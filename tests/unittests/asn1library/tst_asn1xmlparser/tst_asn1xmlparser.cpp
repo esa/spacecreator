@@ -42,6 +42,7 @@ private Q_SLOTS:
     void testChoiceType();
     void testSequenceType();
     void testMixedTypes();
+    void testChoiceReference();
 
 private:
     Asn1XMLParser *xmlParser = nullptr;
@@ -243,6 +244,38 @@ void tst_Asn1XMLParser::testMixedTypes()
     const std::unique_ptr<Asn1Acn::TypeAssignment> &typeAssign10 = definitions->types().at(9);
     QCOMPARE(typeAssign10->name(), QString("MySimpleSeq"));
     QCOMPARE(typeAssign10->type()->typeName(), QString("SEQUENCE"));
+}
+
+void tst_Asn1XMLParser::testChoiceReference()
+{
+    std::unique_ptr<Asn1Acn::File> asn1Types = xmlParser->parseAsn1XmlFile(QFINDTESTDATA("choice_reference.xml"));
+    const Asn1Acn::Definitions *definitions = asn1Types->definitions("DV");
+    QCOMPARE(definitions->types().size(), 2);
+
+    const std::unique_ptr<Asn1Acn::TypeAssignment> &typeAssign1 = definitions->types().at(0);
+    QCOMPARE(typeAssign1->name(), QString("MyInt"));
+    QCOMPARE(typeAssign1->type()->typeName(), QString("INTEGER"));
+    const QVariantMap &data1 = typeAssign1->type()->parameters();
+    QCOMPARE(data1.size(), 2);
+    QCOMPARE(data1[ASN1_MIN].toLongLong(), static_cast<qlonglong>(0));
+    QCOMPARE(data1[ASN1_MAX].toLongLong(), static_cast<qlonglong>(255));
+
+    const std::unique_ptr<Asn1Acn::TypeAssignment> &typeAssign2 = definitions->types().at(1);
+    QCOMPARE(typeAssign2->name(), QString("MyChoice"));
+    QCOMPARE(typeAssign2->type()->typeName(), QString("CHOICE"));
+
+    auto choice = dynamic_cast<const Asn1Acn::Types::Choice *>(typeAssign2->type());
+    QCOMPARE(choice->children().size(), 2);
+
+    const std::unique_ptr<Asn1Acn::Types::Type> &choice1 = choice->children().at(0);
+    QCOMPARE(choice1->typeName(), QString("MyInt"));
+    const QVariantMap &data = choice1->parameters();
+    QCOMPARE(data.size(), 2);
+    QCOMPARE(data[ASN1_MIN].toLongLong(), static_cast<qlonglong>(0));
+    QCOMPARE(data[ASN1_MAX].toLongLong(), static_cast<qlonglong>(255));
+
+    const std::unique_ptr<Asn1Acn::Types::Type> &choice2 = choice->children().at(1);
+    QCOMPARE(choice2->typeName(), QString("BOOLEAN"));
 }
 
 QTEST_APPLESS_MAIN(tst_Asn1XMLParser)

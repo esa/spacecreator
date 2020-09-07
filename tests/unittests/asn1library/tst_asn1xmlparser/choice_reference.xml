@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ASN1AST>
+    <Asn1File FileName="dataview.asn">
+        <Asn1Module ID="DV">
+        <ExportedTypes>
+            <ExportedType Name="MyInt" />
+            <ExportedType Name="MyChoice" /> 
+        </ExportedTypes>
+        <ExportedVariables>
+         
+        </ExportedVariables>
+        <ImportedModules>
+        </ImportedModules>
+        <TypeAssignments>
+            <TypeAssignment Name="MyInt" Line="3" CharPositionInLine="10">
+                <Type Line="3" CharPositionInLine="10" Asn1File="dataview.asn">
+                    <IntegerType Min="0" Max="255"/>
+                </Type>
+            </TypeAssignment>
+            <TypeAssignment Name="MyChoice" Line="5" CharPositionInLine="13">
+                <Type Line="5" CharPositionInLine="13" Asn1File="dataview.asn">
+                    <ChoiceType>
+                        <ChoiceChild VarName="a" Line="5" CharPositionInLine="22" EnumID ="a_PRESENT">
+                            <Type Line="5" CharPositionInLine="24" Asn1File="dataview.asn">
+                                <ReferenceType ReferencedTypeName="MyInt" Min="0" Max="255"/>
+                            </Type>
+                        </ChoiceChild>
+                        <ChoiceChild VarName="b" Line="5" CharPositionInLine="31" EnumID ="b_PRESENT">
+                            <Type Line="5" CharPositionInLine="33" Asn1File="dataview.asn">
+                                <BooleanType />
+                            </Type>
+                        </ChoiceChild>
+                    </ChoiceType>
+                </Type>
+            </TypeAssignment>
+        </TypeAssignments>
+        <VariablesAssignments>
+        </VariablesAssignments>
+        </Asn1Module>
+    </Asn1File>
+</ASN1AST>

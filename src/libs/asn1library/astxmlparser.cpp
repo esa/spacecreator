@@ -379,6 +379,10 @@ void AstXmlParser::readTypeContents(const QString &name, Types::Type *type)
             std::unique_ptr<Types::Type> subType = readType();
             if (subType) {
                 type->addChild(std::move(subType));
+            } else {
+                if (type->parameters().isEmpty()) {
+                    type->setParameters(assignment->type()->parameters());
+                }
             }
         }
         m_xmlReader.skipCurrentElement();
@@ -484,7 +488,9 @@ void AstXmlParser::readChoiceAsn(Types::Type *type)
         std::unique_ptr<Types::Type> choiceType = readType();
         choiceType->setIdentifier(name);
         choice->addChild(std::move(choiceType));
-        m_xmlReader.skipCurrentElement();
+        if (m_xmlReader.name() != QStringLiteral("ChoiceChild")) {
+            m_xmlReader.skipCurrentElement();
+        }
     }
 }
 

@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <ASN1AST>
-    <Asn1File FileName="/home/schwann/work/ESA/SpaceCreator/examples/interfaceview/dataview-uniq.asn">
+    <Asn1File FileName="dataview-uniq.asn">
         <Asn1Module ID="TASTE-BasicTypes">
         <ExportedTypes>
             <ExportedType Name="T-UInt32" />
@@ -21,35 +21,35 @@
         </ImportedModules>
         <TypeAssignments>
             <TypeAssignment Name="T-UInt32" Line="3" CharPositionInLine="13">
-                <Type Line="3" CharPositionInLine="13" Asn1File="/home/schwann/work/ESA/SpaceCreator/examples/interfaceview/dataview-uniq.asn">
+                <Type Line="3" CharPositionInLine="13" Asn1File="dataview-uniq.asn">
                     <IntegerType Min="0" Max="4294967295"/>
                 </Type>
             </TypeAssignment>
             <TypeAssignment Name="TASTE-Peek-id" Line="4" CharPositionInLine="18">
-                <Type Line="4" CharPositionInLine="18" Asn1File="/home/schwann/work/ESA/SpaceCreator/examples/interfaceview/dataview-uniq.asn">
+                <Type Line="4" CharPositionInLine="18" Asn1File="dataview-uniq.asn">
                     <IntegerType Min="0" Max="4294967295"/>
                 </Type>
             </TypeAssignment>
             <TypeAssignment Name="TASTE-Peek-id-list" Line="6" CharPositionInLine="23">
-                <Type Line="6" CharPositionInLine="23" Asn1File="/home/schwann/work/ESA/SpaceCreator/examples/interfaceview/dataview-uniq.asn">
+                <Type Line="6" CharPositionInLine="23" Asn1File="dataview-uniq.asn">
                     <SequenceOfType Min="1" Max="10">
-                        <Type Line="6" CharPositionInLine="50" Asn1File="/home/schwann/work/ESA/SpaceCreator/examples/interfaceview/dataview-uniq.asn">
+                        <Type Line="6" CharPositionInLine="50" Asn1File="dataview-uniq.asn">
                             <ReferenceType ReferencedTypeName="TASTE-Peek-id" Min="0" Max="4294967295"/>
                         </Type>
                     </SequenceOfType>
                 </Type>
             </TypeAssignment>
             <TypeAssignment Name="FixedIntList" Line="7" CharPositionInLine="17">
-                <Type Line="7" CharPositionInLine="17" Asn1File="/home/schwann/work/ESA/SpaceCreator/examples/interfaceview/dataview-uniq.asn">
+                <Type Line="7" CharPositionInLine="17" Asn1File="dataview-uniq.asn">
                     <SequenceOfType Min="3" Max="3">
-                        <Type Line="7" CharPositionInLine="39" Asn1File="/home/schwann/work/ESA/SpaceCreator/examples/interfaceview/dataview-uniq.asn">
+                        <Type Line="7" CharPositionInLine="39" Asn1File="dataview-uniq.asn">
                             <ReferenceType ReferencedTypeName="TASTE-Peek-id" Min="0" Max="4294967295"/>
                         </Type>
                     </SequenceOfType>
                 </Type>
             </TypeAssignment>
             <TypeAssignment Name="MyEnum" Line="9" CharPositionInLine="11">
-                <Type Line="9" CharPositionInLine="11" Asn1File="/home/schwann/work/ESA/SpaceCreator/examples/interfaceview/dataview-uniq.asn">
+                <Type Line="9" CharPositionInLine="11" Asn1File="dataview-uniq.asn">
                     <EnumeratedType Extensible="False" ValuesAutoCalculated="False">
                         <EnumValues>
                             <EnumValue StringValue="one" IntValue="0" Line="9" CharPositionInLine="23" EnumID ="one" />
@@ -62,15 +62,15 @@
                 </Type>
             </TypeAssignment>
             <TypeAssignment Name="MyChoice" Line="11" CharPositionInLine="13">
-                <Type Line="11" CharPositionInLine="13" Asn1File="/home/schwann/work/ESA/SpaceCreator/examples/interfaceview/dataview-uniq.asn">
+                <Type Line="11" CharPositionInLine="13" Asn1File="dataview-uniq.asn">
                     <ChoiceType>
                         <ChoiceChild VarName="a" Line="11" CharPositionInLine="22" EnumID ="a_PRESENT">
-                            <Type Line="11" CharPositionInLine="24" Asn1File="/home/schwann/work/ESA/SpaceCreator/examples/interfaceview/dataview-uniq.asn">
+                            <Type Line="11" CharPositionInLine="24" Asn1File="dataview-uniq.asn">
                                 <BooleanType />
                             </Type>
                         </ChoiceChild>
                         <ChoiceChild VarName="b" Line="11" CharPositionInLine="33" EnumID ="b_PRESENT">
-                            <Type Line="11" CharPositionInLine="35" Asn1File="/home/schwann/work/ESA/SpaceCreator/examples/interfaceview/dataview-uniq.asn">
+                            <Type Line="11" CharPositionInLine="35" Asn1File="dataview-uniq.asn">
                                 <EnumeratedType Extensible="False" ValuesAutoCalculated="False">
                                     <EnumValues>
                                         <EnumValue StringValue="aa" IntValue="0" Line="11" CharPositionInLine="48" EnumID ="aa" />
@@ -83,25 +83,25 @@
                 </Type>
             </TypeAssignment>
             <TypeAssignment Name="MySeq" Line="13" CharPositionInLine="10">
-                <Type Line="13" CharPositionInLine="10" Asn1File="/home/schwann/work/ESA/SpaceCreator/examples/interfaceview/dataview-uniq.asn">
+                <Type Line="13" CharPositionInLine="10" Asn1File="dataview-uniq.asn">
                     <SequenceType>
                         <SequenceOrSetChild VarName="a" CName="a" AdaName="a" Optional="False" Line="13" CharPositionInLine="21" bAlwaysPresent = "True" bAlwaysAbsent="False">
-                            <Type Line="13" CharPositionInLine="23" Asn1File="/home/schwann/work/ESA/SpaceCreator/examples/interfaceview/dataview-uniq.asn">
+                            <Type Line="13" CharPositionInLine="23" Asn1File="dataview-uniq.asn">
                                 <BooleanType />
                             </Type>
                         </SequenceOrSetChild>
                         <SequenceOrSetChild VarName="b" CName="b" AdaName="b" Optional="False" Line="13" CharPositionInLine="32" bAlwaysPresent = "True" bAlwaysAbsent="False">
-                            <Type Line="13" CharPositionInLine="34" Asn1File="/home/schwann/work/ESA/SpaceCreator/examples/interfaceview/dataview-uniq.asn">
+                            <Type Line="13" CharPositionInLine="34" Asn1File="dataview-uniq.asn">
                                 <ReferenceType ReferencedTypeName="MyChoice">
-                                    <Type Line="11" CharPositionInLine="13" Asn1File="/home/schwann/work/ESA/SpaceCreator/examples/interfaceview/dataview-uniq.asn">
+                                    <Type Line="11" CharPositionInLine="13" Asn1File="dataview-uniq.asn">
                                         <ChoiceType>
                                             <ChoiceChild VarName="a" Line="11" CharPositionInLine="22" EnumID ="a_PRESENT">
-                                                <Type Line="11" CharPositionInLine="24" Asn1File="/home/schwann/work/ESA/SpaceCreator/examples/interfaceview/dataview-uniq.asn">
+                                                <Type Line="11" CharPositionInLine="24" Asn1File="dataview-uniq.asn">
                                                     <BooleanType />
                                                 </Type>
                                             </ChoiceChild>
                                             <ChoiceChild VarName="b" Line="11" CharPositionInLine="33" EnumID ="b_PRESENT">
-                                                <Type Line="11" CharPositionInLine="35" Asn1File="/home/schwann/work/ESA/SpaceCreator/examples/interfaceview/dataview-uniq.asn">
+                                                <Type Line="11" CharPositionInLine="35" Asn1File="dataview-uniq.asn">
                                                     <EnumeratedType Extensible="False" ValuesAutoCalculated="False">
                                                         <EnumValues>
                                                             <EnumValue StringValue="aa" IntValue="0" Line="11" CharPositionInLine="48" EnumID ="aa" />
@@ -120,40 +120,40 @@
                 </Type>
             </TypeAssignment>
             <TypeAssignment Name="MySetOf" Line="15" CharPositionInLine="12">
-                <Type Line="15" CharPositionInLine="12" Asn1File="/home/schwann/work/ESA/SpaceCreator/examples/interfaceview/dataview-uniq.asn">
+                <Type Line="15" CharPositionInLine="12" Asn1File="dataview-uniq.asn">
                     <SequenceOfType Min="1" Max="3">
-                        <Type Line="15" CharPositionInLine="32" Asn1File="/home/schwann/work/ESA/SpaceCreator/examples/interfaceview/dataview-uniq.asn">
+                        <Type Line="15" CharPositionInLine="32" Asn1File="dataview-uniq.asn">
                             <IntegerType Min="0" Max="10"/>
                         </Type>
                     </SequenceOfType>
                 </Type>
             </TypeAssignment>
             <TypeAssignment Name="MySeqOf" Line="17" CharPositionInLine="12">
-                <Type Line="17" CharPositionInLine="12" Asn1File="/home/schwann/work/ESA/SpaceCreator/examples/interfaceview/dataview-uniq.asn">
+                <Type Line="17" CharPositionInLine="12" Asn1File="dataview-uniq.asn">
                     <SequenceOfType Min="1" Max="3">
-                        <Type Line="17" CharPositionInLine="37" Asn1File="/home/schwann/work/ESA/SpaceCreator/examples/interfaceview/dataview-uniq.asn">
+                        <Type Line="17" CharPositionInLine="37" Asn1File="dataview-uniq.asn">
                             <IntegerType Min="0" Max="10"/>
                         </Type>
                     </SequenceOfType>
                 </Type>
             </TypeAssignment>
             <TypeAssignment Name="MySimpleSeq" Line="19" CharPositionInLine="16">
-                <Type Line="19" CharPositionInLine="16" Asn1File="/home/schwann/work/ESA/SpaceCreator/examples/interfaceview/dataview-uniq.asn">
+                <Type Line="19" CharPositionInLine="16" Asn1File="dataview-uniq.asn">
                     <SequenceType>
                         <SequenceOrSetChild VarName="a" CName="a" AdaName="a" Optional="False" Line="19" CharPositionInLine="27" bAlwaysPresent = "True" bAlwaysAbsent="False">
-                            <Type Line="19" CharPositionInLine="29" Asn1File="/home/schwann/work/ESA/SpaceCreator/examples/interfaceview/dataview-uniq.asn">
+                            <Type Line="19" CharPositionInLine="29" Asn1File="dataview-uniq.asn">
                                 <IntegerType Min="0" Max="255"/>
                             </Type>
                         </SequenceOrSetChild>
                         <SequenceOrSetChild VarName="b" CName="b" AdaName="b" Optional="False" Line="19" CharPositionInLine="47" bAlwaysPresent = "True" bAlwaysAbsent="False">
-                            <Type Line="19" CharPositionInLine="49" Asn1File="/home/schwann/work/ESA/SpaceCreator/examples/interfaceview/dataview-uniq.asn">
+                            <Type Line="19" CharPositionInLine="49" Asn1File="dataview-uniq.asn">
                                 <BooleanType />
                             </Type>
                         </SequenceOrSetChild>
                         <SequenceOrSetChild VarName="c" CName="c" AdaName="c" Optional="False" Line="19" CharPositionInLine="58" bAlwaysPresent = "True" bAlwaysAbsent="False">
-                            <Type Line="19" CharPositionInLine="60" Asn1File="/home/schwann/work/ESA/SpaceCreator/examples/interfaceview/dataview-uniq.asn">
+                            <Type Line="19" CharPositionInLine="60" Asn1File="dataview-uniq.asn">
                                 <ReferenceType ReferencedTypeName="MyEnum">
-                                    <Type Line="9" CharPositionInLine="11" Asn1File="/home/schwann/work/ESA/SpaceCreator/examples/interfaceview/dataview-uniq.asn">
+                                    <Type Line="9" CharPositionInLine="11" Asn1File="dataview-uniq.asn">
                                         <EnumeratedType Extensible="False" ValuesAutoCalculated="False">
                                             <EnumValues>
                                                 <EnumValue StringValue="one" IntValue="0" Line="9" CharPositionInLine="23" EnumID ="one" />
