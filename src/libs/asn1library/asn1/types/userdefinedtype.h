@@ -35,7 +35,7 @@ namespace Types {
 class UserdefinedType : public Type
 {
 public:
-    UserdefinedType(const QString &typeName, const QString &module);
+    UserdefinedType(const QString &typeName, const QString &module, const TypeAssignment *referencedType);
 
     QString typeName() const override;
     QString label() const override;
@@ -44,9 +44,12 @@ public:
 
     QString baseIconFile() const override;
 
+    const TypeAssignment *referencedType() const;
+
 private:
     QString m_name;
     QString m_module;
+    const TypeAssignment *m_referencedType = nullptr;
 };
 
 }

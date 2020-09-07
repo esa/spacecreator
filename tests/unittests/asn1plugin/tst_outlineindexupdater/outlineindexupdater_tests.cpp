@@ -119,21 +119,21 @@ Asn1Acn::Node *OutlineIndexUpdaterTests::createModelNodes(const QString &filePat
 
     auto definitions1 = std::make_unique<Asn1Acn::Definitions>("Test1", Asn1Acn::SourceLocation { filePath, 1, 0 });
     definitions1->addType(std::make_unique<Asn1Acn::TypeAssignment>("Num1", Asn1Acn::SourceLocation { filePath, 2, 3 },
-            std::make_unique<Asn1Acn::Types::UserdefinedType>("UserTypeName", "Test1")));
+            std::make_unique<Asn1Acn::Types::UserdefinedType>("UserTypeName", "Test1", nullptr)));
     definitions1->addType(std::make_unique<Asn1Acn::TypeAssignment>("Num2", Asn1Acn::SourceLocation { filePath, 3, 3 },
-            std::make_unique<Asn1Acn::Types::UserdefinedType>("UserTypeName", "Test1")));
+            std::make_unique<Asn1Acn::Types::UserdefinedType>("UserTypeName", "Test1", nullptr)));
     root->add(std::move(definitions1));
 
     auto definitions2 = std::make_unique<Asn1Acn::Definitions>("Test2", Asn1Acn::SourceLocation { filePath, 5, 0 });
     definitions2->addType(std::make_unique<Asn1Acn::TypeAssignment>("Num3", Asn1Acn::SourceLocation { filePath, 6, 3 },
-            std::make_unique<Asn1Acn::Types::UserdefinedType>("UserTypeName", "Test2")));
+            std::make_unique<Asn1Acn::Types::UserdefinedType>("UserTypeName", "Test2", nullptr)));
     definitions2->addType(std::make_unique<Asn1Acn::TypeAssignment>("Num4", Asn1Acn::SourceLocation { filePath, 7, 3 },
-            std::make_unique<Asn1Acn::Types::UserdefinedType>("UserTypeName", "Test2")));
+            std::make_unique<Asn1Acn::Types::UserdefinedType>("UserTypeName", "Test2", nullptr)));
 
     definitions2->addType(std::make_unique<Asn1Acn::TypeAssignment>("Num5", Asn1Acn::SourceLocation { filePath, 8, 3 },
-            std::make_unique<Asn1Acn::Types::UserdefinedType>("UserTypeName", "Test2")));
+            std::make_unique<Asn1Acn::Types::UserdefinedType>("UserTypeName", "Test2", nullptr)));
     definitions2->addType(std::make_unique<Asn1Acn::TypeAssignment>("Num6", Asn1Acn::SourceLocation { filePath, 8, 42 },
-            std::make_unique<Asn1Acn::Types::UserdefinedType>("UserTypeName", "Test2")));
+            std::make_unique<Asn1Acn::Types::UserdefinedType>("UserTypeName", "Test2", nullptr)));
     root->add(std::move(definitions2));
 
     m_data = root;

@@ -406,10 +406,11 @@ std::unique_ptr<Types::Type> AstXmlParser::readReferenceType(const SourceLocatio
     }
 
     auto ref = std::make_unique<TypeReference>(refName, module, location);
+    const TypeAssignment *referencedType = m_currentDefinitions->type(refName);
 
     m_data[m_currentFile]->addTypeReference(std::move(ref));
 
-    return std::make_unique<Types::UserdefinedType>(refName, module);
+    return std::make_unique<Types::UserdefinedType>(refName, module, referencedType);
 }
 
 void AstXmlParser::readSequence()

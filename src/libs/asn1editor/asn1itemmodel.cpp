@@ -21,6 +21,7 @@
 #include "asn1editorconst.h"
 #include "typeassignment.h"
 #include "types/builtintypes.h"
+#include "types/userdefinedtype.h"
 
 #include <QStandardItem>
 
@@ -127,7 +128,7 @@ Asn1ItemModel::ItemMap Asn1ItemModel::createModelItems(const Asn1Acn::Types::Typ
         break;
     default:
         if (asn1Item->children().empty()) {
-            valueItem = new QStandardItem();
+            valueItem = createItem(asn1Item);
         } else {
             valueItem = createChildItems(asn1Item, nameItem);
             valueItem->setEditable(false);
@@ -291,7 +292,15 @@ QStandardItem *Asn1ItemModel::createItem(const Asn1Acn::Types::Type *asn1Item, c
 {
     QStandardItem *item = new QStandardItem(text);
 
-    item->setData(asn1Item->typeEnum(), ASN1TYPE_ROLE);
+    Asn1Acn::Types::Type::ASN1Type asntype = asn1Item->typeEnum();
+    if (asntype == Asn1Acn::Types::Type::USERDEFINED) {
+        auto userType = static_cast<const Asn1Acn::Types::UserdefinedType *>(asn1Item);
+        if (userType->referencedType()) {
+            asntype = userType->referencedType()->typeEnum();
+        }
+    }
+
+    item->setData(asntype, ASN1TYPE_ROLE);
     const QVariantMap &values = asn1Item->parameters();
     if (values.contains(Asn1Acn::ASN1_MIN))
         item->setData(values[Asn1Acn::ASN1_MIN], MIN_RANGE_ROLE);

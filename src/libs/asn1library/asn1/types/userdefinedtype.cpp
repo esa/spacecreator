@@ -27,9 +27,10 @@
 
 using namespace Asn1Acn::Types;
 
-UserdefinedType::UserdefinedType(const QString &name, const QString &module)
+UserdefinedType::UserdefinedType(const QString &name, const QString &module, const TypeAssignment *referencedType)
     : m_name(name)
     , m_module(module)
+    , m_referencedType(referencedType)
 {
 }
 
@@ -51,4 +52,12 @@ Type::ASN1Type UserdefinedType::typeEnum() const
 QString UserdefinedType::baseIconFile() const
 {
     return QStringLiteral(":/asn1acn/images/outline/userdefined.png");
+}
+
+/*!
+   Returns the type that this one is based on (references to)
+ */
+const Asn1Acn::TypeAssignment *UserdefinedType::referencedType() const
+{
+    return m_referencedType;
 }
