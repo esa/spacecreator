@@ -15,7 +15,6 @@
         <file alias="fonts/UbuntuMono-RI.ttf">resources/ubuntu-font-family-0.83/UbuntuMono-RI.ttf</file>
     </qresource>
     <qresource prefix="/defaults">
-        <file>resources/taste-types.asn</file>
         <file>interface/properties/resources/aadl_properties.json</file>
         <file>resources/contextmenu.json</file>
         <file>templating/xml_templates/comment.tmplt</file>

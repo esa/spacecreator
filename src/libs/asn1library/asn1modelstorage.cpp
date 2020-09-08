@@ -46,7 +46,7 @@ QString ensureAsnFileExists()
 
     QString asnFilePath = QString("%1/%2").arg(targetDir, asnFileName);
 
-    const QString &rscFilePath = QString(":/defaults/resources/%1").arg(asnFileName);
+    const QString &rscFilePath = QString(":/asn1resources/%1").arg(asnFileName);
     if (shared::copyResourceFile(rscFilePath, asnFilePath, shared::FileCopyingMode::Overwrite)) {
         return asnFilePath;
     }

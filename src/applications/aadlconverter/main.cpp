@@ -15,6 +15,7 @@
   along with this program. If not, see <https://www.gnu.org/licenses/lgpl-2.1.html>.
 */
 
+#include "asn1library.h"
 #include "commandlineparser.h"
 #include "interface/interfacedocument.h"
 #include "iveditor.h"
@@ -26,8 +27,9 @@
 
 int main(int argc, char *argv[])
 {
-    shared::initSharedLibrary();
+    Asn1Acn::initAsn1Library();
     aadlinterface::initIvEditor();
+    shared::initSharedLibrary();
 
     QCoreApplication a(argc, argv);
     a.setOrganizationName(SC_ORGANISATION);

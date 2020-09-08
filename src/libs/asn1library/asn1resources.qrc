@@ -1,0 +1,5 @@
+<RCC>
+    <qresource prefix="/">
+        <file>asn1resources/taste-types.asn</file>
+    </qresource>
+</RCC>

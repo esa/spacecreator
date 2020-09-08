@@ -9,6 +9,7 @@ target_sources(${APP_NAME} PRIVATE
 
 target_link_libraries(${APP_NAME} PUBLIC
     aadl
+    asn1library
     libiveditor
     shared
     templating

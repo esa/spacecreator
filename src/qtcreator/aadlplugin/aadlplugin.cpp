@@ -20,6 +20,7 @@
 #include "aadleditordata.h"
 #include "aadleditorfactory.h"
 #include "aadlpluginconstants.h"
+#include "asn1library.h"
 #include "iveditor.h"
 #include "iveditorcore.h"
 #include "sharedlibrary.h"
@@ -35,8 +36,9 @@ namespace AadlPlugin {
 
 AADLPlugin::AADLPlugin()
 {
-    shared::initSharedLibrary();
+    Asn1Acn::initAsn1Library();
     aadlinterface::initIvEditor();
+    shared::initSharedLibrary();
 }
 
 AADLPlugin::~AADLPlugin()
