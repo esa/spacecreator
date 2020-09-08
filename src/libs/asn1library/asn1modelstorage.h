@@ -18,8 +18,10 @@
 #pragma once
 
 #include <QFileInfo>
+#include <QHash>
 #include <QMap>
 #include <QObject>
+#include <QSet>
 #include <QSharedPointer>
 #include <QString>
 #include <QTimer>
@@ -34,35 +36,35 @@ namespace Types {
 class Type;
 }
 
+/*!
+   Stores shared pointers to all asn1 file objects. If needed the file i loaded (lazy loading).
+   A signal is emitted when a file loaded already is changed \sa dataTypesChanged
+ */
 class Asn1ModelStorage : public QObject
 {
     Q_OBJECT
 public:
     Asn1ModelStorage();
-    Asn1ModelStorage(QSharedPointer<Asn1Acn::File> &dataTypes);
     ~Asn1ModelStorage();
 
-    void init();
-
-    const QSharedPointer<Asn1Acn::File> &asn1DataTypes() const;
-
-    Q_SLOT void setFileName(const QFileInfo &fileName);
-    const QFileInfo &fileName() const;
-
-    void loadDefault();
-
-    Q_SLOT bool loadFile();
+    QSharedPointer<File> asn1DataTypes(const QString &fileName) const;
 
     void clear();
 
 Q_SIGNALS:
-    void dataTypesChanged();
+    void dataTypesChanged(const QString &fileName);
 
 private:
-    QSharedPointer<Asn1Acn::File> m_asn1DataTypes;
-    QFileInfo m_fileName;
+    bool loadFile(const QString &fileName);
+    QSharedPointer<Asn1Acn::File> loadData(const QString &fileName) const;
+    Q_SLOT void loadChangedFiles();
+    QSharedPointer<File> defaultTypes() const;
+
+    QHash<QString, QSharedPointer<Asn1Acn::File>> m_store;
+    mutable QSharedPointer<Asn1Acn::File> m_defaultTypes;
     QFileSystemWatcher *m_asn1Watcher = nullptr;
     QTimer m_reloadTimer;
+    QSet<QString> m_filesToReload;
 };
 
 }

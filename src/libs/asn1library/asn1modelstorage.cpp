@@ -33,7 +33,7 @@
 
 namespace Asn1Acn {
 
-static QString ensureAsnFileExists()
+QString ensureAsnFileExists()
 {
     const QString asnFileName("taste-types.asn");
     const QString targetDir = QStandardPaths::writableLocation(QStandardPaths::AppLocalDataLocation);
@@ -55,98 +55,108 @@ static QString ensureAsnFileExists()
     return QString();
 }
 
+/*!
+   \brief Asn1ModelStorage::Asn1ModelStorage
+ */
 Asn1ModelStorage::Asn1ModelStorage()
-{
-    loadDefault();
-    m_reloadTimer.setSingleShot(true);
-    connect(&m_reloadTimer, &QTimer::timeout, this, &Asn1Acn::Asn1ModelStorage::loadFile);
-}
-
-Asn1ModelStorage::Asn1ModelStorage(QSharedPointer<File> &dataTypes)
-    : m_asn1DataTypes(dataTypes)
+    : m_asn1Watcher(new QFileSystemWatcher(this))
 {
     m_reloadTimer.setSingleShot(true);
-    connect(&m_reloadTimer, &QTimer::timeout, this, &Asn1Acn::Asn1ModelStorage::loadFile);
+    connect(&m_reloadTimer, &QTimer::timeout, this, &Asn1Acn::Asn1ModelStorage::loadChangedFiles);
 }
 
+/*!
+   \brief Asn1ModelStorage::~Asn1ModelStorage
+ */
 Asn1ModelStorage::~Asn1ModelStorage() { }
 
-const QSharedPointer<Asn1Acn::File> &Asn1ModelStorage::asn1DataTypes() const
-{
-    return m_asn1DataTypes;
-}
-
 /*!
-   Set the asn1 file for this types storage. \note The data is reloaded by this function
+   Returns the asn types for the given file (full path).
+   If the file can't be loaded a default set of types is returned.
  */
-void Asn1ModelStorage::setFileName(const QFileInfo &fileName)
+QSharedPointer<Asn1Acn::File> Asn1ModelStorage::asn1DataTypes(const QString &fileName) const
 {
-    if (m_asn1Watcher != nullptr) {
-        // Check if the directory is watched already
-        if (!m_asn1Watcher->files().contains(fileName.absoluteFilePath())) {
-            disconnect(m_asn1Watcher, nullptr, this, nullptr);
-            m_asn1Watcher->deleteLater();
-            m_asn1Watcher = nullptr;
-        }
+    if (fileName.isEmpty()) {
+        return defaultTypes();
     }
 
-    m_fileName = fileName;
-    loadFile();
+    if (!m_store.contains(fileName)) {
+        auto nonConstThis = const_cast<Asn1ModelStorage *>(this);
+        nonConstThis->loadFile(fileName);
+    }
 
-    if (m_asn1Watcher == nullptr && m_fileName.exists()) {
-        m_asn1Watcher = new QFileSystemWatcher(this);
-        m_asn1Watcher->addPath(m_fileName.absoluteFilePath());
-        connect(m_asn1Watcher, &QFileSystemWatcher::fileChanged, this, [this]() {
-            m_reloadTimer.stop();
-            m_reloadTimer.start(20);
-        });
+    if (m_store.contains(fileName)) {
+        return m_store[fileName];
+    } else {
+        return defaultTypes();
     }
 }
 
 /*!
-   Returns the full file information of the asn1 file used for this types storage
+   Clears the whole store
  */
-const QFileInfo &Asn1ModelStorage::fileName() const
+void Asn1ModelStorage::clear()
 {
-    return m_fileName;
-}
-
-/*!
-   Loads the default ASN1 data
- */
-void Asn1ModelStorage::loadDefault()
-{
-    const QString &asnFilePath = ensureAsnFileExists();
-    setFileName(asnFilePath);
+    m_reloadTimer.stop();
+    m_filesToReload.clear();
+    const QStringList files = m_store.keys();
+    if (!files.isEmpty()) {
+        m_asn1Watcher->removePaths(m_store.keys());
+    }
+    m_store.clear();
 }
 
 /*!
    Load the data types stored the file \sa fileName
  */
-bool Asn1ModelStorage::loadFile()
+bool Asn1ModelStorage::loadFile(const QString &fileName)
 {
-    QStringList errorMessages;
-    Asn1Acn::Asn1XMLParser parser;
-    std::unique_ptr<Asn1Acn::File> asn1Data = parser.parseAsn1File(m_fileName, &errorMessages);
-    if (!errorMessages.isEmpty()) {
-        qWarning() << "Can't read file:" << m_fileName << errorMessages.join(", ");
+    QSharedPointer<Asn1Acn::File> asn1Data = loadData(fileName);
+    if (asn1Data.isNull()) {
         return false;
     }
 
-    m_asn1DataTypes.reset(asn1Data.release());
-    Q_EMIT dataTypesChanged();
+    m_store[fileName] = asn1Data;
+    Q_EMIT dataTypesChanged(fileName);
 
+    if (QFileInfo::exists(fileName) && !m_asn1Watcher->files().contains(fileName)) {
+        m_asn1Watcher->addPath(fileName);
+        connect(m_asn1Watcher, &QFileSystemWatcher::fileChanged, this, [this](const QString &path) {
+            m_reloadTimer.stop();
+            m_reloadTimer.start(20);
+            m_filesToReload.insert(path);
+        });
+    }
     return true;
 }
 
-/*!
-   Clear the types data and set the filename to empty.
- */
-void Asn1ModelStorage::clear()
+QSharedPointer<File> Asn1ModelStorage::loadData(const QString &fileName) const
 {
-    m_fileName.setFile("");
-    m_asn1DataTypes.reset();
-    Q_EMIT dataTypesChanged();
+    QStringList errorMessages;
+    Asn1Acn::Asn1XMLParser parser;
+    std::unique_ptr<Asn1Acn::File> asn1Data = parser.parseAsn1File(QFileInfo(fileName), &errorMessages);
+    if (!errorMessages.isEmpty()) {
+        qWarning() << "Can't read file:" << fileName << errorMessages.join(", ");
+        return {};
+    }
+    return QSharedPointer<Asn1Acn::File>(asn1Data.release());
+}
+
+void Asn1ModelStorage::loadChangedFiles()
+{
+    for (QString fileName : m_filesToReload) {
+        loadFile(fileName);
+    }
+    m_filesToReload.clear();
+}
+
+QSharedPointer<File> Asn1ModelStorage::defaultTypes() const
+{
+    if (m_defaultTypes.isNull()) {
+        const QString defaultFile = ensureAsnFileExists();
+        m_defaultTypes = loadData(defaultFile);
+    }
+    return m_defaultTypes;
 }
 
 }

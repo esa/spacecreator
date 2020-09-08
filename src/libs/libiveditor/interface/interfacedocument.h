@@ -73,6 +73,7 @@ public:
 
     void setAsn1FileName(const QString &asnfile);
     QString asn1FileName() const;
+    QString asn1FilePath() const;
 
     void setMscFileName(const QString &mscFile);
     const QString &mscFileName() const;

@@ -159,6 +159,7 @@ struct InterfaceDocument::InterfaceDocumentPrivate {
 
     Asn1Acn::Asn1ModelStorage *asnDataTypes { new Asn1Acn::Asn1ModelStorage() };
     QString mscFileName;
+    QString asnFileName;
 };
 
 /*!
@@ -290,9 +291,7 @@ QString InterfaceDocument::path() const
  */
 void InterfaceDocument::setAsn1FileName(const QString &asnfile)
 {
-    QFileInfo fi(d->filePath);
-    fi.setFile(fi.absolutePath() + QDir::separator() + asnfile);
-    d->asnDataTypes->setFileName(fi);
+    d->asnFileName = asnfile;
 }
 
 /*!
@@ -300,7 +299,14 @@ void InterfaceDocument::setAsn1FileName(const QString &asnfile)
  */
 QString InterfaceDocument::asn1FileName() const
 {
-    return d->asnDataTypes->fileName().fileName();
+    return d->asnFileName;
+}
+
+QString InterfaceDocument::asn1FilePath() const
+{
+    QFileInfo fi(path());
+    fi.setFile(fi.absolutePath() + QDir::separator() + d->asnFileName);
+    return fi.absoluteFilePath();
 }
 
 /*!
@@ -548,7 +554,7 @@ void InterfaceDocument::onDynContextEditorMenuInvoked()
 void InterfaceDocument::showPropertyEditor(aadl::AADLObject *obj)
 {
     aadlinterface::PropertiesDialog *dialog = new aadlinterface::PropertiesDialog(
-            obj, d->asnDataTypes->asn1DataTypes(), qobject_cast<QWidget *>(parent()));
+            obj, d->asnDataTypes->asn1DataTypes(asn1FilePath()), qobject_cast<QWidget *>(parent()));
     dialog->setAttribute(Qt::WA_DeleteOnClose);
     dialog->open();
 }
@@ -582,13 +588,7 @@ bool InterfaceDocument::loadImpl(const QString &path)
     aadl::AADLXMLReader parser;
     connect(&parser, &aadl::AADLXMLReader::objectsParsed, this, &InterfaceDocument::setObjects);
     connect(&parser, &aadl::AADLXMLReader::metaDataParsed, this, [this, path](const QVariantMap &metadata) {
-        if (metadata.contains("asn1file")) {
-            QFileInfo fi(path);
-            fi.setFile(fi.absolutePath() + QDir::separator() + metadata["asn1file"].toString());
-            d->asnDataTypes->setFileName(fi);
-        } else {
-            d->asnDataTypes->loadDefault();
-        }
+        setAsn1FileName(metadata["asn1file"].toString());
         setMscFileName(metadata["mscfile"].toString());
     });
     connect(&parser, &aadl::AADLXMLReader::error, [](const QString &msg) { qWarning() << msg; });
