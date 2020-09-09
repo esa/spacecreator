@@ -51,7 +51,7 @@ namespace MscPlugin {
 
 MainWidget::MainWidget(QWidget *parent)
     : QWidget(parent)
-    , m_plugin(new msc::MSCEditorCore(this))
+    , m_plugin(new msc::MSCEditorCore())
 {
     initUi();
 
