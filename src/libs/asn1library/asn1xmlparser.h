@@ -48,6 +48,9 @@ private:
     QString asn1CompilerCommand() const;
     QString temporaryFileName(const QString &basename, const QString &suffix) const;
 
+    QByteArray fileHash(const QString &fileName) const;
+    bool convertToXML(const QString &asn1FileName, const QString &xmlFilename, QStringList *errorMessages) const;
+
     static QString m_asn1Compiler;
     static QString m_mono;
 };

@@ -21,11 +21,13 @@
 #include "astxmlparser.h"
 #include "file.h"
 
+#include <QCryptographicHash>
 #include <QDebug>
 #include <QDir>
 #include <QFileInfo>
 #include <QProcess>
 #include <QRandomGenerator>
+#include <QStandardPaths>
 
 namespace Asn1Acn {
 
@@ -45,60 +47,23 @@ std::unique_ptr<Asn1Acn::File> Asn1XMLParser::parseAsn1File(const QFileInfo &fil
 std::unique_ptr<Asn1Acn::File> Asn1XMLParser::parseAsn1File(
         const QString &filePath, const QString &fileName, QStringList *errorMessages)
 {
-    static QString asn1Command;
-    if (asn1Command.isEmpty()) {
-        QString cmd = asn1CompilerCommand();
-        if (cmd.isEmpty()) {
-            if (errorMessages)
-                errorMessages->append(tr(
-                        "ASN1 parse error: Unable to run the asn1scc compiler. https://github.com/ttsiodras/asn1scc"));
-            return {};
-        }
-        asn1Command = cmd + "%1 %2";
-    }
-
-    // convert ASN.1 to XML
-    auto fullFilePath = [](const QString &path, const QString &name) {
-        return QFileInfo(QDir(path), name).absoluteFilePath();
-    };
-
-    QString asn1FileName = "\"" + fullFilePath(filePath, fileName) + "\"";
-    QString asn1XMLFileName = temporaryFileName("asn1", "xml");
-
-    QProcess asn1Process;
-    connect(&asn1Process, QOverload<int, QProcess::ExitStatus>::of(&QProcess::finished),
-            [&](int, QProcess::ExitStatus exitStatus) {
-                if (exitStatus == QProcess::CrashExit) {
-                    const QString message = tr("asn1scc compiler process crashed");
-                    qWarning() << message;
-                    if (errorMessages)
-                        errorMessages->append(message);
-                }
-            });
-
-    connect(&asn1Process, &QProcess::errorOccurred, [&](QProcess::ProcessError) {
-        qWarning() << asn1Process.errorString();
-        if (errorMessages)
-            errorMessages->append(asn1Process.errorString());
-    });
-
-    asn1Process.setProcessEnvironment(QProcessEnvironment::systemEnvironment());
-    asn1Process.setProcessChannelMode(QProcess::MergedChannels);
-    asn1Process.start(QString(asn1Command).arg(asn1XMLFileName, asn1FileName));
-    asn1Process.waitForFinished();
-
-    auto error = asn1Process.readAll();
-    if (!error.isEmpty()) {
-        qWarning() << error;
-        if (errorMessages)
-            errorMessages->append(error);
-        QFile::remove(asn1XMLFileName);
+    const QFileInfo asn1File(QDir(filePath), fileName);
+    if (!asn1File.exists()) {
+        errorMessages->append(tr("ASN.1 file %1 does not exist").arg(asn1File.absoluteFilePath()));
         return {};
     }
 
-    std::unique_ptr<Asn1Acn::File> asn1TypesData = parseAsn1XmlFile(asn1XMLFileName);
+    const QString fullFilePath = asn1File.absoluteFilePath();
+    const QByteArray asn1FileHash = fileHash(fullFilePath);
 
-    QFile::remove(asn1XMLFileName);
+    const QString asnCacheFile =
+            QStandardPaths::writableLocation(QStandardPaths::CacheLocation) + "/asn/" + asn1FileHash + ".xml";
+
+    if (!QFile::exists(asnCacheFile)) {
+        convertToXML(fullFilePath, asnCacheFile, errorMessages);
+    }
+
+    std::unique_ptr<Asn1Acn::File> asn1TypesData = parseAsn1XmlFile(asnCacheFile);
 
     return asn1TypesData;
 }
@@ -141,8 +106,9 @@ std::unique_ptr<Asn1Acn::File> Asn1XMLParser::parseAsn1XmlFile(const QString &fi
 
 QString Asn1XMLParser::asn1AsHtml(const QString &filename) const
 {
-    if (filename.isEmpty() || !QFile::exists(filename))
+    if (filename.isEmpty() || !QFile::exists(filename) || QFileInfo(filename).isDir()) {
         return {};
+    }
 
     checkforCompiler();
     if (!m_asn1Compiler.isEmpty()) {
@@ -258,6 +224,73 @@ QString Asn1XMLParser::temporaryFileName(const QString &basename, const QString 
 {
     quint32 value = QRandomGenerator::securelySeeded().generate();
     return QDir::tempPath() + QDir::separator() + QString("%1_%2.%3").arg(basename).arg(value).arg(suffix);
+}
+
+QByteArray Asn1XMLParser::fileHash(const QString &fileName) const
+{
+    QFile file(fileName);
+    if (file.open(QIODevice::ReadOnly)) {
+        QByteArray content = file.readAll();
+        QByteArray hash = QCryptographicHash::hash(content, QCryptographicHash::Md5);
+        return hash.toHex();
+    }
+    return {};
+}
+
+bool Asn1XMLParser::convertToXML(
+        const QString &asn1FileName, const QString &xmlFilename, QStringList *errorMessages) const
+{
+    static QString asn1Command;
+    if (asn1Command.isEmpty()) {
+        QString cmd = asn1CompilerCommand();
+        if (cmd.isEmpty()) {
+            if (errorMessages)
+                errorMessages->append(tr(
+                        "ASN1 parse error: Unable to run the asn1scc compiler. https://github.com/ttsiodras/asn1scc"));
+            return false;
+        }
+        asn1Command = cmd + "%1 %2";
+    }
+
+    QString asn1FileNameParameter = "\"" + asn1FileName + "\"";
+    QString asn1XMLFileName = temporaryFileName("asn1", "xml");
+
+    QProcess asn1Process;
+    connect(&asn1Process, QOverload<int, QProcess::ExitStatus>::of(&QProcess::finished),
+            [&](int, QProcess::ExitStatus exitStatus) {
+                if (exitStatus == QProcess::CrashExit) {
+                    const QString message = tr("asn1scc compiler process crashed");
+                    qWarning() << message;
+                    if (errorMessages)
+                        errorMessages->append(message);
+                }
+            });
+
+    connect(&asn1Process, &QProcess::errorOccurred, [&](QProcess::ProcessError) {
+        qWarning() << asn1Process.errorString();
+        if (errorMessages)
+            errorMessages->append(asn1Process.errorString());
+    });
+
+    asn1Process.setProcessEnvironment(QProcessEnvironment::systemEnvironment());
+    asn1Process.setProcessChannelMode(QProcess::MergedChannels);
+    asn1Process.start(QString(asn1Command).arg(asn1XMLFileName, asn1FileNameParameter));
+    asn1Process.waitForFinished();
+
+    auto error = asn1Process.readAll();
+    if (!error.isEmpty()) {
+        qWarning() << error;
+        if (errorMessages)
+            errorMessages->append(error);
+        QFile::remove(asn1XMLFileName);
+        return false;
+    }
+
+    QDir createpath;
+    createpath.mkpath(QFileInfo(xmlFilename).absolutePath());
+    QFile::rename(asn1XMLFileName, xmlFilename);
+
+    return QFile::exists(xmlFilename);
 }
 
 } // namespace asn1
