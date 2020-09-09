@@ -148,6 +148,7 @@ void MessageCreatorTool::commitPreviewItem()
             const QVariantList &cmdParams = prepareMessage();
             if (!cmdParams.isEmpty()) {
                 startWaitForModelLayoutComplete(m_message);
+                removePreviewItem(); // Remove the preview item before the real one is added
                 msc::cmd::CommandsStack::push(msc::cmd::Id::CreateMessage, cmdParams);
 
                 Q_EMIT created(); // to deactivate toobar's item
