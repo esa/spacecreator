@@ -172,6 +172,12 @@ void MscModel::setAsn1TypesData(QSharedPointer<Asn1Acn::File> data)
 
     m_asn1Data.swap(data);
     Q_EMIT asn1DataChanged();
+
+    QStringList faultyMessages;
+    const bool ok = checkAllMessagesForAsn1Compliance(&faultyMessages);
+    if (!ok) {
+        Q_EMIT asn1ParameterErrorDetected(faultyMessages);
+    }
 }
 
 const QSharedPointer<Asn1Acn::File> &MscModel::asn1Types() const
