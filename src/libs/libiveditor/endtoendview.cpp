@@ -16,6 +16,7 @@
 #include <QFileInfo>
 #include <QGraphicsScene>
 #include <QLabel>
+#include <QMessageBox>
 #include <QPushButton>
 
 namespace aadlinterface {
@@ -27,6 +28,8 @@ struct EndToEndView::EndToEndViewPrivate {
     InterfaceDocument *document { nullptr };
 
     EndToEndConnections dataflow;
+
+    QString lastExportPath;
 };
 
 //! Initialize this with the current document
@@ -41,6 +44,7 @@ EndToEndView::EndToEndView(InterfaceDocument *document, QWidget *parent)
     auto pathLabel = new QLabel;
     auto pathButton = new QPushButton(tr("&Choose MSC file"));
     auto refreshButton = new QPushButton(tr("&Refresh view"));
+    auto exportButton = new QPushButton(tr("&Save as PNG"));
 
     d->view = new shared::ui::GraphicsViewBase;
     d->view->setInteractive(false);
@@ -53,6 +57,7 @@ EndToEndView::EndToEndView(InterfaceDocument *document, QWidget *parent)
     barLayout->addWidget(pathLabel);
     barLayout->addWidget(pathButton);
     barLayout->addWidget(refreshButton);
+    barLayout->addWidget(exportButton);
     barLayout->addStretch(1);
     auto layout = new QVBoxLayout(this);
     layout->addLayout(barLayout);
@@ -80,11 +85,37 @@ EndToEndView::EndToEndView(InterfaceDocument *document, QWidget *parent)
         }
     });
 
+    connect(exportButton, &QPushButton::clicked, this, [this]() {
+        const QString path = QFileDialog::getSaveFileName(
+                parentWidget(), tr("Save as PNG"), d->lastExportPath, tr("PNG Images (*.png)"));
+        if (!path.isEmpty()) {
+            d->lastExportPath = path;
+
+            // Create an image the size of the scene and render the scene into it
+            QPixmap image(d->scene->sceneRect().size().toSize());
+            image.fill(Qt::transparent);
+            QPainter painter(&image);
+            painter.setRenderHint(QPainter::Antialiasing);
+            painter.setRenderHint(QPainter::TextAntialiasing);
+            d->scene->render(&painter);
+            painter.end();
+            if (!image.save(path)) {
+                QMessageBox::critical(parentWidget(), tr("Export failed"), tr("Saving to file %1 failed").arg(path));
+            }
+        }
+    });
+
     // Listen to path changes from the document
     connect(d->document, &InterfaceDocument::mscFileNameChanged, this, setPath);
 
     // Refresh the view
     connect(refreshButton, &QPushButton::clicked, this, &EndToEndView::refreshView);
+
+    if (parent != nullptr) {
+        // Size this a bit smaller than the parent
+        resize(parent->width() - 20, parent->height() - 20);
+        move(parent->x() + 10, parent->y() + 10);
+    }
 }
 
 EndToEndView::~EndToEndView()
@@ -220,6 +251,9 @@ void EndToEndView::refreshView()
             d->scene->addItem(item);
         }
     }
+
+    // Set the scene rect based on what we show
+    d->scene->setSceneRect(d->scene->itemsBoundingRect());
 }
 
 }
