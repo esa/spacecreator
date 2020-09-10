@@ -69,6 +69,7 @@ void tst_EndToEndConnections::testReader()
     QCOMPARE(dataflow.connections[1].message, QString("Access Database"));
 
     QCOMPARE(dataflow.internalConnections.size(), 2);
+    qDebug() << dataflow.internalConnections;
     QCOMPARE(dataflow.internalConnections[0].instance, QString("User Interface"));
     QCOMPARE(dataflow.internalConnections[0].interface1, QString("Start Transaction"));
     QCOMPARE(dataflow.internalConnections[0].interface2, QString("Open File"));
