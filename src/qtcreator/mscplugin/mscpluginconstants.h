@@ -34,6 +34,7 @@ const char C_MSCEDITOR_DISPLAY_NAME[] = QT_TRANSLATE_NOOP("OpenWith::Editors", "
 
 const char MESSAGE_DECLARATIONS_ID[] = "MscPlugin.MessageDeclarations";
 const char CHECK_INSTANCES_ID[] = "MscPlugin.CheckInstances";
+const char CHECK_MESSAGES_ID[] = "MscPlugin.CheckMessages";
 const char SHOW_MINIMAP_ID[] = "MscPlugin.Minimap";
 const char MENU_ID[] = "MscPlugin.Menu";
 

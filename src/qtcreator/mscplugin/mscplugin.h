@@ -20,12 +20,17 @@
 #include "mscplugin_global.h"
 
 #include <QSharedPointer>
+#include <QVector>
 #include <extensionsystem/iplugin.h>
 
 class QAction;
 
 namespace aadlinterface {
 class IVEditorCore;
+}
+
+namespace msc {
+class MSCEditorCore;
 }
 
 namespace MscPlugin {
@@ -50,11 +55,13 @@ public:
 public Q_SLOTS:
     void showMessageDeclarations();
     void checkInstances();
+    void checkMessages();
     void setMinimapVisible(bool visible);
 
 private:
     ExtensionSystem::IPlugin *aadlPlugin() const;
     QSharedPointer<aadlinterface::IVEditorCore> ivPlugin() const;
+    QVector<QSharedPointer<msc::MSCEditorCore>> allMscCores() const;
 
     MscEditorFactory *m_factory = nullptr;
     QAction *m_messageDeclarationAction = nullptr;

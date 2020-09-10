@@ -17,6 +17,8 @@
 
 #include "aadlchecks.h"
 
+#include "aadlnamevalidator.h"
+#include "aadlobjectconnection.h"
 #include "aadlobjectfunction.h"
 #include "aadlobjectsmodel.h"
 #include "interface/interfacedocument.h"
@@ -25,6 +27,7 @@
 #include "mscchart.h"
 #include "msceditorcore.h"
 #include "mscinstance.h"
+#include "mscmessage.h"
 #include "mscmodel.h"
 
 #include <QDebug>
@@ -47,7 +50,7 @@ void AadlChecks::setIvPlugin(QSharedPointer<aadlinterface::IVEditorCore> ivPlugi
 }
 
 /*!
-   Checks all instances if they are defined in the IV model
+   Checks all instances if they are defined in the IV model as function
  */
 QVector<QPair<MscChart *, MscInstance *>> AadlChecks::checkInstanceNames()
 {
@@ -108,23 +111,58 @@ QVector<QPair<MscChart *, MscInstance *>> AadlChecks::checkInstanceRelations()
 }
 
 /*!
+   Checks all messages if they are defined in the IV model as connection
+ */
+QVector<QPair<MscChart *, MscMessage *>> AadlChecks::checkMessages()
+{
+    QVector<QPair<MscChart *, MscMessage *>> result;
+    if (!m_ivPlugin || !m_mscPlugin) {
+        return result;
+    }
+
+    updateAadlConnections();
+
+    QVector<msc::MscChart *> charts = m_mscPlugin->mainModel()->mscModel()->allCharts();
+    for (msc::MscChart *chart : charts) {
+        for (msc::MscInstanceEvent *event : chart->instanceEvents()) {
+            if (auto message = qobject_cast<msc::MscMessage *>(event)) {
+                aadl::AADLObjectConnection *aadlConnection = correspondingConnection(message);
+                if (!aadlConnection) {
+                    result << QPair<MscChart *, MscMessage *>(chart, message);
+                }
+            }
+        }
+    }
+
+    return result;
+}
+
+aadl::AADLObjectsModel *AadlChecks::aadlModel() const
+{
+    if (!m_ivPlugin) {
+        return {};
+    }
+
+    QSharedPointer<aadlinterface::IVEditorCore> ivPlugin = m_ivPlugin.toStrongRef();
+    if (!ivPlugin->document() || !ivPlugin->document()->objectsModel()) {
+        qWarning() << "No AADLObjectsModel";
+        return {};
+    }
+
+    return ivPlugin->document()->objectsModel();
+}
+
+/*!
    Updates the list of functions from the aadl model
  */
 void AadlChecks::updateAadlFunctions()
 {
     m_aadlFunctions.clear();
 
-    if (!m_ivPlugin) {
+    aadl::AADLObjectsModel *aadlModel = this->aadlModel();
+    if (!aadlModel) {
         return;
     }
-
-    aadl::AADLObjectsModel *aadlModel = nullptr;
-    QSharedPointer<aadlinterface::IVEditorCore> ivPlugin = m_ivPlugin.toStrongRef();
-    if (!ivPlugin->document() || !ivPlugin->document()->objectsModel()) {
-        qWarning() << "No AADLObjectsModel";
-        return;
-    }
-    aadlModel = ivPlugin->document()->objectsModel();
 
     const QHash<shared::Id, aadl::AADLObject *> &aadlObjects = aadlModel->objects();
     for (auto obj : aadlObjects) {
@@ -146,13 +184,53 @@ aadl::AADLObjectFunction *AadlChecks::correspondingFunction(MscInstance *instanc
     }
 
     auto it = std::find_if(m_aadlFunctions.begin(), m_aadlFunctions.end(),
-            [&instance](aadl::AADLObjectFunction *func) { return instance->name() == func->title(); });
+            [this, &instance](aadl::AADLObjectFunction *func) { return correspond(func, instance); });
 
     if (it == m_aadlFunctions.end()) {
         return nullptr;
     }
 
     return *it;
+}
+
+/*!
+   Return true, if the aadl object is a function and the msc instance are the same
+ */
+bool AadlChecks::correspond(const aadl::AADLObject *aadlObj, const MscInstance *instance) const
+{
+    if (aadlObj == nullptr && instance == nullptr) {
+        // if both are invalid, it the same
+        return true;
+    }
+    if (aadlObj == nullptr) {
+        return false;
+    }
+
+    if (aadlObj->aadlType() == aadl::AADLObject::Type::Function) {
+        if (auto func = qobject_cast<const aadl::AADLObjectFunction *>(aadlObj)) {
+            return correspond(func, instance);
+        }
+    }
+    return false;
+}
+
+/*!
+   Return true, if the aadl function and the msc instance are the same
+ */
+bool AadlChecks::correspond(const aadl::AADLObjectFunction *aadlFunc, const MscInstance *instance) const
+{
+    if (aadlFunc == nullptr && instance == nullptr) {
+        // if both are invalid, it the same
+        return true;
+    }
+    if (aadlFunc == nullptr || instance == nullptr) {
+        // if only one is invalid, it's not ok
+        return false;
+    }
+
+    const QString instanceName =
+            aadl::AADLNameValidator::decodeName(aadl::AADLObject::Type::Function, instance->name());
+    return instanceName == aadlFunc->title();
 }
 
 /*!
@@ -201,6 +279,63 @@ bool AadlChecks::isAncestor(aadl::AADLObjectFunction *func, aadl::AADLObjectFunc
     }
 
     return false;
+}
+
+/*!
+   Collect all aadl connections in the aadl model
+ */
+void AadlChecks::updateAadlConnections()
+{
+    m_aadlConnections.clear();
+
+    aadl::AADLObjectsModel *aadlModel = this->aadlModel();
+    if (!aadlModel) {
+        return;
+    }
+
+    const QHash<shared::Id, aadl::AADLObject *> &aadlObjects = aadlModel->objects();
+    for (auto obj : aadlObjects) {
+        if (obj->aadlType() == aadl::AADLObject::Type::Connection) {
+            if (auto func = dynamic_cast<aadl::AADLObjectConnection *>(obj)) {
+                m_aadlConnections.append(func);
+            }
+        }
+    }
+}
+
+/*!
+   Returns the cooresponding aadl connection for the given \p message.
+   If no such connection exists, a nullptr is returned.
+ */
+aadl::AADLObjectConnection *AadlChecks::correspondingConnection(MscMessage *message) const
+{
+    if (!message) {
+        return nullptr;
+    }
+
+    auto it = std::find_if(m_aadlConnections.begin(), m_aadlConnections.end(),
+            [this, &message](aadl::AADLObjectConnection *connection) { return correspond(connection, message); });
+
+    if (it == m_aadlConnections.end()) {
+        return nullptr;
+    }
+
+    return *it;
+}
+
+/**
+   Returns if the aadl connection and the msc message are the same
+ */
+bool AadlChecks::correspond(const aadl::AADLObjectConnection *connection, const MscMessage *message) const
+{
+    const QString messageName =
+            aadl::AADLNameValidator::decodeName(aadl::AADLObject::Type::Connection, message->name());
+    bool nameOk = true;
+    if (!connection->targetInterfaceName().isEmpty()) {
+        nameOk &= messageName == connection->targetInterfaceName();
+    }
+    return correspond(connection->source(), message->sourceInstance())
+            && correspond(connection->target(), message->targetInstance()) && nameOk;
 }
 
 }

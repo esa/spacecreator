@@ -32,6 +32,7 @@
 #include "mscpluginconstants.h"
 #include "sharedlibrary.h"
 
+#include <QAction>
 #include <QMessageBox>
 #include <coreplugin/actionmanager/actioncontainer.h>
 #include <coreplugin/actionmanager/actionmanager.h>
@@ -94,9 +95,14 @@ bool MSCPlugin::initialize(const QStringList &arguments, QString *errorString)
     });
 
     auto action = new QAction(tr("Check instances"), this);
-    Core::Command *listAadlCmd = Core::ActionManager::registerAction(
+    Core::Command *checkInstancesCmd = Core::ActionManager::registerAction(
             action, Constants::CHECK_INSTANCES_ID, Core::Context(Core::Constants::C_GLOBAL));
     connect(action, &QAction::triggered, this, &MSCPlugin::checkInstances);
+
+    action = new QAction(tr("Check messages"), this);
+    Core::Command *checkMessagesCmd = Core::ActionManager::registerAction(
+            action, Constants::CHECK_MESSAGES_ID, Core::Context(Core::Constants::C_GLOBAL));
+    connect(action, &QAction::triggered, this, &MSCPlugin::checkMessages);
 
     auto showMinimapAction = new QAction(tr("Show minimap"), this);
     showMinimapAction->setCheckable(true);
@@ -107,7 +113,8 @@ bool MSCPlugin::initialize(const QStringList &arguments, QString *errorString)
     Core::ActionContainer *menu = Core::ActionManager::createMenu(Constants::MENU_ID);
     menu->menu()->setTitle(tr("MscPlugin"));
     menu->addAction(messageDeclCmd);
-    menu->addAction(listAadlCmd);
+    menu->addAction(checkInstancesCmd);
+    menu->addAction(checkMessagesCmd);
     menu->addAction(showMinimapCmd);
     Core::ActionManager::actionContainer(Core::Constants::M_TOOLS)->addMenu(menu);
 
@@ -155,14 +162,7 @@ void MSCPlugin::checkInstances()
         return;
     }
 
-    QStringList mscFiles = m_factory->editorData()->mscFiles();
-    QVector<QSharedPointer<msc::MSCEditorCore>> mscCores;
-    for (const QString &mscFile : mscFiles) {
-        QSharedPointer<msc::MSCEditorCore> core = m_mscStorage->mscData(mscFile);
-        if (core) {
-            mscCores.append(core);
-        }
-    }
+    QVector<QSharedPointer<msc::MSCEditorCore>> mscCores = allMscCores();
 
     // Check for names
     QVector<QPair<msc::MscChart *, msc::MscInstance *>> resultNames;
@@ -189,6 +189,9 @@ void MSCPlugin::checkInstances()
         }
     }
     if (!resultRelations.isEmpty()) {
+        if (!text.isEmpty()) {
+            text += "\n\n";
+        }
         text += tr("Following instances are used with parent/hild of nested functions:\n");
         for (auto item : resultRelations) {
             if (!text.isEmpty()) {
@@ -202,6 +205,39 @@ void MSCPlugin::checkInstances()
         QMessageBox::information(nullptr, tr("All instaces are ok"), tr("All instaces are ok"));
     } else {
         QMessageBox::information(nullptr, tr("Non conforming instances"), text);
+    }
+}
+
+void MSCPlugin::checkMessages()
+{
+    QSharedPointer<aadlinterface::IVEditorCore> ivp = ivPlugin();
+    if (!ivp) {
+        return;
+    }
+
+    QVector<QSharedPointer<msc::MSCEditorCore>> mscCores = allMscCores();
+
+    // check messages
+    QVector<QPair<msc::MscChart *, msc::MscMessage *>> resultNames;
+    for (QSharedPointer<msc::MSCEditorCore> mplugin : mscCores) {
+        mplugin->aadlChecker()->setIvPlugin(ivp);
+        resultNames += mplugin->aadlChecker()->checkMessages();
+    }
+
+    QString text;
+    if (!resultNames.isEmpty()) {
+        text += tr("Following messages have no corresponding aadl connection:\n");
+        for (auto item : resultNames) {
+            if (!text.isEmpty()) {
+                text += "\n";
+            }
+            text += QString("%1 from chart %2").arg(item.second->name(), item.first->name());
+        }
+    }
+    if (resultNames.isEmpty()) {
+        QMessageBox::information(nullptr, tr("All messages are ok"), tr("All messages are ok"));
+    } else {
+        QMessageBox::information(nullptr, tr("Non conforming messages"), text);
     }
 }
 
@@ -234,6 +270,19 @@ QSharedPointer<aadlinterface::IVEditorCore> MSCPlugin::ivPlugin() const
     }
 
     return m_aadlStorage->ivData(aadlFiles.first());
+}
+
+QVector<QSharedPointer<msc::MSCEditorCore>> MSCPlugin::allMscCores() const
+{
+    QStringList mscFiles = m_factory->editorData()->mscFiles();
+    QVector<QSharedPointer<msc::MSCEditorCore>> allMscCores;
+    for (const QString &mscFile : mscFiles) {
+        QSharedPointer<msc::MSCEditorCore> core = m_mscStorage->mscData(mscFile);
+        if (core) {
+            allMscCores.append(core);
+        }
+    }
+    return allMscCores;
 }
 
 }

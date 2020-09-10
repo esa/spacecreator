@@ -24,7 +24,10 @@
 #include <QWeakPointer>
 
 namespace aadl {
+class AADLObject;
+class AADLObjectConnection;
 class AADLObjectFunction;
+class AADLObjectsModel;
 }
 
 namespace aadlinterface {
@@ -32,9 +35,10 @@ class IVEditorCore;
 }
 
 namespace msc {
-class MSCEditorCore;
 class MscChart;
+class MSCEditorCore;
 class MscInstance;
+class MscMessage;
 
 /*!
    \brief The AadlChecks class is used to check consistency of a msc model with one aadl model
@@ -51,17 +55,27 @@ public:
     QVector<QPair<msc::MscChart *, msc::MscInstance *>> checkInstanceNames();
     QVector<QPair<msc::MscChart *, msc::MscInstance *>> checkInstanceRelations();
 
+    QVector<QPair<msc::MscChart *, msc::MscMessage *>> checkMessages();
+
 private:
+    aadl::AADLObjectsModel *aadlModel() const;
     void updateAadlFunctions();
     aadl::AADLObjectFunction *correspondingFunction(msc::MscInstance *instance) const;
+    bool correspond(const aadl::AADLObject *aadlObj, const msc::MscInstance *instance) const;
+    bool correspond(const aadl::AADLObjectFunction *aadlFunc, const msc::MscInstance *instance) const;
     bool hasAncestor(aadl::AADLObjectFunction *func, const QVector<aadl::AADLObjectFunction *> allFunctions) const;
     bool hasDescendant(aadl::AADLObjectFunction *func, const QVector<aadl::AADLObjectFunction *> allFunctions) const;
     bool isAncestor(aadl::AADLObjectFunction *func, aadl::AADLObjectFunction *otherFunc) const;
+
+    void updateAadlConnections();
+    aadl::AADLObjectConnection *correspondingConnection(msc::MscMessage *message) const;
+    bool correspond(const aadl::AADLObjectConnection *connection, const msc::MscMessage *message) const;
 
     QPointer<msc::MSCEditorCore> m_mscPlugin;
     QWeakPointer<aadlinterface::IVEditorCore> m_ivPlugin;
 
     QVector<aadl::AADLObjectFunction *> m_aadlFunctions;
+    QVector<aadl::AADLObjectConnection *> m_aadlConnections;
 };
 
 }

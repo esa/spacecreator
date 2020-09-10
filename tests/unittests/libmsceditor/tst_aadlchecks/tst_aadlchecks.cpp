@@ -16,6 +16,7 @@
 */
 
 #include "aadlchecks.h"
+#include "aadlobjectconnection.h"
 #include "aadlobjectfunction.h"
 #include "aadlobjectsmodel.h"
 #include "baseitems/common/coordinatesconverter.h"
@@ -27,6 +28,7 @@
 #include "mscchart.h"
 #include "msceditorcore.h"
 #include "mscinstance.h"
+#include "mscmessage.h"
 #include "mscmodel.h"
 
 #include <QGraphicsScene>
@@ -50,6 +52,7 @@ private Q_SLOTS:
 
     void testCheckInstanceNames();
     void testCheckInstanceRelations();
+    void testCheckMessageNames();
 
 private:
     QGraphicsView m_view;
@@ -92,6 +95,7 @@ void tst_AadlChecks::testCheckInstanceNames()
     aadlinterface::InterfaceDocument *doc = ivPlugin->document();
     aadl::AADLObjectsModel *aadlModel = doc->objectsModel();
     aadlModel->addObject(new aadl::AADLObjectFunction("init"));
+    result = checker.checkInstanceNames();
     QCOMPARE(result.size(), 1);
 
     // set instance name to the function name
@@ -148,6 +152,58 @@ void tst_AadlChecks::testCheckInstanceRelations()
     function2->setParent(function15);
     result = checker.checkInstanceRelations();
     QCOMPARE(result.size(), 2);
+}
+
+void tst_AadlChecks::testCheckMessageNames()
+{
+    msc::AadlChecks checker;
+    QVector<QPair<msc::MscChart *, msc::MscMessage *>> result = checker.checkMessages();
+    QCOMPARE(result.size(), 0);
+
+    msc::MSCEditorCore mscPlugin;
+    mscPlugin.mainModel()->initialModel();
+    checker.setMscPlugin(&mscPlugin);
+    result = checker.checkMessages();
+    msc::MscChart *chart = mscPlugin.mainModel()->mscModel()->documents().at(0)->documents().at(0)->charts().at(0);
+    QVERIFY(chart != nullptr);
+
+    QSharedPointer<aadlinterface::IVEditorCore> ivPlugin(new aadlinterface::IVEditorCore);
+    checker.setIvPlugin(ivPlugin);
+    result = checker.checkMessages();
+    QCOMPARE(result.size(), 0);
+
+    // Add Message
+    auto instanceA = new msc::MscInstance("Instance A", chart);
+    chart->addInstance(instanceA);
+    auto message = new msc::MscMessage("Msg1", chart);
+    message->setTargetInstance(instanceA);
+    chart->addInstanceEvent(message);
+    result = checker.checkMessages();
+    QCOMPARE(result.size(), 1);
+
+    // Add function with different source/target
+    aadlinterface::InterfaceDocument *doc = ivPlugin->document();
+    aadl::AADLObjectsModel *aadlModel = doc->objectsModel();
+    auto aadlfFunc = new aadl::AADLObjectFunction("Instance A");
+    aadlModel->addObject(aadlfFunc);
+    aadlModel->addObject(new aadl::AADLObjectConnection(aadlfFunc, nullptr, nullptr, nullptr));
+    result = checker.checkMessages();
+    QCOMPARE(result.size(), 1);
+
+    // Add connection with proper source/target, but a wrong name
+    auto createInfo = aadl::AADLObjectIface::CreationInfo(aadlModel, aadlfFunc, QPointF(),
+            aadl::AADLObjectIface::IfaceType::Provided, shared::createId(), QVector<aadl::IfaceParameter>(),
+            aadl::AADLObjectIface::OperationKind::Sporadic, "Dummy");
+    aadl::AADLObjectIface *providedInterface = aadl::AADLObjectIface::createIface(createInfo);
+    aadlModel->addObject(providedInterface);
+    aadlModel->addObject(new aadl::AADLObjectConnection(nullptr, aadlfFunc, nullptr, providedInterface));
+    result = checker.checkMessages();
+    QCOMPARE(result.size(), 1);
+
+    // Correct the name
+    providedInterface->setTitle("Msg1");
+    result = checker.checkMessages();
+    QCOMPARE(result.size(), 0); // Everything is ok
 }
 
 QTEST_MAIN(tst_AadlChecks)
