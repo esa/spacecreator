@@ -220,7 +220,6 @@ void EndToEndView::refreshView()
     for (auto ic : internalConnections) {
         if (ic.pi != nullptr && ic.ri != nullptr) {
             auto item = new QGraphicsPathItem;
-            ;
             item->setPen(connectionPen);
             QPainterPath path;
             path.moveTo(ic.pi->scenePos());
