@@ -110,11 +110,12 @@ static EndToEndConnections::Dataflow readDataFlowFromDocument(msc::MscDocument *
                         aadl::AADLNameValidator::decodeName(aadl::AADLObject::Type::RequiredInterface, msg->name());
 
                 // The source must match, except for the first call which can be from global or any instance
-                if (!message.isEmpty() && !source.isEmpty() && !target.isEmpty()
-                        && (source == lastInstance || dataflow.isEmpty())) {
-                    dataflow.connections.append({ source, target, message });
+                if (!message.isEmpty() && (source == lastInstance || dataflow.isEmpty())) {
+                    if (!source.isEmpty() && !target.isEmpty()) {
+                        dataflow.connections.append({ source, target, message });
+                    }
 
-                    if (source != target && !message.isEmpty()) {
+                    if (source != target && !message.isEmpty() && !lastRI.isEmpty()) {
                         // A message came in to this instance and now a new message is leaving it. Show this in the
                         // dataflow
                         dataflow.internalConnections.append({ source, lastRI, message });
@@ -196,6 +197,22 @@ void EndToEndConnections::setPath(const QString &path)
         // Changing the path means dirty as well
         d->setDirty(true, this);
     }
+}
+
+QDebug operator<<(QDebug debug, const EndToEndConnections::Connection &connection)
+{
+    return debug << "E2E Connection { " << connection.from << " " << connection.to << " " << connection.message << " }";
+}
+
+QDebug operator<<(QDebug debug, const EndToEndConnections::ConnectionInsideFunction &connection)
+{
+    return debug << "E2E Internal Connection { " << connection.instance << " " << connection.interface1 << " "
+                 << connection.interface2 << " }";
+}
+
+QDebug operator<<(QDebug debug, const EndToEndConnections::Dataflow &dataflow)
+{
+    return debug << "Dataflow { " << dataflow.connections << " " << dataflow.internalConnections << " }";
 }
 
 }

@@ -17,6 +17,7 @@
 
 #pragma once
 
+#include <QDebug>
 #include <QObject>
 #include <QPair>
 #include <QString>
@@ -98,5 +99,9 @@ private:
     struct EndToEndConnectionsPrivate;
     EndToEndConnectionsPrivate *d;
 };
+
+QDebug operator<<(QDebug debug, const EndToEndConnections::Connection &connection);
+QDebug operator<<(QDebug debug, const EndToEndConnections::ConnectionInsideFunction &connection);
+QDebug operator<<(QDebug debug, const EndToEndConnections::Dataflow &dataflow);
 
 }
