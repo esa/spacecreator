@@ -113,8 +113,9 @@ EndToEndView::EndToEndView(InterfaceDocument *document, QWidget *parent)
 
     if (parent != nullptr) {
         // Size this a bit smaller than the parent
-        resize(parent->width() - 20, parent->height() - 20);
-        move(parent->x() + 10, parent->y() + 10);
+        const int margin = 10;
+        resize(parent->width() - margin * 2, parent->height() - margin * 2);
+        move(parent->x() + margin, parent->y() + margin);
     }
 }
 
