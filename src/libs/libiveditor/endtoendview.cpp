@@ -85,25 +85,7 @@ EndToEndView::EndToEndView(InterfaceDocument *document, QWidget *parent)
         }
     });
 
-    connect(exportButton, &QPushButton::clicked, this, [this]() {
-        const QString path = QFileDialog::getSaveFileName(
-                parentWidget(), tr("Save as PNG"), d->lastExportPath, tr("PNG Images (*.png)"));
-        if (!path.isEmpty()) {
-            d->lastExportPath = path;
-
-            // Create an image the size of the scene and render the scene into it
-            QPixmap image(d->scene->sceneRect().size().toSize());
-            image.fill(Qt::transparent);
-            QPainter painter(&image);
-            painter.setRenderHint(QPainter::Antialiasing);
-            painter.setRenderHint(QPainter::TextAntialiasing);
-            d->scene->render(&painter);
-            painter.end();
-            if (!image.save(path)) {
-                QMessageBox::critical(parentWidget(), tr("Export failed"), tr("Saving to file %1 failed").arg(path));
-            }
-        }
-    });
+    connect(exportButton, &QPushButton::clicked, this, &EndToEndView::exportToPng);
 
     // Listen to path changes from the document
     connect(d->document, &InterfaceDocument::mscFileNameChanged, this, setPath);
@@ -255,6 +237,27 @@ void EndToEndView::refreshView()
 
     // Set the scene rect based on what we show
     d->scene->setSceneRect(d->scene->itemsBoundingRect());
+}
+
+void EndToEndView::exportToPng()
+{
+    const QString path = QFileDialog::getSaveFileName(
+            parentWidget(), tr("Save as PNG"), d->lastExportPath, tr("PNG Images (*.png)"));
+    if (!path.isEmpty()) {
+        d->lastExportPath = path;
+
+        // Create an image the size of the scene and render the scene into it
+        QPixmap image(d->scene->sceneRect().size().toSize());
+        image.fill(Qt::transparent);
+        QPainter painter(&image);
+        painter.setRenderHint(QPainter::Antialiasing);
+        painter.setRenderHint(QPainter::TextAntialiasing);
+        d->scene->render(&painter);
+        painter.end();
+        if (!image.save(path)) {
+            QMessageBox::critical(parentWidget(), tr("Export failed"), tr("Saving to file %1 failed").arg(path));
+        }
+    }
 }
 
 }

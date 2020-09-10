@@ -24,6 +24,7 @@ Q_SIGNALS:
 
 private Q_SLOTS:
     void refreshView();
+    void exportToPng();
 
 private:
     struct EndToEndViewPrivate;
