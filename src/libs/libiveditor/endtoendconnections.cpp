@@ -110,20 +110,11 @@ static EndToEndConnections::Dataflow readDataFlowFromDocument(msc::MscDocument *
                         aadl::AADLNameValidator::decodeName(aadl::AADLObject::Type::RequiredInterface, msg->name());
 
                 // The source must match, except for the first call which can be from global or any instance
-                if (!message.isEmpty() && !(source.isEmpty() && target.isEmpty())
+                if (!message.isEmpty() && !source.isEmpty() && !target.isEmpty()
                         && (source == lastInstance || dataflow.isEmpty())) {
-                    if (source.isEmpty()) {
-                        // This is a message to the environment
-                        dataflow.envConnections.append({ target, message, true });
-                    } else if (target.isEmpty()) {
-                        // This is a message from the environment
-                        dataflow.envConnections.append({ source, message, false });
-                    } else {
-                        // This is a normal message
-                        dataflow.connections.append({ source, target, message });
-                    }
+                    dataflow.connections.append({ source, target, message });
 
-                    if (source != target && !source.isEmpty() && !target.isEmpty() && !message.isEmpty()) {
+                    if (source != target && !message.isEmpty()) {
                         // A message came in to this instance and now a new message is leaving it. Show this in the
                         // dataflow
                         dataflow.internalConnections.append({ source, lastRI, message });

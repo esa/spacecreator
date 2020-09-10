@@ -165,18 +165,10 @@ void EndToEndView::refreshView()
 
                 auto function = newItem->function();
                 if (function != nullptr) {
-                    // Check if this is to the environment
-                    const EndToEndConnections::ConnectionWithEnvironment c { function->title(), newItem->title(),
-                        false };
-                    qDebug() << "Env" << c.instance << c.interface << c.toInstance;
-                    if (dataflow.envConnections.contains(c)) {
-                        // TODO: Add a connection from the outside
-                    }
-
                     // Check if this is part of an internal connection
                     auto ri = obj->aadlType() == aadl::AADLObject::Type::RequiredInterface ? graphicsItem : nullptr;
                     auto pi = obj->aadlType() == aadl::AADLObject::Type::ProvidedInterface ? graphicsItem : nullptr;
-                    updateInternalConnection(c.instance, c.interface, ri, pi);
+                    updateInternalConnection(function->title(), newItem->title(), ri, pi);
                 }
             }
             break;

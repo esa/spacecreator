@@ -50,18 +50,6 @@ public:
         QString message;
     };
 
-    struct ConnectionWithEnvironment {
-        inline bool operator==(const ConnectionWithEnvironment &other) const
-        {
-            return instance == other.instance && interface == other.interface && toInstance == other.toInstance;
-        }
-        inline bool operator!=(const ConnectionWithEnvironment &other) const { return !(*this == other); }
-
-        QString instance; // Function name
-        QString interface; // RI or PI
-        bool toInstance; // True if from env to instance, false if from instance to env
-    };
-
     struct ConnectionInsideFunction {
         inline bool operator==(const ConnectionInsideFunction &other) const
         {
@@ -75,19 +63,14 @@ public:
     };
 
     struct Dataflow {
-        bool isEmpty() const
-        {
-            return connections.isEmpty() && envConnections.isEmpty() && internalConnections.isEmpty();
-        }
+        inline bool isEmpty() const { return connections.isEmpty() && internalConnections.isEmpty(); }
         inline bool operator==(const Dataflow &d) const
         {
-            return connections == d.connections && envConnections == d.envConnections
-                    && internalConnections == d.internalConnections;
+            return connections == d.connections && internalConnections == d.internalConnections;
         }
         inline bool operator!=(const Dataflow &d) const { return !(*this == d); }
 
         QVector<Connection> connections;
-        QVector<ConnectionWithEnvironment> envConnections;
         QVector<ConnectionInsideFunction> internalConnections;
     };
 
