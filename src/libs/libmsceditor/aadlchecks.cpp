@@ -126,7 +126,7 @@ QVector<QPair<MscChart *, MscInstance *>> AadlChecks::checkInstanceRelations() c
 }
 
 /*!
-   Checks ich the given MSC insatnce has a corresponding aadl function
+   Checks ich the given MSC instance has a corresponding aadl function
  */
 bool AadlChecks::checkInstance(const MscInstance *instance) const
 {
@@ -161,6 +161,19 @@ QVector<QPair<MscChart *, MscMessage *>> AadlChecks::checkMessages() const
     }
 
     return result;
+}
+
+/*!
+   Checks ich the given MSC message has a corresponding aadl connection
+ */
+bool AadlChecks::checkMessage(const MscMessage *message) const
+{
+    if (!m_ivPlugin) {
+        return true;
+    }
+
+    aadl::AADLObjectConnection *aadlConnection = correspondingConnection(message);
+    return aadlConnection != nullptr;
 }
 
 aadl::AADLObjectsModel *AadlChecks::aadlModel() const
@@ -317,7 +330,7 @@ bool AadlChecks::isAncestor(aadl::AADLObjectFunction *func, aadl::AADLObjectFunc
    Returns the cooresponding aadl connection for the given \p message.
    If no such connection exists, a nullptr is returned.
  */
-aadl::AADLObjectConnection *AadlChecks::correspondingConnection(MscMessage *message) const
+aadl::AADLObjectConnection *AadlChecks::correspondingConnection(const MscMessage *message) const
 {
     if (!message) {
         return nullptr;

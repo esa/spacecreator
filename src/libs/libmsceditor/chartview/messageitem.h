@@ -120,18 +120,9 @@ private Q_SLOTS:
     void onRenamed(const QString &title);
     void onManualGeometryChangeFinished(shared::ui::GripPoint *gp, const QPointF &from, const QPointF &to);
     void updateDisplayText();
+    void checkAadlConnection();
 
 private:
-    QPointer<msc::MscMessage> m_message = nullptr;
-    LabeledArrowItem *m_arrowItem = nullptr;
-    QPointer<msc::ChartLayoutManager> m_chartLayoutManager = nullptr;
-    QPointer<InstanceItem> m_sourceInstance = nullptr;
-    QPointer<InstanceItem> m_targetInstance = nullptr;
-    bool m_posChangeIgnored = false;
-    bool m_autoResize = true;
-    bool m_preventRecursion = false;
-    QVector<QPointF> m_originalMessagePoints;
-
     QString displayTextFromModel() const;
 
     bool updateSource(const QPointF &to, ObjectAnchor::Snap snap, InstanceItem *keepInstance = nullptr);
@@ -154,6 +145,18 @@ private:
 
     bool wannabeGlobal() const;
     QPointF validatePoint(const QPointF &requestedPoint, bool isSource, const QPointF &oppositePoint);
+
+    bool aadlConnectionOk() const;
+
+    QPointer<msc::MscMessage> m_message = nullptr;
+    LabeledArrowItem *m_arrowItem = nullptr;
+    QPointer<msc::ChartLayoutManager> m_chartLayoutManager = nullptr;
+    QPointer<InstanceItem> m_sourceInstance = nullptr;
+    QPointer<InstanceItem> m_targetInstance = nullptr;
+    bool m_posChangeIgnored = false;
+    bool m_autoResize = true;
+    bool m_preventRecursion = false;
+    QVector<QPointF> m_originalMessagePoints;
 };
 
 } // namespace msc

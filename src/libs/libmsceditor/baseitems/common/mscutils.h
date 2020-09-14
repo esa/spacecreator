@@ -33,6 +33,7 @@ class InstanceItem;
 constexpr qreal LineHoverTolerance = 10.;
 constexpr qreal LineHorizontalityTolerance = 15.;
 const QColor AadlErrorColor = { 255, 128, 0 };
+const QColor MessageColor = { "#3e47e6" };
 
 enum class CifUpdatePolicy
 {

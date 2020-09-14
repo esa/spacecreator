@@ -17,6 +17,7 @@
 
 #include "messageitem.h"
 
+#include "aadlchecks.h"
 #include "baseitems/arrowitem.h"
 #include "baseitems/common/coordinatesconverter.h"
 #include "baseitems/common/mscutils.h"
@@ -99,14 +100,20 @@ MessageItem::MessageItem(MscMessage *message, ChartLayoutManager *chartLayoutMan
     });
     setInstances(source, target);
 
-    m_arrowItem->setColor(QColor("#3e47e6"));
+    m_arrowItem->setColor(MessageColor);
     m_arrowItem->setDashed(isCreator());
+    checkAadlConnection();
 
     connect(this, &InteractiveObjectBase::relocated, [this](const QPointF &from, const QPointF &to) {
         if (proceedPositionChange()) {
             updateSourceAndTarget(to - from);
         }
     });
+
+    if (m_chartLayoutManager && m_chartLayoutManager->aadlChecker()) {
+        connect(m_chartLayoutManager->aadlChecker(), &msc::AadlChecks::ivPluginChanged, this,
+                &msc::MessageItem::checkAadlConnection);
+    }
 }
 
 void MessageItem::onTextChanged()
@@ -117,6 +124,7 @@ void MessageItem::onTextChanged()
         gph->updateLayout();
     }
 
+    checkAadlConnection();
     update();
 }
 
@@ -211,9 +219,13 @@ InstanceItem *MessageItem::targetInstanceItem() const
 void MessageItem::updateTooltip()
 {
     const QString env(tr("Env"));
-    setToolTip(tr("%1: %2→%3")
+    QString aadlMessage;
+    if (!aadlConnectionOk()) {
+        aadlMessage = "\n\n" + tr("This message does not have a corresponding AADL connection in the aadl model.");
+    }
+    setToolTip(tr("%1: %2→%3%4")
                        .arg(name(), m_sourceInstance ? m_sourceInstance->name() : env,
-                               m_targetInstance ? m_targetInstance->name() : env));
+                               m_targetInstance ? m_targetInstance->name() : env, aadlMessage));
 }
 
 QString MessageItem::name() const
@@ -740,6 +752,15 @@ void MessageItem::updateDisplayText()
     }
 }
 
+/*!
+   Checks in the aadl model, if there is a corresponding connection
+ */
+void MessageItem::checkAadlConnection()
+{
+    m_arrowItem->setColor(aadlConnectionOk() ? msc::MessageColor : msc::AadlErrorColor);
+    updateTooltip();
+}
+
 void MessageItem::addMessagePoint(const QPointF &scenePoint)
 {
     m_arrowItem->arrow()->addTurnPoint(scenePoint);
@@ -951,6 +972,17 @@ bool MessageItem::wannabeGlobal() const
     const bool onlySource = m_sourceInstance && !m_targetInstance;
     const bool onlyTarget = !m_sourceInstance && m_targetInstance;
     return isRegular && (onlySource || onlyTarget);
+}
+
+/*!
+   Returns, if the message has a corresponding ssdl connection
+ */
+bool MessageItem::aadlConnectionOk() const
+{
+    if (m_chartLayoutManager && m_chartLayoutManager->aadlChecker()) {
+        return m_chartLayoutManager->aadlChecker()->checkMessage(m_message);
+    }
+    return true;
 }
 
 } // namespace msc

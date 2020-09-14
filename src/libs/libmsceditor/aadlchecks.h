@@ -59,6 +59,7 @@ public:
     bool checkInstance(const msc::MscInstance *instance) const;
 
     QVector<QPair<msc::MscChart *, msc::MscMessage *>> checkMessages() const;
+    bool checkMessage(const msc::MscMessage *message) const;
 
 Q_SIGNALS:
     void mscPluginChanged();
@@ -76,7 +77,7 @@ private:
     bool hasDescendant(aadl::AADLObjectFunction *func, const QVector<aadl::AADLObjectFunction *> allFunctions) const;
     bool isAncestor(aadl::AADLObjectFunction *func, aadl::AADLObjectFunction *otherFunc) const;
 
-    aadl::AADLObjectConnection *correspondingConnection(msc::MscMessage *message) const;
+    aadl::AADLObjectConnection *correspondingConnection(const MscMessage *message) const;
     bool correspond(const aadl::AADLObjectConnection *connection, const msc::MscMessage *message) const;
 
     QPointer<msc::MSCEditorCore> m_mscPlugin;
