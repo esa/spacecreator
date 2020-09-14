@@ -127,6 +127,8 @@ public:
 
     AADLObjectIface::OperationKind defaultKind() const;
 
+    virtual QString ifaceLabel() const;
+
 Q_SIGNALS:
     void paramsChanged();
 
@@ -205,6 +207,9 @@ public:
     QStringList inheritedLables() const;
     void setPrototype(const AADLObjectIfaceProvided *pi);
     void unsetPrototype(const AADLObjectIfaceProvided *pi);
+
+    QString ifaceLabel() const override;
+    QStringList ifaceLabelList() const;
 
 Q_SIGNALS:
     void propChanged_InheritPI(bool inheritance);

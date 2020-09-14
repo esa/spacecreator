@@ -122,31 +122,11 @@ void EndToEndView::setVisible(bool visible)
 void EndToEndView::refreshView()
 {
     struct InternalConnection {
-        InternalConnection(const EndToEndConnections::ConnectionInsideFunction &c = {})
-            : connection(c)
-        {
-        }
-
         EndToEndConnections::ConnectionInsideFunction connection;
         AADLInterfaceGraphicsItem *ri { nullptr };
         AADLInterfaceGraphicsItem *pi { nullptr };
     };
     QVector<InternalConnection> internalConnections;
-
-    // We need both the ri and the pi graphics item to be able to create a connection between them
-    auto updateInternalConnection = [&](const QString &instance, const QString &interface,
-                                            AADLInterfaceGraphicsItem *ri, AADLInterfaceGraphicsItem *pi) {
-        for (auto &ic : internalConnections) {
-            if (instance == ic.connection.instance) {
-                if (pi != nullptr && interface == ic.connection.interface1) {
-                    // This is the ri side
-                    ic.pi = pi;
-                } else if (ri != nullptr && interface == ic.connection.interface2) {
-                    ic.ri = ri;
-                }
-            }
-        }
-    };
 
     // Remove all the old ones
     qDeleteAll(d->scene->items());
@@ -157,7 +137,7 @@ void EndToEndView::refreshView()
 
     const EndToEndConnections::Dataflow dataflow = d->dataflow.dataflow();
     for (auto c : dataflow.internalConnections) {
-        internalConnections << InternalConnection(c);
+        internalConnections << InternalConnection { c };
     };
 
     // This is used to draw our extra connections
@@ -171,18 +151,37 @@ void EndToEndView::refreshView()
         InteractiveObject *item = nullptr;
         switch (obj->aadlType()) {
         case aadl::AADLObject::Type::RequiredInterface:
-        case aadl::AADLObject::Type::ProvidedInterface:
-            if (auto newItem = qobject_cast<aadl::AADLObjectIface *>(obj)) {
-                // Add the RI/PI
-                auto graphicsItem = new AADLInterfaceGraphicsItem(newItem, parentItem);
+            if (auto ri = qobject_cast<aadl::AADLObjectIfaceRequired *>(obj)) {
+                // Add the RI
+                auto graphicsItem = new AADLInterfaceGraphicsItem(ri, parentItem);
                 item = graphicsItem;
 
-                auto function = newItem->function();
-                if (function != nullptr) {
+                if (auto function = ri->function()) {
                     // Check if this is part of an internal connection
-                    auto ri = obj->aadlType() == aadl::AADLObject::Type::RequiredInterface ? graphicsItem : nullptr;
-                    auto pi = obj->aadlType() == aadl::AADLObject::Type::ProvidedInterface ? graphicsItem : nullptr;
-                    updateInternalConnection(function->title(), newItem->title(), ri, pi);
+                    const QStringList labels = ri->ifaceLabelList();
+                    for (auto &ic : internalConnections) {
+                        if (function->title() == ic.connection.instance && labels.contains(ic.connection.interface2)) {
+                            ic.ri = graphicsItem;
+                        }
+                    }
+                }
+            }
+            break;
+        case aadl::AADLObject::Type::ProvidedInterface:
+            if (auto pi = qobject_cast<aadl::AADLObjectIfaceProvided *>(obj)) {
+                // Add the PI
+                auto graphicsItem = new AADLInterfaceGraphicsItem(pi, parentItem);
+                item = graphicsItem;
+
+                if (auto function = pi->function()) {
+                    // Check if this is part of an internal connection
+                    for (auto &ic : internalConnections) {
+                        if (function->title() == ic.connection.instance
+                                && pi->ifaceLabel() == ic.connection.interface1) {
+                            // This is the ri side
+                            ic.pi = graphicsItem;
+                        }
+                    }
                 }
             }
             break;

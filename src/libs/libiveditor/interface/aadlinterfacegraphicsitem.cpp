@@ -346,15 +346,7 @@ void AADLInterfaceGraphicsItem::updateKind()
 
 QString AADLInterfaceGraphicsItem::ifaceLabel() const
 {
-    if (entity()->isRequired())
-        if (auto ri = qobject_cast<aadl::AADLObjectIfaceRequired *>(entity())) {
-            if (ri->isInheritPI()) {
-                const QStringList &labels = ri->inheritedLables();
-                if (labels.size())
-                    return labels.join(", ");
-            }
-        }
-    return entity()->title();
+    return entity()->ifaceLabel();
 }
 
 QString AADLInterfaceGraphicsItem::prepareTooltip() const

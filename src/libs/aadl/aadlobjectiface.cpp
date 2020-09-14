@@ -176,6 +176,14 @@ AADLObjectIface::OperationKind AADLObjectIface::defaultKind() const
     return isProvided() ? OperationKind::Sporadic : OperationKind::Any;
 }
 
+/*! This returns the title. Unless it's an RI of type inherited, in which case it returns a comma
+ * separated list of PI connected to it - unless none are and then it's back to title.
+ */
+QString AADLObjectIface::ifaceLabel() const
+{
+    return title();
+}
+
 AADLObjectIface::OperationKind AADLObjectIface::kindFromString(const QString &k) const
 {
     return kindFromString(k, defaultKind());
@@ -635,6 +643,26 @@ void AADLObjectIfaceRequired::unsetPrototype(const AADLObjectIfaceProvided *pi)
         restoreInternals(pi);
 
     Q_EMIT inheritedLabelsChanged(inheritedLables());
+}
+
+QString AADLObjectIfaceRequired::ifaceLabel() const
+{
+    return ifaceLabelList().join(", ");
+}
+
+/*! Get the list of labels for this interface. It will either have the
+ * inherited names or, if this is empty, the title. There will always
+ * be at least one in the returned list.
+ */
+QStringList AADLObjectIfaceRequired::ifaceLabelList() const
+{
+    if (isInheritPI()) {
+        const QStringList &labels = inheritedLables();
+        if (!labels.isEmpty()) {
+            return labels;
+        }
+    }
+    return { AADLObjectIface::ifaceLabel() };
 }
 
 bool AADLObjectIfaceRequired::isInheritPI() const
