@@ -18,6 +18,7 @@
 
 #include "graphicsviewutils.h"
 
+#include <QColor>
 #include <QGraphicsItem>
 #include <QGraphicsScene>
 #include <QPainterPath>
@@ -31,6 +32,7 @@ class InstanceItem;
 
 constexpr qreal LineHoverTolerance = 10.;
 constexpr qreal LineHorizontalityTolerance = 15.;
+const QColor AadlErrorColor = { 255, 128, 0 };
 
 enum class CifUpdatePolicy
 {

@@ -60,6 +60,10 @@ public:
 
     QVector<QPair<msc::MscChart *, msc::MscMessage *>> checkMessages() const;
 
+Q_SIGNALS:
+    void mscPluginChanged();
+    void ivPluginChanged();
+
 private:
     Q_SLOT void updateAadlItems();
 

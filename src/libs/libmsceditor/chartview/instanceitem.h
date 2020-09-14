@@ -112,14 +112,9 @@ protected:
 private Q_SLOTS:
     void onNameEdited(const QString &newName);
     void onKindEdited(const QString &newKind);
+    void checkAadlFunction();
 
 private:
-    ChartLayoutManager *m_model = nullptr;
-    msc::MscInstance *m_instance = nullptr;
-    QPointer<msc::MscChart> m_chart;
-    QGraphicsLineItem *m_axisSymbol = nullptr;
-    InstanceHeadItem *m_headSymbol = nullptr;
-    InstanceEndItem *m_endSymbol = nullptr;
     qreal m_axisHeight = defaultAxisHeight();
 
     Q_INVOKABLE void reflectTextLayoutChange();
@@ -127,6 +122,15 @@ private:
     void updatePropertyString(const QLatin1String &property, const QString &value);
 
     QVariantList prepareChangePositionCommand() const;
+
+    bool aadlFunctionOk() const;
+
+    ChartLayoutManager *m_model = nullptr;
+    msc::MscInstance *m_instance = nullptr;
+    QPointer<msc::MscChart> m_chart;
+    QGraphicsLineItem *m_axisSymbol = nullptr;
+    InstanceHeadItem *m_headSymbol = nullptr;
+    InstanceEndItem *m_endSymbol = nullptr;
 };
 
 } // namespace msc

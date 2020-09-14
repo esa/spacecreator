@@ -64,6 +64,8 @@ void AadlChecks::setIvPlugin(QSharedPointer<aadlinterface::IVEditorCore> ivPlugi
         connect(model, &aadl::AADLObjectsModel::aadlObjectAdded, this, &msc::AadlChecks::updateAadlItems);
         connect(model, &aadl::AADLObjectsModel::aadlObjectRemoved, this, &msc::AadlChecks::updateAadlItems);
     }
+
+    Q_EMIT ivPluginChanged();
 }
 
 /*!
@@ -128,6 +130,10 @@ QVector<QPair<MscChart *, MscInstance *>> AadlChecks::checkInstanceRelations() c
  */
 bool AadlChecks::checkInstance(const MscInstance *instance) const
 {
+    if (!m_ivPlugin) {
+        return true;
+    }
+
     aadl::AADLObjectFunction *aadlFunction = correspondingFunction(instance);
     return aadlFunction != nullptr;
 }

@@ -17,6 +17,7 @@
 
 #include "instanceitem.h"
 
+#include "aadlchecks.h"
 #include "baseitems/common/coordinatesconverter.h"
 #include "baseitems/common/mscutils.h"
 #include "baseitems/instanceenditem.h"
@@ -85,6 +86,10 @@ InstanceItem::InstanceItem(
         Q_EMIT needUpdateLayout();
     });
 
+    if (m_model && m_model->aadlChecker()) {
+        connect(m_model->aadlChecker(), &msc::AadlChecks::ivPluginChanged, this, &msc::InstanceItem::checkAadlFunction);
+    }
+
     scheduleLayoutUpdate();
 }
 
@@ -127,6 +132,7 @@ void InstanceItem::setName(const QString &name)
 {
     updatePropertyString(QLatin1String("name"), name);
     m_headSymbol->setName(name);
+    checkAadlFunction();
 }
 
 void InstanceItem::setDenominatorAndKind(const QString &kind)
@@ -329,6 +335,17 @@ void InstanceItem::onKindEdited(const QString &newKind)
     m_headSymbol->setKind(m_instance->denominatorAndKind());
 }
 
+/*!
+   Checks in the aadl model, if there is a corresponding function
+ */
+void InstanceItem::checkAadlFunction()
+{
+    const bool aadlOk = aadlFunctionOk();
+    QPen axisPen(aadlOk ? Qt::darkGray : msc::AadlErrorColor);
+    axisPen.setWidthF(2.);
+    m_axisSymbol->setPen(axisPen);
+}
+
 void InstanceItem::reflectTextLayoutChange()
 {
     if (QGraphicsScene *scene = this->scene()) {
@@ -468,11 +485,15 @@ void InstanceItem::hoverMoveEvent(QGraphicsSceneHoverEvent *event)
     if (const cif::CifBlockShared &cifBlock = cifBlockByType(mainCifType())) {
         const QPoint axisToCif = CoordinatesConverter::sceneToCif({ 0, m_axisHeight });
         const QPointF axisFromCif = CoordinatesConverter::cifToScene(axisToCif);
-        const QString tt = cifBlock->toString(0) + "\naxis:" + QString::number(m_axisHeight) + " "
+        QString tt = cifBlock->toString(0) + "\naxis:" + QString::number(m_axisHeight) + " "
                 + QString::number(m_axisSymbol->line().length()) + "\naxisToCif:" + QString::number(axisToCif.x()) + " "
                 + QString::number(axisToCif.y()) + "\naxisFromCif:" + QString::number(axisFromCif.x()) + " "
                 + QString::number(axisFromCif.y()) + "\nme mbr: " + rectToStr(boundingRect())
                 + "\nme bb: " + rectToStr(boundingRect()) + "\nme sbr: " + rectToStr(sceneBoundingRect());
+
+        if (!aadlFunctionOk()) {
+            tt += "\n\n" + tr("This instance does not have a corresponding AADL function in the aadl model.");
+        }
         setToolTip(tt);
     }
 
@@ -502,6 +523,14 @@ QVariantList InstanceItem::prepareChangePositionCommand() const
     const QVariantList params { QVariant::fromValue(m_instance), QVariant::fromValue(geometryHolder) };
 
     return params;
+}
+
+bool InstanceItem::aadlFunctionOk() const
+{
+    if (m_model && m_model->aadlChecker()) {
+        return m_model->aadlChecker()->checkInstance(m_instance);
+    }
+    return true;
 }
 
 void InstanceItem::setInitialXLocation(const QPointF &requested, const QRectF &chartRect, qreal horSpan)

@@ -35,6 +35,7 @@ class InteractiveObjectBase;
 
 namespace msc {
 
+class AadlChecks;
 class ActionItem;
 class ChartItem;
 class CommentItem;
@@ -115,6 +116,9 @@ public:
     const QRectF &instancesRect() const;
 
     QVector<MscInstanceEvent *> visuallySortedEvents() const;
+
+    void setAadlChecker(AadlChecks *aadlChecker);
+    AadlChecks *aadlChecker() const;
 
 public Q_SLOTS:
     void updateLayout();

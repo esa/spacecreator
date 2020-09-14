@@ -77,6 +77,8 @@ MSCEditorCore::MSCEditorCore(QObject *parent)
     m_hierarchyToolBar->setObjectName("hierarchyTools");
     m_hierarchyToolBar->setAllowedAreas(Qt::AllToolBarAreas);
     m_hierarchyToolBar->setVisible(m_toolbarsVisible);
+
+    m_model->chartViewModel().setAadlChecker(m_aadlChecks.get());
 }
 
 MSCEditorCore::~MSCEditorCore() { }

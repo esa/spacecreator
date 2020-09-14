@@ -121,7 +121,11 @@ bool MSCPlugin::initialize(const QStringList &arguments, QString *errorString)
     m_aadlStorage = new AadlModelStorage(this);
     m_mscStorage = new MscModelStorage(this);
     m_factory = new MscEditorFactory(this);
-    connect(m_factory, &MscEditorFactory::mscDataLoaded, m_mscStorage, &MscModelStorage::setMscData);
+    connect(m_factory, &MscEditorFactory::mscDataLoaded, this,
+            [this](const QString &fileName, QSharedPointer<msc::MSCEditorCore> mscData) {
+                mscData->aadlChecker()->setIvPlugin(ivPlugin()); // All msc documents have access to the iv model
+                m_mscStorage->setMscData(fileName, mscData);
+            });
 
     IPlugin *plugin = aadlPlugin();
     if (!plugin) {
