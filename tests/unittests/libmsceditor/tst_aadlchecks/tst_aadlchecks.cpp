@@ -76,7 +76,6 @@ void tst_AadlChecks::testCheckInstanceNames()
     msc::MSCEditorCore mscPlugin;
     mscPlugin.mainModel()->initialModel();
     checker.setMscPlugin(&mscPlugin);
-    result = checker.checkInstanceNames();
     msc::MscChart *chart = mscPlugin.mainModel()->mscModel()->documents().at(0)->documents().at(0)->charts().at(0);
     QVERIFY(chart != nullptr);
 
@@ -90,18 +89,28 @@ void tst_AadlChecks::testCheckInstanceNames()
     chart->addInstance(instance);
     result = checker.checkInstanceNames();
     QCOMPARE(result.size(), 1);
+    QCOMPARE(checker.checkInstance(instance), false);
 
     // Add function with different name
     aadlinterface::InterfaceDocument *doc = ivPlugin->document();
     aadl::AADLObjectsModel *aadlModel = doc->objectsModel();
-    aadlModel->addObject(new aadl::AADLObjectFunction("init"));
+    auto aadlFnct = new aadl::AADLObjectFunction("init");
+    aadlModel->addObject(aadlFnct);
     result = checker.checkInstanceNames();
     QCOMPARE(result.size(), 1);
+    QCOMPARE(checker.checkInstance(instance), false);
 
     // set instance name to the function name
     instance->setName("init");
     result = checker.checkInstanceNames();
     QCOMPARE(result.size(), 0);
+    QCOMPARE(checker.checkInstance(instance), true);
+
+    // Renaming the aadl function invalidates again
+    aadlFnct->setTitle("Foo");
+    result = checker.checkInstanceNames();
+    QCOMPARE(result.size(), 1);
+    QCOMPARE(checker.checkInstance(instance), false);
 }
 
 void tst_AadlChecks::testCheckInstanceRelations()

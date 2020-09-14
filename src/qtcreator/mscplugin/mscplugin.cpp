@@ -164,17 +164,19 @@ void MSCPlugin::checkInstances()
 
     QVector<QSharedPointer<msc::MSCEditorCore>> mscCores = allMscCores();
 
+    for (QSharedPointer<msc::MSCEditorCore> mplugin : mscCores) {
+        mplugin->aadlChecker()->setIvPlugin(ivp);
+    }
+
     // Check for names
     QVector<QPair<msc::MscChart *, msc::MscInstance *>> resultNames;
     for (QSharedPointer<msc::MSCEditorCore> mplugin : mscCores) {
-        mplugin->aadlChecker()->setIvPlugin(ivp);
         resultNames += mplugin->aadlChecker()->checkInstanceNames();
     }
 
     // Check for nested functions usage
     QVector<QPair<msc::MscChart *, msc::MscInstance *>> resultRelations;
     for (QSharedPointer<msc::MSCEditorCore> mplugin : mscCores) {
-        mplugin->aadlChecker()->setIvPlugin(ivp);
         resultRelations += mplugin->aadlChecker()->checkInstanceRelations();
     }
 

@@ -35,7 +35,10 @@
 
 namespace msc {
 
-AadlChecks::AadlChecks() { }
+AadlChecks::AadlChecks(QObject *parent)
+    : QObject((parent))
+{
+}
 
 AadlChecks::~AadlChecks() { }
 
@@ -46,20 +49,32 @@ void AadlChecks::setMscPlugin(MSCEditorCore *mscPlugin)
 
 void AadlChecks::setIvPlugin(QSharedPointer<aadlinterface::IVEditorCore> ivPlugin)
 {
+    if (ivPlugin == m_ivPlugin) {
+        return;
+    }
+
+    if (aadl::AADLObjectsModel *model = aadlModel()) {
+        disconnect(model, nullptr, this, nullptr);
+    }
+
     m_ivPlugin = ivPlugin;
+    updateAadlItems();
+
+    if (aadl::AADLObjectsModel *model = aadlModel()) {
+        connect(model, &aadl::AADLObjectsModel::aadlObjectAdded, this, &msc::AadlChecks::updateAadlItems);
+        connect(model, &aadl::AADLObjectsModel::aadlObjectRemoved, this, &msc::AadlChecks::updateAadlItems);
+    }
 }
 
 /*!
    Checks all instances if they are defined in the IV model as function
  */
-QVector<QPair<MscChart *, MscInstance *>> AadlChecks::checkInstanceNames()
+QVector<QPair<MscChart *, MscInstance *>> AadlChecks::checkInstanceNames() const
 {
     QVector<QPair<MscChart *, MscInstance *>> result;
     if (!m_ivPlugin || !m_mscPlugin) {
         return result;
     }
-
-    updateAadlFunctions();
 
     QVector<msc::MscChart *> charts = m_mscPlugin->mainModel()->mscModel()->allCharts();
     for (msc::MscChart *chart : charts) {
@@ -77,14 +92,12 @@ QVector<QPair<MscChart *, MscInstance *>> AadlChecks::checkInstanceNames()
 /*!
    Checks if in a chart instances with parent/child relations re used
  */
-QVector<QPair<MscChart *, MscInstance *>> AadlChecks::checkInstanceRelations()
+QVector<QPair<MscChart *, MscInstance *>> AadlChecks::checkInstanceRelations() const
 {
     QVector<QPair<MscChart *, MscInstance *>> result;
     if (!m_ivPlugin || !m_mscPlugin) {
         return result;
     }
-
-    updateAadlFunctions();
 
     QVector<msc::MscChart *> charts = m_mscPlugin->mainModel()->mscModel()->allCharts();
     for (msc::MscChart *chart : charts) {
@@ -111,16 +124,23 @@ QVector<QPair<MscChart *, MscInstance *>> AadlChecks::checkInstanceRelations()
 }
 
 /*!
+   Checks ich the given MSC insatnce has a corresponding aadl function
+ */
+bool AadlChecks::checkInstance(const MscInstance *instance) const
+{
+    aadl::AADLObjectFunction *aadlFunction = correspondingFunction(instance);
+    return aadlFunction != nullptr;
+}
+
+/*!
    Checks all messages if they are defined in the IV model as connection
  */
-QVector<QPair<MscChart *, MscMessage *>> AadlChecks::checkMessages()
+QVector<QPair<MscChart *, MscMessage *>> AadlChecks::checkMessages() const
 {
     QVector<QPair<MscChart *, MscMessage *>> result;
     if (!m_ivPlugin || !m_mscPlugin) {
         return result;
     }
-
-    updateAadlConnections();
 
     QVector<msc::MscChart *> charts = m_mscPlugin->mainModel()->mscModel()->allCharts();
     for (msc::MscChart *chart : charts) {
@@ -155,9 +175,10 @@ aadl::AADLObjectsModel *AadlChecks::aadlModel() const
 /*!
    Updates the list of functions from the aadl model
  */
-void AadlChecks::updateAadlFunctions()
+void AadlChecks::updateAadlItems()
 {
     m_aadlFunctions.clear();
+    m_aadlConnections.clear();
 
     aadl::AADLObjectsModel *aadlModel = this->aadlModel();
     if (!aadlModel) {
@@ -171,13 +192,18 @@ void AadlChecks::updateAadlFunctions()
                 m_aadlFunctions.append(func);
             }
         }
+        if (obj->aadlType() == aadl::AADLObject::Type::Connection) {
+            if (auto func = dynamic_cast<aadl::AADLObjectConnection *>(obj)) {
+                m_aadlConnections.append(func);
+            }
+        }
     }
 }
 
 /*!
    Returns the aadl functions that correlates to the given msc instance
  */
-aadl::AADLObjectFunction *AadlChecks::correspondingFunction(MscInstance *instance) const
+aadl::AADLObjectFunction *AadlChecks::correspondingFunction(const MscInstance *instance) const
 {
     if (!instance) {
         return nullptr;
@@ -279,28 +305,6 @@ bool AadlChecks::isAncestor(aadl::AADLObjectFunction *func, aadl::AADLObjectFunc
     }
 
     return false;
-}
-
-/*!
-   Collect all aadl connections in the aadl model
- */
-void AadlChecks::updateAadlConnections()
-{
-    m_aadlConnections.clear();
-
-    aadl::AADLObjectsModel *aadlModel = this->aadlModel();
-    if (!aadlModel) {
-        return;
-    }
-
-    const QHash<shared::Id, aadl::AADLObject *> &aadlObjects = aadlModel->objects();
-    for (auto obj : aadlObjects) {
-        if (obj->aadlType() == aadl::AADLObject::Type::Connection) {
-            if (auto func = dynamic_cast<aadl::AADLObjectConnection *>(obj)) {
-                m_aadlConnections.append(func);
-            }
-        }
-    }
 }
 
 /*!

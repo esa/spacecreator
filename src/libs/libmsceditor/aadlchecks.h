@@ -17,6 +17,7 @@
 
 #pragma once
 
+#include <QObject>
 #include <QPair>
 #include <QPointer>
 #include <QSharedPointer>
@@ -43,31 +44,34 @@ class MscMessage;
 /*!
    \brief The AadlChecks class is used to check consistency of a msc model with one aadl model
  */
-class AadlChecks
+class AadlChecks : public QObject
 {
+    Q_OBJECT
 public:
-    AadlChecks();
+    explicit AadlChecks(QObject *parent = nullptr);
     ~AadlChecks();
 
     void setMscPlugin(msc::MSCEditorCore *mscPlugin);
     void setIvPlugin(QSharedPointer<aadlinterface::IVEditorCore> ivPlugin);
 
-    QVector<QPair<msc::MscChart *, msc::MscInstance *>> checkInstanceNames();
-    QVector<QPair<msc::MscChart *, msc::MscInstance *>> checkInstanceRelations();
+    QVector<QPair<msc::MscChart *, msc::MscInstance *>> checkInstanceNames() const;
+    QVector<QPair<msc::MscChart *, msc::MscInstance *>> checkInstanceRelations() const;
+    bool checkInstance(const msc::MscInstance *instance) const;
 
-    QVector<QPair<msc::MscChart *, msc::MscMessage *>> checkMessages();
+    QVector<QPair<msc::MscChart *, msc::MscMessage *>> checkMessages() const;
+
+private:
+    Q_SLOT void updateAadlItems();
 
 private:
     aadl::AADLObjectsModel *aadlModel() const;
-    void updateAadlFunctions();
-    aadl::AADLObjectFunction *correspondingFunction(msc::MscInstance *instance) const;
+    aadl::AADLObjectFunction *correspondingFunction(const MscInstance *instance) const;
     bool correspond(const aadl::AADLObject *aadlObj, const msc::MscInstance *instance) const;
     bool correspond(const aadl::AADLObjectFunction *aadlFunc, const msc::MscInstance *instance) const;
     bool hasAncestor(aadl::AADLObjectFunction *func, const QVector<aadl::AADLObjectFunction *> allFunctions) const;
     bool hasDescendant(aadl::AADLObjectFunction *func, const QVector<aadl::AADLObjectFunction *> allFunctions) const;
     bool isAncestor(aadl::AADLObjectFunction *func, aadl::AADLObjectFunction *otherFunc) const;
 
-    void updateAadlConnections();
     aadl::AADLObjectConnection *correspondingConnection(msc::MscMessage *message) const;
     bool correspond(const aadl::AADLObjectConnection *connection, const msc::MscMessage *message) const;
 
