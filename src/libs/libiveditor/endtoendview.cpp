@@ -108,13 +108,18 @@ EndToEndView::~EndToEndView()
 }
 
 //! This emits visibleChanged after calling the standard setVisible method.
-//! This is used to keep the "show e2e" menu action updated
+//! And it refreshes the view if this is now visible.
+//! This is used to keep the "show e2e" menu action updated.
 void EndToEndView::setVisible(bool visible)
 {
     const bool wasVisible = isVisible();
     QWidget::setVisible(visible);
     if (isVisible() != wasVisible) {
         Q_EMIT visibleChanged(visible);
+
+        if (isVisible()) {
+            refreshView();
+        }
     }
 }
 

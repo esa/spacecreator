@@ -153,7 +153,6 @@ EndToEndConnections::Dataflow EndToEndConnections::readDataflow(const QString &f
                 auto dataflow = readDataFlowFromDocument(doc);
                 if (!dataflow.isEmpty()) {
                     // We found a flow! Use it
-                    qDebug() << "Dataflow" << dataflow;
                     return dataflow;
                 }
             } else {
