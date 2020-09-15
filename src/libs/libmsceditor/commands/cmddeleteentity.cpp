@@ -69,8 +69,9 @@ CmdDeleteEntity::CmdDeleteEntity(
                 }
             }
         }
+    }
 
-    } else if (m_document && !items.empty()) {
+    if (m_document && !items.empty()) {
         auto itemDocument = dynamic_cast<MscDocument *>(items[0]);
         if (itemDocument) {
             const int idx = m_document->documents().indexOf(itemDocument);
@@ -90,7 +91,9 @@ void CmdDeleteEntity::redo()
             m_chart->removeInstance(dynamic_cast<MscInstance *>(instance));
         }
         checkVisualSorting();
-    } else if (m_document) {
+    }
+
+    if (m_document) {
         for (auto document : m_entities) {
             m_document->removeDocument(dynamic_cast<MscDocument *>(document), false);
         }
@@ -116,7 +119,9 @@ void CmdDeleteEntity::undo()
             m_chart->addInstanceEvent(event, idx);
         }
         undoVisualSorting();
-    } else if (m_document) {
+    }
+
+    if (m_document) {
         if (!m_document->charts().empty()) {
             m_document->blockSignals(true);
             m_document->clear();
