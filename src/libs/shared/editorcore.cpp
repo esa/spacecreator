@@ -55,6 +55,8 @@ void EditorCore::initMenus(QMainWindow *window)
     menu->addAction(actionSaveFile());
     menu->addAction(actionSaveFileAs());
     menu->addSeparator();
+    menu->addAction(actionOpenAadl());
+    menu->addSeparator();
     addMenuFileActions(menu, window);
     menu->addSeparator();
     menu->addAction(actionQuit());
@@ -120,6 +122,14 @@ QAction *EditorCore::actionSaveFileAs()
         m_actionSaveFileAs->setShortcut(QKeySequence::SaveAs);
     }
     return m_actionSaveFileAs;
+}
+
+QAction *EditorCore::actionOpenAadl()
+{
+    if (m_actionOpenAadl == nullptr) {
+        m_actionOpenAadl = new QAction(tr("Open AADL file ..."), this);
+    }
+    return m_actionOpenAadl;
 }
 
 QAction *EditorCore::actionQuit()

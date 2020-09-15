@@ -46,6 +46,7 @@ public:
     QAction *actionOpenFile();
     QAction *actionSaveFile();
     QAction *actionSaveFileAs();
+    QAction *actionOpenAadl();
     QAction *actionQuit();
     QAction *actionUndo();
     QAction *actionRedo();
@@ -73,6 +74,7 @@ private:
     QAction *m_actionSaveFile { nullptr };
     QAction *m_actionSaveFileAs { nullptr };
     QAction *m_actionCloseFile { nullptr };
+    QAction *m_actionOpenAadl { nullptr };
     QAction *m_actionQuit { nullptr };
     QAction *m_actionUndo { nullptr };
     QAction *m_actionRedo { nullptr };

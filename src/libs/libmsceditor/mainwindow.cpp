@@ -17,6 +17,7 @@
 
 #include "mainwindow.h"
 
+#include "aadlchecks.h"
 #include "baseitems/common/coordinatesconverter.h"
 #include "chartitem.h"
 #include "chartlayoutmanager.h"
@@ -25,6 +26,8 @@
 #include "documentitemmodel.h"
 #include "geometry.h"
 #include "graphicsview.h"
+#include "interface/interfacedocument.h"
+#include "iveditorcore.h"
 #include "mainmodel.h"
 #include "minimap.h"
 #include "mscaction.h"
@@ -32,9 +35,9 @@
 #include "msccondition.h"
 #include "msccreate.h"
 #include "mscdocument.h"
+#include "msceditorcore.h"
 #include "mscmessage.h"
 #include "mscmodel.h"
-#include "msceditorcore.h"
 #include "msctimer.h"
 #include "settings/appoptions.h"
 #include "textviewdialog.h"
@@ -88,6 +91,8 @@ struct MainWindow::MainWindowPrivate {
     msc::TextViewDialog *mscTextBrowser = nullptr;
 
     bool m_dropUnsavedChangesSilently = false;
+
+    QSharedPointer<aadlinterface::IVEditorCore> m_ivCore { new aadlinterface::IVEditorCore() };
 
     Q_DISABLE_COPY(MainWindowPrivate);
 };
@@ -177,6 +182,16 @@ void MainWindow::selectAndOpenFile()
     const QString filename = QFileDialog::getOpenFileName(this, tr("MSC"), path, suffixes.join(";;"));
     if (!filename.isEmpty()) {
         openFileMsc(filename);
+    }
+}
+
+void MainWindow::openAadlFile()
+{
+    const QString &fileName =
+            QFileDialog::getOpenFileName(this, tr("Open file"), "", d->m_ivCore->document()->supportedFileExtensions());
+    if (!fileName.isEmpty()) {
+        d->m_ivCore->document()->load(fileName);
+        d->m_plugin->aadlChecker()->setIvPlugin(d->m_ivCore);
     }
 }
 
@@ -405,6 +420,7 @@ void MainWindow::initActions()
     connect(d->m_plugin->actionOpenFile(), &QAction::triggered, this, &MainWindow::selectAndOpenFile);
     connect(d->m_plugin->actionSaveFile(), &QAction::triggered, this, &MainWindow::saveMsc);
     connect(d->m_plugin->actionSaveFileAs(), &QAction::triggered, this, &MainWindow::saveAsMsc);
+    connect(d->m_plugin->actionOpenAadl(), &QAction::triggered, this, &MainWindow::openAadlFile);
     connect(d->m_plugin->actionQuit(), &QAction::triggered, this, [&]() {
         if (this->saveDocument()) {
             this->saveSettings();
