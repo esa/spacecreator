@@ -61,20 +61,20 @@ void tst_EndToEndConnections::testReader()
     const auto dataflow = aadlinterface::EndToEndConnections::readDataflow(::mscFile1, false);
 
     QCOMPARE(dataflow.connections.size(), 2);
-    QCOMPARE(dataflow.connections[0].from, QString("User Interface"));
-    QCOMPARE(dataflow.connections[0].to, QString("File Manager"));
-    QCOMPARE(dataflow.connections[0].message, QString("Open File"));
-    QCOMPARE(dataflow.connections[1].from, QString("File Manager"));
-    QCOMPARE(dataflow.connections[1].to, QString("Database Manager"));
-    QCOMPARE(dataflow.connections[1].message, QString("Access Database"));
+    QCOMPARE(dataflow.connections[0].from, QString("user interface"));
+    QCOMPARE(dataflow.connections[0].to, QString("file manager"));
+    QCOMPARE(dataflow.connections[0].message, QString("open file"));
+    QCOMPARE(dataflow.connections[1].from, QString("file manager"));
+    QCOMPARE(dataflow.connections[1].to, QString("database manager"));
+    QCOMPARE(dataflow.connections[1].message, QString("access database"));
 
     QCOMPARE(dataflow.internalConnections.size(), 2);
-    QCOMPARE(dataflow.internalConnections[0].instance, QString("User Interface"));
-    QCOMPARE(dataflow.internalConnections[0].interface1, QString("Start Transaction"));
-    QCOMPARE(dataflow.internalConnections[0].interface2, QString("Open File"));
-    QCOMPARE(dataflow.internalConnections[1].instance, QString("File Manager"));
-    QCOMPARE(dataflow.internalConnections[1].interface1, QString("Open File"));
-    QCOMPARE(dataflow.internalConnections[1].interface2, QString("Access Database"));
+    QCOMPARE(dataflow.internalConnections[0].instance, QString("user interface"));
+    QCOMPARE(dataflow.internalConnections[0].interface1, QString("start transaction"));
+    QCOMPARE(dataflow.internalConnections[0].interface2, QString("open file"));
+    QCOMPARE(dataflow.internalConnections[1].instance, QString("file manager"));
+    QCOMPARE(dataflow.internalConnections[1].interface1, QString("open file"));
+    QCOMPARE(dataflow.internalConnections[1].interface2, QString("access database"));
 }
 
 QTEST_MAIN(tst_EndToEndConnections)

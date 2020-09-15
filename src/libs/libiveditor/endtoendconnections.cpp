@@ -104,10 +104,12 @@ static EndToEndConnections::Dataflow readDataFlowFromDocument(msc::MscDocument *
         for (auto event : chart->instanceEvents()) {
             auto msg = dynamic_cast<msc::MscMessage *>(event);
             if (msg != nullptr && msg->messageType() == msc::MscMessage::MessageType::Message) {
-                const QString source = instanceName(msg->sourceInstance());
-                const QString target = instanceName(msg->targetInstance());
+                const QString source = instanceName(msg->sourceInstance()).trimmed().toLower();
+                const QString target = instanceName(msg->targetInstance()).trimmed().toLower();
                 const QString message =
-                        aadl::AADLNameValidator::decodeName(aadl::AADLObject::Type::RequiredInterface, msg->name());
+                        aadl::AADLNameValidator::decodeName(aadl::AADLObject::Type::RequiredInterface, msg->name())
+                                .trimmed()
+                                .toLower();
 
                 // The source must match, except for the first call which can be from global or any instance
                 if (!message.isEmpty() && (source == lastInstance || dataflow.isEmpty())) {
@@ -173,7 +175,8 @@ bool EndToEndConnections::isInDataflow(const Dataflow &dataflow, aadl::AADLObjec
         return false;
     }
 
-    Connection c = { connection->sourceName(), connection->targetName(), connection->targetInterfaceName() };
+    Connection c = { connection->sourceName().trimmed().toLower(), connection->targetName().trimmed().toLower(),
+        connection->targetInterfaceName().trimmed().toLower() };
     return dataflow.connections.contains(c);
 }
 

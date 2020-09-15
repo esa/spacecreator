@@ -50,7 +50,6 @@ EndToEndView::EndToEndView(InterfaceDocument *document, QWidget *parent)
     d->view->setInteractive(false);
     d->scene = new QGraphicsScene(this);
     d->view->setScene(d->scene);
-
     d->document = document;
 
     auto barLayout = new QHBoxLayout;
@@ -163,9 +162,14 @@ void EndToEndView::refreshView()
 
                 if (auto function = ri->function()) {
                     // Check if this is part of an internal connection
-                    const QStringList labels = ri->ifaceLabelList();
+                    const QStringList labelsOriginal = ri->ifaceLabelList();
+                    QStringList labels;
+                    for (auto l : labelsOriginal) {
+                        labels << l.trimmed().toLower();
+                    }
+                    const QString title = function->title().trimmed().toLower();
                     for (auto &ic : internalConnections) {
-                        if (function->title() == ic.connection.instance && labels.contains(ic.connection.interface2)) {
+                        if (title == ic.connection.instance && labels.contains(ic.connection.interface2)) {
                             ic.ri = graphicsItem;
                         }
                     }
@@ -180,9 +184,10 @@ void EndToEndView::refreshView()
 
                 if (auto function = pi->function()) {
                     // Check if this is part of an internal connection
+                    const QString interface = pi->ifaceLabel().trimmed().toLower();
+                    const QString title = function->title().trimmed().toLower();
                     for (auto &ic : internalConnections) {
-                        if (function->title() == ic.connection.instance
-                                && pi->ifaceLabel() == ic.connection.interface1) {
+                        if (title == ic.connection.instance && interface == ic.connection.interface1) {
                             // This is the ri side
                             ic.pi = graphicsItem;
                         }
