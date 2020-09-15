@@ -475,7 +475,7 @@ parameterList
     ;
 
 paramaterDefn
-    : SEQUENCEOF | sdlText | choiceOfChoice | binding | expression | pattern // SEQUENCEOF, sdlText and choiceOfChoice are not in the spec
+    : asnSequence | sdlText | choiceOfChoice | binding | expression | pattern // asnSequence, sdlText and choiceOfChoice are not in the spec
     ;
 
 //
@@ -541,10 +541,22 @@ sdlText
     : LEFTOPEN '.' (name (COMMA name)*) '.' RIGHTOPEN
     ;
 
+// ASN1 type choice
+// choice1 : FALSE
+asnChoice
+    : name COLON name
+    ;
+
 // Allow something like for ASN.1
 // CHOICE { act CHOICE { heater ENUMERATED { nominal, redundant } } }
 choiceOfChoice
     : name COLON name (COLON name)+
+    ;
+
+// Allow something like for ASN.1
+// { field-a  FALSE, field-b  choice1 : FALSE }
+asnSequence
+    : LEFTCURLYBRACKET (NAME (NAME | asnChoice)) (COMMA (NAME | asnChoice))* RIGHTCURLYBRACKET
     ;
 
 /*Keywords*/

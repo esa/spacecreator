@@ -1190,7 +1190,7 @@ msc::MscParameterList MscParserVisitor::readParameterList(MscParser::ParameterLi
             pattern = ::sourceTextForContext(paramaterDefn->sdlText());
         }
         if (pattern.isEmpty()) {
-            pattern = ::treeNodeToString(paramaterDefn->SEQUENCEOF());
+            pattern = ::sourceTextForContext(paramaterDefn->asnSequence());
         }
         if (pattern.isEmpty()) {
             pattern = ::treeNodeToString(paramaterDefn->choiceOfChoice());

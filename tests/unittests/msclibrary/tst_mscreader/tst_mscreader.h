@@ -77,6 +77,7 @@ private Q_SLOTS:
     void testMessageParametersCurlyBraces();
     void testMessageChoiceParameter();
     void testMessageComplexParameter();
+    void testMessageAsn1SequenceChoiceParameter();
     void testSortedMessage();
     void testSortedMessageTwoCharts();
     void testSortedInstanceEvents();
