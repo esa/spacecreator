@@ -1,0 +1,67 @@
+mscdocument automade;
+    language ASN.1;
+    data dataview-uniq.asn;
+    inst flight_software;
+    inst ground_segment;
+    inst mass_memory;
+    inst payload;
+
+    msg picture : (Picture);
+    msg housekeeping : (Housekeeping-Data);
+    msg ack : ();
+    msg completion_report : (Completion-Status);
+    msg take_picture : ();
+    msg set_true_anomaly : (T-UInt32);
+    msg flight_software_true_anomaly : ();
+
+    msc recorded;
+        flight_software: instance;
+            out set_true_anomaly,1(1000) to satellite_platform_timer_manager;
+            timeout true_anomaly;
+            out take_picture,3() to payload;
+            in completion_report,6(success) from payload;
+            out housekeeping,7({events no-error, status success}) to ground_segment;
+            out set_true_anomaly,8(1000) to satellite_platform_timer_manager;
+            timeout true_anomaly;
+            out take_picture,10() to payload;
+            in completion_report,13(success) from payload;
+            out housekeeping,14({events no-error, status success}) to ground_segment;
+            out set_true_anomaly,15(1000) to satellite_platform_timer_manager;
+            timeout true_anomaly;
+            out take_picture,17() to payload;
+            in completion_report,20(success) from payload;
+            out housekeeping,21({events no-error, status success}) to ground_segment;
+        endinstance;
+
+        ground_segment: instance;
+            in housekeeping,7({events no-error, status success}) from flight_software;
+            in housekeeping,14({events no-error, status success}) from flight_software;
+            in housekeeping,21({events no-error, status success}) from flight_software;
+        endinstance;
+
+        mass_memory: instance;
+            in picture,4('5261772064617461'H) from payload;
+            out ack,5() to payload;
+            in picture,11('5261772064617461'H) from payload;
+            out ack,12() to payload;
+            in picture,18('5261772064617461'H) from payload;
+            out ack,19() to payload;
+        endinstance;
+
+        payload: instance;
+            in take_picture,3() from flight_software;
+            out picture,4('5261772064617461'H) to mass_memory;
+            in ack,5() from mass_memory;
+            out completion_report,6(success) to flight_software;
+            in take_picture,10() from flight_software;
+            out picture,11('5261772064617461'H) to mass_memory;
+            in ack,12() from mass_memory;
+            out completion_report,13(success) to flight_software;
+            in take_picture,17() from flight_software;
+            out picture,18('5261772064617461'H) to mass_memory;
+            in ack,19() from mass_memory;
+            out completion_report,20(success) to flight_software;
+        endinstance;
+
+    endmsc;
+endmscdocument;

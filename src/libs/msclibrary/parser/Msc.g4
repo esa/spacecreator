@@ -466,6 +466,7 @@ wildcard
     | functionText // extending the spec
     | LEFTCURLYBRACKET functionText RIGHTCURLYBRACKET // extending the spec
     | LEFTCURLYBRACKET (NAME | CHARACTERSTRING | variableString | sdlText)+ (COMMA (NAME | CHARACTERSTRING | variableString | sdlText)+)* RIGHTCURLYBRACKET // extending the spec
+    | asnValue
     ;
 
 // 5.8 Data in message and timer parameters
@@ -541,23 +542,25 @@ sdlText
     : LEFTOPEN '.' (name (COMMA name)*) '.' RIGHTOPEN
     ;
 
+// ASN.1 value
+asnValue
+    : NAME | OCTECTSTRING | BITSTRING | BOOLEAN
+    ;
 // ASN1 type choice
 // choice1 : FALSE
 asnChoice
     : name COLON name
     ;
-
 // Allow something like for ASN.1
 // CHOICE { act CHOICE { heater ENUMERATED { nominal, redundant } } }
 choiceOfChoice
     : name COLON name (COLON name)+
     ;
-
 // Allow something like for ASN.1
 // { field-a  FALSE, field-b  choice1 : FALSE }
 asnSequence
     : SEQUENCEOF
-    | LEFTCURLYBRACKET (NAME | COMMA | asnChoice)+ RIGHTCURLYBRACKET
+    | LEFTCURLYBRACKET (asnValue | COMMA | asnChoice)+ RIGHTCURLYBRACKET
     | LEFTCURLYBRACKET asnSequence (COMMA asnSequence)* RIGHTCURLYBRACKET
     ;
 
@@ -748,11 +751,24 @@ FILENAME : ( LETTER | DECIMALDIGIT | UNDERLINE | FULLSTOP | MINUS )+  ;
 STRING : '"' (ALPHANUMERIC | SPECIAL | STRINGOTHERCHARACTER)* '"';
 STRINGOTHERCHARACTER : '?' | '%' | '+' | MINUS | '!' | '*' | '=' | '/' | UNDERLINE | FULLSTOP;
 
+// ASN.1 extensions
+fragment OCTECT
+    : ((DECIMALDIGIT | [a-fA-F]) (DECIMALDIGIT | [a-fA-F]))+
+    ;
+OCTECTSTRING
+    : APOSTROPHE (OCTECT)+ APOSTROPHE ('H' | 'h')
+    ;
+BITSTRING
+    : APOSTROPHE ('0' | '1')+ APOSTROPHE ('B' | 'b')
+    ;
+BOOLEAN
+    : ('T' 'R' 'U' 'E') | ('t' 'r' 'u' 'e') | ('F' 'A' 'L' 'S' 'E') |  ('f' 'a' 'l' 's' 'e')
+    ;
 SEQUENCEOF // custom
-    : LEFTCURLYBRACKET (NAME | ' ' | COMMA)* RIGHTCURLYBRACKET
+    : LEFTCURLYBRACKET (NAME | OCTECTSTRING | BITSTRING | ' ' | COMMA)* RIGHTCURLYBRACKET
     ;
 
-
+// Skip stuff
 COMMENTLOST : '/*' .*? '*/' -> channel(2);
 WS : [ \t\r\n]+ -> skip ; // skip spaces, tabs, newlines
 LB : '/' ('\r' | '\n')+ ->skip; // linebreak

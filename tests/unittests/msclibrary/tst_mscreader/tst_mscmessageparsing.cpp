@@ -337,6 +337,39 @@ void tst_MscReader::testMessageAsn1SequenceOfSecencesParameter()
     QCOMPARE(message->parameters().at(0).parameter(), QString("{{empty, empty, empty}, {empty, red, empty}}"));
 }
 
+void tst_MscReader::testMessageAsn1OctetString()
+{
+    QString msc = "mscdocument Untitled_Leaf;\
+                     msc Untitled_MSC; \
+                       instance Instance_1; \
+                         out mymsg('4143545f494555'H) to Instance_2; \
+                         out mymsg2({'4143545f494555'H, '4143545f494555'H}) to Instance_2; \
+                       endinstance; \
+                       instance Instance_2; \
+                         in mymsg('4143545f494555'H) from Instance_1; \
+                         in mymsg2({'4143545f494555'H, '4143545f494555'H}) from Instance_1; \
+                       endinstance; \
+                     endmsc;\
+                   endmscdocument;";
+
+    QScopedPointer<MscModel> model(m_reader->parseText(msc));
+
+    QCOMPARE(model->documents().size(), 1);
+    MscDocument *doc = model->documents().at(0);
+    QCOMPARE(doc->charts().size(), 1);
+    MscChart *chart = doc->charts().at(0);
+
+    QCOMPARE(chart->instances().size(), 2);
+    QCOMPARE(chart->instanceEvents().size(), 2);
+    auto message = qobject_cast<MscMessage *>(chart->instanceEvents().at(0));
+    QVERIFY(message != nullptr);
+    QCOMPARE(message->parameters().size(), 1);
+    QCOMPARE(message->parameters().at(0).parameter(), QString("'4143545f494555'H"));
+    message = qobject_cast<MscMessage *>(chart->instanceEvents().at(1));
+    QCOMPARE(message->parameters().size(), 1);
+    QCOMPARE(message->parameters().at(0).parameter(), QString("{'4143545f494555'H, '4143545f494555'H}"));
+}
+
 void tst_MscReader::testSortedMessage()
 {
     static const QLatin1String msc("msc connection; \
