@@ -23,6 +23,8 @@
 #include <QRegularExpression>
 #include <QTextOption>
 
+class QCompleter;
+
 namespace msc {
 
 class TextItem : public QGraphicsTextItem
@@ -79,6 +81,9 @@ public:
     bool textIsValid() const;
     void setMscValidationTest(const QString &text);
 
+    void updateCompleter(const QStringList &completionList);
+    void removeCompleter();
+
 Q_SIGNALS:
     void edited(const QString &newText);
     void textChanged();
@@ -122,6 +127,7 @@ protected:
     bool m_textIsValid = true;
     bool m_filterInvalidText = true;
     QString m_mscValidationTest;
+    QCompleter *m_completer = nullptr;
 };
 
 class NameItem : public TextItem

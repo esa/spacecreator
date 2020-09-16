@@ -20,11 +20,15 @@
 
 #include "mscreader.h"
 
+#include <QAbstractItemView>
 #include <QApplication>
+#include <QCompleter>
 #include <QDebug>
 #include <QGraphicsSceneMouseEvent>
+#include <QGraphicsView>
 #include <QKeyEvent>
 #include <QPainter>
+#include <QStringListModel>
 #include <QTextCursor>
 #include <QTextDocument>
 
@@ -225,6 +229,7 @@ void TextItem::disableEditMode()
 
 void TextItem::focusOutEvent(QFocusEvent *event)
 {
+    removeCompleter();
     disableEditMode();
     QGraphicsTextItem::focusOutEvent(event);
 }
@@ -499,6 +504,66 @@ bool TextItem::textIsValid() const
 void TextItem::setMscValidationTest(const QString &text)
 {
     m_mscValidationTest = text;
+}
+
+/*!
+   Updates and show the name completer with all function names, if there are (matching) items
+ */
+void TextItem::updateCompleter(const QStringList &completionList)
+{
+    if (completionList.isEmpty()) {
+        removeCompleter();
+    }
+
+    if (m_completer == nullptr) {
+        m_completer = new QCompleter(completionList, this);
+        m_completer->setCompletionMode(QCompleter::PopupCompletion);
+        connect(this, &TextItem::textChanged, this, [this]() {
+            m_completer->setCompletionPrefix(toPlainText());
+            QAbstractItemView *popup = m_completer->popup();
+            if (m_completer->completionModel()->rowCount() > 0) {
+                popup->show();
+            } else {
+                popup->hide();
+            }
+        });
+        connect(m_completer, qOverload<const QString &>(&QCompleter::highlighted), this, &msc::TextItem::setPlainText);
+    }
+
+    if (auto stringModel = qobject_cast<QStringListModel *>(m_completer->model())) {
+        if (stringModel->stringList() != completionList) {
+            stringModel->setStringList(completionList);
+        }
+    }
+
+    m_completer->setCompletionPrefix(toPlainText());
+
+    QPoint textPos;
+    QList<QGraphicsView *> views = scene()->views();
+    if (!views.isEmpty()) {
+        QGraphicsView *view = views[0];
+        m_completer->setWidget(view);
+        QPointF sceneP = mapToScene(boundingRect().bottomLeft());
+        QPoint viewP = view->mapFromScene(sceneP);
+        textPos = view->viewport()->mapToGlobal(viewP);
+    }
+    QAbstractItemView *popup = m_completer->popup();
+    QRect popRect = popup->geometry();
+    popRect.moveTopLeft(textPos);
+    popup->setGeometry(popRect);
+    if (m_completer->completionModel()->rowCount() > 0) {
+        popup->show();
+    } else {
+        popup->hide();
+    }
+}
+
+void TextItem::removeCompleter()
+{
+    if (m_completer) {
+        m_completer->deleteLater();
+        m_completer = nullptr;
+    }
 }
 
 void TextItem::checkTextValidity()

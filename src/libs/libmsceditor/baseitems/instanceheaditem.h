@@ -21,6 +21,7 @@
 #include <QLinearGradient>
 
 namespace msc {
+class AadlChecks;
 class TextItem;
 
 class InstanceHeadItem : public QGraphicsObject
@@ -48,6 +49,9 @@ public:
 
     static QSizeF defaultSize();
 
+    void setAadlChecker(AadlChecks *checker);
+    void showCompleter();
+
 public Q_SLOTS:
     void setName(const QString &name);
     void setKind(const QString &kind);
@@ -59,6 +63,9 @@ Q_SIGNALS:
     void manualMoveFinished(const QPointF &sceneFrom, const QPointF &sceneTo);
     void layoutUpdated();
 
+protected Q_SLOTS:
+    void updateLayout();
+
 protected:
     void mouseMoveEvent(QGraphicsSceneMouseEvent *event) override;
     void mousePressEvent(QGraphicsSceneMouseEvent *event) override;
@@ -66,17 +73,15 @@ protected:
     void mouseDoubleClickEvent(QGraphicsSceneMouseEvent *event) override;
 
 private:
+    static QLinearGradient createGradientForKind(const QGraphicsItem *itemKind);
+    static QLinearGradient createGradientForName(const QGraphicsItem *itemName);
+
     TextItem *m_textItemName;
     QGraphicsRectItem *m_rectItem;
     TextItem *m_textItemKind;
     QPointF m_manualMovementFrom, m_manualMovementTo;
     QRectF m_explicitTextBox;
-
-    static QLinearGradient createGradientForKind(const QGraphicsItem *itemKind);
-    static QLinearGradient createGradientForName(const QGraphicsItem *itemName);
-
-protected Q_SLOTS:
-    void updateLayout();
+    AadlChecks *m_aadlChecker = nullptr;
 };
 
 } // ns msc

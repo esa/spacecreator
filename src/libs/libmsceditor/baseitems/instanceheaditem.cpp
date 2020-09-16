@@ -17,6 +17,7 @@
 
 #include "instanceheaditem.h"
 
+#include "aadlchecks.h"
 #include "baseitems/common/coordinatesconverter.h"
 #include "baseitems/common/mscutils.h"
 #include "baseitems/textitem.h"
@@ -264,9 +265,10 @@ void InstanceHeadItem::mouseReleaseEvent(QGraphicsSceneMouseEvent *event)
 
 void InstanceHeadItem::mouseDoubleClickEvent(QGraphicsSceneMouseEvent *event)
 {
-    auto activateTextEdit = [](TextItem *textItem, const QPointF &scenePos) {
+    auto activateTextEdit = [this](TextItem *textItem, const QPointF &scenePos) {
         if (textItem->contains(textItem->mapFromScene(scenePos))) {
             textItem->enableEditMode();
+            showCompleter();
             return true;
         }
         return false;
@@ -320,6 +322,24 @@ QSizeF InstanceHeadItem::defaultSize()
     }
 
     return sizeScene;
+}
+
+/*!
+   Set the aadl checker to verify data with the aadl model
+ */
+void InstanceHeadItem::setAadlChecker(AadlChecks *checker)
+{
+    m_aadlChecker = checker;
+}
+
+/*!
+   Updates and show the name completer with all function names
+ */
+void InstanceHeadItem::showCompleter()
+{
+    if (m_aadlChecker) {
+        m_textItemName->updateCompleter(m_aadlChecker->functionsNames());
+    }
 }
 
 } // ns msc

@@ -21,6 +21,7 @@
 #include <QPair>
 #include <QPointer>
 #include <QSharedPointer>
+#include <QStringList>
 #include <QVector>
 #include <QWeakPointer>
 
@@ -57,6 +58,7 @@ public:
     QVector<QPair<msc::MscChart *, msc::MscInstance *>> checkInstanceNames() const;
     QVector<QPair<msc::MscChart *, msc::MscInstance *>> checkInstanceRelations() const;
     bool checkInstance(const msc::MscInstance *instance) const;
+    QStringList functionsNames() const;
 
     QVector<QPair<msc::MscChart *, msc::MscMessage *>> checkMessages() const;
     bool checkMessage(const msc::MscMessage *message) const;

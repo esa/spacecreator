@@ -74,6 +74,8 @@ public:
 
     QPair<QPointF, bool> commentPoint() const override;
 
+    void postCreatePolishing() override;
+
     void applyCif() override;
 
     void updateCif() override;

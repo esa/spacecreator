@@ -139,6 +139,25 @@ bool AadlChecks::checkInstance(const MscInstance *instance) const
 }
 
 /*!
+   Returns a list of the names of all functions in the aadl model
+ */
+QStringList AadlChecks::functionsNames() const
+{
+    if (!m_ivPlugin) {
+        return {};
+    }
+
+    QStringList functionNames;
+    for (const aadl::AADLObjectFunction *aadlFunction : m_aadlFunctions) {
+        if (aadlFunction && !aadlFunction->title().isEmpty()) {
+            functionNames << aadl::AADLNameValidator::encodeName(
+                    aadl::AADLObject::Type::Function, aadlFunction->title());
+        }
+    }
+    return functionNames;
+}
+
+/*!
    Checks all messages if they are defined in the IV model as connection
  */
 QVector<QPair<MscChart *, MscMessage *>> AadlChecks::checkMessages() const

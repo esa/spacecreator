@@ -87,6 +87,7 @@ InstanceItem::InstanceItem(
     });
 
     if (m_model && m_model->aadlChecker()) {
+        m_headSymbol->setAadlChecker(m_model->aadlChecker());
         connect(m_model->aadlChecker(), &msc::AadlChecks::ivPluginChanged, this, &msc::InstanceItem::checkAadlFunction);
     }
 
@@ -299,6 +300,12 @@ InstanceItem *InstanceItem::createDefaultItem(
 QPair<QPointF, bool> InstanceItem::commentPoint() const
 {
     return qMakePair(QPointF(m_headSymbol->rectGeometry().right(), m_headSymbol->rectGeometry().center().y()), false);
+}
+
+void InstanceItem::postCreatePolishing()
+{
+    InteractiveObject::postCreatePolishing();
+    m_headSymbol->showCompleter();
 }
 
 void InstanceItem::initGripPoints()
