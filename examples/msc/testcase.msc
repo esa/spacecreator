@@ -1,0 +1,22 @@
+mscdocument Untitled_Document /* MSC AND */;
+    language ASN.1;
+    data DataView.asn;
+    msg mymsg : (My-Seq);
+/* CIF MSCDOCUMENT (0, 0) (3486, 2380) */
+mscdocument Untitled_Leaf /* MSC LEAF */;
+    language ASN.1;
+    data DataView.asn;
+msc Untitled_MSC;
+/* CIF INSTANCE (0, 80) (271, 114) (800, 2162) */
+instance Instance_1;
+/* CIF MESSAGE (137, 348) (1200, 444) */
+out mymsg({ field-a  FALSE, field-b  choice1 : FALSE }) to Instance_2;
+endinstance;
+/* CIF INSTANCE (1063, 80) (271, 114) (800, 2162) */
+instance Instance_2;
+/* CIF MESSAGE (137, 348) (1200, 444) */
+in mymsg({ field-a  FALSE, field-b  choice1 : FALSE }) from Instance_1;
+endinstance;
+endmsc;
+endmscdocument;
+endmscdocument;

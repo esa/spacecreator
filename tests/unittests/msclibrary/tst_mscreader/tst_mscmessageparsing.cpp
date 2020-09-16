@@ -309,6 +309,34 @@ void tst_MscReader::testMessageAsn1SequenceChoiceParameter()
     QCOMPARE(message->parameters().at(0).parameter(), QString("{ field-a  FALSE, field-b  choice1 : FALSE }"));
 }
 
+void tst_MscReader::testMessageAsn1SequenceOfSecencesParameter()
+{
+    QString msc = "mscdocument Untitled_Leaf;\
+                     msc Untitled_MSC; \
+                       instance Instance_1; \
+                         out mymsg({{empty, empty, empty}, {empty, red, empty}}) to Instance_2; \
+                       endinstance; \
+                       instance Instance_2; \
+                         in mymsg({{empty, empty, empty}, {empty, red, empty}}) from Instance_1; \
+                       endinstance; \
+                     endmsc;\
+                   endmscdocument;";
+
+    QScopedPointer<MscModel> model(m_reader->parseText(msc));
+
+    QCOMPARE(model->documents().size(), 1);
+    MscDocument *doc = model->documents().at(0);
+    QCOMPARE(doc->charts().size(), 1);
+    MscChart *chart = doc->charts().at(0);
+
+    QCOMPARE(chart->instances().size(), 2);
+    QCOMPARE(chart->instanceEvents().size(), 1);
+    auto message = qobject_cast<MscMessage *>(chart->instanceEvents().at(0));
+    QVERIFY(message != nullptr);
+    QCOMPARE(message->parameters().size(), 1);
+    QCOMPARE(message->parameters().at(0).parameter(), QString("{{empty, empty, empty}, {empty, red, empty}}"));
+}
+
 void tst_MscReader::testSortedMessage()
 {
     static const QLatin1String msc("msc connection; \

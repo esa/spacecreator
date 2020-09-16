@@ -484,7 +484,7 @@ expressionString
     : name COLON NAME // TODO not correct ?
     | LEFTCURLYBRACKET name COLON NAME (COMMA name COLON NAME)* RIGHTCURLYBRACKET // TODO not correct ?
     | name COLON CHARACTERSTRING // extending the spec here ?
-    | name COLON LEFTCURLYBRACKET NAME SEQUENCEOF RIGHTCURLYBRACKET // extending the spec here
+    | name COLON LEFTCURLYBRACKET NAME asnSequence RIGHTCURLYBRACKET // extending the spec here
     ;
 
 variableValue
@@ -534,7 +534,7 @@ functionText
     : functionName=name LEFTOPEN sdlText (COMMA sdlText)* RIGHTOPEN
     | functionName=name LEFTOPEN (name (COMMA name)*)? RIGHTOPEN
     | functionName=name LEFTOPEN functionText RIGHTOPEN
-    | functionName=name SEQUENCEOF
+    | functionName=name asnSequence
     ;
 
 sdlText
@@ -556,7 +556,9 @@ choiceOfChoice
 // Allow something like for ASN.1
 // { field-a  FALSE, field-b  choice1 : FALSE }
 asnSequence
-    : LEFTCURLYBRACKET (NAME (NAME | asnChoice)) (COMMA (NAME | asnChoice))* RIGHTCURLYBRACKET
+    : SEQUENCEOF
+    | LEFTCURLYBRACKET (NAME | COMMA | asnChoice)+ RIGHTCURLYBRACKET
+    | LEFTCURLYBRACKET asnSequence (COMMA asnSequence)* RIGHTCURLYBRACKET
     ;
 
 /*Keywords*/
@@ -726,8 +728,6 @@ CHARACTERSTRING :
 
 fragment
 TEXT : ( ALPHANUMERIC | OTHERCHARACTER | SPECIAL | FULLSTOP | UNDERLINE | ' ' | APOSTROPHE )*;
-
-MISC : OTHERCHARACTER | APOSTROPHE;
 
 OTHERCHARACTER : '?' | '%' | '+' | '-' | '!' | '*' | '"' | '=' | '/';
 
