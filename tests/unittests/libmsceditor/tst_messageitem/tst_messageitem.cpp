@@ -35,6 +35,7 @@
 #include <QVector>
 #include <QtTest>
 #include <cmath>
+#include <msccreate.h>
 
 using namespace msc;
 
@@ -58,8 +59,11 @@ private:
     void enterText(const QString &text);
     void parseMsc(const QString &mscText);
     void waitForLayoutUpdate();
+    void addMessage();
+    void addCreate();
 
     MscMessage *m_message = nullptr;
+    MscCreate *m_create = nullptr;
     QPointer<MessageItem> m_messageItem = nullptr;
 
     QGraphicsView *m_view = nullptr;
@@ -115,6 +119,22 @@ void tst_MessageItem::waitForLayoutUpdate()
     QApplication::processEvents();
 }
 
+void tst_MessageItem::addMessage()
+{
+    m_message = new MscMessage("Event1");
+    m_messageItem = new MessageItem(m_message, nullptr);
+
+    m_view->scene()->addItem(m_messageItem);
+}
+
+void tst_MessageItem::addCreate()
+{
+    m_create = new MscCreate("Create1");
+    m_messageItem = new MessageItem(m_create, nullptr);
+
+    m_view->scene()->addItem(m_messageItem);
+}
+
 void tst_MessageItem::init()
 {
     vstest::saveMousePosition();
@@ -125,11 +145,6 @@ void tst_MessageItem::init()
 
     m_view = new QGraphicsView();
     m_view->setScene(m_chartModel->graphicsScene());
-
-    m_message = new MscMessage("Event1");
-    m_messageItem = new MessageItem(m_message, nullptr);
-
-    m_view->scene()->addItem(m_messageItem);
 }
 
 void tst_MessageItem::cleanup()
@@ -138,6 +153,8 @@ void tst_MessageItem::cleanup()
     m_messageItem = nullptr;
     delete m_message;
     m_message = nullptr;
+    delete m_create;
+    m_create = nullptr;
     delete m_view;
     m_view = nullptr;
     delete m_undoStack;
@@ -153,6 +170,7 @@ void tst_MessageItem::cleanup()
 
 void tst_MessageItem::testNameUpdate()
 {
+    addMessage();
     QCOMPARE(m_messageItem->displayedText(), QString("Event1"));
 
     m_message->setName("OutCall");
@@ -161,12 +179,14 @@ void tst_MessageItem::testNameUpdate()
 
 void tst_MessageItem::testNameEntering()
 {
+    addCreate();
     enterText("Ping");
-    QCOMPARE(m_message->name(), QString("Ping"));
+    QCOMPARE(m_create->name(), QString("Ping"));
 }
 
 void tst_MessageItem::testNameWithParameter()
 {
+    addMessage();
     delete m_messageItem;
 
     m_message->setParameters({ { "", "pattern" } });
@@ -180,7 +200,7 @@ void tst_MessageItem::testNameWithParameter()
 
 void tst_MessageItem::testNameWithParameterWithExtraBraces()
 {
-    delete m_messageItem;
+    m_message = new MscMessage("Event1");
 
     m_message->setParameters({ { "", "{pattern}" } });
     m_messageItem = new MessageItem(m_message, nullptr);
@@ -202,19 +222,21 @@ void tst_MessageItem::testNameWithParameterWithExtraBraces()
 
 void tst_MessageItem::testNameAndParameterEntering()
 {
+    addCreate();
     enterText("call(47)");
-    QCOMPARE(m_message->name(), QString("call"));
-    QCOMPARE(m_message->parameters().size(), 1);
-    QCOMPARE(m_message->parameters().at(0).pattern(), QString("47"));
+    QCOMPARE(m_create->name(), QString("call"));
+    QCOMPARE(m_create->parameters().size(), 1);
+    QCOMPARE(m_create->parameters().at(0).pattern(), QString("47"));
 }
 
 void tst_MessageItem::testNameAndParametersEntering()
 {
+    addCreate();
     enterText("call(47, ex: pression)");
-    QCOMPARE(m_message->name(), QString("call"));
-    QCOMPARE(m_message->parameters().size(), 2);
-    QCOMPARE(m_message->parameters().at(0).pattern(), QString("47"));
-    QCOMPARE(m_message->parameters().at(1).expression(), QString("ex: pression"));
+    QCOMPARE(m_create->name(), QString("call"));
+    QCOMPARE(m_create->parameters().size(), 2);
+    QCOMPARE(m_create->parameters().at(0).pattern(), QString("47"));
+    QCOMPARE(m_create->parameters().at(1).expression(), QString("ex: pression"));
 }
 
 void tst_MessageItem::testPositionUpdateOnInstanceChange()

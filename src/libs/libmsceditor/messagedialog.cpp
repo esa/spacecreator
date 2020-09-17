@@ -32,6 +32,7 @@
 #include "mscwriter.h"
 #include "ui_messagedialog.h"
 
+#include <QCompleter>
 #include <QDebug>
 #include <QKeyEvent>
 #include <QRegExp>
@@ -87,6 +88,19 @@ MessageDialog::MessageDialog(msc::MscMessage *message, QWidget *parent)
 MessageDialog::~MessageDialog()
 {
     delete ui;
+}
+
+/*!
+   Sets the auto completion list for the name line edit
+ */
+void MessageDialog::setAadlConnectionNames(const QStringList &names)
+{
+    if (ui->nameLineEdit->completer()) {
+        ui->nameLineEdit->completer()->deleteLater();
+    }
+    auto completer = new QCompleter(names, ui->nameLineEdit);
+    ui->nameLineEdit->setCompleter(completer);
+    m_connectionNames = names;
 }
 
 void MessageDialog::accept()
@@ -180,6 +194,7 @@ void MessageDialog::editDeclarations()
 
     MessageDeclarationsDialog dialog(declarations, mscModel(), this);
     dialog.setFileName(model->dataDefinitionString());
+    dialog.setAadlConnectionNames(m_connectionNames);
 
     int result = dialog.exec();
 

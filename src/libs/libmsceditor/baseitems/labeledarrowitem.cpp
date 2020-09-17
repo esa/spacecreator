@@ -16,6 +16,7 @@
 */
 #include "labeledarrowitem.h"
 
+#include "aadlchecks.h"
 #include "arrowitem.h"
 #include "baseitems/msgidentificationitem.h"
 #include "chartitem.h"
@@ -51,6 +52,7 @@ LabeledArrowItem::LabeledArrowItem(QGraphicsItem *parent)
     connect(m_itemArrow, &ArrowItem::geometryChanged, this, &LabeledArrowItem::updateLayout);
     connect(m_itemText, &TextItem::textChanged, this, &LabeledArrowItem::onTextChanged);
     connect(m_itemText, &TextItem::edited, this, &LabeledArrowItem::onTextEdited);
+    connect(m_itemText, &TextItem::doubleClicked, this, &LabeledArrowItem::doubleClicked);
 
     m_selectionHighlighterPen.setWidthF(m_itemArrow->bodyPen().widthF() * 2.);
 }
@@ -205,6 +207,11 @@ void LabeledArrowItem::setDashed(bool dashed)
 void LabeledArrowItem::enableEditMode()
 {
     m_itemText->enableEditMode();
+}
+
+void LabeledArrowItem::setEditable(bool edit)
+{
+    m_itemText->setEditable(edit);
 }
 
 void LabeledArrowItem::onTextChanged()

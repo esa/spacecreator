@@ -298,6 +298,7 @@ void TextItem::mouseDoubleClickEvent(QGraphicsSceneMouseEvent *event)
 {
     enableEditMode();
     QGraphicsTextItem::mouseDoubleClickEvent(event);
+    Q_EMIT doubleClicked();
 }
 
 /*!

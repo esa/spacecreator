@@ -580,6 +580,7 @@ void MSCEditorCore::openMessageDeclarationEditor(QWidget *parentwidget)
     }
 
     MessageDeclarationsDialog dialog(docs.at(0)->messageDeclarations(), model, parentwidget);
+    dialog.setAadlConnectionNames(m_aadlChecks->connectionNames());
     int result = dialog.exec();
     if (result == QDialog::Accepted) {
         msc::cmd::CommandsStack::current()->beginMacro("Edit message declarations");

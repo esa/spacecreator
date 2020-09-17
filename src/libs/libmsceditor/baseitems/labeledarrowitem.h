@@ -55,10 +55,13 @@ public:
 
     void enableEditMode();
 
+    void setEditable(bool edit);
+
 Q_SIGNALS:
     void layoutChanged();
     void textEdited(const QString &text);
     void textChanged();
+    void doubleClicked();
 
 public Q_SLOTS:
     void setText(const QString &text);

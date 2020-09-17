@@ -92,6 +92,7 @@ Q_SIGNALS:
        Send when setSendClickEvent() is set true, and the item was clicked.
      */
     void clicked();
+    void doubleClicked();
     void textIsValidChanged();
 
 protected Q_SLOTS:

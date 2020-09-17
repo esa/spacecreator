@@ -28,6 +28,7 @@
 #include "typeassignment.h"
 #include "ui_messagedeclarationsdialog.h"
 
+#include <QCompleter>
 #include <QDebug>
 #include <QFileDialog>
 #include <QItemSelectionModel>
@@ -97,6 +98,18 @@ void MessageDeclarationsDialog::setFileName(const QString &fileName)
 const QString &MessageDeclarationsDialog::fileName() const
 {
     return m_fileName;
+}
+
+/*!
+   Sets the auto completion list for the name line edit
+ */
+void MessageDeclarationsDialog::setAadlConnectionNames(const QStringList &names)
+{
+    if (ui->nameLineEdit->completer()) {
+        ui->nameLineEdit->completer()->deleteLater();
+    }
+    auto completer = new QCompleter(names, ui->nameLineEdit);
+    ui->nameLineEdit->setCompleter(completer);
 }
 
 void MessageDeclarationsDialog::keyPressEvent(QKeyEvent *event)

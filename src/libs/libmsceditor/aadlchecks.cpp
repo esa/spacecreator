@@ -195,6 +195,26 @@ bool AadlChecks::checkMessage(const MscMessage *message) const
     return aadlConnection != nullptr;
 }
 
+/*!
+   Returns a list of the names of all connections in the aadl model
+ */
+QStringList AadlChecks::connectionNames() const
+{
+    if (!m_ivPlugin) {
+        return {};
+    }
+
+    QStringList connectionNames;
+    for (const aadl::AADLObjectConnection *aadlConnection : m_aadlConnections) {
+        if (aadlConnection && !aadlConnection->targetInterfaceName().isEmpty()) {
+            connectionNames << aadl::AADLNameValidator::encodeName(
+                    aadl::AADLObject::Type::ProvidedInterface, aadlConnection->targetInterfaceName());
+        }
+    }
+    connectionNames.removeDuplicates();
+    return connectionNames;
+}
+
 aadl::AADLObjectsModel *AadlChecks::aadlModel() const
 {
     if (!m_ivPlugin) {
@@ -371,7 +391,7 @@ aadl::AADLObjectConnection *AadlChecks::correspondingConnection(const MscMessage
 bool AadlChecks::correspond(const aadl::AADLObjectConnection *connection, const MscMessage *message) const
 {
     const QString messageName =
-            aadl::AADLNameValidator::decodeName(aadl::AADLObject::Type::Connection, message->name());
+            aadl::AADLNameValidator::decodeName(aadl::AADLObject::Type::ProvidedInterface, message->name());
     bool nameOk = true;
     if (!connection->targetInterfaceName().isEmpty()) {
         nameOk &= messageName == connection->targetInterfaceName();

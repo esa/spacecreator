@@ -114,6 +114,11 @@ MessageItem::MessageItem(MscMessage *message, ChartLayoutManager *chartLayoutMan
         connect(m_chartLayoutManager->aadlChecker(), &msc::AadlChecks::ivPluginChanged, this,
                 &msc::MessageItem::checkAadlConnection);
     }
+
+    if (!isCreator()) {
+        m_arrowItem->setEditable(false);
+    }
+    connect(m_arrowItem, &msc::LabeledArrowItem::doubleClicked, this, &msc::MessageItem::showMessageDialog);
 }
 
 void MessageItem::onTextChanged()
@@ -132,6 +137,7 @@ void MessageItem::showMessageDialog()
 {
     if (m_message->messageType() == MscMessage::MessageType::Message) {
         MessageDialog dialog(m_message);
+        dialog.setAadlConnectionNames(m_chartLayoutManager->aadlChecker()->connectionNames());
         dialog.exec();
     }
 }
@@ -257,7 +263,7 @@ QPair<QPointF, bool> MessageItem::commentPoint() const
 void MessageItem::postCreatePolishing()
 {
     showMessageDialog();
-    if (m_message->messageType() == MscMessage::MessageType::Create)
+    if (isCreator())
         m_arrowItem->enableEditMode();
 }
 
@@ -688,7 +694,11 @@ void MessageItem::setPositionChangeIgnored(bool ignored)
 void MessageItem::mouseDoubleClickEvent(QGraphicsSceneMouseEvent *event)
 {
     InteractiveObject::mouseDoubleClickEvent(event);
-    showMessageDialog();
+    if (isCreator()) {
+        m_arrowItem->enableEditMode();
+    } else {
+        showMessageDialog();
+    }
 }
 
 bool MessageItem::isCreator() const

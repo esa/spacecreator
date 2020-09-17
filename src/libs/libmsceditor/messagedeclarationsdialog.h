@@ -18,6 +18,7 @@
 #pragma once
 
 #include <QDialog>
+#include <QStringList>
 #include <QVariantList>
 #include <memory>
 
@@ -44,6 +45,8 @@ public:
 
     void setFileName(const QString &fileName);
     const QString &fileName() const;
+
+    void setAadlConnectionNames(const QStringList &names);
 
 protected:
     void keyPressEvent(QKeyEvent *event) override;

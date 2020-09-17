@@ -19,6 +19,7 @@
 
 #include <QDialog>
 #include <QPointer>
+#include <QStringList>
 
 namespace msc {
 class MscMessage;
@@ -40,6 +41,8 @@ class MessageDialog : public QDialog
 public:
     explicit MessageDialog(msc::MscMessage *message, QWidget *parent = nullptr);
     ~MessageDialog();
+
+    void setAadlConnectionNames(const QStringList &names);
 
 public Q_SLOTS:
     void accept() override;
@@ -70,4 +73,5 @@ private:
     QPointer<msc::MscMessage> m_message;
     QPointer<msc::MscMessageDeclaration> m_selectedDeclaration;
     bool m_isValid = true;
+    QStringList m_connectionNames;
 };

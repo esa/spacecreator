@@ -62,6 +62,7 @@ public:
 
     QVector<QPair<msc::MscChart *, msc::MscMessage *>> checkMessages() const;
     bool checkMessage(const msc::MscMessage *message) const;
+    QStringList connectionNames() const;
 
 Q_SIGNALS:
     void mscPluginChanged();
