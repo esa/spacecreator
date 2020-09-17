@@ -56,7 +56,8 @@ AADLInterfaceGraphicsItem::AADLInterfaceGraphicsItem(aadl::AADLObjectIface *enti
     m_iface->setPath(ifacePath());
     //    setInterfaceName(ifaceLabel());
 
-    connect(entity, &aadl::AADLObject::attributeChanged, this, &AADLInterfaceGraphicsItem::onAttrOrPropChanged);
+    connect(entity, qOverload<aadl::meta::Props::Token>(&aadl::AADLObject::attributeChanged), this,
+            &AADLInterfaceGraphicsItem::onAttrOrPropChanged);
     connect(entity, &aadl::AADLObjectIface::titleChanged, this, &AADLInterfaceGraphicsItem::updateLabel);
     if (auto ri = qobject_cast<aadl::AADLObjectIfaceRequired *>(entity))
         connect(ri, &aadl::AADLObjectIfaceRequired::inheritedLabelsChanged, this,

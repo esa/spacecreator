@@ -32,28 +32,28 @@ class DynamicPropertyConfig
 {
 public:
     static DynamicPropertyConfig *instance();
-    static QVector<DynamicProperty *> parseAttributesList(const QByteArray &fromData);
+    static QList<DynamicProperty *> parseAttributesList(
+            const QString &fromData, QString *errorMsg = nullptr, int *errorLine = nullptr, int *errorColumn = nullptr);
     void init();
 
-    static QVector<DynamicProperty *> attributesForObject(aadl::AADLObject *obj);
-    static QVector<DynamicProperty *> attributesForFunctionType();
-    static QVector<DynamicProperty *> attributesForFunction();
-    static QVector<DynamicProperty *> attributesForIface();
+    static QHash<QString, DynamicProperty *> attributesForObject(const aadl::AADLObject *obj);
+    static QList<DynamicProperty *> attributesForFunction();
+    static QList<DynamicProperty *> attributesForRequiredInterface();
+    static QList<DynamicProperty *> attributesForProvidedInterface();
 
     static QString defaultConfigPath();
     static QString currentConfigPath();
+    static QString resourceConfigPath();
 
 private:
     static DynamicPropertyConfig *m_instance;
 
     DynamicPropertyConfig();
 
-    static void generateSampleFile();
     QString configPath() const;
-    QVector<DynamicProperty *> readAttrs(const QByteArray &data) const;
 
     struct DynamicPropertyConfigPrivate;
     std::unique_ptr<DynamicPropertyConfigPrivate> d;
 };
 
-}
+} // namespace aadlinterface

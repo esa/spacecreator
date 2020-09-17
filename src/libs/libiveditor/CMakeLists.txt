@@ -130,6 +130,8 @@ target_sources(${LIB_NAME} PRIVATE
     interface/properties/contextparametersmodel.h
     interface/properties/delegates/asn1valuedelegate.cpp
     interface/properties/delegates/asn1valuedelegate.h
+    interface/properties/delegates/attributedelegate.cpp
+    interface/properties/delegates/attributedelegate.h
     interface/properties/delegates/comboboxdelegate.cpp
     interface/properties/delegates/comboboxdelegate.h
     interface/properties/delegates/functionattrdelegate.cpp
@@ -201,6 +203,7 @@ target_link_libraries(${LIB_NAME}
     Qt5::Network
     Qt5::Svg
     Qt5::Widgets
+    Qt5::Xml
 )
 
 target_include_directories(${LIB_NAME} PUBLIC .)

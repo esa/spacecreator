@@ -25,8 +25,6 @@
 #include <QDebug>
 #include <QFile>
 #include <QFileInfo>
-#include <QJsonArray>
-#include <QJsonDocument>
 #include <QMessageBox>
 
 namespace aadlinterface {
@@ -39,7 +37,7 @@ DynamicPropertyManager::DynamicPropertyManager(QWidget *parent)
 
     connect(ui->plainTextEdit, &QPlainTextEdit::textChanged, this, &DynamicPropertyManager::updateErrorInfo);
 
-    readJson(DynamicPropertyConfig::currentConfigPath());
+    readConfig(DynamicPropertyConfig::currentConfigPath());
 }
 
 DynamicPropertyManager::~DynamicPropertyManager()
@@ -47,67 +45,54 @@ DynamicPropertyManager::~DynamicPropertyManager()
     delete ui;
 }
 
-bool DynamicPropertyManager::readJson(const QString &from)
+bool DynamicPropertyManager::readConfig(const QString &from)
 {
     if (from.isEmpty())
         return false;
 
-    QFile jsonFile(from);
-    if (!jsonFile.open(QIODevice::ReadOnly | QIODevice::Text)) {
-        qWarning() << "File opening failed:" << from << jsonFile.errorString();
+    QFile configFile(from);
+    if (!configFile.open(QIODevice::ReadOnly | QIODevice::Text)) {
+        qWarning() << "File opening failed:" << from << configFile.errorString();
         return false;
     }
 
-    ui->plainTextEdit->setPlainText(jsonFile.readAll());
+    ui->plainTextEdit->setPlainText(configFile.readAll());
     return true;
 }
 
 void DynamicPropertyManager::updateErrorInfo()
 {
-    QJsonParseError errorHandler;
-    const QByteArray &jsonData = ui->plainTextEdit->toPlainText().toUtf8();
-    QJsonDocument doc = QJsonDocument::fromJson(jsonData, &errorHandler);
+    const QString &xmlData = ui->plainTextEdit->toPlainText();
 
     QColor textColor(Qt::black);
-    QString errorText;
-    bool success(true);
     m_usedNames.clear();
 
-    if (!jsonData.isEmpty()) {
-        success = errorHandler.error == QJsonParseError::NoError;
-        if (!success) {
-            errorText = errorHandler.errorString();
-            qWarning() << errorText;
+    QString errorMsg;
+    int errorLine = -1;
+    int errorColumn = -1;
+
+    if (!xmlData.isEmpty()) {
+        const QList<DynamicProperty *> &attrs =
+                DynamicPropertyConfig::parseAttributesList(xmlData, &errorMsg, &errorLine, &errorColumn);
+
+        if (!errorMsg.isEmpty()) {
+            qWarning() << errorMsg << errorLine << errorColumn;
             textColor = Qt::red;
         } else {
-            const QVector<DynamicProperty *> &attrs = DynamicPropertyConfig::parseAttributesList(jsonData);
-            const int jsonArraySize = doc.array().size();
-            success = jsonArraySize == attrs.size();
-
-            if (success) {
-                for (DynamicProperty *attr : attrs) {
-                    if (m_usedNames.contains(attr->name())) {
-                        errorText = tr("Duplicate names found: %1").arg(attr->name());
-                        success = false;
-                        break;
-                    }
-                    m_usedNames.append(attr->name());
+            for (DynamicProperty *attr : attrs) {
+                if (m_usedNames.contains(attr->name())) {
+                    errorMsg = tr("Duplicate names found: %1").arg(attr->name());
+                    break;
                 }
-            }
-
-            if (!success) {
-                if (errorText.isEmpty())
-                    errorText = "Please remove incomplete properties";
-                qWarning() << "Properties stored (JSON):" << jsonArraySize << "; parsed:" << attrs.size();
-                textColor = Qt::red;
+                m_usedNames.append(attr->name());
             }
         }
     }
 
-    ui->errorDisplay->setText(errorText);
+    ui->errorDisplay->setText(errorMsg);
     setTextColor(textColor);
-    ui->btnNewProp->setEnabled(success || jsonData.isEmpty());
-    ui->buttonBox->button(QDialogButtonBox::Ok)->setEnabled(success);
+    ui->btnNewProp->setEnabled(errorMsg.isEmpty() || xmlData.isEmpty());
+    ui->buttonBox->button(QDialogButtonBox::Ok)->setEnabled(errorMsg.isEmpty());
 }
 
 void DynamicPropertyManager::setTextColor(const QColor &color)
@@ -122,11 +107,15 @@ void DynamicPropertyManager::on_btnNewProp_clicked()
     AddDynamicPropertyDialog *dlg = new AddDynamicPropertyDialog(m_usedNames, this);
     if (dlg->exec() == QDialog::Accepted) {
         if (DynamicProperty *attr = dlg->attribute()) {
-            const QByteArray &jsonData = ui->plainTextEdit->toPlainText().toUtf8();
-            QJsonArray jArr = QJsonDocument::fromJson(jsonData).array();
-            jArr.append(attr->toJson());
-            ui->plainTextEdit->setPlainText(QJsonDocument(jArr).toJson());
-            ui->plainTextEdit->find(QString("\"name\": \"%1\",").arg(attr->name()));
+            const QString &xmlData = ui->plainTextEdit->toPlainText();
+            QDomDocument doc;
+            if (doc.setContent(xmlData)) {
+                QDomElement rootElement = doc.documentElement();
+                rootElement.appendChild(attr->toXml(&doc));
+
+                ui->plainTextEdit->setPlainText(doc.toString());
+                ui->plainTextEdit->find(QString("\"name\": \"%1\",").arg(attr->name()));
+            }
         }
     }
     delete dlg;

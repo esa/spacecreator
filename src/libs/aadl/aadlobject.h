@@ -114,6 +114,8 @@ public:
 Q_SIGNALS:
     void titleChanged(const QString &title);
     void coordinatesChanged(const QVector<qint32> &coordinates);
+    void attributeChanged(const QString &name);
+    void propertyChanged(const QString &name);
     void attributeChanged(aadl::meta::Props::Token attr = aadl::meta::Props::Token::Unknown);
     void propertyChanged(aadl::meta::Props::Token prop = aadl::meta::Props::Token::Unknown);
 

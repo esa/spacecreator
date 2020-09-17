@@ -51,6 +51,12 @@ AADLObject::AADLObject(const AADLObject::Type t, const QString &title, QObject *
     : QObject(parent)
     , d(new AADLObjectPrivate(id, t))
 {
+    connect(this, qOverload<const QString &>(&AADLObject::propertyChanged), this,
+            [this](const QString &token) { Q_EMIT propertyChanged(meta::Props::token(token)); });
+
+    connect(this, qOverload<const QString &>(&AADLObject::attributeChanged), this,
+            [this](const QString &token) { Q_EMIT attributeChanged(meta::Props::token(token)); });
+
     if (const AADLObject *parentObject = qobject_cast<const AADLObject *>(parent))
         setObjectsModel(parentObject->objectsModel());
     else if (AADLObjectsModel *model = qobject_cast<AADLObjectsModel *>(parent))
@@ -279,14 +285,14 @@ void AADLObject::setAttr(const QString &name, const QVariant &val)
             d->m_attrs[name] = val;
             break;
         }
-        Q_EMIT attributeChanged(meta::Props::token(name));
+        Q_EMIT attributeChanged(name);
     }
 }
 
 void AADLObject::removeAttr(const QString &name)
 {
     if (!name.isEmpty() && d->m_attrs.remove(name))
-        Q_EMIT attributeChanged(meta::Props::token(name));
+        Q_EMIT attributeChanged(name);
 }
 
 QHash<QString, QVariant> AADLObject::props() const
@@ -313,14 +319,15 @@ void AADLObject::setProp(const QString &name, const QVariant &val)
 {
     if (!name.isEmpty() && val != d->m_props[name]) {
         d->m_props[name] = val;
-        Q_EMIT propertyChanged(meta::Props::token(name));
+        Q_EMIT propertyChanged(name);
     }
 }
 
 void AADLObject::removeProp(const QString &name)
 {
-    if (!name.isEmpty() && d->m_props.remove(name))
-        Q_EMIT propertyChanged(meta::Props::token(name));
+    if (!name.isEmpty() && d->m_props.remove(name)) {
+        Q_EMIT propertyChanged(name);
+    }
 }
 
 void AADLObject::setObjectsModel(AADLObjectsModel *model)

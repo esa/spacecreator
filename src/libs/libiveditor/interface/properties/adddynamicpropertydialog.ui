@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>273</width>
-    <height>258</height>
+    <width>352</width>
+    <height>495</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -29,60 +29,67 @@
      <property name="title">
       <string>Scope</string>
      </property>
-     <layout class="QHBoxLayout" name="horizontalLayout">
-      <item>
-       <widget class="QCheckBox" name="cbFunctionType">
+     <layout class="QGridLayout" name="gridLayout">
+      <item row="0" column="2">
+       <widget class="QCheckBox" name="cbProvIface">
         <property name="text">
-         <string>Function Type</string>
+         <string>Provided IFace</string>
         </property>
        </widget>
       </item>
-      <item>
+      <item row="0" column="1">
+       <widget class="QCheckBox" name="cbReqIface">
+        <property name="text">
+         <string>Required IFace</string>
+        </property>
+       </widget>
+      </item>
+      <item row="0" column="0">
        <widget class="QCheckBox" name="cbFunction">
         <property name="text">
          <string>Function</string>
         </property>
        </widget>
       </item>
-      <item>
-       <widget class="QCheckBox" name="cbInterface">
+      <item row="1" column="0">
+       <widget class="QCheckBox" name="cbComment">
         <property name="text">
-         <string>Interface</string>
+         <string>Comment</string>
+        </property>
+       </widget>
+      </item>
+      <item row="1" column="1">
+       <widget class="QCheckBox" name="cbConnection">
+        <property name="text">
+         <string>Connection</string>
         </property>
        </widget>
       </item>
      </layout>
     </widget>
    </item>
-   <item row="4" column="0">
+   <item row="7" column="0">
     <widget class="QLabel" name="label_2">
      <property name="text">
       <string>Type:</string>
      </property>
     </widget>
    </item>
-   <item row="4" column="1">
+   <item row="7" column="1">
     <layout class="QHBoxLayout" name="horizontalLayout_2">
      <item>
       <widget class="QComboBox" name="comboTypes"/>
      </item>
-     <item>
-      <widget class="QCheckBox" name="cbList">
-       <property name="text">
-        <string>List</string>
-       </property>
-      </widget>
-     </item>
     </layout>
    </item>
-   <item row="6" column="0" colspan="2">
+   <item row="9" column="0" colspan="2">
     <widget class="QPlainTextEdit" name="teValues">
      <property name="placeholderText">
       <string>Comma separated values</string>
      </property>
     </widget>
    </item>
-   <item row="8" column="0">
+   <item row="11" column="0">
     <spacer name="verticalSpacer_2">
      <property name="orientation">
       <enum>Qt::Vertical</enum>
@@ -95,7 +102,7 @@
      </property>
     </spacer>
    </item>
-   <item row="9" column="1">
+   <item row="12" column="1">
     <widget class="QDialogButtonBox" name="buttonBox">
      <property name="orientation">
       <enum>Qt::Horizontal</enum>
@@ -103,6 +110,42 @@
      <property name="standardButtons">
       <set>QDialogButtonBox::Cancel|QDialogButtonBox::Ok</set>
      </property>
+    </widget>
+   </item>
+   <item row="6" column="0">
+    <widget class="QLabel" name="label_3">
+     <property name="text">
+      <string>Validation pattern:</string>
+     </property>
+    </widget>
+   </item>
+   <item row="6" column="1">
+    <widget class="QLineEdit" name="leValidationPattern"/>
+   </item>
+   <item row="5" column="0" colspan="2">
+    <widget class="QGroupBox" name="groupBox">
+     <property name="title">
+      <string>Serialization type</string>
+     </property>
+     <layout class="QHBoxLayout" name="horizontalLayout_3">
+      <item>
+       <widget class="QRadioButton" name="rbAttribute">
+        <property name="text">
+         <string>Attribute</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QRadioButton" name="rbProperty">
+        <property name="text">
+         <string>Property</string>
+        </property>
+        <property name="checked">
+         <bool>true</bool>
+        </property>
+       </widget>
+      </item>
+     </layout>
     </widget>
    </item>
   </layout>

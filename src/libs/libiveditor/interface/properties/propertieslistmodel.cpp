@@ -27,7 +27,6 @@
 #include "interface/commands/cmdentitypropertychange.h"
 #include "interface/commands/cmdentitypropertycreate.h"
 #include "interface/commands/commandsfactory.h"
-#include "interface/properties/dynamicproperty.h"
 #include "interface/properties/dynamicpropertyconfig.h"
 
 #include <QDebug>
@@ -51,46 +50,154 @@ PropertiesListModel::PropertiesListModel(QObject *parent)
 
 PropertiesListModel::~PropertiesListModel() { }
 
-void PropertiesListModel::createNewRow(const QString &title, const QVariant &value, ItemType type, int row)
+void PropertiesListModel::createNewRow(
+        int row, const QString &title, DynamicProperty::Info info, const QVariant &value, const QVariant &editValue)
 {
     m_names.append(title);
     QStandardItem *titleItem = new QStandardItem(title);
-    titleItem->setData(type, ItemTypeRole);
+
     QStandardItem *valueItem = new QStandardItem();
+    valueItem->setData(value, Qt::DisplayRole);
     valueItem->setData(value, Qt::EditRole);
-    valueItem->setData(type, ItemTypeRole);
+    valueItem->setData(editValue, PropertyDataRole);
+    valueItem->setData(static_cast<int>(info), PropertyInfoRole);
 
     setItem(row, ColumnTitle, titleItem);
     setItem(row, ColumnValue, valueItem);
+}
+
+void PropertiesListModel::invalidateProperties(const QString &propName)
+{
+    if (!m_dataObject)
+        return;
+
+    static const QMap<aadl::AADLObject::Type, DynamicProperty::Scope> kScopeMappings = {
+        { aadl::AADLObject::Type::Function, DynamicProperty::Scope::Function },
+        { aadl::AADLObject::Type::RequiredInterface, DynamicProperty::Scope::Required_Interface },
+        { aadl::AADLObject::Type::ProvidedInterface, DynamicProperty::Scope::Provided_Interface },
+        { aadl::AADLObject::Type::Comment, DynamicProperty::Scope::Comment },
+        { aadl::AADLObject::Type::Connection, DynamicProperty::Scope::Connection },
+    };
+    const auto attrs = DynamicPropertyConfig::attributesForObject(m_dataObject);
+    QStringList attrsAboutToBeRemoved, attrsAboutToBeAdded;
+    /// TBD:
+}
+
+void PropertiesListModel::invalidateAttributes(const QString &attrName)
+{
+    /// TBD:
+}
+
+static QVariant convertData(const QVariant &value, DynamicProperty::Type type)
+{
+    QVariant typedValue;
+    switch (type) {
+    case DynamicProperty::Type::Boolean: {
+        const bool falseValue = QString::compare(value.toString(), QLatin1String("false")) == 0;
+        const bool trueValue = QString::compare(value.toString(), QLatin1String("true")) == 0;
+        if (falseValue) {
+            typedValue = false;
+        } else if (trueValue) {
+            typedValue = true;
+        } else {
+            return QVariant(QVariant::Bool);
+        }
+    } break;
+    case DynamicProperty::Type::Integer: {
+        bool ok;
+        typedValue = value.toString().toInt(&ok);
+        if (!ok)
+            return QVariant(QVariant::Int);
+    } break;
+    case DynamicProperty::Type::Real: {
+        bool ok;
+        typedValue = value.toString().toDouble(&ok);
+        if (!ok)
+            return QVariant(QVariant::Double);
+    } break;
+    case DynamicProperty::Type::String: {
+        if (value.isValid())
+            typedValue = value.toString();
+        else
+            typedValue = QVariant(QVariant::String);
+    } break;
+    case DynamicProperty::Type::Enumeration: {
+        if (value.isValid()) {
+            QStringList typedList;
+            for (const auto dataItem : value.toList()) {
+                typedList.append(dataItem.toString());
+            }
+            typedValue = typedList;
+        } else {
+            typedValue = QVariant(QVariant::StringList);
+        }
+    } break;
+    default:
+        break;
+    }
+    return typedValue;
 }
 
 void PropertiesListModel::setDataObject(aadl::AADLObject *obj)
 {
     clear();
     m_names.clear();
+
+    if (m_dataObject) {
+        disconnect(m_dataObject, qOverload<const QString &>(&aadl::AADLObject::propertyChanged), this,
+                &PropertiesListModel::invalidateProperties);
+        disconnect(m_dataObject, qOverload<const QString &>(&aadl::AADLObject::attributeChanged), this,
+                &PropertiesListModel::invalidateAttributes);
+    }
+
     m_dataObject = obj;
 
     if (!m_dataObject)
         return;
 
-    auto initRows = [this](const QHash<QString, QVariant> &vals, ItemType type, int offset) {
+    connect(m_dataObject, qOverload<const QString &>(&aadl::AADLObject::propertyChanged), this,
+            &PropertiesListModel::invalidateProperties, Qt::UniqueConnection);
+    connect(m_dataObject, qOverload<const QString &>(&aadl::AADLObject::attributeChanged), this,
+            &PropertiesListModel::invalidateAttributes, Qt::UniqueConnection);
+
+    auto initRows = [this](const QHash<QString, QVariant> &vals, DynamicProperty::Info info, int offset,
+                            const QHash<QString, DynamicProperty *> &dynProps) {
         QList<QString> keys(vals.keys());
         std::sort(keys.begin(), keys.end());
-        for (int i = 0; i < keys.size(); ++i)
-            createNewRow(keys[i], vals[keys[i]], type, i + offset);
+        for (int i = 0; i < keys.size(); ++i) {
+            auto propertyPtr = dynProps.value(keys[i]);
+            if (propertyPtr && !propertyPtr->isVisible())
+                continue;
+
+            const QVariant dynPropValues = propertyPtr ? propertyPtr->valuesList() : QVariant();
+            const DynamicProperty::Type type = propertyPtr ? propertyPtr->type() : DynamicProperty::Type::String;
+            createNewRow(i + offset, keys[i], info, vals[keys[i]],
+                    propertyPtr ? convertData(dynPropValues, type) : QVariant(QVariant::String));
+        }
     };
 
-    beginInsertRows(QModelIndex(), 0, m_dataObject->attrs().size() + m_dataObject->props().size());
-    initRows(m_dataObject->attrs(), ItemType::Attribute, rowCount());
-    initRows(m_dataObject->props(), ItemType::Property, rowCount());
+    const auto attrs = DynamicPropertyConfig::attributesForObject(m_dataObject);
 
-    QHash<QString, QVariant> customProps;
-    for (auto attr : DynamicPropertyConfig::attributesForObject(m_dataObject)) {
-        if (!m_names.contains(attr->name()))
-            customProps.insert(attr->name(), QVariant::fromValue(attr));
+    beginResetModel();
+    initRows(m_dataObject->attrs(), DynamicProperty::Info::Attribute, rowCount(), attrs);
+    initRows(m_dataObject->props(), DynamicProperty::Info::Property, rowCount(), attrs);
+
+    for (auto attr : attrs) {
+        if (!m_names.contains(attr->name()) && attr->isVisible()) {
+            QVariant value;
+            if (attr->type() == DynamicProperty::Type::Unknown) {
+                continue;
+            } else if (attr->type() == DynamicProperty::Type::Enumeration) {
+                value = attr->valuesList();
+            } else { // Shouldn't be here
+                const auto dataList = attr->valuesList();
+                value = dataList.isEmpty() ? QVariant() : dataList.first();
+            }
+            createNewRow(rowCount(), attr->name(), attr->info(), {}, convertData(value, attr->type()));
+        }
     }
-    initRows(customProps, ItemType::Property, rowCount());
-    endInsertRows();
+
+    endResetModel();
 }
 
 const aadl::AADLObject *PropertiesListModel::dataObject() const
@@ -150,7 +257,6 @@ bool PropertiesListModel::setData(const QModelIndex &index, const QVariant &valu
     if (role == Qt::EditRole) {
         const QString &name = this->index(index.row(), ColumnTitle).data().toString();
         if (isAttr(index) && index.column() == ColumnValue) {
-
             switch (tokenFromIndex(index)) {
             case aadl::meta::Props::Token::name: {
                 if (!aadl::AADLNameValidator::isAcceptableName(m_dataObject, value.toString()))
@@ -218,7 +324,7 @@ bool PropertiesListModel::createProperty(const QString &propName)
         res = true;
     }
 
-    createNewRow(propName, QString(), ItemType::Property, rowCount());
+    createNewRow(rowCount(), propName, DynamicProperty::Info::Property, {}, {});
 
     endInsertRows();
 
@@ -253,29 +359,25 @@ bool PropertiesListModel::removeProperty(const QModelIndex &index)
 
 bool PropertiesListModel::isAttr(const QModelIndex &id) const
 {
-    return id.isValid() && ItemType::Attribute == id.data(ItemTypeRole).toInt();
+    return id.isValid() && static_cast<int>(DynamicProperty::Info::Attribute) == id.data(PropertyInfoRole).toInt();
 }
 
 bool PropertiesListModel::isProp(const QModelIndex &id) const
 {
-    return id.isValid() && ItemType::Property == id.data(ItemTypeRole).toInt();
+    return id.isValid() && static_cast<int>(DynamicProperty::Info::Property) == id.data(PropertyInfoRole).toInt();
 }
 
-bool PropertiesListModel::isEditable(const QModelIndex & /*index*/) const
+bool PropertiesListModel::isEditable(const QModelIndex &index) const
 {
-    return true;
+    return index.column() == ColumnTitle ? this->index(index.row(), ColumnValue).data().isNull() : true;
 }
 
 Qt::ItemFlags PropertiesListModel::flags(const QModelIndex &index) const
 {
     bool editable = isEditable(index);
-
-    if (editable && index.column() == ColumnTitle && isAttr(index)) {
-        editable = false;
-    }
-
     if (editable) {
         switch (tokenFromIndex(index)) {
+        case aadl::meta::Props::Token::RootCoordinates:
         case aadl::meta::Props::Token::InnerCoordinates:
         case aadl::meta::Props::Token::coordinates: {
             editable = false;
@@ -301,11 +403,10 @@ FunctionPropertiesListModel::FunctionPropertiesListModel(QObject *parent)
 
 bool FunctionPropertiesListModel::isEditable(const QModelIndex &index) const
 {
-    if (!dataObject() || !index.isValid())
+    if (!dataObject() || !index.isValid() || !PropertiesListModel::isEditable(index))
         return false;
 
     bool editable = true;
-
     switch (tokenFromIndex(index)) {
     case aadl::meta::Props::Token::is_type: {
         editable = false;
@@ -341,7 +442,7 @@ InterfacePropertiesListModel::InterfacePropertiesListModel(QObject *parent)
 
 bool InterfacePropertiesListModel::isEditable(const QModelIndex &index) const
 {
-    if (!dataObject() || !index.isValid())
+    if (!dataObject() || !index.isValid() || !PropertiesListModel::isEditable(index))
         return false;
 
     bool editable = true;
@@ -370,5 +471,4 @@ bool InterfacePropertiesListModel::isEditable(const QModelIndex &index) const
 
     return editable;
 }
-
 }

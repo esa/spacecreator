@@ -23,6 +23,7 @@
 #include "commandsstack.h"
 #include "contextparametersmodel.h"
 #include "delegates/asn1valuedelegate.h"
+#include "delegates/attributedelegate.h"
 #include "delegates/comboboxdelegate.h"
 #include "delegates/functionattrdelegate.h"
 #include "delegates/interfaceattrdelegate.h"
@@ -104,19 +105,16 @@ void PropertiesDialog::initTabs()
 
     auto initAttributesView = [this]() {
         auto viewAttrs = new PropertiesViewBase(this);
-        QStyledItemDelegate *modelDelegate { nullptr };
         PropertiesListModel *modelAttrs { nullptr };
 
         switch (m_dataObject->aadlType()) {
         case aadl::AADLObject::Type::Function: {
             modelAttrs = new FunctionPropertiesListModel(this);
-            modelDelegate = new FunctionAttrDelegate(viewAttrs->tableView());
             break;
         }
         case aadl::AADLObject::Type::RequiredInterface:
         case aadl::AADLObject::Type::ProvidedInterface: {
             modelAttrs = new InterfacePropertiesListModel(this);
-            modelDelegate = new InterfaceAttrDelegate(viewAttrs->tableView());
             break;
         }
         default:
@@ -126,9 +124,8 @@ void PropertiesDialog::initTabs()
 
         modelAttrs->setDataObject(m_dataObject);
         viewAttrs->setModel(modelAttrs);
-
-        if (modelDelegate)
-            viewAttrs->tableView()->setItemDelegateForColumn(PropertiesListModel::ColumnValue, modelDelegate);
+        viewAttrs->tableView()->setItemDelegateForColumn(
+                PropertiesListModel::ColumnValue, new AttributeDelegate(viewAttrs->tableView()));
 
         ui->tabWidget->insertTab(0, viewAttrs, tr("Attributes"));
     };

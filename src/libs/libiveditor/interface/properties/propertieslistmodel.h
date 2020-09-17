@@ -17,6 +17,8 @@
 
 #pragma once
 
+#include "aadlcommonprops.h"
+#include "interface/properties/dynamicproperty.h"
 #include "propertiesmodelbase.h"
 
 #include <QVector>
@@ -32,15 +34,10 @@ class PropertiesListModel : public PropertiesModelBase
     Q_OBJECT
 
 public:
-    static const int ItemTypeRole { Qt::UserRole + 2 };
+    static const int PropertyInfoRole { Qt::UserRole + 2 };
+    static const int PropertyDataRole { PropertyInfoRole + 1 };
     static const int ColumnTitle { 0 };
     static const int ColumnValue { 1 };
-
-    enum ItemType
-    {
-        Attribute = 0,
-        Property
-    };
 
     explicit PropertiesListModel(QObject *parent = nullptr);
     ~PropertiesListModel() override;
@@ -69,7 +66,11 @@ protected:
     QVector<QString> m_names;
 
     virtual bool isEditable(const QModelIndex &index) const;
-    void createNewRow(const QString &title, const QVariant &value, ItemType type, int row);
+    void createNewRow(int row, const QString &title, DynamicProperty::Info info, const QVariant &value,
+            const QVariant &editValue);
+
+    void invalidateProperties(const QString &propName);
+    void invalidateAttributes(const QString &attrName);
 };
 
 class FunctionPropertiesListModel : public PropertiesListModel

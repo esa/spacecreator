@@ -15,7 +15,6 @@
         <file alias="fonts/UbuntuMono-RI.ttf">resources/ubuntu-font-family-0.83/UbuntuMono-RI.ttf</file>
     </qresource>
     <qresource prefix="/defaults">
-        <file>interface/properties/resources/aadl_properties.json</file>
         <file>resources/contextmenu.json</file>
         <file>templating/xml_templates/comment.tmplt</file>
         <file>templating/xml_templates/comments.tmplt</file>
@@ -26,5 +25,6 @@
         <file>templating/xml_templates/interface.tmplt</file>
         <file>templating/xml_templates/interfaces.tmplt</file>
         <file>templating/xml_templates/interfaceview.tmplt</file>
+        <file>interface/properties/resources/default_attributes.xml</file>
     </qresource>
 </RCC>

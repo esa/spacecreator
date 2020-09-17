@@ -69,7 +69,7 @@ QTableView *PropertiesViewBase::tableView() const
 void PropertiesViewBase::onCurrentRowChanged(const QModelIndex &current, const QModelIndex &)
 {
     if (m_model && !setButtonsDisabled()) {
-        ui->btnDel->setEnabled(current.isValid() && m_model->isProp(current));
+        ui->btnDel->setEnabled(current.isValid());
     }
 }
 

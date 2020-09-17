@@ -82,12 +82,6 @@ bool AddDynamicPropertyDialog::validateType()
 {
     DynamicProperty::Type t = static_cast<DynamicProperty::Type>(ui->comboTypes->currentData().toInt());
     const bool isEnum(t == DynamicProperty::Type::Enumeration);
-    if (isEnum) {
-        ui->cbList->setChecked(false);
-        ui->cbList->setEnabled(false);
-    } else
-        ui->cbList->setEnabled(true);
-
     ui->teValues->setVisible(isEnum);
 
     return true;
@@ -116,7 +110,7 @@ bool AddDynamicPropertyDialog::validateValuesList()
 
 bool AddDynamicPropertyDialog::validateScope()
 {
-    const bool ok(ui->cbFunction->isChecked() || ui->cbFunctionType->isChecked() || ui->cbInterface->isChecked());
+    const bool ok(ui->cbFunction->isChecked() || ui->cbReqIface->isChecked() || ui->cbProvIface->isChecked());
 
     if (!ok)
         QMessageBox::warning(this, tr("Scope"), tr("Please select the property's scope"));
@@ -143,17 +137,31 @@ void AddDynamicPropertyDialog::accept()
     DynamicProperty::Scopes s;
     if (ui->cbFunction->isChecked())
         s |= DynamicProperty::Scope::Function;
-    if (ui->cbFunctionType->isChecked())
-        s |= DynamicProperty::Scope::FunctionType;
-    if (ui->cbInterface->isChecked())
-        s |= DynamicProperty::Scope::Interface;
+    if (ui->cbReqIface->isChecked())
+        s |= DynamicProperty::Scope::Required_Interface;
+    if (ui->cbProvIface->isChecked())
+        s |= DynamicProperty::Scope::Provided_Interface;
+    if (ui->cbComment->isChecked())
+        s |= DynamicProperty::Scope::Comment;
+    if (ui->cbConnection->isChecked())
+        s |= DynamicProperty::Scope::Connection;
 
-    QVector<QVariant> list;
-    if (t == DynamicProperty::Type::Enumeration || ui->cbList->isChecked())
+    QList<QVariant> list;
+    if (t == DynamicProperty::Type::Enumeration)
         for (const QString &str : listValues())
             list.append(str.trimmed());
 
-    m_attr = new DynamicProperty(name, t, s, list);
+    const QString &pattern = ui->leValidationPattern->text().trimmed();
+
+    const DynamicProperty::Info i =
+            ui->rbAttribute->isChecked() ? DynamicProperty::Info::Attribute : DynamicProperty::Info::Property;
+    m_attr = new DynamicProperty;
+    m_attr->setName(name);
+    m_attr->setInfo(i);
+    m_attr->setType(t);
+    m_attr->setScope(s);
+    m_attr->setValuesList(list);
+    m_attr->setValueValidatorPattern(pattern);
     QDialog::accept();
 }
 
@@ -162,4 +170,4 @@ DynamicProperty *AddDynamicPropertyDialog::attribute() const
     return m_attr;
 }
 
-}
+} // namespace aadlinterface

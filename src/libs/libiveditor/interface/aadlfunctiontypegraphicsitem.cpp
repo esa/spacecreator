@@ -66,7 +66,7 @@ AADLFunctionTypeGraphicsItem::AADLFunctionTypeGraphicsItem(aadl::AADLObjectFunct
                         cmd::ChangeEntityAttributes, { QVariant::fromValue(entity), QVariant::fromValue(attributess) }))
                 cmd::CommandsStack::current()->push(attributesCmd);
         });
-        connect(entity, &aadl::AADLObjectFunction::attributeChanged, this,
+        connect(entity, qOverload<aadl::meta::Props::Token>(&aadl::AADLObjectFunction::attributeChanged), this,
                 [this, entity](aadl::meta::Props::Token attr) {
                     if (attr == aadl::meta::Props::Token::name) {
                         const QString txt = entity->title();

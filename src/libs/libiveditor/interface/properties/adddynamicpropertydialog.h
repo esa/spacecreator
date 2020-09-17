@@ -51,4 +51,4 @@ private:
     QStringList listValues() const;
 };
 
-}
+} // namespace aadlinterface

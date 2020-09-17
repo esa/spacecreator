@@ -332,18 +332,20 @@ void AADLObjectIface::cloneInternals(const AADLObjectIface *from)
     if (storedKindDiffers())
         Q_EMIT attributeChanged(meta::Props::Token::kind);
 
-    connect(from, &AADLObjectIface::attributeChanged, this, &AADLObjectIface::onReflectedAttrChanged,
-            Qt::UniqueConnection);
-    connect(from, &AADLObjectIface::propertyChanged, this, &AADLObjectIface::onReflectedPropChanged,
-            Qt::UniqueConnection);
+    connect(from, qOverload<aadl::meta::Props::Token>(&AADLObjectIface::attributeChanged), this,
+            &AADLObjectIface::onReflectedAttrChanged, Qt::UniqueConnection);
+    connect(from, qOverload<aadl::meta::Props::Token>(&AADLObjectIface::propertyChanged), this,
+            &AADLObjectIface::onReflectedPropChanged, Qt::UniqueConnection);
     connect(from, &AADLObjectIface::paramsChanged, this, &AADLObjectIface::onReflectedParamsChanged,
             Qt::UniqueConnection);
 }
 
 void AADLObjectIface::restoreInternals(const AADLObjectIface *disconnectMe)
 {
-    disconnect(disconnectMe, &AADLObjectIface::attributeChanged, this, &AADLObjectIface::onReflectedAttrChanged);
-    disconnect(disconnectMe, &AADLObjectIface::propertyChanged, this, &AADLObjectIface::onReflectedPropChanged);
+    disconnect(disconnectMe, qOverload<aadl::meta::Props::Token>(&AADLObjectIface::attributeChanged), this,
+            &AADLObjectIface::onReflectedAttrChanged);
+    disconnect(disconnectMe, qOverload<aadl::meta::Props::Token>(&AADLObjectIface::propertyChanged), this,
+            &AADLObjectIface::onReflectedPropChanged);
     disconnect(disconnectMe, &AADLObjectIface::paramsChanged, this, &AADLObjectIface::onReflectedParamsChanged);
 
     if (!m_originalFields.collected())

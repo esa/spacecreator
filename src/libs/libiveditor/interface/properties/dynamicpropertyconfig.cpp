@@ -31,6 +31,7 @@
 #include <QJsonArray>
 #include <QJsonDocument>
 #include <QJsonObject>
+#include <QRegularExpression>
 #include <QStandardPaths>
 
 namespace aadlinterface {
@@ -49,38 +50,36 @@ void collectUniqeAttributes(
 };
 
 struct DynamicPropertyConfig::DynamicPropertyConfigPrivate {
-    DynamicPropertyConfigPrivate() { }
-    ~DynamicPropertyConfigPrivate() { }
-    void init(const QVector<DynamicProperty *> &attrs)
+    void init(const QList<DynamicProperty *> &attrs)
     {
         QHash<DynamicProperty *, DynamicProperty *> uniqeAttrs;
-        collectUniqeAttributes(m_functionType, uniqeAttrs);
         collectUniqeAttributes(m_function, uniqeAttrs);
-        collectUniqeAttributes(m_iface, uniqeAttrs);
+        collectUniqeAttributes(m_reqIface, uniqeAttrs);
+        collectUniqeAttributes(m_provIface, uniqeAttrs);
 
         qDeleteAll(uniqeAttrs);
-        m_functionType.clear();
         m_function.clear();
-        m_iface.clear();
+        m_reqIface.clear();
+        m_provIface.clear();
 
         for (DynamicProperty *attr : attrs) {
             if (attr->scope() == DynamicProperty::Scopes(DynamicProperty::Scope::None))
                 continue;
 
-            if (attr->scope().testFlag(DynamicProperty::Scope::FunctionType))
-                m_functionType.insert(attr->name(), attr);
-
             if (attr->scope().testFlag(DynamicProperty::Scope::Function))
                 m_function.insert(attr->name(), attr);
 
-            if (attr->scope().testFlag(DynamicProperty::Scope::Interface))
-                m_iface.insert(attr->name(), attr);
+            if (attr->scope().testFlag(DynamicProperty::Scope::Required_Interface))
+                m_reqIface.insert(attr->name(), attr);
+
+            if (attr->scope().testFlag(DynamicProperty::Scope::Provided_Interface))
+                m_provIface.insert(attr->name(), attr);
         }
     }
 
-    QHash<QString, DynamicProperty *> m_functionType;
     QHash<QString, DynamicProperty *> m_function;
-    QHash<QString, DynamicProperty *> m_iface;
+    QHash<QString, DynamicProperty *> m_reqIface;
+    QHash<QString, DynamicProperty *> m_provIface;
 };
 
 DynamicPropertyConfig *DynamicPropertyConfig::m_instance = nullptr;
@@ -94,12 +93,17 @@ QString DynamicPropertyConfig::defaultConfigPath()
 {
     const QString &path = QStandardPaths::writableLocation(QStandardPaths::AppLocalDataLocation);
     shared::ensureDirExists(path);
-    return path + "/aadl_properties.json";
+    return path + "/default_attributes.xml";
 }
 
 QString DynamicPropertyConfig::currentConfigPath()
 {
     return instance()->configPath();
+}
+
+QString DynamicPropertyConfig::resourceConfigPath()
+{
+    return QLatin1String(":/defaults/interface/properties/resources/default_attributes.xml");
 }
 
 QString DynamicPropertyConfig::configPath() const
@@ -129,9 +133,8 @@ QString ensureFileExists()
         if (storedFilePath.isEmpty())
             storedFilePath = DynamicPropertyConfig::defaultConfigPath();
 
-        const QString rscFilePath(":/defaults/tab_interface/properties/resources/aadl_properties.json");
-        if (!shared::copyResourceFile(rscFilePath, storedFilePath)) {
-            qWarning() << "Can't create default ASN datatypes file" << storedFilePath;
+        if (!shared::copyResourceFile(DynamicPropertyConfig::resourceConfigPath(), storedFilePath)) {
+            qWarning() << "Can't create default storage for properties/attributes" << storedFilePath;
             return QString();
         }
     }
@@ -144,7 +147,10 @@ void DynamicPropertyConfig::init()
     if (!filePath.isEmpty()) {
         QFile f(filePath);
         if (f.open(QIODevice::ReadOnly | QIODevice::Text)) {
-            d->init(readAttrs(f.readAll()));
+            QString errMsg;
+            int line;
+            int column;
+            d->init(parseAttributesList(QString::fromUtf8(f.readAll()), &errMsg, &line, &column));
             return;
         }
 
@@ -152,99 +158,103 @@ void DynamicPropertyConfig::init()
     }
 }
 
-void DynamicPropertyConfig::generateSampleFile()
+QList<DynamicProperty *> DynamicPropertyConfig::parseAttributesList(
+        const QString &fromData, QString *errorMsg, int *errorLine, int *errorColumn)
 {
-    QVector<DynamicProperty *> attrs;
-    attrs << new DynamicProperty("CustomIntForAll", DynamicProperty::Type::Integer,
-            DynamicProperty::Scope::FunctionType | DynamicProperty::Scope::Function
-                    | DynamicProperty::Scope::Interface);
-    attrs << new DynamicProperty("CustomRealForTwo", DynamicProperty::Type::Real,
-            DynamicProperty::Scope::FunctionType | DynamicProperty::Scope::Function);
-    attrs << new DynamicProperty("CustomBoolForOne", DynamicProperty::Type::Boolean, DynamicProperty::Scope::Interface);
-    attrs << new DynamicProperty("CustomString", DynamicProperty::Type::String, DynamicProperty::Scope::Interface);
-    attrs << new DynamicProperty("CustomStringList", DynamicProperty::Type::String, DynamicProperty::Scope::Interface,
-            { "./file.a", "../file.b", "/file.c" });
-    attrs << new DynamicProperty(
-            "CustomIntList", DynamicProperty::Type::Integer, DynamicProperty::Scope::Interface, { -1, 0, 1 });
-    attrs << new DynamicProperty(
-            "CustomRealList", DynamicProperty::Type::Integer, DynamicProperty::Scope::Interface, { -1.5, 0., 1.5 });
-    attrs << new DynamicProperty("CustomEnum", DynamicProperty::Type::Enumeration, DynamicProperty::Scope::Interface,
-            { "First", "Next", "Last" });
+    QList<DynamicProperty *> attrs;
+    QDomDocument doc;
+    if (doc.setContent(fromData, false, errorMsg, errorLine, errorColumn)) {
+        const QDomElement docElem = doc.documentElement();
+        if (docElem.isNull())
+            return {};
 
-    QJsonArray attrsHolder;
-    for (auto attr : attrs)
-        attrsHolder.append(attr->toJson());
-
-    QFile tmp("./aadl_properties.json");
-    if (tmp.open(QIODevice::WriteOnly)) {
-        QJsonDocument doc(attrsHolder);
-        const QByteArray &j = doc.toJson();
-        tmp.write(j);
-    } else {
-        qWarning() << "Unable to write file" << tmp.fileName();
+        QDomElement attributeElement = docElem.firstChildElement(DynamicProperty::tagName());
+        while (!attributeElement.isNull()) {
+            if (auto dynamicProperty = DynamicProperty::fromXml(attributeElement)) {
+                attrs.append(dynamicProperty);
+            }
+            attributeElement = attributeElement.nextSiblingElement(DynamicProperty::tagName());
+        }
     }
-}
-
-QVector<DynamicProperty *> DynamicPropertyConfig::parseAttributesList(const QByteArray &fromData)
-{
-    QVector<DynamicProperty *> attrs;
-    QJsonParseError errorHandler;
-    QJsonDocument doc = QJsonDocument::fromJson(fromData, &errorHandler);
-    if (errorHandler.error != QJsonParseError::NoError) {
-        qWarning() << errorHandler.errorString();
-        return attrs;
-    }
-
-    QJsonArray jsonRoot = doc.array();
-    if (jsonRoot.isEmpty()) {
-        qWarning() << "No configured properties were found";
-        return attrs;
-    }
-
-    for (int i = 0; i < jsonRoot.size(); ++i)
-        if (DynamicProperty *attr = DynamicProperty::fromJson(jsonRoot.at(i).toObject()))
-            attrs << attr;
-
     return attrs;
 }
 
-QVector<DynamicProperty *> DynamicPropertyConfig::readAttrs(const QByteArray &data) const
+QHash<QString, DynamicProperty *> DynamicPropertyConfig::attributesForObject(const aadl::AADLObject *obj)
 {
-    const QVector<DynamicProperty *> &attrs = parseAttributesList(data);
-    if (attrs.isEmpty())
-        qWarning() << "It seems no custom properties has been defined";
-
-    return attrs;
-}
-
-QVector<DynamicProperty *> DynamicPropertyConfig::attributesForObject(aadl::AADLObject *obj)
-{
+    auto scope = DynamicProperty::Scope::None;
+    QList<DynamicProperty *> properties;
     switch (obj->aadlType()) {
     case aadl::AADLObject::Type::FunctionType:
-        return attributesForFunctionType();
     case aadl::AADLObject::Type::Function:
-        return attributesForFunction();
+        scope = DynamicProperty::Scope::Function;
+        properties = attributesForFunction();
+        break;
     case aadl::AADLObject::Type::RequiredInterface:
+        scope = DynamicProperty::Scope::Required_Interface;
+        properties = attributesForRequiredInterface();
+        break;
     case aadl::AADLObject::Type::ProvidedInterface:
-        return attributesForIface();
+        scope = DynamicProperty::Scope::Provided_Interface;
+        properties = attributesForProvidedInterface();
+        break;
     default:
         return {};
     }
+    QHash<QString, DynamicProperty *> result;
+    auto validate = [obj, scope](DynamicProperty *property) {
+        if (!property->scope().testFlag(scope)) {
+            return false;
+        }
+
+        const auto scopesValidators = property->attrValidatorPatterns();
+        for (auto it = scopesValidators.constBegin(); it != scopesValidators.constEnd(); ++it) {
+            if (it.key() != scope) {
+                continue;
+            }
+
+            ///
+            auto checkPattern = [](const QHash<QString, QVariant> &data, const QString &name, const QString &pattern) {
+                auto objPropIter = data.constFind(name);
+                if (objPropIter != data.constEnd()) {
+                    const QRegularExpression rx(pattern);
+                    const QRegularExpressionMatch match = rx.match(objPropIter.value().toString());
+                    if (!match.hasMatch())
+                        return false;
+                }
+                return true;
+            };
+            /// TODO: add type into XML storage for AttrValidator (PropValidator)
+            /// to lookup in appropriate data set
+            /// Add mandatory attribute for combined checks
+            if (!checkPattern(obj->props(), it->first, it->second))
+                return false;
+
+            if (!checkPattern(obj->attrs(), it->first, it->second))
+                return false;
+        }
+
+        return true;
+    };
+    std::for_each(properties.constBegin(), properties.constEnd(), [&result, validate](DynamicProperty *property) {
+        if (validate(property))
+            result.insert(property->name(), property);
+    });
+    return result;
 }
 
-QVector<DynamicProperty *> DynamicPropertyConfig::attributesForFunctionType()
+QList<DynamicProperty *> DynamicPropertyConfig::attributesForFunction()
 {
-    return instance()->d->m_functionType.values().toVector();
+    return instance()->d->m_function.values();
 }
 
-QVector<DynamicProperty *> DynamicPropertyConfig::attributesForFunction()
+QList<DynamicProperty *> DynamicPropertyConfig::attributesForRequiredInterface()
 {
-    return instance()->d->m_function.values().toVector();
+    return instance()->d->m_reqIface.values();
 }
 
-QVector<DynamicProperty *> DynamicPropertyConfig::attributesForIface()
+QList<DynamicProperty *> DynamicPropertyConfig::attributesForProvidedInterface()
 {
-    return instance()->d->m_iface.values().toVector();
+    return instance()->d->m_provIface.values();
 }
 
-}
+} // namespace aadlinterface

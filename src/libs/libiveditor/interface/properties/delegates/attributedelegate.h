@@ -1,5 +1,5 @@
 /*
-  Copyright (C) 2019 European Space Agency - <maxime.perrotin@esa.int>
+  Copyright (C) 2020 European Space Agency - <maxime.perrotin@esa.int>
 
   This library is free software; you can redistribute it and/or
   modify it under the terms of the GNU Library General Public
@@ -17,34 +17,18 @@
 
 #pragma once
 
-#include <QDialog>
-
-namespace Ui {
-class DynamicPropertyManager;
-}
+#include <QStyledItemDelegate>
 
 namespace aadlinterface {
 
-class DynamicPropertyManager : public QDialog
+class AttributeDelegate : public QStyledItemDelegate
 {
     Q_OBJECT
-
 public:
-    explicit DynamicPropertyManager(QWidget *parent = nullptr);
-    ~DynamicPropertyManager() override;
+    explicit AttributeDelegate(QObject *parent = nullptr);
 
-public Q_SLOTS:
-    void accept() override;
-
-private Q_SLOTS:
-    void updateErrorInfo();
-    void on_btnNewProp_clicked();
-
-private:
-    Ui::DynamicPropertyManager *ui;
-    QStringList m_usedNames;
-    bool readConfig(const QString &from);
-    void setTextColor(const QColor &color);
+    QWidget *createEditor(QWidget *parent, const QStyleOptionViewItem &option, const QModelIndex &index) const override;
+    void setEditorData(QWidget *editor, const QModelIndex &index) const override;
 };
 
-}
+} // namespace aadlinterface

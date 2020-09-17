@@ -66,8 +66,10 @@ void AADLObjectFunction::setInstanceOf(AADLObjectFunctionType *fnType)
 
             disconnect(d->m_fnType, &AADLObjectFunction::contextParamsChanged, this,
                     &AADLObjectFunction::reflectContextParam);
-            disconnect(d->m_fnType, &AADLObjectFunction::propertyChanged, this, &AADLObjectFunction::reflectProp);
-            disconnect(d->m_fnType, &AADLObjectFunction::attributeChanged, this, &AADLObjectFunction::reflectAttr);
+            disconnect(d->m_fnType, qOverload<aadl::meta::Props::Token>(&AADLObjectFunction::propertyChanged), this,
+                    &AADLObjectFunction::reflectProp);
+            disconnect(d->m_fnType, qOverload<aadl::meta::Props::Token>(&AADLObjectFunction::attributeChanged), this,
+                    &AADLObjectFunction::reflectAttr);
 
             restoreInternals();
         }
@@ -77,8 +79,10 @@ void AADLObjectFunction::setInstanceOf(AADLObjectFunctionType *fnType)
         if (d->m_fnType) {
             cloneInternals();
 
-            connect(d->m_fnType, &AADLObjectFunction::attributeChanged, this, &AADLObjectFunction::reflectAttr);
-            connect(d->m_fnType, &AADLObjectFunction::propertyChanged, this, &AADLObjectFunction::reflectProp);
+            connect(d->m_fnType, qOverload<aadl::meta::Props::Token>(&AADLObjectFunction::attributeChanged), this,
+                    &AADLObjectFunction::reflectAttr);
+            connect(d->m_fnType, qOverload<aadl::meta::Props::Token>(&AADLObjectFunction::propertyChanged), this,
+                    &AADLObjectFunction::reflectProp);
             connect(d->m_fnType, &AADLObjectFunction::contextParamsChanged, this,
                     &AADLObjectFunction::reflectContextParam);
         }
