@@ -86,6 +86,8 @@ Implemented commands and parameters list:
 - **Redo** - Redo the last reverted comand
 - **Save** - save the current chart to a file
     + **fileName** - name of the file to save to
+    + **asn1File** - name of the file that is having the asn data. This is the file name only. So not including a the
+path. The file is expected to bein the same directory as the msc file. This parameter is optional
 - **VisibleItemLimit** - limit visible events in the scene
    + **number** - count of visible items, -1 if all of them should be visible
 
