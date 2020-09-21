@@ -1515,6 +1515,9 @@ void ChartLayoutManager::onInstanceEventItemMoved(shared::ui::InteractiveObjectB
 
     if (auto conditionItem = qobject_cast<ConditionItem *>(item)) {
         MscInstance *newInstance = nearestInstance(conditionItem->sceneBoundingRect().center());
+        if (newInstance == nullptr && conditionItem->modelItem()->shared()) {
+            newInstance = conditionItem->modelItem()->instance();
+        }
         const int currentIdx = d->m_currentChart->instanceEvents().indexOf(conditionItem->modelItem());
         const int newIdx = eventIndex(item->y());
         if (!newInstance || newInstance != conditionItem->modelItem()->instance() || newIdx != currentIdx) {
