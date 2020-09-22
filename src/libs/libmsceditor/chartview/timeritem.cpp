@@ -115,7 +115,8 @@ void TimerItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *option,
     QPen pen(Qt::black, 1);
     painter->setPen(pen);
 
-    auto br = boundingRect();
+    const QRectF br = boundingRect();
+
     QPointF start(br.x(), br.center().y());
     QRectF symboxRect = symbolBox();
 

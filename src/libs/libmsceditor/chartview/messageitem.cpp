@@ -464,6 +464,9 @@ void MessageItem::onTargetInstanceMoved(const QPointF &from, const QPointF &to)
         updateCif();
 }
 
+/*!
+   The coordinates of the head point in scene coordinates
+ */
 QPointF MessageItem::head() const
 {
     return m_arrowItem->mapToScene(m_arrowItem->endSignPos());
@@ -477,6 +480,9 @@ void MessageItem::setHead(const QPointF &head, ObjectAnchor::Snap snap)
     updateTarget(head, snap);
 }
 
+/*!
+   The coordinates of the tail point in scene coordinates
+ */
 QPointF MessageItem::tail() const
 {
     return m_arrowItem->mapToScene(m_arrowItem->startSignPos());
@@ -574,7 +580,6 @@ void MessageItem::onManualResizeProgress(shared::ui::GripPoint *gp, const QPoint
 void MessageItem::onManualGeometryChangeFinished(shared::ui::GripPoint *gp, const QPointF &from, const QPointF &to)
 {
     Q_UNUSED(to);
-
     if (m_sourceInstance == m_targetInstance) {
         GeometryNotificationBlocker keepSilent(this);
         m_originalMessagePoints.clear();
@@ -643,7 +648,8 @@ void MessageItem::onManualGeometryChangeFinished(shared::ui::GripPoint *gp, cons
                         QVariant::fromValue<MscMessage::EndType>(MscMessage::EndType::TARGET_HEAD) });
     }
 
-    const int newIdx = m_chartLayoutManager->eventIndex(tail().y());
+    const qreal newPos = (gp && gp->location() == shared::ui::GripPoint::Center) ? to.y() : tail().y();
+    int newIdx = m_chartLayoutManager->eventIndex(newPos, m_message);
     msc::cmd::CommandsStack::push(msc::cmd::EditMessagePoints,
             { QVariant::fromValue(m_message.data()), QVariant::fromValue(oldPointsCif),
                     QVariant::fromValue(newPointsCif), newIdx });

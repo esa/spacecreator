@@ -92,7 +92,8 @@ public:
 
     msc::MscEntity *nearestEntity(const QPointF &pos);
     msc::MscInstance *nearestInstance(const QPointF &pos);
-    int eventIndex(qreal y);
+    int eventIndex(qreal y, MscInstanceEvent *ignoreEvent = nullptr);
+    int indexOfEvent(MscInstanceEvent *instanceEvent) const;
     msc::MscInstanceEvent *eventAtPosition(const QPointF &pos);
 
     QSizeF preferredChartBoxSize() const;

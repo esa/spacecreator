@@ -122,7 +122,7 @@ void GripPointsHandler::setGripPointPos(GripPoint::Location location, const QPoi
     }
 }
 
-GripPoint *GripPointsHandler::gripPoint(GripPoint::Location location)
+GripPoint *GripPointsHandler::gripPoint(GripPoint::Location location) const
 {
     for (auto gp : m_gripPoints) {
         if (gp->location() == location) {

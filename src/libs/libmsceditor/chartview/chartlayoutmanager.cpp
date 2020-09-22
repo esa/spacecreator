@@ -1080,11 +1080,11 @@ MscInstance *ChartLayoutManager::nearestInstance(const QPointF &pos)
    Returns the index an event would have if it was placed at Y-position \p y.
    @param y the Y-position in scene coordinates
  */
-int ChartLayoutManager::eventIndex(qreal y)
+int ChartLayoutManager::eventIndex(qreal y, MscInstanceEvent *ignoreEvent)
 {
     int idx = 0;
-    for (auto item : d->m_instanceEventItemsSorted) {
-        if (item->sceneBoundingRect().y() < y) {
+    for (msc::InteractiveObject *item : d->m_instanceEventItemsSorted) {
+        if (item->modelEntity() != ignoreEvent && item->sceneBoundingRect().y() < y) {
             ++idx;
             if (auto coregionItem = qobject_cast<CoregionItem *>(item)) {
                 if (coregionItem->sceneBoundingRect().bottom() < y)
@@ -1093,6 +1093,14 @@ int ChartLayoutManager::eventIndex(qreal y)
         }
     }
     return idx;
+}
+
+int ChartLayoutManager::indexOfEvent(MscInstanceEvent *instanceEvent) const
+{
+    if (!d->m_currentChart) {
+        return -1;
+    }
+    return d->m_currentChart->indexofEvent(instanceEvent);
 }
 
 MscInstanceEvent *ChartLayoutManager::eventAtPosition(const QPointF &scenePos)
