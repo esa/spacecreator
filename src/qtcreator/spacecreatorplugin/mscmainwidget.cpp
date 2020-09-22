@@ -15,7 +15,7 @@
    along with this program. If not, see <https://www.gnu.org/licenses/lgpl-2.1.html>.
 */
 
-#include "mainwidget.h"
+#include "mscmainwidget.h"
 
 #include "asn1fileview.h"
 #include "chartlayoutmanager.h"
@@ -43,13 +43,13 @@
 #include <QtWidgets/QHeaderView>
 #include <coreplugin/minisplitter.h>
 
-namespace MscPlugin {
+namespace spctr {
 
 /*!
-   \brief MscPlugin::MainWidget::MainWidget Is the main widget for the whole MSC plugin in QtCreator
+   \brief MscEditorCore::MainWidget::MainWidget Is the main widget for the whole MSC plugin in QtCreator
  */
 
-MainWidget::MainWidget(QWidget *parent)
+MscMainWidget::MscMainWidget(QWidget *parent)
     : QWidget(parent)
     , m_plugin(new msc::MSCEditorCore())
 {
@@ -65,7 +65,7 @@ MainWidget::MainWidget(QWidget *parent)
     m_plugin->showDocumentView(true);
 }
 
-MainWidget::~MainWidget()
+MscMainWidget::~MscMainWidget()
 {
     if (m_documentTree->model()) {
         disconnect(m_documentTree->model(), nullptr, this, nullptr);
@@ -75,7 +75,7 @@ MainWidget::~MainWidget()
     disconnect(m_plugin->mainModel()->undoStack(), nullptr, this, nullptr);
 }
 
-bool MainWidget::load(const QString &filename)
+bool MscMainWidget::load(const QString &filename)
 {
     m_plugin->mainModel()->chartViewModel().setPreferredChartBoxSize(QSizeF());
 
@@ -88,62 +88,62 @@ bool MainWidget::load(const QString &filename)
     return ok;
 }
 
-bool MainWidget::save()
+bool MscMainWidget::save()
 {
     return m_plugin->mainModel()->saveMsc(m_plugin->mainModel()->currentFilePath());
 }
 
-QString MainWidget::errorMessage() const
+QString MscMainWidget::errorMessage() const
 {
     return m_plugin->mainModel()->mscErrorMessages().join("\n");
 }
 
-void MainWidget::setFileName(const QString &filename)
+void MscMainWidget::setFileName(const QString &filename)
 {
     m_plugin->mainModel()->setCurrentFilePath(filename);
 }
 
-bool MainWidget::isDirty() const
+bool MscMainWidget::isDirty() const
 {
     return m_plugin->mainModel()->needSave();
 }
 
-QUndoStack *MainWidget::undoStack()
+QUndoStack *MscMainWidget::undoStack()
 {
     return m_plugin->mainModel()->undoStack();
 }
 
-QString MainWidget::textContents() const
+QString MscMainWidget::textContents() const
 {
     return m_plugin->mainModel()->modelText();
 }
 
-QAction *MainWidget::actionCopy() const
+QAction *MscMainWidget::actionCopy() const
 {
     return m_plugin->actionCopy();
 }
 
-QAction *MainWidget::actionPaste() const
+QAction *MscMainWidget::actionPaste() const
 {
     return m_plugin->actionPaste();
 }
 
-QAction *MainWidget::actionToolDelete() const
+QAction *MscMainWidget::actionToolDelete() const
 {
     return m_plugin->deleteTool()->action();
 }
 
-QVector<QAction *> MainWidget::toolActions() const
+QVector<QAction *> MscMainWidget::toolActions() const
 {
     return m_plugin->chartActions();
 }
 
-QSharedPointer<msc::MSCEditorCore> MainWidget::mscPlugin() const
+QSharedPointer<msc::MSCEditorCore> MscMainWidget::mscPlugin() const
 {
     return m_plugin;
 }
 
-void MainWidget::showChart(const QModelIndex &index)
+void MscMainWidget::showChart(const QModelIndex &index)
 {
     if (!index.isValid()) {
         return;
@@ -162,7 +162,7 @@ void MainWidget::showChart(const QModelIndex &index)
     }
 }
 
-void MainWidget::showSelection(const QModelIndex &current, const QModelIndex &previous)
+void MscMainWidget::showSelection(const QModelIndex &current, const QModelIndex &previous)
 {
     Q_UNUSED(previous)
     if (!current.isValid()) {
@@ -196,13 +196,13 @@ void MainWidget::showSelection(const QModelIndex &current, const QModelIndex &pr
     }
 }
 
-void MainWidget::showAsn1Errors(const QStringList &faultyMessages)
+void MscMainWidget::showAsn1Errors(const QStringList &faultyMessages)
 {
     QMessageBox::warning(
             this, tr("ASN1 error"), tr("Following messgages have ASN.1 errors:") + "\n" + faultyMessages.join("\n"));
 }
 
-void MainWidget::initUi()
+void MscMainWidget::initUi()
 {
     auto centerView = new QStackedWidget(this);
     auto graphicsView = new msc::GraphicsView(this);
@@ -236,16 +236,17 @@ void MainWidget::initUi()
     m_documentTree->setModel(m_plugin->mainModel()->documentItemModel());
 }
 
-void MainWidget::initConnections()
+void MscMainWidget::initConnections()
 {
-    connect(m_documentTree->selectionModel(), &QItemSelectionModel::currentChanged, this, &MainWidget::showSelection);
-    connect(m_documentTree, &QTreeView::doubleClicked, this, &MainWidget::showChart);
+    connect(m_documentTree->selectionModel(), &QItemSelectionModel::currentChanged, this,
+            &MscMainWidget::showSelection);
+    connect(m_documentTree, &QTreeView::doubleClicked, this, &MscMainWidget::showChart);
 
     connect(m_plugin->mainModel(), &msc::MainModel::selectedDocumentChanged, m_documentTree,
             &msc::DocumentTreeView::setSelectedDocument);
 
     connect(m_plugin->mainModel()->documentItemModel(), &msc::DocumentItemModel::dataChanged, this,
-            &MainWidget::showSelection);
+            &MscMainWidget::showSelection);
 
     connect(m_plugin->mainModel()->undoStack(), &QUndoStack::indexChanged, this,
             [&]() { Q_EMIT dirtyChanged(isDirty()); });
@@ -266,7 +267,7 @@ void MainWidget::initConnections()
         }
         Q_EMIT asn1Selected(fileName);
     });
-    connect(m_plugin->mainModel(), &msc::MainModel::asn1ParameterErrorDetected, this, &MainWidget::showAsn1Errors);
+    connect(m_plugin->mainModel(), &msc::MainModel::asn1ParameterErrorDetected, this, &MscMainWidget::showAsn1Errors);
 }
 
 }

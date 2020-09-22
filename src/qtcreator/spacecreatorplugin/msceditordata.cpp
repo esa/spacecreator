@@ -17,13 +17,13 @@
 
 #include "msceditordata.h"
 
-#include "mainwidget.h"
 #include "msccontext.h"
 #include "msceditorcore.h"
 #include "msceditordocument.h"
 #include "msceditorstack.h"
-#include "mscpluginconstants.h"
+#include "mscmainwidget.h"
 #include "msctexteditor.h"
+#include "spacecreatorpluginconstants.h"
 
 #include <QToolBar>
 #include <QUndoGroup>
@@ -48,7 +48,7 @@
 #include <utils/qtcassert.h>
 #include <utils/utilsicons.h>
 
-namespace MscPlugin {
+namespace spctr {
 
 class MscTextEditorWidget : public TextEditor::TextEditorWidget
 {
@@ -64,14 +64,14 @@ class MscTextEditorFactory : public TextEditor::TextEditorFactory
 public:
     MscTextEditorFactory()
     {
-        setId(MscPlugin::Constants::K_MSC_EDITOR_ID);
+        setId(spctr::Constants::K_MSC_EDITOR_ID);
         setEditorCreator([]() { return new MscTextEditor; });
         setEditorWidgetCreator([]() { return new MscTextEditorWidget; });
         setUseGenericHighlighter(true);
         setDuplicatedSupported(false);
     }
 
-    MscTextEditor *create(MscPlugin::MainWidget *designWidget)
+    MscTextEditor *create(spctr::MscMainWidget *designWidget)
     {
         setDocumentCreator([designWidget]() { return new MscEditorDocument(designWidget); });
         return qobject_cast<MscTextEditor *>(createEditor());
@@ -81,7 +81,7 @@ public:
 MscEditorData::MscEditorData(QObject *parent)
     : QObject(parent)
 {
-    m_contexts.add(MscPlugin::Constants::C_MSCEDITOR);
+    m_contexts.add(spctr::Constants::C_MSCEDITOR);
 
     QObject::connect(
             Core::EditorManager::instance(), &Core::EditorManager::currentEditorChanged, [this](Core::IEditor *editor) {
@@ -140,12 +140,12 @@ void MscEditorData::fullInit()
     Core::ICore::addContextObject(m_context);
 
     Core::DesignMode::registerDesignWidget(
-            m_modeWidget, QStringList(QLatin1String(MscPlugin::Constants::MSC_MIMETYPE)), m_contexts);
+            m_modeWidget, QStringList(QLatin1String(spctr::Constants::MSC_MIMETYPE)), m_contexts);
 }
 
 Core::IEditor *MscEditorData::createEditor()
 {
-    auto designWidget = new MainWidget;
+    auto designWidget = new MscMainWidget;
     MscTextEditor *mscEditor = m_editorFactory->create(designWidget);
 
     m_undoGroup->addStack(designWidget->undoStack());
@@ -160,8 +160,8 @@ Core::IEditor *MscEditorData::createEditor()
         mscEditor->document()->infoBar()->addInfo(info);
     }
 
-    connect(designWidget, &MscPlugin::MainWidget::asn1Selected, this, &MscEditorData::openEditor);
-    connect(designWidget, &MscPlugin::MainWidget::mscDataLoaded, this, &MscEditorData::mscDataLoaded);
+    connect(designWidget, &spctr::MscMainWidget::asn1Selected, this, &MscEditorData::openEditor);
+    connect(designWidget, &spctr::MscMainWidget::mscDataLoaded, this, &MscEditorData::mscDataLoaded);
 
     return mscEditor;
 }
@@ -173,7 +173,7 @@ void MscEditorData::editMessageDeclarations(QWidget *parentWidget)
 {
     auto editorManager = Core::EditorManager::instance();
     Core::IDocument *currentDoc = editorManager->currentDocument();
-    auto document = qobject_cast<MscPlugin::MscEditorDocument *>(currentDoc);
+    auto document = qobject_cast<spctr::MscEditorDocument *>(currentDoc);
     if (document && document->designWidget()) {
         document->designWidget()->mscPlugin()->openMessageDeclarationEditor(parentWidget);
     }
@@ -205,7 +205,7 @@ void MscEditorData::setMinimapVisible(bool visible)
     m_minimapVisible = visible;
 
     for (auto openedDocument : Core::DocumentModel::openedDocuments()) {
-        if (auto document = qobject_cast<MscPlugin::MscEditorDocument *>(openedDocument)) {
+        if (auto document = qobject_cast<spctr::MscEditorDocument *>(openedDocument)) {
             if (document && document->designWidget()) {
                 document->designWidget()->mscPlugin()->minimapView()->setVisible(visible);
             }
@@ -215,7 +215,7 @@ void MscEditorData::setMinimapVisible(bool visible)
 
 void MscEditorData::updateToolBar()
 {
-    auto designWidget = static_cast<MainWidget *>(m_widgetStack->currentWidget());
+    auto designWidget = static_cast<MscMainWidget *>(m_widgetStack->currentWidget());
     if (designWidget && m_widgetToolBar) {
         m_undoGroup->setActiveStack(designWidget->undoStack());
         m_widgetToolBar->clear();

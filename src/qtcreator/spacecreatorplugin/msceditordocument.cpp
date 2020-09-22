@@ -17,8 +17,8 @@
 
 #include "msceditordocument.h"
 
-#include "mainwidget.h"
-#include "mscpluginconstants.h"
+#include "mscmainwidget.h"
+#include "spacecreatorpluginconstants.h"
 
 #include <QFileInfo>
 #include <QTextCodec>
@@ -27,18 +27,18 @@
 
 using namespace Utils;
 
-namespace MscPlugin {
+namespace spctr {
 
-MscEditorDocument::MscEditorDocument(MainWidget *designWidget, QObject *parent)
+MscEditorDocument::MscEditorDocument(MscMainWidget *designWidget, QObject *parent)
     : m_designWidget(designWidget)
 {
-    setMimeType(QLatin1String(MscPlugin::Constants::MSC_MIMETYPE));
+    setMimeType(QLatin1String(spctr::Constants::MSC_MIMETYPE));
     setParent(parent);
-    setId(Core::Id(MscPlugin::Constants::K_MSC_EDITOR_ID));
+    setId(Core::Id(spctr::Constants::K_MSC_EDITOR_ID));
 
     // Designer needs UTF-8 regardless of settings.
     setCodec(QTextCodec::codecForName("UTF-8"));
-    connect(m_designWidget.data(), &MainWidget::dirtyChanged, this, [this] { Q_EMIT changed(); });
+    connect(m_designWidget.data(), &MscMainWidget::dirtyChanged, this, [this] { Q_EMIT changed(); });
 }
 
 Core::IDocument::OpenResult MscEditorDocument::open(
@@ -111,7 +111,7 @@ bool MscEditorDocument::isSaveAsAllowed() const
     return true;
 }
 
-MainWidget *MscEditorDocument::designWidget() const
+MscMainWidget *MscEditorDocument::designWidget() const
 {
     return m_designWidget;
 }

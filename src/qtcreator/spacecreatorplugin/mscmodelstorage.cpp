@@ -15,27 +15,27 @@
    along with this program. If not, see <https://www.gnu.org/licenses/lgpl-2.1.html>.
 */
 
-#include "aadlmodelstorage.h"
+#include "mscmodelstorage.h"
 
-#include "interface/interfacedocument.h"
-#include "iveditorcore.h"
+#include "mainmodel.h"
+#include "msceditorcore.h"
 
-namespace MscPlugin {
+namespace spctr {
 
-AadlModelStorage::AadlModelStorage(QObject *parent)
+MscModelStorage::MscModelStorage(QObject *parent)
     : QObject(parent)
 {
 }
 
 /*!
-   Returns the IVEditorCore object for the given file
+   Returns the MSCEditorCore object for the given file
    If the object does not exist yet, one will be created and the data be loaded
  */
-QSharedPointer<aadlinterface::IVEditorCore> AadlModelStorage::ivData(const QString &fileName)
+QSharedPointer<msc::MSCEditorCore> MscModelStorage::mscData(const QString &fileName)
 {
     if (!m_store.contains(fileName)) {
-        QSharedPointer<aadlinterface::IVEditorCore> data(new aadlinterface::IVEditorCore());
-        data->document()->load(fileName);
+        QSharedPointer<msc::MSCEditorCore> data(new msc::MSCEditorCore());
+        data->mainModel()->loadFile(fileName);
         m_store[fileName] = data;
         return data;
     }
@@ -44,17 +44,17 @@ QSharedPointer<aadlinterface::IVEditorCore> AadlModelStorage::ivData(const QStri
 }
 
 /*!
-   Sets the IVEditorCore object for the given file.
+   Sets the MSCEditorCore object for the given file.
    If the object was already used for another file, that old file/object connection is removed.
  */
-void AadlModelStorage::setIvData(const QString &fileName, QSharedPointer<aadlinterface::IVEditorCore> ivData)
+void MscModelStorage::setMscData(const QString &fileName, QSharedPointer<msc::MSCEditorCore> mscData)
 {
-    const QString oldKey = m_store.key(ivData, "");
+    const QString oldKey = m_store.key(mscData, "");
     if (!oldKey.isEmpty()) {
         m_store.remove(oldKey);
     }
 
-    m_store[fileName] = ivData;
+    m_store[fileName] = mscData;
 }
 
 }

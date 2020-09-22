@@ -17,33 +17,36 @@
 
 #pragma once
 
-#include <QSharedPointer>
-#include <coreplugin/editormanager/ieditorfactory.h>
+#include <QStackedWidget>
+#include <coreplugin/id.h>
 
-namespace msc {
-class MSCEditorCore;
+namespace Core {
+class IEditor;
+class IMode;
 }
 
-namespace MscPlugin {
+namespace spctr {
 
-class MscEditorData;
+class MscTextEditor;
 
-class MscEditorFactory : public Core::IEditorFactory
+class MscEditorStack : public QStackedWidget
 {
     Q_OBJECT
 
 public:
-    explicit MscEditorFactory(QObject *parent);
+    MscEditorStack(QWidget *parent = nullptr);
 
-    Core::IEditor *createEditor() override;
+    void add(MscTextEditor *editor, QWidget *widget);
+    QWidget *widgetForEditor(MscTextEditor *editor);
+    void removeMscTextEditor(QObject *);
+    bool setVisibleEditor(Core::IEditor *xmlEditor);
 
-    MscEditorData *editorData() const;
-
-Q_SIGNALS:
-    void mscDataLoaded(const QString &fileName, QSharedPointer<msc::MSCEditorCore> data);
+    QVector<MscTextEditor *> editors() const;
 
 private:
-    mutable MscEditorData *m_editorData = nullptr;
+    void modeAboutToChange(Core::Id m);
+
+    QVector<MscTextEditor *> m_editors;
 };
 
 }

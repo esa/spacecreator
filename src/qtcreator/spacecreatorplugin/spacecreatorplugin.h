@@ -17,7 +17,7 @@
 
 #pragma once
 
-#include "mscplugin_global.h"
+#include "spacecreatorplugin_global.h"
 
 #include <QSharedPointer>
 #include <QVector>
@@ -33,7 +33,7 @@ namespace msc {
 class MSCEditorCore;
 }
 
-namespace MscPlugin {
+namespace spctr {
 
 class AadlModelStorage;
 class MscEditorFactory;

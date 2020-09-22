@@ -17,14 +17,33 @@
 
 #pragma once
 
-#include <coreplugin/icontext.h>
+#include <QSharedPointer>
+#include <coreplugin/editormanager/ieditorfactory.h>
 
-namespace MscPlugin {
+namespace msc {
+class MSCEditorCore;
+}
 
-class MscContext : public Core::IContext
+namespace spctr {
+
+class MscEditorData;
+
+class MscEditorFactory : public Core::IEditorFactory
 {
+    Q_OBJECT
+
 public:
-    explicit MscContext(const Core::Context &contexts, QWidget *widget, QObject *parent = nullptr);
+    explicit MscEditorFactory(QObject *parent);
+
+    Core::IEditor *createEditor() override;
+
+    MscEditorData *editorData() const;
+
+Q_SIGNALS:
+    void mscDataLoaded(const QString &fileName, QSharedPointer<msc::MSCEditorCore> data);
+
+private:
+    mutable MscEditorData *m_editorData = nullptr;
 };
 
 }

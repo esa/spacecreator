@@ -17,19 +17,19 @@
 
 #include "msctexteditor.h"
 
-#include "mainwidget.h"
 #include "msceditordocument.h"
-#include "mscpluginconstants.h"
+#include "mscmainwidget.h"
+#include "spacecreatorpluginconstants.h"
 
 #include <QFileInfo>
 #include <utils/qtcassert.h>
 
-namespace MscPlugin {
+namespace spctr {
 
 MscTextEditor::MscTextEditor()
 {
-    addContext(MscPlugin::Constants::K_MSC_EDITOR_ID);
-    addContext(MscPlugin::Constants::C_MSC_EDITOR);
+    addContext(spctr::Constants::K_MSC_EDITOR_ID);
+    addContext(spctr::Constants::C_MSC_EDITOR);
 }
 
 void MscTextEditor::finalizeInitialization()
@@ -43,7 +43,7 @@ void MscTextEditor::finalizeInitialization()
 bool MscTextEditor::open(QString *errorString, const QString &fileName, const QString & /*realFileName*/)
 {
     auto document = qobject_cast<MscEditorDocument *>(textDocument());
-    MainWidget *designWidget = document->designWidget();
+    MscMainWidget *designWidget = document->designWidget();
     QTC_ASSERT(designWidget, return false);
 
     if (fileName.isEmpty())

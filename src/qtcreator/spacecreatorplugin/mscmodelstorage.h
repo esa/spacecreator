@@ -1,5 +1,5 @@
 /*
-   Copyright (C) 2018 - 2019 European Space Agency - <maxime.perrotin@esa.int>
+   Copyright (C) 2020 European Space Agency - <maxime.perrotin@esa.int>
 
    This library is free software; you can redistribute it and/or
    modify it under the terms of the GNU Library General Public
@@ -15,15 +15,34 @@
    along with this program. If not, see <https://www.gnu.org/licenses/lgpl-2.1.html>.
 */
 
-#include "msccontext.h"
+#pragma once
 
-namespace MscPlugin {
+#include <QHash>
+#include <QObject>
+#include <QSharedPointer>
 
-MscContext::MscContext(const Core::Context &context, QWidget *widget, QObject *parent)
-    : Core::IContext(parent)
-{
-    setContext(context);
-    setWidget(widget);
+namespace msc {
+class MSCEditorCore;
 }
+
+namespace spctr {
+
+/*!
+   Stores shared pointers to all msc file objects. And creates a new one if needed
+ */
+class MscModelStorage : public QObject
+{
+    Q_OBJECT
+public:
+    explicit MscModelStorage(QObject *parent = nullptr);
+
+    QSharedPointer<msc::MSCEditorCore> mscData(const QString &fileName);
+
+public Q_SLOTS:
+    void setMscData(const QString &fileName, QSharedPointer<msc::MSCEditorCore> mscData);
+
+private:
+    QHash<QString, QSharedPointer<msc::MSCEditorCore>> m_store;
+};
 
 }

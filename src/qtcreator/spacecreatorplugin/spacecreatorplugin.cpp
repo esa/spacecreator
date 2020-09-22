@@ -15,7 +15,7 @@
    along with this program. If not, see <https://www.gnu.org/licenses/lgpl-2.1.html>.
 */
 
-#include "mscplugin.h"
+#include "spacecreatorplugin.h"
 
 #include "aadlchecks.h"
 #include "aadlmodelstorage.h"
@@ -29,8 +29,8 @@
 #include "mscinstance.h"
 #include "msclibrary.h"
 #include "mscmodelstorage.h"
-#include "mscpluginconstants.h"
 #include "sharedlibrary.h"
+#include "spacecreatorpluginconstants.h"
 
 #include <QAction>
 #include <QMessageBox>
@@ -54,7 +54,7 @@ void initMscResources()
 
 using namespace Core;
 
-namespace MscPlugin {
+namespace spctr {
 
 MSCPlugin::MSCPlugin()
 {

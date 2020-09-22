@@ -33,7 +33,7 @@ class EditorToolBar;
 class IEditor;
 }
 
-namespace MscPlugin {
+namespace spctr {
 
 class MscTextEditorFactory;
 class MscEditorWidget;

@@ -1,12 +1,12 @@
 {
-    \"Name\" : \"MscPlugin\",
+    \"Name\" : \"SpaceCreatorPlugin\",
     \"Version\" : \"$$PLUGIN_VERSION\",
     \"CompatVersion\" : \"$$QTCREATOR_COMPAT_VERSION\",
     \"Vendor\" : \"$$ORGANISATION\",
-    \"Copyright\" : \"(C) 2019 European Space Agency\",
+    \"Copyright\" : \"(C) 2020 European Space Agency\",
     \"License\" : \"LGPL 2.1\",
     \"Category\" : \"Modeling\",
-    \"Description\" : \"Visual Editor for MSC (message sequence diagram) files\",
+    \"Description\" : \"Visual Editor for MSC (message sequence diagram) and AADL files\",
     \"Url\" : \"$$ORGANISATION_DOMAIN",
     $$dependencyList,
 
@@ -16,7 +16,12 @@
         \"    <mime-type type=\'text/vnd.msc\'>\",
         \"        <sub-class-of type=\'text/msc\'/>\",
         \"        <comment>MSC Model File</comment>\",
-        \"        <glob pattern=\'*.msc\'/>\",
+        \"        <glob pattern=\'*.msc;\'/>\",
+        \"    </mime-type>\",
+        \"    <mime-type type=\'application/xml\'>\",
+        \"        <sub-class-of type=\'text/plain\'/>\",
+        \"        <comment>AADL Model File</comment>\",
+        \"        <glob pattern=\'*interfaceeditor.xml\'/>\",
         \"    </mime-type>\",
         \"</mime-info>\"
     ]

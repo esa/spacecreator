@@ -59,7 +59,7 @@ struct StreamingWindow::StreamingWindowPrivate {
 
 /*!
  * \brief StreamingWindow::StreamingWindow Create an empty view.
- * \param plugin hosts most code of the code for the MSC UI of type \ref msc::MSCPlugin
+ * \param plugin hosts most code of the code for the MSC UI of type \ref msc::MSCEditorCore
  * \param parent
  */
 StreamingWindow::StreamingWindow(msc::MSCEditorCore *plugin, QWidget *parent)

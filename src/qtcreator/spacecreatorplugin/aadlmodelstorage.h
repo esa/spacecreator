@@ -25,7 +25,7 @@ namespace aadlinterface {
 class IVEditorCore;
 }
 
-namespace MscPlugin {
+namespace spctr {
 
 /*!
    Stores shared pointers to all aadl file objects. And creates a new one if needed

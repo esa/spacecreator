@@ -1,11 +1,9 @@
-set(PLUGIN_NAME MscPlugin)
+set(PLUGIN_NAME SpaceCreatorPlugin)
 
 set(MSC_PLUGIN_SOURCES
+    SpaceCreatorPlugin.json.in
     aadlmodelstorage.cpp
     aadlmodelstorage.h
-    MscPlugin.json.in
-    mainwidget.cpp
-    mainwidget.h
     msccontext.cpp
     msccontext.h
     msceditordata.cpp
@@ -16,14 +14,16 @@ set(MSC_PLUGIN_SOURCES
     msceditorfactory.h
     msceditorstack.cpp
     msceditorstack.h
+    mscmainwidget.cpp
+    mscmainwidget.h
     mscmodelstorage.cpp
     mscmodelstorage.h
-    mscpluginconstants.h
-    mscplugin.cpp
-    mscplugin.h
-    mscplugin_global.h
     msctexteditor.cpp
     msctexteditor.h
+    spacecreatorplugin.cpp
+    spacecreatorplugin.h
+    spacecreatorplugin_global.h
+    spacecreatorpluginconstants.h
 )
 
 set(MSC_QTC_LIBRARIES
@@ -38,7 +38,6 @@ set(MSC_QTC_PLUGINS
     ProjectExplorer
     QtSupport
     TextEditor
-#    AadlPlugin
 )
 
 add_qtc_plugin(${PLUGIN_NAME}

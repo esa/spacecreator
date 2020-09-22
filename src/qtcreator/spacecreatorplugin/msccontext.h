@@ -17,36 +17,14 @@
 
 #pragma once
 
-#include <QStackedWidget>
-#include <coreplugin/id.h>
+#include <coreplugin/icontext.h>
 
-namespace Core {
-class IEditor;
-class IMode;
-}
+namespace spctr {
 
-namespace MscPlugin {
-
-class MscTextEditor;
-
-class MscEditorStack : public QStackedWidget
+class MscContext : public Core::IContext
 {
-    Q_OBJECT
-
 public:
-    MscEditorStack(QWidget *parent = nullptr);
-
-    void add(MscTextEditor *editor, QWidget *widget);
-    QWidget *widgetForEditor(MscTextEditor *editor);
-    void removeMscTextEditor(QObject *);
-    bool setVisibleEditor(Core::IEditor *xmlEditor);
-
-    QVector<MscTextEditor *> editors() const;
-
-private:
-    void modeAboutToChange(Core::Id m);
-
-    QVector<MscTextEditor *> m_editors;
+    explicit MscContext(const Core::Context &contexts, QWidget *widget, QObject *parent = nullptr);
 };
 
 }

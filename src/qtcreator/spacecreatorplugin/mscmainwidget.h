@@ -37,14 +37,14 @@ class GraphicsView;
 class MSCEditorCore;
 }
 
-namespace MscPlugin {
+namespace spctr {
 
-class MainWidget : public QWidget
+class MscMainWidget : public QWidget
 {
     Q_OBJECT
 public:
-    explicit MainWidget(QWidget *parent = nullptr);
-    ~MainWidget();
+    explicit MscMainWidget(QWidget *parent = nullptr);
+    ~MscMainWidget();
 
     bool load(const QString &filename);
     bool save();

@@ -24,7 +24,7 @@
 #include <coreplugin/modemanager.h>
 #include <utils/qtcassert.h>
 
-namespace MscPlugin {
+namespace spctr {
 
 MscEditorStack::MscEditorStack(QWidget *parent)
     : QStackedWidget(parent)

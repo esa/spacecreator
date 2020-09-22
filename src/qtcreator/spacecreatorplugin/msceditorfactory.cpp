@@ -19,19 +19,19 @@
 
 #include "msceditorcore.h"
 #include "msceditordata.h"
-#include "mscpluginconstants.h"
+#include "spacecreatorpluginconstants.h"
 
 #include <QGuiApplication>
 #include <coreplugin/fileiconprovider.h>
 
-namespace MscPlugin {
+namespace spctr {
 
 MscEditorFactory::MscEditorFactory(QObject *parent)
     : IEditorFactory(parent)
 {
     setId(Constants::K_MSC_EDITOR_ID);
     setDisplayName(QCoreApplication::translate("MscEditor", Constants::C_MSCEDITOR_DISPLAY_NAME));
-    addMimeType(MscPlugin::Constants::MSC_MIMETYPE);
+    addMimeType(spctr::Constants::MSC_MIMETYPE);
 
     Core::FileIconProvider::registerIconOverlayForSuffix(":/projectexplorer/images/fileoverlay_scxml.png", "msc");
 }

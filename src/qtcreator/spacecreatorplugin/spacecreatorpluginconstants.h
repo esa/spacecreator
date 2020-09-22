@@ -17,25 +17,26 @@
 
 #pragma once
 
-#include "mscplugin_global.h"
+#include <QtGlobal>
 
-#include <texteditor/texteditor.h>
+namespace spctr {
+namespace Constants {
 
-namespace MscPlugin {
+const char MSC_MIMETYPE[] = "text/vnd.msc";
 
-class MscTextEditor : public TextEditor::BaseTextEditor
-{
-    Q_OBJECT
+const char K_MSC_EDITOR_ID[] = "MscEditor.Editor";
+const char C_MSC_EDITOR[] = "Msc Editor";
 
-public:
-    MscTextEditor();
+const char INFO_READ_ONLY[] = "MscEditor.ReadOnly";
 
-    void finalizeInitialization() override;
-    bool open(QString *errorString, const QString &fileName, const QString &realFileName);
+const char C_MSCEDITOR[] = "Qt5.MscEditor";
+const char C_MSCEDITOR_DISPLAY_NAME[] = QT_TRANSLATE_NOOP("OpenWith::Editors", "Msc Editor");
 
-    QWidget *toolBar() override { return nullptr; }
+const char MESSAGE_DECLARATIONS_ID[] = "MscPlugin.MessageDeclarations";
+const char CHECK_INSTANCES_ID[] = "MscPlugin.CheckInstances";
+const char CHECK_MESSAGES_ID[] = "MscPlugin.CheckMessages";
+const char SHOW_MINIMAP_ID[] = "MscPlugin.Minimap";
+const char MENU_ID[] = "MscPlugin.Menu";
 
-    bool isDesignModePreferred() const override { return true; }
-};
-
+}
 }
