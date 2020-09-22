@@ -74,7 +74,8 @@ bool AADLPlugin::initialize(const QStringList &arguments, QString *errorString)
     m_asn1DialogAction->setEnabled(false);
     connect(editorManager, &Core::EditorManager::currentEditorChanged, this, [&](Core::IEditor *editor) {
         if (editor && editor->document()) {
-            const bool isAadl = editor->document()->filePath().toString().endsWith(".xml", Qt::CaseInsensitive);
+            const bool isAadl =
+                    editor->document()->filePath().toString().endsWith("interfaceeditor.xml", Qt::CaseInsensitive);
             m_asn1DialogAction->setEnabled(isAadl);
         }
     });

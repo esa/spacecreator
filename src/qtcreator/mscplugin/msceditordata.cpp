@@ -184,7 +184,7 @@ void MscEditorData::editMessageDeclarations(QWidget *parentWidget)
  */
 QStringList MscEditorData::aadlFiles() const
 {
-    return projectFiles(".xml");
+    return projectFiles("interfaceeditor.xml");
 }
 
 /*!
