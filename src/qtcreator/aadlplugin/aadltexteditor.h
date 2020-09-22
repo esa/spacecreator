@@ -24,7 +24,7 @@ namespace aadlinterface {
 class IVEditorCore;
 }
 
-namespace AadlPlugin {
+namespace spctr {
 
 class AadlTextEditor : public TextEditor::BaseTextEditor
 {

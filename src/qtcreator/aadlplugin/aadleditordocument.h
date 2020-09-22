@@ -22,7 +22,7 @@
 
 QT_FORWARD_DECLARE_CLASS(QDesignerFormWindowInterface)
 
-namespace AadlPlugin {
+namespace spctr {
 
 class AadlMainWidget;
 

@@ -23,7 +23,7 @@
 #include <QString>
 #include <coreplugin/editormanager/ieditorfactory.h>
 
-namespace AadlPlugin {
+namespace spctr {
 
 class AadlEditorData;
 

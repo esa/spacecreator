@@ -26,12 +26,12 @@
 #include <QFileInfo>
 #include <utils/qtcassert.h>
 
-namespace AadlPlugin {
+namespace spctr {
 
 AadlTextEditor::AadlTextEditor()
 {
-    addContext(AadlPlugin::Constants::K_AADL_EDITOR_ID);
-    addContext(AadlPlugin::Constants::C_AADL_EDITOR);
+    addContext(spctr::Constants::K_AADL_EDITOR_ID);
+    addContext(spctr::Constants::C_AADL_EDITOR);
 }
 
 void AadlTextEditor::finalizeInitialization()

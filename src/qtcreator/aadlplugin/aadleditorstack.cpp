@@ -25,7 +25,7 @@
 #include <coreplugin/modemanager.h>
 #include <utils/qtcassert.h>
 
-namespace AadlPlugin {
+namespace spctr {
 
 AadlEditorStack::AadlEditorStack(QWidget *parent)
     : QStackedWidget(parent)

@@ -34,7 +34,7 @@ class EditorToolBar;
 class IEditor;
 }
 
-namespace AadlPlugin {
+namespace spctr {
 
 class AadlTextEditorFactory;
 class AadlEditorStack;

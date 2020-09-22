@@ -17,7 +17,7 @@
 
 #include "aadlcontext.h"
 
-namespace AadlPlugin {
+namespace spctr {
 
 AadlContext::AadlContext(const Core::Context &context, QWidget *widget, QObject *parent)
     : Core::IContext(parent)

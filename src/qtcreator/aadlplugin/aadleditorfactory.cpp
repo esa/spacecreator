@@ -23,14 +23,14 @@
 #include <QGuiApplication>
 #include <coreplugin/fileiconprovider.h>
 
-namespace AadlPlugin {
+namespace spctr {
 
 AadlEditorFactory::AadlEditorFactory(QObject *parent)
     : IEditorFactory(parent)
 {
-    setId(AadlPlugin::Constants::K_AADL_EDITOR_ID);
-    setDisplayName(QCoreApplication::translate("AADL Editor", AadlPlugin::Constants::C_AADLEDITOR_DISPLAY_NAME));
-    addMimeType(AadlPlugin::Constants::AADL_MIMETYPE);
+    setId(spctr::Constants::K_AADL_EDITOR_ID);
+    setDisplayName(QCoreApplication::translate("AADL Editor", spctr::Constants::C_AADLEDITOR_DISPLAY_NAME));
+    addMimeType(spctr::Constants::AADL_MIMETYPE);
 
     Core::FileIconProvider::registerIconOverlayForSuffix(":/projectexplorer/images/fileoverlay_scxml.png", "xml");
 }

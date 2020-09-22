@@ -46,7 +46,7 @@
 #include <utils/qtcassert.h>
 #include <utils/utilsicons.h>
 
-namespace AadlPlugin {
+namespace spctr {
 
 class AadlTextEditorWidget : public TextEditor::TextEditorWidget
 {
@@ -61,7 +61,7 @@ class AadlTextEditorFactory : public TextEditor::TextEditorFactory
 public:
     AadlTextEditorFactory()
     {
-        setId(AadlPlugin::Constants::K_AADL_EDITOR_ID);
+        setId(spctr::Constants::K_AADL_EDITOR_ID);
         setEditorCreator([]() { return new AadlTextEditor; });
         setEditorWidgetCreator([]() { return new AadlTextEditorWidget; });
         setUseGenericHighlighter(true);
@@ -78,7 +78,7 @@ public:
 AadlEditorData::AadlEditorData(QObject *parent)
     : QObject(parent)
 {
-    m_contexts.add(AadlPlugin::Constants::C_AADL_EDITOR);
+    m_contexts.add(spctr::Constants::C_AADL_EDITOR);
 
     QObject::connect(
             Core::EditorManager::instance(), &Core::EditorManager::currentEditorChanged, [this](Core::IEditor *editor) {
@@ -137,7 +137,7 @@ void AadlEditorData::fullInit()
     Core::ICore::addContextObject(m_context);
 
     Core::DesignMode::registerDesignWidget(
-            m_modeWidget, QStringList(QLatin1String(AadlPlugin::Constants::AADL_MIMETYPE)), m_contexts);
+            m_modeWidget, QStringList(QLatin1String(spctr::Constants::AADL_MIMETYPE)), m_contexts);
 }
 
 Core::IEditor *AadlEditorData::createEditor()
@@ -167,7 +167,7 @@ void AadlEditorData::showAsn1Dialog()
 {
     auto editorManager = Core::EditorManager::instance();
     Core::IDocument *currentDoc = editorManager->currentDocument();
-    auto document = qobject_cast<AadlPlugin::AadlEditorDocument *>(currentDoc);
+    auto document = qobject_cast<spctr::AadlEditorDocument *>(currentDoc);
     if (document && document->designWidget()) {
         document->designWidget()->showAsn1Dialog();
     }
@@ -178,7 +178,7 @@ void AadlEditorData::showMinimap(bool visible)
     m_minimapVisible = visible;
 
     for (auto openedDocument : Core::DocumentModel::openedDocuments()) {
-        if (auto document = qobject_cast<AadlPlugin::AadlEditorDocument *>(openedDocument)) {
+        if (auto document = qobject_cast<spctr::AadlEditorDocument *>(openedDocument)) {
             if (document && document->designWidget()) {
                 document->designWidget()->setMinimapVisible(visible);
             }
@@ -190,7 +190,7 @@ void AadlEditorData::onAttributesManagerRequested()
 {
     auto editorManager = Core::EditorManager::instance();
     Core::IDocument *currentDoc = editorManager->currentDocument();
-    auto document = qobject_cast<AadlPlugin::AadlEditorDocument *>(currentDoc);
+    auto document = qobject_cast<spctr::AadlEditorDocument *>(currentDoc);
     if (document && document->designWidget()) {
         document->designWidget()->onAttributesManagerRequested();
     }
@@ -200,7 +200,7 @@ void AadlEditorData::onColorSchemeMenuInvoked()
 {
     auto editorManager = Core::EditorManager::instance();
     Core::IDocument *currentDoc = editorManager->currentDocument();
-    auto document = qobject_cast<AadlPlugin::AadlEditorDocument *>(currentDoc);
+    auto document = qobject_cast<spctr::AadlEditorDocument *>(currentDoc);
     if (document && document->designWidget()) {
         document->designWidget()->onColorSchemeMenuInvoked();
     }
@@ -210,7 +210,7 @@ void AadlEditorData::onDynContextEditorMenuInvoked()
 {
     auto editorManager = Core::EditorManager::instance();
     Core::IDocument *currentDoc = editorManager->currentDocument();
-    auto document = qobject_cast<AadlPlugin::AadlEditorDocument *>(currentDoc);
+    auto document = qobject_cast<spctr::AadlEditorDocument *>(currentDoc);
     if (document && document->designWidget()) {
         document->designWidget()->onDynContextEditorMenuInvoked();
     }

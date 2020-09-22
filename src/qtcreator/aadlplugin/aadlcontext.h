@@ -19,7 +19,7 @@
 
 #include <coreplugin/icontext.h>
 
-namespace AadlPlugin {
+namespace spctr {
 
 class AadlContext : public Core::IContext
 {

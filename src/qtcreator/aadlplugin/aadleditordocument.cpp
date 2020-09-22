@@ -27,14 +27,14 @@
 
 using namespace Utils;
 
-namespace AadlPlugin {
+namespace spctr {
 
 AadlEditorDocument::AadlEditorDocument(AadlMainWidget *designWidget, QObject *parent)
     : m_designWidget(designWidget)
 {
-    setMimeType(QLatin1String(AadlPlugin::Constants::AADL_MIMETYPE));
+    setMimeType(QLatin1String(spctr::Constants::AADL_MIMETYPE));
     setParent(parent);
-    setId(Core::Id(AadlPlugin::Constants::K_AADL_EDITOR_ID));
+    setId(Core::Id(spctr::Constants::K_AADL_EDITOR_ID));
 
     // Designer needs UTF-8 regardless of settings.
     setCodec(QTextCodec::codecForName("UTF-8"));

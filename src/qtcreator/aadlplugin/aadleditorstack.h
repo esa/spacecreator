@@ -30,7 +30,7 @@ class IEditor;
 class IMode;
 }
 
-namespace AadlPlugin {
+namespace spctr {
 
 class AadlTextEditor;
 

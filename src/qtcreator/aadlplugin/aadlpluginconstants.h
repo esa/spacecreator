@@ -19,7 +19,7 @@
 
 #include <QtGlobal>
 
-namespace AadlPlugin {
+namespace spctr {
 namespace Constants {
 
 const char AADL_MIMETYPE[] = "application/xml";

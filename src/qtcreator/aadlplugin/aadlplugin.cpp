@@ -32,7 +32,7 @@
 #include <editormanager/editormanager.h>
 #include <editormanager/ieditor.h>
 
-namespace AadlPlugin {
+namespace spctr {
 
 AADLPlugin::AADLPlugin()
 {

@@ -32,7 +32,7 @@
 #include <QUndoGroup>
 #include <QUndoStack>
 
-namespace AadlPlugin {
+namespace spctr {
 
 AadlMainWidget::AadlMainWidget(QWidget *parent)
     : QWidget(parent)

@@ -31,7 +31,7 @@ namespace aadlinterface {
 class IVEditorCore;
 }
 
-namespace AadlPlugin {
+namespace spctr {
 
 class AadlMainWidget : public QWidget
 {

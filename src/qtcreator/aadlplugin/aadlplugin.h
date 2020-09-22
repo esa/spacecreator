@@ -25,7 +25,7 @@
 
 class QAction;
 
-namespace AadlPlugin {
+namespace spctr {
 
 class AadlEditorFactory;
 
