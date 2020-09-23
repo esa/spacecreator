@@ -62,18 +62,18 @@ using namespace Core;
 
 namespace spctr {
 
-MSCPlugin::MSCPlugin()
+SpaceCreatorPlugin::SpaceCreatorPlugin()
 {
     initMscResources();
 }
 
-MSCPlugin::~MSCPlugin()
+SpaceCreatorPlugin::~SpaceCreatorPlugin()
 {
     // Unregister objects from the plugin manager's object pool
     // Delete members
 }
 
-bool MSCPlugin::initialize(const QStringList &arguments, QString *errorString)
+bool SpaceCreatorPlugin::initialize(const QStringList &arguments, QString *errorString)
 {
     // Register objects in the plugin manager's object pool
     // Load settings
@@ -96,7 +96,7 @@ bool MSCPlugin::initialize(const QStringList &arguments, QString *errorString)
     m_messageDeclarationAction = new QAction(tr("Message declarations ..."), this);
     Core::Command *messageDeclCmd =
             Core::ActionManager::registerAction(m_messageDeclarationAction, Constants::MESSAGE_DECLARATIONS_ID);
-    connect(m_messageDeclarationAction, &QAction::triggered, this, &MSCPlugin::showMessageDeclarations);
+    connect(m_messageDeclarationAction, &QAction::triggered, this, &SpaceCreatorPlugin::showMessageDeclarations);
 
     m_messageDeclarationAction->setEnabled(false);
     connect(editorManager, &Core::EditorManager::currentEditorChanged, this, [&](Core::IEditor *editor) {
@@ -109,25 +109,26 @@ bool MSCPlugin::initialize(const QStringList &arguments, QString *errorString)
     auto action = new QAction(tr("Check instances"), this);
     Core::Command *checkInstancesCmd = Core::ActionManager::registerAction(
             action, Constants::CHECK_INSTANCES_ID, Core::Context(Core::Constants::C_GLOBAL));
-    connect(action, &QAction::triggered, this, &MSCPlugin::checkInstances);
+    connect(action, &QAction::triggered, this, &SpaceCreatorPlugin::checkInstances);
 
     action = new QAction(tr("Check messages"), this);
     Core::Command *checkMessagesCmd = Core::ActionManager::registerAction(
             action, Constants::CHECK_MESSAGES_ID, Core::Context(Core::Constants::C_GLOBAL));
-    connect(action, &QAction::triggered, this, &MSCPlugin::checkMessages);
+    connect(action, &QAction::triggered, this, &SpaceCreatorPlugin::checkMessages);
 
     auto showMinimapAction = new QAction(tr("Show minimap"), this);
     showMinimapAction->setCheckable(true);
     Core::Command *showMinimapCmd = Core::ActionManager::registerAction(
             showMinimapAction, Constants::SHOW_MINIMAP_ID, Core::Context(Core::Constants::C_DESIGN_MODE));
-    connect(showMinimapAction, &QAction::triggered, this, &MSCPlugin::setMinimapVisible);
+    connect(showMinimapAction, &QAction::triggered, this, &SpaceCreatorPlugin::setMinimapVisible);
 
     Core::ActionContainer *menu = Core::ActionManager::createMenu(Constants::MENU_ID);
     menu->menu()->setTitle(tr("SpaceCreator"));
+    menu->addAction(showMinimapCmd);
+    menu->addSeparator();
     menu->addAction(messageDeclCmd);
     menu->addAction(checkInstancesCmd);
     menu->addAction(checkMessagesCmd);
-    menu->addAction(showMinimapCmd);
     Core::ActionManager::actionContainer(Core::Constants::M_TOOLS)->addMenu(menu);
 
     connect(m_mscFactory, &MscEditorFactory::mscDataLoaded, this,
@@ -147,7 +148,7 @@ bool MSCPlugin::initialize(const QStringList &arguments, QString *errorString)
     // AADL
     m_asn1DialogAction = new QAction(tr("Show ASN1 dialog ..."), this);
     Core::Command *showAsn1Cmd = Core::ActionManager::registerAction(m_asn1DialogAction, Constants::AADL_SHOW_ASN1_ID);
-    connect(m_asn1DialogAction, &QAction::triggered, this, &MSCPlugin::showAsn1Dialog);
+    connect(m_asn1DialogAction, &QAction::triggered, this, &SpaceCreatorPlugin::showAsn1Dialog);
 
     m_asn1DialogAction->setEnabled(false);
     connect(editorManager, &Core::EditorManager::currentEditorChanged, this, [&](Core::IEditor *editor) {
@@ -161,17 +162,17 @@ bool MSCPlugin::initialize(const QStringList &arguments, QString *errorString)
     QAction *actCommonProps = new QAction(tr("Common Properties"), this);
     Core::Command *showCommonPropsCmd = Core::ActionManager::registerAction(
             actCommonProps, Constants::AADL_SHOW_COMMON_PROPS_ID, Core::Context(Core::Constants::C_DESIGN_MODE));
-    connect(actCommonProps, &QAction::triggered, this, &MSCPlugin::onAttributesManagerRequested);
+    connect(actCommonProps, &QAction::triggered, this, &SpaceCreatorPlugin::onAttributesManagerRequested);
 
     QAction *actColorScheme = new QAction(tr("Color Scheme"), this);
     Core::Command *showColorSchemeCmd = Core::ActionManager::registerAction(
             actColorScheme, Constants::AADL_SHOW_COLOR_SCHEME_ID, Core::Context(Core::Constants::C_DESIGN_MODE));
-    connect(actColorScheme, &QAction::triggered, this, &MSCPlugin::onColorSchemeMenuInvoked);
+    connect(actColorScheme, &QAction::triggered, this, &SpaceCreatorPlugin::onColorSchemeMenuInvoked);
 
     QAction *actDynContext = new QAction(tr("Context Actions"), this);
     Core::Command *showDynContextCmd = Core::ActionManager::registerAction(
             actDynContext, Constants::AADL_SHOW_DYN_CONTEXT_ID, Core::Context(Core::Constants::C_DESIGN_MODE));
-    connect(actDynContext, &QAction::triggered, this, &MSCPlugin::onDynContextEditorMenuInvoked);
+    connect(actDynContext, &QAction::triggered, this, &SpaceCreatorPlugin::onDynContextEditorMenuInvoked);
 
     menu->addSeparator();
     menu->addAction(showAsn1Cmd);
@@ -186,7 +187,7 @@ bool MSCPlugin::initialize(const QStringList &arguments, QString *errorString)
     return true;
 }
 
-void MSCPlugin::extensionsInitialized()
+void SpaceCreatorPlugin::extensionsInitialized()
 {
     // Retrieve objects from the plugin manager's object pool
     // In the extensionsInitialized function, a plugin can be sure that all
@@ -194,7 +195,7 @@ void MSCPlugin::extensionsInitialized()
     DesignMode::setDesignModeIsRequired();
 }
 
-ExtensionSystem::IPlugin::ShutdownFlag MSCPlugin::aboutToShutdown()
+ExtensionSystem::IPlugin::ShutdownFlag SpaceCreatorPlugin::aboutToShutdown()
 {
     // Save settings
     // Disconnect from signals that are not needed during shutdown
@@ -202,12 +203,12 @@ ExtensionSystem::IPlugin::ShutdownFlag MSCPlugin::aboutToShutdown()
     return SynchronousShutdown;
 }
 
-void MSCPlugin::showMessageDeclarations()
+void SpaceCreatorPlugin::showMessageDeclarations()
 {
     m_mscFactory->editorData()->editMessageDeclarations(Core::ICore::mainWindow());
 }
 
-void MSCPlugin::checkInstances()
+void SpaceCreatorPlugin::checkInstances()
 {
     QSharedPointer<aadlinterface::IVEditorCore> ivp = ivPlugin();
     if (!ivp) {
@@ -262,7 +263,7 @@ void MSCPlugin::checkInstances()
     }
 }
 
-void MSCPlugin::checkMessages()
+void SpaceCreatorPlugin::checkMessages()
 {
     QSharedPointer<aadlinterface::IVEditorCore> ivp = ivPlugin();
     if (!ivp) {
@@ -295,28 +296,28 @@ void MSCPlugin::checkMessages()
     }
 }
 
-void MSCPlugin::setMinimapVisible(bool visible)
+void SpaceCreatorPlugin::setMinimapVisible(bool visible)
 {
     m_mscFactory->editorData()->setMinimapVisible(visible);
     m_aadlFactory->editorData()->showMinimap(visible);
 }
 
-void MSCPlugin::showAsn1Dialog()
+void SpaceCreatorPlugin::showAsn1Dialog()
 {
     m_aadlFactory->editorData()->showAsn1Dialog();
 }
 
-void MSCPlugin::onAttributesManagerRequested()
+void SpaceCreatorPlugin::onAttributesManagerRequested()
 {
     m_aadlFactory->editorData()->onAttributesManagerRequested();
 }
 
-void MSCPlugin::onColorSchemeMenuInvoked()
+void SpaceCreatorPlugin::onColorSchemeMenuInvoked()
 {
     m_aadlFactory->editorData()->onColorSchemeMenuInvoked();
 }
 
-void MSCPlugin::onDynContextEditorMenuInvoked()
+void SpaceCreatorPlugin::onDynContextEditorMenuInvoked()
 {
     m_aadlFactory->editorData()->onDynContextEditorMenuInvoked();
 }
@@ -324,7 +325,7 @@ void MSCPlugin::onDynContextEditorMenuInvoked()
 /*!
    Returns the AadlPlugin
  */
-ExtensionSystem::IPlugin *MSCPlugin::aadlPlugin() const
+ExtensionSystem::IPlugin *SpaceCreatorPlugin::aadlPlugin() const
 {
     ExtensionSystem::PluginManager *manager = ExtensionSystem::PluginManager::instance();
     QList<ExtensionSystem::PluginSpec *> plugins = manager->plugins();
@@ -336,7 +337,7 @@ ExtensionSystem::IPlugin *MSCPlugin::aadlPlugin() const
     return nullptr;
 }
 
-QSharedPointer<aadlinterface::IVEditorCore> MSCPlugin::ivPlugin() const
+QSharedPointer<aadlinterface::IVEditorCore> SpaceCreatorPlugin::ivPlugin() const
 {
     QStringList aadlFiles = m_mscFactory->editorData()->aadlFiles();
     if (aadlFiles.empty()) {
@@ -347,7 +348,7 @@ QSharedPointer<aadlinterface::IVEditorCore> MSCPlugin::ivPlugin() const
     return m_aadlStorage->ivData(aadlFiles.first());
 }
 
-QVector<QSharedPointer<msc::MSCEditorCore>> MSCPlugin::allMscCores() const
+QVector<QSharedPointer<msc::MSCEditorCore>> SpaceCreatorPlugin::allMscCores() const
 {
     QStringList mscFiles = m_mscFactory->editorData()->mscFiles();
     QVector<QSharedPointer<msc::MSCEditorCore>> allMscCores;

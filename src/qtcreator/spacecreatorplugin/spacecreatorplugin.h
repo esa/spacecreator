@@ -40,14 +40,14 @@ class AadlModelStorage;
 class MscEditorFactory;
 class MscModelStorage;
 
-class MSCPlugin : public ExtensionSystem::IPlugin
+class SpaceCreatorPlugin : public ExtensionSystem::IPlugin
 {
     Q_OBJECT
     Q_PLUGIN_METADATA(IID "org.qt-project.Qt.QtCreatorPlugin" FILE "SpaceCreatorPlugin.json")
 
 public:
-    MSCPlugin();
-    ~MSCPlugin();
+    SpaceCreatorPlugin();
+    ~SpaceCreatorPlugin();
 
     bool initialize(const QStringList &arguments, QString *errorString) override;
     void extensionsInitialized() override;

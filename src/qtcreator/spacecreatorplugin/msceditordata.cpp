@@ -81,7 +81,7 @@ public:
 MscEditorData::MscEditorData(QObject *parent)
     : QObject(parent)
 {
-    m_contexts.add(spctr::Constants::C_MSCEDITOR);
+    m_contexts.add(spctr::Constants::C_MSC_EDITOR);
 
     QObject::connect(
             Core::EditorManager::instance(), &Core::EditorManager::currentEditorChanged, [this](Core::IEditor *editor) {
