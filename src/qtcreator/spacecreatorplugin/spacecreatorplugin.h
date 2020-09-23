@@ -64,8 +64,7 @@ public Q_SLOTS:
     void onDynContextEditorMenuInvoked();
 
 private:
-    ExtensionSystem::IPlugin *aadlPlugin() const;
-    QSharedPointer<aadlinterface::IVEditorCore> ivPlugin() const;
+    QSharedPointer<aadlinterface::IVEditorCore> ivCore() const;
     QVector<QSharedPointer<msc::MSCEditorCore>> allMscCores() const;
 
     MscEditorFactory *m_mscFactory = nullptr;

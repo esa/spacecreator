@@ -133,17 +133,9 @@ bool SpaceCreatorPlugin::initialize(const QStringList &arguments, QString *error
 
     connect(m_mscFactory, &MscEditorFactory::mscDataLoaded, this,
             [this](const QString &fileName, QSharedPointer<msc::MSCEditorCore> mscData) {
-                mscData->aadlChecker()->setIvPlugin(ivPlugin()); // All msc documents have access to the iv model
+                mscData->aadlChecker()->setIvPlugin(ivCore()); // All msc documents have access to the iv model
                 m_mscStorage->setMscData(fileName, mscData);
             });
-
-    IPlugin *plugin = aadlPlugin();
-    if (!plugin) {
-        qWarning() << "AadlPlugin is not found or loaded";
-    } else {
-        connect(plugin, SIGNAL(aadlDataLoaded(const QString &, QSharedPointer<aadlinterface::IVEditorCore>)),
-                m_aadlStorage, SLOT(setIvData(const QString &, QSharedPointer<aadlinterface::IVEditorCore>)));
-    }
 
     // AADL
     m_asn1DialogAction = new QAction(tr("Show ASN1 dialog ..."), this);
@@ -182,7 +174,8 @@ bool SpaceCreatorPlugin::initialize(const QStringList &arguments, QString *error
     menu->menu()->setEnabled(true);
     Core::ActionManager::actionContainer(Core::Constants::M_TOOLS)->addMenu(menu);
 
-    // connect(m_factory, &AadlEditorFactory::aadlDataLoaded, this, &AADLPlugin::aadlDataLoaded);
+    connect(m_aadlFactory, SIGNAL(aadlDataLoaded(const QString &, QSharedPointer<aadlinterface::IVEditorCore>)),
+            m_aadlStorage, SLOT(setIvData(const QString &, QSharedPointer<aadlinterface::IVEditorCore>)));
 
     return true;
 }
@@ -210,7 +203,7 @@ void SpaceCreatorPlugin::showMessageDeclarations()
 
 void SpaceCreatorPlugin::checkInstances()
 {
-    QSharedPointer<aadlinterface::IVEditorCore> ivp = ivPlugin();
+    QSharedPointer<aadlinterface::IVEditorCore> ivp = ivCore();
     if (!ivp) {
         return;
     }
@@ -265,7 +258,7 @@ void SpaceCreatorPlugin::checkInstances()
 
 void SpaceCreatorPlugin::checkMessages()
 {
-    QSharedPointer<aadlinterface::IVEditorCore> ivp = ivPlugin();
+    QSharedPointer<aadlinterface::IVEditorCore> ivp = ivCore();
     if (!ivp) {
         return;
     }
@@ -322,22 +315,7 @@ void SpaceCreatorPlugin::onDynContextEditorMenuInvoked()
     m_aadlFactory->editorData()->onDynContextEditorMenuInvoked();
 }
 
-/*!
-   Returns the AadlPlugin
- */
-ExtensionSystem::IPlugin *SpaceCreatorPlugin::aadlPlugin() const
-{
-    ExtensionSystem::PluginManager *manager = ExtensionSystem::PluginManager::instance();
-    QList<ExtensionSystem::PluginSpec *> plugins = manager->plugins();
-    for (ExtensionSystem::PluginSpec *pluginSpec : plugins) {
-        if (pluginSpec->name() == "AadlPlugin") {
-            return pluginSpec->plugin();
-        }
-    }
-    return nullptr;
-}
-
-QSharedPointer<aadlinterface::IVEditorCore> SpaceCreatorPlugin::ivPlugin() const
+QSharedPointer<aadlinterface::IVEditorCore> SpaceCreatorPlugin::ivCore() const
 {
     QStringList aadlFiles = m_mscFactory->editorData()->aadlFiles();
     if (aadlFiles.empty()) {
