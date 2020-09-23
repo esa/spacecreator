@@ -1,6 +1,6 @@
 set(PLUGIN_NAME SpaceCreatorPlugin)
 
-set(MSC_PLUGIN_SOURCES
+set(SC_PLUGIN_SOURCES
     SpaceCreatorPlugin.json.in
     aadleditordata.cpp
     aadleditordata.h
@@ -38,14 +38,14 @@ set(MSC_PLUGIN_SOURCES
     spacecreatorpluginconstants.h
 )
 
-set(MSC_QTC_LIBRARIES
+set(SC_QTC_LIBRARIES
     -L"${QTC_LIB_DIR}"
     -L"${QTC_PLUGINS_DIR}"
     Aggregation
     ExtensionSystem
     Utils
 )
-set(MSC_QTC_PLUGINS
+set(SC_QTC_PLUGINS
     Core
     ProjectExplorer
     QtSupport
@@ -53,10 +53,10 @@ set(MSC_QTC_PLUGINS
 )
 
 add_qtc_plugin(${PLUGIN_NAME}
-    DEFINES MSCPLUGIN_LIBRARY
-    DEPENDS libmsceditor libiveditor Qt5::Core Qt5::Gui Qt5::Widgets ${MSC_QTC_LIBRARIES} ${MSC_QTC_PLUGINS}
-    PLUGIN_DEPENDS ${MSC_QTC_PLUGINS}
-    SOURCES ${MSC_PLUGIN_SOURCES}
+    DEFINES SCPLUGIN_LIBRARY
+    DEPENDS libmsceditor libiveditor Qt5::Core Qt5::Gui Qt5::Widgets ${SC_QTC_LIBRARIES} ${SC_QTC_PLUGINS}
+    PLUGIN_DEPENDS ${SC_QTC_PLUGINS}
+    SOURCES ${SC_PLUGIN_SOURCES}
 )
 
 target_include_directories(${PLUGIN_NAME}

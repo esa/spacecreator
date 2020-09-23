@@ -62,7 +62,7 @@ public:
     QAction *actionToolDelete() const;
     QVector<QAction *> toolActions() const;
 
-    QSharedPointer<msc::MSCEditorCore> mscPlugin() const;
+    QSharedPointer<msc::MSCEditorCore> mscCore() const;
 
 Q_SIGNALS:
     void dirtyChanged(bool dirty);

@@ -57,53 +57,53 @@ process command line arguments and user actions.
 \sa aadlinterface::InterfaceDocument, shared::CommandLineParser
 */
 
-MainWindow::MainWindow(aadlinterface::IVEditorCore *plugin, QWidget *parent)
+MainWindow::MainWindow(aadlinterface::IVEditorCore *core, QWidget *parent)
     : QMainWindow(parent)
     , ui(new Ui::MainWindow)
     , m_zoomCtrl(new ZoomController())
-    , m_plugin(plugin)
+    , m_core(core)
 {
     ui->setupUi(this);
 
-    setCentralWidget(m_plugin->document()->view());
+    setCentralWidget(m_core->document()->view());
 
     statusBar()->addPermanentWidget(m_zoomCtrl);
-    m_plugin->addToolBars(this);
+    m_core->addToolBars(this);
 
     // Connect the actions
-    connect(m_plugin->actionNewFile(), &QAction::triggered, this, &MainWindow::onCreateFileRequested);
-    connect(m_plugin->actionOpenFile(), &QAction::triggered, this, &MainWindow::onOpenFileRequested);
-    connect(m_plugin->actionSaveFile(), &QAction::triggered, this, [=]() { exportXml(); });
-    connect(m_plugin->actionSaveFileAs(), &QAction::triggered, this, [=]() { exportXmlAs(); });
-    connect(m_plugin->actionQuit(), &QAction::triggered, this, &MainWindow::onQuitRequested);
+    connect(m_core->actionNewFile(), &QAction::triggered, this, &MainWindow::onCreateFileRequested);
+    connect(m_core->actionOpenFile(), &QAction::triggered, this, &MainWindow::onOpenFileRequested);
+    connect(m_core->actionSaveFile(), &QAction::triggered, this, [=]() { exportXml(); });
+    connect(m_core->actionSaveFileAs(), &QAction::triggered, this, [=]() { exportXmlAs(); });
+    connect(m_core->actionQuit(), &QAction::triggered, this, &MainWindow::onQuitRequested);
 
     // Register the actions to the action manager
-    ActionsManager::registerAction(Q_FUNC_INFO, m_plugin->actionNewFile(), "Create file", "Create new empty file");
-    ActionsManager::registerAction(Q_FUNC_INFO, m_plugin->actionOpenFile(), "Open file", "Show Open File dialog");
-    ActionsManager::registerAction(Q_FUNC_INFO, m_plugin->actionQuit(), "Quit", "Quite the application");
-    ActionsManager::registerAction(Q_FUNC_INFO, m_plugin->actionUndo(), "Undo", "Undo the last operation");
-    ActionsManager::registerAction(Q_FUNC_INFO, m_plugin->actionRedo(), "Redo", "Redo the last undone operation");
+    ActionsManager::registerAction(Q_FUNC_INFO, m_core->actionNewFile(), "Create file", "Create new empty file");
+    ActionsManager::registerAction(Q_FUNC_INFO, m_core->actionOpenFile(), "Open file", "Show Open File dialog");
+    ActionsManager::registerAction(Q_FUNC_INFO, m_core->actionQuit(), "Quit", "Quite the application");
+    ActionsManager::registerAction(Q_FUNC_INFO, m_core->actionUndo(), "Undo", "Undo the last operation");
+    ActionsManager::registerAction(Q_FUNC_INFO, m_core->actionRedo(), "Redo", "Redo the last undone operation");
 
-    connect(m_plugin->document(), &InterfaceDocument::dirtyChanged, this, &MainWindow::onDocDirtyChanged);
+    connect(m_core->document(), &InterfaceDocument::dirtyChanged, this, &MainWindow::onDocDirtyChanged);
 
-    m_plugin->initMenus(this);
+    m_core->initMenus(this);
 
     QUndoStack *currentStack { nullptr };
-    m_plugin->document()->fillToolBar(m_plugin->docToolBar());
-    currentStack = m_plugin->document()->commandsStack();
-    if (auto view = qobject_cast<aadlinterface::GraphicsView *>(m_plugin->document()->view())) {
+    m_core->document()->fillToolBar(m_core->docToolBar());
+    currentStack = m_core->document()->commandsStack();
+    if (auto view = qobject_cast<aadlinterface::GraphicsView *>(m_core->document()->view())) {
         m_zoomCtrl->setView(view);
         connect(view, &aadlinterface::GraphicsView::mouseMoved, this, &MainWindow::onGraphicsViewInfo,
                 Qt::UniqueConnection);
     }
 
     if (currentStack) {
-        if (m_plugin->undoGroup()->stacks().contains(currentStack)) {
-            m_plugin->undoGroup()->addStack(currentStack);
+        if (m_core->undoGroup()->stacks().contains(currentStack)) {
+            m_core->undoGroup()->addStack(currentStack);
         }
-        m_plugin->undoGroup()->setActiveStack(currentStack);
+        m_core->undoGroup()->setActiveStack(currentStack);
     } else {
-        m_plugin->undoGroup()->removeStack(m_plugin->undoGroup()->activeStack());
+        m_core->undoGroup()->removeStack(m_core->undoGroup()->activeStack());
     }
 
     aadlinterface::cmd::CommandsStack::setCurrent(currentStack);
@@ -113,16 +113,16 @@ MainWindow::MainWindow(aadlinterface::IVEditorCore *plugin, QWidget *parent)
     initSettings();
 
     updateWindowTitle();
-    connect(m_plugin->document(), &InterfaceDocument::titleChanged, this, &MainWindow::updateWindowTitle);
+    connect(m_core->document(), &InterfaceDocument::titleChanged, this, &MainWindow::updateWindowTitle);
 
-    m_plugin->setupMiniMap();
+    m_core->setupMiniMap();
 
     // Create the E2E view and add the action
-    auto endToEndView = new EndToEndView(m_plugin->document(), this);
+    auto endToEndView = new EndToEndView(m_core->document(), this);
     endToEndView->hide();
-    connect(plugin->actionToggleE2EView(), &QAction::toggled, endToEndView, &QWidget::setVisible);
-    connect(endToEndView, &EndToEndView::visibleChanged, plugin->actionToggleE2EView(), &QAction::setChecked);
-    endToEndView->setVisible(plugin->actionToggleE2EView()->isChecked());
+    connect(core->actionToggleE2EView(), &QAction::toggled, endToEndView, &QWidget::setVisible);
+    connect(endToEndView, &EndToEndView::visibleChanged, core->actionToggleE2EView(), &QAction::setChecked);
+    endToEndView->setVisible(core->actionToggleE2EView()->isChecked());
 }
 
 /*!
@@ -150,11 +150,11 @@ void MainWindow::closeEvent(QCloseEvent *e)
  */
 void MainWindow::onOpenFileRequested()
 {
-    const QString prevPath(m_plugin->document()->path());
+    const QString prevPath(m_core->document()->path());
     const QString &fileName = QFileDialog::getOpenFileName(
-            this, tr("Open file"), prevPath, m_plugin->document()->supportedFileExtensions());
+            this, tr("Open file"), prevPath, m_core->document()->supportedFileExtensions());
     if (!fileName.isEmpty() && closeFile()) {
-        m_plugin->document()->load(fileName);
+        m_core->document()->load(fileName);
     }
 }
 
@@ -164,7 +164,7 @@ void MainWindow::onOpenFileRequested()
 void MainWindow::onCreateFileRequested()
 {
     if (closeFile()) {
-        m_plugin->document()->create();
+        m_core->document()->create();
     }
 }
 
@@ -206,7 +206,7 @@ void MainWindow::onSaveRenderRequested()
  */
 bool MainWindow::exportXml(const QString &savePath, const QString &templatePath)
 {
-    return XmlDocExporter::exportDocSilently(m_plugin->document(), savePath, templatePath);
+    return XmlDocExporter::exportDocSilently(m_core->document(), savePath, templatePath);
 }
 
 /*!
@@ -217,7 +217,7 @@ bool MainWindow::exportXml(const QString &savePath, const QString &templatePath)
  */
 bool MainWindow::exportXmlAs(const QString &savePath, const QString &templatePath)
 {
-    return XmlDocExporter::exportDocInteractive(m_plugin->document(), this, savePath, templatePath);
+    return XmlDocExporter::exportDocInteractive(m_core->document(), this, savePath, templatePath);
 }
 
 void MainWindow::onQuitRequested()
@@ -229,8 +229,8 @@ void MainWindow::onQuitRequested()
 void MainWindow::onReportRequested()
 {
     QList<QPixmap> images;
-    if (m_plugin->document() != nullptr) {
-        if (QGraphicsScene *scene = m_plugin->document()->scene()) {
+    if (m_core->document() != nullptr) {
+        if (QGraphicsScene *scene = m_core->document()->scene()) {
             const QSize sceneSize = scene->sceneRect().size().toSize();
             if (!sceneSize.isNull()) {
                 QPixmap pix(sceneSize);
@@ -257,18 +257,18 @@ void MainWindow::initSettings()
     restoreState(aadlinterface::AppOptions::MainWindow.State.read().toByteArray());
 
     const bool showMinimap = false; // TODO: use a storable option
-    m_plugin->actionToggleMinimap()->setChecked(showMinimap);
+    m_core->actionToggleMinimap()->setChecked(showMinimap);
 }
 
 void MainWindow::updateActions()
 {
     bool renderAvailable(false);
-    if (QGraphicsScene *scene = m_plugin->document()->scene()) {
+    if (QGraphicsScene *scene = m_core->document()->scene()) {
         renderAvailable = !scene->sceneRect().isEmpty() && !scene->items().isEmpty();
     }
 
-    m_plugin->actionSaveFile()->setEnabled(m_plugin->document()->isDirty());
-    m_plugin->actionSaveSceneRender()->setEnabled(renderAvailable);
+    m_core->actionSaveFile()->setEnabled(m_core->document()->isDirty());
+    m_core->actionSaveSceneRender()->setEnabled(renderAvailable);
 }
 
 /*!
@@ -285,8 +285,8 @@ bool MainWindow::processCommandLineArg(shared::CommandLineParser::Positional arg
         return true;
     }
     case shared::CommandLineParser::Positional::OpenAADLXMLFile: {
-        if (!value.isEmpty() && m_plugin->document() != nullptr) {
-            return m_plugin->document()->load(value);
+        if (!value.isEmpty() && m_core->document() != nullptr) {
+            return m_core->document()->load(value);
         };
 
         return false;
@@ -319,7 +319,7 @@ void MainWindow::saveSceneRender(const QString &filePath) const
     if (filePath.isEmpty())
         return;
 
-    if (QGraphicsScene *scene = m_plugin->document()->scene()) {
+    if (QGraphicsScene *scene = m_core->document()->scene()) {
         QImage img(scene->sceneRect().size().toSize(), QImage::Format_ARGB32_Premultiplied);
         img.fill(Qt::transparent);
         QPainter p(&img);
@@ -348,7 +348,7 @@ void MainWindow::onGraphicsViewInfo(const QString &info)
 
 void MainWindow::updateWindowTitle()
 {
-    setWindowTitle(QString("Interface View Editor [%1][*]").arg(m_plugin->document()->title()));
+    setWindowTitle(QString("Interface View Editor [%1][*]").arg(m_core->document()->title()));
 }
 
 /*!
@@ -357,14 +357,14 @@ void MainWindow::updateWindowTitle()
 void MainWindow::openAsn1Dialog()
 {
     Asn1Dialog dialog;
-    QFileInfo fi(m_plugin->document()->path());
-    fi.setFile(fi.absolutePath() + "/" + m_plugin->document()->asn1FileName());
+    QFileInfo fi(m_core->document()->path());
+    fi.setFile(fi.absolutePath() + "/" + m_core->document()->asn1FileName());
     dialog.setFile(fi);
     dialog.show();
     int result = dialog.exec();
     if (result == QDialog::Accepted) {
-        if (m_plugin->document()->asn1FileName() != dialog.fileName()) {
-            QVariantList params { QVariant::fromValue(m_plugin->document()), QVariant::fromValue(dialog.fileName()) };
+        if (m_core->document()->asn1FileName() != dialog.fileName()) {
+            QVariantList params { QVariant::fromValue(m_core->document()), QVariant::fromValue(dialog.fileName()) };
             QUndoCommand *command = cmd::CommandsFactory::create(cmd::ChangeAsn1File, params);
             if (command) {
                 cmd::CommandsStack::current()->push(command);
@@ -379,7 +379,7 @@ void MainWindow::openAsn1Dialog()
  */
 bool MainWindow::closeFile()
 {
-    if (m_plugin->document()->isDirty() && !m_dropUnsavedChangesSilently) {
+    if (m_core->document()->isDirty() && !m_dropUnsavedChangesSilently) {
         const QMessageBox::StandardButtons btns(QMessageBox::Save | QMessageBox::No | QMessageBox::Cancel);
         auto btn = QMessageBox::question(this, tr("Document closing"),
                 tr("There are unsaved changes.\nWould you like to save the document?"), btns);
@@ -392,7 +392,7 @@ bool MainWindow::closeFile()
         }
     }
 
-    m_plugin->document()->close();
+    m_core->document()->close();
 
     return true;
 }

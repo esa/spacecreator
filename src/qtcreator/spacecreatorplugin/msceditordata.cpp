@@ -175,7 +175,7 @@ void MscEditorData::editMessageDeclarations(QWidget *parentWidget)
     Core::IDocument *currentDoc = editorManager->currentDocument();
     auto document = qobject_cast<spctr::MscEditorDocument *>(currentDoc);
     if (document && document->designWidget()) {
-        document->designWidget()->mscPlugin()->openMessageDeclarationEditor(parentWidget);
+        document->designWidget()->mscCore()->openMessageDeclarationEditor(parentWidget);
     }
 }
 
@@ -207,7 +207,7 @@ void MscEditorData::setMinimapVisible(bool visible)
     for (auto openedDocument : Core::DocumentModel::openedDocuments()) {
         if (auto document = qobject_cast<spctr::MscEditorDocument *>(openedDocument)) {
             if (document && document->designWidget()) {
-                document->designWidget()->mscPlugin()->minimapView()->setVisible(visible);
+                document->designWidget()->mscCore()->minimapView()->setVisible(visible);
             }
         }
     }
@@ -232,11 +232,11 @@ void MscEditorData::updateToolBar()
             m_widgetToolBar->addAction(action);
         }
         m_widgetToolBar->addSeparator();
-        for (QAction *action : designWidget->mscPlugin()->hierarchyActions()) {
+        for (QAction *action : designWidget->mscCore()->hierarchyActions()) {
             m_widgetToolBar->addAction(action);
         }
 
-        designWidget->mscPlugin()->showToolbars(false);
+        designWidget->mscCore()->showToolbars(false);
     }
 }
 

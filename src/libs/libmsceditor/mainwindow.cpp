@@ -73,9 +73,9 @@ namespace msc {
 const QLatin1String MainWindow::DotMscFileExtensionLow = QLatin1String(".msc");
 
 struct MainWindow::MainWindowPrivate {
-    explicit MainWindowPrivate(msc::MSCEditorCore *plugin, MainWindow *mainWindow)
+    explicit MainWindowPrivate(msc::MSCEditorCore *core, MainWindow *mainWindow)
         : ui(new Ui::MainWindow)
-        , m_plugin(plugin)
+        , m_core(core)
         , mscTextBrowser(new TextViewDialog(mainWindow))
     {
     }
@@ -84,7 +84,7 @@ struct MainWindow::MainWindowPrivate {
 
     Ui::MainWindow *ui = nullptr;
 
-    msc::MSCEditorCore *m_plugin;
+    msc::MSCEditorCore *m_core;
 
     QComboBox *m_zoomBox = nullptr;
 
@@ -105,28 +105,27 @@ struct MainWindow::MainWindowPrivate {
 
 /*!
  * \brief MainWindow::MainWindow Create an empty view.
- * \param plugin hosts most code of the code for the MSC Editor UI of type \ref msc::MSCPlugin
+ * \param core hosts most code of the code for the MSC Editor UI of type \ref msc::MSCEditorCore
  * \param parent
  */
-MainWindow::MainWindow(msc::MSCEditorCore *plugin, QWidget *parent)
+MainWindow::MainWindow(msc::MSCEditorCore *core, QWidget *parent)
     : QMainWindow(parent)
-    , d(new MainWindowPrivate(plugin, this))
+    , d(new MainWindowPrivate(core, this))
 {
     setupUi();
-    d->m_plugin->hierarchyView()->setRenderHints(
+    d->m_core->hierarchyView()->setRenderHints(
             QPainter::Antialiasing | QPainter::TextAntialiasing | QPainter::SmoothPixmapTransform);
 
     initConnections();
-    d->m_plugin->initConnections();
+    d->m_core->initConnections();
 
-    d->m_plugin->selectCurrentChart();
-    d->m_plugin->showDocumentView(true);
+    d->m_core->selectCurrentChart();
+    d->m_core->showDocumentView(true);
 
     loadSettings();
 
-    d->m_plugin->mscToolBar()->setVisible(d->m_plugin->centerView()->currentWidget() == d->m_plugin->chartView());
-    d->m_plugin->hierarchyToolBar()->setVisible(
-            d->m_plugin->centerView()->currentWidget() == d->m_plugin->hierarchyView());
+    d->m_core->mscToolBar()->setVisible(d->m_core->centerView()->currentWidget() == d->m_core->chartView());
+    d->m_core->hierarchyToolBar()->setVisible(d->m_core->centerView()->currentWidget() == d->m_core->hierarchyView());
 }
 
 MainWindow::~MainWindow()
@@ -134,11 +133,11 @@ MainWindow::~MainWindow()
     if (d->ui->documentTreeView->model()) {
         disconnect(d->ui->documentTreeView->model(), nullptr, this, nullptr);
     }
-    disconnect(&(d->m_plugin->mainModel()->chartViewModel()), nullptr, this, nullptr);
+    disconnect(&(d->m_core->mainModel()->chartViewModel()), nullptr, this, nullptr);
 
     // Had this connection not dropped, the currentUndoStack() would need check
-    // for nullptr d, d->ui, d->m_plugin->chartView()
-    disconnect(d->m_plugin->mainModel()->undoStack(), &QUndoStack::indexChanged, this, &MainWindow::updateTitles);
+    // for nullptr d, d->ui, d->m_core->chartView()
+    disconnect(d->m_core->mainModel()->undoStack(), &QUndoStack::indexChanged, this, &MainWindow::updateTitles);
 }
 
 /*!
@@ -147,7 +146,7 @@ MainWindow::~MainWindow()
  */
 QGraphicsView *MainWindow::currentView() const
 {
-    return d->m_plugin->chartView();
+    return d->m_core->chartView();
 }
 
 /*!
@@ -159,10 +158,10 @@ void MainWindow::createNewDocument()
         return;
     }
 
-    d->m_plugin->mainModel()->chartViewModel().setPreferredChartBoxSize(prepareChartBoxSize());
-    d->m_plugin->mainModel()->initialModel();
+    d->m_core->mainModel()->chartViewModel().setPreferredChartBoxSize(prepareChartBoxSize());
+    d->m_core->mainModel()->initialModel();
 
-    d->m_plugin->chartView()->setZoom(100);
+    d->m_core->chartView()->setZoom(100);
 }
 
 /*!
@@ -177,7 +176,7 @@ void MainWindow::selectAndOpenFile()
     static const QStringList suffixes = { QString("MSC files (%1)").arg(mscFileFilters().join(" ")),
         QString("All files (*.*)") };
 
-    const QString path = QFileInfo(d->m_plugin->mainModel()->currentFilePath()).absoluteFilePath();
+    const QString path = QFileInfo(d->m_core->mainModel()->currentFilePath()).absoluteFilePath();
 
     const QString filename = QFileDialog::getOpenFileName(this, tr("MSC"), path, suffixes.join(";;"));
     if (!filename.isEmpty()) {
@@ -191,7 +190,7 @@ void MainWindow::openAadlFile()
             QFileDialog::getOpenFileName(this, tr("Open file"), "", d->m_ivCore->document()->supportedFileExtensions());
     if (!fileName.isEmpty()) {
         d->m_ivCore->document()->load(fileName);
-        d->m_plugin->aadlChecker()->setIvPlugin(d->m_ivCore);
+        d->m_core->aadlChecker()->setIvCore(d->m_ivCore);
     }
 }
 
@@ -208,23 +207,22 @@ bool MainWindow::openFileMsc(const QString &file)
         return false;
     }
 
-    d->m_plugin->mainModel()->chartViewModel().setPreferredChartBoxSize(QSizeF());
+    d->m_core->mainModel()->chartViewModel().setPreferredChartBoxSize(QSizeF());
 
-    const bool ok = d->m_plugin->mainModel()->loadFile(file);
+    const bool ok = d->m_core->mainModel()->loadFile(file);
     if (!ok) {
         QMessageBox::critical(this, tr("File Error"),
-                tr("Could not read the file. Errors:\n%1")
-                        .arg(d->m_plugin->mainModel()->mscErrorMessages().join("\n")));
+                tr("Could not read the file. Errors:\n%1").arg(d->m_core->mainModel()->mscErrorMessages().join("\n")));
         return false;
     }
 
-    if (!d->m_plugin->mainModel()->mscErrorMessages().isEmpty()) {
+    if (!d->m_core->mainModel()->mscErrorMessages().isEmpty()) {
         QMessageBox::warning(this, tr("Open File Warnings"),
                 tr("Warnings found while opening the file:\n%1")
-                        .arg(d->m_plugin->mainModel()->mscErrorMessages().join("\n")));
+                        .arg(d->m_core->mainModel()->mscErrorMessages().join("\n")));
     }
 
-    d->m_plugin->chartView()->setZoom(100);
+    d->m_core->chartView()->setZoom(100);
 
     return true;
 }
@@ -236,8 +234,8 @@ void MainWindow::updateTitles()
 {
     static const QString title = tr("%1 [%2]%3");
 
-    const QString dirtyMarker(d->m_plugin->mainModel()->needSave() ? "*" : "");
-    const QString &filename = d->m_plugin->mainModel()->currentFilePath();
+    const QString dirtyMarker(d->m_core->mainModel()->needSave() ? "*" : "");
+    const QString &filename = d->m_core->mainModel()->currentFilePath();
     const QString mscFileName(filename.isEmpty() ? tr("Untitled") : QFileInfo(filename).fileName());
     setWindowTitle(title.arg(qApp->applicationName(), mscFileName, dirtyMarker));
 }
@@ -267,11 +265,11 @@ bool MainWindow::openMscChain(const QString &dirPath)
  */
 void MainWindow::saveMsc()
 {
-    const QString &filename = d->m_plugin->mainModel()->currentFilePath();
+    const QString &filename = d->m_core->mainModel()->currentFilePath();
     if (filename.isEmpty()) {
         saveAsMsc();
     } else {
-        d->m_plugin->mainModel()->saveMsc(filename);
+        d->m_core->mainModel()->saveMsc(filename);
     }
 }
 
@@ -281,12 +279,12 @@ void MainWindow::saveMsc()
 void MainWindow::saveAsMsc()
 {
     QString fileName = QFileDialog::getSaveFileName(this, tr("Save as..."),
-            QFileInfo(d->m_plugin->mainModel()->currentFilePath()).path(),
+            QFileInfo(d->m_core->mainModel()->currentFilePath()).path(),
             tr("MSC files (%1);;All files (*.*)").arg(mscFileFilters().join(" ")));
     if (!fileName.isEmpty()) {
         if (!fileName.endsWith(DotMscFileExtensionLow))
             fileName.append(DotMscFileExtensionLow);
-        d->m_plugin->mainModel()->setCurrentFilePath(fileName);
+        d->m_core->mainModel()->setCurrentFilePath(fileName);
 
         saveMsc();
     }
@@ -298,9 +296,9 @@ void MainWindow::saveAsMsc()
  */
 void MainWindow::showDocumentView(bool show)
 {
-    d->m_plugin->showDocumentView(show);
+    d->m_core->showDocumentView(show);
     if (show) {
-        updateZoomBox(d->m_plugin->chartView()->zoom());
+        updateZoomBox(d->m_core->chartView()->zoom());
     }
 }
 
@@ -310,9 +308,9 @@ void MainWindow::showDocumentView(bool show)
  */
 void MainWindow::showHierarchyView(bool show)
 {
-    d->m_plugin->showHierarchyView(show);
+    d->m_core->showHierarchyView(show);
     if (show) {
-        updateZoomBox(d->m_plugin->hierarchyView()->zoom());
+        updateZoomBox(d->m_core->hierarchyView()->zoom());
     }
 }
 
@@ -332,7 +330,7 @@ void MainWindow::showChart(const QModelIndex &index)
 
     if (auto document = dynamic_cast<msc::MscDocument *>(obj)) {
         if (!document->charts().empty()) {
-            d->m_plugin->mainModel()->chartViewModel().setCurrentChart(document->charts()[0]);
+            d->m_core->mainModel()->chartViewModel().setCurrentChart(document->charts()[0]);
             showDocumentView(true);
         }
     }
@@ -347,21 +345,21 @@ void MainWindow::showSelection(const QModelIndex &current, const QModelIndex &pr
 
     auto *obj = static_cast<QObject *>(current.internalPointer());
     if (obj == nullptr) {
-        d->m_plugin->mainModel()->setSelectedDocument(nullptr);
+        d->m_core->mainModel()->setSelectedDocument(nullptr);
         return;
     }
 
     if (auto chart = dynamic_cast<msc::MscChart *>(obj)) {
-        d->m_plugin->mainModel()->chartViewModel().setCurrentChart(chart);
+        d->m_core->mainModel()->chartViewModel().setCurrentChart(chart);
         showDocumentView(true);
     } else {
         showHierarchyView(true);
 
         if (auto document = dynamic_cast<msc::MscDocument *>(obj)) {
-            d->m_plugin->mainModel()->setSelectedDocument(document);
-            d->m_plugin->actionPaste()->setEnabled(
+            d->m_core->mainModel()->setSelectedDocument(document);
+            d->m_core->actionPaste()->setEnabled(
                     QApplication::clipboard()->mimeData()->hasFormat(MainModel::MscChartMimeType)
-                    && d->m_plugin->mainModel()->selectedDocument()->isAddChildEnable());
+                    && d->m_core->mainModel()->selectedDocument()->isAddChildEnable());
         }
     }
 }
@@ -372,38 +370,38 @@ void MainWindow::showSelection(const QModelIndex &current, const QModelIndex &pr
 void MainWindow::setupUi()
 {
     d->ui->setupUi(this);
-    d->m_plugin->setViews(d->ui->centerView, d->ui->graphicsView, d->ui->hierarchyView);
+    d->m_core->setViews(d->ui->centerView, d->ui->graphicsView, d->ui->hierarchyView);
 
-    d->m_plugin->addToolBars(this);
+    d->m_core->addToolBars(this);
 
-    d->ui->documentTreeView->setModel(d->m_plugin->mainModel()->documentItemModel());
-    d->mscTextBrowser->setModel(d->m_plugin->mainModel()->mscModel());
+    d->ui->documentTreeView->setModel(d->m_core->mainModel()->documentItemModel());
+    d->mscTextBrowser->setModel(d->m_core->mainModel()->mscModel());
 
     initActions();
 
-    d->m_plugin->initChartTools();
-    d->m_plugin->initHierarchyViewActions();
-    d->m_plugin->initMenus(this);
+    d->m_core->initChartTools();
+    d->m_core->initHierarchyViewActions();
+    d->m_core->initMenus(this);
     initMainToolbar();
 
-    d->m_plugin->setupMiniMap();
+    d->m_core->setupMiniMap();
 
     // status bar
     d->m_zoomBox = new QComboBox(d->ui->statusBar);
-    for (auto x = d->m_plugin->chartView()->minZoomPercent(); x <= d->m_plugin->chartView()->maxZoomPercent();
-            x += d->m_plugin->chartView()->zoomStepPercent())
+    for (auto x = d->m_core->chartView()->minZoomPercent(); x <= d->m_core->chartView()->maxZoomPercent();
+            x += d->m_core->chartView()->zoomStepPercent())
         d->m_zoomBox->addItem(QString("%1 %").arg(x), x);
 
     d->m_zoomBox->setCurrentIndex(d->m_zoomBox->findData(100));
 
     connect(d->m_zoomBox, QOverload<int>::of(&QComboBox::currentIndexChanged), this, [&](int index) {
-        if (auto graphicsView = dynamic_cast<msc::GraphicsView *>(d->m_plugin->centerView()->currentWidget()))
+        if (auto graphicsView = dynamic_cast<msc::GraphicsView *>(d->m_core->centerView()->currentWidget()))
             graphicsView->setZoom(qobject_cast<QComboBox *>(sender())->itemData(index).toDouble());
     });
 
-    connect(d->m_plugin->chartView(), QOverload<double>::of(&msc::GraphicsView::zoomChanged), this,
+    connect(d->m_core->chartView(), QOverload<double>::of(&msc::GraphicsView::zoomChanged), this,
             &MainWindow::updateZoomBox);
-    connect(d->m_plugin->hierarchyView(), QOverload<double>::of(&msc::GraphicsView::zoomChanged), this,
+    connect(d->m_core->hierarchyView(), QOverload<double>::of(&msc::GraphicsView::zoomChanged), this,
             &MainWindow::updateZoomBox);
 
     statusBar()->addPermanentWidget(d->m_zoomBox);
@@ -415,13 +413,13 @@ void MainWindow::setupUi()
  */
 void MainWindow::initActions()
 {
-    // Connect the plugin actions
-    connect(d->m_plugin->actionNewFile(), &QAction::triggered, this, &MainWindow::createNewDocument);
-    connect(d->m_plugin->actionOpenFile(), &QAction::triggered, this, &MainWindow::selectAndOpenFile);
-    connect(d->m_plugin->actionSaveFile(), &QAction::triggered, this, &MainWindow::saveMsc);
-    connect(d->m_plugin->actionSaveFileAs(), &QAction::triggered, this, &MainWindow::saveAsMsc);
-    connect(d->m_plugin->actionOpenAadl(), &QAction::triggered, this, &MainWindow::openAadlFile);
-    connect(d->m_plugin->actionQuit(), &QAction::triggered, this, [&]() {
+    // Connect the core actions
+    connect(d->m_core->actionNewFile(), &QAction::triggered, this, &MainWindow::createNewDocument);
+    connect(d->m_core->actionOpenFile(), &QAction::triggered, this, &MainWindow::selectAndOpenFile);
+    connect(d->m_core->actionSaveFile(), &QAction::triggered, this, &MainWindow::saveMsc);
+    connect(d->m_core->actionSaveFileAs(), &QAction::triggered, this, &MainWindow::saveAsMsc);
+    connect(d->m_core->actionOpenAadl(), &QAction::triggered, this, &MainWindow::openAadlFile);
+    connect(d->m_core->actionQuit(), &QAction::triggered, this, [&]() {
         if (this->saveDocument()) {
             this->saveSettings();
             QApplication::quit();
@@ -431,13 +429,13 @@ void MainWindow::initActions()
 
 void MainWindow::initMainToolbar()
 {
-    auto mainToolBar = d->m_plugin->mainToolBar();
+    auto mainToolBar = d->m_core->mainToolBar();
     mainToolBar->addSeparator();
-    mainToolBar->addAction(d->m_plugin->deleteTool()->action());
+    mainToolBar->addAction(d->m_core->deleteTool()->action());
 
     mainToolBar->addSeparator();
-    mainToolBar->addAction(d->m_plugin->actionCopy());
-    mainToolBar->addAction(d->m_plugin->actionPaste());
+    mainToolBar->addAction(d->m_core->actionCopy());
+    mainToolBar->addAction(d->m_core->actionPaste());
 }
 
 void MainWindow::initConnections()
@@ -446,35 +444,35 @@ void MainWindow::initConnections()
             &MainWindow::showSelection);
     connect(d->ui->documentTreeView, &QTreeView::doubleClicked, this, &MainWindow::showChart);
 
-    connect(d->m_plugin->mainModel(), &MainModel::selectedDocumentChanged, d->ui->documentTreeView,
+    connect(d->m_core->mainModel(), &MainModel::selectedDocumentChanged, d->ui->documentTreeView,
             &DocumentTreeView::setSelectedDocument);
 
-    connect(d->m_plugin->chartView(), &msc::GraphicsView::mouseMoved, this, &MainWindow::showCoordinatesInfo);
+    connect(d->m_core->chartView(), &msc::GraphicsView::mouseMoved, this, &MainWindow::showCoordinatesInfo);
 
-    connect(d->m_plugin->mainModel(), &MainModel::modelDataChanged, this, &MainWindow::updateModel);
-    connect(d->m_plugin->mainModel(), &MainModel::modelUpdated, this, &MainWindow::updateModel);
+    connect(d->m_core->mainModel(), &MainModel::modelDataChanged, this, &MainWindow::updateModel);
+    connect(d->m_core->mainModel(), &MainModel::modelUpdated, this, &MainWindow::updateModel);
 
-    connect(d->m_plugin->mainModel()->documentItemModel(), &msc::DocumentItemModel::dataChanged, this,
+    connect(d->m_core->mainModel()->documentItemModel(), &msc::DocumentItemModel::dataChanged, this,
             &MainWindow::showSelection);
 
-    connect(d->m_plugin->mainModel()->undoStack(), &QUndoStack::indexChanged, this, &MainWindow::updateTitles);
-    connect(d->m_plugin->mainModel(), &MainModel::lasteSaveUndoChange, this, &MainWindow::updateTitles);
+    connect(d->m_core->mainModel()->undoStack(), &QUndoStack::indexChanged, this, &MainWindow::updateTitles);
+    connect(d->m_core->mainModel(), &MainModel::lasteSaveUndoChange, this, &MainWindow::updateTitles);
 
     // ASN1 view
-    connect(d->m_plugin->mainModel(), &MainModel::currentFilePathChanged, this, [&](const QString &filename) {
+    connect(d->m_core->mainModel(), &MainModel::currentFilePathChanged, this, [&](const QString &filename) {
         QFileInfo fileInfo(filename);
         d->ui->asn1Widget->setDirectory(fileInfo.absolutePath());
     });
-    connect(d->m_plugin->mainModel(), &msc::MainModel::asn1FileNameChanged, d->ui->asn1Widget,
+    connect(d->m_core->mainModel(), &msc::MainModel::asn1FileNameChanged, d->ui->asn1Widget,
             &asn1::ASN1FileView::setFileName);
     connect(d->ui->asn1Widget, &asn1::ASN1FileView::asn1Selected, this, [this]() {
-        msc::MscModel *model = d->m_plugin->mainModel()->mscModel();
+        msc::MscModel *model = d->m_core->mainModel()->mscModel();
         if (model->dataDefinitionString() != d->ui->asn1Widget->fileName()) {
             const QVariantList params { QVariant::fromValue(model), d->ui->asn1Widget->fileName(), "ASN.1" };
             msc::cmd::CommandsStack::push(msc::cmd::Id::SetAsn1File, params);
         }
     });
-    connect(d->m_plugin->mainModel(), &MainModel::asn1ParameterErrorDetected, this, &MainWindow::showAsn1Errors);
+    connect(d->m_core->mainModel(), &MainModel::asn1ParameterErrorDetected, this, &MainWindow::showAsn1Errors);
 }
 
 /*!
@@ -517,17 +515,17 @@ QAction *MainWindow::dockWidgetAsn1ToggleAction()
 
 void MainWindow::copyCurrentChart()
 {
-    d->m_plugin->mainModel()->copyCurrentChart();
+    d->m_core->mainModel()->copyCurrentChart();
 }
 
 void MainWindow::copyCurrentChartAsPicture()
 {
-    d->m_plugin->mainModel()->copyCurrentChartAsPicture();
+    d->m_core->mainModel()->copyCurrentChartAsPicture();
 }
 
 void MainWindow::pasteChart()
 {
-    d->m_plugin->mainModel()->pasteChart();
+    d->m_core->mainModel()->pasteChart();
 }
 
 void MainWindow::keyPressEvent(QKeyEvent *e)
@@ -537,7 +535,7 @@ void MainWindow::keyPressEvent(QKeyEvent *e)
     switch (e->key()) {
     case Qt::Key_Escape: {
         if (!e->isAutoRepeat()) {
-            if (QAction *pointerToolAction = d->m_plugin->mscToolBar()->actions().first())
+            if (QAction *pointerToolAction = d->m_core->mscToolBar()->actions().first())
                 if (!pointerToolAction->isChecked())
                     pointerToolAction->setChecked(true);
         }
@@ -546,7 +544,7 @@ void MainWindow::keyPressEvent(QKeyEvent *e)
 #ifdef QT_DEBUG
     case Qt::Key_R: {
         if (!e->isAutoRepeat() && (e->modifiers() == Qt::ControlModifier)) {
-            openFileMsc(d->m_plugin->mainModel()->currentFilePath());
+            openFileMsc(d->m_core->mainModel()->currentFilePath());
         }
         break;
     }
@@ -558,7 +556,7 @@ void MainWindow::keyPressEvent(QKeyEvent *e)
         break;
     }
     default: {
-        if (msc::BaseTool *tool = d->m_plugin->activeTool())
+        if (msc::BaseTool *tool = d->m_core->activeTool())
             tool->processKeyPress(e);
         break;
     }
@@ -572,15 +570,14 @@ void MainWindow::loadSettings()
     restoreState(AppOptions::MainWindow.State->read().toByteArray());
 
     // the toolbar might be hidden from a streaming tool session
-    d->m_plugin->mainToolBar()->show();
+    d->m_core->mainToolBar()->show();
 
     const bool isDocViewMode = 0 == AppOptions::MainWindow.DocOrHierarchyViewMode->read().toInt();
     if (isDocViewMode)
         showDocumentView(true);
     else
         showHierarchyView(true);
-    QAction *changeViewModeAction =
-            isDocViewMode ? d->m_plugin->actionShowDocument() : d->m_plugin->actionShowHierarchy();
+    QAction *changeViewModeAction = isDocViewMode ? d->m_core->actionShowDocument() : d->m_core->actionShowHierarchy();
     changeViewModeAction->setChecked(true);
 }
 
@@ -588,8 +585,8 @@ void MainWindow::saveSettings()
 {
     AppOptions::MainWindow.Geometry->write(saveGeometry());
     AppOptions::MainWindow.State->write(saveState());
-    AppOptions::MainWindow.LastFilePath->write(d->m_plugin->mainModel()->currentFilePath());
-    AppOptions::MainWindow.DocOrHierarchyViewMode->write(d->m_plugin->centerView()->currentIndex());
+    AppOptions::MainWindow.LastFilePath->write(d->m_core->mainModel()->currentFilePath());
+    AppOptions::MainWindow.DocOrHierarchyViewMode->write(d->m_core->centerView()->currentIndex());
 }
 
 void MainWindow::closeEvent(QCloseEvent *e)
@@ -633,8 +630,8 @@ void MainWindow::changeEvent(QEvent *e)
 void MainWindow::onGeometryRestored()
 {
     // A new document should be created only if no files were opened by command line args
-    if (d->m_plugin->mainModel()->currentFilePath().isEmpty()) {
-        if (auto chart = d->m_plugin->mainModel()->chartViewModel().currentChart()) {
+    if (d->m_core->mainModel()->currentFilePath().isEmpty()) {
+        if (auto chart = d->m_core->mainModel()->chartViewModel().currentChart()) {
             if (chart->isEmpty()) {
                 QMetaObject::invokeMethod(this, "createNewDocument", Qt::QueuedConnection);
             }
@@ -653,11 +650,11 @@ QSizeF MainWindow::prepareChartBoxSize() const
 
 void MainWindow::updateMscToolbarActionsEnablement()
 {
-    auto chart = d->m_plugin->mainModel()->chartViewModel().currentChart();
+    auto chart = d->m_core->mainModel()->chartViewModel().currentChart();
     const bool hasInstance = chart && !chart->instances().isEmpty();
 
     bool forceDefault(false);
-    for (QAction *act : d->m_plugin->mscToolBar()->actions()) {
+    for (QAction *act : d->m_core->mscToolBar()->actions()) {
         const msc::BaseTool::ToolType toolType(act->data().value<msc::BaseTool::ToolType>());
         switch (toolType) {
         case msc::BaseTool::ToolType::ActionCreator:
@@ -682,10 +679,10 @@ void MainWindow::updateMscToolbarActionsEnablement()
         }
     }
 
-    d->m_plugin->checkGlobalComment();
+    d->m_core->checkGlobalComment();
 
     if (forceDefault) {
-        d->m_plugin->activateDefaultTool();
+        d->m_core->activateDefaultTool();
     }
 }
 
@@ -701,7 +698,7 @@ QStringList MainWindow::mscFileFilters()
 
 bool MainWindow::saveDocument()
 {
-    if (!d->m_dropUnsavedChangesSilently && d->m_plugin->mainModel()->needSave()) {
+    if (!d->m_dropUnsavedChangesSilently && d->m_core->mainModel()->needSave()) {
         auto result = QMessageBox::warning(this, windowTitle(),
                 tr("You have unsaved data. Do you want to save the MSC document?"),
                 QMessageBox::Save | QMessageBox::Discard | QMessageBox::Cancel, QMessageBox::Save);
@@ -718,7 +715,7 @@ bool MainWindow::saveDocument()
 
 void MainWindow::updateModel()
 {
-    d->mscTextBrowser->setModel(d->m_plugin->mainModel()->mscModel());
+    d->mscTextBrowser->setModel(d->m_core->mainModel()->mscModel());
     updateMscToolbarActionsEnablement();
 }
 
@@ -776,7 +773,7 @@ void MainWindow::showCoordinatesInfo(const QString &info)
 
 void MainWindow::openMessageDeclarationEditor()
 {
-    d->m_plugin->openMessageDeclarationEditor(this);
+    d->m_core->openMessageDeclarationEditor(this);
 }
 
 void MainWindow::updateZoomBox(double percent)
@@ -825,7 +822,7 @@ void MainWindow::saveSceneRender(const QString &filePath) const
     if (filePath.isEmpty())
         return;
 
-    if (QGraphicsScene *scene = d->m_plugin->mainModel()->graphicsScene()) {
+    if (QGraphicsScene *scene = d->m_core->mainModel()->graphicsScene()) {
         QImage img(scene->sceneRect().size().toSize(), QImage::Format_ARGB32_Premultiplied);
         img.fill(Qt::transparent);
         QPainter p(&img);

@@ -45,7 +45,7 @@ class MainWindow : public QMainWindow
     Q_OBJECT
 
 public:
-    explicit MainWindow(msc::MSCEditorCore *plugin, QWidget *parent = nullptr);
+    explicit MainWindow(msc::MSCEditorCore *core, QWidget *parent = nullptr);
     ~MainWindow();
 
     QGraphicsView *currentView() const;

@@ -138,7 +138,7 @@ QVector<QAction *> MscMainWidget::toolActions() const
     return m_plugin->chartActions();
 }
 
-QSharedPointer<msc::MSCEditorCore> MscMainWidget::mscPlugin() const
+QSharedPointer<msc::MSCEditorCore> MscMainWidget::mscCore() const
 {
     return m_plugin;
 }

@@ -45,4 +45,4 @@ public:
     QSharedPointer<aadlinterface::IVEditorCore> ivPlugin() const;
 };
 
-} // namespace MscPlugin
+}

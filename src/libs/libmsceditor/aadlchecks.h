@@ -52,8 +52,8 @@ public:
     explicit AadlChecks(QObject *parent = nullptr);
     ~AadlChecks();
 
-    void setMscPlugin(msc::MSCEditorCore *mscPlugin);
-    void setIvPlugin(QSharedPointer<aadlinterface::IVEditorCore> ivPlugin);
+    void setMscCore(msc::MSCEditorCore *mscCore);
+    void setIvCore(QSharedPointer<aadlinterface::IVEditorCore> ivCore);
 
     QVector<QPair<msc::MscChart *, msc::MscInstance *>> checkInstanceNames() const;
     QVector<QPair<msc::MscChart *, msc::MscInstance *>> checkInstanceRelations() const;
@@ -65,8 +65,8 @@ public:
     QStringList connectionNames() const;
 
 Q_SIGNALS:
-    void mscPluginChanged();
-    void ivPluginChanged();
+    void mscCoreChanged();
+    void ivCoreChanged();
 
 private:
     Q_SLOT void updateAadlItems();
@@ -83,8 +83,8 @@ private:
     aadl::AADLObjectConnection *correspondingConnection(const MscMessage *message) const;
     bool correspond(const aadl::AADLObjectConnection *connection, const msc::MscMessage *message) const;
 
-    QPointer<msc::MSCEditorCore> m_mscPlugin;
-    QWeakPointer<aadlinterface::IVEditorCore> m_ivPlugin;
+    QPointer<msc::MSCEditorCore> m_mscCore;
+    QWeakPointer<aadlinterface::IVEditorCore> m_ivCore;
 
     QVector<aadl::AADLObjectFunction *> m_aadlFunctions;
     QVector<aadl::AADLObjectConnection *> m_aadlConnections;

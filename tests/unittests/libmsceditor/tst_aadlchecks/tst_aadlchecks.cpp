@@ -73,14 +73,14 @@ void tst_AadlChecks::testCheckInstanceNames()
     QVector<QPair<msc::MscChart *, msc::MscInstance *>> result = checker.checkInstanceNames();
     QCOMPARE(result.size(), 0);
 
-    msc::MSCEditorCore mscPlugin;
-    mscPlugin.mainModel()->initialModel();
-    checker.setMscPlugin(&mscPlugin);
-    msc::MscChart *chart = mscPlugin.mainModel()->mscModel()->documents().at(0)->documents().at(0)->charts().at(0);
+    msc::MSCEditorCore mscCore;
+    mscCore.mainModel()->initialModel();
+    checker.setMscCore(&mscCore);
+    msc::MscChart *chart = mscCore.mainModel()->mscModel()->documents().at(0)->documents().at(0)->charts().at(0);
     QVERIFY(chart != nullptr);
 
     QSharedPointer<aadlinterface::IVEditorCore> ivPlugin(new aadlinterface::IVEditorCore);
-    checker.setIvPlugin(ivPlugin);
+    checker.setIvCore(ivPlugin);
     result = checker.checkInstanceNames();
     QCOMPARE(result.size(), 0);
 
@@ -119,15 +119,15 @@ void tst_AadlChecks::testCheckInstanceRelations()
     QVector<QPair<msc::MscChart *, msc::MscInstance *>> result = checker.checkInstanceRelations();
     QCOMPARE(result.size(), 0);
 
-    msc::MSCEditorCore mscPlugin;
-    mscPlugin.mainModel()->initialModel();
-    checker.setMscPlugin(&mscPlugin);
+    msc::MSCEditorCore mscCore;
+    mscCore.mainModel()->initialModel();
+    checker.setMscCore(&mscCore);
     result = checker.checkInstanceRelations();
-    msc::MscChart *chart = mscPlugin.mainModel()->mscModel()->documents().at(0)->documents().at(0)->charts().at(0);
+    msc::MscChart *chart = mscCore.mainModel()->mscModel()->documents().at(0)->documents().at(0)->charts().at(0);
     QVERIFY(chart != nullptr);
 
     QSharedPointer<aadlinterface::IVEditorCore> ivPlugin(new aadlinterface::IVEditorCore);
-    checker.setIvPlugin(ivPlugin);
+    checker.setIvCore(ivPlugin);
     result = checker.checkInstanceRelations();
     QCOMPARE(result.size(), 0);
 
@@ -169,15 +169,15 @@ void tst_AadlChecks::testCheckMessageNames()
     QVector<QPair<msc::MscChart *, msc::MscMessage *>> result = checker.checkMessages();
     QCOMPARE(result.size(), 0);
 
-    msc::MSCEditorCore mscPlugin;
-    mscPlugin.mainModel()->initialModel();
-    checker.setMscPlugin(&mscPlugin);
+    msc::MSCEditorCore mscCore;
+    mscCore.mainModel()->initialModel();
+    checker.setMscCore(&mscCore);
     result = checker.checkMessages();
-    msc::MscChart *chart = mscPlugin.mainModel()->mscModel()->documents().at(0)->documents().at(0)->charts().at(0);
+    msc::MscChart *chart = mscCore.mainModel()->mscModel()->documents().at(0)->documents().at(0)->charts().at(0);
     QVERIFY(chart != nullptr);
 
     QSharedPointer<aadlinterface::IVEditorCore> ivPlugin(new aadlinterface::IVEditorCore);
-    checker.setIvPlugin(ivPlugin);
+    checker.setIvCore(ivPlugin);
     result = checker.checkMessages();
     QCOMPARE(result.size(), 0);
 

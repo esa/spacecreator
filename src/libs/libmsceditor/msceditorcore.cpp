@@ -58,7 +58,7 @@ namespace msc {
 static const char *HIERARCHY_TYPE_TAG = "hierarchyTag";
 
 /*!
- * \class MSCPlugin
+ * \class MSCEditorCore
  * \brief Has most of the code for the MSC Editor UI and the underlying library
  */
 
@@ -69,7 +69,7 @@ MSCEditorCore::MSCEditorCore(QObject *parent)
     , m_mscToolBar(new QToolBar(tr("MSC")))
     , m_hierarchyToolBar(new QToolBar(tr("Hierarchy")))
 {
-    m_aadlChecks->setMscPlugin(this);
+    m_aadlChecks->setMscCore(this);
 
     m_mscToolBar->setObjectName("mscTools");
     m_mscToolBar->setAllowedAreas(Qt::AllToolBarAreas);
@@ -526,7 +526,7 @@ void MSCEditorCore::activateDefaultTool()
 }
 
 /*!
- * \brief msc::MSCPlugin::selectCurrentChart Set the current chart as the currently selected.
+ * \brief msc::MSCEditorCore::selectCurrentChart Set the current chart as the currently selected.
  */
 void MSCEditorCore::selectCurrentChart()
 {

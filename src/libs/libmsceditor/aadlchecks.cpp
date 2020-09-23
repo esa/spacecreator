@@ -42,14 +42,14 @@ AadlChecks::AadlChecks(QObject *parent)
 
 AadlChecks::~AadlChecks() { }
 
-void AadlChecks::setMscPlugin(MSCEditorCore *mscPlugin)
+void AadlChecks::setMscCore(MSCEditorCore *mscCore)
 {
-    m_mscPlugin = mscPlugin;
+    m_mscCore = mscCore;
 }
 
-void AadlChecks::setIvPlugin(QSharedPointer<aadlinterface::IVEditorCore> ivPlugin)
+void AadlChecks::setIvCore(QSharedPointer<aadlinterface::IVEditorCore> ivCore)
 {
-    if (ivPlugin == m_ivPlugin) {
+    if (ivCore == m_ivCore) {
         return;
     }
 
@@ -57,7 +57,7 @@ void AadlChecks::setIvPlugin(QSharedPointer<aadlinterface::IVEditorCore> ivPlugi
         disconnect(model, nullptr, this, nullptr);
     }
 
-    m_ivPlugin = ivPlugin;
+    m_ivCore = ivCore;
     updateAadlItems();
 
     if (aadl::AADLObjectsModel *model = aadlModel()) {
@@ -65,7 +65,7 @@ void AadlChecks::setIvPlugin(QSharedPointer<aadlinterface::IVEditorCore> ivPlugi
         connect(model, &aadl::AADLObjectsModel::aadlObjectRemoved, this, &msc::AadlChecks::updateAadlItems);
     }
 
-    Q_EMIT ivPluginChanged();
+    Q_EMIT ivCoreChanged();
 }
 
 /*!
@@ -74,11 +74,11 @@ void AadlChecks::setIvPlugin(QSharedPointer<aadlinterface::IVEditorCore> ivPlugi
 QVector<QPair<MscChart *, MscInstance *>> AadlChecks::checkInstanceNames() const
 {
     QVector<QPair<MscChart *, MscInstance *>> result;
-    if (!m_ivPlugin || !m_mscPlugin) {
+    if (!m_ivCore || !m_mscCore) {
         return result;
     }
 
-    QVector<msc::MscChart *> charts = m_mscPlugin->mainModel()->mscModel()->allCharts();
+    QVector<msc::MscChart *> charts = m_mscCore->mainModel()->mscModel()->allCharts();
     for (msc::MscChart *chart : charts) {
         for (msc::MscInstance *instance : chart->instances()) {
             aadl::AADLObjectFunction *aadlFunction = correspondingFunction(instance);
@@ -97,11 +97,11 @@ QVector<QPair<MscChart *, MscInstance *>> AadlChecks::checkInstanceNames() const
 QVector<QPair<MscChart *, MscInstance *>> AadlChecks::checkInstanceRelations() const
 {
     QVector<QPair<MscChart *, MscInstance *>> result;
-    if (!m_ivPlugin || !m_mscPlugin) {
+    if (!m_ivCore || !m_mscCore) {
         return result;
     }
 
-    QVector<msc::MscChart *> charts = m_mscPlugin->mainModel()->mscModel()->allCharts();
+    QVector<msc::MscChart *> charts = m_mscCore->mainModel()->mscModel()->allCharts();
     for (msc::MscChart *chart : charts) {
         QVector<QPair<MscInstance *, aadl::AADLObjectFunction *>> pairs;
         for (msc::MscInstance *instance : chart->instances()) {
@@ -130,7 +130,7 @@ QVector<QPair<MscChart *, MscInstance *>> AadlChecks::checkInstanceRelations() c
  */
 bool AadlChecks::checkInstance(const MscInstance *instance) const
 {
-    if (!m_ivPlugin) {
+    if (!m_ivCore) {
         return true;
     }
 
@@ -143,7 +143,7 @@ bool AadlChecks::checkInstance(const MscInstance *instance) const
  */
 QStringList AadlChecks::functionsNames() const
 {
-    if (!m_ivPlugin) {
+    if (!m_ivCore) {
         return {};
     }
 
@@ -163,11 +163,11 @@ QStringList AadlChecks::functionsNames() const
 QVector<QPair<MscChart *, MscMessage *>> AadlChecks::checkMessages() const
 {
     QVector<QPair<MscChart *, MscMessage *>> result;
-    if (!m_ivPlugin || !m_mscPlugin) {
+    if (!m_ivCore || !m_mscCore) {
         return result;
     }
 
-    QVector<msc::MscChart *> charts = m_mscPlugin->mainModel()->mscModel()->allCharts();
+    QVector<msc::MscChart *> charts = m_mscCore->mainModel()->mscModel()->allCharts();
     for (msc::MscChart *chart : charts) {
         for (msc::MscInstanceEvent *event : chart->instanceEvents()) {
             if (auto message = qobject_cast<msc::MscMessage *>(event)) {
@@ -187,7 +187,7 @@ QVector<QPair<MscChart *, MscMessage *>> AadlChecks::checkMessages() const
  */
 bool AadlChecks::checkMessage(const MscMessage *message) const
 {
-    if (!m_ivPlugin) {
+    if (!m_ivCore) {
         return true;
     }
 
@@ -200,7 +200,7 @@ bool AadlChecks::checkMessage(const MscMessage *message) const
  */
 QStringList AadlChecks::connectionNames() const
 {
-    if (!m_ivPlugin) {
+    if (!m_ivCore) {
         return {};
     }
 
@@ -217,17 +217,17 @@ QStringList AadlChecks::connectionNames() const
 
 aadl::AADLObjectsModel *AadlChecks::aadlModel() const
 {
-    if (!m_ivPlugin) {
+    if (!m_ivCore) {
         return {};
     }
 
-    QSharedPointer<aadlinterface::IVEditorCore> ivPlugin = m_ivPlugin.toStrongRef();
-    if (!ivPlugin->document() || !ivPlugin->document()->objectsModel()) {
+    QSharedPointer<aadlinterface::IVEditorCore> ivCore = m_ivCore.toStrongRef();
+    if (!ivCore->document() || !ivCore->document()->objectsModel()) {
         qWarning() << "No AADLObjectsModel";
         return {};
     }
 
-    return ivPlugin->document()->objectsModel();
+    return ivCore->document()->objectsModel();
 }
 
 /*!

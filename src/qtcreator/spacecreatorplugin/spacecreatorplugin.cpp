@@ -133,7 +133,7 @@ bool SpaceCreatorPlugin::initialize(const QStringList &arguments, QString *error
 
     connect(m_mscFactory, &MscEditorFactory::mscDataLoaded, this,
             [this](const QString &fileName, QSharedPointer<msc::MSCEditorCore> mscData) {
-                mscData->aadlChecker()->setIvPlugin(ivCore()); // All msc documents have access to the iv model
+                mscData->aadlChecker()->setIvCore(ivCore()); // All msc documents have access to the iv model
                 m_mscStorage->setMscData(fileName, mscData);
             });
 
@@ -211,7 +211,7 @@ void SpaceCreatorPlugin::checkInstances()
     QVector<QSharedPointer<msc::MSCEditorCore>> mscCores = allMscCores();
 
     for (QSharedPointer<msc::MSCEditorCore> mplugin : mscCores) {
-        mplugin->aadlChecker()->setIvPlugin(ivp);
+        mplugin->aadlChecker()->setIvCore(ivp);
     }
 
     // Check for names
@@ -268,7 +268,7 @@ void SpaceCreatorPlugin::checkMessages()
     // check messages
     QVector<QPair<msc::MscChart *, msc::MscMessage *>> resultNames;
     for (QSharedPointer<msc::MSCEditorCore> mplugin : mscCores) {
-        mplugin->aadlChecker()->setIvPlugin(ivp);
+        mplugin->aadlChecker()->setIvCore(ivp);
         resultNames += mplugin->aadlChecker()->checkMessages();
     }
 

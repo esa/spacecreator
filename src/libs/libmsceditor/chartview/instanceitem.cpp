@@ -88,7 +88,7 @@ InstanceItem::InstanceItem(
 
     if (m_model && m_model->aadlChecker()) {
         m_headSymbol->setAadlChecker(m_model->aadlChecker());
-        connect(m_model->aadlChecker(), &msc::AadlChecks::ivPluginChanged, this, &msc::InstanceItem::checkAadlFunction);
+        connect(m_model->aadlChecker(), &msc::AadlChecks::ivCoreChanged, this, &msc::InstanceItem::checkAadlFunction);
     }
 
     scheduleLayoutUpdate();

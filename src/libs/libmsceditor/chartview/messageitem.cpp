@@ -111,7 +111,7 @@ MessageItem::MessageItem(MscMessage *message, ChartLayoutManager *chartLayoutMan
     });
 
     if (m_chartLayoutManager && m_chartLayoutManager->aadlChecker()) {
-        connect(m_chartLayoutManager->aadlChecker(), &msc::AadlChecks::ivPluginChanged, this,
+        connect(m_chartLayoutManager->aadlChecker(), &msc::AadlChecks::ivCoreChanged, this,
                 &msc::MessageItem::checkAadlConnection);
     }
 

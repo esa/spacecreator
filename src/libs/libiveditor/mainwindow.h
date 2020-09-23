@@ -40,7 +40,7 @@ class MainWindow : public QMainWindow
     Q_OBJECT
 
 public:
-    explicit MainWindow(aadlinterface::IVEditorCore *plugin, QWidget *parent = nullptr);
+    explicit MainWindow(aadlinterface::IVEditorCore *core, QWidget *parent = nullptr);
     ~MainWindow() override;
 
     bool processCommandLineArg(shared::CommandLineParser::Positional arg, const QString &value);
@@ -75,7 +75,7 @@ private:
 
     bool m_dropUnsavedChangesSilently { false };
 
-    aadlinterface::IVEditorCore *m_plugin { nullptr };
+    aadlinterface::IVEditorCore *m_core { nullptr };
 };
 
 }
