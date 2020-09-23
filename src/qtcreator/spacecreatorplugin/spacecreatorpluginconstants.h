@@ -23,11 +23,12 @@ namespace spctr {
 namespace Constants {
 
 const char MSC_MIMETYPE[] = "text/vnd.msc";
+const char AADL_MIMETYPE[] = "application/xml";
+
+const char INFO_READ_ONLY[] = "SpaceCreator.ReadOnly";
 
 const char K_MSC_EDITOR_ID[] = "MscEditor.Editor";
 const char C_MSC_EDITOR[] = "Msc Editor";
-
-const char INFO_READ_ONLY[] = "MscEditor.ReadOnly";
 
 const char C_MSCEDITOR[] = "Qt5.MscEditor";
 const char C_MSCEDITOR_DISPLAY_NAME[] = QT_TRANSLATE_NOOP("OpenWith::Editors", "Msc Editor");
@@ -38,12 +39,8 @@ const char CHECK_MESSAGES_ID[] = "MscPlugin.CheckMessages";
 const char SHOW_MINIMAP_ID[] = "MscPlugin.Minimap";
 const char MENU_ID[] = "MscPlugin.Menu";
 
-const char AADL_MIMETYPE[] = "application/xml";
-
 const char K_AADL_EDITOR_ID[] = "AadlEditor.Editor";
 const char C_AADL_EDITOR[] = "AADL Editor";
-
-// const char INFO_READ_ONLY[] = "AadlEditor.ReadOnly";
 
 const char C_AADLEDITOR_DISPLAY_NAME[] = QT_TRANSLATE_NOOP("OpenWith::Editors", "AADL Editor");
 

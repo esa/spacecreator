@@ -35,6 +35,7 @@ class MSCEditorCore;
 
 namespace spctr {
 
+class AadlEditorFactory;
 class AadlModelStorage;
 class MscEditorFactory;
 class MscModelStorage;
@@ -57,14 +58,20 @@ public Q_SLOTS:
     void checkInstances();
     void checkMessages();
     void setMinimapVisible(bool visible);
+    void showAsn1Dialog();
+    void onAttributesManagerRequested();
+    void onColorSchemeMenuInvoked();
+    void onDynContextEditorMenuInvoked();
 
 private:
     ExtensionSystem::IPlugin *aadlPlugin() const;
     QSharedPointer<aadlinterface::IVEditorCore> ivPlugin() const;
     QVector<QSharedPointer<msc::MSCEditorCore>> allMscCores() const;
 
-    MscEditorFactory *m_factory = nullptr;
+    MscEditorFactory *m_mscFactory = nullptr;
+    AadlEditorFactory *m_aadlFactory = nullptr;
     QAction *m_messageDeclarationAction = nullptr;
+    QAction *m_asn1DialogAction = nullptr;
     AadlModelStorage *m_aadlStorage = nullptr;
     MscModelStorage *m_mscStorage = nullptr;
 };

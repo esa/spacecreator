@@ -18,8 +18,12 @@
 #include "spacecreatorplugin.h"
 
 #include "aadlchecks.h"
+#include "aadleditordata.h"
+#include "aadleditorfactory.h"
 #include "aadlmodelstorage.h"
+#include "asn1library.h"
 #include "interface/interfacedocument.h"
+#include "iveditor.h"
 #include "iveditorcore.h"
 #include "mscchart.h"
 #include "msceditor.h"
@@ -48,8 +52,10 @@ void initMscResources()
 {
     Q_INIT_RESOURCE(asn1_resources);
     shared::initSharedLibrary();
+    Asn1Acn::initAsn1Library();
     msc::initMscLibrary();
     msc::initMscEditor();
+    aadlinterface::initIvEditor();
 }
 
 using namespace Core;
@@ -81,6 +87,12 @@ bool MSCPlugin::initialize(const QStringList &arguments, QString *errorString)
 
     auto editorManager = Core::EditorManager::instance();
 
+    m_aadlStorage = new AadlModelStorage(this);
+    m_mscStorage = new MscModelStorage(this);
+    m_mscFactory = new MscEditorFactory(this);
+    m_aadlFactory = new AadlEditorFactory(this);
+
+    // MSC
     m_messageDeclarationAction = new QAction(tr("Message declarations ..."), this);
     Core::Command *messageDeclCmd =
             Core::ActionManager::registerAction(m_messageDeclarationAction, Constants::MESSAGE_DECLARATIONS_ID);
@@ -118,10 +130,7 @@ bool MSCPlugin::initialize(const QStringList &arguments, QString *errorString)
     menu->addAction(showMinimapCmd);
     Core::ActionManager::actionContainer(Core::Constants::M_TOOLS)->addMenu(menu);
 
-    m_aadlStorage = new AadlModelStorage(this);
-    m_mscStorage = new MscModelStorage(this);
-    m_factory = new MscEditorFactory(this);
-    connect(m_factory, &MscEditorFactory::mscDataLoaded, this,
+    connect(m_mscFactory, &MscEditorFactory::mscDataLoaded, this,
             [this](const QString &fileName, QSharedPointer<msc::MSCEditorCore> mscData) {
                 mscData->aadlChecker()->setIvPlugin(ivPlugin()); // All msc documents have access to the iv model
                 m_mscStorage->setMscData(fileName, mscData);
@@ -134,6 +143,45 @@ bool MSCPlugin::initialize(const QStringList &arguments, QString *errorString)
         connect(plugin, SIGNAL(aadlDataLoaded(const QString &, QSharedPointer<aadlinterface::IVEditorCore>)),
                 m_aadlStorage, SLOT(setIvData(const QString &, QSharedPointer<aadlinterface::IVEditorCore>)));
     }
+
+    // AADL
+    m_asn1DialogAction = new QAction(tr("Show ASN1 dialog ..."), this);
+    Core::Command *showAsn1Cmd = Core::ActionManager::registerAction(m_asn1DialogAction, Constants::AADL_SHOW_ASN1_ID);
+    connect(m_asn1DialogAction, &QAction::triggered, this, &MSCPlugin::showAsn1Dialog);
+
+    m_asn1DialogAction->setEnabled(false);
+    connect(editorManager, &Core::EditorManager::currentEditorChanged, this, [&](Core::IEditor *editor) {
+        if (editor && editor->document()) {
+            const bool isAadl =
+                    editor->document()->filePath().toString().endsWith("interfaceeditor.xml", Qt::CaseInsensitive);
+            m_asn1DialogAction->setEnabled(isAadl);
+        }
+    });
+
+    QAction *actCommonProps = new QAction(tr("Common Properties"), this);
+    Core::Command *showCommonPropsCmd = Core::ActionManager::registerAction(
+            actCommonProps, Constants::AADL_SHOW_COMMON_PROPS_ID, Core::Context(Core::Constants::C_DESIGN_MODE));
+    connect(actCommonProps, &QAction::triggered, this, &MSCPlugin::onAttributesManagerRequested);
+
+    QAction *actColorScheme = new QAction(tr("Color Scheme"), this);
+    Core::Command *showColorSchemeCmd = Core::ActionManager::registerAction(
+            actColorScheme, Constants::AADL_SHOW_COLOR_SCHEME_ID, Core::Context(Core::Constants::C_DESIGN_MODE));
+    connect(actColorScheme, &QAction::triggered, this, &MSCPlugin::onColorSchemeMenuInvoked);
+
+    QAction *actDynContext = new QAction(tr("Context Actions"), this);
+    Core::Command *showDynContextCmd = Core::ActionManager::registerAction(
+            actDynContext, Constants::AADL_SHOW_DYN_CONTEXT_ID, Core::Context(Core::Constants::C_DESIGN_MODE));
+    connect(actDynContext, &QAction::triggered, this, &MSCPlugin::onDynContextEditorMenuInvoked);
+
+    menu->addSeparator();
+    menu->addAction(showAsn1Cmd);
+    menu->addAction(showCommonPropsCmd);
+    menu->addAction(showColorSchemeCmd);
+    menu->addAction(showDynContextCmd);
+    menu->menu()->setEnabled(true);
+    Core::ActionManager::actionContainer(Core::Constants::M_TOOLS)->addMenu(menu);
+
+    // connect(m_factory, &AadlEditorFactory::aadlDataLoaded, this, &AADLPlugin::aadlDataLoaded);
 
     return true;
 }
@@ -156,7 +204,7 @@ ExtensionSystem::IPlugin::ShutdownFlag MSCPlugin::aboutToShutdown()
 
 void MSCPlugin::showMessageDeclarations()
 {
-    m_factory->editorData()->editMessageDeclarations(Core::ICore::mainWindow());
+    m_mscFactory->editorData()->editMessageDeclarations(Core::ICore::mainWindow());
 }
 
 void MSCPlugin::checkInstances()
@@ -249,7 +297,28 @@ void MSCPlugin::checkMessages()
 
 void MSCPlugin::setMinimapVisible(bool visible)
 {
-    m_factory->editorData()->setMinimapVisible(visible);
+    m_mscFactory->editorData()->setMinimapVisible(visible);
+    m_aadlFactory->editorData()->showMinimap(visible);
+}
+
+void MSCPlugin::showAsn1Dialog()
+{
+    m_aadlFactory->editorData()->showAsn1Dialog();
+}
+
+void MSCPlugin::onAttributesManagerRequested()
+{
+    m_aadlFactory->editorData()->onAttributesManagerRequested();
+}
+
+void MSCPlugin::onColorSchemeMenuInvoked()
+{
+    m_aadlFactory->editorData()->onColorSchemeMenuInvoked();
+}
+
+void MSCPlugin::onDynContextEditorMenuInvoked()
+{
+    m_aadlFactory->editorData()->onDynContextEditorMenuInvoked();
 }
 
 /*!
@@ -269,7 +338,7 @@ ExtensionSystem::IPlugin *MSCPlugin::aadlPlugin() const
 
 QSharedPointer<aadlinterface::IVEditorCore> MSCPlugin::ivPlugin() const
 {
-    QStringList aadlFiles = m_factory->editorData()->aadlFiles();
+    QStringList aadlFiles = m_mscFactory->editorData()->aadlFiles();
     if (aadlFiles.empty()) {
         qWarning() << "No AADL file in the projec";
         return {};
@@ -280,7 +349,7 @@ QSharedPointer<aadlinterface::IVEditorCore> MSCPlugin::ivPlugin() const
 
 QVector<QSharedPointer<msc::MSCEditorCore>> MSCPlugin::allMscCores() const
 {
-    QStringList mscFiles = m_factory->editorData()->mscFiles();
+    QStringList mscFiles = m_mscFactory->editorData()->mscFiles();
     QVector<QSharedPointer<msc::MSCEditorCore>> allMscCores;
     for (const QString &mscFile : mscFiles) {
         QSharedPointer<msc::MSCEditorCore> core = m_mscStorage->mscData(mscFile);
