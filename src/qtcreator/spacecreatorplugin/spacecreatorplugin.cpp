@@ -111,7 +111,7 @@ bool MSCPlugin::initialize(const QStringList &arguments, QString *errorString)
     connect(showMinimapAction, &QAction::triggered, this, &MSCPlugin::setMinimapVisible);
 
     Core::ActionContainer *menu = Core::ActionManager::createMenu(Constants::MENU_ID);
-    menu->menu()->setTitle(tr("MscPlugin"));
+    menu->menu()->setTitle(tr("SpaceCreator"));
     menu->addAction(messageDeclCmd);
     menu->addAction(checkInstancesCmd);
     menu->addAction(checkMessagesCmd);

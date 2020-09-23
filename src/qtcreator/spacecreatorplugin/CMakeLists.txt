@@ -2,8 +2,20 @@ set(PLUGIN_NAME SpaceCreatorPlugin)
 
 set(MSC_PLUGIN_SOURCES
     SpaceCreatorPlugin.json.in
+    aadleditordata.cpp
+    aadleditordata.h
+    aadleditordocument.cpp
+    aadleditordocument.h
+    aadleditorfactory.cpp
+    aadleditorfactory.h
+    aadleditorstack.cpp
+    aadleditorstack.h
+    aadlmainwidget.cpp
+    aadlmainwidget.h
     aadlmodelstorage.cpp
     aadlmodelstorage.h
+    aadltexteditor.cpp
+    aadltexteditor.h
     msccontext.cpp
     msccontext.h
     msceditordata.cpp

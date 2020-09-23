@@ -18,7 +18,7 @@
 #include "aadleditorfactory.h"
 
 #include "aadleditordata.h"
-#include "aadlpluginconstants.h"
+#include "spacecreatorpluginconstants.h"
 
 #include <QGuiApplication>
 #include <coreplugin/fileiconprovider.h>

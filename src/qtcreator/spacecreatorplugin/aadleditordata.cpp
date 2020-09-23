@@ -17,13 +17,13 @@
 
 #include "aadleditordata.h"
 
-#include "aadlcontext.h"
 #include "aadleditordocument.h"
 #include "aadleditorstack.h"
 #include "aadlmainwidget.h"
-#include "aadlpluginconstants.h"
 #include "aadltexteditor.h"
 #include "iveditorcore.h"
+#include "msccontext.h"
+#include "spacecreatorpluginconstants.h"
 
 #include <QToolBar>
 #include <QUndoGroup>
@@ -133,7 +133,7 @@ void AadlEditorData::fullInit()
 
     Core::Context aadlContexts = m_contexts;
     aadlContexts.add(Core::Constants::C_EDITORMANAGER);
-    m_context = new AadlContext(aadlContexts, m_modeWidget, this);
+    m_context = new MscContext(aadlContexts, m_modeWidget, this);
     Core::ICore::addContextObject(m_context);
 
     Core::DesignMode::registerDesignWidget(

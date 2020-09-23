@@ -4,22 +4,10 @@ set(MSC_PLUGIN_SOURCES
     AadlPlugin.json.in
     aadlcontext.cpp
     aadlcontext.h
-    aadleditordata.cpp
-    aadleditordata.h
-    aadleditordocument.cpp
-    aadleditordocument.h
-    aadleditorfactory.cpp
-    aadleditorfactory.h
-    aadleditorstack.cpp
-    aadleditorstack.h
-    aadlmainwidget.cpp
-    aadlmainwidget.h
     aadlplugin.cpp
     aadlplugin.h
     aadlplugin_global.h
     aadlpluginconstants.h
-    aadltexteditor.cpp
-    aadltexteditor.h
 )
 
 set(AADL_QTC_LIBRARIES

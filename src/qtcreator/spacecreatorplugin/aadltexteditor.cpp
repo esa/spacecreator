@@ -19,9 +19,9 @@
 
 #include "aadleditordocument.h"
 #include "aadlmainwidget.h"
-#include "aadlpluginconstants.h"
 #include "interface/interfacedocument.h"
 #include "iveditorcore.h"
+#include "spacecreatorpluginconstants.h"
 
 #include <QFileInfo>
 #include <utils/qtcassert.h>

@@ -38,7 +38,7 @@ namespace spctr {
 
 class AadlTextEditorFactory;
 class AadlEditorStack;
-class AadlContext;
+class MscContext;
 
 class AadlEditorData : public QObject
 {
@@ -66,7 +66,7 @@ private:
     QWidget *createModeWidget();
     Core::EditorToolBar *createMainToolBar();
 
-    AadlContext *m_context = nullptr;
+    MscContext *m_context = nullptr;
     Core::Context m_contexts;
     QWidget *m_modeWidget = nullptr;
     AadlEditorStack *m_widgetStack = nullptr;

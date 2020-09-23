@@ -38,5 +38,21 @@ const char CHECK_MESSAGES_ID[] = "MscPlugin.CheckMessages";
 const char SHOW_MINIMAP_ID[] = "MscPlugin.Minimap";
 const char MENU_ID[] = "MscPlugin.Menu";
 
+const char AADL_MIMETYPE[] = "application/xml";
+
+const char K_AADL_EDITOR_ID[] = "AadlEditor.Editor";
+const char C_AADL_EDITOR[] = "AADL Editor";
+
+// const char INFO_READ_ONLY[] = "AadlEditor.ReadOnly";
+
+const char C_AADLEDITOR_DISPLAY_NAME[] = QT_TRANSLATE_NOOP("OpenWith::Editors", "AADL Editor");
+
+const char AADL_SHOW_ASN1_ID[] = "AadlEditor.MessageDeclarations";
+const char AADL_SHOW_MINIMAP_ID[] = "AadlEditor.Minimap";
+const char AADL_SHOW_COMMON_PROPS_ID[] = "AadlEditor.CommonProps";
+const char AADL_SHOW_COLOR_SCHEME_ID[] = "AadlEditor.ColorScheme";
+const char AADL_SHOW_DYN_CONTEXT_ID[] = "AadlEditor.DynContext";
+const char AADL_MENU_ID[] = "AadlEditor.Menu";
+
 }
 }

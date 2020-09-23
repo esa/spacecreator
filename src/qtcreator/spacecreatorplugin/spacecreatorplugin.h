@@ -42,7 +42,7 @@ class MscModelStorage;
 class MSCPlugin : public ExtensionSystem::IPlugin
 {
     Q_OBJECT
-    Q_PLUGIN_METADATA(IID "org.qt-project.Qt.QtCreatorPlugin" FILE "MscPlugin.json")
+    Q_PLUGIN_METADATA(IID "org.qt-project.Qt.QtCreatorPlugin" FILE "SpaceCreatorPlugin.json")
 
 public:
     MSCPlugin();

@@ -21,6 +21,7 @@
 #include "msceditordata.h"
 #include "spacecreatorpluginconstants.h"
 
+#include <QDebug>
 #include <QGuiApplication>
 #include <coreplugin/fileiconprovider.h>
 

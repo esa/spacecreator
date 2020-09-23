@@ -18,7 +18,7 @@
 #include "aadleditordocument.h"
 
 #include "aadlmainwidget.h"
-#include "aadlpluginconstants.h"
+#include "spacecreatorpluginconstants.h"
 
 #include <QFileInfo>
 #include <QTextCodec>
