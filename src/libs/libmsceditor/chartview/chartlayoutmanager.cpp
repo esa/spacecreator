@@ -886,6 +886,12 @@ void ChartLayoutManager::checkVerticalConstraints()
         if (!item) {
             continue;
         }
+        // Ignore global comments
+        if (auto commentItem = qobject_cast<CommentItem *>(item)) {
+            if (commentItem->isGlobal()) {
+                continue;
+            }
+        }
 
         bool updateBox = true;
         bool shiftIfNeeded = true;
