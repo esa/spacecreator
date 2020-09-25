@@ -17,14 +17,23 @@
 
 #include "iveditorcore.h"
 
+#include "aadlobjectfunction.h"
+#include "aadlobjectsmodel.h"
+#include "baseitems/common/aadlutils.h"
 #include "commandlineparser.h"
+#include "commandsstack.h"
 #include "context/action/actionsmanager.h"
+#include "interface/commands/cmdfunctionitemcreate.h"
+#include "interface/commands/commandsfactory.h"
 #include "interface/interfacedocument.h"
 #include "mainwindow.h"
 
+#include <QDebug>
 #include <QMainWindow>
 #include <QMenu>
+#include <QRectF>
 #include <QToolBar>
+#include <QUndoStack>
 
 namespace aadlinterface {
 
@@ -113,6 +122,22 @@ void IVEditorCore::populateCommandLineArguments(shared::CommandLineParser *parse
     parser->handlePositional(shared::CommandLineParser::Positional::ExportToFile);
     parser->handlePositional(shared::CommandLineParser::Positional::ListScriptableActions);
     parser->handlePositional(shared::CommandLineParser::Positional::DropUnsavedChangesSilently);
+}
+
+/*!
+   Adds an aadl function with the given \p name
+   @todo handle positioning of the function
+ */
+void IVEditorCore::addFunction(const QString &name)
+{
+    if (!aadlinterface::cmd::CommandsStack::current()) {
+        aadlinterface::cmd::CommandsStack::setCurrent(new QUndoStack(this));
+    }
+
+    aadl::AADLObjectFunction *parent = nullptr;
+    const QVariantList params = { QVariant::fromValue(m_document->objectsModel()), QVariant::fromValue(parent),
+        QVariant::fromValue(QRectF(QPointF(10., 10.), DefaultGraphicsItemSize)), QVariant::fromValue(name) };
+    cmd::CommandsStack::current()->push(cmd::CommandsFactory::create(cmd::CreateFunctionEntity, params));
 }
 
 }

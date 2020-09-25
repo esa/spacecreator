@@ -69,6 +69,22 @@ void AadlChecks::setIvCore(QSharedPointer<aadlinterface::IVEditorCore> ivCore)
 }
 
 /*!
+   Returns a pointer to the IV editor model
+ */
+const QSharedPointer<aadlinterface::IVEditorCore> &AadlChecks::ivPlugin() const
+{
+    return m_ivCore;
+}
+
+/*!
+   Returns if the IV model has be set
+ */
+bool AadlChecks::hasIvModel() const
+{
+    return !m_ivCore.isNull();
+}
+
+/*!
    Checks all instances if they are defined in the IV model as function
  */
 QVector<QPair<MscChart *, MscInstance *>> AadlChecks::checkInstanceNames() const
@@ -221,13 +237,12 @@ aadl::AADLObjectsModel *AadlChecks::aadlModel() const
         return {};
     }
 
-    QSharedPointer<aadlinterface::IVEditorCore> ivCore = m_ivCore.toStrongRef();
-    if (!ivCore->document() || !ivCore->document()->objectsModel()) {
+    if (!m_ivCore->document() || !m_ivCore->document()->objectsModel()) {
         qWarning() << "No AADLObjectsModel";
         return {};
     }
 
-    return ivCore->document()->objectsModel();
+    return m_ivCore->document()->objectsModel();
 }
 
 /*!

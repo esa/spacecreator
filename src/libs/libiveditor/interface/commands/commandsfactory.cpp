@@ -122,14 +122,15 @@ QUndoCommand *CommandsFactory::create(Id id, const QVariantList &params)
 
 QUndoCommand *CommandsFactory::createFunctionCommand(const QVariantList &params)
 {
-    Q_ASSERT(params.size() == 3);
+    Q_ASSERT(params.size() == 3 || params.size() == 4);
     const QVariant model = params.value(0);
     const QVariant parent = params.value(1);
     const QVariant geometry = params.value(2);
+    const QString name = params.size() == 4 ? params.value(3).toString() : "";
     if (geometry.isValid() && geometry.canConvert<QRectF>() && model.isValid()
             && model.canConvert<aadl::AADLObjectsModel *>() && parent.canConvert<aadl::AADLObjectFunction *>())
         return new CmdFunctionItemCreate(model.value<aadl::AADLObjectsModel *>(),
-                parent.value<aadl::AADLObjectFunction *>(), geometry.value<QRectF>());
+                parent.value<aadl::AADLObjectFunction *>(), geometry.value<QRectF>(), name);
 
     return nullptr;
 }

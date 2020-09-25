@@ -54,6 +54,8 @@ public:
 
     void setMscCore(msc::MSCEditorCore *mscCore);
     void setIvCore(QSharedPointer<aadlinterface::IVEditorCore> ivCore);
+    const QSharedPointer<aadlinterface::IVEditorCore> &ivPlugin() const;
+    bool hasIvModel() const;
 
     QVector<QPair<msc::MscChart *, msc::MscInstance *>> checkInstanceNames() const;
     QVector<QPair<msc::MscChart *, msc::MscInstance *>> checkInstanceRelations() const;
@@ -84,7 +86,7 @@ private:
     bool correspond(const aadl::AADLObjectConnection *connection, const msc::MscMessage *message) const;
 
     QPointer<msc::MSCEditorCore> m_mscCore;
-    QWeakPointer<aadlinterface::IVEditorCore> m_ivCore;
+    QSharedPointer<aadlinterface::IVEditorCore> m_ivCore;
 
     QVector<aadl::AADLObjectFunction *> m_aadlFunctions;
     QVector<aadl::AADLObjectConnection *> m_aadlConnections;

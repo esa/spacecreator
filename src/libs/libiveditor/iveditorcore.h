@@ -47,6 +47,8 @@ public:
     QAction *actionSaveSceneRender() { return m_actionSaveSceneRender; }
     QAction *actionShowAsnDialog() { return m_actionShowAsnDialog; }
 
+    void addFunction(const QString &name);
+
 private:
     aadlinterface::InterfaceDocument *m_document { nullptr };
 

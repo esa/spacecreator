@@ -29,6 +29,7 @@
 #include "cif/cifblocks.h"
 #include "cif/ciflines.h"
 #include "commands/common/commandsstack.h"
+#include "iveditorcore.h"
 #include "messageitem.h"
 #include "mscchart.h"
 #include "mscinstance.h"
@@ -42,6 +43,7 @@
 #include <QGraphicsSceneMouseEvent>
 #include <QGraphicsTextItem>
 #include <QLinearGradient>
+#include <QMessageBox>
 #include <QPainter>
 #include <QPainterPath>
 #include <QUndoStack>
@@ -322,15 +324,31 @@ void InstanceItem::initGripPoints()
 void InstanceItem::onNameEdited(const QString &newName)
 {
     Q_ASSERT(m_chart);
-    if (newName.isEmpty())
+    if (newName.isEmpty()) {
         return;
+    }
+
+    m_headSymbol->removeCompleter();
 
     if (m_chart->instanceByName(newName)) {
         // revert to old name as the given name is used already
         m_headSymbol->setName(m_instance->name());
+
     } else {
         using namespace msc::cmd;
         CommandsStack::push(RenameEntity, { QVariant::fromValue<MscEntity *>(this->modelItem()), newName });
+
+        msc::AadlChecks *checker = m_model ? m_model->aadlChecker() : nullptr;
+        if (checker && checker->hasIvModel() && !checker->functionsNames().contains(m_instance->name())) {
+            const int result = QMessageBox::question(nullptr, tr("No AADL function"),
+                    tr("The AADL model doesn't contain a function called:\n%1\n"
+                       "\nDo you want to add it to the AADL model?")
+                            .arg(newName));
+            if (result == QMessageBox::Yes) {
+                checker->ivPlugin()->addFunction(newName);
+                checkAadlFunction();
+            }
+        }
     }
 }
 

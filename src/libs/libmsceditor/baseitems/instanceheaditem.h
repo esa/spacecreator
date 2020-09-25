@@ -51,6 +51,7 @@ public:
 
     void setAadlChecker(AadlChecks *checker);
     void showCompleter();
+    void removeCompleter();
 
 public Q_SLOTS:
     void setName(const QString &name);

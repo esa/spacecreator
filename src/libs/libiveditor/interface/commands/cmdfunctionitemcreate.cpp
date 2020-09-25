@@ -29,12 +29,12 @@ namespace aadlinterface {
 namespace cmd {
 
 CmdFunctionItemCreate::CmdFunctionItemCreate(
-        aadl::AADLObjectsModel *model, aadl::AADLObjectFunction *parent, const QRectF &geometry)
+        aadl::AADLObjectsModel *model, aadl::AADLObjectFunction *parent, const QRectF &geometry, const QString &title)
     : CmdEntityGeometryChange({}, QObject::tr("Create Function"))
     , m_model(model)
     , m_parent(parent)
     , m_entity(new aadl::AADLObjectFunction(
-              QString(), m_parent ? qobject_cast<QObject *>(m_parent) : qobject_cast<QObject *>(m_model)))
+              title, m_parent ? qobject_cast<QObject *>(m_parent) : qobject_cast<QObject *>(m_model)))
 {
     prepareData({ qMakePair(m_entity, QVector<QPointF> { geometry.topLeft(), geometry.bottomRight() }) });
 }

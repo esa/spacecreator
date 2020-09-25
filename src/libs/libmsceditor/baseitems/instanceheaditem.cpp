@@ -342,4 +342,12 @@ void InstanceHeadItem::showCompleter()
     }
 }
 
+/*!
+   Removes the completer if it is used.
+ */
+void InstanceHeadItem::removeCompleter()
+{
+    m_textItemName->removeCompleter();
+}
+
 } // ns msc
