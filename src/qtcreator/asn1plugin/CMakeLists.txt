@@ -288,4 +288,3 @@ target_include_directories(${PLUGIN_NAME}
 
 install(FILES generic-highlighter/syntax/acn.xml generic-highlighter/syntax/asn1.xml DESTINATION ${IDE_DATA_PATH}/generic-highlighter)
 install(DIRECTORY snippets DESTINATION ${IDE_DATA_PATH})
-install(DIRECTORY templates DESTINATION ${IDE_DATA_PATH})
