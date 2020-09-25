@@ -1,0 +1,42 @@
+{
+    "version": 1,
+    "supportedProjectTypes": [ ],
+    "id": "ESA.MSC",
+    "category": "X.SpaceCreator",
+    "trDescription": "Creates an empty MSC file.",
+    "trDisplayName": "Message Sequence Chart",
+    "trDisplayCategory": "Space Creator",
+    "icon": "icon.png",
+    "platformIndependent": true,
+
+    "options": [
+        { "key": "FileName", "value": "%{JS: Util.fileName(value('TargetPath'), Util.preferredSuffix('application/msc'))}" },
+        { "key": "InitialFileName", "value": "file.msc" }
+    ],
+
+    "pages" :
+    [
+        {
+            "trDisplayName": "Location",
+            "trShortTitle": "Location",
+            "typeId": "File"
+        },
+        {
+            "trDisplayName": "Project Management",
+            "trShortTitle": "Summary",
+            "typeId": "Summary"
+        }
+    ],
+    "generators" :
+    [
+        {
+            "typeId": "File",
+            "data":
+            {
+                "source": "empty.msc",
+                "target": "%{FileName}",
+                "openInEditor": true
+            }
+        }
+    ]
+}
