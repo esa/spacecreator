@@ -1,0 +1,42 @@
+{
+    "version": 1,
+    "supportedProjectTypes": [ ],
+    "id": "ESA.InterfaceViewXML",
+    "category": "X.SpaceCreator",
+    "trDescription": "Creates an empty interface view file.",
+    "trDisplayName": "Interface View File",
+    "trDisplayCategory": "Space Creator",
+    "icon": "icon.png",
+    "platformIndependent": true,
+
+    "options": [
+        { "key": "FileName", "value": "%{JS: Util.fileName(value('TargetPath'), Util.preferredSuffix('text/xml'))}" },
+        { "key": "InitialFileName", "value": "interfaceview.xml" }
+    ],
+
+    "pages" :
+    [
+        {
+            "trDisplayName": "Location",
+            "trShortTitle": "Location",
+            "typeId": "File"
+        },
+        {
+            "trDisplayName": "Project Management",
+            "trShortTitle": "Summary",
+            "typeId": "Summary"
+        }
+    ],
+    "generators" :
+    [
+        {
+            "typeId": "File",
+            "data":
+            {
+                "source": "interfaceview.xml",
+                "target": "%{FileName}",
+                "openInEditor": true
+            }
+        }
+    ]
+}
