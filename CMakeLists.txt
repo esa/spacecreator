@@ -86,6 +86,9 @@ add_custom_target(BuildFiles SOURCES
 # The actual code
 add_subdirectory(src)
 
+# The wizards
+add_subdirectory(wizards)
+
 # Testing
 option(ENABLE_TESTS "Build the tests" ON)
 if(ENABLE_TESTS)
