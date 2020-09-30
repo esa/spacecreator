@@ -1,10 +1,10 @@
 {
     "version": 1,
     "supportedProjectTypes": [ "CMakeProjectManager.CMakeProject", "Qt4ProjectManager.Qt4Project" ],
-    "id": "S.Plain Asn1Acn Project",
+    "id": "S.SpaceCreator Project",
     "category": "I.Projects",
-    "trDescription": "Create Asn1Acn project with optional default models.",
-    "trDisplayName": "Plain ASN.1/ACN Project",
+    "trDescription": "Create SpaceCreator project with optional default models.",
+    "trDisplayName": "SpaceCreator Project",
     "trDisplayCategory": "Non-Qt Project",
     "enabled": true,
 
@@ -15,8 +15,10 @@
         { "key": "CMakeFile", "value": "%{ProjectDirectory}/CMakeLists.txt" },
         { "key": "AsnFile", "value": "%{JS: Util.fileName('%{Model}', '%{AsnModelExtension}')}" },
         { "key": "AsnRelativePath", "value": "%{JS: Util.relativeFilePath('%{AsnTargetDirectory}', '%{ProjectDirectory}')}" },
-        { "key": "AcnFile", "value": "%{JS: Util.fileName('%{Model}', '%{JS: Util.preferredSuffix('text/x-acn')}')}" },
-        { "key": "AcnRelativePath", "value": "%{JS: Util.relativeFilePath('%{AcnTargetDirectory}', '%{ProjectDirectory}')}" }
+        { "key": "MSCFile", "value": "%{JS: Util.fileName('%{Model}.msc', '%{JS: Util.preferredSuffix('application/x-msc')}')}" },
+        { "key": "MSCRelativePath", "value": "%{JS: Util.relativeFilePath('%{MSCTargetDirectory}', '%{ProjectDirectory}')}" },
+        { "key": "IVFile", "value": "%{JS: Util.fileName('interfaceview.xml', '%{JS: Util.preferredSuffix('text/xml')}')}" },
+        { "key": "IVRelativePath", "value": "%{JS: Util.relativeFilePath('%{IVTargetDirectory}', '%{ProjectDirectory}')}" }
     ],
 
     "pages":
@@ -59,24 +61,29 @@
                     "name": "AddAsnFile",
                     "trDisplayName": "Add ASN.1 file",
                     "type": "CheckBox",
-                    "data": { "checked": false }
+                    "data": { "checked": true }
                 },
                 {
-                    "name": "AddAcnFile",
-                    "trDisplayName": "Add ACN file",
+                    "name": "AddMSCFile",
+                    "trDisplayName": "Add MSC file",
                     "type": "CheckBox",
-                    "data": { "checked": false }
+                    "data": { "checked": true }
+                },
+                {
+                    "name": "AddIVFile",
+                    "trDisplayName": "Add AADL/XML file",
+                    "type": "CheckBox",
+                    "data": { "checked": true }
                 },
                 {
                     "name": "Model",
                     "trDisplayName": "Model name:",
-                    "visible": "%{JS: (%{AddAsnFile} || %{AddAcnFile})}",
+                    "visible": "%{JS: (%{AddAsnFile} || %{AddMSCFile})}",
                     "mandatory": true,
                     "type": "LineEdit",
                     "data":
                     {
-                        "validator": "[A-Z]([a-zA-Z0-9]|-)*",
-                        "fixup": "%{JS: '%{INPUT}'.charAt(0).toUpperCase() + '%{INPUT}'.slice(1) }"
+                        "validator": "[A-Z]([a-zA-Z0-9]|-)*"
                     }
                 },
                 {
@@ -129,23 +136,47 @@
                     "type": "Spacer",
                     "visible": "%{JS: %{AddAsnFile}}",
                     "data": { "factor": 4 }
-                },
+                    },
                 {
-                    "name": "AcnFileEdit",
+                    "name": "MSCFileEdit",
                     "type": "LineEdit",
-                    "trDisplayName": "ACN name:",
-                    "visible": "%{JS: %{AddAcnFile}}",
+                    "trDisplayName": "MSC name:",
+                    "visible": "%{JS: %{AddMSCFile}}",
                     "mandatory": true,
                     "data":
                     {
-                        "trText": "%{AcnFile}"
+                        "trText": "%{MSCFile}"
                     }
                 },
                 {
-                    "name": "AcnTargetDirectory",
+                    "name": "MSCTargetDirectory",
                     "type": "PathChooser",
-                    "trDisplayName": "ACN path:",
-                    "visible": "%{JS: %{AddAcnFile}}",
+                    "trDisplayName": "MSC path:",
+                    "visible": "%{JS: %{AddMSCFile}}",
+                    "mandatory": true,
+                    "data":
+                    {
+                        "kind": "directory",
+                        "basePath": "%{ProjectDirectory}",
+                        "path": "%{ProjectDirectory}"
+                    }
+                },
+                {
+                    "name": "IVFileEdit",
+                    "type": "LineEdit",
+                    "trDisplayName": "Interface view (AADL/XML) name:",
+                    "visible": "%{JS: %{AddIVFile}}",
+                    "mandatory": true,
+                    "data":
+                    {
+                        "trText": "%{IVFile}"
+                    }
+                },
+                {
+                    "name": "IVTargetDirectory",
+                    "type": "PathChooser",
+                    "trDisplayName": "Interface view (AADL/XML) path:",
+                    "visible": "%{JS: %{AddIVFile}}",
                     "mandatory": true,
                     "data":
                     {
@@ -182,19 +213,19 @@
                     "condition": "%{JS: '%{BuildSystem}' === 'qmake'}"
                 },
                 {
-                    "source": "handleAsn1AcnBuild.pri",
+                    "source": "../asn1acn/handleAsn1AcnBuild.pri",
                     "target": "handleAsn1AcnBuild.pri",
                     "openAsProject": false,
                     "condition": "%{JS: '%{BuildSystem}' === 'qmake'}"
                 },
                 {
-                    "source": "updateSourcesList.pri",
+                    "source": "../asn1acn/updateSourcesList.pri",
                     "target": "updateSourcesList.pri",
                     "openAsProject": false,
                     "condition": "%{JS: '%{BuildSystem}' === 'qmake'}"
                 },
                 {
-                    "source": "generateFromAsn1.pri",
+                    "source": "../asn1acn/generateFromAsn1.pri",
                     "target": "generateFromAsn1.pri",
                     "openAsProject": false,
                     "condition": "%{JS: '%{BuildSystem}' === 'qmake'}"
@@ -206,39 +237,40 @@
                     "condition": "%{JS: '%{BuildSystem}' === 'cmake'}"
                 },
                 {
-                    "source": "asn1sccSettings.cmake",
+                    "source": "../asn1acn/asn1sccSettings.cmake",
                     "target": "asn1sccSettings.cmake",
                     "openAsProject": false,
                     "condition": "%{JS: '%{BuildSystem}' === 'cmake'}"
                 },
                 {
-                    "source": "configureAsn1SccTarget.cmake",
+                    "source": "../asn1acn/configureAsn1SccTarget.cmake",
                     "target": "configureAsn1SccTarget.cmake",
                     "openAsProject": false,
                     "condition": "%{JS: '%{BuildSystem}' === 'cmake'}"
                 },
                 {
-                    "source": "createFilesList.cmake",
+                    "source": "../asn1acn/createFilesList.cmake",
                     "target": "createFilesList.cmake",
                     "openAsProject": false,
                     "condition": "%{JS: '%{BuildSystem}' === 'cmake'}"
                 },
                 {
-                    "source": "template.asn",
+                    "source": "../asn1acn/template.asn",
                     "target": "%{AsnTargetDirectory}/%{AsnFile}",
                     "openInEditor": true,
                     "condition": "%{AddAsnFile}"
                 },
                 {
-                    "source": "template.acn",
-                    "target": "%{AcnTargetDirectory}/%{AcnFile}",
+                    "source": "../../files/msc/empty.msc",
+                    "target": "%{MSCTargetDirectory}/%{MSCFile}",
                     "openInEditor": true,
-                    "condition": "%{AddAcnFile}"
+                    "condition": "%{AddMSCFile}"
                 },
                 {
-                    "source": "../git.ignore",
-                    "target": ".gitignore",
-                    "condition": "%{JS: ! %{IsSubproject} && '%{VersionControl}' === 'G.Git'}"
+                    "source": "../../files/interfaceview/interfaceview.xml",
+                    "target": "%{IVTargetDirectory}/%{IVFile}",
+                    "openInEditor": true,
+                    "condition": "%{AddIVFile}"
                 }
             ]
         }
