@@ -38,6 +38,11 @@ ChartBaseCommand::ChartBaseCommand(
  */
 void ChartBaseCommand::checkVisualSorting()
 {
+    if (m_layoutManager && m_layoutManager->isStreamingModeEnabled()) {
+        // Dont do a visual check, as in streaming mode, only a subset of events might be shown
+        return;
+    }
+
     if (m_newSortedEvents.isEmpty() && m_layoutManager) {
         m_layoutManager->doLayout();
         m_newSortedEvents = m_layoutManager->visuallySortedEvents();

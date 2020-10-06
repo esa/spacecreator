@@ -110,6 +110,8 @@ public:
 
     const QVector<msc::InstanceItem *> &instanceItems() const;
 
+    const QVector<msc::InteractiveObject *> &instanceEventItems() const;
+
     const QVector<msc::ActionItem *> actionsOfInstance(const MscInstance *instance) const;
     const QVector<msc::ConditionItem *> conditionsOfInstance(const MscInstance *instance) const;
     const QVector<msc::TimerItem *> timersOfInstance(const MscInstance *instance) const;
@@ -120,6 +122,8 @@ public:
 
     void setAadlChecker(AadlChecks *aadlChecker);
     AadlChecks *aadlChecker() const;
+
+    bool layoutUpdatePending() const;
 
 public Q_SLOTS:
     void updateLayout();

@@ -76,8 +76,10 @@ void ChartViewTestBase::loadView(const QString &mscDoc)
 void ChartViewTestBase::waitForLayoutUpdate()
 {
     QApplication::processEvents();
-    QTest::qWait(2);
-    QApplication::processEvents();
+    while (m_chartModel && m_chartModel->layoutUpdatePending()) {
+        QTest::qWait(2);
+        QApplication::processEvents();
+    }
 }
 
 QPoint ChartViewTestBase::center(const QGraphicsItem *item) const

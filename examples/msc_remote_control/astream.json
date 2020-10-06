@@ -116,6 +116,99 @@
                 "name": "Condition_2",
                 "instanceName": "Instance_B"
             }
+        },
+        {
+            "CommandType": "Condition",
+            "Parameters": {
+                "name": "Condition_shared_2",
+                "instanceName": "Instance_B"
+            }
+        },
+        {
+            "CommandType": "Message",
+            "Parameters": {
+                "name": "Message_C-A",
+                "srcName": "Instance_C",
+                "dstName": "Instance_A"
+            }
+        },
+        {
+            "CommandType": "Timer",
+            "Parameters": {
+                "name": "Timer_C_2",
+                "instanceName": "Instance_C",
+                "TimerType": "Start"
+            }
+        },
+        {
+            "CommandType": "Timer",
+            "Parameters": {
+                "name": "Timer_A_2",
+                "instanceName": "Instance_A",
+                "TimerType": "Timeout"
+            }
+        },
+        {
+            "CommandType": "Message",
+            "Parameters": {
+                "name": "Message_B_C",
+                "srcName": "Instance_B",
+                "dstName": "Instance_C"
+            }
+        },
+        {
+            "CommandType": "Timer",
+            "Parameters": {
+                "name": "Timer_C_2",
+                "instanceName": "Instance_C",
+                "TimerType": "Stop"
+            }
+        },
+        {
+            "CommandType": "Message",
+            "Parameters": {
+                "name": "Message_A-B",
+                "srcName": "Instance_A",
+                "dstName": "Instance_B"
+            }
+        },
+        {
+            "CommandType": "Timer",
+            "Parameters": {
+                "name": "Timer_A_3",
+                "instanceName": "Instance_A",
+                "TimerType": "Start"
+            }
+        },
+        {
+            "CommandType": "Condition",
+            "Parameters": {
+                "name": "Condition_3",
+                "instanceName": "Instance_B"
+            }
+        },
+        {
+            "CommandType": "Condition",
+            "Parameters": {
+                "name": "Condition_shared_3",
+                "instanceName": "Instance_B"
+            }
+        },
+        {
+            "CommandType": "Message",
+            "Parameters": {
+                "name": "Message_C-A",
+                "srcName": "Instance_C",
+                "dstName": "Instance_A"
+            }
+        },
+        {
+            "CommandType": "Timer",
+            "Parameters": {
+                "name": "Timer_C_3",
+                "instanceName": "Instance_C",
+                "TimerType": "Start"
+            }
         }
     ]
 }

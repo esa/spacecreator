@@ -15,10 +15,14 @@
    along with this program. If not, see <https://www.gnu.org/licenses/lgpl-2.1.html>.
 */
 
+#include "actionitem.h"
 #include "chartitem.h"
 #include "chartviewtestbase.h"
+#include "commands/cmdactionitemcreate.h"
+#include "commands/common/commandsstack.h"
 #include "instanceitem.h"
 #include "messageitem.h"
+#include "mscaction.h"
 #include "mscchart.h"
 #include "mscinstance.h"
 #include "mscmessage.h"
@@ -38,21 +42,21 @@ private Q_SLOTS:
     void cleanup() { cleanupBase(); }
 
     void testKeepSpaceAtBottom();
+    void testItemLimit();
 };
 
 void tsti_Chartitem::testKeepSpaceAtBottom()
 {
-    static const QString msc("MSCDOCUMENT doc1; \
-                             MSC msc1; \
-                                 INSTANCE A; \
-                                     OUT m1 TO B; \
-                                 ENDINSTANCE; \
-                                 INSTANCE B; \
-                                     IN m1 FROM A; \
-                                 ENDINSTANCE; \
-                             ENDMSC; \
-                         ENDMSCDOCUMENT;");
-
+    const QString msc("MSCDOCUMENT doc1; \
+                         MSC msc1; \
+                             INSTANCE A; \
+                                 OUT m1 TO B; \
+                             ENDINSTANCE; \
+                             INSTANCE B; \
+                                 IN m1 FROM A; \
+                             ENDINSTANCE; \
+                         ENDMSC; \
+                     ENDMSCDOCUMENT;");
     loadView(msc);
 
     msc::ChartItem *chartItem = m_chartModel->itemForChart();
@@ -78,6 +82,58 @@ void tsti_Chartitem::testKeepSpaceAtBottom()
 
     // The chart increases it's height, so a new item can be added easily (space at the bottom)
     QVERIFY(newRect.height() > oldRect.height());
+}
+
+void tsti_Chartitem::testItemLimit()
+{
+    const QString msc("MSCDOCUMENT doc1; \
+                         MSC msc1; \
+                             INSTANCE A; \
+                                 ACTION 'a0';\
+                                 OUT m2 TO B; \
+                             ENDINSTANCE; \
+                             INSTANCE B; \
+                                 ACTION 'a1';\
+                                 IN m2 FROM A; \
+                             ENDINSTANCE; \
+                         ENDMSC; \
+                     ENDMSCDOCUMENT;");
+    m_chartModel->setVisibleItemLimit(3);
+    loadView(msc);
+
+    QCOMPARE(m_chart->instanceEvents().size(), 3);
+    QCOMPARE(m_chartModel->instanceEventItems().size(), 3);
+    InteractiveObject *action0 = m_chartModel->itemForEntity(m_chart->instanceEvents().at(0));
+    QVERIFY(action0 != nullptr);
+    InteractiveObject *action1 = m_chartModel->itemForEntity(m_chart->instanceEvents().at(1));
+    QVERIFY(action1 != nullptr);
+    InteractiveObject *message2 = m_chartModel->itemForEntity(m_chart->instanceEvents().at(2));
+    QVERIFY(message2 != nullptr);
+
+    // append one action
+    auto instanceA = qobject_cast<msc::MscInstance *>(m_chart->instances().at(0));
+    auto addCommand = new cmd::CmdActionItemCreate(nullptr, instanceA, -1, m_chart, m_chartModel.data());
+    cmd::CommandsStack::current()->push(addCommand);
+    waitForLayoutUpdate();
+    QCOMPARE(m_chart->instanceEvents().size(), 4);
+    const QVector<InteractiveObject *> &items = m_chartModel->instanceEventItems();
+    QCOMPARE(items.size(), 3);
+    QVERIFY(!items.contains(action0)); // action0 is not shown anymore
+    QVERIFY(items.contains(action1));
+    QVERIFY(items.contains(message2));
+    InteractiveObject *action3 = m_chartModel->itemForEntity(m_chart->instanceEvents().at(3));
+    QVERIFY(action3 != nullptr);
+
+    // append one more action, pusing the message to the top
+    addCommand = new cmd::CmdActionItemCreate(nullptr, instanceA, -1, m_chart, m_chartModel.data());
+    cmd::CommandsStack::current()->push(addCommand);
+    waitForLayoutUpdate();
+    QCOMPARE(m_chart->instanceEvents().size(), 5);
+    QCOMPARE(items.size(), 3);
+    QVERIFY(!items.contains(action0)); // action0 is not shown anymore
+    QVERIFY(!items.contains(action1)); // action1 is not shown anymore
+    QVERIFY(items.contains(message2));
+    QVERIFY(items.contains(action3));
 }
 
 QTEST_MAIN(tsti_Chartitem)

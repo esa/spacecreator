@@ -712,6 +712,15 @@ const QVector<InstanceItem *> &ChartLayoutManager::instanceItems() const
 }
 
 /*!
+   Returns all instance event items
+   \note The sorting is not neccesarily in the correct (vertical) order
+ */
+const QVector<InteractiveObject *> &ChartLayoutManager::instanceEventItems() const
+{
+    return d->m_instanceEventItemsSorted;
+}
+
+/*!
    Returns all action items belonging to the given instance
  */
 const QVector<ActionItem *> ChartLayoutManager::actionsOfInstance(const msc::MscInstance *instance) const
@@ -1850,6 +1859,14 @@ void ChartLayoutManager::setAadlChecker(AadlChecks *aadlChecker)
 AadlChecks *ChartLayoutManager::aadlChecker() const
 {
     return d->m_aadlChecker.data();
+}
+
+/*!
+   Returns if a layout update is still pending
+ */
+bool ChartLayoutManager::layoutUpdatePending() const
+{
+    return d->m_layoutUpdateTimer.isActive();
 }
 
 void ChartLayoutManager::setInstancesRect(const QRectF &rect)
