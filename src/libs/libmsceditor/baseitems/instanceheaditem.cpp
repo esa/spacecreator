@@ -21,6 +21,7 @@
 #include "baseitems/common/coordinatesconverter.h"
 #include "baseitems/common/mscutils.h"
 #include "baseitems/textitem.h"
+#include "mscchart.h"
 #include "mscinstance.h"
 
 #include <QCursor>
@@ -83,11 +84,12 @@ QLinearGradient InstanceHeadItem::createGradientForName(const QGraphicsItem *ite
     return gradient;
 }
 
-InstanceHeadItem::InstanceHeadItem(QGraphicsItem *parent)
+InstanceHeadItem::InstanceHeadItem(MscChart *chart, QGraphicsItem *parent)
     : QGraphicsObject(parent)
     , m_textItemName(new NameItem(this))
     , m_rectItem(new QGraphicsRectItem(this))
     , m_textItemKind(new TextItem(this))
+    , m_chart(chart)
 {
     m_textItemKind->setBackgroundColor(Qt::transparent);
     m_textItemKind->setEditable(true);
@@ -338,7 +340,13 @@ void InstanceHeadItem::setAadlChecker(AadlChecks *checker)
 void InstanceHeadItem::showCompleter()
 {
     if (m_aadlChecker) {
-        m_textItemName->updateCompleter(m_aadlChecker->functionsNames());
+        QStringList functionNames = m_aadlChecker->functionsNames();
+        if (!m_chart.isNull()) {
+            for (MscInstance *instance : m_chart->instances()) {
+                functionNames.removeAll(instance->name());
+            }
+        }
+        m_textItemName->updateCompleter(functionNames);
     }
 }
 

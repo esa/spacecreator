@@ -59,7 +59,7 @@ InstanceItem::InstanceItem(
     , m_instance(instance)
     , m_chart(chart)
     , m_axisSymbol(new QGraphicsLineItem(this))
-    , m_headSymbol(new InstanceHeadItem(this))
+    , m_headSymbol(new InstanceHeadItem(chart, this))
     , m_endSymbol(new InstanceEndItem(m_instance->explicitStop(), this))
 {
     Q_ASSERT(m_instance != nullptr);

@@ -19,9 +19,11 @@
 
 #include <QGraphicsObject>
 #include <QLinearGradient>
+#include <QPointer>
 
 namespace msc {
 class AadlChecks;
+class MscChart;
 class TextItem;
 
 class InstanceHeadItem : public QGraphicsObject
@@ -32,7 +34,7 @@ class InstanceHeadItem : public QGraphicsObject
     Q_PROPERTY(QString kind READ kind WRITE setKind NOTIFY kindEdited)
 
 public:
-    explicit InstanceHeadItem(QGraphicsItem *parent = nullptr);
+    InstanceHeadItem(MscChart *chart, QGraphicsItem *parent = nullptr);
 
     QString name() const;
     QString kind() const;
@@ -77,12 +79,14 @@ private:
     static QLinearGradient createGradientForKind(const QGraphicsItem *itemKind);
     static QLinearGradient createGradientForName(const QGraphicsItem *itemName);
 
-    TextItem *m_textItemName;
-    QGraphicsRectItem *m_rectItem;
-    TextItem *m_textItemKind;
-    QPointF m_manualMovementFrom, m_manualMovementTo;
+    TextItem *m_textItemName = nullptr;
+    QGraphicsRectItem *m_rectItem = nullptr;
+    TextItem *m_textItemKind = nullptr;
+    QPointF m_manualMovementFrom;
+    QPointF m_manualMovementTo;
     QRectF m_explicitTextBox;
     AadlChecks *m_aadlChecker = nullptr;
+    QPointer<MscChart> m_chart;
 };
 
 } // ns msc
