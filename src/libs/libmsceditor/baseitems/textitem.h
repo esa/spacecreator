@@ -97,6 +97,7 @@ Q_SIGNALS:
 
 protected Q_SLOTS:
     virtual void onContentsChange(int position, int charsRemoved, int charsAdded);
+    void updateCompleterText();
 
 protected:
     void focusOutEvent(QFocusEvent *event) override;

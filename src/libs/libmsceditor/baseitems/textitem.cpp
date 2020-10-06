@@ -51,6 +51,8 @@ TextItem::TextItem(QGraphicsItem *parent)
     setTextInteractionFlags(Qt::NoTextInteraction);
     connect(document(), &QTextDocument::contentsChange, this, &TextItem::onContentsChange);
     setInputValidationPattern(QString());
+
+    connect(this, &TextItem::textChanged, this, &TextItem::updateCompleterText);
 }
 
 QBrush TextItem::background() const
@@ -463,6 +465,21 @@ void TextItem::onContentsChange(int position, int charsRemoved, int charsAdded)
     checkTextValidity();
 }
 
+void TextItem::updateCompleterText()
+{
+    if (!m_completer) {
+        return;
+    }
+
+    m_completer->setCompletionPrefix(toPlainText());
+    QAbstractItemView *popup = m_completer->popup();
+    if (m_completer->completionModel()->rowCount() > 0) {
+        popup->show();
+    } else {
+        popup->hide();
+    }
+}
+
 void TextItem::setExplicitSize(const QSizeF &size)
 {
     if (m_explicitSize != size) {
@@ -519,15 +536,6 @@ void TextItem::updateCompleter(const QStringList &completionList)
     if (m_completer == nullptr) {
         m_completer = new QCompleter(completionList, this);
         m_completer->setCompletionMode(QCompleter::PopupCompletion);
-        connect(this, &TextItem::textChanged, this, [this]() {
-            m_completer->setCompletionPrefix(toPlainText());
-            QAbstractItemView *popup = m_completer->popup();
-            if (m_completer->completionModel()->rowCount() > 0) {
-                popup->show();
-            } else {
-                popup->hide();
-            }
-        });
         connect(m_completer, qOverload<const QString &>(&QCompleter::highlighted), this, &msc::TextItem::setPlainText);
     }
 
