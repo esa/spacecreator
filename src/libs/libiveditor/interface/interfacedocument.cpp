@@ -132,7 +132,7 @@ namespace aadlinterface {
 
 struct InterfaceDocument::InterfaceDocumentPrivate {
     QGraphicsScene *scene { nullptr };
-    QWidget *view { nullptr };
+    QPointer<QWidget> view { nullptr };
     QUndoStack *commandsStack { nullptr };
 
     QString filePath;

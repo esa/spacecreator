@@ -19,6 +19,7 @@
 
 #include "iveditorcore.h"
 
+#include <QPointer>
 #include <QSharedPointer>
 #include <QVector>
 #include <QWidget>
@@ -33,11 +34,13 @@ class IVEditorCore;
 
 namespace spctr {
 
+class AadlModelStorage;
+
 class AadlMainWidget : public QWidget
 {
     Q_OBJECT
 public:
-    explicit AadlMainWidget(QWidget *parent = nullptr);
+    AadlMainWidget(AadlModelStorage *aadlStorage, QWidget *parent = nullptr);
     ~AadlMainWidget();
 
     bool load(const QString &filename);
@@ -66,10 +69,11 @@ Q_SIGNALS:
     void aadlDataLoaded(const QString &fileName, QSharedPointer<aadlinterface::IVEditorCore> data);
 
 private:
-    void initUi();
+    void init();
 
     QSharedPointer<aadlinterface::IVEditorCore> m_plugin;
     QVector<QAction *> m_actions;
+    QPointer<AadlModelStorage> m_aadlStorage;
 };
 
 }

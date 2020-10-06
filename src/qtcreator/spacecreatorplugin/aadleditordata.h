@@ -19,6 +19,7 @@
 
 #include "iveditorcore.h"
 
+#include <QPointer>
 #include <QSharedPointer>
 #include <coreplugin/icontext.h>
 
@@ -36,15 +37,16 @@ class IEditor;
 
 namespace spctr {
 
-class AadlTextEditorFactory;
 class AadlEditorStack;
+class AadlModelStorage;
+class AadlTextEditorFactory;
 class MscContext;
 
 class AadlEditorData : public QObject
 {
     Q_OBJECT
 public:
-    AadlEditorData(QObject *parent = nullptr);
+    AadlEditorData(AadlModelStorage *aadlStorage, QObject *parent = nullptr);
     ~AadlEditorData() override;
 
     void fullInit();
@@ -78,6 +80,8 @@ private:
 
     AadlTextEditorFactory *m_editorFactory = nullptr;
     bool m_minimapVisible = false;
+
+    QPointer<AadlModelStorage> m_aadlStorage;
 };
 
 }

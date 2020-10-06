@@ -19,6 +19,7 @@
 
 #include "iveditorcore.h"
 
+#include <QPointer>
 #include <QSharedPointer>
 #include <QString>
 #include <coreplugin/editormanager/ieditorfactory.h>
@@ -26,13 +27,14 @@
 namespace spctr {
 
 class AadlEditorData;
+class AadlModelStorage;
 
 class AadlEditorFactory : public Core::IEditorFactory
 {
     Q_OBJECT
 
 public:
-    explicit AadlEditorFactory(QObject *parent);
+    explicit AadlEditorFactory(AadlModelStorage *aadlStorage, QObject *parent);
 
     Core::IEditor *createEditor() override;
 
@@ -43,6 +45,7 @@ Q_SIGNALS:
 
 private:
     mutable AadlEditorData *m_editorData = nullptr;
+    QPointer<AadlModelStorage> m_aadlStorage;
 };
 
 }

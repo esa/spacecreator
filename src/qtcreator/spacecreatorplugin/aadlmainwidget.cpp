@@ -17,6 +17,7 @@
 
 #include "aadlmainwidget.h"
 
+#include "aadlmodelstorage.h"
 #include "asn1dialog.h"
 #include "commandsstack.h"
 #include "interface/commands/commandsfactory.h"
@@ -34,30 +35,24 @@
 
 namespace spctr {
 
-AadlMainWidget::AadlMainWidget(QWidget *parent)
+AadlMainWidget::AadlMainWidget(AadlModelStorage *aadlStorage, QWidget *parent)
     : QWidget(parent)
-    , m_plugin(new aadlinterface::IVEditorCore)
+    , m_aadlStorage(aadlStorage)
 {
-    initUi();
-
-    QUndoStack *currentStack { nullptr };
-    currentStack = m_plugin->document()->commandsStack();
-    if (currentStack) {
-        if (m_plugin->undoGroup()->stacks().contains(currentStack)) {
-            m_plugin->undoGroup()->addStack(currentStack);
-        }
-        m_plugin->undoGroup()->setActiveStack(currentStack);
-    } else {
-        m_plugin->undoGroup()->removeStack(m_plugin->undoGroup()->activeStack());
-    }
-
-    aadlinterface::cmd::CommandsStack::setCurrent(currentStack);
 }
 
-AadlMainWidget::~AadlMainWidget() { }
+AadlMainWidget::~AadlMainWidget()
+{
+    if (m_plugin && m_plugin->document()->view() && m_plugin->document()->view()->parent() == this) {
+        m_plugin->document()->view()->setParent(nullptr);
+    }
+}
 
 bool AadlMainWidget::load(const QString &filename)
 {
+    m_plugin = m_aadlStorage->ivData(filename);
+    init();
+
     const bool ok = m_plugin->document()->load(filename);
     if (ok) {
         Q_EMIT aadlDataLoaded(filename, m_plugin);
@@ -77,16 +72,26 @@ void AadlMainWidget::setFileName(const QString &filename)
 
 bool AadlMainWidget::isDirty() const
 {
+    if (m_aadlStorage.isNull()) {
+        return false;
+    }
     return m_plugin->document()->isDirty();
 }
 
 QUndoStack *AadlMainWidget::undoStack()
 {
+    if (m_aadlStorage.isNull()) {
+        return nullptr;
+    }
     return m_plugin->document()->commandsStack();
 }
 
 QString AadlMainWidget::textContents() const
 {
+    if (m_aadlStorage.isNull()) {
+        return {};
+    }
+
     QBuffer buffer;
     buffer.open(QIODevice::ReadWrite);
     bool ok = aadlinterface::XmlDocExporter::exportDoc(m_plugin->document(), &buffer);
@@ -107,6 +112,10 @@ QVector<QAction *> AadlMainWidget::toolActions() const
  */
 void AadlMainWidget::showAsn1Dialog()
 {
+    if (m_aadlStorage.isNull()) {
+        return;
+    }
+
     aadlinterface::Asn1Dialog dialog;
     QFileInfo fi(m_plugin->document()->path());
     fi.setFile(fi.absolutePath() + "/" + m_plugin->document()->asn1FileName());
@@ -127,21 +136,33 @@ void AadlMainWidget::showAsn1Dialog()
 
 void AadlMainWidget::setMinimapVisible(bool visible)
 {
+    if (m_aadlStorage.isNull()) {
+        return;
+    }
     m_plugin->minimapView()->setVisible(visible);
 }
 
 void AadlMainWidget::onAttributesManagerRequested()
 {
+    if (m_aadlStorage.isNull()) {
+        return;
+    }
     m_plugin->document()->onAttributesManagerRequested();
 }
 
 void AadlMainWidget::onColorSchemeMenuInvoked()
 {
+    if (m_aadlStorage.isNull()) {
+        return;
+    }
     m_plugin->document()->onColorSchemeMenuInvoked();
 }
 
 void AadlMainWidget::onDynContextEditorMenuInvoked()
 {
+    if (m_aadlStorage.isNull()) {
+        return;
+    }
     m_plugin->document()->onDynContextEditorMenuInvoked();
 }
 
@@ -150,15 +171,32 @@ QSharedPointer<aadlinterface::IVEditorCore> AadlMainWidget::ivPlugin() const
     return m_plugin;
 }
 
-void AadlMainWidget::initUi()
+void AadlMainWidget::init()
 {
+    if (m_aadlStorage.isNull()) {
+        return;
+    }
+
     setLayout(new QVBoxLayout(this));
+    m_plugin->document()->init();
     layout()->addWidget(m_plugin->document()->view());
     layout()->setMargin(0);
 
     m_actions = m_plugin->document()->initActions();
 
     m_plugin->setupMiniMap();
+
+    QUndoStack *currentStack = m_plugin->document()->commandsStack();
+    if (currentStack) {
+        if (m_plugin->undoGroup()->stacks().contains(currentStack)) {
+            m_plugin->undoGroup()->addStack(currentStack);
+        }
+        m_plugin->undoGroup()->setActiveStack(currentStack);
+    } else {
+        m_plugin->undoGroup()->removeStack(m_plugin->undoGroup()->activeStack());
+    }
+
+    aadlinterface::cmd::CommandsStack::setCurrent(currentStack);
 }
 
 }

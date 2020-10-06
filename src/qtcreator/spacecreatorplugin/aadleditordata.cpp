@@ -20,6 +20,7 @@
 #include "aadleditordocument.h"
 #include "aadleditorstack.h"
 #include "aadlmainwidget.h"
+#include "aadlmodelstorage.h"
 #include "aadltexteditor.h"
 #include "iveditorcore.h"
 #include "msccontext.h"
@@ -75,8 +76,9 @@ public:
     }
 };
 
-AadlEditorData::AadlEditorData(QObject *parent)
+AadlEditorData::AadlEditorData(AadlModelStorage *aadlStorage, QObject *parent)
     : QObject(parent)
+    , m_aadlStorage(aadlStorage)
 {
     m_contexts.add(spctr::Constants::C_AADL_EDITOR);
 
@@ -142,11 +144,9 @@ void AadlEditorData::fullInit()
 
 Core::IEditor *AadlEditorData::createEditor()
 {
-    auto designWidget = new AadlMainWidget;
-    designWidget->setMinimapVisible(m_minimapVisible);
+    auto designWidget = new AadlMainWidget(m_aadlStorage);
     AadlTextEditor *aadlEditor = m_editorFactory->create(designWidget);
 
-    m_undoGroup->addStack(designWidget->undoStack());
     m_widgetStack->add(aadlEditor, designWidget);
     m_mainToolBar->addEditor(aadlEditor);
 
@@ -158,7 +158,12 @@ Core::IEditor *AadlEditorData::createEditor()
         aadlEditor->document()->infoBar()->addInfo(info);
     }
 
-    connect(designWidget, &AadlMainWidget::aadlDataLoaded, this, &AadlEditorData::aadlDataLoaded);
+    connect(designWidget, &AadlMainWidget::aadlDataLoaded, this,
+            [this, designWidget](const QString &fileName, QSharedPointer<aadlinterface::IVEditorCore> data) {
+                designWidget->setMinimapVisible(m_minimapVisible);
+                m_undoGroup->addStack(designWidget->undoStack());
+                Q_EMIT aadlDataLoaded(fileName, data);
+            });
 
     return aadlEditor;
 }
