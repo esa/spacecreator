@@ -2,5 +2,5 @@ TEMPLATE = aux
 
 OTHER_FILES = \
     dataview.asn \
-    interfaceeditor.xml \
+    interfaceview.xml \
     test7.msc

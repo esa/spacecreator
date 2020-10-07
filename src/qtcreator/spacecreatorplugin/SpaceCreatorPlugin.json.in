@@ -21,7 +21,7 @@
         \"    <mime-type type=\'application/xml\'>\",
         \"        <sub-class-of type=\'text/plain\'/>\",
         \"        <comment>AADL Model File</comment>\",
-        \"        <glob pattern=\'*interfaceeditor.xml\'/>\",
+        \"        <glob pattern=\'*interfaceview.xml\'/>\",
         \"    </mime-type>\",
         \"</mime-info>\"
     ]

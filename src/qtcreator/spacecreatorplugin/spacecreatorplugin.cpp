@@ -146,7 +146,7 @@ bool SpaceCreatorPlugin::initialize(const QStringList &arguments, QString *error
     connect(editorManager, &Core::EditorManager::currentEditorChanged, this, [&](Core::IEditor *editor) {
         if (editor && editor->document()) {
             const bool isAadl =
-                    editor->document()->filePath().toString().endsWith("interfaceeditor.xml", Qt::CaseInsensitive);
+                    editor->document()->filePath().toString().endsWith("interfaceview.xml", Qt::CaseInsensitive);
             m_asn1DialogAction->setEnabled(isAadl);
         }
     });
