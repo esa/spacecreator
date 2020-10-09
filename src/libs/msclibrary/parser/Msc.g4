@@ -544,12 +544,12 @@ sdlText
 
 // ASN.1 value
 asnValue
-    : NAME | OCTECTSTRING | BITSTRING | BOOLEAN
+    : NAME | OCTECTSTRING | BITSTRING | BOOLEAN | STRING
     ;
 // ASN1 type choice
 // choice1 : FALSE
 asnChoice
-    : name COLON name
+    : name COLON asnValue
     ;
 // Allow something like for ASN.1
 // CHOICE { act CHOICE { heater ENUMERATED { nominal, redundant } } }
@@ -557,12 +557,13 @@ choiceOfChoice
     : name COLON name (COLON name)+
     ;
 // Allow something like for ASN.1
-// { field-a  FALSE, field-b  choice1 : FALSE }
+// { field-a  FALSE, field-b choice1 : FALSE }
 asnSequence
     : SEQUENCEOF
-    | LEFTCURLYBRACKET (asnValue | COMMA | asnChoice)+ RIGHTCURLYBRACKET
+    | LEFTCURLYBRACKET name (asnValue | asnChoice) (COMMA name (asnValue | asnChoice))* RIGHTCURLYBRACKET
     | LEFTCURLYBRACKET asnSequence (COMMA asnSequence)* RIGHTCURLYBRACKET
     ;
+
 
 /*Keywords*/
 

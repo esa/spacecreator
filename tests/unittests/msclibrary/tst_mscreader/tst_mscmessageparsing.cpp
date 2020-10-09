@@ -287,9 +287,13 @@ void tst_MscReader::testMessageAsn1SequenceChoiceParameter()
                      msc Untitled_MSC; \
                        instance Instance_1; \
                          out mymsg({ field-a  FALSE, field-b  choice1 : FALSE }) to Instance_2; \
+                         out mymsg2({destination displayer, action display:'48656c6c6f'H}) to Instance_2; \
+                         out mymsg3({destination displayer, action display: \"Hello\"}) to Instance_2; \
                        endinstance; \
                        instance Instance_2; \
                          in mymsg({ field-a  FALSE, field-b  choice1 : FALSE }) from Instance_1; \
+                         in mymsg2({destination displayer, action display:'48656c6c6f'H}) from Instance_1; \
+                         in mymsg3({destination displayer, action display: \"Hello\"}) from Instance_1; \
                        endinstance; \
                      endmsc;\
                    endmscdocument;";
@@ -302,11 +306,21 @@ void tst_MscReader::testMessageAsn1SequenceChoiceParameter()
     MscChart *chart = doc->charts().at(0);
 
     QCOMPARE(chart->instances().size(), 2);
-    QCOMPARE(chart->instanceEvents().size(), 1);
+    QCOMPARE(chart->instanceEvents().size(), 3);
     auto message = qobject_cast<MscMessage *>(chart->instanceEvents().at(0));
     QVERIFY(message != nullptr);
     QCOMPARE(message->parameters().size(), 1);
     QCOMPARE(message->parameters().at(0).parameter(), QString("{ field-a  FALSE, field-b  choice1 : FALSE }"));
+
+    message = qobject_cast<MscMessage *>(chart->instanceEvents().at(1));
+    QVERIFY(message != nullptr);
+    QCOMPARE(message->parameters().size(), 1);
+    QCOMPARE(message->parameters().at(0).parameter(), QString("{destination displayer, action display:'48656c6c6f'H}"));
+
+    message = qobject_cast<MscMessage *>(chart->instanceEvents().at(2));
+    QVERIFY(message != nullptr);
+    QCOMPARE(message->parameters().size(), 1);
+    QCOMPARE(message->parameters().at(0).parameter(), QString("{destination displayer, action display: \"Hello\"}"));
 }
 
 void tst_MscReader::testMessageAsn1SequenceOfSecencesParameter()
