@@ -29,6 +29,10 @@ target_sources(${LIB_NAME} PRIVATE
     aadlxmlreader.h
     connectioncreationvalidator.cpp
     connectioncreationvalidator.h
+    aadlobjectconnectiongroup.cpp
+    aadlobjectconnectiongroup.h
+    aadlobjectifacegroup.cpp
+    aadlobjectifacegroup.h
 )
 
 target_include_directories(${LIB_NAME} PUBLIC .)

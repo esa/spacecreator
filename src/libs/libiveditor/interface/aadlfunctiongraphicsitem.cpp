@@ -53,7 +53,6 @@ AADLFunctionGraphicsItem::AADLFunctionGraphicsItem(aadl::AADLObjectFunction *ent
     m_textItem->setVisible(!isRootItem());
     m_textItem->setTextAlignment(Qt::AlignCenter);
 
-    applyColorScheme();
     if (!m_svgRenderer) // TODO: change icon
         m_svgRenderer = new QSvgRenderer(QLatin1String(":/tab_interface/toolbar/icns/change_root.svg"));
 }

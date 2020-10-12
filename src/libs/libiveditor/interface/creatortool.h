@@ -24,11 +24,11 @@ class QMouseEvent;
 class QContextMenuEvent;
 
 namespace aadl {
-class AADLObjectsModel;
 class AADLObject;
 }
 
 namespace aadlinterface {
+class AADLItemModel;
 
 class InteractiveObject;
 
@@ -37,7 +37,7 @@ class CreatorTool : public QObject
     Q_OBJECT
 
 public:
-    CreatorTool(QGraphicsView *view, aadl::AADLObjectsModel *model, QObject *parent = nullptr);
+    CreatorTool(QGraphicsView *view, AADLItemModel *model, QObject *parent = nullptr);
     ~CreatorTool() override;
 
     enum class ToolType
@@ -49,12 +49,15 @@ public:
         ProvidedInterface,
         RequiredInterface,
         MultiPointConnection,
-        DirectConnection
+        DirectConnection,
+        GroupConnection
     };
 
     CreatorTool::ToolType toolType() const;
     void setCurrentToolType(CreatorTool::ToolType type);
     void removeSelectedItems();
+    void setSelectedItemsVisible(bool visible);
+    void groupSelectedItems();
 
 Q_SIGNALS:
     void created();

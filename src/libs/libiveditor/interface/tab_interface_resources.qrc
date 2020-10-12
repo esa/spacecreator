@@ -13,6 +13,7 @@
         <file>icns/exit.svg</file>
         <file>icns/exit_parent.svg</file>
         <file>icns/change_root.svg</file>
+        <file>icns/connection_group.svg</file>
     </qresource>
     <qresource prefix="/">
         <file>colors/default_colors.json</file>

@@ -41,6 +41,8 @@ public:
 
     aadl::AADLObjectFunctionType *entity() const;
 
+    void init() override;
+
     QSizeF minimalSize() const override;
 
     QString prepareTooltip() const override;

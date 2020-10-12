@@ -148,6 +148,8 @@ ColorManager::ColorManager(QObject *parent)
               { HandledColors::Iface, ColorHandler() },
               { HandledColors::Connection, ColorHandler() },
               { HandledColors::Comment, ColorHandler() },
+              { HandledColors::ConnectionGroup, ColorHandler() },
+              { HandledColors::IfaceGroup, ColorHandler() },
       })
 {
     const QString defaultSourcePath = prepareDefaultSource();
@@ -194,6 +196,10 @@ QString ColorManager::handledColorTypeName(HandledColors t)
         return tr("Interface");
     case Connection:
         return tr("Connection");
+    case ConnectionGroup:
+        return tr("Connection Group");
+    case IfaceGroup:
+        return tr("Interface Group");
     case Comment:
         return tr("Comment");
     default:

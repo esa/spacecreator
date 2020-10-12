@@ -23,9 +23,9 @@
 **
 ****************************************************************************/
 
-#include <QTimer>
-
 #include "networkreply.h"
+
+#include <QTimer>
 
 using namespace Asn1Acn::Internal::Tests;
 
@@ -61,7 +61,7 @@ void NetworkReply::onTimerTimeout()
     QTimer *timer = qobject_cast<QTimer *>(sender());
     timer->deleteLater();
 
-    emit finished();
+    Q_EMIT finished();
 }
 
 qint64 NetworkReply::readData(char *data, qint64 maxlen)

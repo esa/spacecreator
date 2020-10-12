@@ -21,6 +21,7 @@
 
 #include <aadlobject.h>
 #include <aadlobjectconnection.h>
+#include <aadlobjectconnectiongroup.h>
 #include <aadlobjectfunction.h>
 #include <aadlobjectfunctiontype.h>
 #include <aadlobjectiface.h>
@@ -158,6 +159,13 @@ void CmdEntityRemove::collectRelatedItems(aadl::AADLObject *toBeRemoved)
         return;
 
     switch (toBeRemoved->aadlType()) {
+    case aadl::AADLObject::Type::ConnectionGroup:
+        if (auto connection = qobject_cast<aadl::AADLObjectConnectionGroup *>(toBeRemoved)) {
+            storeLinkedEntity(connection->sourceInterface());
+            storeLinkedEntity(connection->targetInterface());
+        }
+        break;
+    case aadl::AADLObject::Type::InterfaceGroup:
     case aadl::AADLObject::Type::RequiredInterface:
     case aadl::AADLObject::Type::ProvidedInterface: {
         if (auto *iface = qobject_cast<aadl::AADLObjectIface *>(toBeRemoved)) {
@@ -202,6 +210,7 @@ void CmdEntityRemove::storeLinkedEntity(aadl::AADLObject *linkedEntity)
     case aadl::AADLObject::Type::Connection:
         pCollection = &m_relatedConnections;
         break;
+    case aadl::AADLObject::Type::InterfaceGroup:
     case aadl::AADLObject::Type::RequiredInterface:
     case aadl::AADLObject::Type::ProvidedInterface:
         pCollection = &m_relatedIfaces;

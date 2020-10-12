@@ -62,7 +62,7 @@ void SynchronizedIndexUpdater::setEditor(TextEditor::TextEditorWidget *editorWid
                 static_cast<void (QTimer::*)()>(&QTimer::start));
         m_updateIndexTimer->start();
     } else {
-        emit indexSelectionUpdated(QModelIndexList(), QModelIndex());
+        Q_EMIT indexSelectionUpdated(QModelIndexList(), QModelIndex());
     }
 }
 
@@ -167,7 +167,7 @@ void SynchronizedIndexUpdater::updateNow()
 
     fillSelectedIndexes(current, selected);
 
-    emit indexSelectionUpdated(selected, current);
+    Q_EMIT indexSelectionUpdated(selected, current);
 }
 
 void SynchronizedIndexUpdater::createUpdateTimer()

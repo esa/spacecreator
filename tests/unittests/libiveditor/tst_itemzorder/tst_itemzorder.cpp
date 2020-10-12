@@ -18,16 +18,20 @@
 #include "aadlobject.h"
 #include "aadlobjectcomment.h"
 #include "aadlobjectconnection.h"
+#include "aadlobjectconnectiongroup.h"
 #include "aadlobjectfunction.h"
 #include "aadlobjectfunctiontype.h"
 #include "aadlobjectiface.h"
+#include "aadlobjectifacegroup.h"
 #include "baseitems/common/aadlutils.h"
 #include "baseitems/interactiveobject.h"
 #include "interface/aadlcommentgraphicsitem.h"
 #include "interface/aadlconnectiongraphicsitem.h"
+#include "interface/aadlconnectiongroupgraphicsitem.h"
 #include "interface/aadlfunctiongraphicsitem.h"
 #include "interface/aadlfunctiontypegraphicsitem.h"
 #include "interface/aadlinterfacegraphicsitem.h"
+#include "interface/aadlinterfacegroupgraphicsitem.h"
 
 #include <QMetaEnum>
 #include <QObject>
@@ -47,9 +51,11 @@ private Q_SLOTS:
     void testItem_FunctionType();
     void testItem_Function();
     void testItem_Comment();
+    void testItem_InterfaceGroup();
     void testItem_RequiredInterface();
     void testItem_ProvidedInterface();
     void testItem_Connection();
+    void testItem_ConnectionGroup();
 
     void testItem_CheckCoverage();
 
@@ -108,6 +114,19 @@ void tst_ItemZOrder::testItem_Comment()
     checkItem(&item, aadlinterface::ZOrder.Comment);
 }
 
+void tst_ItemZOrder::testItem_InterfaceGroup()
+{
+    aadl::AADLObjectFunction aadlFunction(QStringLiteral("TestFunction"));
+    aadl::AADLObjectIface::CreationInfo ci;
+    ci.function = &aadlFunction;
+    ci.type = aadl::AADLObjectIface::IfaceType::Grouped;
+    std::unique_ptr<aadl::AADLObjectIfaceGroup> pIface =
+            std::unique_ptr<aadl::AADLObjectIfaceGroup>(new aadl::AADLObjectIfaceGroup(ci));
+    aadlinterface::AADLInterfaceGroupGraphicsItem item(pIface.get());
+
+    checkItem(&item, aadlinterface::ZOrder.Interface);
+}
+
 void tst_ItemZOrder::testItem_RequiredInterface()
 {
     aadl::AADLObjectFunction aadlFunction(QStringLiteral("TestFunction"));
@@ -155,6 +174,34 @@ void tst_ItemZOrder::testItem_Connection()
 
     aadl::AADLObjectConnection aadlConnection(&aadlFunctionA, &aadlFunctionB, pIfaceA.get(), pIfaceB.get());
     aadlinterface::AADLConnectionGraphicsItem connectionItem(&aadlConnection, &itemA, &itemB);
+
+    checkItem(&connectionItem, aadlinterface::ZOrder.Connection);
+}
+
+void tst_ItemZOrder::testItem_ConnectionGroup()
+{
+    aadl::AADLObjectFunction aadlFunctionA(QStringLiteral("TestFunctionA"));
+    aadl::AADLObjectFunction aadlFunctionB(QStringLiteral("TestFunctionB"));
+
+    aadl::AADLObjectIface::CreationInfo ciA;
+    ciA.function = &aadlFunctionA;
+    ciA.type = aadl::AADLObjectIface::IfaceType::Provided;
+    std::unique_ptr<aadl::AADLObjectIfaceGroup> pIfaceA = std::make_unique<aadl::AADLObjectIfaceGroup>(ciA);
+    aadlinterface::AADLInterfaceGroupGraphicsItem itemA(pIfaceA.get());
+
+    aadl::AADLObjectIface::CreationInfo ciB;
+    ciB.function = &aadlFunctionA;
+    ciB.type = aadl::AADLObjectIface::IfaceType::Provided;
+    std::unique_ptr<aadl::AADLObjectIfaceGroup> pIfaceB = std::make_unique<aadl::AADLObjectIfaceGroup>(ciB);
+    aadlinterface::AADLInterfaceGroupGraphicsItem itemB(pIfaceB.get());
+
+    std::unique_ptr<aadl::AADLObjectConnection> aadlConnection { new aadl::AADLObjectConnection(
+            &aadlFunctionA, &aadlFunctionB, pIfaceA.get(), pIfaceB.get()) };
+
+    aadl::AADLObjectConnectionGroup aadlConnectionGroup(
+            QStringLiteral("TestConnectionGroup"), pIfaceA.get(), pIfaceB.get(), { aadlConnection.get() });
+
+    aadlinterface::AADLConnectionGroupGraphicsItem connectionItem(&aadlConnectionGroup, &itemA, &itemB);
 
     checkItem(&connectionItem, aadlinterface::ZOrder.Connection);
 }

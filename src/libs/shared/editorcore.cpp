@@ -57,6 +57,9 @@ void EditorCore::initMenus(QMainWindow *window)
     menu->addSeparator();
     menu->addAction(actionOpenAadl());
     menu->addSeparator();
+    menu->addAction(actionImport());
+    menu->addAction(actionExport());
+    menu->addSeparator();
     addMenuFileActions(menu, window);
     menu->addSeparator();
     menu->addAction(actionQuit());
@@ -82,6 +85,7 @@ void EditorCore::addMenuViewActions(QMenu *menu, QMainWindow * /*window*/)
 {
     menu->addAction(actionToggleMinimap());
     menu->addAction(actionToggleE2EView());
+    menu->addAction(actionToggleModelView());
     menu->addSeparator();
 }
 
@@ -132,6 +136,22 @@ QAction *EditorCore::actionOpenAadl()
     return m_actionOpenAadl;
 }
 
+QAction *EditorCore::actionImport()
+{
+    if (m_actionImport == nullptr) {
+        m_actionImport = new QAction(tr("Import all"), this);
+    }
+    return m_actionImport;
+}
+
+QAction *EditorCore::actionExport()
+{
+    if (m_actionExport == nullptr) {
+        m_actionExport = new QAction(tr("Export selected"), this);
+    }
+    return m_actionExport;
+}
+
 QAction *EditorCore::actionQuit()
 {
     if (m_actionQuit == nullptr) {
@@ -177,6 +197,15 @@ QAction *EditorCore::actionToggleE2EView()
         m_actionToggleE2EView->setCheckable(true);
     }
     return m_actionToggleE2EView;
+}
+
+QAction *EditorCore::actionToggleModelView()
+{
+    if (m_actionToggleModelView == nullptr) {
+        m_actionToggleModelView = new QAction(tr("Show model &view"), this);
+        //        m_actionToggleModelView->setCheckable(true);
+    }
+    return m_actionToggleModelView;
 }
 
 /*!

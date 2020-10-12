@@ -92,6 +92,11 @@ public:
 
     bool isOneDirection() const;
 
+protected:
+    explicit AADLObjectConnection(const AADLObject::Type t, AADLObject *source, AADLObject *target,
+            AADLObjectIface *ifaceSource, AADLObjectIface *ifaceTarget, QObject *parent = nullptr);
+    bool lookupEndpointsPostponed();
+
 private:
     const std::unique_ptr<AADLObjectConnectionPrivate> d;
 
@@ -104,7 +109,6 @@ private:
     void handleProvidedTitleChanged(const QString &title);
     void handleInheritPIChange(bool enabled);
 
-    bool lookupEndpointsPostponed();
     void clearPostponedEndpoints();
 };
 

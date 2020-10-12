@@ -43,8 +43,9 @@ class AADLObjectIface : public AADLObject
 public:
     enum class IfaceType
     {
-        Required = 0,
-        Provided
+        Required,
+        Provided,
+        Grouped
     };
     Q_ENUM(IfaceType)
     static constexpr IfaceType DefaultDirection { IfaceType::Required };
@@ -110,7 +111,7 @@ public:
     void setParams(const QVector<IfaceParameter> &params);
     void addParam(const IfaceParameter &param);
 
-    AADLObjectFunction *function() const;
+    AADLObjectFunctionType *function() const;
 
     AADLObjectIface *cloneOf() const;
     bool isClone() const;

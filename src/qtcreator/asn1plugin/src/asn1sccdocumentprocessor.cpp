@@ -92,7 +92,7 @@ void Asn1SccDocumentProcessor::onBuilderFinished()
     m_results = m_docBuilder->takeDocuments();
     setState(State::Successful);
 
-    emit processingFinished(m_projectName);
+    Q_EMIT processingFinished(m_projectName);
 }
 
 void Asn1SccDocumentProcessor::onBuilderFailed()
@@ -100,7 +100,7 @@ void Asn1SccDocumentProcessor::onBuilderFailed()
     createFallbackResults();
     setState(State::Failed);
 
-    emit processingFinished(m_projectName);
+    Q_EMIT processingFinished(m_projectName);
 }
 
 void Asn1SccDocumentProcessor::onBuilderErrored()
@@ -108,7 +108,7 @@ void Asn1SccDocumentProcessor::onBuilderErrored()
     createFallbackResults();
     setState(State::Errored);
 
-    emit processingFinished(m_projectName);
+    Q_EMIT processingFinished(m_projectName);
 }
 
 void Asn1SccDocumentProcessor::setState(Asn1SccDocumentProcessor::State expected)

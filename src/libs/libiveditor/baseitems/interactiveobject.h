@@ -49,6 +49,7 @@ public:
     QFont font() const;
     void setFont(const QFont &font);
 
+    virtual void init();
     virtual void updateEntity();
     virtual void updateFromEntity() = 0;
     virtual QList<QVariantList> prepareChangeCoordinatesCommandParams() const;

@@ -20,8 +20,10 @@
 #include "aadlcommonprops.h"
 #include "aadlobjectcomment.h"
 #include "aadlobjectconnection.h"
+#include "aadlobjectconnectiongroup.h"
 #include "aadlobjectfunction.h"
 #include "aadlobjectiface.h"
+#include "aadlobjectifacegroup.h"
 
 #include <QDebug>
 
@@ -36,8 +38,10 @@ struct AADLObjectFunctionTypePrivate {
     QVector<AADLObjectFunction *> m_functions;
     QVector<AADLObjectIface *> m_pis;
     QVector<AADLObjectIface *> m_ris;
+    QVector<AADLObjectIfaceGroup *> m_ifaceGroups;
     QVector<AADLObjectComment *> m_comments;
     QVector<AADLObjectConnection *> m_connections;
+    QVector<AADLObjectConnectionGroup *> m_connectionGroups;
 };
 
 AADLObjectFunctionType::AADLObjectFunctionType(const QString &title, QObject *parent)
@@ -79,6 +83,10 @@ bool AADLObjectFunctionType::addChild(AADLObject *child)
             d->m_functionTypes.append(child->as<AADLObjectFunction *>());
             break;
         }
+        case AADLObject::Type::InterfaceGroup: {
+            d->m_ifaceGroups.append(child->as<AADLObjectIfaceGroup *>());
+            break;
+        }
         case AADLObject::Type::ProvidedInterface: {
             d->m_pis.append(child->as<AADLObjectIfaceProvided *>());
             break;
@@ -89,6 +97,10 @@ bool AADLObjectFunctionType::addChild(AADLObject *child)
         }
         case AADLObject::Type::Comment: {
             d->m_comments.append(child->as<AADLObjectComment *>());
+            break;
+        }
+        case AADLObject::Type::ConnectionGroup: {
+            d->m_connectionGroups.append(child->as<AADLObjectConnectionGroup *>());
             break;
         }
         case AADLObject::Type::Connection: {
@@ -124,6 +136,10 @@ bool AADLObjectFunctionType::removeChild(AADLObject *child)
             d->m_functionTypes.removeAll(child->as<AADLObjectFunction *>());
             break;
         }
+        case AADLObject::Type::InterfaceGroup: {
+            d->m_ifaceGroups.removeAll(child->as<AADLObjectIfaceGroup *>());
+            break;
+        }
         case AADLObject::Type::RequiredInterface: {
             d->m_ris.removeAll(child->as<AADLObjectIfaceRequired *>());
             break;
@@ -134,6 +150,10 @@ bool AADLObjectFunctionType::removeChild(AADLObject *child)
         }
         case AADLObject::Type::Comment: {
             d->m_comments.removeAll(child->as<AADLObjectComment *>());
+            break;
+        }
+        case AADLObject::Type::ConnectionGroup: {
+            d->m_connectionGroups.removeAll(child->as<AADLObjectConnectionGroup *>());
             break;
         }
         case AADLObject::Type::Connection: {
@@ -167,6 +187,11 @@ QVector<AADLObjectConnection *> AADLObjectFunctionType::connections() const
     return d->m_connections;
 }
 
+QVector<AADLObjectConnectionGroup *> AADLObjectFunctionType::connectionGroups() const
+{
+    return d->m_connectionGroups;
+}
+
 QVector<AADLObjectComment *> AADLObjectFunctionType::comments() const
 {
     return d->m_comments;
@@ -182,6 +207,9 @@ QVector<AADLObjectIface *> AADLObjectFunctionType::interfaces() const
     for (auto i : d->m_ris)
         result.append(i->as<AADLObjectIface *>());
 
+    for (auto i : d->m_ifaceGroups)
+        result.append(i->as<AADLObjectIface *>());
+
     return result;
 }
 
@@ -193,6 +221,11 @@ QVector<AADLObjectIface *> AADLObjectFunctionType::ris() const
 QVector<AADLObjectIface *> AADLObjectFunctionType::pis() const
 {
     return d->m_pis;
+}
+
+QVector<AADLObjectIfaceGroup *> AADLObjectFunctionType::interfaceGroups() const
+{
+    return d->m_ifaceGroups;
 }
 
 bool AADLObjectFunctionType::hasNestedChildren() const

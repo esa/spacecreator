@@ -52,7 +52,7 @@ void DocumentProcessorStub::run()
         m_results.push_back(std::move(modules));
     }
 
-    emit processingFinished(m_projectName);
+    Q_EMIT processingFinished(m_projectName);
 }
 
 std::vector<std::unique_ptr<Asn1Acn::File>> DocumentProcessorStub::takeResults()

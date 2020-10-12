@@ -35,4 +35,7 @@ conn            :       |_ Instance of nested connections
 {% for conn in func.connections %}
     {% include "connection.tmplt" %}
 {% endfor %}
+{% for conn in func.connectiongroups %}
+    {% include "connectiongroup.tmplt" %}
+{% endfor %}
 </Function>

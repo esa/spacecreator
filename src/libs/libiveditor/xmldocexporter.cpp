@@ -59,7 +59,8 @@ QString XmlDocExporter::interfaceDefaultTemplate()
 void XmlDocExporter::ensureDefaultTemplatesDeployed_interface(RolloutDefaultsPolicy policy)
 {
     const QStringList fileNames { QStringLiteral("interfaceview"), QStringLiteral("interface"),
-        QStringLiteral("function"), QStringLiteral("connection"), QStringLiteral("comment") };
+        QStringLiteral("function"), QStringLiteral("connection"), QStringLiteral("connectiongroup"),
+        QStringLiteral("comment") };
 
     const QString sourceFile(":/defaults/templating/xml_templates/%1.%2");
     const QString targetFilePath = QFileInfo(interfaceDefaultTemplate()).path();
@@ -114,6 +115,30 @@ bool XmlDocExporter::exportDoc(InterfaceDocument *doc, QBuffer *outBuffer, const
     }
 
     const QHash<QString, QVariant> aadlObjects = collectInterfaceObjects(doc);
+    QScopedPointer<templating::StringTemplate> strTemplate(templating::StringTemplate::create());
+    return strTemplate->parseFile(aadlObjects, usedTemplatePath, outBuffer);
+}
+/**
+   @brief XmlDocExporter::exportObjects writes the document as xml to the given buffer
+   @param doc the set of AADL entities
+   @param outBuffer the buffer that is open and ready to be written to
+   @param templatePath the grantlee template to use for the export. If empty, the default one is used
+   @return true when the export was successful.
+ */
+bool XmlDocExporter::exportObjects(
+        const QList<aadl::AADLObject *> &objects, QBuffer *outBuffer, const QString &templatePath)
+{
+    if (objects.isEmpty() || !outBuffer || !outBuffer->isWritable()) {
+        return false;
+    }
+
+    ensureDefaultTemplatesDeployed_interface();
+    QString usedTemplatePath(templatePath);
+    if (templatePath.isEmpty()) {
+        usedTemplatePath = XmlDocExporter::interfaceDefaultTemplate();
+    }
+
+    const QHash<QString, QVariant> aadlObjects = collectInterfaceObjects(objects);
     QScopedPointer<templating::StringTemplate> strTemplate(templating::StringTemplate::create());
     return strTemplate->parseFile(aadlObjects, usedTemplatePath, outBuffer);
 }
@@ -194,14 +219,31 @@ bool XmlDocExporter::showExportDialog(InterfaceDocument *doc, QWidget *parentWin
 
 QHash<QString, QVariant> XmlDocExporter::collectInterfaceObjects(InterfaceDocument *doc)
 {
+    QHash<QString, QVariant> grouppedObjects = collectInterfaceObjects(doc->objects().values());
+    // Add meta-data
+    if (!doc->asn1FileName().isEmpty()) {
+        grouppedObjects["Asn1FileName"] = QVariant::fromValue(doc->asn1FileName());
+    }
+    if (!doc->mscFileName().isEmpty()) {
+        grouppedObjects["MscFileName"] = QVariant::fromValue(doc->mscFileName());
+    }
+
+    return grouppedObjects;
+}
+
+QHash<QString, QVariant> XmlDocExporter::collectInterfaceObjects(const QList<aadl::AADLObject *> &objects)
+{
     QHash<QString, QVariant> grouppedObjects;
 
-    for (const auto aadlObject : doc->objects()) {
+    for (const auto aadlObject : objects) {
         const aadl::AADLObject::Type t = aadlObject->aadlType();
         switch (t) {
+        case aadl::AADLObject::Type::InterfaceGroup:
+            continue;
         case aadl::AADLObject::Type::FunctionType:
         case aadl::AADLObject::Type::Function:
         case aadl::AADLObject::Type::Comment:
+        case aadl::AADLObject::Type::ConnectionGroup:
         case aadl::AADLObject::Type::Connection:
         case aadl::AADLObject::Type::Unknown: {
             if (t == aadl::AADLObject::Type::Unknown || aadlObject->isNested())
@@ -221,15 +263,6 @@ QHash<QString, QVariant> XmlDocExporter::collectInterfaceObjects(InterfaceDocume
         objects << exportedObject;
         grouppedObjects[o.groupName()] = objects;
     }
-
-    // Add meta-data
-    if (!doc->asn1FileName().isEmpty()) {
-        grouppedObjects["Asn1FileName"] = QVariant::fromValue(doc->asn1FileName());
-    }
-    if (!doc->mscFileName().isEmpty()) {
-        grouppedObjects["MscFileName"] = QVariant::fromValue(doc->mscFileName());
-    }
-
     return grouppedObjects;
 }
 

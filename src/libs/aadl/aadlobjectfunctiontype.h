@@ -30,6 +30,8 @@ class AADLObjectFunction;
 class AADLObjectConnection;
 class AADLObjectComment;
 class AADLObjectIface;
+class AADLObjectIfaceGroup;
+class AADLObjectConnectionGroup;
 
 struct AADLObjectFunctionTypePrivate;
 
@@ -48,10 +50,12 @@ public:
     QVector<AADLObjectFunctionType *> functionTypes() const;
     QVector<AADLObjectFunction *> functions() const;
     QVector<AADLObjectConnection *> connections() const;
+    QVector<AADLObjectConnectionGroup *> connectionGroups() const;
     QVector<AADLObjectComment *> comments() const;
     QVector<AADLObjectIface *> interfaces() const;
     QVector<AADLObjectIface *> ris() const;
     QVector<AADLObjectIface *> pis() const;
+    QVector<AADLObjectIfaceGroup *> interfaceGroups() const;
     bool hasNestedChildren() const;
 
     QVector<ContextParameter> contextParams() const;

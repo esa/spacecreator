@@ -352,11 +352,13 @@ qreal itemLevel(const aadl::AADLObject *const object, bool itemSelected)
     case aadl::AADLObject::Type::Function:
     case aadl::AADLObject::Type::FunctionType:
         return ZOrder.Function;
+    case aadl::AADLObject::Type::InterfaceGroup:
     case aadl::AADLObject::Type::RequiredInterface:
     case aadl::AADLObject::Type::ProvidedInterface:
         return ZOrder.Interface;
     case aadl::AADLObject::Type::Comment:
         return ZOrder.Comment;
+    case aadl::AADLObject::Type::ConnectionGroup:
     case aadl::AADLObject::Type::Connection:
         return ZOrder.Connection;
     default:

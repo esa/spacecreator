@@ -136,7 +136,7 @@ void Document::updateExtraSelections() const
 
     const auto list = errorsToSelection(file->errors(), document());
 
-    emit extraSelectionsUpdated(list);
+    Q_EMIT extraSelectionsUpdated(list);
 }
 
 const QString Document::activeProjectName() const

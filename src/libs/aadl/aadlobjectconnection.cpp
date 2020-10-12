@@ -35,7 +35,7 @@ struct ConnectionHolder {
 };
 
 struct AADLObjectConnectionPrivate {
-    AADLObjectConnectionPrivate() {}
+    AADLObjectConnectionPrivate() { }
     AADLObjectConnectionPrivate(
             AADLObject *source, AADLObject *target, AADLObjectIface *ifaceSource, AADLObjectIface *ifaceTarget)
         : m_source(source)
@@ -55,6 +55,13 @@ struct AADLObjectConnectionPrivate {
 AADLObjectConnection::AADLObjectConnection(AADLObject *source, AADLObject *target, AADLObjectIface *ifaceSource,
         AADLObjectIface *ifaceTarget, QObject *parent)
     : AADLObject(AADLObject::Type::Connection, QString(), parent)
+    , d(new AADLObjectConnectionPrivate { source, target, ifaceSource, ifaceTarget })
+{
+}
+
+AADLObjectConnection::AADLObjectConnection(const AADLObject::Type t, AADLObject *source, AADLObject *target,
+        AADLObjectIface *ifaceSource, AADLObjectIface *ifaceTarget, QObject *parent)
+    : AADLObject(t, QString(), parent)
     , d(new AADLObjectConnectionPrivate { source, target, ifaceSource, ifaceTarget })
 {
 }

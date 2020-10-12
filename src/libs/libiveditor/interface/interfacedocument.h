@@ -27,6 +27,8 @@
 class QMenu;
 class QToolBar;
 class QUndoStack;
+class QAbstractItemView;
+class QTreeView;
 
 namespace Asn1Acn {
 class Asn1ModelStorage;
@@ -62,10 +64,13 @@ public:
 
     QGraphicsScene *scene() const;
     QWidget *view() const;
+    QTreeView *modelView() const;
     QUndoStack *commandsStack() const;
 
     bool create(const QString &path = QString());
     bool load(const QString &path);
+    bool import();
+    bool exportSelected();
     bool save(const QString &path);
     void close();
 
@@ -86,6 +91,7 @@ public:
 
     const QHash<shared::Id, aadl::AADLObject *> &objects() const;
     aadl::AADLObjectsModel *objectsModel() const;
+    aadl::AADLObjectsModel *importModel() const;
 
     Asn1Acn::Asn1ModelStorage *asn1DataTypes() const;
 
@@ -106,15 +112,11 @@ public Q_SLOTS:
 
 private Q_SLOTS:
     void updateDirtyness();
-    void onAADLObjectAdded(aadl::AADLObject *object);
-    void onAADLObjectRemoved(aadl::AADLObject *object);
-    void onItemClicked();
-    void onItemDoubleClicked();
-    void onRootObjectChanged(shared::Id rootId);
+    void onItemClicked(shared::Id id);
+    void onItemDoubleClicked(shared::Id id);
 
     void onDataTypesMenuInvoked();
     void showPropertyEditor(aadl::AADLObject *obj);
-
     void showInfoMessage(const QString &title, const QString &message);
 
 private:
@@ -123,25 +125,13 @@ private:
     void resetDirtyness();
 
     bool loadImpl(const QString &path);
+    bool importImpl(const QString &path);
 
     QWidget *createView();
-    QGraphicsScene *createScene();
-
-    QGraphicsItem *createItemForObject(aadl::AADLObject *obj);
-    aadlinterface::AADLFunctionGraphicsItem *rootItem() const;
-    void updateItem(QGraphicsItem *item);
-
-    void updateComment(aadlinterface::AADLCommentGraphicsItem *comment);
-    void updateInterface(aadlinterface::AADLInterfaceGraphicsItem *iface);
-    void updateFunction(aadlinterface::AADLFunctionGraphicsItem *function);
-    void updateFunctionType(aadlinterface::AADLFunctionTypeGraphicsItem *functionType);
-    void updateConnection(aadlinterface::AADLConnectionGraphicsItem *connection);
-
-    void clearScene();
-    void changeRootItem(shared::Id id);
+    QTreeView *createModelView();
+    QTreeView *createImportView();
 
     void showNIYGUI(const QString &title = QString());
-    void updateSceneRect();
 
     struct InterfaceDocumentPrivate;
     InterfaceDocumentPrivate *d;

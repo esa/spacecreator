@@ -27,6 +27,7 @@ enum Id
     CreateFunctionEntity,
     CreateInterfaceEntity,
     CreateConnectionEntity,
+    CreateConnectionGroupEntity,
     ChangeEntityGeometry,
     RemoveEntity,
     ChangeRootEntity,

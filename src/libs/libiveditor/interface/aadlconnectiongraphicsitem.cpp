@@ -68,10 +68,6 @@ AADLConnectionGraphicsItem::AADLConnectionGraphicsItem(aadl::AADLObjectConnectio
     setFlags(QGraphicsItem::ItemIsSelectable | QGraphicsItem::ItemHasNoContents | QGraphicsItem::ItemClipsToShape
             | QGraphicsItem::ItemContainsChildrenInShape);
     setZValue(ZOrder.Connection);
-
-    applyColorScheme();
-
-    updateInterfaceConnectionsReference(IfaceConnectionReference::Set);
 }
 
 AADLConnectionGraphicsItem::~AADLConnectionGraphicsItem()
@@ -101,6 +97,12 @@ void AADLConnectionGraphicsItem::updateFromEntity()
         return;
 
     setPoints(polygon(obj->coordinates()));
+}
+
+void AADLConnectionGraphicsItem::init()
+{
+    InteractiveObject::init();
+    updateInterfaceConnectionsReference(IfaceConnectionReference::Set);
 }
 
 void AADLConnectionGraphicsItem::setPoints(const QVector<QPointF> &points)

@@ -47,11 +47,14 @@ public:
     QAction *actionSaveFile();
     QAction *actionSaveFileAs();
     QAction *actionOpenAadl();
+    QAction *actionImport();
+    QAction *actionExport();
     QAction *actionQuit();
     QAction *actionUndo();
     QAction *actionRedo();
     QAction *actionToggleMinimap();
     QAction *actionToggleE2EView();
+    QAction *actionToggleModelView();
 
     // Populate a CommandLineParser with the arguments this application can handle
     virtual void populateCommandLineArguments(CommandLineParser *parser) const = 0;
@@ -75,11 +78,14 @@ private:
     QAction *m_actionSaveFileAs { nullptr };
     QAction *m_actionCloseFile { nullptr };
     QAction *m_actionOpenAadl { nullptr };
+    QAction *m_actionImport { nullptr };
+    QAction *m_actionExport { nullptr };
     QAction *m_actionQuit { nullptr };
     QAction *m_actionUndo { nullptr };
     QAction *m_actionRedo { nullptr };
     QAction *m_actionToggleMinimap { nullptr };
     QAction *m_actionToggleE2EView { nullptr };
+    QAction *m_actionToggleModelView { nullptr };
 };
 
 }

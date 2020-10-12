@@ -20,7 +20,7 @@
 #include "aadlobject.h"
 #include "aadlobjectiface.h"
 
-#include <QObject>
+#include <QAbstractItemModel>
 #include <QVector>
 #include <memory>
 
@@ -32,10 +32,16 @@ class AADLObjectFunction;
 class AADLObjectFunctionType;
 
 struct AADLObjectsModelPrivate;
-class AADLObjectsModel : public QObject
+class AADLObjectsModel : public QAbstractItemModel
 {
     Q_OBJECT
 public:
+    enum class AADLRoles
+    {
+        IdRole = Qt::UserRole,
+        TypeRole
+    };
+
     explicit AADLObjectsModel(QObject *parent = nullptr);
     ~AADLObjectsModel() override;
 
@@ -49,7 +55,7 @@ public:
     AADLObject *getObject(const shared::Id &id) const;
     AADLObject *getObjectByName(const QString &name, AADLObject::Type type = AADLObject::Type::Unknown) const;
     AADLObjectIface *getIfaceByName(
-            const QString &name, AADLObjectIface::IfaceType dir, AADLObjectFunctionType *parent = nullptr) const;
+            const QString &name, AADLObjectIface::IfaceType dir, const AADLObjectFunctionType *parent = nullptr) const;
     AADLObjectFunction *getFunction(const shared::Id &id) const;
     AADLObjectFunction *getFunction(const QString &name) const;
     AADLObjectFunctionType *getFunctionType(const shared::Id &id) const;
@@ -59,6 +65,8 @@ public:
     AADLObjectIfaceProvided *getProvidedInterface(const shared::Id &id) const;
     AADLObjectConnection *getConnection(const shared::Id &id) const;
     AADLObjectComment *getCommentById(const shared::Id &id) const;
+    AADLObjectConnection *getConnection(
+            const QString &interfaceName, const QString &source, const QString &target) const;
 
     AADLObjectConnection *getConnectionForIface(const shared::Id &id) const;
     QVector<AADLObjectConnection *> getConnectionsForIface(const shared::Id &id) const;
@@ -70,8 +78,17 @@ public:
 
     void clear();
 
-    AADLObjectConnection *getConnection(
-            const QString &interfaceName, const QString &source, const QString &target) const;
+    QModelIndex index(int row, int column, const QModelIndex &parent) const override;
+    QModelIndex parent(const QModelIndex &child) const override;
+    int rowCount(const QModelIndex &parent = QModelIndex()) const override;
+    int columnCount(const QModelIndex &parent = QModelIndex()) const override;
+    QVariant data(const QModelIndex &index, int role = Qt::DisplayRole) const override;
+    Qt::ItemFlags flags(const QModelIndex &index) const override;
+    QModelIndex indexFromObject(AADLObject *object) const;
+    AADLObject *objectFromIndex(const QModelIndex &index) const;
+
+private:
+    int rowInParent(AADLObject *obj) const;
 
 Q_SIGNALS:
     void aadlObjectAdded(aadl::AADLObject *object);

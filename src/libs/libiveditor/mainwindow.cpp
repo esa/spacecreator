@@ -44,8 +44,10 @@
 #include <QMessageBox>
 #include <QStatusBar>
 #include <QTabWidget>
+#include <QTreeView>
 #include <QUndoCommand>
 #include <QUndoGroup>
+#include <QWindow>
 
 namespace aadlinterface {
 
@@ -76,6 +78,8 @@ MainWindow::MainWindow(aadlinterface::IVEditorCore *core, QWidget *parent)
     connect(m_core->actionSaveFile(), &QAction::triggered, this, [=]() { exportXml(); });
     connect(m_core->actionSaveFileAs(), &QAction::triggered, this, [=]() { exportXmlAs(); });
     connect(m_core->actionQuit(), &QAction::triggered, this, &MainWindow::onQuitRequested);
+    connect(m_core->actionImport(), &QAction::triggered, this, &MainWindow::onImportRequested);
+    connect(m_core->actionExport(), &QAction::triggered, this, &MainWindow::onExportRequested);
 
     // Register the actions to the action manager
     ActionsManager::registerAction(Q_FUNC_INFO, m_core->actionNewFile(), "Create file", "Create new empty file");
@@ -83,6 +87,8 @@ MainWindow::MainWindow(aadlinterface::IVEditorCore *core, QWidget *parent)
     ActionsManager::registerAction(Q_FUNC_INFO, m_core->actionQuit(), "Quit", "Quite the application");
     ActionsManager::registerAction(Q_FUNC_INFO, m_core->actionUndo(), "Undo", "Undo the last operation");
     ActionsManager::registerAction(Q_FUNC_INFO, m_core->actionRedo(), "Redo", "Redo the last undone operation");
+    ActionsManager::registerAction(Q_FUNC_INFO, m_core->actionImport(), "Import", "Import all available AADL files");
+    ActionsManager::registerAction(Q_FUNC_INFO, m_core->actionExport(), "Export", "Export selected objects");
 
     connect(m_core->document(), &InterfaceDocument::dirtyChanged, this, &MainWindow::onDocDirtyChanged);
 
@@ -123,6 +129,8 @@ MainWindow::MainWindow(aadlinterface::IVEditorCore *core, QWidget *parent)
     connect(core->actionToggleE2EView(), &QAction::toggled, endToEndView, &QWidget::setVisible);
     connect(endToEndView, &EndToEndView::visibleChanged, core->actionToggleE2EView(), &QAction::setChecked);
     endToEndView->setVisible(core->actionToggleE2EView()->isChecked());
+
+    connect(core->actionToggleModelView(), &QAction::triggered, core->document()->modelView(), &QWidget::show);
 }
 
 /*!
@@ -198,6 +206,16 @@ void MainWindow::onSaveRenderRequested()
 
         saveSceneRender(fileName);
     }
+}
+
+void MainWindow::onImportRequested()
+{
+    m_core->document()->import();
+}
+
+void MainWindow::onExportRequested()
+{
+    m_core->document()->exportSelected();
 }
 
 /*!

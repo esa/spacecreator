@@ -23,6 +23,7 @@
 #include "aadlobjectfunctiontype.h"
 #include "common.h"
 
+#include <QIcon>
 #include <QtDebug>
 
 namespace aadl {
@@ -35,7 +36,7 @@ struct AADLObjectsModelPrivate {
 };
 
 AADLObjectsModel::AADLObjectsModel(QObject *parent)
-    : QObject(parent)
+    : QAbstractItemModel(parent)
     , d(new AADLObjectsModelPrivate)
 {
 }
@@ -87,9 +88,19 @@ bool AADLObjectsModel::addObject(AADLObject *obj)
 
     obj->setObjectsModel(this);
 
+    const int parentObjRow = rowInParent(obj->parentObject());
+    const QModelIndex parentIdx =
+            parentObjRow == -1 ? QModelIndex() : createIndex(parentObjRow, 0, obj->parentObject());
+
+    const int objRow = rowInParent(obj);
+    beginInsertRows(parentIdx, objRow, objRow);
+
     d->m_objects.insert(id, obj);
     d->m_objectsOrder.append(id);
     d->m_visibleObjects.append(obj);
+
+    endInsertRows();
+
     Q_EMIT aadlObjectAdded(obj);
     return true;
 }
@@ -103,9 +114,15 @@ bool AADLObjectsModel::removeObject(AADLObject *obj)
     if (!getObject(id))
         return false;
 
+    const int objRow = rowInParent(obj);
+    const QModelIndex currentIdx = createIndex(objRow, 0, obj);
+    beginRemoveRows(currentIdx.parent(), objRow, objRow);
+
     d->m_objects.remove(id);
     d->m_objectsOrder.removeAll(id);
     d->m_visibleObjects.removeAll(obj);
+
+    endRemoveRows();
 
     Q_EMIT aadlObjectRemoved(obj);
     return true;
@@ -123,6 +140,8 @@ void AADLObjectsModel::setRootObject(shared::Id rootId)
 
     d->m_visibleObjects = visibleObjects(rootId);
     Q_EMIT rootObjectChanged(d->m_rootObjectId);
+
+    Q_EMIT dataChanged(QModelIndex(), QModelIndex());
 }
 
 AADLObject *AADLObjectsModel::rootObject() const
@@ -156,7 +175,7 @@ AADLObject *AADLObjectsModel::getObjectByName(const QString &name, AADLObject::T
 }
 
 AADLObjectIface *AADLObjectsModel::getIfaceByName(
-        const QString &name, AADLObjectIface::IfaceType dir, AADLObjectFunctionType *parent) const
+        const QString &name, AADLObjectIface::IfaceType dir, const AADLObjectFunctionType *parent) const
 {
     if (name.isEmpty()) {
         return nullptr;
@@ -253,9 +272,6 @@ AADLObjectComment *AADLObjectsModel::getCommentById(const shared::Id &id) const
 AADLObjectConnection *AADLObjectsModel::getConnectionForIface(const shared::Id &id) const
 {
     for (auto it = d->m_objects.constBegin(); it != d->m_objects.constEnd(); ++it) {
-        if (it.value()->aadlType() != AADLObject::Type::Connection)
-            continue;
-
         if (auto connection = qobject_cast<AADLObjectConnection *>(it.value())) {
             Q_ASSERT(connection->sourceInterface() != nullptr);
             Q_ASSERT(connection->targetInterface() != nullptr);
@@ -322,6 +338,8 @@ void AADLObjectsModel::clear()
 {
     Q_EMIT modelReset();
 
+    beginResetModel();
+
     for (auto object : d->m_objects.values())
         object->deleteLater();
 
@@ -330,6 +348,173 @@ void AADLObjectsModel::clear()
     d->m_visibleObjects.clear();
 
     d->m_rootObjectId = shared::InvalidId;
+
+    endResetModel();
+}
+
+QModelIndex AADLObjectsModel::index(int row, int column, const QModelIndex &parent) const
+{
+    if (!hasIndex(row, column, parent)) {
+        return QModelIndex();
+    }
+
+    QObject *internalPtr { nullptr };
+    if (parent.isValid()) {
+        const auto parentObj = static_cast<QObject *>(parent.internalPointer());
+        const QObjectList siblings = parentObj->children();
+        internalPtr = siblings.value(row);
+    } else {
+        int rootItemRow = 0;
+        for (const auto aadlObjectId : d->m_objectsOrder) {
+            if (const auto aadlObject = d->m_objects.value(aadlObjectId)) {
+                if (aadlObject->parent() == this) {
+                    if (rootItemRow == row) {
+                        internalPtr = aadlObject;
+                        break;
+                    }
+                    ++rootItemRow;
+                }
+            }
+        }
+    }
+
+    return createIndex(row, column, internalPtr);
+}
+
+Qt::ItemFlags AADLObjectsModel::flags(const QModelIndex &index) const
+{
+    if (index.isValid()) {
+        return Qt::ItemIsEnabled | Qt::ItemIsSelectable | Qt::ItemIsUserCheckable;
+    }
+
+    return Qt::NoItemFlags;
+}
+
+QModelIndex AADLObjectsModel::indexFromObject(AADLObject *object) const
+{
+    return createIndex(rowInParent(object), 0, object);
+}
+
+AADLObject *AADLObjectsModel::objectFromIndex(const QModelIndex &index) const
+{
+    if (!index.isValid()) {
+        return nullptr;
+    }
+
+    return static_cast<AADLObject *>(index.internalPointer());
+}
+
+int AADLObjectsModel::rowInParent(AADLObject *obj) const
+{
+    if (!obj) {
+        return -1;
+    }
+
+    if (obj->parent() == this) {
+        int rootItemRow = 0;
+        for (const auto aadlObjectId : d->m_objectsOrder) {
+            if (const auto aadlObject = d->m_objects.value(aadlObjectId)) {
+                if (aadlObject->parent() == this) {
+                    if (aadlObject == obj)
+                        break;
+                    ++rootItemRow;
+                }
+            }
+        }
+        return rootItemRow;
+    }
+
+    if (auto parentObj = obj->parentObject()) {
+        return parentObj->children().indexOf(obj);
+    }
+
+    return -1;
+}
+
+QModelIndex AADLObjectsModel::parent(const QModelIndex &child) const
+{
+    if (!child.isValid() || static_cast<QObject *>(child.internalPointer())->parent() == this) {
+        return QModelIndex();
+    }
+
+    return createIndex(rowInParent(static_cast<AADLObject *>(child.internalPointer())), 0,
+            static_cast<QObject *>(child.internalPointer())->parent());
+}
+
+int AADLObjectsModel::rowCount(const QModelIndex &parent) const
+{
+    const QObject *parentPtr = parent.isValid() ? static_cast<QObject *>(parent.internalPointer()) : this;
+    return std::count_if(d->m_objects.constBegin(), d->m_objects.constEnd(),
+            [parentPtr](AADLObject *obj) { return obj->parent() == parentPtr; });
+}
+
+int AADLObjectsModel::columnCount(const QModelIndex &parent) const
+{
+    return 1;
+}
+
+QVariant AADLObjectsModel::data(const QModelIndex &index, int role) const
+{
+    if (!index.isValid()) {
+        return QVariant();
+    }
+
+    auto obj = static_cast<AADLObject *>(index.internalPointer());
+    Q_ASSERT(obj);
+    if (role == Qt::DecorationRole) {
+        switch (obj->aadlType()) {
+        case AADLObject::Type::Function: {
+            static const QPixmap icon =
+                    QIcon(QLatin1String(":/tab_interface/toolbar/icns/function.svg")).pixmap(16, 16);
+            return icon;
+        } break;
+        case AADLObject::Type::FunctionType: {
+            static const QPixmap icon =
+                    QIcon(QLatin1String(":/tab_interface/toolbar/icns/function_type.svg")).pixmap(16, 16);
+            return icon;
+        } break;
+        case AADLObject::Type::Comment: {
+            static const QPixmap icon = QIcon(QLatin1String(":/tab_interface/toolbar/icns/comment.svg")).pixmap(16, 16);
+            return icon;
+        } break;
+        case AADLObject::Type::RequiredInterface: {
+            static const QPixmap icon = QIcon(QLatin1String(":/tab_interface/toolbar/icns/ri.svg")).pixmap(16, 16);
+            return icon;
+        } break;
+        case AADLObject::Type::ProvidedInterface: {
+            static const QPixmap icon = QIcon(QLatin1String(":/tab_interface/toolbar/icns/pi.svg")).pixmap(16, 16);
+            return icon;
+        } break;
+        case AADLObject::Type::Connection: {
+            static const QPixmap icon =
+                    QIcon(QLatin1String(":/tab_interface/toolbar/icns/connection.svg")).pixmap(16, 16);
+            return icon;
+        } break;
+        default:
+            break;
+        }
+        return QIcon();
+    }
+
+    if (role == static_cast<int>(AADLRoles::IdRole)) {
+        return obj->id();
+    } else if (role == static_cast<int>(AADLRoles::TypeRole)) {
+        return static_cast<int>(obj->aadlType());
+    }
+
+    if (role == Qt::DisplayRole) {
+        if (obj->aadlType() == AADLObject::Type::Connection) {
+            if (auto connectionPtr = qobject_cast<AADLObjectConnection *>(obj)) {
+                return QString("%1.%2 <-> %3.%4")
+                        .arg(connectionPtr->sourceName(), connectionPtr->sourceInterfaceName(),
+                                connectionPtr->targetName(), connectionPtr->targetInterfaceName());
+            }
+            return QVariant();
+        }
+        return obj->title();
+    }
+
+    return QVariant();
 }
 
 /*!

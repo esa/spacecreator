@@ -73,6 +73,11 @@ void InteractiveObject::setFont(const QFont &font)
     m_font = font;
 }
 
+void InteractiveObject::init()
+{
+    applyColorScheme();
+}
+
 void InteractiveObject::updateEntity()
 {
     QList<QVariant> params;

@@ -1,7 +1,7 @@
 <Attrs>
     <Attr name="name">
         <Type>
-            <String validator="[a-zA-Z0-9_]+"/>
+            <String defaultValue="AAAA" validator="[a-zA-Z0-9_]+"/>
         </Type>
         <Scopes/>
     </Attr>
@@ -16,10 +16,11 @@
             <Function/>
         </Scopes>
         <Type>
-            <Enumeration>
+            <Enumeration defaultValue="SDL">
                 <Entry value="C"/>
                 <Entry value="ADA"/>
                 <Entry value="SDL"/>
+                <Entry value="Cobol"/>
             </Enumeration>
         </Type>
     </Attr>
@@ -51,10 +52,10 @@
         </Scopes>
         <Type>
             <Enumeration>
-                <Entry value="CYCLIC_OPERATION"/>
-                <Entry value="SPORADIC_OPERATION"/>
-                <Entry value="PROTECTED_OPERATION"/>
-                <Entry value="UNPROTECTED_OPERATION"/>
+                <Entry value="Cyclic"/>
+                <Entry value="Sporadic"/>
+                <Entry value="Protected"/>
+                <Entry value="Unprotected"/>
             </Enumeration>
         </Type>
     </Attr>
@@ -64,10 +65,10 @@
         </Type>
         <Scopes>
             <Required_Interface>
-                <AttrValidator name="kind" value="CYCLIC_OPERATION"/>
+                <AttrValidator name="kind" value="Cyclic"/>
             </Required_Interface>
             <Provided_Interface>
-                <AttrValidator name="kind" value="CYCLIC_OPERATION"/>
+                <AttrValidator name="kind" value="Cyclic"/>
             </Provided_Interface>
         </Scopes>
     </Attr>
@@ -77,10 +78,10 @@
         </Type>
         <Scopes>
             <Required_Interface>
-                <AttrValidator name="kind" value="CYCLIC_OPERATION"/>
+                <AttrValidator name="kind" value="Cyclic"/>
             </Required_Interface>
             <Provided_Interface>
-                <AttrValidator name="kind" value="CYCLIC_OPERATION"/>
+                <AttrValidator name="kind" value="Cyclic"/>
             </Provided_Interface>
         </Scopes>
     </Attr>
@@ -90,10 +91,10 @@
         </Type>
         <Scopes>
             <Required_Interface>
-                <AttrValidator name="kind" value="CYCLIC_OPERATION"/>
+                <AttrValidator name="kind" value="Cyclic"/>
             </Required_Interface>
             <Provided_Interface>
-                <AttrValidator name="kind" value="CYCLIC_OPERATION"/>
+                <AttrValidator name="kind" value="Cyclic"/>
             </Provided_Interface>
         </Scopes>
     </Attr>
@@ -109,7 +110,7 @@
         </Type>
         <Scopes/>
     </Attr>
-    <Attr name="Taste::RootCoordinates" type="property" visible="false">
+    <Attr label="SomeLabel" name="Taste::RootCoordinates" type="property" visible="false">
         <Type>
             <String validator="[0-9 ]+"/>
         </Type>

@@ -20,9 +20,11 @@
 #include "aadlcommonprops.h"
 #include "aadlobjectcomment.h"
 #include "aadlobjectconnection.h"
+#include "aadlobjectconnectiongroup.h"
 #include "aadlobjectfunction.h"
 #include "aadlobjectfunctiontype.h"
 #include "aadlobjectiface.h"
+#include "aadlobjectifacegroup.h"
 #include "aadlparameter.h"
 
 #include <QDebug>
@@ -71,6 +73,7 @@ struct CurrentObjectHolder {
         m_iface = m_object ? m_object->as<AADLObjectIface *>() : nullptr;
         m_comment = m_object ? m_object->as<AADLObjectComment *>() : nullptr;
         m_connection = m_object ? m_object->as<AADLObjectConnection *>() : nullptr;
+        m_connectionGroup = m_object ? m_object->as<AADLObjectConnectionGroup *>() : nullptr;
     }
 
     QPointer<AADLObject> get() { return m_object; }
@@ -78,6 +81,7 @@ struct CurrentObjectHolder {
     QPointer<AADLObjectIface> iface() { return m_iface; }
     QPointer<AADLObjectComment> comment() { return m_comment; }
     QPointer<AADLObjectConnection> connection() { return m_connection; }
+    QPointer<AADLObjectConnectionGroup> connectionGroup() { return m_connectionGroup; }
 
 private:
     QPointer<AADLObject> m_object { nullptr };
@@ -85,6 +89,7 @@ private:
     QPointer<AADLObjectIface> m_iface { nullptr };
     QPointer<AADLObjectComment> m_comment { nullptr };
     QPointer<AADLObjectConnection> m_connection { nullptr };
+    QPointer<AADLObjectConnectionGroup> m_connectionGroup { nullptr };
 };
 
 typedef QHash<QString, QHash<QString, AADLObjectIface *>> IfacesByFunction; // { Function[Type]Id, {IfaceName, Iface} }
@@ -95,6 +100,12 @@ struct AADLXMLReaderPrivate {
     IfacesByFunction m_ifaceRequiredNames {};
     IfacesByFunction m_ifaceProvidedNames {};
     QHash<QString, AADLObjectConnection *> m_connectionsById {};
+    struct GroupInfo {
+        QList<shared::Id> m_connectionIds;
+        QList<AADLObjectIface *> m_interfaces;
+    };
+
+    QHash<QString, GroupInfo> m_connectionGroups;
 
     CurrentObjectHolder m_currentObject;
     void setCurrentObject(AADLObject *obj)
@@ -278,7 +289,11 @@ void AADLXMLReader::processTagOpen(QXmlStreamReader &xml)
     case Props::Token::Required_Interface: {
         Q_ASSERT(d->m_currentObject.function() != nullptr);
 
-        obj = addIface(nameAttr.m_value, Props::Token::Required_Interface == t);
+        const auto iface = addIface(nameAttr.m_value, Props::Token::Required_Interface == t);
+        const QString groupName = attrs.value(Props::token(Props::Token::group_name)).m_value;
+        if (!groupName.isEmpty())
+            d->m_connectionGroups[groupName].m_interfaces.append(iface);
+        obj = iface;
         break;
     }
     case Props::Token::Output_Parameter:
@@ -290,22 +305,29 @@ void AADLXMLReader::processTagOpen(QXmlStreamReader &xml)
         d->m_currentObject.iface()->addParam(param);
         break;
     }
+    case Props::Token::ConnectionGroup: {
+        obj = addConnectionGroup(nameAttr.m_value);
+        break;
+    }
     case Props::Token::Connection: {
         obj = addConnection();
+        const QString groupName = attrs.value(Props::token(Props::Token::group_name)).m_value;
+        if (!groupName.isEmpty())
+            d->m_connectionGroups[groupName].m_connectionIds.append(obj->id());
         break;
     }
     case Props::Token::Source:
     case Props::Token::Target: {
         Q_ASSERT(d->m_currentObject.connection() != nullptr);
 
-        if (AADLObjectConnection::EndPointInfo *info = addConnectionPart(attrs)) {
-            if (d->m_currentObject.connection()) {
-                if (t == Props::Token::Source)
+        if (d->m_currentObject.connection()) {
+            if (AADLObjectConnection::EndPointInfo *info = addConnectionPart(attrs)) {
+                if (t == Props::Token::Source) {
                     d->m_currentObject.connection()->setDelayedStart(info);
-                else
+                } else {
                     d->m_currentObject.connection()->setDelayedEnd(info);
-            } else
-                delete info;
+                }
+            }
         }
         break;
     }
@@ -339,6 +361,7 @@ void AADLXMLReader::processTagClose(QXmlStreamReader &xml)
     case Props::Token::Function:
     case Props::Token::Required_Interface:
     case Props::Token::Provided_Interface:
+    case Props::Token::ConnectionGroup:
     case Props::Token::Connection:
     case Props::Token::Comment: {
         d->setCurrentObject(d->m_currentObject.get() ? d->m_currentObject.get()->parentObject() : nullptr);
@@ -402,4 +425,35 @@ AADLObjectConnection *AADLXMLReader::addConnection()
     return connection;
 }
 
+AADLObjectConnectionGroup *AADLXMLReader::addConnectionGroup(const QString &groupName)
+{
+    QHash<shared::Id, AADLObjectIfaceGroup *> mappings;
+    for (const auto iface : d->m_connectionGroups.value(groupName).m_interfaces) {
+        Q_ASSERT(iface->parentObject());
+        auto it = mappings.find(iface->parentObject()->id());
+        if (it != mappings.end()) {
+            it.value()->addEntity(iface);
+        } else {
+            auto ifaceGroup = new AADLObjectIfaceGroup({});
+            ifaceGroup->setParentObject(iface->parentObject());
+            ifaceGroup->setGroupName(groupName);
+            ifaceGroup->addEntity(iface);
+            mappings.insert(iface->parentObject()->id(), ifaceGroup);
+        }
+    }
+    Q_ASSERT(mappings.size() == 2);
+    auto sourceIfaceGroup = *mappings.begin();
+    auto targetIfaceGroup = *std::next(mappings.begin());
+
+    d->m_allObjects.append(sourceIfaceGroup);
+    d->m_allObjects.append(targetIfaceGroup);
+
+    AADLObjectConnectionGroup *connection =
+            new AADLObjectConnectionGroup(groupName, sourceIfaceGroup, targetIfaceGroup, {}, d->m_currentObject.get());
+    connection->initConnections(d->m_connectionGroups.value(groupName).m_connectionIds);
+    if (d->m_currentObject.function())
+        d->m_currentObject.function()->addChild(connection);
+
+    return connection;
+}
 }

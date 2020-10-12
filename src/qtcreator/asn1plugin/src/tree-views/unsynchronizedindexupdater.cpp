@@ -57,7 +57,7 @@ void UnsynchronizedIndexUpdater::updateCurrentIndex()
     const auto selected = restoreSelectedPaths();
     const auto current = restoreCurrentPath();
 
-    emit indexSelectionUpdated(selected, current);
+    Q_EMIT indexSelectionUpdated(selected, current);
 }
 
 void UnsynchronizedIndexUpdater::clearSavedPaths()

@@ -109,7 +109,7 @@ void SelectSourcePage::builtInRadioToggled(bool checked)
     else
         m_ui.builtInCombo->clear();
 
-    emit completeChanged();
+    Q_EMIT completeChanged();
 }
 
 bool SelectSourcePage::configHasBuiltInLibraries() const

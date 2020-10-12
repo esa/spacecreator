@@ -54,5 +54,21 @@
         "fill_type": 0,
         "pen_color": "#ff7c714e",
         "pen_width": 2
+    },
+    {
+        "brush_color0": "#fff9e29c",
+        "brush_color1": "#fff9e29c",
+        "color_type": 7,
+        "fill_type": 0,
+        "pen_color": "#ff7c714e",
+        "pen_width": 4
+    },
+    {
+        "brush_color0": "#fff9e29c",
+        "brush_color1": "#fff9e29c",
+        "color_type": 8,
+        "fill_type": 0,
+        "pen_color": "#ff7c714e",
+        "pen_width": 1
     }
 ]

@@ -52,7 +52,7 @@ void ModelValidityGuard::invalidate()
 
     m_modifiersCnt++;
 
-    emit modelAboutToChange();
+    Q_EMIT modelAboutToChange();
 }
 
 void ModelValidityGuard::validate()
@@ -66,5 +66,5 @@ void ModelValidityGuard::validate()
     }
 
     ParsedDataStorage::instance()->resetProjectBuildersCount();
-    emit modelChanged();
+    Q_EMIT modelChanged();
 }

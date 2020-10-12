@@ -44,10 +44,12 @@ AADLCommentGraphicsItem::AADLCommentGraphicsItem(aadl::AADLObjectComment *commen
     setFlag(QGraphicsItem::ItemIsSelectable);
     setFont(qApp->font());
     setZValue(ZOrder.Comment);
+}
 
-    applyColorScheme();
-
-    connect(comment, &aadl::AADLObject::titleChanged, this, &InteractiveObject::updateGraphicsItem);
+void AADLCommentGraphicsItem::init()
+{
+    AADLRectGraphicsItem::init();
+    connect(entity(), &aadl::AADLObject::titleChanged, this, &InteractiveObject::updateGraphicsItem);
 }
 
 void AADLCommentGraphicsItem::updateFromEntity()

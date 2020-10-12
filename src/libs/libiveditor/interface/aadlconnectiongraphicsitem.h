@@ -55,6 +55,8 @@ public:
     aadl::AADLObjectConnection *entity() const;
     void updateFromEntity() override;
 
+    void init() override;
+
     QPainterPath shape() const override;
     QRectF boundingRect() const override;
     void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget) override;
@@ -85,6 +87,7 @@ protected:
     void onManualMoveFinish(shared::ui::GripPoint *gp, const QPointF &pressedAt, const QPointF &releasedAt) override;
 
     virtual ColorManager::HandledColors handledColorType() const override;
+    virtual void updateBoundingRect();
 
 protected Q_SLOTS:
     virtual void applyColorScheme() override;
@@ -94,7 +97,6 @@ protected Q_SLOTS:
 private:
     bool removeCollidedGrips(shared::ui::GripPoint *gp);
     void simplify();
-    void updateBoundingRect();
 
     enum class IfaceConnectionReference
     {

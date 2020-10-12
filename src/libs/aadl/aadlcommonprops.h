@@ -40,6 +40,7 @@ public:
         Output_Parameter,
         Required_Interface,
         Connection,
+        ConnectionGroup,
         Comment,
         Source,
         Target,
@@ -58,6 +59,7 @@ public:
         encoding,
         ri_name,
         pi_name,
+        group_name,
         func_name,
 
         // KNOWN TASTE props:

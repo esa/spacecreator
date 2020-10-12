@@ -19,6 +19,7 @@
 
 #include "aadlobjectcomment.h"
 #include "aadlobjectconnection.h"
+#include "aadlobjectconnectiongroup.h"
 #include "aadlobjectfunction.h"
 #include "aadlobjectfunctiontype.h"
 #include "aadlobjectiface.h"
@@ -63,6 +64,14 @@ QVariantList ExportableAADLFunction::connections() const
     for (const auto connection : exportedObject<aadl::AADLObjectFunctionType>()->connections())
         connections << createFrom(connection);
     return connections;
+}
+
+QVariantList ExportableAADLFunction::connectionGroups() const
+{
+    QVariantList connectionGroups;
+    for (const auto connectionGroup : exportedObject<aadl::AADLObjectFunctionType>()->connectionGroups())
+        connectionGroups << createFrom(connectionGroup);
+    return connectionGroups;
 }
 
 }

@@ -37,12 +37,12 @@ LibraryStorage *LibraryStorage::instance()
 
 void LibraryStorage::addLibrary(LibraryPtr library)
 {
-    emit aboutToChange();
+    Q_EMIT aboutToChange();
     {
         QMutexLocker lock(&m_libraryMutex);
         m_libraries[library->name()] = std::move(library);
     }
-    emit changed();
+    Q_EMIT changed();
 }
 
 void LibraryStorage::addGeneralMetadata(Metadata::General metadata)
@@ -59,12 +59,12 @@ Metadata::General LibraryStorage::generalMetadata(const QString &path)
 
 void LibraryStorage::removeLibraries()
 {
-    emit aboutToChange();
+    Q_EMIT aboutToChange();
     {
         QMutexLocker lock(&m_libraryMutex);
         m_libraries.clear();
     }
-    emit changed();
+    Q_EMIT changed();
 }
 
 void LibraryStorage::removeAllMetadata()

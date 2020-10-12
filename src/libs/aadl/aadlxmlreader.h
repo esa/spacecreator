@@ -33,6 +33,7 @@ class AADLObjectIface;
 class AADLObjectFunctionType;
 class AADLObjectComment;
 class AADLObjectConnection;
+class AADLObjectConnectionGroup;
 struct AADLXMLReaderPrivate;
 class AADLXMLReader : public QObject
 {
@@ -63,6 +64,7 @@ private:
     AADLObjectIface *addIface(const QString &name, bool isRI);
     AADLObjectComment *addComment(const QString &text);
     AADLObjectConnection *addConnection();
+    AADLObjectConnectionGroup *addConnectionGroup(const QString &groupName);
 };
 
 }

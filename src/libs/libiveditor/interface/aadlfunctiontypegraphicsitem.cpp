@@ -50,44 +50,45 @@ AADLFunctionTypeGraphicsItem::AADLFunctionTypeGraphicsItem(aadl::AADLObjectFunct
 {
     setFlag(QGraphicsItem::ItemIsSelectable);
     setZValue(ZOrder.Function);
-
-    if (entity) {
-        m_textItem->setPlainText(entity->title());
-        m_textItem->setTextAlignment(Qt::AlignLeft | Qt::AlignTop);
-
-        connect(m_textItem, &TextGraphicsItem::edited, this, [this, entity](const QString &text) {
-            if (!aadl::AADLNameValidator::isAcceptableName(entity, text)) {
-                m_textItem->setPlainText(entity->title());
-                return;
-            }
-
-            const QVariantMap attributess = { { aadl::meta::Props::token(aadl::meta::Props::Token::name), text } };
-            if (const auto attributesCmd = cmd::CommandsFactory::create(
-                        cmd::ChangeEntityAttributes, { QVariant::fromValue(entity), QVariant::fromValue(attributess) }))
-                cmd::CommandsStack::current()->push(attributesCmd);
-        });
-        connect(entity, qOverload<aadl::meta::Props::Token>(&aadl::AADLObjectFunction::attributeChanged), this,
-                [this, entity](aadl::meta::Props::Token attr) {
-                    if (attr == aadl::meta::Props::Token::name) {
-                        const QString txt = entity->title();
-                        if (m_textItem->toPlainText() != txt) {
-                            m_textItem->setPlainText(txt);
-                            updateTextPosition();
-                        }
-                    }
-                });
-        connect(entity, &aadl::AADLObjectFunction::titleChanged, this, [this](const QString &text) {
-            m_textItem->setPlainText(text);
-            instantLayoutUpdate();
-        });
-        connect(m_textItem, &AADLFunctionNameGraphicsItem::editingModeOff, this, [this]() { updateTextPosition(); });
-    }
-    applyColorScheme();
 }
 
 aadl::AADLObjectFunctionType *AADLFunctionTypeGraphicsItem::entity() const
 {
     return qobject_cast<aadl::AADLObjectFunctionType *>(aadlObject());
+}
+
+void AADLFunctionTypeGraphicsItem::init()
+{
+    AADLRectGraphicsItem::init();
+    m_textItem->setPlainText(entity()->title());
+    m_textItem->setTextAlignment(Qt::AlignLeft | Qt::AlignTop);
+
+    connect(m_textItem, &TextGraphicsItem::edited, this, [this](const QString &text) {
+        if (!aadl::AADLNameValidator::isAcceptableName(entity(), text)) {
+            m_textItem->setPlainText(entity()->title());
+            return;
+        }
+
+        const QVariantMap attributess = { { aadl::meta::Props::token(aadl::meta::Props::Token::name), text } };
+        if (const auto attributesCmd = cmd::CommandsFactory::create(
+                    cmd::ChangeEntityAttributes, { QVariant::fromValue(entity()), QVariant::fromValue(attributess) }))
+            cmd::CommandsStack::current()->push(attributesCmd);
+    });
+    connect(entity(), qOverload<aadl::meta::Props::Token>(&aadl::AADLObjectFunction::attributeChanged), this,
+            [this](aadl::meta::Props::Token attr) {
+                if (attr == aadl::meta::Props::Token::name) {
+                    const QString txt = entity()->title();
+                    if (m_textItem->toPlainText() != txt) {
+                        m_textItem->setPlainText(txt);
+                        updateTextPosition();
+                    }
+                }
+            });
+    connect(entity(), &aadl::AADLObjectFunction::titleChanged, this, [this](const QString &text) {
+        m_textItem->setPlainText(text);
+        instantLayoutUpdate();
+    });
+    connect(m_textItem, &AADLFunctionNameGraphicsItem::editingModeOff, this, [this]() { updateTextPosition(); });
 }
 
 void AADLFunctionTypeGraphicsItem::rebuildLayout()

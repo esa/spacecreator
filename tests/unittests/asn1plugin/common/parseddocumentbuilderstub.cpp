@@ -38,14 +38,14 @@ void ParsedDocumentBuilderStub::run()
     const auto value = it.value();
 
     if (value == "ERROR") {
-        emit errored();
+        Q_EMIT errored();
     } else if (value == "FAILED") {
-        emit failed();
+        Q_EMIT failed();
     } else if (value == "SUCCESS") {
         auto modules = std::make_unique<Asn1Acn::File>(it.key());
         m_parsedDocuments.push_back(std::move(modules));
 
-        emit finished();
+        Q_EMIT finished();
     }
 }
 

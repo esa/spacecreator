@@ -89,7 +89,7 @@ void VcsHandler::addToVcs(const QStringList &files)
 void VcsHandler::onConfigChanged()
 {
     updateVcsList();
-    emit vcsListChanged();
+    Q_EMIT vcsListChanged();
 }
 
 namespace {

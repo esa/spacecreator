@@ -31,6 +31,7 @@ const QHash<QString, Props::Token> Props::TokensByName = {
     { "Output_Parameter", Token::Output_Parameter },
     { "Required_Interface", Token::Required_Interface },
     { "Connection", Token::Connection },
+    { "ConnectionGroup", Token::ConnectionGroup },
     { "Comment", Token::Comment },
     { "Source", Token::Source },
     { "Target", Token::Target },
@@ -49,6 +50,7 @@ const QHash<QString, Props::Token> Props::TokensByName = {
     { "encoding", Token::encoding },
     { "ri_name", Token::ri_name },
     { "pi_name", Token::pi_name },
+    { "group_name", Token::group_name },
     { "func_name", Token::func_name },
 
     // TASTE props:

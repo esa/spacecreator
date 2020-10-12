@@ -45,6 +45,7 @@ public:
 
     aadl::AADLObjectIface *entity() const;
 
+    void init() override;
     int type() const override { return Type; }
     void addConnection(AADLConnectionGraphicsItem *item);
     void removeConnection(AADLConnectionGraphicsItem *item);
@@ -74,6 +75,8 @@ protected:
     void updateInternalItems(Qt::Alignment alignment);
     virtual ColorManager::HandledColors handledColorType() const override;
     void adjustItem();
+    qreal typeIconHeight() const;
+    qreal baseLength() const;
 
     QVariant itemChange(GraphicsItemChange change, const QVariant &value) override;
 
@@ -81,15 +84,16 @@ protected Q_SLOTS:
     virtual void applyColorScheme() override;
     void updateLabel();
     void updateKind();
+    void updateIface();
     void onAttrOrPropChanged(aadl::meta::Props::Token t);
+
+    virtual QPainterPath ifacePath() const;
+    virtual QPainterPath typePath() const;
 
 private:
     QTransform typeTransform(Qt::Alignment alignment) const;
     QTransform ifaceTransform(Qt::Alignment alignment) const;
     QPainterPath itemPath(Qt::Alignment alignment) const;
-
-    QPainterPath ifacePath() const;
-    QPainterPath typePath() const;
 
 private:
     friend tst_PositionLookupHelper;

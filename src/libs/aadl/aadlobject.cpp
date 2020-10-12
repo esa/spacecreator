@@ -191,6 +191,11 @@ bool AADLObject::isFunctionType() const
     return aadlType() == Type::FunctionType;
 }
 
+bool AADLObject::isInterfaceGroup() const
+{
+    return aadlType() == Type::InterfaceGroup;
+}
+
 bool AADLObject::isRequiredInterface() const
 {
     return aadlType() == Type::RequiredInterface;
@@ -203,7 +208,7 @@ bool AADLObject::isProvidedInterface() const
 
 bool AADLObject::isInterface() const
 {
-    return isRequiredInterface() || isProvidedInterface();
+    return isRequiredInterface() || isProvidedInterface() || isInterfaceGroup();
 }
 
 bool AADLObject::isComment() const
@@ -214,6 +219,11 @@ bool AADLObject::isComment() const
 bool AADLObject::isConnection() const
 {
     return aadlType() == Type::Connection;
+}
+
+bool AADLObject::isConnectionGroup() const
+{
+    return aadlType() == Type::ConnectionGroup;
 }
 
 bool AADLObject::isNestedInFunction() const
@@ -233,6 +243,16 @@ bool AADLObject::isNestedInFunctionType() const
 bool AADLObject::isNested() const
 {
     return isNestedInFunction() || isNestedInFunctionType();
+}
+
+QString AADLObject::groupName() const
+{
+    return attr(meta::Props::token(meta::Props::Token::group_name)).toString();
+}
+
+void AADLObject::setGroupName(const QString &groupName)
+{
+    setAttr(meta::Props::token(meta::Props::Token::group_name), groupName);
 }
 
 QHash<QString, QVariant> AADLObject::attrs() const
@@ -343,6 +363,11 @@ AADLObjectsModel *AADLObject::objectsModel() const
 bool AADLObject::isRootObject() const
 {
     return d->m_model ? d->m_model->rootObject() == this : false;
+}
+
+bool AADLObject::isGrouped() const
+{
+    return !groupName().isEmpty();
 }
 
 }

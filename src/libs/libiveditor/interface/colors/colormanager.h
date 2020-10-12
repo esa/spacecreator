@@ -85,6 +85,8 @@ public:
         Iface,
         Connection,
         Comment,
+        ConnectionGroup,
+        IfaceGroup,
     };
 
     static QString handledColorTypeName(HandledColors t);

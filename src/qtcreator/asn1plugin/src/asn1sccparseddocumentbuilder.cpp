@@ -74,7 +74,7 @@ void Asn1SccParsedDocumentBuilder::requestFinished()
         parseResponse(reply->readAll());
     } else {
         Messages::messageNetworkReplyError(reply);
-        emit failed();
+        Q_EMIT failed();
     }
 
     reply->deleteLater();
@@ -85,10 +85,10 @@ void Asn1SccParsedDocumentBuilder::parseResponse(const QByteArray &jsonData)
     const auto json = QJsonDocument::fromJson(jsonData).object();
     if (responseContainsAst(json)) {
         parseXML(getAstXml(json));
-        emit finished();
+        Q_EMIT finished();
     } else {
         storeErrorMessages(json);
-        emit errored();
+        Q_EMIT errored();
     }
 }
 

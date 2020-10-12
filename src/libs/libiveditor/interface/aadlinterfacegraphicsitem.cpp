@@ -51,24 +51,26 @@ AADLInterfaceGraphicsItem::AADLInterfaceGraphicsItem(aadl::AADLObjectIface *enti
     setFlag(QGraphicsItem::ItemHasNoContents);
     setFlag(QGraphicsItem::ItemIsSelectable);
     setZValue(ZOrder.Interface);
-    updateKind();
-
-    m_iface->setPath(ifacePath());
-    //    setInterfaceName(ifaceLabel());
-
-    connect(entity, qOverload<aadl::meta::Props::Token>(&aadl::AADLObject::attributeChanged), this,
-            &AADLInterfaceGraphicsItem::onAttrOrPropChanged);
-    connect(entity, &aadl::AADLObjectIface::titleChanged, this, &AADLInterfaceGraphicsItem::updateLabel);
-    if (auto ri = qobject_cast<aadl::AADLObjectIfaceRequired *>(entity))
-        connect(ri, &aadl::AADLObjectIfaceRequired::inheritedLabelsChanged, this,
-                &AADLInterfaceGraphicsItem::updateLabel);
-
-    applyColorScheme();
 }
 
 aadl::AADLObjectIface *AADLInterfaceGraphicsItem::entity() const
 {
     return qobject_cast<aadl::AADLObjectIface *>(aadlObject());
+}
+
+void AADLInterfaceGraphicsItem::init()
+{
+    InteractiveObject::init();
+    connect(entity(), qOverload<aadl::meta::Props::Token>(&aadl::AADLObject::attributeChanged), this,
+            &AADLInterfaceGraphicsItem::onAttrOrPropChanged);
+    connect(entity(), &aadl::AADLObjectIface::titleChanged, this, &AADLInterfaceGraphicsItem::updateLabel);
+    if (auto ri = qobject_cast<aadl::AADLObjectIfaceRequired *>(entity()))
+        connect(ri, &aadl::AADLObjectIfaceRequired::inheritedLabelsChanged, this,
+                &AADLInterfaceGraphicsItem::updateLabel);
+
+    updateIface();
+    updateKind();
+    setInterfaceName(ifaceLabel());
 }
 
 void AADLInterfaceGraphicsItem::addConnection(AADLConnectionGraphicsItem *item)
@@ -323,6 +325,15 @@ void AADLInterfaceGraphicsItem::adjustItem()
     }
 }
 
+qreal AADLInterfaceGraphicsItem::typeIconHeight() const
+{
+    return kHeight;
+}
+qreal AADLInterfaceGraphicsItem::baseLength() const
+{
+    return kBase;
+}
+
 void AADLInterfaceGraphicsItem::applyColorScheme()
 {
     const ColorHandler &h = colorHandler();
@@ -342,6 +353,12 @@ void AADLInterfaceGraphicsItem::updateLabel()
 void AADLInterfaceGraphicsItem::updateKind()
 {
     m_type->setPath(typePath());
+    m_shape = composeShape();
+}
+
+void AADLInterfaceGraphicsItem::updateIface()
+{
+    m_iface->setPath(ifacePath());
     m_shape = composeShape();
 }
 

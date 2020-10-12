@@ -134,7 +134,7 @@ void MetadataModel::selectItems(const MetadataCheckStateHandler::States &items)
 {
     for (auto it = items.begin(); it != items.end(); ++it) {
         m_selectedItems.insert(it.key(), it.value());
-        emit dataChanged(it.key(), it.key());
+        Q_EMIT dataChanged(it.key(), it.key());
     }
 }
 
@@ -143,5 +143,5 @@ void MetadataModel::itemConflicted(const MetadataCheckStateHandler::Conflict &co
     QTC_ASSERT(!conflict.first.isEmpty(), return );
     QTC_ASSERT(!conflict.second.isEmpty(), return );
 
-    emit conflictOccurred(conflict.first, conflict.second);
+    Q_EMIT conflictOccurred(conflict.first, conflict.second);
 }

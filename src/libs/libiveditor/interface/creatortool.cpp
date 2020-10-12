@@ -22,12 +22,13 @@
 #include "aadlfunctiongraphicsitem.h"
 #include "aadlfunctiontypegraphicsitem.h"
 #include "aadlinterfacegraphicsitem.h"
+#include "aadlitemmodel.h"
 #include "aadlobjectcomment.h"
 #include "aadlobjectconnection.h"
+#include "aadlobjectconnectiongroup.h"
 #include "aadlobjectfunction.h"
 #include "aadlobjectfunctiontype.h"
 #include "aadlobjectiface.h"
-#include "aadlobjectsmodel.h"
 #include "baseitems/common/aadlutils.h"
 #include "commands/cmdcommentitemcreate.h"
 #include "commands/cmdfunctionitemcreate.h"
@@ -39,12 +40,14 @@
 #include "context/action/actionsmanager.h"
 #include "graphicsitemhelpers.h"
 #include "graphicsviewutils.h"
+#include "interface/createconnectiongroupdialog.h"
 #include "ui/grippointshandler.h"
 
 #include <QAction>
 #include <QCursor>
 #include <QGraphicsItem>
 #include <QGraphicsView>
+#include <QItemSelectionModel>
 #include <QMenu>
 #include <QMouseEvent>
 #include <QPointer>
@@ -203,7 +206,7 @@ static ValidationResult validate(QGraphicsScene *scene, const QVector<QPointF> &
 namespace aadlinterface {
 
 struct CreatorTool::CreatorToolPrivate {
-    CreatorToolPrivate(CreatorTool *tool, QGraphicsView *v, aadl::AADLObjectsModel *m)
+    CreatorToolPrivate(CreatorTool *tool, QGraphicsView *v, AADLItemModel *m)
         : thisTool(tool)
         , view(v)
         , model(m)
@@ -236,7 +239,7 @@ struct CreatorTool::CreatorToolPrivate {
     QPointF cursorInScene(const QPoint &screenPos) const;
 
     QPointer<QGraphicsView> view;
-    QPointer<aadl::AADLObjectsModel> model;
+    QPointer<AADLItemModel> model;
     QGraphicsRectItem *previewItem = nullptr;
     QGraphicsPathItem *previewConnectionItem = nullptr;
     QVector<QPointF> connectionPoints;
@@ -246,7 +249,7 @@ struct CreatorTool::CreatorToolPrivate {
     QSet<InteractiveObject *> collidedItems;
 };
 
-CreatorTool::CreatorTool(QGraphicsView *view, aadl::AADLObjectsModel *model, QObject *parent)
+CreatorTool::CreatorTool(QGraphicsView *view, AADLItemModel *model, QObject *parent)
     : QObject(parent)
     , d(new CreatorToolPrivate(this, view, model))
 {
@@ -326,6 +329,67 @@ void CreatorTool::removeSelectedItems()
             Q_EMIT informUser(tr("Interface removal"), msg);
         }
     }
+}
+
+void CreatorTool::setSelectedItemsVisible(bool visible)
+{
+    if (!d->view) {
+        return;
+    }
+
+    auto scene = d->view->scene();
+    if (!scene) {
+        return;
+    }
+    QStringList clonedIfaces;
+    cmd::CommandsStack::current()->beginMacro(visible ? tr("Show selected item(s)") : tr("Hide selected item(s)"));
+    d->clearPreviewItem();
+    /// TODO:
+    cmd::CommandsStack::current()->endMacro();
+}
+
+void CreatorTool::groupSelectedItems()
+{
+    QList<aadl::AADLObjectConnectionGroup::CreationInfo> groupCreationDataList;
+
+    auto processConnection = [&](aadl::AADLObjectConnection *connection) {
+        auto it = std::find_if(groupCreationDataList.begin(), groupCreationDataList.end(),
+                [connection](const aadl::AADLObjectConnectionGroup::CreationInfo &data) {
+                    const bool functionMatch = data.sourceObject->id() == connection->source()->id()
+                            && data.targetObject->id() == connection->target()->id();
+                    const bool functionMatchReversed = data.targetObject->id() == connection->source()->id()
+                            && data.sourceObject->id() == connection->target()->id();
+
+                    return functionMatch || functionMatchReversed;
+                });
+
+        if (it != groupCreationDataList.end()) {
+            it->connections.append(connection);
+        } else {
+            groupCreationDataList.append({ d->model.data(), connection->parentObject(), connection->source(),
+                    connection->target(), {}, { connection } });
+        }
+    };
+
+    static const int role = static_cast<int>(aadl::AADLObjectsModel::AADLRoles::IdRole);
+    for (const auto id : d->model->selectionModel()->selectedIndexes()) {
+        if (aadl::AADLObject *object = d->model->getObject(id.data(role).toUuid())) {
+            if (object->isConnection()) {
+                if (aadl::AADLObjectConnection *connectionObj = qobject_cast<aadl::AADLObjectConnection *>(object)) {
+                    processConnection(connectionObj);
+                }
+            }
+        }
+    }
+
+    CreateConnectionGroupDialog *dialog = new CreateConnectionGroupDialog(groupCreationDataList, d->view->window());
+    if (dialog->exec() == QDialog::Accepted) {
+        for (auto data : dialog->info()) {
+            const auto undoCommand = cmd::CommandsFactory::create(cmd::CreateConnectionGroupEntity, data.toVarList());
+            cmd::CommandsStack::current()->push(undoCommand);
+        }
+    }
+    dialog->deleteLater();
 }
 
 bool CreatorTool::eventFilter(QObject *watched, QEvent *event)
@@ -643,6 +707,7 @@ bool CreatorTool::CreatorToolPrivate::showContextMenu(const QPoint &globalPos)
     if (menu->isEmpty()) {
         delete menu;
         menu = nullptr;
+        return false;
     }
 
     connect(menu, &QMenu::aboutToHide, [this]() {
@@ -682,6 +747,15 @@ void CreatorTool::CreatorToolPrivate::populateContextMenu_commonCreate(QMenu *me
                 thisTool->tr("Provided Interface"), thisTool,
                 [this, scenePos]() { handleToolType(ToolType::ProvidedInterface, scenePos); });
         action->setEnabled(!isRect && this->previewItem->parentItem());
+
+        action = menu->addAction(QIcon(QLatin1String(":/tab_interface/toolbar/icns/connection_group.svg")),
+                thisTool->tr("Connection group"), thisTool, [this]() { thisTool->groupSelectedItems(); });
+        const QModelIndexList idxs = model->selectionModel()->selection().indexes();
+        auto it = std::find_if(idxs.cbegin(), idxs.cend(), [](const QModelIndex &index) {
+            return index.data(static_cast<int>(aadl::AADLObjectsModel::AADLRoles::TypeRole)).toInt()
+                    == static_cast<int>(aadl::AADLObject::Type::Connection);
+        });
+        action->setEnabled(it != idxs.cend());
     }
 }
 

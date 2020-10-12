@@ -91,7 +91,7 @@ struct AADLObjectIfacePrivate {
         : m_direction(dir)
     {
     }
-    const AADLObjectIface::IfaceType m_direction;
+    AADLObjectIface::IfaceType m_direction;
     QVector<IfaceParameter> m_params = {};
     QPointer<AADLObjectIface> m_cloneOf { nullptr };
     QVector<QPointer<AADLObjectIface>> m_clones {};
@@ -99,8 +99,10 @@ struct AADLObjectIfacePrivate {
 
 AADLObjectIface::AADLObjectIface(AADLObject::Type ifaceType, const CreationInfo &ci)
     : AADLObject(ifaceType, ci.name, ci.function, ci.toBeCloned ? shared::createId() : ci.id)
-    , d(new AADLObjectIfacePrivate(Type::RequiredInterface == ifaceType ? AADLObjectIface::IfaceType::Required
-                                                                        : AADLObjectIface::IfaceType::Provided))
+    , d(new AADLObjectIfacePrivate(Type::InterfaceGroup == ifaceType
+                      ? ci.type
+                      : Type::RequiredInterface == ifaceType ? AADLObjectIface::IfaceType::Required
+                                                             : AADLObjectIface::IfaceType::Provided))
 {
     setupInitialAttrs();
 
@@ -234,9 +236,9 @@ void AADLObjectIface::addParam(const IfaceParameter &param)
     }
 }
 
-AADLObjectFunction *AADLObjectIface::function() const
+AADLObjectFunctionType *AADLObjectIface::function() const
 {
-    return qobject_cast<AADLObjectFunction *>(parentObject());
+    return qobject_cast<AADLObjectFunctionType *>(parentObject());
 }
 
 AADLObjectIface *AADLObjectIface::cloneOf() const
@@ -582,7 +584,7 @@ void AADLObjectIfaceRequired::namesForRIToPIs(QStringList &result) const
 
 void AADLObjectIfaceRequired::namesForRIsToPI(QStringList &result) const
 {
-    AADLObjectFunction *parentFn = function();
+    const AADLObjectFunctionType *parentFn = function();
     if (!parentFn)
         return;
 

@@ -77,7 +77,7 @@ bool FileModel::setData(const QModelIndex &index, const QVariant &value, int rol
 void FileModel::setItemCheck(const QModelIndex &index, const QVariant &value)
 {
     changeCheckState(index, value);
-    emit dataChanged(index, index);
+    Q_EMIT dataChanged(index, index);
 }
 
 void FileModel::setChildrenCheck(const QModelIndex &parent, const QVariant &value)
@@ -94,8 +94,8 @@ void FileModel::setChildrenCheck(const QModelIndex &parent, const QVariant &valu
     }
 
     const auto &model = parent.model();
-    emit dataChanged(model->index(0, 0, parent),
-                     model->index(rowCount(parent), rowCount(parent), parent));
+    Q_EMIT dataChanged(model->index(0, 0, parent),
+                       model->index(rowCount(parent), rowCount(parent), parent));
 }
 
 void FileModel::setParentCheck(const QModelIndex &index)
@@ -106,7 +106,7 @@ void FileModel::setParentCheck(const QModelIndex &index)
         changeCheckState(parent, checkState);
         checkState = parentState(parent);
 
-        emit dataChanged(parent, parent);
+        Q_EMIT dataChanged(parent, parent);
     }
 }
 

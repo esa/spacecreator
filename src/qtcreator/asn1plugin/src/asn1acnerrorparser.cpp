@@ -47,7 +47,7 @@ void Asn1AcnErrorParser::stdError(const QString &line)
                                error.location().line(),
                                ProjectExplorer::Constants::TASK_CATEGORY_COMPILE);
 
-    emit addTask(task, 1);
+    Q_EMIT addTask(task, 1);
 
     IOutputParser::stdError(line);
 }

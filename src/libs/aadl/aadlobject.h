@@ -44,8 +44,10 @@ public:
         FunctionType,
         RequiredInterface,
         ProvidedInterface,
+        InterfaceGroup,
         Comment,
         Connection,
+        ConnectionGroup,
     };
     Q_ENUM(Type)
 
@@ -64,14 +66,19 @@ public:
     AADLObject *parentObject() const;
     bool isFunction() const;
     bool isFunctionType() const;
+    bool isInterfaceGroup() const;
     bool isRequiredInterface() const;
     bool isProvidedInterface() const;
     bool isInterface() const;
     bool isComment() const;
     bool isConnection() const;
+    bool isConnectionGroup() const;
     bool isNestedInFunction() const;
     bool isNestedInFunctionType() const;
     bool isNested() const;
+
+    QString groupName() const;
+    void setGroupName(const QString &groupName);
 
     // "attributes" - payload data in the opening XML tag,
     // like "name" and "kind" below:
@@ -94,6 +101,8 @@ public:
     AADLObjectsModel *objectsModel() const;
 
     bool isRootObject() const;
+
+    bool isGrouped() const;
 
     virtual bool postInit();
 

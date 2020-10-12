@@ -191,6 +191,18 @@ target_sources(${LIB_NAME} PRIVATE
     zoomcontroller.h
     iveditorresources.qrc
     interface/tab_interface_resources.qrc
+    interface/aadlitemmodel.cpp
+    interface/aadlitemmodel.h
+    interface/createconnectiongroupdialog.cpp
+    interface/createconnectiongroupdialog.h
+    interface/aadlconnectiongroupgraphicsitem.cpp
+    interface/aadlconnectiongroupgraphicsitem.h
+    interface/aadlinterfacegroupgraphicsitem.cpp
+    interface/aadlinterfacegroupgraphicsitem.h
+    interface/commands/cmdconnectiongroupitemcreate.cpp
+    interface/commands/cmdconnectiongroupitemcreate.h
+    templating/exportableaadlconnectiongroup.cpp
+    templating/exportableaadlconnectiongroup.h
 )
 
 target_link_libraries(${LIB_NAME}

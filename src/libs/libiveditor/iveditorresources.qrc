@@ -26,5 +26,6 @@
         <file>templating/xml_templates/interfaces.tmplt</file>
         <file>templating/xml_templates/interfaceview.tmplt</file>
         <file>interface/properties/resources/default_attributes.xml</file>
+        <file>templating/xml_templates/connectiongroup.tmplt</file>
     </qresource>
 </RCC>

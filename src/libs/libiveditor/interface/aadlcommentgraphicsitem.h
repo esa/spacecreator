@@ -40,6 +40,8 @@ public:
     };
     int type() const override { return Type; }
 
+    void init() override;
+
     void setText(const QString &text);
     QString text() const;
 

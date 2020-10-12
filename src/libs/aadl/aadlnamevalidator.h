@@ -57,6 +57,7 @@ private:
     QString nameRequiredInterface(const AADLObject *iface) const;
     QString nameProvidedInterface(const AADLObject *iface) const;
     QString nameComment(const AADLObject *comment) const;
+    QString nameConnection(const AADLObject *connection) const;
 
     bool isValidFunctionTypeName(const QString &name, const AADLObject *fnType) const;
     bool isValidFunctionName(const QString &name, const AADLObject *fn) const;

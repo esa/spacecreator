@@ -17,10 +17,12 @@
 
 #include "commandsfactory.h"
 
+#include "aadlobjectconnectiongroup.h"
 #include "aadlobjectfunction.h"
 #include "aadlobjectsmodel.h"
 #include "cmdchangeasn1file.h"
 #include "cmdcommentitemcreate.h"
+#include "cmdconnectiongroupitemcreate.h"
 #include "cmdconnectionitemcreate.h"
 #include "cmdcontextparameterchange.h"
 #include "cmdcontextparametercreate.h"
@@ -71,6 +73,8 @@ QUndoCommand *CommandsFactory::create(Id id, const QVariantList &params)
         return cmd::CommandsFactory::createInterfaceCommand(params);
     case cmd::CreateConnectionEntity:
         return cmd::CommandsFactory::createConnectionCommand(params);
+    case cmd::CreateConnectionGroupEntity:
+        return cmd::CommandsFactory::createConnectionGroupCommand(params);
     case cmd::ChangeEntityGeometry:
         return cmd::CommandsFactory::changeGeometryCommand(params);
     case cmd::RemoveEntity:
@@ -189,6 +193,16 @@ QUndoCommand *CommandsFactory::createConnectionCommand(const QVariantList &param
                 parentFunction.value<aadl::AADLObjectFunction *>(), startIfaceId.value<shared::Id>(),
                 endIfaceId.value<shared::Id>(), points.value<QVector<QPointF>>());
     }
+
+    return nullptr;
+}
+
+QUndoCommand *CommandsFactory::createConnectionGroupCommand(const QVariantList &params)
+{
+    Q_ASSERT(params.size() == 1);
+    const QVariant creationInfo = params.value(0);
+    if (creationInfo.isValid() && creationInfo.canConvert<aadl::AADLObjectConnectionGroup::CreationInfo>())
+        return new CmdConnectionGroupItemCreate(creationInfo.value<aadl::AADLObjectConnectionGroup::CreationInfo>());
 
     return nullptr;
 }
