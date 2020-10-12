@@ -54,8 +54,8 @@ public:
 
     void setMscCore(msc::MSCEditorCore *mscCore);
     void setIvCore(QSharedPointer<aadlinterface::IVEditorCore> ivCore);
-    const QSharedPointer<aadlinterface::IVEditorCore> &ivPlugin() const;
-    bool hasIvModel() const;
+    const QSharedPointer<aadlinterface::IVEditorCore> &ivCore() const;
+    bool hasIvCore() const;
 
     QVector<QPair<msc::MscChart *, msc::MscInstance *>> checkInstanceNames() const;
     QVector<QPair<msc::MscChart *, msc::MscInstance *>> checkInstanceRelations() const;
@@ -65,6 +65,7 @@ public:
     QVector<QPair<msc::MscChart *, msc::MscMessage *>> checkMessages() const;
     bool checkMessage(const msc::MscMessage *message) const;
     QStringList connectionNames() const;
+    bool connectionExists(QString name, const QString &sourceName, const QString &targetName) const;
 
 Q_SIGNALS:
     void mscCoreChanged();

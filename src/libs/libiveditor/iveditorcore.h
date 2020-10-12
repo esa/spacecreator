@@ -17,6 +17,7 @@
 
 #pragma once
 
+#include "aadlobjectiface.h"
 #include "editorcore.h"
 #include "ui/graphicsviewbase.h"
 
@@ -28,6 +29,7 @@ class IVEditorCore : public shared::EditorCore
 {
 public:
     explicit IVEditorCore(QObject *parent = 0);
+    ~IVEditorCore();
 
     aadlinterface::InterfaceDocument *document() const;
 
@@ -47,9 +49,13 @@ public:
     QAction *actionSaveSceneRender() { return m_actionSaveSceneRender; }
     QAction *actionShowAsnDialog() { return m_actionShowAsnDialog; }
 
-    void addFunction(const QString &name);
+    bool addFunction(const QString &name);
+    bool addConnection(QString name, const QString &fromInstanceName, const QString &toInstanceName);
 
 private:
+    aadl::AADLObjectIface *getInterface(
+            const QString &ifName, aadl::AADLObjectIface::IfaceType ifType, aadl::AADLObjectFunction *parentFunction);
+
     aadlinterface::InterfaceDocument *m_document { nullptr };
 
     QToolBar *m_docToolBar;

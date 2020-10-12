@@ -20,6 +20,8 @@
 #include "interface/interfacedocument.h"
 #include "iveditorcore.h"
 
+#include <QDebug>
+
 namespace spctr {
 
 AadlModelStorage::AadlModelStorage(QObject *parent)
@@ -36,7 +38,7 @@ QSharedPointer<aadlinterface::IVEditorCore> AadlModelStorage::ivData(const QStri
     if (!m_store.contains(fileName)) {
         QSharedPointer<aadlinterface::IVEditorCore> data(new aadlinterface::IVEditorCore());
         data->document()->load(fileName);
-        m_store[fileName] = data;
+        setIvData(fileName, data);
         return data;
     }
 
@@ -51,6 +53,9 @@ void AadlModelStorage::setIvData(const QString &fileName, QSharedPointer<aadlint
 {
     const QString oldKey = m_store.key(ivData, "");
     if (!oldKey.isEmpty()) {
+        if (m_store[fileName] == ivData) {
+            return;
+        }
         m_store.remove(oldKey);
     }
 

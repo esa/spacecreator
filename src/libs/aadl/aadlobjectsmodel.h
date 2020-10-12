@@ -51,6 +51,7 @@ public:
     AADLObjectIface *getIfaceByName(
             const QString &name, AADLObjectIface::IfaceType dir, AADLObjectFunctionType *parent = nullptr) const;
     AADLObjectFunction *getFunction(const shared::Id &id) const;
+    AADLObjectFunction *getFunction(const QString &name) const;
     AADLObjectFunctionType *getFunctionType(const shared::Id &id) const;
     QHash<QString, AADLObjectFunctionType *> getAvailableFunctionTypes(const AADLObjectFunction *fnObj) const;
     AADLObjectIface *getInterface(const shared::Id &id) const;
@@ -68,6 +69,9 @@ public:
     QList<AADLObject *> visibleObjects(shared::Id rootId) const;
 
     void clear();
+
+    AADLObjectConnection *getConnection(
+            const QString &interfaceName, const QString &source, const QString &target) const;
 
 Q_SIGNALS:
     void aadlObjectAdded(aadl::AADLObject *object);

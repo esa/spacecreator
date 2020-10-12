@@ -17,10 +17,12 @@
 
 #include "messagedialog.h"
 
+#include "aadlchecks.h"
 #include "asn1editor.h"
 #include "asn1valueparser.h"
 #include "commands/common/commandsstack.h"
 #include "file.h"
+#include "iveditorcore.h"
 #include "messagedeclarationsdialog.h"
 #include "mscchart.h"
 #include "mscdocument.h"
@@ -35,6 +37,7 @@
 #include <QCompleter>
 #include <QDebug>
 #include <QKeyEvent>
+#include <QMessageBox>
 #include <QRegExp>
 #include <QRegExpValidator>
 #include <QStyledItemDelegate>
@@ -103,6 +106,15 @@ void MessageDialog::setAadlConnectionNames(const QStringList &names)
     m_connectionNames = names;
 }
 
+/*!
+   \brief MessageDialog::setAadlChecker
+   \param checker
+ */
+void MessageDialog::setAadlChecker(msc::AadlChecks *checker)
+{
+    m_aadlChecker = checker;
+}
+
 void MessageDialog::accept()
 {
     msc::cmd::CommandsStack::current()->beginMacro("Edit message");
@@ -121,6 +133,20 @@ void MessageDialog::accept()
     msc::cmd::CommandsStack::push(
             msc::cmd::SetParameterList, { QVariant::fromValue(m_message.data()), QVariant::fromValue(parameters) });
     msc::cmd::CommandsStack::current()->endMacro();
+
+    if (m_aadlChecker && m_aadlChecker->hasIvCore()) {
+        const QString fromName = m_message->sourceInstance() ? m_message->sourceInstance()->name() : "";
+        const QString toName = m_message->targetInstance() ? m_message->targetInstance()->name() : "";
+        if (!m_aadlChecker->connectionExists(m_message->name(), fromName, toName)) {
+            const int result = QMessageBox::question(nullptr, tr("No AADL connection"),
+                    tr("The AADL model doesn't contain a connection called:\n%1\n"
+                       "\nDo you want to add it to the AADL model?")
+                            .arg(m_message->name()));
+            if (result == QMessageBox::Yes) {
+                m_aadlChecker->ivCore()->addConnection(m_message->name(), fromName, toName);
+            }
+        }
+    }
 
     QDialog::accept();
 }

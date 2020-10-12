@@ -158,14 +158,18 @@ AADLObject *AADLObjectsModel::getObjectByName(const QString &name, AADLObject::T
 AADLObjectIface *AADLObjectsModel::getIfaceByName(
         const QString &name, AADLObjectIface::IfaceType dir, AADLObjectFunctionType *parent) const
 {
-    if (name.isEmpty())
+    if (name.isEmpty()) {
         return nullptr;
+    }
 
     for (auto obj : d->m_objects) {
-        if (obj->isInterface() && obj->title() == name)
-            if (AADLObjectIface *iface = obj->as<AADLObjectIface *>())
-                if (iface->direction() == dir && (!parent || iface->parentObject() == parent))
+        if (obj->isInterface() && obj->title() == name) {
+            if (AADLObjectIface *iface = obj->as<AADLObjectIface *>()) {
+                if (iface->direction() == dir && (!parent || iface->parentObject() == parent)) {
                     return iface;
+                }
+            }
+        }
     }
 
     return nullptr;
@@ -174,6 +178,15 @@ AADLObjectIface *AADLObjectsModel::getIfaceByName(
 AADLObjectFunction *AADLObjectsModel::getFunction(const shared::Id &id) const
 {
     return qobject_cast<AADLObjectFunction *>(getObject(id));
+}
+
+/*!
+   Returns the function with the given name.
+   If no such function exists nullptr is returned.
+ */
+AADLObjectFunction *AADLObjectsModel::getFunction(const QString &name) const
+{
+    return qobject_cast<AADLObjectFunction *>(getObjectByName(name));
 }
 
 AADLObjectFunctionType *AADLObjectsModel::getFunctionType(const shared::Id &id) const
@@ -317,6 +330,26 @@ void AADLObjectsModel::clear()
     d->m_visibleObjects.clear();
 
     d->m_rootObjectId = shared::InvalidId;
+}
+
+/*!
+   Returns the connection with the given \p interfaceName connection from function \p source to function \p target
+   If no such connection is found, a nullptr is returned.
+ */
+AADLObjectConnection *AADLObjectsModel::getConnection(
+        const QString &interfaceName, const QString &source, const QString &target) const
+{
+    for (AADLObject *obj : d->m_objects) {
+        if (obj->isConnection()) {
+            if (AADLObjectConnection *connection = qobject_cast<AADLObjectConnection *>(obj)) {
+                if (connection->targetInterfaceName() == interfaceName && connection->sourceName() == source
+                        && connection->targetName() == target) {
+                    return connection;
+                }
+            }
+        }
+    }
+    return nullptr;
 }
 
 }

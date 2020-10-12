@@ -38,9 +38,13 @@ namespace msc {
 AadlChecks::AadlChecks(QObject *parent)
     : QObject((parent))
 {
+    qDebug() << Q_FUNC_INFO;
 }
 
-AadlChecks::~AadlChecks() { }
+AadlChecks::~AadlChecks()
+{
+    qDebug() << Q_FUNC_INFO;
+}
 
 void AadlChecks::setMscCore(MSCEditorCore *mscCore)
 {
@@ -71,7 +75,7 @@ void AadlChecks::setIvCore(QSharedPointer<aadlinterface::IVEditorCore> ivCore)
 /*!
    Returns a pointer to the IV editor model
  */
-const QSharedPointer<aadlinterface::IVEditorCore> &AadlChecks::ivPlugin() const
+const QSharedPointer<aadlinterface::IVEditorCore> &AadlChecks::ivCore() const
 {
     return m_ivCore;
 }
@@ -79,7 +83,7 @@ const QSharedPointer<aadlinterface::IVEditorCore> &AadlChecks::ivPlugin() const
 /*!
    Returns if the IV model has be set
  */
-bool AadlChecks::hasIvModel() const
+bool AadlChecks::hasIvCore() const
 {
     return !m_ivCore.isNull();
 }
@@ -229,6 +233,17 @@ QStringList AadlChecks::connectionNames() const
     }
     connectionNames.removeDuplicates();
     return connectionNames;
+}
+
+bool AadlChecks::connectionExists(QString name, const QString &sourceName, const QString &targetName) const
+{
+    aadl::AADLObjectsModel *model = aadlModel();
+    if (model == nullptr) {
+        return true;
+    }
+
+    name = aadl::AADLNameValidator::decodeName(aadl::AADLObject::Type::ProvidedInterface, name);
+    return model->getConnection(name, sourceName, targetName) != nullptr;
 }
 
 aadl::AADLObjectsModel *AadlChecks::aadlModel() const

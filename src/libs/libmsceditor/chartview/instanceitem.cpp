@@ -339,13 +339,13 @@ void InstanceItem::onNameEdited(const QString &newName)
         CommandsStack::push(RenameEntity, { QVariant::fromValue<MscEntity *>(this->modelItem()), newName });
 
         msc::AadlChecks *checker = m_model ? m_model->aadlChecker() : nullptr;
-        if (checker && checker->hasIvModel() && !checker->functionsNames().contains(m_instance->name())) {
+        if (checker && checker->hasIvCore() && !checker->functionsNames().contains(m_instance->name())) {
             const int result = QMessageBox::question(nullptr, tr("No AADL function"),
                     tr("The AADL model doesn't contain a function called:\n%1\n"
                        "\nDo you want to add it to the AADL model?")
                             .arg(newName));
             if (result == QMessageBox::Yes) {
-                checker->ivPlugin()->addFunction(newName);
+                checker->ivCore()->addFunction(newName);
                 checkAadlFunction();
             }
         }

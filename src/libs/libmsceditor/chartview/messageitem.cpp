@@ -138,6 +138,7 @@ void MessageItem::showMessageDialog()
     if (m_message->messageType() == MscMessage::MessageType::Message) {
         MessageDialog dialog(m_message);
         dialog.setAadlConnectionNames(m_chartLayoutManager->aadlChecker()->connectionNames());
+        dialog.setAadlChecker(m_chartLayoutManager->aadlChecker());
         dialog.exec();
     }
 }

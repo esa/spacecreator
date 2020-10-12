@@ -16,12 +16,14 @@
 */
 
 #include "aadlobject.h"
+#include "aadlobjectconnection.h"
 #include "aadlobjectfunction.h"
 #include "aadlobjectfunctiontype.h"
 #include "aadlobjectiface.h"
 #include "aadlobjectsmodel.h"
 #include "aadltestutils.h"
 
+#include <QScopedPointer>
 #include <QtTest>
 
 class tst_AADLObjectsModel : public QObject
@@ -29,11 +31,21 @@ class tst_AADLObjectsModel : public QObject
     Q_OBJECT
 
 private Q_SLOTS:
+    void init();
     void testManageContainers();
     void testManageFunctions();
     void testManageIfaces();
     void testManageMixed();
+    void testConnectionQuery();
+
+private:
+    QScopedPointer<aadl::AADLObjectsModel> m_model;
 };
+
+void tst_AADLObjectsModel::init()
+{
+    m_model.reset(new aadl::AADLObjectsModel);
+}
 
 void tst_AADLObjectsModel::testManageContainers()
 {
@@ -287,8 +299,31 @@ void tst_AADLObjectsModel::testManageMixed()
         QVERIFY(model.removeObject(object));
 
     QCOMPARE(model.objects().size(), 0);
-    QCOMPARE(model.objects().size(), 0);
-    QCOMPARE(model.objects().size(), 0);
+}
+
+void tst_AADLObjectsModel::testConnectionQuery()
+{
+    auto fn1 = new aadl::AADLObjectFunction("Fn1");
+    m_model->addObject(fn1);
+    aadl::AADLObjectIface::CreationInfo ci1 = aadl::testutils::init(aadl::AADLObjectIface::IfaceType::Required, fn1);
+    ci1.name = "cnt1";
+    aadl::AADLObjectIface *iface1 = aadl::AADLObjectIface::createIface(ci1);
+    m_model->addObject(iface1);
+
+    auto fn2 = new aadl::AADLObjectFunction("Fn2");
+    m_model->addObject(fn2);
+    aadl::AADLObjectIface::CreationInfo ci2 = aadl::testutils::init(aadl::AADLObjectIface::IfaceType::Provided, fn2);
+    ci2.name = "cnt1";
+    aadl::AADLObjectIface *iface2 = aadl::AADLObjectIface::createIface(ci2);
+    m_model->addObject(iface2);
+
+    auto connect1 = new aadl::AADLObjectConnection(fn1, fn2, iface1, iface2);
+    m_model->addObject(connect1);
+
+    QCOMPARE(m_model->getConnection("Dummy", "Fn1", "Fn2"), nullptr);
+    QCOMPARE(m_model->getConnection("cnt1", "Dummy", "Fn2"), nullptr);
+    QCOMPARE(m_model->getConnection("cnt1", "Fn1", "Dummy"), nullptr);
+    QCOMPARE(m_model->getConnection("cnt1", "Fn1", "Fn2"), connect1);
 }
 
 QTEST_APPLESS_MAIN(tst_AADLObjectsModel)

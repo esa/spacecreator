@@ -17,7 +17,9 @@
 
 #include "iveditorcore.h"
 
+#include "aadlnamevalidator.h"
 #include "aadlobjectfunction.h"
+#include "aadlobjectiface.h"
 #include "aadlobjectsmodel.h"
 #include "baseitems/common/aadlutils.h"
 #include "commandlineparser.h"
@@ -53,6 +55,8 @@ IVEditorCore::IVEditorCore(QObject *parent)
     m_docToolBar->setAllowedAreas(Qt::AllToolBarAreas);
     m_docToolBar->setMovable(true);
 }
+
+IVEditorCore::~IVEditorCore() { }
 
 /*!
    Returns the interface document
@@ -128,7 +132,7 @@ void IVEditorCore::populateCommandLineArguments(shared::CommandLineParser *parse
    Adds an aadl function with the given \p name
    @todo handle positioning of the function
  */
-void IVEditorCore::addFunction(const QString &name)
+bool IVEditorCore::addFunction(const QString &name)
 {
     if (!aadlinterface::cmd::CommandsStack::current()) {
         aadlinterface::cmd::CommandsStack::setCurrent(new QUndoStack(this));
@@ -138,6 +142,87 @@ void IVEditorCore::addFunction(const QString &name)
     const QVariantList params = { QVariant::fromValue(m_document->objectsModel()), QVariant::fromValue(parent),
         QVariant::fromValue(QRectF(QPointF(10., 10.), DefaultGraphicsItemSize)), QVariant::fromValue(name) };
     cmd::CommandsStack::current()->push(cmd::CommandsFactory::create(cmd::CreateFunctionEntity, params));
+
+    return true;
+}
+
+/*!
+   Adds the connection and the needed interfaces between the given instances
+ */
+bool IVEditorCore::addConnection(QString name, const QString &fromInstanceName, const QString &toInstanceName)
+{
+    if (!aadlinterface::cmd::CommandsStack::current()) {
+        aadlinterface::cmd::CommandsStack::setCurrent(new QUndoStack(this));
+    }
+
+    name = aadl::AADLNameValidator::decodeName(aadl::AADLObject::Type::ProvidedInterface, name);
+
+    aadl::AADLObjectsModel *aadlModel = m_document->objectsModel();
+    if (aadlModel->getConnection(name, fromInstanceName, toInstanceName) != nullptr) {
+        // The connection exists already
+        return false;
+    }
+
+    aadl::AADLObjectFunction *fromFunc = aadlModel->getFunction(fromInstanceName);
+    aadl::AADLObjectFunction *toFunc = aadlModel->getFunction(toInstanceName);
+
+    if (!fromFunc && !toFunc) {
+        qDebug() << Q_FUNC_INFO << "No function for the connection" << name;
+    }
+
+    cmd::CommandsStack::current()->beginMacro("Add connection");
+
+    aadl::AADLObjectIface *fromInterface = getInterface(name, aadl::AADLObjectIface::IfaceType::Required, fromFunc);
+    aadl::AADLObjectIface *toInterface = getInterface(name, aadl::AADLObjectIface::IfaceType::Provided, toFunc);
+
+    if (fromInterface && toInterface) {
+        QVector<QPointF> points;
+        points.append(aadlinterface::pos(fromInterface->coordinates()));
+        points.append(aadlinterface::pos(toInterface->coordinates()));
+        const QVariantList params = { QVariant::fromValue(aadlModel), QVariant::fromValue(fromFunc),
+            fromInterface->id(), toInterface->id(), QVariant::fromValue(points) };
+        QUndoCommand *command = cmd::CommandsFactory::create(cmd::CreateConnectionEntity, params);
+        cmd::CommandsStack::current()->push(command);
+    }
+
+    cmd::CommandsStack::current()->endMacro();
+
+    return true;
+}
+
+/*!
+   Get the interface, or creates it if it does not exist. In case the \p parentFunction is a nullptr, a nullptr is
+   returned
+ */
+aadl::AADLObjectIface *IVEditorCore::getInterface(
+        const QString &ifName, aadl::AADLObjectIface::IfaceType ifType, aadl::AADLObjectFunction *parentFunction)
+{
+    if (parentFunction == nullptr) {
+        return {};
+    }
+
+    aadl::AADLObjectsModel *aadlModel = m_document->objectsModel();
+    if (!aadlModel) {
+        return {};
+    }
+
+    aadl::AADLObjectIface *interface = aadlModel->getIfaceByName(ifName, ifType, parentFunction);
+    if (!interface) {
+        // create the interface
+        aadl::AADLObjectIface::CreationInfo createInfo(aadlModel, parentFunction);
+        createInfo.name = ifName;
+        createInfo.type = ifType;
+        QRectF funcRect = aadlinterface::rect(parentFunction->coordinates());
+        QPointF ifPos(funcRect.left(), funcRect.center().y());
+        if (ifType == aadl::AADLObjectIface::IfaceType::Required) {
+            ifPos.setX(funcRect.right());
+        }
+        createInfo.position = ifPos;
+        QUndoCommand *command = cmd::CommandsFactory::create(cmd::CreateInterfaceEntity, createInfo.toVarList());
+        cmd::CommandsStack::current()->push(command);
+        interface = aadlModel->getIfaceByName(ifName, ifType, parentFunction);
+    }
+    return interface;
 }
 
 }
