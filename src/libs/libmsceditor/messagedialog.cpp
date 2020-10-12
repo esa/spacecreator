@@ -113,6 +113,9 @@ void MessageDialog::setAadlConnectionNames(const QStringList &names)
 void MessageDialog::setAadlChecker(msc::AadlChecks *checker)
 {
     m_aadlChecker = checker;
+    const QString sourceName = m_message->sourceInstance() ? m_message->sourceInstance()->name() : "";
+    const QString targetName = m_message->targetInstance() ? m_message->targetInstance()->name() : "";
+    setAadlConnectionNames(m_aadlChecker->connectionNamesFromTo(sourceName, targetName));
 }
 
 void MessageDialog::accept()

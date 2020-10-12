@@ -217,6 +217,7 @@ bool AadlChecks::checkMessage(const MscMessage *message) const
 
 /*!
    Returns a list of the names of all connections in the aadl model
+   \sa connectionNamesFromTo
  */
 QStringList AadlChecks::connectionNames() const
 {
@@ -244,6 +245,33 @@ bool AadlChecks::connectionExists(QString name, const QString &sourceName, const
 
     name = aadl::AADLNameValidator::decodeName(aadl::AADLObject::Type::ProvidedInterface, name);
     return model->getConnection(name, sourceName, targetName) != nullptr;
+}
+
+/*!
+   Returns all connections that have \p sourceName as required interface and \p targetName as providedinterface
+   \note the names are aadl encoded by this function
+   \sa connectionNames
+ */
+QStringList AadlChecks::connectionNamesFromTo(QString sourceName, QString targetName) const
+{
+    if (!m_ivCore) {
+        return {};
+    }
+
+    sourceName = aadl::AADLNameValidator::encodeName(aadl::AADLObject::Type::Function, sourceName);
+    targetName = aadl::AADLNameValidator::encodeName(aadl::AADLObject::Type::Function, targetName);
+
+    QStringList connectionNames;
+    for (const aadl::AADLObjectConnection *aadlConnection : m_aadlConnections) {
+        if (aadlConnection && !aadlConnection->targetInterfaceName().isEmpty()) {
+            if (aadlConnection->sourceName() == sourceName && aadlConnection->targetName() == targetName) {
+                connectionNames << aadl::AADLNameValidator::encodeName(
+                        aadl::AADLObject::Type::ProvidedInterface, aadlConnection->targetInterfaceName());
+            }
+        }
+    }
+    connectionNames.removeDuplicates();
+    return connectionNames;
 }
 
 aadl::AADLObjectsModel *AadlChecks::aadlModel() const

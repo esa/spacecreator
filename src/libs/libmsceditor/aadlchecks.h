@@ -66,6 +66,7 @@ public:
     bool checkMessage(const msc::MscMessage *message) const;
     QStringList connectionNames() const;
     bool connectionExists(QString name, const QString &sourceName, const QString &targetName) const;
+    QStringList connectionNamesFromTo(QString sourceName, QString targetName) const;
 
 Q_SIGNALS:
     void mscCoreChanged();

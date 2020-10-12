@@ -70,6 +70,7 @@ MessageItem::MessageItem(MscMessage *message, ChartLayoutManager *chartLayoutMan
 
     setFlags(ItemSendsGeometryChanges | ItemSendsScenePositionChanges | ItemIsSelectable);
 
+    connect(m_message, &msc::MscMessage::dataChanged, this, &msc::MessageItem::checkAadlConnection);
     connect(m_message, &msc::MscMessage::dataChanged, this, &msc::MessageItem::updateDisplayText);
     updateDisplayText();
 
@@ -137,7 +138,6 @@ void MessageItem::showMessageDialog()
 {
     if (m_message->messageType() == MscMessage::MessageType::Message) {
         MessageDialog dialog(m_message);
-        dialog.setAadlConnectionNames(m_chartLayoutManager->aadlChecker()->connectionNames());
         dialog.setAadlChecker(m_chartLayoutManager->aadlChecker());
         dialog.exec();
     }
