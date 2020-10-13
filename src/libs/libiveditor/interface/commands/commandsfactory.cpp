@@ -22,6 +22,7 @@
 #include "aadlobjectsmodel.h"
 #include "cmdchangeasn1file.h"
 #include "cmdcommentitemcreate.h"
+#include "cmdconnectiongroupitemchange.h"
 #include "cmdconnectiongroupitemcreate.h"
 #include "cmdconnectionitemcreate.h"
 #include "cmdcontextparameterchange.h"
@@ -75,6 +76,8 @@ QUndoCommand *CommandsFactory::create(Id id, const QVariantList &params)
         return cmd::CommandsFactory::createConnectionCommand(params);
     case cmd::CreateConnectionGroupEntity:
         return cmd::CommandsFactory::createConnectionGroupCommand(params);
+    case cmd::ChangeConnectionGroupEntity:
+        return cmd::CommandsFactory::changeConnectionGroupCommand(params);
     case cmd::ChangeEntityGeometry:
         return cmd::CommandsFactory::changeGeometryCommand(params);
     case cmd::RemoveEntity:
@@ -203,6 +206,22 @@ QUndoCommand *CommandsFactory::createConnectionGroupCommand(const QVariantList &
     const QVariant creationInfo = params.value(0);
     if (creationInfo.isValid() && creationInfo.canConvert<aadl::AADLObjectConnectionGroup::CreationInfo>())
         return new CmdConnectionGroupItemCreate(creationInfo.value<aadl::AADLObjectConnectionGroup::CreationInfo>());
+
+    return nullptr;
+}
+
+QUndoCommand *CommandsFactory::changeConnectionGroupCommand(const QVariantList &params)
+{
+    Q_ASSERT(params.size() == 3);
+    const QVariant groupVar = params.value(0);
+    const QVariant connectionVar = params.value(1);
+    const QVariant addConnectionVar = params.value(2);
+    if (groupVar.isValid() && groupVar.canConvert<aadl::AADLObjectConnectionGroup *>() && connectionVar.isValid()
+            && connectionVar.canConvert<aadl::AADLObjectConnection *>() && addConnectionVar.isValid()
+            && addConnectionVar.canConvert<bool>()) {
+        return new CmdConnectionGroupItemChange(groupVar.value<aadl::AADLObjectConnectionGroup *>(),
+                connectionVar.value<aadl::AADLObjectConnection *>(), addConnectionVar.value<bool>());
+    }
 
     return nullptr;
 }

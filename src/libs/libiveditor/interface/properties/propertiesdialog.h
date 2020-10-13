@@ -53,7 +53,12 @@ public Q_SLOTS:
 private:
     QString objectTypeName() const;
     void initTabs();
+    void initConnectionGroup();
+    void initAttributesView();
+    void initContextParams();
+    void initIfaceParams();
 
+private:
     Ui::PropertiesDialog *ui;
     aadl::AADLObject *m_dataObject { nullptr };
     cmd::CommandsStack::Macro *m_cmdMacro { nullptr };

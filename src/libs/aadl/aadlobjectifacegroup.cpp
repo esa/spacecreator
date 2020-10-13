@@ -24,6 +24,13 @@ AADLObjectIfaceGroup::AADLObjectIfaceGroup(const CreationInfo &ci)
 {
 }
 
+void AADLObjectIfaceGroup::removeEntity(AADLObjectIface *iface)
+{
+    m_entities.removeAll(iface);
+    if (m_entities.isEmpty())
+        iface->setGroupName(QString());
+}
+
 void AADLObjectIfaceGroup::addEntity(AADLObjectIface *iface)
 {
     iface->setGroupName(groupName());

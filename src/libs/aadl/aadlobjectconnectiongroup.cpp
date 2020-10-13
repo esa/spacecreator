@@ -77,6 +77,22 @@ QList<QPointer<AADLObjectIface>> AADLObjectConnectionGroup::groupedTargetInterfa
     return {};
 }
 
+QList<AADLObjectIface *> AADLObjectConnectionGroup::sourceFunctionInterfaces() const
+{
+    if (auto function = qobject_cast<AADLObjectFunctionType *>(source())) {
+        return function->interfaces().toList();
+    }
+    return {};
+}
+
+QList<AADLObjectIface *> AADLObjectConnectionGroup::targetFunctionInterfaces() const
+{
+    if (auto function = qobject_cast<AADLObjectFunctionType *>(target())) {
+        return function->interfaces().toList();
+    }
+    return {};
+}
+
 AADLObjectIfaceGroup *AADLObjectConnectionGroup::sourceInterfaceGroup() const
 {
     return qobject_cast<AADLObjectIfaceGroup *>(sourceInterface());
@@ -114,6 +130,40 @@ void AADLObjectConnectionGroup::addConnection(const QPointer<AADLObjectConnectio
     }
 
     m_connections.append(connection);
+
+    Q_EMIT connectionAdded(connection);
+}
+
+void AADLObjectConnectionGroup::removeConnection(const QPointer<AADLObjectConnection> &connection)
+{
+    m_connections.removeAll(connection);
+    bool removeSourceIface = true;
+    bool removeTargetIface = true;
+
+    std::for_each(m_connections.constBegin(), m_connections.constEnd(),
+            [&](const QPointer<AADLObjectConnection> &connectionObj) {
+                if (connectionObj.isNull()) {
+                    return;
+                }
+                if ((connectionObj->sourceInterface() == connection->sourceInterface()
+                            || connectionObj->targetInterface() == connection->sourceInterface())
+                        && removeSourceIface) {
+                    removeSourceIface = false;
+                }
+                if ((connectionObj->sourceInterface() == connection->targetInterface()
+                            || connectionObj->targetInterface() == connection->targetInterface())
+                        && removeTargetIface) {
+                    removeTargetIface = false;
+                }
+            });
+    if (removeSourceIface) {
+        sourceInterfaceGroup()->removeEntity(connection->sourceInterface());
+    }
+    if (removeTargetIface) {
+        targetInterfaceGroup()->removeEntity(connection->targetInterface());
+    }
+
+    Q_EMIT connectionRemoved(connection);
 }
 
 QVariantList AADLObjectConnectionGroup::CreationInfo::toVarList() const

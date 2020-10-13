@@ -27,6 +27,7 @@ class AADLObjectIfaceGroup : public AADLObjectIface
 public:
     explicit AADLObjectIfaceGroup(const CreationInfo &ci);
 
+    void removeEntity(AADLObjectIface *iface);
     void addEntity(AADLObjectIface *iface);
     QList<QPointer<AADLObjectIface>> entities() const;
 

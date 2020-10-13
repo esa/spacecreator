@@ -207,6 +207,19 @@ QVector<AADLObjectIface *> AADLObjectFunctionType::interfaces() const
     for (auto i : d->m_ris)
         result.append(i->as<AADLObjectIface *>());
 
+    return result;
+}
+
+QVector<AADLObjectIface *> AADLObjectFunctionType::allInterfaces() const
+{
+    QVector<AADLObjectIface *> result;
+
+    for (auto i : d->m_pis)
+        result.append(i->as<AADLObjectIface *>());
+
+    for (auto i : d->m_ris)
+        result.append(i->as<AADLObjectIface *>());
+
     for (auto i : d->m_ifaceGroups)
         result.append(i->as<AADLObjectIface *>());
 

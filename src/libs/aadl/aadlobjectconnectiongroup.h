@@ -46,14 +46,23 @@ public:
     bool postInit() override;
 
     void addConnection(const QPointer<AADLObjectConnection> &connection);
+    void removeConnection(const QPointer<AADLObjectConnection> &connection);
+
     void initConnections(const QList<shared::Id> &ids) { m_initConnections = ids; }
 
     QList<QPointer<AADLObjectConnection>> groupedConnections() const;
     QList<QPointer<AADLObjectIface>> groupedSourceInterfaces() const;
     QList<QPointer<AADLObjectIface>> groupedTargetInterfaces() const;
 
+    QList<AADLObjectIface *> sourceFunctionInterfaces() const;
+    QList<AADLObjectIface *> targetFunctionInterfaces() const;
+
     AADLObjectIfaceGroup *sourceInterfaceGroup() const;
     AADLObjectIfaceGroup *targetInterfaceGroup() const;
+
+Q_SIGNALS:
+    void connectionAdded(AADLObjectConnection *connection);
+    void connectionRemoved(AADLObjectConnection *connection);
 
 private:
     QList<QPointer<AADLObjectConnection>> m_connections;

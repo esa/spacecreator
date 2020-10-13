@@ -164,21 +164,12 @@ void AADLItemModel::onAADLObjectAdded(aadl::AADLObject *object)
     if (!item) {
         item = createItemForObject(object);
         if (const auto connectionGroup = qobject_cast<aadl::AADLObjectConnectionGroup *>(object)) {
-            auto removeItemForObject = [this](aadl::AADLObject *object) {
-                if (auto connectionItem = items.take(object->id())) {
-                    graphicsScene->removeItem(connectionItem);
-                    delete connectionItem;
-                }
-            };
-
-            for (const auto connection : connectionGroup->groupedConnections()) {
-                removeItemForObject(connection);
-            }
-            for (const auto sourceIface : connectionGroup->groupedSourceInterfaces()) {
-                removeItemForObject(sourceIface);
-            }
-            for (const auto targetIface : connectionGroup->groupedTargetInterfaces()) {
-                removeItemForObject(targetIface);
+            connect(connectionGroup, &aadl::AADLObjectConnectionGroup::connectionAdded, this,
+                    &AADLItemModel::onConnectionAddedToGroup);
+            connect(connectionGroup, &aadl::AADLObjectConnectionGroup::connectionRemoved, this,
+                    &AADLItemModel::onConnectionRemovedFromGroup);
+            for (auto connection : connectionGroup->groupedConnections()) {
+                onConnectionAddedToGroup(connection);
             }
             updateSceneRect();
         }
@@ -230,16 +221,9 @@ void AADLItemModel::onAADLObjectRemoved(aadl::AADLObject *object)
     while (!rmQueu.isEmpty()) {
         if (mutex->tryLock()) {
             aadl::AADLObject *obj = rmQueu.dequeue();
-
             if (const auto connectionGroup = qobject_cast<aadl::AADLObjectConnectionGroup *>(obj)) {
-                for (const auto sourceIface : connectionGroup->groupedSourceInterfaces()) {
-                    createItemForObject(sourceIface);
-                }
-                for (const auto targetIface : connectionGroup->groupedTargetInterfaces()) {
-                    createItemForObject(targetIface);
-                }
                 for (const auto connection : connectionGroup->groupedConnections()) {
-                    createItemForObject(connection);
+                    onConnectionRemovedFromGroup(connection);
                 }
             }
 
@@ -265,6 +249,20 @@ void AADLItemModel::onRootObjectChanged(shared::Id rootId)
     }
 
     updateSceneRect();
+}
+
+void AADLItemModel::onConnectionAddedToGroup(aadl::AADLObjectConnection *connection)
+{
+    removeItemForObject(connection);
+    removeItemForObject(connection->sourceInterface());
+    removeItemForObject(connection->targetInterface());
+}
+
+void AADLItemModel::onConnectionRemovedFromGroup(aadl::AADLObjectConnection *connection)
+{
+    createItemForObject(connection->targetInterface());
+    createItemForObject(connection->sourceInterface());
+    createItemForObject(connection);
 }
 
 void AADLItemModel::onSceneSelectionChanged()
@@ -318,6 +316,14 @@ void AADLItemModel::updateItem(QGraphicsItem *item)
     if (mutex->tryLock()) {
         updateSceneRect();
         mutex->unlock();
+    }
+}
+
+void AADLItemModel::removeItemForObject(aadl::AADLObject *object)
+{
+    if (auto connectionItem = items.take(object->id())) {
+        graphicsScene->removeItem(connectionItem);
+        delete connectionItem;
     }
 }
 

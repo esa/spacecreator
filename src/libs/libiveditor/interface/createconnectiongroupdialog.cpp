@@ -21,7 +21,7 @@
 
 #include <QDialogButtonBox>
 #include <QFormLayout>
-#include <QLineEdit>
+#include <QPlainTextEdit>
 #include <QSignalMapper>
 
 namespace aadlinterface {
@@ -33,8 +33,8 @@ CreateConnectionGroupDialog::CreateConnectionGroupDialog(
     , m_signalMapper(new QSignalMapper(this))
 {
     connect(m_signalMapper, qOverload<int>(&QSignalMapper::mapped), this, [this](int idx) {
-        if (const auto lineEdit = qobject_cast<QLineEdit *>(m_signalMapper->mapping(idx))) {
-            m_info[idx].name = lineEdit->text().trimmed();
+        if (const auto textEdit = qobject_cast<QPlainTextEdit *>(m_signalMapper->mapping(idx))) {
+            m_info[idx].name = textEdit->toPlainText().trimmed();
         }
     });
 
@@ -47,27 +47,26 @@ CreateConnectionGroupDialog::CreateConnectionGroupDialog(
                                               connection->targetName(), connection->targetInterfaceName()));
             }
         }
-        return result.join(QLatin1String(","));
+        return result.join(QLatin1Char('\n'));
     };
 
     auto formLayout = new QFormLayout;
     for (int idx = 0; idx < groupCreationDataList.size(); ++idx) {
         const aadl::AADLObjectConnectionGroup::CreationInfo &info = groupCreationDataList.value(idx);
-        QLineEdit *lineEdit = new QLineEdit(this);
-        connect(lineEdit, &QLineEdit::textEdited, m_signalMapper, qOverload<>(&QSignalMapper::map));
-        m_signalMapper->setMapping(lineEdit, idx);
-        formLayout->addRow(labelConnection(info.connections), lineEdit);
+        auto textEdit = new QPlainTextEdit(this);
+        connect(textEdit, &QPlainTextEdit::textChanged, m_signalMapper, qOverload<>(&QSignalMapper::map));
+        m_signalMapper->setMapping(textEdit, idx);
+        formLayout->addRow(labelConnection(info.connections), textEdit);
     }
-    auto rootLayout = new QVBoxLayout;
-    rootLayout->addLayout(formLayout);
-
     auto box = new QDialogButtonBox(QDialogButtonBox::Ok | QDialogButtonBox::Cancel, this);
     connect(box, &QDialogButtonBox::accepted, this, &QDialog::accept);
     connect(box, &QDialogButtonBox::rejected, this, &QDialog::reject);
 
+    auto rootLayout = new QVBoxLayout;
+    rootLayout->addLayout(formLayout);
     rootLayout->addWidget(box);
     setLayout(rootLayout);
-    adjustSize();
+    resize(sizeHint().width(), minimumSizeHint().height());
 }
 
 CreateConnectionGroupDialog::~CreateConnectionGroupDialog() { }

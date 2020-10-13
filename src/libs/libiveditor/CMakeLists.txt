@@ -203,6 +203,10 @@ target_sources(${LIB_NAME} PRIVATE
     interface/commands/cmdconnectiongroupitemcreate.h
     templating/exportableaadlconnectiongroup.cpp
     templating/exportableaadlconnectiongroup.h
+    interface/aadlconnectiongroupmodel.cpp
+    interface/aadlconnectiongroupmodel.h
+    interface/commands/cmdconnectiongroupitemchange.cpp
+    interface/commands/cmdconnectiongroupitemchange.h
 )
 
 target_link_libraries(${LIB_NAME}

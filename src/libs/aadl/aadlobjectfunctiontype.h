@@ -53,6 +53,7 @@ public:
     QVector<AADLObjectConnectionGroup *> connectionGroups() const;
     QVector<AADLObjectComment *> comments() const;
     QVector<AADLObjectIface *> interfaces() const;
+    QVector<AADLObjectIface *> allInterfaces() const;
     QVector<AADLObjectIface *> ris() const;
     QVector<AADLObjectIface *> pis() const;
     QVector<AADLObjectIfaceGroup *> interfaceGroups() const;

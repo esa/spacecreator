@@ -252,7 +252,11 @@ QString AADLObject::groupName() const
 
 void AADLObject::setGroupName(const QString &groupName)
 {
-    setAttr(meta::Props::token(meta::Props::Token::group_name), groupName);
+    if (groupName.isEmpty()) {
+        removeAttr(meta::Props::token(meta::Props::Token::group_name));
+    } else {
+        setAttr(meta::Props::token(meta::Props::Token::group_name), groupName);
+    }
 }
 
 QHash<QString, QVariant> AADLObject::attrs() const

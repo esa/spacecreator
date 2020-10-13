@@ -19,6 +19,7 @@
 
 #include "aadlnamevalidator.h"
 #include "aadlobject.h"
+#include "aadlobjectconnectiongroup.h"
 #include "aadlobjectiface.h"
 #include "commandsstack.h"
 #include "contextparametersmodel.h"
@@ -29,12 +30,14 @@
 #include "delegates/interfaceattrdelegate.h"
 #include "delegates/propertytypedelegate.h"
 #include "ifaceparametersmodel.h"
+#include "interface/aadlconnectiongroupmodel.h"
 #include "propertieslistmodel.h"
 #include "propertiesviewbase.h"
 #include "ui_propertiesdialog.h"
 
 #include <QDebug>
 #include <QHeaderView>
+#include <QListView>
 #include <QTableView>
 
 namespace aadlinterface {
@@ -82,6 +85,8 @@ QString PropertiesDialog::objectTypeName() const
         return tr("Comment");
     case aadl::AADLObject::Type::Connection:
         return tr("Connection");
+    case aadl::AADLObject::Type::ConnectionGroup:
+        return tr("Connection Group");
     default:
         return QString();
     }
@@ -103,107 +108,101 @@ void PropertiesDialog::initTabs()
     if (!m_dataObject)
         return;
 
-    auto initAttributesView = [this]() {
-        auto viewAttrs = new PropertiesViewBase(this);
-        PropertiesListModel *modelAttrs { nullptr };
-
-        switch (m_dataObject->aadlType()) {
-        case aadl::AADLObject::Type::Function: {
-            modelAttrs = new FunctionPropertiesListModel(this);
-            break;
-        }
-        case aadl::AADLObject::Type::RequiredInterface:
-        case aadl::AADLObject::Type::ProvidedInterface: {
-            modelAttrs = new InterfacePropertiesListModel(this);
-            break;
-        }
-        default:
-            modelAttrs = new InterfacePropertiesListModel(this);
-            break;
-        }
-
-        modelAttrs->setDataObject(m_dataObject);
-        viewAttrs->setModel(modelAttrs);
-        viewAttrs->tableView()->setItemDelegateForColumn(
-                PropertiesListModel::ColumnValue, new AttributeDelegate(viewAttrs->tableView()));
-
-        ui->tabWidget->insertTab(0, viewAttrs, tr("Attributes"));
-    };
-
-    auto initContextParams = [this]() {
-        ContextParametersModel *modelCtxParams = new ContextParametersModel(this);
-        modelCtxParams->setDataTypes(m_dataTypes);
-        modelCtxParams->setDataObject(m_dataObject);
-
-        PropertiesViewBase *viewAttrs = new PropertiesViewBase(this);
-        viewAttrs->tableView()->setItemDelegateForColumn(
-                ContextParametersModel::ColumnType, new PropertyTypeDelegate(m_dataTypes, viewAttrs->tableView()));
-        viewAttrs->tableView()->setItemDelegateForColumn(
-                ContextParametersModel::ColumnValue, new Asn1ValueDelegate(m_dataTypes, viewAttrs->tableView()));
-        viewAttrs->tableView()->horizontalHeader()->show();
-        viewAttrs->setModel(modelCtxParams);
-        ui->tabWidget->insertTab(0, viewAttrs, tr("Context Parameters"));
-    };
-
-    auto initIfaceParams = [this]() {
-        IfaceParametersModel *modelIfaceParams = new IfaceParametersModel(this);
-        modelIfaceParams->setDataObject(m_dataObject);
-
-        PropertiesViewBase *viewAttrs = new PropertiesViewBase(this);
-        viewAttrs->tableView()->setItemDelegateForColumn(
-                IfaceParametersModel::ColumnType, new PropertyTypeDelegate(m_dataTypes, viewAttrs->tableView()));
-        viewAttrs->tableView()->setItemDelegateForColumn(IfaceParametersModel::ColumnEncoding,
-                new StringListComboDelegate({ tr("NATIVE"), tr("UPER"), tr("ACN") }, // TODO: is it configurable?
-                        viewAttrs->tableView()));
-        viewAttrs->tableView()->setItemDelegateForColumn(IfaceParametersModel::ColumnDirection,
-                new StringListComboDelegate(
-                        { aadl::IfaceParameter::directionName(aadl::IfaceParameter::Direction::In),
-                                aadl::IfaceParameter::directionName(aadl::IfaceParameter::Direction::Out) },
-                        viewAttrs->tableView()));
-        viewAttrs->tableView()->horizontalHeader()->show();
-        viewAttrs->setModel(modelIfaceParams);
-        ui->tabWidget->insertTab(0, viewAttrs, tr("Parameters"));
-    };
-
-    QString objectTypeLabel;
-
     switch (m_dataObject->aadlType()) {
-    case aadl::AADLObject::Type::FunctionType: {
-        objectTypeLabel = tr("Function Type");
-        initContextParams();
-        break;
-    }
+    case aadl::AADLObject::Type::FunctionType:
     case aadl::AADLObject::Type::Function: {
-        objectTypeLabel = tr("Function");
         initContextParams();
         break;
     }
-    case aadl::AADLObject::Type::RequiredInterface: {
-        objectTypeLabel = tr("RI");
-        initIfaceParams();
-        break;
-    }
+    case aadl::AADLObject::Type::RequiredInterface:
     case aadl::AADLObject::Type::ProvidedInterface: {
-        objectTypeLabel = tr("PI");
         initIfaceParams();
         break;
     }
-    case aadl::AADLObject::Type::Comment: {
-        objectTypeLabel = tr("Comment");
-        break;
-    }
-    case aadl::AADLObject::Type::Connection: {
-        objectTypeLabel = tr("Connection");
+    case aadl::AADLObject::Type::ConnectionGroup: {
+        initConnectionGroup();
         break;
     }
     default:
         break;
     }
 
-    setWindowTitle(tr("Edit %1").arg(objectTypeLabel));
-
+    setWindowTitle(tr("Edit %1").arg(objectTypeName()));
     initAttributesView();
     ui->tabWidget->setCurrentIndex(0);
 }
 
+void PropertiesDialog::initConnectionGroup()
+{
+    auto model = new AADLConnectionGroupModel(qobject_cast<aadl::AADLObjectConnectionGroup *>(m_dataObject), this);
+    auto connectionsView = new QListView;
+    connectionsView->setModel(model);
+    ui->tabWidget->insertTab(0, connectionsView, tr("Connections"));
 }
+
+void PropertiesDialog::initAttributesView()
+{
+    auto viewAttrs = new PropertiesViewBase(this);
+    PropertiesListModel *modelAttrs { nullptr };
+
+    switch (m_dataObject->aadlType()) {
+    case aadl::AADLObject::Type::Function: {
+        modelAttrs = new FunctionPropertiesListModel(this);
+        break;
+    }
+    case aadl::AADLObject::Type::RequiredInterface:
+    case aadl::AADLObject::Type::ProvidedInterface: {
+        modelAttrs = new InterfacePropertiesListModel(this);
+        break;
+    }
+    default:
+        modelAttrs = new InterfacePropertiesListModel(this);
+        break;
+    }
+
+    modelAttrs->setDataObject(m_dataObject);
+    viewAttrs->setModel(modelAttrs);
+    viewAttrs->tableView()->setItemDelegateForColumn(
+            PropertiesListModel::ColumnValue, new AttributeDelegate(viewAttrs->tableView()));
+
+    ui->tabWidget->insertTab(0, viewAttrs, tr("Attributes"));
+}
+
+void PropertiesDialog::initContextParams()
+{
+    ContextParametersModel *modelCtxParams = new ContextParametersModel(this);
+    modelCtxParams->setDataTypes(m_dataTypes);
+    modelCtxParams->setDataObject(m_dataObject);
+
+    PropertiesViewBase *viewAttrs = new PropertiesViewBase(this);
+    viewAttrs->tableView()->setItemDelegateForColumn(
+            ContextParametersModel::ColumnType, new PropertyTypeDelegate(m_dataTypes, viewAttrs->tableView()));
+    viewAttrs->tableView()->setItemDelegateForColumn(
+            ContextParametersModel::ColumnValue, new Asn1ValueDelegate(m_dataTypes, viewAttrs->tableView()));
+    viewAttrs->tableView()->horizontalHeader()->show();
+    viewAttrs->setModel(modelCtxParams);
+    ui->tabWidget->insertTab(0, viewAttrs, tr("Context Parameters"));
+}
+
+void PropertiesDialog::initIfaceParams()
+{
+    IfaceParametersModel *modelIfaceParams = new IfaceParametersModel(this);
+    modelIfaceParams->setDataObject(m_dataObject);
+
+    PropertiesViewBase *viewAttrs = new PropertiesViewBase(this);
+    viewAttrs->tableView()->setItemDelegateForColumn(
+            IfaceParametersModel::ColumnType, new PropertyTypeDelegate(m_dataTypes, viewAttrs->tableView()));
+    viewAttrs->tableView()->setItemDelegateForColumn(IfaceParametersModel::ColumnEncoding,
+            new StringListComboDelegate({ tr("NATIVE"), tr("UPER"), tr("ACN") }, // TODO: is it configurable?
+                    viewAttrs->tableView()));
+    viewAttrs->tableView()->setItemDelegateForColumn(IfaceParametersModel::ColumnDirection,
+            new StringListComboDelegate(
+                    { aadl::IfaceParameter::directionName(aadl::IfaceParameter::Direction::In),
+                            aadl::IfaceParameter::directionName(aadl::IfaceParameter::Direction::Out) },
+                    viewAttrs->tableView()));
+    viewAttrs->tableView()->horizontalHeader()->show();
+    viewAttrs->setModel(modelIfaceParams);
+    ui->tabWidget->insertTab(0, viewAttrs, tr("Parameters"));
+}
+
+} // namespace aadlinterface

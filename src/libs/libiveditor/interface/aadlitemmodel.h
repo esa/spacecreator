@@ -77,13 +77,17 @@ private Q_SLOTS:
     void onAADLObjectAdded(aadl::AADLObject *object);
     void onAADLObjectRemoved(aadl::AADLObject *object);
     void onRootObjectChanged(shared::Id rootId);
+    void onConnectionAddedToGroup(aadl::AADLObjectConnection *connection);
+    void onConnectionRemovedFromGroup(aadl::AADLObjectConnection *connection);
 
     void onSceneSelectionChanged();
     void onViewSelectionChanged(const QItemSelection &selected, const QItemSelection &deselected);
 
+private:
     QGraphicsItem *createItemForObject(aadl::AADLObject *obj);
     AADLFunctionGraphicsItem *rootItem() const;
     void updateItem(QGraphicsItem *item);
+    void removeItemForObject(aadl::AADLObject *object);
 
 private:
     QItemSelectionModel *itemSelectionModel;
