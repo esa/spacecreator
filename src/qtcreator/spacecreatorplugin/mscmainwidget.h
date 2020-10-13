@@ -26,6 +26,7 @@ class QAction;
 class QGraphicsView;
 class QSplitter;
 class QUndoStack;
+class QVBoxLayout;
 
 namespace asn1 {
 class ASN1FileView;
@@ -78,8 +79,9 @@ private:
     void initUi();
     void initConnections();
 
+    QWidget *m_leftArea = nullptr;
     QSplitter *m_horizontalSplitter = nullptr;
-    QSplitter *m_leftVerticalSplitter = nullptr;
+    QVBoxLayout *m_leftVerticalLayout = nullptr;
 
     msc::DocumentTreeView *m_documentTree = nullptr;
     asn1::ASN1FileView *m_asn1Widget = nullptr;

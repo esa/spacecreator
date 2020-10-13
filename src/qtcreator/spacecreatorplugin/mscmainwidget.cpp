@@ -40,6 +40,7 @@
 #include <QSplitter>
 #include <QStackedWidget>
 #include <QUndoStack>
+#include <QVBoxLayout>
 #include <QtWidgets/QHeaderView>
 #include <coreplugin/minisplitter.h>
 
@@ -216,15 +217,18 @@ void MscMainWidget::initUi()
     m_documentTree->header()->setVisible(true);
 
     m_asn1Widget = new asn1::ASN1FileView(this);
+    m_asn1Widget->setFileContentVisible(false);
+    m_asn1Widget->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Minimum);
 
-    m_leftVerticalSplitter = new Core::MiniSplitter(Qt::Vertical);
-    m_leftVerticalSplitter->addWidget(m_documentTree);
-    m_leftVerticalSplitter->addWidget(m_asn1Widget);
-    m_leftVerticalSplitter->setStretchFactor(0, 1);
-    m_leftVerticalSplitter->setStretchFactor(1, 0);
+    m_leftArea = new QWidget(this);
+
+    m_leftVerticalLayout = new QVBoxLayout(m_leftArea);
+    m_leftVerticalLayout->setMargin(0);
+    m_leftVerticalLayout->addWidget(m_documentTree);
+    m_leftVerticalLayout->addWidget(m_asn1Widget);
 
     m_horizontalSplitter = new Core::MiniSplitter(Qt::Horizontal);
-    m_horizontalSplitter->addWidget(m_leftVerticalSplitter);
+    m_horizontalSplitter->addWidget(m_leftArea);
     m_horizontalSplitter->addWidget(centerView);
     m_horizontalSplitter->setStretchFactor(0, 0);
     m_horizontalSplitter->setStretchFactor(1, 1);

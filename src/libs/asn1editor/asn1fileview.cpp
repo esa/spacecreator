@@ -41,7 +41,6 @@ ASN1FileView::ASN1FileView(QWidget *parent)
     , ui(new Ui::ASN1FileView)
 {
     ui->setupUi(this);
-    ui->textEdit->setFont(QFontDatabase::systemFont(QFontDatabase::FixedFont));
     connect(ui->selectFileButton, &QPushButton::clicked, this, &ASN1FileView::selectFile);
 }
 
@@ -52,7 +51,11 @@ ASN1FileView::~ASN1FileView()
 
 QSize ASN1FileView::sizeHint() const
 {
-    return QSize(200, 200);
+    if (fileContentVisible()) {
+        return QSize(200, 200);
+    } else {
+        return QWidget::sizeHint();
+    }
 }
 
 /*!
@@ -61,6 +64,36 @@ QSize ASN1FileView::sizeHint() const
 QString ASN1FileView::fileName() const
 {
     return ui->filenameLabel->text();
+}
+
+/*!
+   Returns if the asn file content is shown
+ */
+bool ASN1FileView::fileContentVisible() const
+{
+    return ui->textEdit != nullptr;
+}
+
+/*!
+   Sets if the ASN file content should be shown
+ */
+void ASN1FileView::setFileContentVisible(bool visible)
+{
+    if (fileContentVisible() == visible) {
+        return;
+    }
+
+    ui->textEdit->setVisible(visible);
+    if (visible) {
+        ui->textEdit = new QTextEdit(this);
+        ui->textEdit->setReadOnly(true);
+        ui->gridLayout->addWidget(ui->textEdit, 1, 0, 1, 1);
+        fillPreview();
+    } else {
+        delete ui->textEdit;
+        ui->textEdit = nullptr;
+    }
+    Q_EMIT fileContentVisibleChanged();
 }
 
 /*!
@@ -114,12 +147,18 @@ void ASN1FileView::selectFile()
  */
 void ASN1FileView::fillPreview()
 {
+    if (!fileContentVisible()) {
+        return;
+    }
+
     QString filename = m_directory + QDir::separator() + ui->filenameLabel->text();
     QFileInfo fi(filename);
     if (!fi.exists()) {
         ui->textEdit->clear();
         return;
     }
+
+    ui->textEdit->setFont(QFontDatabase::systemFont(QFontDatabase::FixedFont));
 
     Asn1Acn::Asn1XMLParser parser;
     QString html = parser.asn1AsHtml(filename);

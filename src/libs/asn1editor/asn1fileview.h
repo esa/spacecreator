@@ -30,6 +30,8 @@ namespace asn1 {
 class ASN1FileView : public QWidget
 {
     Q_OBJECT
+    Q_PROPERTY(bool fileContentVisible READ fileContentVisible WRITE setFileContentVisible NOTIFY
+                    fileContentVisibleChanged)
 
 public:
     explicit ASN1FileView(QWidget *parent = nullptr);
@@ -39,13 +41,18 @@ public:
 
     QString fileName() const;
 
+    bool fileContentVisible() const;
+
 public Q_SLOTS:
     void setDirectory(const QString &directory);
     void setFileName(const QString &fileName);
     void setFile(const QFileInfo &file);
 
+    void setFileContentVisible(bool fileContentVisible);
+
 Q_SIGNALS:
     void asn1Selected(const QString &fileName);
+    void fileContentVisibleChanged();
 
 private Q_SLOTS:
     void selectFile();
