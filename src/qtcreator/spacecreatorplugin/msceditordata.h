@@ -17,6 +17,7 @@
 
 #pragma once
 
+#include <QPointer>
 #include <QSharedPointer>
 #include <coreplugin/icontext.h>
 
@@ -35,16 +36,17 @@ class IEditor;
 
 namespace spctr {
 
-class MscTextEditorFactory;
+class MscContext;
 class MscEditorWidget;
 class MscEditorStack;
-class MscContext;
+class MscModelStorage;
+class MscTextEditorFactory;
 
 class MscEditorData : public QObject
 {
     Q_OBJECT
 public:
-    MscEditorData(QObject *parent = nullptr);
+    MscEditorData(MscModelStorage *mscStorage, QObject *parent = nullptr);
     ~MscEditorData() override;
 
     void fullInit();
@@ -76,6 +78,8 @@ private:
 
     MscTextEditorFactory *m_editorFactory = nullptr;
     bool m_minimapVisible = false;
+
+    QPointer<MscModelStorage> m_mscStorage;
 };
 
 }

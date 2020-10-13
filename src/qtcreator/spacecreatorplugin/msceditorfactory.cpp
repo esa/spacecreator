@@ -19,6 +19,7 @@
 
 #include "msceditorcore.h"
 #include "msceditordata.h"
+#include "mscmodelstorage.h"
 #include "spacecreatorpluginconstants.h"
 
 #include <QDebug>
@@ -27,8 +28,9 @@
 
 namespace spctr {
 
-MscEditorFactory::MscEditorFactory(QObject *parent)
+MscEditorFactory::MscEditorFactory(MscModelStorage *mscStorage, QObject *parent)
     : IEditorFactory(parent)
+    , m_mscStorage(mscStorage)
 {
     setId(Constants::K_MSC_EDITOR_ID);
     setDisplayName(QCoreApplication::translate("MscEditor", Constants::C_MSCEDITOR_DISPLAY_NAME));
@@ -45,7 +47,7 @@ Core::IEditor *MscEditorFactory::createEditor()
 MscEditorData *MscEditorFactory::editorData() const
 {
     if (!m_editorData) {
-        m_editorData = new MscEditorData(const_cast<MscEditorFactory *>(this));
+        m_editorData = new MscEditorData(m_mscStorage, const_cast<MscEditorFactory *>(this));
         QGuiApplication::setOverrideCursor(Qt::WaitCursor);
         m_editorData->fullInit();
         connect(m_editorData, &MscEditorData::mscDataLoaded, this, &MscEditorFactory::mscDataLoaded);

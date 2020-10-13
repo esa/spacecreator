@@ -319,7 +319,12 @@ QString InterfaceDocument::path() const
  */
 void InterfaceDocument::setAsn1FileName(const QString &asnfile)
 {
+    if (d->asnFileName == asnfile) {
+        return;
+    }
+
     d->asnFileName = asnfile;
+    Q_EMIT dirtyChanged(true);
 }
 
 /*!
@@ -343,10 +348,12 @@ QString InterfaceDocument::asn1FilePath() const
  */
 void InterfaceDocument::setMscFileName(const QString &mscFile)
 {
-    if (mscFile != d->mscFileName) {
-        d->mscFileName = mscFile;
-        Q_EMIT mscFileNameChanged(mscFile);
+    if (mscFile == d->mscFileName) {
+        return;
     }
+
+    d->mscFileName = mscFile;
+    Q_EMIT mscFileNameChanged(mscFile);
 }
 
 /*!
@@ -540,7 +547,7 @@ bool InterfaceDocument::loadImpl(const QString &path)
     aadl::AADLXMLReader parser;
     connect(&parser, &aadl::AADLXMLReader::objectsParsed, this, &InterfaceDocument::setObjects);
     connect(&parser, &aadl::AADLXMLReader::metaDataParsed, this, [this, path](const QVariantMap &metadata) {
-        setAsn1FileName(metadata["asn1file"].toString());
+        d->asnFileName = metadata["asn1file"].toString();
         setMscFileName(metadata["mscfile"].toString());
     });
     connect(&parser, &aadl::AADLXMLReader::error, [](const QString &msg) { qWarning() << msg; });

@@ -114,11 +114,7 @@ QPoint CoordinatesConverter::sceneToCif(const QPointF &scenePointSrc, bool *ok)
 
                 if (ok)
                     *ok = true;
-            } else {
-                qWarning() << "CoordinatesConverter: Can't obtain current view";
             }
-        } else {
-            qWarning() << "CoordinatesConverter: Can't obtain current DPI";
         }
     }
     return mmPoint;
@@ -173,11 +169,7 @@ QPointF CoordinatesConverter::cifToScene(const QPoint &cifPoint, bool *ok)
 
                 if (ok)
                     *ok = true;
-            } else {
-                qWarning() << "CoordinatesConverter: Can't obtain current view";
             }
-        } else {
-            qWarning() << "CoordinatesConverter: Can't obtain current DPI";
         }
     }
 
@@ -245,9 +237,6 @@ QPointF CoordinatesConverter::vector2DInScene(const int mmX, const int mmY)
 {
     bool converted(false);
     const QPointF &scenePoint = cifToScene({ mmX, mmY }, &converted);
-    if (!converted) {
-        qWarning() << "CoordinatesConverter::vector2DInScene: failed";
-    }
 
     return converted ? scenePoint : QPointF();
 }

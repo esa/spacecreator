@@ -22,6 +22,7 @@
 #include "msceditordocument.h"
 #include "msceditorstack.h"
 #include "mscmainwidget.h"
+#include "mscmodelstorage.h"
 #include "msctexteditor.h"
 #include "spacecreatorpluginconstants.h"
 
@@ -75,8 +76,9 @@ public:
     }
 };
 
-MscEditorData::MscEditorData(QObject *parent)
+MscEditorData::MscEditorData(MscModelStorage *mscStorage, QObject *parent)
     : QObject(parent)
+    , m_mscStorage(mscStorage)
 {
     m_contexts.add(spctr::Constants::C_MSC_EDITOR);
 
@@ -142,10 +144,9 @@ void MscEditorData::fullInit()
 
 Core::IEditor *MscEditorData::createEditor()
 {
-    auto designWidget = new MscMainWidget;
+    auto designWidget = new MscMainWidget(m_mscStorage);
     MscTextEditor *mscEditor = m_editorFactory->create(designWidget);
 
-    m_undoGroup->addStack(designWidget->undoStack());
     m_widgetStack->add(mscEditor, designWidget);
     m_mainToolBar->addEditor(mscEditor);
 
@@ -158,7 +159,12 @@ Core::IEditor *MscEditorData::createEditor()
     }
 
     connect(designWidget, &spctr::MscMainWidget::asn1Selected, this, &MscEditorData::openEditor);
-    connect(designWidget, &spctr::MscMainWidget::mscDataLoaded, this, &MscEditorData::mscDataLoaded);
+    connect(designWidget, &spctr::MscMainWidget::mscDataLoaded, this,
+            [this, designWidget](const QString &fileName, QSharedPointer<msc::MSCEditorCore> data) {
+                designWidget->mscCore()->minimapView()->setVisible(m_minimapVisible);
+                m_undoGroup->addStack(designWidget->undoStack());
+                Q_EMIT mscDataLoaded(fileName, data);
+            });
 
     return mscEditor;
 }

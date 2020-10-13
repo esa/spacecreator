@@ -17,6 +17,7 @@
 
 #pragma once
 
+#include <QPointer>
 #include <QSharedPointer>
 #include <coreplugin/editormanager/ieditorfactory.h>
 
@@ -26,6 +27,8 @@ class MSCEditorCore;
 
 namespace spctr {
 
+class MscModelStorage;
+
 class MscEditorData;
 
 class MscEditorFactory : public Core::IEditorFactory
@@ -33,7 +36,7 @@ class MscEditorFactory : public Core::IEditorFactory
     Q_OBJECT
 
 public:
-    explicit MscEditorFactory(QObject *parent);
+    MscEditorFactory(MscModelStorage *mscStorage, QObject *parent);
 
     Core::IEditor *createEditor() override;
 
@@ -44,6 +47,7 @@ Q_SIGNALS:
 
 private:
     mutable MscEditorData *m_editorData = nullptr;
+    QPointer<MscModelStorage> m_mscStorage;
 };
 
 }

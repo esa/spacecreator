@@ -92,7 +92,7 @@ bool SpaceCreatorPlugin::initialize(const QStringList &arguments, QString *error
 
     m_aadlStorage = new AadlModelStorage(this);
     m_mscStorage = new MscModelStorage(this);
-    m_mscFactory = new MscEditorFactory(this);
+    m_mscFactory = new MscEditorFactory(m_mscStorage, this);
     m_aadlFactory = new AadlEditorFactory(m_aadlStorage, this);
 
     // MSC
@@ -134,12 +134,6 @@ bool SpaceCreatorPlugin::initialize(const QStringList &arguments, QString *error
     menu->addAction(checkMessagesCmd);
     Core::ActionManager::actionContainer(Core::Constants::M_TOOLS)->addMenu(menu);
 
-    connect(m_mscFactory, &MscEditorFactory::mscDataLoaded, this,
-            [this](const QString &fileName, QSharedPointer<msc::MSCEditorCore> mscData) {
-                mscData->aadlChecker()->setIvCore(ivCore()); // All msc documents have access to the iv model
-                m_mscStorage->setMscData(fileName, mscData);
-            });
-
     // AADL
     m_asn1DialogAction = new QAction(tr("Show ASN1 dialog ..."), this);
     Core::Command *showAsn1Cmd = Core::ActionManager::registerAction(m_asn1DialogAction, Constants::AADL_SHOW_ASN1_ID);
@@ -176,9 +170,6 @@ bool SpaceCreatorPlugin::initialize(const QStringList &arguments, QString *error
     menu->addAction(showDynContextCmd);
     menu->menu()->setEnabled(true);
     Core::ActionManager::actionContainer(Core::Constants::M_TOOLS)->addMenu(menu);
-
-    connect(m_aadlFactory, SIGNAL(aadlDataLoaded(const QString &, QSharedPointer<aadlinterface::IVEditorCore>)),
-            m_aadlStorage, SLOT(setIvData(const QString &, QSharedPointer<aadlinterface::IVEditorCore>)));
 
     // asn connection
     connect(ProjectExplorer::ProjectTree::instance(), &ProjectExplorer::ProjectTree::currentProjectChanged, this,

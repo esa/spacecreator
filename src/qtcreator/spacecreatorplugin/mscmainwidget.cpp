@@ -28,6 +28,7 @@
 #include "mscdocument.h"
 #include "msceditorcore.h"
 #include "mscmodel.h"
+#include "mscmodelstorage.h"
 #include "tools/entitydeletetool.h"
 
 #include <QAction>
@@ -50,20 +51,11 @@ namespace spctr {
    \brief MscEditorCore::MainWidget::MainWidget Is the main widget for the whole MSC plugin in QtCreator
  */
 
-MscMainWidget::MscMainWidget(QWidget *parent)
+MscMainWidget::MscMainWidget(MscModelStorage *mscStorage, QWidget *parent)
     : QWidget(parent)
-    , m_plugin(new msc::MSCEditorCore())
+    , m_mscStorage((mscStorage))
 {
-    initUi();
-
-    m_plugin->createActionCopy(nullptr);
-    m_plugin->createActionPaste(nullptr);
-    m_plugin->initChartTools();
-    m_plugin->initHierarchyViewActions();
-    initConnections();
-    m_plugin->initConnections();
-    m_plugin->setupMiniMap();
-    m_plugin->showDocumentView(true);
+    init();
 }
 
 MscMainWidget::~MscMainWidget()
@@ -71,71 +63,107 @@ MscMainWidget::~MscMainWidget()
     if (m_documentTree->model()) {
         disconnect(m_documentTree->model(), nullptr, this, nullptr);
     }
-    disconnect(&(m_plugin->mainModel()->chartViewModel()), nullptr, this, nullptr);
-    disconnect(m_plugin->mainModel(), nullptr, this, nullptr);
-    disconnect(m_plugin->mainModel()->undoStack(), nullptr, this, nullptr);
+    if (!m_plugin.isNull()) {
+        disconnect(&(m_plugin->mainModel()->chartViewModel()), nullptr, this, nullptr);
+        disconnect(m_plugin->mainModel(), nullptr, this, nullptr);
+        disconnect(m_plugin->mainModel()->undoStack(), nullptr, this, nullptr);
+    }
 }
 
 bool MscMainWidget::load(const QString &filename)
 {
-    m_plugin->mainModel()->chartViewModel().setPreferredChartBoxSize(QSizeF());
-
-    const bool ok = m_plugin->mainModel()->loadFile(filename);
-    if (ok) {
-        m_plugin->chartView()->setZoom(100);
-        Q_EMIT mscDataLoaded(filename, m_plugin);
+    m_plugin = m_mscStorage->mscData(filename);
+    if (!m_plugin->chartView()) {
+        init();
+        m_plugin->mainModel()->chartViewModel().clearScene();
+        m_plugin->mainModel()->chartViewModel().updateLayout();
     }
+    m_asn1Widget->setFile(m_plugin->mainModel()->asn1File());
+    m_plugin->chartView()->setZoom(100);
+    m_documentTree->expandAll();
+    m_documentTree->setSelectedDocument(m_plugin->mainModel()->selectedDocument());
+    Q_EMIT mscDataLoaded(filename, m_plugin);
 
-    return ok;
+    return true;
 }
 
 bool MscMainWidget::save()
 {
+    if (m_plugin.isNull()) {
+        return false;
+    }
     return m_plugin->mainModel()->saveMsc(m_plugin->mainModel()->currentFilePath());
 }
 
 QString MscMainWidget::errorMessage() const
 {
+    if (m_plugin.isNull()) {
+        return {};
+    }
     return m_plugin->mainModel()->mscErrorMessages().join("\n");
 }
 
 void MscMainWidget::setFileName(const QString &filename)
 {
+    if (m_plugin.isNull()) {
+        return;
+    }
     m_plugin->mainModel()->setCurrentFilePath(filename);
 }
 
 bool MscMainWidget::isDirty() const
 {
+    if (m_plugin.isNull()) {
+        return false;
+    }
     return m_plugin->mainModel()->needSave();
 }
 
 QUndoStack *MscMainWidget::undoStack()
 {
+    if (m_plugin.isNull()) {
+        return {};
+    }
     return m_plugin->mainModel()->undoStack();
 }
 
 QString MscMainWidget::textContents() const
 {
+    if (m_plugin.isNull()) {
+        return {};
+    }
     return m_plugin->mainModel()->modelText();
 }
 
 QAction *MscMainWidget::actionCopy() const
 {
+    if (m_plugin.isNull()) {
+        return {};
+    }
     return m_plugin->actionCopy();
 }
 
 QAction *MscMainWidget::actionPaste() const
 {
+    if (m_plugin.isNull()) {
+        return {};
+    }
     return m_plugin->actionPaste();
 }
 
 QAction *MscMainWidget::actionToolDelete() const
 {
+    if (m_plugin.isNull()) {
+        return {};
+    }
     return m_plugin->deleteTool()->action();
 }
 
 QVector<QAction *> MscMainWidget::toolActions() const
 {
+    if (m_plugin.isNull()) {
+        return {};
+    }
     return m_plugin->chartActions();
 }
 
@@ -147,6 +175,9 @@ QSharedPointer<msc::MSCEditorCore> MscMainWidget::mscCore() const
 void MscMainWidget::showChart(const QModelIndex &index)
 {
     if (!index.isValid()) {
+        return;
+    }
+    if (m_plugin.isNull()) {
         return;
     }
 
@@ -167,6 +198,9 @@ void MscMainWidget::showSelection(const QModelIndex &current, const QModelIndex 
 {
     Q_UNUSED(previous)
     if (!current.isValid()) {
+        return;
+    }
+    if (m_plugin.isNull()) {
         return;
     }
 
@@ -203,8 +237,13 @@ void MscMainWidget::showAsn1Errors(const QStringList &faultyMessages)
             this, tr("ASN1 error"), tr("Following messgages have ASN.1 errors:") + "\n" + faultyMessages.join("\n"));
 }
 
-void MscMainWidget::initUi()
+void MscMainWidget::init()
 {
+    if (m_documentTree || m_plugin.isNull()) {
+        // initialized already
+        return;
+    }
+
     auto centerView = new QStackedWidget(this);
     auto graphicsView = new msc::GraphicsView(this);
     centerView->addWidget(graphicsView);
@@ -238,6 +277,15 @@ void MscMainWidget::initUi()
     layout()->setMargin(0);
 
     m_documentTree->setModel(m_plugin->mainModel()->documentItemModel());
+
+    m_plugin->createActionCopy(nullptr);
+    m_plugin->createActionPaste(nullptr);
+    m_plugin->initChartTools();
+    m_plugin->initHierarchyViewActions();
+    initConnections();
+    m_plugin->initConnections();
+    m_plugin->setupMiniMap();
+    m_plugin->showDocumentView(true);
 }
 
 void MscMainWidget::initConnections()

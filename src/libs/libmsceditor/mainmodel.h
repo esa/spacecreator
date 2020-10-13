@@ -79,6 +79,8 @@ public:
     void storeCurrentUndoCommandId();
     bool needSave() const;
 
+    QFileInfo asn1File() const;
+
 Q_SIGNALS:
     void showChartVew();
     void modelDataChanged();
@@ -106,7 +108,6 @@ private:
     msc::MscChart *firstChart(const QVector<msc::MscDocument *> &docs) const;
     void clearMscModel();
     void setNewModel(msc::MscModel *model);
-    QFileInfo asn1File() const;
 
     std::unique_ptr<MainModelPrivate> const d;
 };

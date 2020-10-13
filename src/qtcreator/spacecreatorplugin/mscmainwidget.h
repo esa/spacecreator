@@ -17,6 +17,7 @@
 
 #pragma once
 
+#include <QPointer>
 #include <QSharedPointer>
 #include <QStackedWidget>
 #include <QWidget>
@@ -39,12 +40,13 @@ class MSCEditorCore;
 }
 
 namespace spctr {
+class MscModelStorage;
 
 class MscMainWidget : public QWidget
 {
     Q_OBJECT
 public:
-    explicit MscMainWidget(QWidget *parent = nullptr);
+    MscMainWidget(MscModelStorage *mscStorage, QWidget *parent = nullptr);
     ~MscMainWidget();
 
     bool load(const QString &filename);
@@ -76,7 +78,7 @@ private Q_SLOTS:
     void showAsn1Errors(const QStringList &faultyMessages);
 
 private:
-    void initUi();
+    void init();
     void initConnections();
 
     QWidget *m_leftArea = nullptr;
@@ -87,6 +89,7 @@ private:
     asn1::ASN1FileView *m_asn1Widget = nullptr;
 
     QSharedPointer<msc::MSCEditorCore> m_plugin;
+    QPointer<MscModelStorage> m_mscStorage;
 };
 
 }

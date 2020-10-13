@@ -52,12 +52,8 @@ bool AadlMainWidget::load(const QString &filename)
 {
     m_plugin = m_aadlStorage->ivData(filename);
     init();
-
-    const bool ok = m_plugin->document()->load(filename);
-    if (ok) {
-        Q_EMIT aadlDataLoaded(filename, m_plugin);
-    }
-    return ok;
+    Q_EMIT aadlDataLoaded(filename, m_plugin);
+    return true;
 }
 
 bool AadlMainWidget::save()
@@ -197,6 +193,8 @@ void AadlMainWidget::init()
     }
 
     aadlinterface::cmd::CommandsStack::setCurrent(currentStack);
+
+    connect(currentStack, &QUndoStack::indexChanged, this, [&]() { Q_EMIT dirtyChanged(isDirty()); });
 }
 
 }
