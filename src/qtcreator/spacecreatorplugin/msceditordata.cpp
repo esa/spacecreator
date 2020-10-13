@@ -40,9 +40,6 @@
 #include <coreplugin/modemanager.h>
 #include <coreplugin/outputpane.h>
 #include <editormanager/editormanager.h>
-#include <projectexplorer/project.h>
-#include <projectexplorer/projectexplorerconstants.h>
-#include <projectexplorer/projecttree.h>
 #include <texteditor/texteditor.h>
 #include <utils/icon.h>
 #include <utils/qtcassert.h>
@@ -179,22 +176,6 @@ void MscEditorData::editMessageDeclarations(QWidget *parentWidget)
     }
 }
 
-/*!
-   Returns all aald files in this project
- */
-QStringList MscEditorData::aadlFiles() const
-{
-    return projectFiles("interfaceview.xml");
-}
-
-/*!
-   Returns all msc files in this project
- */
-QStringList MscEditorData::mscFiles() const
-{
-    return projectFiles(".msc");
-}
-
 void MscEditorData::openEditor(const QString &fileName)
 {
     Core::EditorManager::instance()->openEditor(fileName);
@@ -248,23 +229,6 @@ Core::EditorToolBar *MscEditorData::createMainToolBar()
     toolBar->addCenterToolBar(m_widgetToolBar);
 
     return toolBar;
-}
-
-QStringList MscEditorData::projectFiles(const QString &suffix) const
-{
-    ProjectExplorer::Project *project = ProjectExplorer::ProjectTree::currentProject();
-    if (!project) {
-        return {};
-    }
-
-    QStringList result;
-    for (Utils::FileName fileName : project->files(ProjectExplorer::Project::AllFiles)) {
-        if (fileName.toString().endsWith(suffix, Qt::CaseInsensitive)) {
-            result.append(fileName.toString());
-        }
-    }
-
-    return result;
 }
 
 QWidget *MscEditorData::createModeWidget()

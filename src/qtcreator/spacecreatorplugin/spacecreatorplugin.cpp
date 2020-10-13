@@ -47,6 +47,9 @@
 #include <editormanager/ieditor.h>
 #include <extensionsystem/pluginmanager.h>
 #include <extensionsystem/pluginspec.h>
+#include <projectexplorer/project.h>
+#include <projectexplorer/projectexplorerconstants.h>
+#include <projectexplorer/projecttree.h>
 
 void initMscResources()
 {
@@ -177,6 +180,14 @@ bool SpaceCreatorPlugin::initialize(const QStringList &arguments, QString *error
     connect(m_aadlFactory, SIGNAL(aadlDataLoaded(const QString &, QSharedPointer<aadlinterface::IVEditorCore>)),
             m_aadlStorage, SLOT(setIvData(const QString &, QSharedPointer<aadlinterface::IVEditorCore>)));
 
+    // asn connection
+    connect(ProjectExplorer::ProjectTree::instance(), &ProjectExplorer::ProjectTree::currentProjectChanged, this,
+            [this](ProjectExplorer::Project *project) {
+                m_asnFiles = allAsn1Files();
+                connect(project, &ProjectExplorer::Project::fileListChanged, this,
+                        &spctr::SpaceCreatorPlugin::checkAsnFileRename, Qt::UniqueConnection);
+            });
+
     return true;
 }
 
@@ -194,6 +205,30 @@ ExtensionSystem::IPlugin::ShutdownFlag SpaceCreatorPlugin::aboutToShutdown()
     // Disconnect from signals that are not needed during shutdown
     // Hide UI (if you add UI that is not in the main window directly)
     return SynchronousShutdown;
+}
+
+/*!
+   Returns all aald files of the current project
+ */
+QStringList SpaceCreatorPlugin::allAadlFiles() const
+{
+    return projectFiles("interfaceview.xml");
+}
+
+/*!
+   Returns all msc files of the current project
+ */
+QStringList SpaceCreatorPlugin::allMscFiles() const
+{
+    return projectFiles(".msc");
+}
+
+/*!
+   Returns all asn files of the current project
+ */
+QStringList SpaceCreatorPlugin::allAsn1Files() const
+{
+    return projectFiles(".asn");
 }
 
 void SpaceCreatorPlugin::showMessageDeclarations()
@@ -315,9 +350,39 @@ void SpaceCreatorPlugin::onDynContextEditorMenuInvoked()
     m_aadlFactory->editorData()->onDynContextEditorMenuInvoked();
 }
 
+/*!
+   Checks if one asn1 file was renamed. If yes, update the filename in all msc and aadl files.
+ */
+void SpaceCreatorPlugin::checkAsnFileRename()
+{
+    QStringList asnFiles = allAsn1Files();
+
+    QStringList newAsnFiles;
+    for (const QString &file : asnFiles) {
+        if (!m_asnFiles.contains(file)) {
+            newAsnFiles.append(file);
+        }
+    }
+    QStringList lostAsnFiles;
+    for (const QString &file : m_asnFiles) {
+        if (!asnFiles.contains(file)) {
+            lostAsnFiles.append(file);
+        }
+    }
+
+    if (newAsnFiles.size() == 1 && lostAsnFiles.size() == 1) {
+        for (QSharedPointer<msc::MSCEditorCore> &mscCore : allMscCores()) {
+            mscCore->renameAsnFile(lostAsnFiles[0], newAsnFiles[0]);
+        }
+        ivCore()->renameAsnFile(lostAsnFiles[0], newAsnFiles[0]);
+    }
+
+    m_asnFiles = asnFiles;
+}
+
 QSharedPointer<aadlinterface::IVEditorCore> SpaceCreatorPlugin::ivCore() const
 {
-    QStringList aadlFiles = m_mscFactory->editorData()->aadlFiles();
+    QStringList aadlFiles = allAadlFiles();
     if (aadlFiles.empty()) {
         qWarning() << "No AADL file in the projec";
         return {};
@@ -328,7 +393,7 @@ QSharedPointer<aadlinterface::IVEditorCore> SpaceCreatorPlugin::ivCore() const
 
 QVector<QSharedPointer<msc::MSCEditorCore>> SpaceCreatorPlugin::allMscCores() const
 {
-    QStringList mscFiles = m_mscFactory->editorData()->mscFiles();
+    QStringList mscFiles = allMscFiles();
     QVector<QSharedPointer<msc::MSCEditorCore>> allMscCores;
     for (const QString &mscFile : mscFiles) {
         QSharedPointer<msc::MSCEditorCore> core = m_mscStorage->mscData(mscFile);
@@ -337,6 +402,26 @@ QVector<QSharedPointer<msc::MSCEditorCore>> SpaceCreatorPlugin::allMscCores() co
         }
     }
     return allMscCores;
+}
+
+/*!
+   Returns all files of the current project endig with the given \p suffix
+ */
+QStringList SpaceCreatorPlugin::projectFiles(const QString &suffix) const
+{
+    ProjectExplorer::Project *project = ProjectExplorer::ProjectTree::currentProject();
+    if (!project) {
+        return {};
+    }
+
+    QStringList result;
+    for (Utils::FileName fileName : project->files(ProjectExplorer::Project::AllFiles)) {
+        if (fileName.toString().endsWith(suffix, Qt::CaseInsensitive)) {
+            result.append(fileName.toString());
+        }
+    }
+
+    return result;
 }
 
 }

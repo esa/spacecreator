@@ -31,6 +31,7 @@
 #include "mainwindow.h"
 
 #include <QDebug>
+#include <QFileInfo>
 #include <QMainWindow>
 #include <QMenu>
 #include <QRectF>
@@ -188,6 +189,34 @@ bool IVEditorCore::addConnection(QString name, const QString &fromInstanceName, 
     cmd::CommandsStack::current()->endMacro();
 
     return true;
+}
+
+/*!
+   Changes the asn1 referenceto \p newName if the existing one if pointing to \p oldName
+ */
+void IVEditorCore::renameAsnFile(const QString &oldName, const QString &newName)
+{
+    if (!aadlinterface::cmd::CommandsStack::current()) {
+        QUndoStack *currentStack = document()->commandsStack();
+        if (currentStack) {
+            aadlinterface::cmd::CommandsStack::setCurrent(currentStack);
+        } else {
+            aadlinterface::cmd::CommandsStack::setCurrent(new QUndoStack(this));
+        }
+    }
+
+    QFileInfo oldFile(oldName);
+    const QString oldFileName = oldFile.fileName();
+    QFileInfo newFile(newName);
+    const QString newFileName = newFile.fileName();
+
+    if (document()->asn1FileName() == oldFileName) {
+        QVariantList params { QVariant::fromValue(document()), QVariant::fromValue(newName) };
+        QUndoCommand *command = cmd::CommandsFactory::create(cmd::ChangeAsn1File, params);
+        if (command) {
+            cmd::CommandsStack::current()->push(command);
+        }
+    }
 }
 
 /*!

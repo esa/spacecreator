@@ -61,6 +61,8 @@ public:
 
     void setupMiniMap();
 
+    virtual void renameAsnFile(const QString &oldName, const QString &newName) = 0;
+
 public Q_SLOTS:
     void showAboutDialog();
 

@@ -38,13 +38,9 @@ namespace msc {
 AadlChecks::AadlChecks(QObject *parent)
     : QObject((parent))
 {
-    qDebug() << Q_FUNC_INFO;
 }
 
-AadlChecks::~AadlChecks()
-{
-    qDebug() << Q_FUNC_INFO;
-}
+AadlChecks::~AadlChecks() { }
 
 void AadlChecks::setMscCore(MSCEditorCore *mscCore)
 {

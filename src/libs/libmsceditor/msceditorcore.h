@@ -104,6 +104,8 @@ public:
 
     ViewMode viewMode();
 
+    void renameAsnFile(const QString &oldName, const QString &newName) override;
+
 public Q_SLOTS:
     void setViewMode(ViewMode mode);
     void showDocumentView(bool show);

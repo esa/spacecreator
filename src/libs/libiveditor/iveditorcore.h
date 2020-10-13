@@ -52,6 +52,8 @@ public:
     bool addFunction(const QString &name);
     bool addConnection(QString name, const QString &fromInstanceName, const QString &toInstanceName);
 
+    void renameAsnFile(const QString &oldName, const QString &newName) override;
+
 private:
     aadl::AADLObjectIface *getInterface(
             const QString &ifName, aadl::AADLObjectIface::IfaceType ifType, aadl::AADLObjectFunction *parentFunction);

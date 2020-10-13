@@ -45,6 +45,7 @@
 #include <QApplication>
 #include <QClipboard>
 #include <QDebug>
+#include <QFileInfo>
 #include <QMainWindow>
 #include <QMenu>
 #include <QMimeData>
@@ -416,6 +417,23 @@ AadlChecks *MSCEditorCore::aadlChecker() const
 MSCEditorCore::ViewMode MSCEditorCore::viewMode()
 {
     return m_viewMode;
+}
+
+/*!
+   Changes the asn1 referenceto \p newName if the existing one if pointing to \p oldName
+ */
+void MSCEditorCore::renameAsnFile(const QString &oldName, const QString &newName)
+{
+    QFileInfo oldFile(oldName);
+    const QString oldFileName = oldFile.fileName();
+    QFileInfo newFile(newName);
+    const QString newFileName = newFile.fileName();
+
+    MscModel *mscModel = m_model->mscModel();
+    if (mscModel->dataDefinitionString() == oldFileName) {
+        const QVariantList params { QVariant::fromValue(mscModel), newFileName, "ASN.1" };
+        msc::cmd::CommandsStack::push(msc::cmd::Id::SetAsn1File, params);
+    }
 }
 
 void MSCEditorCore::setViewMode(MSCEditorCore::ViewMode mode)

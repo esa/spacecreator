@@ -52,9 +52,6 @@ public:
 
     void editMessageDeclarations(QWidget *parentWidget);
 
-    QStringList aadlFiles() const;
-    QStringList mscFiles() const;
-
 public Q_SLOTS:
     void openEditor(const QString &fileName);
     void setMinimapVisible(bool visible);
@@ -66,7 +63,6 @@ private:
     void updateToolBar();
     QWidget *createModeWidget();
     Core::EditorToolBar *createMainToolBar();
-    QStringList projectFiles(const QString &suffix) const;
 
     MscContext *m_context = nullptr;
     Core::Context m_contexts;
