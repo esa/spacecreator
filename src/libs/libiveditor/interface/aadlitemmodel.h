@@ -65,6 +65,8 @@ public:
     void changeRootItem(shared::Id id);
     void zoomChanged();
 
+    QGraphicsItem *getItem(const shared::Id id) const;
+
 Q_SIGNALS:
     void itemClicked(shared::Id id);
     void itemDoubleClicked(shared::Id id);
@@ -90,13 +92,13 @@ private:
     void removeItemForObject(aadl::AADLObject *object);
 
 private:
-    QItemSelectionModel *itemSelectionModel;
-    InterfaceTabGraphicsScene *graphicsScene { nullptr };
-    QHash<shared::Id, QGraphicsItem *> items;
-    QMutex *mutex { nullptr };
-    QQueue<aadl::AADLObject *> rmQueu;
-    QRectF desktopGeometry;
-    QRectF prevItemsRect;
+    QItemSelectionModel *m_itemSelectionModel;
+    InterfaceTabGraphicsScene *m_graphicsScene { nullptr };
+    QHash<shared::Id, QGraphicsItem *> m_items;
+    QMutex *m_mutex { nullptr };
+    QQueue<aadl::AADLObject *> m_rmQueu;
+    QRectF m_desktopGeometry;
+    QRectF m_prevItemsRect;
 };
 
 } // namespace aadlinterface

@@ -366,8 +366,25 @@ void CreatorTool::groupSelectedItems()
         if (it != groupCreationDataList.end()) {
             it->connections.append(connection);
         } else {
+            const QGraphicsItem *sourceItem = d->model->getItem(connection->source()->id());
+            const QGraphicsItem *targetItem = d->model->getItem(connection->target()->id());
+
+            if (!sourceItem || !targetItem) {
+                return;
+            }
+
+            auto startPoint = sourceItem->sceneBoundingRect().center();
+            auto endPoint = targetItem->sceneBoundingRect().center();
+
+            const bool startAdjusted = shared::graphicsviewutils::intersects(
+                    sourceItem->sceneBoundingRect(), { startPoint, endPoint }, &startPoint);
+            const bool endAdjusted = shared::graphicsviewutils::intersects(
+                    targetItem->sceneBoundingRect(), { startPoint, endPoint }, &endPoint);
+            if (!startAdjusted || !endAdjusted) {
+                return;
+            }
             groupCreationDataList.append({ d->model.data(), connection->parentObject(), connection->source(),
-                    connection->target(), {}, { connection } });
+                    connection->target(), {}, { connection }, { startPoint, endPoint } });
         }
     };
 
@@ -1264,5 +1281,4 @@ QPointF CreatorTool::CreatorToolPrivate::cursorInScene(const QPoint &globalPos) 
     }
     return sceneCoordinates;
 }
-
 }

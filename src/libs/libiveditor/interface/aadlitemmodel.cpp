@@ -114,12 +114,12 @@ namespace aadlinterface {
 
 AADLItemModel::AADLItemModel(QObject *parent)
     : aadl::AADLObjectsModel(parent)
-    , graphicsScene(new InterfaceTabGraphicsScene(this))
-    , mutex(new QMutex(QMutex::NonRecursive))
-    , itemSelectionModel(new QItemSelectionModel(this))
+    , m_graphicsScene(new InterfaceTabGraphicsScene(this))
+    , m_mutex(new QMutex(QMutex::NonRecursive))
+    , m_itemSelectionModel(new QItemSelectionModel(this))
 {
     if (QGuiApplication::primaryScreen()) {
-        desktopGeometry = QGuiApplication::primaryScreen()->availableGeometry();
+        m_desktopGeometry = QGuiApplication::primaryScreen()->availableGeometry();
     }
 
     connect(this, &aadl::AADLObjectsModel::modelReset, this, &AADLItemModel::clearScene);
@@ -128,39 +128,39 @@ AADLItemModel::AADLItemModel(QObject *parent)
     connect(this, &aadl::AADLObjectsModel::aadlObjectAdded, this, &AADLItemModel::onAADLObjectAdded);
     connect(this, &aadl::AADLObjectsModel::aadlObjectRemoved, this, &AADLItemModel::onAADLObjectRemoved);
 
-    connect(graphicsScene, &QGraphicsScene::selectionChanged, this, &AADLItemModel::onSceneSelectionChanged);
-    connect(itemSelectionModel, &QItemSelectionModel::selectionChanged, this, &AADLItemModel::onViewSelectionChanged);
+    connect(m_graphicsScene, &QGraphicsScene::selectionChanged, this, &AADLItemModel::onSceneSelectionChanged);
+    connect(m_itemSelectionModel, &QItemSelectionModel::selectionChanged, this, &AADLItemModel::onViewSelectionChanged);
 }
 
 AADLItemModel::~AADLItemModel()
 {
-    delete mutex;
+    delete m_mutex;
 }
 
 QGraphicsScene *AADLItemModel::scene() const
 {
-    return graphicsScene;
+    return m_graphicsScene;
 }
 
 QItemSelectionModel *AADLItemModel::selectionModel() const
 {
-    return itemSelectionModel;
+    return m_itemSelectionModel;
 }
 
 void AADLItemModel::onAADLObjectAdded(aadl::AADLObject *object)
 {
-    if (!graphicsScene) {
+    if (!m_graphicsScene) {
         return;
     }
 
     auto propertyChanged = [this]() {
         if (auto senerObject = qobject_cast<aadl::AADLObject *>(sender())) {
-            if (auto item = items.value(senerObject->id()))
+            if (auto item = m_items.value(senerObject->id()))
                 updateItem(item);
         }
     };
 
-    auto item = items.value(object->id());
+    auto item = m_items.value(object->id());
     if (!item) {
         item = createItemForObject(object);
         if (const auto connectionGroup = qobject_cast<aadl::AADLObjectConnectionGroup *>(object)) {
@@ -202,9 +202,9 @@ void AADLItemModel::onAADLObjectAdded(aadl::AADLObject *object)
                     },
                     Qt::QueuedConnection);
         }
-        items.insert(object->id(), item);
-        if (graphicsScene != item->scene()) {
-            graphicsScene->addItem(item);
+        m_items.insert(object->id(), item);
+        if (m_graphicsScene != item->scene()) {
+            m_graphicsScene->addItem(item);
         }
     }
     updateItem(item);
@@ -212,27 +212,27 @@ void AADLItemModel::onAADLObjectAdded(aadl::AADLObject *object)
 
 void AADLItemModel::onAADLObjectRemoved(aadl::AADLObject *object)
 {
-    if (!graphicsScene) {
+    if (!m_graphicsScene) {
         return;
     }
 
-    rmQueu.enqueue(object);
+    m_rmQueu.enqueue(object);
 
-    while (!rmQueu.isEmpty()) {
-        if (mutex->tryLock()) {
-            aadl::AADLObject *obj = rmQueu.dequeue();
+    while (!m_rmQueu.isEmpty()) {
+        if (m_mutex->tryLock()) {
+            aadl::AADLObject *obj = m_rmQueu.dequeue();
             if (const auto connectionGroup = qobject_cast<aadl::AADLObjectConnectionGroup *>(obj)) {
                 for (const auto connection : connectionGroup->groupedConnections()) {
                     onConnectionRemovedFromGroup(connection);
                 }
             }
 
-            if (auto item = items.take(obj->id())) {
-                graphicsScene->removeItem(item);
+            if (auto item = m_items.take(obj->id())) {
+                m_graphicsScene->removeItem(item);
                 delete item;
                 updateSceneRect();
             }
-            mutex->unlock();
+            m_mutex->unlock();
         }
     }
 }
@@ -241,7 +241,7 @@ void AADLItemModel::onRootObjectChanged(shared::Id rootId)
 {
     Q_UNUSED(rootId)
 
-    QMutexLocker lockme(mutex);
+    QMutexLocker lockme(m_mutex);
     QList<aadl::AADLObject *> objects = visibleObjects();
     aadl::AADLObject::sortObjectList(objects);
     for (auto object : objects) {
@@ -253,21 +253,21 @@ void AADLItemModel::onRootObjectChanged(shared::Id rootId)
 
 void AADLItemModel::onConnectionAddedToGroup(aadl::AADLObjectConnection *connection)
 {
-    removeItemForObject(connection);
-    removeItemForObject(connection->sourceInterface());
-    removeItemForObject(connection->targetInterface());
+    onAADLObjectRemoved(connection);
+    onAADLObjectRemoved(connection->sourceInterface());
+    onAADLObjectRemoved(connection->targetInterface());
 }
 
 void AADLItemModel::onConnectionRemovedFromGroup(aadl::AADLObjectConnection *connection)
 {
-    createItemForObject(connection->targetInterface());
-    createItemForObject(connection->sourceInterface());
-    createItemForObject(connection);
+    onAADLObjectAdded(connection->targetInterface());
+    onAADLObjectAdded(connection->sourceInterface());
+    onAADLObjectAdded(connection);
 }
 
 void AADLItemModel::onSceneSelectionChanged()
 {
-    const QList<QGraphicsItem *> selectedItems = graphicsScene->selectedItems();
+    const QList<QGraphicsItem *> selectedItems = m_graphicsScene->selectedItems();
     QItemSelection itemSelection;
     for (auto item : selectedItems) {
         if (auto iObj = qobject_cast<aadlinterface::InteractiveObject *>(item->toGraphicsObject())) {
@@ -279,7 +279,7 @@ void AADLItemModel::onSceneSelectionChanged()
             }
         }
     }
-    itemSelectionModel->select(itemSelection,
+    m_itemSelectionModel->select(itemSelection,
             QItemSelectionModel::Rows | QItemSelectionModel::Current | QItemSelectionModel::ClearAndSelect);
 }
 
@@ -288,7 +288,7 @@ void AADLItemModel::onViewSelectionChanged(const QItemSelection &selected, const
     auto updateSelection = [this](const QItemSelection &selection, bool value) {
         for (const QModelIndex &idx : selection.indexes()) {
             if (auto const obj = objectFromIndex(idx)) {
-                if (auto graphicsItem = items.value(obj->id())) {
+                if (auto graphicsItem = m_items.value(obj->id())) {
                     graphicsItem->setSelected(value);
                 }
             }
@@ -301,7 +301,7 @@ void AADLItemModel::onViewSelectionChanged(const QItemSelection &selected, const
 
 AADLFunctionGraphicsItem *AADLItemModel::rootItem() const
 {
-    return qgraphicsitem_cast<AADLFunctionGraphicsItem *>(items.value(rootObjectId()));
+    return qgraphicsitem_cast<AADLFunctionGraphicsItem *>(m_items.value(rootObjectId()));
 }
 
 void AADLItemModel::updateItem(QGraphicsItem *item)
@@ -313,26 +313,26 @@ void AADLItemModel::updateItem(QGraphicsItem *item)
     if (auto iObj = qobject_cast<InteractiveObject *>(item->toGraphicsObject())) {
         iObj->updateFromEntity();
     }
-    if (mutex->tryLock()) {
+    if (m_mutex->tryLock()) {
         updateSceneRect();
-        mutex->unlock();
+        m_mutex->unlock();
     }
 }
 
 void AADLItemModel::removeItemForObject(aadl::AADLObject *object)
 {
-    if (auto connectionItem = items.take(object->id())) {
-        graphicsScene->removeItem(connectionItem);
+    if (auto connectionItem = m_items.take(object->id())) {
+        m_graphicsScene->removeItem(connectionItem);
         delete connectionItem;
     }
 }
 
 void AADLItemModel::clearScene()
 {
-    if (graphicsScene) {
-        graphicsScene->clear();
+    if (m_graphicsScene) {
+        m_graphicsScene->clear();
     }
-    items.clear();
+    m_items.clear();
     updateSceneRect();
 }
 
@@ -348,33 +348,38 @@ void AADLItemModel::changeRootItem(shared::Id id)
 
 void AADLItemModel::zoomChanged()
 {
-    for (auto item : graphicsScene->selectedItems()) {
+    for (auto item : m_graphicsScene->selectedItems()) {
         if (auto iObj = qobject_cast<aadlinterface::InteractiveObject *>(item->toGraphicsObject())) {
             iObj->updateGripPoints();
         }
     }
 }
 
+QGraphicsItem *AADLItemModel::getItem(const shared::Id id) const
+{
+    return m_items.value(id);
+}
+
 void AADLItemModel::updateSceneRect()
 {
-    if (!graphicsScene) {
+    if (!m_graphicsScene) {
         return;
     }
 
-    const QRectF itemsRect = graphicsScene->itemsBoundingRect();
+    const QRectF itemsRect = m_graphicsScene->itemsBoundingRect();
     if (itemsRect.isEmpty()) {
-        prevItemsRect = {};
-        graphicsScene->setSceneRect(desktopGeometry);
+        m_prevItemsRect = {};
+        m_graphicsScene->setSceneRect(m_desktopGeometry);
         return;
     }
 
-    if (itemsRect != prevItemsRect) {
-        const QRectF sceneRect = graphicsScene->sceneRect();
+    if (itemsRect != m_prevItemsRect) {
+        const QRectF sceneRect = m_graphicsScene->sceneRect();
         const QRectF updated = sceneRect.united(itemsRect);
 
         if (sceneRect != updated) {
-            graphicsScene->setSceneRect(updated);
-            prevItemsRect = itemsRect;
+            m_graphicsScene->setSceneRect(updated);
+            m_prevItemsRect = itemsRect;
         }
     }
 }
@@ -385,7 +390,7 @@ QGraphicsItem *AADLItemModel::createItemForObject(aadl::AADLObject *obj)
     if (!obj)
         return nullptr;
 
-    QGraphicsItem *parentItem = obj->parentObject() ? items.value(obj->parentObject()->id()) : nullptr;
+    QGraphicsItem *parentItem = obj->parentObject() ? m_items.value(obj->parentObject()->id()) : nullptr;
     auto nestedGeomtryConnect = [this](QGraphicsItem *parentItem, InteractiveObject *child) {
         if (parentItem) {
             if (auto iObjParent = qobject_cast<InteractiveObject *>(parentItem->toGraphicsObject()))
@@ -412,11 +417,11 @@ QGraphicsItem *AADLItemModel::createItemForObject(aadl::AADLObject *obj)
         if (auto connection = qobject_cast<aadl::AADLObjectConnectionGroup *>(obj)) {
             aadl::AADLObjectIface *ifaceStart = connection->sourceInterface();
             auto startItem = qgraphicsitem_cast<AADLInterfaceGraphicsItem *>(
-                    ifaceStart ? items.value(ifaceStart->id()) : nullptr);
+                    ifaceStart ? m_items.value(ifaceStart->id()) : nullptr);
 
             aadl::AADLObjectIface *ifaceEnd = connection->targetInterface();
             auto endItem =
-                    qgraphicsitem_cast<AADLInterfaceGraphicsItem *>(ifaceEnd ? items.value(ifaceEnd->id()) : nullptr);
+                    qgraphicsitem_cast<AADLInterfaceGraphicsItem *>(ifaceEnd ? m_items.value(ifaceEnd->id()) : nullptr);
 
             iObj = new AADLConnectionGroupGraphicsItem(connection,
                     qobject_cast<AADLInterfaceGroupGraphicsItem *>(startItem),
@@ -427,11 +432,11 @@ QGraphicsItem *AADLItemModel::createItemForObject(aadl::AADLObject *obj)
         if (auto connection = qobject_cast<aadl::AADLObjectConnection *>(obj)) {
             aadl::AADLObjectIface *ifaceStart = connection->sourceInterface();
             auto startItem = qgraphicsitem_cast<AADLInterfaceGraphicsItem *>(
-                    ifaceStart ? items.value(ifaceStart->id()) : nullptr);
+                    ifaceStart ? m_items.value(ifaceStart->id()) : nullptr);
 
             aadl::AADLObjectIface *ifaceEnd = connection->targetInterface();
             auto endItem =
-                    qgraphicsitem_cast<AADLInterfaceGraphicsItem *>(ifaceEnd ? items.value(ifaceEnd->id()) : nullptr);
+                    qgraphicsitem_cast<AADLInterfaceGraphicsItem *>(ifaceEnd ? m_items.value(ifaceEnd->id()) : nullptr);
 
             iObj = new AADLConnectionGraphicsItem(connection, startItem, endItem, parentItem);
         }
