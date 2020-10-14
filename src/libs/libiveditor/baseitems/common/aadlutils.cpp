@@ -719,11 +719,14 @@ QVector<QPointF> findPath(
         QGraphicsScene *scene, const QLineF &startDirection, const QLineF &endDirection, QRectF *intersectedRect)
 {
     static const QList<int> types = { AADLFunctionGraphicsItem::Type, AADLFunctionTypeGraphicsItem::Type };
-    QVector<QPointF> points = generateSegments(startDirection, endDirection);
+    const QVector<QPointF> points = generateSegments(startDirection, endDirection);
     const QList<QGraphicsItem *> intersectedItems = scene->items(points);
 
-    auto it = std::find_if(intersectedItems.constBegin(), intersectedItems.constEnd(),
-            [](const QGraphicsItem *item) { return types.contains(item->type()); });
+    auto it = std::find_if(
+            intersectedItems.constBegin(), intersectedItems.constEnd(), [points](const QGraphicsItem *item) {
+                return types.contains(item->type())
+                        && shared::graphicsviewutils::intersects(item->sceneBoundingRect(), points);
+            });
     if (it == intersectedItems.constEnd())
         return points;
 
