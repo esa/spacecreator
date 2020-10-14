@@ -22,9 +22,14 @@
 
 class QComboBox;
 
+namespace shared {
+namespace ui {
+class GraphicsViewBase;
+} // namespace ui
+} // namespace shared
+
 namespace aadlinterface {
 
-class GraphicsView;
 class ZoomValidator;
 
 class ZoomController : public QWidget
@@ -34,7 +39,7 @@ class ZoomController : public QWidget
 public:
     explicit ZoomController(QWidget *parent = nullptr);
 
-    void setView(aadlinterface::GraphicsView *view);
+    void setView(shared::ui::GraphicsViewBase *view);
 
 protected Q_SLOTS:
     void onCurrentIndexChanged(const QString &text);
@@ -44,7 +49,7 @@ protected Q_SLOTS:
 private:
     QComboBox *m_combo { nullptr };
     ZoomValidator *m_validator { nullptr };
-    QPointer<aadlinterface::GraphicsView> m_view;
+    QPointer<shared::ui::GraphicsViewBase> m_view;
 
     void refill();
 };

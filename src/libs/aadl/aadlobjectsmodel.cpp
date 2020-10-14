@@ -33,12 +33,14 @@ struct AADLObjectsModelPrivate {
     QList<shared::Id> m_objectsOrder;
     QHash<shared::Id, AADLObject *> m_objects;
     QList<AADLObject *> m_visibleObjects;
+    QVector<QString> m_headerTitles;
 };
 
 AADLObjectsModel::AADLObjectsModel(QObject *parent)
     : QAbstractItemModel(parent)
     , d(new AADLObjectsModelPrivate)
 {
+    d->m_headerTitles.resize(columnCount());
 }
 
 AADLObjectsModel::~AADLObjectsModel() { }
@@ -390,6 +392,27 @@ Qt::ItemFlags AADLObjectsModel::flags(const QModelIndex &index) const
     return Qt::NoItemFlags;
 }
 
+bool AADLObjectsModel::setHeaderData(int section, Qt::Orientation orientation, const QVariant &value, int role)
+{
+    if (section >= d->m_headerTitles.size() || role != Qt::DisplayRole || orientation != Qt::Horizontal) {
+        return false;
+    }
+    d->m_headerTitles[section] = value.toString();
+    return true;
+}
+
+QVariant AADLObjectsModel::headerData(int section, Qt::Orientation orientation, int role) const
+{
+    if (orientation == Qt::Horizontal) {
+        if (role == Qt::DisplayRole) {
+            return d->m_headerTitles.value(section);
+        } else if (role == Qt::TextAlignmentRole) {
+            return Qt::AlignCenter;
+        }
+    }
+    return QVariant();
+}
+
 QModelIndex AADLObjectsModel::indexFromObject(AADLObject *object) const
 {
     return createIndex(rowInParent(object), 0, object);
@@ -450,6 +473,8 @@ int AADLObjectsModel::rowCount(const QModelIndex &parent) const
 
 int AADLObjectsModel::columnCount(const QModelIndex &parent) const
 {
+    Q_UNUSED(parent);
+
     return 1;
 }
 

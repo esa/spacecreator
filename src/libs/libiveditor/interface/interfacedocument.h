@@ -63,8 +63,8 @@ public:
     void fillToolBar(QToolBar *toolBar);
 
     QGraphicsScene *scene() const;
+    shared::ui::GraphicsViewBase *graphicsView() const;
     QWidget *view() const;
-    QTreeView *modelView() const;
     QUndoStack *commandsStack() const;
 
     bool create(const QString &path = QString());
@@ -124,7 +124,7 @@ private:
     bool loadImpl(const QString &path);
     bool importImpl(const QString &path);
 
-    QWidget *createView();
+    QWidget *createGraphicsView();
     QTreeView *createModelView();
     QTreeView *createImportView();
 

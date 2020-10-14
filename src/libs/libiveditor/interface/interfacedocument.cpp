@@ -56,6 +56,7 @@
 #include <QMutexLocker>
 #include <QScreen>
 #include <QShortcut>
+#include <QSplitter>
 #include <QStandardItemModel>
 #include <QStandardPaths>
 #include <QToolBar>
@@ -70,7 +71,8 @@ struct InterfaceDocument::InterfaceDocumentPrivate {
 
     QString filePath;
 
-    QPointer<aadlinterface::GraphicsView> graphicsView { nullptr };
+    QPointer<QWidget> view;
+    aadlinterface::GraphicsView *graphicsView { nullptr };
     QTreeView *objectsView { nullptr };
     AADLItemModel *model { nullptr };
     QTreeView *importView { nullptr };
@@ -112,17 +114,40 @@ InterfaceDocument::InterfaceDocument(QObject *parent)
 
 InterfaceDocument::~InterfaceDocument()
 {
-    delete d->objectsView;
     delete d->asnDataTypes;
-    delete d->graphicsView;
+    delete d->view;
     delete d;
 }
 
 void InterfaceDocument::init()
 {
-    createView();
-    createModelView();
-    createImportView();
+    if (!d->view.isNull()) {
+        return;
+    }
+
+    QWidget *panelWidget = new QWidget;
+    QVBoxLayout *panelLayout = new QVBoxLayout;
+    panelLayout->setMargin(0);
+    panelWidget->setLayout(panelLayout);
+
+    QSplitter *panelSplitter = new QSplitter(Qt::Vertical, panelWidget);
+    panelSplitter->setHandleWidth(1);
+    panelSplitter->addWidget(createModelView());
+    panelSplitter->addWidget(createImportView());
+    panelLayout->addWidget(panelSplitter);
+
+    d->view = new QWidget;
+    auto rootLayout = new QVBoxLayout;
+    rootLayout->setMargin(0);
+    d->view->setLayout(rootLayout);
+
+    auto splitter = new QSplitter(Qt::Horizontal, d->view);
+    splitter->setHandleWidth(1);
+    splitter->addWidget(panelWidget);
+    splitter->addWidget(createGraphicsView());
+    splitter->setStretchFactor(0, 0);
+    splitter->setStretchFactor(1, 1);
+    rootLayout->addWidget(splitter);
 }
 
 void InterfaceDocument::fillToolBar(QToolBar *toolBar)
@@ -147,14 +172,14 @@ QGraphicsScene *InterfaceDocument::scene() const
     return d->model->scene();
 }
 
-QWidget *InterfaceDocument::view() const
+shared::ui::GraphicsViewBase *InterfaceDocument::graphicsView() const
 {
     return d->graphicsView;
 }
 
-QTreeView *InterfaceDocument::modelView() const
+QWidget *InterfaceDocument::view() const
 {
-    return d->objectsView;
+    return d->view;
 }
 
 QUndoStack *InterfaceDocument::commandsStack() const
@@ -667,7 +692,7 @@ QVector<QAction *> InterfaceDocument::initActions()
     return d->m_toolbarActions;
 }
 
-QWidget *InterfaceDocument::createView()
+QWidget *InterfaceDocument::createGraphicsView()
 {
     if (!d->graphicsView) {
         d->graphicsView = new aadlinterface::GraphicsView;
@@ -690,15 +715,12 @@ QTreeView *InterfaceDocument::createModelView()
         return d->objectsView;
 
     d->objectsView = new QTreeView;
-    d->objectsView->setWindowTitle(tr("AADL Structure"));
     d->objectsView->setObjectName(QLatin1String("AADLModelView"));
-    d->objectsView->setWindowFlag(Qt::Tool);
-    d->objectsView->setWindowFlag(Qt::WindowStaysOnTopHint);
-    d->objectsView->setHeaderHidden(true);
     d->objectsView->setSelectionBehavior(QAbstractItemView::SelectionBehavior::SelectItems);
     d->objectsView->setSelectionMode(QAbstractItemView::SelectionMode::ExtendedSelection);
     d->objectsView->setModel(d->model);
     d->objectsView->setSelectionModel(d->model->selectionModel());
+    d->model->setHeaderData(0, Qt::Horizontal, tr("AADL Structure"), Qt::DisplayRole);
 
     return d->objectsView;
 }
@@ -709,17 +731,14 @@ QTreeView *InterfaceDocument::createImportView()
         return d->importView;
 
     d->importView = new QTreeView;
-    d->importView->setWindowTitle(tr("Import AADL"));
     d->importView->setObjectName(QLatin1String("ImportView"));
-    d->importView->setWindowFlag(Qt::Tool);
-    d->importView->setWindowFlag(Qt::WindowStaysOnTopHint);
-    d->importView->setHeaderHidden(true);
     d->importView->setSelectionBehavior(QAbstractItemView::SelectionBehavior::SelectItems);
     d->importView->setSelectionMode(QAbstractItemView::SelectionMode::ExtendedSelection);
     d->importView->setModel(d->importModel);
     d->importView->setSelectionModel(d->importModel->selectionModel());
+    d->importModel->setHeaderData(0, Qt::Horizontal, tr("Import AADL"), Qt::DisplayRole);
 
-    return d->objectsView;
+    return d->importView;
 }
 
 void InterfaceDocument::showNIYGUI(const QString &title)

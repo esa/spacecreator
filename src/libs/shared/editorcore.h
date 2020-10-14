@@ -54,7 +54,6 @@ public:
     QAction *actionRedo();
     QAction *actionToggleMinimap();
     QAction *actionToggleE2EView();
-    QAction *actionToggleModelView();
 
     // Populate a CommandLineParser with the arguments this application can handle
     virtual void populateCommandLineArguments(CommandLineParser *parser) const = 0;
@@ -95,7 +94,6 @@ private:
     QAction *m_actionRedo { nullptr };
     QAction *m_actionToggleMinimap { nullptr };
     QAction *m_actionToggleE2EView { nullptr };
-    QAction *m_actionToggleModelView { nullptr };
 };
 
 }

@@ -85,7 +85,6 @@ void EditorCore::addMenuViewActions(QMenu *menu, QMainWindow * /*window*/)
 {
     menu->addAction(actionToggleMinimap());
     menu->addAction(actionToggleE2EView());
-    menu->addAction(actionToggleModelView());
     menu->addSeparator();
 }
 
@@ -197,15 +196,6 @@ QAction *EditorCore::actionToggleE2EView()
         m_actionToggleE2EView->setCheckable(true);
     }
     return m_actionToggleE2EView;
-}
-
-QAction *EditorCore::actionToggleModelView()
-{
-    if (m_actionToggleModelView == nullptr) {
-        m_actionToggleModelView = new QAction(tr("Show model &view"), this);
-        //        m_actionToggleModelView->setCheckable(true);
-    }
-    return m_actionToggleModelView;
 }
 
 /*!

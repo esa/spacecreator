@@ -75,7 +75,7 @@ void IVEditorCore::setPluginActive(bool active)
 
 shared::ui::GraphicsViewBase *IVEditorCore::chartView()
 {
-    return qobject_cast<shared::ui::GraphicsViewBase *>(m_document->view());
+    return m_document->graphicsView();
 }
 
 void IVEditorCore::addToolBars(QMainWindow *window)

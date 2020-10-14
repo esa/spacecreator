@@ -97,7 +97,7 @@ MainWindow::MainWindow(aadlinterface::IVEditorCore *core, QWidget *parent)
     QUndoStack *currentStack { nullptr };
     m_core->document()->fillToolBar(m_core->docToolBar());
     currentStack = m_core->document()->commandsStack();
-    if (auto view = qobject_cast<aadlinterface::GraphicsView *>(m_core->document()->view())) {
+    if (auto view = m_core->chartView()) {
         m_zoomCtrl->setView(view);
         connect(view, &aadlinterface::GraphicsView::mouseMoved, this, &MainWindow::onGraphicsViewInfo,
                 Qt::UniqueConnection);
@@ -129,8 +129,6 @@ MainWindow::MainWindow(aadlinterface::IVEditorCore *core, QWidget *parent)
     connect(core->actionToggleE2EView(), &QAction::toggled, endToEndView, &QWidget::setVisible);
     connect(endToEndView, &EndToEndView::visibleChanged, core->actionToggleE2EView(), &QAction::setChecked);
     endToEndView->setVisible(core->actionToggleE2EView()->isChecked());
-
-    connect(core->actionToggleModelView(), &QAction::triggered, core->document()->modelView(), &QWidget::show);
 }
 
 /*!
