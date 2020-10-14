@@ -52,7 +52,10 @@ public:
     bool addFunction(const QString &name);
     bool addConnection(QString name, const QString &fromInstanceName, const QString &toInstanceName);
 
-    void renameAsnFile(const QString &oldName, const QString &newName) override;
+    bool renameAsnFile(const QString &oldName, const QString &newName) override;
+
+    QString filePath() const override;
+    bool save() override;
 
 private:
     aadl::AADLObjectIface *getInterface(

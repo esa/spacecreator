@@ -25,6 +25,10 @@ namespace msc {
 class MSCEditorCore;
 }
 
+namespace shared {
+class EditorCore;
+}
+
 namespace spctr {
 
 /*!
@@ -40,6 +44,9 @@ public:
 
 public Q_SLOTS:
     void setMscData(const QString &fileName, QSharedPointer<msc::MSCEditorCore> mscData);
+
+Q_SIGNALS:
+    void editedExternally(shared::EditorCore *);
 
 private:
     QHash<QString, QSharedPointer<msc::MSCEditorCore>> m_store;

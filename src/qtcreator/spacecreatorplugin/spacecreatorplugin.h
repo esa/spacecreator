@@ -33,6 +33,10 @@ namespace msc {
 class MSCEditorCore;
 }
 
+namespace shared {
+class EditorCore;
+}
+
 namespace spctr {
 
 class AadlEditorFactory;
@@ -67,11 +71,13 @@ private Q_SLOTS:
     void onColorSchemeMenuInvoked();
     void onDynContextEditorMenuInvoked();
     void checkAsnFileRename();
+    void saveIfNotOpen(shared::EditorCore *core);
 
 private:
     QSharedPointer<aadlinterface::IVEditorCore> ivCore() const;
     QVector<QSharedPointer<msc::MSCEditorCore>> allMscCores() const;
     QStringList projectFiles(const QString &suffix) const;
+    bool isOpenInEditor(shared::EditorCore *core) const;
 
     MscEditorFactory *m_mscFactory = nullptr;
     AadlEditorFactory *m_aadlFactory = nullptr;

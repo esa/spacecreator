@@ -56,10 +56,12 @@ void AadlModelStorage::setIvData(const QString &fileName, QSharedPointer<aadlint
         if (m_store[fileName] == ivData) {
             return;
         }
-        m_store.remove(oldKey);
+        QSharedPointer<aadlinterface::IVEditorCore> oldData = m_store.take(oldKey);
+        disconnect(oldData.data(), nullptr, this, nullptr);
     }
 
     m_store[fileName] = ivData;
+    connect(ivData.data(), &shared::EditorCore::editedExternally, this, &spctr::AadlModelStorage::editedExternally);
 }
 
 }

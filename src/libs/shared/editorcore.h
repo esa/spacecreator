@@ -61,10 +61,18 @@ public:
 
     void setupMiniMap();
 
-    virtual void renameAsnFile(const QString &oldName, const QString &newName) = 0;
+    virtual bool renameAsnFile(const QString &oldName, const QString &newName) = 0;
+
+    /// Returns the full file path of the file in this core
+    virtual QString filePath() const = 0;
+    /// Saves the file
+    virtual bool save() = 0;
 
 public Q_SLOTS:
     void showAboutDialog();
+
+Q_SIGNALS:
+    void editedExternally(shared::EditorCore *);
 
 private:
     QUndoGroup *m_undoGroup;

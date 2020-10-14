@@ -29,6 +29,7 @@
 #include "interface/commands/commandsfactory.h"
 #include "interface/interfacedocument.h"
 #include "mainwindow.h"
+#include "xmldocexporter.h"
 
 #include <QDebug>
 #include <QFileInfo>
@@ -144,6 +145,7 @@ bool IVEditorCore::addFunction(const QString &name)
         QVariant::fromValue(QRectF(QPointF(10., 10.), DefaultGraphicsItemSize)), QVariant::fromValue(name) };
     cmd::CommandsStack::current()->push(cmd::CommandsFactory::create(cmd::CreateFunctionEntity, params));
 
+    Q_EMIT editedExternally(this);
     return true;
 }
 
@@ -188,13 +190,14 @@ bool IVEditorCore::addConnection(QString name, const QString &fromInstanceName, 
 
     cmd::CommandsStack::current()->endMacro();
 
+    Q_EMIT editedExternally(this);
     return true;
 }
 
 /*!
    Changes the asn1 referenceto \p newName if the existing one if pointing to \p oldName
  */
-void IVEditorCore::renameAsnFile(const QString &oldName, const QString &newName)
+bool IVEditorCore::renameAsnFile(const QString &oldName, const QString &newName)
 {
     if (!aadlinterface::cmd::CommandsStack::current()) {
         QUndoStack *currentStack = document()->commandsStack();
@@ -207,16 +210,28 @@ void IVEditorCore::renameAsnFile(const QString &oldName, const QString &newName)
 
     QFileInfo oldFile(oldName);
     const QString oldFileName = oldFile.fileName();
-    QFileInfo newFile(newName);
-    const QString newFileName = newFile.fileName();
 
     if (document()->asn1FileName() == oldFileName) {
         QVariantList params { QVariant::fromValue(document()), QVariant::fromValue(newName) };
         QUndoCommand *command = cmd::CommandsFactory::create(cmd::ChangeAsn1File, params);
         if (command) {
             cmd::CommandsStack::current()->push(command);
+            Q_EMIT editedExternally(this);
+            return true;
         }
     }
+
+    return false;
+}
+
+QString IVEditorCore::filePath() const
+{
+    return m_document->path();
+}
+
+bool IVEditorCore::save()
+{
+    return aadlinterface::XmlDocExporter::exportDocSilently(m_document, {}, {});
 }
 
 /*!

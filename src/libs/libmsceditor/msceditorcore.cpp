@@ -422,7 +422,7 @@ MSCEditorCore::ViewMode MSCEditorCore::viewMode()
 /*!
    Changes the asn1 referenceto \p newName if the existing one if pointing to \p oldName
  */
-void MSCEditorCore::renameAsnFile(const QString &oldName, const QString &newName)
+bool MSCEditorCore::renameAsnFile(const QString &oldName, const QString &newName)
 {
     QFileInfo oldFile(oldName);
     const QString oldFileName = oldFile.fileName();
@@ -433,7 +433,25 @@ void MSCEditorCore::renameAsnFile(const QString &oldName, const QString &newName
     if (mscModel->dataDefinitionString() == oldFileName) {
         const QVariantList params { QVariant::fromValue(mscModel), newFileName, "ASN.1" };
         msc::cmd::CommandsStack::push(msc::cmd::Id::SetAsn1File, params);
+
+        Q_EMIT editedExternally(this);
+        return true;
     }
+    return false;
+}
+
+QString MSCEditorCore::filePath() const
+{
+    return m_model->currentFilePath();
+}
+
+bool MSCEditorCore::save()
+{
+    if (!m_model) {
+        return false;
+    }
+
+    return m_model->saveMsc(m_model->currentFilePath());
 }
 
 void MSCEditorCore::setViewMode(MSCEditorCore::ViewMode mode)

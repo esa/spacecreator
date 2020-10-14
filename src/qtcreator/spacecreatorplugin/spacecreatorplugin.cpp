@@ -25,6 +25,7 @@
 #include "interface/interfacedocument.h"
 #include "iveditor.h"
 #include "iveditorcore.h"
+#include "mainmodel.h"
 #include "mscchart.h"
 #include "msceditor.h"
 #include "msceditorcore.h"
@@ -43,6 +44,7 @@
 #include <coreplugin/designmode.h>
 #include <coreplugin/icore.h>
 #include <coreplugin/idocument.h>
+#include <editormanager/documentmodel.h>
 #include <editormanager/editormanager.h>
 #include <editormanager/ieditor.h>
 #include <extensionsystem/pluginmanager.h>
@@ -91,7 +93,9 @@ bool SpaceCreatorPlugin::initialize(const QStringList &arguments, QString *error
     auto editorManager = Core::EditorManager::instance();
 
     m_aadlStorage = new AadlModelStorage(this);
+    connect(m_aadlStorage, &spctr::AadlModelStorage::editedExternally, this, &spctr::SpaceCreatorPlugin::saveIfNotOpen);
     m_mscStorage = new MscModelStorage(this);
+    connect(m_mscStorage, &spctr::MscModelStorage::editedExternally, this, &spctr::SpaceCreatorPlugin::saveIfNotOpen);
     m_mscFactory = new MscEditorFactory(m_mscStorage, this);
     m_aadlFactory = new AadlEditorFactory(m_aadlStorage, this);
 
@@ -371,6 +375,17 @@ void SpaceCreatorPlugin::checkAsnFileRename()
     m_asnFiles = asnFiles;
 }
 
+/*!
+   \brief SpaceCreatorPlugin::saveIfNotOpen
+   \param core
+ */
+void SpaceCreatorPlugin::saveIfNotOpen(shared::EditorCore *core)
+{
+    if (!isOpenInEditor(core)) {
+        core->save();
+    }
+}
+
 QSharedPointer<aadlinterface::IVEditorCore> SpaceCreatorPlugin::ivCore() const
 {
     QStringList aadlFiles = allAadlFiles();
@@ -413,6 +428,20 @@ QStringList SpaceCreatorPlugin::projectFiles(const QString &suffix) const
     }
 
     return result;
+}
+
+/*!
+   Returns true, if the file of the given /p core is open in an editor
+ */
+bool SpaceCreatorPlugin::isOpenInEditor(shared::EditorCore *core) const
+{
+    QList<Core::IDocument *> openDocuments = Core::DocumentModel::openedDocuments();
+    for (Core::IDocument *doc : openDocuments) {
+        if (doc->filePath().toString() == core->filePath()) {
+            return true;
+        }
+    }
+    return false;
 }
 
 }

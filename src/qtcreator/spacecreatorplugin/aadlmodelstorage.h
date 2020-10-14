@@ -25,6 +25,10 @@ namespace aadlinterface {
 class IVEditorCore;
 }
 
+namespace shared {
+class EditorCore;
+}
+
 namespace spctr {
 
 /*!
@@ -41,6 +45,9 @@ public:
 
 public Q_SLOTS:
     void setIvData(const QString &fileName, QSharedPointer<aadlinterface::IVEditorCore> ivData);
+
+Q_SIGNALS:
+    void editedExternally(shared::EditorCore *);
 
 private:
     QHash<QString, QSharedPointer<aadlinterface::IVEditorCore>> m_store;

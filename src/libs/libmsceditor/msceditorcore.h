@@ -104,7 +104,10 @@ public:
 
     ViewMode viewMode();
 
-    void renameAsnFile(const QString &oldName, const QString &newName) override;
+    bool renameAsnFile(const QString &oldName, const QString &newName) override;
+
+    QString filePath() const override;
+    bool save() override;
 
 public Q_SLOTS:
     void setViewMode(ViewMode mode);

@@ -36,7 +36,7 @@ QSharedPointer<msc::MSCEditorCore> MscModelStorage::mscData(const QString &fileN
     if (!m_store.contains(fileName)) {
         QSharedPointer<msc::MSCEditorCore> data(new msc::MSCEditorCore());
         data->mainModel()->loadFile(fileName);
-        m_store[fileName] = data;
+        setMscData(fileName, data);
         return data;
     }
 
@@ -51,10 +51,15 @@ void MscModelStorage::setMscData(const QString &fileName, QSharedPointer<msc::MS
 {
     const QString oldKey = m_store.key(mscData, "");
     if (!oldKey.isEmpty()) {
-        m_store.remove(oldKey);
+        if (m_store[fileName] == mscData) {
+            return;
+        }
+        QSharedPointer<msc::MSCEditorCore> oldData = m_store.take(oldKey);
+        disconnect(oldData.data(), nullptr, this, nullptr);
     }
 
     m_store[fileName] = mscData;
+    connect(mscData.data(), &shared::EditorCore::editedExternally, this, &spctr::MscModelStorage::editedExternally);
 }
 
 }
