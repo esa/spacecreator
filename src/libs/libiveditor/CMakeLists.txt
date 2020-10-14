@@ -112,9 +112,6 @@ target_sources(${LIB_NAME} PRIVATE
     interface/commands/commandids.h
     interface/commands/commandsfactory.cpp
     interface/commands/commandsfactory.h
-    interface/commenttextdialog.cpp
-    interface/commenttextdialog.h
-    interface/commenttextdialog.ui
     interface/creatortool.cpp
     interface/creatortool.h
     interface/graphicsitemhelpers.cpp

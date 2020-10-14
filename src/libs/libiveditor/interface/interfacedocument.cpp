@@ -34,7 +34,6 @@
 #include "context/action/editor/dynactioneditor.h"
 #include "creatortool.h"
 #include "interface/colors/colormanagerdialog.h"
-#include "interface/commenttextdialog.h"
 #include "interface/properties/dynamicpropertymanager.h"
 #include "interface/properties/propertiesdialog.h"
 #include "xmldocexporter.h"
@@ -467,11 +466,7 @@ void InterfaceDocument::onItemDoubleClicked(shared::Id id)
     }
 
     if (auto entity = d->model->getObject(id)) {
-        if (entity->aadlType() == aadl::AADLObject::Type::Comment) {
-            auto dialog = new aadlinterface::CommentTextDialog(d->model->getCommentById(id), d->graphicsView);
-            dialog->setAttribute(Qt::WA_DeleteOnClose);
-            dialog->open();
-        } else if (entity->aadlType() != aadl::AADLObject::Type::Connection) {
+        if (entity->aadlType() != aadl::AADLObject::Type::Connection) {
             showPropertyEditor(entity);
         }
     }

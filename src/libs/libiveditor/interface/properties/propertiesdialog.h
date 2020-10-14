@@ -57,6 +57,7 @@ private:
     void initAttributesView();
     void initContextParams();
     void initIfaceParams();
+    void initCommentView();
 
 private:
     Ui::PropertiesDialog *ui;

@@ -27,6 +27,7 @@ class AADLObjectFunctionType;
 class AADLObjectIface;
 class AADLObjectComment;
 class AADLObjectConnection;
+class AADLObject;
 }
 
 namespace aadlinterface {
@@ -41,6 +42,8 @@ aadl::AADLObjectIface *interfaceObject(QGraphicsItem *item);
 aadl::AADLObjectComment *commentObject(QGraphicsItem *item);
 
 aadl::AADLObjectConnection *connectionObject(QGraphicsItem *item);
+
+aadl::AADLObject *object(const QGraphicsItem *item);
 
 enum RectOperation
 {

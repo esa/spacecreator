@@ -366,23 +366,29 @@ void CreatorTool::groupSelectedItems()
         if (it != groupCreationDataList.end()) {
             it->connections.append(connection);
         } else {
-            const QGraphicsItem *sourceItem = d->model->getItem(connection->source()->id());
-            const QGraphicsItem *targetItem = d->model->getItem(connection->target()->id());
+            QPointF startPoint, endPoint;
+            const auto points = aadlinterface::polygon(connection->coordinates());
+            if (points.isEmpty()) {
+                const QGraphicsItem *sourceItem = d->model->getItem(connection->source()->id());
+                const QGraphicsItem *targetItem = d->model->getItem(connection->target()->id());
+                if (!sourceItem || !targetItem) {
+                    return;
+                }
 
-            if (!sourceItem || !targetItem) {
-                return;
+                startPoint = sourceItem->sceneBoundingRect().center();
+                endPoint = targetItem->sceneBoundingRect().center();
+                const bool startAdjusted = shared::graphicsviewutils::intersects(
+                        sourceItem->sceneBoundingRect(), { startPoint, endPoint }, &startPoint);
+                const bool endAdjusted = shared::graphicsviewutils::intersects(
+                        targetItem->sceneBoundingRect(), { startPoint, endPoint }, &endPoint);
+                if (!startAdjusted || !endAdjusted) {
+                    return;
+                }
+            } else {
+                startPoint = points.first();
+                endPoint = points.last();
             }
 
-            auto startPoint = sourceItem->sceneBoundingRect().center();
-            auto endPoint = targetItem->sceneBoundingRect().center();
-
-            const bool startAdjusted = shared::graphicsviewutils::intersects(
-                    sourceItem->sceneBoundingRect(), { startPoint, endPoint }, &startPoint);
-            const bool endAdjusted = shared::graphicsviewutils::intersects(
-                    targetItem->sceneBoundingRect(), { startPoint, endPoint }, &endPoint);
-            if (!startAdjusted || !endAdjusted) {
-                return;
-            }
             groupCreationDataList.append({ d->model.data(), connection->parentObject(), connection->source(),
                     connection->target(), {}, { connection }, { startPoint, endPoint } });
         }
@@ -783,34 +789,18 @@ void CreatorTool::CreatorToolPrivate::populateContextMenu_propertiesDialog(QMenu
         return;
     }
 
-    aadl::AADLObject *aadlObj { nullptr };
-    if (QGraphicsItem *gi = scene->selectedItems().isEmpty() ? nullptr : scene->selectedItems().first()) {
-        switch (gi->type()) {
-        case AADLFunctionTypeGraphicsItem::Type: {
-            aadlObj = gi::functionTypeObject(gi);
-            break;
-        }
-        case AADLFunctionGraphicsItem::Type: {
-            aadlObj = gi::functionObject(gi);
-            break;
-        }
-        case AADLInterfaceGraphicsItem::Type: {
-            aadlObj = gi::interfaceObject(gi);
-            break;
-        }
-        default:
-            break;
-        }
-    }
+    const QGraphicsItem *gi = scene->selectedItems().isEmpty() ? nullptr : scene->selectedItems().first();
+    if (aadl::AADLObject *aadlObj = gi::object(gi)) {
+        if (aadlObj->aadlType() != aadl::AADLObject::Type::Connection) {
+            menu->addSeparator();
+            QAction *action = menu->addAction(tr("Properties"));
+            action->setEnabled(aadlObj);
 
-    menu->addSeparator();
-    QAction *action = menu->addAction(tr("Properties"));
-    action->setEnabled(aadlObj);
-
-    if (aadlObj) {
-        connect(action, &QAction::triggered, [this, aadlObj]() { Q_EMIT thisTool->propertyEditorRequest(aadlObj); });
-        ActionsManager::registerAction(
-                Q_FUNC_INFO, menu->actions().last(), "Properties", "Show AADL object properties editor");
+            connect(action, &QAction::triggered,
+                    [this, aadlObj]() { Q_EMIT thisTool->propertyEditorRequest(aadlObj); });
+            ActionsManager::registerAction(
+                    Q_FUNC_INFO, menu->actions().last(), "Properties", "Show AADL object properties editor");
+        }
     }
 }
 

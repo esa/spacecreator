@@ -19,6 +19,7 @@
 
 #include "aadlnamevalidator.h"
 #include "aadlobject.h"
+#include "aadlobjectcomment.h"
 #include "aadlobjectconnectiongroup.h"
 #include "aadlobjectiface.h"
 #include "commandsstack.h"
@@ -31,6 +32,8 @@
 #include "delegates/propertytypedelegate.h"
 #include "ifaceparametersmodel.h"
 #include "interface/aadlconnectiongroupmodel.h"
+#include "interface/commands/commandids.h"
+#include "interface/commands/commandsfactory.h"
 #include "propertieslistmodel.h"
 #include "propertiesviewbase.h"
 #include "ui_propertiesdialog.h"
@@ -38,7 +41,9 @@
 #include <QDebug>
 #include <QHeaderView>
 #include <QListView>
+#include <QPlainTextEdit>
 #include <QTableView>
+#include <QUndoCommand>
 
 namespace aadlinterface {
 
@@ -112,15 +117,22 @@ void PropertiesDialog::initTabs()
     case aadl::AADLObject::Type::FunctionType:
     case aadl::AADLObject::Type::Function: {
         initContextParams();
+        initAttributesView();
         break;
     }
     case aadl::AADLObject::Type::RequiredInterface:
     case aadl::AADLObject::Type::ProvidedInterface: {
         initIfaceParams();
+        initAttributesView();
         break;
     }
     case aadl::AADLObject::Type::ConnectionGroup: {
         initConnectionGroup();
+        initAttributesView();
+        break;
+    }
+    case aadl::AADLObject::Type::Comment: {
+        initCommentView();
         break;
     }
     default:
@@ -128,7 +140,6 @@ void PropertiesDialog::initTabs()
     }
 
     setWindowTitle(tr("Edit %1").arg(objectTypeName()));
-    initAttributesView();
     ui->tabWidget->setCurrentIndex(0);
 }
 
@@ -203,6 +214,28 @@ void PropertiesDialog::initIfaceParams()
     viewAttrs->tableView()->horizontalHeader()->show();
     viewAttrs->setModel(modelIfaceParams);
     ui->tabWidget->insertTab(0, viewAttrs, tr("Parameters"));
+}
+
+void PropertiesDialog::initCommentView()
+{
+    if (auto comment = qobject_cast<aadl::AADLObjectComment *>(m_dataObject)) {
+        auto commentEdit = new QPlainTextEdit(this);
+        commentEdit->setPlainText(comment->title());
+        ui->tabWidget->insertTab(0, commentEdit, tr("Comment content"));
+        connect(this, &QDialog::accepted, this, [comment, commentEdit]() {
+            const QString text = commentEdit->toPlainText();
+            if (comment->title() == text)
+                return;
+
+            const QVariantMap textArg { { aadl::meta::Props::token(aadl::meta::Props::Token::name), text } };
+            const QVariantList commentTextParams { QVariant::fromValue(comment), QVariant::fromValue(textArg) };
+            auto commentTextCmd = cmd::CommandsFactory::create(cmd::ChangeEntityAttributes, commentTextParams);
+            if (commentTextCmd) {
+                commentTextCmd->setText(tr("Edit Comment"));
+                cmd::CommandsStack::current()->push(commentTextCmd);
+            }
+        });
+    }
 }
 
 } // namespace aadlinterface

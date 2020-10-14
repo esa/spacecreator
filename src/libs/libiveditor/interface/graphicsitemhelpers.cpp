@@ -24,6 +24,7 @@
 #include "aadlobjectfunctiontype.h"
 #include "aadlobjectiface.h"
 #include "baseitems/common/aadlutils.h"
+#include "baseitems/interactiveobject.h"
 #include "interface/aadlcommentgraphicsitem.h"
 #include "interface/aadlconnectiongraphicsitem.h"
 #include "interface/aadlfunctiongraphicsitem.h"
@@ -125,6 +126,17 @@ bool canPlaceRect(QGraphicsScene *scene, const QGraphicsItem *upcomingItem, cons
     }
 
     return true;
+}
+
+aadl::AADLObject *object(const QGraphicsItem *item)
+{
+    if (!item)
+        return nullptr;
+
+    if (auto interactiveObject = qobject_cast<const InteractiveObject *>(item->toGraphicsObject()))
+        return interactiveObject->aadlObject();
+
+    return nullptr;
 }
 
 }
