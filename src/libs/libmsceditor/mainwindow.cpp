@@ -455,8 +455,7 @@ void MainWindow::initConnections()
     connect(d->m_core->mainModel()->documentItemModel(), &msc::DocumentItemModel::dataChanged, this,
             &MainWindow::showSelection);
 
-    connect(d->m_core->mainModel()->undoStack(), &QUndoStack::indexChanged, this, &MainWindow::updateTitles);
-    connect(d->m_core->mainModel(), &MainModel::lasteSaveUndoChange, this, &MainWindow::updateTitles);
+    connect(d->m_core->mainModel()->undoStack(), &QUndoStack::cleanChanged, this, &MainWindow::updateTitles);
 
     // ASN1 view
     connect(d->m_core->mainModel(), &MainModel::currentFilePathChanged, this, [&](const QString &filename) {

@@ -111,7 +111,6 @@ public Q_SLOTS:
     void onDynContextEditorMenuInvoked();
 
 private Q_SLOTS:
-    void updateDirtyness();
     void onItemClicked(shared::Id id);
     void onItemDoubleClicked(shared::Id id);
 
@@ -121,8 +120,6 @@ private Q_SLOTS:
 
 private:
     void setPath(const QString &path);
-
-    void resetDirtyness();
 
     bool loadImpl(const QString &path);
     bool importImpl(const QString &path);

@@ -80,7 +80,6 @@ struct MainModelPrivate {
     QFileSystemWatcher *m_asn1Watcher = nullptr;
 
     QUndoStack m_undoStack;
-    int m_lastSavedUndoId = 0;
 };
 
 /*!
@@ -134,7 +133,7 @@ void MainModel::initialModel()
     setNewModel(model);
 
     setCurrentFilePath("");
-    clearUndoStack();
+    d->m_undoStack.clear();
 }
 
 /*!
@@ -275,27 +274,12 @@ QUndoStack *MainModel::undoStack()
 }
 
 /*!
- * \brief MainModel::clearUndoStack Clear the undo stack.
- */
-void MainModel::clearUndoStack()
-{
-    d->m_undoStack.clear();
-    storeCurrentUndoCommandId();
-}
-
-void MainModel::storeCurrentUndoCommandId()
-{
-    d->m_lastSavedUndoId = d->m_undoStack.index();
-    Q_EMIT lasteSaveUndoChange();
-}
-
-/*!
  * \brief MainModel::needSave Check if the model is modified since the last save
  * \return true if it is modified
  */
 bool MainModel::needSave() const
 {
-    return d->m_lastSavedUndoId != d->m_undoStack.index();
+    return !d->m_undoStack.isClean();
 }
 
 /*!
@@ -332,7 +316,7 @@ bool MainModel::loadFile(const QString &filename)
 
     setCurrentFilePath(filename);
     setNewModel(model);
-    clearUndoStack();
+    d->m_undoStack.clear();
 
     return true;
 }
@@ -353,7 +337,7 @@ bool MainModel::saveMsc(const QString &filename)
         ok = mscWriter.saveChart(d->m_chartLayoutManager.currentChart(), filename);
 
     setCurrentFilePath(filename);
-    storeCurrentUndoCommandId();
+    d->m_undoStack.setClean();
 
     return ok;
 }

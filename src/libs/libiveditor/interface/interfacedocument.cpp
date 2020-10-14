@@ -69,8 +69,6 @@ struct InterfaceDocument::InterfaceDocumentPrivate {
     QUndoStack *commandsStack { nullptr };
 
     QString filePath;
-    int lastSavedIndex { 0 };
-    bool dirty { false };
 
     QPointer<aadlinterface::GraphicsView> graphicsView { nullptr };
     QTreeView *objectsView { nullptr };
@@ -103,7 +101,7 @@ InterfaceDocument::InterfaceDocument(QObject *parent)
     , d(new InterfaceDocumentPrivate)
 {
     d->commandsStack = new QUndoStack(this);
-    connect(d->commandsStack, &QUndoStack::indexChanged, this, &InterfaceDocument::updateDirtyness);
+    connect(d->commandsStack, &QUndoStack::cleanChanged, this, [this](bool clean) { Q_EMIT dirtyChanged(!clean); });
 
     d->model = new AADLItemModel(this);
     connect(d->model, &AADLItemModel::itemClicked, this, &InterfaceDocument::onItemClicked);
@@ -172,7 +170,6 @@ bool InterfaceDocument::create(const QString &path)
     }
     if (created) {
         d->commandsStack->clear();
-        resetDirtyness();
     }
     return created;
 }
@@ -184,8 +181,6 @@ bool InterfaceDocument::load(const QString &path)
     if (loaded) {
         setPath(path);
         d->commandsStack->clear();
-        resetDirtyness();
-        Q_EMIT dirtyChanged(false);
     }
 
     return loaded;
@@ -285,10 +280,6 @@ bool InterfaceDocument::importImpl(const QString &path)
             }
         }
     });
-    connect(&parser, &aadl::AADLXMLReader::metaDataParsed, this, [this, path](const QVariantMap &metadata) {
-        //        setAsn1FileName(metadata["asn1file"].toString());
-        //        setMscFileName(metadata["mscfile"].toString());
-    });
     connect(&parser, &aadl::AADLXMLReader::error, [](const QString &msg) { qWarning() << msg; });
 
     return parser.readFile(path);
@@ -296,6 +287,7 @@ bool InterfaceDocument::importImpl(const QString &path)
 
 bool InterfaceDocument::save(const QString &path)
 {
+    Q_UNUSED(path)
     return false;
 }
 
@@ -304,8 +296,6 @@ void InterfaceDocument::close()
     d->model->clear();
     setPath(QString());
     d->commandsStack->clear();
-    resetDirtyness();
-    Q_EMIT dirtyChanged(false);
 }
 
 QString InterfaceDocument::path() const
@@ -324,7 +314,6 @@ void InterfaceDocument::setAsn1FileName(const QString &asnfile)
     }
 
     d->asnFileName = asnfile;
-    Q_EMIT dirtyChanged(true);
 }
 
 /*!
@@ -367,7 +356,7 @@ const QString &InterfaceDocument::mscFileName() const
 
 bool InterfaceDocument::isDirty() const
 {
-    return d->dirty;
+    return d->commandsStack && !d->commandsStack->isClean();
 }
 
 QString InterfaceDocument::title() const
@@ -433,14 +422,8 @@ QString InterfaceDocument::supportedFileExtensions() const
 void InterfaceDocument::onSavedExternally(const QString &filePath, bool saved)
 {
     if (saved) {
-        const bool forceTitleUpdate = d->filePath != filePath && !isDirty();
-
         setPath(filePath);
-
-        if (forceTitleUpdate)
-            Q_EMIT dirtyChanged(false);
-        else
-            resetDirtyness();
+        d->commandsStack->setClean();
     }
 }
 
@@ -454,17 +437,10 @@ void InterfaceDocument::setObjects(const QVector<aadl::AADLObject *> &objects)
     }
 }
 
-void InterfaceDocument::updateDirtyness()
+void InterfaceDocument::onItemClicked(shared::Id id)
 {
-    const bool wasDirty = isDirty();
-    d->dirty = d->lastSavedIndex != d->commandsStack->index();
-
-    if (wasDirty != isDirty()) {
-        Q_EMIT dirtyChanged(isDirty());
-    }
+    Q_UNUSED(id)
 }
-
-void InterfaceDocument::onItemClicked(shared::Id id) { }
 
 void InterfaceDocument::onItemDoubleClicked(shared::Id id)
 {
@@ -529,12 +505,6 @@ void InterfaceDocument::setPath(const QString &path)
         d->filePath = path;
         Q_EMIT titleChanged();
     }
-}
-
-void InterfaceDocument::resetDirtyness()
-{
-    d->lastSavedIndex = d->commandsStack->index();
-    updateDirtyness();
 }
 
 bool InterfaceDocument::loadImpl(const QString &path)

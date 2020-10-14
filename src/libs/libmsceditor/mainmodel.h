@@ -75,8 +75,6 @@ public:
     const QString &currentFilePath() const;
 
     QUndoStack *undoStack();
-    void clearUndoStack();
-    void storeCurrentUndoCommandId();
     bool needSave() const;
 
     QFileInfo asn1File() const;
@@ -86,7 +84,6 @@ Q_SIGNALS:
     void modelDataChanged();
     void modelUpdated(msc::MscModel *);
     void selectedDocumentChanged(msc::MscDocument *selectedDocument);
-    void lasteSaveUndoChange();
     void currentFilePathChanged(const QString &);
     void asn1FileNameChanged(const QString &);
     void asn1ParameterErrorDetected(const QStringList &faultyMessages);

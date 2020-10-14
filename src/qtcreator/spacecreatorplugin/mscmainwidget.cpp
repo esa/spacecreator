@@ -300,9 +300,7 @@ void MscMainWidget::initConnections()
     connect(m_plugin->mainModel()->documentItemModel(), &msc::DocumentItemModel::dataChanged, this,
             &MscMainWidget::showSelection);
 
-    connect(m_plugin->mainModel()->undoStack(), &QUndoStack::indexChanged, this,
-            [&]() { Q_EMIT dirtyChanged(isDirty()); });
-    connect(m_plugin->mainModel(), &msc::MainModel::lasteSaveUndoChange, this,
+    connect(m_plugin->mainModel()->undoStack(), &QUndoStack::cleanChanged, this,
             [&]() { Q_EMIT dirtyChanged(isDirty()); });
 
     connect(m_plugin->mainModel(), &msc::MainModel::currentFilePathChanged, this, [&](const QString &filename) {
