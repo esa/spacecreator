@@ -63,6 +63,7 @@ private Q_SLOTS:
     void editItem(QTableWidgetItem *item);
     void setItemFlags(QTableWidgetItem *item);
     void checkTextValidity();
+    void checkforEmptyCompleter();
 
 private:
     void fillMessageDeclartionBox();

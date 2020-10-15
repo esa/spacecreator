@@ -65,6 +65,8 @@ private Q_SLOTS:
 
     void selectAsn1File();
 
+    void checkforEmptyCompleter();
+
 private:
     void updateAsn1TypesView();
 

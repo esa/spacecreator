@@ -34,6 +34,7 @@
 #include <QItemSelectionModel>
 #include <QKeyEvent>
 #include <QRegExpValidator>
+#include <QTimer>
 
 MessageDeclarationsDialog::MessageDeclarationsDialog(
         msc::MscMessageDeclarationList *model, msc::MscModel *mscModel, QWidget *parent)
@@ -73,6 +74,8 @@ MessageDeclarationsDialog::MessageDeclarationsDialog(
 
     connect(ui->asn1Button, &QPushButton::clicked, this, &MessageDeclarationsDialog::selectAsn1File);
 
+    connect(ui->nameLineEdit, &QLineEdit::textEdited, this, &MessageDeclarationsDialog::checkforEmptyCompleter);
+
     updateDeclarationDetails();
 }
 
@@ -109,6 +112,8 @@ void MessageDeclarationsDialog::setAadlConnectionNames(const QStringList &names)
         ui->nameLineEdit->completer()->deleteLater();
     }
     auto completer = new QCompleter(names, ui->nameLineEdit);
+    completer->setFilterMode(Qt::MatchContains);
+    completer->setCaseSensitivity(Qt::CaseInsensitive);
     ui->nameLineEdit->setCompleter(completer);
 }
 
@@ -150,6 +155,7 @@ void MessageDeclarationsDialog::addDeclaration()
     QModelIndex index = m_model->index(m_model->indexOf(declaration));
     ui->messagesView->selectionModel()->select(index, QItemSelectionModel::ClearAndSelect);
     ui->nameLineEdit->setFocus();
+    ui->nameLineEdit->selectAll();
 }
 
 void MessageDeclarationsDialog::removeDeclaration()
@@ -266,6 +272,20 @@ void MessageDeclarationsDialog::selectAsn1File()
             qWarning() << "File" << fileName << "is no valid ASN.1 file:" << errors;
         }
     }
+}
+
+/*!
+   If the name is empty, thet completer popup needs to be shown "manually"
+   \note The popup is delayed, as otherwise it will be closed immediately after popup
+ */
+void MessageDeclarationsDialog::checkforEmptyCompleter()
+{
+    QTimer::singleShot(1, this, [this]() {
+        if (ui->nameLineEdit->text().isEmpty() && ui->nameLineEdit->completer()) {
+            ui->nameLineEdit->completer()->setCompletionPrefix("");
+            ui->nameLineEdit->completer()->complete();
+        }
+    });
 }
 
 void MessageDeclarationsDialog::updateAsn1TypesView()

@@ -41,6 +41,7 @@
 #include <QRegExp>
 #include <QRegExpValidator>
 #include <QStyledItemDelegate>
+#include <QTimer>
 #include <QUndoStack>
 
 /*!
@@ -77,6 +78,8 @@ MessageDialog::MessageDialog(msc::MscMessage *message, QWidget *parent)
     connect(ui->declarationButton, &QPushButton::clicked, this, &MessageDialog::copyDeclarationData);
     connect(ui->editDeclarationsButton, &QPushButton::clicked, this, &MessageDialog::editDeclarations);
 
+    connect(ui->nameLineEdit, &QLineEdit::textEdited, this, &MessageDialog::checkforEmptyCompleter);
+
     fillMessageDeclartionBox();
     selectDeclarationFromName();
 
@@ -102,6 +105,8 @@ void MessageDialog::setAadlConnectionNames(const QStringList &names)
         ui->nameLineEdit->completer()->deleteLater();
     }
     auto completer = new QCompleter(names, ui->nameLineEdit);
+    completer->setFilterMode(Qt::MatchContains);
+    completer->setCaseSensitivity(Qt::CaseInsensitive);
     ui->nameLineEdit->setCompleter(completer);
     m_connectionNames = names;
 }
@@ -379,6 +384,20 @@ void MessageDialog::checkTextValidity()
         ui->previewLabel->setText(tr("<font color='red'>Invalid message:<br>%1</font>").arg(text));
 
     ui->buttonBox->button(QDialogButtonBox::Ok)->setEnabled(m_isValid);
+}
+
+/*!
+   If the name is empty, thet completer popup needs to be shown "manually"
+   \note The popup is delayed, as otherwise it will be closed immediately after popup
+ */
+void MessageDialog::checkforEmptyCompleter()
+{
+    QTimer::singleShot(1, this, [this]() {
+        if (ui->nameLineEdit->text().isEmpty() && ui->nameLineEdit->completer()) {
+            ui->nameLineEdit->completer()->setCompletionPrefix("");
+            ui->nameLineEdit->completer()->complete();
+        }
+    });
 }
 
 void MessageDialog::fillMessageDeclartionBox()

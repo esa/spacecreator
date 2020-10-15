@@ -536,6 +536,8 @@ void TextItem::updateCompleter(const QStringList &completionList)
     if (m_completer == nullptr) {
         m_completer = new QCompleter(completionList, this);
         m_completer->setCompletionMode(QCompleter::PopupCompletion);
+        m_completer->setFilterMode(Qt::MatchContains);
+        m_completer->setCaseSensitivity(Qt::CaseInsensitive);
         connect(m_completer, qOverload<const QString &>(&QCompleter::highlighted), this, &msc::TextItem::setPlainText);
     }
 
