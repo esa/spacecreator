@@ -94,25 +94,14 @@ MainWindow::MainWindow(aadlinterface::IVEditorCore *core, QWidget *parent)
 
     m_core->initMenus(this);
 
-    QUndoStack *currentStack { nullptr };
     m_core->document()->fillToolBar(m_core->docToolBar());
-    currentStack = m_core->document()->commandsStack();
     if (auto view = m_core->chartView()) {
         m_zoomCtrl->setView(view);
         connect(view, &aadlinterface::GraphicsView::mouseMoved, this, &MainWindow::onGraphicsViewInfo,
                 Qt::UniqueConnection);
     }
 
-    if (currentStack) {
-        if (m_core->undoGroup()->stacks().contains(currentStack)) {
-            m_core->undoGroup()->addStack(currentStack);
-        }
-        m_core->undoGroup()->setActiveStack(currentStack);
-    } else {
-        m_core->undoGroup()->removeStack(m_core->undoGroup()->activeStack());
-    }
-
-    aadlinterface::cmd::CommandsStack::setCurrent(currentStack);
+    aadlinterface::cmd::CommandsStack::setCurrent(m_core->document()->commandsStack());
 
     updateActions();
 

@@ -17,15 +17,14 @@
 
 #include "baseitems/common/mscutils.h"
 #include "chartlayoutmanager.h"
-#include "commands/cmdmessageitemcreate.h"
-#include "commands/common/commandsfactory.h"
-#include "commands/common/commandsstack.h"
+#include "commands/cmdinstanceitemcreate.h"
 #include "messageitem.h"
 #include "mscchart.h"
 #include "mscinstance.h"
 
 #include <QAction>
 #include <QGraphicsScene>
+#include <QScopedPointer>
 #include <QUndoStack>
 #include <QVariant>
 #include <QVariantList>
@@ -51,6 +50,7 @@ private:
     ChartLayoutManager m_chartModel;
     static constexpr int CommandsCount = 10;
     msc::MscChart *m_chart = nullptr;
+    QScopedPointer<QUndoStack> m_undoStack;
 
     int itemsCount();
 };
@@ -62,10 +62,8 @@ void tst_CmdInstanceItemCreate::initTestCase()
 {
     m_chart = new msc::MscChart();
     m_chartModel.setCurrentChart(m_chart);
-    cmd::CommandsStack::setCurrent(new QUndoStack(this));
-    cmd::CommandsStack::current()->setUndoLimit(CommandsCount);
-    cmd::CommandsStack::instance()->factory()->setCurrentChart(m_chart);
-    cmd::CommandsStack::instance()->factory()->setChartLayoutManager(&m_chartModel);
+    m_undoStack.reset(new QUndoStack);
+    m_undoStack->setUndoLimit(CommandsCount);
 }
 
 void tst_CmdInstanceItemCreate::cleanupTestCase()
@@ -76,12 +74,13 @@ void tst_CmdInstanceItemCreate::cleanupTestCase()
 void tst_CmdInstanceItemCreate::testCreate()
 {
     m_chartModel.clearScene();
-    cmd::CommandsStack::current()->clear();
+    m_undoStack->clear();
 
     QCOMPARE(itemsCount(), 0);
     QMetaObject::invokeMethod(&m_chartModel, "doLayout", Qt::DirectConnection);
     for (int i = 0; i < CommandsCount; ++i) {
-        cmd::CommandsStack::push(cmd::Id::CreateInstance, { QVariant::fromValue<msc::MscInstance *>(nullptr), -1 });
+        auto cmd = new msc::cmd::CmdInstanceItemCreate(nullptr, -1, m_chart, &m_chartModel);
+        m_undoStack->push(cmd);
     }
 
     QCOMPARE(itemsCount(), CommandsCount);
@@ -89,10 +88,10 @@ void tst_CmdInstanceItemCreate::testCreate()
 
 void tst_CmdInstanceItemCreate::testUndo()
 {
-    QCOMPARE(cmd::CommandsStack::current()->count(), CommandsCount);
+    QCOMPARE(m_undoStack->count(), CommandsCount);
     int undone(0);
-    while (cmd::CommandsStack::current()->canUndo()) {
-        cmd::CommandsStack::current()->undo();
+    while (m_undoStack->canUndo()) {
+        m_undoStack->undo();
         ++undone;
     }
 
@@ -102,10 +101,10 @@ void tst_CmdInstanceItemCreate::testUndo()
 
 void tst_CmdInstanceItemCreate::testRedo()
 {
-    QCOMPARE(cmd::CommandsStack::current()->count(), CommandsCount);
+    QCOMPARE(m_undoStack->count(), CommandsCount);
     int redone(0);
-    while (cmd::CommandsStack::current()->canRedo()) {
-        cmd::CommandsStack::current()->redo();
+    while (m_undoStack->canRedo()) {
+        m_undoStack->redo();
         ++redone;
     }
 
@@ -122,18 +121,19 @@ void tst_CmdInstanceItemCreate::testInsertingOrder()
 {
     static const QStringList names = { "A", "B", "C", "D" };
 
-    while (cmd::CommandsStack::current()->canUndo())
-        cmd::CommandsStack::current()->undo();
+    while (m_undoStack->canUndo()) {
+        m_undoStack->undo();
+    }
     m_chartModel.clearScene();
-    cmd::CommandsStack::current()->clear();
+    m_undoStack->clear();
 
     QCOMPARE(itemsCount(), 0);
 
     QMetaObject::invokeMethod(&m_chartModel, "doLayout", Qt::DirectConnection);
 
     for (const QString &name : names) {
-        cmd::CommandsStack::push(cmd::Id::CreateInstance,
-                { QVariant::fromValue<msc::MscInstance *>(new msc::MscInstance(name)), 0 }); // prepends instance
+        auto cmd = new msc::cmd::CmdInstanceItemCreate(new msc::MscInstance(name), 0, m_chart, &m_chartModel);
+        m_undoStack->push(cmd);
     }
 
     QCOMPARE(m_chart->instances().size(), names.size());

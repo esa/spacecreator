@@ -2,11 +2,11 @@
 
 #include <QObject>
 
-class QToolBar;
 class QAction;
-class QUndoGroup;
 class QMainWindow;
 class QMenu;
+class QToolBar;
+class QUndoStack;
 
 namespace shared {
 
@@ -40,8 +40,6 @@ public:
     virtual void addMenuViewActions(QMenu *menu, QMainWindow *window);
     virtual void addMenuHelpActions(QMenu *menu, QMainWindow *window) = 0;
 
-    QUndoGroup *undoGroup() { return m_undoGroup; }
-
     QAction *actionNewFile();
     QAction *actionOpenFile();
     QAction *actionSaveFile();
@@ -60,6 +58,8 @@ public:
 
     void setupMiniMap();
 
+    virtual QUndoStack *undoStack() const = 0;
+
     virtual bool renameAsnFile(const QString &oldName, const QString &newName) = 0;
 
     /// Returns the full file path of the file in this core
@@ -74,8 +74,6 @@ Q_SIGNALS:
     void editedExternally(shared::EditorCore *);
 
 private:
-    QUndoGroup *m_undoGroup;
-
     QMainWindow *m_mainWindow = { nullptr };
     QToolBar *m_mainToolBar { nullptr };
 

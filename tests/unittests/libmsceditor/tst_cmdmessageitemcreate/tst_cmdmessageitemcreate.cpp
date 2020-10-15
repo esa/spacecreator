@@ -18,8 +18,6 @@
 #include "baseitems/common/mscutils.h"
 #include "chartlayoutmanager.h"
 #include "commands/cmdmessageitemcreate.h"
-#include "commands/common/commandsfactory.h"
-#include "commands/common/commandsstack.h"
 #include "messageitem.h"
 #include "mscchart.h"
 #include "mscmessage.h"
@@ -53,9 +51,9 @@ private:
     static constexpr int CommandsCount = 10;
     static constexpr bool SkipBenchmark = true; // not a really usefull thing to be run on the CI server
     msc::MscChart *m_chart = nullptr;
+    QScopedPointer<QUndoStack> m_undoStack;
 
     static const QVariant m_dummyCif;
-    QVariantList createParams(MscMessage *message = nullptr, int insertId = -1);
 
     int itemsCount();
 };
@@ -69,10 +67,8 @@ void tst_CmdMessageItemCreate::initTestCase()
 {
     m_chart = new msc::MscChart();
     m_chartModel.setCurrentChart(m_chart);
-    cmd::CommandsStack::setCurrent(new QUndoStack(this));
-    cmd::CommandsStack::current()->setUndoLimit(CommandsCount);
-    cmd::CommandsStack::instance()->factory()->setCurrentChart(m_chart);
-    cmd::CommandsStack::instance()->factory()->setChartLayoutManager(&m_chartModel);
+    m_undoStack.reset(new QUndoStack);
+    m_undoStack->setUndoLimit(CommandsCount);
 }
 
 void tst_CmdMessageItemCreate::cleanupTestCase()
@@ -80,20 +76,16 @@ void tst_CmdMessageItemCreate::cleanupTestCase()
     delete m_chart;
 }
 
-QVariantList tst_CmdMessageItemCreate::createParams(MscMessage *message, int insertId)
-{
-    return { QVariant::fromValue<msc::MscMessage *>(message), insertId, m_dummyCif };
-}
-
 void tst_CmdMessageItemCreate::testCreate()
 {
     m_chartModel.clearScene();
-    cmd::CommandsStack::current()->clear();
+    m_undoStack->clear();
 
     QCOMPARE(itemsCount(), 0);
 
     for (int i = 0; i < CommandsCount; ++i) {
-        cmd::CommandsStack::push(cmd::Id::CreateMessage, createParams());
+        auto cmd = new msc::cmd::CmdMessageItemCreate(nullptr, -1, m_chart, &m_chartModel);
+        m_undoStack->push(cmd);
     }
 
     QCOMPARE(itemsCount(), CommandsCount);
@@ -101,10 +93,10 @@ void tst_CmdMessageItemCreate::testCreate()
 
 void tst_CmdMessageItemCreate::testUndo()
 {
-    QCOMPARE(cmd::CommandsStack::current()->count(), CommandsCount);
+    QCOMPARE(m_undoStack->count(), CommandsCount);
     int undone(0);
-    while (cmd::CommandsStack::current()->canUndo()) {
-        cmd::CommandsStack::current()->undo();
+    while (m_undoStack->canUndo()) {
+        m_undoStack->undo();
         ++undone;
     }
 
@@ -114,10 +106,10 @@ void tst_CmdMessageItemCreate::testUndo()
 
 void tst_CmdMessageItemCreate::testRedo()
 {
-    QCOMPARE(cmd::CommandsStack::current()->count(), CommandsCount);
+    QCOMPARE(m_undoStack->count(), CommandsCount);
     int redone(0);
-    while (cmd::CommandsStack::current()->canRedo()) {
-        cmd::CommandsStack::current()->redo();
+    while (m_undoStack->canRedo()) {
+        m_undoStack->redo();
         ++redone;
     }
 
@@ -134,7 +126,7 @@ void tst_CmdMessageItemCreate::testPerformance()
                                  .arg(CommandsCount)));
 
     m_chartModel.clearScene();
-    cmd::CommandsStack::current()->clear();
+    m_undoStack->clear();
 
     QCOMPARE(itemsCount(), 0);
 
@@ -144,20 +136,21 @@ void tst_CmdMessageItemCreate::testPerformance()
 
         // create:
         for (int i = 0; i < CommandsCount; ++i) {
-            cmd::CommandsStack::push(cmd::Id::CreateMessage, createParams());
+            auto cmd = new msc::cmd::CmdMessageItemCreate(nullptr, -1, m_chart, &m_chartModel);
+            m_undoStack->push(cmd);
         }
 
         // undo:
         int undone(0);
-        while (cmd::CommandsStack::current()->canUndo()) {
-            cmd::CommandsStack::current()->undo();
+        while (m_undoStack->canUndo()) {
+            m_undoStack->undo();
             ++undone;
         }
 
         // redo:
         int redone(0);
-        while (cmd::CommandsStack::current()->canRedo()) {
-            cmd::CommandsStack::current()->redo();
+        while (m_undoStack->canRedo()) {
+            m_undoStack->redo();
             ++redone;
         }
     }
@@ -172,16 +165,16 @@ void tst_CmdMessageItemCreate::testInsertingOrder()
 {
     static const QStringList names = { "A", "B", "C", "D" };
 
-    while (cmd::CommandsStack::current()->canUndo())
-        cmd::CommandsStack::current()->undo();
+    while (m_undoStack->canUndo())
+        m_undoStack->undo();
     m_chartModel.clearScene();
-    cmd::CommandsStack::current()->clear();
+    m_undoStack->clear();
 
     QCOMPARE(itemsCount(), 0);
 
     for (const QString &name : names) {
-        cmd::CommandsStack::push(
-                cmd::Id::CreateMessage, createParams(new msc::MscMessage(name), 0)); // prepends message
+        auto cmd = new msc::cmd::CmdMessageItemCreate(new msc::MscMessage(name), 0, m_chart, &m_chartModel);
+        m_undoStack->push(cmd);
     }
 
     QCOMPARE(m_chart->instanceEvents().size(), names.size());

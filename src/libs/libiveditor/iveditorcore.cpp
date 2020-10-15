@@ -194,6 +194,11 @@ bool IVEditorCore::addConnection(QString name, const QString &fromInstanceName, 
     return true;
 }
 
+QUndoStack *IVEditorCore::undoStack() const
+{
+    return m_document->commandsStack();
+}
+
 /*!
    Changes the asn1 referenceto \p newName if the existing one if pointing to \p oldName
  */

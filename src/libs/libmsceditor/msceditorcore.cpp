@@ -419,6 +419,11 @@ MSCEditorCore::ViewMode MSCEditorCore::viewMode()
     return m_viewMode;
 }
 
+QUndoStack *MSCEditorCore::undoStack() const
+{
+    return m_model->undoStack();
+}
+
 /*!
    Changes the asn1 referenceto \p newName if the existing one if pointing to \p oldName
  */
@@ -566,23 +571,13 @@ void MSCEditorCore::activateDefaultTool()
  */
 void MSCEditorCore::selectCurrentChart()
 {
+    msc::cmd::CommandsStack::setCurrent(m_model->undoStack());
+
     msc::MscChart *chart = m_model->chartViewModel().currentChart();
-
     if (chart != nullptr) {
-        if (QUndoStack *currentStack = m_model->undoStack()) {
-            if (!undoGroup()->stacks().contains(currentStack)) {
-                undoGroup()->addStack(currentStack);
-            }
-            undoGroup()->setActiveStack(currentStack);
-        } else {
-            undoGroup()->removeStack(undoGroup()->activeStack());
-        }
-        msc::cmd::CommandsStack::setCurrent(undoGroup()->activeStack());
-
         connect(chart, &msc::MscEntity::commentChanged, this, &msc::MSCEditorCore::checkGlobalComment,
                 Qt::UniqueConnection);
     }
-
     checkGlobalComment();
 }
 

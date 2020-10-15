@@ -24,7 +24,6 @@
 #include "baseitems/instanceenditem.h"
 #include "baseitems/instanceheaditem.h"
 #include "chartitem.h"
-#include "commands/common/commandsfactory.h"
 #include "commands/common/commandsstack.h"
 #include "commentitem.h"
 #include "conditionitem.h"
@@ -197,7 +196,6 @@ void ChartLayoutManager::setCurrentChart(MscChart *chart)
     }
 
     d->m_currentChart = chart;
-    cmd::CommandsStack::instance()->factory()->setCurrentChart(d->m_currentChart);
 
     clearScene();
 
@@ -360,9 +358,13 @@ void ChartLayoutManager::doLayout()
     connectItems();
 
     // make instance items be highlightable on message (dis-)connection
-    for (MscInstance *instance : d->m_currentChart->instances())
-        if (InstanceItem *item = itemForInstance(instance))
-            item->setHighlightable(true);
+    if (d->m_currentChart) {
+        for (MscInstance *instance : d->m_currentChart->instances()) {
+            if (InstanceItem *item = itemForInstance(instance)) {
+                item->setHighlightable(true);
+            }
+        }
+    }
 
     forceCifForAll();
 
@@ -371,6 +373,10 @@ void ChartLayoutManager::doLayout()
 
 void ChartLayoutManager::addInstanceItems()
 {
+    if (!d->m_currentChart) {
+        return;
+    }
+
     QRectF newInstancesRect;
     const QRectF &chartRect = d->m_layoutInfo.m_chartItem->contentRect();
 
@@ -442,6 +448,10 @@ void ChartLayoutManager::addInstanceItems()
 
 void ChartLayoutManager::addInstanceEventItems()
 {
+    if (!d->m_currentChart) {
+        return;
+    }
+
     InteractiveObject *instanceEventItem(nullptr);
     const QVector<MscInstanceEvent *> &chartEvents = d->m_currentChart->instanceEvents();
     auto it = chartEvents.begin();
@@ -854,6 +864,10 @@ void ChartLayoutManager::updateContentToChartbox(const QRectF &chartBoxRect)
  */
 void ChartLayoutManager::checkHorizontalConstraints()
 {
+    if (!d->m_currentChart) {
+        return;
+    }
+
     qreal leftXLimit = 0.0;
     for (MscInstance *instance : d->m_currentChart->instances()) {
         InstanceItem *instanceItem = itemForInstance(instance);
@@ -889,6 +903,10 @@ void ChartLayoutManager::checkHorizontalConstraints()
  */
 void ChartLayoutManager::checkVerticalConstraints()
 {
+    if (!d->m_currentChart) {
+        return;
+    }
+
     QRectF lastBox;
     for (MscInstanceEvent *event : d->m_currentChart->instanceEvents()) {
         InteractiveObject *item = itemForEntity(event);

@@ -52,6 +52,8 @@ public:
     bool addFunction(const QString &name);
     bool addConnection(QString name, const QString &fromInstanceName, const QString &toInstanceName);
 
+    QUndoStack *undoStack() const override;
+
     bool renameAsnFile(const QString &oldName, const QString &newName) override;
 
     QString filePath() const override;

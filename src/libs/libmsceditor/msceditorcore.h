@@ -104,6 +104,8 @@ public:
 
     ViewMode viewMode();
 
+    QUndoStack *undoStack() const override;
+
     bool renameAsnFile(const QString &oldName, const QString &newName) override;
 
     QString filePath() const override;

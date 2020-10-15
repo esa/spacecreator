@@ -182,19 +182,10 @@ void AadlMainWidget::init()
 
     m_plugin->setupMiniMap();
 
-    QUndoStack *currentStack = m_plugin->document()->commandsStack();
-    if (currentStack) {
-        if (m_plugin->undoGroup()->stacks().contains(currentStack)) {
-            m_plugin->undoGroup()->addStack(currentStack);
-        }
-        m_plugin->undoGroup()->setActiveStack(currentStack);
-    } else {
-        m_plugin->undoGroup()->removeStack(m_plugin->undoGroup()->activeStack());
-    }
+    aadlinterface::cmd::CommandsStack::setCurrent(m_plugin->document()->commandsStack());
 
-    aadlinterface::cmd::CommandsStack::setCurrent(currentStack);
-
-    connect(currentStack, &QUndoStack::indexChanged, this, [&]() { Q_EMIT dirtyChanged(isDirty()); });
+    connect(m_plugin->document()->commandsStack(), &QUndoStack::cleanChanged, this,
+            [&]() { Q_EMIT dirtyChanged(isDirty()); });
 }
 
 }

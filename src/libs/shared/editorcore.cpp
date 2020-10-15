@@ -9,13 +9,12 @@
 #include <QMenuBar>
 #include <QMessageBox>
 #include <QToolBar>
-#include <QUndoGroup>
+#include <QUndoStack>
 
 namespace shared {
 
 EditorCore::EditorCore(QObject *parent)
     : QObject(parent)
-    , m_undoGroup(new QUndoGroup(this))
 {
 }
 
@@ -167,7 +166,7 @@ QAction *EditorCore::actionQuit()
 QAction *EditorCore::actionUndo()
 {
     if (m_actionUndo == nullptr) {
-        m_actionUndo = m_undoGroup->createUndoAction(this);
+        m_actionUndo = undoStack()->createUndoAction(this);
         m_actionUndo->setShortcut(QKeySequence::Undo);
         m_actionUndo->setIcon(QIcon::fromTheme("edit-undo", QIcon(QLatin1String(":/sharedresources/icons/undo.svg"))));
     }
@@ -177,7 +176,7 @@ QAction *EditorCore::actionUndo()
 QAction *EditorCore::actionRedo()
 {
     if (m_actionRedo == nullptr) {
-        m_actionRedo = m_undoGroup->createRedoAction(this);
+        m_actionRedo = undoStack()->createRedoAction(this);
         m_actionRedo->setShortcut(QKeySequence::Redo);
         m_actionRedo->setIcon(QIcon::fromTheme("edit-redo", QIcon(QLatin1String(":/sharedresources/icons/redo.svg"))));
     }

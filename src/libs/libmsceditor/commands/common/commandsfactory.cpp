@@ -136,11 +136,6 @@ QUndoCommand *CommandsFactory::create(Id id, const QVariantList &params)
     return nullptr;
 }
 
-void CommandsFactory::setCurrentChart(MscChart *chart)
-{
-    m_chart = chart;
-}
-
 void CommandsFactory::setChartLayoutManager(msc::ChartLayoutManager *layoutManager)
 {
     m_layoutManager = layoutManager;
@@ -150,7 +145,7 @@ QUndoCommand *CommandsFactory::createChangeComment(const QVariantList &params)
 {
     Q_ASSERT(params.size() == 2);
 
-    if (m_chart.isNull()) {
+    if (!m_layoutManager->currentChart()) {
         return nullptr;
     }
 
@@ -164,7 +159,7 @@ QUndoCommand *CommandsFactory::createChangeComment(const QVariantList &params)
             return nullptr;
         }
 
-        return new CmdEntityCommentChange(item, comment, m_chart.data(), m_layoutManager.data());
+        return new CmdEntityCommentChange(item, comment, m_layoutManager->currentChart(), m_layoutManager.data());
     }
 
     return nullptr;
@@ -177,7 +172,7 @@ QUndoCommand *CommandsFactory::createRenameEntity(const QVariantList &params)
     if (MscEntity *item = params.first().value<MscEntity *>()) {
         const QString &name = params.last().toString();
         if (item->name() != name && !name.isEmpty()) {
-            return new CmdEntityNameChange(item, name, m_chart.data(), m_layoutManager.data());
+            return new CmdEntityNameChange(item, name, m_layoutManager->currentChart(), m_layoutManager.data());
         }
     }
 
@@ -190,8 +185,8 @@ QUndoCommand *CommandsFactory::createDeleteEntity(const QVariantList &params)
 
     QVector<MscEntity *> items = params.at(0).value<QVector<MscEntity *>>();
     if (!items.isEmpty()) {
-        return new CmdDeleteEntity(
-                items, params.at(1).value<msc::MscDocument *>(), m_chart.data(), m_layoutManager.data());
+        return new CmdDeleteEntity(items, params.at(1).value<msc::MscDocument *>(), m_layoutManager->currentChart(),
+                m_layoutManager.data());
     }
 
     return nullptr;
@@ -205,8 +200,9 @@ QUndoCommand *CommandsFactory::createMessageItemRetarget(const QVariantList &par
         int newPos = params.at(1).toInt();
         msc::MscInstance *newInstance = params.at(2).value<msc::MscInstance *>();
         msc::MscMessage::EndType endtype = params.at(3).value<msc::MscMessage::EndType>();
-        if (!m_chart.isNull()) {
-            return new CmdMessageItemResize(item, newPos, newInstance, endtype, m_chart.data(), m_layoutManager.data());
+        if (m_layoutManager->currentChart()) {
+            return new CmdMessageItemResize(
+                    item, newPos, newInstance, endtype, m_layoutManager->currentChart(), m_layoutManager.data());
         }
     }
 
@@ -220,7 +216,8 @@ QUndoCommand *CommandsFactory::createMessageItemCreate(const QVariantList &param
     msc::MscMessage *message = params.at(0).value<msc::MscMessage *>();
     if (!m_layoutManager.isNull()) {
         const QVector<QPoint> &points = params.size() == 3 ? params.at(2).value<QVector<QPoint>>() : QVector<QPoint>();
-        return new CmdMessageItemCreate(message, params.at(1).toInt(), m_chart.data(), m_layoutManager.data(), points);
+        return new CmdMessageItemCreate(
+                message, params.at(1).toInt(), m_layoutManager->currentChart(), m_layoutManager.data(), points);
     }
 
     return nullptr;
@@ -241,8 +238,8 @@ QUndoCommand *CommandsFactory::createChangeInstanceOrder(const QVariantList &par
 
     if (MscInstance *item = params.first().value<MscInstance *>()) {
         const int &toIdx = params.at(1).toInt();
-        if (!m_chart.isNull()) {
-            return new CmdChangeInstanceOrder(item, toIdx, m_chart.data(), m_layoutManager.data());
+        if (m_layoutManager->currentChart()) {
+            return new CmdChangeInstanceOrder(item, toIdx, m_layoutManager->currentChart(), m_layoutManager.data());
         }
     }
 
@@ -254,9 +251,9 @@ QUndoCommand *CommandsFactory::createInstanceItemCreate(const QVariantList &para
     Q_ASSERT(params.size() == 2);
 
     msc::MscInstance *message = params.at(0).value<msc::MscInstance *>();
-    if (!m_chart.isNull()) {
+    if (m_layoutManager->currentChart()) {
         const int pos = params.at(1).toInt();
-        return new CmdInstanceItemCreate(message, pos, m_chart.data(), m_layoutManager.data());
+        return new CmdInstanceItemCreate(message, pos, m_layoutManager->currentChart(), m_layoutManager.data());
     }
 
     return nullptr;
@@ -269,7 +266,7 @@ QUndoCommand *CommandsFactory::createInstanceKindChange(const QVariantList &para
     if (MscInstance *item = params.first().value<MscInstance *>()) {
         const QString &name = params.last().toString();
         if (item->denominatorAndKind() != name)
-            return new CmdInstanceKindChange(item, name, m_chart.data(), m_layoutManager.data());
+            return new CmdInstanceKindChange(item, name, m_layoutManager->currentChart(), m_layoutManager.data());
     }
 
     return nullptr;
@@ -281,7 +278,7 @@ QUndoCommand *CommandsFactory::createInstanceStopChange(const QVariantList &para
 
     if (MscInstance *item = params.first().value<MscInstance *>()) {
         const bool newValue = params.last().toBool();
-        return new CmdInstanceStopChange(item, newValue, m_chart.data(), m_layoutManager.data());
+        return new CmdInstanceStopChange(item, newValue, m_layoutManager->currentChart(), m_layoutManager.data());
     }
 
     return nullptr;
@@ -292,10 +289,11 @@ QUndoCommand *CommandsFactory::createConditionItemCreate(const QVariantList &par
     Q_ASSERT(params.size() == 3);
 
     auto condition = params.at(0).value<msc::MscCondition *>();
-    if (!m_chart.isNull()) {
+    if (m_layoutManager->currentChart()) {
         auto instance = params.at(1).value<msc::MscInstance *>();
         int eventIndex = params.at(2).toInt();
-        return new CmdConditionItemCreate(condition, instance, eventIndex, m_chart.data(), m_layoutManager.data());
+        return new CmdConditionItemCreate(
+                condition, instance, eventIndex, m_layoutManager->currentChart(), m_layoutManager.data());
     }
 
     return nullptr;
@@ -308,8 +306,9 @@ QUndoCommand *CommandsFactory::createConditionItemMove(const QVariantList &param
     if (msc::MscCondition *item = params.at(0).value<msc::MscCondition *>()) {
         int newPos = params.at(1).toInt();
         if (msc::MscInstance *newInstance = params.at(2).value<msc::MscInstance *>()) {
-            if (!m_chart.isNull()) {
-                return new CmdConditionItemMove(item, newPos, newInstance, m_chart.data(), m_layoutManager.data());
+            if (m_layoutManager->currentChart()) {
+                return new CmdConditionItemMove(
+                        item, newPos, newInstance, m_layoutManager->currentChart(), m_layoutManager.data());
             }
         }
     }
@@ -322,10 +321,11 @@ QUndoCommand *CommandsFactory::createActionItemCreate(const QVariantList &params
     Q_ASSERT(params.size() == 3);
 
     auto action = params.at(0).value<msc::MscAction *>();
-    if (!m_chart.isNull()) {
+    if (m_layoutManager->currentChart()) {
         auto instance = params.at(1).value<msc::MscInstance *>();
         int eventIndex = params.at(2).toInt();
-        return new CmdActionItemCreate(action, instance, eventIndex, m_chart.data(), m_layoutManager.data());
+        return new CmdActionItemCreate(
+                action, instance, eventIndex, m_layoutManager->currentChart(), m_layoutManager.data());
     }
 
     return nullptr;
@@ -337,12 +337,12 @@ QUndoCommand *CommandsFactory::createCoregionItemCreate(const QVariantList &para
 
     auto begin = params.value(0).value<msc::MscCoregion *>();
     auto end = params.value(1).value<msc::MscCoregion *>();
-    if (!m_chart.isNull()) {
+    if (m_layoutManager->currentChart()) {
         auto instance = params.value(2).value<msc::MscInstance *>();
         bool ok;
         int eventIndex = params.value(3).toInt(&ok);
         return new CmdCoregionItemCreate(
-                begin, end, instance, ok ? eventIndex : -1, m_chart.data(), m_layoutManager.data());
+                begin, end, instance, ok ? eventIndex : -1, m_layoutManager->currentChart(), m_layoutManager.data());
     }
 
     return nullptr;
@@ -359,9 +359,9 @@ QUndoCommand *CommandsFactory::createCoregionMove(const QVariantList &params)
     auto newInstance = params.at(4).value<msc::MscInstance *>();
 
     Q_ASSERT(newBeginPos < newEndPos);
-    if (itemBegin && itemEnd && newInstance && !m_chart.isNull()) {
-        return new CmdCoRegionItemMove(
-                itemBegin, itemEnd, newBeginPos, newEndPos, newInstance, m_chart.data(), m_layoutManager.data());
+    if (itemBegin && itemEnd && newInstance && m_layoutManager->currentChart()) {
+        return new CmdCoRegionItemMove(itemBegin, itemEnd, newBeginPos, newEndPos, newInstance,
+                m_layoutManager->currentChart(), m_layoutManager.data());
     }
 
     return nullptr;
@@ -374,8 +374,9 @@ QUndoCommand *CommandsFactory::createActionItemMove(const QVariantList &params)
     if (msc::MscAction *item = params.at(0).value<msc::MscAction *>()) {
         int newPos = params.at(1).toInt();
         if (msc::MscInstance *newInstance = params.at(2).value<msc::MscInstance *>()) {
-            if (!m_chart.isNull()) {
-                return new CmdActionItemMove(item, newPos, newInstance, m_chart.data(), m_layoutManager.data());
+            if (m_layoutManager->currentChart()) {
+                return new CmdActionItemMove(
+                        item, newPos, newInstance, m_layoutManager->currentChart(), m_layoutManager.data());
             }
         }
     }
@@ -390,7 +391,7 @@ QUndoCommand *CommandsFactory::createActionInformalText(const QVariantList &para
     if (MscAction *item = params.first().value<MscAction *>()) {
         const QString &text = params.last().toString();
         if (item->informalAction() != text) {
-            return new CmdActionInformalText(item, text, m_chart.data(), m_layoutManager.data());
+            return new CmdActionInformalText(item, text, m_layoutManager->currentChart(), m_layoutManager.data());
         }
     }
 
@@ -403,10 +404,11 @@ QUndoCommand *CommandsFactory::createTimerItemCreate(const QVariantList &params)
 
     auto timer = params.at(0).value<msc::MscTimer *>();
     auto timerType = params.at(1).value<msc::MscTimer::TimerType>();
-    if (!m_chart.isNull()) {
+    if (m_layoutManager->currentChart()) {
         auto instance = params.at(2).value<msc::MscInstance *>();
         int eventIndex = params.at(3).toInt();
-        return new CmdTimerItemCreate(timer, timerType, instance, eventIndex, m_chart.data(), m_layoutManager.data());
+        return new CmdTimerItemCreate(
+                timer, timerType, instance, eventIndex, m_layoutManager->currentChart(), m_layoutManager.data());
     }
 
     return nullptr;
@@ -419,8 +421,9 @@ QUndoCommand *CommandsFactory::createTimerItemMove(const QVariantList &params)
     if (msc::MscTimer *item = params.at(0).value<msc::MscTimer *>()) {
         int newPos = params.at(1).toInt();
         if (msc::MscInstance *newInstance = params.at(2).value<msc::MscInstance *>()) {
-            if (!m_chart.isNull()) {
-                return new CmdTimerItemMove(item, newPos, newInstance, m_chart.data(), m_layoutManager.data());
+            if (m_layoutManager->currentChart()) {
+                return new CmdTimerItemMove(
+                        item, newPos, newInstance, m_layoutManager->currentChart(), m_layoutManager.data());
             }
         }
     }
@@ -459,9 +462,9 @@ QUndoCommand *CommandsFactory::createChartGeometryChange(const QVariantList &par
 {
     Q_ASSERT(params.size() == 2);
 
-    if (!m_chart.isNull()) {
-        return new CmdChartItemChangeGeometry(
-                params.value(0).toRectF(), params.value(1).toRectF(), m_chart.data(), m_layoutManager.data());
+    if (m_layoutManager->currentChart()) {
+        return new CmdChartItemChangeGeometry(params.value(0).toRectF(), params.value(1).toRectF(),
+                m_layoutManager->currentChart(), m_layoutManager.data());
     }
 
     return nullptr;
@@ -471,7 +474,7 @@ QUndoCommand *CommandsFactory::createCommentGeometryChange(const QVariantList &p
 {
     Q_ASSERT(params.size() == 3);
 
-    if (m_chart.isNull()) {
+    if (!m_layoutManager->currentChart()) {
         return nullptr;
     }
 
@@ -486,7 +489,8 @@ QUndoCommand *CommandsFactory::createCommentGeometryChange(const QVariantList &p
             return nullptr;
         }
 
-        return new CmdCommentItemChangeGeometry(oldRect, newRect, entity, m_chart.data(), m_layoutManager.data());
+        return new CmdCommentItemChangeGeometry(
+                oldRect, newRect, entity, m_layoutManager->currentChart(), m_layoutManager.data());
     }
 
     return nullptr;
@@ -555,10 +559,10 @@ QUndoCommand *CommandsFactory::createEditMessagePoints(const QVariantList &param
 {
     Q_ASSERT(params.size() == 4);
 
-    if (!m_chart.isNull()) {
+    if (m_layoutManager->currentChart()) {
         if (auto message = params.at(0).value<MscMessage *>()) {
             return new CmdMessagePointsEdit(message, params.at(1).value<QVector<QPoint>>(),
-                    params.at(2).value<QVector<QPoint>>(), params.at(3).toInt(), m_chart.data(),
+                    params.at(2).value<QVector<QPoint>>(), params.at(3).toInt(), m_layoutManager->currentChart(),
                     m_layoutManager.data());
         }
     }

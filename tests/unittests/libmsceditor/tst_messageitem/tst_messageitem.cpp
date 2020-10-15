@@ -18,6 +18,7 @@
 #include "baseitems/common/coordinatesconverter.h"
 #include "chartitem.h"
 #include "chartlayoutmanager.h"
+#include "commands/common/commandsfactory.h"
 #include "commands/common/commandsstack.h"
 #include "exceptions.h"
 #include "messageitem.h"
@@ -142,6 +143,7 @@ void tst_MessageItem::init()
     m_chartModel = new ChartLayoutManager;
     m_undoStack = new QUndoStack();
     cmd::CommandsStack::setCurrent(m_undoStack);
+    cmd::CommandsStack::instance()->factory()->setChartLayoutManager(m_chartModel);
 
     m_view = new QGraphicsView();
     m_view->setScene(m_chartModel->graphicsScene());
