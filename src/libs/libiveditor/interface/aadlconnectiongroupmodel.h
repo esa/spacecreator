@@ -41,6 +41,9 @@ public:
     Qt::ItemFlags flags(const QModelIndex &index) const override;
 
 private:
+    bool isEnabled(const QModelIndex &index) const;
+
+private:
     aadl::AADLObjectConnectionGroup *m_connectionGroup;
     QList<QPointer<aadl::AADLObjectConnection>> m_allConnections;
     QSet<shared::Id> m_groupedConnetions;

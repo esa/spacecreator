@@ -56,16 +56,28 @@ AADLConnectionGroupModel::AADLConnectionGroupModel(aadl::AADLObjectConnectionGro
         }
     }
 
+    auto updateEnableState = [this]() {
+        if (m_groupedConnetions.size() == 1) {
+            if (auto model = m_connectionGroup->objectsModel()) {
+                aadl::AADLObjectConnection *connection = model->getConnection(*m_groupedConnetions.begin());
+                const QModelIndex idx = index(m_allConnections.indexOf(connection));
+                Q_EMIT dataChanged(idx, idx);
+            }
+        }
+    };
+
     connect(connectionGroup, &aadl::AADLObjectConnectionGroup::connectionAdded, this,
-            [this](aadl::AADLObjectConnection *connection) {
+            [this, updateEnableState](aadl::AADLObjectConnection *connection) {
+                updateEnableState();
                 m_groupedConnetions.insert(connection->id());
 
                 const QModelIndex idx = index(m_allConnections.indexOf(connection));
                 Q_EMIT dataChanged(idx, idx, { Qt::CheckStateRole });
             });
     connect(connectionGroup, &aadl::AADLObjectConnectionGroup::connectionRemoved, this,
-            [this](aadl::AADLObjectConnection *connection) {
+            [this, updateEnableState](aadl::AADLObjectConnection *connection) {
                 m_groupedConnetions.remove(connection->id());
+                updateEnableState();
 
                 const QModelIndex idx = index(m_allConnections.indexOf(connection));
                 Q_EMIT dataChanged(idx, idx, { Qt::CheckStateRole });
@@ -101,8 +113,12 @@ int AADLConnectionGroupModel::rowCount(const QModelIndex &parent) const
 
 bool AADLConnectionGroupModel::setData(const QModelIndex &index, const QVariant &value, int role)
 {
-    if (role != Qt::CheckStateRole)
+    if (!index.isValid()) {
         return false;
+    }
+    if (role != Qt::CheckStateRole) {
+        return false;
+    }
 
     const auto state = value.value<Qt::CheckState>();
     const auto connection = m_allConnections.at(index.row());
@@ -118,7 +134,18 @@ bool AADLConnectionGroupModel::setData(const QModelIndex &index, const QVariant 
 
 Qt::ItemFlags AADLConnectionGroupModel::flags(const QModelIndex &index) const
 {
-    return Qt::ItemIsEnabled | Qt::ItemIsUserCheckable;
+    return Qt::ItemIsUserCheckable | (isEnabled(index) ? Qt::ItemIsEnabled : Qt::NoItemFlags);
+}
+
+bool AADLConnectionGroupModel::isEnabled(const QModelIndex &index) const
+{
+    if (!index.isValid()) {
+        return false;
+    }
+    if (m_groupedConnetions.size() != 1) {
+        return true;
+    }
+    return !m_groupedConnetions.contains(m_allConnections.at(index.row())->id());
 }
 
 } // namespace aadlinterface
