@@ -93,7 +93,8 @@ QAction *EditorCore::actionNewFile()
     if (m_actionNewFile == nullptr) {
         m_actionNewFile = new QAction(tr("&New file"), this);
         m_actionNewFile->setShortcut(QKeySequence::New);
-        m_actionNewFile->setIcon(QIcon(QLatin1String(":/sharedresources/icons/newfile.svg")));
+        m_actionNewFile->setIcon(
+                QIcon::fromTheme("document-new", QIcon(QLatin1String(":/sharedresources/icons/newfile.svg"))));
     }
     return m_actionNewFile;
 }
@@ -103,7 +104,8 @@ QAction *EditorCore::actionOpenFile()
     if (m_actionOpenFile == nullptr) {
         m_actionOpenFile = new QAction(tr("&Open file..."), this);
         m_actionOpenFile->setShortcut(QKeySequence::Open);
-        m_actionOpenFile->setIcon(QIcon(QLatin1String(":/sharedresources/icons/open.svg")));
+        m_actionOpenFile->setIcon(
+                QIcon::fromTheme("document-open", QIcon(QLatin1String(":/sharedresources/icons/open.svg"))));
     }
     return m_actionOpenFile;
 }
@@ -113,7 +115,8 @@ QAction *EditorCore::actionSaveFile()
     if (m_actionSaveFile == nullptr) {
         m_actionSaveFile = new QAction(tr("&Save file"), this);
         m_actionSaveFile->setShortcut(QKeySequence::Save);
-        m_actionSaveFile->setIcon(QIcon(QLatin1String(":/sharedresources/icons/save.svg")));
+        m_actionSaveFile->setIcon(
+                QIcon::fromTheme("document-save", QIcon(QLatin1String(":/sharedresources/icons/save.svg"))));
     }
     return m_actionSaveFile;
 }
@@ -122,6 +125,7 @@ QAction *EditorCore::actionSaveFileAs()
 {
     if (m_actionSaveFileAs == nullptr) {
         m_actionSaveFileAs = new QAction(tr("Save file &as..."), this);
+        m_actionSaveFile->setIcon(QIcon::fromTheme("document-save"));
         m_actionSaveFileAs->setShortcut(QKeySequence::SaveAs);
     }
     return m_actionSaveFileAs;
@@ -165,7 +169,7 @@ QAction *EditorCore::actionUndo()
     if (m_actionUndo == nullptr) {
         m_actionUndo = m_undoGroup->createUndoAction(this);
         m_actionUndo->setShortcut(QKeySequence::Undo);
-        m_actionUndo->setIcon(QIcon(QLatin1String(":/sharedresources/icons/undo.svg")));
+        m_actionUndo->setIcon(QIcon::fromTheme("edit-undo", QIcon(QLatin1String(":/sharedresources/icons/undo.svg"))));
     }
     return m_actionUndo;
 }
@@ -175,7 +179,7 @@ QAction *EditorCore::actionRedo()
     if (m_actionRedo == nullptr) {
         m_actionRedo = m_undoGroup->createRedoAction(this);
         m_actionRedo->setShortcut(QKeySequence::Redo);
-        m_actionRedo->setIcon(QIcon(QLatin1String(":/sharedresources/icons/redo.svg")));
+        m_actionRedo->setIcon(QIcon::fromTheme("edit-redo", QIcon(QLatin1String(":/sharedresources/icons/redo.svg"))));
     }
     return m_actionRedo;
 }
