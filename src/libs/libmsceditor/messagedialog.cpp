@@ -51,10 +51,11 @@
    But the parameters a only checked after editing using the msc parser, as the parameters can be
    quite complex. See paramaterDefn in the msc.g4 grammar file.
  */
-MessageDialog::MessageDialog(msc::MscMessage *message, QWidget *parent)
+MessageDialog::MessageDialog(msc::MscMessage *message, QUndoStack *undoStack, QWidget *parent)
     : QDialog(parent)
     , ui(new Ui::MessageDialog)
     , m_message(message)
+    , m_undoStack(undoStack)
 {
     Q_ASSERT(message);
     ui->setupUi(this);
@@ -226,7 +227,7 @@ void MessageDialog::editDeclarations()
     if (docs.isEmpty())
         return;
 
-    MessageDeclarationsDialog dialog(declarations, mscModel(), this);
+    MessageDeclarationsDialog dialog(declarations, mscModel(), m_undoStack, this);
     dialog.setFileName(model->dataDefinitionString());
     dialog.setAadlConnectionNames(m_connectionNames);
 

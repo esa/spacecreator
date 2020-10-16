@@ -47,7 +47,7 @@ private Q_SLOTS:
     void testInsertingOrder();
 
 private:
-    ChartLayoutManager m_chartModel;
+    QScopedPointer<ChartLayoutManager> m_chartModel;
     static constexpr int CommandsCount = 10;
     msc::MscChart *m_chart = nullptr;
     QScopedPointer<QUndoStack> m_undoStack;
@@ -60,9 +60,10 @@ constexpr int tst_CmdInstanceItemCreate::CommandsCount;
 
 void tst_CmdInstanceItemCreate::initTestCase()
 {
-    m_chart = new msc::MscChart();
-    m_chartModel.setCurrentChart(m_chart);
     m_undoStack.reset(new QUndoStack);
+    m_chart = new msc::MscChart();
+    m_chartModel.reset(new msc::ChartLayoutManager(m_undoStack.data()));
+    m_chartModel->setCurrentChart(m_chart);
     m_undoStack->setUndoLimit(CommandsCount);
 }
 
@@ -73,13 +74,13 @@ void tst_CmdInstanceItemCreate::cleanupTestCase()
 
 void tst_CmdInstanceItemCreate::testCreate()
 {
-    m_chartModel.clearScene();
+    m_chartModel->clearScene();
     m_undoStack->clear();
 
     QCOMPARE(itemsCount(), 0);
-    QMetaObject::invokeMethod(&m_chartModel, "doLayout", Qt::DirectConnection);
+    QMetaObject::invokeMethod(m_chartModel.data(), "doLayout", Qt::DirectConnection);
     for (int i = 0; i < CommandsCount; ++i) {
-        auto cmd = new msc::cmd::CmdInstanceItemCreate(nullptr, -1, &m_chartModel);
+        auto cmd = new msc::cmd::CmdInstanceItemCreate(nullptr, -1, m_chartModel.data());
         m_undoStack->push(cmd);
     }
 
@@ -124,15 +125,15 @@ void tst_CmdInstanceItemCreate::testInsertingOrder()
     while (m_undoStack->canUndo()) {
         m_undoStack->undo();
     }
-    m_chartModel.clearScene();
+    m_chartModel->clearScene();
     m_undoStack->clear();
 
     QCOMPARE(itemsCount(), 0);
 
-    QMetaObject::invokeMethod(&m_chartModel, "doLayout", Qt::DirectConnection);
+    QMetaObject::invokeMethod(m_chartModel.data(), "doLayout", Qt::DirectConnection);
 
     for (const QString &name : names) {
-        auto cmd = new msc::cmd::CmdInstanceItemCreate(new msc::MscInstance(name), 0, &m_chartModel);
+        auto cmd = new msc::cmd::CmdInstanceItemCreate(new msc::MscInstance(name), 0, m_chartModel.data());
         m_undoStack->push(cmd);
     }
 

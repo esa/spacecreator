@@ -23,6 +23,7 @@
 #include <QGraphicsView>
 #include <QPointer>
 #include <QUndoStack>
+#include <memory>
 
 namespace msc {
 

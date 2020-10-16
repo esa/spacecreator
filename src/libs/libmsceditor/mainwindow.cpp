@@ -22,7 +22,7 @@
 #include "chartitem.h"
 #include "chartlayoutmanager.h"
 #include "commandlineparser.h"
-#include "commands/common/commandsstack.h"
+#include "commands/cmdsetasn1file.h"
 #include "documentitemmodel.h"
 #include "geometry.h"
 #include "graphicsview.h"
@@ -467,8 +467,7 @@ void MainWindow::initConnections()
     connect(d->ui->asn1Widget, &asn1::ASN1FileView::asn1Selected, this, [this]() {
         msc::MscModel *model = d->m_core->mainModel()->mscModel();
         if (model->dataDefinitionString() != d->ui->asn1Widget->fileName()) {
-            const QVariantList params { QVariant::fromValue(model), d->ui->asn1Widget->fileName(), "ASN.1" };
-            msc::cmd::CommandsStack::push(msc::cmd::Id::SetAsn1File, params);
+            d->m_core->undoStack()->push(new cmd::CmdSetAsn1File(model, d->ui->asn1Widget->fileName(), "ASN.1"));
         }
     });
     connect(d->m_core->mainModel(), &MainModel::asn1ParameterErrorDetected, this, &MainWindow::showAsn1Errors);

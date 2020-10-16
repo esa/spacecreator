@@ -68,7 +68,7 @@ private:
     QPointer<MessageItem> m_messageItem = nullptr;
 
     QGraphicsView *m_view = nullptr;
-    QUndoStack *m_undoStack = nullptr;
+    QScopedPointer<QUndoStack> m_undoStack;
 
     ChartLayoutManager *m_chartModel = nullptr;
     MscModel *m_mscModel = nullptr;
@@ -140,9 +140,9 @@ void tst_MessageItem::init()
 {
     vstest::saveMousePosition();
 
-    m_chartModel = new ChartLayoutManager;
-    m_undoStack = new QUndoStack();
-    cmd::CommandsStack::setCurrent(m_undoStack);
+    m_undoStack.reset(new QUndoStack);
+    m_chartModel = new ChartLayoutManager(m_undoStack.data());
+    cmd::CommandsStack::setCurrent(m_undoStack.data());
     cmd::CommandsStack::instance()->factory()->setChartLayoutManager(m_chartModel);
 
     m_view = new QGraphicsView();
@@ -159,8 +159,6 @@ void tst_MessageItem::cleanup()
     m_create = nullptr;
     delete m_view;
     m_view = nullptr;
-    delete m_undoStack;
-    m_undoStack = nullptr;
     delete m_chartModel;
     m_chartModel = nullptr;
 

@@ -26,6 +26,7 @@
 
 class QGraphicsScene;
 class QGraphicsObject;
+class QUndoStack;
 
 namespace shared {
 namespace ui {
@@ -63,7 +64,7 @@ class ChartLayoutManager : public QObject
     Q_PROPERTY(QRectF instanceRect READ instancesRect NOTIFY instancesRectChanged)
 
 public:
-    explicit ChartLayoutManager(QObject *parent = nullptr);
+    explicit ChartLayoutManager(QUndoStack *undoStack, QObject *parent = nullptr);
     ~ChartLayoutManager();
 
     QGraphicsScene *graphicsScene() const;
@@ -124,6 +125,8 @@ public:
     AadlChecks *aadlChecker() const;
 
     bool layoutUpdatePending() const;
+
+    QUndoStack *undoStack() const;
 
 public Q_SLOTS:
     void updateLayout();

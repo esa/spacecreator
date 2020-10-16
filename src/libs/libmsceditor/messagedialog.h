@@ -21,6 +21,8 @@
 #include <QPointer>
 #include <QStringList>
 
+class QUndoStack;
+
 namespace msc {
 class AadlChecks;
 class MscMessage;
@@ -40,7 +42,7 @@ class MessageDialog : public QDialog
     Q_OBJECT
 
 public:
-    explicit MessageDialog(msc::MscMessage *message, QWidget *parent = nullptr);
+    explicit MessageDialog(msc::MscMessage *message, QUndoStack *undoStack, QWidget *parent = nullptr);
     ~MessageDialog();
 
     void setAadlConnectionNames(const QStringList &names);
@@ -78,4 +80,5 @@ private:
     bool m_isValid = true;
     QStringList m_connectionNames;
     QPointer<msc::AadlChecks> m_aadlChecker;
+    QPointer<QUndoStack> m_undoStack;
 };

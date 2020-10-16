@@ -49,9 +49,9 @@ private:
 void tst_CmdEntityCommentChange::init()
 {
     m_chart.reset(new msc::MscChart());
-    m_layoutManager.reset(new msc::ChartLayoutManager);
-    m_layoutManager->setCurrentChart(m_chart.data());
     m_undoStack.reset(new QUndoStack);
+    m_layoutManager.reset(new msc::ChartLayoutManager(m_undoStack.data()));
+    m_layoutManager->setCurrentChart(m_chart.data());
 }
 
 void tst_CmdEntityCommentChange::testRedo()

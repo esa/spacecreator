@@ -137,7 +137,7 @@ void MessageItem::onTextChanged()
 void MessageItem::showMessageDialog()
 {
     if (m_message->messageType() == MscMessage::MessageType::Message) {
-        MessageDialog dialog(m_message);
+        MessageDialog dialog(m_message, m_chartLayoutManager->undoStack());
         dialog.setAadlChecker(m_chartLayoutManager->aadlChecker());
         dialog.exec();
     }

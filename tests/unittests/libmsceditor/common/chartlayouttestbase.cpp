@@ -30,19 +30,13 @@ namespace msc {
 
 void ChartLayoutTestBase::initBase()
 {
-    m_chartModel = std::make_unique<ChartLayoutManager>();
     m_undoStack = std::make_unique<QUndoStack>();
+    m_chartModel.reset(new ChartLayoutManager(m_undoStack.get()));
     cmd::CommandsStack::instance()->factory()->setChartLayoutManager(m_chartModel.get());
     cmd::CommandsStack::setCurrent(m_undoStack.get());
     m_view = std::make_unique<QGraphicsView>();
     m_view->setScene(m_chartModel->graphicsScene());
     m_reader = std::make_unique<MscReader>();
-
-    m_chartModel.reset(new ChartLayoutManager());
-    cmd::CommandsStack::instance()->factory()->setChartLayoutManager(m_chartModel.get());
-    m_view.reset(new QGraphicsView());
-    m_view->setScene(m_chartModel->graphicsScene());
-    m_reader.reset(new MscReader);
 
     CoordinatesConverter::instance()->setScene(m_chartModel->graphicsScene());
     const QPointF dpi1to1(CoordinatesConverter::Dpi1To1, CoordinatesConverter::Dpi1To1);

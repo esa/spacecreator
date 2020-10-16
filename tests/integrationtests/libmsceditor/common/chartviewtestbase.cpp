@@ -28,7 +28,6 @@
 #include <QGraphicsView>
 #include <QStandardPaths>
 #include <QTest>
-#include <QUndoStack>
 
 namespace msc {
 
@@ -41,7 +40,9 @@ void ChartViewTestBase::initTestCaseBase()
 void ChartViewTestBase::initBase()
 {
     vstest::saveMousePosition();
-    m_chartModel.reset(new ChartLayoutManager());
+    m_undoStack.reset(new QUndoStack);
+    m_chartModel.reset(new ChartLayoutManager(m_undoStack.data()));
+    cmd::CommandsStack::instance()->setCurrent(m_undoStack.data());
     cmd::CommandsStack::instance()->factory()->setChartLayoutManager(m_chartModel.get());
     m_view.reset(new QGraphicsView());
     m_view->setScene(m_chartModel->graphicsScene());

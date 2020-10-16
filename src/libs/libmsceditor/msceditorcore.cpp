@@ -19,6 +19,9 @@
 
 #include "aadlchecks.h"
 #include "commandlineparser.h"
+#include "commands/cmddocumentcreate.h"
+#include "commands/cmdsetasn1file.h"
+#include "commands/cmdsetmessagedeclarations.h"
 #include "commands/common/commandsstack.h"
 #include "graphicsview.h"
 #include "hierarchyviewmodel.h"
@@ -436,8 +439,7 @@ bool MSCEditorCore::renameAsnFile(const QString &oldName, const QString &newName
 
     MscModel *mscModel = m_model->mscModel();
     if (mscModel->dataDefinitionString() == oldFileName) {
-        const QVariantList params { QVariant::fromValue(mscModel), newFileName, "ASN.1" };
-        msc::cmd::CommandsStack::push(msc::cmd::Id::SetAsn1File, params);
+        undoStack()->push(new cmd::CmdSetAsn1File(mscModel, newFileName, "ASN.1"));
 
         Q_EMIT editedExternally(this);
         return true;
@@ -610,17 +612,14 @@ void MSCEditorCore::openMessageDeclarationEditor(QWidget *parentwidget)
         return;
     }
 
-    MessageDeclarationsDialog dialog(docs.at(0)->messageDeclarations(), model, parentwidget);
+    MessageDeclarationsDialog dialog(docs.at(0)->messageDeclarations(), model, undoStack(), parentwidget);
     dialog.setAadlConnectionNames(m_aadlChecks->connectionNames());
     int result = dialog.exec();
     if (result == QDialog::Accepted) {
-        msc::cmd::CommandsStack::current()->beginMacro("Edit message declarations");
-        const QVariantList cmdParams = { QVariant::fromValue<msc::MscDocument *>(docs.at(0)),
-            QVariant::fromValue<msc::MscMessageDeclarationList *>(dialog.declarations()) };
-        msc::cmd::CommandsStack::push(msc::cmd::Id::SetMessageDeclarations, cmdParams);
-        const QVariantList params { QVariant::fromValue(model), dialog.fileName(), "ASN.1" };
-        msc::cmd::CommandsStack::push(msc::cmd::Id::SetAsn1File, params);
-        msc::cmd::CommandsStack::current()->endMacro();
+        undoStack()->beginMacro("Edit message declarations");
+        undoStack()->push(new cmd::CmdSetMessageDeclarations(docs.at(0), dialog.declarations()));
+        undoStack()->push(new cmd::CmdSetAsn1File(model, dialog.fileName(), "ASN.1"));
+        undoStack()->endMacro();
     }
 }
 
@@ -677,9 +676,7 @@ void MSCEditorCore::addDocument(MscDocument::HierarchyType type)
     MscDocument *document = new MscDocument(QObject::tr("Document_%1").arg(parentDoc->documents().size()));
     document->setHierarchyType(type);
 
-    const QVariantList &cmdParams = { QVariant::fromValue<msc::MscDocument *>(document),
-        QVariant::fromValue<msc::MscDocument *>(parentDoc) };
-    msc::cmd::CommandsStack::push(msc::cmd::Id::CreateDocument, cmdParams);
+    undoStack()->push(new cmd::CmdDocumentCreate(document, parentDoc));
 
     m_model->setSelectedDocument(document);
 }

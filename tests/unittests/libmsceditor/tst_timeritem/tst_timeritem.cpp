@@ -21,6 +21,8 @@
 #include "msctimer.h"
 #include "timeritem.h"
 
+#include <QScopedPointer>
+#include <QUndoStack>
 #include <QtTest>
 
 using namespace msc;
@@ -45,11 +47,13 @@ private:
     TimerItem *m_timerItem = nullptr;
     MscInstance *m_instance = nullptr;
     ChartLayoutManager *m_model = nullptr;
+    QScopedPointer<QUndoStack> m_undoStack;
 };
 
 void tst_TimerItem::init()
 {
-    m_model = new ChartLayoutManager;
+    m_undoStack.reset(new QUndoStack);
+    m_model = new ChartLayoutManager(m_undoStack.data());
     m_instance = new MscInstance;
 
     m_timer = new MscTimer();

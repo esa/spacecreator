@@ -24,6 +24,7 @@
 #include "mscinstance.h"
 
 #include <QGraphicsScene>
+#include <QUndoStack>
 #include <QtTest>
 #include <chrono>
 #include <random>
@@ -51,6 +52,7 @@ private:
     QScopedPointer<msc::MscChart> m_chart;
     QPointer<InstanceItem> m_item1;
     QPointer<InstanceItem> m_item2;
+    QScopedPointer<QUndoStack> m_undoStack;
 
     QRectF instanceRect(const InstanceItem *const instance) const;
     int scenePopulation() const;
@@ -58,7 +60,8 @@ private:
 
 void tst_ArrowItem::initTestCase()
 {
-    m_model.reset(new ChartLayoutManager);
+    m_undoStack.reset(new QUndoStack);
+    m_model.reset(new ChartLayoutManager(m_undoStack.data()));
     m_chart.reset(new msc::MscChart);
     m_model->setCurrentChart(m_chart.data());
     m_scene.reset(new QGraphicsScene);

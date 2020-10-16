@@ -24,6 +24,7 @@
 #include <QVariantMap>
 
 namespace msc {
+class ChartLayoutManager;
 class MainModel;
 
 class RemoteControlHandler : public QObject
@@ -50,6 +51,8 @@ private:
     bool handleActionCommand(const QVariantMap &params, QString *errorString);
     bool handleConditionCommand(const QVariantMap &params, QString *errorString);
     bool handleMessageDeclarationCommand(const QVariantMap &params, QString *errorString);
+
+    msc::ChartLayoutManager *chartViewModel() const;
 
     QPointer<msc::MainModel> m_model;
 };

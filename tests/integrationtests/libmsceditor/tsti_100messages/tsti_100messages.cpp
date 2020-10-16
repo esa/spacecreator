@@ -18,8 +18,6 @@
 #include "baseitems/arrowitem.h"
 #include "chartlayoutmanager.h"
 #include "commands/cmdmessageitemcreate.h"
-#include "commands/common/commandsfactory.h"
-#include "commands/common/commandsstack.h"
 #include "instanceitem.h"
 #include "messageitem.h"
 #include "mscchart.h"
@@ -31,6 +29,7 @@
 #include <QGraphicsView>
 #include <QPainterPath>
 #include <QPointer>
+#include <QUndoStack>
 #include <QtTest>
 
 using namespace msc;
@@ -54,7 +53,9 @@ private:
         QApplication::processEvents();
     }
 
-    ChartLayoutManager m_model;
+    QScopedPointer<QUndoStack> m_undoStack;
+    QScopedPointer<ChartLayoutManager> m_model;
+    QScopedPointer<msc::MscChart> m_chart;
     QPointer<QGraphicsView> m_view;
     QPointer<InstanceItem> m_instanceItem;
     static constexpr int CommandsCount = 100;
@@ -72,20 +73,20 @@ void tsti100messages::initTestCase()
 {
     vstest::saveMousePosition();
 
-    QScopedPointer<msc::MscChart> chart(new msc::MscChart());
-    m_model.setCurrentChart(chart.data());
-    cmd::CommandsStack::setCurrent(new QUndoStack(this));
-    cmd::CommandsStack::current()->setUndoLimit(CommandsCount);
-    cmd::CommandsStack::instance()->factory()->setChartLayoutManager(&m_model);
+    m_undoStack.reset(new QUndoStack);
+    m_model.reset(new ChartLayoutManager(m_undoStack.data()));
+    m_chart.reset(new msc::MscChart());
+    m_model->setCurrentChart(m_chart.data());
+    m_undoStack->setUndoLimit(CommandsCount);
 
-    m_instanceItem = new InstanceItem(new MscInstance("Instance", this), &m_model);
+    m_instanceItem = new InstanceItem(new MscInstance("Instance", this), m_model.data());
     m_instanceItem->setAxisHeight(2 * CommandsCount);
     m_instanceItem->setPos(CommandsCount, 0.);
-    m_model.graphicsScene()->addItem(m_instanceItem);
+    m_model->graphicsScene()->addItem(m_instanceItem);
     m_view = new QGraphicsView();
-    m_view->setScene(m_model.graphicsScene());
+    m_view->setScene(m_model->graphicsScene());
 
-    m_model.graphicsScene()->setSceneRect(0., 0, 2. * CommandsCount, 2. * CommandsCount);
+    m_model->graphicsScene()->setSceneRect(0., 0, 2. * CommandsCount, 2. * CommandsCount);
 
     if (IsLocalBuild)
         m_view->show();
@@ -114,16 +115,13 @@ void tsti100messages::testPerformance()
                                  .arg(CommandsCount)));
     QBENCHMARK {
         const QPointF &instacneCenter = m_instanceItem->boundingRect().translated(m_instanceItem->pos()).center();
-        const QPointF &messagePos = { instacneCenter.x() - ArrowItem::defaultWidth() / 2, instacneCenter.y() };
 
-        QVariantList params = { QVariant::fromValue<QGraphicsScene *>(m_model.graphicsScene()), QPointF() };
+        QVariantList params = { QVariant::fromValue<QGraphicsScene *>(m_model->graphicsScene()), QPointF() };
 
         for (int j = 0; j < CommandsCount / 2; ++j) {
+            m_undoStack->push(new msc::cmd::CmdMessageItemCreate(nullptr, -1, m_model.data()));
+            m_undoStack->push(new msc::cmd::CmdMessageItemCreate(nullptr, -1, m_model.data()));
 
-            params.replace(2, QPointF(messagePos.x(), messagePos.y() + j));
-            cmd::CommandsStack::push(cmd::Id::CreateMessage, params);
-            params.replace(2, QPointF(messagePos.x(), messagePos.y() - j));
-            cmd::CommandsStack::push(cmd::Id::CreateMessage, params);
             if (IsLocalBuild) {
                 waitForLayoutUpdate();
             }
@@ -131,8 +129,8 @@ void tsti100messages::testPerformance()
 
         moveInstance(m_view->mapFromScene(instacneCenter));
 
-        while (cmd::CommandsStack::current()->canUndo()) {
-            cmd::CommandsStack::current()->undo();
+        while (m_undoStack->canUndo()) {
+            m_undoStack->undo();
             if (IsLocalBuild) {
                 waitForLayoutUpdate();
             }

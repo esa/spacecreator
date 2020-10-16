@@ -24,7 +24,11 @@
 #include "baseitems/instanceenditem.h"
 #include "baseitems/instanceheaditem.h"
 #include "chartitem.h"
-#include "commands/common/commandsstack.h"
+#include "commands/cmdactionitemmove.h"
+#include "commands/cmdconditionitemmove.h"
+#include "commands/cmdcoregionitemmove.h"
+#include "commands/cmdmessageitemresize.h"
+#include "commands/cmdtimeritemmove.h"
 #include "commentitem.h"
 #include "conditionitem.h"
 #include "coregionitem.h"
@@ -45,6 +49,7 @@
 #include <QMap>
 #include <QPointer>
 #include <QTimer>
+#include <QUndoStack>
 #include <QVector>
 #include <cmath>
 #include <limits>
@@ -99,6 +104,7 @@ struct ChartLayoutManagerPrivate {
     QHash<QUuid, msc::InteractiveObject *> m_instanceEventItems;
     QVector<msc::InteractiveObject *> m_instanceEventItemsSorted;
     QPointer<msc::AadlChecks> m_aadlChecker;
+    QPointer<QUndoStack> m_undoStack;
 
     QPointer<msc::MscChart> m_currentChart = nullptr;
     static qreal interMessageSpan()
@@ -163,13 +169,16 @@ struct ChartLayoutManagerPrivate {
     }
 };
 
-ChartLayoutManager::ChartLayoutManager(QObject *parent)
+ChartLayoutManager::ChartLayoutManager(QUndoStack *undoStack, QObject *parent)
     : QObject(parent)
     , d(new ChartLayoutManagerPrivate())
 {
     d->m_layoutUpdateTimer.setInterval(1);
     d->m_layoutUpdateTimer.setSingleShot(true);
     connect(&d->m_layoutUpdateTimer, &QTimer::timeout, this, &msc::ChartLayoutManager::doLayout);
+
+    Q_ASSERT(undoStack != nullptr);
+    d->m_undoStack = undoStack;
 }
 
 ChartLayoutManager::~ChartLayoutManager()
@@ -1549,8 +1558,7 @@ void ChartLayoutManager::onInstanceEventItemMoved(shared::ui::InteractiveObjectB
         const int currentIdx = d->m_currentChart->instanceEvents().indexOf(actionItem->modelItem());
         const int newIdx = eventIndex(item->y());
         if (!newInstance || newInstance != actionItem->modelItem()->instance() || newIdx != currentIdx) {
-            msc::cmd::CommandsStack::push(msc::cmd::MoveAction,
-                    { QVariant::fromValue(actionItem->modelItem()), newIdx, QVariant::fromValue(newInstance) });
+            d->m_undoStack->push(new cmd::CmdActionItemMove(actionItem->modelItem(), newIdx, newInstance, this));
         }
     }
 
@@ -1562,9 +1570,7 @@ void ChartLayoutManager::onInstanceEventItemMoved(shared::ui::InteractiveObjectB
         const int currentIdx = d->m_currentChart->instanceEvents().indexOf(conditionItem->modelItem());
         const int newIdx = eventIndex(item->y());
         if (!newInstance || newInstance != conditionItem->modelItem()->instance() || newIdx != currentIdx) {
-            msc::cmd::CommandsStack::push(msc::cmd::MoveCondition,
-                    { QVariant::fromValue<MscCondition *>(conditionItem->modelItem()), newIdx,
-                            QVariant::fromValue<MscInstance *>(newInstance) });
+            d->m_undoStack->push(new cmd::CmdConditionItemMove(conditionItem->modelItem(), newIdx, newInstance, this));
         }
     }
 
@@ -1573,9 +1579,7 @@ void ChartLayoutManager::onInstanceEventItemMoved(shared::ui::InteractiveObjectB
         const int currentIdx = d->m_currentChart->instanceEvents().indexOf(timerItem->modelItem());
         const int newIdx = eventIndex(item->y());
         if (!newInstance || newInstance != timerItem->modelItem()->instance() || newIdx != currentIdx) {
-            msc::cmd::CommandsStack::push(msc::cmd::MoveTimer,
-                    { QVariant::fromValue<MscTimer *>(timerItem->modelItem()), newIdx,
-                            QVariant::fromValue<MscInstance *>(newInstance) });
+            d->m_undoStack->push(new cmd::CmdTimerItemMove(timerItem->modelItem(), newIdx, newInstance, this));
         }
     }
 
@@ -1587,10 +1591,8 @@ void ChartLayoutManager::onInstanceEventItemMoved(shared::ui::InteractiveObjectB
         const int newIdxEnd = eventIndex(item->sceneBoundingRect().bottom());
         if (!newInstance || newInstance != coregionItem->begin()->instance() || currentBeginIdx != newIdxBegin
                 || currentEndIdx != newIdxEnd) {
-            msc::cmd::CommandsStack::push(msc::cmd::MoveCoRegion,
-                    { QVariant::fromValue<MscCoregion *>(coregionItem->begin()),
-                            QVariant::fromValue<MscCoregion *>(coregionItem->end()), newIdxBegin, newIdxEnd,
-                            QVariant::fromValue<MscInstance *>(newInstance) });
+            d->m_undoStack->push(new cmd::CmdCoRegionItemMove(
+                    coregionItem->begin(), coregionItem->end(), newIdxBegin, newIdxEnd, newInstance, this));
         }
     }
 
@@ -1624,9 +1626,7 @@ void ChartLayoutManager::onMessageRetargeted(MessageItem *item, const QPointF &p
         } else {
             item->updateCif();
         }
-        msc::cmd::CommandsStack::push(msc::cmd::RetargetMessage,
-                { QVariant::fromValue<MscMessage *>(message), newIdx, QVariant::fromValue<MscInstance *>(newInstance),
-                        QVariant::fromValue<MscMessage::EndType>(endType) });
+        d->m_undoStack->push(new cmd::CmdMessageItemResize(message, newIdx, newInstance, endType, this));
     } else {
         if (item->geometryManagedByCif())
             item->applyCif();
@@ -1885,6 +1885,15 @@ AadlChecks *ChartLayoutManager::aadlChecker() const
 bool ChartLayoutManager::layoutUpdatePending() const
 {
     return d->m_layoutUpdateTimer.isActive();
+}
+
+/*!
+   Returns the undo stack used for the modles displayed by this ChartLayoutManager
+   \note The QUndoStack object is owned by some other class
+ */
+QUndoStack *ChartLayoutManager::undoStack() const
+{
+    return d->m_undoStack;
 }
 
 void ChartLayoutManager::setInstancesRect(const QRectF &rect)

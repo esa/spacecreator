@@ -19,7 +19,7 @@
 
 #include "asn1fileview.h"
 #include "chartlayoutmanager.h"
-#include "commands/common/commandsstack.h"
+#include "commands/cmdsetasn1file.h"
 #include "documentitemmodel.h"
 #include "documenttreeview.h"
 #include "graphicsview.h"
@@ -312,8 +312,8 @@ void MscMainWidget::initConnections()
     connect(m_asn1Widget, &asn1::ASN1FileView::asn1Selected, this, [this](QString fileName) {
         msc::MscModel *model = m_plugin->mainModel()->mscModel();
         if (model && model->dataDefinitionString() != m_asn1Widget->fileName()) {
-            const QVariantList params { QVariant::fromValue(model), m_asn1Widget->fileName(), "ASN.1" };
-            msc::cmd::CommandsStack::push(msc::cmd::Id::SetAsn1File, params);
+            m_plugin->mainModel()->undoStack()->push(
+                    new msc::cmd::CmdSetAsn1File(model, m_asn1Widget->fileName(), "ASN.1"));
         }
         Q_EMIT asn1Selected(fileName);
     });

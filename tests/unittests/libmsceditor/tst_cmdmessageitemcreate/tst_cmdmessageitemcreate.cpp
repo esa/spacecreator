@@ -47,7 +47,7 @@ private Q_SLOTS:
     void testInsertingOrder();
 
 private:
-    ChartLayoutManager m_chartModel;
+    QScopedPointer<ChartLayoutManager> m_chartModel;
     static constexpr int CommandsCount = 10;
     static constexpr bool SkipBenchmark = true; // not a really usefull thing to be run on the CI server
     msc::MscChart *m_chart = nullptr;
@@ -65,9 +65,10 @@ const QVariant tst_CmdMessageItemCreate::m_dummyCif = QVariant::fromValue<QVecto
 
 void tst_CmdMessageItemCreate::initTestCase()
 {
-    m_chart = new msc::MscChart();
-    m_chartModel.setCurrentChart(m_chart);
     m_undoStack.reset(new QUndoStack);
+    m_chart = new msc::MscChart();
+    m_chartModel.reset(new msc::ChartLayoutManager(m_undoStack.data()));
+    m_chartModel->setCurrentChart(m_chart);
     m_undoStack->setUndoLimit(CommandsCount);
 }
 
@@ -78,13 +79,8 @@ void tst_CmdMessageItemCreate::cleanupTestCase()
 
 void tst_CmdMessageItemCreate::testCreate()
 {
-    m_chartModel.clearScene();
-    m_undoStack->clear();
-
-    QCOMPARE(itemsCount(), 0);
-
     for (int i = 0; i < CommandsCount; ++i) {
-        auto cmd = new msc::cmd::CmdMessageItemCreate(nullptr, -1, &m_chartModel);
+        auto cmd = new msc::cmd::CmdMessageItemCreate(nullptr, -1, m_chartModel.data());
         m_undoStack->push(cmd);
     }
 
@@ -125,18 +121,18 @@ void tst_CmdMessageItemCreate::testPerformance()
                                  "It's intended for manual testing, so skipped here.")
                                  .arg(CommandsCount)));
 
-    m_chartModel.clearScene();
+    m_chartModel->clearScene();
     m_undoStack->clear();
 
     QCOMPARE(itemsCount(), 0);
 
     QBENCHMARK {
-        m_chartModel.graphicsScene()->setSceneRect(
+        m_chartModel->graphicsScene()->setSceneRect(
                 -CommandsCount, -CommandsCount, 2. * CommandsCount, 2. * CommandsCount);
 
         // create:
         for (int i = 0; i < CommandsCount; ++i) {
-            auto cmd = new msc::cmd::CmdMessageItemCreate(nullptr, -1, &m_chartModel);
+            auto cmd = new msc::cmd::CmdMessageItemCreate(nullptr, -1, m_chartModel.data());
             m_undoStack->push(cmd);
         }
 
@@ -167,13 +163,13 @@ void tst_CmdMessageItemCreate::testInsertingOrder()
 
     while (m_undoStack->canUndo())
         m_undoStack->undo();
-    m_chartModel.clearScene();
+    m_chartModel->clearScene();
     m_undoStack->clear();
 
     QCOMPARE(itemsCount(), 0);
 
     for (const QString &name : names) {
-        auto cmd = new msc::cmd::CmdMessageItemCreate(new msc::MscMessage(name), 0, &m_chartModel);
+        auto cmd = new msc::cmd::CmdMessageItemCreate(new msc::MscMessage(name), 0, m_chartModel.data());
         m_undoStack->push(cmd);
     }
 

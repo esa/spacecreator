@@ -20,6 +20,7 @@
 #include "asn1xmlparser.h"
 #include "astxmlparser.h"
 #include "chartlayoutmanager.h"
+#include "commands/cmdpastechart.h"
 #include "commands/common/commandsfactory.h"
 #include "commands/common/commandsstack.h"
 #include "documentitemmodel.h"
@@ -61,7 +62,8 @@ struct MainModelPrivate {
 #else
                   "../../msceditor/examples"
 #endif // QT_DEBUG and Q_OS_WIN
-          )
+                          )
+        , m_chartLayoutManager(&m_undoStack)
     {
     }
     ~MainModelPrivate()
@@ -70,6 +72,7 @@ struct MainModelPrivate {
         delete m_documentItemModel;
     }
 
+    QUndoStack m_undoStack;
     MscModel *m_mscModel = nullptr; /// model of the msc data
     QStringList m_mscErrorMessages;
     ChartLayoutManager m_chartLayoutManager; /// model for the chart UI
@@ -78,8 +81,6 @@ struct MainModelPrivate {
     QPointer<msc::MscDocument> m_selectedDocument;
     QString m_currentFilePath;
     QFileSystemWatcher *m_asn1Watcher = nullptr;
-
-    QUndoStack m_undoStack;
 };
 
 /*!
@@ -382,15 +383,13 @@ void MainModel::copyCurrentChartAsPicture()
 void MainModel::pasteChart()
 {
     msc::MscDocument *document = d->m_selectedDocument;
-    if (document == nullptr)
+    if (document == nullptr) {
         return;
+    }
 
     const QMimeData *mideData = QApplication::clipboard()->mimeData();
-
     if (mideData->hasFormat(MscChartMimeType)) {
-        const QVariantList &cmdParams = { QVariant::fromValue<msc::MscDocument *>(document),
-            mideData->data(MscChartMimeType) };
-        msc::cmd::CommandsStack::push(msc::cmd::Id::PasteChart, cmdParams);
+        d->m_undoStack.push(new cmd::CmdPasteChart(document, mideData->data(MscChartMimeType)));
         setSelectedDocument(document);
     }
 }

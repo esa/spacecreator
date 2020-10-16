@@ -18,7 +18,7 @@
 #include "messagedeclarationsdialog.h"
 
 #include "asn1xmlparser.h"
-#include "commands/common/commandsstack.h"
+#include "commands/cmdsetasn1file.h"
 #include "definitions.h"
 #include "file.h"
 #include "mscdocument.h"
@@ -35,13 +35,15 @@
 #include <QKeyEvent>
 #include <QRegExpValidator>
 #include <QTimer>
+#include <QUndoStack>
 
 MessageDeclarationsDialog::MessageDeclarationsDialog(
-        msc::MscMessageDeclarationList *model, msc::MscModel *mscModel, QWidget *parent)
+        msc::MscMessageDeclarationList *model, msc::MscModel *mscModel, QUndoStack *undoStack, QWidget *parent)
     : QDialog(parent)
     , ui(new Ui::MessageDeclarationsDialog)
     , m_model(model->clone())
     , m_mscModel(mscModel)
+    , m_undoStack(undoStack)
 {
     Q_ASSERT(m_model);
     Q_ASSERT(m_mscModel);
@@ -265,8 +267,7 @@ void MessageDeclarationsDialog::selectAsn1File()
         if (errors.isEmpty()) {
             updateAsn1TypesView();
             m_fileName = fileInfo.fileName();
-            const QVariantList params { QVariant::fromValue(m_mscModel), m_fileName, "ASN.1" };
-            msc::cmd::CommandsStack::push(msc::cmd::Id::SetAsn1File, params);
+            m_undoStack->push(new msc::cmd::CmdSetAsn1File(m_mscModel, m_fileName, "ASN.1"));
             m_mscModel->setAsn1TypesData(sharedTypes);
         } else {
             qWarning() << "File" << fileName << "is no valid ASN.1 file:" << errors;
