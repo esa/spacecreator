@@ -29,8 +29,7 @@ namespace cmd {
 class CmdEntityCommentChange : public ChartBaseCommand
 {
 public:
-    CmdEntityCommentChange(
-            MscEntity *item, const QString &newComment, msc::MscChart *chart, ChartLayoutManager *layoutManager);
+    CmdEntityCommentChange(MscEntity *item, const QString &newComment, ChartLayoutManager *layoutManager);
 
     void redo() override;
     void undo() override;

@@ -19,6 +19,7 @@
 
 #include "baseitems/common/coordinatesconverter.h"
 #include "chartitem.h"
+#include "chartlayoutmanager.h"
 #include "common/commandids.h"
 #include "mscchart.h"
 
@@ -26,8 +27,8 @@ namespace msc {
 namespace cmd {
 
 CmdChartItemChangeGeometry::CmdChartItemChangeGeometry(
-        const QRectF &oldRect, const QRectF &newRect, MscChart *chart, ChartLayoutManager *layoutManager)
-    : ChartBaseCommand(chart, chart, layoutManager)
+        const QRectF &oldRect, const QRectF &newRect, ChartLayoutManager *layoutManager)
+    : ChartBaseCommand(layoutManager->currentChart(), layoutManager)
     , m_oldRect(oldRect)
     , m_newRect(newRect)
 {

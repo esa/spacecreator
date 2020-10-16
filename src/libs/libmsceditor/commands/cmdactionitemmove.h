@@ -34,8 +34,8 @@ namespace cmd {
 class CmdActionItemMove : public ChartBaseCommand
 {
 public:
-    CmdActionItemMove(msc::MscAction *action, int newPos, msc::MscInstance *newInsance, MscChart *chart,
-            ChartLayoutManager *layoutManager);
+    CmdActionItemMove(
+            msc::MscAction *action, int newPos, msc::MscInstance *newInsance, ChartLayoutManager *layoutManager);
 
     void redo() override;
     void undo() override;

@@ -28,8 +28,8 @@ namespace msc {
 namespace cmd {
 
 CmdMessagePointsEdit::CmdMessagePointsEdit(MscMessage *message, const QVector<QPoint> &cifPointsOld,
-        const QVector<QPoint> &cifPointsNew, int newIdx, MscChart *chart, ChartLayoutManager *layoutManager)
-    : ChartBaseCommand(message, chart, layoutManager)
+        const QVector<QPoint> &cifPointsNew, int newIdx, ChartLayoutManager *layoutManager)
+    : ChartBaseCommand(message, layoutManager)
     , m_message(message)
     , m_newCif(cifPointsNew)
     , m_oldCif(cifPointsOld)

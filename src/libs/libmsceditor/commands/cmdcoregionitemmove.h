@@ -34,7 +34,7 @@ class CmdCoRegionItemMove : public ChartBaseCommand
     Q_OBJECT
 public:
     CmdCoRegionItemMove(MscCoregion *coregionBegin, MscCoregion *coregionEnd, int newBeginPos, int newEndPos,
-            MscInstance *newInsance, msc::MscChart *chart, ChartLayoutManager *layoutManager);
+            MscInstance *newInsance, ChartLayoutManager *layoutManager);
 
     void redo() override;
     void undo() override;

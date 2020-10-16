@@ -32,7 +32,7 @@ namespace cmd {
 class CmdActionItemCreate : public ChartBaseCommand
 {
 public:
-    CmdActionItemCreate(msc::MscAction *action, msc::MscInstance *instance, int eventIndex, msc::MscChart *chart,
+    CmdActionItemCreate(msc::MscAction *action, msc::MscInstance *instance, int eventIndex,
             ChartLayoutManager *layoutManager);
 
     void redo() override;

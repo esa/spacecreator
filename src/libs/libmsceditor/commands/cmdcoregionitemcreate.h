@@ -34,7 +34,7 @@ class CmdCoregionItemCreate : public ChartBaseCommand
     Q_OBJECT
 public:
     explicit CmdCoregionItemCreate(msc::MscCoregion *begin, msc::MscCoregion *end, msc::MscInstance *instance,
-            int eventIndex, msc::MscChart *chart, ChartLayoutManager *layoutManager);
+            int eventIndex, ChartLayoutManager *layoutManager);
     void redo() override;
     void undo() override;
     bool mergeWith(const QUndoCommand *command) override;

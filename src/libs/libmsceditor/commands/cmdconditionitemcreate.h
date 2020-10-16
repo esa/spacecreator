@@ -32,8 +32,7 @@ namespace cmd {
 class CmdConditionItemCreate : public ChartBaseCommand
 {
 public:
-    CmdConditionItemCreate(msc::MscCondition *condition, msc::MscInstance *instance, int eventIndex,
-            msc::MscChart *chart, ChartLayoutManager *layoutManager);
+    CmdConditionItemCreate(msc::MscCondition *condition, msc::MscInstance *instance, int eventIndex, ChartLayoutManager *layoutManager);
 
     void redo() override;
     void undo() override;

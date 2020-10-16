@@ -23,9 +23,8 @@
 namespace msc {
 namespace cmd {
 
-CmdInstanceStopChange::CmdInstanceStopChange(
-        msc::MscInstance *item, bool newValue, MscChart *chart, ChartLayoutManager *layoutManager)
-    : ChartBaseCommand(item, chart, layoutManager)
+CmdInstanceStopChange::CmdInstanceStopChange(msc::MscInstance *item, bool newValue, ChartLayoutManager *layoutManager)
+    : ChartBaseCommand(item, layoutManager)
     , m_instance(item)
     , m_newExStop(newValue)
 {

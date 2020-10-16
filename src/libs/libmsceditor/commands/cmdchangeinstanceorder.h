@@ -31,7 +31,7 @@ namespace cmd {
 class CmdChangeInstanceOrder : public ChartBaseCommand
 {
 public:
-    CmdChangeInstanceOrder(msc::MscInstance *instance, int pos, MscChart *chart, ChartLayoutManager *layoutManager);
+    CmdChangeInstanceOrder(msc::MscInstance *instance, int pos, ChartLayoutManager *layoutManager);
 
     void redo() override;
     void undo() override;

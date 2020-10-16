@@ -29,8 +29,8 @@ namespace msc {
 namespace cmd {
 
 CmdDeleteEntity::CmdDeleteEntity(
-        QVector<MscEntity *> items, msc::MscDocument *document, msc::MscChart *chart, ChartLayoutManager *layoutManager)
-    : ChartBaseCommand(nullptr, chart, layoutManager)
+        QVector<MscEntity *> items, msc::MscDocument *document, ChartLayoutManager *layoutManager)
+    : ChartBaseCommand(nullptr, layoutManager)
     , m_document(document)
 {
     setText(QObject::tr("Delete"));

@@ -35,7 +35,7 @@ namespace cmd {
 class CmdMessageItemCreate : public ChartBaseCommand
 {
 public:
-    CmdMessageItemCreate(msc::MscMessage *message, int eventIndex, msc::MscChart *chart,
+    CmdMessageItemCreate(msc::MscMessage *message, int eventIndex,
             ChartLayoutManager *layoutManager, const QVector<QPoint> &points = QVector<QPoint>());
 
     void redo() override;

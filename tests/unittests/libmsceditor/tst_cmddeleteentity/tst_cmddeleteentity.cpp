@@ -69,7 +69,7 @@ void tst_CmdDeleteEntity::testUndoMessageDelete()
     const QRectF loadedGeometry = messageItem->sceneBoundingRect();
 
     // delete the message
-    auto deleteCmd = new msc::cmd::CmdDeleteEntity({ message }, nullptr, m_chart.data(), m_chartModel.get());
+    auto deleteCmd = new msc::cmd::CmdDeleteEntity({ message }, nullptr, m_chartModel.get());
     msc::cmd::CommandsStack::current()->push(deleteCmd);
     QCOMPARE(m_chart->instanceEvents().size(), 0);
 

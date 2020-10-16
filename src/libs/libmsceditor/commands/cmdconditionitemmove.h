@@ -32,7 +32,7 @@ namespace cmd {
 class CmdConditionItemMove : public ChartBaseCommand
 {
 public:
-    CmdConditionItemMove(MscCondition *condition, int newPos, msc::MscInstance *newInsance, msc::MscChart *chart,
+    CmdConditionItemMove(MscCondition *condition, int newPos, msc::MscInstance *newInsance,
             ChartLayoutManager *layoutManager);
 
     void redo() override;

@@ -112,7 +112,7 @@ void tsti_Chartitem::testItemLimit()
 
     // append one action
     auto instanceA = qobject_cast<msc::MscInstance *>(m_chart->instances().at(0));
-    auto addCommand = new cmd::CmdActionItemCreate(nullptr, instanceA, -1, m_chart, m_chartModel.data());
+    auto addCommand = new cmd::CmdActionItemCreate(nullptr, instanceA, -1, m_chartModel.data());
     cmd::CommandsStack::current()->push(addCommand);
     waitForLayoutUpdate();
     QCOMPARE(m_chart->instanceEvents().size(), 4);
@@ -125,7 +125,7 @@ void tsti_Chartitem::testItemLimit()
     QVERIFY(action3 != nullptr);
 
     // append one more action, pusing the message to the top
-    addCommand = new cmd::CmdActionItemCreate(nullptr, instanceA, -1, m_chart, m_chartModel.data());
+    addCommand = new cmd::CmdActionItemCreate(nullptr, instanceA, -1, m_chartModel.data());
     cmd::CommandsStack::current()->push(addCommand);
     waitForLayoutUpdate();
     QCOMPARE(m_chart->instanceEvents().size(), 5);

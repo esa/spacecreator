@@ -32,8 +32,7 @@ class CmdChartItemChangeGeometry : public ChartBaseCommand
 {
     Q_OBJECT
 public:
-    explicit CmdChartItemChangeGeometry(
-            const QRectF &oldRect, const QRectF &newRect, MscChart *chart, ChartLayoutManager *layoutManager);
+    explicit CmdChartItemChangeGeometry(const QRectF &oldRect, const QRectF &newRect, ChartLayoutManager *layoutManager);
 
     void redo() override;
     void undo() override;

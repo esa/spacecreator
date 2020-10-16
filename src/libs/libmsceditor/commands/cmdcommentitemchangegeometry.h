@@ -33,8 +33,7 @@ class CmdCommentItemChangeGeometry : public ChartBaseCommand
 {
     Q_OBJECT
 public:
-    explicit CmdCommentItemChangeGeometry(const QRect &oldRect, const QRect &newRect, MscEntity *entity,
-            MscChart *chart, ChartLayoutManager *layoutManager);
+    explicit CmdCommentItemChangeGeometry(const QRect &oldRect, const QRect &newRect, MscEntity *entity, ChartLayoutManager *layoutManager);
 
     void redo() override;
     void undo() override;

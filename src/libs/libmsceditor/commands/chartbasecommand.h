@@ -33,8 +33,7 @@ namespace cmd {
 class ChartBaseCommand : public BaseCommand
 {
 public:
-    ChartBaseCommand(
-            MscEntity *item, MscChart *chart, ChartLayoutManager *layoutManager, QUndoCommand *parent = nullptr);
+    ChartBaseCommand(MscEntity *item, ChartLayoutManager *layoutManager, QUndoCommand *parent = nullptr);
 
 protected:
     void checkVisualSorting();

@@ -17,6 +17,7 @@
 
 #include "cmdcoregionitemmove.h"
 
+#include "chartlayoutmanager.h"
 #include "common/commandids.h"
 #include "mscchart.h"
 #include "msccoregion.h"
@@ -26,12 +27,12 @@ namespace msc {
 namespace cmd {
 
 CmdCoRegionItemMove::CmdCoRegionItemMove(MscCoregion *coregionBegin, MscCoregion *coregionEnd, int newBeginPos,
-        int newEndPos, MscInstance *newInsance, MscChart *chart, ChartLayoutManager *layoutManager)
-    : ChartBaseCommand(coregionBegin, chart, layoutManager)
+        int newEndPos, MscInstance *newInsance, ChartLayoutManager *layoutManager)
+    : ChartBaseCommand(coregionBegin, layoutManager)
     , m_coregionBegin(coregionBegin)
     , m_coregionEnd(coregionEnd)
-    , m_oldBeginIndex(chart->instanceEvents().indexOf(coregionBegin))
-    , m_oldEndIndex(chart->instanceEvents().indexOf(coregionEnd))
+    , m_oldBeginIndex(m_chart->instanceEvents().indexOf(coregionBegin))
+    , m_oldEndIndex(m_chart->instanceEvents().indexOf(coregionEnd))
     , m_newBeginIndex(newBeginPos)
     , m_newEndIndex(newEndPos)
     , m_oldInstance(coregionEnd->instance())

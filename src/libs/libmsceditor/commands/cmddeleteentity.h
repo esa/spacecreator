@@ -36,7 +36,7 @@ namespace cmd {
 class CmdDeleteEntity : public ChartBaseCommand
 {
 public:
-    CmdDeleteEntity(QVector<msc::MscEntity *> items, msc::MscDocument *document, msc::MscChart *chart,
+    CmdDeleteEntity(QVector<msc::MscEntity *> items, msc::MscDocument *document,
             ChartLayoutManager *layoutManager);
 
     void redo() override;

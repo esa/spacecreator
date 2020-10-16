@@ -41,9 +41,9 @@ CmdMessageItemCreate::InstanceGeometry CmdMessageItemCreate::initGeometryHolder(
     return geometry;
 }
 
-CmdMessageItemCreate::CmdMessageItemCreate(msc::MscMessage *message, int eventIndex, MscChart *chart,
-        ChartLayoutManager *layoutManager, const QVector<QPoint> &points)
-    : ChartBaseCommand(message, chart, layoutManager)
+CmdMessageItemCreate::CmdMessageItemCreate(
+        msc::MscMessage *message, int eventIndex, ChartLayoutManager *layoutManager, const QVector<QPoint> &points)
+    : ChartBaseCommand(message, layoutManager)
     , m_message(message)
     , m_eventIndex(eventIndex)
     , m_msgPoints(points)

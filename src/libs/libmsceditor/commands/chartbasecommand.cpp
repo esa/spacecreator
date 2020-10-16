@@ -24,10 +24,9 @@
 namespace msc {
 namespace cmd {
 
-ChartBaseCommand::ChartBaseCommand(
-        MscEntity *item, MscChart *chart, ChartLayoutManager *layoutManager, QUndoCommand *parent)
+ChartBaseCommand::ChartBaseCommand(MscEntity *item, ChartLayoutManager *layoutManager, QUndoCommand *parent)
     : BaseCommand(item, parent)
-    , m_chart(chart)
+    , m_chart(layoutManager ? layoutManager->currentChart() : nullptr)
     , m_layoutManager(layoutManager)
     , m_oldSortedEvents(m_chart ? m_chart->instanceEvents() : QVector<msc::MscInstanceEvent *>())
 {

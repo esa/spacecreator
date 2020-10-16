@@ -27,11 +27,11 @@
 namespace msc {
 namespace cmd {
 
-CmdConditionItemMove::CmdConditionItemMove(MscCondition *condition, int newPos, MscInstance *newInsance,
-        msc::MscChart *chart, ChartLayoutManager *layoutManager)
-    : ChartBaseCommand(condition, chart, layoutManager)
+CmdConditionItemMove::CmdConditionItemMove(
+        MscCondition *condition, int newPos, MscInstance *newInsance, ChartLayoutManager *layoutManager)
+    : ChartBaseCommand(condition, layoutManager)
     , m_condition(condition)
-    , m_oldIndex(chart->instanceEvents().indexOf(condition))
+    , m_oldIndex(m_chart->instanceEvents().indexOf(condition))
     , m_newIndex(newPos)
     , m_oldInstance(condition->instance())
     , m_newInstance(newInsance)

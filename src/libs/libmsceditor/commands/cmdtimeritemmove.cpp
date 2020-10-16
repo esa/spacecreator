@@ -27,10 +27,10 @@ namespace msc {
 namespace cmd {
 
 CmdTimerItemMove::CmdTimerItemMove(
-        msc::MscTimer *timer, int newPos, MscInstance *newInsance, MscChart *chart, ChartLayoutManager *layoutManager)
-    : ChartBaseCommand(timer, chart, layoutManager)
+        msc::MscTimer *timer, int newPos, MscInstance *newInsance, ChartLayoutManager *layoutManager)
+    : ChartBaseCommand(timer, layoutManager)
     , m_timer(timer)
-    , m_oldIndex(chart->instanceEvents().indexOf(timer))
+    , m_oldIndex(m_chart->instanceEvents().indexOf(timer))
     , m_newIndex(newPos)
     , m_oldInstance(timer->instance())
     , m_newInstance(newInsance)

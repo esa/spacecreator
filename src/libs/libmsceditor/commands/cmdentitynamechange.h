@@ -28,8 +28,7 @@ namespace cmd {
 class CmdEntityNameChange : public ChartBaseCommand
 {
 public:
-    CmdEntityNameChange(
-            MscEntity *item, const QString &newName, msc::MscChart *chart, ChartLayoutManager *layoutManager);
+    CmdEntityNameChange(MscEntity *item, const QString &newName, ChartLayoutManager *layoutManager);
 
     void redo() override;
     void undo() override;

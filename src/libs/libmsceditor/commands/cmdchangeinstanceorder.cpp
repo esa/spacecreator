@@ -25,11 +25,10 @@
 namespace msc {
 namespace cmd {
 
-CmdChangeInstanceOrder::CmdChangeInstanceOrder(
-        msc::MscInstance *instance, int pos, MscChart *chart, ChartLayoutManager *layoutManager)
-    : ChartBaseCommand(instance, chart, layoutManager)
+CmdChangeInstanceOrder::CmdChangeInstanceOrder(msc::MscInstance *instance, int pos, ChartLayoutManager *layoutManager)
+    : ChartBaseCommand(instance, layoutManager)
     , m_instance(instance)
-    , m_posFrom(chart->instances().indexOf(m_instance))
+    , m_posFrom(m_chart->instances().indexOf(m_instance))
     , m_posTo(pos)
 {
     setText(QObject::tr("Move instance"));

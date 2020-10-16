@@ -32,8 +32,7 @@ namespace cmd {
 class CmdTimerItemMove : public ChartBaseCommand
 {
 public:
-    CmdTimerItemMove(msc::MscTimer *timer, int newPos, msc::MscInstance *newInsance, msc::MscChart *chart,
-            ChartLayoutManager *layoutManager);
+    CmdTimerItemMove(msc::MscTimer *timer, int newPos, msc::MscInstance *newInsance, ChartLayoutManager *layoutManager);
 
     void redo() override;
     void undo() override;

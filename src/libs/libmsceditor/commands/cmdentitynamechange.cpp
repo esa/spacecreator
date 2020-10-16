@@ -25,9 +25,8 @@
 namespace msc {
 namespace cmd {
 
-CmdEntityNameChange::CmdEntityNameChange(
-        MscEntity *item, const QString &newName, MscChart *chart, ChartLayoutManager *layoutManager)
-    : ChartBaseCommand(item, chart, layoutManager)
+CmdEntityNameChange::CmdEntityNameChange(MscEntity *item, const QString &newName, ChartLayoutManager *layoutManager)
+    : ChartBaseCommand(item, layoutManager)
     , m_oldName(item->name())
     , m_newName(newName)
 {

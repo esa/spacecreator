@@ -25,10 +25,10 @@ namespace msc {
 namespace cmd {
 
 CmdMessageItemResize::CmdMessageItemResize(MscMessage *message, int newPos, MscInstance *newInsance,
-        MscMessage::EndType endType, MscChart *chart, ChartLayoutManager *layoutManager)
-    : ChartBaseCommand(message, chart, layoutManager)
+        MscMessage::EndType endType, ChartLayoutManager *layoutManager)
+    : ChartBaseCommand(message, layoutManager)
     , m_message(message)
-    , m_oldIndex(chart->instanceEvents().indexOf(message))
+    , m_oldIndex(m_chart->instanceEvents().indexOf(message))
     , m_newIndex(newPos)
     , m_oldInstance(
               endType == msc::MscMessage::EndType::SOURCE_TAIL ? message->sourceInstance() : message->targetInstance())
