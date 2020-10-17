@@ -23,6 +23,7 @@
 #include "ui_propertiesviewbase.h"
 
 #include <QDebug>
+#include <QHeaderView>
 #include <QSortFilterProxyModel>
 
 namespace aadlinterface {
@@ -32,6 +33,7 @@ PropertiesViewBase::PropertiesViewBase(QWidget *parent)
     , ui(new Ui::PropertiesViewBase)
 {
     ui->setupUi(this);
+    ui->tableView->horizontalHeader()->setSectionResizeMode(QHeaderView::ResizeToContents);
     setButtonsDisabled();
 }
 
@@ -76,20 +78,17 @@ void PropertiesViewBase::onCurrentRowChanged(const QModelIndex &current, const Q
 void PropertiesViewBase::on_btnAdd_clicked()
 {
     if (m_model) {
-        static const QString newNameTmp = tr("New property");
+        const aadl::AADLObject::Type type = m_model->dataObject()->aadlType();
+        const bool isInterfaceType = type == aadl::AADLObject::Type::ProvidedInterface
+                || type == aadl::AADLObject::Type::RequiredInterface;
+        const QString newNameTmp = isInterfaceType ? tr("Parameter name") : tr("New property");
         QString newName(newNameTmp);
         int duplicateCounter(0);
         while (!m_model->findItems(newName).isEmpty())
             newName = QString("%1 #%2").arg(newNameTmp, QString::number(++duplicateCounter));
 
         if (m_model->createProperty(newName)) {
-            auto updateColumnsWidth = [this]() { // #QTBUG-52307
-                ui->tableView->horizontalHeader()->setStretchLastSection(false);
-                ui->tableView->resizeColumnsToContents();
-                ui->tableView->horizontalHeader()->setStretchLastSection(true);
-            };
             const QModelIndex &added = m_model->index(m_model->rowCount() - 1, 0);
-            updateColumnsWidth();
             ui->tableView->scrollToBottom();
             ui->tableView->edit(added);
         }
