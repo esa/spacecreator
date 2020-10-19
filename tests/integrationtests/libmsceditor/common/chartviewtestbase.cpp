@@ -17,8 +17,6 @@
 
 #include "chartviewtestbase.h"
 
-#include "commands/common/commandsfactory.h"
-#include "commands/common/commandsstack.h"
 #include "exceptions.h"
 #include "mscdocument.h"
 #include "syntheticinteraction.h"
@@ -34,7 +32,6 @@ namespace msc {
 void ChartViewTestBase::initTestCaseBase()
 {
     QStandardPaths::setTestModeEnabled(true);
-    cmd::CommandsStack::setCurrent(new QUndoStack(this));
 }
 
 void ChartViewTestBase::initBase()
@@ -42,8 +39,6 @@ void ChartViewTestBase::initBase()
     vstest::saveMousePosition();
     m_undoStack.reset(new QUndoStack);
     m_chartModel.reset(new ChartLayoutManager(m_undoStack.data()));
-    cmd::CommandsStack::instance()->setCurrent(m_undoStack.data());
-    cmd::CommandsStack::instance()->factory()->setChartLayoutManager(m_chartModel.get());
     m_view.reset(new QGraphicsView());
     m_view->setScene(m_chartModel->graphicsScene());
     m_reader.reset(new MscReader);

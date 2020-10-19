@@ -113,11 +113,7 @@ target_sources(${LIB_NAME} PRIVATE
     commands/cmdtimeritemcreate.h
     commands/cmdtimeritemmove.cpp
     commands/cmdtimeritemmove.h
-    commands/common/commandids.h
-    commands/common/commandsfactory.cpp
-    commands/common/commandsfactory.h
-    commands/common/commandsstack.cpp
-    commands/common/commandsstack.h
+    commands/commandids.h
     documenttree/documentitemmodel.cpp
     documenttree/documentitemmodel.h
     documenttree/documenttreeview.cpp

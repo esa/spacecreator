@@ -20,7 +20,6 @@
 #include "baseitems/common/mscutils.h"
 #include "chartlayoutmanager.h"
 #include "commands/cmdconditionitemcreate.h"
-#include "commands/common/commandsstack.h"
 #include "conditionitem.h"
 #include "mscchart.h"
 #include "msccondition.h"

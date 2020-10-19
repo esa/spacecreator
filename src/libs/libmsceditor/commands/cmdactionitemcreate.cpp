@@ -17,7 +17,7 @@
 
 #include "cmdactionitemcreate.h"
 
-#include "common/commandids.h"
+#include "commandids.h"
 #include "mscaction.h"
 #include "mscchart.h"
 #include "mscinstance.h"

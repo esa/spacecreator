@@ -17,7 +17,7 @@
 
 #include "cmdmessagepointsedit.h"
 
-#include "common/commandids.h"
+#include "commandids.h"
 #include "mscchart.h"
 #include "mscinstance.h"
 #include "mscmessage.h"

@@ -22,7 +22,6 @@
 #include "commands/cmddocumentcreate.h"
 #include "commands/cmdsetasn1file.h"
 #include "commands/cmdsetmessagedeclarations.h"
-#include "commands/common/commandsstack.h"
 #include "graphicsview.h"
 #include "hierarchyviewmodel.h"
 #include "mainmodel.h"
@@ -573,8 +572,6 @@ void MSCEditorCore::activateDefaultTool()
  */
 void MSCEditorCore::selectCurrentChart()
 {
-    msc::cmd::CommandsStack::setCurrent(m_model->undoStack());
-
     msc::MscChart *chart = m_model->chartViewModel().currentChart();
     if (chart != nullptr) {
         connect(chart, &msc::MscEntity::commentChanged, this, &msc::MSCEditorCore::checkGlobalComment,

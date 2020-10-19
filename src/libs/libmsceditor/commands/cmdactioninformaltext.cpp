@@ -17,7 +17,7 @@
 
 #include "cmdactioninformaltext.h"
 
-#include "common/commandids.h"
+#include "commandids.h"
 #include "mscaction.h"
 
 namespace msc {

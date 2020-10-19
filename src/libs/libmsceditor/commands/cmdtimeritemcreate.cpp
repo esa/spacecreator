@@ -17,7 +17,7 @@
 
 #include "cmdtimeritemcreate.h"
 
-#include "common/commandids.h"
+#include "commandids.h"
 #include "mscchart.h"
 #include "mscinstance.h"
 

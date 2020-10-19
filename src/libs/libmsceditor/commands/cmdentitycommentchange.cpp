@@ -17,7 +17,7 @@
 
 #include "cmdentitycommentchange.h"
 
-#include "common/commandids.h"
+#include "commandids.h"
 #include "mscchart.h"
 #include "msccomment.h"
 

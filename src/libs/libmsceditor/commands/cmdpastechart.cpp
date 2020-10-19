@@ -17,7 +17,7 @@
 
 #include "cmdpastechart.h"
 
-#include "common/commandids.h"
+#include "commandids.h"
 #include "mscchart.h"
 #include "mscdocument.h"
 #include "mscmodel.h"

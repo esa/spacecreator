@@ -18,7 +18,6 @@
 #include "chartlayoutmanager.h"
 #include "chartlayouttestbase.h"
 #include "commands/cmddeleteentity.h"
-#include "commands/common/commandsstack.h"
 #include "messageitem.h"
 #include "mscchart.h"
 #include "mscdocument.h"
@@ -70,11 +69,11 @@ void tst_CmdDeleteEntity::testUndoMessageDelete()
 
     // delete the message
     auto deleteCmd = new msc::cmd::CmdDeleteEntity({ message }, nullptr, m_chartModel.get());
-    msc::cmd::CommandsStack::current()->push(deleteCmd);
+    m_undoStack->push(deleteCmd);
     QCOMPARE(m_chart->instanceEvents().size(), 0);
 
     // undo
-    msc::cmd::CommandsStack::current()->undo();
+    m_undoStack->undo();
     waitForLayoutUpdate();
     QCOMPARE(m_chart->instanceEvents().size(), 1);
     message = qobject_cast<msc::MscMessage *>(m_chart->instanceEvents().at(0));

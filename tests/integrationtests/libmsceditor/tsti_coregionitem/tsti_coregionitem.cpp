@@ -19,7 +19,6 @@
 #include "baseitems/common/coordinatesconverter.h"
 #include "chartlayoutmanager.h"
 #include "chartviewtestbase.h"
-#include "commands/common/commandsstack.h"
 #include "coregionitem.h"
 #include "graphicsitemcompare.h"
 #include "instanceitem.h"

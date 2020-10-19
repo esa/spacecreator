@@ -17,7 +17,7 @@
 
 #include "cmdsetasn1file.h"
 
-#include "commands/common/commandids.h"
+#include "commandids.h"
 #include "mscmodel.h"
 
 namespace msc {

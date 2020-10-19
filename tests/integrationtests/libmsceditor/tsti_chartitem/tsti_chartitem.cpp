@@ -19,7 +19,6 @@
 #include "chartitem.h"
 #include "chartviewtestbase.h"
 #include "commands/cmdactionitemcreate.h"
-#include "commands/common/commandsstack.h"
 #include "instanceitem.h"
 #include "messageitem.h"
 #include "mscaction.h"
@@ -113,7 +112,7 @@ void tsti_Chartitem::testItemLimit()
     // append one action
     auto instanceA = qobject_cast<msc::MscInstance *>(m_chart->instances().at(0));
     auto addCommand = new cmd::CmdActionItemCreate(nullptr, instanceA, -1, m_chartModel.data());
-    cmd::CommandsStack::current()->push(addCommand);
+    m_undoStack->push(addCommand);
     waitForLayoutUpdate();
     QCOMPARE(m_chart->instanceEvents().size(), 4);
     const QVector<InteractiveObject *> &items = m_chartModel->instanceEventItems();
@@ -126,7 +125,7 @@ void tsti_Chartitem::testItemLimit()
 
     // append one more action, pusing the message to the top
     addCommand = new cmd::CmdActionItemCreate(nullptr, instanceA, -1, m_chartModel.data());
-    cmd::CommandsStack::current()->push(addCommand);
+    m_undoStack->push(addCommand);
     waitForLayoutUpdate();
     QCOMPARE(m_chart->instanceEvents().size(), 5);
     QCOMPARE(items.size(), 3);

@@ -20,7 +20,7 @@
 #include "baseitems/common/coordinatesconverter.h"
 #include "chartitem.h"
 #include "chartlayoutmanager.h"
-#include "common/commandids.h"
+#include "commandids.h"
 #include "mscchart.h"
 
 namespace msc {

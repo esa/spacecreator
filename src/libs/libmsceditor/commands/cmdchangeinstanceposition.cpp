@@ -19,7 +19,7 @@
 
 #include "cif/cifblockfactory.h"
 #include "cif/cifparser.h"
-#include "common/commandids.h"
+#include "commandids.h"
 #include "mscinstance.h"
 
 namespace msc {

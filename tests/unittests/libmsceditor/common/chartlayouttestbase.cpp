@@ -18,8 +18,6 @@
 #include "chartlayouttestbase.h"
 
 #include "baseitems/common/coordinatesconverter.h"
-#include "commands/common/commandsfactory.h"
-#include "commands/common/commandsstack.h"
 #include "mscdocument.h"
 
 #include <QDebug>
@@ -32,8 +30,6 @@ void ChartLayoutTestBase::initBase()
 {
     m_undoStack = std::make_unique<QUndoStack>();
     m_chartModel.reset(new ChartLayoutManager(m_undoStack.get()));
-    cmd::CommandsStack::instance()->factory()->setChartLayoutManager(m_chartModel.get());
-    cmd::CommandsStack::setCurrent(m_undoStack.get());
     m_view = std::make_unique<QGraphicsView>();
     m_view->setScene(m_chartModel->graphicsScene());
     m_reader = std::make_unique<MscReader>();

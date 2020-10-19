@@ -17,7 +17,7 @@
 
 #include "cmdhierarchytypechange.h"
 
-#include "common/commandids.h"
+#include "commandids.h"
 #include "mscchart.h"
 
 namespace msc {

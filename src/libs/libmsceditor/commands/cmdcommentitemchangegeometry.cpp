@@ -20,7 +20,7 @@
 #include "cif/cifblockfactory.h"
 #include "cif/cifline.h"
 #include "cif/ciflines.h"
-#include "common/commandids.h"
+#include "commandids.h"
 #include "mscchart.h"
 #include "msccomment.h"
 

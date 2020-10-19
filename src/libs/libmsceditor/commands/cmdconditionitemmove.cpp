@@ -18,7 +18,7 @@
 
 #include "cmdconditionitemmove.h"
 
-#include "common/commandids.h"
+#include "commandids.h"
 #include "conditionitem.h"
 #include "mscchart.h"
 #include "msccondition.h"

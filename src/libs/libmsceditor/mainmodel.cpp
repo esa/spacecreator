@@ -21,8 +21,6 @@
 #include "astxmlparser.h"
 #include "chartlayoutmanager.h"
 #include "commands/cmdpastechart.h"
-#include "commands/common/commandsfactory.h"
-#include "commands/common/commandsstack.h"
 #include "documentitemmodel.h"
 #include "exceptions.h"
 #include "hierarchyviewmodel.h"
@@ -107,9 +105,6 @@ MainModel::MainModel(QObject *parent)
     d->m_documentItemModel->setUndoStack(&(d->m_undoStack));
     d->m_hierarchyModel.setUndoStack(&(d->m_undoStack));
     showFirstChart();
-
-    msc::cmd::CommandsStack::setCurrent(&d->m_undoStack);
-    msc::cmd::CommandsStack::instance()->factory()->setChartLayoutManager(&d->m_chartLayoutManager);
 }
 
 MainModel::~MainModel()
