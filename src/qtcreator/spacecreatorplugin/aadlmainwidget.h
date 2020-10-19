@@ -17,6 +17,7 @@
 
 #pragma once
 
+#include "endtoendview.h"
 #include "iveditorcore.h"
 
 #include <QPointer>
@@ -58,6 +59,7 @@ public:
 
     void showAsn1Dialog();
     void setMinimapVisible(bool visible);
+    void showE2EDataflow();
     void onAttributesManagerRequested();
     void onColorSchemeMenuInvoked();
     void onDynContextEditorMenuInvoked();
@@ -74,6 +76,7 @@ private:
     QSharedPointer<aadlinterface::IVEditorCore> m_plugin;
     QVector<QAction *> m_actions;
     QPointer<AadlModelStorage> m_aadlStorage;
+    QPointer<aadlinterface::EndToEndView> m_endToEndView;
 };
 
 }

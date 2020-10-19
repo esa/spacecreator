@@ -40,6 +40,7 @@ const char C_AADLEDITOR_DISPLAY_NAME[] = QT_TRANSLATE_NOOP("OpenWith::Editors", 
 // Menu
 const char MENU_ID[] = "SpaceCreator.Menu";
 const char SHOW_MINIMAP_ID[] = "MscEditor.Minimap";
+const char SHOW_E2E_ID[] = "SpaceCreator.E2EDataflow";
 const char MESSAGE_DECLARATIONS_ID[] = "MscEditor.MessageDeclarations";
 const char CHECK_INSTANCES_ID[] = "MscEditor.CheckInstances";
 const char CHECK_MESSAGES_ID[] = "MscEditor.CheckMessages";

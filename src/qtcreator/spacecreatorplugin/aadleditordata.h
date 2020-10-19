@@ -54,6 +54,7 @@ public:
 
     void showAsn1Dialog();
     void showMinimap(bool visible);
+    void showE2EDataflow();
     void onAttributesManagerRequested();
     void onColorSchemeMenuInvoked();
     void onDynContextEditorMenuInvoked();

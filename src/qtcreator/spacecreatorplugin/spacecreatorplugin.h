@@ -51,7 +51,7 @@ class SpaceCreatorPlugin : public ExtensionSystem::IPlugin
 
 public:
     SpaceCreatorPlugin();
-    ~SpaceCreatorPlugin();
+    ~SpaceCreatorPlugin() override;
 
     bool initialize(const QStringList &arguments, QString *errorString) override;
     void extensionsInitialized() override;

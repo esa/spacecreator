@@ -46,6 +46,7 @@ AadlMainWidget::~AadlMainWidget()
     if (m_plugin && m_plugin->document()->view() && m_plugin->document()->view()->parent() == this) {
         m_plugin->document()->view()->setParent(nullptr);
     }
+    delete m_endToEndView.data();
 }
 
 bool AadlMainWidget::load(const QString &filename)
@@ -136,6 +137,20 @@ void AadlMainWidget::setMinimapVisible(bool visible)
         return;
     }
     m_plugin->minimapView()->setVisible(visible);
+}
+
+void AadlMainWidget::showE2EDataflow()
+{
+    if (m_aadlStorage.isNull()) {
+        return;
+    }
+    if (m_endToEndView.isNull()) {
+        m_endToEndView = new aadlinterface::EndToEndView(m_plugin->document());
+        m_endToEndView->setAttribute(Qt::WA_DeleteOnClose);
+        connect(m_plugin->document(), &QObject::destroyed, m_endToEndView.data(), &QObject::deleteLater);
+    }
+    m_endToEndView->show();
+    m_endToEndView->raise();
 }
 
 void AadlMainWidget::onAttributesManagerRequested()

@@ -230,7 +230,7 @@ bool InterfaceDocument::exportSelected()
 {
     QList<aadl::AADLObject *> objects;
     QStringList exportName;
-    for (const auto id : d->model->selectionModel()->selection().indexes()) {
+    for (const auto &id : d->model->selectionModel()->selection().indexes()) {
         const int role = static_cast<int>(aadl::AADLObjectsModel::AADLRoles::IdRole);
         if (aadl::AADLObject *object = d->model->getObject(id.data(role).toUuid())) {
             if (object->isFunction() && object->parentObject() == nullptr) {
@@ -680,7 +680,7 @@ QVector<QAction *> InterfaceDocument::initActions()
         }
     });
     connect(d->model->selectionModel(), &QItemSelectionModel::selectionChanged, this,
-            [this](const QItemSelection &selected, const QItemSelection &deselected) {
+            [this](const QItemSelection &selected, const QItemSelection & /*deselected*/) {
                 d->actRemove->setEnabled(!selected.isEmpty());
                 const QModelIndexList idxs = selected.indexes();
                 auto it = std::find_if(idxs.cbegin(), idxs.cend(), [](const QModelIndex &index) {

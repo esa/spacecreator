@@ -40,7 +40,7 @@ CreateConnectionGroupDialog::CreateConnectionGroupDialog(
 
     auto labelConnection = [](const QList<QPointer<aadl::AADLObjectConnection>> connections) -> QString {
         QStringList result;
-        for (const auto connection : connections) {
+        for (const auto &connection : connections) {
             if (connection) {
                 result.append(QStringLiteral("%1.%2 <-> %3.%4")
                                       .arg(connection->sourceName(), connection->sourceInterfaceName(),
@@ -69,7 +69,7 @@ CreateConnectionGroupDialog::CreateConnectionGroupDialog(
     resize(sizeHint().width(), minimumSizeHint().height());
 }
 
-CreateConnectionGroupDialog::~CreateConnectionGroupDialog() { }
+CreateConnectionGroupDialog::~CreateConnectionGroupDialog() {}
 
 QList<aadl::AADLObjectConnectionGroup::CreationInfo> CreateConnectionGroupDialog::info() const
 {

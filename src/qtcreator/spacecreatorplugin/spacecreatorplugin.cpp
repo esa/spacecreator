@@ -129,9 +129,15 @@ bool SpaceCreatorPlugin::initialize(const QStringList &arguments, QString *error
             showMinimapAction, Constants::SHOW_MINIMAP_ID, Core::Context(Core::Constants::C_DESIGN_MODE));
     connect(showMinimapAction, &QAction::triggered, this, &SpaceCreatorPlugin::setMinimapVisible);
 
+    auto showE2EDataflow = new QAction(tr("Show end to end dataflow"), this);
+    Core::Command *showE2ECmd = Core::ActionManager::registerAction(
+            showE2EDataflow, Constants::SHOW_E2E_ID, Core::Context(Core::Constants::C_DESIGN_MODE));
+    connect(showE2EDataflow, &QAction::triggered, this, [this]() { m_aadlFactory->editorData()->showE2EDataflow(); });
+
     Core::ActionContainer *menu = Core::ActionManager::createMenu(Constants::MENU_ID);
     menu->menu()->setTitle(tr("SpaceCreator"));
     menu->addAction(showMinimapCmd);
+    menu->addAction(showE2ECmd);
     menu->addSeparator();
     menu->addAction(messageDeclCmd);
     menu->addAction(checkInstancesCmd);
