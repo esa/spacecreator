@@ -20,7 +20,9 @@
 #include "baseitems/common/coordinatesconverter.h"
 #include "baseitems/common/mscutils.h"
 #include "chartitem.h"
-#include "commands/common/commandsstack.h"
+#include "chartlayoutmanager.h"
+#include "commands/cmdcommentitemchangegeometry.h"
+#include "commands/cmdentitycommentchange.h"
 #include "commentitem.h"
 #include "msccomment.h"
 
@@ -54,7 +56,7 @@ void CommentCreatorTool::createPreviewItem()
     if (!m_scene || m_previewItem || !m_active)
         return;
 
-    CommentItem *item = new CommentItem(m_model->currentChart());
+    CommentItem *item = new CommentItem(m_model->currentChart(), m_model);
     item->setText(tr("Add new comments here"));
     item->setOpacity(0.5);
     item->setGlobalPreview(m_isGlobalComment);
@@ -87,18 +89,16 @@ void CommentCreatorTool::commitPreviewItem()
 
         QRect newRect;
         if (CoordinatesConverter::sceneToCif(itemSceneRect, newRect)) {
-            msc::cmd::CommandsStack::current()->beginMacro(tr("Create comment"));
-            msc::cmd::CommandsStack::push(msc::cmd::Id::ChangeCommentGeometry,
-                    { m_model->currentChart()->cifRect(), newRect,
-                            QVariant::fromValue<MscEntity *>(m_model->currentChart()) });
-            msc::cmd::CommandsStack::push(msc::cmd::Id::ChangeComment,
-                    { QVariant::fromValue<msc::MscEntity *>(m_model->currentChart()), itemComment });
-            msc::cmd::CommandsStack::current()->endMacro();
+            QUndoStack *undoStack = m_model->undoStack();
+            undoStack->beginMacro(tr("Create comment"));
+            undoStack->push(new cmd::CmdCommentItemChangeGeometry(
+                    m_model->currentChart()->cifRect(), newRect, m_model->currentChart(), m_model));
+            undoStack->push(new cmd::CmdEntityCommentChange(m_model->currentChart(), itemComment, m_model));
+            undoStack->endMacro();
         }
     } else {
         auto previewEntity = m_model->nearestEntity(m_previewItem->sceneBoundingRect().center());
-        const QVariantList cmdParams = { QVariant::fromValue<msc::MscEntity *>(previewEntity), itemComment };
-        msc::cmd::CommandsStack::push(msc::cmd::Id::ChangeComment, cmdParams);
+        m_model->undoStack()->push(new cmd::CmdEntityCommentChange(previewEntity, itemComment, m_model));
     }
 
     m_model->updateLayout();

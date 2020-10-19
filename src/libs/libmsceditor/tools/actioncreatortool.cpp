@@ -19,10 +19,12 @@
 
 #include "actionitem.h"
 #include "baseitems/common/mscutils.h"
-#include "commands/common/commandsstack.h"
+#include "commands/cmdactionitemcreate.h"
 #include "mscaction.h"
 #include "mscchart.h"
 #include "mscinstance.h"
+
+#include <QUndoStack>
 
 namespace msc {
 
@@ -47,7 +49,7 @@ void ActionCreatorTool::createPreviewItem()
 
     auto orphanAction = new MscAction(this);
     orphanAction->setInformalAction(tr("Action_%1").arg(m_model->currentChart()->instanceEvents().size()));
-    auto actionItem = new ActionItem(orphanAction);
+    auto actionItem = new ActionItem(orphanAction, m_model);
 
     m_previewItem = actionItem;
     m_previewEntity.reset(actionItem->modelItem());
@@ -65,9 +67,7 @@ void ActionCreatorTool::commitPreviewItem()
     auto action = qobject_cast<msc::MscAction *>(m_previewEntity.take());
     auto instance = m_model->nearestInstance(m_previewItem->sceneBoundingRect().center());
     const int eventIndex = m_model->eventIndex(m_previewItem->y());
-    const QVariantList &cmdParams = { QVariant::fromValue<msc::MscAction *>(action),
-        QVariant::fromValue<msc::MscInstance *>(instance), eventIndex };
-    msc::cmd::CommandsStack::push(msc::cmd::Id::CreateAction, cmdParams);
+    m_model->undoStack()->push(new cmd::CmdActionItemCreate(action, instance, eventIndex, m_model));
 
     startWaitForModelLayoutComplete(action);
     removePreviewItem();

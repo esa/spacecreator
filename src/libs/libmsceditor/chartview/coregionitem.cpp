@@ -32,9 +32,8 @@
 
 namespace msc {
 
-CoregionItem::CoregionItem(ChartLayoutManager *model, QGraphicsItem *parent)
-    : InteractiveObject(nullptr, parent)
-    , m_model(model)
+CoregionItem::CoregionItem(ChartLayoutManager *chartLayoutManager, QGraphicsItem *parent)
+    : InteractiveObject(nullptr, chartLayoutManager, parent)
 {
     setFlag(QGraphicsItem::ItemIsSelectable);
     setFlag(ItemClipsToShape, false);
@@ -93,13 +92,14 @@ void CoregionItem::rebuildLayout()
     }
 
     QRectF rect;
-    const QVector<MscInstanceEvent *> &events = m_model->currentChart()->eventsForInstance(m_instance->modelItem());
+    const QVector<MscInstanceEvent *> &events =
+            m_chartLayoutManager->currentChart()->eventsForInstance(m_instance->modelItem());
     auto it = std::next(std::find(events.constBegin(), events.constEnd(), m_begin));
     auto itEnd = std::find(events.constBegin(), events.constEnd(), m_end);
     while (it != events.end() && it != itEnd) {
         Q_ASSERT(*it);
 
-        if (InteractiveObject *iObj = m_model->itemForEntity(*it)) {
+        if (InteractiveObject *iObj = m_chartLayoutManager->itemForEntity(*it)) {
             auto messageItem = qobject_cast<MessageItem *>(iObj);
             if (messageItem != nullptr) {
                 // insert the messages source or target - depending which is in the co-region
@@ -171,7 +171,7 @@ void CoregionItem::onManualResizeFinish(shared::ui::GripPoint *gp, const QPointF
     Q_UNUSED(pressedAt)
     Q_UNUSED(releasedAt)
 
-    Q_ASSERT(!m_model.isNull());
+    Q_ASSERT(!m_chartLayoutManager.isNull());
 
     m_topMove = QPointF();
     m_bottomMove = QPointF();

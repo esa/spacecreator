@@ -19,17 +19,20 @@
 
 #include "baseitems/common/mscutils.h"
 #include "baseitems/instanceenditem.h"
-#include "commands/common/commandsstack.h"
+#include "chartlayoutmanager.h"
+#include "commands/cmdinstancestopchange.h"
 #include "instanceitem.h"
 #include "mscinstance.h"
 
 #include <QGraphicsScene>
 #include <QGraphicsView>
+#include <QUndoStack>
 
 namespace msc {
 
-InstanceStopTool::InstanceStopTool(QGraphicsView *view, QObject *parent)
+InstanceStopTool::InstanceStopTool(ChartLayoutManager *chartLayoutManager, QGraphicsView *view, QObject *parent)
     : BaseTool(view, parent)
+    , m_model(chartLayoutManager)
 {
     m_title = tr("Instance");
     m_description = tr("Stop Instance item");
@@ -101,8 +104,7 @@ void InstanceStopTool::setExplicitStop()
     const bool newValue = !instance->explicitStop();
     instance->setExplicitStop(newValue);
 
-    msc::cmd::CommandsStack::push(
-            msc::cmd::StopInstance, { QVariant::fromValue<msc::MscInstance *>(instance), newValue });
+    m_model->undoStack()->push(new cmd::CmdInstanceStopChange(instance, newValue, m_model));
 }
 
 void InstanceStopTool::updateEnabledState()

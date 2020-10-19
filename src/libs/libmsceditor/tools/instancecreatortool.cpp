@@ -17,10 +17,12 @@
 
 #include "instancecreatortool.h"
 
-#include "commands/common/commandsstack.h"
+#include "chartlayoutmanager.h"
+#include "commands/cmdinstanceitemcreate.h"
 #include "mscinstance.h"
 
 #include <QDebug>
+#include <QUndoStack>
 
 namespace msc {
 
@@ -75,8 +77,7 @@ void InstanceCreatorTool::onActionTriggered(bool activated)
     startWaitForModelLayoutComplete(instance);
 
     static constexpr int pos { -1 };
-    const QVariantList &cmdParams = { QVariant::fromValue<msc::MscInstance *>(instance), pos };
-    msc::cmd::CommandsStack::push(msc::cmd::Id::CreateInstance, cmdParams);
+    m_model->undoStack()->push(new cmd::CmdInstanceItemCreate(instance, pos, m_model));
     Q_EMIT created();
 }
 

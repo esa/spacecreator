@@ -18,11 +18,13 @@
 #include "coregioncreatortool.h"
 
 #include "baseitems/common/mscutils.h"
-#include "commands/common/commandids.h"
-#include "commands/common/commandsstack.h"
+#include "chartlayoutmanager.h"
+#include "commands/cmdcoregionitemcreate.h"
 #include "coregionitem.h"
 #include "msccoregion.h"
 #include "mscinstance.h"
+
+#include <QUndoStack>
 
 namespace msc {
 
@@ -69,10 +71,8 @@ void CoregionCreatorTool::commitPreviewItem()
     auto coregion = qobject_cast<msc::CoregionItem *>(m_previewItem);
     auto instance = m_model->nearestInstance(m_previewItem->sceneBoundingRect().center());
     const int eventIndex = m_model->eventIndex(m_previewItem->y());
-    const QVariantList &cmdParams = { QVariant::fromValue<msc::MscCoregion *>(coregion->begin()),
-        QVariant::fromValue<msc::MscCoregion *>(coregion->end()), QVariant::fromValue<msc::MscInstance *>(instance),
-        eventIndex };
-    msc::cmd::CommandsStack::push(msc::cmd::Id::CreateCoregion, cmdParams);
+    m_model->undoStack()->push(
+            new cmd::CmdCoregionItemCreate(coregion->begin(), coregion->end(), instance, eventIndex, m_model));
 
     removePreviewItem();
 

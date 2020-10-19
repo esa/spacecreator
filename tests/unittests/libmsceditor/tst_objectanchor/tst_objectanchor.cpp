@@ -50,8 +50,8 @@ private:
 void tst_ObjectAnchor::init()
 {
     m_scene = new QGraphicsScene();
-    m_instanceItemA = new InstanceItem(new MscInstance("InstA", this));
-    m_instanceItemB = new InstanceItem(new MscInstance("InstB", this));
+    m_instanceItemA = new InstanceItem(new MscInstance("InstA", this), nullptr);
+    m_instanceItemB = new InstanceItem(new MscInstance("InstB", this), nullptr);
     m_scene->addItem(m_instanceItemA);
     m_scene->addItem(m_instanceItemB);
 }

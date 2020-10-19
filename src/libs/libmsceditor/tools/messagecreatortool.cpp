@@ -21,9 +21,9 @@
 #include "baseitems/common/coordinatesconverter.h"
 #include "baseitems/common/mscutils.h"
 #include "baseitems/common/objectanchor.h"
-#include "commands/common/commandsstack.h"
+#include "chartlayoutmanager.h"
+#include "commands/cmdmessageitemcreate.h"
 #include "instanceitem.h"
-#include "messagedialog.h"
 #include "mscchart.h"
 #include "msccreate.h"
 #include "mscinstance.h"
@@ -149,7 +149,11 @@ void MessageCreatorTool::commitPreviewItem()
             if (!cmdParams.isEmpty()) {
                 startWaitForModelLayoutComplete(m_message);
                 removePreviewItem(); // Remove the preview item before the real one is added
-                msc::cmd::CommandsStack::push(msc::cmd::Id::CreateMessage, cmdParams);
+
+                const int eventIndex = cmdParams.at(1).toInt();
+                const QVector<QPoint> &points =
+                        cmdParams.size() == 3 ? cmdParams.at(2).value<QVector<QPoint>>() : QVector<QPoint>();
+                m_model->undoStack()->push(new cmd::CmdMessageItemCreate(m_message, eventIndex, m_model, points));
 
                 Q_EMIT created(); // to deactivate toobar's item
             }

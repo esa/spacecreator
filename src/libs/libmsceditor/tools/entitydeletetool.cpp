@@ -18,7 +18,9 @@
 #include "entitydeletetool.h"
 
 #include "baseitems/interactiveobject.h"
-#include "commands/common/commandsstack.h"
+#include "chartlayoutmanager.h"
+#include "commands/cmddeleteentity.h"
+#include "commands/cmdentitycommentchange.h"
 #include "commentitem.h"
 #include "coregionitem.h"
 #include "documentitem.h"
@@ -135,16 +137,13 @@ void EntityDeleteTool::deleteSelectedItems()
         }
     }
 
-    msc::cmd::CommandsStack::current()->beginMacro(tr("Removing Entities"));
+    QUndoStack *undoStack = m_model->undoStack();
+    undoStack->beginMacro(tr("Removing Entities"));
     for (msc::MscEntity *entity : comments) {
-        msc::cmd::CommandsStack::push(
-                msc::cmd::Id::ChangeComment, { QVariant::fromValue<msc::MscEntity *>(entity), QString() });
+        m_model->undoStack()->push(new cmd::CmdEntityCommentChange(entity, QString(), m_model));
     }
-    msc::cmd::CommandsStack::push(msc::cmd::DeleteEntity,
-            { QVariant::fromValue<QVector<msc::MscEntity *>>(items),
-
-                    QVariant::fromValue<msc::MscDocument *>(parentDocument) });
-    msc::cmd::CommandsStack::current()->endMacro();
+    m_model->undoStack()->push(new cmd::CmdDeleteEntity(items, parentDocument, m_model));
+    undoStack->endMacro();
 }
 
 void EntityDeleteTool::updateEnabledState()

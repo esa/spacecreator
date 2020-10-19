@@ -31,7 +31,8 @@ class ActionItem : public InteractiveObject
 {
     Q_OBJECT
 public:
-    explicit ActionItem(msc::MscAction *action, QGraphicsItem *parent = nullptr);
+    explicit ActionItem(
+            msc::MscAction *action, ChartLayoutManager *chartLayoutManager, QGraphicsItem *parent = nullptr);
 
     MscAction *modelItem() const;
 

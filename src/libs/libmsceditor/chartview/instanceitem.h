@@ -51,8 +51,8 @@ class InstanceItem : public InteractiveObject
     Q_OBJECT
 
 public:
-    explicit InstanceItem(MscInstance *instance, ChartLayoutManager *chartLayoutManager = nullptr,
-            MscChart *chart = nullptr, QGraphicsItem *parent = nullptr);
+    explicit InstanceItem(MscInstance *instance, ChartLayoutManager *chartLayoutManager, MscChart *chart = nullptr,
+            QGraphicsItem *parent = nullptr);
 
     MscInstance *modelItem() const;
 
@@ -123,11 +123,10 @@ private:
 
     void updatePropertyString(const QLatin1String &property, const QString &value);
 
-    QVariantList prepareChangePositionCommand() const;
+    QVector<QPoint> prepareChangePositionCommand() const;
 
     bool aadlFunctionOk() const;
 
-    ChartLayoutManager *m_model = nullptr;
     msc::MscInstance *m_instance = nullptr;
     QPointer<msc::MscChart> m_chart;
     QGraphicsLineItem *m_axisSymbol = nullptr;

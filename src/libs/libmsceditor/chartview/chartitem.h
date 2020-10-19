@@ -40,7 +40,7 @@ class ChartItem : public InteractiveObject
     Q_OBJECT
 
 public:
-    explicit ChartItem(MscChart *chartEntity, ChartLayoutManager *chartLayoutManager = nullptr, QGraphicsItem *parent = nullptr);
+    explicit ChartItem(MscChart *chartEntity, ChartLayoutManager *chartLayoutManager, QGraphicsItem *parent = nullptr);
     ~ChartItem() override = default;
 
     QRectF boundingRect() const override;
@@ -84,7 +84,6 @@ private:
     MscChart *chart() const;
 
 private:
-    QPointer<ChartLayoutManager> m_chartLayoutManager;
     QGraphicsRectItem *m_rectItem = nullptr;
     QGraphicsRectItem *m_contentArea = nullptr;
     TextItem *m_textItemName = nullptr;

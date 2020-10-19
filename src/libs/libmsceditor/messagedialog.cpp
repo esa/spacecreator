@@ -20,7 +20,11 @@
 #include "aadlchecks.h"
 #include "asn1editor.h"
 #include "asn1valueparser.h"
-#include "commands/common/commandsstack.h"
+#include "chartlayoutmanager.h"
+#include "commands/cmdentitynamechange.h"
+#include "commands/cmdsetasn1file.h"
+#include "commands/cmdsetmessagedeclarations.h"
+#include "commands/cmdsetparameterlist.h"
 #include "file.h"
 #include "iveditorcore.h"
 #include "messagedeclarationsdialog.h"
@@ -51,11 +55,11 @@
    But the parameters a only checked after editing using the msc parser, as the parameters can be
    quite complex. See paramaterDefn in the msc.g4 grammar file.
  */
-MessageDialog::MessageDialog(msc::MscMessage *message, QUndoStack *undoStack, QWidget *parent)
+MessageDialog::MessageDialog(msc::MscMessage *message, msc::ChartLayoutManager *charlayoutManager, QWidget *parent)
     : QDialog(parent)
     , ui(new Ui::MessageDialog)
     , m_message(message)
-    , m_undoStack(undoStack)
+    , m_chartLayoutManager(charlayoutManager)
 {
     Q_ASSERT(message);
     ui->setupUi(this);
@@ -126,9 +130,9 @@ void MessageDialog::setAadlChecker(msc::AadlChecks *checker)
 
 void MessageDialog::accept()
 {
-    msc::cmd::CommandsStack::current()->beginMacro("Edit message");
-    msc::cmd::CommandsStack::push(msc::cmd::RenameEntity,
-            { QVariant::fromValue(m_message.data()), QVariant::fromValue(ui->nameLineEdit->text()) });
+    QUndoStack *undoStack = m_chartLayoutManager->undoStack();
+    undoStack->beginMacro("Edit message");
+    undoStack->push(new msc::cmd::CmdEntityNameChange(m_message, ui->nameLineEdit->text(), m_chartLayoutManager));
 
     msc::MscParameterList parameters;
     for (int i = 0; i < ui->parameterTable->rowCount(); ++i) {
@@ -139,9 +143,8 @@ void MessageDialog::accept()
             qWarning() << "An empty parameter is not allowed";
         }
     }
-    msc::cmd::CommandsStack::push(
-            msc::cmd::SetParameterList, { QVariant::fromValue(m_message.data()), QVariant::fromValue(parameters) });
-    msc::cmd::CommandsStack::current()->endMacro();
+    undoStack->push(new msc::cmd::CmdSetParameterList(m_message, parameters));
+    undoStack->endMacro();
 
     if (m_aadlChecker && m_aadlChecker->hasIvCore()) {
         const QString fromName = m_message->sourceInstance() ? m_message->sourceInstance()->name() : "";
@@ -227,18 +230,16 @@ void MessageDialog::editDeclarations()
     if (docs.isEmpty())
         return;
 
-    MessageDeclarationsDialog dialog(declarations, mscModel(), m_undoStack, this);
+    MessageDeclarationsDialog dialog(declarations, mscModel(), m_chartLayoutManager->undoStack(), this);
     dialog.setFileName(model->dataDefinitionString());
     dialog.setAadlConnectionNames(m_connectionNames);
 
     int result = dialog.exec();
 
     if (result == QDialog::Accepted) {
-        const QVariantList cmdParams = { QVariant::fromValue<msc::MscDocument *>(docs.at(0)),
-            QVariant::fromValue<msc::MscMessageDeclarationList *>(dialog.declarations()) };
-        msc::cmd::CommandsStack::push(msc::cmd::Id::SetMessageDeclarations, cmdParams);
-        const QVariantList params { QVariant::fromValue(model), dialog.fileName(), "ASN.1" };
-        msc::cmd::CommandsStack::push(msc::cmd::Id::SetAsn1File, params);
+        m_chartLayoutManager->undoStack()->push(
+                new msc::cmd::CmdSetMessageDeclarations(docs.at(0), dialog.declarations()));
+        m_chartLayoutManager->undoStack()->push(new msc::cmd::CmdSetAsn1File(model, dialog.fileName(), "ASN.1"));
         fillMessageDeclartionBox();
         selectDeclarationFromName();
     }

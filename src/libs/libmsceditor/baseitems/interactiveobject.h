@@ -26,6 +26,7 @@
 
 namespace msc {
 
+class ChartLayoutManager;
 class MscEntity;
 
 class InteractiveObject : public shared::ui::InteractiveObjectBase
@@ -33,7 +34,8 @@ class InteractiveObject : public shared::ui::InteractiveObjectBase
     Q_OBJECT
 
 public:
-    explicit InteractiveObject(msc::MscEntity *entity, QGraphicsItem *parent = nullptr);
+    explicit InteractiveObject(
+            msc::MscEntity *entity, msc::ChartLayoutManager *chartLayoutManager, QGraphicsItem *parent = nullptr);
 
     msc::MscEntity *modelEntity() const;
 
@@ -62,6 +64,7 @@ protected:
     QRectF getChartBox() const;
 
     QPointer<msc::MscEntity> m_entity;
+    QPointer<ChartLayoutManager> m_chartLayoutManager;
 
     bool m_hovered = false;
     qreal m_storedZ = 0.;

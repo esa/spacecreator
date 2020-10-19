@@ -104,6 +104,8 @@ MainModel::MainModel(QObject *parent)
     connect(&d->m_chartLayoutManager, &ChartLayoutManager::cifDataChanged, d->m_mscModel, &msc::MscModel::dataChanged);
 
     initialModel();
+    d->m_documentItemModel->setUndoStack(&(d->m_undoStack));
+    d->m_hierarchyModel.setUndoStack(&(d->m_undoStack));
     showFirstChart();
 
     msc::cmd::CommandsStack::setCurrent(&d->m_undoStack);

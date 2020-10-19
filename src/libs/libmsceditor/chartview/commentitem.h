@@ -31,7 +31,7 @@ class CommentItem : public InteractiveObject
 {
     Q_OBJECT
 public:
-    explicit CommentItem(MscChart *chart, QGraphicsItem *parent = nullptr);
+    explicit CommentItem(MscChart *chart, ChartLayoutManager *chartLayoutManager, QGraphicsItem *parent = nullptr);
     ~CommentItem() override;
 
     void setText(const QString &text);

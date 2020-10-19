@@ -19,7 +19,8 @@
 
 #include "baseitems/common/coordinatesconverter.h"
 #include "baseitems/textitem.h"
-#include "commands/common/commandsstack.h"
+#include "chartlayoutmanager.h"
+#include "commands/cmdactioninformaltext.h"
 #include "datastatement.h"
 #include "instanceitem.h"
 #include "mscaction.h"
@@ -30,6 +31,7 @@
 #include <QDebug>
 #include <QGraphicsSceneMouseEvent>
 #include <QPainter>
+#include <QUndoStack>
 #include <cmath>
 
 namespace msc {
@@ -69,8 +71,8 @@ protected:
  *
  * This class shows an action
  */
-ActionItem::ActionItem(msc::MscAction *action, QGraphicsItem *parent)
-    : InteractiveObject(action, parent)
+ActionItem::ActionItem(msc::MscAction *action, ChartLayoutManager *chartLayoutManager, QGraphicsItem *parent)
+    : InteractiveObject(action, chartLayoutManager, parent)
     , m_action(action)
     , m_textItem(new ActionTextItem(this))
 {
@@ -176,8 +178,8 @@ void ActionItem::onTextEdited(const QString &text)
         return;
     }
 
-    using namespace msc::cmd;
-    CommandsStack::push(InformatActionText, { QVariant::fromValue<MscEntity *>(this->modelItem()), text });
+    m_chartLayoutManager->undoStack()->push(
+            new cmd::CmdActionInformalText(this->modelItem(), text, m_chartLayoutManager));
 }
 
 void ActionItem::rebuildLayout()

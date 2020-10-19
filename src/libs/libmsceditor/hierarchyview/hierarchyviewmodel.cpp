@@ -17,7 +17,7 @@
 
 #include "hierarchyviewmodel.h"
 
-#include "commands/common/commandsstack.h"
+#include "commands/cmddocumentmove.h"
 #include "documentitem.h"
 #include "mscdocument.h"
 #include "mscmodel.h"
@@ -134,6 +134,7 @@ public:
     }
 
     MscModel *model = nullptr;
+    QPointer<QUndoStack> undoStack;
 
     QGraphicsScene scene;
     QVector<DocumentItem *> documentItems;
@@ -183,6 +184,11 @@ void HierarchyViewModel::setModel(MscModel *model)
 
         updateModel();
     }
+}
+
+void HierarchyViewModel::setUndoStack(QUndoStack *undoStack)
+{
+    d->undoStack = undoStack;
 }
 
 /*!
@@ -274,9 +280,7 @@ void HierarchyViewModel::documentMoved(const DocumentItem *documentItem, const Q
 
     if (parentItem && parentItem != documentItem->parentItem() && parentItem->document()
             && parentItem->document()->isAddChildEnable()) {
-        msc::cmd::CommandsStack::push(msc::cmd::MoveDocument,
-                { QVariant::fromValue<MscDocument *>(documentItem->document()),
-                        QVariant::fromValue<MscDocument *>(parentItem->document()) });
+        d->undoStack->push(new cmd::CmdDocumentMove(documentItem->document(), parentItem->document()));
     } else {
         updateModel();
     }

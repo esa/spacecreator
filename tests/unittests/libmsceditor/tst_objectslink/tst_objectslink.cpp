@@ -15,9 +15,9 @@
    along with this program. If not, see <https://www.gnu.org/licenses/lgpl-2.1.html>.
 */
 
+#include "baseitems/common/mscutils.h"
 #include "baseitems/common/objectanchor.h"
 #include "baseitems/common/objectslink.h"
-#include "baseitems/common/mscutils.h"
 #include "instanceitem.h"
 #include "mscinstance.h"
 
@@ -53,9 +53,9 @@ void tst_ObjectsLink::init()
 {
     m_scene = new QGraphicsScene();
 
-    m_itemA = new InstanceItem(new MscInstance("A", this));
-    m_itemB = new InstanceItem(new MscInstance("B", this));
-    m_itemC = new InstanceItem(new MscInstance("C", this));
+    m_itemA = new InstanceItem(new MscInstance("A", this), nullptr);
+    m_itemB = new InstanceItem(new MscInstance("B", this), nullptr);
+    m_itemC = new InstanceItem(new MscInstance("C", this), nullptr);
 
     for (InstanceItem *item : { m_itemA, m_itemB, m_itemC }) {
         m_scene->addItem(item);

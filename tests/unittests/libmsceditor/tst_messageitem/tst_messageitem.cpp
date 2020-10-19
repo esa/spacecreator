@@ -123,7 +123,7 @@ void tst_MessageItem::waitForLayoutUpdate()
 void tst_MessageItem::addMessage()
 {
     m_message = new MscMessage("Event1");
-    m_messageItem = new MessageItem(m_message, nullptr);
+    m_messageItem = new MessageItem(m_message, m_chartModel);
 
     m_view->scene()->addItem(m_messageItem);
 }
@@ -131,7 +131,7 @@ void tst_MessageItem::addMessage()
 void tst_MessageItem::addCreate()
 {
     m_create = new MscCreate("Create1");
-    m_messageItem = new MessageItem(m_create, nullptr);
+    m_messageItem = new MessageItem(m_create, m_chartModel);
 
     m_view->scene()->addItem(m_messageItem);
 }
@@ -190,7 +190,7 @@ void tst_MessageItem::testNameWithParameter()
     delete m_messageItem;
 
     m_message->setParameters({ { "", "pattern" } });
-    m_messageItem = new MessageItem(m_message, nullptr);
+    m_messageItem = new MessageItem(m_message, m_chartModel);
 
     QCOMPARE(m_messageItem->displayedText(), QString("Event1(pattern)"));
 
@@ -203,7 +203,7 @@ void tst_MessageItem::testNameWithParameterWithExtraBraces()
     m_message = new MscMessage("Event1");
 
     m_message->setParameters({ { "", "{pattern}" } });
-    m_messageItem = new MessageItem(m_message, nullptr);
+    m_messageItem = new MessageItem(m_message, m_chartModel);
 
     QCOMPARE(m_messageItem->displayedText(), QString("Event1({pattern})"));
 

@@ -150,7 +150,6 @@ private:
 
     QPointer<msc::MscMessage> m_message = nullptr;
     LabeledArrowItem *m_arrowItem = nullptr;
-    QPointer<msc::ChartLayoutManager> m_chartLayoutManager = nullptr;
     QPointer<InstanceItem> m_sourceInstance = nullptr;
     QPointer<InstanceItem> m_targetInstance = nullptr;
     bool m_posChangeIgnored = false;

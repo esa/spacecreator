@@ -140,7 +140,7 @@ void MSCEditorCore::initChartTools()
     m_instanceCreatorTool = new msc::InstanceCreatorTool(&(m_model->chartViewModel()), nullptr, this);
     m_tools.append(m_instanceCreatorTool);
 
-    m_instanceStopTool = new msc::InstanceStopTool(nullptr, this);
+    m_instanceStopTool = new msc::InstanceStopTool(&(m_model->chartViewModel()), nullptr, this);
     m_tools.append(m_instanceStopTool);
 
     m_messageCreateTool = new msc::MessageCreatorTool(

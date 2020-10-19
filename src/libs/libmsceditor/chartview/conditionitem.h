@@ -34,7 +34,8 @@ class ConditionItem : public InteractiveObject
     Q_OBJECT
 
 public:
-    explicit ConditionItem(MscCondition *condition, QGraphicsItem *parent = nullptr);
+    explicit ConditionItem(
+            MscCondition *condition, ChartLayoutManager *chartLayoutManager, QGraphicsItem *parent = nullptr);
 
     MscCondition *modelItem() const;
 
@@ -44,7 +45,8 @@ public:
 
     void connectObjects(InstanceItem *instance, qreal y, const QRectF &instancesRect);
 
-    static ConditionItem *createDefaultItem(MscCondition *condition, const QPointF &pos);
+    static ConditionItem *createDefaultItem(
+            MscCondition *condition, ChartLayoutManager *chartLayoutManager, const QPointF &pos);
 
 public Q_SLOTS:
     void setName(const QString &name);

@@ -20,7 +20,7 @@
 #include "baseitems/textitem.h"
 #include "chartlayoutmanager.h"
 #include "chartview/mscchartviewconstants.h"
-#include "commands/common/commandsstack.h"
+#include "commands/cmdentitynamechange.h"
 #include "instanceitem.h"
 #include "msctimer.h"
 #include "ui/grippointshandler.h"
@@ -28,6 +28,7 @@
 #include <QDebug>
 #include <QGraphicsSceneMouseEvent>
 #include <QPainter>
+#include <QUndoStack>
 
 namespace msc {
 
@@ -37,15 +38,13 @@ namespace msc {
    \see msc::MscTimer
  */
 
-TimerItem::TimerItem(msc::MscTimer *timer, ChartLayoutManager *model, QGraphicsItem *parent)
-    : InteractiveObject(timer, parent)
+TimerItem::TimerItem(msc::MscTimer *timer, ChartLayoutManager *chartLayoutManager, QGraphicsItem *parent)
+    : InteractiveObject(timer, chartLayoutManager, parent)
     , m_timer(timer)
-    , m_model(model)
     , m_textItem(new TextItem(this))
     , m_timerConnector(new QGraphicsLineItem(this))
 {
     Q_ASSERT(m_timer != nullptr);
-    Q_ASSERT(m_model != nullptr);
 
     setFlags(ItemSendsGeometryChanges | ItemSendsScenePositionChanges | ItemIsSelectable);
 
@@ -169,13 +168,13 @@ void TimerItem::mouseMoveEvent(QGraphicsSceneMouseEvent *event)
 
 void TimerItem::mouseReleaseEvent(QGraphicsSceneMouseEvent *event)
 {
-    msc::MscInstanceEvent *instanceEvent = m_model->eventAtPosition(event->scenePos());
+    msc::MscInstanceEvent *instanceEvent = m_chartLayoutManager->eventAtPosition(event->scenePos());
     if (instanceEvent) {
         auto timer = qobject_cast<msc::MscTimer *>(instanceEvent);
         if (timer) {
             if (canConnectTimers(timer, event->scenePos())) {
-                using namespace msc::cmd;
-                CommandsStack::push(RenameEntity, { QVariant::fromValue<MscEntity *>(timer), m_timer->name() });
+                m_chartLayoutManager->undoStack()->push(
+                        new cmd::CmdEntityNameChange(timer, m_timer->name(), m_chartLayoutManager));
             }
         }
     }
@@ -215,8 +214,7 @@ void TimerItem::onTextEdited(const QString &text)
         return;
     }
 
-    using namespace msc::cmd;
-    CommandsStack::push(RenameEntity, { QVariant::fromValue<MscEntity *>(this->modelItem()), text });
+    m_chartLayoutManager->undoStack()->push(new cmd::CmdEntityNameChange(m_timer, text, m_chartLayoutManager));
 }
 
 void TimerItem::rebuildLayout()
@@ -238,7 +236,7 @@ void TimerItem::rebuildLayout()
         br.setWidth(TIMER_SYMBOL_SIZE.width() + m_textItem->boundingRect().width());
     } else {
         m_textItem->setVisible(false);
-        TimerItem *preTimer = m_model->itemForTimer(m_timer->precedingTimer());
+        TimerItem *preTimer = m_chartLayoutManager->itemForTimer(m_timer->precedingTimer());
         if (preTimer) {
             const QRectF &symbolRect = symbolBox();
             const QPointF &boxCenter = symbolRect.center();
@@ -267,7 +265,7 @@ void TimerItem::onInstanceMoved(const QPointF &from, const QPointF &to)
 
 void TimerItem::updateConnectorLineVisibility()
 {
-    TimerItem *preTimer = m_model->itemForTimer(m_timer->precedingTimer());
+    TimerItem *preTimer = m_chartLayoutManager->itemForTimer(m_timer->precedingTimer());
     m_timerConnector->setVisible(preTimer && preTimer->isVisible());
 }
 

@@ -1312,7 +1312,7 @@ CommentItem *ChartLayoutManager::addCommentItem(MscComment *comment)
             if (!entity)
                 return nullptr;
 
-            item = new CommentItem(d->m_currentChart);
+            item = new CommentItem(d->m_currentChart, this);
             auto iObj = entity->entityType() == MscEntity::EntityType::Chart ? d->m_layoutInfo.m_chartItem
                                                                              : itemForEntity(entity);
             item->attachTo(iObj);
@@ -1365,7 +1365,7 @@ ActionItem *ChartLayoutManager::addActionItem(MscAction *action)
 
     ActionItem *item = itemForAction(action);
     if (!item) {
-        item = new ActionItem(action);
+        item = new ActionItem(action, this);
         storeEntityItem(item);
     }
     item->connectObjects(instance, d->m_layoutInfo.m_pos.y() + instanceVerticalOffset);
@@ -1379,7 +1379,7 @@ ConditionItem *ChartLayoutManager::addConditionItem(
 {
     auto *item = itemForCondition(condition);
     if (!item) {
-        item = new ConditionItem(condition);
+        item = new ConditionItem(condition, this);
         connect(this, &msc::ChartLayoutManager::instancesRectChanged, item, &msc::ConditionItem::setInstancesRect);
         storeEntityItem(item);
     }

@@ -18,11 +18,14 @@
 #include "timercreatortool.h"
 
 #include "baseitems/common/mscutils.h"
-#include "commands/common/commandsstack.h"
+#include "chartlayoutmanager.h"
+#include "commands/cmdtimeritemcreate.h"
 #include "mscchart.h"
 #include "mscinstance.h"
 #include "msctimer.h"
 #include "timeritem.h"
+
+#include <QUndoStack>
 
 namespace msc {
 
@@ -85,10 +88,7 @@ void TimerCreatorTool::commitPreviewItem()
     auto timer = qobject_cast<msc::MscTimer *>(m_previewEntity.take());
     auto instance = m_model->nearestInstance(m_previewItem->sceneBoundingRect().center());
     const int eventIndex = m_model->eventIndex(m_previewItem->y());
-    const QVariantList &cmdParams = { QVariant::fromValue<msc::MscTimer *>(timer),
-        QVariant::fromValue<msc::MscTimer::TimerType>(m_timerType), QVariant::fromValue<msc::MscInstance *>(instance),
-        eventIndex };
-    msc::cmd::CommandsStack::push(msc::cmd::Id::CreateTimer, cmdParams);
+    m_model->undoStack()->push(new cmd::CmdTimerItemCreate(timer, m_timerType, instance, eventIndex, m_model));
 
     startWaitForModelLayoutComplete(timer);
     removePreviewItem();

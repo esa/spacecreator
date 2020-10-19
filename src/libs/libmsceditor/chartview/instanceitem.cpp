@@ -28,7 +28,10 @@
 #include "cif/cifblockfactory.h"
 #include "cif/cifblocks.h"
 #include "cif/ciflines.h"
-#include "commands/common/commandsstack.h"
+#include "commands/cmdchangeinstanceorder.h"
+#include "commands/cmdchangeinstanceposition.h"
+#include "commands/cmdentitynamechange.h"
+#include "commands/cmdinstancekindchange.h"
 #include "iveditorcore.h"
 #include "messageitem.h"
 #include "mscchart.h"
@@ -54,8 +57,7 @@ namespace msc {
 
 InstanceItem::InstanceItem(
         msc::MscInstance *instance, ChartLayoutManager *chartLayoutManager, MscChart *chart, QGraphicsItem *parent)
-    : InteractiveObject(instance, parent)
-    , m_model(chartLayoutManager)
+    : InteractiveObject(instance, chartLayoutManager, parent)
     , m_instance(instance)
     , m_chart(chart)
     , m_axisSymbol(new QGraphicsLineItem(this))
@@ -88,9 +90,10 @@ InstanceItem::InstanceItem(
         Q_EMIT needUpdateLayout();
     });
 
-    if (m_model && m_model->aadlChecker()) {
-        m_headSymbol->setAadlChecker(m_model->aadlChecker());
-        connect(m_model->aadlChecker(), &msc::AadlChecks::ivCoreChanged, this, &msc::InstanceItem::checkAadlFunction);
+    if (m_chartLayoutManager && m_chartLayoutManager->aadlChecker()) {
+        m_headSymbol->setAadlChecker(m_chartLayoutManager->aadlChecker());
+        connect(m_chartLayoutManager->aadlChecker(), &msc::AadlChecks::ivCoreChanged, this,
+                &msc::InstanceItem::checkAadlFunction);
     }
 
     scheduleLayoutUpdate();
@@ -244,7 +247,7 @@ void InstanceItem::onManualMoveProgress(shared::ui::GripPoint *, const QPointF &
         return;
 
     const QRectF newRect = sceneBoundingRect().translated(delta.x(), delta.y());
-    const QRectF contentRect = m_model->itemForChart()->contentRect();
+    const QRectF contentRect = m_chartLayoutManager->itemForChart()->contentRect();
 
     if (contentRect.left() > newRect.left())
         delta += QPointF(contentRect.left() - newRect.left(), 0.);
@@ -280,11 +283,11 @@ void InstanceItem::setGeometry(const QRectF &geometry)
  */
 QRectF InstanceItem::extendedSceneBoundingRect() const
 {
-    if (!m_instance || !m_instance->explicitStop() || !m_model || !m_model->chartItem()) {
+    if (!m_instance || !m_instance->explicitStop() || !m_chartLayoutManager || !m_chartLayoutManager->chartItem()) {
         return sceneBoundingRect();
     }
 
-    const qreal chartbottom = m_model->chartItem()->contentRect().bottom();
+    const qreal chartbottom = m_chartLayoutManager->chartItem()->contentRect().bottom();
     QRectF box = sceneBoundingRect();
     box.setBottom(chartbottom);
     return box;
@@ -335,10 +338,10 @@ void InstanceItem::onNameEdited(const QString &newName)
         m_headSymbol->setName(m_instance->name());
 
     } else {
-        using namespace msc::cmd;
-        CommandsStack::push(RenameEntity, { QVariant::fromValue<MscEntity *>(this->modelItem()), newName });
+        m_chartLayoutManager->undoStack()->push(
+                new cmd::CmdEntityNameChange(modelEntity(), newName, m_chartLayoutManager));
 
-        msc::AadlChecks *checker = m_model ? m_model->aadlChecker() : nullptr;
+        msc::AadlChecks *checker = m_chartLayoutManager ? m_chartLayoutManager->aadlChecker() : nullptr;
         if (checker && checker->hasIvCore() && !checker->functionsNames().contains(m_instance->name())) {
             const int result = QMessageBox::question(nullptr, tr("No AADL function"),
                     tr("The AADL model doesn't contain a function called:\n%1\n"
@@ -354,8 +357,7 @@ void InstanceItem::onNameEdited(const QString &newName)
 
 void InstanceItem::onKindEdited(const QString &newKind)
 {
-    using namespace msc::cmd;
-    CommandsStack::push(RenameInstanceKind, { QVariant::fromValue<MscEntity *>(this->modelItem()), newKind });
+    m_chartLayoutManager->undoStack()->push(new cmd::CmdInstanceKindChange(m_instance, newKind, m_chartLayoutManager));
     // Update to have the bold text correct
     m_headSymbol->setKind(m_instance->denominatorAndKind());
 }
@@ -473,29 +475,30 @@ void InstanceItem::onManualMoveFinish(shared::ui::GripPoint *, const QPointF &fr
     if (!delta.isNull())
         setPos(pos() + delta);
 
-    const QVariantList &paramsPosition = prepareChangePositionCommand();
-    if (!paramsPosition.isEmpty()) {
-        cmd::CommandsStack::current()->beginMacro(QStringLiteral("Change Instance geometry"));
-        if (!geometryManagedByCif() && m_model) {
-            const QVector<MscInstance *> instances = m_model->currentChart()->instances();
+    QVector<QPoint> points = prepareChangePositionCommand();
+    if (!points.isEmpty()) {
+        QUndoStack *undoStack = m_chartLayoutManager->undoStack();
+
+        undoStack->beginMacro(QStringLiteral("Change Instance geometry"));
+        if (!geometryManagedByCif() && m_chartLayoutManager) {
+            const QVector<MscInstance *> instances = m_chartLayoutManager->currentChart()->instances();
             const int oldIdx = instances.indexOf(m_instance);
             int newIdx = 0;
             for (MscInstance *instance : instances) {
                 if (instance == m_instance)
                     continue;
 
-                if (auto item = m_model->itemForInstance(instance))
+                if (auto item = m_chartLayoutManager->itemForInstance(instance))
                     if (x() > item->x())
                         ++newIdx;
             }
 
             if (oldIdx != newIdx) {
-                cmd::CommandsStack::push(
-                        cmd::Id::ReorderInstance, { QVariant::fromValue<MscInstance *>(m_instance), newIdx });
+                undoStack->push(new cmd::CmdChangeInstanceOrder(m_instance, newIdx, m_chartLayoutManager));
             }
         }
-        cmd::CommandsStack::push(cmd::Id::ChangeInstancePosition, paramsPosition);
-        cmd::CommandsStack::current()->endMacro();
+        undoStack->push(new cmd::CmdChangeInstancePosition(m_instance, points));
+        undoStack->endMacro();
     }
 }
 
@@ -526,34 +529,33 @@ void InstanceItem::hoverMoveEvent(QGraphicsSceneHoverEvent *event)
 }
 #endif
 
-QVariantList InstanceItem::prepareChangePositionCommand() const
+QVector<QPoint> InstanceItem::prepareChangePositionCommand() const
 {
     const QRectF &textBoxRect = m_headSymbol->textBoxSceneRect();
     QRect textBoxRectCif;
     if (!CoordinatesConverter::sceneToCif(textBoxRect, textBoxRectCif)) {
         qWarning() << Q_FUNC_INFO << "Can't convert text box coordinates to CIF";
-        return QVariantList();
+        return {};
     }
 
     QPoint axisPointCif;
     if (!CoordinatesConverter::sceneToCif({ 0., m_axisHeight }, axisPointCif)) {
         qWarning() << Q_FUNC_INFO << "Can't convert axis coordinates to CIF";
-        return QVariantList();
+        return {};
     }
 
     const QPoint wh { textBoxRectCif.width(), textBoxRectCif.height() };
     const QPoint axisHeight { cif::CifBlockInstance::AxisWidth, axisPointCif.y() };
 
     const QVector<QPoint> geometryHolder { textBoxRectCif.topLeft(), wh, axisHeight };
-    const QVariantList params { QVariant::fromValue(m_instance), QVariant::fromValue(geometryHolder) };
 
-    return params;
+    return geometryHolder;
 }
 
 bool InstanceItem::aadlFunctionOk() const
 {
-    if (m_model && m_model->aadlChecker()) {
-        return m_model->aadlChecker()->checkInstance(m_instance);
+    if (m_chartLayoutManager && m_chartLayoutManager->aadlChecker()) {
+        return m_chartLayoutManager->aadlChecker()->checkInstance(m_instance);
     }
     return true;
 }

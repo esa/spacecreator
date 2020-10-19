@@ -30,7 +30,7 @@ class CoregionItem : public InteractiveObject
 {
     Q_OBJECT
 public:
-    explicit CoregionItem(ChartLayoutManager *model, QGraphicsItem *parent = nullptr);
+    explicit CoregionItem(ChartLayoutManager *chartLayoutManager, QGraphicsItem *parent = nullptr);
 
     void setBegin(MscCoregion *begin);
     MscCoregion *begin() const { return m_begin; }
@@ -50,7 +50,6 @@ protected:
     void onManualResizeFinish(shared::ui::GripPoint *gp, const QPointF &pressedAt, const QPointF &releasedAt) override;
 
 private:
-    QPointer<ChartLayoutManager> m_model;
     QPointer<InstanceItem> m_instance;
 
     MscCoregion *m_begin = nullptr;

@@ -22,11 +22,12 @@
 #include "baseitems/common/objectslink.h"
 #include "baseitems/objectslinkitem.h"
 #include "baseitems/textitem.h"
+#include "chartlayoutmanager.h"
 #include "cif/cifblockfactory.h"
 #include "cif/cifline.h"
 #include "cif/ciflines.h"
 #include "commands/cmdcommentitemchangegeometry.h"
-#include "commands/common/commandsstack.h"
+#include "commands/cmdentitycommentchange.h"
 #include "mscchart.h"
 #include "mscchartviewconstants.h"
 #include "msccomment.h"
@@ -35,6 +36,7 @@
 
 #include <QGraphicsScene>
 #include <QPainter>
+#include <QUndoStack>
 #include <QtDebug>
 
 namespace msc {
@@ -45,8 +47,8 @@ namespace msc {
  * Comment box item.
  */
 
-CommentItem::CommentItem(MscChart *chart, QGraphicsItem *parent)
-    : InteractiveObject(nullptr, parent)
+CommentItem::CommentItem(MscChart *chart, ChartLayoutManager *chartLayoutManager, QGraphicsItem *parent)
+    : InteractiveObject(nullptr, chartLayoutManager, parent)
     , m_textItem(new TextItem(this))
     , m_linkItem(new QGraphicsPathItem)
     , m_chart(chart)
@@ -338,8 +340,8 @@ void CommentItem::onManualMoveProgress(shared::ui::GripPoint *gp, const QPointF 
     QRectF rect { newPos, boundingRect().size() };
     QRect newRect;
     if (CoordinatesConverter::sceneToCif(rect, newRect)) {
-        msc::cmd::CommandsStack::push(msc::cmd::ChangeCommentGeometry,
-                { oldRect, newRect, QVariant::fromValue<MscEntity *>(m_iObj->modelEntity()) });
+        m_chartLayoutManager->undoStack()->push(
+                new cmd::CmdCommentItemChangeGeometry(oldRect, newRect, m_iObj->modelEntity(), m_chartLayoutManager));
 
         rebuildLayout();
         updateGripPoints();
@@ -396,8 +398,8 @@ void CommentItem::onManualResizeProgress(shared::ui::GripPoint *gp, const QPoint
 
     QRect newRect;
     if (CoordinatesConverter::sceneToCif(rect, newRect)) {
-        msc::cmd::CommandsStack::push(msc::cmd::ChangeCommentGeometry,
-                { oldRect, newRect, QVariant::fromValue<MscEntity *>(m_iObj->modelEntity()) });
+        m_chartLayoutManager->undoStack()->push(
+                new cmd::CmdCommentItemChangeGeometry(oldRect, newRect, m_iObj->modelEntity(), m_chartLayoutManager));
 
         rebuildLayout();
         updateGripPoints();
@@ -419,12 +421,12 @@ void CommentItem::textEdited(const QString &text)
     QRect newRect;
     if (CoordinatesConverter::sceneToCif(m_textItem->sceneBoundingRect(), newRect)) {
         if (oldRect != newRect || oldText != text) {
-            msc::cmd::CommandsStack::current()->beginMacro(tr("Change comment"));
-            msc::cmd::CommandsStack::push(msc::cmd::ChangeCommentGeometry,
-                    { oldRect, newRect, QVariant::fromValue<MscEntity *>(m_iObj->modelEntity()) });
-            msc::cmd::CommandsStack::push(msc::cmd::Id::ChangeComment,
-                    { QVariant::fromValue<msc::MscEntity *>(m_iObj->modelEntity()), text });
-            msc::cmd::CommandsStack::current()->endMacro();
+            QUndoStack *undoStack = m_chartLayoutManager->undoStack();
+            undoStack->beginMacro(tr("Change comment"));
+            undoStack->push(new cmd::CmdCommentItemChangeGeometry(
+                    oldRect, newRect, m_iObj->modelEntity(), m_chartLayoutManager));
+            undoStack->push(new cmd::CmdEntityCommentChange(m_iObj->modelEntity(), text, m_chartLayoutManager));
+            undoStack->endMacro();
         }
     }
     rebuildLayout();

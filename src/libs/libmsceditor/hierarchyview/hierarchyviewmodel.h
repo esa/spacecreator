@@ -23,6 +23,7 @@
 #include <memory>
 
 class QGraphicsScene;
+class QUndoStack;
 
 namespace msc {
 
@@ -39,6 +40,7 @@ public:
     QGraphicsScene *graphicsScene() const;
 
     void setModel(MscModel *model);
+    void setUndoStack(QUndoStack *undoStack);
 
     void setSelectedDocument(msc::MscDocument *document);
     MscDocument *selectedDocument() const;

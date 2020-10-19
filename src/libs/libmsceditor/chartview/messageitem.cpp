@@ -24,10 +24,14 @@
 #include "baseitems/common/objectslink.h"
 #include "baseitems/labeledarrowitem.h"
 #include "baseitems/msgidentificationitem.h"
+#include "chartlayoutmanager.h"
 #include "cif/cifblockfactory.h"
 #include "cif/cifblocks.h"
 #include "cif/ciflines.h"
-#include "commands/common/commandsstack.h"
+#include "commands/cmdentitynamechange.h"
+#include "commands/cmdmessageitemresize.h"
+#include "commands/cmdmessagepointsedit.h"
+#include "commands/cmdsetparameterlist.h"
 #include "commentitem.h"
 #include "messagedialog.h"
 #include "mscchart.h"
@@ -61,12 +65,12 @@ MessageItem::GeometryNotificationBlocker ::~GeometryNotificationBlocker()
 
 MessageItem::MessageItem(MscMessage *message, ChartLayoutManager *chartLayoutManager, InstanceItem *source,
         InstanceItem *target, QGraphicsItem *parent)
-    : InteractiveObject(message, parent)
+    : InteractiveObject(message, chartLayoutManager, parent)
     , m_message(message)
     , m_arrowItem(new LabeledArrowItem(this))
-    , m_chartLayoutManager(chartLayoutManager)
 {
     Q_ASSERT(m_message != nullptr);
+    Q_ASSERT(chartLayoutManager != nullptr);
 
     setFlags(ItemSendsGeometryChanges | ItemSendsScenePositionChanges | ItemIsSelectable);
 
@@ -137,7 +141,7 @@ void MessageItem::onTextChanged()
 void MessageItem::showMessageDialog()
 {
     if (m_message->messageType() == MscMessage::MessageType::Message) {
-        MessageDialog dialog(m_message, m_chartLayoutManager->undoStack());
+        MessageDialog dialog(m_message, m_chartLayoutManager);
         dialog.setAadlChecker(m_chartLayoutManager->aadlChecker());
         dialog.exec();
     }
@@ -614,7 +618,9 @@ void MessageItem::onManualGeometryChangeFinished(shared::ui::GripPoint *gp, cons
 
     m_originalMessagePoints.clear();
 
-    msc::cmd::CommandsStack::current()->beginMacro(tr("Change message geometry"));
+    QUndoStack *undoStack = m_chartLayoutManager->undoStack();
+
+    undoStack->beginMacro(tr("Change message geometry"));
 
     bool sourceChanged = false;
     if (auto src = sourceInstanceItem()) {
@@ -634,27 +640,21 @@ void MessageItem::onManualGeometryChangeFinished(shared::ui::GripPoint *gp, cons
 
     if (sourceChanged) {
         const int newIdx = m_chartLayoutManager->eventIndex(tail().y());
-        msc::cmd::CommandsStack::push(msc::cmd::RetargetMessage,
-                { QVariant::fromValue<MscMessage *>(m_message), newIdx,
-                        QVariant::fromValue<MscInstance *>(
-                                sourceInstanceItem() ? sourceInstanceItem()->modelItem() : nullptr),
-                        QVariant::fromValue<MscMessage::EndType>(MscMessage::EndType::SOURCE_TAIL) });
+        undoStack->push(new cmd::CmdMessageItemResize(m_message, newIdx,
+                sourceInstanceItem() ? sourceInstanceItem()->modelItem() : nullptr, MscMessage::EndType::SOURCE_TAIL,
+                m_chartLayoutManager));
     }
     if (targetChanged) {
         const int newIdx = m_chartLayoutManager->eventIndex(head().y());
-        msc::cmd::CommandsStack::push(msc::cmd::RetargetMessage,
-                { QVariant::fromValue<MscMessage *>(m_message), newIdx,
-                        QVariant::fromValue<MscInstance *>(
-                                targetInstanceItem() ? targetInstanceItem()->modelItem() : nullptr),
-                        QVariant::fromValue<MscMessage::EndType>(MscMessage::EndType::TARGET_HEAD) });
+        undoStack->push(new cmd::CmdMessageItemResize(m_message, newIdx,
+                targetInstanceItem() ? targetInstanceItem()->modelItem() : nullptr, MscMessage::EndType::TARGET_HEAD,
+                m_chartLayoutManager));
     }
 
     const qreal newPos = (gp && gp->location() == shared::ui::GripPoint::Center) ? to.y() : tail().y();
     int newIdx = m_chartLayoutManager->eventIndex(newPos, m_message);
-    msc::cmd::CommandsStack::push(msc::cmd::EditMessagePoints,
-            { QVariant::fromValue(m_message.data()), QVariant::fromValue(oldPointsCif),
-                    QVariant::fromValue(newPointsCif), newIdx });
-    cmd::CommandsStack::current()->endMacro();
+    undoStack->push(new cmd::CmdMessagePointsEdit(m_message, oldPointsCif, newPointsCif, newIdx, m_chartLayoutManager));
+    undoStack->endMacro();
 
     if (auto item = m_chartLayoutManager->itemForComment(m_message->comment())) {
         item->instantLayoutUpdate();
@@ -749,11 +749,11 @@ void MessageItem::onRenamed(const QString &title)
 
     // prevent recursion, as parametes ans name are not set as one unit
     disconnect(m_message, &msc::MscMessage::dataChanged, this, &msc::MessageItem::updateDisplayText);
-    CommandsStack::current()->beginMacro(tr("Set message identification"));
-    CommandsStack::push(SetParameterList,
-            { QVariant::fromValue<MscEntity *>(m_message), QVariant::fromValue<MscParameterList>(parameters) });
-    CommandsStack::push(RenameEntity, { QVariant::fromValue<MscEntity *>(m_message), name });
-    CommandsStack::current()->endMacro();
+    QUndoStack *undoStack = m_chartLayoutManager->undoStack();
+    undoStack->beginMacro(tr("Set message identification"));
+    undoStack->push(new cmd::CmdSetParameterList(m_message, parameters));
+    undoStack->push(new cmd::CmdEntityNameChange(m_message, name, m_chartLayoutManager));
+    undoStack->endMacro();
     connect(m_message, &msc::MscMessage::dataChanged, this, &msc::MessageItem::updateDisplayText);
 
     m_preventRecursion = false;

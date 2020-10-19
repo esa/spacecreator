@@ -18,11 +18,15 @@
 #include "conditioncreatortool.h"
 
 #include "baseitems/common/mscutils.h"
+#include "chartlayoutmanager.h"
+#include "commands/cmdconditionitemcreate.h"
 #include "commands/common/commandsstack.h"
 #include "conditionitem.h"
 #include "mscchart.h"
 #include "msccondition.h"
 #include "mscinstance.h"
+
+#include <QUndoStack>
 
 namespace msc {
 
@@ -53,7 +57,7 @@ void ConditionCreatorTool::createPreviewItem()
 
     auto orphanCondition = new MscCondition(this);
     orphanCondition->setName(tr("Condition_%1").arg(m_model->currentChart()->instanceEvents().size()));
-    auto item = new ConditionItem(orphanCondition);
+    auto item = new ConditionItem(orphanCondition, m_model);
 
     m_previewItem = item;
     m_previewEntity.reset(item->modelItem());
@@ -72,9 +76,7 @@ void ConditionCreatorTool::commitPreviewItem()
     condition->setShared(m_shared);
     auto instance = m_model->nearestInstance(m_previewItem->sceneBoundingRect().center());
     const int eventIndex = m_model->eventIndex(m_previewItem->y());
-    const QVariantList &cmdParams = { QVariant::fromValue<msc::MscCondition *>(condition),
-        QVariant::fromValue<msc::MscInstance *>(instance), eventIndex };
-    msc::cmd::CommandsStack::push(msc::cmd::Id::CreateCondition, cmdParams);
+    m_model->undoStack()->push(new cmd::CmdConditionItemCreate(condition, instance, eventIndex, m_model));
 
     startWaitForModelLayoutComplete(condition);
     removePreviewItem();

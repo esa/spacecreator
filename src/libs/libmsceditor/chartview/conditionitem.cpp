@@ -18,7 +18,8 @@
 #include "conditionitem.h"
 
 #include "baseitems/textitem.h"
-#include "commands/common/commandsstack.h"
+#include "chartlayoutmanager.h"
+#include "commands/cmdentitynamechange.h"
 #include "mscchartviewconstants.h"
 #include "msccondition.h"
 #include "ui/grippointshandler.h"
@@ -26,11 +27,12 @@
 #include <QDebug>
 #include <QGraphicsPolygonItem>
 #include <QGraphicsSceneMouseEvent>
+#include <QUndoStack>
 
 namespace msc {
 
-ConditionItem::ConditionItem(MscCondition *condition, QGraphicsItem *parent)
-    : InteractiveObject(condition, parent)
+ConditionItem::ConditionItem(MscCondition *condition, ChartLayoutManager *chartLayoutManager, QGraphicsItem *parent)
+    : InteractiveObject(condition, chartLayoutManager, parent)
     , m_condition(condition)
     , m_polygonItem(new QGraphicsPolygonItem(this))
     , m_nameItem(new TextItem(this))
@@ -113,9 +115,10 @@ void ConditionItem::setInstance(InstanceItem *instance)
     scheduleLayoutUpdate();
 }
 
-ConditionItem *ConditionItem::createDefaultItem(MscCondition *condition, const QPointF &pos)
+ConditionItem *ConditionItem::createDefaultItem(
+        MscCondition *condition, ChartLayoutManager *chartLayoutManager, const QPointF &pos)
 {
-    ConditionItem *item = new ConditionItem(condition);
+    ConditionItem *item = new ConditionItem(condition, chartLayoutManager);
     item->setPos(pos);
 
     return item;
@@ -191,8 +194,7 @@ void ConditionItem::onNameEdited(const QString &name)
         return;
     }
 
-    using namespace msc::cmd;
-    CommandsStack::push(RenameEntity, { QVariant::fromValue<MscEntity *>(this->modelItem()), name });
+    m_chartLayoutManager->undoStack()->push(new cmd::CmdEntityNameChange(modelItem(), name, m_chartLayoutManager));
 }
 
 void ConditionItem::rebuildLayout()

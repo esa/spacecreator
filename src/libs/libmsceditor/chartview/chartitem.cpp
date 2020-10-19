@@ -21,7 +21,8 @@
 #include "baseitems/common/mscutils.h"
 #include "baseitems/textitem.h"
 #include "chartlayoutmanager.h"
-#include "commands/common/commandsstack.h"
+#include "commands/cmdchartitemchangegeometry.h"
+#include "commands/cmdentitynamechange.h"
 #include "graphicsviewutils.h"
 #include "mscchart.h"
 #include "mscchartviewconstants.h"
@@ -33,6 +34,7 @@
 #include <QGraphicsSceneMouseEvent>
 #include <QPainter>
 #include <QPointer>
+#include <QUndoStack>
 
 namespace msc {
 
@@ -44,8 +46,7 @@ QPointF ChartItem::m_margin = { CHART_BOX_ARGIN, CHART_BOX_ARGIN };
  * This class represents an entire chart. The contents with be children of this item
  */
 ChartItem::ChartItem(MscChart *chart, ChartLayoutManager *chartLayoutManager, QGraphicsItem *parent)
-    : InteractiveObject(chart, parent)
-    , m_chartLayoutManager(chartLayoutManager)
+    : InteractiveObject(chart, chartLayoutManager, parent)
     , m_rectItem(new QGraphicsRectItem(this))
     , m_contentArea(new QGraphicsRectItem(this))
     , m_textItemName(new NameItem(this))
@@ -77,7 +78,7 @@ void ChartItem::onNameEdited(const QString &text)
     if (!m_entity)
         return;
 
-    cmd::CommandsStack::push(cmd::RenameEntity, { QVariant::fromValue(m_entity.data()), text });
+    m_chartLayoutManager->undoStack()->push(new cmd::CmdEntityNameChange(m_entity, text, m_chartLayoutManager));
 }
 
 QRectF ChartItem::boundingRect() const
@@ -172,8 +173,8 @@ void ChartItem::onManualGeometryChangeFinished(shared::ui::GripPoint *, const QP
     if (!CoordinatesConverter::sceneToCif(chartBox, cifRectCurr))
         qWarning() << "ChartItem: Coordinates conversion (scene->mm) failed" << chartBox;
 
-    const QVariantList params { cifRectPrev, cifRectCurr };
-    msc::cmd::CommandsStack::push(msc::cmd::ChangeChartGeometry, params);
+    m_chartLayoutManager->undoStack()->push(
+            new cmd::CmdChartItemChangeGeometry(cifRectPrev, cifRectCurr, m_chartLayoutManager));
     m_prevContentRect = QRectF();
 }
 

@@ -17,7 +17,8 @@
 
 #include "documentitemmodel.h"
 
-#include "commands/common/commandsstack.h"
+#include "commands/cmdentitynamechange.h"
+#include "commands/cmdhierarchytypechange.h"
 #include "mscchart.h"
 #include "mscdocument.h"
 #include "mscmodel.h"
@@ -88,6 +89,12 @@ MscModel *DocumentItemModel::mscModel() const
     return m_mscModel.data();
 }
 
+void DocumentItemModel::setUndoStack(QUndoStack *undoStack)
+{
+    m_undoStack = undoStack;
+    Q_ASSERT(!m_undoStack.isNull());
+}
+
 QModelIndex DocumentItemModel::index(MscDocument *document) const
 {
     if (!document || m_mscModel.isNull()) {
@@ -108,13 +115,17 @@ QModelIndex DocumentItemModel::index(MscDocument *document) const
  */
 void DocumentItemModel::updateHierarchyType(const QModelIndex &index, const QVariant &hierarchyType)
 {
+    Q_ASSERT(!m_undoStack.isNull());
     if (!index.isValid() || index.internalPointer() == nullptr) {
         return;
     }
 
     auto obj = static_cast<QObject *>(index.internalPointer());
     if (auto document = dynamic_cast<MscDocument *>(obj)) {
-        cmd::CommandsStack::push(cmd::HierarchyType, { QVariant::fromValue(document), hierarchyType });
+        const MscDocument::HierarchyType type = static_cast<MscDocument::HierarchyType>(hierarchyType.toInt());
+        if (document->hierarchyType() != type) {
+            m_undoStack->push(new cmd::CmdHierarchyTypeChange(document, type));
+        }
     }
 }
 
@@ -283,6 +294,7 @@ QVariant DocumentItemModel::headerData(int section, Qt::Orientation orientation,
 
 bool DocumentItemModel::setData(const QModelIndex &index, const QVariant &value, int role)
 {
+    Q_ASSERT(!m_undoStack.isNull());
     if (role != Qt::EditRole) {
         return false;
     }
@@ -291,7 +303,7 @@ bool DocumentItemModel::setData(const QModelIndex &index, const QVariant &value,
         QVariant item;
         item = QVariant::fromValue(document);
 
-        cmd::CommandsStack::push(cmd::RenameEntity, { item, value });
+        m_undoStack->push(new cmd::CmdEntityNameChange(document, value.toString(), nullptr));
     }
 
     return true;

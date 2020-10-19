@@ -19,13 +19,16 @@
 
 #include "basetool.h"
 
+#include <QPointer>
+
 namespace msc {
+class ChartLayoutManager;
 
 class InstanceStopTool : public BaseTool
 {
     Q_OBJECT
 public:
-    explicit InstanceStopTool(QGraphicsView *view, QObject *parent = nullptr);
+    explicit InstanceStopTool(ChartLayoutManager *chartLayoutManager, QGraphicsView *view, QObject *parent = nullptr);
     void setView(QGraphicsView *view) override;
     void setAction(QAction *action) override;
 
@@ -41,6 +44,7 @@ private:
     void updateEnabledState();
 
 private:
+    QPointer<ChartLayoutManager> m_model = nullptr;
 };
 
 }; // ns msc

@@ -39,7 +39,7 @@ void tst_ChartItem::testChartName()
     using namespace msc;
 
     QScopedPointer<MscChart> chart(new MscChart());
-    QScopedPointer<ChartItem> chartItem(new ChartItem(chart.data()));
+    QScopedPointer<ChartItem> chartItem(new ChartItem(chart.data(), nullptr));
 
     QCOMPARE(chart->name(), MscEntity::DefaultName);
     QCOMPARE(chartItem->chartName(), chart->name());
