@@ -15,46 +15,25 @@
    along with this program. If not, see <https://www.gnu.org/licenses/lgpl-2.1.html>.
 */
 
-#include <QHash>
-#include <QObject>
-#include <QPointer>
-#include <QSharedPointer>
-
 #pragma once
 
-namespace aadlinterface {
-class IVEditorCore;
-}
+#include <QObject>
+#include <QString>
 
 namespace shared {
-class EditorCore;
-}
-
-namespace spctr {
-class MscChecks;
 
 /*!
-   Stores shared pointers to all aadl file objects. And creates a new one if needed
+   Virtual base class to perform consitency checks an corrections between MSC and AADL
  */
-class AadlModelStorage : public QObject
+class MscChecksBase : public QObject
 {
     Q_OBJECT
 
 public:
-    explicit AadlModelStorage(QObject *parent = nullptr);
+    MscChecksBase(QObject *parent = nullptr);
 
-    void setChecker(MscChecks *checks);
-
-    QSharedPointer<aadlinterface::IVEditorCore> ivData(const QString &fileName);
-
-Q_SIGNALS:
-    void editedExternally(shared::EditorCore *);
-
-private:
-    void setIvData(const QString &fileName, QSharedPointer<aadlinterface::IVEditorCore> ivData);
-
-    QHash<QString, QSharedPointer<aadlinterface::IVEditorCore>> m_store;
-    QPointer<MscChecks> m_checks;
+    virtual bool mscInstancesExists(const QString &name) = 0;
+    virtual void changeMscInstanceName(const QString &oldName, const QString &name) = 0;
 };
 
 }

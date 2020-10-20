@@ -15,40 +15,13 @@
    along with this program. If not, see <https://www.gnu.org/licenses/lgpl-2.1.html>.
 */
 
-#pragma once
-
-#include <QHash>
-#include <QObject>
-#include <QSharedPointer>
-
-namespace msc {
-class MSCEditorCore;
-}
+#include "mscchecksbase.h"
 
 namespace shared {
-class EditorCore;
-}
 
-namespace spctr {
-
-/*!
-   Stores shared pointers to all msc file objects. And creates a new one if needed
- */
-class MscModelStorage : public QObject
+MscChecksBase::MscChecksBase(QObject *parent)
+    : QObject(parent)
 {
-    Q_OBJECT
-public:
-    explicit MscModelStorage(QObject *parent = nullptr);
-
-    QSharedPointer<msc::MSCEditorCore> mscData(const QString &fileName);
-
-Q_SIGNALS:
-    void editedExternally(shared::EditorCore *);
-
-private:
-    void setMscData(const QString &fileName, QSharedPointer<msc::MSCEditorCore> mscData);
-
-    QHash<QString, QSharedPointer<msc::MSCEditorCore>> m_store;
-};
+}
 
 }

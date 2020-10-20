@@ -19,6 +19,7 @@
 
 #include "interface/interfacedocument.h"
 #include "iveditorcore.h"
+#include "mscchecks.h"
 
 #include <QDebug>
 
@@ -29,6 +30,11 @@ AadlModelStorage::AadlModelStorage(QObject *parent)
 {
 }
 
+void AadlModelStorage::setChecker(MscChecks *checks)
+{
+    m_checks = checks;
+}
+
 /*!
    Returns the IVEditorCore object for the given file
    If the object does not exist yet, one will be created and the data be loaded
@@ -37,6 +43,7 @@ QSharedPointer<aadlinterface::IVEditorCore> AadlModelStorage::ivData(const QStri
 {
     if (!m_store.contains(fileName)) {
         QSharedPointer<aadlinterface::IVEditorCore> data(new aadlinterface::IVEditorCore());
+        data->document()->setChecker(m_checks);
         data->document()->load(fileName);
         setIvData(fileName, data);
         return data;

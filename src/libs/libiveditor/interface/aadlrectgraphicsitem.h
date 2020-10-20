@@ -19,7 +19,12 @@
 
 #include "baseitems/interactiveobject.h"
 
+#include <QPointer>
 #include <QSet>
+
+namespace shared {
+class MscChecksBase;
+}
 
 namespace aadlinterface {
 
@@ -48,7 +53,11 @@ public:
     bool itemNeedsToBeRelayout() const;
     void layout();
 
+    void setChecker(shared::MscChecksBase *checks);
+
 protected:
+    QPointer<shared::MscChecksBase> m_checks;
+
     void rebuildLayout() override;
     void initGripPoints() override;
     void onManualMoveProgress(shared::ui::GripPoint *grip, const QPointF &from, const QPointF &to) override;

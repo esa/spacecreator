@@ -36,6 +36,7 @@
 #include "interface/colors/colormanagerdialog.h"
 #include "interface/properties/dynamicpropertymanager.h"
 #include "interface/properties/propertiesdialog.h"
+#include "mscchecksbase.h"
 #include "xmldocexporter.h"
 
 #include <QAction>
@@ -54,6 +55,7 @@
 #include <QMessageBox>
 #include <QMutex>
 #include <QMutexLocker>
+#include <QPointer>
 #include <QScreen>
 #include <QShortcut>
 #include <QSplitter>
@@ -442,6 +444,11 @@ Asn1Acn::Asn1ModelStorage *InterfaceDocument::asn1DataTypes() const
 QString InterfaceDocument::supportedFileExtensions() const
 {
     return QStringLiteral("*.xml");
+}
+
+void InterfaceDocument::setChecker(shared::MscChecksBase *checks)
+{
+    d->model->setChecker(checks);
 }
 
 void InterfaceDocument::onSavedExternally(const QString &filePath, bool saved)

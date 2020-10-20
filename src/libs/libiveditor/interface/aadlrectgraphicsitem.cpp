@@ -21,6 +21,7 @@
 #include "baseitems/common/aadlutils.h"
 #include "commandsstack.h"
 #include "interface/graphicsitemhelpers.h"
+#include "mscchecksbase.h"
 #include "ui/grippointshandler.h"
 
 #include <QKeyEvent>
@@ -401,6 +402,11 @@ void AADLRectGraphicsItem::layout()
     findGeometryForItem(this, itemRect, boundedRect);
     setRect(itemRect.marginsRemoved(kContentMargins));
     mergeGeometry();
+}
+
+void AADLRectGraphicsItem::setChecker(shared::MscChecksBase *checks)
+{
+    m_checks = checks;
 }
 
 bool AADLRectGraphicsItem::itemNeedsToBeRelayout() const

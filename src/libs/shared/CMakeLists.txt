@@ -36,14 +36,16 @@ target_sources(${LIB_NAME} PRIVATE
     geometry.h
     graphicsviewutils.cpp
     graphicsviewutils.h
+    mscchecksbase.cpp
+    mscchecksbase.h
+    minimap.h
+    minimap.cpp
     settingsappoption.cpp
     settingsappoption.h
     settingsmanager.cpp
     settingsmanager.h
     sharedlibrary.cpp
     sharedlibrary.h
-    minimap.h
-    minimap.cpp
     sharedresources/sharedresources.qrc
 )
 

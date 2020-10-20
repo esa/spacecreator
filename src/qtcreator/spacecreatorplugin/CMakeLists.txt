@@ -16,6 +16,8 @@ set(SC_PLUGIN_SOURCES
     aadlmodelstorage.h
     aadltexteditor.cpp
     aadltexteditor.h
+    mscchecks.cpp
+    mscchecks.h
     msccontext.cpp
     msccontext.h
     msceditordata.cpp

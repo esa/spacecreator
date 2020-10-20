@@ -17,10 +17,16 @@
 
 #pragma once
 
+#include "aadlobjectsmodel.h"
+
 #include <QObject>
+#include <QPointer>
 #include <QQueue>
 #include <QRectF>
-#include <aadlobjectsmodel.h>
+
+namespace shared {
+class MscChecksBase;
+}
 
 class QMutex;
 class QGraphicsItem;
@@ -67,6 +73,8 @@ public:
 
     QGraphicsItem *getItem(const shared::Id id) const;
 
+    void setChecker(shared::MscChecksBase *checks);
+
 Q_SIGNALS:
     void itemClicked(shared::Id id);
     void itemDoubleClicked(shared::Id id);
@@ -99,6 +107,7 @@ private:
     QQueue<aadl::AADLObject *> m_rmQueu;
     QRectF m_desktopGeometry;
     QRectF m_prevItemsRect;
+    QPointer<shared::MscChecksBase> m_checks;
 };
 
 } // namespace aadlinterface

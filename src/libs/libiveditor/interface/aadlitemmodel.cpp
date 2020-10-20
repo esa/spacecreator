@@ -35,6 +35,7 @@
 #include "interface/aadlinterfacegraphicsitem.h"
 #include "interface/aadlinterfacegroupgraphicsitem.h"
 #include "interfacetabgraphicsscene.h"
+#include "mscchecksbase.h"
 
 #include <QGuiApplication>
 #include <QItemSelectionModel>
@@ -114,9 +115,9 @@ namespace aadlinterface {
 
 AADLItemModel::AADLItemModel(QObject *parent)
     : aadl::AADLObjectsModel(parent)
+    , m_itemSelectionModel(new QItemSelectionModel(this))
     , m_graphicsScene(new InterfaceTabGraphicsScene(this))
     , m_mutex(new QMutex(QMutex::NonRecursive))
-    , m_itemSelectionModel(new QItemSelectionModel(this))
 {
     if (QGuiApplication::primaryScreen()) {
         m_desktopGeometry = QGuiApplication::primaryScreen()->availableGeometry();
@@ -360,6 +361,11 @@ QGraphicsItem *AADLItemModel::getItem(const shared::Id id) const
     return m_items.value(id);
 }
 
+void AADLItemModel::setChecker(shared::MscChecksBase *checks)
+{
+    m_checks = checks;
+}
+
 void AADLItemModel::updateSceneRect()
 {
     if (!m_graphicsScene) {
@@ -443,12 +449,14 @@ QGraphicsItem *AADLItemModel::createItemForObject(aadl::AADLObject *obj)
         break;
     case aadl::AADLObject::Type::Function: {
         auto function = new AADLFunctionGraphicsItem(qobject_cast<aadl::AADLObjectFunction *>(obj), parentItem);
+        function->setChecker(m_checks);
         nestedGeomtryConnect(parentItem, function);
         iObj = function;
     } break;
     case aadl::AADLObject::Type::FunctionType: {
         auto functionType =
                 new AADLFunctionTypeGraphicsItem(qobject_cast<aadl::AADLObjectFunctionType *>(obj), parentItem);
+        functionType->setChecker(m_checks);
         nestedGeomtryConnect(parentItem, functionType);
         iObj = functionType;
     } break;

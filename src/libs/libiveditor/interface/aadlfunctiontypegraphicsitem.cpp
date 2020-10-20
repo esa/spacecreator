@@ -33,10 +33,12 @@
 #include "commands/commandids.h"
 #include "commands/commandsfactory.h"
 #include "commandsstack.h"
+#include "mscchecksbase.h"
 
 #include <QApplication>
 #include <QGraphicsScene>
 #include <QGraphicsView>
+#include <QMessageBox>
 #include <QPainter>
 #include <QtDebug>
 
@@ -63,17 +65,7 @@ void AADLFunctionTypeGraphicsItem::init()
     m_textItem->setPlainText(entity()->title());
     m_textItem->setTextAlignment(Qt::AlignLeft | Qt::AlignTop);
 
-    connect(m_textItem, &TextGraphicsItem::edited, this, [this](const QString &text) {
-        if (!aadl::AADLNameValidator::isAcceptableName(entity(), text)) {
-            m_textItem->setPlainText(entity()->title());
-            return;
-        }
-
-        const QVariantMap attributess = { { aadl::meta::Props::token(aadl::meta::Props::Token::name), text } };
-        if (const auto attributesCmd = cmd::CommandsFactory::create(
-                    cmd::ChangeEntityAttributes, { QVariant::fromValue(entity()), QVariant::fromValue(attributess) }))
-            cmd::CommandsStack::current()->push(attributesCmd);
-    });
+    connect(m_textItem, &TextGraphicsItem::edited, this, &AADLFunctionTypeGraphicsItem::updateNameFromUi);
     connect(entity(), qOverload<aadl::meta::Props::Token>(&aadl::AADLObjectFunction::attributeChanged), this,
             [this](aadl::meta::Props::Token attr) {
                 if (attr == aadl::meta::Props::Token::name) {
@@ -151,6 +143,35 @@ void AADLFunctionTypeGraphicsItem::applyColorScheme()
     setPen(h.pen());
     setBrush(h.brush());
     update();
+}
+
+void AADLFunctionTypeGraphicsItem::updateNameFromUi(const QString &name)
+{
+    if (name == entity()->title()) {
+        return;
+    }
+    if (!aadl::AADLNameValidator::isAcceptableName(entity(), name)) {
+        m_textItem->setPlainText(entity()->title());
+        return;
+    }
+
+    const QString oldName = entity()->title();
+
+    const QVariantMap attributess = { { aadl::meta::Props::token(aadl::meta::Props::Token::name), name } };
+    if (const auto attributesCmd = cmd::CommandsFactory::create(
+                cmd::ChangeEntityAttributes, { QVariant::fromValue(entity()), QVariant::fromValue(attributess) })) {
+        cmd::CommandsStack::current()->push(attributesCmd);
+    }
+
+    if (m_checks) {
+        if (m_checks->mscInstancesExists(oldName)) {
+            const int result =
+                    QMessageBox::question(nullptr, tr("Update instances"), tr("Do you want to update MSC instances?"));
+            if (result == QMessageBox::Yes) {
+                m_checks->changeMscInstanceName(oldName, name);
+            }
+        }
+    }
 }
 
 QString AADLFunctionTypeGraphicsItem::prepareTooltip() const

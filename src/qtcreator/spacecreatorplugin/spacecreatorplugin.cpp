@@ -27,6 +27,7 @@
 #include "iveditorcore.h"
 #include "mainmodel.h"
 #include "mscchart.h"
+#include "mscchecks.h"
 #include "msceditor.h"
 #include "msceditorcore.h"
 #include "msceditordata.h"
@@ -96,6 +97,11 @@ bool SpaceCreatorPlugin::initialize(const QStringList &arguments, QString *error
     connect(m_aadlStorage, &spctr::AadlModelStorage::editedExternally, this, &spctr::SpaceCreatorPlugin::saveIfNotOpen);
     m_mscStorage = new MscModelStorage(this);
     connect(m_mscStorage, &spctr::MscModelStorage::editedExternally, this, &spctr::SpaceCreatorPlugin::saveIfNotOpen);
+
+    m_checks = new MscChecks(this);
+    m_checks->setMscStorage(m_mscStorage);
+    m_aadlStorage->setChecker(m_checks);
+
     m_mscFactory = new MscEditorFactory(m_mscStorage, this);
     m_aadlFactory = new AadlEditorFactory(m_aadlStorage, this);
 
@@ -184,7 +190,7 @@ bool SpaceCreatorPlugin::initialize(const QStringList &arguments, QString *error
     // asn connection
     connect(ProjectExplorer::ProjectTree::instance(), &ProjectExplorer::ProjectTree::currentProjectChanged, this,
             [this](ProjectExplorer::Project *project) {
-                m_asnFiles = allAsn1Files();
+                m_asnFiles = m_checks->allAsn1Files();
                 connect(project, &ProjectExplorer::Project::fileListChanged, this,
                         &spctr::SpaceCreatorPlugin::checkAsnFileRename, Qt::UniqueConnection);
             });
@@ -208,30 +214,6 @@ ExtensionSystem::IPlugin::ShutdownFlag SpaceCreatorPlugin::aboutToShutdown()
     return SynchronousShutdown;
 }
 
-/*!
-   Returns all aald files of the current project
- */
-QStringList SpaceCreatorPlugin::allAadlFiles() const
-{
-    return projectFiles("interfaceview.xml");
-}
-
-/*!
-   Returns all msc files of the current project
- */
-QStringList SpaceCreatorPlugin::allMscFiles() const
-{
-    return projectFiles(".msc");
-}
-
-/*!
-   Returns all asn files of the current project
- */
-QStringList SpaceCreatorPlugin::allAsn1Files() const
-{
-    return projectFiles(".asn");
-}
-
 void SpaceCreatorPlugin::showMessageDeclarations()
 {
     m_mscFactory->editorData()->editMessageDeclarations(Core::ICore::mainWindow());
@@ -244,7 +226,7 @@ void SpaceCreatorPlugin::checkInstances()
         return;
     }
 
-    QVector<QSharedPointer<msc::MSCEditorCore>> mscCores = allMscCores();
+    QVector<QSharedPointer<msc::MSCEditorCore>> mscCores = m_checks->allMscCores();
 
     for (QSharedPointer<msc::MSCEditorCore> mplugin : mscCores) {
         mplugin->aadlChecker()->setIvCore(ivp);
@@ -299,7 +281,7 @@ void SpaceCreatorPlugin::checkMessages()
         return;
     }
 
-    QVector<QSharedPointer<msc::MSCEditorCore>> mscCores = allMscCores();
+    QVector<QSharedPointer<msc::MSCEditorCore>> mscCores = m_checks->allMscCores();
 
     // check messages
     QVector<QPair<msc::MscChart *, msc::MscMessage *>> resultNames;
@@ -356,7 +338,7 @@ void SpaceCreatorPlugin::onDynContextEditorMenuInvoked()
  */
 void SpaceCreatorPlugin::checkAsnFileRename()
 {
-    QStringList asnFiles = allAsn1Files();
+    QStringList asnFiles = m_checks->allAsn1Files();
 
     QStringList newAsnFiles;
     for (const QString &file : asnFiles) {
@@ -372,7 +354,7 @@ void SpaceCreatorPlugin::checkAsnFileRename()
     }
 
     if (newAsnFiles.size() == 1 && lostAsnFiles.size() == 1) {
-        for (QSharedPointer<msc::MSCEditorCore> &mscCore : allMscCores()) {
+        for (QSharedPointer<msc::MSCEditorCore> &mscCore : m_checks->allMscCores()) {
             mscCore->renameAsnFile(lostAsnFiles[0], newAsnFiles[0]);
         }
         ivCore()->renameAsnFile(lostAsnFiles[0], newAsnFiles[0]);
@@ -394,46 +376,13 @@ void SpaceCreatorPlugin::saveIfNotOpen(shared::EditorCore *core)
 
 QSharedPointer<aadlinterface::IVEditorCore> SpaceCreatorPlugin::ivCore() const
 {
-    QStringList aadlFiles = allAadlFiles();
+    QStringList aadlFiles = m_checks->allAadlFiles();
     if (aadlFiles.empty()) {
         qWarning() << "No AADL file in the projec";
         return {};
     }
 
     return m_aadlStorage->ivData(aadlFiles.first());
-}
-
-QVector<QSharedPointer<msc::MSCEditorCore>> SpaceCreatorPlugin::allMscCores() const
-{
-    QStringList mscFiles = allMscFiles();
-    QVector<QSharedPointer<msc::MSCEditorCore>> allMscCores;
-    for (const QString &mscFile : mscFiles) {
-        QSharedPointer<msc::MSCEditorCore> core = m_mscStorage->mscData(mscFile);
-        if (core) {
-            allMscCores.append(core);
-        }
-    }
-    return allMscCores;
-}
-
-/*!
-   Returns all files of the current project endig with the given \p suffix
- */
-QStringList SpaceCreatorPlugin::projectFiles(const QString &suffix) const
-{
-    ProjectExplorer::Project *project = ProjectExplorer::ProjectTree::currentProject();
-    if (!project) {
-        return {};
-    }
-
-    QStringList result;
-    for (Utils::FileName fileName : project->files(ProjectExplorer::Project::AllFiles)) {
-        if (fileName.toString().endsWith(suffix, Qt::CaseInsensitive)) {
-            result.append(fileName.toString());
-        }
-    }
-
-    return result;
 }
 
 /*!

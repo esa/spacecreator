@@ -41,6 +41,7 @@ namespace spctr {
 
 class AadlEditorFactory;
 class AadlModelStorage;
+class MscChecks;
 class MscEditorFactory;
 class MscModelStorage;
 
@@ -57,10 +58,6 @@ public:
     void extensionsInitialized() override;
     ShutdownFlag aboutToShutdown() override;
 
-    QStringList allAadlFiles() const;
-    QStringList allMscFiles() const;
-    QStringList allAsn1Files() const;
-
 private Q_SLOTS:
     void showMessageDeclarations();
     void checkInstances();
@@ -75,8 +72,6 @@ private Q_SLOTS:
 
 private:
     QSharedPointer<aadlinterface::IVEditorCore> ivCore() const;
-    QVector<QSharedPointer<msc::MSCEditorCore>> allMscCores() const;
-    QStringList projectFiles(const QString &suffix) const;
     bool isOpenInEditor(shared::EditorCore *core) const;
 
     MscEditorFactory *m_mscFactory = nullptr;
@@ -86,6 +81,7 @@ private:
     AadlModelStorage *m_aadlStorage = nullptr;
     MscModelStorage *m_mscStorage = nullptr;
     QStringList m_asnFiles;
+    MscChecks *m_checks = nullptr;
 };
 
 }
