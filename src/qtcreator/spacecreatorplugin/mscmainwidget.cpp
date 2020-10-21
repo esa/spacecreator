@@ -77,11 +77,15 @@ bool MscMainWidget::load(const QString &filename)
         init();
         m_plugin->mainModel()->chartViewModel().clearScene();
         m_plugin->mainModel()->chartViewModel().updateLayout();
+        m_plugin->chartView()->setZoom(100);
     }
-    m_asn1Widget->setFile(m_plugin->mainModel()->asn1File());
-    m_plugin->chartView()->setZoom(100);
-    m_documentTree->expandAll();
-    m_documentTree->setSelectedDocument(m_plugin->mainModel()->selectedDocument());
+    if (m_asn1Widget) {
+        m_asn1Widget->setFile(m_plugin->mainModel()->asn1File());
+    }
+    if (m_documentTree) {
+        m_documentTree->expandAll();
+        m_documentTree->setSelectedDocument(m_plugin->mainModel()->selectedDocument());
+    }
     Q_EMIT mscDataLoaded(filename, m_plugin);
 
     return true;
