@@ -17,22 +17,18 @@
 
 #include "spacecreatorplugin.h"
 
-#include "aadlchecks.h"
 #include "aadleditordata.h"
 #include "aadleditorfactory.h"
 #include "aadlmodelstorage.h"
 #include "aadlmscchecks.h"
 #include "asn1library.h"
-#include "interface/interfacedocument.h"
 #include "iveditor.h"
 #include "iveditorcore.h"
 #include "mainmodel.h"
-#include "mscchart.h"
 #include "msceditor.h"
 #include "msceditorcore.h"
 #include "msceditordata.h"
 #include "msceditorfactory.h"
-#include "mscinstance.h"
 #include "msclibrary.h"
 #include "mscmodelstorage.h"
 #include "sharedlibrary.h"
@@ -100,6 +96,7 @@ bool SpaceCreatorPlugin::initialize(const QStringList &arguments, QString *error
 
     m_checks = new AadlMscChecks(this);
     m_checks->setMscStorage(m_mscStorage);
+    m_checks->setAadlStorage(m_aadlStorage);
     m_aadlStorage->setChecker(m_checks);
 
     m_mscFactory = new MscEditorFactory(m_mscStorage, this);
@@ -122,12 +119,12 @@ bool SpaceCreatorPlugin::initialize(const QStringList &arguments, QString *error
     auto action = new QAction(tr("Check instances"), this);
     Core::Command *checkInstancesCmd = Core::ActionManager::registerAction(
             action, Constants::CHECK_INSTANCES_ID, Core::Context(Core::Constants::C_GLOBAL));
-    connect(action, &QAction::triggered, this, &SpaceCreatorPlugin::checkInstances);
+    connect(action, &QAction::triggered, m_checks, &AadlMscChecks::checkInstances);
 
     action = new QAction(tr("Check messages"), this);
     Core::Command *checkMessagesCmd = Core::ActionManager::registerAction(
             action, Constants::CHECK_MESSAGES_ID, Core::Context(Core::Constants::C_GLOBAL));
-    connect(action, &QAction::triggered, this, &SpaceCreatorPlugin::checkMessages);
+    connect(action, &QAction::triggered, m_checks, &AadlMscChecks::checkMessages);
 
     auto showMinimapAction = new QAction(tr("Show minimap"), this);
     showMinimapAction->setCheckable(true);
@@ -219,94 +216,6 @@ void SpaceCreatorPlugin::showMessageDeclarations()
     m_mscFactory->editorData()->editMessageDeclarations(Core::ICore::mainWindow());
 }
 
-void SpaceCreatorPlugin::checkInstances()
-{
-    QSharedPointer<aadlinterface::IVEditorCore> ivp = ivCore();
-    if (!ivp) {
-        return;
-    }
-
-    QVector<QSharedPointer<msc::MSCEditorCore>> mscCores = m_checks->allMscCores();
-
-    for (QSharedPointer<msc::MSCEditorCore> mplugin : mscCores) {
-        mplugin->aadlChecker()->setIvCore(ivp);
-    }
-
-    // Check for names
-    QVector<QPair<msc::MscChart *, msc::MscInstance *>> resultNames;
-    for (QSharedPointer<msc::MSCEditorCore> mplugin : mscCores) {
-        resultNames += mplugin->aadlChecker()->checkInstanceNames();
-    }
-
-    // Check for nested functions usage
-    QVector<QPair<msc::MscChart *, msc::MscInstance *>> resultRelations;
-    for (QSharedPointer<msc::MSCEditorCore> mplugin : mscCores) {
-        resultRelations += mplugin->aadlChecker()->checkInstanceRelations();
-    }
-
-    QString text;
-    if (!resultNames.isEmpty()) {
-        text += tr("Following instances have no corresponding aadl function:\n");
-        for (auto item : resultNames) {
-            if (!text.isEmpty()) {
-                text += "\n";
-            }
-            text += QString("%1 from chart %2").arg(item.second->name(), item.first->name());
-        }
-    }
-    if (!resultRelations.isEmpty()) {
-        if (!text.isEmpty()) {
-            text += "\n\n";
-        }
-        text += tr("Following instances are used with parent/hild of nested functions:\n");
-        for (auto item : resultRelations) {
-            if (!text.isEmpty()) {
-                text += "\n";
-            }
-            text += QString("%1 from chart %2").arg(item.second->name(), item.first->name());
-        }
-    }
-
-    if (resultNames.isEmpty() && resultRelations.isEmpty()) {
-        QMessageBox::information(nullptr, tr("All instaces are ok"), tr("All instaces are ok"));
-    } else {
-        QMessageBox::information(nullptr, tr("Non conforming instances"), text);
-    }
-}
-
-void SpaceCreatorPlugin::checkMessages()
-{
-    QSharedPointer<aadlinterface::IVEditorCore> ivp = ivCore();
-    if (!ivp) {
-        return;
-    }
-
-    QVector<QSharedPointer<msc::MSCEditorCore>> mscCores = m_checks->allMscCores();
-
-    // check messages
-    QVector<QPair<msc::MscChart *, msc::MscMessage *>> resultNames;
-    for (QSharedPointer<msc::MSCEditorCore> mplugin : mscCores) {
-        mplugin->aadlChecker()->setIvCore(ivp);
-        resultNames += mplugin->aadlChecker()->checkMessages();
-    }
-
-    QString text;
-    if (!resultNames.isEmpty()) {
-        text += tr("Following messages have no corresponding aadl connection:\n");
-        for (auto item : resultNames) {
-            if (!text.isEmpty()) {
-                text += "\n";
-            }
-            text += QString("%1 from chart %2").arg(item.second->name(), item.first->name());
-        }
-    }
-    if (resultNames.isEmpty()) {
-        QMessageBox::information(nullptr, tr("All messages are ok"), tr("All messages are ok"));
-    } else {
-        QMessageBox::information(nullptr, tr("Non conforming messages"), text);
-    }
-}
-
 void SpaceCreatorPlugin::setMinimapVisible(bool visible)
 {
     m_mscFactory->editorData()->setMinimapVisible(visible);
@@ -357,7 +266,7 @@ void SpaceCreatorPlugin::checkAsnFileRename()
         for (QSharedPointer<msc::MSCEditorCore> &mscCore : m_checks->allMscCores()) {
             mscCore->renameAsnFile(lostAsnFiles[0], newAsnFiles[0]);
         }
-        ivCore()->renameAsnFile(lostAsnFiles[0], newAsnFiles[0]);
+        m_checks->ivCore()->renameAsnFile(lostAsnFiles[0], newAsnFiles[0]);
     }
 
     m_asnFiles = asnFiles;
@@ -372,17 +281,6 @@ void SpaceCreatorPlugin::saveIfNotOpen(shared::EditorCore *core)
     if (!isOpenInEditor(core)) {
         core->save();
     }
-}
-
-QSharedPointer<aadlinterface::IVEditorCore> SpaceCreatorPlugin::ivCore() const
-{
-    QStringList aadlFiles = m_checks->allAadlFiles();
-    if (aadlFiles.empty()) {
-        qWarning() << "No AADL file in the projec";
-        return {};
-    }
-
-    return m_aadlStorage->ivData(aadlFiles.first());
 }
 
 /*!

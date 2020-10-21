@@ -60,8 +60,6 @@ public:
 
 private Q_SLOTS:
     void showMessageDeclarations();
-    void checkInstances();
-    void checkMessages();
     void setMinimapVisible(bool visible);
     void showAsn1Dialog();
     void onAttributesManagerRequested();
@@ -71,7 +69,6 @@ private Q_SLOTS:
     void saveIfNotOpen(shared::EditorCore *core);
 
 private:
-    QSharedPointer<aadlinterface::IVEditorCore> ivCore() const;
     bool isOpenInEditor(shared::EditorCore *core) const;
 
     MscEditorFactory *m_mscFactory = nullptr;

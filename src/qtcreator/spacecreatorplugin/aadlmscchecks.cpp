@@ -17,8 +17,11 @@
 
 #include "aadlmscchecks.h"
 
+#include "aadlchecks.h"
+#include "aadlmodelstorage.h"
 #include "chartlayoutmanager.h"
 #include "commands/cmdentitynamechange.h"
+#include "iveditorcore.h"
 #include "mainmodel.h"
 #include "mscchart.h"
 #include "msceditorcore.h"
@@ -27,6 +30,7 @@
 #include "mscmodelstorage.h"
 
 #include <QDebug>
+#include <QMessageBox>
 #include <QUndoStack>
 #include <projectexplorer/project.h>
 #include <projectexplorer/projecttree.h>
@@ -42,6 +46,11 @@ AadlMscChecks::AadlMscChecks(QObject *parent)
 void AadlMscChecks::setMscStorage(MscModelStorage *mscStorage)
 {
     m_mscStorage = mscStorage;
+}
+
+void AadlMscChecks::setAadlStorage(AadlModelStorage *aadlStorage)
+{
+    m_aadlStorage = aadlStorage;
 }
 
 /*!
@@ -78,6 +87,105 @@ void AadlMscChecks::changeMscInstanceName(const QString &oldName, const QString 
             }
         }
     }
+}
+
+void AadlMscChecks::checkInstances()
+{
+    QSharedPointer<aadlinterface::IVEditorCore> ivp = ivCore();
+    if (!ivp) {
+        return;
+    }
+
+    QVector<QSharedPointer<msc::MSCEditorCore>> mscCores = allMscCores();
+
+    for (QSharedPointer<msc::MSCEditorCore> mplugin : mscCores) {
+        mplugin->aadlChecker()->setIvCore(ivp);
+    }
+
+    // Check for names
+    QVector<QPair<msc::MscChart *, msc::MscInstance *>> resultNames;
+    for (QSharedPointer<msc::MSCEditorCore> mplugin : mscCores) {
+        resultNames += mplugin->aadlChecker()->checkInstanceNames();
+    }
+
+    // Check for nested functions usage
+    QVector<QPair<msc::MscChart *, msc::MscInstance *>> resultRelations;
+    for (QSharedPointer<msc::MSCEditorCore> mplugin : mscCores) {
+        resultRelations += mplugin->aadlChecker()->checkInstanceRelations();
+    }
+
+    QString text;
+    if (!resultNames.isEmpty()) {
+        text += tr("Following instances have no corresponding aadl function:\n");
+        for (auto item : resultNames) {
+            if (!text.isEmpty()) {
+                text += "\n";
+            }
+            text += QString("%1 from chart %2").arg(item.second->name(), item.first->name());
+        }
+    }
+    if (!resultRelations.isEmpty()) {
+        if (!text.isEmpty()) {
+            text += "\n\n";
+        }
+        text += tr("Following instances are used with parent/hild of nested functions:\n");
+        for (auto item : resultRelations) {
+            if (!text.isEmpty()) {
+                text += "\n";
+            }
+            text += QString("%1 from chart %2").arg(item.second->name(), item.first->name());
+        }
+    }
+
+    if (resultNames.isEmpty() && resultRelations.isEmpty()) {
+        QMessageBox::information(nullptr, tr("All instaces are ok"), tr("All instaces are ok"));
+    } else {
+        QMessageBox::information(nullptr, tr("Non conforming instances"), text);
+    }
+}
+
+void AadlMscChecks::checkMessages()
+{
+    QSharedPointer<aadlinterface::IVEditorCore> ivp = ivCore();
+    if (!ivp) {
+        return;
+    }
+
+    QVector<QSharedPointer<msc::MSCEditorCore>> mscCores = allMscCores();
+
+    // check messages
+    QVector<QPair<msc::MscChart *, msc::MscMessage *>> resultNames;
+    for (QSharedPointer<msc::MSCEditorCore> mplugin : mscCores) {
+        mplugin->aadlChecker()->setIvCore(ivp);
+        resultNames += mplugin->aadlChecker()->checkMessages();
+    }
+
+    QString text;
+    if (!resultNames.isEmpty()) {
+        text += tr("Following messages have no corresponding aadl connection:\n");
+        for (auto item : resultNames) {
+            if (!text.isEmpty()) {
+                text += "\n";
+            }
+            text += QString("%1 from chart %2").arg(item.second->name(), item.first->name());
+        }
+    }
+    if (resultNames.isEmpty()) {
+        QMessageBox::information(nullptr, tr("All messages are ok"), tr("All messages are ok"));
+    } else {
+        QMessageBox::information(nullptr, tr("Non conforming messages"), text);
+    }
+}
+
+QSharedPointer<aadlinterface::IVEditorCore> AadlMscChecks::ivCore() const
+{
+    QStringList aadlFiles = allAadlFiles();
+    if (aadlFiles.empty()) {
+        qWarning() << "No AADL file in the projec";
+        return {};
+    }
+
+    return m_aadlStorage->ivData(aadlFiles.first());
 }
 
 /*!

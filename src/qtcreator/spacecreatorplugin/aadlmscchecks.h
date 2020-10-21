@@ -23,11 +23,16 @@
 #include <QSharedPointer>
 #include <QVector>
 
+namespace aadlinterface {
+class IVEditorCore;
+}
+
 namespace msc {
 class MSCEditorCore;
 }
 
 namespace spctr {
+class AadlModelStorage;
 class MscModelStorage;
 
 /*!
@@ -38,11 +43,19 @@ class AadlMscChecks : public shared::AadlMscChecksBase
 public:
     AadlMscChecks(QObject *parent = nullptr);
 
+    // Setup functions
     void setMscStorage(MscModelStorage *mscStorage);
+    void setAadlStorage(AadlModelStorage *aadlStorage);
 
+    // Check functions
     bool mscInstancesExists(const QString &name) override;
     void changeMscInstanceName(const QString &oldName, const QString &name) override;
 
+    void checkInstances();
+    void checkMessages();
+
+    // Query functions
+    QSharedPointer<aadlinterface::IVEditorCore> ivCore() const;
     QVector<QSharedPointer<msc::MSCEditorCore>> allMscCores() const;
 
     QStringList allAadlFiles() const;
@@ -52,6 +65,7 @@ public:
 
 private:
     QPointer<MscModelStorage> m_mscStorage;
+    QPointer<AadlModelStorage> m_aadlStorage;
 };
 
 }
