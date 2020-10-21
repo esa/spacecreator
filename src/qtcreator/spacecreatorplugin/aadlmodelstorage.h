@@ -49,6 +49,7 @@ public:
 
 Q_SIGNALS:
     void editedExternally(shared::EditorCore *);
+    void coreAdded(QSharedPointer<aadlinterface::IVEditorCore> mscCore);
 
 private:
     void setIvData(const QString &fileName, QSharedPointer<aadlinterface::IVEditorCore> ivData);

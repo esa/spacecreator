@@ -44,6 +44,7 @@ public:
 
 Q_SIGNALS:
     void editedExternally(shared::EditorCore *);
+    void coreAdded(QSharedPointer<msc::MSCEditorCore> mscCore);
 
 private:
     void setMscData(const QString &fileName, QSharedPointer<msc::MSCEditorCore> mscData);

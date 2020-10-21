@@ -17,6 +17,7 @@
 
 #include "spacecreatorplugin.h"
 
+#include "aadlchecks.h"
 #include "aadleditordata.h"
 #include "aadleditorfactory.h"
 #include "aadlmodelstorage.h"
@@ -98,6 +99,10 @@ bool SpaceCreatorPlugin::initialize(const QStringList &arguments, QString *error
     m_checks->setMscStorage(m_mscStorage);
     m_checks->setAadlStorage(m_aadlStorage);
     m_aadlStorage->setChecker(m_checks);
+
+    connect(m_mscStorage, &spctr::MscModelStorage::coreAdded, this, [this](QSharedPointer<msc::MSCEditorCore> mscCore) {
+        mscCore->aadlChecker()->setIvCore(m_checks->ivCore());
+    });
 
     m_mscFactory = new MscEditorFactory(m_mscStorage, this);
     m_aadlFactory = new AadlEditorFactory(m_aadlStorage, this);

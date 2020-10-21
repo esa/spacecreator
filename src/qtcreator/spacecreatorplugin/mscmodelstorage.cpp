@@ -60,6 +60,7 @@ void MscModelStorage::setMscData(const QString &fileName, QSharedPointer<msc::MS
 
     m_store[fileName] = mscData;
     connect(mscData.data(), &shared::EditorCore::editedExternally, this, &spctr::MscModelStorage::editedExternally);
+    Q_EMIT coreAdded(mscData);
 }
 
 }

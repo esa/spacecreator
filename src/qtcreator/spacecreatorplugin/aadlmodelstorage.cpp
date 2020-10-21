@@ -69,6 +69,7 @@ void AadlModelStorage::setIvData(const QString &fileName, QSharedPointer<aadlint
 
     m_store[fileName] = ivData;
     connect(ivData.data(), &shared::EditorCore::editedExternally, this, &spctr::AadlModelStorage::editedExternally);
+    Q_EMIT coreAdded(ivData);
 }
 
 }
