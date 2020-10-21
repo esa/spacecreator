@@ -124,7 +124,7 @@ QAction *EditorCore::actionSaveFileAs()
 {
     if (m_actionSaveFileAs == nullptr) {
         m_actionSaveFileAs = new QAction(tr("Save file &as..."), this);
-        m_actionSaveFile->setIcon(QIcon::fromTheme("document-save"));
+        m_actionSaveFileAs->setIcon(QIcon::fromTheme("document-save-as"));
         m_actionSaveFileAs->setShortcut(QKeySequence::SaveAs);
     }
     return m_actionSaveFileAs;
