@@ -17,11 +17,11 @@
 
 #include "aadlrectgraphicsitem.h"
 
+#include "aadlmscchecksbase.h"
 #include "aadlobject.h"
 #include "baseitems/common/aadlutils.h"
 #include "commandsstack.h"
 #include "interface/graphicsitemhelpers.h"
-#include "mscchecksbase.h"
 #include "ui/grippointshandler.h"
 
 #include <QKeyEvent>
@@ -404,7 +404,7 @@ void AADLRectGraphicsItem::layout()
     mergeGeometry();
 }
 
-void AADLRectGraphicsItem::setChecker(shared::MscChecksBase *checks)
+void AADLRectGraphicsItem::setChecker(shared::AadlMscChecksBase *checks)
 {
     m_checks = checks;
 }

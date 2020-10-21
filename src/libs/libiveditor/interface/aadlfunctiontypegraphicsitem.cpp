@@ -22,6 +22,7 @@
 #include "aadlfunctiongraphicsitem.h"
 #include "aadlfunctionnamegraphicsitem.h"
 #include "aadlinterfacegraphicsitem.h"
+#include "aadlmscchecksbase.h"
 #include "aadlnamevalidator.h"
 #include "aadlobject.h"
 #include "aadlobjectconnection.h"
@@ -33,7 +34,6 @@
 #include "commands/commandids.h"
 #include "commands/commandsfactory.h"
 #include "commandsstack.h"
-#include "mscchecksbase.h"
 
 #include <QApplication>
 #include <QGraphicsScene>

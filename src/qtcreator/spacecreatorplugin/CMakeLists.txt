@@ -14,10 +14,10 @@ set(SC_PLUGIN_SOURCES
     aadlmainwidget.h
     aadlmodelstorage.cpp
     aadlmodelstorage.h
+    aadlmscchecks.cpp
+    aadlmscchecks.h
     aadltexteditor.cpp
     aadltexteditor.h
-    mscchecks.cpp
-    mscchecks.h
     msccontext.cpp
     msccontext.h
     msceditordata.cpp

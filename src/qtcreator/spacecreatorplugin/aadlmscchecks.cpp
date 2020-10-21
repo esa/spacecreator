@@ -15,7 +15,7 @@
   along with this program. If not, see <https://www.gnu.org/licenses/lgpl-2.1.html>.
 */
 
-#include "mscchecks.h"
+#include "aadlmscchecks.h"
 
 #include "chartlayoutmanager.h"
 #include "commands/cmdentitynamechange.h"
@@ -34,12 +34,12 @@
 
 namespace spctr {
 
-MscChecks::MscChecks(QObject *parent)
-    : shared::MscChecksBase(parent)
+AadlMscChecks::AadlMscChecks(QObject *parent)
+    : shared::AadlMscChecksBase(parent)
 {
 }
 
-void MscChecks::setMscStorage(MscModelStorage *mscStorage)
+void AadlMscChecks::setMscStorage(MscModelStorage *mscStorage)
 {
     m_mscStorage = mscStorage;
 }
@@ -47,7 +47,7 @@ void MscChecks::setMscStorage(MscModelStorage *mscStorage)
 /*!
    Returns if at least one instance in one of the .msc files has the name \p name
  */
-bool MscChecks::mscInstancesExists(const QString &name)
+bool AadlMscChecks::mscInstancesExists(const QString &name)
 {
     for (QSharedPointer<msc::MSCEditorCore> mscCore : allMscCores()) {
         for (msc::MscChart *chart : mscCore->mainModel()->mscModel()->allCharts()) {
@@ -64,7 +64,7 @@ bool MscChecks::mscInstancesExists(const QString &name)
 /*!
    Changes all instances that have the name \p oldName to have the new name \p name
  */
-void MscChecks::changeMscInstanceName(const QString &oldName, const QString &name)
+void AadlMscChecks::changeMscInstanceName(const QString &oldName, const QString &name)
 {
     for (QSharedPointer<msc::MSCEditorCore> mscCore : allMscCores()) {
         for (msc::MscChart *chart : mscCore->mainModel()->mscModel()->allCharts()) {
@@ -83,7 +83,7 @@ void MscChecks::changeMscInstanceName(const QString &oldName, const QString &nam
 /*!
    Returns all MSCEditorCore objects, that are used in the current project
  */
-QVector<QSharedPointer<msc::MSCEditorCore>> MscChecks::allMscCores() const
+QVector<QSharedPointer<msc::MSCEditorCore>> AadlMscChecks::allMscCores() const
 {
     QStringList mscFiles = allMscFiles();
     QVector<QSharedPointer<msc::MSCEditorCore>> allMscCores;
@@ -99,7 +99,7 @@ QVector<QSharedPointer<msc::MSCEditorCore>> MscChecks::allMscCores() const
 /*!
    Returns all aald files of the current project
  */
-QStringList MscChecks::allAadlFiles() const
+QStringList AadlMscChecks::allAadlFiles() const
 {
     return projectFiles("interfaceview.xml");
 }
@@ -107,7 +107,7 @@ QStringList MscChecks::allAadlFiles() const
 /*!
    Returns all msc files of the current project
  */
-QStringList MscChecks::allMscFiles() const
+QStringList AadlMscChecks::allMscFiles() const
 {
     return projectFiles(".msc");
 }
@@ -115,7 +115,7 @@ QStringList MscChecks::allMscFiles() const
 /*!
    Returns all asn files of the current project
  */
-QStringList MscChecks::allAsn1Files() const
+QStringList AadlMscChecks::allAsn1Files() const
 {
     return projectFiles(".asn");
 }
@@ -123,7 +123,7 @@ QStringList MscChecks::allAsn1Files() const
 /*!
    Returns all files of the current project endig with the given \p suffix
  */
-QStringList MscChecks::projectFiles(const QString &suffix) const
+QStringList AadlMscChecks::projectFiles(const QString &suffix) const
 {
     ProjectExplorer::Project *project = ProjectExplorer::ProjectTree::currentProject();
     if (!project) {

@@ -22,6 +22,8 @@ target_sources(${LIB_NAME} PRIVATE
     ui/highlightrectitem.h
     ui/interactiveobjectbase.cpp
     ui/interactiveobjectbase.h
+    aadlmscchecksbase.cpp
+    aadlmscchecksbase.h
     animation.cpp
     animation.h
     commandlineparser.cpp
@@ -36,8 +38,6 @@ target_sources(${LIB_NAME} PRIVATE
     geometry.h
     graphicsviewutils.cpp
     graphicsviewutils.h
-    mscchecksbase.cpp
-    mscchecksbase.h
     minimap.h
     minimap.cpp
     settingsappoption.cpp

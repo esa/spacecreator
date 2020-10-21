@@ -31,7 +31,7 @@ class EditorCore;
 }
 
 namespace spctr {
-class MscChecks;
+class AadlMscChecks;
 
 /*!
    Stores shared pointers to all aadl file objects. And creates a new one if needed
@@ -43,7 +43,7 @@ class AadlModelStorage : public QObject
 public:
     explicit AadlModelStorage(QObject *parent = nullptr);
 
-    void setChecker(MscChecks *checks);
+    void setChecker(AadlMscChecks *checks);
 
     QSharedPointer<aadlinterface::IVEditorCore> ivData(const QString &fileName);
 
@@ -54,7 +54,7 @@ private:
     void setIvData(const QString &fileName, QSharedPointer<aadlinterface::IVEditorCore> ivData);
 
     QHash<QString, QSharedPointer<aadlinterface::IVEditorCore>> m_store;
-    QPointer<MscChecks> m_checks;
+    QPointer<AadlMscChecks> m_checks;
 };
 
 }

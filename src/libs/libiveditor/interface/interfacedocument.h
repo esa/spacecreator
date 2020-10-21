@@ -40,7 +40,7 @@ class AADLObjectsModel;
 }
 
 namespace shared {
-class MscChecksBase;
+class AadlMscChecksBase;
 }
 
 namespace aadlinterface {
@@ -101,7 +101,7 @@ public:
 
     QString supportedFileExtensions() const;
 
-    void setChecker(shared::MscChecksBase *checks);
+    void setChecker(shared::AadlMscChecksBase *checks);
 
 Q_SIGNALS:
     void dirtyChanged(bool dirty);

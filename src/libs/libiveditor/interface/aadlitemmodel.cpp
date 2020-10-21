@@ -17,6 +17,7 @@
 
 #include "aadlitemmodel.h"
 
+#include "aadlmscchecksbase.h"
 #include "aadlobjectcomment.h"
 #include "aadlobjectconnection.h"
 #include "aadlobjectconnectiongroup.h"
@@ -35,7 +36,6 @@
 #include "interface/aadlinterfacegraphicsitem.h"
 #include "interface/aadlinterfacegroupgraphicsitem.h"
 #include "interfacetabgraphicsscene.h"
-#include "mscchecksbase.h"
 
 #include <QGuiApplication>
 #include <QItemSelectionModel>
@@ -361,7 +361,7 @@ QGraphicsItem *AADLItemModel::getItem(const shared::Id id) const
     return m_items.value(id);
 }
 
-void AADLItemModel::setChecker(shared::MscChecksBase *checks)
+void AADLItemModel::setChecker(shared::AadlMscChecksBase *checks)
 {
     m_checks = checks;
 }

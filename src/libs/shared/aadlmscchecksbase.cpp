@@ -15,25 +15,13 @@
    along with this program. If not, see <https://www.gnu.org/licenses/lgpl-2.1.html>.
 */
 
-#pragma once
-
-#include <QObject>
-#include <QString>
+#include "aadlmscchecksbase.h"
 
 namespace shared {
 
-/*!
-   Virtual base class to perform consitency checks an corrections between MSC and AADL
- */
-class MscChecksBase : public QObject
+AadlMscChecksBase::AadlMscChecksBase(QObject *parent)
+    : QObject(parent)
 {
-    Q_OBJECT
-
-public:
-    MscChecksBase(QObject *parent = nullptr);
-
-    virtual bool mscInstancesExists(const QString &name) = 0;
-    virtual void changeMscInstanceName(const QString &oldName, const QString &name) = 0;
-};
+}
 
 }

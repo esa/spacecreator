@@ -17,7 +17,7 @@
 
 #pragma once
 
-#include "mscchecksbase.h"
+#include "aadlmscchecksbase.h"
 
 #include <QPointer>
 #include <QSharedPointer>
@@ -33,10 +33,10 @@ class MscModelStorage;
 /*!
    Class to perform consitency checks an corrections between MSC and AADL
  */
-class MscChecks : public shared::MscChecksBase
+class AadlMscChecks : public shared::AadlMscChecksBase
 {
 public:
-    MscChecks(QObject *parent = nullptr);
+    AadlMscChecks(QObject *parent = nullptr);
 
     void setMscStorage(MscModelStorage *mscStorage);
 

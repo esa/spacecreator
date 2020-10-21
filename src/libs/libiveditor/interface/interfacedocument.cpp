@@ -18,6 +18,7 @@
 #include "interfacedocument.h"
 
 #include "aadlitemmodel.h"
+#include "aadlmscchecksbase.h"
 #include "aadlobjectcomment.h"
 #include "aadlobjectconnection.h"
 #include "aadlobjectconnectiongroup.h"
@@ -36,7 +37,6 @@
 #include "interface/colors/colormanagerdialog.h"
 #include "interface/properties/dynamicpropertymanager.h"
 #include "interface/properties/propertiesdialog.h"
-#include "mscchecksbase.h"
 #include "xmldocexporter.h"
 
 #include <QAction>
@@ -446,7 +446,7 @@ QString InterfaceDocument::supportedFileExtensions() const
     return QStringLiteral("*.xml");
 }
 
-void InterfaceDocument::setChecker(shared::MscChecksBase *checks)
+void InterfaceDocument::setChecker(shared::AadlMscChecksBase *checks)
 {
     d->model->setChecker(checks);
 }

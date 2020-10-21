@@ -17,9 +17,9 @@
 
 #include "aadlmodelstorage.h"
 
+#include "aadlmscchecks.h"
 #include "interface/interfacedocument.h"
 #include "iveditorcore.h"
-#include "mscchecks.h"
 
 #include <QDebug>
 
@@ -30,7 +30,7 @@ AadlModelStorage::AadlModelStorage(QObject *parent)
 {
 }
 
-void AadlModelStorage::setChecker(MscChecks *checks)
+void AadlModelStorage::setChecker(AadlMscChecks *checks)
 {
     m_checks = checks;
 }

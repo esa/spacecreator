@@ -21,13 +21,13 @@
 #include "aadleditordata.h"
 #include "aadleditorfactory.h"
 #include "aadlmodelstorage.h"
+#include "aadlmscchecks.h"
 #include "asn1library.h"
 #include "interface/interfacedocument.h"
 #include "iveditor.h"
 #include "iveditorcore.h"
 #include "mainmodel.h"
 #include "mscchart.h"
-#include "mscchecks.h"
 #include "msceditor.h"
 #include "msceditorcore.h"
 #include "msceditordata.h"
@@ -98,7 +98,7 @@ bool SpaceCreatorPlugin::initialize(const QStringList &arguments, QString *error
     m_mscStorage = new MscModelStorage(this);
     connect(m_mscStorage, &spctr::MscModelStorage::editedExternally, this, &spctr::SpaceCreatorPlugin::saveIfNotOpen);
 
-    m_checks = new MscChecks(this);
+    m_checks = new AadlMscChecks(this);
     m_checks->setMscStorage(m_mscStorage);
     m_aadlStorage->setChecker(m_checks);
 

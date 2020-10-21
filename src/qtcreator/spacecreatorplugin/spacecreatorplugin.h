@@ -41,7 +41,7 @@ namespace spctr {
 
 class AadlEditorFactory;
 class AadlModelStorage;
-class MscChecks;
+class AadlMscChecks;
 class MscEditorFactory;
 class MscModelStorage;
 
@@ -81,7 +81,7 @@ private:
     AadlModelStorage *m_aadlStorage = nullptr;
     MscModelStorage *m_mscStorage = nullptr;
     QStringList m_asnFiles;
-    MscChecks *m_checks = nullptr;
+    AadlMscChecks *m_checks = nullptr;
 };
 
 }

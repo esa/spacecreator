@@ -25,7 +25,7 @@
 #include <QRectF>
 
 namespace shared {
-class MscChecksBase;
+class AadlMscChecksBase;
 }
 
 class QMutex;
@@ -73,7 +73,7 @@ public:
 
     QGraphicsItem *getItem(const shared::Id id) const;
 
-    void setChecker(shared::MscChecksBase *checks);
+    void setChecker(shared::AadlMscChecksBase *checks);
 
 Q_SIGNALS:
     void itemClicked(shared::Id id);
@@ -107,7 +107,7 @@ private:
     QQueue<aadl::AADLObject *> m_rmQueu;
     QRectF m_desktopGeometry;
     QRectF m_prevItemsRect;
-    QPointer<shared::MscChecksBase> m_checks;
+    QPointer<shared::AadlMscChecksBase> m_checks;
 };
 
 } // namespace aadlinterface

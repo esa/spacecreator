@@ -23,7 +23,7 @@
 #include <QSet>
 
 namespace shared {
-class MscChecksBase;
+class AadlMscChecksBase;
 }
 
 namespace aadlinterface {
@@ -53,10 +53,10 @@ public:
     bool itemNeedsToBeRelayout() const;
     void layout();
 
-    void setChecker(shared::MscChecksBase *checks);
+    void setChecker(shared::AadlMscChecksBase *checks);
 
 protected:
-    QPointer<shared::MscChecksBase> m_checks;
+    QPointer<shared::AadlMscChecksBase> m_checks;
 
     void rebuildLayout() override;
     void initGripPoints() override;
