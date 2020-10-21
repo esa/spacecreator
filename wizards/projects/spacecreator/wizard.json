@@ -15,10 +15,13 @@
         { "key": "CMakeFile", "value": "%{ProjectDirectory}/CMakeLists.txt" },
         { "key": "AsnFile", "value": "%{JS: Util.fileName('%{Model}', '%{AsnModelExtension}')}" },
         { "key": "AsnRelativePath", "value": "%{JS: Util.relativeFilePath('%{AsnTargetDirectory}', '%{ProjectDirectory}')}" },
+        { "key": "AsnFileRelativePath", "value": "%{JS: Util.fileName(value('AsnRelativePath') + '/' + value('AsnFile'))}" },
         { "key": "MSCFile", "value": "%{JS: Util.fileName('%{Model}.msc', '%{JS: Util.preferredSuffix('application/x-msc')}')}" },
         { "key": "MSCRelativePath", "value": "%{JS: Util.relativeFilePath('%{MSCTargetDirectory}', '%{ProjectDirectory}')}" },
         { "key": "IVFile", "value": "%{JS: Util.fileName('interfaceview.xml', '%{JS: Util.preferredSuffix('text/xml')}')}" },
-        { "key": "IVRelativePath", "value": "%{JS: Util.relativeFilePath('%{IVTargetDirectory}', '%{ProjectDirectory}')}" }
+        { "key": "IVRelativePath", "value": "%{JS: Util.relativeFilePath('%{IVTargetDirectory}', '%{ProjectDirectory}')}" },
+        { "key": "MSCAsnFile", "value": "%{JS: %{AddAsnFile} ? '    language ASN.1;\\\\n    data %{AsnFileRelativePath}' : ''}" },
+        { "key": "IVAsnFile", "value": "%{JS: %{AddAsnFile} ? ' asn1file=\"%{AsnFileRelativePath}\"' : ''}" }
     ],
 
     "pages":
