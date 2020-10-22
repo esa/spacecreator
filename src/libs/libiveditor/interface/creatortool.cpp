@@ -525,7 +525,8 @@ bool CreatorTool::onMousePress(QMouseEvent *e)
             || (d->toolType != ToolType::RequiredInterface && d->toolType != ToolType::ProvidedInterface)) {
         if (!d->previewItem) {
             QGraphicsItem *parentItem = d->view->itemAt(e->pos());
-            while (parentItem != nullptr && parentItem->type() != AADLFunctionGraphicsItem::Type) {
+            while (parentItem != nullptr && parentItem->type() != AADLFunctionGraphicsItem::Type
+                    && parentItem->type() != AADLFunctionTypeGraphicsItem::Type) {
                 parentItem = parentItem->parentItem();
             }
             d->previewItem = new QGraphicsRectItem(parentItem);
@@ -746,7 +747,7 @@ bool CreatorTool::CreatorToolPrivate::showContextMenu(const QPoint &globalPos)
 void CreatorTool::CreatorToolPrivate::populateContextMenu_commonCreate(QMenu *menu, const QPointF &scenePos)
 {
     if (this->previewItem) {
-        const QSizeF emptyPreviewItemSize = QSizeF(kPreviewItemPenWidth, kPreviewItemPenWidth);
+        static const QSizeF emptyPreviewItemSize = QSizeF(kPreviewItemPenWidth, kPreviewItemPenWidth);
         const bool isRect = this->previewItem->boundingRect().size() != emptyPreviewItemSize;
         // TODO: use a Fn/FnType/Comment's min size to disable related actions if the creation is impossible?
 

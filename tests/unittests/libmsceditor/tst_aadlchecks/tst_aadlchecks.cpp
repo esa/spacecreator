@@ -181,31 +181,43 @@ void tst_AadlChecks::testCheckMessageNames()
     result = checker.checkMessages();
     QCOMPARE(result.size(), 0);
 
-    // Add Message
+    // Add Instance 'A' and message 'Msg1'
     auto instanceA = new msc::MscInstance("Instance A", chart);
     chart->addInstance(instanceA);
     auto message = new msc::MscMessage("Msg1", chart);
     message->setTargetInstance(instanceA);
     chart->addInstanceEvent(message);
+
+    // Add Instance 'B'
+    auto instanceB = new msc::MscInstance("Instance B", chart);
+    chart->addInstance(instanceB);
+    message->setSourceInstance(instanceB);
+
     result = checker.checkMessages();
     QCOMPARE(result.size(), 1);
 
     // Add function with different source/target
     aadlinterface::InterfaceDocument *doc = ivPlugin->document();
     aadl::AADLObjectsModel *aadlModel = doc->objectsModel();
-    auto aadlfFunc = new aadl::AADLObjectFunction("Instance A");
-    aadlModel->addObject(aadlfFunc);
-    aadlModel->addObject(new aadl::AADLObjectConnection(aadlfFunc, nullptr, nullptr, nullptr));
-    result = checker.checkMessages();
-    QCOMPARE(result.size(), 1);
+    auto aadlfFuncA = new aadl::AADLObjectFunction("Instance A");
+    aadlModel->addObject(aadlfFuncA);
+    auto aadlfFuncB = new aadl::AADLObjectFunction("Instance B");
+    aadlModel->addObject(aadlfFuncB);
 
     // Add connection with proper source/target, but a wrong name
-    auto createInfo = aadl::AADLObjectIface::CreationInfo(aadlModel, aadlfFunc, QPointF(),
+    const auto createInfoA = aadl::AADLObjectIface::CreationInfo(aadlModel, aadlfFuncA, QPointF(),
             aadl::AADLObjectIface::IfaceType::Provided, shared::createId(), QVector<aadl::IfaceParameter>(),
-            aadl::AADLObjectIface::OperationKind::Sporadic, "Dummy");
-    aadl::AADLObjectIface *providedInterface = aadl::AADLObjectIface::createIface(createInfo);
+            aadl::AADLObjectIface::OperationKind::Sporadic, "DummyA");
+    aadl::AADLObjectIface *providedInterface = aadl::AADLObjectIface::createIface(createInfoA);
     aadlModel->addObject(providedInterface);
-    aadlModel->addObject(new aadl::AADLObjectConnection(nullptr, aadlfFunc, nullptr, providedInterface));
+
+    const auto createInfoB = aadl::AADLObjectIface::CreationInfo(aadlModel, aadlfFuncB, QPointF(),
+            aadl::AADLObjectIface::IfaceType::Required, shared::createId(), QVector<aadl::IfaceParameter>(),
+            aadl::AADLObjectIface::OperationKind::Sporadic, "DummyB");
+    aadl::AADLObjectIface *requiredInterface = aadl::AADLObjectIface::createIface(createInfoB);
+
+    aadlModel->addObject(providedInterface);
+    aadlModel->addObject(new aadl::AADLObjectConnection(aadlfFuncB, aadlfFuncA, requiredInterface, providedInterface));
     result = checker.checkMessages();
     QCOMPARE(result.size(), 1);
 
