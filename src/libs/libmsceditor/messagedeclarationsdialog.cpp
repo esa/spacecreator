@@ -78,6 +78,8 @@ MessageDeclarationsDialog::MessageDeclarationsDialog(
 
     connect(ui->nameLineEdit, &QLineEdit::textEdited, this, &MessageDeclarationsDialog::checkforEmptyCompleter);
 
+    connect(m_mscModel, &msc::MscModel::asn1DataChanged, this, &MessageDeclarationsDialog::updateAsn1TypesView);
+
     updateDeclarationDetails();
 }
 
