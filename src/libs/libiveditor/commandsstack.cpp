@@ -17,6 +17,9 @@
 
 #include "commandsstack.h"
 
+#include "aadlobject.h"
+#include "interface/commands/cmdentityattributechange.h"
+
 #include <QUndoStack>
 
 namespace aadlinterface {
@@ -87,7 +90,7 @@ bool CommandsStack::Macro::push(QUndoCommand *cmd) const
 {
     if (!cmd)
         return false;
-    CommandsStack::current()->push(cmd);
+    CommandsStack::push(cmd);
     return true;
 }
 
@@ -150,6 +153,9 @@ QUndoStack *CommandsStack::current()
 bool CommandsStack::push(QUndoCommand *command)
 {
     if (command && CommandsStack::current()) {
+        if (auto nameCommand = dynamic_cast<CmdEntityAttributeChange *>(command)) {
+            connect(nameCommand, &CmdEntityAttributeChange::nameChanged, instance(), &CommandsStack::nameChanged);
+        }
         CommandsStack::current()->push(command);
         return true;
     }

@@ -372,7 +372,7 @@ void MainWindow::openAsn1Dialog()
             QVariantList params { QVariant::fromValue(m_core->document()), QVariant::fromValue(dialog.fileName()) };
             QUndoCommand *command = cmd::CommandsFactory::create(cmd::ChangeAsn1File, params);
             if (command) {
-                cmd::CommandsStack::current()->push(command);
+                cmd::CommandsStack::push(command);
             }
         }
     }

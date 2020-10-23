@@ -19,9 +19,9 @@
 #pragma once
 
 #include "common.h"
+#include "undocommand.h"
 
 #include <QPointer>
-#include <QUndoCommand>
 
 namespace aadl {
 class AADLObject;
@@ -32,16 +32,20 @@ class AADLObjectFunctionType;
 namespace aadlinterface {
 namespace cmd {
 
-class CmdEntityAttributeChange : public QUndoCommand
+class CmdEntityAttributeChange : public UndoCommand
 {
+    Q_OBJECT
+
 public:
     explicit CmdEntityAttributeChange(aadl::AADLObject *entity, const QVariantHash &attrs);
     ~CmdEntityAttributeChange() override;
 
     void redo() override;
     void undo() override;
-    bool mergeWith(const QUndoCommand *command) override;
     int id() const override;
+
+Q_SIGNALS:
+    void nameChanged(aadl::AADLObject *entity, const QString &oldName, UndoCommand *command);
 
 private:
     QPointer<aadl::AADLObject> m_entity;

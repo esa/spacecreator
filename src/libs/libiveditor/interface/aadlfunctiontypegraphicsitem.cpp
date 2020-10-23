@@ -22,7 +22,6 @@
 #include "aadlfunctiongraphicsitem.h"
 #include "aadlfunctionnamegraphicsitem.h"
 #include "aadlinterfacegraphicsitem.h"
-#include "aadlmscchecksbase.h"
 #include "aadlnamevalidator.h"
 #include "aadlobject.h"
 #include "aadlobjectconnection.h"
@@ -160,17 +159,7 @@ void AADLFunctionTypeGraphicsItem::updateNameFromUi(const QString &name)
     const QVariantMap attributess = { { aadl::meta::Props::token(aadl::meta::Props::Token::name), name } };
     if (const auto attributesCmd = cmd::CommandsFactory::create(
                 cmd::ChangeEntityAttributes, { QVariant::fromValue(entity()), QVariant::fromValue(attributess) })) {
-        cmd::CommandsStack::current()->push(attributesCmd);
-    }
-
-    if (m_checks) {
-        if (m_checks->mscInstancesExists(oldName)) {
-            const int result =
-                    QMessageBox::question(nullptr, tr("Update instances"), tr("Do you want to update MSC instances?"));
-            if (result == QMessageBox::Yes) {
-                m_checks->changeMscInstanceName(oldName, name);
-            }
-        }
+        cmd::CommandsStack::push(attributesCmd);
     }
 }
 

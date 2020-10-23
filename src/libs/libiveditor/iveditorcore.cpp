@@ -143,7 +143,7 @@ bool IVEditorCore::addFunction(const QString &name)
     aadl::AADLObjectFunction *parent = nullptr;
     const QVariantList params = { QVariant::fromValue(m_document->objectsModel()), QVariant::fromValue(parent),
         QVariant::fromValue(QRectF(QPointF(10., 10.), DefaultGraphicsItemSize)), QVariant::fromValue(name) };
-    cmd::CommandsStack::current()->push(cmd::CommandsFactory::create(cmd::CreateFunctionEntity, params));
+    cmd::CommandsStack::push(cmd::CommandsFactory::create(cmd::CreateFunctionEntity, params));
 
     Q_EMIT editedExternally(this);
     return true;
@@ -185,7 +185,7 @@ bool IVEditorCore::addConnection(QString name, const QString &fromInstanceName, 
         const QVariantList params = { QVariant::fromValue(aadlModel), QVariant::fromValue(fromFunc),
             fromInterface->id(), toInterface->id(), QVariant::fromValue(points) };
         QUndoCommand *command = cmd::CommandsFactory::create(cmd::CreateConnectionEntity, params);
-        cmd::CommandsStack::current()->push(command);
+        cmd::CommandsStack::push(command);
     }
 
     cmd::CommandsStack::current()->endMacro();
@@ -197,6 +197,11 @@ bool IVEditorCore::addConnection(QString name, const QString &fromInstanceName, 
 QUndoStack *IVEditorCore::undoStack() const
 {
     return m_document->commandsStack();
+}
+
+cmd::CommandsStack *IVEditorCore::commandsStack() const
+{
+    return cmd::CommandsStack::instance();
 }
 
 /*!
@@ -220,7 +225,7 @@ bool IVEditorCore::renameAsnFile(const QString &oldName, const QString &newName)
         QVariantList params { QVariant::fromValue(document()), QVariant::fromValue(newName) };
         QUndoCommand *command = cmd::CommandsFactory::create(cmd::ChangeAsn1File, params);
         if (command) {
-            cmd::CommandsStack::current()->push(command);
+            cmd::CommandsStack::push(command);
             Q_EMIT editedExternally(this);
             return true;
         }
@@ -268,7 +273,7 @@ aadl::AADLObjectIface *IVEditorCore::getInterface(
         }
         createInfo.position = ifPos;
         QUndoCommand *command = cmd::CommandsFactory::create(cmd::CreateInterfaceEntity, createInfo.toVarList());
-        cmd::CommandsStack::current()->push(command);
+        cmd::CommandsStack::push(command);
         interface = aadlModel->getIfaceByName(ifName, ifType, parentFunction);
     }
     return interface;

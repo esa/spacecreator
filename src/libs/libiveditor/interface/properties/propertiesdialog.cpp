@@ -232,7 +232,7 @@ void PropertiesDialog::initCommentView()
             auto commentTextCmd = cmd::CommandsFactory::create(cmd::ChangeEntityAttributes, commentTextParams);
             if (commentTextCmd) {
                 commentTextCmd->setText(tr("Edit Comment"));
-                cmd::CommandsStack::current()->push(commentTextCmd);
+                cmd::CommandsStack::push(commentTextCmd);
             }
         });
     }

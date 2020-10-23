@@ -41,7 +41,7 @@ static inline QVariantHash getCurrentAttributes(aadl::AADLObject *entity, const 
 }
 
 CmdEntityAttributeChange::CmdEntityAttributeChange(aadl::AADLObject *entity, const QVariantHash &attrs)
-    : QUndoCommand()
+    : UndoCommand()
     , m_entity(entity)
     , m_function(m_entity ? m_entity->as<aadl::AADLObjectFunction *>() : nullptr)
     , m_newAttrs(attrs)
@@ -64,17 +64,30 @@ CmdEntityAttributeChange::~CmdEntityAttributeChange()
 void CmdEntityAttributeChange::redo()
 {
     setAttrs(m_newAttrs, true);
+
+    const QString nameKey = aadl::meta::Props::token(aadl::meta::Props::Token::name);
+    if (m_oldAttrs.contains(nameKey) && m_entity->title() != m_oldAttrs[nameKey].toString()) {
+        const QString oldName = m_oldAttrs[nameKey].toString();
+        Q_EMIT nameChanged(m_entity, oldName, this);
+    }
+    // Command stack then "re-emits"
+    // In some slot (AadlMscChecks?), check if type is function, use code from
+    // `AADLFunctionTypeGraphicsItem::updateNameFromUi`
+    //  - there a flag in this CMD is set (m_updateMsc)
+    // "emit" name changed, with flag m_updateMsc
+
+    m_firstRedo = false;
 }
 
 void CmdEntityAttributeChange::undo()
 {
     setAttrs(m_oldAttrs, false);
-}
 
-bool CmdEntityAttributeChange::mergeWith(const QUndoCommand *command)
-{
-    Q_UNUSED(command)
-    return false;
+    const QString nameKey = aadl::meta::Props::token(aadl::meta::Props::Token::name);
+    if (m_oldAttrs.contains(nameKey) && m_entity->title() != m_newAttrs[nameKey].toString()) {
+        const QString oldName = m_newAttrs[nameKey].toString();
+        Q_EMIT nameChanged(m_entity, oldName, this);
+    }
 }
 
 int CmdEntityAttributeChange::id() const

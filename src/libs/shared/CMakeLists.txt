@@ -22,8 +22,6 @@ target_sources(${LIB_NAME} PRIVATE
     ui/highlightrectitem.h
     ui/interactiveobjectbase.cpp
     ui/interactiveobjectbase.h
-    aadlmscchecksbase.cpp
-    aadlmscchecksbase.h
     animation.cpp
     animation.h
     commandlineparser.cpp

@@ -107,6 +107,7 @@ public:
     QUndoStack *undoStack() const override;
 
     bool renameAsnFile(const QString &oldName, const QString &newName) override;
+    void changeMscInstanceName(const QString &oldName, const QString &name);
 
     QString filePath() const override;
     bool save() override;

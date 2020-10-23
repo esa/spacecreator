@@ -314,7 +314,7 @@ void CreatorTool::removeSelectedItems()
                     }
                     const QVariantList params = { QVariant::fromValue(entity), QVariant::fromValue(d->model.data()) };
                     if (QUndoCommand *cmdRm = cmd::CommandsFactory::create(cmd::RemoveEntity, params))
-                        cmd::CommandsStack::current()->push(cmdRm);
+                        cmd::CommandsStack::push(cmdRm);
                 }
             }
         }
@@ -409,7 +409,7 @@ void CreatorTool::groupSelectedItems()
     if (dialog->exec() == QDialog::Accepted) {
         for (auto data : dialog->info()) {
             const auto undoCommand = cmd::CommandsFactory::create(cmd::CreateConnectionGroupEntity, data.toVarList());
-            cmd::CommandsStack::current()->push(undoCommand);
+            cmd::CommandsStack::push(undoCommand);
         }
     }
     dialog->deleteLater();
@@ -901,7 +901,7 @@ void CreatorTool::CreatorToolPrivate::handleComment(QGraphicsScene *scene, const
                 adjustToSize(this->previewItem->mapRectToScene(this->previewItem->rect()), DefaultGraphicsItemSize);
         const QVariantList params = { QVariant::fromValue(this->model.data()), QVariant::fromValue(parentObject),
             itemSceneRect };
-        cmd::CommandsStack::current()->push(cmd::CommandsFactory::create(cmd::CreateCommentEntity, params));
+        cmd::CommandsStack::push(cmd::CommandsFactory::create(cmd::CreateCommentEntity, params));
     }
 }
 
@@ -921,7 +921,7 @@ void CreatorTool::CreatorToolPrivate::handleFunctionType(QGraphicsScene *scene, 
 
         const QVariantList params = { QVariant::fromValue(this->model.data()), QVariant::fromValue(parentObject),
             itemSceneRect };
-        cmd::CommandsStack::current()->push(cmd::CommandsFactory::create(cmd::CreateFunctionTypeEntity, params));
+        cmd::CommandsStack::push(cmd::CommandsFactory::create(cmd::CreateFunctionTypeEntity, params));
     }
 }
 
@@ -941,7 +941,7 @@ void CreatorTool::CreatorToolPrivate::handleFunction(QGraphicsScene *scene, cons
         const QVariantList params = { QVariant::fromValue(this->model.data()), QVariant::fromValue(parentObject),
             itemSceneRect };
 
-        cmd::CommandsStack::current()->push(cmd::CommandsFactory::create(cmd::CreateFunctionEntity, params));
+        cmd::CommandsStack::push(cmd::CommandsFactory::create(cmd::CreateFunctionEntity, params));
     }
 }
 
@@ -954,7 +954,7 @@ void CreatorTool::CreatorToolPrivate::handleInterface(
         ifaceDescr.resetKind();
 
         if (auto cmd = createInterfaceCommand(ifaceDescr))
-            cmd::CommandsStack::current()->push(cmd);
+            cmd::CommandsStack::push(cmd);
     }
 }
 

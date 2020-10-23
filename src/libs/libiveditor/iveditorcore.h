@@ -22,6 +22,9 @@
 #include "ui/graphicsviewbase.h"
 
 namespace aadlinterface {
+namespace cmd {
+class CommandsStack;
+}
 
 class InterfaceDocument;
 
@@ -53,6 +56,7 @@ public:
     bool addConnection(QString name, const QString &fromInstanceName, const QString &toInstanceName);
 
     QUndoStack *undoStack() const override;
+    cmd::CommandsStack *commandsStack() const;
 
     bool renameAsnFile(const QString &oldName, const QString &newName) override;
 

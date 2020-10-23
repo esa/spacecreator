@@ -17,14 +17,19 @@
 
 #pragma once
 
-#include "aadlmscchecksbase.h"
-
 #include <QPointer>
 #include <QSharedPointer>
 #include <QVector>
 
+namespace aadl {
+class AADLObject;
+}
+
 namespace aadlinterface {
 class IVEditorCore;
+namespace cmd {
+class UndoCommand;
+}
 }
 
 namespace msc {
@@ -38,8 +43,10 @@ class MscModelStorage;
 /*!
    Class to perform consitency checks an corrections between MSC and AADL
  */
-class AadlMscChecks : public shared::AadlMscChecksBase
+class AadlMscChecks : public QObject
 {
+    Q_OBJECT
+
 public:
     AadlMscChecks(QObject *parent = nullptr);
 
@@ -48,8 +55,8 @@ public:
     void setAadlStorage(AadlModelStorage *aadlStorage);
 
     // Check functions
-    bool mscInstancesExists(const QString &name) override;
-    void changeMscInstanceName(const QString &oldName, const QString &name) override;
+    bool mscInstancesExists(const QString &name);
+    void changeMscInstanceName(const QString &oldName, const QString &name);
 
     void checkInstances();
     void checkMessages();
@@ -62,6 +69,10 @@ public:
     QStringList allMscFiles() const;
     QStringList allAsn1Files() const;
     QStringList projectFiles(const QString &suffix) const;
+
+public Q_SLOTS:
+    void onEntityNameChanged(
+            aadl::AADLObject *entity, const QString &oldName, aadlinterface::cmd::UndoCommand *command);
 
 private:
     QPointer<MscModelStorage> m_mscStorage;

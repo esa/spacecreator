@@ -270,14 +270,14 @@ bool PropertiesListModel::setData(const QModelIndex &index, const QVariant &valu
             const QVariantMap attributes = { { name, value } };
             const auto attributesCmd = cmd::CommandsFactory::create(cmd::ChangeEntityAttributes,
                     { QVariant::fromValue(m_dataObject), QVariant::fromValue(attributes) });
-            cmd::CommandsStack::current()->push(attributesCmd);
+            cmd::CommandsStack::push(attributesCmd);
         } else if (isProp(index)) {
             switch (index.column()) {
             case ColumnValue: {
                 const QVariantMap props = { { name, value } };
                 const auto propsCmd = cmd::CommandsFactory::create(
                         cmd::ChangeEntityProperty, { QVariant::fromValue(m_dataObject), QVariant::fromValue(props) });
-                cmd::CommandsStack::current()->push(propsCmd);
+                cmd::CommandsStack::push(propsCmd);
 
                 break;
             }
@@ -288,7 +288,7 @@ bool PropertiesListModel::setData(const QModelIndex &index, const QVariant &valu
                 const QHash<QString, QString> props = { { name, newName } };
                 const auto propsCmd = cmd::CommandsFactory::create(
                         cmd::RenameEntityProperty, { QVariant::fromValue(m_dataObject), QVariant::fromValue(props) });
-                cmd::CommandsStack::current()->push(propsCmd);
+                cmd::CommandsStack::push(propsCmd);
                 const int idx = m_names.indexOf(name);
                 if (idx >= 0) {
                     m_names.replace(idx, newName);
@@ -320,7 +320,7 @@ bool PropertiesListModel::createProperty(const QString &propName)
     const auto propsCmd = cmd::CommandsFactory::create(
             cmd::CreateEntityProperty, { QVariant::fromValue(m_dataObject), QVariant::fromValue(props) });
     if (propsCmd) {
-        cmd::CommandsStack::current()->push(propsCmd);
+        cmd::CommandsStack::push(propsCmd);
         res = true;
     }
 
@@ -347,7 +347,7 @@ bool PropertiesListModel::removeProperty(const QModelIndex &index)
     const auto propsCmd = cmd::CommandsFactory::create(
             cmd::RemoveEntityProperty, { QVariant::fromValue(m_dataObject), QVariant::fromValue(props) });
     if (propsCmd) {
-        cmd::CommandsStack::current()->push(propsCmd);
+        cmd::CommandsStack::push(propsCmd);
         removeRow(row);
         m_names.removeAt(row);
 

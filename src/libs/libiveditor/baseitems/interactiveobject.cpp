@@ -85,7 +85,7 @@ void InteractiveObject::updateEntity()
     std::transform(preparedParams.cbegin(), preparedParams.cend(), std::back_inserter(params),
             [](const QVariantList entryParams) { return QVariant::fromValue(entryParams); });
     const auto changeGeometryCmd = cmd::CommandsFactory::create(cmd::ChangeEntityGeometry, params);
-    cmd::CommandsStack::current()->push(changeGeometryCmd);
+    cmd::CommandsStack::push(changeGeometryCmd);
 }
 
 void InteractiveObject::mergeGeometry()

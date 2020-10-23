@@ -17,7 +17,6 @@
 
 #include "aadlitemmodel.h"
 
-#include "aadlmscchecksbase.h"
 #include "aadlobjectcomment.h"
 #include "aadlobjectconnection.h"
 #include "aadlobjectconnectiongroup.h"
@@ -349,7 +348,7 @@ void AADLItemModel::changeRootItem(shared::Id id)
 
     const QVariantList rootEntityParams { QVariant::fromValue(this), QVariant::fromValue(id) };
     const auto geometryCmd = cmd::CommandsFactory::create(cmd::ChangeRootEntity, rootEntityParams);
-    cmd::CommandsStack::current()->push(geometryCmd);
+    cmd::CommandsStack::push(geometryCmd);
 }
 
 void AADLItemModel::zoomChanged()
@@ -364,11 +363,6 @@ void AADLItemModel::zoomChanged()
 QGraphicsItem *AADLItemModel::getItem(const shared::Id id) const
 {
     return m_items.value(id);
-}
-
-void AADLItemModel::setChecker(shared::AadlMscChecksBase *checks)
-{
-    m_checks = checks;
 }
 
 void AADLItemModel::updateSceneRect()
@@ -454,14 +448,12 @@ QGraphicsItem *AADLItemModel::createItemForObject(aadl::AADLObject *obj)
         break;
     case aadl::AADLObject::Type::Function: {
         auto function = new AADLFunctionGraphicsItem(qobject_cast<aadl::AADLObjectFunction *>(obj), parentItem);
-        function->setChecker(m_checks);
         nestedGeomtryConnect(parentItem, function);
         iObj = function;
     } break;
     case aadl::AADLObject::Type::FunctionType: {
         auto functionType =
                 new AADLFunctionTypeGraphicsItem(qobject_cast<aadl::AADLObjectFunctionType *>(obj), parentItem);
-        functionType->setChecker(m_checks);
         nestedGeomtryConnect(parentItem, functionType);
         iObj = functionType;
     } break;

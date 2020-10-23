@@ -20,7 +20,7 @@
 #include "aadlchecks.h"
 #include "aadlmodelstorage.h"
 #include "chartlayoutmanager.h"
-#include "commands/cmdentitynamechange.h"
+#include "interface/commands/cmdentityattributechange.h"
 #include "iveditorcore.h"
 #include "mainmodel.h"
 #include "mscchart.h"
@@ -39,7 +39,7 @@
 namespace spctr {
 
 AadlMscChecks::AadlMscChecks(QObject *parent)
-    : shared::AadlMscChecksBase(parent)
+    : QObject(parent)
 {
 }
 
@@ -76,16 +76,7 @@ bool AadlMscChecks::mscInstancesExists(const QString &name)
 void AadlMscChecks::changeMscInstanceName(const QString &oldName, const QString &name)
 {
     for (QSharedPointer<msc::MSCEditorCore> mscCore : allMscCores()) {
-        for (msc::MscChart *chart : mscCore->mainModel()->mscModel()->allCharts()) {
-            for (msc::MscInstance *instance : chart->instances()) {
-                if (instance->name() == oldName) {
-                    QUndoStack *undoStack = mscCore->undoStack();
-                    auto cmd = new msc::cmd::CmdEntityNameChange(
-                            instance, name, &(mscCore->mainModel()->chartViewModel()));
-                    undoStack->push(cmd);
-                }
-            }
-        }
+        mscCore->changeMscInstanceName(oldName, name);
     }
 }
 
@@ -246,6 +237,30 @@ QStringList AadlMscChecks::projectFiles(const QString &suffix) const
     }
 
     return result;
+}
+
+void AadlMscChecks::onEntityNameChanged(
+        aadl::AADLObject *entity, const QString &oldName, aadlinterface::cmd::UndoCommand *command)
+{
+    if (!command->isFirstChange() && !command->checkSystem()) {
+        return;
+    }
+
+    auto cmdAttribChange = dynamic_cast<aadlinterface::cmd::CmdEntityAttributeChange *>(command);
+    if (cmdAttribChange) {
+        if (mscInstancesExists(oldName)) {
+            if (command->isFirstChange()) {
+                const int result = QMessageBox::question(
+                        nullptr, tr("Update instances"), tr("Do you want to update MSC instances?"));
+                if (result == QMessageBox::Yes) {
+                    cmdAttribChange->setSystemCheck(true);
+                    changeMscInstanceName(oldName, entity->title());
+                }
+            } else {
+                changeMscInstanceName(oldName, entity->title());
+            }
+        }
+    }
 }
 
 }

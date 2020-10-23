@@ -162,7 +162,7 @@ bool ContextParametersModel::setData(const QModelIndex &index, const QVariant &v
                     { QVariant::fromValue(m_dataObject), QVariant::fromValue(paramOld),
                             QVariant::fromValue(paramNew) })) {
 
-            cmd::CommandsStack::current()->push(attributesCmd);
+            cmd::CommandsStack::push(attributesCmd);
             m_params.replace(index.row(), paramNew);
         }
     }
@@ -185,7 +185,7 @@ bool ContextParametersModel::createProperty(const QString &propName)
         const int rows = rowCount();
         beginInsertRows(QModelIndex(), rows, rows);
 
-        cmd::CommandsStack::current()->push(propsCmd);
+        cmd::CommandsStack::push(propsCmd);
         createNewRow(param, rows);
         res = true;
 
@@ -205,7 +205,7 @@ bool ContextParametersModel::removeProperty(const QModelIndex &index)
     const auto propsCmd = cmd::CommandsFactory::create(
             cmd::RemoveContextParameter, { QVariant::fromValue(m_dataObject), QVariant::fromValue(row) });
     if (propsCmd) {
-        cmd::CommandsStack::current()->push(propsCmd);
+        cmd::CommandsStack::push(propsCmd);
         removeRow(row);
         m_params.removeAt(row);
 

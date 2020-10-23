@@ -17,7 +17,6 @@
 
 #include "aadlrectgraphicsitem.h"
 
-#include "aadlmscchecksbase.h"
 #include "aadlobject.h"
 #include "baseitems/common/aadlutils.h"
 #include "commandsstack.h"
@@ -402,11 +401,6 @@ void AADLRectGraphicsItem::layout()
     findGeometryForItem(this, itemRect, boundedRect);
     setRect(itemRect.marginsRemoved(kContentMargins));
     mergeGeometry();
-}
-
-void AADLRectGraphicsItem::setChecker(shared::AadlMscChecksBase *checks)
-{
-    m_checks = checks;
 }
 
 bool AADLRectGraphicsItem::itemNeedsToBeRelayout() const

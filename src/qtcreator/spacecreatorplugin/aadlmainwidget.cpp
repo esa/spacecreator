@@ -125,7 +125,7 @@ void AadlMainWidget::showAsn1Dialog()
             QUndoCommand *command =
                     aadlinterface::cmd::CommandsFactory::create(aadlinterface::cmd::ChangeAsn1File, params);
             if (command) {
-                aadlinterface::cmd::CommandsStack::current()->push(command);
+                aadlinterface::cmd::CommandsStack::push(command);
             }
         }
     }

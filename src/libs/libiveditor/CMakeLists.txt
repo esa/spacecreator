@@ -112,6 +112,8 @@ target_sources(${LIB_NAME} PRIVATE
     interface/commands/commandids.h
     interface/commands/commandsfactory.cpp
     interface/commands/commandsfactory.h
+    interface/commands/undocommand.cpp
+    interface/commands/undocommand.h
     interface/creatortool.cpp
     interface/creatortool.h
     interface/graphicsitemhelpers.cpp

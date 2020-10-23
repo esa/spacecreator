@@ -20,6 +20,7 @@
 #include "aadlchecks.h"
 #include "commandlineparser.h"
 #include "commands/cmddocumentcreate.h"
+#include "commands/cmdentitynamechange.h"
 #include "commands/cmdsetasn1file.h"
 #include "commands/cmdsetmessagedeclarations.h"
 #include "graphicsview.h"
@@ -27,7 +28,9 @@
 #include "mainmodel.h"
 #include "mainwindow.h"
 #include "messagedeclarationsdialog.h"
+#include "mscchart.h"
 #include "mscdocument.h"
+#include "mscinstance.h"
 #include "mscmessagedeclarationlist.h"
 #include "mscmodel.h"
 #include "tools/actioncreatortool.h"
@@ -444,6 +447,27 @@ bool MSCEditorCore::renameAsnFile(const QString &oldName, const QString &newName
         return true;
     }
     return false;
+}
+
+/*!
+   Changes all instances that have the name \p oldName to have the new name \p name
+ */
+void MSCEditorCore::changeMscInstanceName(const QString &oldName, const QString &name)
+{
+    bool updated = false;
+    for (msc::MscChart *chart : m_model->mscModel()->allCharts()) {
+        for (msc::MscInstance *instance : chart->instances()) {
+            if (instance->name() == oldName) {
+                QUndoStack *undo = undoStack();
+                auto cmd = new msc::cmd::CmdEntityNameChange(instance, name, nullptr);
+                undo->push(cmd);
+                updated = true;
+            }
+        }
+    }
+    if (updated) {
+        Q_EMIT editedExternally(this);
+    }
 }
 
 QString MSCEditorCore::filePath() const

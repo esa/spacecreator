@@ -18,6 +18,8 @@
 #include "aadlmodelstorage.h"
 
 #include "aadlmscchecks.h"
+#include "commandsstack.h"
+#include "interface/commands/cmdentityattributechange.h"
 #include "interface/interfacedocument.h"
 #include "iveditorcore.h"
 
@@ -43,7 +45,6 @@ QSharedPointer<aadlinterface::IVEditorCore> AadlModelStorage::ivData(const QStri
 {
     if (!m_store.contains(fileName)) {
         QSharedPointer<aadlinterface::IVEditorCore> data(new aadlinterface::IVEditorCore());
-        data->document()->setChecker(m_checks);
         data->document()->load(fileName);
         setIvData(fileName, data);
         return data;
@@ -69,6 +70,8 @@ void AadlModelStorage::setIvData(const QString &fileName, QSharedPointer<aadlint
 
     m_store[fileName] = ivData;
     connect(ivData.data(), &shared::EditorCore::editedExternally, this, &spctr::AadlModelStorage::editedExternally);
+    connect(ivData->commandsStack(), &aadlinterface::cmd::CommandsStack::nameChanged, m_checks,
+            &spctr::AadlMscChecks::onEntityNameChanged);
     Q_EMIT coreAdded(ivData);
 }
 

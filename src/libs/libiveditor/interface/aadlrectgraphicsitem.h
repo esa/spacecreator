@@ -22,10 +22,6 @@
 #include <QPointer>
 #include <QSet>
 
-namespace shared {
-class AadlMscChecksBase;
-}
-
 namespace aadlinterface {
 
 class AADLRectGraphicsItem : public InteractiveObject
@@ -53,11 +49,7 @@ public:
     bool itemNeedsToBeRelayout() const;
     void layout();
 
-    void setChecker(shared::AadlMscChecksBase *checks);
-
 protected:
-    QPointer<shared::AadlMscChecksBase> m_checks;
-
     void rebuildLayout() override;
     void initGripPoints() override;
     void onManualMoveProgress(shared::ui::GripPoint *grip, const QPointF &from, const QPointF &to) override;

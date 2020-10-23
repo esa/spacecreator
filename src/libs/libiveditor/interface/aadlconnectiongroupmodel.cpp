@@ -126,7 +126,7 @@ bool AADLConnectionGroupModel::setData(const QModelIndex &index, const QVariant 
     const QVariantList params { QVariant::fromValue(m_connectionGroup), QVariant::fromValue(connection.data()),
         state == Qt::Checked };
     if (const auto propsCmd = cmd::CommandsFactory::create(cmd::ChangeConnectionGroupEntity, params)) {
-        cmd::CommandsStack::current()->push(propsCmd);
+        cmd::CommandsStack::push(propsCmd);
         return true;
     }
     return false;

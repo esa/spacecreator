@@ -39,10 +39,6 @@ class AADLObject;
 class AADLObjectsModel;
 }
 
-namespace shared {
-class AadlMscChecksBase;
-}
-
 namespace aadlinterface {
 
 class AADLCommentGraphicsItem;
@@ -100,8 +96,6 @@ public:
     Asn1Acn::Asn1ModelStorage *asn1DataTypes() const;
 
     QString supportedFileExtensions() const;
-
-    void setChecker(shared::AadlMscChecksBase *checks);
 
 Q_SIGNALS:
     void dirtyChanged(bool dirty);
