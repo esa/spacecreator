@@ -21,7 +21,7 @@
 #include "aadleditordata.h"
 #include "aadleditorfactory.h"
 #include "aadlmodelstorage.h"
-#include "aadlmscchecks.h"
+#include "mscsystemchecks.h"
 #include "asn1library.h"
 #include "iveditor.h"
 #include "iveditorcore.h"
@@ -95,7 +95,7 @@ bool SpaceCreatorPlugin::initialize(const QStringList &arguments, QString *error
     m_mscStorage = new MscModelStorage(this);
     connect(m_mscStorage, &spctr::MscModelStorage::editedExternally, this, &spctr::SpaceCreatorPlugin::saveIfNotOpen);
 
-    m_checks = new AadlMscChecks(this);
+    m_checks = new MscSystemChecks(this);
     m_checks->setMscStorage(m_mscStorage);
     m_checks->setAadlStorage(m_aadlStorage);
     m_aadlStorage->setChecker(m_checks);
@@ -124,12 +124,12 @@ bool SpaceCreatorPlugin::initialize(const QStringList &arguments, QString *error
     auto action = new QAction(tr("Check instances"), this);
     Core::Command *checkInstancesCmd = Core::ActionManager::registerAction(
             action, Constants::CHECK_INSTANCES_ID, Core::Context(Core::Constants::C_GLOBAL));
-    connect(action, &QAction::triggered, m_checks, &AadlMscChecks::checkInstances);
+    connect(action, &QAction::triggered, m_checks, &MscSystemChecks::checkInstances);
 
     action = new QAction(tr("Check messages"), this);
     Core::Command *checkMessagesCmd = Core::ActionManager::registerAction(
             action, Constants::CHECK_MESSAGES_ID, Core::Context(Core::Constants::C_GLOBAL));
-    connect(action, &QAction::triggered, m_checks, &AadlMscChecks::checkMessages);
+    connect(action, &QAction::triggered, m_checks, &MscSystemChecks::checkMessages);
 
     auto showMinimapAction = new QAction(tr("Show minimap"), this);
     showMinimapAction->setCheckable(true);

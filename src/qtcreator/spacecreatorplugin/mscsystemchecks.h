@@ -43,12 +43,12 @@ class MscModelStorage;
 /*!
    Class to perform consitency checks an corrections between MSC and AADL
  */
-class AadlMscChecks : public QObject
+class MscSystemChecks : public QObject
 {
     Q_OBJECT
 
 public:
-    AadlMscChecks(QObject *parent = nullptr);
+    MscSystemChecks(QObject *parent = nullptr);
 
     // Setup functions
     void setMscStorage(MscModelStorage *mscStorage);

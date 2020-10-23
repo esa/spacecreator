@@ -14,8 +14,6 @@ set(SC_PLUGIN_SOURCES
     aadlmainwidget.h
     aadlmodelstorage.cpp
     aadlmodelstorage.h
-    aadlmscchecks.cpp
-    aadlmscchecks.h
     aadltexteditor.cpp
     aadltexteditor.h
     msccontext.cpp
@@ -32,6 +30,8 @@ set(SC_PLUGIN_SOURCES
     mscmainwidget.h
     mscmodelstorage.cpp
     mscmodelstorage.h
+    mscsystemchecks.cpp
+    mscsystemchecks.h
     msctexteditor.cpp
     msctexteditor.h
     spacecreatorplugin.cpp

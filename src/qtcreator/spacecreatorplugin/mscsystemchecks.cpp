@@ -15,7 +15,7 @@
   along with this program. If not, see <https://www.gnu.org/licenses/lgpl-2.1.html>.
 */
 
-#include "aadlmscchecks.h"
+#include "mscsystemchecks.h"
 
 #include "aadlchecks.h"
 #include "aadlmodelstorage.h"
@@ -38,17 +38,17 @@
 
 namespace spctr {
 
-AadlMscChecks::AadlMscChecks(QObject *parent)
+MscSystemChecks::MscSystemChecks(QObject *parent)
     : QObject(parent)
 {
 }
 
-void AadlMscChecks::setMscStorage(MscModelStorage *mscStorage)
+void MscSystemChecks::setMscStorage(MscModelStorage *mscStorage)
 {
     m_mscStorage = mscStorage;
 }
 
-void AadlMscChecks::setAadlStorage(AadlModelStorage *aadlStorage)
+void MscSystemChecks::setAadlStorage(AadlModelStorage *aadlStorage)
 {
     m_aadlStorage = aadlStorage;
 }
@@ -56,7 +56,7 @@ void AadlMscChecks::setAadlStorage(AadlModelStorage *aadlStorage)
 /*!
    Returns if at least one instance in one of the .msc files has the name \p name
  */
-bool AadlMscChecks::mscInstancesExists(const QString &name)
+bool MscSystemChecks::mscInstancesExists(const QString &name)
 {
     for (QSharedPointer<msc::MSCEditorCore> mscCore : allMscCores()) {
         for (msc::MscChart *chart : mscCore->mainModel()->mscModel()->allCharts()) {
@@ -73,14 +73,14 @@ bool AadlMscChecks::mscInstancesExists(const QString &name)
 /*!
    Changes all instances that have the name \p oldName to have the new name \p name
  */
-void AadlMscChecks::changeMscInstanceName(const QString &oldName, const QString &name)
+void MscSystemChecks::changeMscInstanceName(const QString &oldName, const QString &name)
 {
     for (QSharedPointer<msc::MSCEditorCore> mscCore : allMscCores()) {
         mscCore->changeMscInstanceName(oldName, name);
     }
 }
 
-void AadlMscChecks::checkInstances()
+void MscSystemChecks::checkInstances()
 {
     QSharedPointer<aadlinterface::IVEditorCore> ivp = ivCore();
     if (!ivp) {
@@ -135,7 +135,7 @@ void AadlMscChecks::checkInstances()
     }
 }
 
-void AadlMscChecks::checkMessages()
+void MscSystemChecks::checkMessages()
 {
     QSharedPointer<aadlinterface::IVEditorCore> ivp = ivCore();
     if (!ivp) {
@@ -168,7 +168,7 @@ void AadlMscChecks::checkMessages()
     }
 }
 
-QSharedPointer<aadlinterface::IVEditorCore> AadlMscChecks::ivCore() const
+QSharedPointer<aadlinterface::IVEditorCore> MscSystemChecks::ivCore() const
 {
     QStringList aadlFiles = allAadlFiles();
     if (aadlFiles.empty()) {
@@ -182,7 +182,7 @@ QSharedPointer<aadlinterface::IVEditorCore> AadlMscChecks::ivCore() const
 /*!
    Returns all MSCEditorCore objects, that are used in the current project
  */
-QVector<QSharedPointer<msc::MSCEditorCore>> AadlMscChecks::allMscCores() const
+QVector<QSharedPointer<msc::MSCEditorCore>> MscSystemChecks::allMscCores() const
 {
     QStringList mscFiles = allMscFiles();
     QVector<QSharedPointer<msc::MSCEditorCore>> allMscCores;
@@ -198,7 +198,7 @@ QVector<QSharedPointer<msc::MSCEditorCore>> AadlMscChecks::allMscCores() const
 /*!
    Returns all aald files of the current project
  */
-QStringList AadlMscChecks::allAadlFiles() const
+QStringList MscSystemChecks::allAadlFiles() const
 {
     return projectFiles("interfaceview.xml");
 }
@@ -206,7 +206,7 @@ QStringList AadlMscChecks::allAadlFiles() const
 /*!
    Returns all msc files of the current project
  */
-QStringList AadlMscChecks::allMscFiles() const
+QStringList MscSystemChecks::allMscFiles() const
 {
     return projectFiles(".msc");
 }
@@ -214,7 +214,7 @@ QStringList AadlMscChecks::allMscFiles() const
 /*!
    Returns all asn files of the current project
  */
-QStringList AadlMscChecks::allAsn1Files() const
+QStringList MscSystemChecks::allAsn1Files() const
 {
     return projectFiles(".asn");
 }
@@ -222,7 +222,7 @@ QStringList AadlMscChecks::allAsn1Files() const
 /*!
    Returns all files of the current project endig with the given \p suffix
  */
-QStringList AadlMscChecks::projectFiles(const QString &suffix) const
+QStringList MscSystemChecks::projectFiles(const QString &suffix) const
 {
     ProjectExplorer::Project *project = ProjectExplorer::ProjectTree::currentProject();
     if (!project) {
@@ -239,7 +239,7 @@ QStringList AadlMscChecks::projectFiles(const QString &suffix) const
     return result;
 }
 
-void AadlMscChecks::onEntityNameChanged(
+void MscSystemChecks::onEntityNameChanged(
         aadl::AADLObject *entity, const QString &oldName, aadlinterface::cmd::UndoCommand *command)
 {
     if (!command->isFirstChange() && !command->checkSystem()) {

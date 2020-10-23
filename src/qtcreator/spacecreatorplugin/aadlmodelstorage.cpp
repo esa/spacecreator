@@ -17,11 +17,11 @@
 
 #include "aadlmodelstorage.h"
 
-#include "aadlmscchecks.h"
 #include "commandsstack.h"
 #include "interface/commands/cmdentityattributechange.h"
 #include "interface/interfacedocument.h"
 #include "iveditorcore.h"
+#include "mscsystemchecks.h"
 
 #include <QDebug>
 
@@ -32,7 +32,7 @@ AadlModelStorage::AadlModelStorage(QObject *parent)
 {
 }
 
-void AadlModelStorage::setChecker(AadlMscChecks *checks)
+void AadlModelStorage::setChecker(MscSystemChecks *checks)
 {
     m_checks = checks;
 }
@@ -71,7 +71,7 @@ void AadlModelStorage::setIvData(const QString &fileName, QSharedPointer<aadlint
     m_store[fileName] = ivData;
     connect(ivData.data(), &shared::EditorCore::editedExternally, this, &spctr::AadlModelStorage::editedExternally);
     connect(ivData->commandsStack(), &aadlinterface::cmd::CommandsStack::nameChanged, m_checks,
-            &spctr::AadlMscChecks::onEntityNameChanged);
+            &spctr::MscSystemChecks::onEntityNameChanged);
     Q_EMIT coreAdded(ivData);
 }
 
