@@ -17,7 +17,7 @@
 
 #include "instanceitem.h"
 
-#include "aadlchecks.h"
+#include "aadlsystemchecks.h"
 #include "baseitems/common/coordinatesconverter.h"
 #include "baseitems/common/mscutils.h"
 #include "baseitems/instanceenditem.h"
@@ -92,7 +92,7 @@ InstanceItem::InstanceItem(
 
     if (m_chartLayoutManager && m_chartLayoutManager->aadlChecker()) {
         m_headSymbol->setAadlChecker(m_chartLayoutManager->aadlChecker());
-        connect(m_chartLayoutManager->aadlChecker(), &msc::AadlChecks::ivCoreChanged, this,
+        connect(m_chartLayoutManager->aadlChecker(), &msc::AadlSystemChecks::ivCoreChanged, this,
                 &msc::InstanceItem::checkAadlFunction);
     }
 
@@ -341,7 +341,7 @@ void InstanceItem::onNameEdited(const QString &newName)
         m_chartLayoutManager->undoStack()->push(
                 new cmd::CmdEntityNameChange(modelEntity(), newName, m_chartLayoutManager));
 
-        msc::AadlChecks *checker = m_chartLayoutManager ? m_chartLayoutManager->aadlChecker() : nullptr;
+        msc::AadlSystemChecks *checker = m_chartLayoutManager ? m_chartLayoutManager->aadlChecker() : nullptr;
         if (checker && checker->hasIvCore() && !checker->functionsNames().contains(m_instance->name())) {
             const int result = QMessageBox::question(nullptr, tr("No AADL function"),
                     tr("The AADL model doesn't contain a function called:\n%1\n"

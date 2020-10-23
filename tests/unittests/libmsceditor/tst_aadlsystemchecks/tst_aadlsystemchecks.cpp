@@ -15,10 +15,10 @@
    along with this program. If not, see <https://www.gnu.org/licenses/lgpl-2.1.html>.
 */
 
-#include "aadlchecks.h"
 #include "aadlobjectconnection.h"
 #include "aadlobjectfunction.h"
 #include "aadlobjectsmodel.h"
+#include "aadlsystemchecks.h"
 #include "baseitems/common/coordinatesconverter.h"
 #include "chartitem.h"
 #include "commandsstack.h"
@@ -38,11 +38,11 @@
 
 using namespace msc;
 
-class tst_AadlChecks : public QObject
+class tst_AadlSystemChecks : public QObject
 {
     Q_OBJECT
 public:
-    tst_AadlChecks()
+    tst_AadlSystemChecks()
         : m_chartItem(nullptr, nullptr)
     {
     }
@@ -60,16 +60,16 @@ private:
     QUndoStack m_stack;
 };
 
-void tst_AadlChecks::initTestCase()
+void tst_AadlSystemChecks::initTestCase()
 {
     auto converter = msc::CoordinatesConverter::instance();
     converter->setDPI(QPointF(109., 109.), QPointF(96., 96.));
     aadlinterface::cmd::CommandsStack::setCurrent(&m_stack);
 }
 
-void tst_AadlChecks::testCheckInstanceNames()
+void tst_AadlSystemChecks::testCheckInstanceNames()
 {
-    msc::AadlChecks checker;
+    msc::AadlSystemChecks checker;
     QVector<QPair<msc::MscChart *, msc::MscInstance *>> result = checker.checkInstanceNames();
     QCOMPARE(result.size(), 0);
 
@@ -113,9 +113,9 @@ void tst_AadlChecks::testCheckInstanceNames()
     QCOMPARE(checker.checkInstance(instance), false);
 }
 
-void tst_AadlChecks::testCheckInstanceRelations()
+void tst_AadlSystemChecks::testCheckInstanceRelations()
 {
-    msc::AadlChecks checker;
+    msc::AadlSystemChecks checker;
     QVector<QPair<msc::MscChart *, msc::MscInstance *>> result = checker.checkInstanceRelations();
     QCOMPARE(result.size(), 0);
 
@@ -163,9 +163,9 @@ void tst_AadlChecks::testCheckInstanceRelations()
     QCOMPARE(result.size(), 2);
 }
 
-void tst_AadlChecks::testCheckMessageNames()
+void tst_AadlSystemChecks::testCheckMessageNames()
 {
-    msc::AadlChecks checker;
+    msc::AadlSystemChecks checker;
     QVector<QPair<msc::MscChart *, msc::MscMessage *>> result = checker.checkMessages();
     QCOMPARE(result.size(), 0);
 
@@ -227,6 +227,6 @@ void tst_AadlChecks::testCheckMessageNames()
     QCOMPARE(result.size(), 0); // Everything is ok
 }
 
-QTEST_MAIN(tst_AadlChecks)
+QTEST_MAIN(tst_AadlSystemChecks)
 
-#include "tst_aadlchecks.moc"
+#include "tst_aadlsystemchecks.moc"

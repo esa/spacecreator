@@ -36,7 +36,7 @@ class InteractiveObjectBase;
 
 namespace msc {
 
-class AadlChecks;
+class AadlSystemChecks;
 class ActionItem;
 class ChartItem;
 class CommentItem;
@@ -121,8 +121,8 @@ public:
 
     QVector<MscInstanceEvent *> visuallySortedEvents() const;
 
-    void setAadlChecker(AadlChecks *aadlChecker);
-    AadlChecks *aadlChecker() const;
+    void setAadlChecker(AadlSystemChecks *aadlChecker);
+    AadlSystemChecks *aadlChecker() const;
 
     bool layoutUpdatePending() const;
 

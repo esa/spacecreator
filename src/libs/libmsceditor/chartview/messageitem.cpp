@@ -17,7 +17,7 @@
 
 #include "messageitem.h"
 
-#include "aadlchecks.h"
+#include "aadlsystemchecks.h"
 #include "baseitems/arrowitem.h"
 #include "baseitems/common/coordinatesconverter.h"
 #include "baseitems/common/mscutils.h"
@@ -116,7 +116,7 @@ MessageItem::MessageItem(MscMessage *message, ChartLayoutManager *chartLayoutMan
     });
 
     if (m_chartLayoutManager && m_chartLayoutManager->aadlChecker()) {
-        connect(m_chartLayoutManager->aadlChecker(), &msc::AadlChecks::ivCoreChanged, this,
+        connect(m_chartLayoutManager->aadlChecker(), &msc::AadlSystemChecks::ivCoreChanged, this,
                 &msc::MessageItem::checkAadlConnection);
     }
 

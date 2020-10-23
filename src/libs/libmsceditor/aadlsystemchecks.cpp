@@ -15,7 +15,7 @@
    along with this program. If not, see <https://www.gnu.org/licenses/lgpl-2.1.html>.
 */
 
-#include "aadlchecks.h"
+#include "aadlsystemchecks.h"
 
 #include "aadlnamevalidator.h"
 #include "aadlobjectconnection.h"
@@ -35,19 +35,19 @@
 
 namespace msc {
 
-AadlChecks::AadlChecks(QObject *parent)
+AadlSystemChecks::AadlSystemChecks(QObject *parent)
     : QObject((parent))
 {
 }
 
-AadlChecks::~AadlChecks() { }
+AadlSystemChecks::~AadlSystemChecks() { }
 
-void AadlChecks::setMscCore(MSCEditorCore *mscCore)
+void AadlSystemChecks::setMscCore(MSCEditorCore *mscCore)
 {
     m_mscCore = mscCore;
 }
 
-void AadlChecks::setIvCore(QSharedPointer<aadlinterface::IVEditorCore> ivCore)
+void AadlSystemChecks::setIvCore(QSharedPointer<aadlinterface::IVEditorCore> ivCore)
 {
     if (ivCore == m_ivCore) {
         return;
@@ -61,8 +61,8 @@ void AadlChecks::setIvCore(QSharedPointer<aadlinterface::IVEditorCore> ivCore)
     updateAadlItems();
 
     if (aadl::AADLObjectsModel *model = aadlModel()) {
-        connect(model, &aadl::AADLObjectsModel::aadlObjectsAdded, this, &msc::AadlChecks::updateAadlItems);
-        connect(model, &aadl::AADLObjectsModel::aadlObjectRemoved, this, &msc::AadlChecks::updateAadlItems);
+        connect(model, &aadl::AADLObjectsModel::aadlObjectsAdded, this, &msc::AadlSystemChecks::updateAadlItems);
+        connect(model, &aadl::AADLObjectsModel::aadlObjectRemoved, this, &msc::AadlSystemChecks::updateAadlItems);
     }
 
     Q_EMIT ivCoreChanged();
@@ -71,7 +71,7 @@ void AadlChecks::setIvCore(QSharedPointer<aadlinterface::IVEditorCore> ivCore)
 /*!
    Returns a pointer to the IV editor model
  */
-const QSharedPointer<aadlinterface::IVEditorCore> &AadlChecks::ivCore() const
+const QSharedPointer<aadlinterface::IVEditorCore> &AadlSystemChecks::ivCore() const
 {
     return m_ivCore;
 }
@@ -79,7 +79,7 @@ const QSharedPointer<aadlinterface::IVEditorCore> &AadlChecks::ivCore() const
 /*!
    Returns if the IV model has be set
  */
-bool AadlChecks::hasIvCore() const
+bool AadlSystemChecks::hasIvCore() const
 {
     return !m_ivCore.isNull();
 }
@@ -87,7 +87,7 @@ bool AadlChecks::hasIvCore() const
 /*!
    Checks all instances if they are defined in the IV model as function
  */
-QVector<QPair<MscChart *, MscInstance *>> AadlChecks::checkInstanceNames() const
+QVector<QPair<MscChart *, MscInstance *>> AadlSystemChecks::checkInstanceNames() const
 {
     QVector<QPair<MscChart *, MscInstance *>> result;
     if (!m_ivCore || !m_mscCore) {
@@ -110,7 +110,7 @@ QVector<QPair<MscChart *, MscInstance *>> AadlChecks::checkInstanceNames() const
 /*!
    Checks if in a chart instances with parent/child relations re used
  */
-QVector<QPair<MscChart *, MscInstance *>> AadlChecks::checkInstanceRelations() const
+QVector<QPair<MscChart *, MscInstance *>> AadlSystemChecks::checkInstanceRelations() const
 {
     QVector<QPair<MscChart *, MscInstance *>> result;
     if (!m_ivCore || !m_mscCore) {
@@ -144,7 +144,7 @@ QVector<QPair<MscChart *, MscInstance *>> AadlChecks::checkInstanceRelations() c
 /*!
    Checks ich the given MSC instance has a corresponding aadl function
  */
-bool AadlChecks::checkInstance(const MscInstance *instance) const
+bool AadlSystemChecks::checkInstance(const MscInstance *instance) const
 {
     if (!m_ivCore) {
         return true;
@@ -157,7 +157,7 @@ bool AadlChecks::checkInstance(const MscInstance *instance) const
 /*!
    Returns a list of the names of all functions in the aadl model
  */
-QStringList AadlChecks::functionsNames() const
+QStringList AadlSystemChecks::functionsNames() const
 {
     if (!m_ivCore) {
         return {};
@@ -176,7 +176,7 @@ QStringList AadlChecks::functionsNames() const
 /*!
    Checks all messages if they are defined in the IV model as connection
  */
-QVector<QPair<MscChart *, MscMessage *>> AadlChecks::checkMessages() const
+QVector<QPair<MscChart *, MscMessage *>> AadlSystemChecks::checkMessages() const
 {
     QVector<QPair<MscChart *, MscMessage *>> result;
     if (!m_ivCore || !m_mscCore) {
@@ -201,7 +201,7 @@ QVector<QPair<MscChart *, MscMessage *>> AadlChecks::checkMessages() const
 /*!
    Checks ich the given MSC message has a corresponding aadl connection
  */
-bool AadlChecks::checkMessage(const MscMessage *message) const
+bool AadlSystemChecks::checkMessage(const MscMessage *message) const
 {
     if (!m_ivCore) {
         return true;
@@ -215,7 +215,7 @@ bool AadlChecks::checkMessage(const MscMessage *message) const
    Returns a list of the names of all connections in the aadl model
    \sa connectionNamesFromTo
  */
-QStringList AadlChecks::connectionNames() const
+QStringList AadlSystemChecks::connectionNames() const
 {
     if (!m_ivCore) {
         return {};
@@ -232,7 +232,7 @@ QStringList AadlChecks::connectionNames() const
     return connectionNames;
 }
 
-bool AadlChecks::connectionExists(QString name, const QString &sourceName, const QString &targetName) const
+bool AadlSystemChecks::connectionExists(QString name, const QString &sourceName, const QString &targetName) const
 {
     aadl::AADLObjectsModel *model = aadlModel();
     if (model == nullptr) {
@@ -248,7 +248,7 @@ bool AadlChecks::connectionExists(QString name, const QString &sourceName, const
    \note the names are aadl encoded by this function
    \sa connectionNames
  */
-QStringList AadlChecks::connectionNamesFromTo(QString sourceName, QString targetName) const
+QStringList AadlSystemChecks::connectionNamesFromTo(QString sourceName, QString targetName) const
 {
     if (!m_ivCore) {
         return {};
@@ -270,7 +270,7 @@ QStringList AadlChecks::connectionNamesFromTo(QString sourceName, QString target
     return connectionNames;
 }
 
-aadl::AADLObjectsModel *AadlChecks::aadlModel() const
+aadl::AADLObjectsModel *AadlSystemChecks::aadlModel() const
 {
     if (!m_ivCore) {
         return {};
@@ -287,7 +287,7 @@ aadl::AADLObjectsModel *AadlChecks::aadlModel() const
 /*!
    Updates the list of functions from the aadl model
  */
-void AadlChecks::updateAadlItems()
+void AadlSystemChecks::updateAadlItems()
 {
     m_aadlFunctions.clear();
     m_aadlConnections.clear();
@@ -315,7 +315,7 @@ void AadlChecks::updateAadlItems()
 /*!
    Returns the aadl functions that correlates to the given msc instance
  */
-aadl::AADLObjectFunction *AadlChecks::correspondingFunction(const MscInstance *instance) const
+aadl::AADLObjectFunction *AadlSystemChecks::correspondingFunction(const MscInstance *instance) const
 {
     if (!instance) {
         return nullptr;
@@ -334,7 +334,7 @@ aadl::AADLObjectFunction *AadlChecks::correspondingFunction(const MscInstance *i
 /*!
    Return true, if the aadl object is a function and the msc instance are the same
  */
-bool AadlChecks::correspond(const aadl::AADLObject *aadlObj, const MscInstance *instance) const
+bool AadlSystemChecks::correspond(const aadl::AADLObject *aadlObj, const MscInstance *instance) const
 {
     if (aadlObj == nullptr && instance == nullptr) {
         // if both are invalid, it the same
@@ -355,7 +355,7 @@ bool AadlChecks::correspond(const aadl::AADLObject *aadlObj, const MscInstance *
 /*!
    Return true, if the aadl function and the msc instance are the same
  */
-bool AadlChecks::correspond(const aadl::AADLObjectFunction *aadlFunc, const MscInstance *instance) const
+bool AadlSystemChecks::correspond(const aadl::AADLObjectFunction *aadlFunc, const MscInstance *instance) const
 {
     if (aadlFunc == nullptr && instance == nullptr) {
         // if both are invalid, it the same
@@ -374,7 +374,7 @@ bool AadlChecks::correspond(const aadl::AADLObjectFunction *aadlFunc, const MscI
 /*!
    Returns if the given aadl function \p func has an ancestor (is nesed by) one of the functions
  */
-bool AadlChecks::hasAncestor(
+bool AadlSystemChecks::hasAncestor(
         aadl::AADLObjectFunction *func, const QVector<aadl::AADLObjectFunction *> allFunctions) const
 {
     for (aadl::AADLObjectFunction *f : allFunctions) {
@@ -388,7 +388,7 @@ bool AadlChecks::hasAncestor(
 /*!
    Returns if the given aadl function \p func has an descendant (is nesting by) at least one of the functions
  */
-bool AadlChecks::hasDescendant(
+bool AadlSystemChecks::hasDescendant(
         aadl::AADLObjectFunction *func, const QVector<aadl::AADLObjectFunction *> allFunctions) const
 {
     for (aadl::AADLObjectFunction *f : allFunctions) {
@@ -402,7 +402,7 @@ bool AadlChecks::hasDescendant(
 /*!
    Returns if the given aadl function \p otherFunc is an ancestor (parent, grand-parent, ...) of the function \p func
  */
-bool AadlChecks::isAncestor(aadl::AADLObjectFunction *func, aadl::AADLObjectFunction *otherFunc) const
+bool AadlSystemChecks::isAncestor(aadl::AADLObjectFunction *func, aadl::AADLObjectFunction *otherFunc) const
 {
     if (!func || !otherFunc || func == otherFunc) {
         return false;
@@ -423,7 +423,7 @@ bool AadlChecks::isAncestor(aadl::AADLObjectFunction *func, aadl::AADLObjectFunc
    Returns the cooresponding aadl connection for the given \p message.
    If no such connection exists, a nullptr is returned.
  */
-aadl::AADLObjectConnection *AadlChecks::correspondingConnection(const MscMessage *message) const
+aadl::AADLObjectConnection *AadlSystemChecks::correspondingConnection(const MscMessage *message) const
 {
     if (!message) {
         return nullptr;
@@ -442,7 +442,7 @@ aadl::AADLObjectConnection *AadlChecks::correspondingConnection(const MscMessage
 /**
    Returns if the aadl connection and the msc message are the same
  */
-bool AadlChecks::correspond(const aadl::AADLObjectConnection *connection, const MscMessage *message) const
+bool AadlSystemChecks::correspond(const aadl::AADLObjectConnection *connection, const MscMessage *message) const
 {
     const QString messageName =
             aadl::AADLNameValidator::decodeName(aadl::AADLObject::Type::ProvidedInterface, message->name());

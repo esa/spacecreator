@@ -17,7 +17,7 @@
 
 #include "msceditorcore.h"
 
-#include "aadlchecks.h"
+#include "aadlsystemchecks.h"
 #include "commandlineparser.h"
 #include "commands/cmddocumentcreate.h"
 #include "commands/cmdentitynamechange.h"
@@ -71,7 +71,7 @@ static const char *HIERARCHY_TYPE_TAG = "hierarchyTag";
 MSCEditorCore::MSCEditorCore(QObject *parent)
     : shared::EditorCore(parent)
     , m_model(new msc::MainModel())
-    , m_aadlChecks(new AadlChecks)
+    , m_aadlChecks(new AadlSystemChecks)
     , m_mscToolBar(new QToolBar(tr("MSC")))
     , m_hierarchyToolBar(new QToolBar(tr("Hierarchy")))
 {
@@ -414,7 +414,7 @@ QAction *MSCEditorCore::createActionPaste(MainWindow *window)
 /*!
    Returns the checker for aadl consistency
  */
-AadlChecks *MSCEditorCore::aadlChecker() const
+AadlSystemChecks *MSCEditorCore::aadlChecker() const
 {
     return m_aadlChecks.get();
 }

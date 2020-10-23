@@ -17,8 +17,8 @@
 
 #include "mscsystemchecks.h"
 
-#include "aadlchecks.h"
 #include "aadlmodelstorage.h"
+#include "aadlsystemchecks.h"
 #include "chartlayoutmanager.h"
 #include "interface/commands/cmdentityattributechange.h"
 #include "iveditorcore.h"

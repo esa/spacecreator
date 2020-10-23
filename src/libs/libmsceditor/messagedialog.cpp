@@ -17,7 +17,7 @@
 
 #include "messagedialog.h"
 
-#include "aadlchecks.h"
+#include "aadlsystemchecks.h"
 #include "asn1editor.h"
 #include "asn1valueparser.h"
 #include "chartlayoutmanager.h"
@@ -120,7 +120,7 @@ void MessageDialog::setAadlConnectionNames(const QStringList &names)
    \brief MessageDialog::setAadlChecker
    \param checker
  */
-void MessageDialog::setAadlChecker(msc::AadlChecks *checker)
+void MessageDialog::setAadlChecker(msc::AadlSystemChecks *checker)
 {
     m_aadlChecker = checker;
     const QString sourceName = m_message->sourceInstance() ? m_message->sourceInstance()->name() : "";

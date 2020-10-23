@@ -26,7 +26,7 @@
 class QStackedWidget;
 
 namespace msc {
-class AadlChecks;
+class AadlSystemChecks;
 class ActionCreatorTool;
 class BaseTool;
 class CommentCreatorTool;
@@ -100,7 +100,7 @@ public:
     QAction *createActionCopy(MainWindow *window);
     QAction *createActionPaste(MainWindow *window);
 
-    msc::AadlChecks *aadlChecker() const;
+    msc::AadlSystemChecks *aadlChecker() const;
 
     ViewMode viewMode();
 
@@ -131,7 +131,7 @@ private Q_SLOTS:
 
 private:
     std::unique_ptr<msc::MainModel> m_model;
-    std::unique_ptr<msc::AadlChecks> m_aadlChecks;
+    std::unique_ptr<msc::AadlSystemChecks> m_aadlChecks;
 
     ViewMode m_viewMode = ViewMode::CHART;
 

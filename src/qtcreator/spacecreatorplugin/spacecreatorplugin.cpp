@@ -17,7 +17,7 @@
 
 #include "spacecreatorplugin.h"
 
-#include "aadlchecks.h"
+#include "aadlsystemchecks.h"
 #include "aadleditordata.h"
 #include "aadleditorfactory.h"
 #include "aadlmodelstorage.h"

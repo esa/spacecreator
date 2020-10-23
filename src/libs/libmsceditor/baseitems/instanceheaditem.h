@@ -22,7 +22,7 @@
 #include <QPointer>
 
 namespace msc {
-class AadlChecks;
+class AadlSystemChecks;
 class MscChart;
 class TextItem;
 
@@ -51,7 +51,7 @@ public:
 
     static QSizeF defaultSize();
 
-    void setAadlChecker(AadlChecks *checker);
+    void setAadlChecker(AadlSystemChecks *checker);
     void showCompleter();
     void removeCompleter();
 
@@ -85,7 +85,7 @@ private:
     QPointF m_manualMovementFrom;
     QPointF m_manualMovementTo;
     QRectF m_explicitTextBox;
-    AadlChecks *m_aadlChecker = nullptr;
+    AadlSystemChecks *m_aadlChecker = nullptr;
     QPointer<MscChart> m_chart;
 };
 

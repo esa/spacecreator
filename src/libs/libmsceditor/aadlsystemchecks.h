@@ -43,14 +43,14 @@ class MscInstance;
 class MscMessage;
 
 /*!
-   \brief The AadlChecks class is used to check consistency of a msc model with one aadl model
+   \brief The AadlSystemChecks class is used to check consistency of a msc model with one aadl model
  */
-class AadlChecks : public QObject
+class AadlSystemChecks : public QObject
 {
     Q_OBJECT
 public:
-    explicit AadlChecks(QObject *parent = nullptr);
-    ~AadlChecks();
+    explicit AadlSystemChecks(QObject *parent = nullptr);
+    ~AadlSystemChecks();
 
     void setMscCore(msc::MSCEditorCore *mscCore);
     void setIvCore(QSharedPointer<aadlinterface::IVEditorCore> ivCore);

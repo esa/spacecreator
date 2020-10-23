@@ -70,11 +70,6 @@ void CmdEntityAttributeChange::redo()
         const QString oldName = m_oldAttrs[nameKey].toString();
         Q_EMIT nameChanged(m_entity, oldName, this);
     }
-    // Command stack then "re-emits"
-    // In some slot (AadlMscChecks?), check if type is function, use code from
-    // `AADLFunctionTypeGraphicsItem::updateNameFromUi`
-    //  - there a flag in this CMD is set (m_updateMsc)
-    // "emit" name changed, with flag m_updateMsc
 
     m_firstRedo = false;
 }

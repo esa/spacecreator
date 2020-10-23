@@ -1,8 +1,8 @@
-set(TEST_NAME tst_aadlchecks)
+set(TEST_NAME tst_aadlsystemchecks)
 project(${TEST_NAME})
 
 add_executable(${TEST_NAME}
-    tst_aadlchecks.cpp
+    tst_aadlsystemchecks.cpp
 )
 
 add_test(NAME ${TEST_NAME} COMMAND ${TEST_NAME})

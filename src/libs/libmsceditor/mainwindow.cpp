@@ -17,7 +17,7 @@
 
 #include "mainwindow.h"
 
-#include "aadlchecks.h"
+#include "aadlsystemchecks.h"
 #include "baseitems/common/coordinatesconverter.h"
 #include "chartitem.h"
 #include "chartlayoutmanager.h"

@@ -17,7 +17,7 @@
 
 #include "instanceheaditem.h"
 
-#include "aadlchecks.h"
+#include "aadlsystemchecks.h"
 #include "baseitems/common/coordinatesconverter.h"
 #include "baseitems/common/mscutils.h"
 #include "baseitems/textitem.h"
@@ -329,7 +329,7 @@ QSizeF InstanceHeadItem::defaultSize()
 /*!
    Set the aadl checker to verify data with the aadl model
  */
-void InstanceHeadItem::setAadlChecker(AadlChecks *checker)
+void InstanceHeadItem::setAadlChecker(AadlSystemChecks *checker)
 {
     m_aadlChecker = checker;
 }

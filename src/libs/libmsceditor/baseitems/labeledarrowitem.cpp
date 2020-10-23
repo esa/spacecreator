@@ -16,7 +16,7 @@
 */
 #include "labeledarrowitem.h"
 
-#include "aadlchecks.h"
+#include "aadlsystemchecks.h"
 #include "arrowitem.h"
 #include "baseitems/msgidentificationitem.h"
 #include "chartitem.h"

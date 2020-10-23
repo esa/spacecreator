@@ -22,7 +22,7 @@
 #include <QStringList>
 
 namespace msc {
-class AadlChecks;
+class AadlSystemChecks;
 class ChartLayoutManager;
 class MscMessage;
 class MscMessageDeclaration;
@@ -46,7 +46,7 @@ public:
     ~MessageDialog();
 
     void setAadlConnectionNames(const QStringList &names);
-    void setAadlChecker(msc::AadlChecks *checker);
+    void setAadlChecker(msc::AadlSystemChecks *checker);
 
 public Q_SLOTS:
     void accept() override;
@@ -79,6 +79,6 @@ private:
     QPointer<msc::MscMessageDeclaration> m_selectedDeclaration;
     bool m_isValid = true;
     QStringList m_connectionNames;
-    QPointer<msc::AadlChecks> m_aadlChecker;
+    QPointer<msc::AadlSystemChecks> m_aadlChecker;
     QPointer<msc::ChartLayoutManager> m_chartLayoutManager;
 };
