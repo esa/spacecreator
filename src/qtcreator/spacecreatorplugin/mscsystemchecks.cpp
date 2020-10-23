@@ -58,7 +58,7 @@ void MscSystemChecks::setAadlStorage(AadlModelStorage *aadlStorage)
  */
 bool MscSystemChecks::mscInstancesExists(const QString &name)
 {
-    for (QSharedPointer<msc::MSCEditorCore> mscCore : allMscCores()) {
+    for (QSharedPointer<msc::MSCEditorCore> &mscCore : allMscCores()) {
         for (msc::MscChart *chart : mscCore->mainModel()->mscModel()->allCharts()) {
             for (msc::MscInstance *instance : chart->instances()) {
                 if (instance->name() == name) {
@@ -75,33 +75,24 @@ bool MscSystemChecks::mscInstancesExists(const QString &name)
  */
 void MscSystemChecks::changeMscInstanceName(const QString &oldName, const QString &name)
 {
-    for (QSharedPointer<msc::MSCEditorCore> mscCore : allMscCores()) {
+    for (QSharedPointer<msc::MSCEditorCore> &mscCore : allMscCores()) {
         mscCore->changeMscInstanceName(oldName, name);
     }
 }
 
 void MscSystemChecks::checkInstances()
 {
-    QSharedPointer<aadlinterface::IVEditorCore> ivp = ivCore();
-    if (!ivp) {
-        return;
-    }
-
     QVector<QSharedPointer<msc::MSCEditorCore>> mscCores = allMscCores();
-
-    for (QSharedPointer<msc::MSCEditorCore> mplugin : mscCores) {
-        mplugin->aadlChecker()->setIvCore(ivp);
-    }
 
     // Check for names
     QVector<QPair<msc::MscChart *, msc::MscInstance *>> resultNames;
-    for (QSharedPointer<msc::MSCEditorCore> mplugin : mscCores) {
+    for (QSharedPointer<msc::MSCEditorCore> &mplugin : mscCores) {
         resultNames += mplugin->aadlChecker()->checkInstanceNames();
     }
 
     // Check for nested functions usage
     QVector<QPair<msc::MscChart *, msc::MscInstance *>> resultRelations;
-    for (QSharedPointer<msc::MSCEditorCore> mplugin : mscCores) {
+    for (QSharedPointer<msc::MSCEditorCore> &mplugin : mscCores) {
         resultRelations += mplugin->aadlChecker()->checkInstanceRelations();
     }
 
@@ -137,17 +128,11 @@ void MscSystemChecks::checkInstances()
 
 void MscSystemChecks::checkMessages()
 {
-    QSharedPointer<aadlinterface::IVEditorCore> ivp = ivCore();
-    if (!ivp) {
-        return;
-    }
-
     QVector<QSharedPointer<msc::MSCEditorCore>> mscCores = allMscCores();
 
     // check messages
     QVector<QPair<msc::MscChart *, msc::MscMessage *>> resultNames;
-    for (QSharedPointer<msc::MSCEditorCore> mplugin : mscCores) {
-        mplugin->aadlChecker()->setIvCore(ivp);
+    for (const QSharedPointer<msc::MSCEditorCore> &mplugin : mscCores) {
         resultNames += mplugin->aadlChecker()->checkMessages();
     }
 
@@ -230,7 +215,7 @@ QStringList MscSystemChecks::projectFiles(const QString &suffix) const
     }
 
     QStringList result;
-    for (Utils::FileName fileName : project->files(ProjectExplorer::Project::AllFiles)) {
+    for (const Utils::FileName &fileName : project->files(ProjectExplorer::Project::AllFiles)) {
         if (fileName.toString().endsWith(suffix, Qt::CaseInsensitive)) {
             result.append(fileName.toString());
         }
