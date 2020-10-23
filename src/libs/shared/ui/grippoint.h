@@ -62,6 +62,7 @@ public:
 
     explicit GripPoint(Location pos, GripPointsHandler *parent = nullptr);
 
+    QPainterPath shape() const override;
     QRectF boundingRect() const override;
     void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget) override;
 
@@ -94,7 +95,6 @@ protected:
 
     const QRectF m_boundRect;
     QCursor m_cursor;
-    QPainterPath m_path;
 
     bool m_used = true;
 
@@ -103,5 +103,5 @@ protected:
     void mouseReleaseEvent(QGraphicsSceneMouseEvent *event) override;
 };
 
-}
-}
+} // namespace ui
+} // namespace shared

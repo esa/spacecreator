@@ -40,8 +40,17 @@ GripPoint::GripPoint(Location pos, GripPointsHandler *parent)
               QPointF(-::uiDescr.rectSize().width() / 2., -::uiDescr.rectSize().height() / 2.), ::uiDescr.rectSize())
 {
     setFlags(QGraphicsItem::ItemIsMovable);
+    setFlags(QGraphicsItem::ItemIgnoresTransformations);
     setAcceptHoverEvents(true);
     setVisible(true);
+}
+
+QPainterPath GripPoint::shape() const
+{
+    const qreal penWidth = ::uiDescr.borderWidth();
+    QPainterPath pp;
+    pp.addRect(m_boundRect.adjusted(-penWidth / 2, -penWidth / 2, penWidth / 2, penWidth / 2));
+    return pp;
 }
 
 QRectF GripPoint::boundingRect() const
@@ -51,8 +60,11 @@ QRectF GripPoint::boundingRect() const
 
 void GripPoint::paint(QPainter *painter, const QStyleOptionGraphicsItem *, QWidget *)
 {
-    painter->fillPath(m_path, ::uiDescr.body());
-    painter->strokePath(m_path, ::uiDescr.border());
+    painter->save();
+    painter->setPen(::uiDescr.border());
+    painter->setBrush(::uiDescr.body());
+    painter->drawRect(m_boundRect);
+    painter->restore();
 }
 
 void GripPoint::setSideSize(qreal sz)
@@ -121,63 +133,58 @@ void GripPoint::setIsUsed(bool used)
 
 void GripPoint::updateLayout()
 {
-    if (QGraphicsItem *targetObj = parentItem()) {
-        QCursor c;
+    QCursor c;
 
-        const QRectF targetRect = targetObj->boundingRect();
-        QPointF destination;
-        switch (m_location) {
-        case TopLeft:
-            destination = targetRect.topLeft();
-            c = Qt::SizeFDiagCursor;
-            break;
-        case Top:
-            destination = { targetRect.center().x(), targetRect.top() };
-            c = Qt::SizeVerCursor;
-            break;
-        case TopRight:
-            destination = targetRect.topRight();
-            c = Qt::SizeBDiagCursor;
-            break;
-        case Right:
-            destination = { targetRect.right(), targetRect.center().y() };
-            c = Qt::SizeHorCursor;
-            break;
-        case BottomRight:
-            destination = targetRect.bottomRight();
-            c = Qt::SizeFDiagCursor;
-            break;
-        case Bottom:
-            destination = { targetRect.center().x(), targetRect.bottom() };
-            c = Qt::SizeVerCursor;
-            break;
-        case BottomLeft:
-            destination = targetRect.bottomLeft();
-            c = Qt::SizeBDiagCursor;
-            break;
-        case Left:
-            destination = { targetRect.left(), targetRect.center().y() };
-            c = Qt::SizeHorCursor;
-            break;
-        case Center:
-            destination = targetRect.center();
-            c = Qt::SizeAllCursor;
-            break;
-        case Absolute:
-            c = Qt::SizeAllCursor;
-            break;
-        }
-
-        if (m_location != Absolute) {
-            QRectF r(m_boundRect.translated(pos()));
-            r.moveCenter(destination);
-            setPos(r.center());
-        }
-        setCursor(c);
+    const QRectF targetRect = m_listener->targetBoundingRect();
+    QPointF destination;
+    switch (m_location) {
+    case TopLeft:
+        destination = targetRect.topLeft();
+        c = Qt::SizeFDiagCursor;
+        break;
+    case Top:
+        destination = { targetRect.center().x(), targetRect.top() };
+        c = Qt::SizeVerCursor;
+        break;
+    case TopRight:
+        destination = targetRect.topRight();
+        c = Qt::SizeBDiagCursor;
+        break;
+    case Right:
+        destination = { targetRect.right(), targetRect.center().y() };
+        c = Qt::SizeHorCursor;
+        break;
+    case BottomRight:
+        destination = targetRect.bottomRight();
+        c = Qt::SizeFDiagCursor;
+        break;
+    case Bottom:
+        destination = { targetRect.center().x(), targetRect.bottom() };
+        c = Qt::SizeVerCursor;
+        break;
+    case BottomLeft:
+        destination = targetRect.bottomLeft();
+        c = Qt::SizeBDiagCursor;
+        break;
+    case Left:
+        destination = { targetRect.left(), targetRect.center().y() };
+        c = Qt::SizeHorCursor;
+        break;
+    case Center:
+        destination = targetRect.center();
+        c = Qt::SizeAllCursor;
+        break;
+    case Absolute:
+        c = Qt::SizeAllCursor;
+        break;
     }
 
-    m_path = QPainterPath();
-    m_path.addRect(m_boundRect);
+    if (m_location != Absolute) {
+        QRectF r(m_boundRect.translated(pos()));
+        r.moveCenter(destination);
+        setPos(r.center());
+    }
+    setCursor(c);
 }
 
 void GripPoint::mouseMoveEvent(QGraphicsSceneMouseEvent *event)
@@ -209,5 +216,5 @@ void GripPoint::mouseReleaseEvent(QGraphicsSceneMouseEvent *event)
     }
 }
 
-}
-}
+} // namespace ui
+} // namespace shared

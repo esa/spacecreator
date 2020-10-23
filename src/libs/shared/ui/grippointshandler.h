@@ -50,12 +50,12 @@ public:
 
     QSizeF minSize() const;
 
+    QRectF targetBoundingRect() const;
+
     void setUsedPoints(GripPoint::Locations points);
     GripPoint::Locations usedPoints() const;
 
-    void setGripPointPos(GripPoint *grip, const QPointF &pos);
     void setGripPointPos(GripPoint::Location location, const QPointF &pos);
-
     GripPoint *gripPoint(GripPoint::Location location) const;
 
 public Q_SLOTS:
@@ -72,19 +72,6 @@ Q_SIGNALS:
 
 private:
     void changeVisibilityAnimated(bool appear);
-
-    /*
-     * To keep the selection frame and its grippoints unscaled,
-     * the QGraphicsItem::ItemIgnoresTransformations flag is used.
-     * That means that the own bounding box and/or child positions should be managed
-     * manually to reflect the current view scale.
-     *
-     * The result routine is too fragile, though: it depends on scene()->views(),
-     * plus the scale factor could be obtained from QTransform only in case
-     * there were no additional transformations performed (no translate nor rotate).
-     * For now it seems enough, but it might need refactoring afterwhile.
-     */
-    QPointF viewScale() const;
 
     QList<GripPoint *> m_gripPoints;
     DrawRectInfo m_highlighter;

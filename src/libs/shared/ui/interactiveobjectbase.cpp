@@ -87,7 +87,7 @@ void InteractiveObjectBase::setBoundingRect(const QRectF newRect)
     Q_EMIT boundingBoxChanged();
 }
 
-GripPointsHandler *InteractiveObjectBase::gripPointsHandler()
+GripPointsHandler *InteractiveObjectBase::gripPointsHandler() const
 {
     return d->gripPointsHandler;
 }

@@ -65,8 +65,7 @@ AADLConnectionGraphicsItem::AADLConnectionGraphicsItem(aadl::AADLObjectConnectio
     , m_item(new GraphicsPathItem(this))
     , m_points()
 {
-    setFlags(QGraphicsItem::ItemIsSelectable | QGraphicsItem::ItemHasNoContents | QGraphicsItem::ItemClipsToShape
-            | QGraphicsItem::ItemContainsChildrenInShape);
+    setFlags(QGraphicsItem::ItemIsSelectable | QGraphicsItem::ItemHasNoContents | QGraphicsItem::ItemClipsToShape);
     setZValue(ZOrder.Connection);
 }
 
@@ -308,6 +307,9 @@ shared::ui::GripPoint *AADLConnectionGraphicsItem::gripPointByPos(
 
 void AADLConnectionGraphicsItem::onManualMoveStart(shared::ui::GripPoint *gp, const QPointF &at)
 {
+    if (gripPointsHandler() == nullptr)
+        return;
+
     const auto &grips = gripPointsHandler()->gripPoints();
     const int idx = grips.indexOf(gp ? gp : gripPointByPos(grips, at));
     if (idx == -1)
@@ -316,7 +318,7 @@ void AADLConnectionGraphicsItem::onManualMoveStart(shared::ui::GripPoint *gp, co
     if (qApp->keyboardModifiers().testFlag(Qt::ControlModifier)) {
         m_points.insert(idx, at);
         auto grip = gripPointsHandler()->createGripPoint(gp->location(), idx);
-        gripPointsHandler()->setGripPointPos(grip, at);
+        grip->setPos(at);
         grip->stackBefore(gp);
         updateBoundingRect();
     }
@@ -341,13 +343,18 @@ void AADLConnectionGraphicsItem::updateGripPoints()
         if (idx >= grips.size()) {
             gripPointsHandler()->createGripPoint(shared::ui::GripPoint::Absolute);
         }
-        gripPointsHandler()->setGripPointPos(grips.value(idx), points.value(idx));
+        if (auto grip = grips.value(idx)) {
+            grip->setPos(points.value(idx));
+        }
     }
     InteractiveObject::updateGripPoints();
 }
 
 void AADLConnectionGraphicsItem::onManualMoveProgress(shared::ui::GripPoint *gp, const QPointF &from, const QPointF &to)
 {
+    if (gripPointsHandler() == nullptr)
+        return;
+
     const auto &grips = gripPointsHandler()->gripPoints();
     int idx = grips.indexOf(gp ? gp : gripPointByPos(grips, from));
     if (idx == -1)
@@ -380,6 +387,9 @@ void AADLConnectionGraphicsItem::onManualMoveProgress(shared::ui::GripPoint *gp,
 void AADLConnectionGraphicsItem::onManualMoveFinish(
         shared::ui::GripPoint *gp, const QPointF &pressedAt, const QPointF &releasedAt)
 {
+    if (gripPointsHandler() == nullptr)
+        return;
+
     const auto &grips = gripPointsHandler()->gripPoints();
     const auto grip = gp ? gp : gripPointByPos(grips, releasedAt);
     if (pressedAt == releasedAt || !grip)
@@ -560,4 +570,4 @@ void AADLConnectionGraphicsItem::updateLastChunk(const AADLInterfaceGraphicsItem
     updateBoundingRect();
 }
 
-}
+} // namespace aadlinterface

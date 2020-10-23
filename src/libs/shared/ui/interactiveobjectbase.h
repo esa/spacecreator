@@ -48,7 +48,7 @@ public:
     QRectF boundingRect() const override;
     void setBoundingRect(const QRectF newRect);
 
-    GripPointsHandler *gripPointsHandler();
+    GripPointsHandler *gripPointsHandler() const;
     GripPoint *gripPointItem(GripPoint::Location location) const;
 
     bool isHovered() const;

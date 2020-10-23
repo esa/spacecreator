@@ -32,7 +32,8 @@ namespace ui {
 GripPointsHandler::GripPointsHandler(QGraphicsItem *parent)
     : QGraphicsObject(parent)
 {
-    setFlags(QGraphicsItem::ItemIgnoresTransformations | QGraphicsItem::ItemSendsGeometryChanges);
+    setFlag(QGraphicsItem::ItemHasNoContents);
+    setFlag(QGraphicsItem::ItemSendsGeometryChanges);
     hide();
 }
 
@@ -52,16 +53,10 @@ void GripPointsHandler::removeGripPoint(GripPoint *handle)
 
 QRectF GripPointsHandler::boundingRect() const
 {
-    if (QGraphicsItem *parent = parentItem()) {
-        auto bounds = parent->boundingRect();
-        auto scaleFactor = viewScale();
-        return QRectF(bounds.topLeft().x() * scaleFactor.x(), bounds.topLeft().y() * scaleFactor.y(),
-                bounds.width() * scaleFactor.x(), bounds.height() * scaleFactor.y());
-    }
     return QRectF();
 }
 
-void GripPointsHandler::paint(QPainter *, const QStyleOptionGraphicsItem *, QWidget *) { }
+void GripPointsHandler::paint(QPainter *painter, const QStyleOptionGraphicsItem *, QWidget *) { }
 
 QList<GripPoint *> GripPointsHandler::gripPoints() const
 {
@@ -85,6 +80,11 @@ QSizeF GripPointsHandler::minSize() const
     return { oneSide, oneSide };
 }
 
+QRectF GripPointsHandler::targetBoundingRect() const
+{
+    return parentItem() ? parentItem()->boundingRect() : QRectF();
+}
+
 void GripPointsHandler::setUsedPoints(GripPoint::Locations points)
 {
     if (m_usedPoints == points)
@@ -102,21 +102,11 @@ GripPoint::Locations GripPointsHandler::usedPoints() const
     return m_usedPoints;
 }
 
-void GripPointsHandler::setGripPointPos(GripPoint *grip, const QPointF &pos)
-{
-    if (grip) {
-        const QPointF &currScale(viewScale());
-        const QPointF &destination(mapFromScene(pos));
-        const QPointF &destinationScaled = { destination.x() * currScale.x(), destination.y() * currScale.y() };
-        grip->setPos(destinationScaled);
-    }
-}
-
 void GripPointsHandler::setGripPointPos(GripPoint::Location location, const QPointF &pos)
 {
     for (auto l : m_gripPoints) {
         if (l->location() == location) {
-            setGripPointPos(l, pos);
+            l->setPos(pos);
             return;
         }
     }
@@ -170,28 +160,5 @@ void GripPointsHandler::changeVisibilityAnimated(bool appear)
     }
 }
 
-QPointF GripPointsHandler::viewScale() const
-{
-    if (QGraphicsItem *parent = parentItem()) {
-        if (scene()) {
-            const int viewsCount = scene()->views().size();
-            if (viewsCount) {
-                if (viewsCount > 1) {
-                    static bool warningShown = false;
-                    if (!warningShown) {
-                        qWarning() << Q_FUNC_INFO << "The multiple views support is not implemented yet.";
-                        warningShown = true;
-                    }
-                }
-
-                const QTransform &t = parent->deviceTransform(scene()->views().first()->viewportTransform());
-                return { t.m11(), t.m22() };
-            }
-        }
-    }
-
-    return { 1., 1. };
-}
-
-}
-}
+} // namespace ui
+} // namespace shared
