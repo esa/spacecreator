@@ -52,6 +52,7 @@ enum Id
     ChangeIfaceAttribute,
 
     ChangeAsn1File,
+    ImportEntities,
 
     LastId
 };

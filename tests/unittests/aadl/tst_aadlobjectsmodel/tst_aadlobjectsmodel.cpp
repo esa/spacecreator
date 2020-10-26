@@ -62,7 +62,7 @@ void tst_AADLObjectsModel::testManageContainers()
     const QVector<aadl::AADLObjectFunction *> containers { &container1, &container2, &container3 };
     for (int i = 0; i < containers.size(); ++i) {
         auto container = containers.at(i);
-        QSignalSpy spyCommon(&model, &aadl::AADLObjectsModel::aadlObjectAdded);
+        QSignalSpy spyCommon(&model, &aadl::AADLObjectsModel::aadlObjectsAdded);
 
         const bool added = model.addObject(container);
         QVERIFY(added);
@@ -72,7 +72,7 @@ void tst_AADLObjectsModel::testManageContainers()
     }
 
     {
-        QSignalSpy spyCommon(&model, &aadl::AADLObjectsModel::aadlObjectAdded);
+        QSignalSpy spyCommon(&model, &aadl::AADLObjectsModel::aadlObjectsAdded);
 
         const bool nullAdded = model.addObject(nullptr);
         QVERIFY(!nullAdded);
@@ -104,7 +104,7 @@ void tst_AADLObjectsModel::testManageContainers()
 
     for (int i = 0; i < containers.size(); ++i) {
         auto container = containers.at(i);
-        QSignalSpy spyConcrete(&model, &aadl::AADLObjectsModel::aadlObjectAdded);
+        QSignalSpy spyConcrete(&model, &aadl::AADLObjectsModel::aadlObjectsAdded);
         QSignalSpy spyCommon(&model, &aadl::AADLObjectsModel::aadlObjectRemoved);
 
         const bool removed = model.removeObject(container);
@@ -131,7 +131,7 @@ void tst_AADLObjectsModel::testManageFunctions()
     const aadl::AADLFunctionsVector functions { &fn1, &fn2, &fn3 };
     for (int i = 0; i < functions.size(); ++i) {
         auto function = functions.at(i);
-        QSignalSpy spyCommon(&model, &aadl::AADLObjectsModel::aadlObjectAdded);
+        QSignalSpy spyCommon(&model, &aadl::AADLObjectsModel::aadlObjectsAdded);
 
         const bool added = model.addObject(function);
         QVERIFY(added);
@@ -141,7 +141,7 @@ void tst_AADLObjectsModel::testManageFunctions()
     }
 
     {
-        QSignalSpy spyCommon(&model, &aadl::AADLObjectsModel::aadlObjectAdded);
+        QSignalSpy spyCommon(&model, &aadl::AADLObjectsModel::aadlObjectsAdded);
 
         const bool nullAdded = model.addObject(nullptr);
         QVERIFY(!nullAdded);
@@ -203,7 +203,7 @@ void tst_AADLObjectsModel::testManageIfaces()
     QVector<aadl::AADLObjectIface *> createdIfaces;
     const QVector<aadl::AADLObjectIface::CreationInfo> ifaces { ci1, ci2, ci3 };
     for (int i = 0; i < ifaces.size(); ++i) {
-        QSignalSpy spyCommon(&model, &aadl::AADLObjectsModel::aadlObjectAdded);
+        QSignalSpy spyCommon(&model, &aadl::AADLObjectsModel::aadlObjectsAdded);
 
         aadl::AADLObjectIface::CreationInfo ci = ifaces.at(i);
         aadl::AADLObjectIface *iface = aadl::AADLObjectIface::createIface(ci);
@@ -218,7 +218,7 @@ void tst_AADLObjectsModel::testManageIfaces()
     }
 
     {
-        QSignalSpy spyCommon(&model, &aadl::AADLObjectsModel::aadlObjectAdded);
+        QSignalSpy spyCommon(&model, &aadl::AADLObjectsModel::aadlObjectsAdded);
 
         const bool nullAdded = model.addObject(nullptr);
         QVERIFY(!nullAdded);

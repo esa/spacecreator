@@ -92,15 +92,16 @@ public:
 
 private:
     int rowInParent(AADLObject *obj) const;
+    bool addObjectImpl(AADLObject *obj);
 
 Q_SIGNALS:
-    void aadlObjectAdded(aadl::AADLObject *object);
+    void aadlObjectsAdded(const QVector<aadl::AADLObject *> &object);
     void aadlObjectRemoved(aadl::AADLObject *object);
-    void modelReset();
     void rootObjectChanged(shared::Id rootId);
 
 public Q_SLOTS:
     bool initFromObjects(const QVector<aadl::AADLObject *> &visibleObjects);
+    bool addObjects(const QVector<aadl::AADLObject *> &objects);
 
 private:
     const std::unique_ptr<AADLObjectsModelPrivate> d;

@@ -204,6 +204,10 @@ target_sources(${LIB_NAME} PRIVATE
     interface/aadlconnectiongroupmodel.h
     interface/commands/cmdconnectiongroupitemchange.cpp
     interface/commands/cmdconnectiongroupitemchange.h
+    interface/aadlobjectstreeview.cpp
+    interface/aadlobjectstreeview.h
+    interface/commands/cmdentitiesimport.cpp
+    interface/commands/cmdentitiesimport.h
 )
 
 target_link_libraries(${LIB_NAME}

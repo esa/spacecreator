@@ -96,6 +96,7 @@ protected:
     explicit AADLObjectConnection(const AADLObject::Type t, AADLObject *source, AADLObject *target,
             AADLObjectIface *ifaceSource, AADLObjectIface *ifaceTarget, QObject *parent = nullptr);
     bool lookupEndpointsPostponed();
+    bool needPostponedInit() const;
 
 private:
     const std::unique_ptr<AADLObjectConnectionPrivate> d;

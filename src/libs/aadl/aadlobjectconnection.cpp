@@ -274,6 +274,11 @@ bool AADLObjectConnection::lookupEndpointsPostponed()
     return true;
 }
 
+bool AADLObjectConnection::needPostponedInit() const
+{
+    return !(d->m_source && d->m_target && d->m_ifaceSource && d->m_ifaceTarget);
+}
+
 void AADLObjectConnection::clearPostponedEndpoints()
 {
     delete d->m_delayedInit.m_from;
@@ -285,7 +290,7 @@ void AADLObjectConnection::clearPostponedEndpoints()
 
 bool AADLObjectConnection::postInit()
 {
-    if (!lookupEndpointsPostponed()) {
+    if (needPostponedInit() && !lookupEndpointsPostponed()) {
         qWarning() << "Postponed Connection initialization failed";
         return false;
     }

@@ -85,6 +85,7 @@ public Q_SLOTS:
 
 private Q_SLOTS:
     void onAADLObjectAdded(aadl::AADLObject *object);
+    void onAADLObjectsAdded(const QVector<aadl::AADLObject *> &objects);
     void onAADLObjectRemoved(aadl::AADLObject *object);
     void onRootObjectChanged(shared::Id rootId);
     void onConnectionAddedToGroup(aadl::AADLObjectConnection *connection);

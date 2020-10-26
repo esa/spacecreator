@@ -28,6 +28,7 @@
 #include "cmdcontextparameterchange.h"
 #include "cmdcontextparametercreate.h"
 #include "cmdcontextparameterremove.h"
+#include "cmdentitiesimport.h"
 #include "cmdentityattributechange.h"
 #include "cmdentityautolayout.h"
 #include "cmdentitygeometrychange.h"
@@ -82,6 +83,8 @@ QUndoCommand *CommandsFactory::create(Id id, const QVariantList &params)
         return cmd::CommandsFactory::changeGeometryCommand(params);
     case cmd::RemoveEntity:
         return cmd::CommandsFactory::removeEntityCommand(params);
+    case cmd::ImportEntities:
+        return cmd::CommandsFactory::importEntitiesCommand(params);
     case cmd::ChangeRootEntity:
         return cmd::CommandsFactory::changeRootEntityCommand(params);
     case cmd::AutoLayoutEntity:
@@ -258,6 +261,21 @@ QUndoCommand *CommandsFactory::removeEntityCommand(const QVariantList &params)
     if (entity.isValid() && entity.canConvert<aadl::AADLObject *>() && model.isValid()
             && model.canConvert<aadl::AADLObjectsModel *>()) {
         return new CmdEntityRemove(entity.value<aadl::AADLObject *>(), model.value<aadl::AADLObjectsModel *>());
+    }
+
+    return nullptr;
+}
+
+QUndoCommand *CommandsFactory::importEntitiesCommand(const QVariantList &params)
+{
+    Q_ASSERT(params.size() == 3);
+    const QVariant entity = params.value(0);
+    const QVariant model = params.value(1);
+    const QVariant pos = params.value(2);
+    if (entity.isValid() && entity.canConvert<aadl::AADLObject *>() && model.isValid()
+            && model.canConvert<aadl::AADLObjectsModel *>() && pos.isValid() && pos.canConvert<QPointF>()) {
+        return new CmdEntitiesImport(
+                entity.value<aadl::AADLObject *>(), model.value<aadl::AADLObjectsModel *>(), pos.value<QPointF>());
     }
 
     return nullptr;

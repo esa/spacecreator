@@ -61,7 +61,7 @@ void AadlChecks::setIvCore(QSharedPointer<aadlinterface::IVEditorCore> ivCore)
     updateAadlItems();
 
     if (aadl::AADLObjectsModel *model = aadlModel()) {
-        connect(model, &aadl::AADLObjectsModel::aadlObjectAdded, this, &msc::AadlChecks::updateAadlItems);
+        connect(model, &aadl::AADLObjectsModel::aadlObjectsAdded, this, &msc::AadlChecks::updateAadlItems);
         connect(model, &aadl::AADLObjectsModel::aadlObjectRemoved, this, &msc::AadlChecks::updateAadlItems);
     }
 

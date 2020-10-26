@@ -41,6 +41,7 @@ private:
     static QUndoCommand *changeConnectionGroupCommand(const QVariantList &params);
     static QUndoCommand *changeGeometryCommand(const QVariantList &params);
     static QUndoCommand *removeEntityCommand(const QVariantList &params);
+    static QUndoCommand *importEntitiesCommand(const QVariantList &params);
     static QUndoCommand *addEntityPropertyCommand(const QVariantList &params);
     static QUndoCommand *changeEntityPropertyCommand(const QVariantList &params);
     static QUndoCommand *renameEntityPropertyCommand(const QVariantList &params);

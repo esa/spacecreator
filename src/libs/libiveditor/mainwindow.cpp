@@ -197,7 +197,7 @@ void MainWindow::onSaveRenderRequested()
 
 void MainWindow::onImportRequested()
 {
-    m_core->document()->import();
+    m_core->document()->loadAvailableComponents();
 }
 
 void MainWindow::onExportRequested()

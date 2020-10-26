@@ -48,45 +48,44 @@ AADLObjectsModel::~AADLObjectsModel() { }
 bool AADLObjectsModel::initFromObjects(const QVector<AADLObject *> &objects)
 {
     clear();
+    return addObjects(objects);
+}
 
-    const bool currentState = blockSignals(true);
+bool AADLObjectsModel::addObjects(const QVector<AADLObject *> &objects)
+{
+    for (auto obj : objects) {
+        addObjectImpl(obj);
+    }
 
-    for (auto obj : objects)
-        addObject(obj);
-
-    for (auto obj : objects)
+    for (auto obj : objects) {
         if (!obj->postInit()) {
-            switch (obj->aadlType()) {
-            case AADLObject::Type::Connection: {
-                if (AADLObjectFunction *parentFn = qobject_cast<AADLObjectFunction *>(obj->parentObject()))
+            if (obj->aadlType() == AADLObject::Type::Connection) {
+                if (AADLObjectFunction *parentFn = qobject_cast<AADLObjectFunction *>(obj->parentObject())) {
                     parentFn->removeChild(obj);
-                break;
+                }
+            } else {
+                removeObject(obj);
             }
-            default:
-                break;
-            }
-
-            removeObject(obj);
         }
+    }
 
-    blockSignals(currentState);
-
-    Q_EMIT rootObjectChanged(d->m_rootObjectId);
-
+    Q_EMIT aadlObjectsAdded(objects);
     return true;
 }
 
-bool AADLObjectsModel::addObject(AADLObject *obj)
+bool AADLObjectsModel::addObjectImpl(AADLObject *obj)
 {
     if (!obj)
         return false;
 
     const shared::Id &id = obj->id();
-    if (getObject(id))
+    if (getObject(id)) {
         return false;
+    }
 
-    if (!obj->parent())
+    if (!obj->parent()) {
         obj->setParent(this);
+    }
 
     obj->setObjectsModel(this);
 
@@ -103,8 +102,23 @@ bool AADLObjectsModel::addObject(AADLObject *obj)
 
     endInsertRows();
 
-    Q_EMIT aadlObjectAdded(obj);
     return true;
+}
+
+bool AADLObjectsModel::addObject(AADLObject *obj)
+{
+    if (addObjectImpl(obj)) {
+        if (!obj->postInit()) {
+            removeObject(obj);
+            if (auto parentObj = qobject_cast<aadl::AADLObjectFunctionType *>(obj->parentObject())) {
+                parentObj->removeChild(obj);
+            }
+        } else {
+            Q_EMIT aadlObjectsAdded({ obj });
+            return true;
+        }
+    }
+    return false;
 }
 
 bool AADLObjectsModel::removeObject(AADLObject *obj)
@@ -135,14 +149,10 @@ void AADLObjectsModel::setRootObject(shared::Id rootId)
     if (d->m_rootObjectId == rootId) {
         return;
     }
-
     d->m_rootObjectId = rootId;
-    d->m_visibleObjects.clear();
-    Q_EMIT modelReset();
-
     d->m_visibleObjects = visibleObjects(rootId);
-    Q_EMIT rootObjectChanged(d->m_rootObjectId);
 
+    Q_EMIT rootObjectChanged(d->m_rootObjectId);
     Q_EMIT dataChanged(QModelIndex(), QModelIndex());
 }
 
@@ -338,8 +348,6 @@ QList<AADLObject *> AADLObjectsModel::visibleObjects(shared::Id rootId) const
 
 void AADLObjectsModel::clear()
 {
-    Q_EMIT modelReset();
-
     beginResetModel();
 
     for (auto object : d->m_objects.values())
@@ -386,7 +394,7 @@ QModelIndex AADLObjectsModel::index(int row, int column, const QModelIndex &pare
 Qt::ItemFlags AADLObjectsModel::flags(const QModelIndex &index) const
 {
     if (index.isValid()) {
-        return Qt::ItemIsEnabled | Qt::ItemIsSelectable | Qt::ItemIsUserCheckable;
+        return Qt::ItemIsDragEnabled | Qt::ItemIsEnabled | Qt::ItemIsSelectable | Qt::ItemIsUserCheckable;
     }
 
     return Qt::NoItemFlags;

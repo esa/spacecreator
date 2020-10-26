@@ -34,6 +34,7 @@
 #include "context/action/actionsmanager.h"
 #include "context/action/editor/dynactioneditor.h"
 #include "creatortool.h"
+#include "interface/aadlobjectstreeview.h"
 #include "interface/colors/colormanagerdialog.h"
 #include "interface/properties/dynamicpropertymanager.h"
 #include "interface/properties/propertiesdialog.h"
@@ -43,6 +44,7 @@
 #include <QBuffer>
 #include <QComboBox>
 #include <QDebug>
+#include <QDialogButtonBox>
 #include <QDir>
 #include <QDirIterator>
 #include <QFile>
@@ -50,6 +52,7 @@
 #include <QGraphicsItem>
 #include <QGraphicsView>
 #include <QGuiApplication>
+#include <QLabel>
 #include <QLineEdit>
 #include <QMenu>
 #include <QMessageBox>
@@ -68,6 +71,24 @@
 
 namespace aadlinterface {
 
+static const QString kDefaultFilename { QLatin1String("interfaceview.xml") };
+
+static inline QString componentsLibraryPath()
+{
+    static const QString kDefaultPath = QStandardPaths::writableLocation(QStandardPaths::AppLocalDataLocation)
+            + QDir::separator() + QLatin1String("components_library") + QDir::separator();
+
+    return qEnvironmentVariable("TASTE_COMPONENTS_LIBRARY", kDefaultPath);
+}
+
+static inline QString sharedTypesPath()
+{
+    static const QString kDefaultPath = QStandardPaths::writableLocation(QStandardPaths::AppLocalDataLocation)
+            + QDir::separator() + QLatin1String("shared_types") + QDir::separator();
+
+    return qEnvironmentVariable("TASTE_SHARED_TYPES", kDefaultPath);
+}
+
 struct InterfaceDocument::InterfaceDocumentPrivate {
     QUndoStack *commandsStack { nullptr };
 
@@ -77,8 +98,8 @@ struct InterfaceDocument::InterfaceDocumentPrivate {
     aadlinterface::GraphicsView *graphicsView { nullptr };
     QTreeView *objectsView { nullptr };
     AADLItemModel *model { nullptr };
-    QTreeView *importView { nullptr };
-    AADLItemModel *importModel { nullptr };
+    AADLObjectsTreeView *importView { nullptr };
+    aadl::AADLObjectsModel *importModel { nullptr };
 
     QAction *actCreateConnectionGroup { nullptr };
     QAction *actRemove { nullptr };
@@ -111,7 +132,7 @@ InterfaceDocument::InterfaceDocument(QObject *parent)
     connect(d->model, &AADLItemModel::itemClicked, this, &InterfaceDocument::onItemClicked);
     connect(d->model, &AADLItemModel::itemDoubleClicked, this, &InterfaceDocument::onItemDoubleClicked);
 
-    d->importModel = new AADLItemModel(this);
+    d->importModel = new aadl::AADLObjectsModel(this);
 }
 
 InterfaceDocument::~InterfaceDocument()
@@ -150,6 +171,8 @@ void InterfaceDocument::init()
     splitter->setStretchFactor(0, 0);
     splitter->setStretchFactor(1, 1);
     rootLayout->addWidget(splitter);
+
+    QTimer::singleShot(0, this, &InterfaceDocument::loadAvailableComponents);
 }
 
 void InterfaceDocument::fillToolBar(QToolBar *toolBar)
@@ -213,38 +236,72 @@ bool InterfaceDocument::load(const QString &path)
     return loaded;
 }
 
-bool InterfaceDocument::import()
+bool InterfaceDocument::loadAvailableComponents()
 {
     d->importModel->clear();
-    createImportView();
-    const QString path =
-            QStringLiteral("%1/workspace").arg(QStandardPaths::writableLocation(QStandardPaths::AppLocalDataLocation));
-
-    QDirIterator it(path);
+    QDirIterator it(componentsLibraryPath());
     while (it.hasNext()) {
-        importImpl(it.next() + QDir::separator() + QLatin1String("interfaceview.xml"));
+        importImpl(it.next() + QDir::separator() + kDefaultFilename);
     }
-    d->importView->show();
     return true;
 }
 
-bool InterfaceDocument::exportSelected()
+QString InterfaceDocument::getComponentName(const QStringList &exportNames)
+{
+    QString name = exportNames.join(QLatin1Char('_'));
+    auto dialog = new QDialog(qobject_cast<QWidget *>(parent()));
+    dialog->setWindowTitle(tr("Export"));
+    auto layout = new QVBoxLayout;
+    layout->addWidget(new QLabel(tr("Enter the name for exporting component:"), dialog));
+    auto lineEdit = new QLineEdit(dialog);
+    lineEdit->setText(name);
+    lineEdit->selectAll();
+    auto box = new QDialogButtonBox(QDialogButtonBox::Save | QDialogButtonBox::Cancel, Qt::Horizontal, dialog);
+    connect(box, &QDialogButtonBox::accepted, dialog, &QDialog::accept);
+    connect(box, &QDialogButtonBox::rejected, dialog, &QDialog::reject);
+    layout->addWidget(lineEdit);
+    layout->addWidget(box);
+    dialog->setLayout(layout);
+    dialog->adjustSize();
+    if (dialog->exec() == QDialog::Accepted) {
+        name = lineEdit->text();
+    }
+    dialog->deleteLater();
+    return name;
+}
+
+QList<aadl::AADLObject *> InterfaceDocument::prepareSelectedObjectsForExport(QString &name)
 {
     QList<aadl::AADLObject *> objects;
-    QStringList exportName;
-    for (const auto &id : d->model->selectionModel()->selection().indexes()) {
+    QStringList exportNames;
+    for (const auto id : d->model->selectionModel()->selection().indexes()) {
         const int role = static_cast<int>(aadl::AADLObjectsModel::AADLRoles::IdRole);
         if (aadl::AADLObject *object = d->model->getObject(id.data(role).toUuid())) {
             if (object->isFunction() && object->parentObject() == nullptr) {
-                exportName.append(object->attr(QLatin1String("name")).toString());
+                exportNames.append(object->attr(QLatin1String("name")).toString());
             }
             objects.append(object);
         }
     }
 
-    static const QString exportFileName("interfaceview.xml");
-    const QString targetDir = QStandardPaths::writableLocation(QStandardPaths::AppLocalDataLocation) + QDir::separator()
-            + QLatin1String("workspace") + QDir::separator() + exportName.join(QLatin1Char('_'));
+    name = getComponentName(exportNames);
+    if (exportNames.size() > 1) {
+        aadl::AADLObjectFunction *dummyFunction = new aadl::AADLObjectFunction(name);
+        for (auto object : objects) {
+            if (!object->parentObject()) {
+                dummyFunction->addChild(object);
+            }
+        }
+        objects.prepend(dummyFunction);
+    }
+    return objects;
+}
+
+bool InterfaceDocument::exportSelected()
+{
+    QString name;
+    const QList<aadl::AADLObject *> objects = prepareSelectedObjectsForExport(name);
+    const QString targetDir = componentsLibraryPath();
 
     const bool ok = shared::ensureDirExists(targetDir);
     if (!ok) {
@@ -252,7 +309,7 @@ bool InterfaceDocument::exportSelected()
         return {};
     }
 
-    const QString exportFilePath = QString("%1/%2").arg(targetDir, exportFileName);
+    const QString exportFilePath = QString("%1/%2").arg(targetDir, kDefaultFilename);
 
     const QFileInfo fi(exportFilePath);
     if (fi.exists()) {
@@ -261,20 +318,29 @@ bool InterfaceDocument::exportSelected()
     }
 
     QBuffer buffer;
-    if (buffer.open(QIODevice::WriteOnly)) {
-        if (XmlDocExporter::exportObjects(objects, &buffer)) {
-            buffer.close();
-            QFile file(fi.absoluteFilePath());
-            if (file.open(QIODevice::WriteOnly)) {
-                file.write(buffer.buffer());
-                file.close();
-                return true;
-            } else {
-                qWarning() << "Can't export file: " << file.errorString();
-            }
-        }
+    if (!buffer.open(QIODevice::WriteOnly)) {
+        qWarning() << "Can't open buffer for exporting:" << buffer.errorString();
+        return false;
     }
-    return false;
+    if (!XmlDocExporter::exportObjects(objects, &buffer)) {
+        qWarning() << "Error during component export";
+        return false;
+    }
+    buffer.close();
+
+    QFile file(fi.absoluteFilePath());
+    if (!file.open(QIODevice::WriteOnly)) {
+        qWarning() << "Can't export file: " << file.errorString();
+        return false;
+    }
+    file.write(buffer.buffer());
+    file.close();
+    if (QFile::copy(asn1FilePath(), targetDir + QDir::separator() + asn1FileName())) {
+        qWarning() << "Error during ASN.1 file copying:" << asn1FilePath();
+    }
+
+    d->model->selectionModel()->clearSelection();
+    return true;
 }
 
 bool InterfaceDocument::importImpl(const QString &path)
@@ -285,28 +351,7 @@ bool InterfaceDocument::importImpl(const QString &path)
     }
 
     aadl::AADLXMLReader parser;
-    connect(&parser, &aadl::AADLXMLReader::objectsParsed, this, [this](const QVector<aadl::AADLObject *> &objects) {
-        for (const auto obj : objects) {
-            d->importModel->addObject(obj);
-        }
-        for (auto obj : objects) {
-            if (!obj->postInit()) {
-                switch (obj->aadlType()) {
-                case aadl::AADLObject::Type::Connection: {
-                    if (aadl::AADLObjectFunction *parentFn =
-                                    qobject_cast<aadl::AADLObjectFunction *>(obj->parentObject())) {
-                        parentFn->removeChild(obj);
-                    }
-                    break;
-                }
-                default:
-                    break;
-                }
-
-                d->importModel->removeObject(obj);
-            }
-        }
-    });
+    connect(&parser, &aadl::AADLXMLReader::objectsParsed, d->importModel, &aadl::AADLObjectsModel::addObjects);
     connect(&parser, &aadl::AADLXMLReader::error, [](const QString &msg) { qWarning() << msg; });
 
     return parser.readFile(path);
@@ -531,6 +576,23 @@ void InterfaceDocument::showInfoMessage(const QString &title, const QString &mes
     QMessageBox::information(qobject_cast<QWidget *>(parent()), title, message);
 }
 
+void InterfaceDocument::importEntity(const shared::Id &id, const QPointF &sceneDropPoint)
+{
+    const auto obj = d->importModel->getObject(id);
+    if (!obj) {
+        return;
+    }
+    if (d->model->getObjectByName(obj->title())) {
+        return;
+    }
+
+    const QVariantList params = { QVariant::fromValue(obj), QVariant::fromValue(d->model),
+        QVariant::fromValue(sceneDropPoint) };
+    if (QUndoCommand *cmdImport = cmd::CommandsFactory::create(cmd::ImportEntities, params)) {
+        cmd::CommandsStack::current()->push(cmdImport);
+    }
+}
+
 void InterfaceDocument::setPath(const QString &path)
 {
     if (path != d->filePath) {
@@ -708,6 +770,8 @@ QWidget *InterfaceDocument::createGraphicsView()
             d->actZoomIn->setEnabled(!qFuzzyCompare(percent, d->graphicsView->maxZoomPercent()));
             d->actZoomOut->setEnabled(!qFuzzyCompare(percent, d->graphicsView->minZoomPercent()));
         });
+
+        connect(d->graphicsView, &GraphicsView::entityDropped, this, &InterfaceDocument::importEntity);
     }
     d->graphicsView->setScene(d->model->scene());
     d->graphicsView->setUpdatesEnabled(false);
@@ -737,13 +801,12 @@ QTreeView *InterfaceDocument::createImportView()
     if (d->importView)
         return d->importView;
 
-    d->importView = new QTreeView;
+    d->importView = new AADLObjectsTreeView;
     d->importView->setObjectName(QLatin1String("ImportView"));
     d->importView->setSelectionBehavior(QAbstractItemView::SelectionBehavior::SelectItems);
-    d->importView->setSelectionMode(QAbstractItemView::SelectionMode::ExtendedSelection);
+    d->importView->setSelectionMode(QAbstractItemView::SelectionMode::SingleSelection);
     d->importView->setModel(d->importModel);
-    d->importView->setSelectionModel(d->importModel->selectionModel());
-    d->importModel->setHeaderData(0, Qt::Horizontal, tr("Import AADL"), Qt::DisplayRole);
+    d->importModel->setHeaderData(0, Qt::Horizontal, tr("Import Component"), Qt::DisplayRole);
 
     return d->importView;
 }

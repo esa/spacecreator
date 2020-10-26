@@ -73,7 +73,7 @@ public:
 
     bool create(const QString &path = QString());
     bool load(const QString &path);
-    bool import();
+    bool loadAvailableComponents();
     bool exportSelected();
     bool save(const QString &path);
     void close();
@@ -123,12 +123,15 @@ private Q_SLOTS:
     void onDataTypesMenuInvoked();
     void showPropertyEditor(aadl::AADLObject *obj);
     void showInfoMessage(const QString &title, const QString &message);
+    void importEntity(const shared::Id &id, const QPointF &sceneDropPoint);
 
 private:
     void setPath(const QString &path);
 
     bool loadImpl(const QString &path);
     bool importImpl(const QString &path);
+    QString getComponentName(const QStringList &exportNames);
+    QList<aadl::AADLObject *> prepareSelectedObjectsForExport(QString &name);
 
     QWidget *createGraphicsView();
     QTreeView *createModelView();

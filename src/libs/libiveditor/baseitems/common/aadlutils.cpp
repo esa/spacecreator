@@ -22,6 +22,7 @@
 #include "graphicsviewutils.h"
 #include "interface/aadlcommentgraphicsitem.h"
 #include "interface/aadlconnectiongraphicsitem.h"
+#include "interface/aadlconnectiongroupgraphicsitem.h"
 #include "interface/aadlfunctiongraphicsitem.h"
 #include "interface/aadlfunctiontypegraphicsitem.h"
 #include "interface/aadlinterfacegraphicsitem.h"
@@ -321,6 +322,7 @@ QList<int> knownGraphicsItemTypes()
         case aadl::AADLObject::Type::FunctionType:
             itemType = aadlinterface::AADLFunctionTypeGraphicsItem::Type;
             break;
+        case aadl::AADLObject::Type::InterfaceGroup:
         case aadl::AADLObject::Type::ProvidedInterface:
         case aadl::AADLObject::Type::RequiredInterface:
             itemType = aadlinterface::AADLInterfaceGraphicsItem::Type;
@@ -330,6 +332,9 @@ QList<int> knownGraphicsItemTypes()
             break;
         case aadl::AADLObject::Type::Connection:
             itemType = aadlinterface::AADLConnectionGraphicsItem::Type;
+            break;
+        case aadl::AADLObject::Type::ConnectionGroup:
+            itemType = aadlinterface::AADLConnectionGroupGraphicsItem::Type;
             break;
         case aadl::AADLObject::Type::Unknown:
             continue;

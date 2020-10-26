@@ -126,7 +126,8 @@ AADLItemModel::AADLItemModel(QObject *parent)
     connect(this, &aadl::AADLObjectsModel::modelReset, this, &AADLItemModel::clearScene);
     connect(this, &aadl::AADLObjectsModel::rootObjectChanged, this, &AADLItemModel::onRootObjectChanged,
             Qt::QueuedConnection);
-    connect(this, &aadl::AADLObjectsModel::aadlObjectAdded, this, &AADLItemModel::onAADLObjectAdded);
+    connect(this, &aadl::AADLObjectsModel::aadlObjectsAdded, this, &AADLItemModel::onAADLObjectsAdded,
+            Qt::QueuedConnection);
     connect(this, &aadl::AADLObjectsModel::aadlObjectRemoved, this, &AADLItemModel::onAADLObjectRemoved);
 
     connect(m_graphicsScene, &QGraphicsScene::selectionChanged, this, &AADLItemModel::onSceneSelectionChanged);
@@ -155,8 +156,8 @@ void AADLItemModel::onAADLObjectAdded(aadl::AADLObject *object)
     }
 
     auto propertyChanged = [this]() {
-        if (auto senerObject = qobject_cast<aadl::AADLObject *>(sender())) {
-            if (auto item = m_items.value(senerObject->id()))
+        if (auto senderObject = qobject_cast<aadl::AADLObject *>(sender())) {
+            if (auto item = m_items.value(senderObject->id()))
                 updateItem(item);
         }
     };
@@ -211,6 +212,24 @@ void AADLItemModel::onAADLObjectAdded(aadl::AADLObject *object)
     updateItem(item);
 }
 
+void AADLItemModel::onAADLObjectsAdded(const QVector<aadl::AADLObject *> &objects)
+{
+    QList<aadl::AADLObject *> objectsToAdd(objects.toList());
+    aadl::AADLObject::sortObjectList(objectsToAdd);
+    for (auto object : objectsToAdd) {
+        onAADLObjectAdded(object);
+    }
+
+    updateSceneRect();
+}
+
+void AADLItemModel::onRootObjectChanged(shared::Id rootId)
+{
+    Q_UNUSED(rootId)
+    clearScene();
+    onAADLObjectsAdded(visibleObjects().toVector());
+}
+
 void AADLItemModel::onAADLObjectRemoved(aadl::AADLObject *object)
 {
     if (!m_graphicsScene) {
@@ -236,20 +255,6 @@ void AADLItemModel::onAADLObjectRemoved(aadl::AADLObject *object)
             m_mutex->unlock();
         }
     }
-}
-
-void AADLItemModel::onRootObjectChanged(shared::Id rootId)
-{
-    Q_UNUSED(rootId)
-
-    QMutexLocker lockme(m_mutex);
-    QList<aadl::AADLObject *> objects = visibleObjects();
-    aadl::AADLObject::sortObjectList(objects);
-    for (auto object : objects) {
-        onAADLObjectAdded(object);
-    }
-
-    updateSceneRect();
 }
 
 void AADLItemModel::onConnectionAddedToGroup(aadl::AADLObjectConnection *connection)

@@ -23,7 +23,9 @@
 #include "interface/aadlrectgraphicsitem.h"
 
 #include <QGraphicsItem>
+#include <QMimeData>
 #include <QMouseEvent>
+#include <QtDebug>
 
 namespace aadlinterface {
 
@@ -35,6 +37,8 @@ GraphicsView::GraphicsView(QWidget *parent)
 
     setDragMode(QGraphicsView::DragMode::RubberBandDrag);
     setRubberBandSelectionMode(Qt::IntersectsItemShape);
+
+    setAcceptDrops(true);
 }
 
 QList<QPair<QPointF, QString>> GraphicsView::mouseMoveCoordinates(
@@ -78,6 +82,24 @@ void GraphicsView::keyPressEvent(QKeyEvent *event)
         event->accept();
     else
         GraphicsViewBase::keyPressEvent(event);
+}
+
+void GraphicsView::dragEnterEvent(QDragEnterEvent *event)
+{
+    event->acceptProposedAction();
+}
+
+void GraphicsView::dragMoveEvent(QDragMoveEvent *event)
+{
+    event->acceptProposedAction();
+}
+
+void GraphicsView::dropEvent(QDropEvent *event)
+{
+    auto mimeData = event->mimeData();
+    const shared::Id id = QUuid::fromString(mimeData->text());
+    Q_EMIT entityDropped(id, mapToScene(event->pos()));
+    event->accept();
 }
 
 }

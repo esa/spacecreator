@@ -69,11 +69,12 @@ void CmdEntityRemove::advancedRemove(aadl::AADLObject *obj)
     if (!obj)
         return;
 
-    if (auto *fn = putParentFunctionFor(obj))
-        fn->removeChild(obj);
-
+    auto fn = putParentFunctionFor(obj);
     if (m_model)
         m_model->removeObject(obj);
+
+    if (fn)
+        fn->removeChild(obj);
 }
 
 void CmdEntityRemove::advancedRestore(aadl::AADLObject *obj)

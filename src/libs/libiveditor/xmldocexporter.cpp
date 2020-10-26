@@ -246,7 +246,7 @@ QHash<QString, QVariant> XmlDocExporter::collectInterfaceObjects(const QList<aad
         case aadl::AADLObject::Type::ConnectionGroup:
         case aadl::AADLObject::Type::Connection:
         case aadl::AADLObject::Type::Unknown: {
-            if (t == aadl::AADLObject::Type::Unknown || aadlObject->isNested())
+            if (t == aadl::AADLObject::Type::Unknown || (aadlObject->isNested() && objects.size() > 1))
                 continue;
             break;
         }
