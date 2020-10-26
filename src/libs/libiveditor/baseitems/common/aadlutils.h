@@ -68,8 +68,8 @@ static const struct {
     const qreal Selected = Topmost - 1.;
     const qreal Preview = Topmost;
 
-    const qreal Function = 0.;
-    const qreal Connection = 1.;
+    const qreal Connection = 0.;
+    const qreal Function = 1.;
     const qreal Interface = 2.;
     const qreal Comment = 3.;
     const qreal GripPoint = Selected;
