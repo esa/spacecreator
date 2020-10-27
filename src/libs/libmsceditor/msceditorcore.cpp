@@ -23,7 +23,6 @@
 #include "commands/cmdentitynamechange.h"
 #include "commands/cmdsetasn1file.h"
 #include "commands/cmdsetmessagedeclarations.h"
-#include "graphicsview.h"
 #include "hierarchyviewmodel.h"
 #include "mainmodel.h"
 #include "mainwindow.h"
@@ -136,6 +135,11 @@ void MSCEditorCore::initChartTools()
 {
     Q_ASSERT(m_chartView != nullptr);
 
+    if (!m_tools.isEmpty()) {
+        qDeleteAll(m_tools);
+        m_tools.clear();
+    }
+
     m_pointerTool = new msc::PointerTool(nullptr, this);
     m_tools.append(m_pointerTool);
 
@@ -217,6 +221,11 @@ void MSCEditorCore::initChartTools()
 void MSCEditorCore::initHierarchyViewActions()
 {
     Q_ASSERT(m_hierarchyView != nullptr);
+
+    if (!m_hierarchyActions.isEmpty()) {
+        qDeleteAll(m_hierarchyActions);
+        m_hierarchyActions.clear();
+    }
 
     auto addAction = [&](msc::MscDocument::HierarchyType type, const QString &title, const QPixmap &icon) {
         QAction *action = new QAction(title, this);

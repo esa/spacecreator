@@ -1,11 +1,31 @@
+/*
+   Copyright (C) 2020 European Space Agency - <maxime.perrotin@esa.int>
+
+   This library is free software; you can redistribute it and/or
+   modify it under the terms of the GNU Library General Public
+   License as published by the Free Software Foundation; either
+   version 2 of the License, or (at your option) any later version.
+
+   This library is distributed in the hope that it will be useful,
+   but WITHOUT ANY WARRANTY; without even the implied warranty of
+   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+   Library General Public License for more details.
+
+   You should have received a copy of the GNU Library General Public License
+   along with this program. If not, see <https://www.gnu.org/licenses/lgpl-2.1.html>.
+*/
+
 #pragma once
 
+#include "minimap.h"
+
 #include <QObject>
+#include <QPointer>
+#include <QToolBar>
 
 class QAction;
 class QMainWindow;
 class QMenu;
-class QToolBar;
 class QUndoStack;
 
 namespace shared {
@@ -14,7 +34,6 @@ class CommandLineParser;
 
 namespace ui {
 class GraphicsViewBase;
-class MiniMap;
 }
 
 class EditorCore : public QObject
@@ -75,9 +94,9 @@ Q_SIGNALS:
 
 private:
     QMainWindow *m_mainWindow = { nullptr };
-    QToolBar *m_mainToolBar { nullptr };
+    QPointer<QToolBar> m_mainToolBar { nullptr };
 
-    ui::MiniMap *m_miniMap { nullptr };
+    QPointer<ui::MiniMap> m_miniMap { nullptr };
 
     QAction *m_actionNewFile { nullptr };
     QAction *m_actionOpenFile { nullptr };

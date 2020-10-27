@@ -18,12 +18,12 @@
 #pragma once
 
 #include "editorcore.h"
+#include "graphicsview.h"
 #include "mscdocument.h"
 
+#include <QStackedWidget>
 #include <QVector>
 #include <memory>
-
-class QStackedWidget;
 
 namespace msc {
 class AadlSystemChecks;
@@ -33,7 +33,6 @@ class CommentCreatorTool;
 class ConditionCreatorTool;
 class CoregionCreatorTool;
 class EntityDeleteTool;
-class GraphicsView;
 class InstanceCreatorTool;
 class InstanceStopTool;
 class MainModel;
@@ -137,12 +136,12 @@ private:
 
     ViewMode m_viewMode = ViewMode::CHART;
 
-    QStackedWidget *m_centerView = nullptr;
-    shared::ui::GraphicsViewBase *m_chartView = nullptr;
-    msc::GraphicsView *m_hierarchyView = nullptr;
+    QPointer<QStackedWidget> m_centerView = nullptr;
+    QPointer<shared::ui::GraphicsViewBase> m_chartView = nullptr;
+    QPointer<msc::GraphicsView> m_hierarchyView = nullptr;
 
-    QToolBar *m_mscToolBar;
-    QToolBar *m_hierarchyToolBar;
+    QPointer<QToolBar> m_mscToolBar = nullptr;
+    QPointer<QToolBar> m_hierarchyToolBar = nullptr;
 
     QAction *m_actionScreenshot = nullptr;
     QAction *m_editSeparator = nullptr;

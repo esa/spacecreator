@@ -173,6 +173,7 @@ QVector<QAction *> MscMainWidget::toolActions() const
 
 QSharedPointer<msc::MSCEditorCore> MscMainWidget::mscCore() const
 {
+    Q_ASSERT(!m_plugin.isNull());
     return m_plugin;
 }
 
