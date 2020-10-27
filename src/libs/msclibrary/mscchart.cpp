@@ -345,6 +345,20 @@ MscInstanceEvent *MscChart::firstEventOfInstance(MscInstance *instance) const
     return nullptr;
 }
 
+/*!
+   Returns all messages of this chart
+ */
+QVector<MscMessage *> MscChart::messages() const
+{
+    QVector<MscMessage *> result;
+    for (MscInstanceEvent *event : m_instanceEvents) {
+        if (event->entityType() == msc::MscEntity::EntityType::Message) {
+            result.append(static_cast<msc::MscMessage *>(event));
+        }
+    }
+    return result;
+}
+
 const QVector<MscGate *> &MscChart::gates() const
 {
     return m_gates;

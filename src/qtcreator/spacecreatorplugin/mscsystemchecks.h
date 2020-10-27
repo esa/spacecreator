@@ -41,7 +41,7 @@ class AadlModelStorage;
 class MscModelStorage;
 
 /*!
-   Class to perform consitency checks an corrections between MSC and AADL
+   Class to perform consistency checks for MSC against a AADL model
  */
 class MscSystemChecks : public QObject
 {
@@ -55,8 +55,12 @@ public:
     void setAadlStorage(AadlModelStorage *aadlStorage);
 
     // Check functions
-    bool mscInstancesExists(const QString &name);
+    bool mscInstancesExist(const QString &name);
     void changeMscInstanceName(const QString &oldName, const QString &name);
+
+    bool mscMessagesExist(const QString &messageName, const QString &sourceName, const QString &targetName);
+    void changeMscMessageName(
+            const QString &oldName, const QString &name, const QString &sourceName, const QString &targetName);
 
     void checkInstances();
     void checkMessages();

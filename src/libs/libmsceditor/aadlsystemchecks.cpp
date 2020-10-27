@@ -142,7 +142,7 @@ QVector<QPair<MscChart *, MscInstance *>> AadlSystemChecks::checkInstanceRelatio
 }
 
 /*!
-   Checks ich the given MSC instance has a corresponding aadl function
+   Checks if the given MSC instance has a corresponding aadl function
  */
 bool AadlSystemChecks::checkInstance(const MscInstance *instance) const
 {
@@ -199,7 +199,7 @@ QVector<QPair<MscChart *, MscMessage *>> AadlSystemChecks::checkMessages() const
 }
 
 /*!
-   Checks ich the given MSC message has a corresponding aadl connection
+   Checks if the given MSC message has a corresponding aadl connection
  */
 bool AadlSystemChecks::checkMessage(const MscMessage *message) const
 {

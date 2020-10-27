@@ -63,6 +63,8 @@ public:
     MscMessage *messageByName(const QString &name) const;
     MscInstanceEvent *firstEventOfInstance(MscInstance *instance) const;
 
+    QVector<MscMessage *> messages() const;
+
     const QVector<MscGate *> &gates() const;
     void addGate(MscGate *gate);
     void removeGate(MscGate *gate);

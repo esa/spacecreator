@@ -25,6 +25,11 @@ UndoCommand::UndoCommand(QObject *parent)
 {
 }
 
+UndoCommand::UndoCommand(QUndoCommand *parent)
+    : QUndoCommand(parent)
+{
+}
+
 void UndoCommand::setSystemCheck(bool check)
 {
     m_systemCheck = check;

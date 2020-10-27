@@ -28,6 +28,7 @@ class UndoCommand : public QObject, public QUndoCommand
     Q_OBJECT
 public:
     explicit UndoCommand(QObject *parent = nullptr);
+    explicit UndoCommand(QUndoCommand *parent);
     explicit UndoCommand(const UndoCommand &other) { }
 
     void setSystemCheck(bool check);

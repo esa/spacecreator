@@ -27,7 +27,7 @@ namespace cmd {
 
 CmdIfaceDataChangeBase::CmdIfaceDataChangeBase(aadl::AADLObjectIface *iface, const QString &targetName,
         const QVariant &targetValue, const QVariant &prevValue, QUndoCommand *parent)
-    : QUndoCommand(parent)
+    : UndoCommand(parent)
     , m_iface(iface)
     , m_model(m_iface ? m_iface->objectsModel() : nullptr)
     , m_relatedConnections()
@@ -67,6 +67,11 @@ QVector<aadl::AADLObjectConnection *> CmdIfaceDataChangeBase::getRelatedConnecti
             affected += m_model->getConnectionsForIface(i->id());
 
     return affected;
+}
+
+aadl::AADLObjectIface *CmdIfaceDataChangeBase::interface() const
+{
+    return m_iface;
 }
 
 aadl::AADLObjectIface *CmdIfaceDataChangeBase::getConnectionOtherSide(

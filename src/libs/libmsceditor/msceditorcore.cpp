@@ -470,6 +470,33 @@ void MSCEditorCore::changeMscInstanceName(const QString &oldName, const QString 
     }
 }
 
+/*!
+   Changes all messages that have the name \p oldName to have the new name \p newName, if the source and taget have the
+   names \p sourceName and \p targetName
+ */
+void MSCEditorCore::changeMscMessageName(
+        const QString &oldName, const QString &newName, const QString &sourceName, const QString &targetName)
+{
+    bool updated = false;
+    for (msc::MscChart *chart : m_model->mscModel()->allCharts()) {
+        for (msc::MscMessage *message : chart->messages()) {
+            if (message->name() == oldName) {
+                const QString messageSource = message->sourceInstance() ? message->sourceInstance()->name() : "";
+                const QString messageTarget = message->targetInstance() ? message->targetInstance()->name() : "";
+                if (messageSource == sourceName && messageTarget == targetName) {
+                    QUndoStack *undo = undoStack();
+                    auto cmd = new msc::cmd::CmdEntityNameChange(message, newName, nullptr);
+                    undo->push(cmd);
+                    updated = true;
+                }
+            }
+        }
+    }
+    if (updated) {
+        Q_EMIT editedExternally(this);
+    }
+}
+
 QString MSCEditorCore::filePath() const
 {
     return m_model->currentFilePath();

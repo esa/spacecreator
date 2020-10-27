@@ -38,7 +38,6 @@ public:
 
     void redo() override;
     void undo() override;
-    bool mergeWith(const QUndoCommand *command) override;
     int id() const override;
 
 private:

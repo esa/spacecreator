@@ -18,13 +18,14 @@
 #pragma once
 
 #include "aadlcommonprops.h" // for Props, Props::Token
+#include "undocommand.h"
 
 #include <QPointer>
-#include <QUndoCommand>
 #include <QVariant>
 #include <QVector>
 
 namespace aadl {
+class AADLObject;
 class AADLObjectConnection;
 class AADLObjectIface;
 class AADLObjectsModel;
@@ -33,10 +34,18 @@ class AADLObjectsModel;
 namespace aadlinterface {
 namespace cmd {
 
-class CmdIfaceDataChangeBase : public QUndoCommand
+class CmdIfaceDataChangeBase : public UndoCommand
 {
+    Q_OBJECT
+
 public:
     ~CmdIfaceDataChangeBase() override;
+
+    virtual QVector<aadl::AADLObjectConnection *> getRelatedConnections();
+    aadl::AADLObjectIface *interface() const;
+
+Q_SIGNALS:
+    void nameChanged(aadl::AADLObject *entity, const QString &oldName, UndoCommand *command);
 
 protected:
     CmdIfaceDataChangeBase() = delete;
@@ -53,7 +62,6 @@ protected:
     QVector<QUndoCommand *> m_cmdRmConnection;
 
     virtual QVector<QPointer<aadl::AADLObjectIface>> getRelatedIfaces();
-    virtual QVector<aadl::AADLObjectConnection *> getRelatedConnections();
     virtual bool connectionMustDie(const aadl::AADLObjectConnection *connection) const = 0;
     static aadl::AADLObjectIface *getConnectionOtherSide(
             const aadl::AADLObjectConnection *connection, aadl::AADLObjectIface *changedIface);

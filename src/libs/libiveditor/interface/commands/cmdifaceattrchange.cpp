@@ -48,6 +48,11 @@ void CmdIfaceAttrChange::redo()
         m_iface->setAttr(m_targetName, m_newValue);
         break;
     }
+
+    if (m_targetToken == aadl::meta::Props::Token::name) {
+        Q_EMIT nameChanged(m_iface, m_oldValue.toString(), this);
+    }
+    m_firstRedo = false;
 }
 
 void CmdIfaceAttrChange::undo()
@@ -61,12 +66,10 @@ void CmdIfaceAttrChange::undo()
         m_iface->setAttr(m_targetName, m_oldValue);
         break;
     }
-}
 
-bool CmdIfaceAttrChange::mergeWith(const QUndoCommand *command)
-{
-    Q_UNUSED(command)
-    return false;
+    if (m_targetToken == aadl::meta::Props::Token::name) {
+        Q_EMIT nameChanged(m_iface, m_newValue.toString(), this);
+    }
 }
 
 int CmdIfaceAttrChange::id() const

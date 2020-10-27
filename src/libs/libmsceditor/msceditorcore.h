@@ -108,6 +108,8 @@ public:
 
     bool renameAsnFile(const QString &oldName, const QString &newName) override;
     void changeMscInstanceName(const QString &oldName, const QString &name);
+    void changeMscMessageName(
+            const QString &oldName, const QString &newName, const QString &sourceName, const QString &targetName);
 
     QString filePath() const override;
     bool save() override;

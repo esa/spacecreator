@@ -18,9 +18,12 @@
 #include "mscsystemchecks.h"
 
 #include "aadlmodelstorage.h"
+#include "aadlobjectconnection.h"
+#include "aadlobjectiface.h"
 #include "aadlsystemchecks.h"
 #include "chartlayoutmanager.h"
 #include "interface/commands/cmdentityattributechange.h"
+#include "interface/commands/cmdifaceattrchange.h"
 #include "iveditorcore.h"
 #include "mainmodel.h"
 #include "mscchart.h"
@@ -56,7 +59,7 @@ void MscSystemChecks::setAadlStorage(AadlModelStorage *aadlStorage)
 /*!
    Returns if at least one instance in one of the .msc files has the name \p name
  */
-bool MscSystemChecks::mscInstancesExists(const QString &name)
+bool MscSystemChecks::mscInstancesExist(const QString &name)
 {
     for (QSharedPointer<msc::MSCEditorCore> &mscCore : allMscCores()) {
         for (msc::MscChart *chart : mscCore->mainModel()->mscModel()->allCharts()) {
@@ -80,6 +83,43 @@ void MscSystemChecks::changeMscInstanceName(const QString &oldName, const QStrin
     }
 }
 
+/*!
+  Returns if at least one message in one of the .msc files has the name \p messageName
+ */
+bool MscSystemChecks::mscMessagesExist(const QString &messageName, const QString &sourceName, const QString &targetName)
+{
+    for (QSharedPointer<msc::MSCEditorCore> &mscCore : allMscCores()) {
+        for (msc::MscChart *chart : mscCore->mainModel()->mscModel()->allCharts()) {
+            for (msc::MscMessage *message : chart->messages()) {
+                if (message->name() == messageName) {
+                    const QString messageSource = message->sourceInstance() ? message->sourceInstance()->name() : "";
+                    const QString messageTarget = message->targetInstance() ? message->targetInstance()->name() : "";
+                    if (messageSource == sourceName && messageTarget == targetName) {
+                        return true;
+                    }
+                }
+            }
+        }
+    }
+    return false;
+}
+
+/*!
+   Changes all messages that have the name \p oldName to have the new name \p newName, if the source and taget have the
+   names \p sourceName and \p targetName
+ */
+void MscSystemChecks::changeMscMessageName(
+        const QString &oldName, const QString &newName, const QString &sourceName, const QString &targetName)
+{
+    for (QSharedPointer<msc::MSCEditorCore> &mscCore : allMscCores()) {
+        mscCore->changeMscMessageName(oldName, newName, sourceName, targetName);
+    }
+}
+
+/*!
+   Checks if all instances have corresponding functions in the aadl model
+   Errors are reported in a message box
+ */
 void MscSystemChecks::checkInstances()
 {
     QVector<QSharedPointer<msc::MSCEditorCore>> mscCores = allMscCores();
@@ -126,6 +166,10 @@ void MscSystemChecks::checkInstances()
     }
 }
 
+/*!
+   Checks if all messages have corresponding connections in the aadl model
+   Errors are reported in a message box
+ */
 void MscSystemChecks::checkMessages()
 {
     QVector<QSharedPointer<msc::MSCEditorCore>> mscCores = allMscCores();
@@ -233,7 +277,7 @@ void MscSystemChecks::onEntityNameChanged(
 
     auto cmdAttribChange = dynamic_cast<aadlinterface::cmd::CmdEntityAttributeChange *>(command);
     if (cmdAttribChange) {
-        if (mscInstancesExists(oldName)) {
+        if (mscInstancesExist(oldName)) {
             if (command->isFirstChange()) {
                 const int result = QMessageBox::question(
                         nullptr, tr("Update instances"), tr("Do you want to update MSC instances?"));
@@ -243,6 +287,27 @@ void MscSystemChecks::onEntityNameChanged(
                 }
             } else {
                 changeMscInstanceName(oldName, entity->title());
+            }
+        }
+    }
+
+    auto cmdIfaceAttribChange = dynamic_cast<aadlinterface::cmd::CmdIfaceAttrChange *>(command);
+    if (cmdIfaceAttribChange
+            && cmdIfaceAttribChange->interface()->direction() == aadl::AADLObjectIface::IfaceType::Provided) {
+        QVector<aadl::AADLObjectConnection *> connections = cmdIfaceAttribChange->getRelatedConnections();
+        for (const aadl::AADLObjectConnection *connection : connections) {
+            if (mscMessagesExist(oldName, connection->sourceName(), connection->targetName())) {
+                if (command->isFirstChange()) {
+                    const int result = QMessageBox::question(
+                            nullptr, tr("Update messages"), tr("Do you want to update MSC messages?"));
+                    if (result == QMessageBox::Yes) {
+                        cmdIfaceAttribChange->setSystemCheck(true);
+                        changeMscMessageName(
+                                oldName, entity->title(), connection->sourceName(), connection->targetName());
+                    }
+                } else {
+                    changeMscMessageName(oldName, entity->title(), connection->sourceName(), connection->targetName());
+                }
             }
         }
     }
