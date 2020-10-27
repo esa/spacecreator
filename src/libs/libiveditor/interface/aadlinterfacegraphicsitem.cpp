@@ -118,6 +118,62 @@ void AADLInterfaceGraphicsItem::setInterfaceName(const QString &name)
     }
 }
 
+QPointF AADLInterfaceGraphicsItem::connectionEndPoint(const bool nestedConnection) const
+{
+    const QRectF ifaceRect = m_iface->sceneBoundingRect();
+    if (!ifaceRect.isValid()) {
+        return {};
+    }
+    if (auto parentGraphicsItem = parentItem()) {
+        const QRectF parentRect = parentGraphicsItem->boundingRect();
+        const Qt::Alignment alignment = getNearestSide(parentRect, pos());
+        switch (alignment) {
+        case Qt::AlignLeft:
+            if (nestedConnection) {
+                return { ifaceRect.right(), QLineF(ifaceRect.topRight(), ifaceRect.bottomRight()).center().y() };
+            } else {
+                return { ifaceRect.left(), QLineF(ifaceRect.topLeft(), ifaceRect.bottomLeft()).center().y() };
+            }
+        case Qt::AlignTop:
+            if (nestedConnection) {
+                return { QLineF(ifaceRect.bottomLeft(), ifaceRect.bottomRight()).center().x(), ifaceRect.bottom() };
+            } else {
+                return { QLineF(ifaceRect.topLeft(), ifaceRect.topRight()).center().x(), ifaceRect.top() };
+            }
+        case Qt::AlignRight:
+            if (nestedConnection) {
+                return { ifaceRect.left(), QLineF(ifaceRect.topLeft(), ifaceRect.bottomLeft()).center().y() };
+            } else {
+                return { ifaceRect.right(), QLineF(ifaceRect.topRight(), ifaceRect.bottomRight()).center().y() };
+            }
+        case Qt::AlignBottom:
+            if (nestedConnection) {
+                return { QLineF(ifaceRect.topLeft(), ifaceRect.topRight()).center().x(), ifaceRect.top() };
+            } else {
+                return { QLineF(ifaceRect.bottomLeft(), ifaceRect.bottomRight()).center().x(), ifaceRect.bottom() };
+            }
+        default:
+            return {};
+        }
+    }
+    return {};
+}
+
+QPointF AADLInterfaceGraphicsItem::connectionEndPoint(AADLConnectionGraphicsItem *connection) const
+{
+    const QRectF ifaceRect = m_iface->sceneBoundingRect();
+    if (connection) {
+        const bool innerConnection = connection->entity()->parentObject() == entity()->parentObject();
+        return connectionEndPoint(innerConnection);
+    }
+    return ifaceRect.center();
+}
+
+QPainterPath AADLInterfaceGraphicsItem::ifaceShape() const
+{
+    return mapToScene(m_iface->shape());
+}
+
 void AADLInterfaceGraphicsItem::updateInternalItems(Qt::Alignment alignment)
 {
     prepareGeometryChange();

@@ -169,8 +169,8 @@ void AADLConnectionGraphicsItem::rebuildLayout()
 
     bool pathObsolete(true);
     if (m_points.size() >= 2) {
-        pathObsolete = (!startItem() || startItem()->scenePos() != m_points.first())
-                || (!endItem() || endItem()->scenePos() != m_points.last());
+        pathObsolete = (!startItem() || !startItem()->ifaceShape().contains(m_points.first()))
+                || (!endItem() || !endItem()->ifaceShape().contains(m_points.last()));
     }
 
     if (pathObsolete) {
@@ -198,11 +198,11 @@ void AADLConnectionGraphicsItem::updateEdgePoint(const AADLInterfaceGraphicsItem
         return;
 
     if (iface == startItem()) {
-        m_points.first() = iface->scenePos();
-        m_points.last() = endItem()->scenePos();
+        m_points.first() = iface->connectionEndPoint(this);
+        m_points.last() = endItem()->connectionEndPoint(this);
     } else if (iface == endItem()) {
-        m_points.first() = startItem()->scenePos();
-        m_points.last() = iface->scenePos();
+        m_points.first() = startItem()->connectionEndPoint(this);
+        m_points.last() = iface->connectionEndPoint(this);
     } else {
         qWarning() << "Attempt to update from an unknown iterface";
         return;
@@ -413,13 +413,13 @@ void AADLConnectionGraphicsItem::onManualMoveFinish(
 
     if (idx == 0) {
         m_startItem->instantLayoutUpdate();
-        m_points[idx] = m_startItem->scenePos();
+        m_points[idx] = m_startItem->connectionEndPoint(this);
 
         for (auto connection : m_startItem->connectionItems())
             connection->layout();
     } else if (idx == grips.size() - 1) {
         m_endItem->instantLayoutUpdate();
-        m_points[idx] = m_endItem->scenePos();
+        m_points[idx] = m_endItem->connectionEndPoint(this);
 
         for (auto connection : m_endItem->connectionItems())
             connection->layout();
@@ -506,8 +506,12 @@ QVector<QPointF> AADLConnectionGraphicsItem::connectionPath(
     QGraphicsScene *scene = startItem->scene();
     Q_ASSERT(startItem->scene() == endItem->scene() && scene);
 
-    return createConnectionPath(scene, startItem->scenePos(), startItem->targetItem()->sceneBoundingRect(),
-            endItem->scenePos(), endItem->targetItem()->sceneBoundingRect());
+    const bool isStartEndpointNested = startItem->targetItem()->isAncestorOf(endItem);
+    const bool isEndEndpointNested = endItem->targetItem()->isAncestorOf(startItem);
+
+    return createConnectionPath(scene, startItem->connectionEndPoint(isStartEndpointNested),
+            startItem->targetItem()->sceneBoundingRect(), endItem->connectionEndPoint(isEndEndpointNested),
+            endItem->targetItem()->sceneBoundingRect());
 }
 
 /*!
@@ -550,7 +554,7 @@ void AADLConnectionGraphicsItem::updateLastChunk(const AADLInterfaceGraphicsItem
         }
     }
 
-    const QVector<QPointF> points = path(scene(), m_points.value(pos), iface->scenePos());
+    const QVector<QPointF> points = path(scene(), m_points.value(pos), iface->connectionEndPoint(this));
     if (!points.isEmpty()) {
         if (reverse) {
             m_points.remove(0, pos + 1);

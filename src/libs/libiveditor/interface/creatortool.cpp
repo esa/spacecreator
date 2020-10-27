@@ -92,7 +92,13 @@ struct ValidationResult {
 /*!
  * \brief The tolerance used to find an AADLInterfaceGraphicsItem on scene (the size of a squre used as a search area)
  */
-static const qreal kInterfaceTolerance = 20.;
+static const qreal kInterfaceTolerance = 5.;
+
+/*!
+ * \brief The tolerance used to find an AADLFunction(Type)GraphicsItem on scene (the size of a squre used as a search
+ * area)
+ */
+static const qreal kFunctionTolerance = 20.;
 
 /*!
  * \brief Performs the validation to detect if it's possible to connect the \a scene's items located in \a startPos and
@@ -108,10 +114,10 @@ static ValidationResult validateCreate(QGraphicsScene *scene, const QPointF &sta
 
     result.connectionLine = { startPos, endPos };
     result.functionAtStartPos =
-            aadlinterface::nearestItem(scene, aadlinterface::adjustFromPoint(startPos, kInterfaceTolerance),
+            aadlinterface::nearestItem(scene, aadlinterface::adjustFromPoint(startPos, kFunctionTolerance),
                     { aadlinterface::AADLFunctionGraphicsItem::Type });
     result.functionAtEndPos =
-            aadlinterface::nearestItem(scene, aadlinterface::adjustFromPoint(endPos, kInterfaceTolerance),
+            aadlinterface::nearestItem(scene, aadlinterface::adjustFromPoint(endPos, kFunctionTolerance),
                     { aadlinterface::AADLFunctionGraphicsItem::Type });
     result.startObject = aadlinterface::gi::functionObject(result.functionAtStartPos);
     result.endObject = aadlinterface::gi::functionObject(result.functionAtEndPos);
@@ -124,11 +130,13 @@ static ValidationResult validateCreate(QGraphicsScene *scene, const QPointF &sta
         return result;
     }
 
-    if (auto startIfaceItem = qgraphicsitem_cast<aadlinterface::AADLInterfaceGraphicsItem *>(
-                aadlinterface::nearestItem(scene, aadlinterface::adjustFromPoint(startPos, kInterfaceTolerance),
-                        { aadlinterface::AADLInterfaceGraphicsItem::Type }))) {
+    const auto startIfaceItem = qgraphicsitem_cast<aadlinterface::AADLInterfaceGraphicsItem *>(
+            aadlinterface::nearestItem(scene, aadlinterface::adjustFromPoint(startPos, kInterfaceTolerance),
+                    { aadlinterface::AADLInterfaceGraphicsItem::Type }));
+    if (startIfaceItem && startIfaceItem->ifaceShape().contains(startPos)) {
         result.startIface = startIfaceItem->entity();
-        result.startPointAdjusted = startIfaceItem->scenePos();
+        result.startPointAdjusted =
+                startIfaceItem->connectionEndPoint(result.functionAtStartPos->isAncestorOf(result.functionAtEndPos));
     } else if (!shared::graphicsviewutils::intersects(result.functionAtStartPos->sceneBoundingRect(),
                        result.connectionLine, &result.startPointAdjusted)) {
         result.setFailed(aadl::ConnectionCreationValidator::FailReason::CannotCreateStartIface);
@@ -140,11 +148,13 @@ static ValidationResult validateCreate(QGraphicsScene *scene, const QPointF &sta
         return result;
     }
 
-    if (auto endIfaceItem = qgraphicsitem_cast<aadlinterface::AADLInterfaceGraphicsItem *>(
-                aadlinterface::nearestItem(scene, aadlinterface::adjustFromPoint(endPos, kInterfaceTolerance),
-                        { aadlinterface::AADLInterfaceGraphicsItem::Type }))) {
+    const auto endIfaceItem = qgraphicsitem_cast<aadlinterface::AADLInterfaceGraphicsItem *>(
+            aadlinterface::nearestItem(scene, aadlinterface::adjustFromPoint(endPos, kInterfaceTolerance),
+                    { aadlinterface::AADLInterfaceGraphicsItem::Type }));
+    if (endIfaceItem && endIfaceItem->ifaceShape().contains(endPos)) {
         result.endIface = endIfaceItem->entity();
-        result.endPointAdjusted = endIfaceItem->scenePos();
+        result.endPointAdjusted =
+                endIfaceItem->connectionEndPoint(result.functionAtEndPos->isAncestorOf(result.functionAtStartPos));
     } else if (!shared::graphicsviewutils::intersects(
                        result.functionAtEndPos->sceneBoundingRect(), result.connectionLine, &result.endPointAdjusted)) {
         result.setFailed(aadl::ConnectionCreationValidator::FailReason::CannotCreateEndIface);

@@ -56,6 +56,10 @@ public:
 
     void setInterfaceName(const QString &name);
 
+    QPointF connectionEndPoint(const bool nestedConnection) const;
+    QPointF connectionEndPoint(AADLConnectionGraphicsItem *connection = nullptr) const;
+    QPainterPath ifaceShape() const;
+
     QPainterPath shape() const override;
 
     void updateFromEntity() override;
