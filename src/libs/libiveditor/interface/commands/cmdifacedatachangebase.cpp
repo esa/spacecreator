@@ -27,7 +27,7 @@ namespace cmd {
 
 CmdIfaceDataChangeBase::CmdIfaceDataChangeBase(aadl::AADLObjectIface *iface, const QString &targetName,
         const QVariant &targetValue, const QVariant &prevValue, QUndoCommand *parent)
-    : UndoCommand(parent)
+    : shared::UndoCommand(parent)
     , m_iface(iface)
     , m_model(m_iface ? m_iface->objectsModel() : nullptr)
     , m_relatedConnections()

@@ -20,6 +20,7 @@
 #include "aadlobject.h"
 #include "interface/commands/cmdentityattributechange.h"
 #include "interface/commands/cmdifaceattrchange.h"
+#include "undocommand.h"
 
 #include <QUndoStack>
 

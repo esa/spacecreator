@@ -34,7 +34,7 @@ class AADLObjectsModel;
 namespace aadlinterface {
 namespace cmd {
 
-class CmdIfaceDataChangeBase : public UndoCommand
+class CmdIfaceDataChangeBase : public shared::UndoCommand
 {
     Q_OBJECT
 
@@ -45,7 +45,7 @@ public:
     aadl::AADLObjectIface *interface() const;
 
 Q_SIGNALS:
-    void nameChanged(aadl::AADLObject *entity, const QString &oldName, UndoCommand *command);
+    void nameChanged(aadl::AADLObject *entity, const QString &oldName, shared::UndoCommand *command);
 
 protected:
     CmdIfaceDataChangeBase() = delete;

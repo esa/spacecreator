@@ -31,6 +31,7 @@
 #include "mscinstance.h"
 #include "mscmodel.h"
 #include "mscmodelstorage.h"
+#include "undocommand.h"
 
 #include <QDebug>
 #include <QMessageBox>
@@ -269,7 +270,7 @@ QStringList MscSystemChecks::projectFiles(const QString &suffix) const
 }
 
 void MscSystemChecks::onEntityNameChanged(
-        aadl::AADLObject *entity, const QString &oldName, aadlinterface::cmd::UndoCommand *command)
+        aadl::AADLObject *entity, const QString &oldName, shared::UndoCommand *command)
 {
     if (!command->isFirstChange() && !command->checkSystem()) {
         return;

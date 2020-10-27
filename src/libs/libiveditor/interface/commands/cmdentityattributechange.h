@@ -32,7 +32,7 @@ class AADLObjectFunctionType;
 namespace aadlinterface {
 namespace cmd {
 
-class CmdEntityAttributeChange : public UndoCommand
+class CmdEntityAttributeChange : public shared::UndoCommand
 {
     Q_OBJECT
 
@@ -45,7 +45,7 @@ public:
     int id() const override;
 
 Q_SIGNALS:
-    void nameChanged(aadl::AADLObject *entity, const QString &oldName, UndoCommand *command);
+    void nameChanged(aadl::AADLObject *entity, const QString &oldName, shared::UndoCommand *command);
 
 private:
     QPointer<aadl::AADLObject> m_entity;

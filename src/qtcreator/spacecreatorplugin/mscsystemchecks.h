@@ -27,13 +27,14 @@ class AADLObject;
 
 namespace aadlinterface {
 class IVEditorCore;
-namespace cmd {
-class UndoCommand;
-}
 }
 
 namespace msc {
 class MSCEditorCore;
+}
+
+namespace shared {
+class UndoCommand;
 }
 
 namespace spctr {
@@ -75,8 +76,7 @@ public:
     QStringList projectFiles(const QString &suffix) const;
 
 public Q_SLOTS:
-    void onEntityNameChanged(
-            aadl::AADLObject *entity, const QString &oldName, aadlinterface::cmd::UndoCommand *command);
+    void onEntityNameChanged(aadl::AADLObject *entity, const QString &oldName, shared::UndoCommand *command);
 
 private:
     QPointer<MscModelStorage> m_mscStorage;

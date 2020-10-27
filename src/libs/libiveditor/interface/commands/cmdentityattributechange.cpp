@@ -41,7 +41,7 @@ static inline QVariantHash getCurrentAttributes(aadl::AADLObject *entity, const 
 }
 
 CmdEntityAttributeChange::CmdEntityAttributeChange(aadl::AADLObject *entity, const QVariantHash &attrs)
-    : UndoCommand()
+    : shared::UndoCommand()
     , m_entity(entity)
     , m_function(m_entity ? m_entity->as<aadl::AADLObjectFunction *>() : nullptr)
     , m_newAttrs(attrs)

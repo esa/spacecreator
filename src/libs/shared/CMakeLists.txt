@@ -45,6 +45,8 @@ target_sources(${LIB_NAME} PRIVATE
     sharedlibrary.cpp
     sharedlibrary.h
     sharedresources/sharedresources.qrc
+    undocommand.cpp
+    undocommand.h
 )
 
 target_include_directories(${LIB_NAME} PUBLIC .)

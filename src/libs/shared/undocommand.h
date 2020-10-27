@@ -15,35 +15,31 @@
   along with this program. If not, see <https://www.gnu.org/licenses/lgpl-2.1.html>.
 */
 
-#include "undocommand.h"
+#pragma once
 
-namespace aadlinterface {
-namespace cmd {
+#include <QObject>
+#include <QUndoCommand>
 
-UndoCommand::UndoCommand(QObject *parent)
-    : QObject(parent)
+namespace shared {
+
+class UndoCommand : public QObject, public QUndoCommand
 {
-}
+    Q_OBJECT
+public:
+    explicit UndoCommand(QObject *parent = nullptr);
+    explicit UndoCommand(QUndoCommand *parent);
+    explicit UndoCommand(const UndoCommand &other) { }
 
-UndoCommand::UndoCommand(QUndoCommand *parent)
-    : QUndoCommand(parent)
-{
-}
+    void setSystemCheck(bool check);
+    bool checkSystem() const;
 
-void UndoCommand::setSystemCheck(bool check)
-{
-    m_systemCheck = check;
-}
+    bool isFirstChange() const;
 
-bool UndoCommand::checkSystem() const
-{
-    return m_systemCheck;
-}
-
-bool UndoCommand::isFirstChange() const
-{
-    return m_firstRedo;
-}
+protected:
+    bool m_systemCheck = false;
+    bool m_firstRedo = true;
+};
 
 }
-}
+
+Q_DECLARE_METATYPE(shared::UndoCommand)
