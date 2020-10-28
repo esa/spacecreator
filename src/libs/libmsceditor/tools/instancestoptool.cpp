@@ -22,11 +22,11 @@
 #include "chartlayoutmanager.h"
 #include "commands/cmdinstancestopchange.h"
 #include "instanceitem.h"
+#include "msccommandsstack.h"
 #include "mscinstance.h"
 
 #include <QGraphicsScene>
 #include <QGraphicsView>
-#include <QUndoStack>
 
 namespace msc {
 

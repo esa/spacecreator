@@ -20,12 +20,12 @@
 #include "commands/cmdinstanceitemcreate.h"
 #include "messageitem.h"
 #include "mscchart.h"
+#include "msccommandsstack.h"
 #include "mscinstance.h"
 
 #include <QAction>
 #include <QGraphicsScene>
 #include <QScopedPointer>
-#include <QUndoStack>
 #include <QVariant>
 #include <QVariantList>
 #include <QVector>
@@ -50,7 +50,7 @@ private:
     QScopedPointer<ChartLayoutManager> m_chartModel;
     static constexpr int CommandsCount = 10;
     msc::MscChart *m_chart = nullptr;
-    QScopedPointer<QUndoStack> m_undoStack;
+    QScopedPointer<msc::MscCommandsStack> m_undoStack;
 
     int itemsCount();
 };
@@ -60,7 +60,7 @@ constexpr int tst_CmdInstanceItemCreate::CommandsCount;
 
 void tst_CmdInstanceItemCreate::initTestCase()
 {
-    m_undoStack.reset(new QUndoStack);
+    m_undoStack.reset(new msc::MscCommandsStack);
     m_chart = new msc::MscChart();
     m_chartModel.reset(new msc::ChartLayoutManager(m_undoStack.data()));
     m_chartModel->setCurrentChart(m_chart);

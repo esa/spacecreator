@@ -21,10 +21,9 @@
 #include "chartlayoutmanager.h"
 #include "commands/cmdcoregionitemcreate.h"
 #include "coregionitem.h"
+#include "msccommandsstack.h"
 #include "msccoregion.h"
 #include "mscinstance.h"
-
-#include <QUndoStack>
 
 namespace msc {
 

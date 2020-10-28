@@ -19,10 +19,10 @@
 
 #include "chartlayoutmanager.h"
 #include "commands/cmdinstanceitemcreate.h"
+#include "msccommandsstack.h"
 #include "mscinstance.h"
 
 #include <QDebug>
-#include <QUndoStack>
 
 namespace msc {
 

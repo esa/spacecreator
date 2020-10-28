@@ -21,6 +21,7 @@
 #include "exceptions.h"
 #include "messageitem.h"
 #include "mscchart.h"
+#include "msccommandsstack.h"
 #include "mscdocument.h"
 #include "mscmessage.h"
 #include "mscmodel.h"
@@ -30,7 +31,6 @@
 #include <QGraphicsScene>
 #include <QGraphicsView>
 #include <QScopedPointer>
-#include <QUndoStack>
 #include <QVector>
 #include <QtTest>
 #include <cmath>
@@ -66,7 +66,7 @@ private:
     QPointer<MessageItem> m_messageItem = nullptr;
 
     QGraphicsView *m_view = nullptr;
-    QScopedPointer<QUndoStack> m_undoStack;
+    QScopedPointer<msc::MscCommandsStack> m_undoStack;
 
     ChartLayoutManager *m_chartModel = nullptr;
     MscModel *m_mscModel = nullptr;
@@ -138,7 +138,7 @@ void tst_MessageItem::init()
 {
     vstest::saveMousePosition();
 
-    m_undoStack.reset(new QUndoStack);
+    m_undoStack.reset(new msc::MscCommandsStack);
     m_chartModel = new ChartLayoutManager(m_undoStack.data());
 
     m_view = new QGraphicsView();

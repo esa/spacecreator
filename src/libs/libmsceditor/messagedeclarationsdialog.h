@@ -23,9 +23,8 @@
 #include <QVariantList>
 #include <memory>
 
-class QUndoStack;
-
 namespace msc {
+class MscCommandsStack;
 class MscModel;
 class MscMessageDeclaration;
 class MscMessageDeclarationList;
@@ -41,7 +40,7 @@ class MessageDeclarationsDialog : public QDialog
 
 public:
     explicit MessageDeclarationsDialog(msc::MscMessageDeclarationList *model, msc::MscModel *mscModel,
-            QUndoStack *undoStack, QWidget *parent = nullptr);
+            msc::MscCommandsStack *undoStack, QWidget *parent = nullptr);
     ~MessageDeclarationsDialog();
 
     msc::MscMessageDeclarationList *declarations() const;
@@ -78,5 +77,5 @@ private:
     msc::MscMessageDeclaration *m_selectedDeclaration = nullptr;
     msc::MscModel *m_mscModel;
     QString m_fileName;
-    QPointer<QUndoStack> m_undoStack;
+    QPointer<msc::MscCommandsStack> m_undoStack;
 };

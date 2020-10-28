@@ -25,13 +25,13 @@
 #include "commands/cmdmessageitemcreate.h"
 #include "instanceitem.h"
 #include "mscchart.h"
+#include "msccommandsstack.h"
 #include "msccreate.h"
 #include "mscinstance.h"
 #include "mscmessage.h"
 
 #include <QDebug>
 #include <QMouseEvent>
-#include <QUndoStack>
 
 namespace msc {
 

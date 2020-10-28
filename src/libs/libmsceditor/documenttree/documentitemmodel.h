@@ -20,12 +20,11 @@
 #include <QAbstractItemModel>
 #include <QPointer>
 
-class QUndoStack;
-
 namespace msc {
 class MscChart;
 class MscDocument;
 class MscModel;
+class MscCommandsStack;
 
 class DocumentItemModel : public QAbstractItemModel
 {
@@ -36,7 +35,7 @@ public:
     void setMscModel(MscModel *mscModel);
     MscModel *mscModel() const;
 
-    void setUndoStack(QUndoStack *undoStack);
+    void setUndoStack(MscCommandsStack *undoStack);
 
     QModelIndex index(MscDocument *document) const;
 
@@ -61,7 +60,7 @@ private:
     void disconnectDocument(msc::MscDocument *document);
 
     QPointer<MscModel> m_mscModel;
-    QPointer<QUndoStack> m_undoStack;
+    QPointer<MscCommandsStack> m_undoStack;
 };
 
 } // namespace msc

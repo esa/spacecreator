@@ -37,7 +37,7 @@ void ChartViewTestBase::initTestCaseBase()
 void ChartViewTestBase::initBase()
 {
     vstest::saveMousePosition();
-    m_undoStack.reset(new QUndoStack);
+    m_undoStack.reset(new msc::MscCommandsStack);
     m_chartModel.reset(new ChartLayoutManager(m_undoStack.data()));
     m_view.reset(new QGraphicsView());
     m_view->setScene(m_chartModel->graphicsScene());

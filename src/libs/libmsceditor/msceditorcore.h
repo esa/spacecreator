@@ -38,6 +38,7 @@ class InstanceStopTool;
 class MainModel;
 class MessageCreatorTool;
 class MscChart;
+class MscCommandsStack;
 class PointerTool;
 class TimerCreatorTool;
 
@@ -104,6 +105,7 @@ public:
     ViewMode viewMode();
 
     QUndoStack *undoStack() const override;
+    msc::MscCommandsStack *commandsStack() const;
 
     bool renameAsnFile(const QString &oldName, const QString &newName) override;
     void changeMscInstanceName(const QString &oldName, const QString &name);

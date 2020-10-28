@@ -32,6 +32,7 @@
 #include "minimap.h"
 #include "mscaction.h"
 #include "mscchart.h"
+#include "msccommandsstack.h"
 #include "msccondition.h"
 #include "msccreate.h"
 #include "mscdocument.h"
@@ -65,7 +66,6 @@
 #include <QScreen>
 #include <QToolBar>
 #include <QUndoGroup>
-#include <QUndoStack>
 #include <QVector>
 
 namespace msc {
@@ -467,7 +467,7 @@ void MainWindow::initConnections()
     connect(d->ui->asn1Widget, &asn1::ASN1FileView::asn1Selected, this, [this]() {
         msc::MscModel *model = d->m_core->mainModel()->mscModel();
         if (model->dataDefinitionString() != d->ui->asn1Widget->fileName()) {
-            d->m_core->undoStack()->push(new cmd::CmdSetAsn1File(model, d->ui->asn1Widget->fileName(), "ASN.1"));
+            d->m_core->commandsStack()->push(new cmd::CmdSetAsn1File(model, d->ui->asn1Widget->fileName(), "ASN.1"));
         }
     });
     connect(d->m_core->mainModel(), &MainModel::asn1ParameterErrorDetected, this, &MainWindow::showAsn1Errors);

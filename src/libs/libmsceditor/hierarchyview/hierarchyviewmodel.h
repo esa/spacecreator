@@ -23,11 +23,11 @@
 #include <memory>
 
 class QGraphicsScene;
-class QUndoStack;
 
 namespace msc {
 
 class DocumentItem;
+class MscCommandsStack;
 class MscModel;
 
 class HierarchyViewModel : public QObject
@@ -40,7 +40,7 @@ public:
     QGraphicsScene *graphicsScene() const;
 
     void setModel(MscModel *model);
-    void setUndoStack(QUndoStack *undoStack);
+    void setUndoStack(MscCommandsStack *undoStack);
 
     void setSelectedDocument(msc::MscDocument *document);
     MscDocument *selectedDocument() const;

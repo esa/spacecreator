@@ -22,13 +22,13 @@
 #include "chartview/mscchartviewconstants.h"
 #include "commands/cmdentitynamechange.h"
 #include "instanceitem.h"
+#include "msccommandsstack.h"
 #include "msctimer.h"
 #include "ui/grippointshandler.h"
 
 #include <QDebug>
 #include <QGraphicsSceneMouseEvent>
 #include <QPainter>
-#include <QUndoStack>
 
 namespace msc {
 

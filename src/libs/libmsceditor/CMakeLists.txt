@@ -135,6 +135,8 @@ target_sources(${LIB_NAME} PRIVATE
     messagedialog.cpp
     messagedialog.h
     messagedialog.ui
+    msccommandsstack.cpp
+    msccommandsstack.h
     msceditor.cpp
     msceditor.h
     msceditorcore.cpp

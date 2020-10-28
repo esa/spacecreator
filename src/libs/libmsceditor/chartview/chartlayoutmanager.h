@@ -26,7 +26,6 @@
 
 class QGraphicsScene;
 class QGraphicsObject;
-class QUndoStack;
 
 namespace shared {
 namespace ui {
@@ -49,6 +48,7 @@ class TimerItem;
 
 class MscAction;
 class MscChart;
+class MscCommandsStack;
 class MscCondition;
 class MscCoregion;
 class MscInstance;
@@ -64,7 +64,7 @@ class ChartLayoutManager : public QObject
     Q_PROPERTY(QRectF instanceRect READ instancesRect NOTIFY instancesRectChanged)
 
 public:
-    explicit ChartLayoutManager(QUndoStack *undoStack, QObject *parent = nullptr);
+    explicit ChartLayoutManager(MscCommandsStack *undoStack, QObject *parent = nullptr);
     ~ChartLayoutManager();
 
     QGraphicsScene *graphicsScene() const;
@@ -126,7 +126,7 @@ public:
 
     bool layoutUpdatePending() const;
 
-    QUndoStack *undoStack() const;
+    MscCommandsStack *undoStack() const;
 
 public Q_SLOTS:
     void updateLayout();

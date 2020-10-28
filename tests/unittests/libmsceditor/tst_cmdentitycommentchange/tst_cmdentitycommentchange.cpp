@@ -18,10 +18,10 @@
 #include "chartlayoutmanager.h"
 #include "commands/cmdentitycommentchange.h"
 #include "mscchart.h"
+#include "msccommandsstack.h"
 #include "msccomment.h"
 
 #include <QScopedPointer>
-#include <QUndoStack>
 #include <QVariant>
 #include <QVariantList>
 #include <QtTest>
@@ -43,13 +43,13 @@ private Q_SLOTS:
 private:
     QScopedPointer<msc::MscChart> m_chart;
     QScopedPointer<msc::ChartLayoutManager> m_layoutManager;
-    QScopedPointer<QUndoStack> m_undoStack;
+    QScopedPointer<msc::MscCommandsStack> m_undoStack;
 };
 
 void tst_CmdEntityCommentChange::init()
 {
     m_chart.reset(new msc::MscChart());
-    m_undoStack.reset(new QUndoStack);
+    m_undoStack.reset(new msc::MscCommandsStack);
     m_layoutManager.reset(new msc::ChartLayoutManager(m_undoStack.data()));
     m_layoutManager->setCurrentChart(m_chart.data());
 }

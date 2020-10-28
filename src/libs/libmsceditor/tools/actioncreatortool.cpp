@@ -22,9 +22,8 @@
 #include "commands/cmdactionitemcreate.h"
 #include "mscaction.h"
 #include "mscchart.h"
+#include "msccommandsstack.h"
 #include "mscinstance.h"
-
-#include <QUndoStack>
 
 namespace msc {
 

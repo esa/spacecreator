@@ -17,12 +17,12 @@
 
 #include "chartlayoutmanager.h"
 #include "exceptions.h"
+#include "msccommandsstack.h"
 #include "mscinstance.h"
 #include "msctimer.h"
 #include "timeritem.h"
 
 #include <QScopedPointer>
-#include <QUndoStack>
 #include <QtTest>
 
 using namespace msc;
@@ -47,12 +47,12 @@ private:
     TimerItem *m_timerItem = nullptr;
     MscInstance *m_instance = nullptr;
     ChartLayoutManager *m_model = nullptr;
-    QScopedPointer<QUndoStack> m_undoStack;
+    QScopedPointer<msc::MscCommandsStack> m_undoStack;
 };
 
 void tst_TimerItem::init()
 {
-    m_undoStack.reset(new QUndoStack);
+    m_undoStack.reset(new msc::MscCommandsStack);
     m_model = new ChartLayoutManager(m_undoStack.data());
     m_instance = new MscInstance;
 

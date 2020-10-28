@@ -25,13 +25,13 @@
 #include "instanceitem.h"
 #include "mscaction.h"
 #include "mscchartviewconstants.h"
+#include "msccommandsstack.h"
 #include "mscreader.h"
 #include "ui/grippointshandler.h"
 
 #include <QDebug>
 #include <QGraphicsSceneMouseEvent>
 #include <QPainter>
-#include <QUndoStack>
 #include <cmath>
 
 namespace msc {

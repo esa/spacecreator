@@ -27,6 +27,7 @@
 #include "instanceitem.h"
 #include "messageitem.h"
 #include "mscchart.h"
+#include "msccommandsstack.h"
 #include "mscdocument.h"
 #include "mscinstance.h"
 #include "mscmessage.h"
@@ -53,6 +54,7 @@ const QLatin1String MainModel::MscChartMimeType("application/mscchart");
 struct MainModelPrivate {
     explicit MainModelPrivate(MainModel *q)
         : m_mscModel(new MscModel())
+        , m_chartLayoutManager(&m_undoStack)
         , m_documentItemModel(new DocumentItemModel(q))
         , m_currentFilePath(
 #if defined(QT_DEBUG) && defined(Q_OS_WIN)
@@ -60,8 +62,7 @@ struct MainModelPrivate {
 #else
                   "../../msceditor/examples"
 #endif // QT_DEBUG and Q_OS_WIN
-                          )
-        , m_chartLayoutManager(&m_undoStack)
+          )
     {
     }
     ~MainModelPrivate()
@@ -70,7 +71,7 @@ struct MainModelPrivate {
         delete m_documentItemModel;
     }
 
-    QUndoStack m_undoStack;
+    MscCommandsStack m_undoStack;
     MscModel *m_mscModel = nullptr; /// model of the msc data
     QStringList m_mscErrorMessages;
     ChartLayoutManager m_chartLayoutManager; /// model for the chart UI
@@ -268,7 +269,12 @@ const QString &MainModel::currentFilePath() const
  */
 QUndoStack *MainModel::undoStack()
 {
-    return &d->m_undoStack;
+    return d->m_undoStack.undoStack();
+}
+
+msc::MscCommandsStack *MainModel::commandsStack() const
+{
+    return &(d->m_undoStack);
 }
 
 /*!

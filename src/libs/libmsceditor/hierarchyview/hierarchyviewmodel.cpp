@@ -19,6 +19,7 @@
 
 #include "commands/cmddocumentmove.h"
 #include "documentitem.h"
+#include "msccommandsstack.h"
 #include "mscdocument.h"
 #include "mscmodel.h"
 
@@ -134,7 +135,7 @@ public:
     }
 
     MscModel *model = nullptr;
-    QPointer<QUndoStack> undoStack;
+    QPointer<MscCommandsStack> undoStack;
 
     QGraphicsScene scene;
     QVector<DocumentItem *> documentItems;
@@ -186,7 +187,7 @@ void HierarchyViewModel::setModel(MscModel *model)
     }
 }
 
-void HierarchyViewModel::setUndoStack(QUndoStack *undoStack)
+void HierarchyViewModel::setUndoStack(MscCommandsStack *undoStack)
 {
     d->undoStack = undoStack;
 }

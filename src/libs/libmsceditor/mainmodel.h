@@ -33,6 +33,7 @@ class ChartLayoutManager;
 class DocumentItemModel;
 class HierarchyViewModel;
 class MscChart;
+class MscCommandsStack;
 class MscDocument;
 class MscModel;
 
@@ -75,6 +76,7 @@ public:
     const QString &currentFilePath() const;
 
     QUndoStack *undoStack();
+    msc::MscCommandsStack *commandsStack() const;
     bool needSave() const;
 
     QFileInfo asn1File() const;

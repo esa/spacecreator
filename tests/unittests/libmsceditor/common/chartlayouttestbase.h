@@ -17,12 +17,12 @@
 
 #include "chartlayoutmanager.h"
 #include "mscchart.h"
+#include "msccommandsstack.h"
 #include "mscmodel.h"
 #include "mscreader.h"
 
 #include <QGraphicsView>
 #include <QPointer>
-#include <QUndoStack>
 #include <memory>
 
 namespace msc {
@@ -47,7 +47,7 @@ protected:
     QPointer<msc::MscChart> m_chart;
     std::unique_ptr<MscModel> m_model;
     std::unique_ptr<QGraphicsView> m_view;
-    std::unique_ptr<QUndoStack> m_undoStack;
+    std::unique_ptr<msc::MscCommandsStack> m_undoStack;
 };
 
 }

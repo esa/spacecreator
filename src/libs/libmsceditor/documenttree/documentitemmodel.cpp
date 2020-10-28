@@ -20,6 +20,7 @@
 #include "commands/cmdentitynamechange.h"
 #include "commands/cmdhierarchytypechange.h"
 #include "mscchart.h"
+#include "msccommandsstack.h"
 #include "mscdocument.h"
 #include "mscmodel.h"
 
@@ -89,7 +90,7 @@ MscModel *DocumentItemModel::mscModel() const
     return m_mscModel.data();
 }
 
-void DocumentItemModel::setUndoStack(QUndoStack *undoStack)
+void DocumentItemModel::setUndoStack(MscCommandsStack *undoStack)
 {
     m_undoStack = undoStack;
     Q_ASSERT(!m_undoStack.isNull());

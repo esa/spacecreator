@@ -35,6 +35,7 @@
 #include "commentitem.h"
 #include "messagedialog.h"
 #include "mscchart.h"
+#include "msccommandsstack.h"
 #include "mscinstance.h"
 #include "ui/grippointshandler.h"
 
@@ -45,7 +46,6 @@
 #include <QGraphicsScene>
 #include <QPainter>
 #include <QPolygonF>
-#include <QUndoStack>
 
 namespace msc {
 
@@ -618,7 +618,7 @@ void MessageItem::onManualGeometryChangeFinished(shared::ui::GripPoint *gp, cons
 
     m_originalMessagePoints.clear();
 
-    QUndoStack *undoStack = m_chartLayoutManager->undoStack();
+    MscCommandsStack *undoStack = m_chartLayoutManager->undoStack();
 
     undoStack->beginMacro(tr("Change message geometry"));
 
@@ -749,7 +749,7 @@ void MessageItem::onRenamed(const QString &title)
 
     // prevent recursion, as parametes ans name are not set as one unit
     disconnect(m_message, &msc::MscMessage::dataChanged, this, &msc::MessageItem::updateDisplayText);
-    QUndoStack *undoStack = m_chartLayoutManager->undoStack();
+    MscCommandsStack *undoStack = m_chartLayoutManager->undoStack();
     undoStack->beginMacro(tr("Set message identification"));
     undoStack->push(new cmd::CmdSetParameterList(m_message, parameters));
     undoStack->push(new cmd::CmdEntityNameChange(m_message, name, m_chartLayoutManager));

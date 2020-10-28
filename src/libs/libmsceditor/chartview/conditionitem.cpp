@@ -21,13 +21,13 @@
 #include "chartlayoutmanager.h"
 #include "commands/cmdentitynamechange.h"
 #include "mscchartviewconstants.h"
+#include "msccommandsstack.h"
 #include "msccondition.h"
 #include "ui/grippointshandler.h"
 
 #include <QDebug>
 #include <QGraphicsPolygonItem>
 #include <QGraphicsSceneMouseEvent>
-#include <QUndoStack>
 
 namespace msc {
 

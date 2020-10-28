@@ -25,6 +25,7 @@
 #include "coregionitem.h"
 #include "documentitem.h"
 #include "mscchart.h"
+#include "msccommandsstack.h"
 #include "msccomment.h"
 #include "msccoregion.h"
 #include "mscdocument.h"
@@ -33,7 +34,6 @@
 #include <QAction>
 #include <QGraphicsScene>
 #include <QGraphicsView>
-#include <QUndoStack>
 #include <QVariant>
 #include <QVector>
 
@@ -137,7 +137,7 @@ void EntityDeleteTool::deleteSelectedItems()
         }
     }
 
-    QUndoStack *undoStack = m_model->undoStack();
+    MscCommandsStack *undoStack = m_model->undoStack();
     undoStack->beginMacro(tr("Removing Entities"));
     for (msc::MscEntity *entity : comments) {
         m_model->undoStack()->push(new cmd::CmdEntityCommentChange(entity, QString(), m_model));

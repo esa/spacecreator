@@ -17,6 +17,7 @@
 
 #include "chartlayoutmanager.h"
 #include "mscchart.h"
+#include "msccommandsstack.h"
 #include "mscmodel.h"
 #include "mscreader.h"
 
@@ -24,7 +25,6 @@
 #include <QGraphicsView>
 #include <QPointer>
 #include <QScopedPointer>
-#include <QUndoStack>
 
 namespace msc {
 
@@ -48,7 +48,7 @@ protected:
     QPoint topCenter(const QGraphicsItem *item) const;
     QPoint bottomCenter(const QGraphicsItem *item) const;
 
-    QScopedPointer<QUndoStack> m_undoStack;
+    QScopedPointer<msc::MscCommandsStack> m_undoStack;
     QScopedPointer<ChartLayoutManager> m_chartModel;
     QScopedPointer<QGraphicsView> m_view;
     QScopedPointer<MscReader> m_reader;

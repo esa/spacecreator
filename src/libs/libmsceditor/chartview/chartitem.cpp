@@ -26,6 +26,7 @@
 #include "graphicsviewutils.h"
 #include "mscchart.h"
 #include "mscchartviewconstants.h"
+#include "msccommandsstack.h"
 #include "ui/grippoint.h"
 #include "ui/grippointshandler.h"
 
@@ -34,7 +35,6 @@
 #include <QGraphicsSceneMouseEvent>
 #include <QPainter>
 #include <QPointer>
-#include <QUndoStack>
 
 namespace msc {
 

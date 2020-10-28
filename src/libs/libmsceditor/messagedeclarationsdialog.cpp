@@ -21,6 +21,7 @@
 #include "commands/cmdsetasn1file.h"
 #include "definitions.h"
 #include "file.h"
+#include "msccommandsstack.h"
 #include "mscdocument.h"
 #include "mscmessagedeclarationlist.h"
 #include "mscmodel.h"
@@ -35,10 +36,9 @@
 #include <QKeyEvent>
 #include <QRegExpValidator>
 #include <QTimer>
-#include <QUndoStack>
 
-MessageDeclarationsDialog::MessageDeclarationsDialog(
-        msc::MscMessageDeclarationList *model, msc::MscModel *mscModel, QUndoStack *undoStack, QWidget *parent)
+MessageDeclarationsDialog::MessageDeclarationsDialog(msc::MscMessageDeclarationList *model, msc::MscModel *mscModel,
+        msc::MscCommandsStack *undoStack, QWidget *parent)
     : QDialog(parent)
     , ui(new Ui::MessageDeclarationsDialog)
     , m_model(model->clone())

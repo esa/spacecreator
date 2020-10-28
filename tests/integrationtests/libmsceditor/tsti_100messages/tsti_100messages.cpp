@@ -21,6 +21,7 @@
 #include "instanceitem.h"
 #include "messageitem.h"
 #include "mscchart.h"
+#include "msccommandsstack.h"
 #include "mscinstance.h"
 #include "mscmessage.h"
 #include "syntheticinteraction.h"
@@ -29,7 +30,6 @@
 #include <QGraphicsView>
 #include <QPainterPath>
 #include <QPointer>
-#include <QUndoStack>
 #include <QtTest>
 
 using namespace msc;
@@ -53,7 +53,7 @@ private:
         QApplication::processEvents();
     }
 
-    QScopedPointer<QUndoStack> m_undoStack;
+    QScopedPointer<msc::MscCommandsStack> m_undoStack;
     QScopedPointer<ChartLayoutManager> m_model;
     QScopedPointer<msc::MscChart> m_chart;
     QPointer<QGraphicsView> m_view;
@@ -73,7 +73,7 @@ void tsti100messages::initTestCase()
 {
     vstest::saveMousePosition();
 
-    m_undoStack.reset(new QUndoStack);
+    m_undoStack.reset(new msc::MscCommandsStack);
     m_model.reset(new ChartLayoutManager(m_undoStack.data()));
     m_chart.reset(new msc::MscChart());
     m_model->setCurrentChart(m_chart.data());

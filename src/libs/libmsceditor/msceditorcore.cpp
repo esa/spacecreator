@@ -28,6 +28,7 @@
 #include "mainwindow.h"
 #include "messagedeclarationsdialog.h"
 #include "mscchart.h"
+#include "msccommandsstack.h"
 #include "mscdocument.h"
 #include "mscinstance.h"
 #include "mscmessagedeclarationlist.h"
@@ -438,6 +439,11 @@ QUndoStack *MSCEditorCore::undoStack() const
     return m_model->undoStack();
 }
 
+msc::MscCommandsStack *MSCEditorCore::commandsStack() const
+{
+    return m_model->commandsStack();
+}
+
 /*!
    Changes the asn1 referenceto \p newName if the existing one if pointing to \p oldName
  */
@@ -450,7 +456,7 @@ bool MSCEditorCore::renameAsnFile(const QString &oldName, const QString &newName
 
     MscModel *mscModel = m_model->mscModel();
     if (mscModel->dataDefinitionString() == oldFileName) {
-        undoStack()->push(new cmd::CmdSetAsn1File(mscModel, newFileName, "ASN.1"));
+        commandsStack()->push(new cmd::CmdSetAsn1File(mscModel, newFileName, "ASN.1"));
 
         Q_EMIT editedExternally(this);
         return true;
@@ -467,7 +473,7 @@ void MSCEditorCore::changeMscInstanceName(const QString &oldName, const QString 
     for (msc::MscChart *chart : m_model->mscModel()->allCharts()) {
         for (msc::MscInstance *instance : chart->instances()) {
             if (instance->name() == oldName) {
-                QUndoStack *undo = undoStack();
+                msc::MscCommandsStack *undo = commandsStack();
                 auto cmd = new msc::cmd::CmdEntityNameChange(instance, name, nullptr);
                 undo->push(cmd);
                 updated = true;
@@ -493,7 +499,7 @@ void MSCEditorCore::changeMscMessageName(
                 const QString messageSource = message->sourceInstance() ? message->sourceInstance()->name() : "";
                 const QString messageTarget = message->targetInstance() ? message->targetInstance()->name() : "";
                 if (messageSource == sourceName && messageTarget == targetName) {
-                    QUndoStack *undo = undoStack();
+                    msc::MscCommandsStack *undo = commandsStack();
                     auto cmd = new msc::cmd::CmdEntityNameChange(message, newName, nullptr);
                     undo->push(cmd);
                     updated = true;
@@ -669,14 +675,14 @@ void MSCEditorCore::openMessageDeclarationEditor(QWidget *parentwidget)
         return;
     }
 
-    MessageDeclarationsDialog dialog(docs.at(0)->messageDeclarations(), model, undoStack(), parentwidget);
+    MessageDeclarationsDialog dialog(docs.at(0)->messageDeclarations(), model, commandsStack(), parentwidget);
     dialog.setAadlConnectionNames(m_aadlChecks->connectionNames());
     int result = dialog.exec();
     if (result == QDialog::Accepted) {
-        undoStack()->beginMacro("Edit message declarations");
-        undoStack()->push(new cmd::CmdSetMessageDeclarations(docs.at(0), dialog.declarations()));
-        undoStack()->push(new cmd::CmdSetAsn1File(model, dialog.fileName(), "ASN.1"));
-        undoStack()->endMacro();
+        commandsStack()->beginMacro("Edit message declarations");
+        commandsStack()->push(new cmd::CmdSetMessageDeclarations(docs.at(0), dialog.declarations()));
+        commandsStack()->push(new cmd::CmdSetAsn1File(model, dialog.fileName(), "ASN.1"));
+        commandsStack()->endMacro();
     }
 }
 
@@ -733,7 +739,7 @@ void MSCEditorCore::addDocument(MscDocument::HierarchyType type)
     MscDocument *document = new MscDocument(QObject::tr("Document_%1").arg(parentDoc->documents().size()));
     document->setHierarchyType(type);
 
-    undoStack()->push(new cmd::CmdDocumentCreate(document, parentDoc));
+    commandsStack()->push(new cmd::CmdDocumentCreate(document, parentDoc));
 
     m_model->setSelectedDocument(document);
 }

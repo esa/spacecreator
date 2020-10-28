@@ -22,10 +22,9 @@
 #include "commands/cmdconditionitemcreate.h"
 #include "conditionitem.h"
 #include "mscchart.h"
+#include "msccommandsstack.h"
 #include "msccondition.h"
 #include "mscinstance.h"
-
-#include <QUndoStack>
 
 namespace msc {
 

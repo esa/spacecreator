@@ -35,6 +35,7 @@
 #include "iveditorcore.h"
 #include "messageitem.h"
 #include "mscchart.h"
+#include "msccommandsstack.h"
 #include "mscinstance.h"
 #include "ui/grippoint.h"
 #include "ui/grippointshandler.h"
@@ -49,7 +50,6 @@
 #include <QMessageBox>
 #include <QPainter>
 #include <QPainterPath>
-#include <QUndoStack>
 #include <QtDebug>
 #include <functional>
 
@@ -477,7 +477,7 @@ void InstanceItem::onManualMoveFinish(shared::ui::GripPoint *, const QPointF &fr
 
     QVector<QPoint> points = prepareChangePositionCommand();
     if (!points.isEmpty()) {
-        QUndoStack *undoStack = m_chartLayoutManager->undoStack();
+        MscCommandsStack *undoStack = m_chartLayoutManager->undoStack();
 
         undoStack->beginMacro(QStringLiteral("Change Instance geometry"));
         if (!geometryManagedByCif() && m_chartLayoutManager) {

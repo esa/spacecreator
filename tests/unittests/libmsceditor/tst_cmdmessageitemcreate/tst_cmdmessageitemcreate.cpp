@@ -20,11 +20,11 @@
 #include "commands/cmdmessageitemcreate.h"
 #include "messageitem.h"
 #include "mscchart.h"
+#include "msccommandsstack.h"
 #include "mscmessage.h"
 
 #include <QAction>
 #include <QGraphicsScene>
-#include <QUndoStack>
 #include <QVariant>
 #include <QVariantList>
 #include <QVector>
@@ -51,7 +51,7 @@ private:
     static constexpr int CommandsCount = 10;
     static constexpr bool SkipBenchmark = true; // not a really usefull thing to be run on the CI server
     msc::MscChart *m_chart = nullptr;
-    QScopedPointer<QUndoStack> m_undoStack;
+    QScopedPointer<msc::MscCommandsStack> m_undoStack;
 
     static const QVariant m_dummyCif;
 
@@ -65,7 +65,7 @@ const QVariant tst_CmdMessageItemCreate::m_dummyCif = QVariant::fromValue<QVecto
 
 void tst_CmdMessageItemCreate::initTestCase()
 {
-    m_undoStack.reset(new QUndoStack);
+    m_undoStack.reset(new msc::MscCommandsStack);
     m_chart = new msc::MscChart();
     m_chartModel.reset(new msc::ChartLayoutManager(m_undoStack.data()));
     m_chartModel->setCurrentChart(m_chart);

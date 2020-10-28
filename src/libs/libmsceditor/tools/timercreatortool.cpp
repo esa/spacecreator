@@ -21,11 +21,10 @@
 #include "chartlayoutmanager.h"
 #include "commands/cmdtimeritemcreate.h"
 #include "mscchart.h"
+#include "msccommandsstack.h"
 #include "mscinstance.h"
 #include "msctimer.h"
 #include "timeritem.h"
-
-#include <QUndoStack>
 
 namespace msc {
 

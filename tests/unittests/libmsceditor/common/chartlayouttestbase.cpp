@@ -28,7 +28,7 @@ namespace msc {
 
 void ChartLayoutTestBase::initBase()
 {
-    m_undoStack = std::make_unique<QUndoStack>();
+    m_undoStack = std::make_unique<msc::MscCommandsStack>();
     m_chartModel.reset(new ChartLayoutManager(m_undoStack.get()));
     m_view = std::make_unique<QGraphicsView>();
     m_view->setScene(m_chartModel->graphicsScene());

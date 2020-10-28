@@ -29,6 +29,7 @@
 #include "iveditorcore.h"
 #include "messagedeclarationsdialog.h"
 #include "mscchart.h"
+#include "msccommandsstack.h"
 #include "mscdocument.h"
 #include "mscinstance.h"
 #include "mscmessage.h"
@@ -46,7 +47,6 @@
 #include <QRegExpValidator>
 #include <QStyledItemDelegate>
 #include <QTimer>
-#include <QUndoStack>
 
 /*!
    \brief MessageDialog::MessageDialog
@@ -130,7 +130,7 @@ void MessageDialog::setAadlChecker(msc::AadlSystemChecks *checker)
 
 void MessageDialog::accept()
 {
-    QUndoStack *undoStack = m_chartLayoutManager->undoStack();
+    msc::MscCommandsStack *undoStack = m_chartLayoutManager->undoStack();
     undoStack->beginMacro("Edit message");
     undoStack->push(new msc::cmd::CmdEntityNameChange(m_message, ui->nameLineEdit->text(), m_chartLayoutManager));
 

@@ -35,6 +35,7 @@
 #include "messageitem.h"
 #include "mscaction.h"
 #include "mscchart.h"
+#include "msccommandsstack.h"
 #include "msccomment.h"
 #include "msccondition.h"
 #include "msccoregion.h"
@@ -49,7 +50,6 @@
 #include <QMap>
 #include <QPointer>
 #include <QTimer>
-#include <QUndoStack>
 #include <QVector>
 #include <cmath>
 #include <limits>
@@ -104,7 +104,7 @@ struct ChartLayoutManagerPrivate {
     QHash<QUuid, msc::InteractiveObject *> m_instanceEventItems;
     QVector<msc::InteractiveObject *> m_instanceEventItemsSorted;
     QPointer<msc::AadlSystemChecks> m_aadlChecker;
-    QPointer<QUndoStack> m_undoStack;
+    QPointer<MscCommandsStack> m_undoStack;
 
     QPointer<msc::MscChart> m_currentChart = nullptr;
     static qreal interMessageSpan()
@@ -169,7 +169,7 @@ struct ChartLayoutManagerPrivate {
     }
 };
 
-ChartLayoutManager::ChartLayoutManager(QUndoStack *undoStack, QObject *parent)
+ChartLayoutManager::ChartLayoutManager(MscCommandsStack *undoStack, QObject *parent)
     : QObject(parent)
     , d(new ChartLayoutManagerPrivate())
 {
@@ -1889,9 +1889,9 @@ bool ChartLayoutManager::layoutUpdatePending() const
 
 /*!
    Returns the undo stack used for the modles displayed by this ChartLayoutManager
-   \note The QUndoStack object is owned by some other class
+   \note The MscCommandsStack object is owned by some other class
  */
-QUndoStack *ChartLayoutManager::undoStack() const
+MscCommandsStack *ChartLayoutManager::undoStack() const
 {
     return d->m_undoStack;
 }

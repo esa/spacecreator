@@ -44,7 +44,6 @@
 #include "msctimer.h"
 
 #include <QMetaEnum>
-#include <QUndoStack>
 
 namespace msc {
 

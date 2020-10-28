@@ -30,13 +30,13 @@
 #include "commands/cmdentitycommentchange.h"
 #include "mscchart.h"
 #include "mscchartviewconstants.h"
+#include "msccommandsstack.h"
 #include "msccomment.h"
 #include "mscentity.h"
 #include "ui/grippointshandler.h"
 
 #include <QGraphicsScene>
 #include <QPainter>
-#include <QUndoStack>
 #include <QtDebug>
 
 namespace msc {
@@ -421,7 +421,7 @@ void CommentItem::textEdited(const QString &text)
     QRect newRect;
     if (CoordinatesConverter::sceneToCif(m_textItem->sceneBoundingRect(), newRect)) {
         if (oldRect != newRect || oldText != text) {
-            QUndoStack *undoStack = m_chartLayoutManager->undoStack();
+            MscCommandsStack *undoStack = m_chartLayoutManager->undoStack();
             undoStack->beginMacro(tr("Change comment"));
             undoStack->push(new cmd::CmdCommentItemChangeGeometry(
                     oldRect, newRect, m_iObj->modelEntity(), m_chartLayoutManager));

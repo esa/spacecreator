@@ -24,10 +24,10 @@
 #include "commands/cmdcommentitemchangegeometry.h"
 #include "commands/cmdentitycommentchange.h"
 #include "commentitem.h"
+#include "msccommandsstack.h"
 #include "msccomment.h"
 
 #include <QMouseEvent>
-#include <QUndoStack>
 
 namespace msc {
 
@@ -89,7 +89,7 @@ void CommentCreatorTool::commitPreviewItem()
 
         QRect newRect;
         if (CoordinatesConverter::sceneToCif(itemSceneRect, newRect)) {
-            QUndoStack *undoStack = m_model->undoStack();
+            MscCommandsStack *undoStack = m_model->undoStack();
             undoStack->beginMacro(tr("Create comment"));
             undoStack->push(new cmd::CmdCommentItemChangeGeometry(
                     m_model->currentChart()->cifRect(), newRect, m_model->currentChart(), m_model));
