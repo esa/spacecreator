@@ -235,7 +235,7 @@ QStringList AadlSystemChecks::connectionNamesFromTo(QString sourceName, QString 
     sourceName = aadl::AADLNameValidator::encodeName(aadl::AADLObject::Type::Function, sourceName);
     targetName = aadl::AADLNameValidator::encodeName(aadl::AADLObject::Type::Function, targetName);
 
-    QVector<aadl::AADLObjectConnection *> connections = m_ivCore->allAadlConnections();
+    const QVector<aadl::AADLObjectConnection *> connections = m_ivCore->allAadlConnections();
     QStringList connectionNames;
     for (const aadl::AADLObjectConnection *aadlConnection : connections) {
         if (aadlConnection && !aadlConnection->targetInterfaceName().isEmpty()) {
