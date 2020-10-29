@@ -276,7 +276,7 @@ aadl::AADLObjectFunction *AadlSystemChecks::correspondingFunction(const MscInsta
     auto it = std::find_if(functions.cbegin(), functions.cend(),
             [this, &instance](aadl::AADLObjectFunction *func) { return correspond(func, instance); });
 
-    if (it == functions.end()) {
+    if (it == functions.cend()) {
         return nullptr;
     }
 
