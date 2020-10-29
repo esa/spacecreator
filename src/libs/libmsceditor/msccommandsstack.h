@@ -83,7 +83,7 @@ Q_SIGNALS:
     void undoTextChanged(const QString &undoText);
     void redoTextChanged(const QString &redoText);
 
-    void nameChanged();
+    void nameChanged(QObject *entity, const QString &oldName, shared::UndoCommand *command);
 
 private:
     std::unique_ptr<QUndoStack> m_undoStack;

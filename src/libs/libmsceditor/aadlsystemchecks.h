@@ -73,9 +73,6 @@ Q_SIGNALS:
     void ivCoreChanged();
 
 private:
-    Q_SLOT void updateAadlItems();
-
-private:
     aadl::AADLObjectsModel *aadlModel() const;
     aadl::AADLObjectFunction *correspondingFunction(const MscInstance *instance) const;
     bool correspond(const aadl::AADLObject *aadlObj, const msc::MscInstance *instance) const;
@@ -89,9 +86,6 @@ private:
 
     QPointer<msc::MSCEditorCore> m_mscCore;
     QSharedPointer<aadlinterface::IVEditorCore> m_ivCore;
-
-    QVector<aadl::AADLObjectFunction *> m_aadlFunctions;
-    QVector<aadl::AADLObjectConnection *> m_aadlConnections;
 };
 
 }

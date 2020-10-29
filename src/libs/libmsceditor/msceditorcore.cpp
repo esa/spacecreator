@@ -85,6 +85,8 @@ MSCEditorCore::MSCEditorCore(QObject *parent)
     m_hierarchyToolBar->setVisible(m_toolbarsVisible);
 
     m_model->chartViewModel().setAadlChecker(m_aadlChecks.get());
+
+    connect(m_model->commandsStack(), &msc::MscCommandsStack::nameChanged, this, &msc::MSCEditorCore::nameChanged);
 }
 
 MSCEditorCore::~MSCEditorCore() { }
@@ -467,7 +469,7 @@ bool MSCEditorCore::renameAsnFile(const QString &oldName, const QString &newName
 /*!
    Changes all instances that have the name \p oldName to have the new name \p name
  */
-void MSCEditorCore::changeMscInstanceName(const QString &oldName, const QString &name)
+void MSCEditorCore::changeMscInstanceName(const QString &oldName, const QString &name, bool updateSystem)
 {
     bool updated = false;
     for (msc::MscChart *chart : m_model->mscModel()->allCharts()) {
@@ -475,6 +477,7 @@ void MSCEditorCore::changeMscInstanceName(const QString &oldName, const QString 
             if (instance->name() == oldName) {
                 msc::MscCommandsStack *undo = commandsStack();
                 auto cmd = new msc::cmd::CmdEntityNameChange(instance, name, nullptr);
+                cmd->setSystemCheck(updateSystem);
                 undo->push(cmd);
                 updated = true;
             }

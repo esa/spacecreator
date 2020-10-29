@@ -38,6 +38,7 @@ void CmdEntityNameChange::redo()
         m_modelItem->setName(m_newName);
         setChartDocumentName(m_newName);
         checkVisualSorting();
+        Q_EMIT nameChanged(m_modelItem, m_oldName, this);
     }
 }
 
@@ -47,6 +48,7 @@ void CmdEntityNameChange::undo()
         m_modelItem->setName(m_oldName);
         setChartDocumentName(m_oldName);
         undoVisualSorting();
+        Q_EMIT nameChanged(m_modelItem, m_newName, this);
     }
 }
 

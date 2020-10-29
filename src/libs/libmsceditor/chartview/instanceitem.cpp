@@ -340,18 +340,7 @@ void InstanceItem::onNameEdited(const QString &newName)
     } else {
         m_chartLayoutManager->undoStack()->push(
                 new cmd::CmdEntityNameChange(modelEntity(), newName, m_chartLayoutManager));
-
-        msc::AadlSystemChecks *checker = m_chartLayoutManager ? m_chartLayoutManager->aadlChecker() : nullptr;
-        if (checker && checker->hasIvCore() && !checker->functionsNames().contains(m_instance->name())) {
-            const int result = QMessageBox::question(nullptr, tr("No AADL function"),
-                    tr("The AADL model doesn't contain a function called:\n%1\n"
-                       "\nDo you want to add it to the AADL model?")
-                            .arg(newName));
-            if (result == QMessageBox::Yes) {
-                checker->ivCore()->addFunction(newName);
-                checkAadlFunction();
-            }
-        }
+        checkAadlFunction();
     }
 }
 

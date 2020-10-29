@@ -21,6 +21,12 @@
 #include "editorcore.h"
 #include "ui/graphicsviewbase.h"
 
+#include <QVector>
+
+namespace aadl {
+class AADLObjectConnection;
+}
+
 namespace aadlinterface {
 namespace cmd {
 class CommandsStack;
@@ -55,6 +61,8 @@ public:
     bool addFunction(const QString &name);
     bool addConnection(QString name, const QString &fromInstanceName, const QString &toInstanceName);
 
+    bool renameAadlFunction(const QString &oldName, const QString &newName, bool updateSystem = false);
+
     QUndoStack *undoStack() const override;
     cmd::CommandsStack *commandsStack() const;
 
@@ -63,9 +71,16 @@ public:
     QString filePath() const override;
     bool save() override;
 
+    QVector<aadl::AADLObjectFunction *> allAadlFunctions() const;
+    QVector<aadl::AADLObjectConnection *> allAadlConnections() const;
+
+    QStringList aadlFunctionsNames() const;
+    QStringList aadlConnectionNames() const;
+
 private:
     aadl::AADLObjectIface *getInterface(
             const QString &ifName, aadl::AADLObjectIface::IfaceType ifType, aadl::AADLObjectFunction *parentFunction);
+    Q_SLOT void updateAadlItems();
 
     aadlinterface::InterfaceDocument *m_document { nullptr };
 
@@ -73,6 +88,9 @@ private:
 
     QAction *m_actionSaveSceneRender { nullptr };
     QAction *m_actionShowAsnDialog { nullptr };
+
+    QVector<aadl::AADLObjectFunction *> m_aadlFunctions;
+    QVector<aadl::AADLObjectConnection *> m_aadlConnections;
 };
 
 }

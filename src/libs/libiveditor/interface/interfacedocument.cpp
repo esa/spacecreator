@@ -174,6 +174,8 @@ void InterfaceDocument::init()
     splitter->setStretchFactor(1, 1);
     rootLayout->addWidget(splitter);
 
+    aadlinterface::cmd::CommandsStack::setCurrent(d->commandsStack);
+
     QTimer::singleShot(0, this, &InterfaceDocument::loadAvailableComponents);
 }
 

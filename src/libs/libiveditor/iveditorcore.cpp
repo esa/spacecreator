@@ -18,6 +18,7 @@
 #include "iveditorcore.h"
 
 #include "aadlnamevalidator.h"
+#include "aadlobjectconnection.h"
 #include "aadlobjectfunction.h"
 #include "aadlobjectiface.h"
 #include "aadlobjectsmodel.h"
@@ -25,6 +26,7 @@
 #include "commandlineparser.h"
 #include "commandsstack.h"
 #include "context/action/actionsmanager.h"
+#include "interface/commands/cmdentityattributechange.h"
 #include "interface/commands/cmdfunctionitemcreate.h"
 #include "interface/commands/commandsfactory.h"
 #include "interface/interfacedocument.h"
@@ -56,6 +58,12 @@ IVEditorCore::IVEditorCore(QObject *parent)
     m_docToolBar->setObjectName("Document ToolBar");
     m_docToolBar->setAllowedAreas(Qt::AllToolBarAreas);
     m_docToolBar->setMovable(true);
+
+    if (aadl::AADLObjectsModel *model = document()->objectsModel()) {
+        connect(model, &aadl::AADLObjectsModel::aadlObjectsAdded, this, &aadlinterface::IVEditorCore::updateAadlItems);
+        connect(model, &aadl::AADLObjectsModel::aadlObjectRemoved, this, &aadlinterface::IVEditorCore::updateAadlItems);
+        connect(model, &aadl::AADLObjectsModel::rootObjectChanged, this, &aadlinterface::IVEditorCore::updateAadlItems);
+    }
 }
 
 IVEditorCore::~IVEditorCore() { }
@@ -194,6 +202,27 @@ bool IVEditorCore::addConnection(QString name, const QString &fromInstanceName, 
     return true;
 }
 
+/*!
+   Renames the function with current name \p oldName to \p newName.
+   If \p updateSystem is true, the user is asked to check the .msc models to be updated as well
+ */
+bool IVEditorCore::renameAadlFunction(const QString &oldName, const QString &newName, bool updateSystem)
+{
+    aadl::AADLObjectsModel *aadlModel = m_document->objectsModel();
+    aadl::AADLObjectFunction *aadlFunc = aadlModel->getFunction(oldName);
+    if (!aadlFunc) {
+        return false;
+    }
+
+    const QVariantHash attributess = { { aadl::meta::Props::token(aadl::meta::Props::Token::name), newName } };
+    auto cmd = new cmd::CmdEntityAttributeChange(aadlFunc, attributess);
+    cmd->setSystemCheck(updateSystem);
+    cmd::CommandsStack::push(cmd);
+
+    Q_EMIT editedExternally(this);
+    return true;
+}
+
 QUndoStack *IVEditorCore::undoStack() const
 {
     return m_document->commandsStack();
@@ -244,6 +273,47 @@ bool IVEditorCore::save()
     return aadlinterface::XmlDocExporter::exportDocSilently(m_document, {}, {});
 }
 
+QVector<aadl::AADLObjectFunction *> IVEditorCore::allAadlFunctions() const
+{
+    return m_aadlFunctions;
+}
+
+QVector<aadl::AADLObjectConnection *> IVEditorCore::allAadlConnections() const
+{
+    return m_aadlConnections;
+}
+
+/*!
+   Returns a list of the names of all functions in the aadl model
+ */
+QStringList IVEditorCore::aadlFunctionsNames() const
+{
+    QStringList functionNames;
+    for (const aadl::AADLObjectFunction *aadlFunction : m_aadlFunctions) {
+        if (aadlFunction && !aadlFunction->title().isEmpty()) {
+            functionNames << aadl::AADLNameValidator::encodeName(
+                    aadl::AADLObject::Type::Function, aadlFunction->title());
+        }
+    }
+    return functionNames;
+}
+
+/*!
+   Returns a list of the names of all connections in the aadl model
+ */
+QStringList IVEditorCore::aadlConnectionNames() const
+{
+    QStringList connectionNames;
+    for (const aadl::AADLObjectConnection *aadlConnection : m_aadlConnections) {
+        if (aadlConnection && !aadlConnection->targetInterfaceName().isEmpty()) {
+            connectionNames << aadl::AADLNameValidator::encodeName(
+                    aadl::AADLObject::Type::ProvidedInterface, aadlConnection->targetInterfaceName());
+        }
+    }
+    connectionNames.removeDuplicates();
+    return connectionNames;
+}
+
 /*!
    Get the interface, or creates it if it does not exist. In case the \p parentFunction is a nullptr, a nullptr is
    returned
@@ -279,4 +349,31 @@ aadl::AADLObjectIface *IVEditorCore::getInterface(
     return interface;
 }
 
+/*!
+   Updates the list of functions and connections from the aadl model
+ */
+void IVEditorCore::updateAadlItems()
+{
+    m_aadlFunctions.clear();
+    m_aadlConnections.clear();
+
+    aadl::AADLObjectsModel *aadlModel = m_document->objectsModel();
+    if (!aadlModel) {
+        return;
+    }
+
+    const QHash<shared::Id, aadl::AADLObject *> &aadlObjects = aadlModel->objects();
+    for (auto obj : aadlObjects) {
+        if (obj->aadlType() == aadl::AADLObject::Type::Function) {
+            if (auto func = dynamic_cast<aadl::AADLObjectFunction *>(obj)) {
+                m_aadlFunctions.append(func);
+            }
+        }
+        if (obj->aadlType() == aadl::AADLObject::Type::Connection) {
+            if (auto func = dynamic_cast<aadl::AADLObjectConnection *>(obj)) {
+                m_aadlConnections.append(func);
+            }
+        }
+    }
+}
 }

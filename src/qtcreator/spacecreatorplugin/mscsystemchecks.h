@@ -77,6 +77,7 @@ public:
 
 public Q_SLOTS:
     void onEntityNameChanged(aadl::AADLObject *entity, const QString &oldName, shared::UndoCommand *command);
+    void onMscEntityNameChanged(QObject *entity, const QString &oldName, shared::UndoCommand *command);
 
 private:
     QPointer<MscModelStorage> m_mscStorage;

@@ -23,12 +23,12 @@ namespace msc {
 namespace cmd {
 
 BaseCommand::BaseCommand()
-    : QUndoCommand(nullptr)
+    : shared::UndoCommand()
 {
 }
 
 BaseCommand::BaseCommand(MscEntity *item, QUndoCommand *parent)
-    : QUndoCommand(parent)
+    : shared::UndoCommand(parent)
     , m_modelItem(item)
 {
 }

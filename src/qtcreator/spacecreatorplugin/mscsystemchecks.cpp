@@ -35,6 +35,7 @@
 
 #include <QDebug>
 #include <QMessageBox>
+#include <QPushButton>
 #include <QUndoStack>
 #include <projectexplorer/project.h>
 #include <projectexplorer/projecttree.h>
@@ -50,6 +51,9 @@ MscSystemChecks::MscSystemChecks(QObject *parent)
 void MscSystemChecks::setMscStorage(MscModelStorage *mscStorage)
 {
     m_mscStorage = mscStorage;
+    connect(m_mscStorage, &spctr::MscModelStorage::coreAdded, this, [=](QSharedPointer<msc::MSCEditorCore> core) {
+        connect(core.data(), &msc::MSCEditorCore::nameChanged, this, &spctr::MscSystemChecks::onMscEntityNameChanged);
+    });
 }
 
 void MscSystemChecks::setAadlStorage(AadlModelStorage *aadlStorage)
@@ -80,7 +84,7 @@ bool MscSystemChecks::mscInstancesExist(const QString &name)
 void MscSystemChecks::changeMscInstanceName(const QString &oldName, const QString &name)
 {
     for (QSharedPointer<msc::MSCEditorCore> &mscCore : allMscCores()) {
-        mscCore->changeMscInstanceName(oldName, name);
+        mscCore->changeMscInstanceName(oldName, name, false);
     }
 }
 
@@ -272,7 +276,7 @@ QStringList MscSystemChecks::projectFiles(const QString &suffix) const
 void MscSystemChecks::onEntityNameChanged(
         aadl::AADLObject *entity, const QString &oldName, shared::UndoCommand *command)
 {
-    if (!command->isFirstChange() && !command->checkSystem()) {
+    if (!command->isFirstChange() || !command->checkSystem()) {
         return;
     }
 
@@ -314,4 +318,52 @@ void MscSystemChecks::onEntityNameChanged(
     }
 }
 
+/*!
+   Checks if aadl function and connection needs to be updated/added
+ */
+void MscSystemChecks::onMscEntityNameChanged(QObject *entity, const QString &oldName, shared::UndoCommand *command)
+{
+    if (!command->isFirstChange() && !command->checkSystem()) {
+        return;
+    }
+    if (!ivCore()) {
+        return;
+    }
+
+    auto instance = dynamic_cast<msc::MscInstance *>(entity);
+    if (instance) {
+        const bool hasOldName = ivCore()->aadlFunctionsNames().contains(oldName);
+        const bool hasNewName = ivCore()->aadlFunctionsNames().contains(instance->name());
+
+        if (!hasOldName && !hasNewName) {
+            const int result = QMessageBox::question(nullptr, tr("No AADL function"),
+                    tr("The AADL model doesn't contain a function called:\n%1\n"
+                       "\nDo you want to add it to the AADL model?")
+                            .arg(instance->name()));
+            if (result == QMessageBox::Yes) {
+                ivCore()->addFunction(instance->name());
+            }
+        }
+
+        if (hasOldName && !hasNewName) {
+            QMessageBox box;
+            box.setWindowTitle(tr("Update AADL function"));
+            box.setText(tr("The AADL function should be updated"
+                           "\nDo you want to update it?"
+                           "\nDo you want to add it to the AADL model?"));
+            QPushButton *updateButton = box.addButton(tr("Update"), QMessageBox::AcceptRole);
+            QPushButton *addButton = box.addButton(tr("Add"), QMessageBox::AcceptRole);
+            box.addButton(tr("Ignore"), QMessageBox::RejectRole);
+            box.setDefaultButton(updateButton);
+            box.exec();
+            if (box.clickedButton() == updateButton) {
+                ivCore()->renameAadlFunction(oldName, instance->name(), false);
+                changeMscInstanceName(oldName, instance->name());
+            }
+            if (box.clickedButton() == addButton) {
+                ivCore()->addFunction(instance->name());
+            }
+        }
+    }
+}
 }

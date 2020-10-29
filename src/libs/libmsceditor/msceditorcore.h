@@ -25,6 +25,10 @@
 #include <QVector>
 #include <memory>
 
+namespace shared {
+class UndoCommand;
+}
+
 namespace msc {
 class AadlSystemChecks;
 class ActionCreatorTool;
@@ -108,7 +112,7 @@ public:
     msc::MscCommandsStack *commandsStack() const;
 
     bool renameAsnFile(const QString &oldName, const QString &newName) override;
-    void changeMscInstanceName(const QString &oldName, const QString &name);
+    void changeMscInstanceName(const QString &oldName, const QString &name, bool updateSystem = false);
     void changeMscMessageName(
             const QString &oldName, const QString &newName, const QString &sourceName, const QString &targetName);
 
@@ -126,6 +130,7 @@ public Q_SLOTS:
 
 Q_SIGNALS:
     void viewModeChanged(ViewMode);
+    void nameChanged(QObject *entity, const QString &oldName, shared::UndoCommand *command);
 
 private Q_SLOTS:
     void updateMscToolbarActionsChecked();

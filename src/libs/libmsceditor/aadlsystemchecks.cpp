@@ -58,13 +58,6 @@ void AadlSystemChecks::setIvCore(QSharedPointer<aadlinterface::IVEditorCore> ivC
     }
 
     m_ivCore = ivCore;
-    updateAadlItems();
-
-    if (aadl::AADLObjectsModel *model = aadlModel()) {
-        connect(model, &aadl::AADLObjectsModel::aadlObjectsAdded, this, &msc::AadlSystemChecks::updateAadlItems);
-        connect(model, &aadl::AADLObjectsModel::aadlObjectRemoved, this, &msc::AadlSystemChecks::updateAadlItems);
-    }
-
     Q_EMIT ivCoreChanged();
 }
 
@@ -163,14 +156,7 @@ QStringList AadlSystemChecks::functionsNames() const
         return {};
     }
 
-    QStringList functionNames;
-    for (const aadl::AADLObjectFunction *aadlFunction : m_aadlFunctions) {
-        if (aadlFunction && !aadlFunction->title().isEmpty()) {
-            functionNames << aadl::AADLNameValidator::encodeName(
-                    aadl::AADLObject::Type::Function, aadlFunction->title());
-        }
-    }
-    return functionNames;
+    return m_ivCore->aadlFunctionsNames();
 }
 
 /*!
@@ -221,15 +207,7 @@ QStringList AadlSystemChecks::connectionNames() const
         return {};
     }
 
-    QStringList connectionNames;
-    for (const aadl::AADLObjectConnection *aadlConnection : m_aadlConnections) {
-        if (aadlConnection && !aadlConnection->targetInterfaceName().isEmpty()) {
-            connectionNames << aadl::AADLNameValidator::encodeName(
-                    aadl::AADLObject::Type::ProvidedInterface, aadlConnection->targetInterfaceName());
-        }
-    }
-    connectionNames.removeDuplicates();
-    return connectionNames;
+    return m_ivCore->aadlConnectionNames();
 }
 
 bool AadlSystemChecks::connectionExists(QString name, const QString &sourceName, const QString &targetName) const
@@ -257,8 +235,9 @@ QStringList AadlSystemChecks::connectionNamesFromTo(QString sourceName, QString 
     sourceName = aadl::AADLNameValidator::encodeName(aadl::AADLObject::Type::Function, sourceName);
     targetName = aadl::AADLNameValidator::encodeName(aadl::AADLObject::Type::Function, targetName);
 
+    QVector<aadl::AADLObjectConnection *> connections = m_ivCore->allAadlConnections();
     QStringList connectionNames;
-    for (const aadl::AADLObjectConnection *aadlConnection : m_aadlConnections) {
+    for (const aadl::AADLObjectConnection *aadlConnection : connections) {
         if (aadlConnection && !aadlConnection->targetInterfaceName().isEmpty()) {
             if (aadlConnection->sourceName() == sourceName && aadlConnection->targetName() == targetName) {
                 connectionNames << aadl::AADLNameValidator::encodeName(
@@ -285,34 +264,6 @@ aadl::AADLObjectsModel *AadlSystemChecks::aadlModel() const
 }
 
 /*!
-   Updates the list of functions from the aadl model
- */
-void AadlSystemChecks::updateAadlItems()
-{
-    m_aadlFunctions.clear();
-    m_aadlConnections.clear();
-
-    aadl::AADLObjectsModel *aadlModel = this->aadlModel();
-    if (!aadlModel) {
-        return;
-    }
-
-    const QHash<shared::Id, aadl::AADLObject *> &aadlObjects = aadlModel->objects();
-    for (auto obj : aadlObjects) {
-        if (obj->aadlType() == aadl::AADLObject::Type::Function) {
-            if (auto func = dynamic_cast<aadl::AADLObjectFunction *>(obj)) {
-                m_aadlFunctions.append(func);
-            }
-        }
-        if (obj->aadlType() == aadl::AADLObject::Type::Connection) {
-            if (auto func = dynamic_cast<aadl::AADLObjectConnection *>(obj)) {
-                m_aadlConnections.append(func);
-            }
-        }
-    }
-}
-
-/*!
    Returns the aadl functions that correlates to the given msc instance
  */
 aadl::AADLObjectFunction *AadlSystemChecks::correspondingFunction(const MscInstance *instance) const
@@ -321,10 +272,11 @@ aadl::AADLObjectFunction *AadlSystemChecks::correspondingFunction(const MscInsta
         return nullptr;
     }
 
-    auto it = std::find_if(m_aadlFunctions.begin(), m_aadlFunctions.end(),
+    QVector<aadl::AADLObjectFunction *> functions = m_ivCore->allAadlFunctions();
+    auto it = std::find_if(functions.begin(), functions.end(),
             [this, &instance](aadl::AADLObjectFunction *func) { return correspond(func, instance); });
 
-    if (it == m_aadlFunctions.end()) {
+    if (it == functions.end()) {
         return nullptr;
     }
 
@@ -429,10 +381,11 @@ aadl::AADLObjectConnection *AadlSystemChecks::correspondingConnection(const MscM
         return nullptr;
     }
 
-    auto it = std::find_if(m_aadlConnections.begin(), m_aadlConnections.end(),
+    QVector<aadl::AADLObjectConnection *> connections = m_ivCore->allAadlConnections();
+    auto it = std::find_if(connections.begin(), connections.end(),
             [this, &message](aadl::AADLObjectConnection *connection) { return correspond(connection, message); });
 
-    if (it == m_aadlConnections.end()) {
+    if (it == connections.end()) {
         return nullptr;
     }
 

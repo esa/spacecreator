@@ -17,8 +17,9 @@
 
 #pragma once
 
+#include "undocommand.h"
+
 #include <QPointer>
-#include <QUndoCommand>
 
 namespace msc {
 
@@ -26,7 +27,7 @@ class MscEntity;
 
 namespace cmd {
 
-class BaseCommand : public QObject, public QUndoCommand
+class BaseCommand : public shared::UndoCommand
 {
 public:
     BaseCommand();

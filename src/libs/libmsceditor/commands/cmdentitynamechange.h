@@ -27,6 +27,8 @@ namespace cmd {
 
 class CmdEntityNameChange : public ChartBaseCommand
 {
+    Q_OBJECT
+
 public:
     CmdEntityNameChange(MscEntity *item, const QString &newName, ChartLayoutManager *layoutManager);
 
@@ -34,6 +36,9 @@ public:
     void undo() override;
     bool mergeWith(const QUndoCommand *command) override;
     int id() const override;
+
+Q_SIGNALS:
+    void nameChanged(QObject *entity, const QString &oldName, shared::UndoCommand *command);
 
 private:
     void setChartDocumentName(const QString &name);

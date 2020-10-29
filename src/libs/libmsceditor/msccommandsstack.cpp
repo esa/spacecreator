@@ -17,6 +17,8 @@
 
 #include "msccommandsstack.h"
 
+#include "commands/cmdentitynamechange.h"
+
 #include <QUndoStack>
 
 namespace msc {
@@ -43,6 +45,12 @@ void MscCommandsStack::clear()
 void MscCommandsStack::push(QUndoCommand *command)
 {
     // check connection for name connection
+    if (command) {
+        if (auto nameCommand = dynamic_cast<msc::cmd::CmdEntityNameChange *>(command)) {
+            connect(nameCommand, &msc::cmd::CmdEntityNameChange::nameChanged, this,
+                    &msc::MscCommandsStack::nameChanged);
+        }
+    }
     m_undoStack->push(command);
 }
 
