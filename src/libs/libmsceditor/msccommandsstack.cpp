@@ -156,7 +156,7 @@ void MscCommandsStack::undo()
 
 void MscCommandsStack::redo()
 {
-    m_undoStack->undo();
+    m_undoStack->redo();
 }
 
 void MscCommandsStack::setActive(bool active)
