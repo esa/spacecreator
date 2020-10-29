@@ -160,7 +160,7 @@ void MscSystemChecks::checkInstances()
     }
 
     if (resultNames.isEmpty() && resultRelations.isEmpty()) {
-        QMessageBox::information(nullptr, tr("All instaces are ok"), tr("All instaces are ok"));
+        QMessageBox::information(nullptr, tr("All instances are ok"), tr("All instances are ok"));
     } else {
         QMessageBox::information(nullptr, tr("Non conforming instances"), text);
     }
