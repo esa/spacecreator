@@ -39,7 +39,7 @@ public:
 
         QString name;
         QList<QPointer<AADLObjectConnection>> connections;
-        QList<QPointF> points;
+        QVector<QPointF> points;
 
         QVariantList toVarList() const;
     };

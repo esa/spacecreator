@@ -96,7 +96,8 @@ struct InterfaceDocument::InterfaceDocumentPrivate {
     QPointer<QWidget> view;
     aadlinterface::GraphicsView *graphicsView { nullptr };
     QTreeView *objectsView { nullptr };
-    AADLItemModel *model { nullptr };
+    AADLItemModel *itemsModel { nullptr };
+    aadl::AADLObjectsModel *objectsModel { nullptr };
     AADLObjectsTreeView *importView { nullptr };
     aadl::AADLObjectsModel *importModel { nullptr };
 
@@ -127,9 +128,7 @@ InterfaceDocument::InterfaceDocument(QObject *parent)
     d->commandsStack = new QUndoStack(this);
     connect(d->commandsStack, &QUndoStack::cleanChanged, this, [this](bool clean) { Q_EMIT dirtyChanged(!clean); });
 
-    d->model = new AADLItemModel(this);
-    connect(d->model, &AADLItemModel::itemClicked, this, &InterfaceDocument::onItemClicked);
-    connect(d->model, &AADLItemModel::itemDoubleClicked, this, &InterfaceDocument::onItemDoubleClicked);
+    d->objectsModel = new aadl::AADLObjectsModel(this);
 
     d->importModel = new aadl::AADLObjectsModel(this);
 }
@@ -146,6 +145,10 @@ void InterfaceDocument::init()
     if (!d->view.isNull()) {
         return;
     }
+
+    d->itemsModel = new AADLItemModel(d->objectsModel, this);
+    connect(d->itemsModel, &AADLItemModel::itemClicked, this, &InterfaceDocument::onItemClicked);
+    connect(d->itemsModel, &AADLItemModel::itemDoubleClicked, this, &InterfaceDocument::onItemDoubleClicked);
 
     QWidget *panelWidget = new QWidget;
     QVBoxLayout *panelLayout = new QVBoxLayout;
@@ -193,7 +196,7 @@ void InterfaceDocument::fillToolBar(QToolBar *toolBar)
 
 QGraphicsScene *InterfaceDocument::scene() const
 {
-    return d->model->scene();
+    return d->itemsModel->scene();
 }
 
 shared::ui::GraphicsViewBase *InterfaceDocument::graphicsView() const
@@ -273,9 +276,9 @@ QList<aadl::AADLObject *> InterfaceDocument::prepareSelectedObjectsForExport(QSt
 {
     QList<aadl::AADLObject *> objects;
     QStringList exportNames;
-    for (const auto id : d->model->selectionModel()->selection().indexes()) {
+    for (const auto id : d->itemsModel->selectionModel()->selection().indexes()) {
         const int role = static_cast<int>(aadl::AADLObjectsModel::AADLRoles::IdRole);
-        if (aadl::AADLObject *object = d->model->getObject(id.data(role).toUuid())) {
+        if (aadl::AADLObject *object = d->objectsModel->getObject(id.data(role).toUuid())) {
             if (object->isFunction() && object->parentObject() == nullptr) {
                 exportNames.append(object->attr(QLatin1String("name")).toString());
             }
@@ -338,7 +341,7 @@ bool InterfaceDocument::exportSelected()
         qWarning() << "Error during ASN.1 file copying:" << asn1FilePath();
     }
 
-    d->model->selectionModel()->clearSelection();
+    d->itemsModel->selectionModel()->clearSelection();
     return true;
 }
 
@@ -364,7 +367,7 @@ bool InterfaceDocument::save(const QString &path)
 
 void InterfaceDocument::close()
 {
-    d->model->clear();
+    d->objectsModel->clear();
     setPath(QString());
     d->commandsStack->clear();
 }
@@ -467,12 +470,12 @@ QList<QAction *> InterfaceDocument::customActions() const
 
 const QHash<shared::Id, aadl::AADLObject *> &InterfaceDocument::objects() const
 {
-    return d->model->objects();
+    return d->objectsModel->objects();
 }
 
 aadl::AADLObjectsModel *InterfaceDocument::objectsModel() const
 {
-    return d->model;
+    return d->objectsModel;
 }
 
 aadl::AADLObjectsModel *InterfaceDocument::importModel() const
@@ -503,8 +506,8 @@ void InterfaceDocument::onSavedExternally(const QString &filePath, bool saved)
  */
 void InterfaceDocument::setObjects(const QVector<aadl::AADLObject *> &objects)
 {
-    if (d->model->initFromObjects(objects)) {
-        d->model->setRootObject({});
+    if (d->objectsModel->initFromObjects(objects)) {
+        d->objectsModel->setRootObject({});
     }
 }
 
@@ -519,7 +522,7 @@ void InterfaceDocument::onItemDoubleClicked(shared::Id id)
         return;
     }
 
-    if (auto entity = d->model->getObject(id)) {
+    if (auto entity = d->objectsModel->getObject(id)) {
         if (entity->aadlType() != aadl::AADLObject::Type::Connection) {
             showPropertyEditor(entity);
         }
@@ -576,11 +579,11 @@ void InterfaceDocument::importEntity(const shared::Id &id, const QPointF &sceneD
     if (!obj) {
         return;
     }
-    if (d->model->getObjectByName(obj->title())) {
+    if (d->objectsModel->getObjectByName(obj->title())) {
         return;
     }
 
-    const QVariantList params = { QVariant::fromValue(obj), QVariant::fromValue(d->model),
+    const QVariantList params = { QVariant::fromValue(obj), QVariant::fromValue(d->itemsModel),
         QVariant::fromValue(sceneDropPoint) };
     if (QUndoCommand *cmdImport = cmd::CommandsFactory::create(cmd::ImportEntities, params)) {
         cmd::CommandsStack::current()->push(cmdImport);
@@ -619,7 +622,7 @@ QVector<QAction *> InterfaceDocument::initActions()
     actionGroup->setExclusive(true);
 
     if (!d->tool) {
-        d->tool = new CreatorTool(d->graphicsView, d->model, this);
+        d->tool = new CreatorTool(d->graphicsView, d->itemsModel, this);
         connect(d->tool, &CreatorTool::created, this, [this, actionGroup]() {
             if (QAction *currentAction = actionGroup->checkedAction())
                 currentAction->setChecked(false);
@@ -718,15 +721,16 @@ QVector<QAction *> InterfaceDocument::initActions()
     d->actExitToRoot = new QAction(tr("Exit to root funtion"));
     d->actExitToRoot->setActionGroup(actionGroup);
     d->actExitToRoot->setEnabled(false);
-    connect(d->actExitToRoot, &QAction::triggered, this, [this]() { d->model->changeRootItem({}); });
+    connect(d->actExitToRoot, &QAction::triggered, this, [this]() { d->itemsModel->changeRootItem({}); });
     d->actExitToRoot->setIcon(QIcon(":/tab_interface/toolbar/icns/exit.svg"));
 
     d->actExitToParent = new QAction(tr("Exit to parent function"));
     d->actExitToParent->setActionGroup(actionGroup);
     d->actExitToParent->setEnabled(false);
     connect(d->actExitToParent, &QAction::triggered, this, [this]() {
-        aadl::AADLObject *parentObject = d->model->rootObject() ? d->model->rootObject()->parentObject() : nullptr;
-        d->model->changeRootItem(parentObject ? parentObject->id() : shared::InvalidId);
+        aadl::AADLObject *parentObject =
+                d->objectsModel->rootObject() ? d->objectsModel->rootObject()->parentObject() : nullptr;
+        d->itemsModel->changeRootItem(parentObject ? parentObject->id() : shared::InvalidId);
     });
     d->actExitToParent->setIcon(QIcon(":/tab_interface/toolbar/icns/exit_parent.svg"));
 
@@ -734,15 +738,15 @@ QVector<QAction *> InterfaceDocument::initActions()
         actCreateRequiredInterface, actCreateComment, actCreateConnection, d->actCreateConnectionGroup, d->actRemove,
         d->actZoomIn, d->actZoomOut, d->actExitToRoot, d->actExitToParent };
 
-    connect(d->model, &AADLItemModel::rootObjectChanged, this, [this]() {
+    connect(d->objectsModel, &aadl::AADLObjectsModel::rootObjectChanged, this, [this]() {
         if (d->actExitToRoot) {
-            d->actExitToRoot->setEnabled(nullptr != d->model->rootObject());
+            d->actExitToRoot->setEnabled(nullptr != d->objectsModel->rootObject());
         }
         if (d->actExitToParent) {
-            d->actExitToParent->setEnabled(nullptr != d->model->rootObject());
+            d->actExitToParent->setEnabled(nullptr != d->objectsModel->rootObject());
         }
     });
-    connect(d->model->selectionModel(), &QItemSelectionModel::selectionChanged, this,
+    connect(d->itemsModel->selectionModel(), &QItemSelectionModel::selectionChanged, this,
             [this](const QItemSelection &selected, const QItemSelection & /*deselected*/) {
                 d->actRemove->setEnabled(!selected.isEmpty());
                 const QModelIndexList idxs = selected.indexes();
@@ -760,16 +764,16 @@ QWidget *InterfaceDocument::createGraphicsView()
     if (!d->graphicsView) {
         d->graphicsView = new aadlinterface::GraphicsView;
         connect(d->graphicsView, &aadlinterface::GraphicsView::zoomChanged, this, [this](qreal percent) {
-            d->model->zoomChanged();
+            d->itemsModel->zoomChanged();
             d->actZoomIn->setEnabled(!qFuzzyCompare(percent, d->graphicsView->maxZoomPercent()));
             d->actZoomOut->setEnabled(!qFuzzyCompare(percent, d->graphicsView->minZoomPercent()));
         });
 
         connect(d->graphicsView, &GraphicsView::entityDropped, this, &InterfaceDocument::importEntity);
     }
-    d->graphicsView->setScene(d->model->scene());
+    d->graphicsView->setScene(d->itemsModel->scene());
     d->graphicsView->setUpdatesEnabled(false);
-    d->model->updateSceneRect();
+    d->itemsModel->updateSceneRect();
     d->graphicsView->setUpdatesEnabled(true);
     return d->graphicsView;
 }
@@ -783,9 +787,9 @@ QTreeView *InterfaceDocument::createModelView()
     d->objectsView->setObjectName(QLatin1String("AADLModelView"));
     d->objectsView->setSelectionBehavior(QAbstractItemView::SelectionBehavior::SelectItems);
     d->objectsView->setSelectionMode(QAbstractItemView::SelectionMode::ExtendedSelection);
-    d->objectsView->setModel(d->model);
-    d->objectsView->setSelectionModel(d->model->selectionModel());
-    d->model->setHeaderData(0, Qt::Horizontal, tr("AADL Structure"), Qt::DisplayRole);
+    d->objectsView->setModel(d->objectsModel);
+    d->objectsView->setSelectionModel(d->itemsModel->selectionModel());
+    d->objectsModel->setHeaderData(0, Qt::Horizontal, tr("AADL Structure"), Qt::DisplayRole);
 
     return d->objectsView;
 }

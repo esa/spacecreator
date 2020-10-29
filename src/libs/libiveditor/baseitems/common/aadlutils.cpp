@@ -876,4 +876,16 @@ QVector<QPointF> simplifyPoints(const QVector<QPointF> &points)
     return simplifiedPoints;
 }
 
+bool comparePolygones(const QVector<QPointF> &v1, const QVector<QPointF> &v2)
+{
+    if (v1.size() != v2.size())
+        return false;
+
+    for (int idx = 0; idx < v1.size(); ++idx) {
+        if (v1.at(idx).toPoint() != v2.at(idx).toPoint())
+            return false;
+    }
+    return true;
+}
+
 }

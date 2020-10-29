@@ -46,7 +46,7 @@ class AADLConnectionGraphicsItem;
    AADL model. It handles all changes with existing entities and reflects them on graphic scene.
  */
 
-class AADLItemModel : public aadl::AADLObjectsModel
+class AADLItemModel : public QObject
 {
     Q_OBJECT
 public:
@@ -57,7 +57,7 @@ public:
     };
     Q_ENUM(AADLRoles);
 
-    explicit AADLItemModel(QObject *parent = nullptr);
+    explicit AADLItemModel(aadl::AADLObjectsModel *model, QObject *parent = nullptr);
     ~AADLItemModel() override;
 
     QGraphicsScene *scene() const;
@@ -67,6 +67,8 @@ public:
     void zoomChanged();
 
     QGraphicsItem *getItem(const shared::Id id) const;
+
+    aadl::AADLObjectsModel *objectsModel() const;
 
 Q_SIGNALS:
     void itemClicked(shared::Id id);
@@ -94,6 +96,7 @@ private:
     void removeItemForObject(aadl::AADLObject *object);
 
 private:
+    aadl::AADLObjectsModel *m_model { nullptr };
     QItemSelectionModel *m_itemSelectionModel;
     InterfaceTabGraphicsScene *m_graphicsScene { nullptr };
     QHash<shared::Id, QGraphicsItem *> m_items;

@@ -120,7 +120,8 @@ void AADLInterfaceGraphicsItem::setInterfaceName(const QString &name)
 
 QPointF AADLInterfaceGraphicsItem::connectionEndPoint(const bool nestedConnection) const
 {
-    const QRectF ifaceRect = m_iface->sceneBoundingRect();
+    const qreal borderWidth = m_iface->pen().widthF() + 1;
+    const QRectF ifaceRect = m_iface->sceneBoundingRect().adjusted(borderWidth / 2, borderWidth / 2, -borderWidth / 2, -borderWidth / 2);
     if (!ifaceRect.isValid()) {
         return {};
     }
@@ -171,7 +172,9 @@ QPointF AADLInterfaceGraphicsItem::connectionEndPoint(AADLConnectionGraphicsItem
 
 QPainterPath AADLInterfaceGraphicsItem::ifaceShape() const
 {
-    return mapToScene(m_iface->shape());
+    const QRectF parentRect = parentItem()->boundingRect();
+    const Qt::Alignment alignment = getNearestSide(parentRect, pos());
+    return mapToScene(ifaceTransform(alignment).map(ifacePath()));
 }
 
 void AADLInterfaceGraphicsItem::updateInternalItems(Qt::Alignment alignment)

@@ -204,6 +204,8 @@ void tst_ItemZOrder::testItem_ConnectionGroup()
     aadlinterface::AADLConnectionGroupGraphicsItem connectionItem(&aadlConnectionGroup, &itemA, &itemB);
 
     checkItem(&connectionItem, aadlinterface::ZOrder.Connection);
+    aadlConnectionGroup.removeConnection(aadlConnection.get());
+    QVERIFY(aadlConnectionGroup.groupedConnections().isEmpty());
 }
 
 void tst_ItemZOrder::testItem_CheckCoverage()

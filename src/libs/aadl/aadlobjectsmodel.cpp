@@ -23,6 +23,7 @@
 #include "aadlobjectfunctiontype.h"
 #include "common.h"
 
+#include <QFont>
 #include <QIcon>
 #include <QtDebug>
 
@@ -132,13 +133,16 @@ bool AADLObjectsModel::removeObject(AADLObject *obj)
 
     const int objRow = rowInParent(obj);
     const QModelIndex currentIdx = createIndex(objRow, 0, obj);
-    beginRemoveRows(currentIdx.parent(), objRow, objRow);
+    const bool isIndexValid = currentIdx.isValid();
+    if (isIndexValid)
+        beginRemoveRows(currentIdx.parent(), objRow, objRow);
 
     d->m_objects.remove(id);
     d->m_objectsOrder.removeAll(id);
     d->m_visibleObjects.removeAll(obj);
 
-    endRemoveRows();
+    if (isIndexValid)
+        endRemoveRows();
 
     Q_EMIT aadlObjectRemoved(obj);
     return true;
@@ -519,8 +523,15 @@ QVariant AADLObjectsModel::data(const QModelIndex &index, int role) const
             return icon;
         } break;
         case AADLObject::Type::Connection: {
+            static const QPixmap iconHidden =
+                    QIcon(QLatin1String(":/tab_interface/toolbar/icns/connection.svg")).pixmap(16, 16, QIcon::Disabled);
             static const QPixmap icon =
                     QIcon(QLatin1String(":/tab_interface/toolbar/icns/connection.svg")).pixmap(16, 16);
+            return obj->isGrouped() ? iconHidden : icon;
+        } break;
+        case AADLObject::Type::ConnectionGroup: {
+            static const QPixmap icon =
+                    QIcon(QLatin1String(":/tab_interface/toolbar/icns/connection_group.svg")).pixmap(16, 16);
             return icon;
         } break;
         default:
@@ -545,6 +556,17 @@ QVariant AADLObjectsModel::data(const QModelIndex &index, int role) const
             return QVariant();
         }
         return obj->title();
+    }
+
+    if (obj->isGrouped()) {
+        if (role == Qt::ForegroundRole) {
+            return QColor(Qt::lightGray);
+        }
+        if (role == Qt::FontRole) {
+            QFont font;
+            font.setItalic(true);
+            return font;
+        }
     }
 
     return QVariant();

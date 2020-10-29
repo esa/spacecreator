@@ -137,4 +137,6 @@ QVector<QPointF> createConnectionPath(QGraphicsScene *scene, const QPointF &star
 
 QVector<QPointF> simplifyPoints(const QVector<QPointF> &points);
 
+bool comparePolygones(const QVector<QPointF> &v1, const QVector<QPointF> &v2);
+
 }

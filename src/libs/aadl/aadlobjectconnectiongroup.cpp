@@ -129,6 +129,7 @@ void AADLObjectConnectionGroup::addConnection(const QPointer<AADLObjectConnectio
         return;
     }
 
+    connection->setParent(this);
     m_connections.append(connection);
 
     Q_EMIT connectionAdded(connection);
@@ -136,6 +137,12 @@ void AADLObjectConnectionGroup::addConnection(const QPointer<AADLObjectConnectio
 
 void AADLObjectConnectionGroup::removeConnection(const QPointer<AADLObjectConnection> &connection)
 {
+    if (connection.isNull()) {
+        return;
+    }
+
+    connection->setGroupName({});
+    connection->setParent(parent());
     m_connections.removeAll(connection);
     bool removeSourceIface = true;
     bool removeTargetIface = true;

@@ -322,7 +322,8 @@ void CreatorTool::removeSelectedItems()
                             }
                         }
                     }
-                    const QVariantList params = { QVariant::fromValue(entity), QVariant::fromValue(d->model.data()) };
+                    const QVariantList params = { QVariant::fromValue(entity),
+                        QVariant::fromValue(d->model->objectsModel()) };
                     if (QUndoCommand *cmdRm = cmd::CommandsFactory::create(cmd::RemoveEntity, params))
                         cmd::CommandsStack::push(cmdRm);
                 }
@@ -376,8 +377,7 @@ void CreatorTool::groupSelectedItems()
         if (it != groupCreationDataList.end()) {
             it->connections.append(connection);
         } else {
-            QPointF startPoint, endPoint;
-            const auto points = aadlinterface::polygon(connection->coordinates());
+            QVector<QPointF> points = aadlinterface::polygon(connection->coordinates());
             if (points.isEmpty()) {
                 const QGraphicsItem *sourceItem = d->model->getItem(connection->source()->id());
                 const QGraphicsItem *targetItem = d->model->getItem(connection->target()->id());
@@ -385,8 +385,8 @@ void CreatorTool::groupSelectedItems()
                     return;
                 }
 
-                startPoint = sourceItem->sceneBoundingRect().center();
-                endPoint = targetItem->sceneBoundingRect().center();
+                QPointF startPoint = sourceItem->sceneBoundingRect().center();
+                QPointF endPoint = targetItem->sceneBoundingRect().center();
                 const bool startAdjusted = shared::graphicsviewutils::intersects(
                         sourceItem->sceneBoundingRect(), { startPoint, endPoint }, &startPoint);
                 const bool endAdjusted = shared::graphicsviewutils::intersects(
@@ -394,19 +394,16 @@ void CreatorTool::groupSelectedItems()
                 if (!startAdjusted || !endAdjusted) {
                     return;
                 }
-            } else {
-                startPoint = points.first();
-                endPoint = points.last();
+                points << startPoint << endPoint;
             }
-
-            groupCreationDataList.append({ d->model.data(), connection->parentObject(), connection->source(),
-                    connection->target(), {}, { connection }, { startPoint, endPoint } });
+            groupCreationDataList.append({ d->model->objectsModel(), connection->parentObject(), connection->source(),
+                    connection->target(), {}, { connection }, points });
         }
     };
 
     static const int role = static_cast<int>(aadl::AADLObjectsModel::AADLRoles::IdRole);
     for (const auto id : d->model->selectionModel()->selectedIndexes()) {
-        if (aadl::AADLObject *object = d->model->getObject(id.data(role).toUuid())) {
+        if (aadl::AADLObject *object = d->model->objectsModel()->getObject(id.data(role).toUuid())) {
             if (object->isConnection()) {
                 if (aadl::AADLObjectConnection *connectionObj = qobject_cast<aadl::AADLObjectConnection *>(object)) {
                     processConnection(connectionObj);
@@ -909,7 +906,7 @@ void CreatorTool::CreatorToolPrivate::handleComment(QGraphicsScene *scene, const
 
         const QRectF itemSceneRect =
                 adjustToSize(this->previewItem->mapRectToScene(this->previewItem->rect()), DefaultGraphicsItemSize);
-        const QVariantList params = { QVariant::fromValue(this->model.data()), QVariant::fromValue(parentObject),
+        const QVariantList params = { QVariant::fromValue(model->objectsModel()), QVariant::fromValue(parentObject),
             itemSceneRect };
         cmd::CommandsStack::push(cmd::CommandsFactory::create(cmd::CreateCommentEntity, params));
     }
@@ -929,7 +926,7 @@ void CreatorTool::CreatorToolPrivate::handleFunctionType(QGraphicsScene *scene, 
 
         aadl::AADLObjectFunction *parentObject = gi::functionObject(this->previewItem->parentItem());
 
-        const QVariantList params = { QVariant::fromValue(this->model.data()), QVariant::fromValue(parentObject),
+        const QVariantList params = { QVariant::fromValue(model->objectsModel()), QVariant::fromValue(parentObject),
             itemSceneRect };
         cmd::CommandsStack::push(cmd::CommandsFactory::create(cmd::CreateFunctionTypeEntity, params));
     }
@@ -948,7 +945,7 @@ void CreatorTool::CreatorToolPrivate::handleFunction(QGraphicsScene *scene, cons
             return;
 
         aadl::AADLObjectFunction *parentObject = gi::functionObject(this->previewItem->parentItem());
-        const QVariantList params = { QVariant::fromValue(this->model.data()), QVariant::fromValue(parentObject),
+        const QVariantList params = { QVariant::fromValue(model->objectsModel()), QVariant::fromValue(parentObject),
             itemSceneRect };
 
         cmd::CommandsStack::push(cmd::CommandsFactory::create(cmd::CreateFunctionEntity, params));
@@ -960,7 +957,8 @@ void CreatorTool::CreatorToolPrivate::handleInterface(
 {
     if (auto parentItem = nearestItem(scene, adjustFromPoint(pos, ::kInterfaceTolerance), kFunctionTypes)) {
         aadl::AADLObjectFunctionType *parentObject = gi::functionTypeObject(parentItem);
-        aadl::AADLObjectIface::CreationInfo ifaceDescr(this->model.data(), parentObject, pos, type, shared::InvalidId);
+        aadl::AADLObjectIface::CreationInfo ifaceDescr(
+                model->objectsModel(), parentObject, pos, type, shared::InvalidId);
         ifaceDescr.resetKind();
 
         if (auto cmd = createInterfaceCommand(ifaceDescr))
@@ -1052,7 +1050,7 @@ void CreatorTool::CreatorToolPrivate::handleConnection(const QVector<QPointF> &c
         if (!cmdMacro.push(createInterfaceCommand(ifaceCommons)))
             return;
     } else if (!info.startIface && !info.endIface) {
-        ifaceCommons.model = this->model.data();
+        ifaceCommons.model = model->objectsModel();
 
         ifaceCommons.function = info.startObject;
         ifaceCommons.position = info.startPointAdjusted;
@@ -1129,7 +1127,7 @@ void CreatorTool::CreatorToolPrivate::handleConnection(const QVector<QPointF> &c
                 return;
         }
 
-        const QVariantList params = { QVariant::fromValue(this->model.data()), QVariant::fromValue(item->entity()),
+        const QVariantList params = { QVariant::fromValue(model->objectsModel()), QVariant::fromValue(item->entity()),
             prevStartIfaceId, ifaceCommons.id, QVariant::fromValue(points) };
         if (!cmdMacro.push(cmd::CommandsFactory::create(cmd::CreateConnectionEntity, params)))
             return;
@@ -1173,7 +1171,7 @@ void CreatorTool::CreatorToolPrivate::handleConnection(const QVector<QPointF> &c
             if (!cmdMacro.push(createInterfaceCommand(ifaceCommons)))
                 return;
         }
-        const QVariantList params = { QVariant::fromValue(this->model.data()), QVariant::fromValue(item->entity()),
+        const QVariantList params = { QVariant::fromValue(model->objectsModel()), QVariant::fromValue(item->entity()),
             prevEndIfaceId, ifaceCommons.id, QVariant::fromValue(points) };
         if (!cmdMacro.push(cmd::CommandsFactory::create(cmd::CreateConnectionEntity, params)))
             return;
@@ -1194,7 +1192,7 @@ void CreatorTool::CreatorToolPrivate::handleConnection(const QVector<QPointF> &c
     points.append(endInterfacePoint);
     Q_ASSERT(points.size() >= 2);
     if (points.first() != points.last()) {
-        const QVariantList params = { QVariant::fromValue(this->model.data()),
+        const QVariantList params = { QVariant::fromValue(model->objectsModel()),
             QVariant::fromValue(parentForConnection ? parentForConnection->entity() : nullptr), prevStartIfaceId,
             prevEndIfaceId, QVariant::fromValue(points) };
         if (!cmdMacro.push(cmd::CommandsFactory::create(cmd::CreateConnectionEntity, params)))

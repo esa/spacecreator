@@ -114,7 +114,7 @@ void AADLConnectionGraphicsItem::setPoints(const QVector<QPointF> &points)
         return;
     }
 
-    if (m_points != points) {
+    if (!comparePolygones(m_points, points)) {
         m_points = points;
         instantLayoutUpdate();
     }
@@ -168,24 +168,15 @@ void AADLConnectionGraphicsItem::rebuildLayout()
         m_endItem->layout();
 
     bool pathObsolete(true);
-    if (m_points.size() >= 2) {
+    if (m_points.size() > 2) {
         pathObsolete = (!startItem() || !startItem()->ifaceShape().contains(m_points.first()))
                 || (!endItem() || !endItem()->ifaceShape().contains(m_points.last()));
     }
 
     if (pathObsolete) {
-        if (m_points.size() <= 2) {
-            layout();
-        } else if (m_firstUpdate) {
-            // perform the "second" update - when additional points are in place,
-            // yet the turn angles are weird due to interface autolayout, or whatever
-            m_firstUpdate = false;
-            layout();
-        } else {
-            updateEdgePoint(m_startItem); // TODO: restore prev ?
-        }
-    } else if (m_points.size() == 2) {
         layout();
+        mergeGeometry();
+        return;
     }
 
     updateBoundingRect();

@@ -32,6 +32,7 @@ CmdConnectionGroupItemCreate::CmdConnectionGroupItemCreate(
     , m_groupName(creationInfo.name)
     , m_model(creationInfo.model)
     , m_parent(qobject_cast<aadl::AADLObjectFunction *>(creationInfo.parentObject))
+    , m_connections(creationInfo.connections)
 {
     Q_ASSERT(creationInfo.model);
     Q_ASSERT(creationInfo.sourceObject);
@@ -49,8 +50,8 @@ CmdConnectionGroupItemCreate::CmdConnectionGroupItemCreate(
     m_targetIface = new aadl::AADLObjectIfaceGroup(targetInfo);
 
     m_entity = new aadl::AADLObjectConnectionGroup(
-            creationInfo.name, m_sourceIface, m_targetIface, creationInfo.connections, creationInfo.parentObject);
-    //    prepareData({ qMakePair(m_entity, points) });
+            creationInfo.name, m_sourceIface, m_targetIface, {}, creationInfo.parentObject);
+    prepareData({ qMakePair(m_entity, creationInfo.points) });
 }
 
 void CmdConnectionGroupItemCreate::redo()
@@ -66,11 +67,20 @@ void CmdConnectionGroupItemCreate::redo()
     m_model->addObject(m_sourceIface);
     m_model->addObject(m_targetIface);
     m_model->addObject(m_entity);
+
+    for (auto connection : m_connections) {
+        m_entity->addConnection(connection);
+    }
 }
 
 void CmdConnectionGroupItemCreate::undo()
 {
     CmdEntityGeometryChange::undo();
+
+    for (auto connection : m_connections) {
+        m_entity->removeConnection(connection);
+    }
+
     m_model->removeObject(m_entity);
     m_model->removeObject(m_targetIface);
     m_model->removeObject(m_sourceIface);
