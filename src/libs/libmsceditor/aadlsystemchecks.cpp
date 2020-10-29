@@ -385,7 +385,7 @@ aadl::AADLObjectConnection *AadlSystemChecks::correspondingConnection(const MscM
     auto it = std::find_if(connections.cbegin(), connections.cend(),
             [this, &message](aadl::AADLObjectConnection *connection) { return correspond(connection, message); });
 
-    if (it == connections.end()) {
+    if (it == connections.cend()) {
         return nullptr;
     }
 
