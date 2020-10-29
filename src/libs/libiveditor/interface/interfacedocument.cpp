@@ -692,7 +692,8 @@ QVector<QAction *> InterfaceDocument::initActions()
     actCreateConnection->setIcon(QIcon(":/tab_interface/toolbar/icns/connection.svg"));
 
     d->actCreateConnectionGroup = new QAction(tr("Create Connection Group"));
-    ActionsManager::registerAction(Q_FUNC_INFO, d->actCreateConnectionGroup, "Connection", "Create Connection group");
+    ActionsManager::registerAction(
+            Q_FUNC_INFO, d->actCreateConnectionGroup, "Connection Group", "Create Connection group");
     d->actCreateConnectionGroup->setActionGroup(actionGroup);
     connect(d->actCreateConnectionGroup, &QAction::triggered, this, [this]() { d->tool->groupSelectedItems(); });
     d->actCreateConnectionGroup->setIcon(QIcon(":/tab_interface/toolbar/icns/connection_group.svg"));

@@ -59,6 +59,8 @@ int main(int argc, char *argv[])
 
     if (!cmdParser.isSet(shared::CommandLineParser::Positional::ListScriptableActions)) {
         w.show();
+    } else {
+        return 0;
     }
 
     return a.exec();

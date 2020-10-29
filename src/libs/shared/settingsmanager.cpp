@@ -30,7 +30,7 @@ namespace shared {
 SettingsManager::SettingsManager()
     : m_settings(new QSettings(path(), QSettings::IniFormat, this))
 {
-    qDebug() << "Config:" << m_settings->fileName();
+    qInfo() << "Config:" << m_settings->fileName();
 }
 
 SettingsManager *SettingsManager::instance()
