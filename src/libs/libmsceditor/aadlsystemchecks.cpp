@@ -272,7 +272,7 @@ aadl::AADLObjectFunction *AadlSystemChecks::correspondingFunction(const MscInsta
         return nullptr;
     }
 
-    QVector<aadl::AADLObjectFunction *> functions = m_ivCore->allAadlFunctions();
+    const QVector<aadl::AADLObjectFunction *> functions = m_ivCore->allAadlFunctions();
     auto it = std::find_if(functions.begin(), functions.end(),
             [this, &instance](aadl::AADLObjectFunction *func) { return correspond(func, instance); });
 
