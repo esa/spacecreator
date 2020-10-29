@@ -55,7 +55,8 @@ public:
     void setUsedPoints(GripPoint::Locations points);
     GripPoint::Locations usedPoints() const;
 
-    void setGripPointPos(GripPoint::Location location, const QPointF &pos);
+    void setGripPointPos(GripPoint::Location location, const QPointF &scenePos);
+    void setGripPointPos(GripPoint *gripPoint, const QPointF &scenePos);
     GripPoint *gripPoint(GripPoint::Location location) const;
 
 public Q_SLOTS:

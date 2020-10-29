@@ -102,13 +102,20 @@ GripPoint::Locations GripPointsHandler::usedPoints() const
     return m_usedPoints;
 }
 
-void GripPointsHandler::setGripPointPos(GripPoint::Location location, const QPointF &pos)
+void GripPointsHandler::setGripPointPos(GripPoint::Location location, const QPointF &scenePos)
 {
     for (auto l : m_gripPoints) {
         if (l->location() == location) {
-            l->setPos(pos);
+            l->setPos(mapFromScene(scenePos));
             return;
         }
+    }
+}
+
+void GripPointsHandler::setGripPointPos(GripPoint *gripPoint, const QPointF &scenePos)
+{
+    if (gripPoint) {
+        gripPoint->setPos(mapFromScene(scenePos));
     }
 }
 

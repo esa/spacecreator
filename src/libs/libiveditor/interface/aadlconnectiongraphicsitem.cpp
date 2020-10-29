@@ -318,7 +318,7 @@ void AADLConnectionGraphicsItem::onManualMoveStart(shared::ui::GripPoint *gp, co
     if (qApp->keyboardModifiers().testFlag(Qt::ControlModifier)) {
         m_points.insert(idx, at);
         auto grip = gripPointsHandler()->createGripPoint(gp->location(), idx);
-        grip->setPos(gripPointsHandler()->mapFromScene(at));
+        gripPointsHandler()->setGripPointPos(grip, at);
         grip->stackBefore(gp);
         updateBoundingRect();
     }
@@ -344,7 +344,7 @@ void AADLConnectionGraphicsItem::updateGripPoints()
             gripPointsHandler()->createGripPoint(shared::ui::GripPoint::Absolute);
         }
         if (auto grip = grips.value(idx)) {
-            grip->setPos(gripPointsHandler()->mapFromScene(points.value(idx)));
+            gripPointsHandler()->setGripPointPos(grip, points.value(idx));
         }
     }
     InteractiveObject::updateGripPoints();
