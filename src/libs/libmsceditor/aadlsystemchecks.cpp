@@ -382,7 +382,7 @@ aadl::AADLObjectConnection *AadlSystemChecks::correspondingConnection(const MscM
     }
 
     const QVector<aadl::AADLObjectConnection *> connections = m_ivCore->allAadlConnections();
-    auto it = std::find_if(connections.begin(), connections.end(),
+    auto it = std::find_if(connections.cbegin(), connections.cend(),
             [this, &message](aadl::AADLObjectConnection *connection) { return correspond(connection, message); });
 
     if (it == connections.end()) {
