@@ -18,17 +18,21 @@
 #include "mscsystemchecks.h"
 
 #include "aadlmodelstorage.h"
+#include "aadlnamevalidator.h"
 #include "aadlobjectconnection.h"
 #include "aadlobjectiface.h"
+#include "aadlobjectsmodel.h"
 #include "aadlsystemchecks.h"
 #include "chartlayoutmanager.h"
 #include "interface/commands/cmdentityattributechange.h"
 #include "interface/commands/cmdifaceattrchange.h"
+#include "interface/interfacedocument.h"
 #include "iveditorcore.h"
 #include "mainmodel.h"
 #include "mscchart.h"
 #include "msceditorcore.h"
 #include "mscinstance.h"
+#include "mscmessage.h"
 #include "mscmodel.h"
 #include "mscmodelstorage.h"
 #include "undocommand.h"
@@ -348,7 +352,7 @@ void MscSystemChecks::onMscEntityNameChanged(QObject *entity, const QString &old
         if (hasOldName && !hasNewName) {
             QMessageBox box;
             box.setWindowTitle(tr("Update AADL function"));
-            box.setText(tr("The AADL function should be updated"
+            box.setText(tr("The AADL function should be updated."
                            "\nDo you want to update it?"
                            "\nDo you want to add it to the AADL model?"));
             QPushButton *updateButton = box.addButton(tr("Update"), QMessageBox::AcceptRole);
@@ -365,5 +369,52 @@ void MscSystemChecks::onMscEntityNameChanged(QObject *entity, const QString &old
             }
         }
     }
+
+    auto message = dynamic_cast<msc::MscMessage *>(entity);
+    if (message && ivCore() && ivCore()->document() && ivCore()->document()->objectsModel()) {
+        const QString fromName = aadl::AADLNameValidator::decodeName(
+                aadl::AADLObject::Type::Function, message->sourceInstance() ? message->sourceInstance()->name() : "");
+        const QString toName = aadl::AADLNameValidator::decodeName(
+                aadl::AADLObject::Type::Function, message->targetInstance() ? message->targetInstance()->name() : "");
+        const QString decodedNewName =
+                aadl::AADLNameValidator::decodeName(aadl::AADLObject::Type::ProvidedInterface, message->name());
+        const QString decodedOldName =
+                aadl::AADLNameValidator::decodeName(aadl::AADLObject::Type::ProvidedInterface, oldName);
+        const bool hasNewName =
+                ivCore()->document()->objectsModel()->getConnection(decodedNewName, fromName, toName) != nullptr;
+        const bool hasOldName =
+                ivCore()->document()->objectsModel()->getConnection(decodedOldName, fromName, toName) != nullptr;
+
+        if (!hasNewName && !hasOldName) {
+            const int result = QMessageBox::question(nullptr, tr("No AADL connection"),
+                    tr("The AADL model doesn't contain a connection called:\n%1\n"
+                       "\nDo you want to add it to the AADL model?")
+                            .arg(message->name()));
+            if (result == QMessageBox::Yes) {
+                ivCore()->addConnection(message->name(), fromName, toName);
+            }
+        }
+
+        if (hasOldName && !hasNewName) {
+            QMessageBox box;
+            box.setWindowTitle(tr("Update AADL connection"));
+            box.setText(tr("The AADL connection should be updated."
+                           "\nDo you want to update it?"
+                           "\nDo you want to add it to the AADL model?"));
+            QPushButton *updateButton = box.addButton(tr("Update"), QMessageBox::AcceptRole);
+            QPushButton *addButton = box.addButton(tr("Add"), QMessageBox::AcceptRole);
+            box.addButton(tr("Ignore"), QMessageBox::RejectRole);
+            box.setDefaultButton(updateButton);
+            box.exec();
+            if (box.clickedButton() == updateButton) {
+                ivCore()->renameAadlConnection(oldName, message->name(), fromName, toName, false);
+                changeMscMessageName(oldName, message->name(), fromName, toName);
+            }
+            if (box.clickedButton() == addButton) {
+                ivCore()->addConnection(message->name(), fromName, toName);
+            }
+        }
+    }
 }
+
 }

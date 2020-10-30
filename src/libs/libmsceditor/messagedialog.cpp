@@ -146,20 +146,6 @@ void MessageDialog::accept()
     undoStack->push(new msc::cmd::CmdSetParameterList(m_message, parameters));
     undoStack->endMacro();
 
-    if (m_aadlChecker && m_aadlChecker->hasIvCore()) {
-        const QString fromName = m_message->sourceInstance() ? m_message->sourceInstance()->name() : "";
-        const QString toName = m_message->targetInstance() ? m_message->targetInstance()->name() : "";
-        if (!m_aadlChecker->connectionExists(m_message->name(), fromName, toName)) {
-            const int result = QMessageBox::question(nullptr, tr("No AADL connection"),
-                    tr("The AADL model doesn't contain a connection called:\n%1\n"
-                       "\nDo you want to add it to the AADL model?")
-                            .arg(m_message->name()));
-            if (result == QMessageBox::Yes) {
-                m_aadlChecker->ivCore()->addConnection(m_message->name(), fromName, toName);
-            }
-        }
-    }
-
     QDialog::accept();
 }
 

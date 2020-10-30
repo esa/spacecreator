@@ -32,7 +32,6 @@ namespace msc {
   \brief Source-to-end arrow with a text holder.
 
   \ingroup MscWidgets
-
 */
 
 LabeledArrowItem::LabeledArrowItem(QGraphicsItem *parent)
@@ -64,7 +63,6 @@ void LabeledArrowItem::setText(const QString &text)
         return;
 
     m_itemText->setPlainText(text);
-    onTextEdited(text);
 }
 
 QString LabeledArrowItem::text() const
@@ -216,6 +214,7 @@ void LabeledArrowItem::setEditable(bool edit)
 
 void LabeledArrowItem::onTextChanged()
 {
+    m_itemText->adjustSize();
     {
         QSignalBlocker suppressLayoutUpdated(this);
         updateLayout();

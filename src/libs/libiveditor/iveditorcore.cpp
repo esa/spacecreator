@@ -28,6 +28,7 @@
 #include "context/action/actionsmanager.h"
 #include "interface/commands/cmdentityattributechange.h"
 #include "interface/commands/cmdfunctionitemcreate.h"
+#include "interface/commands/cmdifaceattrchange.h"
 #include "interface/commands/commandsfactory.h"
 #include "interface/interfacedocument.h"
 #include "mainwindow.h"
@@ -216,6 +217,32 @@ bool IVEditorCore::renameAadlFunction(const QString &oldName, const QString &new
 
     const QVariantHash attributess = { { aadl::meta::Props::token(aadl::meta::Props::Token::name), newName } };
     auto cmd = new cmd::CmdEntityAttributeChange(aadlFunc, attributess);
+    cmd->setSystemCheck(updateSystem);
+    cmd::CommandsStack::push(cmd);
+
+    Q_EMIT editedExternally(this);
+    return true;
+}
+
+/*!
+   \brief IVEditorCore::addAadlConnection
+   \param oldName
+   \param newName
+   \param fromInstanceName
+   \param toInstanceName
+   \return
+ */
+bool IVEditorCore::renameAadlConnection(const QString &oldName, const QString &newName, const QString &fromInstanceName,
+        const QString &toInstanceName, bool updateSystem)
+{
+    aadl::AADLObjectsModel *aadlModel = m_document->objectsModel();
+    aadl::AADLObjectConnection *aadlConnect = aadlModel->getConnection(oldName, fromInstanceName, toInstanceName);
+    if (!aadlConnect) {
+        return false;
+    }
+
+    auto cmd = new cmd::CmdIfaceAttrChange(aadlConnect->targetInterface(),
+            aadl::meta::Props::token(aadl::meta::Props::Token::name), QVariant::fromValue(newName));
     cmd->setSystemCheck(updateSystem);
     cmd::CommandsStack::push(cmd);
 
