@@ -98,6 +98,9 @@ endif()
 
 # Installer data
 if(UNIX)
+# ASN1 compiler
+add_subdirectory(asn1scc)
+
 # install grantlee
 install(FILES /usr/lib/libGrantlee_Templates.so /usr/lib/libGrantlee_Templates.so.5 /usr/lib/libGrantlee_Templates.so.5.2.0 DESTINATION /usr/lib)
 

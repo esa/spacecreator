@@ -15,6 +15,10 @@ build_debian10_gcc:
     - mkdir -p build; cd build
     - cmake -GNinja ..
     - ninja
+  cache:
+    key: asn1scc
+    paths:
+      - build/asn1scc_bin
   artifacts:
     paths:
       - build
@@ -42,6 +46,10 @@ test_docker:
     - ./scripts/run_tests.sh build
   dependencies:
     - build_debian10_gcc
+  cache:
+    key: asn1scc
+    paths:
+      - build/asn1scc_bin
   artifacts:
     reports:
       junit: build/tst_*-result.xml
@@ -56,6 +64,10 @@ documentation:
   image: registry.git.vikingsoftware.com/esa/taste3-ci-image:latest
   script:
     - ./scripts/generate_documentation.sh
+  cache:
+    key: asn1scc
+    paths:
+      - build/asn1scc_bin
   artifacts:
     paths:
       - doc/doxygen/html
@@ -74,6 +86,10 @@ debian_package:
   - cmake --build . --target all
   - cpack
   - cd ..; mkdir -p package; cp build/*.deb package
+  cache:
+    key: asn1scc
+    paths:
+      - build/asn1scc_bin
   artifacts:
     paths:
       - package
