@@ -19,8 +19,8 @@
 
 #include <QAction>
 #include <QGraphicsObject>
+#include <QIcon>
 #include <QObject>
-#include <QPixmap>
 #include <QPointer>
 
 class QGraphicsView;
@@ -54,7 +54,7 @@ public:
 
     bool isActive() const;
 
-    QPixmap icon() const;
+    QIcon icon() const;
     QString title() const;
     QString description() const;
 
@@ -74,7 +74,7 @@ protected:
     QPointer<QGraphicsView> m_view;
     QPointer<QGraphicsScene> m_scene;
     bool m_active = false;
-    QPixmap m_icon;
+    QIcon m_icon;
     QString m_title = tr("Untitled");
     QString m_description = tr("Unimplemented tool");
     QPointer<QGraphicsObject> m_previewItem = nullptr;

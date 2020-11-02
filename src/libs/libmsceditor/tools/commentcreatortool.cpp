@@ -37,11 +37,11 @@ CommentCreatorTool::CommentCreatorTool(bool isGlobal, ChartLayoutManager *model,
 {
     if (m_isGlobalComment) {
         m_title = tr("Comment");
-        m_icon = QPixmap(":/icons/toolbar/global_comment.svg");
+        m_icon = QIcon(":/icons/toolbar/global_comment.svg");
         m_description = tr("Create new Comment the Chart");
     } else {
         m_title = tr("Comment");
-        m_icon = QPixmap(":/icons/toolbar/comment.svg");
+        m_icon = QIcon(":/icons/toolbar/comment.svg");
         m_description = tr("Create new Comment for item");
     }
 }

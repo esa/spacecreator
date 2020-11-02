@@ -32,7 +32,7 @@ ActionCreatorTool::ActionCreatorTool(ChartLayoutManager *model, QGraphicsView *v
 {
     m_title = tr("Action");
     m_description = tr("Create new Action item");
-    m_icon = QPixmap(":/icons/toolbar/action.svg");
+    m_icon = QIcon(":/icons/toolbar/action.svg");
 }
 
 BaseTool::ToolType ActionCreatorTool::toolType() const

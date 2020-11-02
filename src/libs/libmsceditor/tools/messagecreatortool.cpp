@@ -43,11 +43,11 @@ MessageCreatorTool::MessageCreatorTool(
     if (msgType == MscMessage::MessageType::Create) {
         m_title = tr("Create (Drag)");
         m_description = tr("Create new Create item");
-        m_icon = QPixmap(":/icons/toolbar/create.svg");
+        m_icon = QIcon(":/icons/toolbar/create.svg");
     } else {
         m_title = tr("Message (Drag)");
         m_description = tr("Create new Message item");
-        m_icon = QPixmap(":/icons/toolbar/message.png");
+        m_icon = QIcon(":/icons/toolbar/message.png");
     }
     m_cursor = QCursor(Qt::CrossCursor);
 }

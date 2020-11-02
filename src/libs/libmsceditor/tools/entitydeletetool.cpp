@@ -44,7 +44,7 @@ EntityDeleteTool::EntityDeleteTool(ChartLayoutManager *model, QGraphicsView *vie
 {
     m_title = tr("Delete");
     m_description = tr("Delete an item");
-    m_icon = QPixmap(":/icons/toolbar/delete.svg");
+    m_icon = QIcon(":/icons/toolbar/delete.svg");
 
     setAction(new QAction(m_icon, m_title, this));
     m_action->setToolTip(m_description);

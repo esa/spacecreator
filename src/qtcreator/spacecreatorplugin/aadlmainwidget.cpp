@@ -18,6 +18,7 @@
 #include "aadlmainwidget.h"
 
 #include "aadlmodelstorage.h"
+#include "actionsbar.h"
 #include "asn1dialog.h"
 #include "commandsstack.h"
 #include "interface/commands/commandsfactory.h"
@@ -97,11 +98,6 @@ QString AadlMainWidget::textContents() const
     } else {
         return QString();
     }
-}
-
-QVector<QAction *> AadlMainWidget::toolActions() const
-{
-    return m_actions;
 }
 
 /*!
@@ -188,12 +184,21 @@ void AadlMainWidget::init()
         return;
     }
 
-    setLayout(new QVBoxLayout(this));
+    auto layout = new QHBoxLayout(this);
+    layout->setMargin(0);
+    layout->setSpacing(0);
+    setLayout(layout);
     m_plugin->document()->init();
-    layout()->addWidget(m_plugin->document()->view());
-    layout()->setMargin(0);
+
+    m_aadlToolBar = new shared::ActionsBar(this);
+    layout->addWidget(m_aadlToolBar);
+
+    layout->addWidget(m_plugin->document()->view());
 
     m_actions = m_plugin->document()->initActions();
+    for (QAction *action : m_actions) {
+        m_aadlToolBar->addAction(action);
+    }
 
     m_plugin->setupMiniMap();
 

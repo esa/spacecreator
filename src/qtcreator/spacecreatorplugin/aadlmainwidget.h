@@ -33,6 +33,10 @@ namespace aadlinterface {
 class IVEditorCore;
 }
 
+namespace shared {
+class ActionsBar;
+}
+
 namespace spctr {
 
 class AadlModelStorage;
@@ -54,9 +58,6 @@ public:
 
     QString textContents() const;
 
-    QVector<QAction *> toolActions() const;
-    QVector<QAction *> hierarchyActions() const;
-
     void showAsn1Dialog();
     void setMinimapVisible(bool visible);
     void showE2EDataflow();
@@ -77,6 +78,7 @@ private:
     QVector<QAction *> m_actions;
     QPointer<AadlModelStorage> m_aadlStorage;
     QPointer<aadlinterface::EndToEndView> m_endToEndView;
+    shared::ActionsBar *m_aadlToolBar = nullptr;
 };
 
 }

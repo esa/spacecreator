@@ -230,7 +230,7 @@ void MSCEditorCore::initHierarchyViewActions()
         m_hierarchyActions.clear();
     }
 
-    auto addAction = [&](msc::MscDocument::HierarchyType type, const QString &title, const QPixmap &icon) {
+    auto addAction = [&](msc::MscDocument::HierarchyType type, const QString &title, const QIcon &icon) {
         QAction *action = new QAction(title, this);
         action->setProperty(HIERARCHY_TYPE_TAG, type);
         action->setIcon(icon);
@@ -249,14 +249,13 @@ void MSCEditorCore::initHierarchyViewActions()
         });
     };
 
-    addAction(msc::MscDocument::HierarchyAnd, tr("Hierarchy And"), QPixmap(":/icons/document_and.png"));
-    addAction(msc::MscDocument::HierarchyOr, tr("Hierarchy Or"), QPixmap(":/icons/document_or.png"));
-    addAction(msc::MscDocument::HierarchyParallel, tr("Hierarchy Parallel"), QPixmap(":/icons/document_parallel.png"));
-    addAction(msc::MscDocument::HierarchyIs, tr("Hierarchy Is"), QPixmap(":/icons/document_is_scenario.png"));
-    addAction(msc::MscDocument::HierarchyRepeat, tr("Hierarchy Repeat"), QPixmap(":/icons/document_repeat.png"));
-    addAction(
-            msc::MscDocument::HierarchyException, tr("Hierarchy Exception"), QPixmap(":/icons/document_exception.png"));
-    addAction(msc::MscDocument::HierarchyLeaf, tr("Hierarchy Leaf"), QPixmap(":/icons/document_leaf.png"));
+    addAction(msc::MscDocument::HierarchyAnd, tr("Hierarchy And"), QIcon(":/icons/document_and.png"));
+    addAction(msc::MscDocument::HierarchyOr, tr("Hierarchy Or"), QIcon(":/icons/document_or.png"));
+    addAction(msc::MscDocument::HierarchyParallel, tr("Hierarchy Parallel"), QIcon(":/icons/document_parallel.png"));
+    addAction(msc::MscDocument::HierarchyIs, tr("Hierarchy Is"), QIcon(":/icons/document_is_scenario.png"));
+    addAction(msc::MscDocument::HierarchyRepeat, tr("Hierarchy Repeat"), QIcon(":/icons/document_repeat.png"));
+    addAction(msc::MscDocument::HierarchyException, tr("Hierarchy Exception"), QIcon(":/icons/document_exception.png"));
+    addAction(msc::MscDocument::HierarchyLeaf, tr("Hierarchy Leaf"), QIcon(":/icons/document_leaf.png"));
 }
 
 void MSCEditorCore::initConnections()

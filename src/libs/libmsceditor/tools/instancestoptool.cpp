@@ -36,7 +36,7 @@ InstanceStopTool::InstanceStopTool(ChartLayoutManager *chartLayoutManager, QGrap
 {
     m_title = tr("Instance");
     m_description = tr("Stop Instance item");
-    m_icon = QPixmap(":/icons/toolbar/instance_stop.svg");
+    m_icon = QIcon(":/icons/toolbar/instance_stop.svg");
 
     if (m_view) {
         connect(m_view->scene(), &QGraphicsScene::selectionChanged, this, &InstanceStopTool::updateEnabledState);

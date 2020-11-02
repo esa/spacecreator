@@ -17,6 +17,7 @@
 
 #include "mscmainwidget.h"
 
+#include "actionsbar.h"
 #include "asn1fileview.h"
 #include "chartlayoutmanager.h"
 #include "commands/cmdsetasn1file.h"
@@ -163,14 +164,6 @@ QAction *MscMainWidget::actionToolDelete() const
     return m_plugin->deleteTool()->action();
 }
 
-QVector<QAction *> MscMainWidget::toolActions() const
-{
-    if (m_plugin.isNull()) {
-        return {};
-    }
-    return m_plugin->chartActions();
-}
-
 QSharedPointer<msc::MSCEditorCore> MscMainWidget::mscCore() const
 {
     Q_ASSERT(!m_plugin.isNull());
@@ -242,12 +235,33 @@ void MscMainWidget::showAsn1Errors(const QStringList &faultyMessages)
             this, tr("ASN1 error"), tr("Following messgages have ASN.1 errors:") + "\n" + faultyMessages.join("\n"));
 }
 
+/*!
+   Thw the chart of document tool bar depending of the view mode
+ */
+void MscMainWidget::onViewModeChanged()
+{
+    m_chartToolBar->setVisible(m_plugin->viewMode() == msc::MSCEditorCore::ViewMode::CHART);
+    m_documentToolBar->setVisible(m_plugin->viewMode() == msc::MSCEditorCore::ViewMode::HIERARCHY);
+}
+
 void MscMainWidget::init()
 {
     if (m_documentTree || m_plugin.isNull()) {
         // initialized already
         return;
     }
+
+    auto viewLayout = new QHBoxLayout(this);
+    viewLayout->setMargin(0);
+    viewLayout->setSpacing(0);
+    this->setLayout(viewLayout);
+
+    m_chartToolBar = new shared::ActionsBar(this);
+    viewLayout->addWidget(m_chartToolBar);
+    m_documentToolBar = new shared::ActionsBar(this);
+    viewLayout->addWidget(m_documentToolBar);
+    connect(m_plugin.data(), &msc::MSCEditorCore::viewModeChanged, this, &spctr::MscMainWidget::onViewModeChanged);
+    onViewModeChanged();
 
     auto centerView = new QStackedWidget(this);
     auto graphicsView = new msc::GraphicsView(this);
@@ -291,6 +305,13 @@ void MscMainWidget::init()
     m_plugin->initConnections();
     m_plugin->setupMiniMap();
     m_plugin->showDocumentView(true);
+
+    for (QAction *chartAction : m_plugin->chartActions()) {
+        m_chartToolBar->addAction(chartAction);
+    }
+    for (QAction *documentAction : m_plugin->hierarchyActions()) {
+        m_documentToolBar->addAction(documentAction);
+    }
 }
 
 void MscMainWidget::initConnections()

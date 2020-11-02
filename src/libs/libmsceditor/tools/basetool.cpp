@@ -43,7 +43,7 @@ bool BaseTool::isActive() const
     return m_active;
 }
 
-QPixmap BaseTool::icon() const
+QIcon BaseTool::icon() const
 {
     return m_icon;
 }

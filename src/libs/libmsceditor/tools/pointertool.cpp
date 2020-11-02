@@ -26,7 +26,7 @@ PointerTool::PointerTool(QGraphicsView *view, QObject *parent)
 {
     m_title = tr("Pointer");
     m_description = tr("Select/move/resize items");
-    m_icon = QPixmap(":/icons/toolbar/pointer.png");
+    m_icon = QIcon(":/icons/toolbar/pointer.png");
 }
 
 BaseTool::ToolType PointerTool::toolType() const

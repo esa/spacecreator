@@ -245,10 +245,6 @@ void AadlEditorData::updateToolBar()
         m_widgetToolBar->clear();
         m_widgetToolBar->addAction(m_undoAction);
         m_widgetToolBar->addAction(m_redoAction);
-        m_widgetToolBar->addSeparator();
-        for (QAction *action : designWidget->toolActions()) {
-            m_widgetToolBar->addAction(action);
-        }
     }
 }
 

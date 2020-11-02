@@ -31,7 +31,7 @@ CoregionCreatorTool::CoregionCreatorTool(ChartLayoutManager *model, QGraphicsVie
     : BaseCreatorTool(model, view, parent)
 {
     m_title = tr("Coregion");
-    m_icon = QPixmap(":/icons/toolbar/coregion.svg");
+    m_icon = QIcon(":/icons/toolbar/coregion.svg");
     m_description = tr("Create new Coregion");
 }
 

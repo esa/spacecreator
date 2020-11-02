@@ -39,15 +39,15 @@ TimerCreatorTool::TimerCreatorTool(
 
     switch (m_timerType) {
     case MscTimer::TimerType::Start:
-        m_icon = QPixmap(":/icons/toolbar/starttimer.svg");
+        m_icon = QIcon(":/icons/toolbar/starttimer.svg");
         m_description = tr("Create new start timer item");
         break;
     case MscTimer::TimerType::Stop:
-        m_icon = QPixmap(":/icons/toolbar/stoptimer.svg");
+        m_icon = QIcon(":/icons/toolbar/stoptimer.svg");
         m_description = tr("Create new stop/reset timer item");
         break;
     case MscTimer::TimerType::Timeout:
-        m_icon = QPixmap(":/icons/toolbar/timeouttimer.svg");
+        m_icon = QIcon(":/icons/toolbar/timeouttimer.svg");
         m_description = tr("Create new timeout item");
         break;
     default:

@@ -39,6 +39,10 @@ class GraphicsView;
 class MSCEditorCore;
 }
 
+namespace shared {
+class ActionsBar;
+}
+
 namespace spctr {
 class MscModelStorage;
 
@@ -63,7 +67,6 @@ public:
     QAction *actionCopy() const;
     QAction *actionPaste() const;
     QAction *actionToolDelete() const;
-    QVector<QAction *> toolActions() const;
 
     QSharedPointer<msc::MSCEditorCore> mscCore() const;
 
@@ -76,11 +79,14 @@ private Q_SLOTS:
     void showChart(const QModelIndex &index);
     void showSelection(const QModelIndex &current, const QModelIndex &previous);
     void showAsn1Errors(const QStringList &faultyMessages);
+    void onViewModeChanged();
 
 private:
     void init();
     void initConnections();
 
+    shared::ActionsBar *m_chartToolBar = nullptr;
+    shared::ActionsBar *m_documentToolBar = nullptr;
     QWidget *m_leftArea = nullptr;
     QSplitter *m_horizontalSplitter = nullptr;
     QVBoxLayout *m_leftVerticalLayout = nullptr;

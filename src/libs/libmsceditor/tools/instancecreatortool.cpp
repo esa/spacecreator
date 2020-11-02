@@ -31,7 +31,7 @@ InstanceCreatorTool::InstanceCreatorTool(ChartLayoutManager *model, QGraphicsVie
 {
     m_title = tr("Instance");
     m_description = tr("Create new Instance item");
-    m_icon = QPixmap(":/icons/toolbar/instance.png");
+    m_icon = QIcon(":/icons/toolbar/instance.png");
 }
 
 void InstanceCreatorTool::setAction(QAction *action)

@@ -35,11 +35,11 @@ ConditionCreatorTool::ConditionCreatorTool(bool shared, ChartLayoutManager *mode
     if (shared) {
         m_title = tr("Shared Condition");
         m_description = tr("Create new shared Condition item");
-        m_icon = QPixmap(":/icons/toolbar/condition_shared.svg");
+        m_icon = QIcon(":/icons/toolbar/condition_shared.svg");
     } else {
         m_title = tr("Condition");
         m_description = tr("Create new Condition item");
-        m_icon = QPixmap(":/icons/toolbar/condition.svg");
+        m_icon = QIcon(":/icons/toolbar/condition.svg");
     }
 }
 BaseTool::ToolType ConditionCreatorTool::toolType() const

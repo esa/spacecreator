@@ -214,14 +214,6 @@ void MscEditorData::updateToolBar()
         m_widgetToolBar->addAction(designWidget->actionCopy());
         m_widgetToolBar->addAction(designWidget->actionPaste());
         // m_widgetToolBar->addAction(designWidget->actionScreenshot());
-        m_widgetToolBar->addSeparator();
-        for (QAction *action : designWidget->toolActions()) {
-            m_widgetToolBar->addAction(action);
-        }
-        m_widgetToolBar->addSeparator();
-        for (QAction *action : designWidget->mscCore()->hierarchyActions()) {
-            m_widgetToolBar->addAction(action);
-        }
 
         designWidget->mscCore()->showToolbars(false);
     }
