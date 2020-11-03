@@ -37,7 +37,8 @@ public:
     explicit GraphicsView(QWidget *parent = nullptr);
 
 Q_SIGNALS:
-    void entityDropped(const shared::Id &id, const QPointF &scenePos);
+    void importEntity(const shared::Id &id, const QPointF &scenePos);
+    void instantiateEntity(const shared::Id &id, const QPointF &scenePos);
 
 protected:
     QList<QPair<QPointF, QString>> mouseMoveCoordinates(

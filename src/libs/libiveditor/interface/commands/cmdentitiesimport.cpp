@@ -17,6 +17,7 @@
 
 #include "cmdentitiesimport.h"
 
+#include "aadlobjectfunctiontype.h"
 #include "aadlobjectsmodel.h"
 #include "aadlxmlreader.h"
 #include "baseitems/common/aadlutils.h"
@@ -30,9 +31,11 @@
 namespace aadlinterface {
 namespace cmd {
 
-CmdEntitiesImport::CmdEntitiesImport(aadl::AADLObject *entity, aadl::AADLObjectsModel *model, const QPointF &pos)
+CmdEntitiesImport::CmdEntitiesImport(aadl::AADLObject *entity, aadl::AADLObjectFunctionType *parent,
+        aadl::AADLObjectsModel *model, const QPointF &pos)
     : QUndoCommand()
     , m_model(model)
+    , m_parent(parent)
 
 {
     QBuffer buffer;
@@ -49,7 +52,7 @@ CmdEntitiesImport::CmdEntitiesImport(aadl::AADLObject *entity, aadl::AADLObjects
 
     aadl::AADLXMLReader parser;
     QObject::connect(&parser, &aadl::AADLXMLReader::objectsParsed, m_model,
-            [this, pos](const QVector<aadl::AADLObject *> &objects) {
+            [this, pos, parent](const QVector<aadl::AADLObject *> &objects) {
                 static const QPointF outOfScene { std::numeric_limits<qreal>::max(),
                     std::numeric_limits<qreal>::max() };
                 QPointF basePoint { outOfScene };
@@ -64,6 +67,7 @@ CmdEntitiesImport::CmdEntitiesImport(aadl::AADLObject *entity, aadl::AADLObjects
                         if (point.y() < basePoint.y())
                             basePoint.setY(point.y());
                     });
+                    m_rootEntities.append(obj);
                 }
                 const QPointF offset = basePoint == outOfScene ? QPointF() : pos - basePoint;
                 for (auto obj : objects) {
@@ -89,7 +93,7 @@ CmdEntitiesImport::CmdEntitiesImport(aadl::AADLObject *entity, aadl::AADLObjects
 
 CmdEntitiesImport::~CmdEntitiesImport()
 {
-    const QVector<QPointer<aadl::AADLObject>> &objects = m_importedEntities;
+    const QVector<QPointer<aadl::AADLObject>> &objects = m_rootEntities;
     for (aadl::AADLObject *obj : objects)
         if (obj && !obj->parent())
             delete obj;
@@ -102,6 +106,11 @@ void CmdEntitiesImport::redo()
     }
 
     QVector<aadl::AADLObject *> entities;
+    if (m_parent) {
+        for (auto entity : m_rootEntities) {
+            m_parent->addChild(entity);
+        }
+    }
     for (auto entity : m_importedEntities) {
         Q_ASSERT(entity);
         if (entity) {
@@ -115,6 +124,13 @@ void CmdEntitiesImport::undo()
 {
     for (auto it = m_importedEntities.crbegin(); it != m_importedEntities.crend(); ++it) {
         m_model->removeObject(*it);
+    }
+    for (auto it = m_rootEntities.crbegin(); it != m_rootEntities.crend(); ++it) {
+        if (m_parent) {
+            m_parent->removeChild(*it);
+        } else {
+            (*it)->setParentObject(nullptr);
+        }
     }
 }
 

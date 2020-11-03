@@ -23,19 +23,21 @@
 
 namespace aadl {
 class AADLObject;
+class AADLObjectFunction;
 class AADLObjectFunctionType;
 class AADLObjectsModel;
 }
 
 namespace aadlinterface {
 namespace cmd {
+class CmdEntityAttributeChange;
 
-class CmdEntitiesImport : public QUndoCommand
+class CmdEntitiesInstantiate : public QUndoCommand
 {
 public:
-    explicit CmdEntitiesImport(aadl::AADLObject *entity, aadl::AADLObjectFunctionType *parent,
+    explicit CmdEntitiesInstantiate(aadl::AADLObjectFunctionType *entity, aadl::AADLObjectFunctionType *parent,
             aadl::AADLObjectsModel *model, const QPointF &pos);
-    ~CmdEntitiesImport() override;
+    ~CmdEntitiesInstantiate() override;
 
     void redo() override;
     void undo() override;
@@ -43,10 +45,10 @@ public:
     int id() const override;
 
 private:
-    QPointer<aadl::AADLObjectsModel> m_model;
     QPointer<aadl::AADLObjectFunctionType> m_parent;
-    QVector<QPointer<aadl::AADLObject>> m_rootEntities;
-    QVector<QPointer<aadl::AADLObject>> m_importedEntities;
+    QPointer<aadl::AADLObjectsModel> m_model;
+    QPointer<aadl::AADLObjectFunction> m_instantiatedEntity;
+    CmdEntityAttributeChange *m_subCmd { nullptr };
 };
 
 } // namespace aadlinterface

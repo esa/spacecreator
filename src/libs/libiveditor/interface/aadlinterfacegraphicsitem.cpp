@@ -121,7 +121,8 @@ void AADLInterfaceGraphicsItem::setInterfaceName(const QString &name)
 QPointF AADLInterfaceGraphicsItem::connectionEndPoint(const bool nestedConnection) const
 {
     const qreal borderWidth = m_iface->pen().widthF() + 1;
-    const QRectF ifaceRect = m_iface->sceneBoundingRect().adjusted(borderWidth / 2, borderWidth / 2, -borderWidth / 2, -borderWidth / 2);
+    const QRectF ifaceRect =
+            m_iface->sceneBoundingRect().adjusted(borderWidth / 2, borderWidth / 2, -borderWidth / 2, -borderWidth / 2);
     if (!ifaceRect.isValid()) {
         return {};
     }
@@ -196,15 +197,14 @@ void AADLInterfaceGraphicsItem::rebuildLayout()
     }
 
     const QPointF ifacePos = pos();
+    const QRectF parentRect = parentItem()->boundingRect();
+    const Qt::Alignment alignment = getNearestSide(parentRect, ifacePos);
+    updateInternalItems(alignment);
     if (entity() && aadlinterface::pos(entity()->coordinates()).isNull()) {
         layout();
         return;
     }
 
-    const QRectF parentRect = parentItem()->boundingRect();
-    const Qt::Alignment alignment = getNearestSide(parentRect, ifacePos);
-
-    updateInternalItems(alignment);
     const QPointF stickyPos = getSidePosition(parentRect, ifacePos, alignment);
     setPos(stickyPos);
 }
@@ -292,6 +292,7 @@ void AADLInterfaceGraphicsItem::layout()
             }
         }
     } else {
+        adjustItem();
         /// NOTE: iface items without connections are put close to top left corner
         /// because of null pos
     }

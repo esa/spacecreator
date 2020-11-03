@@ -76,7 +76,8 @@ void EditorCore::initMenus(QMainWindow *window)
     menu->addAction(actionOpenAadl());
     menu->addSeparator();
     menu->addAction(actionImport());
-    menu->addAction(actionExport());
+    menu->addAction(actionExportFunctions());
+    menu->addAction(actionExportType());
     menu->addSeparator();
     addMenuFileActions(menu, window);
     menu->addSeparator();
@@ -165,12 +166,20 @@ QAction *EditorCore::actionImport()
     return m_actionImport;
 }
 
-QAction *EditorCore::actionExport()
+QAction *EditorCore::actionExportFunctions()
 {
-    if (m_actionExport == nullptr) {
-        m_actionExport = new QAction(tr("Export selected"), this);
+    if (m_actionExportFunctions == nullptr) {
+        m_actionExportFunctions = new QAction(tr("Export selected entity"), this);
     }
-    return m_actionExport;
+    return m_actionExportFunctions;
+}
+
+QAction *EditorCore::actionExportType()
+{
+    if (m_actionExportType == nullptr) {
+        m_actionExportType = new QAction(tr("Export component type"), this);
+    }
+    return m_actionExportType;
 }
 
 QAction *EditorCore::actionQuit()

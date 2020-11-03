@@ -30,6 +30,7 @@
 namespace aadl {
 
 struct AADLObjectsModelPrivate {
+    AADLObjectsModel *m_sharedTypesModel;
     shared::Id m_rootObjectId;
     QList<shared::Id> m_objectsOrder;
     QHash<shared::Id, AADLObject *> m_objects;
@@ -45,6 +46,11 @@ AADLObjectsModel::AADLObjectsModel(QObject *parent)
 }
 
 AADLObjectsModel::~AADLObjectsModel() { }
+
+void AADLObjectsModel::setSharedTypesModel(AADLObjectsModel *sharedTypesModel)
+{
+    d->m_sharedTypesModel = sharedTypesModel;
+}
 
 bool AADLObjectsModel::initFromObjects(const QVector<AADLObject *> &objects)
 {
@@ -251,11 +257,24 @@ QHash<QString, AADLObjectFunctionType *> AADLObjectsModel::getAvailableFunctionT
         return false;
     };
 
-    for (AADLObject *obj : d->m_objects)
-        if (obj->isFunctionType())
-            if (AADLObjectFunctionType *objFnType = qobject_cast<AADLObjectFunctionType *>(obj))
-                if (isValid(objFnType, fnObj))
+    for (AADLObject *obj : d->m_objects) {
+        if (obj->isFunctionType()) {
+            if (AADLObjectFunctionType *objFnType = qobject_cast<AADLObjectFunctionType *>(obj)) {
+                if (isValid(objFnType, fnObj)) {
                     result.insert(objFnType->title(), objFnType);
+                }
+            }
+        }
+    }
+
+    const auto sharedObjects = d->m_sharedTypesModel->objects();
+    for (auto sharedObject : sharedObjects) {
+        if (sharedObject->isFunctionType() && sharedObject->parentObject() == nullptr) {
+            if (auto fnType = sharedObject->as<AADLObjectFunctionType *>()) {
+                result[fnType->title()] = fnType;
+            }
+        }
+    }
 
     return result;
 }

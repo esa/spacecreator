@@ -73,6 +73,7 @@ AADLObjectIface::CreationInfo AADLObjectIface::CreationInfo::cloneIface(AADLObje
 {
     AADLObjectIface::CreationInfo info = initFromIface(iface, AADLObjectIface::CreationInfo::Policy::Clone);
     info.function = fn;
+    info.model = fn->objectsModel();
     return info;
 }
 

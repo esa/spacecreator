@@ -17,6 +17,7 @@
 
 #include "interfacedocument.h"
 
+#include "aadlfunctiongraphicsitem.h"
 #include "aadlitemmodel.h"
 #include "aadlobjectcomment.h"
 #include "aadlobjectconnection.h"
@@ -33,6 +34,7 @@
 #include "context/action/actionsmanager.h"
 #include "context/action/editor/dynactioneditor.h"
 #include "creatortool.h"
+#include "graphicsitemhelpers.h"
 #include "interface/aadlobjectstreeview.h"
 #include "interface/colors/colormanagerdialog.h"
 #include "interface/properties/dynamicpropertymanager.h"
@@ -100,6 +102,8 @@ struct InterfaceDocument::InterfaceDocumentPrivate {
     aadl::AADLObjectsModel *objectsModel { nullptr };
     AADLObjectsTreeView *importView { nullptr };
     aadl::AADLObjectsModel *importModel { nullptr };
+    AADLObjectsTreeView *sharedView { nullptr };
+    aadl::AADLObjectsModel *sharedModel { nullptr };
 
     QAction *actCreateConnectionGroup { nullptr };
     QAction *actRemove { nullptr };
@@ -128,9 +132,10 @@ InterfaceDocument::InterfaceDocument(QObject *parent)
     d->commandsStack = new QUndoStack(this);
     connect(d->commandsStack, &QUndoStack::cleanChanged, this, [this](bool clean) { Q_EMIT dirtyChanged(!clean); });
 
-    d->objectsModel = new aadl::AADLObjectsModel(this);
-
     d->importModel = new aadl::AADLObjectsModel(this);
+    d->sharedModel = new aadl::AADLObjectsModel(this);
+    d->objectsModel = new aadl::AADLObjectsModel(this);
+    d->objectsModel->setSharedTypesModel(d->sharedModel);
 }
 
 InterfaceDocument::~InterfaceDocument()
@@ -159,6 +164,7 @@ void InterfaceDocument::init()
     panelSplitter->setHandleWidth(1);
     panelSplitter->addWidget(createModelView());
     panelSplitter->addWidget(createImportView());
+    panelSplitter->addWidget(createSharedView());
     panelLayout->addWidget(panelSplitter);
 
     d->view = new QWidget;
@@ -243,10 +249,17 @@ bool InterfaceDocument::load(const QString &path)
 bool InterfaceDocument::loadAvailableComponents()
 {
     d->importModel->clear();
-    QDirIterator it(componentsLibraryPath());
-    while (it.hasNext()) {
-        importImpl(it.next() + QDir::separator() + kDefaultFilename);
+    QDirIterator importableIt(componentsLibraryPath());
+    while (importableIt.hasNext()) {
+        loadComponentModel(d->importModel, importableIt.next() + QDir::separator() + kDefaultFilename);
     }
+
+    d->sharedModel->clear();
+    QDirIterator instantiatableIt(sharedTypesPath());
+    while (instantiatableIt.hasNext()) {
+        loadComponentModel(d->sharedModel, instantiatableIt.next() + QDir::separator() + kDefaultFilename);
+    }
+
     return true;
 }
 
@@ -301,53 +314,40 @@ QList<aadl::AADLObject *> InterfaceDocument::prepareSelectedObjectsForExport(QSt
     return objects;
 }
 
-bool InterfaceDocument::exportSelected()
+bool InterfaceDocument::exportSelectedFunctions()
 {
     QString name;
     const QList<aadl::AADLObject *> objects = prepareSelectedObjectsForExport(name);
-    const QString targetDir = componentsLibraryPath();
-
-    const bool ok = shared::ensureDirExists(targetDir);
-    if (!ok) {
-        qWarning() << "Unable to create directory" << targetDir;
-        return {};
-    }
-
-    const QString exportFilePath = QString("%1/%2").arg(targetDir, kDefaultFilename);
-
-    const QFileInfo fi(exportFilePath);
-    if (fi.exists()) {
-        qWarning() << "Current object already exported: " << exportFilePath;
-        return false;
-    }
-
-    QBuffer buffer;
-    if (!buffer.open(QIODevice::WriteOnly)) {
-        qWarning() << "Can't open buffer for exporting:" << buffer.errorString();
-        return false;
-    }
-    if (!XmlDocExporter::exportObjects(objects, &buffer)) {
-        qWarning() << "Error during component export";
-        return false;
-    }
-    buffer.close();
-
-    QFile file(fi.absoluteFilePath());
-    if (!file.open(QIODevice::WriteOnly)) {
-        qWarning() << "Can't export file: " << file.errorString();
-        return false;
-    }
-    file.write(buffer.buffer());
-    file.close();
-    if (QFile::copy(asn1FilePath(), targetDir + QDir::separator() + asn1FileName())) {
-        qWarning() << "Error during ASN.1 file copying:" << asn1FilePath();
-    }
-
     d->itemsModel->selectionModel()->clearSelection();
-    return true;
+    return exportImpl(componentsLibraryPath() + QDir::separator() + name, objects);
 }
 
-bool InterfaceDocument::importImpl(const QString &path)
+bool InterfaceDocument::exportSelectedType()
+{
+    const auto indexes = d->itemsModel->selectionModel()->selection().indexes();
+    if (indexes.isEmpty()) {
+        return false;
+    }
+    static const int role = static_cast<int>(aadl::AADLObjectsModel::AADLRoles::IdRole);
+    aadl::AADLObject *rootType = nullptr;
+    for (const auto index : indexes) {
+        if (aadl::AADLObject *object = d->objectsModel->getObject(index.data(role).toUuid())) {
+            if (object->isFunctionType() && object->parentObject() == nullptr) {
+                if (rootType) {
+                    return false;
+                }
+                rootType = object;
+            }
+        }
+    }
+    if (!rootType) {
+        return false;
+    }
+    d->itemsModel->selectionModel()->clearSelection();
+    return exportImpl(sharedTypesPath() + QDir::separator() + rootType->title(), { rootType });
+}
+
+bool InterfaceDocument::loadComponentModel(aadl::AADLObjectsModel *model, const QString &path)
 {
     if (path.isEmpty() || !QFileInfo::exists(path)) {
         qWarning() << Q_FUNC_INFO << "Invalid path";
@@ -355,7 +355,7 @@ bool InterfaceDocument::importImpl(const QString &path)
     }
 
     aadl::AADLXMLReader parser;
-    connect(&parser, &aadl::AADLXMLReader::objectsParsed, d->importModel, &aadl::AADLObjectsModel::addObjects);
+    connect(&parser, &aadl::AADLXMLReader::objectsParsed, model, &aadl::AADLObjectsModel::addObjects);
     connect(&parser, &aadl::AADLXMLReader::error, [](const QString &msg) { qWarning() << msg; });
 
     return parser.readFile(path);
@@ -584,11 +584,33 @@ void InterfaceDocument::importEntity(const shared::Id &id, const QPointF &sceneD
     if (d->objectsModel->getObjectByName(obj->title())) {
         return;
     }
-
-    const QVariantList params = { QVariant::fromValue(obj), QVariant::fromValue(d->itemsModel),
-        QVariant::fromValue(sceneDropPoint) };
+    QGraphicsItem *itemAtScenePos = scene()->itemAt(sceneDropPoint, graphicsView()->transform());
+    while (itemAtScenePos && itemAtScenePos->type() != AADLFunctionGraphicsItem::Type) {
+        itemAtScenePos = itemAtScenePos->parentItem();
+    }
+    aadl::AADLObjectFunctionType *parentObject = gi::functionObject(itemAtScenePos);
+    const QVariantList params = { QVariant::fromValue(obj), QVariant::fromValue(parentObject),
+        QVariant::fromValue(d->objectsModel), QVariant::fromValue(sceneDropPoint) };
     if (QUndoCommand *cmdImport = cmd::CommandsFactory::create(cmd::ImportEntities, params)) {
         cmd::CommandsStack::current()->push(cmdImport);
+    }
+}
+
+void InterfaceDocument::instantiateEntity(const shared::Id &id, const QPointF &sceneDropPoint)
+{
+    const auto obj = d->sharedModel->getObject(id);
+    if (!obj || obj->aadlType() != aadl::AADLObject::Type::FunctionType) {
+        return;
+    }
+    QGraphicsItem *itemAtScenePos = scene()->itemAt(sceneDropPoint, graphicsView()->transform());
+    while (itemAtScenePos && itemAtScenePos->type() != AADLFunctionGraphicsItem::Type) {
+        itemAtScenePos = itemAtScenePos->parentItem();
+    }
+    aadl::AADLObjectFunctionType *parentObject = gi::functionObject(itemAtScenePos);
+    const QVariantList params = { QVariant::fromValue(obj->as<aadl::AADLObjectFunctionType *>()),
+        QVariant::fromValue(parentObject), QVariant::fromValue(d->objectsModel), QVariant::fromValue(sceneDropPoint) };
+    if (QUndoCommand *cmdInstantiate = cmd::CommandsFactory::create(cmd::InstantiateEntities, params)) {
+        cmd::CommandsStack::current()->push(cmdInstantiate);
     }
 }
 
@@ -598,6 +620,46 @@ void InterfaceDocument::setPath(const QString &path)
         d->filePath = path;
         Q_EMIT titleChanged();
     }
+}
+
+bool InterfaceDocument::exportImpl(const QString &targetDir, const QList<aadl::AADLObject *> &objects)
+{
+    const bool ok = shared::ensureDirExists(targetDir);
+    if (!ok) {
+        qWarning() << "Unable to create directory" << targetDir;
+        return {};
+    }
+
+    const QString exportFilePath = QString("%1/%2").arg(targetDir, kDefaultFilename);
+
+    const QFileInfo fi(exportFilePath);
+    if (fi.exists()) {
+        qWarning() << "Current object already exported: " << exportFilePath;
+        return false;
+    }
+
+    QBuffer buffer;
+    if (!buffer.open(QIODevice::WriteOnly)) {
+        qWarning() << "Can't open buffer for exporting:" << buffer.errorString();
+        return false;
+    }
+    if (!XmlDocExporter::exportObjects(objects, &buffer)) {
+        qWarning() << "Error during component export";
+        return false;
+    }
+    buffer.close();
+
+    QFile file(fi.absoluteFilePath());
+    if (!file.open(QIODevice::WriteOnly)) {
+        qWarning() << "Can't export file: " << file.errorString();
+        return false;
+    }
+    file.write(buffer.buffer());
+    file.close();
+    if (QFile::copy(asn1FilePath(), targetDir + QDir::separator() + asn1FileName())) {
+        qWarning() << "Error during ASN.1 file copying:" << asn1FilePath();
+    }
+    return true;
 }
 
 bool InterfaceDocument::loadImpl(const QString &path)
@@ -772,7 +834,8 @@ QWidget *InterfaceDocument::createGraphicsView()
             d->actZoomOut->setEnabled(!qFuzzyCompare(percent, d->graphicsView->minZoomPercent()));
         });
 
-        connect(d->graphicsView, &GraphicsView::entityDropped, this, &InterfaceDocument::importEntity);
+        connect(d->graphicsView, &GraphicsView::importEntity, this, &InterfaceDocument::importEntity);
+        connect(d->graphicsView, &GraphicsView::instantiateEntity, this, &InterfaceDocument::instantiateEntity);
     }
     d->graphicsView->setScene(d->itemsModel->scene());
     d->graphicsView->setUpdatesEnabled(false);
@@ -802,7 +865,7 @@ QTreeView *InterfaceDocument::createImportView()
     if (d->importView)
         return d->importView;
 
-    d->importView = new AADLObjectsTreeView;
+    d->importView = new AADLObjectsTreeView(shared::DropType::ImportableType);
     d->importView->setObjectName(QLatin1String("ImportView"));
     d->importView->setSelectionBehavior(QAbstractItemView::SelectionBehavior::SelectItems);
     d->importView->setSelectionMode(QAbstractItemView::SelectionMode::SingleSelection);
@@ -810,6 +873,21 @@ QTreeView *InterfaceDocument::createImportView()
     d->importModel->setHeaderData(0, Qt::Horizontal, tr("Import Component"), Qt::DisplayRole);
 
     return d->importView;
+}
+
+QTreeView *InterfaceDocument::createSharedView()
+{
+    if (d->sharedView)
+        return d->sharedView;
+
+    d->sharedView = new AADLObjectsTreeView(shared::DropType::InstantiatableType);
+    d->sharedView->setObjectName(QLatin1String("SharedView"));
+    d->sharedView->setSelectionBehavior(QAbstractItemView::SelectionBehavior::SelectItems);
+    d->sharedView->setSelectionMode(QAbstractItemView::SelectionMode::SingleSelection);
+    d->sharedView->setModel(d->sharedModel);
+    d->sharedModel->setHeaderData(0, Qt::Horizontal, tr("Shared Types"), Qt::DisplayRole);
+
+    return d->sharedView;
 }
 
 void InterfaceDocument::showNIYGUI(const QString &title)

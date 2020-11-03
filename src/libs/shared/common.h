@@ -23,6 +23,12 @@
 
 namespace shared {
 
+enum class DropType
+{
+    InstantiatableType,
+    ImportableType
+};
+
 typedef QUuid Id;
 
 static const Id InvalidId = Id();

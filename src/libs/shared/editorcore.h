@@ -65,7 +65,8 @@ public:
     QAction *actionSaveFileAs();
     QAction *actionOpenAadl();
     QAction *actionImport();
-    QAction *actionExport();
+    QAction *actionExportFunctions();
+    QAction *actionExportType();
     QAction *actionQuit();
     QAction *actionUndo();
     QAction *actionRedo();
@@ -105,7 +106,8 @@ private:
     QAction *m_actionCloseFile { nullptr };
     QAction *m_actionOpenAadl { nullptr };
     QAction *m_actionImport { nullptr };
-    QAction *m_actionExport { nullptr };
+    QAction *m_actionExportFunctions { nullptr };
+    QAction *m_actionExportType { nullptr };
     QAction *m_actionQuit { nullptr };
     QAction *m_actionUndo { nullptr };
     QAction *m_actionRedo { nullptr };

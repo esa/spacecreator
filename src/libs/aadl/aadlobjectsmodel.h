@@ -45,6 +45,8 @@ public:
     explicit AADLObjectsModel(QObject *parent = nullptr);
     ~AADLObjectsModel() override;
 
+    void setSharedTypesModel(AADLObjectsModel *sharedTypesModel);
+
     bool addObject(AADLObject *obj);
     bool removeObject(AADLObject *obj);
 

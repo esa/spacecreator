@@ -27,8 +27,9 @@
 
 namespace aadlinterface {
 
-AADLObjectsTreeView::AADLObjectsTreeView(QWidget *parent)
+AADLObjectsTreeView::AADLObjectsTreeView(shared::DropType componentType, QWidget *parent)
     : QTreeView(parent)
+    , m_componentType(componentType)
 {
     setDragEnabled(true);
     setDragDropMode(QAbstractItemView::DragOnly);
@@ -56,8 +57,21 @@ void AADLObjectsTreeView::mouseMoveEvent(QMouseEvent *event)
             const shared::Id id = index.data(static_cast<int>(aadl::AADLObjectsModel::AADLRoles::IdRole)).toUuid();
             mimeData->setText(id.toString());
             drag->setMimeData(mimeData);
-            drag->setPixmap({});
-            Qt::DropAction dropAction = drag->exec(Qt::CopyAction | Qt::MoveAction);
+            QPixmap pix;
+            Qt::DropAction dropAction;
+            if (m_componentType == shared::DropType::ImportableType) {
+                static QPixmap icon =
+                        QIcon(QLatin1String(":/tab_interface/toolbar/icns/function.svg")).pixmap(128, 128);
+                pix = icon;
+                dropAction = Qt::CopyAction;
+            } else if (m_componentType == shared::DropType::InstantiatableType) {
+                static QPixmap icon =
+                        QIcon(QLatin1String(":/tab_interface/toolbar/icns/function_type.svg")).pixmap(128, 128);
+                pix = icon;
+                dropAction = Qt::LinkAction;
+            }
+            drag->setPixmap(pix);
+            drag->exec(dropAction);
             return;
         }
     }

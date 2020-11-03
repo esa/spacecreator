@@ -79,7 +79,8 @@ MainWindow::MainWindow(aadlinterface::IVEditorCore *core, QWidget *parent)
     connect(m_core->actionSaveFileAs(), &QAction::triggered, this, [=]() { exportXmlAs(); });
     connect(m_core->actionQuit(), &QAction::triggered, this, &MainWindow::onQuitRequested);
     connect(m_core->actionImport(), &QAction::triggered, this, &MainWindow::onImportRequested);
-    connect(m_core->actionExport(), &QAction::triggered, this, &MainWindow::onExportRequested);
+    connect(m_core->actionExportFunctions(), &QAction::triggered, this, &MainWindow::onExportFunctionsRequested);
+    connect(m_core->actionExportType(), &QAction::triggered, this, &MainWindow::onExportTypeRequested);
 
     // Register the actions to the action manager
     ActionsManager::registerAction(Q_FUNC_INFO, m_core->actionNewFile(), "Create file", "Create new empty file");
@@ -88,7 +89,10 @@ MainWindow::MainWindow(aadlinterface::IVEditorCore *core, QWidget *parent)
     ActionsManager::registerAction(Q_FUNC_INFO, m_core->actionUndo(), "Undo", "Undo the last operation");
     ActionsManager::registerAction(Q_FUNC_INFO, m_core->actionRedo(), "Redo", "Redo the last undone operation");
     ActionsManager::registerAction(Q_FUNC_INFO, m_core->actionImport(), "Import", "Import all available AADL files");
-    ActionsManager::registerAction(Q_FUNC_INFO, m_core->actionExport(), "Export", "Export selected objects");
+    ActionsManager::registerAction(
+            Q_FUNC_INFO, m_core->actionExportFunctions(), "Export Functions", "Export selected objects");
+    ActionsManager::registerAction(
+            Q_FUNC_INFO, m_core->actionExportType(), "Export Type", "Export selected component type");
 
     connect(m_core->document(), &InterfaceDocument::dirtyChanged, this, &MainWindow::onDocDirtyChanged);
 
@@ -200,9 +204,14 @@ void MainWindow::onImportRequested()
     m_core->document()->loadAvailableComponents();
 }
 
-void MainWindow::onExportRequested()
+void MainWindow::onExportFunctionsRequested()
 {
-    m_core->document()->exportSelected();
+    m_core->document()->exportSelectedFunctions();
+}
+
+void MainWindow::onExportTypeRequested()
+{
+    m_core->document()->exportSelectedType();
 }
 
 /*!

@@ -98,8 +98,15 @@ void GraphicsView::dropEvent(QDropEvent *event)
 {
     auto mimeData = event->mimeData();
     const shared::Id id = QUuid::fromString(mimeData->text());
-    Q_EMIT entityDropped(id, mapToScene(event->pos()));
-    event->accept();
+    if (event->dropAction() == Qt::DropAction::CopyAction) {
+        Q_EMIT importEntity(id, mapToScene(event->pos()));
+        event->accept();
+    } else if (event->dropAction() == Qt::DropAction::LinkAction) {
+        Q_EMIT instantiateEntity(id, mapToScene(event->pos()));
+        event->accept();
+    } else {
+        event->ignore();
+    }
 }
 
 }

@@ -70,7 +70,8 @@ public:
     bool create(const QString &path = QString());
     bool load(const QString &path);
     bool loadAvailableComponents();
-    bool exportSelected();
+    bool exportSelectedFunctions();
+    bool exportSelectedType();
     bool save(const QString &path);
     void close();
 
@@ -118,18 +119,21 @@ private Q_SLOTS:
     void showPropertyEditor(aadl::AADLObject *obj);
     void showInfoMessage(const QString &title, const QString &message);
     void importEntity(const shared::Id &id, const QPointF &sceneDropPoint);
+    void instantiateEntity(const shared::Id &id, const QPointF &sceneDropPoint);
 
 private:
     void setPath(const QString &path);
 
+    bool exportImpl(const QString &path, const QList<aadl::AADLObject *> &objects);
     bool loadImpl(const QString &path);
-    bool importImpl(const QString &path);
+    bool loadComponentModel(aadl::AADLObjectsModel *model, const QString &path);
     QString getComponentName(const QStringList &exportNames);
     QList<aadl::AADLObject *> prepareSelectedObjectsForExport(QString &name);
 
     QWidget *createGraphicsView();
     QTreeView *createModelView();
     QTreeView *createImportView();
+    QTreeView *createSharedView();
 
     void showNIYGUI(const QString &title = QString());
 

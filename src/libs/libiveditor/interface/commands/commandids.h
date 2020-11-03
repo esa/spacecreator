@@ -53,6 +53,7 @@ enum Id
 
     ChangeAsn1File,
     ImportEntities,
+    InstantiateEntities,
 
     LastId
 };

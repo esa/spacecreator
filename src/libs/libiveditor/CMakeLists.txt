@@ -208,6 +208,8 @@ target_sources(${LIB_NAME} PRIVATE
     interface/aadlobjectstreeview.h
     interface/commands/cmdentitiesimport.cpp
     interface/commands/cmdentitiesimport.h
+    interface/commands/cmdentitiesinstantiate.cpp
+    interface/commands/cmdentitiesinstantiate.h
 )
 
 target_link_libraries(${LIB_NAME}

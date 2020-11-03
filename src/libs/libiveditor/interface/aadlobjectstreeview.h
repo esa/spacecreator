@@ -17,6 +17,8 @@
 
 #pragma once
 
+#include "common.h"
+
 #include <QTreeView>
 
 namespace aadlinterface {
@@ -25,12 +27,13 @@ class AADLObjectsTreeView : public QTreeView
 {
     Q_OBJECT
 public:
-    explicit AADLObjectsTreeView(QWidget *parent = nullptr);
+    explicit AADLObjectsTreeView(shared::DropType componentType, QWidget *parent = nullptr);
 
     void mousePressEvent(QMouseEvent *event) override;
     void mouseMoveEvent(QMouseEvent *event) override;
 
 private:
+    const shared::DropType m_componentType;
     QPoint m_dragStartPosition;
 };
 

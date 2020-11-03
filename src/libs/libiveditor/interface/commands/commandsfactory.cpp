@@ -29,6 +29,7 @@
 #include "cmdcontextparametercreate.h"
 #include "cmdcontextparameterremove.h"
 #include "cmdentitiesimport.h"
+#include "cmdentitiesinstantiate.h"
 #include "cmdentityattributechange.h"
 #include "cmdentityautolayout.h"
 #include "cmdentitygeometrychange.h"
@@ -85,6 +86,8 @@ QUndoCommand *CommandsFactory::create(Id id, const QVariantList &params)
         return cmd::CommandsFactory::removeEntityCommand(params);
     case cmd::ImportEntities:
         return cmd::CommandsFactory::importEntitiesCommand(params);
+    case cmd::InstantiateEntities:
+        return cmd::CommandsFactory::instantiateEntitiesCommand(params);
     case cmd::ChangeRootEntity:
         return cmd::CommandsFactory::changeRootEntityCommand(params);
     case cmd::AutoLayoutEntity:
@@ -268,14 +271,34 @@ QUndoCommand *CommandsFactory::removeEntityCommand(const QVariantList &params)
 
 QUndoCommand *CommandsFactory::importEntitiesCommand(const QVariantList &params)
 {
-    Q_ASSERT(params.size() == 3);
+    Q_ASSERT(params.size() == 4);
     const QVariant entity = params.value(0);
-    const QVariant model = params.value(1);
-    const QVariant pos = params.value(2);
-    if (entity.isValid() && entity.canConvert<aadl::AADLObject *>() && model.isValid()
+    const QVariant parent = params.value(1);
+    const QVariant model = params.value(2);
+    const QVariant pos = params.value(3);
+    if (entity.isValid() && entity.canConvert<aadl::AADLObject *>() && parent.isValid()
+            && parent.canConvert<aadl::AADLObjectFunctionType *>() && model.isValid()
             && model.canConvert<aadl::AADLObjectsModel *>() && pos.isValid() && pos.canConvert<QPointF>()) {
-        return new CmdEntitiesImport(
-                entity.value<aadl::AADLObject *>(), model.value<aadl::AADLObjectsModel *>(), pos.value<QPointF>());
+        return new CmdEntitiesImport(entity.value<aadl::AADLObject *>(), parent.value<aadl::AADLObjectFunctionType *>(),
+                model.value<aadl::AADLObjectsModel *>(), pos.value<QPointF>());
+    }
+
+    return nullptr;
+}
+
+QUndoCommand *CommandsFactory::instantiateEntitiesCommand(const QVariantList &params)
+{
+    Q_ASSERT(params.size() == 4);
+    const QVariant entity = params.value(0);
+    const QVariant parent = params.value(1);
+    const QVariant model = params.value(2);
+    const QVariant pos = params.value(3);
+    if (entity.isValid() && entity.canConvert<aadl::AADLObjectFunctionType *>() && model.isValid() && parent.isValid()
+            && parent.canConvert<aadl::AADLObjectFunctionType *>() && model.canConvert<aadl::AADLObjectsModel *>()
+            && pos.isValid() && pos.canConvert<QPointF>()) {
+        return new CmdEntitiesInstantiate(entity.value<aadl::AADLObjectFunctionType *>(),
+                parent.value<aadl::AADLObjectFunctionType *>(), model.value<aadl::AADLObjectsModel *>(),
+                pos.value<QPointF>());
     }
 
     return nullptr;
