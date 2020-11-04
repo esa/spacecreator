@@ -55,7 +55,7 @@ PropertiesDialog::PropertiesDialog(
     , m_cmdMacro(new cmd::CommandsStack::Macro(
               tr("Edit %1 - %2")
                       .arg(aadl::AADLNameValidator::nameOfType(m_dataObject->aadlType()).trimmed(),
-                              m_dataObject->title())))
+                              m_dataObject->titleUI())))
     , m_dataTypes(dataTypes)
 {
     ui->setupUi(this);
@@ -220,14 +220,15 @@ void PropertiesDialog::initCommentView()
 {
     if (auto comment = qobject_cast<aadl::AADLObjectComment *>(m_dataObject)) {
         auto commentEdit = new QPlainTextEdit(this);
-        commentEdit->setPlainText(comment->title());
+        commentEdit->setPlainText(comment->titleUI());
         ui->tabWidget->insertTab(0, commentEdit, tr("Comment content"));
         connect(this, &QDialog::accepted, this, [comment, commentEdit]() {
             const QString text = commentEdit->toPlainText();
-            if (comment->title() == text)
+            if (comment->titleUI() == text)
                 return;
 
-            const QVariantMap textArg { { aadl::meta::Props::token(aadl::meta::Props::Token::name), text } };
+            const QString encodedText = aadl::AADLNameValidator::encodeName(comment->aadlType(), text);
+            const QVariantMap textArg { { aadl::meta::Props::token(aadl::meta::Props::Token::name), encodedText } };
             const QVariantList commentTextParams { QVariant::fromValue(comment), QVariant::fromValue(textArg) };
             auto commentTextCmd = cmd::CommandsFactory::create(cmd::ChangeEntityAttributes, commentTextParams);
             if (commentTextCmd) {

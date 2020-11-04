@@ -17,7 +17,6 @@
 
 #include "iveditorcore.h"
 
-#include "aadlnamevalidator.h"
 #include "aadlobjectconnection.h"
 #include "aadlobjectfunction.h"
 #include "aadlobjectiface.h"
@@ -166,8 +165,6 @@ bool IVEditorCore::addConnection(QString name, const QString &fromInstanceName, 
     if (!aadlinterface::cmd::CommandsStack::current()) {
         aadlinterface::cmd::CommandsStack::setCurrent(new QUndoStack(this));
     }
-
-    name = aadl::AADLNameValidator::decodeName(aadl::AADLObject::Type::ProvidedInterface, name);
 
     aadl::AADLObjectsModel *aadlModel = m_document->objectsModel();
     if (aadlModel->getConnection(name, fromInstanceName, toInstanceName, m_caseCheck) != nullptr) {
@@ -319,8 +316,7 @@ QStringList IVEditorCore::aadlFunctionsNames() const
     QStringList functionNames;
     for (const aadl::AADLObjectFunction *aadlFunction : m_aadlFunctions) {
         if (aadlFunction && !aadlFunction->title().isEmpty()) {
-            functionNames << aadl::AADLNameValidator::encodeName(
-                    aadl::AADLObject::Type::Function, aadlFunction->title());
+            functionNames << aadlFunction->title();
         }
     }
     return functionNames;
@@ -334,8 +330,7 @@ QStringList IVEditorCore::aadlConnectionNames() const
     QStringList connectionNames;
     for (const aadl::AADLObjectConnection *aadlConnection : m_aadlConnections) {
         if (aadlConnection && !aadlConnection->targetInterfaceName().isEmpty()) {
-            connectionNames << aadl::AADLNameValidator::encodeName(
-                    aadl::AADLObject::Type::ProvidedInterface, aadlConnection->targetInterfaceName());
+            connectionNames << aadlConnection->targetInterfaceName();
         }
     }
     connectionNames.removeDuplicates();

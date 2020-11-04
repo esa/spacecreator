@@ -37,7 +37,7 @@ CmdIfaceDataChangeBase::CmdIfaceDataChangeBase(aadl::AADLObjectIface *iface, con
     , m_newValue(targetValue)
     , m_cmdRmConnection()
 {
-    setText(QObject::tr("Change %1's %2").arg(m_iface->title(), m_targetName));
+    setText(QObject::tr("Change %1's %2").arg(m_iface->titleUI(), m_targetName));
 }
 
 CmdIfaceDataChangeBase::~CmdIfaceDataChangeBase()

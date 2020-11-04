@@ -144,7 +144,7 @@
             <Property name="Taste::InnerCoordinates" value="143900 72200 90300 72200 90300 92000"/>
         </Connection>
     </Function>
-    <Function name="Function_1" language="" is_type="NO" instance_of=Function_Type_1">
+    <Function name="Function_1" language="" is_type="NO" instance_of="Function_Type_1">
         <Property name="Taste::coordinates" value="36000 43900 70300 57100"/>
         <Provided_Interface name="PI_FnTyped" kind="SPORADIC_OPERATION" period="" wcet="" queue_size="">
             <Property name="Taste::coordinates" value="36000 53400"/>
@@ -165,7 +165,7 @@
             <Property name="Taste::Autonamed" value="false"/>
         </Required_Interface>
     </Function>
-    <Function name=Function_Type_1" language="" is_type="YES">
+    <Function name="Function_Type_1" language="" is_type="YES">
         <Property name="Taste::coordinates" value="37200 9800 66000 25300"/>
         <Provided_Interface name="PI_FnTyped" kind="SPORADIC_OPERATION" period="" wcet="" queue_size="">
             <Property name="Taste::coordinates" value="40700 9800"/>

@@ -17,7 +17,6 @@
 
 #include "endtoendconnections.h"
 
-#include "aadlnamevalidator.h"
 #include "aadlobjectconnection.h"
 #include "mscchart.h"
 #include "mscdocument.h"
@@ -78,7 +77,7 @@ static QString instanceName(msc::MscInstance *instance)
     if (instance == nullptr) {
         return {};
     }
-    return aadl::AADLNameValidator::decodeName(aadl::AADLObject::Type::Function, instance->name());
+    return instance->name();
 }
 
 //! Get the end to end dataflow. If the dirty flag is set, this will read from the file
@@ -106,10 +105,7 @@ static EndToEndConnections::Dataflow readDataFlowFromDocument(msc::MscDocument *
             if (msg != nullptr && msg->messageType() == msc::MscMessage::MessageType::Message) {
                 const QString source = instanceName(msg->sourceInstance()).trimmed().toLower();
                 const QString target = instanceName(msg->targetInstance()).trimmed().toLower();
-                const QString message =
-                        aadl::AADLNameValidator::decodeName(aadl::AADLObject::Type::RequiredInterface, msg->name())
-                                .trimmed()
-                                .toLower();
+                const QString message = msg->name().trimmed().toLower();
 
                 // The source must match, except for the first call which can be from global or any instance
                 if (!message.isEmpty() && (source == lastInstance || dataflow.isEmpty())) {

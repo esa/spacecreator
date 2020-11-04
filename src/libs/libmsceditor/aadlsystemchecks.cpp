@@ -17,7 +17,6 @@
 
 #include "aadlsystemchecks.h"
 
-#include "aadlnamevalidator.h"
 #include "aadlobjectconnection.h"
 #include "aadlobjectfunction.h"
 #include "aadlobjectsmodel.h"
@@ -210,14 +209,13 @@ QStringList AadlSystemChecks::connectionNames() const
     return m_ivCore->aadlConnectionNames();
 }
 
-bool AadlSystemChecks::connectionExists(QString name, const QString &sourceName, const QString &targetName) const
+bool AadlSystemChecks::connectionExists(const QString &name, const QString &sourceName, const QString &targetName) const
 {
     aadl::AADLObjectsModel *model = aadlModel();
     if (model == nullptr) {
         return true;
     }
 
-    name = aadl::AADLNameValidator::decodeName(aadl::AADLObject::Type::ProvidedInterface, name);
     return model->getConnection(name, sourceName, targetName, m_caseCheck) != nullptr;
 }
 
@@ -226,14 +224,11 @@ bool AadlSystemChecks::connectionExists(QString name, const QString &sourceName,
    \note the names are aadl encoded by this function
    \sa connectionNames
  */
-QStringList AadlSystemChecks::connectionNamesFromTo(QString sourceName, QString targetName) const
+QStringList AadlSystemChecks::connectionNamesFromTo(const QString &sourceName, const QString &targetName) const
 {
     if (!m_ivCore) {
         return {};
     }
-
-    sourceName = aadl::AADLNameValidator::encodeName(aadl::AADLObject::Type::Function, sourceName);
-    targetName = aadl::AADLNameValidator::encodeName(aadl::AADLObject::Type::Function, targetName);
 
     const QVector<aadl::AADLObjectConnection *> connections = m_ivCore->allAadlConnections();
     QStringList connectionNames;
@@ -241,8 +236,7 @@ QStringList AadlSystemChecks::connectionNamesFromTo(QString sourceName, QString 
         if (aadlConnection && !aadlConnection->targetInterfaceName().isEmpty()) {
             if (aadlConnection->sourceName().compare(sourceName, m_caseCheck) == 0
                     && aadlConnection->targetName().compare(targetName, m_caseCheck) == 0) {
-                connectionNames << aadl::AADLNameValidator::encodeName(
-                        aadl::AADLObject::Type::ProvidedInterface, aadlConnection->targetInterfaceName());
+                connectionNames << aadlConnection->targetInterfaceName();
             }
         }
     }
@@ -319,9 +313,7 @@ bool AadlSystemChecks::correspond(const aadl::AADLObjectFunction *aadlFunc, cons
         return false;
     }
 
-    const QString instanceName =
-            aadl::AADLNameValidator::decodeName(aadl::AADLObject::Type::Function, instance->name());
-    return instanceName.compare(aadlFunc->title(), m_caseCheck) == 0;
+    return instance->name().compare(aadlFunc->title(), m_caseCheck) == 0;
 }
 
 /*!
@@ -398,11 +390,9 @@ aadl::AADLObjectConnection *AadlSystemChecks::correspondingConnection(const MscM
  */
 bool AadlSystemChecks::correspond(const aadl::AADLObjectConnection *connection, const MscMessage *message) const
 {
-    const QString messageName =
-            aadl::AADLNameValidator::decodeName(aadl::AADLObject::Type::ProvidedInterface, message->name());
     bool nameOk = true;
     if (!connection->targetInterfaceName().isEmpty()) {
-        nameOk &= messageName.compare(connection->targetInterfaceName(), m_caseCheck) == 0;
+        nameOk &= message->name().compare(connection->targetInterfaceName(), m_caseCheck) == 0;
     }
     return correspond(connection->source(), message->sourceInstance())
             && correspond(connection->target(), message->targetInstance()) && nameOk;

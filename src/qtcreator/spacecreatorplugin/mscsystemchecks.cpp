@@ -18,7 +18,6 @@
 #include "mscsystemchecks.h"
 
 #include "aadlmodelstorage.h"
-#include "aadlnamevalidator.h"
 #include "aadlobjectconnection.h"
 #include "aadlobjectiface.h"
 #include "aadlobjectsmodel.h"
@@ -372,20 +371,13 @@ void MscSystemChecks::onMscEntityNameChanged(QObject *entity, const QString &old
 
     auto message = dynamic_cast<msc::MscMessage *>(entity);
     if (message && ivCore() && ivCore()->document() && ivCore()->document()->objectsModel()) {
-        const QString fromName = aadl::AADLNameValidator::decodeName(
-                aadl::AADLObject::Type::Function, message->sourceInstance() ? message->sourceInstance()->name() : "");
-        const QString toName = aadl::AADLNameValidator::decodeName(
-                aadl::AADLObject::Type::Function, message->targetInstance() ? message->targetInstance()->name() : "");
-        const QString decodedNewName =
-                aadl::AADLNameValidator::decodeName(aadl::AADLObject::Type::ProvidedInterface, message->name());
-        const QString decodedOldName =
-                aadl::AADLNameValidator::decodeName(aadl::AADLObject::Type::ProvidedInterface, oldName);
+        const QString fromName = message->sourceInstance() ? message->sourceInstance()->name() : "";
+        const QString toName = message->targetInstance() ? message->targetInstance()->name() : "";
         const bool hasNewName =
-                ivCore()->document()->objectsModel()->getConnection(decodedNewName, fromName, toName, m_caseCheck)
+                ivCore()->document()->objectsModel()->getConnection(message->name(), fromName, toName, m_caseCheck)
                 != nullptr;
         const bool hasOldName =
-                ivCore()->document()->objectsModel()->getConnection(decodedOldName, fromName, toName, m_caseCheck)
-                != nullptr;
+                ivCore()->document()->objectsModel()->getConnection(oldName, fromName, toName, m_caseCheck) != nullptr;
 
         if (!hasNewName && !hasOldName) {
             const int result = QMessageBox::question(nullptr, tr("No AADL connection"),

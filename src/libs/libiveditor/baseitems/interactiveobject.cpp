@@ -193,7 +193,7 @@ ColorHandler InteractiveObject::colorHandler() const
 
 QString InteractiveObject::prepareTooltip() const
 {
-    return aadlObject() ? aadlObject()->title() : QString();
+    return aadlObject() ? aadlObject()->titleUI() : QString();
 }
 
 }

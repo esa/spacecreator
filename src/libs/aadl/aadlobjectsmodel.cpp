@@ -17,6 +17,7 @@
 
 #include "aadlobjectsmodel.h"
 
+#include "aadlnamevalidator.h"
 #include "aadlobjectcomment.h"
 #include "aadlobjectconnection.h"
 #include "aadlobjectfunction.h"
@@ -570,13 +571,20 @@ QVariant AADLObjectsModel::data(const QModelIndex &index, int role) const
     if (role == Qt::DisplayRole) {
         if (obj->aadlType() == AADLObject::Type::Connection) {
             if (auto connectionPtr = qobject_cast<AADLObjectConnection *>(obj)) {
-                return QString("%1.%2 <-> %3.%4")
-                        .arg(connectionPtr->sourceName(), connectionPtr->sourceInterfaceName(),
-                                connectionPtr->targetName(), connectionPtr->targetInterfaceName());
+                const QString sourceName =
+                        AADLNameValidator::decodeName(AADLObject::Type::Function, connectionPtr->sourceName());
+                const QString sourceInterfaceName = AADLNameValidator::decodeName(
+                        AADLObject::Type::RequiredInterface, connectionPtr->sourceInterfaceName());
+                const QString targetName =
+                        AADLNameValidator::decodeName(AADLObject::Type::Function, connectionPtr->targetName());
+                const QString targetInterfaceName = AADLNameValidator::decodeName(
+                        AADLObject::Type::ProvidedInterface, connectionPtr->targetInterfaceName());
+                return QString("%1.%2 <-> %3.%4").arg(sourceName, sourceInterfaceName, targetName, targetInterfaceName);
             }
             return QVariant();
+        } else {
+            return obj->titleUI();
         }
-        return obj->title();
     }
 
     if (obj->isGrouped()) {

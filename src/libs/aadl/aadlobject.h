@@ -56,6 +56,7 @@ public:
     virtual ~AADLObject();
 
     QString title() const;
+    QString titleUI() const;
     shared::Id id() const;
 
     AADLObject::Type aadlType() const;

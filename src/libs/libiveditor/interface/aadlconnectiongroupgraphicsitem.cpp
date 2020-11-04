@@ -42,7 +42,7 @@ ColorManager::HandledColors AADLConnectionGroupGraphicsItem::handledColorType() 
 void AADLConnectionGroupGraphicsItem::init()
 {
     AADLConnectionGraphicsItem::init();
-    updateLabel(entity()->title());
+    updateLabel(entity()->titleUI());
 }
 
 void AADLConnectionGroupGraphicsItem::updateBoundingRect()

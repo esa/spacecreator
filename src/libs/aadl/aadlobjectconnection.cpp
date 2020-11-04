@@ -17,7 +17,6 @@
 
 #include "aadlobjectconnection.h"
 
-#include "aadlnamevalidator.h"
 #include "aadlobjectfunction.h"
 #include "aadlobjectfunctiontype.h"
 #include "aadlobjectiface.h"
@@ -208,12 +207,9 @@ bool AADLObjectConnection::lookupEndpointsPostponed()
         if (!info || info->m_functionName.isEmpty())
             return nullptr;
 
-        const QString decodedName = AADLNameValidator::decodeName(AADLObject::Type::Function, info->m_functionName);
-        AADLObject *aadlFunction = objectsModel()->getObjectByName(decodedName);
+        AADLObject *aadlFunction = objectsModel()->getObjectByName(info->m_functionName);
         if (!aadlFunction) {
             QString warningMessage = QStringLiteral("Unable to find Fn/FnType %1").arg(info->m_functionName);
-            if (info->m_functionName != decodedName)
-                warningMessage += QStringLiteral(" (decoded name: %1)").arg(decodedName);
             qWarning() << qPrintable(warningMessage);
         }
         return aadlFunction;
@@ -225,16 +221,10 @@ bool AADLObjectConnection::lookupEndpointsPostponed()
             return nullptr;
         }
 
-        const AADLObject::Type ifaceType = info->m_ifaceDirection == AADLObjectIface::IfaceType::Provided
-                ? AADLObject::Type::ProvidedInterface
-                : AADLObject::Type::RequiredInterface;
-        const QString decodedName = AADLNameValidator::decodeName(ifaceType, info->m_interfaceName);
-        AADLObjectIface *aadlIface = objectsModel()->getIfaceByName(decodedName, info->m_ifaceDirection,
+        AADLObjectIface *aadlIface = objectsModel()->getIfaceByName(info->m_interfaceName, info->m_ifaceDirection,
                 parentObject ? parentObject->as<AADLObjectFunctionType *>() : nullptr);
         if (!aadlIface) {
             QString warningMessage = QStringLiteral("Unable to find Interface %1").arg(info->m_interfaceName);
-            if (info->m_functionName != decodedName)
-                warningMessage += QStringLiteral(" (decoded name: %1)").arg(decodedName);
             qWarning() << qPrintable(warningMessage);
         }
         return aadlIface;

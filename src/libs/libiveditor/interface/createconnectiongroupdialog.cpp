@@ -17,6 +17,7 @@
 
 #include "createconnectiongroupdialog.h"
 
+#include "aadlnamevalidator.h"
 #include "ui_createconnectiongroupdialog.h"
 
 #include <QDialogButtonBox>
@@ -42,9 +43,16 @@ CreateConnectionGroupDialog::CreateConnectionGroupDialog(
         QStringList result;
         for (const auto &connection : connections) {
             if (connection) {
+                const QString sourceName =
+                        aadl::AADLNameValidator::decodeName(aadl::AADLObject::Type::Function, connection->sourceName());
+                const QString sourceInterfaceName = aadl::AADLNameValidator::decodeName(
+                        aadl::AADLObject::Type::RequiredInterface, connection->sourceInterfaceName());
+                const QString targetName =
+                        aadl::AADLNameValidator::decodeName(aadl::AADLObject::Type::Function, connection->targetName());
+                const QString targetInterfaceName = aadl::AADLNameValidator::decodeName(
+                        aadl::AADLObject::Type::ProvidedInterface, connection->targetInterfaceName());
                 result.append(QStringLiteral("%1.%2 <-> %3.%4")
-                                      .arg(connection->sourceName(), connection->sourceInterfaceName(),
-                                              connection->targetName(), connection->targetInterfaceName()));
+                                      .arg(sourceName, sourceInterfaceName, targetName, targetInterfaceName));
             }
         }
         return result.join(QLatin1Char('\n'));
@@ -69,7 +77,7 @@ CreateConnectionGroupDialog::CreateConnectionGroupDialog(
     resize(sizeHint().width(), minimumSizeHint().height());
 }
 
-CreateConnectionGroupDialog::~CreateConnectionGroupDialog() {}
+CreateConnectionGroupDialog::~CreateConnectionGroupDialog() { }
 
 QList<aadl::AADLObjectConnectionGroup::CreationInfo> CreateConnectionGroupDialog::info() const
 {

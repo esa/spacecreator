@@ -55,7 +55,7 @@ void AADLCommentGraphicsItem::init()
 void AADLCommentGraphicsItem::updateFromEntity()
 {
     AADLRectGraphicsItem::updateFromEntity();
-    setText(entity()->title());
+    setText(entity()->titleUI());
 }
 
 void AADLCommentGraphicsItem::setText(const QString &text)

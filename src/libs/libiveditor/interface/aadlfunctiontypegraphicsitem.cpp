@@ -61,14 +61,14 @@ aadl::AADLObjectFunctionType *AADLFunctionTypeGraphicsItem::entity() const
 void AADLFunctionTypeGraphicsItem::init()
 {
     AADLRectGraphicsItem::init();
-    m_textItem->setPlainText(entity()->title());
+    m_textItem->setPlainText(entity()->titleUI());
     m_textItem->setTextAlignment(Qt::AlignLeft | Qt::AlignTop);
 
     connect(m_textItem, &TextGraphicsItem::edited, this, &AADLFunctionTypeGraphicsItem::updateNameFromUi);
     connect(entity(), qOverload<aadl::meta::Props::Token>(&aadl::AADLObjectFunction::attributeChanged), this,
             [this](aadl::meta::Props::Token attr) {
                 if (attr == aadl::meta::Props::Token::name) {
-                    const QString txt = entity()->title();
+                    const QString txt = entity()->titleUI();
                     if (m_textItem->toPlainText() != txt) {
                         m_textItem->setPlainText(txt);
                         updateTextPosition();
@@ -146,17 +146,16 @@ void AADLFunctionTypeGraphicsItem::applyColorScheme()
 
 void AADLFunctionTypeGraphicsItem::updateNameFromUi(const QString &name)
 {
-    if (name == entity()->title()) {
+    if (name == entity()->titleUI()) {
         return;
     }
     if (!aadl::AADLNameValidator::isAcceptableName(entity(), name)) {
-        m_textItem->setPlainText(entity()->title());
+        m_textItem->setPlainText(entity()->titleUI());
         return;
     }
 
-    const QString oldName = entity()->title();
-
-    const QVariantMap attributess = { { aadl::meta::Props::token(aadl::meta::Props::Token::name), name } };
+    const QString newName = aadl::AADLNameValidator::encodeName(aadlObject()->aadlType(), name);
+    const QVariantMap attributess = { { aadl::meta::Props::token(aadl::meta::Props::Token::name), newName } };
     if (const auto attributesCmd = cmd::CommandsFactory::create(
                 cmd::ChangeEntityAttributes, { QVariant::fromValue(entity()), QVariant::fromValue(attributess) })) {
         cmd::CommandsStack::push(attributesCmd);

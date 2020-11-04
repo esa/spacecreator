@@ -20,6 +20,7 @@
 
 #include "aadlconnectiongraphicsitem.h"
 #include "aadlfunctiongraphicsitem.h"
+#include "aadlnamevalidator.h"
 #include "aadlobjectconnection.h"
 #include "aadlobjectfunction.h"
 #include "aadlobjectiface.h"
@@ -112,9 +113,10 @@ void AADLInterfaceGraphicsItem::setTargetItem(QGraphicsItem *item, const QPointF
 
 void AADLInterfaceGraphicsItem::setInterfaceName(const QString &name)
 {
-    if (name != m_text->toPlainText()) {
+    const QString text = aadl::AADLNameValidator::decodeName(entity()->aadlType(), name);
+    if (text != m_text->toPlainText()) {
         const QFontMetrics fm(m_text->font());
-        m_text->setPlainText(fm.elidedText(name, Qt::ElideRight, kInterfaceTitleMaxLength));
+        m_text->setPlainText(fm.elidedText(text, Qt::ElideRight, kInterfaceTitleMaxLength));
         instantLayoutUpdate();
     }
 }
@@ -438,7 +440,7 @@ QString AADLInterfaceGraphicsItem::prepareTooltip() const
     if (!ri)
         return toolTip;
 
-    const QString label = ifaceLabel();
+    const QString label = aadl::AADLNameValidator::decodeName(entity()->aadlType(), ifaceLabel());
     if (toolTip != label)
         toolTip = QString("%1<br><i><b>%2</b></i>").arg(label, toolTip);
 

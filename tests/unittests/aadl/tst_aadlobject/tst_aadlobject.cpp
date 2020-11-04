@@ -42,15 +42,13 @@ private Q_SLOTS:
     void test_setTitle();
 };
 
-static const char *TestObjectTitleValid = "Test_Object_Title";
-static const char *TestObjectTitleInvalid = "Test Object Title";
-
 void tst_AADLObject::test_defaultConstructor()
 {
     AADLObjectImp obj;
 
     QCOMPARE(obj.parent(), nullptr);
-    QCOMPARE(obj.title(), QString("Function 1"));
+    QCOMPARE(obj.title(), QString("Function_1"));
+    QCOMPARE(obj.titleUI(), QString("Function 1"));
     QVERIFY(!obj.id().toString().isEmpty());
 }
 
@@ -61,13 +59,15 @@ void tst_AADLObject::test_paramConstructor()
     auto obj = new AADLObjectImp("Some_name", this);
     QCOMPARE(obj->parent(), this);
     QCOMPARE(obj->attrs().value(nameToken).toString(), QString("Some_name")); // This is the stored value
-    QCOMPARE(obj->title(), "Some name"); // This is what the user sees
+    QCOMPARE(obj->title(), "Some_name"); // This is the stored value
+    QCOMPARE(obj->titleUI(), "Some name"); // This is what the user sees
     QVERIFY(!obj->id().toString().isEmpty());
 
-    obj = new AADLObjectImp("Another name", this);
+    obj = new AADLObjectImp("Another_name", this);
     QCOMPARE(obj->parent(), this);
     QCOMPARE(obj->attrs().value(nameToken).toString(), QString("Another_name")); // This is the stored value
-    QCOMPARE(obj->title(), "Another name"); // This is what the user sees
+    QCOMPARE(obj->title(), "Another_name"); // This is the stored value
+    QCOMPARE(obj->titleUI(), "Another name"); // This is what the user sees
     QVERIFY(!obj->id().toString().isEmpty());
 }
 
@@ -80,7 +80,7 @@ void tst_AADLObject::test_setTitle()
     QVERIFY(obj1.title() != "Test_Object_Title");
     obj1.setTitle("Test_Object_Title");
     QCOMPARE(obj1.attrs().value(nameToken).toString(), QString("Test_Object_Title"));
-    QCOMPARE(obj1.title(), QString("Test Object Title"));
+    QCOMPARE(obj1.titleUI(), QString("Test Object Title"));
     QVERIFY(spy1.count() == 1);
     auto arguments = spy1.takeFirst();
     QVERIFY(arguments.size() == 1);
@@ -90,9 +90,9 @@ void tst_AADLObject::test_setTitle()
     AADLObjectImp obj2;
     QSignalSpy spy2(&obj2, &aadl::AADLObject::titleChanged);
     QVERIFY(obj2.title() != "Test_Object_Title");
-    obj2.setTitle("Test Object Title");
+    obj2.setTitle("Test_Object_Title");
     QCOMPARE(obj2.attrs().value(nameToken).toString(), QString("Test_Object_Title"));
-    QCOMPARE(obj2.title(), QString("Test Object Title"));
+    QCOMPARE(obj2.titleUI(), QString("Test Object Title"));
     QVERIFY(spy2.count() == 1);
     arguments = spy2.takeFirst();
     QVERIFY(arguments.size() == 1);

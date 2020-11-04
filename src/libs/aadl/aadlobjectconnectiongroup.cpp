@@ -17,7 +17,6 @@
 
 #include "aadlobjectconnectiongroup.h"
 
-#include "aadlnamevalidator.h"
 #include "aadlobjectfunctiontype.h"
 #include "aadlobjectifacegroup.h"
 #include "aadlobjectsmodel.h"
@@ -110,8 +109,7 @@ void AADLObjectConnectionGroup::addConnection(const QPointer<AADLObjectConnectio
         return;
     }
 
-    const QString encodedName = AADLNameValidator::encodeName(aadlType(), title());
-    connection->setGroupName(encodedName);
+    connection->setGroupName(title());
 
     if (sourceInterfaceGroup()->parentObject()->id() == connection->sourceInterface()->parentObject()->id()) {
         sourceInterfaceGroup()->addEntity(connection->sourceInterface());

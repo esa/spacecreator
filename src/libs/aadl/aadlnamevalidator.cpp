@@ -32,14 +32,14 @@ AADLNameValidator *AADLNameValidator::m_instance = nullptr;
 
 AADLNameValidator::AADLNameValidator()
     : m_typePrefixes {
-        { AADLObject::Type::FunctionType, QObject::tr("Function Type ") },
-        { AADLObject::Type::Function, QObject::tr("Function ") },
-        { AADLObject::Type::RequiredInterface, QObject::tr("RI ") },
-        { AADLObject::Type::ProvidedInterface, QObject::tr("PI ") },
-        { AADLObject::Type::InterfaceGroup, QObject::tr("Interface Group ") },
-        { AADLObject::Type::Comment, QObject::tr("Comment ") },
-        { AADLObject::Type::Connection, QObject::tr("Connection ") },
-        { AADLObject::Type::ConnectionGroup, QObject::tr("Connection Group ") },
+        { AADLObject::Type::FunctionType, QObject::tr("Function_Type_") },
+        { AADLObject::Type::Function, QObject::tr("Function_") },
+        { AADLObject::Type::RequiredInterface, QObject::tr("RI_") },
+        { AADLObject::Type::ProvidedInterface, QObject::tr("PI_") },
+        { AADLObject::Type::InterfaceGroup, QObject::tr("Interface_Group_") },
+        { AADLObject::Type::Comment, QObject::tr("Comment_") },
+        { AADLObject::Type::Connection, QObject::tr("Connection_") },
+        { AADLObject::Type::ConnectionGroup, QObject::tr("Connection_Group_") },
     }
 {
 }

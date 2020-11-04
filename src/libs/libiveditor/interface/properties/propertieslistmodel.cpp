@@ -257,17 +257,19 @@ bool PropertiesListModel::setData(const QModelIndex &index, const QVariant &valu
     if (role == Qt::EditRole) {
         const QString &name = this->index(index.row(), ColumnTitle).data().toString();
         if (isAttr(index) && index.column() == ColumnValue) {
+            QVariant attributeValue = value;
             switch (tokenFromIndex(index)) {
             case aadl::meta::Props::Token::name: {
                 if (!aadl::AADLNameValidator::isAcceptableName(m_dataObject, value.toString()))
                     return false; // TODO: move to editor's validator
+                attributeValue = aadl::AADLNameValidator::encodeName(m_dataObject->aadlType(), value.toString());
                 break;
             }
             default:
                 break;
             }
 
-            const QVariantMap attributes = { { name, value } };
+            const QVariantMap attributes = { { name, attributeValue } };
             const auto attributesCmd = cmd::CommandsFactory::create(cmd::ChangeEntityAttributes,
                     { QVariant::fromValue(m_dataObject), QVariant::fromValue(attributes) });
             cmd::CommandsStack::push(attributesCmd);

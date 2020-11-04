@@ -63,7 +63,7 @@ protected:
     {
         QStringList result;
         std::transform(collection.cbegin(), collection.cend(), std::back_inserter(result),
-                [](AADLType obj) { return obj ? obj->title() : QString(); });
+                [](AADLType obj) { return obj ? obj->titleUI() : QString(); });
         const QString line = joinNonEmpty(result, QStringLiteral(", "));
         return line.isEmpty() ? QString() : QString("<b>%1</b>%2").arg(prefix, line);
     }

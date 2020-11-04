@@ -1233,7 +1233,7 @@ QUndoCommand *CreatorTool::CreatorToolPrivate::createInterfaceCommand(
             if (const aadl::AADLObjectFunctionType *fnType = fn->instanceOf()) {
                 const QString message = thisTool->tr("Can't add interface directly in <b>%1</b>.<br>"
                                                      "Please edit the related <b>%2</b> instead.")
-                                                .arg(fn->title(), fnType->title());
+                                                .arg(fn->titleUI(), fnType->titleUI());
                 Q_EMIT thisTool->informUser(thisTool->tr("Interface adding"), message);
                 return nullptr;
             }

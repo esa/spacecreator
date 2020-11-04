@@ -21,6 +21,7 @@
 #include "aadlfunctiongraphicsitem.h"
 #include "aadlfunctiontypegraphicsitem.h"
 #include "aadlinterfacegraphicsitem.h"
+#include "aadlnamevalidator.h"
 #include "aadlobjectconnection.h"
 #include "aadlobjectfunction.h"
 #include "aadlobjectiface.h"
@@ -481,10 +482,17 @@ bool AADLConnectionGraphicsItem::removeCollidedGrips(shared::ui::GripPoint *gp)
 
 QString AADLConnectionGraphicsItem::prepareTooltip() const
 {
+    const QString sourceName =
+            aadl::AADLNameValidator::decodeName(aadl::AADLObject::Type::Function, entity()->sourceName());
+    const QString sourceInterfaceName = aadl::AADLNameValidator::decodeName(
+            aadl::AADLObject::Type::RequiredInterface, entity()->sourceInterfaceName());
+    const QString targetName =
+            aadl::AADLNameValidator::decodeName(aadl::AADLObject::Type::Function, entity()->targetName());
+    const QString targetInterfaceName = aadl::AADLNameValidator::decodeName(
+            aadl::AADLObject::Type::ProvidedInterface, entity()->targetInterfaceName());
     const QString sign = entity()->sourceInterface()->isRequired() ? "->" : "<-";
-    const QString tooltip = QString("%1.%2 %3 %4.%5")
-                                    .arg(entity()->sourceName(), entity()->sourceInterfaceName(), sign,
-                                            entity()->targetName(), entity()->targetInterfaceName());
+    const QString tooltip =
+            QString("%1.%2 %3 %4.%5").arg(sourceName, sourceInterfaceName, sign, targetName, targetInterfaceName);
     return tooltip;
 }
 

@@ -72,6 +72,11 @@ QString AADLObject::title() const
     return attr(meta::Props::token(meta::Props::Token::name)).toString();
 }
 
+QString AADLObject::titleUI() const
+{
+    return AADLNameValidator::decodeName(aadlType(), title());
+}
+
 bool AADLObject::postInit()
 {
     return true;
@@ -276,17 +281,7 @@ void AADLObject::setAttrs(const QHash<QString, QVariant> &attrs)
 
 QVariant AADLObject::attr(const QString &name, const QVariant &defaultValue) const
 {
-    QVariant val = d->m_attrs.value(name, defaultValue);
-    const meta::Props::Token t = meta::Props::token(name);
-    switch (t) {
-    case meta::Props::Token::name: {
-        val = AADLNameValidator::decodeName(aadlType(), val.toString());
-        break;
-    }
-    default:
-        break;
-    }
-    return val;
+    return d->m_attrs.value(name, defaultValue);
 }
 
 void AADLObject::setAttr(const QString &name, const QVariant &val)
@@ -303,8 +298,6 @@ void AADLObject::setAttr(const QString &name, const QVariant &val)
             QString usedName = val.toString();
             if (usedName.isEmpty())
                 usedName = AADLNameValidator::nextNameFor(this);
-            else
-                usedName = AADLNameValidator::encodeName(this->aadlType(), usedName);
 
             d->m_attrs[name] = usedName;
             Q_EMIT titleChanged(usedName);
