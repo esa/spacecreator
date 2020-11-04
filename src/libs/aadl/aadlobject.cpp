@@ -294,6 +294,11 @@ void AADLObject::setAttr(const QString &name, const QVariant &val)
     if (!name.isEmpty() && val != d->m_attrs[name]) {
         const meta::Props::Token t = meta::Props::token(name);
         switch (t) {
+        case meta::Props::Token::is_visible: {
+            d->m_attrs[name] = val;
+            Q_EMIT visibilityChanged(val.toBool());
+            break;
+        }
         case meta::Props::Token::name: {
             QString usedName = val.toString();
             if (usedName.isEmpty())
@@ -372,6 +377,16 @@ bool AADLObject::isRootObject() const
 bool AADLObject::isGrouped() const
 {
     return !groupName().isEmpty();
+}
+
+void AADLObject::setVisible(bool isVisible)
+{
+    setAttr(meta::Props::token(meta::Props::Token::is_visible), isVisible);
+}
+
+bool AADLObject::isVisible() const
+{
+    return d->m_attrs.value(meta::Props::token(meta::Props::Token::is_visible), true).toBool();
 }
 
 }

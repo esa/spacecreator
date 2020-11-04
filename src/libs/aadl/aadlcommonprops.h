@@ -61,6 +61,7 @@ public:
         pi_name,
         group_name,
         func_name,
+        is_visible,
 
         // KNOWN TASTE props:
         coordinates,

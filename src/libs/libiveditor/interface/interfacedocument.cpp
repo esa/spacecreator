@@ -374,6 +374,16 @@ void InterfaceDocument::close()
     d->commandsStack->clear();
 }
 
+void InterfaceDocument::toggleObjectVisibility()
+{
+    for (const auto id : d->itemsModel->selectionModel()->selection().indexes()) {
+        const int role = static_cast<int>(aadl::AADLObjectsModel::AADLRoles::IdRole);
+        if (aadl::AADLObject *object = d->objectsModel->getObject(id.data(role).toUuid())) {
+            object->setVisible(!object->isVisible());
+        }
+    }
+}
+
 QString InterfaceDocument::path() const
 {
     return d->filePath;
@@ -612,6 +622,48 @@ void InterfaceDocument::instantiateEntity(const shared::Id &id, const QPointF &s
     if (QUndoCommand *cmdInstantiate = cmd::CommandsFactory::create(cmd::InstantiateEntities, params)) {
         cmd::CommandsStack::current()->push(cmdInstantiate);
     }
+}
+
+void InterfaceDocument::showContextMenuForAADLModel(const QPoint &pos)
+{
+    const QModelIndex idx = d->objectsView->indexAt(pos);
+    if (!idx.isValid()) {
+        return;
+    }
+
+    const auto obj =
+            d->objectsModel->getObject(idx.data(static_cast<int>(aadl::AADLObjectsModel::AADLRoles::IdRole)).toUuid());
+    if (!obj) {
+        return;
+    }
+    QList<QAction *> actions;
+
+    if (obj->aadlType() == aadl::AADLObject::Type::Function
+            || obj->aadlType() == aadl::AADLObject::Type::FunctionType) {
+        QAction *actExportSelectedEntities = new QAction(tr("Export selected entities"));
+        connect(actExportSelectedEntities, &QAction::triggered, this, &InterfaceDocument::exportSelectedFunctions);
+        actions.append(actExportSelectedEntities);
+        ActionsManager::registerAction(
+                Q_FUNC_INFO, actExportSelectedEntities, "Export selected entities", "Export selected entities");
+    }
+
+    if (obj->aadlType() == aadl::AADLObject::Type::FunctionType) {
+        QAction *actExportSelectedSharedType = new QAction(tr("Export component type"));
+        connect(actExportSelectedSharedType, &QAction::triggered, this, &InterfaceDocument::exportSelectedType);
+        actions.append(actExportSelectedSharedType);
+        ActionsManager::registerAction(
+                Q_FUNC_INFO, actExportSelectedSharedType, "Export component type", "Export component type");
+    }
+
+    QAction *actToggleVisibility = new QAction(tr("Toggle object visibility"));
+    connect(actToggleVisibility, &QAction::triggered, this, &InterfaceDocument::toggleObjectVisibility);
+    actions.append(actToggleVisibility);
+    ActionsManager::registerAction(Q_FUNC_INFO, actToggleVisibility, "Change object visibility",
+            "Change object visibility in the graphics scene");
+
+    QMenu *menu = new QMenu;
+    menu->addActions(actions);
+    menu->exec(d->objectsView->mapToGlobal(pos));
 }
 
 void InterfaceDocument::setPath(const QString &path)
@@ -856,6 +908,9 @@ QTreeView *InterfaceDocument::createModelView()
     d->objectsView->setModel(d->objectsModel);
     d->objectsView->setSelectionModel(d->itemsModel->selectionModel());
     d->objectsModel->setHeaderData(0, Qt::Horizontal, tr("AADL Structure"), Qt::DisplayRole);
+    d->objectsView->setContextMenuPolicy(Qt::ContextMenuPolicy::CustomContextMenu);
+    connect(d->objectsView, &QTreeView::customContextMenuRequested, this,
+            &InterfaceDocument::showContextMenuForAADLModel);
 
     return d->objectsView;
 }

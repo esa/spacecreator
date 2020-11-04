@@ -104,6 +104,9 @@ public:
 
     bool isGrouped() const;
 
+    void setVisible(bool isVisible);
+    bool isVisible() const;
+
     virtual bool postInit();
 
     template<class T>
@@ -123,6 +126,7 @@ public:
 Q_SIGNALS:
     void titleChanged(const QString &title);
     void coordinatesChanged(const QVector<qint32> &coordinates);
+    void visibilityChanged(bool visible);
     void attributeChanged(const QString &name);
     void propertyChanged(const QString &name);
     void attributeChanged(aadl::meta::Props::Token attr = aadl::meta::Props::Token::Unknown);

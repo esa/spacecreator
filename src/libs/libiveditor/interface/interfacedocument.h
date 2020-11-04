@@ -75,6 +75,8 @@ public:
     bool save(const QString &path);
     void close();
 
+    void toggleObjectVisibility();
+
     QString path() const;
 
     void setAsn1FileName(const QString &asnfile);
@@ -120,6 +122,8 @@ private Q_SLOTS:
     void showInfoMessage(const QString &title, const QString &message);
     void importEntity(const shared::Id &id, const QPointF &sceneDropPoint);
     void instantiateEntity(const shared::Id &id, const QPointF &sceneDropPoint);
+
+    void showContextMenuForAADLModel(const QPoint &pos);
 
 private:
     void setPath(const QString &path);

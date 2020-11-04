@@ -155,6 +155,11 @@ void AADLItemModel::onAADLObjectAdded(aadl::AADLObject *object)
             }
             updateSceneRect();
         }
+        connect(object, &aadl::AADLObject::visibilityChanged, this, [this, id = object->id()](bool isVisible) {
+            if (auto item = m_items.value(id)) {
+                item->setVisible(isVisible);
+            }
+        });
         connect(object, &aadl::AADLObject::coordinatesChanged, this, propertyChanged);
         if (auto clickable = qobject_cast<InteractiveObject *>(item->toGraphicsObject())) {
             connect(

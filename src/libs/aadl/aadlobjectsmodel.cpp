@@ -581,11 +581,21 @@ QVariant AADLObjectsModel::data(const QModelIndex &index, int role) const
 
     if (obj->isGrouped()) {
         if (role == Qt::ForegroundRole) {
+            return QColor(Qt::darkGray);
+        }
+        if (role == Qt::FontRole) {
+            QFont font;
+            font.setItalic(true);
+            return font;
+        }
+    } else if (!obj->isVisible()) {
+        if (role == Qt::ForegroundRole) {
             return QColor(Qt::lightGray);
         }
         if (role == Qt::FontRole) {
             QFont font;
             font.setItalic(true);
+            font.setWeight(QFont::Light);
             return font;
         }
     }

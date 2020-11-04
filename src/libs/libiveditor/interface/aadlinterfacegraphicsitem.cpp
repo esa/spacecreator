@@ -68,6 +68,7 @@ void AADLInterfaceGraphicsItem::init()
         connect(ri, &aadl::AADLObjectIfaceRequired::inheritedLabelsChanged, this,
                 &AADLInterfaceGraphicsItem::updateLabel);
 
+    updateLabel();
     updateIface();
     updateKind();
     setInterfaceName(ifaceLabel());
