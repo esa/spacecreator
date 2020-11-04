@@ -55,11 +55,13 @@ public:
     shared::Id rootObjectId() const;
 
     AADLObject *getObject(const shared::Id &id) const;
-    AADLObject *getObjectByName(const QString &name, AADLObject::Type type = AADLObject::Type::Unknown) const;
-    AADLObjectIface *getIfaceByName(
-            const QString &name, AADLObjectIface::IfaceType dir, const AADLObjectFunctionType *parent = nullptr) const;
+    AADLObject *getObjectByName(const QString &name, AADLObject::Type type = AADLObject::Type::Unknown,
+            Qt::CaseSensitivity caseSensitivity = Qt::CaseInsensitive) const;
+    AADLObjectIface *getIfaceByName(const QString &name, AADLObjectIface::IfaceType dir,
+            const AADLObjectFunctionType *parent = nullptr,
+            Qt::CaseSensitivity caseSensitivity = Qt::CaseInsensitive) const;
     AADLObjectFunction *getFunction(const shared::Id &id) const;
-    AADLObjectFunction *getFunction(const QString &name) const;
+    AADLObjectFunction *getFunction(const QString &name, Qt::CaseSensitivity caseSensitivity) const;
     AADLObjectFunctionType *getFunctionType(const shared::Id &id) const;
     QHash<QString, AADLObjectFunctionType *> getAvailableFunctionTypes(const AADLObjectFunction *fnObj) const;
     AADLObjectIface *getInterface(const shared::Id &id) const;
@@ -67,8 +69,8 @@ public:
     AADLObjectIfaceProvided *getProvidedInterface(const shared::Id &id) const;
     AADLObjectConnection *getConnection(const shared::Id &id) const;
     AADLObjectComment *getCommentById(const shared::Id &id) const;
-    AADLObjectConnection *getConnection(
-            const QString &interfaceName, const QString &source, const QString &target) const;
+    AADLObjectConnection *getConnection(const QString &interfaceName, const QString &source, const QString &target,
+            Qt::CaseSensitivity caseSensitivity) const;
 
     AADLObjectConnection *getConnectionForIface(const shared::Id &id) const;
     QVector<AADLObjectConnection *> getConnectionsForIface(const shared::Id &id) const;

@@ -86,6 +86,7 @@ private:
 
     QPointer<msc::MSCEditorCore> m_mscCore;
     QSharedPointer<aadlinterface::IVEditorCore> m_ivCore;
+    Qt::CaseSensitivity m_caseCheck = Qt::CaseInsensitive;
 };
 
 }

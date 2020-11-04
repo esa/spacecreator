@@ -82,6 +82,7 @@ public Q_SLOTS:
 private:
     QPointer<MscModelStorage> m_mscStorage;
     QPointer<AadlModelStorage> m_aadlStorage;
+    Qt::CaseSensitivity m_caseCheck = Qt::CaseInsensitive;
 };
 
 }

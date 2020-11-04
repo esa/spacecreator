@@ -185,26 +185,28 @@ AADLObject *AADLObjectsModel::getObject(const shared::Id &id) const
     return d->m_objects.value(id, nullptr);
 }
 
-AADLObject *AADLObjectsModel::getObjectByName(const QString &name, AADLObject::Type type) const
+AADLObject *AADLObjectsModel::getObjectByName(
+        const QString &name, AADLObject::Type type, Qt::CaseSensitivity caseSensitivity) const
 {
     if (name.isEmpty())
         return nullptr;
 
     for (auto obj : d->m_objects)
-        if ((type == AADLObject::Type::Unknown || type == obj->aadlType()) && obj->title() == name)
+        if ((type == AADLObject::Type::Unknown || type == obj->aadlType())
+                && obj->title().compare(name, caseSensitivity) == 0)
             return obj;
     return nullptr;
 }
 
-AADLObjectIface *AADLObjectsModel::getIfaceByName(
-        const QString &name, AADLObjectIface::IfaceType dir, const AADLObjectFunctionType *parent) const
+AADLObjectIface *AADLObjectsModel::getIfaceByName(const QString &name, AADLObjectIface::IfaceType dir,
+        const AADLObjectFunctionType *parent, Qt::CaseSensitivity caseSensitivity) const
 {
     if (name.isEmpty()) {
         return nullptr;
     }
 
     for (auto obj : d->m_objects) {
-        if (obj->isInterface() && obj->title() == name) {
+        if (obj->isInterface() && obj->title().compare(name, caseSensitivity) == 0) {
             if (AADLObjectIface *iface = obj->as<AADLObjectIface *>()) {
                 if (iface->direction() == dir && (!parent || iface->parentObject() == parent)) {
                     return iface;
@@ -225,9 +227,9 @@ AADLObjectFunction *AADLObjectsModel::getFunction(const shared::Id &id) const
    Returns the function with the given name.
    If no such function exists nullptr is returned.
  */
-AADLObjectFunction *AADLObjectsModel::getFunction(const QString &name) const
+AADLObjectFunction *AADLObjectsModel::getFunction(const QString &name, Qt::CaseSensitivity caseSensitivity) const
 {
-    return qobject_cast<AADLObjectFunction *>(getObjectByName(name));
+    return qobject_cast<AADLObjectFunction *>(getObjectByName(name, AADLObject::Type::Unknown, caseSensitivity));
 }
 
 AADLObjectFunctionType *AADLObjectsModel::getFunctionType(const shared::Id &id) const
@@ -595,14 +597,15 @@ QVariant AADLObjectsModel::data(const QModelIndex &index, int role) const
    Returns the connection with the given \p interfaceName connection from function \p source to function \p target
    If no such connection is found, a nullptr is returned.
  */
-AADLObjectConnection *AADLObjectsModel::getConnection(
-        const QString &interfaceName, const QString &source, const QString &target) const
+AADLObjectConnection *AADLObjectsModel::getConnection(const QString &interfaceName, const QString &source,
+        const QString &target, Qt::CaseSensitivity caseSensitivity) const
 {
     for (AADLObject *obj : d->m_objects) {
         if (obj->isConnection()) {
             if (AADLObjectConnection *connection = qobject_cast<AADLObjectConnection *>(obj)) {
-                if (connection->targetInterfaceName() == interfaceName && connection->sourceName() == source
-                        && connection->targetName() == target) {
+                if (connection->targetInterfaceName().compare(interfaceName, caseSensitivity) == 0
+                        && connection->sourceName().compare(source, caseSensitivity) == 0
+                        && connection->targetName().compare(target, caseSensitivity) == 0) {
                     return connection;
                 }
             }

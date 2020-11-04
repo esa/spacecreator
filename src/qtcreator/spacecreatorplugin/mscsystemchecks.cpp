@@ -336,8 +336,8 @@ void MscSystemChecks::onMscEntityNameChanged(QObject *entity, const QString &old
 
     auto instance = dynamic_cast<msc::MscInstance *>(entity);
     if (instance) {
-        const bool hasOldName = ivCore()->aadlFunctionsNames().contains(oldName);
-        const bool hasNewName = ivCore()->aadlFunctionsNames().contains(instance->name());
+        const bool hasOldName = ivCore()->aadlFunctionsNames().contains(oldName, m_caseCheck);
+        const bool hasNewName = ivCore()->aadlFunctionsNames().contains(instance->name(), m_caseCheck);
 
         if (!hasOldName && !hasNewName) {
             const int result = QMessageBox::question(nullptr, tr("No AADL function"),
@@ -381,9 +381,11 @@ void MscSystemChecks::onMscEntityNameChanged(QObject *entity, const QString &old
         const QString decodedOldName =
                 aadl::AADLNameValidator::decodeName(aadl::AADLObject::Type::ProvidedInterface, oldName);
         const bool hasNewName =
-                ivCore()->document()->objectsModel()->getConnection(decodedNewName, fromName, toName) != nullptr;
+                ivCore()->document()->objectsModel()->getConnection(decodedNewName, fromName, toName, m_caseCheck)
+                != nullptr;
         const bool hasOldName =
-                ivCore()->document()->objectsModel()->getConnection(decodedOldName, fromName, toName) != nullptr;
+                ivCore()->document()->objectsModel()->getConnection(decodedOldName, fromName, toName, m_caseCheck)
+                != nullptr;
 
         if (!hasNewName && !hasOldName) {
             const int result = QMessageBox::question(nullptr, tr("No AADL connection"),

@@ -218,7 +218,7 @@ bool AadlSystemChecks::connectionExists(QString name, const QString &sourceName,
     }
 
     name = aadl::AADLNameValidator::decodeName(aadl::AADLObject::Type::ProvidedInterface, name);
-    return model->getConnection(name, sourceName, targetName) != nullptr;
+    return model->getConnection(name, sourceName, targetName, m_caseCheck) != nullptr;
 }
 
 /*!
@@ -239,7 +239,8 @@ QStringList AadlSystemChecks::connectionNamesFromTo(QString sourceName, QString 
     QStringList connectionNames;
     for (const aadl::AADLObjectConnection *aadlConnection : connections) {
         if (aadlConnection && !aadlConnection->targetInterfaceName().isEmpty()) {
-            if (aadlConnection->sourceName() == sourceName && aadlConnection->targetName() == targetName) {
+            if (aadlConnection->sourceName().compare(sourceName, m_caseCheck) == 0
+                    && aadlConnection->targetName().compare(targetName, m_caseCheck) == 0) {
                 connectionNames << aadl::AADLNameValidator::encodeName(
                         aadl::AADLObject::Type::ProvidedInterface, aadlConnection->targetInterfaceName());
             }
@@ -320,7 +321,7 @@ bool AadlSystemChecks::correspond(const aadl::AADLObjectFunction *aadlFunc, cons
 
     const QString instanceName =
             aadl::AADLNameValidator::decodeName(aadl::AADLObject::Type::Function, instance->name());
-    return instanceName == aadlFunc->title();
+    return instanceName.compare(aadlFunc->title(), m_caseCheck) == 0;
 }
 
 /*!
@@ -401,7 +402,7 @@ bool AadlSystemChecks::correspond(const aadl::AADLObjectConnection *connection, 
             aadl::AADLNameValidator::decodeName(aadl::AADLObject::Type::ProvidedInterface, message->name());
     bool nameOk = true;
     if (!connection->targetInterfaceName().isEmpty()) {
-        nameOk &= messageName == connection->targetInterfaceName();
+        nameOk &= messageName.compare(connection->targetInterfaceName(), m_caseCheck) == 0;
     }
     return correspond(connection->source(), message->sourceInstance())
             && correspond(connection->target(), message->targetInstance()) && nameOk;

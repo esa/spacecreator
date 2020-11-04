@@ -320,10 +320,11 @@ void tst_AADLObjectsModel::testConnectionQuery()
     auto connect1 = new aadl::AADLObjectConnection(fn1, fn2, iface1, iface2);
     m_model->addObject(connect1);
 
-    QCOMPARE(m_model->getConnection("Dummy", "Fn1", "Fn2"), nullptr);
-    QCOMPARE(m_model->getConnection("cnt1", "Dummy", "Fn2"), nullptr);
-    QCOMPARE(m_model->getConnection("cnt1", "Fn1", "Dummy"), nullptr);
-    QCOMPARE(m_model->getConnection("cnt1", "Fn1", "Fn2"), connect1);
+    const Qt::CaseSensitivity m_caseCheck = Qt::CaseInsensitive;
+    QCOMPARE(m_model->getConnection("Dummy", "Fn1", "Fn2", m_caseCheck), nullptr);
+    QCOMPARE(m_model->getConnection("cnt1", "Dummy", "Fn2", m_caseCheck), nullptr);
+    QCOMPARE(m_model->getConnection("cnt1", "Fn1", "Dummy", m_caseCheck), nullptr);
+    QCOMPARE(m_model->getConnection("cnt1", "Fn1", "Fn2", m_caseCheck), connect1);
 }
 
 QTEST_APPLESS_MAIN(tst_AADLObjectsModel)

@@ -170,13 +170,13 @@ bool IVEditorCore::addConnection(QString name, const QString &fromInstanceName, 
     name = aadl::AADLNameValidator::decodeName(aadl::AADLObject::Type::ProvidedInterface, name);
 
     aadl::AADLObjectsModel *aadlModel = m_document->objectsModel();
-    if (aadlModel->getConnection(name, fromInstanceName, toInstanceName) != nullptr) {
+    if (aadlModel->getConnection(name, fromInstanceName, toInstanceName, m_caseCheck) != nullptr) {
         // The connection exists already
         return false;
     }
 
-    aadl::AADLObjectFunction *fromFunc = aadlModel->getFunction(fromInstanceName);
-    aadl::AADLObjectFunction *toFunc = aadlModel->getFunction(toInstanceName);
+    aadl::AADLObjectFunction *fromFunc = aadlModel->getFunction(fromInstanceName, m_caseCheck);
+    aadl::AADLObjectFunction *toFunc = aadlModel->getFunction(toInstanceName, m_caseCheck);
 
     if (!fromFunc && !toFunc) {
         qDebug() << Q_FUNC_INFO << "No function for the connection" << name;
@@ -210,7 +210,7 @@ bool IVEditorCore::addConnection(QString name, const QString &fromInstanceName, 
 bool IVEditorCore::renameAadlFunction(const QString &oldName, const QString &newName, bool updateSystem)
 {
     aadl::AADLObjectsModel *aadlModel = m_document->objectsModel();
-    aadl::AADLObjectFunction *aadlFunc = aadlModel->getFunction(oldName);
+    aadl::AADLObjectFunction *aadlFunc = aadlModel->getFunction(oldName, m_caseCheck);
     if (!aadlFunc) {
         return false;
     }
@@ -236,7 +236,8 @@ bool IVEditorCore::renameAadlConnection(const QString &oldName, const QString &n
         const QString &toInstanceName, bool updateSystem)
 {
     aadl::AADLObjectsModel *aadlModel = m_document->objectsModel();
-    aadl::AADLObjectConnection *aadlConnect = aadlModel->getConnection(oldName, fromInstanceName, toInstanceName);
+    aadl::AADLObjectConnection *aadlConnect =
+            aadlModel->getConnection(oldName, fromInstanceName, toInstanceName, m_caseCheck);
     if (!aadlConnect) {
         return false;
     }
@@ -357,7 +358,7 @@ aadl::AADLObjectIface *IVEditorCore::getInterface(
         return {};
     }
 
-    aadl::AADLObjectIface *interface = aadlModel->getIfaceByName(ifName, ifType, parentFunction);
+    aadl::AADLObjectIface *interface = aadlModel->getIfaceByName(ifName, ifType, parentFunction, m_caseCheck);
     if (!interface) {
         // create the interface
         aadl::AADLObjectIface::CreationInfo createInfo(aadlModel, parentFunction);
@@ -371,7 +372,7 @@ aadl::AADLObjectIface *IVEditorCore::getInterface(
         createInfo.position = ifPos;
         QUndoCommand *command = cmd::CommandsFactory::create(cmd::CreateInterfaceEntity, createInfo.toVarList());
         cmd::CommandsStack::push(command);
-        interface = aadlModel->getIfaceByName(ifName, ifType, parentFunction);
+        interface = aadlModel->getIfaceByName(ifName, ifType, parentFunction, m_caseCheck);
     }
     return interface;
 }

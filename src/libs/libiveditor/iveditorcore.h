@@ -93,6 +93,8 @@ private:
 
     QVector<aadl::AADLObjectFunction *> m_aadlFunctions;
     QVector<aadl::AADLObjectConnection *> m_aadlConnections;
+
+    Qt::CaseSensitivity m_caseCheck = Qt::CaseInsensitive;
 };
 
 }
