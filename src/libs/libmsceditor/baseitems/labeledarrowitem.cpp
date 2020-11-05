@@ -121,6 +121,14 @@ void LabeledArrowItem::setColor(const QColor &color)
     m_itemArrow->setTargetBrush(color);
 }
 
+/*!
+   Returns the color currently used to draw the arrow
+ */
+QColor LabeledArrowItem::color() const
+{
+    return m_itemArrow->bodyPen().color();
+}
+
 void LabeledArrowItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget)
 {
     Q_UNUSED(option);

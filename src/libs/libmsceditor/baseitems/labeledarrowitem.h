@@ -50,6 +50,7 @@ public:
     void updatePoints(const QPointF &source, const QPointF &target);
 
     void setColor(const QColor &color);
+    QColor color() const;
 
     void setDashed(bool dashed);
 

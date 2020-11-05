@@ -46,6 +46,7 @@
 #include <QGraphicsScene>
 #include <QPainter>
 #include <QPolygonF>
+#include <QTimer>
 
 namespace msc {
 
@@ -74,7 +75,8 @@ MessageItem::MessageItem(MscMessage *message, ChartLayoutManager *chartLayoutMan
 
     setFlags(ItemSendsGeometryChanges | ItemSendsScenePositionChanges | ItemIsSelectable);
 
-    connect(m_message, &msc::MscMessage::dataChanged, this, &msc::MessageItem::checkAadlConnection);
+    connect(m_message, &msc::MscMessage::dataChanged, this, &msc::MessageItem::checkAadlConnection,
+            Qt::QueuedConnection);
     connect(m_message, &msc::MscMessage::dataChanged, this, &msc::MessageItem::updateDisplayText);
     updateDisplayText();
 
@@ -134,7 +136,7 @@ void MessageItem::onTextChanged()
         gph->updateLayout();
     }
 
-    checkAadlConnection();
+    QTimer::singleShot(1, this, &msc::MessageItem::checkAadlConnection);
     update();
 }
 
@@ -144,6 +146,7 @@ void MessageItem::showMessageDialog()
         MessageDialog dialog(m_message, m_chartLayoutManager);
         dialog.setAadlChecker(m_chartLayoutManager->aadlChecker());
         dialog.exec();
+        checkAadlConnection();
     }
 }
 
@@ -774,8 +777,11 @@ void MessageItem::updateDisplayText()
  */
 void MessageItem::checkAadlConnection()
 {
-    m_arrowItem->setColor(aadlConnectionOk() ? msc::MessageColor : msc::AadlErrorColor);
-    updateTooltip();
+    QColor lineColor = aadlConnectionOk() ? msc::MessageColor : msc::AadlErrorColor;
+    if (lineColor != m_arrowItem->color()) {
+        m_arrowItem->setColor(aadlConnectionOk() ? msc::MessageColor : msc::AadlErrorColor);
+        updateTooltip();
+    }
 }
 
 void MessageItem::addMessagePoint(const QPointF &scenePoint)
