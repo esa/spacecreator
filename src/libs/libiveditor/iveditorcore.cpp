@@ -204,7 +204,7 @@ bool IVEditorCore::addConnection(QString name, const QString &fromInstanceName, 
    Renames the function with current name \p oldName to \p newName.
    If \p updateSystem is true, the user is asked to check the .msc models to be updated as well
  */
-bool IVEditorCore::renameAadlFunction(const QString &oldName, const QString &newName, bool updateSystem)
+bool IVEditorCore::renameAadlFunction(const QString &oldName, const QString &newName)
 {
     aadl::AADLObjectsModel *aadlModel = m_document->objectsModel();
     aadl::AADLObjectFunction *aadlFunc = aadlModel->getFunction(oldName, m_caseCheck);
@@ -214,7 +214,6 @@ bool IVEditorCore::renameAadlFunction(const QString &oldName, const QString &new
 
     const QVariantHash attributess = { { aadl::meta::Props::token(aadl::meta::Props::Token::name), newName } };
     auto cmd = new cmd::CmdEntityAttributeChange(aadlFunc, attributess);
-    cmd->setSystemCheck(updateSystem);
     cmd::CommandsStack::push(cmd);
 
     Q_EMIT editedExternally(this);
@@ -229,8 +228,8 @@ bool IVEditorCore::renameAadlFunction(const QString &oldName, const QString &new
    \param toInstanceName
    \return
  */
-bool IVEditorCore::renameAadlConnection(const QString &oldName, const QString &newName, const QString &fromInstanceName,
-        const QString &toInstanceName, bool updateSystem)
+bool IVEditorCore::renameAadlConnection(
+        const QString &oldName, const QString &newName, const QString &fromInstanceName, const QString &toInstanceName)
 {
     aadl::AADLObjectsModel *aadlModel = m_document->objectsModel();
     aadl::AADLObjectConnection *aadlConnect =
@@ -241,7 +240,6 @@ bool IVEditorCore::renameAadlConnection(const QString &oldName, const QString &n
 
     auto cmd = new cmd::CmdIfaceAttrChange(aadlConnect->targetInterface(),
             aadl::meta::Props::token(aadl::meta::Props::Token::name), QVariant::fromValue(newName));
-    cmd->setSystemCheck(updateSystem);
     cmd::CommandsStack::push(cmd);
 
     Q_EMIT editedExternally(this);

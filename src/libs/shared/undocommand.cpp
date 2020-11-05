@@ -29,16 +29,6 @@ UndoCommand::UndoCommand(QUndoCommand *parent)
 {
 }
 
-void UndoCommand::setSystemCheck(bool check)
-{
-    m_systemCheck = check;
-}
-
-bool UndoCommand::checkSystem() const
-{
-    return m_systemCheck;
-}
-
 bool UndoCommand::isFirstChange() const
 {
     return m_firstRedo;

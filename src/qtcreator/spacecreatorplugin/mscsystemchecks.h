@@ -83,6 +83,7 @@ private:
     QPointer<MscModelStorage> m_mscStorage;
     QPointer<AadlModelStorage> m_aadlStorage;
     Qt::CaseSensitivity m_caseCheck = Qt::CaseInsensitive;
+    bool m_nameUpdateRunning = false;
 };
 
 }

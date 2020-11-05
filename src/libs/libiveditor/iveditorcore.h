@@ -61,9 +61,9 @@ public:
     bool addFunction(const QString &name);
     bool addConnection(QString name, const QString &fromInstanceName, const QString &toInstanceName);
 
-    bool renameAadlFunction(const QString &oldName, const QString &newName, bool updateSystem = false);
+    bool renameAadlFunction(const QString &oldName, const QString &newName);
     bool renameAadlConnection(const QString &oldName, const QString &newName, const QString &fromInstanceName,
-            const QString &toInstanceName, bool updateSystem = false);
+            const QString &toInstanceName);
 
     QUndoStack *undoStack() const override;
     cmd::CommandsStack *commandsStack() const;

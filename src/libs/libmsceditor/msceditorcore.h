@@ -112,7 +112,7 @@ public:
     msc::MscCommandsStack *commandsStack() const;
 
     bool renameAsnFile(const QString &oldName, const QString &newName) override;
-    void changeMscInstanceName(const QString &oldName, const QString &name, bool updateSystem = false);
+    void changeMscInstanceName(const QString &oldName, const QString &name);
     void changeMscMessageName(
             const QString &oldName, const QString &newName, const QString &sourceName, const QString &targetName);
 

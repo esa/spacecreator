@@ -40,6 +40,8 @@ void CmdEntityNameChange::redo()
         checkVisualSorting();
         Q_EMIT nameChanged(m_modelItem, m_oldName, this);
     }
+
+    m_firstRedo = false;
 }
 
 void CmdEntityNameChange::undo()

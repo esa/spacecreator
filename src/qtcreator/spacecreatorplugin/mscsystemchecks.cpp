@@ -87,7 +87,7 @@ bool MscSystemChecks::mscInstancesExist(const QString &name)
 void MscSystemChecks::changeMscInstanceName(const QString &oldName, const QString &name)
 {
     for (QSharedPointer<msc::MSCEditorCore> &mscCore : allMscCores()) {
-        mscCore->changeMscInstanceName(oldName, name, false);
+        mscCore->changeMscInstanceName(oldName, name);
     }
 }
 
@@ -279,7 +279,7 @@ QStringList MscSystemChecks::projectFiles(const QString &suffix) const
 void MscSystemChecks::onEntityNameChanged(
         aadl::AADLObject *entity, const QString &oldName, shared::UndoCommand *command)
 {
-    if (!command->isFirstChange() || !command->checkSystem()) {
+    if (m_nameUpdateRunning) {
         return;
     }
 
@@ -290,8 +290,9 @@ void MscSystemChecks::onEntityNameChanged(
                 const int result = QMessageBox::question(
                         nullptr, tr("Update instances"), tr("Do you want to update MSC instances?"));
                 if (result == QMessageBox::Yes) {
-                    cmdAttribChange->setSystemCheck(true);
+                    m_nameUpdateRunning = true;
                     changeMscInstanceName(oldName, entity->title());
+                    m_nameUpdateRunning = false;
                 }
             } else {
                 changeMscInstanceName(oldName, entity->title());
@@ -309,7 +310,6 @@ void MscSystemChecks::onEntityNameChanged(
                     const int result = QMessageBox::question(
                             nullptr, tr("Update messages"), tr("Do you want to update MSC messages?"));
                     if (result == QMessageBox::Yes) {
-                        cmdIfaceAttribChange->setSystemCheck(true);
                         changeMscMessageName(
                                 oldName, entity->title(), connection->sourceName(), connection->targetName());
                     }
@@ -326,7 +326,7 @@ void MscSystemChecks::onEntityNameChanged(
  */
 void MscSystemChecks::onMscEntityNameChanged(QObject *entity, const QString &oldName, shared::UndoCommand *command)
 {
-    if (!command->isFirstChange() && !command->checkSystem()) {
+    if (m_nameUpdateRunning) {
         return;
     }
     if (!ivCore()) {
@@ -349,22 +349,31 @@ void MscSystemChecks::onMscEntityNameChanged(QObject *entity, const QString &old
         }
 
         if (hasOldName && !hasNewName) {
-            QMessageBox box;
-            box.setWindowTitle(tr("Update AADL function"));
-            box.setText(tr("The AADL function should be updated."
-                           "\nDo you want to update it?"
-                           "\nDo you want to add it to the AADL model?"));
-            QPushButton *updateButton = box.addButton(tr("Update"), QMessageBox::AcceptRole);
-            QPushButton *addButton = box.addButton(tr("Add"), QMessageBox::AcceptRole);
-            box.addButton(tr("Ignore"), QMessageBox::RejectRole);
-            box.setDefaultButton(updateButton);
-            box.exec();
-            if (box.clickedButton() == updateButton) {
-                ivCore()->renameAadlFunction(oldName, instance->name(), false);
+            if (command->isFirstChange()) {
+                QMessageBox box;
+                box.setWindowTitle(tr("Update AADL function"));
+                box.setText(tr("The AADL function should be updated."
+                               "\nDo you want to update it?"
+                               "\nDo you want to add it to the AADL model?"));
+                QPushButton *updateButton = box.addButton(tr("Update"), QMessageBox::AcceptRole);
+                QPushButton *addButton = box.addButton(tr("Add"), QMessageBox::AcceptRole);
+                box.addButton(tr("Ignore"), QMessageBox::RejectRole);
+                box.setDefaultButton(updateButton);
+                box.exec();
+                if (box.clickedButton() == updateButton) {
+                    m_nameUpdateRunning = true;
+                    ivCore()->renameAadlFunction(oldName, instance->name());
+                    changeMscInstanceName(oldName, instance->name());
+                    m_nameUpdateRunning = false;
+                }
+                if (box.clickedButton() == addButton) {
+                    ivCore()->addFunction(instance->name());
+                }
+            } else {
+                m_nameUpdateRunning = true;
+                ivCore()->renameAadlFunction(oldName, instance->name());
                 changeMscInstanceName(oldName, instance->name());
-            }
-            if (box.clickedButton() == addButton) {
-                ivCore()->addFunction(instance->name());
+                m_nameUpdateRunning = false;
             }
         }
     }
@@ -390,22 +399,31 @@ void MscSystemChecks::onMscEntityNameChanged(QObject *entity, const QString &old
         }
 
         if (hasOldName && !hasNewName) {
-            QMessageBox box;
-            box.setWindowTitle(tr("Update AADL connection"));
-            box.setText(tr("The AADL connection should be updated."
-                           "\nDo you want to update it?"
-                           "\nDo you want to add it to the AADL model?"));
-            QPushButton *updateButton = box.addButton(tr("Update"), QMessageBox::AcceptRole);
-            QPushButton *addButton = box.addButton(tr("Add"), QMessageBox::AcceptRole);
-            box.addButton(tr("Ignore"), QMessageBox::RejectRole);
-            box.setDefaultButton(updateButton);
-            box.exec();
-            if (box.clickedButton() == updateButton) {
-                ivCore()->renameAadlConnection(oldName, message->name(), fromName, toName, false);
+            if (command->isFirstChange()) {
+                QMessageBox box;
+                box.setWindowTitle(tr("Update AADL connection"));
+                box.setText(tr("The AADL connection should be updated."
+                               "\nDo you want to update it?"
+                               "\nDo you want to add it to the AADL model?"));
+                QPushButton *updateButton = box.addButton(tr("Update"), QMessageBox::AcceptRole);
+                QPushButton *addButton = box.addButton(tr("Add"), QMessageBox::AcceptRole);
+                box.addButton(tr("Ignore"), QMessageBox::RejectRole);
+                box.setDefaultButton(updateButton);
+                box.exec();
+                if (box.clickedButton() == updateButton) {
+                    m_nameUpdateRunning = true;
+                    ivCore()->renameAadlConnection(oldName, message->name(), fromName, toName);
+                    changeMscMessageName(oldName, message->name(), fromName, toName);
+                    m_nameUpdateRunning = false;
+                }
+                if (box.clickedButton() == addButton) {
+                    ivCore()->addConnection(message->name(), fromName, toName);
+                }
+            } else {
+                m_nameUpdateRunning = true;
+                ivCore()->renameAadlConnection(oldName, message->name(), fromName, toName);
                 changeMscMessageName(oldName, message->name(), fromName, toName);
-            }
-            if (box.clickedButton() == addButton) {
-                ivCore()->addConnection(message->name(), fromName, toName);
+                m_nameUpdateRunning = false;
             }
         }
     }

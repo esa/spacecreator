@@ -50,6 +50,7 @@
 #include <QMessageBox>
 #include <QPainter>
 #include <QPainterPath>
+#include <QTimer>
 #include <QtDebug>
 #include <functional>
 
@@ -138,7 +139,7 @@ void InstanceItem::setName(const QString &name)
 {
     updatePropertyString(QLatin1String("name"), name);
     m_headSymbol->setName(name);
-    checkAadlFunction();
+    QTimer::singleShot(1, this, &msc::InstanceItem::checkAadlFunction);
 }
 
 void InstanceItem::setDenominatorAndKind(const QString &kind)

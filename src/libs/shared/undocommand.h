@@ -30,13 +30,9 @@ public:
     explicit UndoCommand(QUndoCommand *parent);
     explicit UndoCommand(const UndoCommand &other) { }
 
-    void setSystemCheck(bool check);
-    bool checkSystem() const;
-
     bool isFirstChange() const;
 
 protected:
-    bool m_systemCheck = false;
     bool m_firstRedo = true;
 };
 
