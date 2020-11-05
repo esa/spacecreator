@@ -17,6 +17,7 @@
 
 #include "aadlobjectconnection.h"
 
+#include "aadlnamevalidator.h"
 #include "aadlobjectfunction.h"
 #include "aadlobjectfunctiontype.h"
 #include "aadlobjectiface.h"
@@ -209,8 +210,13 @@ bool AADLObjectConnection::lookupEndpointsPostponed()
 
         AADLObject *aadlFunction = objectsModel()->getObjectByName(info->m_functionName);
         if (!aadlFunction) {
-            QString warningMessage = QStringLiteral("Unable to find Fn/FnType %1").arg(info->m_functionName);
-            qWarning() << qPrintable(warningMessage);
+            // Try with old encoding
+            aadlFunction = objectsModel()->getObjectByName(
+                    AADLNameValidator::encodeName(AADLObject::Type::Function, info->m_functionName));
+            if (!aadlFunction) {
+                QString warningMessage = QStringLiteral("Unable to find Fn/FnType %1").arg(info->m_functionName);
+                qWarning() << qPrintable(warningMessage);
+            }
         }
         return aadlFunction;
     };
@@ -221,11 +227,18 @@ bool AADLObjectConnection::lookupEndpointsPostponed()
             return nullptr;
         }
 
-        AADLObjectIface *aadlIface = objectsModel()->getIfaceByName(info->m_interfaceName, info->m_ifaceDirection,
-                parentObject ? parentObject->as<AADLObjectFunctionType *>() : nullptr);
+        AADLObjectFunctionType *parentObj = parentObject ? parentObject->as<AADLObjectFunctionType *>() : nullptr;
+        AADLObjectIface *aadlIface =
+                objectsModel()->getIfaceByName(info->m_interfaceName, info->m_ifaceDirection, parentObj);
         if (!aadlIface) {
-            QString warningMessage = QStringLiteral("Unable to find Interface %1").arg(info->m_interfaceName);
-            qWarning() << qPrintable(warningMessage);
+            // Try with old encoding
+            const QString encodedName =
+                    AADLNameValidator::encodeName(AADLObject::Type::RequiredInterface, info->m_interfaceName);
+            aadlIface = objectsModel()->getIfaceByName(encodedName, info->m_ifaceDirection, parentObj);
+            if (!aadlIface) {
+                QString warningMessage = QStringLiteral("Unable to find Interface %1").arg(info->m_interfaceName);
+                qWarning() << qPrintable(warningMessage);
+            }
         }
         return aadlIface;
     };
