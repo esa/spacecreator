@@ -19,7 +19,7 @@ prop              :      |_ Instance of property
 prop.name         :          |_ Name of property
 prop.value        :          |_ Value of property
 {% endcomment %}
-<Connection {% for attr in conn.attributes %} {{ attr.name }}="{{ attr.value }}"{% endfor %}>
+<Connection {% for attr in conn.attributes %}{% if attr.value %} {{ attr.name }}="{{ attr.value }}"{% endif %}{% endfor %}>
     <Source func_name="{{ conn.source }}" {% if conn.siIsRequired %}ri_name={% else %}pi_name={% endif %}"{{ conn.siName }}"/>
     <Target func_name="{{ conn.target }}" {% if conn.tiIsRequired %}ri_name={% else %}pi_name={% endif %}"{{ conn.tiName }}"/>
     {% for prop in conn.properties %}

@@ -332,7 +332,7 @@ void AADLItemModel::changeRootItem(shared::Id id)
     if (m_model->rootObjectId() == id)
         return;
 
-    const QVariantList rootEntityParams { QVariant::fromValue(this), QVariant::fromValue(id) };
+    const QVariantList rootEntityParams { QVariant::fromValue(m_model), QVariant::fromValue(id) };
     const auto geometryCmd = cmd::CommandsFactory::create(cmd::ChangeRootEntity, rootEntityParams);
     cmd::CommandsStack::push(geometryCmd);
 }

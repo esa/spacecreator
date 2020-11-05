@@ -319,7 +319,11 @@ bool InterfaceDocument::exportSelectedFunctions()
     QString name;
     const QList<aadl::AADLObject *> objects = prepareSelectedObjectsForExport(name);
     d->itemsModel->selectionModel()->clearSelection();
-    return exportImpl(componentsLibraryPath() + QDir::separator() + name, objects);
+    const QString path = componentsLibraryPath() + QDir::separator() + name;
+    if (exportImpl(path, objects)) {
+        return loadComponentModel(d->importModel, path + QDir::separator() + kDefaultFilename);
+    }
+    return false;
 }
 
 bool InterfaceDocument::exportSelectedType()
@@ -344,7 +348,11 @@ bool InterfaceDocument::exportSelectedType()
         return false;
     }
     d->itemsModel->selectionModel()->clearSelection();
-    return exportImpl(sharedTypesPath() + QDir::separator() + rootType->title(), { rootType });
+    const QString path = sharedTypesPath() + QDir::separator() + rootType->title();
+    if (exportImpl(path, { rootType })) {
+        return loadComponentModel(d->sharedModel, path + QDir::separator() + kDefaultFilename);
+    }
+    return false;
 }
 
 bool InterfaceDocument::loadComponentModel(aadl::AADLObjectsModel *model, const QString &path)
