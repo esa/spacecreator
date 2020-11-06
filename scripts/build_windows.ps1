@@ -1,5 +1,5 @@
 # Visual Studio installation path
-$VC_PATH = "C:/Program Files (x86)/Microsoft Visual Studio/2019/Community/VC"
+$VC_PATH = "C:/BuildTools/VC"
 
 # Set the variables for visual studio builds
 pushd $VC_PATH'/Auxiliary/Build'
@@ -16,14 +16,13 @@ popd
 
 # Variables for the build system
 $VC_BIN_PATH = "$VC_PATH/Tools/MSVC/$Env:VCToolsVersion/bin/Hostx64/x64"
-$QT_DIR = "C:/Qt/5.14.2/msvc2017_64"
 
 # Create the build directory
 mkdir build_win
 cd build_win
 
 # Run CMake
-cmake -GNinja -DCMAKE_CXX_COMPILER="$VC_BIN_PATH/cl.exe" -DCMAKE_C_COMPILER="$VC_BIN_PATH/cl.exe" -DCMAKE_PREFIX_PATH="$QT_DIR" -DQT_QMAKE_EXECUTABLE="$QT_DIR/bin/qmake.exe" ..
+cmake -GNinja -DCMAKE_PREFIX_PATH="$Env:QTDIR" -DQT_QMAKE_EXECUTABLE="$Env:QTDIR/bin/qmake.exe" ..
 # Build it
 if( $LASTEXITCODE -eq 0 ) {
     ninja

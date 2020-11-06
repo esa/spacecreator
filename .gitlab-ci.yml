@@ -27,10 +27,8 @@ build_debian10_gcc:
 build_windows:
   stage: build
   tags:
-    - win10
-    - vs2019
-    - x64
-    - grantlee
+    - docker-windows
+  image: registry.git.vikingsoftware.com/esa/esa-ci-image-windows:latest
   script:
     - ./scripts/build_windows.ps1
 
