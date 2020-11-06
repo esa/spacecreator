@@ -235,7 +235,7 @@ QVector<QSharedPointer<msc::MSCEditorCore>> MscSystemChecks::allMscCores() const
 /*!
    Returns all aald files of the current project
  */
-QStringList MscSystemChecks::allAadlFiles() const
+QStringList MscSystemChecks::allAadlFiles()
 {
     return projectFiles("interfaceview.xml");
 }
@@ -243,7 +243,7 @@ QStringList MscSystemChecks::allAadlFiles() const
 /*!
    Returns all msc files of the current project
  */
-QStringList MscSystemChecks::allMscFiles() const
+QStringList MscSystemChecks::allMscFiles()
 {
     return projectFiles(".msc");
 }
@@ -251,7 +251,7 @@ QStringList MscSystemChecks::allMscFiles() const
 /*!
    Returns all asn files of the current project
  */
-QStringList MscSystemChecks::allAsn1Files() const
+QStringList MscSystemChecks::allAsn1Files()
 {
     return projectFiles(".asn");
 }
@@ -259,7 +259,7 @@ QStringList MscSystemChecks::allAsn1Files() const
 /*!
    Returns all files of the current project endig with the given \p suffix
  */
-QStringList MscSystemChecks::projectFiles(const QString &suffix) const
+QStringList MscSystemChecks::projectFiles(const QString &suffix)
 {
     ProjectExplorer::Project *project = ProjectExplorer::ProjectTree::currentProject();
     if (!project) {

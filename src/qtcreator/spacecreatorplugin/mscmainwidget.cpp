@@ -34,11 +34,13 @@
 
 #include <QAction>
 #include <QDebug>
+#include <QFileDialog>
 #include <QFileInfo>
 #include <QGraphicsScene>
 #include <QHBoxLayout>
 #include <QImage>
 #include <QMessageBox>
+#include <QPushButton>
 #include <QSplitter>
 #include <QStackedWidget>
 #include <QUndoStack>
@@ -80,9 +82,9 @@ bool MscMainWidget::load(const QString &filename)
         m_plugin->mainModel()->chartViewModel().updateLayout();
         m_plugin->chartView()->setZoom(100);
     }
-    if (m_asn1Widget) {
-        m_asn1Widget->setFile(m_plugin->mainModel()->asn1File());
-    }
+
+    m_asn1Switch->setText(m_plugin->mainModel()->mscModel()->dataDefinitionString());
+
     if (m_documentTree) {
         m_documentTree->expandAll();
         m_documentTree->setSelectedDocument(m_plugin->mainModel()->selectedDocument());
@@ -244,6 +246,17 @@ void MscMainWidget::onViewModeChanged()
     m_documentToolBar->setVisible(m_plugin->viewMode() == msc::MSCEditorCore::ViewMode::HIERARCHY);
 }
 
+void MscMainWidget::openAsn1Dialog()
+{
+    QString dir = QFileInfo(m_plugin->mainModel()->currentFilePath()).absolutePath();
+    QString asn1File = QFileDialog::getOpenFileName(this, tr("Select a asn.1 file"), dir, "*.asn");
+    if (!asn1File.isEmpty()) {
+        QFileInfo fi(asn1File);
+        msc::MscModel *model = m_plugin->mainModel()->mscModel();
+        m_plugin->mainModel()->undoStack()->push(new msc::cmd::CmdSetAsn1File(model, fi.fileName(), "ASN.1"));
+    }
+}
+
 void MscMainWidget::init()
 {
     if (m_documentTree || m_plugin.isNull()) {
@@ -271,19 +284,36 @@ void MscMainWidget::init()
 
     m_plugin->setViews(centerView, graphicsView, hierarchyView);
 
-    m_documentTree = new msc::DocumentTreeView(this);
+    m_leftArea = new QWidget(this);
+
+    m_documentTree = new msc::DocumentTreeView(m_leftArea);
     m_documentTree->header()->setVisible(true);
 
-    m_asn1Widget = new asn1::ASN1FileView(this);
-    m_asn1Widget->setFileContentVisible(false);
-    m_asn1Widget->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Minimum);
+    m_aadlSwitch = new QPushButton("interfaceview.xml", m_leftArea);
+    m_aadlSwitch->setToolTip(tr("Open the file"));
+    connect(m_aadlSwitch, &QPushButton::clicked, this, &spctr::MscMainWidget::showAadlFile);
+    m_aadlSwitch->setSizePolicy(QSizePolicy::MinimumExpanding, QSizePolicy::Minimum);
 
-    m_leftArea = new QWidget(this);
+    auto asn1Widget = new QWidget(m_leftArea);
+    asn1Widget->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Minimum);
+    auto asn1Layout = new QHBoxLayout(asn1Widget);
+    asn1Layout->setMargin(0);
+    asn1Widget->setLayout(asn1Layout);
+    m_asn1Switch = new QPushButton("file.asn", asn1Widget);
+    m_asn1Switch->setToolTip(tr("Open the file"));
+    m_asn1Switch->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Minimum);
+    m_asn1Select = new QPushButton(tr("..."), asn1Widget);
+    m_asn1Select->setToolTip(tr("Select the ASN.1 file"));
+    connect(m_asn1Select, &QPushButton::clicked, this, &spctr::MscMainWidget::openAsn1Dialog);
+    m_asn1Select->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Minimum);
+    asn1Layout->addWidget(m_asn1Switch);
+    asn1Layout->addWidget(m_asn1Select);
 
     m_leftVerticalLayout = new QVBoxLayout(m_leftArea);
     m_leftVerticalLayout->setMargin(0);
     m_leftVerticalLayout->addWidget(m_documentTree);
-    m_leftVerticalLayout->addWidget(m_asn1Widget);
+    m_leftVerticalLayout->addWidget(m_aadlSwitch);
+    m_leftVerticalLayout->addWidget(asn1Widget);
 
     m_horizontalSplitter = new Core::MiniSplitter(Qt::Horizontal);
     m_horizontalSplitter->addWidget(m_leftArea);
@@ -329,21 +359,11 @@ void MscMainWidget::initConnections()
     connect(m_plugin->mainModel()->undoStack(), &QUndoStack::cleanChanged, this,
             [&]() { Q_EMIT dirtyChanged(isDirty()); });
 
-    connect(m_plugin->mainModel(), &msc::MainModel::currentFilePathChanged, this, [&](const QString &filename) {
-        QFileInfo fileInfo(filename);
-        m_asn1Widget->setDirectory(fileInfo.absolutePath());
-    });
-    connect(m_plugin->mainModel(), &msc::MainModel::asn1FileNameChanged, m_asn1Widget,
-            &asn1::ASN1FileView::setFileName);
-    connect(m_asn1Widget, &asn1::ASN1FileView::asn1Selected, this, [this](QString fileName) {
-        msc::MscModel *model = m_plugin->mainModel()->mscModel();
-        if (model && model->dataDefinitionString() != m_asn1Widget->fileName()) {
-            m_plugin->mainModel()->undoStack()->push(
-                    new msc::cmd::CmdSetAsn1File(model, m_asn1Widget->fileName(), "ASN.1"));
-        }
-        Q_EMIT asn1Selected(fileName);
-    });
     connect(m_plugin->mainModel(), &msc::MainModel::asn1ParameterErrorDetected, this, &MscMainWidget::showAsn1Errors);
+
+    connect(m_plugin->mainModel(), &msc::MainModel::asn1FileNameChanged, m_asn1Switch, &QPushButton::setText);
+    connect(m_asn1Switch, &QPushButton::clicked, this,
+            [&]() { Q_EMIT showAsn1File(m_plugin->mainModel()->asn1File().absoluteFilePath()); });
 }
 
 }

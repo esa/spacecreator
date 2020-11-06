@@ -70,10 +70,10 @@ public:
     QSharedPointer<aadlinterface::IVEditorCore> ivCore() const;
     QVector<QSharedPointer<msc::MSCEditorCore>> allMscCores() const;
 
-    QStringList allAadlFiles() const;
-    QStringList allMscFiles() const;
-    QStringList allAsn1Files() const;
-    QStringList projectFiles(const QString &suffix) const;
+    static QStringList allAadlFiles();
+    static QStringList allMscFiles();
+    static QStringList allAsn1Files();
+    static QStringList projectFiles(const QString &suffix);
 
 public Q_SLOTS:
     void onEntityNameChanged(aadl::AADLObject *entity, const QString &oldName, shared::UndoCommand *command);

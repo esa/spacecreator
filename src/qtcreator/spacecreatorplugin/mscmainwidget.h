@@ -25,13 +25,10 @@
 
 class QAction;
 class QGraphicsView;
+class QPushButton;
 class QSplitter;
 class QUndoStack;
 class QVBoxLayout;
-
-namespace asn1 {
-class ASN1FileView;
-}
 
 namespace msc {
 class DocumentTreeView;
@@ -72,7 +69,8 @@ public:
 
 Q_SIGNALS:
     void dirtyChanged(bool dirty);
-    void asn1Selected(const QString &fileName);
+    void showAadlFile();
+    void showAsn1File(const QString &fileName);
     void mscDataLoaded(const QString &fileName, QSharedPointer<msc::MSCEditorCore> data);
 
 private Q_SLOTS:
@@ -80,6 +78,7 @@ private Q_SLOTS:
     void showSelection(const QModelIndex &current, const QModelIndex &previous);
     void showAsn1Errors(const QStringList &faultyMessages);
     void onViewModeChanged();
+    void openAsn1Dialog();
 
 private:
     void init();
@@ -92,7 +91,9 @@ private:
     QVBoxLayout *m_leftVerticalLayout = nullptr;
 
     msc::DocumentTreeView *m_documentTree = nullptr;
-    asn1::ASN1FileView *m_asn1Widget = nullptr;
+    QPushButton *m_aadlSwitch = nullptr;
+    QPushButton *m_asn1Switch = nullptr;
+    QPushButton *m_asn1Select = nullptr;
 
     QSharedPointer<msc::MSCEditorCore> m_plugin;
     QPointer<MscModelStorage> m_mscStorage;

@@ -23,6 +23,7 @@
 #include "msceditorstack.h"
 #include "mscmainwidget.h"
 #include "mscmodelstorage.h"
+#include "mscsystemchecks.h"
 #include "msctexteditor.h"
 #include "spacecreatorpluginconstants.h"
 
@@ -158,7 +159,13 @@ Core::IEditor *MscEditorData::createEditor()
         mscEditor->document()->infoBar()->addInfo(info);
     }
 
-    connect(designWidget, &spctr::MscMainWidget::asn1Selected, this, &MscEditorData::openEditor);
+    connect(designWidget, &spctr::MscMainWidget::showAsn1File, this, &MscEditorData::openEditor);
+    connect(designWidget, &spctr::MscMainWidget::showAadlFile, this, [&]() {
+        QStringList aadlFiles = MscSystemChecks::allAadlFiles();
+        if (!aadlFiles.isEmpty()) {
+            openEditor(aadlFiles.first());
+        }
+    });
     connect(designWidget, &spctr::MscMainWidget::mscDataLoaded, this,
             [this, designWidget](const QString &fileName, QSharedPointer<msc::MSCEditorCore> data) {
                 designWidget->mscCore()->minimapView()->setVisible(m_minimapVisible);
