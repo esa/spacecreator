@@ -30,7 +30,9 @@ build_windows:
     - docker-windows
   image: registry.git.vikingsoftware.com/esa/esa-ci-image-windows:latest
   script:
-    - ./scripts/build_windows.ps1
+    - mkdir build; cd build
+    - cmake -GNinja -DCMAKE_PREFIX_PATH="$Env:QTDIR" -DQT_QMAKE_EXECUTABLE="$Env:QTDIR/bin/qmake.exe" ..
+    - ninja
 
 ##################
 # TEST
