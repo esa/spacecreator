@@ -65,8 +65,15 @@ public:
     QVector<QPair<msc::MscChart *, msc::MscMessage *>> checkMessages() const;
     bool checkMessage(const msc::MscMessage *message) const;
     QStringList connectionNames() const;
-    bool connectionExists(const QString& name, const QString &sourceName, const QString &targetName) const;
-    QStringList connectionNamesFromTo(const QString& sourceName, const QString& targetName) const;
+    bool connectionExists(const QString &name, const QString &sourceName, const QString &targetName) const;
+    QStringList connectionNamesFromTo(const QString &sourceName, const QString &targetName) const;
+
+    aadl::AADLObjectFunction *correspondingFunction(const MscInstance *instance) const;
+    bool correspond(const aadl::AADLObject *aadlObj, const msc::MscInstance *instance) const;
+    bool correspond(const aadl::AADLObjectFunction *aadlFunc, const msc::MscInstance *instance) const;
+
+    aadl::AADLObjectConnection *correspondingConnection(const MscMessage *message) const;
+    bool correspond(const aadl::AADLObjectConnection *connection, const msc::MscMessage *message) const;
 
 Q_SIGNALS:
     void mscCoreChanged();
@@ -74,15 +81,9 @@ Q_SIGNALS:
 
 private:
     aadl::AADLObjectsModel *aadlModel() const;
-    aadl::AADLObjectFunction *correspondingFunction(const MscInstance *instance) const;
-    bool correspond(const aadl::AADLObject *aadlObj, const msc::MscInstance *instance) const;
-    bool correspond(const aadl::AADLObjectFunction *aadlFunc, const msc::MscInstance *instance) const;
     bool hasAncestor(aadl::AADLObjectFunction *func, const QVector<aadl::AADLObjectFunction *> allFunctions) const;
     bool hasDescendant(aadl::AADLObjectFunction *func, const QVector<aadl::AADLObjectFunction *> allFunctions) const;
     bool isAncestor(aadl::AADLObjectFunction *func, aadl::AADLObjectFunction *otherFunc) const;
-
-    aadl::AADLObjectConnection *correspondingConnection(const MscMessage *message) const;
-    bool correspond(const aadl::AADLObjectConnection *connection, const msc::MscMessage *message) const;
 
     QPointer<msc::MSCEditorCore> m_mscCore;
     QSharedPointer<aadlinterface::IVEditorCore> m_ivCore;

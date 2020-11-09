@@ -43,6 +43,24 @@ struct AADLObjectConnectionPrivate {
         , m_ifaceSource(ifaceSource)
         , m_ifaceTarget(ifaceTarget)
     {
+        setData(source, target, ifaceSource, ifaceTarget);
+    }
+    void setData(AADLObject *source, AADLObject *target, AADLObjectIface *ifaceSource, AADLObjectIface *ifaceTarget)
+    {
+        m_source = source;
+        m_ifaceSource = ifaceSource;
+        m_target = target;
+        m_ifaceTarget = ifaceTarget;
+        if (m_source && m_ifaceSource && m_target && m_ifaceTarget) {
+            if (ifaceSource->direction() == AADLObjectIface::IfaceType::Provided
+                    && ifaceTarget->direction() == AADLObjectIface::IfaceType::Required) {
+                // source and target should be reversed
+                m_source = target;
+                m_ifaceSource = ifaceTarget;
+                m_target = source;
+                m_ifaceTarget = ifaceSource;
+            }
+        }
     }
     QPointer<AADLObject> m_source { nullptr };
     QPointer<AADLObject> m_target { nullptr };
@@ -268,10 +286,7 @@ bool AADLObjectConnection::lookupEndpointsPostponed()
         return false;
     }
 
-    d->m_source = objFrom;
-    d->m_target = objTo;
-    d->m_ifaceSource = ifaceFrom;
-    d->m_ifaceTarget = ifaceTo;
+    d->setData(objFrom, objTo, ifaceFrom, ifaceTo);
 
     clearPostponedEndpoints();
     return true;

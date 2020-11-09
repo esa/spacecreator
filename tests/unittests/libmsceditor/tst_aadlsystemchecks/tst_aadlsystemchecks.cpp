@@ -32,9 +32,9 @@
 #include "mscmodel.h"
 
 #include <QGraphicsScene>
-#include <QGraphicsView>
 #include <QUndoCommand>
 #include <QtTest>
+#include <memory>
 
 using namespace msc;
 
@@ -54,8 +54,10 @@ private Q_SLOTS:
     void testCheckInstanceRelations();
     void testCheckMessageNames();
 
+    void testCorrespondMessage_data();
+    void testCorrespondMessage();
+
 private:
-    QGraphicsView m_view;
     msc::ChartItem m_chartItem;
     QUndoStack m_stack;
 };
@@ -185,13 +187,13 @@ void tst_AadlSystemChecks::testCheckMessageNames()
     auto instanceA = new msc::MscInstance("Instance A", chart);
     chart->addInstance(instanceA);
     auto message = new msc::MscMessage("Msg1", chart);
-    message->setTargetInstance(instanceA);
+    message->setSourceInstance(instanceA);
     chart->addInstanceEvent(message);
 
     // Add Instance 'B'
     auto instanceB = new msc::MscInstance("Instance B", chart);
     chart->addInstance(instanceB);
-    message->setSourceInstance(instanceB);
+    message->setTargetInstance(instanceB);
 
     result = checker.checkMessages();
     QCOMPARE(result.size(), 1);
@@ -206,18 +208,19 @@ void tst_AadlSystemChecks::testCheckMessageNames()
 
     // Add connection with proper source/target, but a wrong name
     const auto createInfoA = aadl::AADLObjectIface::CreationInfo(aadlModel, aadlfFuncA, QPointF(),
-            aadl::AADLObjectIface::IfaceType::Provided, shared::createId(), QVector<aadl::IfaceParameter>(),
+            aadl::AADLObjectIface::IfaceType::Required, shared::createId(), QVector<aadl::IfaceParameter>(),
             aadl::AADLObjectIface::OperationKind::Sporadic, "DummyA");
-    aadl::AADLObjectIface *providedInterface = aadl::AADLObjectIface::createIface(createInfoA);
-    aadlModel->addObject(providedInterface);
+    aadl::AADLObjectIface *requiredInterface = aadl::AADLObjectIface::createIface(createInfoA);
+    aadlModel->addObject(requiredInterface);
 
     const auto createInfoB = aadl::AADLObjectIface::CreationInfo(aadlModel, aadlfFuncB, QPointF(),
-            aadl::AADLObjectIface::IfaceType::Required, shared::createId(), QVector<aadl::IfaceParameter>(),
+            aadl::AADLObjectIface::IfaceType::Provided, shared::createId(), QVector<aadl::IfaceParameter>(),
             aadl::AADLObjectIface::OperationKind::Sporadic, "DummyB");
-    aadl::AADLObjectIface *requiredInterface = aadl::AADLObjectIface::createIface(createInfoB);
-
+    aadl::AADLObjectIface *providedInterface = aadl::AADLObjectIface::createIface(createInfoB);
     aadlModel->addObject(providedInterface);
-    aadlModel->addObject(new aadl::AADLObjectConnection(aadlfFuncB, aadlfFuncA, requiredInterface, providedInterface));
+
+    auto connection = new aadl::AADLObjectConnection(aadlfFuncA, aadlfFuncB, requiredInterface, providedInterface);
+    aadlModel->addObject(connection);
     result = checker.checkMessages();
     QCOMPARE(result.size(), 1);
 
@@ -225,6 +228,69 @@ void tst_AadlSystemChecks::testCheckMessageNames()
     providedInterface->setTitle("Msg1");
     result = checker.checkMessages();
     QCOMPARE(result.size(), 0); // Everything is ok
+}
+
+void tst_AadlSystemChecks::testCorrespondMessage_data()
+{
+    using namespace aadl;
+    QTest::addColumn<QString>("sourceFuncName");
+    QTest::addColumn<QString>("sourceIfName");
+    QTest::addColumn<AADLObjectIface::IfaceType>("sourceIfType");
+    QTest::addColumn<QString>("targetFuncName");
+    QTest::addColumn<QString>("targetIfName");
+    QTest::addColumn<AADLObjectIface::IfaceType>("targetIfType");
+    QTest::addColumn<bool>("expected");
+
+    QTest::newRow("Correct") << "A"
+                             << "msg" << AADLObjectIface::IfaceType::Required << "B"
+                             << "msg" << AADLObjectIface::IfaceType::Provided << true;
+    QTest::newRow("Source IF name ignored") << "A"
+                                            << "IGNORED" << AADLObjectIface::IfaceType::Required << "B"
+                                            << "msg" << AADLObjectIface::IfaceType::Provided << true;
+    QTest::newRow("From name wrong") << "ERROR"
+                                     << "msg" << AADLObjectIface::IfaceType::Required << "B"
+                                     << "msg" << AADLObjectIface::IfaceType::Provided << false;
+    QTest::newRow("To name wrong") << "A"
+                                   << "msg" << AADLObjectIface::IfaceType::Required << "ERROR"
+                                   << "msg" << AADLObjectIface::IfaceType::Provided << false;
+    QTest::newRow("Source/targe flip irgnored") << "B"
+                                                << "msg" << AADLObjectIface::IfaceType::Provided << "A"
+                                                << "msg" << AADLObjectIface::IfaceType::Required << true;
+}
+
+void tst_AadlSystemChecks::testCorrespondMessage()
+{
+    using namespace aadl;
+    QFETCH(QString, sourceFuncName);
+    QFETCH(QString, sourceIfName);
+    QFETCH(AADLObjectIface::IfaceType, sourceIfType);
+    QFETCH(QString, targetFuncName);
+    QFETCH(QString, targetIfName);
+    QFETCH(AADLObjectIface::IfaceType, targetIfType);
+    QFETCH(bool, expected);
+
+    // Setup message "msg" from "A" to "B"
+    auto instanceFrom = std::make_unique<msc::MscInstance>("A", nullptr);
+    auto instanceTo = std::make_unique<msc::MscInstance>("B", nullptr);
+    auto message = std::make_unique<msc::MscMessage>("msg", nullptr);
+    message->setSourceInstance(instanceFrom.get());
+    message->setTargetInstance(instanceTo.get());
+
+    // Setup the connection
+    auto sourceFunc = std::make_unique<AADLObjectFunction>(sourceFuncName);
+    auto targetFunc = std::make_unique<AADLObjectFunction>(targetFuncName);
+    const auto sourceIfInfo = AADLObjectIface::CreationInfo(nullptr, sourceFunc.get(), QPointF(), sourceIfType,
+            shared::createId(), QVector<IfaceParameter>(), AADLObjectIface::OperationKind::Sporadic, sourceIfName);
+    std::unique_ptr<AADLObjectIface> sourceIf(AADLObjectIface::createIface(sourceIfInfo));
+    const auto targetIfInfo = AADLObjectIface::CreationInfo(nullptr, targetFunc.get(), QPointF(), targetIfType,
+            shared::createId(), QVector<IfaceParameter>(), AADLObjectIface::OperationKind::Sporadic, targetIfName);
+    std::unique_ptr<AADLObjectIface> targetIf(AADLObjectIface::createIface(targetIfInfo));
+    auto connection =
+            std::make_unique<AADLObjectConnection>(sourceFunc.get(), targetFunc.get(), sourceIf.get(), targetIf.get());
+
+    msc::AadlSystemChecks checker;
+    const bool doCorrespond = checker.correspond(connection.get(), message.get());
+    QCOMPARE(doCorrespond, expected);
 }
 
 QTEST_MAIN(tst_AadlSystemChecks)
