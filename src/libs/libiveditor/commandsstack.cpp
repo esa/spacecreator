@@ -19,6 +19,7 @@
 
 #include "aadlobject.h"
 #include "interface/commands/cmdentityattributechange.h"
+#include "interface/commands/cmdentityremove.h"
 #include "interface/commands/cmdifaceattrchange.h"
 #include "undocommand.h"
 
@@ -160,6 +161,9 @@ bool CommandsStack::push(QUndoCommand *command)
         }
         if (auto nameCommand = dynamic_cast<CmdIfaceAttrChange *>(command)) {
             connect(nameCommand, &CmdIfaceAttrChange::nameChanged, instance(), &CommandsStack::nameChanged);
+        }
+        if (auto nameCommand = dynamic_cast<CmdEntityRemove *>(command)) {
+            connect(nameCommand, &CmdEntityRemove::entityRemoved, instance(), &CommandsStack::entityRemoved);
         }
         CommandsStack::current()->push(command);
         return true;

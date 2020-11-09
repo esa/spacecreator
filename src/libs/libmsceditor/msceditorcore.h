@@ -25,6 +25,11 @@
 #include <QVector>
 #include <memory>
 
+namespace aadl {
+class AADLObjectConnection;
+class AADLObjectFunction;
+}
+
 namespace shared {
 class UndoCommand;
 }
@@ -115,6 +120,8 @@ public:
     void changeMscInstanceName(const QString &oldName, const QString &name);
     void changeMscMessageName(
             const QString &oldName, const QString &newName, const QString &sourceName, const QString &targetName);
+    void removeMscInstances(aadl::AADLObjectFunction *aaldFunction);
+    void removeMscMessages(aadl::AADLObjectConnection *aadlConnection);
 
     QString filePath() const override;
     bool save() override;

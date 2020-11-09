@@ -36,8 +36,8 @@ namespace cmd {
 class CmdDeleteEntity : public ChartBaseCommand
 {
 public:
-    CmdDeleteEntity(QVector<msc::MscEntity *> items, msc::MscDocument *document,
-            ChartLayoutManager *layoutManager);
+    CmdDeleteEntity(QVector<msc::MscEntity *> items, msc::MscDocument *document, ChartLayoutManager *layoutManager);
+    CmdDeleteEntity(QVector<msc::MscEntity *> items, msc::MscChart *chart);
 
     void redo() override;
     void undo() override;
@@ -45,6 +45,8 @@ public:
     int id() const override;
 
 private:
+    void initChartData(const QVector<MscEntity *> &items);
+
     QMap<int, MscInstanceEvent *> m_events;
     QMap<int, MscEntity *> m_entities;
     QPointer<MscDocument> m_document;

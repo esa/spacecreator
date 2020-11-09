@@ -72,6 +72,8 @@ void AadlModelStorage::setIvData(const QString &fileName, QSharedPointer<aadlint
     connect(ivData.data(), &shared::EditorCore::editedExternally, this, &spctr::AadlModelStorage::editedExternally);
     connect(ivData->commandsStack(), &aadlinterface::cmd::CommandsStack::nameChanged, m_checks,
             &spctr::MscSystemChecks::onEntityNameChanged);
+    connect(ivData->commandsStack(), &aadlinterface::cmd::CommandsStack::entityRemoved, m_checks,
+            &spctr::MscSystemChecks::onEntityRemoved);
     Q_EMIT coreAdded(ivData);
 }
 

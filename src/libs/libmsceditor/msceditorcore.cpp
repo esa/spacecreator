@@ -17,8 +17,10 @@
 
 #include "msceditorcore.h"
 
+#include "aadlobjectconnection.h"
 #include "aadlsystemchecks.h"
 #include "commandlineparser.h"
+#include "commands/cmddeleteentity.h"
 #include "commands/cmddocumentcreate.h"
 #include "commands/cmdentitynamechange.h"
 #include "commands/cmdsetasn1file.h"
@@ -513,6 +515,50 @@ void MSCEditorCore::changeMscMessageName(
     }
 }
 
+/*!
+   Removes all instance that are corresponding to the function \p aaldFunction
+ */
+void MSCEditorCore::removeMscInstances(aadl::AADLObjectFunction *aaldFunction)
+{
+    bool updated = false;
+    msc::MscCommandsStack *undo = commandsStack();
+    for (msc::MscChart *chart : m_model->mscModel()->allCharts()) {
+        for (msc::MscInstance *instance : chart->instances()) {
+            if (m_aadlChecks->correspond(aaldFunction, instance)) {
+                auto cmd = new msc::cmd::CmdDeleteEntity({ instance }, chart);
+                undo->push(cmd);
+                updated = true;
+            }
+        }
+    }
+
+    if (updated) {
+        Q_EMIT editedExternally(this);
+    }
+}
+
+/*!
+   Removes all messages that are corresponding to the connection \p aadlConnection
+ */
+void MSCEditorCore::removeMscMessages(aadl::AADLObjectConnection *aadlConnection)
+{
+    bool updated = false;
+    msc::MscCommandsStack *undo = commandsStack();
+    for (msc::MscChart *chart : m_model->mscModel()->allCharts()) {
+        for (msc::MscMessage *message : chart->messages()) {
+            if (m_aadlChecks->correspond(aadlConnection, message)) {
+                auto cmd = new msc::cmd::CmdDeleteEntity({ message }, chart);
+                undo->push(cmd);
+                updated = true;
+            }
+        }
+    }
+
+    if (updated) {
+        Q_EMIT editedExternally(this);
+    }
+}
+
 QString MSCEditorCore::filePath() const
 {
     return m_model->currentFilePath();
@@ -744,5 +790,4 @@ void MSCEditorCore::addDocument(MscDocument::HierarchyType type)
 
     m_model->setSelectedDocument(document);
 }
-
 }

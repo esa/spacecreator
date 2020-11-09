@@ -23,6 +23,8 @@
 
 namespace aadl {
 class AADLObject;
+class AADLObjectConnection;
+class AADLObjectFunction;
 }
 
 namespace aadlinterface {
@@ -58,10 +60,12 @@ public:
     // Check functions
     bool mscInstancesExist(const QString &name);
     void changeMscInstanceName(const QString &oldName, const QString &name);
+    void removeMscInstances(aadl::AADLObjectFunction *aadlFunction);
 
     bool mscMessagesExist(const QString &messageName, const QString &sourceName, const QString &targetName);
     void changeMscMessageName(
             const QString &oldName, const QString &name, const QString &sourceName, const QString &targetName);
+    void removeMscMessages(aadl::AADLObjectConnection *aadlConnection);
 
     void checkInstances();
     void checkMessages();
@@ -78,6 +82,7 @@ public:
 public Q_SLOTS:
     void onEntityNameChanged(aadl::AADLObject *entity, const QString &oldName, shared::UndoCommand *command);
     void onMscEntityNameChanged(QObject *entity, const QString &oldName, shared::UndoCommand *command);
+    void onEntityRemoved(aadl::AADLObject *entity, shared::UndoCommand *command);
 
 private:
     QPointer<MscModelStorage> m_mscStorage;

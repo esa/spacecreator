@@ -61,6 +61,7 @@ public:
 Q_SIGNALS:
     void currentStackChanged(QUndoStack *to);
     void nameChanged(aadl::AADLObject *entity, const QString &oldName, shared::UndoCommand *command);
+    void entityRemoved(aadl::AADLObject *entity, shared::UndoCommand *command);
 
 private:
     explicit CommandsStack(QObject *parent = nullptr);

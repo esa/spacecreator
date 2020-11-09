@@ -30,7 +30,7 @@ namespace aadlinterface {
 namespace cmd {
 
 CmdEntityRemove::CmdEntityRemove(aadl::AADLObject *entity, aadl::AADLObjectsModel *model)
-    : QUndoCommand()
+    : shared::UndoCommand()
     , m_model(model)
     , m_entity(entity)
 {
@@ -110,8 +110,10 @@ void CmdEntityRemove::redo()
 
     removeAadlObjects(m_relatedEntities);
 
-    if (m_entity)
+    if (m_entity) {
         advancedRemove(m_entity);
+        Q_EMIT entityRemoved(m_entity, this);
+    }
 }
 
 void CmdEntityRemove::undo()

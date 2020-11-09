@@ -18,6 +18,7 @@
 #pragma once
 
 #include "common.h"
+#include "undocommand.h"
 
 #include <QPointer>
 #include <QUndoCommand>
@@ -32,8 +33,9 @@ class AADLObjectFunctionType;
 namespace aadlinterface {
 namespace cmd {
 
-class CmdEntityRemove : public QUndoCommand
+class CmdEntityRemove : public shared::UndoCommand
 {
+    Q_OBJECT
 public:
     explicit CmdEntityRemove(aadl::AADLObject *entity, aadl::AADLObjectsModel *model);
     ~CmdEntityRemove() override;
@@ -44,6 +46,9 @@ public:
     int id() const override;
 
     aadl::AADLObject *entity() const;
+
+Q_SIGNALS:
+    void entityRemoved(aadl::AADLObject *obj, shared::UndoCommand *command);
 
 private:
     QPointer<aadl::AADLObjectsModel> m_model;

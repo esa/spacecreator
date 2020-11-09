@@ -259,7 +259,7 @@ aadl::AADLObjectsModel *AadlSystemChecks::aadlModel() const
 }
 
 /*!
-   Returns the aadl functions that correlates to the given msc instance
+   Returns the aadl functions that corresponds to the given msc instance
  */
 aadl::AADLObjectFunction *AadlSystemChecks::correspondingFunction(const MscInstance *instance) const
 {

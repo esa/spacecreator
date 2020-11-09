@@ -35,41 +35,7 @@ CmdDeleteEntity::CmdDeleteEntity(
 {
     setText(QObject::tr("Delete"));
 
-    if (m_chart) {
-        auto fetchRelatedComments = [this](MscEntity *entity) {
-            if (MscInstanceEvent *commentEntity = entity->comment()) {
-                const int idx = m_chart->instanceEvents().indexOf(commentEntity);
-                m_events[idx] = commentEntity;
-            }
-        };
-
-        for (auto item : items) {
-            auto event = dynamic_cast<MscInstanceEvent *>(item);
-            if (event) {
-                const int idx = m_chart->instanceEvents().indexOf(event);
-                m_events[idx] = event;
-            }
-            auto instance = dynamic_cast<MscInstance *>(item);
-            if (instance) {
-                const int idx = m_chart->instances().indexOf(instance);
-                m_entities[idx] = instance;
-            }
-            fetchRelatedComments(item);
-        }
-
-        // now add all events that depend on instances that are deleted
-        for (auto entity : m_entities) {
-            auto instance = dynamic_cast<MscInstance *>(entity);
-            m_chart->removeInstance(instance);
-            for (auto event : m_chart->instanceEvents()) {
-                if (event->relatesTo(instance)) {
-                    const int idx = m_chart->instanceEvents().indexOf(event);
-                    m_events[idx] = event;
-                    fetchRelatedComments(event);
-                }
-            }
-        }
-    }
+    initChartData(items);
 
     if (m_document && !items.empty()) {
         auto itemDocument = dynamic_cast<MscDocument *>(items[0]);
@@ -78,6 +44,15 @@ CmdDeleteEntity::CmdDeleteEntity(
             m_entities[idx] = itemDocument;
         }
     }
+}
+
+CmdDeleteEntity::CmdDeleteEntity(QVector<MscEntity *> items, MscChart *chart)
+    : ChartBaseCommand(nullptr, nullptr)
+{
+    m_chart = chart;
+    setText(QObject::tr("Delete"));
+
+    initChartData(items);
 }
 
 void CmdDeleteEntity::redo()
@@ -145,6 +120,47 @@ bool CmdDeleteEntity::mergeWith(const QUndoCommand *command)
 int CmdDeleteEntity::id() const
 {
     return msc::cmd::Id::DeleteEntity;
+}
+
+void CmdDeleteEntity::initChartData(const QVector<MscEntity *> &items)
+{
+    if (!m_chart) {
+        return;
+    }
+
+    auto fetchRelatedComments = [this](MscEntity *entity) {
+        if (MscInstanceEvent *commentEntity = entity->comment()) {
+            const int idx = m_chart->instanceEvents().indexOf(commentEntity);
+            m_events[idx] = commentEntity;
+        }
+    };
+
+    for (auto item : items) {
+        auto event = dynamic_cast<MscInstanceEvent *>(item);
+        if (event) {
+            const int idx = m_chart->instanceEvents().indexOf(event);
+            m_events[idx] = event;
+        }
+        auto instance = dynamic_cast<MscInstance *>(item);
+        if (instance) {
+            const int idx = m_chart->instances().indexOf(instance);
+            m_entities[idx] = instance;
+        }
+        fetchRelatedComments(item);
+    }
+
+    // now add all events that depend on instances that are deleted
+    for (auto entity : m_entities) {
+        auto instance = dynamic_cast<MscInstance *>(entity);
+        m_chart->removeInstance(instance);
+        for (auto event : m_chart->instanceEvents()) {
+            if (event->relatesTo(instance)) {
+                const int idx = m_chart->instanceEvents().indexOf(event);
+                m_events[idx] = event;
+                fetchRelatedComments(event);
+            }
+        }
+    }
 }
 
 } // namespace cmd

@@ -19,6 +19,7 @@
 
 #include "aadlmodelstorage.h"
 #include "aadlobjectconnection.h"
+#include "aadlobjectfunction.h"
 #include "aadlobjectiface.h"
 #include "aadlobjectsmodel.h"
 #include "aadlsystemchecks.h"
@@ -92,6 +93,16 @@ void MscSystemChecks::changeMscInstanceName(const QString &oldName, const QStrin
 }
 
 /*!
+   Removes all instance that are corresponding to the function \p aaldFunction
+ */
+void MscSystemChecks::removeMscInstances(aadl::AADLObjectFunction *aadlFunction)
+{
+    for (QSharedPointer<msc::MSCEditorCore> &mscCore : allMscCores()) {
+        mscCore->removeMscInstances(aadlFunction);
+    }
+}
+
+/*!
   Returns if at least one message in one of the .msc files has the name \p messageName
  */
 bool MscSystemChecks::mscMessagesExist(const QString &messageName, const QString &sourceName, const QString &targetName)
@@ -121,6 +132,16 @@ void MscSystemChecks::changeMscMessageName(
 {
     for (QSharedPointer<msc::MSCEditorCore> &mscCore : allMscCores()) {
         mscCore->changeMscMessageName(oldName, newName, sourceName, targetName);
+    }
+}
+
+/*!
+   Removes all messages that are corresponding to the connection \p aadlConnection
+ */
+void MscSystemChecks::removeMscMessages(aadl::AADLObjectConnection *aadlConnection)
+{
+    for (QSharedPointer<msc::MSCEditorCore> &mscCore : allMscCores()) {
+        mscCore->removeMscMessages(aadlConnection);
     }
 }
 
@@ -425,6 +446,37 @@ void MscSystemChecks::onMscEntityNameChanged(QObject *entity, const QString &old
                 changeMscMessageName(oldName, message->name(), fromName, toName);
                 m_nameUpdateRunning = false;
             }
+        }
+    }
+}
+
+/*!
+   Removes corresponding MSC entities when a AADL entity wasremoved
+ */
+void MscSystemChecks::onEntityRemoved(aadl::AADLObject *entity, shared::UndoCommand *command)
+{
+    if (!entity) {
+        return;
+    }
+
+    bool doRemove = true;
+    if (command->isFirstChange()) {
+        const int result = QMessageBox::question(nullptr, tr("Remove MSC entities"),
+                tr("The AADL entity %1 was removed."
+                   "\nDo you want to remove the corelating MSC entities?")
+                        .arg(entity->title()));
+        if (result != QMessageBox::Yes) {
+            doRemove = false;
+        }
+    }
+    if (doRemove) {
+        auto aadlFunction = dynamic_cast<aadl::AADLObjectFunction *>(entity);
+        if (aadlFunction) {
+            removeMscInstances(aadlFunction);
+        }
+        auto aadlConnection = dynamic_cast<aadl::AADLObjectConnection *>(entity);
+        if (aadlConnection) {
+            removeMscMessages(aadlConnection);
         }
     }
 }
