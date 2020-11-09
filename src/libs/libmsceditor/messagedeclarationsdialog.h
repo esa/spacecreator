@@ -24,6 +24,7 @@
 #include <memory>
 
 namespace msc {
+class AadlSystemChecks;
 class MscCommandsStack;
 class MscModel;
 class MscMessageDeclaration;
@@ -40,7 +41,7 @@ class MessageDeclarationsDialog : public QDialog
 
 public:
     explicit MessageDeclarationsDialog(msc::MscMessageDeclarationList *model, msc::MscModel *mscModel,
-            msc::MscCommandsStack *undoStack, QWidget *parent = nullptr);
+            msc::MscCommandsStack *undoStack, msc::AadlSystemChecks *checker, QWidget *parent = nullptr);
     ~MessageDeclarationsDialog();
 
     msc::MscMessageDeclarationList *declarations() const;
@@ -69,6 +70,8 @@ private Q_SLOTS:
 
     void checkforEmptyCompleter();
 
+    void importFromAadl();
+
 private:
     void updateAsn1TypesView();
 
@@ -78,4 +81,5 @@ private:
     msc::MscModel *m_mscModel;
     QString m_fileName;
     QPointer<msc::MscCommandsStack> m_undoStack;
+    QPointer<msc::AadlSystemChecks> m_checker;
 };

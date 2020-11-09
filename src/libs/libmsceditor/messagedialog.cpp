@@ -216,7 +216,7 @@ void MessageDialog::editDeclarations()
     if (docs.isEmpty())
         return;
 
-    MessageDeclarationsDialog dialog(declarations, mscModel(), m_chartLayoutManager->undoStack(), this);
+    MessageDeclarationsDialog dialog(declarations, mscModel(), m_chartLayoutManager->undoStack(), m_aadlChecker, this);
     dialog.setFileName(model->dataDefinitionString());
     dialog.setAadlConnectionNames(m_connectionNames);
 

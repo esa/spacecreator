@@ -84,4 +84,18 @@ void MscMessageDeclarationList::setObjectList(const QList<MscMessageDeclaration 
     }
 }
 
+/*!
+   Returns if this list contains a message declaration that is the same as \p declaration.
+   Meaning the names and declarations are the same
+ */
+bool MscMessageDeclarationList::exists(MscMessageDeclaration *declaration) const
+{
+    for (const MscMessageDeclaration *decl : *this) {
+        if (*decl == *declaration) {
+            return true;
+        }
+    }
+    return false;
+}
+
 } // namespace msc

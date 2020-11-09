@@ -319,6 +319,7 @@ bool AADLObjectConnection::postInit()
 
 AADLObjectConnection::ConnectionType AADLObjectConnection::connectionType() const
 {
+
     const AADLObjectIface *srcIface = sourceInterface();
     const AADLObjectIface *dstIface = targetInterface();
     if (!srcIface || !dstIface)
@@ -333,6 +334,28 @@ AADLObjectConnection::ConnectionType AADLObjectConnection::connectionType() cons
 bool AADLObjectConnection::isOneDirection() const
 {
     return sourceInterface()->direction() == targetInterface()->direction();
+}
+
+/*!
+   Returns the name of a connection. Usually that's the name of the provider interface
+ */
+QString AADLObjectConnection::name() const
+{
+    return targetInterfaceName().isEmpty() ? sourceInterfaceName() : targetInterfaceName();
+}
+
+/*!
+   Returns the parameters. Usually that's the parameters  of the provider interface
+ */
+QVector<IfaceParameter> AADLObjectConnection::params() const
+{
+    if (d->m_ifaceTarget) {
+        return d->m_ifaceTarget->params();
+    }
+    if (d->m_ifaceSource) {
+        return d->m_ifaceSource->params();
+    }
+    return {};
 }
 
 }

@@ -92,6 +92,9 @@ public:
 
     bool isOneDirection() const;
 
+    QString name() const;
+    QVector<IfaceParameter> params() const;
+
 protected:
     explicit AADLObjectConnection(const AADLObject::Type t, AADLObject *source, AADLObject *target,
             AADLObjectIface *ifaceSource, AADLObjectIface *ifaceTarget, QObject *parent = nullptr);

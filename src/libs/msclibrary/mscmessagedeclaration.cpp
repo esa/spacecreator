@@ -55,6 +55,21 @@ QString MscMessageDeclaration::joinedTypeRefList() const
     return m_typeRefList.join(", ");
 }
 
+/*!
+   Does a case insensitive check if the name(s) and parameters are the same
+ */
+bool MscMessageDeclaration::operator==(const MscMessageDeclaration &other) const
+{
+    if (joinedNames().compare(other.joinedNames(), Qt::CaseInsensitive) != 0) {
+        return false;
+    }
+    if (joinedTypeRefList().compare(other.joinedTypeRefList(), Qt::CaseInsensitive) != 0) {
+        return false;
+    }
+
+    return true;
+}
+
 void MscMessageDeclaration::setNames(const QStringList &names)
 {
     Q_ASSERT(!names.isEmpty());

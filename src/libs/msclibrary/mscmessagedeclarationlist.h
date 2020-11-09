@@ -36,6 +36,8 @@ public:
     MscMessageDeclarationList *clone() const;
 
     void setObjectList(const QList<MscMessageDeclaration *> &objects) override;
+
+    bool exists(MscMessageDeclaration *declaration) const;
 };
 
 }

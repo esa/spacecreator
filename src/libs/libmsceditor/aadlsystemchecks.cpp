@@ -27,6 +27,7 @@
 #include "msceditorcore.h"
 #include "mscinstance.h"
 #include "mscmessage.h"
+#include "mscmessagedeclaration.h"
 #include "mscmodel.h"
 
 #include <QDebug>
@@ -391,11 +392,32 @@ aadl::AADLObjectConnection *AadlSystemChecks::correspondingConnection(const MscM
 bool AadlSystemChecks::correspond(const aadl::AADLObjectConnection *connection, const MscMessage *message) const
 {
     bool nameOk = true;
-    if (!connection->targetInterfaceName().isEmpty()) {
-        nameOk &= message->name().compare(connection->targetInterfaceName(), m_caseCheck) == 0;
+    if (!connection->name().isEmpty()) {
+        nameOk &= message->name().compare(connection->name(), m_caseCheck) == 0;
     }
     return correspond(connection->source(), message->sourceInstance())
             && correspond(connection->target(), message->targetInstance()) && nameOk;
+}
+
+/*!
+   Returns all aadl connections as msc message declarations
+ */
+QVector<MscMessageDeclaration *> AadlSystemChecks::allConnectionsAsDeclaration() const
+{
+    QVector<MscMessageDeclaration *> result;
+
+    for (aadl::AADLObjectConnection *connection : m_ivCore->allAadlConnections()) {
+        auto declaration = new MscMessageDeclaration();
+        declaration->setNames({ connection->name() });
+        QStringList params;
+        for (aadl::IfaceParameter p : connection->params()) {
+            params.append(p.paramTypeName());
+        }
+        declaration->setTypeRefList(params);
+        result.append(declaration);
+    }
+
+    return result;
 }
 
 }

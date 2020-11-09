@@ -17,6 +17,7 @@
 
 #include "messagedeclarationsdialog.h"
 
+#include "aadlsystemchecks.h"
 #include "asn1xmlparser.h"
 #include "commands/cmdsetasn1file.h"
 #include "definitions.h"
@@ -38,12 +39,13 @@
 #include <QTimer>
 
 MessageDeclarationsDialog::MessageDeclarationsDialog(msc::MscMessageDeclarationList *model, msc::MscModel *mscModel,
-        msc::MscCommandsStack *undoStack, QWidget *parent)
+        msc::MscCommandsStack *undoStack, msc::AadlSystemChecks *checker, QWidget *parent)
     : QDialog(parent)
     , ui(new Ui::MessageDeclarationsDialog)
     , m_model(model->clone())
     , m_mscModel(mscModel)
     , m_undoStack(undoStack)
+    , m_checker(checker)
 {
     Q_ASSERT(m_model);
     Q_ASSERT(m_mscModel);
@@ -79,6 +81,9 @@ MessageDeclarationsDialog::MessageDeclarationsDialog(msc::MscMessageDeclarationL
     connect(ui->nameLineEdit, &QLineEdit::textEdited, this, &MessageDeclarationsDialog::checkforEmptyCompleter);
 
     connect(m_mscModel, &msc::MscModel::asn1DataChanged, this, &MessageDeclarationsDialog::updateAsn1TypesView);
+
+    ui->aadlImportButton->setEnabled(m_checker && m_checker->hasIvCore());
+    connect(ui->aadlImportButton, &QPushButton::clicked, this, &MessageDeclarationsDialog::importFromAadl);
 
     updateDeclarationDetails();
 }
@@ -289,6 +294,27 @@ void MessageDeclarationsDialog::checkforEmptyCompleter()
             ui->nameLineEdit->completer()->complete();
         }
     });
+}
+
+/*!
+   Adds all missing declarations from the aadl model
+ */
+void MessageDeclarationsDialog::importFromAadl()
+{
+    if (!m_checker || !m_checker->hasIvCore()) {
+        return;
+    }
+
+    QVector<msc::MscMessageDeclaration *> aadlDeclarations = m_checker->allConnectionsAsDeclaration();
+
+    while (!aadlDeclarations.isEmpty()) {
+        msc::MscMessageDeclaration *declaration = aadlDeclarations.takeFirst();
+        if (!m_model->exists(declaration)) {
+            m_model->append(declaration);
+        } else {
+            delete declaration;
+        }
+    }
 }
 
 void MessageDeclarationsDialog::updateAsn1TypesView()

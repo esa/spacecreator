@@ -39,6 +39,8 @@ public:
     const QStringList &typeRefList() const;
     QString joinedTypeRefList() const;
 
+    bool operator==(const MscMessageDeclaration &other) const;
+
 public Q_SLOTS:
     void setNames(const QStringList &names);
     void setTypeRefList(const QStringList &typeRefList);
