@@ -89,8 +89,8 @@ public:
     void addMenuViewActions(QMenu *menu, QMainWindow *window) override;
     void addMenuHelpActions(QMenu *menu, QMainWindow *window) override;
 
-    QToolBar *mscToolBar() { return m_mscToolBar; }
-    QToolBar *hierarchyToolBar() { return m_hierarchyToolBar; }
+    QToolBar *mscToolBar();
+    QToolBar *hierarchyToolBar();
     void showToolbars(bool show);
 
     void populateCommandLineArguments(shared::CommandLineParser *parser) const override;

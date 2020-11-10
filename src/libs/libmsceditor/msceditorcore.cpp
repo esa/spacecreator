@@ -74,17 +74,8 @@ MSCEditorCore::MSCEditorCore(QObject *parent)
     : shared::EditorCore(parent)
     , m_model(new msc::MainModel())
     , m_aadlChecks(new AadlSystemChecks)
-    , m_mscToolBar(new QToolBar(tr("MSC")))
-    , m_hierarchyToolBar(new QToolBar(tr("Hierarchy")))
 {
     m_aadlChecks->setMscCore(this);
-
-    m_mscToolBar->setObjectName("mscTools");
-    m_mscToolBar->setAllowedAreas(Qt::AllToolBarAreas);
-    m_mscToolBar->setVisible(m_toolbarsVisible);
-    m_hierarchyToolBar->setObjectName("hierarchyTools");
-    m_hierarchyToolBar->setAllowedAreas(Qt::AllToolBarAreas);
-    m_hierarchyToolBar->setVisible(m_toolbarsVisible);
 
     m_model->chartViewModel().setAadlChecker(m_aadlChecks.get());
 
@@ -287,8 +278,8 @@ void MSCEditorCore::initConnections()
 void MSCEditorCore::addToolBars(QMainWindow *window)
 {
     window->addToolBar(mainToolBar());
-    window->addToolBar(Qt::LeftToolBarArea, m_mscToolBar);
-    window->addToolBar(Qt::LeftToolBarArea, m_hierarchyToolBar);
+    window->addToolBar(Qt::LeftToolBarArea, mscToolBar());
+    window->addToolBar(Qt::LeftToolBarArea, hierarchyToolBar());
 }
 
 /*!
@@ -345,11 +336,37 @@ void MSCEditorCore::addMenuHelpActions(QMenu * /*menu*/, QMainWindow * /*window*
     // Do nothing
 }
 
+QToolBar *MSCEditorCore::mscToolBar()
+{
+    if (!m_mscToolBar) {
+        m_mscToolBar = new QToolBar(tr("MSC"));
+        m_mscToolBar->setObjectName("mscTools");
+        m_mscToolBar->setAllowedAreas(Qt::AllToolBarAreas);
+        m_mscToolBar->setVisible(m_toolbarsVisible);
+    }
+    return m_mscToolBar;
+}
+
+QToolBar *MSCEditorCore::hierarchyToolBar()
+{
+    if (!m_hierarchyToolBar) {
+        m_hierarchyToolBar = new QToolBar(tr("Hierarchy"));
+        m_hierarchyToolBar->setObjectName("hierarchyTools");
+        m_hierarchyToolBar->setAllowedAreas(Qt::AllToolBarAreas);
+        m_hierarchyToolBar->setVisible(m_toolbarsVisible);
+    }
+    return m_hierarchyToolBar;
+}
+
 void MSCEditorCore::showToolbars(bool show)
 {
     m_toolbarsVisible = show;
-    m_mscToolBar->setVisible(m_toolbarsVisible);
-    m_hierarchyToolBar->setVisible(m_toolbarsVisible);
+    if (m_mscToolBar) {
+        m_mscToolBar->setVisible(m_toolbarsVisible);
+    }
+    if (m_hierarchyToolBar) {
+        m_hierarchyToolBar->setVisible(m_toolbarsVisible);
+    }
 }
 
 void MSCEditorCore::populateCommandLineArguments(shared::CommandLineParser *parser) const
