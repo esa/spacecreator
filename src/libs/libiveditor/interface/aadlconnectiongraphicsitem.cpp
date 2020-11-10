@@ -170,8 +170,8 @@ void AADLConnectionGraphicsItem::rebuildLayout()
 
     bool pathObsolete(true);
     if (m_points.size() > 2) {
-        pathObsolete = (!startItem() || !startItem()->ifaceShape().contains(m_points.first()))
-                || (!endItem() || !endItem()->ifaceShape().contains(m_points.last()));
+        pathObsolete = (!startItem() || !startItem()->ifaceShape().boundingRect().contains(m_points.first()))
+                || (!endItem() || !endItem()->ifaceShape().boundingRect().contains(m_points.last()));
     }
 
     if (pathObsolete) {

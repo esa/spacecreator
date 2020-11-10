@@ -395,8 +395,8 @@ bool AadlSystemChecks::correspond(const aadl::AADLObjectConnection *connection, 
     if (!connection->name().isEmpty()) {
         nameOk &= message->name().compare(connection->name(), m_caseCheck) == 0;
     }
-    return correspond(connection->source(), message->sourceInstance())
-            && correspond(connection->target(), message->targetInstance()) && nameOk;
+    return nameOk && correspond(connection->source(), message->sourceInstance())
+            && correspond(connection->target(), message->targetInstance());
 }
 
 /*!

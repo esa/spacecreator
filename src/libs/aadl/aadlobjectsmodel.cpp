@@ -31,7 +31,7 @@
 namespace aadl {
 
 struct AADLObjectsModelPrivate {
-    AADLObjectsModel *m_sharedTypesModel;
+    AADLObjectsModel *m_sharedTypesModel { nullptr };
     shared::Id m_rootObjectId;
     QList<shared::Id> m_objectsOrder;
     QHash<shared::Id, AADLObject *> m_objects;
@@ -46,7 +46,7 @@ AADLObjectsModel::AADLObjectsModel(QObject *parent)
     d->m_headerTitles.resize(columnCount());
 }
 
-AADLObjectsModel::~AADLObjectsModel() { }
+AADLObjectsModel::~AADLObjectsModel() {}
 
 void AADLObjectsModel::setSharedTypesModel(AADLObjectsModel *sharedTypesModel)
 {

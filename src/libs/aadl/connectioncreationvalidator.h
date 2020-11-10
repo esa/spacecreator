@@ -20,6 +20,8 @@
 #include "common.h"
 
 #include <QObject>
+#include <QPointF>
+#include <QVector>
 
 class QGraphicsScene;
 class QGraphicsItem;
@@ -62,6 +64,29 @@ private:
 
     static ConnectionCreationValidator::FailReason checkKindAndParams(
             AADLObjectIface *sourceIface, AADLObjectIface *targetIface);
+};
+
+struct ValidationResult {
+    aadl::AADLObjectIface *startIface { nullptr };
+    aadl::AADLObjectIface *endIface { nullptr };
+    shared::Id startIfaceId = {};
+    shared::Id endIfaceId = {};
+    QPointF startPointAdjusted {};
+    QPointF endPointAdjusted {};
+    QVector<QPointF> connectionPoints;
+    QGraphicsItem *functionAtStartPos { nullptr };
+    aadl::AADLObjectFunction *startObject { nullptr };
+    QGraphicsItem *functionAtEndPos { nullptr };
+    aadl::AADLObjectFunction *endObject { nullptr };
+    bool isToOrFromNested { false };
+
+    ConnectionCreationValidator::FailReason status { ConnectionCreationValidator::FailReason::NoScene };
+    inline bool failed() const { return status != ConnectionCreationValidator::FailReason::NotFail; }
+    inline bool setFailed(ConnectionCreationValidator::FailReason s)
+    {
+        status = s;
+        return failed();
+    }
 };
 
 }

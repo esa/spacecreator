@@ -36,51 +36,55 @@ struct ConnectionHolder {
 
 struct AADLObjectConnectionPrivate {
     AADLObjectConnectionPrivate() { }
-    AADLObjectConnectionPrivate(
-            AADLObject *source, AADLObject *target, AADLObjectIface *ifaceSource, AADLObjectIface *ifaceTarget)
-        : m_source(source)
-        , m_target(target)
-        , m_ifaceSource(ifaceSource)
-        , m_ifaceTarget(ifaceTarget)
+    AADLObjectConnectionPrivate(AADLObjectIface *ifaceSource, AADLObjectIface *ifaceTarget)
     {
-        setData(source, target, ifaceSource, ifaceTarget);
+        setData(ifaceSource, ifaceTarget);
     }
-    void setData(AADLObject *source, AADLObject *target, AADLObjectIface *ifaceSource, AADLObjectIface *ifaceTarget)
+
+    void setData(AADLObjectIface *ifaceSource, AADLObjectIface *ifaceTarget)
     {
-        m_source = source;
         m_ifaceSource = ifaceSource;
-        m_target = target;
         m_ifaceTarget = ifaceTarget;
-        if (m_source && m_ifaceSource && m_target && m_ifaceTarget) {
-            if (ifaceSource->direction() == AADLObjectIface::IfaceType::Provided
-                    && ifaceTarget->direction() == AADLObjectIface::IfaceType::Required) {
-                // source and target should be reversed
-                m_source = target;
-                m_ifaceSource = ifaceTarget;
-                m_target = source;
-                m_ifaceTarget = ifaceSource;
+        if (m_ifaceSource && m_ifaceTarget) {
+            Q_ASSERT(ifaceSource->parentObject() && ifaceTarget->parentObject());
+            bool isReversed = false;
+            if (shared::isAncestorOf(ifaceSource->parentObject(), ifaceTarget->parentObject())) {
+                isReversed = ifaceSource->direction() == AADLObjectIface::IfaceType::Required
+                        || ifaceTarget->direction() == AADLObjectIface::IfaceType::Provided;
+            } else if (shared::isAncestorOf(ifaceTarget->parentObject(), ifaceSource->parentObject())) {
+                isReversed = ifaceSource->direction() == AADLObjectIface::IfaceType::Provided
+                        || ifaceTarget->direction() == AADLObjectIface::IfaceType::Required;
+            } else {
+                isReversed = ifaceSource->direction() == AADLObjectIface::IfaceType::Provided
+                        && ifaceTarget->direction() == AADLObjectIface::IfaceType::Required;
+            }
+
+            if (isReversed) {
+                m_ifaceSource.swap(m_ifaceTarget);
             }
         }
     }
-    QPointer<AADLObject> m_source { nullptr };
-    QPointer<AADLObject> m_target { nullptr };
-    QPointer<AADLObjectIface> m_ifaceSource { nullptr };
-    QPointer<AADLObjectIface> m_ifaceTarget { nullptr };
+
+    AADLObjectIface *sourceIface() const { return m_ifaceSource; }
+    AADLObjectIface *targetIface() const { return m_ifaceTarget; }
 
     ConnectionHolder m_delayedInit;
+
+private:
+    QPointer<AADLObjectIface> m_ifaceSource { nullptr };
+    QPointer<AADLObjectIface> m_ifaceTarget { nullptr };
 };
 
-AADLObjectConnection::AADLObjectConnection(AADLObject *source, AADLObject *target, AADLObjectIface *ifaceSource,
-        AADLObjectIface *ifaceTarget, QObject *parent)
+AADLObjectConnection::AADLObjectConnection(AADLObjectIface *ifaceSource, AADLObjectIface *ifaceTarget, QObject *parent)
     : AADLObject(AADLObject::Type::Connection, QString(), parent)
-    , d(new AADLObjectConnectionPrivate { source, target, ifaceSource, ifaceTarget })
+    , d(new AADLObjectConnectionPrivate { ifaceSource, ifaceTarget })
 {
 }
 
-AADLObjectConnection::AADLObjectConnection(const AADLObject::Type t, AADLObject *source, AADLObject *target,
-        AADLObjectIface *ifaceSource, AADLObjectIface *ifaceTarget, QObject *parent)
+AADLObjectConnection::AADLObjectConnection(
+        const AADLObject::Type t, AADLObjectIface *ifaceSource, AADLObjectIface *ifaceTarget, QObject *parent)
     : AADLObject(t, QString(), parent)
-    , d(new AADLObjectConnectionPrivate { source, target, ifaceSource, ifaceTarget })
+    , d(new AADLObjectConnectionPrivate { ifaceSource, ifaceTarget })
 {
 }
 
@@ -96,7 +100,7 @@ QString AADLObjectConnection::sourceName() const
 
 AADLObject *AADLObjectConnection::source() const
 {
-    return d->m_source;
+    return d->sourceIface() ? d->sourceIface()->function() : nullptr;
 }
 
 QString AADLObjectConnection::targetName() const
@@ -106,12 +110,12 @@ QString AADLObjectConnection::targetName() const
 
 AADLObject *AADLObjectConnection::target() const
 {
-    return d->m_target;
+    return d->targetIface() ? d->targetIface()->function() : nullptr;
 }
 
 AADLObjectIface *AADLObjectConnection::sourceInterface() const
 {
-    return d->m_ifaceSource;
+    return d->sourceIface();
 }
 
 QString AADLObjectConnection::sourceInterfaceName() const
@@ -121,7 +125,7 @@ QString AADLObjectConnection::sourceInterfaceName() const
 
 AADLObjectIface *AADLObjectConnection::targetInterface() const
 {
-    return d->m_ifaceTarget;
+    return d->targetIface();
 }
 
 QString AADLObjectConnection::targetInterfaceName() const
@@ -286,7 +290,7 @@ bool AADLObjectConnection::lookupEndpointsPostponed()
         return false;
     }
 
-    d->setData(objFrom, objTo, ifaceFrom, ifaceTo);
+    d->setData(ifaceFrom, ifaceTo);
 
     clearPostponedEndpoints();
     return true;
@@ -294,7 +298,7 @@ bool AADLObjectConnection::lookupEndpointsPostponed()
 
 bool AADLObjectConnection::needPostponedInit() const
 {
-    return !(d->m_source && d->m_target && d->m_ifaceSource && d->m_ifaceTarget);
+    return !(d->sourceIface() && d->targetIface());
 }
 
 void AADLObjectConnection::clearPostponedEndpoints()
@@ -335,7 +339,6 @@ bool AADLObjectConnection::isOneDirection() const
 {
     return sourceInterface()->direction() == targetInterface()->direction();
 }
-
 /*!
    Returns the name of a connection. Usually that's the name of the provider interface
  */
@@ -349,11 +352,11 @@ QString AADLObjectConnection::name() const
  */
 QVector<IfaceParameter> AADLObjectConnection::params() const
 {
-    if (d->m_ifaceTarget) {
-        return d->m_ifaceTarget->params();
+    if (d->targetIface()) {
+        return d->targetIface()->params();
     }
-    if (d->m_ifaceSource) {
-        return d->m_ifaceSource->params();
+    if (d->sourceIface()) {
+        return d->sourceIface()->params();
     }
     return {};
 }

@@ -31,7 +31,7 @@ class AADLObjectConnection : public AADLObject
     Q_OBJECT
 
 public:
-    explicit AADLObjectConnection(AADLObject *source, AADLObject *target, AADLObjectIface *ifaceSource,
+    explicit AADLObjectConnection(AADLObjectIface *ifaceSource,
             AADLObjectIface *ifaceTarget, QObject *parent = nullptr);
     ~AADLObjectConnection() override;
 
@@ -96,8 +96,7 @@ public:
     QVector<IfaceParameter> params() const;
 
 protected:
-    explicit AADLObjectConnection(const AADLObject::Type t, AADLObject *source, AADLObject *target,
-            AADLObjectIface *ifaceSource, AADLObjectIface *ifaceTarget, QObject *parent = nullptr);
+    explicit AADLObjectConnection(const AADLObject::Type t, AADLObjectIface *ifaceSource, AADLObjectIface *ifaceTarget, QObject *parent = nullptr);
     bool lookupEndpointsPostponed();
     bool needPostponedInit() const;
 

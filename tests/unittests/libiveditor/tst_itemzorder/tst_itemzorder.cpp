@@ -172,7 +172,7 @@ void tst_ItemZOrder::testItem_Connection()
             std::unique_ptr<aadl::AADLObjectIface>(aadl::AADLObjectIface::createIface(ciB));
     aadlinterface::AADLInterfaceGraphicsItem itemB(pIfaceB.get());
 
-    aadl::AADLObjectConnection aadlConnection(&aadlFunctionA, &aadlFunctionB, pIfaceA.get(), pIfaceB.get());
+    aadl::AADLObjectConnection aadlConnection(pIfaceA.get(), pIfaceB.get());
     aadlinterface::AADLConnectionGraphicsItem connectionItem(&aadlConnection, &itemA, &itemB);
 
     checkItem(&connectionItem, aadlinterface::ZOrder.Connection);
@@ -196,7 +196,7 @@ void tst_ItemZOrder::testItem_ConnectionGroup()
     aadlinterface::AADLInterfaceGroupGraphicsItem itemB(pIfaceB.get());
 
     std::unique_ptr<aadl::AADLObjectConnection> aadlConnection { new aadl::AADLObjectConnection(
-            &aadlFunctionA, &aadlFunctionB, pIfaceA.get(), pIfaceB.get()) };
+            pIfaceA.get(), pIfaceB.get()) };
 
     aadl::AADLObjectConnectionGroup aadlConnectionGroup(
             QStringLiteral("TestConnectionGroup"), pIfaceA.get(), pIfaceB.get(), { aadlConnection.get() });

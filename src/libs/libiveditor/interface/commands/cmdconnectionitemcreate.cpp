@@ -42,8 +42,7 @@ CmdConnectionItemCreate::CmdConnectionItemCreate(aadl::AADLObjectsModel *model, 
 
     aadl::AADLObjectIface *sourceIface = m_model->getInterface(sourceIfaceId);
     aadl::AADLObjectIface *targetIface = m_model->getInterface(targetIfaceId);
-    m_entity = new aadl::AADLObjectConnection(
-            sourceIface->function(), targetIface->function(), sourceIface, targetIface, parent);
+    m_entity = new aadl::AADLObjectConnection(sourceIface, targetIface, parent);
     prepareData({ qMakePair(m_entity, points) });
 }
 

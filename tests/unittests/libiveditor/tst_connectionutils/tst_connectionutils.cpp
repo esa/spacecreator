@@ -16,12 +16,19 @@
 */
 
 #include "aadlobjectfunction.h"
+#include "aadlobjectiface.h"
 #include "baseitems/common/aadlutils.h"
+#include "common.h"
+#include "connectioncreationvalidator.h"
 #include "graphicsviewutils.h"
 #include "interface/aadlfunctiongraphicsitem.h"
+#include "interface/aadlinterfacegraphicsitem.h"
+#include "interface/graphicsitemhelpers.h"
 
 #include <QObject>
+#include <QPainter>
 #include <QtTest>
+#include <array>
 
 class tst_ConnectionUtils : public QObject
 {
@@ -38,12 +45,61 @@ private Q_SLOTS:
     void tst_findPath();
     void tst_findSubPath();
     void tst_pathByPoints();
+    void tst_endPoints();
     void tst_path();
 
 private:
     QGraphicsScene m_scene;
     aadlinterface::AADLFunctionGraphicsItem *f1 { nullptr };
     aadlinterface::AADLFunctionGraphicsItem *f2 { nullptr };
+    aadlinterface::AADLFunctionGraphicsItem *nf1 { nullptr };
+    aadlinterface::AADLFunctionGraphicsItem *nf2 { nullptr };
+
+    struct Data {
+        enum class EndPoint
+        {
+            Req,
+            Prov,
+            Empty
+        };
+
+        Data(aadlinterface::AADLFunctionGraphicsItem *function)
+            : fn(function)
+        {
+            const QRectF r = rect();
+            points = { QLineF(r.topRight(), r.bottomRight()).center(), QLineF(r.topLeft(), r.bottomLeft()).center(),
+                QLineF(r.topLeft(), r.topRight()).center(), QLineF(r.bottomLeft(), r.bottomRight()).center() };
+        }
+
+        QRectF rect() const { return fn->sceneBoundingRect(); }
+        aadlinterface::AADLFunctionGraphicsItem *function() const { return fn; }
+        QPointF requiredIfacePoint() const { return points.at(static_cast<int>(EndPoint::Req)); }
+        QPointF providedIfacePoint() const { return points.at(static_cast<int>(EndPoint::Prov)); }
+        QPointF emptyPoint() const { return points.at(static_cast<int>(EndPoint::Empty)); }
+        QPointF point(const Data::EndPoint ep) const { return points.at(static_cast<int>(ep)); }
+        QPointF point(const aadl::AADLObjectIface::IfaceType type) const
+        {
+            switch (type) {
+            case aadl::AADLObjectIface::IfaceType::Required:
+                return requiredIfacePoint();
+            case aadl::AADLObjectIface::IfaceType::Provided:
+                return providedIfacePoint();
+            default:
+                break;
+            }
+            return {};
+        }
+
+    private:
+        aadlinterface::AADLFunctionGraphicsItem *fn;
+        QList<QPointF> points;
+    };
+
+    QVector<Data> data;
+
+private:
+    void checkEndPoints(aadlinterface::AADLFunctionGraphicsItem *startFn, Data::EndPoint startEp,
+            aadlinterface::AADLFunctionGraphicsItem *endFn, Data::EndPoint endEp, bool isReversed, bool shouldFail);
 };
 
 void tst_ConnectionUtils::initTestCase()
@@ -53,17 +109,35 @@ void tst_ConnectionUtils::initTestCase()
     m_scene.addItem(f1);
     f1->setRect(QRectF(100, 100, 300, 300));
 
+    auto nestedEntity1 = new aadl::AADLObjectFunction("Nested_F1");
+    entity1->addChild(nestedEntity1);
+    nf1 = new aadlinterface::AADLFunctionGraphicsItem(nestedEntity1, f1);
+    nf1->setRect(QRectF(150, 150, 100, 100));
+
     auto entity2 = new aadl::AADLObjectFunction("F2");
     f2 = new aadlinterface::AADLFunctionGraphicsItem(entity2);
     m_scene.addItem(f2);
     f2->setRect(QRectF(600, 100, 300, 300));
+
+    auto nestedEntity2 = new aadl::AADLObjectFunction("Nested_F2");
+    entity2->addChild(nestedEntity2);
+    nf2 = new aadlinterface::AADLFunctionGraphicsItem(nestedEntity2, f2);
+    nf2->setRect(QRectF(650, 150, 100, 100));
+
+    data = { Data(f1), Data(nf1), Data(f2), Data(nf2) };
 }
 
 void tst_ConnectionUtils::cleanupTestCase()
 {
+    delete f1->entity();
+    delete f2->entity();
+
     m_scene.clear();
+
     f1 = nullptr;
     f2 = nullptr;
+    nf1 = nullptr;
+    nf2 = nullptr;
 }
 
 void tst_ConnectionUtils::tst_segmentGenerationByPoints()
@@ -300,6 +374,129 @@ void tst_ConnectionUtils::tst_pathByPoints()
     QVERIFY(!path.isEmpty());
 }
 
+void tst_ConnectionUtils::tst_endPoints()
+{
+    auto addIfaces = [this](const aadl::AADLObjectIface::IfaceType ifaceType) {
+        for (int idx = 0; idx < data.size(); ++idx) {
+            aadl::AADLObjectIface::CreationInfo ci;
+            ci.function = data.at(idx).function()->entity();
+            ci.name = ci.function->title();
+            ci.position = data.at(idx).point(ifaceType);
+            ci.type = ifaceType;
+            aadl::AADLObjectIface *iface { nullptr };
+            if (ifaceType == aadl::AADLObjectIface::IfaceType::Required) {
+                ci.name += QLatin1String("_ReqIface");
+                iface = new aadl::AADLObjectIfaceRequired(ci);
+            } else if (ifaceType == aadl::AADLObjectIface::IfaceType::Provided) {
+                ci.name += QLatin1String("_ProvIface");
+                iface = new aadl::AADLObjectIfaceProvided(ci);
+            } else {
+                qFatal("Test for Interface group isn't implemented yet");
+            }
+            iface->setCoordinates(aadlinterface::coordinates(ci.position));
+            iface->postInit();
+            if (ci.function->addChild(iface)) {
+                auto ifaceItem = new aadlinterface::AADLInterfaceGraphicsItem(iface, data.at(idx).function());
+                ifaceItem->init();
+                ifaceItem->setTargetItem(data.at(idx).function(), ci.position);
+            }
+        }
+    };
+
+    addIfaces(aadl::AADLObjectIface::IfaceType::Required);
+    addIfaces(aadl::AADLObjectIface::IfaceType::Provided);
+
+    /// Nested_F1-Empty <> F1-Empty
+    checkEndPoints(nf1, Data::EndPoint::Empty, f1, Data::EndPoint::Empty, false, false);
+    /// F1-Empty <> Nested_F1-Empty
+    checkEndPoints(f1, Data::EndPoint::Empty, nf1, Data::EndPoint::Empty, true, false);
+
+    /// F1-Empty <> Nested_F1-Req
+    checkEndPoints(f1, Data::EndPoint::Empty, nf1, Data::EndPoint::Req, false, false);
+    /// Nested_F1-Req <> F1-Empty
+    checkEndPoints(nf1, Data::EndPoint::Req, f1, Data::EndPoint::Empty, false, false);
+
+    /// Nested_F1-Prov <> F1-Empty
+    checkEndPoints(nf1, Data::EndPoint::Prov, f1, Data::EndPoint::Empty, true, false);
+    /// F1-Empty <> Nested_F1-Prov
+    checkEndPoints(f1, Data::EndPoint::Empty, nf1, Data::EndPoint::Prov, true, false);
+
+    /// F1-Req <> Nested_F1-Empty
+    checkEndPoints(f1, Data::EndPoint::Req, nf1, Data::EndPoint::Empty, true, false);
+    /// Nested_F1-Empty <> F1-Req
+    checkEndPoints(nf1, Data::EndPoint::Empty, f1, Data::EndPoint::Req, true, false);
+
+    /// F1-Prov <> Nested_F1-Empty
+    checkEndPoints(f1, Data::EndPoint::Prov, nf1, Data::EndPoint::Empty, false, false);
+    /// Nested_F1-Empty <> F1-Prov
+    checkEndPoints(nf1, Data::EndPoint::Empty, f1, Data::EndPoint::Prov, false, false);
+
+    /// Nested_F1-Req <> F1-Req
+    checkEndPoints(nf1, Data::EndPoint::Req, f1, Data::EndPoint::Req, false, false);
+    /// F1-Req <> Nested_F1-Req
+    checkEndPoints(f1, Data::EndPoint::Req, nf1, Data::EndPoint::Req, true, false);
+
+    /// F1-Req <> Nested_F1-Prov
+    checkEndPoints(f1, Data::EndPoint::Req, nf1, Data::EndPoint::Prov, true, true);
+    /// Nested_F1-Prov <> F1-Req
+    checkEndPoints(nf1, Data::EndPoint::Prov, f1, Data::EndPoint::Req, false, true);
+
+    /// Nested_F1-Prov <> F1-Prov
+    checkEndPoints(nf1, Data::EndPoint::Prov, f1, Data::EndPoint::Prov, true, false);
+    /// F1-Prov <> Nested_F1-Prov
+    checkEndPoints(f1, Data::EndPoint::Prov, nf1, Data::EndPoint::Prov, false, false);
+
+    /// F1-Prov <> Nested_F1-Req
+    checkEndPoints(f1, Data::EndPoint::Prov, nf1, Data::EndPoint::Req, false, true);
+    /// Nested_F1-Prov <> F1-Req
+    checkEndPoints(nf1, Data::EndPoint::Prov, f1, Data::EndPoint::Req, true, true);
+
+    /// F1-Req <> F2-Req
+    checkEndPoints(f1, Data::EndPoint::Req, f2, Data::EndPoint::Req, false, true);
+    /// F2-Req <> F1-Req
+    checkEndPoints(f2, Data::EndPoint::Req, f1, Data::EndPoint::Req, false, true);
+
+    /// F1-Req <> F2-Prov
+    checkEndPoints(f1, Data::EndPoint::Req, f2, Data::EndPoint::Prov, false, false);
+    /// F2-Prov <> F1-Req
+    checkEndPoints(f2, Data::EndPoint::Prov, f1, Data::EndPoint::Req, true, false);
+
+    /// F1-Prov <> F2-Prov
+    checkEndPoints(f1, Data::EndPoint::Prov, f2, Data::EndPoint::Prov, true, true);
+    /// F2-Prov <> F1-Prov
+    checkEndPoints(f2, Data::EndPoint::Prov, f1, Data::EndPoint::Prov, false, true);
+
+    /// F1-Req <> F2-Prov
+    checkEndPoints(f1, Data::EndPoint::Req, f2, Data::EndPoint::Prov, false, false);
+    /// F2-Prov <> F1-Req
+    checkEndPoints(f2, Data::EndPoint::Prov, f1, Data::EndPoint::Req, true, false);
+
+    /// F1-Empty <> F2-Empty
+    checkEndPoints(f1, Data::EndPoint::Empty, f2, Data::EndPoint::Empty, false, false);
+    /// F2-Empty <> F1-Empty
+    checkEndPoints(f2, Data::EndPoint::Empty, f1, Data::EndPoint::Empty, false, false);
+
+    /// F2-Empty <> F1-Req
+    checkEndPoints(f2, Data::EndPoint::Empty, f1, Data::EndPoint::Req, true, false);
+    /// F1-Req <> F2-Empty
+    checkEndPoints(f1, Data::EndPoint::Req, f2, Data::EndPoint::Empty, false, false);
+
+    /// F1-Prov <> F2-Empty
+    checkEndPoints(f1, Data::EndPoint::Prov, f2, Data::EndPoint::Empty, true, false);
+    /// F2-Empty <> F1-Prov
+    checkEndPoints(f2, Data::EndPoint::Empty, f1, Data::EndPoint::Prov, false, false);
+
+    /// F2-Req <> F1-Empty
+    checkEndPoints(f2, Data::EndPoint::Req, f1, Data::EndPoint::Empty, false, false);
+    /// F1-Empty <> F2-Req
+    checkEndPoints(f1, Data::EndPoint::Empty, f2, Data::EndPoint::Req, true, false);
+
+    /// F2-Prov <> F1-Empty
+    checkEndPoints(f2, Data::EndPoint::Prov, f1, Data::EndPoint::Empty, true, false);
+    /// F1-Empty <> F2-Prov
+    checkEndPoints(f1, Data::EndPoint::Empty, f2, Data::EndPoint::Prov, false, false);
+}
+
 void tst_ConnectionUtils::tst_path()
 {
     const QRectF r1 = f1->sceneBoundingRect();
@@ -312,6 +509,32 @@ void tst_ConnectionUtils::tst_path()
 
     auto path = aadlinterface::path(&m_scene, startSegment, endSegment);
     QVERIFY(!path.isEmpty());
+}
+
+void tst_ConnectionUtils::checkEndPoints(aadlinterface::AADLFunctionGraphicsItem *startFn, Data::EndPoint startEp,
+        aadlinterface::AADLFunctionGraphicsItem *endFn, Data::EndPoint endEp, bool isReversed, bool shouldFail)
+{
+    const Data start(startFn);
+    const Data end(endFn);
+
+    QVector<QPointF> connectionPoints { start.point(startEp), end.point(endEp) };
+    auto result = aadlinterface::gi::validateConnectionCreate(&m_scene, connectionPoints);
+    QCOMPARE(result.isToOrFromNested,
+            (start.function()->isAncestorOf(end.function()) || end.function()->isAncestorOf(start.function())));
+    QCOMPARE(result.failed(), shouldFail);
+    if (!result.failed()) {
+        if (isReversed) {
+            QVERIFY(result.connectionPoints.first() == connectionPoints.last()
+                    && result.connectionPoints.last() == connectionPoints.first());
+        } else {
+            QCOMPARE(result.connectionPoints, connectionPoints);
+        }
+
+        auto path = aadlinterface::createConnectionPath(&m_scene, result.connectionPoints.first(),
+                isReversed ? end.rect() : start.rect(), result.connectionPoints.last(),
+                isReversed ? start.rect() : end.rect());
+        QVERIFY(!path.isEmpty());
+    }
 }
 
 QTEST_MAIN(tst_ConnectionUtils)

@@ -27,7 +27,7 @@
 
 using namespace Asn1Acn::Types;
 
-UserdefinedType::UserdefinedType(const QString &name, const QString &module, const TypeAssignment *referencedType)
+UserdefinedType::UserdefinedType(const QString &name, const QString &module, const Asn1Acn::TypeAssignment *referencedType)
     : m_name(name)
     , m_module(module)
     , m_referencedType(referencedType)

@@ -418,7 +418,7 @@ AADLObjectComment *AADLXMLReader::addComment(const QString &text)
 AADLObjectConnection *AADLXMLReader::addConnection()
 {
     AADLObjectConnection *connection =
-            new AADLObjectConnection(nullptr, nullptr, nullptr, nullptr, d->m_currentObject.get());
+            new AADLObjectConnection(nullptr, nullptr, d->m_currentObject.get());
     if (d->m_currentObject.function())
         d->m_currentObject.function()->addChild(connection);
 

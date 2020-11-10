@@ -19,6 +19,7 @@
 
 #include "aadlobject.h"
 #include "baseitems/interactiveobject.h"
+#include "connectioncreationvalidator.h"
 #include "graphicsviewutils.h"
 #include "interface/aadlcommentgraphicsitem.h"
 #include "interface/aadlconnectiongraphicsitem.h"
@@ -596,20 +597,14 @@ QLineF ifaceSegment(const QRectF &sceneRect, const QPointF &firstEndPoint, const
  */
 QVector<QPointF> path(QGraphicsScene *scene, const QPointF &startPoint, const QPointF &endPoint)
 {
-    QVector<QPointF> points { startPoint, endPoint };
-    QList<QGraphicsItem *> intersectedItems = scene->items(points);
+    const QVector<QPointF> points { startPoint, endPoint };
+    const QList<QGraphicsItem *> intersectedItems = scene->items(points);
     if (intersectedItems.isEmpty()) {
         return points;
     }
 
-    std::sort(
-            intersectedItems.begin(), intersectedItems.end(), [startPoint](QGraphicsItem *item1, QGraphicsItem *item2) {
-                return distanceLine(startPoint, item1->sceneBoundingRect().center())
-                        < distanceLine(startPoint, item2->sceneBoundingRect().center());
-            });
-
     static const QList<int> types = { AADLFunctionGraphicsItem::Type, AADLFunctionTypeGraphicsItem::Type };
-    auto it = std::find_if(intersectedItems.constBegin(), intersectedItems.constEnd(), [points](QGraphicsItem *item) {
+    auto it = std::find_if(intersectedItems.crbegin(), intersectedItems.crend(), [points](QGraphicsItem *item) {
         if (!types.contains(item->type()))
             return false;
 
@@ -617,7 +612,7 @@ QVector<QPointF> path(QGraphicsScene *scene, const QPointF &startPoint, const QP
                 shared::graphicsviewutils::intersectionPoints(item->sceneBoundingRect(), points);
         return intersectionPoints.size() > 1;
     });
-    if (it == intersectedItems.constEnd())
+    if (it == intersectedItems.crend())
         return points;
 
     const QList<QVector<QPointF>> possiblePaths =
@@ -727,12 +722,10 @@ QVector<QPointF> findPath(
     const QVector<QPointF> points = generateSegments(startDirection, endDirection);
     const QList<QGraphicsItem *> intersectedItems = scene->items(points);
 
-    auto it = std::find_if(
-            intersectedItems.constBegin(), intersectedItems.constEnd(), [points](const QGraphicsItem *item) {
-                return types.contains(item->type())
-                        && shared::graphicsviewutils::intersects(item->sceneBoundingRect(), points);
-            });
-    if (it == intersectedItems.constEnd())
+    auto it = std::find_if(intersectedItems.crbegin(), intersectedItems.crend(), [points](const QGraphicsItem *item) {
+        return types.contains(item->type()) && shared::graphicsviewutils::intersects(item->sceneBoundingRect(), points);
+    });
+    if (it == intersectedItems.crend())
         return points;
 
     *intersectedRect = (*it)->sceneBoundingRect();
@@ -778,7 +771,7 @@ QVector<QPointF> path(QGraphicsScene *scene, const QLineF &startDirection, const
 
                 const QList<QGraphicsItem *> intersectedItems = scene->items(subPath);
                 auto it = std::find_if(
-                        intersectedItems.constBegin(), intersectedItems.constEnd(), [subPath](QGraphicsItem *item) {
+                        intersectedItems.crbegin(), intersectedItems.crend(), [subPath](QGraphicsItem *item) {
                             if (!types.contains(item->type())) {
                                 return false;
                             }
@@ -786,7 +779,7 @@ QVector<QPointF> path(QGraphicsScene *scene, const QLineF &startDirection, const
                                     shared::graphicsviewutils::intersectionPoints(item->sceneBoundingRect(), subPath);
                             return points.size() > 1;
                         });
-                if (it != intersectedItems.constEnd())
+                if (it != intersectedItems.crend())
                     continue;
                 else if (subPath.last() == endDirection.p2())
                     results.append(subPath);

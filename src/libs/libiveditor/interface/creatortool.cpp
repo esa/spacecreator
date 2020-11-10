@@ -62,157 +62,6 @@ static const QList<int> kFunctionTypes = { aadlinterface::AADLFunctionGraphicsIt
     aadlinterface::AADLFunctionTypeGraphicsItem::Type };
 static const qreal kPreviewItemPenWidth = 2.;
 
-namespace {
-
-struct ValidationResult {
-    aadl::AADLObjectIface *startIface { nullptr };
-    aadl::AADLObjectIface *endIface { nullptr };
-    shared::Id startIfaceId = {};
-    shared::Id endIfaceId = {};
-    QPointF startPointAdjusted {};
-    QPointF endPointAdjusted {};
-    QLineF connectionLine {};
-    QGraphicsItem *functionAtStartPos { nullptr };
-    aadl::AADLObjectFunction *startObject { nullptr };
-    QGraphicsItem *functionAtEndPos { nullptr };
-    aadl::AADLObjectFunction *endObject { nullptr };
-    bool isToOrFromNested { false };
-
-    aadl::ConnectionCreationValidator::FailReason status { aadl::ConnectionCreationValidator::FailReason::NoScene };
-    inline bool failed() const { return status != aadl::ConnectionCreationValidator::FailReason::NotFail; }
-    inline bool setFailed(aadl::ConnectionCreationValidator::FailReason s)
-    {
-        status = s;
-        return failed();
-    }
-};
-
-}
-
-/*!
- * \brief The tolerance used to find an AADLInterfaceGraphicsItem on scene (the size of a squre used as a search area)
- */
-static const qreal kInterfaceTolerance = 5.;
-
-/*!
- * \brief The tolerance used to find an AADLFunction(Type)GraphicsItem on scene (the size of a squre used as a search
- * area)
- */
-static const qreal kFunctionTolerance = 20.;
-
-/*!
- * \brief Performs the validation to detect if it's possible to connect the \a scene's items located in \a startPos and
- * \a endPos.
- *
- * Returns the status of such validation as instance of ConnectionCreationValidator::ValidationResult.
- * Anything except the FailReason::NotFail in ConnectionCreationValidator::ValidationResult::status
- * means that the connection creation is prohibited.
- */
-static ValidationResult validateCreate(QGraphicsScene *scene, const QPointF &startPos, const QPointF &endPos)
-{
-    ValidationResult result;
-
-    result.connectionLine = { startPos, endPos };
-    result.functionAtStartPos =
-            aadlinterface::nearestItem(scene, aadlinterface::adjustFromPoint(startPos, kFunctionTolerance),
-                    { aadlinterface::AADLFunctionGraphicsItem::Type });
-    result.functionAtEndPos =
-            aadlinterface::nearestItem(scene, aadlinterface::adjustFromPoint(endPos, kFunctionTolerance),
-                    { aadlinterface::AADLFunctionGraphicsItem::Type });
-    result.startObject = aadlinterface::gi::functionObject(result.functionAtStartPos);
-    result.endObject = aadlinterface::gi::functionObject(result.functionAtEndPos);
-    result.isToOrFromNested =
-            (result.functionAtStartPos && result.functionAtStartPos->isAncestorOf(result.functionAtEndPos))
-            || (result.functionAtEndPos && result.functionAtEndPos->isAncestorOf(result.functionAtStartPos));
-
-    if (!result.startObject) {
-        result.setFailed(aadl::ConnectionCreationValidator::FailReason::NoStartFunction);
-        return result;
-    }
-
-    const auto startIfaceItem = qgraphicsitem_cast<aadlinterface::AADLInterfaceGraphicsItem *>(
-            aadlinterface::nearestItem(scene, aadlinterface::adjustFromPoint(startPos, kInterfaceTolerance),
-                    { aadlinterface::AADLInterfaceGraphicsItem::Type }));
-    if (startIfaceItem && startIfaceItem->ifaceShape().contains(startPos)) {
-        result.startIface = startIfaceItem->entity();
-        result.startPointAdjusted =
-                startIfaceItem->connectionEndPoint(result.functionAtStartPos->isAncestorOf(result.functionAtEndPos));
-    } else if (!shared::graphicsviewutils::intersects(result.functionAtStartPos->sceneBoundingRect(),
-                       result.connectionLine, &result.startPointAdjusted)) {
-        result.setFailed(aadl::ConnectionCreationValidator::FailReason::CannotCreateStartIface);
-        return result;
-    }
-
-    if (!result.endObject) {
-        result.setFailed(aadl::ConnectionCreationValidator::FailReason::NoEndFunction);
-        return result;
-    }
-
-    const auto endIfaceItem = qgraphicsitem_cast<aadlinterface::AADLInterfaceGraphicsItem *>(
-            aadlinterface::nearestItem(scene, aadlinterface::adjustFromPoint(endPos, kInterfaceTolerance),
-                    { aadlinterface::AADLInterfaceGraphicsItem::Type }));
-    if (endIfaceItem && endIfaceItem->ifaceShape().contains(endPos)) {
-        result.endIface = endIfaceItem->entity();
-        result.endPointAdjusted =
-                endIfaceItem->connectionEndPoint(result.functionAtEndPos->isAncestorOf(result.functionAtStartPos));
-    } else if (!shared::graphicsviewutils::intersects(
-                       result.functionAtEndPos->sceneBoundingRect(), result.connectionLine, &result.endPointAdjusted)) {
-        result.setFailed(aadl::ConnectionCreationValidator::FailReason::CannotCreateEndIface);
-        return result;
-    }
-
-    if (result.startIface && result.endIface && result.isToOrFromNested) {
-        if (result.startIface->direction() != result.endIface->direction()) {
-            result.setFailed(aadl::ConnectionCreationValidator::FailReason::ToFromNestedDifferentDirection);
-            return result;
-        }
-    }
-
-    if (result.startIface && result.endIface) {
-        if (result.startIface->direction() == result.endIface->direction() && !result.isToOrFromNested) {
-            result.setFailed(aadl::ConnectionCreationValidator::FailReason::SameDirectionIfaceWrongParents);
-            return result;
-        }
-    }
-
-    if (!result.startIface) {
-        if (auto fn = result.startObject->as<const aadl::AADLObjectFunction *>())
-            if (fn->instanceOf()) {
-                result.setFailed(
-                        aadl::ConnectionCreationValidator::FailReason::DirectIfaceCreationInInstanceOfFunctionType);
-                return result;
-            }
-    }
-
-    if (!result.endIface) {
-        if (auto fn = result.endObject->as<const aadl::AADLObjectFunction *>())
-            if (fn->instanceOf()) {
-                result.setFailed(
-                        aadl::ConnectionCreationValidator::FailReason::DirectIfaceCreationInInstanceOfFunctionType);
-                return result;
-            }
-    }
-
-    result.startIfaceId = result.startIface ? result.startIface->id() : shared::createId();
-    result.endIfaceId = result.endIface ? result.endIface->id() : shared::createId();
-
-    result.status = aadl::ConnectionCreationValidator::canConnect(
-            result.startObject, result.endObject, result.startIface, result.endIface);
-    return result;
-}
-
-/*!
- * \brief The helper method that perfoms validation and prints its status.
- * Used to bypass the \a scene and edge points of \a connectionPoints to
- * ConnectionCreationValidator::validateCreate() and returns the result of such validation.
- */
-static ValidationResult validate(QGraphicsScene *scene, const QVector<QPointF> &connectionPoints)
-{
-    const ValidationResult info = validateCreate(scene, connectionPoints.first(), connectionPoints.last());
-    qDebug() << info.status;
-    return info;
-}
-
 namespace aadlinterface {
 
 struct CreatorTool::CreatorToolPrivate {
@@ -235,7 +84,7 @@ struct CreatorTool::CreatorToolPrivate {
     void handleInterface(QGraphicsScene *scene, aadl::AADLObjectIface::IfaceType type, const QPointF &pos);
     bool handleConnectionCreate(const QPointF &pos);
     void handleDirectConnection(const QPointF &pos);
-    void handleConnection(const QVector<QPointF> &connectionPoints) const;
+    void handleConnection(const QVector<QPointF> &graphicPoints) const;
 
     bool warnConnectionPreview(const QPointF &pos);
 
@@ -402,7 +251,7 @@ void CreatorTool::groupSelectedItems()
     };
 
     static const int role = static_cast<int>(aadl::AADLObjectsModel::AADLRoles::IdRole);
-    for (const auto id : d->model->selectionModel()->selectedIndexes()) {
+    for (const auto &id : d->model->selectionModel()->selectedIndexes()) {
         if (aadl::AADLObject *object = d->model->objectsModel()->getObject(id.data(role).toUuid())) {
             if (object->isConnection()) {
                 if (aadl::AADLObjectConnection *connectionObj = qobject_cast<aadl::AADLObjectConnection *>(object)) {
@@ -498,7 +347,7 @@ bool CreatorTool::onMousePress(QMouseEvent *e)
     if (d->toolType == ToolType::DirectConnection && e->button() != Qt::RightButton) {
         static const QList<int> functionItemsOnly { static_cast<int>(AADLFunctionGraphicsItem::Type) };
         if (!nearestItem(scene, scenePos, functionItemsOnly)) {
-            if (!nearestItem(scene, scenePos, ::kInterfaceTolerance / 2, functionItemsOnly))
+            if (!nearestItem(scene, scenePos, kInterfaceTolerance / 2, functionItemsOnly))
                 return false;
         }
 
@@ -664,9 +513,9 @@ bool CreatorTool::onContextMenu(QContextMenuEvent *e)
 
     // onMousePress is needed to set an apppropriate d->previewItem
     QMouseEvent mouseEvent(QEvent::MouseButtonPress, viewPos, Qt::RightButton, Qt::RightButton | Qt::MaxMouseButton,
-            0); // Qt::MaxMouseButton is a fake button
-                // to distinguish this mouse event
-                // and thus avoid selecting of another object
+            nullptr); // Qt::MaxMouseButton is a fake button
+                      // to distinguish this mouse event
+                      // and thus avoid selecting of another object
     onMousePress(&mouseEvent);
 
     return d->showContextMenu(globalPos);
@@ -955,7 +804,7 @@ void CreatorTool::CreatorToolPrivate::handleFunction(QGraphicsScene *scene, cons
 void CreatorTool::CreatorToolPrivate::handleInterface(
         QGraphicsScene *scene, aadl::AADLObjectIface::IfaceType type, const QPointF &pos)
 {
-    if (auto parentItem = nearestItem(scene, adjustFromPoint(pos, ::kInterfaceTolerance), kFunctionTypes)) {
+    if (auto parentItem = nearestItem(scene, adjustFromPoint(pos, kInterfaceTolerance), kFunctionTypes)) {
         aadl::AADLObjectFunctionType *parentObject = gi::functionTypeObject(parentItem);
         aadl::AADLObjectIface::CreationInfo ifaceDescr(
                 model->objectsModel(), parentObject, pos, type, shared::InvalidId);
@@ -977,8 +826,7 @@ bool CreatorTool::CreatorToolPrivate::handleConnectionCreate(const QPointF &pos)
 
     QPointF alignedPos { pos };
     if (this->connectionPoints.size() > 2) {
-        if (auto itemUnderCursor =
-                        nearestItem(scene, pos, ::kInterfaceTolerance, { AADLInterfaceGraphicsItem::Type })) {
+        if (auto itemUnderCursor = nearestItem(scene, pos, kInterfaceTolerance, { AADLInterfaceGraphicsItem::Type })) {
             const QPointF finishPoint = itemUnderCursor->mapToScene(QPointF(0, 0));
             if (!alignToSidePoint(scene, finishPoint, this->connectionPoints.last()))
                 return false;
@@ -1008,9 +856,10 @@ void CreatorTool::CreatorToolPrivate::handleDirectConnection(const QPointF &pos)
     handleConnection(this->connectionPoints);
 }
 
-void CreatorTool::CreatorToolPrivate::handleConnection(const QVector<QPointF> &connectionPoints) const
+void CreatorTool::CreatorToolPrivate::handleConnection(const QVector<QPointF> &graphicPoints) const
 {
-    auto info = ::validate(this->view ? this->view->scene() : nullptr, connectionPoints);
+    const auto info =
+            aadlinterface::gi::validateConnectionCreate(this->view ? this->view->scene() : nullptr, graphicPoints);
     if (info.failed())
         return;
 
@@ -1020,30 +869,23 @@ void CreatorTool::CreatorToolPrivate::handleConnection(const QVector<QPointF> &c
     aadl::AADLObjectIface::CreationInfo ifaceCommons;
     cmd::CommandsStack::Macro cmdMacro(tr("Create connection"));
 
-    bool startRequired = true;
     if (info.startIface && !info.endIface) {
-        startRequired = info.startIface->isRequired();
-
         ifaceCommons = aadl::AADLObjectIface::CreationInfo::fromIface(info.startIface);
         ifaceCommons.function = info.endObject;
         ifaceCommons.position = info.endPointAdjusted;
-        ifaceCommons.type = (startRequired && info.isToOrFromNested) || (!startRequired && !info.isToOrFromNested)
-                ? aadl::AADLObjectIface::IfaceType::Required
-                : aadl::AADLObjectIface::IfaceType::Provided;
+        ifaceCommons.type =
+                info.isToOrFromNested ? info.startIface->direction() : aadl::AADLObjectIface::IfaceType::Provided;
         ifaceCommons.id = info.endIfaceId;
         ifaceCommons.resetKind();
 
         if (!cmdMacro.push(createInterfaceCommand(ifaceCommons)))
             return;
     } else if (info.endIface && !info.startIface) {
-        startRequired = (info.endIface->isRequired() && info.isToOrFromNested)
-                || (info.endIface->isProvided() && !info.isToOrFromNested);
-
         ifaceCommons = aadl::AADLObjectIface::CreationInfo::fromIface(info.endIface);
         ifaceCommons.function = info.startObject;
         ifaceCommons.position = info.startPointAdjusted;
         ifaceCommons.type =
-                startRequired ? aadl::AADLObjectIface::IfaceType::Required : aadl::AADLObjectIface::IfaceType::Provided;
+                info.isToOrFromNested ? info.endIface->direction() : aadl::AADLObjectIface::IfaceType::Required;
         ifaceCommons.id = info.startIfaceId;
         ifaceCommons.resetKind();
 
@@ -1055,14 +897,7 @@ void CreatorTool::CreatorToolPrivate::handleConnection(const QVector<QPointF> &c
         ifaceCommons.function = info.startObject;
         ifaceCommons.position = info.startPointAdjusted;
         ifaceCommons.id = info.startIfaceId;
-
-        const bool isToNested = info.isToOrFromNested && info.functionAtEndPos->isAncestorOf(info.functionAtStartPos);
-        if (info.isToOrFromNested)
-            ifaceCommons.type = (isToNested) ? aadl::AADLObjectIface::IfaceType::Required
-                                             : aadl::AADLObjectIface::IfaceType::Provided;
-        else
-            ifaceCommons.type = (startRequired ? aadl::AADLObjectIface::IfaceType::Required
-                                               : aadl::AADLObjectIface::IfaceType::Provided);
+        ifaceCommons.type = aadl::AADLObjectIface::IfaceType::Required;
         ifaceCommons.resetKind();
 
         if (!cmdMacro.push(createInterfaceCommand(ifaceCommons)))
@@ -1071,13 +906,8 @@ void CreatorTool::CreatorToolPrivate::handleConnection(const QVector<QPointF> &c
         ifaceCommons.function = info.endObject;
         ifaceCommons.position = info.endPointAdjusted;
         ifaceCommons.id = info.endIfaceId;
-
-        if (info.isToOrFromNested)
-            ifaceCommons.type = (isToNested) ? aadl::AADLObjectIface::IfaceType::Required
-                                             : aadl::AADLObjectIface::IfaceType::Provided;
-        else
-            ifaceCommons.type = startRequired ? aadl::AADLObjectIface::IfaceType::Provided
-                                              : aadl::AADLObjectIface::IfaceType::Required;
+        ifaceCommons.type = info.isToOrFromNested ? aadl::AADLObjectIface::IfaceType::Required
+                                                  : aadl::AADLObjectIface::IfaceType::Provided;
         ifaceCommons.resetKind();
 
         if (!cmdMacro.push(createInterfaceCommand(ifaceCommons)))
@@ -1094,27 +924,27 @@ void CreatorTool::CreatorToolPrivate::handleConnection(const QVector<QPointF> &c
 
     AADLFunctionGraphicsItem *prevStartItem =
             qgraphicsitem_cast<aadlinterface::AADLFunctionGraphicsItem *>(info.functionAtStartPos);
-    QPointF firstExcludedPoint = *std::next(connectionPoints.constBegin());
+    QPointF firstExcludedPoint = *std::next(info.connectionPoints.constBegin());
     shared::Id prevStartIfaceId = info.startIfaceId;
     /// TODO: check creating connection from nested function as a start function
     while (auto item = qgraphicsitem_cast<aadlinterface::AADLFunctionGraphicsItem *>(prevStartItem->parentItem())) {
         const QVector<QPointF> intersectionPoints =
-                shared::graphicsviewutils::intersectionPoints(item->sceneBoundingRect(), connectionPoints);
+                shared::graphicsviewutils::intersectionPoints(item->sceneBoundingRect(), info.connectionPoints);
         if (intersectionPoints.isEmpty() || intersectionPoints.size() % 2 == 0) {
             parentForConnection = item;
             break;
         }
 
         const QRectF rect = item->sceneBoundingRect();
-        auto beginIt = std::find(connectionPoints.constBegin(), connectionPoints.constEnd(), firstExcludedPoint);
-        auto endIt = std::find_if(connectionPoints.constBegin(), connectionPoints.constEnd(),
+        auto beginIt =
+                std::find(info.connectionPoints.constBegin(), info.connectionPoints.constEnd(), firstExcludedPoint);
+        auto endIt = std::find_if(info.connectionPoints.constBegin(), info.connectionPoints.constEnd(),
                 [&rect](const QPointF &point) { return !rect.contains(point); });
         QVector<QPointF> points { startInterfacePoint };
         std::copy(beginIt, endIt, std::back_inserter(points));
         points.append(intersectionPoints.last());
 
-        ifaceCommons.type =
-                startRequired ? aadl::AADLObjectIface::IfaceType::Required : aadl::AADLObjectIface::IfaceType::Provided;
+        ifaceCommons.type = info.startIface ? info.startIface->direction() : aadl::AADLObjectIface::IfaceType::Required;
 
         if (item == info.functionAtEndPos) {
             ifaceCommons.id = info.endIfaceId;
@@ -1132,27 +962,27 @@ void CreatorTool::CreatorToolPrivate::handleConnection(const QVector<QPointF> &c
         if (!cmdMacro.push(cmd::CommandsFactory::create(cmd::CreateConnectionEntity, params)))
             return;
 
-        firstExcludedPoint = endIt != connectionPoints.constEnd() ? *endIt : QPointF();
+        firstExcludedPoint = endIt != points.constEnd() ? *endIt : QPointF();
         startInterfacePoint = intersectionPoints.last();
         prevStartItem = item;
         prevStartIfaceId = ifaceCommons.id;
     }
 
-    QPointF lastExcludedPoint = *std::next(connectionPoints.crbegin());
+    QPointF lastExcludedPoint = *std::next(info.connectionPoints.crbegin());
     auto prevEndItem = qgraphicsitem_cast<aadlinterface::AADLFunctionGraphicsItem *>(info.functionAtEndPos);
     shared::Id prevEndIfaceId = info.endIfaceId;
     /// TODO: check creating connection from parent item as a start function
     while (auto item = qgraphicsitem_cast<aadlinterface::AADLFunctionGraphicsItem *>(prevEndItem->parentItem())) {
         auto intersectionPoints =
-                shared::graphicsviewutils::intersectionPoints(item->sceneBoundingRect(), connectionPoints);
+                shared::graphicsviewutils::intersectionPoints(item->sceneBoundingRect(), info.connectionPoints);
         if (intersectionPoints.isEmpty() || intersectionPoints.size() % 2 == 0) {
             Q_ASSERT(parentForConnection == item || parentForConnection == nullptr);
             parentForConnection = item;
             break;
         }
         const QRectF rect = item->sceneBoundingRect();
-        auto beginIt = std::find(connectionPoints.crbegin(), connectionPoints.crend(), lastExcludedPoint);
-        auto endIt = std::find_if(connectionPoints.crbegin(), connectionPoints.crend(),
+        auto beginIt = std::find(info.connectionPoints.crbegin(), info.connectionPoints.crend(), lastExcludedPoint);
+        auto endIt = std::find_if(info.connectionPoints.crbegin(), info.connectionPoints.crend(),
                 [&rect](const QPointF &point) { return !rect.contains(point); });
         QVector<QPointF> points { endInterfacePoint };
         std::copy(beginIt, endIt, std::back_inserter(points));
@@ -1165,8 +995,7 @@ void CreatorTool::CreatorToolPrivate::handleConnection(const QVector<QPointF> &c
 
             ifaceCommons.function = item->entity();
             ifaceCommons.position = intersectionPoints.last();
-            ifaceCommons.type = startRequired ? aadl::AADLObjectIface::IfaceType::Provided
-                                              : aadl::AADLObjectIface::IfaceType::Required;
+            ifaceCommons.type = info.endIface ? info.endIface->direction() : aadl::AADLObjectIface::IfaceType::Provided;
 
             if (!cmdMacro.push(createInterfaceCommand(ifaceCommons)))
                 return;
@@ -1176,25 +1005,25 @@ void CreatorTool::CreatorToolPrivate::handleConnection(const QVector<QPointF> &c
         if (!cmdMacro.push(cmd::CommandsFactory::create(cmd::CreateConnectionEntity, params)))
             return;
 
-        lastExcludedPoint = endIt != connectionPoints.crend() ? *endIt : QPointF();
+        lastExcludedPoint = endIt != info.connectionPoints.crend() ? *endIt : QPointF();
         endInterfacePoint = intersectionPoints.last();
         prevEndItem = item;
         prevEndIfaceId = ifaceCommons.id;
     }
 
-    auto beginIt = std::find(connectionPoints.constBegin(), connectionPoints.constEnd(), firstExcludedPoint);
-    auto endIt = std::find(beginIt, connectionPoints.constEnd(), lastExcludedPoint);
-    QVector<QPointF> points { startInterfacePoint };
-    if (endIt != connectionPoints.constEnd()) {
+    auto beginIt = std::find(info.connectionPoints.constBegin(), info.connectionPoints.constEnd(), firstExcludedPoint);
+    auto endIt = std::find(beginIt, info.connectionPoints.constEnd(), lastExcludedPoint);
+    QVector<QPointF> resultPoints { startInterfacePoint };
+    if (endIt != info.connectionPoints.constEnd()) {
         std::advance(endIt, 1);
-        std::copy(beginIt, endIt, std::back_inserter(points));
+        std::copy(beginIt, endIt, std::back_inserter(resultPoints));
     }
-    points.append(endInterfacePoint);
-    Q_ASSERT(points.size() >= 2);
-    if (points.first() != points.last()) {
+    resultPoints.append(endInterfacePoint);
+    Q_ASSERT(resultPoints.size() >= 2);
+    if (resultPoints.first() != resultPoints.last()) {
         const QVariantList params = { QVariant::fromValue(model->objectsModel()),
             QVariant::fromValue(parentForConnection ? parentForConnection->entity() : nullptr), prevStartIfaceId,
-            prevEndIfaceId, QVariant::fromValue(points) };
+            prevEndIfaceId, QVariant::fromValue(resultPoints) };
         if (!cmdMacro.push(cmd::CommandsFactory::create(cmd::CreateConnectionEntity, params)))
             return;
     }
@@ -1210,7 +1039,8 @@ bool CreatorTool::CreatorToolPrivate::warnConnectionPreview(const QPointF &pos)
     else
         connectionPoints.append(pos);
 
-    auto info = ::validate(this->view ? this->view->scene() : nullptr, connectionPoints);
+    auto info =
+            aadlinterface::gi::validateConnectionCreate(this->view ? this->view->scene() : nullptr, connectionPoints);
     const bool warn = info.failed();
 
     if (this->previewConnectionItem) {

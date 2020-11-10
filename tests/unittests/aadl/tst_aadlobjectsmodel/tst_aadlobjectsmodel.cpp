@@ -258,6 +258,11 @@ void tst_AADLObjectsModel::testManageIfaces()
         QCOMPARE(model.objects().size(), ifaces.size() - i); // +function
 
         QVERIFY(spyCommon.count() == 1);
+        if (auto parent = qobject_cast<aadl::AADLObjectFunction *>(iface->parentObject())) {
+            parent->removeChild(iface);
+            delete iface;
+            iface = nullptr;
+        }
     }
 
     QCOMPARE(model.objects().size(), 1); // the function is still in place!
@@ -317,7 +322,7 @@ void tst_AADLObjectsModel::testConnectionQuery()
     aadl::AADLObjectIface *iface2 = aadl::AADLObjectIface::createIface(ci2);
     m_model->addObject(iface2);
 
-    auto connect1 = new aadl::AADLObjectConnection(fn1, fn2, iface1, iface2);
+    auto connect1 = new aadl::AADLObjectConnection(iface1, iface2);
     m_model->addObject(connect1);
 
     const Qt::CaseSensitivity m_caseCheck = Qt::CaseInsensitive;

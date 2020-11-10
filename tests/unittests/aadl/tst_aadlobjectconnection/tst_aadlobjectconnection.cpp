@@ -29,7 +29,7 @@ private Q_SLOTS:
 
 void tst_AADLObjectConnection::testPostInitEmptyConnection()
 {
-    aadl::AADLObjectConnection connection(nullptr, nullptr, nullptr, nullptr);
+    aadl::AADLObjectConnection connection(nullptr, nullptr);
     const bool result = connection.postInit();
     // postInit() for connections without source/target fails
     QCOMPARE(result, false);

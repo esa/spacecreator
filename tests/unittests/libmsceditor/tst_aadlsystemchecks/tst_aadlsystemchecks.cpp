@@ -175,6 +175,7 @@ void tst_AadlSystemChecks::testCheckMessageNames()
     mscCore.mainModel()->initialModel();
     checker.setMscCore(&mscCore);
     result = checker.checkMessages();
+    QCOMPARE(result.size(), 0);
     msc::MscChart *chart = mscCore.mainModel()->mscModel()->documents().at(0)->documents().at(0)->charts().at(0);
     QVERIFY(chart != nullptr);
 
@@ -218,9 +219,7 @@ void tst_AadlSystemChecks::testCheckMessageNames()
             aadl::AADLObjectIface::OperationKind::Sporadic, "DummyB");
     aadl::AADLObjectIface *providedInterface = aadl::AADLObjectIface::createIface(createInfoB);
     aadlModel->addObject(providedInterface);
-
-    auto connection = new aadl::AADLObjectConnection(aadlfFuncA, aadlfFuncB, requiredInterface, providedInterface);
-    aadlModel->addObject(connection);
+    aadlModel->addObject(new aadl::AADLObjectConnection(requiredInterface, providedInterface));
     result = checker.checkMessages();
     QCOMPARE(result.size(), 1);
 
@@ -285,8 +284,7 @@ void tst_AadlSystemChecks::testCorrespondMessage()
     const auto targetIfInfo = AADLObjectIface::CreationInfo(nullptr, targetFunc.get(), QPointF(), targetIfType,
             shared::createId(), QVector<IfaceParameter>(), AADLObjectIface::OperationKind::Sporadic, targetIfName);
     std::unique_ptr<AADLObjectIface> targetIf(AADLObjectIface::createIface(targetIfInfo));
-    auto connection =
-            std::make_unique<AADLObjectConnection>(sourceFunc.get(), targetFunc.get(), sourceIf.get(), targetIf.get());
+    auto connection = std::make_unique<AADLObjectConnection>(sourceIf.get(), targetIf.get());
 
     msc::AadlSystemChecks checker;
     const bool doCorrespond = checker.correspond(connection.get(), message.get());

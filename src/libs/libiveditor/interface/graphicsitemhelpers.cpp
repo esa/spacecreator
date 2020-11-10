@@ -25,6 +25,8 @@
 #include "aadlobjectiface.h"
 #include "baseitems/common/aadlutils.h"
 #include "baseitems/interactiveobject.h"
+#include "connectioncreationvalidator.h"
+#include "graphicsviewutils.h"
 #include "interface/aadlcommentgraphicsitem.h"
 #include "interface/aadlconnectiongraphicsitem.h"
 #include "interface/aadlfunctiongraphicsitem.h"
@@ -139,5 +141,143 @@ aadl::AADLObject *object(const QGraphicsItem *item)
     return nullptr;
 }
 
+static bool isReversed(const aadl::ValidationResult &result)
+{
+    bool isReversed { false };
+
+    if (result.isToOrFromNested) {
+        if (result.startIface && result.endIface) {
+            Q_ASSERT(result.startIface->isProvided() == result.endIface->isProvided()
+                    && result.endIface->isRequired() == result.startIface->isRequired());
+        }
+        if (result.startIface) {
+            isReversed = (result.startIface->isRequired() && shared::isAncestorOf(result.startObject, result.endObject))
+                    || (result.startIface->isProvided() && shared::isAncestorOf(result.endObject, result.startObject));
+        } else if (result.endIface) {
+            isReversed = (result.endIface->isProvided() && shared::isAncestorOf(result.startObject, result.endObject))
+                    || (result.endIface->isRequired() && shared::isAncestorOf(result.endObject, result.startObject));
+        } else {
+            isReversed = shared::isAncestorOf(result.startObject, result.endObject);
+        }
+    } else {
+        if (result.startIface && result.endIface) {
+            Q_ASSERT(result.startIface->isProvided() == result.endIface->isRequired()
+                    && result.endIface->isProvided() == result.startIface->isRequired());
+        }
+
+        if (result.startIface) {
+            isReversed = result.startIface->isProvided();
+        } else if (result.endIface) {
+            isReversed = result.endIface->isRequired();
+        }
+    }
+
+    return isReversed;
 }
+
+aadl::ValidationResult validateConnectionCreate(QGraphicsScene *scene, const QVector<QPointF> &points)
+{
+    const QPointF startPos { points.first() };
+    const QPointF endPos { points.last() };
+    const QLineF connectionLine = { startPos, endPos };
+
+    aadl::ValidationResult result;
+    result.connectionPoints = points;
+    result.functionAtStartPos =
+            aadlinterface::nearestItem(scene, aadlinterface::adjustFromPoint(startPos, kFunctionTolerance),
+                    { aadlinterface::AADLFunctionGraphicsItem::Type });
+    result.functionAtEndPos =
+            aadlinterface::nearestItem(scene, aadlinterface::adjustFromPoint(endPos, kFunctionTolerance),
+                    { aadlinterface::AADLFunctionGraphicsItem::Type });
+    result.startObject = aadlinterface::gi::functionObject(result.functionAtStartPos);
+    result.endObject = aadlinterface::gi::functionObject(result.functionAtEndPos);
+    result.isToOrFromNested =
+            (result.functionAtStartPos && result.functionAtStartPos->isAncestorOf(result.functionAtEndPos))
+            || (result.functionAtEndPos && result.functionAtEndPos->isAncestorOf(result.functionAtStartPos));
+
+    if (!result.startObject) {
+        result.setFailed(aadl::ConnectionCreationValidator::FailReason::NoStartFunction);
+        return result;
+    }
+
+    const auto startIfaceItem = qgraphicsitem_cast<aadlinterface::AADLInterfaceGraphicsItem *>(
+            aadlinterface::nearestItem(scene, aadlinterface::adjustFromPoint(startPos, kInterfaceTolerance),
+                    { aadlinterface::AADLInterfaceGraphicsItem::Type }));
+    if (startIfaceItem && startIfaceItem->ifaceShape().contains(startPos)) {
+        result.startIface = startIfaceItem->entity();
+        result.startPointAdjusted =
+                startIfaceItem->connectionEndPoint(result.functionAtStartPos->isAncestorOf(result.functionAtEndPos));
+    } else if (!shared::graphicsviewutils::intersects(
+                       result.functionAtStartPos->sceneBoundingRect(), connectionLine, &result.startPointAdjusted)) {
+        result.setFailed(aadl::ConnectionCreationValidator::FailReason::CannotCreateStartIface);
+        return result;
+    }
+
+    if (!result.endObject) {
+        result.setFailed(aadl::ConnectionCreationValidator::FailReason::NoEndFunction);
+        return result;
+    }
+
+    const auto endIfaceItem = qgraphicsitem_cast<aadlinterface::AADLInterfaceGraphicsItem *>(
+            aadlinterface::nearestItem(scene, aadlinterface::adjustFromPoint(endPos, kInterfaceTolerance),
+                    { aadlinterface::AADLInterfaceGraphicsItem::Type }));
+    if (endIfaceItem && endIfaceItem->ifaceShape().contains(endPos)) {
+        result.endIface = endIfaceItem->entity();
+        result.endPointAdjusted =
+                endIfaceItem->connectionEndPoint(result.functionAtEndPos->isAncestorOf(result.functionAtStartPos));
+    } else if (!shared::graphicsviewutils::intersects(
+                       result.functionAtEndPos->sceneBoundingRect(), connectionLine, &result.endPointAdjusted)) {
+        result.setFailed(aadl::ConnectionCreationValidator::FailReason::CannotCreateEndIface);
+        return result;
+    }
+
+    if (result.startIface && result.endIface && result.isToOrFromNested) {
+        if (result.startIface->direction() != result.endIface->direction()) {
+            result.setFailed(aadl::ConnectionCreationValidator::FailReason::ToFromNestedDifferentDirection);
+            return result;
+        }
+    }
+
+    if (result.startIface && result.endIface) {
+        if (result.startIface->direction() == result.endIface->direction() && !result.isToOrFromNested) {
+            result.setFailed(aadl::ConnectionCreationValidator::FailReason::SameDirectionIfaceWrongParents);
+            return result;
+        }
+    }
+
+    if (!result.startIface) {
+        if (auto fn = result.startObject->as<const aadl::AADLObjectFunction *>())
+            if (fn->instanceOf()) {
+                result.setFailed(
+                        aadl::ConnectionCreationValidator::FailReason::DirectIfaceCreationInInstanceOfFunctionType);
+                return result;
+            }
+    }
+
+    if (!result.endIface) {
+        if (auto fn = result.endObject->as<const aadl::AADLObjectFunction *>())
+            if (fn->instanceOf()) {
+                result.setFailed(
+                        aadl::ConnectionCreationValidator::FailReason::DirectIfaceCreationInInstanceOfFunctionType);
+                return result;
+            }
+    }
+
+    if (isReversed(result)) {
+        std::swap(result.startIface, result.endIface);
+        std::swap(result.startIfaceId, result.endIfaceId);
+        std::swap(result.startObject, result.endObject);
+        std::swap(result.startPointAdjusted, result.endPointAdjusted);
+        std::swap(result.functionAtStartPos, result.functionAtEndPos);
+        std::reverse(result.connectionPoints.begin(), result.connectionPoints.end());
+    }
+
+    result.startIfaceId = result.startIface ? result.startIface->id() : shared::createId();
+    result.endIfaceId = result.endIface ? result.endIface->id() : shared::createId();
+    result.status = aadl::ConnectionCreationValidator::canConnect(
+            result.startObject, result.endObject, result.startIface, result.endIface);
+    return result;
 }
+
+} // namespace gi
+} // namespace aadlinterface

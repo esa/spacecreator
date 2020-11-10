@@ -27,8 +27,7 @@ namespace aadl {
 
 AADLObjectConnectionGroup::AADLObjectConnectionGroup(const QString &name, AADLObjectIfaceGroup *ifaceSource,
         AADLObjectIfaceGroup *ifaceTarget, const QList<QPointer<AADLObjectConnection>> &connections, QObject *parent)
-    : AADLObjectConnection(AADLObject::Type::ConnectionGroup, ifaceSource ? ifaceSource->function() : nullptr,
-            ifaceTarget ? ifaceTarget->function() : nullptr, ifaceSource, ifaceTarget, parent)
+    : AADLObjectConnection(AADLObject::Type::ConnectionGroup, ifaceSource, ifaceTarget, parent)
 {
     setTitle(name);
     ifaceSource->setGroupName(name);
