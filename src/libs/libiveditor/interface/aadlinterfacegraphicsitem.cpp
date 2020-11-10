@@ -348,6 +348,10 @@ ColorManager::HandledColors AADLInterfaceGraphicsItem::handledColorType() const
 
 void AADLInterfaceGraphicsItem::adjustItem()
 {
+    if (!parentItem()) {
+        return;
+    }
+
     QList<QRectF> siblingsRects;
     const QList<QGraphicsItem *> siblingItems = parentItem()->childItems();
     std::for_each(siblingItems.cbegin(), siblingItems.cend(), [this, &siblingsRects](const QGraphicsItem *sibling) {
