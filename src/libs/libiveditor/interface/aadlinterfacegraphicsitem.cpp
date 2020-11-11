@@ -310,8 +310,18 @@ void AADLInterfaceGraphicsItem::paint(QPainter *painter, const QStyleOptionGraph
 
 void AADLInterfaceGraphicsItem::onManualMoveProgress(shared::ui::GripPoint *, const QPointF &from, const QPointF &to)
 {
-    if (!scene() || !m_connections.isEmpty())
+    if (!scene())
         return;
+
+    if (!m_connections.isEmpty()) {
+        auto it = std::find_if(m_connections.cbegin(), m_connections.cend(),
+                [](const QPointer<AADLConnectionGraphicsItem> &connectionItem) {
+                    return !connectionItem.isNull() && connectionItem->isVisible();
+                });
+        if (it != m_connections.cend()) {
+            return;
+        }
+    }
 
     const QPointF shift = { to - from };
     if (shift.isNull())
