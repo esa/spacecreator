@@ -46,7 +46,7 @@ AADLObjectsModel::AADLObjectsModel(QObject *parent)
     d->m_headerTitles.resize(columnCount());
 }
 
-AADLObjectsModel::~AADLObjectsModel() {}
+AADLObjectsModel::~AADLObjectsModel() { }
 
 void AADLObjectsModel::setSharedTypesModel(AADLObjectsModel *sharedTypesModel)
 {
@@ -419,11 +419,14 @@ QModelIndex AADLObjectsModel::index(int row, int column, const QModelIndex &pare
 
 Qt::ItemFlags AADLObjectsModel::flags(const QModelIndex &index) const
 {
-    if (index.isValid()) {
-        return Qt::ItemIsDragEnabled | Qt::ItemIsEnabled | Qt::ItemIsSelectable | Qt::ItemIsUserCheckable;
+    if (!index.isValid()) {
+        return Qt::NoItemFlags;
     }
-
-    return Qt::NoItemFlags;
+    Qt::ItemFlags flags = Qt::ItemIsDragEnabled | Qt::ItemIsEnabled | Qt::ItemIsSelectable | Qt::ItemIsUserCheckable;
+    if (index.column() == 0) {
+        flags |= Qt::ItemIsEditable;
+    }
+    return flags;
 }
 
 bool AADLObjectsModel::setHeaderData(int section, Qt::Orientation orientation, const QVariant &value, int role)
@@ -512,6 +515,16 @@ int AADLObjectsModel::columnCount(const QModelIndex &parent) const
     return 1;
 }
 
+bool AADLObjectsModel::setData(const QModelIndex &index, const QVariant &value, int role)
+{
+    if (role == Qt::CheckStateRole) {
+        auto obj = objectFromIndex(index);
+        obj->setVisible(value.toBool());
+        return true;
+    }
+    return false;
+}
+
 QVariant AADLObjectsModel::data(const QModelIndex &index, int role) const
 {
     if (!index.isValid()) {
@@ -585,6 +598,10 @@ QVariant AADLObjectsModel::data(const QModelIndex &index, int role) const
         } else {
             return obj->titleUI();
         }
+    }
+
+    if (d->m_sharedTypesModel && role == Qt::CheckStateRole) {
+        return obj->isVisible() ? Qt::Checked : Qt::Unchecked;
     }
 
     if (obj->isGrouped()) {
