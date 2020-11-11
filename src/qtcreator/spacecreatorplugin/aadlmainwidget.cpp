@@ -31,6 +31,7 @@
 #include <QDebug>
 #include <QFileInfo>
 #include <QHBoxLayout>
+#include <QMessageBox>
 #include <QUndoGroup>
 #include <QUndoStack>
 
@@ -110,8 +111,7 @@ void AadlMainWidget::showAsn1Dialog()
     }
 
     aadlinterface::Asn1Dialog dialog;
-    QFileInfo fi(m_plugin->document()->path());
-    fi.setFile(fi.absolutePath() + "/" + m_plugin->document()->asn1FileName());
+    QFileInfo fi(m_plugin->document()->asn1FilePath());
     dialog.setFile(fi);
     dialog.show();
     int result = dialog.exec();
@@ -206,6 +206,15 @@ void AadlMainWidget::init()
 
     connect(m_plugin->document()->commandsStack(), &QUndoStack::cleanChanged, this,
             [&]() { Q_EMIT dirtyChanged(isDirty()); });
+
+    connect(m_plugin->document(), &aadlinterface::InterfaceDocument::asn1ParameterErrorDetected, this,
+            &AadlMainWidget::showAsn1Errors);
+}
+
+void spctr::AadlMainWidget::showAsn1Errors(const QStringList &faultyInterfaces)
+{
+    QMessageBox::warning(
+            this, tr("ASN1 error"), tr("Following interfaces have ASN.1 errors:") + "\n" + faultyInterfaces.join("\n"));
 }
 
 }

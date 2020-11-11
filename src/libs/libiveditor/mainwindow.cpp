@@ -116,6 +116,8 @@ MainWindow::MainWindow(aadlinterface::IVEditorCore *core, QWidget *parent)
 
     m_core->setupMiniMap();
 
+    connect(m_core->document(), &InterfaceDocument::asn1ParameterErrorDetected, this, &MainWindow::showAsn1Errors);
+
     // Create the E2E view and add the action
     auto endToEndView = new EndToEndView(m_core->document(), this);
     endToEndView->hide();
@@ -371,8 +373,7 @@ void MainWindow::updateWindowTitle()
 void MainWindow::openAsn1Dialog()
 {
     Asn1Dialog dialog;
-    QFileInfo fi(m_core->document()->path());
-    fi.setFile(fi.absolutePath() + "/" + m_core->document()->asn1FileName());
+    QFileInfo fi(m_core->document()->asn1FilePath());
     dialog.setFile(fi);
     dialog.show();
     int result = dialog.exec();
@@ -385,6 +386,12 @@ void MainWindow::openAsn1Dialog()
             }
         }
     }
+}
+
+void MainWindow::showAsn1Errors(const QStringList &faultyInterfaces)
+{
+    QMessageBox::warning(
+            this, tr("ASN1 error"), tr("Following interfaces have ASN.1 errors:") + "\n" + faultyInterfaces.join("\n"));
 }
 
 /*!

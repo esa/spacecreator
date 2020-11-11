@@ -228,31 +228,6 @@ void MscModel::checkInstanceNames()
 }
 
 /*!
-   Checks if the given \p parameter complies to the ASN.1 type of the name \p typeName
- */
-bool MscModel::checkparameterAsn1Compliance(const QString &parameter, const QString &typeName) const
-{
-    if (!m_asn1Data) {
-        return true;
-    }
-
-    for (const auto &definitions : m_asn1Data->definitionsList()) {
-        for (const std::unique_ptr<Asn1Acn::TypeAssignment> &typeAssignment : definitions->types()) {
-            if (typeAssignment->name() == typeName) {
-                bool ok;
-                Asn1Acn::Asn1ValueParser parser;
-                parser.parseAsn1Value(typeAssignment.get(), parameter, &ok);
-                if (ok) {
-                    return true;
-                }
-            }
-        }
-    }
-
-    return false;
-}
-
-/*!
    Checks if the parameters of the \p message comply to the ASN1 definition
    The message name has to match a \see msc::MscMessageDeclaration
  */
@@ -281,7 +256,7 @@ bool MscModel::checkMessageAsn1Compliance(const msc::MscMessage &message) const
         for (int i = 0; i < message.parameters().size(); ++i) {
             const QString &parameter = message.parameters().at(i).parameter();
             const QString &type = usedDeclaration->typeRefList().at(i);
-            if (!checkparameterAsn1Compliance(parameter, type)) {
+            if (m_asn1Data && !m_asn1Data->checkAsn1Compliance(parameter, type)) {
                 return false;
             }
         }

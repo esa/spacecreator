@@ -24,6 +24,7 @@
 ****************************************************************************/
 #include "file.h"
 
+#include "asn1valueparser.h"
 #include "visitor.h"
 
 using namespace Asn1Acn;
@@ -104,4 +105,33 @@ const Types::Type *File::typeFromName(const QString &name) const
         }
     }
     return nullptr;
+}
+
+/*!
+   Returns if the type \p typeName exists
+ */
+bool File::hasType(const QString &typeName) const
+{
+    return typeFromName(typeName) != nullptr;
+}
+
+/*!
+   Check if the \p parameter of type \p typeName is valid by this ASN1 file
+ */
+bool File::checkAsn1Compliance(const QString &parameter, const QString &typeName) const
+{
+    for (const std::unique_ptr<Asn1Acn::Definitions> &definitions : m_definitionsList) {
+        for (const std::unique_ptr<Asn1Acn::TypeAssignment> &typeAssignment : definitions->types()) {
+            if (typeAssignment->name() == typeName) {
+                bool ok;
+                Asn1Acn::Asn1ValueParser parser;
+                parser.parseAsn1Value(typeAssignment.get(), parameter, &ok);
+                if (ok) {
+                    return true;
+                }
+            }
+        }
+    }
+
+    return false;
 }

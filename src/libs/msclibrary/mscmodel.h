@@ -68,7 +68,6 @@ public:
 
     void checkInstanceNames();
 
-    bool checkparameterAsn1Compliance(const QString &parameter, const QString &typeName) const;
     bool checkMessageAsn1Compliance(const msc::MscMessage &message) const;
     bool checkAllMessagesForAsn1Compliance(QStringList *faultyMessages = nullptr) const;
 

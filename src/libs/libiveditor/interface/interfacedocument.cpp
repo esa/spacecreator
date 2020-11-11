@@ -34,6 +34,7 @@
 #include "context/action/actionsmanager.h"
 #include "context/action/editor/dynactioneditor.h"
 #include "creatortool.h"
+#include "file.h"
 #include "graphicsitemhelpers.h"
 #include "interface/aadlobjectstreeview.h"
 #include "interface/colors/colormanagerdialog.h"
@@ -61,6 +62,7 @@
 #include <QMutexLocker>
 #include <QPointer>
 #include <QScreen>
+#include <QSharedPointer>
 #include <QShortcut>
 #include <QSplitter>
 #include <QStandardItemModel>
@@ -136,6 +138,12 @@ InterfaceDocument::InterfaceDocument(QObject *parent)
     d->sharedModel = new aadl::AADLObjectsModel(this);
     d->objectsModel = new aadl::AADLObjectsModel(this);
     d->objectsModel->setSharedTypesModel(d->sharedModel);
+
+    connect(d->asnDataTypes, &Asn1Acn::Asn1ModelStorage::dataTypesChanged, this, [&](const QString &fileName) {
+        if (fileName == asn1FilePath()) {
+            checkAllInterfacesForAsn1Compliance();
+        }
+    });
 }
 
 InterfaceDocument::~InterfaceDocument()
@@ -236,11 +244,15 @@ bool InterfaceDocument::create(const QString &path)
 
 bool InterfaceDocument::load(const QString &path)
 {
+    const QString oldPath = d->filePath = path;
+    setPath(path);
+
     const bool loaded = loadImpl(path);
 
     if (loaded) {
-        setPath(path);
         d->commandsStack->clear();
+    } else {
+        setPath(oldPath);
     }
 
     return loaded;
@@ -408,6 +420,14 @@ void InterfaceDocument::setAsn1FileName(const QString &asnfile)
     }
 
     d->asnFileName = asnfile;
+    Q_EMIT asn1FileNameChanged(d->asnFileName);
+
+    if (d->asnDataTypes->contains(asn1FilePath())) {
+        checkAllInterfacesForAsn1Compliance();
+    } else {
+        // does load the data
+        d->asnDataTypes->asn1DataTypes(asn1FilePath());
+    }
 }
 
 /*!
@@ -418,6 +438,9 @@ QString InterfaceDocument::asn1FileName() const
     return d->asnFileName;
 }
 
+/*!
+   Returns the ASN.1 file including it's full path
+ */
 QString InterfaceDocument::asn1FilePath() const
 {
     QFileInfo fi(path());
@@ -511,6 +534,59 @@ Asn1Acn::Asn1ModelStorage *InterfaceDocument::asn1DataTypes() const
 QString InterfaceDocument::supportedFileExtensions() const
 {
     return QStringLiteral("*.xml");
+}
+
+/*!
+   \brief InterfaceDocument::checkInterfaceAsn1Compliance
+   \param interface
+   \return
+ */
+bool InterfaceDocument::checkInterfaceAsn1Compliance(const aadl::AADLObjectIface *interface) const
+{
+    if (!d->asnDataTypes) {
+        return true;
+    }
+
+    const QSharedPointer<Asn1Acn::File> &dataTypes = d->asnDataTypes->asn1DataTypes(asn1FilePath());
+    for (const aadl::IfaceParameter &param : interface->params()) {
+        if (!dataTypes->hasType(param.paramTypeName())) {
+            return false;
+        }
+    }
+    return true;
+}
+
+/*!
+   \brief InterfaceDocument::checkAllInterfacesForAsn1Compliance
+   \param faultyInterface
+   \return
+ */
+bool InterfaceDocument::checkAllInterfacesForAsn1Compliance()
+{
+    QStringList faultyInterfaces;
+
+    bool ok = true;
+    for (aadl::AADLObjectIface *interface : d->objectsModel->allObjectsByType<aadl::AADLObjectIface>()) {
+        if (!checkInterfaceAsn1Compliance(interface)) {
+            ok = false;
+            const QString id = QString("%1.%2").arg(
+                    interface->function() ? interface->function()->title() : "", interface->title());
+            QString parameters;
+            for (const aadl::IfaceParameter &param : interface->params()) {
+                if (!parameters.isEmpty()) {
+                    parameters += ", ";
+                }
+                parameters += param.toString();
+            }
+            faultyInterfaces << QString("%1(%2)").arg(id, parameters);
+        }
+    }
+
+    if (!ok) {
+        Q_EMIT asn1ParameterErrorDetected(faultyInterfaces);
+    }
+
+    return ok;
 }
 
 void InterfaceDocument::onSavedExternally(const QString &filePath, bool saved)
@@ -732,7 +808,7 @@ bool InterfaceDocument::loadImpl(const QString &path)
     aadl::AADLXMLReader parser;
     connect(&parser, &aadl::AADLXMLReader::objectsParsed, this, &InterfaceDocument::setObjects);
     connect(&parser, &aadl::AADLXMLReader::metaDataParsed, this, [this, path](const QVariantMap &metadata) {
-        d->asnFileName = metadata["asn1file"].toString();
+        setAsn1FileName(metadata["asn1file"].toString());
         setMscFileName(metadata["mscfile"].toString());
     });
     connect(&parser, &aadl::AADLXMLReader::error, [](const QString &msg) { qWarning() << msg; });

@@ -93,6 +93,14 @@ QSharedPointer<Asn1Acn::File> Asn1ModelStorage::asn1DataTypes(const QString &fil
 }
 
 /*!
+   Returns if the file is already loaded in this store
+ */
+bool Asn1ModelStorage::contains(const QString &fileName) const
+{
+    return m_store.contains(fileName);
+}
+
+/*!
    Clears the whole store
  */
 void Asn1ModelStorage::clear()

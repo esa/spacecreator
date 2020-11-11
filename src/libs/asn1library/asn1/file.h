@@ -71,6 +71,9 @@ public:
     const std::unique_ptr<TypeAssignment> &typeAssignment(const QString &text) const;
 
     const Asn1Acn::Types::Type *typeFromName(const QString &name) const;
+    bool hasType(const QString &name) const;
+
+    bool checkAsn1Compliance(const QString &parameter, const QString &typeName) const;
 
 private:
     DefinitionsList m_definitionsList;

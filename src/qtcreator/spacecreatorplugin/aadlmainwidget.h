@@ -71,6 +71,9 @@ Q_SIGNALS:
     void dirtyChanged(bool dirty);
     void aadlDataLoaded(const QString &fileName, QSharedPointer<aadlinterface::IVEditorCore> data);
 
+private Q_SLOTS:
+    void showAsn1Errors(const QStringList &faultyInterfaces);
+
 private:
     void init();
 

@@ -45,7 +45,6 @@ private Q_SLOTS:
     void testAddChart();
     void testNoDuplicateChart();
     void testNoNullPtrChart();
-    void testAsn1Compliance();
     void testMessageCompliance();
     void testAllMessagesCompliance();
     void testAllDocuments();
@@ -115,22 +114,6 @@ void tst_MscModel::testNoNullPtrChart()
 {
     m_model->addChart(nullptr);
     QCOMPARE(m_model->charts().size(), 0);
-}
-
-void tst_MscModel::testAsn1Compliance()
-{
-    QSharedPointer<Asn1Acn::File> asn1Data;
-    m_model->setAsn1TypesData(asn1Data);
-    bool ok = m_model->checkparameterAsn1Compliance("", "MyInt");
-    QCOMPARE(ok, true);
-
-    addAsn1Types();
-
-    ok = m_model->checkparameterAsn1Compliance("5", "MyInt");
-    QCOMPARE(ok, true);
-
-    ok = m_model->checkparameterAsn1Compliance("false", "MyInt");
-    QCOMPARE(ok, false);
 }
 
 void tst_MscModel::testMessageCompliance()

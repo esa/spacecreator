@@ -94,6 +94,22 @@ public:
     QModelIndex indexFromObject(AADLObject *object) const;
     AADLObject *objectFromIndex(const QModelIndex &index) const;
 
+    /*!
+      Returns all objects of the given type
+    */
+    template<typename T>
+    QVector<T *> allObjectsByType() const
+    {
+        QVector<T *> result;
+        const QHash<shared::Id, aadl::AADLObject *> &aadlObjects = objects();
+        for (auto obj : aadlObjects) {
+            if (auto func = dynamic_cast<T *>(obj)) {
+                result.append(func);
+            }
+        }
+        return result;
+    }
+
 private:
     int rowInParent(AADLObject *obj) const;
     bool addObjectImpl(AADLObject *obj);

@@ -48,6 +48,7 @@ public:
     ~Asn1ModelStorage();
 
     QSharedPointer<File> asn1DataTypes(const QString &fileName) const;
+    bool contains(const QString &fileName) const;
 
     void clear();
 

@@ -69,6 +69,7 @@ public Q_SLOTS:
     void onGraphicsViewInfo(const QString &info);
     void updateWindowTitle();
     void openAsn1Dialog();
+    void showAsn1Errors(const QStringList &faultyInterfaces);
 
 private:
     bool closeFile();

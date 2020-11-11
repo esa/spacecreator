@@ -257,7 +257,7 @@ cmd::CommandsStack *IVEditorCore::commandsStack() const
 }
 
 /*!
-   Changes the asn1 referenceto \p newName if the existing one if pointing to \p oldName
+   Changes the asn1 reference to \p newName if the existing one is pointing to \p oldName
  */
 bool IVEditorCore::renameAsnFile(const QString &oldName, const QString &newName)
 {
@@ -383,18 +383,8 @@ void IVEditorCore::updateAadlItems()
         return;
     }
 
-    const QHash<shared::Id, aadl::AADLObject *> &aadlObjects = aadlModel->objects();
-    for (auto obj : aadlObjects) {
-        if (obj->aadlType() == aadl::AADLObject::Type::Function) {
-            if (auto func = dynamic_cast<aadl::AADLObjectFunction *>(obj)) {
-                m_aadlFunctions.append(func);
-            }
-        }
-        if (obj->aadlType() == aadl::AADLObject::Type::Connection) {
-            if (auto func = dynamic_cast<aadl::AADLObjectConnection *>(obj)) {
-                m_aadlConnections.append(func);
-            }
-        }
-    }
+    m_aadlFunctions = aadlModel->allObjectsByType<aadl::AADLObjectFunction>();
+    m_aadlConnections = aadlModel->allObjectsByType<aadl::AADLObjectConnection>();
 }
+
 }
