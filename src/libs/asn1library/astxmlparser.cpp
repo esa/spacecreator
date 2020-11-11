@@ -318,7 +318,9 @@ std::unique_ptr<Types::Type> AstXmlParser::readType()
     const auto location = readLocationFromAttributes();
     auto type = readTypeDetails(location);
 
-    m_xmlReader.skipCurrentElement();
+    if (m_xmlReader.name() != "Asn1Type" && m_xmlReader.name() != "Type") {
+        m_xmlReader.skipCurrentElement();
+    }
 
     return type;
 }

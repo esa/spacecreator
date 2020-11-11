@@ -4,6 +4,8 @@ project(${TEST_NAME})
 add_executable(${TEST_NAME}
     astxmlparser_tests.cpp
     astxmlparser_tests.h
+    testmsc3.asn
+    testmsc3.xml
 )
 
 add_test(NAME ${TEST_NAME} COMMAND ${TEST_NAME})
@@ -13,3 +15,5 @@ target_link_libraries(${TEST_NAME} PUBLIC
     Qt5::Core
     Qt5::Test
 )
+
+source_group("Test Files" REGULAR_EXPRESSION "(.*.asn$)|(.*.xml$)")

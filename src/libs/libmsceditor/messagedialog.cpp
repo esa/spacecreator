@@ -346,21 +346,23 @@ void MessageDialog::checkTextValidity()
     if (m_selectedDeclaration) {
         Asn1Acn::Asn1ValueParser parser;
         const QSharedPointer<Asn1Acn::File> &asn1Data = mscModel()->asn1Types();
-        for (int i = 0; i < ui->parameterTable->rowCount(); ++i) {
-            QTableWidgetItem *item = ui->parameterTable->item(i, 0);
-            if (item) {
-                const QString &value = ui->parameterTable->item(i, 0)->text();
-                if (ui->parameterTable->verticalHeaderItem(i) != nullptr) {
-                    const QString &typeName = ui->parameterTable->verticalHeaderItem(i)->text();
-                    const std::unique_ptr<Asn1Acn::TypeAssignment> &assignment = asn1Data->typeAssignment(typeName);
-                    if (assignment) {
-                        bool ok;
-                        parser.parseAsn1Value(assignment->type(), value, &ok);
-                        m_isValid = m_isValid && ok;
-                    } else
+        if (!asn1Data.isNull()) {
+            for (int i = 0; i < ui->parameterTable->rowCount(); ++i) {
+                QTableWidgetItem *item = ui->parameterTable->item(i, 0);
+                if (item) {
+                    const QString &value = ui->parameterTable->item(i, 0)->text();
+                    if (ui->parameterTable->verticalHeaderItem(i) != nullptr) {
+                        const QString &typeName = ui->parameterTable->verticalHeaderItem(i)->text();
+                        const std::unique_ptr<Asn1Acn::TypeAssignment> &assignment = asn1Data->typeAssignment(typeName);
+                        if (assignment) {
+                            bool ok;
+                            parser.parseAsn1Value(assignment->type(), value, &ok);
+                            m_isValid = m_isValid && ok;
+                        } else
+                            m_isValid = false;
+                    } else {
                         m_isValid = false;
-                } else {
-                    m_isValid = false;
+                    }
                 }
             }
         }

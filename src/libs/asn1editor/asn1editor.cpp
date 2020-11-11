@@ -119,9 +119,11 @@ void Asn1Editor::showParseError(const QString &error)
  */
 void Asn1Editor::showAsn1Type(const QString &text)
 {
-    const std::unique_ptr<Asn1Acn::TypeAssignment> &asn1Item = m_asn1Types->typeAssignment(text);
-    if (asn1Item) {
-        m_asn1TreeView->setAsn1Model(asn1Item);
+    if (!m_asn1Types.isNull()) {
+        const std::unique_ptr<Asn1Acn::TypeAssignment> &asn1Item = m_asn1Types->typeAssignment(text);
+        if (asn1Item) {
+            m_asn1TreeView->setAsn1Model(asn1Item);
+        }
     }
 
     if (ui->typesCB->currentText() != text) {

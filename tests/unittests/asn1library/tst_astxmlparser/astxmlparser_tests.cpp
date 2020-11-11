@@ -781,6 +781,23 @@ void AstXmlParserTests::test_asn1AstParsing()
     QCOMPARE(intType2->parameters()["max"].toLongLong(), 4294967295);
 }
 
+void AstXmlParserTests::test_asn1AstReferenceParsing()
+{
+    parseTestFile("testmsc3.xml");
+    QVERIFY(m_parsedData.find("testmsc3.asn") != m_parsedData.end());
+
+    const Asn1Acn::Definitions *definitions = m_parsedData["testmsc3.asn"]->definitions("TETRIS-DATAVIEW");
+    QVERIFY(definitions != nullptr);
+    // Check is "Move-Status" is read and not skipped by "Sprite"
+    const Asn1Acn::Definitions::Types &types = definitions->types();
+    QCOMPARE(types.size(), 10);
+
+    const Asn1Acn::Definitions *definitions2 = m_parsedData["testmsc3.asn"]->definitions("TASTE-BasicTypes");
+    QVERIFY(definitions2 != nullptr);
+    const Asn1Acn::Definitions::Types &types2 = definitions2->types();
+    QCOMPARE(types2.size(), 5);
+}
+
 void AstXmlParserTests::parsingFails(const QString &xmlData)
 {
     setXmlData(xmlData);
@@ -794,6 +811,18 @@ void AstXmlParserTests::parse(const QString &xmlData)
     Asn1Acn::AstXmlParser parser(m_xmlReader);
     QVERIFY(parser.parse());
     m_parsedData = parser.takeData();
+}
+
+void AstXmlParserTests::parseTestFile(const QString &fileName)
+{
+    QFile testfile(QFINDTESTDATA(fileName));
+    testfile.open(QIODevice::ReadOnly);
+    m_xmlReader.clear();
+    m_xmlReader.setDevice(&testfile);
+    Asn1Acn::AstXmlParser parser(m_xmlReader);
+    QVERIFY(parser.parse());
+    m_parsedData = parser.takeData();
+    m_xmlReader.clear();
 }
 
 QTEST_MAIN(AstXmlParserTests)

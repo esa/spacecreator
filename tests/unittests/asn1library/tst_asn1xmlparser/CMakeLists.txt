@@ -19,3 +19,5 @@ target_link_libraries(${TEST_NAME} PUBLIC
     Qt5::Core
     Qt5::Test
 )
+
+source_group("Test Files" REGULAR_EXPRESSION "(.*.asn$)|(.*.xml$)")

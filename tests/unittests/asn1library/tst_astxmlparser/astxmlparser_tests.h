@@ -62,11 +62,13 @@ private Q_SLOTS:
     void test_multipleFiles();
     void test_parametrizedInstancesContentsAreIgnored();
     void test_asn1AstParsing();
+    void test_asn1AstReferenceParsing();
 
 private:
     void setXmlData(const QString &str);
     void parsingFails(const QString &xmlData);
     void parse(const QString &xmlData);
+    void parseTestFile(const QString &fileName);
 
     QXmlStreamReader m_xmlReader;
     std::map<QString, std::unique_ptr<Asn1Acn::File>> m_parsedData;
