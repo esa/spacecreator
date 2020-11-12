@@ -33,12 +33,12 @@ ChartBaseCommand::ChartBaseCommand(MscEntity *item, ChartLayoutManager *layoutMa
 }
 
 /*!
-   Checks if the visual sorting/order of events got changed (might havven as messages are fixed to theis cif geometry)
+   Checks if the visual sorting/order of events got changed (might have as messages are fixed to their cif geometry)
  */
 void ChartBaseCommand::checkVisualSorting()
 {
     if (m_layoutManager && m_layoutManager->isStreamingModeEnabled()) {
-        // Dont do a visual check, as in streaming mode, only a subset of events might be shown
+        // Don't do a visual check, as in streaming mode, only a subset of events might be shown
         return;
     }
 

@@ -73,7 +73,7 @@ void CifBlock::setPayload(const QVariant &p, CifLine::CifType forType)
             qWarning() << Q_FUNC_INFO << "Line for type not found:" << targetType;
         }
     } else {
-        qWarning() << Q_FUNC_INFO << "Attempt to update payload for CIF block with Unkonw type.";
+        qWarning() << Q_FUNC_INFO << "Attempt to update payload for CIF block with Unknown type.";
     }
 }
 

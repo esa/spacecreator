@@ -24,7 +24,7 @@ namespace shared {
 /**
    Ensures that the returned rect is inside of parentRect.
    @param sourceRect the rectangle to move and shrink if needed
-   @param paramRect the rectangle that the sourceRect should fit in
+   @param parentRect the rectangle that the sourceRect should fit in
  */
 QRect rectInRect(const QRect &sourceRect, const QRect &parentRect)
 {

@@ -397,7 +397,7 @@ int Asn1ValueParser::nextIndex(const QString &value) const
     int index;
 
     if (value.startsWith("{")) {
-        /* possile formats:
+        /* possible formats:
          *  { ... }
          *  { { ...  }, { ... }, ... }
          *  { { { ...  }, { ... } }, { { ...  }, { ... } }, ... }

@@ -126,8 +126,8 @@ TemplateEditor::TemplateEditor(const QString &saveHere, QWidget *parent)
 }
 
 /**
- * @brief PreviewDialog::parse generates ahd shows XML text document
- * @param grouppedObjects groupped objects which are used as replacement in template
+ * @brief PreviewDialog::parse generates and shows XML text document
+ * @param grouppedObjects grouped objects which are used as replacement in template
  * @param templateFileName name of template file
  */
 bool TemplateEditor::parseTemplate(const QHash<QString, QVariant> &grouppedObjects, const QString &templateFileName)

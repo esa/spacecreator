@@ -116,7 +116,7 @@ protected:
 class NameItem : public TextGraphicsItem
 {
     // This could be done on the caller side, but currently it's the only used
-    // concretization, so let's wrapp it here to manage in a centralized manner.
+    // concretization, so let's wrap it here to manage in a centralized manner.
     // And since it's just a single string customization I don't want to place
     // it into a separate file (at least, for now).
 

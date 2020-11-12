@@ -240,7 +240,7 @@ IfaceParameter addIfaceParameter(
             break;
         }
         default: {
-            qWarning() << QStringLiteral("Interface Parameter - unknow attribute: %1").arg(attr.m_name);
+            qWarning() << QStringLiteral("Interface Parameter - unknown attribute: %1").arg(attr.m_name);
             break;
         }
         }
@@ -340,7 +340,7 @@ void AADLXMLReader::processTagOpen(QXmlStreamReader &xml)
         break;
     }
     default:
-        static const QString msg("The '%1' is unknown/unexpedted here: %2@%3 %4");
+        static const QString msg("The '%1' is unknown/unexpected here: %2@%3 %4");
         qWarning() << msg.arg(
                 tagName, QString::number(xml.lineNumber()), QString::number(xml.columnNumber()), xml.tokenString());
         break;
@@ -417,8 +417,7 @@ AADLObjectComment *AADLXMLReader::addComment(const QString &text)
 
 AADLObjectConnection *AADLXMLReader::addConnection()
 {
-    AADLObjectConnection *connection =
-            new AADLObjectConnection(nullptr, nullptr, d->m_currentObject.get());
+    AADLObjectConnection *connection = new AADLObjectConnection(nullptr, nullptr, d->m_currentObject.get());
     if (d->m_currentObject.function())
         d->m_currentObject.function()->addChild(connection);
 

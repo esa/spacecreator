@@ -198,9 +198,9 @@ QPen InteractiveObjectBase::selectedPen() const
 
 /*!
    \brief InteractiveObjectBase::scheduleLayoutUpdate
-   Triggers a gemoetry update of that item. That might be needed if for example the underlaying entity changes some of
+   Triggers a geometry update of that item. That might be needed if for example the underlying entity changes some of
    it's data.
-   The actual update is done in the derived itmes in the virtual function \see InteractiveObject::rebuildLayout.
+   The actual update is done in the derived items in the virtual function \see InteractiveObject::rebuildLayout.
    To perform update instantly use the \see InteractiveObject::instantLayoutUpdate
  */
 void InteractiveObjectBase::scheduleLayoutUpdate()
@@ -214,7 +214,7 @@ void InteractiveObjectBase::scheduleLayoutUpdate()
 
 /*!
    \brief InteractiveObjectBase::instantLayoutUpdate
-   Triggers a gemoetry update of that item. That might be needed if for example the underlaying entity changes some of
+   Triggers a geometry update of that item. That might be needed if for example the underlying entity changes some of
    it's data.
    Unlike the \see InteractiveObject::scheduleLayoutUpdate actual update is performed instantly
  */
@@ -307,7 +307,7 @@ QVariant InteractiveObjectBase::itemChange(GraphicsItemChange change, const QVar
 /*!
    \brief InteractiveObjectBase::rebuildLayout
    In this function updates to the geometry, content etc. is done
-   This is usually triggered by the funtion \see InteractiveObject::updateLayout
+   This is usually triggered by the function \see InteractiveObject::updateLayout
  */
 void InteractiveObjectBase::rebuildLayout() { }
 

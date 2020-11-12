@@ -40,13 +40,13 @@ bool removeSceneItem(QGraphicsItem *item)
     // Workaround from discussions above:
     // Just delete the item (without removing it from scene). I'm not sure how,
     // but with manual adding/removing it seems to work.
-    // But the crash is here agin when stresstesting with QBENCHMARK
+    // But the crash is here again when stress testing with QBENCHMARK
     //
     // https://bugreports.qt.io/browse/QTBUG-18021
     //
     // The permanent switch of ItemIndexMethod to the QGraphicsScene::NoIndex leads to not so smooth
-    // expirience in a brief manual test.
-    // This way a temporrary switch to QGraphicsScene::NoIndex seems to be a best option for now:
+    // experience in a brief manual test.
+    // This way a temporary switch to QGraphicsScene::NoIndex seems to be a best option for now:
 
     if (!item || !item->scene())
         return false;

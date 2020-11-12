@@ -123,7 +123,7 @@ void tsti_Chartitem::testItemLimit()
     InteractiveObject *action3 = m_chartModel->itemForEntity(m_chart->instanceEvents().at(3));
     QVERIFY(action3 != nullptr);
 
-    // append one more action, pusing the message to the top
+    // append one more action, pushing the message to the top
     addCommand = new cmd::CmdActionItemCreate(nullptr, instanceA, -1, m_chartModel.data());
     m_undoStack->push(addCommand);
     waitForLayoutUpdate();

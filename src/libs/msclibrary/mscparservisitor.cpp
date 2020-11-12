@@ -632,7 +632,7 @@ void appendDataStatement(MscAction *action, MscParser::DataStatementListContext 
         action->addDataStatement(statement);
     }
     if (statementCtx->binding()) {
-        qWarning() << "Formal binding action types is not suported";
+        qWarning() << "Formal binding action types is not supported";
         delete statement;
     }
 
@@ -675,7 +675,7 @@ antlrcpp::Any MscParserVisitor::visitCreate(MscParser::CreateContext *context)
     if (context->CREATE()) {
         QString name = ::treeNodeToString(context->NAME());
 
-        // find dublicate create name
+        // find duplicate create name
         auto isDuplicate = [&](const MscInstanceEvent *event) {
             if (event->entityType() == MscEntity::EntityType::Create) {
                 const MscCreate *message = static_cast<const MscCreate *>(event);
@@ -688,7 +688,7 @@ antlrcpp::Any MscParserVisitor::visitCreate(MscParser::CreateContext *context)
         auto checkForDuplicates = [&name, &isDuplicate](const InstanceEvents &instanceEvents) {
             auto find = std::find_if(instanceEvents.cbegin(), instanceEvents.cend(), isDuplicate);
             if (find != instanceEvents.cend()) {
-                throw ParserException(QObject::tr("Incorrect (dublicate) create name '%1'").arg(name));
+                throw ParserException(QObject::tr("Incorrect (duplicate) create name '%1'").arg(name));
             }
         };
 
@@ -850,7 +850,7 @@ void MscParserVisitor::resetInstanceEvents()
 /*!
    Fixes the ordering of events
 Algorithm:
-- First fix create-messages, to be on the created instace-list as the first event
+- First fix create-messages, to be on the created instance-list as the first event
 - Loop through all instance event lists and check the first event, if it can be added
   Adding it is possible if
     + It has no dependencies to any other instance (action, single condition, timer, ...)
@@ -1012,7 +1012,7 @@ void MscParserVisitor::checkMessagesDoubleNotation() const
 }
 
 /*!
-   Returns thestring, if it is a denominator keyword match
+   Returns the string, if it is a denominator keyword match
  */
 QString MscParserVisitor::denominatorString(const QString &name) const
 {
@@ -1092,7 +1092,7 @@ antlrcpp::Any MscParserVisitor::visitEnd(MscParser::EndContext *ctx)
     storePrecedingCif(ctx);
 
     // While currently the order of rules parsing seems to be correct,
-    // dbg output below may be usefull for upcoming CIF improvements/tunning.
+    // dbg output below may be useful for upcoming CIF improvements/tuning.
     // Please keep it as a dead code for a while
     // TODO: Remove after completing (more or less) CIF support
     //    if (antlr4::ParserRuleContext *pParentRule = dynamic_cast<antlr4::ParserRuleContext *>(ctx->parent)) {

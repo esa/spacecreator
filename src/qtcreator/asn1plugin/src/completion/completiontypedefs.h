@@ -5,7 +5,7 @@
 **
 ** This file is part of ASN.1/ACN Plugin for QtCreator.
 **
-** Plugin was developed under a programme and funded by
+** Plugin was developed under a program and funded by
 ** European Space Agency.
 **
 ** This Plugin is free software: you can redistribute it and/or modify
@@ -35,6 +35,6 @@ namespace Completion {
 
 using Proposals = QList<TextEditor::AssistProposalItemInterface *>;
 
-} /* nameapsce Completion */
+} /* namespace Completion */
 } /* namespace Internal */
 } /* namespace Asn1Acn */

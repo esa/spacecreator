@@ -330,7 +330,7 @@ bool MessageCreatorTool::validateUserPoints(msc::MscMessage *message)
     // onMouseMove:    current(210,75) m_mouseDown(210,76)
     // onMouseRelease: current(210,75) m_mouseDown(210,76)
     //
-    // While technicaly it's a drag, mostprobably it was not the user's intent to
+    // While technically it's a drag, most probably it was not the user's intent to
     // create such a short arrow.
     // That's the first reason for validation - a message should intersect geometry
     // of source or target instances, otherwise it will be discarded silently.

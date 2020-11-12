@@ -26,7 +26,7 @@ QPainterPath lineShape(const QLineF &line, qreal span)
 
 /*!
  * \brief Helper to detect if the \a line intersects the \a rect.
- * Coordinates of the intersection point stored in \a intersctPos.
+ * Coordinates of the intersection point stored in \a intersectPos.
  * Returns \c true if \a rect and \a line are not null and intersected.
  */
 bool intersects(const QRectF &rect, const QLineF &line, QPointF *intersectPos)

@@ -196,7 +196,7 @@ void AADLConnectionGraphicsItem::updateEdgePoint(const AADLInterfaceGraphicsItem
         m_points.first() = startItem()->connectionEndPoint(this);
         m_points.last() = iface->connectionEndPoint(this);
     } else {
-        qWarning() << "Attempt to update from an unknown iterface";
+        qWarning() << "Attempt to update from an unknown interface";
         return;
     }
 
@@ -528,7 +528,7 @@ void AADLConnectionGraphicsItem::updateLastChunk(const AADLInterfaceGraphicsItem
     }
 
     if (iface != startItem() && iface != endItem()) {
-        qWarning() << "Attempt to update from an unknown iterface";
+        qWarning() << "Attempt to update from an unknown interface";
         return;
     }
 

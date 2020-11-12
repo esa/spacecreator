@@ -31,7 +31,7 @@ namespace templating {
 
 /**
  * @brief The StringTemplate class generates XML document from string template
- * which is based on Django syntax. Also it validates and formtats XML schema.
+ * which is based on Django syntax. Also it validates and formats XML schema.
  * Internally it uses Grantlee libary: https://github.com/steveire/grantlee
  * To build and install Grantlee, please read README.md.
  */
@@ -41,7 +41,7 @@ class StringTemplate : public QObject
 public:
     static StringTemplate *create(QObject *parent = nullptr);
 
-    bool parseFile(const QHash<QString, QVariant>& grouppedObjects, const QString &templateFileName, QIODevice *out);
+    bool parseFile(const QHash<QString, QVariant> &grouppedObjects, const QString &templateFileName, QIODevice *out);
 
     QString formatText(const QString &text);
 

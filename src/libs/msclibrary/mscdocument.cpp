@@ -167,7 +167,7 @@ MscMessageDeclarationList *MscDocument::messageDeclarations()
 }
 
 /**
-    Return the message declarations in a QList (if QObjectListT can't be handeled)
+    Return the message declarations in a QList (if QObjectListT can't be handled)
     Normally messageDeclarations() is preferred.
  */
 QList<msc::MscMessageDeclaration *> MscDocument::declarations() const

@@ -39,12 +39,12 @@ static const qreal kConnectionMargin = 20;
 static const qreal kMinLineLength = 20;
 
 /*!
- * \brief The tolerance used to find an AADLInterfaceGraphicsItem on scene (the size of a squre used as a search area)
+ * \brief The tolerance used to find an AADLInterfaceGraphicsItem on scene (the size of a square used as a search area)
  */
 static const qreal kInterfaceTolerance = 5.;
 
 /*!
- * \brief The tolerance used to find an AADLFunction(Type)GraphicsItem on scene (the size of a squre used as a search
+ * \brief The tolerance used to find an AADLFunction(Type)GraphicsItem on scene (the size of a square used as a search
  * area)
  */
 static const qreal kFunctionTolerance = 20.;

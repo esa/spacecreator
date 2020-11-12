@@ -498,7 +498,7 @@ QRectF TextItem::boundingRect() const
 }
 
 /*!
-   If set to ture, emits the clicked() signal when clicked. But consumes the mouse event.
+   If set to true, emits the clicked() signal when clicked. But consumes the mouse event.
    So other items don't receive the event.
  */
 void TextItem::setSendClickEvent(bool send)
@@ -514,7 +514,7 @@ bool TextItem::textIsValid() const
 /*!
    Sets the text to check if the user input is valid. The text is a MSC text with \em %1 as a placeholder for the text.
    For the validation the MSC parser is used.
-   Exmaple:
+   Example:
    \code
     QString("msc c1;instance i1 comment '%1';endinstance;endmsc;")
    \endcode

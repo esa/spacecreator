@@ -37,7 +37,7 @@ QString CifLinePointsTestBase::lineTag() const
             name = CifLine::nameForType(line->lineType());
         } else {
             *detected = false;
-            name = "Can't aquire CifLine for testing.";
+            name = "Can't acquire CifLine for testing.";
         }
         return name;
     };
@@ -140,7 +140,7 @@ void CifLinePointsTestBase::checkInitFromInsufficient()
             QVERIFY(initialized == false);
         }
     } else {
-        QFAIL("Can't aquire CifLine for testing.");
+        QFAIL("Can't acquire CifLine for testing.");
     }
 }
 
@@ -153,7 +153,7 @@ void CifLinePointsTestBase::checkInitFromExcessive()
             QVERIFY(initialized == false);
         }
     } else {
-        QFAIL("Can't aquire CifLine for testing.");
+        QFAIL("Can't acquire CifLine for testing.");
     }
 }
 

@@ -221,7 +221,7 @@ bool AadlSystemChecks::connectionExists(const QString &name, const QString &sour
 }
 
 /*!
-   Returns all connections that have \p sourceName as required interface and \p targetName as providedinterface
+   Returns all connections that have \p sourceName as required interface and \p targetName as provided interface
    \note the names are aadl encoded by this function
    \sa connectionNames
  */
@@ -318,7 +318,7 @@ bool AadlSystemChecks::correspond(const aadl::AADLObjectFunction *aadlFunc, cons
 }
 
 /*!
-   Returns if the given aadl function \p func has an ancestor (is nesed by) one of the functions
+   Returns if the given aadl function \p func has an ancestor (is nested by) one of the functions
  */
 bool AadlSystemChecks::hasAncestor(
         aadl::AADLObjectFunction *func, const QVector<aadl::AADLObjectFunction *> allFunctions) const
@@ -366,7 +366,7 @@ bool AadlSystemChecks::isAncestor(aadl::AADLObjectFunction *func, aadl::AADLObje
 }
 
 /*!
-   Returns the cooresponding aadl connection for the given \p message.
+   Returns the corresponding aadl connection for the given \p message.
    If no such connection exists, a nullptr is returned.
  */
 aadl::AADLObjectConnection *AadlSystemChecks::correspondingConnection(const MscMessage *message) const

@@ -750,7 +750,7 @@ void MessageItem::onRenamed(const QString &title)
 
     using namespace msc::cmd;
 
-    // prevent recursion, as parametes ans name are not set as one unit
+    // prevent recursion, as parameters ans name are not set as one unit
     disconnect(m_message, &msc::MscMessage::dataChanged, this, &msc::MessageItem::updateDisplayText);
     MscCommandsStack *undoStack = m_chartLayoutManager->undoStack();
     undoStack->beginMacro(tr("Set message identification"));

@@ -46,7 +46,7 @@ void TextItemBaseTest::initImpl()
     m_item->setPos(m_view->viewport()->rect().center());
     m_view->scene()->addItem(m_item);
 
-    // This could be usefull during local development,
+    // This could be useful during local development,
     // but fails the test in CI environment:
     if (isLocalBuild)
         m_view->show();

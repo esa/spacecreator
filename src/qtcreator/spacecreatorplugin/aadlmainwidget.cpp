@@ -102,7 +102,7 @@ QString AadlMainWidget::textContents() const
 }
 
 /*!
-   Show the dialog to display and edit the uased ASN1 file
+   Show the dialog to display and edit the used ASN1 file
  */
 void AadlMainWidget::showAsn1Dialog()
 {

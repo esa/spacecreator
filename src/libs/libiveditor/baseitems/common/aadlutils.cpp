@@ -91,7 +91,7 @@ Qt::Alignment getNearestSide(const QRectF &boundingArea, const QPointF &pos)
 }
 
 /*!
- * \brief Adjusts appropriate coordinate of \a pos to the \a boundingArea side specificed by \a side.
+ * \brief Adjusts appropriate coordinate of \a pos to the \a boundingArea side specified by \a side.
  * Returns the adjusted \a pos.
  */
 QPointF getSidePosition(const QRectF &boundingArea, const QPointF &pos, Qt::Alignment side)
@@ -111,7 +111,7 @@ QPointF getSidePosition(const QRectF &boundingArea, const QPointF &pos, Qt::Alig
 }
 
 /*!
- * \brief Iterates over all \a scene items in the specificied \a pos and returns the first one which QGraphicsItem::type
+ * \brief Iterates over all \a scene items in the specified \a pos and returns the first one which QGraphicsItem::type
  * found in \a acceptableTypes list.
  */
 QGraphicsItem *nearestItem(const QGraphicsScene *scene, const QPointF &pos, const QList<int> &acceptableTypes)
@@ -125,7 +125,7 @@ QGraphicsItem *nearestItem(const QGraphicsScene *scene, const QPointF &pos, cons
 }
 
 /*!
- * \brief Iterates over all \a scene items in the specificied \a area and returns the first one which
+ * \brief Iterates over all \a scene items in the specified \a area and returns the first one which
  * QGraphicsItem::type found in \a acceptableTypes list.
  */
 QGraphicsItem *nearestItem(const QGraphicsScene *scene, const QRectF &area, const QList<int> &acceptableTypes)
@@ -590,7 +590,7 @@ QLineF ifaceSegment(const QRectF &sceneRect, const QPointF &firstEndPoint, const
 
 /*!
  * Generates the path for \a AADLConnectionGraphicsItem from \a startPoint to \a endPoint
- * \param scene QGraphicsScene pointer for finding overlappings with other items
+ * \param scene QGraphicsScene pointer for finding overlapping with other items
  * \param startPoint as first polyline node
  * \param endDirection as last polyline node
  * \return set of polyline nodes coordinates
@@ -710,7 +710,7 @@ QList<QVector<QPointF>> findSubPath(
 
 /*!
  * Generates the path for \a AADLConnectionGraphicsItem from \a startPoint to \a endPoint
- * \param scene QGraphicsScene pointer for finding overlappings with other items
+ * \param scene QGraphicsScene pointer for finding overlapping with other items
  * \param startPoint as first polyline node
  * \param endDirection as last polyline node
  * \return set of polyline nodes coordinates
@@ -734,7 +734,7 @@ QVector<QPointF> findPath(
 
 /*!
  * Generates the whole path for \a AADLConnectionGraphicsItem
- * \param scene QGraphicsScene pointer for finding overlappings with other items
+ * \param scene QGraphicsScene pointer for finding overlapping with other items
  * \param startDirection as first polyline segment
  * \param endDirection as last polyline segment
  * \return set of polyline nodes coordinates

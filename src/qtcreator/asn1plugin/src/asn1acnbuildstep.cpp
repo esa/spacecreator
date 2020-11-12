@@ -5,7 +5,7 @@
 **
 ** This file is part of ASN.1/ACN Plugin for QtCreator.
 **
-** Plugin was developed under a programme and funded by
+** Plugin was developed under a program and funded by
 ** European Space Agency.
 **
 ** This Plugin is free software: you can redistribute it and/or modify
@@ -116,7 +116,7 @@ bool Asn1AcnBuildStep::finishCommand()
 {
     bool success = false;
     if (m_commandFuture->isCanceled())
-        addOutput(tr("Asn1Acn build step cancelled"), BuildStep::OutputFormat::ErrorMessage);
+        addOutput(tr("Asn1Acn build step canceled"), BuildStep::OutputFormat::ErrorMessage);
     else if (m_commandFuture->isFinished())
         success = m_commandFuture->future().result();
 

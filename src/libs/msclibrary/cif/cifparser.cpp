@@ -110,7 +110,7 @@ CifLineShared CifParser::readCifLine(const QString &line) const
     case CifLine::CifType::TextName:
         return readCifLineTextName(line);
     default: {
-        qDebug() << (QString("Unknow CIF entry: %1").arg(line));
+        qDebug() << (QString("Unknown CIF entry: %1").arg(line));
         return {};
     }
     }

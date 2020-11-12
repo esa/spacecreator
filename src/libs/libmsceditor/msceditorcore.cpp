@@ -506,7 +506,7 @@ void MSCEditorCore::changeMscInstanceName(const QString &oldName, const QString 
 }
 
 /*!
-   Changes all messages that have the name \p oldName to have the new name \p newName, if the source and taget have the
+   Changes all messages that have the name \p oldName to have the new name \p newName, if the source and target have the
    names \p sourceName and \p targetName
  */
 void MSCEditorCore::changeMscMessageName(
@@ -786,7 +786,7 @@ void MSCEditorCore::updateHierarchyActions()
 }
 
 /*!
-   Adds a MSC document if the hierarhy view is active and a "non-leafe" document is selected
+   Adds a MSC document if the hierarchy view is active and a "non-leaf" document is selected
  */
 void MSCEditorCore::addDocument(MscDocument::HierarchyType type)
 {

@@ -200,7 +200,7 @@ void MscModel::clear()
 }
 
 /*!
-   Goes through all messages in the model and checks if there are "duplicte" messages
+   Goes through all messages in the model and checks if there are "duplicate" messages
    that need to have the message instance name set.
    The instance name used is a simple number/counter, that starts at 1, or the
    highest existing number (+1) in any instance name. That counter

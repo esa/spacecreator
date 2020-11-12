@@ -62,7 +62,7 @@ void MscEntity::setName(const QString &name)
 }
 
 /*!
-   Returns a regualr expresssion that can be used to check if names are correct for the msc specification
+   Returns a regular expression that can be used to check if names are correct for the msc specification
  */
 const QRegExp &MscEntity::nameVerifier()
 {

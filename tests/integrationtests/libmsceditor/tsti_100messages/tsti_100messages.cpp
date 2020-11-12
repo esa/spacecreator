@@ -59,7 +59,7 @@ private:
     QPointer<QGraphicsView> m_view;
     QPointer<InstanceItem> m_instanceItem;
     static constexpr int CommandsCount = 100;
-    static constexpr bool SkipBenchmark = true; // not a really usefull thing to be run on the CI server
+    static constexpr bool SkipBenchmark = true; // not a really useful thing to be run on the CI server
     static constexpr bool IsLocalBuild = false; // show the view and process events after each action to see the result
 
     void moveInstance(const QPoint &from);
@@ -109,7 +109,7 @@ void tsti100messages::testPerformance()
                                  "- Create %1 MessageItems connected to a single InstanceItem;\n\t"
                                  "- Move that InstanceItem by mouse;\n\t"
                                  "- Undo messages creation.\n"
-                                 "Coudl be used to test the general smoothness of processes where "
+                                 "Could be used to test the general smoothness of processes where "
                                  "the user interaction is involved.\n"
                                  "It's intended for manual testing, so skipped here.")
                                  .arg(CommandsCount)));

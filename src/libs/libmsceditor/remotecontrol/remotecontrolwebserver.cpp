@@ -83,11 +83,11 @@ Implemented commands and parameters list:
     + **names** Names of the message declaration separated by commas ","
     + **typeRefList** String representation of the (ASN.1)types of each parameters, separated by commas ","
 - **Undo** - revert the last command
-- **Redo** - Redo the last reverted comand
+- **Redo** - Redo the last reverted command
 - **Save** - save the current chart to a file
     + **fileName** - name of the file to save to
     + **asn1File** - name of the file that is having the asn data. This is the file name only. So not including a the
-path. The file is expected to bein the same directory as the msc file. This parameter is optional
+path. The file is expected to be in the same directory as the msc file. This parameter is optional
 - **VisibleItemLimit** - limit visible events in the scene
    + **number** - count of visible items, -1 if all of them should be visible
 

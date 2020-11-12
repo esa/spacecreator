@@ -26,7 +26,7 @@ const int COLUMN_ID_Value = 1;
 
 /*!
  * \class aadlinterface::AttributesModel
- * \brief The model to store scriptable actions attributes in editor dialog.
+ * \brief The model to store script-able actions attributes in editor dialog.
  */
 AttributesModel::AttributesModel(QObject *parent)
     : QStringListModel(parent)

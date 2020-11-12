@@ -588,7 +588,7 @@ qreal InstanceItem::defaultAxisHeight()
 /*!
    Returns the left point where a creator message should point to.
    From the MSC standard: "The arrowhead points to the <instance head symbol> of the created instance."
-   \note The retunred point is in scene coordinates
+   \note The returned point is in scene coordinates
  */
 QPointF InstanceItem::leftCreatorTarget() const
 {
@@ -598,7 +598,7 @@ QPointF InstanceItem::leftCreatorTarget() const
 /*!
    Returns the right point where a creator message should point to.
    From the MSC standard: "The arrowhead points to the <instance head symbol> of the created instance."
-   \note The retunred point is in scene coordinates
+   \note The returned point is in scene coordinates
  */
 QPointF InstanceItem::rightCreatorTarget() const
 {

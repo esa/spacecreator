@@ -607,7 +607,7 @@ void MainWindow::changeEvent(QEvent *e)
         // box sized accordingly to this->centralWidget(), we have to wait while
         // processing of restoreState(...) & restoreGeometry(...) will be finished.
         // The final geometry (which is stored in a QByteArray and not in a QRect)
-        // is applyed after QEvent::Show, so QEvent::Resize handler seems to be
+        // is applied after QEvent::Show, so QEvent::Resize handler seems to be
         // a proper entry point, but actually it's not:
         // in case the saved window state is "normal", the resizeEvent(...) will
         // be called once, but for "maximized" there would be one more call, and
@@ -719,7 +719,7 @@ void MainWindow::updateModel()
 
 #ifdef QT_DEBUG
 
-// A way to precisiousely move mouse pointer to scene coordinates without pixel hunting.
+// A way to precisely move mouse pointer to scene coordinates without pixel hunting.
 // Invoked by CTRL+ALT+SHIFT+M
 void MainWindow::showMousePositioner()
 {
@@ -812,7 +812,7 @@ void MainWindow::saveScreenshot()
 void MainWindow::showAsn1Errors(const QStringList &faultyMessages)
 {
     QMessageBox::warning(
-            this, tr("ASN1 error"), tr("Following messgages have ASN.1 errors:") + "\n" + faultyMessages.join("\n"));
+            this, tr("ASN1 error"), tr("Following messages have ASN.1 errors:") + "\n" + faultyMessages.join("\n"));
 }
 
 void MainWindow::saveSceneRender(const QString &filePath) const

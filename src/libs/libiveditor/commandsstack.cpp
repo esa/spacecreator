@@ -30,13 +30,13 @@ namespace cmd {
 
 /*!
  * \class CommandsStack
- * \brief A wrapper around the QUndoStack, provides the convenient acces to the current stack.
+ * \brief A wrapper around the QUndoStack, provides the convenient access to the current stack.
  * During integration of other types of documents may be replaced by QUndoGroup. Or may not.
  */
 
 /*!
  * \brief CommandsStack::Macro::Macro
- * The helper structure to remove "macros" from the undo stack. Used in cases when a macro cancelled during its
+ * The helper structure to remove "macros" from the undo stack. Used in cases when a macro canceled during its
  composition.
  * \sa CreatorTool::handleConnection(), PropertiesDialog
 
@@ -48,7 +48,7 @@ CommandsStack::Macro::Macro(const QString &title)
 
 /*!
  * \brief CommandsStack::Macro::~Macro
- * The actuall magic appears here. Uses the const_cast and particular calls order, so the magic is black.
+ * The actual magic appears here. Uses the const_cast and particular calls order, so the magic is black.
  * To avoid this, the following refactoring is necessary:
  *  all the existing custom undo commands and methods of CommandsFactory have to receive the QUndoCommand* as a
  * parameter, so the macro would be managed as: \code
@@ -120,7 +120,7 @@ CommandsStack *CommandsStack::m_instance = nullptr;
 
 /*!
  * \brief CommandsStack::instance
- * Common accesor to the global instance.
+ * Common accessor to the global instance.
  */
 CommandsStack *CommandsStack::instance()
 {

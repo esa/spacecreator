@@ -38,8 +38,8 @@ public:
 
     /**
      * @brief groupName is a logical name of a group of objects which given object belongs to.
-     * Exportable objects are groupped by the group name and kept in QVariantList.
-     * Then the group name is used in the string template to retrive all groupped objects.
+     * Exportable objects are grouped by the group name and kept in QVariantList.
+     * Then the group name is used in the string template to retrieve all grouped objects.
      * @return name of the group
      */
     virtual QString groupName() const = 0;

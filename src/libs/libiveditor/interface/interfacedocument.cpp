@@ -919,7 +919,7 @@ QVector<QAction *> InterfaceDocument::initActions()
     connect(d->actZoomOut, &QAction::triggered, this,
             [this]() { d->graphicsView->setZoom(d->graphicsView->zoom() - d->graphicsView->zoomStepPercent()); });
 
-    d->actExitToRoot = new QAction(tr("Exit to root funtion"));
+    d->actExitToRoot = new QAction(tr("Exit to root function"));
     d->actExitToRoot->setActionGroup(actionGroup);
     d->actExitToRoot->setEnabled(false);
     connect(d->actExitToRoot, &QAction::triggered, this, [this]() { d->itemsModel->changeRootItem({}); });

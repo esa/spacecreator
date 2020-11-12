@@ -37,7 +37,7 @@
 namespace aadlinterface {
 
 /*!
-   Adds all attribibutes from \p attrs that are not already in \a storage to that data
+   Adds all attributes from \p attrs that are not already in \a storage to that data
  */
 void collectUniqeAttributes(
         const QHash<QString, DynamicProperty *> &attrs, QHash<DynamicProperty *, DynamicProperty *> &storage)

@@ -325,7 +325,7 @@ MessageItem *ChartLayoutManager::fillMessageItem(
 }
 
 /*!
-   Triggers an update. The update is sheduled, so multiple calls of this function trigger only one layout update.
+   Triggers an update. The update is scheduled, so multiple calls of this function trigger only one layout update.
    \sa doLayout()
  */
 void ChartLayoutManager::updateLayout()
@@ -732,7 +732,7 @@ const QVector<InstanceItem *> &ChartLayoutManager::instanceItems() const
 
 /*!
    Returns all instance event items
-   \note The sorting is not neccesarily in the correct (vertical) order
+   \note The sorting is not necessarily in the correct (vertical) order
  */
 const QVector<InteractiveObject *> &ChartLayoutManager::instanceEventItems() const
 {
@@ -978,7 +978,7 @@ void ChartLayoutManager::actualizeInstancesHeights(qreal height) const
 
 void ChartLayoutManager::updateStoppedInstanceHeight(InstanceItem *instanceItem, qreal totalH) const
 {
-    // update instance's end Y-postion to the last message
+    // update instance's end Y-position to the last message
     QVector<QGraphicsObject *> events(instanceEventItems(instanceItem->modelItem()));
     if (!events.isEmpty()) {
         std::sort(events.begin(), events.end(), [](const QGraphicsObject *const a, const QGraphicsObject *const b) {
@@ -1862,7 +1862,7 @@ QVector<msc::MscInstanceEvent *> ChartLayoutManager::visuallySortedEvents() cons
 }
 
 /*!
-   Sets the object to ckeck if the msc entities correspond to the aadl model
+   Sets the object to check if the msc entities correspond to the aadl model
  */
 void ChartLayoutManager::setAadlChecker(AadlSystemChecks *aadlChecker)
 {

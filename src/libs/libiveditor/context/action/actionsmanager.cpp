@@ -74,7 +74,7 @@ namespace aadlinterface {
 
 /*!
  *\class aadlinterface::ActionsManager
- * \brief The application wide manager for sriptable actions.
+ * \brief The application wide manager for script-able actions.
  * Used to: store action instances in runtime, deploy the default file from resources (if necessary), populate the
  *context menu and to actually invoke the internal QAction or external application.
  */
@@ -114,7 +114,7 @@ void ActionsManager::populateMenu(QMenu *menu, aadl::AADLObject *currObj)
                     triggerActionExternal(actHandler, act ? act->data().value<aadl::AADLObject *>() : nullptr);
                 } else {
                     QMessageBox::warning(nullptr, QObject::tr("Custom action"),
-                            QObject::tr("No internal or extrernal action provided by %1").arg(actHandler.m_title));
+                            QObject::tr("No internal or external action provided by %1").arg(actHandler.m_title));
                 }
             });
         }
@@ -223,7 +223,7 @@ QVector<Action> ActionsManager::parseFile(const QString &filePath, QString *erro
 
 /*!
  * \brief ActionsManager::registerScriptableAction
- * Marks the \a action as scriptable and makes it available by \a key.
+ * Marks the \a action as script able and makes it available by \a key.
  * The \a description is optional.
  * Returns \c false if \a action is null, the \a key is empty already used.
  */
@@ -265,7 +265,7 @@ QStringList ActionsManager::scriptableActionNames()
 
 /*!
  * \brief ActionsManager::triggerActionInternal
- * Handler for "internal" actions. Triggers a QAction previousely registered with
+ * Handler for "internal" actions. Triggers a QAction previously registered with
  * ActionsManager::registerScriptableAction()
  */
 void ActionsManager::triggerActionInternal(const Action &act)
@@ -378,7 +378,7 @@ QStringList ActionsManager::externalArgsHoldersDescr()
 }
 
 /*!
-  \brief Helper function for registering the \a action as scriptable, with key \a title and optional \a description.
+  \brief Helper function for registering the \a action as script-able, with key \a title and optional \a description.
  * The \a caller argument is used to provide reasonable debug record.
  */
 void ActionsManager::registerAction(

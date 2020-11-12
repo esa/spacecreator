@@ -5,7 +5,7 @@
 **
 ** This file is part of ASN.1/ACN Plugin for QtCreator.
 **
-** Plugin was developed under a programme and funded by
+** Plugin was developed under a program and funded by
 ** European Space Agency.
 **
 ** This Plugin is free software: you can redistribute it and/or modify
@@ -93,7 +93,7 @@ const std::unique_ptr<TypeAssignment> &File::typeAssignment(const QString &text)
 }
 
 /*!
-   Retruns the first type having the given \p name
+   Returns the first type having the given \p name
  */
 const Types::Type *File::typeFromName(const QString &name) const
 {

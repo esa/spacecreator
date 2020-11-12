@@ -124,7 +124,7 @@ bool MscSystemChecks::mscMessagesExist(const QString &messageName, const QString
 }
 
 /*!
-   Changes all messages that have the name \p oldName to have the new name \p newName, if the source and taget have the
+   Changes all messages that have the name \p oldName to have the new name \p newName, if the source and target have the
    names \p sourceName and \p targetName
  */
 void MscSystemChecks::changeMscMessageName(
@@ -179,7 +179,7 @@ void MscSystemChecks::checkInstances()
         if (!text.isEmpty()) {
             text += "\n\n";
         }
-        text += tr("Following instances are used with parent/hild of nested functions:\n");
+        text += tr("Following instances are used with parent/child of nested functions:\n");
         for (auto item : resultRelations) {
             if (!text.isEmpty()) {
                 text += "\n";
@@ -463,7 +463,7 @@ void MscSystemChecks::onEntityRemoved(aadl::AADLObject *entity, shared::UndoComm
     if (command->isFirstChange()) {
         const int result = QMessageBox::question(nullptr, tr("Remove MSC entities"),
                 tr("The AADL entity %1 was removed."
-                   "\nDo you want to remove the corelating MSC entities?")
+                   "\nDo you want to remove the correlating MSC entities?")
                         .arg(entity->title()));
         if (result != QMessageBox::Yes) {
             doRemove = false;

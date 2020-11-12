@@ -5,7 +5,7 @@
 **
 ** This file is part of ASN.1/ACN Plugin for QtCreator.
 **
-** Plugin was developed under a programme and funded by
+** Plugin was developed under a program and funded by
 ** European Space Agency.
 **
 ** This Plugin is free software: you can redistribute it and/or modify
@@ -98,7 +98,7 @@ void ComponentImporter::createTargetDir(QDir &parent, const QString &path)
 void ComponentImporter::copyFile(const QString &source, const QString &target)
 {
     if (QFile::exists(target) && !QFile::remove(target))
-        throw std::runtime_error("Could not replace exisitng file \'" + target.toStdString() + "\'");
+        throw std::runtime_error("Could not replace existing file \'" + target.toStdString() + "\'");
 
     if (!QFile::copy(source, target))
         throw std::runtime_error("Could not copy \'" + source.toStdString() + "\' to \'"

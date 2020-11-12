@@ -57,7 +57,7 @@ void ChartViewTestBase::loadView(const QString &mscDoc)
     m_chart = m_model->documents().first()->charts().first();
     m_chartModel->setCurrentChart(m_chart);
 
-    // This could be usefull during local development (to see the mouse interaction),
+    // This could be useful during local development (to see the mouse interaction),
     // but fails the test in CI environment:
     if (m_isLocalBuild) {
         vstest::EventsDelayMs = 300;

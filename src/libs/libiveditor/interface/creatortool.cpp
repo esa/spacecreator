@@ -511,7 +511,7 @@ bool CreatorTool::onContextMenu(QContextMenuEvent *e)
         viewPos = d->view->mapFromGlobal(globalPos);
     }
 
-    // onMousePress is needed to set an apppropriate d->previewItem
+    // onMousePress is needed to set an appropriate d->previewItem
     QMouseEvent mouseEvent(QEvent::MouseButtonPress, viewPos, Qt::RightButton, Qt::RightButton | Qt::MaxMouseButton,
             nullptr); // Qt::MaxMouseButton is a fake button
                       // to distinguish this mouse event

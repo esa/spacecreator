@@ -188,7 +188,7 @@ void InstanceHeadItem::updateLayout()
         m_explicitTextBox = symbolRect;
     }
 
-    // center name horizontaly:
+    // center name horizontally:
     nameRect.moveCenter(symbolRect.center());
     nameRect.moveTop(0.);
 

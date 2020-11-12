@@ -43,7 +43,7 @@ class TextItem;
 /*!
    \brief The InstanceItem class is the graphical representation of an MSC instance.
 
-   \note The CIF geometry (for user defined positions) only applies to the X. All the Y information is calulcated
+   \note The CIF geometry (for user defined positions) only applies to the X. All the Y information is calculated
    automatically. As the user can only control the horizontal position.
  */
 class InstanceItem : public InteractiveObject

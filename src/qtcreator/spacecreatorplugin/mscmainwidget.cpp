@@ -234,7 +234,7 @@ void MscMainWidget::showSelection(const QModelIndex &current, const QModelIndex 
 void MscMainWidget::showAsn1Errors(const QStringList &faultyMessages)
 {
     QMessageBox::warning(
-            this, tr("ASN1 error"), tr("Following messgages have ASN.1 errors:") + "\n" + faultyMessages.join("\n"));
+            this, tr("ASN1 error"), tr("Following messages have ASN.1 errors:") + "\n" + faultyMessages.join("\n"));
 }
 
 /*!

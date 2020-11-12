@@ -90,8 +90,8 @@ QVariant ExportableAADLObject::createFrom(const aadl::AADLObject *aadlObject)
 }
 
 /**
- * @brief ExportableAADLObject::attributes returns list of attribues for using in string templates.
- * @return list of attribues.
+ * @brief ExportableAADLObject::attributes returns list of attributes for using in string templates.
+ * @return list of attributes.
  */
 QVariantList ExportableAADLObject::attributes() const
 {

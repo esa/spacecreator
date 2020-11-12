@@ -32,7 +32,7 @@ namespace aadl {
 
 /*!
  * \class aadl::ConnectionCreationValidator
- * The collection of static funcitons to detect if it's possible to connect two interfaces/scene points.
+ * The collection of static functions to detect if it's possible to connect two interfaces/scene points.
  */
 
 /*!
@@ -58,13 +58,13 @@ namespace aadl {
         \value NoScene
             Invalid pointer to the QGraphicsScene. The default initial value for ValidationResult::status.
         \value NoStartFunction
-            Can not detect a AADLFunctionGraphicsItem at specificied start postion.
+            Can not detect a AADLFunctionGraphicsItem at specified start position.
         \value CannotCreateStartIface
-            The predicted AADLFunctionGraphicsItem to create Interface in can not be found in specificied position.
+            The predicted AADLFunctionGraphicsItem to create Interface in can not be found in specified position.
         \value NoEndFunction
-            Can not detect a AADLFunctionGraphicsItem at specificied end postion.
+            Can not detect a AADLFunctionGraphicsItem at specified end position.
         \value CannotCreateEndIface
-            The predicted AADLFunctionGraphicsItem to create Interface in can not be found in specificied position.
+            The predicted AADLFunctionGraphicsItem to create Interface in can not be found in specified position.
         \value SameDirectionIfaceWrongParents
             Attempt to connect PI to PI or RI to RI when parent Functions are not direct ancestors.
         \value ToFromNestedDifferentDirection
@@ -74,8 +74,8 @@ namespace aadl {
  */
 
 /*!
- * \brief Check if the \a sourceFunction whic contains the \a sourceIface
- * can be used to setup a connection to the \a targetFunction wich contains the \a targetIface.
+ * \brief Check if the \a sourceFunction which contains the \a sourceIface
+ * can be used to setup a connection to the \a targetFunction winch contains the \a targetIface.
  *
  * Ensure that:
  * 1. the items on edges are not the AADLFunctionTypeGraphicsItem;

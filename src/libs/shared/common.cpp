@@ -32,7 +32,7 @@ namespace shared {
 /*!
   \namespace shared
 
-  \brief The collection of utilites shared among all submodules.
+  \brief The collection of utilities shared among all submodules.
 */
 
 /*!
@@ -63,10 +63,10 @@ Id createId()
 /*!
  * \brief Copies the \a source file from resources to the \a target file.
 
- * Returns \c true if the \a source file copied succesfully and
+ * Returns \c true if the \a source file copied successfully and
  * the QFile::WriteUser permission explicitly set for the \a target
  * (otherwise it would be read-only as any file in qrc).
- * If the \a target file already exists, this function will not owervirite
+ * If the \a target file already exists, this function will not overwrite
  * and return \c false;
  */
 bool copyResourceFile(const QString &source, const QString &target, FileCopyingMode replaceMode)

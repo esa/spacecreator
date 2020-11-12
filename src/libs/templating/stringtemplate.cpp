@@ -94,7 +94,7 @@ void StringTemplate::init()
 
 /**
  * @brief StringTemplate::parseFile parses template file
- * @param grouppedObjects objects which are groupped by type name.
+ * @param grouppedObjects objects which are grouped by type name.
  * Type names can be Functions, Connections, Comments and etc.
  * @param templateFileName name of template file
  * @param out a pointer to the QIODevice to store result

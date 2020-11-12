@@ -392,7 +392,7 @@ void TextGraphicsItem::onContentsChange(int position, int charsRemoved, int char
         if (validateInput(newChar))
             inputStringValid.append(newChar);
         else {
-            const QString wrnMsg("Invalid characted '%1' [%2] at #%3 filtered out in '%4'");
+            const QString wrnMsg("Invalid character '%1' [%2] at #%3 filtered out in '%4'");
             qWarning() << wrnMsg.arg(newChar).arg(newChar.unicode()).arg(i + 1).arg(inputString);
         }
     }

@@ -377,7 +377,7 @@ void MessageDialog::checkTextValidity()
 }
 
 /*!
-   If the name is empty, thet completer popup needs to be shown "manually"
+   If the name is empty, the completer popup needs to be shown "manually"
    \note The popup is delayed, as otherwise it will be closed immediately after popup
  */
 void MessageDialog::checkforEmptyCompleter()

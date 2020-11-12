@@ -65,7 +65,7 @@ void GraphicsView::keyPressEvent(QKeyEvent *event)
     case Qt::Key_Down: {
         for (QGraphicsItem *item : scene()->selectedItems()) {
             if (aadlinterface::AADLRectGraphicsItem *rectItem =
-                            // Not the qgraphicsitem_cast due its "successfull" cast of AADLFunctionName/Text Graphics
+                            // Not the qgraphicsitem_cast due its "successful" cast of AADLFunctionName/Text Graphics
                             // Items
                     qobject_cast<aadlinterface::AADLRectGraphicsItem *>(item->toGraphicsObject())) {
                 rectItem->singleStepMove(aadlinterface::AADLRectGraphicsItem::MoveStep(event->key()));

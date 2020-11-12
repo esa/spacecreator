@@ -53,7 +53,7 @@ namespace aadlinterface {
 
 /*!
 \class aadlinterface::MainWindow
-\brief Main appllication window - the place to store and manage supported document types, import/export data,
+\brief Main application window - the place to store and manage supported document types, import/export data,
 process command line arguments and user actions.
 
 \sa aadlinterface::InterfaceDocument, shared::CommandLineParser
@@ -218,7 +218,7 @@ void MainWindow::onExportTypeRequested()
 
 /*!
  * \brief Exports the document document to the output file \a savePath using the template file \a templatePath.
- * Returns \c true on succes.
+ * Returns \c true on success.
  */
 bool MainWindow::exportXml(const QString &savePath, const QString &templatePath)
 {
@@ -226,7 +226,7 @@ bool MainWindow::exportXml(const QString &savePath, const QString &templatePath)
 }
 
 /*!
- * \brief Shows the preview dialog for exportin the document to the output file \a savePath
+ * \brief Shows the preview dialog for exporting the document to the output file \a savePath
  * using the template file \a templatePath.
  * If a \a savePath or \a templatePath is empty, user will be asked to select the file via QFileDialog.
  * Returns true if the preview dialog can not be shown.
@@ -420,7 +420,7 @@ bool MainWindow::closeFile()
 
 /*!
  * \brief Closes documents, attempting to save changes, if any.
- * If user declyne request to save cahnges, returns \c false.
+ * If user decline request to save changes, returns \c false.
  */
 bool MainWindow::prepareQuit()
 {

@@ -23,7 +23,7 @@ namespace aadlinterface {
 
 /*!
  * \class aadlinterface::ActionsModel
- * \brief The model to store instances of scriptable actions in editor dialog.
+ * \brief The model to store instances of script-able actions in editor dialog.
  */
 ActionsModel::ActionsModel(QObject *parent)
     : QStringListModel(parent)
