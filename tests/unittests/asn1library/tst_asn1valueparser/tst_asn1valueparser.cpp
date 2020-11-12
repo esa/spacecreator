@@ -52,6 +52,7 @@ private Q_SLOTS:
     void testChoiceValueError();
     void testSequenceValue();
     void testSequenceValueError();
+    void testSequenceOfValue();
 
 private:
     Asn1ValueParser *valueParser = nullptr;
@@ -338,6 +339,39 @@ void tst_Asn1ValueParser::testSequenceValueError()
 
     arguments = spy.takeFirst();
     QCOMPARE(arguments.at(0).toString(), tr("Incorrect value for MySequence"));
+}
+
+void tst_Asn1ValueParser::testSequenceOfValue()
+{
+    Asn1Acn::SourceLocation location;
+    auto ofType = std::make_unique<Asn1Acn::Types::Enumerated>();
+    QVariantList enumValues = { "red", "green", "blue" };
+    QVariantMap params;
+    params["values"] = enumValues;
+    params["Min"] = 2;
+    params["Max"] = 2;
+    ofType->setParameters(params);
+
+    auto type = std::make_unique<Asn1Acn::Types::SequenceOf>();
+    type->addChild(std::move(ofType));
+
+    auto assignment = std::make_unique<Asn1Acn::TypeAssignment>("MySequenceOf", location, std::move(type));
+
+    auto valueMap = valueParser->parseAsn1Value(assignment.get(), "{ blue, green }");
+
+    QCOMPARE(valueMap.size(), 2);
+    QCOMPARE(valueMap["name"].toString(), QString("MySequenceOf"));
+
+    auto childrenValue = valueMap["seqofvalue"].toList();
+    QCOMPARE(childrenValue.size(), 2);
+
+    auto childValue = childrenValue.at(0).toMap();
+    QCOMPARE(childValue.size(), 2);
+    QCOMPARE(childValue["value"].toString(), QString("blue"));
+
+    childValue = childrenValue.at(1).toMap();
+    QCOMPARE(childValue.size(), 2);
+    QCOMPARE(childValue["value"].toString(), QString("green"));
 }
 
 QTEST_APPLESS_MAIN(tst_Asn1ValueParser)

@@ -304,12 +304,20 @@ QString Asn1TreeView::getItemValue(const QStandardItem *item, const QString &sep
     else if (asnType.startsWith("choice", Qt::CaseInsensitive)) {
         itemValue += getItemValue(item->child(itemChoiceIndex(item, asnValue)), " :");
     } else if (asnType.startsWith("sequenceOf", Qt::CaseInsensitive)
-            || asnType.startsWith("sequence", Qt::CaseInsensitive)) {
+            || asnType.startsWith("sequence of", Qt::CaseInsensitive)) {
         itemValue += "{ ";
-
-        int childCount = asnType.startsWith("sequenceOf", Qt::CaseInsensitive) ? asnValue.toInt() : item->rowCount();
+        int childCount = asnValue.toInt();
         for (int x = 0; x < childCount; ++x) {
-            itemValue += getItemValue(item->child(x), asnType.startsWith("sequenceOf", Qt::CaseInsensitive) ? "" : " ");
+            itemValue += getItemValue(item->child(x), "");
+            if (x < childCount - 1)
+                itemValue += ", ";
+        }
+        itemValue += " }";
+    } else if (asnType.startsWith("sequence", Qt::CaseInsensitive)) {
+        itemValue += "{ ";
+        int childCount = item->rowCount();
+        for (int x = 0; x < childCount; ++x) {
+            itemValue += getItemValue(item->child(x), " ");
             if (x < childCount - 1)
                 itemValue += ", ";
         }

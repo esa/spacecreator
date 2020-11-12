@@ -81,7 +81,7 @@ private:
     void readTypeContents(const QString &name, Types::Type *type);
     void readSequence();
     void readSequenceAsn(Types::Type *type);
-    void readSequenceOf();
+    void readSequenceOf(Types::Type *type);
     void readChoice();
     void readChoiceAsn(Types::Type *type);
 

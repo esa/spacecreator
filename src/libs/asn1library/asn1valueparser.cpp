@@ -321,7 +321,9 @@ bool Asn1ValueParser::parseSequenceOfValue(
     while ((index = nextIndex(value))) {
         auto item = value.mid(0, index);
 
-        auto itemValue = parseAsn1Value(asn1Type, item);
+        const Asn1Acn::Types::Type *itemType =
+                asn1Type->children().empty() ? asn1Type : asn1Type->children().at(0).get();
+        auto itemValue = parseAsn1Value(itemType, item);
         if (itemValue.size())
             seqofValues.append(itemValue);
         else

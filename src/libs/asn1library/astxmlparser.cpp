@@ -358,7 +358,7 @@ void AstXmlParser::readTypeContents(const QString &name, Types::Type *type)
         }
     } else if (name == QStringLiteral("SEQUENCE OF")) {
         parseRange<qlonglong>(*type);
-        readSequenceOf();
+        readSequenceOf(type);
     } else if (name == QStringLiteral("CHOICE")) {
         if (m_xmlReader.name() == "ChoiceType") {
             readChoiceAsn(type);
@@ -463,11 +463,19 @@ bool AstXmlParser::skipToChildElement(const QStringList &names)
     return false;
 }
 
-void AstXmlParser::readSequenceOf()
+void AstXmlParser::readSequenceOf(Types::Type *type)
 {
-    auto type = readType();
-    if (type && m_xmlReader.name() == QStringLiteral("Type")) {
-        m_xmlReader.skipCurrentElement();
+    auto sequenceOf = dynamic_cast<Types::SequenceOf *>(type);
+    if (!sequenceOf) {
+        return;
+    }
+
+    auto ofType = readType();
+    if (ofType) {
+        sequenceOf->addChild(std::move(ofType));
+        if (m_xmlReader.name() == QStringLiteral("Type")) {
+            m_xmlReader.skipCurrentElement();
+        }
     }
 }
 
