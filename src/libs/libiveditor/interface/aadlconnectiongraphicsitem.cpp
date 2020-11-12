@@ -267,6 +267,10 @@ AADLFunctionGraphicsItem *AADLConnectionGraphicsItem::targetItem() const
 
 QList<QVariantList> AADLConnectionGraphicsItem::prepareChangeCoordinatesCommandParams() const
 {
+    if (!entity() || !m_startItem || !m_startItem->entity() || !m_endItem || !m_endItem->entity()) {
+        return {};
+    }
+
     // item->prepareChangeCoordinatesCommandParams() - will be fixed during work on Undo/Redo issues
     auto prepareParams = [](AADLInterfaceGraphicsItem *item) -> QVariantList {
         return { QVariant::fromValue(item->entity()), QVariant::fromValue<QVector<QPointF>>({ item->scenePos() }) };

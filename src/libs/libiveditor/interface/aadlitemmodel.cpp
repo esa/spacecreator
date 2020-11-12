@@ -131,7 +131,19 @@ QItemSelectionModel *AADLItemModel::selectionModel() const
 
 void AADLItemModel::onAADLObjectAdded(aadl::AADLObject *object)
 {
-    if (!m_graphicsScene) {
+    if (!m_graphicsScene || !object) {
+        return;
+    }
+
+    const int currentLevel = nestingLevel(m_model->rootObject());
+    int levelAdjustment = m_model->rootObject() ? 2 : 1;
+    if (object->aadlType() == aadl::AADLObject::Type::Connection
+            || object->aadlType() == aadl::AADLObject::Type::ConnectionGroup) {
+        levelAdjustment -= 1;
+    }
+    const int maxLevel = currentLevel + levelAdjustment;
+    const int objLevel = nestingLevel(object);
+    if (currentLevel > objLevel || maxLevel < objLevel) {
         return;
     }
 

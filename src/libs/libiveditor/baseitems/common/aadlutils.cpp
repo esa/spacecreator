@@ -881,4 +881,20 @@ bool comparePolygones(const QVector<QPointF> &v1, const QVector<QPointF> &v2)
     return true;
 }
 
+int nestingLevel(aadl::AADLObject *object)
+{
+    int level = 0;
+    if (!object)
+        return level;
+
+    while (auto parentObject = object->parentObject()) {
+        if (object->aadlType() == aadl::AADLObject::Type::Function
+                || object->aadlType() == aadl::AADLObject::Type::FunctionType) {
+            ++level;
+        }
+        object = parentObject;
+    }
+    return level;
 }
+
+} // namespace aadlinterface

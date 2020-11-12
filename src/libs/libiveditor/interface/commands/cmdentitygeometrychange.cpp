@@ -79,16 +79,6 @@ void CmdEntityGeometryChange::mergeCommand(QUndoCommand *command)
     m_mergedCmds.append(command);
 }
 
-static inline int parentLevel(aadl::AADLObject *object)
-{
-    int idx = 0;
-    while (auto parentObject = object->parentObject()) {
-        ++idx;
-        object = parentObject;
-    }
-    return idx;
-}
-
 QList<CmdEntityGeometryChange::ObjectData> CmdEntityGeometryChange::convertData(
         const QList<QPair<aadl::AADLObject *, QVector<QPointF>>> &objectsData)
 {
@@ -98,7 +88,7 @@ QList<CmdEntityGeometryChange::ObjectData> CmdEntityGeometryChange::convertData(
 
     std::stable_sort(result.begin(), result.end(), [](const ObjectData &data1, const ObjectData &data2) {
         if (data1.entity->aadlType() == data2.entity->aadlType())
-            return parentLevel(data1.entity) < parentLevel(data2.entity);
+            return aadlinterface::nestingLevel(data1.entity) < aadlinterface::nestingLevel(data2.entity);
 
         return data1.entity->aadlType() < data2.entity->aadlType();
     });

@@ -72,6 +72,8 @@ public:
 
 Q_SIGNALS:
     void contextParamsChanged();
+    void childAdded(const shared::Id &id);
+    void childRemoved(const shared::Id &id);
 
 protected:
     explicit AADLObjectFunctionType(

@@ -57,6 +57,13 @@ AADLFunctionGraphicsItem::AADLFunctionGraphicsItem(aadl::AADLObjectFunction *ent
         m_svgRenderer = new QSvgRenderer(QLatin1String(":/tab_interface/toolbar/icns/change_root.svg"));
 }
 
+void AADLFunctionGraphicsItem::init()
+{
+    AADLFunctionTypeGraphicsItem::init();
+    connect(entity(), &aadl::AADLObjectFunction::childAdded, this, [this]() { update(); });
+    connect(entity(), &aadl::AADLObjectFunction::childRemoved, this, [this]() { update(); });
+}
+
 aadl::AADLObjectFunction *AADLFunctionGraphicsItem::entity() const
 {
     return qobject_cast<aadl::AADLObjectFunction *>(aadlObject());
@@ -128,44 +135,13 @@ void AADLFunctionGraphicsItem::paint(QPainter *painter, const QStyleOptionGraphi
     else
         painter->drawRoundedRect(br, kRadius, kRadius);
 
-    if (m_hasNestedItems) {
+    if (!isRootItem() && entity() && entity()->hasNestedChildren()) {
         QRectF iconRect { QPointF(0, 0), m_svgRenderer->defaultSize() };
         iconRect.moveTopRight(br.adjusted(kRadius, kRadius, -kRadius, -kRadius).topRight());
         m_svgRenderer->render(painter, iconRect);
     }
 
     painter->restore();
-}
-
-QVariant AADLFunctionGraphicsItem::itemChange(QGraphicsItem::GraphicsItemChange change, const QVariant &value)
-{
-    bool needUpdateColor(false);
-    bool needUpdateNestedIcon(false);
-    switch (change) {
-    case QGraphicsItem::ItemParentHasChanged: {
-        m_textItem->setVisible(!isRootItem());
-        needUpdateColor = true;
-        break;
-    }
-    case QGraphicsItem::ItemChildAddedChange:
-    case QGraphicsItem::ItemChildRemovedChange: {
-        needUpdateColor = true;
-        needUpdateNestedIcon = !isRootItem();
-        break;
-    }
-    default:
-        break;
-    }
-
-    // NOTE: According to the documentation, a child might not be fully constructed, so
-    // the UI doesn't need an immediate update of the "nested" icon. That's why the delayed invocation used here.
-    if (needUpdateNestedIcon)
-        // the updateNestedIcon also calls the applyColorScheme
-        QMetaObject::invokeMethod(this, &AADLFunctionGraphicsItem::updateNestedIcon, Qt::QueuedConnection);
-    else if (needUpdateColor)
-        QMetaObject::invokeMethod(this, &AADLFunctionGraphicsItem::applyColorScheme, Qt::QueuedConnection);
-
-    return AADLFunctionTypeGraphicsItem::itemChange(change, value);
 }
 
 void AADLFunctionGraphicsItem::onManualResizeProgress(
@@ -306,12 +282,6 @@ void AADLFunctionGraphicsItem::applyColorScheme()
                 nestedFunction->applyColorScheme();
 
     update();
-}
-
-void AADLFunctionGraphicsItem::updateNestedIcon()
-{
-    m_hasNestedItems = entity() && entity()->hasNestedChildren();
-    applyColorScheme();
 }
 
 QString AADLFunctionGraphicsItem::prepareTooltip() const

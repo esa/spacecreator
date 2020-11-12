@@ -109,10 +109,11 @@ bool AADLObjectFunctionType::addChild(AADLObject *child)
         }
         default: {
             qWarning() << "attempt to reg unsupported Function child:" << t;
-            break;
+            return false;
         }
         }
 
+        Q_EMIT childAdded(child->id());
         return true;
     }
 
@@ -162,10 +163,11 @@ bool AADLObjectFunctionType::removeChild(AADLObject *child)
         }
         default: {
             qWarning() << "attempt to unreg unsupported Function child:" << t;
-            break;
+            return false;
         }
         }
 
+        Q_EMIT childRemoved(child->id());
         return true;
     }
 

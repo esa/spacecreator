@@ -37,6 +37,8 @@ public:
         Type = UserType + static_cast<int>(aadl::AADLObject::Type::Function)
     };
 
+    void init() override;
+
     aadl::AADLObjectFunction *entity() const;
 
     int type() const override { return Type; }
@@ -50,7 +52,6 @@ public:
 protected:
     void rebuildLayout() override;
     void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget) override;
-    QVariant itemChange(QGraphicsItem::GraphicsItemChange change, const QVariant &value) override;
 
     void onManualResizeProgress(shared::ui::GripPoint *grip, const QPointF &from, const QPointF &to) override;
     void onManualResizeFinish(
@@ -66,8 +67,6 @@ protected Q_SLOTS:
     void applyColorScheme() override;
 
 private:
-    Q_INVOKABLE void updateNestedIcon();
-
     enum ConnectionLayoutPolicy
     {
         IgnoreCollisions = 0,

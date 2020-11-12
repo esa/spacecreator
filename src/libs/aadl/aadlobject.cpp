@@ -138,7 +138,8 @@ QVector<qint32> AADLObject::coordinates() const
             if (isInterface() && grandParent->isRootObject())
                 token = meta::Props::Token::InnerCoordinates;
         }
-    } else if (isRootObject()) {
+    }
+    if (isRootObject()) {
         token = meta::Props::Token::RootCoordinates;
     }
 
@@ -173,7 +174,8 @@ void AADLObject::setCoordinates(const QVector<qint32> &coordinates)
             if (isInterface() && grandParent->isRootObject())
                 token = meta::Props::Token::InnerCoordinates;
         }
-    } else if (isRootObject()) {
+    }
+    if (isRootObject()) {
         token = meta::Props::Token::RootCoordinates;
     }
 
