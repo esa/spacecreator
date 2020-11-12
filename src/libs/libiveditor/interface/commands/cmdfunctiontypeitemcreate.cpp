@@ -37,6 +37,13 @@ CmdFunctionTypeItemCreate::CmdFunctionTypeItemCreate(
     prepareData({ qMakePair(m_entity, QVector<QPointF> { geometry.topLeft(), geometry.bottomRight() }) });
 }
 
+CmdFunctionTypeItemCreate::~CmdFunctionTypeItemCreate()
+{
+    if (m_entity && !m_entity->parent()) {
+        delete m_entity;
+    }
+}
+
 void CmdFunctionTypeItemCreate::redo()
 {
     CmdEntityGeometryChange::redo();

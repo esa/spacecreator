@@ -37,6 +37,8 @@ public:
     explicit CmdFunctionTypeItemCreate(
             aadl::AADLObjectsModel *model, aadl::AADLObjectFunction *parent, const QRectF &geometry);
 
+    ~CmdFunctionTypeItemCreate() override;
+
     void redo() override;
     void undo() override;
     int id() const override;

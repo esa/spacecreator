@@ -46,6 +46,13 @@ CmdConnectionItemCreate::CmdConnectionItemCreate(aadl::AADLObjectsModel *model, 
     prepareData({ qMakePair(m_entity, points) });
 }
 
+CmdConnectionItemCreate::~CmdConnectionItemCreate()
+{
+    if (m_entity && !m_entity->parent()) {
+        delete m_entity;
+    }
+}
+
 void CmdConnectionItemCreate::redo()
 {
     CmdEntityGeometryChange::redo();

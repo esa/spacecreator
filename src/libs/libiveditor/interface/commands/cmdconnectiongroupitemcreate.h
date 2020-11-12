@@ -27,7 +27,7 @@ class CmdConnectionGroupItemCreate : public CmdEntityGeometryChange
 {
 public:
     explicit CmdConnectionGroupItemCreate(const aadl::AADLObjectConnectionGroup::CreationInfo &creationInfo);
-
+    ~CmdConnectionGroupItemCreate() override;
     void redo() override;
     void undo() override;
     int id() const override;

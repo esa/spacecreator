@@ -54,6 +54,19 @@ CmdConnectionGroupItemCreate::CmdConnectionGroupItemCreate(
     prepareData({ qMakePair(m_entity, creationInfo.points) });
 }
 
+CmdConnectionGroupItemCreate::~CmdConnectionGroupItemCreate()
+{
+    if (m_sourceIface && !m_sourceIface->parent()) {
+        delete m_sourceIface;
+    }
+    if (m_targetIface && !m_targetIface->parent()) {
+        delete m_targetIface;
+    }
+    if (m_entity && !m_entity->parent()) {
+        delete m_entity;
+    }
+}
+
 void CmdConnectionGroupItemCreate::redo()
 {
     CmdEntityGeometryChange::redo();

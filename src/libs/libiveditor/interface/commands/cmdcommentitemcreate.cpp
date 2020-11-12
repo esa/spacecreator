@@ -37,6 +37,13 @@ CmdCommentItemCreate::CmdCommentItemCreate(
     prepareData({ qMakePair(m_entity, QVector<QPointF> { geometry.topLeft(), geometry.bottomRight() }) });
 }
 
+CmdCommentItemCreate::~CmdCommentItemCreate()
+{
+    if (m_entity && !m_entity->parent()) {
+        delete m_entity;
+    }
+}
+
 void CmdCommentItemCreate::redo()
 {
     CmdEntityGeometryChange::redo();

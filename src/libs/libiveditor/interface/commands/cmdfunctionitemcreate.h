@@ -36,6 +36,7 @@ class CmdFunctionItemCreate : public CmdEntityGeometryChange
 public:
     explicit CmdFunctionItemCreate(aadl::AADLObjectsModel *model, aadl::AADLObjectFunction *parent,
             const QRectF &geometry, const QString &title = QString());
+    ~CmdFunctionItemCreate() override;
 
     void redo() override;
     void undo() override;

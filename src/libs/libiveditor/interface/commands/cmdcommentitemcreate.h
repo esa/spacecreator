@@ -36,6 +36,8 @@ public:
     explicit CmdCommentItemCreate(
             aadl::AADLObjectsModel *model, aadl::AADLObjectFunctionType *parent, const QRectF &geometry);
 
+    ~CmdCommentItemCreate() override;
+
     void redo() override;
     void undo() override;
     int id() const override;

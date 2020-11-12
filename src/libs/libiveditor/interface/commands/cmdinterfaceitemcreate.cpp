@@ -63,6 +63,9 @@ CmdInterfaceItemCreate::CmdInterfaceItemCreate(const aadl::AADLObjectIface::Crea
 CmdInterfaceItemCreate::~CmdInterfaceItemCreate()
 {
     qDeleteAll(m_cmdClones);
+    if (m_entity && !m_entity->parent()) {
+        delete m_entity;
+    }
 }
 
 void CmdInterfaceItemCreate::redo()
