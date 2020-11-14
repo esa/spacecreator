@@ -26,6 +26,7 @@ class AADLObjectFunction;
 }
 
 namespace aadlinterface {
+class AADLInterfaceGraphicsItem;
 
 class AADLFunctionGraphicsItem : public AADLFunctionTypeGraphicsItem
 {
@@ -74,7 +75,9 @@ private:
         PartialRebuildOnCollision
     };
     void layoutConnectionsOnMove(ConnectionLayoutPolicy layoutPolicy);
-    void layoutConnectionsOnResize();
+    void layoutConnectionsOnResize(ConnectionLayoutPolicy layoutPolicy);
+    void layoutConnection(
+            AADLInterfaceGraphicsItem *ifaceItem, ConnectionLayoutPolicy layoutPolicy, bool includingNested);
 
 private:
     static QPointer<QSvgRenderer> m_svgRenderer;

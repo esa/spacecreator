@@ -148,7 +148,7 @@ void AADLFunctionGraphicsItem::onManualResizeProgress(
         shared::ui::GripPoint *grip, const QPointF &from, const QPointF &to)
 {
     AADLFunctionTypeGraphicsItem::onManualResizeProgress(grip, from, to);
-    layoutConnectionsOnResize();
+    layoutConnectionsOnResize(ConnectionLayoutPolicy::IgnoreCollisions);
 }
 
 void AADLFunctionGraphicsItem::onManualResizeFinish(
@@ -158,11 +158,11 @@ void AADLFunctionGraphicsItem::onManualResizeFinish(
         return;
 
     if (allowGeometryChange(pressedAt, releasedAt)) {
+        layoutConnectionsOnResize(ConnectionLayoutPolicy::PartialRebuildOnCollision);
         updateEntity();
-        layoutConnectionsOnResize();
     } else { // Fallback to previous geometry in case colliding with items at the same level
         updateFromEntity();
-        layoutConnectionsOnResize();
+        layoutConnectionsOnResize(ConnectionLayoutPolicy::IgnoreCollisions);
     }
 }
 
@@ -193,18 +193,38 @@ void AADLFunctionGraphicsItem::onManualMoveFinish(
     }
 }
 
-void AADLFunctionGraphicsItem::layoutConnectionsOnResize()
+void AADLFunctionGraphicsItem::layoutConnectionsOnResize(ConnectionLayoutPolicy layoutPolicy)
 {
     /// Changing inner and outer connections bound to current function item
     for (auto item : childItems()) {
         if (auto iface = qgraphicsitem_cast<AADLInterfaceGraphicsItem *>(item)) {
-            for (AADLConnectionGraphicsItem *connection : iface->connectionItems()) {
-                Q_ASSERT(connection->startItem() && connection->endItem());
-                connection->layout();
-            }
+            layoutConnection(iface, layoutPolicy, true);
         } else if (auto connection = qgraphicsitem_cast<AADLConnectionGraphicsItem *>(item)) {
             if (connection->sourceItem() != this && connection->targetItem() != this)
                 connection->layout();
+        }
+    }
+}
+
+void AADLFunctionGraphicsItem::layoutConnection(
+        AADLInterfaceGraphicsItem *ifaceItem, ConnectionLayoutPolicy layoutPolicy, bool includingNested)
+{
+    for (AADLConnectionGraphicsItem *connection : ifaceItem->connectionItems()) {
+        Q_ASSERT(connection->startItem() && connection->endItem());
+        if (includingNested || connection->parentItem() != this) {
+            if (ConnectionLayoutPolicy::IgnoreCollisions == layoutPolicy) {
+                connection->updateEdgePoint(ifaceItem);
+            } else if (ConnectionLayoutPolicy::PartialRebuildOnCollision == layoutPolicy) {
+                connection->updateLastChunk(ifaceItem);
+            } else {
+                const auto collidingItems = scene()->collidingItems(connection);
+                if (std::any_of(
+                            collidingItems.begin(), collidingItems.end(), [this](const QGraphicsItem *collidingItem) {
+                                return kNestedTypes.contains(collidingItem->type()) && collidingItem != this;
+                            })) {
+                    connection->layout();
+                }
+            }
         }
     }
 }
@@ -214,23 +234,7 @@ void AADLFunctionGraphicsItem::layoutConnectionsOnMove(ConnectionLayoutPolicy la
     /// Changing outer connections only cause inner stay unchanged as children of current item
     for (auto item : childItems()) {
         if (auto iface = qgraphicsitem_cast<AADLInterfaceGraphicsItem *>(item)) {
-            for (AADLConnectionGraphicsItem *connection : iface->connectionItems()) {
-                Q_ASSERT(connection->startItem() && connection->endItem());
-                if (connection->parentItem() != this) {
-                    if (ConnectionLayoutPolicy::IgnoreCollisions == layoutPolicy) {
-                        connection->updateEdgePoint(iface);
-                    } else if (ConnectionLayoutPolicy::PartialRebuildOnCollision == layoutPolicy) {
-                        connection->updateLastChunk(iface);
-                    } else {
-                        for (const QGraphicsItem *item : scene()->collidingItems(connection)) {
-                            if (kNestedTypes.contains(item->type()) && item != this) {
-                                connection->layout();
-                                break;
-                            }
-                        }
-                    }
-                }
-            }
+            layoutConnection(iface, layoutPolicy, false);
         }
     }
 }
