@@ -166,12 +166,11 @@ QPointF AADLInterfaceGraphicsItem::connectionEndPoint(const bool nestedConnectio
 
 QPointF AADLInterfaceGraphicsItem::connectionEndPoint(AADLConnectionGraphicsItem *connection) const
 {
-    const QRectF ifaceRect = m_iface->sceneBoundingRect();
     if (connection) {
         const bool innerConnection = connection->entity()->parentObject() == entity()->parentObject();
         return connectionEndPoint(innerConnection);
     }
-    return ifaceRect.center();
+    return m_iface->sceneBoundingRect().center();
 }
 
 QPainterPath AADLInterfaceGraphicsItem::ifaceShape() const
@@ -200,7 +199,7 @@ void AADLInterfaceGraphicsItem::rebuildLayout()
     }
 
     const QPointF ifacePos = pos();
-    const QRectF parentRect = parentItem()->boundingRect();
+    const QRectF parentRect = targetItem()->boundingRect();
     const Qt::Alignment alignment = getNearestSide(parentRect, ifacePos);
     updateInternalItems(alignment);
     if (entity() && aadlinterface::pos(entity()->coordinates()).isNull()) {

@@ -409,16 +409,10 @@ void AADLConnectionGraphicsItem::onManualMoveFinish(
 
     if (idx == 0) {
         m_startItem->instantLayoutUpdate();
-        m_points[idx] = m_startItem->connectionEndPoint(this);
-
-        for (auto connection : m_startItem->connectionItems())
-            connection->layout();
+        updateLastChunk(m_startItem);
     } else if (idx == grips.size() - 1) {
         m_endItem->instantLayoutUpdate();
-        m_points[idx] = m_endItem->connectionEndPoint(this);
-
-        for (auto connection : m_endItem->connectionItems())
-            connection->layout();
+        updateLastChunk(m_endItem);
     }
 
     for (auto item : scene()->items(m_points)) {
@@ -556,7 +550,6 @@ void AADLConnectionGraphicsItem::updateLastChunk(const AADLInterfaceGraphicsItem
             }
         }
     }
-
     const QVector<QPointF> points = path(scene(), m_points.value(pos), iface->connectionEndPoint(this));
     if (!points.isEmpty()) {
         if (reverse) {

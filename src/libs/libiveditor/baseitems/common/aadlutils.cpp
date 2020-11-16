@@ -98,13 +98,13 @@ QPointF getSidePosition(const QRectF &boundingArea, const QPointF &pos, Qt::Alig
 {
     switch (side) {
     case Qt::AlignLeft:
-        return QPointF(boundingArea.left(), pos.y());
+        return QPointF(boundingArea.left(), qBound(boundingArea.top(), pos.y(), boundingArea.bottom()));
     case Qt::AlignRight:
-        return QPointF(boundingArea.right(), pos.y());
+        return QPointF(boundingArea.right(), qBound(boundingArea.top(), pos.y(), boundingArea.bottom()));
     case Qt::AlignTop:
-        return QPointF(pos.x(), boundingArea.top());
+        return QPointF(qBound(boundingArea.left(), pos.x(), boundingArea.right()), boundingArea.top());
     case Qt::AlignBottom:
-        return QPointF(pos.x(), boundingArea.bottom());
+        return QPointF(qBound(boundingArea.left(), pos.x(), boundingArea.right()), boundingArea.bottom());
     }
 
     return boundingArea.center();
