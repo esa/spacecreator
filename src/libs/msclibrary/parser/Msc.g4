@@ -476,7 +476,7 @@ parameterList
     ;
 
 paramaterDefn
-    : asnSequence | sdlText | choiceOfChoice | binding | expression | pattern // asnSequence, sdlText and choiceOfChoice are not in the spec
+    : asnSequence | asnSequenceOf | sdlText | choiceOfChoice | binding | expression | pattern // asn*, sdlText and choiceOfChoice are not in the spec
     ;
 
 //
@@ -544,7 +544,7 @@ sdlText
 
 // ASN.1 value
 asnValue
-    : NAME | OCTECTSTRING | BITSTRING | BOOLEAN | STRING
+    : name | OCTECTSTRING | BITSTRING | BOOLEAN | STRING
     ;
 // ASN1 type choice
 // choice1 : FALSE
@@ -559,9 +559,15 @@ choiceOfChoice
 // Allow something like for ASN.1
 // { field-a  FALSE, field-b choice1 : FALSE }
 asnSequence
-    : SEQUENCEOF
-    | LEFTCURLYBRACKET name (asnValue | asnChoice) (COMMA name (asnValue | asnChoice))* RIGHTCURLYBRACKET
-    | LEFTCURLYBRACKET asnSequence (COMMA asnSequence)* RIGHTCURLYBRACKET
+    : LEFTCURLYBRACKET name (asnItem | asnValue) (COMMA name (asnItem | asnValue))* RIGHTCURLYBRACKET
+    ;
+asnSequenceOf
+    : LEFTCURLYBRACKET asnValue (COMMA asnValue)* RIGHTCURLYBRACKET
+    | LEFTCURLYBRACKET asnItem (COMMA asnItem)* RIGHTCURLYBRACKET
+    | LEFTCURLYBRACKET RIGHTCURLYBRACKET
+    ;
+asnItem
+    : asnChoice | asnSequence | asnSequenceOf
     ;
 
 
@@ -749,8 +755,8 @@ NAME : ( LETTER | DECIMALDIGIT | UNDERLINE | FULLSTOP | MINUS | '`' | '/' )+ ;
 
 FILENAME : ( LETTER | DECIMALDIGIT | UNDERLINE | FULLSTOP | MINUS )+  ;
 
+fragment STRINGOTHERCHARACTER : '?' | '%' | '+' | MINUS | '!' | '*' | '=' | '/' | UNDERLINE | FULLSTOP;
 STRING : '"' (ALPHANUMERIC | SPECIAL | STRINGOTHERCHARACTER)* '"';
-STRINGOTHERCHARACTER : '?' | '%' | '+' | MINUS | '!' | '*' | '=' | '/' | UNDERLINE | FULLSTOP;
 
 // ASN.1 extensions
 fragment OCTECT
@@ -764,9 +770,6 @@ BITSTRING
     ;
 BOOLEAN
     : ('T' 'R' 'U' 'E') | ('t' 'r' 'u' 'e') | ('F' 'A' 'L' 'S' 'E') |  ('f' 'a' 'l' 's' 'e')
-    ;
-SEQUENCEOF // custom
-    : LEFTCURLYBRACKET (NAME | OCTECTSTRING | BITSTRING | ' ' | COMMA)* RIGHTCURLYBRACKET
     ;
 
 // Skip stuff

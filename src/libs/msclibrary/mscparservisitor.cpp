@@ -1193,6 +1193,9 @@ msc::MscParameterList MscParserVisitor::readParameterList(MscParser::ParameterLi
             pattern = ::sourceTextForContext(paramaterDefn->asnSequence());
         }
         if (pattern.isEmpty()) {
+            pattern = ::sourceTextForContext(paramaterDefn->asnSequenceOf());
+        }
+        if (pattern.isEmpty()) {
             pattern = ::treeNodeToString(paramaterDefn->choiceOfChoice());
         }
         if (!expression.isEmpty() || !pattern.isEmpty()) {

@@ -1,0 +1,22 @@
+mscdocument Untitled_Document /* MSC AND */;
+    msg Cabin_Command : (Cabin-button);
+    msg Floor_Command : (Floor-button);
+    msg Manual_Control : (Lift-control);
+    msg Start_Controller : (Start-condition);
+    msg Housekeeping : (Status);
+/* CIF MSCDOCUMENT (0, 0) (1585, 1119) */
+mscdocument Untitled_Leaf /* MSC LEAF */;
+msc Untitled_MSC;
+instance user;
+out Manual_Control({direction down, motor on, brake off, door door-open}) to TASTE_System;
+out Start_Controller(nb-of-cycle: 1) to TASTE_System;
+in Housekeeping({lift {door-open FALSE, door-closed TRUE, floor-detected FALSE, pos-x 69.999632125}, door door-close}) from TASTE_System;
+endinstance;
+instance TASTE_System;
+in Manual_Control({direction down, motor on, brake off, door door-open}) from user;
+in Start_Controller(nb-of-cycle: 1) from user;
+out Housekeeping({lift {door-open FALSE, door-closed TRUE, floor-detected FALSE, pos-x 69.999632125}, door door-close}) to user;
+endinstance;
+endmsc;
+endmscdocument;
+endmscdocument;

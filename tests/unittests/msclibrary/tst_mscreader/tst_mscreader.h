@@ -80,6 +80,7 @@ private Q_SLOTS:
     void testMessageAsn1SequenceChoiceParameter();
     void testMessageAsn1SequenceOfSecencesParameter();
     void testMessageAsn1OctetString();
+    void testMessageAsn1SequenceOfInSequence();
     void testSortedMessage();
     void testSortedMessageTwoCharts();
     void testSortedInstanceEvents();
