@@ -63,7 +63,7 @@ void Asn1ItemModel::setAsn1Model(const std::unique_ptr<Asn1Acn::TypeAssignment> 
 }
 
 /*!
- * \brief Asn1ItemModel::createModelItems Create items for the treeview from the map
+ * \brief Asn1ItemModel::createModelItems Create items for the tree view from the map
  * \param asn1Item The map with the items
  * \return The created item map
  */
@@ -71,7 +71,7 @@ Asn1ItemModel::ItemMap Asn1ItemModel::createModelItems(const Asn1Acn::Types::Typ
 {
     ItemMap itemMap;
     QString typeLimit;
-    QStandardItem *valueItem;
+    QStandardItem *valueItem = nullptr;
 
     QStandardItem *nameItem = new QStandardItem(asn1Item->identifier());
     nameItem->setEditable(false);
@@ -96,7 +96,6 @@ Asn1ItemModel::ItemMap Asn1ItemModel::createModelItems(const Asn1Acn::Types::Typ
         break;
     case Asn1Acn::Types::Type::SEQUENCEOF:
         valueItem = createSequenceOfItem(asn1Item, nameItem);
-
         if (values.contains(Asn1Acn::ASN1_MIN) && values.contains(Asn1Acn::ASN1_MAX)) {
             if (values[Asn1Acn::ASN1_MIN] == values[Asn1Acn::ASN1_MAX])
                 typeLimit = QString(tr(" Size(%1)")).arg(values[Asn1Acn::ASN1_MIN].toString());
@@ -117,7 +116,6 @@ Asn1ItemModel::ItemMap Asn1ItemModel::createModelItems(const Asn1Acn::Types::Typ
     case Asn1Acn::Types::Type::NUMERICSTRING:
     case Asn1Acn::Types::Type::IA5STRING:
         valueItem = createItem(asn1Item);
-
         if (values.contains(Asn1Acn::ASN1_MIN) && values.contains(Asn1Acn::ASN1_MAX)) {
             if (values[Asn1Acn::ASN1_MIN] == values[Asn1Acn::ASN1_MAX])
                 typeLimit = QString(tr(" Length(%1)")).arg(values[Asn1Acn::ASN1_MIN].toString());
@@ -126,13 +124,24 @@ Asn1ItemModel::ItemMap Asn1ItemModel::createModelItems(const Asn1Acn::Types::Typ
                                     .arg(values[Asn1Acn::ASN1_MIN].toString(), values[Asn1Acn::ASN1_MAX].toString());
         }
         break;
+    case Asn1Acn::Types::Type::USERDEFINED: {
+        auto userType = static_cast<const Asn1Acn::Types::UserdefinedType *>(asn1Item);
+        if (userType->referencedType()) {
+            return createModelItems(userType->referencedType()->type());
+        } else if (!asn1Item->children().empty()) {
+            valueItem = createItem(asn1Item->children().at(0).get());
+        }
+        break;
+    }
     default:
-        if (asn1Item->children().empty()) {
-            valueItem = createItem(asn1Item);
-        } else {
+        if (!asn1Item->children().empty()) {
             valueItem = createChildItems(asn1Item, nameItem);
             valueItem->setEditable(false);
         }
+    }
+
+    if (!valueItem) {
+        valueItem = createItem(asn1Item);
     }
 
     QStandardItem *typeItem = new QStandardItem(asn1Item->typeName() + typeLimit);

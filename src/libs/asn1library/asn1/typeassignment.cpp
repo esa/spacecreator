@@ -43,6 +43,11 @@ void TypeAssignment::accept(Visitor &visitor) const
     visitor.visit(*this);
 }
 
+Types::Type *TypeAssignment::type() const
+{
+    return m_type.get();
+}
+
 /*!
    Quick access to the type's enum.
  */

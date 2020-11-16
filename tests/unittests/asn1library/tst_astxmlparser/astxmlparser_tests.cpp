@@ -25,6 +25,7 @@
 #include "astxmlparser_tests.h"
 
 #include "types/builtintypes.h"
+#include "types/userdefinedtype.h"
 
 #include <QtTest>
 
@@ -792,6 +793,47 @@ void AstXmlParserTests::test_asn1AstReferenceParsing()
     const Asn1Acn::Definitions::Types &types = definitions->types();
     QCOMPARE(types.size(), 10);
 
+    // Check reference in Sprite
+    const Asn1Acn::TypeAssignment *sprite = definitions->type("Sprite");
+    QVERIFY(sprite != nullptr);
+    const Asn1Acn::Types::Sequence *spriteType = dynamic_cast<const Asn1Acn::Types::Sequence *>(sprite->type());
+    QVERIFY(spriteType != nullptr);
+    QCOMPARE(spriteType->children().size(), 2);
+    const std::unique_ptr<Asn1Acn::Types::Type> &spriteChild1 = spriteType->children().at(0);
+    QCOMPARE(spriteChild1->typeEnum(), Asn1Acn::Types::Type::USERDEFINED);
+    QCOMPARE(spriteChild1->typeName(), QString("Coordinates"));
+    QCOMPARE(spriteChild1->identifier(), QString("origin"));
+    QCOMPARE(spriteChild1->children().size(), 1); // This is the actual content of the reference (available in XML)
+    QCOMPARE(spriteChild1->children().at(0)->typeName(), QString("SEQUENCE"));
+    const Asn1Acn::Types::UserdefinedType *userType1 =
+            dynamic_cast<const Asn1Acn::Types::UserdefinedType *>(spriteChild1.get());
+    QVERIFY(userType1 != nullptr);
+
+    const std::unique_ptr<Asn1Acn::Types::Type> &spriteChild2 = spriteType->children().at(1);
+    QCOMPARE(spriteChild2->typeEnum(), Asn1Acn::Types::Type::USERDEFINED);
+    QCOMPARE(spriteChild2->typeName(), QString("Pixels"));
+    QCOMPARE(spriteChild2->identifier(), QString("shape"));
+    QCOMPARE(spriteChild2->children().size(),
+            0); // This is the actual content of the reference (not in XML - grabbed it as reference)
+    const Asn1Acn::Types::UserdefinedType *userType2 =
+            dynamic_cast<const Asn1Acn::Types::UserdefinedType *>(spriteChild2.get());
+    QVERIFY(userType2 != nullptr);
+
+    // Check reference in Grid
+    const Asn1Acn::TypeAssignment *grid = definitions->type("Grid");
+    QVERIFY(grid != nullptr);
+    const Asn1Acn::Types::SequenceOf *gridType = dynamic_cast<const Asn1Acn::Types::SequenceOf *>(grid->type());
+    QVERIFY(gridType != nullptr);
+    QCOMPARE(gridType->children().size(), 1);
+    const std::unique_ptr<Asn1Acn::Types::Type> &gridChild1 = gridType->children().at(0);
+    QCOMPARE(gridChild1->typeEnum(), Asn1Acn::Types::Type::USERDEFINED);
+    QCOMPARE(gridChild1->typeName(), QString("Line"));
+    QCOMPARE(gridChild1->children().size(), 0);
+    const Asn1Acn::Types::UserdefinedType *gridUserType1 =
+            dynamic_cast<const Asn1Acn::Types::UserdefinedType *>(gridChild1.get());
+    QVERIFY(gridUserType1 != nullptr);
+
+    // Loading of second module
     const Asn1Acn::Definitions *definitions2 = m_parsedData["testmsc3.asn"]->definitions("TASTE-BasicTypes");
     QVERIFY(definitions2 != nullptr);
     const Asn1Acn::Definitions::Types &types2 = definitions2->types();

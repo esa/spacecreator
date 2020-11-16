@@ -355,7 +355,7 @@ void MessageDialog::checkTextValidity()
                         const QString &typeName = ui->parameterTable->verticalHeaderItem(i)->text();
                         const std::unique_ptr<Asn1Acn::TypeAssignment> &assignment = asn1Data->typeAssignment(typeName);
                         if (assignment) {
-                            bool ok;
+                            bool ok = true;
                             parser.parseAsn1Value(assignment->type(), value, &ok);
                             m_isValid = m_isValid && ok;
                         } else

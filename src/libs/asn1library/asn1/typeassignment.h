@@ -41,7 +41,7 @@ public:
 
     void accept(Visitor &visitor) const override;
 
-    const Types::Type *type() const { return m_type.get(); }
+    Types::Type *type() const;
 
     Types::Type::ASN1Type typeEnum() const;
 

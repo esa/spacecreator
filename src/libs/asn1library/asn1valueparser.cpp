@@ -20,6 +20,7 @@
 #include "asn1const.h"
 #include "typeassignment.h"
 #include "types/type.h"
+#include "types/userdefinedtype.h"
 
 #include <QVariant>
 
@@ -57,6 +58,14 @@ QVariantMap Asn1ValueParser::parseAsn1Value(
 
     if (!type || asn1Value.isEmpty()) {
         return valueMap;
+    }
+
+    // In case of user types, use the referenced type
+    if (type->typeEnum() == Asn1Acn::Types::Type::USERDEFINED) {
+        auto userType = dynamic_cast<const Asn1Acn::Types::UserdefinedType *>(type);
+        if (userType && userType->referencedType()) {
+            return parseAsn1Value(userType->referencedType()->type(), asn1Value, valueOk);
+        }
     }
 
     QString value = asn1Value.trimmed();
@@ -139,84 +148,6 @@ QVariantMap Asn1ValueParser::parseAsn1Value(
     }
     return valueMap;
 }
-
-/*QVariantMap Asn1ValueParser::parseAsn1Value(const QVariantMap &asn1Type, const QString &asn1Value, bool *valueOk)
-const
-{
-    QVariantMap valueMap;
-    //    bool ok = true;
-
-    //    if (asn1Type.empty() || asn1Value.isEmpty())
-    //        return valueMap;
-
-    //    QString value = asn1Value.trimmed();
-    //    auto valueType = static_cast<ASN1Type>(asn1Type[ASN1_TYPE].toInt());
-
-    //    valueMap["name"] = asn1Type[ASN1_NAME];
-
-    //    switch (valueType) {
-    //    case INTEGER: {
-    //        int intVal = value.toInt(&ok);
-
-    //        if (ok && (ok = checkRange(asn1Type, intVal)))
-    //            valueMap["value"] = value;
-
-    //        break;
-    //    }
-    //    case DOUBLE: {
-    //        double doubleVal = value.toDouble(&ok);
-
-    //        if (ok && (ok = checkRange(asn1Type, doubleVal)))
-    //            valueMap["value"] = value;
-
-    //        break;
-    //    }
-    //    case BOOL:
-    //        if ((ok = value == "TRUE" || value == "FALSE"))
-    //            valueMap["value"] = value == "TRUE" ? true : false;
-
-    //        break;
-    //    case SEQUENCE:
-    //        ok = parseSequenceValue(asn1Type, value, valueMap);
-    //        break;
-    //    case SEQUENCEOF:
-    //        ok = parseSequenceOfValue(asn1Type, value, valueMap)
-    //                && checkRange(asn1Type, valueMap["seqofvalue"].toList().count());
-    //        break;
-    //    case ENUMERATED: {
-    //        QVariantList values = asn1Type["values"].toList();
-
-    //        // check enumerated value
-    //        if ((ok = values.contains(value)))
-    //            valueMap["value"] = value;
-
-    //        break;
-    //    }
-    //    case CHOICE:
-    //        ok = parseChoiceValue(asn1Type, value, valueMap);
-    //        break;
-    //    default:
-    //        // take string between " "
-    //        if (value.startsWith("\""))
-    //            value = value.remove(0, 1);
-
-    //        if (value.endsWith("\""))
-    //            value.chop(1);
-
-    //        if ((ok = checkRange(asn1Type, value.length())))
-    //            valueMap["value"] = value;
-    //        break;
-    //    }
-
-    //    if (!ok) {
-    //        valueMap.clear();
-    //        Q_EMIT parseError(QString(tr("Incorrect value for %1")).arg(asn1Type["name"].toString()));
-    //    }
-
-    //    if (valueOk != nullptr)
-    //        *valueOk = ok;
-    return valueMap;
-}*/
 
 bool Asn1ValueParser::checkFormat(const QString &asn1Value) const
 {
@@ -372,6 +303,16 @@ const Asn1Acn::Types::Type *Asn1ValueParser::getType(const QString &name, const 
 
     if (asn1Type->identifier() == name) {
         return asn1Type;
+    }
+
+    // For user defined types check the referenced type
+    if (asn1Type->typeEnum() == Asn1Acn::Types::Type::USERDEFINED) {
+        auto userType = dynamic_cast<const Asn1Acn::Types::UserdefinedType *>(asn1Type);
+        if (userType && userType->referencedType() && userType->referencedType()->type()) {
+            if (userType->referencedType()->type()->identifier() == name) {
+                return userType->referencedType()->type();
+            }
+        }
     }
 
     for (const std::unique_ptr<Asn1Acn::Types::Type> &type : asn1Type->children()) {

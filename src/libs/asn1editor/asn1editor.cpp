@@ -149,10 +149,12 @@ void Asn1Editor::getAsn1Value()
 
 void Asn1Editor::addAsn1TypeItems()
 {
-    QStringList typeNames;
-
     ui->typesCB->clear();
+    if (!m_asn1Types) {
+        return;
+    }
 
+    QStringList typeNames;
     for (const std::unique_ptr<Asn1Acn::Definitions> &definitions : m_asn1Types->definitionsList()) {
         for (const std::unique_ptr<Asn1Acn::TypeAssignment> &type : definitions->types()) {
             typeNames << type->name();

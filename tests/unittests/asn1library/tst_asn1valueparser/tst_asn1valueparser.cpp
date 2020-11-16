@@ -21,6 +21,7 @@
 #include "typeassignment.h"
 #include "types/builtintypes.h"
 #include "types/type.h"
+#include "types/userdefinedtype.h"
 
 #include <QSignalSpy>
 #include <QtTest>
@@ -53,6 +54,7 @@ private Q_SLOTS:
     void testSequenceValue();
     void testSequenceValueError();
     void testSequenceOfValue();
+    void testUserType();
 
 private:
     Asn1ValueParser *valueParser = nullptr;
@@ -355,6 +357,44 @@ void tst_Asn1ValueParser::testSequenceOfValue()
     auto type = std::make_unique<Asn1Acn::Types::SequenceOf>();
     type->addChild(std::move(ofType));
 
+    auto assignment = std::make_unique<Asn1Acn::TypeAssignment>("MySequenceOf", location, std::move(type));
+
+    auto valueMap = valueParser->parseAsn1Value(assignment.get(), "{ blue, green }");
+
+    QCOMPARE(valueMap.size(), 2);
+    QCOMPARE(valueMap["name"].toString(), QString("MySequenceOf"));
+
+    auto childrenValue = valueMap["seqofvalue"].toList();
+    QCOMPARE(childrenValue.size(), 2);
+
+    auto childValue = childrenValue.at(0).toMap();
+    QCOMPARE(childValue.size(), 2);
+    QCOMPARE(childValue["value"].toString(), QString("blue"));
+
+    childValue = childrenValue.at(1).toMap();
+    QCOMPARE(childValue.size(), 2);
+    QCOMPARE(childValue["value"].toString(), QString("green"));
+}
+
+void tst_Asn1ValueParser::testUserType()
+{
+    Asn1Acn::SourceLocation location;
+
+    auto colorType = std::make_unique<Asn1Acn::Types::Enumerated>();
+    QVariantList enumValues = { "red", "green", "blue" };
+    QVariantMap emunPparams;
+    emunPparams["values"] = enumValues;
+    colorType->setParameters(emunPparams);
+    auto colorAssignment = std::make_unique<Asn1Acn::TypeAssignment>("Color", location, std::move(colorType));
+
+    auto userType = std::make_unique<Asn1Acn::Types::UserdefinedType>("Color", "", colorAssignment.get());
+    QVariantMap userParams;
+    userParams["Min"] = 2;
+    userParams["Max"] = 2;
+    userType->setParameters(userParams);
+
+    auto type = std::make_unique<Asn1Acn::Types::SequenceOf>();
+    type->addChild(std::move(userType));
     auto assignment = std::make_unique<Asn1Acn::TypeAssignment>("MySequenceOf", location, std::move(type));
 
     auto valueMap = valueParser->parseAsn1Value(assignment.get(), "{ blue, green }");
