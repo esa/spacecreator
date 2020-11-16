@@ -675,7 +675,14 @@ void InterfaceDocument::importEntity(const shared::Id &id, const QPointF &sceneD
     if (!obj) {
         return;
     }
-    if (d->objectsModel->getObjectByName(obj->title())) {
+    const auto existingFunctionNames = d->objectsModel->nestedFunctionNames();
+    const auto intersectedNames = d->importModel->nestedFunctionNames(obj->as<const aadl::AADLObjectFunctionType *>())
+                                          .intersect(existingFunctionNames);
+    if (!intersectedNames.isEmpty()) {
+        QMessageBox::critical(view()->window(), tr("Entity importing"),
+                tr("Chosen entity [%1] couldn't be imported because of Function names conflict(s): %2")
+                        .arg(obj->titleUI())
+                        .arg(intersectedNames.toList().join(QLatin1Char('\n'))));
         return;
     }
     QGraphicsItem *itemAtScenePos = scene()->itemAt(sceneDropPoint, graphicsView()->transform());

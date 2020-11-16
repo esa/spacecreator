@@ -72,6 +72,8 @@ public:
     AADLObjectConnection *getConnection(const QString &interfaceName, const QString &source, const QString &target,
             Qt::CaseSensitivity caseSensitivity) const;
 
+    QSet<QString> nestedFunctionNames(const AADLObjectFunctionType *fnt = nullptr) const;
+
     AADLObjectConnection *getConnectionForIface(const shared::Id &id) const;
     QVector<AADLObjectConnection *> getConnectionsForIface(const shared::Id &id) const;
 

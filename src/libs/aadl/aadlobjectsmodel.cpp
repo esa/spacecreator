@@ -649,4 +649,38 @@ AADLObjectConnection *AADLObjectsModel::getConnection(const QString &interfaceNa
     return nullptr;
 }
 
+static inline QVector<AADLObjectFunctionType *> nestedFunctions(const AADLObjectFunctionType *fnt)
+{
+    if (!fnt) {
+        return {};
+    }
+
+    QVector<AADLObjectFunctionType *> children = fnt->functionTypes();
+    for (auto fn : fnt->functions()) {
+        children.append(fn);
+    }
+    for (const auto child : children) {
+        children << nestedFunctions(child);
+    }
+    return children;
+}
+
+QSet<QString> AADLObjectsModel::nestedFunctionNames(const AADLObjectFunctionType *fnt) const
+{
+    QSet<QString> names;
+    if (!fnt) {
+        for (AADLObject *obj : d->m_objects) {
+            if (obj->aadlType() == AADLObject::Type::Function || obj->aadlType() == AADLObject::Type::FunctionType) {
+                names.insert(obj->title());
+            }
+        }
+    } else {
+        for (const auto obj : nestedFunctions(fnt)) {
+            names.insert(obj->title());
+        }
+    }
+
+    return names;
+}
+
 }

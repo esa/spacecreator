@@ -17,6 +17,7 @@
 
 #include "cmdentitiesinstantiate.h"
 
+#include "aadlnamevalidator.h"
 #include "aadlobjectfunction.h"
 #include "aadlobjectfunctiontype.h"
 #include "aadlobjectsmodel.h"
@@ -35,7 +36,10 @@ CmdEntitiesInstantiate::CmdEntitiesInstantiate(aadl::AADLObjectFunctionType *ent
 
 {
     Q_ASSERT(entity);
-    m_instantiatedEntity = new aadl::AADLObjectFunction(entity->title() + QLatin1String("Instance"));
+    m_instantiatedEntity = new aadl::AADLObjectFunction(
+            {}, m_parent ? qobject_cast<QObject *>(m_parent) : qobject_cast<QObject *>(m_model));
+    m_instantiatedEntity->setTitle(aadl::AADLNameValidator::nameForInstance(
+            m_instantiatedEntity, entity->title() + QLatin1String("_Instance_")));
     QRectF typeGeometry = aadlinterface::rect(entity->coordinates());
     typeGeometry.moveTopLeft(pos);
     m_instantiatedEntity->setCoordinates(aadlinterface::coordinates(typeGeometry));
