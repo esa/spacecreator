@@ -192,7 +192,7 @@ void AADLInterfaceGraphicsItem::updateInternalItems(Qt::Alignment alignment)
 
 void AADLInterfaceGraphicsItem::rebuildLayout()
 {
-    if (!parentItem()) {
+    if (!targetItem()) {
         prepareGeometryChange();
         setBoundingRect(QRectF());
         return;
