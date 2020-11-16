@@ -103,6 +103,7 @@ add_subdirectory(asn1scc)
 
 # install grantlee
 install(FILES /usr/lib/libGrantlee_Templates.so /usr/lib/libGrantlee_Templates.so.5 /usr/lib/libGrantlee_Templates.so.5.2.0 DESTINATION /usr/lib)
+install(DIRECTORY /usr/lib/grantlee DESTINATION /usr/lib)
 
 set (CPACK_PACKAGE_NAME "${SC_NAME}")
 set (CPACK_PACKAGE_VENDOR "European Space Agency")
