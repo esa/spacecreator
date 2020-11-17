@@ -63,6 +63,7 @@ EndToEndView::EndToEndView(InterfaceDocument *document, QWidget *parent)
     , d(new EndToEndViewPrivate)
 {
     d->ui->setupUi(this);
+    setMscFiles({});
 
     setAttribute(Qt::WA_DeleteOnClose, false);
     setAttribute(Qt::WA_QuitOnClose, false);
@@ -75,40 +76,21 @@ EndToEndView::EndToEndView(InterfaceDocument *document, QWidget *parent)
     d->leafDocuments = new LeafDocumentsModel(this);
     d->ui->leafDocsView->setModel(d->leafDocuments);
 
-    auto setPath = [this](const QString &path) {
-        d->dataflow.setPath(path);
-
-        msc::MscReader reader;
-        d->model.reset(reader.parseFile(path));
-        d->document->setMscFileName(path);
-        if (d->model && !d->model->documents().empty()) {
-            d->leafDocuments->fillModel(d->model->documents().first());
-            d->ui->leafDocsView->setCurrentIndex(d->leafDocuments->index(0, 0));
-        } else {
-            d->leafDocuments->clear();
-        }
-        QFileInfo info(path);
-        if (info.exists()) {
-            d->ui->pathLabel->setText(tr("MSC file: %1").arg(info.fileName()));
-        } else {
-            d->ui->pathLabel->setText(tr("MSC file: -"));
-        }
-    };
-
-    connect(d->ui->pathButton, &QPushButton::clicked, this, [this, setPath]() {
+    connect(d->ui->pathButton, &QPushButton::clicked, this, [this]() {
         QFileInfo fi(d->document->mscFileName());
         const QString dir = fi.path();
         const QString path =
                 QFileDialog::getOpenFileName(this, tr("Choose MSC file"), dir, tr("MSC files (*.msc);;All files (*)"));
         if (!path.isEmpty()) {
-            setPath(path);
+            setMscFile(path);
         }
     });
+    connect(d->ui->fileSelectBox, &QComboBox::currentTextChanged, this, &EndToEndView::setMscFile);
 
     connect(d->ui->exportButton, &QPushButton::clicked, this, &EndToEndView::exportToPng);
 
     // Listen to path changes from the document
-    connect(d->document, &InterfaceDocument::mscFileNameChanged, this, setPath);
+    connect(d->document, &InterfaceDocument::mscFileNameChanged, this, &EndToEndView::setMscFile);
 
     // Refresh the view
     connect(d->ui->refreshButton, &QPushButton::clicked, this, &EndToEndView::refreshView);
@@ -144,6 +126,16 @@ void EndToEndView::setVisible(bool visible)
             refreshView();
         }
     }
+}
+
+void EndToEndView::setMscFiles(const QStringList &files)
+{
+    d->ui->fileSelectBox->clear();
+    d->ui->fileSelectBox->addItems(files);
+
+    const bool showFileButton = files.isEmpty();
+    d->ui->pathButton->setVisible(showFileButton);
+    d->ui->fileSelectBox->setVisible(!showFileButton);
 }
 
 //! Update the view with the current model and MSC file contents
@@ -300,6 +292,26 @@ void EndToEndView::exportToPng()
             QMessageBox::critical(parentWidget(), tr("Export failed"), tr("Saving to file %1 failed").arg(path));
         }
     }
+}
+
+void EndToEndView::setMscFile(const QString &fileName)
+{
+
+    msc::MscReader reader;
+    try {
+        d->model.reset(reader.parseFile(fileName));
+    } catch (...) {
+        QMessageBox::warning(this, tr("Can't load msc file"),
+                tr("Can't load the msc file\n%1\n\n%2").arg(fileName, reader.getErrorMessages().join('\n')));
+        return;
+    }
+
+    d->document->setMscFileName(fileName);
+    d->dataflow.setPath(fileName);
+    QFileInfo info(fileName);
+    d->ui->pathLabel->setText(tr("MSC file: %1").arg(info.fileName()));
+    d->leafDocuments->fillModel(d->model->documents().first());
+    d->ui->leafDocsView->setCurrentIndex(d->leafDocuments->index(0, 0));
 }
 
 }

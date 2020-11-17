@@ -191,12 +191,12 @@ void AadlEditorData::showMinimap(bool visible)
     }
 }
 
-void AadlEditorData::showE2EDataflow()
+void AadlEditorData::showE2EDataflow(const QStringList &mscFiles)
 {
     for (auto openedDocument : Core::DocumentModel::openedDocuments()) {
         if (auto document = qobject_cast<spctr::AadlEditorDocument *>(openedDocument)) {
             if (document && document->designWidget()) {
-                document->designWidget()->showE2EDataflow();
+                document->designWidget()->showE2EDataflow(mscFiles);
             }
         }
     }

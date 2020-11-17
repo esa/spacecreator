@@ -18,6 +18,7 @@
 #pragma once
 
 #include <QString>
+#include <QStringList>
 
 namespace antlr4 {
 class ANTLRInputStream;
@@ -39,8 +40,9 @@ public:
 
 private:
     MscModel *parse(antlr4::ANTLRInputStream &input, QStringList *errorMessages = nullptr);
-
     void checkDocumentHierarchy(MscDocument *doc);
+
+    QStringList m_errorMessages;
 };
 
 }

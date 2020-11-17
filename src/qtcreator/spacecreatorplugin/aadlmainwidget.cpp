@@ -135,7 +135,7 @@ void AadlMainWidget::setMinimapVisible(bool visible)
     m_plugin->minimapView()->setVisible(visible);
 }
 
-void AadlMainWidget::showE2EDataflow()
+void AadlMainWidget::showE2EDataflow(const QStringList &mscFiles)
 {
     if (m_aadlStorage.isNull()) {
         return;
@@ -143,6 +143,7 @@ void AadlMainWidget::showE2EDataflow()
     if (m_endToEndView.isNull()) {
         m_endToEndView = new aadlinterface::EndToEndView(m_plugin->document());
         m_endToEndView->setAttribute(Qt::WA_DeleteOnClose);
+        m_endToEndView->setMscFiles(mscFiles);
         connect(m_plugin->document(), &QObject::destroyed, m_endToEndView.data(), &QObject::deleteLater);
     }
     m_endToEndView->show();

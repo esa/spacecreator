@@ -76,6 +76,14 @@ MscModel *MscReader::parseText(const QString &text, QStringList *errorMessages)
     return parse(input, errorMessages);
 }
 
+/*!
+   Returns the error messages of the last parsing
+ */
+QStringList MscReader::getErrorMessages() const
+{
+    return m_errorMessages;
+}
+
 MscModel *MscReader::parse(ANTLRInputStream &input, QStringList *errorMessages)
 {
     MscErrorListener errorListener;
@@ -94,8 +102,9 @@ MscModel *MscReader::parse(ANTLRInputStream &input, QStringList *errorMessages)
     MscParserVisitor visitor(&tokens);
     visitor.visit(parser.file());
 
+    m_errorMessages = errorListener.getErrorMessages();
     if (errorMessages != nullptr) {
-        *errorMessages = errorListener.getErrorMessages();
+        *errorMessages = m_errorMessages;
     }
 
     if (lexer.getNumberOfSyntaxErrors() > 0) {

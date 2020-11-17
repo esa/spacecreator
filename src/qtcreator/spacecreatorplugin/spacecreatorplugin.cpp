@@ -17,11 +17,10 @@
 
 #include "spacecreatorplugin.h"
 
-#include "aadlsystemchecks.h"
 #include "aadleditordata.h"
 #include "aadleditorfactory.h"
 #include "aadlmodelstorage.h"
-#include "mscsystemchecks.h"
+#include "aadlsystemchecks.h"
 #include "asn1library.h"
 #include "iveditor.h"
 #include "iveditorcore.h"
@@ -32,6 +31,7 @@
 #include "msceditorfactory.h"
 #include "msclibrary.h"
 #include "mscmodelstorage.h"
+#include "mscsystemchecks.h"
 #include "sharedlibrary.h"
 #include "spacecreatorpluginconstants.h"
 
@@ -140,7 +140,8 @@ bool SpaceCreatorPlugin::initialize(const QStringList &arguments, QString *error
     auto showE2EDataflow = new QAction(tr("Show end to end dataflow"), this);
     Core::Command *showE2ECmd = Core::ActionManager::registerAction(
             showE2EDataflow, Constants::SHOW_E2E_ID, Core::Context(Core::Constants::C_DESIGN_MODE));
-    connect(showE2EDataflow, &QAction::triggered, this, [this]() { m_aadlFactory->editorData()->showE2EDataflow(); });
+    connect(showE2EDataflow, &QAction::triggered, this,
+            [this]() { m_aadlFactory->editorData()->showE2EDataflow(m_checks->allMscFiles()); });
 
     Core::ActionContainer *menu = Core::ActionManager::createMenu(Constants::MENU_ID);
     menu->menu()->setTitle(tr("SpaceCreator"));

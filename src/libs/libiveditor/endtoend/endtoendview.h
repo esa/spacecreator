@@ -35,6 +35,7 @@ public:
     ~EndToEndView() override;
 
     void setVisible(bool visible) override;
+    void setMscFiles(const QStringList &files);
 
 Q_SIGNALS:
     void visibleChanged(bool visible);
@@ -42,6 +43,7 @@ Q_SIGNALS:
 private Q_SLOTS:
     void refreshView();
     void exportToPng();
+    void setMscFile(const QString &fileName);
 
 private:
     struct EndToEndViewPrivate;

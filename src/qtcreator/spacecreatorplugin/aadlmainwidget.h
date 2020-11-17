@@ -60,7 +60,7 @@ public:
 
     void showAsn1Dialog();
     void setMinimapVisible(bool visible);
-    void showE2EDataflow();
+    void showE2EDataflow(const QStringList &mscFiles);
     void onAttributesManagerRequested();
     void onColorSchemeMenuInvoked();
     void onDynContextEditorMenuInvoked();
