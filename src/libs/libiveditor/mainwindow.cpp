@@ -23,7 +23,7 @@
 #include "commandsstack.h"
 #include "common.h"
 #include "context/action/actionsmanager.h"
-#include "endtoendview.h"
+#include "endtoend/endtoendview.h"
 #include "interface/commands/commandsfactory.h"
 #include "interface/interfacedocument.h"
 #include "iveditorcore.h"

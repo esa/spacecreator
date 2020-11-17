@@ -94,7 +94,15 @@ EndToEndConnections::Dataflow EndToEndConnections::dataflow() const
     return d->dataflow;
 }
 
-static EndToEndConnections::Dataflow readDataFlowFromDocument(msc::MscDocument *document)
+EndToEndConnections::Dataflow EndToEndConnections::dataflow(msc::MscDocument *document) const
+{
+    d->dataflow = readDataFlowFromDocument(document);
+    d->dirty = false;
+
+    return d->dataflow;
+}
+
+EndToEndConnections::Dataflow EndToEndConnections::readDataFlowFromDocument(msc::MscDocument *document)
 {
     for (auto chart : document->charts()) {
         EndToEndConnections::Dataflow dataflow;

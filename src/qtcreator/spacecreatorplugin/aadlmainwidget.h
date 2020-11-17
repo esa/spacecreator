@@ -17,7 +17,7 @@
 
 #pragma once
 
-#include "endtoendview.h"
+#include "endtoend/endtoendview.h"
 #include "iveditorcore.h"
 
 #include <QPointer>

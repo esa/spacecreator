@@ -1,3 +1,20 @@
+/*
+   Copyright (C) 2020 European Space Agency - <maxime.perrotin@esa.int>
+
+   This library is free software; you can redistribute it and/or
+   modify it under the terms of the GNU Library General Public
+   License as published by the Free Software Foundation; either
+   version 2 of the License, or (at your option) any later version.
+
+   This library is distributed in the hope that it will be useful,
+   but WITHOUT ANY WARRANTY; without even the implied warranty of
+   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+   Library General Public License for more details.
+
+   You should have received a copy of the GNU Library General Public License
+   along with this program. If not, see <https://www.gnu.org/licenses/lgpl-2.1.html>.
+*/
+
 #include "endtoendview.h"
 
 #include "aadlobjectconnection.h"
@@ -8,7 +25,11 @@
 #include "interface/aadlfunctiongraphicsitem.h"
 #include "interface/aadlinterfacegraphicsitem.h"
 #include "interface/interfacedocument.h"
+#include "leafdocumentsmodel.h"
+#include "mscmodel.h"
+#include "mscreader.h"
 #include "ui/graphicsviewbase.h"
+#include "ui_endtoendview.h"
 
 #include <QBoxLayout>
 #include <QDebug>
@@ -16,18 +37,22 @@
 #include <QFileInfo>
 #include <QGraphicsScene>
 #include <QLabel>
+#include <QListView>
 #include <QMessageBox>
 #include <QPushButton>
+#include <memory>
 
 namespace aadlinterface {
 
 struct EndToEndView::EndToEndViewPrivate {
-    shared::ui::GraphicsViewBase *view { nullptr };
+    Ui::EndToEndView *ui { new Ui::EndToEndView };
     QGraphicsScene *scene { nullptr };
 
     InterfaceDocument *document { nullptr };
+    std::unique_ptr<msc::MscModel> model;
 
     EndToEndConnections dataflow;
+    LeafDocumentsModel *leafDocuments { nullptr };
 
     QString lastExportPath;
 };
@@ -37,60 +62,59 @@ EndToEndView::EndToEndView(InterfaceDocument *document, QWidget *parent)
     : QDialog(parent)
     , d(new EndToEndViewPrivate)
 {
-    setWindowTitle(tr("End To End Dataflow"));
+    d->ui->setupUi(this);
+
     setAttribute(Qt::WA_DeleteOnClose, false);
     setAttribute(Qt::WA_QuitOnClose, false);
 
-    auto pathLabel = new QLabel;
-    auto pathButton = new QPushButton(tr("&Choose MSC file"));
-    auto refreshButton = new QPushButton(tr("&Refresh view"));
-    auto exportButton = new QPushButton(tr("&Save as PNG"));
-
-    d->view = new shared::ui::GraphicsViewBase;
-    d->view->setInteractive(false);
+    d->ui->view->setInteractive(false);
     d->scene = new QGraphicsScene(this);
-    d->view->setScene(d->scene);
+    d->ui->view->setScene(d->scene);
     d->document = document;
 
-    auto barLayout = new QHBoxLayout;
-    barLayout->addWidget(pathLabel);
-    barLayout->addWidget(pathButton);
-    barLayout->addWidget(refreshButton);
-    barLayout->addWidget(exportButton);
-    barLayout->addStretch(1);
-    auto layout = new QVBoxLayout(this);
-    layout->addLayout(barLayout);
-    layout->addWidget(d->view);
+    d->leafDocuments = new LeafDocumentsModel(this);
+    d->ui->leafDocsView->setModel(d->leafDocuments);
 
-    auto setPath = [this, pathLabel](const QString &path) {
-        d->document->setMscFileName(path);
+    auto setPath = [this](const QString &path) {
         d->dataflow.setPath(path);
+
+        msc::MscReader reader;
+        d->model.reset(reader.parseFile(path));
+        d->document->setMscFileName(path);
+        if (d->model && !d->model->documents().empty()) {
+            d->leafDocuments->fillModel(d->model->documents().first());
+            d->ui->leafDocsView->setCurrentIndex(d->leafDocuments->index(0, 0));
+        } else {
+            d->leafDocuments->clear();
+        }
         QFileInfo info(path);
         if (info.exists()) {
-            pathLabel->setText(tr("MSC file: %1").arg(info.fileName()));
+            d->ui->pathLabel->setText(tr("MSC file: %1").arg(info.fileName()));
         } else {
-            pathLabel->setText(tr("MSC file: -"));
+            d->ui->pathLabel->setText(tr("MSC file: -"));
         }
     };
 
-    connect(pathButton, &QPushButton::clicked, this, [this, setPath]() {
+    connect(d->ui->pathButton, &QPushButton::clicked, this, [this, setPath]() {
         QFileInfo fi(d->document->mscFileName());
         const QString dir = fi.path();
         const QString path =
                 QFileDialog::getOpenFileName(this, tr("Choose MSC file"), dir, tr("MSC files (*.msc);;All files (*)"));
         if (!path.isEmpty()) {
             setPath(path);
-            refreshView();
         }
     });
 
-    connect(exportButton, &QPushButton::clicked, this, &EndToEndView::exportToPng);
+    connect(d->ui->exportButton, &QPushButton::clicked, this, &EndToEndView::exportToPng);
 
     // Listen to path changes from the document
     connect(d->document, &InterfaceDocument::mscFileNameChanged, this, setPath);
 
     // Refresh the view
-    connect(refreshButton, &QPushButton::clicked, this, &EndToEndView::refreshView);
+    connect(d->ui->refreshButton, &QPushButton::clicked, this, &EndToEndView::refreshView);
+
+    connect(d->ui->leafDocsView->selectionModel(), &QItemSelectionModel::currentChanged, this,
+            &EndToEndView::refreshView);
 
     if (parent != nullptr) {
         // Size this a bit smaller than the parent
@@ -139,7 +163,12 @@ void EndToEndView::refreshView()
     QList<aadl::AADLObject *> objects = d->document->objectsModel()->visibleObjects({});
     aadl::AADLObject::sortObjectList(objects);
 
-    const EndToEndConnections::Dataflow dataflow = d->dataflow.dataflow();
+    msc::MscDocument *doc = nullptr;
+    if (d->ui->leafDocsView->currentIndex().isValid()) {
+        QVariant currentData = d->ui->leafDocsView->currentIndex().data(QObjectListModel::ObjectRole);
+        doc = currentData.value<msc::MscDocument *>();
+    }
+    const EndToEndConnections::Dataflow dataflow = doc ? d->dataflow.dataflow(doc) : d->dataflow.dataflow();
     for (auto c : dataflow.internalConnections) {
         internalConnections << InternalConnection { c };
     };

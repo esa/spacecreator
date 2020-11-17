@@ -35,6 +35,13 @@ target_sources(${LIB_NAME} PRIVATE
     context/action/condition.h
     context/action/extprocmonitor.cpp
     context/action/extprocmonitor.h
+    endtoend/endtoendconnections.cpp
+    endtoend/endtoendconnections.h
+    endtoend/endtoendview.cpp
+    endtoend/endtoendview.h
+    endtoend/endtoendview.ui
+    endtoend/leafdocumentsmodel.cpp
+    endtoend/leafdocumentsmodel.h
     interface/aadlcommentgraphicsitem.cpp
     interface/aadlcommentgraphicsitem.h
     interface/aadlconnectiongraphicsitem.cpp
@@ -171,10 +178,6 @@ target_sources(${LIB_NAME} PRIVATE
     asn1dialog.ui
     commandsstack.cpp
     commandsstack.h
-    endtoendconnections.cpp
-    endtoendconnections.h
-    endtoendview.cpp
-    endtoendview.h
     iveditor.cpp
     iveditor.h
     iveditorcore.cpp

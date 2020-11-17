@@ -27,6 +27,10 @@ namespace aadl {
 class AADLObjectConnection;
 }
 
+namespace msc {
+class MscDocument;
+}
+
 namespace aadlinterface {
 
 /*!
@@ -83,8 +87,10 @@ public:
     QString path() const;
 
     Dataflow dataflow() const;
+    Dataflow dataflow(msc::MscDocument *document) const;
 
     static Dataflow readDataflow(const QString &file, bool isFile);
+    static Dataflow readDataFlowFromDocument(msc::MscDocument *document);
 
     static bool isInDataflow(const Dataflow &dataflow, aadl::AADLObjectConnection *connection);
 
