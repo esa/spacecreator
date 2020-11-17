@@ -1,0 +1,51 @@
+<?xml version="1.0"?>
+<InterfaceView asn1file="taste-types.asn" mscfile="C:/Users/bo/Projects/esa/wp7.msc">
+    <Function name="Database_Manager" language="" is_type="NO" instance_of="">
+        <Property name="Taste::coordinates" value="90100 49200 132400 71400"/>
+        <Provided_Interface name="Access_Database" kind="SPORADIC_OPERATION" period="" wcet="" queue_size="">
+            <Property name="Taste::coordinates" value="95900 49200"/>
+        </Provided_Interface>
+    </Function>
+    <Function name="File_Manager" language="" is_type="NO" instance_of="">
+        <Property name="Taste::coordinates" value="64600 18800 96300 38600"/>
+        <Provided_Interface name="Open_File" kind="SPORADIC_OPERATION" period="" wcet="" queue_size="">
+            <Property name="Taste::coordinates" value="64600 24800"/>
+        </Provided_Interface>
+        <Provided_Interface name="Close_File" kind="SPORADIC_OPERATION" period="" wcet="" queue_size="">
+            <Property name="Taste::coordinates" value="64600 35700"/>
+        </Provided_Interface>
+        <Required_Interface name="Access_Database" kind="SPORADIC_OPERATION" period="" wcet="" queue_size="">
+            <Property name="Taste::coordinates" value="88800 38600"/>
+            <Property name="Taste::InheritPI" value="true"/>
+        </Required_Interface>
+    </Function>
+    <Function name="User_Interface" language="" is_type="NO" instance_of="">
+        <Property name="Taste::coordinates" value="12000 6400 40200 22200"/>
+        <Provided_Interface name="Start_Transaction" kind="SPORADIC_OPERATION" period="" wcet="" queue_size="">
+            <Property name="Taste::coordinates" value="12000 18000"/>
+        </Provided_Interface>
+        <Required_Interface name="Open_File" kind="SPORADIC_OPERATION" period="" wcet="" queue_size="">
+            <Property name="Taste::coordinates" value="40200 17100"/>
+            <Property name="Taste::InheritPI" value="true"/>
+        </Required_Interface>
+        <Required_Interface name="Close_File" kind="SPORADIC_OPERATION" period="" wcet="" queue_size="">
+            <Property name="Taste::coordinates" value="36400 22200"/>
+            <Property name="Taste::InheritPI" value="true"/>
+        </Required_Interface>
+    </Function>
+    <Connection>
+        <Source func_name="File Manager" ri_name="Access Database"/>
+        <Target func_name="Database Manager" pi_name="Access Database"/>
+        <Property name="Taste::coordinates" value="88800 38600 95900 49200"/>
+    </Connection>
+    <Connection>
+        <Source func_name="User Interface" ri_name="Open File"/>
+        <Target func_name="File Manager" pi_name="Open File"/>
+        <Property name="Taste::coordinates" value="40200 17100 52400 17100 52400 24800 64600 24800"/>
+    </Connection>
+    <Connection>
+        <Source func_name="User Interface" ri_name="Close File"/>
+        <Target func_name="File Manager" pi_name="Close File"/>
+        <Property name="Taste::coordinates" value="36400 22200 36400 35700 64600 35700"/>
+    </Connection>
+</InterfaceView>

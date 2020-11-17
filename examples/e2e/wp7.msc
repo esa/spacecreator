@@ -1,0 +1,55 @@
+mscdocument Untitled_Document /* MSC AND */;
+
+
+/* CIF MSCDOCUMENT (0, 0) (3122, 1417) */
+
+mscdocument Untitled_Leaf /* MSC LEAF */;
+
+
+msc Untitled_MSC;
+/* CIF INSTANCE (1011, 93) (421, 120) (800, 1180) */
+
+instance User_Interface;
+/* CIF MESSAGE (-55, 330) (1221, 330) */
+
+in Start_Transaction from env;
+
+/* CIF MESSAGE (1221, 489) (1764, 489) */
+
+out Open_File to File_Manager;
+
+
+endinstance;
+
+/* CIF INSTANCE (1568, 93) (391, 120) (800, 1180) */
+
+instance File_Manager;
+
+/* CIF MESSAGE (1221, 489) (1764, 489) */
+
+in Open_File from User_Interface;
+
+/* CIF MESSAGE (1764, 647) (2636, 647) */
+
+out Access_Database to Database_Manager;
+
+endinstance;
+
+/* CIF INSTANCE (2371, 93) (527, 120) (800, 1180) */
+
+instance Database_Manager;
+
+
+/* CIF MESSAGE (1764, 647) (2636, 647) */
+
+in Access_Database from File_Manager;
+
+endinstance;
+
+endmsc;
+
+
+endmscdocument;
+
+
+endmscdocument;
