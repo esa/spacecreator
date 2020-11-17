@@ -184,41 +184,45 @@ void EndToEndView::refreshView()
         InteractiveObject *item = nullptr;
         switch (obj->aadlType()) {
         case aadl::AADLObject::Type::RequiredInterface:
-            if (auto ri = qobject_cast<aadl::AADLObjectIfaceRequired *>(obj)) {
-                // Add the RI
-                auto graphicsItem = new AADLInterfaceGraphicsItem(ri, parentItem);
-                item = graphicsItem;
+            if (parentItem) {
+                if (auto ri = qobject_cast<aadl::AADLObjectIfaceRequired *>(obj)) {
+                    // Add the RI
+                    auto graphicsItem = new AADLInterfaceGraphicsItem(ri, parentItem);
+                    item = graphicsItem;
 
-                if (auto function = ri->function()) {
-                    // Check if this is part of an internal connection
-                    const QStringList labelsOriginal = ri->ifaceLabelList();
-                    QStringList labels;
-                    for (auto l : labelsOriginal) {
-                        labels << l.trimmed().toLower();
-                    }
-                    const QString title = function->title().trimmed().toLower();
-                    for (auto &ic : internalConnections) {
-                        if (title == ic.connection.instance && labels.contains(ic.connection.interface2)) {
-                            ic.ri = graphicsItem;
+                    if (auto function = ri->function()) {
+                        // Check if this is part of an internal connection
+                        const QStringList labelsOriginal = ri->ifaceLabelList();
+                        QStringList labels;
+                        for (auto l : labelsOriginal) {
+                            labels << l.trimmed().toLower();
+                        }
+                        const QString title = function->title().trimmed().toLower();
+                        for (auto &ic : internalConnections) {
+                            if (title == ic.connection.instance && labels.contains(ic.connection.interface2)) {
+                                ic.ri = graphicsItem;
+                            }
                         }
                     }
                 }
             }
             break;
         case aadl::AADLObject::Type::ProvidedInterface:
-            if (auto pi = qobject_cast<aadl::AADLObjectIfaceProvided *>(obj)) {
-                // Add the PI
-                auto graphicsItem = new AADLInterfaceGraphicsItem(pi, parentItem);
-                item = graphicsItem;
+            if (parentItem) {
+                if (auto pi = qobject_cast<aadl::AADLObjectIfaceProvided *>(obj)) {
+                    // Add the PI
+                    auto graphicsItem = new AADLInterfaceGraphicsItem(pi, parentItem);
+                    item = graphicsItem;
 
-                if (auto function = pi->function()) {
-                    // Check if this is part of an internal connection
-                    const QString interface = pi->ifaceLabel().trimmed().toLower();
-                    const QString title = function->title().trimmed().toLower();
-                    for (auto &ic : internalConnections) {
-                        if (title == ic.connection.instance && interface == ic.connection.interface1) {
-                            // This is the ri side
-                            ic.pi = graphicsItem;
+                    if (auto function = pi->function()) {
+                        // Check if this is part of an internal connection
+                        const QString interface = pi->ifaceLabel().trimmed().toLower();
+                        const QString title = function->title().trimmed().toLower();
+                        for (auto &ic : internalConnections) {
+                            if (title == ic.connection.instance && interface == ic.connection.interface1) {
+                                // This is the ri side
+                                ic.pi = graphicsItem;
+                            }
                         }
                     }
                 }
