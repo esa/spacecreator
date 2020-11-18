@@ -63,6 +63,7 @@ void AADLFunctionTypeGraphicsItem::init()
     AADLRectGraphicsItem::init();
     m_textItem->setPlainText(entity()->titleUI());
     m_textItem->setTextAlignment(Qt::AlignLeft | Qt::AlignTop);
+    m_textItem->setFont(font());
 
     connect(m_textItem, &TextGraphicsItem::edited, this, &AADLFunctionTypeGraphicsItem::updateNameFromUi);
     connect(entity(), qOverload<aadl::meta::Props::Token>(&aadl::AADLObjectFunction::attributeChanged), this,

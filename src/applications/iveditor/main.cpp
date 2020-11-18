@@ -42,7 +42,7 @@ int main(int argc, char *argv[])
     QDirIterator dirIt(":/fonts");
     while (dirIt.hasNext())
         QFontDatabase::addApplicationFont(dirIt.next());
-    a.setFont(QFont(QLatin1String("Ubuntu"), 10));
+    a.setFont(QFont(QLatin1String("Ubuntu"), 8));
 
     aadlinterface::IVEditorCore plugin;
 

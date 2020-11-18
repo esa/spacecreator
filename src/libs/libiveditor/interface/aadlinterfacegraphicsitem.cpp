@@ -36,7 +36,7 @@
 #include <QPainter>
 #include <QtDebug>
 
-static const qreal kBase = 15;
+static const qreal kBase = 12;
 static const qreal kHeight = kBase * 4 / 5;
 static const QColor kSelectedBackgroundColor = QColor(Qt::magenta);
 static const QColor kDefaultBackgroundColor = QColor(Qt::blue);
