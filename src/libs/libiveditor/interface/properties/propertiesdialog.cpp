@@ -188,7 +188,7 @@ void PropertiesDialog::initContextParams()
 
     PropertiesViewBase *viewAttrs = new PropertiesViewBase(this);
     viewAttrs->tableView()->setItemDelegateForColumn(
-            ContextParametersModel::ColumnType, new PropertyTypeDelegate(m_dataTypes, viewAttrs->tableView()));
+            ContextParametersModel::ColumnType, new ContextParametersTypeDelegate(viewAttrs->tableView()));
     viewAttrs->tableView()->setItemDelegateForColumn(
             ContextParametersModel::ColumnValue, new Asn1ValueDelegate(m_dataTypes, viewAttrs->tableView()));
     viewAttrs->tableView()->horizontalHeader()->show();
@@ -203,7 +203,7 @@ void PropertiesDialog::initIfaceParams()
 
     PropertiesViewBase *viewAttrs = new PropertiesViewBase(this);
     viewAttrs->tableView()->setItemDelegateForColumn(
-            IfaceParametersModel::ColumnType, new PropertyTypeDelegate(m_dataTypes, viewAttrs->tableView()));
+            IfaceParametersModel::ColumnType, new IfaceParametersTypeDelegate(m_dataTypes, viewAttrs->tableView()));
     viewAttrs->tableView()->setItemDelegateForColumn(IfaceParametersModel::ColumnEncoding,
             new StringListComboDelegate({ tr("NATIVE"), tr("UPER"), tr("ACN") }, // TODO: is it configurable?
                     viewAttrs->tableView()));

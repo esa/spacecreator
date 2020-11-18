@@ -25,12 +25,20 @@ class File;
 
 namespace aadlinterface {
 
-class PropertyTypeDelegate : public StringListComboDelegate
+class IfaceParametersTypeDelegate : public StringListComboDelegate
 {
     Q_OBJECT
 public:
-    PropertyTypeDelegate(const QSharedPointer<Asn1Acn::File> &dataTypes, QObject *parent = nullptr);
-    ~PropertyTypeDelegate() override;
+    IfaceParametersTypeDelegate(const QSharedPointer<Asn1Acn::File> &dataTypes, QObject *parent = nullptr);
+    ~IfaceParametersTypeDelegate() override;
+};
+
+class ContextParametersTypeDelegate : public StringListComboDelegate
+{
+    Q_OBJECT
+public:
+    ContextParametersTypeDelegate(QObject *parent = nullptr);
+    ~ContextParametersTypeDelegate() override;
 };
 
 }

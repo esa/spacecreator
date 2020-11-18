@@ -75,8 +75,9 @@ class ContextParameter : public BasicParameter
     Q_GADGET
     Q_PROPERTY(QVariant defaultValue READ defaultValue)
 public:
-    ContextParameter(const QString &name = QString(), Type t = BasicParameter::Type::Other,
-            const QString &paramTypeName = QString(), const QVariant &val = QVariant());
+    ContextParameter(const QString &name = QString(), Type t = BasicParameter::Type::Timer,
+            const QString &paramTypeName = BasicParameter::typeName(BasicParameter::Type::Timer),
+            const QVariant &val = QVariant());
     ~ContextParameter() override;
 
     QVariant defaultValue() const;
@@ -109,9 +110,9 @@ public:
 
     Q_ENUM(Direction)
 
-    IfaceParameter(const QString &name = QObject::tr("IfaceParam"), Type t = BasicParameter::Type::Timer,
-            const QString &paramTypeName = BasicParameter::typeName(BasicParameter::Type::Timer),
-            const QString &encoding = QObject::tr("NATIVE"), Direction dir = IfaceParameter::Direction::In);
+    IfaceParameter(const QString &name = QObject::tr("IfaceParam"), Type t = BasicParameter::Type::Other,
+            const QString &paramTypeName = {}, const QString &encoding = QObject::tr("NATIVE"),
+            Direction dir = IfaceParameter::Direction::In);
     ~IfaceParameter() override;
 
     QString encoding() const;
