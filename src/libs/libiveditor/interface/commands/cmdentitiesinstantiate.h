@@ -17,6 +17,7 @@
 
 #pragma once
 
+#include <QPointF>
 #include <QPointer>
 #include <QUndoCommand>
 #include <QVector>
@@ -48,6 +49,7 @@ private:
     QPointer<aadl::AADLObjectFunctionType> m_parent;
     QPointer<aadl::AADLObjectsModel> m_model;
     QPointer<aadl::AADLObjectFunction> m_instantiatedEntity;
+    QPointF m_offset;
     CmdEntityAttributeChange *m_subCmd { nullptr };
 };
 

@@ -30,7 +30,7 @@ namespace aadl {
 
 AADLObjectIface::CreationInfo::CreationInfo(AADLObjectsModel *model, AADLObjectFunctionType *function,
         const QPointF &position, AADLObjectIface::IfaceType type, const shared::Id &id,
-        const QVector<IfaceParameter> parameters, OperationKind kind, const QString &name,
+        const QVector<IfaceParameter> &parameters, OperationKind kind, const QString &name,
         const CreationInfo::Policy policy, AADLObjectIface *source)
     : model(model)
     , function(function)
@@ -56,9 +56,14 @@ AADLObjectIface::CreationInfo AADLObjectIface::CreationInfo::initFromIface(
     if (!iface)
         return {};
 
+    auto getIfacePos = [](const QVector<qint32> &coordinates) {
+        return coordinates.size() < 2 ? QPointF() : QPointF(coordinates.front(), coordinates.back());
+    };
+
     return { iface->objectsModel(),
-        (iface->parentObject() ? iface->parentObject()->as<AADLObjectFunctionType *>() : nullptr), QPointF(),
-        iface->direction(), iface->id(), iface->params(), iface->kind(), iface->title(), policy, iface };
+        (iface->parentObject() ? iface->parentObject()->as<AADLObjectFunctionType *>() : nullptr),
+        getIfacePos(iface->coordinates()), iface->direction(), iface->id(), iface->params(), iface->kind(),
+        iface->title(), policy, iface };
 }
 
 AADLObjectIface::CreationInfo AADLObjectIface::CreationInfo::fromIface(AADLObjectIface *iface)
@@ -100,9 +105,10 @@ struct AADLObjectIfacePrivate {
 
 AADLObjectIface::AADLObjectIface(AADLObject::Type ifaceType, const CreationInfo &ci)
     : AADLObject(ifaceType, ci.name, ci.function, ci.toBeCloned ? shared::createId() : ci.id)
-    , d(new AADLObjectIfacePrivate(Type::InterfaceGroup == ifaceType ? ci.type
-                      : Type::RequiredInterface == ifaceType         ? AADLObjectIface::IfaceType::Required
-                                                                     : AADLObjectIface::IfaceType::Provided))
+    , d(new AADLObjectIfacePrivate(Type::InterfaceGroup == ifaceType
+                      ? ci.type
+                      : Type::RequiredInterface == ifaceType ? AADLObjectIface::IfaceType::Required
+                                                             : AADLObjectIface::IfaceType::Provided))
 {
     setupInitialAttrs();
 

@@ -25,6 +25,23 @@
 #include "cmdentityattributechange.h"
 #include "commandids.h"
 
+static inline void shiftObjects(const QVector<aadl::AADLObject *> &objects, const QPointF &offset)
+{
+    for (auto obj : objects) {
+        if (!obj) {
+            continue;
+        }
+        auto points = aadlinterface::polygon(obj->coordinates());
+        std::transform(
+                points.cbegin(), points.cend(), points.begin(), [offset](const QPointF &p) { return p + offset; });
+        obj->setCoordinates(aadlinterface::coordinates(points));
+        if (obj->aadlType() == aadl::AADLObject::Type::FunctionType
+                || obj->aadlType() == aadl::AADLObject::Type::Function) {
+            shiftObjects(obj->as<aadl::AADLObjectFunctionType *>()->children(), offset);
+        }
+    }
+}
+
 namespace aadlinterface {
 namespace cmd {
 
@@ -40,9 +57,10 @@ CmdEntitiesInstantiate::CmdEntitiesInstantiate(aadl::AADLObjectFunctionType *ent
             {}, m_parent ? qobject_cast<QObject *>(m_parent) : qobject_cast<QObject *>(m_model));
     m_instantiatedEntity->setTitle(aadl::AADLNameValidator::nameForInstance(
             m_instantiatedEntity, entity->title() + QLatin1String("_Instance_")));
-    QRectF typeGeometry = aadlinterface::rect(entity->coordinates());
-    typeGeometry.moveTopLeft(pos);
-    m_instantiatedEntity->setCoordinates(aadlinterface::coordinates(typeGeometry));
+    m_instantiatedEntity->setCoordinates(entity->coordinates());
+
+    const QRectF typeGeometry = aadlinterface::rect(entity->coordinates());
+    m_offset = pos - typeGeometry.topLeft();
     const QString nameKey = aadl::meta::Props::token(aadl::meta::Props::Token::instance_of);
     m_subCmd = new CmdEntityAttributeChange(m_instantiatedEntity, { { nameKey, entity->title() } });
 }
@@ -64,12 +82,14 @@ void CmdEntitiesInstantiate::redo()
         }
         m_model->addObject(m_instantiatedEntity);
         m_subCmd->redo();
+        shiftObjects({ m_instantiatedEntity }, m_offset);
     }
 }
 
 void CmdEntitiesInstantiate::undo()
 {
     if (!m_instantiatedEntity.isNull()) {
+        shiftObjects({ m_instantiatedEntity }, -m_offset);
         m_subCmd->undo();
         m_model->removeObject(m_instantiatedEntity);
         if (m_parent) {
