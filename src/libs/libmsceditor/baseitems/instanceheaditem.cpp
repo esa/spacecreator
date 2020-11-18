@@ -342,8 +342,17 @@ void InstanceHeadItem::showCompleter()
     if (m_aadlChecker) {
         QStringList functionNames = m_aadlChecker->functionsNames();
         if (!m_chart.isNull()) {
+            QStringList instanceNames;
             for (MscInstance *instance : m_chart->instances()) {
-                functionNames.removeAll(instance->name());
+                instanceNames.append(instance->name());
+            }
+            int i = 0;
+            while (i < functionNames.size()) {
+                if (instanceNames.contains(functionNames[i], m_aadlChecker->stringSensitivity())) {
+                    functionNames.removeAt(i);
+                } else {
+                    ++i;
+                }
             }
         }
         m_textItemName->updateCompleter(functionNames);

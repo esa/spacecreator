@@ -420,4 +420,12 @@ QVector<MscMessageDeclaration *> AadlSystemChecks::allConnectionsAsDeclaration()
     return result;
 }
 
+/*!
+   Returns if strings comparisons fo AADL and MSC string should be case sensitive
+ */
+Qt::CaseSensitivity AadlSystemChecks::stringSensitivity() const
+{
+    return m_caseCheck;
+}
+
 }

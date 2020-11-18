@@ -78,6 +78,8 @@ public:
 
     QVector<msc::MscMessageDeclaration *> allConnectionsAsDeclaration() const;
 
+    Qt::CaseSensitivity stringSensitivity() const;
+
 Q_SIGNALS:
     void mscCoreChanged();
     void ivCoreChanged();
