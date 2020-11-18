@@ -152,7 +152,7 @@ void CreatorTool::removeSelectedItems()
 
     if (auto scene = d->view->scene()) {
         QStringList clonedIfaces;
-        cmd::CommandsStack::current()->beginMacro(tr("Remove selected item(s)"));
+        cmd::CommandsStack::Macro cmdMacro(tr("Remove selected item(s)"));
         while (!scene->selectedItems().isEmpty()) {
             d->clearPreviewItem();
 
@@ -178,7 +178,7 @@ void CreatorTool::removeSelectedItems()
                 }
             }
         }
-        cmd::CommandsStack::current()->endMacro();
+        cmdMacro.setComplete(true);
 
         if (!clonedIfaces.isEmpty()) {
             const QString names = clonedIfaces.join(QStringLiteral("<br>"));
@@ -189,23 +189,6 @@ void CreatorTool::removeSelectedItems()
             Q_EMIT informUser(tr("Interface removal"), msg);
         }
     }
-}
-
-void CreatorTool::setSelectedItemsVisible(bool visible)
-{
-    if (!d->view) {
-        return;
-    }
-
-    auto scene = d->view->scene();
-    if (!scene) {
-        return;
-    }
-    QStringList clonedIfaces;
-    cmd::CommandsStack::current()->beginMacro(visible ? tr("Show selected item(s)") : tr("Hide selected item(s)"));
-    d->clearPreviewItem();
-    /// TODO:
-    cmd::CommandsStack::current()->endMacro();
 }
 
 void CreatorTool::groupSelectedItems()

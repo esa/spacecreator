@@ -18,6 +18,7 @@
 #pragma once
 
 #include "aadlcommonprops.h"
+#include "commandsstack.h"
 #include "interface/properties/dynamicproperty.h"
 #include "propertiesmodelbase.h"
 
@@ -39,7 +40,7 @@ public:
     static const int ColumnTitle { 0 };
     static const int ColumnValue { 1 };
 
-    explicit PropertiesListModel(QObject *parent = nullptr);
+    explicit PropertiesListModel(cmd::CommandsStack::Macro *macro, QObject *parent = nullptr);
     ~PropertiesListModel() override;
 
     int rowCount(const QModelIndex &parent = QModelIndex()) const override;
@@ -62,6 +63,7 @@ public:
     bool isProp(const QModelIndex &id) const override;
 
 protected:
+    cmd::CommandsStack::Macro *m_cmdMacro { nullptr };
     aadl::AADLObject *m_dataObject { nullptr };
     QVector<QString> m_names;
 
@@ -76,7 +78,7 @@ protected:
 class FunctionPropertiesListModel : public PropertiesListModel
 {
 public:
-    explicit FunctionPropertiesListModel(QObject *parent = nullptr);
+    explicit FunctionPropertiesListModel(cmd::CommandsStack::Macro *macro, QObject *parent = nullptr);
 
 protected:
     bool isEditable(const QModelIndex &index) const override;
@@ -85,7 +87,7 @@ protected:
 class InterfacePropertiesListModel : public PropertiesListModel
 {
 public:
-    explicit InterfacePropertiesListModel(QObject *parent = nullptr);
+    explicit InterfacePropertiesListModel(cmd::CommandsStack::Macro *macro, QObject *parent = nullptr);
 
 protected:
     bool isEditable(const QModelIndex &index) const override;

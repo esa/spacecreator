@@ -145,7 +145,8 @@ void PropertiesDialog::initTabs()
 
 void PropertiesDialog::initConnectionGroup()
 {
-    auto model = new AADLConnectionGroupModel(qobject_cast<aadl::AADLObjectConnectionGroup *>(m_dataObject), this);
+    auto model = new AADLConnectionGroupModel(
+            qobject_cast<aadl::AADLObjectConnectionGroup *>(m_dataObject), m_cmdMacro, this);
     auto connectionsView = new QListView;
     connectionsView->setModel(model);
     ui->tabWidget->insertTab(0, connectionsView, tr("Connections"));
@@ -158,16 +159,16 @@ void PropertiesDialog::initAttributesView()
 
     switch (m_dataObject->aadlType()) {
     case aadl::AADLObject::Type::Function: {
-        modelAttrs = new FunctionPropertiesListModel(this);
+        modelAttrs = new FunctionPropertiesListModel(m_cmdMacro, this);
         break;
     }
     case aadl::AADLObject::Type::RequiredInterface:
     case aadl::AADLObject::Type::ProvidedInterface: {
-        modelAttrs = new InterfacePropertiesListModel(this);
+        modelAttrs = new InterfacePropertiesListModel(m_cmdMacro, this);
         break;
     }
     default:
-        modelAttrs = new InterfacePropertiesListModel(this);
+        modelAttrs = new InterfacePropertiesListModel(m_cmdMacro, this);
         break;
     }
 
@@ -181,7 +182,7 @@ void PropertiesDialog::initAttributesView()
 
 void PropertiesDialog::initContextParams()
 {
-    ContextParametersModel *modelCtxParams = new ContextParametersModel(this);
+    ContextParametersModel *modelCtxParams = new ContextParametersModel(m_cmdMacro, this);
     modelCtxParams->setDataTypes(m_dataTypes);
     modelCtxParams->setDataObject(m_dataObject);
 
@@ -197,7 +198,7 @@ void PropertiesDialog::initContextParams()
 
 void PropertiesDialog::initIfaceParams()
 {
-    IfaceParametersModel *modelIfaceParams = new IfaceParametersModel(this);
+    IfaceParametersModel *modelIfaceParams = new IfaceParametersModel(m_cmdMacro, this);
     modelIfaceParams->setDataObject(m_dataObject);
 
     PropertiesViewBase *viewAttrs = new PropertiesViewBase(this);

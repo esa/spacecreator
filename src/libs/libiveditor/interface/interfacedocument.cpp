@@ -693,7 +693,7 @@ void InterfaceDocument::importEntity(const shared::Id &id, const QPointF &sceneD
     const QVariantList params = { QVariant::fromValue(obj), QVariant::fromValue(parentObject),
         QVariant::fromValue(d->objectsModel), QVariant::fromValue(sceneDropPoint) };
     if (QUndoCommand *cmdImport = cmd::CommandsFactory::create(cmd::ImportEntities, params)) {
-        cmd::CommandsStack::current()->push(cmdImport);
+        cmd::CommandsStack::push(cmdImport);
     }
 }
 
@@ -711,7 +711,7 @@ void InterfaceDocument::instantiateEntity(const shared::Id &id, const QPointF &s
     const QVariantList params = { QVariant::fromValue(obj->as<aadl::AADLObjectFunctionType *>()),
         QVariant::fromValue(parentObject), QVariant::fromValue(d->objectsModel), QVariant::fromValue(sceneDropPoint) };
     if (QUndoCommand *cmdInstantiate = cmd::CommandsFactory::create(cmd::InstantiateEntities, params)) {
-        cmd::CommandsStack::current()->push(cmdInstantiate);
+        cmd::CommandsStack::push(cmdInstantiate);
     }
 }
 

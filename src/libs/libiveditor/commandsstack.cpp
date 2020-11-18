@@ -91,10 +91,7 @@ CommandsStack::Macro::~Macro()
  */
 bool CommandsStack::Macro::push(QUndoCommand *cmd) const
 {
-    if (!cmd)
-        return false;
-    CommandsStack::push(cmd);
-    return true;
+    return CommandsStack::push(cmd);
 }
 
 /*!
@@ -157,13 +154,16 @@ bool CommandsStack::push(QUndoCommand *command)
 {
     if (command && CommandsStack::current()) {
         if (auto nameCommand = dynamic_cast<CmdEntityAttributeChange *>(command)) {
-            connect(nameCommand, &CmdEntityAttributeChange::nameChanged, instance(), &CommandsStack::nameChanged);
+            connect(nameCommand, &CmdEntityAttributeChange::nameChanged, instance(), &CommandsStack::nameChanged,
+                    Qt::UniqueConnection);
         }
         if (auto nameCommand = dynamic_cast<CmdIfaceAttrChange *>(command)) {
-            connect(nameCommand, &CmdIfaceAttrChange::nameChanged, instance(), &CommandsStack::nameChanged);
+            connect(nameCommand, &CmdIfaceAttrChange::nameChanged, instance(), &CommandsStack::nameChanged,
+                    Qt::UniqueConnection);
         }
         if (auto nameCommand = dynamic_cast<CmdEntityRemove *>(command)) {
-            connect(nameCommand, &CmdEntityRemove::entityRemoved, instance(), &CommandsStack::entityRemoved);
+            connect(nameCommand, &CmdEntityRemove::entityRemoved, instance(), &CommandsStack::entityRemoved,
+                    Qt::UniqueConnection);
         }
         CommandsStack::current()->push(command);
         return true;

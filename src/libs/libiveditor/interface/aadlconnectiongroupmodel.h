@@ -17,6 +17,7 @@
 
 #pragma once
 
+#include "commandsstack.h"
 #include "common.h"
 
 #include <QAbstractListModel>
@@ -33,7 +34,8 @@ class AADLConnectionGroupModel : public QAbstractListModel
 {
     Q_OBJECT
 public:
-    explicit AADLConnectionGroupModel(aadl::AADLObjectConnectionGroup *connectionGroup, QObject *parent = nullptr);
+    explicit AADLConnectionGroupModel(aadl::AADLObjectConnectionGroup *connectionGroup,
+            cmd::CommandsStack::Macro *macro, QObject *parent = nullptr);
 
     QVariant data(const QModelIndex &index, int role = Qt::DisplayRole) const override;
     int rowCount(const QModelIndex &parent = QModelIndex()) const override;
@@ -44,7 +46,8 @@ private:
     bool isEnabled(const QModelIndex &index) const;
 
 private:
-    aadl::AADLObjectConnectionGroup *m_connectionGroup;
+    aadl::AADLObjectConnectionGroup *m_connectionGroup { nullptr };
+    cmd::CommandsStack::Macro *m_cmdMacro { nullptr };
     QList<QPointer<aadl::AADLObjectConnection>> m_allConnections;
     QSet<shared::Id> m_groupedConnetions;
 };

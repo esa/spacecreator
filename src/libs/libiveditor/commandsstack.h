@@ -48,7 +48,6 @@ public:
 
     private:
         bool m_keepMacro { false };
-        bool m_cleared { false };
     };
 
     static CommandsStack *instance();

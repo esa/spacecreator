@@ -30,12 +30,13 @@
 
 namespace aadlinterface {
 
-IfaceParametersModel::IfaceParametersModel(QObject *parent)
+IfaceParametersModel::IfaceParametersModel(cmd::CommandsStack::Macro *macro, QObject *parent)
     : PropertiesModelBase(parent)
+    , m_cmdMacro(macro)
 {
 }
 
-IfaceParametersModel::~IfaceParametersModel() { }
+IfaceParametersModel::~IfaceParametersModel() {}
 
 void IfaceParametersModel::createNewRow(const aadl::IfaceParameter &param, int row)
 {
@@ -158,7 +159,7 @@ bool IfaceParametersModel::setData(const QModelIndex &index, const QVariant &val
                     { QVariant::fromValue(m_dataObject), QVariant::fromValue(paramOld),
                             QVariant::fromValue(paramNew) })) {
 
-            cmd::CommandsStack::push(attributesCmd);
+            m_cmdMacro->push(attributesCmd);
             m_params.replace(index.row(), paramNew);
         }
     }
@@ -180,7 +181,7 @@ bool IfaceParametersModel::createProperty(const QString &propName)
         const int rows = rowCount();
         beginInsertRows(QModelIndex(), rows, rows);
 
-        cmd::CommandsStack::push(propsCmd);
+        m_cmdMacro->push(propsCmd);
         createNewRow(param, rows);
         res = true;
 
@@ -200,7 +201,7 @@ bool IfaceParametersModel::removeProperty(const QModelIndex &index)
     const auto propsCmd = cmd::CommandsFactory::create(
             cmd::RemoveIfaceParam, { QVariant::fromValue(m_dataObject), QVariant::fromValue(m_params.value(row)) });
     if (propsCmd) {
-        cmd::CommandsStack::push(propsCmd);
+        m_cmdMacro->push(propsCmd);
         removeRow(row);
         m_params.removeAt(row);
 

@@ -30,9 +30,11 @@
 
 namespace aadlinterface {
 
-AADLConnectionGroupModel::AADLConnectionGroupModel(aadl::AADLObjectConnectionGroup *connectionGroup, QObject *parent)
+AADLConnectionGroupModel::AADLConnectionGroupModel(
+        aadl::AADLObjectConnectionGroup *connectionGroup, cmd::CommandsStack::Macro *macro, QObject *parent)
     : QAbstractListModel(parent)
     , m_connectionGroup(connectionGroup)
+    , m_cmdMacro(macro)
 {
     const auto groupedConnections = connectionGroup->groupedConnections();
     std::for_each(groupedConnections.constBegin(), groupedConnections.constEnd(),
@@ -108,6 +110,8 @@ QVariant AADLConnectionGroupModel::data(const QModelIndex &index, int role) cons
 
 int AADLConnectionGroupModel::rowCount(const QModelIndex &parent) const
 {
+    Q_UNUSED(parent)
+
     return m_allConnections.size();
 }
 
@@ -126,7 +130,7 @@ bool AADLConnectionGroupModel::setData(const QModelIndex &index, const QVariant 
     const QVariantList params { QVariant::fromValue(m_connectionGroup), QVariant::fromValue(connection.data()),
         state == Qt::Checked };
     if (const auto propsCmd = cmd::CommandsFactory::create(cmd::ChangeConnectionGroupEntity, params)) {
-        cmd::CommandsStack::push(propsCmd);
+        m_cmdMacro->push(propsCmd);
         return true;
     }
     return false;

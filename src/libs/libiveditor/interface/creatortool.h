@@ -56,7 +56,6 @@ public:
     CreatorTool::ToolType toolType() const;
     void setCurrentToolType(CreatorTool::ToolType type);
     void removeSelectedItems();
-    void setSelectedItemsVisible(bool visible);
     void groupSelectedItems();
 
 Q_SIGNALS:

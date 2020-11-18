@@ -38,8 +38,8 @@ class IVEditorCore : public shared::EditorCore
 {
     Q_OBJECT
 public:
-    explicit IVEditorCore(QObject *parent = 0);
-    ~IVEditorCore();
+    explicit IVEditorCore(QObject *parent = nullptr);
+    ~IVEditorCore() override;
 
     aadlinterface::InterfaceDocument *document() const;
 

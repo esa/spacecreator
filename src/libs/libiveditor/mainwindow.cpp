@@ -98,8 +98,6 @@ MainWindow::MainWindow(aadlinterface::IVEditorCore *core, QWidget *parent)
                 Qt::UniqueConnection);
     }
 
-    aadlinterface::cmd::CommandsStack::setCurrent(m_core->document()->commandsStack());
-
     updateActions();
 
     initSettings();

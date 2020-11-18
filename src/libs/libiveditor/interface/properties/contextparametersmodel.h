@@ -18,6 +18,7 @@
 #pragma once
 
 #include "aadlparameter.h"
+#include "commandsstack.h"
 #include "propertiesmodelbase.h"
 
 #include <QPointer>
@@ -44,7 +45,7 @@ public:
     static const int ColumnType { 1 };
     static const int ColumnValue { 2 };
 
-    explicit ContextParametersModel(QObject *parent = nullptr);
+    explicit ContextParametersModel(cmd::CommandsStack::Macro *macro, QObject *parent = nullptr);
     ~ContextParametersModel() override;
 
     int rowCount(const QModelIndex &parent = QModelIndex()) const override;
@@ -71,6 +72,7 @@ public:
     QVariant headerData(int section, Qt::Orientation orientation, int role) const override;
 
 private:
+    cmd::CommandsStack::Macro *m_cmdMacro { nullptr };
     aadl::AADLObject *m_dataObject { nullptr };
     QVector<aadl::ContextParameter> m_params;
     QSharedPointer<Asn1Acn::File> m_dataTypes;

@@ -30,6 +30,7 @@
 #include <QDebug>
 #include <QGraphicsScene>
 #include <QGraphicsSceneMouseEvent>
+#include <QTimer>
 #include <functional>
 
 namespace aadlinterface {
@@ -90,26 +91,27 @@ void InteractiveObject::updateEntity()
 
 void InteractiveObject::mergeGeometry()
 {
-    for (auto child : childItems()) {
-        if (auto io = qobject_cast<InteractiveObject *>(child->toGraphicsObject())) {
-            io->mergeGeometry();
+    QTimer::singleShot(0, this, [this]() {
+        for (auto child : childItems()) {
+            if (auto io = qobject_cast<InteractiveObject *>(child->toGraphicsObject())) {
+                io->mergeGeometry();
+            }
         }
-    }
 
-    QList<QVariant> params;
-    const QList<QVariantList> preparedParams { prepareChangeCoordinatesCommandParams() };
-    std::transform(preparedParams.cbegin(), preparedParams.cend(), std::back_inserter(params),
-            [](const QVariantList entryParams) { return QVariant::fromValue(entryParams); });
+        QList<QVariant> params;
+        const QList<QVariantList> preparedParams { prepareChangeCoordinatesCommandParams() };
+        std::transform(preparedParams.cbegin(), preparedParams.cend(), std::back_inserter(params),
+                [](const QVariantList entryParams) { return QVariant::fromValue(entryParams); });
 
-    QUndoCommand *autolayoutCmd = cmd::CommandsFactory::create(cmd::AutoLayoutEntity, params);
-    autolayoutCmd->redo();
+        QUndoCommand *autolayoutCmd = cmd::CommandsFactory::create(cmd::AutoLayoutEntity, params);
+        autolayoutCmd->redo();
 
-    const int cmdIdx = cmd::CommandsStack::current()->index();
-    const QUndoCommand *prevCmd = cmd::CommandsStack::current()->command(cmdIdx - 1);
-    if (auto prevGeometryBasedCmd = dynamic_cast<const cmd::CmdEntityGeometryChange *>(prevCmd))
-        const_cast<cmd::CmdEntityGeometryChange *>(prevGeometryBasedCmd)->mergeCommand(autolayoutCmd);
-    else
-        delete autolayoutCmd;
+        const QUndoCommand *cmd = cmd::CommandsStack::current()->command(cmd::CommandsStack::current()->index() -1);
+        if (auto prevGeometryBasedCmd = dynamic_cast<const cmd::CmdEntityGeometryChange *>(cmd))
+            const_cast<cmd::CmdEntityGeometryChange *>(prevGeometryBasedCmd)->mergeCommand(autolayoutCmd);
+        else
+            delete autolayoutCmd;
+    });
 }
 
 QList<QVariantList> InteractiveObject::prepareChangeCoordinatesCommandParams() const

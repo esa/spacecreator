@@ -33,12 +33,13 @@
 
 namespace aadlinterface {
 
-ContextParametersModel::ContextParametersModel(QObject *parent)
+ContextParametersModel::ContextParametersModel(cmd::CommandsStack::Macro *macro, QObject *parent)
     : PropertiesModelBase(parent)
+    , m_cmdMacro(macro)
 {
 }
 
-ContextParametersModel::~ContextParametersModel() { }
+ContextParametersModel::~ContextParametersModel() {}
 
 void ContextParametersModel::createNewRow(const aadl::ContextParameter &param, int row)
 {

@@ -43,12 +43,13 @@ aadl::meta::Props::Token tokenFromIndex(const QModelIndex &index)
     return aadl::meta::Props::token(name);
 }
 
-PropertiesListModel::PropertiesListModel(QObject *parent)
+PropertiesListModel::PropertiesListModel(cmd::CommandsStack::Macro *macro, QObject *parent)
     : PropertiesModelBase(parent)
+    , m_cmdMacro(macro)
 {
 }
 
-PropertiesListModel::~PropertiesListModel() { }
+PropertiesListModel::~PropertiesListModel() {}
 
 void PropertiesListModel::createNewRow(
         int row, const QString &title, DynamicProperty::Info info, const QVariant &value, const QVariant &editValue)
@@ -68,6 +69,8 @@ void PropertiesListModel::createNewRow(
 
 void PropertiesListModel::invalidateProperties(const QString &propName)
 {
+    Q_UNUSED(propName)
+
     if (!m_dataObject)
         return;
 
@@ -85,6 +88,8 @@ void PropertiesListModel::invalidateProperties(const QString &propName)
 
 void PropertiesListModel::invalidateAttributes(const QString &attrName)
 {
+    Q_UNUSED(attrName)
+
     /// TBD:
 }
 
@@ -124,7 +129,7 @@ static QVariant convertData(const QVariant &value, DynamicProperty::Type type)
     case DynamicProperty::Type::Enumeration: {
         if (value.isValid()) {
             QStringList typedList;
-            for (const auto dataItem : value.toList()) {
+            for (const auto &dataItem : value.toList()) {
                 typedList.append(dataItem.toString());
             }
             typedValue = typedList;
@@ -272,14 +277,14 @@ bool PropertiesListModel::setData(const QModelIndex &index, const QVariant &valu
             const QVariantMap attributes = { { name, attributeValue } };
             const auto attributesCmd = cmd::CommandsFactory::create(cmd::ChangeEntityAttributes,
                     { QVariant::fromValue(m_dataObject), QVariant::fromValue(attributes) });
-            cmd::CommandsStack::push(attributesCmd);
+            m_cmdMacro->push(attributesCmd);
         } else if (isProp(index)) {
             switch (index.column()) {
             case ColumnValue: {
                 const QVariantMap props = { { name, value } };
                 const auto propsCmd = cmd::CommandsFactory::create(
                         cmd::ChangeEntityProperty, { QVariant::fromValue(m_dataObject), QVariant::fromValue(props) });
-                cmd::CommandsStack::push(propsCmd);
+                m_cmdMacro->push(propsCmd);
 
                 break;
             }
@@ -290,7 +295,7 @@ bool PropertiesListModel::setData(const QModelIndex &index, const QVariant &valu
                 const QHash<QString, QString> props = { { name, newName } };
                 const auto propsCmd = cmd::CommandsFactory::create(
                         cmd::RenameEntityProperty, { QVariant::fromValue(m_dataObject), QVariant::fromValue(props) });
-                cmd::CommandsStack::push(propsCmd);
+                m_cmdMacro->push(propsCmd);
                 const int idx = m_names.indexOf(name);
                 if (idx >= 0) {
                     m_names.replace(idx, newName);
@@ -322,7 +327,7 @@ bool PropertiesListModel::createProperty(const QString &propName)
     const auto propsCmd = cmd::CommandsFactory::create(
             cmd::CreateEntityProperty, { QVariant::fromValue(m_dataObject), QVariant::fromValue(props) });
     if (propsCmd) {
-        cmd::CommandsStack::push(propsCmd);
+        m_cmdMacro->push(propsCmd);
         res = true;
     }
 
@@ -349,7 +354,7 @@ bool PropertiesListModel::removeProperty(const QModelIndex &index)
     const auto propsCmd = cmd::CommandsFactory::create(
             cmd::RemoveEntityProperty, { QVariant::fromValue(m_dataObject), QVariant::fromValue(props) });
     if (propsCmd) {
-        cmd::CommandsStack::push(propsCmd);
+        m_cmdMacro->push(propsCmd);
         removeRow(row);
         m_names.removeAt(row);
 
@@ -398,8 +403,8 @@ Qt::ItemFlags PropertiesListModel::flags(const QModelIndex &index) const
     return flags;
 }
 
-FunctionPropertiesListModel::FunctionPropertiesListModel(QObject *parent)
-    : PropertiesListModel(parent)
+FunctionPropertiesListModel::FunctionPropertiesListModel(cmd::CommandsStack::Macro *macro, QObject *parent)
+    : PropertiesListModel(macro, parent)
 {
 }
 
@@ -437,8 +442,8 @@ bool FunctionPropertiesListModel::isEditable(const QModelIndex &index) const
     return editable;
 }
 
-InterfacePropertiesListModel::InterfacePropertiesListModel(QObject *parent)
-    : PropertiesListModel(parent)
+InterfacePropertiesListModel::InterfacePropertiesListModel(cmd::CommandsStack::Macro *macro, QObject *parent)
+    : PropertiesListModel(macro, parent)
 {
 }
 

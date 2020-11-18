@@ -69,7 +69,7 @@ IVEditorCore::IVEditorCore(QObject *parent)
     }
 }
 
-IVEditorCore::~IVEditorCore() { }
+IVEditorCore::~IVEditorCore() {}
 
 /*!
    Returns the interface document
@@ -159,10 +159,6 @@ void IVEditorCore::populateCommandLineArguments(shared::CommandLineParser *parse
  */
 bool IVEditorCore::addFunction(const QString &name)
 {
-    if (!aadlinterface::cmd::CommandsStack::current()) {
-        aadlinterface::cmd::CommandsStack::setCurrent(new QUndoStack(this));
-    }
-
     aadl::AADLObjectFunction *parent = nullptr;
     const QVariantList params = { QVariant::fromValue(m_document->objectsModel()), QVariant::fromValue(parent),
         QVariant::fromValue(QRectF(QPointF(10., 10.), DefaultGraphicsItemSize)), QVariant::fromValue(name) };
@@ -177,10 +173,6 @@ bool IVEditorCore::addFunction(const QString &name)
  */
 bool IVEditorCore::addConnection(QString name, const QString &fromInstanceName, const QString &toInstanceName)
 {
-    if (!aadlinterface::cmd::CommandsStack::current()) {
-        aadlinterface::cmd::CommandsStack::setCurrent(new QUndoStack(this));
-    }
-
     aadl::AADLObjectsModel *aadlModel = m_document->objectsModel();
     if (aadlModel->getConnection(name, fromInstanceName, toInstanceName, m_caseCheck) != nullptr) {
         // The connection exists already
@@ -194,8 +186,6 @@ bool IVEditorCore::addConnection(QString name, const QString &fromInstanceName, 
         qDebug() << Q_FUNC_INFO << "No function for the connection" << name;
     }
 
-    cmd::CommandsStack::current()->beginMacro("Add connection");
-
     aadl::AADLObjectIface *fromInterface = getInterface(name, aadl::AADLObjectIface::IfaceType::Required, fromFunc);
     aadl::AADLObjectIface *toInterface = getInterface(name, aadl::AADLObjectIface::IfaceType::Provided, toFunc);
 
@@ -208,8 +198,6 @@ bool IVEditorCore::addConnection(QString name, const QString &fromInstanceName, 
         QUndoCommand *command = cmd::CommandsFactory::create(cmd::CreateConnectionEntity, params);
         cmd::CommandsStack::push(command);
     }
-
-    cmd::CommandsStack::current()->endMacro();
 
     Q_EMIT editedExternally(this);
     return true;
@@ -276,15 +264,6 @@ cmd::CommandsStack *IVEditorCore::commandsStack() const
  */
 bool IVEditorCore::renameAsnFile(const QString &oldName, const QString &newName)
 {
-    if (!aadlinterface::cmd::CommandsStack::current()) {
-        QUndoStack *currentStack = document()->commandsStack();
-        if (currentStack) {
-            aadlinterface::cmd::CommandsStack::setCurrent(currentStack);
-        } else {
-            aadlinterface::cmd::CommandsStack::setCurrent(new QUndoStack(this));
-        }
-    }
-
     QFileInfo oldFile(oldName);
     const QString oldFileName = oldFile.fileName();
 

@@ -18,6 +18,7 @@
 #pragma once
 
 #include "aadlparameter.h"
+#include "commandsstack.h"
 #include "propertiesmodelbase.h"
 
 #include <QVector>
@@ -39,7 +40,7 @@ public:
     static const int ColumnEncoding { 2 };
     static const int ColumnDirection { 3 };
 
-    explicit IfaceParametersModel(QObject *parent = nullptr);
+    explicit IfaceParametersModel(cmd::CommandsStack::Macro *macro, QObject *parent = nullptr);
     ~IfaceParametersModel() override;
 
     int rowCount(const QModelIndex &parent = QModelIndex()) const override;
@@ -63,6 +64,7 @@ public:
     Qt::ItemFlags flags(const QModelIndex &index) const override;
 
 private:
+    cmd::CommandsStack::Macro *m_cmdMacro { nullptr };
     aadl::AADLObject *m_dataObject { nullptr };
     QVector<aadl::IfaceParameter> m_params;
 
