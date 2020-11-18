@@ -10,7 +10,6 @@
     "platformIndependent": true,
 
     "options": [
-        { "key": "FileName", "value": "%{JS: Util.fileName(value('TargetPath'), Util.preferredSuffix('text/xml'))}" },
         { "key": "InitialFileName", "value": "interfaceview.xml" }
     ],
 
@@ -34,7 +33,7 @@
             "data":
             {
                 "source": "interfaceview.xml",
-                "target": "%{FileName}",
+                "target": "%{JS: Util.fileName('%{TargetPath}', '%{JS: Util.preferredSuffix('text/xml')}')}",
                 "openInEditor": true
             }
         }
