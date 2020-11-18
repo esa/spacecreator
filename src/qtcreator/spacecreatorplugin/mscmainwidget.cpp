@@ -289,7 +289,7 @@ void MscMainWidget::init()
     m_documentTree = new msc::DocumentTreeView(m_leftArea);
     m_documentTree->header()->setVisible(true);
 
-    m_aadlSwitch = new QPushButton("interfaceview.xml", m_leftArea);
+    m_aadlSwitch = new QPushButton("Interface view", m_leftArea);
     m_aadlSwitch->setToolTip(tr("Open the file"));
     connect(m_aadlSwitch, &QPushButton::clicked, this, &spctr::MscMainWidget::showAadlFile);
     m_aadlSwitch->setSizePolicy(QSizePolicy::MinimumExpanding, QSizePolicy::Minimum);
@@ -321,7 +321,6 @@ void MscMainWidget::init()
     m_horizontalSplitter->setStretchFactor(0, 0);
     m_horizontalSplitter->setStretchFactor(1, 1);
 
-    setLayout(new QVBoxLayout);
     layout()->addWidget(m_horizontalSplitter);
     layout()->setMargin(0);
 
