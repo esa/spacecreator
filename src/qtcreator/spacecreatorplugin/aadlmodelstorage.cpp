@@ -45,6 +45,9 @@ QSharedPointer<aadlinterface::IVEditorCore> AadlModelStorage::ivData(const QStri
 {
     if (!m_store.contains(fileName)) {
         QSharedPointer<aadlinterface::IVEditorCore> data(new aadlinterface::IVEditorCore());
+        data->registerBasicActions();
+        data->document()->customActions(); // There some further actions are registered
+
         data->document()->load(fileName);
         setIvData(fileName, data);
         return data;

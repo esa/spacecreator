@@ -33,8 +33,11 @@
 #include "mainwindow.h"
 #include "xmldocexporter.h"
 
+#include <QDateTime>
 #include <QDebug>
+#include <QFileDialog>
 #include <QFileInfo>
+#include <QImageWriter>
 #include <QMainWindow>
 #include <QMenu>
 #include <QRectF>
@@ -98,7 +101,7 @@ void IVEditorCore::addToolBars(QMainWindow *window)
 void IVEditorCore::addMenuFileActions(QMenu *menu, QMainWindow *window)
 {
     auto mainWindow = dynamic_cast<MainWindow *>(window);
-    m_actionSaveSceneRender = menu->addAction(tr("Render Scene..."), mainWindow, &MainWindow::onSaveRenderRequested);
+    m_actionSaveSceneRender = menu->addAction(tr("Render Scene..."), this, &IVEditorCore::onSaveRenderRequested);
     m_actionShowAsnDialog = menu->addAction(tr("ASN1 dialog..."), mainWindow, &MainWindow::openAsn1Dialog);
 
     ActionsManager::registerAction(
@@ -127,6 +130,18 @@ void IVEditorCore::addMenuHelpActions(QMenu *menu, QMainWindow *window)
     auto report = menu->addAction(tr("Send report..."), mainWindow, &MainWindow::onReportRequested);
 
     ActionsManager::registerAction(Q_FUNC_INFO, report, "Report", "Send the debug information");
+}
+
+void IVEditorCore::registerBasicActions()
+{
+    aadlinterface::ActionsManager::registerAction(Q_FUNC_INFO, actionUndo(), "Undo", "Undo the last operation");
+    aadlinterface::ActionsManager::registerAction(Q_FUNC_INFO, actionRedo(), "Redo", "Redo the last undone operation");
+    aadlinterface::ActionsManager::registerAction(
+            Q_FUNC_INFO, actionImport(), "Import", "Import all available AADL files");
+    aadlinterface::ActionsManager::registerAction(
+            Q_FUNC_INFO, actionExportFunctions(), "Export Functions", "Export selected objects");
+    aadlinterface::ActionsManager::registerAction(
+            Q_FUNC_INFO, actionExportType(), "Export Type", "Export selected component type");
 }
 
 void IVEditorCore::populateCommandLineArguments(shared::CommandLineParser *parser) const
@@ -333,6 +348,53 @@ QStringList IVEditorCore::aadlConnectionNames() const
     }
     connectionNames.removeDuplicates();
     return connectionNames;
+}
+
+/*!
+ * \brief Return the list of image formats which the Qt is available to write.
+ */
+static QStringList supportedImgFileExtensions()
+{
+    QStringList extensions;
+    const QList<QByteArray> &formats = QImageWriter::supportedImageFormats();
+    for (const QByteArray &format : formats)
+        extensions << ("*." + format.toLower());
+    return extensions;
+}
+
+/*!
+ * \brief Handler for render scene request.
+ */
+void IVEditorCore::onSaveRenderRequested()
+{
+    const QString defaultFileName = QString("%1.png").arg(QDateTime::currentDateTime().toString("dd-MM-yyyy_HH-mm-ss"));
+    const QStringList &extensions = supportedImgFileExtensions();
+    QString fileName =
+            QFileDialog::getSaveFileName(nullptr, tr("Save screenshot..."), defaultFileName, extensions.join(";; "));
+
+    if (!fileName.isEmpty()) {
+        QFileInfo selectedFile(fileName);
+        const QString usedExtension = "*." + selectedFile.suffix().toLower();
+        if (!extensions.contains(usedExtension))
+            fileName.append(".png");
+
+        saveSceneRender(fileName);
+    }
+}
+
+void IVEditorCore::saveSceneRender(const QString &filePath) const
+{
+    if (filePath.isEmpty())
+        return;
+
+    if (QGraphicsScene *scene = document()->scene()) {
+        QImage img(scene->sceneRect().size().toSize(), QImage::Format_ARGB32_Premultiplied);
+        img.fill(Qt::transparent);
+        QPainter p(&img);
+        scene->render(&p);
+        p.end();
+        img.save(filePath);
+    }
 }
 
 /*!

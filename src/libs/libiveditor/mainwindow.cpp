@@ -35,12 +35,10 @@
 #include "zoomcontroller.h"
 
 #include <QCloseEvent>
-#include <QDateTime>
 #include <QDebug>
 #include <QFileDialog>
 #include <QFileInfo>
 #include <QGraphicsView>
-#include <QImageWriter>
 #include <QMessageBox>
 #include <QStatusBar>
 #include <QTabWidget>
@@ -48,6 +46,7 @@
 #include <QUndoCommand>
 #include <QUndoGroup>
 #include <QWindow>
+#include <iostream>
 
 namespace aadlinterface {
 
@@ -85,14 +84,8 @@ MainWindow::MainWindow(aadlinterface::IVEditorCore *core, QWidget *parent)
     // Register the actions to the action manager
     ActionsManager::registerAction(Q_FUNC_INFO, m_core->actionNewFile(), "Create file", "Create new empty file");
     ActionsManager::registerAction(Q_FUNC_INFO, m_core->actionOpenFile(), "Open file", "Show Open File dialog");
-    ActionsManager::registerAction(Q_FUNC_INFO, m_core->actionQuit(), "Quit", "Quite the application");
-    ActionsManager::registerAction(Q_FUNC_INFO, m_core->actionUndo(), "Undo", "Undo the last operation");
-    ActionsManager::registerAction(Q_FUNC_INFO, m_core->actionRedo(), "Redo", "Redo the last undone operation");
-    ActionsManager::registerAction(Q_FUNC_INFO, m_core->actionImport(), "Import", "Import all available AADL files");
-    ActionsManager::registerAction(
-            Q_FUNC_INFO, m_core->actionExportFunctions(), "Export Functions", "Export selected objects");
-    ActionsManager::registerAction(
-            Q_FUNC_INFO, m_core->actionExportType(), "Export Type", "Export selected component type");
+    ActionsManager::registerAction(Q_FUNC_INFO, m_core->actionQuit(), "Quit", "Quit the application");
+    m_core->registerBasicActions();
 
     connect(m_core->document(), &InterfaceDocument::dirtyChanged, this, &MainWindow::onDocDirtyChanged);
 
@@ -157,6 +150,7 @@ void MainWindow::onOpenFileRequested()
     if (!fileName.isEmpty() && closeFile()) {
         m_core->document()->load(fileName);
     }
+    updateActions();
 }
 
 /*!
@@ -166,38 +160,6 @@ void MainWindow::onCreateFileRequested()
 {
     if (closeFile()) {
         m_core->document()->create();
-    }
-}
-
-/*!
- * \brief Return the list of image formats which the Qt is available to write.
- */
-static QStringList supportedImgFileExtensions()
-{
-    QStringList extensions;
-    const QList<QByteArray> &formats = QImageWriter::supportedImageFormats();
-    for (const QByteArray &format : formats)
-        extensions << ("*." + format.toLower());
-    return extensions;
-}
-
-/*!
- * \brief Handler for render scene request.
- */
-void MainWindow::onSaveRenderRequested()
-{
-    const QString defaultFileName = QString("%1.png").arg(QDateTime::currentDateTime().toString("dd-MM-yyyy_HH-mm-ss"));
-    const QStringList &extensions = supportedImgFileExtensions();
-    QString fileName =
-            QFileDialog::getSaveFileName(this, tr("Save screenshot..."), defaultFileName, extensions.join(";; "));
-
-    if (!fileName.isEmpty()) {
-        QFileInfo selectedFile(fileName);
-        const QString usedExtension = "*." + selectedFile.suffix().toLower();
-        if (!extensions.contains(usedExtension))
-            fileName.append(".png");
-
-        saveSceneRender(fileName);
     }
 }
 
@@ -316,7 +278,8 @@ bool MainWindow::processCommandLineArg(shared::CommandLineParser::Positional arg
             return exportXml(value);
         return false;
     case shared::CommandLineParser::Positional::ListScriptableActions: {
-        ActionsManager::listRegisteredActions();
+        QString list = ActionsManager::listRegisteredActions();
+        std::cout << list.toStdString() << std::endl;
         QMetaObject::invokeMethod(qApp, "quit", Qt::QueuedConnection);
         return true;
     }
@@ -325,23 +288,6 @@ bool MainWindow::processCommandLineArg(shared::CommandLineParser::Positional arg
     }
     qWarning() << Q_FUNC_INFO << "Unhandled option:" << arg << value;
     return false;
-}
-
-/*!
- * \brief Renders the whole scene and saves it to the \a filePath
- */
-void MainWindow::saveSceneRender(const QString &filePath) const
-{
-    if (filePath.isEmpty())
-        return;
-
-    if (QGraphicsScene *scene = m_core->document()->scene()) {
-        QImage img(scene->sceneRect().size().toSize(), QImage::Format_ARGB32_Premultiplied);
-        img.fill(Qt::transparent);
-        QPainter p(&img);
-        scene->render(&p);
-        img.save(filePath);
-    }
 }
 
 /*!

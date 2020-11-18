@@ -25,8 +25,8 @@
             }
         ],
         "action": "",
-        "app": "IVEditor",
-        "appArgs": [ "-l" ],
+        "app": "",
+        "appArgs": [],
         "appCwd": "",
         "title": "List scriptable actions"
     }

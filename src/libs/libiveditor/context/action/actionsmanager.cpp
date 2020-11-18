@@ -29,6 +29,7 @@
 #include <QDir>
 #include <QFile>
 #include <QFileInfo>
+#include <QFontDatabase>
 #include <QJsonArray>
 #include <QJsonDocument>
 #include <QJsonObject>
@@ -38,8 +39,6 @@
 #include <QObject>
 #include <QProcess>
 #include <QStandardPaths>
-#include <iomanip>
-#include <iostream>
 
 struct ExternalArgHolder {
     enum Type
@@ -108,6 +107,9 @@ void ActionsManager::populateMenu(QMenu *menu, aadl::AADLObject *currObj)
         act->setEnabled(enabled);
         if (enabled) {
             QObject::connect(act, &QAction::triggered, [actHandler, act]() {
+                if (triggerActionHidden(actHandler)) {
+                    return;
+                }
                 if (!actHandler.m_internalActName.isEmpty())
                     triggerActionInternal(actHandler);
                 else if (!actHandler.m_externalApp.isEmpty()) {
@@ -239,18 +241,22 @@ bool ActionsManager::registerScriptableAction(QAction *action, const QString &ke
     return true;
 }
 
-void ActionsManager::listRegisteredActions()
+QString ActionsManager::listRegisteredActions()
 {
+    QString result = QObject::tr("Available actions:");
+
     const QMap<QString, ActionsManager::ScriptableActionHandler> &actions = ActionsManager::scriptableActions();
     const QStringList &names = actions.keys();
     const int titleLength = std::max_element(names.cbegin(), names.cend(), [](const QString &lhs, const QString &rhs) {
         return lhs.length() < rhs.length();
     })->length();
 
-    std::cout << qPrintable(QObject::tr("Available actions:")) << std::endl;
-    for (const ActionsManager::ScriptableActionHandler &h : actions)
-        std::cout << std::left << std::setw(titleLength) << qPrintable(h.m_title) << "\t- "
-                  << qPrintable(h.m_description) << std::endl;
+    for (const ActionsManager::ScriptableActionHandler &h : actions) {
+        QString padding;
+        padding.fill(' ', titleLength - h.m_title.length());
+        result += QString("\n%1%2 - %3").arg(h.m_title, padding, h.m_description);
+    }
+    return result;
 }
 
 QMap<QString, ActionsManager::ScriptableActionHandler> ActionsManager::scriptableActions()
@@ -366,6 +372,21 @@ void ActionsManager::triggerActionExternal(const Action &act, const aadl::AADLOb
 
         mon->start(act.m_externalApp, params, cwd);
     }
+}
+
+bool ActionsManager::triggerActionHidden(const Action &act)
+{
+    if (act.m_title == "List scriptable actions") {
+        //        QMessageBox::information(nullptr, QObject::tr("Scriptable Actions"), listRegisteredActions());
+        QMessageBox *msg = new QMessageBox(QMessageBox::Information, QObject::tr("Scriptable Actions"),
+                listRegisteredActions(), QMessageBox::Ok, nullptr);
+        const QFont fixedFont = QFontDatabase::systemFont(QFontDatabase::FixedFont);
+        msg->setFont(fixedFont);
+        msg->setAttribute(Qt::WA_DeleteOnClose);
+        msg->exec();
+        return true;
+    }
+    return false;
 }
 
 QStringList ActionsManager::externalArgsHoldersDescr()

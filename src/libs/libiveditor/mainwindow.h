@@ -52,12 +52,10 @@ protected:
     void initSettings();
 
     void updateActions();
-    void saveSceneRender(const QString &filePath) const;
 
 public Q_SLOTS:
     void onOpenFileRequested();
     void onCreateFileRequested();
-    void onSaveRenderRequested();
     void onImportRequested();
     void onExportFunctionsRequested();
     void onExportTypeRequested();

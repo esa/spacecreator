@@ -22,6 +22,7 @@
 #include "aadlmodelstorage.h"
 #include "aadlsystemchecks.h"
 #include "asn1library.h"
+#include "context/action/actionsmanager.h"
 #include "iveditor.h"
 #include "iveditorcore.h"
 #include "mainmodel.h"
@@ -156,14 +157,23 @@ bool SpaceCreatorPlugin::initialize(const QStringList &arguments, QString *error
     // AADL
     m_asn1DialogAction = new QAction(tr("Show ASN1 dialog ..."), this);
     Core::Command *showAsn1Cmd = Core::ActionManager::registerAction(m_asn1DialogAction, Constants::AADL_SHOW_ASN1_ID);
+    aadlinterface::ActionsManager::registerAction(Q_FUNC_INFO, m_asn1DialogAction, "Asn1", "Edit the ASN1 file");
     connect(m_asn1DialogAction, &QAction::triggered, this, &SpaceCreatorPlugin::showAsn1Dialog);
-
     m_asn1DialogAction->setEnabled(false);
+
+    m_actionSaveSceneRender = new QAction(tr("Render Scene..."), this);
+    Core::Command *renderCmd = Core::ActionManager::registerAction(m_actionSaveSceneRender, Constants::AADL_RENDER_ID);
+    aadlinterface::ActionsManager::registerAction(
+            Q_FUNC_INFO, m_actionSaveSceneRender, "Render", "Save current scene complete render.");
+    connect(m_actionSaveSceneRender, &QAction::triggered, this,
+            [this]() { m_checks->ivCore()->onSaveRenderRequested(); });
+
     connect(editorManager, &Core::EditorManager::currentEditorChanged, this, [&](Core::IEditor *editor) {
         if (editor && editor->document()) {
             const bool isAadl =
                     editor->document()->filePath().toString().endsWith("interfaceview.xml", Qt::CaseInsensitive);
             m_asn1DialogAction->setEnabled(isAadl);
+            m_actionSaveSceneRender->setEnabled(isAadl);
         }
     });
 
@@ -184,6 +194,7 @@ bool SpaceCreatorPlugin::initialize(const QStringList &arguments, QString *error
 
     menu->addSeparator();
     menu->addAction(showAsn1Cmd);
+    menu->addAction(renderCmd);
     menu->addAction(showCommonPropsCmd);
     menu->addAction(showColorSchemeCmd);
     menu->addAction(showDynContextCmd);

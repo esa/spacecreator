@@ -75,6 +75,7 @@ private:
     AadlEditorFactory *m_aadlFactory = nullptr;
     QAction *m_messageDeclarationAction = nullptr;
     QAction *m_asn1DialogAction = nullptr;
+    QAction *m_actionSaveSceneRender = nullptr;
     AadlModelStorage *m_aadlStorage = nullptr;
     MscModelStorage *m_mscStorage = nullptr;
     QStringList m_asnFiles;

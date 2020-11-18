@@ -36,7 +36,7 @@ class ActionsManager
 public:
     static void populateMenu(QMenu *menu, aadl::AADLObject *currObj);
     static bool registerScriptableAction(QAction *action, const QString &key, const QString &description);
-    static void listRegisteredActions();
+    static QString listRegisteredActions();
     static ActionsManager *instance();
     static QVector<Action> parseFile(const QString &filePath, QString *errorHandler = nullptr);
     static QStringList listUserFiles();
@@ -66,6 +66,7 @@ private:
 
     static void triggerActionInternal(const Action &act);
     static void triggerActionExternal(const Action &act, const aadl::AADLObject *aadlObj);
+    static bool triggerActionHidden(const Action &act);
 
     static QMap<QString, ActionsManager::ScriptableActionHandler> scriptableActions();
 

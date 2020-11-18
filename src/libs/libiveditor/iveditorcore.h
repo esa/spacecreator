@@ -36,6 +36,7 @@ class InterfaceDocument;
 
 class IVEditorCore : public shared::EditorCore
 {
+    Q_OBJECT
 public:
     explicit IVEditorCore(QObject *parent = 0);
     ~IVEditorCore();
@@ -50,6 +51,8 @@ public:
     void addMenuEditActions(QMenu *menu, QMainWindow *window) override;
     void addMenuViewActions(QMenu *menu, QMainWindow *window) override;
     void addMenuHelpActions(QMenu *menu, QMainWindow *window) override;
+
+    void registerBasicActions();
 
     QToolBar *docToolBar() { return m_docToolBar; }
 
@@ -79,7 +82,11 @@ public:
     QStringList aadlFunctionsNames() const;
     QStringList aadlConnectionNames() const;
 
+public Q_SLOTS:
+    void onSaveRenderRequested();
+
 private:
+    void saveSceneRender(const QString &filePath) const;
     aadl::AADLObjectIface *getInterface(
             const QString &ifName, aadl::AADLObjectIface::IfaceType ifType, aadl::AADLObjectFunction *parentFunction);
     Q_SLOT void updateAadlItems();
