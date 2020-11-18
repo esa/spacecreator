@@ -741,6 +741,7 @@ void MSCEditorCore::openMessageDeclarationEditor(QWidget *parentwidget)
 
     MessageDeclarationsDialog dialog(
             docs.at(0)->messageDeclarations(), model, commandsStack(), m_aadlChecks.get(), parentwidget);
+    dialog.setFileName(model->dataDefinitionString());
     dialog.setAadlConnectionNames(m_aadlChecks->connectionNames());
     int result = dialog.exec();
     if (result == QDialog::Accepted) {
