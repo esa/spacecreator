@@ -47,6 +47,8 @@ public:
 
     QString prepareTooltip() const override;
 
+    bool isRootItem() const;
+
 protected Q_SLOTS:
     void applyColorScheme() override;
     void updateNameFromUi(const QString &name);

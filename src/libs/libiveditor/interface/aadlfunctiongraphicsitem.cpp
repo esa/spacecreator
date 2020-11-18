@@ -80,11 +80,6 @@ QPainterPath AADLFunctionGraphicsItem::shape() const
     return pp;
 }
 
-bool AADLFunctionGraphicsItem::isRootItem() const
-{
-    return !parentItem() && entity() && entity()->isRootObject();
-}
-
 void AADLFunctionGraphicsItem::rebuildLayout()
 {
     //    qDebug() << Q_FUNC_INFO << entity()->title();

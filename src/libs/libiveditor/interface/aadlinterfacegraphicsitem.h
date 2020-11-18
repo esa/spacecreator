@@ -32,6 +32,7 @@ class AADLObjectIface;
 namespace aadlinterface {
 class AADLConnectionGraphicsItem;
 class AADLFunctionGraphicsItem;
+class AADLFunctionTypeGraphicsItem;
 
 class AADLInterfaceGraphicsItem : public InteractiveObject
 {
@@ -51,7 +52,7 @@ public:
     void removeConnection(AADLConnectionGraphicsItem *item);
     QList<QPointer<AADLConnectionGraphicsItem>> connectionItems() const;
 
-    AADLFunctionGraphicsItem *targetItem() const;
+    aadlinterface::AADLFunctionTypeGraphicsItem *targetItem() const;
     void setTargetItem(QGraphicsItem *item, const QPointF &globalPos);
 
     void setInterfaceName(const QString &name);

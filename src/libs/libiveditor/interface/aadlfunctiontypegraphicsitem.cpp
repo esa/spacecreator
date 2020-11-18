@@ -172,6 +172,11 @@ QString AADLFunctionTypeGraphicsItem::prepareTooltip() const
     return joinNonEmpty({ title, instances, ris, pis }, QStringLiteral("<br>"));
 }
 
+bool AADLFunctionTypeGraphicsItem::isRootItem() const
+{
+    return !parentItem() && entity() && entity()->isRootObject();
+}
+
 void AADLFunctionTypeGraphicsItem::prepareTextRect(QRectF &textRect, const QRectF &targetTextRect) const
 {
     textRect.moveTopLeft(targetTextRect.topLeft());

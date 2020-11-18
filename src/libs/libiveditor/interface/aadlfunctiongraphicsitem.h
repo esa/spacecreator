@@ -46,8 +46,6 @@ public:
 
     QPainterPath shape() const override;
 
-    bool isRootItem() const;
-
     QString prepareTooltip() const override;
 
 protected:

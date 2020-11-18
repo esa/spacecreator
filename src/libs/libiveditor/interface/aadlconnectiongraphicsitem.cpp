@@ -257,12 +257,12 @@ AADLInterfaceGraphicsItem *AADLConnectionGraphicsItem::startItem() const
 
 AADLFunctionGraphicsItem *AADLConnectionGraphicsItem::sourceItem() const
 {
-    return m_startItem ? m_startItem->targetItem() : nullptr;
+    return m_startItem ? qgraphicsitem_cast<AADLFunctionGraphicsItem *>(m_startItem->targetItem()) : nullptr;
 }
 
 AADLFunctionGraphicsItem *AADLConnectionGraphicsItem::targetItem() const
 {
-    return m_endItem ? m_endItem->targetItem() : nullptr;
+    return m_endItem ? qgraphicsitem_cast<AADLFunctionGraphicsItem *>(m_endItem->targetItem()) : nullptr;
 }
 
 QList<QVariantList> AADLConnectionGraphicsItem::prepareChangeCoordinatesCommandParams() const

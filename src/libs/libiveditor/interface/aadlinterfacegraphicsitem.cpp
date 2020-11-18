@@ -20,6 +20,7 @@
 
 #include "aadlconnectiongraphicsitem.h"
 #include "aadlfunctiongraphicsitem.h"
+#include "aadlfunctiontypegraphicsitem.h"
 #include "aadlnamevalidator.h"
 #include "aadlobjectconnection.h"
 #include "aadlobjectfunction.h"
@@ -39,7 +40,7 @@ static const qreal kBase = 15;
 static const qreal kHeight = kBase * 4 / 5;
 static const QColor kSelectedBackgroundColor = QColor(Qt::magenta);
 static const QColor kDefaultBackgroundColor = QColor(Qt::blue);
-static const qreal kInterfaceTitleMaxLength = 80;
+static const int kInterfaceTitleMaxLength = 80;
 
 namespace aadlinterface {
 
@@ -96,9 +97,9 @@ QList<QPointer<AADLConnectionGraphicsItem>> AADLInterfaceGraphicsItem::connectio
     return m_connections;
 }
 
-AADLFunctionGraphicsItem *AADLInterfaceGraphicsItem::targetItem() const
+AADLFunctionTypeGraphicsItem *AADLInterfaceGraphicsItem::targetItem() const
 {
-    return qgraphicsitem_cast<AADLFunctionGraphicsItem *>(parentItem());
+    return parentItem() ? qobject_cast<AADLFunctionTypeGraphicsItem *>(parentItem()->toGraphicsObject()) : nullptr;
 }
 
 void AADLInterfaceGraphicsItem::setTargetItem(QGraphicsItem *item, const QPointF &scenePos)
@@ -481,7 +482,6 @@ void AADLInterfaceGraphicsItem::onAttrOrPropChanged(aadl::meta::Props::Token t)
 
 QTransform AADLInterfaceGraphicsItem::typeTransform(Qt::Alignment alignment) const
 {
-    const bool insideOut = entity()->direction() == aadl::AADLObjectIface::IfaceType::Required;
     const qreal offset = kBase + 2;
 
     QPointF shift(0., 0.);
