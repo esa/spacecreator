@@ -230,7 +230,7 @@ QSharedPointer<aadlinterface::IVEditorCore> MscSystemChecks::ivCore() const
 {
     QStringList aadlFiles = allAadlFiles();
     if (aadlFiles.empty()) {
-        qWarning() << "No AADL file in the projec";
+        qWarning() << "No AADL file in the project";
         return {};
     }
 
