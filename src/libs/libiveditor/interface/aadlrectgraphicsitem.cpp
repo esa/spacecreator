@@ -347,6 +347,9 @@ static inline QRectF collidingItemsBoundingRect(QGraphicsItem *item, const QRect
 
     QRectF br;
     for (auto collidingItem : collidingItems) {
+        if (item == collidingItem || item->type() < QGraphicsItem::UserType)
+            continue;
+
         if (auto rectItem = qobject_cast<AADLRectGraphicsItem *>(collidingItem->toGraphicsObject())) {
             if (rectItem->parentItem() == item->parentItem() && rectItem != item) {
                 br |= rectItem->sceneBoundingRect();
@@ -384,7 +387,7 @@ void AADLRectGraphicsItem::layout()
 {
     const QRectF currentSceneRect = sceneBoundingRect();
     if (currentSceneRect.isValid()) {
-        const QRectF collidingRect = collidingItemsBoundingRect(this, currentSceneRect);
+        const QRectF collidingRect = collidingItemsBoundingRect(this, currentSceneRect.marginsAdded(kContentMargins));
         if (!collidingRect.isValid())
             return;
     }
