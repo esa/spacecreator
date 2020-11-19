@@ -81,6 +81,7 @@ static const struct {
 
     const qreal Connection = 0.;
     const qreal Function = 1.;
+    const qreal InternalConnection = 1.5;
     const qreal Interface = 2.;
     const qreal Comment = 3.;
     const qreal GripPoint = Selected;

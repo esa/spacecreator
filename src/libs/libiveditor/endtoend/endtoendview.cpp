@@ -20,6 +20,7 @@
 #include "aadlobjectconnection.h"
 #include "aadlobjectfunction.h"
 #include "aadlobjectsmodel.h"
+#include "baseitems/common/aadlutils.h"
 #include "endtoendconnections.h"
 #include "interface/aadlconnectiongraphicsitem.h"
 #include "interface/aadlfunctiongraphicsitem.h"
@@ -268,6 +269,7 @@ void EndToEndView::refreshView()
             path.moveTo(ic.pi->scenePos());
             path.lineTo(ic.ri->scenePos());
             item->setPath(path);
+            item->setZValue(ZOrder.InternalConnection);
             d->scene->addItem(item);
         }
     }
