@@ -398,12 +398,21 @@ void AADLConnectionGraphicsItem::onManualMoveFinish(
     }
     m_points[idx] = intersectionPoint;
 
+    auto updateIfaceItem = [this](AADLInterfaceGraphicsItem *ifaceItem) {
+        if (ifaceItem) {
+            ifaceItem->instantLayoutUpdate();
+            for (auto connectionItem : ifaceItem->connectionItems()) {
+                if (!connectionItem.isNull() && connectionItem->isVisible()) {
+                    connectionItem->updateLastChunk(ifaceItem);
+                }
+            }
+        }
+    };
+
     if (idx == 0) {
-        m_startItem->instantLayoutUpdate();
-        updateLastChunk(m_startItem);
+        updateIfaceItem(m_startItem);
     } else if (idx == grips.size() - 1) {
-        m_endItem->instantLayoutUpdate();
-        updateLastChunk(m_endItem);
+        updateIfaceItem(m_endItem);
     }
 
     for (auto item : scene()->items(m_points)) {

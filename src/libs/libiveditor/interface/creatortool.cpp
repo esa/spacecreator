@@ -909,8 +909,11 @@ void CreatorTool::CreatorToolPrivate::handleConnection(const QVector<QPointF> &g
             qgraphicsitem_cast<aadlinterface::AADLFunctionGraphicsItem *>(info.functionAtStartPos);
     QPointF firstExcludedPoint = *std::next(info.connectionPoints.constBegin());
     shared::Id prevStartIfaceId = info.startIfaceId;
-    /// TODO: check creating connection from nested function as a start function
     while (auto item = qgraphicsitem_cast<aadlinterface::AADLFunctionGraphicsItem *>(prevStartItem->parentItem())) {
+        if (item == info.functionAtEndPos && info.endIface) {
+            parentForConnection = item;
+            break;
+        }
         const QVector<QPointF> intersectionPoints =
                 shared::graphicsviewutils::intersectionPoints(item->sceneBoundingRect(), info.connectionPoints);
         if (intersectionPoints.isEmpty() || intersectionPoints.size() % 2 == 0) {
@@ -954,8 +957,12 @@ void CreatorTool::CreatorToolPrivate::handleConnection(const QVector<QPointF> &g
     QPointF lastExcludedPoint = *std::next(info.connectionPoints.crbegin());
     auto prevEndItem = qgraphicsitem_cast<aadlinterface::AADLFunctionGraphicsItem *>(info.functionAtEndPos);
     shared::Id prevEndIfaceId = info.endIfaceId;
-    /// TODO: check creating connection from parent item as a start function
     while (auto item = qgraphicsitem_cast<aadlinterface::AADLFunctionGraphicsItem *>(prevEndItem->parentItem())) {
+        if (item == info.functionAtStartPos && info.startIface) {
+            Q_ASSERT(parentForConnection == item || parentForConnection == nullptr);
+            parentForConnection = item;
+            break;
+        }
         auto intersectionPoints =
                 shared::graphicsviewutils::intersectionPoints(item->sceneBoundingRect(), info.connectionPoints);
         if (intersectionPoints.isEmpty() || intersectionPoints.size() % 2 == 0) {

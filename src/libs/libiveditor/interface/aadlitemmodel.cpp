@@ -59,6 +59,7 @@ static inline void dumpItem(QObject *obj, bool strict = false)
         qDebug() << "\nInternal Iface data:\n"
                  << iface->entity()->title() << "\n"
                  << aadlinterface::pos(iface->entity()->coordinates()) << "\n";
+        qDebug() << "\n####:\n" << iface->connectionItems();
         Q_ASSERT(!strict || iface->scenePos().toPoint() == aadlinterface::pos(iface->entity()->coordinates()));
     } else if (auto connection = qobject_cast<aadlinterface::AADLConnectionGraphicsItem *>(item)) {
         qDebug() << "\nGraphics Connection geometry:\n"
