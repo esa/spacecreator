@@ -241,6 +241,7 @@ void EndToEndView::refreshView()
             break;
         case aadl::AADLObject::Type::Function:
             item = new AADLFunctionGraphicsItem(qobject_cast<aadl::AADLObjectFunction *>(obj), parentItem);
+            item->init();
             break;
         default:
             break;
