@@ -675,6 +675,7 @@ QSet<QString> AADLObjectsModel::nestedFunctionNames(const AADLObjectFunctionType
             }
         }
     } else {
+        names.insert(fnt->title());
         for (const auto obj : nestedFunctions(fnt)) {
             names.insert(obj->title());
         }

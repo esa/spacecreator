@@ -26,6 +26,7 @@
 #include "aadlobject.h"
 #include "aadlobjectconnection.h"
 #include "aadlobjectfunction.h"
+#include "aadlobjectsmodel.h"
 #include "baseitems/common/aadlutils.h"
 #include "baseitems/textgraphicsitem.h"
 #include "colors/colormanager.h"
@@ -154,8 +155,12 @@ void AADLFunctionTypeGraphicsItem::updateNameFromUi(const QString &name)
         m_textItem->setPlainText(entity()->titleUI());
         return;
     }
-
     const QString newName = aadl::AADLNameValidator::encodeName(aadlObject()->aadlType(), name);
+    if (entity()->objectsModel()->nestedFunctionNames().contains(newName)) {
+        m_textItem->setPlainText(entity()->titleUI());
+        return;
+    }
+
     const QVariantMap attributess = { { aadl::meta::Props::token(aadl::meta::Props::Token::name), newName } };
     if (const auto attributesCmd = cmd::CommandsFactory::create(
                 cmd::ChangeEntityAttributes, { QVariant::fromValue(entity()), QVariant::fromValue(attributess) })) {
