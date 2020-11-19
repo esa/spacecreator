@@ -180,6 +180,7 @@ void EndToEndView::refreshView()
                 if (auto ri = qobject_cast<aadl::AADLObjectIfaceRequired *>(obj)) {
                     // Add the RI
                     auto graphicsItem = new AADLInterfaceGraphicsItem(ri, parentItem);
+                    graphicsItem->init();
                     item = graphicsItem;
 
                     if (auto function = ri->function()) {
@@ -204,6 +205,7 @@ void EndToEndView::refreshView()
                 if (auto pi = qobject_cast<aadl::AADLObjectIfaceProvided *>(obj)) {
                     // Add the PI
                     auto graphicsItem = new AADLInterfaceGraphicsItem(pi, parentItem);
+                    graphicsItem->init();
                     item = graphicsItem;
 
                     if (auto function = pi->function()) {
