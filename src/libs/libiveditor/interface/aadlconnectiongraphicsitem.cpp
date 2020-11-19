@@ -214,15 +214,6 @@ void AADLConnectionGraphicsItem::layout()
     updateBoundingRect();
 }
 
-//! This updates the connection to be part of the path in the E2E view
-void AADLConnectionGraphicsItem::setEndToEndDataFlowConnection()
-{
-    QPen p = pen();
-    p.setWidth(5);
-    setPen(p);
-    m_item->setPen(p);
-}
-
 void AADLConnectionGraphicsItem::onSelectionChanged(bool isSelected)
 {
     const ColorHandler h = colorHandler();

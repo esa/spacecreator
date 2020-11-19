@@ -26,6 +26,7 @@
 #include <QJsonArray>
 #include <QJsonDocument>
 #include <QJsonObject>
+#include <QMetaEnum>
 #include <QStandardPaths>
 
 namespace aadlinterface {
@@ -147,6 +148,7 @@ ColorManager::ColorManager(QObject *parent)
               { HandledColors::FunctionType, ColorHandler() },
               { HandledColors::Iface, ColorHandler() },
               { HandledColors::Connection, ColorHandler() },
+              { HandledColors::ConnectionFlow, ColorHandler() },
               { HandledColors::Comment, ColorHandler() },
               { HandledColors::ConnectionGroup, ColorHandler() },
               { HandledColors::IfaceGroup, ColorHandler() },
@@ -196,6 +198,8 @@ QString ColorManager::handledColorTypeName(HandledColors t)
         return tr("Interface");
     case Connection:
         return tr("Connection");
+    case ConnectionFlow:
+        return tr("Connection Flow");
     case ConnectionGroup:
         return tr("Connection Group");
     case IfaceGroup:
@@ -241,6 +245,10 @@ bool ColorManager::setSourceFile(const QString &from)
         }
     } else {
         qWarning() << "File open failed:" << from << jsonFile.errorString();
+    }
+
+    if (m_colors.size() != QMetaEnum::fromType<aadlinterface::ColorManager::HandledColors>().keyCount() - 1) {
+        return false;
     }
 
     if (loaded) {

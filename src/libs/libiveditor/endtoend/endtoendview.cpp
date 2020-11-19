@@ -23,6 +23,7 @@
 #include "baseitems/common/aadlutils.h"
 #include "endtoendconnections.h"
 #include "interface/aadlconnectiongraphicsitem.h"
+#include "interface/aadlflowconnectiongraphicsitem.h"
 #include "interface/aadlfunctiongraphicsitem.h"
 #include "interface/aadlinterfacegraphicsitem.h"
 #include "interface/interfacedocument.h"
@@ -166,9 +167,6 @@ void EndToEndView::refreshView()
         internalConnections << InternalConnection { c };
     };
 
-    // This is used to draw our extra connections
-    QPen connectionPen;
-
     // Add new graphics items for each object
     QHash<shared::Id, QGraphicsItem *> items;
     for (auto obj : objects) {
@@ -206,7 +204,6 @@ void EndToEndView::refreshView()
                 if (auto pi = qobject_cast<aadl::AADLObjectIfaceProvided *>(obj)) {
                     // Add the PI
                     auto graphicsItem = new AADLInterfaceGraphicsItem(pi, parentItem);
-                    graphicsItem->init();
                     item = graphicsItem;
 
                     if (auto function = pi->function()) {
@@ -233,24 +230,22 @@ void EndToEndView::refreshView()
                 auto endItem = qgraphicsitem_cast<AADLInterfaceGraphicsItem *>(
                         ifaceEnd ? items.value(ifaceEnd->id()) : nullptr);
 
-                auto i = new AADLConnectionGraphicsItem(connection, startItem, endItem, parentItem);
-                item = i;
                 if (EndToEndConnections::isInDataflow(dataflow, connection)) {
-                    i->setEndToEndDataFlowConnection();
+                    item = new AADLFlowConnectionGraphicsItem(connection, startItem, endItem, parentItem);
+                } else {
+                    item = new AADLConnectionGraphicsItem(connection, startItem, endItem, parentItem);
                 }
-
-                connectionPen = item->pen();
             }
             break;
         case aadl::AADLObject::Type::Function:
             item = new AADLFunctionGraphicsItem(qobject_cast<aadl::AADLObjectFunction *>(obj), parentItem);
-            item->init();
             break;
         default:
             break;
         }
 
         if (item != nullptr) {
+            item->init();
             items.insert(obj->id(), item);
             if (item->parentItem() == nullptr) {
                 // Only items without a parent should be added to the scene or we get a warning
@@ -260,11 +255,11 @@ void EndToEndView::refreshView()
         }
     }
 
-    connectionPen.setWidth(5);
+    const ColorHandler colorHandler = ColorManager::colorsForItem(ColorManager::HandledColors::ConnectionFlow);
     for (auto ic : internalConnections) {
         if (ic.pi != nullptr && ic.ri != nullptr) {
             auto item = new QGraphicsPathItem;
-            item->setPen(connectionPen);
+            item->setPen(colorHandler.pen());
             QPainterPath path;
             path.moveTo(ic.pi->scenePos());
             path.lineTo(ic.ri->scenePos());

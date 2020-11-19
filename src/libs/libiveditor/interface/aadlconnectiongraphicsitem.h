@@ -79,18 +79,16 @@ public:
 
     void layout();
 
-    void setEndToEndDataFlowConnection();
-
 protected:
     void onManualMoveStart(shared::ui::GripPoint *gp, const QPointF &at) override;
     void onManualMoveProgress(shared::ui::GripPoint *gp, const QPointF &from, const QPointF &to) override;
     void onManualMoveFinish(shared::ui::GripPoint *gp, const QPointF &pressedAt, const QPointF &releasedAt) override;
 
-    virtual ColorManager::HandledColors handledColorType() const override;
+    ColorManager::HandledColors handledColorType() const override;
     virtual void updateBoundingRect();
 
 protected Q_SLOTS:
-    virtual void applyColorScheme() override;
+    void applyColorScheme() override;
     void rebuildLayout() override;
     void onSelectionChanged(bool isSelected) override;
 

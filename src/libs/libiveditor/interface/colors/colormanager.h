@@ -87,7 +87,9 @@ public:
         Comment,
         ConnectionGroup,
         IfaceGroup,
+        ConnectionFlow,
     };
+    Q_ENUM(HandledColors)
 
     static QString handledColorTypeName(HandledColors t);
     static ColorManager *instance();

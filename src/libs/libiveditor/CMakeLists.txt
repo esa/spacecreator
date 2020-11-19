@@ -3,16 +3,29 @@ set(LIB_NAME libiveditor)
 add_library(${LIB_NAME} STATIC)
 
 target_sources(${LIB_NAME} PRIVATE
+    asn1dialog.cpp
+    asn1dialog.h
+    asn1dialog.ui
     baseitems/common/aadlutils.cpp
     baseitems/common/aadlutils.h
-    baseitems/common/positionlookuphelper.h
     baseitems/common/positionlookuphelper.cpp
+    baseitems/common/positionlookuphelper.h
     baseitems/graphicsview.cpp
     baseitems/graphicsview.h
     baseitems/interactiveobject.cpp
     baseitems/interactiveobject.h
     baseitems/textgraphicsitem.cpp
     baseitems/textgraphicsitem.h
+    commandsstack.cpp
+    commandsstack.h
+    context/action/action.cpp
+    context/action/action.h
+    context/action/actionsmanager.cpp
+    context/action/actionsmanager.h
+    context/action/attrhandler.cpp
+    context/action/attrhandler.h
+    context/action/condition.cpp
+    context/action/condition.h
     context/action/editor/actionsmodel.cpp
     context/action/editor/actionsmodel.h
     context/action/editor/attributesmodel.cpp
@@ -25,14 +38,6 @@ target_sources(${LIB_NAME} PRIVATE
     context/action/editor/dynactioneditor.cpp
     context/action/editor/dynactioneditor.h
     context/action/editor/dynactioneditor.ui
-    context/action/action.cpp
-    context/action/action.h
-    context/action/actionsmanager.cpp
-    context/action/actionsmanager.h
-    context/action/attrhandler.cpp
-    context/action/attrhandler.h
-    context/action/condition.cpp
-    context/action/condition.h
     context/action/extprocmonitor.cpp
     context/action/extprocmonitor.h
     endtoend/endtoendconnections.cpp
@@ -46,6 +51,12 @@ target_sources(${LIB_NAME} PRIVATE
     interface/aadlcommentgraphicsitem.h
     interface/aadlconnectiongraphicsitem.cpp
     interface/aadlconnectiongraphicsitem.h
+    interface/aadlconnectiongroupgraphicsitem.cpp
+    interface/aadlconnectiongroupgraphicsitem.h
+    interface/aadlconnectiongroupmodel.cpp
+    interface/aadlconnectiongroupmodel.h
+    interface/aadlflowconnectiongraphicsitem.cpp
+    interface/aadlflowconnectiongraphicsitem.h
     interface/aadlfunctiongraphicsitem.cpp
     interface/aadlfunctiongraphicsitem.h
     interface/aadlfunctionnamegraphicsitem.cpp
@@ -54,6 +65,12 @@ target_sources(${LIB_NAME} PRIVATE
     interface/aadlfunctiontypegraphicsitem.h
     interface/aadlinterfacegraphicsitem.cpp
     interface/aadlinterfacegraphicsitem.h
+    interface/aadlinterfacegroupgraphicsitem.cpp
+    interface/aadlinterfacegroupgraphicsitem.h
+    interface/aadlitemmodel.cpp
+    interface/aadlitemmodel.h
+    interface/aadlobjectstreeview.cpp
+    interface/aadlobjectstreeview.h
     interface/aadlrectgraphicsitem.cpp
     interface/aadlrectgraphicsitem.h
     interface/colors/colorhandlereditor.cpp
@@ -70,6 +87,10 @@ target_sources(${LIB_NAME} PRIVATE
     interface/commands/cmdchangeasn1file.h
     interface/commands/cmdcommentitemcreate.cpp
     interface/commands/cmdcommentitemcreate.h
+    interface/commands/cmdconnectiongroupitemchange.cpp
+    interface/commands/cmdconnectiongroupitemchange.h
+    interface/commands/cmdconnectiongroupitemcreate.cpp
+    interface/commands/cmdconnectiongroupitemcreate.h
     interface/commands/cmdconnectionitemcreate.cpp
     interface/commands/cmdconnectionitemcreate.h
     interface/commands/cmdcontextparameterchange.cpp
@@ -78,6 +99,10 @@ target_sources(${LIB_NAME} PRIVATE
     interface/commands/cmdcontextparametercreate.h
     interface/commands/cmdcontextparameterremove.cpp
     interface/commands/cmdcontextparameterremove.h
+    interface/commands/cmdentitiesimport.cpp
+    interface/commands/cmdentitiesimport.h
+    interface/commands/cmdentitiesinstantiate.cpp
+    interface/commands/cmdentitiesinstantiate.h
     interface/commands/cmdentityattributechange.cpp
     interface/commands/cmdentityattributechange.h
     interface/commands/cmdentityautolayout.cpp
@@ -119,6 +144,8 @@ target_sources(${LIB_NAME} PRIVATE
     interface/commands/commandids.h
     interface/commands/commandsfactory.cpp
     interface/commands/commandsfactory.h
+    interface/createconnectiongroupdialog.cpp
+    interface/createconnectiongroupdialog.h
     interface/creatortool.cpp
     interface/creatortool.h
     interface/graphicsitemhelpers.cpp
@@ -163,56 +190,31 @@ target_sources(${LIB_NAME} PRIVATE
     interface/properties/propertiesviewbase.cpp
     interface/properties/propertiesviewbase.h
     interface/properties/propertiesviewbase.ui
+    interface/tab_interface_resources.qrc
+    iveditor.cpp
+    iveditor.h
+    iveditorcore.cpp
+    iveditorcore.h
+    iveditorresources.qrc
+    mainwindow.cpp
+    mainwindow.h
+    mainwindow.ui
     settings/appoptions.cpp
     settings/appoptions.h
     templating/exportableaadlconnection.cpp
     templating/exportableaadlconnection.h
+    templating/exportableaadlconnectiongroup.cpp
+    templating/exportableaadlconnectiongroup.h
     templating/exportableaadlfunction.cpp
     templating/exportableaadlfunction.h
     templating/exportableaadliface.cpp
     templating/exportableaadliface.h
     templating/exportableaadlobject.cpp
     templating/exportableaadlobject.h
-    asn1dialog.cpp
-    asn1dialog.h
-    asn1dialog.ui
-    commandsstack.cpp
-    commandsstack.h
-    iveditor.cpp
-    iveditor.h
-    iveditorcore.cpp
-    iveditorcore.h
-    mainwindow.cpp
-    mainwindow.h
-    mainwindow.ui
     xmldocexporter.cpp
     xmldocexporter.h
     zoomcontroller.cpp
     zoomcontroller.h
-    iveditorresources.qrc
-    interface/tab_interface_resources.qrc
-    interface/aadlitemmodel.cpp
-    interface/aadlitemmodel.h
-    interface/createconnectiongroupdialog.cpp
-    interface/createconnectiongroupdialog.h
-    interface/aadlconnectiongroupgraphicsitem.cpp
-    interface/aadlconnectiongroupgraphicsitem.h
-    interface/aadlinterfacegroupgraphicsitem.cpp
-    interface/aadlinterfacegroupgraphicsitem.h
-    interface/commands/cmdconnectiongroupitemcreate.cpp
-    interface/commands/cmdconnectiongroupitemcreate.h
-    templating/exportableaadlconnectiongroup.cpp
-    templating/exportableaadlconnectiongroup.h
-    interface/aadlconnectiongroupmodel.cpp
-    interface/aadlconnectiongroupmodel.h
-    interface/commands/cmdconnectiongroupitemchange.cpp
-    interface/commands/cmdconnectiongroupitemchange.h
-    interface/aadlobjectstreeview.cpp
-    interface/aadlobjectstreeview.h
-    interface/commands/cmdentitiesimport.cpp
-    interface/commands/cmdentitiesimport.h
-    interface/commands/cmdentitiesinstantiate.cpp
-    interface/commands/cmdentitiesinstantiate.h
 )
 
 target_link_libraries(${LIB_NAME}
