@@ -148,7 +148,7 @@ AADLXMLReader::AADLXMLReader(QObject *parent)
 {
 }
 
-AADLXMLReader::~AADLXMLReader() { }
+AADLXMLReader::~AADLXMLReader() {}
 
 bool AADLXMLReader::readFile(const QString &file)
 {
@@ -263,6 +263,7 @@ AADLObjectConnection::EndPointInfo *addConnectionPart(const XmlAttributes &other
             isRI ? otherAttrs.value(attrRiName).m_value : otherAttrs.value(Props::token(Props::Token::pi_name)).m_value;
     info->m_ifaceDirection = isRI ? AADLObjectIface::IfaceType::Required : AADLObjectIface::IfaceType::Provided;
 
+    Q_ASSERT(info->isReady());
     return info;
 }
 

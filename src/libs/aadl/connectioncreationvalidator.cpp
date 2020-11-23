@@ -55,6 +55,8 @@ namespace aadl {
             Attempt to make a connection with a PI which kind is AADLObjectIface::OperationKind::Cyclic.
         \value SameParent
             The source and target AADLFunctionGraphicsItem is the same instance.
+        \value SameInterface
+            The source and target AADLInterfaceGraphicsItem is the same instance.
         \value NoScene
             Invalid pointer to the QGraphicsScene. The default initial value for ValidationResult::status.
         \value NoStartFunction
@@ -113,6 +115,10 @@ ConnectionCreationValidator::FailReason ConnectionCreationValidator::canConnect(
             targetFunction ? targetFunction : (targetIface ? targetIface->parentObject() : nullptr);
     if ((srcParent || dstParent) && srcParent == dstParent)
         return FailReason::SameParent;
+
+    // [7] - Source and Target is the same interface.
+    if (sourceIface == targetIface && sourceIface && targetIface)
+        return FailReason::SameInterface;
 
     // [6] - the RI is not connected to any other RIs
     const bool maybeRiRi = !sourceIface || !targetIface

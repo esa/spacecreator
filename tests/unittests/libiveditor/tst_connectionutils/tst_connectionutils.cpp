@@ -517,23 +517,42 @@ void tst_ConnectionUtils::checkEndPoints(aadlinterface::AADLFunctionGraphicsItem
     const Data start(startFn);
     const Data end(endFn);
 
-    QVector<QPointF> connectionPoints { start.point(startEp), end.point(endEp) };
-    auto result = aadlinterface::gi::validateConnectionCreate(&m_scene, connectionPoints);
-    QCOMPARE(result.isToOrFromNested,
-            (start.function()->isAncestorOf(end.function()) || end.function()->isAncestorOf(start.function())));
-    QCOMPARE(result.failed(), shouldFail);
-    if (!result.failed()) {
-        if (isReversed) {
-            QVERIFY(result.connectionPoints.first() == connectionPoints.last()
-                    && result.connectionPoints.last() == connectionPoints.first());
-        } else {
-            QCOMPARE(result.connectionPoints, connectionPoints);
-        }
+    static const QVector<QPointF> offsets { QPointF(0, 0), QPointF(-2, 0), QPointF(0, -2), QPointF(2, 0),
+        QPointF(0, 2) };
 
-        auto path = aadlinterface::createConnectionPath(&m_scene, result.connectionPoints.first(),
-                isReversed ? end.rect() : start.rect(), result.connectionPoints.last(),
-                isReversed ? start.rect() : end.rect());
-        QVERIFY(!path.isEmpty());
+    for (int startIdx = 0; startIdx < offsets.size(); ++startIdx) {
+        for (int endIdx = 0; endIdx < offsets.size(); ++endIdx) {
+            const QVector<QPointF> connectionPoints { start.point(startEp) + offsets[startIdx],
+                end.point(endEp) + offsets[endIdx] };
+
+            if (!shared::graphicsviewutils::intersects(startFn->sceneBoundingRect(), connectionPoints)
+                    || !shared::graphicsviewutils::intersects(endFn->sceneBoundingRect(), connectionPoints)) {
+                continue;
+            }
+
+            if (!startFn->sceneBoundingRect().contains(connectionPoints.first()))
+                continue;
+
+            const auto result = aadlinterface::gi::validateConnectionCreate(&m_scene, connectionPoints);
+            QVERIFY(result.startIface != result.endIface
+                    || (result.startIface == nullptr && result.endIface == nullptr));
+            QCOMPARE(result.isToOrFromNested,
+                    (start.function()->isAncestorOf(end.function()) || end.function()->isAncestorOf(start.function())));
+            QCOMPARE(result.failed(), shouldFail);
+            if (!result.failed()) {
+                if (isReversed) {
+                    QVERIFY(result.connectionPoints.first() == connectionPoints.last()
+                            && result.connectionPoints.last() == connectionPoints.first());
+                } else {
+                    QCOMPARE(result.connectionPoints, connectionPoints);
+                }
+
+                const auto path = aadlinterface::createConnectionPath(&m_scene, result.connectionPoints.first(),
+                        isReversed ? end.rect() : start.rect(), result.connectionPoints.last(),
+                        isReversed ? start.rect() : end.rect());
+                QVERIFY(!path.isEmpty());
+            }
+        }
     }
 }
 

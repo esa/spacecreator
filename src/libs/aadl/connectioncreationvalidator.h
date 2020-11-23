@@ -45,6 +45,7 @@ public:
         ParentIsFunctionType,
         IsCyclic,
         SameParent,
+        SameInterface,
         NoScene,
         NoStartFunction,
         CannotCreateStartIface,

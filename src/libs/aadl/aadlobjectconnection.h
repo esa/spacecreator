@@ -31,8 +31,8 @@ class AADLObjectConnection : public AADLObject
     Q_OBJECT
 
 public:
-    explicit AADLObjectConnection(AADLObjectIface *ifaceSource,
-            AADLObjectIface *ifaceTarget, QObject *parent = nullptr);
+    explicit AADLObjectConnection(
+            AADLObjectIface *ifaceSource, AADLObjectIface *ifaceTarget, QObject *parent = nullptr);
     ~AADLObjectConnection() override;
 
     QString sourceName() const;
@@ -74,7 +74,7 @@ public:
         QString m_functionName;
         QString m_interfaceName;
         AADLObjectIface::IfaceType m_ifaceDirection;
-        inline bool isReady() const { return m_functionName.isEmpty() && m_interfaceName.isEmpty(); }
+        inline bool isReady() const { return !m_functionName.isEmpty() && !m_interfaceName.isEmpty(); }
     };
 
     void setDelayedStart(AADLObjectConnection::EndPointInfo *start);
@@ -96,7 +96,8 @@ public:
     QVector<IfaceParameter> params() const;
 
 protected:
-    explicit AADLObjectConnection(const AADLObject::Type t, AADLObjectIface *ifaceSource, AADLObjectIface *ifaceTarget, QObject *parent = nullptr);
+    explicit AADLObjectConnection(const AADLObject::Type t, AADLObjectIface *ifaceSource, AADLObjectIface *ifaceTarget,
+            QObject *parent = nullptr);
     bool lookupEndpointsPostponed();
     bool needPostponedInit() const;
 

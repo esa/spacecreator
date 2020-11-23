@@ -35,7 +35,7 @@ struct ConnectionHolder {
 };
 
 struct AADLObjectConnectionPrivate {
-    AADLObjectConnectionPrivate() { }
+    AADLObjectConnectionPrivate() {}
     AADLObjectConnectionPrivate(AADLObjectIface *ifaceSource, AADLObjectIface *ifaceTarget)
     {
         setData(ifaceSource, ifaceTarget);
@@ -225,6 +225,9 @@ bool AADLObjectConnection::lookupEndpointsPostponed()
         qWarning() << "Can't connect, as the target is missing";
         return false;
     }
+
+    Q_ASSERT(d->m_delayedInit.m_to->isReady());
+    Q_ASSERT(d->m_delayedInit.m_from->isReady());
 
     auto findFunction = [&](const AADLObjectConnection::EndPointInfo *const info) -> AADLObject * {
         if (!info || info->m_functionName.isEmpty())
