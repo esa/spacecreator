@@ -46,17 +46,20 @@ struct AADLObjectConnectionPrivate {
         m_ifaceSource = ifaceSource;
         m_ifaceTarget = ifaceTarget;
         if (m_ifaceSource && m_ifaceTarget) {
-            Q_ASSERT(ifaceSource->parentObject() && ifaceTarget->parentObject());
+            Q_ASSERT(m_ifaceSource != m_ifaceTarget); // An interface can't be connected to itself
+            Q_ASSERT(ifaceSource->parentObject()
+                    && ifaceTarget->parentObject()); // The interfaces have to belong to functions
             bool isReversed = false;
-            if (shared::isAncestorOf(ifaceSource->parentObject(), ifaceTarget->parentObject())) {
-                isReversed = ifaceSource->direction() == AADLObjectIface::IfaceType::Required
-                        || ifaceTarget->direction() == AADLObjectIface::IfaceType::Provided;
-            } else if (shared::isAncestorOf(ifaceTarget->parentObject(), ifaceSource->parentObject())) {
-                isReversed = ifaceSource->direction() == AADLObjectIface::IfaceType::Provided
-                        || ifaceTarget->direction() == AADLObjectIface::IfaceType::Required;
-            } else {
+            if (ifaceSource->direction() != ifaceTarget->direction()) {
                 isReversed = ifaceSource->direction() == AADLObjectIface::IfaceType::Provided
                         && ifaceTarget->direction() == AADLObjectIface::IfaceType::Required;
+            } else {
+                // PI->PI or RI->RI connection
+                if (shared::isAncestorOf(ifaceSource->parentObject(), ifaceTarget->parentObject())) {
+                    isReversed = ifaceSource->direction() == AADLObjectIface::IfaceType::Required;
+                } else if (shared::isAncestorOf(ifaceTarget->parentObject(), ifaceSource->parentObject())) {
+                    isReversed = ifaceSource->direction() == AADLObjectIface::IfaceType::Provided;
+                }
             }
 
             if (isReversed) {
