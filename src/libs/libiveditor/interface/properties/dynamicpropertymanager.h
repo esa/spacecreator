@@ -22,6 +22,9 @@
 namespace Ui {
 class DynamicPropertyManager;
 }
+namespace aadl {
+class DynamicPropertyConfig;
+} // namespace aadl
 
 namespace aadlinterface {
 
@@ -30,7 +33,7 @@ class DynamicPropertyManager : public QDialog
     Q_OBJECT
 
 public:
-    explicit DynamicPropertyManager(QWidget *parent = nullptr);
+    explicit DynamicPropertyManager(aadl::DynamicPropertyConfig *dynPropConfig, QWidget *parent = nullptr);
     ~DynamicPropertyManager() override;
 
 public Q_SLOTS:
@@ -41,7 +44,8 @@ private Q_SLOTS:
     void on_btnNewProp_clicked();
 
 private:
-    Ui::DynamicPropertyManager *ui;
+    Ui::DynamicPropertyManager *ui { nullptr };
+    aadl::DynamicPropertyConfig *m_dynPropConfig { nullptr };
     QStringList m_usedNames;
     bool readConfig(const QString &from);
     void setTextColor(const QColor &color);

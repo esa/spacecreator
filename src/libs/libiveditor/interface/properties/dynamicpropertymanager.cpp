@@ -23,21 +23,23 @@
 #include "ui_dynamicpropertymanager.h"
 
 #include <QDebug>
+#include <QDomDocument>
 #include <QFile>
 #include <QFileInfo>
 #include <QMessageBox>
 
 namespace aadlinterface {
 
-DynamicPropertyManager::DynamicPropertyManager(QWidget *parent)
+DynamicPropertyManager::DynamicPropertyManager(aadl::DynamicPropertyConfig *dynPropConfig, QWidget *parent)
     : QDialog(parent)
     , ui(new Ui::DynamicPropertyManager)
+    , m_dynPropConfig(dynPropConfig)
 {
     ui->setupUi(this);
 
     connect(ui->plainTextEdit, &QPlainTextEdit::textChanged, this, &DynamicPropertyManager::updateErrorInfo);
 
-    readConfig(DynamicPropertyConfig::currentConfigPath());
+    readConfig(m_dynPropConfig->configPath());
 }
 
 DynamicPropertyManager::~DynamicPropertyManager()
@@ -72,14 +74,14 @@ void DynamicPropertyManager::updateErrorInfo()
     int errorColumn = -1;
 
     if (!xmlData.isEmpty()) {
-        const QList<DynamicProperty *> &attrs =
-                DynamicPropertyConfig::parseAttributesList(xmlData, &errorMsg, &errorLine, &errorColumn);
+        const QList<aadl::DynamicProperty *> &attrs =
+                m_dynPropConfig->parseAttributesList(xmlData, &errorMsg, &errorLine, &errorColumn);
 
         if (!errorMsg.isEmpty()) {
             qWarning() << errorMsg << errorLine << errorColumn;
             textColor = Qt::red;
         } else {
-            for (DynamicProperty *attr : attrs) {
+            for (aadl::DynamicProperty *attr : attrs) {
                 if (m_usedNames.contains(attr->name())) {
                     errorMsg = tr("Duplicate names found: %1").arg(attr->name());
                     break;
@@ -106,7 +108,7 @@ void DynamicPropertyManager::on_btnNewProp_clicked()
 {
     AddDynamicPropertyDialog *dlg = new AddDynamicPropertyDialog(m_usedNames, this);
     if (dlg->exec() == QDialog::Accepted) {
-        if (DynamicProperty *attr = dlg->attribute()) {
+        if (aadl::DynamicProperty *attr = dlg->attribute()) {
             const QString &xmlData = ui->plainTextEdit->toPlainText();
             QDomDocument doc;
             if (doc.setContent(xmlData)) {
@@ -123,13 +125,12 @@ void DynamicPropertyManager::on_btnNewProp_clicked()
 
 void DynamicPropertyManager::accept()
 {
-    const QString &filePath = DynamicPropertyConfig::currentConfigPath();
+    const QString &filePath = m_dynPropConfig->configPath();
     QFile out(filePath);
     if (out.open(QIODevice::WriteOnly | QIODevice::Text | QIODevice::Truncate)) {
         const QByteArray &content = ui->plainTextEdit->toPlainText().toUtf8();
         out.write(content);
         out.close();
-        DynamicPropertyConfig::instance()->init();
     } else {
         const QString warn(tr("Can't save file %1 - %2").arg(filePath, out.errorString()));
         qWarning() << warn;

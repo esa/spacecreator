@@ -18,13 +18,12 @@
 #include "dynamicpropertyconfig.h"
 
 #include "aadlobject.h"
-#include "baseitems/common/aadlutils.h"
 #include "common.h"
 #include "dynamicproperty.h"
-#include "settings/appoptions.h"
 
 #include <QDebug>
 #include <QDir>
+#include <QDomDocument>
 #include <QFile>
 #include <QFileInfo>
 #include <QHash>
@@ -34,7 +33,7 @@
 #include <QRegularExpression>
 #include <QStandardPaths>
 
-namespace aadlinterface {
+namespace aadl {
 
 /*!
    Adds all attributes from \p attrs that are not already in \a storage to that data
@@ -77,75 +76,39 @@ struct DynamicPropertyConfig::DynamicPropertyConfigPrivate {
         }
     }
 
+    QString m_configPath;
     QHash<QString, DynamicProperty *> m_function;
     QHash<QString, DynamicProperty *> m_reqIface;
     QHash<QString, DynamicProperty *> m_provIface;
 };
-
-DynamicPropertyConfig *DynamicPropertyConfig::m_instance = nullptr;
 
 DynamicPropertyConfig::DynamicPropertyConfig()
     : d(new DynamicPropertyConfigPrivate())
 {
 }
 
-QString DynamicPropertyConfig::defaultConfigPath()
-{
-    const QString &path = QStandardPaths::writableLocation(QStandardPaths::AppLocalDataLocation);
-    shared::ensureDirExists(path);
-    return path + "/default_attributes.xml";
-}
+DynamicPropertyConfig::~DynamicPropertyConfig() { }
 
-QString DynamicPropertyConfig::currentConfigPath()
-{
-    return instance()->configPath();
-}
-
-QString DynamicPropertyConfig::resourceConfigPath()
+QString resourceConfigPath()
 {
     return QLatin1String(":/defaults/interface/properties/resources/default_attributes.xml");
 }
 
-QString DynamicPropertyConfig::configPath() const
+static bool ensureFileExists(const QString &filePath)
 {
-    QString storedFilePath = AppOptions::Aadl.CustomPropertiesConfig.read().toString();
-    if (storedFilePath.isEmpty()) {
-        storedFilePath = defaultConfigPath();
-        AppOptions::Aadl.CustomPropertiesConfig.write(storedFilePath);
+    if (!QFileInfo::exists(filePath) && !shared::copyResourceFile(resourceConfigPath(), filePath)) {
+        qWarning() << "Can't create default storage for properties/attributes" << filePath
+                   << "from:" << resourceConfigPath();
+        return false;
     }
-    return storedFilePath;
+    return true;
 }
 
-DynamicPropertyConfig *DynamicPropertyConfig::instance()
+void DynamicPropertyConfig::init(const QString &configPath)
 {
-    if (!m_instance) {
-        m_instance = new DynamicPropertyConfig();
-        m_instance->init();
-    }
-
-    return m_instance;
-}
-
-QString ensureFileExists()
-{
-    QString storedFilePath(AppOptions::Aadl.CustomPropertiesConfig.read().toString());
-    if (storedFilePath.isEmpty() || !QFileInfo::exists(storedFilePath)) {
-        if (storedFilePath.isEmpty())
-            storedFilePath = DynamicPropertyConfig::defaultConfigPath();
-
-        if (!shared::copyResourceFile(DynamicPropertyConfig::resourceConfigPath(), storedFilePath)) {
-            qWarning() << "Can't create default storage for properties/attributes" << storedFilePath;
-            return QString();
-        }
-    }
-    return storedFilePath;
-}
-
-void DynamicPropertyConfig::init()
-{
-    const QString &filePath = ensureFileExists();
-    if (!filePath.isEmpty()) {
-        QFile f(filePath);
+    if (ensureFileExists(configPath)) {
+        d->m_configPath = configPath;
+        QFile f(configPath);
         if (f.open(QIODevice::ReadOnly | QIODevice::Text)) {
             QString errMsg;
             int line;
@@ -154,7 +117,7 @@ void DynamicPropertyConfig::init()
             return;
         }
 
-        qWarning() << "Can't open file:" << filePath << f.errorString();
+        qWarning() << "Can't open file:" << configPath << f.errorString();
     }
 }
 
@@ -244,17 +207,22 @@ QHash<QString, DynamicProperty *> DynamicPropertyConfig::attributesForObject(con
 
 QList<DynamicProperty *> DynamicPropertyConfig::attributesForFunction()
 {
-    return instance()->d->m_function.values();
+    return d->m_function.values();
 }
 
 QList<DynamicProperty *> DynamicPropertyConfig::attributesForRequiredInterface()
 {
-    return instance()->d->m_reqIface.values();
+    return d->m_reqIface.values();
 }
 
 QList<DynamicProperty *> DynamicPropertyConfig::attributesForProvidedInterface()
 {
-    return instance()->d->m_provIface.values();
+    return d->m_provIface.values();
 }
 
-} // namespace aadlinterface
+QString DynamicPropertyConfig::configPath() const
+{
+    return d->m_configPath;
+}
+
+} // namespace aadl

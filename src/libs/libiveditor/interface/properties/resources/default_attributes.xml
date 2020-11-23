@@ -20,13 +20,13 @@
                 <Entry value="C"/>
                 <Entry value="ADA"/>
                 <Entry value="SDL"/>
-                <Entry value="Cobol"/>
+                <Entry value="COBOL"/>
             </Enumeration>
         </Type>
     </Attr>
     <Attr name="is_type">
         <Type>
-            <Enumeration>
+            <Enumeration defaultValue="NO">
                 <Entry value="YES"/>
                 <Entry value="NO"/>
             </Enumeration>

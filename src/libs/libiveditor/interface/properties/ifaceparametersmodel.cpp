@@ -20,10 +20,10 @@
 #include "aadlobject.h"
 #include "aadlobjectiface.h"
 #include "commandsstack.h"
+#include "dynamicproperty.h"
+#include "dynamicpropertyconfig.h"
 #include "interface/commands/cmdentitypropertycreate.h"
 #include "interface/commands/commandsfactory.h"
-#include "interface/properties/dynamicproperty.h"
-#include "interface/properties/dynamicpropertyconfig.h"
 
 #include <QDebug>
 #include <algorithm>
@@ -36,7 +36,7 @@ IfaceParametersModel::IfaceParametersModel(cmd::CommandsStack::Macro *macro, QOb
 {
 }
 
-IfaceParametersModel::~IfaceParametersModel() {}
+IfaceParametersModel::~IfaceParametersModel() { }
 
 void IfaceParametersModel::createNewRow(const aadl::IfaceParameter &param, int row)
 {

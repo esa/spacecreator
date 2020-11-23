@@ -22,12 +22,12 @@
 #include "aadlobjectfunction.h"
 #include "asn1/file.h"
 #include "commandsstack.h"
+#include "dynamicproperty.h"
+#include "dynamicpropertyconfig.h"
 #include "interface/commands/cmdentityattributechange.h"
 #include "interface/commands/cmdentitypropertychange.h"
 #include "interface/commands/cmdentitypropertycreate.h"
 #include "interface/commands/commandsfactory.h"
-#include "interface/properties/dynamicproperty.h"
-#include "interface/properties/dynamicpropertyconfig.h"
 
 #include <algorithm>
 
@@ -39,7 +39,7 @@ ContextParametersModel::ContextParametersModel(cmd::CommandsStack::Macro *macro,
 {
 }
 
-ContextParametersModel::~ContextParametersModel() {}
+ContextParametersModel::~ContextParametersModel() { }
 
 void ContextParametersModel::createNewRow(const aadl::ContextParameter &param, int row)
 {

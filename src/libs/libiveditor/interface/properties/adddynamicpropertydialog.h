@@ -23,9 +23,12 @@ namespace Ui {
 class AddDynamicPropertyDialog;
 }
 
+namespace aadl {
+class DynamicProperty;
+} // namespace aadl
+
 namespace aadlinterface {
 
-class DynamicProperty;
 class AddDynamicPropertyDialog : public QDialog
 {
     Q_OBJECT
@@ -34,7 +37,7 @@ public:
     explicit AddDynamicPropertyDialog(const QStringList &prohibitedNames, QWidget *parent = nullptr);
     ~AddDynamicPropertyDialog() override;
 
-    DynamicProperty *attribute() const;
+    aadl::DynamicProperty *attribute() const;
 public Q_SLOTS:
     void accept() override;
 
@@ -42,7 +45,7 @@ private:
     Ui::AddDynamicPropertyDialog *ui;
     QStringList m_prohibitedNames;
     QColor m_nameColorDefault;
-    DynamicProperty *m_attr;
+    aadl::DynamicProperty *m_attr;
     bool validateName(bool showWarn);
     bool validateType();
     bool validateValuesList();

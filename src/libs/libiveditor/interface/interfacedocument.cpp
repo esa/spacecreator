@@ -34,6 +34,7 @@
 #include "context/action/actionsmanager.h"
 #include "context/action/editor/dynactioneditor.h"
 #include "creatortool.h"
+#include "dynamicpropertyconfig.h"
 #include "file.h"
 #include "graphicsitemhelpers.h"
 #include "interface/aadlobjectstreeview.h"
@@ -76,6 +77,14 @@ namespace aadlinterface {
 
 static const QString kDefaultFilename { QLatin1String("interfaceview.xml") };
 
+static inline QString dynamicPropertiesFilePath()
+{
+    static const QString kDefaultPath = QStandardPaths::writableLocation(QStandardPaths::AppLocalDataLocation)
+            + QDir::separator() + QLatin1String("default_attributes.xml");
+
+    return qEnvironmentVariable("TASTE_DEFAULT_ATTRIBUTES_PATH", kDefaultPath);
+}
+
 static inline QString componentsLibraryPath()
 {
     static const QString kDefaultPath = QStandardPaths::writableLocation(QStandardPaths::AppLocalDataLocation)
@@ -99,6 +108,7 @@ struct InterfaceDocument::InterfaceDocumentPrivate {
 
     QPointer<QWidget> view;
     aadlinterface::GraphicsView *graphicsView { nullptr };
+    aadl::DynamicPropertyConfig *dynPropConfig { nullptr };
     QTreeView *objectsView { nullptr };
     AADLItemModel *itemsModel { nullptr };
     aadl::AADLObjectsModel *objectsModel { nullptr };
@@ -134,9 +144,12 @@ InterfaceDocument::InterfaceDocument(QObject *parent)
     d->commandsStack = new QUndoStack(this);
     connect(d->commandsStack, &QUndoStack::cleanChanged, this, [this](bool clean) { Q_EMIT dirtyChanged(!clean); });
 
-    d->importModel = new aadl::AADLObjectsModel(this);
-    d->sharedModel = new aadl::AADLObjectsModel(this);
-    d->objectsModel = new aadl::AADLObjectsModel(this);
+    d->dynPropConfig = new aadl::DynamicPropertyConfig;
+    d->dynPropConfig->init(dynamicPropertiesFilePath());
+
+    d->importModel = new aadl::AADLObjectsModel(d->dynPropConfig, this);
+    d->sharedModel = new aadl::AADLObjectsModel(d->dynPropConfig, this);
+    d->objectsModel = new aadl::AADLObjectsModel(d->dynPropConfig, this);
     d->objectsModel->setSharedTypesModel(d->sharedModel);
 
     connect(d->asnDataTypes, &Asn1Acn::Asn1ModelStorage::dataTypesChanged, this, [&](const QString &fileName) {
@@ -150,6 +163,7 @@ InterfaceDocument::~InterfaceDocument()
 {
     delete d->asnDataTypes;
     delete d->view;
+    delete d->dynPropConfig;
     delete d;
 }
 
@@ -627,7 +641,7 @@ void InterfaceDocument::onItemDoubleClicked(shared::Id id)
 
 void InterfaceDocument::onAttributesManagerRequested()
 {
-    auto dialog = new aadlinterface::DynamicPropertyManager(qobject_cast<QWidget *>(parent()));
+    auto dialog = new aadlinterface::DynamicPropertyManager(d->dynPropConfig, qobject_cast<QWidget *>(parent()));
     dialog->setAttribute(Qt::WA_DeleteOnClose);
     dialog->open();
 }
@@ -659,7 +673,7 @@ void InterfaceDocument::onDynContextEditorMenuInvoked()
 void InterfaceDocument::showPropertyEditor(aadl::AADLObject *obj)
 {
     aadlinterface::PropertiesDialog *dialog = new aadlinterface::PropertiesDialog(
-            obj, d->asnDataTypes->asn1DataTypes(asn1FilePath()), qobject_cast<QWidget *>(parent()));
+            d->dynPropConfig, obj, d->asnDataTypes->asn1DataTypes(asn1FilePath()), qobject_cast<QWidget *>(parent()));
     dialog->setAttribute(Qt::WA_DeleteOnClose);
     dialog->open();
 }

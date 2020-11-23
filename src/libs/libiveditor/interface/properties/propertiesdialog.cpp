@@ -47,11 +47,12 @@
 
 namespace aadlinterface {
 
-PropertiesDialog::PropertiesDialog(
-        aadl::AADLObject *obj, const QSharedPointer<Asn1Acn::File> &dataTypes, QWidget *parent)
+PropertiesDialog::PropertiesDialog(aadl::DynamicPropertyConfig *dynPropConfig, aadl::AADLObject *obj,
+        const QSharedPointer<Asn1Acn::File> &dataTypes, QWidget *parent)
     : QDialog(parent)
     , ui(new Ui::PropertiesDialog)
     , m_dataObject(obj)
+    , m_dynPropConfig(dynPropConfig)
     , m_cmdMacro(new cmd::CommandsStack::Macro(
               tr("Edit %1 - %2")
                       .arg(aadl::AADLNameValidator::nameOfType(m_dataObject->aadlType()).trimmed(),
@@ -159,16 +160,16 @@ void PropertiesDialog::initAttributesView()
 
     switch (m_dataObject->aadlType()) {
     case aadl::AADLObject::Type::Function: {
-        modelAttrs = new FunctionPropertiesListModel(m_cmdMacro, this);
+        modelAttrs = new FunctionPropertiesListModel(m_cmdMacro, m_dynPropConfig, this);
         break;
     }
     case aadl::AADLObject::Type::RequiredInterface:
     case aadl::AADLObject::Type::ProvidedInterface: {
-        modelAttrs = new InterfacePropertiesListModel(m_cmdMacro, this);
+        modelAttrs = new InterfacePropertiesListModel(m_cmdMacro, m_dynPropConfig, this);
         break;
     }
     default:
-        modelAttrs = new InterfacePropertiesListModel(m_cmdMacro, this);
+        modelAttrs = new InterfacePropertiesListModel(m_cmdMacro, m_dynPropConfig, this);
         break;
     }
 

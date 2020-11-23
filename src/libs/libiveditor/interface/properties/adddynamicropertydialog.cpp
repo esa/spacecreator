@@ -42,11 +42,11 @@ AddDynamicPropertyDialog::AddDynamicPropertyDialog(const QStringList &prohibited
 
     m_nameColorDefault = ui->leName->palette().color(QPalette::Text);
 
-    ui->comboTypes->addItem(tr("Integer"), QVariant::fromValue(DynamicProperty::Type::Integer));
-    ui->comboTypes->addItem(tr("Real"), QVariant::fromValue(DynamicProperty::Type::Real));
-    ui->comboTypes->addItem(tr("Boolean"), QVariant::fromValue(DynamicProperty::Type::Boolean));
-    ui->comboTypes->addItem(tr("String"), QVariant::fromValue(DynamicProperty::Type::String));
-    ui->comboTypes->addItem(tr("Enumeration"), QVariant::fromValue(DynamicProperty::Type::Enumeration));
+    ui->comboTypes->addItem(tr("Integer"), QVariant::fromValue(aadl::DynamicProperty::Type::Integer));
+    ui->comboTypes->addItem(tr("Real"), QVariant::fromValue(aadl::DynamicProperty::Type::Real));
+    ui->comboTypes->addItem(tr("Boolean"), QVariant::fromValue(aadl::DynamicProperty::Type::Boolean));
+    ui->comboTypes->addItem(tr("String"), QVariant::fromValue(aadl::DynamicProperty::Type::String));
+    ui->comboTypes->addItem(tr("Enumeration"), QVariant::fromValue(aadl::DynamicProperty::Type::Enumeration));
 
     ui->teValues->setVisible(false);
 
@@ -80,8 +80,8 @@ bool AddDynamicPropertyDialog::validateName(const bool showWarn)
 
 bool AddDynamicPropertyDialog::validateType()
 {
-    DynamicProperty::Type t = static_cast<DynamicProperty::Type>(ui->comboTypes->currentData().toInt());
-    const bool isEnum(t == DynamicProperty::Type::Enumeration);
+    aadl::DynamicProperty::Type t = static_cast<aadl::DynamicProperty::Type>(ui->comboTypes->currentData().toInt());
+    const bool isEnum(t == aadl::DynamicProperty::Type::Enumeration);
     ui->teValues->setVisible(isEnum);
 
     return true;
@@ -96,8 +96,8 @@ QStringList AddDynamicPropertyDialog::listValues() const
 bool AddDynamicPropertyDialog::validateValuesList()
 {
     QString warn;
-    DynamicProperty::Type t = static_cast<DynamicProperty::Type>(ui->comboTypes->currentData().toInt());
-    if (t == DynamicProperty::Type::Enumeration && listValues().isEmpty())
+    aadl::DynamicProperty::Type t = static_cast<aadl::DynamicProperty::Type>(ui->comboTypes->currentData().toInt());
+    if (t == aadl::DynamicProperty::Type::Enumeration && listValues().isEmpty())
         warn = tr("Please specify at least one Enum value.");
 
     const bool ok(warn.isEmpty());
@@ -133,29 +133,30 @@ void AddDynamicPropertyDialog::accept()
         return;
 
     const QString &name = ui->leName->text().trimmed();
-    const DynamicProperty::Type t = static_cast<DynamicProperty::Type>(ui->comboTypes->currentData().toInt());
-    DynamicProperty::Scopes s;
+    const aadl::DynamicProperty::Type t =
+            static_cast<aadl::DynamicProperty::Type>(ui->comboTypes->currentData().toInt());
+    aadl::DynamicProperty::Scopes s;
     if (ui->cbFunction->isChecked())
-        s |= DynamicProperty::Scope::Function;
+        s |= aadl::DynamicProperty::Scope::Function;
     if (ui->cbReqIface->isChecked())
-        s |= DynamicProperty::Scope::Required_Interface;
+        s |= aadl::DynamicProperty::Scope::Required_Interface;
     if (ui->cbProvIface->isChecked())
-        s |= DynamicProperty::Scope::Provided_Interface;
+        s |= aadl::DynamicProperty::Scope::Provided_Interface;
     if (ui->cbComment->isChecked())
-        s |= DynamicProperty::Scope::Comment;
+        s |= aadl::DynamicProperty::Scope::Comment;
     if (ui->cbConnection->isChecked())
-        s |= DynamicProperty::Scope::Connection;
+        s |= aadl::DynamicProperty::Scope::Connection;
 
     QList<QVariant> list;
-    if (t == DynamicProperty::Type::Enumeration)
+    if (t == aadl::DynamicProperty::Type::Enumeration)
         for (const QString &str : listValues())
             list.append(str.trimmed());
 
     const QString &pattern = ui->leValidationPattern->text().trimmed();
 
-    const DynamicProperty::Info i =
-            ui->rbAttribute->isChecked() ? DynamicProperty::Info::Attribute : DynamicProperty::Info::Property;
-    m_attr = new DynamicProperty;
+    const aadl::DynamicProperty::Info i = ui->rbAttribute->isChecked() ? aadl::DynamicProperty::Info::Attribute
+                                                                       : aadl::DynamicProperty::Info::Property;
+    m_attr = new aadl::DynamicProperty;
     m_attr->setName(name);
     m_attr->setInfo(i);
     m_attr->setType(t);
@@ -165,7 +166,7 @@ void AddDynamicPropertyDialog::accept()
     QDialog::accept();
 }
 
-DynamicProperty *AddDynamicPropertyDialog::attribute() const
+aadl::DynamicProperty *AddDynamicPropertyDialog::attribute() const
 {
     return m_attr;
 }

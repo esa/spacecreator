@@ -22,38 +22,29 @@
 
 namespace aadl {
 class AADLObject;
-}
-
-namespace aadlinterface {
-
 class DynamicProperty;
 
 class DynamicPropertyConfig
 {
 public:
-    static DynamicPropertyConfig *instance();
-    static QList<DynamicProperty *> parseAttributesList(
-            const QString &fromData, QString *errorMsg = nullptr, int *errorLine = nullptr, int *errorColumn = nullptr);
-    void init();
-
-    static QHash<QString, DynamicProperty *> attributesForObject(const aadl::AADLObject *obj);
-    static QList<DynamicProperty *> attributesForFunction();
-    static QList<DynamicProperty *> attributesForRequiredInterface();
-    static QList<DynamicProperty *> attributesForProvidedInterface();
-
-    static QString defaultConfigPath();
-    static QString currentConfigPath();
-    static QString resourceConfigPath();
-
-private:
-    static DynamicPropertyConfig *m_instance;
-
     DynamicPropertyConfig();
+    ~DynamicPropertyConfig();
+
+    void init(const QString &configPath);
+
+    QHash<QString, DynamicProperty *> attributesForObject(const aadl::AADLObject *obj);
+    QList<DynamicProperty *> attributesForFunction();
+    QList<DynamicProperty *> attributesForRequiredInterface();
+    QList<DynamicProperty *> attributesForProvidedInterface();
 
     QString configPath() const;
 
+    static QList<DynamicProperty *> parseAttributesList(
+            const QString &fromData, QString *errorMsg = nullptr, int *errorLine = nullptr, int *errorColumn = nullptr);
+
+private:
     struct DynamicPropertyConfigPrivate;
     std::unique_ptr<DynamicPropertyConfigPrivate> d;
 };
 
-} // namespace aadlinterface
+} // namespace aadl

@@ -20,8 +20,8 @@
 #include "aadlcommonprops.h"
 #include "aadlobject.h"
 #include "aadlobjectsmodel.h"
-#include "interface/properties/dynamicproperty.h"
-#include "interface/properties/dynamicpropertyconfig.h"
+#include "dynamicproperty.h"
+#include "dynamicpropertyconfig.h"
 #include "interface/properties/propertieslistmodel.h"
 
 #include <QCheckBox>

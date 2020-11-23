@@ -19,13 +19,14 @@
 
 #include "aadlcommonprops.h"
 #include "commandsstack.h"
-#include "interface/properties/dynamicproperty.h"
+#include "dynamicproperty.h"
 #include "propertiesmodelbase.h"
 
 #include <QVector>
 
 namespace aadl {
 class AADLObject;
+class DynamicPropertyConfig;
 }
 
 namespace aadlinterface {
@@ -40,7 +41,8 @@ public:
     static const int ColumnTitle { 0 };
     static const int ColumnValue { 1 };
 
-    explicit PropertiesListModel(cmd::CommandsStack::Macro *macro, QObject *parent = nullptr);
+    explicit PropertiesListModel(
+            cmd::CommandsStack::Macro *macro, aadl::DynamicPropertyConfig *dynPropConfig, QObject *parent = nullptr);
     ~PropertiesListModel() override;
 
     int rowCount(const QModelIndex &parent = QModelIndex()) const override;
@@ -64,12 +66,13 @@ public:
 
 protected:
     cmd::CommandsStack::Macro *m_cmdMacro { nullptr };
+    aadl::DynamicPropertyConfig *m_dynPropConfig { nullptr };
     aadl::AADLObject *m_dataObject { nullptr };
     QVector<QString> m_names;
 
     virtual bool isEditable(const QModelIndex &index) const;
-    void createNewRow(int row, const QString &title, DynamicProperty::Info info, const QVariant &value,
-            const QVariant &editValue);
+    void createNewRow(int row, const QString &title, aadl::DynamicProperty::Info info, const QVariant &value,
+            const QVariant &editValue, const QVariant &defaulValue);
 
     void invalidateProperties(const QString &propName);
     void invalidateAttributes(const QString &attrName);
@@ -78,7 +81,8 @@ protected:
 class FunctionPropertiesListModel : public PropertiesListModel
 {
 public:
-    explicit FunctionPropertiesListModel(cmd::CommandsStack::Macro *macro, QObject *parent = nullptr);
+    explicit FunctionPropertiesListModel(
+            cmd::CommandsStack::Macro *macro, aadl::DynamicPropertyConfig *dynPropConfig, QObject *parent = nullptr);
 
 protected:
     bool isEditable(const QModelIndex &index) const override;
@@ -87,7 +91,8 @@ protected:
 class InterfacePropertiesListModel : public PropertiesListModel
 {
 public:
-    explicit InterfacePropertiesListModel(cmd::CommandsStack::Macro *macro, QObject *parent = nullptr);
+    explicit InterfacePropertiesListModel(
+            cmd::CommandsStack::Macro *macro, aadl::DynamicPropertyConfig *dynPropConfig, QObject *parent = nullptr);
 
 protected:
     bool isEditable(const QModelIndex &index) const override;

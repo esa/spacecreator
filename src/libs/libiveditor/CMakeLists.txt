@@ -171,10 +171,6 @@ target_sources(${LIB_NAME} PRIVATE
     interface/properties/delegates/interfaceattrdelegate.h
     interface/properties/delegates/propertytypedelegate.cpp
     interface/properties/delegates/propertytypedelegate.h
-    interface/properties/dynamicproperty.cpp
-    interface/properties/dynamicproperty.h
-    interface/properties/dynamicpropertyconfig.cpp
-    interface/properties/dynamicpropertyconfig.h
     interface/properties/dynamicpropertymanager.cpp
     interface/properties/dynamicpropertymanager.h
     interface/properties/dynamicpropertymanager.ui

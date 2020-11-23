@@ -1,14 +1,15 @@
 #pragma once
 
-#include <QDomElement>
 #include <QObject>
 #include <QVariant>
 #include <QVector>
 #include <memory>
 
 class QValidator;
+class QDomDocument;
+class QDomElement;
 
-namespace aadlinterface {
+namespace aadl {
 
 class DynamicProperty
 {
@@ -47,7 +48,7 @@ public:
 #if (QT_VERSION >= QT_VERSION_CHECK(5, 12, 0))
     Q_DECLARE_FLAGS(Scopes, Scope)
 #else
-    Q_DECLARE_FLAGS(Scopes, aadlinterface::DynamicProperty::Scope)
+    Q_DECLARE_FLAGS(Scopes, aadl::DynamicProperty::Scope)
 #endif
     Q_FLAG(Scopes)
 
@@ -72,6 +73,9 @@ public:
     QList<QVariant> valuesList() const;
     void setValuesList(const QList<QVariant> &range);
 
+    QVariant defaultValue() const;
+    void setDefaultValue(const QVariant &value);
+
     QString valueValidatorPattern() const;
     void setValueValidatorPattern(const QString &pattern);
 
@@ -81,14 +85,15 @@ public:
     QDomElement toXml(QDomDocument *domDoc) const;
     static DynamicProperty *fromXml(const QDomElement &element);
     static QString tagName();
+    static QVariant convertData(const QVariant &value, DynamicProperty::Type type);
 
 private:
     struct DynamicPropertyPrivate;
     const std::unique_ptr<DynamicPropertyPrivate> d;
 };
 
-} // namespace aadlinterface
+} // namespace aadl
 
-Q_DECLARE_OPERATORS_FOR_FLAGS(aadlinterface::DynamicProperty::Scopes)
-Q_DECLARE_METATYPE(aadlinterface::DynamicProperty::Type)
-Q_DECLARE_METATYPE(aadlinterface::DynamicProperty::Scopes)
+Q_DECLARE_OPERATORS_FOR_FLAGS(aadl::DynamicProperty::Scopes)
+Q_DECLARE_METATYPE(aadl::DynamicProperty::Type)
+Q_DECLARE_METATYPE(aadl::DynamicProperty::Scopes)

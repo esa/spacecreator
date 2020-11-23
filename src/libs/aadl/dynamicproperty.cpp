@@ -17,9 +17,10 @@
 
 #include "dynamicproperty.h"
 
+#include <QDomElement>
 #include <QMetaEnum>
 
-namespace aadlinterface {
+namespace aadl {
 
 const QString kTagName = QLatin1String("Attr");
 
@@ -29,6 +30,7 @@ struct DynamicProperty::DynamicPropertyPrivate {
     DynamicProperty::Type m_type;
     DynamicProperty::Scopes m_scope;
     QList<QVariant> m_vals;
+    QVariant m_defaultValue;
     QString m_rxValueValidatorPattern;
     QMap<DynamicProperty::Scope, QPair<QString, QString>> m_rxAttrValidatorPattern;
     bool m_isVisible = true;
@@ -100,12 +102,22 @@ void DynamicProperty::setValuesList(const QList<QVariant> &range)
     d->m_vals = range;
 }
 
+QVariant DynamicProperty::defaultValue() const
+{
+    return d->m_defaultValue;
+}
+
+void DynamicProperty::setDefaultValue(const QVariant &value)
+{
+    d->m_defaultValue = value;
+}
+
 QString DynamicProperty::valueValidatorPattern() const
 {
     return d->m_rxValueValidatorPattern;
 }
 
-void aadlinterface::DynamicProperty::setValueValidatorPattern(const QString &pattern)
+void DynamicProperty::setValueValidatorPattern(const QString &pattern)
 {
     d->m_rxValueValidatorPattern = pattern;
 }
@@ -206,6 +218,7 @@ DynamicProperty *DynamicProperty::fromXml(const QDomElement &element)
     const QDomElement typeElement = element.firstChildElement(typeMeta.name());
     DynamicProperty::Type t = DynamicProperty::Type::Unknown;
 
+    QVariant defaultValue { QVariant::String };
     QList<QVariant> enumVals;
     QString typeValidator;
     if (!typeElement.isNull()) {
@@ -217,12 +230,15 @@ DynamicProperty *DynamicProperty::fromXml(const QDomElement &element)
                 t = static_cast<DynamicProperty::Type>(typeInt);
             }
             if (t == DynamicProperty::Type::Enumeration) {
+                defaultValue = typeSubElement.attribute(QLatin1String("defaultValue"));
                 QDomElement typeEntryElement = typeSubElement.firstChildElement(QLatin1String("Entry"));
                 while (!typeEntryElement.isNull()) {
                     const QVariant value = typeEntryElement.attribute(QLatin1String("value"));
                     enumVals.append(value);
                     typeEntryElement = typeEntryElement.nextSiblingElement(typeEntryElement.tagName());
                 }
+            } else {
+                defaultValue = convertData(typeSubElement.attribute(QLatin1String("defaultValue")), t);
             }
         }
     }
@@ -268,6 +284,7 @@ DynamicProperty *DynamicProperty::fromXml(const QDomElement &element)
     dynamicProperty->setType(t);
     dynamicProperty->setScope(s);
     dynamicProperty->setValuesList(enumVals);
+    dynamicProperty->setDefaultValue(defaultValue);
     dynamicProperty->setAttrValidatorPattern(attrValidators);
     dynamicProperty->setValueValidatorPattern(typeValidator);
     dynamicProperty->setVisible(isVisible);
@@ -279,4 +296,54 @@ QString DynamicProperty::tagName()
     return kTagName;
 }
 
-} // namespace aadlinterface
+QVariant DynamicProperty::convertData(const QVariant &value, DynamicProperty::Type type)
+{
+    QVariant typedValue;
+    switch (type) {
+    case DynamicProperty::Type::Boolean: {
+        const bool falseValue = QString::compare(value.toString(), QLatin1String("false"), Qt::CaseInsensitive) == 0;
+        const bool trueValue = QString::compare(value.toString(), QLatin1String("true"), Qt::CaseInsensitive) == 0;
+        if (falseValue) {
+            typedValue = false;
+        } else if (trueValue) {
+            typedValue = true;
+        } else {
+            return QVariant(QVariant::Bool);
+        }
+    } break;
+    case DynamicProperty::Type::Integer: {
+        bool ok;
+        typedValue = value.toString().toInt(&ok);
+        if (!ok)
+            return QVariant(QVariant::Int);
+    } break;
+    case DynamicProperty::Type::Real: {
+        bool ok;
+        typedValue = value.toString().toDouble(&ok);
+        if (!ok)
+            return QVariant(QVariant::Double);
+    } break;
+    case DynamicProperty::Type::String: {
+        if (value.isValid())
+            typedValue = value.toString();
+        else
+            typedValue = QVariant(QVariant::String);
+    } break;
+    case DynamicProperty::Type::Enumeration: {
+        if (value.isValid()) {
+            QStringList typedList;
+            for (const auto &dataItem : value.toList()) {
+                typedList.append(dataItem.toString());
+            }
+            typedValue = typedList;
+        } else {
+            typedValue = QVariant(QVariant::StringList);
+        }
+    } break;
+    default:
+        break;
+    }
+    return typedValue;
+}
+
+} // namespace aadl

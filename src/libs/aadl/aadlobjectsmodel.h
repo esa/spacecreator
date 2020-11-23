@@ -30,6 +30,7 @@ class AADLObjectComment;
 class AADLObjectConnection;
 class AADLObjectFunction;
 class AADLObjectFunctionType;
+class DynamicPropertyConfig;
 
 struct AADLObjectsModelPrivate;
 class AADLObjectsModel : public QAbstractItemModel
@@ -42,7 +43,7 @@ public:
         TypeRole
     };
 
-    explicit AADLObjectsModel(QObject *parent = nullptr);
+    explicit AADLObjectsModel(DynamicPropertyConfig *dynPropConfig, QObject *parent = nullptr);
     ~AADLObjectsModel() override;
 
     void setSharedTypesModel(AADLObjectsModel *sharedTypesModel);

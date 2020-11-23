@@ -13,6 +13,7 @@ target_link_libraries(${TEST_NAME} PUBLIC
     Qt5::Network
     Qt5::Svg
     Qt5::Test
+    Qt5::Xml
     Qt5::Widgets
     Grantlee5::Templates
 )
