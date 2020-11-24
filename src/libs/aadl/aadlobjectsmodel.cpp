@@ -114,6 +114,15 @@ bool AADLObjectsModel::addObjectImpl(AADLObject *obj)
 
     endInsertRows();
 
+    connect(obj, &AADLObject::titleChanged, this, [this](const QString &title) {
+        if (AADLObject *object = qobject_cast<AADLObject *>(sender())) {
+            const QModelIndex idx = indexFromObject(object);
+            if (idx.isValid()) {
+                Q_EMIT dataChanged(idx, idx, { Qt::DisplayRole });
+            }
+        }
+    });
+
     return true;
 }
 
@@ -536,10 +545,20 @@ int AADLObjectsModel::columnCount(const QModelIndex &parent) const
 
 bool AADLObjectsModel::setData(const QModelIndex &index, const QVariant &value, int role)
 {
-    if (role == Qt::CheckStateRole) {
-        auto obj = objectFromIndex(index);
-        obj->setVisible(value.toBool());
-        return true;
+    if (!index.isValid()) {
+        return false;
+    } else if (role == Qt::CheckStateRole) {
+        if (auto obj = objectFromIndex(index)) {
+            obj->setVisible(value.toBool());
+            return true;
+        }
+    } else if (role == Qt::EditRole) {
+        const QString newTitle = value.toString();
+        if (!newTitle.isEmpty() && !nestedFunctionNames().contains(newTitle)) {
+            if (auto obj = objectFromIndex(index)) {
+                return obj->setTitle(newTitle);
+            }
+        }
     }
     return false;
 }
