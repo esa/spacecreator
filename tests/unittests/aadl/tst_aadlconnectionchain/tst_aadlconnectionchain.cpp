@@ -33,6 +33,7 @@ private Q_SLOTS:
     void testTargetJoinIntone();
     void testChainCreationMultiChainOnInterfaces();
     void testContains();
+    void testGetNames();
 
 private:
     aadl::AADLObjectConnection *selectConnection(const QString &sourceName, const QString &targetName,
@@ -203,8 +204,32 @@ void tst_AADLConnectionChain::testContains()
     QCOMPARE(chain->contains("PI_1", "foo", "MiniB"), false); // Wrong source
     QCOMPARE(chain->contains("PI_1", "MiniA", "foo"), false); // Wrong target
 
+    // message from/to environment
+    QCOMPARE(chain->contains("PI_1", "", "MiniB"), true);
+    QCOMPARE(chain->contains("PI_1", "MiniA", ""), true);
+
     qDeleteAll(chains);
     chains.clear();
+}
+
+// MiniA -> BlockA -> BlockB -> MiniB
+void tst_AADLConnectionChain::testGetNames()
+{
+    aadl::DynamicPropertyConfig conf;
+    aadl::AADLObjectsModel model(&conf);
+    aadl::AADLXMLReader parser;
+    connect(&parser, &aadl::AADLXMLReader::objectsParsed, &model, &aadl::AADLObjectsModel::addObjects);
+    parser.readFile(QFINDTESTDATA("connectionchains01.xml"));
+
+    QList<aadl::AADLConnectionChain *> chains = aadl::AADLConnectionChain::build(model);
+    QCOMPARE(chains.size(), 1);
+    aadl::AADLConnectionChain *chain = chains.at(0);
+
+    QCOMPARE(chain->connectionNames("MiniA", "MiniB"), { QString("PI_1") });
+    QCOMPARE(chain->connectionNames("MiniA", "BlockB"), { QString("PI_2") });
+    QCOMPARE(chain->connectionNames("BlockA", "MiniB"), { QString("PI_1") });
+    QStringList result = { QString("PI_2"), QString("PI_1") };
+    QCOMPARE(chain->connectionNames("BlockA", ""), result);
 }
 
 QTEST_APPLESS_MAIN(tst_AADLConnectionChain)

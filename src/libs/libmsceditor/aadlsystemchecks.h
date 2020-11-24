@@ -42,6 +42,7 @@ class MSCEditorCore;
 class MscInstance;
 class MscMessage;
 class MscMessageDeclaration;
+class MscModel;
 
 /*!
    \brief The AadlSystemChecks class is used to check consistency of a msc model with one aadl model
@@ -66,14 +67,12 @@ public:
     QVector<QPair<msc::MscChart *, msc::MscMessage *>> checkMessages() const;
     bool checkMessage(const msc::MscMessage *message) const;
     QStringList connectionNames() const;
-    bool connectionExists(const QString &name, const QString &sourceName, const QString &targetName) const;
     QStringList connectionNamesFromTo(const QString &sourceName, const QString &targetName) const;
 
     aadl::AADLObjectFunction *correspondingFunction(const MscInstance *instance) const;
     bool correspond(const aadl::AADLObject *aadlObj, const msc::MscInstance *instance) const;
     bool correspond(const aadl::AADLObjectFunction *aadlFunc, const msc::MscInstance *instance) const;
 
-    aadl::AADLObjectConnection *correspondingConnection(const MscMessage *message) const;
     bool correspond(const aadl::AADLObjectConnection *connection, const msc::MscMessage *message) const;
 
     QVector<msc::MscMessageDeclaration *> allConnectionsAsDeclaration() const;

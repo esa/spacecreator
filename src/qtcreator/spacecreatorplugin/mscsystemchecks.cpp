@@ -17,6 +17,7 @@
 
 #include "mscsystemchecks.h"
 
+#include "aadlconnectionchain.h"
 #include "aadlmodelstorage.h"
 #include "aadlobjectconnection.h"
 #include "aadlobjectfunction.h"
@@ -403,11 +404,20 @@ void MscSystemChecks::onMscEntityNameChanged(QObject *entity, const QString &old
     if (message && ivCore() && ivCore()->document() && ivCore()->document()->objectsModel()) {
         const QString fromName = message->sourceInstance() ? message->sourceInstance()->name() : "";
         const QString toName = message->targetInstance() ? message->targetInstance()->name() : "";
-        const bool hasNewName =
-                ivCore()->document()->objectsModel()->getConnection(message->name(), fromName, toName, m_caseCheck)
-                != nullptr;
-        const bool hasOldName =
-                ivCore()->document()->objectsModel()->getConnection(oldName, fromName, toName, m_caseCheck) != nullptr;
+        QList<aadl::AADLConnectionChain *> chains =
+                aadl::AADLConnectionChain::build(*ivCore()->document()->objectsModel());
+        bool hasNewName = false;
+        bool hasOldName = false;
+        for (aadl::AADLConnectionChain *chain : chains) {
+            if (chain->contains(message->name(), fromName, toName)) {
+                hasNewName = true;
+                break;
+            }
+            if (chain->contains(oldName, fromName, toName)) {
+                hasOldName = true;
+                break;
+            }
+        }
 
         if (!hasNewName && !hasOldName) {
             const int result = QMessageBox::question(nullptr, tr("No AADL connection"),

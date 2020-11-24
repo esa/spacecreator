@@ -19,6 +19,7 @@
 #include "aadlobjectfunction.h"
 #include "aadlobjectsmodel.h"
 #include "aadlsystemchecks.h"
+#include "aadltestutils.h"
 #include "baseitems/common/coordinatesconverter.h"
 #include "chartitem.h"
 #include "commandsstack.h"
@@ -207,17 +208,12 @@ void tst_AadlSystemChecks::testCheckMessageNames()
     auto aadlfFuncB = new aadl::AADLObjectFunction("Instance B");
     aadlModel->addObject(aadlfFuncB);
 
-    // Add connection with proper source/target, but a wrong name
-    const auto createInfoA = aadl::AADLObjectIface::CreationInfo(aadlModel, aadlfFuncA, QPointF(),
-            aadl::AADLObjectIface::IfaceType::Required, shared::createId(), QVector<aadl::IfaceParameter>(),
-            aadl::AADLObjectIface::OperationKind::Sporadic, "DummyA");
-    aadl::AADLObjectIface *requiredInterface = aadl::AADLObjectIface::createIface(createInfoA);
+    aadl::AADLObjectIface *requiredInterface =
+            aadl::testutils::createIface(aadlfFuncA, aadl::AADLObjectIface::IfaceType::Required, "DummyA");
     aadlModel->addObject(requiredInterface);
 
-    const auto createInfoB = aadl::AADLObjectIface::CreationInfo(aadlModel, aadlfFuncB, QPointF(),
-            aadl::AADLObjectIface::IfaceType::Provided, shared::createId(), QVector<aadl::IfaceParameter>(),
-            aadl::AADLObjectIface::OperationKind::Sporadic, "DummyB");
-    aadl::AADLObjectIface *providedInterface = aadl::AADLObjectIface::createIface(createInfoB);
+    aadl::AADLObjectIface *providedInterface =
+            aadl::testutils::createIface(aadlfFuncB, aadl::AADLObjectIface::IfaceType::Provided, "DummyB");
     aadlModel->addObject(providedInterface);
     aadlModel->addObject(new aadl::AADLObjectConnection(requiredInterface, providedInterface));
     result = checker.checkMessages();
@@ -278,12 +274,10 @@ void tst_AadlSystemChecks::testCorrespondMessage()
     // Setup the connection
     auto sourceFunc = std::make_unique<AADLObjectFunction>(sourceFuncName);
     auto targetFunc = std::make_unique<AADLObjectFunction>(targetFuncName);
-    const auto sourceIfInfo = AADLObjectIface::CreationInfo(nullptr, sourceFunc.get(), QPointF(), sourceIfType,
-            shared::createId(), QVector<IfaceParameter>(), AADLObjectIface::OperationKind::Sporadic, sourceIfName);
-    std::unique_ptr<AADLObjectIface> sourceIf(AADLObjectIface::createIface(sourceIfInfo));
-    const auto targetIfInfo = AADLObjectIface::CreationInfo(nullptr, targetFunc.get(), QPointF(), targetIfType,
-            shared::createId(), QVector<IfaceParameter>(), AADLObjectIface::OperationKind::Sporadic, targetIfName);
-    std::unique_ptr<AADLObjectIface> targetIf(AADLObjectIface::createIface(targetIfInfo));
+    std::unique_ptr<AADLObjectIface> sourceIf(
+            aadl::testutils::createIface(sourceFunc.get(), sourceIfType, sourceIfName));
+    std::unique_ptr<AADLObjectIface> targetIf(
+            aadl::testutils::createIface(targetFunc.get(), targetIfType, targetIfName));
     auto connection = std::make_unique<AADLObjectConnection>(sourceIf.get(), targetIf.get());
 
     msc::AadlSystemChecks checker;

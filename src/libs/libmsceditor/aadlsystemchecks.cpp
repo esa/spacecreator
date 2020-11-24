@@ -17,6 +17,7 @@
 
 #include "aadlsystemchecks.h"
 
+#include "aadlconnectionchain.h"
 #include "aadlobjectconnection.h"
 #include "aadlobjectfunction.h"
 #include "aadlobjectsmodel.h"
@@ -161,6 +162,7 @@ QStringList AadlSystemChecks::functionsNames() const
 
 /*!
    Checks all messages if they are defined in the IV model as connection
+   Returns all messages with their chart, that are not part
  */
 QVector<QPair<MscChart *, MscMessage *>> AadlSystemChecks::checkMessages() const
 {
@@ -173,8 +175,7 @@ QVector<QPair<MscChart *, MscMessage *>> AadlSystemChecks::checkMessages() const
     for (msc::MscChart *chart : charts) {
         for (msc::MscInstanceEvent *event : chart->instanceEvents()) {
             if (auto message = qobject_cast<msc::MscMessage *>(event)) {
-                aadl::AADLObjectConnection *aadlConnection = correspondingConnection(message);
-                if (!aadlConnection) {
+                if (!checkMessage(message)) {
                     result << QPair<MscChart *, MscMessage *>(chart, message);
                 }
             }
@@ -186,15 +187,24 @@ QVector<QPair<MscChart *, MscMessage *>> AadlSystemChecks::checkMessages() const
 
 /*!
    Checks if the given MSC message has a corresponding aadl connection
+   @return Returns false, if the message is not part of the aadl model
  */
 bool AadlSystemChecks::checkMessage(const MscMessage *message) const
 {
-    if (!m_ivCore) {
-        return true;
+    if (!m_ivCore || !message) {
+        return false;
     }
 
-    aadl::AADLObjectConnection *aadlConnection = correspondingConnection(message);
-    return aadlConnection != nullptr;
+    QList<aadl::AADLConnectionChain *> chains = aadl::AADLConnectionChain::build(*aadlModel());
+    const QString sourceName = message->sourceInstance() ? message->sourceInstance()->name() : "";
+    const QString targetName = message->targetInstance() ? message->targetInstance()->name() : "";
+    for (aadl::AADLConnectionChain *chain : chains) {
+        if (chain->contains(message->name(), sourceName, targetName)) {
+            return true;
+        }
+    }
+
+    return false;
 }
 
 /*!
@@ -210,16 +220,6 @@ QStringList AadlSystemChecks::connectionNames() const
     return m_ivCore->aadlConnectionNames();
 }
 
-bool AadlSystemChecks::connectionExists(const QString &name, const QString &sourceName, const QString &targetName) const
-{
-    aadl::AADLObjectsModel *model = aadlModel();
-    if (model == nullptr) {
-        return true;
-    }
-
-    return model->getConnection(name, sourceName, targetName, m_caseCheck) != nullptr;
-}
-
 /*!
    Returns all connections that have \p sourceName as required interface and \p targetName as provided interface
    \note the names are aadl encoded by this function
@@ -231,20 +231,19 @@ QStringList AadlSystemChecks::connectionNamesFromTo(const QString &sourceName, c
         return {};
     }
 
-    const QVector<aadl::AADLObjectConnection *> connections = m_ivCore->allAadlConnections();
     QStringList connectionNames;
-    for (const aadl::AADLObjectConnection *aadlConnection : connections) {
-        if (aadlConnection && !aadlConnection->targetInterfaceName().isEmpty()) {
-            if (aadlConnection->sourceName().compare(sourceName, m_caseCheck) == 0
-                    && aadlConnection->targetName().compare(targetName, m_caseCheck) == 0) {
-                connectionNames << aadlConnection->targetInterfaceName();
-            }
-        }
+    QList<aadl::AADLConnectionChain *> chains = aadl::AADLConnectionChain::build(*aadlModel());
+    for (aadl::AADLConnectionChain *chain : chains) {
+        const QStringList names = chain->connectionNames(sourceName, targetName);
+        connectionNames += names;
     }
     connectionNames.removeDuplicates();
     return connectionNames;
 }
 
+/*!
+   Returns a pointer to the AADL model of the in-core
+ */
 aadl::AADLObjectsModel *AadlSystemChecks::aadlModel() const
 {
     if (!m_ivCore) {
@@ -363,27 +362,6 @@ bool AadlSystemChecks::isAncestor(aadl::AADLObjectFunction *func, aadl::AADLObje
     }
 
     return false;
-}
-
-/*!
-   Returns the corresponding aadl connection for the given \p message.
-   If no such connection exists, a nullptr is returned.
- */
-aadl::AADLObjectConnection *AadlSystemChecks::correspondingConnection(const MscMessage *message) const
-{
-    if (!message) {
-        return nullptr;
-    }
-
-    const QVector<aadl::AADLObjectConnection *> connections = m_ivCore->allAadlConnections();
-    auto it = std::find_if(connections.cbegin(), connections.cend(),
-            [this, &message](aadl::AADLObjectConnection *connection) { return correspond(connection, message); });
-
-    if (it == connections.cend()) {
-        return nullptr;
-    }
-
-    return *it;
 }
 
 /**

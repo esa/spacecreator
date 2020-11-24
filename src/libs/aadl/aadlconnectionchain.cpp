@@ -193,19 +193,81 @@ bool AADLConnectionChain::contains(AADLObjectConnection *connection) const
 bool AADLConnectionChain::contains(
         const QString &connectionName, const QString &sourceName, const QString &targetName) const
 {
-    auto it = m_chain.begin();
-    while (it != m_chain.end() && (*it)->sourceName().trimmed().toLower() != sourceName.trimmed().toLower()) {
-        ++it;
-    }
-    while (it != m_chain.end() && (*it)->targetName().trimmed().toLower() != targetName.trimmed().toLower()) {
-        ++it;
+    if (sourceName.isEmpty() && targetName.isEmpty()) {
+        return false;
     }
 
-    if (it != m_chain.end()) {
-        return (*it)->name().trimmed().toLower() == connectionName.trimmed().toLower();
+    const QString sName = sourceName.trimmed().toLower();
+    const QString tName = targetName.trimmed().toLower();
+
+    auto it = m_chain.begin();
+    if (!sName.isEmpty()) {
+        while (it != m_chain.end() && (*it)->sourceName().trimmed().toLower() != sName) {
+            ++it;
+        }
+    }
+
+    if (!tName.isEmpty()) {
+        while (it != m_chain.end() && (*it)->targetName().trimmed().toLower() != tName) {
+            ++it;
+        }
+    }
+
+    if (!sName.isEmpty() && !tName.isEmpty()) {
+        if (it != m_chain.end()) {
+            return (*it)->name().trimmed().toLower() == connectionName.trimmed().toLower();
+        }
+    } else {
+        // at least one name has to to match for a message from/to the environment
+        it = m_chain.begin();
+        while (it != m_chain.end()) {
+            if ((*it)->name().trimmed().toLower() == connectionName.trimmed().toLower()) {
+                return true;
+            }
+            ++it;
+        }
     }
 
     return false;
+}
+
+/*!
+   Returns the connection name for the given target (if it is part of this chain)
+   If the the targetName is empty (from/to environment) all connection names after the source are returned.
+ */
+QStringList AADLConnectionChain::connectionNames(const QString &sourceName, const QString &targetName) const
+{
+    if (sourceName.isEmpty() && targetName.isEmpty()) {
+        return {};
+    }
+
+    const QString sName = sourceName.trimmed().toLower();
+    const QString tName = targetName.trimmed().toLower();
+
+    auto it = m_chain.begin();
+    if (!sName.isEmpty()) {
+        while (it != m_chain.end() && (*it)->sourceName().trimmed().toLower() != sName) {
+            ++it;
+        }
+    }
+
+    if (!tName.isEmpty()) {
+        while (it != m_chain.end() && (*it)->targetName().trimmed().toLower() != tName) {
+            ++it;
+        }
+        if (it != m_chain.end()) {
+            return { (*it)->name() };
+        }
+    } else {
+        QStringList result;
+        while (it != m_chain.end()) {
+            result << (*it)->name();
+            ++it;
+        }
+        return result;
+    }
+
+    return {};
 }
 
 /*!

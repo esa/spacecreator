@@ -998,7 +998,7 @@ bool MessageItem::wannabeGlobal() const
 }
 
 /*!
-   Returns, if the message has a corresponding ssdl connection
+   Returns, if the message has a corresponding aadl connection
  */
 bool MessageItem::aadlConnectionOk() const
 {
