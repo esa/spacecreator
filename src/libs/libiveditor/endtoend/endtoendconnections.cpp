@@ -17,6 +17,7 @@
 
 #include "endtoendconnections.h"
 
+#include "aadlconnectionchain.h"
 #include "aadlobjectconnection.h"
 #include "mscchart.h"
 #include "mscdocument.h"
@@ -172,16 +173,25 @@ EndToEndConnections::Dataflow EndToEndConnections::readDataflow(const QString &f
     return {};
 }
 
-bool EndToEndConnections::isInDataflow(const Dataflow &dataflow, aadl::AADLObjectConnection *connection)
+bool EndToEndConnections::isInDataflow(const Dataflow &dataflow, const QList<aadl::AADLConnectionChain *> &chains,
+        aadl::AADLObjectConnection *connection)
 {
     // Just to be on the save side
     if (connection == nullptr) {
         return false;
     }
 
-    Connection c = { connection->sourceName().trimmed().toLower(), connection->targetName().trimmed().toLower(),
-        connection->targetInterfaceName().trimmed().toLower() };
-    return dataflow.connections.contains(c);
+    for (aadl::AADLConnectionChain *chain : chains) {
+        for (const Connection &mscConnection : dataflow.connections) {
+            if (chain->contains(connection)) {
+                if (chain->contains(mscConnection.message, mscConnection.from, mscConnection.to)) {
+                    return true;
+                }
+            }
+        }
+    }
+
+    return false;
 }
 
 //! Set the path of the MSC file

@@ -17,6 +17,7 @@
 
 #include "endtoendview.h"
 
+#include "aadlconnectionchain.h"
 #include "aadlobjectconnection.h"
 #include "aadlobjectfunction.h"
 #include "aadlobjectsmodel.h"
@@ -157,6 +158,8 @@ void EndToEndView::refreshView()
     QList<aadl::AADLObject *> objects = d->document->objectsModel()->visibleObjects({});
     aadl::AADLObject::sortObjectList(objects);
 
+    const QList<aadl::AADLConnectionChain *> chains = aadl::AADLConnectionChain::build(*d->document->objectsModel());
+
     msc::MscDocument *doc = nullptr;
     if (d->ui->leafDocsView->currentIndex().isValid()) {
         QVariant currentData = d->ui->leafDocsView->currentIndex().data(QObjectListModel::ObjectRole);
@@ -230,7 +233,7 @@ void EndToEndView::refreshView()
                 auto endItem = qgraphicsitem_cast<AADLInterfaceGraphicsItem *>(
                         ifaceEnd ? items.value(ifaceEnd->id()) : nullptr);
 
-                if (EndToEndConnections::isInDataflow(dataflow, connection)) {
+                if (EndToEndConnections::isInDataflow(dataflow, chains, connection)) {
                     item = new AADLFlowConnectionGraphicsItem(connection, startItem, endItem, parentItem);
                 } else {
                     item = new AADLConnectionGraphicsItem(connection, startItem, endItem, parentItem);

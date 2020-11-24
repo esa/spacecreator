@@ -42,6 +42,7 @@ public:
     bool append(AADLObjectConnection *connection);
     bool append(AADLConnectionChain *chain);
 
+    bool contains(AADLObjectConnection *connection) const;
     bool contains(const QString &connectionName, const QString &sourceName, const QString &targetName) const;
 
     bool operator==(const AADLConnectionChain &other) const;

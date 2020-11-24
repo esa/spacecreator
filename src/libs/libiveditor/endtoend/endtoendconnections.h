@@ -24,6 +24,7 @@
 #include <QVector>
 
 namespace aadl {
+class AADLConnectionChain;
 class AADLObjectConnection;
 }
 
@@ -92,7 +93,8 @@ public:
     static Dataflow readDataflow(const QString &file, bool isFile);
     static Dataflow readDataFlowFromDocument(msc::MscDocument *document);
 
-    static bool isInDataflow(const Dataflow &dataflow, aadl::AADLObjectConnection *connection);
+    static bool isInDataflow(const Dataflow &dataflow, const QList<aadl::AADLConnectionChain *> &chains,
+            aadl::AADLObjectConnection *connection);
 
 Q_SIGNALS:
     void pathChanged(const QString &path);

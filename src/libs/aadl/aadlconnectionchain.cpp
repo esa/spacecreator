@@ -178,6 +178,14 @@ bool AADLConnectionChain::append(AADLConnectionChain *chain)
 }
 
 /*!
+   Return if the aadl \p connection is part of this chain
+ */
+bool AADLConnectionChain::contains(AADLObjectConnection *connection) const
+{
+    return m_chain.contains(connection);
+}
+
+/*!
    Returns if the chain does connect source \p sourceName with target \p targetName with the connection \p
    connectionName.
    Or if a part of the chain does
@@ -186,15 +194,15 @@ bool AADLConnectionChain::contains(
         const QString &connectionName, const QString &sourceName, const QString &targetName) const
 {
     auto it = m_chain.begin();
-    while (it != m_chain.end() && (*it)->sourceName() != sourceName) {
+    while (it != m_chain.end() && (*it)->sourceName().trimmed().toLower() != sourceName.trimmed().toLower()) {
         ++it;
     }
-    while (it != m_chain.end() && (*it)->targetName() != targetName) {
+    while (it != m_chain.end() && (*it)->targetName().trimmed().toLower() != targetName.trimmed().toLower()) {
         ++it;
     }
 
     if (it != m_chain.end()) {
-        return (*it)->name() == connectionName;
+        return (*it)->name().trimmed().toLower() == connectionName.trimmed().toLower();
     }
 
     return false;
