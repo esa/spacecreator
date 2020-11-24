@@ -117,3 +117,5 @@ private:
 };
 
 }
+
+QDebug operator<<(QDebug debug, const aadl::AADLObjectConnection &connection);

@@ -368,3 +368,11 @@ QVector<IfaceParameter> AADLObjectConnection::params() const
 }
 
 }
+
+QDebug operator<<(QDebug debug, const aadl::AADLObjectConnection &c)
+{
+    QDebugStateSaver saver(debug);
+    debug.nospace() << QString("%1.%2<->%3.%4")
+                               .arg(c.sourceName(), c.sourceInterfaceName(), c.targetName(), c.targetInterfaceName());
+    return debug;
+}

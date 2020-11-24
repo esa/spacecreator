@@ -1,0 +1,133 @@
+<?xml version="1.0"?>
+<InterfaceView>
+    <Function name="BlockA" language="" is_type="NO" instance_of="">
+        <Property name="Taste::coordinates" value="13300 14000 56700 54400"/>
+        <Required_Interface name="RI_1" kind="SPORADIC_OPERATION" period="" wcet="" queue_size="">
+            <Property name="Taste::coordinates" value="56700 22300"/>
+            <Property name="Taste::InheritPI" value="true"/>
+        </Required_Interface>
+        <Required_Interface name="RI_2" kind="SPORADIC_OPERATION" period="" wcet="" queue_size="">
+            <Property name="Taste::coordinates" value="56700 27200"/>
+            <Property name="Taste::InheritPI" value="true"/>
+        </Required_Interface>
+        <Required_Interface name="RI_3" kind="SPORADIC_OPERATION" period="" wcet="" queue_size="">
+            <Property name="Taste::coordinates" value="56700 41000"/>
+            <Property name="Taste::InheritPI" value="true"/>
+        </Required_Interface>
+        <Required_Interface name="RI_4" kind="SPORADIC_OPERATION" period="" wcet="" queue_size="">
+            <Property name="Taste::coordinates" value="56700 31200"/>
+            <Property name="Taste::InheritPI" value="true"/>
+        </Required_Interface>
+        <Required_Interface name="RI_5" kind="SPORADIC_OPERATION" period="" wcet="" queue_size="">
+            <Property name="Taste::coordinates" value="56700 47100"/>
+            <Property name="Taste::InheritPI" value="true"/>
+        </Required_Interface>
+        <Function name="MiniA" language="" is_type="NO" instance_of="">
+            <Property name="Taste::coordinates" value="21800 17700 41800 33000"/>
+            <Required_Interface name="RI_1" kind="ANY_OPERATION">
+                <Property name="Taste::coordinates" value="41800 22300"/>
+                <Property name="Taste::InheritPI" value="true"/>
+                <Property name="Taste::Autonamed" value="true"/>
+            </Required_Interface>
+            <Required_Interface name="RI_2" kind="ANY_OPERATION">
+                <Property name="Taste::coordinates" value="41800 27300"/>
+                <Property name="Taste::InheritPI" value="true"/>
+                <Property name="Taste::Autonamed" value="true"/>
+            </Required_Interface>
+            <Required_Interface name="RI_3" kind="ANY_OPERATION">
+                <Property name="Taste::coordinates" value="41800 31300"/>
+                <Property name="Taste::InheritPI" value="true"/>
+                <Property name="Taste::Autonamed" value="true"/>
+            </Required_Interface>
+        </Function>
+        <Connection>
+            <Source func_name="MiniA" ri_name="RI_1"/>
+            <Target func_name="BlockA" ri_name="RI_1"/>
+            <Property name="Taste::coordinates" value="42400 22300 56400 22300"/>
+        </Connection>
+        <Connection>
+            <Source func_name="MiniA" ri_name="RI_2"/>
+            <Target func_name="BlockA" ri_name="RI_2"/>
+            <Property name="Taste::coordinates" value="42400 27300 56400 27200"/>
+        </Connection>
+        <Connection>
+            <Source func_name="MiniA" ri_name="RI_3"/>
+            <Target func_name="BlockA" ri_name="RI_4"/>
+            <Property name="Taste::coordinates" value="42400 31300 56400 31200"/>
+        </Connection>
+    </Function>
+    <Function name="BlockB" language="" is_type="NO" instance_of="">
+        <Property name="Taste::coordinates" value="69800 14600 116400 53900"/>
+        <Provided_Interface name="PI_1" kind="SPORADIC_OPERATION" period="" wcet="" queue_size="">
+            <Property name="Taste::coordinates" value="69800 22100"/>
+        </Provided_Interface>
+        <Provided_Interface name="PI_2" kind="SPORADIC_OPERATION" period="" wcet="" queue_size="">
+            <Property name="Taste::coordinates" value="69800 27000"/>
+        </Provided_Interface>
+        <Provided_Interface name="PI_3" kind="SPORADIC_OPERATION" period="" wcet="" queue_size="">
+            <Property name="Taste::coordinates" value="69800 40800"/>
+        </Provided_Interface>
+        <Provided_Interface name="PI_4" kind="SPORADIC_OPERATION" period="" wcet="" queue_size="">
+            <Property name="Taste::coordinates" value="69800 31000"/>
+        </Provided_Interface>
+        <Function name="MiniB" language="" is_type="NO" instance_of="">
+            <Property name="Taste::coordinates" value="82600 19500 109600 33300"/>
+            <Property name="Taste::RootCoordinates" value="3100 3100 126700 81400"/>
+            <Provided_Interface name="PI_1" kind="SPORADIC_OPERATION" period="" wcet="" queue_size="">
+                <Property name="Taste::coordinates" value="82600 22100"/>
+                <Property name="Taste::InnerCoordinates" value="3100 10100"/>
+            </Provided_Interface>
+            <Provided_Interface name="PI_2" kind="SPORADIC_OPERATION" period="" wcet="" queue_size="">
+                <Property name="Taste::coordinates" value="82600 31100"/>
+                <Property name="Taste::InnerCoordinates" value="3100 28200"/>
+            </Provided_Interface>
+            <Function name="MacroB" language="" is_type="NO" instance_of="">
+                <Property name="Taste::coordinates" value="98300 22600 118300 30600"/>
+                <Property name="Taste::InnerCoordinates" value="30200 15900 62100 38200"/>
+                <Provided_Interface name="PI_2" kind="SPORADIC_OPERATION" period="" wcet="" queue_size="">
+                    <Property name="Taste::InnerCoordinates" value="30200 27700"/>
+                </Provided_Interface>
+            </Function>
+            <Connection>
+                <Source func_name="MacroB" pi_name="PI_2"/>
+                <Target func_name="MiniB" pi_name="PI_2"/>
+                <Property name="Taste::InnerCoordinates" value="29900 27700 3700 28200"/>
+            </Connection>
+        </Function>
+        <Connection>
+            <Source func_name="MiniB" pi_name="PI_1"/>
+            <Target func_name="BlockB" pi_name="PI_1"/>
+            <Property name="Taste::coordinates" value="82300 22100 70400 22100"/>
+        </Connection>
+        <Connection>
+            <Source func_name="MiniB" pi_name="PI_2"/>
+            <Target func_name="BlockB" pi_name="PI_4"/>
+            <Property name="Taste::coordinates" value="82300 31100 70400 31000"/>
+        </Connection>
+    </Function>
+    <Connection>
+        <Source func_name="BlockA" ri_name="RI_4"/>
+        <Target func_name="BlockB" pi_name="PI_4"/>
+        <Property name="Taste::coordinates" value="57300 31200 69500 31000"/>
+    </Connection>
+    <Connection>
+        <Source func_name="BlockA" ri_name="RI_5"/>
+        <Target func_name="BlockB" pi_name="PI_3"/>
+        <Property name="Taste::coordinates" value="57300 47100 63400 47100 63400 40800 69500 40800"/>
+    </Connection>
+    <Connection>
+        <Source func_name="BlockA" ri_name="RI_2"/>
+        <Target func_name="BlockB" pi_name="PI_2"/>
+        <Property name="Taste::coordinates" value="57300 27200 69500 27000"/>
+    </Connection>
+    <Connection>
+        <Source func_name="BlockA" ri_name="RI_3"/>
+        <Target func_name="BlockB" pi_name="PI_3"/>
+        <Property name="Taste::coordinates" value="57300 41000 69500 40800"/>
+    </Connection>
+    <Connection>
+        <Source func_name="BlockA" ri_name="RI_1"/>
+        <Target func_name="BlockB" pi_name="PI_1"/>
+        <Property name="Taste::coordinates" value="57300 22300 69500 22100"/>
+    </Connection>
+</InterfaceView>

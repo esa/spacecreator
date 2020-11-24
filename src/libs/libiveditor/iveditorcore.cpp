@@ -69,7 +69,7 @@ IVEditorCore::IVEditorCore(QObject *parent)
     }
 }
 
-IVEditorCore::~IVEditorCore() {}
+IVEditorCore::~IVEditorCore() { }
 
 /*!
    Returns the interface document
@@ -321,8 +321,8 @@ QStringList IVEditorCore::aadlConnectionNames() const
 {
     QStringList connectionNames;
     for (const aadl::AADLObjectConnection *aadlConnection : m_aadlConnections) {
-        if (aadlConnection && !aadlConnection->targetInterfaceName().isEmpty()) {
-            connectionNames << aadlConnection->targetInterfaceName();
+        if (aadlConnection && !aadlConnection->name().isEmpty()) {
+            connectionNames << aadlConnection->name();
         }
     }
     connectionNames.removeDuplicates();

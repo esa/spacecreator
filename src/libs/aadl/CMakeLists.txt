@@ -5,6 +5,8 @@ add_library(${LIB_NAME} STATIC)
 target_sources(${LIB_NAME} PRIVATE
     aadlcommonprops.cpp
     aadlcommonprops.h
+    aadlconnectionchain.cpp
+    aadlconnectionchain.h
     aadlnamevalidator.cpp
     aadlnamevalidator.h
     aadlobject.cpp
