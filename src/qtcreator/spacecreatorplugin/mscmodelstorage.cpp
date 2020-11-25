@@ -44,6 +44,14 @@ QSharedPointer<msc::MSCEditorCore> MscModelStorage::mscData(const QString &fileN
 }
 
 /*!
+   Clears the whole store
+ */
+void MscModelStorage::remove(const QString &fileName)
+{
+    m_store.remove(fileName);
+}
+
+/*!
    Sets the MSCEditorCore object for the given file.
    If the object was already used for another file, that old file/object connection is removed.
  */

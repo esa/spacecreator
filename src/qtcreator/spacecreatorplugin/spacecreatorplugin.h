@@ -25,6 +25,10 @@
 
 class QAction;
 
+namespace ProjectExplorer {
+class Project;
+}
+
 namespace aadlinterface {
 class IVEditorCore;
 }
@@ -67,6 +71,7 @@ private Q_SLOTS:
     void onDynContextEditorMenuInvoked();
     void checkAsnFileRename();
     void saveIfNotOpen(shared::EditorCore *core);
+    void clearProjectData(ProjectExplorer::Project *project);
 
 private:
     bool isOpenInEditor(shared::EditorCore *core) const;

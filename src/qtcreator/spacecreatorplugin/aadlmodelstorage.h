@@ -47,6 +47,8 @@ public:
 
     QSharedPointer<aadlinterface::IVEditorCore> ivData(const QString &fileName);
 
+    void remove(const QString &fileName);
+
 Q_SIGNALS:
     void editedExternally(shared::EditorCore *);
     void coreAdded(QSharedPointer<aadlinterface::IVEditorCore> mscCore);

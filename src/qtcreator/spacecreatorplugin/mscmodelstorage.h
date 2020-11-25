@@ -42,6 +42,8 @@ public:
 
     QSharedPointer<msc::MSCEditorCore> mscData(const QString &fileName);
 
+    void remove(const QString &fileName);
+
 Q_SIGNALS:
     void editedExternally(shared::EditorCore *);
     void coreAdded(QSharedPointer<msc::MSCEditorCore> mscCore);

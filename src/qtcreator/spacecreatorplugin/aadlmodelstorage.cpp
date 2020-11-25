@@ -57,6 +57,14 @@ QSharedPointer<aadlinterface::IVEditorCore> AadlModelStorage::ivData(const QStri
 }
 
 /*!
+   Removes the file \p fileName if included in the store
+ */
+void AadlModelStorage::remove(const QString &fileName)
+{
+    m_store.remove(fileName);
+}
+
+/*!
    Sets the IVEditorCore object for the given file.
    If the object was already used for another file, that old file/object connection is removed.
  */

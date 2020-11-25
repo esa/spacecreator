@@ -51,6 +51,8 @@
 #include <projectexplorer/project.h>
 #include <projectexplorer/projectexplorerconstants.h>
 #include <projectexplorer/projecttree.h>
+#include <projectexplorer/session.h>
+#include <utils/fileutils.h>
 
 void initMscResources()
 {
@@ -204,10 +206,16 @@ bool SpaceCreatorPlugin::initialize(const QStringList &arguments, QString *error
     // asn connection
     connect(ProjectExplorer::ProjectTree::instance(), &ProjectExplorer::ProjectTree::currentProjectChanged, this,
             [this](ProjectExplorer::Project *project) {
-                m_asnFiles = m_checks->allAsn1Files();
-                connect(project, &ProjectExplorer::Project::fileListChanged, this,
-                        &spctr::SpaceCreatorPlugin::checkAsnFileRename, Qt::UniqueConnection);
+                if (project) {
+                    m_asnFiles = m_checks->allAsn1Files();
+                    connect(project, &ProjectExplorer::Project::fileListChanged, this,
+                            &spctr::SpaceCreatorPlugin::checkAsnFileRename, Qt::UniqueConnection);
+                }
             });
+
+    // QtCreator stuff
+    connect(ProjectExplorer::SessionManager::instance(), &ProjectExplorer::SessionManager::aboutToRemoveProject, this,
+            &spctr::SpaceCreatorPlugin::clearProjectData);
 
     return true;
 }
@@ -297,6 +305,22 @@ void SpaceCreatorPlugin::saveIfNotOpen(shared::EditorCore *core)
 {
     if (!isOpenInEditor(core)) {
         core->save();
+    }
+}
+
+/*!
+   Clears all data of the given project
+ */
+void SpaceCreatorPlugin::clearProjectData(ProjectExplorer::Project *project)
+{
+    if (!project) {
+        return;
+    }
+
+    const Utils::FileNameList files = project->files(ProjectExplorer::Project::AllFiles);
+    for (const Utils::FileName &fileName : files) {
+        m_aadlStorage->remove(fileName.toString());
+        m_mscStorage->remove(fileName.toString());
     }
 }
 
