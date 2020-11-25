@@ -82,8 +82,7 @@ bool DynActionEditor::init()
     if (files.size() == 1)
         file = files.first();
     else {
-        file = QFileDialog::getOpenFileName(
-                this, tr("Select actions file"), ActionsManager::storagePath(), "*.json");
+        file = QFileDialog::getOpenFileName(this, tr("Select actions file"), ActionsManager::storagePath(), "*.json");
     }
 
     return loadFile(file);
@@ -265,9 +264,11 @@ void DynActionEditor::on_btnSelectFile_clicked()
 
 void DynActionEditor::on_btnCreateFile_clicked()
 {
-    const QString &filePath =
-            QFileDialog::getSaveFileName(this, tr("Save new file"), ActionsManager::storagePath(), "*.json");
-    if (!filePath.isEmpty()) {
+    QFileDialog dialog(this, tr("Save new file"), ActionsManager::storagePath(), "*.json");
+    dialog.setAcceptMode(QFileDialog::AcceptSave);
+    dialog.setDefaultSuffix(".json");
+    if (dialog.exec() == QDialog::Accepted) {
+        const QString filePath = dialog.selectedUrls().value(0).toLocalFile();
         m_actions.clear();
         m_action = nullptr;
 

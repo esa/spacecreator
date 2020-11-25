@@ -348,15 +348,12 @@ void IVEditorCore::onSaveRenderRequested()
 {
     const QString defaultFileName = QString("%1.png").arg(QDateTime::currentDateTime().toString("dd-MM-yyyy_HH-mm-ss"));
     const QStringList &extensions = supportedImgFileExtensions();
-    QString fileName =
-            QFileDialog::getSaveFileName(nullptr, tr("Save screenshot..."), defaultFileName, extensions.join(";; "));
 
-    if (!fileName.isEmpty()) {
-        QFileInfo selectedFile(fileName);
-        const QString usedExtension = "*." + selectedFile.suffix().toLower();
-        if (!extensions.contains(usedExtension))
-            fileName.append(".png");
-
+    QFileDialog dialog(nullptr, tr("Save screenshot..."), defaultFileName, extensions.join(";; "));
+    dialog.setAcceptMode(QFileDialog::AcceptSave);
+    dialog.setDefaultSuffix(".png");
+    if (dialog.exec() == QDialog::Accepted) {
+        const QString fileName = dialog.selectedUrls().value(0).toLocalFile();
         saveSceneRender(fileName);
     }
 }

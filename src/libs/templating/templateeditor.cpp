@@ -249,12 +249,14 @@ void TemplateEditor::onHelpRequested()
  */
 void TemplateEditor::onSaveResult()
 {
-    const QString &outputFileName =
-            QFileDialog::getSaveFileName(this, tr("Save result to file"), m_outFileName, QStringLiteral("*.xml"));
-    if (outputFileName.isEmpty())
-        return;
-
-    saveResultToFile(outputFileName);
+    const QString extension = ".xml";
+    QFileDialog dialog(this, tr("Save result to file"), m_outFileName, QString("*%1").arg(extension));
+    dialog.setAcceptMode(QFileDialog::AcceptSave);
+    dialog.setDefaultSuffix(extension);
+    if (dialog.exec() == QDialog::Accepted) {
+        const QString outputFileName = dialog.selectedUrls().value(0).toLocalFile();
+        saveResultToFile(outputFileName);
+    }
 }
 
 /**

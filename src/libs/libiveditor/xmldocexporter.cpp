@@ -173,9 +173,15 @@ bool XmlDocExporter::exportDocInterface(InterfaceDocument *doc, QWidget *parentW
     if (savePath.isEmpty())
         savePath = doc->path();
 
-    if (savePath.isEmpty())
-        savePath = QFileDialog::getSaveFileName(parentWindow, QObject::tr("Export Interface to an XML file"),
-                doc->path(), doc->supportedFileExtensions());
+    if (savePath.isEmpty()) {
+        QFileDialog dialog(parentWindow, QObject::tr("Export Interface to an XML file"), doc->path(),
+                doc->supportedFileExtensions());
+        dialog.setAcceptMode(QFileDialog::AcceptSave);
+        dialog.setDefaultSuffix(".xml");
+        if (dialog.exec() == QDialog::Accepted) {
+            savePath = dialog.selectedUrls().value(0).toLocalFile();
+        }
+    }
 
     if (savePath.isEmpty())
         return false;

@@ -278,9 +278,11 @@ void EndToEndView::refreshView()
 
 void EndToEndView::exportToPng()
 {
-    const QString path = QFileDialog::getSaveFileName(
-            parentWidget(), tr("Save as PNG"), d->lastExportPath, tr("PNG Images (*.png)"));
-    if (!path.isEmpty()) {
+    QFileDialog dialog(parentWidget(), tr("Save as PNG"), d->lastExportPath, tr("PNG Images (*.png)"));
+    dialog.setAcceptMode(QFileDialog::AcceptSave);
+    dialog.setDefaultSuffix(".png");
+    if (dialog.exec() == QDialog::Accepted) {
+        const QString path = dialog.selectedUrls().value(0).toLocalFile();
         d->lastExportPath = path;
 
         // Create an image the size of the scene and render the scene into it

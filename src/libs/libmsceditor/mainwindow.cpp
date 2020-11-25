@@ -278,14 +278,13 @@ void MainWindow::saveMsc()
  */
 void MainWindow::saveAsMsc()
 {
-    QString fileName = QFileDialog::getSaveFileName(this, tr("Save as..."),
-            QFileInfo(d->m_core->mainModel()->currentFilePath()).path(),
+    QFileDialog dialog(this, tr("Save as..."), QFileInfo(d->m_core->mainModel()->currentFilePath()).path(),
             tr("MSC files (%1);;All files (*.*)").arg(mscFileFilters().join(" ")));
-    if (!fileName.isEmpty()) {
-        if (!fileName.endsWith(DotMscFileExtensionLow))
-            fileName.append(DotMscFileExtensionLow);
+    dialog.setAcceptMode(QFileDialog::AcceptSave);
+    dialog.setDefaultSuffix(DotMscFileExtensionLow);
+    if (dialog.exec() == QDialog::Accepted) {
+        const QString fileName = dialog.selectedUrls().value(0).toLocalFile();
         d->m_core->mainModel()->setCurrentFilePath(fileName);
-
         saveMsc();
     }
 }
@@ -796,15 +795,12 @@ void MainWindow::saveScreenshot()
 {
     const QString defaultFileName = QString("%1.png").arg(QDateTime::currentDateTime().toString("dd-MM-yyyy_HH-mm-ss"));
     const QStringList &extensions = supportedImgFileExtensions();
-    QString fileName =
-            QFileDialog::getSaveFileName(this, tr("Save screenshot..."), defaultFileName, extensions.join(";; "));
 
-    if (!fileName.isEmpty()) {
-        QFileInfo selectedFile(fileName);
-        const QString usedExtension = "*." + selectedFile.suffix().toLower();
-        if (!extensions.contains(usedExtension))
-            fileName.append(".png");
-
+    QFileDialog dialog(nullptr, tr("Save screenshot..."), defaultFileName, extensions.join(";; "));
+    dialog.setAcceptMode(QFileDialog::AcceptSave);
+    dialog.setDefaultSuffix(".png");
+    if (dialog.exec() == QDialog::Accepted) {
+        const QString fileName = dialog.selectedUrls().value(0).toLocalFile();
         saveSceneRender(fileName);
     }
 }
@@ -828,5 +824,4 @@ void MainWindow::saveSceneRender(const QString &filePath) const
         img.save(filePath);
     }
 }
-
 }

@@ -98,10 +98,16 @@ void ColorManagerDialog::on_btnOpen_clicked()
 
 void ColorManagerDialog::on_btnCreateNew_clicked()
 {
-    const QString file =
-            QFileDialog::getSaveFileName(this, tr("Choose color scheme file"), ui->lePath->text(), "*.json");
-    if (shared::copyResourceFile(ColorManager::defaultColorsResourceFile(), file, shared::FileCopyingMode::Overwrite))
-        openFile(file);
+    QFileDialog dialog(this, tr("Choose color scheme file"), ui->lePath->text(), "*.json");
+    dialog.setAcceptMode(QFileDialog::AcceptSave);
+    dialog.setDefaultSuffix(".json");
+    if (dialog.exec() == QDialog::Accepted) {
+        const QString file = dialog.selectedUrls().value(0).toLocalFile();
+        if (shared::copyResourceFile(
+                    ColorManager::defaultColorsResourceFile(), file, shared::FileCopyingMode::Overwrite)) {
+            openFile(file);
+        }
+    }
 }
 
 void ColorManagerDialog::onDialogButtonClicked(QAbstractButton *button)
