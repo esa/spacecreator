@@ -41,7 +41,7 @@ Q_SIGNALS:
     void visibleChanged(bool visible);
 
 private Q_SLOTS:
-    void refreshView();
+    bool refreshView();
     void exportToPng();
     void setMscFile(const QString &fileName);
 

@@ -86,6 +86,11 @@ EndToEndView::EndToEndView(InterfaceDocument *document, QWidget *parent)
                 QFileDialog::getOpenFileName(this, tr("Choose MSC file"), dir, tr("MSC files (*.msc);;All files (*)"));
         if (!path.isEmpty()) {
             setMscFile(path);
+            bool match = refreshView();
+            if (!match) {
+                QMessageBox::information(
+                        this, tr("File mismatch"), tr("The AADL file and the MSC file do not seem to match."));
+            }
         }
     });
     connect(d->ui->fileSelectBox, &QComboBox::currentTextChanged, this, &EndToEndView::setMscFile);
@@ -141,8 +146,11 @@ void EndToEndView::setMscFiles(const QStringList &files)
     d->ui->fileSelectBox->setVisible(!showFileButton);
 }
 
-//! Update the view with the current model and MSC file contents
-void EndToEndView::refreshView()
+/*!
+   Update the view with the current model and MSC file contents
+   @return Returns true, if at least one matching connection was found
+*/
+bool EndToEndView::refreshView()
 {
     struct InternalConnection {
         EndToEndConnections::ConnectionInsideFunction connection;
@@ -169,6 +177,8 @@ void EndToEndView::refreshView()
     for (auto c : dataflow.internalConnections) {
         internalConnections << InternalConnection { c };
     };
+
+    bool foundConnection = false;
 
     // Add new graphics items for each object
     QHash<shared::Id, QGraphicsItem *> items;
@@ -235,6 +245,7 @@ void EndToEndView::refreshView()
 
                 if (EndToEndConnections::isInDataflow(dataflow, chains, connection)) {
                     item = new AADLFlowConnectionGraphicsItem(connection, startItem, endItem, parentItem);
+                    foundConnection = true;
                 } else {
                     item = new AADLConnectionGraphicsItem(connection, startItem, endItem, parentItem);
                 }
@@ -274,6 +285,8 @@ void EndToEndView::refreshView()
 
     // Set the scene rect based on what we show
     d->scene->setSceneRect(d->scene->itemsBoundingRect());
+
+    return foundConnection || !internalConnections.isEmpty();
 }
 
 void EndToEndView::exportToPng()
@@ -301,7 +314,6 @@ void EndToEndView::exportToPng()
 
 void EndToEndView::setMscFile(const QString &fileName)
 {
-
     msc::MscReader reader;
     try {
         d->model.reset(reader.parseFile(fileName));
