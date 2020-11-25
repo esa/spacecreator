@@ -23,7 +23,6 @@ wget -O ${DOWNLOAD_DIR}/asn1scc.7z "https://n7space-my.sharepoint.com/:u:/p/kgro
 mkdir -p ${LIBEXEC_DIST_DIR}
 7zr x -o${LIBEXEC_DIST_DIR} ${DOWNLOAD_DIR}/asn1scc.7z
 rm ${DOWNLOAD_DIR}/asn1scc.7z
-chmod ugo+x ${LIBEXEC_DIST_DIR}/asn1scc/daemon/asn1.daemon.exe
 
 echo "Downloading asn1scc.Fuzzer to distribute with plugin"
 wget -O ${DOWNLOAD_DIR}/fuzzer.7z "https://github.com/n7space/asn1scc.Fuzzer/releases/download/${FUZZER_VERSION}/asn1scc-Fuzzer-${FUZZER_VERSION}-linux-x64.tar.gz"
