@@ -18,6 +18,11 @@
 #pragma once
 
 #include <QDialog>
+#include <functional>
+
+namespace msc {
+class MscModel;
+}
 
 namespace aadlinterface {
 
@@ -36,6 +41,7 @@ public:
 
     void setVisible(bool visible) override;
     void setMscFiles(const QStringList &files);
+    void setMscDataFetcher(std::function<msc::MscModel *(QString)> fetcher);
 
 Q_SIGNALS:
     void visibleChanged(bool visible);

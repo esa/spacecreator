@@ -40,12 +40,13 @@ class ActionsBar;
 namespace spctr {
 
 class AadlModelStorage;
+class MscModelStorage;
 
 class AadlMainWidget : public QWidget
 {
     Q_OBJECT
 public:
-    AadlMainWidget(AadlModelStorage *aadlStorage, QWidget *parent = nullptr);
+    AadlMainWidget(AadlModelStorage *aadlStorage, MscModelStorage *mscStorage, QWidget *parent = nullptr);
     ~AadlMainWidget();
 
     bool load(const QString &filename);
@@ -80,6 +81,7 @@ private:
     QSharedPointer<aadlinterface::IVEditorCore> m_plugin;
     QVector<QAction *> m_actions;
     QPointer<AadlModelStorage> m_aadlStorage;
+    QPointer<MscModelStorage> m_mscStorage;
     QPointer<aadlinterface::EndToEndView> m_endToEndView;
     shared::ActionsBar *m_aadlToolBar = nullptr;
 };

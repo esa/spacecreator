@@ -28,13 +28,14 @@ namespace spctr {
 
 class AadlEditorData;
 class AadlModelStorage;
+class MscModelStorage;
 
 class AadlEditorFactory : public Core::IEditorFactory
 {
     Q_OBJECT
 
 public:
-    explicit AadlEditorFactory(AadlModelStorage *aadlStorage, QObject *parent);
+    explicit AadlEditorFactory(AadlModelStorage *aadlStorage, MscModelStorage *mscStorage, QObject *parent);
 
     Core::IEditor *createEditor() override;
 
@@ -46,6 +47,7 @@ Q_SIGNALS:
 private:
     mutable AadlEditorData *m_editorData = nullptr;
     QPointer<AadlModelStorage> m_aadlStorage;
+    QPointer<MscModelStorage> m_mscStorage;
 };
 
 }

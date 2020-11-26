@@ -41,12 +41,13 @@ class AadlEditorStack;
 class AadlModelStorage;
 class AadlTextEditorFactory;
 class MscContext;
+class MscModelStorage;
 
 class AadlEditorData : public QObject
 {
     Q_OBJECT
 public:
-    AadlEditorData(AadlModelStorage *aadlStorage, QObject *parent = nullptr);
+    AadlEditorData(AadlModelStorage *aadlStorage, MscModelStorage *mscStorage, QObject *parent = nullptr);
     ~AadlEditorData() override;
 
     void fullInit();
@@ -54,7 +55,7 @@ public:
 
     void showAsn1Dialog();
     void showMinimap(bool visible);
-    void showE2EDataflow(const QStringList& mscFiles);
+    void showE2EDataflow(const QStringList &mscFiles);
     void onAttributesManagerRequested();
     void onColorSchemeMenuInvoked();
     void onDynContextEditorMenuInvoked();
@@ -83,6 +84,7 @@ private:
     bool m_minimapVisible = false;
 
     QPointer<AadlModelStorage> m_aadlStorage;
+    QPointer<MscModelStorage> m_mscStorage;
 };
 
 }

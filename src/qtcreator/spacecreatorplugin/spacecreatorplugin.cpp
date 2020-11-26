@@ -108,7 +108,7 @@ bool SpaceCreatorPlugin::initialize(const QStringList &arguments, QString *error
     });
 
     m_mscFactory = new MscEditorFactory(m_mscStorage, this);
-    m_aadlFactory = new AadlEditorFactory(m_aadlStorage, this);
+    m_aadlFactory = new AadlEditorFactory(m_aadlStorage, m_mscStorage, this);
 
     // MSC
     m_messageDeclarationAction = new QAction(tr("Message declarations ..."), this);

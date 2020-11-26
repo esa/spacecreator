@@ -24,6 +24,7 @@
 #include "aadltexteditor.h"
 #include "iveditorcore.h"
 #include "msccontext.h"
+#include "mscmodelstorage.h"
 #include "spacecreatorpluginconstants.h"
 
 #include <QToolBar>
@@ -76,9 +77,10 @@ public:
     }
 };
 
-AadlEditorData::AadlEditorData(AadlModelStorage *aadlStorage, QObject *parent)
+AadlEditorData::AadlEditorData(AadlModelStorage *aadlStorage, MscModelStorage *mscStorage, QObject *parent)
     : QObject(parent)
     , m_aadlStorage(aadlStorage)
+    , m_mscStorage(mscStorage)
 {
     m_contexts.add(spctr::Constants::C_AADL_EDITOR);
 
@@ -144,7 +146,7 @@ void AadlEditorData::fullInit()
 
 Core::IEditor *AadlEditorData::createEditor()
 {
-    auto designWidget = new AadlMainWidget(m_aadlStorage);
+    auto designWidget = new AadlMainWidget(m_aadlStorage, m_mscStorage);
     AadlTextEditor *aadlEditor = m_editorFactory->create(designWidget);
 
     m_widgetStack->add(aadlEditor, designWidget);

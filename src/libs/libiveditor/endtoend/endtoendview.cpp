@@ -52,12 +52,14 @@ struct EndToEndView::EndToEndViewPrivate {
     QGraphicsScene *scene { nullptr };
 
     InterfaceDocument *document { nullptr };
-    std::unique_ptr<msc::MscModel> model;
+    msc::MscModel *model { nullptr };
 
     EndToEndConnections dataflow;
     LeafDocumentsModel *leafDocuments { nullptr };
 
     QString lastExportPath;
+
+    std::function<msc::MscModel *(QString)> mscModelFetcher = [](QString) { return nullptr; };
 };
 
 //! Initialize this with the current document
@@ -144,6 +146,14 @@ void EndToEndView::setMscFiles(const QStringList &files)
     const bool showFileButton = files.isEmpty();
     d->ui->pathButton->setVisible(showFileButton);
     d->ui->fileSelectBox->setVisible(!showFileButton);
+}
+
+/*!
+   Sets a function that returns the MscModel for a given filename
+ */
+void EndToEndView::setMscDataFetcher(std::function<msc::MscModel *(QString)> fetcher)
+{
+    d->mscModelFetcher = fetcher;
 }
 
 /*!
@@ -314,13 +324,22 @@ void EndToEndView::exportToPng()
 
 void EndToEndView::setMscFile(const QString &fileName)
 {
-    msc::MscReader reader;
-    try {
-        d->model.reset(reader.parseFile(fileName));
-    } catch (...) {
-        QMessageBox::warning(this, tr("Can't load msc file"),
-                tr("Can't load the msc file\n%1\n\n%2").arg(fileName, reader.getErrorMessages().join('\n')));
-        return;
+    if (d->model && d->model->parent() == this) {
+        delete d->model;
+        d->model = nullptr;
+    }
+
+    d->model = d->mscModelFetcher(fileName);
+    if (d->model == nullptr) {
+        msc::MscReader reader;
+        try {
+            d->model = reader.parseFile(fileName);
+            d->model->setParent(this);
+        } catch (...) {
+            QMessageBox::warning(this, tr("Can't load msc file"),
+                    tr("Can't load the msc file\n%1\n\n%2").arg(fileName, reader.getErrorMessages().join('\n')));
+            return;
+        }
     }
 
     d->document->setMscFileName(fileName);

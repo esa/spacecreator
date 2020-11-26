@@ -24,6 +24,10 @@
 #include "interface/commands/commandsfactory.h"
 #include "interface/interfacedocument.h"
 #include "iveditorcore.h"
+#include "mainmodel.h"
+#include "msceditorcore.h"
+#include "mscmodel.h"
+#include "mscmodelstorage.h"
 #include "xmldocexporter.h"
 
 #include <QAction>
@@ -32,14 +36,16 @@
 #include <QFileInfo>
 #include <QHBoxLayout>
 #include <QMessageBox>
+#include <QSharedPointer>
 #include <QUndoGroup>
 #include <QUndoStack>
 
 namespace spctr {
 
-AadlMainWidget::AadlMainWidget(AadlModelStorage *aadlStorage, QWidget *parent)
+AadlMainWidget::AadlMainWidget(AadlModelStorage *aadlStorage, MscModelStorage *mscStorage, QWidget *parent)
     : QWidget(parent)
     , m_aadlStorage(aadlStorage)
+    , m_mscStorage(mscStorage)
 {
 }
 
@@ -143,6 +149,16 @@ void AadlMainWidget::showE2EDataflow(const QStringList &mscFiles)
     if (m_endToEndView.isNull()) {
         m_endToEndView = new aadlinterface::EndToEndView(m_plugin->document());
         m_endToEndView->setAttribute(Qt::WA_DeleteOnClose);
+        std::function<msc::MscModel *(QString fileName)> fetcher = [this](QString fileName) -> msc::MscModel * {
+            if (m_mscStorage) {
+                QSharedPointer<msc::MSCEditorCore> core = m_mscStorage->mscData(fileName);
+                if (core) {
+                    return core->mainModel()->mscModel();
+                }
+            }
+            return {};
+        };
+        m_endToEndView->setMscDataFetcher(fetcher);
         m_endToEndView->setMscFiles(mscFiles);
         connect(m_plugin->document(), &QObject::destroyed, m_endToEndView.data(), &QObject::deleteLater);
     }
