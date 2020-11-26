@@ -18,118 +18,17 @@
 
 #pragma once
 
-#include <QGraphicsTextItem>
-#include <QLinearGradient>
-#include <QRegularExpression>
-#include <QTextOption>
-
-class QCompleter;
+#include "ui/textitem.h"
 
 namespace msc {
 
-class TextItem : public QGraphicsTextItem
+class TextItem : public shared::ui::TextItem
 {
-    Q_OBJECT
-    Q_PROPERTY(bool textIsValid READ textIsValid NOTIFY textIsValidChanged)
-
 public:
-    TextItem(QGraphicsItem *parent = nullptr);
-
-    QBrush background() const;
-    void setBackgroundColor(const QColor &color);
-    void setBackgroundGradient(const QLinearGradient &color);
-
-    QColor frameColor() const;
-    void setFrameColor(const QColor &color);
-
-    qreal frameWidth() const;
-    void setFrameWidth(qreal w);
-
-    Qt::Alignment textAlignment() const;
-    void setTextAllignment(Qt::Alignment alignment);
-
-    void setTextWrapMode(QTextOption::WrapMode wrapMode);
-
-    bool framed() const;
-    void setFramed(bool to);
-
-    void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget) override;
-
-    bool isEditing() const;
-    bool isEditable() const;
-    void setEditable(bool editable);
-
-    void enableEditMode();
-    void disableEditMode();
-
-    void setTextMargin(qreal margin);
-    qreal textMargin() const;
-
-    void selectText(bool select);
-
-    qreal idealWidth() const;
-
-    QString inputValidationPattern() const;
-    void setInputValidationPattern(const QString &pattern);
-
-    void setExplicitSize(const QSizeF &r);
-
-    QRectF boundingRect() const override;
-
-    void setSendClickEvent(bool send);
-
-    bool textIsValid() const;
-    void setMscValidationTest(const QString &text);
-
-    void updateCompleter(const QStringList &completionList);
-    void removeCompleter();
-
-Q_SIGNALS:
-    void edited(const QString &newText);
-    void textChanged();
-    void inputValidationPatternChanged(const QString &);
-    /*!
-       Send when setSendClickEvent() is set true, and the item was clicked.
-     */
-    void clicked();
-    void doubleClicked();
-    void textIsValidChanged();
-
-protected Q_SLOTS:
-    virtual void onContentsChange(int position, int charsRemoved, int charsAdded);
-    void updateCompleterText();
+    explicit TextItem(QGraphicsItem *parent = nullptr);
 
 protected:
-    void focusOutEvent(QFocusEvent *event) override;
-    void keyPressEvent(QKeyEvent *event) override;
-    void mousePressEvent(QGraphicsSceneMouseEvent *event) override;
-    void mouseReleaseEvent(QGraphicsSceneMouseEvent *event) override;
-    void mouseDoubleClickEvent(QGraphicsSceneMouseEvent *event) override;
-
-    virtual bool validateInput(const QString &text) const;
-    virtual bool validateText(const QString &text) const;
-
-    QPair<int, int> prepareSelectionRange(int desiredFrom, int desiredTo) const;
-
-    void checkTextValidity();
-
-protected:
-    QColor m_bgrColor = Qt::white;
-    QLinearGradient m_gradient;
-    QColor m_frameColor = Qt::black;
-    qreal m_frameWidth = 0.5;
-    bool m_showFrame = false;
-    bool m_gradientUsed = false;
-    bool m_editable = false;
-    QString m_prevText;
-    QRegularExpression m_inputValidator;
-    QSizeF m_explicitSize;
-    bool m_sendClickEvent = false;
-    bool m_disableEditingGuard = false;
-    bool m_textIsValid = true;
-    bool m_filterInvalidText = true;
-    QString m_mscValidationTest;
-    QCompleter *m_completer = nullptr;
+    bool validateText(const QString &text) const override;
 };
 
 class NameItem : public TextItem
@@ -160,4 +59,4 @@ public:
     }
 };
 
-} // ns msc
+}

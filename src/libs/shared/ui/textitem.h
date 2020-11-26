@@ -23,13 +23,18 @@
 #include <QRegularExpression>
 #include <QTextOption>
 
-namespace aadlinterface {
+class QCompleter;
 
-class TextGraphicsItem : public QGraphicsTextItem
+namespace shared {
+namespace ui {
+
+class TextItem : public QGraphicsTextItem
 {
     Q_OBJECT
+    Q_PROPERTY(bool textIsValid READ textIsValid NOTIFY textIsValidChanged)
+
 public:
-    explicit TextGraphicsItem(QGraphicsItem *parent = nullptr);
+    explicit TextItem(QGraphicsItem *parent = nullptr);
 
     QBrush background() const;
     void setBackgroundColor(const QColor &color);
@@ -74,6 +79,12 @@ public:
 
     void setSendClickEvent(bool send);
 
+    bool textIsValid() const;
+    void setMscValidationTest(const QString &text);
+
+    void updateCompleter(const QStringList &completionList);
+    void removeCompleter();
+
 Q_SIGNALS:
     void edited(const QString &newText);
     void textChanged();
@@ -82,21 +93,26 @@ Q_SIGNALS:
        Send when setSendClickEvent() is set true, and the item was clicked.
      */
     void clicked();
+    void doubleClicked();
+    void textIsValidChanged();
     void editingModeOff();
 
 protected Q_SLOTS:
     virtual void onContentsChange(int position, int charsRemoved, int charsAdded);
+    void updateCompleterText();
 
 protected:
     void focusOutEvent(QFocusEvent *event) override;
     void keyPressEvent(QKeyEvent *event) override;
     void mousePressEvent(QGraphicsSceneMouseEvent *event) override;
-    void mouseReleaseEvent(QGraphicsSceneMouseEvent *event) override;
     void mouseDoubleClickEvent(QGraphicsSceneMouseEvent *event) override;
 
     virtual bool validateInput(const QString &text) const;
+    virtual bool validateText(const QString &text) const;
 
     QPair<int, int> prepareSelectionRange(int desiredFrom, int desiredTo) const;
+
+    void checkTextValidity();
 
 protected:
     QColor m_bgrColor = Qt::white;
@@ -111,9 +127,13 @@ protected:
     QSizeF m_explicitSize;
     bool m_sendClickEvent = false;
     bool m_disableEditingGuard = false;
+    bool m_textIsValid = true;
+    bool m_filterInvalidText = true;
+    QString m_mscValidationTest;
+    QCompleter *m_completer = nullptr;
 };
 
-class NameItem : public TextGraphicsItem
+class NameItem : public TextItem
 {
     // This could be done on the caller side, but currently it's the only used
     // concretization, so let's wrap it here to manage in a centralized manner.
@@ -123,7 +143,7 @@ class NameItem : public TextGraphicsItem
     Q_OBJECT
 public:
     NameItem(QGraphicsItem *parent = nullptr)
-        : TextGraphicsItem(parent)
+        : TextItem(parent)
     {
         // see the MSC spec or Msc.g4
         static const QLatin1String LETTER("A-Za-z");
@@ -141,4 +161,5 @@ public:
     }
 };
 
+}
 }

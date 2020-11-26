@@ -20,11 +20,11 @@
 #include "aadlfunctiongraphicsitem.h"
 #include "aadlobjectcomment.h"
 #include "baseitems/common/aadlutils.h"
-#include "baseitems/textgraphicsitem.h"
 #include "colors/colormanager.h"
 #include "commands/commandids.h"
 #include "commands/commandsfactory.h"
 #include "commandsstack.h"
+#include "ui/textitem.h"
 
 #include <QApplication>
 #include <QGraphicsScene>

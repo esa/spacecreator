@@ -25,7 +25,7 @@
 namespace aadlinterface {
 
 AADLFunctionNameGraphicsItem::AADLFunctionNameGraphicsItem(QGraphicsItem *parent)
-    : TextGraphicsItem(parent)
+    : shared::ui::TextItem(parent)
 {
     setEditable(true);
 

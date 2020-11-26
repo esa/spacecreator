@@ -28,12 +28,12 @@
 #include "aadlobjectfunction.h"
 #include "aadlobjectsmodel.h"
 #include "baseitems/common/aadlutils.h"
-#include "baseitems/textgraphicsitem.h"
 #include "colors/colormanager.h"
 #include "commands/cmdfunctionitemcreate.h"
 #include "commands/commandids.h"
 #include "commands/commandsfactory.h"
 #include "commandsstack.h"
+#include "ui/textitem.h"
 
 #include <QApplication>
 #include <QGraphicsScene>
@@ -66,7 +66,7 @@ void AADLFunctionTypeGraphicsItem::init()
     m_textItem->setTextAlignment(Qt::AlignLeft | Qt::AlignTop);
     m_textItem->setFont(font());
 
-    connect(m_textItem, &TextGraphicsItem::edited, this, &AADLFunctionTypeGraphicsItem::updateNameFromUi);
+    connect(m_textItem, &shared::ui::TextItem::edited, this, &AADLFunctionTypeGraphicsItem::updateNameFromUi);
     connect(entity(), qOverload<aadl::meta::Props::Token>(&aadl::AADLObjectFunction::attributeChanged), this,
             [this](aadl::meta::Props::Token attr) {
                 if (attr == aadl::meta::Props::Token::name) {

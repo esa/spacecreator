@@ -14,8 +14,6 @@ target_sources(${LIB_NAME} PRIVATE
     baseitems/graphicsview.h
     baseitems/interactiveobject.cpp
     baseitems/interactiveobject.h
-    baseitems/textgraphicsitem.cpp
-    baseitems/textgraphicsitem.h
     commandsstack.cpp
     commandsstack.h
     context/action/action.cpp

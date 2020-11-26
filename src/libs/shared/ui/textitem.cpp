@@ -1,42 +1,58 @@
 /*
-  Copyright (C) 2018-2019 European Space Agency - <maxime.perrotin@esa.int>
+   Copyright (C) 2018-2019 European Space Agency - <maxime.perrotin@esa.int>
 
-  This library is free software; you can redistribute it and/or
-  modify it under the terms of the GNU Library General Public
-  License as published by the Free Software Foundation; either
-  version 2 of the License, or (at your option) any later version.
+   This library is free software; you can redistribute it and/or
+   modify it under the terms of the GNU Library General Public
+   License as published by the Free Software Foundation; either
+   version 2 of the License, or (at your option) any later version.
 
-  This library is distributed in the hope that it will be useful,
-  but WITHOUT ANY WARRANTY; without even the implied warranty of
-  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-  Library General Public License for more details.
+   This library is distributed in the hope that it will be useful,
+   but WITHOUT ANY WARRANTY; without even the implied warranty of
+   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+   Library General Public License for more details.
 
-  You should have received a copy of the GNU Library General Public License
-  along with this program. If not, see
-  <https://www.gnu.org/licenses/lgpl-2.1.html>.
+   You should have received a copy of the GNU Library General Public License
+   along with this program. If not, see
+   <https://www.gnu.org/licenses/lgpl-2.1.html>.
 */
 
-#include "textgraphicsitem.h"
+#include "textitem.h"
 
+#include <QAbstractItemView>
+#include <QApplication>
+#include <QCompleter>
 #include <QDebug>
 #include <QGraphicsSceneMouseEvent>
+#include <QGraphicsView>
 #include <QKeyEvent>
 #include <QPainter>
+#include <QStringListModel>
 #include <QTextCursor>
 #include <QTextDocument>
 
-namespace aadlinterface {
+namespace shared {
+namespace ui {
 
-TextGraphicsItem::TextGraphicsItem(QGraphicsItem *parent)
+static const QColor ERROR_BACKGROUND_COLOR(255, 128, 128);
+
+/*!
+  \class shared::ui::TextItem
+  \brief Text holder with customizable alignment, background and frame.
+
+*/
+
+TextItem::TextItem(QGraphicsItem *parent)
     : QGraphicsTextItem(parent)
 {
     setTextAlignment(Qt::AlignCenter);
     setTextInteractionFlags(Qt::NoTextInteraction);
-    connect(document(), &QTextDocument::contentsChange, this, &TextGraphicsItem::onContentsChange);
     setInputValidationPattern(QString());
+
+    connect(document(), &QTextDocument::contentsChange, this, &TextItem::onContentsChange);
+    connect(this, &TextItem::textChanged, this, &TextItem::updateCompleterText);
 }
 
-QBrush TextGraphicsItem::background() const
+QBrush TextItem::background() const
 {
     if (m_gradientUsed) {
         const QRectF &bounds = boundingRect();
@@ -48,7 +64,7 @@ QBrush TextGraphicsItem::background() const
     return m_bgrColor;
 }
 
-void TextGraphicsItem::setBackgroundColor(const QColor &color)
+void TextItem::setBackgroundColor(const QColor &color)
 {
     if (m_bgrColor == color)
         return;
@@ -59,7 +75,7 @@ void TextGraphicsItem::setBackgroundColor(const QColor &color)
     update();
 }
 
-void TextGraphicsItem::setBackgroundGradient(const QLinearGradient &gradient)
+void TextItem::setBackgroundGradient(const QLinearGradient &gradient)
 {
     if (gradient == m_gradient)
         return;
@@ -70,12 +86,12 @@ void TextGraphicsItem::setBackgroundGradient(const QLinearGradient &gradient)
     update();
 }
 
-QColor TextGraphicsItem::frameColor() const
+QColor TextItem::frameColor() const
 {
     return m_frameColor;
 }
 
-void TextGraphicsItem::setFrameColor(const QColor &color)
+void TextItem::setFrameColor(const QColor &color)
 {
     if (color == m_frameColor)
         return;
@@ -84,12 +100,12 @@ void TextGraphicsItem::setFrameColor(const QColor &color)
     update();
 }
 
-qreal TextGraphicsItem::frameWidth() const
+qreal TextItem::frameWidth() const
 {
     return m_frameWidth;
 }
 
-void TextGraphicsItem::setFrameWidth(qreal w)
+void TextItem::setFrameWidth(qreal w)
 {
     if (qFuzzyCompare(m_frameWidth, w))
         return;
@@ -97,19 +113,19 @@ void TextGraphicsItem::setFrameWidth(qreal w)
     m_frameWidth = w;
 }
 
-Qt::Alignment TextGraphicsItem::textAlignment() const
+Qt::Alignment TextItem::textAlignment() const
 {
     return document()->defaultTextOption().alignment();
 }
 
-void TextGraphicsItem::setTextAlignment(Qt::Alignment alignment)
+void TextItem::setTextAlignment(Qt::Alignment alignment)
 {
     QTextOption txtOpt = document()->defaultTextOption();
     txtOpt.setAlignment(alignment);
     document()->setDefaultTextOption(txtOpt);
 }
 
-void TextGraphicsItem::setTextWrapMode(QTextOption::WrapMode wrapMode)
+void TextItem::setTextWrapMode(QTextOption::WrapMode wrapMode)
 {
     QTextOption txtOpt = document()->defaultTextOption();
 
@@ -117,12 +133,12 @@ void TextGraphicsItem::setTextWrapMode(QTextOption::WrapMode wrapMode)
     document()->setDefaultTextOption(txtOpt);
 }
 
-bool TextGraphicsItem::framed() const
+bool TextItem::framed() const
 {
     return m_showFrame;
 }
 
-void TextGraphicsItem::setFramed(bool to)
+void TextItem::setFramed(bool to)
 {
     if (to == m_showFrame)
         return;
@@ -131,12 +147,16 @@ void TextGraphicsItem::setFramed(bool to)
     update();
 }
 
-void TextGraphicsItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget)
+void TextItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget)
 {
     painter->save();
 
     const QRectF body = boundingRect();
-    painter->fillRect(body, background());
+    QBrush backColor = background();
+    if (!m_textIsValid) {
+        backColor = QBrush(ERROR_BACKGROUND_COLOR);
+    }
+    painter->fillRect(body, backColor);
 
     if (framed()) {
         QPen pen(painter->pen());
@@ -151,17 +171,17 @@ void TextGraphicsItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *
     QGraphicsTextItem::paint(painter, option, widget);
 }
 
-bool TextGraphicsItem::isEditable() const
+bool TextItem::isEditable() const
 {
     return m_editable;
 }
 
-bool TextGraphicsItem::isEditing() const
+bool TextItem::isEditing() const
 {
     return isEditable() && textInteractionFlags() != Qt::NoTextInteraction;
 }
 
-void TextGraphicsItem::setEditable(bool editable)
+void TextItem::setEditable(bool editable)
 {
     if (editable == m_editable)
         return;
@@ -169,7 +189,7 @@ void TextGraphicsItem::setEditable(bool editable)
     m_editable = editable;
 }
 
-void TextGraphicsItem::enableEditMode()
+void TextItem::enableEditMode()
 {
     if (!m_editable)
         return;
@@ -182,15 +202,15 @@ void TextGraphicsItem::enableEditMode()
     setFocus();
 }
 
-void TextGraphicsItem::disableEditMode()
+void TextItem::disableEditMode()
 {
     if (m_disableEditingGuard)
         return;
 
     m_disableEditingGuard = true;
 
-    if (m_prevText != toPlainText()) {
-        if (toPlainText().isEmpty()) {
+    if (m_prevText != toPlainText() || !m_textIsValid) {
+        if (toPlainText().isEmpty() || !m_textIsValid) {
             setPlainText(m_prevText);
             setTextWidth(idealWidth());
             adjustSize();
@@ -207,13 +227,14 @@ void TextGraphicsItem::disableEditMode()
     Q_EMIT editingModeOff();
 }
 
-void TextGraphicsItem::focusOutEvent(QFocusEvent *event)
+void TextItem::focusOutEvent(QFocusEvent *event)
 {
+    removeCompleter();
     disableEditMode();
     QGraphicsTextItem::focusOutEvent(event);
 }
 
-void TextGraphicsItem::keyPressEvent(QKeyEvent *event)
+void TextItem::keyPressEvent(QKeyEvent *event)
 {
     bool accepted(false);
     if (isEditing())
@@ -259,7 +280,7 @@ void TextGraphicsItem::keyPressEvent(QKeyEvent *event)
     Q_EMIT textChanged();
 }
 
-void TextGraphicsItem::mousePressEvent(QGraphicsSceneMouseEvent *event)
+void TextItem::mousePressEvent(QGraphicsSceneMouseEvent *event)
 {
     QGraphicsTextItem::mousePressEvent(event);
     if (m_sendClickEvent) {
@@ -268,22 +289,18 @@ void TextGraphicsItem::mousePressEvent(QGraphicsSceneMouseEvent *event)
     }
 }
 
-void TextGraphicsItem::mouseReleaseEvent(QGraphicsSceneMouseEvent *event)
-{
-    QGraphicsTextItem::mouseReleaseEvent(event);
-}
-
-void TextGraphicsItem::mouseDoubleClickEvent(QGraphicsSceneMouseEvent *event)
+void TextItem::mouseDoubleClickEvent(QGraphicsSceneMouseEvent *event)
 {
     enableEditMode();
     QGraphicsTextItem::mouseDoubleClickEvent(event);
+    Q_EMIT doubleClicked();
 }
 
 /*!
    \brief TextItem::selectText
-   \a select if true, the entire text will be selected. If false, the the selection will be cleared
+   \param select if true, the entire text will be selected. If false, the the selection will be cleared
  */
-void TextGraphicsItem::selectText(bool select)
+void TextItem::selectText(bool select)
 {
     QTextCursor txtCursor = textCursor();
     if (select)
@@ -293,16 +310,16 @@ void TextGraphicsItem::selectText(bool select)
     setTextCursor(txtCursor);
 }
 
-void TextGraphicsItem::setTextMargin(qreal margin)
+void TextItem::setTextMargin(qreal margin)
 {
     document()->setDocumentMargin(margin);
 }
-qreal TextGraphicsItem::textMargin() const
+qreal TextItem::textMargin() const
 {
     return document()->documentMargin();
 }
 
-qreal TextGraphicsItem::idealWidth() const
+qreal TextItem::idealWidth() const
 {
     return document()->idealWidth();
 }
@@ -312,7 +329,7 @@ qreal TextGraphicsItem::idealWidth() const
   QRegularExpression pattern used for input validation on the fly. If empty,
   text is not validated during input.
 */
-QString TextGraphicsItem::inputValidationPattern() const
+QString TextItem::inputValidationPattern() const
 {
     return m_inputValidator.pattern();
 }
@@ -322,7 +339,7 @@ QString TextGraphicsItem::inputValidationPattern() const
   Sets pattern for QRegularExpression used for input validation on the fly.
   Pass an empty string to disable text validation during input.
 */
-void TextGraphicsItem::setInputValidationPattern(const QString &pattern)
+void TextItem::setInputValidationPattern(const QString &pattern)
 {
     const QString patternForced(pattern.isEmpty() ? ".*" : pattern);
     if (m_inputValidator.pattern() == patternForced)
@@ -332,7 +349,7 @@ void TextGraphicsItem::setInputValidationPattern(const QString &pattern)
     Q_EMIT inputValidationPatternChanged(inputValidationPattern());
 }
 
-bool TextGraphicsItem::validateInput(const QString &text) const
+bool TextItem::validateInput(const QString &text) const
 {
     if (inputValidationPattern().isEmpty() || text.isEmpty() || !m_inputValidator.isValid())
         return false;
@@ -341,7 +358,12 @@ bool TextGraphicsItem::validateInput(const QString &text) const
     return matched.hasMatch() && matched.captured() == text;
 }
 
-QPair<int, int> TextGraphicsItem::prepareSelectionRange(int desiredFrom, int desiredTo) const
+bool TextItem::validateText(const QString &text) const
+{
+    return true;
+}
+
+QPair<int, int> TextItem::prepareSelectionRange(int desiredFrom, int desiredTo) const
 {
     QPair<int, int> res(0, 0);
 
@@ -366,12 +388,14 @@ QPair<int, int> TextGraphicsItem::prepareSelectionRange(int desiredFrom, int des
     return res;
 }
 
-void TextGraphicsItem::onContentsChange(int position, int charsRemoved, int charsAdded)
+void TextItem::onContentsChange(int position, int charsRemoved, int charsAdded)
 {
     Q_UNUSED(charsRemoved);
 
-    if (0 == charsAdded)
+    if (0 == charsAdded) {
+        checkTextValidity();
         return;
+    }
 
     // QTextDocument automatically appends the 'PARAGRAPH SEPARATOR' (U+2029) char
     // which is not actually an input (and does not affect the view)
@@ -385,20 +409,23 @@ void TextGraphicsItem::onContentsChange(int position, int charsRemoved, int char
     const int inputLength = position + charsAdded;
     for (int i = position; i < inputLength; ++i) {
         const QChar &newChar = document()->characterAt(i);
-        if (isAutoParagraphSeparator(newChar, i, inputLength))
+        if (isAutoParagraphSeparator(newChar, i, inputLength)) {
             break;
+        }
 
         inputString.append(newChar);
-        if (validateInput(newChar))
-            inputStringValid.append(newChar);
-        else {
-            const QString wrnMsg("Invalid character '%1' [%2] at #%3 filtered out in '%4'");
+        if (!validateInput(newChar) && m_filterInvalidText) {
+            const QString wrnMsg("Invalid characted '%1' [%2] at #%3 filtered out in '%4'");
             qWarning() << wrnMsg.arg(newChar).arg(newChar.unicode()).arg(i + 1).arg(inputString);
+        } else {
+            inputStringValid.append(newChar);
         }
     }
 
-    if (inputStringValid == inputString)
+    if (inputStringValid == inputString) {
+        checkTextValidity();
         return;
+    }
 
     QTextCursor currCursor = textCursor();
     if (currCursor.isNull()) {
@@ -416,9 +443,25 @@ void TextGraphicsItem::onContentsChange(int position, int charsRemoved, int char
 
     QSignalBlocker suppressContentsChange(document());
     setTextCursor(currCursor);
+    checkTextValidity();
 }
 
-void TextGraphicsItem::setExplicitSize(const QSizeF &size)
+void TextItem::updateCompleterText()
+{
+    if (!m_completer) {
+        return;
+    }
+
+    m_completer->setCompletionPrefix(toPlainText());
+    QAbstractItemView *popup = m_completer->popup();
+    if (m_completer->completionModel()->rowCount() > 0) {
+        popup->show();
+    } else {
+        popup->hide();
+    }
+}
+
+void TextItem::setExplicitSize(const QSizeF &size)
 {
     if (m_explicitSize != size) {
         m_explicitSize = size;
@@ -430,7 +473,7 @@ void TextGraphicsItem::setExplicitSize(const QSizeF &size)
     }
 }
 
-QRectF TextGraphicsItem::boundingRect() const
+QRectF TextItem::boundingRect() const
 {
     return m_explicitSize.isEmpty() ? QGraphicsTextItem::boundingRect() : QRectF(QPointF(0., 0.), m_explicitSize);
 }
@@ -439,9 +482,93 @@ QRectF TextGraphicsItem::boundingRect() const
    If set to true, emits the clicked() signal when clicked. But consumes the mouse event.
    So other items don't receive the event.
  */
-void TextGraphicsItem::setSendClickEvent(bool send)
+void TextItem::setSendClickEvent(bool send)
 {
     m_sendClickEvent = send;
 }
 
+bool TextItem::textIsValid() const
+{
+    return m_textIsValid;
+}
+
+/*!
+   Sets the text to check if the user input is valid. The text is a MSC text with \em %1 as a placeholder for the text.
+   For the validation the MSC parser is used.
+   Example:
+   \code
+    QString("msc c1;instance i1 comment '%1';endinstance;endmsc;")
+   \endcode
+ */
+void TextItem::setMscValidationTest(const QString &text)
+{
+    m_mscValidationTest = text;
+}
+
+/*!
+   Updates and show the name completer with all function names, if there are (matching) items
+ */
+void TextItem::updateCompleter(const QStringList &completionList)
+{
+    if (completionList.isEmpty()) {
+        removeCompleter();
+    }
+
+    if (m_completer == nullptr) {
+        m_completer = new QCompleter(completionList, this);
+        m_completer->setCompletionMode(QCompleter::PopupCompletion);
+        m_completer->setFilterMode(Qt::MatchContains);
+        m_completer->setCaseSensitivity(Qt::CaseInsensitive);
+        connect(m_completer, qOverload<const QString &>(&QCompleter::highlighted), this,
+                &shared::ui::TextItem::setPlainText);
+    }
+
+    if (auto stringModel = qobject_cast<QStringListModel *>(m_completer->model())) {
+        if (stringModel->stringList() != completionList) {
+            stringModel->setStringList(completionList);
+        }
+    }
+
+    m_completer->setCompletionPrefix(toPlainText());
+
+    QPoint textPos;
+    QList<QGraphicsView *> views = scene()->views();
+    if (!views.isEmpty()) {
+        QGraphicsView *view = views[0];
+        m_completer->setWidget(view);
+        QPointF sceneP = mapToScene(boundingRect().bottomLeft());
+        QPoint viewP = view->mapFromScene(sceneP);
+        textPos = view->viewport()->mapToGlobal(viewP);
+    }
+    QAbstractItemView *popup = m_completer->popup();
+    QRect popRect = popup->geometry();
+    popRect.moveTopLeft(textPos);
+    popup->setGeometry(popRect);
+    if (m_completer->completionModel()->rowCount() > 0) {
+        popup->show();
+    } else {
+        popup->hide();
+    }
+}
+
+void TextItem::removeCompleter()
+{
+    if (m_completer) {
+        m_completer->deleteLater();
+        m_completer = nullptr;
+    }
+}
+
+void TextItem::checkTextValidity()
+{
+    bool valid = validateText(toPlainText());
+    if (valid == m_textIsValid) {
+        return;
+    }
+
+    m_textIsValid = valid;
+    Q_EMIT textIsValidChanged();
+}
+
+}
 }

@@ -59,7 +59,7 @@ CommentItem::CommentItem(MscChart *chart, ChartLayoutManager *chartLayoutManager
     m_textItem->setFramed(false);
     m_textItem->setEditable(true);
     m_textItem->setBackgroundColor(Qt::transparent);
-    m_textItem->setTextAllignment(Qt::AlignCenter);
+    m_textItem->setTextAlignment(Qt::AlignCenter);
     m_textItem->setTextWrapMode(QTextOption::WrapAtWordBoundaryOrAnywhere);
     connect(m_textItem, &TextItem::edited, this, &CommentItem::textEdited);
     connect(m_textItem, &TextItem::textChanged, this, [this]() {

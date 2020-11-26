@@ -18,11 +18,11 @@
 
 #pragma once
 
-#include <baseitems/textgraphicsitem.h>
+#include <ui/textitem.h>
 
 namespace aadlinterface {
 
-class AADLFunctionNameGraphicsItem : public TextGraphicsItem
+class AADLFunctionNameGraphicsItem : public shared::ui::TextItem
 {
     Q_OBJECT
 public:
