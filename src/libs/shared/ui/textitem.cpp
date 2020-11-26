@@ -199,6 +199,17 @@ void TextItem::enableEditMode()
     selectText(true);
 
     setTextInteractionFlags(Qt::TextEditorInteraction | Qt::TextEditable);
+
+    // Bugfix for issue #284
+    // Inspired by workaround from https://bugreports.qt.io/browse/QTBUG-8188
+    if (scene()) {
+        int i = 0;
+        while (!scene()->isActive() && i < 100) {
+            QEvent activate(QEvent::WindowActivate);
+            QApplication::sendEvent(scene(), &activate);
+            ++i;
+        }
+    }
     setFocus();
 }
 
