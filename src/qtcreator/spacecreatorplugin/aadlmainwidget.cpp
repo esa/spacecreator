@@ -70,14 +70,9 @@ bool AadlMainWidget::save()
     return aadlinterface::XmlDocExporter::exportDocSilently(m_plugin->document(), {}, {});
 }
 
-void AadlMainWidget::setFileName(const QString &filename)
-{
-    Q_UNUSED(filename)
-}
-
 bool AadlMainWidget::isDirty() const
 {
-    if (m_aadlStorage.isNull()) {
+    if (m_plugin.isNull()) {
         return false;
     }
     return m_plugin->document()->isDirty();
@@ -85,7 +80,7 @@ bool AadlMainWidget::isDirty() const
 
 QUndoStack *AadlMainWidget::undoStack()
 {
-    if (m_aadlStorage.isNull()) {
+    if (m_plugin.isNull()) {
         return nullptr;
     }
     return m_plugin->document()->commandsStack();
@@ -93,7 +88,7 @@ QUndoStack *AadlMainWidget::undoStack()
 
 QString AadlMainWidget::textContents() const
 {
-    if (m_aadlStorage.isNull()) {
+    if (m_plugin.isNull()) {
         return {};
     }
 
@@ -112,7 +107,7 @@ QString AadlMainWidget::textContents() const
  */
 void AadlMainWidget::showAsn1Dialog()
 {
-    if (m_aadlStorage.isNull()) {
+    if (m_plugin.isNull()) {
         return;
     }
 
@@ -135,7 +130,7 @@ void AadlMainWidget::showAsn1Dialog()
 
 void AadlMainWidget::setMinimapVisible(bool visible)
 {
-    if (m_aadlStorage.isNull()) {
+    if (m_plugin.isNull()) {
         return;
     }
     m_plugin->minimapView()->setVisible(visible);
@@ -143,7 +138,7 @@ void AadlMainWidget::setMinimapVisible(bool visible)
 
 void AadlMainWidget::showE2EDataflow(const QStringList &mscFiles)
 {
-    if (m_aadlStorage.isNull()) {
+    if (m_plugin.isNull()) {
         return;
     }
     if (m_endToEndView.isNull()) {
@@ -168,7 +163,7 @@ void AadlMainWidget::showE2EDataflow(const QStringList &mscFiles)
 
 void AadlMainWidget::onAttributesManagerRequested()
 {
-    if (m_aadlStorage.isNull()) {
+    if (m_plugin.isNull()) {
         return;
     }
     m_plugin->document()->onAttributesManagerRequested();
@@ -176,7 +171,7 @@ void AadlMainWidget::onAttributesManagerRequested()
 
 void AadlMainWidget::onColorSchemeMenuInvoked()
 {
-    if (m_aadlStorage.isNull()) {
+    if (m_plugin.isNull()) {
         return;
     }
     m_plugin->document()->onColorSchemeMenuInvoked();
@@ -184,7 +179,7 @@ void AadlMainWidget::onColorSchemeMenuInvoked()
 
 void AadlMainWidget::onDynContextEditorMenuInvoked()
 {
-    if (m_aadlStorage.isNull()) {
+    if (m_plugin.isNull()) {
         return;
     }
     m_plugin->document()->onDynContextEditorMenuInvoked();
@@ -197,7 +192,7 @@ QSharedPointer<aadlinterface::IVEditorCore> AadlMainWidget::ivPlugin() const
 
 void AadlMainWidget::init()
 {
-    if (m_aadlStorage.isNull()) {
+    if (m_plugin.isNull()) {
         return;
     }
 

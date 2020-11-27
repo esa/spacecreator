@@ -52,8 +52,6 @@ public:
     bool load(const QString &filename);
     bool save();
 
-    void setFileName(const QString &filename);
-
     bool isDirty() const;
     QUndoStack *undoStack();
 

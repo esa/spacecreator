@@ -67,35 +67,28 @@ Core::IDocument::OpenResult AadlEditorDocument::open(
 bool AadlEditorDocument::save(QString *errorString, const QString &name, bool autoSave)
 {
     Q_UNUSED(errorString)
+    Q_UNUSED(autoSave)
     const FileName oldFileName = filePath();
     const FileName actualName = name.isEmpty() ? oldFileName : FileName::fromString(name);
-    if (actualName.isEmpty())
+    if (actualName.isEmpty()) {
         return false;
+    }
+
     bool dirty = m_designWidget->isDirty();
-
-    m_designWidget->setFileName(actualName.toString());
+    setFilePath(actualName);
     if (!m_designWidget->save()) {
-        m_designWidget->setFileName(oldFileName.toString());
         return false;
     }
 
-    if (autoSave) {
-        m_designWidget->setFileName(oldFileName.toString());
-        m_designWidget->save();
-        return true;
-    }
-
-    setFilePath(actualName);
-
-    if (dirty != m_designWidget->isDirty())
+    if (dirty != m_designWidget->isDirty()) {
         Q_EMIT changed();
+    }
 
     return true;
 }
 
 void AadlEditorDocument::setFilePath(const FileName &newName)
 {
-    m_designWidget->setFileName(newName.toString());
     IDocument::setFilePath(newName);
 }
 
