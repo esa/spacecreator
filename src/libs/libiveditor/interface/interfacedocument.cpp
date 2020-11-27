@@ -672,10 +672,9 @@ void InterfaceDocument::onDynContextEditorMenuInvoked()
 
 void InterfaceDocument::showPropertyEditor(aadl::AADLObject *obj)
 {
-    aadlinterface::PropertiesDialog *dialog = new aadlinterface::PropertiesDialog(
-            d->dynPropConfig, obj, d->asnDataTypes->asn1DataTypes(asn1FilePath()), qobject_cast<QWidget *>(parent()));
-    dialog->setAttribute(Qt::WA_DeleteOnClose);
-    dialog->open();
+    aadlinterface::PropertiesDialog dialog(
+            d->dynPropConfig, obj, d->asnDataTypes->asn1DataTypes(asn1FilePath()), d->graphicsView);
+    dialog.exec();
 }
 
 void InterfaceDocument::showInfoMessage(const QString &title, const QString &message)
