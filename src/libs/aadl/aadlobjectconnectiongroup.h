@@ -45,6 +45,7 @@ public:
     };
 
     bool postInit() override;
+    bool preDestroy() override;
 
     void addConnection(const QPointer<AADLObjectConnection> &connection);
     void removeConnection(const QPointer<AADLObjectConnection> &connection);

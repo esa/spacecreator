@@ -233,11 +233,10 @@ void CreatorTool::groupSelectedItems()
         }
     };
 
-    static const int role = static_cast<int>(aadl::AADLObjectsModel::AADLRoles::IdRole);
-    for (const auto &id : d->model->selectionModel()->selectedIndexes()) {
-        if (aadl::AADLObject *object = d->model->objectsModel()->getObject(id.data(role).toUuid())) {
-            if (object->isConnection()) {
-                if (aadl::AADLObjectConnection *connectionObj = qobject_cast<aadl::AADLObjectConnection *>(object)) {
+    for (const auto item : d->view->scene()->selectedItems()) {
+        if (item->type() == AADLConnectionGraphicsItem::Type) {
+            if (auto connectionItem = qgraphicsitem_cast<AADLConnectionGraphicsItem *>(item)) {
+                if (aadl::AADLObjectConnection *connectionObj = connectionItem->entity()) {
                     processConnection(connectionObj);
                 }
             }
@@ -613,12 +612,10 @@ void CreatorTool::CreatorToolPrivate::populateContextMenu_commonCreate(QMenu *me
 
         action = menu->addAction(QIcon(QLatin1String(":/tab_interface/toolbar/icns/connection_group.svg")),
                 thisTool->tr("Connection group"), thisTool, [this]() { thisTool->groupSelectedItems(); });
-        const QModelIndexList idxs = model->selectionModel()->selection().indexes();
-        auto it = std::find_if(idxs.cbegin(), idxs.cend(), [](const QModelIndex &index) {
-            return index.data(static_cast<int>(aadl::AADLObjectsModel::AADLRoles::TypeRole)).toInt()
-                    == static_cast<int>(aadl::AADLObject::Type::Connection);
-        });
-        action->setEnabled(it != idxs.cend());
+        const auto selectedItems = previewItem->scene()->selectedItems();
+        const auto it = std::find_if(selectedItems.cbegin(), selectedItems.cend(),
+                [](const QGraphicsItem *item) { return item->type() == AADLConnectionGraphicsItem::Type; });
+        action->setEnabled(it != selectedItems.cend());
     }
 }
 

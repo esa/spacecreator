@@ -41,7 +41,7 @@ CmdEntityRemove::CmdEntityRemove(aadl::AADLObject *entity, aadl::AADLObjectsMode
 
 CmdEntityRemove::~CmdEntityRemove()
 {
-    const QVector<QPointer<aadl::AADLObject>> &objects = m_relatedIfaces + m_relatedConnections + m_relatedEntities
+    QVector<QPointer<aadl::AADLObject>> objects = m_relatedIfaces + m_relatedConnections + m_relatedEntities
             + QVector<QPointer<aadl::AADLObject>> { m_entity };
     for (aadl::AADLObject *obj : objects)
         if (obj && !obj->parent())
@@ -111,19 +111,13 @@ void CmdEntityRemove::redo()
 
     removeAadlObjects(m_relatedEntities);
 
-    if (m_entity) {
-        advancedRemove(m_entity);
-        Q_EMIT entityRemoved(m_entity, this);
-    }
+    Q_EMIT entityRemoved(m_entity, this);
 }
 
 void CmdEntityRemove::undo()
 {
     if (!m_model)
         return;
-
-    if (m_entity)
-        advancedRestore(m_entity);
 
     auto restoreAadlObjects = [this](const QVector<QPointer<aadl::AADLObject>> &collection) {
         for (auto it = collection.crbegin(); it != collection.crend(); ++it)
@@ -211,6 +205,7 @@ void CmdEntityRemove::storeLinkedEntity(aadl::AADLObject *linkedEntity)
 
     QVector<QPointer<aadl::AADLObject>> *pCollection { nullptr };
     switch (linkedEntity->aadlType()) {
+    case aadl::AADLObject::Type::ConnectionGroup:
     case aadl::AADLObject::Type::Connection:
         pCollection = &m_relatedConnections;
         break;

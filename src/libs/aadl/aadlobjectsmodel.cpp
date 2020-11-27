@@ -1,5 +1,5 @@
 /*
-  Copyright (C) 2019 European Space Agency - <maxime.perrotin@esa.int>
+  Copyright (C) 2019-2020 European Space Agency - <maxime.perrotin@esa.int>
 
   This library is free software; you can redistribute it and/or
   modify it under the terms of the GNU Library General Public
@@ -26,8 +26,6 @@
 #include "dynamicproperty.h"
 #include "dynamicpropertyconfig.h"
 
-#include <QFont>
-#include <QIcon>
 #include <QtDebug>
 
 namespace aadl {
@@ -43,11 +41,10 @@ struct AADLObjectsModelPrivate {
 };
 
 AADLObjectsModel::AADLObjectsModel(DynamicPropertyConfig *dynPropConfig, QObject *parent)
-    : QAbstractItemModel(parent)
+    : QObject(parent)
     , d(new AADLObjectsModelPrivate)
 {
     d->m_dynPropConfig = dynPropConfig;
-    d->m_headerTitles.resize(columnCount());
 }
 
 AADLObjectsModel::~AADLObjectsModel() { }
@@ -101,27 +98,9 @@ bool AADLObjectsModel::addObjectImpl(AADLObject *obj)
 
     obj->setObjectsModel(this);
 
-    const int parentObjRow = rowInParent(obj->parentObject());
-    const QModelIndex parentIdx =
-            parentObjRow == -1 ? QModelIndex() : createIndex(parentObjRow, 0, obj->parentObject());
-
-    const int objRow = rowInParent(obj);
-    beginInsertRows(parentIdx, objRow, objRow);
-
     d->m_objects.insert(id, obj);
     d->m_objectsOrder.append(id);
     d->m_visibleObjects.append(obj);
-
-    endInsertRows();
-
-    connect(obj, &AADLObject::titleChanged, this, [this](const QString &title) {
-        if (AADLObject *object = qobject_cast<AADLObject *>(sender())) {
-            const QModelIndex idx = indexFromObject(object);
-            if (idx.isValid()) {
-                Q_EMIT dataChanged(idx, idx, { Qt::DisplayRole });
-            }
-        }
-    });
 
     return true;
 }
@@ -150,6 +129,7 @@ bool AADLObjectsModel::addObject(AADLObject *obj)
                     }
                 }
             }
+
             Q_EMIT aadlObjectsAdded({ obj });
             return true;
         }
@@ -166,18 +146,11 @@ bool AADLObjectsModel::removeObject(AADLObject *obj)
     if (!getObject(id))
         return false;
 
-    const int objRow = rowInParent(obj);
-    const QModelIndex currentIdx = createIndex(objRow, 0, obj);
-    const bool isIndexValid = currentIdx.isValid();
-    if (isIndexValid)
-        beginRemoveRows(currentIdx.parent(), objRow, objRow);
-
     d->m_objects.remove(id);
     d->m_objectsOrder.removeAll(id);
     d->m_visibleObjects.removeAll(obj);
 
-    if (isIndexValid)
-        endRemoveRows();
+    obj->preDestroy();
 
     Q_EMIT aadlObjectRemoved(obj);
     return true;
@@ -192,7 +165,6 @@ void AADLObjectsModel::setRootObject(shared::Id rootId)
     d->m_visibleObjects = visibleObjects(rootId);
 
     Q_EMIT rootObjectChanged(d->m_rootObjectId);
-    Q_EMIT dataChanged(QModelIndex(), QModelIndex());
 }
 
 AADLObject *AADLObjectsModel::rootObject() const
@@ -402,8 +374,6 @@ QList<AADLObject *> AADLObjectsModel::visibleObjects(shared::Id rootId) const
 
 void AADLObjectsModel::clear()
 {
-    beginResetModel();
-
     for (auto object : d->m_objects.values())
         object->deleteLater();
 
@@ -412,258 +382,7 @@ void AADLObjectsModel::clear()
     d->m_visibleObjects.clear();
 
     d->m_rootObjectId = shared::InvalidId;
-
-    endResetModel();
-}
-
-QModelIndex AADLObjectsModel::index(int row, int column, const QModelIndex &parent) const
-{
-    if (!hasIndex(row, column, parent)) {
-        return QModelIndex();
-    }
-
-    QObject *internalPtr { nullptr };
-    if (parent.isValid()) {
-        const auto parentObj = static_cast<QObject *>(parent.internalPointer());
-        const QObjectList siblings = parentObj->children();
-        internalPtr = siblings.value(row);
-    } else {
-        int rootItemRow = 0;
-        for (const auto aadlObjectId : d->m_objectsOrder) {
-            if (const auto aadlObject = d->m_objects.value(aadlObjectId)) {
-                if (aadlObject->parent() == this) {
-                    if (rootItemRow == row) {
-                        internalPtr = aadlObject;
-                        break;
-                    }
-                    ++rootItemRow;
-                }
-            }
-        }
-    }
-
-    return createIndex(row, column, internalPtr);
-}
-
-Qt::ItemFlags AADLObjectsModel::flags(const QModelIndex &index) const
-{
-    if (!index.isValid()) {
-        return Qt::NoItemFlags;
-    }
-    Qt::ItemFlags flags = Qt::ItemIsDragEnabled | Qt::ItemIsEnabled | Qt::ItemIsSelectable | Qt::ItemIsUserCheckable;
-    if (index.column() == 0) {
-        flags |= Qt::ItemIsEditable;
-    }
-    return flags;
-}
-
-bool AADLObjectsModel::setHeaderData(int section, Qt::Orientation orientation, const QVariant &value, int role)
-{
-    if (section >= d->m_headerTitles.size() || role != Qt::DisplayRole || orientation != Qt::Horizontal) {
-        return false;
-    }
-    d->m_headerTitles[section] = value.toString();
-    return true;
-}
-
-QVariant AADLObjectsModel::headerData(int section, Qt::Orientation orientation, int role) const
-{
-    if (orientation == Qt::Horizontal) {
-        if (role == Qt::DisplayRole) {
-            return d->m_headerTitles.value(section);
-        } else if (role == Qt::TextAlignmentRole) {
-            return Qt::AlignCenter;
-        }
-    }
-    return QVariant();
-}
-
-QModelIndex AADLObjectsModel::indexFromObject(AADLObject *object) const
-{
-    return createIndex(rowInParent(object), 0, object);
-}
-
-AADLObject *AADLObjectsModel::objectFromIndex(const QModelIndex &index) const
-{
-    if (!index.isValid()) {
-        return nullptr;
-    }
-
-    return static_cast<AADLObject *>(index.internalPointer());
-}
-
-int AADLObjectsModel::rowInParent(AADLObject *obj) const
-{
-    if (!obj) {
-        return -1;
-    }
-
-    if (obj->parent() == this) {
-        int rootItemRow = 0;
-        for (const auto aadlObjectId : d->m_objectsOrder) {
-            if (const auto aadlObject = d->m_objects.value(aadlObjectId)) {
-                if (aadlObject->parent() == this) {
-                    if (aadlObject == obj)
-                        break;
-                    ++rootItemRow;
-                }
-            }
-        }
-        return rootItemRow;
-    }
-
-    if (auto parentObj = obj->parentObject()) {
-        return parentObj->children().indexOf(obj);
-    }
-
-    return -1;
-}
-
-QModelIndex AADLObjectsModel::parent(const QModelIndex &child) const
-{
-    if (!child.isValid() || static_cast<QObject *>(child.internalPointer())->parent() == this) {
-        return QModelIndex();
-    }
-
-    return createIndex(rowInParent(static_cast<AADLObject *>(child.internalPointer())), 0,
-            static_cast<QObject *>(child.internalPointer())->parent());
-}
-
-int AADLObjectsModel::rowCount(const QModelIndex &parent) const
-{
-    const QObject *parentPtr = parent.isValid() ? static_cast<QObject *>(parent.internalPointer()) : this;
-    return std::count_if(d->m_objects.constBegin(), d->m_objects.constEnd(),
-            [parentPtr](AADLObject *obj) { return obj->parent() == parentPtr; });
-}
-
-int AADLObjectsModel::columnCount(const QModelIndex &parent) const
-{
-    Q_UNUSED(parent);
-
-    return 1;
-}
-
-bool AADLObjectsModel::setData(const QModelIndex &index, const QVariant &value, int role)
-{
-    if (!index.isValid()) {
-        return false;
-    } else if (role == Qt::CheckStateRole) {
-        if (auto obj = objectFromIndex(index)) {
-            obj->setVisible(value.toBool());
-            return true;
-        }
-    } else if (role == Qt::EditRole) {
-        const QString newTitle = value.toString();
-        if (!newTitle.isEmpty() && !nestedFunctionNames().contains(newTitle)) {
-            if (auto obj = objectFromIndex(index)) {
-                return obj->setTitle(newTitle);
-            }
-        }
-    }
-    return false;
-}
-
-QVariant AADLObjectsModel::data(const QModelIndex &index, int role) const
-{
-    if (!index.isValid()) {
-        return QVariant();
-    }
-
-    auto obj = static_cast<AADLObject *>(index.internalPointer());
-    Q_ASSERT(obj);
-    if (role == Qt::DecorationRole) {
-        switch (obj->aadlType()) {
-        case AADLObject::Type::Function: {
-            static const QPixmap icon =
-                    QIcon(QLatin1String(":/tab_interface/toolbar/icns/function.svg")).pixmap(16, 16);
-            return icon;
-        } break;
-        case AADLObject::Type::FunctionType: {
-            static const QPixmap icon =
-                    QIcon(QLatin1String(":/tab_interface/toolbar/icns/function_type.svg")).pixmap(16, 16);
-            return icon;
-        } break;
-        case AADLObject::Type::Comment: {
-            static const QPixmap icon = QIcon(QLatin1String(":/tab_interface/toolbar/icns/comment.svg")).pixmap(16, 16);
-            return icon;
-        } break;
-        case AADLObject::Type::RequiredInterface: {
-            static const QPixmap icon = QIcon(QLatin1String(":/tab_interface/toolbar/icns/ri.svg")).pixmap(16, 16);
-            return icon;
-        } break;
-        case AADLObject::Type::ProvidedInterface: {
-            static const QPixmap icon = QIcon(QLatin1String(":/tab_interface/toolbar/icns/pi.svg")).pixmap(16, 16);
-            return icon;
-        } break;
-        case AADLObject::Type::Connection: {
-            static const QPixmap iconHidden =
-                    QIcon(QLatin1String(":/tab_interface/toolbar/icns/connection.svg")).pixmap(16, 16, QIcon::Disabled);
-            static const QPixmap icon =
-                    QIcon(QLatin1String(":/tab_interface/toolbar/icns/connection.svg")).pixmap(16, 16);
-            return obj->isGrouped() ? iconHidden : icon;
-        } break;
-        case AADLObject::Type::ConnectionGroup: {
-            static const QPixmap icon =
-                    QIcon(QLatin1String(":/tab_interface/toolbar/icns/connection_group.svg")).pixmap(16, 16);
-            return icon;
-        } break;
-        default:
-            break;
-        }
-        return QIcon();
-    }
-
-    if (role == static_cast<int>(AADLRoles::IdRole)) {
-        return obj->id();
-    } else if (role == static_cast<int>(AADLRoles::TypeRole)) {
-        return static_cast<int>(obj->aadlType());
-    }
-
-    if (role == Qt::DisplayRole) {
-        if (obj->aadlType() == AADLObject::Type::Connection) {
-            if (auto connectionPtr = qobject_cast<AADLObjectConnection *>(obj)) {
-                const QString sourceName =
-                        AADLNameValidator::decodeName(AADLObject::Type::Function, connectionPtr->sourceName());
-                const QString sourceInterfaceName = AADLNameValidator::decodeName(
-                        AADLObject::Type::RequiredInterface, connectionPtr->sourceInterfaceName());
-                const QString targetName =
-                        AADLNameValidator::decodeName(AADLObject::Type::Function, connectionPtr->targetName());
-                const QString targetInterfaceName = AADLNameValidator::decodeName(
-                        AADLObject::Type::ProvidedInterface, connectionPtr->targetInterfaceName());
-                return QString("%1.%2 <-> %3.%4").arg(sourceName, sourceInterfaceName, targetName, targetInterfaceName);
-            }
-            return QVariant();
-        } else {
-            return obj->titleUI();
-        }
-    }
-
-    if (d->m_sharedTypesModel && role == Qt::CheckStateRole) {
-        return obj->isVisible() ? Qt::Checked : Qt::Unchecked;
-    }
-
-    if (obj->isGrouped()) {
-        if (role == Qt::ForegroundRole) {
-            return QColor(Qt::darkGray);
-        }
-        if (role == Qt::FontRole) {
-            QFont font;
-            font.setItalic(true);
-            return font;
-        }
-    } else if (!obj->isVisible()) {
-        if (role == Qt::ForegroundRole) {
-            return QColor(Qt::lightGray);
-        }
-        if (role == Qt::FontRole) {
-            QFont font;
-            font.setItalic(true);
-            font.setWeight(QFont::Light);
-            return font;
-        }
-    }
-
-    return QVariant();
+    Q_EMIT modelReset();
 }
 
 /*!
@@ -694,7 +413,7 @@ static inline QVector<AADLObjectFunctionType *> nestedFunctions(const AADLObject
     }
 
     QVector<AADLObjectFunctionType *> children = fnt->functionTypes();
-    for (auto fn : fnt->functions()) {
+    for (const auto fn : fnt->functions()) {
         children.append(fn);
     }
     for (const auto child : children) {

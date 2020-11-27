@@ -18,6 +18,7 @@
 #include "aadlobjectstreeview.h"
 
 #include "aadlobjectsmodel.h"
+#include "commonvisualizationmodel.h"
 
 #include <QApplication>
 #include <QDrag>
@@ -54,7 +55,7 @@ void AADLObjectsTreeView::mouseMoveEvent(QMouseEvent *event)
 
             QDrag *drag = new QDrag(this);
             QMimeData *mimeData = new QMimeData;
-            const shared::Id id = index.data(static_cast<int>(aadl::AADLObjectsModel::AADLRoles::IdRole)).toUuid();
+            const shared::Id id = index.data(CommonVisualizationModel::IdRole).toUuid();
             mimeData->setText(id.toString());
             drag->setMimeData(mimeData);
             QPixmap pix;

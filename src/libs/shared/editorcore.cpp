@@ -75,7 +75,6 @@ void EditorCore::initMenus(QMainWindow *window)
     menu->addSeparator();
     menu->addAction(actionOpenAadl());
     menu->addSeparator();
-    menu->addAction(actionImport());
     menu->addAction(actionExportFunctions());
     menu->addAction(actionExportType());
     menu->addSeparator();
@@ -156,14 +155,6 @@ QAction *EditorCore::actionOpenAadl()
         m_actionOpenAadl = new QAction(tr("Open AADL file ..."), this);
     }
     return m_actionOpenAadl;
-}
-
-QAction *EditorCore::actionImport()
-{
-    if (m_actionImport == nullptr) {
-        m_actionImport = new QAction(tr("Import all"), this);
-    }
-    return m_actionImport;
 }
 
 QAction *EditorCore::actionExportFunctions()

@@ -209,6 +209,8 @@ target_sources(${LIB_NAME} PRIVATE
     xmldocexporter.h
     zoomcontroller.cpp
     zoomcontroller.h
+    interface/commonvisualizationmodel.cpp
+    interface/commonvisualizationmodel.h
 )
 
 target_link_libraries(${LIB_NAME}

@@ -37,7 +37,6 @@
 #include "interfacetabgraphicsscene.h"
 
 #include <QGuiApplication>
-#include <QItemSelectionModel>
 #include <QMutex>
 #include <QScreen>
 #include <QUndoStack>
@@ -98,7 +97,6 @@ namespace aadlinterface {
 AADLItemModel::AADLItemModel(aadl::AADLObjectsModel *model, QObject *parent)
     : QObject(parent)
     , m_model(model)
-    , m_itemSelectionModel(new QItemSelectionModel(model))
     , m_graphicsScene(new InterfaceTabGraphicsScene(this))
     , m_mutex(new QMutex(QMutex::NonRecursive))
 {
@@ -112,7 +110,6 @@ AADLItemModel::AADLItemModel(aadl::AADLObjectsModel *model, QObject *parent)
     connect(m_model, &aadl::AADLObjectsModel::aadlObjectRemoved, this, &AADLItemModel::onAADLObjectRemoved);
 
     connect(m_graphicsScene, &QGraphicsScene::selectionChanged, this, &AADLItemModel::onSceneSelectionChanged);
-    connect(m_itemSelectionModel, &QItemSelectionModel::selectionChanged, this, &AADLItemModel::onViewSelectionChanged);
 }
 
 AADLItemModel::~AADLItemModel()
@@ -123,11 +120,6 @@ AADLItemModel::~AADLItemModel()
 QGraphicsScene *AADLItemModel::scene() const
 {
     return m_graphicsScene;
-}
-
-QItemSelectionModel *AADLItemModel::selectionModel() const
-{
-    return m_itemSelectionModel;
 }
 
 void AADLItemModel::onAADLObjectAdded(aadl::AADLObject *object)
@@ -160,9 +152,9 @@ void AADLItemModel::onAADLObjectAdded(aadl::AADLObject *object)
         item = createItemForObject(object);
         if (const auto connectionGroup = qobject_cast<aadl::AADLObjectConnectionGroup *>(object)) {
             connect(connectionGroup, &aadl::AADLObjectConnectionGroup::connectionAdded, this,
-                    &AADLItemModel::onConnectionAddedToGroup);
+                    &AADLItemModel::onConnectionAddedToGroup, Qt::UniqueConnection);
             connect(connectionGroup, &aadl::AADLObjectConnectionGroup::connectionRemoved, this,
-                    &AADLItemModel::onConnectionRemovedFromGroup);
+                    &AADLItemModel::onConnectionRemovedFromGroup, Qt::UniqueConnection);
             for (auto connection : connectionGroup->groupedConnections()) {
                 onConnectionAddedToGroup(connection);
             }
@@ -239,12 +231,6 @@ void AADLItemModel::onAADLObjectRemoved(aadl::AADLObject *object)
     while (!m_rmQueu.isEmpty()) {
         if (m_mutex->tryLock()) {
             aadl::AADLObject *obj = m_rmQueu.dequeue();
-            if (const auto connectionGroup = qobject_cast<aadl::AADLObjectConnectionGroup *>(obj)) {
-                for (const auto connection : connectionGroup->groupedConnections()) {
-                    connectionGroup->removeConnection(connection);
-                }
-            }
-
             if (auto item = m_items.take(obj->id())) {
                 m_graphicsScene->removeItem(item);
                 delete item;
@@ -271,36 +257,13 @@ void AADLItemModel::onConnectionRemovedFromGroup(aadl::AADLObjectConnection *con
 
 void AADLItemModel::onSceneSelectionChanged()
 {
-    const QList<QGraphicsItem *> selectedItems = m_graphicsScene->selectedItems();
-    QItemSelection itemSelection;
-    for (auto item : selectedItems) {
-        if (auto iObj = qobject_cast<aadlinterface::InteractiveObject *>(item->toGraphicsObject())) {
-            const QModelIndex idx = m_model->indexFromObject(iObj->aadlObject());
-            if (itemSelection.isEmpty()) {
-                itemSelection.select(idx, idx);
-            } else {
-                itemSelection.merge(QItemSelection(idx, idx), QItemSelectionModel::SelectCurrent);
-            }
+    QList<shared::Id> ids;
+    for (auto item : m_graphicsScene->selectedItems()) {
+        if (auto iObj = qobject_cast<InteractiveObject *>(item->toGraphicsObject())) {
+            ids.append(iObj->aadlObject()->id());
         }
     }
-    m_itemSelectionModel->select(itemSelection,
-            QItemSelectionModel::Rows | QItemSelectionModel::Current | QItemSelectionModel::ClearAndSelect);
-}
-
-void AADLItemModel::onViewSelectionChanged(const QItemSelection &selected, const QItemSelection &deselected)
-{
-    auto updateSelection = [this](const QItemSelection &selection, bool value) {
-        for (const QModelIndex &idx : selection.indexes()) {
-            if (auto const obj = m_model->objectFromIndex(idx)) {
-                if (auto graphicsItem = m_items.value(obj->id())) {
-                    graphicsItem->setSelected(value);
-                }
-            }
-        }
-    };
-
-    updateSelection(deselected, false);
-    updateSelection(selected, true);
+    Q_EMIT itemsSelected(ids);
 }
 
 AADLFunctionGraphicsItem *AADLItemModel::rootItem() const
@@ -361,6 +324,10 @@ void AADLItemModel::zoomChanged()
 
 QGraphicsItem *AADLItemModel::getItem(const shared::Id id) const
 {
+    if (id.isNull()) {
+        return nullptr;
+    }
+
     return m_items.value(id);
 }
 

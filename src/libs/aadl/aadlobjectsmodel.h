@@ -33,16 +33,10 @@ class AADLObjectFunctionType;
 class DynamicPropertyConfig;
 
 struct AADLObjectsModelPrivate;
-class AADLObjectsModel : public QAbstractItemModel
+class AADLObjectsModel : public QObject
 {
     Q_OBJECT
 public:
-    enum class AADLRoles
-    {
-        IdRole = Qt::UserRole,
-        TypeRole
-    };
-
     explicit AADLObjectsModel(DynamicPropertyConfig *dynPropConfig, QObject *parent = nullptr);
     ~AADLObjectsModel() override;
 
@@ -85,19 +79,6 @@ public:
 
     void clear();
 
-    QModelIndex index(int row, int column, const QModelIndex &parent) const override;
-    QModelIndex parent(const QModelIndex &child) const override;
-    int rowCount(const QModelIndex &parent = QModelIndex()) const override;
-    int columnCount(const QModelIndex &parent = QModelIndex()) const override;
-    bool setData(const QModelIndex &index, const QVariant &value, int role = Qt::EditRole) override;
-    QVariant data(const QModelIndex &index, int role = Qt::DisplayRole) const override;
-    Qt::ItemFlags flags(const QModelIndex &index) const override;
-    bool setHeaderData(
-            int section, Qt::Orientation orientation, const QVariant &value, int role = Qt::EditRole) override;
-    QVariant headerData(int section, Qt::Orientation orientation, int role = Qt::DisplayRole) const override;
-    QModelIndex indexFromObject(AADLObject *object) const;
-    AADLObject *objectFromIndex(const QModelIndex &index) const;
-
     /*!
       Returns all objects of the given type
     */
@@ -115,13 +96,13 @@ public:
     }
 
 private:
-    int rowInParent(AADLObject *obj) const;
     bool addObjectImpl(AADLObject *obj);
 
 Q_SIGNALS:
     void aadlObjectsAdded(const QVector<aadl::AADLObject *> &object);
     void aadlObjectRemoved(aadl::AADLObject *object);
     void rootObjectChanged(shared::Id rootId);
+    void modelReset();
 
 public Q_SLOTS:
     bool initFromObjects(const QVector<aadl::AADLObject *> &visibleObjects);

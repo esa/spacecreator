@@ -82,6 +82,11 @@ bool AADLObject::postInit()
     return true;
 }
 
+bool AADLObject::preDestroy()
+{
+    return true;
+}
+
 //! This sorts the objects on type.
 //! \sa aadlType
 void AADLObject::sortObjectList(QList<AADLObject *> &objects)
@@ -294,6 +299,11 @@ void AADLObject::setAttr(const QString &name, const QVariant &val)
         case meta::Props::Token::is_visible: {
             d->m_attrs[name] = val;
             Q_EMIT visibilityChanged(val.toBool());
+            break;
+        }
+        case meta::Props::Token::group_name: {
+            d->m_attrs[name] = val;
+            Q_EMIT groupChanged(val.toString());
             break;
         }
         case meta::Props::Token::name: {

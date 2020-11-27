@@ -26,8 +26,6 @@
 class QMutex;
 class QGraphicsItem;
 class QGraphicsScene;
-class QItemSelectionModel;
-class QItemSelection;
 
 namespace aadl {
 class AADLObject;
@@ -61,7 +59,6 @@ public:
     ~AADLItemModel() override;
 
     QGraphicsScene *scene() const;
-    QItemSelectionModel *selectionModel() const;
 
     void changeRootItem(shared::Id id);
     void zoomChanged();
@@ -73,6 +70,7 @@ public:
 Q_SIGNALS:
     void itemClicked(shared::Id id);
     void itemDoubleClicked(shared::Id id);
+    void itemsSelected(const QList<shared::Id> &ids);
 
 public Q_SLOTS:
     void updateSceneRect();
@@ -87,7 +85,6 @@ private Q_SLOTS:
     void onConnectionRemovedFromGroup(aadl::AADLObjectConnection *connection);
 
     void onSceneSelectionChanged();
-    void onViewSelectionChanged(const QItemSelection &selected, const QItemSelection &deselected);
 
 private:
     QGraphicsItem *createItemForObject(aadl::AADLObject *obj);
@@ -97,7 +94,6 @@ private:
 
 private:
     aadl::AADLObjectsModel *m_model { nullptr };
-    QItemSelectionModel *m_itemSelectionModel;
     InterfaceTabGraphicsScene *m_graphicsScene { nullptr };
     QHash<shared::Id, QGraphicsItem *> m_items;
     QMutex *m_mutex { nullptr };

@@ -31,6 +31,7 @@
 #include "commands/commandids.h"
 #include "commands/commandsfactory.h"
 #include "commandsstack.h"
+#include "commonvisualizationmodel.h"
 #include "context/action/actionsmanager.h"
 #include "context/action/editor/dynactioneditor.h"
 #include "creatortool.h"
@@ -45,31 +46,17 @@
 
 #include <QAction>
 #include <QBuffer>
-#include <QComboBox>
 #include <QDebug>
 #include <QDialogButtonBox>
 #include <QDir>
 #include <QDirIterator>
-#include <QFile>
-#include <QFileInfo>
-#include <QGraphicsItem>
-#include <QGraphicsView>
-#include <QGuiApplication>
 #include <QLabel>
 #include <QLineEdit>
 #include <QMenu>
 #include <QMessageBox>
-#include <QMutex>
-#include <QMutexLocker>
-#include <QPointer>
-#include <QScreen>
-#include <QSharedPointer>
-#include <QShortcut>
 #include <QSplitter>
-#include <QStandardItemModel>
 #include <QStandardPaths>
 #include <QToolBar>
-#include <QTreeView>
 #include <QUndoStack>
 #include <QVBoxLayout>
 
@@ -111,6 +98,8 @@ struct InterfaceDocument::InterfaceDocumentPrivate {
     aadl::DynamicPropertyConfig *dynPropConfig { nullptr };
     QTreeView *objectsView { nullptr };
     AADLItemModel *itemsModel { nullptr };
+    CommonVisualizationModel *objectsVisualizationModel { nullptr };
+    QItemSelectionModel *objectsSelectionModel { nullptr };
     aadl::AADLObjectsModel *objectsModel { nullptr };
     AADLObjectsTreeView *importView { nullptr };
     aadl::AADLObjectsModel *importModel { nullptr };
@@ -176,6 +165,7 @@ void InterfaceDocument::init()
     d->itemsModel = new AADLItemModel(d->objectsModel, this);
     connect(d->itemsModel, &AADLItemModel::itemClicked, this, &InterfaceDocument::onItemClicked);
     connect(d->itemsModel, &AADLItemModel::itemDoubleClicked, this, &InterfaceDocument::onItemDoubleClicked);
+    connect(d->itemsModel, &AADLItemModel::itemsSelected, this, &InterfaceDocument::onSceneSelectionChanged);
 
     QWidget *panelWidget = new QWidget;
     QVBoxLayout *panelLayout = new QVBoxLayout;
@@ -274,19 +264,21 @@ bool InterfaceDocument::load(const QString &path)
 
 bool InterfaceDocument::loadAvailableComponents()
 {
+    bool result = true;
+
     d->importModel->clear();
     QDirIterator importableIt(componentsLibraryPath());
     while (importableIt.hasNext()) {
-        loadComponentModel(d->importModel, importableIt.next() + QDir::separator() + kDefaultFilename);
+        result |= loadComponentModel(d->importModel, importableIt.next() + QDir::separator() + kDefaultFilename);
     }
 
     d->sharedModel->clear();
     QDirIterator instantiatableIt(sharedTypesPath());
     while (instantiatableIt.hasNext()) {
-        loadComponentModel(d->sharedModel, instantiatableIt.next() + QDir::separator() + kDefaultFilename);
+        result |= loadComponentModel(d->sharedModel, instantiatableIt.next() + QDir::separator() + kDefaultFilename);
     }
 
-    return true;
+    return result;
 }
 
 QString InterfaceDocument::getComponentName(const QStringList &exportNames)
@@ -317,8 +309,8 @@ QList<aadl::AADLObject *> InterfaceDocument::prepareSelectedObjectsForExport(QSt
 {
     QList<aadl::AADLObject *> objects;
     QStringList exportNames;
-    for (const auto id : d->itemsModel->selectionModel()->selection().indexes()) {
-        const int role = static_cast<int>(aadl::AADLObjectsModel::AADLRoles::IdRole);
+    for (const auto id : d->objectsSelectionModel->selection().indexes()) {
+        const int role = static_cast<int>(aadlinterface::CommonVisualizationModel::IdRole);
         if (aadl::AADLObject *object = d->objectsModel->getObject(id.data(role).toUuid())) {
             if (object->isFunction() && object->parentObject() == nullptr) {
                 exportNames.append(object->attr(QLatin1String("name")).toString());
@@ -344,7 +336,7 @@ bool InterfaceDocument::exportSelectedFunctions()
 {
     QString name;
     const QList<aadl::AADLObject *> objects = prepareSelectedObjectsForExport(name);
-    d->itemsModel->selectionModel()->clearSelection();
+    d->objectsSelectionModel->clearSelection();
     const QString path = componentsLibraryPath() + QDir::separator() + name;
     if (exportImpl(path, objects)) {
         return loadComponentModel(d->importModel, path + QDir::separator() + kDefaultFilename);
@@ -354,11 +346,11 @@ bool InterfaceDocument::exportSelectedFunctions()
 
 bool InterfaceDocument::exportSelectedType()
 {
-    const auto indexes = d->itemsModel->selectionModel()->selection().indexes();
+    const auto indexes = d->objectsSelectionModel->selection().indexes();
     if (indexes.isEmpty()) {
         return false;
     }
-    static const int role = static_cast<int>(aadl::AADLObjectsModel::AADLRoles::IdRole);
+    static const int role = static_cast<int>(aadlinterface::CommonVisualizationModel::IdRole);
     aadl::AADLObject *rootType = nullptr;
     for (const auto index : indexes) {
         if (aadl::AADLObject *object = d->objectsModel->getObject(index.data(role).toUuid())) {
@@ -373,7 +365,7 @@ bool InterfaceDocument::exportSelectedType()
     if (!rootType) {
         return false;
     }
-    d->itemsModel->selectionModel()->clearSelection();
+    d->objectsSelectionModel->clearSelection();
     const QString path = sharedTypesPath() + QDir::separator() + rootType->title();
     if (exportImpl(path, { rootType })) {
         return loadComponentModel(d->sharedModel, path + QDir::separator() + kDefaultFilename);
@@ -406,16 +398,6 @@ void InterfaceDocument::close()
     d->objectsModel->clear();
     setPath(QString());
     d->commandsStack->clear();
-}
-
-void InterfaceDocument::toggleObjectVisibility()
-{
-    for (const auto id : d->itemsModel->selectionModel()->selection().indexes()) {
-        const int role = static_cast<int>(aadl::AADLObjectsModel::AADLRoles::IdRole);
-        if (aadl::AADLObject *object = d->objectsModel->getObject(id.data(role).toUuid())) {
-            object->setVisible(!object->isVisible());
-        }
-    }
 }
 
 QString InterfaceDocument::path() const
@@ -561,13 +543,10 @@ bool InterfaceDocument::checkInterfaceAsn1Compliance(const aadl::AADLObjectIface
         return true;
     }
 
-    const QSharedPointer<Asn1Acn::File> &dataTypes = d->asnDataTypes->asn1DataTypes(asn1FilePath());
-    for (const aadl::IfaceParameter &param : interface->params()) {
-        if (!dataTypes->hasType(param.paramTypeName())) {
-            return false;
-        }
-    }
-    return true;
+    const QSharedPointer<Asn1Acn::File> dataTypes = d->asnDataTypes->asn1DataTypes(asn1FilePath());
+    const QVector<aadl::IfaceParameter> &params = interface->params();
+    return std::any_of(params.cbegin(), params.cend(),
+            [dataTypes](const aadl::IfaceParameter &param) { return dataTypes->hasType(param.paramTypeName()); });
 }
 
 /*!
@@ -735,8 +714,8 @@ void InterfaceDocument::showContextMenuForAADLModel(const QPoint &pos)
         return;
     }
 
-    const auto obj =
-            d->objectsModel->getObject(idx.data(static_cast<int>(aadl::AADLObjectsModel::AADLRoles::IdRole)).toUuid());
+    const auto obj = d->objectsModel->getObject(
+            idx.data(static_cast<int>(aadlinterface::CommonVisualizationModel::IdRole)).toUuid());
     if (!obj) {
         return;
     }
@@ -758,12 +737,6 @@ void InterfaceDocument::showContextMenuForAADLModel(const QPoint &pos)
         ActionsManager::registerAction(
                 Q_FUNC_INFO, actExportSelectedSharedType, "Export component type", "Export component type");
     }
-
-    QAction *actToggleVisibility = new QAction(tr("Toggle object visibility"));
-    connect(actToggleVisibility, &QAction::triggered, this, &InterfaceDocument::toggleObjectVisibility);
-    actions.append(actToggleVisibility);
-    ActionsManager::registerAction(Q_FUNC_INFO, actToggleVisibility, "Change object visibility",
-            "Change object visibility in the graphics scene");
 
     QMenu *menu = new QMenu;
     menu->addActions(actions);
@@ -967,12 +940,12 @@ QVector<QAction *> InterfaceDocument::initActions()
             d->actExitToParent->setEnabled(nullptr != d->objectsModel->rootObject());
         }
     });
-    connect(d->itemsModel->selectionModel(), &QItemSelectionModel::selectionChanged, this,
+    connect(d->objectsSelectionModel, &QItemSelectionModel::selectionChanged, this,
             [this](const QItemSelection &selected, const QItemSelection & /*deselected*/) {
                 d->actRemove->setEnabled(!selected.isEmpty());
                 const QModelIndexList idxs = selected.indexes();
                 auto it = std::find_if(idxs.cbegin(), idxs.cend(), [](const QModelIndex &index) {
-                    return index.data(static_cast<int>(aadl::AADLObjectsModel::AADLRoles::TypeRole)).toInt()
+                    return index.data(static_cast<int>(aadlinterface::CommonVisualizationModel::TypeRole)).toInt()
                             == static_cast<int>(aadl::AADLObject::Type::Connection);
                 });
                 d->actCreateConnectionGroup->setEnabled(it != std::cend(idxs));
@@ -1009,12 +982,20 @@ QTreeView *InterfaceDocument::createModelView()
     d->objectsView->setObjectName(QLatin1String("AADLModelView"));
     d->objectsView->setSelectionBehavior(QAbstractItemView::SelectionBehavior::SelectItems);
     d->objectsView->setSelectionMode(QAbstractItemView::SelectionMode::ExtendedSelection);
-    d->objectsView->setModel(d->objectsModel);
-    d->objectsView->setSelectionModel(d->itemsModel->selectionModel());
-    d->objectsModel->setHeaderData(0, Qt::Horizontal, tr("AADL Structure"), Qt::DisplayRole);
     d->objectsView->setContextMenuPolicy(Qt::ContextMenuPolicy::CustomContextMenu);
     connect(d->objectsView, &QTreeView::customContextMenuRequested, this,
             &InterfaceDocument::showContextMenuForAADLModel);
+
+    d->objectsVisualizationModel = new VisualizationModel(d->objectsModel, d->objectsView);
+    auto headerItem = new QStandardItem(tr("AADL Structure"));
+    headerItem->setTextAlignment(Qt::AlignCenter);
+    d->objectsVisualizationModel->setHorizontalHeaderItem(0, headerItem);
+    d->objectsView->setModel(d->objectsVisualizationModel);
+
+    d->objectsSelectionModel = new QItemSelectionModel(d->objectsVisualizationModel, d->objectsView);
+    connect(d->objectsSelectionModel, &QItemSelectionModel::selectionChanged, this,
+            &InterfaceDocument::onViewSelectionChanged);
+    d->objectsView->setSelectionModel(d->objectsSelectionModel);
 
     return d->objectsView;
 }
@@ -1028,8 +1009,11 @@ QTreeView *InterfaceDocument::createImportView()
     d->importView->setObjectName(QLatin1String("ImportView"));
     d->importView->setSelectionBehavior(QAbstractItemView::SelectionBehavior::SelectItems);
     d->importView->setSelectionMode(QAbstractItemView::SelectionMode::SingleSelection);
-    d->importView->setModel(d->importModel);
-    d->importModel->setHeaderData(0, Qt::Horizontal, tr("Import Component"), Qt::DisplayRole);
+    auto sourceModel = new CommonVisualizationModel(d->importModel, d->importView);
+    auto headerItem = new QStandardItem(tr("Import Component"));
+    headerItem->setTextAlignment(Qt::AlignCenter);
+    sourceModel->setHorizontalHeaderItem(0, headerItem);
+    d->importView->setModel(sourceModel);
 
     return d->importView;
 }
@@ -1043,8 +1027,11 @@ QTreeView *InterfaceDocument::createSharedView()
     d->sharedView->setObjectName(QLatin1String("SharedView"));
     d->sharedView->setSelectionBehavior(QAbstractItemView::SelectionBehavior::SelectItems);
     d->sharedView->setSelectionMode(QAbstractItemView::SelectionMode::SingleSelection);
-    d->sharedView->setModel(d->sharedModel);
-    d->sharedModel->setHeaderData(0, Qt::Horizontal, tr("Shared Types"), Qt::DisplayRole);
+    auto sourceModel = new CommonVisualizationModel(d->sharedModel, d->sharedView);
+    auto headerItem = new QStandardItem(tr("Shared Types"));
+    headerItem->setTextAlignment(Qt::AlignCenter);
+    sourceModel->setHorizontalHeaderItem(0, headerItem);
+    d->sharedView->setModel(sourceModel);
 
     return d->sharedView;
 }
@@ -1055,4 +1042,34 @@ void InterfaceDocument::showNIYGUI(const QString &title)
     QWidget *mainWindow = qobject_cast<QWidget *>(parent());
     QMessageBox::information(mainWindow, header, "Not implemented yet!");
 }
+
+void InterfaceDocument::onSceneSelectionChanged(const QList<shared::Id> &selectedObjects)
+{
+    QItemSelection itemSelection;
+    for (auto id : selectedObjects) {
+        const QModelIndex idx = d->objectsVisualizationModel->indexFromItem(d->objectsVisualizationModel->getItem(id));
+        if (itemSelection.isEmpty()) {
+            itemSelection.select(idx, idx);
+        } else {
+            itemSelection.merge(QItemSelection(idx, idx), QItemSelectionModel::SelectCurrent);
+        }
+    }
+    d->objectsSelectionModel->select(itemSelection,
+            QItemSelectionModel::Rows | QItemSelectionModel::Current | QItemSelectionModel::ClearAndSelect);
+}
+
+void InterfaceDocument::onViewSelectionChanged(const QItemSelection &selected, const QItemSelection &deselected)
+{
+    auto updateSelection = [this](const QItemSelection &selection, bool value) {
+        for (const QModelIndex &idx : selection.indexes()) {
+            if (auto graphicsItem = d->itemsModel->getItem(idx.data(CommonVisualizationModel::IdRole).toUuid())) {
+                graphicsItem->setSelected(value);
+            }
+        }
+    };
+
+    updateSelection(deselected, false);
+    updateSelection(selected, true);
+}
+
 }

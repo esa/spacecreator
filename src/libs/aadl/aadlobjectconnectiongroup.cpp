@@ -32,8 +32,9 @@ AADLObjectConnectionGroup::AADLObjectConnectionGroup(const QString &name, AADLOb
     setTitle(name);
     ifaceSource->setGroupName(name);
     ifaceTarget->setGroupName(name);
+
     for (auto connection : connections) {
-        addConnection(connection);
+        m_initConnections.append(connection->id());
     }
 }
 
@@ -51,6 +52,19 @@ bool AADLObjectConnectionGroup::postInit()
 
     m_initConnections.clear();
 
+    return true;
+}
+
+bool AADLObjectConnectionGroup::preDestroy()
+{
+    if (!m_connections.isEmpty()) {
+        m_initConnections.clear();
+    }
+    while (!m_connections.isEmpty()) {
+        const auto connection = m_connections.takeLast();
+        removeConnection(connection);
+        m_initConnections.append(connection->id());
+    }
     return true;
 }
 

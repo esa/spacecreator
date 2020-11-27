@@ -77,7 +77,6 @@ MainWindow::MainWindow(aadlinterface::IVEditorCore *core, QWidget *parent)
     connect(m_core->actionSaveFile(), &QAction::triggered, this, [=]() { exportXml(); });
     connect(m_core->actionSaveFileAs(), &QAction::triggered, this, [=]() { exportXmlAs(); });
     connect(m_core->actionQuit(), &QAction::triggered, this, &MainWindow::onQuitRequested);
-    connect(m_core->actionImport(), &QAction::triggered, this, &MainWindow::onImportRequested);
     connect(m_core->actionExportFunctions(), &QAction::triggered, this, &MainWindow::onExportFunctionsRequested);
     connect(m_core->actionExportType(), &QAction::triggered, this, &MainWindow::onExportTypeRequested);
 
@@ -159,11 +158,6 @@ void MainWindow::onCreateFileRequested()
     if (closeFile()) {
         m_core->document()->create();
     }
-}
-
-void MainWindow::onImportRequested()
-{
-    m_core->document()->loadAvailableComponents();
 }
 
 void MainWindow::onExportFunctionsRequested()

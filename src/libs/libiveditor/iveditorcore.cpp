@@ -137,8 +137,6 @@ void IVEditorCore::registerBasicActions()
     aadlinterface::ActionsManager::registerAction(Q_FUNC_INFO, actionUndo(), "Undo", "Undo the last operation");
     aadlinterface::ActionsManager::registerAction(Q_FUNC_INFO, actionRedo(), "Redo", "Redo the last undone operation");
     aadlinterface::ActionsManager::registerAction(
-            Q_FUNC_INFO, actionImport(), "Import", "Import all available AADL files");
-    aadlinterface::ActionsManager::registerAction(
             Q_FUNC_INFO, actionExportFunctions(), "Export Functions", "Export selected objects");
     aadlinterface::ActionsManager::registerAction(
             Q_FUNC_INFO, actionExportType(), "Export Type", "Export selected component type");

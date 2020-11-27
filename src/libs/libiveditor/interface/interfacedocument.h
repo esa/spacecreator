@@ -29,6 +29,7 @@ class QToolBar;
 class QUndoStack;
 class QAbstractItemView;
 class QTreeView;
+class QItemSelection;
 
 namespace Asn1Acn {
 class Asn1ModelStorage;
@@ -75,8 +76,6 @@ public:
     bool exportSelectedType();
     bool save(const QString &path);
     void close();
-
-    void toggleObjectVisibility();
 
     QString path() const;
 
@@ -137,14 +136,17 @@ private:
 
     bool exportImpl(const QString &path, const QList<aadl::AADLObject *> &objects);
     bool loadImpl(const QString &path);
-    bool loadComponentModel(aadl::AADLObjectsModel *model, const QString &path);
     QString getComponentName(const QStringList &exportNames);
     QList<aadl::AADLObject *> prepareSelectedObjectsForExport(QString &name);
+    static bool loadComponentModel(aadl::AADLObjectsModel *model, const QString &path);
 
     QWidget *createGraphicsView();
     QTreeView *createModelView();
     QTreeView *createImportView();
     QTreeView *createSharedView();
+
+    void onSceneSelectionChanged(const QList<shared::Id> &selectedObjects);
+    void onViewSelectionChanged(const QItemSelection &selected, const QItemSelection &deselected);
 
     void showNIYGUI(const QString &title = QString());
 
