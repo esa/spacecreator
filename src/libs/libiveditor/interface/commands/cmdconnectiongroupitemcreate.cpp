@@ -71,9 +71,13 @@ void CmdConnectionGroupItemCreate::redo()
 {
     CmdEntityGeometryChange::redo();
 
+    if (auto fn = m_sourceIface->function()) {
+        fn->addChild(m_sourceIface);
+    }
+    if (auto fn = m_targetIface->function()) {
+        fn->addChild(m_targetIface);
+    }
     if (m_parent) {
-        m_parent->addChild(m_sourceIface);
-        m_parent->addChild(m_targetIface);
         m_parent->addChild(m_entity);
     }
 
@@ -92,8 +96,12 @@ void CmdConnectionGroupItemCreate::undo()
 
     if (m_parent) {
         m_parent->removeChild(m_entity);
-        m_parent->removeChild(m_targetIface);
-        m_parent->removeChild(m_sourceIface);
+    }
+    if (auto fn = m_targetIface->function()) {
+        fn->removeChild(m_targetIface);
+    }
+    if (auto fn = m_sourceIface->function()) {
+        fn->removeChild(m_sourceIface);
     }
 }
 

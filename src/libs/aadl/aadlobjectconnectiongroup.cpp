@@ -46,7 +46,7 @@ bool AADLObjectConnectionGroup::postInit()
 
     m_connections.clear();
 
-    for (const auto id : m_initConnections) {
+    for (const auto &id : m_initConnections) {
         addConnection(objectsModel()->getConnection(id));
     }
 

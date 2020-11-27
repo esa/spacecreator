@@ -41,8 +41,7 @@ CmdEntityRemove::CmdEntityRemove(aadl::AADLObject *entity, aadl::AADLObjectsMode
 
 CmdEntityRemove::~CmdEntityRemove()
 {
-    QVector<QPointer<aadl::AADLObject>> objects = m_relatedIfaces + m_relatedConnections + m_relatedEntities
-            + QVector<QPointer<aadl::AADLObject>> { m_entity };
+    const QVector<QPointer<aadl::AADLObject>> objects = m_relatedIfaces + m_relatedConnections + m_relatedEntities;
     for (aadl::AADLObject *obj : objects)
         if (obj && !obj->parent())
             delete obj;
