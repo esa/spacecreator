@@ -30,6 +30,13 @@
             "typeId": "Project"
         },
         {
+            "trDisplayName": "Kit Selection",
+            "trShortTitle": "Kits",
+            "typeId": "Kits",
+            "enabled": true,
+            "data": { "projectFilePath": "%{ProjectFile}" }
+        },
+        {
             "trDisplayName": "Project Management",
             "trShortTitle": "Summary",
             "typeId": "Summary"
