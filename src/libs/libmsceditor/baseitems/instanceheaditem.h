@@ -65,9 +65,11 @@ Q_SIGNALS:
     void manualMoveRequested(const QPointF &sceneFrom, const QPointF &sceneTo);
     void manualMoveFinished(const QPointF &sceneFrom, const QPointF &sceneTo);
     void layoutUpdated();
+    void textChanged();
 
 protected Q_SLOTS:
     void updateLayout();
+    void updateGeometryOnTextChange();
 
 protected:
     void mouseMoveEvent(QGraphicsSceneMouseEvent *event) override;

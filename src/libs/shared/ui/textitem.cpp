@@ -371,6 +371,7 @@ bool TextItem::validateInput(const QString &text) const
 
 bool TextItem::validateText(const QString &text) const
 {
+    Q_UNUSED(text);
     return true;
 }
 

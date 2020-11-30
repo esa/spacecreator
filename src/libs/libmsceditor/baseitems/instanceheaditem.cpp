@@ -112,6 +112,9 @@ InstanceHeadItem::InstanceHeadItem(MscChart *chart, QGraphicsItem *parent)
         Q_EMIT kindEdited(txt);
     });
 
+    connect(m_textItemName, &shared::ui::TextItem::textChanged, this, &InstanceHeadItem::updateGeometryOnTextChange);
+    connect(m_textItemKind, &shared::ui::TextItem::textChanged, this, &InstanceHeadItem::updateGeometryOnTextChange);
+
     m_rectItem->setCursor(Qt::SizeAllCursor);
     m_textItemKind->setCursor(Qt::SizeAllCursor); // TODO: restore regular cursor for editing
 }
@@ -128,8 +131,9 @@ QString InstanceHeadItem::kind() const
 
 void InstanceHeadItem::setName(const QString &name)
 {
-    if (name == this->name())
+    if (name == this->name() || m_textItemName->isEditing()) {
         return;
+    }
 
     m_explicitTextBox = QRectF();
     m_textItemName->setPlainText(name);
@@ -140,8 +144,9 @@ void InstanceHeadItem::setName(const QString &name)
 
 void InstanceHeadItem::setKind(const QString &kind)
 {
-    if (kind == m_textItemKind->toPlainText())
+    if (kind == m_textItemKind->toPlainText() || m_textItemKind->isEditing()) {
         return;
+    }
 
     QString denominator;
     QString kindText;
@@ -215,6 +220,15 @@ void InstanceHeadItem::updateLayout()
     m_rectItem->setBrush(createGradientForKind(m_rectItem));
 
     Q_EMIT layoutUpdated();
+}
+
+void InstanceHeadItem::updateGeometryOnTextChange()
+{
+    m_explicitTextBox = QRectF();
+    m_textItemName->adjustSize();
+    m_textItemKind->adjustSize();
+    updateLayout();
+    Q_EMIT textChanged();
 }
 
 QRectF InstanceHeadItem::boundingRect() const

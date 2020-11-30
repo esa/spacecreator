@@ -78,6 +78,7 @@ InstanceItem::InstanceItem(
     axisPen.setWidthF(2.);
     m_axisSymbol->setPen(axisPen);
 
+    connect(m_headSymbol, &InstanceHeadItem::textChanged, this, &InstanceItem::rebuildLayout);
     connect(m_headSymbol, &InstanceHeadItem::nameEdited, this, &InstanceItem::onNameEdited);
     connect(m_headSymbol, &InstanceHeadItem::kindEdited, this, &InstanceItem::onKindEdited);
     connect(m_headSymbol, &InstanceHeadItem::manualMoveRequested, this,
