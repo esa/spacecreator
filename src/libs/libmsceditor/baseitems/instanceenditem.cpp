@@ -112,23 +112,13 @@ QRectF InstanceEndItem::boundingRect() const
 qreal InstanceEndItem::stopSymbolHeight()
 {
     static constexpr int stopSymbolHeightCIF { 50 };
-    static qreal stopSymbolHeightScene { 0. };
-    if (qFuzzyIsNull(stopSymbolHeightScene)) {
-        stopSymbolHeightScene = CoordinatesConverter::heightInScene(stopSymbolHeightCIF);
-    }
-
-    return stopSymbolHeightScene;
+    return CoordinatesConverter::heightInScene(stopSymbolHeightCIF);
 }
 
 qreal InstanceEndItem::endSymbolHeight()
 {
     static constexpr int endSymbolHeightCIF { 25 };
-    static qreal endSymbolHeightScene { 0. };
-    if (qFuzzyIsNull(endSymbolHeightScene)) {
-        endSymbolHeightScene = CoordinatesConverter::heightInScene(endSymbolHeightCIF);
-    }
-
-    return endSymbolHeightScene;
+    return CoordinatesConverter::heightInScene(endSymbolHeightCIF);
 }
 
 } // ns msc

@@ -181,9 +181,8 @@ void InstanceItem::rebuildLayout()
     br.setHeight(headRect.height() + m_axisHeight + endSymbolHeight);
     setBoundingRect(br);
 
-    // move end symb to the bottom:
-    QRectF footerRect(boundingRect());
-    footerRect.setTop(footerRect.bottom() - endSymbolHeight);
+    // move end symbol to the bottom:
+    QRectF footerRect(br.x(), br.bottom() - endSymbolHeight, br.width(), endSymbolHeight);
     m_endSymbol->setRect(footerRect);
 
     // line between the head and end symbols:
@@ -201,7 +200,7 @@ void InstanceItem::rebuildLayout()
 }
 
 /*!
-   If the instance is not stopped, the bottom is moved to be at the botton of the msc chart box
+   If the instance is not stopped, the bottom is moved to be at the bottom of the msc chart box
  */
 void InstanceItem::syncHeightToChartBox()
 {
