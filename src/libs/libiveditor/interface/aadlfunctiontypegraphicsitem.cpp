@@ -81,7 +81,7 @@ void AADLFunctionTypeGraphicsItem::init()
         m_textItem->setPlainText(text);
         instantLayoutUpdate();
     });
-    connect(m_textItem, &AADLFunctionNameGraphicsItem::editingModeOff, this, [this]() { updateTextPosition(); });
+    connect(m_textItem, &AADLFunctionNameGraphicsItem::textChanged, this, [this]() { updateTextPosition(); });
 }
 
 void AADLFunctionTypeGraphicsItem::rebuildLayout()

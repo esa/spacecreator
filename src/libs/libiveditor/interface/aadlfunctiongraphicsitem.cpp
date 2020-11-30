@@ -82,8 +82,6 @@ QPainterPath AADLFunctionGraphicsItem::shape() const
 
 void AADLFunctionGraphicsItem::rebuildLayout()
 {
-    //    qDebug() << Q_FUNC_INFO << entity()->title();
-
     auto view = scene()->views().value(0);
     if (!view)
         return;
