@@ -120,6 +120,8 @@ endif()
 set (CPACK_PACKAGING_INSTALL_PREFIX /usr)
 set (CPACK_GENERATOR "DEB")
 set (CPACK_DEBIAN_PACKAGE_SECTION "Development")
-set (CPACK_DEBIAN_PACKAGE_DEPENDS "libqt5gui5, libqt5svg5, libqt5widgets5, qtcreator, qtbase5-dev")
+# libmono-system-data-services-client4.0-cil is needed for the asn1.scc.daemon
+# qtbase5-dev is needed to hae a proper qmake project
+set (CPACK_DEBIAN_PACKAGE_DEPENDS "libqt5gui5, libqt5svg5, libqt5widgets5, qtcreator, qtbase5-dev, libmono-system-data-services-client4.0-cil")
 include(CPack)
 endif()
