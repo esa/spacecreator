@@ -83,6 +83,10 @@ add_custom_target(BuildFiles SOURCES
     lgpl.lic.qtc
 )
 
+if (COVERAGE_ENABLED)
+    include(CodeCoverage)
+endif()
+
 # The actual code
 add_subdirectory(src)
 
