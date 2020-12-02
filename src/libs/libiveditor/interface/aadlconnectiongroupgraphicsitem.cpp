@@ -69,7 +69,7 @@ void AADLConnectionGroupGraphicsItem::updateTitleItemPosition()
 
     const qreal width = m_textItem->boundingRect().width();
     const qreal height = m_textItem->boundingRect().height();
-    QLineF longest, horizontal, baseLine;
+    QLineF longest, horizontal;
     for (int idx = 1; idx < scenePoints.size(); ++idx) {
         const QLineF line { scenePoints.at(idx - 1), scenePoints.at(idx) };
         if (line.length() > longest.length()) {

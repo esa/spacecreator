@@ -21,6 +21,7 @@
 #include "aadlobjectfunction.h"
 #include "aadlobjectifacegroup.h"
 #include "aadlobjectsmodel.h"
+#include "cmdconnectiongroupitemchange.h"
 #include "commandids.h"
 
 namespace aadlinterface {
@@ -32,7 +33,8 @@ CmdConnectionGroupItemCreate::CmdConnectionGroupItemCreate(
     , m_groupName(creationInfo.name)
     , m_model(creationInfo.model)
     , m_parent(qobject_cast<aadl::AADLObjectFunction *>(creationInfo.parentObject))
-    , m_connections(creationInfo.connections)
+    , m_sourceIfaceParent(qobject_cast<aadl::AADLObjectFunction *>(creationInfo.sourceObject))
+    , m_targetIfaceParent(qobject_cast<aadl::AADLObjectFunction *>(creationInfo.targetObject))
 {
     Q_ASSERT(creationInfo.model);
     Q_ASSERT(creationInfo.sourceObject);
@@ -41,17 +43,23 @@ CmdConnectionGroupItemCreate::CmdConnectionGroupItemCreate(
 
     aadl::AADLObjectIface::CreationInfo sourceInfo;
     sourceInfo.model = m_model;
-    sourceInfo.function = qobject_cast<aadl::AADLObjectFunction *>(creationInfo.sourceObject);
+    sourceInfo.function = m_sourceIfaceParent;
     m_sourceIface = new aadl::AADLObjectIfaceGroup(sourceInfo);
 
     aadl::AADLObjectIface::CreationInfo targetInfo;
     targetInfo.model = m_model;
-    targetInfo.function = qobject_cast<aadl::AADLObjectFunction *>(creationInfo.targetObject);
+    targetInfo.function = m_targetIfaceParent;
     m_targetIface = new aadl::AADLObjectIfaceGroup(targetInfo);
 
     m_entity = new aadl::AADLObjectConnectionGroup(
-            creationInfo.name, m_sourceIface, m_targetIface, m_connections, creationInfo.parentObject);
+            creationInfo.name, m_sourceIface, m_targetIface, {}, creationInfo.parentObject);
     prepareData({ qMakePair(m_entity, creationInfo.points) });
+
+    for (auto conn : creationInfo.connections) {
+        if (conn) {
+            m_subCommands.append(new CmdConnectionGroupItemChange(m_entity, conn, true));
+        }
+    }
 }
 
 CmdConnectionGroupItemCreate::~CmdConnectionGroupItemCreate()
@@ -65,17 +73,20 @@ CmdConnectionGroupItemCreate::~CmdConnectionGroupItemCreate()
     if (m_entity && !m_entity->parent()) {
         delete m_entity;
     }
+
+    qDeleteAll(m_subCommands);
+    m_subCommands.clear();
 }
 
 void CmdConnectionGroupItemCreate::redo()
 {
     CmdEntityGeometryChange::redo();
 
-    if (auto fn = m_sourceIface->function()) {
-        fn->addChild(m_sourceIface);
+    if (m_sourceIfaceParent) {
+        m_sourceIfaceParent->addChild(m_sourceIface);
     }
-    if (auto fn = m_targetIface->function()) {
-        fn->addChild(m_targetIface);
+    if (m_targetIfaceParent) {
+        m_targetIfaceParent->addChild(m_targetIface);
     }
     if (m_parent) {
         m_parent->addChild(m_entity);
@@ -84,10 +95,18 @@ void CmdConnectionGroupItemCreate::redo()
     m_model->addObject(m_sourceIface);
     m_model->addObject(m_targetIface);
     m_model->addObject(m_entity);
+
+    for (auto it = m_subCommands.begin(); it != m_subCommands.end(); ++it) {
+        (*it)->redo();
+    }
 }
 
 void CmdConnectionGroupItemCreate::undo()
 {
+    for (auto it = m_subCommands.rbegin(); it != m_subCommands.rend(); ++it) {
+        (*it)->undo();
+    }
+
     CmdEntityGeometryChange::undo();
 
     m_model->removeObject(m_entity);
@@ -97,11 +116,11 @@ void CmdConnectionGroupItemCreate::undo()
     if (m_parent) {
         m_parent->removeChild(m_entity);
     }
-    if (auto fn = m_targetIface->function()) {
-        fn->removeChild(m_targetIface);
+    if (m_targetIfaceParent) {
+        m_targetIfaceParent->removeChild(m_targetIface);
     }
-    if (auto fn = m_sourceIface->function()) {
-        fn->removeChild(m_sourceIface);
+    if (m_sourceIfaceParent) {
+        m_sourceIfaceParent->removeChild(m_sourceIface);
     }
 }
 

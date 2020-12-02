@@ -47,7 +47,7 @@ AADLObjectsModel::AADLObjectsModel(DynamicPropertyConfig *dynPropConfig, QObject
     d->m_dynPropConfig = dynPropConfig;
 }
 
-AADLObjectsModel::~AADLObjectsModel() { }
+AADLObjectsModel::~AADLObjectsModel() {}
 
 void AADLObjectsModel::setSharedTypesModel(AADLObjectsModel *sharedTypesModel)
 {
@@ -146,11 +146,11 @@ bool AADLObjectsModel::removeObject(AADLObject *obj)
     if (!getObject(id))
         return false;
 
+    obj->aboutToBeRemoved();
+
     d->m_objects.remove(id);
     d->m_objectsOrder.removeAll(id);
     d->m_visibleObjects.removeAll(obj);
-
-    obj->preDestroy();
 
     Q_EMIT aadlObjectRemoved(obj);
     return true;
@@ -356,7 +356,8 @@ QList<AADLObject *> AADLObjectsModel::visibleObjects(shared::Id rootId) const
                 continue;
             }
 
-            if (!obj->isConnection() && (shared::isAncestorOf(rootObj, obj) || rootObj == nullptr)) {
+            if (!obj->isConnection() && !obj->isConnectionGroup()
+                    && (shared::isAncestorOf(rootObj, obj) || rootObj == nullptr)) {
                 visibleObjects.append(obj);
             } else if (auto connection = qobject_cast<aadl::AADLObjectConnection *>(obj)) {
                 const bool sourceIfaceAncestor =

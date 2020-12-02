@@ -214,6 +214,26 @@ void AADLConnectionGraphicsItem::layout()
     updateBoundingRect();
 }
 
+bool AADLConnectionGraphicsItem::replaceInterface(
+        AADLInterfaceGraphicsItem *ifaceToBeReplaced, AADLInterfaceGraphicsItem *newIface)
+{
+    if (m_startItem == ifaceToBeReplaced) {
+        Q_ASSERT(m_startItem->parentItem() == newIface->parentItem());
+        m_startItem->removeConnection(this);
+        m_startItem = newIface;
+    } else if (m_endItem == ifaceToBeReplaced) {
+        Q_ASSERT(m_endItem->parentItem() == newIface->parentItem());
+        m_endItem->removeConnection(this);
+        m_endItem = newIface;
+    } else {
+        return false;
+    }
+
+    newIface->addConnection(this);
+    updateLastChunk(newIface);
+    return true;
+}
+
 void AADLConnectionGraphicsItem::onSelectionChanged(bool isSelected)
 {
     const ColorHandler h = colorHandler();
@@ -398,7 +418,7 @@ void AADLConnectionGraphicsItem::onManualMoveFinish(
     }
     m_points[idx] = intersectionPoint;
 
-    auto updateIfaceItem = [this](AADLInterfaceGraphicsItem *ifaceItem) {
+    auto updateIfaceItem = [](AADLInterfaceGraphicsItem *ifaceItem) {
         if (ifaceItem) {
             ifaceItem->instantLayoutUpdate();
             for (auto connectionItem : ifaceItem->connectionItems()) {

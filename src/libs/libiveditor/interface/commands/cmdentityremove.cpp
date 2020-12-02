@@ -95,19 +95,18 @@ void CmdEntityRemove::redo()
         return;
 
     auto removeAadlObjects = [this](const QVector<QPointer<aadl::AADLObject>> &collection) {
-        for (auto it = collection.cbegin(); it != collection.cend(); ++it)
+        for (auto it = collection.cbegin(); it != collection.cend(); ++it) {
+            if ((*it)->aadlType() == aadl::AADLObject::Type::Connection) {
+                if (auto *connection = qobject_cast<aadl::AADLObjectConnection *>(*it)) {
+                    connection->unsetInheritPI();
+                }
+            }
             advancedRemove(*it);
+        }
     };
 
+    removeAadlObjects(m_relatedConnections);
     removeAadlObjects(m_relatedIfaces);
-
-    for (auto it = m_relatedConnections.cbegin(); it != m_relatedConnections.cend(); ++it) {
-        if (auto *connection = qobject_cast<aadl::AADLObjectConnection *>(*it))
-            connection->unsetInheritPI();
-
-        advancedRemove(*it);
-    }
-
     removeAadlObjects(m_relatedEntities);
 
     Q_EMIT entityRemoved(m_entity, this);
@@ -119,19 +118,19 @@ void CmdEntityRemove::undo()
         return;
 
     auto restoreAadlObjects = [this](const QVector<QPointer<aadl::AADLObject>> &collection) {
-        for (auto it = collection.crbegin(); it != collection.crend(); ++it)
+        for (auto it = collection.crbegin(); it != collection.crend(); ++it) {
+            if ((*it)->aadlType() == aadl::AADLObject::Type::Connection) {
+                if (auto *connection = qobject_cast<aadl::AADLObjectConnection *>(*it)) {
+                    connection->setInheritPI();
+                }
+            }
             advancedRestore(*it);
+        }
     };
 
     restoreAadlObjects(m_relatedEntities);
     restoreAadlObjects(m_relatedIfaces);
-
-    for (auto it = m_relatedConnections.crbegin(); it != m_relatedConnections.crend(); ++it) {
-        if (auto *connection = qobject_cast<aadl::AADLObjectConnection *>(*it))
-            connection->setInheritPI();
-
-        advancedRestore(*it);
-    }
+    restoreAadlObjects(m_relatedConnections);
 }
 
 bool CmdEntityRemove::mergeWith(const QUndoCommand *command)

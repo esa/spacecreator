@@ -55,7 +55,7 @@ bool AADLObjectConnectionGroup::postInit()
     return true;
 }
 
-bool AADLObjectConnectionGroup::preDestroy()
+bool AADLObjectConnectionGroup::aboutToBeRemoved()
 {
     if (!m_connections.isEmpty()) {
         m_initConnections.clear();
@@ -118,7 +118,7 @@ AADLObjectIfaceGroup *AADLObjectConnectionGroup::targetInterfaceGroup() const
 void AADLObjectConnectionGroup::addConnection(const QPointer<AADLObjectConnection> &connection)
 {
     if (connection.isNull() || !connection->sourceInterface() || !connection->targetInterface()
-            || !sourceInterfaceGroup() || !targetInterfaceGroup()) {
+            || !sourceInterfaceGroup() || !targetInterfaceGroup() || m_connections.contains(connection)) {
         return;
     }
 

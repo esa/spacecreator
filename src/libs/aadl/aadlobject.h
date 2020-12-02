@@ -109,7 +109,7 @@ public:
     bool isVisible() const;
 
     virtual bool postInit();
-    virtual bool preDestroy();
+    virtual bool aboutToBeRemoved();
 
     template<class T>
     inline T as()

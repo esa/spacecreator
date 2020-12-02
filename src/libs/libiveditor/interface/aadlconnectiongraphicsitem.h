@@ -79,6 +79,8 @@ public:
 
     void layout();
 
+    bool replaceInterface(AADLInterfaceGraphicsItem *ifaceToBeReplaced, AADLInterfaceGraphicsItem *newIface);
+
 protected:
     void onManualMoveStart(shared::ui::GripPoint *gp, const QPointF &at) override;
     void onManualMoveProgress(shared::ui::GripPoint *gp, const QPointF &from, const QPointF &to) override;
@@ -113,8 +115,8 @@ private:
         QPainterPath shape() const override;
     };
 
-    const QPointer<AADLInterfaceGraphicsItem> m_startItem;
-    const QPointer<AADLInterfaceGraphicsItem> m_endItem;
+    QPointer<AADLInterfaceGraphicsItem> m_startItem;
+    QPointer<AADLInterfaceGraphicsItem> m_endItem;
     GraphicsPathItem *m_item = nullptr;
     QVector<QPointF> m_points;
     bool m_firstUpdate { true };

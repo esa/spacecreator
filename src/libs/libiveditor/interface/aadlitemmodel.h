@@ -92,6 +92,9 @@ private:
     void updateItem(QGraphicsItem *item);
     void removeItemForObject(aadl::AADLObject *object);
 
+    template<typename T>
+    T getItem(const shared::Id id) const;
+
 private:
     aadl::AADLObjectsModel *m_model { nullptr };
     InterfaceTabGraphicsScene *m_graphicsScene { nullptr };

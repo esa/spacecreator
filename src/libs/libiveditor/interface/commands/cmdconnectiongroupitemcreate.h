@@ -38,8 +38,10 @@ private:
     QPointer<aadl::AADLObjectConnectionGroup> m_entity;
     QPointer<aadl::AADLObjectFunction> m_parent;
     QPointer<aadl::AADLObjectIfaceGroup> m_sourceIface;
+    QPointer<aadl::AADLObjectFunction> m_sourceIfaceParent;
     QPointer<aadl::AADLObjectIfaceGroup> m_targetIface;
-    QList<QPointer<aadl::AADLObjectConnection>> m_connections;
+    QPointer<aadl::AADLObjectFunction> m_targetIfaceParent;
+    QList<QUndoCommand *> m_subCommands;
 };
 
 } // namespace aadlinterface
