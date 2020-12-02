@@ -313,16 +313,6 @@ void AADLInterfaceGraphicsItem::onManualMoveProgress(shared::ui::GripPoint *, co
     if (!scene())
         return;
 
-    if (!m_connections.isEmpty()) {
-        auto it = std::find_if(m_connections.cbegin(), m_connections.cend(),
-                [](const QPointer<AADLConnectionGraphicsItem> &connectionItem) {
-                    return !connectionItem.isNull() && connectionItem->isVisible();
-                });
-        if (it != m_connections.cend()) {
-            return;
-        }
-    }
-
     const QPointF shift = { to - from };
     if (shift.isNull())
         return;
@@ -340,6 +330,12 @@ void AADLInterfaceGraphicsItem::onManualMoveProgress(shared::ui::GripPoint *, co
     updateGripPoints();
 
     Q_EMIT needUpdateLayout();
+
+    for (auto connectionItem : m_connections) {
+        if (!connectionItem.isNull() && connectionItem->isVisible()) {
+            connectionItem->updateLastChunk(this);
+        }
+    }
 }
 
 void AADLInterfaceGraphicsItem::onManualMoveFinish(shared::ui::GripPoint *, const QPointF &from, const QPointF &to)
