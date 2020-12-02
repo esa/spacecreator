@@ -69,11 +69,15 @@ public:
     QString prepareTooltip() const override;
     void layout();
 
+    qreal maxWidth() const;
+
+public Q_SLOTS:
+    void updateLabel();
+
 protected:
     void rebuildLayout() override;
     void onSelectionChanged(bool isSelected) override;
 
-    void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget) override;
     void onManualMoveProgress(shared::ui::GripPoint *grip, const QPointF &from, const QPointF &to) override;
     void onManualMoveFinish(shared::ui::GripPoint *grip, const QPointF &from, const QPointF &to) override;
 
@@ -87,7 +91,6 @@ protected:
 
 protected Q_SLOTS:
     virtual void applyColorScheme() override;
-    void updateLabel();
     void updateKind();
     void updateIface();
     void onAttrOrPropChanged(aadl::meta::Props::Token t);

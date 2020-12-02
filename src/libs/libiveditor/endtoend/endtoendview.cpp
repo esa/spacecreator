@@ -193,6 +193,7 @@ bool EndToEndView::refreshView()
     };
 
     bool foundConnection = false;
+    QVector<AADLInterfaceGraphicsItem *> interfaceItems;
 
     // Add new graphics items for each object
     QHash<shared::Id, QGraphicsItem *> items;
@@ -206,7 +207,6 @@ bool EndToEndView::refreshView()
                 if (auto ifaceGroup = qobject_cast<aadl::AADLObjectIfaceGroup *>(obj)) {
                     // Add the Interface
                     auto graphicsItem = new AADLInterfaceGroupGraphicsItem(ifaceGroup, parentItem);
-                    graphicsItem->init();
                     item = graphicsItem;
 
                     if (auto function = ifaceGroup->function()) {
@@ -250,7 +250,7 @@ bool EndToEndView::refreshView()
                 if (auto reqIface = qobject_cast<aadl::AADLObjectIfaceRequired *>(obj)) {
                     // Add the RI
                     auto graphicsItem = new AADLInterfaceGraphicsItem(reqIface, parentItem);
-                    graphicsItem->init();
+                    interfaceItems.append(graphicsItem);
                     item = graphicsItem;
 
                     if (auto function = reqIface->function()) {
@@ -276,6 +276,7 @@ bool EndToEndView::refreshView()
                 if (auto provIface = qobject_cast<aadl::AADLObjectIfaceProvided *>(obj)) {
                     // Add the PI
                     auto graphicsItem = new AADLInterfaceGraphicsItem(provIface, parentItem);
+                    interfaceItems.append(graphicsItem);
                     item = graphicsItem;
 
                     if (auto function = provIface->function()) {
@@ -379,6 +380,10 @@ bool EndToEndView::refreshView()
             item->setZValue(ZOrder.InternalConnection);
             d->scene->addItem(item);
         }
+    }
+
+    for (AADLInterfaceGraphicsItem *ifItem : interfaceItems) {
+        ifItem->updateLabel();
     }
 
     // Set the scene rect based on what we show

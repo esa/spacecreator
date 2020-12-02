@@ -156,10 +156,11 @@ ColorManager::ColorManager(QObject *parent)
 {
     const QString defaultSourcePath = prepareDefaultSource();
     QString sourcePath = AppOptions::Aadl.ColorSchemeFile.read().toString();
-    if (!QFile::exists(sourcePath))
+    if (!QFile::exists(sourcePath)) {
         sourcePath = defaultSourcePath;
+    }
 
-    if (!setSourceFile(sourcePath)) { // source file can be corrupted
+    if (!sourcePath.isEmpty() && !setSourceFile(sourcePath)) { // source file can be corrupted
         shared::copyResourceFile(defaultColorsResourceFile(), sourcePath, shared::FileCopyingMode::Overwrite);
         setSourceFile(sourcePath);
     }

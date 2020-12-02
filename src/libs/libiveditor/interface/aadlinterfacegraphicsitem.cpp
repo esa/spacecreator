@@ -18,6 +18,7 @@
 
 #include "aadlinterfacegraphicsitem.h"
 
+#include "aadlcommentgraphicsitem.h"
 #include "aadlconnectiongraphicsitem.h"
 #include "aadlfunctiongraphicsitem.h"
 #include "aadlfunctiontypegraphicsitem.h"
@@ -40,7 +41,8 @@ static const qreal kBase = 12;
 static const qreal kHeight = kBase * 4 / 5;
 static const QColor kSelectedBackgroundColor = QColor(Qt::magenta);
 static const QColor kDefaultBackgroundColor = QColor(Qt::blue);
-static const int kInterfaceTitleMaxLength = 80;
+static const int kInterfaceMinDistance = 20;
+static const int kTextMargin = 2;
 
 namespace aadlinterface {
 
@@ -114,10 +116,18 @@ void AADLInterfaceGraphicsItem::setTargetItem(QGraphicsItem *item, const QPointF
 
 void AADLInterfaceGraphicsItem::setInterfaceName(const QString &name)
 {
-    const QString text = aadl::AADLNameValidator::decodeName(entity()->aadlType(), name);
-    if (text != m_text->toPlainText()) {
+    QString text = aadl::AADLNameValidator::decodeName(entity()->aadlType(), name);
+
+    int maxTextWidth = maxWidth();
+    if (maxTextWidth > 0) {
+        // text is always at 0, interface item might (probably is) negative
+        maxTextWidth = maxTextWidth + (boundingRect().x() - kTextMargin);
         const QFontMetrics fm(m_text->font());
-        m_text->setPlainText(fm.elidedText(text, Qt::ElideRight, kInterfaceTitleMaxLength));
+        text = fm.elidedText(text, Qt::ElideRight, maxTextWidth);
+    }
+
+    if (text != m_text->toPlainText()) {
+        m_text->setPlainText(text);
         instantLayoutUpdate();
     }
 }
@@ -301,11 +311,48 @@ void AADLInterfaceGraphicsItem::layout()
     }
 }
 
-void AADLInterfaceGraphicsItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget)
+/*!
+   Returns the maximal width of this item. The width is limited by other functions and interfaces on the right.
+   If there is no other item on the right, -1 (unlimited) is returned.
+ */
+qreal AADLInterfaceGraphicsItem::maxWidth() const
 {
-    Q_UNUSED(painter)
-    Q_UNUSED(option)
-    Q_UNUSED(widget)
+    qreal width = -1.;
+    if (!scene()) {
+        return width;
+    }
+
+    const qreal itemLeft = sceneBoundingRect().left();
+    QRectF rect = sceneBoundingRect();
+    rect.setWidth(9e12); // extend to the right very far (infinite)
+    for (QGraphicsItem *rootItem : scene()->items(rect)) {
+        if (dynamic_cast<aadlinterface::AADLFunctionTypeGraphicsItem *>(rootItem)
+                || dynamic_cast<aadlinterface::AADLCommentGraphicsItem *>(rootItem)) {
+            QList<QGraphicsItem *> items;
+            for (QGraphicsItem *item : rootItem->childItems()) {
+                if (dynamic_cast<aadlinterface::AADLFunctionTypeGraphicsItem *>(item)
+                        || dynamic_cast<aadlinterface::AADLInterfaceGraphicsItem *>(item)) {
+                    items.append(item);
+                }
+            }
+            items.append(rootItem);
+
+            for (QGraphicsItem *item : items) {
+                if (item->isVisible() && item != this && item != parentItem()) {
+                    const QRectF otherRect = item->sceneBoundingRect();
+                    if (otherRect.left() > itemLeft) {
+                        if (width < 0.) {
+                            width = otherRect.left() - itemLeft;
+                        } else {
+                            width = std::min(otherRect.left() - itemLeft, width);
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    return width;
 }
 
 void AADLInterfaceGraphicsItem::onManualMoveProgress(shared::ui::GripPoint *, const QPointF &from, const QPointF &to)
@@ -336,6 +383,8 @@ void AADLInterfaceGraphicsItem::onManualMoveProgress(shared::ui::GripPoint *, co
             connectionItem->updateLastChunk(this);
         }
     }
+
+    Q_EMIT boundingBoxChanged();
 }
 
 void AADLInterfaceGraphicsItem::onManualMoveFinish(shared::ui::GripPoint *, const QPointF &from, const QPointF &to)
@@ -361,12 +410,18 @@ void AADLInterfaceGraphicsItem::adjustItem()
     QList<QRectF> siblingsRects;
     const QList<QGraphicsItem *> siblingItems = parentItem()->childItems();
     std::for_each(siblingItems.cbegin(), siblingItems.cend(), [this, &siblingsRects](const QGraphicsItem *sibling) {
-        if (sibling->type() == AADLInterfaceGraphicsItem::Type && sibling != this)
-            siblingsRects.append(sibling->mapRectToParent(sibling->boundingRect()));
+        if (sibling->type() == AADLInterfaceGraphicsItem::Type && sibling != this) {
+            QRectF itemRect = sibling->boundingRect();
+            itemRect.setWidth(kInterfaceMinDistance - itemRect.x());
+            itemRect = sibling->mapRectToParent(itemRect);
+            siblingsRects.append(itemRect);
+        }
     });
 
     const QPointF initialOffset = boundingRect().topLeft();
-    const QRectF itemRect = mapRectToParent(boundingRect());
+    QRectF itemRect = boundingRect();
+    itemRect.setWidth(kInterfaceMinDistance - itemRect.x());
+    itemRect = mapRectToParent(itemRect);
     const QRectF parentRect = parentItem()->boundingRect();
 
     QRectF intersectedRect;

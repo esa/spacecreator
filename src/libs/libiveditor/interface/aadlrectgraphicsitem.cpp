@@ -75,9 +75,9 @@ bool AADLRectGraphicsItem::setGeometry(const QRectF &sceneGeometry)
         prepareGeometryChange();
         br.setSize(sceneGeometry.size());
         setBoundingRect(br);
-
-        Q_EMIT boundingBoxChanged();
     }
+
+    Q_EMIT boundingBoxChanged();
 
     updateGripPoints();
     return true;

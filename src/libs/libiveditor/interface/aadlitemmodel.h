@@ -31,6 +31,10 @@ namespace aadl {
 class AADLObject;
 } // namespace aadl
 
+namespace shared {
+class DelayedSignal;
+}
+
 namespace aadlinterface {
 class InterfaceTabGraphicsScene;
 class AADLCommentGraphicsItem;
@@ -86,6 +90,9 @@ private Q_SLOTS:
 
     void onSceneSelectionChanged();
 
+    void scheduleInterfaceTextUpdate();
+    void updateInterfaceTexts();
+
 private:
     QGraphicsItem *createItemForObject(aadl::AADLObject *obj);
     AADLFunctionGraphicsItem *rootItem() const;
@@ -103,6 +110,7 @@ private:
     QQueue<aadl::AADLObject *> m_rmQueu;
     QRectF m_desktopGeometry;
     QRectF m_prevItemsRect;
+    shared::DelayedSignal *m_textUpdate = nullptr;
 };
 
 } // namespace aadlinterface
