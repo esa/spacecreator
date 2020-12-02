@@ -26,6 +26,7 @@
 #include "baseitems/common/aadlutils.h"
 #include "endtoendconnections.h"
 #include "interface/aadlconnectiongraphicsitem.h"
+#include "interface/aadlconnectiongroupgraphicsitem.h"
 #include "interface/aadlflowconnectiongraphicsitem.h"
 #include "interface/aadlfunctiongraphicsitem.h"
 #include "interface/aadlinterfacegraphicsitem.h"
@@ -295,11 +296,31 @@ bool EndToEndView::refreshView()
         case aadl::AADLObject::Type::ConnectionGroup:
         case aadl::AADLObject::Type::Connection:
             if (auto connection = qobject_cast<aadl::AADLObjectConnection *>(obj)) {
+                auto findGroupObject = [&](aadl::AADLObjectIface *iface) {
+                    auto it = std::find_if(objects.cbegin(), objects.cend(), [iface](aadl::AADLObject *obj) {
+                        if (obj->aadlType() == aadl::AADLObject::Type::InterfaceGroup) {
+                            for (auto entity : obj->as<aadl::AADLObjectIfaceGroup *>()->entities()) {
+                                if (entity->id() == iface->id()) {
+                                    return true;
+                                }
+                            }
+                        }
+                        return false;
+                    });
+                    return it != objects.cend() ? (*it)->as<aadl::AADLObjectIfaceGroup *>() : nullptr;
+                };
+
                 aadl::AADLObjectIface *ifaceStart = connection->sourceInterface();
+                if (ifaceStart->isGrouped() && ifaceStart->aadlType() != aadl::AADLObject::Type::InterfaceGroup) {
+                    ifaceStart = findGroupObject(ifaceStart);
+                }
                 auto startItem = qgraphicsitem_cast<AADLInterfaceGraphicsItem *>(
                         ifaceStart ? items.value(ifaceStart->id()) : nullptr);
 
                 aadl::AADLObjectIface *ifaceEnd = connection->targetInterface();
+                if (ifaceEnd->isGrouped() && ifaceEnd->aadlType() != aadl::AADLObject::Type::InterfaceGroup) {
+                    ifaceEnd = findGroupObject(ifaceEnd);
+                }
                 auto endItem = qgraphicsitem_cast<AADLInterfaceGraphicsItem *>(
                         ifaceEnd ? items.value(ifaceEnd->id()) : nullptr);
 
@@ -313,6 +334,10 @@ bool EndToEndView::refreshView()
                                 })) {
                         item = new AADLFlowConnectionGraphicsItem(connection, startItem, endItem, parentItem);
                         foundConnection = true;
+                    } else {
+                        item = new AADLConnectionGroupGraphicsItem(connection->as<aadl::AADLObjectConnectionGroup *>(),
+                                qgraphicsitem_cast<AADLInterfaceGroupGraphicsItem *>(startItem),
+                                qgraphicsitem_cast<AADLInterfaceGroupGraphicsItem *>(endItem), parentItem);
                     }
                 } else if (!obj->isGrouped()) {
                     if (EndToEndConnections::isInDataflow(dataflow, chains, connection)) {
