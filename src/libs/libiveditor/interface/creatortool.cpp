@@ -41,6 +41,7 @@
 #include "graphicsitemhelpers.h"
 #include "graphicsviewutils.h"
 #include "interface/createconnectiongroupdialog.h"
+#include "interfacedocument.h"
 #include "ui/grippointshandler.h"
 
 #include <QAction>
@@ -65,10 +66,11 @@ static const qreal kPreviewItemPenWidth = 2.;
 namespace aadlinterface {
 
 struct CreatorTool::CreatorToolPrivate {
-    CreatorToolPrivate(CreatorTool *tool, QGraphicsView *v, AADLItemModel *m)
+    CreatorToolPrivate(CreatorTool *tool, InterfaceDocument *doc)
         : thisTool(tool)
-        , view(v)
-        , model(m)
+        , doc(doc)
+        , view(doc->graphicsView())
+        , model(doc->itemsModel())
     {
     }
 
@@ -97,6 +99,7 @@ struct CreatorTool::CreatorToolPrivate {
     QPointF cursorInScene() const;
     QPointF cursorInScene(const QPoint &screenPos) const;
 
+    QPointer<InterfaceDocument> doc;
     QPointer<QGraphicsView> view;
     QPointer<AADLItemModel> model;
     QGraphicsRectItem *previewItem = nullptr;
@@ -108,12 +111,13 @@ struct CreatorTool::CreatorToolPrivate {
     QSet<InteractiveObject *> collidedItems;
 };
 
-CreatorTool::CreatorTool(QGraphicsView *view, AADLItemModel *model, QObject *parent)
-    : QObject(parent)
-    , d(new CreatorToolPrivate(this, view, model))
+CreatorTool::CreatorTool(InterfaceDocument *doc)
+    : QObject(doc)
+    , d(new CreatorToolPrivate(this, doc))
 {
-    Q_ASSERT(view != nullptr);
-    Q_ASSERT(model != nullptr);
+    Q_ASSERT(doc != nullptr);
+    Q_ASSERT(d->view != nullptr);
+    Q_ASSERT(d->model != nullptr);
 
     if (d->view && d->view->viewport()) {
         d->view->installEventFilter(this);
@@ -681,7 +685,7 @@ void CreatorTool::CreatorToolPrivate::populateContextMenu_user(QMenu *menu, cons
         }
     }
 
-    ActionsManager::populateMenu(menu, aadlObj);
+    ActionsManager::populateMenu(menu, aadlObj, doc->path());
 }
 
 void CreatorTool::CreatorToolPrivate::handleToolType(CreatorTool::ToolType type, const QPointF &pos)

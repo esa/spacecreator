@@ -43,6 +43,7 @@ class AADLObjectsModel;
 
 namespace aadlinterface {
 
+class AADLItemModel;
 class AADLCommentGraphicsItem;
 class AADLConnectionGraphicsItem;
 class AADLFunctionGraphicsItem;
@@ -95,6 +96,7 @@ public:
     const QHash<shared::Id, aadl::AADLObject *> &objects() const;
     aadl::AADLObjectsModel *objectsModel() const;
     aadl::AADLObjectsModel *importModel() const;
+    AADLItemModel *itemsModel() const;
 
     Asn1Acn::Asn1ModelStorage *asn1DataTypes() const;
 

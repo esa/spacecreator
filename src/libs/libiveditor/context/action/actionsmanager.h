@@ -34,7 +34,7 @@ namespace aadlinterface {
 class ActionsManager
 {
 public:
-    static void populateMenu(QMenu *menu, aadl::AADLObject *currObj);
+    static void populateMenu(QMenu *menu, aadl::AADLObject *currObj, const QString &projectDir);
     static bool registerScriptableAction(QAction *action, const QString &key, const QString &description);
     static QString listRegisteredActions();
     static ActionsManager *instance();
@@ -65,12 +65,12 @@ private:
     void loadActions(const QString &fromFile);
 
     static void triggerActionInternal(const Action &act);
-    static void triggerActionExternal(const Action &act, const aadl::AADLObject *aadlObj);
+    static void triggerActionExternal(const Action &act, const aadl::AADLObject *aadlObj, const QString &projectDir);
     static bool triggerActionHidden(const Action &act);
 
     static QMap<QString, ActionsManager::ScriptableActionHandler> scriptableActions();
 
-    static QString replaceKeyHolder(const QString &text, const aadl::AADLObject *aadlObj);
+    static QString replaceKeyHolder(const QString &text, const aadl::AADLObject *aadlObj, const QString &projectDir);
 
     QVector<Action> m_actions;
     QMap<QString, ScriptableActionHandler> m_qactions;

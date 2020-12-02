@@ -522,6 +522,11 @@ aadl::AADLObjectsModel *InterfaceDocument::importModel() const
     return d->importModel;
 }
 
+AADLItemModel *InterfaceDocument::itemsModel() const
+{
+    return d->itemsModel;
+}
+
 Asn1Acn::Asn1ModelStorage *InterfaceDocument::asn1DataTypes() const
 {
     return d->asnDataTypes;
@@ -815,7 +820,7 @@ QVector<QAction *> InterfaceDocument::initActions()
     actionGroup->setExclusive(true);
 
     if (!d->tool) {
-        d->tool = new CreatorTool(d->graphicsView, d->itemsModel, this);
+        d->tool = new CreatorTool(this);
         connect(d->tool, &CreatorTool::created, this, [this, actionGroup]() {
             if (QAction *currentAction = actionGroup->checkedAction())
                 currentAction->setChecked(false);

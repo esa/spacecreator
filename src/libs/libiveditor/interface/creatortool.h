@@ -29,7 +29,7 @@ class AADLObject;
 
 namespace aadlinterface {
 class AADLItemModel;
-
+class InterfaceDocument;
 class InteractiveObject;
 
 class CreatorTool : public QObject
@@ -37,7 +37,7 @@ class CreatorTool : public QObject
     Q_OBJECT
 
 public:
-    CreatorTool(QGraphicsView *view, AADLItemModel *model, QObject *parent = nullptr);
+    CreatorTool(InterfaceDocument *doc);
     ~CreatorTool() override;
 
     enum class ToolType

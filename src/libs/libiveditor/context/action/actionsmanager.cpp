@@ -46,7 +46,8 @@ struct ExternalArgHolder {
         CWD,
         Attr,
         Prop,
-        Param
+        Param,
+        ProjectPath,
     };
 
     QString key;
@@ -56,9 +57,11 @@ struct ExternalArgHolder {
 
 static QVector<ExternalArgHolder> externalArgs(bool namedKey)
 {
-    const QString name = namedKey ? "name" : "";
+    const QString name = namedKey ? QLatin1String("name") : QString();
     QVector<ExternalArgHolder> args;
     args.append({ "$TASTE3", QObject::tr("Path to the Taste binary"), ExternalArgHolder::Type::CWD });
+    args.append(
+            { "$PRJ_FOLDER", QObject::tr("Path to the Taste current project"), ExternalArgHolder::Type::ProjectPath });
     args.append({ "$attr_" + name, QObject::tr("Value of the selected object's attribute [name]"),
             ExternalArgHolder::Type::Attr });
     args.append({ "$prop_" + name, QObject::tr("Value of the selected object's property [name]"),
@@ -93,7 +96,7 @@ QString ActionsManager::storagePath()
  * Adds the appropriate actions into \a menu, managing its enablement based on action conditions and the \a currObj.
  * Initiates connection from QAction to the related handler slot.
  */
-void ActionsManager::populateMenu(QMenu *menu, aadl::AADLObject *currObj)
+void ActionsManager::populateMenu(QMenu *menu, aadl::AADLObject *currObj, const QString &projectDir)
 {
     if (!menu)
         return;
@@ -106,14 +109,15 @@ void ActionsManager::populateMenu(QMenu *menu, aadl::AADLObject *currObj)
         const bool enabled(actHandler.isAcceptable(currObj));
         act->setEnabled(enabled);
         if (enabled) {
-            QObject::connect(act, &QAction::triggered, [actHandler, act]() {
+            QObject::connect(act, &QAction::triggered, [actHandler, act, projectDir]() {
                 if (triggerActionHidden(actHandler)) {
                     return;
                 }
                 if (!actHandler.m_internalActName.isEmpty())
                     triggerActionInternal(actHandler);
                 else if (!actHandler.m_externalApp.isEmpty()) {
-                    triggerActionExternal(actHandler, act ? act->data().value<aadl::AADLObject *>() : nullptr);
+                    triggerActionExternal(
+                            actHandler, act ? act->data().value<aadl::AADLObject *>() : nullptr, projectDir);
                 } else {
                     QMessageBox::warning(nullptr, QObject::tr("Custom action"),
                             QObject::tr("No internal or external action provided by %1").arg(actHandler.m_title));
@@ -285,7 +289,8 @@ void ActionsManager::triggerActionInternal(const Action &act)
     }
 }
 
-QString ActionsManager::replaceKeyHolder(const QString &text, const aadl::AADLObject *aadlObj)
+QString ActionsManager::replaceKeyHolder(
+        const QString &text, const aadl::AADLObject *aadlObj, const QString &projectDir)
 {
     if (text.isEmpty() || !aadlObj) {
         return {};
@@ -298,6 +303,10 @@ QString ActionsManager::replaceKeyHolder(const QString &text, const aadl::AADLOb
     for (const ExternalArgHolder &holder : externalArgs(false)) {
         const QString name = text.mid(holder.key.size());
         switch (holder.target) {
+        case ExternalArgHolder::ProjectPath:
+            if (text == holder.key)
+                return QFileInfo(projectDir).absolutePath();
+            break;
         case ExternalArgHolder::CWD:
             if (text == holder.key)
                 return qApp->applicationDirPath();
@@ -349,14 +358,15 @@ QString ActionsManager::replaceKeyHolder(const QString &text, const aadl::AADLOb
  * Replaces the keyholders by actual values of \a aadlObj's attributes or parameters.
  * Creates and shows an instance of ExtProcMonitor.
  */
-void ActionsManager::triggerActionExternal(const Action &act, const aadl::AADLObject *aadlObj)
+void ActionsManager::triggerActionExternal(
+        const Action &act, const aadl::AADLObject *aadlObj, const QString &projectDir)
 {
     if (!act.m_externalApp.isEmpty()) {
         QStringList params = act.m_externalAppParams;
         params.prepend(act.m_externalAppCwd);
 
         for (QString &param : params)
-            param = replaceKeyHolder(param, aadlObj);
+            param = replaceKeyHolder(param, aadlObj, projectDir);
 
         const QString cwd = params.takeFirst();
 
