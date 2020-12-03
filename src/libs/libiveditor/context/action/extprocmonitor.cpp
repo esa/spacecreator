@@ -21,7 +21,7 @@
 #include <QCloseEvent>
 #include <QDateTime>
 #include <QDebug>
-#include <QFileInfo>
+#include <QDir>
 #include <QLayout>
 #include <QMessageBox>
 #include <QTextBrowser>
@@ -58,10 +58,12 @@ bool ExtProcMonitor::start(const QString &app, const QStringList &args, const QS
     if (app.isEmpty())
         return false;
 
-    m_process->setWorkingDirectory(workingDir);
+    if (!workingDir.isEmpty()) {
+        m_process->setWorkingDirectory(workingDir);
+    }
 
-    m_display->append(
-            QString("<b>Starting</b> %1 %2\nin %3").arg(app, args.join(" "), QFileInfo(workingDir).absolutePath()));
+    m_display->append(QString("<b>Starting</b> %1 %2\nin %3")
+                              .arg(app, args.join(" "), QDir(m_process->workingDirectory()).absolutePath()));
     setWindowTitle(app);
     show();
 

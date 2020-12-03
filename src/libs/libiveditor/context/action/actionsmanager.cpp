@@ -292,11 +292,7 @@ void ActionsManager::triggerActionInternal(const Action &act)
 QString ActionsManager::replaceKeyHolder(
         const QString &text, const aadl::AADLObject *aadlObj, const QString &projectDir)
 {
-    if (text.isEmpty() || !aadlObj) {
-        return {};
-    }
-
-    if (text[0] != '$') {
+    if (text.isEmpty() || text[0] != '$') {
         return text;
     }
 
@@ -312,17 +308,17 @@ QString ActionsManager::replaceKeyHolder(
                 return qApp->applicationDirPath();
             break;
         case ExternalArgHolder::Attr:
-            if (text.startsWith(holder.key)) {
+            if (text.startsWith(holder.key) && aadlObj) {
                 return aadlObj->attr(name).toString();
             }
             break;
         case ExternalArgHolder::Prop:
-            if (text.startsWith(holder.key)) {
+            if (text.startsWith(holder.key) && aadlObj) {
                 return aadlObj->prop(name).toString();
             }
             break;
         case ExternalArgHolder::Param:
-            if (text.startsWith(holder.key)) {
+            if (text.startsWith(holder.key) && aadlObj) {
                 switch (aadlObj->aadlType()) {
                 case aadl::AADLObject::Type::RequiredInterface:
                 case aadl::AADLObject::Type::ProvidedInterface:
@@ -362,13 +358,13 @@ void ActionsManager::triggerActionExternal(
         const Action &act, const aadl::AADLObject *aadlObj, const QString &projectDir)
 {
     if (!act.m_externalApp.isEmpty()) {
-        QStringList params = act.m_externalAppParams;
-        params.prepend(act.m_externalAppCwd);
-
-        for (QString &param : params)
-            param = replaceKeyHolder(param, aadlObj, projectDir);
-
-        const QString cwd = params.takeFirst();
+        QStringList params;
+        for (const QString &param : act.m_externalAppParams) {
+            if (!param.isEmpty()) {
+                params.append(replaceKeyHolder(param, aadlObj, projectDir));
+            }
+        }
+        const QString cwd = replaceKeyHolder(act.m_externalAppCwd, aadlObj, projectDir);
 
         QWidget *mainWindow(nullptr);
         for (auto w : qApp->topLevelWidgets())
