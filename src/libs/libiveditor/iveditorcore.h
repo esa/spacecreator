@@ -25,6 +25,7 @@
 
 namespace aadl {
 class AADLObjectConnection;
+class AADLObjectFunction;
 }
 
 namespace aadlinterface {
@@ -61,7 +62,7 @@ public:
     QAction *actionSaveSceneRender() { return m_actionSaveSceneRender; }
     QAction *actionShowAsnDialog() { return m_actionShowAsnDialog; }
 
-    bool addFunction(const QString &name);
+    aadl::AADLObjectFunction *addFunction(const QString &name, aadl::AADLObjectFunction *parent = nullptr);
     bool addConnection(QString name, const QString &fromInstanceName, const QString &toInstanceName);
 
     bool renameAadlFunction(const QString &oldName, const QString &newName);

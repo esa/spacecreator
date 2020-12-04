@@ -71,5 +71,10 @@ int CmdFunctionItemCreate::id() const
     return CreateFunctionEntity;
 }
 
+aadl::AADLObjectFunction *CmdFunctionItemCreate::createdFunction() const
+{
+    return m_entity;
+}
+
 }
 }

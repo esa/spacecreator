@@ -29,8 +29,14 @@ class tst_AADLInterfaceGraphicsItem : public QObject
     Q_OBJECT
 
 private Q_SLOTS:
+    void initTestCase();
     void testMaxWidth();
 };
+
+void tst_AADLInterfaceGraphicsItem::initTestCase()
+{
+    QStandardPaths::setTestModeEnabled(true);
+}
 
 void tst_AADLInterfaceGraphicsItem::testMaxWidth()
 {

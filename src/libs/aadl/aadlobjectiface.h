@@ -21,6 +21,7 @@
 #include "aadlparameter.h"
 
 #include <QHash>
+#include <QList>
 #include <QMap>
 #include <QMetaType>
 #include <QObject>
@@ -112,6 +113,8 @@ public:
     void addParam(const IfaceParameter &param);
 
     AADLObjectFunctionType *function() const;
+
+    QList<AADLObjectFunction *> functionsStack() const;
 
     AADLObjectIface *cloneOf() const;
     bool isClone() const;

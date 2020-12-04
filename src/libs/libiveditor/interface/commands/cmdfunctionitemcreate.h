@@ -42,6 +42,8 @@ public:
     void undo() override;
     int id() const override;
 
+    aadl::AADLObjectFunction *createdFunction() const;
+
 private:
     QPointer<aadl::AADLObjectsModel> m_model;
     QPointer<aadl::AADLObjectFunctionType> m_parent;

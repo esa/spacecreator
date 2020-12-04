@@ -24,11 +24,14 @@
 #include "baseitems/common/aadlutils.h"
 #include "commandlineparser.h"
 #include "commandsstack.h"
+#include "connectioncreationvalidator.h"
 #include "context/action/actionsmanager.h"
+#include "interface/commands/cmdconnectionitemcreate.h"
 #include "interface/commands/cmdentityattributechange.h"
 #include "interface/commands/cmdfunctionitemcreate.h"
 #include "interface/commands/cmdifaceattrchange.h"
 #include "interface/commands/commandsfactory.h"
+#include "interface/creatortool.h"
 #include "interface/interfacedocument.h"
 #include "mainwindow.h"
 #include "xmldocexporter.h"
@@ -153,17 +156,19 @@ void IVEditorCore::populateCommandLineArguments(shared::CommandLineParser *parse
 
 /*!
    Adds an aadl function with the given \p name
-   @todo handle positioning of the function
+   @return Returns the newly created function. Or nullptr if the creation failed.
  */
-bool IVEditorCore::addFunction(const QString &name)
+aadl::AADLObjectFunction *IVEditorCore::addFunction(const QString &name, aadl::AADLObjectFunction *parent)
 {
-    aadl::AADLObjectFunction *parent = nullptr;
-    const QVariantList params = { QVariant::fromValue(m_document->objectsModel()), QVariant::fromValue(parent),
-        QVariant::fromValue(QRectF(QPointF(10., 10.), DefaultGraphicsItemSize)), QVariant::fromValue(name) };
-    cmd::CommandsStack::push(cmd::CommandsFactory::create(cmd::CreateFunctionEntity, params));
+    auto cmd = new cmd::CmdFunctionItemCreate(
+            m_document->objectsModel(), parent, QRectF(QPointF(10., 10.), DefaultGraphicsItemSize), name);
+    bool ok = cmd::CommandsStack::push(cmd);
+    if (ok) {
+        Q_EMIT editedExternally(this);
+        return cmd->createdFunction();
+    }
 
-    Q_EMIT editedExternally(this);
-    return true;
+    return nullptr;
 }
 
 /*!
@@ -171,6 +176,10 @@ bool IVEditorCore::addFunction(const QString &name)
  */
 bool IVEditorCore::addConnection(QString name, const QString &fromInstanceName, const QString &toInstanceName)
 {
+    if (fromInstanceName == toInstanceName) {
+        return false;
+    }
+
     aadl::AADLObjectsModel *aadlModel = m_document->objectsModel();
     if (aadlModel->getConnection(name, fromInstanceName, toInstanceName, m_caseCheck) != nullptr) {
         // The connection exists already
@@ -180,21 +189,66 @@ bool IVEditorCore::addConnection(QString name, const QString &fromInstanceName, 
     aadl::AADLObjectFunction *fromFunc = aadlModel->getFunction(fromInstanceName, m_caseCheck);
     aadl::AADLObjectFunction *toFunc = aadlModel->getFunction(toInstanceName, m_caseCheck);
 
-    if (!fromFunc && !toFunc) {
+    if (!fromFunc || !toFunc) {
         qDebug() << Q_FUNC_INFO << "No function for the connection" << name;
+        return false;
     }
 
     aadl::AADLObjectIface *fromInterface = getInterface(name, aadl::AADLObjectIface::IfaceType::Required, fromFunc);
     aadl::AADLObjectIface *toInterface = getInterface(name, aadl::AADLObjectIface::IfaceType::Provided, toFunc);
 
     if (fromInterface && toInterface) {
-        QVector<QPointF> points;
-        points.append(aadlinterface::pos(fromInterface->coordinates()));
-        points.append(aadlinterface::pos(toInterface->coordinates()));
-        const QVariantList params = { QVariant::fromValue(aadlModel), QVariant::fromValue(fromFunc),
-            fromInterface->id(), toInterface->id(), QVariant::fromValue(points) };
-        QUndoCommand *command = cmd::CommandsFactory::create(cmd::CreateConnectionEntity, params);
-        cmd::CommandsStack::push(command);
+        cmd::CommandsStack::Macro cmdMacro(tr("Create connection"));
+
+        auto createConnection = [aadlModel](aadl::AADLObjectFunction *parent, aadl::AADLObjectIface *inIf,
+                                        aadl::AADLObjectIface *outIf) {
+            QVector<QPointF> points;
+            points.append(aadlinterface::pos(inIf->coordinates()));
+            points.append(aadlinterface::pos(outIf->coordinates()));
+            auto command = new cmd::CmdConnectionItemCreate(aadlModel, parent, inIf->id(), outIf->id(), points);
+            cmd::CommandsStack::push(command);
+        };
+
+        // find all (nested/parent) functions for "source" and "target" connections
+        QList<aadl::AADLObjectFunction *> fromFunctions = fromInterface->functionsStack();
+        QList<aadl::AADLObjectFunction *> toFunctions = toInterface->functionsStack();
+        aadl::AADLObjectFunction *firstCommonFunction = nullptr;
+        while (!fromFunctions.isEmpty() && !toFunctions.isEmpty() && fromFunctions.last() == toFunctions.last()) {
+            firstCommonFunction = fromFunctions.last();
+            fromFunctions.takeLast();
+            toFunctions.takeLast();
+        }
+
+        // Create all connections on the "source" side
+        while (fromFunctions.size() > 1) {
+            aadl::AADLObjectFunction *parentFunc = fromFunctions[1];
+            aadl::AADLObjectIface *sourceIf = fromInterface;
+            aadl::AADLObjectIface *targetIf =
+                    getInterface(name, aadl::AADLObjectIface::IfaceType::Required, parentFunc);
+
+            createConnection(parentFunc, sourceIf, targetIf);
+
+            fromFunctions.takeFirst();
+            fromInterface = targetIf;
+        }
+
+        // Create all connections on the "target" side
+        while (toFunctions.size() > 1) {
+            aadl::AADLObjectFunction *parentFunc = toFunctions[1];
+            aadl::AADLObjectIface *sourceIf = toInterface;
+            aadl::AADLObjectIface *targetIf =
+                    getInterface(name, aadl::AADLObjectIface::IfaceType::Provided, parentFunc);
+
+            createConnection(parentFunc, sourceIf, targetIf);
+
+            toFunctions.takeFirst();
+            toInterface = targetIf;
+        }
+
+        // Create the connection that connects "source" to "target"
+        createConnection(firstCommonFunction, fromInterface, toInterface);
+
+        cmdMacro.setComplete(true);
     }
 
     Q_EMIT editedExternally(this);
