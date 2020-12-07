@@ -34,6 +34,7 @@ class ExportableAADLIface : public ExportableAADLObject
     Q_PROPERTY(bool isProvided READ isProvided)
     Q_PROPERTY(bool isRequired READ isRequired)
     Q_PROPERTY(QVariantList params READ paramList)
+    Q_PROPERTY(QVariantList connectedInterfaces READ connectedInterfaces)
 
 public:
     explicit ExportableAADLIface(const aadl::AADLObjectIface *iface = nullptr);
@@ -41,6 +42,7 @@ public:
     bool isProvided() const;
     bool isRequired() const;
     QVariantList paramList() const;
+    QVariantList connectedInterfaces() const;
 };
 
 }

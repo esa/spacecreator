@@ -36,6 +36,7 @@ class ExportableAADLFunction : public ExportableAADLObject
     Q_PROPERTY(QVariantList comments READ comments)
     Q_PROPERTY(QVariantList connections READ connections)
     Q_PROPERTY(QVariantList connectionGroups READ connectionGroups)
+    Q_PROPERTY(QVariantList connectedFunctions READ connectedFunctions)
 
 public:
     explicit ExportableAADLFunction(const aadl::AADLObjectFunctionType *function = nullptr);
@@ -45,6 +46,7 @@ public:
     QVariantList comments() const;
     QVariantList connections() const;
     QVariantList connectionGroups() const;
+    QVariantList connectedFunctions() const;
 };
 
 }

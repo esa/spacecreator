@@ -65,7 +65,7 @@ AADLObject::AADLObject(const AADLObject::Type t, const QString &title, QObject *
     setAttr(meta::Props::token(meta::Props::Token::name), title);
 }
 
-AADLObject::~AADLObject() {}
+AADLObject::~AADLObject() { }
 
 QString AADLObject::title() const
 {
@@ -186,6 +186,28 @@ void AADLObject::setCoordinates(const QVector<qint32> &coordinates)
 
     setProp(meta::Props::token(token), coordinatesToString(coordinates));
     Q_EMIT coordinatesChanged(coordinates);
+}
+
+QStringList AADLObject::path() const
+{
+    return AADLObject::path(this);
+}
+
+QStringList AADLObject::path(const AADLObject *obj)
+{
+    if (!obj) {
+        return {};
+    }
+    QStringList list { obj->title() };
+    AADLObject *parent = obj->parentObject();
+    while (parent) {
+        if (parent->aadlType() == aadl::AADLObject::Type::Function
+                || parent->aadlType() == aadl::AADLObject::Type::FunctionType) {
+            list.prepend(parent->title());
+        }
+        parent = parent->parentObject();
+    };
+    return list;
 }
 
 AADLObject *AADLObject::parentObject() const

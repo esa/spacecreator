@@ -68,6 +68,7 @@ public:
             Qt::CaseSensitivity caseSensitivity) const;
 
     QSet<QString> nestedFunctionNames(const AADLObjectFunctionType *fnt = nullptr) const;
+    QSet<QStringList> nestedFunctionPaths(const AADLObjectFunctionType *fnt = nullptr) const;
 
     AADLObjectConnection *getConnectionForIface(const shared::Id &id) const;
     QVector<AADLObjectConnection *> getConnectionsForIface(const shared::Id &id) const;

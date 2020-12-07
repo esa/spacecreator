@@ -2,6 +2,7 @@
 Template for generation of XML scheme of connection group.
 The following tags are available in this sub-template:
 conngroups              : Instance of connection (provided by a top level template)
+conngroups.name         :   |_ Connection group name
 conngroups.attributes   :   |_ List of all attributes of connection group
 attr                    :       |_ Instance of attriubute
 attr.name               :           |_ Name of attribute

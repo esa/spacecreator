@@ -47,7 +47,7 @@ AADLObjectsModel::AADLObjectsModel(DynamicPropertyConfig *dynPropConfig, QObject
     d->m_dynPropConfig = dynPropConfig;
 }
 
-AADLObjectsModel::~AADLObjectsModel() {}
+AADLObjectsModel::~AADLObjectsModel() { }
 
 void AADLObjectsModel::setSharedTypesModel(AADLObjectsModel *sharedTypesModel)
 {
@@ -440,6 +440,25 @@ QSet<QString> AADLObjectsModel::nestedFunctionNames(const AADLObjectFunctionType
     }
 
     return names;
+}
+
+QSet<QStringList> AADLObjectsModel::nestedFunctionPaths(const AADLObjectFunctionType *fnt) const
+{
+    QSet<QStringList> paths;
+    if (!fnt) {
+        for (AADLObject *obj : d->m_objects) {
+            if (obj->aadlType() == AADLObject::Type::Function || obj->aadlType() == AADLObject::Type::FunctionType) {
+                paths.insert(obj->path());
+            }
+        }
+    } else {
+        paths.insert(fnt->path());
+        for (const auto obj : nestedFunctions(fnt)) {
+            paths.insert(obj->path());
+        }
+    }
+
+    return paths;
 }
 
 }

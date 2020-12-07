@@ -64,6 +64,9 @@ public:
     QVector<qint32> coordinates() const;
     void setCoordinates(const QVector<qint32> &coordinates);
 
+    QStringList path() const;
+    static QStringList path(const AADLObject *obj);
+
     AADLObject *parentObject() const;
     bool isFunction() const;
     bool isFunctionType() const;

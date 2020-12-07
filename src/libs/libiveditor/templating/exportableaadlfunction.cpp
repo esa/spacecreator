@@ -17,12 +17,14 @@
 
 #include "exportableaadlfunction.h"
 
+#include "aadlinterfacechain.h"
 #include "aadlobjectcomment.h"
 #include "aadlobjectconnection.h"
 #include "aadlobjectconnectiongroup.h"
 #include "aadlobjectfunction.h"
 #include "aadlobjectfunctiontype.h"
 #include "aadlobjectiface.h"
+#include "aadlobjectsmodel.h"
 
 namespace aadlinterface {
 
@@ -72,6 +74,16 @@ QVariantList ExportableAADLFunction::connectionGroups() const
     for (const auto connectionGroup : exportedObject<aadl::AADLObjectFunctionType>()->connectionGroups())
         connectionGroups << createFrom(connectionGroup);
     return connectionGroups;
+}
+
+QVariantList ExportableAADLFunction::connectedFunctions() const
+{
+    const auto aadlFunction = exportedObject<aadl::AADLObjectFunction>();
+    QVariantList list;
+    for (auto chain : aadl::AADLInterfaceChain::linkedFunctions(aadlFunction)) {
+        list << qVariantFromValue(chain);
+    }
+    return list;
 }
 
 }

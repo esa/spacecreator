@@ -7,6 +7,8 @@ target_sources(${LIB_NAME} PRIVATE
     aadlcommonprops.h
     aadlconnectionchain.cpp
     aadlconnectionchain.h
+    aadlinterfacechain.cpp
+    aadlinterfacechain.h
     aadlnamevalidator.cpp
     aadlnamevalidator.h
     aadlobject.cpp
@@ -15,12 +17,16 @@ target_sources(${LIB_NAME} PRIVATE
     aadlobjectcomment.h
     aadlobjectconnection.cpp
     aadlobjectconnection.h
+    aadlobjectconnectiongroup.cpp
+    aadlobjectconnectiongroup.h
     aadlobjectfunction.cpp
     aadlobjectfunction.h
     aadlobjectfunctiontype.cpp
     aadlobjectfunctiontype.h
     aadlobjectiface.cpp
     aadlobjectiface.h
+    aadlobjectifacegroup.cpp
+    aadlobjectifacegroup.h
     aadlobjectsmodel.cpp
     aadlobjectsmodel.h
     aadlparameter.cpp
@@ -31,10 +37,6 @@ target_sources(${LIB_NAME} PRIVATE
     aadlxmlreader.h
     connectioncreationvalidator.cpp
     connectioncreationvalidator.h
-    aadlobjectconnectiongroup.cpp
-    aadlobjectconnectiongroup.h
-    aadlobjectifacegroup.cpp
-    aadlobjectifacegroup.h
     dynamicproperty.cpp
     dynamicproperty.h
     dynamicpropertyconfig.cpp

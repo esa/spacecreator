@@ -58,6 +58,11 @@ QString ExportableAADLObject::groupName() const
     return QString();
 }
 
+QString ExportableAADLObject::name() const
+{
+    return exportedObject<aadl::AADLObject>()->title();
+}
+
 /**
  * @brief ExportableAADLObject::createFrom creates appropriate exported class and casts to QVariant
  * @param aadlObject exported object
@@ -105,6 +110,11 @@ QVariantList ExportableAADLObject::attributes() const
 QVariantList ExportableAADLObject::properties() const
 {
     return generateProperties(exportedObject<aadl::AADLObject>()->props());
+}
+
+QStringList ExportableAADLObject::path() const
+{
+    return exportedObject<aadl::AADLObject>()->path();
 }
 
 /**

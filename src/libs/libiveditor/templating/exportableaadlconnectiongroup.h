@@ -28,11 +28,11 @@ namespace aadlinterface {
 class ExportableAADLConnectionGroup : public ExportableAADLObject
 {
     Q_GADGET
-    //    Q_PROPERTY(QString name READ connectionGroupName)
-    //    Q_PROPERTY(QString source READ sourceName)
-    //    Q_PROPERTY(QString target READ targetName)
-    //    Q_PROPERTY(QVariantMap sifaces READ sourceInterfaces)
-    //    Q_PROPERTY(QVariantMap tifaces READ targetInterfaces)
+    Q_PROPERTY(QString name READ connectionGroupName)
+    Q_PROPERTY(QString source READ sourceName)
+    Q_PROPERTY(QString target READ targetName)
+    Q_PROPERTY(QVariantMap sifaces READ sourceInterfaces)
+    Q_PROPERTY(QVariantMap tifaces READ targetInterfaces)
 
 public:
     ExportableAADLConnectionGroup(const aadl::AADLObjectConnectionGroup *connection = nullptr);

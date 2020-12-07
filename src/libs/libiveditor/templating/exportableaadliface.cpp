@@ -17,6 +17,7 @@
 
 #include "exportableaadliface.h"
 
+#include "aadlinterfacechain.h"
 #include "aadlobjectiface.h"
 
 namespace aadlinterface {
@@ -42,6 +43,17 @@ QVariantList ExportableAADLIface::paramList() const
     for (const auto &param : exportedObject<aadl::AADLObjectIface>()->params())
         list << QVariant::fromValue(param);
     return list;
+}
+
+QVariantList ExportableAADLIface::connectedInterfaces() const
+{
+    QVariantList connectedInterfaces;
+    auto iface = exportedObject<aadl::AADLObjectIface>();
+    const auto chains = aadl::AADLInterfaceChain::build(iface);
+    for (auto chain : chains) {
+        connectedInterfaces << chain.targetEndPointPath();
+    }
+    return connectedInterfaces;
 }
 
 }

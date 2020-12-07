@@ -33,19 +33,23 @@ namespace aadlinterface {
 class ExportableAADLObject : public templating::AbstractExportableObject
 {
     Q_GADGET
+    Q_PROPERTY(QString name READ name)
     Q_PROPERTY(QString groupName READ groupName)
     Q_PROPERTY(QVariantList attributes READ attributes)
     Q_PROPERTY(QVariantList properties READ properties)
+    Q_PROPERTY(QStringList path READ path)
 
 public:
     explicit ExportableAADLObject(const aadl::AADLObject *aadlObject = nullptr);
 
     QString groupName() const override;
+    QString name() const;
 
     static QVariant createFrom(const aadl::AADLObject *aadlObject);
 
     QVariantList attributes() const;
     QVariantList properties() const;
+    QStringList path() const;
 
 protected:
     static QVariantList generateProperties(const QHash<QString, QVariant> &props);
