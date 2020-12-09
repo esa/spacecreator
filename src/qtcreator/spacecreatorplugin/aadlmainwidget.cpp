@@ -54,7 +54,6 @@ AadlMainWidget::~AadlMainWidget()
     if (m_plugin && m_plugin->document()->view() && m_plugin->document()->view()->parent() == this) {
         m_plugin->document()->view()->setParent(nullptr);
     }
-    delete m_endToEndView.data();
 }
 
 bool AadlMainWidget::load(const QString &filename)
@@ -142,7 +141,7 @@ void AadlMainWidget::showE2EDataflow(const QStringList &mscFiles)
         return;
     }
     if (m_endToEndView.isNull()) {
-        m_endToEndView = new aadlinterface::EndToEndView(m_plugin->document());
+        m_endToEndView = new aadlinterface::EndToEndView(m_plugin->document(), window());
         m_endToEndView->setAttribute(Qt::WA_DeleteOnClose);
         std::function<msc::MscModel *(QString fileName)> fetcher = [this](QString fileName) -> msc::MscModel * {
             if (m_mscStorage) {

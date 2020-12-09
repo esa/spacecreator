@@ -152,6 +152,8 @@ private:
 
     void showNIYGUI(const QString &title = QString());
 
+    QWidget *window();
+
     struct InterfaceDocumentPrivate;
     InterfaceDocumentPrivate *d;
 };

@@ -284,7 +284,7 @@ bool InterfaceDocument::loadAvailableComponents()
 QString InterfaceDocument::getComponentName(const QStringList &exportNames)
 {
     QString name = exportNames.join(QLatin1Char('_'));
-    auto dialog = new QDialog(qobject_cast<QWidget *>(parent()));
+    auto dialog = new QDialog(qobject_cast<QWidget *>(window()));
     dialog->setWindowTitle(tr("Export"));
     auto layout = new QVBoxLayout;
     layout->addWidget(new QLabel(tr("Enter the name for exporting component:"), dialog));
@@ -625,7 +625,7 @@ void InterfaceDocument::onItemDoubleClicked(shared::Id id)
 
 void InterfaceDocument::onAttributesManagerRequested()
 {
-    auto dialog = new aadlinterface::DynamicPropertyManager(d->dynPropConfig, qobject_cast<QWidget *>(parent()));
+    auto dialog = new aadlinterface::DynamicPropertyManager(d->dynPropConfig, window());
     dialog->setAttribute(Qt::WA_DeleteOnClose);
     dialog->open();
 }
@@ -638,20 +638,20 @@ void InterfaceDocument::onDataTypesMenuInvoked()
 
 void InterfaceDocument::onColorSchemeMenuInvoked()
 {
-    aadlinterface::ColorManagerDialog *dialog =
-            new aadlinterface::ColorManagerDialog(qobject_cast<QWidget *>(parent()));
+    aadlinterface::ColorManagerDialog *dialog = new aadlinterface::ColorManagerDialog(window());
     dialog->setAttribute(Qt::WA_DeleteOnClose);
     dialog->open();
 }
 
 void InterfaceDocument::onDynContextEditorMenuInvoked()
 {
-    auto dialog = new DynActionEditor(qobject_cast<QWidget *>(parent()));
+    auto dialog = new DynActionEditor(window());
     dialog->setAttribute(Qt::WA_DeleteOnClose);
 
     dialog->open();
-    if (!dialog->init())
+    if (!dialog->init()) {
         dialog->close();
+    }
 }
 
 void InterfaceDocument::showPropertyEditor(aadl::AADLObject *obj)
@@ -1044,8 +1044,15 @@ QTreeView *InterfaceDocument::createSharedView()
 void InterfaceDocument::showNIYGUI(const QString &title)
 {
     QString header = title.isEmpty() ? "NIY" : title;
-    QWidget *mainWindow = qobject_cast<QWidget *>(parent());
-    QMessageBox::information(mainWindow, header, "Not implemented yet!");
+    QMessageBox::information(window(), header, "Not implemented yet!");
+}
+
+QWidget *InterfaceDocument::window()
+{
+    if (d->view) {
+        return d->view->window();
+    }
+    return nullptr;
 }
 
 void InterfaceDocument::onSceneSelectionChanged(const QList<shared::Id> &selectedObjects)
