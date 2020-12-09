@@ -14,7 +14,6 @@
         { "key": "ProjectFile", "value": "%{JS: '%{BuildSystem}' === 'qmake' ? '%{ProFile}' : '%{CMakeFile}'}" },
         { "key": "ProFile", "value": "%{JS: Util.fileName('%{ProjectDirectory}/%{ProjectName}', 'pro')}" },
         { "key": "CMakeFile", "value": "%{ProjectDirectory}/CMakeLists.txt" },
-        { "key": "Model", "value": "%{ProjectName}" },
         { "key": "AsnFile", "value": "%{ProjectName}.asn" },
         { "key": "MSCFile", "value": "%{ProjectName}.msc" },
         { "key": "IVFile", "value": "interfaceview.xml" },
@@ -28,6 +27,30 @@
             "trDisplayName": "Project Location",
             "trShortTitle": "Location",
             "typeId": "Project"
+        },
+        {
+            "trDisplayName": "ASN.1 Model",
+            "trShortTitle": "ASN.1 Model",
+            "trSubTitle": "Name of the ASN.1 model",
+            "typeId": "Fields",
+            "enabled": true,
+            "data" :
+            [
+                {
+                    "name": "Model",
+                    "trDisplayName": "Model name:",
+                    "mandatory": true,
+                    "type": "LineEdit",
+                    "isComplete": "%{JS: /[A-Z]([a-zA-Z0-9]|-)*/.test('%{Model}') }",
+                    "trIncompleteMessage": "The ASN.1 model name has to start with upper case letter. And only contain letters, numbers and dashes.",
+                    "data":
+                    {
+                        "validator": "[A-Z]([a-zA-Z0-9]|-)*",
+                        "fixup": "%{JS: '%{INPUT}'.charAt(0).toUpperCase() + '%{INPUT}'.slice(1).replace('_', '-') }",
+                        "trText": "%{JS: '%{ProjectName}'.charAt(0).toUpperCase() + '%{ProjectName}'.slice(1).replace('_', '-') }"
+                    }
+                }
+            ]
         },
         {
             "trDisplayName": "Kit Selection",
