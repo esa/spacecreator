@@ -36,13 +36,13 @@ namespace shared {
     \var shared::CommandLineParser::DbgOpenMscExamplesChain
            Used for debug/test purpose only
     \var shared::CommandLineParser::StartRemoteControl
-           Run the MSC editor instreaming mode
+           Run the MSC editor in streaming mode
     \var shared::CommandLineParser::OpenAADLXMLFile
            Automatically load the speceficied file on startup.
     \var shared::CommandLineParser::ListScriptableActions
            List all the actions available for scripting and exit.
     \var shared::CommandLineParser::OpenStringTemplateFile
-           Load the specificied template file.
+           Load the specified template file.
     \var shared::CommandLineParser::ExportToFile
            Save the file opened by OpenAADLXMLFile using the template passed with OpenStringTemplateFile.
     \var shared::CommandLineParser::DropUnsavedChangesSilently
@@ -146,8 +146,7 @@ QCommandLineOption CommandLineParser::positionalArg(CommandLineParser::Positiona
     case CommandLineParser::Positional::OpenAADLXMLFile:
         names << "o"
               << "open-aadl-xml";
-        description = QCoreApplication::translate(
-                "CommandLineParser", "Do not propose to save changes when closing a document");
+        description = QCoreApplication::translate("CommandLineParser", "The aadl-xml document to load document");
         valueName = QCoreApplication::translate("CommandLineParser", "file");
         break;
     case CommandLineParser::Positional::OpenStringTemplateFile:
