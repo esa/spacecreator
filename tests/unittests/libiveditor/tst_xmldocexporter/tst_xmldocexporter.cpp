@@ -85,8 +85,9 @@ void tst_XmlDocExporter::testExportEmptyDoc()
 {
     aadlinterface::XmlDocExporter::exportDocSilently(m_doc.get(), testFilePath);
     QByteArray text = testFileContent();
-    QByteArray expected = "<?xml version=\"1.0\"?>\n<InterfaceView/>";
-    QCOMPARE(text, expected);
+    QByteArray expectedRaw = "<InterfaceView>\n</InterfaceView>";
+    QByteArray expectedFormatted = "<?xml version=\"1.0\"?>\n<InterfaceView/>";
+    QVERIFY(text == expectedRaw || text == expectedFormatted);
 }
 
 void tst_XmlDocExporter::testExportFunctions()
@@ -102,12 +103,19 @@ void tst_XmlDocExporter::testExportFunctions()
     aadlinterface::XmlDocExporter::exportDocSilently(m_doc.get(), testFilePath);
     QByteArray text = testFileContent();
 
-    QByteArray expected = "<?xml version=\"1.0\"?>\n<InterfaceView>\n"
-                          "    <Function name=\"TestFunc1\" language=\"\" is_type=\"NO\" instance_of=\"\" foo=\"11\">\n"
-                          "        <Property name=\"bar\" value=\"22\"/>\n"
-                          "    </Function>\n"
-                          "</InterfaceView>";
-    QCOMPARE(text, expected);
+    QByteArray expectedFormatted =
+            "<?xml version=\"1.0\"?>\n<InterfaceView>\n"
+            "    <Function name=\"TestFunc1\" language=\"\" is_type=\"NO\" instance_of=\"\" foo=\"11\">\n"
+            "        <Property name=\"bar\" value=\"22\"/>\n"
+            "    </Function>\n"
+            "</InterfaceView>";
+    QByteArray expectedRaw = "<InterfaceView>\n"
+                             "<Function name=\"TestFunc1\" language=\"\" is_type=\"NO\" instance_of=\"\" foo=\"11\">\n"
+                             "    <Property name=\"bar\" value=\"22\"/>\n"
+                             "</Function>\n\n"
+                             "</InterfaceView>";
+    qDebug() << text;
+    QVERIFY(text == expectedRaw || text == expectedFormatted);
 }
 
 void tst_XmlDocExporter::testExportComment()
@@ -123,10 +131,13 @@ void tst_XmlDocExporter::testExportComment()
     aadlinterface::XmlDocExporter::exportDocSilently(m_doc.get(), testFilePath);
     QByteArray text = testFileContent();
 
-    QByteArray expected = "<?xml version=\"1.0\"?>\n<InterfaceView>\n"
-                          "    <Comment name=\"TestComment1\" foo=\"11\"/>\n"
-                          "</InterfaceView>";
-    QCOMPARE(text, expected);
+    QByteArray expectedFormatted = "<?xml version=\"1.0\"?>\n<InterfaceView>\n"
+                                   "    <Comment name=\"TestComment1\" foo=\"11\"/>\n"
+                                   "</InterfaceView>";
+    QByteArray expectedRaw =
+            "<InterfaceView>\n<Comment name=\"TestComment1\" foo=\"11\">\n</Comment>\n\n</InterfaceView>";
+    qDebug() << text;
+    QVERIFY(text == expectedRaw || text == expectedFormatted);
 }
 
 void tst_XmlDocExporter::testExportNestedComment()
@@ -142,12 +153,16 @@ void tst_XmlDocExporter::testExportNestedComment()
     aadlinterface::XmlDocExporter::exportDocSilently(m_doc.get(), testFilePath);
     QByteArray text = testFileContent();
 
-    QByteArray expected = "<?xml version=\"1.0\"?>\n<InterfaceView>\n"
-                          "    <Function name=\"TestFunc1\" language=\"\" is_type=\"NO\" instance_of=\"\">\n"
-                          "        <Comment name=\"TestComment1\"/>\n"
-                          "    </Function>\n"
-                          "</InterfaceView>";
-    QCOMPARE(text, expected);
+    QByteArray expectedFormatted = "<?xml version=\"1.0\"?>\n<InterfaceView>\n"
+                                   "    <Function name=\"TestFunc1\" language=\"\" is_type=\"NO\" instance_of=\"\">\n"
+                                   "        <Comment name=\"TestComment1\"/>\n"
+                                   "    </Function>\n"
+                                   "</InterfaceView>";
+    QByteArray expectedRaw =
+            "<InterfaceView>\n<Function name=\"TestFunc1\" language=\"\" is_type=\"NO\" instance_of=\"\">\n<Comment "
+            "name=\"TestComment1\">\n</Comment>\n\n</Function>\n\n</InterfaceView>";
+    qDebug() << text;
+    QVERIFY(text == expectedRaw || text == expectedFormatted);
 }
 
 void tst_XmlDocExporter::testExportAsn1File()
@@ -156,8 +171,10 @@ void tst_XmlDocExporter::testExportAsn1File()
     aadlinterface::XmlDocExporter::exportDocSilently(m_doc.get(), testFilePath);
     QByteArray text = testFileContent();
 
-    QByteArray expected = "<?xml version=\"1.0\"?>\n<InterfaceView asn1file=\"fake.asn\"/>";
-    QCOMPARE(text, expected);
+    QByteArray expectedFormatted = "<?xml version=\"1.0\"?>\n<InterfaceView asn1file=\"fake.asn\"/>";
+    QByteArray expectedRaw = "<InterfaceView asn1file=\"fake.asn\">\n</InterfaceView>";
+
+    QVERIFY(text == expectedRaw || text == expectedFormatted);
 }
 
 void tst_XmlDocExporter::testExportToBuffer()
@@ -166,8 +183,9 @@ void tst_XmlDocExporter::testExportToBuffer()
     buffer.open(QIODevice::ReadWrite);
     bool ok = aadlinterface::XmlDocExporter::exportDoc(m_doc.get(), &buffer);
     QCOMPARE(ok, true);
-    QByteArray expected = "<?xml version=\"1.0\"?>\n<InterfaceView/>";
-    QCOMPARE(buffer.data(), expected);
+    QByteArray expectedRaw = "<InterfaceView>\n</InterfaceView>";
+    QByteArray expectedFormatted = "<?xml version=\"1.0\"?>\n<InterfaceView/>";
+    QVERIFY(buffer.data() == expectedRaw || buffer.data() == expectedFormatted);
 }
 
 QTEST_MAIN(tst_XmlDocExporter)

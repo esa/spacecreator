@@ -62,7 +62,7 @@ private:
 
     Grantlee::Engine *m_engine = nullptr;
     QSharedPointer<Grantlee::FileSystemTemplateLoader> m_fileLoader;
-    bool m_validateXMLDocument = true;
+    bool m_validateXMLDocument = false;
     bool m_doEscape = true;
     int m_autoFormattingIndent = 4;
 };
