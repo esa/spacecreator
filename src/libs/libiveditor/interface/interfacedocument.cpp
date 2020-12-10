@@ -59,6 +59,7 @@
 #include <QToolBar>
 #include <QUndoStack>
 #include <QVBoxLayout>
+#include <algorithm>
 
 namespace aadlinterface {
 
@@ -439,6 +440,10 @@ QString InterfaceDocument::asn1FileName() const
  */
 QString InterfaceDocument::asn1FilePath() const
 {
+    if (path().isEmpty()) {
+        return {};
+    }
+
     QFileInfo fi(path());
     fi.setFile(fi.absolutePath() + QDir::separator() + d->asnFileName);
     return fi.absoluteFilePath();
@@ -547,9 +552,15 @@ bool InterfaceDocument::checkInterfaceAsn1Compliance(const aadl::AADLObjectIface
     if (!d->asnDataTypes) {
         return true;
     }
-
     const QSharedPointer<Asn1Acn::File> dataTypes = d->asnDataTypes->asn1DataTypes(asn1FilePath());
+    if (dataTypes.isNull()) {
+        return true;
+    }
+
     const QVector<aadl::IfaceParameter> &params = interface->params();
+    if (params.isEmpty()) {
+        return true;
+    }
     return std::any_of(params.cbegin(), params.cend(),
             [dataTypes](const aadl::IfaceParameter &param) { return dataTypes->hasType(param.paramTypeName()); });
 }
