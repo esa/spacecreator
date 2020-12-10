@@ -113,6 +113,7 @@ AADLItemModel::AADLItemModel(aadl::AADLObjectsModel *model, QObject *parent)
 
     connect(m_graphicsScene, &QGraphicsScene::selectionChanged, this, &AADLItemModel::onSceneSelectionChanged);
 
+    m_textUpdate->setInterval(10);
     connect(m_textUpdate, &shared::DelayedSignal::triggered, this, &AADLItemModel::updateInterfaceTexts);
 }
 
@@ -146,8 +147,10 @@ void AADLItemModel::onAADLObjectAdded(aadl::AADLObject *object)
 
     auto propertyChanged = [this]() {
         if (auto senderObject = qobject_cast<aadl::AADLObject *>(sender())) {
-            if (auto item = m_items.value(senderObject->id()))
+            if (auto item = m_items.value(senderObject->id())) {
                 updateItem(item);
+            }
+            scheduleInterfaceTextUpdate();
         }
     };
 
