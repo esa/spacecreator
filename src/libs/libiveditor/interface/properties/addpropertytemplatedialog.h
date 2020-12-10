@@ -20,32 +20,32 @@
 #include <QDialog>
 
 namespace Ui {
-class AddDynamicPropertyDialog;
+class AddPropertyTemplateDialog;
 }
 
 namespace aadl {
-class DynamicProperty;
+class PropertyTemplate;
 } // namespace aadl
 
 namespace aadlinterface {
 
-class AddDynamicPropertyDialog : public QDialog
+class AddPropertyTemplateDialog : public QDialog
 {
     Q_OBJECT
 
 public:
-    explicit AddDynamicPropertyDialog(const QStringList &prohibitedNames, QWidget *parent = nullptr);
-    ~AddDynamicPropertyDialog() override;
+    explicit AddPropertyTemplateDialog(const QStringList &prohibitedNames, QWidget *parent = nullptr);
+    ~AddPropertyTemplateDialog() override;
 
-    aadl::DynamicProperty *attribute() const;
+    aadl::PropertyTemplate *attribute() const;
 public Q_SLOTS:
     void accept() override;
 
 private:
-    Ui::AddDynamicPropertyDialog *ui;
+    Ui::AddPropertyTemplateDialog *ui;
     QStringList m_prohibitedNames;
     QColor m_nameColorDefault;
-    aadl::DynamicProperty *m_attr;
+    aadl::PropertyTemplate *m_attr;
     bool validateName(bool showWarn);
     bool validateType();
     bool validateValuesList();

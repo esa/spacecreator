@@ -1,7 +1,7 @@
 <InterfaceView>
     <Function name="Function_1" language="" is_type="NO" instance_of="">
         <Property name="Taste::coordinates" value="600 -500 20600 7500"/>
-        <Required_Interface name="RI_1" kind="SPORADIC_OPERATION" period="" wcet="" queue_size="">
+        <Required_Interface name="RI_1" kind="Sporadic" period="" wcet="" queue_size="">
             <Input_Parameter name="Property_0" type="T-Boolean" encoding="NATIVE"/>
             <Input_Parameter name="Property_1" type="T-Enum" encoding="NATIVE"/>
             <Input_Parameter name="Property_2" type="T-Int31" encoding="NATIVE"/>
@@ -68,7 +68,7 @@
     </Function>
     <Function name="Function_2" language="" is_type="NO" instance_of="">
         <Property name="Taste::coordinates" value="33700 -100 53700 7900"/>
-        <Provided_Interface name="PI_1" kind="SPORADIC_OPERATION" period="" wcet="" queue_size="">
+        <Provided_Interface name="PI_1" kind="Sporadic" period="" wcet="" queue_size="">
             <Input_Parameter name="Property_0" type="T-Boolean" encoding="NATIVE"/>
             <Input_Parameter name="Property_1" type="T-Enum" encoding="NATIVE"/>
             <Input_Parameter name="Property_2" type="T-Int31" encoding="NATIVE"/>

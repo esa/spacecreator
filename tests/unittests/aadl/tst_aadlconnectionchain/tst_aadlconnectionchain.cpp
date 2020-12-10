@@ -19,7 +19,7 @@
 #include "aadlobjectconnection.h"
 #include "aadlobjectsmodel.h"
 #include "aadlxmlreader.h"
-#include "dynamicpropertyconfig.h"
+#include "propertytemplateconfig.h"
 
 #include <QtTest>
 
@@ -88,7 +88,7 @@ void tst_AADLConnectionChain::test3StraightConnections()
 {
     const QStringList expectedChain = { "MiniA", "BlockA", "BlockB", "MiniB" };
 
-    aadl::DynamicPropertyConfig conf;
+    aadl::PropertyTemplateConfig conf;
     aadl::AADLObjectsModel model(&conf);
     aadl::AADLXMLReader parser;
     connect(&parser, &aadl::AADLXMLReader::objectsParsed, &model, &aadl::AADLObjectsModel::addObjects);
@@ -128,7 +128,7 @@ void tst_AADLConnectionChain::test3StraightConnections()
 // MiniA -> BlockA -> BlockB -> MiniB2
 void tst_AADLConnectionChain::testTargetSplitsIntoTwo()
 {
-    aadl::DynamicPropertyConfig conf;
+    aadl::PropertyTemplateConfig conf;
     aadl::AADLObjectsModel model(&conf);
     aadl::AADLXMLReader parser;
     connect(&parser, &aadl::AADLXMLReader::objectsParsed, &model, &aadl::AADLObjectsModel::addObjects);
@@ -146,7 +146,7 @@ void tst_AADLConnectionChain::testTargetSplitsIntoTwo()
 // MiniA2 -> BlockA -> BlockB -> MiniB1 -> MacroB1
 void tst_AADLConnectionChain::testTargetJoinIntone()
 {
-    aadl::DynamicPropertyConfig conf;
+    aadl::PropertyTemplateConfig conf;
     aadl::AADLObjectsModel model(&conf);
     aadl::AADLXMLReader parser;
     connect(&parser, &aadl::AADLXMLReader::objectsParsed, &model, &aadl::AADLObjectsModel::addObjects);
@@ -167,7 +167,7 @@ void tst_AADLConnectionChain::testTargetJoinIntone()
 // MiniA1.RI_1->BlockA.RI_1->BlockB.PI_1->MiniB2.PI_1
 void tst_AADLConnectionChain::testChainCreationMultiChainOnInterfaces()
 {
-    aadl::DynamicPropertyConfig conf;
+    aadl::PropertyTemplateConfig conf;
     aadl::AADLObjectsModel model(&conf);
     aadl::AADLXMLReader parser;
     connect(&parser, &aadl::AADLXMLReader::objectsParsed, &model, &aadl::AADLObjectsModel::addObjects);
@@ -184,7 +184,7 @@ void tst_AADLConnectionChain::testChainCreationMultiChainOnInterfaces()
 // MiniA -> BlockA -> BlockB -> MiniB
 void tst_AADLConnectionChain::testContains()
 {
-    aadl::DynamicPropertyConfig conf;
+    aadl::PropertyTemplateConfig conf;
     aadl::AADLObjectsModel model(&conf);
     aadl::AADLXMLReader parser;
     connect(&parser, &aadl::AADLXMLReader::objectsParsed, &model, &aadl::AADLObjectsModel::addObjects);
@@ -215,7 +215,7 @@ void tst_AADLConnectionChain::testContains()
 // MiniA -> BlockA -> BlockB -> MiniB
 void tst_AADLConnectionChain::testGetNames()
 {
-    aadl::DynamicPropertyConfig conf;
+    aadl::PropertyTemplateConfig conf;
     aadl::AADLObjectsModel model(&conf);
     aadl::AADLXMLReader parser;
     connect(&parser, &aadl::AADLXMLReader::objectsParsed, &model, &aadl::AADLObjectsModel::addObjects);

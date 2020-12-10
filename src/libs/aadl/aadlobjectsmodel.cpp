@@ -23,15 +23,15 @@
 #include "aadlobjectfunction.h"
 #include "aadlobjectfunctiontype.h"
 #include "common.h"
-#include "dynamicproperty.h"
-#include "dynamicpropertyconfig.h"
+#include "propertytemplate.h"
+#include "propertytemplateconfig.h"
 
 #include <QtDebug>
 
 namespace aadl {
 
 struct AADLObjectsModelPrivate {
-    DynamicPropertyConfig *m_dynPropConfig { nullptr };
+    PropertyTemplateConfig *m_dynPropConfig { nullptr };
     AADLObjectsModel *m_sharedTypesModel { nullptr };
     shared::Id m_rootObjectId;
     QList<shared::Id> m_objectsOrder;
@@ -40,7 +40,7 @@ struct AADLObjectsModelPrivate {
     QVector<QString> m_headerTitles;
 };
 
-AADLObjectsModel::AADLObjectsModel(DynamicPropertyConfig *dynPropConfig, QObject *parent)
+AADLObjectsModel::AADLObjectsModel(PropertyTemplateConfig *dynPropConfig, QObject *parent)
     : QObject(parent)
     , d(new AADLObjectsModelPrivate)
 {
@@ -114,14 +114,14 @@ bool AADLObjectsModel::addObject(AADLObject *obj)
                 parentObj->removeChild(obj);
             }
         } else {
-            for (auto attr : d->m_dynPropConfig->attributesForObject(obj)) {
+            for (auto attr : d->m_dynPropConfig->propertyTemplatesForObject(obj)) {
                 const QVariant &currentValue = obj->attr(attr->name());
                 if (currentValue.isNull()) {
                     const QVariant &defaultValue = attr->defaultValue();
                     if (!defaultValue.isNull()) {
-                        if (attr->info() == aadl::DynamicProperty::Info::Attribute) {
+                        if (attr->info() == aadl::PropertyTemplate::Info::Attribute) {
                             obj->setAttr(attr->name(), defaultValue);
-                        } else if (attr->info() == aadl::DynamicProperty::Info::Property) {
+                        } else if (attr->info() == aadl::PropertyTemplate::Info::Property) {
                             obj->setProp(attr->name(), defaultValue);
                         } else {
                             qWarning() << "Unknown dynamic property info:" << attr->info();

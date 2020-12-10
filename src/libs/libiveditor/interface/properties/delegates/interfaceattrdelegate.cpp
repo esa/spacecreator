@@ -47,20 +47,10 @@ QWidget *InterfaceAttrDelegate::createEditor(
 
                 switch (t) {
                 case aadl::meta::Props::Token::kind: {
-                    auto names = aadl::AADLObjectIface::xmlKindNames();
-                    if (auto model = qobject_cast<const PropertiesListModel *>(index.model()))
-                        if (auto iface = model->dataObject()->as<const aadl::AADLObjectIface *>()) {
-                            if (iface->isProvided())
-                                names.take(aadl::AADLObjectIface::OperationKind::Any);
-                            else
-                                names.take(aadl::AADLObjectIface::OperationKind::Cyclic);
-                        }
-
+                    auto names = iface->availableKindNames();
                     QComboBox *cb = new QComboBox(parent);
-                    auto i = names.cbegin();
-                    while (i != names.cend()) {
-                        cb->addItem(i.value(), QVariant::fromValue(i.key()));
-                        ++i;
+                    for (auto it = names.cbegin(); it != names.cend(); ++it) {
+                        cb->addItem(it.value(), QVariant::fromValue(it.key()));
                     }
                     return cb;
                 }

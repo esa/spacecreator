@@ -23,11 +23,11 @@
 #include "aadlobjectfunction.h"
 #include "aadlobjectiface.h"
 #include "commandsstack.h"
-#include "dynamicpropertyconfig.h"
 #include "interface/commands/cmdentityattributechange.h"
 #include "interface/commands/cmdentitypropertychange.h"
 #include "interface/commands/cmdentitypropertycreate.h"
 #include "interface/commands/commandsfactory.h"
+#include "propertytemplateconfig.h"
 
 #include <QDebug>
 #include <algorithm>
@@ -44,20 +44,22 @@ aadl::meta::Props::Token tokenFromIndex(const QModelIndex &index)
 }
 
 PropertiesListModel::PropertiesListModel(
-        cmd::CommandsStack::Macro *macro, aadl::DynamicPropertyConfig *dynPropConfig, QObject *parent)
+        cmd::CommandsStack::Macro *macro, aadl::PropertyTemplateConfig *dynPropConfig, QObject *parent)
     : PropertiesModelBase(parent)
     , m_cmdMacro(macro)
-    , m_dynPropConfig(dynPropConfig)
+    , m_propTamplesConfig(dynPropConfig)
 {
 }
 
 PropertiesListModel::~PropertiesListModel() { }
 
-void PropertiesListModel::createNewRow(int row, const QString &title, aadl::DynamicProperty::Info info,
-        const QVariant &value, const QVariant &editValue, const QVariant &defaulValue)
+void PropertiesListModel::createNewRow(int row, const QString &label, const QString &name,
+        aadl::PropertyTemplate::Info info, const QVariant &value, const QVariant &editValue,
+        const QVariant &defaulValue)
 {
-    m_names.append(title);
-    QStandardItem *titleItem = new QStandardItem(title);
+    m_names.append(name);
+    QStandardItem *titleItem = new QStandardItem(label.isEmpty() ? name : label);
+    titleItem->setData(name, PropertyNameRole);
 
     QStandardItem *valueItem = new QStandardItem();
     valueItem->setData(value, Qt::DisplayRole);
@@ -76,14 +78,14 @@ void PropertiesListModel::invalidateProperties(const QString &propName)
     if (!m_dataObject)
         return;
 
-    static const QMap<aadl::AADLObject::Type, aadl::DynamicProperty::Scope> kScopeMappings = {
-        { aadl::AADLObject::Type::Function, aadl::DynamicProperty::Scope::Function },
-        { aadl::AADLObject::Type::RequiredInterface, aadl::DynamicProperty::Scope::Required_Interface },
-        { aadl::AADLObject::Type::ProvidedInterface, aadl::DynamicProperty::Scope::Provided_Interface },
-        { aadl::AADLObject::Type::Comment, aadl::DynamicProperty::Scope::Comment },
-        { aadl::AADLObject::Type::Connection, aadl::DynamicProperty::Scope::Connection },
+    static const QMap<aadl::AADLObject::Type, aadl::PropertyTemplate::Scope> kScopeMappings = {
+        { aadl::AADLObject::Type::Function, aadl::PropertyTemplate::Scope::Function },
+        { aadl::AADLObject::Type::RequiredInterface, aadl::PropertyTemplate::Scope::Required_Interface },
+        { aadl::AADLObject::Type::ProvidedInterface, aadl::PropertyTemplate::Scope::Provided_Interface },
+        { aadl::AADLObject::Type::Comment, aadl::PropertyTemplate::Scope::Comment },
+        { aadl::AADLObject::Type::Connection, aadl::PropertyTemplate::Scope::Connection },
     };
-    const auto attrs = m_dynPropConfig->attributesForObject(m_dataObject);
+    const auto attrs = m_propTamplesConfig->propertyTemplatesForObject(m_dataObject);
     QStringList attrsAboutToBeRemoved, attrsAboutToBeAdded;
     /// TBD:
 }
@@ -117,40 +119,42 @@ void PropertiesListModel::setDataObject(aadl::AADLObject *obj)
     connect(m_dataObject, qOverload<const QString &>(&aadl::AADLObject::attributeChanged), this,
             &PropertiesListModel::invalidateAttributes, Qt::UniqueConnection);
 
-    auto initRows = [this](const QHash<QString, QVariant> &vals, aadl::DynamicProperty::Info info, int offset,
-                            const QHash<QString, aadl::DynamicProperty *> &dynProps) {
+    auto initRows = [this](const QHash<QString, QVariant> &vals, aadl::PropertyTemplate::Info info, int offset,
+                            const QHash<QString, aadl::PropertyTemplate *> &templates) {
         QList<QString> keys(vals.keys());
         std::sort(keys.begin(), keys.end());
         for (int i = 0; i < keys.size(); ++i) {
-            auto propertyPtr = dynProps.value(keys[i]);
+            auto propertyPtr = templates.value(keys[i]);
             if (propertyPtr && !propertyPtr->isVisible())
                 continue;
 
-            const QVariant dynPropValues = propertyPtr ? propertyPtr->valuesList() : QVariant();
-            const aadl::DynamicProperty::Type type =
-                    propertyPtr ? propertyPtr->type() : aadl::DynamicProperty::Type::String;
-            createNewRow(i + offset, keys[i], info, vals[keys[i]],
-                    propertyPtr ? aadl::DynamicProperty::convertData(dynPropValues, type) : QVariant(QVariant::String),
+            const QVariant propTemplatesValues = propertyPtr ? propertyPtr->valuesList() : QVariant();
+            const aadl::PropertyTemplate::Type type =
+                    propertyPtr ? propertyPtr->type() : aadl::PropertyTemplate::Type::String;
+            const QString title = propertyPtr ? propertyPtr->label() : QString();
+            createNewRow(i + offset, title, keys[i], info, vals[keys[i]],
+                    propertyPtr ? aadl::PropertyTemplate::convertData(propTemplatesValues, type)
+                                : QVariant(QVariant::String),
                     propertyPtr ? propertyPtr->defaultValue() : QVariant(QVariant::String));
         }
     };
 
-    const auto attrs = m_dynPropConfig->attributesForObject(m_dataObject);
+    const auto templates = m_propTamplesConfig->propertyTemplatesForObject(m_dataObject);
 
     beginResetModel();
-    initRows(m_dataObject->attrs(), aadl::DynamicProperty::Info::Attribute, rowCount(), attrs);
-    initRows(m_dataObject->props(), aadl::DynamicProperty::Info::Property, rowCount(), attrs);
+    initRows(m_dataObject->attrs(), aadl::PropertyTemplate::Info::Attribute, rowCount(), templates);
+    initRows(m_dataObject->props(), aadl::PropertyTemplate::Info::Property, rowCount(), templates);
 
-    for (auto attr : attrs) {
-        if (!m_names.contains(attr->name()) && attr->isVisible()) {
+    for (auto propTemplate : templates) {
+        if (!m_names.contains(propTemplate->name()) && propTemplate->isVisible()) {
             QVariant value;
-            if (attr->type() == aadl::DynamicProperty::Type::Unknown) {
+            if (propTemplate->type() == aadl::PropertyTemplate::Type::Unknown) {
                 continue;
-            } else if (attr->type() == aadl::DynamicProperty::Type::Enumeration) {
-                value = attr->valuesList();
+            } else if (propTemplate->type() == aadl::PropertyTemplate::Type::Enumeration) {
+                value = propTemplate->valuesList();
             }
-            createNewRow(rowCount(), attr->name(), attr->info(), {},
-                    aadl::DynamicProperty::convertData(value, attr->type()), attr->defaultValue());
+            createNewRow(rowCount(), propTemplate->label(), propTemplate->name(), propTemplate->info(), {},
+                    aadl::PropertyTemplate::convertData(value, propTemplate->type()), propTemplate->defaultValue());
         }
     }
 
@@ -197,7 +201,7 @@ QVariant PropertiesListModel::data(const QModelIndex &index, int role) const
         const QString &title = m_names.at(index.row());
 
         if (index.column() == ColumnTitle)
-            return title;
+            return res;
 
         return isAttr(index) ? m_dataObject->attr(title) : m_dataObject->prop(title);
     }
@@ -212,7 +216,7 @@ bool PropertiesListModel::setData(const QModelIndex &index, const QVariant &valu
         return false;
 
     if (role == Qt::EditRole) {
-        const QString &name = this->index(index.row(), ColumnTitle).data().toString();
+        const QString &name = this->index(index.row(), ColumnTitle).data(PropertyNameRole).toString();
         if (isAttr(index) && index.column() == ColumnValue) {
             QVariant attributeValue = value;
             switch (tokenFromIndex(index)) {
@@ -283,7 +287,8 @@ bool PropertiesListModel::createProperty(const QString &propName)
         res = true;
     }
 
-    createNewRow(rowCount(), propName, aadl::DynamicProperty::Info::Property, {}, {}, {});
+    createNewRow(rowCount(), {}, propName, aadl::PropertyTemplate::Info::Property, QVariant(QVariant::String),
+            QVariant(QVariant::String), QVariant(QVariant::String));
 
     endInsertRows();
 
@@ -319,17 +324,27 @@ bool PropertiesListModel::removeProperty(const QModelIndex &index)
 bool PropertiesListModel::isAttr(const QModelIndex &id) const
 {
     return id.isValid()
-            && static_cast<int>(aadl::DynamicProperty::Info::Attribute) == id.data(PropertyInfoRole).toInt();
+            && static_cast<int>(aadl::PropertyTemplate::Info::Attribute) == id.data(PropertyInfoRole).toInt();
 }
 
 bool PropertiesListModel::isProp(const QModelIndex &id) const
 {
-    return id.isValid() && static_cast<int>(aadl::DynamicProperty::Info::Property) == id.data(PropertyInfoRole).toInt();
+    return id.isValid()
+            && static_cast<int>(aadl::PropertyTemplate::Info::Property) == id.data(PropertyInfoRole).toInt();
 }
 
-bool PropertiesListModel::isEditable(const QModelIndex &index) const
+bool PropertiesListModel::isEditable(const QModelIndex &idx) const
 {
-    return index.column() == ColumnTitle ? this->index(index.row(), ColumnValue).data().isNull() : true;
+    if (idx.column() == ColumnTitle) {
+        const QString propName = m_names.value(idx.row());
+        const auto templates = m_propTamplesConfig->propertyTemplatesForObject(m_dataObject);
+        if (templates.contains(propName)) {
+            return false;
+        }
+        return index(idx.row(), ColumnValue).data().isNull();
+    }
+
+    return true;
 }
 
 Qt::ItemFlags PropertiesListModel::flags(const QModelIndex &index) const
@@ -357,7 +372,7 @@ Qt::ItemFlags PropertiesListModel::flags(const QModelIndex &index) const
 }
 
 FunctionPropertiesListModel::FunctionPropertiesListModel(
-        cmd::CommandsStack::Macro *macro, aadl::DynamicPropertyConfig *dynPropConfig, QObject *parent)
+        cmd::CommandsStack::Macro *macro, aadl::PropertyTemplateConfig *dynPropConfig, QObject *parent)
     : PropertiesListModel(macro, dynPropConfig, parent)
 {
 }
@@ -378,7 +393,7 @@ bool FunctionPropertiesListModel::isEditable(const QModelIndex &index) const
         break;
     }
     case aadl::meta::Props::Token::instance_of: {
-        if (dataObject()->isFunctionType())
+        if (dataObject()->isFunctionType() || index.column() == ColumnTitle)
             editable = false;
         else {
             if (auto fn = dataObject()->as<const aadl::AADLObjectFunction *>()) {
@@ -397,9 +412,20 @@ bool FunctionPropertiesListModel::isEditable(const QModelIndex &index) const
 }
 
 InterfacePropertiesListModel::InterfacePropertiesListModel(
-        cmd::CommandsStack::Macro *macro, aadl::DynamicPropertyConfig *dynPropConfig, QObject *parent)
+        cmd::CommandsStack::Macro *macro, aadl::PropertyTemplateConfig *dynPropConfig, QObject *parent)
     : PropertiesListModel(macro, dynPropConfig, parent)
 {
+}
+
+QVariant InterfacePropertiesListModel::data(const QModelIndex &index, int role) const
+{
+    if ((role == Qt::DisplayRole || role == Qt::EditRole) && index.column() == ColumnValue) {
+        if (m_dataObject->aadlType() == aadl::AADLObject::Type::RequiredInterface
+                && tokenFromIndex(index) == aadl::meta::Props::Token::name) {
+            return m_dataObject->as<aadl::AADLObjectIfaceRequired *>()->ifaceLabel();
+        }
+    }
+    return PropertiesListModel::data(index, role);
 }
 
 bool InterfacePropertiesListModel::isEditable(const QModelIndex &index) const

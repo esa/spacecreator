@@ -11,7 +11,7 @@ class QDomElement;
 
 namespace aadl {
 
-class DynamicProperty
+class PropertyTemplate
 {
     Q_GADGET
 public:
@@ -48,15 +48,18 @@ public:
 #if (QT_VERSION >= QT_VERSION_CHECK(5, 12, 0))
     Q_DECLARE_FLAGS(Scopes, Scope)
 #else
-    Q_DECLARE_FLAGS(Scopes, aadl::DynamicProperty::Scope)
+    Q_DECLARE_FLAGS(Scopes, aadl::PropertyTemplate::Scope)
 #endif
     Q_FLAG(Scopes)
 
-    DynamicProperty();
-    ~DynamicProperty();
+    PropertyTemplate();
+    ~PropertyTemplate();
 
     QString name() const;
     void setName(const QString &name);
+
+    QString label() const;
+    void setLabel(const QString &name);
 
     Type type() const;
     void setType(Type t);
@@ -79,21 +82,21 @@ public:
     QString valueValidatorPattern() const;
     void setValueValidatorPattern(const QString &pattern);
 
-    QMap<DynamicProperty::Scope, QPair<QString, QString>> attrValidatorPatterns() const;
-    void setAttrValidatorPattern(const QMap<DynamicProperty::Scope, QPair<QString, QString>> &pattern);
+    QMap<PropertyTemplate::Scope, QPair<QString, QString>> attrValidatorPatterns() const;
+    void setAttrValidatorPattern(const QMap<PropertyTemplate::Scope, QPair<QString, QString>> &pattern);
 
     QDomElement toXml(QDomDocument *domDoc) const;
-    static DynamicProperty *fromXml(const QDomElement &element);
+    static PropertyTemplate *fromXml(const QDomElement &element);
     static QString tagName();
-    static QVariant convertData(const QVariant &value, DynamicProperty::Type type);
+    static QVariant convertData(const QVariant &value, PropertyTemplate::Type type);
 
 private:
-    struct DynamicPropertyPrivate;
-    const std::unique_ptr<DynamicPropertyPrivate> d;
+    struct PropertyTemplatePrivate;
+    const std::unique_ptr<PropertyTemplatePrivate> d;
 };
 
 } // namespace aadl
 
-Q_DECLARE_OPERATORS_FOR_FLAGS(aadl::DynamicProperty::Scopes)
-Q_DECLARE_METATYPE(aadl::DynamicProperty::Type)
-Q_DECLARE_METATYPE(aadl::DynamicProperty::Scopes)
+Q_DECLARE_OPERATORS_FOR_FLAGS(aadl::PropertyTemplate::Scopes)
+Q_DECLARE_METATYPE(aadl::PropertyTemplate::Type)
+Q_DECLARE_METATYPE(aadl::PropertyTemplate::Scopes)

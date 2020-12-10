@@ -152,9 +152,9 @@ target_sources(${LIB_NAME} PRIVATE
     interface/interfacedocument.h
     interface/interfacetabgraphicsscene.cpp
     interface/interfacetabgraphicsscene.h
-    interface/properties/adddynamicpropertydialog.h
-    interface/properties/adddynamicpropertydialog.ui
-    interface/properties/adddynamicropertydialog.cpp
+    interface/properties/addpropertytemplatedialog.h
+    interface/properties/addpropertytemplatedialog.ui
+    interface/properties/addpropertytemplatedialog.cpp
     interface/properties/contextparametersmodel.cpp
     interface/properties/contextparametersmodel.h
     interface/properties/delegates/asn1valuedelegate.cpp
@@ -169,9 +169,9 @@ target_sources(${LIB_NAME} PRIVATE
     interface/properties/delegates/interfaceattrdelegate.h
     interface/properties/delegates/propertytypedelegate.cpp
     interface/properties/delegates/propertytypedelegate.h
-    interface/properties/dynamicpropertymanager.cpp
-    interface/properties/dynamicpropertymanager.h
-    interface/properties/dynamicpropertymanager.ui
+    interface/properties/propertytemplatemanager.cpp
+    interface/properties/propertytemplatemanager.h
+    interface/properties/propertytemplatemanager.ui
     interface/properties/ifaceparametersmodel.cpp
     interface/properties/ifaceparametersmodel.h
     interface/properties/propertiesdialog.cpp

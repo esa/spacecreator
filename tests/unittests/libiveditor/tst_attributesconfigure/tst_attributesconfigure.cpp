@@ -15,8 +15,8 @@
    along with this program. If not, see <https://www.gnu.org/licenses/lgpl-2.1.html>.
 */
 
-#include "dynamicproperty.h"
-#include "dynamicpropertyconfig.h"
+#include "propertytemplate.h"
+#include "propertytemplateconfig.h"
 #include "iveditor.h"
 
 #include <QDomDocument>
@@ -33,13 +33,13 @@ private Q_SLOTS:
     void tst_loadImpl();
 
 private:
-    QScopedPointer<aadl::DynamicPropertyConfig> m_dynPropConfig;
+    QScopedPointer<aadl::PropertyTemplateConfig> m_dynPropConfig;
 };
 
 void tst_AttributesConfigure::initTestCase()
 {
     aadlinterface::initIvEditor();
-    m_dynPropConfig.reset(new aadl::DynamicPropertyConfig);
+    m_dynPropConfig.reset(new aadl::PropertyTemplateConfig);
     m_dynPropConfig->init(QLatin1String("default_attributes.xml"));
 }
 
@@ -50,29 +50,29 @@ void tst_AttributesConfigure::tst_attributesLoad()
     QString errMsg;
     int line;
     int column;
-    aadl::DynamicPropertyConfig::parseAttributesList(QString::fromUtf8(file.readAll()), &errMsg, &line, &column);
+    aadl::PropertyTemplateConfig::parseAttributesList(QString::fromUtf8(file.readAll()), &errMsg, &line, &column);
     QVERIFY2(errMsg.isEmpty(), QStringLiteral("ERROR [%1:%2]: %3").arg(line).arg(column).arg(errMsg).toUtf8().data());
 }
 
 void tst_AttributesConfigure::tst_loadImpl()
 {
-    aadl::DynamicProperty dp;
+    aadl::PropertyTemplate dp;
     dp.setName(QLatin1String("test_name"));
-    dp.setInfo(aadl::DynamicProperty::Info::Property);
-    dp.setType(aadl::DynamicProperty::Type::Enumeration);
-    const auto scope = aadl::DynamicProperty::Scope::Provided_Interface;
+    dp.setInfo(aadl::PropertyTemplate::Info::Property);
+    dp.setType(aadl::PropertyTemplate::Type::Enumeration);
+    const auto scope = aadl::PropertyTemplate::Scope::Provided_Interface;
     dp.setScope(scope);
     dp.setVisible(false);
     dp.setValuesList({ QVariant::fromValue(QString("value1")), QVariant::fromValue(QString("value2")) });
     dp.setValueValidatorPattern(QString("[\\d+]"));
-    dp.setAttrValidatorPattern(QMap<aadl::DynamicProperty::Scope, QPair<QString, QString>> {
+    dp.setAttrValidatorPattern(QMap<aadl::PropertyTemplate::Scope, QPair<QString, QString>> {
             { scope, qMakePair(QString("attrName"), QString("value")) } });
 
     QDomDocument doc;
     doc.appendChild(dp.toXml(&doc));
 
     const auto element = doc.documentElement();
-    auto propPtr = aadl::DynamicProperty::fromXml(element);
+    auto propPtr = aadl::PropertyTemplate::fromXml(element);
     QVERIFY(propPtr != nullptr);
     QVERIFY(propPtr->name() == dp.name());
     QVERIFY(propPtr->info() == dp.info());

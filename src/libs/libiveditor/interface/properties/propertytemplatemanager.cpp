@@ -15,12 +15,12 @@
   along with this program. If not, see <https://www.gnu.org/licenses/lgpl-2.1.html>.
 */
 
-#include "dynamicpropertymanager.h"
+#include "propertytemplatemanager.h"
 
-#include "adddynamicpropertydialog.h"
-#include "dynamicproperty.h"
-#include "dynamicpropertyconfig.h"
-#include "ui_dynamicpropertymanager.h"
+#include "addpropertytemplatedialog.h"
+#include "propertytemplate.h"
+#include "propertytemplateconfig.h"
+#include "ui_propertytemplatemanager.h"
 
 #include <QDebug>
 #include <QDomDocument>
@@ -30,24 +30,24 @@
 
 namespace aadlinterface {
 
-DynamicPropertyManager::DynamicPropertyManager(aadl::DynamicPropertyConfig *dynPropConfig, QWidget *parent)
+PropertyTemplateManager::PropertyTemplateManager(aadl::PropertyTemplateConfig *dynPropConfig, QWidget *parent)
     : QDialog(parent)
-    , ui(new Ui::DynamicPropertyManager)
+    , ui(new Ui::PropertyTemplateManager)
     , m_dynPropConfig(dynPropConfig)
 {
     ui->setupUi(this);
 
-    connect(ui->plainTextEdit, &QPlainTextEdit::textChanged, this, &DynamicPropertyManager::updateErrorInfo);
+    connect(ui->plainTextEdit, &QPlainTextEdit::textChanged, this, &PropertyTemplateManager::updateErrorInfo);
 
     readConfig(m_dynPropConfig->configPath());
 }
 
-DynamicPropertyManager::~DynamicPropertyManager()
+PropertyTemplateManager::~PropertyTemplateManager()
 {
     delete ui;
 }
 
-bool DynamicPropertyManager::readConfig(const QString &from)
+bool PropertyTemplateManager::readConfig(const QString &from)
 {
     if (from.isEmpty())
         return false;
@@ -62,7 +62,7 @@ bool DynamicPropertyManager::readConfig(const QString &from)
     return true;
 }
 
-void DynamicPropertyManager::updateErrorInfo()
+void PropertyTemplateManager::updateErrorInfo()
 {
     const QString &xmlData = ui->plainTextEdit->toPlainText();
 
@@ -74,14 +74,14 @@ void DynamicPropertyManager::updateErrorInfo()
     int errorColumn = -1;
 
     if (!xmlData.isEmpty()) {
-        const QList<aadl::DynamicProperty *> &attrs =
+        const QList<aadl::PropertyTemplate *> &attrs =
                 m_dynPropConfig->parseAttributesList(xmlData, &errorMsg, &errorLine, &errorColumn);
 
         if (!errorMsg.isEmpty()) {
             qWarning() << errorMsg << errorLine << errorColumn;
             textColor = Qt::red;
         } else {
-            for (aadl::DynamicProperty *attr : attrs) {
+            for (aadl::PropertyTemplate *attr : attrs) {
                 if (m_usedNames.contains(attr->name())) {
                     errorMsg = tr("Duplicate names found: %1").arg(attr->name());
                     break;
@@ -97,18 +97,18 @@ void DynamicPropertyManager::updateErrorInfo()
     ui->buttonBox->button(QDialogButtonBox::Ok)->setEnabled(errorMsg.isEmpty());
 }
 
-void DynamicPropertyManager::setTextColor(const QColor &color)
+void PropertyTemplateManager::setTextColor(const QColor &color)
 {
     QPalette p(ui->plainTextEdit->palette());
     p.setColor(QPalette::Text, color);
     ui->plainTextEdit->setPalette(p);
 }
 
-void DynamicPropertyManager::on_btnNewProp_clicked()
+void PropertyTemplateManager::on_btnNewProp_clicked()
 {
-    AddDynamicPropertyDialog *dlg = new AddDynamicPropertyDialog(m_usedNames, this);
+    AddPropertyTemplateDialog *dlg = new AddPropertyTemplateDialog(m_usedNames, this);
     if (dlg->exec() == QDialog::Accepted) {
-        if (aadl::DynamicProperty *attr = dlg->attribute()) {
+        if (aadl::PropertyTemplate *attr = dlg->attribute()) {
             const QString &xmlData = ui->plainTextEdit->toPlainText();
             QDomDocument doc;
             if (doc.setContent(xmlData)) {
@@ -123,7 +123,7 @@ void DynamicPropertyManager::on_btnNewProp_clicked()
     delete dlg;
 }
 
-void DynamicPropertyManager::accept()
+void PropertyTemplateManager::accept()
 {
     const QString &filePath = m_dynPropConfig->configPath();
     QFile out(filePath);

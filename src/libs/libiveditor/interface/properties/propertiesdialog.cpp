@@ -47,7 +47,7 @@
 
 namespace aadlinterface {
 
-PropertiesDialog::PropertiesDialog(aadl::DynamicPropertyConfig *dynPropConfig, aadl::AADLObject *obj,
+PropertiesDialog::PropertiesDialog(aadl::PropertyTemplateConfig *dynPropConfig, aadl::AADLObject *obj,
         const QSharedPointer<Asn1Acn::File> &dataTypes, QWidget *parent)
     : QDialog(parent)
     , ui(new Ui::PropertiesDialog)

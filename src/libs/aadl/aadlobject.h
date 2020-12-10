@@ -86,7 +86,7 @@ public:
 
     // "attributes" - payload data in the opening XML tag,
     // like "name" and "kind" below:
-    // <Required_Interface name="run_forrest" kind="SPORADIC_OPERATION">
+    // <Required_Interface name="run_forrest" kind="Sporadic">
 
     QHash<QString, QVariant> attrs() const;
     void setAttrs(const QHash<QString, QVariant> &attrs);

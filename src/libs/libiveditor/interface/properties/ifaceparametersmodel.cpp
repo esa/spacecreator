@@ -20,8 +20,8 @@
 #include "aadlobject.h"
 #include "aadlobjectiface.h"
 #include "commandsstack.h"
-#include "dynamicproperty.h"
-#include "dynamicpropertyconfig.h"
+#include "propertytemplate.h"
+#include "propertytemplateconfig.h"
 #include "interface/commands/cmdentitypropertycreate.h"
 #include "interface/commands/commandsfactory.h"
 

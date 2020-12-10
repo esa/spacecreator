@@ -35,13 +35,13 @@
 #include "context/action/actionsmanager.h"
 #include "context/action/editor/dynactioneditor.h"
 #include "creatortool.h"
-#include "dynamicpropertyconfig.h"
 #include "file.h"
 #include "graphicsitemhelpers.h"
 #include "interface/aadlobjectstreeview.h"
 #include "interface/colors/colormanagerdialog.h"
-#include "interface/properties/dynamicpropertymanager.h"
 #include "interface/properties/propertiesdialog.h"
+#include "interface/properties/propertytemplatemanager.h"
+#include "propertytemplateconfig.h"
 #include "xmldocexporter.h"
 
 #include <QAction>
@@ -95,7 +95,7 @@ struct InterfaceDocument::InterfaceDocumentPrivate {
 
     QPointer<QWidget> view;
     aadlinterface::GraphicsView *graphicsView { nullptr };
-    aadl::DynamicPropertyConfig *dynPropConfig { nullptr };
+    aadl::PropertyTemplateConfig *dynPropConfig { nullptr };
     QTreeView *objectsView { nullptr };
     AADLItemModel *itemsModel { nullptr };
     CommonVisualizationModel *objectsVisualizationModel { nullptr };
@@ -133,7 +133,7 @@ InterfaceDocument::InterfaceDocument(QObject *parent)
     d->commandsStack = new QUndoStack(this);
     connect(d->commandsStack, &QUndoStack::cleanChanged, this, [this](bool clean) { Q_EMIT dirtyChanged(!clean); });
 
-    d->dynPropConfig = new aadl::DynamicPropertyConfig;
+    d->dynPropConfig = new aadl::PropertyTemplateConfig;
     d->dynPropConfig->init(dynamicPropertiesFilePath());
 
     d->importModel = new aadl::AADLObjectsModel(d->dynPropConfig, this);
@@ -625,7 +625,7 @@ void InterfaceDocument::onItemDoubleClicked(shared::Id id)
 
 void InterfaceDocument::onAttributesManagerRequested()
 {
-    auto dialog = new aadlinterface::DynamicPropertyManager(d->dynPropConfig, window());
+    auto dialog = new aadlinterface::PropertyTemplateManager(d->dynPropConfig, window());
     dialog->setAttribute(Qt::WA_DeleteOnClose);
     dialog->open();
 }

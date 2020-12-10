@@ -15,7 +15,7 @@
   along with this program. If not, see <https://www.gnu.org/licenses/lgpl-2.1.html>.
 */
 
-#include "dynamicproperty.h"
+#include "propertytemplate.h"
 
 #include <QDomElement>
 #include <QMetaEnum>
@@ -24,135 +24,150 @@ namespace aadl {
 
 const QString kTagName = QLatin1String("Attr");
 
-struct DynamicProperty::DynamicPropertyPrivate {
+struct PropertyTemplate::PropertyTemplatePrivate {
     QString m_name;
-    DynamicProperty::Info m_info;
-    DynamicProperty::Type m_type;
-    DynamicProperty::Scopes m_scope;
+    QString m_label;
+    PropertyTemplate::Info m_info;
+    PropertyTemplate::Type m_type;
+    PropertyTemplate::Scopes m_scope;
     QList<QVariant> m_vals;
     QVariant m_defaultValue;
     QString m_rxValueValidatorPattern;
-    QMap<DynamicProperty::Scope, QPair<QString, QString>> m_rxAttrValidatorPattern;
+    QMap<PropertyTemplate::Scope, QPair<QString, QString>> m_rxAttrValidatorPattern;
     bool m_isVisible = true;
 };
 
-DynamicProperty::DynamicProperty()
-    : d(new DynamicPropertyPrivate)
+PropertyTemplate::PropertyTemplate()
+    : d(new PropertyTemplatePrivate)
 {
 }
 
-DynamicProperty::~DynamicProperty() { }
+PropertyTemplate::~PropertyTemplate() { }
 
-QString DynamicProperty::name() const
+QString PropertyTemplate::name() const
 {
     return d->m_name;
 }
-void DynamicProperty::setName(const QString &name)
+
+void PropertyTemplate::setName(const QString &name)
 {
     d->m_name = name;
 }
 
-DynamicProperty::Info DynamicProperty::info() const
+QString PropertyTemplate::label() const
+{
+    return d->m_label;
+}
+
+void PropertyTemplate::setLabel(const QString &label)
+{
+    d->m_label = label;
+}
+
+PropertyTemplate::Info PropertyTemplate::info() const
 {
     return d->m_info;
 }
 
-void DynamicProperty::setInfo(DynamicProperty::Info info)
+void PropertyTemplate::setInfo(PropertyTemplate::Info info)
 {
     d->m_info = info;
 }
 
-DynamicProperty::Type DynamicProperty::type() const
+PropertyTemplate::Type PropertyTemplate::type() const
 {
     return d->m_type;
 }
 
-void DynamicProperty::setType(DynamicProperty::Type t)
+void PropertyTemplate::setType(PropertyTemplate::Type t)
 {
     d->m_type = t;
 }
 
-DynamicProperty::Scopes DynamicProperty::scope() const
+PropertyTemplate::Scopes PropertyTemplate::scope() const
 {
     return d->m_scope;
 }
 
-void DynamicProperty::setScope(const DynamicProperty::Scopes &s)
+void PropertyTemplate::setScope(const PropertyTemplate::Scopes &s)
 {
     d->m_scope = s;
 }
 
-bool DynamicProperty::isVisible() const
+bool PropertyTemplate::isVisible() const
 {
     return d->m_isVisible;
 }
 
-void DynamicProperty::setVisible(bool value)
+void PropertyTemplate::setVisible(bool value)
 {
     d->m_isVisible = value;
 }
 
-QList<QVariant> DynamicProperty::valuesList() const
+QList<QVariant> PropertyTemplate::valuesList() const
 {
     return d->m_vals;
 }
 
-void DynamicProperty::setValuesList(const QList<QVariant> &range)
+void PropertyTemplate::setValuesList(const QList<QVariant> &range)
 {
     d->m_vals = range;
 }
 
-QVariant DynamicProperty::defaultValue() const
+QVariant PropertyTemplate::defaultValue() const
 {
     return d->m_defaultValue;
 }
 
-void DynamicProperty::setDefaultValue(const QVariant &value)
+void PropertyTemplate::setDefaultValue(const QVariant &value)
 {
     d->m_defaultValue = value;
 }
 
-QString DynamicProperty::valueValidatorPattern() const
+QString PropertyTemplate::valueValidatorPattern() const
 {
     return d->m_rxValueValidatorPattern;
 }
 
-void DynamicProperty::setValueValidatorPattern(const QString &pattern)
+void PropertyTemplate::setValueValidatorPattern(const QString &pattern)
 {
     d->m_rxValueValidatorPattern = pattern;
 }
 
-QMap<DynamicProperty::Scope, QPair<QString, QString>> DynamicProperty::attrValidatorPatterns() const
+QMap<PropertyTemplate::Scope, QPair<QString, QString>> PropertyTemplate::attrValidatorPatterns() const
 {
     return d->m_rxAttrValidatorPattern;
 }
 
-void DynamicProperty::setAttrValidatorPattern(const QMap<Scope, QPair<QString, QString>> &pattern)
+void PropertyTemplate::setAttrValidatorPattern(const QMap<Scope, QPair<QString, QString>> &pattern)
 {
     d->m_rxAttrValidatorPattern = pattern;
 }
 
-QDomElement DynamicProperty::toXml(QDomDocument *doc) const
+QDomElement PropertyTemplate::toXml(QDomDocument *doc) const
 {
     QDomElement attrElement = doc->createElement(kTagName);
     attrElement.setAttribute(QLatin1String("name"), d->m_name);
+    if (!d->m_label.isEmpty()) {
+        attrElement.setAttribute(QLatin1String("label"), d->m_label);
+    }
     if (!d->m_isVisible) {
         attrElement.setAttribute(QLatin1String("visible"), QLatin1String("false"));
     }
 
-    static const QMetaEnum &infoMeta = QMetaEnum::fromType<DynamicProperty::Info>();
-    if (d->m_info == DynamicProperty::Info::Property) {
+    static const QMetaEnum &infoMeta = QMetaEnum::fromType<PropertyTemplate::Info>();
+    if (d->m_info == PropertyTemplate::Info::Property) {
         attrElement.setAttribute(QLatin1String("type"), infoMeta.valueToKey(static_cast<int>(d->m_info)));
     }
 
-    static const QMetaEnum &typeMeta = QMetaEnum::fromType<DynamicProperty::Type>();
+    static const QMetaEnum &typeMeta = QMetaEnum::fromType<PropertyTemplate::Type>();
     QDomElement typeElement = doc->createElement(typeMeta.name());
     const QString typeString = typeMeta.valueToKey(static_cast<int>(d->m_type));
     QDomElement typeSubElement = doc->createElement(typeString);
     if (!d->m_rxValueValidatorPattern.isEmpty()) {
         typeSubElement.setAttribute(QLatin1String("validator"), d->m_rxValueValidatorPattern);
     }
-    if (d->m_type == DynamicProperty::Type::Enumeration) {
+    if (d->m_type == PropertyTemplate::Type::Enumeration) {
         for (auto entry : d->m_vals) {
             QDomElement entryElement = doc->createElement(QLatin1String("Entry"));
             entryElement.setAttribute(QLatin1String("value"), entry.toString());
@@ -163,22 +178,22 @@ QDomElement DynamicProperty::toXml(QDomDocument *doc) const
     attrElement.appendChild(typeElement);
 
 #if (QT_VERSION >= QT_VERSION_CHECK(5, 12, 0))
-    static const QMetaEnum &scopeMeta = QMetaEnum::fromType<DynamicProperty::Scopes>();
+    static const QMetaEnum &scopeMeta = QMetaEnum::fromType<PropertyTemplate::Scopes>();
     static const QString scopesElementTag = scopeMeta.name();
 #else
-    static const QMetaEnum &scopeMeta = QMetaEnum::fromType<DynamicProperty::Scope>();
+    static const QMetaEnum &scopeMeta = QMetaEnum::fromType<PropertyTemplate::Scope>();
     static const QString scopesElementTag = QLatin1String("Scopes");
 #endif
     QDomElement scopeElement = doc->createElement(scopesElementTag);
-    auto scopesToString = [](const DynamicProperty::Scopes s) -> QStringList {
+    auto scopesToString = [](const PropertyTemplate::Scopes s) -> QStringList {
         QStringList result;
         for (int idx = 0; idx < scopeMeta.keyCount(); ++idx) {
-            if (s.testFlag(static_cast<DynamicProperty::Scope>(scopeMeta.value(idx)))) {
+            if (s.testFlag(static_cast<PropertyTemplate::Scope>(scopeMeta.value(idx)))) {
                 result.append(QString::fromLatin1(scopeMeta.key(idx)));
             }
         }
         if (result.isEmpty()) {
-            return { scopeMeta.valueToKeys(static_cast<int>(DynamicProperty::Scope::None)) };
+            return { scopeMeta.valueToKeys(static_cast<int>(PropertyTemplate::Scope::None)) };
         }
         return result;
     };
@@ -197,7 +212,7 @@ QDomElement DynamicProperty::toXml(QDomDocument *doc) const
     return attrElement;
 }
 
-DynamicProperty *DynamicProperty::fromXml(const QDomElement &element)
+PropertyTemplate *PropertyTemplate::fromXml(const QDomElement &element)
 {
     if (element.isNull() || element.tagName() != kTagName || !element.hasAttribute(QLatin1String("name"))
             || !element.hasChildNodes()) {
@@ -206,17 +221,20 @@ DynamicProperty *DynamicProperty::fromXml(const QDomElement &element)
     bool ok;
 
     const QString attrName = element.attribute(QLatin1String("name"));
+    const QString attrLabel = element.attribute(QLatin1String("label"));
+
     const QString attrType = element.attribute(QLatin1String("type"), QLatin1String("Attribute"));
     const bool isVisible =
             QString::compare(element.attribute(QLatin1String("visible")), QLatin1String("false"), Qt::CaseInsensitive)
             != 0;
-    static const QMetaEnum &infoMeta = QMetaEnum::fromType<DynamicProperty::Info>();
+    static const QMetaEnum &infoMeta = QMetaEnum::fromType<PropertyTemplate::Info>();
     const int infoInt = infoMeta.keyToValue(attrType.toUtf8().data(), &ok);
-    const DynamicProperty::Info i = ok ? static_cast<DynamicProperty::Info>(infoInt) : DynamicProperty::Info::Property;
+    const PropertyTemplate::Info i =
+            ok ? static_cast<PropertyTemplate::Info>(infoInt) : PropertyTemplate::Info::Property;
 
-    static const QMetaEnum &typeMeta = QMetaEnum::fromType<DynamicProperty::Type>();
+    static const QMetaEnum &typeMeta = QMetaEnum::fromType<PropertyTemplate::Type>();
     const QDomElement typeElement = element.firstChildElement(typeMeta.name());
-    DynamicProperty::Type t = DynamicProperty::Type::Unknown;
+    PropertyTemplate::Type t = PropertyTemplate::Type::Unknown;
 
     QVariant defaultValue { QVariant::String };
     QList<QVariant> enumVals;
@@ -227,9 +245,9 @@ DynamicProperty *DynamicProperty::fromXml(const QDomElement &element)
             typeValidator = typeSubElement.attribute(QLatin1String("validator"));
             const int typeInt = typeMeta.keyToValue(typeSubElement.tagName().toUtf8().data(), &ok);
             if (ok && typeInt != -1) {
-                t = static_cast<DynamicProperty::Type>(typeInt);
+                t = static_cast<PropertyTemplate::Type>(typeInt);
             }
-            if (t == DynamicProperty::Type::Enumeration) {
+            if (t == PropertyTemplate::Type::Enumeration) {
                 defaultValue = typeSubElement.attribute(QLatin1String("defaultValue"));
                 QDomElement typeEntryElement = typeSubElement.firstChildElement(QLatin1String("Entry"));
                 while (!typeEntryElement.isNull()) {
@@ -244,17 +262,17 @@ DynamicProperty *DynamicProperty::fromXml(const QDomElement &element)
     }
 
 #if (QT_VERSION >= QT_VERSION_CHECK(5, 12, 0))
-    static const QMetaEnum &scopeMeta = QMetaEnum::fromType<DynamicProperty::Scopes>();
+    static const QMetaEnum &scopeMeta = QMetaEnum::fromType<PropertyTemplate::Scopes>();
     static const QString scopesElementTag = scopeMeta.name();
 #else
-    static const QMetaEnum &scopeMeta = QMetaEnum::fromType<DynamicProperty::Scope>();
+    static const QMetaEnum &scopeMeta = QMetaEnum::fromType<PropertyTemplate::Scope>();
     static const QString scopesElementTag = QLatin1String("Scopes");
 #endif
     const QDomElement scopeElement = element.firstChildElement(scopesElementTag);
-    DynamicProperty::Scopes s = DynamicProperty::Scope::None;
-    QMap<DynamicProperty::Scope, QPair<QString, QString>> attrValidators;
+    PropertyTemplate::Scopes s = PropertyTemplate::Scope::None;
+    QMap<PropertyTemplate::Scope, QPair<QString, QString>> attrValidators;
     if (scopeElement.isNull() || !scopeElement.hasChildNodes()) {
-        s = DynamicProperty::Scope::All;
+        s = PropertyTemplate::Scope::All;
     } else {
         QDomElement scopeSubElement = scopeElement.firstChildElement();
         while (!scopeSubElement.isNull()) {
@@ -263,7 +281,7 @@ DynamicProperty *DynamicProperty::fromXml(const QDomElement &element)
             if (!ok || scopeInt == -1) {
                 continue;
             }
-            const DynamicProperty::Scope scope = static_cast<DynamicProperty::Scope>(scopeInt);
+            const PropertyTemplate::Scope scope = static_cast<PropertyTemplate::Scope>(scopeInt);
             s.setFlag(scope);
             QDomElement attrValidatorElement = scopeSubElement.firstChildElement(QLatin1String("AttrValidator"));
             while (!attrValidatorElement.isNull()) {
@@ -278,29 +296,30 @@ DynamicProperty *DynamicProperty::fromXml(const QDomElement &element)
         }
     }
 
-    auto dynamicProperty = new DynamicProperty;
-    dynamicProperty->setName(attrName);
-    dynamicProperty->setInfo(i);
-    dynamicProperty->setType(t);
-    dynamicProperty->setScope(s);
-    dynamicProperty->setValuesList(enumVals);
-    dynamicProperty->setDefaultValue(defaultValue);
-    dynamicProperty->setAttrValidatorPattern(attrValidators);
-    dynamicProperty->setValueValidatorPattern(typeValidator);
-    dynamicProperty->setVisible(isVisible);
-    return dynamicProperty;
+    auto propertyTemplate = new PropertyTemplate;
+    propertyTemplate->setName(attrName);
+    propertyTemplate->setLabel(attrLabel);
+    propertyTemplate->setInfo(i);
+    propertyTemplate->setType(t);
+    propertyTemplate->setScope(s);
+    propertyTemplate->setValuesList(enumVals);
+    propertyTemplate->setDefaultValue(defaultValue);
+    propertyTemplate->setAttrValidatorPattern(attrValidators);
+    propertyTemplate->setValueValidatorPattern(typeValidator);
+    propertyTemplate->setVisible(isVisible);
+    return propertyTemplate;
 }
 
-QString DynamicProperty::tagName()
+QString PropertyTemplate::tagName()
 {
     return kTagName;
 }
 
-QVariant DynamicProperty::convertData(const QVariant &value, DynamicProperty::Type type)
+QVariant PropertyTemplate::convertData(const QVariant &value, PropertyTemplate::Type type)
 {
     QVariant typedValue;
     switch (type) {
-    case DynamicProperty::Type::Boolean: {
+    case PropertyTemplate::Type::Boolean: {
         const bool falseValue = QString::compare(value.toString(), QLatin1String("false"), Qt::CaseInsensitive) == 0;
         const bool trueValue = QString::compare(value.toString(), QLatin1String("true"), Qt::CaseInsensitive) == 0;
         if (falseValue) {
@@ -311,25 +330,25 @@ QVariant DynamicProperty::convertData(const QVariant &value, DynamicProperty::Ty
             return QVariant(QVariant::Bool);
         }
     } break;
-    case DynamicProperty::Type::Integer: {
+    case PropertyTemplate::Type::Integer: {
         bool ok;
         typedValue = value.toString().toInt(&ok);
         if (!ok)
             return QVariant(QVariant::Int);
     } break;
-    case DynamicProperty::Type::Real: {
+    case PropertyTemplate::Type::Real: {
         bool ok;
         typedValue = value.toString().toDouble(&ok);
         if (!ok)
             return QVariant(QVariant::Double);
     } break;
-    case DynamicProperty::Type::String: {
+    case PropertyTemplate::Type::String: {
         if (value.isValid())
             typedValue = value.toString();
         else
             typedValue = QVariant(QVariant::String);
     } break;
-    case DynamicProperty::Type::Enumeration: {
+    case PropertyTemplate::Type::Enumeration: {
         if (value.isValid()) {
             QStringList typedList;
             for (const auto &dataItem : value.toList()) {

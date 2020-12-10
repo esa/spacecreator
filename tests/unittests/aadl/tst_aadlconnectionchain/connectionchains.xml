@@ -2,39 +2,39 @@
 <InterfaceView>
     <Function name="BlockA" language="" is_type="NO" instance_of="">
         <Property name="Taste::coordinates" value="13300 14000 56700 54400"/>
-        <Required_Interface name="RI_1" kind="SPORADIC_OPERATION" period="" wcet="" queue_size="">
+        <Required_Interface name="RI_1" kind="Sporadic" period="" wcet="" queue_size="">
             <Property name="Taste::coordinates" value="56700 22300"/>
             <Property name="Taste::InheritPI" value="true"/>
         </Required_Interface>
-        <Required_Interface name="RI_2" kind="SPORADIC_OPERATION" period="" wcet="" queue_size="">
+        <Required_Interface name="RI_2" kind="Sporadic" period="" wcet="" queue_size="">
             <Property name="Taste::coordinates" value="56700 27200"/>
             <Property name="Taste::InheritPI" value="true"/>
         </Required_Interface>
-        <Required_Interface name="RI_3" kind="SPORADIC_OPERATION" period="" wcet="" queue_size="">
+        <Required_Interface name="RI_3" kind="Sporadic" period="" wcet="" queue_size="">
             <Property name="Taste::coordinates" value="56700 41000"/>
             <Property name="Taste::InheritPI" value="true"/>
         </Required_Interface>
-        <Required_Interface name="RI_4" kind="SPORADIC_OPERATION" period="" wcet="" queue_size="">
+        <Required_Interface name="RI_4" kind="Sporadic" period="" wcet="" queue_size="">
             <Property name="Taste::coordinates" value="56700 31200"/>
             <Property name="Taste::InheritPI" value="true"/>
         </Required_Interface>
-        <Required_Interface name="RI_5" kind="SPORADIC_OPERATION" period="" wcet="" queue_size="">
+        <Required_Interface name="RI_5" kind="Sporadic" period="" wcet="" queue_size="">
             <Property name="Taste::coordinates" value="56700 47100"/>
             <Property name="Taste::InheritPI" value="true"/>
         </Required_Interface>
         <Function name="MiniA" language="" is_type="NO" instance_of="">
             <Property name="Taste::coordinates" value="21800 17700 41800 33000"/>
-            <Required_Interface name="RI_1" kind="ANY_OPERATION">
+            <Required_Interface name="RI_1" kind="Any">
                 <Property name="Taste::coordinates" value="41800 22300"/>
                 <Property name="Taste::InheritPI" value="true"/>
                 <Property name="Taste::Autonamed" value="true"/>
             </Required_Interface>
-            <Required_Interface name="RI_2" kind="ANY_OPERATION">
+            <Required_Interface name="RI_2" kind="Any">
                 <Property name="Taste::coordinates" value="41800 27300"/>
                 <Property name="Taste::InheritPI" value="true"/>
                 <Property name="Taste::Autonamed" value="true"/>
             </Required_Interface>
-            <Required_Interface name="RI_3" kind="ANY_OPERATION">
+            <Required_Interface name="RI_3" kind="Any">
                 <Property name="Taste::coordinates" value="41800 31300"/>
                 <Property name="Taste::InheritPI" value="true"/>
                 <Property name="Taste::Autonamed" value="true"/>
@@ -58,33 +58,33 @@
     </Function>
     <Function name="BlockB" language="" is_type="NO" instance_of="">
         <Property name="Taste::coordinates" value="69800 14600 116400 53900"/>
-        <Provided_Interface name="PI_1" kind="SPORADIC_OPERATION" period="" wcet="" queue_size="">
+        <Provided_Interface name="PI_1" kind="Sporadic" period="" wcet="" queue_size="">
             <Property name="Taste::coordinates" value="69800 22100"/>
         </Provided_Interface>
-        <Provided_Interface name="PI_2" kind="SPORADIC_OPERATION" period="" wcet="" queue_size="">
+        <Provided_Interface name="PI_2" kind="Sporadic" period="" wcet="" queue_size="">
             <Property name="Taste::coordinates" value="69800 27000"/>
         </Provided_Interface>
-        <Provided_Interface name="PI_3" kind="SPORADIC_OPERATION" period="" wcet="" queue_size="">
+        <Provided_Interface name="PI_3" kind="Sporadic" period="" wcet="" queue_size="">
             <Property name="Taste::coordinates" value="69800 40800"/>
         </Provided_Interface>
-        <Provided_Interface name="PI_4" kind="SPORADIC_OPERATION" period="" wcet="" queue_size="">
+        <Provided_Interface name="PI_4" kind="Sporadic" period="" wcet="" queue_size="">
             <Property name="Taste::coordinates" value="69800 31000"/>
         </Provided_Interface>
         <Function name="MiniB" language="" is_type="NO" instance_of="">
             <Property name="Taste::coordinates" value="82600 19500 109600 33300"/>
             <Property name="Taste::RootCoordinates" value="3100 3100 126700 81400"/>
-            <Provided_Interface name="PI_1" kind="SPORADIC_OPERATION" period="" wcet="" queue_size="">
+            <Provided_Interface name="PI_1" kind="Sporadic" period="" wcet="" queue_size="">
                 <Property name="Taste::coordinates" value="82600 22100"/>
                 <Property name="Taste::InnerCoordinates" value="3100 10100"/>
             </Provided_Interface>
-            <Provided_Interface name="PI_2" kind="SPORADIC_OPERATION" period="" wcet="" queue_size="">
+            <Provided_Interface name="PI_2" kind="Sporadic" period="" wcet="" queue_size="">
                 <Property name="Taste::coordinates" value="82600 31100"/>
                 <Property name="Taste::InnerCoordinates" value="3100 28200"/>
             </Provided_Interface>
             <Function name="MacroB" language="" is_type="NO" instance_of="">
                 <Property name="Taste::coordinates" value="98300 22600 118300 30600"/>
                 <Property name="Taste::InnerCoordinates" value="30200 15900 62100 38200"/>
-                <Provided_Interface name="PI_2" kind="SPORADIC_OPERATION" period="" wcet="" queue_size="">
+                <Provided_Interface name="PI_2" kind="Sporadic" period="" wcet="" queue_size="">
                     <Property name="Taste::InnerCoordinates" value="30200 27700"/>
                 </Provided_Interface>
             </Function>

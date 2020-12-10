@@ -92,7 +92,7 @@ public:
         void resetKind();
     };
 
-    static QMap<AADLObjectIface::OperationKind, QString> xmlKindNames();
+    QMap<AADLObjectIface::OperationKind, QString> availableKindNames() const;
     static QString kindToString(AADLObjectIface::OperationKind k);
     static AADLObjectIface::OperationKind kindFromString(const QString &k, AADLObjectIface::OperationKind defaultKind);
     AADLObjectIface::OperationKind kindFromString(const QString &k) const;

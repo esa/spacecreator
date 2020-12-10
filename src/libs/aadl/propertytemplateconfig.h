@@ -22,29 +22,29 @@
 
 namespace aadl {
 class AADLObject;
-class DynamicProperty;
+class PropertyTemplate;
 
-class DynamicPropertyConfig
+class PropertyTemplateConfig
 {
 public:
-    DynamicPropertyConfig();
-    ~DynamicPropertyConfig();
+    PropertyTemplateConfig();
+    ~PropertyTemplateConfig();
 
     void init(const QString &configPath);
 
-    QHash<QString, DynamicProperty *> attributesForObject(const aadl::AADLObject *obj);
-    QList<DynamicProperty *> attributesForFunction();
-    QList<DynamicProperty *> attributesForRequiredInterface();
-    QList<DynamicProperty *> attributesForProvidedInterface();
+    QHash<QString, PropertyTemplate *> propertyTemplatesForObject(const aadl::AADLObject *obj);
+    QList<PropertyTemplate *> attributesForFunction();
+    QList<PropertyTemplate *> attributesForRequiredInterface();
+    QList<PropertyTemplate *> attributesForProvidedInterface();
 
     QString configPath() const;
 
-    static QList<DynamicProperty *> parseAttributesList(
+    static QList<PropertyTemplate *> parseAttributesList(
             const QString &fromData, QString *errorMsg = nullptr, int *errorLine = nullptr, int *errorColumn = nullptr);
 
 private:
-    struct DynamicPropertyConfigPrivate;
-    std::unique_ptr<DynamicPropertyConfigPrivate> d;
+    struct PropertyTemplateConfigPrivate;
+    std::unique_ptr<PropertyTemplateConfigPrivate> d;
 };
 
 } // namespace aadl

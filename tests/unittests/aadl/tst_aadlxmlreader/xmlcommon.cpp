@@ -158,7 +158,7 @@ XmlFileMock XmlFileMock::createSingleComment()
 XmlFileMock XmlFileMock::createSingleIfaceInvalid()
 {
     XmlFileMock file(QStringLiteral("<InterfaceView>\n \
-                                    <Required_Interface name=\"GlobalFnType_PI\" kind=\"SPORADIC_OPERATION\" period=\"\" wcet=\"\" queue_size=\"\">\n \
+                                    <Required_Interface name=\"GlobalFnType_PI\" kind=\"Sporadic\" period=\"\" wcet=\"\" queue_size=\"\">\n \
                                         <Property name=\"Taste::coordinates\" value=\"35000 25400\"/>\n \
                                         <Property name=\"Taste::InheritPI\" value=\"true\"/>\n \
                                     </Required_Interface>\n \
@@ -173,7 +173,7 @@ XmlFileMock XmlFileMock::createSingleIfaceValid()
     XmlFileMock file(QStringLiteral("<InterfaceView>\n \
                                     <Function name=\"Global_Fn3\" language=\"\" is_type=\"NO\" instance_of=\"\">\n \
                                         <Property name=\"Taste::coordinates\" value=\"-5200 25400 59900 38700\"/>\n \
-                                        <Required_Interface name=\"GlobalFnType_PI\" kind=\"SPORADIC_OPERATION\" period=\"\" wcet=\"\" queue_size=\"\">\n \
+                                        <Required_Interface name=\"GlobalFnType_PI\" kind=\"Sporadic\" period=\"\" wcet=\"\" queue_size=\"\">\n \
                                             <Property name=\"Taste::coordinates\" value=\"35000 25400\"/>\n \
                                             <Property name=\"Taste::InheritPI\" value=\"true\"/>\n \
                                         </Required_Interface>\n \
@@ -259,14 +259,14 @@ XmlFileMock XmlFileMock::createSingleConnectionValid()
     XmlFileMock file(QStringLiteral("<InterfaceView>\n \
                                     <Function name=\"Function_1\" language=\"\" is_type=\"NO\" instance_of=\"\">\n \
                                         <Property name=\"Taste::coordinates\" value=\"-62300 -36600 -42300 -28600\"/>\n \
-                                        <Required_Interface name=\"RI_2\" kind=\"SPORADIC_OPERATION\" period=\"\" wcet=\"\" queue_size=\"\">\n \
+                                        <Required_Interface name=\"RI_2\" kind=\"Sporadic\" period=\"\" wcet=\"\" queue_size=\"\">\n \
                                             <Property name=\"Taste::coordinates\" value=\"-42300 -33000\"/>\n \
                                             <Property name=\"Taste::InheritPI\" value=\"true\"/>\n \
                                         </Required_Interface>\n \
                                     </Function>\n \
                                     <Function name=\"Function_2\" language=\"\" is_type=\"NO\" instance_of=\"\">\n \
                                         <Property name=\"Taste::coordinates\" value=\"-30600 -36600 -10600 -28600\"/>\n \
-                                        <Provided_Interface name=\"PI_2\" kind=\"SPORADIC_OPERATION\" period=\"\" wcet=\"\" queue_size=\"\">\n \
+                                        <Provided_Interface name=\"PI_2\" kind=\"Sporadic\" period=\"\" wcet=\"\" queue_size=\"\">\n \
                                             <Property name=\"Taste::coordinates\" value=\"-30600 -33000\"/>\n \
                                         </Provided_Interface>\n \
                                     </Function>\n \
@@ -304,14 +304,14 @@ XmlFileMock XmlFileMock::createSingleConnectionValidMultipoint()
     XmlFileMock file(QStringLiteral("<InterfaceView>\n \
                                     <Function name=\"Function_1\" language=\"\" is_type=\"NO\" instance_of=\"\">\n \
                                         <Property name=\"Taste::coordinates\" value=\"-62300 -36600 -42300 -28600\"/>\n \
-                                        <Required_Interface name=\"RI_2\" kind=\"SPORADIC_OPERATION\" period=\"\" wcet=\"\" queue_size=\"\">\n \
+                                        <Required_Interface name=\"RI_2\" kind=\"Sporadic\" period=\"\" wcet=\"\" queue_size=\"\">\n \
                                             <Property name=\"Taste::coordinates\" value=\"-42300 -33000\"/>\n \
                                             <Property name=\"Taste::InheritPI\" value=\"true\"/>\n \
                                         </Required_Interface>\n \
                                     </Function>\n \
                                     <Function name=\"Function_2\" language=\"\" is_type=\"NO\" instance_of=\"\">\n \
                                         <Property name=\"Taste::coordinates\" value=\"-30600 -36600 -10600 -28600\"/>\n \
-                                        <Provided_Interface name=\"PI_2\" kind=\"SPORADIC_OPERATION\" period=\"\" wcet=\"\" queue_size=\"\">\n \
+                                        <Provided_Interface name=\"PI_2\" kind=\"Sporadic\" period=\"\" wcet=\"\" queue_size=\"\">\n \
                                             <Property name=\"Taste::coordinates\" value=\"-30600 -33000\"/>\n \
                                         </Provided_Interface>\n \
                                     </Function>\n \

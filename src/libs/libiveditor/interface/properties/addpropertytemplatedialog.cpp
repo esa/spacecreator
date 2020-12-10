@@ -15,11 +15,12 @@
   along with this program. If not, see <https://www.gnu.org/licenses/lgpl-2.1.html>.
 */
 
-#include "adddynamicpropertydialog.h"
+#include "addpropertytemplatedialog.h"
+
 #include "baseitems/common/aadlutils.h"
 #include "common.h"
-#include "dynamicproperty.h"
-#include "ui_adddynamicpropertydialog.h"
+#include "propertytemplate.h"
+#include "ui_addpropertytemplatedialog.h"
 
 #include <QComboBox>
 #include <QDebug>
@@ -29,9 +30,9 @@
 
 namespace aadlinterface {
 
-AddDynamicPropertyDialog::AddDynamicPropertyDialog(const QStringList &prohibitedNames, QWidget *parent)
+AddPropertyTemplateDialog::AddPropertyTemplateDialog(const QStringList &prohibitedNames, QWidget *parent)
     : QDialog(parent)
-    , ui(new Ui::AddDynamicPropertyDialog)
+    , ui(new Ui::AddPropertyTemplateDialog)
     , m_prohibitedNames(prohibitedNames)
 {
     ui->setupUi(this);
@@ -42,11 +43,11 @@ AddDynamicPropertyDialog::AddDynamicPropertyDialog(const QStringList &prohibited
 
     m_nameColorDefault = ui->leName->palette().color(QPalette::Text);
 
-    ui->comboTypes->addItem(tr("Integer"), QVariant::fromValue(aadl::DynamicProperty::Type::Integer));
-    ui->comboTypes->addItem(tr("Real"), QVariant::fromValue(aadl::DynamicProperty::Type::Real));
-    ui->comboTypes->addItem(tr("Boolean"), QVariant::fromValue(aadl::DynamicProperty::Type::Boolean));
-    ui->comboTypes->addItem(tr("String"), QVariant::fromValue(aadl::DynamicProperty::Type::String));
-    ui->comboTypes->addItem(tr("Enumeration"), QVariant::fromValue(aadl::DynamicProperty::Type::Enumeration));
+    ui->comboTypes->addItem(tr("Integer"), QVariant::fromValue(aadl::PropertyTemplate::Type::Integer));
+    ui->comboTypes->addItem(tr("Real"), QVariant::fromValue(aadl::PropertyTemplate::Type::Real));
+    ui->comboTypes->addItem(tr("Boolean"), QVariant::fromValue(aadl::PropertyTemplate::Type::Boolean));
+    ui->comboTypes->addItem(tr("String"), QVariant::fromValue(aadl::PropertyTemplate::Type::String));
+    ui->comboTypes->addItem(tr("Enumeration"), QVariant::fromValue(aadl::PropertyTemplate::Type::Enumeration));
 
     ui->teValues->setVisible(false);
 
@@ -54,12 +55,12 @@ AddDynamicPropertyDialog::AddDynamicPropertyDialog(const QStringList &prohibited
     connect(ui->comboTypes, QOverload<int>::of(&QComboBox::activated), [this]() { validateType(); });
 }
 
-AddDynamicPropertyDialog::~AddDynamicPropertyDialog()
+AddPropertyTemplateDialog::~AddPropertyTemplateDialog()
 {
     delete ui;
 }
 
-bool AddDynamicPropertyDialog::validateName(const bool showWarn)
+bool AddPropertyTemplateDialog::validateName(const bool showWarn)
 {
     QString warn;
     const QString &name = ui->leName->text().trimmed();
@@ -78,26 +79,26 @@ bool AddDynamicPropertyDialog::validateName(const bool showWarn)
     return valid;
 }
 
-bool AddDynamicPropertyDialog::validateType()
+bool AddPropertyTemplateDialog::validateType()
 {
-    aadl::DynamicProperty::Type t = static_cast<aadl::DynamicProperty::Type>(ui->comboTypes->currentData().toInt());
-    const bool isEnum(t == aadl::DynamicProperty::Type::Enumeration);
+    aadl::PropertyTemplate::Type t = static_cast<aadl::PropertyTemplate::Type>(ui->comboTypes->currentData().toInt());
+    const bool isEnum(t == aadl::PropertyTemplate::Type::Enumeration);
     ui->teValues->setVisible(isEnum);
 
     return true;
 }
 
-QStringList AddDynamicPropertyDialog::listValues() const
+QStringList AddPropertyTemplateDialog::listValues() const
 {
     const QString &values = ui->teValues->toPlainText().trimmed();
     return values.split(",", QString::SkipEmptyParts);
 }
 
-bool AddDynamicPropertyDialog::validateValuesList()
+bool AddPropertyTemplateDialog::validateValuesList()
 {
     QString warn;
-    aadl::DynamicProperty::Type t = static_cast<aadl::DynamicProperty::Type>(ui->comboTypes->currentData().toInt());
-    if (t == aadl::DynamicProperty::Type::Enumeration && listValues().isEmpty())
+    aadl::PropertyTemplate::Type t = static_cast<aadl::PropertyTemplate::Type>(ui->comboTypes->currentData().toInt());
+    if (t == aadl::PropertyTemplate::Type::Enumeration && listValues().isEmpty())
         warn = tr("Please specify at least one Enum value.");
 
     const bool ok(warn.isEmpty());
@@ -108,7 +109,7 @@ bool AddDynamicPropertyDialog::validateValuesList()
     return ok;
 }
 
-bool AddDynamicPropertyDialog::validateScope()
+bool AddPropertyTemplateDialog::validateScope()
 {
     const bool ok(ui->cbFunction->isChecked() || ui->cbReqIface->isChecked() || ui->cbProvIface->isChecked());
 
@@ -118,7 +119,7 @@ bool AddDynamicPropertyDialog::validateScope()
     return ok;
 }
 
-void AddDynamicPropertyDialog::accept()
+void AddPropertyTemplateDialog::accept()
 {
     if (!validateName(true))
         return;
@@ -133,30 +134,30 @@ void AddDynamicPropertyDialog::accept()
         return;
 
     const QString &name = ui->leName->text().trimmed();
-    const aadl::DynamicProperty::Type t =
-            static_cast<aadl::DynamicProperty::Type>(ui->comboTypes->currentData().toInt());
-    aadl::DynamicProperty::Scopes s;
+    const aadl::PropertyTemplate::Type t =
+            static_cast<aadl::PropertyTemplate::Type>(ui->comboTypes->currentData().toInt());
+    aadl::PropertyTemplate::Scopes s;
     if (ui->cbFunction->isChecked())
-        s |= aadl::DynamicProperty::Scope::Function;
+        s |= aadl::PropertyTemplate::Scope::Function;
     if (ui->cbReqIface->isChecked())
-        s |= aadl::DynamicProperty::Scope::Required_Interface;
+        s |= aadl::PropertyTemplate::Scope::Required_Interface;
     if (ui->cbProvIface->isChecked())
-        s |= aadl::DynamicProperty::Scope::Provided_Interface;
+        s |= aadl::PropertyTemplate::Scope::Provided_Interface;
     if (ui->cbComment->isChecked())
-        s |= aadl::DynamicProperty::Scope::Comment;
+        s |= aadl::PropertyTemplate::Scope::Comment;
     if (ui->cbConnection->isChecked())
-        s |= aadl::DynamicProperty::Scope::Connection;
+        s |= aadl::PropertyTemplate::Scope::Connection;
 
     QList<QVariant> list;
-    if (t == aadl::DynamicProperty::Type::Enumeration)
+    if (t == aadl::PropertyTemplate::Type::Enumeration)
         for (const QString &str : listValues())
             list.append(str.trimmed());
 
     const QString &pattern = ui->leValidationPattern->text().trimmed();
 
-    const aadl::DynamicProperty::Info i = ui->rbAttribute->isChecked() ? aadl::DynamicProperty::Info::Attribute
-                                                                       : aadl::DynamicProperty::Info::Property;
-    m_attr = new aadl::DynamicProperty;
+    const aadl::PropertyTemplate::Info i = ui->rbAttribute->isChecked() ? aadl::PropertyTemplate::Info::Attribute
+                                                                        : aadl::PropertyTemplate::Info::Property;
+    m_attr = new aadl::PropertyTemplate;
     m_attr->setName(name);
     m_attr->setInfo(i);
     m_attr->setType(t);
@@ -166,7 +167,7 @@ void AddDynamicPropertyDialog::accept()
     QDialog::accept();
 }
 
-aadl::DynamicProperty *AddDynamicPropertyDialog::attribute() const
+aadl::PropertyTemplate *AddPropertyTemplateDialog::attribute() const
 {
     return m_attr;
 }

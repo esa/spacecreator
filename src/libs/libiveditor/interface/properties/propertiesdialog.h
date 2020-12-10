@@ -33,7 +33,7 @@ class File;
 
 namespace aadl {
 class AADLObject;
-class DynamicPropertyConfig;
+class PropertyTemplateConfig;
 }
 
 namespace aadlinterface {
@@ -43,7 +43,7 @@ class PropertiesDialog : public QDialog
     Q_OBJECT
 
 public:
-    explicit PropertiesDialog(aadl::DynamicPropertyConfig *dynPropConfig, aadl::AADLObject *obj,
+    explicit PropertiesDialog(aadl::PropertyTemplateConfig *dynPropConfig, aadl::AADLObject *obj,
             const QSharedPointer<Asn1Acn::File> &dataTypes, QWidget *parent = nullptr);
     ~PropertiesDialog() override;
 
@@ -63,7 +63,7 @@ private:
 private:
     Ui::PropertiesDialog *ui;
     aadl::AADLObject *m_dataObject { nullptr };
-    aadl::DynamicPropertyConfig *m_dynPropConfig { nullptr };
+    aadl::PropertyTemplateConfig *m_dynPropConfig { nullptr };
     cmd::CommandsStack::Macro *m_cmdMacro { nullptr };
     QSharedPointer<Asn1Acn::File> m_dataTypes;
 };

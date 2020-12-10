@@ -30,14 +30,14 @@ class AADLObjectComment;
 class AADLObjectConnection;
 class AADLObjectFunction;
 class AADLObjectFunctionType;
-class DynamicPropertyConfig;
+class PropertyTemplateConfig;
 
 struct AADLObjectsModelPrivate;
 class AADLObjectsModel : public QObject
 {
     Q_OBJECT
 public:
-    explicit AADLObjectsModel(DynamicPropertyConfig *dynPropConfig, QObject *parent = nullptr);
+    explicit AADLObjectsModel(PropertyTemplateConfig *dynPropConfig, QObject *parent = nullptr);
     ~AADLObjectsModel() override;
 
     void setSharedTypesModel(AADLObjectsModel *sharedTypesModel);

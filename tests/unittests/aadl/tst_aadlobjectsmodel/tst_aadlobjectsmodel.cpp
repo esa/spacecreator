@@ -22,7 +22,7 @@
 #include "aadlobjectiface.h"
 #include "aadlobjectsmodel.h"
 #include "aadltestutils.h"
-#include "dynamicpropertyconfig.h"
+#include "propertytemplateconfig.h"
 
 #include <QScopedPointer>
 #include <QtTest>
@@ -40,13 +40,13 @@ private Q_SLOTS:
     void testConnectionQuery();
 
 private:
-    QScopedPointer<aadl::DynamicPropertyConfig> m_dynPropConfig;
+    QScopedPointer<aadl::PropertyTemplateConfig> m_dynPropConfig;
     QScopedPointer<aadl::AADLObjectsModel> m_model;
 };
 
 void tst_AADLObjectsModel::init()
 {
-    m_dynPropConfig.reset(new aadl::DynamicPropertyConfig);
+    m_dynPropConfig.reset(new aadl::PropertyTemplateConfig);
     m_dynPropConfig->init(QLatin1String("default_attributes.xml"));
     m_model.reset(new aadl::AADLObjectsModel(m_dynPropConfig.data()));
 }

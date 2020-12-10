@@ -37,10 +37,10 @@ target_sources(${LIB_NAME} PRIVATE
     aadlxmlreader.h
     connectioncreationvalidator.cpp
     connectioncreationvalidator.h
-    dynamicproperty.cpp
-    dynamicproperty.h
-    dynamicpropertyconfig.cpp
-    dynamicpropertyconfig.h
+    propertytemplate.cpp
+    propertytemplate.h
+    propertytemplateconfig.cpp
+    propertytemplateconfig.h
 )
 
 target_include_directories(${LIB_NAME} PUBLIC .)

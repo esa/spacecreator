@@ -105,9 +105,10 @@ struct AADLObjectIfacePrivate {
 
 AADLObjectIface::AADLObjectIface(AADLObject::Type ifaceType, const CreationInfo &ci)
     : AADLObject(ifaceType, ci.name, ci.function, ci.toBeCloned ? shared::createId() : ci.id)
-    , d(new AADLObjectIfacePrivate(Type::InterfaceGroup == ifaceType ? ci.type
-                      : Type::RequiredInterface == ifaceType         ? AADLObjectIface::IfaceType::Required
-                                                                     : AADLObjectIface::IfaceType::Provided))
+    , d(new AADLObjectIfacePrivate(Type::InterfaceGroup == ifaceType
+                      ? ci.type
+                      : Type::RequiredInterface == ifaceType ? AADLObjectIface::IfaceType::Required
+                                                             : AADLObjectIface::IfaceType::Provided))
 {
     setupInitialAttrs();
 
@@ -150,14 +151,17 @@ bool AADLObjectIface::isRequired() const
     return direction() == IfaceType::Required;
 }
 
-QMap<AADLObjectIface::OperationKind, QString> AADLObjectIface::xmlKindNames()
+QMap<AADLObjectIface::OperationKind, QString> AADLObjectIface::availableKindNames() const
 {
-    static QMap<AADLObjectIface::OperationKind, QString> result;
+    QMap<AADLObjectIface::OperationKind, QString> result;
     if (result.isEmpty()) {
         const QMetaEnum &me = QMetaEnum::fromType<aadl::AADLObjectIface::OperationKind>();
         for (int i = 0; i < me.keyCount(); ++i) {
             const AADLObjectIface::OperationKind k = static_cast<AADLObjectIface::OperationKind>(me.value(i));
-            result.insert(k, QString(me.key(i)).toUpper() + QLatin1String("_OPERATION"));
+            if ((isProvided() && k == OperationKind::Any) || (isRequired() && k == OperationKind::Cyclic)) {
+                continue;
+            }
+            result.insert(k, QString(me.key(i)));
         }
     }
     return result;
@@ -165,17 +169,17 @@ QMap<AADLObjectIface::OperationKind, QString> AADLObjectIface::xmlKindNames()
 
 QString AADLObjectIface::kindToString(AADLObjectIface::OperationKind k)
 {
-    static const QMap<AADLObjectIface::OperationKind, QString> &kindNamesXml = xmlKindNames();
-    return kindNamesXml.contains(k) ? kindNamesXml.value(k) : QString();
+    const QMetaEnum &me = QMetaEnum::fromType<aadl::AADLObjectIface::OperationKind>();
+    return QString::fromLatin1(me.valueToKey(static_cast<int>(k)));
 }
 
 AADLObjectIface::OperationKind AADLObjectIface::kindFromString(
         const QString &k, AADLObjectIface::OperationKind defaultKind)
 {
-    static const QMap<AADLObjectIface::OperationKind, QString> &kindNamesXml = AADLObjectIface::xmlKindNames();
-    static const QStringList &names = kindNamesXml.values();
-
-    return names.contains(k) ? kindNamesXml.key(k) : defaultKind;
+    const QMetaEnum &me = QMetaEnum::fromType<aadl::AADLObjectIface::OperationKind>();
+    bool ok = false;
+    const auto kind = static_cast<AADLObjectIface::OperationKind>(me.keyToValue(k.toLatin1().data(), &ok));
+    return ok ? kind : defaultKind;
 }
 
 AADLObjectIface::OperationKind AADLObjectIface::defaultKind() const

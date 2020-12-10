@@ -15,11 +15,11 @@
   along with this program. If not, see <https://www.gnu.org/licenses/lgpl-2.1.html>.
 */
 
-#include "dynamicpropertyconfig.h"
+#include "propertytemplateconfig.h"
 
 #include "aadlobject.h"
 #include "common.h"
-#include "dynamicproperty.h"
+#include "propertytemplate.h"
 
 #include <QDebug>
 #include <QDir>
@@ -39,7 +39,7 @@ namespace aadl {
    Adds all attributes from \p attrs that are not already in \a storage to that data
  */
 void collectUniqeAttributes(
-        const QHash<QString, DynamicProperty *> &attrs, QHash<DynamicProperty *, DynamicProperty *> &storage)
+        const QHash<QString, PropertyTemplate *> &attrs, QHash<PropertyTemplate *, PropertyTemplate *> &storage)
 {
     for (auto attr : attrs) {
         if (!storage.contains(attr)) {
@@ -48,10 +48,10 @@ void collectUniqeAttributes(
     }
 };
 
-struct DynamicPropertyConfig::DynamicPropertyConfigPrivate {
-    void init(const QList<DynamicProperty *> &attrs)
+struct PropertyTemplateConfig::PropertyTemplateConfigPrivate {
+    void init(const QList<PropertyTemplate *> &attrs)
     {
-        QHash<DynamicProperty *, DynamicProperty *> uniqeAttrs;
+        QHash<PropertyTemplate *, PropertyTemplate *> uniqeAttrs;
         collectUniqeAttributes(m_function, uniqeAttrs);
         collectUniqeAttributes(m_reqIface, uniqeAttrs);
         collectUniqeAttributes(m_provIface, uniqeAttrs);
@@ -61,33 +61,33 @@ struct DynamicPropertyConfig::DynamicPropertyConfigPrivate {
         m_reqIface.clear();
         m_provIface.clear();
 
-        for (DynamicProperty *attr : attrs) {
-            if (attr->scope() == DynamicProperty::Scopes(DynamicProperty::Scope::None))
+        for (PropertyTemplate *attr : attrs) {
+            if (attr->scope() == PropertyTemplate::Scopes(PropertyTemplate::Scope::None))
                 continue;
 
-            if (attr->scope().testFlag(DynamicProperty::Scope::Function))
+            if (attr->scope().testFlag(PropertyTemplate::Scope::Function))
                 m_function.insert(attr->name(), attr);
 
-            if (attr->scope().testFlag(DynamicProperty::Scope::Required_Interface))
+            if (attr->scope().testFlag(PropertyTemplate::Scope::Required_Interface))
                 m_reqIface.insert(attr->name(), attr);
 
-            if (attr->scope().testFlag(DynamicProperty::Scope::Provided_Interface))
+            if (attr->scope().testFlag(PropertyTemplate::Scope::Provided_Interface))
                 m_provIface.insert(attr->name(), attr);
         }
     }
 
     QString m_configPath;
-    QHash<QString, DynamicProperty *> m_function;
-    QHash<QString, DynamicProperty *> m_reqIface;
-    QHash<QString, DynamicProperty *> m_provIface;
+    QHash<QString, PropertyTemplate *> m_function;
+    QHash<QString, PropertyTemplate *> m_reqIface;
+    QHash<QString, PropertyTemplate *> m_provIface;
 };
 
-DynamicPropertyConfig::DynamicPropertyConfig()
-    : d(new DynamicPropertyConfigPrivate())
+PropertyTemplateConfig::PropertyTemplateConfig()
+    : d(new PropertyTemplateConfigPrivate())
 {
 }
 
-DynamicPropertyConfig::~DynamicPropertyConfig() { }
+PropertyTemplateConfig::~PropertyTemplateConfig() { }
 
 QString resourceConfigPath()
 {
@@ -104,7 +104,7 @@ static bool ensureFileExists(const QString &filePath)
     return true;
 }
 
-void DynamicPropertyConfig::init(const QString &configPath)
+void PropertyTemplateConfig::init(const QString &configPath)
 {
     if (ensureFileExists(configPath)) {
         d->m_configPath = configPath;
@@ -121,50 +121,50 @@ void DynamicPropertyConfig::init(const QString &configPath)
     }
 }
 
-QList<DynamicProperty *> DynamicPropertyConfig::parseAttributesList(
+QList<PropertyTemplate *> PropertyTemplateConfig::parseAttributesList(
         const QString &fromData, QString *errorMsg, int *errorLine, int *errorColumn)
 {
-    QList<DynamicProperty *> attrs;
+    QList<PropertyTemplate *> attrs;
     QDomDocument doc;
     if (doc.setContent(fromData, false, errorMsg, errorLine, errorColumn)) {
         const QDomElement docElem = doc.documentElement();
         if (docElem.isNull())
             return {};
 
-        QDomElement attributeElement = docElem.firstChildElement(DynamicProperty::tagName());
+        QDomElement attributeElement = docElem.firstChildElement(PropertyTemplate::tagName());
         while (!attributeElement.isNull()) {
-            if (auto dynamicProperty = DynamicProperty::fromXml(attributeElement)) {
-                attrs.append(dynamicProperty);
+            if (auto PropertyTemplate = PropertyTemplate::fromXml(attributeElement)) {
+                attrs.append(PropertyTemplate);
             }
-            attributeElement = attributeElement.nextSiblingElement(DynamicProperty::tagName());
+            attributeElement = attributeElement.nextSiblingElement(PropertyTemplate::tagName());
         }
     }
     return attrs;
 }
 
-QHash<QString, DynamicProperty *> DynamicPropertyConfig::attributesForObject(const aadl::AADLObject *obj)
+QHash<QString, PropertyTemplate *> PropertyTemplateConfig::propertyTemplatesForObject(const aadl::AADLObject *obj)
 {
-    auto scope = DynamicProperty::Scope::None;
-    QList<DynamicProperty *> properties;
+    auto scope = PropertyTemplate::Scope::None;
+    QList<PropertyTemplate *> properties;
     switch (obj->aadlType()) {
     case aadl::AADLObject::Type::FunctionType:
     case aadl::AADLObject::Type::Function:
-        scope = DynamicProperty::Scope::Function;
+        scope = PropertyTemplate::Scope::Function;
         properties = attributesForFunction();
         break;
     case aadl::AADLObject::Type::RequiredInterface:
-        scope = DynamicProperty::Scope::Required_Interface;
+        scope = PropertyTemplate::Scope::Required_Interface;
         properties = attributesForRequiredInterface();
         break;
     case aadl::AADLObject::Type::ProvidedInterface:
-        scope = DynamicProperty::Scope::Provided_Interface;
+        scope = PropertyTemplate::Scope::Provided_Interface;
         properties = attributesForProvidedInterface();
         break;
     default:
         return {};
     }
-    QHash<QString, DynamicProperty *> result;
-    auto validate = [obj, scope](DynamicProperty *property) {
+    QHash<QString, PropertyTemplate *> result;
+    auto validate = [obj, scope](PropertyTemplate *property) {
         if (!property->scope().testFlag(scope)) {
             return false;
         }
@@ -198,29 +198,29 @@ QHash<QString, DynamicProperty *> DynamicPropertyConfig::attributesForObject(con
 
         return true;
     };
-    std::for_each(properties.constBegin(), properties.constEnd(), [&result, validate](DynamicProperty *property) {
+    std::for_each(properties.constBegin(), properties.constEnd(), [&result, validate](PropertyTemplate *property) {
         if (validate(property))
             result.insert(property->name(), property);
     });
     return result;
 }
 
-QList<DynamicProperty *> DynamicPropertyConfig::attributesForFunction()
+QList<PropertyTemplate *> PropertyTemplateConfig::attributesForFunction()
 {
     return d->m_function.values();
 }
 
-QList<DynamicProperty *> DynamicPropertyConfig::attributesForRequiredInterface()
+QList<PropertyTemplate *> PropertyTemplateConfig::attributesForRequiredInterface()
 {
     return d->m_reqIface.values();
 }
 
-QList<DynamicProperty *> DynamicPropertyConfig::attributesForProvidedInterface()
+QList<PropertyTemplate *> PropertyTemplateConfig::attributesForProvidedInterface()
 {
     return d->m_provIface.values();
 }
 
-QString DynamicPropertyConfig::configPath() const
+QString PropertyTemplateConfig::configPath() const
 {
     return d->m_configPath;
 }

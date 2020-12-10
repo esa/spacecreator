@@ -110,7 +110,7 @@
         </Type>
         <Scopes/>
     </Attr>
-    <Attr label="SomeLabel" name="Taste::RootCoordinates" type="property" visible="false">
+    <Attr name="Taste::RootCoordinates" type="property" visible="false">
         <Type>
             <String validator="[0-9 ]+"/>
         </Type>
@@ -132,6 +132,14 @@
         </Type>
         <Scopes>
             <Required_Interface/>
+        </Scopes>
+    </Attr>
+    <Attr label="UIText" name="LabelTest" type="property">
+        <Type>
+            <Boolean/>
+        </Type>
+        <Scopes>
+            <Function/>
         </Scopes>
     </Attr>
 </Attrs>

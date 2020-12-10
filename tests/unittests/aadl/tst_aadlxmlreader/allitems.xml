@@ -1,97 +1,97 @@
 <InterfaceView>
     <Function name="GlobalFnType" language="" is_type="YES">
         <Property name="Taste::coordinates" value="-110000 -29900 -90000 -21900"/>
-        <Required_Interface name="GlobalFnType_RI" kind="SPORADIC_OPERATION">
+        <Required_Interface name="GlobalFnType_RI" kind="Sporadic">
             <Property name="Taste::coordinates" value="-96500 -22600"/>
             <Property name="Taste::InheritPI" value="true"/>
         </Required_Interface>
-        <Provided_Interface name="GlobalFnType_PI" kind="SPORADIC_OPERATION" period="" wcet="" queue_size="">
+        <Provided_Interface name="GlobalFnType_PI" kind="Sporadic" period="" wcet="" queue_size="">
             <Property name="Taste::coordinates" value="-106200 -22900"/>
         </Provided_Interface>
     </Function>
     <Function name="Global_Fn2" language="" is_type="NO" instance_of="">
         <Property name="Taste::coordinates" value="-79900 -30000 4800 23600"/>
-        <Required_Interface name="RI_3" kind="SPORADIC_OPERATION" period="" wcet="" queue_size="">
+        <Required_Interface name="RI_3" kind="Sporadic" period="" wcet="" queue_size="">
             <Property name="Taste::coordinates" value="-79900 3500"/>
             <Property name="Taste::InheritPI" value="true"/>
         </Required_Interface>
-        <Required_Interface name="RI_8" kind="SPORADIC_OPERATION">
+        <Required_Interface name="RI_8" kind="Sporadic">
             <Property name="Taste::coordinates" value="-43000 23600"/>
             <Property name="Taste::InheritPI" value="true"/>
         </Required_Interface>
-        <Provided_Interface name="PI_4" kind="SPORADIC_OPERATION" period="" wcet="" queue_size="">
+        <Provided_Interface name="PI_4" kind="Sporadic" period="" wcet="" queue_size="">
             <Property name="Taste::coordinates" value="-79900 -3000"/>
         </Provided_Interface>
-        <Provided_Interface name="PI_7" kind="SPORADIC_OPERATION" period="" wcet="" queue_size="">
+        <Provided_Interface name="PI_7" kind="Sporadic" period="" wcet="" queue_size="">
             <Property name="Taste::coordinates" value="-36300 23600"/>
         </Provided_Interface>
-        <Provided_Interface name="PI_10" kind="SPORADIC_OPERATION" period="" wcet="" queue_size="">
+        <Provided_Interface name="PI_10" kind="Sporadic" period="" wcet="" queue_size="">
             <Property name="Taste::coordinates" value="-79900 10800"/>
         </Provided_Interface>
         <Function name="LocalFnType" language="" is_type="YES">
             <Property name="Taste::coordinates" value="-73600 -24000 -53900 -6200"/>
-            <Required_Interface name="LocalFnType_RI" kind="SPORADIC_OPERATION">
+            <Required_Interface name="LocalFnType_RI" kind="Sporadic">
                 <Property name="Taste::coordinates" value="-53900 -16000"/>
                 <Property name="Taste::InheritPI" value="true"/>
             </Required_Interface>
-            <Provided_Interface name="LocalFnType_PI" kind="SPORADIC_OPERATION" period="" wcet="" queue_size="">
+            <Provided_Interface name="LocalFnType_PI" kind="Sporadic" period="" wcet="" queue_size="">
                 <Property name="Taste::coordinates" value="-73600 -16000"/>
             </Provided_Interface>
         </Function>
         <Function name="Nested_Fn1" language="" is_type="NO" instance_of="">
             <Property name="Taste::coordinates" value="-47400 -24000 -27700 -6200"/>
-            <Provided_Interface name="PI_11" kind="SPORADIC_OPERATION" period="" wcet="" queue_size="">
+            <Provided_Interface name="PI_11" kind="Sporadic" period="" wcet="" queue_size="">
                 <Property name="Taste::coordinates" value="-46900 -6200"/>
             </Provided_Interface>
         </Function>
         <Function name="NestedFn_Typed_local" language="" is_type="NO" instance_of="LocalFnType">
             <Property name="Taste::coordinates" value="-21200 -24000 -1500 -6200"/>
-            <Required_Interface name="LocalFnType_RI" kind="SPORADIC_OPERATION" period="" wcet="" queue_size="">
+            <Required_Interface name="LocalFnType_RI" kind="Sporadic" period="" wcet="" queue_size="">
                 <Property name="Taste::coordinates" value="-21200 -24000"/>
                 <Property name="Taste::InheritPI" value="true"/>
             </Required_Interface>
-            <Required_Interface name="RI_6" kind="SPORADIC_OPERATION" period="" wcet="" queue_size="">
+            <Required_Interface name="RI_6" kind="Sporadic" period="" wcet="" queue_size="">
                 <Property name="Taste::coordinates" value="-21200 -7500"/>
                 <Property name="Taste::InheritPI" value="true"/>
             </Required_Interface>
-            <Provided_Interface name="LocalFnType_PI" kind="SPORADIC_OPERATION" period="" wcet="" queue_size="">
+            <Provided_Interface name="LocalFnType_PI" kind="Sporadic" period="" wcet="" queue_size="">
                 <Property name="Taste::coordinates" value="-12100 -24000"/>
             </Provided_Interface>
         </Function>
         <Function name="NestedFn_Typed_Global" language="" is_type="NO" instance_of="GlobalFnType">
             <Property name="Taste::coordinates" value="-47400 -200 -27700 17600"/>
-            <Required_Interface name="GlobalFnType_RI" kind="SPORADIC_OPERATION">
+            <Required_Interface name="GlobalFnType_RI" kind="Sporadic">
                 <Property name="Taste::coordinates" value="-47400 -200"/>
                 <Property name="Taste::InheritPI" value="true"/>
             </Required_Interface>
-            <Required_Interface name="RI_7" kind="SPORADIC_OPERATION">
+            <Required_Interface name="RI_7" kind="Sporadic">
                 <Property name="Taste::coordinates" value="-43100 17600"/>
                 <Property name="Taste::InheritPI" value="true"/>
             </Required_Interface>
-            <Provided_Interface name="GlobalFnType_PI" kind="SPORADIC_OPERATION" period="" wcet="" queue_size="">
+            <Provided_Interface name="GlobalFnType_PI" kind="Sporadic" period="" wcet="" queue_size="">
                 <Property name="Taste::coordinates" value="-38400 -200"/>
             </Provided_Interface>
-            <Provided_Interface name="PI_8" kind="SPORADIC_OPERATION" period="" wcet="" queue_size="">
+            <Provided_Interface name="PI_8" kind="Sporadic" period="" wcet="" queue_size="">
                 <Property name="Taste::coordinates" value="-36500 17600"/>
             </Provided_Interface>
         </Function>
         <Function name="Nested_Fn2" language="" is_type="NO" instance_of="">
             <Property name="Taste::coordinates" value="-75900 100 -55900 17800"/>
-            <Required_Interface name="RI_5" kind="SPORADIC_OPERATION" period="" wcet="" queue_size="">
+            <Required_Interface name="RI_5" kind="Sporadic" period="" wcet="" queue_size="">
                 <Property name="Taste::coordinates" value="-63200 17600"/>
                 <Property name="Taste::InheritPI" value="true"/>
             </Required_Interface>
-            <Required_Interface name="RI_10" kind="SPORADIC_OPERATION" period="" wcet="" queue_size="">
+            <Required_Interface name="RI_10" kind="Sporadic" period="" wcet="" queue_size="">
                 <Property name="Taste::coordinates" value="-67000 100"/>
                 <Property name="Taste::InheritPI" value="true"/>
             </Required_Interface>
-            <Provided_Interface name="PI_5" kind="SPORADIC_OPERATION" period="" wcet="" queue_size="">
+            <Provided_Interface name="PI_5" kind="Sporadic" period="" wcet="" queue_size="">
                 <Property name="Taste::coordinates" value="-70000 17500"/>
             </Provided_Interface>
-            <Provided_Interface name="PI_6" kind="SPORADIC_OPERATION" period="" wcet="" queue_size="">
+            <Provided_Interface name="PI_6" kind="Sporadic" period="" wcet="" queue_size="">
                 <Property name="Taste::coordinates" value="-55900 700"/>
             </Provided_Interface>
-            <Provided_Interface name="PI_9" kind="SPORADIC_OPERATION" period="" wcet="" queue_size="">
+            <Provided_Interface name="PI_9" kind="Sporadic" period="" wcet="" queue_size="">
                 <Property name="Taste::coordinates" value="-75900 12200"/>
             </Provided_Interface>
         </Function>
@@ -101,25 +101,25 @@
     </Function>
     <Function name="Global_Fn" language="" is_type="NO" instance_of="">
         <Property name="Taste::coordinates" value="-110000 -15000 -90000 -7000"/>
-        <Required_Interface name="RI_4" kind="SPORADIC_OPERATION" period="" wcet="" queue_size="">
+        <Required_Interface name="RI_4" kind="Sporadic" period="" wcet="" queue_size="">
             <Property name="Taste::coordinates" value="-90700 -9800"/>
             <Property name="Taste::InheritPI" value="true"/>
         </Required_Interface>
-        <Provided_Interface name="PI_3" kind="SPORADIC_OPERATION" period="" wcet="" queue_size="">
+        <Provided_Interface name="PI_3" kind="Sporadic" period="" wcet="" queue_size="">
             <Property name="Taste::coordinates" value="-110000 -11300"/>
         </Provided_Interface>
     </Function>
     <Function name="Global_FnTyped_Fn" language="" is_type="NO" instance_of="GlobalFnType">
         <Property name="Taste::coordinates" value="-109900 100 -89900 8100"/>
-        <Required_Interface name="GlobalFnType_RI" kind="SPORADIC_OPERATION" period="" wcet="" queue_size="">
+        <Required_Interface name="GlobalFnType_RI" kind="Sporadic" period="" wcet="" queue_size="">
             <Property name="Taste::coordinates" value="-109900 4700"/>
             <Property name="Taste::InheritPI" value="true"/>
         </Required_Interface>
-        <Required_Interface name="RI_9" kind="SPORADIC_OPERATION" period="" wcet="" queue_size="">
+        <Required_Interface name="RI_9" kind="Sporadic" period="" wcet="" queue_size="">
             <Property name="Taste::coordinates" value="-89900 7400"/>
             <Property name="Taste::InheritPI" value="true"/>
         </Required_Interface>
-        <Provided_Interface name="GlobalFnType_PI" kind="SPORADIC_OPERATION" period="" wcet="" queue_size="">
+        <Provided_Interface name="GlobalFnType_PI" kind="Sporadic" period="" wcet="" queue_size="">
             <Property name="Taste::coordinates" value="0 0"/>
         </Provided_Interface>
     </Function>
