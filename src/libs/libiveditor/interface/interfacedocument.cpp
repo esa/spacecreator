@@ -909,7 +909,7 @@ QVector<QAction *> InterfaceDocument::initActions()
 
     d->actRemove = new QAction(tr("Remove"));
     ActionsManager::registerAction(Q_FUNC_INFO, d->actRemove, "Remove", "Remove selected object");
-    d->actRemove->setIcon(QIcon(QLatin1String(":/tab_interface/toolbar/icns/remove.svg")));
+    d->actRemove->setIcon(QIcon(QLatin1String(":/tab_interface/toolbar/icns/delete.svg")));
     d->actRemove->setEnabled(false);
     d->actRemove->setShortcut(QKeySequence::Delete);
     connect(d->actRemove, &QAction::triggered, this, [this]() { d->tool->removeSelectedItems(); });
