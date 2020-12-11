@@ -47,7 +47,7 @@ AADLObjectsModel::AADLObjectsModel(PropertyTemplateConfig *dynPropConfig, QObjec
     d->m_dynPropConfig = dynPropConfig;
 }
 
-AADLObjectsModel::~AADLObjectsModel() { }
+AADLObjectsModel::~AADLObjectsModel() {}
 
 void AADLObjectsModel::setSharedTypesModel(AADLObjectsModel *sharedTypesModel)
 {
@@ -161,10 +161,16 @@ void AADLObjectsModel::setRootObject(shared::Id rootId)
     if (d->m_rootObjectId == rootId) {
         return;
     }
+
+    const auto oldRootId = d->m_rootObjectId;
     d->m_rootObjectId = rootId;
     d->m_visibleObjects = visibleObjects(rootId);
 
     Q_EMIT rootObjectChanged(d->m_rootObjectId);
+
+    if (auto oldRootObject = getObject(oldRootId)) {
+        oldRootObject->removeAttr(meta::Props::token(meta::Props::Token::RootCoordinates));
+    }
 }
 
 AADLObject *AADLObjectsModel::rootObject() const
