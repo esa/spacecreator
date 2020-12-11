@@ -411,6 +411,10 @@ void AADLObject::setVisible(bool isVisible)
     setAttr(meta::Props::token(meta::Props::Token::is_visible), isVisible);
 }
 
+/*!
+   Returns false, if the "is_visible" is set to false.
+   Returns true, if set to true or is not set at all. Also does not take the parent's visibility into account.
+ */
 bool AADLObject::isVisible() const
 {
     return d->m_attrs.value(meta::Props::token(meta::Props::Token::is_visible), true).toBool();

@@ -168,8 +168,8 @@ void AADLItemModel::onAADLObjectAdded(aadl::AADLObject *object)
             }
         }
         connect(object, &aadl::AADLObject::visibilityChanged, this, [this, id = object->id()](bool isVisible) {
-            if (auto item = m_items.value(id)) {
-                item->setVisible(isVisible);
+            if (auto item = dynamic_cast<InteractiveObject *>(m_items.value(id))) {
+                item->scheduleLayoutUpdate();
                 scheduleInterfaceTextUpdate();
             }
         });

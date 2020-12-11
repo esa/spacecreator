@@ -187,11 +187,13 @@ void AADLRectGraphicsItem::rebuildLayout()
     const QRectF sceneRect = sceneBoundingRect();
     if (auto graphicsItemParent = parentItem()) {
         const QRectF parentRect = graphicsItemParent->sceneBoundingRect();
-        setVisible(parentRect.contains(sceneRect));
+        setVisible(parentRect.contains(sceneRect) && aadlObject()->isVisible());
     }
     for (auto child : childItems()) {
-        if (auto rectItem = qobject_cast<AADLRectGraphicsItem *>(child->toGraphicsObject()))
-            rectItem->setVisible(sceneRect.contains(rectItem->sceneBoundingRect()));
+        if (auto rectItem = qobject_cast<AADLRectGraphicsItem *>(child->toGraphicsObject())) {
+            rectItem->setVisible(
+                    sceneRect.contains(rectItem->sceneBoundingRect()) && rectItem->aadlObject()->isVisible());
+        }
     }
     updateGripPoints();
     applyColorScheme();
