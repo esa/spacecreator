@@ -322,7 +322,8 @@ qreal AADLInterfaceGraphicsItem::maxWidth() const
         return width;
     }
 
-    const qreal itemLeft = sceneBoundingRect().left();
+    const QRectF itemRect = sceneBoundingRect();
+    const qreal itemLeft = itemRect.left();
     QRectF rect = sceneBoundingRect();
     rect.setWidth(9e12); // extend to the right very far (infinite)
     for (QGraphicsItem *rootItem : scene()->items(rect)) {
@@ -340,11 +341,14 @@ qreal AADLInterfaceGraphicsItem::maxWidth() const
             for (QGraphicsItem *item : items) {
                 if (item->isVisible() && item != this && item != parentItem()) {
                     const QRectF otherRect = item->sceneBoundingRect();
-                    if (otherRect.left() > itemLeft) {
-                        if (width < 0.) {
-                            width = otherRect.left() - itemLeft;
-                        } else {
-                            width = std::min(otherRect.left() - itemLeft, width);
+                    if (otherRect.bottom() > itemRect.top() && otherRect.top() < itemRect.bottom()) {
+                        // the items do vertically intersect
+                        if (otherRect.left() > itemLeft) {
+                            if (width < 0.) {
+                                width = otherRect.left() - itemLeft;
+                            } else {
+                                width = std::min(otherRect.left() - itemLeft, width);
+                            }
                         }
                     }
                 }
@@ -492,7 +496,10 @@ void AADLInterfaceGraphicsItem::updateIface()
 
 QString AADLInterfaceGraphicsItem::ifaceLabel() const
 {
-    return entity()->ifaceLabel();
+    if (entity()) {
+        return entity()->ifaceLabel();
+    }
+    return {};
 }
 
 QString AADLInterfaceGraphicsItem::prepareTooltip() const

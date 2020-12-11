@@ -19,6 +19,7 @@
 #include "interface/aadlfunctiongraphicsitem.h"
 #include "interface/aadlfunctiontypegraphicsitem.h"
 #include "interface/aadlinterfacegraphicsitem.h"
+#include "iveditor.h"
 
 #include <QDebug>
 #include <QGraphicsScene>
@@ -35,6 +36,7 @@ private Q_SLOTS:
 
 void tst_AADLInterfaceGraphicsItem::initTestCase()
 {
+    aadlinterface::initIvEditor();
     QStandardPaths::setTestModeEnabled(true);
 }
 
@@ -68,6 +70,12 @@ void tst_AADLInterfaceGraphicsItem::testMaxWidth()
     QCOMPARE(item->maxWidth(), 110.);
     // Invisible items don't limit the width
     item2->setVisible(false);
+    QCOMPARE(item->maxWidth(), -1.);
+    // Item above/below don't limit the size
+    item2->setVisible(true);
+    item2->setBoundingRect(QRectF(130., -40., 50., 30.));
+    QCOMPARE(item->maxWidth(), -1.);
+    item2->setBoundingRect(QRectF(130., 50., 50., 30.));
     QCOMPARE(item->maxWidth(), -1.);
 
     // Function type
