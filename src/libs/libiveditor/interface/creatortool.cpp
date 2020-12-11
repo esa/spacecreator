@@ -445,7 +445,7 @@ bool CreatorTool::onMouseMove(QMouseEvent *e)
 
                     if (item->parentItem() == d->previewItem->parentItem()
                             || (d->previewItem->parentItem() == item
-                                    && !item->sceneBoundingRect().contains(expandedGeometry))) {
+                                       && !item->sceneBoundingRect().contains(expandedGeometry))) {
                         items.insert(iObjItem);
                     }
                 });
@@ -808,20 +808,15 @@ bool CreatorTool::CreatorToolPrivate::handleConnectionCreate(const QPointF &pos)
     if (!this->previewConnectionItem)
         return false;
 
-    QPointF alignedPos { pos };
-    if (this->connectionPoints.size() > 2) {
-        if (auto itemUnderCursor = nearestItem(scene, pos, kInterfaceTolerance, { AADLInterfaceGraphicsItem::Type })) {
-            const QPointF finishPoint = itemUnderCursor->mapToScene(QPointF(0, 0));
-            if (!alignToSidePoint(scene, finishPoint, this->connectionPoints.last()))
-                return false;
-
-            this->connectionPoints.append(finishPoint);
+    if (auto itemUnderCursor = qgraphicsitem_cast<AADLInterfaceGraphicsItem *>(
+                nearestItem(scene, pos, kInterfaceTolerance, { AADLInterfaceGraphicsItem::Type }))) {
+        const QPointF finishPoint = itemUnderCursor->connectionEndPoint();
+        this->connectionPoints.append(finishPoint);
+        if (!itemUnderCursor->ifaceShape().contains(this->connectionPoints.front())) {
             return true;
         }
-    } else if (!alignToSidePoint(scene, this->connectionPoints.value(0), alignedPos))
-        return false;
-
-    this->connectionPoints.append(alignedPos);
+    }
+    this->connectionPoints.append(pos);
 
     QPainterPath pp;
     pp.addPolygon(this->connectionPoints);
