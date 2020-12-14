@@ -158,7 +158,8 @@ void AADLConnectionGraphicsItem::paint(QPainter *painter, const QStyleOptionGrap
 
 void AADLConnectionGraphicsItem::rebuildLayout()
 {
-    if (!m_startItem || !m_startItem->isVisible() || !m_endItem || !m_endItem->isVisible()) {
+    if (!m_startItem || !m_startItem->isVisible() || !m_endItem || !m_endItem->isVisible() || !m_dataObject
+            || !m_dataObject->isVisible()) {
         setVisible(false);
         return;
     }

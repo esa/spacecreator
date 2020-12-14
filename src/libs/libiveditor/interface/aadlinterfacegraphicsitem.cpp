@@ -203,6 +203,8 @@ void AADLInterfaceGraphicsItem::updateInternalItems(Qt::Alignment alignment)
 
 void AADLInterfaceGraphicsItem::rebuildLayout()
 {
+    setVisible(m_dataObject && m_dataObject->isVisible());
+
     if (!targetItem()) {
         prepareGeometryChange();
         setBoundingRect(QRectF());

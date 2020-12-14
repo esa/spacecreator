@@ -188,6 +188,8 @@ void AADLRectGraphicsItem::rebuildLayout()
     if (auto graphicsItemParent = parentItem()) {
         const QRectF parentRect = graphicsItemParent->sceneBoundingRect();
         setVisible(parentRect.contains(sceneRect) && aadlObject()->isVisible());
+    } else {
+        setVisible(aadlObject()->isVisible());
     }
     for (auto child : childItems()) {
         if (auto rectItem = qobject_cast<AADLRectGraphicsItem *>(child->toGraphicsObject())) {
