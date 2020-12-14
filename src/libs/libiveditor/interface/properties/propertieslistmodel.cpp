@@ -203,7 +203,16 @@ QVariant PropertiesListModel::data(const QModelIndex &index, int role) const
         if (index.column() == ColumnTitle)
             return res;
 
-        return isAttr(index) ? m_dataObject->attr(title) : m_dataObject->prop(title);
+        if (isAttr(index)) {
+            QVariant value = m_dataObject->attr(title);
+            if (title == aadl::meta::Props::token(aadl::meta::Props::Token::name)) {
+                return QVariant::fromValue(
+                        aadl::AADLNameValidator::decodeName(m_dataObject->aadlType(), value.toString()));
+            }
+            return value;
+        } else {
+            m_dataObject->prop(title);
+        }
     }
     }
 
