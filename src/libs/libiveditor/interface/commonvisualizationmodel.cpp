@@ -22,6 +22,8 @@
 #include "aadlobjectconnectiongroup.h"
 #include "aadlobjectsmodel.h"
 #include "aadlxmlreader.h"
+#include "commandsstack.h"
+#include "interface/commands/commandsfactory.h"
 
 #include <QDebug>
 #include <QDirIterator>
@@ -271,7 +273,11 @@ void VisualizationModel::onDataChanged(
                     }
                     if (roles.contains(Qt::DisplayRole)) {
                         const QString name = aadl::AADLNameValidator::encodeName(obj->aadlType(), item->text());
-                        obj->setTitle(name);
+                        const QVariantMap attributes = { { aadl::meta::Props::token(aadl::meta::Props::Token::name),
+                                name } };
+                        const auto attributesCmd = cmd::CommandsFactory::create(cmd::ChangeEntityAttributes,
+                                { QVariant::fromValue(obj), QVariant::fromValue(attributes) });
+                        cmd::CommandsStack::push(attributesCmd);
                     }
                 }
             }

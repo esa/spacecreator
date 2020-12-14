@@ -40,6 +40,7 @@ private Q_SLOTS:
     void test_defaultConstructor();
     void test_paramConstructor();
     void test_setTitle();
+    void test_hasAttributes();
 };
 
 void tst_AADLObject::test_defaultConstructor()
@@ -98,6 +99,23 @@ void tst_AADLObject::test_setTitle()
     QVERIFY(arguments.size() == 1);
     QVERIFY(arguments.at(0).type() == QVariant::String);
     QCOMPARE(arguments.at(0).value<QString>(), QString("Test_Object_Title"));
+}
+
+void tst_AADLObject::test_hasAttributes()
+{
+    AADLObjectImp obj;
+    QHash<QString, QVariant> attributes = { { "foo", QVariant::fromValue(11) },
+        { "bar", QVariant::fromValue(QString("dummy")) } };
+    QCOMPARE(obj.hasAttributes(attributes), false);
+
+    obj.setAttr("foo", QVariant::fromValue(999));
+    QCOMPARE(obj.hasAttributes(attributes), false);
+
+    obj.setAttr("bar", QVariant::fromValue(QString("dummy")));
+    QCOMPARE(obj.hasAttributes(attributes), false);
+
+    obj.setAttr("foo", QVariant::fromValue(11));
+    QCOMPARE(obj.hasAttributes(attributes), true);
 }
 
 QTEST_APPLESS_MAIN(tst_AADLObject)

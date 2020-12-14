@@ -351,6 +351,30 @@ void AADLObject::removeAttr(const QString &name)
         Q_EMIT attributeChanged(name);
 }
 
+/*!
+   Returns true, when the object has an attribute wit the given \p key and the given \p value
+ */
+bool AADLObject::hasAttribute(const QString &attributeName, const QVariant &value) const
+{
+    if (!d->m_attrs.contains(attributeName)) {
+        return false;
+    }
+    return d->m_attrs[attributeName] == value;
+}
+
+/*!
+   Returns true, if the object contains all the given attributes with exactly the same value
+ */
+bool AADLObject::hasAttributes(const QHash<QString, QVariant> &attrs) const
+{
+    for (auto it = attrs.cbegin(); it != attrs.end(); ++it) {
+        if (!hasAttribute(it.key(), it.value())) {
+            return false;
+        }
+    }
+    return true;
+}
+
 QHash<QString, QVariant> AADLObject::props() const
 {
     return d->m_props;

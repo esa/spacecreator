@@ -53,7 +53,7 @@
 #include <QRect>
 #include <QVariant>
 #include <QtDebug>
-#include <aadlobjectsmodel.h>
+#include <algorithm>
 
 namespace aadlinterface {
 namespace cmd {
@@ -358,13 +358,17 @@ QUndoCommand *CommandsFactory::changeEntityAttributesCommand(const QVariantList 
 {
     Q_ASSERT(params.size() == 2);
     const QVariant entity = params.value(0);
-    const QVariantHash attributess = params.value(1).toHash();
-    if (entity.isValid() && entity.canConvert<aadl::AADLObject *>() && !attributess.isEmpty()) {
+    const QVariantHash attributes = params.value(1).toHash();
+    if (entity.isValid() && entity.canConvert<aadl::AADLObject *>() && !attributes.isEmpty()) {
         if (auto aadlObject = entity.value<aadl::AADLObject *>()) {
+            if (aadlObject->hasAttributes(attributes)) {
+                return nullptr;
+            }
+
             if (aadlObject->isInterface())
                 return changeIfaceAttributeCommand(params);
 
-            return new CmdEntityAttributeChange(aadlObject, attributess);
+            return new CmdEntityAttributeChange(aadlObject, attributes);
         }
     }
 
