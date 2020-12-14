@@ -270,7 +270,8 @@ void VisualizationModel::onDataChanged(
                         obj->setVisible(item->checkState() == Qt::Checked);
                     }
                     if (roles.contains(Qt::DisplayRole)) {
-                        obj->setTitle(item->text());
+                        const QString name = aadl::AADLNameValidator::encodeName(obj->aadlType(), item->text());
+                        obj->setTitle(name);
                     }
                 }
             }
