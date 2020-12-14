@@ -811,12 +811,13 @@ bool CreatorTool::CreatorToolPrivate::handleConnectionCreate(const QPointF &pos)
     if (auto itemUnderCursor = qgraphicsitem_cast<AADLInterfaceGraphicsItem *>(
                 nearestItem(scene, pos, kInterfaceTolerance, { AADLInterfaceGraphicsItem::Type }))) {
         const QPointF finishPoint = itemUnderCursor->connectionEndPoint();
-        this->connectionPoints.append(finishPoint);
         if (!itemUnderCursor->ifaceShape().contains(this->connectionPoints.front())) {
+            this->connectionPoints.append(finishPoint);
             return true;
         }
+    } else {
+        this->connectionPoints.append(pos);
     }
-    this->connectionPoints.append(pos);
 
     QPainterPath pp;
     pp.addPolygon(this->connectionPoints);
