@@ -30,15 +30,13 @@ class IfaceParametersTypeDelegate : public StringListComboDelegate
     Q_OBJECT
 public:
     IfaceParametersTypeDelegate(const QSharedPointer<Asn1Acn::File> &dataTypes, QObject *parent = nullptr);
-    ~IfaceParametersTypeDelegate() override;
 };
 
 class ContextParametersTypeDelegate : public StringListComboDelegate
 {
     Q_OBJECT
 public:
-    ContextParametersTypeDelegate(QObject *parent = nullptr);
-    ~ContextParametersTypeDelegate() override;
+    ContextParametersTypeDelegate(const QSharedPointer<Asn1Acn::File> &dataTypes, QObject *parent = nullptr);
 };
 
 }

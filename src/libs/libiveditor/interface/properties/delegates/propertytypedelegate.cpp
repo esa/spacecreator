@@ -26,12 +26,6 @@
 
 namespace aadlinterface {
 
-static QStringList contextParamsNames()
-{
-    return { aadl::BasicParameter::typeName(aadl::BasicParameter::Type::Timer),
-        aadl::BasicParameter::typeName(aadl::BasicParameter::Type::Directive) };
-}
-
 static QStringList asn1Names(const QSharedPointer<Asn1Acn::File> &dataTypes)
 {
     QStringList names;
@@ -47,19 +41,23 @@ static QStringList asn1Names(const QSharedPointer<Asn1Acn::File> &dataTypes)
     return names;
 }
 
+static QStringList contextParamsNames(const QSharedPointer<Asn1Acn::File> &dataTypes)
+{
+    QStringList names = { aadl::BasicParameter::typeName(aadl::BasicParameter::Type::Timer) };
+    names.append(asn1Names(dataTypes));
+    return names;
+}
+
 IfaceParametersTypeDelegate::IfaceParametersTypeDelegate(
         const QSharedPointer<Asn1Acn::File> &dataTypes, QObject *parent)
     : StringListComboDelegate(asn1Names(dataTypes), parent)
 {
 }
 
-IfaceParametersTypeDelegate::~IfaceParametersTypeDelegate() {}
-
-ContextParametersTypeDelegate::ContextParametersTypeDelegate(QObject *parent)
-    : StringListComboDelegate(contextParamsNames(), parent)
+ContextParametersTypeDelegate::ContextParametersTypeDelegate(
+        const QSharedPointer<Asn1Acn::File> &dataTypes, QObject *parent)
+    : StringListComboDelegate(contextParamsNames(dataTypes), parent)
 {
 }
-
-ContextParametersTypeDelegate::~ContextParametersTypeDelegate() {}
 
 } // namespace aadlinterface

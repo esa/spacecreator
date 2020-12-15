@@ -189,7 +189,7 @@ void PropertiesDialog::initContextParams()
 
     PropertiesViewBase *viewAttrs = new PropertiesViewBase(this);
     viewAttrs->tableView()->setItemDelegateForColumn(
-            ContextParametersModel::ColumnType, new ContextParametersTypeDelegate(viewAttrs->tableView()));
+            ContextParametersModel::ColumnType, new ContextParametersTypeDelegate(m_dataTypes, viewAttrs->tableView()));
     viewAttrs->tableView()->setItemDelegateForColumn(
             ContextParametersModel::ColumnValue, new Asn1ValueDelegate(m_dataTypes, viewAttrs->tableView()));
     viewAttrs->tableView()->horizontalHeader()->show();
