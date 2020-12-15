@@ -319,7 +319,37 @@ bool CreatorTool::onMousePress(QMouseEvent *e)
     }
 
     const QPointF scenePos = d->cursorInScene(e->globalPos());
-    if (e->modifiers() & Qt::ControlModifier) {
+    if (e->modifiers() & Qt::ShiftModifier) {
+        QGraphicsItem *item = nearestItem(scene, scenePos, kInterfaceTolerance, { AADLInterfaceGraphicsItem::Type });
+        if (!item || item->type() != AADLInterfaceGraphicsItem::Type)
+            return false;
+
+        auto interfaceItem = qgraphicsitem_cast<const AADLInterfaceGraphicsItem *>(item);
+        if (!interfaceItem)
+            return false;
+
+        if (interfaceItem->connectionItems().size() != 1 || !interfaceItem->entity()->isProvided())
+            return false;
+
+        auto connectionItem = interfaceItem->connectionItems().front();
+        Q_ASSERT(connectionItem);
+
+        auto reqIface = connectionItem->startItem();
+        Q_ASSERT(reqIface);
+
+        d->toolType = ToolType::MultiPointConnection;
+        d->previewConnectionItem = new QGraphicsPathItem;
+        d->previewConnectionItem->setPen(QPen(Qt::black, 2, Qt::DotLine));
+        d->previewConnectionItem->setZValue(ZOrder.Preview);
+        scene->addItem(d->previewConnectionItem);
+        d->connectionPoints.append(reqIface->connectionEndPoint(connectionItem));
+
+        const QVariantList params = { QVariant::fromValue(connectionItem->entity()),
+            QVariant::fromValue(d->model->objectsModel()) };
+        if (QUndoCommand *cmdRm = cmd::CommandsFactory::create(cmd::RemoveEntity, params))
+            cmd::CommandsStack::push(cmdRm);
+        return true;
+    } else if (e->modifiers() & Qt::ControlModifier) {
         auto itemAtCursor = d->view->itemAt(e->pos());
         if ((e->button() & Qt::MouseButton::LeftButton)
                 && (!itemAtCursor || itemAtCursor->type() != shared::ui::GripPoint::Type))
@@ -630,7 +660,7 @@ void CreatorTool::CreatorToolPrivate::populateContextMenu_propertiesDialog(QMenu
         return;
     }
 
-    const QGraphicsItem *gi = scene->selectedItems().isEmpty() ? nullptr : scene->selectedItems().first();
+    QGraphicsItem *gi = scene->selectedItems().isEmpty() ? nullptr : scene->selectedItems().first();
     if (aadl::AADLObject *aadlObj = gi::object(gi)) {
         if (aadlObj->aadlType() != aadl::AADLObject::Type::Connection) {
             menu->addSeparator();
@@ -639,8 +669,19 @@ void CreatorTool::CreatorToolPrivate::populateContextMenu_propertiesDialog(QMenu
 
             connect(action, &QAction::triggered,
                     [this, aadlObj]() { Q_EMIT thisTool->propertyEditorRequest(aadlObj); });
+            ActionsManager::registerAction(Q_FUNC_INFO, action, "Properties", "Show AADL object properties editor");
+        } else {
+            menu->addSeparator();
+            QAction *action = menu->addAction(tr("Recreate path"));
+            action->setEnabled(aadlObj);
+
+            connect(action, &QAction::triggered, [gi]() {
+                if (auto connectionItem = qgraphicsitem_cast<AADLConnectionGraphicsItem *>(gi)) {
+                    connectionItem->layout();
+                }
+            });
             ActionsManager::registerAction(
-                    Q_FUNC_INFO, menu->actions().last(), "Properties", "Show AADL object properties editor");
+                    Q_FUNC_INFO, action, "Connection", "Create a generic connection path instead of existing one");
         }
     }
 }

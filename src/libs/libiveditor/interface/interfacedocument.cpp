@@ -885,13 +885,6 @@ QVector<QAction *> InterfaceDocument::initActions()
             [this]() { d->tool->setCurrentToolType(CreatorTool::ToolType::Comment); });
     actCreateComment->setIcon(QIcon(":/tab_interface/toolbar/icns/comment.svg"));
 
-    //    auto actGroupConnections = new QAction(tr("Group"));
-    //    actGroupConnections->setCheckable(true);
-    //    actGroupConnections->setActionGroup(actionGroup);
-    //    connect(actGroupConnections, &QAction::triggered, this,
-    //            [this]() { qWarning() << Q_FUNC_INFO << "Not implemented yet."; });
-    //    actGroupConnections->setIcon(QIcon(":/tab_interface/toolbar/icns/group.svg"));
-
     auto actCreateConnection = new QAction(tr("Connection"));
     ActionsManager::registerAction(Q_FUNC_INFO, actCreateConnection, "Connection", "Create Connection object");
     actCreateConnection->setCheckable(true);
