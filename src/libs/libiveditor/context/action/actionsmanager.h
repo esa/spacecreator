@@ -31,10 +31,12 @@ class QMenu;
 
 namespace aadlinterface {
 
+class InterfaceDocument;
+
 class ActionsManager
 {
 public:
-    static void populateMenu(QMenu *menu, aadl::AADLObject *currObj, const QString &projectDir);
+    static void populateMenu(QMenu *menu, aadl::AADLObject *currObj, InterfaceDocument *doc);
     static bool registerScriptableAction(QAction *action, const QString &key, const QString &description);
     static QString listRegisteredActions();
     static ActionsManager *instance();
@@ -65,7 +67,7 @@ private:
     void loadActions(const QString &fromFile);
 
     static void triggerActionInternal(const Action &act);
-    static void triggerActionExternal(const Action &act, const aadl::AADLObject *aadlObj, const QString &projectDir);
+    static void triggerActionExternal(const Action &act, const aadl::AADLObject *aadlObj, InterfaceDocument *doc);
     static bool triggerActionHidden(const Action &act);
 
     static QMap<QString, ActionsManager::ScriptableActionHandler> scriptableActions();

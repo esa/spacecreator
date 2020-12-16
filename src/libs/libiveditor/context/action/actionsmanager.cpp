@@ -22,6 +22,8 @@
 #include "aadlobjectiface.h"
 #include "common.h"
 #include "extprocmonitor.h"
+#include "interface/interfacedocument.h"
+#include "xmldocexporter.h"
 
 #include <QAction>
 #include <QApplication>
@@ -96,7 +98,7 @@ QString ActionsManager::storagePath()
  * Adds the appropriate actions into \a menu, managing its enablement based on action conditions and the \a currObj.
  * Initiates connection from QAction to the related handler slot.
  */
-void ActionsManager::populateMenu(QMenu *menu, aadl::AADLObject *currObj, const QString &projectDir)
+void ActionsManager::populateMenu(QMenu *menu, aadl::AADLObject *currObj, InterfaceDocument *doc)
 {
     if (!menu)
         return;
@@ -109,15 +111,14 @@ void ActionsManager::populateMenu(QMenu *menu, aadl::AADLObject *currObj, const 
         const bool enabled(actHandler.isAcceptable(currObj));
         act->setEnabled(enabled);
         if (enabled) {
-            QObject::connect(act, &QAction::triggered, [actHandler, act, projectDir]() {
+            QObject::connect(act, &QAction::triggered, [actHandler, act, doc]() {
                 if (triggerActionHidden(actHandler)) {
                     return;
                 }
                 if (!actHandler.m_internalActName.isEmpty())
                     triggerActionInternal(actHandler);
                 else if (!actHandler.m_externalApp.isEmpty()) {
-                    triggerActionExternal(
-                            actHandler, act ? act->data().value<aadl::AADLObject *>() : nullptr, projectDir);
+                    triggerActionExternal(actHandler, act ? act->data().value<aadl::AADLObject *>() : nullptr, doc);
                 } else {
                     QMessageBox::warning(nullptr, QObject::tr("Custom action"),
                             QObject::tr("No internal or external action provided by %1").arg(actHandler.m_title));
@@ -354,17 +355,32 @@ QString ActionsManager::replaceKeyHolder(
  * Replaces the keyholders by actual values of \a aadlObj's attributes or parameters.
  * Creates and shows an instance of ExtProcMonitor.
  */
-void ActionsManager::triggerActionExternal(
-        const Action &act, const aadl::AADLObject *aadlObj, const QString &projectDir)
+void ActionsManager::triggerActionExternal(const Action &act, const aadl::AADLObject *aadlObj, InterfaceDocument *doc)
 {
     if (!act.m_externalApp.isEmpty()) {
+        if (doc->isDirty()) {
+            const QMessageBox::StandardButtons btns(QMessageBox::Save | QMessageBox::No | QMessageBox::Cancel);
+            auto btn = QMessageBox::question(nullptr, QObject::tr("Document closing"),
+                    QObject::tr("There are unsaved changes.\nWould you like to save the document?"), btns);
+            if (btn == QMessageBox::Save) {
+                const bool ok = XmlDocExporter::exportDocSilently(doc);
+                if (!ok) {
+                    QMessageBox::warning(
+                            nullptr, QObject::tr("Save error"), QObject::tr("Unable to save the document.\nAborting"));
+                    return;
+                }
+            } else if (btn == QMessageBox::Cancel) {
+                return;
+            }
+        }
+
         QStringList params;
         for (const QString &param : act.m_externalAppParams) {
             if (!param.isEmpty()) {
-                params.append(replaceKeyHolder(param, aadlObj, projectDir));
+                params.append(replaceKeyHolder(param, aadlObj, doc->path()));
             }
         }
-        const QString cwd = replaceKeyHolder(act.m_externalAppCwd, aadlObj, projectDir);
+        const QString cwd = replaceKeyHolder(act.m_externalAppCwd, aadlObj, doc->path());
 
         QWidget *mainWindow(nullptr);
         for (auto w : qApp->topLevelWidgets())
@@ -383,7 +399,6 @@ void ActionsManager::triggerActionExternal(
 bool ActionsManager::triggerActionHidden(const Action &act)
 {
     if (act.m_title == "List scriptable actions") {
-        //        QMessageBox::information(nullptr, QObject::tr("Scriptable Actions"), listRegisteredActions());
         QMessageBox *msg = new QMessageBox(QMessageBox::Information, QObject::tr("Scriptable Actions"),
                 listRegisteredActions(), QMessageBox::Ok, nullptr);
         const QFont fixedFont = QFontDatabase::systemFont(QFontDatabase::FixedFont);

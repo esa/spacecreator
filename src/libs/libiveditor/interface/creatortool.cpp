@@ -475,7 +475,7 @@ bool CreatorTool::onMouseMove(QMouseEvent *e)
 
                     if (item->parentItem() == d->previewItem->parentItem()
                             || (d->previewItem->parentItem() == item
-                                       && !item->sceneBoundingRect().contains(expandedGeometry))) {
+                                    && !item->sceneBoundingRect().contains(expandedGeometry))) {
                         items.insert(iObjItem);
                     }
                 });
@@ -726,7 +726,7 @@ void CreatorTool::CreatorToolPrivate::populateContextMenu_user(QMenu *menu, cons
         }
     }
 
-    ActionsManager::populateMenu(menu, aadlObj, doc->path());
+    ActionsManager::populateMenu(menu, aadlObj, doc);
 }
 
 void CreatorTool::CreatorToolPrivate::handleToolType(CreatorTool::ToolType type, const QPointF &pos)
