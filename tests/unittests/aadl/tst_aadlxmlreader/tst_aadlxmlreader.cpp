@@ -15,6 +15,7 @@
   along with this program. If not, see <https://www.gnu.org/licenses/lgpl-2.1.html>.
 */
 #include "aadlobject.h"
+#include "aadlobjectfunction.h"
 #include "aadlxmlreader.h"
 #include "iveditor.h"
 #include "xmlcommon.h"
@@ -37,6 +38,7 @@ private Q_SLOTS:
     void test_singleItems();
     void test_allItems();
     void test_readMetaData();
+    void test_readFunction();
 };
 
 XMLReader::XMLReader()
@@ -124,6 +126,45 @@ void XMLReader::test_readMetaData()
     QCOMPARE(metadata.count(), 2);
     QCOMPARE(metadata["asn1file"].toString(), QString("dataview.asn"));
     QCOMPARE(metadata["mscfile"].toString(), QString("newfile.msc"));
+}
+
+void XMLReader::test_readFunction()
+{
+    QByteArray xml("<InterfaceView>"
+                   "<Function name=\"Global_Fn2\" is_type=\"NO\">"
+                   "<ContextParameter name=\"duration\" type=\"MyInt\" value=\"60\"/>"
+                   "<ContextParameter name=\"trigger\" type=\"Timer\" value=\"\"/>"
+                   "</Function></InterfaceView>");
+
+    QBuffer buffer(&xml);
+    buffer.open(QIODevice::ReadOnly | QIODevice::Text);
+
+    aadl::AADLObjectFunction *function = nullptr;
+    aadl::AADLXMLReader reader;
+    connect(&reader, &aadl::AADLXMLReader::objectsParsed, this,
+            [&function](const QVector<aadl::AADLObject *> &objectsList) {
+                QCOMPARE(objectsList.size(), 1);
+                function = qobject_cast<aadl::AADLObjectFunction *>(objectsList[0]);
+            });
+
+    QSignalSpy spyError(&reader, &aadl::AADLXMLReader::error);
+
+    const bool ok = reader.read(&buffer);
+    QVERIFY(ok);
+    QCOMPARE(spyError.count(), 0);
+
+    QVERIFY(function != nullptr);
+    QCOMPARE(function->contextParams().size(), 2);
+
+    aadl::ContextParameter param1 = function->contextParam("duration");
+    QVERIFY(!param1.isNull());
+    QCOMPARE(param1.paramType(), aadl::BasicParameter::Type::Other);
+    QCOMPARE(param1.paramTypeName(), QString("MyInt"));
+    QCOMPARE(param1.defaultValue(), QVariant::fromValue(60));
+
+    aadl::ContextParameter param2 = function->contextParam("trigger");
+    QVERIFY(!param2.isNull());
+    QCOMPARE(param2.paramType(), aadl::BasicParameter::Type::Timer);
 }
 
 QTEST_APPLESS_MAIN(XMLReader)

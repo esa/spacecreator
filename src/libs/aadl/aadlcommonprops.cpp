@@ -26,6 +26,7 @@ const QHash<QString, Props::Token> Props::TokensByName = {
     // tags:
     { "Function", Token::Function },
     { "Property", Token::Property },
+    { "ContextParameter", Token::ContextParameter },
     { "Provided_Interface", Token::Provided_Interface },
     { "Input_Parameter", Token::Input_Parameter },
     { "Output_Parameter", Token::Output_Parameter },

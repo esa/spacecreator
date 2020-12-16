@@ -17,6 +17,7 @@
 
 #include "aadlobjectcomment.h"
 #include "aadlobjectfunction.h"
+#include "aadlparameter.h"
 #include "asn1modelstorage.h"
 #include "interface/interfacedocument.h"
 #include "iveditor.h"
@@ -95,6 +96,8 @@ void tst_XmlDocExporter::testExportFunctions()
     auto testfunc1 = new aadl::AADLObjectFunction("TestFunc1", m_doc.get());
     testfunc1->setAttr("foo", QVariant::fromValue(11));
     testfunc1->setProp("bar", QVariant::fromValue(22));
+    testfunc1->addContextParam(
+            aadl::ContextParameter("Mo", aadl::BasicParameter::Type::Other, "MyInt", QVariant::fromValue(33)));
 
     QVector<aadl::AADLObject *> objects;
     objects.append(testfunc1);
@@ -107,11 +110,13 @@ void tst_XmlDocExporter::testExportFunctions()
             "<?xml version=\"1.0\"?>\n<InterfaceView>\n"
             "    <Function name=\"TestFunc1\" language=\"\" is_type=\"NO\" instance_of=\"\" foo=\"11\">\n"
             "        <Property name=\"bar\" value=\"22\"/>\n"
+            "        <ContextParameter name=\"Mo\" type=\"MyInt\" value=\"33\"/>\n"
             "    </Function>\n"
             "</InterfaceView>";
     QByteArray expectedRaw = "<InterfaceView>\n"
                              "<Function name=\"TestFunc1\" language=\"\" is_type=\"NO\" instance_of=\"\" foo=\"11\">\n"
                              "    <Property name=\"bar\" value=\"22\"/>\n"
+                             "    <ContextParameter name=\"Mo\" type=\"MyInt\" value=\"33\"/>\n"
                              "</Function>\n\n"
                              "</InterfaceView>";
     qDebug() << text;

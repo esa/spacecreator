@@ -35,6 +35,7 @@ public:
         // tags:
         Function,
         Property,
+        ContextParameter,
         Provided_Interface,
         Input_Parameter,
         Output_Parameter,

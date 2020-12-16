@@ -148,7 +148,7 @@ AADLXMLReader::AADLXMLReader(QObject *parent)
 {
 }
 
-AADLXMLReader::~AADLXMLReader() {}
+AADLXMLReader::~AADLXMLReader() { }
 
 bool AADLXMLReader::readFile(const QString &file)
 {
@@ -338,6 +338,20 @@ void AADLXMLReader::processTagOpen(QXmlStreamReader &xml)
     }
     case Props::Token::Property: {
         d->m_currentObject.get()->setProp(nameAttr.m_value, attrs.value(Props::token(Props::Token::value)).m_value);
+        break;
+    }
+    case Props::Token::ContextParameter: {
+        auto function = qobject_cast<aadl::AADLObjectFunctionType *>(d->m_currentObject.get());
+        if (function) {
+            const QString typeString = attrs.value(Props::token(Props::Token::type)).m_value;
+            aadl::BasicParameter::Type paramType = typeString == "Timer"
+                    ? aadl::BasicParameter::Type::Timer
+                    : (typeString == "Directive" ? aadl::BasicParameter::Type::Directive
+                                                 : aadl::BasicParameter::Type::Other);
+            ContextParameter param(
+                    nameAttr.m_value, paramType, typeString, attrs.value(Props::token(Props::Token::value)).m_value);
+            function->addContextParam(param);
+        }
         break;
     }
     default:

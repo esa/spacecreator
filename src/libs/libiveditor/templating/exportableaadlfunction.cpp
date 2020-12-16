@@ -86,4 +86,13 @@ QVariantList ExportableAADLFunction::connectedFunctions() const
     return list;
 }
 
+QVariantList ExportableAADLFunction::contextParameters() const
+{
+    QVariantList parameters;
+    for (const aadl::ContextParameter &param : exportedObject<aadl::AADLObjectFunctionType>()->contextParams()) {
+        parameters << qVariantFromValue(param);
+    }
+    return parameters;
+}
+
 }

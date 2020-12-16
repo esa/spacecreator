@@ -27,6 +27,9 @@ connectedFunc           :       |_ List of parent Functions names
 {% for prop in func.properties %}
     <Property name="{{ prop.name }}" value="{{ prop.value }}"/>
 {% endfor %}
+{% for param in func.contextParameters %}
+    <ContextParameter name="{{ param.name }}" type="{{ param.type }}" value="{{ param.defaultValue }}"/>
+{% endfor %}
 {% for iface in func.interfaces %}
     {% include "interface.tmplt" %}
 {% endfor %}

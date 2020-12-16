@@ -58,8 +58,8 @@ public:
 
     static QString typeName(const Type &type);
 
-    QString toString() const;
-    bool isNull() const;
+    virtual QString toString() const;
+    virtual bool isNull() const;
 
 protected:
     static const QString ToStringDelemiter;
@@ -88,8 +88,8 @@ public:
     bool setParamType(const Type &type) override;
     bool setParamTypeName(const QString &typeName) override;
 
-    QString toString() const;
-    bool isNull() const;
+    QString toString() const override;
+    bool isNull() const override;
 
 protected:
     QVariant m_defaultValue = {};
@@ -128,8 +128,8 @@ public:
 
     bool operator==(const IfaceParameter &other) const;
 
-    QString toString() const;
-    bool isNull() const;
+    QString toString() const override;
+    bool isNull() const override;
 
 protected:
     QString m_encoding = {};
