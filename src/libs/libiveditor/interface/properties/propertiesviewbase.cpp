@@ -81,7 +81,7 @@ void PropertiesViewBase::on_btnAdd_clicked()
         const aadl::AADLObject::Type type = m_model->dataObject()->aadlType();
         const bool isInterfaceType =
                 type == aadl::AADLObject::Type::ProvidedInterface || type == aadl::AADLObject::Type::RequiredInterface;
-        const QString newNameTmp = isInterfaceType ? tr("Parameter name") : tr("New property");
+        const QString newNameTmp = isInterfaceType ? tr("Parameter name") : tr("New_property");
         QString newName(newNameTmp);
         int duplicateCounter(0);
         while (!m_model->findItems(newName).isEmpty())

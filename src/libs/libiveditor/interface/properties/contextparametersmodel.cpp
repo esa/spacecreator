@@ -18,16 +18,17 @@
 #include "contextparametersmodel.h"
 
 #include "aadlcommonprops.h"
+#include "aadlnamevalidator.h"
 #include "aadlobject.h"
 #include "aadlobjectfunction.h"
 #include "asn1/file.h"
 #include "commandsstack.h"
-#include "propertytemplate.h"
-#include "propertytemplateconfig.h"
 #include "interface/commands/cmdentityattributechange.h"
 #include "interface/commands/cmdentitypropertychange.h"
 #include "interface/commands/cmdentitypropertycreate.h"
 #include "interface/commands/commandsfactory.h"
+#include "propertytemplate.h"
+#include "propertytemplateconfig.h"
 
 #include <algorithm>
 
@@ -117,7 +118,7 @@ QVariant ContextParametersModel::data(const QModelIndex &index, int role) const
         case ColumnValue:
             return param.defaultValue();
         default:
-            return param.name();
+            return aadl::AADLNameValidator::decodeName(m_dataObject->aadlType(), param.name());
         }
     }
     }
@@ -136,7 +137,7 @@ bool ContextParametersModel::setData(const QModelIndex &index, const QVariant &v
 
         switch (index.column()) {
         case ColumnName: {
-            if (!paramNew.setName(value.toString()))
+            if (!paramNew.setName(aadl::AADLNameValidator::encodeName(m_dataObject->aadlType(), value.toString())))
                 return false;
             break;
         }
