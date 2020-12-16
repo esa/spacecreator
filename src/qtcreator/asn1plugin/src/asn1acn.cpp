@@ -282,7 +282,8 @@ void Asn1AcnPlugin::initializeGenerateTestsAction(ActionContainer *toolsMenu,
     connect(action, &QAction::triggered, [this, settings]() {
         if (m_fuzzerDialog.isNull()) {
             auto paramsProvider = std::make_shared<Fuzzer::FuzzerParamsProvider>(settings);
-            m_fuzzerDialog = new Fuzzer::FuzzerParamsDialog(paramsProvider);
+            m_fuzzerDialog = new Fuzzer::FuzzerParamsDialog(paramsProvider,
+                                                            Core::ICore::mainWindow());
         }
         m_fuzzerDialog->exec();
     });

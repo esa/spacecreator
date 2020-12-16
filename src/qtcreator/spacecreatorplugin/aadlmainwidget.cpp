@@ -110,7 +110,7 @@ void AadlMainWidget::showAsn1Dialog()
         return;
     }
 
-    aadlinterface::Asn1Dialog dialog;
+    aadlinterface::Asn1Dialog dialog(this);
     QFileInfo fi(m_plugin->document()->asn1FilePath());
     dialog.setFile(fi);
     dialog.show();

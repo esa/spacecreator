@@ -143,7 +143,11 @@ void MessageItem::onTextChanged()
 void MessageItem::showMessageDialog()
 {
     if (m_message->messageType() == MscMessage::MessageType::Message) {
-        MessageDialog dialog(m_message, m_chartLayoutManager);
+        QWidget *view = nullptr;
+        if (scene() && scene()->views().size() > 0) {
+            view = scene()->views().at(0);
+        }
+        MessageDialog dialog(m_message, m_chartLayoutManager, view);
         dialog.setAadlChecker(m_chartLayoutManager->aadlChecker());
         dialog.exec();
         checkAadlConnection();
