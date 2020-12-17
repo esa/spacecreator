@@ -672,16 +672,17 @@ void CreatorTool::CreatorToolPrivate::populateContextMenu_propertiesDialog(QMenu
             ActionsManager::registerAction(Q_FUNC_INFO, action, "Properties", "Show AADL object properties editor");
         } else {
             menu->addSeparator();
-            QAction *action = menu->addAction(tr("Recreate path"));
+            QAction *action = menu->addAction(tr("Re=create path"));
             action->setEnabled(aadlObj);
 
             connect(action, &QAction::triggered, [gi]() {
                 if (auto connectionItem = qgraphicsitem_cast<AADLConnectionGraphicsItem *>(gi)) {
                     connectionItem->layout();
+                    connectionItem->updateEntity();
                 }
             });
-            ActionsManager::registerAction(
-                    Q_FUNC_INFO, action, "Connection", "Create a generic connection path instead of existing one");
+            ActionsManager::registerAction(Q_FUNC_INFO, action, "Connection re-creation",
+                    "Create a generic connection path instead of existing one");
         }
     }
 }
