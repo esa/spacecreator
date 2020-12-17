@@ -27,6 +27,13 @@ class AADLObject;
 
 namespace aadlinterface {
 
+enum class IntersectionType
+{
+    Edge,
+    Single,
+    Multiple,
+};
+
 static constexpr qreal LineHoverTolerance = 10.;
 static constexpr qreal LineHorizontalityTolerance = 15.;
 static const QSizeF DefaultGraphicsItemSize = { 200, 80 };
@@ -152,5 +159,8 @@ QVector<QPointF> simplifyPoints(const QVector<QPointF> &points);
 bool comparePolygones(const QVector<QPointF> &v1, const QVector<QPointF> &v2);
 
 int nestingLevel(aadl::AADLObject *object);
+
+QGraphicsItem *firstIntersectedItem(
+        QGraphicsScene *scene, const QVector<QPointF> &points, IntersectionType intersectionType);
 
 } // namespace aadlinterface

@@ -206,9 +206,10 @@ void AADLFunctionGraphicsItem::layoutConnection(
         Q_ASSERT(connection->startItem() && connection->endItem());
         if (includingNested || connection->parentItem() != this) {
             if (ConnectionLayoutPolicy::IgnoreCollisions == layoutPolicy) {
-                connection->updateEdgePoint(ifaceItem);
+                connection->updateEndPoint(ifaceItem);
             } else if (ConnectionLayoutPolicy::PartialRebuildOnCollision == layoutPolicy) {
-                connection->updateLastChunk(ifaceItem);
+                connection->updateEndPoint(ifaceItem);
+                connection->updateOverlappedSections();
             } else {
                 const auto collidingItems = scene()->collidingItems(connection);
                 if (std::any_of(

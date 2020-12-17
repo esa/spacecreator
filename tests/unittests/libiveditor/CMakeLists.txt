@@ -1,4 +1,5 @@
 add_subdirectory(tst_aadlinterfacegraphicsitem)
+add_subdirectory(tst_aadlconnectiongraphicsitem)
 add_subdirectory(tst_attributesconfigure)
 add_subdirectory(tst_connectionutils)
 add_subdirectory(tst_endtoendconnections)

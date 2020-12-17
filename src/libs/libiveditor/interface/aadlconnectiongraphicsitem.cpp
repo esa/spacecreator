@@ -231,8 +231,115 @@ bool AADLConnectionGraphicsItem::replaceInterface(
     }
 
     newIface->addConnection(this);
-    updateLastChunk(newIface);
+    updateEndPoint(newIface);
     return true;
+}
+
+//! Get list of graphics items intersected with \a connection
+static inline QList<QGraphicsItem *> intersectedItems(AADLConnectionGraphicsItem *connection,
+        const QList<int> &types = { AADLFunctionGraphicsItem::Type, AADLFunctionTypeGraphicsItem::Type })
+{
+    const QVector<QPointF> &points = connection->points();
+    QList<QGraphicsItem *> intersectedGraphicsItems = connection->scene()->items(points);
+    auto endIt = std::remove_if(intersectedGraphicsItems.begin(), intersectedGraphicsItems.end(),
+            [connection, points, types](QGraphicsItem *item) {
+                if (!types.contains(item->type())) {
+                    return true;
+                }
+
+                if (item->parentItem() != connection->parentItem()) {
+                    return true;
+                }
+
+                const auto intersectionPoints =
+                        shared::graphicsviewutils::intersectionPoints(item->sceneBoundingRect(), points);
+                return intersectionPoints.size() <= 1;
+            });
+    intersectedGraphicsItems.erase(endIt, intersectedGraphicsItems.end());
+    return intersectedGraphicsItems;
+}
+
+//! Get the connection path with replaced \a connection segments intersected with \a cachedIntersectedItems
+static inline QVector<QPointF> replaceIntersectedSegments(
+        const QList<QGraphicsItem *> &cachedIntersectedItems, AADLConnectionGraphicsItem *connection)
+{
+    QVector<QPointF> points = connection->points();
+    QList<QPair<QPointF, QPointF>> sections;
+    QPointF point;
+    for (int idx = 1; idx < points.size(); ++idx) {
+        if (points.at(idx - 1) == points.at(idx)) {
+            continue;
+        }
+        for (int cacheIdx = 0; cacheIdx < cachedIntersectedItems.size(); ++cacheIdx) {
+            const auto intersectionPoints = shared::graphicsviewutils::intersectionPoints(
+                    cachedIntersectedItems.value(cacheIdx)->sceneBoundingRect(),
+                    QVector<QPointF> { points.value(idx - 1), points.value(idx) });
+            const int properIntersectionPointsCount = std::count_if(
+                    intersectionPoints.cbegin(), intersectionPoints.cend(), [&points](const QPointF &intesectionPoint) {
+                        return points.first() != intesectionPoint && points.last() != intesectionPoint;
+                    });
+            if (properIntersectionPointsCount == 0) {
+                /// Current segment doesn't intersect Function(Type) item
+                continue;
+            }
+            Q_ASSERT(properIntersectionPointsCount <= 2);
+            if (!point.isNull()) {
+                /// Merging sequential sections
+                if (!sections.isEmpty() && sections.last().second == point) {
+                    sections.last().second = points.value(idx);
+                } else {
+                    sections.append(qMakePair(point, points.value(idx)));
+                }
+                point = QPointF();
+            } else if (properIntersectionPointsCount == 2) {
+                sections.append(qMakePair(points.value(idx - 1), points.value(idx)));
+                /// Checking other intersected items could be overlapped by current segment
+                continue;
+            } else {
+                point = points.value(idx - 1);
+            }
+            break;
+        }
+    }
+    sections.erase(std::unique(sections.begin(), sections.end()), sections.end());
+    for (auto chunk : sections) {
+        const QVector<QPointF> subPath = path(connection->scene(), chunk.first, chunk.second);
+        if (!points.isEmpty()) {
+            /// Remove overlapped chunk
+            const int idxStart = points.indexOf(chunk.first);
+            const int idxEnd = points.indexOf(chunk.second);
+            points.remove(idxStart, idxEnd - idxStart);
+
+            /// Insert new subpath instead of removed one
+            for (int idx = 0; idx < subPath.size(); ++idx) {
+                points.insert(idxStart + idx, subPath.value(idx));
+            }
+        } else {
+            /// Normally shouldn't be here, but if there is an error during subpath finding
+            /// stop update and recreate the whole path
+            points = AADLConnectionGraphicsItem::connectionPath(connection->startItem(), connection->endItem());
+            break;
+        }
+    }
+    return simplifyPoints(points);
+}
+
+//! Replaces intersected segments of connection path with newly generated subpaths if any
+void AADLConnectionGraphicsItem::updateOverlappedSections()
+{
+    if (m_points.isEmpty()) {
+        return;
+    }
+
+    /// Cache intersected items to avoid grabbing intersections of all items from scene
+    /// during checking all connection segments
+    const QList<QGraphicsItem *> cachedIntersectedItems = intersectedItems(this);
+    /// Nothing to update without intersections with Function(Type) items
+    if (cachedIntersectedItems.isEmpty()) {
+        return;
+    }
+    m_points = replaceIntersectedSegments(cachedIntersectedItems, this);
+    updateBoundingRect();
 }
 
 void AADLConnectionGraphicsItem::onSelectionChanged(bool isSelected)
@@ -436,17 +543,7 @@ void AADLConnectionGraphicsItem::onManualMoveFinish(
         updateIfaceItem(m_endItem);
     }
 
-    for (auto item : scene()->items(m_points)) {
-        if (qobject_cast<AADLRectGraphicsItem *>(item->toGraphicsObject())) {
-            if (shared::graphicsviewutils::intersectionPoints(item->sceneBoundingRect(), QPolygonF(m_points)).size()
-                    > 1) {
-                rebuildLayout();
-                updateEntity();
-                return;
-            }
-        }
-    }
-
+    updateOverlappedSections();
     updateBoundingRect();
     updateEntity();
 }
@@ -513,6 +610,70 @@ QString AADLConnectionGraphicsItem::prepareTooltip() const
     const QString tooltip =
             QString("%1.%2 %3 %4.%5").arg(sourceName, sourceInterfaceName, sign, targetName, targetInterfaceName);
     return tooltip;
+}
+
+void AADLConnectionGraphicsItem::updateEndPoint(const AADLInterfaceGraphicsItem *iface)
+{
+    if (!iface || m_points.size() < 2) {
+        return;
+    }
+
+    const QPointF ifaceEndPoint = iface->connectionEndPoint(this);
+    if (m_points.front().toPoint() == ifaceEndPoint.toPoint() && m_points.last().toPoint() == ifaceEndPoint.toPoint()) {
+        return;
+    }
+
+    if (m_points.size() > 2) {
+        QVector<QPointF> initialPoints = aadlinterface::polygon(entity()->coordinates());
+        const QRectF currentRect = QRectF(initialPoints.first(), initialPoints.last());
+        QRectF newRect;
+        QPointF delta;
+        if (iface == startItem()) {
+            newRect = QRectF(ifaceEndPoint, m_points.last());
+        } else if (iface == endItem()) {
+            newRect = QRectF(m_points.first(), ifaceEndPoint);
+        } else {
+            qWarning() << "Attempt to update from an unknown interface";
+            return;
+        }
+
+        const qreal xScale = newRect.width() / currentRect.width();
+        const qreal yScale = newRect.height() / currentRect.height();
+        if (qFuzzyCompare(xScale, 1.0) && qFuzzyCompare(yScale, 1.0)) {
+            return;
+        }
+        for (auto it = std::next(initialPoints.begin()); it != std::prev(initialPoints.end()); ++it) {
+            qreal x = 0, y = 0;
+            if (it->x() <= currentRect.left()) {
+                x = it->x() - currentRect.left() + newRect.left();
+            } else if (it->x() >= currentRect.right()) {
+                x = it->x() - currentRect.right() + newRect.right();
+            } else {
+                x = (it->x() - currentRect.left()) * xScale + newRect.left();
+            }
+
+            if (it->y() <= currentRect.top()) {
+                y = it->y() - currentRect.top() + newRect.top();
+            } else if (it->y() >= currentRect.bottom()) {
+                y = it->y() - currentRect.bottom() + newRect.bottom();
+            } else {
+                y = (it->y() - currentRect.top()) * yScale + newRect.top();
+            }
+
+            *it = { x, y };
+        }
+        m_points = initialPoints;
+    }
+
+    if (iface == startItem()) {
+        m_points.first() = ifaceEndPoint;
+        m_points.last() = endItem()->connectionEndPoint(this);
+    } else if (iface == endItem()) {
+        m_points.first() = startItem()->connectionEndPoint(this);
+        m_points.last() = ifaceEndPoint;
+    }
+
+    updateBoundingRect();
 }
 
 QVector<QPointF> AADLConnectionGraphicsItem::connectionPath(

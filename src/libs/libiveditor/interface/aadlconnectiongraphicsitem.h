@@ -74,12 +74,15 @@ public:
 
     QString prepareTooltip() const override;
 
+    void updateEndPoint(const AADLInterfaceGraphicsItem *iface);
     void updateLastChunk(const AADLInterfaceGraphicsItem *iface);
     void updateEdgePoint(const AADLInterfaceGraphicsItem *iface);
 
     void layout();
 
     bool replaceInterface(AADLInterfaceGraphicsItem *ifaceToBeReplaced, AADLInterfaceGraphicsItem *newIface);
+
+    void updateOverlappedSections();
 
 protected:
     void onManualMoveStart(shared::ui::GripPoint *gp, const QPointF &at) override;

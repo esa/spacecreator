@@ -387,6 +387,7 @@ void AADLInterfaceGraphicsItem::onManualMoveProgress(shared::ui::GripPoint *, co
     for (auto connectionItem : m_connections) {
         if (!connectionItem.isNull() && connectionItem->isVisible()) {
             connectionItem->updateLastChunk(this);
+            connectionItem->updateOverlappedSections();
         }
     }
 

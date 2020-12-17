@@ -145,6 +145,7 @@ void tst_ConnectionUtils::tst_segmentGenerationByPoints()
     QPointF startPoint { 100, 100 };
     QPointF endPoint { startPoint };
     auto segments = aadlinterface::generateSegments(startPoint, endPoint);
+    QVERIFY(segments.isEmpty());
 
     endPoint += QPointF(200, 200);
     segments = aadlinterface::generateSegments(startPoint, endPoint);
@@ -367,8 +368,8 @@ void tst_ConnectionUtils::tst_pathByPoints()
 {
     const QRectF r1 = f1->sceneBoundingRect();
     const QRectF r2 = f2->sceneBoundingRect();
-    const QPointF startPoint(r1.x(), r1.y() + 100);
-    const QPointF endPoint(r2.right(), r2.y() + 100);
+    const QPointF startPoint(r1.x() - 100, r1.center().y());
+    const QPointF endPoint(r2.right() + 100, r2.center().y());
 
     auto path = aadlinterface::path(&m_scene, startPoint, endPoint);
     QVERIFY(!path.isEmpty());
@@ -501,8 +502,8 @@ void tst_ConnectionUtils::tst_path()
 {
     const QRectF r1 = f1->sceneBoundingRect();
     const QRectF r2 = f2->sceneBoundingRect();
-    const QPointF startPoint(r1.x(), r1.y() + 100);
-    const QPointF endPoint(r2.right(), r2.y() + 100);
+    const QPointF startPoint(r1.x() - 100, r1.center().y());
+    const QPointF endPoint(r2.right() + 100, r2.center().y());
 
     const QLineF startSegment = aadlinterface::ifaceSegment(r1, startPoint, endPoint);
     const QLineF endSegment = aadlinterface::ifaceSegment(r2, endPoint, startPoint);
@@ -510,6 +511,28 @@ void tst_ConnectionUtils::tst_path()
     auto path = aadlinterface::path(&m_scene, startSegment, endSegment);
     QVERIFY(!path.isEmpty());
 }
+
+static inline bool isOnVerticalSide(const QRectF &rect, const QPointF &point)
+{
+    return (qFuzzyCompare(rect.left(), point.x()) || qFuzzyCompare(rect.right(), point.x()))
+            && ((rect.top() < point.y() && rect.bottom() > point.y()) || qFuzzyCompare(rect.top(), point.y())
+                    || qFuzzyCompare(rect.bottom(), point.y()));
+}
+
+static inline bool isOnHorizontalSide(const QRectF &rect, const QPointF &point)
+{
+    return (qFuzzyCompare(rect.top(), point.y()) || qFuzzyCompare(rect.bottom(), point.y()))
+            && ((rect.left() < point.x() && rect.right() > point.x()) || qFuzzyCompare(rect.left(), point.x())
+                    || qFuzzyCompare(rect.right(), point.x()));
+}
+
+static inline bool rectContainsPoint(const QRectF &rect, const QPointF &point, bool proper = true)
+{
+    if (!rect.contains(point)) {
+        return false;
+    }
+    return !proper || (!isOnHorizontalSide(rect, point) && !isOnVerticalSide(rect, point));
+};
 
 void tst_ConnectionUtils::checkEndPoints(aadlinterface::AADLFunctionGraphicsItem *startFn, Data::EndPoint startEp,
         aadlinterface::AADLFunctionGraphicsItem *endFn, Data::EndPoint endEp, bool isReversed, bool shouldFail)
@@ -525,13 +548,19 @@ void tst_ConnectionUtils::checkEndPoints(aadlinterface::AADLFunctionGraphicsItem
             const QVector<QPointF> connectionPoints { start.point(startEp) + offsets[startIdx],
                 end.point(endEp) + offsets[endIdx] };
 
-            if (!shared::graphicsviewutils::intersects(startFn->sceneBoundingRect(), connectionPoints)
-                    || !shared::graphicsviewutils::intersects(endFn->sceneBoundingRect(), connectionPoints)) {
-                continue;
+            const QPointF p = isReversed ? connectionPoints.last() : connectionPoints.first();
+            if (startEp == Data::EndPoint::Empty) {
+                const bool validPoint = isOnVerticalSide(start.rect(), p) || isOnVerticalSide(start.rect(), p);
+                if (!validPoint) {
+                    continue;
+                }
             }
-
-            if (!startFn->sceneBoundingRect().contains(connectionPoints.first()))
-                continue;
+            if (endEp == Data::EndPoint::Empty) {
+                const bool validPoint = isOnVerticalSide(end.rect(), p) || isOnVerticalSide(end.rect(), p);
+                if (!validPoint) {
+                    continue;
+                }
+            }
 
             const auto result = aadlinterface::gi::validateConnectionCreate(&m_scene, connectionPoints);
             QVERIFY(result.startIface != result.endIface
@@ -547,9 +576,9 @@ void tst_ConnectionUtils::checkEndPoints(aadlinterface::AADLFunctionGraphicsItem
                     QCOMPARE(result.connectionPoints, connectionPoints);
                 }
 
-                const auto path = aadlinterface::createConnectionPath(&m_scene, result.connectionPoints.first(),
-                        isReversed ? end.rect() : start.rect(), result.connectionPoints.last(),
-                        isReversed ? start.rect() : end.rect());
+                const auto path = aadlinterface::createConnectionPath(&m_scene,
+                        isReversed ? result.connectionPoints.last() : result.connectionPoints.first(), start.rect(),
+                        isReversed ? result.connectionPoints.first() : result.connectionPoints.last(), end.rect());
                 QVERIFY(!path.isEmpty());
             }
         }

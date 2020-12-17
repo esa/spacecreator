@@ -36,6 +36,73 @@
 
 namespace aadlinterface {
 
+static const QList<int> kNonIntersectableTypes = { AADLFunctionGraphicsItem::Type, AADLFunctionTypeGraphicsItem::Type };
+
+QGraphicsItem *firstIntersectedItem(
+        QGraphicsScene *scene, const QVector<QPointF> &points, IntersectionType intersectionType)
+{
+    if (points.size() < 2) {
+        return nullptr;
+    }
+
+    struct SearchIndex {
+        QGraphicsItem *closestIntersectedItem = nullptr;
+        qreal distance = 0;
+        int sectionIdx = -1;
+    };
+    QList<SearchIndex> indexes;
+    const QList<QGraphicsItem *> intersectedItems = scene->items(points);
+    for (int idx = 1; idx < points.size(); ++idx) {
+        const QLineF line { points.at(idx - 1), points.at(idx) };
+        if (qFuzzyIsNull(line.length())) {
+            continue;
+        }
+        for (auto it = intersectedItems.cbegin(); it != intersectedItems.cend(); ++it) {
+            if (!kNonIntersectableTypes.contains((*it)->type())) {
+                continue;
+            }
+            QPointF intersectionPoint;
+            if (intersectionType == IntersectionType::Edge
+                    && !shared::graphicsviewutils::intersects((*it)->sceneBoundingRect(), line, &intersectionPoint)) {
+                continue;
+            } else {
+                const auto intersectionPoints = shared::graphicsviewutils::intersectionPoints(
+                        (*it)->sceneBoundingRect(), QPolygonF(QVector<QPointF> { line.p1(), line.p2() }));
+                if (intersectionPoints.isEmpty()) {
+                    continue;
+                }
+                if (intersectionType == IntersectionType::Multiple) {
+                    if (intersectionPoints.size() <= 1) {
+                        continue;
+                    }
+                } else {
+                    const int properPointsCount = std::count_if(
+                            intersectionPoints.cbegin(), intersectionPoints.cend(), [points](const QPointF &point) {
+                                return points.first() != point && points.last() != point;
+                            });
+                    if (properPointsCount == 0) {
+                        continue;
+                    }
+                }
+                std::for_each(intersectionPoints.cbegin(), intersectionPoints.cend(),
+                        [&intersectionPoint, sectionStartPoint = line.p1()](const QPointF &p) {
+                            if (aadlinterface::distanceLine(sectionStartPoint, intersectionPoint)
+                                    > aadlinterface::distanceLine(p, sectionStartPoint)) {
+                                intersectionPoint = p;
+                            }
+                        });
+            }
+            indexes << SearchIndex { *it, QLineF(line.p1(), intersectionPoint).length(), idx };
+        }
+    }
+
+    std::sort(indexes.begin(), indexes.end(), [](const SearchIndex &sh1, const SearchIndex &sh2) {
+        return sh1.sectionIdx == sh2.sectionIdx ? sh1.distance < sh2.distance : sh1.sectionIdx < sh2.sectionIdx;
+    });
+
+    return indexes.isEmpty() ? nullptr : indexes.first().closestIntersectedItem;
+}
+
 /*!
  * Returns the side type of \a boundingArea's which is most close to the \a pos.
  */
@@ -598,25 +665,12 @@ QLineF ifaceSegment(const QRectF &sceneRect, const QPointF &firstEndPoint, const
 QVector<QPointF> path(QGraphicsScene *scene, const QPointF &startPoint, const QPointF &endPoint)
 {
     const QVector<QPointF> points { startPoint, endPoint };
-    const QList<QGraphicsItem *> intersectedItems = scene->items(points);
-    if (intersectedItems.isEmpty()) {
-        return points;
-    }
-
-    static const QList<int> types = { AADLFunctionGraphicsItem::Type, AADLFunctionTypeGraphicsItem::Type };
-    auto it = std::find_if(intersectedItems.crbegin(), intersectedItems.crend(), [points](QGraphicsItem *item) {
-        if (!types.contains(item->type()))
-            return false;
-
-        const auto intersectionPoints =
-                shared::graphicsviewutils::intersectionPoints(item->sceneBoundingRect(), points);
-        return intersectionPoints.size() > 1;
-    });
-    if (it == intersectedItems.crend())
+    auto item = firstIntersectedItem(scene, points, IntersectionType::Multiple);
+    if (!item)
         return points;
 
     const QList<QVector<QPointF>> possiblePaths =
-            findSubPath((*it)->sceneBoundingRect(), { startPoint }, { endPoint }, false);
+            findSubPath(item->sceneBoundingRect(), { startPoint }, { endPoint }, false);
     if (possiblePaths.isEmpty()) {
         return {};
     }
@@ -718,17 +772,13 @@ QList<QVector<QPointF>> findSubPath(
 QVector<QPointF> findPath(
         QGraphicsScene *scene, const QLineF &startDirection, const QLineF &endDirection, QRectF *intersectedRect)
 {
-    static const QList<int> types = { AADLFunctionGraphicsItem::Type, AADLFunctionTypeGraphicsItem::Type };
     const QVector<QPointF> points = generateSegments(startDirection, endDirection);
-    const QList<QGraphicsItem *> intersectedItems = scene->items(points);
-
-    auto it = std::find_if(intersectedItems.crbegin(), intersectedItems.crend(), [points](const QGraphicsItem *item) {
-        return types.contains(item->type()) && shared::graphicsviewutils::intersects(item->sceneBoundingRect(), points);
-    });
-    if (it == intersectedItems.crend())
+    const auto item = firstIntersectedItem(scene, points, IntersectionType::Single);
+    if (!item)
         return points;
 
-    *intersectedRect = (*it)->sceneBoundingRect();
+    if (intersectedRect)
+        *intersectedRect = item->sceneBoundingRect();
     return {};
 }
 
@@ -763,23 +813,13 @@ QVector<QPointF> path(QGraphicsScene *scene, const QLineF &startDirection, const
                 continue;
             }
             const auto subPaths = findSubPath(intersectedRect, path, { endDirection.p1(), endDirection.p2() });
-            static const QList<int> types = { AADLFunctionGraphicsItem::Type, AADLFunctionTypeGraphicsItem::Type };
             for (auto subPath : subPaths) {
                 if (subPath.isEmpty()) {
                     continue;
                 }
 
-                const QList<QGraphicsItem *> intersectedItems = scene->items(subPath);
-                auto it = std::find_if(
-                        intersectedItems.crbegin(), intersectedItems.crend(), [subPath](QGraphicsItem *item) {
-                            if (!types.contains(item->type())) {
-                                return false;
-                            }
-                            auto points =
-                                    shared::graphicsviewutils::intersectionPoints(item->sceneBoundingRect(), subPath);
-                            return points.size() > 1;
-                        });
-                if (it != intersectedItems.crend())
+                const auto item = firstIntersectedItem(scene, subPath, IntersectionType::Single);
+                if (item)
                     continue;
                 else if (subPath.last() == endDirection.p2())
                     results.append(subPath);
