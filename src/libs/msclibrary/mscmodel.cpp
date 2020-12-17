@@ -55,6 +55,7 @@ bool MscModel::addDocument(MscDocument *document)
     document->setParent(this);
     m_documents.append(document);
     connect(document, &MscDocument::dataChanged, this, &MscModel::dataChanged);
+    connect(document, &MscDocument::documentRemovedFrom, this, &MscModel::documentRemovedFrom);
     Q_EMIT documentAdded(document);
     Q_EMIT dataChanged();
 
@@ -73,6 +74,8 @@ void MscModel::removeDocument(MscDocument *document)
     if (m_documents.removeAll(document)) {
         document->clear();
     }
+
+    Q_EMIT documentRemovedFrom(document, this);
 }
 
 /*!

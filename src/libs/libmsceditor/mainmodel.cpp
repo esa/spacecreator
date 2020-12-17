@@ -224,8 +224,9 @@ QString MainModel::chartText(const MscChart *chart) const
  */
 void MainModel::setSelectedDocument(MscDocument *document)
 {
-    if (d->m_selectedDocument == document)
+    if (d->m_selectedDocument == document) {
         return;
+    }
 
     d->m_selectedDocument = document;
     d->m_hierarchyModel.setSelectedDocument(d->m_selectedDocument);
@@ -519,6 +520,12 @@ void MainModel::setNewModel(MscModel *model)
     connect(d->m_mscModel, &msc::MscModel::dataChanged, this, &MainModel::modelDataChanged);
     connect(d->m_mscModel, &msc::MscModel::asn1ParameterErrorDetected, this,
             &msc::MainModel::asn1ParameterErrorDetected);
+    connect(d->m_mscModel, &msc::MscModel::documentRemovedFrom, this, [&](msc::MscDocument *document, QObject *) {
+        const msc::MscChart *currentChart = d->m_chartLayoutManager.currentChart();
+        if (!currentChart || currentChart->parentDocument() == document) {
+            showFirstChart();
+        }
+    });
     connect(&d->m_chartLayoutManager, &ChartLayoutManager::cifDataChanged, d->m_mscModel, &msc::MscModel::dataChanged);
 
     showFirstChart();

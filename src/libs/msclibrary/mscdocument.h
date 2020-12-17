@@ -92,6 +92,7 @@ Q_SIGNALS:
     void chartAdded(msc::MscChart *chart);
     void cleared();
     void hierarchyTypeChanged(msc::MscDocument::HierarchyType type);
+    void documentRemovedFrom(msc::MscDocument *document, QObject *parentObject);
 
 private:
     QVector<MscDocument *> m_documents;

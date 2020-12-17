@@ -81,6 +81,9 @@ Q_SIGNALS:
     void asn1DataChanged();
     void asn1ParameterErrorDetected(const QStringList &faultyMessages);
 
+    // Emitted whenever a document is removed anywhere in the model
+    void documentRemovedFrom(msc::MscDocument *document, QObject *parentObject);
+
 private:
     void appendMessages(msc::MscDocument *doc, QVector<msc::MscMessage *> &messages) const;
     void appendMessages(msc::MscChart *chart, QVector<msc::MscMessage *> &messages) const;
