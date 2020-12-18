@@ -50,7 +50,8 @@ public:
         RequiredInterface,
         MultiPointConnection,
         DirectConnection,
-        GroupConnection
+        GroupConnection,
+        ReCreateConnection,
     };
 
     CreatorTool::ToolType toolType() const;

@@ -1,4 +1,4 @@
-/*
+﻿/*
   Copyright (C) 2019 European Space Agency - <maxime.perrotin@esa.int>
 
   This library is free software; you can redistribute it and/or
@@ -86,6 +86,7 @@ struct CreatorTool::CreatorToolPrivate {
     void handleInterface(QGraphicsScene *scene, aadl::AADLObjectIface::IfaceType type, const QPointF &pos);
     bool handleConnectionCreate(const QPointF &pos);
     void handleDirectConnection(const QPointF &pos);
+    void handleConnectionReCreate(const QVector<QPointF> &graphicPoints);
     void handleConnection(const QVector<QPointF> &graphicPoints) const;
 
     bool warnConnectionPreview(const QPointF &pos);
@@ -319,35 +320,36 @@ bool CreatorTool::onMousePress(QMouseEvent *e)
     }
 
     const QPointF scenePos = d->cursorInScene(e->globalPos());
-    if (e->modifiers() & Qt::ShiftModifier) {
-        QGraphicsItem *item = nearestItem(scene, scenePos, kInterfaceTolerance, { AADLInterfaceGraphicsItem::Type });
-        if (!item || item->type() != AADLInterfaceGraphicsItem::Type)
-            return false;
+    if ((d->toolType == ToolType::ReCreateConnection || e->modifiers() & Qt::ShiftModifier)
+            && e->button() != Qt::RightButton) {
+        if (!d->previewConnectionItem) {
+            QGraphicsItem *item =
+                    nearestItem(scene, scenePos, kInterfaceTolerance, { AADLInterfaceGraphicsItem::Type });
+            if (!item || item->type() != AADLInterfaceGraphicsItem::Type)
+                return false;
 
-        auto interfaceItem = qgraphicsitem_cast<const AADLInterfaceGraphicsItem *>(item);
-        if (!interfaceItem)
-            return false;
+            auto interfaceItem = qgraphicsitem_cast<const AADLInterfaceGraphicsItem *>(item);
+            if (!interfaceItem)
+                return false;
 
-        if (interfaceItem->connectionItems().size() != 1 || !interfaceItem->entity()->isProvided())
-            return false;
+            if (interfaceItem->connectionItems().size() != 1 || !interfaceItem->entity()->isProvided())
+                return false;
 
-        auto connectionItem = interfaceItem->connectionItems().front();
-        Q_ASSERT(connectionItem);
+            auto connectionItem = interfaceItem->connectionItems().front();
+            Q_ASSERT(connectionItem);
 
-        auto reqIface = connectionItem->startItem();
-        Q_ASSERT(reqIface);
+            auto reqIface = connectionItem->startItem();
+            Q_ASSERT(reqIface);
 
-        d->toolType = ToolType::MultiPointConnection;
-        d->previewConnectionItem = new QGraphicsPathItem;
-        d->previewConnectionItem->setPen(QPen(Qt::black, 2, Qt::DotLine));
-        d->previewConnectionItem->setZValue(ZOrder.Preview);
-        scene->addItem(d->previewConnectionItem);
-        d->connectionPoints.append(reqIface->connectionEndPoint(connectionItem));
-
-        const QVariantList params = { QVariant::fromValue(connectionItem->entity()),
-            QVariant::fromValue(d->model->objectsModel()) };
-        if (QUndoCommand *cmdRm = cmd::CommandsFactory::create(cmd::RemoveEntity, params))
-            cmd::CommandsStack::push(cmdRm);
+            d->toolType = ToolType::ReCreateConnection;
+            d->previewConnectionItem = new QGraphicsPathItem;
+            d->previewConnectionItem->setPen(QPen(Qt::black, 2, Qt::DotLine));
+            d->previewConnectionItem->setZValue(ZOrder.Preview);
+            d->previewConnectionItem->setData(Qt::UserRole, connectionItem->entity()->id());
+            scene->addItem(d->previewConnectionItem);
+            d->connectionPoints.append(reqIface->connectionEndPoint(connectionItem));
+            connectionItem->setVisible(false);
+        }
         return true;
     } else if (e->modifiers() & Qt::ControlModifier) {
         auto itemAtCursor = d->view->itemAt(e->pos());
@@ -760,6 +762,11 @@ void CreatorTool::CreatorToolPrivate::handleToolType(CreatorTool::ToolType type,
         case ToolType::DirectConnection:
             handleDirectConnection(pos);
             break;
+        case ToolType::ReCreateConnection:
+            if (!handleConnectionCreate(pos))
+                return;
+            handleConnectionReCreate(connectionPoints);
+            break;
         default:
             break;
         }
@@ -1060,6 +1067,34 @@ void CreatorTool::CreatorToolPrivate::handleConnection(const QVector<QPointF> &g
     cmdMacro.setComplete(true);
 }
 
+void CreatorTool::CreatorToolPrivate::handleConnectionReCreate(const QVector<QPointF> &graphicPoints)
+{
+    toolType = ToolType::Pointer;
+    const auto info = aadlinterface::gi::validateConnectionCreate(view ? view->scene() : nullptr, graphicPoints);
+    if (info.status != aadl::ConnectionCreationValidator::FailReason::MulticastDisabled) {
+        return;
+    }
+    const shared::Id id = previewConnectionItem->data(Qt::UserRole).toUuid();
+    if (id.isNull()) {
+        return;
+    }
+
+    if (auto item = model->getItem(id)) {
+        if (auto connection = qgraphicsitem_cast<AADLConnectionGraphicsItem *>(item)) {
+            if (connection->startItem()->entity()->id() != info.startIfaceId
+                    || connection->endItem()->entity()->id() != info.endIfaceId) {
+                return;
+            }
+            const QVariantList params = { QVariant::fromValue(connection->entity()),
+                QVariant::fromValue(info.connectionPoints) };
+            QList<QVariant> paramsList;
+            paramsList.append(qVariantFromValue(params));
+            if (QUndoCommand *cmdRm = cmd::CommandsFactory::create(cmd::ChangeEntityGeometry, paramsList))
+                cmd::CommandsStack::push(cmdRm);
+        }
+    }
+}
+
 bool CreatorTool::CreatorToolPrivate::warnConnectionPreview(const QPointF &pos)
 {
     QVector<QPointF> connectionPoints = this->connectionPoints;
@@ -1070,8 +1105,24 @@ bool CreatorTool::CreatorToolPrivate::warnConnectionPreview(const QPointF &pos)
 
     auto info =
             aadlinterface::gi::validateConnectionCreate(this->view ? this->view->scene() : nullptr, connectionPoints);
-    const bool warn = info.failed();
-
+    bool warn = true;
+    if (toolType == ToolType::ReCreateConnection) {
+        if (info.status != aadl::ConnectionCreationValidator::FailReason::MulticastDisabled || !info.endIface
+                || !info.startIface) {
+            warn = true;
+        } else {
+            auto startItem = qgraphicsitem_cast<AADLInterfaceGraphicsItem *>(model->getItem(info.startIfaceId));
+            auto endItem = qgraphicsitem_cast<AADLInterfaceGraphicsItem *>(model->getItem(info.endIfaceId));
+            if (!startItem || !endItem) {
+                warn = true;
+            } else {
+                warn = !startItem->ifaceShape().contains(connectionPoints.first())
+                        && endItem->ifaceShape().contains(connectionPoints.last());
+            }
+        }
+    } else {
+        warn = info.failed();
+    }
     if (this->previewConnectionItem) {
         QPen p = this->previewConnectionItem->pen();
         p.setColor(warn ? Qt::red : Qt::black);
@@ -1113,6 +1164,13 @@ void CreatorTool::CreatorToolPrivate::clearPreviewItem()
 
     this->connectionPoints.clear();
     if (this->previewConnectionItem) {
+        const auto id = previewConnectionItem->data(Qt::UserRole).toUuid();
+        if (!id.isNull()) {
+            if (auto item = model->getItem(id)) {
+                item->setVisible(true);
+            }
+        }
+
         this->previewConnectionItem->scene()->removeItem(this->previewConnectionItem);
         delete this->previewConnectionItem;
         this->previewConnectionItem = nullptr;
