@@ -937,4 +937,26 @@ int nestingLevel(aadl::AADLObject *object)
     return level;
 }
 
+bool isOnVerticalSide(const QRectF &rect, const QPointF &point)
+{
+    return (qFuzzyCompare(rect.left(), point.x()) || qFuzzyCompare(rect.right(), point.x()))
+            && ((rect.top() < point.y() && rect.bottom() > point.y()) || qFuzzyCompare(rect.top(), point.y())
+                    || qFuzzyCompare(rect.bottom(), point.y()));
+}
+
+bool isOnHorizontalSide(const QRectF &rect, const QPointF &point)
+{
+    return (qFuzzyCompare(rect.top(), point.y()) || qFuzzyCompare(rect.bottom(), point.y()))
+            && ((rect.left() < point.x() && rect.right() > point.x()) || qFuzzyCompare(rect.left(), point.x())
+                    || qFuzzyCompare(rect.right(), point.x()));
+}
+
+bool rectContainsPoint(const QRectF &rect, const QPointF &point, bool proper)
+{
+    if (!rect.contains(point)) {
+        return false;
+    }
+    return !proper || (!isOnHorizontalSide(rect, point) && !isOnVerticalSide(rect, point));
+}
+
 } // namespace aadlinterface

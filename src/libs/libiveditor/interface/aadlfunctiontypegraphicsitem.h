@@ -54,6 +54,7 @@ protected Q_SLOTS:
     void updateNameFromUi(const QString &name);
 
 protected:
+    void onManualResizeProgress(shared::ui::GripPoint *grip, const QPointF &from, const QPointF &to) override;
     void rebuildLayout() override;
     void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget) override;
     ColorManager::HandledColors handledColorType() const override;

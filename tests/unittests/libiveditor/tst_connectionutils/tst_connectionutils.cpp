@@ -512,28 +512,6 @@ void tst_ConnectionUtils::tst_path()
     QVERIFY(!path.isEmpty());
 }
 
-static inline bool isOnVerticalSide(const QRectF &rect, const QPointF &point)
-{
-    return (qFuzzyCompare(rect.left(), point.x()) || qFuzzyCompare(rect.right(), point.x()))
-            && ((rect.top() < point.y() && rect.bottom() > point.y()) || qFuzzyCompare(rect.top(), point.y())
-                    || qFuzzyCompare(rect.bottom(), point.y()));
-}
-
-static inline bool isOnHorizontalSide(const QRectF &rect, const QPointF &point)
-{
-    return (qFuzzyCompare(rect.top(), point.y()) || qFuzzyCompare(rect.bottom(), point.y()))
-            && ((rect.left() < point.x() && rect.right() > point.x()) || qFuzzyCompare(rect.left(), point.x())
-                    || qFuzzyCompare(rect.right(), point.x()));
-}
-
-static inline bool rectContainsPoint(const QRectF &rect, const QPointF &point, bool proper = true)
-{
-    if (!rect.contains(point)) {
-        return false;
-    }
-    return !proper || (!isOnHorizontalSide(rect, point) && !isOnVerticalSide(rect, point));
-};
-
 void tst_ConnectionUtils::checkEndPoints(aadlinterface::AADLFunctionGraphicsItem *startFn, Data::EndPoint startEp,
         aadlinterface::AADLFunctionGraphicsItem *endFn, Data::EndPoint endEp, bool isReversed, bool shouldFail)
 {
@@ -550,13 +528,15 @@ void tst_ConnectionUtils::checkEndPoints(aadlinterface::AADLFunctionGraphicsItem
 
             const QPointF p = isReversed ? connectionPoints.last() : connectionPoints.first();
             if (startEp == Data::EndPoint::Empty) {
-                const bool validPoint = isOnVerticalSide(start.rect(), p) || isOnVerticalSide(start.rect(), p);
+                const bool validPoint = aadlinterface::isOnVerticalSide(start.rect(), p)
+                        || aadlinterface::isOnVerticalSide(start.rect(), p);
                 if (!validPoint) {
                     continue;
                 }
             }
             if (endEp == Data::EndPoint::Empty) {
-                const bool validPoint = isOnVerticalSide(end.rect(), p) || isOnVerticalSide(end.rect(), p);
+                const bool validPoint = aadlinterface::isOnVerticalSide(end.rect(), p)
+                        || aadlinterface::isOnVerticalSide(end.rect(), p);
                 if (!validPoint) {
                     continue;
                 }

@@ -163,4 +163,9 @@ int nestingLevel(aadl::AADLObject *object);
 QGraphicsItem *firstIntersectedItem(
         QGraphicsScene *scene, const QVector<QPointF> &points, IntersectionType intersectionType);
 
+bool isOnVerticalSide(const QRectF &rect, const QPointF &point);
+bool isOnHorizontalSide(const QRectF &rect, const QPointF &point);
+bool rectContainsPoint(const QRectF &rect, const QPointF &point, bool proper = true);
+;
+
 } // namespace aadlinterface

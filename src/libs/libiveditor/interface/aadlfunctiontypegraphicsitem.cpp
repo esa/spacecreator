@@ -168,6 +168,39 @@ void AADLFunctionTypeGraphicsItem::updateNameFromUi(const QString &name)
     }
 }
 
+void AADLFunctionTypeGraphicsItem::onManualResizeProgress(
+        shared::ui::GripPoint *grip, const QPointF &from, const QPointF &to)
+{
+    const QRectF rect = sceneBoundingRect();
+
+    AADLRectGraphicsItem::onManualResizeProgress(grip, from, to);
+    const QPointF delta = to - from;
+    if (delta.isNull()) {
+        return;
+    }
+    for (auto child : childItems()) {
+        if (auto iface = qgraphicsitem_cast<AADLInterfaceGraphicsItem *>(child)) {
+            const aadl::AADLObjectIface *obj = iface->entity();
+            Q_ASSERT(obj);
+            if (!obj) {
+                return;
+            }
+
+            const QPointF storedPos = aadlinterface::pos(obj->coordinates());
+            if (storedPos.isNull() || !grip) {
+                iface->instantLayoutUpdate();
+                continue;
+            }
+
+            const QPointF ifacePos = iface->scenePos();
+            const Qt::Alignment side = getNearestSide(rect, storedPos);
+            const QRectF sceneRect = sceneBoundingRect();
+            const QPointF pos = getSidePosition(sceneRect, storedPos, side);
+            iface->setPos(iface->parentItem()->mapFromScene(pos));
+        }
+    }
+}
+
 QString AADLFunctionTypeGraphicsItem::prepareTooltip() const
 {
     const QString title = uniteNames<aadl::AADLObjectFunctionType *>({ entity() }, QString());
