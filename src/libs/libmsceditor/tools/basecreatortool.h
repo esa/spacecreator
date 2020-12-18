@@ -37,6 +37,7 @@ public Q_SLOTS:
 
 Q_SIGNALS:
     void created();
+    void canceled();
 
 protected Q_SLOTS:
     virtual void onCurrentChartChagend(msc::MscChart *);

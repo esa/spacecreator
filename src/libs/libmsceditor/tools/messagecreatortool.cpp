@@ -156,12 +156,15 @@ void MessageCreatorTool::commitPreviewItem()
                 m_model->undoStack()->push(new cmd::CmdMessageItemCreate(m_message, eventIndex, m_model, points));
 
                 Q_EMIT created(); // to deactivate toobar's item
+                m_message.clear();
+                return;
             }
         }
     }
 
     removePreviewItem();
     m_message.clear();
+    Q_EMIT canceled();
 }
 
 bool MessageCreatorTool::onMousePress(QMouseEvent *e)
