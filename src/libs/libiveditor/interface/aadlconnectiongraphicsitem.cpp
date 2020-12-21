@@ -627,7 +627,6 @@ void AADLConnectionGraphicsItem::updateEndPoint(const AADLInterfaceGraphicsItem 
         QVector<QPointF> initialPoints = aadlinterface::polygon(entity()->coordinates());
         const QRectF currentRect = QRectF(initialPoints.first(), initialPoints.last());
         QRectF newRect;
-        QPointF delta;
         if (iface == startItem()) {
             newRect = QRectF(ifaceEndPoint, m_points.last());
         } else if (iface == endItem()) {
@@ -644,17 +643,17 @@ void AADLConnectionGraphicsItem::updateEndPoint(const AADLInterfaceGraphicsItem 
         }
         for (auto it = std::next(initialPoints.begin()); it != std::prev(initialPoints.end()); ++it) {
             qreal x = 0, y = 0;
-            if (it->x() <= currentRect.left()) {
+            if (it->x() <= currentRect.left() && it->x() < currentRect.right()) {
                 x = it->x() - currentRect.left() + newRect.left();
-            } else if (it->x() >= currentRect.right()) {
+            } else if (it->x() >= currentRect.right() && it->x() > currentRect.left()) {
                 x = it->x() - currentRect.right() + newRect.right();
             } else {
                 x = (it->x() - currentRect.left()) * xScale + newRect.left();
             }
 
-            if (it->y() <= currentRect.top()) {
+            if (it->y() <= currentRect.top() && it->y() < currentRect.bottom()) {
                 y = it->y() - currentRect.top() + newRect.top();
-            } else if (it->y() >= currentRect.bottom()) {
+            } else if (it->y() >= currentRect.bottom() && it->y() > currentRect.top()) {
                 y = it->y() - currentRect.bottom() + newRect.bottom();
             } else {
                 y = (it->y() - currentRect.top()) * yScale + newRect.top();
