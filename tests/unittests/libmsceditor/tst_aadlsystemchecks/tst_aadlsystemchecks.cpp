@@ -24,6 +24,7 @@
 #include "chartitem.h"
 #include "commandsstack.h"
 #include "interface/interfacedocument.h"
+#include "iveditor.h"
 #include "iveditorcore.h"
 #include "mainmodel.h"
 #include "mscchart.h"
@@ -58,6 +59,8 @@ private Q_SLOTS:
     void testCorrespondMessage_data();
     void testCorrespondMessage();
 
+    void testCheckMessage();
+
 private:
     msc::ChartItem m_chartItem;
     QUndoStack m_stack;
@@ -65,6 +68,8 @@ private:
 
 void tst_AadlSystemChecks::initTestCase()
 {
+    QStandardPaths::setTestModeEnabled(true);
+    aadlinterface::initIvEditor();
     auto converter = msc::CoordinatesConverter::instance();
     converter->setDPI(QPointF(109., 109.), QPointF(96., 96.));
     aadlinterface::cmd::CommandsStack::setCurrent(&m_stack);
@@ -283,6 +288,58 @@ void tst_AadlSystemChecks::testCorrespondMessage()
     msc::AadlSystemChecks checker;
     const bool doCorrespond = checker.correspond(connection.get(), message.get());
     QCOMPARE(doCorrespond, expected);
+}
+
+void tst_AadlSystemChecks::testCheckMessage()
+{
+    msc::AadlSystemChecks checker;
+    msc::MSCEditorCore mscCore;
+    mscCore.mainModel()->initialModel();
+    checker.setMscCore(&mscCore);
+    msc::MscChart *chart = mscCore.mainModel()->mscModel()->documents().at(0)->documents().at(0)->charts().at(0);
+
+    // Add instance
+    auto instance1 = new msc::MscInstance("Dummy1", chart);
+    chart->addInstance(instance1);
+    auto instance2 = new msc::MscInstance("Dummy2", chart);
+    chart->addInstance(instance2);
+    // Add message
+    auto message = new msc::MscMessage("Msg1", chart);
+    message->setSourceInstance(instance1);
+    message->setTargetInstance(instance2);
+    chart->addInstanceEvent(message);
+
+    // Having no IVEditorCore, is ok for all messages
+    QCOMPARE(checker.checkMessage(message), true);
+
+    // Add IVEditorCore for real checks
+    QSharedPointer<aadlinterface::IVEditorCore> ivPlugin(new aadlinterface::IVEditorCore);
+    checker.setIvCore(ivPlugin);
+    QCOMPARE(checker.checkMessage(message), false);
+
+    // Create corresponding aadl model
+    aadlinterface::InterfaceDocument *doc = ivPlugin->document();
+    aadl::AADLObjectsModel *aadlModel = doc->objectsModel();
+    auto sourceFunc = new aadl::AADLObjectFunction("Dummy1");
+    aadlModel->addObject(sourceFunc);
+    auto targetFunc = new aadl::AADLObjectFunction("Dummy2");
+    aadlModel->addObject(targetFunc);
+    aadl::AADLObjectIface *sourceIf(
+            aadl::testutils::createIface(sourceFunc, aadl::AADLObjectIface::IfaceType::Required, "Msg1"));
+    aadl::AADLObjectIface *targetIf =
+            aadl::testutils::createIface(targetFunc, aadl::AADLObjectIface::IfaceType::Provided, "Msg1");
+    auto connection = new aadl::AADLObjectConnection(sourceIf, targetIf);
+    aadlModel->addObject(connection);
+    QCOMPARE(checker.checkMessage(message), true);
+
+    // reverse direction fails
+    aadlModel->removeObject(connection);
+    delete connection;
+    sourceIf = aadl::testutils::createIface(targetFunc, aadl::AADLObjectIface::IfaceType::Required, "Msg1");
+    targetIf = aadl::testutils::createIface(sourceFunc, aadl::AADLObjectIface::IfaceType::Provided, "Msg1");
+    connection = new aadl::AADLObjectConnection(targetIf, sourceIf);
+    aadlModel->addObject(connection);
+    QCOMPARE(checker.checkMessage(message), false);
 }
 
 QTEST_MAIN(tst_AadlSystemChecks)

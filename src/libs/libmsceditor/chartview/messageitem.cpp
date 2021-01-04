@@ -783,7 +783,7 @@ void MessageItem::checkAadlConnection()
 {
     QColor lineColor = aadlConnectionOk() ? msc::MessageColor : msc::AadlErrorColor;
     if (lineColor != m_arrowItem->color()) {
-        m_arrowItem->setColor(aadlConnectionOk() ? msc::MessageColor : msc::AadlErrorColor);
+        m_arrowItem->setColor(lineColor);
         updateTooltip();
     }
 }

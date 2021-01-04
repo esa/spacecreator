@@ -192,13 +192,13 @@ QVector<QPair<MscChart *, MscMessage *>> AadlSystemChecks::checkMessages() const
 bool AadlSystemChecks::checkMessage(const MscMessage *message) const
 {
     if (!m_ivCore || !message) {
-        return false;
+        return true;
     }
 
     QList<aadl::AADLConnectionChain *> chains = aadl::AADLConnectionChain::build(*aadlModel());
     const QString sourceName = message->sourceInstance() ? message->sourceInstance()->name() : "";
     const QString targetName = message->targetInstance() ? message->targetInstance()->name() : "";
-    for (aadl::AADLConnectionChain *chain : chains) {
+    for (const aadl::AADLConnectionChain *chain : qAsConst(chains)) {
         if (chain->contains(message->name(), sourceName, targetName)) {
             return true;
         }
@@ -233,7 +233,7 @@ QStringList AadlSystemChecks::connectionNamesFromTo(const QString &sourceName, c
 
     QStringList connectionNames;
     QList<aadl::AADLConnectionChain *> chains = aadl::AADLConnectionChain::build(*aadlModel());
-    for (aadl::AADLConnectionChain *chain : chains) {
+    for (const aadl::AADLConnectionChain *chain : qAsConst(chains)) {
         const QStringList names = chain->connectionNames(sourceName, targetName);
         connectionNames += names;
     }
