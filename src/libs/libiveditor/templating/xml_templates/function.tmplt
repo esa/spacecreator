@@ -11,6 +11,11 @@ func.properties         :   |_ List of all properties of function
 prop                    :       |_ Instance of property
 prop.name               :           |_ Name of property
 prop.value              :           |_ Value of property
+func.contextParameters  :   |_ List of all context parameters of function
+param                   :       |_ Instance of context parameter
+param.name              :           |_ Name of context parameter
+param.type              :           |_ Type name context parameter (from ASN.1 for example)
+param.defaultValue      :           |_ Value of context parameter
 func.interfaces         :   |_ List of all interfaces of function
 iface                   :       |_ Instance of interface
 func.functions          :   |_ List of all nested functions of function
