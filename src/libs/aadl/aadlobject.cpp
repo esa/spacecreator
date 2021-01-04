@@ -123,7 +123,7 @@ bool AADLObject::setParentObject(AADLObject *parentObject)
     return true;
 }
 
-QVector<qint32> AADLObject::coordinatesFromString(const QString &strCoordinates) const
+QVector<qint32> AADLObject::coordinatesFromString(const QString &strCoordinates)
 {
     const QStringList &strCoords = strCoordinates.split(' ', QString::SkipEmptyParts);
     const int coordsCount = strCoords.size();
@@ -133,28 +133,7 @@ QVector<qint32> AADLObject::coordinatesFromString(const QString &strCoordinates)
     return coords;
 }
 
-QVector<qint32> AADLObject::coordinates() const
-{
-    meta::Props::Token token = meta::Props::Token::coordinates;
-    if (auto parentItem = parentObject()) {
-        if (parentObject()->isRootObject()) {
-            token = meta::Props::Token::InnerCoordinates;
-        } else if (auto grandParent = parentItem->parentObject()) {
-            if (isInterface() && grandParent->isRootObject())
-                token = meta::Props::Token::InnerCoordinates;
-        }
-    }
-    if (isRootObject()) {
-        token = meta::Props::Token::RootCoordinates;
-    }
-
-    QVariant varCoord = prop(meta::Props::token(token));
-    if (!varCoord.isValid() && token == meta::Props::Token::InnerCoordinates)
-        varCoord = prop(meta::Props::token(meta::Props::Token::coordinates));
-    return coordinatesFromString(varCoord.toString());
-}
-
-QString AADLObject::coordinatesToString(const QVector<qint32> &coordinates) const
+QString AADLObject::coordinatesToString(const QVector<qint32> &coordinates)
 {
     QString coordString;
     for (auto coord : coordinates) {
@@ -166,26 +145,43 @@ QString AADLObject::coordinatesToString(const QVector<qint32> &coordinates) cons
     return coordString;
 }
 
+QVector<qint32> AADLObject::coordinates() const
+{
+    const meta::Props::Token token = coordinatesType();
+    const QVariant varCoord = prop(meta::Props::token(token));
+    return coordinatesFromString(varCoord.toString());
+}
+
 void AADLObject::setCoordinates(const QVector<qint32> &coordinates)
 {
     if (this->coordinates() == coordinates)
         return;
 
+    const meta::Props::Token token = coordinatesType();
+    setProp(meta::Props::token(token), coordinatesToString(coordinates));
+    Q_EMIT coordinatesChanged(coordinates);
+}
+
+meta::Props::Token AADLObject::coordinatesType() const
+{
     meta::Props::Token token = meta::Props::Token::coordinates;
     if (auto parentItem = parentObject()) {
         if (parentObject()->isRootObject()) {
-            token = meta::Props::Token::InnerCoordinates;
-        } else if (auto grandParent = parentItem->parentObject()) {
-            if (isInterface() && grandParent->isRootObject())
+            if (isInterface()) {
+                token = meta::Props::Token::RootCoordinates;
+            } else {
                 token = meta::Props::Token::InnerCoordinates;
+            }
+        } else if (auto grandParent = parentItem->parentObject()) {
+            if (isInterface() && grandParent->isRootObject()) {
+                token = meta::Props::Token::InnerCoordinates;
+            }
         }
     }
     if (isRootObject()) {
         token = meta::Props::Token::RootCoordinates;
     }
-
-    setProp(meta::Props::token(token), coordinatesToString(coordinates));
-    Q_EMIT coordinatesChanged(coordinates);
+    return token;
 }
 
 QStringList AADLObject::path() const

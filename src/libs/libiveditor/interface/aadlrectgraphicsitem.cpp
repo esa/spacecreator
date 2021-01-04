@@ -163,7 +163,17 @@ void AADLRectGraphicsItem::updateFromEntity()
     if (!obj)
         return;
 
-    const QRectF itemSceneRect { rect(obj->coordinates()) };
+    static const QList<aadl::meta::Props::Token> types { aadl::meta::Props::Token::coordinates,
+        aadl::meta::Props::Token::InnerCoordinates, aadl::meta::Props::Token::RootCoordinates };
+
+    QRectF itemSceneRect { aadlinterface::rect(obj->coordinates()) };
+    int idx = 0;
+    while (itemSceneRect.isNull() && idx < types.size()) {
+        const aadl::meta::Props::Token token = types.at(idx);
+        const QString strCoordinates = obj->prop(aadl::meta::Props::token(token)).toString();
+        itemSceneRect = aadlinterface::rect(aadl::AADLObject::coordinatesFromString(strCoordinates));
+        ++idx;
+    }
     if (!itemSceneRect.isValid())
         instantLayoutUpdate();
     else

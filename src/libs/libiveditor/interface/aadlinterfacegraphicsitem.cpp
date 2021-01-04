@@ -272,45 +272,48 @@ QList<QVariantList> AADLInterfaceGraphicsItem::prepareChangeCoordinatesCommandPa
 
 void AADLInterfaceGraphicsItem::layout()
 {
-    if (auto connection = m_connections.value(0)) {
-        auto theirIface = connection->startItem() == this ? connection->endItem() : connection->startItem();
-        if (theirIface != nullptr) {
-            if (auto theirItem = theirIface->targetItem()) {
-                const QRectF theirRect = theirItem->sceneBoundingRect();
-                const QRectF ourRect = targetItem()->sceneBoundingRect();
-                const QPointF theirPos = aadlinterface::pos(theirIface->entity()->coordinates());
-                const QPointF ourPos = ourRect.center();
-                Qt::Alignment side = Qt::AlignAbsolute;
-                QPointF sidePos;
-                if (theirItem->isRootItem()) {
-                    if (theirPos.isNull()) {
-                        side = getNearestSide(theirRect, ourPos);
-                        sidePos = getSidePosition(theirRect, ourPos, side);
-                    } else {
-                        side = getNearestSide(ourRect, theirPos);
-                        sidePos = getSidePosition(ourRect, ourPos, side);
-                    }
-                } else if (targetItem()->isRootItem()) {
-                    side = getNearestSide(ourRect, theirRect.center());
-                    sidePos = getSidePosition(ourRect, theirRect.center(), side);
-                } else if (theirRect.isValid()) {
-                    if (theirPos.isNull())
-                        side = getNearestSide(ourRect, theirRect.center());
-                    else
-                        side = getNearestSide(ourRect, theirPos);
-                    sidePos = getSidePosition(ourRect, ourRect.center(), side);
-                }
-                if (side != Qt::AlignAbsolute) {
-                    updateInternalItems(side);
-                    setPos(parentItem()->mapFromScene(sidePos));
-                }
-            }
-        }
-    } else {
+    static const QList<aadl::meta::Props::Token> types { aadl::meta::Props::Token::coordinates,
+        aadl::meta::Props::Token::InnerCoordinates, aadl::meta::Props::Token::RootCoordinates };
+
+    QPointF pos = aadlinterface::pos(entity()->coordinates());
+    int idx = 0;
+    aadl::meta::Props::Token token = entity()->coordinatesType();
+    while (pos.isNull() && idx < types.size()) {
+        token = types.at(idx);
+        const QString strCoordinates = entity()->prop(aadl::meta::Props::token(token)).toString();
+        pos = aadlinterface::pos(aadl::AADLObject::coordinatesFromString(strCoordinates));
+        ++idx;
+    }
+    if (pos.isNull()) {
         adjustItem();
         /// NOTE: iface items without connections are put close to top left corner
         /// because of null pos
+        return;
     }
+
+    const auto parentFn = entity()->parentObject()->as<aadl::AADLObjectFunctionType *>();
+    const QRectF fnRect = aadlinterface::rect(
+            aadl::AADLObject::coordinatesFromString(parentFn->prop(aadl::meta::Props::token(token)).toString()))
+                                  .normalized();
+    const auto side = getNearestSide(fnRect, pos);
+    pos = getSidePosition(fnRect, pos, side);
+
+    const QRectF sceneParentFnRect = targetItem()->sceneBoundingRect();
+    if (qFuzzyCompare(fnRect.top(), pos.y())) {
+        const qreal sf = (pos.x() - fnRect.left()) / (fnRect.right() - fnRect.left());
+        pos = QLineF(sceneParentFnRect.topLeft(), sceneParentFnRect.topRight()).pointAt(sf);
+    } else if (qFuzzyCompare(fnRect.bottom(), pos.y())) {
+        const qreal sf = (pos.x() - fnRect.left()) / (fnRect.right() - fnRect.left());
+        pos = QLineF(sceneParentFnRect.bottomLeft(), sceneParentFnRect.bottomRight()).pointAt(sf);
+    } else if (qFuzzyCompare(fnRect.left(), pos.x())) {
+        const qreal sf = (pos.y() - fnRect.top()) / (fnRect.bottom() - fnRect.top());
+        pos = QLineF(sceneParentFnRect.topLeft(), sceneParentFnRect.bottomLeft()).pointAt(sf);
+    } else if (qFuzzyCompare(fnRect.right(), pos.x())) {
+        const qreal sf = (pos.y() - fnRect.top()) / (fnRect.bottom() - fnRect.top());
+        pos = QLineF(sceneParentFnRect.topRight(), sceneParentFnRect.bottomRight()).pointAt(sf);
+    }
+    updateInternalItems(side);
+    setPos(targetItem()->mapFromScene(pos));
 }
 
 /*!

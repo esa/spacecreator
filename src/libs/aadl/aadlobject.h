@@ -63,6 +63,7 @@ public:
 
     QVector<qint32> coordinates() const;
     void setCoordinates(const QVector<qint32> &coordinates);
+    meta::Props::Token coordinatesType() const;
 
     QStringList path() const;
     static QStringList path(const AADLObject *obj);
@@ -129,6 +130,8 @@ public:
     }
 
     static void sortObjectList(QList<aadl::AADLObject *> &objects);
+    static QVector<qint32> coordinatesFromString(const QString &strCoordinates);
+    static QString coordinatesToString(const QVector<qint32> &coordinates);
 
 Q_SIGNALS:
     void titleChanged(const QString &title);
@@ -146,8 +149,6 @@ public Q_SLOTS:
 
 private:
     const std::unique_ptr<AADLObjectPrivate> d;
-    QVector<qint32> coordinatesFromString(const QString &strCoordinates) const;
-    QString coordinatesToString(const QVector<qint32> &coordinates) const;
 };
 
 inline uint qHash(const AADLObject::Type &key, uint seed)

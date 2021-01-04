@@ -17,6 +17,9 @@
 
 #include "aadlcommonprops.h"
 #include "aadlobject.h"
+#include "aadlobjectfunction.h"
+#include "aadlobjectsmodel.h"
+#include "propertytemplateconfig.h"
 
 #include <QSignalSpy>
 #include <QTest>
@@ -40,6 +43,8 @@ private Q_SLOTS:
     void test_defaultConstructor();
     void test_paramConstructor();
     void test_setTitle();
+    void test_coordinatesConverting();
+    void test_coordinatesType();
     void test_hasAttributes();
 };
 
@@ -99,6 +104,49 @@ void tst_AADLObject::test_setTitle()
     QVERIFY(arguments.size() == 1);
     QVERIFY(arguments.at(0).type() == QVariant::String);
     QCOMPARE(arguments.at(0).value<QString>(), QString("Test_Object_Title"));
+}
+
+void tst_AADLObject::test_coordinatesConverting()
+{
+    QVector<qint32> coordinates = aadl::AADLObject::coordinatesFromString("");
+    QVERIFY(coordinates.isEmpty());
+    coordinates << 100 << 100 << 200 << 200;
+    QString coordinatesStr = aadl::AADLObject::coordinatesToString(coordinates);
+    QCOMPARE(coordinatesStr.compare("10000 10000 20000 20000"), 0);
+    coordinatesStr.append(" 30000 30000 40000 40000");
+    QVector<qint32> coordinatesEx = aadl::AADLObject::coordinatesFromString(coordinatesStr);
+    coordinates << 300 << 300 << 400 << 400;
+    QCOMPARE(coordinates, coordinatesEx);
+}
+
+void tst_AADLObject::test_coordinatesType()
+{
+    aadl::PropertyTemplateConfig dynPropConfig;
+    dynPropConfig.init(QLatin1String("default_attributes.xml"));
+    aadl::AADLObjectsModel model(&dynPropConfig);
+
+    aadl::AADLObjectFunction fn1("Fn1");
+    aadl::AADLObjectFunction fn2("Fn2", &fn1);
+    aadl::AADLObjectFunction fn3("Fn3", &fn2);
+
+    const QVector<aadl::AADLObject *> objects { &fn1, &fn2, &fn3 };
+
+    for (auto object : objects)
+        QVERIFY(model.addObject(object));
+
+    QCOMPARE(fn1.coordinatesType(), aadl::meta::Props::Token::coordinates);
+    QCOMPARE(fn2.coordinatesType(), aadl::meta::Props::Token::coordinates);
+    QCOMPARE(fn3.coordinatesType(), aadl::meta::Props::Token::coordinates);
+
+    model.setRootObject(fn1.id());
+    QCOMPARE(fn1.coordinatesType(), aadl::meta::Props::Token::RootCoordinates);
+    QCOMPARE(fn2.coordinatesType(), aadl::meta::Props::Token::InnerCoordinates);
+    QCOMPARE(fn3.coordinatesType(), aadl::meta::Props::Token::coordinates);
+
+    model.setRootObject(fn2.id());
+    QCOMPARE(fn1.coordinatesType(), aadl::meta::Props::Token::coordinates);
+    QCOMPARE(fn2.coordinatesType(), aadl::meta::Props::Token::RootCoordinates);
+    QCOMPARE(fn3.coordinatesType(), aadl::meta::Props::Token::InnerCoordinates);
 }
 
 void tst_AADLObject::test_hasAttributes()
