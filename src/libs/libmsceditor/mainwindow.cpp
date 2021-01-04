@@ -638,7 +638,7 @@ void MainWindow::onGeometryRestored()
 
 QSizeF MainWindow::prepareChartBoxSize() const
 {
-    static constexpr qreal padding = 100.;
+    static constexpr qreal padding = 110.;
     if (centralWidget()) {
         return centralWidget()->geometry().size() - QSizeF(padding, padding);
     }

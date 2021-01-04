@@ -210,6 +210,12 @@ void MscMainWidget::showSelection(const QModelIndex &current, const QModelIndex 
         return;
     }
 
+    if (m_plugin->chartView()) {
+        static constexpr qreal padding = 110.;
+        QSizeF preferredSize = m_plugin->chartView()->size() - QSizeF(padding, padding);
+        m_plugin->mainModel()->chartViewModel().setPreferredChartBoxSize(preferredSize);
+    }
+
     auto chart = dynamic_cast<msc::MscChart *>(obj);
     if (!chart) {
         if (auto document = dynamic_cast<msc::MscDocument *>(obj)) {
