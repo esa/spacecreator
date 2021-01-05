@@ -5,6 +5,7 @@
 #include <QString>
 
 namespace aadl {
+class AADLObjectConnection;
 class AADLObjectFunctionType;
 
 namespace testutils {
@@ -15,5 +16,7 @@ AADLObjectIface::CreationInfo init(
 AADLObjectIface *createIface(AADLObjectFunctionType *fn,
         AADLObjectIface::IfaceType t = AADLObjectIface::IfaceType::Provided, const QString &name = QString());
 
+AADLObjectConnection *createConnection(
+        AADLObjectFunctionType *source, AADLObjectFunctionType *target, const QString &name);
 }
 }

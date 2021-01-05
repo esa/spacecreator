@@ -51,6 +51,7 @@ public:
 
 private Q_SLOTS:
     void initTestCase();
+    void init();
 
     void testCheckInstanceNames();
     void testCheckInstanceRelations();
@@ -64,6 +65,8 @@ private Q_SLOTS:
 private:
     msc::ChartItem m_chartItem;
     QUndoStack m_stack;
+    std::unique_ptr<msc::AadlSystemChecks> m_checker;
+    std::unique_ptr<msc::MSCEditorCore> m_mscCore;
 };
 
 void tst_AadlSystemChecks::initTestCase()
@@ -75,68 +78,68 @@ void tst_AadlSystemChecks::initTestCase()
     aadlinterface::cmd::CommandsStack::setCurrent(&m_stack);
 }
 
+void tst_AadlSystemChecks::init()
+{
+    m_checker = std::make_unique<msc::AadlSystemChecks>();
+    m_mscCore = std::make_unique<msc::MSCEditorCore>();
+    m_mscCore->mainModel()->initialModel();
+    m_checker->setMscCore(m_mscCore.get());
+}
+
 void tst_AadlSystemChecks::testCheckInstanceNames()
 {
-    msc::AadlSystemChecks checker;
-    QVector<QPair<msc::MscChart *, msc::MscInstance *>> result = checker.checkInstanceNames();
+    QVector<QPair<msc::MscChart *, msc::MscInstance *>> result = m_checker->checkInstanceNames();
     QCOMPARE(result.size(), 0);
 
-    msc::MSCEditorCore mscCore;
-    mscCore.mainModel()->initialModel();
-    checker.setMscCore(&mscCore);
-    msc::MscChart *chart = mscCore.mainModel()->mscModel()->documents().at(0)->documents().at(0)->charts().at(0);
+    msc::MscChart *chart = m_mscCore->mainModel()->mscModel()->documents().at(0)->documents().at(0)->charts().at(0);
     QVERIFY(chart != nullptr);
 
     QSharedPointer<aadlinterface::IVEditorCore> ivPlugin(new aadlinterface::IVEditorCore);
-    checker.setIvCore(ivPlugin);
-    result = checker.checkInstanceNames();
+    m_checker->setIvCore(ivPlugin);
+    result = m_checker->checkInstanceNames();
     QCOMPARE(result.size(), 0);
 
     // Add instance
     auto instance = new msc::MscInstance("Dummy", chart);
     chart->addInstance(instance);
-    result = checker.checkInstanceNames();
+    result = m_checker->checkInstanceNames();
     QCOMPARE(result.size(), 1);
-    QCOMPARE(checker.checkInstance(instance), false);
+    QCOMPARE(m_checker->checkInstance(instance), false);
 
     // Add function with different name
     aadlinterface::InterfaceDocument *doc = ivPlugin->document();
     aadl::AADLObjectsModel *aadlModel = doc->objectsModel();
     auto aadlFnct = new aadl::AADLObjectFunction("init");
     aadlModel->addObject(aadlFnct);
-    result = checker.checkInstanceNames();
+    result = m_checker->checkInstanceNames();
     QCOMPARE(result.size(), 1);
-    QCOMPARE(checker.checkInstance(instance), false);
+    QCOMPARE(m_checker->checkInstance(instance), false);
 
     // set instance name to the function name
     instance->setName("init");
-    result = checker.checkInstanceNames();
+    result = m_checker->checkInstanceNames();
     QCOMPARE(result.size(), 0);
-    QCOMPARE(checker.checkInstance(instance), true);
+    QCOMPARE(m_checker->checkInstance(instance), true);
 
     // Renaming the aadl function invalidates again
     aadlFnct->setTitle("Foo");
-    result = checker.checkInstanceNames();
+    result = m_checker->checkInstanceNames();
     QCOMPARE(result.size(), 1);
-    QCOMPARE(checker.checkInstance(instance), false);
+    QCOMPARE(m_checker->checkInstance(instance), false);
 }
 
 void tst_AadlSystemChecks::testCheckInstanceRelations()
 {
-    msc::AadlSystemChecks checker;
-    QVector<QPair<msc::MscChart *, msc::MscInstance *>> result = checker.checkInstanceRelations();
+    QVector<QPair<msc::MscChart *, msc::MscInstance *>> result = m_checker->checkInstanceRelations();
     QCOMPARE(result.size(), 0);
 
-    msc::MSCEditorCore mscCore;
-    mscCore.mainModel()->initialModel();
-    checker.setMscCore(&mscCore);
-    result = checker.checkInstanceRelations();
-    msc::MscChart *chart = mscCore.mainModel()->mscModel()->documents().at(0)->documents().at(0)->charts().at(0);
+    result = m_checker->checkInstanceRelations();
+    msc::MscChart *chart = m_mscCore->mainModel()->mscModel()->documents().at(0)->documents().at(0)->charts().at(0);
     QVERIFY(chart != nullptr);
 
     QSharedPointer<aadlinterface::IVEditorCore> ivPlugin(new aadlinterface::IVEditorCore);
-    checker.setIvCore(ivPlugin);
-    result = checker.checkInstanceRelations();
+    m_checker->setIvCore(ivPlugin);
+    result = m_checker->checkInstanceRelations();
     QCOMPARE(result.size(), 0);
 
     // Add instance2
@@ -144,7 +147,7 @@ void tst_AadlSystemChecks::testCheckInstanceRelations()
     chart->addInstance(instance1);
     auto instance2 = new msc::MscInstance("reset", chart);
     chart->addInstance(instance2);
-    result = checker.checkInstanceRelations();
+    result = m_checker->checkInstanceRelations();
     QCOMPARE(result.size(), 0);
 
     // Add function for the instances
@@ -154,12 +157,12 @@ void tst_AadlSystemChecks::testCheckInstanceRelations()
     aadlModel->addObject(function1);
     auto function2 = new aadl::AADLObjectFunction("reset");
     aadlModel->addObject(function2);
-    result = checker.checkInstanceRelations();
+    result = m_checker->checkInstanceRelations();
     QCOMPARE(result.size(), 0);
 
     // Make function2 be nested by function1
     function2->setParent(function1);
-    result = checker.checkInstanceRelations();
+    result = m_checker->checkInstanceRelations();
     QCOMPARE(result.size(), 2);
 
     // Make function2 be nested by function1 via another one
@@ -167,27 +170,18 @@ void tst_AadlSystemChecks::testCheckInstanceRelations()
     aadlModel->addObject(function15);
     function15->setParent(function1);
     function2->setParent(function15);
-    result = checker.checkInstanceRelations();
+    result = m_checker->checkInstanceRelations();
     QCOMPARE(result.size(), 2);
 }
 
 void tst_AadlSystemChecks::testCheckMessageNames()
 {
-    msc::AadlSystemChecks checker;
-    QVector<QPair<msc::MscChart *, msc::MscMessage *>> result = checker.checkMessages();
-    QCOMPARE(result.size(), 0);
-
-    msc::MSCEditorCore mscCore;
-    mscCore.mainModel()->initialModel();
-    checker.setMscCore(&mscCore);
-    result = checker.checkMessages();
-    QCOMPARE(result.size(), 0);
-    msc::MscChart *chart = mscCore.mainModel()->mscModel()->documents().at(0)->documents().at(0)->charts().at(0);
+    msc::MscChart *chart = m_mscCore->mainModel()->mscModel()->documents().at(0)->documents().at(0)->charts().at(0);
     QVERIFY(chart != nullptr);
 
     QSharedPointer<aadlinterface::IVEditorCore> ivPlugin(new aadlinterface::IVEditorCore);
-    checker.setIvCore(ivPlugin);
-    result = checker.checkMessages();
+    m_checker->setIvCore(ivPlugin);
+    QVector<QPair<msc::MscChart *, msc::MscMessage *>> result = m_checker->checkMessages();
     QCOMPARE(result.size(), 0);
 
     // Add Instance 'A' and message 'Msg1'
@@ -202,7 +196,7 @@ void tst_AadlSystemChecks::testCheckMessageNames()
     chart->addInstance(instanceB);
     message->setTargetInstance(instanceB);
 
-    result = checker.checkMessages();
+    result = m_checker->checkMessages();
     QCOMPARE(result.size(), 1);
 
     // Add function with different source/target
@@ -221,12 +215,12 @@ void tst_AadlSystemChecks::testCheckMessageNames()
             aadl::testutils::createIface(aadlfFuncB, aadl::AADLObjectIface::IfaceType::Provided, "DummyB");
     aadlModel->addObject(providedInterface);
     aadlModel->addObject(new aadl::AADLObjectConnection(requiredInterface, providedInterface));
-    result = checker.checkMessages();
+    result = m_checker->checkMessages();
     QCOMPARE(result.size(), 1);
 
     // Correct the name
     providedInterface->setTitle("Msg1");
-    result = checker.checkMessages();
+    result = m_checker->checkMessages();
     QCOMPARE(result.size(), 0); // Everything is ok
 }
 
@@ -285,18 +279,13 @@ void tst_AadlSystemChecks::testCorrespondMessage()
             aadl::testutils::createIface(targetFunc.get(), targetIfType, targetIfName));
     auto connection = std::make_unique<AADLObjectConnection>(sourceIf.get(), targetIf.get());
 
-    msc::AadlSystemChecks checker;
-    const bool doCorrespond = checker.correspond(connection.get(), message.get());
+    const bool doCorrespond = m_checker->correspond(connection.get(), message.get());
     QCOMPARE(doCorrespond, expected);
 }
 
 void tst_AadlSystemChecks::testCheckMessage()
 {
-    msc::AadlSystemChecks checker;
-    msc::MSCEditorCore mscCore;
-    mscCore.mainModel()->initialModel();
-    checker.setMscCore(&mscCore);
-    msc::MscChart *chart = mscCore.mainModel()->mscModel()->documents().at(0)->documents().at(0)->charts().at(0);
+    msc::MscChart *chart = m_mscCore->mainModel()->mscModel()->documents().at(0)->documents().at(0)->charts().at(0);
 
     // Add instance
     auto instance1 = new msc::MscInstance("Dummy1", chart);
@@ -310,12 +299,12 @@ void tst_AadlSystemChecks::testCheckMessage()
     chart->addInstanceEvent(message);
 
     // Having no IVEditorCore, is ok for all messages
-    QCOMPARE(checker.checkMessage(message), true);
+    QCOMPARE(m_checker->checkMessage(message), true);
 
     // Add IVEditorCore for real checks
     QSharedPointer<aadlinterface::IVEditorCore> ivPlugin(new aadlinterface::IVEditorCore);
-    checker.setIvCore(ivPlugin);
-    QCOMPARE(checker.checkMessage(message), false);
+    m_checker->setIvCore(ivPlugin);
+    QCOMPARE(m_checker->checkMessage(message), false);
 
     // Create corresponding aadl model
     aadlinterface::InterfaceDocument *doc = ivPlugin->document();
@@ -324,22 +313,16 @@ void tst_AadlSystemChecks::testCheckMessage()
     aadlModel->addObject(sourceFunc);
     auto targetFunc = new aadl::AADLObjectFunction("Dummy2");
     aadlModel->addObject(targetFunc);
-    aadl::AADLObjectIface *sourceIf(
-            aadl::testutils::createIface(sourceFunc, aadl::AADLObjectIface::IfaceType::Required, "Msg1"));
-    aadl::AADLObjectIface *targetIf =
-            aadl::testutils::createIface(targetFunc, aadl::AADLObjectIface::IfaceType::Provided, "Msg1");
-    auto connection = new aadl::AADLObjectConnection(sourceIf, targetIf);
+    aadl::AADLObjectConnection *connection = aadl::testutils::createConnection(sourceFunc, targetFunc, "Msg1");
     aadlModel->addObject(connection);
-    QCOMPARE(checker.checkMessage(message), true);
-
-    // reverse direction fails
+    QCOMPARE(m_checker->checkMessage(message), true);
     aadlModel->removeObject(connection);
     delete connection;
-    sourceIf = aadl::testutils::createIface(targetFunc, aadl::AADLObjectIface::IfaceType::Required, "Msg1");
-    targetIf = aadl::testutils::createIface(sourceFunc, aadl::AADLObjectIface::IfaceType::Provided, "Msg1");
-    connection = new aadl::AADLObjectConnection(targetIf, sourceIf);
+
+    // Reverse direction fails
+    connection = aadl::testutils::createConnection(targetFunc, sourceFunc, "Msg1");
     aadlModel->addObject(connection);
-    QCOMPARE(checker.checkMessage(message), false);
+    QCOMPARE(m_checker->checkMessage(message), false);
 }
 
 QTEST_MAIN(tst_AadlSystemChecks)

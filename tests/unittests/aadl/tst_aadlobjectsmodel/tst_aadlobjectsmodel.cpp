@@ -314,19 +314,9 @@ void tst_AADLObjectsModel::testConnectionQuery()
 {
     auto fn1 = new aadl::AADLObjectFunction("Fn1");
     m_model->addObject(fn1);
-    aadl::AADLObjectIface::CreationInfo ci1 = aadl::testutils::init(aadl::AADLObjectIface::IfaceType::Required, fn1);
-    ci1.name = "cnt1";
-    aadl::AADLObjectIface *iface1 = aadl::AADLObjectIface::createIface(ci1);
-    m_model->addObject(iface1);
-
     auto fn2 = new aadl::AADLObjectFunction("Fn2");
     m_model->addObject(fn2);
-    aadl::AADLObjectIface::CreationInfo ci2 = aadl::testutils::init(aadl::AADLObjectIface::IfaceType::Provided, fn2);
-    ci2.name = "cnt1";
-    aadl::AADLObjectIface *iface2 = aadl::AADLObjectIface::createIface(ci2);
-    m_model->addObject(iface2);
-
-    auto connect1 = new aadl::AADLObjectConnection(iface1, iface2);
+    aadl::AADLObjectConnection *connect1 = aadl::testutils::createConnection(fn1, fn2, "cnt1");
     m_model->addObject(connect1);
 
     const Qt::CaseSensitivity m_caseCheck = Qt::CaseInsensitive;

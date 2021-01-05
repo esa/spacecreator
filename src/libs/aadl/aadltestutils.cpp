@@ -1,6 +1,9 @@
 #include "aadltestutils.h"
 
+#include "aadlobjectconnection.h"
 #include "aadlobjectfunctiontype.h"
+
+#include <algorithm>
 
 namespace aadl {
 namespace testutils {
@@ -25,6 +28,26 @@ AADLObjectIface::CreationInfo init(AADLObjectIface::IfaceType t, AADLObjectFunct
 AADLObjectIface *createIface(AADLObjectFunctionType *fn, AADLObjectIface::IfaceType t, const QString &name)
 {
     return AADLObjectIface::createIface(init(t, fn, name));
+}
+
+AADLObjectConnection *createConnection(
+        AADLObjectFunctionType *source, AADLObjectFunctionType *target, const QString &name)
+{
+    const QVector<AADLObjectIface *> requiredInterfaces = target->ris();
+    auto it = std::find_if(requiredInterfaces.begin(), requiredInterfaces.end(),
+            [&name](AADLObjectIface *interface) { return interface->title() == name; });
+    aadl::AADLObjectIface *sourceIf = it != requiredInterfaces.end()
+            ? *it
+            : aadl::testutils::createIface(source, aadl::AADLObjectIface::IfaceType::Required, name);
+
+    const QVector<AADLObjectIface *> providedInterfaces = target->pis();
+    it = std::find_if(providedInterfaces.begin(), providedInterfaces.end(),
+            [&name](AADLObjectIface *interface) { return interface->title() == name; });
+    aadl::AADLObjectIface *targetIf = it != providedInterfaces.end()
+            ? *it
+            : aadl::testutils::createIface(target, aadl::AADLObjectIface::IfaceType::Provided, name);
+
+    return new aadl::AADLObjectConnection(targetIf, sourceIf);
 }
 
 }
