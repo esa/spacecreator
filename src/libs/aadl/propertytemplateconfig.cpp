@@ -89,16 +89,21 @@ PropertyTemplateConfig::PropertyTemplateConfig()
 
 PropertyTemplateConfig::~PropertyTemplateConfig() { }
 
-QString resourceConfigPath()
+QString systemResourceConfigPath()
+{
+    return QLatin1String(":/defaults/interface/properties/resources/system_attributes.xml");
+}
+
+QString userResourceConfigPath()
 {
     return QLatin1String(":/defaults/interface/properties/resources/default_attributes.xml");
 }
 
 static bool ensureFileExists(const QString &filePath)
 {
-    if (!QFileInfo::exists(filePath) && !shared::copyResourceFile(resourceConfigPath(), filePath)) {
+    if (!QFileInfo::exists(filePath) && !shared::copyResourceFile(userResourceConfigPath(), filePath)) {
         qWarning() << "Can't create default storage for properties/attributes" << filePath
-                   << "from:" << resourceConfigPath();
+                   << "from:" << userResourceConfigPath();
         return false;
     }
     return true;
@@ -106,19 +111,43 @@ static bool ensureFileExists(const QString &filePath)
 
 void PropertyTemplateConfig::init(const QString &configPath)
 {
+    QList<PropertyTemplate *> systemAttributes;
+    QFile f(systemResourceConfigPath());
+    if (!f.open(QIODevice::ReadOnly | QIODevice::Text)) {
+        qWarning() << "Can't open file:" << configPath << f.errorString();
+        return;
+    }
+    systemAttributes = parseAttributesList(QString::fromUtf8(f.readAll()));
+
+    QList<PropertyTemplate *> userAttributes;
     if (ensureFileExists(configPath)) {
         d->m_configPath = configPath;
         QFile f(configPath);
-        if (f.open(QIODevice::ReadOnly | QIODevice::Text)) {
-            QString errMsg;
-            int line;
-            int column;
-            d->init(parseAttributesList(QString::fromUtf8(f.readAll()), &errMsg, &line, &column));
+        if (!f.open(QIODevice::ReadOnly | QIODevice::Text)) {
+            qWarning() << "Can't open file:" << configPath << f.errorString();
             return;
         }
-
-        qWarning() << "Can't open file:" << configPath << f.errorString();
+        userAttributes = parseAttributesList(QString::fromUtf8(f.readAll()));
     }
+
+    // merge configs
+    auto inSystemAttributes = [&systemAttributes](const QString &name) -> bool {
+        auto it = std::find_if(systemAttributes.begin(), systemAttributes.end(),
+                [&name](PropertyTemplate *property) { return property->name() == name; });
+        return it != systemAttributes.end();
+    };
+    auto it = userAttributes.begin();
+    while (it != userAttributes.end()) {
+        if (!inSystemAttributes((*it)->name())) {
+            systemAttributes.append(*it);
+            it = userAttributes.erase(it);
+        } else {
+            ++it;
+        }
+    }
+    qDeleteAll(userAttributes);
+
+    d->init(systemAttributes);
 }
 
 QList<PropertyTemplate *> PropertyTemplateConfig::parseAttributesList(
