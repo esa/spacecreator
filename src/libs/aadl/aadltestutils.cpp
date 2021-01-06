@@ -2,6 +2,7 @@
 
 #include "aadlobjectconnection.h"
 #include "aadlobjectfunctiontype.h"
+#include "aadlobjectsmodel.h"
 
 #include <algorithm>
 
@@ -27,7 +28,12 @@ AADLObjectIface::CreationInfo init(AADLObjectIface::IfaceType t, AADLObjectFunct
 
 AADLObjectIface *createIface(AADLObjectFunctionType *fn, AADLObjectIface::IfaceType t, const QString &name)
 {
-    return AADLObjectIface::createIface(init(t, fn, name));
+    AADLObjectIface *interface = AADLObjectIface::createIface(init(t, fn, name));
+
+    if (fn->objectsModel()) {
+        fn->objectsModel()->addObject(interface);
+    }
+    return interface;
 }
 
 AADLObjectConnection *createConnection(
@@ -47,7 +53,12 @@ AADLObjectConnection *createConnection(
             ? *it
             : aadl::testutils::createIface(target, aadl::AADLObjectIface::IfaceType::Provided, name);
 
-    return new aadl::AADLObjectConnection(targetIf, sourceIf);
+    auto connection = new aadl::AADLObjectConnection(targetIf, sourceIf);
+    aadl::AADLObjectsModel *aadlModel = source ? source->objectsModel() : target->objectsModel();
+    if (aadlModel) {
+        aadlModel->addObject(connection);
+    }
+    return connection;
 }
 
 }

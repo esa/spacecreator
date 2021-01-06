@@ -62,21 +62,18 @@ void tst_InterfaceDocument::test_checkAllInterfacesForAsn1Compliance()
 
     // Empty parameters results to true
     auto if1 = aadl::testutils::createIface(fn1, aadl::AADLObjectIface::IfaceType::Provided, "If1");
-    ivDoc->objectsModel()->addObject(if1);
     bool ok = ivDoc->checkAllInterfacesForAsn1Compliance();
     QCOMPARE(ok, true);
 
     // Used type is defined in ASN1
     auto if2 = aadl::testutils::createIface(fn1, aadl::AADLObjectIface::IfaceType::Provided, "If2");
     if2->addParam(aadl::IfaceParameter("IfaceParam", aadl::BasicParameter::Type::Other, "T-Int31"));
-    ivDoc->objectsModel()->addObject(if2);
     ok = ivDoc->checkAllInterfacesForAsn1Compliance();
     QCOMPARE(ok, true);
 
     // Unknown type
     auto if3 = aadl::testutils::createIface(fn1, aadl::AADLObjectIface::IfaceType::Provided, "If3");
     if3->addParam(aadl::IfaceParameter("IfaceParam", aadl::BasicParameter::Type::Other, "InvalidType"));
-    ivDoc->objectsModel()->addObject(if3);
     ok = ivDoc->checkAllInterfacesForAsn1Compliance();
     QCOMPARE(ok, false);
 }

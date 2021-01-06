@@ -47,7 +47,7 @@ AADLObjectsModel::AADLObjectsModel(PropertyTemplateConfig *dynPropConfig, QObjec
     d->m_dynPropConfig = dynPropConfig;
 }
 
-AADLObjectsModel::~AADLObjectsModel() {}
+AADLObjectsModel::~AADLObjectsModel() { }
 
 void AADLObjectsModel::setSharedTypesModel(AADLObjectsModel *sharedTypesModel)
 {
@@ -205,6 +205,9 @@ AADLObject *AADLObjectsModel::getObjectByName(
     return nullptr;
 }
 
+/*!
+   Returns the first interface found, that has the given \p name and \p dir
+ */
 AADLObjectIface *AADLObjectsModel::getIfaceByName(const QString &name, AADLObjectIface::IfaceType dir,
         const AADLObjectFunctionType *parent, Qt::CaseSensitivity caseSensitivity) const
 {
@@ -212,7 +215,7 @@ AADLObjectIface *AADLObjectsModel::getIfaceByName(const QString &name, AADLObjec
         return nullptr;
     }
 
-    for (auto obj : d->m_objects) {
+    for (auto obj : qAsConst(d->m_objects)) {
         if (obj->isInterface() && obj->title().compare(name, caseSensitivity) == 0) {
             if (AADLObjectIface *iface = obj->as<AADLObjectIface *>()) {
                 if (iface->direction() == dir && (!parent || iface->parentObject() == parent)) {
@@ -223,6 +226,28 @@ AADLObjectIface *AADLObjectsModel::getIfaceByName(const QString &name, AADLObjec
     }
 
     return nullptr;
+}
+
+/*!
+   Returns all interfaces with the given \p name
+ */
+QList<AADLObjectIface *> AADLObjectsModel::getIfacesByName(
+        const QString &name, Qt::CaseSensitivity caseSensitivity) const
+{
+    QList<AADLObjectIface *> result;
+    if (name.isEmpty()) {
+        return result;
+    }
+
+    for (auto obj : qAsConst(d->m_objects)) {
+        if (obj->isInterface() && obj->title().compare(name, caseSensitivity) == 0) {
+            if (AADLObjectIface *iface = obj->as<AADLObjectIface *>()) {
+                result << iface;
+            }
+        }
+    }
+
+    return result;
 }
 
 AADLObjectFunction *AADLObjectsModel::getFunction(const shared::Id &id) const

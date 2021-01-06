@@ -55,6 +55,8 @@ public:
     AADLObjectIface *getIfaceByName(const QString &name, AADLObjectIface::IfaceType dir,
             const AADLObjectFunctionType *parent = nullptr,
             Qt::CaseSensitivity caseSensitivity = Qt::CaseInsensitive) const;
+    QList<AADLObjectIface *> getIfacesByName(
+            const QString &name, Qt::CaseSensitivity caseSensitivity = Qt::CaseInsensitive) const;
     AADLObjectFunction *getFunction(const shared::Id &id) const;
     AADLObjectFunction *getFunction(const QString &name, Qt::CaseSensitivity caseSensitivity) const;
     AADLObjectFunctionType *getFunctionType(const shared::Id &id) const;

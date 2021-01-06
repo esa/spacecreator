@@ -314,15 +314,26 @@ void tst_AadlSystemChecks::testCheckMessage()
     auto targetFunc = new aadl::AADLObjectFunction("Dummy2");
     aadlModel->addObject(targetFunc);
     aadl::AADLObjectConnection *connection = aadl::testutils::createConnection(sourceFunc, targetFunc, "Msg1");
-    aadlModel->addObject(connection);
     QCOMPARE(m_checker->checkMessage(message), true);
     aadlModel->removeObject(connection);
     delete connection;
 
     // Reverse direction fails
-    connection = aadl::testutils::createConnection(targetFunc, sourceFunc, "Msg1");
-    aadlModel->addObject(connection);
+    aadl::testutils::createConnection(targetFunc, sourceFunc, "Msg1");
     QCOMPARE(m_checker->checkMessage(message), false);
+
+    // Message from the environment
+    auto message1 = new msc::MscMessage("Env1", chart);
+    message1->setTargetInstance(instance1);
+    chart->addInstanceEvent(message1);
+    QCOMPARE(m_checker->checkMessage(message1), false);
+    // Default interface is not ok
+    aadl::AADLObjectIface *if1 =
+            aadl::testutils::createIface(sourceFunc, aadl::AADLObjectIface::IfaceType::Provided, "Env1");
+    QCOMPARE(m_checker->checkMessage(message1), false);
+    // interface type has to be "cyclic"
+    if1->setKind(aadl::AADLObjectIface::OperationKind::Cyclic);
+    QCOMPARE(m_checker->checkMessage(message1), true);
 }
 
 QTEST_MAIN(tst_AadlSystemChecks)

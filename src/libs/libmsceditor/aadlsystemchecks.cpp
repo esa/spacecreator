@@ -172,7 +172,7 @@ QVector<QPair<MscChart *, MscMessage *>> AadlSystemChecks::checkMessages() const
     }
 
     QVector<msc::MscChart *> charts = m_mscCore->mainModel()->mscModel()->allCharts();
-    for (msc::MscChart *chart : charts) {
+    for (msc::MscChart *chart : qAsConst(charts)) {
         for (msc::MscInstanceEvent *event : chart->instanceEvents()) {
             if (auto message = qobject_cast<msc::MscMessage *>(event)) {
                 if (!checkMessage(message)) {
@@ -195,12 +195,40 @@ bool AadlSystemChecks::checkMessage(const MscMessage *message) const
         return true;
     }
 
-    QList<aadl::AADLConnectionChain *> chains = aadl::AADLConnectionChain::build(*aadlModel());
     const QString sourceName = message->sourceInstance() ? message->sourceInstance()->name() : "";
     const QString targetName = message->targetInstance() ? message->targetInstance()->name() : "";
-    for (const aadl::AADLConnectionChain *chain : qAsConst(chains)) {
-        if (chain->contains(message->name(), sourceName, targetName)) {
-            return true;
+    if (!sourceName.isEmpty() && !targetName.isEmpty()) {
+        QList<aadl::AADLConnectionChain *> chains = aadl::AADLConnectionChain::build(*aadlModel());
+        for (const aadl::AADLConnectionChain *chain : qAsConst(chains)) {
+            if (chain->contains(message->name(), sourceName, targetName)) {
+                return true;
+            }
+        }
+    }
+
+    QList<aadl::AADLObjectIface *> interfaces = aadlModel()->getIfacesByName(message->name());
+    // From the environment
+    if (sourceName.isEmpty() && !targetName.isEmpty()) {
+        for (aadl::AADLObjectIface *interface : qAsConst(interfaces)) {
+            if (auto func = qobject_cast<aadl::AADLObjectFunction *>(interface->parent())) {
+                if (targetName.compare(func->title(), m_caseCheck) == 0) {
+                    if (interface->kind() == aadl::AADLObjectIface::OperationKind::Cyclic) {
+                        return true;
+                    }
+                }
+            }
+        }
+    }
+    // To the environment
+    if (!sourceName.isEmpty() && targetName.isEmpty()) {
+        for (aadl::AADLObjectIface *interface : qAsConst(interfaces)) {
+            if (auto func = qobject_cast<aadl::AADLObjectFunction *>(interface->parent())) {
+                if (sourceName.compare(func->title(), m_caseCheck) == 0) {
+                    if (interface->kind() == aadl::AADLObjectIface::OperationKind::Cyclic) {
+                        return true;
+                    }
+                }
+            }
         }
     }
 

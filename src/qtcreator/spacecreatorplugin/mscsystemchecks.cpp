@@ -402,22 +402,16 @@ void MscSystemChecks::onMscEntityNameChanged(QObject *entity, const QString &old
 
     auto message = dynamic_cast<msc::MscMessage *>(entity);
     if (message && ivCore() && ivCore()->document() && ivCore()->document()->objectsModel()) {
+        // Check for names
         const QString fromName = message->sourceInstance() ? message->sourceInstance()->name() : "";
         const QString toName = message->targetInstance() ? message->targetInstance()->name() : "";
-        QList<aadl::AADLConnectionChain *> chains =
-                aadl::AADLConnectionChain::build(*ivCore()->document()->objectsModel());
-        bool hasNewName = false;
-        bool hasOldName = false;
-        for (aadl::AADLConnectionChain *chain : chains) {
-            if (chain->contains(message->name(), fromName, toName)) {
-                hasNewName = true;
-                break;
-            }
-            if (chain->contains(oldName, fromName, toName)) {
-                hasOldName = true;
-                break;
-            }
-        }
+        msc::AadlSystemChecks aadlChecker;
+        aadlChecker.setIvCore(ivCore());
+        bool hasNewName = aadlChecker.checkMessage(message);
+        msc::MscMessage oldMessage(oldName);
+        oldMessage.setSourceInstance(message->sourceInstance());
+        oldMessage.setTargetInstance(message->targetInstance());
+        bool hasOldName = aadlChecker.checkMessage(&oldMessage);
 
         if (!hasNewName && !hasOldName) {
             const int result = QMessageBox::question(nullptr, tr("No AADL connection"),
