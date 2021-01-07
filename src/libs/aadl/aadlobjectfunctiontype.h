@@ -58,6 +58,7 @@ public:
     QVector<AADLObjectIface *> pis() const;
     QVector<AADLObjectIfaceGroup *> interfaceGroups() const;
     bool hasNestedChildren() const;
+    bool hasInterface(const QString &name, Qt::CaseSensitivity caseSensitivity = Qt::CaseInsensitive) const;
 
     QVector<ContextParameter> contextParams() const;
     ContextParameter contextParam(const QString &name) const;

@@ -99,5 +99,10 @@ int CmdInterfaceItemCreate::id() const
     return CreateInterfaceEntity;
 }
 
+aadl::AADLObjectIface *CmdInterfaceItemCreate::createdInterface() const
+{
+    return m_entity;
+}
+
 }
 }

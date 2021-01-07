@@ -19,6 +19,7 @@
 #include "aadlobjectfunction.h"
 #include "aadlobjectiface.h"
 #include "aadlobjectsmodel.h"
+#include "aadltestutils.h"
 #include "interface/interfacedocument.h"
 #include "iveditor.h"
 #include "iveditorcore.h"
@@ -36,7 +37,9 @@ private Q_SLOTS:
     void init();
 
     void test_addConnection();
+    void test_addConnectionFromEnv();
     void test_addConnectionFails();
+    void test_renameAadlConnection();
     void test_addToNestedConnection();
     void test_addFromNestedConnection();
     void test_addRootToNestedConnections();
@@ -69,6 +72,25 @@ void tst_IVEditorCore::test_addConnection()
     QCOMPARE(connections[0]->parentObject(), nullptr); // placed at root level
 }
 
+void tst_IVEditorCore::test_addConnectionFromEnv()
+{
+    aadl::AADLObjectsModel *aadlModel = ivCore->document()->objectsModel();
+    ivCore->addFunction("f1");
+    bool ok = ivCore->addConnection("m1", "", "f1");
+    QCOMPARE(ok, true);
+    QVector<aadl::AADLObjectConnection *> connections = aadlModel->allObjectsByType<aadl::AADLObjectConnection>();
+    QCOMPARE(connections.size(), 0);
+
+    QVector<aadl::AADLObjectIface *> interfaces = aadlModel->allObjectsByType<aadl::AADLObjectIface>();
+    QCOMPARE(interfaces.size(), 1);
+
+    // Adding it again, fails
+    ok = ivCore->addConnection("m1", "", "f1");
+    QCOMPARE(ok, false);
+    interfaces = aadlModel->allObjectsByType<aadl::AADLObjectIface>();
+    QCOMPARE(interfaces.size(), 1);
+}
+
 void tst_IVEditorCore::test_addConnectionFails()
 {
     // No function
@@ -91,6 +113,23 @@ void tst_IVEditorCore::test_addConnectionFails()
     // Adding it again, fails
     ok = ivCore->addConnection("m1", "f1", "f2");
     QCOMPARE(ok, false);
+}
+
+void tst_IVEditorCore::test_renameAadlConnection()
+{
+    aadl::AADLObjectFunction *funcF1 = ivCore->addFunction("f1");
+    aadl::AADLObjectFunction *funcF2 = ivCore->addFunction("f2");
+    aadl::AADLObjectConnection *connection = aadl::testutils::createConnection(funcF1, funcF2, "init");
+
+    bool ok = ivCore->renameAadlConnection("init", "doIt", "f1", "f2");
+    QCOMPARE(ok, true);
+    QCOMPARE(connection->name(), "doIt");
+
+    // cyclic interface only
+    aadl::AADLObjectIface *interface = ivCore->addInterface("push", "f2");
+    ok = ivCore->renameAadlConnection("push", "call", "", "f2");
+    QCOMPARE(ok, true);
+    QCOMPARE(interface->title(), "call");
 }
 
 void tst_IVEditorCore::test_addToNestedConnection()

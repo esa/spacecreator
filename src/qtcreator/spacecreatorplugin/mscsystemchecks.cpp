@@ -323,20 +323,41 @@ void MscSystemChecks::onEntityNameChanged(
     }
 
     auto cmdIfaceAttribChange = dynamic_cast<aadlinterface::cmd::CmdIfaceAttrChange *>(command);
-    if (cmdIfaceAttribChange
-            && cmdIfaceAttribChange->interface()->direction() == aadl::AADLObjectIface::IfaceType::Provided) {
-        QVector<aadl::AADLObjectConnection *> connections = cmdIfaceAttribChange->getRelatedConnections();
-        for (const aadl::AADLObjectConnection *connection : connections) {
-            if (mscMessagesExist(oldName, connection->sourceName(), connection->targetName())) {
-                if (command->isFirstChange()) {
-                    const int result = QMessageBox::question(
-                            nullptr, tr("Update messages"), tr("Do you want to update MSC messages?"));
-                    if (result == QMessageBox::Yes) {
-                        changeMscMessageName(
-                                oldName, entity->title(), connection->sourceName(), connection->targetName());
+    if (cmdIfaceAttribChange) {
+        aadl::AADLObjectIface *interface = cmdIfaceAttribChange->interface();
+        QList<QStringList> messagesData;
+        if (interface->direction() == aadl::AADLObjectIface::IfaceType::Provided) {
+            // Update from connections
+            QVector<aadl::AADLObjectConnection *> connections = cmdIfaceAttribChange->getRelatedConnections();
+            for (const aadl::AADLObjectConnection *connection : qAsConst(connections)) {
+                if (mscMessagesExist(oldName, connection->sourceName(), connection->targetName())) {
+                    messagesData << QStringList({ connection->sourceName(), connection->targetName() });
+                }
+            }
+            // Update from cyclic interfaces
+            aadl::AADLObjectFunctionType *func = interface->function();
+            if (func && interface->kind() == aadl::AADLObjectIface::OperationKind::Cyclic) {
+                if (mscMessagesExist(oldName, func->title(), "")) {
+                    messagesData << QStringList({ func->title(), "" });
+                }
+                if (mscMessagesExist(oldName, "", func->title())) {
+                    messagesData << QStringList({ "", func->title() });
+                }
+            }
+        }
+
+        if (!messagesData.isEmpty()) {
+            if (command->isFirstChange()) {
+                const int result = QMessageBox::question(
+                        nullptr, tr("Update messages"), tr("Do you want to update MSC messages?"));
+                if (result == QMessageBox::Yes) {
+                    for (const QStringList &data : qAsConst(messagesData)) {
+                        changeMscMessageName(oldName, entity->title(), data[0], data[1]);
                     }
-                } else {
-                    changeMscMessageName(oldName, entity->title(), connection->sourceName(), connection->targetName());
+                }
+            } else {
+                for (const QStringList &data : qAsConst(messagesData)) {
+                    changeMscMessageName(oldName, entity->title(), data[0], data[1]);
                 }
             }
         }

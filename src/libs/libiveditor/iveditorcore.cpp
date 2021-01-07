@@ -30,6 +30,7 @@
 #include "interface/commands/cmdentityattributechange.h"
 #include "interface/commands/cmdfunctionitemcreate.h"
 #include "interface/commands/cmdifaceattrchange.h"
+#include "interface/commands/cmdinterfaceitemcreate.h"
 #include "interface/commands/commandsfactory.h"
 #include "interface/creatortool.h"
 #include "interface/interfacedocument.h"
@@ -180,6 +181,14 @@ bool IVEditorCore::addConnection(QString name, const QString &fromInstanceName, 
         return false;
     }
 
+    if (fromInstanceName.isEmpty()) {
+        return addInterface(name, toInstanceName) != nullptr;
+    }
+
+    if (toInstanceName.isEmpty()) {
+        return addInterface(name, fromInstanceName) != nullptr;
+    }
+
     aadl::AADLObjectsModel *aadlModel = m_document->objectsModel();
     if (aadlModel->getConnection(name, fromInstanceName, toInstanceName, m_caseCheck) != nullptr) {
         // The connection exists already
@@ -256,6 +265,39 @@ bool IVEditorCore::addConnection(QString name, const QString &fromInstanceName, 
 }
 
 /*!
+   Adds an interface with name \p name to the function \p functionName to the model.
+   Returns the newly returned interface, or nullptr in case of an error.
+ */
+aadl::AADLObjectIface *IVEditorCore::addInterface(QString name, const QString &functionName)
+{
+    aadl::AADLObjectsModel *aadlModel = m_document->objectsModel();
+    aadl::AADLObjectFunction *func = aadlModel->getFunction(functionName, m_caseCheck);
+    if (!func) {
+        qDebug() << Q_FUNC_INFO << "No function" << functionName << "for the interface" << name;
+        return nullptr;
+    }
+
+    if (func->hasInterface(name, m_caseCheck)) {
+        qDebug() << Q_FUNC_INFO << "Function" << functionName << "already has an interface named" << name;
+        return nullptr;
+    }
+
+    aadl::AADLObjectIface::CreationInfo ci;
+    ci.kind = aadl::AADLObjectIface::OperationKind::Cyclic;
+    ci.type = aadl::AADLObjectIface::IfaceType::Provided;
+    ci.function = func;
+    ci.model = aadlModel;
+    ci.name = name;
+
+    auto command = new cmd::CmdInterfaceItemCreate(ci);
+    cmd::CommandsStack::push(command);
+
+    Q_EMIT editedExternally(this);
+
+    return command->createdInterface();
+}
+
+/*!
    Renames the function with current name \p oldName to \p newName.
    If \p updateSystem is true, the user is asked to check the .msc models to be updated as well
  */
@@ -286,6 +328,13 @@ bool IVEditorCore::renameAadlFunction(const QString &oldName, const QString &new
 bool IVEditorCore::renameAadlConnection(
         const QString &oldName, const QString &newName, const QString &fromInstanceName, const QString &toInstanceName)
 {
+    if (fromInstanceName.isEmpty()) {
+        return renameCyclicInterface(oldName, newName, toInstanceName);
+    }
+    if (toInstanceName.isEmpty()) {
+        return renameCyclicInterface(oldName, newName, fromInstanceName);
+    }
+
     aadl::AADLObjectsModel *aadlModel = m_document->objectsModel();
     aadl::AADLObjectConnection *aadlConnect =
             aadlModel->getConnection(oldName, fromInstanceName, toInstanceName, m_caseCheck);
@@ -295,6 +344,34 @@ bool IVEditorCore::renameAadlConnection(
 
     auto cmd = new cmd::CmdIfaceAttrChange(aadlConnect->targetInterface(),
             aadl::meta::Props::token(aadl::meta::Props::Token::name), QVariant::fromValue(newName));
+    cmd::CommandsStack::push(cmd);
+
+    Q_EMIT editedExternally(this);
+    return true;
+}
+
+bool IVEditorCore::renameCyclicInterface(const QString &oldName, const QString &newName, const QString &functionName)
+{
+    aadl::AADLObjectsModel *aadlModel = m_document->objectsModel();
+    aadl::AADLObjectFunction *func = aadlModel->getFunction(functionName, m_caseCheck);
+    if (!func) {
+        qDebug() << Q_FUNC_INFO << "No function" << functionName << "to rename the interface from" << newName << "to"
+                 << oldName;
+        return false;
+    }
+
+    aadl::AADLObjectIface *interface =
+            aadlModel->getIfaceByName(oldName, aadl::AADLObjectIface::IfaceType::Required, func, m_caseCheck);
+    if (!interface) {
+        interface = aadlModel->getIfaceByName(oldName, aadl::AADLObjectIface::IfaceType::Provided, func, m_caseCheck);
+    }
+    if (!interface) {
+        qDebug() << Q_FUNC_INFO << "No interface" << oldName << "to rname for function" << functionName;
+        return false;
+    }
+
+    auto cmd = new cmd::CmdIfaceAttrChange(
+            interface, aadl::meta::Props::token(aadl::meta::Props::Token::name), QVariant::fromValue(newName));
     cmd::CommandsStack::push(cmd);
 
     Q_EMIT editedExternally(this);

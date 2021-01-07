@@ -248,6 +248,26 @@ bool AADLObjectFunctionType::hasNestedChildren() const
     return functionTypes().size() || functions().size() || comments().size();
 }
 
+/*!
+   Returns ig the functions has an interface with the given \p name.
+   \note The interface type is not relevant
+ */
+bool AADLObjectFunctionType::hasInterface(const QString &name, Qt::CaseSensitivity caseSensitivity) const
+{
+    for (auto i : qAsConst(d->m_pis)) {
+        if (name.compare(i->title(), caseSensitivity) == 0) {
+            return true;
+        }
+    }
+    for (auto i : qAsConst(d->m_ris)) {
+        if (name.compare(i->title(), caseSensitivity) == 0) {
+            return true;
+        }
+    }
+
+    return false;
+}
+
 QVector<ContextParameter> AADLObjectFunctionType::contextParams() const
 {
     return d->m_contextParams;

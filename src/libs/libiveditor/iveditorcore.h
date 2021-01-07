@@ -64,10 +64,12 @@ public:
 
     aadl::AADLObjectFunction *addFunction(const QString &name, aadl::AADLObjectFunction *parent = nullptr);
     bool addConnection(QString name, const QString &fromInstanceName, const QString &toInstanceName);
+    aadl::AADLObjectIface *addInterface(QString name, const QString &functionName);
 
     bool renameAadlFunction(const QString &oldName, const QString &newName);
     bool renameAadlConnection(const QString &oldName, const QString &newName, const QString &fromInstanceName,
             const QString &toInstanceName);
+    bool renameCyclicInterface(const QString &oldName, const QString &newName, const QString &functionName);
 
     QUndoStack *undoStack() const override;
     cmd::CommandsStack *commandsStack() const;

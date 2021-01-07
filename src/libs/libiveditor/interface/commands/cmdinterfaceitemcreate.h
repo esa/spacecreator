@@ -36,6 +36,8 @@ public:
     void undo() override;
     int id() const override;
 
+    aadl::AADLObjectIface *createdInterface() const;
+
 private:
     const aadl::AADLObjectIface::CreationInfo m_ifaceInfo;
     QPointer<aadl::AADLObjectIface> m_entity;
