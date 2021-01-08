@@ -15,7 +15,7 @@
    along with this program. If not, see <https://www.gnu.org/licenses/lgpl-2.1.html>.
 */
 
-#include "asn1xmlparser.h"
+#include "asn1reader.h"
 
 #include "asn1const.h"
 #include "astxmlparser.h"
@@ -31,20 +31,20 @@
 
 namespace Asn1Acn {
 
-QString Asn1XMLParser::m_asn1Compiler {};
-QString Asn1XMLParser::m_mono {};
+QString Asn1Reader::m_asn1Compiler {};
+QString Asn1Reader::m_mono {};
 
-Asn1XMLParser::Asn1XMLParser(QObject *parent)
+Asn1Reader::Asn1Reader(QObject *parent)
     : QObject(parent)
 {
 }
 
-std::unique_ptr<Asn1Acn::File> Asn1XMLParser::parseAsn1File(const QFileInfo &fileInfo, QStringList *errorMessages)
+std::unique_ptr<Asn1Acn::File> Asn1Reader::parseAsn1File(const QFileInfo &fileInfo, QStringList *errorMessages)
 {
     return parseAsn1File(fileInfo.dir().absolutePath(), fileInfo.fileName(), errorMessages);
 }
 
-std::unique_ptr<Asn1Acn::File> Asn1XMLParser::parseAsn1File(
+std::unique_ptr<Asn1Acn::File> Asn1Reader::parseAsn1File(
         const QString &filePath, const QString &fileName, QStringList *errorMessages)
 {
     const QFileInfo asn1File(QDir(filePath), fileName);
@@ -68,7 +68,7 @@ std::unique_ptr<Asn1Acn::File> Asn1XMLParser::parseAsn1File(
     return asn1TypesData;
 }
 
-std::unique_ptr<Asn1Acn::File> Asn1XMLParser::parseAsn1XmlFile(const QString &fileName)
+std::unique_ptr<Asn1Acn::File> Asn1Reader::parseAsn1XmlFile(const QString &fileName)
 {
     QFileInfo fileInfo;
     if (fileInfo.exists(fileName)) {
@@ -104,7 +104,7 @@ std::unique_ptr<Asn1Acn::File> Asn1XMLParser::parseAsn1XmlFile(const QString &fi
     return {};
 }
 
-QString Asn1XMLParser::asn1AsHtml(const QString &filename) const
+QString Asn1Reader::asn1AsHtml(const QString &filename) const
 {
     if (filename.isEmpty() || !QFile::exists(filename) || QFileInfo(filename).isDir()) {
         return {};
@@ -161,7 +161,7 @@ QString Asn1XMLParser::asn1AsHtml(const QString &filename) const
     }
 }
 
-void Asn1XMLParser::checkforCompiler() const
+void Asn1Reader::checkforCompiler() const
 {
 #ifdef Q_OS_WIN
     if (m_asn1Compiler.isEmpty()) {
@@ -206,7 +206,7 @@ void Asn1XMLParser::checkforCompiler() const
 #endif
 }
 
-QString Asn1XMLParser::asn1CompilerCommand() const
+QString Asn1Reader::asn1CompilerCommand() const
 {
     checkforCompiler();
     if (!m_asn1Compiler.isEmpty()) {
@@ -220,13 +220,13 @@ QString Asn1XMLParser::asn1CompilerCommand() const
         return {};
 }
 
-QString Asn1XMLParser::temporaryFileName(const QString &basename, const QString &suffix) const
+QString Asn1Reader::temporaryFileName(const QString &basename, const QString &suffix) const
 {
     quint32 value = QRandomGenerator::securelySeeded().generate();
     return QDir::tempPath() + QDir::separator() + QString("%1_%2.%3").arg(basename).arg(value).arg(suffix);
 }
 
-QByteArray Asn1XMLParser::fileHash(const QString &fileName) const
+QByteArray Asn1Reader::fileHash(const QString &fileName) const
 {
     QFile file(fileName);
     if (file.open(QIODevice::ReadOnly)) {
@@ -237,8 +237,7 @@ QByteArray Asn1XMLParser::fileHash(const QString &fileName) const
     return {};
 }
 
-bool Asn1XMLParser::convertToXML(
-        const QString &asn1FileName, const QString &xmlFilename, QStringList *errorMessages) const
+bool Asn1Reader::convertToXML(const QString &asn1FileName, const QString &xmlFilename, QStringList *errorMessages) const
 {
     static QString asn1Command;
     if (asn1Command.isEmpty()) {

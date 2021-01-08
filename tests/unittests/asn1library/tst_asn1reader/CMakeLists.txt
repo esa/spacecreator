@@ -1,8 +1,8 @@
-set(TEST_NAME tst_asn1xmlparser)
+set(TEST_NAME tst_asn1reader)
 project(${TEST_NAME})
 
 add_executable(${TEST_NAME}
-    tst_asn1xmlparser.cpp
+    tst_asn1reader.cpp
     boolenum_type.xml
     choice_type.xml
     empty.xml

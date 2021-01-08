@@ -26,12 +26,12 @@ class QStringList;
 namespace Asn1Acn {
 class File;
 
-class Asn1XMLParser : public QObject
+class Asn1Reader : public QObject
 {
     Q_OBJECT
 
 public:
-    Asn1XMLParser(QObject *parent = nullptr);
+    Asn1Reader(QObject *parent = nullptr);
 
     std::unique_ptr<Asn1Acn::File> parseAsn1File(const QFileInfo &fileInfo, QStringList *errorMessages);
     std::unique_ptr<Asn1Acn::File> parseAsn1File(
@@ -55,4 +55,4 @@ private:
     static QString m_mono;
 };
 
-} // namespace asn1
+}

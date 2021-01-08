@@ -17,7 +17,7 @@
 
 #include "asn1fileview.h"
 
-#include "asn1xmlparser.h"
+#include "asn1reader.h"
 #include "file.h"
 #include "ui_asn1fileview.h"
 
@@ -160,7 +160,7 @@ void ASN1FileView::fillPreview()
 
     ui->textEdit->setFont(QFontDatabase::systemFont(QFontDatabase::FixedFont));
 
-    Asn1Acn::Asn1XMLParser parser;
+    Asn1Acn::Asn1Reader parser;
     QString html = parser.asn1AsHtml(filename);
     if (html.isEmpty()) {
         QFile file(filename);

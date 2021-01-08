@@ -17,7 +17,7 @@
 
 #include "mainmodel.h"
 
-#include "asn1xmlparser.h"
+#include "asn1reader.h"
 #include "astxmlparser.h"
 #include "chartlayoutmanager.h"
 #include "commands/cmdpastechart.h"
@@ -431,7 +431,7 @@ void MainModel::readAsn1Types()
     }
 
     if (asn1FileInfo.exists()) {
-        Asn1Acn::Asn1XMLParser xmlParser;
+        Asn1Acn::Asn1Reader xmlParser;
         QStringList errorMessages;
         std::unique_ptr<Asn1Acn::File> asn1Data = xmlParser.parseAsn1File(asn1FileInfo, &errorMessages);
         QSharedPointer<Asn1Acn::File> sharedAsn1Data(asn1Data.release());

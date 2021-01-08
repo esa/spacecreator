@@ -11,8 +11,8 @@ target_sources(${LIB_NAME} PRIVATE
     asn1resources.qrc
     asn1valueparser.cpp
     asn1valueparser.h
-    asn1xmlparser.cpp
-    asn1xmlparser.h
+    asn1reader.cpp
+    asn1reader.h
     astxmlparser.cpp
     astxmlparser.h
     asn1/definitions.cpp

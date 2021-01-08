@@ -20,7 +20,7 @@
 #include "asn1/definitions.h"
 #include "asn1/file.h"
 #include "asn1/types/builtintypes.h"
-#include "asn1xmlparser.h"
+#include "asn1reader.h"
 #include "common.h"
 
 #include <QDebug>
@@ -141,7 +141,7 @@ bool Asn1ModelStorage::loadFile(const QString &fileName)
 QSharedPointer<File> Asn1ModelStorage::loadData(const QString &fileName) const
 {
     QStringList errorMessages;
-    Asn1Acn::Asn1XMLParser parser;
+    Asn1Acn::Asn1Reader parser;
     std::unique_ptr<Asn1Acn::File> asn1Data = parser.parseAsn1File(QFileInfo(fileName), &errorMessages);
     if (!errorMessages.isEmpty()) {
         qWarning() << "Can't read file:" << fileName << errorMessages.join(", ");

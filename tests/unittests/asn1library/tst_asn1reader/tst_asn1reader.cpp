@@ -16,7 +16,7 @@
 */
 
 #include "asn1const.h"
-#include "asn1xmlparser.h"
+#include "asn1reader.h"
 #include "definitions.h"
 #include "file.h"
 #include "typeassignment.h"
@@ -27,7 +27,7 @@
 
 using namespace Asn1Acn;
 
-class tst_Asn1XMLParser : public QObject
+class tst_Asn1Reader : public QObject
 {
     Q_OBJECT
 
@@ -45,25 +45,25 @@ private Q_SLOTS:
     void testChoiceReference();
 
 private:
-    Asn1XMLParser *xmlParser = nullptr;
+    Asn1Reader *xmlParser = nullptr;
     Asn1Acn::Types::Type::ASN1Type toAsn1Type(const QVariant &value)
     {
         return static_cast<Asn1Acn::Types::Type::ASN1Type>(value.toInt());
     }
 };
 
-void tst_Asn1XMLParser::init()
+void tst_Asn1Reader::init()
 {
-    xmlParser = new Asn1XMLParser;
+    xmlParser = new Asn1Reader;
 }
 
-void tst_Asn1XMLParser::cleanup()
+void tst_Asn1Reader::cleanup()
 {
     delete xmlParser;
     xmlParser = nullptr;
 }
 
-void tst_Asn1XMLParser::testFileOpenError()
+void tst_Asn1Reader::testFileOpenError()
 {
     QSignalSpy spy(xmlParser, SIGNAL(parseError(const QString &)));
 
@@ -76,7 +76,7 @@ void tst_Asn1XMLParser::testFileOpenError()
     QCOMPARE(arguments.at(0).toString(), tr("File not found"));
 }
 
-void tst_Asn1XMLParser::testInvalidXMLFormat()
+void tst_Asn1Reader::testInvalidXMLFormat()
 {
     QSignalSpy spy(xmlParser, SIGNAL(parseError(const QString &)));
     xmlParser->parseAsn1XmlFile(QFINDTESTDATA("invalid_format.xml"));
@@ -86,14 +86,14 @@ void tst_Asn1XMLParser::testInvalidXMLFormat()
     QCOMPARE(arguments.at(0).toString(), tr("Invalid XML format"));
 }
 
-void tst_Asn1XMLParser::testEmptyFile()
+void tst_Asn1Reader::testEmptyFile()
 {
     std::unique_ptr<Asn1Acn::File> asn1Types = xmlParser->parseAsn1XmlFile(QFINDTESTDATA("empty.xml"));
     QCOMPARE(asn1Types->definitionsList().size(), 1);
     QCOMPARE(asn1Types->definitionsList().at(0)->types().size(), 0);
 }
 
-void tst_Asn1XMLParser::testIntRealTypes()
+void tst_Asn1Reader::testIntRealTypes()
 {
     std::unique_ptr<Asn1Acn::File> asn1Types = xmlParser->parseAsn1XmlFile(QFINDTESTDATA("number_type.xml"));
     QVERIFY(asn1Types);
@@ -128,7 +128,7 @@ void tst_Asn1XMLParser::testIntRealTypes()
     QCOMPARE(data3[ASN1_MAX].toLongLong(), static_cast<qlonglong>(4294967295));
 }
 
-void tst_Asn1XMLParser::testBoolEnumTypes()
+void tst_Asn1Reader::testBoolEnumTypes()
 {
     std::unique_ptr<Asn1Acn::File> asn1Types = xmlParser->parseAsn1XmlFile(QFINDTESTDATA("boolenum_type.xml"));
     const Asn1Acn::Definitions *definitions = asn1Types->definitions("ModuleTest");
@@ -151,7 +151,7 @@ void tst_Asn1XMLParser::testBoolEnumTypes()
     QCOMPARE(enumValues.at(2).toString(), QString("blue"));
 }
 
-void tst_Asn1XMLParser::testChoiceType()
+void tst_Asn1Reader::testChoiceType()
 {
     std::unique_ptr<Asn1Acn::File> asn1Types = xmlParser->parseAsn1XmlFile(QFINDTESTDATA("choice_type.xml"));
     const Asn1Acn::Definitions *definitions = asn1Types->definitions("ModuleTest");
@@ -175,7 +175,7 @@ void tst_Asn1XMLParser::testChoiceType()
     QCOMPARE(data[ASN1_MAX].toLongLong(), 90.0);
 }
 
-void tst_Asn1XMLParser::testSequenceType()
+void tst_Asn1Reader::testSequenceType()
 {
     std::unique_ptr<Asn1Acn::File> asn1Types = xmlParser->parseAsn1XmlFile(QFINDTESTDATA("sequence_type.xml"));
     const Asn1Acn::Definitions *definitions = asn1Types->definitions("ModuleTest");
@@ -199,7 +199,7 @@ void tst_Asn1XMLParser::testSequenceType()
     QCOMPARE(data[ASN1_MAX].toInt(), 10);
 }
 
-void tst_Asn1XMLParser::testMixedTypes()
+void tst_Asn1Reader::testMixedTypes()
 {
     std::unique_ptr<Asn1Acn::File> asn1Types = xmlParser->parseAsn1XmlFile(QFINDTESTDATA("mixed_types01.xml"));
     const Asn1Acn::Definitions *definitions = asn1Types->definitions("TASTE-BasicTypes");
@@ -246,7 +246,7 @@ void tst_Asn1XMLParser::testMixedTypes()
     QCOMPARE(typeAssign10->type()->typeName(), QString("SEQUENCE"));
 }
 
-void tst_Asn1XMLParser::testChoiceReference()
+void tst_Asn1Reader::testChoiceReference()
 {
     std::unique_ptr<Asn1Acn::File> asn1Types = xmlParser->parseAsn1XmlFile(QFINDTESTDATA("choice_reference.xml"));
     const Asn1Acn::Definitions *definitions = asn1Types->definitions("DV");
@@ -278,6 +278,6 @@ void tst_Asn1XMLParser::testChoiceReference()
     QCOMPARE(choice2->typeName(), QString("BOOLEAN"));
 }
 
-QTEST_APPLESS_MAIN(tst_Asn1XMLParser)
+QTEST_APPLESS_MAIN(tst_Asn1Reader)
 
-#include "tst_asn1xmlparser.moc"
+#include "tst_asn1reader.moc"

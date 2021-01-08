@@ -15,8 +15,8 @@
    along with this program. If not, see <https://www.gnu.org/licenses/lgpl-2.1.html>.
 */
 
+#include "asn1reader.h"
 #include "asn1treeview.h"
-#include "asn1xmlparser.h"
 #include "definitions.h"
 #include "file.h"
 #include "typeassignment.h"
@@ -52,7 +52,7 @@ void tst_Asn1TreeView::cleanup()
 
 void tst_Asn1TreeView::testSetAsn1Value()
 {
-    Asn1Acn::Asn1XMLParser parser;
+    Asn1Acn::Asn1Reader parser;
     std::unique_ptr<Asn1Acn::File> types = parser.parseAsn1XmlFile(QFINDTESTDATA("DataView.xml"));
 
     const Asn1Acn::Definitions *definitions = types->definitions("DataView");

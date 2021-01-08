@@ -18,7 +18,7 @@
 #include "messagedeclarationsdialog.h"
 
 #include "aadlsystemchecks.h"
-#include "asn1xmlparser.h"
+#include "asn1reader.h"
 #include "commands/cmdsetasn1file.h"
 #include "definitions.h"
 #include "file.h"
@@ -268,7 +268,7 @@ void MessageDeclarationsDialog::selectAsn1File()
     if (!fileName.isEmpty()) {
         QFileInfo fileInfo(fileName);
         QStringList errors;
-        Asn1Acn::Asn1XMLParser parser;
+        Asn1Acn::Asn1Reader parser;
         std::unique_ptr<Asn1Acn::File> types = parser.parseAsn1File(fileInfo, &errors);
         QSharedPointer<Asn1Acn::File> sharedTypes(types.release());
         if (errors.isEmpty()) {
