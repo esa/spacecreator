@@ -45,6 +45,8 @@ namespace spctr {
 
 class AadlEditorFactory;
 class AadlModelStorage;
+class DeploymentEditorFactory;
+class DeploymentModelStorage;
 class MscSystemChecks;
 class MscEditorFactory;
 class MscModelStorage;
@@ -78,11 +80,13 @@ private:
 
     MscEditorFactory *m_mscFactory = nullptr;
     AadlEditorFactory *m_aadlFactory = nullptr;
+    DeploymentEditorFactory *m_deploymentFactory = nullptr;
     QAction *m_messageDeclarationAction = nullptr;
     QAction *m_asn1DialogAction = nullptr;
     QAction *m_actionSaveSceneRender = nullptr;
     AadlModelStorage *m_aadlStorage = nullptr;
     MscModelStorage *m_mscStorage = nullptr;
+    DeploymentModelStorage *m_deploymentStorage = nullptr;
     QStringList m_asnFiles;
     MscSystemChecks *m_checks = nullptr;
 };

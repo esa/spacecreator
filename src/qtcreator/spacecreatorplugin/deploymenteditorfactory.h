@@ -1,5 +1,5 @@
 /*
-   Copyright (C) 2018-2019 European Space Agency - <maxime.perrotin@esa.int>
+   Copyright (C) 2021 European Space Agency - <maxime.perrotin@esa.int>
 
    This library is free software; you can redistribute it and/or
    modify it under the terms of the GNU Library General Public
@@ -17,34 +17,26 @@
 
 #pragma once
 
-#include "commandsstackbase.h"
+#include "dveditorcore.h"
 
 #include <QObject>
+#include <coreplugin/editormanager/ieditorfactory.h>
 
-class QUndoCommand;
-class QUndoStack;
+namespace spctr {
+class DeploymentEditorData;
 
-namespace aadl {
-class AADLObject;
-}
-
-namespace shared {
-class UndoCommand;
-}
-
-namespace aadlinterface {
-namespace cmd {
-
-class CommandsStack : public shared::cmd::CommandsStackBase
+class DeploymentEditorFactory : public Core::IEditorFactory
 {
     Q_OBJECT
 public:
-    static bool push(QUndoCommand *command);
+    explicit DeploymentEditorFactory(QObject *parent = nullptr);
 
-Q_SIGNALS:
-    void nameChanged(aadl::AADLObject *entity, const QString &oldName, shared::UndoCommand *command);
-    void entityRemoved(aadl::AADLObject *entity, shared::UndoCommand *command);
+    Core::IEditor *createEditor() override;
+
+    DeploymentEditorData *editorData() const;
+
+private:
+    mutable DeploymentEditorData *m_editorData = nullptr;
 };
 
-}
-}
+} // namespace spctr

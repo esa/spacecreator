@@ -26,19 +26,4 @@
         <file alias="toolbar/global_comment.svg">resources/icons/toolbar/global_comment.svg</file>
         <file alias="toolbar/coregion.svg">resources/icons/toolbar/coregion.svg</file>
     </qresource>
-    <qresource prefix="/fonts">
-        <file alias="Ubuntu-B.ttf">resources/ubuntu-font-family-0.83/Ubuntu-B.ttf</file>
-        <file alias="Ubuntu-BI.ttf">resources/ubuntu-font-family-0.83/Ubuntu-BI.ttf</file>
-        <file alias="Ubuntu-C.ttf">resources/ubuntu-font-family-0.83/Ubuntu-C.ttf</file>
-        <file alias="Ubuntu-L.ttf">resources/ubuntu-font-family-0.83/Ubuntu-L.ttf</file>
-        <file alias="Ubuntu-LI.ttf">resources/ubuntu-font-family-0.83/Ubuntu-LI.ttf</file>
-        <file alias="Ubuntu-M.ttf">resources/ubuntu-font-family-0.83/Ubuntu-M.ttf</file>
-        <file alias="Ubuntu-MI.ttf">resources/ubuntu-font-family-0.83/Ubuntu-MI.ttf</file>
-        <file alias="UbuntuMono-B.ttf">resources/ubuntu-font-family-0.83/UbuntuMono-B.ttf</file>
-        <file alias="UbuntuMono-BI.ttf">resources/ubuntu-font-family-0.83/UbuntuMono-BI.ttf</file>
-        <file alias="UbuntuMono-R.ttf">resources/ubuntu-font-family-0.83/UbuntuMono-R.ttf</file>
-        <file alias="UbuntuMono-RI.ttf">resources/ubuntu-font-family-0.83/UbuntuMono-RI.ttf</file>
-        <file alias="Ubuntu-R.ttf">resources/ubuntu-font-family-0.83/Ubuntu-R.ttf</file>
-        <file alias="Ubuntu-RI.ttf">resources/ubuntu-font-family-0.83/Ubuntu-RI.ttf</file>
-    </qresource>
 </RCC>

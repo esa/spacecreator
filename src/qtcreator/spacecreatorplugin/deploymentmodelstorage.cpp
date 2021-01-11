@@ -1,5 +1,5 @@
 /*
-   Copyright (C) 2018-2019 European Space Agency - <maxime.perrotin@esa.int>
+   Copyright (C) 2021 European Space Agency - <maxime.perrotin@esa.int>
 
    This library is free software; you can redistribute it and/or
    modify it under the terms of the GNU Library General Public
@@ -15,36 +15,19 @@
    along with this program. If not, see <https://www.gnu.org/licenses/lgpl-2.1.html>.
 */
 
-#pragma once
+#include "deploymentmodelstorage.h"
 
-#include "commandsstackbase.h"
+#include "dveditorcore.h"
 
-#include <QObject>
+namespace spctr {
 
-class QUndoCommand;
-class QUndoStack;
-
-namespace aadl {
-class AADLObject;
-}
-
-namespace shared {
-class UndoCommand;
-}
-
-namespace aadlinterface {
-namespace cmd {
-
-class CommandsStack : public shared::cmd::CommandsStackBase
+DeploymentModelStorage::DeploymentModelStorage(QObject *parent)
+    : QObject(parent)
 {
-    Q_OBJECT
-public:
-    static bool push(QUndoCommand *command);
-
-Q_SIGNALS:
-    void nameChanged(aadl::AADLObject *entity, const QString &oldName, shared::UndoCommand *command);
-    void entityRemoved(aadl::AADLObject *entity, shared::UndoCommand *command);
-};
-
 }
-}
+
+QSharedPointer<deploymentinterface::DVEditorCore> DeploymentModelStorage::dvData(const QString &fileName) { }
+
+void DeploymentModelStorage::remove(const QString &fileName) { }
+
+} // namespace spctr

@@ -38,6 +38,12 @@ set(SC_PLUGIN_SOURCES
     spacecreatorplugin.h
     spacecreatorplugin_global.h
     spacecreatorpluginconstants.h
+    deploymentmodelstorage.cpp
+    deploymentmodelstorage.h
+    deploymenteditorfactory.cpp
+    deploymenteditorfactory.h
+    deploymenteditordata.cpp
+    deploymenteditordata.h
 )
 
 set(SC_QTC_LIBRARIES
@@ -56,7 +62,7 @@ set(SC_QTC_PLUGINS
 
 add_qtc_plugin(${PLUGIN_NAME}
     DEFINES SCPLUGIN_LIBRARY
-    DEPENDS libmsceditor libiveditor Qt5::Core Qt5::Gui Qt5::Widgets ${SC_QTC_LIBRARIES} ${SC_QTC_PLUGINS}
+    DEPENDS libmsceditor libiveditor libdveditor Qt5::Core Qt5::Gui Qt5::Widgets ${SC_QTC_LIBRARIES} ${SC_QTC_PLUGINS}
     PLUGIN_DEPENDS ${SC_QTC_PLUGINS}
     SOURCES ${SC_PLUGIN_SOURCES}
 )

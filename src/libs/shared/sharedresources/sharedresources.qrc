@@ -1,4 +1,19 @@
 <RCC>
+<qresource prefix="/">
+    <file alias="fonts/Ubuntu-B.ttf">ubuntu-font-family-0.83/Ubuntu-B.ttf</file>
+    <file alias="fonts/Ubuntu-BI.ttf">ubuntu-font-family-0.83/Ubuntu-BI.ttf</file>
+    <file alias="fonts/Ubuntu-C.ttf">ubuntu-font-family-0.83/Ubuntu-C.ttf</file>
+    <file alias="fonts/Ubuntu-L.ttf">ubuntu-font-family-0.83/Ubuntu-L.ttf</file>
+    <file alias="fonts/Ubuntu-LI.ttf">ubuntu-font-family-0.83/Ubuntu-LI.ttf</file>
+    <file alias="fonts/Ubuntu-M.ttf">ubuntu-font-family-0.83/Ubuntu-M.ttf</file>
+    <file alias="fonts/Ubuntu-MI.ttf">ubuntu-font-family-0.83/Ubuntu-MI.ttf</file>
+    <file alias="fonts/Ubuntu-R.ttf">ubuntu-font-family-0.83/Ubuntu-R.ttf</file>
+    <file alias="fonts/Ubuntu-RI.ttf">ubuntu-font-family-0.83/Ubuntu-RI.ttf</file>
+    <file alias="fonts/UbuntuMono-B.ttf">ubuntu-font-family-0.83/UbuntuMono-B.ttf</file>
+    <file alias="fonts/UbuntuMono-BI.ttf">ubuntu-font-family-0.83/UbuntuMono-BI.ttf</file>
+    <file alias="fonts/UbuntuMono-R.ttf">ubuntu-font-family-0.83/UbuntuMono-R.ttf</file>
+    <file alias="fonts/UbuntuMono-RI.ttf">ubuntu-font-family-0.83/UbuntuMono-RI.ttf</file>
+</qresource>
     <qresource prefix="/sharedresources">
         <file>icons/newfile.svg</file>
         <file>icons/open.svg</file>

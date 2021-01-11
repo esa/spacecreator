@@ -17,34 +17,8 @@
 
 #pragma once
 
-#include "commandsstackbase.h"
+namespace deploymentinterface {
 
-#include <QObject>
+void initDvEditor();
 
-class QUndoCommand;
-class QUndoStack;
-
-namespace aadl {
-class AADLObject;
-}
-
-namespace shared {
-class UndoCommand;
-}
-
-namespace aadlinterface {
-namespace cmd {
-
-class CommandsStack : public shared::cmd::CommandsStackBase
-{
-    Q_OBJECT
-public:
-    static bool push(QUndoCommand *command);
-
-Q_SIGNALS:
-    void nameChanged(aadl::AADLObject *entity, const QString &oldName, shared::UndoCommand *command);
-    void entityRemoved(aadl::AADLObject *entity, shared::UndoCommand *command);
-};
-
-}
-}
+} // namespace deploymentinterface

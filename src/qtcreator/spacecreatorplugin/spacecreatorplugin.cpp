@@ -23,6 +23,8 @@
 #include "aadlsystemchecks.h"
 #include "asn1library.h"
 #include "context/action/actionsmanager.h"
+#include "deploymenteditorfactory.h"
+#include "deploymentmodelstorage.h"
 #include "iveditor.h"
 #include "iveditorcore.h"
 #include "mainmodel.h"
@@ -97,6 +99,7 @@ bool SpaceCreatorPlugin::initialize(const QStringList &arguments, QString *error
     connect(m_aadlStorage, &spctr::AadlModelStorage::editedExternally, this, &spctr::SpaceCreatorPlugin::saveIfNotOpen);
     m_mscStorage = new MscModelStorage(this);
     connect(m_mscStorage, &spctr::MscModelStorage::editedExternally, this, &spctr::SpaceCreatorPlugin::saveIfNotOpen);
+    m_deploymentStorage = new DeploymentModelStorage(this);
 
     m_checks = new MscSystemChecks(this);
     m_checks->setMscStorage(m_mscStorage);
@@ -109,6 +112,7 @@ bool SpaceCreatorPlugin::initialize(const QStringList &arguments, QString *error
 
     m_mscFactory = new MscEditorFactory(m_mscStorage, this);
     m_aadlFactory = new AadlEditorFactory(m_aadlStorage, m_mscStorage, this);
+    m_deploymentFactory = new DeploymentEditorFactory(this);
 
     // MSC
     m_messageDeclarationAction = new QAction(tr("Message declarations ..."), this);

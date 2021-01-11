@@ -385,7 +385,7 @@ QUndoStack *IVEditorCore::undoStack() const
 
 cmd::CommandsStack *IVEditorCore::commandsStack() const
 {
-    return cmd::CommandsStack::instance();
+    return static_cast<cmd::CommandsStack *>(cmd::CommandsStack::instance());
 }
 
 /*!

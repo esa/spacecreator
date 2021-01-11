@@ -15,36 +15,20 @@
    along with this program. If not, see <https://www.gnu.org/licenses/lgpl-2.1.html>.
 */
 
-#pragma once
+#include "dveditor.h"
 
-#include "commandsstackbase.h"
+#include <QtGlobal>
 
-#include <QObject>
-
-class QUndoCommand;
-class QUndoStack;
-
-namespace aadl {
-class AADLObject;
-}
-
-namespace shared {
-class UndoCommand;
-}
-
-namespace aadlinterface {
-namespace cmd {
-
-class CommandsStack : public shared::cmd::CommandsStackBase
+static void init_dv_editor_library()
 {
-    Q_OBJECT
-public:
-    static bool push(QUndoCommand *command);
-
-Q_SIGNALS:
-    void nameChanged(aadl::AADLObject *entity, const QString &oldName, shared::UndoCommand *command);
-    void entityRemoved(aadl::AADLObject *entity, shared::UndoCommand *command);
-};
-
+    Q_INIT_RESOURCE(dveditorresources);
 }
+
+namespace deploymentinterface {
+
+void initDvEditor()
+{
+    init_dv_editor_library();
 }
+
+} // namespace deploymentinterface

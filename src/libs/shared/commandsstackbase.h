@@ -1,5 +1,5 @@
 /*
-   Copyright (C) 2018-2019 European Space Agency - <maxime.perrotin@esa.int>
+   Copyright (C) 2021 European Space Agency - <maxime.perrotin@esa.int>
 
    This library is free software; you can redistribute it and/or
    modify it under the terms of the GNU Library General Public
@@ -17,34 +17,52 @@
 
 #pragma once
 
-#include "commandsstackbase.h"
-
 #include <QObject>
 
 class QUndoCommand;
 class QUndoStack;
 
-namespace aadl {
-class AADLObject;
-}
-
 namespace shared {
 class UndoCommand;
-}
 
-namespace aadlinterface {
 namespace cmd {
 
-class CommandsStack : public shared::cmd::CommandsStackBase
+class CommandsStackBase : public QObject
 {
     Q_OBJECT
 public:
+    struct Macro {
+        explicit Macro(const QString &title = QString());
+        ~Macro();
+
+        bool push(QUndoCommand *cmd) const;
+
+        void setComplete(bool complete);
+        bool isComplete() const;
+
+    private:
+        bool m_keepMacro { false };
+    };
+
+    static CommandsStackBase *instance();
+
+    static void setCurrent(QUndoStack *stack);
+    static QUndoStack *current();
+
     static bool push(QUndoCommand *command);
 
 Q_SIGNALS:
-    void nameChanged(aadl::AADLObject *entity, const QString &oldName, shared::UndoCommand *command);
-    void entityRemoved(aadl::AADLObject *entity, shared::UndoCommand *command);
+    void currentStackChanged(QUndoStack *to);
+
+private:
+    explicit CommandsStackBase(QObject *parent = nullptr);
+
+    void setCurrentStack(QUndoStack *stack);
+    QUndoStack *currentStack() const;
+
+    static CommandsStackBase *m_instance;
+    QUndoStack *m_current = nullptr;
 };
 
-}
-}
+} // cmd
+} // shared

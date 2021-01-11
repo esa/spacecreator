@@ -1,5 +1,5 @@
 /*
-   Copyright (C) 2018-2019 European Space Agency - <maxime.perrotin@esa.int>
+   Copyright (C) 2021 European Space Agency - <maxime.perrotin@esa.int>
 
    This library is free software; you can redistribute it and/or
    modify it under the terms of the GNU Library General Public
@@ -17,34 +17,20 @@
 
 #pragma once
 
-#include "commandsstackbase.h"
+#include "ui/graphicsviewbase.h"
 
-#include <QObject>
+namespace deploymentinterface {
 
-class QUndoCommand;
-class QUndoStack;
-
-namespace aadl {
-class AADLObject;
-}
-
-namespace shared {
-class UndoCommand;
-}
-
-namespace aadlinterface {
-namespace cmd {
-
-class CommandsStack : public shared::cmd::CommandsStackBase
+/*!
+  \class GraphicsView
+  \brief The QGraphicsView wrapper for displaying the Deployment view.
+*/
+class GraphicsView : public shared::ui::GraphicsViewBase
 {
     Q_OBJECT
-public:
-    static bool push(QUndoCommand *command);
 
-Q_SIGNALS:
-    void nameChanged(aadl::AADLObject *entity, const QString &oldName, shared::UndoCommand *command);
-    void entityRemoved(aadl::AADLObject *entity, shared::UndoCommand *command);
+public:
+    explicit GraphicsView(QWidget *parent = nullptr);
 };
 
-}
-}
+} // namespace deploymentinterface
