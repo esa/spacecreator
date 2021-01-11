@@ -55,6 +55,7 @@ public:
         return visitor.value();
     }
 
+    void setName(const QString &name) { m_name = name; }
     const QString &name() const { return m_name; }
     const SourceLocation &location() const { return m_location; }
 

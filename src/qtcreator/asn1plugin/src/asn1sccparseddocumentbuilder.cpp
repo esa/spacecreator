@@ -25,24 +25,24 @@
 
 #include "asn1sccparseddocumentbuilder.h"
 
-#include <QJsonArray>
-#include <QJsonDocument>
-#include <QJsonObject>
-#include <QJsonValue>
-#include <QNetworkReply>
-
 #include <extensionsystem/pluginmanager.h>
 
+#include "messages/messagemanager.h"
 #include <messages/messageutils.h>
 
 #include "asn1/definitions.h"
 #include "asn1/file.h"
 
+#include "asn1reader.h"
 #include "astxmlparser.h"
 #include "errormessageparser.h"
 
-using namespace Asn1Acn::Internal;
+namespace Asn1Acn {
+namespace Internal {
 
+/*!
+  Factory method to create a ParsedDocumentBuilder object
+ */
 ParsedDocumentBuilder *Asn1SccParsedDocumentBuilder::create(const QHash<QString, QString> &documents)
 {
     auto serviceProvider = ExtensionSystem::PluginManager::getObject<ParsingServiceProvider>();
@@ -55,54 +55,32 @@ Asn1SccParsedDocumentBuilder::Asn1SccParsedDocumentBuilder(ParsingServiceProvide
     , m_documentSources(documents)
 {}
 
+Asn1SccParsedDocumentBuilder::~Asn1SccParsedDocumentBuilder()
+{
+    m_workerThread.quit();
+    m_workerThread.wait();
+}
+
 void Asn1SccParsedDocumentBuilder::run()
 {
-    QNetworkReply *reply = m_serviceProvider->requestAst(m_documentSources);
-
-    QObject::connect(reply,
-                     &QNetworkReply::finished,
-                     this,
-                     &Asn1SccParsedDocumentBuilder::requestFinished);
+    m_worker = new Asn1ReadWorker(this);
+    m_worker->moveToThread(&m_workerThread);
+    connect(&m_workerThread, &QThread::finished, m_worker, &QObject::deleteLater);
+    connect(m_worker,
+            &Asn1ReadWorker::resultReady,
+            this,
+            &Asn1SccParsedDocumentBuilder::handleResults);
+    m_workerThread.start();
+    QMetaObject::invokeMethod(m_worker, "doWork");
 }
 
-void Asn1SccParsedDocumentBuilder::requestFinished()
+void Asn1SccParsedDocumentBuilder::handleResults()
 {
-    QNetworkReply *reply = qobject_cast<QNetworkReply *>(sender());
-
-    if (reply->error() == QNetworkReply::NoError) {
-        Messages::messageNetworkReply(reply);
-        parseResponse(reply->readAll());
-    } else {
-        Messages::messageNetworkReplyError(reply);
-        Q_EMIT failed();
-    }
-
-    reply->deleteLater();
-}
-
-void Asn1SccParsedDocumentBuilder::parseResponse(const QByteArray &jsonData)
-{
-    const auto json = QJsonDocument::fromJson(jsonData).object();
-    if (responseContainsAst(json)) {
-        parseXML(getAstXml(json));
-        Q_EMIT finished();
-    } else {
-        storeErrorMessages(json);
+    Q_ASSERT(m_worker != nullptr);
+    if (m_worker->hadError()) {
         Q_EMIT errored();
     }
-}
-
-void Asn1SccParsedDocumentBuilder::parseXML(const QString &textData)
-{
-    QXmlStreamReader reader;
-    reader.addData(textData);
-
-    AstXmlParser parser(reader);
-    parser.parse();
-
-    auto parsedData = parser.takeData();
-    for (auto &item : parsedData)
-        m_parsedDocuments.push_back(std::move(item.second));
+    Q_EMIT finished();
 }
 
 std::vector<std::unique_ptr<Asn1Acn::File>> Asn1SccParsedDocumentBuilder::takeDocuments()
@@ -110,25 +88,44 @@ std::vector<std::unique_ptr<Asn1Acn::File>> Asn1SccParsedDocumentBuilder::takeDo
     return std::move(m_parsedDocuments);
 }
 
-bool Asn1SccParsedDocumentBuilder::responseContainsAst(const QJsonObject &json)
-{
-    return json[QLatin1Literal("ErrorCode")].toInt(-1) == 0;
-}
+/*!
+   \brief Asn1ReadWorker::Asn1ReadWorker
+   \param builder
+ */
+Asn1ReadWorker::Asn1ReadWorker(Asn1SccParsedDocumentBuilder *builder)
+    : QObject()
+    , m_builder(builder)
+{}
 
-void Asn1SccParsedDocumentBuilder::storeErrorMessages(const QJsonObject &json)
+/*!
+   Does the parsing for all the files
+ */
+void Asn1ReadWorker::doWork()
 {
-    const auto parser = ErrorMessageParser();
-    for (const auto message : json[QLatin1Literal("Messages")].toArray()) {
-        const auto msg = parser.parse(message.toString());
-        if (msg.isValid())
-            m_errorMessages.push_back(msg);
+    Asn1Reader reader;
+    for (auto it = m_builder->m_documentSources.begin(); it != m_builder->m_documentSources.end();
+         ++it) {
+        const QString &fileName = it.key();
+        const QString &asnContent = it.value();
+        QStringList errorMessages;
+        std::unique_ptr<Asn1Acn::File> data = reader.parseAsn1File(fileName,
+                                                                   &errorMessages,
+                                                                   asnContent);
+        if (!errorMessages.isEmpty() || data.get() == nullptr) {
+            if (errorMessages.isEmpty()) {
+                m_builder->m_errorMessages.push_back(
+                    {{}, QString("Error reading file %1").arg(fileName)});
+            } else {
+                for (const QString &error : qAsConst(errorMessages)) {
+                    m_builder->m_errorMessages.push_back({SourceLocation(fileName, 1, 1), error});
+                }
+            }
+        } else {
+            m_builder->m_parsedDocuments.push_back(std::move(data));
+        }
     }
+    Q_EMIT resultReady();
 }
 
-QString Asn1SccParsedDocumentBuilder::getAstXml(const QJsonObject &json)
-{
-    const auto files = json[QLatin1Literal("Files")].toArray();
-    if (files.size() != 1)
-        return QString();
-    return files[0].toObject()[QLatin1Literal("Contents")].toString();
-}
+} // namespace Internal
+} // namespace Asn1Acn

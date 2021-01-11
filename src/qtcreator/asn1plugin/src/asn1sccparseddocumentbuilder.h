@@ -30,15 +30,19 @@
 #include <QByteArray>
 #include <QHash>
 #include <QString>
+#include <QThread>
 
 #include "asn1sccserviceprovider.h"
 #include "parseddocumentbuilder.h"
 
-class QJsonObject;
-
 namespace Asn1Acn {
 namespace Internal {
 
+class Asn1ReadWorker;
+
+/*!
+   Build ASN data structure from ASN files/content
+ */
 class Asn1SccParsedDocumentBuilder : public ParsedDocumentBuilder
 {
     Q_OBJECT
@@ -48,6 +52,7 @@ public:
 
     Asn1SccParsedDocumentBuilder(ParsingServiceProvider *serviceProvider,
                                  const QHash<QString, QString> &documents);
+    ~Asn1SccParsedDocumentBuilder();
     void run() override;
 
     std::vector<std::unique_ptr<Asn1Acn::File>> takeDocuments() override;
@@ -57,22 +62,40 @@ public:
     }
 
 private Q_SLOTS:
-    void requestFinished();
+    void handleResults();
 
 private:
-    void parseResponse(const QByteArray &jsonData);
-    void parseXML(const QString &textData);
-    void storeErrorMessages(const QJsonObject &json);
-
-    bool responseContainsAst(const QJsonObject &json);
-    QString getAstXml(const QJsonObject &json);
-
-    ParsingServiceProvider *m_serviceProvider;
+    ParsingServiceProvider *m_serviceProvider = nullptr;
 
     const QHash<QString, QString> m_documentSources;
 
     std::vector<std::unique_ptr<Asn1Acn::File>> m_parsedDocuments;
     std::vector<Asn1Acn::ErrorMessage> m_errorMessages;
+
+    QThread m_workerThread;
+    Asn1ReadWorker *m_worker = nullptr;
+
+    friend class Asn1ReadWorker;
+};
+
+/*!
+   Worker class for parsing asn.1 files in a thread
+ */
+class Asn1ReadWorker : public QObject
+{
+    Q_OBJECT
+public:
+    Asn1ReadWorker(Asn1SccParsedDocumentBuilder *builder);
+    bool hadError() const { return false; }
+
+public Q_SLOTS:
+    void doWork();
+
+Q_SIGNALS:
+    void resultReady();
+
+private:
+    Asn1SccParsedDocumentBuilder *m_builder = nullptr;
 };
 
 } /* namespace Internal */

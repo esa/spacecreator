@@ -17,6 +17,7 @@
 
 #pragma once
 
+#include <QCache>
 #include <QObject>
 #include <memory>
 
@@ -26,6 +27,14 @@ class QStringList;
 namespace Asn1Acn {
 class File;
 
+/*!
+   Class to parse ASN.1 files and return the result as Asn1Acn::File object.
+
+   If the source is a file, the converted xml is cached in the the application's cache directory.
+   If the source is a text, the converted xml is cached in memory.
+
+   \note uses the program asn1scc for converting to xml https://github.com/ttsiodras/asn1scc
+ */
 class Asn1Reader : public QObject
 {
     Q_OBJECT
@@ -36,7 +45,10 @@ public:
     std::unique_ptr<Asn1Acn::File> parseAsn1File(const QFileInfo &fileInfo, QStringList *errorMessages);
     std::unique_ptr<Asn1Acn::File> parseAsn1File(
             const QString &filePath, const QString &fileName, QStringList *errorMessages);
+    std::unique_ptr<Asn1Acn::File> parseAsn1File(
+            const QString &fileName, QStringList *errorMessages, const QString &content);
     std::unique_ptr<Asn1Acn::File> parseAsn1XmlFile(const QString &fileName);
+    std::unique_ptr<Asn1Acn::File> parseAsn1XmlContent(const QString &xmlContent, const QString &fileName);
 
     QString asn1AsHtml(const QString &filename) const;
 
@@ -53,6 +65,8 @@ private:
 
     static QString m_asn1Compiler;
     static QString m_mono;
+
+    static QCache<QString, QString> m_cache;
 };
 
 }

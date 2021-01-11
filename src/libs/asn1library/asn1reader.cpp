@@ -28,22 +28,38 @@
 #include <QProcess>
 #include <QRandomGenerator>
 #include <QStandardPaths>
+#include <QTemporaryDir>
 
 namespace Asn1Acn {
 
 QString Asn1Reader::m_asn1Compiler {};
 QString Asn1Reader::m_mono {};
+QCache<QString, QString> Asn1Reader::m_cache {};
 
 Asn1Reader::Asn1Reader(QObject *parent)
     : QObject(parent)
 {
 }
 
+/*!
+   \brief Parses a asn.1 file
+   \param fileInfo information of the asn.1 file to parse
+   \param errorMessages optional output parameter containing error messages
+   \return An empty unique ptr if an error occured
+   \return
+ */
 std::unique_ptr<Asn1Acn::File> Asn1Reader::parseAsn1File(const QFileInfo &fileInfo, QStringList *errorMessages)
 {
     return parseAsn1File(fileInfo.dir().absolutePath(), fileInfo.fileName(), errorMessages);
 }
 
+/*!
+   \brief Parses a asn.1 file
+   \param filePath the directory (full path) of the asn.1 file. Does not inlcude the filename.
+   \param fileName filename (without path) of the asn.1 file
+   \param errorMessages optional output parameter containing error messages
+   \return An empty unique ptr if an error occured
+ */
 std::unique_ptr<Asn1Acn::File> Asn1Reader::parseAsn1File(
         const QString &filePath, const QString &fileName, QStringList *errorMessages)
 {
@@ -68,10 +84,57 @@ std::unique_ptr<Asn1Acn::File> Asn1Reader::parseAsn1File(
     return asn1TypesData;
 }
 
+/*!
+   \brief Parses a asn.1 text
+   \param fileName filename (without path) of the asn.1 file
+   \param errorMessages optional output parameter containing error messages
+   \param content the actual content of the asn.1 file
+   \return An empty unique ptr if an error occured
+ */
+std::unique_ptr<Asn1Acn::File> Asn1Reader::parseAsn1File(
+        const QString &fileName, QStringList *errorMessages, const QString &content)
+{
+    QByteArray hash = QCryptographicHash::hash(content.toUtf8(), QCryptographicHash::Md5).toHex();
+    QTemporaryDir tempDir;
+    QFileInfo fi(fileName);
+    const QString asnFile = tempDir.filePath(fi.fileName());
+    const QString xmlFile = asnFile + "xml";
+
+    if (!m_cache.contains(hash)) {
+        QFile fileAsn(asnFile);
+        if (!fileAsn.open(QIODevice::WriteOnly)) {
+            return {};
+        }
+        fileAsn.write(content.toUtf8());
+        fileAsn.close();
+
+        bool ok = convertToXML(asnFile, xmlFile, errorMessages);
+        if (!ok) {
+            return {};
+        }
+
+        QFile fileXml(xmlFile);
+        if (!fileXml.open(QIODevice::ReadOnly)) {
+            return {};
+        }
+        m_cache.insert(hash, new QString(fileXml.readAll()));
+    }
+
+    std::unique_ptr<Asn1Acn::File> asn1TypesData = parseAsn1XmlContent(*(m_cache[hash]), xmlFile);
+    if (asn1TypesData) {
+        asn1TypesData->setName(fileName);
+    }
+    return asn1TypesData;
+}
+
+/*!
+   Reads the file \p fileName which is a asn->xml converted file
+   \return An empty unique ptr if an error occured
+ */
 std::unique_ptr<Asn1Acn::File> Asn1Reader::parseAsn1XmlFile(const QString &fileName)
 {
-    QFileInfo fileInfo;
-    if (fileInfo.exists(fileName)) {
+    QFileInfo fileInfo(fileName);
+    if (fileInfo.exists()) {
         QFile file(fileName);
 
         if (file.open(QIODevice::ReadOnly)) {
@@ -104,6 +167,39 @@ std::unique_ptr<Asn1Acn::File> Asn1Reader::parseAsn1XmlFile(const QString &fileN
     return {};
 }
 
+/*!
+   Reads the text \p xmlContent (originally from asn.1 file \p fileName) which is a asn->xml converted file
+   \return An empty unique ptr if an error occured
+ */
+std::unique_ptr<File> Asn1Reader::parseAsn1XmlContent(const QString &xmlContent, const QString &fileName)
+{
+    QFileInfo fileInfo(fileName);
+    QXmlStreamReader reader(xmlContent);
+    Asn1Acn::AstXmlParser parser(reader);
+    const bool ok = parser.parse();
+    if (!ok) {
+        Q_EMIT parseError(tr("Error parsing the asn1 file %1").arg(fileName));
+    }
+    std::map<QString, std::unique_ptr<Asn1Acn::File>> data = parser.takeData();
+    if (data.empty()) {
+        Q_EMIT parseError(tr("Invalid XML format"));
+        return {};
+    }
+
+    if (data.size() == 1) {
+        return std::move(data.begin()->second);
+    }
+
+    if (data.find(fileInfo.fileName()) != data.end()) {
+        return std::move(data[fileInfo.fileName()]);
+    }
+
+    return {};
+}
+
+/*!
+   Returns the asn.1 file \p filename as HTML representation
+ */
 QString Asn1Reader::asn1AsHtml(const QString &filename) const
 {
     if (filename.isEmpty() || !QFile::exists(filename) || QFileInfo(filename).isDir()) {
@@ -211,7 +307,7 @@ QString Asn1Reader::asn1CompilerCommand() const
     checkforCompiler();
     if (!m_asn1Compiler.isEmpty()) {
 #ifdef Q_OS_WIN
-        return QString("asn1 -customStg \"%1xml.stg\"::").arg(m_asn1Compiler);
+        return QString("%1 -customStg \"%2xml.stg\"::").arg(m_asn1Compiler, asnFile.path());
 #else
         QFileInfo asnFile(m_asn1Compiler);
         return QString("%1 %2 -customStg %3/xml.stg:").arg(m_mono, m_asn1Compiler, asnFile.path());
