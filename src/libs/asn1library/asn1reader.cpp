@@ -306,10 +306,10 @@ QString Asn1Reader::asn1CompilerCommand() const
 {
     checkforCompiler();
     if (!m_asn1Compiler.isEmpty()) {
+        QFileInfo asnFile(m_asn1Compiler);
 #ifdef Q_OS_WIN
         return QString("%1 -customStg \"%2xml.stg\"::").arg(m_asn1Compiler, asnFile.path());
 #else
-        QFileInfo asnFile(m_asn1Compiler);
         return QString("%1 %2 -customStg %3/xml.stg:").arg(m_mono, m_asn1Compiler, asnFile.path());
 #endif
     } else
