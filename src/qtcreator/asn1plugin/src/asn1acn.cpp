@@ -50,12 +50,10 @@
 
 #include "settings/fuzzer.h"
 #include "settings/libraries.h"
-#include "settings/service.h"
 #include "settings/settings.h"
 
 #include "options-pages/fuzzer.h"
 #include "options-pages/libraries.h"
-#include "options-pages/service.h"
 
 #include "tree-views/outlinewidget.h"
 #include "tree-views/typestreewidget.h"
@@ -70,7 +68,6 @@
 #include "acneditor.h"
 #include "asn1acnconstants.h"
 #include "asn1acnjsextension.h"
-#include "asn1sccserviceprovider.h"
 #include "asneditor.h"
 #include "kitinformation.h"
 #include "projectmenuimportitemcontroller.h"
@@ -80,55 +77,22 @@
 #include "tr.h"
 #include "typeslocator.h"
 
-#ifdef WITH_TESTS
-#include "libraries/tests/filemodel_tests.h"
-#include "libraries/tests/generalmetadataparser_tests.h"
-#include "libraries/tests/metadatacheckstatehandler_tests.h"
-#include "libraries/tests/metadatamodel_tests.h"
-#include "libraries/tests/modulemetadataparser_tests.h"
-#include "tests/astxmlparser_tests.h"
-#include "tests/autocompleter_tests.h"
-#include "tests/documentprocessor_tests.h"
-#include "tests/errormessageparser_tests.h"
-#include "tests/indenter_tests.h"
-#include "tests/linkcreator_tests.h"
-#include "tests/modelvalidityguard_tests.h"
-#include "tests/parseddatastorage_tests.h"
-#include "tests/parseddocumentbuilder_tests.h"
-#include "tests/projectcontenthandler_tests.h"
-#include "tests/selectionpositionresolver_test.h"
-#include "tree-views/tests/combomodel_tests.h"
-#include "tree-views/tests/displayrolevisitor_tests.h"
-#include "tree-views/tests/outlineindexupdater_tests.h"
-#include "tree-views/tests/outlinemodel_tests.h"
-#include "tree-views/tests/typestreemodel_tests.h"
-#endif
-
 namespace Asn1Acn {
 namespace Internal {
 
 class Asn1AcnPluginPrivate
 {
 public:
-    Asn1AcnPluginPrivate(Settings::ServicePtr serviceSettings,
-                         Settings::LibrariesPtr librariesSettings,
+    Asn1AcnPluginPrivate(Settings::LibrariesPtr librariesSettings,
                          Settings::FuzzerPtr fuzzerSettings)
-        : m_optionsPagesService(serviceSettings)
-        , m_optionsPagesLibraries(librariesSettings)
+        : m_optionsPagesLibraries(librariesSettings)
         , m_optionsPagesFuzzer(fuzzerSettings)
         , m_componentDirectoryWatcher(librariesSettings)
-        , m_asn1sccServiceProvider(serviceSettings)
     {
-        ExtensionSystem::PluginManager::addObject(&m_asn1sccServiceProvider);
         ProjectExplorer::KitManager::registerKitInformation<KitInformation>();
-
-        m_asn1sccServiceProvider.start();
     }
 
-    ~Asn1AcnPluginPrivate()
-    {
-        ExtensionSystem::PluginManager::removeObject(&m_asn1sccServiceProvider);
-    }
+    ~Asn1AcnPluginPrivate() {}
 
     TreeViews::OutlineWidgetFactory m_outlineWidgetFactory;
     TreeViews::TypesTreeWidgetFactory m_typesTreeWidgetFactory;
@@ -137,13 +101,10 @@ public:
     ProjectWatcher m_projectWatcher;
     TypesLocator m_typesLocator;
 
-    OptionsPages::Service m_optionsPagesService;
     OptionsPages::Libraries m_optionsPagesLibraries;
     OptionsPages::Fuzzer m_optionsPagesFuzzer;
 
     Libraries::ComponentDirectoryWatcher m_componentDirectoryWatcher;
-
-    Asn1SccServiceProvider m_asn1sccServiceProvider;
 };
 
 Asn1AcnPlugin::Asn1AcnPlugin() {}
@@ -159,11 +120,10 @@ bool Asn1AcnPlugin::initialize(const QStringList &arguments, QString *errorStrin
     Q_UNUSED(arguments)
     Q_UNUSED(errorString)
 
-    const auto serviceSettings = Settings::load<Settings::Service>();
     const auto librariesSettings = Settings::load<Settings::Libraries>();
     const auto fuzzerSettings = Settings::load<Settings::Fuzzer>();
 
-    d = new Asn1AcnPluginPrivate(serviceSettings, librariesSettings, fuzzerSettings);
+    d = new Asn1AcnPluginPrivate(librariesSettings, fuzzerSettings);
 
     Completion::AsnSnippets::registerGroup();
     Completion::AcnSnippets::registerGroup();

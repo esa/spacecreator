@@ -32,7 +32,6 @@
 #include <QString>
 #include <QThread>
 
-#include "asn1sccserviceprovider.h"
 #include "parseddocumentbuilder.h"
 
 namespace Asn1Acn {
@@ -50,8 +49,7 @@ class Asn1SccParsedDocumentBuilder : public ParsedDocumentBuilder
 public:
     static ParsedDocumentBuilder *create(const QHash<QString, QString> &documents);
 
-    Asn1SccParsedDocumentBuilder(ParsingServiceProvider *serviceProvider,
-                                 const QHash<QString, QString> &documents);
+    Asn1SccParsedDocumentBuilder(const QHash<QString, QString> &documents);
     ~Asn1SccParsedDocumentBuilder();
     void run() override;
 
@@ -65,8 +63,6 @@ private Q_SLOTS:
     void handleResults();
 
 private:
-    ParsingServiceProvider *m_serviceProvider = nullptr;
-
     const QHash<QString, QString> m_documentSources;
 
     std::vector<std::unique_ptr<Asn1Acn::File>> m_parsedDocuments;

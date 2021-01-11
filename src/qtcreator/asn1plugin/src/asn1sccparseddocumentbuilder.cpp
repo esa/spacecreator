@@ -25,17 +25,8 @@
 
 #include "asn1sccparseddocumentbuilder.h"
 
-#include <extensionsystem/pluginmanager.h>
-
-#include "messages/messagemanager.h"
-#include <messages/messageutils.h>
-
-#include "asn1/definitions.h"
 #include "asn1/file.h"
-
 #include "asn1reader.h"
-#include "astxmlparser.h"
-#include "errormessageparser.h"
 
 namespace Asn1Acn {
 namespace Internal {
@@ -45,14 +36,11 @@ namespace Internal {
  */
 ParsedDocumentBuilder *Asn1SccParsedDocumentBuilder::create(const QHash<QString, QString> &documents)
 {
-    auto serviceProvider = ExtensionSystem::PluginManager::getObject<ParsingServiceProvider>();
-    return new Asn1SccParsedDocumentBuilder(serviceProvider, documents);
+    return new Asn1SccParsedDocumentBuilder(documents);
 }
 
-Asn1SccParsedDocumentBuilder::Asn1SccParsedDocumentBuilder(ParsingServiceProvider *serviceProvider,
-                                                           const QHash<QString, QString> &documents)
-    : m_serviceProvider(serviceProvider)
-    , m_documentSources(documents)
+Asn1SccParsedDocumentBuilder::Asn1SccParsedDocumentBuilder(const QHash<QString, QString> &documents)
+    : m_documentSources(documents)
 {}
 
 Asn1SccParsedDocumentBuilder::~Asn1SccParsedDocumentBuilder()

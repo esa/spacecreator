@@ -41,14 +41,11 @@ set(ASN1_SOURCES
     src/tree-views/outlinewidget.cpp
     src/tree-views/typestreewidget.cpp
     src/tree-views/expansionstaterestorer.cpp
-    src/options-pages/service.cpp
     src/options-pages/libraries.cpp
     src/options-pages/fuzzer.cpp
-    src/options-pages/servicewidget.cpp
     src/options-pages/librarieswidget.cpp
     src/options-pages/fuzzerwidget.cpp
     src/settings/settings.cpp
-    src/settings/service.cpp
     src/settings/libraries.cpp
     src/settings/fuzzer.cpp
     src/fuzzer/fuzzerparamsdialog.cpp
@@ -89,7 +86,6 @@ set(ASN1_SOURCES
     src/projectwatcher.cpp
     src/document.cpp
     src/asn1acnjsextension.cpp
-    src/asn1sccserviceprovider.cpp
     src/asn1sccparseddocumentbuilder.cpp
     src/projectcontenthandler.cpp
     src/indenter.cpp
@@ -154,14 +150,11 @@ set(ASN1_SOURCES
     src/tree-views/indexupdaterfactory.h
     src/tree-views/typestreeindexupdaterfactory.h
     src/tree-views/outlineindexupdaterfactory.h
-    src/options-pages/service.h
     src/options-pages/libraries.h
     src/options-pages/fuzzer.h
-    src/options-pages/servicewidget.h
     src/options-pages/librarieswidget.h
     src/options-pages/fuzzerwidget.h
     src/settings/settings.h
-    src/settings/service.h
     src/settings/libraries.h
     src/settings/fuzzer.h
     src/fuzzer/fuzzerparamsdialog.h
@@ -212,7 +205,6 @@ set(ASN1_SOURCES
     src/projectwatcher.h
     src/document.h
     src/asn1acnjsextension.h
-    src/asn1sccserviceprovider.h
     src/asn1sccparseddocumentbuilder.h
     src/projectcontenthandler.h
     src/indenter.h
@@ -220,7 +212,6 @@ set(ASN1_SOURCES
     src/linkcreator.h
     src/referencefinder.h
     src/tools.h
-    src/parsingserviceprovider.h
     src/parseddocumentbuilder.h
     src/documentprocessor.h
     src/sourcereader.h
@@ -239,7 +230,6 @@ set(ASN1_SOURCES
     src/asn1acnbuildstep.h
     src/asn1acnbuildsteprunner.h
     src/fuzzer/fuzzerparams.ui
-    src/options-pages/service.ui
     src/options-pages/libraries.ui
     src/options-pages/fuzzer.ui
     src/libraries/wizard/import_component.ui
