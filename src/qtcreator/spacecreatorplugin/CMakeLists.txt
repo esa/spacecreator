@@ -2,48 +2,48 @@ set(PLUGIN_NAME SpaceCreatorPlugin)
 
 set(SC_PLUGIN_SOURCES
     SpaceCreatorPlugin.json.in
-    aadleditordata.cpp
-    aadleditordata.h
-    aadleditordocument.cpp
-    aadleditordocument.h
-    aadleditorfactory.cpp
-    aadleditorfactory.h
-    aadleditorstack.cpp
-    aadleditorstack.h
-    aadlmainwidget.cpp
-    aadlmainwidget.h
     aadlmodelstorage.cpp
     aadlmodelstorage.h
-    aadltexteditor.cpp
-    aadltexteditor.h
-    msccontext.cpp
-    msccontext.h
-    msceditordata.cpp
-    msceditordata.h
-    msceditordocument.cpp
-    msceditordocument.h
-    msceditorfactory.cpp
-    msceditorfactory.h
-    msceditorstack.cpp
-    msceditorstack.h
-    mscmainwidget.cpp
-    mscmainwidget.h
+    deploymentmodelstorage.cpp
+    deploymentmodelstorage.h
+    dv/deploymenteditordata.cpp
+    dv/deploymenteditordata.h
+    dv/deploymenteditorfactory.cpp
+    dv/deploymenteditorfactory.h
+    iv/aadleditordata.cpp
+    iv/aadleditordata.h
+    iv/aadleditordocument.cpp
+    iv/aadleditordocument.h
+    iv/aadleditorfactory.cpp
+    iv/aadleditorfactory.h
+    iv/aadleditorstack.cpp
+    iv/aadleditorstack.h
+    iv/aadlmainwidget.cpp
+    iv/aadlmainwidget.h
+    iv/aadltexteditor.cpp
+    iv/aadltexteditor.h
+    msc/msccontext.cpp
+    msc/msccontext.h
+    msc/msceditordata.cpp
+    msc/msceditordata.h
+    msc/msceditordocument.cpp
+    msc/msceditordocument.h
+    msc/msceditorfactory.cpp
+    msc/msceditorfactory.h
+    msc/msceditorstack.cpp
+    msc/msceditorstack.h
+    msc/mscmainwidget.cpp
+    msc/mscmainwidget.h
+    msc/mscqtceditor.cpp
+    msc/mscqtceditor.h
     mscmodelstorage.cpp
     mscmodelstorage.h
-    mscqtceditor.cpp
-    mscqtceditor.h
     mscsystemchecks.cpp
     mscsystemchecks.h
     spacecreatorplugin.cpp
     spacecreatorplugin.h
     spacecreatorplugin_global.h
     spacecreatorpluginconstants.h
-    deploymentmodelstorage.cpp
-    deploymentmodelstorage.h
-    deploymenteditorfactory.cpp
-    deploymenteditorfactory.h
-    deploymenteditordata.cpp
-    deploymenteditordata.h
 )
 
 set(SC_QTC_LIBRARIES

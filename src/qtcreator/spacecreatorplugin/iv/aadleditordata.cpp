@@ -23,7 +23,7 @@
 #include "aadlmodelstorage.h"
 #include "aadltexteditor.h"
 #include "iveditorcore.h"
-#include "msccontext.h"
+#include "msc/msccontext.h"
 #include "mscmodelstorage.h"
 #include "spacecreatorpluginconstants.h"
 
