@@ -275,6 +275,8 @@ void MscMainWidget::init()
     viewLayout->setSpacing(0);
     this->setLayout(viewLayout);
 
+    m_plugin->showToolbars(false);
+
     m_chartToolBar = new shared::ActionsBar(this);
     viewLayout->addWidget(m_chartToolBar);
     m_documentToolBar = new shared::ActionsBar(this);

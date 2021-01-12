@@ -23,8 +23,8 @@
 #include "msceditorstack.h"
 #include "mscmainwidget.h"
 #include "mscmodelstorage.h"
+#include "mscqtceditor.h"
 #include "mscsystemchecks.h"
-#include "msctexteditor.h"
 #include "spacecreatorpluginconstants.h"
 
 #include <QToolBar>
@@ -42,39 +42,28 @@
 #include <coreplugin/modemanager.h>
 #include <coreplugin/outputpane.h>
 #include <editormanager/editormanager.h>
-#include <texteditor/texteditor.h>
+#include <editormanager/ieditorfactory.h>
 #include <utils/icon.h>
 #include <utils/qtcassert.h>
 #include <utils/utilsicons.h>
 
 namespace spctr {
 
-class MscTextEditorWidget : public TextEditor::TextEditorWidget
-{
-    Q_OBJECT
-public:
-    MscTextEditorWidget() = default;
-
-    void finalizeInitialization() override { setReadOnly(true); }
-};
-
-class MscTextEditorFactory : public TextEditor::TextEditorFactory
+class MscTextEditorFactory : public Core::IEditorFactory
 {
 public:
-    MscTextEditorFactory()
+    MscTextEditorFactory(MscEditorData *data)
+        : Core::IEditorFactory()
+        , m_data(data)
     {
+        Q_ASSERT(m_data);
         setId(spctr::Constants::K_MSC_EDITOR_ID);
-        setEditorCreator([]() { return new MscTextEditor; });
-        setEditorWidgetCreator([]() { return new MscTextEditorWidget; });
-        setUseGenericHighlighter(true);
-        setDuplicatedSupported(false);
     }
 
-    MscTextEditor *create(spctr::MscMainWidget *designWidget)
-    {
-        setDocumentCreator([designWidget]() { return new MscEditorDocument(designWidget); });
-        return qobject_cast<MscTextEditor *>(createEditor());
-    }
+    Core::IEditor *createEditor() override { return new MscQtCEditor(m_data); }
+
+private:
+    MscEditorData *m_data = nullptr;
 };
 
 MscEditorData::MscEditorData(MscModelStorage *mscStorage, QObject *parent)
@@ -86,9 +75,9 @@ MscEditorData::MscEditorData(MscModelStorage *mscStorage, QObject *parent)
     QObject::connect(
             Core::EditorManager::instance(), &Core::EditorManager::currentEditorChanged, [this](Core::IEditor *editor) {
                 if (editor && editor->document()->id() == Constants::K_MSC_EDITOR_ID) {
-                    auto mscEditor = qobject_cast<MscTextEditor *>(editor);
+                    auto mscEditor = qobject_cast<MscQtCEditor *>(editor);
                     QTC_ASSERT(mscEditor, return );
-                    QWidget *dw = m_widgetStack->widgetForEditor(mscEditor);
+                    QWidget *dw = mscEditor->widget();
                     QTC_ASSERT(dw, return );
                     m_widgetStack->setVisibleEditor(mscEditor);
                     m_mainToolBar->setCurrentEditor(mscEditor);
@@ -96,19 +85,13 @@ MscEditorData::MscEditorData(MscModelStorage *mscStorage, QObject *parent)
                 }
             });
 
-    m_editorFactory = new MscTextEditorFactory;
+    m_editorFactory = new MscTextEditorFactory(this);
 }
 
 MscEditorData::~MscEditorData()
 {
     if (m_context)
         Core::ICore::removeContextObject(m_context);
-
-    if (m_modeWidget) {
-        Core::DesignMode::unregisterDesignWidget(m_modeWidget);
-        delete m_modeWidget;
-        m_modeWidget = nullptr;
-    }
 
     delete m_editorFactory;
 }
@@ -119,7 +102,6 @@ void MscEditorData::fullInit()
     m_widgetStack = new MscEditorStack;
     m_widgetToolBar = new QToolBar;
     m_mainToolBar = createMainToolBar();
-    m_modeWidget = createModeWidget();
 
     // Create undo/redo group/actions
     m_undoGroup = new QUndoGroup(m_widgetToolBar);
@@ -136,40 +118,28 @@ void MscEditorData::fullInit()
 
     Core::Context mscContexts = m_contexts;
     mscContexts.add(Core::Constants::C_EDITORMANAGER);
-    m_context = new MscContext(mscContexts, m_modeWidget, this);
+    m_context = new MscContext(mscContexts, nullptr, this);
     Core::ICore::addContextObject(m_context);
-
-    Core::DesignMode::registerDesignWidget(
-            m_modeWidget, QStringList(QLatin1String(spctr::Constants::MSC_MIMETYPE)), m_contexts);
 }
 
 Core::IEditor *MscEditorData::createEditor()
 {
-    auto designWidget = new MscMainWidget(m_mscStorage);
-    MscTextEditor *mscEditor = m_editorFactory->create(designWidget);
+    Core::IEditor *mscEditor = m_editorFactory->createEditor();
 
-    m_widgetStack->add(mscEditor, designWidget);
+    m_widgetStack->add(mscEditor, m_editorWidget);
     m_mainToolBar->addEditor(mscEditor);
 
-    if (mscEditor) {
-        Core::InfoBarEntry info(
-                Core::Id(Constants::INFO_READ_ONLY), tr("This file can only be edited in <b>Design</b> mode."));
-        info.setCustomButtonInfo(
-                tr("Switch Mode"), []() { Core::ModeManager::activateMode(Core::Constants::MODE_DESIGN); });
-        mscEditor->document()->infoBar()->addInfo(info);
-    }
-
-    connect(designWidget, &spctr::MscMainWidget::showAsn1File, this, &MscEditorData::openEditor);
-    connect(designWidget, &spctr::MscMainWidget::showAadlFile, this, [&]() {
+    connect(m_editorWidget, &spctr::MscMainWidget::showAsn1File, this, &MscEditorData::openEditor);
+    connect(m_editorWidget, &spctr::MscMainWidget::showAadlFile, this, [&]() {
         QStringList aadlFiles = MscSystemChecks::allAadlFiles();
         if (!aadlFiles.isEmpty()) {
             openEditor(aadlFiles.first());
         }
     });
-    connect(designWidget, &spctr::MscMainWidget::mscDataLoaded, this,
-            [this, designWidget](const QString &fileName, QSharedPointer<msc::MSCEditorCore> data) {
-                designWidget->mscCore()->minimapView()->setVisible(m_minimapVisible);
-                m_undoGroup->addStack(designWidget->undoStack());
+    connect(m_editorWidget, &spctr::MscMainWidget::mscDataLoaded, this,
+            [this](const QString &fileName, QSharedPointer<msc::MSCEditorCore> data) {
+                m_editorWidget->mscCore()->minimapView()->setVisible(m_minimapVisible);
+                m_undoGroup->addStack(m_editorWidget->undoStack());
                 Q_EMIT mscDataLoaded(fileName, data);
             });
 
@@ -187,6 +157,17 @@ void MscEditorData::editMessageDeclarations(QWidget *parentWidget)
     if (document && document->designWidget()) {
         document->designWidget()->mscCore()->openMessageDeclarationEditor(parentWidget);
     }
+}
+
+/*!
+   Returns the editor widget, that contains the whole UI of the MSC editor
+ */
+MscMainWidget *MscEditorData::editorWidget()
+{
+    if (!m_editorWidget) {
+        m_editorWidget = new MscMainWidget(m_mscStorage);
+    }
+    return m_editorWidget;
 }
 
 void MscEditorData::openEditor(const QString &fileName)
@@ -236,28 +217,4 @@ Core::EditorToolBar *MscEditorData::createMainToolBar()
     return toolBar;
 }
 
-QWidget *MscEditorData::createModeWidget()
-{
-    auto widget = new QWidget;
-
-    widget->setObjectName("MscEditorDesignModeWidget");
-    auto layout = new QVBoxLayout;
-    layout->setMargin(0);
-    layout->setSpacing(0);
-    layout->addWidget(m_mainToolBar);
-    // Avoid mode switch to 'Edit' mode when the application started by
-    // 'Run' in 'Design' mode emits output.
-    auto splitter = new Core::MiniSplitter(Qt::Vertical);
-    splitter->addWidget(m_widgetStack);
-    auto outputPane = new Core::OutputPanePlaceHolder(Core::Constants::MODE_DESIGN, splitter);
-    outputPane->setObjectName("DesignerOutputPanePlaceHolder");
-    splitter->addWidget(outputPane);
-    layout->addWidget(splitter);
-    widget->setLayout(layout);
-
-    return widget;
 }
-
-}
-
-#include "msceditordata.moc"

@@ -18,7 +18,7 @@
 #pragma once
 
 #include <QPointer>
-#include <texteditor/textdocument.h>
+#include <coreplugin/idocument.h>
 
 QT_FORWARD_DECLARE_CLASS(QDesignerFormWindowInterface)
 
@@ -26,7 +26,7 @@ namespace spctr {
 
 class MscMainWidget;
 
-class MscEditorDocument : public TextEditor::TextDocument
+class MscEditorDocument : public Core::IDocument
 {
     Q_OBJECT
 
@@ -43,7 +43,6 @@ public:
 
     // Internal
     MscMainWidget *designWidget() const;
-    void syncXmlFromDesignWidget();
     QString designWidgetContents() const;
     void setFilePath(const Utils::FileName &) override;
 

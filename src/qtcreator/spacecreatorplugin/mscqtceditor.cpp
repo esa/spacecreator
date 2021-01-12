@@ -15,27 +15,37 @@
    along with this program. If not, see <https://www.gnu.org/licenses/lgpl-2.1.html>.
 */
 
-#pragma once
+#include "mscqtceditor.h"
 
-#include "spacecreatorplugin_global.h"
+#include "msceditordata.h"
+#include "msceditordocument.h"
+#include "mscmainwidget.h"
+#include "spacecreatorpluginconstants.h"
 
-#include <texteditor/texteditor.h>
+#include <QFileInfo>
+#include <utils/qtcassert.h>
 
 namespace spctr {
 
-class MscTextEditor : public TextEditor::BaseTextEditor
+MscQtCEditor::MscQtCEditor(MscEditorData *data)
+    : Core::IEditor()
+    , m_data(data)
 {
-    Q_OBJECT
+    Q_ASSERT(m_data);
 
-public:
-    MscTextEditor();
+    setContext(Core::Context(spctr::Constants::K_MSC_EDITOR_ID));
+    m_document = new MscEditorDocument(m_data->editorWidget(), this);
+    setWidget(m_data->editorWidget());
+}
 
-    void finalizeInitialization() override;
-    bool open(QString *errorString, const QString &fileName, const QString &realFileName);
+Core::IDocument *MscQtCEditor::document() const
+{
+    return m_document;
+}
 
-    QWidget *toolBar() override { return nullptr; }
-
-    bool isDesignModePreferred() const override { return true; }
-};
+QWidget *MscQtCEditor::toolBar()
+{
+    return nullptr;
+}
 
 }

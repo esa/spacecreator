@@ -17,29 +17,28 @@
 
 #pragma once
 
-#include <QStackedWidget>
-#include <coreplugin/id.h>
+#include "spacecreatorplugin_global.h"
 
-namespace Core {
-class IEditor;
-class IMode;
-}
+#include <editormanager/ieditor.h>
 
 namespace spctr {
 
-class MscEditorStack : public QStackedWidget
+class MscEditorData;
+class MscEditorDocument;
+
+class MscQtCEditor : public Core::IEditor
 {
     Q_OBJECT
 
 public:
-    MscEditorStack(QWidget *parent = nullptr);
+    MscQtCEditor(MscEditorData *data);
 
-    void add(Core::IEditor *editor, QWidget *widget);
-    void removeMscTextEditor(QObject *editor);
-    bool setVisibleEditor(Core::IEditor *editor);
+    Core::IDocument *document() const override;
+    QWidget *toolBar() override;
 
 private:
-    QVector<Core::IEditor *> m_editors;
+    MscEditorData *m_data = nullptr;
+    MscEditorDocument *m_document = nullptr;
 };
 
 }

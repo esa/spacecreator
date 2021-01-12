@@ -30,10 +30,10 @@ set(SC_PLUGIN_SOURCES
     mscmainwidget.h
     mscmodelstorage.cpp
     mscmodelstorage.h
+    mscqtceditor.cpp
+    mscqtceditor.h
     mscsystemchecks.cpp
     mscsystemchecks.h
-    msctexteditor.cpp
-    msctexteditor.h
     spacecreatorplugin.cpp
     spacecreatorplugin.h
     spacecreatorplugin_global.h

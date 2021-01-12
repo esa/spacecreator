@@ -39,6 +39,7 @@ namespace spctr {
 class MscContext;
 class MscEditorWidget;
 class MscEditorStack;
+class MscMainWidget;
 class MscModelStorage;
 class MscTextEditorFactory;
 
@@ -54,6 +55,8 @@ public:
 
     void editMessageDeclarations(QWidget *parentWidget);
 
+    MscMainWidget *editorWidget();
+
 public Q_SLOTS:
     void openEditor(const QString &fileName);
     void setMinimapVisible(bool visible);
@@ -63,15 +66,14 @@ Q_SIGNALS:
 
 private:
     void updateToolBar();
-    QWidget *createModeWidget();
     Core::EditorToolBar *createMainToolBar();
 
     MscContext *m_context = nullptr;
     Core::Context m_contexts;
-    QWidget *m_modeWidget = nullptr;
     MscEditorStack *m_widgetStack = nullptr;
     QToolBar *m_widgetToolBar = nullptr; // the actual toolbar shown in m_mainToolBar
     Core::EditorToolBar *m_mainToolBar = nullptr; // The 'fake' toolbar on top of the document, containing a QToolbar
+    MscMainWidget *m_editorWidget = nullptr;
     QUndoGroup *m_undoGroup = nullptr;
     QAction *m_undoAction = nullptr;
     QAction *m_redoAction = nullptr;

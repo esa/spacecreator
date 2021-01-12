@@ -23,21 +23,21 @@
 #include <QFileInfo>
 #include <QTextCodec>
 #include <QTextDocument>
-#include <fileutils.h>
+#include <coreplugin/id.h>
+#include <utils/fileutils.h>
 
 using namespace Utils;
 
 namespace spctr {
 
 MscEditorDocument::MscEditorDocument(MscMainWidget *designWidget, QObject *parent)
-    : m_designWidget(designWidget)
+    : Core::IDocument(parent)
+    , m_designWidget(designWidget)
 {
+    Q_ASSERT(m_designWidget);
     setMimeType(QLatin1String(spctr::Constants::MSC_MIMETYPE));
-    setParent(parent);
     setId(Core::Id(spctr::Constants::K_MSC_EDITOR_ID));
 
-    // Designer needs UTF-8 regardless of settings.
-    setCodec(QTextCodec::codecForName("UTF-8"));
     connect(m_designWidget.data(), &MscMainWidget::dirtyChanged, this, [this] { Q_EMIT changed(); });
 }
 
@@ -146,8 +146,4 @@ QString MscEditorDocument::designWidgetContents() const
     return m_designWidget->textContents();
 }
 
-void MscEditorDocument::syncXmlFromDesignWidget()
-{
-    document()->setPlainText(designWidgetContents());
-}
 }
