@@ -18,20 +18,23 @@
 #pragma once
 
 #include <QPointer>
-#include <texteditor/textdocument.h>
+#include <QSharedPointer>
+#include <coreplugin/idocument.h>
 
-QT_FORWARD_DECLARE_CLASS(QDesignerFormWindowInterface)
+namespace aadlinterface {
+class IVEditorCore;
+}
 
 namespace spctr {
 
-class AadlMainWidget;
+class AadlModelStorage;
 
-class AadlEditorDocument : public TextEditor::TextDocument
+class AadlEditorDocument : public Core::IDocument
 {
     Q_OBJECT
 
 public:
-    explicit AadlEditorDocument(AadlMainWidget *designWidget, QObject *parent = nullptr);
+    explicit AadlEditorDocument(AadlModelStorage *aadlStorage, QObject *parent = nullptr);
 
     // IDocument
     OpenResult open(QString *errorString, const QString &fileName, const QString &realFileName) override;
@@ -42,16 +45,16 @@ public:
     bool reload(QString *errorString, ReloadFlag flag, ChangeType type) override;
 
     // Internal
-    AadlMainWidget *designWidget() const;
-    void syncXmlFromDesignWidget();
-    QString designWidgetContents() const;
+    QSharedPointer<aadlinterface::IVEditorCore> ivEditorCore() const;
     void setFilePath(const Utils::FileName &) override;
 
 Q_SIGNALS:
     void reloadRequested(QString *errorString, const QString &);
+    void ivDataLoaded(const QString &fileName, QSharedPointer<aadlinterface::IVEditorCore> data);
 
 private:
-    QPointer<AadlMainWidget> m_designWidget;
+    QPointer<AadlModelStorage> m_aadlStorage;
+    QSharedPointer<aadlinterface::IVEditorCore> m_plugin;
 };
 
 }

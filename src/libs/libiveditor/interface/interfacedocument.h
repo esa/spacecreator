@@ -75,10 +75,10 @@ public:
     bool loadAvailableComponents();
     bool exportSelectedFunctions();
     bool exportSelectedType();
-    bool save(const QString &path);
     void close();
 
     QString path() const;
+    void setPath(const QString &path);
 
     void setAsn1FileName(const QString &asnfile);
     QString asn1FileName() const;
@@ -134,8 +134,6 @@ private Q_SLOTS:
     void showContextMenuForAADLModel(const QPoint &pos);
 
 private:
-    void setPath(const QString &path);
-
     bool exportImpl(const QString &path, const QList<aadl::AADLObject *> &objects);
     bool loadImpl(const QString &path);
     QString getComponentName(const QStringList &exportNames);

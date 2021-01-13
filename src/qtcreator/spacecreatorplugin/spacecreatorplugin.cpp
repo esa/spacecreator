@@ -23,8 +23,10 @@
 #include "context/action/actionsmanager.h"
 #include "deploymentmodelstorage.h"
 #include "dv/deploymenteditorfactory.h"
+#include "interface/interfacedocument.h"
 #include "iv/aadleditordata.h"
 #include "iv/aadleditorfactory.h"
+#include "iv/aadlqtceditor.h"
 #include "iveditor.h"
 #include "iveditorcore.h"
 #include "mainmodel.h"
@@ -122,12 +124,6 @@ bool SpaceCreatorPlugin::initialize(const QStringList &arguments, QString *error
     connect(m_messageDeclarationAction, &QAction::triggered, this, &SpaceCreatorPlugin::showMessageDeclarations);
 
     m_messageDeclarationAction->setEnabled(false);
-    connect(editorManager, &Core::EditorManager::currentEditorChanged, this, [&](Core::IEditor *editor) {
-        if (editor && editor->document()) {
-            const bool isMsc = editor->document()->filePath().toString().endsWith(".msc", Qt::CaseInsensitive);
-            m_messageDeclarationAction->setEnabled(isMsc);
-        }
-    });
 
     auto action = new QAction(tr("Check instances"), this);
     Core::Command *checkInstancesCmd = Core::ActionManager::registerAction(
@@ -139,17 +135,16 @@ bool SpaceCreatorPlugin::initialize(const QStringList &arguments, QString *error
             action, Constants::CHECK_MESSAGES_ID, Core::Context(Core::Constants::C_GLOBAL));
     connect(action, &QAction::triggered, m_checks, &MscSystemChecks::checkMessages);
 
-    auto showMinimapAction = new QAction(tr("Show minimap"), this);
-    showMinimapAction->setCheckable(true);
+    m_showMinimapAction = new QAction(tr("Show minimap"), this);
+    m_showMinimapAction->setCheckable(true);
     Core::Command *showMinimapCmd = Core::ActionManager::registerAction(
-            showMinimapAction, Constants::SHOW_MINIMAP_ID, Core::Context(Core::Constants::C_DESIGN_MODE));
-    connect(showMinimapAction, &QAction::triggered, this, &SpaceCreatorPlugin::setMinimapVisible);
+            m_showMinimapAction, Constants::SHOW_MINIMAP_ID, Core::Context(Core::Constants::C_EDIT_MODE));
+    connect(m_showMinimapAction, &QAction::triggered, this, &SpaceCreatorPlugin::setMinimapVisible);
 
-    auto showE2EDataflow = new QAction(tr("Show end to end dataflow"), this);
+    m_showE2EDataflow = new QAction(tr("Show end to end dataflow"), this);
     Core::Command *showE2ECmd = Core::ActionManager::registerAction(
-            showE2EDataflow, Constants::SHOW_E2E_ID, Core::Context(Core::Constants::C_DESIGN_MODE));
-    connect(showE2EDataflow, &QAction::triggered, this,
-            [this]() { m_aadlFactory->editorData()->showE2EDataflow(m_checks->allMscFiles()); });
+            m_showE2EDataflow, Constants::SHOW_E2E_ID, Core::Context(Core::Constants::C_EDIT_MODE));
+    connect(m_showE2EDataflow, &QAction::triggered, this, &SpaceCreatorPlugin::showE2EDataflow);
 
     Core::ActionContainer *menu = Core::ActionManager::createMenu(Constants::MENU_ID);
     menu->menu()->setTitle(tr("SpaceCreator"));
@@ -177,27 +172,34 @@ bool SpaceCreatorPlugin::initialize(const QStringList &arguments, QString *error
 
     connect(editorManager, &Core::EditorManager::currentEditorChanged, this, [&](Core::IEditor *editor) {
         if (editor && editor->document()) {
+            const bool isMsc = editor->document()->filePath().toString().endsWith(".msc", Qt::CaseInsensitive);
             const bool isAadl =
                     editor->document()->filePath().toString().endsWith("interfaceview.xml", Qt::CaseInsensitive);
+            m_messageDeclarationAction->setEnabled(isMsc);
             m_asn1DialogAction->setEnabled(isAadl);
             m_actionSaveSceneRender->setEnabled(isAadl);
+            m_showMinimapAction->setEnabled(isAadl || isMsc);
+            m_showE2EDataflow->setEnabled(isAadl);
+            m_actCommonProps->setEnabled(isAadl);
+            m_actColorScheme->setEnabled(isAadl);
+            m_actDynContext->setEnabled(isAadl);
         }
     });
 
-    QAction *actCommonProps = new QAction(tr("Common Properties"), this);
+    m_actCommonProps = new QAction(tr("Common Properties"), this);
     Core::Command *showCommonPropsCmd = Core::ActionManager::registerAction(
-            actCommonProps, Constants::AADL_SHOW_COMMON_PROPS_ID, Core::Context(Core::Constants::C_DESIGN_MODE));
-    connect(actCommonProps, &QAction::triggered, this, &SpaceCreatorPlugin::onAttributesManagerRequested);
+            m_actCommonProps, Constants::AADL_SHOW_COMMON_PROPS_ID, Core::Context(Core::Constants::C_GLOBAL));
+    connect(m_actCommonProps, &QAction::triggered, this, &SpaceCreatorPlugin::onAttributesManagerRequested);
 
-    QAction *actColorScheme = new QAction(tr("Color Scheme"), this);
+    m_actColorScheme = new QAction(tr("Color Scheme"), this);
     Core::Command *showColorSchemeCmd = Core::ActionManager::registerAction(
-            actColorScheme, Constants::AADL_SHOW_COLOR_SCHEME_ID, Core::Context(Core::Constants::C_DESIGN_MODE));
-    connect(actColorScheme, &QAction::triggered, this, &SpaceCreatorPlugin::onColorSchemeMenuInvoked);
+            m_actColorScheme, Constants::AADL_SHOW_COLOR_SCHEME_ID, Core::Context(Core::Constants::C_GLOBAL));
+    connect(m_actColorScheme, &QAction::triggered, this, &SpaceCreatorPlugin::onColorSchemeMenuInvoked);
 
-    QAction *actDynContext = new QAction(tr("Context Actions"), this);
+    m_actDynContext = new QAction(tr("Context Actions"), this);
     Core::Command *showDynContextCmd = Core::ActionManager::registerAction(
-            actDynContext, Constants::AADL_SHOW_DYN_CONTEXT_ID, Core::Context(Core::Constants::C_DESIGN_MODE));
-    connect(actDynContext, &QAction::triggered, this, &SpaceCreatorPlugin::onDynContextEditorMenuInvoked);
+            m_actDynContext, Constants::AADL_SHOW_DYN_CONTEXT_ID, Core::Context(Core::Constants::C_GLOBAL));
+    connect(m_actDynContext, &QAction::triggered, this, &SpaceCreatorPlugin::onDynContextEditorMenuInvoked);
 
     menu->addSeparator();
     menu->addAction(showAsn1Cmd);
@@ -256,24 +258,39 @@ void SpaceCreatorPlugin::setMinimapVisible(bool visible)
     m_aadlFactory->editorData()->showMinimap(visible);
 }
 
+void SpaceCreatorPlugin::showE2EDataflow()
+{
+    if (auto aadlEditor = qobject_cast<spctr::AadlQtCEditor *>(Core::EditorManager::currentEditor())) {
+        aadlEditor->showE2EDataflow(m_checks->allMscFiles());
+    }
+}
+
 void SpaceCreatorPlugin::showAsn1Dialog()
 {
-    m_aadlFactory->editorData()->showAsn1Dialog();
+    if (auto aadlEditor = qobject_cast<spctr::AadlQtCEditor *>(Core::EditorManager::currentEditor())) {
+        aadlEditor->showAsn1Dialog();
+    }
 }
 
 void SpaceCreatorPlugin::onAttributesManagerRequested()
 {
-    m_aadlFactory->editorData()->onAttributesManagerRequested();
+    if (auto aadlEditor = qobject_cast<spctr::AadlQtCEditor *>(Core::EditorManager::currentEditor())) {
+        aadlEditor->ivPlugin()->document()->onAttributesManagerRequested();
+    }
 }
 
 void SpaceCreatorPlugin::onColorSchemeMenuInvoked()
 {
-    m_aadlFactory->editorData()->onColorSchemeMenuInvoked();
+    if (auto aadlEditor = qobject_cast<spctr::AadlQtCEditor *>(Core::EditorManager::currentEditor())) {
+        aadlEditor->ivPlugin()->document()->onColorSchemeMenuInvoked();
+    }
 }
 
 void SpaceCreatorPlugin::onDynContextEditorMenuInvoked()
 {
-    m_aadlFactory->editorData()->onDynContextEditorMenuInvoked();
+    if (auto aadlEditor = qobject_cast<spctr::AadlQtCEditor *>(Core::EditorManager::currentEditor())) {
+        aadlEditor->ivPlugin()->document()->onDynContextEditorMenuInvoked();
+    }
 }
 
 /*!
@@ -346,5 +363,4 @@ bool SpaceCreatorPlugin::isOpenInEditor(shared::EditorCore *core) const
     }
     return false;
 }
-
 }

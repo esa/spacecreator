@@ -17,17 +17,11 @@
 
 #pragma once
 
-#include "endtoend/endtoendview.h"
-#include "iveditorcore.h"
-
-#include <QPointer>
 #include <QSharedPointer>
 #include <QVector>
 #include <QWidget>
 
 class QAction;
-class QGraphicsView;
-class QUndoStack;
 
 namespace aadlinterface {
 class IVEditorCore;
@@ -39,36 +33,19 @@ class ActionsBar;
 
 namespace spctr {
 
-class AadlModelStorage;
-class MscModelStorage;
-
 class AadlMainWidget : public QWidget
 {
     Q_OBJECT
 public:
-    AadlMainWidget(AadlModelStorage *aadlStorage, MscModelStorage *mscStorage, QWidget *parent = nullptr);
+    AadlMainWidget(QWidget *parent = nullptr);
     ~AadlMainWidget();
 
-    bool load(const QString &filename);
-    bool save();
-
-    bool isDirty() const;
-    QUndoStack *undoStack();
-
-    QString textContents() const;
-
-    void showAsn1Dialog();
-    void setMinimapVisible(bool visible);
-    void showE2EDataflow(const QStringList &mscFiles);
-    void onAttributesManagerRequested();
-    void onColorSchemeMenuInvoked();
-    void onDynContextEditorMenuInvoked();
+    bool init(QSharedPointer<aadlinterface::IVEditorCore> data);
 
     QSharedPointer<aadlinterface::IVEditorCore> ivPlugin() const;
 
-Q_SIGNALS:
-    void dirtyChanged(bool dirty);
-    void aadlDataLoaded(const QString &fileName, QSharedPointer<aadlinterface::IVEditorCore> data);
+public Q_SLOTS:
+    void setMinimapVisible(bool visible);
 
 private Q_SLOTS:
     void showAsn1Errors(const QStringList &faultyInterfaces);
@@ -78,9 +55,6 @@ private:
 
     QSharedPointer<aadlinterface::IVEditorCore> m_plugin;
     QVector<QAction *> m_actions;
-    QPointer<AadlModelStorage> m_aadlStorage;
-    QPointer<MscModelStorage> m_mscStorage;
-    QPointer<aadlinterface::EndToEndView> m_endToEndView;
     shared::ActionsBar *m_aadlToolBar = nullptr;
 };
 

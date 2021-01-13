@@ -23,10 +23,7 @@
 #include "mscmodelstorage.h"
 #include "spacecreatorpluginconstants.h"
 
-#include <QDebug>
 #include <QFileInfo>
-#include <QTextCodec>
-#include <QTextDocument>
 #include <QUndoStack>
 #include <coreplugin/id.h>
 #include <utils/fileutils.h>
@@ -65,7 +62,7 @@ Core::IDocument::OpenResult MscEditorDocument::open(
 
     setFilePath(Utils::FileName::fromString(absfileName));
 
-    connect(m_plugin->mainModel()->undoStack(), &QUndoStack::cleanChanged, this, [this](bool) { Q_EMIT changed(); });
+    connect(m_plugin->undoStack(), &QUndoStack::cleanChanged, this, [this](bool) { Q_EMIT changed(); });
     Q_EMIT mscDataLoaded(absfileName, m_plugin);
 
     return OpenResult::Success;
@@ -109,14 +106,6 @@ bool MscEditorDocument::save(QString *errorString, const QString &name, bool aut
     return true;
 }
 
-void MscEditorDocument::setFilePath(const FileName &newName)
-{
-    if (!m_plugin.isNull()) {
-        m_plugin->mainModel()->setCurrentFilePath(newName.toString());
-    }
-    IDocument::setFilePath(newName);
-}
-
 bool MscEditorDocument::shouldAutoSave() const
 {
     return false;
@@ -125,11 +114,6 @@ bool MscEditorDocument::shouldAutoSave() const
 bool MscEditorDocument::isSaveAsAllowed() const
 {
     return true;
-}
-
-QSharedPointer<msc::MSCEditorCore> MscEditorDocument::mscEditorCore() const
-{
-    return m_plugin;
 }
 
 bool MscEditorDocument::isModified() const
@@ -156,6 +140,19 @@ bool MscEditorDocument::reload(QString *errorString, ReloadFlag flag, ChangeType
     }
 
     return true;
+}
+
+QSharedPointer<msc::MSCEditorCore> MscEditorDocument::mscEditorCore() const
+{
+    return m_plugin;
+}
+
+void MscEditorDocument::setFilePath(const FileName &newName)
+{
+    if (!m_plugin.isNull()) {
+        m_plugin->mainModel()->setCurrentFilePath(newName.toString());
+    }
+    IDocument::setFilePath(newName);
 }
 
 }

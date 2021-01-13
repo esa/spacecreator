@@ -31,10 +31,10 @@ namespace spctr {
 
 MscQtCEditor::MscQtCEditor(MscModelStorage *mscStorage)
     : Core::IEditor()
+    , m_document(new MscEditorDocument(mscStorage, this))
     , m_editorWidget(new MscMainWidget)
 {
     setContext(Core::Context(spctr::Constants::K_MSC_EDITOR_ID));
-    m_document = new MscEditorDocument(mscStorage, this);
     setWidget(m_editorWidget);
 
     connect(m_document, &spctr::MscEditorDocument::mscDataLoaded, this,

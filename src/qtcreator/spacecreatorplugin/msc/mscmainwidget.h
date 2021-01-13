@@ -54,9 +54,6 @@ public:
 
     QSharedPointer<msc::MSCEditorCore> mscCore() const;
 
-Q_SIGNALS:
-    void mscDataLoaded(const QString &fileName, QSharedPointer<msc::MSCEditorCore> data);
-
 private Q_SLOTS:
     void showChart(const QModelIndex &index);
     void showSelection(const QModelIndex &current, const QModelIndex &previous);

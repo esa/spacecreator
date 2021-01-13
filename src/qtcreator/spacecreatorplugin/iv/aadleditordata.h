@@ -17,14 +17,11 @@
 
 #pragma once
 
-#include "iveditorcore.h"
-
 #include <QPointer>
 #include <QSharedPointer>
 #include <coreplugin/icontext.h>
 
 class QUndoGroup;
-class QToolBar;
 
 namespace aadlinterface {
 class IVEditorCore;
@@ -37,9 +34,7 @@ class IEditor;
 
 namespace spctr {
 
-class AadlEditorStack;
 class AadlModelStorage;
-class AadlTextEditorFactory;
 class MscContext;
 class MscModelStorage;
 
@@ -50,37 +45,23 @@ public:
     AadlEditorData(AadlModelStorage *aadlStorage, MscModelStorage *mscStorage, QObject *parent = nullptr);
     ~AadlEditorData() override;
 
-    void fullInit();
     Core::IEditor *createEditor();
 
-    void showAsn1Dialog();
     void showMinimap(bool visible);
-    void showE2EDataflow(const QStringList &mscFiles);
-    void onAttributesManagerRequested();
-    void onColorSchemeMenuInvoked();
-    void onDynContextEditorMenuInvoked();
 
     QSharedPointer<aadlinterface::IVEditorCore> ivPlugin(const QString &fileName);
 
 Q_SIGNALS:
     void aadlDataLoaded(const QString &fileName, QSharedPointer<aadlinterface::IVEditorCore> data);
 
-private:
-    void updateToolBar();
-    QWidget *createModeWidget();
-    Core::EditorToolBar *createMainToolBar();
+private Q_SLOTS:
+    void onCurrentEditorChanged(Core::IEditor *editor);
 
+private:
     MscContext *m_context = nullptr;
     Core::Context m_contexts;
-    QWidget *m_modeWidget = nullptr;
-    AadlEditorStack *m_widgetStack = nullptr;
-    QToolBar *m_widgetToolBar = nullptr;
-    Core::EditorToolBar *m_mainToolBar = nullptr;
     QUndoGroup *m_undoGroup = nullptr;
-    QAction *m_undoAction = nullptr;
-    QAction *m_redoAction = nullptr;
 
-    AadlTextEditorFactory *m_editorFactory = nullptr;
     bool m_minimapVisible = false;
 
     QPointer<AadlModelStorage> m_aadlStorage;

@@ -17,8 +17,6 @@
 
 #pragma once
 
-#include "spacecreatorplugin_global.h"
-
 #include <QPointer>
 #include <QSharedPointer>
 #include <editormanager/ieditor.h>

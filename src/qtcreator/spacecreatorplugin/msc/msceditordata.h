@@ -22,8 +22,6 @@
 #include <coreplugin/icontext.h>
 
 class QUndoGroup;
-class QStringList;
-class QToolBar;
 
 namespace msc {
 class MSCEditorCore;

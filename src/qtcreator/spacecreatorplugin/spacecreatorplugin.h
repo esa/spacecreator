@@ -67,6 +67,7 @@ public:
 private Q_SLOTS:
     void showMessageDeclarations();
     void setMinimapVisible(bool visible);
+    void showE2EDataflow();
     void showAsn1Dialog();
     void onAttributesManagerRequested();
     void onColorSchemeMenuInvoked();
@@ -84,6 +85,11 @@ private:
     QAction *m_messageDeclarationAction = nullptr;
     QAction *m_asn1DialogAction = nullptr;
     QAction *m_actionSaveSceneRender = nullptr;
+    QAction *m_showMinimapAction = nullptr;
+    QAction *m_showE2EDataflow = nullptr;
+    QAction *m_actCommonProps = nullptr;
+    QAction *m_actColorScheme = nullptr;
+    QAction *m_actDynContext = nullptr;
     AadlModelStorage *m_aadlStorage = nullptr;
     MscModelStorage *m_mscStorage = nullptr;
     DeploymentModelStorage *m_deploymentStorage = nullptr;

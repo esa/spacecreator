@@ -18,7 +18,7 @@
 #include "aadleditorstack.h"
 
 #include "aadleditordocument.h"
-#include "aadltexteditor.h"
+#include "aadlqtceditor.h"
 #include "iveditorcore.h"
 
 #include <coreplugin/coreconstants.h>
@@ -33,19 +33,19 @@ AadlEditorStack::AadlEditorStack(QWidget *parent)
     setObjectName("AadlEditorStack");
 }
 
-void AadlEditorStack::add(AadlTextEditor *editor, QWidget *w)
+void AadlEditorStack::add(AadlQtCEditor *editor, QWidget *w)
 {
     connect(Core::ModeManager::instance(), &Core::ModeManager::currentModeAboutToChange, this,
             &AadlEditorStack::modeAboutToChange);
 
     m_editors.append(editor);
     addWidget(w);
-    connect(editor, &AadlTextEditor::destroyed, this, &AadlEditorStack::removeAadlTextEditor);
+    connect(editor, &AadlQtCEditor::destroyed, this, &AadlEditorStack::removeAadlTextEditor);
 }
 
 void AadlEditorStack::removeAadlTextEditor(QObject *xmlEditor)
 {
-    const int i = m_editors.indexOf(static_cast<AadlTextEditor *>(xmlEditor));
+    const int i = m_editors.indexOf(static_cast<AadlQtCEditor *>(xmlEditor));
     QTC_ASSERT(i >= 0, return );
 
     QWidget *widget = this->widget(i);
@@ -58,7 +58,7 @@ void AadlEditorStack::removeAadlTextEditor(QObject *xmlEditor)
 
 bool AadlEditorStack::setVisibleEditor(Core::IEditor *xmlEditor)
 {
-    const int i = m_editors.indexOf(static_cast<AadlTextEditor *>(xmlEditor));
+    const int i = m_editors.indexOf(static_cast<AadlQtCEditor *>(xmlEditor));
     QTC_ASSERT(i >= 0, return false);
 
     if (i != currentIndex()) {
@@ -70,7 +70,7 @@ bool AadlEditorStack::setVisibleEditor(Core::IEditor *xmlEditor)
 
 QSharedPointer<aadlinterface::IVEditorCore> AadlEditorStack::ivPlugin(const QString &fileName) const
 {
-    for (AadlTextEditor *editor : m_editors) {
+    for (AadlQtCEditor *editor : m_editors) {
         if (editor->fileName() == fileName) {
             return editor->ivPlugin();
         }
@@ -78,7 +78,7 @@ QSharedPointer<aadlinterface::IVEditorCore> AadlEditorStack::ivPlugin(const QStr
     return nullptr;
 }
 
-QWidget *AadlEditorStack::widgetForEditor(AadlTextEditor *xmlEditor)
+QWidget *AadlEditorStack::widgetForEditor(AadlQtCEditor *xmlEditor)
 {
     const int i = m_editors.indexOf(xmlEditor);
     QTC_ASSERT(i >= 0, return nullptr);

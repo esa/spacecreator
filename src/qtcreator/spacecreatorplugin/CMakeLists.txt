@@ -16,12 +16,10 @@ set(SC_PLUGIN_SOURCES
     iv/aadleditordocument.h
     iv/aadleditorfactory.cpp
     iv/aadleditorfactory.h
-    iv/aadleditorstack.cpp
-    iv/aadleditorstack.h
     iv/aadlmainwidget.cpp
     iv/aadlmainwidget.h
-    iv/aadltexteditor.cpp
-    iv/aadltexteditor.h
+    iv/aadlqtceditor.cpp
+    iv/aadlqtceditor.h
     msc/msccontext.cpp
     msc/msccontext.h
     msc/msceditordata.cpp

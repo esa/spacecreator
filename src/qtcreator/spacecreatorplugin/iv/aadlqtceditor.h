@@ -17,32 +17,48 @@
 
 #pragma once
 
+#include <QPointer>
 #include <QSharedPointer>
-#include <texteditor/texteditor.h>
+#include <editormanager/ieditor.h>
+
+class QToolBar;
 
 namespace aadlinterface {
+class EndToEndView;
 class IVEditorCore;
 }
 
 namespace spctr {
 
-class AadlTextEditor : public TextEditor::BaseTextEditor
+class AadlEditorDocument;
+class AadlMainWidget;
+class AadlModelStorage;
+class MscModelStorage;
+
+class AadlQtCEditor : public Core::IEditor
 {
     Q_OBJECT
 
 public:
-    AadlTextEditor();
+    AadlQtCEditor(AadlModelStorage *aadlStorage, MscModelStorage *mscStorage);
+    ~AadlQtCEditor();
 
-    void finalizeInitialization() override;
-    bool open(QString *errorString, const QString &fileName, const QString &realFileName);
-
-    QWidget *toolBar() override { return nullptr; }
-
-    bool isDesignModePreferred() const override { return true; }
-
-    QString fileName() const;
-
+    Core::IDocument *document() const override;
+    AadlEditorDocument *ivDocument() const;
     QSharedPointer<aadlinterface::IVEditorCore> ivPlugin() const;
+
+    QWidget *toolBar() override;
+
+public Q_SLOTS:
+    void showAsn1Dialog();
+    void showE2EDataflow(const QStringList &mscFiles);
+
+private:
+    AadlEditorDocument *m_document = nullptr;
+    QPointer<QToolBar> m_toolbar = nullptr;
+    AadlMainWidget *m_editorWidget = nullptr;
+    QPointer<aadlinterface::EndToEndView> m_endToEndView;
+    QPointer<MscModelStorage> m_mscStorage;
 };
 
 }

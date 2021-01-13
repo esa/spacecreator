@@ -388,12 +388,6 @@ bool InterfaceDocument::loadComponentModel(aadl::AADLObjectsModel *model, const 
     return parser.readFile(path);
 }
 
-bool InterfaceDocument::save(const QString &path)
-{
-    Q_UNUSED(path)
-    return false;
-}
-
 void InterfaceDocument::close()
 {
     d->objectsModel->clear();
@@ -404,6 +398,14 @@ void InterfaceDocument::close()
 QString InterfaceDocument::path() const
 {
     return d->filePath;
+}
+
+void InterfaceDocument::setPath(const QString &path)
+{
+    if (path != d->filePath) {
+        d->filePath = path;
+        Q_EMIT titleChanged();
+    }
 }
 
 /*!
@@ -757,14 +759,6 @@ void InterfaceDocument::showContextMenuForAADLModel(const QPoint &pos)
     QMenu *menu = new QMenu;
     menu->addActions(actions);
     menu->exec(d->objectsView->mapToGlobal(pos));
-}
-
-void InterfaceDocument::setPath(const QString &path)
-{
-    if (path != d->filePath) {
-        d->filePath = path;
-        Q_EMIT titleChanged();
-    }
 }
 
 bool InterfaceDocument::exportImpl(const QString &targetDir, const QList<aadl::AADLObject *> &objects)

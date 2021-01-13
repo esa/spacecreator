@@ -18,27 +18,27 @@
 #include "aadleditordocument.h"
 
 #include "aadlmainwidget.h"
+#include "aadlmodelstorage.h"
+#include "interface/interfacedocument.h"
+#include "iveditorcore.h"
 #include "spacecreatorpluginconstants.h"
+#include "xmldocexporter.h"
 
 #include <QFileInfo>
-#include <QTextCodec>
-#include <QTextDocument>
+#include <QUndoStack>
+#include <coreplugin/id.h>
 #include <fileutils.h>
 
 using namespace Utils;
 
 namespace spctr {
 
-AadlEditorDocument::AadlEditorDocument(AadlMainWidget *designWidget, QObject *parent)
-    : m_designWidget(designWidget)
+AadlEditorDocument::AadlEditorDocument(AadlModelStorage *aadlStorage, QObject *parent)
+    : Core::IDocument(parent)
+    , m_aadlStorage(aadlStorage)
 {
     setMimeType(QLatin1String(spctr::Constants::AADL_MIMETYPE));
-    setParent(parent);
     setId(Core::Id(spctr::Constants::K_AADL_EDITOR_ID));
-
-    // Designer needs UTF-8 regardless of settings.
-    setCodec(QTextCodec::codecForName("UTF-8"));
-    connect(m_designWidget.data(), &AadlMainWidget::dirtyChanged, this, [this] { Q_EMIT changed(); });
 }
 
 Core::IDocument::OpenResult AadlEditorDocument::open(
@@ -47,19 +47,21 @@ Core::IDocument::OpenResult AadlEditorDocument::open(
     Q_UNUSED(errorString)
     Q_UNUSED(realFileName)
 
-    if (fileName.isEmpty())
+    if (fileName.isEmpty() || !m_aadlStorage) {
         return OpenResult::ReadError;
-
-    if (!m_designWidget)
-        return OpenResult::ReadError;
+    }
 
     const QFileInfo fi(fileName);
     const QString absfileName = fi.absoluteFilePath();
-    if (!m_designWidget->load(absfileName)) {
-        return OpenResult::CannotHandle;
+    m_plugin = m_aadlStorage->ivData(absfileName);
+    if (m_plugin.isNull()) {
+        return OpenResult::ReadError;
     }
 
     setFilePath(Utils::FileName::fromString(absfileName));
+
+    connect(m_plugin->undoStack(), &QUndoStack::cleanChanged, this, [this](bool) { Q_EMIT changed(); });
+    Q_EMIT ivDataLoaded(absfileName, m_plugin);
 
     return OpenResult::Success;
 }
@@ -67,29 +69,37 @@ Core::IDocument::OpenResult AadlEditorDocument::open(
 bool AadlEditorDocument::save(QString *errorString, const QString &name, bool autoSave)
 {
     Q_UNUSED(errorString)
-    Q_UNUSED(autoSave)
+    if (m_plugin.isNull()) {
+        return false;
+    }
+
     const FileName oldFileName = filePath();
     const FileName actualName = name.isEmpty() ? oldFileName : FileName::fromString(name);
     if (actualName.isEmpty()) {
         return false;
     }
+    bool dirty = isModified();
 
-    bool dirty = m_designWidget->isDirty();
-    setFilePath(actualName);
-    if (!m_designWidget->save()) {
+    aadlinterface::InterfaceDocument *ivDocument = m_plugin->document();
+    ivDocument->setPath(actualName.toString());
+    if (!aadlinterface::XmlDocExporter::exportDocSilently(m_plugin->document(), actualName.toString(), {})) {
+        ivDocument->setPath(oldFileName.toString());
         return false;
     }
 
-    if (dirty != m_designWidget->isDirty()) {
+    if (autoSave) {
+        ivDocument->setPath(oldFileName.toString());
+        aadlinterface::XmlDocExporter::exportDocSilently(m_plugin->document(), actualName.toString(), {});
+        return true;
+    }
+
+    setFilePath(actualName);
+
+    if (dirty != isModified()) {
         Q_EMIT changed();
     }
 
     return true;
-}
-
-void AadlEditorDocument::setFilePath(const FileName &newName)
-{
-    IDocument::setFilePath(newName);
 }
 
 bool AadlEditorDocument::shouldAutoSave() const
@@ -102,14 +112,9 @@ bool AadlEditorDocument::isSaveAsAllowed() const
     return true;
 }
 
-AadlMainWidget *AadlEditorDocument::designWidget() const
-{
-    return m_designWidget;
-}
-
 bool AadlEditorDocument::isModified() const
 {
-    return m_designWidget && m_designWidget->isDirty();
+    return m_plugin && m_plugin->document()->isDirty();
 }
 
 bool AadlEditorDocument::reload(QString *errorString, ReloadFlag flag, ChangeType type)
@@ -123,8 +128,9 @@ bool AadlEditorDocument::reload(QString *errorString, ReloadFlag flag, ChangeTyp
         Q_EMIT aboutToReload();
         Q_EMIT reloadRequested(errorString, filePath().toString());
         bool success = true;
-        if (errorString != nullptr)
+        if (errorString != nullptr) {
             success = errorString->isEmpty();
+        }
         Q_EMIT reloadFinished(success);
         return success;
     }
@@ -132,14 +138,14 @@ bool AadlEditorDocument::reload(QString *errorString, ReloadFlag flag, ChangeTyp
     return true;
 }
 
-QString AadlEditorDocument::designWidgetContents() const
+QSharedPointer<aadlinterface::IVEditorCore> AadlEditorDocument::ivEditorCore() const
 {
-    return m_designWidget->textContents();
+    return m_plugin;
 }
 
-void AadlEditorDocument::syncXmlFromDesignWidget()
+void AadlEditorDocument::setFilePath(const FileName &newName)
 {
-    document()->setPlainText(designWidgetContents());
+    IDocument::setFilePath(newName);
 }
 
 }

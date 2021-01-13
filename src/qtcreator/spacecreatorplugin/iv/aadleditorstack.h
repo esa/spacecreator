@@ -32,7 +32,7 @@ class IMode;
 
 namespace spctr {
 
-class AadlTextEditor;
+class AadlQtCEditor;
 
 class AadlEditorStack : public QStackedWidget
 {
@@ -41,8 +41,8 @@ class AadlEditorStack : public QStackedWidget
 public:
     AadlEditorStack(QWidget *parent = nullptr);
 
-    void add(AadlTextEditor *editor, QWidget *widget);
-    QWidget *widgetForEditor(AadlTextEditor *editor);
+    void add(AadlQtCEditor *editor, QWidget *widget);
+    QWidget *widgetForEditor(AadlQtCEditor *editor);
     void removeAadlTextEditor(QObject *);
     bool setVisibleEditor(Core::IEditor *xmlEditor);
 
@@ -51,7 +51,7 @@ public:
 private:
     void modeAboutToChange(Core::Id m);
 
-    QVector<AadlTextEditor *> m_editors;
+    QVector<AadlQtCEditor *> m_editors;
 };
 
 }
