@@ -30,6 +30,7 @@
 #include "mainmodel.h"
 #include "msc/msceditordata.h"
 #include "msc/msceditorfactory.h"
+#include "msc/mscqtceditor.h"
 #include "msceditor.h"
 #include "msceditorcore.h"
 #include "msclibrary.h"
@@ -229,7 +230,6 @@ void SpaceCreatorPlugin::extensionsInitialized()
     // Retrieve objects from the plugin manager's object pool
     // In the extensionsInitialized function, a plugin can be sure that all
     // plugins that depend on it are completely initialized.
-    DesignMode::setDesignModeIsRequired();
 }
 
 ExtensionSystem::IPlugin::ShutdownFlag SpaceCreatorPlugin::aboutToShutdown()
@@ -240,9 +240,14 @@ ExtensionSystem::IPlugin::ShutdownFlag SpaceCreatorPlugin::aboutToShutdown()
     return SynchronousShutdown;
 }
 
+/*!
+   Opens the message declaration dialog for the current msc file
+ */
 void SpaceCreatorPlugin::showMessageDeclarations()
 {
-    m_mscFactory->editorData()->editMessageDeclarations(Core::ICore::mainWindow());
+    if (auto mscEditor = qobject_cast<spctr::MscQtCEditor *>(Core::EditorManager::currentEditor())) {
+        mscEditor->mscEditorCore()->openMessageDeclarationEditor(Core::ICore::mainWindow());
+    }
 }
 
 void SpaceCreatorPlugin::setMinimapVisible(bool visible)

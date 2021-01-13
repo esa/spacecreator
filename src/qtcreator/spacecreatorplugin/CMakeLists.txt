@@ -30,8 +30,6 @@ set(SC_PLUGIN_SOURCES
     msc/msceditordocument.h
     msc/msceditorfactory.cpp
     msc/msceditorfactory.h
-    msc/msceditorstack.cpp
-    msc/msceditorstack.h
     msc/mscmainwidget.cpp
     msc/mscmainwidget.h
     msc/mscqtceditor.cpp

@@ -47,30 +47,14 @@ class MscMainWidget : public QWidget
 {
     Q_OBJECT
 public:
-    MscMainWidget(MscModelStorage *mscStorage, QWidget *parent = nullptr);
+    MscMainWidget(QWidget *parent = nullptr);
     ~MscMainWidget();
 
-    bool load(const QString &filename);
-    bool save();
-    QString errorMessage() const;
-
-    void setFileName(const QString &filename);
-
-    bool isDirty() const;
-    QUndoStack *undoStack();
-
-    QString textContents() const;
-
-    QAction *actionCopy() const;
-    QAction *actionPaste() const;
-    QAction *actionToolDelete() const;
+    bool init(QSharedPointer<msc::MSCEditorCore> plugin);
 
     QSharedPointer<msc::MSCEditorCore> mscCore() const;
 
 Q_SIGNALS:
-    void dirtyChanged(bool dirty);
-    void showAadlFile();
-    void showAsn1File(const QString &fileName);
     void mscDataLoaded(const QString &fileName, QSharedPointer<msc::MSCEditorCore> data);
 
 private Q_SLOTS:
@@ -97,7 +81,6 @@ private:
     QPushButton *m_asn1Select = nullptr;
 
     QSharedPointer<msc::MSCEditorCore> m_plugin;
-    QPointer<MscModelStorage> m_mscStorage;
 };
 
 }

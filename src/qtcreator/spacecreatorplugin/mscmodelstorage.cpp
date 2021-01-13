@@ -35,6 +35,7 @@ QSharedPointer<msc::MSCEditorCore> MscModelStorage::mscData(const QString &fileN
 {
     if (!m_store.contains(fileName)) {
         QSharedPointer<msc::MSCEditorCore> data(new msc::MSCEditorCore());
+        data->showToolbars(false);
         data->mainModel()->loadFile(fileName);
         setMscData(fileName, data);
         return data;

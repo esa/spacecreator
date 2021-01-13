@@ -17,12 +17,17 @@
 
 #include "msceditordocument.h"
 
-#include "mscmainwidget.h"
+#include "mainmodel.h"
+#include "msceditorcore.h"
+#include "mscmodel.h"
+#include "mscmodelstorage.h"
 #include "spacecreatorpluginconstants.h"
 
+#include <QDebug>
 #include <QFileInfo>
 #include <QTextCodec>
 #include <QTextDocument>
+#include <QUndoStack>
 #include <coreplugin/id.h>
 #include <utils/fileutils.h>
 
@@ -30,15 +35,13 @@ using namespace Utils;
 
 namespace spctr {
 
-MscEditorDocument::MscEditorDocument(MscMainWidget *designWidget, QObject *parent)
+MscEditorDocument::MscEditorDocument(MscModelStorage *mscStorage, QObject *parent)
     : Core::IDocument(parent)
-    , m_designWidget(designWidget)
+    , m_mscStorage(mscStorage)
 {
-    Q_ASSERT(m_designWidget);
+    Q_ASSERT(mscStorage);
     setMimeType(QLatin1String(spctr::Constants::MSC_MIMETYPE));
     setId(Core::Id(spctr::Constants::K_MSC_EDITOR_ID));
-
-    connect(m_designWidget.data(), &MscMainWidget::dirtyChanged, this, [this] { Q_EMIT changed(); });
 }
 
 Core::IDocument::OpenResult MscEditorDocument::open(
@@ -46,58 +49,71 @@ Core::IDocument::OpenResult MscEditorDocument::open(
 {
     Q_UNUSED(realFileName)
 
-    if (fileName.isEmpty())
+    if (fileName.isEmpty() || !m_mscStorage) {
         return OpenResult::ReadError;
-
-    if (!m_designWidget)
-        return OpenResult::ReadError;
+    }
 
     const QFileInfo fi(fileName);
     const QString absfileName = fi.absoluteFilePath();
-    if (!m_designWidget->load(absfileName)) {
-        if (errorString != nullptr)
-            *errorString = m_designWidget->errorMessage();
-        return OpenResult::CannotHandle;
+    m_plugin = m_mscStorage->mscData(absfileName);
+    if (m_plugin.isNull()) {
+        return OpenResult::ReadError;
+    }
+    if (errorString) {
+        *errorString = m_plugin->mainModel()->mscErrorMessages().join("\n");
     }
 
     setFilePath(Utils::FileName::fromString(absfileName));
+
+    connect(m_plugin->mainModel()->undoStack(), &QUndoStack::cleanChanged, this, [this](bool) { Q_EMIT changed(); });
+    Q_EMIT mscDataLoaded(absfileName, m_plugin);
 
     return OpenResult::Success;
 }
 
 bool MscEditorDocument::save(QString *errorString, const QString &name, bool autoSave)
 {
+    if (m_plugin.isNull()) {
+        return false;
+    }
+
     const FileName oldFileName = filePath();
     const FileName actualName = name.isEmpty() ? oldFileName : FileName::fromString(name);
-    if (actualName.isEmpty())
+    if (actualName.isEmpty()) {
         return false;
-    bool dirty = m_designWidget->isDirty();
+    }
+    bool dirty = isModified();
 
-    m_designWidget->setFileName(actualName.toString());
-    if (!m_designWidget->save()) {
-        if (errorString != nullptr)
-            *errorString = m_designWidget->errorMessage();
-        m_designWidget->setFileName(oldFileName.toString());
+    msc::MainModel *mainModel = m_plugin->mainModel();
+    mainModel->setCurrentFilePath(actualName.toString());
+    if (!mainModel->saveMsc(mainModel->currentFilePath())) {
+        if (errorString != nullptr) {
+            *errorString = mainModel->mscErrorMessages().join("\n");
+        }
+        mainModel->setCurrentFilePath(oldFileName.toString());
         return false;
     }
 
     if (autoSave) {
-        m_designWidget->setFileName(oldFileName.toString());
-        m_designWidget->save();
+        mainModel->setCurrentFilePath(oldFileName.toString());
+        mainModel->saveMsc(mainModel->currentFilePath());
         return true;
     }
 
     setFilePath(actualName);
 
-    if (dirty != m_designWidget->isDirty())
+    if (dirty != isModified()) {
         Q_EMIT changed();
+    }
 
     return true;
 }
 
 void MscEditorDocument::setFilePath(const FileName &newName)
 {
-    m_designWidget->setFileName(newName.toString());
+    if (!m_plugin.isNull()) {
+        m_plugin->mainModel()->setCurrentFilePath(newName.toString());
+    }
     IDocument::setFilePath(newName);
 }
 
@@ -111,14 +127,14 @@ bool MscEditorDocument::isSaveAsAllowed() const
     return true;
 }
 
-MscMainWidget *MscEditorDocument::designWidget() const
+QSharedPointer<msc::MSCEditorCore> MscEditorDocument::mscEditorCore() const
 {
-    return m_designWidget;
+    return m_plugin;
 }
 
 bool MscEditorDocument::isModified() const
 {
-    return m_designWidget && m_designWidget->isDirty();
+    return m_plugin && m_plugin->mainModel()->needSave();
 }
 
 bool MscEditorDocument::reload(QString *errorString, ReloadFlag flag, ChangeType type)
@@ -132,18 +148,14 @@ bool MscEditorDocument::reload(QString *errorString, ReloadFlag flag, ChangeType
         Q_EMIT aboutToReload();
         Q_EMIT reloadRequested(errorString, filePath().toString());
         bool success = true;
-        if (errorString != nullptr)
+        if (errorString != nullptr) {
             success = errorString->isEmpty();
+        }
         Q_EMIT reloadFinished(success);
         return success;
     }
 
     return true;
-}
-
-QString MscEditorDocument::designWidgetContents() const
-{
-    return m_designWidget->textContents();
 }
 
 }

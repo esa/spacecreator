@@ -30,18 +30,13 @@ class MSCEditorCore;
 }
 
 namespace Core {
-class EditorToolBar;
 class IEditor;
 }
 
 namespace spctr {
 
 class MscContext;
-class MscEditorWidget;
-class MscEditorStack;
-class MscMainWidget;
 class MscModelStorage;
-class MscTextEditorFactory;
 
 class MscEditorData : public QObject
 {
@@ -50,35 +45,22 @@ public:
     MscEditorData(MscModelStorage *mscStorage, QObject *parent = nullptr);
     ~MscEditorData() override;
 
-    void fullInit();
     Core::IEditor *createEditor();
 
-    void editMessageDeclarations(QWidget *parentWidget);
-
-    MscMainWidget *editorWidget();
-
 public Q_SLOTS:
-    void openEditor(const QString &fileName);
     void setMinimapVisible(bool visible);
 
 Q_SIGNALS:
     void mscDataLoaded(const QString &fileName, QSharedPointer<msc::MSCEditorCore> data);
 
-private:
-    void updateToolBar();
-    Core::EditorToolBar *createMainToolBar();
+private Q_SLOTS:
+    void onCurrentEditorChanged(Core::IEditor *editor);
 
+private:
     MscContext *m_context = nullptr;
     Core::Context m_contexts;
-    MscEditorStack *m_widgetStack = nullptr;
-    QToolBar *m_widgetToolBar = nullptr; // the actual toolbar shown in m_mainToolBar
-    Core::EditorToolBar *m_mainToolBar = nullptr; // The 'fake' toolbar on top of the document, containing a QToolbar
-    MscMainWidget *m_editorWidget = nullptr;
     QUndoGroup *m_undoGroup = nullptr;
-    QAction *m_undoAction = nullptr;
-    QAction *m_redoAction = nullptr;
 
-    MscTextEditorFactory *m_editorFactory = nullptr;
     bool m_minimapVisible = false;
 
     QPointer<MscModelStorage> m_mscStorage;

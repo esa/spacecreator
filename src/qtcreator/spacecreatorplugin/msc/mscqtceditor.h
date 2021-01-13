@@ -19,26 +19,40 @@
 
 #include "spacecreatorplugin_global.h"
 
+#include <QPointer>
+#include <QSharedPointer>
 #include <editormanager/ieditor.h>
+
+class QToolBar;
+
+namespace msc {
+class MSCEditorCore;
+}
 
 namespace spctr {
 
-class MscEditorData;
 class MscEditorDocument;
+class MscMainWidget;
+class MscModelStorage;
 
 class MscQtCEditor : public Core::IEditor
 {
     Q_OBJECT
 
 public:
-    MscQtCEditor(MscEditorData *data);
+    MscQtCEditor(MscModelStorage *mscStorage);
+    ~MscQtCEditor();
 
     Core::IDocument *document() const override;
+    MscEditorDocument *mscDocument() const;
+    QSharedPointer<msc::MSCEditorCore> mscEditorCore() const;
+
     QWidget *toolBar() override;
 
 private:
-    MscEditorData *m_data = nullptr;
     MscEditorDocument *m_document = nullptr;
+    QPointer<QToolBar> m_toolbar = nullptr;
+    MscMainWidget *m_editorWidget = nullptr;
 };
 
 }

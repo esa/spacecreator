@@ -48,10 +48,7 @@ MscEditorData *MscEditorFactory::editorData() const
 {
     if (!m_editorData) {
         m_editorData = new MscEditorData(m_mscStorage, const_cast<MscEditorFactory *>(this));
-        QGuiApplication::setOverrideCursor(Qt::WaitCursor);
-        m_editorData->fullInit();
         connect(m_editorData, &MscEditorData::mscDataLoaded, this, &MscEditorFactory::mscDataLoaded);
-        QGuiApplication::restoreOverrideCursor();
     }
 
     return m_editorData;

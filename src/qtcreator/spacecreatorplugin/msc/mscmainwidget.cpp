@@ -29,8 +29,7 @@
 #include "mscdocument.h"
 #include "msceditorcore.h"
 #include "mscmodel.h"
-#include "mscmodelstorage.h"
-#include "tools/entitydeletetool.h"
+#include "mscsystemchecks.h"
 
 #include <QAction>
 #include <QDebug>
@@ -47,6 +46,7 @@
 #include <QVBoxLayout>
 #include <QtWidgets/QHeaderView>
 #include <coreplugin/minisplitter.h>
+#include <editormanager/editormanager.h>
 
 namespace spctr {
 
@@ -54,9 +54,8 @@ namespace spctr {
    \brief MscEditorCore::MainWidget::MainWidget Is the main widget for the whole MSC plugin in QtCreator
  */
 
-MscMainWidget::MscMainWidget(MscModelStorage *mscStorage, QWidget *parent)
+MscMainWidget::MscMainWidget(QWidget *parent)
     : QWidget(parent)
-    , m_mscStorage((mscStorage))
 {
     init();
 }
@@ -73,9 +72,9 @@ MscMainWidget::~MscMainWidget()
     }
 }
 
-bool MscMainWidget::load(const QString &filename)
+bool MscMainWidget::init(QSharedPointer<msc::MSCEditorCore> plugin)
 {
-    m_plugin = m_mscStorage->mscData(filename);
+    m_plugin = plugin;
     if (!m_plugin->chartView()) {
         init();
         m_plugin->mainModel()->chartViewModel().clearScene();
@@ -89,81 +88,8 @@ bool MscMainWidget::load(const QString &filename)
         m_documentTree->expandAll();
         m_documentTree->setSelectedDocument(m_plugin->mainModel()->selectedDocument());
     }
-    Q_EMIT mscDataLoaded(filename, m_plugin);
 
     return true;
-}
-
-bool MscMainWidget::save()
-{
-    if (m_plugin.isNull()) {
-        return false;
-    }
-    return m_plugin->mainModel()->saveMsc(m_plugin->mainModel()->currentFilePath());
-}
-
-QString MscMainWidget::errorMessage() const
-{
-    if (m_plugin.isNull()) {
-        return {};
-    }
-    return m_plugin->mainModel()->mscErrorMessages().join("\n");
-}
-
-void MscMainWidget::setFileName(const QString &filename)
-{
-    if (m_plugin.isNull()) {
-        return;
-    }
-    m_plugin->mainModel()->setCurrentFilePath(filename);
-}
-
-bool MscMainWidget::isDirty() const
-{
-    if (m_plugin.isNull()) {
-        return false;
-    }
-    return m_plugin->mainModel()->needSave();
-}
-
-QUndoStack *MscMainWidget::undoStack()
-{
-    if (m_plugin.isNull()) {
-        return {};
-    }
-    return m_plugin->mainModel()->undoStack();
-}
-
-QString MscMainWidget::textContents() const
-{
-    if (m_plugin.isNull()) {
-        return {};
-    }
-    return m_plugin->mainModel()->modelText();
-}
-
-QAction *MscMainWidget::actionCopy() const
-{
-    if (m_plugin.isNull()) {
-        return {};
-    }
-    return m_plugin->actionCopy();
-}
-
-QAction *MscMainWidget::actionPaste() const
-{
-    if (m_plugin.isNull()) {
-        return {};
-    }
-    return m_plugin->actionPaste();
-}
-
-QAction *MscMainWidget::actionToolDelete() const
-{
-    if (m_plugin.isNull()) {
-        return {};
-    }
-    return m_plugin->deleteTool()->action();
 }
 
 QSharedPointer<msc::MSCEditorCore> MscMainWidget::mscCore() const
@@ -299,7 +225,12 @@ void MscMainWidget::init()
 
     m_aadlSwitch = new QPushButton("Interface view", m_leftArea);
     m_aadlSwitch->setToolTip(tr("Open the file"));
-    connect(m_aadlSwitch, &QPushButton::clicked, this, &spctr::MscMainWidget::showAadlFile);
+    connect(m_aadlSwitch, &QPushButton::clicked, this, []() {
+        QStringList aadlFiles = MscSystemChecks::allAadlFiles();
+        if (!aadlFiles.isEmpty()) {
+            Core::EditorManager::instance()->openEditor(aadlFiles.first());
+        }
+    });
     m_aadlSwitch->setSizePolicy(QSizePolicy::MinimumExpanding, QSizePolicy::Minimum);
 
     auto asn1Widget = new QWidget(m_leftArea);
@@ -363,14 +294,12 @@ void MscMainWidget::initConnections()
     connect(m_plugin->mainModel()->documentItemModel(), &msc::DocumentItemModel::dataChanged, this,
             &MscMainWidget::showSelection);
 
-    connect(m_plugin->mainModel()->undoStack(), &QUndoStack::cleanChanged, this,
-            [&]() { Q_EMIT dirtyChanged(isDirty()); });
-
     connect(m_plugin->mainModel(), &msc::MainModel::asn1ParameterErrorDetected, this, &MscMainWidget::showAsn1Errors);
 
     connect(m_plugin->mainModel(), &msc::MainModel::asn1FileNameChanged, m_asn1Switch, &QPushButton::setText);
-    connect(m_asn1Switch, &QPushButton::clicked, this,
-            [&]() { Q_EMIT showAsn1File(m_plugin->mainModel()->asn1File().absoluteFilePath()); });
+    connect(m_asn1Switch, &QPushButton::clicked, this, [&]() {
+        Core::EditorManager::instance()->openEditor(m_plugin->mainModel()->asn1File().absoluteFilePath());
+    });
 }
 
 }

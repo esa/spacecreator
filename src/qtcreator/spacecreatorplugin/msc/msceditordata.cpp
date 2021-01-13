@@ -20,101 +20,42 @@
 #include "msccontext.h"
 #include "msceditorcore.h"
 #include "msceditordocument.h"
-#include "msceditorstack.h"
-#include "mscmainwidget.h"
 #include "mscmodelstorage.h"
 #include "mscqtceditor.h"
-#include "mscsystemchecks.h"
 #include "spacecreatorpluginconstants.h"
 
-#include <QToolBar>
 #include <QUndoGroup>
-#include <QVBoxLayout>
+#include <QUndoStack>
 #include <coreplugin/actionmanager/actionmanager.h>
 #include <coreplugin/coreconstants.h>
-#include <coreplugin/designmode.h>
 #include <coreplugin/editormanager/editormanager.h>
-#include <coreplugin/editortoolbar.h>
 #include <coreplugin/icore.h>
-#include <coreplugin/idocument.h>
-#include <coreplugin/infobar.h>
-#include <coreplugin/minisplitter.h>
-#include <coreplugin/modemanager.h>
-#include <coreplugin/outputpane.h>
-#include <editormanager/editormanager.h>
-#include <editormanager/ieditorfactory.h>
 #include <utils/icon.h>
-#include <utils/qtcassert.h>
 #include <utils/utilsicons.h>
 
 namespace spctr {
 
-class MscTextEditorFactory : public Core::IEditorFactory
-{
-public:
-    MscTextEditorFactory(MscEditorData *data)
-        : Core::IEditorFactory()
-        , m_data(data)
-    {
-        Q_ASSERT(m_data);
-        setId(spctr::Constants::K_MSC_EDITOR_ID);
-    }
-
-    Core::IEditor *createEditor() override { return new MscQtCEditor(m_data); }
-
-private:
-    MscEditorData *m_data = nullptr;
-};
-
 MscEditorData::MscEditorData(MscModelStorage *mscStorage, QObject *parent)
     : QObject(parent)
+    , m_undoGroup(new QUndoGroup(this))
     , m_mscStorage(mscStorage)
 {
     m_contexts.add(spctr::Constants::C_MSC_EDITOR);
+    m_contexts.add(spctr::Constants::K_MSC_EDITOR_ID);
 
-    QObject::connect(
-            Core::EditorManager::instance(), &Core::EditorManager::currentEditorChanged, [this](Core::IEditor *editor) {
-                if (editor && editor->document()->id() == Constants::K_MSC_EDITOR_ID) {
-                    auto mscEditor = qobject_cast<MscQtCEditor *>(editor);
-                    QTC_ASSERT(mscEditor, return );
-                    QWidget *dw = mscEditor->widget();
-                    QTC_ASSERT(dw, return );
-                    m_widgetStack->setVisibleEditor(mscEditor);
-                    m_mainToolBar->setCurrentEditor(mscEditor);
-                    updateToolBar();
-                }
-            });
+    QObject::connect(Core::EditorManager::instance(), &Core::EditorManager::currentEditorChanged, this,
+            &spctr::MscEditorData::onCurrentEditorChanged);
 
-    m_editorFactory = new MscTextEditorFactory(this);
-}
+    QAction *undoAction = m_undoGroup->createUndoAction(this);
+    undoAction->setIcon(Utils::Icons::UNDO_TOOLBAR.icon());
+    undoAction->setToolTip(tr("Undo (Ctrl + Z)"));
 
-MscEditorData::~MscEditorData()
-{
-    if (m_context)
-        Core::ICore::removeContextObject(m_context);
+    QAction *redoAction = m_undoGroup->createRedoAction(this);
+    redoAction->setIcon(Utils::Icons::REDO_TOOLBAR.icon());
+    redoAction->setToolTip(tr("Redo (Ctrl + Y)"));
 
-    delete m_editorFactory;
-}
-
-void MscEditorData::fullInit()
-{
-    // Create widget-stack, toolbar, mainToolbar and whole design-mode widget
-    m_widgetStack = new MscEditorStack;
-    m_widgetToolBar = new QToolBar;
-    m_mainToolBar = createMainToolBar();
-
-    // Create undo/redo group/actions
-    m_undoGroup = new QUndoGroup(m_widgetToolBar);
-    m_undoAction = m_undoGroup->createUndoAction(m_widgetToolBar);
-    m_undoAction->setIcon(Utils::Icons::UNDO_TOOLBAR.icon());
-    m_undoAction->setToolTip(tr("Undo (Ctrl + Z)"));
-
-    m_redoAction = m_undoGroup->createRedoAction(m_widgetToolBar);
-    m_redoAction->setIcon(Utils::Icons::REDO_TOOLBAR.icon());
-    m_redoAction->setToolTip(tr("Redo (Ctrl + Y)"));
-
-    Core::ActionManager::registerAction(m_undoAction, Core::Constants::UNDO, m_contexts);
-    Core::ActionManager::registerAction(m_redoAction, Core::Constants::REDO, m_contexts);
+    Core::ActionManager::registerAction(undoAction, Core::Constants::UNDO, m_contexts);
+    Core::ActionManager::registerAction(redoAction, Core::Constants::REDO, m_contexts);
 
     Core::Context mscContexts = m_contexts;
     mscContexts.add(Core::Constants::C_EDITORMANAGER);
@@ -122,99 +63,45 @@ void MscEditorData::fullInit()
     Core::ICore::addContextObject(m_context);
 }
 
+MscEditorData::~MscEditorData()
+{
+    if (m_context) {
+        Core::ICore::removeContextObject(m_context);
+    }
+}
+
 Core::IEditor *MscEditorData::createEditor()
 {
-    Core::IEditor *mscEditor = m_editorFactory->createEditor();
+    auto *mscEditor = new MscQtCEditor(m_mscStorage);
 
-    m_widgetStack->add(mscEditor, m_editorWidget);
-    m_mainToolBar->addEditor(mscEditor);
-
-    connect(m_editorWidget, &spctr::MscMainWidget::showAsn1File, this, &MscEditorData::openEditor);
-    connect(m_editorWidget, &spctr::MscMainWidget::showAadlFile, this, [&]() {
-        QStringList aadlFiles = MscSystemChecks::allAadlFiles();
-        if (!aadlFiles.isEmpty()) {
-            openEditor(aadlFiles.first());
-        }
-    });
-    connect(m_editorWidget, &spctr::MscMainWidget::mscDataLoaded, this,
+    connect(mscEditor->mscDocument(), &spctr::MscEditorDocument::mscDataLoaded, this,
             [this](const QString &fileName, QSharedPointer<msc::MSCEditorCore> data) {
-                m_editorWidget->mscCore()->minimapView()->setVisible(m_minimapVisible);
-                m_undoGroup->addStack(m_editorWidget->undoStack());
+                data->minimapView()->setVisible(m_minimapVisible);
+                m_undoGroup->addStack(data->undoStack());
                 Q_EMIT mscDataLoaded(fileName, data);
             });
 
     return mscEditor;
 }
 
-/*!
-   Opens the message declaration dialog for the current msc file
- */
-void MscEditorData::editMessageDeclarations(QWidget *parentWidget)
-{
-    auto editorManager = Core::EditorManager::instance();
-    Core::IDocument *currentDoc = editorManager->currentDocument();
-    auto document = qobject_cast<spctr::MscEditorDocument *>(currentDoc);
-    if (document && document->designWidget()) {
-        document->designWidget()->mscCore()->openMessageDeclarationEditor(parentWidget);
-    }
-}
-
-/*!
-   Returns the editor widget, that contains the whole UI of the MSC editor
- */
-MscMainWidget *MscEditorData::editorWidget()
-{
-    if (!m_editorWidget) {
-        m_editorWidget = new MscMainWidget(m_mscStorage);
-    }
-    return m_editorWidget;
-}
-
-void MscEditorData::openEditor(const QString &fileName)
-{
-    Core::EditorManager::instance()->openEditor(fileName);
-}
-
 void MscEditorData::setMinimapVisible(bool visible)
 {
     m_minimapVisible = visible;
 
-    for (auto openedDocument : Core::DocumentModel::openedDocuments()) {
+    for (Core::IDocument *openedDocument : Core::DocumentModel::openedDocuments()) {
         if (auto document = qobject_cast<spctr::MscEditorDocument *>(openedDocument)) {
-            if (document && document->designWidget()) {
-                document->designWidget()->mscCore()->minimapView()->setVisible(visible);
+            if (document->mscEditorCore()) {
+                document->mscEditorCore()->minimapView()->setVisible(visible);
             }
         }
     }
 }
 
-void MscEditorData::updateToolBar()
+void MscEditorData::onCurrentEditorChanged(Core::IEditor *editor)
 {
-    auto designWidget = static_cast<MscMainWidget *>(m_widgetStack->currentWidget());
-    if (designWidget && m_widgetToolBar) {
-        m_undoGroup->setActiveStack(designWidget->undoStack());
-        m_widgetToolBar->clear();
-        m_widgetToolBar->addAction(m_undoAction);
-        m_widgetToolBar->addAction(m_redoAction);
-        m_widgetToolBar->addSeparator();
-        m_widgetToolBar->addAction(designWidget->actionToolDelete());
-        m_widgetToolBar->addSeparator();
-        m_widgetToolBar->addAction(designWidget->actionCopy());
-        m_widgetToolBar->addAction(designWidget->actionPaste());
-        // m_widgetToolBar->addAction(designWidget->actionScreenshot());
-
-        designWidget->mscCore()->showToolbars(false);
+    if (auto mscEditor = qobject_cast<MscQtCEditor *>(editor)) {
+        m_undoGroup->setActiveStack(mscEditor->mscEditorCore()->undoStack());
     }
-}
-
-Core::EditorToolBar *MscEditorData::createMainToolBar()
-{
-    auto toolBar = new Core::EditorToolBar;
-    toolBar->setToolbarCreationFlags(Core::EditorToolBar::FlagsStandalone);
-    toolBar->setNavigationVisible(false);
-    toolBar->addCenterToolBar(m_widgetToolBar);
-
-    return toolBar;
 }
 
 }

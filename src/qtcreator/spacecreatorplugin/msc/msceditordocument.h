@@ -18,20 +18,23 @@
 #pragma once
 
 #include <QPointer>
+#include <QSharedPointer>
 #include <coreplugin/idocument.h>
 
-QT_FORWARD_DECLARE_CLASS(QDesignerFormWindowInterface)
+namespace msc {
+class MSCEditorCore;
+}
 
 namespace spctr {
 
-class MscMainWidget;
+class MscModelStorage;
 
 class MscEditorDocument : public Core::IDocument
 {
     Q_OBJECT
 
 public:
-    explicit MscEditorDocument(MscMainWidget *designWidget, QObject *parent = nullptr);
+    explicit MscEditorDocument(MscModelStorage *mscStorage, QObject *parent = nullptr);
 
     // IDocument
     OpenResult open(QString *errorString, const QString &fileName, const QString &realFileName) override;
@@ -42,15 +45,16 @@ public:
     bool reload(QString *errorString, ReloadFlag flag, ChangeType type) override;
 
     // Internal
-    MscMainWidget *designWidget() const;
-    QString designWidgetContents() const;
+    QSharedPointer<msc::MSCEditorCore> mscEditorCore() const;
     void setFilePath(const Utils::FileName &) override;
 
 Q_SIGNALS:
     void reloadRequested(QString *errorString, const QString &);
+    void mscDataLoaded(const QString &fileName, QSharedPointer<msc::MSCEditorCore> data);
 
 private:
-    QPointer<MscMainWidget> m_designWidget;
+    QPointer<MscModelStorage> m_mscStorage;
+    QSharedPointer<msc::MSCEditorCore> m_plugin;
 };
 
 }
