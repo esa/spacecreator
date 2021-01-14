@@ -41,6 +41,7 @@
 #include <QDebug>
 #include <QFileDialog>
 #include <QFileInfo>
+#include <QIcon>
 #include <QImageWriter>
 #include <QMainWindow>
 #include <QMenu>
@@ -104,8 +105,14 @@ void IVEditorCore::addToolBars(QMainWindow *window)
  */
 void IVEditorCore::addMenuFileActions(QMenu *menu, QMainWindow *window)
 {
+    menu->addSeparator();
+    menu->addAction(actionExportFunctions());
+    menu->addAction(actionExportType());
+    menu->addSeparator();
+
     auto mainWindow = dynamic_cast<MainWindow *>(window);
-    m_actionSaveSceneRender = menu->addAction(tr("Render Scene..."), this, &IVEditorCore::onSaveRenderRequested);
+    m_actionSaveSceneRender = menu->addAction(QIcon(QLatin1String(":/tab_interface/toolbar/icns/render.svg")),
+            tr("Render Scene..."), this, &IVEditorCore::onSaveRenderRequested);
     m_actionShowAsnDialog = menu->addAction(tr("ASN1 dialog..."), mainWindow, &MainWindow::openAsn1Dialog);
 
     ActionsManager::registerAction(
@@ -122,7 +129,9 @@ void IVEditorCore::addMenuEditActions(QMenu *menu, QMainWindow * /*window*/)
 
 void IVEditorCore::addMenuViewActions(QMenu *menu, QMainWindow *window)
 {
-    EditorCore::addMenuViewActions(menu, window);
+    menu->addAction(actionToggleMinimap());
+    menu->addAction(actionToggleE2EView());
+    menu->addSeparator();
 }
 
 /*!
@@ -153,6 +162,31 @@ void IVEditorCore::populateCommandLineArguments(shared::CommandLineParser *parse
     parser->handlePositional(shared::CommandLineParser::Positional::ExportToFile);
     parser->handlePositional(shared::CommandLineParser::Positional::ListScriptableActions);
     parser->handlePositional(shared::CommandLineParser::Positional::DropUnsavedChangesSilently);
+}
+
+QAction *IVEditorCore::actionExportFunctions()
+{
+    if (m_actionExportFunctions == nullptr) {
+        m_actionExportFunctions = new QAction(tr("Export selected entity"), this);
+    }
+    return m_actionExportFunctions;
+}
+
+QAction *IVEditorCore::actionExportType()
+{
+    if (m_actionExportType == nullptr) {
+        m_actionExportType = new QAction(tr("Export component type"), this);
+    }
+    return m_actionExportType;
+}
+
+QAction *IVEditorCore::actionToggleE2EView()
+{
+    if (m_actionToggleE2EView == nullptr) {
+        m_actionToggleE2EView = new QAction(tr("&Show end to end dataflow"), this);
+        m_actionToggleE2EView->setCheckable(true);
+    }
+    return m_actionToggleE2EView;
 }
 
 /*!

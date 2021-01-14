@@ -17,9 +17,12 @@
 
 #pragma once
 
+#include <QList>
 #include <QPointer>
 #include <QSharedPointer>
 #include <coreplugin/editormanager/ieditorfactory.h>
+
+class QAction;
 
 namespace msc {
 class MSCEditorCore;
@@ -36,7 +39,7 @@ class MscEditorFactory : public Core::IEditorFactory
     Q_OBJECT
 
 public:
-    MscEditorFactory(MscModelStorage *mscStorage, QObject *parent);
+    MscEditorFactory(MscModelStorage *mscStorage, const QList<QAction *> &mscActions, QObject *parent);
 
     Core::IEditor *createEditor() override;
 
@@ -48,6 +51,7 @@ Q_SIGNALS:
 private:
     mutable MscEditorData *m_editorData = nullptr;
     QPointer<MscModelStorage> m_mscStorage;
+    QList<QAction *> m_mscActions;
 };
 
 }

@@ -28,9 +28,10 @@
 
 namespace spctr {
 
-MscEditorFactory::MscEditorFactory(MscModelStorage *mscStorage, QObject *parent)
+MscEditorFactory::MscEditorFactory(MscModelStorage *mscStorage, const QList<QAction *> &mscActions, QObject *parent)
     : IEditorFactory(parent)
     , m_mscStorage(mscStorage)
+    , m_mscActions(mscActions)
 {
     setId(Constants::K_MSC_EDITOR_ID);
     setDisplayName(QCoreApplication::translate("MscEditor", Constants::C_MSCEDITOR_DISPLAY_NAME));
@@ -47,7 +48,7 @@ Core::IEditor *MscEditorFactory::createEditor()
 MscEditorData *MscEditorFactory::editorData() const
 {
     if (!m_editorData) {
-        m_editorData = new MscEditorData(m_mscStorage, const_cast<MscEditorFactory *>(this));
+        m_editorData = new MscEditorData(m_mscStorage, m_mscActions, const_cast<MscEditorFactory *>(this));
         connect(m_editorData, &MscEditorData::mscDataLoaded, this, &MscEditorFactory::mscDataLoaded);
     }
 

@@ -17,10 +17,12 @@
 
 #pragma once
 
+#include <QList>
 #include <QPointer>
 #include <QSharedPointer>
 #include <coreplugin/icontext.h>
 
+class QAction;
 class QUndoGroup;
 
 namespace aadlinterface {
@@ -42,7 +44,8 @@ class AadlEditorData : public QObject
 {
     Q_OBJECT
 public:
-    AadlEditorData(AadlModelStorage *aadlStorage, MscModelStorage *mscStorage, QObject *parent = nullptr);
+    AadlEditorData(AadlModelStorage *aadlStorage, MscModelStorage *mscStorage, const QList<QAction *> &ivActions,
+            QObject *parent = nullptr);
     ~AadlEditorData() override;
 
     Core::IEditor *createEditor();
@@ -66,6 +69,7 @@ private:
 
     QPointer<AadlModelStorage> m_aadlStorage;
     QPointer<MscModelStorage> m_mscStorage;
+    QList<QAction *> m_ivActions;
 };
 
 }

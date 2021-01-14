@@ -40,7 +40,7 @@ class AadlQtCEditor : public Core::IEditor
     Q_OBJECT
 
 public:
-    AadlQtCEditor(AadlModelStorage *aadlStorage, MscModelStorage *mscStorage);
+    AadlQtCEditor(AadlModelStorage *aadlStorage, MscModelStorage *mscStorage, const QList<QAction *> &ivActions);
     ~AadlQtCEditor();
 
     Core::IDocument *document() const override;
@@ -59,6 +59,7 @@ private:
     AadlMainWidget *m_editorWidget = nullptr;
     QPointer<aadlinterface::EndToEndView> m_endToEndView;
     QPointer<MscModelStorage> m_mscStorage;
+    QList<QAction *> m_globalToolbarActions;
 };
 
 }

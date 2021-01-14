@@ -83,6 +83,8 @@ private:
     AadlEditorFactory *m_aadlFactory = nullptr;
     DeploymentEditorFactory *m_deploymentFactory = nullptr;
     QAction *m_messageDeclarationAction = nullptr;
+    QAction *m_checkInstancesAction = nullptr;
+    QAction *m_checkMessagesAction = nullptr;
     QAction *m_asn1DialogAction = nullptr;
     QAction *m_actionSaveSceneRender = nullptr;
     QAction *m_showMinimapAction = nullptr;

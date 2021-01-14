@@ -59,8 +59,11 @@ public:
 
     void populateCommandLineArguments(shared::CommandLineParser *parser) const override;
 
+    QAction *actionExportFunctions();
+    QAction *actionExportType();
     QAction *actionSaveSceneRender() { return m_actionSaveSceneRender; }
     QAction *actionShowAsnDialog() { return m_actionShowAsnDialog; }
+    QAction *actionToggleE2EView();
 
     aadl::AADLObjectFunction *addFunction(const QString &name, aadl::AADLObjectFunction *parent = nullptr);
     bool addConnection(QString name, const QString &fromInstanceName, const QString &toInstanceName);
@@ -96,10 +99,13 @@ private:
 
     aadlinterface::InterfaceDocument *m_document { nullptr };
 
-    QToolBar *m_docToolBar;
+    QToolBar *m_docToolBar { nullptr };
 
+    QAction *m_actionExportFunctions { nullptr };
+    QAction *m_actionExportType { nullptr };
     QAction *m_actionSaveSceneRender { nullptr };
     QAction *m_actionShowAsnDialog { nullptr };
+    QAction *m_actionToggleE2EView { nullptr };
 
     QVector<aadl::AADLObjectFunction *> m_aadlFunctions;
     QVector<aadl::AADLObjectConnection *> m_aadlConnections;

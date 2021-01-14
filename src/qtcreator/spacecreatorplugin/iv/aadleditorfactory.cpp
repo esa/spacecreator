@@ -27,10 +27,12 @@
 
 namespace spctr {
 
-AadlEditorFactory::AadlEditorFactory(AadlModelStorage *aadlStorage, MscModelStorage *mscStorage, QObject *parent)
+AadlEditorFactory::AadlEditorFactory(
+        AadlModelStorage *aadlStorage, MscModelStorage *mscStorage, const QList<QAction *> &ivActions, QObject *parent)
     : IEditorFactory(parent)
     , m_aadlStorage(aadlStorage)
     , m_mscStorage(mscStorage)
+    , m_ivActions(ivActions)
 {
     setId(spctr::Constants::K_AADL_EDITOR_ID);
     setDisplayName(QCoreApplication::translate("AADL Editor", spctr::Constants::C_AADLEDITOR_DISPLAY_NAME));
@@ -47,7 +49,8 @@ Core::IEditor *AadlEditorFactory::createEditor()
 AadlEditorData *AadlEditorFactory::editorData() const
 {
     if (!m_editorData) {
-        m_editorData = new AadlEditorData(m_aadlStorage, m_mscStorage, const_cast<AadlEditorFactory *>(this));
+        m_editorData =
+                new AadlEditorData(m_aadlStorage, m_mscStorage, m_ivActions, const_cast<AadlEditorFactory *>(this));
         connect(m_editorData, &AadlEditorData::aadlDataLoaded, this, &AadlEditorFactory::aadlDataLoaded);
     }
     return m_editorData;

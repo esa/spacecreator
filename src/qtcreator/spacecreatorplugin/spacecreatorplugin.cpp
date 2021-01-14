@@ -113,35 +113,33 @@ bool SpaceCreatorPlugin::initialize(const QStringList &arguments, QString *error
         mscCore->aadlChecker()->setIvCore(m_checks->ivCore());
     });
 
-    m_mscFactory = new MscEditorFactory(m_mscStorage, this);
-    m_aadlFactory = new AadlEditorFactory(m_aadlStorage, m_mscStorage, this);
-    m_deploymentFactory = new DeploymentEditorFactory(this);
-
     // MSC
-    m_messageDeclarationAction = new QAction(tr("Message declarations ..."), this);
+    m_messageDeclarationAction =
+            new QAction(QIcon(QLatin1String(":/icons/message_declarations.svg")), tr("Message declarations ..."), this);
+    m_messageDeclarationAction->setEnabled(false);
     Core::Command *messageDeclCmd =
             Core::ActionManager::registerAction(m_messageDeclarationAction, Constants::MESSAGE_DECLARATIONS_ID);
     connect(m_messageDeclarationAction, &QAction::triggered, this, &SpaceCreatorPlugin::showMessageDeclarations);
 
-    m_messageDeclarationAction->setEnabled(false);
-
-    auto action = new QAction(tr("Check instances"), this);
+    m_checkInstancesAction = new QAction(QIcon(QLatin1String(":/icons/check_yellow.svg")), tr("Check instances"), this);
     Core::Command *checkInstancesCmd = Core::ActionManager::registerAction(
-            action, Constants::CHECK_INSTANCES_ID, Core::Context(Core::Constants::C_GLOBAL));
-    connect(action, &QAction::triggered, m_checks, &MscSystemChecks::checkInstances);
+            m_checkInstancesAction, Constants::CHECK_INSTANCES_ID, Core::Context(Core::Constants::C_GLOBAL));
+    connect(m_checkInstancesAction, &QAction::triggered, m_checks, &MscSystemChecks::checkInstances);
 
-    action = new QAction(tr("Check messages"), this);
+    m_checkMessagesAction = new QAction(QIcon(QLatin1String(":/icons/check_blue.svg")), tr("Check messages"), this);
     Core::Command *checkMessagesCmd = Core::ActionManager::registerAction(
-            action, Constants::CHECK_MESSAGES_ID, Core::Context(Core::Constants::C_GLOBAL));
-    connect(action, &QAction::triggered, m_checks, &MscSystemChecks::checkMessages);
+            m_checkMessagesAction, Constants::CHECK_MESSAGES_ID, Core::Context(Core::Constants::C_GLOBAL));
+    connect(m_checkMessagesAction, &QAction::triggered, m_checks, &MscSystemChecks::checkMessages);
 
-    m_showMinimapAction = new QAction(tr("Show minimap"), this);
+    m_showMinimapAction =
+            new QAction(QIcon(QLatin1String(":/sharedresources/icons/minimap.svg")), tr("Show minimap"), this);
     m_showMinimapAction->setCheckable(true);
     Core::Command *showMinimapCmd = Core::ActionManager::registerAction(
             m_showMinimapAction, Constants::SHOW_MINIMAP_ID, Core::Context(Core::Constants::C_EDIT_MODE));
     connect(m_showMinimapAction, &QAction::triggered, this, &SpaceCreatorPlugin::setMinimapVisible);
 
-    m_showE2EDataflow = new QAction(tr("Show end to end dataflow"), this);
+    m_showE2EDataflow = new QAction(
+            QIcon(QLatin1String(":/tab_interface/toolbar/icns/end_to_end.png")), tr("Show end to end dataflow"), this);
     Core::Command *showE2ECmd = Core::ActionManager::registerAction(
             m_showE2EDataflow, Constants::SHOW_E2E_ID, Core::Context(Core::Constants::C_EDIT_MODE));
     connect(m_showE2EDataflow, &QAction::triggered, this, &SpaceCreatorPlugin::showE2EDataflow);
@@ -157,13 +155,15 @@ bool SpaceCreatorPlugin::initialize(const QStringList &arguments, QString *error
     Core::ActionManager::actionContainer(Core::Constants::M_TOOLS)->addMenu(menu);
 
     // AADL
-    m_asn1DialogAction = new QAction(tr("Show ASN1 dialog ..."), this);
+    m_asn1DialogAction = new QAction(
+            QIcon(QLatin1String(":/tab_interface/toolbar/icns/asn1.png")), tr("Show ASN1 dialog ..."), this);
     Core::Command *showAsn1Cmd = Core::ActionManager::registerAction(m_asn1DialogAction, Constants::AADL_SHOW_ASN1_ID);
     aadlinterface::ActionsManager::registerAction(Q_FUNC_INFO, m_asn1DialogAction, "Asn1", "Edit the ASN1 file");
     connect(m_asn1DialogAction, &QAction::triggered, this, &SpaceCreatorPlugin::showAsn1Dialog);
     m_asn1DialogAction->setEnabled(false);
 
-    m_actionSaveSceneRender = new QAction(tr("Render Scene..."), this);
+    m_actionSaveSceneRender =
+            new QAction(QIcon(QLatin1String(":/tab_interface/toolbar/icns/render.svg")), tr("Render Scene..."), this);
     Core::Command *renderCmd = Core::ActionManager::registerAction(m_actionSaveSceneRender, Constants::AADL_RENDER_ID);
     aadlinterface::ActionsManager::registerAction(
             Q_FUNC_INFO, m_actionSaveSceneRender, "Render", "Save current scene complete render.");
@@ -223,6 +223,14 @@ bool SpaceCreatorPlugin::initialize(const QStringList &arguments, QString *error
     // QtCreator stuff
     connect(ProjectExplorer::SessionManager::instance(), &ProjectExplorer::SessionManager::aboutToRemoveProject, this,
             &spctr::SpaceCreatorPlugin::clearProjectData);
+
+    QList<QAction *> mscActions;
+    mscActions << m_showMinimapAction << m_checkInstancesAction << m_checkMessagesAction;
+    m_mscFactory = new MscEditorFactory(m_mscStorage, mscActions, this);
+    QList<QAction *> ivActions;
+    ivActions << m_asn1DialogAction << m_showMinimapAction << m_showE2EDataflow << m_actionSaveSceneRender;
+    m_aadlFactory = new AadlEditorFactory(m_aadlStorage, m_mscStorage, ivActions, this);
+    m_deploymentFactory = new DeploymentEditorFactory(this);
 
     return true;
 }

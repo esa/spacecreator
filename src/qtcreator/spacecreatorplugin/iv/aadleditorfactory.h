@@ -19,10 +19,13 @@
 
 #include "iveditorcore.h"
 
+#include <QList>
 #include <QPointer>
 #include <QSharedPointer>
 #include <QString>
 #include <coreplugin/editormanager/ieditorfactory.h>
+
+class QAction;
 
 namespace spctr {
 
@@ -35,7 +38,8 @@ class AadlEditorFactory : public Core::IEditorFactory
     Q_OBJECT
 
 public:
-    explicit AadlEditorFactory(AadlModelStorage *aadlStorage, MscModelStorage *mscStorage, QObject *parent);
+    explicit AadlEditorFactory(AadlModelStorage *aadlStorage, MscModelStorage *mscStorage,
+            const QList<QAction *> &ivActions, QObject *parent);
 
     Core::IEditor *createEditor() override;
 
@@ -48,6 +52,7 @@ private:
     mutable AadlEditorData *m_editorData = nullptr;
     QPointer<AadlModelStorage> m_aadlStorage;
     QPointer<MscModelStorage> m_mscStorage;
+    QList<QAction *> m_ivActions;
 };
 
 }

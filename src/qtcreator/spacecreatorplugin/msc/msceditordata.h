@@ -40,7 +40,7 @@ class MscEditorData : public QObject
 {
     Q_OBJECT
 public:
-    MscEditorData(MscModelStorage *mscStorage, QObject *parent = nullptr);
+    MscEditorData(MscModelStorage *mscStorage, const QList<QAction *> &mscActions, QObject *parent = nullptr);
     ~MscEditorData() override;
 
     Core::IEditor *createEditor();
@@ -62,6 +62,7 @@ private:
     bool m_minimapVisible = false;
 
     QPointer<MscModelStorage> m_mscStorage;
+    QList<QAction *> m_mscActions;
 };
 
 }

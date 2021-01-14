@@ -74,10 +74,6 @@ void EditorCore::initMenus(QMainWindow *window)
     menu->addAction(actionSaveFileAs());
     menu->addSeparator();
     menu->addAction(actionOpenAadl());
-    menu->addSeparator();
-    menu->addAction(actionExportFunctions());
-    menu->addAction(actionExportType());
-    menu->addSeparator();
     addMenuFileActions(menu, window);
     menu->addSeparator();
     menu->addAction(actionQuit());
@@ -99,12 +95,7 @@ void EditorCore::initMenus(QMainWindow *window)
     menu->addAction(tr("About Qt"), qApp, &QApplication::aboutQt);
 }
 
-void EditorCore::addMenuViewActions(QMenu *menu, QMainWindow * /*window*/)
-{
-    menu->addAction(actionToggleMinimap());
-    menu->addAction(actionToggleE2EView());
-    menu->addSeparator();
-}
+void EditorCore::addMenuViewActions(QMenu * /*menu*/, QMainWindow * /*window*/) { }
 
 QAction *EditorCore::actionNewFile()
 {
@@ -157,22 +148,6 @@ QAction *EditorCore::actionOpenAadl()
     return m_actionOpenAadl;
 }
 
-QAction *EditorCore::actionExportFunctions()
-{
-    if (m_actionExportFunctions == nullptr) {
-        m_actionExportFunctions = new QAction(tr("Export selected entity"), this);
-    }
-    return m_actionExportFunctions;
-}
-
-QAction *EditorCore::actionExportType()
-{
-    if (m_actionExportType == nullptr) {
-        m_actionExportType = new QAction(tr("Export component type"), this);
-    }
-    return m_actionExportType;
-}
-
 QAction *EditorCore::actionQuit()
 {
     if (m_actionQuit == nullptr) {
@@ -207,17 +182,9 @@ QAction *EditorCore::actionToggleMinimap()
     if (m_actionToggleMinimap == nullptr) {
         m_actionToggleMinimap = new QAction(tr("&Mini map"), this);
         m_actionToggleMinimap->setCheckable(true);
+        m_actionToggleMinimap->setIcon(QIcon(QLatin1String(":/sharedresources/icons/minimap.svg")));
     }
     return m_actionToggleMinimap;
-}
-
-QAction *EditorCore::actionToggleE2EView()
-{
-    if (m_actionToggleE2EView == nullptr) {
-        m_actionToggleE2EView = new QAction(tr("&Show end to end dataflow"), this);
-        m_actionToggleE2EView->setCheckable(true);
-    }
-    return m_actionToggleE2EView;
 }
 
 /*!

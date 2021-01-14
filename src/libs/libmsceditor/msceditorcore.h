@@ -102,6 +102,7 @@ public:
 
     QAction *actionShowDocument() { return m_actionShowDocument; }
     QAction *actionShowHierarchy() { return m_actionShowHierarchy; }
+    QAction *actionMessageDeclarations();
 
     QVector<QAction *> chartActions() const;
     QVector<QAction *> hierarchyActions() const;
@@ -163,6 +164,7 @@ private:
     QAction *m_actionPaste = nullptr;
     QAction *m_actionShowDocument = nullptr;
     QAction *m_actionShowHierarchy = nullptr;
+    QAction *m_actionMessageDeclarations = nullptr;
 
     QVector<msc::BaseTool *> m_tools;
     QAction *m_defaultToolAction = nullptr;

@@ -37,10 +37,12 @@
 
 namespace spctr {
 
-AadlQtCEditor::AadlQtCEditor(AadlModelStorage *aadlStorage, MscModelStorage *mscStorage)
+AadlQtCEditor::AadlQtCEditor(
+        AadlModelStorage *aadlStorage, MscModelStorage *mscStorage, const QList<QAction *> &ivActions)
     : Core::IEditor()
     , m_editorWidget(new AadlMainWidget)
     , m_mscStorage(mscStorage)
+    , m_globalToolbarActions(ivActions)
 {
     setContext(Core::Context(spctr::Constants::K_AADL_EDITOR_ID));
     m_document = new AadlEditorDocument(aadlStorage, this);
@@ -77,6 +79,10 @@ QWidget *AadlQtCEditor::toolBar()
         m_toolbar = new QToolBar;
         m_toolbar->addAction(ivCore->actionUndo());
         m_toolbar->addAction(ivCore->actionRedo());
+        m_toolbar->addSeparator();
+        for (QAction *action : qAsConst(m_globalToolbarActions)) {
+            m_toolbar->addAction(action);
+        }
     }
 
     return m_toolbar;

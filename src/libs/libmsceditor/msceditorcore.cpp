@@ -289,6 +289,7 @@ void MSCEditorCore::addToolBars(QMainWindow *window)
 void MSCEditorCore::addMenuFileActions(QMenu *menu, QMainWindow *window)
 {
     auto mainWindow = dynamic_cast<MainWindow *>(window);
+    menu->addSeparator();
     m_actionScreenshot = menu->addAction(QIcon(QLatin1String(":/sharedresources/icons/save.svg")),
             tr("Save Screenshot..."), mainWindow, &MainWindow::saveScreenshot, QKeySequence(Qt::ALT + Qt::Key_S));
     menu->addSeparator();
@@ -307,9 +308,10 @@ void MSCEditorCore::addMenuEditActions(QMenu *menu, QMainWindow *window)
 
 void MSCEditorCore::addMenuViewActions(QMenu *menu, QMainWindow *window)
 {
-    EditorCore::addMenuViewActions(menu, window);
-
     auto mainWindow = dynamic_cast<MainWindow *>(window);
+
+    menu->addAction(actionToggleMinimap());
+    menu->addSeparator();
 
     m_actionShowDocument = menu->addAction(tr("Show &Document"), mainWindow, &MainWindow::showDocumentView, tr("F8"));
     m_actionShowHierarchy =
@@ -323,7 +325,7 @@ void MSCEditorCore::addMenuViewActions(QMenu *menu, QMainWindow *window)
     m_actionShowDocument->setChecked(true);
 
     menu->addSeparator();
-    menu->addAction(tr("Show messages ..."), mainWindow, &MainWindow::openMessageDeclarationEditor);
+    menu->addAction(actionMessageDeclarations());
 
     menu->addSeparator();
     auto menuWindows = menu->addMenu("Windows");
@@ -386,6 +388,17 @@ BaseTool *MSCEditorCore::activeTool() const
     }
 
     return nullptr;
+}
+
+QAction *MSCEditorCore::actionMessageDeclarations()
+{
+    if (!m_actionMessageDeclarations) {
+        m_actionMessageDeclarations =
+                new QAction(QIcon(QLatin1String(":/icons/message_declarations.svg")), tr("Show messages ..."));
+        connect(m_actionMessageDeclarations, &QAction::triggered, this,
+                [this]() { openMessageDeclarationEditor(nullptr); });
+    }
+    return m_actionMessageDeclarations;
 }
 
 QVector<QAction *> MSCEditorCore::chartActions() const

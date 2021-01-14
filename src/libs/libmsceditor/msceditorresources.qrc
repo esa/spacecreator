@@ -1,5 +1,7 @@
 <RCC>
     <qresource prefix="/icons">
+        <file alias="check_blue.svg">resources/check_blue.svg</file>
+        <file alias="check_yellow.svg">resources/check_yellow.svg</file>
         <file alias="document_and.png">resources/document_and.png</file>
         <file alias="document_exception.png">resources/document_exception.png</file>
         <file alias="document_is_scenario.png">resources/document_is_scenario.png</file>
@@ -7,6 +9,7 @@
         <file alias="document_or.png">resources/document_or.png</file>
         <file alias="document_parallel.png">resources/document_parallel.png</file>
         <file alias="document_repeat.png">resources/document_repeat.png</file>
+        <file alias="message_declarations.svg">resources/message_declarations.svg</file>
         <file alias="toolbar/action.svg">resources/icons/toolbar/action.svg</file>
         <file alias="toolbar/comment.svg">resources/icons/toolbar/comment.svg</file>
         <file alias="toolbar/condition.svg">resources/icons/toolbar/condition.svg</file>

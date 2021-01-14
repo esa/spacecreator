@@ -35,10 +35,11 @@
 
 namespace spctr {
 
-MscEditorData::MscEditorData(MscModelStorage *mscStorage, QObject *parent)
+MscEditorData::MscEditorData(MscModelStorage *mscStorage, const QList<QAction *> &mscActions, QObject *parent)
     : QObject(parent)
     , m_undoGroup(new QUndoGroup(this))
     , m_mscStorage(mscStorage)
+    , m_mscActions(mscActions)
 {
     m_contexts.add(spctr::Constants::C_MSC_EDITOR);
     m_contexts.add(spctr::Constants::K_MSC_EDITOR_ID);
@@ -72,7 +73,7 @@ MscEditorData::~MscEditorData()
 
 Core::IEditor *MscEditorData::createEditor()
 {
-    auto *mscEditor = new MscQtCEditor(m_mscStorage);
+    auto *mscEditor = new MscQtCEditor(m_mscStorage, m_mscActions);
 
     connect(mscEditor->mscDocument(), &spctr::MscEditorDocument::mscDataLoaded, this,
             [this](const QString &fileName, QSharedPointer<msc::MSCEditorCore> data) {

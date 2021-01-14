@@ -29,10 +29,11 @@
 
 namespace spctr {
 
-MscQtCEditor::MscQtCEditor(MscModelStorage *mscStorage)
+MscQtCEditor::MscQtCEditor(MscModelStorage *mscStorage, const QList<QAction *> &toolbarActions)
     : Core::IEditor()
     , m_document(new MscEditorDocument(mscStorage, this))
     , m_editorWidget(new MscMainWidget)
+    , m_globalToolbarActions(toolbarActions)
 {
     setContext(Core::Context(spctr::Constants::K_MSC_EDITOR_ID));
     setWidget(m_editorWidget);
@@ -73,6 +74,11 @@ QWidget *MscQtCEditor::toolBar()
         m_toolbar->addSeparator();
         m_toolbar->addAction(mscCore->actionCopy());
         m_toolbar->addAction(mscCore->actionPaste());
+        m_toolbar->addSeparator();
+        m_toolbar->addAction(mscCore->actionMessageDeclarations());
+        for (QAction *action : qAsConst(m_globalToolbarActions)) {
+            m_toolbar->addAction(action);
+        }
     }
 
     return m_toolbar;
