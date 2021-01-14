@@ -9,6 +9,7 @@ add_executable(${TEST_NAME}
     invalid_format.xml
     mixed_types01.xml
     number_type.xml
+    sequence_custom_type.xml
     sequence_type.xml
 )
 

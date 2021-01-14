@@ -25,8 +25,8 @@
 
 namespace aadlinterface {
 
-const char *MODEL_INDEX_PROPERTY = "modelIndex";
-const char *DIALOG_PROPERTY = "dialog";
+static const char *MODEL_INDEX_PROPERTY = "modelIndex";
+static const char *DIALOG_PROPERTY = "dialog";
 
 Asn1ValueDelegate::Asn1ValueDelegate(const QSharedPointer<Asn1Acn::File> &asn1Types, QObject *parent)
     : QStyledItemDelegate(parent)
@@ -73,6 +73,7 @@ void Asn1ValueDelegate::onDialogAccepted()
         if (model && newValue != model->data(modelIndex).toString()) {
             model->setData(modelIndex, newValue);
         }
+        dialog->deleteLater();
     }
 }
 

@@ -41,6 +41,7 @@ private Q_SLOTS:
     void testBoolEnumTypes();
     void testChoiceType();
     void testSequenceType();
+    void testSequenceCustomType();
     void testMixedTypes();
     void testChoiceReference();
 
@@ -197,6 +198,28 @@ void tst_Asn1Reader::testSequenceType()
     QCOMPARE(data.size(), 2);
     QCOMPARE(data[ASN1_MIN].toInt(), -10);
     QCOMPARE(data[ASN1_MAX].toInt(), 10);
+}
+
+void tst_Asn1Reader::testSequenceCustomType()
+{
+    std::unique_ptr<Asn1Acn::File> asn1Types = xmlParser->parseAsn1XmlFile(QFINDTESTDATA("sequence_custom_type.xml"));
+    const Asn1Acn::Definitions *definitions = asn1Types->definitions("Test11");
+    QVERIFY(definitions != nullptr);
+    QCOMPARE(definitions->types().size(), 2);
+
+    const std::unique_ptr<Asn1Acn::TypeAssignment> &typeAssign1 = definitions->types().at(0);
+    QCOMPARE(typeAssign1->name(), QString("T1"));
+    QCOMPARE(typeAssign1->type()->typeName(), QString("BOOLEAN"));
+
+    const std::unique_ptr<Asn1Acn::TypeAssignment> &typeAssign2 = definitions->types().at(1);
+    QCOMPARE(typeAssign2->name(), QString("U"));
+    QCOMPARE(typeAssign2->type()->typeName(), QString("SEQUENCE"));
+
+    auto sequence = dynamic_cast<const Asn1Acn::Types::Sequence *>(typeAssign2->type());
+    QCOMPARE(sequence->children().size(), 1);
+    const std::unique_ptr<Asn1Acn::Types::Type> &sequence1 = sequence->children().at(0);
+    QCOMPARE(sequence1->identifier(), QString("x"));
+    QCOMPARE(sequence1->typeName(), QString("T1"));
 }
 
 void tst_Asn1Reader::testMixedTypes()

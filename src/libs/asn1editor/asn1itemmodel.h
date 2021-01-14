@@ -45,7 +45,7 @@ public:
 private:
     using ItemMap = QMap<QString, QStandardItem *>;
 
-    ItemMap createModelItems(const Asn1Acn::Types::Type *asn1Item);
+    ItemMap createModelItems(const Asn1Acn::Types::Type *asn1Item, const QString &name = {});
 
     QStandardItem *createNumberItem(const Asn1Acn::Types::Type *asn1Item);
     QStandardItem *createBoolItem(const Asn1Acn::Types::Type *asn1Item);
