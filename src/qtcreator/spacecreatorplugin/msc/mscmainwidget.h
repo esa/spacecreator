@@ -67,10 +67,6 @@ private:
 
     shared::ActionsBar *m_chartToolBar = nullptr;
     shared::ActionsBar *m_documentToolBar = nullptr;
-    QWidget *m_leftArea = nullptr;
-
-    QSplitter *m_horizontalSplitter = nullptr;
-    QVBoxLayout *m_leftVerticalLayout = nullptr;
 
     msc::DocumentTreeView *m_documentTree = nullptr;
     QPushButton *m_aadlSwitch = nullptr;

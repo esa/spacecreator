@@ -25,6 +25,7 @@
 #include "aadlobjectfunction.h"
 #include "aadlobjectsmodel.h"
 #include "aadlxmlreader.h"
+#include "actionsbar.h"
 #include "asn1modelstorage.h"
 #include "baseitems/common/aadlutils.h"
 #include "baseitems/graphicsview.h"
@@ -168,6 +169,11 @@ void InterfaceDocument::init()
     connect(d->itemsModel, &AADLItemModel::itemDoubleClicked, this, &InterfaceDocument::onItemDoubleClicked);
     connect(d->itemsModel, &AADLItemModel::itemsSelected, this, &InterfaceDocument::onSceneSelectionChanged);
 
+    d->view = new QWidget;
+    auto rootLayout = new QVBoxLayout;
+    rootLayout->setMargin(0);
+    d->view->setLayout(rootLayout);
+
     QWidget *panelWidget = new QWidget;
     QVBoxLayout *panelLayout = new QVBoxLayout;
     panelLayout->setMargin(0);
@@ -180,15 +186,24 @@ void InterfaceDocument::init()
     panelSplitter->addWidget(createSharedView());
     panelLayout->addWidget(panelSplitter);
 
-    d->view = new QWidget;
-    auto rootLayout = new QVBoxLayout;
-    rootLayout->setMargin(0);
-    d->view->setLayout(rootLayout);
+    QWidget *editorView = createGraphicsView();
+    auto editorWidget = new QWidget;
+    auto editorLayout = new QHBoxLayout;
+    editorLayout->setMargin(0);
+    editorLayout->setSpacing(0);
+    editorWidget->setLayout(editorLayout);
+    auto aadlToolBar = new shared::ActionsBar(editorWidget);
+    initActions();
+    for (QAction *action : qAsConst(d->m_toolbarActions)) {
+        aadlToolBar->addAction(action);
+    }
+    editorLayout->addWidget(aadlToolBar);
+    editorLayout->addWidget(editorView);
 
     auto splitter = new QSplitter(Qt::Horizontal, d->view);
     splitter->setHandleWidth(1);
     splitter->addWidget(panelWidget);
-    splitter->addWidget(createGraphicsView());
+    splitter->addWidget(editorWidget);
     splitter->setStretchFactor(0, 0);
     splitter->setStretchFactor(1, 1);
     rootLayout->addWidget(splitter);

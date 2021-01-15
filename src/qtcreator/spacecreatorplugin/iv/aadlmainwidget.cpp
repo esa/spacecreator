@@ -71,15 +71,7 @@ void AadlMainWidget::init()
     setLayout(layout);
     m_plugin->document()->init();
 
-    m_aadlToolBar = new shared::ActionsBar(this);
-    layout->addWidget(m_aadlToolBar);
-
     layout->addWidget(m_plugin->document()->view());
-
-    m_actions = m_plugin->document()->initActions();
-    for (QAction *action : m_actions) {
-        m_aadlToolBar->addAction(action);
-    }
 
     m_plugin->setupMiniMap();
 

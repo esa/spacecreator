@@ -27,10 +27,6 @@ namespace aadlinterface {
 class IVEditorCore;
 }
 
-namespace shared {
-class ActionsBar;
-}
-
 namespace spctr {
 
 class AadlMainWidget : public QWidget
@@ -54,8 +50,6 @@ private:
     void init();
 
     QSharedPointer<aadlinterface::IVEditorCore> m_plugin;
-    QVector<QAction *> m_actions;
-    shared::ActionsBar *m_aadlToolBar = nullptr;
 };
 
 }

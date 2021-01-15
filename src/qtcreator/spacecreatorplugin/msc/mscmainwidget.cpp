@@ -196,34 +196,39 @@ void MscMainWidget::init()
         return;
     }
 
-    auto viewLayout = new QHBoxLayout(this);
-    viewLayout->setMargin(0);
-    viewLayout->setSpacing(0);
-    this->setLayout(viewLayout);
+    // Graphical editors
+    auto editorsWidgets = new QWidget(this);
+    auto editorsLayout = new QHBoxLayout(editorsWidgets);
+    editorsLayout->setMargin(0);
+    editorsLayout->setSpacing(0);
+    editorsWidgets->setLayout(editorsLayout);
 
-    m_plugin->showToolbars(false);
-
-    m_chartToolBar = new shared::ActionsBar(this);
-    viewLayout->addWidget(m_chartToolBar);
-    m_documentToolBar = new shared::ActionsBar(this);
-    viewLayout->addWidget(m_documentToolBar);
+    m_chartToolBar = new shared::ActionsBar(editorsWidgets);
+    editorsLayout->addWidget(m_chartToolBar);
+    m_documentToolBar = new shared::ActionsBar(editorsWidgets);
+    editorsLayout->addWidget(m_documentToolBar);
     connect(m_plugin.data(), &msc::MSCEditorCore::viewModeChanged, this, &spctr::MscMainWidget::onViewModeChanged);
     onViewModeChanged();
 
-    auto centerView = new QStackedWidget(this);
-    auto graphicsView = new msc::GraphicsView(this);
+    auto centerView = new QStackedWidget(editorsWidgets);
+    auto graphicsView = new msc::GraphicsView(editorsWidgets);
     centerView->addWidget(graphicsView);
-    auto hierarchyView = new msc::GraphicsView(this);
+    auto hierarchyView = new msc::GraphicsView(editorsWidgets);
     centerView->addWidget(hierarchyView);
+    editorsLayout->addWidget(centerView);
 
     m_plugin->setViews(centerView, graphicsView, hierarchyView);
 
-    m_leftArea = new QWidget(this);
+    // Doceuments tree etc.
+    auto leftArea = new QWidget(this);
+    auto leftVerticalLayout = new QVBoxLayout(leftArea);
+    leftVerticalLayout->setMargin(0);
 
-    m_documentTree = new msc::DocumentTreeView(m_leftArea);
+    m_documentTree = new msc::DocumentTreeView(leftArea);
     m_documentTree->header()->setVisible(true);
+    leftVerticalLayout->addWidget(m_documentTree);
 
-    m_aadlSwitch = new QPushButton("Interface view", m_leftArea);
+    m_aadlSwitch = new QPushButton("Interface view", leftArea);
     m_aadlSwitch->setToolTip(tr("Open the file"));
     connect(m_aadlSwitch, &QPushButton::clicked, this, []() {
         QStringList aadlFiles = MscSystemChecks::allAadlFiles();
@@ -232,8 +237,9 @@ void MscMainWidget::init()
         }
     });
     m_aadlSwitch->setSizePolicy(QSizePolicy::MinimumExpanding, QSizePolicy::Minimum);
+    leftVerticalLayout->addWidget(m_aadlSwitch);
 
-    auto asn1Widget = new QWidget(m_leftArea);
+    auto asn1Widget = new QWidget(leftArea);
     asn1Widget->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Minimum);
     auto asn1Layout = new QHBoxLayout(asn1Widget);
     asn1Layout->setMargin(0);
@@ -248,21 +254,21 @@ void MscMainWidget::init()
     asn1Layout->addWidget(m_asn1Switch);
     asn1Layout->addWidget(m_asn1Select);
 
-    m_leftVerticalLayout = new QVBoxLayout(m_leftArea);
-    m_leftVerticalLayout->setMargin(0);
-    m_leftVerticalLayout->addWidget(m_documentTree);
-    m_leftVerticalLayout->addWidget(m_aadlSwitch);
-    m_leftVerticalLayout->addWidget(asn1Widget);
+    leftVerticalLayout->addWidget(asn1Widget);
 
-    m_horizontalSplitter = new Core::MiniSplitter(Qt::Horizontal);
-    m_horizontalSplitter->addWidget(m_leftArea);
-    m_horizontalSplitter->addWidget(centerView);
-    m_horizontalSplitter->setStretchFactor(0, 0);
-    m_horizontalSplitter->setStretchFactor(1, 1);
+    auto horizontalSplitter = new Core::MiniSplitter(Qt::Horizontal);
+    horizontalSplitter->addWidget(leftArea);
+    horizontalSplitter->addWidget(editorsWidgets);
+    horizontalSplitter->setStretchFactor(0, 0);
+    horizontalSplitter->setStretchFactor(1, 1);
 
-    layout()->addWidget(m_horizontalSplitter);
-    layout()->setMargin(0);
+    auto viewLayout = new QHBoxLayout(this);
+    viewLayout->setMargin(0);
+    viewLayout->setSpacing(0);
+    setLayout(viewLayout);
+    viewLayout->addWidget(horizontalSplitter);
 
+    // init
     m_documentTree->setModel(m_plugin->mainModel()->documentItemModel());
 
     m_plugin->createActionCopy(nullptr);
