@@ -33,6 +33,7 @@
 #include "commands/commandids.h"
 #include "commands/commandsfactory.h"
 #include "commandsstack.h"
+#include "graphicsviewutils.h"
 #include "ui/textitem.h"
 
 #include <QApplication>
@@ -103,8 +104,17 @@ void AADLFunctionTypeGraphicsItem::paint(QPainter *painter, const QStyleOptionGr
     painter->setRenderHints(QPainter::Antialiasing | QPainter::TextAntialiasing);
     painter->setPen(isSelected() ? selectedPen() : pen());
     painter->setBrush(brush());
-    painter->drawRect(
-            boundingRect().adjusted(kBorderWidth / 2, kBorderWidth / 2, -kBorderWidth / 2, -kBorderWidth / 2));
+    QRectF rect =
+            boundingRect().adjusted(kBorderWidth / 2, kBorderWidth / 2, -kBorderWidth / 2, -kBorderWidth / 2).toRect();
+    QPainterPath path = shared::graphicsviewutils::edgeCuttedRectShape(rect, 6);
+    painter->fillPath(path, brush());
+    painter->drawPath(path);
+
+    qreal offset = 3 + painter->pen().width();
+    rect = rect.adjusted(offset, offset, -offset, -offset);
+    path = shared::graphicsviewutils::edgeCuttedRectShape(rect, 5);
+    painter->drawPath(path);
+
     painter->restore();
 }
 
@@ -192,7 +202,6 @@ void AADLFunctionTypeGraphicsItem::onManualResizeProgress(
                 continue;
             }
 
-            const QPointF ifacePos = iface->scenePos();
             const Qt::Alignment side = getNearestSide(rect, storedPos);
             const QRectF sceneRect = sceneBoundingRect();
             const QPointF pos = getSidePosition(sceneRect, storedPos, side);

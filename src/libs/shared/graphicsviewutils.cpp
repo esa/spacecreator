@@ -25,6 +25,29 @@ QPainterPath lineShape(const QLineF &line, qreal span)
 }
 
 /*!
+   Constructs a rectangular octagon. \p rect gives the size and \p cut is the length (in x and y) of the cut.
+ */
+QPainterPath edgeCuttedRectShape(const QRectF &rect, qreal cut)
+{
+    QPainterPath result;
+
+    const QPointF hcut(cut, 0.);
+    const QPointF vcut(0., cut);
+
+    result.moveTo(rect.topLeft() + hcut);
+    result.lineTo(rect.topRight() - hcut);
+    result.lineTo(rect.topRight() + vcut);
+    result.lineTo(rect.bottomRight() - vcut);
+    result.lineTo(rect.bottomRight() - hcut);
+    result.lineTo(rect.bottomLeft() + hcut);
+    result.lineTo(rect.bottomLeft() - vcut);
+    result.lineTo(rect.topLeft() + vcut);
+    result.lineTo(rect.topLeft() + hcut);
+
+    return result;
+}
+
+/*!
  * \brief Helper to detect if the \a line intersects the \a rect.
  * Coordinates of the intersection point stored in \a intersectPos.
  * Returns \c true if \a rect and \a line are not null and intersected.

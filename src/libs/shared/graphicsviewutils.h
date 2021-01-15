@@ -9,6 +9,7 @@ namespace shared {
 namespace graphicsviewutils {
 
 QPainterPath lineShape(const QLineF &line, qreal span);
+QPainterPath edgeCuttedRectShape(const QRectF &rect, qreal cut);
 
 bool intersects(const QRectF &rect, const QLineF &line, QPointF *intersectPos = nullptr);
 bool intersects(const QRectF &rect, const QPolygonF &polygon, QPointF *intersectPos = nullptr);
