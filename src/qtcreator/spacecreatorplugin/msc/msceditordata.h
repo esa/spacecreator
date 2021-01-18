@@ -19,8 +19,8 @@
 
 #include <QPointer>
 #include <QSharedPointer>
-#include <coreplugin/icontext.h>
 
+class QAction;
 class QUndoGroup;
 
 namespace msc {
@@ -56,7 +56,6 @@ private Q_SLOTS:
 
 private:
     MscContext *m_context = nullptr;
-    Core::Context m_contexts;
     QUndoGroup *m_undoGroup = nullptr;
 
     bool m_minimapVisible = false;

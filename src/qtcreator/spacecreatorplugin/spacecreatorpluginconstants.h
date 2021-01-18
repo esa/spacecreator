@@ -27,26 +27,23 @@ const char AADL_MIMETYPE[] = "application/xml";
 
 const char INFO_READ_ONLY[] = "SpaceCreator.ReadOnly";
 
-const char K_MSC_EDITOR_ID[] = "MscEditor.Editor";
-const char C_MSC_EDITOR[] = "Msc Editor";
+const char K_MSC_EDITOR_ID[] = "SpaceCreator.MscEditor";
 
 const char C_MSCEDITOR_DISPLAY_NAME[] = QT_TRANSLATE_NOOP("OpenWith::Editors", "Msc Editor");
 
-const char K_AADL_EDITOR_ID[] = "AadlEditor.Editor";
-const char C_AADL_EDITOR[] = "AADL Editor";
+const char K_AADL_EDITOR_ID[] = "SpaceCreator.AadlEditor";
 
 const char C_AADLEDITOR_DISPLAY_NAME[] = QT_TRANSLATE_NOOP("OpenWith::Editors", "AADL Editor");
 
 // Menu
 const char MENU_ID[] = "SpaceCreator.Menu";
-const char SHOW_MINIMAP_ID[] = "MscEditor.Minimap";
+const char SHOW_MINIMAP_ID[] = "SpaceCreator.Minimap";
 const char SHOW_E2E_ID[] = "SpaceCreator.E2EDataflow";
 const char MESSAGE_DECLARATIONS_ID[] = "MscEditor.MessageDeclarations";
 const char CHECK_INSTANCES_ID[] = "MscEditor.CheckInstances";
 const char CHECK_MESSAGES_ID[] = "MscEditor.CheckMessages";
 const char AADL_SHOW_ASN1_ID[] = "AadlEditor.ShowAsn1";
 const char AADL_RENDER_ID[] = "AadlEditor.RenderToFile";
-const char AADL_SHOW_MINIMAP_ID[] = "AadlEditor.Minimap";
 const char AADL_SHOW_COMMON_PROPS_ID[] = "AadlEditor.CommonProps";
 const char AADL_SHOW_COLOR_SCHEME_ID[] = "AadlEditor.ColorScheme";
 const char AADL_SHOW_DYN_CONTEXT_ID[] = "AadlEditor.DynContext";

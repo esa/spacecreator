@@ -21,6 +21,7 @@
 
 #include <QAction>
 #include <QApplication>
+#include <QKeySequence>
 #include <QMainWindow>
 #include <QMenuBar>
 #include <QMessageBox>
@@ -80,8 +81,12 @@ void EditorCore::initMenus(QMainWindow *window)
 
     // Initialize the edit menu
     menu = window->menuBar()->addMenu(tr("Edit"));
-    menu->addAction(actionUndo());
-    menu->addAction(actionRedo());
+    QAction *undoAction = actionUndo();
+    undoAction->setShortcut(QKeySequence::Undo);
+    menu->addAction(undoAction);
+    QAction *redoAction = actionRedo();
+    redoAction->setShortcut(QKeySequence::Redo);
+    menu->addAction(redoAction);
     addMenuEditActions(menu, window);
 
     // Initialize the view menu
@@ -161,7 +166,6 @@ QAction *EditorCore::actionUndo()
 {
     if (m_actionUndo == nullptr) {
         m_actionUndo = undoStack()->createUndoAction(this);
-        m_actionUndo->setShortcut(QKeySequence::Undo);
         m_actionUndo->setIcon(QIcon::fromTheme("edit-undo", QIcon(QLatin1String(":/sharedresources/icons/undo.svg"))));
     }
     return m_actionUndo;
@@ -171,7 +175,6 @@ QAction *EditorCore::actionRedo()
 {
     if (m_actionRedo == nullptr) {
         m_actionRedo = undoStack()->createRedoAction(this);
-        m_actionRedo->setShortcut(QKeySequence::Redo);
         m_actionRedo->setIcon(QIcon::fromTheme("edit-redo", QIcon(QLatin1String(":/sharedresources/icons/redo.svg"))));
     }
     return m_actionRedo;

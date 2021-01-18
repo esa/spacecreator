@@ -29,6 +29,7 @@
 #include <coreplugin/actionmanager/actionmanager.h>
 #include <coreplugin/coreconstants.h>
 #include <coreplugin/editormanager/editormanager.h>
+#include <coreplugin/icontext.h>
 #include <coreplugin/icore.h>
 #include <utils/icon.h>
 #include <utils/utilsicons.h>
@@ -41,8 +42,8 @@ MscEditorData::MscEditorData(MscModelStorage *mscStorage, const QList<QAction *>
     , m_mscStorage(mscStorage)
     , m_mscActions(mscActions)
 {
-    m_contexts.add(spctr::Constants::C_MSC_EDITOR);
-    m_contexts.add(spctr::Constants::K_MSC_EDITOR_ID);
+    Core::Context contexts;
+    contexts.add(spctr::Constants::K_MSC_EDITOR_ID);
 
     QObject::connect(Core::EditorManager::instance(), &Core::EditorManager::currentEditorChanged, this,
             &spctr::MscEditorData::onCurrentEditorChanged);
@@ -55,12 +56,11 @@ MscEditorData::MscEditorData(MscModelStorage *mscStorage, const QList<QAction *>
     redoAction->setIcon(Utils::Icons::REDO_TOOLBAR.icon());
     redoAction->setToolTip(tr("Redo (Ctrl + Y)"));
 
-    Core::ActionManager::registerAction(undoAction, Core::Constants::UNDO, m_contexts);
-    Core::ActionManager::registerAction(redoAction, Core::Constants::REDO, m_contexts);
+    Core::ActionManager::registerAction(undoAction, Core::Constants::UNDO, contexts);
+    Core::ActionManager::registerAction(redoAction, Core::Constants::REDO, contexts);
 
-    Core::Context mscContexts = m_contexts;
-    mscContexts.add(Core::Constants::C_EDITORMANAGER);
-    m_context = new MscContext(mscContexts, nullptr, this);
+    contexts.add(Core::Constants::C_EDITORMANAGER);
+    m_context = new MscContext(contexts, nullptr, this);
     Core::ICore::addContextObject(m_context);
 }
 

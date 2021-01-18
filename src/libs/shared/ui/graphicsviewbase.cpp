@@ -40,6 +40,8 @@ GraphicsViewBase::GraphicsViewBase(QGraphicsScene *scene, QWidget *parent)
     , d(new GraphicsViewBasePrivate)
 {
     setRenderHints(QPainter::Antialiasing | QPainter::TextAntialiasing | QPainter::SmoothPixmapTransform);
+    setDragMode(QGraphicsView::DragMode::RubberBandDrag);
+    setRubberBandSelectionMode(Qt::IntersectsItemShape);
 }
 
 GraphicsViewBase::GraphicsViewBase(QWidget *parent)

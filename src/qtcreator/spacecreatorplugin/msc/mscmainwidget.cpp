@@ -57,7 +57,6 @@ namespace spctr {
 MscMainWidget::MscMainWidget(QWidget *parent)
     : QWidget(parent)
 {
-    init();
 }
 
 MscMainWidget::~MscMainWidget()
@@ -211,9 +210,9 @@ void MscMainWidget::init()
     onViewModeChanged();
 
     auto centerView = new QStackedWidget(editorsWidgets);
-    auto graphicsView = new msc::GraphicsView(editorsWidgets);
+    auto graphicsView = new msc::GraphicsView(centerView);
     centerView->addWidget(graphicsView);
-    auto hierarchyView = new msc::GraphicsView(editorsWidgets);
+    auto hierarchyView = new msc::GraphicsView(centerView);
     centerView->addWidget(hierarchyView);
     editorsLayout->addWidget(centerView);
 

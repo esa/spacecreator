@@ -35,9 +35,6 @@ GraphicsView::GraphicsView(QWidget *parent)
     setTransformationAnchor(QGraphicsView::AnchorUnderMouse);
     setResizeAnchor(QGraphicsView::AnchorUnderMouse);
 
-    setDragMode(QGraphicsView::DragMode::RubberBandDrag);
-    setRubberBandSelectionMode(Qt::IntersectsItemShape);
-
     setAcceptDrops(true);
 }
 

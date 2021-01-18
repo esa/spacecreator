@@ -32,6 +32,7 @@
 #include "spacecreatorpluginconstants.h"
 
 #include <QFileInfo>
+#include <QToolBar>
 #include <QUndoCommand>
 #include <utils/qtcassert.h>
 
@@ -40,12 +41,12 @@ namespace spctr {
 AadlQtCEditor::AadlQtCEditor(
         AadlModelStorage *aadlStorage, MscModelStorage *mscStorage, const QList<QAction *> &ivActions)
     : Core::IEditor()
+    , m_document(new AadlEditorDocument(aadlStorage, this))
     , m_editorWidget(new AadlMainWidget)
     , m_mscStorage(mscStorage)
     , m_globalToolbarActions(ivActions)
 {
     setContext(Core::Context(spctr::Constants::K_AADL_EDITOR_ID));
-    m_document = new AadlEditorDocument(aadlStorage, this);
     setWidget(m_editorWidget);
 
     connect(m_document, &spctr::AadlEditorDocument::ivDataLoaded, this,
