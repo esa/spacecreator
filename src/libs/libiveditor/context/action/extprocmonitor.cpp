@@ -79,7 +79,7 @@ void ExtProcMonitor::onErrorOccurred(QProcess::ProcessError error)
 
 void ExtProcMonitor::onFinished(int exitCode, QProcess::ExitStatus exitStatus)
 {
-    if (exitStatus == QProcess::NormalExit) {
+    if (exitStatus == QProcess::NormalExit && exitCode == 0) {
         close();
         return;
     }
