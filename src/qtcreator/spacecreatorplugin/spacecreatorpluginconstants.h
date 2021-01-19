@@ -17,6 +17,7 @@
 
 #pragma once
 
+#include <QString>
 #include <QtGlobal>
 
 namespace spctr {
@@ -47,6 +48,13 @@ const char AADL_RENDER_ID[] = "AadlEditor.RenderToFile";
 const char AADL_SHOW_COMMON_PROPS_ID[] = "AadlEditor.CommonProps";
 const char AADL_SHOW_COLOR_SCHEME_ID[] = "AadlEditor.ColorScheme";
 const char AADL_SHOW_DYN_CONTEXT_ID[] = "AadlEditor.DynContext";
+
+// Settings
+const char SETTINGS_CATEGORY_DISPLAY[] = QT_TRANSLATE_NOOP("SpaceCreator", "SpaceCreator");
+const char SETTINGS_ASN1_ID[] = "A.SpaceCreator.Asn1";
+const char SETTINGS_CATEGORY[] = "K.SpaceCreator";
+const QString SETTINGS_ASN_COMPILER_KEY = { "SpaceCreator/asn1compiler" };
+const QString SETTINGS_ASN_COMPILER_PARAMETER_KEY = { "SpaceCreator/asn1compilerparameter" };
 
 }
 }

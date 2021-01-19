@@ -17,7 +17,6 @@
 
 #include "asn1editor.h"
 
-#include "asn1reader.h"
 #include "asn1treeview.h"
 #include "asn1valueparser.h"
 #include "file.h"

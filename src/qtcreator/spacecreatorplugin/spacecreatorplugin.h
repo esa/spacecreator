@@ -17,6 +17,7 @@
 
 #pragma once
 
+#include "options/asn1sccoption.h"
 #include "spacecreatorplugin_global.h"
 
 #include <QSharedPointer>
@@ -97,6 +98,8 @@ private:
     DeploymentModelStorage *m_deploymentStorage = nullptr;
     QStringList m_asnFiles;
     MscSystemChecks *m_checks = nullptr;
+
+    Asn1SccOption m_asnCommandOptions;
 };
 
 }

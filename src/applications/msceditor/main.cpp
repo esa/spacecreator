@@ -16,10 +16,11 @@
 */
 
 #include "commandlineparser.h"
+#include "iveditor.h"
 #include "mainwindow.h"
 #include "msceditor.h"
-#include "msclibrary.h"
 #include "msceditorcore.h"
+#include "msclibrary.h"
 #include "mscwriter.h"
 #include "sharedlibrary.h"
 
@@ -33,6 +34,7 @@ int main(int argc, char *argv[])
     shared::initSharedLibrary();
     msc::initMscLibrary();
     msc::initMscEditor();
+    aadlinterface::initIvEditor();
 
     QApplication a(argc, argv);
     a.setOrganizationName(SC_ORGANISATION);

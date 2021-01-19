@@ -27,14 +27,20 @@
 #include <QFileInfo>
 #include <QProcess>
 #include <QRandomGenerator>
+#include <QSettings>
 #include <QStandardPaths>
 #include <QTemporaryDir>
 
 namespace Asn1Acn {
 
-QString Asn1Reader::m_asn1Compiler {};
-QString Asn1Reader::m_mono {};
+QString Asn1Reader::m_mono;
 QCache<QString, QString> Asn1Reader::m_cache {};
+
+#ifdef Q_OS_WIN
+static const QString defaultParameter("-customStg \"%1xml.stg\"::");
+#else
+static const QString defaultParameter("-customStg %1/xml.stg:");
+#endif
 
 Asn1Reader::Asn1Reader(QObject *parent)
     : QObject(parent)
@@ -206,8 +212,12 @@ QString Asn1Reader::asn1AsHtml(const QString &filename) const
         return {};
     }
 
-    checkforCompiler();
-    if (!m_asn1Compiler.isEmpty()) {
+    QSettings settings;
+    QString asn1Compiler = settings.value("SpaceCreator/asn1compiler").toString();
+    if (asn1Compiler.isEmpty() || !QFile::exists(asn1Compiler)) {
+        asn1Compiler = checkforCompiler();
+    }
+    if (!asn1Compiler.isEmpty()) {
         const QString prettyPrintFileName = temporaryFileName("pretty_print", "stg");
         const QString asn1HtmlFileName = temporaryFileName("asn1", "html");
 
@@ -231,7 +241,7 @@ QString Asn1Reader::asn1AsHtml(const QString &filename) const
         QString cmd = QString("asn1 -customStg \"%1::%2 %3\"").arg(prettyPrintFileName, asn1HtmlFileName, filename);
 #else
         QString cmd = QString("%1 %2 -customIcdUper %3::%4 %5")
-                              .arg(m_mono, m_asn1Compiler, prettyPrintFileName, asn1HtmlFileName, filename);
+                              .arg(m_mono, asn1Compiler, prettyPrintFileName, asn1HtmlFileName, filename);
 #endif
         QProcess process;
         process.setProcessEnvironment(QProcessEnvironment::systemEnvironment());
@@ -257,63 +267,75 @@ QString Asn1Reader::asn1AsHtml(const QString &filename) const
     }
 }
 
-void Asn1Reader::checkforCompiler() const
+QString Asn1Reader::checkforCompiler() const
 {
 #ifdef Q_OS_WIN
-    if (m_asn1Compiler.isEmpty()) {
-        QProcess process;
-        process.start(QString("where asn1"));
-        process.waitForFinished();
-        QString asn1Exec = process.readAll();
-        asn1Exec.remove("\r\n");
-        asn1Exec.remove("asn1.exe");
-        if (asn1Exec.isEmpty()) {
-            qWarning() << tr("Unable to find the asn1scc compiler");
-            return;
-        }
-        m_asn1Compiler = asn1Exec;
+    QProcess process;
+    process.start(QString("where asn1"));
+    process.waitForFinished();
+    QString asn1Exec = process.readAll();
+    asn1Exec.remove("\r\n");
+    asn1Exec.remove("asn1.exe");
+    if (asn1Exec.isEmpty()) {
+        qWarning() << tr("Unable to find the asn1scc compiler");
+        return {};
     }
+    return asn1Exec;
 #else
-    if (m_asn1Compiler.isEmpty()) {
-        QProcess process;
-        process.start(QString("which asn1.exe"));
-        process.waitForFinished();
-        QString asn1Exec = process.readAll();
-        asn1Exec.remove('\n');
-        if (asn1Exec.isEmpty()) {
-            qWarning() << tr("Unable to find the asn1scc compiler");
-            return;
-        }
-        m_asn1Compiler = asn1Exec;
+    QProcess process;
+    process.start(QString("which asn1.exe"));
+    process.waitForFinished();
+    QString asn1Exec = process.readAll();
+    asn1Exec.remove('\n');
+    if (asn1Exec.isEmpty()) {
+        qWarning() << tr("Unable to find the asn1scc compiler");
+        return {};
     }
 
+    process.start(QString("which mono"));
+    process.waitForFinished();
+    m_mono = process.readAll();
+    m_mono.remove('\n');
     if (m_mono.isEmpty()) {
-        QProcess process;
-        process.start(QString("which mono"));
-        process.waitForFinished();
-        QString monoExec = process.readAll();
-        monoExec.remove('\n');
-        if (monoExec.isEmpty()) {
-            qWarning() << tr("Unable to find the mono framework to run the asn1scc compiler");
-            return;
-        }
-        m_mono = monoExec;
+        qWarning() << tr("Unable to find the mono framework to run the asn1scc compiler");
+        return {};
     }
+
+    return asn1Exec;
 #endif
+}
+
+QString Asn1Reader::defaultParameter() const
+{
+    return Asn1Acn::defaultParameter;
 }
 
 QString Asn1Reader::asn1CompilerCommand() const
 {
-    checkforCompiler();
-    if (!m_asn1Compiler.isEmpty()) {
-        QFileInfo asnFile(m_asn1Compiler);
-#ifdef Q_OS_WIN
-        return QString("%1 -customStg \"%2xml.stg\"::").arg(m_asn1Compiler, asnFile.path());
-#else
-        return QString("%1 %2 -customStg %3/xml.stg:").arg(m_mono, m_asn1Compiler, asnFile.path());
-#endif
-    } else
+    QSettings settings;
+    QString asn1Compiler = settings.value("SpaceCreator/asn1compiler").toString();
+    QString parameter = settings.value("SpaceCreator/asn1compilerparameter").toString();
+
+    if (asn1Compiler.isEmpty() || !QFile::exists(asn1Compiler)) {
+        asn1Compiler = checkforCompiler();
+    }
+
+    if (parameter.isEmpty()) {
+        parameter = defaultParameter();
+    }
+
+    if (!asn1Compiler.isEmpty()) {
+        QFileInfo asnFile(asn1Compiler);
+        const QString param = parameter.contains("%1") ? parameter.arg(asnFile.path()) : parameter;
+        if (m_mono.isEmpty()) {
+            return QString("%1 %2").arg(asn1Compiler, param);
+        } else {
+            return QString("%1 %2 %3").arg(m_mono, asn1Compiler, param);
+        }
+    } else {
+        qWarning() << "No asn1scc compiler found";
         return {};
+    }
 }
 
 QString Asn1Reader::temporaryFileName(const QString &basename, const QString &suffix) const
@@ -335,17 +357,14 @@ QByteArray Asn1Reader::fileHash(const QString &fileName) const
 
 bool Asn1Reader::convertToXML(const QString &asn1FileName, const QString &xmlFilename, QStringList *errorMessages) const
 {
-    static QString asn1Command;
-    if (asn1Command.isEmpty()) {
-        QString cmd = asn1CompilerCommand();
-        if (cmd.isEmpty()) {
-            if (errorMessages)
-                errorMessages->append(tr(
-                        "ASN1 parse error: Unable to run the asn1scc compiler. https://github.com/ttsiodras/asn1scc"));
-            return false;
-        }
-        asn1Command = cmd + "%1 %2";
+    QString cmd = asn1CompilerCommand();
+    if (cmd.isEmpty()) {
+        if (errorMessages)
+            errorMessages->append(
+                    tr("ASN1 parse error: Unable to run the asn1scc compiler. https://github.com/ttsiodras/asn1scc"));
+        return false;
     }
+    QString asn1Command = cmd + "%1 %2";
 
     QString asn1FileNameParameter = "\"" + asn1FileName + "\"";
     QString asn1XMLFileName = temporaryFileName("asn1", "xml");
@@ -388,4 +407,4 @@ bool Asn1Reader::convertToXML(const QString &asn1FileName, const QString &xmlFil
     return QFile::exists(xmlFilename);
 }
 
-} // namespace asn1
+}

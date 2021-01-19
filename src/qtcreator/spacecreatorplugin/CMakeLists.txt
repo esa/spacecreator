@@ -32,6 +32,11 @@ set(SC_PLUGIN_SOURCES
     msc/mscmainwidget.h
     msc/mscqtceditor.cpp
     msc/mscqtceditor.h
+    options/asn1sccoption.cpp
+    options/asn1sccoption.h
+    options/asn1sccoptionwidget.cpp
+    options/asn1sccoptionwidget.h
+    options/asn1sccoptionwidget.ui
     mscmodelstorage.cpp
     mscmodelstorage.h
     mscsystemchecks.cpp
@@ -76,3 +81,6 @@ target_include_directories(${PLUGIN_NAME}
     PRIVATE ${QTC_SOURCE_DIR}/src/plugins/qtsupport
     PRIVATE ${QTC_SOURCE_DIR}/src/plugins/texteditor
 )
+
+source_group("Designer Files" REGULAR_EXPRESSION ".*.ui$")
+source_group("Resource Files" REGULAR_EXPRESSION ".*.qrc$")

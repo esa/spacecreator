@@ -20,7 +20,6 @@
 #include "MscBaseVisitor.h"
 #include "MscLexer.h"
 #include "MscParser.h"
-#include "asn1reader.h"
 #include "exceptions.h"
 #include "mscdocument.h"
 #include "mscerrorlistener.h"
