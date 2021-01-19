@@ -203,7 +203,12 @@ aadl::ValidationResult validateConnectionCreate(QGraphicsScene *scene, const QVe
     const auto startIfaceItem = qgraphicsitem_cast<aadlinterface::AADLInterfaceGraphicsItem *>(
             aadlinterface::nearestItem(scene, aadlinterface::adjustFromPoint(startPos, kInterfaceTolerance),
                     { aadlinterface::AADLInterfaceGraphicsItem::Type }));
-    if (startIfaceItem && startIfaceItem->ifaceShape().contains(startPos)) {
+    if (startIfaceItem
+            && startIfaceItem->ifaceShape()
+                       .boundingRect()
+                       .adjusted(-kInterfaceTolerance / 2, -kInterfaceTolerance / 2, kInterfaceTolerance / 2,
+                               kInterfaceTolerance / 2)
+                       .contains(startPos)) {
         result.startIface = startIfaceItem->entity();
         result.startPointAdjusted =
                 startIfaceItem->connectionEndPoint(result.functionAtStartPos->isAncestorOf(result.functionAtEndPos));
@@ -221,7 +226,12 @@ aadl::ValidationResult validateConnectionCreate(QGraphicsScene *scene, const QVe
     const auto endIfaceItem = qgraphicsitem_cast<aadlinterface::AADLInterfaceGraphicsItem *>(
             aadlinterface::nearestItem(scene, aadlinterface::adjustFromPoint(endPos, kInterfaceTolerance),
                     { aadlinterface::AADLInterfaceGraphicsItem::Type }));
-    if (endIfaceItem && endIfaceItem->ifaceShape().contains(endPos)) {
+    if (endIfaceItem
+            && endIfaceItem->ifaceShape()
+                       .boundingRect()
+                       .adjusted(-kInterfaceTolerance / 2, -kInterfaceTolerance / 2, kInterfaceTolerance / 2,
+                               kInterfaceTolerance / 2)
+                       .contains(endPos)) {
         result.endIface = endIfaceItem->entity();
         result.endPointAdjusted =
                 endIfaceItem->connectionEndPoint(result.functionAtEndPos->isAncestorOf(result.functionAtStartPos));

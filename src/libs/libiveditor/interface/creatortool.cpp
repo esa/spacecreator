@@ -363,9 +363,8 @@ bool CreatorTool::onMousePress(QMouseEvent *e)
     }
 
     if (d->toolType == ToolType::DirectConnection && e->button() != Qt::RightButton) {
-        static const QList<int> functionItemsOnly { static_cast<int>(AADLFunctionGraphicsItem::Type) };
-        if (!nearestItem(scene, scenePos, functionItemsOnly)) {
-            if (!nearestItem(scene, scenePos, kInterfaceTolerance / 2, functionItemsOnly))
+        if (!nearestItem(scene, scenePos, { AADLFunctionGraphicsItem::Type })) {
+            if (!nearestItem(scene, scenePos, kInterfaceTolerance, { AADLInterfaceGraphicsItem::Type }))
                 return false;
         }
 
@@ -477,7 +476,7 @@ bool CreatorTool::onMouseMove(QMouseEvent *e)
 
                     if (item->parentItem() == d->previewItem->parentItem()
                             || (d->previewItem->parentItem() == item
-                                    && !item->sceneBoundingRect().contains(expandedGeometry))) {
+                                       && !item->sceneBoundingRect().contains(expandedGeometry))) {
                         items.insert(iObjItem);
                     }
                 });
