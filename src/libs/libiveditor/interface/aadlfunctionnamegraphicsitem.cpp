@@ -18,8 +18,11 @@
 
 #include "aadlfunctionnamegraphicsitem.h"
 
+#include "aadlnamevalidator.h"
+
 #include <QApplication>
 #include <QFont>
+#include <QRegularExpression>
 #include <QTextDocument>
 
 namespace aadlinterface {
@@ -33,6 +36,8 @@ AADLFunctionNameGraphicsItem::AADLFunctionNameGraphicsItem(QGraphicsItem *parent
     setBackgroundColor(Qt::transparent);
     setFlags(QGraphicsItem::ItemIsSelectable);
     setTextWrapMode(QTextOption::WrapAnywhere);
+
+    setInputValidationPattern("[a-zA-Z0-9 ]");
 }
 
 void AADLFunctionNameGraphicsItem::mousePressEvent(QGraphicsSceneMouseEvent *event)
@@ -46,6 +51,12 @@ void AADLFunctionNameGraphicsItem::mousePressEvent(QGraphicsSceneMouseEvent *eve
 void AADLFunctionNameGraphicsItem::mouseDoubleClickEvent(QGraphicsSceneMouseEvent *event)
 {
     QGraphicsTextItem::mouseDoubleClickEvent(event);
+}
+
+bool AADLFunctionNameGraphicsItem::validateText(const QString &text) const
+{
+    QRegularExpression re(aadl::AADLNameValidator::namePatternUI());
+    return re.match(text).hasMatch();
 }
 
 }

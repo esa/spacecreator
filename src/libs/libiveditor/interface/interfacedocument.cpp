@@ -836,19 +836,21 @@ bool InterfaceDocument::loadImpl(const QString &path)
 
 QVector<QAction *> InterfaceDocument::initActions()
 {
+    if (d->tool != nullptr) {
+        return d->m_toolbarActions;
+    }
+
     auto actionGroup = new QActionGroup(this);
     actionGroup->setExclusive(true);
 
-    if (!d->tool) {
-        d->tool = new CreatorTool(this);
-        connect(d->tool, &CreatorTool::created, this, [this, actionGroup]() {
-            if (QAction *currentAction = actionGroup->checkedAction())
-                currentAction->setChecked(false);
-            d->tool->setCurrentToolType(CreatorTool::ToolType::Pointer);
-        });
-        connect(d->tool, &CreatorTool::propertyEditorRequest, this, &InterfaceDocument::showPropertyEditor);
-        connect(d->tool, &CreatorTool::informUser, this, &InterfaceDocument::showInfoMessage);
-    }
+    d->tool = new CreatorTool(this);
+    connect(d->tool, &CreatorTool::created, this, [this, actionGroup]() {
+        if (QAction *currentAction = actionGroup->checkedAction())
+            currentAction->setChecked(false);
+        d->tool->setCurrentToolType(CreatorTool::ToolType::Pointer);
+    });
+    connect(d->tool, &CreatorTool::propertyEditorRequest, this, &InterfaceDocument::showPropertyEditor);
+    connect(d->tool, &CreatorTool::informUser, this, &InterfaceDocument::showInfoMessage);
 
     auto actCreateFunctionType = new QAction(tr("Function Type"));
     ActionsManager::registerAction(Q_FUNC_INFO, actCreateFunctionType, "Function Type", "Create FunctionType object");

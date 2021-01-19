@@ -79,7 +79,7 @@ void AADLFunctionTypeGraphicsItem::init()
                 }
             });
     connect(entity(), &aadl::AADLObjectFunction::titleChanged, this, [this](const QString &text) {
-        m_textItem->setPlainText(text);
+        m_textItem->setPlainText(aadl::AADLNameValidator::decodeName(m_dataObject->aadlType(), text));
         instantLayoutUpdate();
     });
     connect(m_textItem, &AADLFunctionNameGraphicsItem::textChanged, this, [this]() { updateTextPosition(); });
@@ -161,11 +161,12 @@ void AADLFunctionTypeGraphicsItem::updateNameFromUi(const QString &name)
     if (name == entity()->titleUI()) {
         return;
     }
-    if (!aadl::AADLNameValidator::isAcceptableName(entity(), name)) {
+
+    const QString newName = aadl::AADLNameValidator::encodeName(aadlObject()->aadlType(), name);
+    if (!aadl::AADLNameValidator::isAcceptableName(entity(), newName)) {
         m_textItem->setPlainText(entity()->titleUI());
         return;
     }
-    const QString newName = aadl::AADLNameValidator::encodeName(aadlObject()->aadlType(), name);
     if (entity()->objectsModel()->nestedFunctionNames().contains(newName)) {
         m_textItem->setPlainText(entity()->titleUI());
         return;

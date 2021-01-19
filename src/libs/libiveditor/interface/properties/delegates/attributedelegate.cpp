@@ -18,17 +18,19 @@
 #include "attributedelegate.h"
 
 #include "aadlcommonprops.h"
+#include "aadlnamevalidator.h"
 #include "aadlobject.h"
 #include "aadlobjectsmodel.h"
+#include "interface/properties/propertieslistmodel.h"
 #include "propertytemplate.h"
 #include "propertytemplateconfig.h"
-#include "interface/properties/propertieslistmodel.h"
 
 #include <QCheckBox>
 #include <QComboBox>
 #include <QDoubleSpinBox>
 #include <QLineEdit>
-#include <QRegExpValidator>
+#include <QRegularExpression>
+#include <QRegularExpressionValidator>
 #include <QSpinBox>
 
 namespace aadlinterface {
@@ -38,7 +40,8 @@ AttributeDelegate::AttributeDelegate(QObject *parent)
 {
 }
 
-static QWidget *createConfiguredEditor(const QVariant &displayValue, const QVariant &editValue, QWidget *parent)
+static QWidget *createConfiguredEditor(
+        const QVariant &displayValue, const QVariant &editValue, QWidget *parent, const QString &attribute)
 {
     if (editValue.type() == QVariant::Invalid)
         return nullptr;
@@ -53,6 +56,10 @@ static QWidget *createConfiguredEditor(const QVariant &displayValue, const QVari
     }
     case QVariant::String: {
         auto editor = new QLineEdit(parent);
+        if (attribute == aadl::meta::Props::token(aadl::meta::Props::Token::name)) {
+            QRegularExpression re(aadl::AADLNameValidator::namePatternUI());
+            editor->setValidator(new QRegularExpressionValidator(re, editor));
+        }
         editor->setText(displayValue.toString());
         return editor;
     }
@@ -87,8 +94,9 @@ QWidget *AttributeDelegate::createEditor(
     if (index.column() == PropertiesListModel::ColumnValue) {
         if (const auto pModel = qobject_cast<const QStandardItemModel *>(index.model())) {
             if (QStandardItem *item = pModel->itemFromIndex(index)) {
-                return createConfiguredEditor(
-                        item->data(Qt::EditRole), item->data(PropertiesListModel::PropertyDataRole), parent);
+                QModelIndex attrIdx = index.siblingAtColumn(PropertiesListModel::ColumnTitle);
+                return createConfiguredEditor(item->data(Qt::EditRole),
+                        item->data(PropertiesListModel::PropertyDataRole), parent, attrIdx.data().toString());
             }
         }
     }

@@ -1,4 +1,5 @@
 add_subdirectory(tst_aadlconnectionchain)
+add_subdirectory(tst_aadlnamevalidator)
 add_subdirectory(tst_aadlobject)
 add_subdirectory(tst_aadlobjectconnection)
 add_subdirectory(tst_aadlobjectfunction)

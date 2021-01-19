@@ -14,10 +14,10 @@
   You should have received a copy of the GNU Library General Public License
   along with this program. If not, see <https://www.gnu.org/licenses/lgpl-2.1.html>.
 */
+
 #include "aadlobject.h"
 #include "aadlobjectfunction.h"
 #include "aadlxmlreader.h"
-#include "iveditor.h"
 #include "xmlcommon.h"
 
 #include <QBuffer>
@@ -28,8 +28,6 @@ class XMLReader : public QObject
 {
     Q_OBJECT
 public:
-    XMLReader();
-
 private:
     void runReader(const XmlFileMock &xml);
 
@@ -40,11 +38,6 @@ private Q_SLOTS:
     void test_readMetaData();
     void test_readFunction();
 };
-
-XMLReader::XMLReader()
-{
-    aadlinterface::initIvEditor();
-}
 
 void XMLReader::runReader(const XmlFileMock &xml)
 {

@@ -426,7 +426,7 @@ void TextItem::onContentsChange(int position, int charsRemoved, int charsAdded)
         }
 
         inputString.append(newChar);
-        if (!validateInput(newChar) && m_filterInvalidText) {
+        if (m_filterInvalidText && !validateInput(newChar)) {
             const QString wrnMsg("Invalid characted '%1' [%2] at #%3 filtered out in '%4'");
             qWarning() << wrnMsg.arg(newChar).arg(newChar.unicode()).arg(i + 1).arg(inputString);
         } else {

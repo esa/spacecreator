@@ -25,10 +25,14 @@
 #include "aadlobjectsmodel.h"
 
 #include <QDebug>
+#include <QRegularExpression>
 
 namespace aadl {
 
 AADLNameValidator *AADLNameValidator::m_instance = nullptr;
+
+static const QString namePattern("^[a-zA-Z][a-zA-Z0-9_]*[a-zA-Z0-9]$");
+static const QString namePatternUI("^[a-zA-Z][a-zA-Z0-9 ]*[a-zA-Z0-9]$");
 
 AADLNameValidator::AADLNameValidator()
     : m_typePrefixes {
@@ -121,26 +125,61 @@ QString AADLNameValidator::decodeName(const AADLObject::Type t, const QString &n
     return name;
 }
 
+/*!
+   Returns is the gieven \p name is usable as name in general.
+ */
+bool AADLNameValidator::isValidName(const QString &name)
+{
+    if (name.isEmpty()) {
+        return false;
+    }
+
+    static QRegularExpression re(aadl::namePattern);
+    QRegularExpressionMatch match = re.match(name);
+    return match.hasMatch();
+}
+
+/*!
+   The regualr expression pattern for aadl names, used for raw/system/model
+ */
+const QString &AADLNameValidator::namePattern()
+{
+    return aadl::namePattern;
+}
+
+/*!
+   The regualr expression pattern for aadl names, used for the UI (encoded name)
+ */
+const QString &AADLNameValidator::namePatternUI()
+{
+    return aadl::namePatternUI;
+}
+
+/*!
+   Check if the name can be used for that object.
+   It checks if the name is usable at all, and if the names is used already by another relevant object
+ */
 bool AADLNameValidator::isAcceptableName(const AADLObject *object, const QString &name)
 {
-    if (!object || name.isEmpty())
+    if (!object || !isValidName(name)) {
         return false;
+    }
 
     const AADLObject::Type t = object->aadlType();
     switch (t) {
     case AADLObject::Type::FunctionType: {
-        return instance()->isValidFunctionTypeName(name, object);
+        return instance()->isFunctionTypeNameUsed(name, object);
     }
     case AADLObject::Type::Function: {
-        return instance()->isValidFunctionName(name, object);
+        return instance()->isFunctionNameUsed(name, object);
     }
     case AADLObject::Type::RequiredInterface: {
         auto parent = object->parentObject() ? object->parentObject()->as<const AADLObjectFunctionType *>() : nullptr;
-        return instance()->isValidRequiredInterfaceName(name, parent);
+        return instance()->isRequiredInterfaceNameUsed(name, parent);
     }
     case AADLObject::Type::ProvidedInterface: {
         auto parent = object->parentObject() ? object->parentObject()->as<const AADLObjectFunctionType *>() : nullptr;
-        return instance()->isValidProvidedInterfaceName(name, parent);
+        return instance()->isProvidedInterfaceNameUsed(name, parent);
     }
     case AADLObject::Type::InterfaceGroup:
     case AADLObject::Type::ConnectionGroup:
@@ -396,7 +435,7 @@ QString AADLNameValidator::nameConnection(const AADLObject *connection) const
     return {};
 }
 
-bool AADLNameValidator::isValidFunctionTypeName(const QString &name, const AADLObject *fnType) const
+bool AADLNameValidator::isFunctionTypeNameUsed(const QString &name, const AADLObject *fnType) const
 {
     if (name.isEmpty() || !fnType) {
         return false;
@@ -429,7 +468,7 @@ bool AADLNameValidator::isValidFunctionTypeName(const QString &name, const AADLO
     return true;
 }
 
-bool AADLNameValidator::isValidFunctionName(const QString &name, const AADLObject *function) const
+bool AADLNameValidator::isFunctionNameUsed(const QString &name, const AADLObject *function) const
 {
     if (name.isEmpty() || !function) {
         return false;
@@ -460,7 +499,7 @@ bool AADLNameValidator::isValidFunctionName(const QString &name, const AADLObjec
     return true;
 }
 
-bool AADLNameValidator::isValidRequiredInterfaceName(const QString &name, const AADLObjectFunctionType *parent) const
+bool AADLNameValidator::isRequiredInterfaceNameUsed(const QString &name, const AADLObjectFunctionType *parent) const
 {
     if (name.isEmpty()) {
         return false;
@@ -475,7 +514,7 @@ bool AADLNameValidator::isValidRequiredInterfaceName(const QString &name, const 
     return true;
 }
 
-bool AADLNameValidator::isValidProvidedInterfaceName(const QString &name, const AADLObjectFunctionType *parent) const
+bool AADLNameValidator::isProvidedInterfaceNameUsed(const QString &name, const AADLObjectFunctionType *parent) const
 {
     if (name.isEmpty()) {
         return false;

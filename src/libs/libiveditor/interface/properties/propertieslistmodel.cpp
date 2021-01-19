@@ -230,9 +230,11 @@ bool PropertiesListModel::setData(const QModelIndex &index, const QVariant &valu
             QVariant attributeValue = value;
             switch (tokenFromIndex(index)) {
             case aadl::meta::Props::Token::name: {
-                if (!aadl::AADLNameValidator::isAcceptableName(m_dataObject, value.toString()))
-                    return false; // TODO: move to editor's validator
-                attributeValue = aadl::AADLNameValidator::encodeName(m_dataObject->aadlType(), value.toString());
+                const QString newName = aadl::AADLNameValidator::encodeName(m_dataObject->aadlType(), value.toString());
+                if (!aadl::AADLNameValidator::isAcceptableName(m_dataObject, newName)) {
+                    return false;
+                }
+                attributeValue = newName;
                 break;
             }
             default:
