@@ -40,20 +40,20 @@ private Q_SLOTS:
     void testConnectionQuery();
 
 private:
-    QScopedPointer<aadl::PropertyTemplateConfig> m_dynPropConfig;
+    aadl::PropertyTemplateConfig *m_dynPropConfig;
     QScopedPointer<aadl::AADLObjectsModel> m_model;
 };
 
 void tst_AADLObjectsModel::init()
 {
-    m_dynPropConfig.reset(new aadl::PropertyTemplateConfig);
+    m_dynPropConfig = aadl::PropertyTemplateConfig::instance();
     m_dynPropConfig->init(QLatin1String("default_attributes.xml"));
-    m_model.reset(new aadl::AADLObjectsModel(m_dynPropConfig.data()));
+    m_model.reset(new aadl::AADLObjectsModel(m_dynPropConfig));
 }
 
 void tst_AADLObjectsModel::testManageContainers()
 {
-    aadl::AADLObjectsModel model(m_dynPropConfig.data());
+    aadl::AADLObjectsModel model(m_dynPropConfig);
 
     QCOMPARE(model.objects().size(), 0);
 
@@ -124,7 +124,7 @@ void tst_AADLObjectsModel::testManageContainers()
 
 void tst_AADLObjectsModel::testManageFunctions()
 {
-    aadl::AADLObjectsModel model(m_dynPropConfig.data());
+    aadl::AADLObjectsModel model(m_dynPropConfig);
 
     QCOMPARE(model.objects().size(), 0);
 
@@ -191,7 +191,7 @@ void tst_AADLObjectsModel::testManageFunctions()
 
 void tst_AADLObjectsModel::testManageIfaces()
 {
-    aadl::AADLObjectsModel model(m_dynPropConfig.data());
+    aadl::AADLObjectsModel model(m_dynPropConfig);
 
     QCOMPARE(model.objects().size(), 0);
 
@@ -274,7 +274,7 @@ void tst_AADLObjectsModel::testManageIfaces()
 
 void tst_AADLObjectsModel::testManageMixed()
 {
-    aadl::AADLObjectsModel model(m_dynPropConfig.data());
+    aadl::AADLObjectsModel model(m_dynPropConfig);
 
     QCOMPARE(model.objects().size(), 0);
 

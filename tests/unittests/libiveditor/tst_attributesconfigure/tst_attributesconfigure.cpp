@@ -15,9 +15,9 @@
    along with this program. If not, see <https://www.gnu.org/licenses/lgpl-2.1.html>.
 */
 
+#include "iveditor.h"
 #include "propertytemplate.h"
 #include "propertytemplateconfig.h"
-#include "iveditor.h"
 
 #include <QDomDocument>
 #include <QMetaEnum>
@@ -33,13 +33,13 @@ private Q_SLOTS:
     void tst_loadImpl();
 
 private:
-    QScopedPointer<aadl::PropertyTemplateConfig> m_dynPropConfig;
+    aadl::PropertyTemplateConfig *m_dynPropConfig;
 };
 
 void tst_AttributesConfigure::initTestCase()
 {
     aadlinterface::initIvEditor();
-    m_dynPropConfig.reset(new aadl::PropertyTemplateConfig);
+    m_dynPropConfig = aadl::PropertyTemplateConfig::instance();
     m_dynPropConfig->init(QLatin1String("default_attributes.xml"));
 }
 

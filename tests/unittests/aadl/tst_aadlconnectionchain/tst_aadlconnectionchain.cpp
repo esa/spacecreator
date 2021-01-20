@@ -88,8 +88,8 @@ void tst_AADLConnectionChain::test3StraightConnections()
 {
     const QStringList expectedChain = { "MiniA", "BlockA", "BlockB", "MiniB" };
 
-    aadl::PropertyTemplateConfig conf;
-    aadl::AADLObjectsModel model(&conf);
+    aadl::PropertyTemplateConfig *conf = aadl::PropertyTemplateConfig::instance();
+    aadl::AADLObjectsModel model(conf);
     aadl::AADLXMLReader parser;
     connect(&parser, &aadl::AADLXMLReader::objectsParsed, &model, &aadl::AADLObjectsModel::addObjects);
     parser.readFile(QFINDTESTDATA("connectionchains01.xml"));
@@ -128,8 +128,8 @@ void tst_AADLConnectionChain::test3StraightConnections()
 // MiniA -> BlockA -> BlockB -> MiniB2
 void tst_AADLConnectionChain::testTargetSplitsIntoTwo()
 {
-    aadl::PropertyTemplateConfig conf;
-    aadl::AADLObjectsModel model(&conf);
+    aadl::PropertyTemplateConfig *conf = aadl::PropertyTemplateConfig::instance();
+    aadl::AADLObjectsModel model(conf);
     aadl::AADLXMLReader parser;
     connect(&parser, &aadl::AADLXMLReader::objectsParsed, &model, &aadl::AADLObjectsModel::addObjects);
     parser.readFile(QFINDTESTDATA("connectionchains02.xml"));
@@ -146,8 +146,8 @@ void tst_AADLConnectionChain::testTargetSplitsIntoTwo()
 // MiniA2 -> BlockA -> BlockB -> MiniB1 -> MacroB1
 void tst_AADLConnectionChain::testTargetJoinIntone()
 {
-    aadl::PropertyTemplateConfig conf;
-    aadl::AADLObjectsModel model(&conf);
+    aadl::PropertyTemplateConfig *conf = aadl::PropertyTemplateConfig::instance();
+    aadl::AADLObjectsModel model(conf);
     aadl::AADLXMLReader parser;
     connect(&parser, &aadl::AADLXMLReader::objectsParsed, &model, &aadl::AADLObjectsModel::addObjects);
     parser.readFile(QFINDTESTDATA("connectionchains03.xml"));
@@ -167,8 +167,8 @@ void tst_AADLConnectionChain::testTargetJoinIntone()
 // MiniA1.RI_1->BlockA.RI_1->BlockB.PI_1->MiniB2.PI_1
 void tst_AADLConnectionChain::testChainCreationMultiChainOnInterfaces()
 {
-    aadl::PropertyTemplateConfig conf;
-    aadl::AADLObjectsModel model(&conf);
+    aadl::PropertyTemplateConfig *conf = aadl::PropertyTemplateConfig::instance();
+    aadl::AADLObjectsModel model(conf);
     aadl::AADLXMLReader parser;
     connect(&parser, &aadl::AADLXMLReader::objectsParsed, &model, &aadl::AADLObjectsModel::addObjects);
     parser.readFile(QFINDTESTDATA("connectionchains04.xml"));
@@ -184,8 +184,8 @@ void tst_AADLConnectionChain::testChainCreationMultiChainOnInterfaces()
 // MiniA -> BlockA -> BlockB -> MiniB
 void tst_AADLConnectionChain::testContains()
 {
-    aadl::PropertyTemplateConfig conf;
-    aadl::AADLObjectsModel model(&conf);
+    aadl::PropertyTemplateConfig *conf = aadl::PropertyTemplateConfig::instance();
+    aadl::AADLObjectsModel model(conf);
     aadl::AADLXMLReader parser;
     connect(&parser, &aadl::AADLXMLReader::objectsParsed, &model, &aadl::AADLObjectsModel::addObjects);
     parser.readFile(QFINDTESTDATA("connectionchains01.xml"));
@@ -215,8 +215,8 @@ void tst_AADLConnectionChain::testContains()
 // MiniA -> BlockA -> BlockB -> MiniB
 void tst_AADLConnectionChain::testGetNames()
 {
-    aadl::PropertyTemplateConfig conf;
-    aadl::AADLObjectsModel model(&conf);
+    aadl::PropertyTemplateConfig *conf = aadl::PropertyTemplateConfig::instance();
+    aadl::AADLObjectsModel model(conf);
     aadl::AADLXMLReader parser;
     connect(&parser, &aadl::AADLXMLReader::objectsParsed, &model, &aadl::AADLObjectsModel::addObjects);
     parser.readFile(QFINDTESTDATA("connectionchains01.xml"));

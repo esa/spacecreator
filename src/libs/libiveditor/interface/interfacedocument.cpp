@@ -42,6 +42,7 @@
 #include "interface/colors/colormanagerdialog.h"
 #include "interface/properties/propertiesdialog.h"
 #include "interface/properties/propertytemplatemanager.h"
+#include "interface/properties/propertytemplatewidget.h"
 #include "propertytemplateconfig.h"
 #include "xmldocexporter.h"
 
@@ -65,14 +66,6 @@
 namespace aadlinterface {
 
 static const QString kDefaultFilename { QLatin1String("interfaceview.xml") };
-
-static inline QString dynamicPropertiesFilePath()
-{
-    static const QString kDefaultPath = QStandardPaths::writableLocation(QStandardPaths::AppLocalDataLocation)
-            + QDir::separator() + QLatin1String("default_attributes.xml");
-
-    return qEnvironmentVariable("TASTE_DEFAULT_ATTRIBUTES_PATH", kDefaultPath);
-}
 
 static inline QString componentsLibraryPath()
 {
@@ -135,8 +128,8 @@ InterfaceDocument::InterfaceDocument(QObject *parent)
     d->commandsStack = new QUndoStack(this);
     connect(d->commandsStack, &QUndoStack::cleanChanged, this, [this](bool clean) { Q_EMIT dirtyChanged(!clean); });
 
-    d->dynPropConfig = new aadl::PropertyTemplateConfig;
-    d->dynPropConfig->init(dynamicPropertiesFilePath());
+    d->dynPropConfig = aadl::PropertyTemplateConfig::instance();
+    d->dynPropConfig->init(PropertyTemplateWidget::dynamicPropertiesFilePath());
 
     d->importModel = new aadl::AADLObjectsModel(d->dynPropConfig, this);
     d->sharedModel = new aadl::AADLObjectsModel(d->dynPropConfig, this);
@@ -154,7 +147,6 @@ InterfaceDocument::~InterfaceDocument()
 {
     delete d->asnDataTypes;
     delete d->view;
-    delete d->dynPropConfig;
     delete d;
 }
 
@@ -653,7 +645,7 @@ void InterfaceDocument::onItemDoubleClicked(shared::Id id)
 
 void InterfaceDocument::onAttributesManagerRequested()
 {
-    auto dialog = new aadlinterface::PropertyTemplateManager(d->dynPropConfig, window());
+    auto dialog = new aadlinterface::PropertyTemplateManager(window());
     dialog->setAttribute(Qt::WA_DeleteOnClose);
     dialog->open();
 }

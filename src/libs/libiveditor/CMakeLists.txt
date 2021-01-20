@@ -178,6 +178,9 @@ target_sources(${LIB_NAME} PRIVATE
     interface/properties/propertytemplatemanager.cpp
     interface/properties/propertytemplatemanager.h
     interface/properties/propertytemplatemanager.ui
+    interface/properties/propertytemplatewidget.cpp
+    interface/properties/propertytemplatewidget.h
+    interface/properties/propertytemplatewidget.ui
     interface/properties/ifaceparametersmodel.cpp
     interface/properties/ifaceparametersmodel.h
     interface/properties/propertiesdialog.cpp

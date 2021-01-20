@@ -35,6 +35,8 @@
 
 namespace aadl {
 
+PropertyTemplateConfig *PropertyTemplateConfig::m_instance = nullptr;
+
 /*!
    Adds all attributes from \p attrs that are not already in \a storage to that data
  */
@@ -85,6 +87,14 @@ struct PropertyTemplateConfig::PropertyTemplateConfigPrivate {
 PropertyTemplateConfig::PropertyTemplateConfig()
     : d(new PropertyTemplateConfigPrivate())
 {
+}
+
+PropertyTemplateConfig *PropertyTemplateConfig::instance()
+{
+    if (m_instance == nullptr) {
+        m_instance = new PropertyTemplateConfig;
+    }
+    return m_instance;
 }
 
 PropertyTemplateConfig::~PropertyTemplateConfig() { }

@@ -121,9 +121,9 @@ void tst_AADLObject::test_coordinatesConverting()
 
 void tst_AADLObject::test_coordinatesType()
 {
-    aadl::PropertyTemplateConfig dynPropConfig;
-    dynPropConfig.init(QLatin1String("default_attributes.xml"));
-    aadl::AADLObjectsModel model(&dynPropConfig);
+    aadl::PropertyTemplateConfig *dynPropConfig = aadl::PropertyTemplateConfig::instance();
+    dynPropConfig->init(QLatin1String("default_attributes.xml"));
+    aadl::AADLObjectsModel model(dynPropConfig);
 
     aadl::AADLObjectFunction fn1("Fn1");
     aadl::AADLObjectFunction fn2("Fn2", &fn1);

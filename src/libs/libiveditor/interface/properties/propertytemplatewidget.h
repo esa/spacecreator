@@ -1,5 +1,5 @@
 /*
-  Copyright (C) 2019 European Space Agency - <maxime.perrotin@esa.int>
+  Copyright (C) 2021 European Space Agency - <maxime.perrotin@esa.int>
 
   This library is free software; you can redistribute it and/or
   modify it under the terms of the GNU Library General Public
@@ -17,27 +17,45 @@
 
 #pragma once
 
-#include <QDialog>
+#include <QWidget>
 
+namespace aadl {
+class PropertyTemplateConfig;
+}
 namespace Ui {
-class PropertyTemplateManager;
+class PropertyTemplateWidget;
 }
 
 namespace aadlinterface {
 
-class PropertyTemplateManager : public QDialog
+class PropertyTemplateWidget : public QWidget
 {
     Q_OBJECT
 
 public:
-    explicit PropertyTemplateManager(QWidget *parent = nullptr);
-    ~PropertyTemplateManager() override;
+    explicit PropertyTemplateWidget(QWidget *parent = nullptr);
+    ~PropertyTemplateWidget();
 
-public Q_SLOTS:
-    void accept() override;
+    void save();
+    bool readConfig(const QString &from);
+    void setTextColor(const QColor &color);
+
+    bool hasError() const;
+
+    static QString dynamicPropertiesFilePath();
+
+Q_SIGNALS:
+    void hasErrorChanged();
+
+private Q_SLOTS:
+    void updateErrorInfo();
+    void on_btnNewProp_clicked();
 
 private:
-    Ui::PropertyTemplateManager *ui { nullptr };
+    Ui::PropertyTemplateWidget *ui;
+    aadl::PropertyTemplateConfig *m_dynPropConfig { nullptr };
+    QStringList m_usedNames;
+    bool m_error = false;
 };
 
 }

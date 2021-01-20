@@ -180,19 +180,12 @@ bool SpaceCreatorPlugin::initialize(const QStringList &arguments, QString *error
             m_actionSaveSceneRender->setEnabled(isAadl);
             m_showMinimapAction->setEnabled(isAadl || isMsc);
             m_showE2EDataflow->setEnabled(isAadl);
-            m_actCommonProps->setEnabled(isAadl);
         }
     });
-
-    m_actCommonProps = new QAction(tr("Common Properties"), this);
-    Core::Command *showCommonPropsCmd = Core::ActionManager::registerAction(
-            m_actCommonProps, Constants::AADL_SHOW_COMMON_PROPS_ID, Core::Context(Core::Constants::C_GLOBAL));
-    connect(m_actCommonProps, &QAction::triggered, this, &SpaceCreatorPlugin::onAttributesManagerRequested);
 
     menu->addSeparator();
     menu->addAction(showAsn1Cmd);
     menu->addAction(renderCmd);
-    menu->addAction(showCommonPropsCmd);
     menu->menu()->setEnabled(true);
     Core::ActionManager::actionContainer(Core::Constants::M_TOOLS)->addMenu(menu);
 
@@ -263,13 +256,6 @@ void SpaceCreatorPlugin::showAsn1Dialog()
 {
     if (auto aadlEditor = qobject_cast<spctr::AadlQtCEditor *>(Core::EditorManager::currentEditor())) {
         aadlEditor->showAsn1Dialog();
-    }
-}
-
-void SpaceCreatorPlugin::onAttributesManagerRequested()
-{
-    if (auto aadlEditor = qobject_cast<spctr::AadlQtCEditor *>(Core::EditorManager::currentEditor())) {
-        aadlEditor->ivPlugin()->document()->onAttributesManagerRequested();
     }
 }
 

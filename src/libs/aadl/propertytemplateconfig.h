@@ -27,7 +27,7 @@ class PropertyTemplate;
 class PropertyTemplateConfig
 {
 public:
-    PropertyTemplateConfig();
+    static PropertyTemplateConfig *instance();
     ~PropertyTemplateConfig();
 
     void init(const QString &configPath);
@@ -43,6 +43,10 @@ public:
             const QString &fromData, QString *errorMsg = nullptr, int *errorLine = nullptr, int *errorColumn = nullptr);
 
 private:
+    PropertyTemplateConfig();
+
+    static PropertyTemplateConfig *m_instance;
+
     struct PropertyTemplateConfigPrivate;
     std::unique_ptr<PropertyTemplateConfigPrivate> d;
 };
