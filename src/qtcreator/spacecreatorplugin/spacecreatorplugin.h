@@ -18,6 +18,7 @@
 #pragma once
 
 #include "options/asn1sccoption.h"
+#include "options/dynamicactionoption.h"
 #include "options/ivcoloroption.h"
 #include "spacecreatorplugin_global.h"
 
@@ -72,7 +73,6 @@ private Q_SLOTS:
     void showE2EDataflow();
     void showAsn1Dialog();
     void onAttributesManagerRequested();
-    void onDynContextEditorMenuInvoked();
     void checkAsnFileRename();
     void saveIfNotOpen(shared::EditorCore *core);
     void clearProjectData(ProjectExplorer::Project *project);
@@ -91,7 +91,6 @@ private:
     QAction *m_showMinimapAction = nullptr;
     QAction *m_showE2EDataflow = nullptr;
     QAction *m_actCommonProps = nullptr;
-    QAction *m_actDynContext = nullptr;
     AadlModelStorage *m_aadlStorage = nullptr;
     MscModelStorage *m_mscStorage = nullptr;
     DeploymentModelStorage *m_deploymentStorage = nullptr;
@@ -100,6 +99,7 @@ private:
 
     Asn1SccOption m_asnCommandOptions;
     IVColorOption m_ivColorOptions;
+    DynamicActionOption m_ivDynActionOptions;
 };
 
 }

@@ -39,6 +39,8 @@ set(SC_PLUGIN_SOURCES
     options/asn1sccoptionwidget.ui
     options/ivcoloroption.cpp
     options/ivcoloroption.h
+    options/dynamicactionoption.cpp
+    options/dynamicactionoption.h
     mscmodelstorage.cpp
     mscmodelstorage.h
     mscsystemchecks.cpp

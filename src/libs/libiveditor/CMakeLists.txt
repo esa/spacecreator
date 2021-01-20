@@ -36,6 +36,9 @@ target_sources(${LIB_NAME} PRIVATE
     context/action/editor/dynactioneditor.cpp
     context/action/editor/dynactioneditor.h
     context/action/editor/dynactioneditor.ui
+    context/action/editor/dynactioneditorwidget.cpp
+    context/action/editor/dynactioneditorwidget.h
+    context/action/editor/dynactioneditorwidget.ui
     context/action/extprocmonitor.cpp
     context/action/extprocmonitor.h
     endtoend/endtoendconnections.cpp

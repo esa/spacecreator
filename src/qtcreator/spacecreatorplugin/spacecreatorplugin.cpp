@@ -181,7 +181,6 @@ bool SpaceCreatorPlugin::initialize(const QStringList &arguments, QString *error
             m_showMinimapAction->setEnabled(isAadl || isMsc);
             m_showE2EDataflow->setEnabled(isAadl);
             m_actCommonProps->setEnabled(isAadl);
-            m_actDynContext->setEnabled(isAadl);
         }
     });
 
@@ -190,16 +189,10 @@ bool SpaceCreatorPlugin::initialize(const QStringList &arguments, QString *error
             m_actCommonProps, Constants::AADL_SHOW_COMMON_PROPS_ID, Core::Context(Core::Constants::C_GLOBAL));
     connect(m_actCommonProps, &QAction::triggered, this, &SpaceCreatorPlugin::onAttributesManagerRequested);
 
-    m_actDynContext = new QAction(tr("Context Actions"), this);
-    Core::Command *showDynContextCmd = Core::ActionManager::registerAction(
-            m_actDynContext, Constants::AADL_SHOW_DYN_CONTEXT_ID, Core::Context(Core::Constants::C_GLOBAL));
-    connect(m_actDynContext, &QAction::triggered, this, &SpaceCreatorPlugin::onDynContextEditorMenuInvoked);
-
     menu->addSeparator();
     menu->addAction(showAsn1Cmd);
     menu->addAction(renderCmd);
     menu->addAction(showCommonPropsCmd);
-    menu->addAction(showDynContextCmd);
     menu->menu()->setEnabled(true);
     Core::ActionManager::actionContainer(Core::Constants::M_TOOLS)->addMenu(menu);
 
@@ -277,13 +270,6 @@ void SpaceCreatorPlugin::onAttributesManagerRequested()
 {
     if (auto aadlEditor = qobject_cast<spctr::AadlQtCEditor *>(Core::EditorManager::currentEditor())) {
         aadlEditor->ivPlugin()->document()->onAttributesManagerRequested();
-    }
-}
-
-void SpaceCreatorPlugin::onDynContextEditorMenuInvoked()
-{
-    if (auto aadlEditor = qobject_cast<spctr::AadlQtCEditor *>(Core::EditorManager::currentEditor())) {
-        aadlEditor->ivPlugin()->document()->onDynContextEditorMenuInvoked();
     }
 }
 
