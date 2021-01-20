@@ -62,4 +62,4 @@ void Asn1SccOption::finish()
     delete m_widget;
 }
 
-} // namespace spctr
+}

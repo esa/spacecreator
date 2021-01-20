@@ -181,7 +181,6 @@ bool SpaceCreatorPlugin::initialize(const QStringList &arguments, QString *error
             m_showMinimapAction->setEnabled(isAadl || isMsc);
             m_showE2EDataflow->setEnabled(isAadl);
             m_actCommonProps->setEnabled(isAadl);
-            m_actColorScheme->setEnabled(isAadl);
             m_actDynContext->setEnabled(isAadl);
         }
     });
@@ -190,11 +189,6 @@ bool SpaceCreatorPlugin::initialize(const QStringList &arguments, QString *error
     Core::Command *showCommonPropsCmd = Core::ActionManager::registerAction(
             m_actCommonProps, Constants::AADL_SHOW_COMMON_PROPS_ID, Core::Context(Core::Constants::C_GLOBAL));
     connect(m_actCommonProps, &QAction::triggered, this, &SpaceCreatorPlugin::onAttributesManagerRequested);
-
-    m_actColorScheme = new QAction(tr("Color Scheme"), this);
-    Core::Command *showColorSchemeCmd = Core::ActionManager::registerAction(
-            m_actColorScheme, Constants::AADL_SHOW_COLOR_SCHEME_ID, Core::Context(Core::Constants::C_GLOBAL));
-    connect(m_actColorScheme, &QAction::triggered, this, &SpaceCreatorPlugin::onColorSchemeMenuInvoked);
 
     m_actDynContext = new QAction(tr("Context Actions"), this);
     Core::Command *showDynContextCmd = Core::ActionManager::registerAction(
@@ -205,7 +199,6 @@ bool SpaceCreatorPlugin::initialize(const QStringList &arguments, QString *error
     menu->addAction(showAsn1Cmd);
     menu->addAction(renderCmd);
     menu->addAction(showCommonPropsCmd);
-    menu->addAction(showColorSchemeCmd);
     menu->addAction(showDynContextCmd);
     menu->menu()->setEnabled(true);
     Core::ActionManager::actionContainer(Core::Constants::M_TOOLS)->addMenu(menu);
@@ -284,13 +277,6 @@ void SpaceCreatorPlugin::onAttributesManagerRequested()
 {
     if (auto aadlEditor = qobject_cast<spctr::AadlQtCEditor *>(Core::EditorManager::currentEditor())) {
         aadlEditor->ivPlugin()->document()->onAttributesManagerRequested();
-    }
-}
-
-void SpaceCreatorPlugin::onColorSchemeMenuInvoked()
-{
-    if (auto aadlEditor = qobject_cast<spctr::AadlQtCEditor *>(Core::EditorManager::currentEditor())) {
-        aadlEditor->ivPlugin()->document()->onColorSchemeMenuInvoked();
     }
 }
 

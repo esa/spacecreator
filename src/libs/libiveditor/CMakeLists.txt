@@ -81,6 +81,9 @@ target_sources(${LIB_NAME} PRIVATE
     interface/colors/colormanagerdialog.ui
     interface/colors/colorselectorbutton.cpp
     interface/colors/colorselectorbutton.h
+    interface/colors/colorsettingswidget.cpp
+    interface/colors/colorsettingswidget.h
+    interface/colors/colorsettingswidget.ui
     interface/commands/cmdchangeasn1file.cpp
     interface/commands/cmdchangeasn1file.h
     interface/commands/cmdcommentitemcreate.cpp

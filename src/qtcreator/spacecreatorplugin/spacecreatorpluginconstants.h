@@ -52,6 +52,7 @@ const char AADL_SHOW_DYN_CONTEXT_ID[] = "AadlEditor.DynContext";
 // Settings
 const char SETTINGS_CATEGORY_DISPLAY[] = QT_TRANSLATE_NOOP("SpaceCreator", "SpaceCreator");
 const char SETTINGS_ASN1_ID[] = "A.SpaceCreator.Asn1";
+const char SETTINGS_IV_COLOR_ID[] = "B.SpaceCreator.IVColor";
 const char SETTINGS_CATEGORY[] = "K.SpaceCreator";
 const QString SETTINGS_ASN_COMPILER_KEY = { "SpaceCreator/asn1compiler" };
 const QString SETTINGS_ASN_COMPILER_PARAMETER_KEY = { "SpaceCreator/asn1compilerparameter" };

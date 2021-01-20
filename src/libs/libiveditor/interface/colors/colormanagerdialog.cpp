@@ -17,16 +17,10 @@
 
 #include "colormanagerdialog.h"
 
-#include "common.h"
+#include "colormanager.h"
+#include "colorsettingswidget.h"
 #include "ui_colormanagerdialog.h"
 
-#include <QDebug>
-#include <QFile>
-#include <QFileDialog>
-#include <QJsonArray>
-#include <QJsonDocument>
-#include <QJsonObject>
-#include <QMessageBox>
 #include <QPushButton>
 
 namespace aadlinterface {
@@ -34,20 +28,11 @@ namespace aadlinterface {
 ColorManagerDialog::ColorManagerDialog(QWidget *parent)
     : QDialog(parent)
     , ui(new Ui::ColorManagerDialog)
-    , m_namesModel(new QStringListModel(this))
     , m_originalFile(ColorManager::instance()->sourceFile())
 {
     ui->setupUi(this);
     setWindowTitle(tr("Color scheme"));
-    ui->listView->setModel(m_namesModel);
-
-    connect(ui->listView->selectionModel(), &QItemSelectionModel::currentRowChanged, this,
-            &ColorManagerDialog::onColorHandlerSelected);
     connect(ui->buttonBox, &QDialogButtonBox::clicked, this, &ColorManagerDialog::onDialogButtonClicked);
-    connect(ui->colorHandlerEditor, &ColorHandlerEditor::colorHandlerValueChanged, ColorManager::instance(),
-            &ColorManager::colorsUpdated);
-
-    openFile(ColorManager::instance()->sourceFile());
 }
 
 ColorManagerDialog::~ColorManagerDialog()
@@ -55,95 +40,9 @@ ColorManagerDialog::~ColorManagerDialog()
     delete ui;
 }
 
-bool ColorManagerDialog::loadFile(const QString &path)
-{
-    if (!QFile::exists(path)) {
-        qWarning() << "File not exists" << path;
-        return false;
-    }
-
-    if (!ColorManager::instance()->setSourceFile(path))
-        return false;
-
-    m_colorNames.clear();
-
-    for (auto handledColor : ColorManager::instance()->handledColors())
-        m_colorNames[ColorManager::handledColorTypeName(handledColor)] = handledColor;
-
-    const int currentRow = ui->listView->currentIndex().isValid() ? ui->listView->currentIndex().row() : 0;
-
-    m_namesModel->setStringList(m_colorNames.keys());
-
-    ui->listView->setCurrentIndex(ui->listView->model()->index(currentRow, 0));
-    return m_colorNames.size();
-}
-
-void ColorManagerDialog::onColorHandlerSelected(const QModelIndex &id)
-{
-    if (id.isValid()) {
-        const QString &name = id.data().toString();
-        m_color = ColorManager::instance()->colorsForItem(m_colorNames.value(name));
-        ui->colorHandlerEditor->setColorHandler(&m_color);
-    } else {
-        ui->colorHandlerEditor->setColorHandler(nullptr);
-    }
-}
-
-void ColorManagerDialog::on_btnOpen_clicked()
-{
-    const QString file =
-            QFileDialog::getOpenFileName(this, tr("Choose color scheme file"), ui->lePath->text(), "*.json");
-    openFile(file);
-}
-
-void ColorManagerDialog::on_btnCreateNew_clicked()
-{
-    QFileDialog dialog(this, tr("Choose color scheme file"), ui->lePath->text(), "*.json");
-    dialog.setAcceptMode(QFileDialog::AcceptSave);
-    dialog.setDefaultSuffix(".json");
-    if (dialog.exec() == QDialog::Accepted) {
-        const QString file = dialog.selectedUrls().value(0).toLocalFile();
-        if (shared::copyResourceFile(
-                    ColorManager::defaultColorsResourceFile(), file, shared::FileCopyingMode::Overwrite)) {
-            openFile(file);
-        }
-    }
-}
-
-void ColorManagerDialog::onDialogButtonClicked(QAbstractButton *button)
-{
-    if (ui->buttonBox->button(QDialogButtonBox::RestoreDefaults) == button)
-        loadFile(ColorManager::defaultColorsResourceFile());
-}
-
-void ColorManagerDialog::openFile(const QString &path)
-{
-    if (loadFile(path))
-        ui->lePath->setText(path);
-}
-
 void ColorManagerDialog::accept()
 {
-    const QString &filePath = ui->lePath->text();
-
-    QJsonArray ja;
-    for (auto ct : ColorManager::instance()->handledColors()) {
-        ColorHandler ch = ColorManager::instance()->colorsForItem(ct);
-        QJsonObject jObj = ch.toJson();
-        jObj["color_type"] = ct;
-        ja.append(jObj);
-    }
-
-    QFile out(filePath);
-    if (out.open(QIODevice::WriteOnly | QIODevice::Text | QIODevice::Truncate)) {
-        out.write(QJsonDocument(ja).toJson());
-        out.close();
-    } else {
-        QMessageBox::warning(this, tr("Error saving"), tr("Unable to save file %1").arg(filePath));
-        return;
-    }
-
-    ColorManager::instance()->setSourceFile(filePath);
+    ui->widget->saveSettings();
 
     QDialog::accept();
 }
@@ -152,6 +51,13 @@ void ColorManagerDialog::reject()
 {
     ColorManager::instance()->setSourceFile(m_originalFile);
     QDialog::reject();
+}
+
+void ColorManagerDialog::onDialogButtonClicked(QAbstractButton *button)
+{
+    if (ui->buttonBox->button(QDialogButtonBox::RestoreDefaults) == button) {
+        ui->widget->loadFile(ColorManager::defaultColorsResourceFile());
+    }
 }
 
 }
