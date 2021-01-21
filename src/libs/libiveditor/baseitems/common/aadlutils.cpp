@@ -36,38 +36,38 @@
 
 namespace aadlinterface {
 
-static const QList<int> kNonIntersectableTypes = { AADLFunctionGraphicsItem::Type, AADLFunctionTypeGraphicsItem::Type };
-
-QGraphicsItem *firstIntersectedItem(
-        QGraphicsScene *scene, const QVector<QPointF> &points, IntersectionType intersectionType)
+/*!
+ * Returns the nearest rect from \a existingRects which intersects with \a points according to \a intersectionType:
+ *  \p Edge - any intersection point, even located on the edge of rect
+    \p Single - intersection point should be located inside rect, and only one
+    \p Multiple - 2+ intersection points
+ */
+QRectF getNearestIntersectedRect(
+        const QList<QRectF> &existingRects, const QVector<QPointF> &points, IntersectionType intersectionType)
 {
     if (points.size() < 2) {
-        return nullptr;
+        return {};
     }
 
     struct SearchIndex {
-        QGraphicsItem *closestIntersectedItem = nullptr;
+        QRectF closestIntersectedRect;
         qreal distance = 0;
         int sectionIdx = -1;
     };
     QList<SearchIndex> indexes;
-    const QList<QGraphicsItem *> intersectedItems = scene->items(points);
     for (int idx = 1; idx < points.size(); ++idx) {
         const QLineF line { points.at(idx - 1), points.at(idx) };
         if (qFuzzyIsNull(line.length())) {
             continue;
         }
-        for (auto it = intersectedItems.cbegin(); it != intersectedItems.cend(); ++it) {
-            if (!kNonIntersectableTypes.contains((*it)->type())) {
-                continue;
-            }
+        for (auto it = existingRects.cbegin(); it != existingRects.cend(); ++it) {
             QPointF intersectionPoint;
             if (intersectionType == IntersectionType::Edge
-                    && !shared::graphicsviewutils::intersects((*it)->sceneBoundingRect(), line, &intersectionPoint)) {
+                    && !shared::graphicsviewutils::intersects(*it, line, &intersectionPoint)) {
                 continue;
             } else {
                 const auto intersectionPoints = shared::graphicsviewutils::intersectionPoints(
-                        (*it)->sceneBoundingRect(), QPolygonF(QVector<QPointF> { line.p1(), line.p2() }));
+                        *it, QPolygonF(QVector<QPointF> { line.p1(), line.p2() }));
                 if (intersectionPoints.isEmpty()) {
                     continue;
                 }
@@ -100,7 +100,7 @@ QGraphicsItem *firstIntersectedItem(
         return sh1.sectionIdx == sh2.sectionIdx ? sh1.distance < sh2.distance : sh1.sectionIdx < sh2.sectionIdx;
     });
 
-    return indexes.isEmpty() ? nullptr : indexes.first().closestIntersectedItem;
+    return indexes.isEmpty() ? QRectF() : indexes.first().closestIntersectedRect;
 }
 
 /*!
@@ -657,20 +657,19 @@ QLineF ifaceSegment(const QRectF &sceneRect, const QPointF &firstEndPoint, const
 
 /*!
  * Generates the path for \a AADLConnectionGraphicsItem from \a startPoint to \a endPoint
- * \param scene QGraphicsScene pointer for finding overlapping with other items
+ * \param existingRects existing items geometries in scene coordinates shouldn't been overlapped
  * \param startPoint as first polyline node
  * \param endDirection as last polyline node
  * \return set of polyline nodes coordinates
  */
-QVector<QPointF> path(QGraphicsScene *scene, const QPointF &startPoint, const QPointF &endPoint)
+QVector<QPointF> path(const QList<QRectF> &existingRects, const QPointF &startPoint, const QPointF &endPoint)
 {
     const QVector<QPointF> points { startPoint, endPoint };
-    auto item = firstIntersectedItem(scene, points, IntersectionType::Multiple);
-    if (!item)
+    auto item = getNearestIntersectedRect(existingRects, points, IntersectionType::Multiple);
+    if (!item.isValid())
         return points;
 
-    const QList<QVector<QPointF>> possiblePaths =
-            findSubPath(item->sceneBoundingRect(), { startPoint }, { endPoint }, false);
+    const QList<QVector<QPointF>> possiblePaths = findSubPath(item, { startPoint }, { endPoint }, false);
     if (possiblePaths.isEmpty()) {
         return {};
     }
@@ -684,7 +683,7 @@ QVector<QPointF> path(QGraphicsScene *scene, const QPointF &startPoint, const QP
         if (possiblePath.last() == endPoint) {
             paths.append(possiblePath);
         } else {
-            const auto p = path(scene, possiblePath.last(), endPoint);
+            const auto p = path(existingRects, possiblePath.last(), endPoint);
             if (!p.isEmpty()) {
                 QVector<QPointF> prevPath(possiblePath);
                 prevPath.removeLast();
@@ -764,32 +763,33 @@ QList<QVector<QPointF>> findSubPath(
 
 /*!
  * Generates the path for \a AADLConnectionGraphicsItem from \a startPoint to \a endPoint
- * \param scene QGraphicsScene pointer for finding overlapping with other items
- * \param startPoint as first polyline node
- * \param endDirection as last polyline node
+ * \param existingRects geometries of existing items in scene coordinates that should be checked on collisions
+ * \param startDirection as first polyline segment
+ * \param endDirection as last polyline segment
  * \return set of polyline nodes coordinates
  */
-QVector<QPointF> findPath(
-        QGraphicsScene *scene, const QLineF &startDirection, const QLineF &endDirection, QRectF *intersectedRect)
+
+QVector<QPointF> findPath(const QList<QRectF> &existingRects, const QLineF &startDirection, const QLineF &endDirection,
+        QRectF *intersectedRect)
 {
     const QVector<QPointF> points = generateSegments(startDirection, endDirection);
-    const auto item = firstIntersectedItem(scene, points, IntersectionType::Single);
-    if (!item)
+    const QRectF rect = getNearestIntersectedRect(existingRects, points, IntersectionType::Single);
+    if (!rect.isValid())
         return points;
 
     if (intersectedRect)
-        *intersectedRect = item->sceneBoundingRect();
+        *intersectedRect = rect;
     return {};
 }
 
 /*!
  * Generates the whole path for \a AADLConnectionGraphicsItem
- * \param scene QGraphicsScene pointer for finding overlapping with other items
+ * \param existingRects geometries of existing items in scene coordinates that should be checked on collisions
  * \param startDirection as first polyline segment
  * \param endDirection as last polyline segment
  * \return set of polyline nodes coordinates
  */
-QVector<QPointF> path(QGraphicsScene *scene, const QLineF &startDirection, const QLineF &endDirection)
+QVector<QPointF> path(const QList<QRectF> &existingRects, const QLineF &startDirection, const QLineF &endDirection)
 {
     QRectF intersectedRect;
     QList<QVector<QPointF>> paths { { startDirection.p1(), startDirection.p2() } };
@@ -802,7 +802,7 @@ QVector<QPointF> path(QGraphicsScene *scene, const QLineF &startDirection, const
                 return {};
 
             const QLineF prevDirection { path.value(path.size() - 2), path.value(path.size() - 1) };
-            auto shortPath = findPath(scene, prevDirection, endDirection, &intersectedRect);
+            auto shortPath = findPath(existingRects, prevDirection, endDirection, &intersectedRect);
             if (!shortPath.isEmpty()) {
                 QVector<QPointF> result;
                 result.append(startDirection.p1());
@@ -818,8 +818,8 @@ QVector<QPointF> path(QGraphicsScene *scene, const QLineF &startDirection, const
                     continue;
                 }
 
-                const auto item = firstIntersectedItem(scene, subPath, IntersectionType::Single);
-                if (item)
+                const QRectF item = getNearestIntersectedRect(existingRects, subPath, IntersectionType::Single);
+                if (item.isValid())
                     continue;
                 else if (subPath.last() == endDirection.p2())
                     results.append(subPath);
@@ -847,11 +847,9 @@ QVector<QPointF> path(QGraphicsScene *scene, const QLineF &startDirection, const
     return {};
 }
 
-QVector<QPointF> createConnectionPath(QGraphicsScene *scene, const QPointF &startIfacePos, const QRectF &sourceRect,
-        const QPointF &endIfacePos, const QRectF &targetRect)
+QVector<QPointF> createConnectionPath(const QList<QRectF> &existingRects, const QPointF &startIfacePos,
+        const QRectF &sourceRect, const QPointF &endIfacePos, const QRectF &targetRect)
 {
-    Q_ASSERT(scene);
-
     const QLineF startDirection = ifaceSegment(sourceRect, startIfacePos, endIfacePos);
     if (startDirection.isNull())
         return {};
@@ -860,7 +858,7 @@ QVector<QPointF> createConnectionPath(QGraphicsScene *scene, const QPointF &star
     if (endDirection.isNull())
         return {};
 
-    const auto points = path(scene, startDirection, endDirection);
+    const auto points = path(existingRects, startDirection, endDirection);
     return simplifyPoints(points);
 }
 
@@ -957,6 +955,87 @@ bool rectContainsPoint(const QRectF &rect, const QPointF &point, bool proper)
         return false;
     }
     return !proper || (!isOnHorizontalSide(rect, point) && !isOnVerticalSide(rect, point));
+}
+
+/*!
+ * Searches rect from \a existingRects that intersects with \a rect
+ */
+QRectF collidingRect(const QRectF &rect, const QList<QRectF> &existingRects)
+{
+    auto it = std::find_if(existingRects.constBegin(), existingRects.constEnd(),
+            [rect](const QRectF &r) { return r.intersects(rect); });
+    if (it != existingRects.constEnd()) {
+        return *it;
+    }
+    return QRectF();
+};
+
+/*!
+ * Searches location for \a itemRect within \a boundedRect that could be expanded to include mentioned rect
+ * without overlapping with \a existingRects
+ */
+void findGeometryForRect(
+        QRectF &itemRect, QRectF &boundedRect, const QList<QRectF> &existingRects, const QMarginsF &margins)
+{
+    if (!itemRect.isValid()) {
+        itemRect = QRectF(QPointF(0, 0), DefaultGraphicsItemSize);
+    }
+    QRectF itemGeometry(itemRect.marginsAdded(margins));
+    QRectF contentGeometry;
+
+    if (boundedRect.isValid()) {
+        contentGeometry = boundedRect.marginsRemoved(margins);
+        itemGeometry.moveTopLeft(contentGeometry.topLeft());
+    }
+    contentGeometry |= itemGeometry;
+
+    static const qreal kOffset = 2;
+    if (!existingRects.isEmpty()) {
+        QRectF intersectedRect = collidingRect(itemGeometry, existingRects);
+        while (!intersectedRect.isNull()) {
+            if (contentGeometry.right() - intersectedRect.right() > itemGeometry.width()) {
+                itemGeometry.moveLeft(intersectedRect.right() + kOffset);
+            } else if (contentGeometry.bottom() - intersectedRect.bottom() > itemGeometry.height()) {
+                itemGeometry.moveLeft(contentGeometry.left() + kOffset);
+                itemGeometry.moveTop(intersectedRect.bottom() + kOffset);
+            } else if (contentGeometry.width() <= contentGeometry.height()) {
+                itemGeometry.moveLeft(intersectedRect.right() + kOffset);
+                contentGeometry.setRight(itemGeometry.right());
+            } else {
+                itemGeometry.moveLeft(contentGeometry.left() + kOffset);
+                itemGeometry.moveTop(intersectedRect.bottom() + kOffset);
+                contentGeometry.setBottom(itemGeometry.bottom());
+            }
+            intersectedRect = collidingRect(itemGeometry, existingRects);
+        }
+    }
+
+    itemRect = itemGeometry.marginsRemoved(margins);
+    QRectF newBoundingRect;
+    for (const QRectF &rect : existingRects) {
+        newBoundingRect |= rect;
+    }
+    newBoundingRect |= itemRect;
+    boundedRect = newBoundingRect.marginsAdded(margins);
+}
+
+/*!
+ * Gets geometries of all AADLFunctionGraphicsItems and AADLFunctionTypeGraphicsItem
+ * with the same level as \a item in scene coordinates
+ */
+QList<QRectF> siblingSceneRects(QGraphicsItem *item)
+{
+    Q_ASSERT(item && item->scene());
+
+    QList<QRectF> existingRects;
+    static const QList<int> kNonIntersectableTypes = { AADLFunctionGraphicsItem::Type,
+        AADLFunctionTypeGraphicsItem::Type };
+    for (auto graphicsItem : item->scene()->items()) {
+        if (item != graphicsItem && graphicsItem->parentItem() == item->parentItem()
+                && kNonIntersectableTypes.contains(graphicsItem->type()))
+            existingRects.append(graphicsItem->sceneBoundingRect());
+    }
+    return existingRects;
 }
 
 } // namespace aadlinterface

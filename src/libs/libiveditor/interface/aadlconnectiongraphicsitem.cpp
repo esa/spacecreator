@@ -44,6 +44,27 @@ static const qreal kSelectionOffset = 10;
 
 namespace aadlinterface {
 
+/*
+ * Generates a path for existing \a connection
+ */
+static inline QVector<QPointF> generateConnectionPath(AADLConnectionGraphicsItem *connection)
+{
+    const AADLInterfaceGraphicsItem *startItem = connection->startItem();
+    const AADLInterfaceGraphicsItem *endItem = connection->endItem();
+    if (!startItem || !endItem)
+        return {};
+
+    const QGraphicsScene *scene = startItem->scene();
+    Q_ASSERT(startItem->scene() == endItem->scene() && scene);
+
+    const bool isStartEndpointNested = startItem->targetItem()->isAncestorOf(endItem);
+    const bool isEndEndpointNested = endItem->targetItem()->isAncestorOf(startItem);
+
+    return createConnectionPath(siblingSceneRects(connection), startItem->connectionEndPoint(isStartEndpointNested),
+            startItem->targetItem()->sceneBoundingRect(), endItem->connectionEndPoint(isEndEndpointNested),
+            endItem->targetItem()->sceneBoundingRect());
+}
+
 AADLConnectionGraphicsItem::GraphicsPathItem::GraphicsPathItem(QGraphicsItem *parent)
     : QGraphicsPathItem(parent)
 {
@@ -211,7 +232,7 @@ void AADLConnectionGraphicsItem::layout()
         return;
     }
 
-    m_points = connectionPath(m_startItem, m_endItem);
+    m_points = generateConnectionPath(this);
     updateBoundingRect();
 }
 
@@ -302,8 +323,9 @@ static inline QVector<QPointF> replaceIntersectedSegments(
         }
     }
     sections.erase(std::unique(sections.begin(), sections.end()), sections.end());
+    const QList<QRectF> existingRects = siblingSceneRects(connection);
     for (auto chunk : sections) {
-        const QVector<QPointF> subPath = path(connection->scene(), chunk.first, chunk.second);
+        const QVector<QPointF> subPath = path(existingRects, chunk.first, chunk.second);
         if (!points.isEmpty()) {
             /// Remove overlapped chunk
             const int idxStart = points.indexOf(chunk.first);
@@ -317,7 +339,7 @@ static inline QVector<QPointF> replaceIntersectedSegments(
         } else {
             /// Normally shouldn't be here, but if there is an error during subpath finding
             /// stop update and recreate the whole path
-            points = AADLConnectionGraphicsItem::connectionPath(connection->startItem(), connection->endItem());
+            points = generateConnectionPath(connection);
             break;
         }
     }
@@ -675,23 +697,6 @@ void AADLConnectionGraphicsItem::updateEndPoint(const AADLInterfaceGraphicsItem 
     updateBoundingRect();
 }
 
-QVector<QPointF> AADLConnectionGraphicsItem::connectionPath(
-        AADLInterfaceGraphicsItem *startItem, AADLInterfaceGraphicsItem *endItem)
-{
-    if (!startItem || !endItem)
-        return {};
-
-    QGraphicsScene *scene = startItem->scene();
-    Q_ASSERT(startItem->scene() == endItem->scene() && scene);
-
-    const bool isStartEndpointNested = startItem->targetItem()->isAncestorOf(endItem);
-    const bool isEndEndpointNested = endItem->targetItem()->isAncestorOf(startItem);
-
-    return createConnectionPath(scene, startItem->connectionEndPoint(isStartEndpointNested),
-            startItem->targetItem()->sceneBoundingRect(), endItem->connectionEndPoint(isEndEndpointNested),
-            endItem->targetItem()->sceneBoundingRect());
-}
-
 /*!
  * Update last segment of \a AADLConnectionGraphicsItem as argument
  * gets \a AADLInterfaceGraphicsItem on moved/resized \a AADLFunctionGraphicsItem
@@ -731,7 +736,7 @@ void AADLConnectionGraphicsItem::updateLastChunk(const AADLInterfaceGraphicsItem
             }
         }
     }
-    const QVector<QPointF> points = path(scene(), m_points.value(pos), iface->connectionEndPoint(this));
+    const QVector<QPointF> points = path(siblingSceneRects(this), m_points.value(pos), iface->connectionEndPoint(this));
     if (!points.isEmpty()) {
         if (reverse) {
             m_points.remove(0, pos + 1);
@@ -745,7 +750,7 @@ void AADLConnectionGraphicsItem::updateLastChunk(const AADLInterfaceGraphicsItem
         m_points = simplifyPoints(m_points);
         updateGripPoints();
     } else {
-        m_points = connectionPath(m_startItem, m_endItem);
+        m_points = generateConnectionPath(this);
     }
 
     updateBoundingRect();

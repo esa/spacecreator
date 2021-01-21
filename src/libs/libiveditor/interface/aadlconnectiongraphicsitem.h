@@ -45,8 +45,6 @@ public:
             AADLInterfaceGraphicsItem *ifaceEnd, QGraphicsItem *parent = nullptr);
     ~AADLConnectionGraphicsItem() override;
 
-    static QVector<QPointF> connectionPath(AADLInterfaceGraphicsItem *ifaceStart, AADLInterfaceGraphicsItem *ifaceEnd);
-
     void setPoints(const QVector<QPointF> &points);
     QVector<QPointF> points() const;
 

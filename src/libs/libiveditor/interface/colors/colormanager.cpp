@@ -152,6 +152,7 @@ ColorManager::ColorManager(QObject *parent)
               { HandledColors::Comment, ColorHandler() },
               { HandledColors::ConnectionGroup, ColorHandler() },
               { HandledColors::IfaceGroup, ColorHandler() },
+              { HandledColors::FunctionScale, ColorHandler() },
       })
 {
     const QString defaultSourcePath = prepareDefaultSource();
@@ -207,6 +208,8 @@ QString ColorManager::handledColorTypeName(HandledColors t)
         return tr("Interface Group");
     case Comment:
         return tr("Comment");
+    case FunctionScale:
+        return tr("Scaled nested content");
     default:
         return tr("Unknown");
     }

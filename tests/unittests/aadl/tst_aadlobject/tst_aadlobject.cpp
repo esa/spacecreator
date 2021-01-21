@@ -46,6 +46,7 @@ private Q_SLOTS:
     void test_coordinatesConverting();
     void test_coordinatesType();
     void test_hasAttributes();
+    void test_hasProperties();
 };
 
 void tst_AADLObject::test_defaultConstructor()
@@ -155,15 +156,88 @@ void tst_AADLObject::test_hasAttributes()
     QHash<QString, QVariant> attributes = { { "foo", QVariant::fromValue(11) },
         { "bar", QVariant::fromValue(QString("dummy")) } };
     QCOMPARE(obj.hasAttributes(attributes), false);
+    const int attrsCount = obj.attrs().size();
 
     obj.setAttr("foo", QVariant::fromValue(999));
     QCOMPARE(obj.hasAttributes(attributes), false);
+    QCOMPARE(obj.hasAttribute("foo", 11), false);
+    QCOMPARE(obj.hasAttribute("foo", 999), true);
+    QCOMPARE(obj.hasAttribute("bar", "empty"), false);
+    QCOMPARE(obj.hasAttribute("bar", "dummy"), false);
 
     obj.setAttr("bar", QVariant::fromValue(QString("dummy")));
     QCOMPARE(obj.hasAttributes(attributes), false);
+    QCOMPARE(obj.hasAttribute("foo", 11), false);
+    QCOMPARE(obj.hasAttribute("foo", 999), true);
+    QCOMPARE(obj.hasAttribute("bar", "empty"), false);
+    QCOMPARE(obj.hasAttribute("bar", "dummy"), true);
 
     obj.setAttr("foo", QVariant::fromValue(11));
     QCOMPARE(obj.hasAttributes(attributes), true);
+    QCOMPARE(obj.hasAttribute("foo", 11), true);
+    QCOMPARE(obj.hasAttribute("foo", 999), false);
+    QCOMPARE(obj.hasAttribute("bar", "empty"), false);
+    QCOMPARE(obj.hasAttribute("bar", "dummy"), true);
+
+    obj.removeAttr("foo");
+    QCOMPARE(obj.hasAttributes(attributes), false);
+    QCOMPARE(obj.hasAttribute("foo", 11), false);
+    QCOMPARE(obj.hasAttribute("foo", 999), false);
+    QCOMPARE(obj.hasAttribute("bar", "empty"), false);
+    QCOMPARE(obj.hasAttribute("bar", "dummy"), true);
+
+    obj.removeAttr("bar");
+    QCOMPARE(obj.hasAttributes(attributes), false);
+    QCOMPARE(obj.hasAttribute("foo", 11), false);
+    QCOMPARE(obj.hasAttribute("foo", 999), false);
+    QCOMPARE(obj.hasAttribute("bar", "empty"), false);
+    QCOMPARE(obj.hasAttribute("bar", "dummy"), false);
+    QCOMPARE(obj.attrs().size(), attrsCount);
+}
+
+void tst_AADLObject::test_hasProperties()
+{
+    AADLObjectImp obj;
+    QHash<QString, QVariant> properties = { { "foo", QVariant::fromValue(11) },
+        { "bar", QVariant::fromValue(QString("dummy")) } };
+    QCOMPARE(obj.hasProperties(properties), false);
+    const int propsCount = obj.props().size();
+
+    obj.setProp("foo", QVariant::fromValue(999));
+    QCOMPARE(obj.hasProperties(properties), false);
+    QCOMPARE(obj.hasProperty("foo", 11), false);
+    QCOMPARE(obj.hasProperty("foo", 999), true);
+    QCOMPARE(obj.hasProperty("bar", "empty"), false);
+    QCOMPARE(obj.hasProperty("bar", "dummy"), false);
+
+    obj.setProp("bar", QVariant::fromValue(QString("dummy")));
+    QCOMPARE(obj.hasProperties(properties), false);
+    QCOMPARE(obj.hasProperty("foo", 11), false);
+    QCOMPARE(obj.hasProperty("foo", 999), true);
+    QCOMPARE(obj.hasProperty("bar", "empty"), false);
+    QCOMPARE(obj.hasProperty("bar", "dummy"), true);
+
+    obj.setProp("foo", QVariant::fromValue(11));
+    QCOMPARE(obj.hasProperties(properties), true);
+    QCOMPARE(obj.hasProperty("foo", 11), true);
+    QCOMPARE(obj.hasProperty("foo", 999), false);
+    QCOMPARE(obj.hasProperty("bar", "empty"), false);
+    QCOMPARE(obj.hasProperty("bar", "dummy"), true);
+
+    obj.removeProp("foo");
+    QCOMPARE(obj.hasProperties(properties), false);
+    QCOMPARE(obj.hasProperty("foo", 11), false);
+    QCOMPARE(obj.hasProperty("foo", 999), false);
+    QCOMPARE(obj.hasProperty("bar", "empty"), false);
+    QCOMPARE(obj.hasProperty("bar", "dummy"), true);
+
+    obj.removeProp("bar");
+    QCOMPARE(obj.hasProperties(properties), false);
+    QCOMPARE(obj.hasProperty("foo", 11), false);
+    QCOMPARE(obj.hasProperty("foo", 999), false);
+    QCOMPARE(obj.hasProperty("bar", "empty"), false);
+    QCOMPARE(obj.hasProperty("bar", "dummy"), false);
+    QCOMPARE(obj.props().size(), propsCount);
 }
 
 QTEST_APPLESS_MAIN(tst_AADLObject)

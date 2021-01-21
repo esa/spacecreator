@@ -15,8 +15,11 @@
    along with this program. If not, see <https://www.gnu.org/licenses/lgpl-2.1.html>.
 */
 
+#include "aadlobjectfunction.h"
 #include "baseitems/common/aadlutils.h"
+#include "interface/aadlfunctiongraphicsitem.h"
 
+#include <QGraphicsRectItem>
 #include <QMetaEnum>
 #include <QObject>
 #include <QtTest>
@@ -29,6 +32,9 @@ private Q_SLOTS:
     void testSides();
     void testAdjustedRect();
     void testAlignRectToSide();
+    void testCollidingRect();
+    void testSiblingSceneRects();
+    void testFindGeometryForRect();
 };
 
 void tst_Utils::testCheckCollision()
@@ -130,6 +136,80 @@ void tst_Utils::testAlignRectToSide()
             }
         }
     }
+}
+
+void tst_Utils::testCollidingRect()
+{
+    const QList<QRectF> existingRects {
+        { 0, 0, 100, 100 },
+        { 200, 200, 100, 100 },
+        { 0, 200, 100, 100 },
+    };
+    QVERIFY(aadlinterface::collidingRect(QRectF(200, 0, 100, 100), existingRects).isNull());
+    QCOMPARE(aadlinterface::collidingRect(QRectF(150, 150, 100, 100), existingRects), existingRects.at(1));
+    QCOMPARE(aadlinterface::collidingRect(QRectF(-50, 150, 300, 300), existingRects), existingRects.at(1));
+    QCOMPARE(aadlinterface::collidingRect(QRectF(-50, 150, 200, 200), existingRects), existingRects.at(2));
+}
+
+void tst_Utils::testSiblingSceneRects()
+{
+    const QVector<QRectF> existingRects {
+        { 0, 0, 100, 100 },
+        { 0, 200, 100, 100 },
+        { 200, 0, 100, 100 },
+        { 200, 200, 400, 400 },
+    };
+
+    QGraphicsScene scene;
+    aadlinterface::AADLFunctionGraphicsItem *item { nullptr };
+    for (int idx = 0; idx < existingRects.size(); ++idx) {
+        item = new aadlinterface::AADLFunctionGraphicsItem(new aadl::AADLObjectFunction);
+        scene.addItem(item);
+        item->setRect(existingRects.at(idx));
+    }
+    aadlinterface::AADLFunctionGraphicsItem *child { nullptr };
+    for (int idx = 0; idx < 3; ++idx) {
+        child = new aadlinterface::AADLFunctionGraphicsItem(new aadl::AADLObjectFunction, item);
+        child->setRect(existingRects.at(idx));
+    }
+    const auto siblingItems0 = aadlinterface::siblingSceneRects(item);
+    QCOMPARE(siblingItems0.size(), 3);
+    for (auto itemRect : siblingItems0) {
+        const auto it = std::find(existingRects.cbegin(), existingRects.cend(), itemRect);
+        QVERIFY(it != existingRects.cend());
+        QVERIFY(std::distance(existingRects.cbegin(), it) != 3);
+    }
+
+    const auto siblingItems1 = aadlinterface::siblingSceneRects(child);
+    QCOMPARE(siblingItems1.size(), 2);
+    for (auto itemRect : siblingItems1) {
+        const auto it = std::find(existingRects.cbegin(), existingRects.cend(), itemRect);
+        QVERIFY(it != existingRects.cend());
+        QVERIFY(std::distance(existingRects.cbegin(), it) != 3);
+    }
+}
+
+void tst_Utils::testFindGeometryForRect()
+{
+    QList<QRectF> existingRects {
+        { 0, 0, 100, 100 },
+        { 0, 200, 100, 100 },
+        { 200, 0, 100, 100 },
+    };
+    QRectF itemRect { 0, 0, 100, 100 };
+    QRectF br;
+    for (auto r : existingRects)
+        br |= r;
+
+    QRectF boundingRect { br };
+    aadlinterface::findGeometryForRect(itemRect, boundingRect, existingRects, {});
+    QVERIFY(boundingRect.contains(itemRect));
+    QVERIFY(br == boundingRect);
+
+    existingRects << itemRect;
+    aadlinterface::findGeometryForRect(itemRect, boundingRect, existingRects, {});
+    QVERIFY(boundingRect.contains(itemRect));
+    QVERIFY(br != boundingRect);
 }
 
 QTEST_MAIN(tst_Utils)

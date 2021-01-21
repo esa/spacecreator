@@ -125,10 +125,10 @@ void tst_AADLConnectionGraphicsItem::tst_Overlapping()
 
 bool tst_AADLConnectionGraphicsItem::checkIntersections(aadlinterface::AADLConnectionGraphicsItem *connection)
 {
-    auto item = aadlinterface::firstIntersectedItem(
-            connection->scene(), connection->points(), aadlinterface::IntersectionType::Single);
+    const QRectF itemRect = aadlinterface::getNearestIntersectedRect(aadlinterface::siblingSceneRects(connection),
+            connection->points(), aadlinterface::IntersectionType::Single);
 
-    return item != nullptr;
+    return itemRect.isValid();
 }
 
 QTEST_MAIN(tst_AADLConnectionGraphicsItem)

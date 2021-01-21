@@ -18,6 +18,7 @@
 #include "aadlrectgraphicsitem.h"
 
 #include "aadlobject.h"
+#include "aadlobjectfunctiontype.h"
 #include "baseitems/common/aadlutils.h"
 #include "commandsstack.h"
 #include "interface/graphicsitemhelpers.h"
@@ -201,12 +202,7 @@ void AADLRectGraphicsItem::rebuildLayout()
     } else {
         setVisible(aadlObject()->isVisible());
     }
-    for (auto child : childItems()) {
-        if (auto rectItem = qobject_cast<AADLRectGraphicsItem *>(child->toGraphicsObject())) {
-            rectItem->setVisible(
-                    sceneRect.contains(rectItem->sceneBoundingRect()) && rectItem->aadlObject()->isVisible());
-        }
-    }
+    updateChildrenVisibility();
     updateGripPoints();
     applyColorScheme();
 }
@@ -330,6 +326,26 @@ void AADLRectGraphicsItem::shiftBy(const QPointF &shift)
     onManualMoveFinish(nullptr, pressedAt, releasedAt);
 }
 
+void AADLRectGraphicsItem::updateChildrenVisibility()
+{
+    const QRectF sceneRect = sceneBoundingRect();
+    const bool visible = sceneRect.contains(nestedItemsSceneBoundingRect());
+    for (auto child : childItems()) {
+        if (auto rectItem = qobject_cast<AADLRectGraphicsItem *>(child->toGraphicsObject())) {
+            rectItem->setVisible(visible && rectItem->aadlObject()->isVisible());
+        }
+    }
+}
+
+void AADLRectGraphicsItem::updateSiblingVisibility()
+{
+    if (auto parentRectObject = parentObject()) {
+        if (auto parentRectItem = qobject_cast<AADLRectGraphicsItem *>(parentRectObject)) {
+            parentRectItem->updateChildrenVisibility();
+        }
+    }
+}
+
 void AADLRectGraphicsItem::onGeometryChanged()
 {
     QSet<InteractiveObject *> items;
@@ -342,7 +358,7 @@ void AADLRectGraphicsItem::onGeometryChanged()
     QSet<InteractiveObject *> newItems(items);
     newItems.subtract(m_collidedItems);
     for (auto item : newItems)
-        item->doHighlighting(Qt::red, true);
+        item->doHighlighting(Qt::red, false);
 
     QSet<InteractiveObject *> oldItems(m_collidedItems);
     oldItems.subtract(items);
@@ -351,72 +367,48 @@ void AADLRectGraphicsItem::onGeometryChanged()
         item->doHighlighting(Qt::green, false);
 
     m_collidedItems = items;
+
+    if (m_collidedItems.isEmpty())
+        clearHighlight();
+
+    updateSiblingVisibility();
 }
 
-static inline QRectF collidingItemsBoundingRect(QGraphicsItem *item, const QRectF &rect)
+static inline QList<QRectF> siblingRectsForItem(
+        QGraphicsItem *item, const QRectF &rect, const QMarginsF &margins = kContentMargins)
 {
-    QList<QGraphicsItem *> collidingItems = item->scene()->items(rect);
+    QList<QGraphicsItem *> collidingItems = item->scene()->items(rect.marginsAdded(margins));
     if (collidingItems.isEmpty())
         return {};
 
-    QRectF br;
+    QList<QRectF> rects;
     for (auto collidingItem : collidingItems) {
         if (item == collidingItem || item->type() < QGraphicsItem::UserType)
             continue;
 
         if (auto rectItem = qobject_cast<AADLRectGraphicsItem *>(collidingItem->toGraphicsObject())) {
             if (rectItem->parentItem() == item->parentItem() && rectItem != item) {
-                br |= rectItem->sceneBoundingRect();
+                rects.append(rectItem->sceneBoundingRect());
             }
         }
     }
 
-    return br;
-}
-
-static inline void findGeometryForItem(QGraphicsItem *item, QRectF &itemRect, QRectF &boundedRect)
-{
-    const QRectF collidedRect = collidingItemsBoundingRect(item, itemRect);
-    if (!collidedRect.isValid())
-        return;
-
-    if (boundedRect.right() - collidedRect.right() > itemRect.width()) {
-        itemRect.moveLeft(collidedRect.right() + kOffset);
-    } else if (boundedRect.bottom() - collidedRect.bottom() > itemRect.height()) {
-        itemRect.moveLeft(boundedRect.left());
-        itemRect.moveTop(collidedRect.bottom() + kOffset);
-    } else if (boundedRect.width() <= boundedRect.height()) {
-        itemRect.moveLeft(collidedRect.right() + kOffset);
-        boundedRect.setRight(itemRect.right());
-    } else {
-        itemRect.moveLeft(boundedRect.left());
-        itemRect.moveTop(collidedRect.bottom() + kOffset);
-        boundedRect.setBottom(itemRect.bottom());
-    }
-
-    return findGeometryForItem(item, itemRect, boundedRect);
+    return rects;
 }
 
 void AADLRectGraphicsItem::layout()
 {
     const QRectF currentSceneRect = sceneBoundingRect();
-    if (currentSceneRect.isValid()) {
-        const QRectF collidingRect = collidingItemsBoundingRect(this, currentSceneRect.marginsAdded(kContentMargins));
-        if (!collidingRect.isValid())
-            return;
+    if (currentSceneRect.isValid() && siblingRectsForItem(this, currentSceneRect).isEmpty()) {
+        return;
     }
 
-    auto parentFunction = qobject_cast<AADLRectGraphicsItem *>(parentObject());
-    const QMarginsF kCurrentMargins =
-            parentFunction && parentFunction->aadlObject()->isRootObject() ? kRootMargins : kContentMargins;
-
-    QRectF boundedRect = QRectF(parentFunction ? parentFunction->sceneBoundingRect().marginsRemoved(kCurrentMargins)
-                                               : scene()->itemsBoundingRect());
-    QRectF itemRect = QRectF(QPointF(0, 0), DefaultGraphicsItemSize).marginsAdded(kContentMargins);
+    const auto parentFunction = qobject_cast<AADLRectGraphicsItem *>(parentObject());
+    QRectF boundedRect = QRectF(parentFunction ? parentFunction->sceneBoundingRect() : scene()->itemsBoundingRect());
+    QRectF itemRect = QRectF(QPointF(0, 0), DefaultGraphicsItemSize);
     itemRect.moveTopLeft(boundedRect.topLeft());
-
-    findGeometryForItem(this, itemRect, boundedRect);
-    setRect(itemRect.marginsRemoved(kContentMargins));
+    findGeometryForRect(itemRect, boundedRect, siblingRectsForItem(this, boundedRect), kContentMargins);
+    setRect(itemRect);
     mergeGeometry();
 }
 

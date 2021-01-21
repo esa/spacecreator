@@ -167,10 +167,6 @@ void AADLObjectsModel::setRootObject(shared::Id rootId)
     d->m_visibleObjects = visibleObjects(rootId);
 
     Q_EMIT rootObjectChanged(d->m_rootObjectId);
-
-    if (auto oldRootObject = getObject(oldRootId)) {
-        oldRootObject->removeAttr(meta::Props::token(meta::Props::Token::RootCoordinates));
-    }
 }
 
 AADLObject *AADLObjectsModel::rootObject() const

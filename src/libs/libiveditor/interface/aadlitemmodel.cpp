@@ -37,6 +37,7 @@
 #include "interface/aadlinterfacegroupgraphicsitem.h"
 #include "interfacetabgraphicsscene.h"
 
+#include <QGraphicsView>
 #include <QGuiApplication>
 #include <QMutex>
 #include <QScreen>
@@ -133,17 +134,7 @@ void AADLItemModel::onAADLObjectAdded(aadl::AADLObject *object)
         return;
     }
 
-    const int currentLevel = nestingLevel(m_model->rootObject());
-    int levelAdjustment = m_model->rootObject() ? 2 : 1;
-    if (object->aadlType() == aadl::AADLObject::Type::Connection
-            || object->aadlType() == aadl::AADLObject::Type::ConnectionGroup) {
-        levelAdjustment -= 1;
-    }
-    const int maxLevel = currentLevel + levelAdjustment;
-    const int objLevel = nestingLevel(object);
-    if (currentLevel > objLevel || maxLevel < objLevel) {
-        return;
-    }
+    setupInnerGeometry(object);
 
     auto propertyChanged = [this]() {
         if (auto senderObject = qobject_cast<aadl::AADLObject *>(sender())) {
@@ -263,8 +254,8 @@ void AADLItemModel::onConnectionAddedToGroup(aadl::AADLObjectConnection *connect
         auto ifaceObject = connectionGroupEndPoint->function()->id() == connection->source()->id()
                 ? connection->sourceInterface()
                 : connectionGroupEndPoint->function()->id() == connection->target()->id()
-                ? connection->targetInterface()
-                : nullptr;
+                        ? connection->targetInterface()
+                        : nullptr;
         if (auto ifaceItem = getItem<AADLInterfaceGraphicsItem *>(ifaceObject->id())) {
             for (auto ifaceConnection : ifaceItem->connectionItems()) {
                 if (ifaceConnection->entity()->id() == connection->id()) {
@@ -304,8 +295,8 @@ void AADLItemModel::onConnectionRemovedFromGroup(aadl::AADLObjectConnection *con
         auto ifaceObject = connectionGroupEndPoint->function()->id() == connection->source()->id()
                 ? connection->sourceInterface()
                 : connectionGroupEndPoint->function()->id() == connection->target()->id()
-                ? connection->targetInterface()
-                : nullptr;
+                        ? connection->targetInterface()
+                        : nullptr;
         if (auto ifaceItem = getItem<AADLInterfaceGraphicsItem *>(connectionGroupEndPoint->id())) {
             for (auto ifaceConnection : ifaceItem->connectionItems()) {
                 const bool currentHandledConnection = ifaceConnection->entity()->id() == connection->id();
@@ -385,6 +376,57 @@ void AADLItemModel::removeItemForObject(aadl::AADLObject *object)
         delete item;
         updateSceneRect();
     }
+}
+
+void AADLItemModel::setupInnerGeometry(aadl::AADLObject *obj) const
+{
+    if (!obj
+            || !(obj->aadlType() == aadl::AADLObject::Type::Comment
+                    || obj->aadlType() == aadl::AADLObject::Type::Function
+                    || obj->aadlType() == aadl::AADLObject::Type::FunctionType)) {
+        return;
+    }
+    QVariant innerCoord = obj->prop(aadl::meta::Props::token(aadl::meta::Props::Token::InnerCoordinates));
+    if (innerCoord.isValid()) {
+        return;
+    }
+    aadl::AADLObjectFunctionType *parentObj =
+            obj->parentObject() ? obj->parentObject()->as<aadl::AADLObjectFunctionType *>() : nullptr;
+    if (!parentObj) {
+        return;
+    }
+    QRectF rootGeometry;
+    const QVariant rootCoord = parentObj->prop(aadl::meta::Props::token(aadl::meta::Props::Token::RootCoordinates));
+    if (rootCoord.isValid()) {
+        rootGeometry = aadlinterface::rect(aadl::AADLObject::coordinatesFromString(rootCoord.toString()));
+    } else if (const QGraphicsView *view = m_graphicsScene->views().value(0)) {
+        const QRect viewportGeometry = view->viewport()->geometry().marginsRemoved(kContentMargins.toMargins());
+        rootGeometry = QRectF(view->mapToScene(QPoint(0, 0)),
+                view->mapToScene(QPoint(viewportGeometry.width(), viewportGeometry.height())));
+    }
+    QList<QRectF> existingRects;
+    for (const auto child : parentObj->children()) {
+        if (child->aadlType() == aadl::AADLObject::Type::Comment
+                || child->aadlType() == aadl::AADLObject::Type::Function
+                || child->aadlType() == aadl::AADLObject::Type::FunctionType) {
+            innerCoord = child->prop(aadl::meta::Props::token(aadl::meta::Props::Token::InnerCoordinates));
+            if (!innerCoord.isValid()) {
+                continue;
+            }
+            const QRectF innerRect =
+                    aadlinterface::rect(aadl::AADLObject::coordinatesFromString(innerCoord.toString()));
+            rootGeometry |= innerRect;
+            existingRects.append(innerRect);
+        }
+    }
+    QRectF innerGeometry;
+    findGeometryForRect(innerGeometry, rootGeometry, existingRects);
+
+    const QString strRootCoord = aadl::AADLObject::coordinatesToString(aadlinterface::coordinates(rootGeometry));
+    parentObj->setProp(aadl::meta::Props::token(aadl::meta::Props::Token::RootCoordinates), strRootCoord);
+
+    const QString strCoord = aadl::AADLObject::coordinatesToString(aadlinterface::coordinates(innerGeometry));
+    obj->setProp(aadl::meta::Props::token(aadl::meta::Props::Token::InnerCoordinates), strCoord);
 }
 
 void AADLItemModel::clearScene()

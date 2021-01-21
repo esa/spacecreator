@@ -103,6 +103,8 @@ public:
     QVariant prop(const QString &name, const QVariant &defaultValue = QVariant()) const;
     virtual void setProp(const QString &name, const QVariant &val);
     void removeProp(const QString &name);
+    bool hasProperty(const QString &propertyName, const QVariant &value = QVariant()) const;
+    bool hasProperties(const QHash<QString, QVariant> &props) const;
 
     void setObjectsModel(AADLObjectsModel *model);
     AADLObjectsModel *objectsModel() const;

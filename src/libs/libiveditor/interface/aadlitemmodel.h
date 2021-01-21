@@ -98,6 +98,7 @@ private:
     AADLFunctionGraphicsItem *rootItem() const;
     void updateItem(QGraphicsItem *item);
     void removeItemForObject(aadl::AADLObject *object);
+    void setupInnerGeometry(aadl::AADLObject *obj) const;
 
     template<typename T>
     T getItem(const shared::Id id) const;

@@ -406,6 +406,34 @@ void AADLObject::removeProp(const QString &name)
     }
 }
 
+/*!
+   Returns true, when the object has a property with the given \p key and the given \p value
+ */
+bool AADLObject::hasProperty(const QString &propertyName, const QVariant &value) const
+{
+    const auto it = d->m_props.constFind(propertyName);
+    if (it == d->m_props.constEnd()) {
+        return false;
+    }
+    if (value.isNull()) {
+        return true;
+    }
+    return value == *it;
+}
+
+/*!
+   Returns true, if the object contains all the given properties with exactly the same value
+ */
+bool AADLObject::hasProperties(const QHash<QString, QVariant> &props) const
+{
+    for (auto it = props.cbegin(); it != props.end(); ++it) {
+        if (!hasProperty(it.key(), it.value())) {
+            return false;
+        }
+    }
+    return true;
+}
+
 void AADLObject::setObjectsModel(AADLObjectsModel *model)
 {
     d->m_model = model;

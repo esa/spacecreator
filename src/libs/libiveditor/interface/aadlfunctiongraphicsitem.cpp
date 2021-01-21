@@ -21,6 +21,7 @@
 #include "aadlconnectiongraphicsitem.h"
 #include "aadlfunctionnamegraphicsitem.h"
 #include "aadlinterfacegraphicsitem.h"
+#include "aadlobjectconnection.h"
 #include "aadlobjectfunction.h"
 #include "aadlobjectsmodel.h"
 #include "baseitems/common/aadlutils.h"
@@ -36,6 +37,7 @@
 #include <QSvgRenderer>
 #include <QTimer>
 #include <QtDebug>
+#include <cmath>
 
 static const qreal kBorderWidth = 2.0;
 static const qreal kRadius = 10.0;
@@ -132,6 +134,10 @@ void AADLFunctionGraphicsItem::paint(QPainter *painter, const QStyleOptionGraphi
         QRectF iconRect { QPointF(0, 0), m_svgRenderer->defaultSize() };
         iconRect.moveTopRight(br.adjusted(kRadius, kRadius, -kRadius, -kRadius).topRight());
         m_svgRenderer->render(painter, iconRect);
+
+        if (!sceneBoundingRect().contains(nestedItemsSceneBoundingRect())) {
+            drawInnerFunctions(painter);
+        }
     }
 
     painter->restore();
@@ -219,6 +225,110 @@ void AADLFunctionGraphicsItem::layoutConnection(
                     connection->layout();
                 }
             }
+        }
+    }
+}
+
+static inline void drawItems(
+        const QRectF &boundingRect, const QList<QRectF> &existingRects, int count, const qreal sf, QPainter *painter)
+{
+    QRectF childRect { QPointF(), DefaultGraphicsItemSize * sf };
+    const qreal yOffset = sf * (kContentMargins.top() + kContentMargins.bottom());
+    const qreal xOffset = sf * (kContentMargins.left() + kContentMargins.right());
+    const int column = boundingRect.width() / (childRect.width() + xOffset);
+    const int row = boundingRect.height() / (childRect.height() + yOffset);
+    if (!count || !column || !row) {
+        return;
+    }
+    for (int idx = 0; idx < count && idx < column * row;) {
+        const int currentRow = idx / column;
+        const int currentColumn = idx % column;
+        childRect.moveTopLeft(boundingRect.topLeft()
+                + QPointF((childRect.width() + xOffset) * currentColumn, (childRect.height() + yOffset) * currentRow));
+        auto it = std::find_if(existingRects.cbegin(), existingRects.cend(),
+                [childRect](const QRectF &r) { return r.intersects(childRect); });
+        if (it == existingRects.cend()) {
+            painter->drawRect(childRect);
+            ++idx;
+        }
+    }
+};
+
+void AADLFunctionGraphicsItem::drawInnerFunctions(QPainter *painter)
+{
+    if (!entity()->hasNestedChildren()) {
+        return;
+    }
+
+    const QRectF br = boundingRect();
+
+    const ColorHandler ch = ColorManager::instance()->colorsForItem(ColorManager::FunctionScale);
+    painter->setBrush(ch.brush());
+    painter->setPen(QPen(ch.penColor(), ch.penWidth()));
+
+    QRectF nestedRect;
+    const QVector<aadl::AADLObject *> childEntities = entity()->children();
+    static const aadl::meta::Props::Token token = aadl::meta::Props::Token::InnerCoordinates;
+    int itemsCountWithoutGeometry = 0;
+    QList<QRectF> existingRects;
+    QList<QPolygonF> existingPolygons;
+    for (const aadl::AADLObject *child : childEntities) {
+        const QString strCoordinates = child->prop(aadl::meta::Props::token(token)).toString();
+        if (child->aadlType() == aadl::AADLObject::Type::Function
+                || child->aadlType() == aadl::AADLObject::Type::FunctionType
+                || child->aadlType() == aadl::AADLObject::Type::Comment) {
+            const QRectF itemSceneRect = aadlinterface::rect(aadl::AADLObject::coordinatesFromString(strCoordinates));
+            if (itemSceneRect.isValid()) {
+                nestedRect |= itemSceneRect;
+                existingRects << itemSceneRect;
+            } else {
+                itemsCountWithoutGeometry += 1;
+            }
+        } else if (auto connection = qobject_cast<const aadl::AADLObjectConnection *>(child)) {
+            if (connection->source()->id() != entity()->id() && connection->target()->id() != entity()->id()) {
+                const QPolygonF itemScenePoints =
+                        aadlinterface::polygon(aadl::AADLObject::coordinatesFromString(strCoordinates));
+                if (!itemScenePoints.isEmpty()) {
+                    existingPolygons << itemScenePoints;
+                }
+            }
+        }
+    }
+    while (itemsCountWithoutGeometry-- > 0) {
+        QRectF itemRect { QPointF(), DefaultGraphicsItemSize };
+        findGeometryForRect(itemRect, nestedRect, existingRects);
+        existingRects << itemRect;
+    }
+
+    if (!nestedRect.isValid()) {
+        auto view = scene()->views().value(0);
+        if (!view)
+            return;
+
+        const int count =
+                std::count_if(childEntities.cbegin(), childEntities.cend(), [](const aadl::AADLObject *child) {
+                    return child->aadlType() == aadl::AADLObject::Type::Function
+                            || child->aadlType() == aadl::AADLObject::Type::FunctionType
+                            || child->aadlType() == aadl::AADLObject::Type::Comment;
+                });
+
+        const QRect viewportGeometry = view->viewport()->geometry().marginsRemoved(kContentMargins.toMargins());
+        const QRectF mappedViewportGeometry =
+                QRectF(view->mapToScene(viewportGeometry.topLeft()), view->mapToScene(viewportGeometry.bottomRight()));
+
+        const qreal sf =
+                qMin(br.width() / mappedViewportGeometry.width(), br.height() / mappedViewportGeometry.height());
+        drawItems(br, {}, count, sf, painter);
+    } else {
+        const QRectF contentRect { nestedRect.marginsAdded(kRootMargins) };
+        const qreal sf = qMin(br.width() / contentRect.width(), br.height() / contentRect.height());
+        const QTransform transform = QTransform::fromScale(sf, sf).translate(-contentRect.x(), -contentRect.y());
+
+        for (const QRectF &r : qAsConst(existingRects)) {
+            painter->drawRect(transform.mapRect(r));
+        }
+        for (const QPolygonF &p : qAsConst(existingPolygons)) {
+            painter->drawPolyline(transform.map(p));
         }
     }
 }

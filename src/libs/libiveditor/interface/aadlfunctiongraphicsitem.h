@@ -77,9 +77,10 @@ private:
     void layoutConnection(
             AADLInterfaceGraphicsItem *ifaceItem, ConnectionLayoutPolicy layoutPolicy, bool includingNested);
 
+    void drawInnerFunctions(QPainter *painter);
+
 private:
     static QPointer<QSvgRenderer> m_svgRenderer;
-    bool m_hasNestedItems = false;
 };
 
 }

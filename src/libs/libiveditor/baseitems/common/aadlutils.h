@@ -42,7 +42,7 @@ static const QMarginsF kRootMargins = { 50, 50, 50, 50 };
 static const QMarginsF kTextMargins = { 20, 20, 20, 20 };
 static const QList<Qt::Alignment> kRectSides = { Qt::AlignLeft, Qt::AlignTop, Qt::AlignRight, Qt::AlignBottom };
 static const qreal kInterfaceLayoutOffset = 12.0;
-static const qreal kConnectionMargin = 20;
+static const qreal kConnectionMargin = 16;
 static const qreal kMinLineLength = 20;
 
 /*!
@@ -144,15 +144,15 @@ QLineF ifaceSegment(const QRectF &sceneRect, const QPointF &firstEndPoint, const
 QList<QVector<QPointF>> findSubPath(const QRectF &itemRect, const QVector<QPointF> &prevPoints,
         const QVector<QPointF> &nextPoints, bool strict = true);
 
-QVector<QPointF> findPath(
-        QGraphicsScene *scene, const QLineF &startDirection, const QLineF &endDirection, QRectF *intersectedRect);
+QVector<QPointF> findPath(const QList<QRectF> &existingRects, const QLineF &startDirection, const QLineF &endDirection,
+        QRectF *intersectedRect);
 
-QVector<QPointF> path(QGraphicsScene *scene, const QPointF &startPoint, const QPointF &endPoint);
+QVector<QPointF> path(const QList<QRectF> &existingRects, const QPointF &startPoint, const QPointF &endPoint);
 
-QVector<QPointF> path(QGraphicsScene *scene, const QLineF &startDirection, const QLineF &endDirection);
+QVector<QPointF> path(const QList<QRectF> &existingRects, const QLineF &startDirection, const QLineF &endDirection);
 
-QVector<QPointF> createConnectionPath(QGraphicsScene *scene, const QPointF &startIfacePos, const QRectF &sourceRect,
-        const QPointF &endIfacePos, const QRectF &targetRect);
+QVector<QPointF> createConnectionPath(const QList<QRectF> &existingRects, const QPointF &startIfacePos,
+        const QRectF &sourceRect, const QPointF &endIfacePos, const QRectF &targetRect);
 
 QVector<QPointF> simplifyPoints(const QVector<QPointF> &points);
 
@@ -160,12 +160,16 @@ bool comparePolygones(const QVector<QPointF> &v1, const QVector<QPointF> &v2);
 
 int nestingLevel(aadl::AADLObject *object);
 
-QGraphicsItem *firstIntersectedItem(
-        QGraphicsScene *scene, const QVector<QPointF> &points, IntersectionType intersectionType);
+QRectF getNearestIntersectedRect(
+        const QList<QRectF> &existingRects, const QVector<QPointF> &points, IntersectionType intersectionType);
 
 bool isOnVerticalSide(const QRectF &rect, const QPointF &point);
 bool isOnHorizontalSide(const QRectF &rect, const QPointF &point);
 bool rectContainsPoint(const QRectF &rect, const QPointF &point, bool proper = true);
-;
+
+QList<QRectF> siblingSceneRects(QGraphicsItem *item);
+QRectF collidingRect(const QRectF &rect, const QList<QRectF> &existingRects);
+void findGeometryForRect(QRectF &itemRect, QRectF &boundedRect, const QList<QRectF> &existingRects = {},
+        const QMarginsF &margins = kRootMargins);
 
 } // namespace aadlinterface

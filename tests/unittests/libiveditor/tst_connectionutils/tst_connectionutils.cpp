@@ -49,6 +49,18 @@ private Q_SLOTS:
     void tst_path();
 
 private:
+    QList<QRectF> existingRects() const
+    {
+        QList<QRectF> rects;
+        for (auto item : m_scene.items()) {
+            if (item->type() == aadlinterface::AADLFunctionTypeGraphicsItem::Type
+                    || item->type() == aadlinterface::AADLFunctionGraphicsItem::Type) {
+                rects.append(item->sceneBoundingRect());
+            }
+        }
+        return rects;
+    }
+
     QGraphicsScene m_scene;
     aadlinterface::AADLFunctionGraphicsItem *f1 { nullptr };
     aadlinterface::AADLFunctionGraphicsItem *f2 { nullptr };
@@ -284,7 +296,7 @@ void tst_ConnectionUtils::tst_createConnectionPath()
     const QRectF r1 = f1->sceneBoundingRect();
     const QRectF r2 = f2->sceneBoundingRect();
     QVector<QPointF> path = aadlinterface::createConnectionPath(
-            &m_scene, QPointF(r1.x(), r1.y() + 100), r1, QPointF(r2.right(), r2.y() + 100), r2);
+            existingRects(), QPointF(r1.x(), r1.y() + 100), r1, QPointF(r2.right(), r2.y() + 100), r2);
     QVERIFY(!path.isEmpty());
     path.append(path.last());
     path.append(path.last());
@@ -305,13 +317,13 @@ void tst_ConnectionUtils::tst_findPath()
     const QLineF endSegment = aadlinterface::ifaceSegment(r2, endPoint, startPoint);
 
     QRectF intersectedRect;
-    auto path = aadlinterface::findPath(&m_scene, startSegment, endSegment, &intersectedRect);
+    auto path = aadlinterface::findPath(existingRects(), startSegment, endSegment, &intersectedRect);
     QVERIFY(!intersectedRect.isNull());
     QVERIFY(path.isEmpty());
 
     intersectedRect = {};
-    path = aadlinterface::findPath(
-            &m_scene, QLineF(r1.topLeft(), r1.topRight()), QLineF(r2.bottomRight(), r2.bottomLeft()), &intersectedRect);
+    path = aadlinterface::findPath(existingRects(), QLineF(r1.topLeft(), r1.topRight()),
+            QLineF(r2.bottomRight(), r2.bottomLeft()), &intersectedRect);
     QVERIFY(intersectedRect.isNull());
     QVERIFY(!path.isEmpty());
 }
@@ -371,7 +383,7 @@ void tst_ConnectionUtils::tst_pathByPoints()
     const QPointF startPoint(r1.x() - 100, r1.center().y());
     const QPointF endPoint(r2.right() + 100, r2.center().y());
 
-    auto path = aadlinterface::path(&m_scene, startPoint, endPoint);
+    auto path = aadlinterface::path(existingRects(), startPoint, endPoint);
     QVERIFY(!path.isEmpty());
 }
 
@@ -508,7 +520,7 @@ void tst_ConnectionUtils::tst_path()
     const QLineF startSegment = aadlinterface::ifaceSegment(r1, startPoint, endPoint);
     const QLineF endSegment = aadlinterface::ifaceSegment(r2, endPoint, startPoint);
 
-    auto path = aadlinterface::path(&m_scene, startSegment, endSegment);
+    auto path = aadlinterface::path(existingRects(), startSegment, endSegment);
     QVERIFY(!path.isEmpty());
 }
 
@@ -556,7 +568,7 @@ void tst_ConnectionUtils::checkEndPoints(aadlinterface::AADLFunctionGraphicsItem
                     QCOMPARE(result.connectionPoints, connectionPoints);
                 }
 
-                const auto path = aadlinterface::createConnectionPath(&m_scene,
+                const auto path = aadlinterface::createConnectionPath(existingRects(),
                         isReversed ? result.connectionPoints.last() : result.connectionPoints.first(), start.rect(),
                         isReversed ? result.connectionPoints.first() : result.connectionPoints.last(), end.rect());
                 QVERIFY(!path.isEmpty());

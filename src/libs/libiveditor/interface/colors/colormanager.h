@@ -88,6 +88,7 @@ public:
         ConnectionGroup,
         IfaceGroup,
         ConnectionFlow,
+        FunctionScale,
     };
     Q_ENUM(HandledColors)
 
