@@ -104,6 +104,19 @@ void MscSystemChecks::removeMscInstances(aadl::AADLObjectFunction *aadlFunction)
 }
 
 /*!
+   Returns if there is at least one msc instance corresponding to \p aadlFunction
+ */
+bool MscSystemChecks::hasCorrespondingInstances(aadl::AADLObjectFunction *aadlFunction) const
+{
+    for (QSharedPointer<msc::MSCEditorCore> &mscCore : allMscCores()) {
+        if (!mscCore->correspondingInstances(aadlFunction).isEmpty()) {
+            return true;
+        }
+    }
+    return false;
+}
+
+/*!
   Returns if at least one message in one of the .msc files has the name \p messageName
  */
 bool MscSystemChecks::mscMessagesExist(const QString &messageName, const QString &sourceName, const QString &targetName)
@@ -144,6 +157,19 @@ void MscSystemChecks::removeMscMessages(aadl::AADLObjectConnection *aadlConnecti
     for (QSharedPointer<msc::MSCEditorCore> &mscCore : allMscCores()) {
         mscCore->removeMscMessages(aadlConnection);
     }
+}
+
+/*!
+   Returns if there is at least one msc message corresponding to \p aadlConnection
+ */
+bool MscSystemChecks::hasCorrespondingMessages(aadl::AADLObjectConnection *aadlConnection) const
+{
+    for (QSharedPointer<msc::MSCEditorCore> &mscCore : allMscCores()) {
+        if (!mscCore->correspondingMessages(aadlConnection).isEmpty()) {
+            return true;
+        }
+    }
+    return false;
 }
 
 /*!
@@ -484,6 +510,18 @@ void MscSystemChecks::onEntityRemoved(aadl::AADLObject *entity, shared::UndoComm
         return;
     }
 
+    auto aadlFunction = dynamic_cast<aadl::AADLObjectFunction *>(entity);
+    auto aadlConnection = dynamic_cast<aadl::AADLObjectConnection *>(entity);
+    if (!aadlFunction && !aadlConnection) {
+        return;
+    }
+    if (aadlFunction && !hasCorrespondingInstances(aadlFunction)) {
+        return;
+    }
+    if (aadlConnection && !hasCorrespondingMessages(aadlConnection)) {
+        return;
+    }
+
     bool doRemove = true;
     if (command->isFirstChange()) {
         const int result = QMessageBox::question(nullptr, tr("Remove MSC entities"),
@@ -495,11 +533,9 @@ void MscSystemChecks::onEntityRemoved(aadl::AADLObject *entity, shared::UndoComm
         }
     }
     if (doRemove) {
-        auto aadlFunction = dynamic_cast<aadl::AADLObjectFunction *>(entity);
         if (aadlFunction) {
             removeMscInstances(aadlFunction);
         }
-        auto aadlConnection = dynamic_cast<aadl::AADLObjectConnection *>(entity);
         if (aadlConnection) {
             removeMscMessages(aadlConnection);
         }

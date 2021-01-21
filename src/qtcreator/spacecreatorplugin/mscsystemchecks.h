@@ -61,11 +61,13 @@ public:
     bool mscInstancesExist(const QString &name);
     void changeMscInstanceName(const QString &oldName, const QString &name);
     void removeMscInstances(aadl::AADLObjectFunction *aadlFunction);
+    bool hasCorrespondingInstances(aadl::AADLObjectFunction *aadlFunction) const;
 
     bool mscMessagesExist(const QString &messageName, const QString &sourceName, const QString &targetName);
     void changeMscMessageName(
             const QString &oldName, const QString &name, const QString &sourceName, const QString &targetName);
     void removeMscMessages(aadl::AADLObjectConnection *aadlConnection);
+    bool hasCorrespondingMessages(aadl::AADLObjectConnection *aadlConnection) const;
 
     void checkInstances();
     void checkMessages();

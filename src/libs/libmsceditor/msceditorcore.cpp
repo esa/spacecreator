@@ -547,15 +547,15 @@ void MSCEditorCore::changeMscMessageName(
 }
 
 /*!
-   Removes all instance that are corresponding to the function \p aaldFunction
+   Removes all instance that are corresponding to the function \p aadlFunction
  */
-void MSCEditorCore::removeMscInstances(aadl::AADLObjectFunction *aaldFunction)
+void MSCEditorCore::removeMscInstances(aadl::AADLObjectFunction *aadlFunction)
 {
     bool updated = false;
     msc::MscCommandsStack *undo = commandsStack();
     for (msc::MscChart *chart : m_model->mscModel()->allCharts()) {
         for (msc::MscInstance *instance : chart->instances()) {
-            if (m_aadlChecks->correspond(aaldFunction, instance)) {
+            if (m_aadlChecks->correspond(aadlFunction, instance)) {
                 auto cmd = new msc::cmd::CmdDeleteEntity({ instance }, chart);
                 undo->push(cmd);
                 updated = true;
@@ -588,6 +588,39 @@ void MSCEditorCore::removeMscMessages(aadl::AADLObjectConnection *aadlConnection
     if (updated) {
         Q_EMIT editedExternally(this);
     }
+}
+
+/*!
+   Returns a list of all corresponding instances for aadl function \p aadlFunction.
+ */
+QList<MscInstance *> MSCEditorCore::correspondingInstances(aadl::AADLObjectFunction *aadlFunction) const
+{
+    QList<MscInstance *> corresponds;
+    for (msc::MscChart *chart : m_model->mscModel()->allCharts()) {
+        for (msc::MscInstance *instance : chart->instances()) {
+            if (m_aadlChecks->correspond(aadlFunction, instance)) {
+                corresponds.append(instance);
+            }
+        }
+    }
+
+    return corresponds;
+}
+
+/*!
+   Returns a list of all corresponding messages for aadl connection \p aadlConnection.
+ */
+QList<MscMessage *> MSCEditorCore::correspondingMessages(aadl::AADLObjectConnection *aadlConnection) const
+{
+    QList<MscMessage *> corresponds;
+    for (msc::MscChart *chart : m_model->mscModel()->allCharts()) {
+        for (msc::MscMessage *message : chart->messages()) {
+            if (m_aadlChecks->correspond(aadlConnection, message)) {
+                corresponds.append(message);
+            }
+        }
+    }
+    return corresponds;
 }
 
 QString MSCEditorCore::filePath() const

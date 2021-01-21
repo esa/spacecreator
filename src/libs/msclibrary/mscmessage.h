@@ -55,6 +55,7 @@ public:
 
     explicit MscMessage(QObject *parent = nullptr);
     explicit MscMessage(const QString &name, QObject *parent = nullptr);
+    MscMessage(const QString &name, MscInstance *source, MscInstance *target, QObject *parent = nullptr);
 
     const QString &messageInstanceName() const;
     void setMessageInstanceName(const QString &name);

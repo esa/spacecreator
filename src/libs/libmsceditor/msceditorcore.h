@@ -21,6 +21,7 @@
 #include "graphicsview.h"
 #include "mscdocument.h"
 
+#include <QList>
 #include <QStackedWidget>
 #include <QVector>
 #include <memory>
@@ -48,6 +49,8 @@ class MainModel;
 class MessageCreatorTool;
 class MscChart;
 class MscCommandsStack;
+class MscInstance;
+class MscMessage;
 class PointerTool;
 class TimerCreatorTool;
 
@@ -121,8 +124,10 @@ public:
     void changeMscInstanceName(const QString &oldName, const QString &name);
     void changeMscMessageName(
             const QString &oldName, const QString &newName, const QString &sourceName, const QString &targetName);
-    void removeMscInstances(aadl::AADLObjectFunction *aaldFunction);
+    void removeMscInstances(aadl::AADLObjectFunction *aadlFunction);
     void removeMscMessages(aadl::AADLObjectConnection *aadlConnection);
+    QList<msc::MscInstance *> correspondingInstances(aadl::AADLObjectFunction *aadlFunction) const;
+    QList<msc::MscMessage *> correspondingMessages(aadl::AADLObjectConnection *aadlConnection) const;
 
     QString filePath() const override;
     bool save() override;

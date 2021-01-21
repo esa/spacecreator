@@ -42,6 +42,13 @@ MscMessage::MscMessage(const QString &name, QObject *parent)
 {
 }
 
+MscMessage::MscMessage(const QString &name, MscInstance *source, MscInstance *target, QObject *parent)
+    : MscInstanceEvent(name, parent)
+    , m_source(source)
+    , m_target(target)
+{
+}
+
 /*!
    \fn MscMessage::messageInstanceName
    In case, where the \<message name\> and the \<output address\> or \<input address\>
