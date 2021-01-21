@@ -15,4 +15,5 @@ add_subdirectory(libmsceditor)
 add_subdirectory(msclibrary)
 
 # deployment view editor
+add_subdirectory(deploy)
 add_subdirectory(libdveditor)
