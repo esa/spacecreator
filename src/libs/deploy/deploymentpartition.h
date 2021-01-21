@@ -1,17 +1,31 @@
-#ifndef DEPLOYMENTPARTITION_H
-#define DEPLOYMENTPARTITION_H
+/*
+   Copyright (C) 2021 European Space Agency - <maxime.perrotin@esa.int>
 
-#include <QObject>
+   This library is free software; you can redistribute it and/or
+   modify it under the terms of the GNU Library General Public
+   License as published by the Free Software Foundation; either
+   version 2 of the License, or (at your option) any later version.
 
-class DeploymentPartition : public QObject
+   This library is distributed in the hope that it will be useful,
+   but WITHOUT ANY WARRANTY; without even the implied warranty of
+   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+   Library General Public License for more details.
+
+   You should have received a copy of the GNU Library General Public License
+   along with this program. If not, see <https://www.gnu.org/licenses/lgpl-2.1.html>.
+*/
+
+#pragma once
+
+#include "deploymentobject.h"
+
+namespace deployment {
+
+class DeploymentPartition : public DeploymentObject
 {
     Q_OBJECT
 public:
-    explicit DeploymentPartition(QObject *parent = nullptr);
-
-signals:
-
-public slots:
+    explicit DeploymentPartition(DeploymentObject *parent = nullptr);
 };
 
-#endif // DEPLOYMENTPARTITION_H
+} // namespace deployment
