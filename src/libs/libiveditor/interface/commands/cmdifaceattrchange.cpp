@@ -111,25 +111,7 @@ bool CmdIfaceAttrChange::connectionMustDie(const aadl::AADLObjectConnection *con
     }
 
     const aadl::AADLObjectIface::OperationKind newKind = m_iface->kindFromString(m_newValue.toString());
-    if (aadl::AADLObjectIface::OperationKind::Cyclic == newKind)
-        return true;
-    if (aadl::AADLObjectIface::OperationKind::Any == newKind
-            || aadl::AADLObjectIface::OperationKind::Any == otherIface->kind())
-        return false;
-
-    if (!connection->isOneDirection()) {
-        auto isInheritsPI = [](const aadl::AADLObjectIface *iface) {
-            if (iface && iface->isRequired())
-                if (const auto ri = iface->as<const aadl::AADLObjectIfaceRequired *>())
-                    return ri->isInheritPI();
-            return false;
-        };
-
-        if (isInheritsPI(m_iface) || isInheritsPI(otherIface))
-            return false;
-    }
-
-    return otherIface->kind() != newKind;
+    return aadl::AADLObjectIface::OperationKind::Cyclic == newKind;
 }
 
 }
