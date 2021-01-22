@@ -15,13 +15,13 @@
    along with this program. If not, see <https://www.gnu.org/licenses/lgpl-2.1.html>.
 */
 
-#include "deploymentbinding.h"
+#include "deploylink.h"
 
-namespace deployment {
+namespace dvm {
 
-DeploymentBinding::DeploymentBinding(DeploymentObject *parent)
-    : DeploymentObject(DeploymentObject::Type::Binding, {}, parent)
+DeployLink::DeployLink(DeployObject *parent)
+    : DeployObject(DeployObject::Type::Link, {}, parent)
 {
 }
 
-} // namespace deployment
+} // namespace deploy

@@ -15,20 +15,17 @@
    along with this program. If not, see <https://www.gnu.org/licenses/lgpl-2.1.html>.
 */
 
-#include <QObject>
-#include <memory>
+#pragma once
 
-namespace deployment {
-struct DeploymentObjectsModelPrivate;
-class DeploymentObjectsModel : public QObject
+#include "deployobject.h"
+
+namespace dvm {
+
+class DeployDevice : public DeployObject
 {
     Q_OBJECT
 public:
-    explicit DeploymentObjectsModel(QObject *parent = nullptr);
-    ~DeploymentObjectsModel() override;
-
-private:
-    const std::unique_ptr<DeploymentObjectsModelPrivate> d;
+    explicit DeployDevice(DeployObject *parent = nullptr);
 };
 
-} // namespace deployment
+} // namespace deploy

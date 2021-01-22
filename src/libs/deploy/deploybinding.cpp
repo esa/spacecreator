@@ -15,13 +15,13 @@
    along with this program. If not, see <https://www.gnu.org/licenses/lgpl-2.1.html>.
 */
 
-#include "deploymentpartition.h"
+#include "deploybinding.h"
 
-namespace deployment {
+namespace dvm {
 
-DeploymentPartition::DeploymentPartition(DeploymentObject *parent)
-    : DeploymentObject(DeploymentObject::Type::Partition, {}, parent)
+DeployBinding::DeployBinding(DeployObject *parent)
+    : DeployObject(DeployObject::Type::Binding, {}, parent)
 {
 }
 
-} // namespace deployment
+} // namespace deploy

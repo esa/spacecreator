@@ -15,25 +15,17 @@
    along with this program. If not, see <https://www.gnu.org/licenses/lgpl-2.1.html>.
 */
 
-#include "deploymentobjectsmodel.h"
+#pragma once
 
-#include "common.h"
-#include "deploymentobject.h"
+#include "deployobject.h"
 
-#include <QHash>
+namespace dvm {
 
-namespace deployment {
-
-struct DeploymentObjectsModelPrivate {
-    QHash<shared::Id, DeploymentObject *> m_items;
+class DeployBus : public DeployObject
+{
+    Q_OBJECT
+public:
+    explicit DeployBus(DeployObject *parent = nullptr);
 };
 
-DeploymentObjectsModel::DeploymentObjectsModel(QObject *parent)
-    : QObject(parent)
-    , d(std::make_unique<DeploymentObjectsModelPrivate>())
-{
-}
-
-DeploymentObjectsModel::~DeploymentObjectsModel() {}
-
-} // namespace deployment
+} // namespace deploy

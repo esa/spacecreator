@@ -17,7 +17,7 @@
 
 #include "prop.h"
 
-namespace deployment {
+namespace dvm {
 namespace meta {
 
 const QHash<QString, Props::Token> Props::TokensByName = {

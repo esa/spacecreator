@@ -21,7 +21,7 @@
 #include <QObject>
 #include <QString>
 
-namespace deployment {
+namespace dvm {
 namespace meta {
 
 struct Props {

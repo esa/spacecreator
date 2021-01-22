@@ -15,17 +15,13 @@
    along with this program. If not, see <https://www.gnu.org/licenses/lgpl-2.1.html>.
 */
 
-#pragma once
+#include "deploypartition.h"
 
-#include "deploymentobject.h"
+namespace dvm {
 
-namespace deployment {
-
-class DeploymentBus : public DeploymentObject
+DeployPartition::DeployPartition(DeployObject *parent)
+    : DeployObject(DeployObject::Type::Partition, {}, parent)
 {
-    Q_OBJECT
-public:
-    explicit DeploymentBus(DeploymentObject *parent = nullptr);
-};
+}
 
-} // namespace deployment
+} // namespace deploy

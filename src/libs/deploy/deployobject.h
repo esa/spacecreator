@@ -25,12 +25,12 @@
 #include <QVector>
 #include <memory>
 
-namespace deployment {
+namespace dvm {
 
-class DeploymentObjectsModel;
+class DeployObjectsModel;
 
-struct DeploymentObjectPrivate;
-class DeploymentObject : public QObject
+struct DeployObjectPrivate;
+class DeployObject : public QObject
 {
     Q_OBJECT
     Q_PROPERTY(QString title READ title WRITE setTitle NOTIFY titleChanged)
@@ -50,19 +50,19 @@ public:
     };
     Q_ENUM(Type)
 
-    explicit DeploymentObject(const DeploymentObject::Type t, const QString &title = QString(),
-            QObject *parent = nullptr, const shared::Id &id = shared::InvalidId);
-    virtual ~DeploymentObject();
+    explicit DeployObject(const DeployObject::Type t, const QString &title = QString(), QObject *parent = nullptr,
+            const shared::Id &id = shared::InvalidId);
+    virtual ~DeployObject();
 
     QString title() const;
     shared::Id id() const;
 
-    DeploymentObject::Type deployType() const;
+    DeployObject::Type deployType() const;
 
     QVector<qint32> coordinates() const;
     void setCoordinates(const QVector<qint32> &coordinates);
 
-    DeploymentObject *parentObject() const;
+    DeployObject *parentObject() const;
 
     // "attributes" - payload data in the opening XML tag,
     QHash<QString, QVariant> attrs() const;
@@ -82,8 +82,8 @@ public:
     bool hasProperty(const QString &propertyName, const QVariant &value = QVariant()) const;
     bool hasProperties(const QHash<QString, QVariant> &props) const;
 
-    void setObjectsModel(DeploymentObjectsModel *model);
-    DeploymentObjectsModel *objectsModel() const;
+    void setObjectsModel(DeployObjectsModel *model);
+    DeployObjectsModel *objectsModel() const;
 
     template<class T>
     inline T as()
@@ -110,15 +110,15 @@ Q_SIGNALS:
 
 public Q_SLOTS:
     bool setTitle(const QString &title);
-    bool setParentObject(DeploymentObject *parentObject);
+    bool setParentObject(DeployObject *parentObject);
 
 private:
-    const std::unique_ptr<DeploymentObjectPrivate> d;
+    const std::unique_ptr<DeployObjectPrivate> d;
 };
 
-inline uint qHash(const DeploymentObject::Type &key, uint seed)
+inline uint qHash(const DeployObject::Type &key, uint seed)
 {
     return ::qHash(static_cast<uint>(key), seed);
 }
 
-} // namespace deployment
+} // namespace deploy

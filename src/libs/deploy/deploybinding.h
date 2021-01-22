@@ -17,15 +17,15 @@
 
 #pragma once
 
-#include "deploymentobject.h"
+#include "deployobject.h"
 
-namespace deployment {
+namespace dvm {
 
-class DeploymentNode : public DeploymentObject
+class DeployBinding : public DeployObject
 {
     Q_OBJECT
 public:
-    explicit DeploymentNode(DeploymentObject *parent = nullptr);
+    explicit DeployBinding(DeployObject *parent = nullptr);
 };
 
-} // namespace deployment
+} // namespace deploy

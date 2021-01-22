@@ -3,24 +3,24 @@ set(LIB_NAME deploy)
 add_library(${LIB_NAME} STATIC)
 
 target_sources(${LIB_NAME} PRIVATE
-    deploymentobject.cpp
-    deploymentobject.h
-    deploymentobjectsmodel.cpp
-    deploymentobjectsmodel.h
-    deploymentnode.cpp
-    deploymentnode.h
-    deploymentprocessor.cpp
-    deploymentprocessor.h
-    deploymentpartition.cpp
-    deploymentpartition.h
-    deploymentdevice.cpp
-    deploymentdevice.h
-    deploymentbus.cpp
-    deploymentbus.h
-    deploymentlink.cpp
-    deploymentlink.h
-    deploymentbinding.cpp
-    deploymentbinding.h
+    deployobject.cpp
+    deployobject.h
+    deployobjectsmodel.cpp
+    deployobjectsmodel.h
+    deploynode.cpp
+    deploynode.h
+    deployprocessor.cpp
+    deployprocessor.h
+    deploypartition.cpp
+    deploypartition.h
+    deploydevice.cpp
+    deploydevice.h
+    deploybus.cpp
+    deploybus.h
+    deploylink.cpp
+    deploylink.h
+    deploybinding.cpp
+    deploybinding.h
     prop.cpp
     prop.h
 )

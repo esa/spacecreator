@@ -15,13 +15,13 @@
    along with this program. If not, see <https://www.gnu.org/licenses/lgpl-2.1.html>.
 */
 
-#include "deploymentdevice.h"
+#include "deploybus.h"
 
-namespace deployment {
+namespace dvm {
 
-DeploymentDevice::DeploymentDevice(DeploymentObject *parent)
-    : DeploymentObject(DeploymentObject::Type::Device, {}, parent)
+DeployBus::DeployBus(DeployObject *parent)
+    : DeployObject(DeployObject::Type::Bus, {}, parent)
 {
 }
 
-} // namespace deployment
+} // namespace deploy
