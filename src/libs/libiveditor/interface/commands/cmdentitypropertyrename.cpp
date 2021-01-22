@@ -22,7 +22,7 @@
 
 #include <aadlobjectsmodel.h>
 
-namespace aadlinterface {
+namespace ive {
 namespace cmd {
 
 CmdEntityPropertyRename::CmdEntityPropertyRename(aadl::AADLObject *entity, const QHash<QString, QString> &props)

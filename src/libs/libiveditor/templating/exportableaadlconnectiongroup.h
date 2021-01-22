@@ -23,7 +23,7 @@ namespace aadl {
 class AADLObjectConnectionGroup;
 }
 
-namespace aadlinterface {
+namespace ive {
 
 class ExportableAADLConnectionGroup : public ExportableAADLObject
 {
@@ -44,7 +44,7 @@ public:
     QVariantMap targetInterfaces() const;
 };
 
-} // namespace aadlinterface
+} // namespace ive
 
-Q_DECLARE_METATYPE(aadlinterface::ExportableAADLConnectionGroup)
-Q_DECLARE_TYPEINFO(aadlinterface::ExportableAADLConnectionGroup, Q_MOVABLE_TYPE);
+Q_DECLARE_METATYPE(ive::ExportableAADLConnectionGroup)
+Q_DECLARE_TYPEINFO(ive::ExportableAADLConnectionGroup, Q_MOVABLE_TYPE);

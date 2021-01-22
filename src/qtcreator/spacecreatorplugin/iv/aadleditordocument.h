@@ -21,7 +21,7 @@
 #include <QSharedPointer>
 #include <coreplugin/idocument.h>
 
-namespace aadlinterface {
+namespace ive {
 class IVEditorCore;
 }
 
@@ -45,16 +45,16 @@ public:
     bool reload(QString *errorString, ReloadFlag flag, ChangeType type) override;
 
     // Internal
-    QSharedPointer<aadlinterface::IVEditorCore> ivEditorCore() const;
+    QSharedPointer<ive::IVEditorCore> ivEditorCore() const;
     void setFilePath(const Utils::FileName &) override;
 
 Q_SIGNALS:
     void reloadRequested(QString *errorString, const QString &);
-    void ivDataLoaded(const QString &fileName, QSharedPointer<aadlinterface::IVEditorCore> data);
+    void ivDataLoaded(const QString &fileName, QSharedPointer<ive::IVEditorCore> data);
 
 private:
     QPointer<AadlModelStorage> m_aadlStorage;
-    QSharedPointer<aadlinterface::IVEditorCore> m_plugin;
+    QSharedPointer<ive::IVEditorCore> m_plugin;
 };
 
 }

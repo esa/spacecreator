@@ -22,7 +22,7 @@ class QSignalMapper;
 #include <QDialog>
 #include <aadlobjectconnectiongroup.h>
 
-namespace aadlinterface {
+namespace ive {
 
 class CreateConnectionGroupDialog : public QDialog
 {
@@ -41,4 +41,4 @@ private:
     QSignalMapper *m_signalMapper = nullptr;
 };
 
-} // namespace aadlinterface
+} // namespace ive

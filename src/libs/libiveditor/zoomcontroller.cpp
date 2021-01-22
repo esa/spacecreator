@@ -25,10 +25,10 @@
 #include <QIntValidator>
 #include <QLabel>
 
-namespace aadlinterface {
+namespace ive {
 
 /*!
- * \class aadlinterface::ZoomValidator
+ * \class ive::ZoomValidator
  * \brief validator used in ZoomController's combo box.
  * \sa ZoomController
  */
@@ -80,7 +80,7 @@ private:
 };
 
 /*!
- * \class aadlinterface::ZoomController
+ * \class ive::ZoomController
  * \brief Control to change, reset and display the zoom level of the graphics scene. Uses editable combo box.
  * \sa ZoomValidator
  */

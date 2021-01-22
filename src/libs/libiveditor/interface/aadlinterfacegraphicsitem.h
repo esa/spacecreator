@@ -29,7 +29,7 @@ namespace aadl {
 class AADLObjectIface;
 }
 
-namespace aadlinterface {
+namespace ive {
 class AADLConnectionGraphicsItem;
 class AADLFunctionGraphicsItem;
 class AADLFunctionTypeGraphicsItem;
@@ -52,7 +52,7 @@ public:
     void removeConnection(AADLConnectionGraphicsItem *item);
     QList<QPointer<AADLConnectionGraphicsItem>> connectionItems() const;
 
-    aadlinterface::AADLFunctionTypeGraphicsItem *targetItem() const;
+    ive::AADLFunctionTypeGraphicsItem *targetItem() const;
     void setTargetItem(QGraphicsItem *item, const QPointF &globalPos);
 
     void setInterfaceName(const QString &name);

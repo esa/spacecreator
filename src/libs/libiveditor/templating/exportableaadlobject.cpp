@@ -27,7 +27,7 @@
 #include "exportableaadliface.h"
 #include "exportableproperty.h"
 
-namespace aadlinterface {
+namespace ive {
 
 ExportableAADLObject::ExportableAADLObject(const aadl::AADLObject *aadlObject)
     : AbstractExportableObject(aadlObject)

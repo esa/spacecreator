@@ -19,7 +19,7 @@
 
 #include <QGraphicsScene>
 
-namespace aadlinterface {
+namespace ive {
 
 class InterfaceTabGraphicsScene : public QGraphicsScene
 {

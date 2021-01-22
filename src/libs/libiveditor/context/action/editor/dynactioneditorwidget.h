@@ -26,7 +26,7 @@ namespace Ui {
 class DynActionEditorWidget;
 }
 
-namespace aadlinterface {
+namespace ive {
 
 class ActionsModel;
 class ConditionsModel;

@@ -47,8 +47,8 @@ private:
     QGraphicsScene *scene = nullptr;
     aadl::AADLObjectFunction *function = nullptr;
     aadl::AADLObjectIfaceProvided *iface = nullptr;
-    aadlinterface::AADLFunctionGraphicsItem *functionItem = nullptr;
-    aadlinterface::AADLInterfaceGraphicsItem *ifaceItem = nullptr;
+    ive::AADLFunctionGraphicsItem *functionItem = nullptr;
+    ive::AADLInterfaceGraphicsItem *ifaceItem = nullptr;
 };
 
 void tst_PositionLookupHelper::testOnSide(
@@ -56,23 +56,23 @@ void tst_PositionLookupHelper::testOnSide(
 {
     QList<QRectF> siblingsRects;
     for (int idx = 0; idx < itemRects.size(); ++idx) {
-        aadlinterface::PositionLookupHelper clockwiseHelper(
+        ive::PositionLookupHelper clockwiseHelper(
                 sidePaths, parentBoundingRect, siblingsRects, itemRects.value(idx), initialOffset, true);
-        aadlinterface::PositionLookupHelper counterClockwiseHelper(
+        ive::PositionLookupHelper counterClockwiseHelper(
                 sidePaths, parentBoundingRect, siblingsRects, itemRects.value(idx), initialOffset, false);
         while (clockwiseHelper.hasNext() || counterClockwiseHelper.hasNext()) {
             if (clockwiseHelper.lookup()) {
                 if (clockwiseHelper.isSideChanged())
                     ifaceItem->updateInternalItems(clockwiseHelper.side());
                 ifaceItem->setPos(clockwiseHelper.mappedOriginPoint());
-                iface->setCoordinates(aadlinterface::coordinates(clockwiseHelper.mappedOriginPoint()));
+                iface->setCoordinates(ive::coordinates(clockwiseHelper.mappedOriginPoint()));
                 ifaceItem->rebuildLayout();
                 break;
             } else if (counterClockwiseHelper.lookup()) {
                 if (counterClockwiseHelper.isSideChanged())
                     ifaceItem->updateInternalItems(counterClockwiseHelper.side());
                 ifaceItem->setPos(counterClockwiseHelper.mappedOriginPoint());
-                iface->setCoordinates(aadlinterface::coordinates(counterClockwiseHelper.mappedOriginPoint()));
+                iface->setCoordinates(ive::coordinates(counterClockwiseHelper.mappedOriginPoint()));
                 ifaceItem->rebuildLayout();
                 break;
             }
@@ -86,13 +86,13 @@ void tst_PositionLookupHelper::initTestCase()
 {
     scene = new QGraphicsScene;
     function = new aadl::AADLObjectFunction("Function");
-    functionItem = new aadlinterface::AADLFunctionGraphicsItem(function);
+    functionItem = new ive::AADLFunctionGraphicsItem(function);
     scene->addItem(functionItem);
     functionItem->setBoundingRect(QRectF(0, 0, 500, 500));
     aadl::AADLObjectIface::CreationInfo ci;
     ci.name = "PI";
     iface = new aadl::AADLObjectIfaceProvided(ci);
-    ifaceItem = new aadlinterface::AADLInterfaceGraphicsItem(iface, functionItem);
+    ifaceItem = new ive::AADLInterfaceGraphicsItem(iface, functionItem);
     ifaceItem->updateLabel();
 
     sidePaths = {
@@ -130,7 +130,7 @@ void tst_PositionLookupHelper::testLookupOnTop()
     const QRectF parentBoundingRect = functionItem->boundingRect();
     itemRect.translate(parentBoundingRect.left() + parentBoundingRect.width() / 2, parentBoundingRect.top());
     const int ifaceCount = (parentBoundingRect.width() * 2 + parentBoundingRect.height() * 2)
-            / (itemRect.width() + aadlinterface::kInterfaceLayoutOffset);
+            / (itemRect.width() + ive::kInterfaceLayoutOffset);
     QVector<QRectF> itemRects(ifaceCount, itemRect);
     testOnSide(itemRects, initialOffset, parentBoundingRect);
 }
@@ -142,7 +142,7 @@ void tst_PositionLookupHelper::testLookupOnLeft()
     const QRectF parentBoundingRect = functionItem->boundingRect();
     itemRect.translate(parentBoundingRect.left(), parentBoundingRect.top() + parentBoundingRect.height() / 2);
     const int ifaceCount = (parentBoundingRect.width() * 2 + parentBoundingRect.height() * 2)
-            / (itemRect.width() + aadlinterface::kInterfaceLayoutOffset);
+            / (itemRect.width() + ive::kInterfaceLayoutOffset);
     QVector<QRectF> itemRects(ifaceCount, itemRect);
     testOnSide(itemRects, initialOffset, parentBoundingRect);
 }
@@ -154,7 +154,7 @@ void tst_PositionLookupHelper::testLookupOnRight()
     const QRectF parentBoundingRect = functionItem->boundingRect();
     itemRect.translate(parentBoundingRect.right(), parentBoundingRect.top() + parentBoundingRect.height() / 2);
     const int ifaceCount = (parentBoundingRect.width() * 2 + parentBoundingRect.height() * 2)
-            / (itemRect.width() + aadlinterface::kInterfaceLayoutOffset);
+            / (itemRect.width() + ive::kInterfaceLayoutOffset);
     QVector<QRectF> itemRects(ifaceCount, itemRect);
     testOnSide(itemRects, initialOffset, parentBoundingRect);
 }
@@ -165,7 +165,7 @@ void tst_PositionLookupHelper::testLookupOnBottom()
     const QRectF parentBoundingRect = functionItem->boundingRect();
     itemRect.translate(parentBoundingRect.left() + parentBoundingRect.width() / 2, parentBoundingRect.bottom());
     const int ifaceCount = (parentBoundingRect.width() * 2 + parentBoundingRect.height() * 2)
-            / (itemRect.width() + aadlinterface::kInterfaceLayoutOffset);
+            / (itemRect.width() + ive::kInterfaceLayoutOffset);
     QVector<QRectF> itemRects(ifaceCount, itemRect);
     testOnSide(itemRects, initialOffset, parentBoundingRect);
 }
@@ -183,7 +183,7 @@ void tst_PositionLookupHelper::testLookupAllSides()
         QPointF(parentBoundingRect.left(), parentBoundingRect.top() + parentBoundingRect.height() / 2) };
 
     const int ifaceCount = (parentBoundingRect.width() * 2 + parentBoundingRect.height() * 2)
-            / (itemRect.width() + aadlinterface::kInterfaceLayoutOffset);
+            / (itemRect.width() + ive::kInterfaceLayoutOffset);
     QVector<QRectF> itemRects(ifaceCount);
     for (int idx = 0; idx < ifaceCount; ++idx) {
         itemRect.moveTopLeft(insertPoints.value(idx % insertPoints.size()) + initialOffset);

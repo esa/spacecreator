@@ -19,7 +19,7 @@
 
 #include <QStandardPaths>
 
-namespace aadlinterface {
+namespace ive {
 
 GroupMainWindow::GroupMainWindow()
     : Geometry(QString("%1/Geometry").arg(localName()))

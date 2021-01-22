@@ -45,7 +45,7 @@
 
 static const qreal kBorderWidth = 2;
 
-namespace aadlinterface {
+namespace ive {
 
 AADLFunctionTypeGraphicsItem::AADLFunctionTypeGraphicsItem(aadl::AADLObjectFunctionType *entity, QGraphicsItem *parent)
     : AADLRectGraphicsItem(entity, parent)
@@ -197,7 +197,7 @@ void AADLFunctionTypeGraphicsItem::onManualResizeProgress(
                 return;
             }
 
-            const QPointF storedPos = aadlinterface::pos(obj->coordinates());
+            const QPointF storedPos = ive::pos(obj->coordinates());
             if (storedPos.isNull() || !grip) {
                 iface->instantLayoutUpdate();
                 continue;

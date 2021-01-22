@@ -23,7 +23,7 @@
 #include <QDialogButtonBox>
 #include <QPushButton>
 
-namespace aadlinterface {
+namespace ive {
 
 PropertyTemplateManager::PropertyTemplateManager(QWidget *parent)
     : QDialog(parent)
@@ -44,7 +44,7 @@ void PropertyTemplateManager::accept()
 {
     ui->widget->save();
     auto config = aadl::PropertyTemplateConfig::instance();
-    config->init(aadlinterface::PropertyTemplateWidget::dynamicPropertiesFilePath());
+    config->init(ive::PropertyTemplateWidget::dynamicPropertiesFilePath());
 
     QDialog::accept();
 }

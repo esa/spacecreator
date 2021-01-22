@@ -72,10 +72,10 @@ private:
 void tst_AadlSystemChecks::initTestCase()
 {
     QStandardPaths::setTestModeEnabled(true);
-    aadlinterface::initIvEditor();
+    ive::initIvEditor();
     auto converter = msc::CoordinatesConverter::instance();
     converter->setDPI(QPointF(109., 109.), QPointF(96., 96.));
-    aadlinterface::cmd::CommandsStack::setCurrent(&m_stack);
+    ive::cmd::CommandsStack::setCurrent(&m_stack);
 }
 
 void tst_AadlSystemChecks::init()
@@ -94,7 +94,7 @@ void tst_AadlSystemChecks::testCheckInstanceNames()
     msc::MscChart *chart = m_mscCore->mainModel()->mscModel()->documents().at(0)->documents().at(0)->charts().at(0);
     QVERIFY(chart != nullptr);
 
-    QSharedPointer<aadlinterface::IVEditorCore> ivPlugin(new aadlinterface::IVEditorCore);
+    QSharedPointer<ive::IVEditorCore> ivPlugin(new ive::IVEditorCore);
     m_checker->setIvCore(ivPlugin);
     result = m_checker->checkInstanceNames();
     QCOMPARE(result.size(), 0);
@@ -107,7 +107,7 @@ void tst_AadlSystemChecks::testCheckInstanceNames()
     QCOMPARE(m_checker->checkInstance(instance), false);
 
     // Add function with different name
-    aadlinterface::InterfaceDocument *doc = ivPlugin->document();
+    ive::InterfaceDocument *doc = ivPlugin->document();
     aadl::AADLObjectsModel *aadlModel = doc->objectsModel();
     auto aadlFnct = new aadl::AADLObjectFunction("init");
     aadlModel->addObject(aadlFnct);
@@ -137,7 +137,7 @@ void tst_AadlSystemChecks::testCheckInstanceRelations()
     msc::MscChart *chart = m_mscCore->mainModel()->mscModel()->documents().at(0)->documents().at(0)->charts().at(0);
     QVERIFY(chart != nullptr);
 
-    QSharedPointer<aadlinterface::IVEditorCore> ivPlugin(new aadlinterface::IVEditorCore);
+    QSharedPointer<ive::IVEditorCore> ivPlugin(new ive::IVEditorCore);
     m_checker->setIvCore(ivPlugin);
     result = m_checker->checkInstanceRelations();
     QCOMPARE(result.size(), 0);
@@ -151,7 +151,7 @@ void tst_AadlSystemChecks::testCheckInstanceRelations()
     QCOMPARE(result.size(), 0);
 
     // Add function for the instances
-    aadlinterface::InterfaceDocument *doc = ivPlugin->document();
+    ive::InterfaceDocument *doc = ivPlugin->document();
     aadl::AADLObjectsModel *aadlModel = doc->objectsModel();
     auto function1 = new aadl::AADLObjectFunction("init");
     aadlModel->addObject(function1);
@@ -179,7 +179,7 @@ void tst_AadlSystemChecks::testCheckMessageNames()
     msc::MscChart *chart = m_mscCore->mainModel()->mscModel()->documents().at(0)->documents().at(0)->charts().at(0);
     QVERIFY(chart != nullptr);
 
-    QSharedPointer<aadlinterface::IVEditorCore> ivPlugin(new aadlinterface::IVEditorCore);
+    QSharedPointer<ive::IVEditorCore> ivPlugin(new ive::IVEditorCore);
     m_checker->setIvCore(ivPlugin);
     QVector<QPair<msc::MscChart *, msc::MscMessage *>> result = m_checker->checkMessages();
     QCOMPARE(result.size(), 0);
@@ -200,7 +200,7 @@ void tst_AadlSystemChecks::testCheckMessageNames()
     QCOMPARE(result.size(), 1);
 
     // Add function with different source/target
-    aadlinterface::InterfaceDocument *doc = ivPlugin->document();
+    ive::InterfaceDocument *doc = ivPlugin->document();
     aadl::AADLObjectsModel *aadlModel = doc->objectsModel();
     auto aadlfFuncA = new aadl::AADLObjectFunction("Instance A");
     aadlModel->addObject(aadlfFuncA);
@@ -302,12 +302,12 @@ void tst_AadlSystemChecks::testCheckMessage()
     QCOMPARE(m_checker->checkMessage(message), true);
 
     // Add IVEditorCore for real checks
-    QSharedPointer<aadlinterface::IVEditorCore> ivPlugin(new aadlinterface::IVEditorCore);
+    QSharedPointer<ive::IVEditorCore> ivPlugin(new ive::IVEditorCore);
     m_checker->setIvCore(ivPlugin);
     QCOMPARE(m_checker->checkMessage(message), false);
 
     // Create corresponding aadl model
-    aadlinterface::InterfaceDocument *doc = ivPlugin->document();
+    ive::InterfaceDocument *doc = ivPlugin->document();
     aadl::AADLObjectsModel *aadlModel = doc->objectsModel();
     auto sourceFunc = new aadl::AADLObjectFunction("Dummy1");
     aadlModel->addObject(sourceFunc);

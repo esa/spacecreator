@@ -19,7 +19,7 @@
 #include <QJsonObject>
 #include <QVariant>
 
-namespace aadlinterface {
+namespace ive {
 
 struct AttrHandler {
     explicit AttrHandler(const QJsonObject &jObj = QJsonObject());

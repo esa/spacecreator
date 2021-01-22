@@ -23,7 +23,7 @@
 #include <QtDebug>
 #include <QtMath>
 
-namespace aadlinterface {
+namespace ive {
 
 PositionLookupHelper::PositionLookupHelper(const QHash<Qt::Alignment, QPainterPath> &sidePaths,
         const QRectF &parentRect, const QList<QRectF> &siblingsRects, const QRectF &itemRect,
@@ -38,7 +38,7 @@ PositionLookupHelper::PositionLookupHelper(const QHash<Qt::Alignment, QPainterPa
     , m_sideIdx(m_initialSideIdx)
     , m_clockwise(clockwise)
 {
-    aadlinterface::checkCollision(m_siblingsRects, m_itemRect, &m_intersectedRect);
+    ive::checkCollision(m_siblingsRects, m_itemRect, &m_intersectedRect);
 }
 
 bool PositionLookupHelper::lookup()
@@ -56,18 +56,18 @@ bool PositionLookupHelper::lookup()
 
 bool PositionLookupHelper::isReady() const
 {
-    return isBounded() && !aadlinterface::checkCollision(m_siblingsRects, m_itemRect);
+    return isBounded() && !ive::checkCollision(m_siblingsRects, m_itemRect);
 }
 
 bool PositionLookupHelper::hasNext() const
 {
-    return qAbs(m_sideIdx - m_initialSideIdx) < aadlinterface::kRectSides.size();
+    return qAbs(m_sideIdx - m_initialSideIdx) < ive::kRectSides.size();
 }
 
 bool PositionLookupHelper::nextRect()
 {
-    if (aadlinterface::checkCollision(m_siblingsRects, m_itemRect, &m_intersectedRect)) {
-        m_itemRect = adjustedRect(m_itemRect, m_intersectedRect, aadlinterface::sideFromIndex(m_sideIdx), m_clockwise);
+    if (ive::checkCollision(m_siblingsRects, m_itemRect, &m_intersectedRect)) {
+        m_itemRect = adjustedRect(m_itemRect, m_intersectedRect, ive::sideFromIndex(m_sideIdx), m_clockwise);
         return true;
     }
     return false;
@@ -87,7 +87,7 @@ void PositionLookupHelper::nextSide()
     // resetting transposed rect to keep origin point on another edge of function
     sideShape.translate(m_itemRect.topLeft() - m_offset);
     m_itemRect =
-            alignRectToSide(m_parentRect, sideShape.boundingRect(), aadlinterface::sideFromIndex(m_sideIdx), m_offset);
+            alignRectToSide(m_parentRect, sideShape.boundingRect(), ive::sideFromIndex(m_sideIdx), m_offset);
 }
 
 bool PositionLookupHelper::isBounded() const
@@ -107,7 +107,7 @@ QPointF PositionLookupHelper::mappedOriginPoint() const
 
 Qt::Alignment PositionLookupHelper::side() const
 {
-    return aadlinterface::sideFromIndex(m_sideIdx);
+    return ive::sideFromIndex(m_sideIdx);
 }
 
-} // namespace aadlinterface
+} // namespace ive

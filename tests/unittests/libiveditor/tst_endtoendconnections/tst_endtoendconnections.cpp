@@ -58,7 +58,7 @@ private Q_SLOTS:
 
 void tst_EndToEndConnections::testReader()
 {
-    const auto dataflow = aadlinterface::EndToEndConnections::readDataflow(::mscFile1, false);
+    const auto dataflow = ive::EndToEndConnections::readDataflow(::mscFile1, false);
 
     QCOMPARE(dataflow.connections.size(), 2);
     QCOMPARE(dataflow.connections[0].from, QString("user_interface"));

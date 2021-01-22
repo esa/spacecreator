@@ -17,7 +17,7 @@
 
 #pragma once
 
-namespace aadlinterface {
+namespace ive {
 namespace cmd {
 
 enum Id

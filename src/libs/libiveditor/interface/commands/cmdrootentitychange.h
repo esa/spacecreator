@@ -26,7 +26,7 @@ namespace aadl {
 class AADLObjectsModel;
 }
 
-namespace aadlinterface {
+namespace ive {
 namespace cmd {
 
 class CmdRootEntityChange : public CmdEntityGeometryChange

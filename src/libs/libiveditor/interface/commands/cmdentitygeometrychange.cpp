@@ -24,7 +24,7 @@
 
 #include <QtDebug>
 
-namespace aadlinterface {
+namespace ive {
 namespace cmd {
 
 CmdEntityGeometryChange::CmdEntityGeometryChange(
@@ -88,7 +88,7 @@ QList<CmdEntityGeometryChange::ObjectData> CmdEntityGeometryChange::convertData(
 
     std::stable_sort(result.begin(), result.end(), [](const ObjectData &data1, const ObjectData &data2) {
         if (data1.entity->aadlType() == data2.entity->aadlType())
-            return aadlinterface::nestingLevel(data1.entity) < aadlinterface::nestingLevel(data2.entity);
+            return ive::nestingLevel(data1.entity) < ive::nestingLevel(data2.entity);
 
         return data1.entity->aadlType() < data2.entity->aadlType();
     });

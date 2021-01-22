@@ -19,7 +19,7 @@
 
 #include "aadlconnectiongraphicsitem.h"
 
-namespace aadlinterface {
+namespace ive {
 
 /*!
    Connection item used for showing a connection of an E2E dataflow

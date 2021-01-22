@@ -20,7 +20,7 @@
 
 #include <ui/textitem.h>
 
-namespace aadlinterface {
+namespace ive {
 
 class AADLFunctionNameGraphicsItem : public shared::ui::TextItem
 {

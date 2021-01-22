@@ -27,7 +27,7 @@ class AADLObjectComment;
 class AADLObjectsModel;
 }
 
-namespace aadlinterface {
+namespace ive {
 namespace cmd {
 
 class CmdCommentItemCreate : public CmdEntityGeometryChange

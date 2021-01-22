@@ -27,7 +27,7 @@ namespace Ui {
 class ColorSettingsWidget;
 }
 
-namespace aadlinterface {
+namespace ive {
 
 class ColorSettingsWidget : public QWidget
 {

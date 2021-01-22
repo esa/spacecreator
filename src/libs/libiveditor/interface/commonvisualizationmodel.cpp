@@ -29,7 +29,7 @@
 #include <QDirIterator>
 #include <QFileInfo>
 
-namespace aadlinterface {
+namespace ive {
 
 CommonVisualizationModel::CommonVisualizationModel(aadl::AADLObjectsModel *aadlModel, QObject *parent)
     : QStandardItemModel(parent)
@@ -285,4 +285,4 @@ void VisualizationModel::onDataChanged(
     }
 }
 
-} // namespace aadlinterface
+} // namespace ive

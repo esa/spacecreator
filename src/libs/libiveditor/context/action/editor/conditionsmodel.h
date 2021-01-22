@@ -18,7 +18,7 @@
 #pragma once
 #include <QStringListModel>
 
-namespace aadlinterface {
+namespace ive {
 
 struct Condition;
 

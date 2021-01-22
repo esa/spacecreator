@@ -55,7 +55,7 @@ private Q_SLOTS:
 
 private:
     msc::MSCEditorCore m_pluginMSC;
-    aadlinterface::IVEditorCore m_pluginAADL;
+    ive::IVEditorCore m_pluginAADL;
 };
 
 void tst_CommandLineParser::testCmdArgumentOpenMsc()

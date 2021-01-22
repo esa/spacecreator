@@ -45,7 +45,7 @@
 #include <QTableView>
 #include <QUndoCommand>
 
-namespace aadlinterface {
+namespace ive {
 
 PropertiesDialog::PropertiesDialog(aadl::PropertyTemplateConfig *dynPropConfig, aadl::AADLObject *obj,
         const QSharedPointer<Asn1Acn::File> &dataTypes, QWidget *parent)
@@ -241,4 +241,4 @@ void PropertiesDialog::initCommentView()
     }
 }
 
-} // namespace aadlinterface
+} // namespace ive

@@ -21,7 +21,7 @@
 
 #include <aadlobjectsmodel.h>
 
-namespace aadlinterface {
+namespace ive {
 namespace cmd {
 
 CmdRootEntityChange::CmdRootEntityChange(aadl::AADLObjectsModel *model, const shared::Id &id)

@@ -32,7 +32,7 @@ namespace shared {
 class UndoCommand;
 }
 
-namespace aadlinterface {
+namespace ive {
 namespace cmd {
 
 class CommandsStack : public shared::cmd::CommandsStackBase

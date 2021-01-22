@@ -24,7 +24,7 @@ namespace aadl {
 class AADLObjectIfaceGroup;
 }
 
-namespace aadlinterface {
+namespace ive {
 
 class AADLInterfaceGroupGraphicsItem : public AADLInterfaceGraphicsItem
 {
@@ -40,4 +40,4 @@ protected:
     QPainterPath ifacePath() const override;
 };
 
-} // namespace aadlinterface
+} // namespace ive

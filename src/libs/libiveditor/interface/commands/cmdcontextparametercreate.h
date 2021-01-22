@@ -27,7 +27,7 @@ namespace aadl {
 class AADLObjectFunctionType;
 }
 
-namespace aadlinterface {
+namespace ive {
 namespace cmd {
 
 class CmdContextParameterCreate : public QUndoCommand

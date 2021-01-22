@@ -20,7 +20,7 @@
 #include <QPointer>
 #include <coreplugin/dialogs/ioptionspage.h>
 
-namespace aadlinterface {
+namespace ive {
 class DynActionEditorWidget;
 }
 
@@ -36,7 +36,7 @@ public:
     void finish() override;
 
 private:
-    QPointer<aadlinterface::DynActionEditorWidget> m_widget;
+    QPointer<ive::DynActionEditorWidget> m_widget;
 };
 
 }

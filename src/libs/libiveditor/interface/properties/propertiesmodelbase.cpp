@@ -17,7 +17,7 @@
 
 #include "propertiesmodelbase.h"
 
-namespace aadlinterface {
+namespace ive {
 
 PropertiesModelBase::PropertiesModelBase(QObject *parent)
     : QStandardItemModel(parent)

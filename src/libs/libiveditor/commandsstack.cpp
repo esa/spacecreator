@@ -25,7 +25,7 @@
 
 #include <QUndoStack>
 
-namespace aadlinterface {
+namespace ive {
 namespace cmd {
 
 bool CommandsStack::push(QUndoCommand *command)

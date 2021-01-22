@@ -27,7 +27,7 @@ class AADLObjectConnection;
 class AADLObjectFunction;
 }
 
-namespace aadlinterface {
+namespace ive {
 class IVEditorCore;
 }
 
@@ -73,7 +73,7 @@ public:
     void checkMessages();
 
     // Query functions
-    QSharedPointer<aadlinterface::IVEditorCore> ivCore() const;
+    QSharedPointer<ive::IVEditorCore> ivCore() const;
     QVector<QSharedPointer<msc::MSCEditorCore>> allMscCores() const;
 
     static QStringList allAadlFiles();

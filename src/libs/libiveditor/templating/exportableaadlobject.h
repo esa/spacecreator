@@ -25,7 +25,7 @@ namespace aadl {
 class AADLObject;
 }
 
-namespace aadlinterface {
+namespace ive {
 
 /**
  * @brief The ExportableAADLObject is a common class to export AADLObject and its successors
@@ -57,11 +57,11 @@ protected:
 
 }
 
-Q_DECLARE_METATYPE(aadlinterface::ExportableAADLObject)
-Q_DECLARE_TYPEINFO(aadlinterface::ExportableAADLObject, Q_MOVABLE_TYPE);
+Q_DECLARE_METATYPE(ive::ExportableAADLObject)
+Q_DECLARE_TYPEINFO(ive::ExportableAADLObject, Q_MOVABLE_TYPE);
 
 template<>
-inline aadlinterface::ExportableAADLObject qvariant_cast<aadlinterface::ExportableAADLObject>(const QVariant &v)
+inline ive::ExportableAADLObject qvariant_cast<ive::ExportableAADLObject>(const QVariant &v)
 {
-    return *static_cast<const aadlinterface::ExportableAADLObject *>(v.constData());
+    return *static_cast<const ive::ExportableAADLObject *>(v.constData());
 }

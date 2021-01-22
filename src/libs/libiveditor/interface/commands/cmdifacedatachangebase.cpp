@@ -22,7 +22,7 @@
 #include "aadlobjectsmodel.h"
 #include "commandsfactory.h"
 
-namespace aadlinterface {
+namespace ive {
 namespace cmd {
 
 CmdIfaceDataChangeBase::CmdIfaceDataChangeBase(aadl::AADLObjectIface *iface, const QString &targetName,

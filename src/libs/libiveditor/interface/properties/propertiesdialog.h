@@ -36,7 +36,7 @@ class AADLObject;
 class PropertyTemplateConfig;
 }
 
-namespace aadlinterface {
+namespace ive {
 
 class PropertiesDialog : public QDialog
 {

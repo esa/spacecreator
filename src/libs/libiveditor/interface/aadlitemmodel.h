@@ -35,7 +35,7 @@ namespace shared {
 class DelayedSignal;
 }
 
-namespace aadlinterface {
+namespace ive {
 class InterfaceTabGraphicsScene;
 class AADLCommentGraphicsItem;
 class AADLInterfaceGraphicsItem;
@@ -114,4 +114,4 @@ private:
     shared::DelayedSignal *m_textUpdate = nullptr;
 };
 
-} // namespace aadlinterface
+} // namespace ive

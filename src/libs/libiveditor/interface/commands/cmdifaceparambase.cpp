@@ -22,7 +22,7 @@
 #include "commandids.h"
 #include "commandsfactory.h"
 
-namespace aadlinterface {
+namespace ive {
 namespace cmd {
 
 QVector<QPointer<aadl::AADLObjectIface>> relatedIfaces(aadl::AADLObjectIface *iface)

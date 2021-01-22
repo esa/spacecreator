@@ -25,7 +25,7 @@ namespace Ui {
 class ColorHandlerEditor;
 }
 
-namespace aadlinterface {
+namespace ive {
 
 class ColorHandlerEditor : public QWidget
 {

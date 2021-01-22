@@ -21,7 +21,7 @@
 
 class QStringListModel;
 
-namespace aadlinterface {
+namespace ive {
 
 class ComboBoxDelegate : public QStyledItemDelegate
 {

@@ -25,7 +25,7 @@ namespace aadl {
 class AADLObjectFunction;
 }
 
-namespace aadlinterface {
+namespace ive {
 class AADLInterfaceGraphicsItem;
 
 class AADLFunctionGraphicsItem : public AADLFunctionTypeGraphicsItem

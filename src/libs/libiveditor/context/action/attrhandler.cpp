@@ -21,10 +21,10 @@
 #include <QJsonDocument>
 #include <QJsonObject>
 
-namespace aadlinterface {
+namespace ive {
 
 /*!
- * \class aadlinterface::AttrHandler
+ * \class ive::AttrHandler
  * \brief The serializable wrapper for AADLObject's attribute to be used with Action
  */
 static const char *JSON_FIELD_NAME_Title = "title";

@@ -44,7 +44,7 @@ static const QColor kDefaultBackgroundColor = QColor(Qt::blue);
 static const int kInterfaceMinDistance = 20;
 static const int kTextMargin = 2;
 
-namespace aadlinterface {
+namespace ive {
 
 AADLInterfaceGraphicsItem::AADLInterfaceGraphicsItem(aadl::AADLObjectIface *entity, QGraphicsItem *parent)
     : InteractiveObject(entity, parent)
@@ -215,7 +215,7 @@ void AADLInterfaceGraphicsItem::rebuildLayout()
     const QRectF parentRect = targetItem()->boundingRect();
     const Qt::Alignment alignment = getNearestSide(parentRect, ifacePos);
     updateInternalItems(alignment);
-    if (entity() && aadlinterface::pos(entity()->coordinates()).isNull()) {
+    if (entity() && ive::pos(entity()->coordinates()).isNull()) {
         layout();
         return;
     }
@@ -240,7 +240,7 @@ void AADLInterfaceGraphicsItem::updateFromEntity()
         return;
 
     setInterfaceName(ifaceLabel());
-    const QPointF coordinates = aadlinterface::pos(obj->coordinates());
+    const QPointF coordinates = ive::pos(obj->coordinates());
     if (coordinates.isNull())
         instantLayoutUpdate();
     else
@@ -275,13 +275,13 @@ void AADLInterfaceGraphicsItem::layout()
     static const QList<aadl::meta::Props::Token> types { aadl::meta::Props::Token::coordinates,
         aadl::meta::Props::Token::InnerCoordinates, aadl::meta::Props::Token::RootCoordinates };
 
-    QPointF pos = aadlinterface::pos(entity()->coordinates());
+    QPointF pos = ive::pos(entity()->coordinates());
     int idx = 0;
     aadl::meta::Props::Token token = entity()->coordinatesType();
     while (pos.isNull() && idx < types.size()) {
         token = types.at(idx);
         const QString strCoordinates = entity()->prop(aadl::meta::Props::token(token)).toString();
-        pos = aadlinterface::pos(aadl::AADLObject::coordinatesFromString(strCoordinates));
+        pos = ive::pos(aadl::AADLObject::coordinatesFromString(strCoordinates));
         ++idx;
     }
     if (pos.isNull()) {
@@ -292,7 +292,7 @@ void AADLInterfaceGraphicsItem::layout()
     }
 
     const auto parentFn = entity()->parentObject()->as<aadl::AADLObjectFunctionType *>();
-    const QRectF fnRect = aadlinterface::rect(
+    const QRectF fnRect = ive::rect(
             aadl::AADLObject::coordinatesFromString(parentFn->prop(aadl::meta::Props::token(token)).toString()))
                                   .normalized();
     const auto side = getNearestSide(fnRect, pos);
@@ -332,12 +332,12 @@ qreal AADLInterfaceGraphicsItem::maxWidth() const
     QRectF rect = sceneBoundingRect();
     rect.setWidth(9e12); // extend to the right very far (infinite)
     for (QGraphicsItem *rootItem : scene()->items(rect)) {
-        if (dynamic_cast<aadlinterface::AADLFunctionTypeGraphicsItem *>(rootItem)
-                || dynamic_cast<aadlinterface::AADLCommentGraphicsItem *>(rootItem)) {
+        if (dynamic_cast<ive::AADLFunctionTypeGraphicsItem *>(rootItem)
+                || dynamic_cast<ive::AADLCommentGraphicsItem *>(rootItem)) {
             QList<QGraphicsItem *> items;
             for (QGraphicsItem *item : rootItem->childItems()) {
-                if (dynamic_cast<aadlinterface::AADLFunctionTypeGraphicsItem *>(item)
-                        || dynamic_cast<aadlinterface::AADLInterfaceGraphicsItem *>(item)) {
+                if (dynamic_cast<ive::AADLFunctionTypeGraphicsItem *>(item)
+                        || dynamic_cast<ive::AADLInterfaceGraphicsItem *>(item)) {
                     items.append(item);
                 }
             }

@@ -55,11 +55,11 @@
 #include <QtDebug>
 #include <algorithm>
 
-namespace aadlinterface {
+namespace ive {
 namespace cmd {
 
 /*!
- * \namespace aadlinterface::cmd
+ * \namespace ive::cmd
  * \brief Undo and redo commands code for the Interface View Editor
  */
 
@@ -511,7 +511,7 @@ QUndoCommand *CommandsFactory::changeAsn1File(const QVariantList &params)
         return nullptr;
     }
 
-    auto document = params[0].value<aadlinterface::InterfaceDocument *>();
+    auto document = params[0].value<ive::InterfaceDocument *>();
     if (!document) {
         return nullptr;
     }

@@ -48,17 +48,17 @@
 #include <QWindow>
 #include <iostream>
 
-namespace aadlinterface {
+namespace ive {
 
 /*!
-\class aadlinterface::MainWindow
+\class ive::MainWindow
 \brief Main application window - the place to store and manage supported document types, import/export data,
 process command line arguments and user actions.
 
-\sa aadlinterface::InterfaceDocument, shared::CommandLineParser
+\sa ive::InterfaceDocument, shared::CommandLineParser
 */
 
-MainWindow::MainWindow(aadlinterface::IVEditorCore *core, QWidget *parent)
+MainWindow::MainWindow(ive::IVEditorCore *core, QWidget *parent)
     : QMainWindow(parent)
     , ui(new Ui::MainWindow)
     , m_zoomCtrl(new ZoomController())
@@ -93,7 +93,7 @@ MainWindow::MainWindow(aadlinterface::IVEditorCore *core, QWidget *parent)
     m_core->document()->fillToolBar(m_core->docToolBar());
     if (auto view = m_core->chartView()) {
         m_zoomCtrl->setView(view);
-        connect(view, &aadlinterface::GraphicsView::mouseMoved, this, &MainWindow::onGraphicsViewInfo,
+        connect(view, &ive::GraphicsView::mouseMoved, this, &MainWindow::onGraphicsViewInfo,
                 Qt::UniqueConnection);
     }
 
@@ -223,8 +223,8 @@ void MainWindow::onReportRequested()
 
 void MainWindow::initSettings()
 {
-    restoreGeometry(aadlinterface::AppOptions::MainWindow.Geometry.read().toByteArray());
-    restoreState(aadlinterface::AppOptions::MainWindow.State.read().toByteArray());
+    restoreGeometry(ive::AppOptions::MainWindow.Geometry.read().toByteArray());
+    restoreState(ive::AppOptions::MainWindow.State.read().toByteArray());
 
     const bool showMinimap = false; // TODO: use a storable option
     m_core->actionToggleMinimap()->setChecked(showMinimap);
@@ -366,8 +366,8 @@ bool MainWindow::prepareQuit()
         return false;
     }
 
-    aadlinterface::AppOptions::MainWindow.State.write(saveState());
-    aadlinterface::AppOptions::MainWindow.Geometry.write(saveGeometry());
+    ive::AppOptions::MainWindow.State.write(saveState());
+    ive::AppOptions::MainWindow.Geometry.write(saveGeometry());
 
     return true;
 }

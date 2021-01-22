@@ -26,7 +26,7 @@ namespace Ui {
 class PropertyTemplateWidget;
 }
 
-namespace aadlinterface {
+namespace ive {
 
 class PropertyTemplateWidget : public QWidget
 {

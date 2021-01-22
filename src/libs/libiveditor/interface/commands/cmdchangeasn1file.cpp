@@ -22,7 +22,7 @@
 
 #include <QDir>
 
-namespace aadlinterface {
+namespace ive {
 namespace cmd {
 
 CmdChangeAsn1File::CmdChangeAsn1File(InterfaceDocument *document, const QString &newFileName)
@@ -57,4 +57,4 @@ void CmdChangeAsn1File::setFile(const QString &fileName)
 }
 
 } // namespace cmd
-} // namespace aadlinterface
+} // namespace ive

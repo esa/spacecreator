@@ -23,7 +23,7 @@ namespace aadl {
 class AADLObjectConnectionGroup;
 }
 
-namespace aadlinterface {
+namespace ive {
 class AADLInterfaceGroupGraphicsItem;
 
 class AADLConnectionGroupGraphicsItem : public AADLConnectionGraphicsItem
@@ -50,4 +50,4 @@ private:
     QGraphicsTextItem *m_textItem = nullptr;
 };
 
-} // namespace aadlinterface
+} // namespace ive

@@ -21,7 +21,7 @@
 #include <QObject>
 #include <QPen>
 
-namespace aadlinterface {
+namespace ive {
 
 struct ColorHandlerData;
 
@@ -122,4 +122,4 @@ private:
 
 }
 
-Q_DECLARE_TYPEINFO(aadlinterface::ColorHandler, Q_MOVABLE_TYPE);
+Q_DECLARE_TYPEINFO(ive::ColorHandler, Q_MOVABLE_TYPE);

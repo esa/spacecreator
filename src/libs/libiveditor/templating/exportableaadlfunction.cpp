@@ -26,7 +26,7 @@
 #include "aadlobjectiface.h"
 #include "aadlobjectsmodel.h"
 
-namespace aadlinterface {
+namespace ive {
 
 ExportableAADLFunction::ExportableAADLFunction(const aadl::AADLObjectFunctionType *function)
     : ExportableAADLObject(function)

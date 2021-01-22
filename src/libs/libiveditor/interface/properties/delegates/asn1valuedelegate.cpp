@@ -23,7 +23,7 @@
 #include <QLabel>
 #include <QVariant>
 
-namespace aadlinterface {
+namespace ive {
 
 static const char *MODEL_INDEX_PROPERTY = "modelIndex";
 static const char *DIALOG_PROPERTY = "dialog";
@@ -43,7 +43,7 @@ QWidget *Asn1ValueDelegate::createEditor(
     QModelIndex typeIndex = index.siblingAtColumn(index.column() - 1);
     dialog->showAsn1Type(typeIndex.data().toString());
 
-    connect(dialog, &asn1::Asn1Editor::accepted, this, &aadlinterface::Asn1ValueDelegate::onDialogAccepted);
+    connect(dialog, &asn1::Asn1Editor::accepted, this, &ive::Asn1ValueDelegate::onDialogAccepted);
 
     auto *proxy = new QLabel(parent);
     proxy->setProperty(DIALOG_PROPERTY, QVariant::fromValue(dialog));

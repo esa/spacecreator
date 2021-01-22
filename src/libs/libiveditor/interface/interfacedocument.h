@@ -41,7 +41,7 @@ class AADLObjectIface;
 class AADLObjectsModel;
 }
 
-namespace aadlinterface {
+namespace ive {
 
 class AADLItemModel;
 class AADLCommentGraphicsItem;

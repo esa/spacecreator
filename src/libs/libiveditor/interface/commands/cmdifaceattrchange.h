@@ -28,7 +28,7 @@ namespace aadl {
 class AADLObject;
 }
 
-namespace aadlinterface {
+namespace ive {
 namespace cmd {
 
 class CmdIfaceAttrChange : public CmdIfaceDataChangeBase

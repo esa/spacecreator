@@ -66,7 +66,7 @@
           </widget>
          </item>
          <item row="1" column="1">
-          <widget class="aadlinterface::ColorSelectorButton" name="btnColorStroke">
+          <widget class="ive::ColorSelectorButton" name="btnColorStroke">
            <property name="text">
             <string>...</string>
            </property>
@@ -99,7 +99,7 @@
           </widget>
          </item>
          <item row="1" column="1">
-          <widget class="aadlinterface::ColorSelectorButton" name="btnColor">
+          <widget class="ive::ColorSelectorButton" name="btnColor">
            <property name="text">
             <string>...</string>
            </property>
@@ -113,7 +113,7 @@
           </widget>
          </item>
          <item row="2" column="1">
-          <widget class="aadlinterface::ColorSelectorButton" name="btnColorStop">
+          <widget class="ive::ColorSelectorButton" name="btnColorStop">
            <property name="text">
             <string>...</string>
            </property>
@@ -129,7 +129,7 @@
  </widget>
  <customwidgets>
   <customwidget>
-   <class>aadlinterface::ColorSelectorButton</class>
+   <class>ive::ColorSelectorButton</class>
    <extends>QToolButton</extends>
    <header>interface/colors/colorselectorbutton.h</header>
   </customwidget>

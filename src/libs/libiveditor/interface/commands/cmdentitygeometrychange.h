@@ -26,7 +26,7 @@ namespace aadl {
 class AADLObject;
 }
 
-namespace aadlinterface {
+namespace ive {
 namespace cmd {
 
 class CmdEntityGeometryChange : public QUndoCommand

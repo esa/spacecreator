@@ -20,7 +20,7 @@
 #include "aadlobjectconnection.h"
 #include "aadlobjectconnectiongroup.h"
 
-namespace aadlinterface {
+namespace ive {
 namespace cmd {
 
 
@@ -59,5 +59,5 @@ int CmdConnectionGroupItemChange::id() const
     return CreateConnectionGroupEntity;
 }
 
-} // namespace aadlinterface
+} // namespace ive
 } // namespace cmd

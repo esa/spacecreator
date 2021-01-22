@@ -39,19 +39,19 @@ private Q_SLOTS:
     void test_checkAllInterfacesForAsn1Compliance();
 
 private:
-    std::unique_ptr<aadlinterface::InterfaceDocument> ivDoc;
+    std::unique_ptr<ive::InterfaceDocument> ivDoc;
 };
 
 void tst_InterfaceDocument::initTestCase()
 {
     Asn1Acn::initAsn1Library();
-    aadlinterface::initIvEditor();
+    ive::initIvEditor();
     QStandardPaths::setTestModeEnabled(true);
 }
 
 void tst_InterfaceDocument::init()
 {
-    ivDoc = std::make_unique<aadlinterface::InterfaceDocument>();
+    ivDoc = std::make_unique<ive::InterfaceDocument>();
 }
 
 void tst_InterfaceDocument::test_checkAllInterfacesForAsn1Compliance()

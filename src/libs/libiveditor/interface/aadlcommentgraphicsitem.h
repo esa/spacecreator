@@ -26,7 +26,7 @@ namespace aadl {
 class AADLObjectComment;
 }
 
-namespace aadlinterface {
+namespace ive {
 
 class AADLCommentGraphicsItem : public AADLRectGraphicsItem
 {

@@ -28,7 +28,7 @@ class AADLObject;
 class IfaceParameter;
 }
 
-namespace aadlinterface {
+namespace ive {
 
 class IfaceParametersModel : public PropertiesModelBase
 {

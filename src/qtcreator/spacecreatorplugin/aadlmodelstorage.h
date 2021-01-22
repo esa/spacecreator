@@ -22,7 +22,7 @@
 
 #pragma once
 
-namespace aadlinterface {
+namespace ive {
 class IVEditorCore;
 }
 
@@ -45,18 +45,18 @@ public:
 
     void setChecker(MscSystemChecks *checks);
 
-    QSharedPointer<aadlinterface::IVEditorCore> ivData(const QString &fileName);
+    QSharedPointer<ive::IVEditorCore> ivData(const QString &fileName);
 
     void remove(const QString &fileName);
 
 Q_SIGNALS:
     void editedExternally(shared::EditorCore *);
-    void coreAdded(QSharedPointer<aadlinterface::IVEditorCore> mscCore);
+    void coreAdded(QSharedPointer<ive::IVEditorCore> mscCore);
 
 private:
-    void setIvData(const QString &fileName, QSharedPointer<aadlinterface::IVEditorCore> ivData);
+    void setIvData(const QString &fileName, QSharedPointer<ive::IVEditorCore> ivData);
 
-    QHash<QString, QSharedPointer<aadlinterface::IVEditorCore>> m_store;
+    QHash<QString, QSharedPointer<ive::IVEditorCore>> m_store;
     QPointer<MscSystemChecks> m_checks;
 };
 

@@ -23,7 +23,7 @@ namespace aadl {
 class AADLObjectConnection;
 }
 
-namespace aadlinterface {
+namespace ive {
 
 /**
  * @brief The ExportableAADLConnection is a class to export AADLObjectConnection
@@ -55,5 +55,5 @@ public:
 
 }
 
-Q_DECLARE_METATYPE(aadlinterface::ExportableAADLConnection)
-Q_DECLARE_TYPEINFO(aadlinterface::ExportableAADLConnection, Q_MOVABLE_TYPE);
+Q_DECLARE_METATYPE(ive::ExportableAADLConnection)
+Q_DECLARE_TYPEINFO(ive::ExportableAADLConnection, Q_MOVABLE_TYPE);

@@ -34,7 +34,7 @@ int main(int argc, char *argv[])
     shared::initSharedLibrary();
     msc::initMscLibrary();
     msc::initMscEditor();
-    aadlinterface::initIvEditor();
+    ive::initIvEditor();
 
     QApplication a(argc, argv);
     a.setOrganizationName(SC_ORGANISATION);

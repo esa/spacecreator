@@ -25,7 +25,7 @@
 #include <QComboBox>
 #include <QDebug>
 
-namespace aadlinterface {
+namespace ive {
 
 FunctionAttrDelegate::FunctionAttrDelegate(QObject *parent)
     : QStyledItemDelegate(parent)

@@ -24,7 +24,7 @@ namespace msc {
 class MscModel;
 }
 
-namespace aadlinterface {
+namespace ive {
 
 class InterfaceDocument;
 

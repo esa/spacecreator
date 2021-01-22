@@ -74,10 +74,10 @@ static QVector<ExternalArgHolder> externalArgs(bool namedKey)
     return args;
 }
 
-namespace aadlinterface {
+namespace ive {
 
 /*!
- *\class aadlinterface::ActionsManager
+ *\class ive::ActionsManager
  * \brief The application wide manager for script-able actions.
  * Used to: store action instances in runtime, deploy the default file from resources (if necessary), populate the
  *context menu and to actually invoke the internal QAction or external application.

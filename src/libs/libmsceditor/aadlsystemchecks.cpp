@@ -48,7 +48,7 @@ void AadlSystemChecks::setMscCore(MSCEditorCore *mscCore)
     m_mscCore = mscCore;
 }
 
-void AadlSystemChecks::setIvCore(QSharedPointer<aadlinterface::IVEditorCore> ivCore)
+void AadlSystemChecks::setIvCore(QSharedPointer<ive::IVEditorCore> ivCore)
 {
     if (ivCore == m_ivCore) {
         return;
@@ -65,7 +65,7 @@ void AadlSystemChecks::setIvCore(QSharedPointer<aadlinterface::IVEditorCore> ivC
 /*!
    Returns a pointer to the IV editor model
  */
-const QSharedPointer<aadlinterface::IVEditorCore> &AadlSystemChecks::ivCore() const
+const QSharedPointer<ive::IVEditorCore> &AadlSystemChecks::ivCore() const
 {
     return m_ivCore;
 }

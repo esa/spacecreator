@@ -26,12 +26,12 @@
 #include <QMessageBox>
 #include <QTextBrowser>
 
-namespace aadlinterface {
+namespace ive {
 
 /*!
  * \class ExtProcMonitor
  *
- * \brief The GUI for external application, launched by scriptable aadlinterface::Action.
+ * \brief The GUI for external application, launched by scriptable ive::Action.
  */
 
 ExtProcMonitor::ExtProcMonitor(QWidget *parent)

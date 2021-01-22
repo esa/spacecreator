@@ -42,10 +42,10 @@
 static const qreal kBorderWidth = 2.0;
 static const qreal kRadius = 10.0;
 static const qreal kOffset = kBorderWidth / 2.0;
-static const QList<int> kNestedTypes { aadlinterface::AADLFunctionGraphicsItem::Type,
-    aadlinterface::AADLFunctionTypeGraphicsItem::Type, aadlinterface::AADLCommentGraphicsItem::Type };
+static const QList<int> kNestedTypes { ive::AADLFunctionGraphicsItem::Type,
+    ive::AADLFunctionTypeGraphicsItem::Type, ive::AADLCommentGraphicsItem::Type };
 
-namespace aadlinterface {
+namespace ive {
 
 QPointer<QSvgRenderer> AADLFunctionGraphicsItem::m_svgRenderer = {};
 
@@ -277,7 +277,7 @@ void AADLFunctionGraphicsItem::drawInnerFunctions(QPainter *painter)
         if (child->aadlType() == aadl::AADLObject::Type::Function
                 || child->aadlType() == aadl::AADLObject::Type::FunctionType
                 || child->aadlType() == aadl::AADLObject::Type::Comment) {
-            const QRectF itemSceneRect = aadlinterface::rect(aadl::AADLObject::coordinatesFromString(strCoordinates));
+            const QRectF itemSceneRect = ive::rect(aadl::AADLObject::coordinatesFromString(strCoordinates));
             if (itemSceneRect.isValid()) {
                 nestedRect |= itemSceneRect;
                 existingRects << itemSceneRect;
@@ -287,7 +287,7 @@ void AADLFunctionGraphicsItem::drawInnerFunctions(QPainter *painter)
         } else if (auto connection = qobject_cast<const aadl::AADLObjectConnection *>(child)) {
             if (connection->source()->id() != entity()->id() && connection->target()->id() != entity()->id()) {
                 const QPolygonF itemScenePoints =
-                        aadlinterface::polygon(aadl::AADLObject::coordinatesFromString(strCoordinates));
+                        ive::polygon(aadl::AADLObject::coordinatesFromString(strCoordinates));
                 if (!itemScenePoints.isEmpty()) {
                     existingPolygons << itemScenePoints;
                 }

@@ -29,7 +29,7 @@ namespace aadl {
 class AADLObject;
 }
 
-namespace aadlinterface {
+namespace ive {
 
 class InteractiveObject : public shared::ui::InteractiveObjectBase
 {

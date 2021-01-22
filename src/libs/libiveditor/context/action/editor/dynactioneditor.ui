@@ -25,13 +25,13 @@
     </widget>
    </item>
    <item row="0" column="0">
-    <widget class="aadlinterface::DynActionEditorWidget" name="widget" native="true"/>
+    <widget class="ive::DynActionEditorWidget" name="widget" native="true"/>
    </item>
   </layout>
  </widget>
  <customwidgets>
   <customwidget>
-   <class>aadlinterface::DynActionEditorWidget</class>
+   <class>ive::DynActionEditorWidget</class>
    <extends>QWidget</extends>
    <header>context/action/editor/dynactioneditorwidget.h</header>
    <container>1</container>

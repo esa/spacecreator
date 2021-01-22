@@ -25,7 +25,7 @@ namespace Ui {
 class ConditionDialog;
 }
 
-namespace aadlinterface {
+namespace ive {
 
 class AttributesModel;
 class ConditionDialog : public QDialog

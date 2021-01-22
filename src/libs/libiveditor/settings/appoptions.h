@@ -19,7 +19,7 @@
 
 #include "settingsappoption.h"
 
-namespace aadlinterface {
+namespace ive {
 
 class GroupMainWindow
 {

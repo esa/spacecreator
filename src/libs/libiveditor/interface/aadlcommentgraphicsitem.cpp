@@ -36,7 +36,7 @@
 static const qreal kBorderWidth = 2;
 static const qreal kMargins = 14 + kBorderWidth;
 
-namespace aadlinterface {
+namespace ive {
 
 AADLCommentGraphicsItem::AADLCommentGraphicsItem(aadl::AADLObjectComment *comment, QGraphicsItem *parent)
     : AADLRectGraphicsItem(comment, parent)

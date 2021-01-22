@@ -19,7 +19,7 @@
 
 #include <QToolButton>
 
-namespace aadlinterface {
+namespace ive {
 
 class ColorSelectorButton : public QToolButton
 {

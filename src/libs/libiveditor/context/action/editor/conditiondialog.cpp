@@ -20,10 +20,10 @@
 #include "attributesmodel.h"
 #include "ui_conditiondialog.h"
 
-namespace aadlinterface {
+namespace ive {
 
 /*!
- * \class aadlinterface::ConditionDialog
+ * \class ive::ConditionDialog
  * The UI for editing conditions of scriptable actions.
  */
 

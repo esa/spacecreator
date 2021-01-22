@@ -21,7 +21,7 @@
 #include <QStackedWidget>
 #include <coreplugin/id.h>
 
-namespace aadlinterface {
+namespace ive {
 class IVEditorCore;
 }
 
@@ -46,7 +46,7 @@ public:
     void removeAadlTextEditor(QObject *);
     bool setVisibleEditor(Core::IEditor *xmlEditor);
 
-    QSharedPointer<aadlinterface::IVEditorCore> ivPlugin(const QString &fileName) const;
+    QSharedPointer<ive::IVEditorCore> ivPlugin(const QString &fileName) const;
 
 private:
     void modeAboutToChange(Core::Id m);

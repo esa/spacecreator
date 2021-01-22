@@ -35,7 +35,7 @@ DynamicActionOption::DynamicActionOption()
 QWidget *DynamicActionOption::widget()
 {
     if (!m_widget) {
-        m_widget = new aadlinterface::DynActionEditorWidget;
+        m_widget = new ive::DynActionEditorWidget;
         m_widget->init();
     }
     return m_widget;
@@ -44,7 +44,7 @@ QWidget *DynamicActionOption::widget()
 void DynamicActionOption::apply()
 {
     m_widget->save();
-    aadlinterface::ActionsManager::reload();
+    ive::ActionsManager::reload();
 }
 
 void DynamicActionOption::finish()

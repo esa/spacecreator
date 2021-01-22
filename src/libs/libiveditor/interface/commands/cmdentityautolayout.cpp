@@ -22,7 +22,7 @@
 
 #include <QtDebug>
 
-namespace aadlinterface {
+namespace ive {
 namespace cmd {
 
 CmdEntityAutoLayout::CmdEntityAutoLayout(const QList<QPair<aadl::AADLObject *, QVector<QPointF>>> &objectsData)

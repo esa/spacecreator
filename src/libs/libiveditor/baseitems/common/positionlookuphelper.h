@@ -21,10 +21,10 @@
 #include <QPainterPath>
 #include <qnamespace.h>
 
-namespace aadlinterface {
+namespace ive {
 
 /*!
-   \class aadlinterface::PositionLookupHelper
+   \class ive::PositionLookupHelper
    \brief Class to find free place
 
     Class is used to find the place for \a itemRect
@@ -103,4 +103,4 @@ private:
     bool m_clockwise;
 };
 
-} // namespace aadlinterface
+} // namespace ive

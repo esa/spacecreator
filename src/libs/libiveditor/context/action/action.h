@@ -24,7 +24,7 @@ namespace aadl {
 class AADLObject;
 }
 
-namespace aadlinterface {
+namespace ive {
 
 struct Action {
     explicit Action(const QJsonObject &jObj = QJsonObject());

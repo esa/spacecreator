@@ -28,7 +28,7 @@ class GraphicsViewBase;
 } // namespace ui
 } // namespace shared
 
-namespace aadlinterface {
+namespace ive {
 
 class ZoomValidator;
 

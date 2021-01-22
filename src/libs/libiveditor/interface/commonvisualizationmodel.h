@@ -27,7 +27,7 @@ class AADLObjectsModel;
 class AADLObjectConnection;
 }
 
-namespace aadlinterface {
+namespace ive {
 
 class CommonVisualizationModel : public QStandardItemModel
 {
@@ -73,4 +73,4 @@ private Q_SLOTS:
     void onDataChanged(const QModelIndex &topLeft, const QModelIndex &bottomRight, const QVector<int> &roles);
 };
 
-} // namespace aadlinterface
+} // namespace ive

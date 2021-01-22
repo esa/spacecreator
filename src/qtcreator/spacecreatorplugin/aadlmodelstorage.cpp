@@ -41,10 +41,10 @@ void AadlModelStorage::setChecker(MscSystemChecks *checks)
    Returns the IVEditorCore object for the given file
    If the object does not exist yet, one will be created and the data be loaded
  */
-QSharedPointer<aadlinterface::IVEditorCore> AadlModelStorage::ivData(const QString &fileName)
+QSharedPointer<ive::IVEditorCore> AadlModelStorage::ivData(const QString &fileName)
 {
     if (!m_store.contains(fileName)) {
-        QSharedPointer<aadlinterface::IVEditorCore> data(new aadlinterface::IVEditorCore());
+        QSharedPointer<ive::IVEditorCore> data(new ive::IVEditorCore());
         data->registerBasicActions();
         data->document()->customActions(); // There some further actions are registered
 
@@ -68,22 +68,22 @@ void AadlModelStorage::remove(const QString &fileName)
    Sets the IVEditorCore object for the given file.
    If the object was already used for another file, that old file/object connection is removed.
  */
-void AadlModelStorage::setIvData(const QString &fileName, QSharedPointer<aadlinterface::IVEditorCore> ivData)
+void AadlModelStorage::setIvData(const QString &fileName, QSharedPointer<ive::IVEditorCore> ivData)
 {
     const QString oldKey = m_store.key(ivData, "");
     if (!oldKey.isEmpty()) {
         if (m_store[fileName] == ivData) {
             return;
         }
-        QSharedPointer<aadlinterface::IVEditorCore> oldData = m_store.take(oldKey);
+        QSharedPointer<ive::IVEditorCore> oldData = m_store.take(oldKey);
         disconnect(oldData.data(), nullptr, this, nullptr);
     }
 
     m_store[fileName] = ivData;
     connect(ivData.data(), &shared::EditorCore::editedExternally, this, &spctr::AadlModelStorage::editedExternally);
-    connect(ivData->commandsStack(), &aadlinterface::cmd::CommandsStack::nameChanged, m_checks,
+    connect(ivData->commandsStack(), &ive::cmd::CommandsStack::nameChanged, m_checks,
             &spctr::MscSystemChecks::onEntityNameChanged);
-    connect(ivData->commandsStack(), &aadlinterface::cmd::CommandsStack::entityRemoved, m_checks,
+    connect(ivData->commandsStack(), &ive::cmd::CommandsStack::entityRemoved, m_checks,
             &spctr::MscSystemChecks::onEntityRemoved);
     Q_EMIT coreAdded(ivData);
 }

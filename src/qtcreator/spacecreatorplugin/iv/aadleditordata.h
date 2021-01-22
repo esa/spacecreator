@@ -24,7 +24,7 @@
 class QAction;
 class QUndoGroup;
 
-namespace aadlinterface {
+namespace ive {
 class IVEditorCore;
 }
 
@@ -51,10 +51,10 @@ public:
 
     void showMinimap(bool visible);
 
-    QSharedPointer<aadlinterface::IVEditorCore> ivPlugin(const QString &fileName);
+    QSharedPointer<ive::IVEditorCore> ivPlugin(const QString &fileName);
 
 Q_SIGNALS:
-    void aadlDataLoaded(const QString &fileName, QSharedPointer<aadlinterface::IVEditorCore> data);
+    void aadlDataLoaded(const QString &fileName, QSharedPointer<ive::IVEditorCore> data);
 
 private Q_SLOTS:
     void onCurrentEditorChanged(Core::IEditor *editor);

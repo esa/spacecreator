@@ -28,7 +28,7 @@ namespace aadl {
 class ContextParameter;
 }
 
-namespace aadlinterface {
+namespace ive {
 namespace cmd {
 
 class CmdContextParameterRemove : public QUndoCommand

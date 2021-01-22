@@ -28,7 +28,7 @@
 #include <QDebug>
 #include <algorithm>
 
-namespace aadlinterface {
+namespace ive {
 
 IfaceParametersModel::IfaceParametersModel(cmd::CommandsStack::Macro *macro, QObject *parent)
     : PropertiesModelBase(parent)

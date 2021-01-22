@@ -31,7 +31,7 @@ class AADLObjectIface;
 class AADLObjectsModel;
 }
 
-namespace aadlinterface {
+namespace ive {
 namespace cmd {
 
 class CmdIfaceDataChangeBase : public shared::UndoCommand

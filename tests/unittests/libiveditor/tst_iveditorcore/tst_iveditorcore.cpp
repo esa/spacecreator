@@ -46,18 +46,18 @@ private Q_SLOTS:
     void test_addToExistingInterface();
 
 private:
-    std::unique_ptr<aadlinterface::IVEditorCore> ivCore;
+    std::unique_ptr<ive::IVEditorCore> ivCore;
 };
 
 void tst_IVEditorCore::initTestCase()
 {
-    aadlinterface::initIvEditor();
+    ive::initIvEditor();
     QStandardPaths::setTestModeEnabled(true);
 }
 
 void tst_IVEditorCore::init()
 {
-    ivCore = std::make_unique<aadlinterface::IVEditorCore>();
+    ivCore = std::make_unique<ive::IVEditorCore>();
 }
 
 void tst_IVEditorCore::test_addConnection()

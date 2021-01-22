@@ -28,7 +28,7 @@ class PropertiesViewBase;
 class QTableView;
 class QAbstractItemModel;
 
-namespace aadlinterface {
+namespace ive {
 
 class PropertiesModelBase;
 class PropertiesViewBase : public QWidget

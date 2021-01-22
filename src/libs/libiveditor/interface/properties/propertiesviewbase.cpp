@@ -26,7 +26,7 @@
 #include <QHeaderView>
 #include <QSortFilterProxyModel>
 
-namespace aadlinterface {
+namespace ive {
 
 PropertiesViewBase::PropertiesViewBase(QWidget *parent)
     : QWidget(parent)

@@ -28,7 +28,7 @@ class AADLObjectFunction;
 class AADLObjectsModel;
 }
 
-namespace aadlinterface {
+namespace ive {
 namespace cmd {
 
 class CmdFunctionTypeItemCreate : public CmdEntityGeometryChange

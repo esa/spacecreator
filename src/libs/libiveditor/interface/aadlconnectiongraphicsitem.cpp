@@ -42,7 +42,7 @@
 
 static const qreal kSelectionOffset = 10;
 
-namespace aadlinterface {
+namespace ive {
 
 /*
  * Generates a path for existing \a connection
@@ -646,7 +646,7 @@ void AADLConnectionGraphicsItem::updateEndPoint(const AADLInterfaceGraphicsItem 
     }
 
     if (m_points.size() > 2) {
-        QVector<QPointF> initialPoints = aadlinterface::polygon(entity()->coordinates());
+        QVector<QPointF> initialPoints = ive::polygon(entity()->coordinates());
         const QRectF currentRect = QRectF(initialPoints.first(), initialPoints.last());
         QRectF newRect;
         if (iface == startItem()) {
@@ -756,4 +756,4 @@ void AADLConnectionGraphicsItem::updateLastChunk(const AADLInterfaceGraphicsItem
     updateBoundingRect();
 }
 
-} // namespace aadlinterface
+} // namespace ive

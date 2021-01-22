@@ -21,7 +21,7 @@
 
 #include <QTreeView>
 
-namespace aadlinterface {
+namespace ive {
 
 class AADLObjectsTreeView : public QTreeView
 {
@@ -37,4 +37,4 @@ private:
     QPoint m_dragStartPosition;
 };
 
-} // namespace aadlinterface
+} // namespace ive

@@ -33,7 +33,7 @@
 #include <QTimer>
 #include <functional>
 
-namespace aadlinterface {
+namespace ive {
 
 InteractiveObject::InteractiveObject(aadl::AADLObject *entity, QGraphicsItem *parent)
     : shared::ui::InteractiveObjectBase(parent)

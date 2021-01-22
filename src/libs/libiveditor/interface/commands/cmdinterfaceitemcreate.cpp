@@ -25,7 +25,7 @@
 
 #include <QDebug>
 
-namespace aadlinterface {
+namespace ive {
 namespace cmd {
 
 QVector<QUndoCommand *> fillCloneCommands(

@@ -20,10 +20,10 @@
 #include "context/action/actionsmanager.h"
 #include "ui_dynactioneditor.h"
 
-namespace aadlinterface {
+namespace ive {
 
 /*!
- * \class aadlinterface::DynActionEditor
+ * \class ive::DynActionEditor
  * The UI for editing available scriptable actions.
  */
 DynActionEditor::DynActionEditor(QWidget *parent)

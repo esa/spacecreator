@@ -53,8 +53,8 @@ private:
     {
         QList<QRectF> rects;
         for (auto item : m_scene.items()) {
-            if (item->type() == aadlinterface::AADLFunctionTypeGraphicsItem::Type
-                    || item->type() == aadlinterface::AADLFunctionGraphicsItem::Type) {
+            if (item->type() == ive::AADLFunctionTypeGraphicsItem::Type
+                    || item->type() == ive::AADLFunctionGraphicsItem::Type) {
                 rects.append(item->sceneBoundingRect());
             }
         }
@@ -62,10 +62,10 @@ private:
     }
 
     QGraphicsScene m_scene;
-    aadlinterface::AADLFunctionGraphicsItem *f1 { nullptr };
-    aadlinterface::AADLFunctionGraphicsItem *f2 { nullptr };
-    aadlinterface::AADLFunctionGraphicsItem *nf1 { nullptr };
-    aadlinterface::AADLFunctionGraphicsItem *nf2 { nullptr };
+    ive::AADLFunctionGraphicsItem *f1 { nullptr };
+    ive::AADLFunctionGraphicsItem *f2 { nullptr };
+    ive::AADLFunctionGraphicsItem *nf1 { nullptr };
+    ive::AADLFunctionGraphicsItem *nf2 { nullptr };
 
     struct Data {
         enum class EndPoint
@@ -75,7 +75,7 @@ private:
             Empty
         };
 
-        Data(aadlinterface::AADLFunctionGraphicsItem *function)
+        Data(ive::AADLFunctionGraphicsItem *function)
             : fn(function)
         {
             const QRectF r = rect();
@@ -84,7 +84,7 @@ private:
         }
 
         QRectF rect() const { return fn->sceneBoundingRect(); }
-        aadlinterface::AADLFunctionGraphicsItem *function() const { return fn; }
+        ive::AADLFunctionGraphicsItem *function() const { return fn; }
         QPointF requiredIfacePoint() const { return points.at(static_cast<int>(EndPoint::Req)); }
         QPointF providedIfacePoint() const { return points.at(static_cast<int>(EndPoint::Prov)); }
         QPointF emptyPoint() const { return points.at(static_cast<int>(EndPoint::Empty)); }
@@ -103,37 +103,37 @@ private:
         }
 
     private:
-        aadlinterface::AADLFunctionGraphicsItem *fn;
+        ive::AADLFunctionGraphicsItem *fn;
         QList<QPointF> points;
     };
 
     QVector<Data> data;
 
 private:
-    void checkEndPoints(aadlinterface::AADLFunctionGraphicsItem *startFn, Data::EndPoint startEp,
-            aadlinterface::AADLFunctionGraphicsItem *endFn, Data::EndPoint endEp, bool isReversed, bool shouldFail);
+    void checkEndPoints(ive::AADLFunctionGraphicsItem *startFn, Data::EndPoint startEp,
+            ive::AADLFunctionGraphicsItem *endFn, Data::EndPoint endEp, bool isReversed, bool shouldFail);
 };
 
 void tst_ConnectionUtils::initTestCase()
 {
     auto entity1 = new aadl::AADLObjectFunction("F1");
-    f1 = new aadlinterface::AADLFunctionGraphicsItem(entity1);
+    f1 = new ive::AADLFunctionGraphicsItem(entity1);
     m_scene.addItem(f1);
     f1->setRect(QRectF(100, 100, 300, 300));
 
     auto nestedEntity1 = new aadl::AADLObjectFunction("Nested_F1");
     entity1->addChild(nestedEntity1);
-    nf1 = new aadlinterface::AADLFunctionGraphicsItem(nestedEntity1, f1);
+    nf1 = new ive::AADLFunctionGraphicsItem(nestedEntity1, f1);
     nf1->setRect(QRectF(150, 150, 100, 100));
 
     auto entity2 = new aadl::AADLObjectFunction("F2");
-    f2 = new aadlinterface::AADLFunctionGraphicsItem(entity2);
+    f2 = new ive::AADLFunctionGraphicsItem(entity2);
     m_scene.addItem(f2);
     f2->setRect(QRectF(600, 100, 300, 300));
 
     auto nestedEntity2 = new aadl::AADLObjectFunction("Nested_F2");
     entity2->addChild(nestedEntity2);
-    nf2 = new aadlinterface::AADLFunctionGraphicsItem(nestedEntity2, f2);
+    nf2 = new ive::AADLFunctionGraphicsItem(nestedEntity2, f2);
     nf2->setRect(QRectF(650, 150, 100, 100));
 
     data = { Data(f1), Data(nf1), Data(f2), Data(nf2) };
@@ -156,11 +156,11 @@ void tst_ConnectionUtils::tst_segmentGenerationByPoints()
 {
     QPointF startPoint { 100, 100 };
     QPointF endPoint { startPoint };
-    auto segments = aadlinterface::generateSegments(startPoint, endPoint);
+    auto segments = ive::generateSegments(startPoint, endPoint);
     QVERIFY(segments.isEmpty());
 
     endPoint += QPointF(200, 200);
-    segments = aadlinterface::generateSegments(startPoint, endPoint);
+    segments = ive::generateSegments(startPoint, endPoint);
     QVERIFY(!segments.isEmpty());
     for (auto segment : segments) {
         QVERIFY(segment.startsWith(startPoint));
@@ -170,52 +170,52 @@ void tst_ConnectionUtils::tst_segmentGenerationByPoints()
 
 void tst_ConnectionUtils::tst_segmentGeneration()
 {
-    auto segments = aadlinterface::generateSegments(QLineF(), QLineF());
+    auto segments = ive::generateSegments(QLineF(), QLineF());
     QVERIFY(segments.isEmpty());
     QLineF startSegment { QPointF(100, 100), QPointF(100, 200) };
-    segments = aadlinterface::generateSegments(startSegment, QLineF());
+    segments = ive::generateSegments(startSegment, QLineF());
     QVERIFY(segments.isEmpty());
     QLineF endSegment { QPointF(300, 200), QPointF(300, 100) };
-    segments = aadlinterface::generateSegments(QLineF(), endSegment);
+    segments = ive::generateSegments(QLineF(), endSegment);
     QVERIFY(segments.isEmpty());
 
     // ||
-    segments = aadlinterface::generateSegments(startSegment, endSegment);
+    segments = ive::generateSegments(startSegment, endSegment);
     QVERIFY(segments.size() >= 3);
     QVERIFY(segments.first() == startSegment.p2());
     QVERIFY(segments.last() == endSegment.p2());
 
     // |_
     endSegment.setP2(QPointF(200, 200));
-    segments = aadlinterface::generateSegments(startSegment, endSegment);
+    segments = ive::generateSegments(startSegment, endSegment);
     QVERIFY(segments.size() >= 3);
     QVERIFY(segments.first() == startSegment.p2());
     QVERIFY(segments.last() == endSegment.p2());
 
     // \_
     startSegment.setP1(QPointF(0, 0));
-    segments = aadlinterface::generateSegments(startSegment, endSegment);
+    segments = ive::generateSegments(startSegment, endSegment);
     QVERIFY(segments.size() >= 3);
     QVERIFY(segments.first() == startSegment.p2());
     QVERIFY(segments.last() == endSegment.p2());
 
     // \|
     endSegment.setP1(QPointF(200, 100));
-    segments = aadlinterface::generateSegments(startSegment, endSegment);
+    segments = ive::generateSegments(startSegment, endSegment);
     QVERIFY(segments.size() >= 3);
     QVERIFY(segments.first() == startSegment.p2());
     QVERIFY(segments.last() == endSegment.p2());
 
     // /|
     startSegment.setP1(QPointF(100, 100));
-    segments = aadlinterface::generateSegments(startSegment, endSegment);
+    segments = ive::generateSegments(startSegment, endSegment);
     QVERIFY(segments.size() >= 3);
     QVERIFY(segments.first() == startSegment.p2());
     QVERIFY(segments.last() == endSegment.p2());
 
     // /_
     endSegment.setP1(QPointF(300, 200));
-    segments = aadlinterface::generateSegments(startSegment, endSegment);
+    segments = ive::generateSegments(startSegment, endSegment);
     QVERIFY(segments.size() >= 3);
     QVERIFY(segments.first() == startSegment.p2());
     QVERIFY(segments.last() == endSegment.p2());
@@ -223,24 +223,24 @@ void tst_ConnectionUtils::tst_segmentGeneration()
 
 void tst_ConnectionUtils::tst_ifaceSegment()
 {
-    auto line = aadlinterface::ifaceSegment(QRectF(), QPointF(), QPointF());
+    auto line = ive::ifaceSegment(QRectF(), QPointF(), QPointF());
     QVERIFY(line.isNull());
 
     QRectF rect { 100, 100, 300, 300 };
     QPointF first, last;
-    line = aadlinterface::ifaceSegment(rect, first, last);
+    line = ive::ifaceSegment(rect, first, last);
 
     first = QPointF(200, 100);
     Q_ASSERT(rect.contains(first));
 
     last = QPointF(200, 0);
-    line = aadlinterface::ifaceSegment(rect, first, last);
+    line = ive::ifaceSegment(rect, first, last);
     QVERIFY(!line.isNull());
     QVERIFY(line.p1() != line.p2());
     QVERIFY(rect.contains(last) == rect.contains(line.p2()));
 
     last = QPointF(200, 200);
-    line = aadlinterface::ifaceSegment(rect, first, last);
+    line = ive::ifaceSegment(rect, first, last);
     QVERIFY(!line.isNull());
     QVERIFY(line.p1() != line.p2());
     QVERIFY(rect.contains(last) == rect.contains(line.p2()));
@@ -249,13 +249,13 @@ void tst_ConnectionUtils::tst_ifaceSegment()
     Q_ASSERT(rect.contains(first));
 
     last = QPointF(200, 200);
-    line = aadlinterface::ifaceSegment(rect, first, last);
+    line = ive::ifaceSegment(rect, first, last);
     QVERIFY(!line.isNull());
     QVERIFY(line.p1() != line.p2());
     QVERIFY(rect.contains(last) == rect.contains(line.p2()));
 
     last = QPointF(600, 200);
-    line = aadlinterface::ifaceSegment(rect, first, last);
+    line = ive::ifaceSegment(rect, first, last);
     QVERIFY(!line.isNull());
     QVERIFY(line.p1() != line.p2());
     QVERIFY(rect.contains(last) == rect.contains(line.p2()));
@@ -264,13 +264,13 @@ void tst_ConnectionUtils::tst_ifaceSegment()
     Q_ASSERT(rect.contains(first));
 
     last = QPointF(200, 600);
-    line = aadlinterface::ifaceSegment(rect, first, last);
+    line = ive::ifaceSegment(rect, first, last);
     QVERIFY(!line.isNull());
     QVERIFY(line.p1() != line.p2());
     QVERIFY(rect.contains(last) == rect.contains(line.p2()));
 
     last = QPointF(200, 200);
-    line = aadlinterface::ifaceSegment(rect, first, last);
+    line = ive::ifaceSegment(rect, first, last);
     QVERIFY(!line.isNull());
     QVERIFY(line.p1() != line.p2());
     QVERIFY(rect.contains(last) == rect.contains(line.p2()));
@@ -279,13 +279,13 @@ void tst_ConnectionUtils::tst_ifaceSegment()
     Q_ASSERT(rect.contains(first));
 
     last = QPointF(0, 300);
-    line = aadlinterface::ifaceSegment(rect, first, last);
+    line = ive::ifaceSegment(rect, first, last);
     QVERIFY(!line.isNull());
     QVERIFY(line.p1() != line.p2());
     QVERIFY(rect.contains(last) == rect.contains(line.p2()));
 
     last = QPointF(200, 200);
-    line = aadlinterface::ifaceSegment(rect, first, last);
+    line = ive::ifaceSegment(rect, first, last);
     QVERIFY(!line.isNull());
     QVERIFY(line.p1() != line.p2());
     QVERIFY(rect.contains(last) == rect.contains(line.p2()));
@@ -295,14 +295,14 @@ void tst_ConnectionUtils::tst_createConnectionPath()
 {
     const QRectF r1 = f1->sceneBoundingRect();
     const QRectF r2 = f2->sceneBoundingRect();
-    QVector<QPointF> path = aadlinterface::createConnectionPath(
+    QVector<QPointF> path = ive::createConnectionPath(
             existingRects(), QPointF(r1.x(), r1.y() + 100), r1, QPointF(r2.right(), r2.y() + 100), r2);
     QVERIFY(!path.isEmpty());
     path.append(path.last());
     path.append(path.last());
     path.prepend(path.first());
     path.prepend(path.first());
-    auto simplifiedPath = aadlinterface::simplifyPoints(path);
+    auto simplifiedPath = ive::simplifyPoints(path);
     QCOMPARE(simplifiedPath.size() + 4, path.size());
 }
 
@@ -313,16 +313,16 @@ void tst_ConnectionUtils::tst_findPath()
     const QPointF startPoint(r1.x(), r1.y() + 100);
     const QPointF endPoint(r2.right(), r2.y() + 100);
 
-    const QLineF startSegment = aadlinterface::ifaceSegment(r1, startPoint, endPoint);
-    const QLineF endSegment = aadlinterface::ifaceSegment(r2, endPoint, startPoint);
+    const QLineF startSegment = ive::ifaceSegment(r1, startPoint, endPoint);
+    const QLineF endSegment = ive::ifaceSegment(r2, endPoint, startPoint);
 
     QRectF intersectedRect;
-    auto path = aadlinterface::findPath(existingRects(), startSegment, endSegment, &intersectedRect);
+    auto path = ive::findPath(existingRects(), startSegment, endSegment, &intersectedRect);
     QVERIFY(!intersectedRect.isNull());
     QVERIFY(path.isEmpty());
 
     intersectedRect = {};
-    path = aadlinterface::findPath(existingRects(), QLineF(r1.topLeft(), r1.topRight()),
+    path = ive::findPath(existingRects(), QLineF(r1.topLeft(), r1.topRight()),
             QLineF(r2.bottomRight(), r2.bottomLeft()), &intersectedRect);
     QVERIFY(intersectedRect.isNull());
     QVERIFY(!path.isEmpty());
@@ -335,20 +335,20 @@ void tst_ConnectionUtils::tst_findSubPath()
     const QPointF startPoint(r1.x(), r1.y() + 100);
     const QPointF endPoint(r2.right(), r2.y() + 100);
 
-    const QLineF startSegment = aadlinterface::ifaceSegment(r1, startPoint, endPoint);
-    const QLineF endSegment = aadlinterface::ifaceSegment(r2, endPoint, startPoint);
+    const QLineF startSegment = ive::ifaceSegment(r1, startPoint, endPoint);
+    const QLineF endSegment = ive::ifaceSegment(r2, endPoint, startPoint);
 
     const auto pathsFromStart =
-            aadlinterface::findSubPath(r1, QVector<QPointF> { startSegment.p1(), startSegment.p2() },
+            ive::findSubPath(r1, QVector<QPointF> { startSegment.p1(), startSegment.p2() },
                     QVector<QPointF> { endSegment.p1(), endSegment.p2() });
     QVERIFY(!pathsFromStart.isEmpty());
 
-    const auto pathsFromEnd = aadlinterface::findSubPath(r2, QVector<QPointF> { endSegment.p1(), endSegment.p2() },
+    const auto pathsFromEnd = ive::findSubPath(r2, QVector<QPointF> { endSegment.p1(), endSegment.p2() },
             QVector<QPointF> { startSegment.p1(), startSegment.p2() });
     QVERIFY(!pathsFromEnd.isEmpty());
 
-    static const QList<int> types = { aadlinterface::AADLFunctionGraphicsItem::Type,
-        aadlinterface::AADLFunctionTypeGraphicsItem::Type };
+    static const QList<int> types = { ive::AADLFunctionGraphicsItem::Type,
+        ive::AADLFunctionTypeGraphicsItem::Type };
     QList<QVector<QPointF>> paths;
     for (int p1idx = 0; p1idx < pathsFromStart.size(); ++p1idx) {
         for (int p2idx = 0; p2idx < pathsFromEnd.size(); ++p2idx) {
@@ -366,7 +366,7 @@ void tst_ConnectionUtils::tst_findSubPath()
         }
     }
     for (auto path : paths) {
-        path = aadlinterface::simplifyPoints(path);
+        path = ive::simplifyPoints(path);
         auto items = m_scene.items(path);
         auto it = std::find_if(items.constBegin(), items.constEnd(), [path](QGraphicsItem *item) {
             return types.contains(item->type())
@@ -383,7 +383,7 @@ void tst_ConnectionUtils::tst_pathByPoints()
     const QPointF startPoint(r1.x() - 100, r1.center().y());
     const QPointF endPoint(r2.right() + 100, r2.center().y());
 
-    auto path = aadlinterface::path(existingRects(), startPoint, endPoint);
+    auto path = ive::path(existingRects(), startPoint, endPoint);
     QVERIFY(!path.isEmpty());
 }
 
@@ -406,10 +406,10 @@ void tst_ConnectionUtils::tst_endPoints()
             } else {
                 qFatal("Test for Interface group isn't implemented yet");
             }
-            iface->setCoordinates(aadlinterface::coordinates(ci.position));
+            iface->setCoordinates(ive::coordinates(ci.position));
             iface->postInit();
             if (ci.function->addChild(iface)) {
-                auto ifaceItem = new aadlinterface::AADLInterfaceGraphicsItem(iface, data.at(idx).function());
+                auto ifaceItem = new ive::AADLInterfaceGraphicsItem(iface, data.at(idx).function());
                 ifaceItem->init();
                 ifaceItem->setTargetItem(data.at(idx).function(), ci.position);
             }
@@ -517,15 +517,15 @@ void tst_ConnectionUtils::tst_path()
     const QPointF startPoint(r1.x() - 100, r1.center().y());
     const QPointF endPoint(r2.right() + 100, r2.center().y());
 
-    const QLineF startSegment = aadlinterface::ifaceSegment(r1, startPoint, endPoint);
-    const QLineF endSegment = aadlinterface::ifaceSegment(r2, endPoint, startPoint);
+    const QLineF startSegment = ive::ifaceSegment(r1, startPoint, endPoint);
+    const QLineF endSegment = ive::ifaceSegment(r2, endPoint, startPoint);
 
-    auto path = aadlinterface::path(existingRects(), startSegment, endSegment);
+    auto path = ive::path(existingRects(), startSegment, endSegment);
     QVERIFY(!path.isEmpty());
 }
 
-void tst_ConnectionUtils::checkEndPoints(aadlinterface::AADLFunctionGraphicsItem *startFn, Data::EndPoint startEp,
-        aadlinterface::AADLFunctionGraphicsItem *endFn, Data::EndPoint endEp, bool isReversed, bool shouldFail)
+void tst_ConnectionUtils::checkEndPoints(ive::AADLFunctionGraphicsItem *startFn, Data::EndPoint startEp,
+        ive::AADLFunctionGraphicsItem *endFn, Data::EndPoint endEp, bool isReversed, bool shouldFail)
 {
     const Data start(startFn);
     const Data end(endFn);
@@ -540,21 +540,21 @@ void tst_ConnectionUtils::checkEndPoints(aadlinterface::AADLFunctionGraphicsItem
 
             const QPointF p = isReversed ? connectionPoints.last() : connectionPoints.first();
             if (startEp == Data::EndPoint::Empty) {
-                const bool validPoint = aadlinterface::isOnVerticalSide(start.rect(), p)
-                        || aadlinterface::isOnVerticalSide(start.rect(), p);
+                const bool validPoint = ive::isOnVerticalSide(start.rect(), p)
+                        || ive::isOnVerticalSide(start.rect(), p);
                 if (!validPoint) {
                     continue;
                 }
             }
             if (endEp == Data::EndPoint::Empty) {
-                const bool validPoint = aadlinterface::isOnVerticalSide(end.rect(), p)
-                        || aadlinterface::isOnVerticalSide(end.rect(), p);
+                const bool validPoint = ive::isOnVerticalSide(end.rect(), p)
+                        || ive::isOnVerticalSide(end.rect(), p);
                 if (!validPoint) {
                     continue;
                 }
             }
 
-            const auto result = aadlinterface::gi::validateConnectionCreate(&m_scene, connectionPoints);
+            const auto result = ive::gi::validateConnectionCreate(&m_scene, connectionPoints);
             QVERIFY(result.startIface != result.endIface
                     || (result.startIface == nullptr && result.endIface == nullptr));
             QCOMPARE(result.isToOrFromNested,
@@ -568,7 +568,7 @@ void tst_ConnectionUtils::checkEndPoints(aadlinterface::AADLFunctionGraphicsItem
                     QCOMPARE(result.connectionPoints, connectionPoints);
                 }
 
-                const auto path = aadlinterface::createConnectionPath(existingRects(),
+                const auto path = ive::createConnectionPath(existingRects(),
                         isReversed ? result.connectionPoints.last() : result.connectionPoints.first(), start.rect(),
                         isReversed ? result.connectionPoints.first() : result.connectionPoints.last(), end.rect());
                 QVERIFY(!path.isEmpty());

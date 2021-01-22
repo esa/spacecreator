@@ -25,7 +25,7 @@ namespace Ui {
 class ColorManagerDialog;
 }
 
-namespace aadlinterface {
+namespace ive {
 
 class ColorManagerDialog : public QDialog
 {

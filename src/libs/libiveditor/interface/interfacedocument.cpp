@@ -63,7 +63,7 @@
 #include <QVBoxLayout>
 #include <algorithm>
 
-namespace aadlinterface {
+namespace ive {
 
 static const QString kDefaultFilename { QLatin1String("interfaceview.xml") };
 
@@ -89,7 +89,7 @@ struct InterfaceDocument::InterfaceDocumentPrivate {
     QString filePath;
 
     QPointer<QWidget> view;
-    aadlinterface::GraphicsView *graphicsView { nullptr };
+    ive::GraphicsView *graphicsView { nullptr };
     aadl::PropertyTemplateConfig *dynPropConfig { nullptr };
     QTreeView *objectsView { nullptr };
     AADLItemModel *itemsModel { nullptr };
@@ -117,8 +117,8 @@ struct InterfaceDocument::InterfaceDocumentPrivate {
 };
 
 /*!
-\class aadlinterface::InterfaceDocument
-\brief aadlinterface::InterfaceDocument is the document for graphical AADL data (loaded from the XML).
+\class ive::InterfaceDocument
+\brief ive::InterfaceDocument is the document for graphical AADL data (loaded from the XML).
 */
 
 InterfaceDocument::InterfaceDocument(QObject *parent)
@@ -200,7 +200,7 @@ void InterfaceDocument::init()
     splitter->setStretchFactor(1, 1);
     rootLayout->addWidget(splitter);
 
-    aadlinterface::cmd::CommandsStack::setCurrent(d->commandsStack);
+    ive::cmd::CommandsStack::setCurrent(d->commandsStack);
 
     QTimer::singleShot(0, this, &InterfaceDocument::loadAvailableComponents);
 }
@@ -318,7 +318,7 @@ QList<aadl::AADLObject *> InterfaceDocument::prepareSelectedObjectsForExport(QSt
     QList<aadl::AADLObject *> objects;
     QStringList exportNames;
     for (const auto id : d->objectsSelectionModel->selection().indexes()) {
-        const int role = static_cast<int>(aadlinterface::CommonVisualizationModel::IdRole);
+        const int role = static_cast<int>(ive::CommonVisualizationModel::IdRole);
         if (aadl::AADLObject *object = d->objectsModel->getObject(id.data(role).toUuid())) {
             if (object->isFunction() && object->parentObject() == nullptr) {
                 exportNames.append(object->attr(QLatin1String("name")).toString());
@@ -358,7 +358,7 @@ bool InterfaceDocument::exportSelectedType()
     if (indexes.isEmpty()) {
         return false;
     }
-    static const int role = static_cast<int>(aadlinterface::CommonVisualizationModel::IdRole);
+    static const int role = static_cast<int>(ive::CommonVisualizationModel::IdRole);
     aadl::AADLObject *rootType = nullptr;
     for (const auto index : indexes) {
         if (aadl::AADLObject *object = d->objectsModel->getObject(index.data(role).toUuid())) {
@@ -645,7 +645,7 @@ void InterfaceDocument::onItemDoubleClicked(shared::Id id)
 
 void InterfaceDocument::onAttributesManagerRequested()
 {
-    auto dialog = new aadlinterface::PropertyTemplateManager(window());
+    auto dialog = new ive::PropertyTemplateManager(window());
     dialog->setAttribute(Qt::WA_DeleteOnClose);
     dialog->open();
 }
@@ -658,7 +658,7 @@ void InterfaceDocument::onDataTypesMenuInvoked()
 
 void InterfaceDocument::onColorSchemeMenuInvoked()
 {
-    aadlinterface::ColorManagerDialog *dialog = new aadlinterface::ColorManagerDialog(window());
+    ive::ColorManagerDialog *dialog = new ive::ColorManagerDialog(window());
     dialog->setAttribute(Qt::WA_DeleteOnClose);
     dialog->open();
 }
@@ -676,7 +676,7 @@ void InterfaceDocument::onDynContextEditorMenuInvoked()
 
 void InterfaceDocument::showPropertyEditor(aadl::AADLObject *obj)
 {
-    aadlinterface::PropertiesDialog dialog(
+    ive::PropertiesDialog dialog(
             d->dynPropConfig, obj, d->asnDataTypes->asn1DataTypes(asn1FilePath()), d->graphicsView);
     dialog.exec();
 }
@@ -740,7 +740,7 @@ void InterfaceDocument::showContextMenuForAADLModel(const QPoint &pos)
     }
 
     const auto obj = d->objectsModel->getObject(
-            idx.data(static_cast<int>(aadlinterface::CommonVisualizationModel::IdRole)).toUuid());
+            idx.data(static_cast<int>(ive::CommonVisualizationModel::IdRole)).toUuid());
     if (!obj) {
         return;
     }
@@ -957,7 +957,7 @@ QVector<QAction *> InterfaceDocument::initActions()
                 d->actRemove->setEnabled(!selected.isEmpty());
                 const QModelIndexList idxs = selected.indexes();
                 auto it = std::find_if(idxs.cbegin(), idxs.cend(), [](const QModelIndex &index) {
-                    return index.data(static_cast<int>(aadlinterface::CommonVisualizationModel::TypeRole)).toInt()
+                    return index.data(static_cast<int>(ive::CommonVisualizationModel::TypeRole)).toInt()
                             == static_cast<int>(aadl::AADLObject::Type::Connection);
                 });
                 d->actCreateConnectionGroup->setEnabled(it != std::cend(idxs));
@@ -968,8 +968,8 @@ QVector<QAction *> InterfaceDocument::initActions()
 QWidget *InterfaceDocument::createGraphicsView()
 {
     if (!d->graphicsView) {
-        d->graphicsView = new aadlinterface::GraphicsView;
-        connect(d->graphicsView, &aadlinterface::GraphicsView::zoomChanged, this, [this](qreal percent) {
+        d->graphicsView = new ive::GraphicsView;
+        connect(d->graphicsView, &ive::GraphicsView::zoomChanged, this, [this](qreal percent) {
             d->itemsModel->zoomChanged();
             d->actZoomIn->setEnabled(!qFuzzyCompare(percent, d->graphicsView->maxZoomPercent()));
             d->actZoomOut->setEnabled(!qFuzzyCompare(percent, d->graphicsView->minZoomPercent()));

@@ -23,7 +23,7 @@
 
 class QAction;
 
-namespace aadlinterface {
+namespace ive {
 class IVEditorCore;
 }
 
@@ -36,9 +36,9 @@ public:
     AadlMainWidget(QWidget *parent = nullptr);
     ~AadlMainWidget();
 
-    bool init(QSharedPointer<aadlinterface::IVEditorCore> data);
+    bool init(QSharedPointer<ive::IVEditorCore> data);
 
-    QSharedPointer<aadlinterface::IVEditorCore> ivPlugin() const;
+    QSharedPointer<ive::IVEditorCore> ivPlugin() const;
 
 public Q_SLOTS:
     void setMinimapVisible(bool visible);
@@ -49,7 +49,7 @@ private Q_SLOTS:
 private:
     void init();
 
-    QSharedPointer<aadlinterface::IVEditorCore> m_plugin;
+    QSharedPointer<ive::IVEditorCore> m_plugin;
 };
 
 }

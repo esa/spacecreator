@@ -28,7 +28,7 @@
 
 #include <QSet>
 
-namespace aadlinterface {
+namespace ive {
 
 AADLConnectionGroupModel::AADLConnectionGroupModel(
         aadl::AADLObjectConnectionGroup *connectionGroup, cmd::CommandsStack::Macro *macro, QObject *parent)
@@ -152,4 +152,4 @@ bool AADLConnectionGroupModel::isEnabled(const QModelIndex &index) const
     return !m_groupedConnetions.contains(m_allConnections.at(index.row())->id());
 }
 
-} // namespace aadlinterface
+} // namespace ive

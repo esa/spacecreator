@@ -24,7 +24,7 @@ class AADLObjectConnection;
 class AADLObjectConnectionGroup;
 }
 
-namespace aadlinterface {
+namespace ive {
 namespace cmd {
 
 
@@ -44,6 +44,6 @@ private:
     bool m_addConnection = true;
 };
 
-} // namespace aadlinterface
+} // namespace ive
 } // namespace cmd
 

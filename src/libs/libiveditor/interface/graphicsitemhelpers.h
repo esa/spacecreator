@@ -34,7 +34,7 @@ class AADLObject;
 struct ValidationResult;
 }
 
-namespace aadlinterface {
+namespace ive {
 namespace gi {
 
 aadl::AADLObjectFunction *functionObject(QGraphicsItem *item);
@@ -68,4 +68,4 @@ bool canPlaceRect(QGraphicsScene *scene, const QGraphicsItem *upcomingItem, cons
 aadl::ValidationResult validateConnectionCreate(QGraphicsScene *scene, const QVector<QPointF> &points);
 
 } // namespace gi
-} // namespace aadlinterface
+} // namespace ive

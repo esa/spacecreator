@@ -20,7 +20,7 @@
 #include <QStringListModel>
 #include <QVector>
 
-namespace aadlinterface {
+namespace ive {
 
 struct AttrHandler;
 

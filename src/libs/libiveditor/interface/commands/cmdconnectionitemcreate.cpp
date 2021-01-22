@@ -27,7 +27,7 @@
 
 #include <QtMath>
 
-namespace aadlinterface {
+namespace ive {
 namespace cmd {
 
 CmdConnectionItemCreate::CmdConnectionItemCreate(aadl::AADLObjectsModel *model, aadl::AADLObjectFunction *parent,

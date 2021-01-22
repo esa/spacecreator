@@ -25,7 +25,7 @@
 #include <QPlainTextEdit>
 #include <QSignalMapper>
 
-namespace aadlinterface {
+namespace ive {
 
 CreateConnectionGroupDialog::CreateConnectionGroupDialog(
         const QList<aadl::AADLObjectConnectionGroup::CreationInfo> &groupCreationDataList, QWidget *parent)
@@ -84,4 +84,4 @@ QList<aadl::AADLObjectConnectionGroup::CreationInfo> CreateConnectionGroupDialog
     return m_info;
 }
 
-} // namespace aadlinterface
+} // namespace ive

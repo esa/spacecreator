@@ -50,7 +50,7 @@ AadlQtCEditor::AadlQtCEditor(
     setWidget(m_editorWidget);
 
     connect(m_document, &spctr::AadlEditorDocument::ivDataLoaded, this,
-            [this](const QString &, QSharedPointer<aadlinterface::IVEditorCore> data) { m_editorWidget->init(data); });
+            [this](const QString &, QSharedPointer<ive::IVEditorCore> data) { m_editorWidget->init(data); });
 }
 
 AadlQtCEditor::~AadlQtCEditor()
@@ -68,14 +68,14 @@ AadlEditorDocument *AadlQtCEditor::ivDocument() const
     return m_document;
 }
 
-QSharedPointer<aadlinterface::IVEditorCore> AadlQtCEditor::ivPlugin() const
+QSharedPointer<ive::IVEditorCore> AadlQtCEditor::ivPlugin() const
 {
     return m_document->ivEditorCore();
 }
 
 QWidget *AadlQtCEditor::toolBar()
 {
-    QSharedPointer<aadlinterface::IVEditorCore> ivCore = m_document->ivEditorCore();
+    QSharedPointer<ive::IVEditorCore> ivCore = m_document->ivEditorCore();
     if (m_toolbar == nullptr && !ivCore.isNull()) {
         m_toolbar = new QToolBar;
         m_toolbar->addAction(ivCore->actionUndo());
@@ -98,8 +98,8 @@ void AadlQtCEditor::showAsn1Dialog()
         return;
     }
 
-    QSharedPointer<aadlinterface::IVEditorCore> plugin = ivPlugin();
-    aadlinterface::Asn1Dialog dialog;
+    QSharedPointer<ive::IVEditorCore> plugin = ivPlugin();
+    ive::Asn1Dialog dialog;
     QFileInfo fi(plugin->document()->asn1FilePath());
     dialog.setFile(fi);
     dialog.show();
@@ -108,9 +108,9 @@ void AadlQtCEditor::showAsn1Dialog()
         if (plugin->document()->asn1FileName() != dialog.fileName()) {
             QVariantList params { QVariant::fromValue(plugin->document()), QVariant::fromValue(dialog.fileName()) };
             QUndoCommand *command =
-                    aadlinterface::cmd::CommandsFactory::create(aadlinterface::cmd::ChangeAsn1File, params);
+                    ive::cmd::CommandsFactory::create(ive::cmd::ChangeAsn1File, params);
             if (command) {
-                aadlinterface::cmd::CommandsStack::push(command);
+                ive::cmd::CommandsStack::push(command);
             }
         }
     }
@@ -122,9 +122,9 @@ void AadlQtCEditor::showE2EDataflow(const QStringList &mscFiles)
         return;
     }
 
-    QSharedPointer<aadlinterface::IVEditorCore> plugin = ivPlugin();
+    QSharedPointer<ive::IVEditorCore> plugin = ivPlugin();
     if (m_endToEndView.isNull()) {
-        m_endToEndView = new aadlinterface::EndToEndView(plugin->document(), nullptr);
+        m_endToEndView = new ive::EndToEndView(plugin->document(), nullptr);
         m_endToEndView->setAttribute(Qt::WA_DeleteOnClose);
         std::function<msc::MscModel *(QString fileName)> fetcher = [this](QString fileName) -> msc::MscModel * {
             if (m_mscStorage) {

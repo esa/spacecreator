@@ -79,7 +79,7 @@ Core::IEditor *AadlEditorData::createEditor()
     auto *ivEditor = new AadlQtCEditor(m_aadlStorage, m_mscStorage, m_ivActions);
 
     connect(ivEditor->ivDocument(), &spctr::AadlEditorDocument::ivDataLoaded, this,
-            [this](const QString &fileName, QSharedPointer<aadlinterface::IVEditorCore> data) {
+            [this](const QString &fileName, QSharedPointer<ive::IVEditorCore> data) {
                 data->minimapView()->setVisible(m_minimapVisible);
                 m_undoGroup->addStack(data->undoStack());
                 Q_EMIT aadlDataLoaded(fileName, data);

@@ -66,7 +66,7 @@ void initMscResources()
     Asn1Acn::initAsn1Library();
     msc::initMscLibrary();
     msc::initMscEditor();
-    aadlinterface::initIvEditor();
+    ive::initIvEditor();
 }
 
 using namespace Core;
@@ -158,14 +158,14 @@ bool SpaceCreatorPlugin::initialize(const QStringList &arguments, QString *error
     m_asn1DialogAction = new QAction(
             QIcon(QLatin1String(":/tab_interface/toolbar/icns/asn1.png")), tr("Show ASN1 dialog ..."), this);
     Core::Command *showAsn1Cmd = Core::ActionManager::registerAction(m_asn1DialogAction, Constants::AADL_SHOW_ASN1_ID);
-    aadlinterface::ActionsManager::registerAction(Q_FUNC_INFO, m_asn1DialogAction, "Asn1", "Edit the ASN1 file");
+    ive::ActionsManager::registerAction(Q_FUNC_INFO, m_asn1DialogAction, "Asn1", "Edit the ASN1 file");
     connect(m_asn1DialogAction, &QAction::triggered, this, &SpaceCreatorPlugin::showAsn1Dialog);
     m_asn1DialogAction->setEnabled(false);
 
     m_actionSaveSceneRender =
             new QAction(QIcon(QLatin1String(":/tab_interface/toolbar/icns/render.svg")), tr("Render Scene..."), this);
     Core::Command *renderCmd = Core::ActionManager::registerAction(m_actionSaveSceneRender, Constants::AADL_RENDER_ID);
-    aadlinterface::ActionsManager::registerAction(
+    ive::ActionsManager::registerAction(
             Q_FUNC_INFO, m_actionSaveSceneRender, "Render", "Save current scene complete render.");
     connect(m_actionSaveSceneRender, &QAction::triggered, this,
             [this]() { m_checks->ivCore()->onSaveRenderRequested(); });

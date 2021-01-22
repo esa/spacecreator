@@ -19,10 +19,10 @@
 
 #include "context/action/condition.h"
 
-namespace aadlinterface {
+namespace ive {
 
 /*!
- * \class aadlinterface::ConditionsModel
+ * \class ive::ConditionsModel
  * \brief The model to store scriptable actions conditions in editor dialog.
  */
 ConditionsModel::ConditionsModel(QObject *parent)

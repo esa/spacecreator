@@ -20,7 +20,7 @@
 #include <QPointer>
 #include <coreplugin/dialogs/ioptionspage.h>
 
-namespace aadlinterface {
+namespace ive {
 class PropertyTemplateWidget;
 }
 
@@ -36,7 +36,7 @@ public:
     void finish() override;
 
 private:
-    QPointer<aadlinterface::PropertyTemplateWidget> m_widget;
+    QPointer<ive::PropertyTemplateWidget> m_widget;
 };
 
 }

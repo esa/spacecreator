@@ -17,7 +17,7 @@
 
 #include "leafdocumentsmodel.h"
 
-namespace aadlinterface {
+namespace ive {
 
 LeafDocumentsModel::LeafDocumentsModel(QObject *parent)
     : QObjectListModelT<msc::MscDocument *>(parent)

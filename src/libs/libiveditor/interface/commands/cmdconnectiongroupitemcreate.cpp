@@ -24,7 +24,7 @@
 #include "cmdconnectiongroupitemchange.h"
 #include "commandids.h"
 
-namespace aadlinterface {
+namespace ive {
 namespace cmd {
 
 CmdConnectionGroupItemCreate::CmdConnectionGroupItemCreate(
@@ -129,5 +129,5 @@ int CmdConnectionGroupItemCreate::id() const
     return CreateConnectionGroupEntity;
 }
 
-} // namespace aadlinterface
+} // namespace ive
 } // namespace cmd

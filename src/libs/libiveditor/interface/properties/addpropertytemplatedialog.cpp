@@ -28,7 +28,7 @@
 #include <QPushButton>
 #include <QWidget>
 
-namespace aadlinterface {
+namespace ive {
 
 AddPropertyTemplateDialog::AddPropertyTemplateDialog(const QStringList &prohibitedNames, QWidget *parent)
     : QDialog(parent)
@@ -172,4 +172,4 @@ aadl::PropertyTemplate *AddPropertyTemplateDialog::attribute() const
     return m_attr;
 }
 
-} // namespace aadlinterface
+} // namespace ive

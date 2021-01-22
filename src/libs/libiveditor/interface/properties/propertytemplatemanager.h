@@ -23,7 +23,7 @@ namespace Ui {
 class PropertyTemplateManager;
 }
 
-namespace aadlinterface {
+namespace ive {
 
 class PropertyTemplateManager : public QDialog
 {

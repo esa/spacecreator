@@ -25,7 +25,7 @@ namespace aadl {
 class AADLObject;
 }
 
-namespace aadlinterface {
+namespace ive {
 
 enum class IntersectionType
 {
@@ -57,7 +57,7 @@ static const qreal kInterfaceTolerance = 5.;
 static const qreal kFunctionTolerance = 20.;
 
 /*!
-  \brief aadlinterface::ZOrder
+  \brief ive::ZOrder
 
   This static anonymous struct holds values for items Z ordering:
     \var Topmost
@@ -172,4 +172,4 @@ QRectF collidingRect(const QRectF &rect, const QList<QRectF> &existingRects);
 void findGeometryForRect(QRectF &itemRect, QRectF &boundedRect, const QList<QRectF> &existingRects = {},
         const QMarginsF &margins = kRootMargins);
 
-} // namespace aadlinterface
+} // namespace ive

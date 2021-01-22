@@ -22,7 +22,7 @@
 
 #include <aadlobjectsmodel.h>
 
-namespace aadlinterface {
+namespace ive {
 namespace cmd {
 
 static inline QVariantHash getCurrentProperties(aadl::AADLObject *entity, const QStringList &props)

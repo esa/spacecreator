@@ -28,7 +28,7 @@
 int main(int argc, char *argv[])
 {
     Asn1Acn::initAsn1Library();
-    aadlinterface::initIvEditor();
+    ive::initIvEditor();
     shared::initSharedLibrary();
 
     QCoreApplication a(argc, argv);
@@ -51,13 +51,13 @@ int main(int argc, char *argv[])
         const QString templateFile = cmdParser.value(shared::CommandLineParser::Positional::OpenStringTemplateFile);
         const QString outputFile = cmdParser.value(shared::CommandLineParser::Positional::ExportToFile);
 
-        aadlinterface::InterfaceDocument doc;
+        ive::InterfaceDocument doc;
         const bool loadOk = doc.load(inputFile);
         if (!loadOk) {
             qCritical() << "Unable to load file" << inputFile;
             return -1;
         }
-        const bool convertOk = aadlinterface::XmlDocExporter::exportDocSilently(&doc, outputFile, templateFile);
+        const bool convertOk = ive::XmlDocExporter::exportDocSilently(&doc, outputFile, templateFile);
         if (!convertOk) {
             qCritical() << "Error converting " << inputFile << "to" << outputFile;
             return -1;

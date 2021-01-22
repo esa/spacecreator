@@ -26,7 +26,7 @@
 #include <QModelIndex>
 #include <QMouseEvent>
 
-namespace aadlinterface {
+namespace ive {
 
 AADLObjectsTreeView::AADLObjectsTreeView(shared::DropType componentType, QWidget *parent)
     : QTreeView(parent)
@@ -79,4 +79,4 @@ void AADLObjectsTreeView::mouseMoveEvent(QMouseEvent *event)
     QTreeView::mouseMoveEvent(event);
 }
 
-} // namespace aadlinterface
+} // namespace ive

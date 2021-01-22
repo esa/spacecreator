@@ -29,7 +29,7 @@ class AADLObjectFunction;
 class AADLObjectFunctionType;
 }
 
-namespace aadlinterface {
+namespace ive {
 namespace cmd {
 
 class CmdEntityAttributeChange : public shared::UndoCommand

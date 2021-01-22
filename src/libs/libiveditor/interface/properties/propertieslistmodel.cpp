@@ -32,7 +32,7 @@
 #include <QDebug>
 #include <algorithm>
 
-namespace aadlinterface {
+namespace ive {
 
 aadl::meta::Props::Token tokenFromIndex(const QModelIndex &index)
 {

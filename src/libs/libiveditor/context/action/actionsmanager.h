@@ -29,7 +29,7 @@ class AADLObject;
 
 class QMenu;
 
-namespace aadlinterface {
+namespace ive {
 
 class InterfaceDocument;
 

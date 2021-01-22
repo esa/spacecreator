@@ -29,7 +29,7 @@ class AADLObjectFunctionType;
 class AADLObjectsModel;
 }
 
-namespace aadlinterface {
+namespace ive {
 namespace cmd {
 class CmdEntityAttributeChange;
 
@@ -53,5 +53,5 @@ private:
     CmdEntityAttributeChange *m_subCmd { nullptr };
 };
 
-} // namespace aadlinterface
+} // namespace ive
 } // namespace cmd

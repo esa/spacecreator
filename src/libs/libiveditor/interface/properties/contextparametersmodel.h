@@ -33,7 +33,7 @@ class AADLObject;
 class ContextParameter;
 }
 
-namespace aadlinterface {
+namespace ive {
 
 class ContextParametersModel : public PropertiesModelBase
 {

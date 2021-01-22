@@ -20,7 +20,7 @@
 #include "aadlobjectconnectiongroup.h"
 #include "cmdentitygeometrychange.h"
 
-namespace aadlinterface {
+namespace ive {
 namespace cmd {
 
 class CmdConnectionGroupItemCreate : public CmdEntityGeometryChange
@@ -44,5 +44,5 @@ private:
     QList<QUndoCommand *> m_subCommands;
 };
 
-} // namespace aadlinterface
+} // namespace ive
 } // namespace cmd

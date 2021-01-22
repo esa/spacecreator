@@ -26,7 +26,7 @@ class AADLObjectIface;
 class AADLObjectConnection;
 }
 
-namespace aadlinterface {
+namespace ive {
 namespace cmd {
 
 class CmdIfaceParamBase : public QUndoCommand

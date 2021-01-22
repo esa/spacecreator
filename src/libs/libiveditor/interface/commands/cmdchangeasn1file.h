@@ -20,7 +20,7 @@
 #include <QPointer>
 #include <QUndoCommand>
 
-namespace aadlinterface {
+namespace ive {
 
 class InterfaceDocument;
 
@@ -44,4 +44,4 @@ private:
 };
 
 } // namespace cmd
-} // namespace aadlinterface
+} // namespace ive

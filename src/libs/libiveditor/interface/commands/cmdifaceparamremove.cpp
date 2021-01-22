@@ -23,7 +23,7 @@
 #include <aadlobjectsmodel.h>
 #include <aadlparameter.h>
 
-namespace aadlinterface {
+namespace ive {
 namespace cmd {
 
 CmdIfaceParamRemove::CmdIfaceParamRemove(aadl::AADLObject *entity, const aadl::IfaceParameter &param)

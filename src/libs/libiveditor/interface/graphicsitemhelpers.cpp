@@ -35,7 +35,7 @@
 
 #include <QGraphicsScene>
 
-namespace aadlinterface {
+namespace ive {
 namespace gi {
 
 aadl::AADLObjectFunction *functionObject(QGraphicsItem *item)
@@ -184,13 +184,13 @@ aadl::ValidationResult validateConnectionCreate(QGraphicsScene *scene, const QVe
     aadl::ValidationResult result;
     result.connectionPoints = points;
     result.functionAtStartPos =
-            aadlinterface::nearestItem(scene, aadlinterface::adjustFromPoint(startPos, kFunctionTolerance),
-                    { aadlinterface::AADLFunctionGraphicsItem::Type });
+            ive::nearestItem(scene, ive::adjustFromPoint(startPos, kFunctionTolerance),
+                    { ive::AADLFunctionGraphicsItem::Type });
     result.functionAtEndPos =
-            aadlinterface::nearestItem(scene, aadlinterface::adjustFromPoint(endPos, kFunctionTolerance),
-                    { aadlinterface::AADLFunctionGraphicsItem::Type });
-    result.startObject = aadlinterface::gi::functionObject(result.functionAtStartPos);
-    result.endObject = aadlinterface::gi::functionObject(result.functionAtEndPos);
+            ive::nearestItem(scene, ive::adjustFromPoint(endPos, kFunctionTolerance),
+                    { ive::AADLFunctionGraphicsItem::Type });
+    result.startObject = ive::gi::functionObject(result.functionAtStartPos);
+    result.endObject = ive::gi::functionObject(result.functionAtEndPos);
     result.isToOrFromNested =
             (result.functionAtStartPos && result.functionAtStartPos->isAncestorOf(result.functionAtEndPos))
             || (result.functionAtEndPos && result.functionAtEndPos->isAncestorOf(result.functionAtStartPos));
@@ -200,9 +200,9 @@ aadl::ValidationResult validateConnectionCreate(QGraphicsScene *scene, const QVe
         return result;
     }
 
-    const auto startIfaceItem = qgraphicsitem_cast<aadlinterface::AADLInterfaceGraphicsItem *>(
-            aadlinterface::nearestItem(scene, aadlinterface::adjustFromPoint(startPos, kInterfaceTolerance),
-                    { aadlinterface::AADLInterfaceGraphicsItem::Type }));
+    const auto startIfaceItem = qgraphicsitem_cast<ive::AADLInterfaceGraphicsItem *>(
+            ive::nearestItem(scene, ive::adjustFromPoint(startPos, kInterfaceTolerance),
+                    { ive::AADLInterfaceGraphicsItem::Type }));
     if (startIfaceItem
             && startIfaceItem->ifaceShape()
                        .boundingRect()
@@ -223,9 +223,9 @@ aadl::ValidationResult validateConnectionCreate(QGraphicsScene *scene, const QVe
         return result;
     }
 
-    const auto endIfaceItem = qgraphicsitem_cast<aadlinterface::AADLInterfaceGraphicsItem *>(
-            aadlinterface::nearestItem(scene, aadlinterface::adjustFromPoint(endPos, kInterfaceTolerance),
-                    { aadlinterface::AADLInterfaceGraphicsItem::Type }));
+    const auto endIfaceItem = qgraphicsitem_cast<ive::AADLInterfaceGraphicsItem *>(
+            ive::nearestItem(scene, ive::adjustFromPoint(endPos, kInterfaceTolerance),
+                    { ive::AADLInterfaceGraphicsItem::Type }));
     if (endIfaceItem
             && endIfaceItem->ifaceShape()
                        .boundingRect()
@@ -290,4 +290,4 @@ aadl::ValidationResult validateConnectionCreate(QGraphicsScene *scene, const QVe
 }
 
 } // namespace gi
-} // namespace aadlinterface
+} // namespace ive

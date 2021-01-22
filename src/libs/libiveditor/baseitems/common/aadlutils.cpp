@@ -34,7 +34,7 @@
 #include <QtGlobal>
 #include <QtMath>
 
-namespace aadlinterface {
+namespace ive {
 
 /*!
  * Returns the nearest rect from \a existingRects which intersects with \a points according to \a intersectionType:
@@ -86,8 +86,8 @@ QRectF getNearestIntersectedRect(
                 }
                 std::for_each(intersectionPoints.cbegin(), intersectionPoints.cend(),
                         [&intersectionPoint, sectionStartPoint = line.p1()](const QPointF &p) {
-                            if (aadlinterface::distanceLine(sectionStartPoint, intersectionPoint)
-                                    > aadlinterface::distanceLine(p, sectionStartPoint)) {
+                            if (ive::distanceLine(sectionStartPoint, intersectionPoint)
+                                    > ive::distanceLine(p, sectionStartPoint)) {
                                 intersectionPoint = p;
                             }
                         });
@@ -239,7 +239,7 @@ QGraphicsItem *nearestItem(
 }
 
 /*!
- * \fn aadlinterface::bool alignedLine(QLineF &line, int angleTolerance)
+ * \fn ive::bool alignedLine(QLineF &line, int angleTolerance)
  * \brief  Adjusts the angle of the \a line to the nearest x90 degrees ccw with \a angleTolerance.
  * Returns true if the \a line's angle adjusted.
  */
@@ -385,24 +385,24 @@ QList<int> knownGraphicsItemTypes()
         const aadl::AADLObject::Type objectType = static_cast<aadl::AADLObject::Type>(me.value(i));
         switch (objectType) {
         case aadl::AADLObject::Type::Function:
-            itemType = aadlinterface::AADLFunctionGraphicsItem::Type;
+            itemType = ive::AADLFunctionGraphicsItem::Type;
             break;
         case aadl::AADLObject::Type::FunctionType:
-            itemType = aadlinterface::AADLFunctionTypeGraphicsItem::Type;
+            itemType = ive::AADLFunctionTypeGraphicsItem::Type;
             break;
         case aadl::AADLObject::Type::InterfaceGroup:
         case aadl::AADLObject::Type::ProvidedInterface:
         case aadl::AADLObject::Type::RequiredInterface:
-            itemType = aadlinterface::AADLInterfaceGraphicsItem::Type;
+            itemType = ive::AADLInterfaceGraphicsItem::Type;
             break;
         case aadl::AADLObject::Type::Comment:
-            itemType = aadlinterface::AADLCommentGraphicsItem::Type;
+            itemType = ive::AADLCommentGraphicsItem::Type;
             break;
         case aadl::AADLObject::Type::Connection:
-            itemType = aadlinterface::AADLConnectionGraphicsItem::Type;
+            itemType = ive::AADLConnectionGraphicsItem::Type;
             break;
         case aadl::AADLObject::Type::ConnectionGroup:
-            itemType = aadlinterface::AADLConnectionGroupGraphicsItem::Type;
+            itemType = ive::AADLConnectionGroupGraphicsItem::Type;
             break;
         case aadl::AADLObject::Type::Unknown:
             continue;
@@ -1038,4 +1038,4 @@ QList<QRectF> siblingSceneRects(QGraphicsItem *item)
     return existingRects;
 }
 
-} // namespace aadlinterface
+} // namespace ive

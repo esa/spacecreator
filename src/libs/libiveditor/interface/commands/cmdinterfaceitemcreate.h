@@ -23,7 +23,7 @@
 #include <QPointer>
 #include <QVector>
 
-namespace aadlinterface {
+namespace ive {
 namespace cmd {
 
 class CmdInterfaceItemCreate : public CmdEntityGeometryChange

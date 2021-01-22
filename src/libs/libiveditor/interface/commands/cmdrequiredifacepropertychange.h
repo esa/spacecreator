@@ -23,7 +23,7 @@
 
 #include <QVariant>
 
-namespace aadlinterface {
+namespace ive {
 namespace cmd {
 
 class CmdRequiredIfacePropertyChange : public CmdIfaceDataChangeBase

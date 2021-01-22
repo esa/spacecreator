@@ -23,7 +23,7 @@
 
 class QToolBar;
 
-namespace aadlinterface {
+namespace ive {
 class EndToEndView;
 class IVEditorCore;
 }
@@ -45,7 +45,7 @@ public:
 
     Core::IDocument *document() const override;
     AadlEditorDocument *ivDocument() const;
-    QSharedPointer<aadlinterface::IVEditorCore> ivPlugin() const;
+    QSharedPointer<ive::IVEditorCore> ivPlugin() const;
 
     QWidget *toolBar() override;
 
@@ -57,7 +57,7 @@ private:
     AadlEditorDocument *m_document = nullptr;
     QPointer<QToolBar> m_toolbar = nullptr;
     AadlMainWidget *m_editorWidget = nullptr;
-    QPointer<aadlinterface::EndToEndView> m_endToEndView;
+    QPointer<ive::EndToEndView> m_endToEndView;
     QPointer<MscModelStorage> m_mscStorage;
     QList<QAction *> m_globalToolbarActions;
 };

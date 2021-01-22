@@ -25,7 +25,7 @@ namespace Ui {
 class Asn1Dialog;
 }
 
-namespace aadlinterface {
+namespace ive {
 
 class Asn1Dialog : public QDialog
 {

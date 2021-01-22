@@ -33,7 +33,7 @@ namespace ProjectExplorer {
 class Project;
 }
 
-namespace aadlinterface {
+namespace ive {
 class IVEditorCore;
 }
 

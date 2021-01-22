@@ -22,7 +22,7 @@
 #include <QPointer>
 #include <QSet>
 
-namespace aadlinterface {
+namespace ive {
 
 class AADLRectGraphicsItem : public InteractiveObject
 {

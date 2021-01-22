@@ -25,11 +25,11 @@ static void init_iv_editor_library()
     Q_INIT_RESOURCE(tab_interface_resources);
 }
 
-namespace aadlinterface {
+namespace ive {
 
 void initIvEditor()
 {
     init_iv_editor_library();
 }
 
-} // namespace aadlinterface
+} // namespace ive

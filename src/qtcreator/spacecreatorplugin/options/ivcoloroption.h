@@ -20,7 +20,7 @@
 #include <QPointer>
 #include <coreplugin/dialogs/ioptionspage.h>
 
-namespace aadlinterface {
+namespace ive {
 class ColorSettingsWidget;
 }
 
@@ -42,7 +42,7 @@ public Q_SLOTS:
 
 private:
     QPointer<QWidget> m_widget;
-    QPointer<aadlinterface::ColorSettingsWidget> m_colorWidget;
+    QPointer<ive::ColorSettingsWidget> m_colorWidget;
     QString m_originalFile;
     bool m_reset = true;
 };

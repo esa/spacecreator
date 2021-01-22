@@ -25,10 +25,10 @@
 #include <QJsonObject>
 #include <QMetaEnum>
 
-namespace aadlinterface {
+namespace ive {
 
 /*!
- * \class aadlinterface::Condition
+ * \class ive::Condition
  * \brief The serializable collection of AttrHandler.
  */
 static const char *JSON_FIELD_NAME_ItemType = "itemType";

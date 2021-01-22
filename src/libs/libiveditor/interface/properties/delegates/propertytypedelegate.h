@@ -23,7 +23,7 @@ namespace Asn1Acn {
 class File;
 }
 
-namespace aadlinterface {
+namespace ive {
 
 class IfaceParametersTypeDelegate : public StringListComboDelegate
 {

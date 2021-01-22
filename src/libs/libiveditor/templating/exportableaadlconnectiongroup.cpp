@@ -21,7 +21,7 @@
 
 #include <QMetaEnum>
 
-namespace aadlinterface {
+namespace ive {
 
 ExportableAADLConnectionGroup::ExportableAADLConnectionGroup(const aadl::AADLObjectConnectionGroup *connection)
     : ExportableAADLObject(connection)
@@ -67,4 +67,4 @@ QVariantMap ExportableAADLConnectionGroup::targetInterfaces() const
     return interfaceNames;
 }
 
-} // namespace aadlinterface
+} // namespace ive

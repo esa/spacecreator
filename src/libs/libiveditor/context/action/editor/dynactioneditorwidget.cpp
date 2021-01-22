@@ -33,7 +33,7 @@
 #include <QJsonDocument>
 #include <QStandardPaths>
 
-namespace aadlinterface {
+namespace ive {
 
 DynActionEditorWidget::DynActionEditorWidget(QWidget *parent)
     : QWidget(parent)

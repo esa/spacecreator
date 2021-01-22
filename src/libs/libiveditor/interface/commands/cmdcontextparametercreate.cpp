@@ -24,7 +24,7 @@
 #include <aadlobjectfunctiontype.h>
 #include <aadlobjectsmodel.h>
 
-namespace aadlinterface {
+namespace ive {
 namespace cmd {
 
 CmdContextParameterCreate::CmdContextParameterCreate(

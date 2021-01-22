@@ -25,7 +25,7 @@
 
 #include <QtDebug>
 
-namespace aadlinterface {
+namespace ive {
 namespace cmd {
 
 CmdFunctionItemCreate::CmdFunctionItemCreate(

@@ -27,7 +27,7 @@ namespace asn1 {
 class Asn1Editor;
 }
 
-namespace aadlinterface {
+namespace ive {
 
 class Asn1ValueDelegate : public QStyledItemDelegate
 {

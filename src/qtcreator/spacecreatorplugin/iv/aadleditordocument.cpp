@@ -80,16 +80,16 @@ bool AadlEditorDocument::save(QString *errorString, const QString &name, bool au
     }
     bool dirty = isModified();
 
-    aadlinterface::InterfaceDocument *ivDocument = m_plugin->document();
+    ive::InterfaceDocument *ivDocument = m_plugin->document();
     ivDocument->setPath(actualName.toString());
-    if (!aadlinterface::XmlDocExporter::exportDocSilently(m_plugin->document(), actualName.toString(), {})) {
+    if (!ive::XmlDocExporter::exportDocSilently(m_plugin->document(), actualName.toString(), {})) {
         ivDocument->setPath(oldFileName.toString());
         return false;
     }
 
     if (autoSave) {
         ivDocument->setPath(oldFileName.toString());
-        aadlinterface::XmlDocExporter::exportDocSilently(m_plugin->document(), actualName.toString(), {});
+        ive::XmlDocExporter::exportDocSilently(m_plugin->document(), actualName.toString(), {});
         return true;
     }
 
@@ -138,7 +138,7 @@ bool AadlEditorDocument::reload(QString *errorString, ReloadFlag flag, ChangeTyp
     return true;
 }
 
-QSharedPointer<aadlinterface::IVEditorCore> AadlEditorDocument::ivEditorCore() const
+QSharedPointer<ive::IVEditorCore> AadlEditorDocument::ivEditorCore() const
 {
     return m_plugin;
 }

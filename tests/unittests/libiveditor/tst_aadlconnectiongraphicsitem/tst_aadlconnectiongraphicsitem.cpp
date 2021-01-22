@@ -37,33 +37,33 @@ private Q_SLOTS:
     void tst_Overlapping();
 
 private:
-    bool checkIntersections(aadlinterface::AADLConnectionGraphicsItem *connection);
+    bool checkIntersections(ive::AADLConnectionGraphicsItem *connection);
 };
 
 void tst_AADLConnectionGraphicsItem::initTestCase()
 {
-    aadlinterface::initIvEditor();
+    ive::initIvEditor();
     QStandardPaths::setTestModeEnabled(true);
 }
 
 void tst_AADLConnectionGraphicsItem::tst_Overlapping()
 {
     QGraphicsScene scene;
-    auto parentFunc1 = new aadlinterface::AADLFunctionGraphicsItem(nullptr);
+    auto parentFunc1 = new ive::AADLFunctionGraphicsItem(nullptr);
     scene.addItem(parentFunc1);
     parentFunc1->setBoundingRect(QRectF(0., 0., 200., 200.));
-    auto ifaceItem1 = new aadlinterface::AADLInterfaceGraphicsItem(nullptr, parentFunc1);
+    auto ifaceItem1 = new ive::AADLInterfaceGraphicsItem(nullptr, parentFunc1);
     ifaceItem1->setBoundingRect(QRectF(0, 0, 10, 10));
     ifaceItem1->setPos(parentFunc1->mapFromScene(QPointF(100, 0)));
 
-    auto parentFunc2 = new aadlinterface::AADLFunctionGraphicsItem(nullptr);
+    auto parentFunc2 = new ive::AADLFunctionGraphicsItem(nullptr);
     scene.addItem(parentFunc2);
     parentFunc2->setBoundingRect(QRectF(400., 0., 200., 200.));
-    auto ifaceItem2 = new aadlinterface::AADLInterfaceGraphicsItem(nullptr, parentFunc2);
+    auto ifaceItem2 = new ive::AADLInterfaceGraphicsItem(nullptr, parentFunc2);
     ifaceItem2->setBoundingRect(QRectF(0, 0, 10, 10));
     ifaceItem2->setPos(parentFunc2->mapFromScene(QPointF(500, 0)));
 
-    auto connection = new aadlinterface::AADLConnectionGraphicsItem(nullptr, ifaceItem1, ifaceItem2);
+    auto connection = new ive::AADLConnectionGraphicsItem(nullptr, ifaceItem1, ifaceItem2);
     scene.addItem(connection);
     connection->init();
     ifaceItem1->addConnection(connection);
@@ -71,7 +71,7 @@ void tst_AADLConnectionGraphicsItem::tst_Overlapping()
     connection->layout();
     QVERIFY(!checkIntersections(connection));
 
-    auto funcItem = new aadlinterface::AADLFunctionGraphicsItem(nullptr);
+    auto funcItem = new ive::AADLFunctionGraphicsItem(nullptr);
     scene.addItem(funcItem);
     funcItem->setBoundingRect(QRectF(100., 300., 400., 100.));
     connection->setPoints({ ifaceItem1->scenePos(), ifaceItem1->scenePos() - QPointF(0, 100), { 400, 450 },
@@ -123,10 +123,10 @@ void tst_AADLConnectionGraphicsItem::tst_Overlapping()
     QVERIFY(!checkIntersections(connection));
 }
 
-bool tst_AADLConnectionGraphicsItem::checkIntersections(aadlinterface::AADLConnectionGraphicsItem *connection)
+bool tst_AADLConnectionGraphicsItem::checkIntersections(ive::AADLConnectionGraphicsItem *connection)
 {
-    const QRectF itemRect = aadlinterface::getNearestIntersectedRect(aadlinterface::siblingSceneRects(connection),
-            connection->points(), aadlinterface::IntersectionType::Single);
+    const QRectF itemRect = ive::getNearestIntersectedRect(ive::siblingSceneRects(connection),
+            connection->points(), ive::IntersectionType::Single);
 
     return itemRect.isValid();
 }

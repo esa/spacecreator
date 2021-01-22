@@ -22,7 +22,7 @@
 
 class QTextBrowser;
 
-namespace aadlinterface {
+namespace ive {
 
 class ExtProcMonitor : public QWidget
 {

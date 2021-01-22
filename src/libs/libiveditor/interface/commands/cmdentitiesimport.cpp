@@ -28,7 +28,7 @@
 #include <QPointF>
 #include <QtDebug>
 
-namespace aadlinterface {
+namespace ive {
 namespace cmd {
 
 CmdEntitiesImport::CmdEntitiesImport(aadl::AADLObject *entity, aadl::AADLObjectFunctionType *parent,
@@ -60,7 +60,7 @@ CmdEntitiesImport::CmdEntitiesImport(aadl::AADLObject *entity, aadl::AADLObjectF
                     if (obj->parentObject()) {
                         continue;
                     }
-                    QVector<QPointF> coordinates = aadlinterface::polygon(obj->coordinates());
+                    QVector<QPointF> coordinates = ive::polygon(obj->coordinates());
                     std::for_each(coordinates.cbegin(), coordinates.cend(), [&basePoint](const QPointF &point) {
                         if (point.x() < basePoint.x())
                             basePoint.setX(point.x());
@@ -71,14 +71,14 @@ CmdEntitiesImport::CmdEntitiesImport(aadl::AADLObject *entity, aadl::AADLObjectF
                 }
                 const QPointF offset = basePoint == outOfScene ? QPointF() : pos - basePoint;
                 for (auto obj : objects) {
-                    QVector<QPointF> coordinates = aadlinterface::polygon(obj->coordinates());
+                    QVector<QPointF> coordinates = ive::polygon(obj->coordinates());
                     if (coordinates.isEmpty() && !obj->parentObject()) {
                         obj->setCoordinates(
-                                aadlinterface::coordinates(QRectF(pos, aadlinterface::DefaultGraphicsItemSize)));
+                                ive::coordinates(QRectF(pos, ive::DefaultGraphicsItemSize)));
                     } else if (!offset.isNull()) {
                         std::for_each(
                                 coordinates.begin(), coordinates.end(), [offset](QPointF &point) { point += offset; });
-                        obj->setCoordinates(aadlinterface::coordinates(coordinates));
+                        obj->setCoordinates(ive::coordinates(coordinates));
                     }
                     m_importedEntities.append(obj);
                 }
@@ -145,5 +145,5 @@ int CmdEntitiesImport::id() const
     return ImportEntities;
 }
 
-} // namespace aadlinterface
+} // namespace ive
 } // namespace cmd

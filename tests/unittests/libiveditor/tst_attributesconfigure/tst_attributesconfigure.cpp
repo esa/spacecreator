@@ -38,7 +38,7 @@ private:
 
 void tst_AttributesConfigure::initTestCase()
 {
-    aadlinterface::initIvEditor();
+    ive::initIvEditor();
     m_dynPropConfig = aadl::PropertyTemplateConfig::instance();
     m_dynPropConfig->init(QLatin1String("default_attributes.xml"));
 }

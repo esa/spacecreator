@@ -23,7 +23,7 @@ namespace Ui {
 class DynActionEditor;
 }
 
-namespace aadlinterface {
+namespace ive {
 
 class DynActionEditor : public QDialog
 {

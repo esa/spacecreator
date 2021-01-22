@@ -37,10 +37,10 @@
 #include <QScopedPointer>
 #include <QStandardPaths>
 
-namespace aadlinterface {
+namespace ive {
 
 /*!
- * \class aadlinterface::XmlDocExporter
+ * \class ive::XmlDocExporter
  * \brief The helper that incorporates templating::StringTemplate-related stuff.
  */
 

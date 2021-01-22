@@ -31,7 +31,7 @@ int main(int argc, char *argv[])
     Q_INIT_RESOURCE(asn1_resources);
     Asn1Acn::initAsn1Library();
     shared::initSharedLibrary();
-    aadlinterface::initIvEditor();
+    ive::initIvEditor();
 
     QApplication a(argc, argv);
     a.setOrganizationName(SC_ORGANISATION);
@@ -44,9 +44,9 @@ int main(int argc, char *argv[])
         QFontDatabase::addApplicationFont(dirIt.next());
     a.setFont(QFont(QLatin1String("Ubuntu"), 8));
 
-    aadlinterface::IVEditorCore plugin;
+    ive::IVEditorCore plugin;
 
-    aadlinterface::MainWindow w(&plugin);
+    ive::MainWindow w(&plugin);
 
     shared::CommandLineParser cmdParser;
     plugin.populateCommandLineArguments(&cmdParser);

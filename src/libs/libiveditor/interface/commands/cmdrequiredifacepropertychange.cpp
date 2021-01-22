@@ -22,7 +22,7 @@
 #include "commandids.h"
 #include "commandsfactory.h"
 
-namespace aadlinterface {
+namespace ive {
 namespace cmd {
 
 QVariant getCurrentProperty(const aadl::AADLObjectIfaceRequired *entity, const QString &name)

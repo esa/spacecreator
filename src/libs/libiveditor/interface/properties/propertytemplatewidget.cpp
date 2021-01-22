@@ -30,7 +30,7 @@
 #include <QMessageBox>
 #include <QStandardPaths>
 
-namespace aadlinterface {
+namespace ive {
 
 PropertyTemplateWidget::PropertyTemplateWidget(QWidget *parent)
     : QWidget(parent)

@@ -29,7 +29,7 @@
 #include <QFileSystemWatcher>
 #include <memory>
 
-namespace aadlinterface {
+namespace ive {
 
 struct EndToEndConnections::EndToEndConnectionsPrivate {
     void setDirty(bool dirty, EndToEndConnections *q)

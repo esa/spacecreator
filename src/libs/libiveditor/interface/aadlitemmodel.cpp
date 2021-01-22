@@ -47,7 +47,7 @@
 #ifdef AADL_ITEM_DUMP
 static inline void dumpItem(QObject *obj, bool strict = false)
 {
-    auto item = qobject_cast<aadlinterface::InteractiveObject *>(obj);
+    auto item = qobject_cast<ive::InteractiveObject *>(obj);
     if (!item)
         return;
 
@@ -55,14 +55,14 @@ static inline void dumpItem(QObject *obj, bool strict = false)
              << item->aadlObject()->props() << "\n"
              << item->aadlObject()->attrs();
 
-    if (auto iface = qobject_cast<aadlinterface::AADLInterfaceGraphicsItem *>(item)) {
+    if (auto iface = qobject_cast<ive::AADLInterfaceGraphicsItem *>(item)) {
         qDebug() << "\nGraphics Iface geometry:\n" << iface->scenePos() << "\n" << iface->sceneBoundingRect() << "\n";
         qDebug() << "\nInternal Iface data:\n"
                  << iface->entity()->title() << "\n"
-                 << aadlinterface::pos(iface->entity()->coordinates()) << "\n";
+                 << ive::pos(iface->entity()->coordinates()) << "\n";
         qDebug() << "\n####:\n" << iface->connectionItems();
-        Q_ASSERT(!strict || iface->scenePos().toPoint() == aadlinterface::pos(iface->entity()->coordinates()));
-    } else if (auto connection = qobject_cast<aadlinterface::AADLConnectionGraphicsItem *>(item)) {
+        Q_ASSERT(!strict || iface->scenePos().toPoint() == ive::pos(iface->entity()->coordinates()));
+    } else if (auto connection = qobject_cast<ive::AADLConnectionGraphicsItem *>(item)) {
         qDebug() << "\nGraphics Connection geometry:\n"
                  << connection->points() << "\n"
                  << connection->graphicsPoints() << "\n";
@@ -72,29 +72,29 @@ static inline void dumpItem(QObject *obj, bool strict = false)
                                                                                connection->endItem()->entity()->title())
                                                              : connection->entity()->title())
                  << "\n"
-                 << aadlinterface::polygon(connection->entity()->coordinates()) << "\n";
+                 << ive::polygon(connection->entity()->coordinates()) << "\n";
         Q_ASSERT(!strict
-                || aadlinterface::comparePolygones(
-                        connection->graphicsPoints(), aadlinterface::polygon(connection->entity()->coordinates())));
+                || ive::comparePolygones(
+                        connection->graphicsPoints(), ive::polygon(connection->entity()->coordinates())));
         Q_ASSERT(!strict
-                || aadlinterface::comparePolygones(
-                        connection->points(), aadlinterface::polygon(connection->entity()->coordinates())));
-    } else if (auto rectItem = qobject_cast<aadlinterface::AADLRectGraphicsItem *>(item)) {
+                || ive::comparePolygones(
+                        connection->points(), ive::polygon(connection->entity()->coordinates())));
+    } else if (auto rectItem = qobject_cast<ive::AADLRectGraphicsItem *>(item)) {
         qDebug() << "\nGraphics" << rectItem->metaObject()->className() << "geometry:\n"
                  << rectItem->sceneBoundingRect() << "\n";
         qDebug() << "\nInternal Function data:\n"
                  << rectItem->aadlObject()->title() << "\n"
-                 << aadlinterface::rect(rectItem->aadlObject()->coordinates()) << "\n";
+                 << ive::rect(rectItem->aadlObject()->coordinates()) << "\n";
         Q_ASSERT(!strict
                 || rectItem->sceneBoundingRect().toRect()
-                        == aadlinterface::rect(rectItem->aadlObject()->coordinates()).toRect());
+                        == ive::rect(rectItem->aadlObject()->coordinates()).toRect());
     } else {
         qFatal("Not implemented trace");
     }
 }
 #endif
 
-namespace aadlinterface {
+namespace ive {
 
 AADLItemModel::AADLItemModel(aadl::AADLObjectsModel *model, QObject *parent)
     : QObject(parent)
@@ -343,7 +343,7 @@ void AADLItemModel::scheduleInterfaceTextUpdate()
 void AADLItemModel::updateInterfaceTexts()
 {
     for (QGraphicsItem *item : m_items) {
-        if (auto interfaceItem = dynamic_cast<aadlinterface::AADLInterfaceGraphicsItem *>(item)) {
+        if (auto interfaceItem = dynamic_cast<ive::AADLInterfaceGraphicsItem *>(item)) {
             interfaceItem->updateLabel();
         }
     }
@@ -398,7 +398,7 @@ void AADLItemModel::setupInnerGeometry(aadl::AADLObject *obj) const
     QRectF rootGeometry;
     const QVariant rootCoord = parentObj->prop(aadl::meta::Props::token(aadl::meta::Props::Token::RootCoordinates));
     if (rootCoord.isValid()) {
-        rootGeometry = aadlinterface::rect(aadl::AADLObject::coordinatesFromString(rootCoord.toString()));
+        rootGeometry = ive::rect(aadl::AADLObject::coordinatesFromString(rootCoord.toString()));
     } else if (const QGraphicsView *view = m_graphicsScene->views().value(0)) {
         const QRect viewportGeometry = view->viewport()->geometry().marginsRemoved(kContentMargins.toMargins());
         rootGeometry = QRectF(view->mapToScene(QPoint(0, 0)),
@@ -414,7 +414,7 @@ void AADLItemModel::setupInnerGeometry(aadl::AADLObject *obj) const
                 continue;
             }
             const QRectF innerRect =
-                    aadlinterface::rect(aadl::AADLObject::coordinatesFromString(innerCoord.toString()));
+                    ive::rect(aadl::AADLObject::coordinatesFromString(innerCoord.toString()));
             rootGeometry |= innerRect;
             existingRects.append(innerRect);
         }
@@ -422,10 +422,10 @@ void AADLItemModel::setupInnerGeometry(aadl::AADLObject *obj) const
     QRectF innerGeometry;
     findGeometryForRect(innerGeometry, rootGeometry, existingRects);
 
-    const QString strRootCoord = aadl::AADLObject::coordinatesToString(aadlinterface::coordinates(rootGeometry));
+    const QString strRootCoord = aadl::AADLObject::coordinatesToString(ive::coordinates(rootGeometry));
     parentObj->setProp(aadl::meta::Props::token(aadl::meta::Props::Token::RootCoordinates), strRootCoord);
 
-    const QString strCoord = aadl::AADLObject::coordinatesToString(aadlinterface::coordinates(innerGeometry));
+    const QString strCoord = aadl::AADLObject::coordinatesToString(ive::coordinates(innerGeometry));
     obj->setProp(aadl::meta::Props::token(aadl::meta::Props::Token::InnerCoordinates), strCoord);
 }
 
@@ -451,7 +451,7 @@ void AADLItemModel::changeRootItem(shared::Id id)
 void AADLItemModel::zoomChanged()
 {
     for (auto item : m_graphicsScene->selectedItems()) {
-        if (auto iObj = qobject_cast<aadlinterface::InteractiveObject *>(item->toGraphicsObject())) {
+        if (auto iObj = qobject_cast<ive::InteractiveObject *>(item->toGraphicsObject())) {
             iObj->updateGripPoints();
         }
     }
@@ -595,4 +595,4 @@ QGraphicsItem *AADLItemModel::createItemForObject(aadl::AADLObject *obj)
     return iObj;
 }
 
-} // namespace aadlinterface
+} // namespace ive

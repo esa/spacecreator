@@ -31,10 +31,10 @@ static inline void shiftObjects(const QVector<aadl::AADLObject *> &objects, cons
         if (!obj) {
             continue;
         }
-        auto points = aadlinterface::polygon(obj->coordinates());
+        auto points = ive::polygon(obj->coordinates());
         std::transform(
                 points.cbegin(), points.cend(), points.begin(), [offset](const QPointF &p) { return p + offset; });
-        obj->setCoordinates(aadlinterface::coordinates(points));
+        obj->setCoordinates(ive::coordinates(points));
         if (obj->aadlType() == aadl::AADLObject::Type::FunctionType
                 || obj->aadlType() == aadl::AADLObject::Type::Function) {
             shiftObjects(obj->as<aadl::AADLObjectFunctionType *>()->children(), offset);
@@ -42,7 +42,7 @@ static inline void shiftObjects(const QVector<aadl::AADLObject *> &objects, cons
     }
 }
 
-namespace aadlinterface {
+namespace ive {
 namespace cmd {
 
 CmdEntitiesInstantiate::CmdEntitiesInstantiate(aadl::AADLObjectFunctionType *entity,
@@ -59,7 +59,7 @@ CmdEntitiesInstantiate::CmdEntitiesInstantiate(aadl::AADLObjectFunctionType *ent
             m_instantiatedEntity, entity->title() + QLatin1String("_Instance_")));
     m_instantiatedEntity->setCoordinates(entity->coordinates());
 
-    const QRectF typeGeometry = aadlinterface::rect(entity->coordinates());
+    const QRectF typeGeometry = ive::rect(entity->coordinates());
     m_offset = pos - typeGeometry.topLeft();
     const QString nameKey = aadl::meta::Props::token(aadl::meta::Props::Token::instance_of);
     m_subCmd = new CmdEntityAttributeChange(m_instantiatedEntity, { { nameKey, entity->title() } });
@@ -111,5 +111,5 @@ int CmdEntitiesInstantiate::id() const
     return InstantiateEntities;
 }
 
-} // namespace aadlinterface
+} // namespace ive
 } // namespace cmd

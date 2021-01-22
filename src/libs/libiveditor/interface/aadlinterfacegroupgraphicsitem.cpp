@@ -20,7 +20,7 @@
 
 #include "aadlobjectifacegroup.h"
 
-namespace aadlinterface {
+namespace ive {
 
 AADLInterfaceGroupGraphicsItem::AADLInterfaceGroupGraphicsItem(
         aadl::AADLObjectIfaceGroup *entity, QGraphicsItem *parent)
@@ -86,4 +86,4 @@ QPainterPath AADLInterfaceGroupGraphicsItem::ifacePath() const
     return path;
 }
 
-} // namespace aadlinterface
+} // namespace ive

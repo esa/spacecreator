@@ -59,11 +59,11 @@
 #include <limits>
 
 static const qreal kContextMenuItemTolerance = 10.;
-static const QList<int> kFunctionTypes = { aadlinterface::AADLFunctionGraphicsItem::Type,
-    aadlinterface::AADLFunctionTypeGraphicsItem::Type };
+static const QList<int> kFunctionTypes = { ive::AADLFunctionGraphicsItem::Type,
+    ive::AADLFunctionTypeGraphicsItem::Type };
 static const qreal kPreviewItemPenWidth = 2.;
 
-namespace aadlinterface {
+namespace ive {
 
 struct CreatorTool::CreatorToolPrivate {
     CreatorToolPrivate(CreatorTool *tool, InterfaceDocument *doc)
@@ -214,7 +214,7 @@ void CreatorTool::groupSelectedItems()
         if (it != groupCreationDataList.end()) {
             it->connections.append(connection);
         } else {
-            QVector<QPointF> points = aadlinterface::polygon(connection->coordinates());
+            QVector<QPointF> points = ive::polygon(connection->coordinates());
             if (points.isEmpty()) {
                 const QGraphicsItem *sourceItem = d->model->getItem(connection->source()->id());
                 const QGraphicsItem *targetItem = d->model->getItem(connection->target()->id());
@@ -887,7 +887,7 @@ void CreatorTool::CreatorToolPrivate::handleDirectConnection(const QPointF &pos)
 void CreatorTool::CreatorToolPrivate::handleConnection(const QVector<QPointF> &graphicPoints) const
 {
     const auto info =
-            aadlinterface::gi::validateConnectionCreate(this->view ? this->view->scene() : nullptr, graphicPoints);
+            ive::gi::validateConnectionCreate(this->view ? this->view->scene() : nullptr, graphicPoints);
     if (info.failed())
         return;
 
@@ -951,10 +951,10 @@ void CreatorTool::CreatorToolPrivate::handleConnection(const QVector<QPointF> &g
     }
 
     AADLFunctionGraphicsItem *prevStartItem =
-            qgraphicsitem_cast<aadlinterface::AADLFunctionGraphicsItem *>(info.functionAtStartPos);
+            qgraphicsitem_cast<ive::AADLFunctionGraphicsItem *>(info.functionAtStartPos);
     QPointF firstExcludedPoint = *std::next(info.connectionPoints.constBegin());
     shared::Id prevStartIfaceId = info.startIfaceId;
-    while (auto item = qgraphicsitem_cast<aadlinterface::AADLFunctionGraphicsItem *>(prevStartItem->parentItem())) {
+    while (auto item = qgraphicsitem_cast<ive::AADLFunctionGraphicsItem *>(prevStartItem->parentItem())) {
         if (item == info.functionAtEndPos && info.endIface) {
             parentForConnection = item;
             break;
@@ -1000,9 +1000,9 @@ void CreatorTool::CreatorToolPrivate::handleConnection(const QVector<QPointF> &g
     }
 
     QPointF lastExcludedPoint = *std::next(info.connectionPoints.crbegin());
-    auto prevEndItem = qgraphicsitem_cast<aadlinterface::AADLFunctionGraphicsItem *>(info.functionAtEndPos);
+    auto prevEndItem = qgraphicsitem_cast<ive::AADLFunctionGraphicsItem *>(info.functionAtEndPos);
     shared::Id prevEndIfaceId = info.endIfaceId;
-    while (auto item = qgraphicsitem_cast<aadlinterface::AADLFunctionGraphicsItem *>(prevEndItem->parentItem())) {
+    while (auto item = qgraphicsitem_cast<ive::AADLFunctionGraphicsItem *>(prevEndItem->parentItem())) {
         if (item == info.functionAtStartPos && info.startIface) {
             Q_ASSERT(parentForConnection == item || parentForConnection == nullptr);
             parentForConnection = item;
@@ -1069,7 +1069,7 @@ void CreatorTool::CreatorToolPrivate::handleConnection(const QVector<QPointF> &g
 void CreatorTool::CreatorToolPrivate::handleConnectionReCreate(const QVector<QPointF> &graphicPoints)
 {
     toolType = ToolType::Pointer;
-    const auto info = aadlinterface::gi::validateConnectionCreate(view ? view->scene() : nullptr, graphicPoints);
+    const auto info = ive::gi::validateConnectionCreate(view ? view->scene() : nullptr, graphicPoints);
     if (info.status != aadl::ConnectionCreationValidator::FailReason::MulticastDisabled) {
         return;
     }
@@ -1103,7 +1103,7 @@ bool CreatorTool::CreatorToolPrivate::warnConnectionPreview(const QPointF &pos)
         connectionPoints.append(pos);
 
     auto info =
-            aadlinterface::gi::validateConnectionCreate(this->view ? this->view->scene() : nullptr, connectionPoints);
+            ive::gi::validateConnectionCreate(this->view ? this->view->scene() : nullptr, connectionPoints);
     bool warn = true;
     if (toolType == ToolType::ReCreateConnection) {
         if (info.status != aadl::ConnectionCreationValidator::FailReason::MulticastDisabled || !info.endIface

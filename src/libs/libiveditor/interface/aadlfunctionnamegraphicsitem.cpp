@@ -25,7 +25,7 @@
 #include <QRegularExpression>
 #include <QTextDocument>
 
-namespace aadlinterface {
+namespace ive {
 
 AADLFunctionNameGraphicsItem::AADLFunctionNameGraphicsItem(QGraphicsItem *parent)
     : shared::ui::TextItem(parent)

@@ -37,7 +37,7 @@ public:
 
 private:
     QByteArray testFileContent() const;
-    std::unique_ptr<aadlinterface::InterfaceDocument> m_doc;
+    std::unique_ptr<ive::InterfaceDocument> m_doc;
 
 private Q_SLOTS:
     void init();
@@ -53,7 +53,7 @@ private Q_SLOTS:
 
 tst_XmlDocExporter::tst_XmlDocExporter()
 {
-    aadlinterface::initIvEditor();
+    ive::initIvEditor();
 }
 
 QByteArray tst_XmlDocExporter::testFileContent() const
@@ -68,7 +68,7 @@ QByteArray tst_XmlDocExporter::testFileContent() const
 
 void tst_XmlDocExporter::init()
 {
-    m_doc = std::make_unique<aadlinterface::InterfaceDocument>(this);
+    m_doc = std::make_unique<ive::InterfaceDocument>(this);
     m_doc->asn1DataTypes()->clear();
     if (QFile::exists(testFilePath)) {
         QFile::remove(testFilePath);
@@ -84,7 +84,7 @@ void tst_XmlDocExporter::cleanup()
 
 void tst_XmlDocExporter::testExportEmptyDoc()
 {
-    aadlinterface::XmlDocExporter::exportDocSilently(m_doc.get(), testFilePath);
+    ive::XmlDocExporter::exportDocSilently(m_doc.get(), testFilePath);
     QByteArray text = testFileContent();
     QByteArray expectedRaw = "<InterfaceView>\n</InterfaceView>";
     QByteArray expectedFormatted = "<?xml version=\"1.0\"?>\n<InterfaceView/>";
@@ -103,7 +103,7 @@ void tst_XmlDocExporter::testExportFunctions()
     objects.append(testfunc1);
     m_doc->setObjects(objects);
 
-    aadlinterface::XmlDocExporter::exportDocSilently(m_doc.get(), testFilePath);
+    ive::XmlDocExporter::exportDocSilently(m_doc.get(), testFilePath);
     QByteArray text = testFileContent();
 
     QByteArray expectedFormatted =
@@ -133,7 +133,7 @@ void tst_XmlDocExporter::testExportComment()
     objects.append(testcomment1);
     m_doc->setObjects(objects);
 
-    aadlinterface::XmlDocExporter::exportDocSilently(m_doc.get(), testFilePath);
+    ive::XmlDocExporter::exportDocSilently(m_doc.get(), testFilePath);
     QByteArray text = testFileContent();
 
     QByteArray expectedFormatted = "<?xml version=\"1.0\"?>\n<InterfaceView>\n"
@@ -155,7 +155,7 @@ void tst_XmlDocExporter::testExportNestedComment()
     objects.append(testfunc1);
     m_doc->setObjects(objects);
 
-    aadlinterface::XmlDocExporter::exportDocSilently(m_doc.get(), testFilePath);
+    ive::XmlDocExporter::exportDocSilently(m_doc.get(), testFilePath);
     QByteArray text = testFileContent();
 
     QByteArray expectedFormatted = "<?xml version=\"1.0\"?>\n<InterfaceView>\n"
@@ -173,7 +173,7 @@ void tst_XmlDocExporter::testExportNestedComment()
 void tst_XmlDocExporter::testExportAsn1File()
 {
     m_doc->setAsn1FileName("fake.asn");
-    aadlinterface::XmlDocExporter::exportDocSilently(m_doc.get(), testFilePath);
+    ive::XmlDocExporter::exportDocSilently(m_doc.get(), testFilePath);
     QByteArray text = testFileContent();
 
     QByteArray expectedFormatted = "<?xml version=\"1.0\"?>\n<InterfaceView asn1file=\"fake.asn\"/>";
@@ -186,7 +186,7 @@ void tst_XmlDocExporter::testExportToBuffer()
 {
     QBuffer buffer;
     buffer.open(QIODevice::ReadWrite);
-    bool ok = aadlinterface::XmlDocExporter::exportDoc(m_doc.get(), &buffer);
+    bool ok = ive::XmlDocExporter::exportDoc(m_doc.get(), &buffer);
     QCOMPARE(ok, true);
     QByteArray expectedRaw = "<InterfaceView>\n</InterfaceView>";
     QByteArray expectedFormatted = "<?xml version=\"1.0\"?>\n<InterfaceView/>";

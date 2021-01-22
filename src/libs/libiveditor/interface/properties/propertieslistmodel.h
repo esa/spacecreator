@@ -29,7 +29,7 @@ class AADLObject;
 class PropertyTemplateConfig;
 }
 
-namespace aadlinterface {
+namespace ive {
 
 class PropertiesListModel : public PropertiesModelBase
 {

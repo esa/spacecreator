@@ -24,7 +24,7 @@
 
 const qreal kConnectionGroupTitleMaxLength = 200;
 
-namespace aadlinterface {
+namespace ive {
 
 AADLConnectionGroupGraphicsItem::AADLConnectionGroupGraphicsItem(aadl::AADLObjectConnectionGroup *connection,
         AADLInterfaceGroupGraphicsItem *ifaceStart, AADLInterfaceGroupGraphicsItem *ifaceEnd, QGraphicsItem *parent)
@@ -103,4 +103,4 @@ void AADLConnectionGroupGraphicsItem::updateTitleItemPosition()
     m_textItem->setPos(topLeft);
 }
 
-} // namespace aadlinterface
+} // namespace ive

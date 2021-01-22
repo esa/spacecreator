@@ -19,7 +19,7 @@
 
 #include <QStyledItemDelegate>
 
-namespace aadlinterface {
+namespace ive {
 
 class FunctionAttrDelegate : public QStyledItemDelegate
 {

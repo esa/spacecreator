@@ -23,7 +23,7 @@ namespace aadl {
 class AADLObject;
 }
 
-namespace aadlinterface {
+namespace ive {
 
 class PropertiesModelBase : public QStandardItemModel
 {

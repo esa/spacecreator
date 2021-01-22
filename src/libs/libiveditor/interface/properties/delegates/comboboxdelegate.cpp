@@ -20,7 +20,7 @@
 #include <QComboBox>
 #include <QStringListModel>
 
-namespace aadlinterface {
+namespace ive {
 
 ComboBoxDelegate::ComboBoxDelegate(QObject *parent)
     : QStyledItemDelegate(parent)

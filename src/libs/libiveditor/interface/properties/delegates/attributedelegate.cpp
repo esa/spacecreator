@@ -33,7 +33,7 @@
 #include <QRegularExpressionValidator>
 #include <QSpinBox>
 
-namespace aadlinterface {
+namespace ive {
 
 AttributeDelegate::AttributeDelegate(QObject *parent)
     : QStyledItemDelegate(parent)
@@ -121,4 +121,4 @@ void AttributeDelegate::setEditorData(QWidget *editor, const QModelIndex &index)
     return QStyledItemDelegate::setEditorData(editor, index);
 }
 
-} // namespace aadlinterface
+} // namespace ive

@@ -17,7 +17,7 @@
 
 #include "aadlflowconnectiongraphicsitem.h"
 
-namespace aadlinterface {
+namespace ive {
 
 AADLFlowConnectionGraphicsItem::AADLFlowConnectionGraphicsItem(aadl::AADLObjectConnection *connection,
         AADLInterfaceGraphicsItem *startIface, AADLInterfaceGraphicsItem *endIface, QGraphicsItem *parentItem)

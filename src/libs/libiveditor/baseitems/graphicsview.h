@@ -23,7 +23,7 @@
 #include <QList>
 #include <QPair>
 
-namespace aadlinterface {
+namespace ive {
 
 /*!
   \class GraphicsView

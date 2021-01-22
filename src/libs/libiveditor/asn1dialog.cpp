@@ -21,7 +21,7 @@
 
 #include <QFileInfo>
 
-namespace aadlinterface {
+namespace ive {
 
 Asn1Dialog::Asn1Dialog(QWidget *parent)
     : QDialog(parent)

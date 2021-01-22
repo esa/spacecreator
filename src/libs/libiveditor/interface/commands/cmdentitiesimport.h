@@ -27,7 +27,7 @@ class AADLObjectFunctionType;
 class AADLObjectsModel;
 }
 
-namespace aadlinterface {
+namespace ive {
 namespace cmd {
 
 class CmdEntitiesImport : public QUndoCommand
@@ -49,5 +49,5 @@ private:
     QVector<QPointer<aadl::AADLObject>> m_importedEntities;
 };
 
-} // namespace aadlinterface
+} // namespace ive
 } // namespace cmd

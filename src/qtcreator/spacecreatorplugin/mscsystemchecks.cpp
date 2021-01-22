@@ -253,7 +253,7 @@ void MscSystemChecks::checkMessages()
     }
 }
 
-QSharedPointer<aadlinterface::IVEditorCore> MscSystemChecks::ivCore() const
+QSharedPointer<ive::IVEditorCore> MscSystemChecks::ivCore() const
 {
     QStringList aadlFiles = allAadlFiles();
     if (aadlFiles.empty()) {
@@ -331,7 +331,7 @@ void MscSystemChecks::onEntityNameChanged(
         return;
     }
 
-    auto cmdAttribChange = dynamic_cast<aadlinterface::cmd::CmdEntityAttributeChange *>(command);
+    auto cmdAttribChange = dynamic_cast<ive::cmd::CmdEntityAttributeChange *>(command);
     if (cmdAttribChange) {
         if (mscInstancesExist(oldName)) {
             if (command->isFirstChange()) {
@@ -348,7 +348,7 @@ void MscSystemChecks::onEntityNameChanged(
         }
     }
 
-    auto cmdIfaceAttribChange = dynamic_cast<aadlinterface::cmd::CmdIfaceAttrChange *>(command);
+    auto cmdIfaceAttribChange = dynamic_cast<ive::cmd::CmdIfaceAttrChange *>(command);
     if (cmdIfaceAttribChange) {
         aadl::AADLObjectIface *interface = cmdIfaceAttribChange->interface();
         QList<QStringList> messagesData;

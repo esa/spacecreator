@@ -49,7 +49,7 @@
 #include <QPushButton>
 #include <memory>
 
-namespace aadlinterface {
+namespace ive {
 
 struct EndToEndView::EndToEndViewPrivate {
     Ui::EndToEndView *ui { new Ui::EndToEndView };

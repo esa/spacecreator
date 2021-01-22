@@ -19,7 +19,7 @@
 
 #include "aadlobjectconnection.h"
 
-namespace aadlinterface {
+namespace ive {
 
 ExportableAADLConnection::ExportableAADLConnection(const aadl::AADLObjectConnection *connection)
     : ExportableAADLObject(connection)

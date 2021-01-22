@@ -31,4 +31,4 @@ void initAsn1Library()
     init_ans1_library();
 }
 
-} // namespace aadlinterface
+} // namespace ive

@@ -19,13 +19,13 @@
 
 #include "context/action/attrhandler.h"
 
-namespace aadlinterface {
+namespace ive {
 
 const int COLUMN_ID_Name = 0;
 const int COLUMN_ID_Value = 1;
 
 /*!
- * \class aadlinterface::AttributesModel
+ * \class ive::AttributesModel
  * \brief The model to store script-able actions attributes in editor dialog.
  */
 AttributesModel::AttributesModel(QObject *parent)

@@ -23,7 +23,7 @@
 
 class QUndoCommand;
 
-namespace aadlinterface {
+namespace ive {
 namespace cmd {
 
 class CommandsFactory

@@ -19,10 +19,10 @@
 
 #include <QDebug>
 
-namespace aadlinterface {
+namespace ive {
 
 /*!
- * \class aadlinterface::ActionsModel
+ * \class ive::ActionsModel
  * \brief The model to store instances of script-able actions in editor dialog.
  */
 ActionsModel::ActionsModel(QObject *parent)

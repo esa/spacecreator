@@ -32,7 +32,7 @@ class AADLObjectFunction;
 class AADLObjectsModel;
 }
 
-namespace aadlinterface {
+namespace ive {
 class IVEditorCore;
 }
 
@@ -55,8 +55,8 @@ public:
     ~AadlSystemChecks();
 
     void setMscCore(msc::MSCEditorCore *mscCore);
-    void setIvCore(QSharedPointer<aadlinterface::IVEditorCore> ivCore);
-    const QSharedPointer<aadlinterface::IVEditorCore> &ivCore() const;
+    void setIvCore(QSharedPointer<ive::IVEditorCore> ivCore);
+    const QSharedPointer<ive::IVEditorCore> &ivCore() const;
     bool hasIvCore() const;
 
     QVector<QPair<msc::MscChart *, msc::MscInstance *>> checkInstanceNames() const;
@@ -90,7 +90,7 @@ private:
     bool isAncestor(aadl::AADLObjectFunction *func, aadl::AADLObjectFunction *otherFunc) const;
 
     QPointer<msc::MSCEditorCore> m_mscCore;
-    QSharedPointer<aadlinterface::IVEditorCore> m_ivCore;
+    QSharedPointer<ive::IVEditorCore> m_ivCore;
     Qt::CaseSensitivity m_caseCheck = Qt::CaseInsensitive;
 };
 

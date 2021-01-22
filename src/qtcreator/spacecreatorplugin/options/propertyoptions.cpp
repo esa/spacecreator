@@ -36,8 +36,8 @@ QWidget *PropertyOptions::widget()
 {
     if (!m_widget) {
         auto config = aadl::PropertyTemplateConfig::instance();
-        config->init(aadlinterface::PropertyTemplateWidget::dynamicPropertiesFilePath());
-        m_widget = new aadlinterface::PropertyTemplateWidget;
+        config->init(ive::PropertyTemplateWidget::dynamicPropertiesFilePath());
+        m_widget = new ive::PropertyTemplateWidget;
     }
     return m_widget;
 }
@@ -46,7 +46,7 @@ void PropertyOptions::apply()
 {
     m_widget->save();
     auto config = aadl::PropertyTemplateConfig::instance();
-    config->init(aadlinterface::PropertyTemplateWidget::dynamicPropertiesFilePath());
+    config->init(ive::PropertyTemplateWidget::dynamicPropertiesFilePath());
 }
 
 void PropertyOptions::finish()

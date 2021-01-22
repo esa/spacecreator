@@ -20,7 +20,7 @@
 #include "aadlinterfacechain.h"
 #include "aadlobjectiface.h"
 
-namespace aadlinterface {
+namespace ive {
 
 ExportableAADLIface::ExportableAADLIface(const aadl::AADLObjectIface *iface)
     : ExportableAADLObject(iface)

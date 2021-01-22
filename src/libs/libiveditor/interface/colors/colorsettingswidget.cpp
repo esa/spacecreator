@@ -28,7 +28,7 @@
 #include <QJsonObject>
 #include <QMessageBox>
 
-namespace aadlinterface {
+namespace ive {
 
 ColorSettingsWidget::ColorSettingsWidget(QWidget *parent)
     : QWidget(parent)

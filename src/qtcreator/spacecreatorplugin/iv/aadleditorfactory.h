@@ -46,7 +46,7 @@ public:
     AadlEditorData *editorData() const;
 
 Q_SIGNALS:
-    void aadlDataLoaded(const QString &fileName, QSharedPointer<aadlinterface::IVEditorCore> data);
+    void aadlDataLoaded(const QString &fileName, QSharedPointer<ive::IVEditorCore> data);
 
 private:
     mutable AadlEditorData *m_editorData = nullptr;

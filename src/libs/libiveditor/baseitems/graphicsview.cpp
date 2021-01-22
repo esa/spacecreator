@@ -27,7 +27,7 @@
 #include <QMouseEvent>
 #include <QtDebug>
 
-namespace aadlinterface {
+namespace ive {
 
 GraphicsView::GraphicsView(QWidget *parent)
     : shared::ui::GraphicsViewBase(parent)
@@ -44,7 +44,7 @@ QList<QPair<QPointF, QString>> GraphicsView::mouseMoveCoordinates(
     QList<QPair<QPointF, QString>> coords;
     QList<QGraphicsItem *> itemsUnderCursor = items(screenPos);
     for (QGraphicsItem *item : itemsUnderCursor) {
-        if (auto iObj = qobject_cast<aadlinterface::InteractiveObject *>(item->toGraphicsObject())) {
+        if (auto iObj = qobject_cast<ive::InteractiveObject *>(item->toGraphicsObject())) {
             coords.push_back({ item->mapFromScene(scenePos),
                     iObj->aadlObject() ? iObj->aadlObject()->objectName() : QLatin1String("None") });
         }
@@ -61,11 +61,11 @@ void GraphicsView::keyPressEvent(QKeyEvent *event)
     case Qt::Key_Up:
     case Qt::Key_Down: {
         for (QGraphicsItem *item : scene()->selectedItems()) {
-            if (aadlinterface::AADLRectGraphicsItem *rectItem =
+            if (ive::AADLRectGraphicsItem *rectItem =
                             // Not the qgraphicsitem_cast due its "successful" cast of AADLFunctionName/Text Graphics
                             // Items
-                    qobject_cast<aadlinterface::AADLRectGraphicsItem *>(item->toGraphicsObject())) {
-                rectItem->singleStepMove(aadlinterface::AADLRectGraphicsItem::MoveStep(event->key()));
+                    qobject_cast<ive::AADLRectGraphicsItem *>(item->toGraphicsObject())) {
+                rectItem->singleStepMove(ive::AADLRectGraphicsItem::MoveStep(event->key()));
                 keyHandled = true;
             }
         }

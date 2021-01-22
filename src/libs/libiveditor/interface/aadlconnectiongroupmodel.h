@@ -28,7 +28,7 @@ class AADLObjectConnection;
 class AADLObjectConnectionGroup;
 }
 
-namespace aadlinterface {
+namespace ive {
 
 class AADLConnectionGroupModel : public QAbstractListModel
 {
@@ -52,4 +52,4 @@ private:
     QSet<shared::Id> m_groupedConnetions;
 };
 
-} // namespace aadlinterface
+} // namespace ive

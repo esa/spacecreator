@@ -23,7 +23,7 @@
 #include "baseitems/common/aadlutils.h"
 #include "commandids.h"
 
-namespace aadlinterface {
+namespace ive {
 namespace cmd {
 
 CmdCommentItemCreate::CmdCommentItemCreate(

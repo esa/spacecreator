@@ -24,7 +24,7 @@ class AADLObject;
 class IfaceParameter;
 }
 
-namespace aadlinterface {
+namespace ive {
 namespace cmd {
 
 class CmdIfaceParamRemove : public CmdIfaceParamCreate

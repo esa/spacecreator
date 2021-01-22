@@ -20,7 +20,7 @@
 #include "mscdocument.h"
 #include "qobjectlistmodelt.h"
 
-namespace aadlinterface {
+namespace ive {
 
 /*!
    A model containing the leaf documents of a msc model

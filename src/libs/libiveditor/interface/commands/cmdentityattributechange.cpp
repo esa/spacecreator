@@ -26,7 +26,7 @@
 #include <aadlobjectfunction.h>
 #include <aadlobjectsmodel.h>
 
-namespace aadlinterface {
+namespace ive {
 namespace cmd {
 
 typedef QVector<QUndoCommand *> Commands;

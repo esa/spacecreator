@@ -23,7 +23,7 @@
 #include <QGraphicsSceneHelpEvent>
 #include <QToolTip>
 
-namespace aadlinterface {
+namespace ive {
 
 InterfaceTabGraphicsScene::InterfaceTabGraphicsScene(QObject *parent)
     : QGraphicsScene(parent)

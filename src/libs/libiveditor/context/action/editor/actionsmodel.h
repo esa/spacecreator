@@ -22,7 +22,7 @@
 #include <QStringListModel>
 #include <QVector>
 
-namespace aadlinterface {
+namespace ive {
 
 class ActionsModel : public QStringListModel
 {

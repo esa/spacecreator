@@ -27,7 +27,7 @@
 #include <QKeyEvent>
 #include <QtDebug>
 
-namespace aadlinterface {
+namespace ive {
 
 static const qreal kOffset = 2.0;
 
@@ -167,12 +167,12 @@ void AADLRectGraphicsItem::updateFromEntity()
     static const QList<aadl::meta::Props::Token> types { aadl::meta::Props::Token::coordinates,
         aadl::meta::Props::Token::InnerCoordinates, aadl::meta::Props::Token::RootCoordinates };
 
-    QRectF itemSceneRect { aadlinterface::rect(obj->coordinates()) };
+    QRectF itemSceneRect { ive::rect(obj->coordinates()) };
     int idx = 0;
     while (itemSceneRect.isNull() && idx < types.size()) {
         const aadl::meta::Props::Token token = types.at(idx);
         const QString strCoordinates = obj->prop(aadl::meta::Props::token(token)).toString();
-        itemSceneRect = aadlinterface::rect(aadl::AADLObject::coordinatesFromString(strCoordinates));
+        itemSceneRect = ive::rect(aadl::AADLObject::coordinatesFromString(strCoordinates));
         ++idx;
     }
     if (!itemSceneRect.isValid())

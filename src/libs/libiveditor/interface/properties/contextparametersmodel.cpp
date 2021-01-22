@@ -32,7 +32,7 @@
 
 #include <algorithm>
 
-namespace aadlinterface {
+namespace ive {
 
 ContextParametersModel::ContextParametersModel(cmd::CommandsStack::Macro *macro, QObject *parent)
     : PropertiesModelBase(parent)

@@ -22,7 +22,7 @@
 
 #include <aadlobjectsmodel.h>
 
-namespace aadlinterface {
+namespace ive {
 namespace cmd {
 
 CmdIfaceParamCreate::CmdIfaceParamCreate(aadl::AADLObject *entity, const aadl::IfaceParameter &param)

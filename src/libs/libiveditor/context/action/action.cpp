@@ -21,10 +21,10 @@
 
 #include <QJsonArray>
 
-namespace aadlinterface {
+namespace ive {
 
 /*!
- * \class aadlinterface::Action
+ * \class ive::Action
  * \brief Scriptable action used to customize the context menu.
  * Contains its UI title, the title of target application action or external application and its arguments,
  * the list of conditions to detect if this action can be invoked or not.

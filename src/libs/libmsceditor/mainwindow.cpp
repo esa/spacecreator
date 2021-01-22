@@ -92,7 +92,7 @@ struct MainWindow::MainWindowPrivate {
 
     bool m_dropUnsavedChangesSilently = false;
 
-    QSharedPointer<aadlinterface::IVEditorCore> m_ivCore { new aadlinterface::IVEditorCore() };
+    QSharedPointer<ive::IVEditorCore> m_ivCore { new ive::IVEditorCore() };
 
     Q_DISABLE_COPY(MainWindowPrivate);
 };

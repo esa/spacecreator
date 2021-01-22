@@ -49,9 +49,9 @@ void tst_Utils::testCheckCollision()
     const QRectF rectNotCollided { 225, 225, 50, 50 };
     QRectF intersected;
     QRectF notIntersected;
-    QVERIFY(aadlinterface::checkCollision(rects, rectCollided, &intersected));
+    QVERIFY(ive::checkCollision(rects, rectCollided, &intersected));
     QVERIFY(intersected == rects.at(3));
-    QVERIFY(aadlinterface::checkCollision(rects, rectNotCollided, &notIntersected) == false);
+    QVERIFY(ive::checkCollision(rects, rectNotCollided, &notIntersected) == false);
     QVERIFY(!notIntersected.isValid());
 }
 
@@ -60,45 +60,45 @@ void tst_Utils::testSides()
     const QMetaEnum me = QMetaEnum::fromType<Qt::Alignment>();
     for (int idx = 0; idx < me.keyCount(); ++idx) {
         const auto align = static_cast<Qt::Alignment>(me.value(idx));
-        const int sideIdx = aadlinterface::indexFromSide(align);
-        if (aadlinterface::kRectSides.contains(align)) {
-            QVERIFY(align == aadlinterface::sideFromIndex(sideIdx));
+        const int sideIdx = ive::indexFromSide(align);
+        if (ive::kRectSides.contains(align)) {
+            QVERIFY(align == ive::sideFromIndex(sideIdx));
         } else {
             QCOMPARE(sideIdx, -1);
         }
     }
-    QCOMPARE(aadlinterface::sideFromIndex(-1), aadlinterface::sideFromIndex(aadlinterface::kRectSides.size() - 1));
-    QCOMPARE(aadlinterface::sideFromIndex(-2), aadlinterface::sideFromIndex(aadlinterface::kRectSides.size() - 2));
-    QCOMPARE(aadlinterface::sideFromIndex(-3), aadlinterface::sideFromIndex(aadlinterface::kRectSides.size() - 3));
-    QCOMPARE(aadlinterface::sideFromIndex(-4), aadlinterface::sideFromIndex(aadlinterface::kRectSides.size() - 4));
+    QCOMPARE(ive::sideFromIndex(-1), ive::sideFromIndex(ive::kRectSides.size() - 1));
+    QCOMPARE(ive::sideFromIndex(-2), ive::sideFromIndex(ive::kRectSides.size() - 2));
+    QCOMPARE(ive::sideFromIndex(-3), ive::sideFromIndex(ive::kRectSides.size() - 3));
+    QCOMPARE(ive::sideFromIndex(-4), ive::sideFromIndex(ive::kRectSides.size() - 4));
 }
 
 void tst_Utils::testAdjustedRect()
 {
     const QRectF itemRect { 100, 100, 100, 100 };
     const QRectF intersectedItemRect { 150, 150, 100, 100 };
-    QVERIFY(aadlinterface::adjustedRect(itemRect, intersectedItemRect, Qt::AlignLeft, true).bottom()
+    QVERIFY(ive::adjustedRect(itemRect, intersectedItemRect, Qt::AlignLeft, true).bottom()
             < intersectedItemRect.top());
-    QVERIFY(aadlinterface::adjustedRect(itemRect, intersectedItemRect, Qt::AlignLeft, false).top()
+    QVERIFY(ive::adjustedRect(itemRect, intersectedItemRect, Qt::AlignLeft, false).top()
             > intersectedItemRect.bottom());
-    QVERIFY(aadlinterface::adjustedRect(itemRect, intersectedItemRect, Qt::AlignTop, true).left()
+    QVERIFY(ive::adjustedRect(itemRect, intersectedItemRect, Qt::AlignTop, true).left()
             > intersectedItemRect.right());
-    QVERIFY(aadlinterface::adjustedRect(itemRect, intersectedItemRect, Qt::AlignTop, false).right()
+    QVERIFY(ive::adjustedRect(itemRect, intersectedItemRect, Qt::AlignTop, false).right()
             < intersectedItemRect.left());
-    QVERIFY(aadlinterface::adjustedRect(itemRect, intersectedItemRect, Qt::AlignRight, true).top()
+    QVERIFY(ive::adjustedRect(itemRect, intersectedItemRect, Qt::AlignRight, true).top()
             > intersectedItemRect.bottom());
-    QVERIFY(aadlinterface::adjustedRect(itemRect, intersectedItemRect, Qt::AlignRight, false).bottom()
+    QVERIFY(ive::adjustedRect(itemRect, intersectedItemRect, Qt::AlignRight, false).bottom()
             < intersectedItemRect.top());
-    QVERIFY(aadlinterface::adjustedRect(itemRect, intersectedItemRect, Qt::AlignBottom, true).right()
+    QVERIFY(ive::adjustedRect(itemRect, intersectedItemRect, Qt::AlignBottom, true).right()
             < intersectedItemRect.left());
-    QVERIFY(aadlinterface::adjustedRect(itemRect, intersectedItemRect, Qt::AlignBottom, false).left()
+    QVERIFY(ive::adjustedRect(itemRect, intersectedItemRect, Qt::AlignBottom, false).left()
             > intersectedItemRect.right());
 
     const QMetaEnum me = QMetaEnum::fromType<Qt::Alignment>();
     for (int idx = 0; idx < me.keyCount(); ++idx) {
         const auto align = static_cast<Qt::Alignment>(me.value(idx));
-        if (!aadlinterface::kRectSides.contains(align)) {
-            QVERIFY(!aadlinterface::adjustedRect(itemRect, intersectedItemRect, align, true).isValid());
+        if (!ive::kRectSides.contains(align)) {
+            QVERIFY(!ive::adjustedRect(itemRect, intersectedItemRect, align, true).isValid());
         }
     }
 }
@@ -121,15 +121,15 @@ void tst_Utils::testAlignRectToSide()
         const QMetaEnum me = QMetaEnum::fromType<Qt::Alignment>();
         for (int idx = 0; idx < me.keyCount(); ++idx) {
             const auto align = static_cast<Qt::Alignment>(me.value(idx));
-            QVERIFY(!aadlinterface::alignRectToSide({}, testData.itemRect, align, testData.offset).isValid());
-            QVERIFY(!aadlinterface::alignRectToSide(testData.boundingRect, {}, align, testData.offset).isValid());
+            QVERIFY(!ive::alignRectToSide({}, testData.itemRect, align, testData.offset).isValid());
+            QVERIFY(!ive::alignRectToSide(testData.boundingRect, {}, align, testData.offset).isValid());
 
-            if (!aadlinterface::kRectSides.contains(align)) {
-                QVERIFY(!aadlinterface::alignRectToSide(
+            if (!ive::kRectSides.contains(align)) {
+                QVERIFY(!ive::alignRectToSide(
                         testData.boundingRect, testData.itemRect, align, testData.offset)
                                  .isValid());
             } else {
-                const QRectF alignedRect = aadlinterface::alignRectToSide(
+                const QRectF alignedRect = ive::alignRectToSide(
                         testData.boundingRect, testData.itemRect, align, testData.offset);
                 QVERIFY(alignedRect.isValid());
                 QVERIFY(testData.boundingRect.contains(alignedRect.topLeft() - testData.offset));
@@ -145,10 +145,10 @@ void tst_Utils::testCollidingRect()
         { 200, 200, 100, 100 },
         { 0, 200, 100, 100 },
     };
-    QVERIFY(aadlinterface::collidingRect(QRectF(200, 0, 100, 100), existingRects).isNull());
-    QCOMPARE(aadlinterface::collidingRect(QRectF(150, 150, 100, 100), existingRects), existingRects.at(1));
-    QCOMPARE(aadlinterface::collidingRect(QRectF(-50, 150, 300, 300), existingRects), existingRects.at(1));
-    QCOMPARE(aadlinterface::collidingRect(QRectF(-50, 150, 200, 200), existingRects), existingRects.at(2));
+    QVERIFY(ive::collidingRect(QRectF(200, 0, 100, 100), existingRects).isNull());
+    QCOMPARE(ive::collidingRect(QRectF(150, 150, 100, 100), existingRects), existingRects.at(1));
+    QCOMPARE(ive::collidingRect(QRectF(-50, 150, 300, 300), existingRects), existingRects.at(1));
+    QCOMPARE(ive::collidingRect(QRectF(-50, 150, 200, 200), existingRects), existingRects.at(2));
 }
 
 void tst_Utils::testSiblingSceneRects()
@@ -161,18 +161,18 @@ void tst_Utils::testSiblingSceneRects()
     };
 
     QGraphicsScene scene;
-    aadlinterface::AADLFunctionGraphicsItem *item { nullptr };
+    ive::AADLFunctionGraphicsItem *item { nullptr };
     for (int idx = 0; idx < existingRects.size(); ++idx) {
-        item = new aadlinterface::AADLFunctionGraphicsItem(new aadl::AADLObjectFunction);
+        item = new ive::AADLFunctionGraphicsItem(new aadl::AADLObjectFunction);
         scene.addItem(item);
         item->setRect(existingRects.at(idx));
     }
-    aadlinterface::AADLFunctionGraphicsItem *child { nullptr };
+    ive::AADLFunctionGraphicsItem *child { nullptr };
     for (int idx = 0; idx < 3; ++idx) {
-        child = new aadlinterface::AADLFunctionGraphicsItem(new aadl::AADLObjectFunction, item);
+        child = new ive::AADLFunctionGraphicsItem(new aadl::AADLObjectFunction, item);
         child->setRect(existingRects.at(idx));
     }
-    const auto siblingItems0 = aadlinterface::siblingSceneRects(item);
+    const auto siblingItems0 = ive::siblingSceneRects(item);
     QCOMPARE(siblingItems0.size(), 3);
     for (auto itemRect : siblingItems0) {
         const auto it = std::find(existingRects.cbegin(), existingRects.cend(), itemRect);
@@ -180,7 +180,7 @@ void tst_Utils::testSiblingSceneRects()
         QVERIFY(std::distance(existingRects.cbegin(), it) != 3);
     }
 
-    const auto siblingItems1 = aadlinterface::siblingSceneRects(child);
+    const auto siblingItems1 = ive::siblingSceneRects(child);
     QCOMPARE(siblingItems1.size(), 2);
     for (auto itemRect : siblingItems1) {
         const auto it = std::find(existingRects.cbegin(), existingRects.cend(), itemRect);
@@ -202,12 +202,12 @@ void tst_Utils::testFindGeometryForRect()
         br |= r;
 
     QRectF boundingRect { br };
-    aadlinterface::findGeometryForRect(itemRect, boundingRect, existingRects, {});
+    ive::findGeometryForRect(itemRect, boundingRect, existingRects, {});
     QVERIFY(boundingRect.contains(itemRect));
     QVERIFY(br == boundingRect);
 
     existingRects << itemRect;
-    aadlinterface::findGeometryForRect(itemRect, boundingRect, existingRects, {});
+    ive::findGeometryForRect(itemRect, boundingRect, existingRects, {});
     QVERIFY(boundingRect.contains(itemRect));
     QVERIFY(br != boundingRect);
 }

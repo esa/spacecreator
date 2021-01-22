@@ -39,7 +39,7 @@ AadlMainWidget::~AadlMainWidget()
     }
 }
 
-bool AadlMainWidget::init(QSharedPointer<aadlinterface::IVEditorCore> data)
+bool AadlMainWidget::init(QSharedPointer<ive::IVEditorCore> data)
 {
     m_plugin = data;
     init();
@@ -54,7 +54,7 @@ void AadlMainWidget::setMinimapVisible(bool visible)
     m_plugin->minimapView()->setVisible(visible);
 }
 
-QSharedPointer<aadlinterface::IVEditorCore> AadlMainWidget::ivPlugin() const
+QSharedPointer<ive::IVEditorCore> AadlMainWidget::ivPlugin() const
 {
     return m_plugin;
 }
@@ -75,9 +75,9 @@ void AadlMainWidget::init()
 
     m_plugin->setupMiniMap();
 
-    aadlinterface::cmd::CommandsStack::setCurrent(m_plugin->document()->commandsStack());
+    ive::cmd::CommandsStack::setCurrent(m_plugin->document()->commandsStack());
 
-    connect(m_plugin->document(), &aadlinterface::InterfaceDocument::asn1ParameterErrorDetected, this,
+    connect(m_plugin->document(), &ive::InterfaceDocument::asn1ParameterErrorDetected, this,
             &AadlMainWidget::showAsn1Errors);
 }
 

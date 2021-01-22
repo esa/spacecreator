@@ -26,7 +26,7 @@
 #include <aadlobjectfunctiontype.h>
 #include <aadlobjectiface.h>
 #include <aadlobjectsmodel.h>
-namespace aadlinterface {
+namespace ive {
 namespace cmd {
 
 CmdEntityRemove::CmdEntityRemove(aadl::AADLObject *entity, aadl::AADLObjectsModel *model)

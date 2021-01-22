@@ -29,7 +29,7 @@
 #include <QMetaEnum>
 #include <QStandardPaths>
 
-namespace aadlinterface {
+namespace ive {
 
 ColorHandler::ColorHandler()
     : d(new ColorHandlerData())
@@ -251,7 +251,7 @@ bool ColorManager::setSourceFile(const QString &from)
         qWarning() << "File open failed:" << from << jsonFile.errorString();
     }
 
-    if (m_colors.size() != QMetaEnum::fromType<aadlinterface::ColorManager::HandledColors>().keyCount() - 1) {
+    if (m_colors.size() != QMetaEnum::fromType<ive::ColorManager::HandledColors>().keyCount() - 1) {
         return false;
     }
 

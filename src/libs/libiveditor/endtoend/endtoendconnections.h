@@ -32,7 +32,7 @@ namespace msc {
 class MscDocument;
 }
 
-namespace aadlinterface {
+namespace ive {
 
 /*!
  * \brief The EndToEndConnections class reads an MSC file and returns the list of messages->instances.

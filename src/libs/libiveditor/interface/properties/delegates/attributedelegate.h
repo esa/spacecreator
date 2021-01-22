@@ -19,7 +19,7 @@
 
 #include <QStyledItemDelegate>
 
-namespace aadlinterface {
+namespace ive {
 
 class AttributeDelegate : public QStyledItemDelegate
 {
@@ -31,4 +31,4 @@ public:
     void setEditorData(QWidget *editor, const QModelIndex &index) const override;
 };
 
-} // namespace aadlinterface
+} // namespace ive

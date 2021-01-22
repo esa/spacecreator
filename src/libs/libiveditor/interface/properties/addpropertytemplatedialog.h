@@ -27,7 +27,7 @@ namespace aadl {
 class PropertyTemplate;
 } // namespace aadl
 
-namespace aadlinterface {
+namespace ive {
 
 class AddPropertyTemplateDialog : public QDialog
 {
@@ -54,4 +54,4 @@ private:
     QStringList listValues() const;
 };
 
-} // namespace aadlinterface
+} // namespace ive

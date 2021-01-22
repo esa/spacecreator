@@ -28,7 +28,7 @@ namespace spctr {
 
 IVColorOption::IVColorOption(QObject *parent)
     : Core::IOptionsPage(parent)
-    , m_originalFile(aadlinterface::ColorManager::instance()->sourceFile())
+    , m_originalFile(ive::ColorManager::instance()->sourceFile())
 {
     setId(Constants::SETTINGS_IV_COLOR_ID);
     setDisplayName(tr("IV color"));
@@ -44,7 +44,7 @@ QWidget *IVColorOption::widget()
         auto mainLayout = new QVBoxLayout(m_widget);
         m_widget->setLayout(mainLayout);
 
-        m_colorWidget = new aadlinterface::ColorSettingsWidget(m_widget);
+        m_colorWidget = new ive::ColorSettingsWidget(m_widget);
         mainLayout->addWidget(m_colorWidget);
 
         auto buttonLayout = new QHBoxLayout(m_widget);
@@ -68,7 +68,7 @@ void IVColorOption::apply()
 void IVColorOption::finish()
 {
     if (m_reset) {
-        aadlinterface::ColorManager::instance()->setSourceFile(m_originalFile);
+        ive::ColorManager::instance()->setSourceFile(m_originalFile);
     }
     delete m_widget;
 }
@@ -76,7 +76,7 @@ void IVColorOption::finish()
 void IVColorOption::restoreDefaults()
 {
     if (m_colorWidget) {
-        m_colorWidget->loadFile(aadlinterface::ColorManager::defaultColorsResourceFile());
+        m_colorWidget->loadFile(ive::ColorManager::defaultColorsResourceFile());
     }
 }
 

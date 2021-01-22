@@ -36,22 +36,22 @@ private Q_SLOTS:
 
 void tst_AADLInterfaceGraphicsItem::initTestCase()
 {
-    aadlinterface::initIvEditor();
+    ive::initIvEditor();
     QStandardPaths::setTestModeEnabled(true);
 }
 
 void tst_AADLInterfaceGraphicsItem::testMaxWidth()
 {
     QGraphicsScene scene;
-    auto parentFunc = new aadlinterface::AADLFunctionGraphicsItem(nullptr);
+    auto parentFunc = new ive::AADLFunctionGraphicsItem(nullptr);
     scene.addItem(parentFunc);
     parentFunc->setBoundingRect(QRectF(0., 0., 200., 200.));
-    auto item = new aadlinterface::AADLInterfaceGraphicsItem(nullptr, parentFunc);
+    auto item = new ive::AADLInterfaceGraphicsItem(nullptr, parentFunc);
     item->setBoundingRect(QRectF(200., 10., 50., 30.));
 
     QCOMPARE(item->maxWidth(), -1.);
 
-    auto funcItem = new aadlinterface::AADLFunctionGraphicsItem(nullptr);
+    auto funcItem = new ive::AADLFunctionGraphicsItem(nullptr);
     scene.addItem(funcItem);
     funcItem->setBoundingRect(QRectF(400., 400., 300., 300.));
     QCOMPARE(item->maxWidth(), -1.);
@@ -65,7 +65,7 @@ void tst_AADLInterfaceGraphicsItem::testMaxWidth()
 
     // Another interface on the right
     item->setBoundingRect(QRectF(20., 0., 50., 30.));
-    auto item2 = new aadlinterface::AADLInterfaceGraphicsItem(nullptr, parentFunc);
+    auto item2 = new ive::AADLInterfaceGraphicsItem(nullptr, parentFunc);
     item2->setBoundingRect(QRectF(130., 0., 50., 30.));
     QCOMPARE(item->maxWidth(), 110.);
     // Invisible items don't limit the width
@@ -79,13 +79,13 @@ void tst_AADLInterfaceGraphicsItem::testMaxWidth()
     QCOMPARE(item->maxWidth(), -1.);
 
     // Function type
-    auto typeItem = new aadlinterface::AADLFunctionTypeGraphicsItem(nullptr);
+    auto typeItem = new ive::AADLFunctionTypeGraphicsItem(nullptr);
     scene.addItem(typeItem);
     typeItem->setBoundingRect(QRectF(600., 0., 300., 300.));
     QCOMPARE(item->maxWidth(), 580.);
 
     // Comment
-    auto commentItem = new aadlinterface::AADLCommentGraphicsItem(nullptr);
+    auto commentItem = new ive::AADLCommentGraphicsItem(nullptr);
     scene.addItem(commentItem);
     commentItem->setBoundingRect(QRectF(450., 0., 300., 300.));
     QCOMPARE(item->maxWidth(), 430.);

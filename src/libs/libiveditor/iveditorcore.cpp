@@ -49,16 +49,16 @@
 #include <QToolBar>
 #include <QUndoStack>
 
-namespace aadlinterface {
+namespace ive {
 
 /*!
- * \namespace aadlinterface
+ * \namespace ive
  * \brief Has most of the code for the Interface View Editor UI
  */
 
 IVEditorCore::IVEditorCore(QObject *parent)
     : shared::EditorCore(parent)
-    , m_document(new aadlinterface::InterfaceDocument(this))
+    , m_document(new ive::InterfaceDocument(this))
     , m_docToolBar(new QToolBar)
 {
     m_document->init();
@@ -68,9 +68,9 @@ IVEditorCore::IVEditorCore(QObject *parent)
     m_docToolBar->setMovable(true);
 
     if (aadl::AADLObjectsModel *model = document()->objectsModel()) {
-        connect(model, &aadl::AADLObjectsModel::aadlObjectsAdded, this, &aadlinterface::IVEditorCore::updateAadlItems);
-        connect(model, &aadl::AADLObjectsModel::aadlObjectRemoved, this, &aadlinterface::IVEditorCore::updateAadlItems);
-        connect(model, &aadl::AADLObjectsModel::rootObjectChanged, this, &aadlinterface::IVEditorCore::updateAadlItems);
+        connect(model, &aadl::AADLObjectsModel::aadlObjectsAdded, this, &ive::IVEditorCore::updateAadlItems);
+        connect(model, &aadl::AADLObjectsModel::aadlObjectRemoved, this, &ive::IVEditorCore::updateAadlItems);
+        connect(model, &aadl::AADLObjectsModel::rootObjectChanged, this, &ive::IVEditorCore::updateAadlItems);
     }
 }
 
@@ -147,11 +147,11 @@ void IVEditorCore::addMenuHelpActions(QMenu *menu, QMainWindow *window)
 
 void IVEditorCore::registerBasicActions()
 {
-    aadlinterface::ActionsManager::registerAction(Q_FUNC_INFO, actionUndo(), "Undo", "Undo the last operation");
-    aadlinterface::ActionsManager::registerAction(Q_FUNC_INFO, actionRedo(), "Redo", "Redo the last undone operation");
-    aadlinterface::ActionsManager::registerAction(
+    ive::ActionsManager::registerAction(Q_FUNC_INFO, actionUndo(), "Undo", "Undo the last operation");
+    ive::ActionsManager::registerAction(Q_FUNC_INFO, actionRedo(), "Redo", "Redo the last undone operation");
+    ive::ActionsManager::registerAction(
             Q_FUNC_INFO, actionExportFunctions(), "Export Functions", "Export selected objects");
-    aadlinterface::ActionsManager::registerAction(
+    ive::ActionsManager::registerAction(
             Q_FUNC_INFO, actionExportType(), "Export Type", "Export selected component type");
 }
 
@@ -246,8 +246,8 @@ bool IVEditorCore::addConnection(QString name, const QString &fromInstanceName, 
         auto createConnection = [aadlModel](aadl::AADLObjectFunction *parent, aadl::AADLObjectIface *inIf,
                                         aadl::AADLObjectIface *outIf) {
             QVector<QPointF> points;
-            points.append(aadlinterface::pos(inIf->coordinates()));
-            points.append(aadlinterface::pos(outIf->coordinates()));
+            points.append(ive::pos(inIf->coordinates()));
+            points.append(ive::pos(outIf->coordinates()));
             auto command = new cmd::CmdConnectionItemCreate(aadlModel, parent, inIf->id(), outIf->id(), points);
             cmd::CommandsStack::push(command);
         };
@@ -450,7 +450,7 @@ QString IVEditorCore::filePath() const
 
 bool IVEditorCore::save()
 {
-    return aadlinterface::XmlDocExporter::exportDocSilently(m_document, {}, {});
+    return ive::XmlDocExporter::exportDocSilently(m_document, {}, {});
 }
 
 QVector<aadl::AADLObjectFunction *> IVEditorCore::allAadlFunctions() const
@@ -558,7 +558,7 @@ aadl::AADLObjectIface *IVEditorCore::getInterface(
         aadl::AADLObjectIface::CreationInfo createInfo(aadlModel, parentFunction);
         createInfo.name = ifName;
         createInfo.type = ifType;
-        QRectF funcRect = aadlinterface::rect(parentFunction->coordinates());
+        QRectF funcRect = ive::rect(parentFunction->coordinates());
         QPointF ifPos(funcRect.left(), funcRect.center().y());
         if (ifType == aadl::AADLObjectIface::IfaceType::Required) {
             ifPos.setX(funcRect.right());

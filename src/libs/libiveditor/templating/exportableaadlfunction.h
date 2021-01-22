@@ -23,7 +23,7 @@ namespace aadl {
 class AADLObjectFunctionType;
 }
 
-namespace aadlinterface {
+namespace ive {
 
 /**
  * @brief The ExportableAADLFunction is a class to export AADLObjectFunctionType and AADLObjectFunction
@@ -53,5 +53,5 @@ public:
 
 }
 
-Q_DECLARE_METATYPE(aadlinterface::ExportableAADLFunction)
-Q_DECLARE_TYPEINFO(aadlinterface::ExportableAADLFunction, Q_MOVABLE_TYPE);
+Q_DECLARE_METATYPE(ive::ExportableAADLFunction)
+Q_DECLARE_TYPEINFO(ive::ExportableAADLFunction, Q_MOVABLE_TYPE);

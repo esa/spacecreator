@@ -25,13 +25,13 @@
     </widget>
    </item>
    <item row="0" column="0">
-    <widget class="aadlinterface::ColorSettingsWidget" name="widget" native="true"/>
+    <widget class="ive::ColorSettingsWidget" name="widget" native="true"/>
    </item>
   </layout>
  </widget>
  <customwidgets>
   <customwidget>
-   <class>aadlinterface::ColorSettingsWidget</class>
+   <class>ive::ColorSettingsWidget</class>
    <extends>QWidget</extends>
    <header>interface/colors/colorsettingswidget.h</header>
    <container>1</container>

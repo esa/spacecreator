@@ -28,7 +28,7 @@ class AADLObjectConnection;
 class AADLObjectFunction;
 }
 
-namespace aadlinterface {
+namespace ive {
 namespace cmd {
 class CommandsStack;
 }
@@ -42,7 +42,7 @@ public:
     explicit IVEditorCore(QObject *parent = nullptr);
     ~IVEditorCore() override;
 
-    aadlinterface::InterfaceDocument *document() const;
+    ive::InterfaceDocument *document() const;
 
     void setPluginActive(bool active) override;
 
@@ -97,7 +97,7 @@ private:
             const QString &ifName, aadl::AADLObjectIface::IfaceType ifType, aadl::AADLObjectFunction *parentFunction);
     Q_SLOT void updateAadlItems();
 
-    aadlinterface::InterfaceDocument *m_document { nullptr };
+    ive::InterfaceDocument *m_document { nullptr };
 
     QToolBar *m_docToolBar { nullptr };
 

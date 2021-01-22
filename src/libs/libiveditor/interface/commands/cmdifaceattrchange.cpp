@@ -20,7 +20,7 @@
 #include "aadlobjectconnection.h"
 #include "commandids.h"
 
-namespace aadlinterface {
+namespace ive {
 namespace cmd {
 
 static inline QVariant getCurrentAttribute(const aadl::AADLObjectIface *entity, const QString &name)

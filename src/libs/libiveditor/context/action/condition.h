@@ -28,7 +28,7 @@ namespace aadl {
 class AADLObject;
 }
 
-namespace aadlinterface {
+namespace ive {
 
 struct Condition {
     explicit Condition(const QJsonObject &jObj = QJsonObject());

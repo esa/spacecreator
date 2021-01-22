@@ -42,7 +42,7 @@ class tst_ItemZOrder : public QObject
 {
     Q_OBJECT
 private:
-    void checkItem(aadlinterface::InteractiveObject *item, const qreal expectedZ);
+    void checkItem(ive::InteractiveObject *item, const qreal expectedZ);
 
 private Q_SLOTS:
     void initTestCase();
@@ -74,7 +74,7 @@ void tst_ItemZOrder::cleanupTestCase()
     QStandardPaths::setTestModeEnabled(false);
 }
 
-void tst_ItemZOrder::checkItem(aadlinterface::InteractiveObject *item, const qreal expectedZ)
+void tst_ItemZOrder::checkItem(ive::InteractiveObject *item, const qreal expectedZ)
 {
     if (!item || !item->aadlObject() || item->aadlObject()->aadlType() == aadl::AADLObject::Type::Unknown)
         return;
@@ -83,35 +83,35 @@ void tst_ItemZOrder::checkItem(aadlinterface::InteractiveObject *item, const qre
 
     item->setSelected(false);
     QVERIFY(item->isSelected() == false);
-    QCOMPARE(aadlinterface::itemLevel(item->aadlObject(), item->isSelected()), expectedZ);
+    QCOMPARE(ive::itemLevel(item->aadlObject(), item->isSelected()), expectedZ);
 
     item->setSelected(true);
     QVERIFY(item->isSelected() == true);
-    QCOMPARE(aadlinterface::itemLevel(item->aadlObject(), item->isSelected()), aadlinterface::ZOrder.Selected);
+    QCOMPARE(ive::itemLevel(item->aadlObject(), item->isSelected()), ive::ZOrder.Selected);
 }
 
 void tst_ItemZOrder::testItem_FunctionType()
 {
     aadl::AADLObjectFunctionType aadlObject(QStringLiteral("TestFunctionType"));
-    aadlinterface::AADLFunctionTypeGraphicsItem item(&aadlObject);
+    ive::AADLFunctionTypeGraphicsItem item(&aadlObject);
 
-    checkItem(&item, aadlinterface::ZOrder.Function);
+    checkItem(&item, ive::ZOrder.Function);
 }
 
 void tst_ItemZOrder::testItem_Function()
 {
     aadl::AADLObjectFunction aadlObject(QStringLiteral("TestFunction"));
-    aadlinterface::AADLFunctionGraphicsItem item(&aadlObject);
+    ive::AADLFunctionGraphicsItem item(&aadlObject);
 
-    checkItem(&item, aadlinterface::ZOrder.Function);
+    checkItem(&item, ive::ZOrder.Function);
 }
 
 void tst_ItemZOrder::testItem_Comment()
 {
     aadl::AADLObjectComment aadlObject(QStringLiteral("TestComment"));
-    aadlinterface::AADLCommentGraphicsItem item(&aadlObject);
+    ive::AADLCommentGraphicsItem item(&aadlObject);
 
-    checkItem(&item, aadlinterface::ZOrder.Comment);
+    checkItem(&item, ive::ZOrder.Comment);
 }
 
 void tst_ItemZOrder::testItem_InterfaceGroup()
@@ -122,9 +122,9 @@ void tst_ItemZOrder::testItem_InterfaceGroup()
     ci.type = aadl::AADLObjectIface::IfaceType::Grouped;
     std::unique_ptr<aadl::AADLObjectIfaceGroup> pIface =
             std::unique_ptr<aadl::AADLObjectIfaceGroup>(new aadl::AADLObjectIfaceGroup(ci));
-    aadlinterface::AADLInterfaceGroupGraphicsItem item(pIface.get());
+    ive::AADLInterfaceGroupGraphicsItem item(pIface.get());
 
-    checkItem(&item, aadlinterface::ZOrder.Interface);
+    checkItem(&item, ive::ZOrder.Interface);
 }
 
 void tst_ItemZOrder::testItem_RequiredInterface()
@@ -135,9 +135,9 @@ void tst_ItemZOrder::testItem_RequiredInterface()
     ci.type = aadl::AADLObjectIface::IfaceType::Required;
     std::unique_ptr<aadl::AADLObjectIface> pIface =
             std::unique_ptr<aadl::AADLObjectIface>(aadl::AADLObjectIface::createIface(ci));
-    aadlinterface::AADLInterfaceGraphicsItem item(pIface.get());
+    ive::AADLInterfaceGraphicsItem item(pIface.get());
 
-    checkItem(&item, aadlinterface::ZOrder.Interface);
+    checkItem(&item, ive::ZOrder.Interface);
 }
 
 void tst_ItemZOrder::testItem_ProvidedInterface()
@@ -148,9 +148,9 @@ void tst_ItemZOrder::testItem_ProvidedInterface()
     ci.type = aadl::AADLObjectIface::IfaceType::Provided;
     std::unique_ptr<aadl::AADLObjectIface> pIface =
             std::unique_ptr<aadl::AADLObjectIface>(aadl::AADLObjectIface::createIface(ci));
-    aadlinterface::AADLInterfaceGraphicsItem item(pIface.get());
+    ive::AADLInterfaceGraphicsItem item(pIface.get());
 
-    checkItem(&item, aadlinterface::ZOrder.Interface);
+    checkItem(&item, ive::ZOrder.Interface);
 }
 
 void tst_ItemZOrder::testItem_Connection()
@@ -163,19 +163,19 @@ void tst_ItemZOrder::testItem_Connection()
     ciA.type = aadl::AADLObjectIface::IfaceType::Provided;
     std::unique_ptr<aadl::AADLObjectIface> pIfaceA =
             std::unique_ptr<aadl::AADLObjectIface>(aadl::AADLObjectIface::createIface(ciA));
-    aadlinterface::AADLInterfaceGraphicsItem itemA(pIfaceA.get());
+    ive::AADLInterfaceGraphicsItem itemA(pIfaceA.get());
 
     aadl::AADLObjectIface::CreationInfo ciB;
     ciB.function = &aadlFunctionA;
     ciB.type = aadl::AADLObjectIface::IfaceType::Provided;
     std::unique_ptr<aadl::AADLObjectIface> pIfaceB =
             std::unique_ptr<aadl::AADLObjectIface>(aadl::AADLObjectIface::createIface(ciB));
-    aadlinterface::AADLInterfaceGraphicsItem itemB(pIfaceB.get());
+    ive::AADLInterfaceGraphicsItem itemB(pIfaceB.get());
 
     aadl::AADLObjectConnection aadlConnection(pIfaceA.get(), pIfaceB.get());
-    aadlinterface::AADLConnectionGraphicsItem connectionItem(&aadlConnection, &itemA, &itemB);
+    ive::AADLConnectionGraphicsItem connectionItem(&aadlConnection, &itemA, &itemB);
 
-    checkItem(&connectionItem, aadlinterface::ZOrder.Connection);
+    checkItem(&connectionItem, ive::ZOrder.Connection);
 }
 
 void tst_ItemZOrder::testItem_ConnectionGroup()
@@ -187,13 +187,13 @@ void tst_ItemZOrder::testItem_ConnectionGroup()
     ciA.function = &aadlFunctionA;
     ciA.type = aadl::AADLObjectIface::IfaceType::Provided;
     std::unique_ptr<aadl::AADLObjectIfaceGroup> pIfaceA = std::make_unique<aadl::AADLObjectIfaceGroup>(ciA);
-    aadlinterface::AADLInterfaceGroupGraphicsItem itemA(pIfaceA.get());
+    ive::AADLInterfaceGroupGraphicsItem itemA(pIfaceA.get());
 
     aadl::AADLObjectIface::CreationInfo ciB;
     ciB.function = &aadlFunctionA;
     ciB.type = aadl::AADLObjectIface::IfaceType::Provided;
     std::unique_ptr<aadl::AADLObjectIfaceGroup> pIfaceB = std::make_unique<aadl::AADLObjectIfaceGroup>(ciB);
-    aadlinterface::AADLInterfaceGroupGraphicsItem itemB(pIfaceB.get());
+    ive::AADLInterfaceGroupGraphicsItem itemB(pIfaceB.get());
 
     std::unique_ptr<aadl::AADLObjectConnection> aadlConnection { new aadl::AADLObjectConnection(
             pIfaceA.get(), pIfaceB.get()) };
@@ -201,9 +201,9 @@ void tst_ItemZOrder::testItem_ConnectionGroup()
     aadl::AADLObjectConnectionGroup aadlConnectionGroup(
             QStringLiteral("TestConnectionGroup"), pIfaceA.get(), pIfaceB.get(), { aadlConnection.get() });
 
-    aadlinterface::AADLConnectionGroupGraphicsItem connectionItem(&aadlConnectionGroup, &itemA, &itemB);
+    ive::AADLConnectionGroupGraphicsItem connectionItem(&aadlConnectionGroup, &itemA, &itemB);
 
-    checkItem(&connectionItem, aadlinterface::ZOrder.Connection);
+    checkItem(&connectionItem, ive::ZOrder.Connection);
     aadlConnectionGroup.removeConnection(aadlConnection.get());
     QVERIFY(aadlConnectionGroup.groupedConnections().isEmpty());
 }

@@ -17,7 +17,7 @@
 
 #pragma once
 
-namespace aadlinterface {
+namespace ive {
 
 void initIvEditor();
 

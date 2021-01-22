@@ -24,7 +24,7 @@
 
 #include <QSharedPointer>
 
-namespace aadlinterface {
+namespace ive {
 
 static QStringList asn1Names(const QSharedPointer<Asn1Acn::File> &dataTypes)
 {
@@ -60,4 +60,4 @@ ContextParametersTypeDelegate::ContextParametersTypeDelegate(
 {
 }
 
-} // namespace aadlinterface
+} // namespace ive
