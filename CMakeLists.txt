@@ -96,6 +96,7 @@ add_subdirectory(wizards)
 # Testing
 option(ENABLE_TESTS "Build the tests" ON)
 if(ENABLE_TESTS)
+    include(TestUtils)
     enable_testing()
     add_subdirectory(tests)
 endif()

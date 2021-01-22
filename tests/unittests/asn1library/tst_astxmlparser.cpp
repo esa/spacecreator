@@ -22,7 +22,7 @@
 ** along with this program.  If not, see <http://www.gnu.org/licenses/>.
 **
 ****************************************************************************/
-#include "astxmlparser_tests.h"
+#include "tst_astxmlparser.h"
 
 #include "types/builtintypes.h"
 #include "types/userdefinedtype.h"

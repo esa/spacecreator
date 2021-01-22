@@ -1,2 +1,2 @@
-add_subdirectory(tst_asn1itemmodel)
-add_subdirectory(tst_asn1treeview)
+addQtTest(tst_asn1itemmodel asn1editor)
+addQtTest(tst_asn1treeview asn1editor "DataView.xml")
