@@ -1,22 +1,22 @@
 #pragma once
 
-#include "aadlobjectiface.h"
+#include "aadliface.h"
 
 #include <QString>
 
 namespace ivm {
-class AADLObjectConnection;
-class AADLObjectFunctionType;
+class AADLConnection;
+class AADLFunctionType;
 
 namespace testutils {
 
-AADLObjectIface::CreationInfo init(
-        AADLObjectIface::IfaceType t, AADLObjectFunctionType *fn, const QString &name = QString());
+AADLIface::CreationInfo init(
+        AADLIface::IfaceType t, AADLFunctionType *fn, const QString &name = QString());
 
-AADLObjectIface *createIface(AADLObjectFunctionType *fn,
-        AADLObjectIface::IfaceType t = AADLObjectIface::IfaceType::Provided, const QString &name = QString());
+AADLIface *createIface(AADLFunctionType *fn,
+        AADLIface::IfaceType t = AADLIface::IfaceType::Provided, const QString &name = QString());
 
-AADLObjectConnection *createConnection(
-        AADLObjectFunctionType *source, AADLObjectFunctionType *target, const QString &name);
+AADLConnection *createConnection(
+        AADLFunctionType *source, AADLFunctionType *target, const QString &name);
 }
 }

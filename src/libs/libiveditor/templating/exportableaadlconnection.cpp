@@ -17,56 +17,56 @@
 
 #include "exportableaadlconnection.h"
 
-#include "aadlobjectconnection.h"
+#include "aadlconnection.h"
 
 namespace ive {
 
-ExportableAADLConnection::ExportableAADLConnection(const ivm::AADLObjectConnection *connection)
+ExportableAADLConnection::ExportableAADLConnection(const ivm::AADLConnection *connection)
     : ExportableAADLObject(connection)
 {
 }
 
 QString ExportableAADLConnection::sourceName() const
 {
-    return exportedObject<ivm::AADLObjectConnection>()->sourceName();
+    return exportedObject<ivm::AADLConnection>()->sourceName();
 }
 
 QString ExportableAADLConnection::targetName() const
 {
-    return exportedObject<ivm::AADLObjectConnection>()->targetName();
+    return exportedObject<ivm::AADLConnection>()->targetName();
 }
 
 QString ExportableAADLConnection::sourceInterfaceName() const
 {
-    return exportedObject<ivm::AADLObjectConnection>()->sourceInterfaceName();
+    return exportedObject<ivm::AADLConnection>()->sourceInterfaceName();
 }
 
 QString ExportableAADLConnection::targetInterfaceName() const
 {
-    return exportedObject<ivm::AADLObjectConnection>()->targetInterfaceName();
+    return exportedObject<ivm::AADLConnection>()->targetInterfaceName();
 }
 
 bool ExportableAADLConnection::sourceInterfaceIsRequired() const
 {
-    auto o = exportedObject<ivm::AADLObjectConnection>();
+    auto o = exportedObject<ivm::AADLConnection>();
     return o->sourceInterface() ? o->sourceInterface()->isRequired() : false;
 }
 
 bool ExportableAADLConnection::sourceInterfaceIsProvided() const
 {
-    auto o = exportedObject<ivm::AADLObjectConnection>();
+    auto o = exportedObject<ivm::AADLConnection>();
     return o->sourceInterface() ? o->sourceInterface()->isProvided() : false;
 }
 
 bool ExportableAADLConnection::targetInterfaceIsRequired() const
 {
-    auto o = exportedObject<ivm::AADLObjectConnection>();
+    auto o = exportedObject<ivm::AADLConnection>();
     return o->targetInterface() ? o->targetInterface()->isRequired() : false;
 }
 
 bool ExportableAADLConnection::targetInterfaceIsProvided() const
 {
-    auto o = exportedObject<ivm::AADLObjectConnection>();
+    auto o = exportedObject<ivm::AADLConnection>();
     return o->targetInterface() ? o->targetInterface()->isProvided() : false;
 }
 

@@ -18,8 +18,8 @@
 #include "functionattrdelegate.h"
 
 #include "aadlcommonprops.h"
-#include "aadlobjectfunction.h"
-#include "aadlobjectsmodel.h"
+#include "aadlfunction.h"
+#include "aadlmodel.h"
 #include "interface/properties/propertieslistmodel.h"
 
 #include <QComboBox>
@@ -42,7 +42,7 @@ QWidget *FunctionAttrDelegate::createEditor(
                         pModel->data(pModel->index(PropertiesListModel::ColumnTitle, index.row())).toString();
                 const ivm::meta::Props::Token t = ivm::meta::Props::token(attrName);
 
-                auto objFn = qobject_cast<const ivm::AADLObjectFunction *>(pModel->dataObject());
+                auto objFn = qobject_cast<const ivm::AADLFunction *>(pModel->dataObject());
                 Q_ASSERT(objFn);
 
                 switch (t) {

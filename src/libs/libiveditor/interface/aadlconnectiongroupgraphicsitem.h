@@ -20,7 +20,7 @@
 #include "aadlconnectiongraphicsitem.h"
 
 namespace ivm {
-class AADLObjectConnectionGroup;
+class AADLConnectionGroup;
 }
 
 namespace ive {
@@ -30,7 +30,7 @@ class AADLConnectionGroupGraphicsItem : public AADLConnectionGraphicsItem
 {
     Q_OBJECT
 public:
-    explicit AADLConnectionGroupGraphicsItem(ivm::AADLObjectConnectionGroup *connection,
+    explicit AADLConnectionGroupGraphicsItem(ivm::AADLConnectionGroup *connection,
             AADLInterfaceGroupGraphicsItem *ifaceStart, AADLInterfaceGroupGraphicsItem *ifaceEnd,
             QGraphicsItem *parent = nullptr);
 

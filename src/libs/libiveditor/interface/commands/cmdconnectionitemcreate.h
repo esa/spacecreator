@@ -25,9 +25,9 @@
 #include <QVector>
 
 namespace ivm {
-class AADLObjectConnection;
-class AADLObjectFunction;
-class AADLObjectsModel;
+class AADLConnection;
+class AADLFunction;
+class AADLModel;
 }
 
 namespace ive {
@@ -36,7 +36,7 @@ namespace cmd {
 class CmdConnectionItemCreate : public CmdEntityGeometryChange
 {
 public:
-    explicit CmdConnectionItemCreate(ivm::AADLObjectsModel *model, ivm::AADLObjectFunction *parent,
+    explicit CmdConnectionItemCreate(ivm::AADLModel *model, ivm::AADLFunction *parent,
             const shared::Id sourceIfaceId, const shared::Id &targetIfaceId, const QVector<QPointF> &points);
     ~CmdConnectionItemCreate() override;
 
@@ -45,9 +45,9 @@ public:
     int id() const override;
 
 private:
-    QPointer<ivm::AADLObjectsModel> m_model;
-    QPointer<ivm::AADLObjectConnection> m_entity;
-    QPointer<ivm::AADLObjectFunction> m_parent;
+    QPointer<ivm::AADLModel> m_model;
+    QPointer<ivm::AADLConnection> m_entity;
+    QPointer<ivm::AADLFunction> m_parent;
 };
 
 }

@@ -16,7 +16,7 @@
 */
 
 #include "aadlobject.h"
-#include "aadlobjectfunction.h"
+#include "aadlfunction.h"
 #include "aadlxmlreader.h"
 #include "xmlcommon.h"
 
@@ -132,12 +132,12 @@ void XMLReader::test_readFunction()
     QBuffer buffer(&xml);
     buffer.open(QIODevice::ReadOnly | QIODevice::Text);
 
-    ivm::AADLObjectFunction *function = nullptr;
+    ivm::AADLFunction *function = nullptr;
     ivm::AADLXMLReader reader;
     connect(&reader, &ivm::AADLXMLReader::objectsParsed, this,
             [&function](const QVector<ivm::AADLObject *> &objectsList) {
                 QCOMPARE(objectsList.size(), 1);
-                function = qobject_cast<ivm::AADLObjectFunction *>(objectsList[0]);
+                function = qobject_cast<ivm::AADLFunction *>(objectsList[0]);
             });
 
     QSignalSpy spyError(&reader, &ivm::AADLXMLReader::error);

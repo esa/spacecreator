@@ -28,7 +28,7 @@
 namespace ive {
 
 CreateConnectionGroupDialog::CreateConnectionGroupDialog(
-        const QList<ivm::AADLObjectConnectionGroup::CreationInfo> &groupCreationDataList, QWidget *parent)
+        const QList<ivm::AADLConnectionGroup::CreationInfo> &groupCreationDataList, QWidget *parent)
     : QDialog(parent)
     , m_info(groupCreationDataList)
     , m_signalMapper(new QSignalMapper(this))
@@ -39,7 +39,7 @@ CreateConnectionGroupDialog::CreateConnectionGroupDialog(
         }
     });
 
-    auto labelConnection = [](const QList<QPointer<ivm::AADLObjectConnection>> connections) -> QString {
+    auto labelConnection = [](const QList<QPointer<ivm::AADLConnection>> connections) -> QString {
         QStringList result;
         for (const auto &connection : connections) {
             if (connection) {
@@ -60,7 +60,7 @@ CreateConnectionGroupDialog::CreateConnectionGroupDialog(
 
     auto formLayout = new QFormLayout;
     for (int idx = 0; idx < groupCreationDataList.size(); ++idx) {
-        const ivm::AADLObjectConnectionGroup::CreationInfo &info = groupCreationDataList.value(idx);
+        const ivm::AADLConnectionGroup::CreationInfo &info = groupCreationDataList.value(idx);
         auto textEdit = new QPlainTextEdit(this);
         connect(textEdit, &QPlainTextEdit::textChanged, m_signalMapper, qOverload<>(&QSignalMapper::map));
         m_signalMapper->setMapping(textEdit, idx);
@@ -79,7 +79,7 @@ CreateConnectionGroupDialog::CreateConnectionGroupDialog(
 
 CreateConnectionGroupDialog::~CreateConnectionGroupDialog() { }
 
-QList<ivm::AADLObjectConnectionGroup::CreationInfo> CreateConnectionGroupDialog::info() const
+QList<ivm::AADLConnectionGroup::CreationInfo> CreateConnectionGroupDialog::info() const
 {
     return m_info;
 }

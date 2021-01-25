@@ -21,13 +21,13 @@
 #include "commandids.h"
 
 #include <QDebug>
-#include <aadlobjectfunctiontype.h>
-#include <aadlobjectsmodel.h>
+#include <aadlfunctiontype.h>
+#include <aadlmodel.h>
 
 namespace ive {
 namespace cmd {
 
-CmdContextParameterRemove::CmdContextParameterRemove(ivm::AADLObjectFunctionType *entity, int at)
+CmdContextParameterRemove::CmdContextParameterRemove(ivm::AADLFunctionType *entity, int at)
     : QUndoCommand()
     , m_entity(entity)
     , m_params()

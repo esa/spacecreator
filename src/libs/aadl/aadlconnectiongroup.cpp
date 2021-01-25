@@ -15,19 +15,19 @@
    along with this program. If not, see <https://www.gnu.org/licenses/lgpl-2.1.html>.
 */
 
-#include "aadlobjectconnectiongroup.h"
+#include "aadlconnectiongroup.h"
 
-#include "aadlobjectfunctiontype.h"
-#include "aadlobjectifacegroup.h"
-#include "aadlobjectsmodel.h"
+#include "aadlfunctiontype.h"
+#include "aadlifacegroup.h"
+#include "aadlmodel.h"
 
 #include <QtDebug>
 
 namespace ivm {
 
-AADLObjectConnectionGroup::AADLObjectConnectionGroup(const QString &name, AADLObjectIfaceGroup *ifaceSource,
-        AADLObjectIfaceGroup *ifaceTarget, const QList<QPointer<AADLObjectConnection>> &connections, QObject *parent)
-    : AADLObjectConnection(AADLObject::Type::ConnectionGroup, ifaceSource, ifaceTarget, parent)
+AADLConnectionGroup::AADLConnectionGroup(const QString &name, AADLIfaceGroup *ifaceSource,
+        AADLIfaceGroup *ifaceTarget, const QList<QPointer<AADLConnection>> &connections, QObject *parent)
+    : AADLConnection(AADLObject::Type::ConnectionGroup, ifaceSource, ifaceTarget, parent)
 {
     setTitle(name);
     ifaceSource->setGroupName(name);
@@ -38,7 +38,7 @@ AADLObjectConnectionGroup::AADLObjectConnectionGroup(const QString &name, AADLOb
     }
 }
 
-bool AADLObjectConnectionGroup::postInit()
+bool AADLConnectionGroup::postInit()
 {
     if (m_initConnections.isEmpty()) {
         return true;
@@ -55,7 +55,7 @@ bool AADLObjectConnectionGroup::postInit()
     return true;
 }
 
-bool AADLObjectConnectionGroup::aboutToBeRemoved()
+bool AADLConnectionGroup::aboutToBeRemoved()
 {
     if (!m_connections.isEmpty()) {
         m_initConnections.clear();
@@ -68,12 +68,12 @@ bool AADLObjectConnectionGroup::aboutToBeRemoved()
     return true;
 }
 
-QList<QPointer<AADLObjectConnection>> AADLObjectConnectionGroup::groupedConnections() const
+QList<QPointer<AADLConnection>> AADLConnectionGroup::groupedConnections() const
 {
     return m_connections;
 }
 
-QList<QPointer<AADLObjectIface>> AADLObjectConnectionGroup::groupedSourceInterfaces() const
+QList<QPointer<AADLIface>> AADLConnectionGroup::groupedSourceInterfaces() const
 {
     if (auto ifaceGroup = sourceInterfaceGroup())
         return ifaceGroup->entities();
@@ -81,7 +81,7 @@ QList<QPointer<AADLObjectIface>> AADLObjectConnectionGroup::groupedSourceInterfa
     return {};
 }
 
-QList<QPointer<AADLObjectIface>> AADLObjectConnectionGroup::groupedTargetInterfaces() const
+QList<QPointer<AADLIface>> AADLConnectionGroup::groupedTargetInterfaces() const
 {
     if (auto ifaceGroup = targetInterfaceGroup())
         return ifaceGroup->entities();
@@ -89,33 +89,33 @@ QList<QPointer<AADLObjectIface>> AADLObjectConnectionGroup::groupedTargetInterfa
     return {};
 }
 
-QList<AADLObjectIface *> AADLObjectConnectionGroup::sourceFunctionInterfaces() const
+QList<AADLIface *> AADLConnectionGroup::sourceFunctionInterfaces() const
 {
-    if (auto function = qobject_cast<AADLObjectFunctionType *>(source())) {
+    if (auto function = qobject_cast<AADLFunctionType *>(source())) {
         return function->interfaces().toList();
     }
     return {};
 }
 
-QList<AADLObjectIface *> AADLObjectConnectionGroup::targetFunctionInterfaces() const
+QList<AADLIface *> AADLConnectionGroup::targetFunctionInterfaces() const
 {
-    if (auto function = qobject_cast<AADLObjectFunctionType *>(target())) {
+    if (auto function = qobject_cast<AADLFunctionType *>(target())) {
         return function->interfaces().toList();
     }
     return {};
 }
 
-AADLObjectIfaceGroup *AADLObjectConnectionGroup::sourceInterfaceGroup() const
+AADLIfaceGroup *AADLConnectionGroup::sourceInterfaceGroup() const
 {
-    return qobject_cast<AADLObjectIfaceGroup *>(sourceInterface());
+    return qobject_cast<AADLIfaceGroup *>(sourceInterface());
 }
 
-AADLObjectIfaceGroup *AADLObjectConnectionGroup::targetInterfaceGroup() const
+AADLIfaceGroup *AADLConnectionGroup::targetInterfaceGroup() const
 {
-    return qobject_cast<AADLObjectIfaceGroup *>(targetInterface());
+    return qobject_cast<AADLIfaceGroup *>(targetInterface());
 }
 
-void AADLObjectConnectionGroup::addConnection(const QPointer<AADLObjectConnection> &connection)
+void AADLConnectionGroup::addConnection(const QPointer<AADLConnection> &connection)
 {
     if (connection.isNull() || !connection->sourceInterface() || !connection->targetInterface()
             || !sourceInterfaceGroup() || !targetInterfaceGroup() || m_connections.contains(connection)) {
@@ -146,7 +146,7 @@ void AADLObjectConnectionGroup::addConnection(const QPointer<AADLObjectConnectio
     Q_EMIT connectionAdded(connection);
 }
 
-void AADLObjectConnectionGroup::removeConnection(const QPointer<AADLObjectConnection> &connection)
+void AADLConnectionGroup::removeConnection(const QPointer<AADLConnection> &connection)
 {
     if (connection.isNull()) {
         return;
@@ -159,7 +159,7 @@ void AADLObjectConnectionGroup::removeConnection(const QPointer<AADLObjectConnec
     bool removeTargetIface = true;
 
     std::for_each(m_connections.constBegin(), m_connections.constEnd(),
-            [&](const QPointer<AADLObjectConnection> &connectionObj) {
+            [&](const QPointer<AADLConnection> &connectionObj) {
                 if (connectionObj.isNull()) {
                     return;
                 }
@@ -184,7 +184,7 @@ void AADLObjectConnectionGroup::removeConnection(const QPointer<AADLObjectConnec
     Q_EMIT connectionRemoved(connection);
 }
 
-QVariantList AADLObjectConnectionGroup::CreationInfo::toVarList() const
+QVariantList AADLConnectionGroup::CreationInfo::toVarList() const
 {
     return { QVariant::fromValue(*this) };
 }

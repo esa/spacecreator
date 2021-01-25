@@ -25,7 +25,7 @@
 
 namespace ivm {
 class AADLConnectionChain;
-class AADLObjectConnection;
+class AADLConnection;
 }
 
 namespace msc {
@@ -94,7 +94,7 @@ public:
     static Dataflow readDataFlowFromDocument(msc::MscDocument *document);
 
     static bool isInDataflow(const Dataflow &dataflow, const QList<ivm::AADLConnectionChain *> &chains,
-            ivm::AADLObjectConnection *connection);
+            ivm::AADLConnection *connection);
 
 Q_SIGNALS:
     void pathChanged(const QString &path);

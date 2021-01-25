@@ -23,8 +23,8 @@
 #include "commandsfactory.h"
 
 #include <QDebug>
-#include <aadlobjectfunction.h>
-#include <aadlobjectsmodel.h>
+#include <aadlfunction.h>
+#include <aadlmodel.h>
 
 namespace ive {
 namespace cmd {
@@ -43,7 +43,7 @@ static inline QVariantHash getCurrentAttributes(ivm::AADLObject *entity, const Q
 CmdEntityAttributeChange::CmdEntityAttributeChange(ivm::AADLObject *entity, const QVariantHash &attrs)
     : shared::UndoCommand()
     , m_entity(entity)
-    , m_function(m_entity ? m_entity->as<ivm::AADLObjectFunction *>() : nullptr)
+    , m_function(m_entity ? m_entity->as<ivm::AADLFunction *>() : nullptr)
     , m_newAttrs(attrs)
     , m_oldAttrs(getCurrentAttributes(entity, attrs))
 {
@@ -114,7 +114,7 @@ void CmdEntityAttributeChange::setAttrs(const QVariantHash &attrs, bool isRedo)
     }
 }
 
-ivm::AADLObjectFunctionType *CmdEntityAttributeChange::functionTypeByName(const QString &name) const
+ivm::AADLFunctionType *CmdEntityAttributeChange::functionTypeByName(const QString &name) const
 {
     if (name.isEmpty() || !m_function || !m_function->objectsModel())
         return nullptr;
@@ -124,8 +124,8 @@ ivm::AADLObjectFunctionType *CmdEntityAttributeChange::functionTypeByName(const 
 
 void CmdEntityAttributeChange::handleFunctionInstanceOf(const QVariant &attr, bool isRedo)
 {
-    const ivm::AADLObjectFunctionType *oldInstanceOf = m_function->instanceOf();
-    ivm::AADLObjectFunctionType *newInstanceOf = functionTypeByName(attr.toString());
+    const ivm::AADLFunctionType *oldInstanceOf = m_function->instanceOf();
+    ivm::AADLFunctionType *newInstanceOf = functionTypeByName(attr.toString());
     if (oldInstanceOf == newInstanceOf)
         return;
 
@@ -148,9 +148,9 @@ void CmdEntityAttributeChange::handleFunctionInstanceOf(const QVariant &attr, bo
     m_function->setAttr(ivm::meta::Props::token(ivm::meta::Props::Token::instance_of), attr);
 }
 
-Commands getCommands(const ivm::AADLObjectFunctionType *fnType, const CommandsStorage &cmdStorage,
+Commands getCommands(const ivm::AADLFunctionType *fnType, const CommandsStorage &cmdStorage,
         CmdEntityAttributeChange *caller,
-        void (CmdEntityAttributeChange::*prepareMethod)(const ivm::AADLObjectFunctionType *fn))
+        void (CmdEntityAttributeChange::*prepareMethod)(const ivm::AADLFunctionType *fn))
 {
     if (!fnType || !caller || !prepareMethod)
         return {};
@@ -162,12 +162,12 @@ Commands getCommands(const ivm::AADLObjectFunctionType *fnType, const CommandsSt
     return cmdStorage.value(fnTypeId, {});
 }
 
-Commands CmdEntityAttributeChange::commandsUnsetPrevFunctionType(const ivm::AADLObjectFunctionType *fnType)
+Commands CmdEntityAttributeChange::commandsUnsetPrevFunctionType(const ivm::AADLFunctionType *fnType)
 {
     return getCommands(fnType, m_cmdUnset, this, &CmdEntityAttributeChange::prepareUnsetFunctionTypeCommands);
 }
 
-Commands CmdEntityAttributeChange::commandsSetNewFunctionType(const ivm::AADLObjectFunctionType *fnType)
+Commands CmdEntityAttributeChange::commandsSetNewFunctionType(const ivm::AADLFunctionType *fnType)
 {
     return getCommands(fnType, m_cmdSet, this, &CmdEntityAttributeChange::prepareSetFunctionTypeCommands);
 }
@@ -182,7 +182,7 @@ bool useOppositeCommands(CommandsStorage &commands, const CommandsStorage &oppos
     return false;
 }
 
-void CmdEntityAttributeChange::prepareUnsetFunctionTypeCommands(const ivm::AADLObjectFunctionType *fnType)
+void CmdEntityAttributeChange::prepareUnsetFunctionTypeCommands(const ivm::AADLFunctionType *fnType)
 {
     if (!fnType)
         return;
@@ -192,12 +192,12 @@ void CmdEntityAttributeChange::prepareUnsetFunctionTypeCommands(const ivm::AADLO
         return;
 
     Commands &cmdStorage = m_cmdUnset[fnTypeId];
-    const QVector<ivm::AADLObjectIface *> &fnIfaces = m_function->interfaces();
-    const QVector<ivm::AADLObjectIface *> &fnTypeIfaces = fnType->interfaces();
+    const QVector<ivm::AADLIface *> &fnIfaces = m_function->interfaces();
+    const QVector<ivm::AADLIface *> &fnTypeIfaces = fnType->interfaces();
     for (auto fnTypeIface : fnTypeIfaces) {
         for (const auto &clone : fnTypeIface->clones()) {
-            auto found = std::find_if(fnIfaces.cbegin(), fnIfaces.cend(),
-                    [clone](ivm::AADLObjectIface *fnIface) { return clone == fnIface; });
+            auto found = std::find_if(
+                    fnIfaces.cbegin(), fnIfaces.cend(), [clone](ivm::AADLIface *fnIface) { return clone == fnIface; });
 
             if (found != fnIfaces.cend()) {
                 const QVariantList params = { QVariant::fromValue(clone.data()),
@@ -209,7 +209,7 @@ void CmdEntityAttributeChange::prepareUnsetFunctionTypeCommands(const ivm::AADLO
     }
 }
 
-void CmdEntityAttributeChange::prepareSetFunctionTypeCommands(const ivm::AADLObjectFunctionType *fnType)
+void CmdEntityAttributeChange::prepareSetFunctionTypeCommands(const ivm::AADLFunctionType *fnType)
 {
     if (!fnType)
         return;
@@ -220,9 +220,9 @@ void CmdEntityAttributeChange::prepareSetFunctionTypeCommands(const ivm::AADLObj
 
     // Detect an iface which has been just created instead of being properly cloned (the XML file loading).
     // For now it's only a name- and direction-based check. In case there are two or more ifaces with the same name,
-    // the first one found in AADLObjectFunctionType::interfaces is used.
-    auto findExistingClone = [this](ivm::AADLObjectIface *protoIface) -> ivm::AADLObjectIface * {
-        auto mayBeClone = [protoIface](const ivm::AADLObjectIface *iface) {
+    // the first one found in AADLFunctionType::interfaces is used.
+    auto findExistingClone = [this](ivm::AADLIface *protoIface) -> ivm::AADLIface * {
+        auto mayBeClone = [protoIface](const ivm::AADLIface *iface) {
             return iface->direction() == protoIface->direction() && iface->title() == protoIface->title();
         };
 
@@ -235,13 +235,13 @@ void CmdEntityAttributeChange::prepareSetFunctionTypeCommands(const ivm::AADLObj
     };
 
     Commands &cmdStorage = m_cmdSet[fnTypeId];
-    const QVector<ivm::AADLObjectIface *> &fnTypeIfaces = fnType->interfaces();
+    const QVector<ivm::AADLIface *> &fnTypeIfaces = fnType->interfaces();
     for (auto fnTypeIface : fnTypeIfaces) {
-        if (ivm::AADLObjectIface *existingIface = findExistingClone(fnTypeIface)) {
+        if (ivm::AADLIface *existingIface = findExistingClone(fnTypeIface)) {
             existingIface->setCloneOrigin(fnTypeIface);
         } else {
-            const ivm::AADLObjectIface::CreationInfo clone =
-                    ivm::AADLObjectIface::CreationInfo::cloneIface(fnTypeIface, m_function);
+            const ivm::AADLIface::CreationInfo clone =
+                    ivm::AADLIface::CreationInfo::cloneIface(fnTypeIface, m_function);
             if (QUndoCommand *cmdRm = cmd::CommandsFactory::create(cmd::CreateInterfaceEntity, clone.toVarList()))
                 cmdStorage.append(cmdRm);
         }

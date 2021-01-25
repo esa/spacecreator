@@ -26,7 +26,7 @@
 class tst_PositionLookupHelper;
 
 namespace ivm {
-class AADLObjectIface;
+class AADLIface;
 }
 
 namespace ive {
@@ -38,13 +38,13 @@ class AADLInterfaceGraphicsItem : public InteractiveObject
 {
     Q_OBJECT
 public:
-    explicit AADLInterfaceGraphicsItem(ivm::AADLObjectIface *entity, QGraphicsItem *parent = nullptr);
+    explicit AADLInterfaceGraphicsItem(ivm::AADLIface *entity, QGraphicsItem *parent = nullptr);
     enum
     {
         Type = UserType + static_cast<int>(ivm::AADLObject::Type::RequiredInterface) // provided?
     };
 
-    ivm::AADLObjectIface *entity() const;
+    ivm::AADLIface *entity() const;
 
     void init() override;
     int type() const override { return Type; }

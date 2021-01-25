@@ -20,7 +20,7 @@
 #include "aadlcommonprops.h"
 #include "aadlnamevalidator.h"
 #include "aadlobject.h"
-#include "aadlobjectfunction.h"
+#include "aadlfunction.h"
 #include "asn1/file.h"
 #include "commandsstack.h"
 #include "interface/commands/cmdentityattributechange.h"
@@ -65,7 +65,7 @@ void ContextParametersModel::setDataObject(ivm::AADLObject *obj)
     if (!m_dataObject)
         return;
 
-    if (auto func = qobject_cast<ivm::AADLObjectFunctionType *>(m_dataObject)) {
+    if (auto func = qobject_cast<ivm::AADLFunctionType *>(m_dataObject)) {
         const int paramsCount = func->contextParams().size();
 
         beginInsertRows(QModelIndex(), 0, paramsCount);
@@ -239,7 +239,7 @@ Qt::ItemFlags ContextParametersModel::flags(const QModelIndex &index) const
     if (flags.testFlag(Qt::ItemIsEditable) || flags.testFlag(Qt::ItemIsEnabled)) {
         switch (m_dataObject->aadlType()) {
         case ivm::AADLObject::Type::Function: {
-            if (auto fn = m_dataObject->as<const ivm::AADLObjectFunction *>())
+            if (auto fn = m_dataObject->as<const ivm::AADLFunction *>())
                 if (fn->inheritsFunctionType())
                     flags = flags & ~Qt::ItemIsEditable & ~Qt::ItemIsEnabled;
 

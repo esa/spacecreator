@@ -27,8 +27,8 @@
 #include <memory>
 
 namespace ivm {
-class AADLObjectConnection;
-class AADLObjectFunction;
+class AADLConnection;
+class AADLFunction;
 }
 
 namespace shared {
@@ -116,10 +116,10 @@ public:
     void changeMscInstanceName(const QString &oldName, const QString &name);
     void changeMscMessageName(
             const QString &oldName, const QString &newName, const QString &sourceName, const QString &targetName);
-    void removeMscInstances(ivm::AADLObjectFunction *aadlFunction);
-    void removeMscMessages(ivm::AADLObjectConnection *aadlConnection);
-    QList<msc::MscInstance *> correspondingInstances(ivm::AADLObjectFunction *aadlFunction) const;
-    QList<msc::MscMessage *> correspondingMessages(ivm::AADLObjectConnection *aadlConnection) const;
+    void removeMscInstances(ivm::AADLFunction *aadlFunction);
+    void removeMscMessages(ivm::AADLConnection *aadlConnection);
+    QList<msc::MscInstance *> correspondingInstances(ivm::AADLFunction *aadlFunction) const;
+    QList<msc::MscMessage *> correspondingMessages(ivm::AADLConnection *aadlConnection) const;
 
     QString filePath() const override;
     bool save() override;

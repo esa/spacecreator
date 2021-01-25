@@ -26,37 +26,37 @@
 
 namespace ivm {
 
-class AADLObjectFunction;
-class AADLObjectConnection;
-class AADLObjectComment;
-class AADLObjectIface;
-class AADLObjectIfaceGroup;
-class AADLObjectConnectionGroup;
+class AADLFunction;
+class AADLConnection;
+class AADLComment;
+class AADLIface;
+class AADLIfaceGroup;
+class AADLConnectionGroup;
 
-struct AADLObjectFunctionTypePrivate;
+struct AADLFunctionTypePrivate;
 
-class AADLObjectFunctionType : public AADLObject
+class AADLFunctionType : public AADLObject
 {
     Q_OBJECT
 
 public:
-    explicit AADLObjectFunctionType(const QString &title = QString(), QObject *parent = nullptr);
-    ~AADLObjectFunctionType() override;
+    explicit AADLFunctionType(const QString &title = QString(), QObject *parent = nullptr);
+    ~AADLFunctionType() override;
 
     QVector<AADLObject *> children() const;
     bool addChild(AADLObject *child);
     bool removeChild(AADLObject *child);
 
-    QVector<AADLObjectFunctionType *> functionTypes() const;
-    QVector<AADLObjectFunction *> functions() const;
-    QVector<AADLObjectConnection *> connections() const;
-    QVector<AADLObjectConnectionGroup *> connectionGroups() const;
-    QVector<AADLObjectComment *> comments() const;
-    QVector<AADLObjectIface *> interfaces() const;
-    QVector<AADLObjectIface *> allInterfaces() const;
-    QVector<AADLObjectIface *> ris() const;
-    QVector<AADLObjectIface *> pis() const;
-    QVector<AADLObjectIfaceGroup *> interfaceGroups() const;
+    QVector<AADLFunctionType *> functionTypes() const;
+    QVector<AADLFunction *> functions() const;
+    QVector<AADLConnection *> connections() const;
+    QVector<AADLConnectionGroup *> connectionGroups() const;
+    QVector<AADLComment *> comments() const;
+    QVector<AADLIface *> interfaces() const;
+    QVector<AADLIface *> allInterfaces() const;
+    QVector<AADLIface *> ris() const;
+    QVector<AADLIface *> pis() const;
+    QVector<AADLIfaceGroup *> interfaceGroups() const;
     bool hasNestedChildren() const;
     bool hasInterface(const QString &name, Qt::CaseSensitivity caseSensitivity = Qt::CaseInsensitive) const;
 
@@ -67,9 +67,9 @@ public:
     void clearContextParams();
     void setContextParams(const QVector<ContextParameter> &params);
 
-    QVector<QPointer<AADLObjectFunction>> instances() const;
-    void rememberInstance(AADLObjectFunction *function);
-    void forgetInstance(AADLObjectFunction *function);
+    QVector<QPointer<AADLFunction>> instances() const;
+    void rememberInstance(AADLFunction *function);
+    void forgetInstance(AADLFunction *function);
 
 Q_SIGNALS:
     void contextParamsChanged();
@@ -77,13 +77,13 @@ Q_SIGNALS:
     void childRemoved(const shared::Id &id);
 
 protected:
-    explicit AADLObjectFunctionType(
+    explicit AADLFunctionType(
             const AADLObject::Type t, const QString &title = QString(), QObject *parent = nullptr);
 
 private:
-    const std::unique_ptr<AADLObjectFunctionTypePrivate> d;
+    const std::unique_ptr<AADLFunctionTypePrivate> d;
 };
 
-typedef QVector<AADLObjectFunctionType *> AADLFunctionTypeVector;
+typedef QVector<AADLFunctionType *> AADLFunctionTypeVector;
 
 }

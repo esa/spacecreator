@@ -15,8 +15,8 @@
    along with this program. If not, see <https://www.gnu.org/licenses/lgpl-2.1.html>.
 */
 
-#include "aadlobjectfunction.h"
-#include "aadlobjectiface.h"
+#include "aadlfunction.h"
+#include "aadliface.h"
 #include "baseitems/common/aadlutils.h"
 #include "baseitems/common/positionlookuphelper.h"
 #include "interface/aadlfunctiongraphicsitem.h"
@@ -45,8 +45,8 @@ private Q_SLOTS:
 private:
     QHash<Qt::Alignment, QPainterPath> sidePaths;
     QGraphicsScene *scene = nullptr;
-    ivm::AADLObjectFunction *function = nullptr;
-    ivm::AADLObjectIfaceProvided *iface = nullptr;
+    ivm::AADLFunction *function = nullptr;
+    ivm::AADLIfaceProvided *iface = nullptr;
     ive::AADLFunctionGraphicsItem *functionItem = nullptr;
     ive::AADLInterfaceGraphicsItem *ifaceItem = nullptr;
 };
@@ -85,13 +85,13 @@ void tst_PositionLookupHelper::testOnSide(
 void tst_PositionLookupHelper::initTestCase()
 {
     scene = new QGraphicsScene;
-    function = new ivm::AADLObjectFunction("Function");
+    function = new ivm::AADLFunction("Function");
     functionItem = new ive::AADLFunctionGraphicsItem(function);
     scene->addItem(functionItem);
     functionItem->setBoundingRect(QRectF(0, 0, 500, 500));
-    ivm::AADLObjectIface::CreationInfo ci;
+    ivm::AADLIface::CreationInfo ci;
     ci.name = "PI";
-    iface = new ivm::AADLObjectIfaceProvided(ci);
+    iface = new ivm::AADLIfaceProvided(ci);
     ifaceItem = new ive::AADLInterfaceGraphicsItem(iface, functionItem);
     ifaceItem->updateLabel();
 

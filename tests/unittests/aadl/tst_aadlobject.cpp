@@ -17,8 +17,8 @@
 
 #include "aadlcommonprops.h"
 #include "aadlobject.h"
-#include "aadlobjectfunction.h"
-#include "aadlobjectsmodel.h"
+#include "aadlfunction.h"
+#include "aadlmodel.h"
 #include "propertytemplateconfig.h"
 
 #include <QSignalSpy>
@@ -124,11 +124,11 @@ void tst_AADLObject::test_coordinatesType()
 {
     ivm::PropertyTemplateConfig *dynPropConfig = ivm::PropertyTemplateConfig::instance();
     dynPropConfig->init(QLatin1String("default_attributes.xml"));
-    ivm::AADLObjectsModel model(dynPropConfig);
+    ivm::AADLModel model(dynPropConfig);
 
-    ivm::AADLObjectFunction fn1("Fn1");
-    ivm::AADLObjectFunction fn2("Fn2", &fn1);
-    ivm::AADLObjectFunction fn3("Fn3", &fn2);
+    ivm::AADLFunction fn1("Fn1");
+    ivm::AADLFunction fn2("Fn2", &fn1);
+    ivm::AADLFunction fn3("Fn3", &fn2);
 
     const QVector<ivm::AADLObject *> objects { &fn1, &fn2, &fn3 };
 

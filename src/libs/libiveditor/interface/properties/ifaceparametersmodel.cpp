@@ -18,7 +18,7 @@
 #include "ifaceparametersmodel.h"
 
 #include "aadlobject.h"
-#include "aadlobjectiface.h"
+#include "aadliface.h"
 #include "commandsstack.h"
 #include "propertytemplate.h"
 #include "propertytemplateconfig.h"
@@ -62,7 +62,7 @@ void IfaceParametersModel::setDataObject(ivm::AADLObject *obj)
     if (!m_dataObject)
         return;
 
-    if (auto iface = qobject_cast<ivm::AADLObjectIface *>(m_dataObject)) {
+    if (auto iface = qobject_cast<ivm::AADLIface *>(m_dataObject)) {
         const QVector<ivm::IfaceParameter> &params(iface->params());
         const int paramsCount = params.size();
 
@@ -242,10 +242,10 @@ Qt::ItemFlags IfaceParametersModel::flags(const QModelIndex &index) const
 {
     Qt::ItemFlags flags = PropertiesModelBase::flags(index);
     if (m_dataObject)
-        if (auto iface = m_dataObject->as<const ivm::AADLObjectIface *>()) {
+        if (auto iface = m_dataObject->as<const ivm::AADLIface *>()) {
             if (iface->isClone()) {
                 flags = flags & ~Qt::ItemIsEditable & ~Qt::ItemIsEnabled;
-            } else if (auto ri = iface->as<const ivm::AADLObjectIfaceRequired *>()) {
+            } else if (auto ri = iface->as<const ivm::AADLIfaceRequired *>()) {
                 if (ri->hasPrototypePi())
                     flags = flags & ~Qt::ItemIsEditable & ~Qt::ItemIsEnabled;
             }

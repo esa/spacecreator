@@ -17,15 +17,15 @@
 
 #include "cmdifacedatachangebase.h"
 
-#include "aadlobjectconnection.h"
-#include "aadlobjectiface.h"
-#include "aadlobjectsmodel.h"
+#include "aadlconnection.h"
+#include "aadliface.h"
+#include "aadlmodel.h"
 #include "commandsfactory.h"
 
 namespace ive {
 namespace cmd {
 
-CmdIfaceDataChangeBase::CmdIfaceDataChangeBase(ivm::AADLObjectIface *iface, const QString &targetName,
+CmdIfaceDataChangeBase::CmdIfaceDataChangeBase(ivm::AADLIface *iface, const QString &targetName,
         const QVariant &targetValue, const QVariant &prevValue, QUndoCommand *parent)
     : shared::UndoCommand(parent)
     , m_iface(iface)
@@ -45,9 +45,9 @@ CmdIfaceDataChangeBase::~CmdIfaceDataChangeBase()
     qDeleteAll(m_cmdRmConnection);
 }
 
-QVector<QPointer<ivm::AADLObjectIface>> CmdIfaceDataChangeBase::getRelatedIfaces()
+QVector<QPointer<ivm::AADLIface>> CmdIfaceDataChangeBase::getRelatedIfaces()
 {
-    QVector<QPointer<ivm::AADLObjectIface>> ifaces;
+    QVector<QPointer<ivm::AADLIface>> ifaces;
 
     if (m_iface) {
         ifaces.append(m_iface);
@@ -58,9 +58,9 @@ QVector<QPointer<ivm::AADLObjectIface>> CmdIfaceDataChangeBase::getRelatedIfaces
     return ifaces;
 }
 
-QVector<ivm::AADLObjectConnection *> CmdIfaceDataChangeBase::getRelatedConnections()
+QVector<ivm::AADLConnection *> CmdIfaceDataChangeBase::getRelatedConnections()
 {
-    QVector<ivm::AADLObjectConnection *> affected;
+    QVector<ivm::AADLConnection *> affected;
 
     if (m_iface && m_model)
         for (const auto &i : getRelatedIfaces())
@@ -69,24 +69,24 @@ QVector<ivm::AADLObjectConnection *> CmdIfaceDataChangeBase::getRelatedConnectio
     return affected;
 }
 
-ivm::AADLObjectIface *CmdIfaceDataChangeBase::interface() const
+ivm::AADLIface *CmdIfaceDataChangeBase::interface() const
 {
     return m_iface;
 }
 
-ivm::AADLObjectIface *CmdIfaceDataChangeBase::getConnectionOtherSide(
-        const ivm::AADLObjectConnection *connection, ivm::AADLObjectIface *changedIface)
+ivm::AADLIface *CmdIfaceDataChangeBase::getConnectionOtherSide(
+        const ivm::AADLConnection *connection, ivm::AADLIface *changedIface)
 {
     if (connection && changedIface) {
         switch (connection->connectionType()) {
-        case ivm::AADLObjectConnection::ConnectionType::RI2PI: {
+        case ivm::AADLConnection::ConnectionType::RI2PI: {
             return changedIface->isRequired() ? connection->targetInterface() : changedIface;
         }
-        case ivm::AADLObjectConnection::ConnectionType::PI2RI: {
+        case ivm::AADLConnection::ConnectionType::PI2RI: {
             return changedIface->isProvided() ? connection->targetInterface() : changedIface;
         }
-        case ivm::AADLObjectConnection::ConnectionType::PI2PI:
-        case ivm::AADLObjectConnection::ConnectionType::RI2RI: {
+        case ivm::AADLConnection::ConnectionType::PI2PI:
+        case ivm::AADLConnection::ConnectionType::RI2RI: {
             if (connection->sourceInterface() == changedIface
                     || connection->sourceInterface()->cloneOf() == changedIface) {
                 return connection->targetInterface();

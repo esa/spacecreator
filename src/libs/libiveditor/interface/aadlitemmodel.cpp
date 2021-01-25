@@ -17,12 +17,12 @@
 
 #include "aadlitemmodel.h"
 
-#include "aadlobjectcomment.h"
-#include "aadlobjectconnection.h"
-#include "aadlobjectconnectiongroup.h"
-#include "aadlobjectfunction.h"
-#include "aadlobjectiface.h"
-#include "aadlobjectifacegroup.h"
+#include "aadlcomment.h"
+#include "aadlconnection.h"
+#include "aadlconnectiongroup.h"
+#include "aadlfunction.h"
+#include "aadliface.h"
+#include "aadlifacegroup.h"
 #include "baseitems/common/aadlutils.h"
 #include "commands/commandids.h"
 #include "commands/commandsfactory.h"
@@ -96,7 +96,7 @@ static inline void dumpItem(QObject *obj, bool strict = false)
 
 namespace ive {
 
-AADLItemModel::AADLItemModel(ivm::AADLObjectsModel *model, QObject *parent)
+AADLItemModel::AADLItemModel(ivm::AADLModel *model, QObject *parent)
     : QObject(parent)
     , m_model(model)
     , m_graphicsScene(new InterfaceTabGraphicsScene(this))
@@ -107,10 +107,10 @@ AADLItemModel::AADLItemModel(ivm::AADLObjectsModel *model, QObject *parent)
         m_desktopGeometry = QGuiApplication::primaryScreen()->availableGeometry();
     }
 
-    connect(m_model, &ivm::AADLObjectsModel::modelReset, this, &AADLItemModel::clearScene);
-    connect(m_model, &ivm::AADLObjectsModel::rootObjectChanged, this, &AADLItemModel::onRootObjectChanged);
-    connect(m_model, &ivm::AADLObjectsModel::aadlObjectsAdded, this, &AADLItemModel::onAADLObjectsAdded);
-    connect(m_model, &ivm::AADLObjectsModel::aadlObjectRemoved, this, &AADLItemModel::onAADLObjectRemoved);
+    connect(m_model, &ivm::AADLModel::modelReset, this, &AADLItemModel::clearScene);
+    connect(m_model, &ivm::AADLModel::rootObjectChanged, this, &AADLItemModel::onRootObjectChanged);
+    connect(m_model, &ivm::AADLModel::aadlObjectsAdded, this, &AADLItemModel::onAADLObjectsAdded);
+    connect(m_model, &ivm::AADLModel::aadlObjectRemoved, this, &AADLItemModel::onAADLObjectRemoved);
 
     connect(m_graphicsScene, &QGraphicsScene::selectionChanged, this, &AADLItemModel::onSceneSelectionChanged);
 
@@ -148,10 +148,10 @@ void AADLItemModel::onAADLObjectAdded(ivm::AADLObject *object)
     auto item = m_items.value(object->id());
     if (!item) {
         item = createItemForObject(object);
-        if (const auto connectionGroupObject = qobject_cast<ivm::AADLObjectConnectionGroup *>(object)) {
-            connect(connectionGroupObject, &ivm::AADLObjectConnectionGroup::connectionAdded, this,
+        if (const auto connectionGroupObject = qobject_cast<ivm::AADLConnectionGroup *>(object)) {
+            connect(connectionGroupObject, &ivm::AADLConnectionGroup::connectionAdded, this,
                     &AADLItemModel::onConnectionAddedToGroup, Qt::UniqueConnection);
-            connect(connectionGroupObject, &ivm::AADLObjectConnectionGroup::connectionRemoved, this,
+            connect(connectionGroupObject, &ivm::AADLConnectionGroup::connectionRemoved, this,
                     &AADLItemModel::onConnectionRemovedFromGroup, Qt::UniqueConnection);
 
             for (auto groupedConnectionObject : connectionGroupObject->groupedConnections()) {
@@ -181,7 +181,7 @@ void AADLItemModel::onAADLObjectAdded(ivm::AADLObject *object)
                     clickable, &InteractiveObject::doubleClicked, this,
                     [this, clickable]() {
                         if (auto entity = clickable->aadlObject()) {
-                            if (auto function = qobject_cast<ivm::AADLObjectFunction *>(entity)) {
+                            if (auto function = qobject_cast<ivm::AADLFunction *>(entity)) {
                                 if (function->hasNestedChildren() && !function->isRootObject()) {
                                     changeRootItem(function->id());
                                     return;
@@ -238,19 +238,19 @@ void AADLItemModel::onAADLObjectRemoved(ivm::AADLObject *object)
     scheduleInterfaceTextUpdate();
 }
 
-void AADLItemModel::onConnectionAddedToGroup(ivm::AADLObjectConnection *connection)
+void AADLItemModel::onConnectionAddedToGroup(ivm::AADLConnection *connection)
 {
-    auto connectionGroupObject = qobject_cast<ivm::AADLObjectConnectionGroup *>(sender());
+    auto connectionGroupObject = qobject_cast<ivm::AADLConnectionGroup *>(sender());
     if (!connectionGroupObject) {
         connectionGroupObject =
-                qobject_cast<ivm::AADLObjectConnectionGroup *>(m_model->getObjectByName(connection->groupName()));
+                qobject_cast<ivm::AADLConnectionGroup *>(m_model->getObjectByName(connection->groupName()));
         if (!connectionGroupObject) {
             return;
         }
     }
 
-    auto handleIface = [this](ivm::AADLObjectConnection *connection,
-                               ivm::AADLObjectIfaceGroup *connectionGroupEndPoint) {
+    auto handleIface = [this](ivm::AADLConnection *connection,
+                               ivm::AADLIfaceGroup *connectionGroupEndPoint) {
         auto ifaceObject = connectionGroupEndPoint->function()->id() == connection->source()->id()
                 ? connection->sourceInterface()
                 : connectionGroupEndPoint->function()->id() == connection->target()->id()
@@ -275,12 +275,12 @@ void AADLItemModel::onConnectionAddedToGroup(ivm::AADLObjectConnection *connecti
     onAADLObjectRemoved(connection->targetInterface());
 }
 
-void AADLItemModel::onConnectionRemovedFromGroup(ivm::AADLObjectConnection *connection)
+void AADLItemModel::onConnectionRemovedFromGroup(ivm::AADLConnection *connection)
 {
-    auto connectionGroupObject = qobject_cast<ivm::AADLObjectConnectionGroup *>(sender());
+    auto connectionGroupObject = qobject_cast<ivm::AADLConnectionGroup *>(sender());
     if (!connectionGroupObject) {
         connectionGroupObject =
-                qobject_cast<ivm::AADLObjectConnectionGroup *>(m_model->getObjectByName(connection->groupName()));
+                qobject_cast<ivm::AADLConnectionGroup *>(m_model->getObjectByName(connection->groupName()));
         if (!connectionGroupObject) {
             return;
         }
@@ -290,8 +290,8 @@ void AADLItemModel::onConnectionRemovedFromGroup(ivm::AADLObjectConnection *conn
     onAADLObjectAdded(connection->sourceInterface());
     onAADLObjectAdded(connection);
 
-    auto handleIface = [this](ivm::AADLObjectConnection *connection,
-                               ivm::AADLObjectIfaceGroup *connectionGroupEndPoint) {
+    auto handleIface = [this](ivm::AADLConnection *connection,
+                               ivm::AADLIfaceGroup *connectionGroupEndPoint) {
         auto ifaceObject = connectionGroupEndPoint->function()->id() == connection->source()->id()
                 ? connection->sourceInterface()
                 : connectionGroupEndPoint->function()->id() == connection->target()->id()
@@ -390,8 +390,8 @@ void AADLItemModel::setupInnerGeometry(ivm::AADLObject *obj) const
     if (innerCoord.isValid()) {
         return;
     }
-    ivm::AADLObjectFunctionType *parentObj =
-            obj->parentObject() ? obj->parentObject()->as<ivm::AADLObjectFunctionType *>() : nullptr;
+    ivm::AADLFunctionType *parentObj =
+            obj->parentObject() ? obj->parentObject()->as<ivm::AADLFunctionType *>() : nullptr;
     if (!parentObj) {
         return;
     }
@@ -476,7 +476,7 @@ T AADLItemModel::getItem(const shared::Id id) const
     return qgraphicsitem_cast<T>(m_items.value(id));
 }
 
-ivm::AADLObjectsModel *AADLItemModel::objectsModel() const
+ivm::AADLModel *AADLItemModel::objectsModel() const
 {
     return m_model;
 }
@@ -523,30 +523,30 @@ QGraphicsItem *AADLItemModel::createItemForObject(ivm::AADLObject *obj)
     InteractiveObject *iObj = nullptr;
     switch (obj->aadlType()) {
     case ivm::AADLObject::Type::Comment: {
-        auto comment = new AADLCommentGraphicsItem(qobject_cast<ivm::AADLObjectComment *>(obj), parentItem);
+        auto comment = new AADLCommentGraphicsItem(qobject_cast<ivm::AADLComment *>(obj), parentItem);
         connect(comment, &shared::ui::InteractiveObjectBase::boundingBoxChanged, this,
                 &AADLItemModel::scheduleInterfaceTextUpdate);
         nestedGeomtryConnect(parentItem, comment);
         iObj = comment;
     } break;
     case ivm::AADLObject::Type::InterfaceGroup:
-        iObj = new AADLInterfaceGroupGraphicsItem(qobject_cast<ivm::AADLObjectIfaceGroup *>(obj), parentItem);
+        iObj = new AADLInterfaceGroupGraphicsItem(qobject_cast<ivm::AADLIfaceGroup *>(obj), parentItem);
         break;
     case ivm::AADLObject::Type::RequiredInterface:
     case ivm::AADLObject::Type::ProvidedInterface: {
-        auto ifItem = new AADLInterfaceGraphicsItem(qobject_cast<ivm::AADLObjectIface *>(obj), parentItem);
+        auto ifItem = new AADLInterfaceGraphicsItem(qobject_cast<ivm::AADLIface *>(obj), parentItem);
         connect(ifItem, &shared::ui::InteractiveObjectBase::boundingBoxChanged, this,
                 &AADLItemModel::scheduleInterfaceTextUpdate);
         iObj = ifItem;
         break;
     }
     case ivm::AADLObject::Type::ConnectionGroup:
-        if (auto connection = qobject_cast<ivm::AADLObjectConnectionGroup *>(obj)) {
-            ivm::AADLObjectIface *ifaceStart = connection->sourceInterface();
+        if (auto connection = qobject_cast<ivm::AADLConnectionGroup *>(obj)) {
+            ivm::AADLIface *ifaceStart = connection->sourceInterface();
             auto startItem = qgraphicsitem_cast<AADLInterfaceGraphicsItem *>(
                     ifaceStart ? m_items.value(ifaceStart->id()) : nullptr);
 
-            ivm::AADLObjectIface *ifaceEnd = connection->targetInterface();
+            ivm::AADLIface *ifaceEnd = connection->targetInterface();
             auto endItem =
                     qgraphicsitem_cast<AADLInterfaceGraphicsItem *>(ifaceEnd ? m_items.value(ifaceEnd->id()) : nullptr);
 
@@ -556,12 +556,12 @@ QGraphicsItem *AADLItemModel::createItemForObject(ivm::AADLObject *obj)
         }
         break;
     case ivm::AADLObject::Type::Connection:
-        if (auto connection = qobject_cast<ivm::AADLObjectConnection *>(obj)) {
-            ivm::AADLObjectIface *ifaceStart = connection->sourceInterface();
+        if (auto connection = qobject_cast<ivm::AADLConnection *>(obj)) {
+            ivm::AADLIface *ifaceStart = connection->sourceInterface();
             auto startItem = qgraphicsitem_cast<AADLInterfaceGraphicsItem *>(
                     ifaceStart ? m_items.value(ifaceStart->id()) : nullptr);
 
-            ivm::AADLObjectIface *ifaceEnd = connection->targetInterface();
+            ivm::AADLIface *ifaceEnd = connection->targetInterface();
             auto endItem =
                     qgraphicsitem_cast<AADLInterfaceGraphicsItem *>(ifaceEnd ? m_items.value(ifaceEnd->id()) : nullptr);
 
@@ -569,7 +569,7 @@ QGraphicsItem *AADLItemModel::createItemForObject(ivm::AADLObject *obj)
         }
         break;
     case ivm::AADLObject::Type::Function: {
-        auto function = new AADLFunctionGraphicsItem(qobject_cast<ivm::AADLObjectFunction *>(obj), parentItem);
+        auto function = new AADLFunctionGraphicsItem(qobject_cast<ivm::AADLFunction *>(obj), parentItem);
         connect(function, &shared::ui::InteractiveObjectBase::boundingBoxChanged, this,
                 &AADLItemModel::scheduleInterfaceTextUpdate);
         nestedGeomtryConnect(parentItem, function);
@@ -577,7 +577,7 @@ QGraphicsItem *AADLItemModel::createItemForObject(ivm::AADLObject *obj)
     } break;
     case ivm::AADLObject::Type::FunctionType: {
         auto functionType =
-                new AADLFunctionTypeGraphicsItem(qobject_cast<ivm::AADLObjectFunctionType *>(obj), parentItem);
+                new AADLFunctionTypeGraphicsItem(qobject_cast<ivm::AADLFunctionType *>(obj), parentItem);
         connect(functionType, &shared::ui::InteractiveObjectBase::boundingBoxChanged, this,
                 &AADLItemModel::scheduleInterfaceTextUpdate);
         nestedGeomtryConnect(parentItem, functionType);

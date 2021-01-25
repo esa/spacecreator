@@ -19,11 +19,11 @@
 
 #include "aadlfunctiongraphicsitem.h"
 #include "aadlitemmodel.h"
-#include "aadlobjectcomment.h"
-#include "aadlobjectconnection.h"
-#include "aadlobjectconnectiongroup.h"
-#include "aadlobjectfunction.h"
-#include "aadlobjectsmodel.h"
+#include "aadlcomment.h"
+#include "aadlconnection.h"
+#include "aadlconnectiongroup.h"
+#include "aadlfunction.h"
+#include "aadlmodel.h"
 #include "aadlxmlreader.h"
 #include "actionsbar.h"
 #include "asn1modelstorage.h"
@@ -95,11 +95,11 @@ struct InterfaceDocument::InterfaceDocumentPrivate {
     AADLItemModel *itemsModel { nullptr };
     CommonVisualizationModel *objectsVisualizationModel { nullptr };
     QItemSelectionModel *objectsSelectionModel { nullptr };
-    ivm::AADLObjectsModel *objectsModel { nullptr };
+    ivm::AADLModel *objectsModel { nullptr };
     AADLObjectsTreeView *importView { nullptr };
-    ivm::AADLObjectsModel *importModel { nullptr };
+    ivm::AADLModel *importModel { nullptr };
     AADLObjectsTreeView *sharedView { nullptr };
-    ivm::AADLObjectsModel *sharedModel { nullptr };
+    ivm::AADLModel *sharedModel { nullptr };
 
     QAction *actCreateConnectionGroup { nullptr };
     QAction *actRemove { nullptr };
@@ -131,9 +131,9 @@ InterfaceDocument::InterfaceDocument(QObject *parent)
     d->dynPropConfig = ivm::PropertyTemplateConfig::instance();
     d->dynPropConfig->init(PropertyTemplateWidget::dynamicPropertiesFilePath());
 
-    d->importModel = new ivm::AADLObjectsModel(d->dynPropConfig, this);
-    d->sharedModel = new ivm::AADLObjectsModel(d->dynPropConfig, this);
-    d->objectsModel = new ivm::AADLObjectsModel(d->dynPropConfig, this);
+    d->importModel = new ivm::AADLModel(d->dynPropConfig, this);
+    d->sharedModel = new ivm::AADLModel(d->dynPropConfig, this);
+    d->objectsModel = new ivm::AADLModel(d->dynPropConfig, this);
     d->objectsModel->setSharedTypesModel(d->sharedModel);
 
     connect(d->asnDataTypes, &Asn1Acn::Asn1ModelStorage::dataTypesChanged, this, [&](const QString &fileName) {
@@ -329,7 +329,7 @@ QList<ivm::AADLObject *> InterfaceDocument::prepareSelectedObjectsForExport(QStr
 
     name = getComponentName(exportNames);
     if (exportNames.size() > 1) {
-        ivm::AADLObjectFunction *dummyFunction = new ivm::AADLObjectFunction(name);
+        ivm::AADLFunction *dummyFunction = new ivm::AADLFunction(name);
         for (auto object : objects) {
             if (!object->parentObject()) {
                 dummyFunction->addChild(object);
@@ -381,7 +381,7 @@ bool InterfaceDocument::exportSelectedType()
     return false;
 }
 
-bool InterfaceDocument::loadComponentModel(ivm::AADLObjectsModel *model, const QString &path)
+bool InterfaceDocument::loadComponentModel(ivm::AADLModel *model, const QString &path)
 {
     if (path.isEmpty() || !QFileInfo::exists(path)) {
         qWarning() << Q_FUNC_INFO << "Invalid path";
@@ -389,7 +389,7 @@ bool InterfaceDocument::loadComponentModel(ivm::AADLObjectsModel *model, const Q
     }
 
     ivm::AADLXMLReader parser;
-    connect(&parser, &ivm::AADLXMLReader::objectsParsed, model, &ivm::AADLObjectsModel::addObjects);
+    connect(&parser, &ivm::AADLXMLReader::objectsParsed, model, &ivm::AADLModel::addObjects);
     connect(&parser, &ivm::AADLXMLReader::error, [](const QString &msg) { qWarning() << msg; });
 
     return parser.readFile(path);
@@ -526,12 +526,12 @@ const QHash<shared::Id, ivm::AADLObject *> &InterfaceDocument::objects() const
     return d->objectsModel->objects();
 }
 
-ivm::AADLObjectsModel *InterfaceDocument::objectsModel() const
+ivm::AADLModel *InterfaceDocument::objectsModel() const
 {
     return d->objectsModel;
 }
 
-ivm::AADLObjectsModel *InterfaceDocument::importModel() const
+ivm::AADLModel *InterfaceDocument::importModel() const
 {
     return d->importModel;
 }
@@ -556,7 +556,7 @@ QString InterfaceDocument::supportedFileExtensions() const
    \param interface
    \return
  */
-bool InterfaceDocument::checkInterfaceAsn1Compliance(const ivm::AADLObjectIface *interface) const
+bool InterfaceDocument::checkInterfaceAsn1Compliance(const ivm::AADLIface *interface) const
 {
     if (!d->asnDataTypes) {
         return true;
@@ -584,7 +584,7 @@ bool InterfaceDocument::checkAllInterfacesForAsn1Compliance()
     QStringList faultyInterfaces;
 
     bool ok = true;
-    for (ivm::AADLObjectIface *interface : d->objectsModel->allObjectsByType<ivm::AADLObjectIface>()) {
+    for (ivm::AADLIface *interface : d->objectsModel->allObjectsByType<ivm::AADLIface>()) {
         if (!checkInterfaceAsn1Compliance(interface)) {
             ok = false;
             const QString id = QString("%1.%2").arg(
@@ -693,7 +693,7 @@ void InterfaceDocument::importEntity(const shared::Id &id, const QPointF &sceneD
         return;
     }
     const auto existingFunctionNames = d->objectsModel->nestedFunctionNames();
-    const auto intersectedNames = d->importModel->nestedFunctionNames(obj->as<const ivm::AADLObjectFunctionType *>())
+    const auto intersectedNames = d->importModel->nestedFunctionNames(obj->as<const ivm::AADLFunctionType *>())
                                           .intersect(existingFunctionNames);
     if (!intersectedNames.isEmpty()) {
         QMessageBox::critical(view()->window(), tr("Entity importing"),
@@ -706,7 +706,7 @@ void InterfaceDocument::importEntity(const shared::Id &id, const QPointF &sceneD
     while (itemAtScenePos && itemAtScenePos->type() != AADLFunctionGraphicsItem::Type) {
         itemAtScenePos = itemAtScenePos->parentItem();
     }
-    ivm::AADLObjectFunctionType *parentObject = gi::functionObject(itemAtScenePos);
+    ivm::AADLFunctionType *parentObject = gi::functionObject(itemAtScenePos);
     const QVariantList params = { QVariant::fromValue(obj), QVariant::fromValue(parentObject),
         QVariant::fromValue(d->objectsModel), QVariant::fromValue(sceneDropPoint) };
     if (QUndoCommand *cmdImport = cmd::CommandsFactory::create(cmd::ImportEntities, params)) {
@@ -724,8 +724,8 @@ void InterfaceDocument::instantiateEntity(const shared::Id &id, const QPointF &s
     while (itemAtScenePos && itemAtScenePos->type() != AADLFunctionGraphicsItem::Type) {
         itemAtScenePos = itemAtScenePos->parentItem();
     }
-    ivm::AADLObjectFunctionType *parentObject = gi::functionObject(itemAtScenePos);
-    const QVariantList params = { QVariant::fromValue(obj->as<ivm::AADLObjectFunctionType *>()),
+    ivm::AADLFunctionType *parentObject = gi::functionObject(itemAtScenePos);
+    const QVariantList params = { QVariant::fromValue(obj->as<ivm::AADLFunctionType *>()),
         QVariant::fromValue(parentObject), QVariant::fromValue(d->objectsModel), QVariant::fromValue(sceneDropPoint) };
     if (QUndoCommand *cmdInstantiate = cmd::CommandsFactory::create(cmd::InstantiateEntities, params)) {
         cmd::CommandsStack::push(cmdInstantiate);
@@ -944,7 +944,7 @@ QVector<QAction *> InterfaceDocument::initActions()
         actCreateRequiredInterface, actCreateComment, actCreateConnection, d->actCreateConnectionGroup, d->actRemove,
         d->actZoomIn, d->actZoomOut, d->actExitToRoot, d->actExitToParent };
 
-    connect(d->objectsModel, &ivm::AADLObjectsModel::rootObjectChanged, this, [this]() {
+    connect(d->objectsModel, &ivm::AADLModel::rootObjectChanged, this, [this]() {
         if (d->actExitToRoot) {
             d->actExitToRoot->setEnabled(nullptr != d->objectsModel->rootObject());
         }

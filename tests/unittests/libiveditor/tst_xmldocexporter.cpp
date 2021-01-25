@@ -15,8 +15,8 @@
    along with this program. If not, see <https://www.gnu.org/licenses/lgpl-2.1.html>.
 */
 
-#include "aadlobjectcomment.h"
-#include "aadlobjectfunction.h"
+#include "aadlcomment.h"
+#include "aadlfunction.h"
 #include "aadlparameter.h"
 #include "asn1modelstorage.h"
 #include "interface/interfacedocument.h"
@@ -93,7 +93,7 @@ void tst_XmlDocExporter::testExportEmptyDoc()
 
 void tst_XmlDocExporter::testExportFunctions()
 {
-    auto testfunc1 = new ivm::AADLObjectFunction("TestFunc1", m_doc.get());
+    auto testfunc1 = new ivm::AADLFunction("TestFunc1", m_doc.get());
     testfunc1->setAttr("foo", QVariant::fromValue(11));
     testfunc1->setProp("bar", QVariant::fromValue(22));
     testfunc1->addContextParam(
@@ -125,7 +125,7 @@ void tst_XmlDocExporter::testExportFunctions()
 
 void tst_XmlDocExporter::testExportComment()
 {
-    auto testcomment1 = new ivm::AADLObjectComment("TestComment1", m_doc.get());
+    auto testcomment1 = new ivm::AADLComment("TestComment1", m_doc.get());
     testcomment1->setAttr("foo", QVariant::fromValue(11));
     testcomment1->setProperty("bar", QVariant::fromValue(22)); // ignored for comment
 
@@ -147,8 +147,8 @@ void tst_XmlDocExporter::testExportComment()
 
 void tst_XmlDocExporter::testExportNestedComment()
 {
-    auto testfunc1 = new ivm::AADLObjectFunction("TestFunc1", m_doc.get());
-    auto testcomment1 = new ivm::AADLObjectComment("TestComment1", testfunc1);
+    auto testfunc1 = new ivm::AADLFunction("TestFunc1", m_doc.get());
+    auto testcomment1 = new ivm::AADLComment("TestComment1", testfunc1);
     testfunc1->addChild(testcomment1);
 
     QVector<ivm::AADLObject *> objects;

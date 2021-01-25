@@ -23,7 +23,7 @@
 #include <QScopedPointer>
 
 namespace ivm {
-class AADLObjectComment;
+class AADLComment;
 }
 
 namespace ive {
@@ -33,7 +33,7 @@ class AADLCommentGraphicsItem : public AADLRectGraphicsItem
     Q_OBJECT
 
 public:
-    explicit AADLCommentGraphicsItem(ivm::AADLObjectComment *comment, QGraphicsItem *parent = nullptr);
+    explicit AADLCommentGraphicsItem(ivm::AADLComment *comment, QGraphicsItem *parent = nullptr);
     enum
     {
         Type = UserType + static_cast<int>(ivm::AADLObject::Type::Comment)
@@ -45,7 +45,7 @@ public:
     void setText(const QString &text);
     QString text() const;
 
-    ivm::AADLObjectComment *entity() const;
+    ivm::AADLComment *entity() const;
     QSizeF minimalSize() const override;
     void updateFromEntity() override;
 

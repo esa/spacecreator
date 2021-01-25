@@ -17,9 +17,9 @@
 
 #include "cmdcommentitemcreate.h"
 
-#include "aadlobjectcomment.h"
-#include "aadlobjectfunctiontype.h"
-#include "aadlobjectsmodel.h"
+#include "aadlcomment.h"
+#include "aadlfunctiontype.h"
+#include "aadlmodel.h"
 #include "baseitems/common/aadlutils.h"
 #include "commandids.h"
 
@@ -27,11 +27,11 @@ namespace ive {
 namespace cmd {
 
 CmdCommentItemCreate::CmdCommentItemCreate(
-        ivm::AADLObjectsModel *model, ivm::AADLObjectFunctionType *parent, const QRectF &geometry)
+        ivm::AADLModel *model, ivm::AADLFunctionType *parent, const QRectF &geometry)
     : CmdEntityGeometryChange({}, QObject::tr("Create Comment"))
     , m_model(model)
     , m_parent(parent)
-    , m_entity(new ivm::AADLObjectComment(
+    , m_entity(new ivm::AADLComment(
               QString(), m_parent ? qobject_cast<QObject *>(m_parent) : qobject_cast<QObject *>(m_model)))
 {
     prepareData({ qMakePair(m_entity, QVector<QPointF> { geometry.topLeft(), geometry.bottomRight() }) });

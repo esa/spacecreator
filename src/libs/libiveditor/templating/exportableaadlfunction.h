@@ -20,13 +20,13 @@
 #include "exportableaadlobject.h"
 
 namespace ivm {
-class AADLObjectFunctionType;
+class AADLFunctionType;
 }
 
 namespace ive {
 
 /**
- * @brief The ExportableAADLFunction is a class to export AADLObjectFunctionType and AADLObjectFunction
+ * @brief The ExportableAADLFunction is a class to export AADLFunctionType and AADLFunction
  */
 class ExportableAADLFunction : public ExportableAADLObject
 {
@@ -40,7 +40,7 @@ class ExportableAADLFunction : public ExportableAADLObject
     Q_PROPERTY(QVariantList contextParameters READ contextParameters)
 
 public:
-    explicit ExportableAADLFunction(const ivm::AADLObjectFunctionType *function = nullptr);
+    explicit ExportableAADLFunction(const ivm::AADLFunctionType *function = nullptr);
 
     QVariantList interfaces() const;
     QVariantList functions() const;

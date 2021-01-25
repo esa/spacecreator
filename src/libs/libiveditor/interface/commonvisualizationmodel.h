@@ -23,8 +23,8 @@
 
 namespace ivm {
 class AADLObject;
-class AADLObjectsModel;
-class AADLObjectConnection;
+class AADLModel;
+class AADLConnection;
 }
 
 namespace ive {
@@ -33,7 +33,7 @@ class CommonVisualizationModel : public QStandardItemModel
 {
     Q_OBJECT
 public:
-    explicit CommonVisualizationModel(ivm::AADLObjectsModel *aadlModel, QObject *parent = nullptr);
+    explicit CommonVisualizationModel(ivm::AADLModel *aadlModel, QObject *parent = nullptr);
     enum ItemRole
     {
         IdRole = Qt::UserRole + 1,
@@ -53,10 +53,10 @@ private Q_SLOTS:
     void addItems(const QVector<ivm::AADLObject *> &objects);
     void removeItem(ivm::AADLObject *object);
     void updateItem();
-    void updateConnectionItem(ivm::AADLObjectConnection *connection);
+    void updateConnectionItem(ivm::AADLConnection *connection);
 
 protected:
-    ivm::AADLObjectsModel *m_aadlModel { nullptr };
+    ivm::AADLModel *m_aadlModel { nullptr };
     QHash<shared::Id, QStandardItem *> m_itemCache;
 };
 
@@ -64,7 +64,7 @@ class VisualizationModel : public CommonVisualizationModel
 {
     Q_OBJECT
 public:
-    explicit VisualizationModel(ivm::AADLObjectsModel *aadlModel, QObject *parent = nullptr);
+    explicit VisualizationModel(ivm::AADLModel *aadlModel, QObject *parent = nullptr);
 
     void updateItemData(QStandardItem *item, ivm::AADLObject *obj) override;
     QStandardItem *createItem(ivm::AADLObject *obj) override;

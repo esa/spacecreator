@@ -21,14 +21,14 @@
 
 namespace taste3 {
 
-namespace ivm{
-class AADLObjectFunctionType;
+namespace ivm {
+class AADLFunctionType;
 }
 
 namespace templating {
 
 /**
- * @brief The ExportedAADLFunction is a class to export AADLObjectFunctionType and AADLObjectFunction
+ * @brief The ExportedAADLFunction is a class to export AADLFunctionType and AADLFunction
  */
 class ExportedAADLFunction : public ExportedAADLObject
 {
@@ -39,7 +39,7 @@ class ExportedAADLFunction : public ExportedAADLObject
     Q_PROPERTY(QVariantList connections READ connections)
 
 public:
-    explicit ExportedAADLFunction(const ivm::AADLObjectFunctionType *function = nullptr);
+    explicit ExportedAADLFunction(const ivm::AADLFunctionType *function = nullptr);
 
     QVariantList interfaces() const;
     QVariantList functions() const;

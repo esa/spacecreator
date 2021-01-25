@@ -26,8 +26,8 @@
 
 namespace ivm {
 class AADLObject;
-class AADLObjectsModel;
-class AADLObjectFunctionType;
+class AADLModel;
+class AADLFunctionType;
 }
 
 namespace ive {
@@ -37,7 +37,7 @@ class CmdEntityRemove : public shared::UndoCommand
 {
     Q_OBJECT
 public:
-    explicit CmdEntityRemove(ivm::AADLObject *entity, ivm::AADLObjectsModel *model);
+    explicit CmdEntityRemove(ivm::AADLObject *entity, ivm::AADLModel *model);
     ~CmdEntityRemove() override;
 
     void redo() override;
@@ -51,18 +51,18 @@ Q_SIGNALS:
     void entityRemoved(ivm::AADLObject *obj, shared::UndoCommand *command);
 
 private:
-    QPointer<ivm::AADLObjectsModel> m_model;
+    QPointer<ivm::AADLModel> m_model;
     QPointer<ivm::AADLObject> m_entity;
     QVector<QPointer<ivm::AADLObject>> m_relatedEntities;
     QVector<QPointer<ivm::AADLObject>> m_relatedConnections;
     QVector<QPointer<ivm::AADLObject>> m_relatedIfaces;
-    QHash<shared::Id, QPointer<ivm::AADLObjectFunctionType>> m_parentFunctions;
+    QHash<shared::Id, QPointer<ivm::AADLFunctionType>> m_parentFunctions;
 
     void collectRelatedItems(ivm::AADLObject *toBeRemoved);
     void storeLinkedEntity(ivm::AADLObject *linkedEntity);
 
-    ivm::AADLObjectFunctionType *putParentFunctionFor(const ivm::AADLObject *obj);
-    ivm::AADLObjectFunctionType *popParentFunctionFor(const ivm::AADLObject *obj);
+    ivm::AADLFunctionType *putParentFunctionFor(const ivm::AADLObject *obj);
+    ivm::AADLFunctionType *popParentFunctionFor(const ivm::AADLObject *obj);
     void advancedRemove(ivm::AADLObject *obj);
     void advancedRestore(ivm::AADLObject *obj);
 };

@@ -25,8 +25,8 @@
 
 namespace ivm {
 class AADLObject;
-class AADLObjectFunction;
-class AADLObjectFunctionType;
+class AADLFunction;
+class AADLFunctionType;
 }
 
 namespace ive {
@@ -49,7 +49,7 @@ Q_SIGNALS:
 
 private:
     QPointer<ivm::AADLObject> m_entity;
-    ivm::AADLObjectFunction *m_function { nullptr };
+    ivm::AADLFunction *m_function { nullptr };
 
     const QVariantHash m_newAttrs;
     const QVariantHash m_oldAttrs;
@@ -58,14 +58,14 @@ private:
     QHash<shared::Id, QVector<QUndoCommand *>> m_cmdUnset;
 
     void setAttrs(const QVariantHash &attrs, bool isRedo);
-    ivm::AADLObjectFunctionType *functionTypeByName(const QString &name) const;
+    ivm::AADLFunctionType *functionTypeByName(const QString &name) const;
     void handleFunctionInstanceOf(const QVariant &attr, bool isRedo);
 
-    QVector<QUndoCommand *> commandsUnsetPrevFunctionType(const ivm::AADLObjectFunctionType *fnType);
-    QVector<QUndoCommand *> commandsSetNewFunctionType(const ivm::AADLObjectFunctionType *fnType);
+    QVector<QUndoCommand *> commandsUnsetPrevFunctionType(const ivm::AADLFunctionType *fnType);
+    QVector<QUndoCommand *> commandsSetNewFunctionType(const ivm::AADLFunctionType *fnType);
 
-    void prepareUnsetFunctionTypeCommands(const ivm::AADLObjectFunctionType *fnType);
-    void prepareSetFunctionTypeCommands(const ivm::AADLObjectFunctionType *fnType);
+    void prepareUnsetFunctionTypeCommands(const ivm::AADLFunctionType *fnType);
+    void prepareSetFunctionTypeCommands(const ivm::AADLFunctionType *fnType);
 };
 
 }

@@ -25,11 +25,11 @@ class QRectF;
 class QPointF;
 
 namespace ivm {
-class AADLObjectFunction;
-class AADLObjectFunctionType;
-class AADLObjectIface;
-class AADLObjectComment;
-class AADLObjectConnection;
+class AADLFunction;
+class AADLFunctionType;
+class AADLIface;
+class AADLComment;
+class AADLConnection;
 class AADLObject;
 struct ValidationResult;
 }
@@ -37,15 +37,15 @@ struct ValidationResult;
 namespace ive {
 namespace gi {
 
-ivm::AADLObjectFunction *functionObject(QGraphicsItem *item);
+ivm::AADLFunction *functionObject(QGraphicsItem *item);
 
-ivm::AADLObjectFunctionType *functionTypeObject(QGraphicsItem *item);
+ivm::AADLFunctionType *functionTypeObject(QGraphicsItem *item);
 
-ivm::AADLObjectIface *interfaceObject(QGraphicsItem *item);
+ivm::AADLIface *interfaceObject(QGraphicsItem *item);
 
-ivm::AADLObjectComment *commentObject(QGraphicsItem *item);
+ivm::AADLComment *commentObject(QGraphicsItem *item);
 
-ivm::AADLObjectConnection *connectionObject(QGraphicsItem *item);
+ivm::AADLConnection *connectionObject(QGraphicsItem *item);
 
 ivm::AADLObject *object(const QGraphicsItem *item);
 

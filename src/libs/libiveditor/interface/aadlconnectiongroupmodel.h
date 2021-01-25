@@ -24,8 +24,8 @@
 #include <QSet>
 
 namespace ivm {
-class AADLObjectConnection;
-class AADLObjectConnectionGroup;
+class AADLConnection;
+class AADLConnectionGroup;
 }
 
 namespace ive {
@@ -34,7 +34,7 @@ class AADLConnectionGroupModel : public QAbstractListModel
 {
     Q_OBJECT
 public:
-    explicit AADLConnectionGroupModel(ivm::AADLObjectConnectionGroup *connectionGroup,
+    explicit AADLConnectionGroupModel(ivm::AADLConnectionGroup *connectionGroup,
             cmd::CommandsStack::Macro *macro, QObject *parent = nullptr);
 
     QVariant data(const QModelIndex &index, int role = Qt::DisplayRole) const override;
@@ -46,9 +46,9 @@ private:
     bool isEnabled(const QModelIndex &index) const;
 
 private:
-    ivm::AADLObjectConnectionGroup *m_connectionGroup { nullptr };
+    ivm::AADLConnectionGroup *m_connectionGroup { nullptr };
     cmd::CommandsStack::Macro *m_cmdMacro { nullptr };
-    QList<QPointer<ivm::AADLObjectConnection>> m_allConnections;
+    QList<QPointer<ivm::AADLConnection>> m_allConnections;
     QSet<shared::Id> m_groupedConnetions;
 };
 

@@ -22,9 +22,9 @@
 #include <QPointer>
 
 namespace ivm {
-class AADLObjectFunctionType;
-class AADLObjectComment;
-class AADLObjectsModel;
+class AADLFunctionType;
+class AADLComment;
+class AADLModel;
 }
 
 namespace ive {
@@ -34,7 +34,7 @@ class CmdCommentItemCreate : public CmdEntityGeometryChange
 {
 public:
     explicit CmdCommentItemCreate(
-            ivm::AADLObjectsModel *model, ivm::AADLObjectFunctionType *parent, const QRectF &geometry);
+            ivm::AADLModel *model, ivm::AADLFunctionType *parent, const QRectF &geometry);
 
     ~CmdCommentItemCreate() override;
 
@@ -43,9 +43,9 @@ public:
     int id() const override;
 
 private:
-    QPointer<ivm::AADLObjectsModel> m_model;
-    QPointer<ivm::AADLObjectFunctionType> m_parent;
-    QPointer<ivm::AADLObjectComment> m_entity;
+    QPointer<ivm::AADLModel> m_model;
+    QPointer<ivm::AADLFunctionType> m_parent;
+    QPointer<ivm::AADLComment> m_entity;
 };
 
 }

@@ -18,9 +18,9 @@
 #include "commonvisualizationmodel.h"
 
 #include "aadlnamevalidator.h"
-#include "aadlobjectconnection.h"
-#include "aadlobjectconnectiongroup.h"
-#include "aadlobjectsmodel.h"
+#include "aadlconnection.h"
+#include "aadlconnectiongroup.h"
+#include "aadlmodel.h"
 #include "aadlxmlreader.h"
 #include "commandsstack.h"
 #include "interface/commands/commandsfactory.h"
@@ -31,16 +31,16 @@
 
 namespace ive {
 
-CommonVisualizationModel::CommonVisualizationModel(ivm::AADLObjectsModel *aadlModel, QObject *parent)
+CommonVisualizationModel::CommonVisualizationModel(ivm::AADLModel *aadlModel, QObject *parent)
     : QStandardItemModel(parent)
     , m_aadlModel(aadlModel)
 {
-    connect(m_aadlModel, &ivm::AADLObjectsModel::modelReset, this, [this]() {
+    connect(m_aadlModel, &ivm::AADLModel::modelReset, this, [this]() {
         m_itemCache.clear();
         removeRows(0, rowCount());
     });
-    connect(m_aadlModel, &ivm::AADLObjectsModel::aadlObjectsAdded, this, &CommonVisualizationModel::addItems);
-    connect(m_aadlModel, &ivm::AADLObjectsModel::aadlObjectRemoved, this, &CommonVisualizationModel::removeItem);
+    connect(m_aadlModel, &ivm::AADLModel::aadlObjectsAdded, this, &CommonVisualizationModel::addItems);
+    connect(m_aadlModel, &ivm::AADLModel::aadlObjectRemoved, this, &CommonVisualizationModel::removeItem);
     setSortRole(TypeRole);
 }
 
@@ -74,7 +74,7 @@ void CommonVisualizationModel::updateItemData(QStandardItem *item, ivm::AADLObje
         static const QPixmap icon = QIcon(QLatin1String(":/tab_interface/toolbar/icns/connection.svg")).pixmap(16, 16);
         pix = obj->isGrouped() ? iconHidden : icon;
 
-        if (auto connectionPtr = qobject_cast<ivm::AADLObjectConnection *>(obj)) {
+        if (auto connectionPtr = qobject_cast<ivm::AADLConnection *>(obj)) {
             const QString sourceName =
                     ivm::AADLNameValidator::decodeName(ivm::AADLObject::Type::Function, connectionPtr->sourceName());
             const QString sourceInterfaceName = ivm::AADLNameValidator::decodeName(
@@ -161,10 +161,10 @@ void CommonVisualizationModel::addItem(ivm::AADLObject *obj)
         parentItem->sortChildren(0);
         m_itemCache.insert(obj->id(), item);
         if (obj->aadlType() == ivm::AADLObject::Type::ConnectionGroup) {
-            if (auto connectionGroupObj = obj->as<ivm::AADLObjectConnectionGroup *>()) {
-                connect(connectionGroupObj, &ivm::AADLObjectConnectionGroup::connectionAdded, this,
+            if (auto connectionGroupObj = obj->as<ivm::AADLConnectionGroup *>()) {
+                connect(connectionGroupObj, &ivm::AADLConnectionGroup::connectionAdded, this,
                         &CommonVisualizationModel::updateConnectionItem, Qt::UniqueConnection);
-                connect(connectionGroupObj, &ivm::AADLObjectConnectionGroup::connectionRemoved, this,
+                connect(connectionGroupObj, &ivm::AADLConnectionGroup::connectionRemoved, this,
                         &CommonVisualizationModel::updateConnectionItem, Qt::UniqueConnection);
                 for (auto connection : connectionGroupObj->groupedConnections()) {
                     updateConnectionItem(connection);
@@ -174,7 +174,7 @@ void CommonVisualizationModel::addItem(ivm::AADLObject *obj)
     }
 }
 
-void CommonVisualizationModel::updateConnectionItem(ivm::AADLObjectConnection *connection)
+void CommonVisualizationModel::updateConnectionItem(ivm::AADLConnection *connection)
 {
     if (QStandardItem *groupedConnectionItem = getItem(connection->id())) {
         QStandardItem *groupedConnectionParentItem =
@@ -233,7 +233,7 @@ QStandardItem *CommonVisualizationModel::getItem(const shared::Id id)
     return id.isNull() ? nullptr : m_itemCache.value(id);
 }
 
-VisualizationModel::VisualizationModel(ivm::AADLObjectsModel *aadlModel, QObject *parent)
+VisualizationModel::VisualizationModel(ivm::AADLModel *aadlModel, QObject *parent)
     : CommonVisualizationModel(aadlModel, parent)
 {
     connect(this, &QStandardItemModel::dataChanged, this, &VisualizationModel::onDataChanged);

@@ -28,8 +28,8 @@ class QGraphicsItem;
 
 namespace ivm {
 
-class AADLObjectIface;
-class AADLObjectFunction;
+class AADLIface;
+class AADLFunction;
 class ConnectionCreationValidator
 {
     Q_GADGET
@@ -57,28 +57,28 @@ public:
     };
     Q_ENUM(FailReason)
 
-    static ConnectionCreationValidator::FailReason canConnect(AADLObjectFunction *sourceFunction,
-            AADLObjectFunction *targetFunction, AADLObjectIface *sourceIource, AADLObjectIface *targetIface);
+    static ConnectionCreationValidator::FailReason canConnect(AADLFunction *sourceFunction,
+            AADLFunction *targetFunction, AADLIface *sourceIource, AADLIface *targetIface);
 
 private:
     ConnectionCreationValidator();
 
     static ConnectionCreationValidator::FailReason checkKindAndParams(
-            AADLObjectIface *sourceIface, AADLObjectIface *targetIface);
+            AADLIface *sourceIface, AADLIface *targetIface);
 };
 
 struct ValidationResult {
-    ivm::AADLObjectIface *startIface { nullptr };
-    ivm::AADLObjectIface *endIface { nullptr };
+    ivm::AADLIface *startIface { nullptr };
+    ivm::AADLIface *endIface { nullptr };
     shared::Id startIfaceId = {};
     shared::Id endIfaceId = {};
     QPointF startPointAdjusted {};
     QPointF endPointAdjusted {};
     QVector<QPointF> connectionPoints;
     QGraphicsItem *functionAtStartPos { nullptr };
-    ivm::AADLObjectFunction *startObject { nullptr };
+    ivm::AADLFunction *startObject { nullptr };
     QGraphicsItem *functionAtEndPos { nullptr };
-    ivm::AADLObjectFunction *endObject { nullptr };
+    ivm::AADLFunction *endObject { nullptr };
     bool isToOrFromNested { false };
 
     ConnectionCreationValidator::FailReason status { ConnectionCreationValidator::FailReason::NoScene };

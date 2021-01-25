@@ -15,29 +15,29 @@
    along with this program. If not, see <https://www.gnu.org/licenses/lgpl-2.1.html>.
 */
 
-#include "aadlobjectifacegroup.h"
+#include "aadlifacegroup.h"
 
 namespace ivm {
 
-AADLObjectIfaceGroup::AADLObjectIfaceGroup(const CreationInfo &ci)
-    : AADLObjectIface(AADLObject::Type::InterfaceGroup, ci)
+AADLIfaceGroup::AADLIfaceGroup(const CreationInfo &ci)
+    : AADLIface(AADLObject::Type::InterfaceGroup, ci)
 {
 }
 
-void AADLObjectIfaceGroup::removeEntity(AADLObjectIface *iface)
+void AADLIfaceGroup::removeEntity(AADLIface *iface)
 {
     m_entities.removeAll(iface);
     iface->setGroupName(QString());
 }
 
-void AADLObjectIfaceGroup::addEntity(AADLObjectIface *iface)
+void AADLIfaceGroup::addEntity(AADLIface *iface)
 {
     iface->setGroupName(groupName());
     if (!m_entities.contains(iface))
         m_entities.append(iface);
 }
 
-void AADLObjectIfaceGroup::setAttr(const QString &name, const QVariant &val)
+void AADLIfaceGroup::setAttr(const QString &name, const QVariant &val)
 {
     if (name.isEmpty()) {
         return;
@@ -45,16 +45,16 @@ void AADLObjectIfaceGroup::setAttr(const QString &name, const QVariant &val)
 
     const meta::Props::Token t = meta::Props::token(name);
     if (t != meta::Props::Token::name) {
-        AADLObjectIface::setAttr(name, val);
+        AADLIface::setAttr(name, val);
     }
 }
 
-QList<QPointer<AADLObjectIface>> AADLObjectIfaceGroup::entities() const
+QList<QPointer<AADLIface>> AADLIfaceGroup::entities() const
 {
     return m_entities;
 }
 
-QString AADLObjectIfaceGroup::ifaceLabel() const
+QString AADLIfaceGroup::ifaceLabel() const
 {
     return {};
 }

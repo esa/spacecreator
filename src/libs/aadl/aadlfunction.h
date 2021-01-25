@@ -17,7 +17,7 @@
 
 #pragma once
 
-#include "aadlobjectfunctiontype.h"
+#include "aadlfunctiontype.h"
 
 #include <QHash>
 #include <QObject>
@@ -25,18 +25,18 @@
 
 namespace ivm {
 
-struct AADLObjectFunctionPrivate;
-class AADLObjectFunction : public AADLObjectFunctionType
+struct AADLFunctionPrivate;
+class AADLFunction : public AADLFunctionType
 {
     Q_OBJECT
 public:
-    explicit AADLObjectFunction(const QString &title = QString(), QObject *parent = nullptr);
-    ~AADLObjectFunction() override;
+    explicit AADLFunction(const QString &title = QString(), QObject *parent = nullptr);
+    ~AADLFunction() override;
 
     bool postInit() override;
 
-    void setInstanceOf(AADLObjectFunctionType *fnType);
-    const AADLObjectFunctionType *instanceOf() const;
+    void setInstanceOf(AADLFunctionType *fnType);
+    const AADLFunctionType *instanceOf() const;
     bool inheritsFunctionType() const;
 
 protected Q_SLOTS:
@@ -45,10 +45,10 @@ protected Q_SLOTS:
     void reflectContextParam();
 
 private:
-    const std::unique_ptr<AADLObjectFunctionPrivate> d;
+    const std::unique_ptr<AADLFunctionPrivate> d;
 
     struct OriginalPropsHolder {
-        // TODO: unite with AADLObjectIface::OriginalPropsHolder
+        // TODO: unite with AADLIface::OriginalPropsHolder
 
         QString name;
         QHash<QString, QVariant> attrs;
@@ -57,7 +57,7 @@ private:
 
         inline bool collected() const { return m_collected; }
 
-        inline void collect(const AADLObjectFunction *src)
+        inline void collect(const AADLFunction *src)
         {
             if (m_collected || !src)
                 return;
@@ -82,6 +82,6 @@ private:
     void reflectContextParams(const QVector<ContextParameter> &params);
 };
 
-typedef QVector<AADLObjectFunction *> AADLFunctionsVector;
+typedef QVector<AADLFunction *> AADLFunctionsVector;
 
 }

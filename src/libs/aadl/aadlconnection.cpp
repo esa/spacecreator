@@ -15,13 +15,13 @@
   along with this program. If not, see <https://www.gnu.org/licenses/lgpl-2.1.html>.
 */
 
-#include "aadlobjectconnection.h"
+#include "aadlconnection.h"
 
+#include "aadlfunction.h"
+#include "aadlfunctiontype.h"
+#include "aadliface.h"
+#include "aadlmodel.h"
 #include "aadlnamevalidator.h"
-#include "aadlobjectfunction.h"
-#include "aadlobjectfunctiontype.h"
-#include "aadlobjectiface.h"
-#include "aadlobjectsmodel.h"
 #include "connectioncreationvalidator.h"
 
 #include <QDebug>
@@ -30,18 +30,15 @@
 namespace ivm {
 
 struct ConnectionHolder {
-    AADLObjectConnection::EndPointInfo *m_from { nullptr };
-    AADLObjectConnection::EndPointInfo *m_to { nullptr };
+    AADLConnection::EndPointInfo *m_from { nullptr };
+    AADLConnection::EndPointInfo *m_to { nullptr };
 };
 
-struct AADLObjectConnectionPrivate {
-    AADLObjectConnectionPrivate() {}
-    AADLObjectConnectionPrivate(AADLObjectIface *ifaceSource, AADLObjectIface *ifaceTarget)
-    {
-        setData(ifaceSource, ifaceTarget);
-    }
+struct AADLConnectionPrivate {
+    AADLConnectionPrivate() { }
+    AADLConnectionPrivate(AADLIface *ifaceSource, AADLIface *ifaceTarget) { setData(ifaceSource, ifaceTarget); }
 
-    void setData(AADLObjectIface *ifaceSource, AADLObjectIface *ifaceTarget)
+    void setData(AADLIface *ifaceSource, AADLIface *ifaceTarget)
     {
         m_ifaceSource = ifaceSource;
         m_ifaceTarget = ifaceTarget;
@@ -51,14 +48,14 @@ struct AADLObjectConnectionPrivate {
                     && ifaceTarget->parentObject()); // The interfaces have to belong to functions
             bool isReversed = false;
             if (ifaceSource->direction() != ifaceTarget->direction()) {
-                isReversed = ifaceSource->direction() == AADLObjectIface::IfaceType::Provided
-                        && ifaceTarget->direction() == AADLObjectIface::IfaceType::Required;
+                isReversed = ifaceSource->direction() == AADLIface::IfaceType::Provided
+                        && ifaceTarget->direction() == AADLIface::IfaceType::Required;
             } else {
                 // PI->PI or RI->RI connection
                 if (shared::isAncestorOf(ifaceSource->parentObject(), ifaceTarget->parentObject())) {
-                    isReversed = ifaceSource->direction() == AADLObjectIface::IfaceType::Required;
+                    isReversed = ifaceSource->direction() == AADLIface::IfaceType::Required;
                 } else if (shared::isAncestorOf(ifaceTarget->parentObject(), ifaceSource->parentObject())) {
-                    isReversed = ifaceSource->direction() == AADLObjectIface::IfaceType::Provided;
+                    isReversed = ifaceSource->direction() == AADLIface::IfaceType::Provided;
                 }
             }
 
@@ -68,97 +65,97 @@ struct AADLObjectConnectionPrivate {
         }
     }
 
-    AADLObjectIface *sourceIface() const { return m_ifaceSource; }
-    AADLObjectIface *targetIface() const { return m_ifaceTarget; }
+    AADLIface *sourceIface() const { return m_ifaceSource; }
+    AADLIface *targetIface() const { return m_ifaceTarget; }
 
     ConnectionHolder m_delayedInit;
 
 private:
-    QPointer<AADLObjectIface> m_ifaceSource { nullptr };
-    QPointer<AADLObjectIface> m_ifaceTarget { nullptr };
+    QPointer<AADLIface> m_ifaceSource { nullptr };
+    QPointer<AADLIface> m_ifaceTarget { nullptr };
 };
 
-AADLObjectConnection::AADLObjectConnection(AADLObjectIface *ifaceSource, AADLObjectIface *ifaceTarget, QObject *parent)
+AADLConnection::AADLConnection(AADLIface *ifaceSource, AADLIface *ifaceTarget, QObject *parent)
     : AADLObject(AADLObject::Type::Connection, QString(), parent)
-    , d(new AADLObjectConnectionPrivate { ifaceSource, ifaceTarget })
+    , d(new AADLConnectionPrivate { ifaceSource, ifaceTarget })
 {
 }
 
-AADLObjectConnection::AADLObjectConnection(
-        const AADLObject::Type t, AADLObjectIface *ifaceSource, AADLObjectIface *ifaceTarget, QObject *parent)
+AADLConnection::AADLConnection(
+        const AADLObject::Type t, AADLIface *ifaceSource, AADLIface *ifaceTarget, QObject *parent)
     : AADLObject(t, QString(), parent)
-    , d(new AADLObjectConnectionPrivate { ifaceSource, ifaceTarget })
+    , d(new AADLConnectionPrivate { ifaceSource, ifaceTarget })
 {
 }
 
-AADLObjectConnection::~AADLObjectConnection()
+AADLConnection::~AADLConnection()
 {
     clearPostponedEndpoints();
 }
 
-QString AADLObjectConnection::sourceName() const
+QString AADLConnection::sourceName() const
 {
     return source() ? source()->title() : QString();
 }
 
-AADLObject *AADLObjectConnection::source() const
+AADLObject *AADLConnection::source() const
 {
     return d->sourceIface() ? d->sourceIface()->function() : nullptr;
 }
 
-QString AADLObjectConnection::targetName() const
+QString AADLConnection::targetName() const
 {
     return target() ? target()->title() : QString();
 }
 
-AADLObject *AADLObjectConnection::target() const
+AADLObject *AADLConnection::target() const
 {
     return d->targetIface() ? d->targetIface()->function() : nullptr;
 }
 
-AADLObjectIface *AADLObjectConnection::sourceInterface() const
+AADLIface *AADLConnection::sourceInterface() const
 {
     return d->sourceIface();
 }
 
-QString AADLObjectConnection::sourceInterfaceName() const
+QString AADLConnection::sourceInterfaceName() const
 {
     return sourceInterface() ? sourceInterface()->title() : QString();
 }
 
-AADLObjectIface *AADLObjectConnection::targetInterface() const
+AADLIface *AADLConnection::targetInterface() const
 {
     return d->targetIface();
 }
 
-QString AADLObjectConnection::targetInterfaceName() const
+QString AADLConnection::targetInterfaceName() const
 {
     return targetInterface() ? targetInterface()->title() : QString();
 }
 
-void AADLObjectConnection::setInheritPI()
+void AADLConnection::setInheritPI()
 {
     if (isOneDirection())
         return;
 
-    handleInheritPIChange(AADLObjectConnection::InheritPIChange::Inherit);
+    handleInheritPIChange(AADLConnection::InheritPIChange::Inherit);
 }
 
-void AADLObjectConnection::unsetInheritPI()
+void AADLConnection::unsetInheritPI()
 {
     if (isOneDirection())
         return;
 
-    handleInheritPIChange(AADLObjectConnection::InheritPIChange::NotInherit);
+    handleInheritPIChange(AADLConnection::InheritPIChange::NotInherit);
 }
 
-void AADLObjectConnection::handleInheritPIChange(AADLObjectConnection::InheritPIChange inheritance)
+void AADLConnection::handleInheritPIChange(AADLConnection::InheritPIChange inheritance)
 {
     if (isOneDirection())
         return;
 
-    auto ri = selectIface<AADLObjectIfaceRequired *>();
-    const auto pi = selectIface<const AADLObjectIfaceProvided *>();
+    auto ri = selectIface<AADLIfaceRequired *>();
+    const auto pi = selectIface<const AADLIfaceProvided *>();
 
     if (!pi || !ri)
         return;
@@ -166,38 +163,37 @@ void AADLObjectConnection::handleInheritPIChange(AADLObjectConnection::InheritPI
     if (!ri->isInheritPI())
         return;
 
-    const bool rmLabel = inheritance == AADLObjectConnection::InheritPIChange::NotInherit;
+    const bool rmLabel = inheritance == AADLConnection::InheritPIChange::NotInherit;
     if (rmLabel) {
-        disconnect(ri, &AADLObjectIfaceRequired::propChanged_InheritPI, this, nullptr);
-        disconnect(pi, &AADLObjectIface::titleChanged, this, nullptr);
+        disconnect(ri, &AADLIfaceRequired::propChanged_InheritPI, this, nullptr);
+        disconnect(pi, &AADLIface::titleChanged, this, nullptr);
         ri->unsetPrototype(pi);
         return;
     }
 
     ri->setPrototype(pi);
 
-    connect(pi, &AADLObjectIface::titleChanged, this, &AADLObjectConnection::handleProvidedTitleChanged,
-            Qt::UniqueConnection);
-    connect(ri, &AADLObjectIfaceRequired::propChanged_InheritPI, this,
-            QOverload<bool>::of(&AADLObjectConnection::handleInheritPIChange), Qt::UniqueConnection);
+    connect(pi, &AADLIface::titleChanged, this, &AADLConnection::handleProvidedTitleChanged, Qt::UniqueConnection);
+    connect(ri, &AADLIfaceRequired::propChanged_InheritPI, this,
+            QOverload<bool>::of(&AADLConnection::handleInheritPIChange), Qt::UniqueConnection);
 }
 
-void AADLObjectConnection::handleProvidedTitleChanged(const QString &title)
+void AADLConnection::handleProvidedTitleChanged(const QString &title)
 {
     Q_UNUSED(title)
 
     if (isOneDirection())
         return;
 
-    if (auto ri = selectIface<AADLObjectIfaceRequired *>()) {
+    if (auto ri = selectIface<AADLIfaceRequired *>()) {
         if (ri->isInheritPI()) {
-            const auto pi = selectIface<const AADLObjectIfaceProvided *>();
+            const auto pi = selectIface<const AADLIfaceProvided *>();
             ri->setPrototype(pi);
         }
     }
 }
 
-void AADLObjectConnection::handleInheritPIChange(bool enabled)
+void AADLConnection::handleInheritPIChange(bool enabled)
 {
     if (isOneDirection())
         return;
@@ -208,17 +204,17 @@ void AADLObjectConnection::handleInheritPIChange(bool enabled)
         unsetInheritPI();
 }
 
-void AADLObjectConnection::setDelayedStart(AADLObjectConnection::EndPointInfo *start)
+void AADLConnection::setDelayedStart(AADLConnection::EndPointInfo *start)
 {
     d->m_delayedInit.m_from = start;
 }
 
-void AADLObjectConnection::setDelayedEnd(AADLObjectConnection::EndPointInfo *end)
+void AADLConnection::setDelayedEnd(AADLConnection::EndPointInfo *end)
 {
     d->m_delayedInit.m_to = end;
 }
 
-bool AADLObjectConnection::lookupEndpointsPostponed()
+bool AADLConnection::lookupEndpointsPostponed()
 {
     if (!d->m_delayedInit.m_from) {
         qWarning() << "Can't connect, as the source is missing";
@@ -232,7 +228,7 @@ bool AADLObjectConnection::lookupEndpointsPostponed()
     Q_ASSERT(d->m_delayedInit.m_to->isReady());
     Q_ASSERT(d->m_delayedInit.m_from->isReady());
 
-    auto findFunction = [&](const AADLObjectConnection::EndPointInfo *const info) -> AADLObject * {
+    auto findFunction = [&](const AADLConnection::EndPointInfo *const info) -> AADLObject * {
         if (!info || info->m_functionName.isEmpty())
             return nullptr;
 
@@ -249,15 +245,13 @@ bool AADLObjectConnection::lookupEndpointsPostponed()
         return aadlFunction;
     };
 
-    auto findIface = [&](const AADLObjectConnection::EndPointInfo *const info,
-                             AADLObject *parentObject) -> AADLObjectIface * {
+    auto findIface = [&](const AADLConnection::EndPointInfo *const info, AADLObject *parentObject) -> AADLIface * {
         if (!info || info->m_interfaceName.isEmpty()) {
             return nullptr;
         }
 
-        AADLObjectFunctionType *parentObj = parentObject ? parentObject->as<AADLObjectFunctionType *>() : nullptr;
-        AADLObjectIface *aadlIface =
-                objectsModel()->getIfaceByName(info->m_interfaceName, info->m_ifaceDirection, parentObj);
+        AADLFunctionType *parentObj = parentObject ? parentObject->as<AADLFunctionType *>() : nullptr;
+        AADLIface *aadlIface = objectsModel()->getIfaceByName(info->m_interfaceName, info->m_ifaceDirection, parentObj);
         if (!aadlIface) {
             // Try with old encoding
             const QString encodedName =
@@ -272,17 +266,17 @@ bool AADLObjectConnection::lookupEndpointsPostponed()
     };
 
     AADLObject *objFrom = findFunction(d->m_delayedInit.m_from);
-    AADLObjectIface *ifaceFrom = findIface(d->m_delayedInit.m_from, objFrom);
+    AADLIface *ifaceFrom = findIface(d->m_delayedInit.m_from, objFrom);
 
     AADLObject *objTo = findFunction(d->m_delayedInit.m_to);
-    AADLObjectIface *ifaceTo = findIface(d->m_delayedInit.m_to, objTo);
+    AADLIface *ifaceTo = findIface(d->m_delayedInit.m_to, objTo);
 
     if (!objFrom || !ifaceFrom || !objTo || !ifaceTo) {
         return false;
     }
 
     const ConnectionCreationValidator::FailReason status = ConnectionCreationValidator::canConnect(
-            objFrom->as<AADLObjectFunction *>(), objTo->as<AADLObjectFunction *>(), ifaceFrom, ifaceTo);
+            objFrom->as<AADLFunction *>(), objTo->as<AADLFunction *>(), ifaceFrom, ifaceTo);
 
     if (status != ConnectionCreationValidator::FailReason::NotFail) {
         qWarning() << QString("Can't connect %1.%2->%3.%4 - ")
@@ -302,12 +296,12 @@ bool AADLObjectConnection::lookupEndpointsPostponed()
     return true;
 }
 
-bool AADLObjectConnection::needPostponedInit() const
+bool AADLConnection::needPostponedInit() const
 {
     return !(d->sourceIface() && d->targetIface());
 }
 
-void AADLObjectConnection::clearPostponedEndpoints()
+void AADLConnection::clearPostponedEndpoints()
 {
     delete d->m_delayedInit.m_from;
     d->m_delayedInit.m_from = nullptr;
@@ -316,7 +310,7 @@ void AADLObjectConnection::clearPostponedEndpoints()
     d->m_delayedInit.m_to = nullptr;
 }
 
-bool AADLObjectConnection::postInit()
+bool AADLConnection::postInit()
 {
     if (needPostponedInit() && !lookupEndpointsPostponed()) {
         qWarning() << "Postponed Connection initialization failed";
@@ -327,11 +321,11 @@ bool AADLObjectConnection::postInit()
     return true;
 }
 
-AADLObjectConnection::ConnectionType AADLObjectConnection::connectionType() const
+AADLConnection::ConnectionType AADLConnection::connectionType() const
 {
 
-    const AADLObjectIface *srcIface = sourceInterface();
-    const AADLObjectIface *dstIface = targetInterface();
+    const AADLIface *srcIface = sourceInterface();
+    const AADLIface *dstIface = targetInterface();
     if (!srcIface || !dstIface)
         return ConnectionType::NotAConnection;
 
@@ -341,14 +335,14 @@ AADLObjectConnection::ConnectionType AADLObjectConnection::connectionType() cons
         return dstIface->isRequired() ? ConnectionType::RI2RI : ConnectionType::RI2PI;
 }
 
-bool AADLObjectConnection::isOneDirection() const
+bool AADLConnection::isOneDirection() const
 {
     return sourceInterface()->direction() == targetInterface()->direction();
 }
 /*!
    Returns the name of a connection. Usually that's the name of the provider interface
  */
-QString AADLObjectConnection::name() const
+QString AADLConnection::name() const
 {
     return targetInterfaceName().isEmpty() ? sourceInterfaceName() : targetInterfaceName();
 }
@@ -356,7 +350,7 @@ QString AADLObjectConnection::name() const
 /*!
    Returns the parameters. Usually that's the parameters  of the provider interface
  */
-QVector<IfaceParameter> AADLObjectConnection::params() const
+QVector<IfaceParameter> AADLConnection::params() const
 {
     if (d->targetIface()) {
         return d->targetIface()->params();
@@ -369,7 +363,7 @@ QVector<IfaceParameter> AADLObjectConnection::params() const
 
 }
 
-QDebug operator<<(QDebug debug, const ivm::AADLObjectConnection &c)
+QDebug operator<<(QDebug debug, const ivm::AADLConnection &c)
 {
     QDebugStateSaver saver(debug);
     debug.nospace() << QString("%1.%2<->%3.%4")

@@ -13,22 +13,22 @@ target_sources(${LIB_NAME} PRIVATE
     aadlnamevalidator.h
     aadlobject.cpp
     aadlobject.h
-    aadlobjectcomment.cpp
-    aadlobjectcomment.h
-    aadlobjectconnection.cpp
-    aadlobjectconnection.h
-    aadlobjectconnectiongroup.cpp
-    aadlobjectconnectiongroup.h
-    aadlobjectfunction.cpp
-    aadlobjectfunction.h
-    aadlobjectfunctiontype.cpp
-    aadlobjectfunctiontype.h
-    aadlobjectiface.cpp
-    aadlobjectiface.h
-    aadlobjectifacegroup.cpp
-    aadlobjectifacegroup.h
-    aadlobjectsmodel.cpp
-    aadlobjectsmodel.h
+    aadlcomment.cpp
+    aadlcomment.h
+    aadlconnection.cpp
+    aadlconnection.h
+    aadlconnectiongroup.cpp
+    aadlconnectiongroup.h
+    aadlfunction.cpp
+    aadlfunction.h
+    aadlfunctiontype.cpp
+    aadlfunctiontype.h
+    aadliface.cpp
+    aadliface.h
+    aadlifacegroup.cpp
+    aadlifacegroup.h
+    aadlmodel.cpp
+    aadlmodel.h
     aadlparameter.cpp
     aadlparameter.h
     aadltestutils.cpp

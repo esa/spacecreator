@@ -17,11 +17,11 @@
 
 #include "connectioncreationvalidator.h"
 
-#include "aadlobjectconnection.h"
-#include "aadlobjectfunction.h"
-#include "aadlobjectfunctiontype.h"
-#include "aadlobjectiface.h"
-#include "aadlobjectsmodel.h"
+#include "aadlconnection.h"
+#include "aadlfunction.h"
+#include "aadlfunctiontype.h"
+#include "aadliface.h"
+#include "aadlmodel.h"
 
 #include <QDebug>
 #include <QGraphicsItem>
@@ -46,13 +46,13 @@ namespace ivm {
         \value MulticastDisabled
             Attempt to connect the same RI to more than one PI.
         \value KindDiffer
-            No one of interfaces neither has kind AADLObjectIface::OperationKind::Any, nor their kinds are the same.
+            No one of interfaces neither has kind AADLIface::OperationKind::Any, nor their kinds are the same.
         \value ParamsDiffer
             The checked interfaces have different parameters and no one is a RI with InheritPi property set.
         \value ParentIsFunctionType
             Attempt to directly connect a AADLFunctionTypeGraphicsItem.
         \value IsCyclic
-            Attempt to make a connection with a PI which kind is AADLObjectIface::OperationKind::Cyclic.
+            Attempt to make a connection with a PI which kind is AADLIface::OperationKind::Cyclic.
         \value SameParent
             The source and target AADLFunctionGraphicsItem is the same instance.
         \value SameInterface
@@ -82,7 +82,7 @@ namespace ivm {
  * Ensure that:
  * 1. the items on edges are not the AADLFunctionTypeGraphicsItem;
  * 2. interface parents are not the AADLFunctionTypeGraphicsItem
- * 3. an iface kind is not AADLObjectIface::OperationKind::Cyclic;
+ * 3. an iface kind is not AADLIface::OperationKind::Cyclic;
  * 4. parent of the source and target interface differs;
  * 5. both ifaces are either (PI+RI|PI+PI|RI+RI) compatible by kind and params, or PI+RI.inheritPI=true;
  * 6. the RI is not connected to any other RIs;
@@ -90,22 +90,22 @@ namespace ivm {
  * Returns the status of such check as ConnectionCreationValidator::FailReason.
  * Anything except the FailReason::NotFail means that the connection creation is prohibited.
  */
-ConnectionCreationValidator::FailReason ConnectionCreationValidator::canConnect(AADLObjectFunction *sourceFunction,
-        AADLObjectFunction *targetFunction, AADLObjectIface *sourceIface, AADLObjectIface *targetIface)
+ConnectionCreationValidator::FailReason ConnectionCreationValidator::canConnect(
+        AADLFunction *sourceFunction, AADLFunction *targetFunction, AADLIface *sourceIface, AADLIface *targetIface)
 {
     // [1] - the edge functions are not FunctionType
-    for (const AADLObjectFunction *function : { sourceFunction, targetFunction })
+    for (const AADLFunction *function : { sourceFunction, targetFunction })
         if (function && function->isFunctionType())
             return FailReason::IsFunctionType;
 
     // [2] - the edge interfaces parents are not FunctionType
-    for (const AADLObjectIface *iface : { sourceIface, targetIface })
+    for (const AADLIface *iface : { sourceIface, targetIface })
         if (iface && iface->isNestedInFunctionType())
             return FailReason::ParentIsFunctionType;
 
     // [3] - an iface kind is not Cyclic
-    for (const AADLObjectIface *iface : { sourceIface, targetIface })
-        if (iface && iface->kind() == AADLObjectIface::OperationKind::Cyclic)
+    for (const AADLIface *iface : { sourceIface, targetIface })
+        if (iface && iface->kind() == AADLIface::OperationKind::Cyclic)
             return FailReason::IsCyclic;
 
     // [4] - parent of the source and target interface differs
@@ -146,7 +146,7 @@ ConnectionCreationValidator::FailReason ConnectionCreationValidator::canConnect(
 
 /*!
  * \brief Check if the \a sourceIface and \a targetIface:
- * have the same kind (or the kind of at least one of them is AADLObjectIface::OperationKind::Any) and
+ * have the same kind (or the kind of at least one of them is AADLIface::OperationKind::Any) and
  * have the same parameters,
  * or they are the PI and RI and the RI has InheritPI property set to true.
  * In case the passed interfaces are of different directions (PI and RI),
@@ -155,14 +155,14 @@ ConnectionCreationValidator::FailReason ConnectionCreationValidator::canConnect(
  * means that the connection creation is prohibited.
  */
 ConnectionCreationValidator::FailReason ConnectionCreationValidator::checkKindAndParams(
-        AADLObjectIface *sourceIface, AADLObjectIface *targetIface)
+        AADLIface *sourceIface, AADLIface *targetIface)
 {
-    if (auto ri = AADLObjectConnection::selectIface<const AADLObjectIfaceRequired *>(sourceIface, targetIface))
-        if (AADLObjectConnection::selectIface<const AADLObjectIfaceProvided *>(sourceIface, targetIface)) {
+    if (auto ri = AADLConnection::selectIface<const AADLIfaceRequired *>(sourceIface, targetIface))
+        if (AADLConnection::selectIface<const AADLIfaceProvided *>(sourceIface, targetIface)) {
 #ifndef AADL_MULTICAST_CONNECTION
-            if (AADLObjectsModel *model = ri->objectsModel()) {
-                const QVector<AADLObjectConnection *> riConnections = model->getConnectionsForIface(ri->id());
-                for (const AADLObjectConnection *riConnection : riConnections)
+            if (AADLModel *model = ri->objectsModel()) {
+                const QVector<AADLConnection *> riConnections = model->getConnectionsForIface(ri->id());
+                for (const AADLConnection *riConnection : riConnections)
                     if ((riConnection->sourceInterface() && riConnection->sourceInterface()->isProvided())
                             || (riConnection->targetInterface() && riConnection->targetInterface()->isProvided()))
                         return FailReason::MulticastDisabled;
@@ -173,8 +173,8 @@ ConnectionCreationValidator::FailReason ConnectionCreationValidator::checkKindAn
                 return FailReason::NotFail;
         }
 
-    const bool weakKind = sourceIface->kind() == AADLObjectIface::OperationKind::Any
-            || targetIface->kind() == AADLObjectIface::OperationKind::Any;
+    const bool weakKind = sourceIface->kind() == AADLIface::OperationKind::Any
+            || targetIface->kind() == AADLIface::OperationKind::Any;
     if (!weakKind && sourceIface->kind() != targetIface->kind())
         return FailReason::KindDiffer;
 

@@ -17,8 +17,8 @@
 
 #pragma once
 
+#include "aadliface.h"
 #include "aadlobject.h"
-#include "aadlobjectiface.h"
 
 #include <QAbstractItemModel>
 #include <QVector>
@@ -26,21 +26,21 @@
 
 namespace ivm {
 
-class AADLObjectComment;
-class AADLObjectConnection;
-class AADLObjectFunction;
-class AADLObjectFunctionType;
+class AADLComment;
+class AADLConnection;
+class AADLFunction;
+class AADLFunctionType;
 class PropertyTemplateConfig;
 
-struct AADLObjectsModelPrivate;
-class AADLObjectsModel : public QObject
+struct AADLModelPrivate;
+class AADLModel : public QObject
 {
     Q_OBJECT
 public:
-    explicit AADLObjectsModel(PropertyTemplateConfig *dynPropConfig, QObject *parent = nullptr);
-    ~AADLObjectsModel() override;
+    explicit AADLModel(PropertyTemplateConfig *dynPropConfig, QObject *parent = nullptr);
+    ~AADLModel() override;
 
-    void setSharedTypesModel(AADLObjectsModel *sharedTypesModel);
+    void setSharedTypesModel(AADLModel *sharedTypesModel);
 
     bool addObject(AADLObject *obj);
     bool removeObject(AADLObject *obj);
@@ -52,28 +52,27 @@ public:
     AADLObject *getObject(const shared::Id &id) const;
     AADLObject *getObjectByName(const QString &name, AADLObject::Type type = AADLObject::Type::Unknown,
             Qt::CaseSensitivity caseSensitivity = Qt::CaseInsensitive) const;
-    AADLObjectIface *getIfaceByName(const QString &name, AADLObjectIface::IfaceType dir,
-            const AADLObjectFunctionType *parent = nullptr,
+    AADLIface *getIfaceByName(const QString &name, AADLIface::IfaceType dir, const AADLFunctionType *parent = nullptr,
             Qt::CaseSensitivity caseSensitivity = Qt::CaseInsensitive) const;
-    QList<AADLObjectIface *> getIfacesByName(
+    QList<AADLIface *> getIfacesByName(
             const QString &name, Qt::CaseSensitivity caseSensitivity = Qt::CaseInsensitive) const;
-    AADLObjectFunction *getFunction(const shared::Id &id) const;
-    AADLObjectFunction *getFunction(const QString &name, Qt::CaseSensitivity caseSensitivity) const;
-    AADLObjectFunctionType *getFunctionType(const shared::Id &id) const;
-    QHash<QString, AADLObjectFunctionType *> getAvailableFunctionTypes(const AADLObjectFunction *fnObj) const;
-    AADLObjectIface *getInterface(const shared::Id &id) const;
-    AADLObjectIfaceRequired *getRequiredInterface(const shared::Id &id) const;
-    AADLObjectIfaceProvided *getProvidedInterface(const shared::Id &id) const;
-    AADLObjectConnection *getConnection(const shared::Id &id) const;
-    AADLObjectComment *getCommentById(const shared::Id &id) const;
-    AADLObjectConnection *getConnection(const QString &interfaceName, const QString &source, const QString &target,
+    AADLFunction *getFunction(const shared::Id &id) const;
+    AADLFunction *getFunction(const QString &name, Qt::CaseSensitivity caseSensitivity) const;
+    AADLFunctionType *getFunctionType(const shared::Id &id) const;
+    QHash<QString, AADLFunctionType *> getAvailableFunctionTypes(const AADLFunction *fnObj) const;
+    AADLIface *getInterface(const shared::Id &id) const;
+    AADLIfaceRequired *getRequiredInterface(const shared::Id &id) const;
+    AADLIfaceProvided *getProvidedInterface(const shared::Id &id) const;
+    AADLConnection *getConnection(const shared::Id &id) const;
+    AADLComment *getCommentById(const shared::Id &id) const;
+    AADLConnection *getConnection(const QString &interfaceName, const QString &source, const QString &target,
             Qt::CaseSensitivity caseSensitivity) const;
 
-    QSet<QString> nestedFunctionNames(const AADLObjectFunctionType *fnt = nullptr) const;
-    QSet<QStringList> nestedFunctionPaths(const AADLObjectFunctionType *fnt = nullptr) const;
+    QSet<QString> nestedFunctionNames(const AADLFunctionType *fnt = nullptr) const;
+    QSet<QStringList> nestedFunctionPaths(const AADLFunctionType *fnt = nullptr) const;
 
-    AADLObjectConnection *getConnectionForIface(const shared::Id &id) const;
-    QVector<AADLObjectConnection *> getConnectionsForIface(const shared::Id &id) const;
+    AADLConnection *getConnectionForIface(const shared::Id &id) const;
+    QVector<AADLConnection *> getConnectionsForIface(const shared::Id &id) const;
 
     const QHash<shared::Id, AADLObject *> &objects() const;
 
@@ -112,7 +111,7 @@ public Q_SLOTS:
     bool addObjects(const QVector<ivm::AADLObject *> &objects);
 
 private:
-    const std::unique_ptr<AADLObjectsModelPrivate> d;
+    const std::unique_ptr<AADLModelPrivate> d;
 };
 
 }

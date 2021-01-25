@@ -17,15 +17,15 @@
 
 #include "cmdconnectiongroupitemchange.h"
 #include "commandids.h"
-#include "aadlobjectconnection.h"
-#include "aadlobjectconnectiongroup.h"
+#include "aadlconnection.h"
+#include "aadlconnectiongroup.h"
 
 namespace ive {
 namespace cmd {
 
 
-CmdConnectionGroupItemChange::CmdConnectionGroupItemChange(ivm::AADLObjectConnectionGroup *group,
-                                                           ivm::AADLObjectConnection *connection,
+CmdConnectionGroupItemChange::CmdConnectionGroupItemChange(ivm::AADLConnectionGroup *group,
+                                                           ivm::AADLConnection *connection,
                                                            bool add)
     : QUndoCommand()
     , m_group(group)

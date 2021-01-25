@@ -18,9 +18,9 @@
 #include "exportableaadlobject.h"
 
 #include "aadlobject.h"
-#include "aadlobjectconnection.h"
-#include "aadlobjectconnectiongroup.h"
-#include "aadlobjectfunctiontype.h"
+#include "aadlconnection.h"
+#include "aadlconnectiongroup.h"
+#include "aadlfunctiontype.h"
 #include "exportableaadlconnection.h"
 #include "exportableaadlconnectiongroup.h"
 #include "exportableaadlfunction.h"
@@ -76,18 +76,18 @@ QVariant ExportableAADLObject::createFrom(const ivm::AADLObject *aadlObject)
     case ivm::AADLObject::Type::Function:
     case ivm::AADLObject::Type::FunctionType:
         return QVariant::fromValue(
-                ExportableAADLFunction(static_cast<const ivm::AADLObjectFunctionType *>(aadlObject)));
+                ExportableAADLFunction(static_cast<const ivm::AADLFunctionType *>(aadlObject)));
     case ivm::AADLObject::Type::RequiredInterface:
     case ivm::AADLObject::Type::ProvidedInterface:
-        return QVariant::fromValue(ExportableAADLIface(static_cast<const ivm::AADLObjectIface *>(aadlObject)));
+        return QVariant::fromValue(ExportableAADLIface(static_cast<const ivm::AADLIface *>(aadlObject)));
     case ivm::AADLObject::Type::Comment:
         return QVariant::fromValue(ExportableAADLObject(aadlObject));
     case ivm::AADLObject::Type::Connection:
         return QVariant::fromValue(
-                ExportableAADLConnection(static_cast<const ivm::AADLObjectConnection *>(aadlObject)));
+                ExportableAADLConnection(static_cast<const ivm::AADLConnection *>(aadlObject)));
     case ivm::AADLObject::Type::ConnectionGroup:
         return QVariant::fromValue(
-                ExportableAADLConnectionGroup(static_cast<const ivm::AADLObjectConnectionGroup *>(aadlObject)));
+                ExportableAADLConnectionGroup(static_cast<const ivm::AADLConnectionGroup *>(aadlObject)));
     default:
         Q_UNREACHABLE();
     }

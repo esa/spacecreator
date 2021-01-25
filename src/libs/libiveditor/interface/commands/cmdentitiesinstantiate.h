@@ -24,9 +24,9 @@
 
 namespace ivm {
 class AADLObject;
-class AADLObjectFunction;
-class AADLObjectFunctionType;
-class AADLObjectsModel;
+class AADLFunction;
+class AADLFunctionType;
+class AADLModel;
 }
 
 namespace ive {
@@ -36,8 +36,8 @@ class CmdEntityAttributeChange;
 class CmdEntitiesInstantiate : public QUndoCommand
 {
 public:
-    explicit CmdEntitiesInstantiate(ivm::AADLObjectFunctionType *entity, ivm::AADLObjectFunctionType *parent,
-            ivm::AADLObjectsModel *model, const QPointF &pos);
+    explicit CmdEntitiesInstantiate(ivm::AADLFunctionType *entity, ivm::AADLFunctionType *parent,
+            ivm::AADLModel *model, const QPointF &pos);
     ~CmdEntitiesInstantiate() override;
 
     void redo() override;
@@ -46,9 +46,9 @@ public:
     int id() const override;
 
 private:
-    QPointer<ivm::AADLObjectFunctionType> m_parent;
-    QPointer<ivm::AADLObjectsModel> m_model;
-    QPointer<ivm::AADLObjectFunction> m_instantiatedEntity;
+    QPointer<ivm::AADLFunctionType> m_parent;
+    QPointer<ivm::AADLModel> m_model;
+    QPointer<ivm::AADLFunction> m_instantiatedEntity;
     QPointF m_offset;
     CmdEntityAttributeChange *m_subCmd { nullptr };
 };

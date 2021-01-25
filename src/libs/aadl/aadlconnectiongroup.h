@@ -17,28 +17,28 @@
 
 #pragma once
 
-#include "aadlobjectconnection.h"
-#include "aadlobjectiface.h"
+#include "aadlconnection.h"
+#include "aadliface.h"
 
 namespace ivm {
-class AADLObjectIfaceGroup;
+class AADLIfaceGroup;
 
-class AADLObjectConnectionGroup : public AADLObjectConnection
+class AADLConnectionGroup : public AADLConnection
 {
     Q_OBJECT
 public:
-    explicit AADLObjectConnectionGroup(const QString &name, AADLObjectIfaceGroup *ifaceSource,
-            AADLObjectIfaceGroup *ifaceTarget, const QList<QPointer<AADLObjectConnection>> &connections = {},
+    explicit AADLConnectionGroup(const QString &name, AADLIfaceGroup *ifaceSource,
+            AADLIfaceGroup *ifaceTarget, const QList<QPointer<AADLConnection>> &connections = {},
             QObject *parent = nullptr);
 
     struct CreationInfo {
-        QPointer<AADLObjectsModel> model;
+        QPointer<AADLModel> model;
         QPointer<AADLObject> parentObject;
         QPointer<AADLObject> sourceObject;
         QPointer<AADLObject> targetObject;
 
         QString name;
-        QList<QPointer<AADLObjectConnection>> connections;
+        QList<QPointer<AADLConnection>> connections;
         QVector<QPointF> points;
 
         QVariantList toVarList() const;
@@ -47,30 +47,30 @@ public:
     bool postInit() override;
     bool aboutToBeRemoved() override;
 
-    void addConnection(const QPointer<AADLObjectConnection> &connection);
-    void removeConnection(const QPointer<AADLObjectConnection> &connection);
+    void addConnection(const QPointer<AADLConnection> &connection);
+    void removeConnection(const QPointer<AADLConnection> &connection);
 
     void initConnections(const QList<shared::Id> &ids) { m_initConnections = ids; }
 
-    QList<QPointer<AADLObjectConnection>> groupedConnections() const;
-    QList<QPointer<AADLObjectIface>> groupedSourceInterfaces() const;
-    QList<QPointer<AADLObjectIface>> groupedTargetInterfaces() const;
+    QList<QPointer<AADLConnection>> groupedConnections() const;
+    QList<QPointer<AADLIface>> groupedSourceInterfaces() const;
+    QList<QPointer<AADLIface>> groupedTargetInterfaces() const;
 
-    QList<AADLObjectIface *> sourceFunctionInterfaces() const;
-    QList<AADLObjectIface *> targetFunctionInterfaces() const;
+    QList<AADLIface *> sourceFunctionInterfaces() const;
+    QList<AADLIface *> targetFunctionInterfaces() const;
 
-    AADLObjectIfaceGroup *sourceInterfaceGroup() const;
-    AADLObjectIfaceGroup *targetInterfaceGroup() const;
+    AADLIfaceGroup *sourceInterfaceGroup() const;
+    AADLIfaceGroup *targetInterfaceGroup() const;
 
 Q_SIGNALS:
-    void connectionAdded(AADLObjectConnection *connection);
-    void connectionRemoved(AADLObjectConnection *connection);
+    void connectionAdded(AADLConnection *connection);
+    void connectionRemoved(AADLConnection *connection);
 
 private:
-    QList<QPointer<AADLObjectConnection>> m_connections;
+    QList<QPointer<AADLConnection>> m_connections;
     QList<shared::Id> m_initConnections;
 };
 
 } // namespace ivm
 
-Q_DECLARE_METATYPE(ivm::AADLObjectConnectionGroup::CreationInfo);
+Q_DECLARE_METATYPE(ivm::AADLConnectionGroup::CreationInfo);

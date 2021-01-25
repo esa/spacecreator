@@ -15,9 +15,9 @@
    along with this program. If not, see <https://www.gnu.org/licenses/lgpl-2.1.html>.
 */
 
-#include "aadlobjectfunction.h"
-#include "aadlobjectiface.h"
-#include "aadlobjectsmodel.h"
+#include "aadlfunction.h"
+#include "aadliface.h"
+#include "aadlmodel.h"
 #include "aadltestutils.h"
 #include "asn1library.h"
 #include "asn1modelstorage.h"
@@ -57,22 +57,22 @@ void tst_InterfaceDocument::init()
 void tst_InterfaceDocument::test_checkAllInterfacesForAsn1Compliance()
 {
     // see "asn1library/asn1resources/taste-types.asn" for the default
-    auto fn1 = new ivm::AADLObjectFunction("Fn1");
+    auto fn1 = new ivm::AADLFunction("Fn1");
     ivDoc->objectsModel()->addObject(fn1);
 
     // Empty parameters results to true
-    auto if1 = ivm::testutils::createIface(fn1, ivm::AADLObjectIface::IfaceType::Provided, "If1");
+    auto if1 = ivm::testutils::createIface(fn1, ivm::AADLIface::IfaceType::Provided, "If1");
     bool ok = ivDoc->checkAllInterfacesForAsn1Compliance();
     QCOMPARE(ok, true);
 
     // Used type is defined in ASN1
-    auto if2 = ivm::testutils::createIface(fn1, ivm::AADLObjectIface::IfaceType::Provided, "If2");
+    auto if2 = ivm::testutils::createIface(fn1, ivm::AADLIface::IfaceType::Provided, "If2");
     if2->addParam(ivm::IfaceParameter("IfaceParam", ivm::BasicParameter::Type::Other, "T-Int31"));
     ok = ivDoc->checkAllInterfacesForAsn1Compliance();
     QCOMPARE(ok, true);
 
     // Unknown type
-    auto if3 = ivm::testutils::createIface(fn1, ivm::AADLObjectIface::IfaceType::Provided, "If3");
+    auto if3 = ivm::testutils::createIface(fn1, ivm::AADLIface::IfaceType::Provided, "If3");
     if3->addParam(ivm::IfaceParameter("IfaceParam", ivm::BasicParameter::Type::Other, "InvalidType"));
     ok = ivDoc->checkAllInterfacesForAsn1Compliance();
     QCOMPARE(ok, false);

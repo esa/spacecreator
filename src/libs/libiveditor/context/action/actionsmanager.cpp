@@ -18,8 +18,8 @@
 #include "actionsmanager.h"
 
 #include "aadlobject.h"
-#include "aadlobjectfunction.h"
-#include "aadlobjectiface.h"
+#include "aadlfunction.h"
+#include "aadliface.h"
 #include "common.h"
 #include "extprocmonitor.h"
 #include "interface/interfacedocument.h"
@@ -323,7 +323,7 @@ QString ActionsManager::replaceKeyHolder(
                 switch (aadlObj->aadlType()) {
                 case ivm::AADLObject::Type::RequiredInterface:
                 case ivm::AADLObject::Type::ProvidedInterface:
-                    if (const ivm::AADLObjectIface *iface = aadlObj->as<const ivm::AADLObjectIface *>()) {
+                    if (const ivm::AADLIface *iface = aadlObj->as<const ivm::AADLIface *>()) {
                         const ivm::IfaceParameter &ifaceParam = iface->param(name);
                         if (!ifaceParam.isNull())
                             return ifaceParam.toString();
@@ -331,7 +331,7 @@ QString ActionsManager::replaceKeyHolder(
                     break;
                 case ivm::AADLObject::Type::Function:
                 case ivm::AADLObject::Type::FunctionType:
-                    if (const ivm::AADLObjectFunctionType *fn = aadlObj->as<const ivm::AADLObjectFunctionType *>()) {
+                    if (const ivm::AADLFunctionType *fn = aadlObj->as<const ivm::AADLFunctionType *>()) {
                         const ivm::ContextParameter &ctxParam = fn->contextParam(name);
                         if (!ctxParam.isNull())
                             return ctxParam.toString();

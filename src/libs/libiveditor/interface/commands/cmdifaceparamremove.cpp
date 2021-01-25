@@ -20,7 +20,7 @@
 
 #include "commandids.h"
 
-#include <aadlobjectsmodel.h>
+#include <aadlmodel.h>
 #include <aadlparameter.h>
 
 namespace ive {

@@ -22,7 +22,7 @@
 #include <QUndoCommand>
 
 namespace ivm {
-class AADLObjectFunctionType;
+class AADLFunctionType;
 }
 namespace ivm {
 class ContextParameter;
@@ -34,7 +34,7 @@ namespace cmd {
 class CmdContextParameterRemove : public QUndoCommand
 {
 public:
-    explicit CmdContextParameterRemove(ivm::AADLObjectFunctionType *entity, int at);
+    explicit CmdContextParameterRemove(ivm::AADLFunctionType *entity, int at);
 
     void redo() override;
     void undo() override;
@@ -42,7 +42,7 @@ public:
     int id() const override;
 
 private:
-    QPointer<ivm::AADLObjectFunctionType> m_entity;
+    QPointer<ivm::AADLFunctionType> m_entity;
     QHash<int, ivm::ContextParameter> m_params;
 };
 

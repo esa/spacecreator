@@ -24,9 +24,9 @@
 #include "aadlinterfacegraphicsitem.h"
 #include "aadlnamevalidator.h"
 #include "aadlobject.h"
-#include "aadlobjectconnection.h"
-#include "aadlobjectfunction.h"
-#include "aadlobjectsmodel.h"
+#include "aadlconnection.h"
+#include "aadlfunction.h"
+#include "aadlmodel.h"
 #include "baseitems/common/aadlutils.h"
 #include "colors/colormanager.h"
 #include "commands/cmdfunctionitemcreate.h"
@@ -47,7 +47,7 @@ static const qreal kBorderWidth = 2;
 
 namespace ive {
 
-AADLFunctionTypeGraphicsItem::AADLFunctionTypeGraphicsItem(ivm::AADLObjectFunctionType *entity, QGraphicsItem *parent)
+AADLFunctionTypeGraphicsItem::AADLFunctionTypeGraphicsItem(ivm::AADLFunctionType *entity, QGraphicsItem *parent)
     : AADLRectGraphicsItem(entity, parent)
     , m_textItem(new AADLFunctionNameGraphicsItem(this))
 {
@@ -55,9 +55,9 @@ AADLFunctionTypeGraphicsItem::AADLFunctionTypeGraphicsItem(ivm::AADLObjectFuncti
     setZValue(ZOrder.Function);
 }
 
-ivm::AADLObjectFunctionType *AADLFunctionTypeGraphicsItem::entity() const
+ivm::AADLFunctionType *AADLFunctionTypeGraphicsItem::entity() const
 {
-    return qobject_cast<ivm::AADLObjectFunctionType *>(aadlObject());
+    return qobject_cast<ivm::AADLFunctionType *>(aadlObject());
 }
 
 void AADLFunctionTypeGraphicsItem::init()
@@ -68,7 +68,7 @@ void AADLFunctionTypeGraphicsItem::init()
     m_textItem->setFont(font());
 
     connect(m_textItem, &shared::ui::TextItem::edited, this, &AADLFunctionTypeGraphicsItem::updateNameFromUi);
-    connect(entity(), qOverload<ivm::meta::Props::Token>(&ivm::AADLObjectFunction::attributeChanged), this,
+    connect(entity(), qOverload<ivm::meta::Props::Token>(&ivm::AADLFunction::attributeChanged), this,
             [this](ivm::meta::Props::Token attr) {
                 if (attr == ivm::meta::Props::Token::name) {
                     const QString txt = entity()->titleUI();
@@ -78,7 +78,7 @@ void AADLFunctionTypeGraphicsItem::init()
                     }
                 }
             });
-    connect(entity(), &ivm::AADLObjectFunction::titleChanged, this, [this](const QString &text) {
+    connect(entity(), &ivm::AADLFunction::titleChanged, this, [this](const QString &text) {
         m_textItem->setPlainText(ivm::AADLNameValidator::decodeName(m_dataObject->aadlType(), text));
         instantLayoutUpdate();
     });
@@ -191,7 +191,7 @@ void AADLFunctionTypeGraphicsItem::onManualResizeProgress(
     }
     for (auto child : childItems()) {
         if (auto iface = qgraphicsitem_cast<AADLInterfaceGraphicsItem *>(child)) {
-            const ivm::AADLObjectIface *obj = iface->entity();
+            const ivm::AADLIface *obj = iface->entity();
             Q_ASSERT(obj);
             if (!obj) {
                 return;
@@ -213,10 +213,10 @@ void AADLFunctionTypeGraphicsItem::onManualResizeProgress(
 
 QString AADLFunctionTypeGraphicsItem::prepareTooltip() const
 {
-    const QString title = uniteNames<ivm::AADLObjectFunctionType *>({ entity() }, QString());
-    const QString instances = uniteNames<QPointer<ivm::AADLObjectFunction>>(entity()->instances(), tr("Instances: "));
-    const QString ris = uniteNames<ivm::AADLObjectIface *>(entity()->ris(), tr("RI: "));
-    const QString pis = uniteNames<ivm::AADLObjectIface *>(entity()->pis(), tr("PI: "));
+    const QString title = uniteNames<ivm::AADLFunctionType *>({ entity() }, QString());
+    const QString instances = uniteNames<QPointer<ivm::AADLFunction>>(entity()->instances(), tr("Instances: "));
+    const QString ris = uniteNames<ivm::AADLIface *>(entity()->ris(), tr("RI: "));
+    const QString pis = uniteNames<ivm::AADLIface *>(entity()->pis(), tr("PI: "));
 
     return joinNonEmpty({ title, instances, ris, pis }, QStringLiteral("<br>"));
 }

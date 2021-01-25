@@ -19,9 +19,9 @@
 
 #include "aadlnamevalidator.h"
 #include "aadlobject.h"
-#include "aadlobjectcomment.h"
-#include "aadlobjectconnectiongroup.h"
-#include "aadlobjectiface.h"
+#include "aadlcomment.h"
+#include "aadlconnectiongroup.h"
+#include "aadliface.h"
 #include "commandsstack.h"
 #include "contextparametersmodel.h"
 #include "delegates/asn1valuedelegate.h"
@@ -147,7 +147,7 @@ void PropertiesDialog::initTabs()
 void PropertiesDialog::initConnectionGroup()
 {
     auto model = new AADLConnectionGroupModel(
-            qobject_cast<ivm::AADLObjectConnectionGroup *>(m_dataObject), m_cmdMacro, this);
+            qobject_cast<ivm::AADLConnectionGroup *>(m_dataObject), m_cmdMacro, this);
     auto connectionsView = new QListView;
     connectionsView->setModel(model);
     ui->tabWidget->insertTab(0, connectionsView, tr("Connections"));
@@ -220,7 +220,7 @@ void PropertiesDialog::initIfaceParams()
 
 void PropertiesDialog::initCommentView()
 {
-    if (auto comment = qobject_cast<ivm::AADLObjectComment *>(m_dataObject)) {
+    if (auto comment = qobject_cast<ivm::AADLComment *>(m_dataObject)) {
         auto commentEdit = new QPlainTextEdit(this);
         commentEdit->setPlainText(comment->titleUI());
         ui->tabWidget->insertTab(0, commentEdit, tr("Comment content"));

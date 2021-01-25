@@ -20,8 +20,8 @@
 #include <QList>
 
 namespace ivm {
-class AADLObjectConnection;
-class AADLObjectsModel;
+class AADLConnection;
+class AADLModel;
 
 /*!
    Represents a chain of connections
@@ -32,17 +32,17 @@ class AADLConnectionChain
 public:
     AADLConnectionChain();
 
-    static QList<AADLConnectionChain *> build(const ivm::AADLObjectsModel &model);
+    static QList<AADLConnectionChain *> build(const ivm::AADLModel &model);
     static QList<AADLConnectionChain *> build(
-            AADLObjectConnection *connection, const QList<AADLObjectConnection *> &allConnections);
+            AADLConnection *connection, const QList<AADLConnection *> &allConnections);
 
-    const QList<AADLObjectConnection *> &connections() const;
+    const QList<AADLConnection *> &connections() const;
 
-    bool prepend(AADLObjectConnection *connection);
-    bool append(AADLObjectConnection *connection);
+    bool prepend(AADLConnection *connection);
+    bool append(AADLConnection *connection);
     bool append(AADLConnectionChain *chain);
 
-    bool contains(AADLObjectConnection *connection) const;
+    bool contains(AADLConnection *connection) const;
     bool contains(const QString &connectionName, const QString &sourceName, const QString &targetName) const;
 
     QStringList connectionNames(const QString &sourceName, const QString &targetName) const;
@@ -51,11 +51,11 @@ public:
 
 private:
     static QList<AADLConnectionChain *> findPrevious(
-            AADLObjectConnection *connection, const QList<AADLObjectConnection *> &allConnections);
+            AADLConnection *connection, const QList<AADLConnection *> &allConnections);
     static QList<AADLConnectionChain *> findNext(
-            AADLObjectConnection *connection, const QList<AADLObjectConnection *> &allConnections);
+            AADLConnection *connection, const QList<AADLConnection *> &allConnections);
 
-    QList<AADLObjectConnection *> m_chain;
+    QList<AADLConnection *> m_chain;
 };
 
 }

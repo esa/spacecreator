@@ -15,12 +15,12 @@
   along with this program. If not, see <https://www.gnu.org/licenses/lgpl-2.1.html>.
 */
 
-#include "aadlobjectfunction.h"
+#include "aadlfunction.h"
 
 #include "aadlcommonprops.h"
 #include "aadlobject.h"
-#include "aadlobjectiface.h"
-#include "aadlobjectsmodel.h"
+#include "aadliface.h"
+#include "aadlmodel.h"
 //#include "interface/commands/commandsfactory.h"
 
 #include <QDebug>
@@ -29,21 +29,21 @@
 
 namespace ivm {
 
-struct AADLObjectFunctionPrivate {
-    QPointer<AADLObjectFunctionType> m_fnType;
+struct AADLFunctionPrivate {
+    QPointer<AADLFunctionType> m_fnType;
 };
 
-AADLObjectFunction::AADLObjectFunction(const QString &title, QObject *parent)
-    : AADLObjectFunctionType(AADLObject::Type::Function, title, parent)
-    , d(new AADLObjectFunctionPrivate)
+AADLFunction::AADLFunction(const QString &title, QObject *parent)
+    : AADLFunctionType(AADLObject::Type::Function, title, parent)
+    , d(new AADLFunctionPrivate)
 {
     setAttr(meta::Props::token(meta::Props::Token::is_type), QStringLiteral("NO"));
     setAttr(meta::Props::token(meta::Props::Token::instance_of), QVariant());
 }
 
-AADLObjectFunction::~AADLObjectFunction() { }
+AADLFunction::~AADLFunction() { }
 
-bool AADLObjectFunction::postInit()
+bool AADLFunction::postInit()
 {
 #ifdef FIXME_BEFORE_MR
     const QString attrName = meta::Props::token(meta::Props::Token::instance_of);
@@ -59,17 +59,16 @@ bool AADLObjectFunction::postInit()
     return true;
 }
 
-void AADLObjectFunction::setInstanceOf(AADLObjectFunctionType *fnType)
+void AADLFunction::setInstanceOf(AADLFunctionType *fnType)
 {
     if (d->m_fnType != fnType) {
         if (d->m_fnType) {
 
-            disconnect(d->m_fnType, &AADLObjectFunction::contextParamsChanged, this,
-                    &AADLObjectFunction::reflectContextParam);
-            disconnect(d->m_fnType, qOverload<ivm::meta::Props::Token>(&AADLObjectFunction::propertyChanged), this,
-                    &AADLObjectFunction::reflectProp);
-            disconnect(d->m_fnType, qOverload<ivm::meta::Props::Token>(&AADLObjectFunction::attributeChanged), this,
-                    &AADLObjectFunction::reflectAttr);
+            disconnect(d->m_fnType, &AADLFunction::contextParamsChanged, this, &AADLFunction::reflectContextParam);
+            disconnect(d->m_fnType, qOverload<ivm::meta::Props::Token>(&AADLFunction::propertyChanged), this,
+                    &AADLFunction::reflectProp);
+            disconnect(d->m_fnType, qOverload<ivm::meta::Props::Token>(&AADLFunction::attributeChanged), this,
+                    &AADLFunction::reflectAttr);
 
             restoreInternals();
         }
@@ -79,17 +78,16 @@ void AADLObjectFunction::setInstanceOf(AADLObjectFunctionType *fnType)
         if (d->m_fnType) {
             cloneInternals();
 
-            connect(d->m_fnType, qOverload<ivm::meta::Props::Token>(&AADLObjectFunction::attributeChanged), this,
-                    &AADLObjectFunction::reflectAttr);
-            connect(d->m_fnType, qOverload<ivm::meta::Props::Token>(&AADLObjectFunction::propertyChanged), this,
-                    &AADLObjectFunction::reflectProp);
-            connect(d->m_fnType, &AADLObjectFunction::contextParamsChanged, this,
-                    &AADLObjectFunction::reflectContextParam);
+            connect(d->m_fnType, qOverload<ivm::meta::Props::Token>(&AADLFunction::attributeChanged), this,
+                    &AADLFunction::reflectAttr);
+            connect(d->m_fnType, qOverload<ivm::meta::Props::Token>(&AADLFunction::propertyChanged), this,
+                    &AADLFunction::reflectProp);
+            connect(d->m_fnType, &AADLFunction::contextParamsChanged, this, &AADLFunction::reflectContextParam);
         }
     }
 }
 
-void AADLObjectFunction::cloneInternals()
+void AADLFunction::cloneInternals()
 {
     m_originalFields.collect(this);
 
@@ -102,7 +100,7 @@ void AADLObjectFunction::cloneInternals()
     }
 }
 
-void AADLObjectFunction::restoreInternals()
+void AADLFunction::restoreInternals()
 {
     if (d->m_fnType)
         d->m_fnType->forgetInstance(this);
@@ -114,20 +112,20 @@ void AADLObjectFunction::restoreInternals()
     }
 }
 
-const AADLObjectFunctionType *AADLObjectFunction::instanceOf() const
+const AADLFunctionType *AADLFunction::instanceOf() const
 {
     return d->m_fnType;
 }
 
-bool AADLObjectFunction::inheritsFunctionType() const
+bool AADLFunction::inheritsFunctionType() const
 {
     return instanceOf();
 }
 
-void AADLObjectFunction::reflectAttr(ivm::meta::Props::Token attr)
+void AADLFunction::reflectAttr(ivm::meta::Props::Token attr)
 {
     if (!d->m_fnType) {
-        if (const AADLObjectFunctionType *fnType = dynamic_cast<const AADLObjectFunctionType *>(sender()))
+        if (const AADLFunctionType *fnType = dynamic_cast<const AADLFunctionType *>(sender()))
             qWarning() << QString("The Function type \"%1\" (%2) has not been disconnected, it seems")
                                   .arg(fnType->title(), fnType->id().toString());
         return;
@@ -150,7 +148,7 @@ void AADLObjectFunction::reflectAttr(ivm::meta::Props::Token attr)
     }
 }
 
-void AADLObjectFunction::reflectAttrs(const QHash<QString, QVariant> &attrs)
+void AADLFunction::reflectAttrs(const QHash<QString, QVariant> &attrs)
 {
     QHash<QString, QVariant> prepared(attrs);
     for (meta::Props::Token t :
@@ -163,10 +161,10 @@ void AADLObjectFunction::reflectAttrs(const QHash<QString, QVariant> &attrs)
     setAttrs(prepared);
 }
 
-void AADLObjectFunction::reflectProp(ivm::meta::Props::Token prop)
+void AADLFunction::reflectProp(ivm::meta::Props::Token prop)
 {
     if (!d->m_fnType) {
-        if (const AADLObjectFunctionType *fnType = dynamic_cast<const AADLObjectFunctionType *>(sender()))
+        if (const AADLFunctionType *fnType = dynamic_cast<const AADLFunctionType *>(sender()))
             qWarning() << QString("The Function type \"%1\" (%2) has not been disconnected, it seems")
                                   .arg(fnType->title(), fnType->id().toString());
         return;
@@ -188,7 +186,7 @@ void AADLObjectFunction::reflectProp(ivm::meta::Props::Token prop)
     }
 }
 
-void AADLObjectFunction::reflectProps(const QHash<QString, QVariant> &props)
+void AADLFunction::reflectProps(const QHash<QString, QVariant> &props)
 {
     QHash<QString, QVariant> prepared(props);
     for (meta::Props::Token t : { meta::Props::Token::InnerCoordinates, meta::Props::Token::coordinates }) {
@@ -200,10 +198,10 @@ void AADLObjectFunction::reflectProps(const QHash<QString, QVariant> &props)
     setProps(prepared);
 }
 
-void AADLObjectFunction::reflectContextParam()
+void AADLFunction::reflectContextParam()
 {
     if (!d->m_fnType) {
-        if (const AADLObjectFunctionType *fnType = dynamic_cast<const AADLObjectFunctionType *>(sender()))
+        if (const AADLFunctionType *fnType = dynamic_cast<const AADLFunctionType *>(sender()))
             qWarning() << QString("The Function type \"%1\" (%2) has not been disconnected, it seems")
                                   .arg(fnType->title(), fnType->id().toString());
         return;
@@ -212,7 +210,7 @@ void AADLObjectFunction::reflectContextParam()
     reflectContextParams(d->m_fnType->contextParams());
 }
 
-void AADLObjectFunction::reflectContextParams(const QVector<ContextParameter> &params)
+void AADLFunction::reflectContextParams(const QVector<ContextParameter> &params)
 {
     setContextParams(params);
 }

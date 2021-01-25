@@ -28,7 +28,7 @@
 namespace ivm {
 
 struct AADLObjectPrivate;
-class AADLObjectsModel;
+class AADLModel;
 class AADLObject : public QObject
 {
     Q_OBJECT
@@ -106,8 +106,8 @@ public:
     bool hasProperty(const QString &propertyName, const QVariant &value = QVariant()) const;
     bool hasProperties(const QHash<QString, QVariant> &props) const;
 
-    void setObjectsModel(AADLObjectsModel *model);
-    AADLObjectsModel *objectsModel() const;
+    void setObjectsModel(AADLModel *model);
+    AADLModel *objectsModel() const;
 
     bool isRootObject() const;
 

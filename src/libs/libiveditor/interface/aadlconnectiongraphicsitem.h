@@ -23,7 +23,7 @@
 #include <QPointer>
 
 namespace ivm {
-class AADLObjectConnection;
+class AADLConnection;
 }
 
 namespace ive {
@@ -41,7 +41,7 @@ public:
     };
     int type() const override { return Type; }
 
-    explicit AADLConnectionGraphicsItem(ivm::AADLObjectConnection *connection, AADLInterfaceGraphicsItem *ifaceStart,
+    explicit AADLConnectionGraphicsItem(ivm::AADLConnection *connection, AADLInterfaceGraphicsItem *ifaceStart,
             AADLInterfaceGraphicsItem *ifaceEnd, QGraphicsItem *parent = nullptr);
     ~AADLConnectionGraphicsItem() override;
 
@@ -50,7 +50,7 @@ public:
 
     QVector<QPointF> graphicsPoints() const;
 
-    ivm::AADLObjectConnection *entity() const;
+    ivm::AADLConnection *entity() const;
     void updateFromEntity() override;
 
     void init() override;

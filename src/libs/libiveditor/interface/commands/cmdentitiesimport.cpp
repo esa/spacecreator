@@ -17,8 +17,8 @@
 
 #include "cmdentitiesimport.h"
 
-#include "aadlobjectfunctiontype.h"
-#include "aadlobjectsmodel.h"
+#include "aadlfunctiontype.h"
+#include "aadlmodel.h"
 #include "aadlxmlreader.h"
 #include "baseitems/common/aadlutils.h"
 #include "commandids.h"
@@ -31,8 +31,8 @@
 namespace ive {
 namespace cmd {
 
-CmdEntitiesImport::CmdEntitiesImport(ivm::AADLObject *entity, ivm::AADLObjectFunctionType *parent,
-        ivm::AADLObjectsModel *model, const QPointF &pos)
+CmdEntitiesImport::CmdEntitiesImport(ivm::AADLObject *entity, ivm::AADLFunctionType *parent,
+        ivm::AADLModel *model, const QPointF &pos)
     : QUndoCommand()
     , m_model(model)
     , m_parent(parent)

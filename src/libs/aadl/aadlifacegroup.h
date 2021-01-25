@@ -1,5 +1,5 @@
 /*
-   Copyright (C) 2019 European Space Agency - <maxime.perrotin@esa.int>
+   Copyright (C) 2020 European Space Agency - <maxime.perrotin@esa.int>
 
    This library is free software; you can redistribute it and/or
    modify it under the terms of the GNU Library General Public
@@ -17,16 +17,26 @@
 
 #pragma once
 
-#include "aadlobject.h"
+#include "aadliface.h"
 
 namespace ivm {
 
-class AADLObjectComment : public AADLObject
+class AADLIfaceGroup : public AADLIface
 {
     Q_OBJECT
 public:
-    explicit AADLObjectComment(const QString &comment = QString(), QObject *parent = nullptr);
-    ~AADLObjectComment() override;
+    explicit AADLIfaceGroup(const CreationInfo &ci);
+
+    void removeEntity(AADLIface *iface);
+    void addEntity(AADLIface *iface);
+    QList<QPointer<AADLIface>> entities() const;
+
+    QString ifaceLabel() const override;
+
+    void setAttr(const QString &name, const QVariant &val) override;
+
+private:
+    QList<QPointer<AADLIface>> m_entities;
 };
 
-}
+} // namespace ivm

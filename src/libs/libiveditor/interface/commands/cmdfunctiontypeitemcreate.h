@@ -23,9 +23,9 @@
 #include <QRectF>
 
 namespace ivm {
-class AADLObjectFunctionType;
-class AADLObjectFunction;
-class AADLObjectsModel;
+class AADLFunctionType;
+class AADLFunction;
+class AADLModel;
 }
 
 namespace ive {
@@ -35,7 +35,7 @@ class CmdFunctionTypeItemCreate : public CmdEntityGeometryChange
 {
 public:
     explicit CmdFunctionTypeItemCreate(
-            ivm::AADLObjectsModel *model, ivm::AADLObjectFunction *parent, const QRectF &geometry);
+            ivm::AADLModel *model, ivm::AADLFunction *parent, const QRectF &geometry);
 
     ~CmdFunctionTypeItemCreate() override;
 
@@ -44,9 +44,9 @@ public:
     int id() const override;
 
 private:
-    QPointer<ivm::AADLObjectsModel> m_model;
-    QPointer<ivm::AADLObjectFunction> m_parent;
-    QPointer<ivm::AADLObjectFunctionType> m_entity;
+    QPointer<ivm::AADLModel> m_model;
+    QPointer<ivm::AADLFunction> m_parent;
+    QPointer<ivm::AADLFunctionType> m_entity;
 };
 
 }

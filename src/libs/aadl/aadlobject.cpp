@@ -18,7 +18,7 @@
 #include "aadlobject.h"
 
 #include "aadlnamevalidator.h"
-#include "aadlobjectsmodel.h"
+#include "aadlmodel.h"
 
 #include <QPointer>
 #include <QVector>
@@ -43,7 +43,7 @@ struct AADLObjectPrivate {
     const shared::Id m_id;
     QHash<QString, QVariant> m_attrs;
     QHash<QString, QVariant> m_props;
-    AADLObjectsModel *m_model;
+    AADLModel *m_model;
     const AADLObject::Type m_type;
 };
 
@@ -59,7 +59,7 @@ AADLObject::AADLObject(const AADLObject::Type t, const QString &title, QObject *
 
     if (const AADLObject *parentObject = qobject_cast<const AADLObject *>(parent))
         setObjectsModel(parentObject->objectsModel());
-    else if (AADLObjectsModel *model = qobject_cast<AADLObjectsModel *>(parent))
+    else if (AADLModel *model = qobject_cast<AADLModel *>(parent))
         setObjectsModel(model);
 
     setAttr(meta::Props::token(meta::Props::Token::name), title);
@@ -434,12 +434,12 @@ bool AADLObject::hasProperties(const QHash<QString, QVariant> &props) const
     return true;
 }
 
-void AADLObject::setObjectsModel(AADLObjectsModel *model)
+void AADLObject::setObjectsModel(AADLModel *model)
 {
     d->m_model = model;
 }
 
-AADLObjectsModel *AADLObject::objectsModel() const
+AADLModel *AADLObject::objectsModel() const
 {
     return d->m_model;
 }

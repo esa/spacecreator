@@ -18,9 +18,9 @@
 #include "cmdentitiesinstantiate.h"
 
 #include "aadlnamevalidator.h"
-#include "aadlobjectfunction.h"
-#include "aadlobjectfunctiontype.h"
-#include "aadlobjectsmodel.h"
+#include "aadlfunction.h"
+#include "aadlfunctiontype.h"
+#include "aadlmodel.h"
 #include "baseitems/common/aadlutils.h"
 #include "cmdentityattributechange.h"
 #include "commandids.h"
@@ -37,7 +37,7 @@ static inline void shiftObjects(const QVector<ivm::AADLObject *> &objects, const
         obj->setCoordinates(ive::coordinates(points));
         if (obj->aadlType() == ivm::AADLObject::Type::FunctionType
                 || obj->aadlType() == ivm::AADLObject::Type::Function) {
-            shiftObjects(obj->as<ivm::AADLObjectFunctionType *>()->children(), offset);
+            shiftObjects(obj->as<ivm::AADLFunctionType *>()->children(), offset);
         }
     }
 }
@@ -45,15 +45,15 @@ static inline void shiftObjects(const QVector<ivm::AADLObject *> &objects, const
 namespace ive {
 namespace cmd {
 
-CmdEntitiesInstantiate::CmdEntitiesInstantiate(ivm::AADLObjectFunctionType *entity,
-        ivm::AADLObjectFunctionType *parent, ivm::AADLObjectsModel *model, const QPointF &pos)
+CmdEntitiesInstantiate::CmdEntitiesInstantiate(ivm::AADLFunctionType *entity,
+        ivm::AADLFunctionType *parent, ivm::AADLModel *model, const QPointF &pos)
     : QUndoCommand()
     , m_parent(parent)
     , m_model(model)
 
 {
     Q_ASSERT(entity);
-    m_instantiatedEntity = new ivm::AADLObjectFunction(
+    m_instantiatedEntity = new ivm::AADLFunction(
             {}, m_parent ? qobject_cast<QObject *>(m_parent) : qobject_cast<QObject *>(m_model));
     m_instantiatedEntity->setTitle(ivm::AADLNameValidator::nameForInstance(
             m_instantiatedEntity, entity->title() + QLatin1String("_Instance_")));

@@ -17,7 +17,7 @@
 
 #pragma once
 
-#include "aadlobjectconnectiongroup.h"
+#include "aadlconnectiongroup.h"
 #include "cmdentitygeometrychange.h"
 
 namespace ive {
@@ -26,7 +26,7 @@ namespace cmd {
 class CmdConnectionGroupItemCreate : public CmdEntityGeometryChange
 {
 public:
-    explicit CmdConnectionGroupItemCreate(const ivm::AADLObjectConnectionGroup::CreationInfo &creationInfo);
+    explicit CmdConnectionGroupItemCreate(const ivm::AADLConnectionGroup::CreationInfo &creationInfo);
     ~CmdConnectionGroupItemCreate() override;
     void redo() override;
     void undo() override;
@@ -34,13 +34,13 @@ public:
 
 private:
     QString m_groupName;
-    QPointer<ivm::AADLObjectsModel> m_model;
-    QPointer<ivm::AADLObjectConnectionGroup> m_entity;
-    QPointer<ivm::AADLObjectFunction> m_parent;
-    QPointer<ivm::AADLObjectIfaceGroup> m_sourceIface;
-    QPointer<ivm::AADLObjectFunction> m_sourceIfaceParent;
-    QPointer<ivm::AADLObjectIfaceGroup> m_targetIface;
-    QPointer<ivm::AADLObjectFunction> m_targetIfaceParent;
+    QPointer<ivm::AADLModel> m_model;
+    QPointer<ivm::AADLConnectionGroup> m_entity;
+    QPointer<ivm::AADLFunction> m_parent;
+    QPointer<ivm::AADLIfaceGroup> m_sourceIface;
+    QPointer<ivm::AADLFunction> m_sourceIfaceParent;
+    QPointer<ivm::AADLIfaceGroup> m_targetIface;
+    QPointer<ivm::AADLFunction> m_targetIfaceParent;
     QList<QUndoCommand *> m_subCommands;
 };
 

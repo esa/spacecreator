@@ -17,15 +17,15 @@
 
 #pragma once
 
-#include "aadlobjectiface.h"
+#include "aadliface.h"
 #include "editorcore.h"
 #include "ui/graphicsviewbase.h"
 
 #include <QVector>
 
 namespace ivm {
-class AADLObjectConnection;
-class AADLObjectFunction;
+class AADLConnection;
+class AADLFunction;
 }
 
 namespace ive {
@@ -57,9 +57,9 @@ public:
     QAction *actionExportType();
     QAction *actionToggleE2EView();
 
-    ivm::AADLObjectFunction *addFunction(const QString &name, ivm::AADLObjectFunction *parent = nullptr);
+    ivm::AADLFunction *addFunction(const QString &name, ivm::AADLFunction *parent = nullptr);
     bool addConnection(QString name, const QString &fromInstanceName, const QString &toInstanceName);
-    ivm::AADLObjectIface *addInterface(QString name, const QString &functionName);
+    ivm::AADLIface *addInterface(QString name, const QString &functionName);
 
     bool renameAadlFunction(const QString &oldName, const QString &newName);
     bool renameAadlConnection(const QString &oldName, const QString &newName, const QString &fromInstanceName,
@@ -74,8 +74,8 @@ public:
     QString filePath() const override;
     bool save() override;
 
-    QVector<ivm::AADLObjectFunction *> allAadlFunctions() const;
-    QVector<ivm::AADLObjectConnection *> allAadlConnections() const;
+    QVector<ivm::AADLFunction *> allAadlFunctions() const;
+    QVector<ivm::AADLConnection *> allAadlConnections() const;
 
     QStringList aadlFunctionsNames() const;
     QStringList aadlConnectionNames() const;
@@ -85,8 +85,8 @@ public Q_SLOTS:
 
 private:
     void saveSceneRender(const QString &filePath) const;
-    ivm::AADLObjectIface *getInterface(
-            const QString &ifName, ivm::AADLObjectIface::IfaceType ifType, ivm::AADLObjectFunction *parentFunction);
+    ivm::AADLIface *getInterface(
+            const QString &ifName, ivm::AADLIface::IfaceType ifType, ivm::AADLFunction *parentFunction);
     Q_SLOT void updateAadlItems();
 
     ive::InterfaceDocument *m_document { nullptr };
@@ -97,8 +97,8 @@ private:
     QAction *m_actionExportType { nullptr };
     QAction *m_actionToggleE2EView { nullptr };
 
-    QVector<ivm::AADLObjectFunction *> m_aadlFunctions;
-    QVector<ivm::AADLObjectConnection *> m_aadlConnections;
+    QVector<ivm::AADLFunction *> m_aadlFunctions;
+    QVector<ivm::AADLConnection *> m_aadlConnections;
 
     Qt::CaseSensitivity m_caseCheck = Qt::CaseInsensitive;
 };

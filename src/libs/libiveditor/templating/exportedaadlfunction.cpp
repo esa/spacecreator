@@ -17,16 +17,16 @@
 
 #include "exportedaadlfunction.h"
 
-#include "tab_aadl/aadlobjectcomment.h"
-#include "tab_aadl/aadlobjectconnection.h"
-#include "tab_aadl/aadlobjectfunction.h"
-#include "tab_aadl/aadlobjectfunctiontype.h"
-#include "tab_aadl/aadlobjectiface.h"
+#include "tab_aadl/aadlcomment.h"
+#include "tab_aadl/aadlconnection.h"
+#include "tab_aadl/aadlfunction.h"
+#include "tab_aadl/aadlfunctiontype.h"
+#include "tab_aadl/aadliface.h"
 
 namespace taste3 {
 namespace templating {
 
-ExportedAADLFunction::ExportedAADLFunction(const aadl::AADLObjectFunctionType *function)
+ExportedAADLFunction::ExportedAADLFunction(const aadl::AADLFunctionType *function)
     : ExportedAADLObject(function)
 {
 }
@@ -34,7 +34,7 @@ ExportedAADLFunction::ExportedAADLFunction(const aadl::AADLObjectFunctionType *f
 QVariantList ExportedAADLFunction::interfaces() const
 {
     QVariantList ifaces;
-    for (const auto iface : exportedObject<aadl::AADLObjectFunctionType>()->interfaces())
+    for (const auto iface : exportedObject<aadl::AADLFunctionType>()->interfaces())
         ifaces << createFrom(iface);
     return ifaces;
 }
@@ -42,7 +42,7 @@ QVariantList ExportedAADLFunction::interfaces() const
 QVariantList ExportedAADLFunction::functions() const
 {
     QVariantList functions;
-    const aadl::AADLObjectFunctionType *o = exportedObject<aadl::AADLObjectFunctionType>();
+    const aadl::AADLFunctionType *o = exportedObject<aadl::AADLFunctionType>();
     for (const auto function : o->functionTypes())
         functions << createFrom(function);
     for (const auto function : o->functions())
@@ -53,7 +53,7 @@ QVariantList ExportedAADLFunction::functions() const
 QVariantList ExportedAADLFunction::comments() const
 {
     QVariantList comments;
-    for (const auto comment : exportedObject<aadl::AADLObjectFunctionType>()->comments())
+    for (const auto comment : exportedObject<aadl::AADLFunctionType>()->comments())
         comments << createFrom(comment);
     return comments;
 }
@@ -61,7 +61,7 @@ QVariantList ExportedAADLFunction::comments() const
 QVariantList ExportedAADLFunction::connections() const
 {
     QVariantList connections;
-    for (const auto connection : exportedObject<aadl::AADLObjectFunctionType>()->connections())
+    for (const auto connection : exportedObject<aadl::AADLFunctionType>()->connections())
         connections << createFrom(connection);
     return connections;
 }

@@ -18,12 +18,12 @@
 
 #include "aadlinterfacegroupgraphicsitem.h"
 
-#include "aadlobjectifacegroup.h"
+#include "aadlifacegroup.h"
 
 namespace ive {
 
 AADLInterfaceGroupGraphicsItem::AADLInterfaceGroupGraphicsItem(
-        ivm::AADLObjectIfaceGroup *entity, QGraphicsItem *parent)
+        ivm::AADLIfaceGroup *entity, QGraphicsItem *parent)
     : AADLInterfaceGraphicsItem(entity, parent)
 {
 }
@@ -33,14 +33,14 @@ ColorManager::HandledColors AADLInterfaceGroupGraphicsItem::handledColorType() c
     return ColorManager::HandledColors::IfaceGroup;
 }
 
-ivm::AADLObjectIfaceGroup *AADLInterfaceGroupGraphicsItem::entity() const
+ivm::AADLIfaceGroup *AADLInterfaceGroupGraphicsItem::entity() const
 {
-    return qobject_cast<ivm::AADLObjectIfaceGroup *>(aadlObject());
+    return qobject_cast<ivm::AADLIfaceGroup *>(aadlObject());
 }
 
 QPainterPath AADLInterfaceGroupGraphicsItem::typePath() const
 {
-    auto iface = qobject_cast<ivm::AADLObjectIface *>(entity());
+    auto iface = qobject_cast<ivm::AADLIface *>(entity());
     if (!iface)
         return {};
 

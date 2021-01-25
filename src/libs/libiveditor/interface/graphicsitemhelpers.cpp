@@ -18,11 +18,11 @@
 #include "graphicsitemhelpers.h"
 
 #include "aadlobject.h"
-#include "aadlobjectcomment.h"
-#include "aadlobjectconnection.h"
-#include "aadlobjectfunction.h"
-#include "aadlobjectfunctiontype.h"
-#include "aadlobjectiface.h"
+#include "aadlcomment.h"
+#include "aadlconnection.h"
+#include "aadlfunction.h"
+#include "aadlfunctiontype.h"
+#include "aadliface.h"
 #include "baseitems/common/aadlutils.h"
 #include "baseitems/interactiveobject.h"
 #include "connectioncreationvalidator.h"
@@ -38,7 +38,7 @@
 namespace ive {
 namespace gi {
 
-ivm::AADLObjectFunction *functionObject(QGraphicsItem *item)
+ivm::AADLFunction *functionObject(QGraphicsItem *item)
 {
     if (!item)
         return nullptr;
@@ -49,7 +49,7 @@ ivm::AADLObjectFunction *functionObject(QGraphicsItem *item)
     return nullptr;
 };
 
-ivm::AADLObjectFunctionType *functionTypeObject(QGraphicsItem *item)
+ivm::AADLFunctionType *functionTypeObject(QGraphicsItem *item)
 {
     if (!item)
         return nullptr;
@@ -60,7 +60,7 @@ ivm::AADLObjectFunctionType *functionTypeObject(QGraphicsItem *item)
     return nullptr;
 };
 
-ivm::AADLObjectIface *interfaceObject(QGraphicsItem *item)
+ivm::AADLIface *interfaceObject(QGraphicsItem *item)
 {
     if (!item)
         return nullptr;
@@ -71,7 +71,7 @@ ivm::AADLObjectIface *interfaceObject(QGraphicsItem *item)
     return nullptr;
 };
 
-ivm::AADLObjectComment *commentObject(QGraphicsItem *item)
+ivm::AADLComment *commentObject(QGraphicsItem *item)
 {
     if (!item)
         return nullptr;
@@ -82,7 +82,7 @@ ivm::AADLObjectComment *commentObject(QGraphicsItem *item)
     return nullptr;
 };
 
-ivm::AADLObjectConnection *connectionObject(QGraphicsItem *item)
+ivm::AADLConnection *connectionObject(QGraphicsItem *item)
 {
     if (!item)
         return nullptr;
@@ -256,7 +256,7 @@ ivm::ValidationResult validateConnectionCreate(QGraphicsScene *scene, const QVec
     }
 
     if (!result.startIface) {
-        if (auto fn = result.startObject->as<const ivm::AADLObjectFunction *>())
+        if (auto fn = result.startObject->as<const ivm::AADLFunction *>())
             if (fn->instanceOf()) {
                 result.setFailed(
                         ivm::ConnectionCreationValidator::FailReason::DirectIfaceCreationInInstanceOfFunctionType);
@@ -265,7 +265,7 @@ ivm::ValidationResult validateConnectionCreate(QGraphicsScene *scene, const QVec
     }
 
     if (!result.endIface) {
-        if (auto fn = result.endObject->as<const ivm::AADLObjectFunction *>())
+        if (auto fn = result.endObject->as<const ivm::AADLFunction *>())
             if (fn->instanceOf()) {
                 result.setFailed(
                         ivm::ConnectionCreationValidator::FailReason::DirectIfaceCreationInInstanceOfFunctionType);

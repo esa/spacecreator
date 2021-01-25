@@ -18,8 +18,8 @@
 #include "interfaceattrdelegate.h"
 
 #include "aadlcommonprops.h"
-#include "aadlobjectiface.h"
-#include "aadlobjectsmodel.h"
+#include "aadliface.h"
+#include "aadlmodel.h"
 #include "interface/properties/propertieslistmodel.h"
 
 #include <QComboBox>
@@ -42,7 +42,7 @@ QWidget *InterfaceAttrDelegate::createEditor(
                         pModel->data(pModel->index(PropertiesListModel::ColumnTitle, index.row())).toString();
                 const ivm::meta::Props::Token t = ivm::meta::Props::token(attrName);
 
-                auto iface = qobject_cast<const ivm::AADLObjectIface *>(pModel->dataObject());
+                auto iface = qobject_cast<const ivm::AADLIface *>(pModel->dataObject());
                 Q_ASSERT(iface);
 
                 switch (t) {
@@ -72,7 +72,7 @@ void InterfaceAttrDelegate::setEditorData(QWidget *editor, const QModelIndex &in
                         pModel->data(pModel->index(PropertiesListModel::ColumnTitle, index.row())).toString();
                 const ivm::meta::Props::Token t = ivm::meta::Props::token(attrName);
 
-                auto iface = qobject_cast<const ivm::AADLObjectIface *>(pModel->dataObject());
+                auto iface = qobject_cast<const ivm::AADLIface *>(pModel->dataObject());
                 Q_ASSERT(iface);
 
                 switch (t) {

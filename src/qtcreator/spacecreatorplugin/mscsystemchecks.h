@@ -23,8 +23,8 @@
 
 namespace ivm {
 class AADLObject;
-class AADLObjectConnection;
-class AADLObjectFunction;
+class AADLConnection;
+class AADLFunction;
 }
 
 namespace ive {
@@ -60,14 +60,14 @@ public:
     // Check functions
     bool mscInstancesExist(const QString &name);
     void changeMscInstanceName(const QString &oldName, const QString &name);
-    void removeMscInstances(ivm::AADLObjectFunction *aadlFunction);
-    bool hasCorrespondingInstances(ivm::AADLObjectFunction *aadlFunction) const;
+    void removeMscInstances(ivm::AADLFunction *aadlFunction);
+    bool hasCorrespondingInstances(ivm::AADLFunction *aadlFunction) const;
 
     bool mscMessagesExist(const QString &messageName, const QString &sourceName, const QString &targetName);
     void changeMscMessageName(
             const QString &oldName, const QString &name, const QString &sourceName, const QString &targetName);
-    void removeMscMessages(ivm::AADLObjectConnection *aadlConnection);
-    bool hasCorrespondingMessages(ivm::AADLObjectConnection *aadlConnection) const;
+    void removeMscMessages(ivm::AADLConnection *aadlConnection);
+    bool hasCorrespondingMessages(ivm::AADLConnection *aadlConnection) const;
 
     void checkInstances();
     void checkMessages();

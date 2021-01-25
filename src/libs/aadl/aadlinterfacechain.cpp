@@ -17,17 +17,17 @@
 
 #include "aadlinterfacechain.h"
 
-#include "aadlobjectconnection.h"
-#include "aadlobjectfunction.h"
-#include "aadlobjectiface.h"
-#include "aadlobjectsmodel.h"
+#include "aadlconnection.h"
+#include "aadlfunction.h"
+#include "aadliface.h"
+#include "aadlmodel.h"
 
 #include <QSet>
 
 namespace ivm {
 
 QList<AADLInterfaceChain> AADLInterfaceChain::getNextChunk(
-        const AADLInterfaceChain &currentChain, const AADLObjectIface *iface)
+        const AADLInterfaceChain &currentChain, const AADLIface *iface)
 {
     QList<AADLInterfaceChain> chains;
     for (auto connection : iface->objectsModel()->getConnectionsForIface(iface->id())) {
@@ -43,7 +43,7 @@ QList<AADLInterfaceChain> AADLInterfaceChain::getNextChunk(
 }
 
 QList<AADLInterfaceChain> AADLInterfaceChain::getPreviousChunk(
-        const AADLInterfaceChain &currentChain, const AADLObjectIface *iface)
+        const AADLInterfaceChain &currentChain, const AADLIface *iface)
 {
     QList<AADLInterfaceChain> chains;
     for (auto connection : iface->objectsModel()->getConnectionsForIface(iface->id())) {
@@ -58,7 +58,7 @@ QList<AADLInterfaceChain> AADLInterfaceChain::getPreviousChunk(
     return chains.isEmpty() ? QList<AADLInterfaceChain> { currentChain } : chains;
 }
 
-QList<AADLInterfaceChain> AADLInterfaceChain::build(const AADLObjectIface *iface)
+QList<AADLInterfaceChain> AADLInterfaceChain::build(const AADLIface *iface)
 {
     if (!iface) {
         return {};
@@ -79,10 +79,10 @@ QList<AADLInterfaceChain> AADLInterfaceChain::build(const AADLObjectIface *iface
     return result;
 }
 
-QVector<QList<QString>> AADLInterfaceChain::linkedFunctions(const AADLObjectFunction *function)
+QVector<QList<QString>> AADLInterfaceChain::linkedFunctions(const AADLFunction *function)
 {
     QVector<QList<QString>> result;
-    for (AADLObjectIface *iface : function->interfaces()) {
+    for (AADLIface *iface : function->interfaces()) {
         const QList<AADLInterfaceChain> chains = build(iface);
         for (auto chain : chains) {
             if (!chain.ifaces.isEmpty()) {

@@ -20,16 +20,16 @@
 #include "commandids.h"
 
 #include <aadlobject.h>
-#include <aadlobjectconnection.h>
-#include <aadlobjectconnectiongroup.h>
-#include <aadlobjectfunction.h>
-#include <aadlobjectfunctiontype.h>
-#include <aadlobjectiface.h>
-#include <aadlobjectsmodel.h>
+#include <aadlconnection.h>
+#include <aadlconnectiongroup.h>
+#include <aadlfunction.h>
+#include <aadlfunctiontype.h>
+#include <aadliface.h>
+#include <aadlmodel.h>
 namespace ive {
 namespace cmd {
 
-CmdEntityRemove::CmdEntityRemove(ivm::AADLObject *entity, ivm::AADLObjectsModel *model)
+CmdEntityRemove::CmdEntityRemove(ivm::AADLObject *entity, ivm::AADLModel *model)
     : shared::UndoCommand()
     , m_model(model)
     , m_entity(entity)
@@ -47,19 +47,19 @@ CmdEntityRemove::~CmdEntityRemove()
             delete obj;
 }
 
-ivm::AADLObjectFunctionType *CmdEntityRemove::putParentFunctionFor(const ivm::AADLObject *obj)
+ivm::AADLFunctionType *CmdEntityRemove::putParentFunctionFor(const ivm::AADLObject *obj)
 {
     if (!obj || !obj->parentObject())
         return nullptr;
 
     const shared::Id &objId = obj->id();
-    if (auto *fn = obj->parentObject()->as<ivm::AADLObjectFunctionType *>())
+    if (auto *fn = obj->parentObject()->as<ivm::AADLFunctionType *>())
         m_parentFunctions[objId] = fn;
 
     return m_parentFunctions[objId];
 }
 
-ivm::AADLObjectFunctionType *CmdEntityRemove::popParentFunctionFor(const ivm::AADLObject *obj)
+ivm::AADLFunctionType *CmdEntityRemove::popParentFunctionFor(const ivm::AADLObject *obj)
 {
     return obj ? m_parentFunctions.take(obj->id()) : nullptr;
 }
@@ -97,7 +97,7 @@ void CmdEntityRemove::redo()
     auto removeAadlObjects = [this](const QVector<QPointer<ivm::AADLObject>> &collection) {
         for (auto it = collection.cbegin(); it != collection.cend(); ++it) {
             if ((*it)->aadlType() == ivm::AADLObject::Type::Connection) {
-                if (auto *connection = qobject_cast<ivm::AADLObjectConnection *>(*it)) {
+                if (auto *connection = qobject_cast<ivm::AADLConnection *>(*it)) {
                     connection->unsetInheritPI();
                 }
             }
@@ -120,7 +120,7 @@ void CmdEntityRemove::undo()
     auto restoreAadlObjects = [this](const QVector<QPointer<ivm::AADLObject>> &collection) {
         for (auto it = collection.crbegin(); it != collection.crend(); ++it) {
             if ((*it)->aadlType() == ivm::AADLObject::Type::Connection) {
-                if (auto *connection = qobject_cast<ivm::AADLObjectConnection *>(*it)) {
+                if (auto *connection = qobject_cast<ivm::AADLConnection *>(*it)) {
                     connection->setInheritPI();
                 }
             }
@@ -156,7 +156,7 @@ void CmdEntityRemove::collectRelatedItems(ivm::AADLObject *toBeRemoved)
 
     switch (toBeRemoved->aadlType()) {
     case ivm::AADLObject::Type::ConnectionGroup:
-        if (auto connection = qobject_cast<ivm::AADLObjectConnectionGroup *>(toBeRemoved)) {
+        if (auto connection = qobject_cast<ivm::AADLConnectionGroup *>(toBeRemoved)) {
             storeLinkedEntity(connection->sourceInterface());
             storeLinkedEntity(connection->targetInterface());
         }
@@ -164,7 +164,7 @@ void CmdEntityRemove::collectRelatedItems(ivm::AADLObject *toBeRemoved)
     case ivm::AADLObject::Type::InterfaceGroup:
     case ivm::AADLObject::Type::RequiredInterface:
     case ivm::AADLObject::Type::ProvidedInterface: {
-        if (auto *iface = qobject_cast<ivm::AADLObjectIface *>(toBeRemoved)) {
+        if (auto *iface = qobject_cast<ivm::AADLIface *>(toBeRemoved)) {
             for (const auto &clone : iface->clones())
                 collectRelatedItems(clone);
             if (auto connection = m_model->getConnectionForIface(iface->id()))
@@ -174,12 +174,12 @@ void CmdEntityRemove::collectRelatedItems(ivm::AADLObject *toBeRemoved)
     }
     case ivm::AADLObject::Type::Function:
     case ivm::AADLObject::Type::FunctionType: {
-        if (auto *fnType = qobject_cast<ivm::AADLObjectFunctionType *>(toBeRemoved)) {
+        if (auto *fnType = qobject_cast<ivm::AADLFunctionType *>(toBeRemoved)) {
             for (auto iface : fnType->interfaces())
                 collectRelatedItems(iface);
 
             for (auto child :
-                    toBeRemoved->findChildren<ivm::AADLObjectFunction *>(QString(), Qt::FindDirectChildrenOnly))
+                    toBeRemoved->findChildren<ivm::AADLFunction *>(QString(), Qt::FindDirectChildrenOnly))
                 collectRelatedItems(child);
         }
         break;

@@ -17,30 +17,30 @@
 
 #include "exportableaadlconnectiongroup.h"
 
-#include "aadlobjectconnectiongroup.h"
+#include "aadlconnectiongroup.h"
 
 #include <QMetaEnum>
 
 namespace ive {
 
-ExportableAADLConnectionGroup::ExportableAADLConnectionGroup(const ivm::AADLObjectConnectionGroup *connection)
+ExportableAADLConnectionGroup::ExportableAADLConnectionGroup(const ivm::AADLConnectionGroup *connection)
     : ExportableAADLObject(connection)
 {
 }
 
 QString ExportableAADLConnectionGroup::connectionGroupName() const
 {
-    return exportedObject<ivm::AADLObjectConnectionGroup>()->title();
+    return exportedObject<ivm::AADLConnectionGroup>()->title();
 }
 
 QString ExportableAADLConnectionGroup::sourceName() const
 {
-    return exportedObject<ivm::AADLObjectConnectionGroup>()->sourceName();
+    return exportedObject<ivm::AADLConnectionGroup>()->sourceName();
 }
 
 QString ExportableAADLConnectionGroup::targetName() const
 {
-    return exportedObject<ivm::AADLObjectConnectionGroup>()->targetName();
+    return exportedObject<ivm::AADLConnectionGroup>()->targetName();
 }
 
 QVariantMap ExportableAADLConnectionGroup::sourceInterfaces() const
@@ -48,7 +48,7 @@ QVariantMap ExportableAADLConnectionGroup::sourceInterfaces() const
     static const QMetaEnum &typeMetaEnum = QMetaEnum::fromType<ivm::AADLObject::Type>();
 
     QVariantMap interfaceNames;
-    for (const auto interface : exportedObject<ivm::AADLObjectConnectionGroup>()->groupedSourceInterfaces()) {
+    for (const auto interface : exportedObject<ivm::AADLConnectionGroup>()->groupedSourceInterfaces()) {
         const QString ifaceType = typeMetaEnum.valueToKey(static_cast<int>(interface->aadlType()));
         interfaceNames[ifaceType] = interface->title();
     }
@@ -60,7 +60,7 @@ QVariantMap ExportableAADLConnectionGroup::targetInterfaces() const
     static const QMetaEnum &typeMetaEnum = QMetaEnum::fromType<ivm::AADLObject::Type>();
 
     QVariantMap interfaceNames;
-    for (const auto interface : exportedObject<ivm::AADLObjectConnectionGroup>()->groupedTargetInterfaces()) {
+    for (const auto interface : exportedObject<ivm::AADLConnectionGroup>()->groupedTargetInterfaces()) {
         const QString ifaceType = typeMetaEnum.valueToKey(static_cast<int>(interface->aadlType()));
         interfaceNames[ifaceType] = interface->title();
     }

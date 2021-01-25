@@ -17,7 +17,7 @@
 
 #include "msceditorcore.h"
 
-#include "aadlobjectconnection.h"
+#include "aadlconnection.h"
 #include "aadlsystemchecks.h"
 #include "commandlineparser.h"
 #include "commands/cmddeleteentity.h"
@@ -485,7 +485,7 @@ void MSCEditorCore::changeMscMessageName(
 /*!
    Removes all instance that are corresponding to the function \p aadlFunction
  */
-void MSCEditorCore::removeMscInstances(ivm::AADLObjectFunction *aadlFunction)
+void MSCEditorCore::removeMscInstances(ivm::AADLFunction *aadlFunction)
 {
     bool updated = false;
     msc::MscCommandsStack *undo = commandsStack();
@@ -507,7 +507,7 @@ void MSCEditorCore::removeMscInstances(ivm::AADLObjectFunction *aadlFunction)
 /*!
    Removes all messages that are corresponding to the connection \p aadlConnection
  */
-void MSCEditorCore::removeMscMessages(ivm::AADLObjectConnection *aadlConnection)
+void MSCEditorCore::removeMscMessages(ivm::AADLConnection *aadlConnection)
 {
     bool updated = false;
     msc::MscCommandsStack *undo = commandsStack();
@@ -529,7 +529,7 @@ void MSCEditorCore::removeMscMessages(ivm::AADLObjectConnection *aadlConnection)
 /*!
    Returns a list of all corresponding instances for aadl function \p aadlFunction.
  */
-QList<MscInstance *> MSCEditorCore::correspondingInstances(ivm::AADLObjectFunction *aadlFunction) const
+QList<MscInstance *> MSCEditorCore::correspondingInstances(ivm::AADLFunction *aadlFunction) const
 {
     QList<MscInstance *> corresponds;
     for (msc::MscChart *chart : m_model->mscModel()->allCharts()) {
@@ -546,7 +546,7 @@ QList<MscInstance *> MSCEditorCore::correspondingInstances(ivm::AADLObjectFuncti
 /*!
    Returns a list of all corresponding messages for aadl connection \p aadlConnection.
  */
-QList<MscMessage *> MSCEditorCore::correspondingMessages(ivm::AADLObjectConnection *aadlConnection) const
+QList<MscMessage *> MSCEditorCore::correspondingMessages(ivm::AADLConnection *aadlConnection) const
 {
     QList<MscMessage *> corresponds;
     for (msc::MscChart *chart : m_model->mscModel()->allCharts()) {

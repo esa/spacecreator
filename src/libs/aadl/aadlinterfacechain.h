@@ -20,14 +20,14 @@
 #include <QPointer>
 
 namespace ivm {
-class AADLObjectIface;
-class AADLObjectFunction;
+class AADLIface;
+class AADLFunction;
 
 class AADLInterfaceChain
 {
 public:
-    static QList<AADLInterfaceChain> build(const AADLObjectIface *iface);
-    static QVector<QList<QString>> linkedFunctions(const AADLObjectFunction *function);
+    static QList<AADLInterfaceChain> build(const AADLIface *iface);
+    static QVector<QList<QString>> linkedFunctions(const AADLFunction *function);
 
     QString sourceEndPointName() const;
     QString targetEndPointName() const;
@@ -35,12 +35,12 @@ public:
     QStringList targetEndPointPath() const;
 
 private:
-    static QList<AADLInterfaceChain> getNextChunk(const AADLInterfaceChain &currentChain, const AADLObjectIface *iface);
+    static QList<AADLInterfaceChain> getNextChunk(const AADLInterfaceChain &currentChain, const AADLIface *iface);
     static QList<AADLInterfaceChain> getPreviousChunk(
-            const AADLInterfaceChain &currentChain, const AADLObjectIface *iface);
+            const AADLInterfaceChain &currentChain, const AADLIface *iface);
 
 private:
-    QList<const ivm::AADLObjectIface *> ifaces;
+    QList<const ivm::AADLIface *> ifaces;
 };
 
 } // namespace ivm

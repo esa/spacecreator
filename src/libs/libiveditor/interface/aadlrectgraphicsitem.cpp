@@ -18,7 +18,7 @@
 #include "aadlrectgraphicsitem.h"
 
 #include "aadlobject.h"
-#include "aadlobjectfunctiontype.h"
+#include "aadlfunctiontype.h"
 #include "baseitems/common/aadlutils.h"
 #include "commandsstack.h"
 #include "interface/graphicsitemhelpers.h"

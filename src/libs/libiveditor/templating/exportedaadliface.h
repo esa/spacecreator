@@ -21,14 +21,14 @@
 
 namespace taste3 {
 
-namespace ivm{
-class AADLObjectIface;
+namespace ivm {
+class AADLIface;
 }
 
 namespace templating {
 
 /**
- * @brief The TemplatedAADLIface is a class to export AADLObjectIface
+ * @brief The TemplatedAADLIface is a class to export AADLIface
  */
 class TemplatedAADLIface : public ExportedAADLObject
 {
@@ -38,7 +38,7 @@ class TemplatedAADLIface : public ExportedAADLObject
     Q_PROPERTY(QVariantList params READ paramList)
 
 public:
-    explicit TemplatedAADLIface(const ivm::AADLObjectIface *iface = nullptr);
+    explicit TemplatedAADLIface(const ivm::AADLIface *iface = nullptr);
 
     bool isProvided() const;
     bool isRequired() const;

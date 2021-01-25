@@ -20,14 +20,14 @@
 
 #include "commandids.h"
 
-#include <aadlobjectsmodel.h>
+#include <aadlmodel.h>
 
 namespace ive {
 namespace cmd {
 
 CmdIfaceParamChange::CmdIfaceParamChange(
         ivm::AADLObject *entity, const ivm::IfaceParameter &from, const ivm::IfaceParameter &to)
-    : CmdIfaceParamBase(entity ? entity->as<ivm::AADLObjectIface *>() : nullptr)
+    : CmdIfaceParamBase(entity ? entity->as<ivm::AADLIface *>() : nullptr)
     , m_newParam(to)
     , m_oldParam(from)
 {

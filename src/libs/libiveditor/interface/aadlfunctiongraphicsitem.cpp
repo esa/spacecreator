@@ -21,9 +21,9 @@
 #include "aadlconnectiongraphicsitem.h"
 #include "aadlfunctionnamegraphicsitem.h"
 #include "aadlinterfacegraphicsitem.h"
-#include "aadlobjectconnection.h"
-#include "aadlobjectfunction.h"
-#include "aadlobjectsmodel.h"
+#include "aadlconnection.h"
+#include "aadlfunction.h"
+#include "aadlmodel.h"
 #include "baseitems/common/aadlutils.h"
 #include "colors/colormanager.h"
 #include "interface/commands/commandids.h"
@@ -49,7 +49,7 @@ namespace ive {
 
 QPointer<QSvgRenderer> AADLFunctionGraphicsItem::m_svgRenderer = {};
 
-AADLFunctionGraphicsItem::AADLFunctionGraphicsItem(ivm::AADLObjectFunction *entity, QGraphicsItem *parent)
+AADLFunctionGraphicsItem::AADLFunctionGraphicsItem(ivm::AADLFunction *entity, QGraphicsItem *parent)
     : AADLFunctionTypeGraphicsItem(entity, parent)
 {
     m_textItem->setVisible(!isRootItem());
@@ -62,13 +62,13 @@ AADLFunctionGraphicsItem::AADLFunctionGraphicsItem(ivm::AADLObjectFunction *enti
 void AADLFunctionGraphicsItem::init()
 {
     AADLFunctionTypeGraphicsItem::init();
-    connect(entity(), &ivm::AADLObjectFunction::childAdded, this, [this]() { update(); });
-    connect(entity(), &ivm::AADLObjectFunction::childRemoved, this, [this]() { update(); });
+    connect(entity(), &ivm::AADLFunction::childAdded, this, [this]() { update(); });
+    connect(entity(), &ivm::AADLFunction::childRemoved, this, [this]() { update(); });
 }
 
-ivm::AADLObjectFunction *AADLFunctionGraphicsItem::entity() const
+ivm::AADLFunction *AADLFunctionGraphicsItem::entity() const
 {
-    return qobject_cast<ivm::AADLObjectFunction *>(aadlObject());
+    return qobject_cast<ivm::AADLFunction *>(aadlObject());
 }
 
 QPainterPath AADLFunctionGraphicsItem::shape() const
@@ -284,7 +284,7 @@ void AADLFunctionGraphicsItem::drawInnerFunctions(QPainter *painter)
             } else {
                 itemsCountWithoutGeometry += 1;
             }
-        } else if (auto connection = qobject_cast<const ivm::AADLObjectConnection *>(child)) {
+        } else if (auto connection = qobject_cast<const ivm::AADLConnection *>(child)) {
             if (connection->source()->id() != entity()->id() && connection->target()->id() != entity()->id()) {
                 const QPolygonF itemScenePoints =
                         ive::polygon(ivm::AADLObject::coordinatesFromString(strCoordinates));
@@ -394,11 +394,11 @@ void AADLFunctionGraphicsItem::applyColorScheme()
 
 QString AADLFunctionGraphicsItem::prepareTooltip() const
 {
-    const QString title = uniteNames<ivm::AADLObjectFunctionType *>({ entity() }, QString());
+    const QString title = uniteNames<ivm::AADLFunctionType *>({ entity() }, QString());
     const QString prototype =
-            uniteNames<const ivm::AADLObjectFunctionType *>({ entity()->instanceOf() }, tr("Instance of: "));
-    const QString ris = uniteNames<ivm::AADLObjectIface *>(entity()->ris(), tr("RI: "));
-    const QString pis = uniteNames<ivm::AADLObjectIface *>(entity()->pis(), tr("PI: "));
+            uniteNames<const ivm::AADLFunctionType *>({ entity()->instanceOf() }, tr("Instance of: "));
+    const QString ris = uniteNames<ivm::AADLIface *>(entity()->ris(), tr("RI: "));
+    const QString pis = uniteNames<ivm::AADLIface *>(entity()->pis(), tr("PI: "));
 
     return joinNonEmpty({ title, prototype, ris, pis }, QStringLiteral("<br>"));
 }

@@ -17,7 +17,7 @@
 
 #include "cmdrequiredifacepropertychange.h"
 
-#include "aadlobjectconnection.h"
+#include "aadlconnection.h"
 #include "cmdentityremove.h"
 #include "commandids.h"
 #include "commandsfactory.h"
@@ -25,13 +25,13 @@
 namespace ive {
 namespace cmd {
 
-QVariant getCurrentProperty(const ivm::AADLObjectIfaceRequired *entity, const QString &name)
+QVariant getCurrentProperty(const ivm::AADLIfaceRequired *entity, const QString &name)
 {
     return (entity && !name.isEmpty()) ? entity->prop(name) : QVariant();
 }
 
 CmdRequiredIfacePropertyChange::CmdRequiredIfacePropertyChange(
-        ivm::AADLObjectIfaceRequired *entity, const QString &propName, const QVariant &value)
+        ivm::AADLIfaceRequired *entity, const QString &propName, const QVariant &value)
     : CmdIfaceDataChangeBase(entity, propName, value, getCurrentProperty(entity, propName))
 {
     if (m_targetToken == ivm::meta::Props::Token::InheritPI) {
@@ -102,9 +102,9 @@ void CmdRequiredIfacePropertyChange::setInheritPI(bool nowInherited)
     }
 }
 
-bool CmdRequiredIfacePropertyChange::connectionMustDie(const ivm::AADLObjectConnection *connection) const
+bool CmdRequiredIfacePropertyChange::connectionMustDie(const ivm::AADLConnection *connection) const
 {
-    const ivm::AADLObjectIface *otherIface = getConnectionOtherSide(connection, m_iface);
+    const ivm::AADLIface *otherIface = getConnectionOtherSide(connection, m_iface);
     if (!otherIface) {
         Q_UNREACHABLE();
         return true;
@@ -114,15 +114,15 @@ bool CmdRequiredIfacePropertyChange::connectionMustDie(const ivm::AADLObjectConn
     if (!sameParams)
         return true;
 
-    const ivm::AADLObjectIface::OperationKind newKind = m_iface->kindFromString(
+    const ivm::AADLIface::OperationKind newKind = m_iface->kindFromString(
             m_iface->originalAttr(ivm::meta::Props::token(ivm::meta::Props::Token::kind)).toString());
-    if (ivm::AADLObjectIface::OperationKind::Cyclic == newKind) {
+    if (ivm::AADLIface::OperationKind::Cyclic == newKind) {
         Q_UNREACHABLE(); // m_iface is a RI
         return true;
     }
 
-    if (ivm::AADLObjectIface::OperationKind::Any != newKind
-            && ivm::AADLObjectIface::OperationKind::Any != otherIface->kind()) {
+    if (ivm::AADLIface::OperationKind::Any != newKind
+            && ivm::AADLIface::OperationKind::Any != otherIface->kind()) {
         return otherIface->kind() == newKind;
     }
 

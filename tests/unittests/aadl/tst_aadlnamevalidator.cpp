@@ -16,7 +16,7 @@
 */
 
 #include "aadlnamevalidator.h"
-#include "aadlobjectfunction.h"
+#include "aadlfunction.h"
 
 #include <QTest>
 

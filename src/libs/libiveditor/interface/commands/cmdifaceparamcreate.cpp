@@ -20,13 +20,13 @@
 
 #include "commandids.h"
 
-#include <aadlobjectsmodel.h>
+#include <aadlmodel.h>
 
 namespace ive {
 namespace cmd {
 
 CmdIfaceParamCreate::CmdIfaceParamCreate(ivm::AADLObject *entity, const ivm::IfaceParameter &param)
-    : CmdIfaceParamBase(entity ? entity->as<ivm::AADLObjectIface *>() : nullptr)
+    : CmdIfaceParamBase(entity ? entity->as<ivm::AADLIface *>() : nullptr)
     , m_targetParams({ param })
     , m_sourceParams(m_iface ? m_iface->params() : QVector<ivm::IfaceParameter>())
 {

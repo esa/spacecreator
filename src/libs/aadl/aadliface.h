@@ -32,14 +32,14 @@
 
 namespace ivm {
 
-class AADLObjectFunction;
-class AADLObjectFunctionType;
-struct AADLObjectIfacePrivate;
+class AADLFunction;
+class AADLFunctionType;
+struct AADLIfacePrivate;
 
-class AADLObjectIface : public AADLObject
+class AADLIface : public AADLObject
 {
     Q_OBJECT
-    Q_PROPERTY(AADLObjectIface::IfaceType direction READ direction CONSTANT)
+    Q_PROPERTY(AADLIface::IfaceType direction READ direction CONSTANT)
 
 public:
     enum class IfaceType
@@ -67,39 +67,39 @@ public:
             Init = 0,
             Clone
         };
-        CreationInfo(AADLObjectsModel *model = nullptr, AADLObjectFunctionType *function = nullptr,
-                const QPointF &position = QPointF(), AADLObjectIface::IfaceType type = DefaultDirection,
+        CreationInfo(AADLModel *model = nullptr, AADLFunctionType *function = nullptr,
+                const QPointF &position = QPointF(), AADLIface::IfaceType type = DefaultDirection,
                 const shared::Id &id = shared::createId(),
                 const QVector<IfaceParameter> &parameters = QVector<IfaceParameter>(),
                 OperationKind kind = OperationKind::Sporadic, const QString &name = QString(),
-                const CreationInfo::Policy policy = CreationInfo::Policy::Init, AADLObjectIface *toBeCloned = nullptr);
-        AADLObjectsModel *model { nullptr };
-        AADLObjectFunctionType *function { nullptr };
+                const CreationInfo::Policy policy = CreationInfo::Policy::Init, AADLIface *toBeCloned = nullptr);
+        AADLModel *model { nullptr };
+        AADLFunctionType *function { nullptr };
         QPointF position = {};
-        AADLObjectIface::IfaceType type { DefaultDirection };
+        AADLIface::IfaceType type { DefaultDirection };
         shared::Id id = {};
         QVector<IfaceParameter> parameters = {};
         OperationKind kind = { OperationKind::Sporadic };
         QString name {};
         CreationInfo::Policy policy { CreationInfo::Policy::Init };
-        AADLObjectIface *toBeCloned { nullptr };
+        AADLIface *toBeCloned { nullptr };
 
         QVariantList toVarList() const;
-        static CreationInfo initFromIface(AADLObjectIface *iface, const CreationInfo::Policy policy);
-        static CreationInfo fromIface(AADLObjectIface *iface);
-        static CreationInfo cloneIface(AADLObjectIface *iface, AADLObjectFunction *fn);
+        static CreationInfo initFromIface(AADLIface *iface, const CreationInfo::Policy policy);
+        static CreationInfo fromIface(AADLIface *iface);
+        static CreationInfo cloneIface(AADLIface *iface, AADLFunction *fn);
 
         void resetKind();
     };
 
-    QMap<AADLObjectIface::OperationKind, QString> availableKindNames() const;
-    static QString kindToString(AADLObjectIface::OperationKind k);
-    static AADLObjectIface::OperationKind kindFromString(const QString &k, AADLObjectIface::OperationKind defaultKind);
-    AADLObjectIface::OperationKind kindFromString(const QString &k) const;
+    QMap<AADLIface::OperationKind, QString> availableKindNames() const;
+    static QString kindToString(AADLIface::OperationKind k);
+    static AADLIface::OperationKind kindFromString(const QString &k, AADLIface::OperationKind defaultKind);
+    AADLIface::OperationKind kindFromString(const QString &k) const;
 
-    ~AADLObjectIface() override;
+    ~AADLIface() override;
 
-    AADLObjectIface::IfaceType direction() const;
+    AADLIface::IfaceType direction() const;
 
     bool isProvided() const;
     bool isRequired() const;
@@ -112,24 +112,24 @@ public:
     void setParams(const QVector<IfaceParameter> &params);
     void addParam(const IfaceParameter &param);
 
-    AADLObjectFunctionType *function() const;
+    AADLFunctionType *function() const;
 
-    QList<AADLObjectFunction *> functionsStack() const;
+    QList<AADLFunction *> functionsStack() const;
 
-    AADLObjectIface *cloneOf() const;
+    AADLIface *cloneOf() const;
     bool isClone() const;
     bool isCloned() const;
-    QVector<QPointer<AADLObjectIface>> clones() const;
+    QVector<QPointer<AADLIface>> clones() const;
 
-    static AADLObjectIface *createIface(const CreationInfo &descr);
+    static AADLIface *createIface(const CreationInfo &descr);
 
     QVariant originalAttr(const QString &name) const;
     QVariant originalProp(const QString &name) const;
     QVector<IfaceParameter> originalParams() const;
 
-    void setCloneOrigin(AADLObjectIface *source);
+    void setCloneOrigin(AADLIface *source);
 
-    AADLObjectIface::OperationKind defaultKind() const;
+    AADLIface::OperationKind defaultKind() const;
 
     virtual QString ifaceLabel() const;
 
@@ -142,22 +142,22 @@ protected Q_SLOTS:
     void onReflectedParamsChanged();
 
 protected:
-    explicit AADLObjectIface(AADLObject::Type ifaceType, const CreationInfo &ci);
+    explicit AADLIface(AADLObject::Type ifaceType, const CreationInfo &ci);
     void setupInitialAttrs();
 
-    void rememberClone(AADLObjectIface *clone);
-    void forgetClone(AADLObjectIface *clone);
+    void rememberClone(AADLIface *clone);
+    void forgetClone(AADLIface *clone);
 
-    virtual void cloneInternals(const AADLObjectIface *from);
-    virtual void restoreInternals(const AADLObjectIface *disconnectMe);
+    virtual void cloneInternals(const AADLIface *from);
+    virtual void restoreInternals(const AADLIface *disconnectMe);
 
-    void reflectAttrs(const AADLObjectIface *from);
-    void reflectProps(const AADLObjectIface *from);
-    void reflectParams(const AADLObjectIface *from);
+    void reflectAttrs(const AADLIface *from);
+    void reflectProps(const AADLIface *from);
+    void reflectParams(const AADLIface *from);
 
 protected:
     struct OriginalPropsHolder {
-        // TODO: unite with AADLObjectFunction::OriginalPropsHolder
+        // TODO: unite with AADLFunction::OriginalPropsHolder
 
         QString name;
         QHash<QString, QVariant> attrs;
@@ -166,7 +166,7 @@ protected:
 
         inline bool collected() const { return m_collected; }
 
-        inline void collect(const AADLObjectIface *src)
+        inline void collect(const AADLIface *src)
         {
             if (m_collected || !src)
                 return;
@@ -184,23 +184,23 @@ protected:
     } m_originalFields;
 
 private:
-    const std::unique_ptr<AADLObjectIfacePrivate> d;
+    const std::unique_ptr<AADLIfacePrivate> d;
 
     bool storedKindDiffers() const;
 };
 
-class AADLObjectIfaceProvided : public AADLObjectIface
+class AADLIfaceProvided : public AADLIface
 {
     Q_OBJECT
 public:
-    explicit AADLObjectIfaceProvided(const CreationInfo &ci);
+    explicit AADLIfaceProvided(const CreationInfo &ci);
 };
 
-class AADLObjectIfaceRequired : public AADLObjectIface
+class AADLIfaceRequired : public AADLIface
 {
     Q_OBJECT
 public:
-    explicit AADLObjectIfaceRequired(const CreationInfo &ci);
+    explicit AADLIfaceRequired(const CreationInfo &ci);
 
     virtual void setAttr(const QString &name, const QVariant &val) override;
     virtual void setProp(const QString &name, const QVariant &val) override;
@@ -209,8 +209,8 @@ public:
     bool hasPrototypePi() const;
 
     QStringList inheritedLables() const;
-    void setPrototype(const AADLObjectIfaceProvided *pi);
-    void unsetPrototype(const AADLObjectIfaceProvided *pi);
+    void setPrototype(const AADLIfaceProvided *pi);
+    void unsetPrototype(const AADLIfaceProvided *pi);
 
     QString ifaceLabel() const override;
     QStringList ifaceLabelList() const;
@@ -220,10 +220,10 @@ Q_SIGNALS:
     void inheritedLabelsChanged(const QStringList &labels);
 
 protected:
-    QVector<const AADLObjectIfaceProvided *> m_prototypes;
+    QVector<const AADLIfaceProvided *> m_prototypes;
 
-    void cloneInternals(const AADLObjectIface *from) override;
-    void restoreInternals(const AADLObjectIface *disconnectMe) override;
+    void cloneInternals(const AADLIface *from) override;
+    void restoreInternals(const AADLIface *disconnectMe) override;
 
 private:
     QStringList collectInheritedLabels() const;
@@ -231,9 +231,9 @@ private:
     void namesForRIsToPI(QStringList &result) const;
 };
 
-typedef QVector<AADLObjectIface *> AADLIfacesVector;
+typedef QVector<AADLIface *> AADLIfacesVector;
 
 }
 
-Q_DECLARE_METATYPE(ivm::AADLObjectIface::IfaceType);
-Q_DECLARE_METATYPE(ivm::AADLObjectIface::CreationInfo);
+Q_DECLARE_METATYPE(ivm::AADLIface::IfaceType);
+Q_DECLARE_METATYPE(ivm::AADLIface::CreationInfo);

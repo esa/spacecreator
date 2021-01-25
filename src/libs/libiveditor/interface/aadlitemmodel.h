@@ -17,7 +17,7 @@
 
 #pragma once
 
-#include "aadlobjectsmodel.h"
+#include "aadlmodel.h"
 
 #include <QObject>
 #include <QQueue>
@@ -59,7 +59,7 @@ public:
     };
     Q_ENUM(AADLRoles);
 
-    explicit AADLItemModel(ivm::AADLObjectsModel *model, QObject *parent = nullptr);
+    explicit AADLItemModel(ivm::AADLModel *model, QObject *parent = nullptr);
     ~AADLItemModel() override;
 
     QGraphicsScene *scene() const;
@@ -69,7 +69,7 @@ public:
 
     QGraphicsItem *getItem(const shared::Id id) const;
 
-    ivm::AADLObjectsModel *objectsModel() const;
+    ivm::AADLModel *objectsModel() const;
 
 Q_SIGNALS:
     void itemClicked(shared::Id id);
@@ -85,8 +85,8 @@ private Q_SLOTS:
     void onAADLObjectsAdded(const QVector<ivm::AADLObject *> &objects);
     void onAADLObjectRemoved(ivm::AADLObject *object);
     void onRootObjectChanged(shared::Id rootId);
-    void onConnectionAddedToGroup(ivm::AADLObjectConnection *connection);
-    void onConnectionRemovedFromGroup(ivm::AADLObjectConnection *connection);
+    void onConnectionAddedToGroup(ivm::AADLConnection *connection);
+    void onConnectionRemovedFromGroup(ivm::AADLConnection *connection);
 
     void onSceneSelectionChanged();
 
@@ -104,7 +104,7 @@ private:
     T getItem(const shared::Id id) const;
 
 private:
-    ivm::AADLObjectsModel *m_model { nullptr };
+    ivm::AADLModel *m_model { nullptr };
     InterfaceTabGraphicsScene *m_graphicsScene { nullptr };
     QHash<shared::Id, QGraphicsItem *> m_items;
     QMutex *m_mutex { nullptr };

@@ -17,9 +17,9 @@
 
 #include "aadlconnectionchain.h"
 
-#include "aadlobjectconnection.h"
-#include "aadlobjectiface.h"
-#include "aadlobjectsmodel.h"
+#include "aadlconnection.h"
+#include "aadliface.h"
+#include "aadlmodel.h"
 
 #include <QDebug>
 
@@ -46,12 +46,12 @@ bool containsChainAlready(AADLConnectionChain *chain, const QList<AADLConnection
    Creates a list of all connection chains in that model
    The caller has to take over the ownership of the objects in the list
  */
-QList<AADLConnectionChain *> AADLConnectionChain::build(const ivm::AADLObjectsModel &model)
+QList<AADLConnectionChain *> AADLConnectionChain::build(const ivm::AADLModel &model)
 {
     QList<AADLConnectionChain *> chains;
-    QList<AADLObjectConnection *> allConnections = model.allObjectsByType<ivm::AADLObjectConnection>().toList();
+    QList<AADLConnection *> allConnections = model.allObjectsByType<ivm::AADLConnection>().toList();
 
-    for (AADLObjectConnection *connection : allConnections) {
+    for (AADLConnection *connection : allConnections) {
         QList<AADLConnectionChain *> newChains = AADLConnectionChain::build(connection, allConnections);
         for (auto c : newChains) {
             if (!containsChainAlready(c, chains)) {
@@ -67,7 +67,7 @@ QList<AADLConnectionChain *> AADLConnectionChain::build(const ivm::AADLObjectsMo
    Creates a list of all connection chains in the list of given connection
  */
 QList<AADLConnectionChain *> AADLConnectionChain::build(
-        AADLObjectConnection *connection, const QList<AADLObjectConnection *> &allConnections)
+        AADLConnection *connection, const QList<AADLConnection *> &allConnections)
 {
     if (connection == nullptr) {
         return {};
@@ -115,12 +115,12 @@ QList<AADLConnectionChain *> AADLConnectionChain::build(
     return chains;
 }
 
-const QList<AADLObjectConnection *> &AADLConnectionChain::connections() const
+const QList<AADLConnection *> &AADLConnectionChain::connections() const
 {
     return m_chain;
 }
 
-bool AADLConnectionChain::prepend(AADLObjectConnection *connection)
+bool AADLConnectionChain::prepend(AADLConnection *connection)
 {
     if (!connection) {
         return false;
@@ -138,7 +138,7 @@ bool AADLConnectionChain::prepend(AADLObjectConnection *connection)
     return true;
 }
 
-bool AADLConnectionChain::append(AADLObjectConnection *connection)
+bool AADLConnectionChain::append(AADLConnection *connection)
 {
     if (!connection) {
         return false;
@@ -180,7 +180,7 @@ bool AADLConnectionChain::append(AADLConnectionChain *chain)
 /*!
    Return if the aadl \p connection is part of this chain
  */
-bool AADLConnectionChain::contains(AADLObjectConnection *connection) const
+bool AADLConnectionChain::contains(AADLConnection *connection) const
 {
     return m_chain.contains(connection);
 }
@@ -282,15 +282,15 @@ bool AADLConnectionChain::operator==(const AADLConnectionChain &other) const
    Returns all chains that end at the source interface of \p connection
  */
 QList<AADLConnectionChain *> AADLConnectionChain::findPrevious(
-        AADLObjectConnection *connection, const QList<AADLObjectConnection *> &allConnections)
+        AADLConnection *connection, const QList<AADLConnection *> &allConnections)
 {
-    AADLObjectIface *iface = connection->sourceInterface();
+    AADLIface *iface = connection->sourceInterface();
     if (iface == nullptr) {
         return {};
     }
 
     QList<AADLConnectionChain *> chains;
-    for (AADLObjectConnection *c : allConnections) {
+    for (AADLConnection *c : allConnections) {
         if (c->targetInterface() == iface) {
             QList<AADLConnectionChain *> subChains = findPrevious(c, allConnections);
             if (subChains.isEmpty()) {
@@ -313,15 +313,15 @@ QList<AADLConnectionChain *> AADLConnectionChain::findPrevious(
    Returns all chains that start at the target interface of \p connection
  */
 QList<AADLConnectionChain *> AADLConnectionChain::findNext(
-        AADLObjectConnection *connection, const QList<AADLObjectConnection *> &allConnections)
+        AADLConnection *connection, const QList<AADLConnection *> &allConnections)
 {
-    AADLObjectIface *iface = connection->targetInterface();
+    AADLIface *iface = connection->targetInterface();
     if (iface == nullptr) {
         return {};
     }
 
     QList<AADLConnectionChain *> chains;
-    for (AADLObjectConnection *c : allConnections) {
+    for (AADLConnection *c : allConnections) {
         if (c->sourceInterface() == iface) {
             QList<AADLConnectionChain *> subChains = findNext(c, allConnections);
             if (subChains.isEmpty()) {
@@ -355,7 +355,7 @@ QDebug operator<<(QDebug debug, const ivm::AADLConnectionChain &chain)
         QString out;
         out += QString("%1.%2").arg(
                 chain.connections().first()->sourceName(), chain.connections().first()->sourceInterfaceName());
-        for (ivm::AADLObjectConnection *c : chain.connections()) {
+        for (ivm::AADLConnection *c : chain.connections()) {
             out += QString("->%1.%2").arg(c->targetName(), c->targetInterfaceName());
         }
         debug.nospace() << out;

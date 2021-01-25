@@ -15,59 +15,56 @@
   along with this program. If not, see <https://www.gnu.org/licenses/lgpl-2.1.html>.
 */
 
-#include "aadlobjectfunctiontype.h"
+#include "aadlfunctiontype.h"
 
+#include "aadlcomment.h"
 #include "aadlcommonprops.h"
-#include "aadlobjectcomment.h"
-#include "aadlobjectconnection.h"
-#include "aadlobjectconnectiongroup.h"
-#include "aadlobjectfunction.h"
-#include "aadlobjectiface.h"
-#include "aadlobjectifacegroup.h"
+#include "aadlconnection.h"
+#include "aadlconnectiongroup.h"
+#include "aadlfunction.h"
+#include "aadliface.h"
+#include "aadlifacegroup.h"
 
 #include <QDebug>
 
 namespace ivm {
 
-struct AADLObjectFunctionTypePrivate {
+struct AADLFunctionTypePrivate {
     QVector<AADLObject *> m_children {};
     QVector<ContextParameter> m_contextParams {};
-    QVector<QPointer<AADLObjectFunction>> m_instances {};
+    QVector<QPointer<AADLFunction>> m_instances {};
 
-    QVector<AADLObjectFunctionType *> m_functionTypes;
-    QVector<AADLObjectFunction *> m_functions;
-    QVector<AADLObjectIface *> m_pis;
-    QVector<AADLObjectIface *> m_ris;
-    QVector<AADLObjectIfaceGroup *> m_ifaceGroups;
-    QVector<AADLObjectComment *> m_comments;
-    QVector<AADLObjectConnection *> m_connections;
-    QVector<AADLObjectConnectionGroup *> m_connectionGroups;
+    QVector<AADLFunctionType *> m_functionTypes;
+    QVector<AADLFunction *> m_functions;
+    QVector<AADLIface *> m_pis;
+    QVector<AADLIface *> m_ris;
+    QVector<AADLIfaceGroup *> m_ifaceGroups;
+    QVector<AADLComment *> m_comments;
+    QVector<AADLConnection *> m_connections;
+    QVector<AADLConnectionGroup *> m_connectionGroups;
 };
 
-AADLObjectFunctionType::AADLObjectFunctionType(const QString &title, QObject *parent)
-    : AADLObjectFunctionType(AADLObject::Type::FunctionType, title, parent)
+AADLFunctionType::AADLFunctionType(const QString &title, QObject *parent)
+    : AADLFunctionType(AADLObject::Type::FunctionType, title, parent)
 {
 }
 
-AADLObjectFunctionType::AADLObjectFunctionType(const AADLObject::Type t, const QString &title, QObject *parent)
+AADLFunctionType::AADLFunctionType(const AADLObject::Type t, const QString &title, QObject *parent)
     : AADLObject(t, title, parent)
-    , d(new AADLObjectFunctionTypePrivate)
+    , d(new AADLFunctionTypePrivate)
 {
     setAttr(meta::Props::token(meta::Props::Token::language), QVariant());
     setAttr(meta::Props::token(meta::Props::Token::is_type), QStringLiteral("YES"));
-
-    //    if (AADLObjectFunctionType *root = qobject_cast<AADLObjectFunctionType *>(parent))
-    //        root->addChild(this);
 }
 
-AADLObjectFunctionType::~AADLObjectFunctionType() { }
+AADLFunctionType::~AADLFunctionType() { }
 
-QVector<AADLObject *> AADLObjectFunctionType::children() const
+QVector<AADLObject *> AADLFunctionType::children() const
 {
     return d->m_children;
 }
 
-bool AADLObjectFunctionType::addChild(AADLObject *child)
+bool AADLFunctionType::addChild(AADLObject *child)
 {
     if (child && !d->m_children.contains(child)) {
         child->setParentObject(this);
@@ -76,35 +73,35 @@ bool AADLObjectFunctionType::addChild(AADLObject *child)
         const AADLObject::Type t = child->aadlType();
         switch (t) {
         case AADLObject::Type::FunctionType: {
-            d->m_functionTypes.append(child->as<AADLObjectFunctionType *>());
+            d->m_functionTypes.append(child->as<AADLFunctionType *>());
             break;
         }
         case AADLObject::Type::Function: {
-            d->m_functionTypes.append(child->as<AADLObjectFunction *>());
+            d->m_functionTypes.append(child->as<AADLFunction *>());
             break;
         }
         case AADLObject::Type::InterfaceGroup: {
-            d->m_ifaceGroups.append(child->as<AADLObjectIfaceGroup *>());
+            d->m_ifaceGroups.append(child->as<AADLIfaceGroup *>());
             break;
         }
         case AADLObject::Type::ProvidedInterface: {
-            d->m_pis.append(child->as<AADLObjectIfaceProvided *>());
+            d->m_pis.append(child->as<AADLIfaceProvided *>());
             break;
         }
         case AADLObject::Type::RequiredInterface: {
-            d->m_ris.append(child->as<AADLObjectIfaceRequired *>());
+            d->m_ris.append(child->as<AADLIfaceRequired *>());
             break;
         }
         case AADLObject::Type::Comment: {
-            d->m_comments.append(child->as<AADLObjectComment *>());
+            d->m_comments.append(child->as<AADLComment *>());
             break;
         }
         case AADLObject::Type::ConnectionGroup: {
-            d->m_connectionGroups.append(child->as<AADLObjectConnectionGroup *>());
+            d->m_connectionGroups.append(child->as<AADLConnectionGroup *>());
             break;
         }
         case AADLObject::Type::Connection: {
-            d->m_connections.append(child->as<AADLObjectConnection *>());
+            d->m_connections.append(child->as<AADLConnection *>());
             break;
         }
         default: {
@@ -120,7 +117,7 @@ bool AADLObjectFunctionType::addChild(AADLObject *child)
     return false;
 }
 
-bool AADLObjectFunctionType::removeChild(AADLObject *child)
+bool AADLFunctionType::removeChild(AADLObject *child)
 {
     int id = d->m_children.indexOf(child);
     if (id >= 0 && id < d->m_children.size()) {
@@ -130,35 +127,35 @@ bool AADLObjectFunctionType::removeChild(AADLObject *child)
         const AADLObject::Type t = child->aadlType();
         switch (t) {
         case AADLObject::Type::FunctionType: {
-            d->m_functionTypes.removeAll(child->as<AADLObjectFunctionType *>());
+            d->m_functionTypes.removeAll(child->as<AADLFunctionType *>());
             break;
         }
         case AADLObject::Type::Function: {
-            d->m_functionTypes.removeAll(child->as<AADLObjectFunction *>());
+            d->m_functionTypes.removeAll(child->as<AADLFunction *>());
             break;
         }
         case AADLObject::Type::InterfaceGroup: {
-            d->m_ifaceGroups.removeAll(child->as<AADLObjectIfaceGroup *>());
+            d->m_ifaceGroups.removeAll(child->as<AADLIfaceGroup *>());
             break;
         }
         case AADLObject::Type::RequiredInterface: {
-            d->m_ris.removeAll(child->as<AADLObjectIfaceRequired *>());
+            d->m_ris.removeAll(child->as<AADLIfaceRequired *>());
             break;
         }
         case AADLObject::Type::ProvidedInterface: {
-            d->m_pis.removeAll(child->as<AADLObjectIfaceProvided *>());
+            d->m_pis.removeAll(child->as<AADLIfaceProvided *>());
             break;
         }
         case AADLObject::Type::Comment: {
-            d->m_comments.removeAll(child->as<AADLObjectComment *>());
+            d->m_comments.removeAll(child->as<AADLComment *>());
             break;
         }
         case AADLObject::Type::ConnectionGroup: {
-            d->m_connectionGroups.removeAll(child->as<AADLObjectConnectionGroup *>());
+            d->m_connectionGroups.removeAll(child->as<AADLConnectionGroup *>());
             break;
         }
         case AADLObject::Type::Connection: {
-            d->m_connections.removeAll(child->as<AADLObjectConnection *>());
+            d->m_connections.removeAll(child->as<AADLConnection *>());
             break;
         }
         default: {
@@ -174,76 +171,76 @@ bool AADLObjectFunctionType::removeChild(AADLObject *child)
     return false;
 }
 
-QVector<AADLObjectFunctionType *> AADLObjectFunctionType::functionTypes() const
+QVector<AADLFunctionType *> AADLFunctionType::functionTypes() const
 {
     return d->m_functionTypes;
 }
 
-QVector<AADLObjectFunction *> AADLObjectFunctionType::functions() const
+QVector<AADLFunction *> AADLFunctionType::functions() const
 {
     return d->m_functions;
 }
 
-QVector<AADLObjectConnection *> AADLObjectFunctionType::connections() const
+QVector<AADLConnection *> AADLFunctionType::connections() const
 {
     return d->m_connections;
 }
 
-QVector<AADLObjectConnectionGroup *> AADLObjectFunctionType::connectionGroups() const
+QVector<AADLConnectionGroup *> AADLFunctionType::connectionGroups() const
 {
     return d->m_connectionGroups;
 }
 
-QVector<AADLObjectComment *> AADLObjectFunctionType::comments() const
+QVector<AADLComment *> AADLFunctionType::comments() const
 {
     return d->m_comments;
 }
 
-QVector<AADLObjectIface *> AADLObjectFunctionType::interfaces() const
+QVector<AADLIface *> AADLFunctionType::interfaces() const
 {
-    QVector<AADLObjectIface *> result;
+    QVector<AADLIface *> result;
 
     for (auto i : d->m_pis)
-        result.append(i->as<AADLObjectIface *>());
+        result.append(i->as<AADLIface *>());
 
     for (auto i : d->m_ris)
-        result.append(i->as<AADLObjectIface *>());
+        result.append(i->as<AADLIface *>());
 
     return result;
 }
 
-QVector<AADLObjectIface *> AADLObjectFunctionType::allInterfaces() const
+QVector<AADLIface *> AADLFunctionType::allInterfaces() const
 {
-    QVector<AADLObjectIface *> result;
+    QVector<AADLIface *> result;
 
     for (auto i : d->m_pis)
-        result.append(i->as<AADLObjectIface *>());
+        result.append(i->as<AADLIface *>());
 
     for (auto i : d->m_ris)
-        result.append(i->as<AADLObjectIface *>());
+        result.append(i->as<AADLIface *>());
 
     for (auto i : d->m_ifaceGroups)
-        result.append(i->as<AADLObjectIface *>());
+        result.append(i->as<AADLIface *>());
 
     return result;
 }
 
-QVector<AADLObjectIface *> AADLObjectFunctionType::ris() const
+QVector<AADLIface *> AADLFunctionType::ris() const
 {
     return d->m_ris;
 }
 
-QVector<AADLObjectIface *> AADLObjectFunctionType::pis() const
+QVector<AADLIface *> AADLFunctionType::pis() const
 {
     return d->m_pis;
 }
 
-QVector<AADLObjectIfaceGroup *> AADLObjectFunctionType::interfaceGroups() const
+QVector<AADLIfaceGroup *> AADLFunctionType::interfaceGroups() const
 {
     return d->m_ifaceGroups;
 }
 
-bool AADLObjectFunctionType::hasNestedChildren() const
+bool AADLFunctionType::hasNestedChildren() const
 {
     return functionTypes().size() || functions().size() || comments().size();
 }
@@ -252,7 +249,7 @@ bool AADLObjectFunctionType::hasNestedChildren() const
    Returns ig the functions has an interface with the given \p name.
    \note The interface type is not relevant
  */
-bool AADLObjectFunctionType::hasInterface(const QString &name, Qt::CaseSensitivity caseSensitivity) const
+bool AADLFunctionType::hasInterface(const QString &name, Qt::CaseSensitivity caseSensitivity) const
 {
     for (auto i : qAsConst(d->m_pis)) {
         if (name.compare(i->title(), caseSensitivity) == 0) {
@@ -268,12 +265,12 @@ bool AADLObjectFunctionType::hasInterface(const QString &name, Qt::CaseSensitivi
     return false;
 }
 
-QVector<ContextParameter> AADLObjectFunctionType::contextParams() const
+QVector<ContextParameter> AADLFunctionType::contextParams() const
 {
     return d->m_contextParams;
 }
 
-ContextParameter AADLObjectFunctionType::contextParam(const QString &name) const
+ContextParameter AADLFunctionType::contextParam(const QString &name) const
 {
     if (!name.isEmpty())
         for (const ContextParameter &param : contextParams())
@@ -282,7 +279,7 @@ ContextParameter AADLObjectFunctionType::contextParam(const QString &name) const
     return {};
 }
 
-void AADLObjectFunctionType::addContextParam(const ContextParameter &param)
+void AADLFunctionType::addContextParam(const ContextParameter &param)
 {
     if (!d->m_contextParams.contains(param)) {
         d->m_contextParams.append(param);
@@ -290,7 +287,7 @@ void AADLObjectFunctionType::addContextParam(const ContextParameter &param)
     }
 }
 
-bool AADLObjectFunctionType::removeContextParam(const ContextParameter &param)
+bool AADLFunctionType::removeContextParam(const ContextParameter &param)
 {
     const bool removed = d->m_contextParams.removeOne(param);
     if (removed)
@@ -298,7 +295,7 @@ bool AADLObjectFunctionType::removeContextParam(const ContextParameter &param)
     return removed;
 }
 
-void AADLObjectFunctionType::clearContextParams()
+void AADLFunctionType::clearContextParams()
 {
     const int prevSize = d->m_contextParams.size();
     d->m_contextParams.clear();
@@ -308,7 +305,7 @@ void AADLObjectFunctionType::clearContextParams()
         Q_EMIT contextParamsChanged();
 }
 
-void AADLObjectFunctionType::setContextParams(const QVector<ContextParameter> &params)
+void AADLFunctionType::setContextParams(const QVector<ContextParameter> &params)
 {
     if (d->m_contextParams != params) {
         d->m_contextParams = params;
@@ -316,18 +313,18 @@ void AADLObjectFunctionType::setContextParams(const QVector<ContextParameter> &p
     }
 }
 
-QVector<QPointer<AADLObjectFunction>> AADLObjectFunctionType::instances() const
+QVector<QPointer<AADLFunction>> AADLFunctionType::instances() const
 {
     return d->m_instances;
 }
 
-void AADLObjectFunctionType::rememberInstance(AADLObjectFunction *function)
+void AADLFunctionType::rememberInstance(AADLFunction *function)
 {
     if (function && !instances().contains(function))
         d->m_instances.append(function);
 }
 
-void AADLObjectFunctionType::forgetInstance(AADLObjectFunction *function)
+void AADLFunctionType::forgetInstance(AADLFunction *function)
 {
     if (function)
         d->m_instances.removeAll(function);

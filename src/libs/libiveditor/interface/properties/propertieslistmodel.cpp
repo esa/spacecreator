@@ -20,8 +20,8 @@
 #include "aadlcommonprops.h"
 #include "aadlnamevalidator.h"
 #include "aadlobject.h"
-#include "aadlobjectfunction.h"
-#include "aadlobjectiface.h"
+#include "aadlfunction.h"
+#include "aadliface.h"
 #include "commandsstack.h"
 #include "interface/commands/cmdentityattributechange.h"
 #include "interface/commands/cmdentitypropertychange.h"
@@ -407,14 +407,14 @@ bool FunctionPropertiesListModel::isEditable(const QModelIndex &index) const
         if (dataObject()->isFunctionType() || index.column() == ColumnTitle)
             editable = false;
         else {
-            if (auto fn = dataObject()->as<const ivm::AADLObjectFunction *>()) {
+            if (auto fn = dataObject()->as<const ivm::AADLFunction *>()) {
                 editable = fn->instanceOf() || fn->interfaces().isEmpty();
             }
         }
         break;
     }
     default:
-        if (auto fn = dataObject()->as<const ivm::AADLObjectFunction *>())
+        if (auto fn = dataObject()->as<const ivm::AADLFunction *>())
             editable = !fn->inheritsFunctionType();
         break;
     }
@@ -433,7 +433,7 @@ QVariant InterfacePropertiesListModel::data(const QModelIndex &index, int role) 
     if ((role == Qt::DisplayRole || role == Qt::EditRole) && index.column() == ColumnValue) {
         if (m_dataObject->aadlType() == ivm::AADLObject::Type::RequiredInterface
                 && tokenFromIndex(index) == ivm::meta::Props::Token::name) {
-            return m_dataObject->as<ivm::AADLObjectIfaceRequired *>()->ifaceLabel();
+            return m_dataObject->as<ivm::AADLIfaceRequired *>()->ifaceLabel();
         }
     }
     return PropertiesListModel::data(index, role);
@@ -445,7 +445,7 @@ bool InterfacePropertiesListModel::isEditable(const QModelIndex &index) const
         return false;
 
     bool editable = true;
-    if (auto iface = m_dataObject->as<const ivm::AADLObjectIface *>()) {
+    if (auto iface = m_dataObject->as<const ivm::AADLIface *>()) {
         const bool isClone = iface->isClone();
         switch (tokenFromIndex(index)) {
         case ivm::meta::Props::Token::Autonamed: {
@@ -460,7 +460,7 @@ bool InterfacePropertiesListModel::isEditable(const QModelIndex &index) const
         default: {
             bool isInheritedRI = false;
             if (iface->isRequired())
-                if (auto ri = iface->as<const ivm::AADLObjectIfaceRequired *>())
+                if (auto ri = iface->as<const ivm::AADLIfaceRequired *>())
                     isInheritedRI = ri->hasPrototypePi();
             editable = !isClone && !isInheritedRI;
             break;

@@ -17,57 +17,57 @@
 
 #include "exportedaadlconnection.h"
 
-#include "tab_aadl/aadlobjectconnection.h"
+#include "tab_aadl/aadlconnection.h"
 
 namespace taste3 {
 namespace templating {
 
-ExportedAADLConnection::ExportedAADLConnection(const aadl::AADLObjectConnection *connection)
+ExportedAADLConnection::ExportedAADLConnection(const aadl::AADLConnection *connection)
     : ExportedAADLObject(connection)
 {
 }
 
 QString ExportedAADLConnection::sourceName() const
 {
-    return exportedObject<aadl::AADLObjectConnection>()->sourceName();
+    return exportedObject<aadl::AADLConnection>()->sourceName();
 }
 
 QString ExportedAADLConnection::targetName() const
 {
-    return exportedObject<aadl::AADLObjectConnection>()->targetName();
+    return exportedObject<aadl::AADLConnection>()->targetName();
 }
 
 QString ExportedAADLConnection::sourceInterfaceName() const
 {
-    return exportedObject<aadl::AADLObjectConnection>()->sourceInterfaceName();
+    return exportedObject<aadl::AADLConnection>()->sourceInterfaceName();
 }
 
 QString ExportedAADLConnection::targetInterfaceName() const
 {
-    return exportedObject<aadl::AADLObjectConnection>()->targetInterfaceName();
+    return exportedObject<aadl::AADLConnection>()->targetInterfaceName();
 }
 
 bool ExportedAADLConnection::sourceInterfaceIsRequired() const
 {
-    auto o = exportedObject<aadl::AADLObjectConnection>();
+    auto o = exportedObject<aadl::AADLConnection>();
     return o->sourceInterface() ? o->sourceInterface()->isRequired() : false;
 }
 
 bool ExportedAADLConnection::sourceInterfaceIsProvided() const
 {
-    auto o = exportedObject<aadl::AADLObjectConnection>();
+    auto o = exportedObject<aadl::AADLConnection>();
     return o->sourceInterface() ? o->sourceInterface()->isProvided() : false;
 }
 
 bool ExportedAADLConnection::targetInterfaceIsRequired() const
 {
-    auto o = exportedObject<aadl::AADLObjectConnection>();
+    auto o = exportedObject<aadl::AADLConnection>();
     return o->targetInterface() ? o->targetInterface()->isRequired() : false;
 }
 
 bool ExportedAADLConnection::targetInterfaceIsProvided() const
 {
-    auto o = exportedObject<aadl::AADLObjectConnection>();
+    auto o = exportedObject<aadl::AADLConnection>();
     return o->targetInterface() ? o->targetInterface()->isProvided() : false;
 }
 

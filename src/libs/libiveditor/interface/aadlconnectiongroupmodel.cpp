@@ -18,10 +18,10 @@
 #include "aadlconnectiongroupmodel.h"
 
 #include "aadlnamevalidator.h"
-#include "aadlobjectconnection.h"
-#include "aadlobjectconnectiongroup.h"
-#include "aadlobjectfunction.h"
-#include "aadlobjectsmodel.h"
+#include "aadlconnection.h"
+#include "aadlconnectiongroup.h"
+#include "aadlfunction.h"
+#include "aadlmodel.h"
 #include "commandsstack.h"
 #include "interface/commands/cmdconnectiongroupitemchange.h"
 #include "interface/commands/commandsfactory.h"
@@ -31,24 +31,24 @@
 namespace ive {
 
 AADLConnectionGroupModel::AADLConnectionGroupModel(
-        ivm::AADLObjectConnectionGroup *connectionGroup, cmd::CommandsStack::Macro *macro, QObject *parent)
+        ivm::AADLConnectionGroup *connectionGroup, cmd::CommandsStack::Macro *macro, QObject *parent)
     : QAbstractListModel(parent)
     , m_connectionGroup(connectionGroup)
     , m_cmdMacro(macro)
 {
     const auto groupedConnections = connectionGroup->groupedConnections();
     std::for_each(groupedConnections.constBegin(), groupedConnections.constEnd(),
-            [this](ivm::AADLObjectConnection *c) { m_groupedConnetions.insert(c->id()); });
+            [this](ivm::AADLConnection *c) { m_groupedConnetions.insert(c->id()); });
 
     if (auto model = connectionGroup->objectsModel()) {
-        const QList<ivm::AADLObjectIface *> targetIfaces = connectionGroup->targetFunctionInterfaces();
-        const QList<ivm::AADLObjectIface *> sourceIfaces = connectionGroup->sourceFunctionInterfaces();
+        const QList<ivm::AADLIface *> targetIfaces = connectionGroup->targetFunctionInterfaces();
+        const QList<ivm::AADLIface *> sourceIfaces = connectionGroup->sourceFunctionInterfaces();
 
         for (auto iface : sourceIfaces) {
             const auto ifaceConnections = model->getConnectionsForIface(iface->id());
 
             std::copy_if(ifaceConnections.constBegin(), ifaceConnections.constEnd(),
-                    std::back_inserter(m_allConnections), [&](const ivm::AADLObjectConnection *connection) {
+                    std::back_inserter(m_allConnections), [&](const ivm::AADLConnection *connection) {
                         if (sourceIfaces.contains(connection->sourceInterface()))
                             return targetIfaces.contains(connection->targetInterface());
                         else if (sourceIfaces.contains(connection->targetInterface()))
@@ -61,23 +61,23 @@ AADLConnectionGroupModel::AADLConnectionGroupModel(
     auto updateEnableState = [this]() {
         if (m_groupedConnetions.size() == 1) {
             if (auto model = m_connectionGroup->objectsModel()) {
-                ivm::AADLObjectConnection *connection = model->getConnection(*m_groupedConnetions.begin());
+                ivm::AADLConnection *connection = model->getConnection(*m_groupedConnetions.begin());
                 const QModelIndex idx = index(m_allConnections.indexOf(connection));
                 Q_EMIT dataChanged(idx, idx);
             }
         }
     };
 
-    connect(connectionGroup, &ivm::AADLObjectConnectionGroup::connectionAdded, this,
-            [this, updateEnableState](ivm::AADLObjectConnection *connection) {
+    connect(connectionGroup, &ivm::AADLConnectionGroup::connectionAdded, this,
+            [this, updateEnableState](ivm::AADLConnection *connection) {
                 updateEnableState();
                 m_groupedConnetions.insert(connection->id());
 
                 const QModelIndex idx = index(m_allConnections.indexOf(connection));
                 Q_EMIT dataChanged(idx, idx, { Qt::CheckStateRole });
             });
-    connect(connectionGroup, &ivm::AADLObjectConnectionGroup::connectionRemoved, this,
-            [this, updateEnableState](ivm::AADLObjectConnection *connection) {
+    connect(connectionGroup, &ivm::AADLConnectionGroup::connectionRemoved, this,
+            [this, updateEnableState](ivm::AADLConnection *connection) {
                 m_groupedConnetions.remove(connection->id());
                 updateEnableState();
 

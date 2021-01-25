@@ -20,7 +20,7 @@
 #include "aadlcommonprops.h"
 #include "aadlnamevalidator.h"
 #include "aadlobject.h"
-#include "aadlobjectsmodel.h"
+#include "aadlmodel.h"
 #include "interface/properties/propertieslistmodel.h"
 #include "propertytemplate.h"
 #include "propertytemplateconfig.h"

@@ -27,9 +27,9 @@
 
 namespace ivm {
 class AADLObject;
-class AADLObjectConnection;
-class AADLObjectFunction;
-class AADLObjectsModel;
+class AADLConnection;
+class AADLFunction;
+class AADLModel;
 }
 
 namespace ive {
@@ -69,11 +69,11 @@ public:
     QStringList connectionNames() const;
     QStringList connectionNamesFromTo(const QString &sourceName, const QString &targetName) const;
 
-    ivm::AADLObjectFunction *correspondingFunction(const MscInstance *instance) const;
+    ivm::AADLFunction *correspondingFunction(const MscInstance *instance) const;
     bool correspond(const ivm::AADLObject *aadlObj, const msc::MscInstance *instance) const;
-    bool correspond(const ivm::AADLObjectFunction *aadlFunc, const msc::MscInstance *instance) const;
+    bool correspond(const ivm::AADLFunction *aadlFunc, const msc::MscInstance *instance) const;
 
-    bool correspond(const ivm::AADLObjectConnection *connection, const msc::MscMessage *message) const;
+    bool correspond(const ivm::AADLConnection *connection, const msc::MscMessage *message) const;
 
     QVector<msc::MscMessageDeclaration *> allConnectionsAsDeclaration() const;
 
@@ -84,10 +84,10 @@ Q_SIGNALS:
     void ivCoreChanged();
 
 private:
-    ivm::AADLObjectsModel *aadlModel() const;
-    bool hasAncestor(ivm::AADLObjectFunction *func, const QVector<ivm::AADLObjectFunction *> allFunctions) const;
-    bool hasDescendant(ivm::AADLObjectFunction *func, const QVector<ivm::AADLObjectFunction *> allFunctions) const;
-    bool isAncestor(ivm::AADLObjectFunction *func, ivm::AADLObjectFunction *otherFunc) const;
+    ivm::AADLModel *aadlModel() const;
+    bool hasAncestor(ivm::AADLFunction *func, const QVector<ivm::AADLFunction *> allFunctions) const;
+    bool hasDescendant(ivm::AADLFunction *func, const QVector<ivm::AADLFunction *> allFunctions) const;
+    bool isAncestor(ivm::AADLFunction *func, ivm::AADLFunction *otherFunc) const;
 
     QPointer<msc::MSCEditorCore> m_mscCore;
     QSharedPointer<ive::IVEditorCore> m_ivCore;

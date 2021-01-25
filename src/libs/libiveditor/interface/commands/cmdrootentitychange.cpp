@@ -19,12 +19,12 @@
 
 #include "commandids.h"
 
-#include <aadlobjectsmodel.h>
+#include <aadlmodel.h>
 
 namespace ive {
 namespace cmd {
 
-CmdRootEntityChange::CmdRootEntityChange(ivm::AADLObjectsModel *model, const shared::Id &id)
+CmdRootEntityChange::CmdRootEntityChange(ivm::AADLModel *model, const shared::Id &id)
     : CmdEntityGeometryChange({}, QObject::tr("Change root item"))
     , m_model(model)
     , m_newId(id)

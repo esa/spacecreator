@@ -37,8 +37,8 @@ class Asn1ModelStorage;
 
 namespace ivm {
 class AADLObject;
-class AADLObjectIface;
-class AADLObjectsModel;
+class AADLIface;
+class AADLModel;
 }
 
 namespace ive {
@@ -94,15 +94,15 @@ public:
     QList<QAction *> customActions() const;
 
     const QHash<shared::Id, ivm::AADLObject *> &objects() const;
-    ivm::AADLObjectsModel *objectsModel() const;
-    ivm::AADLObjectsModel *importModel() const;
+    ivm::AADLModel *objectsModel() const;
+    ivm::AADLModel *importModel() const;
     AADLItemModel *itemsModel() const;
 
     Asn1Acn::Asn1ModelStorage *asn1DataTypes() const;
 
     QString supportedFileExtensions() const;
 
-    bool checkInterfaceAsn1Compliance(const ivm::AADLObjectIface *interface) const;
+    bool checkInterfaceAsn1Compliance(const ivm::AADLIface *interface) const;
     bool checkAllInterfacesForAsn1Compliance();
 
 Q_SIGNALS:
@@ -138,7 +138,7 @@ private:
     bool loadImpl(const QString &path);
     QString getComponentName(const QStringList &exportNames);
     QList<ivm::AADLObject *> prepareSelectedObjectsForExport(QString &name);
-    static bool loadComponentModel(ivm::AADLObjectsModel *model, const QString &path);
+    static bool loadComponentModel(ivm::AADLModel *model, const QString &path);
 
     QWidget *createGraphicsView();
     QTreeView *createModelView();

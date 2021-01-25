@@ -17,7 +17,7 @@
 
 #pragma once
 
-#include "aadlobjectiface.h"
+#include "aadliface.h"
 #include "cmdentitygeometrychange.h"
 
 #include <QPointer>
@@ -29,18 +29,18 @@ namespace cmd {
 class CmdInterfaceItemCreate : public CmdEntityGeometryChange
 {
 public:
-    explicit CmdInterfaceItemCreate(const ivm::AADLObjectIface::CreationInfo &creationInfo);
+    explicit CmdInterfaceItemCreate(const ivm::AADLIface::CreationInfo &creationInfo);
     ~CmdInterfaceItemCreate() override;
 
     void redo() override;
     void undo() override;
     int id() const override;
 
-    ivm::AADLObjectIface *createdInterface() const;
+    ivm::AADLIface *createdInterface() const;
 
 private:
-    const ivm::AADLObjectIface::CreationInfo m_ifaceInfo;
-    QPointer<ivm::AADLObjectIface> m_entity;
+    const ivm::AADLIface::CreationInfo m_ifaceInfo;
+    QPointer<ivm::AADLIface> m_entity;
     QVector<QUndoCommand *> m_cmdClones;
 };
 

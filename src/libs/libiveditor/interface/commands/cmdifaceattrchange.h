@@ -18,7 +18,7 @@
 #pragma once
 
 #include "aadlcommonprops.h"
-#include "aadlobjectsmodel.h"
+#include "aadlmodel.h"
 #include "cmdifacedatachangebase.h"
 
 #include <QPointer>
@@ -34,7 +34,7 @@ namespace cmd {
 class CmdIfaceAttrChange : public CmdIfaceDataChangeBase
 {
 public:
-    explicit CmdIfaceAttrChange(ivm::AADLObjectIface *entity, const QString &attrName, const QVariant &value);
+    explicit CmdIfaceAttrChange(ivm::AADLIface *entity, const QString &attrName, const QVariant &value);
 
     void redo() override;
     void undo() override;
@@ -45,7 +45,7 @@ private:
     void removeConnections();
     void restoreConnections();
 
-    bool connectionMustDie(const ivm::AADLObjectConnection *connection) const override;
+    bool connectionMustDie(const ivm::AADLConnection *connection) const override;
 };
 
 }

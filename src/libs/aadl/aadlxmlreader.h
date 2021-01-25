@@ -29,11 +29,11 @@ class QXmlStreamReader;
 
 namespace ivm {
 
-class AADLObjectIface;
-class AADLObjectFunctionType;
-class AADLObjectComment;
-class AADLObjectConnection;
-class AADLObjectConnectionGroup;
+class AADLIface;
+class AADLFunctionType;
+class AADLComment;
+class AADLConnection;
+class AADLConnectionGroup;
 struct AADLXMLReaderPrivate;
 class AADLXMLReader : public QObject
 {
@@ -60,11 +60,11 @@ private:
     void processTagOpen(QXmlStreamReader &xml);
     void processTagClose(QXmlStreamReader &xml);
 
-    AADLObjectFunctionType *addFunction(const QString &name, AADLObject::Type fnType);
-    AADLObjectIface *addIface(const QString &name, bool isRI);
-    AADLObjectComment *addComment(const QString &text);
-    AADLObjectConnection *addConnection();
-    AADLObjectConnectionGroup *addConnectionGroup(const QString &groupName);
+    AADLFunctionType *addFunction(const QString &name, AADLObject::Type fnType);
+    AADLIface *addIface(const QString &name, bool isRI);
+    AADLComment *addComment(const QString &text);
+    AADLConnection *addConnection();
+    AADLConnectionGroup *addConnectionGroup(const QString &groupName);
 };
 
 }

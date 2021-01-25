@@ -17,8 +17,8 @@
 
 #include "propertiesviewbase.h"
 
-#include "aadlobjectfunction.h"
-#include "aadlobjectiface.h"
+#include "aadlfunction.h"
+#include "aadliface.h"
 #include "propertieslistmodel.h"
 #include "ui_propertiesviewbase.h"
 
@@ -113,16 +113,16 @@ bool PropertiesViewBase::setButtonsDisabled()
     if (auto dataObject = m_model->dataObject()) {
         switch (dataObject->aadlType()) {
         case ivm::AADLObject::Type::Function: {
-            if (auto fn = dataObject->as<const ivm::AADLObjectFunction *>())
+            if (auto fn = dataObject->as<const ivm::AADLFunction *>())
                 disabled = fn->inheritsFunctionType();
             break;
         }
         case ivm::AADLObject::Type::RequiredInterface:
         case ivm::AADLObject::Type::ProvidedInterface: {
-            if (auto iface = dataObject->as<const ivm::AADLObjectIface *>()) {
+            if (auto iface = dataObject->as<const ivm::AADLIface *>()) {
                 disabled = iface->isClone();
                 if (!disabled && iface->isRequired()) {
-                    if (auto ri = iface->as<const ivm::AADLObjectIfaceRequired *>())
+                    if (auto ri = iface->as<const ivm::AADLIfaceRequired *>())
                         disabled = ri->hasPrototypePi();
                 }
             }

@@ -20,13 +20,13 @@
 #include "exportableaadlobject.h"
 
 namespace ivm {
-class AADLObjectIface;
+class AADLIface;
 }
 
 namespace ive {
 
 /**
- * @brief The ExportableAADLIface is a class to export AADLObjectIface
+ * @brief The ExportableAADLIface is a class to export AADLIface
  */
 class ExportableAADLIface : public ExportableAADLObject
 {
@@ -37,7 +37,7 @@ class ExportableAADLIface : public ExportableAADLObject
     Q_PROPERTY(QVariantList connectedInterfaces READ connectedInterfaces)
 
 public:
-    explicit ExportableAADLIface(const ivm::AADLObjectIface *iface = nullptr);
+    explicit ExportableAADLIface(const ivm::AADLIface *iface = nullptr);
 
     bool isProvided() const;
     bool isRequired() const;

@@ -15,8 +15,8 @@
    along with this program. If not, see <https://www.gnu.org/licenses/lgpl-2.1.html>.
 */
 
-#include "aadlobjectconnection.h"
-#include "aadlobjectfunction.h"
+#include "aadlconnection.h"
+#include "aadlfunction.h"
 #include "aadltestutils.h"
 #include "mainmodel.h"
 #include "mscchart.h"
@@ -62,7 +62,7 @@ void tst_MSCEditorCore::testCorrespondingInstances()
 
     auto instance = new msc::MscInstance("dummy", m_chart);
     m_chart->addInstance(instance);
-    ivm::AADLObjectFunction fnct("foo");
+    ivm::AADLFunction fnct("foo");
     QCOMPARE(m_mscCore->correspondingInstances(&fnct).size(), 0);
 
     fnct.setTitle("dummy");
@@ -80,9 +80,9 @@ void tst_MSCEditorCore::testCorrespondingMessages()
     auto message = new msc::MscMessage("ping", instance1, instance2, m_chart);
     m_chart->addInstanceEvent(message);
 
-    ivm::AADLObjectFunction f1("K1");
-    ivm::AADLObjectFunction f2("K2");
-    std::unique_ptr<ivm::AADLObjectConnection> connection(ivm::testutils::createConnection(&f1, &f2, "call"));
+    ivm::AADLFunction f1("K1");
+    ivm::AADLFunction f2("K2");
+    std::unique_ptr<ivm::AADLConnection> connection(ivm::testutils::createConnection(&f1, &f2, "call"));
     QCOMPARE(m_mscCore->correspondingMessages(connection.get()).size(), 0);
 
     connection->targetInterface()->setTitle("ping");

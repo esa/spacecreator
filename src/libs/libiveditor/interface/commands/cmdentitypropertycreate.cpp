@@ -20,7 +20,7 @@
 
 #include "commandids.h"
 
-#include <aadlobjectsmodel.h>
+#include <aadlmodel.h>
 
 namespace ive {
 namespace cmd {

@@ -18,7 +18,7 @@
 #include "endtoendconnections.h"
 
 #include "aadlconnectionchain.h"
-#include "aadlobjectconnection.h"
+#include "aadlconnection.h"
 #include "mscchart.h"
 #include "mscdocument.h"
 #include "mscinstance.h"
@@ -174,7 +174,7 @@ EndToEndConnections::Dataflow EndToEndConnections::readDataflow(const QString &f
 }
 
 bool EndToEndConnections::isInDataflow(const Dataflow &dataflow, const QList<ivm::AADLConnectionChain *> &chains,
-        ivm::AADLObjectConnection *connection)
+        ivm::AADLConnection *connection)
 {
     // Just to be on the save side
     if (connection == nullptr) {

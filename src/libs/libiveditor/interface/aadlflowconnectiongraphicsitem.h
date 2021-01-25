@@ -27,7 +27,7 @@ namespace ive {
 class AADLFlowConnectionGraphicsItem : public AADLConnectionGraphicsItem
 {
 public:
-    AADLFlowConnectionGraphicsItem(ivm::AADLObjectConnection *connection, AADLInterfaceGraphicsItem *ifaceStart,
+    AADLFlowConnectionGraphicsItem(ivm::AADLConnection *connection, AADLInterfaceGraphicsItem *ifaceStart,
             AADLInterfaceGraphicsItem *ifaceEnd, QGraphicsItem *parent = nullptr);
 
 protected:

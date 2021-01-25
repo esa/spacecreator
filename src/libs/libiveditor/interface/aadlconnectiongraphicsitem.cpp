@@ -22,9 +22,9 @@
 #include "aadlfunctiontypegraphicsitem.h"
 #include "aadlinterfacegraphicsitem.h"
 #include "aadlnamevalidator.h"
-#include "aadlobjectconnection.h"
-#include "aadlobjectfunction.h"
-#include "aadlobjectiface.h"
+#include "aadlconnection.h"
+#include "aadlfunction.h"
+#include "aadliface.h"
 #include "baseitems/common/aadlutils.h"
 #include "colors/colormanager.h"
 #include "commands/cmdentitygeometrychange.h"
@@ -79,7 +79,7 @@ QPainterPath AADLConnectionGraphicsItem::GraphicsPathItem::shape() const
     return stroker.createStroke(path()).simplified();
 }
 
-AADLConnectionGraphicsItem::AADLConnectionGraphicsItem(ivm::AADLObjectConnection *connection,
+AADLConnectionGraphicsItem::AADLConnectionGraphicsItem(ivm::AADLConnection *connection,
         AADLInterfaceGraphicsItem *startIface, AADLInterfaceGraphicsItem *endIface, QGraphicsItem *parentItem)
     : InteractiveObject(connection, parentItem)
     , m_startItem(startIface)
@@ -112,7 +112,7 @@ void AADLConnectionGraphicsItem::updateInterfaceConnectionsReference(IfaceConnec
 
 void AADLConnectionGraphicsItem::updateFromEntity()
 {
-    ivm::AADLObjectConnection *obj = entity();
+    ivm::AADLConnection *obj = entity();
     Q_ASSERT(obj);
     if (!obj)
         return;
@@ -155,9 +155,9 @@ QVector<QPointF> AADLConnectionGraphicsItem::graphicsPoints() const
     return mapToScene(polygon);
 }
 
-ivm::AADLObjectConnection *AADLConnectionGraphicsItem::entity() const
+ivm::AADLConnection *AADLConnectionGraphicsItem::entity() const
 {
-    return qobject_cast<ivm::AADLObjectConnection *>(aadlObject());
+    return qobject_cast<ivm::AADLConnection *>(aadlObject());
 }
 
 QPainterPath AADLConnectionGraphicsItem::shape() const

@@ -17,7 +17,7 @@
 
 #include "cmdentitygeometrychange.h"
 
-#include "aadlobjectsmodel.h"
+#include "aadlmodel.h"
 #include "baseitems/common/aadlutils.h"
 #include "commandids.h"
 #include "commandsstack.h"

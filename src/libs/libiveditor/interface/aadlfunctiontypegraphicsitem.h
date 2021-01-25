@@ -21,7 +21,7 @@
 #include "aadlrectgraphicsitem.h"
 
 namespace ivm {
-class AADLObjectFunctionType;
+class AADLFunctionType;
 }
 
 namespace ive {
@@ -32,14 +32,14 @@ class AADLFunctionTypeGraphicsItem : public AADLRectGraphicsItem
 {
     Q_OBJECT
 public:
-    explicit AADLFunctionTypeGraphicsItem(ivm::AADLObjectFunctionType *entity, QGraphicsItem *parentItem = nullptr);
+    explicit AADLFunctionTypeGraphicsItem(ivm::AADLFunctionType *entity, QGraphicsItem *parentItem = nullptr);
     enum
     {
         Type = UserType + static_cast<int>(ivm::AADLObject::Type::FunctionType)
     };
     int type() const override { return Type; }
 
-    ivm::AADLObjectFunctionType *entity() const;
+    ivm::AADLFunctionType *entity() const;
 
     void init() override;
 

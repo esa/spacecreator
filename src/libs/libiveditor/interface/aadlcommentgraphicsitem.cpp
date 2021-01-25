@@ -18,7 +18,7 @@
 #include "aadlcommentgraphicsitem.h"
 
 #include "aadlfunctiongraphicsitem.h"
-#include "aadlobjectcomment.h"
+#include "aadlcomment.h"
 #include "baseitems/common/aadlutils.h"
 #include "colors/colormanager.h"
 #include "commands/commandids.h"
@@ -38,7 +38,7 @@ static const qreal kMargins = 14 + kBorderWidth;
 
 namespace ive {
 
-AADLCommentGraphicsItem::AADLCommentGraphicsItem(ivm::AADLObjectComment *comment, QGraphicsItem *parent)
+AADLCommentGraphicsItem::AADLCommentGraphicsItem(ivm::AADLComment *comment, QGraphicsItem *parent)
     : AADLRectGraphicsItem(comment, parent)
 {
     setFlag(QGraphicsItem::ItemIsSelectable);
@@ -73,9 +73,9 @@ QString AADLCommentGraphicsItem::text() const
     return m_text;
 }
 
-ivm::AADLObjectComment *AADLCommentGraphicsItem::entity() const
+ivm::AADLComment *AADLCommentGraphicsItem::entity() const
 {
-    return qobject_cast<ivm::AADLObjectComment *>(aadlObject());
+    return qobject_cast<ivm::AADLComment *>(aadlObject());
 }
 
 void AADLCommentGraphicsItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget)

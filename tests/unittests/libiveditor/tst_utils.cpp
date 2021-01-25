@@ -15,7 +15,7 @@
    along with this program. If not, see <https://www.gnu.org/licenses/lgpl-2.1.html>.
 */
 
-#include "aadlobjectfunction.h"
+#include "aadlfunction.h"
 #include "baseitems/common/aadlutils.h"
 #include "interface/aadlfunctiongraphicsitem.h"
 
@@ -163,13 +163,13 @@ void tst_Utils::testSiblingSceneRects()
     QGraphicsScene scene;
     ive::AADLFunctionGraphicsItem *item { nullptr };
     for (int idx = 0; idx < existingRects.size(); ++idx) {
-        item = new ive::AADLFunctionGraphicsItem(new ivm::AADLObjectFunction);
+        item = new ive::AADLFunctionGraphicsItem(new ivm::AADLFunction);
         scene.addItem(item);
         item->setRect(existingRects.at(idx));
     }
     ive::AADLFunctionGraphicsItem *child { nullptr };
     for (int idx = 0; idx < 3; ++idx) {
-        child = new ive::AADLFunctionGraphicsItem(new ivm::AADLObjectFunction, item);
+        child = new ive::AADLFunctionGraphicsItem(new ivm::AADLFunction, item);
         child->setRect(existingRects.at(idx));
     }
     const auto siblingItems0 = ive::siblingSceneRects(item);

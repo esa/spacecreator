@@ -15,10 +15,10 @@
    along with this program. If not, see <https://www.gnu.org/licenses/lgpl-2.1.html>.
 */
 
-#include "aadlobjectconnection.h"
-#include "aadlobjectfunction.h"
-#include "aadlobjectiface.h"
-#include "aadlobjectsmodel.h"
+#include "aadlconnection.h"
+#include "aadlfunction.h"
+#include "aadliface.h"
+#include "aadlmodel.h"
 #include "aadltestutils.h"
 #include "interface/interfacedocument.h"
 #include "iveditor.h"
@@ -66,28 +66,28 @@ void tst_IVEditorCore::test_addConnection()
     ivCore->addFunction("f2");
     bool ok = ivCore->addConnection("m1", "f1", "f2");
     QCOMPARE(ok, true);
-    QVector<ivm::AADLObjectConnection *> connections =
-            ivCore->document()->objectsModel()->allObjectsByType<ivm::AADLObjectConnection>();
+    QVector<ivm::AADLConnection *> connections =
+            ivCore->document()->objectsModel()->allObjectsByType<ivm::AADLConnection>();
     QCOMPARE(connections.size(), 1);
     QCOMPARE(connections[0]->parentObject(), nullptr); // placed at root level
 }
 
 void tst_IVEditorCore::test_addConnectionFromEnv()
 {
-    ivm::AADLObjectsModel *aadlModel = ivCore->document()->objectsModel();
+    ivm::AADLModel *aadlModel = ivCore->document()->objectsModel();
     ivCore->addFunction("f1");
     bool ok = ivCore->addConnection("m1", "", "f1");
     QCOMPARE(ok, true);
-    QVector<ivm::AADLObjectConnection *> connections = aadlModel->allObjectsByType<ivm::AADLObjectConnection>();
+    QVector<ivm::AADLConnection *> connections = aadlModel->allObjectsByType<ivm::AADLConnection>();
     QCOMPARE(connections.size(), 0);
 
-    QVector<ivm::AADLObjectIface *> interfaces = aadlModel->allObjectsByType<ivm::AADLObjectIface>();
+    QVector<ivm::AADLIface *> interfaces = aadlModel->allObjectsByType<ivm::AADLIface>();
     QCOMPARE(interfaces.size(), 1);
 
     // Adding it again, fails
     ok = ivCore->addConnection("m1", "", "f1");
     QCOMPARE(ok, false);
-    interfaces = aadlModel->allObjectsByType<ivm::AADLObjectIface>();
+    interfaces = aadlModel->allObjectsByType<ivm::AADLIface>();
     QCOMPARE(interfaces.size(), 1);
 }
 
@@ -117,16 +117,16 @@ void tst_IVEditorCore::test_addConnectionFails()
 
 void tst_IVEditorCore::test_renameAadlConnection()
 {
-    ivm::AADLObjectFunction *funcF1 = ivCore->addFunction("f1");
-    ivm::AADLObjectFunction *funcF2 = ivCore->addFunction("f2");
-    ivm::AADLObjectConnection *connection = ivm::testutils::createConnection(funcF1, funcF2, "init");
+    ivm::AADLFunction *funcF1 = ivCore->addFunction("f1");
+    ivm::AADLFunction *funcF2 = ivCore->addFunction("f2");
+    ivm::AADLConnection *connection = ivm::testutils::createConnection(funcF1, funcF2, "init");
 
     bool ok = ivCore->renameAadlConnection("init", "doIt", "f1", "f2");
     QCOMPARE(ok, true);
     QCOMPARE(connection->name(), "doIt");
 
     // cyclic interface only
-    ivm::AADLObjectIface *interface = ivCore->addInterface("push", "f2");
+    ivm::AADLIface *interface = ivCore->addInterface("push", "f2");
     ok = ivCore->renameAadlConnection("push", "call", "", "f2");
     QCOMPARE(ok, true);
     QCOMPARE(interface->title(), "call");
@@ -134,38 +134,38 @@ void tst_IVEditorCore::test_renameAadlConnection()
 
 void tst_IVEditorCore::test_addToNestedConnection()
 {
-    ivm::AADLObjectFunction *funcF1 = ivCore->addFunction("f1");
+    ivm::AADLFunction *funcF1 = ivCore->addFunction("f1");
     ivCore->addFunction("f1a", funcF1);
     bool ok = ivCore->addConnection("m1", "f1", "f1a");
     QCOMPARE(ok, true);
-    QVector<ivm::AADLObjectConnection *> connections =
-            ivCore->document()->objectsModel()->allObjectsByType<ivm::AADLObjectConnection>();
+    QVector<ivm::AADLConnection *> connections =
+            ivCore->document()->objectsModel()->allObjectsByType<ivm::AADLConnection>();
     QCOMPARE(connections.size(), 1);
     QCOMPARE(connections[0]->parentObject(), funcF1); // placed as child of "f1"
 }
 
 void tst_IVEditorCore::test_addFromNestedConnection()
 {
-    ivm::AADLObjectFunction *funcF1 = ivCore->addFunction("f1");
+    ivm::AADLFunction *funcF1 = ivCore->addFunction("f1");
     ivCore->addFunction("f1a", funcF1);
     bool ok = ivCore->addConnection("m1", "f1a", "f1");
     QCOMPARE(ok, true);
-    QVector<ivm::AADLObjectConnection *> connections =
-            ivCore->document()->objectsModel()->allObjectsByType<ivm::AADLObjectConnection>();
+    QVector<ivm::AADLConnection *> connections =
+            ivCore->document()->objectsModel()->allObjectsByType<ivm::AADLConnection>();
     QCOMPARE(connections.size(), 1);
     QCOMPARE(connections[0]->parentObject(), funcF1); // placed as child of "f1"
 }
 
 void tst_IVEditorCore::test_addRootToNestedConnections()
 {
-    ivm::AADLObjectFunction *funcF1 = ivCore->addFunction("f1");
+    ivm::AADLFunction *funcF1 = ivCore->addFunction("f1");
     ivCore->addFunction("f1a", funcF1);
-    ivm::AADLObjectFunction *funcF2 = ivCore->addFunction("f2");
+    ivm::AADLFunction *funcF2 = ivCore->addFunction("f2");
     ivCore->addFunction("f2a", funcF2);
     bool ok = ivCore->addConnection("m1", "f1a", "f2a");
     QCOMPARE(ok, true);
-    QVector<ivm::AADLObjectConnection *> connections =
-            ivCore->document()->objectsModel()->allObjectsByType<ivm::AADLObjectConnection>();
+    QVector<ivm::AADLConnection *> connections =
+            ivCore->document()->objectsModel()->allObjectsByType<ivm::AADLConnection>();
     QCOMPARE(connections.size(), 3);
 }
 
@@ -176,13 +176,13 @@ void tst_IVEditorCore::test_addToExistingInterface()
     ivCore->addFunction("f3");
     bool ok = ivCore->addConnection("m1", "f1", "f2");
     QCOMPARE(ok, true);
-    QVector<ivm::AADLObjectConnection *> connections =
-            ivCore->document()->objectsModel()->allObjectsByType<ivm::AADLObjectConnection>();
+    QVector<ivm::AADLConnection *> connections =
+            ivCore->document()->objectsModel()->allObjectsByType<ivm::AADLConnection>();
     QCOMPARE(connections.size(), 1);
 
     ok = ivCore->addConnection("m1", "f3", "f2");
     QCOMPARE(ok, true);
-    connections = ivCore->document()->objectsModel()->allObjectsByType<ivm::AADLObjectConnection>();
+    connections = ivCore->document()->objectsModel()->allObjectsByType<ivm::AADLConnection>();
     QCOMPARE(connections.size(), 2);
 }
 

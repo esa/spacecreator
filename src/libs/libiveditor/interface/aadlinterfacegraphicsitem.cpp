@@ -23,9 +23,9 @@
 #include "aadlfunctiongraphicsitem.h"
 #include "aadlfunctiontypegraphicsitem.h"
 #include "aadlnamevalidator.h"
-#include "aadlobjectconnection.h"
-#include "aadlobjectfunction.h"
-#include "aadlobjectiface.h"
+#include "aadlconnection.h"
+#include "aadlfunction.h"
+#include "aadliface.h"
 #include "baseitems/common/aadlutils.h"
 #include "baseitems/common/positionlookuphelper.h"
 #include "colors/colormanager.h"
@@ -46,7 +46,7 @@ static const int kTextMargin = 2;
 
 namespace ive {
 
-AADLInterfaceGraphicsItem::AADLInterfaceGraphicsItem(ivm::AADLObjectIface *entity, QGraphicsItem *parent)
+AADLInterfaceGraphicsItem::AADLInterfaceGraphicsItem(ivm::AADLIface *entity, QGraphicsItem *parent)
     : InteractiveObject(entity, parent)
     , m_type(new QGraphicsPathItem(this))
     , m_iface(new QGraphicsPathItem(this))
@@ -57,9 +57,9 @@ AADLInterfaceGraphicsItem::AADLInterfaceGraphicsItem(ivm::AADLObjectIface *entit
     setZValue(ZOrder.Interface);
 }
 
-ivm::AADLObjectIface *AADLInterfaceGraphicsItem::entity() const
+ivm::AADLIface *AADLInterfaceGraphicsItem::entity() const
 {
-    return qobject_cast<ivm::AADLObjectIface *>(aadlObject());
+    return qobject_cast<ivm::AADLIface *>(aadlObject());
 }
 
 void AADLInterfaceGraphicsItem::init()
@@ -67,9 +67,9 @@ void AADLInterfaceGraphicsItem::init()
     InteractiveObject::init();
     connect(entity(), qOverload<ivm::meta::Props::Token>(&ivm::AADLObject::attributeChanged), this,
             &AADLInterfaceGraphicsItem::onAttrOrPropChanged);
-    connect(entity(), &ivm::AADLObjectIface::titleChanged, this, &AADLInterfaceGraphicsItem::updateLabel);
-    if (auto ri = qobject_cast<ivm::AADLObjectIfaceRequired *>(entity()))
-        connect(ri, &ivm::AADLObjectIfaceRequired::inheritedLabelsChanged, this,
+    connect(entity(), &ivm::AADLIface::titleChanged, this, &AADLInterfaceGraphicsItem::updateLabel);
+    if (auto ri = qobject_cast<ivm::AADLIfaceRequired *>(entity()))
+        connect(ri, &ivm::AADLIfaceRequired::inheritedLabelsChanged, this,
                 &AADLInterfaceGraphicsItem::updateLabel);
 
     updateLabel();
@@ -234,7 +234,7 @@ QPainterPath AADLInterfaceGraphicsItem::shape() const
 
 void AADLInterfaceGraphicsItem::updateFromEntity()
 {
-    const ivm::AADLObjectIface *obj = entity();
+    const ivm::AADLIface *obj = entity();
     Q_ASSERT(obj);
     if (!obj)
         return;
@@ -291,7 +291,7 @@ void AADLInterfaceGraphicsItem::layout()
         return;
     }
 
-    const auto parentFn = entity()->parentObject()->as<ivm::AADLObjectFunctionType *>();
+    const auto parentFn = entity()->parentObject()->as<ivm::AADLFunctionType *>();
     const QRectF fnRect = ive::rect(
             ivm::AADLObject::coordinatesFromString(parentFn->prop(ivm::meta::Props::token(token)).toString()))
                                   .normalized();
@@ -514,7 +514,7 @@ QString AADLInterfaceGraphicsItem::prepareTooltip() const
     if (entity()->isProvided())
         return toolTip;
 
-    auto ri = entity()->as<const ivm::AADLObjectIfaceRequired *>();
+    auto ri = entity()->as<const ivm::AADLIfaceRequired *>();
     if (!ri)
         return toolTip;
 
@@ -569,7 +569,7 @@ QTransform AADLInterfaceGraphicsItem::typeTransform(Qt::Alignment alignment) con
 
 QTransform AADLInterfaceGraphicsItem::ifaceTransform(Qt::Alignment alignment) const
 {
-    const bool insideOut = entity()->direction() == ivm::AADLObjectIface::IfaceType::Required;
+    const bool insideOut = entity()->direction() == ivm::AADLIface::IfaceType::Required;
     qreal rotationDegree = 0.;
     switch (alignment) {
     case Qt::AlignLeft:
@@ -600,13 +600,13 @@ QPainterPath AADLInterfaceGraphicsItem::ifacePath() const
 
 QPainterPath AADLInterfaceGraphicsItem::typePath() const
 {
-    auto iface = qobject_cast<ivm::AADLObjectIface *>(entity());
+    auto iface = qobject_cast<ivm::AADLIface *>(entity());
     if (!iface)
         return {};
 
     QPainterPath kindPath;
     switch (iface->kind()) {
-    case ivm::AADLObjectIface::OperationKind::Cyclic: {
+    case ivm::AADLIface::OperationKind::Cyclic: {
         const qreal kindBaseValue = kHeight;
         kindPath.arcTo({ kindPath.currentPosition().x() - kindBaseValue / 2,
                                kindPath.currentPosition().y() - kindBaseValue, kindBaseValue, kindBaseValue },
@@ -619,7 +619,7 @@ QPainterPath AADLInterfaceGraphicsItem::typePath() const
         kindPath.translate(0, kindBaseValue / 2);
         break;
     }
-    case ivm::AADLObjectIface::OperationKind::Sporadic: {
+    case ivm::AADLIface::OperationKind::Sporadic: {
         const qreal kindBaseValue = kHeight;
         kindPath.moveTo(-kindBaseValue / 2, 0);
         kindPath.lineTo(0, -kindBaseValue / 4);
@@ -627,7 +627,7 @@ QPainterPath AADLInterfaceGraphicsItem::typePath() const
         kindPath.lineTo(kindBaseValue / 2, 0);
         break;
     }
-    case ivm::AADLObjectIface::OperationKind::Protected: {
+    case ivm::AADLIface::OperationKind::Protected: {
         const qreal kindBaseValue = kHeight;
         const QRectF rect { -kindBaseValue / 2, -kindBaseValue / 2, kindBaseValue, kindBaseValue * 2 / 3 };
         kindPath.addRoundedRect(rect, 2, 2);

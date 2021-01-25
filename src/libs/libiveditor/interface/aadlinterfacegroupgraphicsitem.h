@@ -21,7 +21,7 @@
 #include "aadlinterfacegraphicsitem.h"
 
 namespace ivm {
-class AADLObjectIfaceGroup;
+class AADLIfaceGroup;
 }
 
 namespace ive {
@@ -30,10 +30,10 @@ class AADLInterfaceGroupGraphicsItem : public AADLInterfaceGraphicsItem
 {
     Q_OBJECT
 public:
-    explicit AADLInterfaceGroupGraphicsItem(ivm::AADLObjectIfaceGroup *entity, QGraphicsItem *parent = nullptr);
+    explicit AADLInterfaceGroupGraphicsItem(ivm::AADLIfaceGroup *entity, QGraphicsItem *parent = nullptr);
     ColorManager::HandledColors handledColorType() const override;
 
-    ivm::AADLObjectIfaceGroup *entity() const;
+    ivm::AADLIfaceGroup *entity() const;
 
 protected:
     QPainterPath typePath() const override;

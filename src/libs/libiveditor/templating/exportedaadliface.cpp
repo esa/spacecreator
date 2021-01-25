@@ -1,4 +1,4 @@
-/*
+    /*
    Copyright (C) 2019 European Space Agency - <maxime.perrotin@esa.int>
 
    This library is free software; you can redistribute it and/or
@@ -17,30 +17,30 @@
 
 #include "exportedaadliface.h"
 
-#include "tab_aadl/aadlobjectiface.h"
+#include "tab_aadl/aadliface.h"
 
 namespace taste3 {
 namespace templating {
 
-TemplatedAADLIface::TemplatedAADLIface(const aadl::AADLObjectIface *iface)
+TemplatedAADLIface::TemplatedAADLIface(const aadl::AADLIface *iface)
     : ExportedAADLObject(iface)
 {
 }
 
 bool TemplatedAADLIface::isProvided() const
 {
-    return exportedObject<aadl::AADLObjectIface>()->isProvided();
+    return exportedObject<aadl::AADLIface>()->isProvided();
 }
 
 bool TemplatedAADLIface::isRequired() const
 {
-    return exportedObject<aadl::AADLObjectIface>()->isRequired();
+    return exportedObject<aadl::AADLIface>()->isRequired();
 }
 
 QVariantList TemplatedAADLIface::paramList() const
 {
     QVariantList list;
-    for (const auto &param : exportedObject<aadl::AADLObjectIface>()->params())
+    for (const auto &param : exportedObject<aadl::AADLIface>()->params())
         list << QVariant::fromValue(param);
     return list;
 }

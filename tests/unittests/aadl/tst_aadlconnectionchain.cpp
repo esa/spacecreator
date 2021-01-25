@@ -16,8 +16,8 @@
 */
 
 #include "aadlconnectionchain.h"
-#include "aadlobjectconnection.h"
-#include "aadlobjectsmodel.h"
+#include "aadlconnection.h"
+#include "aadlmodel.h"
 #include "aadlxmlreader.h"
 #include "propertytemplateconfig.h"
 
@@ -36,13 +36,13 @@ private Q_SLOTS:
     void testGetNames();
 
 private:
-    ivm::AADLObjectConnection *selectConnection(const QString &sourceName, const QString &targetName,
-            QList<ivm::AADLObjectConnection *> connections) const;
+    ivm::AADLConnection *selectConnection(const QString &sourceName, const QString &targetName,
+            QList<ivm::AADLConnection *> connections) const;
     bool checkChain(ivm::AADLConnectionChain *chain, const QStringList &functionNames) const;
 };
 
-ivm::AADLObjectConnection *tst_AADLConnectionChain::selectConnection(
-        const QString &sourceName, const QString &targetName, QList<ivm::AADLObjectConnection *> connections) const
+ivm::AADLConnection *tst_AADLConnectionChain::selectConnection(
+        const QString &sourceName, const QString &targetName, QList<ivm::AADLConnection *> connections) const
 {
     for (auto co : connections) {
         if (co->sourceName() == sourceName && co->targetName() == targetName) {
@@ -67,13 +67,13 @@ bool tst_AADLConnectionChain::checkChain(ivm::AADLConnectionChain *chain, const 
         return false;
     }
 
-    const QList<ivm::AADLObjectConnection *> &connections = chain->connections();
+    const QList<ivm::AADLConnection *> &connections = chain->connections();
     if (connections[0]->sourceName() != functionNames[0]) {
         return false;
     }
 
     int i = 1;
-    for (const ivm::AADLObjectConnection *c : connections) {
+    for (const ivm::AADLConnection *c : connections) {
         if (c->targetName() != functionNames[i]) {
             return false;
         }
@@ -89,14 +89,14 @@ void tst_AADLConnectionChain::test3StraightConnections()
     const QStringList expectedChain = { "MiniA", "BlockA", "BlockB", "MiniB" };
 
     ivm::PropertyTemplateConfig *conf = ivm::PropertyTemplateConfig::instance();
-    ivm::AADLObjectsModel model(conf);
+    ivm::AADLModel model(conf);
     ivm::AADLXMLReader parser;
-    connect(&parser, &ivm::AADLXMLReader::objectsParsed, &model, &ivm::AADLObjectsModel::addObjects);
+    connect(&parser, &ivm::AADLXMLReader::objectsParsed, &model, &ivm::AADLModel::addObjects);
     parser.readFile(QFINDTESTDATA("connectionchains01.xml"));
     QCOMPARE(model.objects().size(), 11);
 
-    QList<ivm::AADLObjectConnection *> allConnections = model.allObjectsByType<ivm::AADLObjectConnection>().toList();
-    ivm::AADLObjectConnection *startConnection = selectConnection("MiniA", "BlockA", allConnections);
+    QList<ivm::AADLConnection *> allConnections = model.allObjectsByType<ivm::AADLConnection>().toList();
+    ivm::AADLConnection *startConnection = selectConnection("MiniA", "BlockA", allConnections);
     QList<ivm::AADLConnectionChain *> chains = ivm::AADLConnectionChain::build(startConnection, allConnections);
     QCOMPARE(chains.size(), 1);
     QVERIFY(checkChain(chains[0], expectedChain));
@@ -129,13 +129,13 @@ void tst_AADLConnectionChain::test3StraightConnections()
 void tst_AADLConnectionChain::testTargetSplitsIntoTwo()
 {
     ivm::PropertyTemplateConfig *conf = ivm::PropertyTemplateConfig::instance();
-    ivm::AADLObjectsModel model(conf);
+    ivm::AADLModel model(conf);
     ivm::AADLXMLReader parser;
-    connect(&parser, &ivm::AADLXMLReader::objectsParsed, &model, &ivm::AADLObjectsModel::addObjects);
+    connect(&parser, &ivm::AADLXMLReader::objectsParsed, &model, &ivm::AADLModel::addObjects);
     parser.readFile(QFINDTESTDATA("connectionchains02.xml"));
     QCOMPARE(model.objects().size(), 18);
 
-    QList<ivm::AADLObjectConnection *> allConnections = model.allObjectsByType<ivm::AADLObjectConnection>().toList();
+    QList<ivm::AADLConnection *> allConnections = model.allObjectsByType<ivm::AADLConnection>().toList();
     QList<ivm::AADLConnectionChain *> chains = ivm::AADLConnectionChain::build(model);
     QCOMPARE(chains.size(), 2);
     qDeleteAll(chains);
@@ -147,13 +147,13 @@ void tst_AADLConnectionChain::testTargetSplitsIntoTwo()
 void tst_AADLConnectionChain::testTargetJoinIntone()
 {
     ivm::PropertyTemplateConfig *conf = ivm::PropertyTemplateConfig::instance();
-    ivm::AADLObjectsModel model(conf);
+    ivm::AADLModel model(conf);
     ivm::AADLXMLReader parser;
-    connect(&parser, &ivm::AADLXMLReader::objectsParsed, &model, &ivm::AADLObjectsModel::addObjects);
+    connect(&parser, &ivm::AADLXMLReader::objectsParsed, &model, &ivm::AADLModel::addObjects);
     parser.readFile(QFINDTESTDATA("connectionchains03.xml"));
     QCOMPARE(model.objects().size(), 20);
 
-    QList<ivm::AADLObjectConnection *> allConnections = model.allObjectsByType<ivm::AADLObjectConnection>().toList();
+    QList<ivm::AADLConnection *> allConnections = model.allObjectsByType<ivm::AADLConnection>().toList();
     QList<ivm::AADLConnectionChain *> chains = ivm::AADLConnectionChain::build(model);
     QCOMPARE(chains.size(), 2);
     qDeleteAll(chains);
@@ -168,13 +168,13 @@ void tst_AADLConnectionChain::testTargetJoinIntone()
 void tst_AADLConnectionChain::testChainCreationMultiChainOnInterfaces()
 {
     ivm::PropertyTemplateConfig *conf = ivm::PropertyTemplateConfig::instance();
-    ivm::AADLObjectsModel model(conf);
+    ivm::AADLModel model(conf);
     ivm::AADLXMLReader parser;
-    connect(&parser, &ivm::AADLXMLReader::objectsParsed, &model, &ivm::AADLObjectsModel::addObjects);
+    connect(&parser, &ivm::AADLXMLReader::objectsParsed, &model, &ivm::AADLModel::addObjects);
     parser.readFile(QFINDTESTDATA("connectionchains04.xml"));
     QCOMPARE(model.objects().size(), 22);
 
-    QList<ivm::AADLObjectConnection *> allConnections = model.allObjectsByType<ivm::AADLObjectConnection>().toList();
+    QList<ivm::AADLConnection *> allConnections = model.allObjectsByType<ivm::AADLConnection>().toList();
     QList<ivm::AADLConnectionChain *> chains = ivm::AADLConnectionChain::build(model);
     QCOMPARE(chains.size(), 4);
     qDeleteAll(chains);
@@ -185,9 +185,9 @@ void tst_AADLConnectionChain::testChainCreationMultiChainOnInterfaces()
 void tst_AADLConnectionChain::testContains()
 {
     ivm::PropertyTemplateConfig *conf = ivm::PropertyTemplateConfig::instance();
-    ivm::AADLObjectsModel model(conf);
+    ivm::AADLModel model(conf);
     ivm::AADLXMLReader parser;
-    connect(&parser, &ivm::AADLXMLReader::objectsParsed, &model, &ivm::AADLObjectsModel::addObjects);
+    connect(&parser, &ivm::AADLXMLReader::objectsParsed, &model, &ivm::AADLModel::addObjects);
     parser.readFile(QFINDTESTDATA("connectionchains01.xml"));
     QCOMPARE(model.objects().size(), 11);
 
@@ -216,9 +216,9 @@ void tst_AADLConnectionChain::testContains()
 void tst_AADLConnectionChain::testGetNames()
 {
     ivm::PropertyTemplateConfig *conf = ivm::PropertyTemplateConfig::instance();
-    ivm::AADLObjectsModel model(conf);
+    ivm::AADLModel model(conf);
     ivm::AADLXMLReader parser;
-    connect(&parser, &ivm::AADLXMLReader::objectsParsed, &model, &ivm::AADLObjectsModel::addObjects);
+    connect(&parser, &ivm::AADLXMLReader::objectsParsed, &model, &ivm::AADLModel::addObjects);
     parser.readFile(QFINDTESTDATA("connectionchains01.xml"));
 
     QList<ivm::AADLConnectionChain *> chains = ivm::AADLConnectionChain::build(model);

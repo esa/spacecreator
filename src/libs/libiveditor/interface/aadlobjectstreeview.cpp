@@ -17,7 +17,7 @@
 
 #include "aadlobjectstreeview.h"
 
-#include "aadlobjectsmodel.h"
+#include "aadlmodel.h"
 #include "commonvisualizationmodel.h"
 
 #include <QApplication>
