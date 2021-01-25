@@ -14,4 +14,4 @@ target_include_directories(${LIB_NAME}
     PUBLIC .
 )
 
-target_link_libraries(${LIB_NAME} Qt5::Core)
+target_link_libraries(${LIB_NAME} ${QT_CORE})

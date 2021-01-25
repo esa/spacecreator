@@ -16,7 +16,7 @@ function(addQtTest TEST_NAME LIBRARY)
 
     target_link_libraries(${TEST_NAME} PUBLIC
         ${LIBRARY}
-        Qt5::Test
+        ${QT_TEST}
     )
 
     target_compile_definitions(${TEST_NAME} PUBLIC EXAMPLES_DIR=\"${CMAKE_SOURCE_DIR}/examples/\")

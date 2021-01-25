@@ -25,8 +25,8 @@ function(addAsn1PluginTest TEST_NAME)
         Asn1Acn
         ${QTC_LIBRARIES}
         ${QTC_PLUGINS}
-        Qt5::Test
-        Qt5::Widgets
+        ${QT_TEST}
+        ${QT_WIDGETS}
     )
 
     target_include_directories(${TEST_NAME}

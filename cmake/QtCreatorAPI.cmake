@@ -278,7 +278,7 @@ function(enable_pch target)
       endfunction()
       _recursively_collect_dependencies(${target})
 
-      if ("Qt5::Widgets" IN_LIST dependencies)
+      if ("${QT_WIDGETS}" IN_LIST dependencies)
         set(PCH_FILE "${PROJECT_SOURCE_DIR}/src/shared/qtcreator_gui_pch.h")
       endif()
 

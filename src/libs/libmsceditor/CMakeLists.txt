@@ -186,11 +186,11 @@ target_link_libraries(${LIB_NAME}
     msclibrary
     asn1editor
     libiveditor
-    Qt5::Core
-    Qt5::Gui
-    Qt5::Network
-    Qt5::Widgets
-    Qt5::WebSockets
+    ${QT_CORE}
+    ${QT_GUI}
+    ${QT_NETWORK}
+    ${QT_WIDGETS}
+    ${QT_WEBSOCKETS}
 )
 
 source_group("Designer Files" REGULAR_EXPRESSION ".*.ui$")

@@ -58,11 +58,11 @@ target_sources(${LIB_NAME} PRIVATE
 target_include_directories(${LIB_NAME} PUBLIC .)
 
 target_link_libraries(${LIB_NAME}
-    Qt5::Core
-    Qt5::Gui
-    Qt5::Widgets
-    Qt5::Network
-    Qt5::Concurrent
+    ${QT_CORE}
+    ${QT_GUI}
+    ${QT_WIDGETS}
+    ${QT_NETWORK}
+    ${QT_CONCURRENT}
 )
 
 source_group("Designer Files" REGULAR_EXPRESSION ".*.ui$")

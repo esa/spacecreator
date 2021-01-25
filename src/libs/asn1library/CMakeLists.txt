@@ -56,7 +56,7 @@ target_include_directories(${LIB_NAME}
 
 target_link_libraries(${LIB_NAME}
     shared
-    Qt5::Core
+    ${QT_CORE}
 )
 
 source_group("Resource Files" REGULAR_EXPRESSION ".*.qrc$")

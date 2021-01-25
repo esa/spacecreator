@@ -110,8 +110,8 @@ target_link_libraries(${LIB_NAME}
     asn1library
     qobjectlistmodel
     templating
-    Qt5::Core
-    Qt5::Gui
+    ${QT_CORE}
+    ${QT_GUI}
     antlr4_static
 )
 

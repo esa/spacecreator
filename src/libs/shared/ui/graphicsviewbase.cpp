@@ -120,7 +120,7 @@ QList<QPair<QPointF, QString>> GraphicsViewBase::mouseMoveCoordinates(
 
 void GraphicsViewBase::mousePressEvent(QMouseEvent *event)
 {
-    if (event->buttons() == Qt::MidButton) {
+    if (event->buttons() == Qt::MiddleButton) {
         d->panning = true;
         d->lastMousePosition = event->localPos();
     }

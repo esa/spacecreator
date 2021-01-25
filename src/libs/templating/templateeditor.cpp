@@ -27,7 +27,6 @@
 #include <QBuffer>
 #include <QCheckBox>
 #include <QDebug>
-#include <QDesktopWidget>
 #include <QDialogButtonBox>
 #include <QFileDialog>
 #include <QGroupBox>
@@ -35,6 +34,7 @@
 #include <QMessageBox>
 #include <QPlainTextEdit>
 #include <QPushButton>
+#include <QScreen>
 #include <QSpinBox>
 #include <QSplitter>
 #include <QTabWidget>
@@ -59,8 +59,7 @@ TemplateEditor::TemplateEditor(const QString &saveHere, QWidget *parent)
     setWindowState(Qt::WindowMaximized);
     setWindowTitle(tr("String Template Editor"));
 
-    QDesktopWidget *desktop = QApplication::desktop();
-    QRect geometry = desktop->availableGeometry(this);
+    QRect geometry = QApplication::primaryScreen()->availableGeometry();
     setMinimumSize(geometry.width() * 0.8, geometry.height() * 0.8);
 
     QFont textFont(QStringLiteral("Courier"));

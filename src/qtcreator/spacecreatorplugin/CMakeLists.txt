@@ -69,7 +69,7 @@ set(SC_QTC_PLUGINS
 
 add_qtc_plugin(${PLUGIN_NAME}
     DEFINES SCPLUGIN_LIBRARY
-    DEPENDS libmsceditor libiveditor libdveditor Qt5::Core Qt5::Gui Qt5::Widgets ${SC_QTC_LIBRARIES} ${SC_QTC_PLUGINS}
+    DEPENDS libmsceditor libiveditor libdveditor ${QT_CORE} ${QT_GUI} ${QT_WIDGETS} ${SC_QTC_LIBRARIES} ${SC_QTC_PLUGINS}
     PLUGIN_DEPENDS ${SC_QTC_PLUGINS}
     SOURCES ${SC_PLUGIN_SOURCES}
 )

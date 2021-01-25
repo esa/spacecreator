@@ -214,7 +214,7 @@ void MiniMap::drawItems(QPainter *painter, int numItems, QGraphicsItem **items, 
             continue;
 
         painter->save();
-        painter->setMatrix(items[idx]->sceneMatrix(), true);
+        painter->setTransform(items[idx]->sceneTransform(), true);
         items[idx]->paint(painter, &options[idx], this);
         painter->restore();
     }

@@ -10,7 +10,7 @@ target_sources(${APP_NAME} PRIVATE
 target_link_libraries(${APP_NAME} PUBLIC
     msclibrary
     shared
-    Qt5::Core
+    ${QT_CORE}
 )
 
 target_include_directories(${APP_NAME} PRIVATE

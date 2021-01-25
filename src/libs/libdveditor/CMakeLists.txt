@@ -16,9 +16,9 @@ target_sources(${LIB_NAME} PRIVATE
 
 target_link_libraries(${LIB_NAME}
     shared
-    Qt5::Svg
-    Qt5::Widgets
-    Qt5::Xml
+    ${QT_SVG}
+    ${QT_WIDGETS}
+    ${QT_XML}
 )
 
 target_include_directories(${LIB_NAME} PUBLIC .)

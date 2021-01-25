@@ -15,9 +15,9 @@ target_link_libraries(${APP_NAME} PUBLIC
     libiveditor
     asn1editor
     msclibrary
-    Qt5::Core
-    Qt5::Gui
-    Qt5::Widgets
+    ${QT_CORE}
+    ${QT_GUI}
+    ${QT_WIDGETS}
 )
 
 target_include_directories(${APP_NAME} PRIVATE

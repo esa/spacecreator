@@ -12,8 +12,8 @@ target_sources(${APP_NAME} PRIVATE
 
 target_link_libraries(${APP_NAME} PUBLIC
     libmsceditor
-    Qt5::Gui
-    Qt5::Widgets
+    ${QT_GUI}
+    ${QT_WIDGETS}
 )
 
 target_include_directories(${APP_NAME} PRIVATE

@@ -225,11 +225,11 @@ target_link_libraries(${LIB_NAME}
     shared
     templating
     msclibrary
-    Qt5::Concurrent
-    Qt5::Network
-    Qt5::Svg
-    Qt5::Widgets
-    Qt5::Xml
+    ${QT_CONCURRENT}
+    ${QT_NETWORK}
+    ${QT_SVG}
+    ${QT_WIDGETS}
+    ${QT_XML}
 )
 
 target_include_directories(${LIB_NAME} PUBLIC .)

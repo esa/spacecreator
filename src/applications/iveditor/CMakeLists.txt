@@ -12,7 +12,7 @@ target_sources(${APP_NAME} PRIVATE
 
 target_link_libraries(${APP_NAME} PUBLIC
     libiveditor
-    Qt5::Widgets
+    ${QT_WIDGETS}
 )
 
 target_compile_definitions(${APP_NAME} PUBLIC QT_MESSAGELOGCONTEXT)

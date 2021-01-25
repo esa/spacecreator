@@ -28,7 +28,7 @@ ActionsBar::ActionsBar(QWidget *parent)
     : QWidget(parent)
     , m_layout(new QVBoxLayout(this))
 {
-    m_layout->setMargin(0);
+    m_layout->setContentsMargins(0, 0, 0, 0);
     m_layout->addStretch(1);
     setLayout(m_layout);
 }

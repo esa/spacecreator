@@ -25,9 +25,9 @@ target_include_directories(${LIB_NAME}
 
 target_link_libraries(${LIB_NAME}
     asn1library
-    Qt5::Core
-    Qt5::Gui
-    Qt5::Widgets
+    ${QT_CORE}
+    ${QT_GUI}
+    ${QT_WIDGETS}
 )
 
 source_group("Designer Files" REGULAR_EXPRESSION ".*.ui$")

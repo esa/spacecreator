@@ -12,10 +12,9 @@ target_link_libraries(${APP_NAME} PUBLIC
     libiveditor
     shared
     templating
-    Qt5::Concurrent
-    Qt5::Network
-    Qt5::Svg
-    Qt5::Widgets
+    ${QT_CONCURRENT}
+    ${QT_NETWORK}
+    ${QT_WIDGETS}
 )
 
 target_compile_definitions(${APP_NAME} PUBLIC QT_MESSAGELOGCONTEXT)

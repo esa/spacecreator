@@ -14,7 +14,7 @@ target_link_libraries(${APP_NAME} PUBLIC
     libdveditor
     shared
     templating
-    Qt5::Widgets
+    ${QT_WIDGETS}
 )
 
 target_compile_definitions(${APP_NAME} PUBLIC QT_MESSAGELOGCONTEXT)

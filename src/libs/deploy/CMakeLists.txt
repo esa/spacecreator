@@ -29,7 +29,6 @@ target_include_directories(${LIB_NAME} PUBLIC .)
 
 target_link_libraries(${LIB_NAME}
     shared
-    Qt5::Core
-    Qt5::Gui
-    Qt5::Xml
+    ${QT_CORE}
+    ${QT_XML}
 )
