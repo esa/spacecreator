@@ -19,7 +19,7 @@
 
 #include <QStandardItemModel>
 
-namespace aadl {
+namespace ivm {
 class AADLObject;
 }
 
@@ -37,7 +37,7 @@ public:
     virtual bool isAttr(const QModelIndex &id) const = 0;
     virtual bool isProp(const QModelIndex &id) const = 0;
 
-    virtual const aadl::AADLObject *dataObject() const = 0;
+    virtual const ivm::AADLObject *dataObject() const = 0;
 };
 
 }

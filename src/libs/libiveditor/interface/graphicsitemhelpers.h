@@ -24,7 +24,7 @@ class QGraphicsScene;
 class QRectF;
 class QPointF;
 
-namespace aadl {
+namespace ivm {
 class AADLObjectFunction;
 class AADLObjectFunctionType;
 class AADLObjectIface;
@@ -37,17 +37,17 @@ struct ValidationResult;
 namespace ive {
 namespace gi {
 
-aadl::AADLObjectFunction *functionObject(QGraphicsItem *item);
+ivm::AADLObjectFunction *functionObject(QGraphicsItem *item);
 
-aadl::AADLObjectFunctionType *functionTypeObject(QGraphicsItem *item);
+ivm::AADLObjectFunctionType *functionTypeObject(QGraphicsItem *item);
 
-aadl::AADLObjectIface *interfaceObject(QGraphicsItem *item);
+ivm::AADLObjectIface *interfaceObject(QGraphicsItem *item);
 
-aadl::AADLObjectComment *commentObject(QGraphicsItem *item);
+ivm::AADLObjectComment *commentObject(QGraphicsItem *item);
 
-aadl::AADLObjectConnection *connectionObject(QGraphicsItem *item);
+ivm::AADLObjectConnection *connectionObject(QGraphicsItem *item);
 
-aadl::AADLObject *object(const QGraphicsItem *item);
+ivm::AADLObject *object(const QGraphicsItem *item);
 
 enum RectOperation
 {
@@ -65,7 +65,7 @@ bool canPlaceRect(QGraphicsScene *scene, const QGraphicsItem *upcomingItem, cons
  * Anything except the FailReason::NotFail in ConnectionCreationValidator::ValidationResult::status
  * means that the connection creation is prohibited.
  */
-aadl::ValidationResult validateConnectionCreate(QGraphicsScene *scene, const QVector<QPointF> &points);
+ivm::ValidationResult validateConnectionCreate(QGraphicsScene *scene, const QVector<QPointF> &points);
 
 } // namespace gi
 } // namespace ive

@@ -25,7 +25,7 @@
 #include <QVector>
 #include <memory>
 
-namespace aadl {
+namespace ivm {
 
 struct AADLObjectPrivate;
 class AADLObjectsModel;
@@ -131,7 +131,7 @@ public:
         return qobject_cast<const T>(this);
     }
 
-    static void sortObjectList(QList<aadl::AADLObject *> &objects);
+    static void sortObjectList(QList<ivm::AADLObject *> &objects);
     static QVector<qint32> coordinatesFromString(const QString &strCoordinates);
     static QString coordinatesToString(const QVector<qint32> &coordinates);
 
@@ -142,12 +142,12 @@ Q_SIGNALS:
     void groupChanged(const QString &groupName);
     void attributeChanged(const QString &name);
     void propertyChanged(const QString &name);
-    void attributeChanged(aadl::meta::Props::Token attr = aadl::meta::Props::Token::Unknown);
-    void propertyChanged(aadl::meta::Props::Token prop = aadl::meta::Props::Token::Unknown);
+    void attributeChanged(ivm::meta::Props::Token attr = ivm::meta::Props::Token::Unknown);
+    void propertyChanged(ivm::meta::Props::Token prop = ivm::meta::Props::Token::Unknown);
 
 public Q_SLOTS:
     bool setTitle(const QString &title);
-    bool setParentObject(aadl::AADLObject *parentObject);
+    bool setParentObject(ivm::AADLObject *parentObject);
 
 private:
     const std::unique_ptr<AADLObjectPrivate> d;

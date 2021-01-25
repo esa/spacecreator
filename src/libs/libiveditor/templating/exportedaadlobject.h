@@ -23,7 +23,7 @@
 
 namespace taste3 {
 
-namespace aadl {
+namespace ivm{
 class AADLObject;
 }
 
@@ -39,9 +39,9 @@ class ExportedAADLObject : public GenericExportedObject
     Q_PROPERTY(QVariantList properties READ properties)
 
 public:
-    explicit ExportedAADLObject(const aadl::AADLObject *aadlObject = nullptr);
+    explicit ExportedAADLObject(const ivm::AADLObject *aadlObject = nullptr);
 
-    static QVariant createFrom(const aadl::AADLObject *aadlObject);
+    static QVariant createFrom(const ivm::AADLObject *aadlObject);
 
     QVariantList attributes() const;
     QVariantList properties() const;

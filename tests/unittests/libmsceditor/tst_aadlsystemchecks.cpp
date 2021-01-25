@@ -108,8 +108,8 @@ void tst_AadlSystemChecks::testCheckInstanceNames()
 
     // Add function with different name
     ive::InterfaceDocument *doc = ivPlugin->document();
-    aadl::AADLObjectsModel *aadlModel = doc->objectsModel();
-    auto aadlFnct = new aadl::AADLObjectFunction("init");
+    ivm::AADLObjectsModel *aadlModel = doc->objectsModel();
+    auto aadlFnct = new ivm::AADLObjectFunction("init");
     aadlModel->addObject(aadlFnct);
     result = m_checker->checkInstanceNames();
     QCOMPARE(result.size(), 1);
@@ -152,10 +152,10 @@ void tst_AadlSystemChecks::testCheckInstanceRelations()
 
     // Add function for the instances
     ive::InterfaceDocument *doc = ivPlugin->document();
-    aadl::AADLObjectsModel *aadlModel = doc->objectsModel();
-    auto function1 = new aadl::AADLObjectFunction("init");
+    ivm::AADLObjectsModel *aadlModel = doc->objectsModel();
+    auto function1 = new ivm::AADLObjectFunction("init");
     aadlModel->addObject(function1);
-    auto function2 = new aadl::AADLObjectFunction("reset");
+    auto function2 = new ivm::AADLObjectFunction("reset");
     aadlModel->addObject(function2);
     result = m_checker->checkInstanceRelations();
     QCOMPARE(result.size(), 0);
@@ -166,7 +166,7 @@ void tst_AadlSystemChecks::testCheckInstanceRelations()
     QCOMPARE(result.size(), 2);
 
     // Make function2 be nested by function1 via another one
-    auto function15 = new aadl::AADLObjectFunction("init");
+    auto function15 = new ivm::AADLObjectFunction("init");
     aadlModel->addObject(function15);
     function15->setParent(function1);
     function2->setParent(function15);
@@ -201,20 +201,20 @@ void tst_AadlSystemChecks::testCheckMessageNames()
 
     // Add function with different source/target
     ive::InterfaceDocument *doc = ivPlugin->document();
-    aadl::AADLObjectsModel *aadlModel = doc->objectsModel();
-    auto aadlfFuncA = new aadl::AADLObjectFunction("Instance A");
+    ivm::AADLObjectsModel *aadlModel = doc->objectsModel();
+    auto aadlfFuncA = new ivm::AADLObjectFunction("Instance A");
     aadlModel->addObject(aadlfFuncA);
-    auto aadlfFuncB = new aadl::AADLObjectFunction("Instance B");
+    auto aadlfFuncB = new ivm::AADLObjectFunction("Instance B");
     aadlModel->addObject(aadlfFuncB);
 
-    aadl::AADLObjectIface *requiredInterface =
-            aadl::testutils::createIface(aadlfFuncA, aadl::AADLObjectIface::IfaceType::Required, "DummyA");
+    ivm::AADLObjectIface *requiredInterface =
+            ivm::testutils::createIface(aadlfFuncA, ivm::AADLObjectIface::IfaceType::Required, "DummyA");
     aadlModel->addObject(requiredInterface);
 
-    aadl::AADLObjectIface *providedInterface =
-            aadl::testutils::createIface(aadlfFuncB, aadl::AADLObjectIface::IfaceType::Provided, "DummyB");
+    ivm::AADLObjectIface *providedInterface =
+            ivm::testutils::createIface(aadlfFuncB, ivm::AADLObjectIface::IfaceType::Provided, "DummyB");
     aadlModel->addObject(providedInterface);
-    aadlModel->addObject(new aadl::AADLObjectConnection(requiredInterface, providedInterface));
+    aadlModel->addObject(new ivm::AADLObjectConnection(requiredInterface, providedInterface));
     result = m_checker->checkMessages();
     QCOMPARE(result.size(), 1);
 
@@ -226,7 +226,7 @@ void tst_AadlSystemChecks::testCheckMessageNames()
 
 void tst_AadlSystemChecks::testCorrespondMessage_data()
 {
-    using namespace aadl;
+    using namespace ivm;
     QTest::addColumn<QString>("sourceFuncName");
     QTest::addColumn<QString>("sourceIfName");
     QTest::addColumn<AADLObjectIface::IfaceType>("sourceIfType");
@@ -254,7 +254,7 @@ void tst_AadlSystemChecks::testCorrespondMessage_data()
 
 void tst_AadlSystemChecks::testCorrespondMessage()
 {
-    using namespace aadl;
+    using namespace ivm;
     QFETCH(QString, sourceFuncName);
     QFETCH(QString, sourceIfName);
     QFETCH(AADLObjectIface::IfaceType, sourceIfType);
@@ -274,9 +274,9 @@ void tst_AadlSystemChecks::testCorrespondMessage()
     auto sourceFunc = std::make_unique<AADLObjectFunction>(sourceFuncName);
     auto targetFunc = std::make_unique<AADLObjectFunction>(targetFuncName);
     std::unique_ptr<AADLObjectIface> sourceIf(
-            aadl::testutils::createIface(sourceFunc.get(), sourceIfType, sourceIfName));
+            ivm::testutils::createIface(sourceFunc.get(), sourceIfType, sourceIfName));
     std::unique_ptr<AADLObjectIface> targetIf(
-            aadl::testutils::createIface(targetFunc.get(), targetIfType, targetIfName));
+            ivm::testutils::createIface(targetFunc.get(), targetIfType, targetIfName));
     auto connection = std::make_unique<AADLObjectConnection>(sourceIf.get(), targetIf.get());
 
     const bool doCorrespond = m_checker->correspond(connection.get(), message.get());
@@ -308,18 +308,18 @@ void tst_AadlSystemChecks::testCheckMessage()
 
     // Create corresponding aadl model
     ive::InterfaceDocument *doc = ivPlugin->document();
-    aadl::AADLObjectsModel *aadlModel = doc->objectsModel();
-    auto sourceFunc = new aadl::AADLObjectFunction("Dummy1");
+    ivm::AADLObjectsModel *aadlModel = doc->objectsModel();
+    auto sourceFunc = new ivm::AADLObjectFunction("Dummy1");
     aadlModel->addObject(sourceFunc);
-    auto targetFunc = new aadl::AADLObjectFunction("Dummy2");
+    auto targetFunc = new ivm::AADLObjectFunction("Dummy2");
     aadlModel->addObject(targetFunc);
-    aadl::AADLObjectConnection *connection = aadl::testutils::createConnection(sourceFunc, targetFunc, "Msg1");
+    ivm::AADLObjectConnection *connection = ivm::testutils::createConnection(sourceFunc, targetFunc, "Msg1");
     QCOMPARE(m_checker->checkMessage(message), true);
     aadlModel->removeObject(connection);
     delete connection;
 
     // Reverse direction fails
-    aadl::testutils::createConnection(targetFunc, sourceFunc, "Msg1");
+    ivm::testutils::createConnection(targetFunc, sourceFunc, "Msg1");
     QCOMPARE(m_checker->checkMessage(message), false);
 
     // Message from the environment
@@ -328,11 +328,11 @@ void tst_AadlSystemChecks::testCheckMessage()
     chart->addInstanceEvent(message1);
     QCOMPARE(m_checker->checkMessage(message1), false);
     // Default interface is not ok
-    aadl::AADLObjectIface *if1 =
-            aadl::testutils::createIface(sourceFunc, aadl::AADLObjectIface::IfaceType::Provided, "Env1");
+    ivm::AADLObjectIface *if1 =
+            ivm::testutils::createIface(sourceFunc, ivm::AADLObjectIface::IfaceType::Provided, "Env1");
     QCOMPARE(m_checker->checkMessage(message1), false);
     // interface type has to be "cyclic"
-    if1->setKind(aadl::AADLObjectIface::OperationKind::Cyclic);
+    if1->setKind(ivm::AADLObjectIface::OperationKind::Cyclic);
     QCOMPARE(m_checker->checkMessage(message1), true);
 }
 

@@ -24,7 +24,7 @@
 #include <QStringList>
 #include <QVector>
 
-namespace aadl {
+namespace ivm {
 class AADLObject;
 }
 
@@ -42,7 +42,7 @@ struct Condition {
 
     static QStringList knownTypes();
 
-    bool isAcceptable(aadl::AADLObject *obj) const;
+    bool isAcceptable(ivm::AADLObject *obj) const;
 };
 
 }

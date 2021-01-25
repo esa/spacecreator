@@ -29,16 +29,16 @@ namespace ive {
 namespace cmd {
 
 QVector<QUndoCommand *> fillCloneCommands(
-        aadl::AADLObjectIface *iface, const aadl::AADLObjectIface::CreationInfo &creationInfo)
+        ivm::AADLObjectIface *iface, const ivm::AADLObjectIface::CreationInfo &creationInfo)
 {
     QVector<QUndoCommand *> clones;
 
     if (!iface || !iface->parentObject())
         return clones;
 
-    if (auto fnType = iface->parentObject()->as<const aadl::AADLObjectFunctionType *>())
+    if (auto fnType = iface->parentObject()->as<const ivm::AADLObjectFunctionType *>())
         for (const auto &fn : fnType->instances()) {
-            aadl::AADLObjectIface::CreationInfo clone = aadl::AADLObjectIface::CreationInfo::cloneIface(iface, fn);
+            ivm::AADLObjectIface::CreationInfo clone = ivm::AADLObjectIface::CreationInfo::cloneIface(iface, fn);
             // the cloned iface has not been stored yet,
             // so it has invalid pointer to the model
             clone.model = creationInfo.model;
@@ -49,12 +49,12 @@ QVector<QUndoCommand *> fillCloneCommands(
     return clones;
 }
 
-CmdInterfaceItemCreate::CmdInterfaceItemCreate(const aadl::AADLObjectIface::CreationInfo &creationInfo)
+CmdInterfaceItemCreate::CmdInterfaceItemCreate(const ivm::AADLObjectIface::CreationInfo &creationInfo)
     : CmdEntityGeometryChange({},
-            creationInfo.type == aadl::AADLObjectIface::IfaceType::Provided ? QObject::tr("Create PI")
+            creationInfo.type == ivm::AADLObjectIface::IfaceType::Provided ? QObject::tr("Create PI")
                                                                             : QObject::tr("Create RI"))
     , m_ifaceInfo(creationInfo)
-    , m_entity(aadl::AADLObjectIface::createIface(m_ifaceInfo))
+    , m_entity(ivm::AADLObjectIface::createIface(m_ifaceInfo))
     , m_cmdClones(fillCloneCommands(m_entity, m_ifaceInfo))
 {
     prepareData({ qMakePair(m_entity, QVector<QPointF> { m_ifaceInfo.position }) });
@@ -99,7 +99,7 @@ int CmdInterfaceItemCreate::id() const
     return CreateInterfaceEntity;
 }
 
-aadl::AADLObjectIface *CmdInterfaceItemCreate::createdInterface() const
+ivm::AADLObjectIface *CmdInterfaceItemCreate::createdInterface() const
 {
     return m_entity;
 }

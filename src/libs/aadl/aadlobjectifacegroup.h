@@ -19,7 +19,7 @@
 
 #include "aadlobjectiface.h"
 
-namespace aadl {
+namespace ivm {
 
 class AADLObjectIfaceGroup : public AADLObjectIface
 {
@@ -39,4 +39,4 @@ private:
     QList<QPointer<AADLObjectIface>> m_entities;
 };
 
-} // namespace aadl
+} // namespace ivm

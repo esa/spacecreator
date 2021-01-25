@@ -22,7 +22,7 @@
 
 #include <QPointer>
 
-namespace aadl {
+namespace ivm {
 class AADLObjectConnection;
 }
 
@@ -37,11 +37,11 @@ class AADLConnectionGraphicsItem : public InteractiveObject
 public:
     enum
     {
-        Type = UserType + static_cast<int>(aadl::AADLObject::Type::Connection)
+        Type = UserType + static_cast<int>(ivm::AADLObject::Type::Connection)
     };
     int type() const override { return Type; }
 
-    explicit AADLConnectionGraphicsItem(aadl::AADLObjectConnection *connection, AADLInterfaceGraphicsItem *ifaceStart,
+    explicit AADLConnectionGraphicsItem(ivm::AADLObjectConnection *connection, AADLInterfaceGraphicsItem *ifaceStart,
             AADLInterfaceGraphicsItem *ifaceEnd, QGraphicsItem *parent = nullptr);
     ~AADLConnectionGraphicsItem() override;
 
@@ -50,7 +50,7 @@ public:
 
     QVector<QPointF> graphicsPoints() const;
 
-    aadl::AADLObjectConnection *entity() const;
+    ivm::AADLObjectConnection *entity() const;
     void updateFromEntity() override;
 
     void init() override;

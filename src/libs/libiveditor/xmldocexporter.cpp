@@ -126,7 +126,7 @@ bool XmlDocExporter::exportDoc(InterfaceDocument *doc, QBuffer *outBuffer, const
    @return true when the export was successful.
  */
 bool XmlDocExporter::exportObjects(
-        const QList<aadl::AADLObject *> &objects, QBuffer *outBuffer, const QString &templatePath)
+        const QList<ivm::AADLObject *> &objects, QBuffer *outBuffer, const QString &templatePath)
 {
     if (objects.isEmpty() || !outBuffer || !outBuffer->isWritable()) {
         return false;
@@ -237,22 +237,22 @@ QHash<QString, QVariant> XmlDocExporter::collectInterfaceObjects(InterfaceDocume
     return grouppedObjects;
 }
 
-QHash<QString, QVariant> XmlDocExporter::collectInterfaceObjects(const QList<aadl::AADLObject *> &objects)
+QHash<QString, QVariant> XmlDocExporter::collectInterfaceObjects(const QList<ivm::AADLObject *> &objects)
 {
     QHash<QString, QVariant> grouppedObjects;
 
     for (const auto aadlObject : objects) {
-        const aadl::AADLObject::Type t = aadlObject->aadlType();
+        const ivm::AADLObject::Type t = aadlObject->aadlType();
         switch (t) {
-        case aadl::AADLObject::Type::InterfaceGroup:
+        case ivm::AADLObject::Type::InterfaceGroup:
             continue;
-        case aadl::AADLObject::Type::FunctionType:
-        case aadl::AADLObject::Type::Function:
-        case aadl::AADLObject::Type::Comment:
-        case aadl::AADLObject::Type::ConnectionGroup:
-        case aadl::AADLObject::Type::Connection:
-        case aadl::AADLObject::Type::Unknown: {
-            if (t == aadl::AADLObject::Type::Unknown || (aadlObject->isNested() && objects.size() > 1))
+        case ivm::AADLObject::Type::FunctionType:
+        case ivm::AADLObject::Type::Function:
+        case ivm::AADLObject::Type::Comment:
+        case ivm::AADLObject::Type::ConnectionGroup:
+        case ivm::AADLObject::Type::Connection:
+        case ivm::AADLObject::Type::Unknown: {
+            if (t == ivm::AADLObject::Type::Unknown || (aadlObject->isNested() && objects.size() > 1))
                 continue;
             break;
         }

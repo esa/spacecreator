@@ -46,7 +46,7 @@ static const int kTextMargin = 2;
 
 namespace ive {
 
-AADLInterfaceGraphicsItem::AADLInterfaceGraphicsItem(aadl::AADLObjectIface *entity, QGraphicsItem *parent)
+AADLInterfaceGraphicsItem::AADLInterfaceGraphicsItem(ivm::AADLObjectIface *entity, QGraphicsItem *parent)
     : InteractiveObject(entity, parent)
     , m_type(new QGraphicsPathItem(this))
     , m_iface(new QGraphicsPathItem(this))
@@ -57,19 +57,19 @@ AADLInterfaceGraphicsItem::AADLInterfaceGraphicsItem(aadl::AADLObjectIface *enti
     setZValue(ZOrder.Interface);
 }
 
-aadl::AADLObjectIface *AADLInterfaceGraphicsItem::entity() const
+ivm::AADLObjectIface *AADLInterfaceGraphicsItem::entity() const
 {
-    return qobject_cast<aadl::AADLObjectIface *>(aadlObject());
+    return qobject_cast<ivm::AADLObjectIface *>(aadlObject());
 }
 
 void AADLInterfaceGraphicsItem::init()
 {
     InteractiveObject::init();
-    connect(entity(), qOverload<aadl::meta::Props::Token>(&aadl::AADLObject::attributeChanged), this,
+    connect(entity(), qOverload<ivm::meta::Props::Token>(&ivm::AADLObject::attributeChanged), this,
             &AADLInterfaceGraphicsItem::onAttrOrPropChanged);
-    connect(entity(), &aadl::AADLObjectIface::titleChanged, this, &AADLInterfaceGraphicsItem::updateLabel);
-    if (auto ri = qobject_cast<aadl::AADLObjectIfaceRequired *>(entity()))
-        connect(ri, &aadl::AADLObjectIfaceRequired::inheritedLabelsChanged, this,
+    connect(entity(), &ivm::AADLObjectIface::titleChanged, this, &AADLInterfaceGraphicsItem::updateLabel);
+    if (auto ri = qobject_cast<ivm::AADLObjectIfaceRequired *>(entity()))
+        connect(ri, &ivm::AADLObjectIfaceRequired::inheritedLabelsChanged, this,
                 &AADLInterfaceGraphicsItem::updateLabel);
 
     updateLabel();
@@ -116,7 +116,7 @@ void AADLInterfaceGraphicsItem::setTargetItem(QGraphicsItem *item, const QPointF
 
 void AADLInterfaceGraphicsItem::setInterfaceName(const QString &name)
 {
-    QString text = aadl::AADLNameValidator::decodeName(entity()->aadlType(), name);
+    QString text = ivm::AADLNameValidator::decodeName(entity()->aadlType(), name);
 
     int maxTextWidth = maxWidth();
     if (maxTextWidth > 0) {
@@ -234,7 +234,7 @@ QPainterPath AADLInterfaceGraphicsItem::shape() const
 
 void AADLInterfaceGraphicsItem::updateFromEntity()
 {
-    const aadl::AADLObjectIface *obj = entity();
+    const ivm::AADLObjectIface *obj = entity();
     Q_ASSERT(obj);
     if (!obj)
         return;
@@ -272,16 +272,16 @@ QList<QVariantList> AADLInterfaceGraphicsItem::prepareChangeCoordinatesCommandPa
 
 void AADLInterfaceGraphicsItem::layout()
 {
-    static const QList<aadl::meta::Props::Token> types { aadl::meta::Props::Token::coordinates,
-        aadl::meta::Props::Token::InnerCoordinates, aadl::meta::Props::Token::RootCoordinates };
+    static const QList<ivm::meta::Props::Token> types { ivm::meta::Props::Token::coordinates,
+        ivm::meta::Props::Token::InnerCoordinates, ivm::meta::Props::Token::RootCoordinates };
 
     QPointF pos = ive::pos(entity()->coordinates());
     int idx = 0;
-    aadl::meta::Props::Token token = entity()->coordinatesType();
+    ivm::meta::Props::Token token = entity()->coordinatesType();
     while (pos.isNull() && idx < types.size()) {
         token = types.at(idx);
-        const QString strCoordinates = entity()->prop(aadl::meta::Props::token(token)).toString();
-        pos = ive::pos(aadl::AADLObject::coordinatesFromString(strCoordinates));
+        const QString strCoordinates = entity()->prop(ivm::meta::Props::token(token)).toString();
+        pos = ive::pos(ivm::AADLObject::coordinatesFromString(strCoordinates));
         ++idx;
     }
     if (pos.isNull()) {
@@ -291,9 +291,9 @@ void AADLInterfaceGraphicsItem::layout()
         return;
     }
 
-    const auto parentFn = entity()->parentObject()->as<aadl::AADLObjectFunctionType *>();
+    const auto parentFn = entity()->parentObject()->as<ivm::AADLObjectFunctionType *>();
     const QRectF fnRect = ive::rect(
-            aadl::AADLObject::coordinatesFromString(parentFn->prop(aadl::meta::Props::token(token)).toString()))
+            ivm::AADLObject::coordinatesFromString(parentFn->prop(ivm::meta::Props::token(token)).toString()))
                                   .normalized();
     const auto side = getNearestSide(fnRect, pos);
     pos = getSidePosition(fnRect, pos, side);
@@ -514,29 +514,29 @@ QString AADLInterfaceGraphicsItem::prepareTooltip() const
     if (entity()->isProvided())
         return toolTip;
 
-    auto ri = entity()->as<const aadl::AADLObjectIfaceRequired *>();
+    auto ri = entity()->as<const ivm::AADLObjectIfaceRequired *>();
     if (!ri)
         return toolTip;
 
-    const QString label = aadl::AADLNameValidator::decodeName(entity()->aadlType(), ifaceLabel());
+    const QString label = ivm::AADLNameValidator::decodeName(entity()->aadlType(), ifaceLabel());
     if (toolTip != label)
         toolTip = QString("%1<br><i><b>%2</b></i>").arg(label, toolTip);
 
     return toolTip;
 }
 
-void AADLInterfaceGraphicsItem::onAttrOrPropChanged(aadl::meta::Props::Token t)
+void AADLInterfaceGraphicsItem::onAttrOrPropChanged(ivm::meta::Props::Token t)
 {
     switch (t) {
-        //    aadl::meta::Props::Token::name: // handled in AADLInterfaceGraphicsItem::updateLabel
-    case aadl::meta::Props::Token::InheritPI: {
+        //    ivm::meta::Props::Token::name: // handled in AADLInterfaceGraphicsItem::updateLabel
+    case ivm::meta::Props::Token::InheritPI: {
 #ifdef QT_DEBUG
         qWarning() << "check for a call duplication" << t;
 #endif
         updateLabel();
         break;
     }
-    case aadl::meta::Props::Token::kind:
+    case ivm::meta::Props::Token::kind:
         updateKind();
         break;
     default:
@@ -569,7 +569,7 @@ QTransform AADLInterfaceGraphicsItem::typeTransform(Qt::Alignment alignment) con
 
 QTransform AADLInterfaceGraphicsItem::ifaceTransform(Qt::Alignment alignment) const
 {
-    const bool insideOut = entity()->direction() == aadl::AADLObjectIface::IfaceType::Required;
+    const bool insideOut = entity()->direction() == ivm::AADLObjectIface::IfaceType::Required;
     qreal rotationDegree = 0.;
     switch (alignment) {
     case Qt::AlignLeft:
@@ -600,13 +600,13 @@ QPainterPath AADLInterfaceGraphicsItem::ifacePath() const
 
 QPainterPath AADLInterfaceGraphicsItem::typePath() const
 {
-    auto iface = qobject_cast<aadl::AADLObjectIface *>(entity());
+    auto iface = qobject_cast<ivm::AADLObjectIface *>(entity());
     if (!iface)
         return {};
 
     QPainterPath kindPath;
     switch (iface->kind()) {
-    case aadl::AADLObjectIface::OperationKind::Cyclic: {
+    case ivm::AADLObjectIface::OperationKind::Cyclic: {
         const qreal kindBaseValue = kHeight;
         kindPath.arcTo({ kindPath.currentPosition().x() - kindBaseValue / 2,
                                kindPath.currentPosition().y() - kindBaseValue, kindBaseValue, kindBaseValue },
@@ -619,7 +619,7 @@ QPainterPath AADLInterfaceGraphicsItem::typePath() const
         kindPath.translate(0, kindBaseValue / 2);
         break;
     }
-    case aadl::AADLObjectIface::OperationKind::Sporadic: {
+    case ivm::AADLObjectIface::OperationKind::Sporadic: {
         const qreal kindBaseValue = kHeight;
         kindPath.moveTo(-kindBaseValue / 2, 0);
         kindPath.lineTo(0, -kindBaseValue / 4);
@@ -627,7 +627,7 @@ QPainterPath AADLInterfaceGraphicsItem::typePath() const
         kindPath.lineTo(kindBaseValue / 2, 0);
         break;
     }
-    case aadl::AADLObjectIface::OperationKind::Protected: {
+    case ivm::AADLObjectIface::OperationKind::Protected: {
         const qreal kindBaseValue = kHeight;
         const QRectF rect { -kindBaseValue / 2, -kindBaseValue / 2, kindBaseValue, kindBaseValue * 2 / 3 };
         kindPath.addRoundedRect(rect, 2, 2);

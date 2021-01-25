@@ -19,7 +19,7 @@
 
 #include <QList>
 
-namespace aadl {
+namespace ivm {
 class AADLObjectConnection;
 class AADLObjectsModel;
 
@@ -32,7 +32,7 @@ class AADLConnectionChain
 public:
     AADLConnectionChain();
 
-    static QList<AADLConnectionChain *> build(const aadl::AADLObjectsModel &model);
+    static QList<AADLConnectionChain *> build(const ivm::AADLObjectsModel &model);
     static QList<AADLConnectionChain *> build(
             AADLObjectConnection *connection, const QList<AADLObjectConnection *> &allConnections);
 
@@ -60,4 +60,4 @@ private:
 
 }
 
-QDebug operator<<(QDebug debug, const aadl::AADLConnectionChain &chain);
+QDebug operator<<(QDebug debug, const ivm::AADLConnectionChain &chain);

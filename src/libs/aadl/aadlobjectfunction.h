@@ -23,7 +23,7 @@
 #include <QObject>
 #include <QVector>
 
-namespace aadl {
+namespace ivm {
 
 struct AADLObjectFunctionPrivate;
 class AADLObjectFunction : public AADLObjectFunctionType
@@ -40,8 +40,8 @@ public:
     bool inheritsFunctionType() const;
 
 protected Q_SLOTS:
-    void reflectAttr(aadl::meta::Props::Token attr);
-    void reflectProp(aadl::meta::Props::Token prop);
+    void reflectAttr(ivm::meta::Props::Token attr);
+    void reflectProp(ivm::meta::Props::Token prop);
     void reflectContextParam();
 
 private:

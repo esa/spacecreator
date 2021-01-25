@@ -29,11 +29,11 @@ namespace ive {
 namespace cmd {
 
 CmdFunctionItemCreate::CmdFunctionItemCreate(
-        aadl::AADLObjectsModel *model, aadl::AADLObjectFunction *parent, const QRectF &geometry, const QString &title)
+        ivm::AADLObjectsModel *model, ivm::AADLObjectFunction *parent, const QRectF &geometry, const QString &title)
     : CmdEntityGeometryChange({}, QObject::tr("Create Function"))
     , m_model(model)
     , m_parent(parent)
-    , m_entity(new aadl::AADLObjectFunction(
+    , m_entity(new ivm::AADLObjectFunction(
               title, m_parent ? qobject_cast<QObject *>(m_parent) : qobject_cast<QObject *>(m_model)))
 {
     prepareData({ qMakePair(m_entity, QVector<QPointF> { geometry.topLeft(), geometry.bottomRight() }) });
@@ -71,7 +71,7 @@ int CmdFunctionItemCreate::id() const
     return CreateFunctionEntity;
 }
 
-aadl::AADLObjectFunction *CmdFunctionItemCreate::createdFunction() const
+ivm::AADLObjectFunction *CmdFunctionItemCreate::createdFunction() const
 {
     return m_entity;
 }

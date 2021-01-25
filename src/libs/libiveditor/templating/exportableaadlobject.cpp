@@ -29,28 +29,28 @@
 
 namespace ive {
 
-ExportableAADLObject::ExportableAADLObject(const aadl::AADLObject *aadlObject)
+ExportableAADLObject::ExportableAADLObject(const ivm::AADLObject *aadlObject)
     : AbstractExportableObject(aadlObject)
 {
 }
 
 QString ExportableAADLObject::groupName() const
 {
-    const aadl::AADLObject *aadlObject = exportedObject<aadl::AADLObject>();
+    const ivm::AADLObject *aadlObject = exportedObject<ivm::AADLObject>();
     switch (aadlObject->aadlType()) {
-    case aadl::AADLObject::Type::InterfaceGroup:
+    case ivm::AADLObject::Type::InterfaceGroup:
         return {};
-    case aadl::AADLObject::Type::Function:
-    case aadl::AADLObject::Type::FunctionType:
+    case ivm::AADLObject::Type::Function:
+    case ivm::AADLObject::Type::FunctionType:
         return QStringLiteral("Functions");
-    case aadl::AADLObject::Type::RequiredInterface:
-    case aadl::AADLObject::Type::ProvidedInterface:
+    case ivm::AADLObject::Type::RequiredInterface:
+    case ivm::AADLObject::Type::ProvidedInterface:
         return QStringLiteral("Interfaces");
-    case aadl::AADLObject::Type::Comment:
+    case ivm::AADLObject::Type::Comment:
         return QStringLiteral("Comments");
-    case aadl::AADLObject::Type::Connection:
+    case ivm::AADLObject::Type::Connection:
         return QStringLiteral("Connections");
-    case aadl::AADLObject::Type::ConnectionGroup:
+    case ivm::AADLObject::Type::ConnectionGroup:
         return QStringLiteral("ConnectionGroups");
     default:
         Q_UNREACHABLE();
@@ -60,7 +60,7 @@ QString ExportableAADLObject::groupName() const
 
 QString ExportableAADLObject::name() const
 {
-    return exportedObject<aadl::AADLObject>()->title();
+    return exportedObject<ivm::AADLObject>()->title();
 }
 
 /**
@@ -68,26 +68,26 @@ QString ExportableAADLObject::name() const
  * @param aadlObject exported object
  * @return created exported object as QVariant
  */
-QVariant ExportableAADLObject::createFrom(const aadl::AADLObject *aadlObject)
+QVariant ExportableAADLObject::createFrom(const ivm::AADLObject *aadlObject)
 {
     switch (aadlObject->aadlType()) {
-    case aadl::AADLObject::Type::InterfaceGroup:
+    case ivm::AADLObject::Type::InterfaceGroup:
         return {};
-    case aadl::AADLObject::Type::Function:
-    case aadl::AADLObject::Type::FunctionType:
+    case ivm::AADLObject::Type::Function:
+    case ivm::AADLObject::Type::FunctionType:
         return QVariant::fromValue(
-                ExportableAADLFunction(static_cast<const aadl::AADLObjectFunctionType *>(aadlObject)));
-    case aadl::AADLObject::Type::RequiredInterface:
-    case aadl::AADLObject::Type::ProvidedInterface:
-        return QVariant::fromValue(ExportableAADLIface(static_cast<const aadl::AADLObjectIface *>(aadlObject)));
-    case aadl::AADLObject::Type::Comment:
+                ExportableAADLFunction(static_cast<const ivm::AADLObjectFunctionType *>(aadlObject)));
+    case ivm::AADLObject::Type::RequiredInterface:
+    case ivm::AADLObject::Type::ProvidedInterface:
+        return QVariant::fromValue(ExportableAADLIface(static_cast<const ivm::AADLObjectIface *>(aadlObject)));
+    case ivm::AADLObject::Type::Comment:
         return QVariant::fromValue(ExportableAADLObject(aadlObject));
-    case aadl::AADLObject::Type::Connection:
+    case ivm::AADLObject::Type::Connection:
         return QVariant::fromValue(
-                ExportableAADLConnection(static_cast<const aadl::AADLObjectConnection *>(aadlObject)));
-    case aadl::AADLObject::Type::ConnectionGroup:
+                ExportableAADLConnection(static_cast<const ivm::AADLObjectConnection *>(aadlObject)));
+    case ivm::AADLObject::Type::ConnectionGroup:
         return QVariant::fromValue(
-                ExportableAADLConnectionGroup(static_cast<const aadl::AADLObjectConnectionGroup *>(aadlObject)));
+                ExportableAADLConnectionGroup(static_cast<const ivm::AADLObjectConnectionGroup *>(aadlObject)));
     default:
         Q_UNREACHABLE();
     }
@@ -100,7 +100,7 @@ QVariant ExportableAADLObject::createFrom(const aadl::AADLObject *aadlObject)
  */
 QVariantList ExportableAADLObject::attributes() const
 {
-    return generateProperties(exportedObject<aadl::AADLObject>()->attrs());
+    return generateProperties(exportedObject<ivm::AADLObject>()->attrs());
 }
 
 /**
@@ -109,12 +109,12 @@ QVariantList ExportableAADLObject::attributes() const
  */
 QVariantList ExportableAADLObject::properties() const
 {
-    return generateProperties(exportedObject<aadl::AADLObject>()->props());
+    return generateProperties(exportedObject<ivm::AADLObject>()->props());
 }
 
 QStringList ExportableAADLObject::path() const
 {
-    return exportedObject<aadl::AADLObject>()->path();
+    return exportedObject<ivm::AADLObject>()->path();
 }
 
 /**
@@ -130,13 +130,13 @@ QVariantList ExportableAADLObject::generateProperties(const QHash<QString, QVari
 
     std::sort(result.begin(), result.end(), [](const QVariant &left_val, const QVariant &right_val) {
         const auto &r = right_val.value<templating::ExportableProperty>();
-        const aadl::meta::Props::Token right_token = aadl::meta::Props::token(r.name());
-        if (right_token == aadl::meta::Props::Token::Unknown)
+        const ivm::meta::Props::Token right_token = ivm::meta::Props::token(r.name());
+        if (right_token == ivm::meta::Props::Token::Unknown)
             return true;
 
         const auto &l = left_val.value<templating::ExportableProperty>();
-        const aadl::meta::Props::Token left_token = aadl::meta::Props::token(l.name());
-        if (left_token == aadl::meta::Props::Token::Unknown)
+        const ivm::meta::Props::Token left_token = ivm::meta::Props::token(l.name());
+        if (left_token == ivm::meta::Props::Token::Unknown)
             return false;
 
         return left_token < right_token;

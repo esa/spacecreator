@@ -22,25 +22,25 @@
 
 namespace ive {
 
-ExportableAADLIface::ExportableAADLIface(const aadl::AADLObjectIface *iface)
+ExportableAADLIface::ExportableAADLIface(const ivm::AADLObjectIface *iface)
     : ExportableAADLObject(iface)
 {
 }
 
 bool ExportableAADLIface::isProvided() const
 {
-    return exportedObject<aadl::AADLObjectIface>()->isProvided();
+    return exportedObject<ivm::AADLObjectIface>()->isProvided();
 }
 
 bool ExportableAADLIface::isRequired() const
 {
-    return exportedObject<aadl::AADLObjectIface>()->isRequired();
+    return exportedObject<ivm::AADLObjectIface>()->isRequired();
 }
 
 QVariantList ExportableAADLIface::paramList() const
 {
     QVariantList list;
-    for (const auto &param : exportedObject<aadl::AADLObjectIface>()->params())
+    for (const auto &param : exportedObject<ivm::AADLObjectIface>()->params())
         list << QVariant::fromValue(param);
     return list;
 }
@@ -48,8 +48,8 @@ QVariantList ExportableAADLIface::paramList() const
 QVariantList ExportableAADLIface::connectedInterfaces() const
 {
     QVariantList connectedInterfaces;
-    auto iface = exportedObject<aadl::AADLObjectIface>();
-    const auto chains = aadl::AADLInterfaceChain::build(iface);
+    auto iface = exportedObject<ivm::AADLObjectIface>();
+    const auto chains = ivm::AADLInterfaceChain::build(iface);
     for (auto chain : chains) {
         connectedInterfaces << chain.targetEndPointPath();
     }

@@ -35,21 +35,21 @@ private Q_SLOTS:
 
 void tst_AADLObjectFunction::testAadlType()
 {
-    aadl::AADLObjectFunction obj;
+    ivm::AADLObjectFunction obj;
 
-    QCOMPARE(obj.aadlType(), aadl::AADLObject::Type::Function);
+    QCOMPARE(obj.aadlType(), ivm::AADLObject::Type::Function);
 }
 
 void tst_AADLObjectFunction::testRequiredInterfacesManagement() const
 {
-    aadl::AADLObjectFunction obj;
+    ivm::AADLObjectFunction obj;
 
     QCOMPARE(obj.ris().size(), 0);
 
-    auto ifaceType = aadl::AADLObjectIface::IfaceType::Required;
+    auto ifaceType = ivm::AADLObjectIface::IfaceType::Required;
     const int ifacesCount = 10;
     for (int i = 0; i < ifacesCount; ++i) {
-        auto ri = aadl::testutils::createIface(&obj, ifaceType);
+        auto ri = ivm::testutils::createIface(&obj, ifaceType);
         const bool ok = obj.addChild(ri);
         QVERIFY(ok);
         QCOMPARE(obj.ris().size(), i + 1);
@@ -66,14 +66,14 @@ void tst_AADLObjectFunction::testRequiredInterfacesManagement() const
 
 void tst_AADLObjectFunction::testProvidedInterfacesManagement() const
 {
-    aadl::AADLObjectFunction obj;
+    ivm::AADLObjectFunction obj;
 
     QCOMPARE(obj.ris().size(), 0);
 
-    auto ifaceType = aadl::AADLObjectIface::IfaceType::Provided;
+    auto ifaceType = ivm::AADLObjectIface::IfaceType::Provided;
     const int ifacesCount = 10;
     for (int i = 0; i < ifacesCount; ++i) {
-        auto pi = aadl::testutils::createIface(&obj, ifaceType);
+        auto pi = ivm::testutils::createIface(&obj, ifaceType);
         const bool ok = obj.addChild(pi);
         QVERIFY(ok);
         QCOMPARE(obj.pis().size(), i + 1);
@@ -94,17 +94,17 @@ void tst_AADLObjectFunction::testProvidedInterfacesManagement() const
 
 void tst_AADLObjectFunction::testCommonInterfacesManagement() const
 {
-    aadl::AADLObjectFunction obj;
+    ivm::AADLObjectFunction obj;
 
     QCOMPARE(obj.ris().size(), 0);
 
     const int ifacesCountHalf = 5;
-    auto itProvided = aadl::AADLObjectIface::IfaceType::Provided;
-    auto itRequired = aadl::AADLObjectIface::IfaceType::Required;
+    auto itProvided = ivm::AADLObjectIface::IfaceType::Provided;
+    auto itRequired = ivm::AADLObjectIface::IfaceType::Required;
 
-    QVector<aadl::AADLObjectIface *> ifaces;
+    QVector<ivm::AADLObjectIface *> ifaces;
     for (int i = 0; i < ifacesCountHalf; ++i) {
-        ifaces << aadl::testutils::createIface(&obj, itProvided) << aadl::testutils::createIface(&obj, itRequired);
+        ifaces << ivm::testutils::createIface(&obj, itProvided) << ivm::testutils::createIface(&obj, itRequired);
     }
 
     QCOMPARE(ifaces.size(), ifacesCountHalf * 2);
@@ -118,7 +118,7 @@ void tst_AADLObjectFunction::testCommonInterfacesManagement() const
     QCOMPARE(obj.pis().size(), ifacesCountHalf);
 
     while (ifaces.size()) {
-        if (aadl::AADLObjectIface *iface = ifaces.takeLast()) {
+        if (ivm::AADLObjectIface *iface = ifaces.takeLast()) {
             const int prevCount = iface->isProvided() ? obj.pis().size() : obj.ris().size();
             const bool ok = obj.removeChild(iface);
             QVERIFY(ok);

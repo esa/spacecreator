@@ -33,7 +33,7 @@
 #include <QRegularExpression>
 #include <QStandardPaths>
 
-namespace aadl {
+namespace ivm {
 
 PropertyTemplateConfig *PropertyTemplateConfig::m_instance = nullptr;
 
@@ -181,21 +181,21 @@ QList<PropertyTemplate *> PropertyTemplateConfig::parseAttributesList(
     return attrs;
 }
 
-QHash<QString, PropertyTemplate *> PropertyTemplateConfig::propertyTemplatesForObject(const aadl::AADLObject *obj)
+QHash<QString, PropertyTemplate *> PropertyTemplateConfig::propertyTemplatesForObject(const ivm::AADLObject *obj)
 {
     auto scope = PropertyTemplate::Scope::None;
     QList<PropertyTemplate *> properties;
     switch (obj->aadlType()) {
-    case aadl::AADLObject::Type::FunctionType:
-    case aadl::AADLObject::Type::Function:
+    case ivm::AADLObject::Type::FunctionType:
+    case ivm::AADLObject::Type::Function:
         scope = PropertyTemplate::Scope::Function;
         properties = attributesForFunction();
         break;
-    case aadl::AADLObject::Type::RequiredInterface:
+    case ivm::AADLObject::Type::RequiredInterface:
         scope = PropertyTemplate::Scope::Required_Interface;
         properties = attributesForRequiredInterface();
         break;
-    case aadl::AADLObject::Type::ProvidedInterface:
+    case ivm::AADLObject::Type::ProvidedInterface:
         scope = PropertyTemplate::Scope::Provided_Interface;
         properties = attributesForProvidedInterface();
         break;
@@ -264,4 +264,4 @@ QString PropertyTemplateConfig::configPath() const
     return d->m_configPath;
 }
 
-} // namespace aadl
+} // namespace ivm

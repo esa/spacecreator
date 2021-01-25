@@ -24,7 +24,7 @@
 #include <QVariant>
 #include <QVector>
 
-namespace aadl {
+namespace ivm {
 class AADLObject;
 class AADLObjectConnection;
 class AADLObjectIface;
@@ -41,30 +41,30 @@ class CmdIfaceDataChangeBase : public shared::UndoCommand
 public:
     ~CmdIfaceDataChangeBase() override;
 
-    virtual QVector<aadl::AADLObjectConnection *> getRelatedConnections();
-    aadl::AADLObjectIface *interface() const;
+    virtual QVector<ivm::AADLObjectConnection *> getRelatedConnections();
+    ivm::AADLObjectIface *interface() const;
 
 Q_SIGNALS:
-    void nameChanged(aadl::AADLObject *entity, const QString &oldName, shared::UndoCommand *command);
+    void nameChanged(ivm::AADLObject *entity, const QString &oldName, shared::UndoCommand *command);
 
 protected:
     CmdIfaceDataChangeBase() = delete;
     CmdIfaceDataChangeBase(const CmdIfaceDataChangeBase &other) = delete;
-    explicit CmdIfaceDataChangeBase(aadl::AADLObjectIface *iface, const QString &targetName,
+    explicit CmdIfaceDataChangeBase(ivm::AADLObjectIface *iface, const QString &targetName,
             const QVariant &targetValue, const QVariant &prevValue, QUndoCommand *parent = nullptr);
 
-    QPointer<aadl::AADLObjectIface> m_iface;
-    QPointer<aadl::AADLObjectsModel> m_model;
-    QVector<aadl::AADLObjectConnection *> m_relatedConnections;
+    QPointer<ivm::AADLObjectIface> m_iface;
+    QPointer<ivm::AADLObjectsModel> m_model;
+    QVector<ivm::AADLObjectConnection *> m_relatedConnections;
     const QString m_targetName;
-    const aadl::meta::Props::Token m_targetToken;
+    const ivm::meta::Props::Token m_targetToken;
     const QVariant m_oldValue, m_newValue;
     QVector<QUndoCommand *> m_cmdRmConnection;
 
-    virtual QVector<QPointer<aadl::AADLObjectIface>> getRelatedIfaces();
-    virtual bool connectionMustDie(const aadl::AADLObjectConnection *connection) const = 0;
-    static aadl::AADLObjectIface *getConnectionOtherSide(
-            const aadl::AADLObjectConnection *connection, aadl::AADLObjectIface *changedIface);
+    virtual QVector<QPointer<ivm::AADLObjectIface>> getRelatedIfaces();
+    virtual bool connectionMustDie(const ivm::AADLObjectConnection *connection) const = 0;
+    static ivm::AADLObjectIface *getConnectionOtherSide(
+            const ivm::AADLObjectConnection *connection, ivm::AADLObjectIface *changedIface);
 
     void prepareRemoveConnectionCommands();
 };

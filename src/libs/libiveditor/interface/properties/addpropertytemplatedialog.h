@@ -23,9 +23,9 @@ namespace Ui {
 class AddPropertyTemplateDialog;
 }
 
-namespace aadl {
+namespace ivm {
 class PropertyTemplate;
-} // namespace aadl
+} // namespace ivm
 
 namespace ive {
 
@@ -37,7 +37,7 @@ public:
     explicit AddPropertyTemplateDialog(const QStringList &prohibitedNames, QWidget *parent = nullptr);
     ~AddPropertyTemplateDialog() override;
 
-    aadl::PropertyTemplate *attribute() const;
+    ivm::PropertyTemplate *attribute() const;
 public Q_SLOTS:
     void accept() override;
 
@@ -45,7 +45,7 @@ private:
     Ui::AddPropertyTemplateDialog *ui;
     QStringList m_prohibitedNames;
     QColor m_nameColorDefault;
-    aadl::PropertyTemplate *m_attr;
+    ivm::PropertyTemplate *m_attr;
     bool validateName(bool showWarn);
     bool validateType();
     bool validateValuesList();

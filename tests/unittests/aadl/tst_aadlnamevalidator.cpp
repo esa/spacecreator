@@ -50,7 +50,7 @@ void tst_AADLNameValidator::test_functionName()
     QFETCH(QString, name);
     QFETCH(bool, expectedResult);
 
-    const bool ok = aadl::AADLNameValidator::isValidName(name);
+    const bool ok = ivm::AADLNameValidator::isValidName(name);
     QCOMPARE(ok, expectedResult);
 }
 

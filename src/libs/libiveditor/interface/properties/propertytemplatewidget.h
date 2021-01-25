@@ -19,7 +19,7 @@
 
 #include <QWidget>
 
-namespace aadl {
+namespace ivm {
 class PropertyTemplateConfig;
 }
 namespace Ui {
@@ -53,7 +53,7 @@ private Q_SLOTS:
 
 private:
     Ui::PropertyTemplateWidget *ui;
-    aadl::PropertyTemplateConfig *m_dynPropConfig { nullptr };
+    ivm::PropertyTemplateConfig *m_dynPropConfig { nullptr };
     QStringList m_usedNames;
     bool m_error = false;
 };

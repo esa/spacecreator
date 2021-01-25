@@ -24,7 +24,7 @@
 #include <QVector>
 #include <memory>
 
-namespace aadl {
+namespace ivm {
 
 class AADLObjectFunction;
 class AADLObjectConnection;

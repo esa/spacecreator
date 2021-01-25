@@ -27,7 +27,7 @@
 namespace ive {
 namespace cmd {
 
-CmdContextParameterRemove::CmdContextParameterRemove(aadl::AADLObjectFunctionType *entity, int at)
+CmdContextParameterRemove::CmdContextParameterRemove(ivm::AADLObjectFunctionType *entity, int at)
     : QUndoCommand()
     , m_entity(entity)
     , m_params()
@@ -44,7 +44,7 @@ void CmdContextParameterRemove::redo()
     if (!m_entity)
         return;
 
-    for (const aadl::ContextParameter &param : m_params)
+    for (const ivm::ContextParameter &param : m_params)
         m_entity->removeContextParam(param);
 }
 
@@ -53,12 +53,12 @@ void CmdContextParameterRemove::undo()
     if (!m_entity)
         return;
 
-    QVector<aadl::ContextParameter> params = m_entity->contextParams();
+    QVector<ivm::ContextParameter> params = m_entity->contextParams();
 
     QList<int> ids = m_params.keys();
     std::sort(ids.begin(), ids.end());
     for (int i : ids) {
-        const aadl::ContextParameter &param = m_params.value(i);
+        const ivm::ContextParameter &param = m_params.value(i);
         params.insert(i, param);
     }
     m_entity->setContextParams(params);

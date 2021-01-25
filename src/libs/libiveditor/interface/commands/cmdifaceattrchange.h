@@ -24,7 +24,7 @@
 #include <QPointer>
 #include <QVariant>
 
-namespace aadl {
+namespace ivm {
 class AADLObject;
 }
 
@@ -34,7 +34,7 @@ namespace cmd {
 class CmdIfaceAttrChange : public CmdIfaceDataChangeBase
 {
 public:
-    explicit CmdIfaceAttrChange(aadl::AADLObjectIface *entity, const QString &attrName, const QVariant &value);
+    explicit CmdIfaceAttrChange(ivm::AADLObjectIface *entity, const QString &attrName, const QVariant &value);
 
     void redo() override;
     void undo() override;
@@ -45,7 +45,7 @@ private:
     void removeConnections();
     void restoreConnections();
 
-    bool connectionMustDie(const aadl::AADLObjectConnection *connection) const override;
+    bool connectionMustDie(const ivm::AADLObjectConnection *connection) const override;
 };
 
 }

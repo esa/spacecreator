@@ -25,7 +25,7 @@
 #include "cmdentityattributechange.h"
 #include "commandids.h"
 
-static inline void shiftObjects(const QVector<aadl::AADLObject *> &objects, const QPointF &offset)
+static inline void shiftObjects(const QVector<ivm::AADLObject *> &objects, const QPointF &offset)
 {
     for (auto obj : objects) {
         if (!obj) {
@@ -35,9 +35,9 @@ static inline void shiftObjects(const QVector<aadl::AADLObject *> &objects, cons
         std::transform(
                 points.cbegin(), points.cend(), points.begin(), [offset](const QPointF &p) { return p + offset; });
         obj->setCoordinates(ive::coordinates(points));
-        if (obj->aadlType() == aadl::AADLObject::Type::FunctionType
-                || obj->aadlType() == aadl::AADLObject::Type::Function) {
-            shiftObjects(obj->as<aadl::AADLObjectFunctionType *>()->children(), offset);
+        if (obj->aadlType() == ivm::AADLObject::Type::FunctionType
+                || obj->aadlType() == ivm::AADLObject::Type::Function) {
+            shiftObjects(obj->as<ivm::AADLObjectFunctionType *>()->children(), offset);
         }
     }
 }
@@ -45,23 +45,23 @@ static inline void shiftObjects(const QVector<aadl::AADLObject *> &objects, cons
 namespace ive {
 namespace cmd {
 
-CmdEntitiesInstantiate::CmdEntitiesInstantiate(aadl::AADLObjectFunctionType *entity,
-        aadl::AADLObjectFunctionType *parent, aadl::AADLObjectsModel *model, const QPointF &pos)
+CmdEntitiesInstantiate::CmdEntitiesInstantiate(ivm::AADLObjectFunctionType *entity,
+        ivm::AADLObjectFunctionType *parent, ivm::AADLObjectsModel *model, const QPointF &pos)
     : QUndoCommand()
     , m_parent(parent)
     , m_model(model)
 
 {
     Q_ASSERT(entity);
-    m_instantiatedEntity = new aadl::AADLObjectFunction(
+    m_instantiatedEntity = new ivm::AADLObjectFunction(
             {}, m_parent ? qobject_cast<QObject *>(m_parent) : qobject_cast<QObject *>(m_model));
-    m_instantiatedEntity->setTitle(aadl::AADLNameValidator::nameForInstance(
+    m_instantiatedEntity->setTitle(ivm::AADLNameValidator::nameForInstance(
             m_instantiatedEntity, entity->title() + QLatin1String("_Instance_")));
     m_instantiatedEntity->setCoordinates(entity->coordinates());
 
     const QRectF typeGeometry = ive::rect(entity->coordinates());
     m_offset = pos - typeGeometry.topLeft();
-    const QString nameKey = aadl::meta::Props::token(aadl::meta::Props::Token::instance_of);
+    const QString nameKey = ivm::meta::Props::token(ivm::meta::Props::Token::instance_of);
     m_subCmd = new CmdEntityAttributeChange(m_instantiatedEntity, { { nameKey, entity->title() } });
 }
 

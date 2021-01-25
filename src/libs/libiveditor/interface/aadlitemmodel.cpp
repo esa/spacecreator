@@ -96,7 +96,7 @@ static inline void dumpItem(QObject *obj, bool strict = false)
 
 namespace ive {
 
-AADLItemModel::AADLItemModel(aadl::AADLObjectsModel *model, QObject *parent)
+AADLItemModel::AADLItemModel(ivm::AADLObjectsModel *model, QObject *parent)
     : QObject(parent)
     , m_model(model)
     , m_graphicsScene(new InterfaceTabGraphicsScene(this))
@@ -107,10 +107,10 @@ AADLItemModel::AADLItemModel(aadl::AADLObjectsModel *model, QObject *parent)
         m_desktopGeometry = QGuiApplication::primaryScreen()->availableGeometry();
     }
 
-    connect(m_model, &aadl::AADLObjectsModel::modelReset, this, &AADLItemModel::clearScene);
-    connect(m_model, &aadl::AADLObjectsModel::rootObjectChanged, this, &AADLItemModel::onRootObjectChanged);
-    connect(m_model, &aadl::AADLObjectsModel::aadlObjectsAdded, this, &AADLItemModel::onAADLObjectsAdded);
-    connect(m_model, &aadl::AADLObjectsModel::aadlObjectRemoved, this, &AADLItemModel::onAADLObjectRemoved);
+    connect(m_model, &ivm::AADLObjectsModel::modelReset, this, &AADLItemModel::clearScene);
+    connect(m_model, &ivm::AADLObjectsModel::rootObjectChanged, this, &AADLItemModel::onRootObjectChanged);
+    connect(m_model, &ivm::AADLObjectsModel::aadlObjectsAdded, this, &AADLItemModel::onAADLObjectsAdded);
+    connect(m_model, &ivm::AADLObjectsModel::aadlObjectRemoved, this, &AADLItemModel::onAADLObjectRemoved);
 
     connect(m_graphicsScene, &QGraphicsScene::selectionChanged, this, &AADLItemModel::onSceneSelectionChanged);
 
@@ -128,7 +128,7 @@ QGraphicsScene *AADLItemModel::scene() const
     return m_graphicsScene;
 }
 
-void AADLItemModel::onAADLObjectAdded(aadl::AADLObject *object)
+void AADLItemModel::onAADLObjectAdded(ivm::AADLObject *object)
 {
     if (!m_graphicsScene || !object) {
         return;
@@ -137,7 +137,7 @@ void AADLItemModel::onAADLObjectAdded(aadl::AADLObject *object)
     setupInnerGeometry(object);
 
     auto propertyChanged = [this]() {
-        if (auto senderObject = qobject_cast<aadl::AADLObject *>(sender())) {
+        if (auto senderObject = qobject_cast<ivm::AADLObject *>(sender())) {
             if (auto item = m_items.value(senderObject->id())) {
                 updateItem(item);
             }
@@ -148,23 +148,23 @@ void AADLItemModel::onAADLObjectAdded(aadl::AADLObject *object)
     auto item = m_items.value(object->id());
     if (!item) {
         item = createItemForObject(object);
-        if (const auto connectionGroupObject = qobject_cast<aadl::AADLObjectConnectionGroup *>(object)) {
-            connect(connectionGroupObject, &aadl::AADLObjectConnectionGroup::connectionAdded, this,
+        if (const auto connectionGroupObject = qobject_cast<ivm::AADLObjectConnectionGroup *>(object)) {
+            connect(connectionGroupObject, &ivm::AADLObjectConnectionGroup::connectionAdded, this,
                     &AADLItemModel::onConnectionAddedToGroup, Qt::UniqueConnection);
-            connect(connectionGroupObject, &aadl::AADLObjectConnectionGroup::connectionRemoved, this,
+            connect(connectionGroupObject, &ivm::AADLObjectConnectionGroup::connectionRemoved, this,
                     &AADLItemModel::onConnectionRemovedFromGroup, Qt::UniqueConnection);
 
             for (auto groupedConnectionObject : connectionGroupObject->groupedConnections()) {
                 onConnectionAddedToGroup(groupedConnectionObject);
             }
         }
-        connect(object, &aadl::AADLObject::visibilityChanged, this, [this, id = object->id()](bool isVisible) {
+        connect(object, &ivm::AADLObject::visibilityChanged, this, [this, id = object->id()](bool isVisible) {
             if (auto item = dynamic_cast<InteractiveObject *>(m_items.value(id))) {
                 item->scheduleLayoutUpdate();
                 scheduleInterfaceTextUpdate();
             }
         });
-        connect(object, &aadl::AADLObject::coordinatesChanged, this, propertyChanged);
+        connect(object, &ivm::AADLObject::coordinatesChanged, this, propertyChanged);
         if (auto clickable = qobject_cast<InteractiveObject *>(item->toGraphicsObject())) {
             connect(
                     clickable, &InteractiveObject::clicked, this,
@@ -181,7 +181,7 @@ void AADLItemModel::onAADLObjectAdded(aadl::AADLObject *object)
                     clickable, &InteractiveObject::doubleClicked, this,
                     [this, clickable]() {
                         if (auto entity = clickable->aadlObject()) {
-                            if (auto function = qobject_cast<aadl::AADLObjectFunction *>(entity)) {
+                            if (auto function = qobject_cast<ivm::AADLObjectFunction *>(entity)) {
                                 if (function->hasNestedChildren() && !function->isRootObject()) {
                                     changeRootItem(function->id());
                                     return;
@@ -202,10 +202,10 @@ void AADLItemModel::onAADLObjectAdded(aadl::AADLObject *object)
     updateItem(item);
 }
 
-void AADLItemModel::onAADLObjectsAdded(const QVector<aadl::AADLObject *> &objects)
+void AADLItemModel::onAADLObjectsAdded(const QVector<ivm::AADLObject *> &objects)
 {
-    QList<aadl::AADLObject *> objectsToAdd(objects.toList());
-    aadl::AADLObject::sortObjectList(objectsToAdd);
+    QList<ivm::AADLObject *> objectsToAdd(objects.toList());
+    ivm::AADLObject::sortObjectList(objectsToAdd);
     for (auto object : objectsToAdd) {
         onAADLObjectAdded(object);
     }
@@ -220,7 +220,7 @@ void AADLItemModel::onRootObjectChanged(shared::Id rootId)
     onAADLObjectsAdded(m_model->visibleObjects().toVector());
 }
 
-void AADLItemModel::onAADLObjectRemoved(aadl::AADLObject *object)
+void AADLItemModel::onAADLObjectRemoved(ivm::AADLObject *object)
 {
     if (!m_graphicsScene) {
         return;
@@ -238,19 +238,19 @@ void AADLItemModel::onAADLObjectRemoved(aadl::AADLObject *object)
     scheduleInterfaceTextUpdate();
 }
 
-void AADLItemModel::onConnectionAddedToGroup(aadl::AADLObjectConnection *connection)
+void AADLItemModel::onConnectionAddedToGroup(ivm::AADLObjectConnection *connection)
 {
-    auto connectionGroupObject = qobject_cast<aadl::AADLObjectConnectionGroup *>(sender());
+    auto connectionGroupObject = qobject_cast<ivm::AADLObjectConnectionGroup *>(sender());
     if (!connectionGroupObject) {
         connectionGroupObject =
-                qobject_cast<aadl::AADLObjectConnectionGroup *>(m_model->getObjectByName(connection->groupName()));
+                qobject_cast<ivm::AADLObjectConnectionGroup *>(m_model->getObjectByName(connection->groupName()));
         if (!connectionGroupObject) {
             return;
         }
     }
 
-    auto handleIface = [this](aadl::AADLObjectConnection *connection,
-                               aadl::AADLObjectIfaceGroup *connectionGroupEndPoint) {
+    auto handleIface = [this](ivm::AADLObjectConnection *connection,
+                               ivm::AADLObjectIfaceGroup *connectionGroupEndPoint) {
         auto ifaceObject = connectionGroupEndPoint->function()->id() == connection->source()->id()
                 ? connection->sourceInterface()
                 : connectionGroupEndPoint->function()->id() == connection->target()->id()
@@ -275,12 +275,12 @@ void AADLItemModel::onConnectionAddedToGroup(aadl::AADLObjectConnection *connect
     onAADLObjectRemoved(connection->targetInterface());
 }
 
-void AADLItemModel::onConnectionRemovedFromGroup(aadl::AADLObjectConnection *connection)
+void AADLItemModel::onConnectionRemovedFromGroup(ivm::AADLObjectConnection *connection)
 {
-    auto connectionGroupObject = qobject_cast<aadl::AADLObjectConnectionGroup *>(sender());
+    auto connectionGroupObject = qobject_cast<ivm::AADLObjectConnectionGroup *>(sender());
     if (!connectionGroupObject) {
         connectionGroupObject =
-                qobject_cast<aadl::AADLObjectConnectionGroup *>(m_model->getObjectByName(connection->groupName()));
+                qobject_cast<ivm::AADLObjectConnectionGroup *>(m_model->getObjectByName(connection->groupName()));
         if (!connectionGroupObject) {
             return;
         }
@@ -290,8 +290,8 @@ void AADLItemModel::onConnectionRemovedFromGroup(aadl::AADLObjectConnection *con
     onAADLObjectAdded(connection->sourceInterface());
     onAADLObjectAdded(connection);
 
-    auto handleIface = [this](aadl::AADLObjectConnection *connection,
-                               aadl::AADLObjectIfaceGroup *connectionGroupEndPoint) {
+    auto handleIface = [this](ivm::AADLObjectConnection *connection,
+                               ivm::AADLObjectIfaceGroup *connectionGroupEndPoint) {
         auto ifaceObject = connectionGroupEndPoint->function()->id() == connection->source()->id()
                 ? connection->sourceInterface()
                 : connectionGroupEndPoint->function()->id() == connection->target()->id()
@@ -369,7 +369,7 @@ void AADLItemModel::updateItem(QGraphicsItem *item)
     }
 }
 
-void AADLItemModel::removeItemForObject(aadl::AADLObject *object)
+void AADLItemModel::removeItemForObject(ivm::AADLObject *object)
 {
     if (auto item = m_items.take(object->id())) {
         m_graphicsScene->removeItem(item);
@@ -378,27 +378,27 @@ void AADLItemModel::removeItemForObject(aadl::AADLObject *object)
     }
 }
 
-void AADLItemModel::setupInnerGeometry(aadl::AADLObject *obj) const
+void AADLItemModel::setupInnerGeometry(ivm::AADLObject *obj) const
 {
     if (!obj
-            || !(obj->aadlType() == aadl::AADLObject::Type::Comment
-                    || obj->aadlType() == aadl::AADLObject::Type::Function
-                    || obj->aadlType() == aadl::AADLObject::Type::FunctionType)) {
+            || !(obj->aadlType() == ivm::AADLObject::Type::Comment
+                    || obj->aadlType() == ivm::AADLObject::Type::Function
+                    || obj->aadlType() == ivm::AADLObject::Type::FunctionType)) {
         return;
     }
-    QVariant innerCoord = obj->prop(aadl::meta::Props::token(aadl::meta::Props::Token::InnerCoordinates));
+    QVariant innerCoord = obj->prop(ivm::meta::Props::token(ivm::meta::Props::Token::InnerCoordinates));
     if (innerCoord.isValid()) {
         return;
     }
-    aadl::AADLObjectFunctionType *parentObj =
-            obj->parentObject() ? obj->parentObject()->as<aadl::AADLObjectFunctionType *>() : nullptr;
+    ivm::AADLObjectFunctionType *parentObj =
+            obj->parentObject() ? obj->parentObject()->as<ivm::AADLObjectFunctionType *>() : nullptr;
     if (!parentObj) {
         return;
     }
     QRectF rootGeometry;
-    const QVariant rootCoord = parentObj->prop(aadl::meta::Props::token(aadl::meta::Props::Token::RootCoordinates));
+    const QVariant rootCoord = parentObj->prop(ivm::meta::Props::token(ivm::meta::Props::Token::RootCoordinates));
     if (rootCoord.isValid()) {
-        rootGeometry = ive::rect(aadl::AADLObject::coordinatesFromString(rootCoord.toString()));
+        rootGeometry = ive::rect(ivm::AADLObject::coordinatesFromString(rootCoord.toString()));
     } else if (const QGraphicsView *view = m_graphicsScene->views().value(0)) {
         const QRect viewportGeometry = view->viewport()->geometry().marginsRemoved(kContentMargins.toMargins());
         rootGeometry = QRectF(view->mapToScene(QPoint(0, 0)),
@@ -406,15 +406,15 @@ void AADLItemModel::setupInnerGeometry(aadl::AADLObject *obj) const
     }
     QList<QRectF> existingRects;
     for (const auto child : parentObj->children()) {
-        if (child->aadlType() == aadl::AADLObject::Type::Comment
-                || child->aadlType() == aadl::AADLObject::Type::Function
-                || child->aadlType() == aadl::AADLObject::Type::FunctionType) {
-            innerCoord = child->prop(aadl::meta::Props::token(aadl::meta::Props::Token::InnerCoordinates));
+        if (child->aadlType() == ivm::AADLObject::Type::Comment
+                || child->aadlType() == ivm::AADLObject::Type::Function
+                || child->aadlType() == ivm::AADLObject::Type::FunctionType) {
+            innerCoord = child->prop(ivm::meta::Props::token(ivm::meta::Props::Token::InnerCoordinates));
             if (!innerCoord.isValid()) {
                 continue;
             }
             const QRectF innerRect =
-                    ive::rect(aadl::AADLObject::coordinatesFromString(innerCoord.toString()));
+                    ive::rect(ivm::AADLObject::coordinatesFromString(innerCoord.toString()));
             rootGeometry |= innerRect;
             existingRects.append(innerRect);
         }
@@ -422,11 +422,11 @@ void AADLItemModel::setupInnerGeometry(aadl::AADLObject *obj) const
     QRectF innerGeometry;
     findGeometryForRect(innerGeometry, rootGeometry, existingRects);
 
-    const QString strRootCoord = aadl::AADLObject::coordinatesToString(ive::coordinates(rootGeometry));
-    parentObj->setProp(aadl::meta::Props::token(aadl::meta::Props::Token::RootCoordinates), strRootCoord);
+    const QString strRootCoord = ivm::AADLObject::coordinatesToString(ive::coordinates(rootGeometry));
+    parentObj->setProp(ivm::meta::Props::token(ivm::meta::Props::Token::RootCoordinates), strRootCoord);
 
-    const QString strCoord = aadl::AADLObject::coordinatesToString(ive::coordinates(innerGeometry));
-    obj->setProp(aadl::meta::Props::token(aadl::meta::Props::Token::InnerCoordinates), strCoord);
+    const QString strCoord = ivm::AADLObject::coordinatesToString(ive::coordinates(innerGeometry));
+    obj->setProp(ivm::meta::Props::token(ivm::meta::Props::Token::InnerCoordinates), strCoord);
 }
 
 void AADLItemModel::clearScene()
@@ -476,7 +476,7 @@ T AADLItemModel::getItem(const shared::Id id) const
     return qgraphicsitem_cast<T>(m_items.value(id));
 }
 
-aadl::AADLObjectsModel *AADLItemModel::objectsModel() const
+ivm::AADLObjectsModel *AADLItemModel::objectsModel() const
 {
     return m_model;
 }
@@ -505,7 +505,7 @@ void AADLItemModel::updateSceneRect()
     }
 }
 
-QGraphicsItem *AADLItemModel::createItemForObject(aadl::AADLObject *obj)
+QGraphicsItem *AADLItemModel::createItemForObject(ivm::AADLObject *obj)
 {
     Q_ASSERT(obj);
     if (!obj)
@@ -522,31 +522,31 @@ QGraphicsItem *AADLItemModel::createItemForObject(aadl::AADLObject *obj)
 
     InteractiveObject *iObj = nullptr;
     switch (obj->aadlType()) {
-    case aadl::AADLObject::Type::Comment: {
-        auto comment = new AADLCommentGraphicsItem(qobject_cast<aadl::AADLObjectComment *>(obj), parentItem);
+    case ivm::AADLObject::Type::Comment: {
+        auto comment = new AADLCommentGraphicsItem(qobject_cast<ivm::AADLObjectComment *>(obj), parentItem);
         connect(comment, &shared::ui::InteractiveObjectBase::boundingBoxChanged, this,
                 &AADLItemModel::scheduleInterfaceTextUpdate);
         nestedGeomtryConnect(parentItem, comment);
         iObj = comment;
     } break;
-    case aadl::AADLObject::Type::InterfaceGroup:
-        iObj = new AADLInterfaceGroupGraphicsItem(qobject_cast<aadl::AADLObjectIfaceGroup *>(obj), parentItem);
+    case ivm::AADLObject::Type::InterfaceGroup:
+        iObj = new AADLInterfaceGroupGraphicsItem(qobject_cast<ivm::AADLObjectIfaceGroup *>(obj), parentItem);
         break;
-    case aadl::AADLObject::Type::RequiredInterface:
-    case aadl::AADLObject::Type::ProvidedInterface: {
-        auto ifItem = new AADLInterfaceGraphicsItem(qobject_cast<aadl::AADLObjectIface *>(obj), parentItem);
+    case ivm::AADLObject::Type::RequiredInterface:
+    case ivm::AADLObject::Type::ProvidedInterface: {
+        auto ifItem = new AADLInterfaceGraphicsItem(qobject_cast<ivm::AADLObjectIface *>(obj), parentItem);
         connect(ifItem, &shared::ui::InteractiveObjectBase::boundingBoxChanged, this,
                 &AADLItemModel::scheduleInterfaceTextUpdate);
         iObj = ifItem;
         break;
     }
-    case aadl::AADLObject::Type::ConnectionGroup:
-        if (auto connection = qobject_cast<aadl::AADLObjectConnectionGroup *>(obj)) {
-            aadl::AADLObjectIface *ifaceStart = connection->sourceInterface();
+    case ivm::AADLObject::Type::ConnectionGroup:
+        if (auto connection = qobject_cast<ivm::AADLObjectConnectionGroup *>(obj)) {
+            ivm::AADLObjectIface *ifaceStart = connection->sourceInterface();
             auto startItem = qgraphicsitem_cast<AADLInterfaceGraphicsItem *>(
                     ifaceStart ? m_items.value(ifaceStart->id()) : nullptr);
 
-            aadl::AADLObjectIface *ifaceEnd = connection->targetInterface();
+            ivm::AADLObjectIface *ifaceEnd = connection->targetInterface();
             auto endItem =
                     qgraphicsitem_cast<AADLInterfaceGraphicsItem *>(ifaceEnd ? m_items.value(ifaceEnd->id()) : nullptr);
 
@@ -555,29 +555,29 @@ QGraphicsItem *AADLItemModel::createItemForObject(aadl::AADLObject *obj)
                     qobject_cast<AADLInterfaceGroupGraphicsItem *>(endItem), parentItem);
         }
         break;
-    case aadl::AADLObject::Type::Connection:
-        if (auto connection = qobject_cast<aadl::AADLObjectConnection *>(obj)) {
-            aadl::AADLObjectIface *ifaceStart = connection->sourceInterface();
+    case ivm::AADLObject::Type::Connection:
+        if (auto connection = qobject_cast<ivm::AADLObjectConnection *>(obj)) {
+            ivm::AADLObjectIface *ifaceStart = connection->sourceInterface();
             auto startItem = qgraphicsitem_cast<AADLInterfaceGraphicsItem *>(
                     ifaceStart ? m_items.value(ifaceStart->id()) : nullptr);
 
-            aadl::AADLObjectIface *ifaceEnd = connection->targetInterface();
+            ivm::AADLObjectIface *ifaceEnd = connection->targetInterface();
             auto endItem =
                     qgraphicsitem_cast<AADLInterfaceGraphicsItem *>(ifaceEnd ? m_items.value(ifaceEnd->id()) : nullptr);
 
             iObj = new AADLConnectionGraphicsItem(connection, startItem, endItem, parentItem);
         }
         break;
-    case aadl::AADLObject::Type::Function: {
-        auto function = new AADLFunctionGraphicsItem(qobject_cast<aadl::AADLObjectFunction *>(obj), parentItem);
+    case ivm::AADLObject::Type::Function: {
+        auto function = new AADLFunctionGraphicsItem(qobject_cast<ivm::AADLObjectFunction *>(obj), parentItem);
         connect(function, &shared::ui::InteractiveObjectBase::boundingBoxChanged, this,
                 &AADLItemModel::scheduleInterfaceTextUpdate);
         nestedGeomtryConnect(parentItem, function);
         iObj = function;
     } break;
-    case aadl::AADLObject::Type::FunctionType: {
+    case ivm::AADLObject::Type::FunctionType: {
         auto functionType =
-                new AADLFunctionTypeGraphicsItem(qobject_cast<aadl::AADLObjectFunctionType *>(obj), parentItem);
+                new AADLFunctionTypeGraphicsItem(qobject_cast<ivm::AADLObjectFunctionType *>(obj), parentItem);
         connect(functionType, &shared::ui::InteractiveObjectBase::boundingBoxChanged, this,
                 &AADLItemModel::scheduleInterfaceTextUpdate);
         nestedGeomtryConnect(parentItem, functionType);

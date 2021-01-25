@@ -9,7 +9,7 @@ class QValidator;
 class QDomDocument;
 class QDomElement;
 
-namespace aadl {
+namespace ivm {
 
 class PropertyTemplate
 {
@@ -48,7 +48,7 @@ public:
 #if (QT_VERSION >= QT_VERSION_CHECK(5, 12, 0))
     Q_DECLARE_FLAGS(Scopes, Scope)
 #else
-    Q_DECLARE_FLAGS(Scopes, aadl::PropertyTemplate::Scope)
+    Q_DECLARE_FLAGS(Scopes, ivm::PropertyTemplate::Scope)
 #endif
     Q_FLAG(Scopes)
 
@@ -95,8 +95,8 @@ private:
     const std::unique_ptr<PropertyTemplatePrivate> d;
 };
 
-} // namespace aadl
+} // namespace ivm
 
-Q_DECLARE_OPERATORS_FOR_FLAGS(aadl::PropertyTemplate::Scopes)
-Q_DECLARE_METATYPE(aadl::PropertyTemplate::Type)
-Q_DECLARE_METATYPE(aadl::PropertyTemplate::Scopes)
+Q_DECLARE_OPERATORS_FOR_FLAGS(ivm::PropertyTemplate::Scopes)
+Q_DECLARE_METATYPE(ivm::PropertyTemplate::Type)
+Q_DECLARE_METATYPE(ivm::PropertyTemplate::Scopes)

@@ -26,12 +26,12 @@ const qreal kConnectionGroupTitleMaxLength = 200;
 
 namespace ive {
 
-AADLConnectionGroupGraphicsItem::AADLConnectionGroupGraphicsItem(aadl::AADLObjectConnectionGroup *connection,
+AADLConnectionGroupGraphicsItem::AADLConnectionGroupGraphicsItem(ivm::AADLObjectConnectionGroup *connection,
         AADLInterfaceGroupGraphicsItem *ifaceStart, AADLInterfaceGroupGraphicsItem *ifaceEnd, QGraphicsItem *parent)
     : AADLConnectionGraphicsItem(connection, ifaceStart, ifaceEnd, parent)
     , m_textItem(new QGraphicsTextItem(this))
 {
-    connect(connection, &aadl::AADLObject::titleChanged, this, &AADLConnectionGroupGraphicsItem::updateLabel);
+    connect(connection, &ivm::AADLObject::titleChanged, this, &AADLConnectionGroupGraphicsItem::updateLabel);
 }
 
 ColorManager::HandledColors AADLConnectionGroupGraphicsItem::handledColorType() const

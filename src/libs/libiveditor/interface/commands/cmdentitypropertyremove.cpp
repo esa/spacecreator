@@ -25,7 +25,7 @@
 namespace ive {
 namespace cmd {
 
-static inline QVariantHash getCurrentProperties(aadl::AADLObject *entity, const QStringList &props)
+static inline QVariantHash getCurrentProperties(ivm::AADLObject *entity, const QStringList &props)
 {
     QVariantHash result;
     for (const QString &prop : props)
@@ -33,7 +33,7 @@ static inline QVariantHash getCurrentProperties(aadl::AADLObject *entity, const 
     return result;
 }
 
-CmdEntityPropertyRemove::CmdEntityPropertyRemove(aadl::AADLObject *entity, const QStringList &props)
+CmdEntityPropertyRemove::CmdEntityPropertyRemove(ivm::AADLObject *entity, const QStringList &props)
     : QUndoCommand()
     , m_entity(entity)
     , m_names(props)

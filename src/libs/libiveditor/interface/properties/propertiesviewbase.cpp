@@ -78,9 +78,9 @@ void PropertiesViewBase::onCurrentRowChanged(const QModelIndex &current, const Q
 void PropertiesViewBase::on_btnAdd_clicked()
 {
     if (m_model) {
-        const aadl::AADLObject::Type type = m_model->dataObject()->aadlType();
+        const ivm::AADLObject::Type type = m_model->dataObject()->aadlType();
         const bool isInterfaceType =
-                type == aadl::AADLObject::Type::ProvidedInterface || type == aadl::AADLObject::Type::RequiredInterface;
+                type == ivm::AADLObject::Type::ProvidedInterface || type == ivm::AADLObject::Type::RequiredInterface;
         const QString newNameTmp = isInterfaceType ? tr("Parameter name") : tr("New_property");
         QString newName(newNameTmp);
         int duplicateCounter(0);
@@ -112,17 +112,17 @@ bool PropertiesViewBase::setButtonsDisabled()
 
     if (auto dataObject = m_model->dataObject()) {
         switch (dataObject->aadlType()) {
-        case aadl::AADLObject::Type::Function: {
-            if (auto fn = dataObject->as<const aadl::AADLObjectFunction *>())
+        case ivm::AADLObject::Type::Function: {
+            if (auto fn = dataObject->as<const ivm::AADLObjectFunction *>())
                 disabled = fn->inheritsFunctionType();
             break;
         }
-        case aadl::AADLObject::Type::RequiredInterface:
-        case aadl::AADLObject::Type::ProvidedInterface: {
-            if (auto iface = dataObject->as<const aadl::AADLObjectIface *>()) {
+        case ivm::AADLObject::Type::RequiredInterface:
+        case ivm::AADLObject::Type::ProvidedInterface: {
+            if (auto iface = dataObject->as<const ivm::AADLObjectIface *>()) {
                 disabled = iface->isClone();
                 if (!disabled && iface->isRequired()) {
-                    if (auto ri = iface->as<const aadl::AADLObjectIfaceRequired *>())
+                    if (auto ri = iface->as<const ivm::AADLObjectIfaceRequired *>())
                         disabled = ri->hasPrototypePi();
                 }
             }

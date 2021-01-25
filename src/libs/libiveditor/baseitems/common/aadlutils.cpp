@@ -379,32 +379,32 @@ QList<int> knownGraphicsItemTypes()
 {
     QList<int> result;
 
-    const QMetaEnum &me = QMetaEnum::fromType<aadl::AADLObject::Type>();
+    const QMetaEnum &me = QMetaEnum::fromType<ivm::AADLObject::Type>();
     for (int i = 0; i < me.keyCount(); ++i) {
         int itemType = 0;
-        const aadl::AADLObject::Type objectType = static_cast<aadl::AADLObject::Type>(me.value(i));
+        const ivm::AADLObject::Type objectType = static_cast<ivm::AADLObject::Type>(me.value(i));
         switch (objectType) {
-        case aadl::AADLObject::Type::Function:
+        case ivm::AADLObject::Type::Function:
             itemType = ive::AADLFunctionGraphicsItem::Type;
             break;
-        case aadl::AADLObject::Type::FunctionType:
+        case ivm::AADLObject::Type::FunctionType:
             itemType = ive::AADLFunctionTypeGraphicsItem::Type;
             break;
-        case aadl::AADLObject::Type::InterfaceGroup:
-        case aadl::AADLObject::Type::ProvidedInterface:
-        case aadl::AADLObject::Type::RequiredInterface:
+        case ivm::AADLObject::Type::InterfaceGroup:
+        case ivm::AADLObject::Type::ProvidedInterface:
+        case ivm::AADLObject::Type::RequiredInterface:
             itemType = ive::AADLInterfaceGraphicsItem::Type;
             break;
-        case aadl::AADLObject::Type::Comment:
+        case ivm::AADLObject::Type::Comment:
             itemType = ive::AADLCommentGraphicsItem::Type;
             break;
-        case aadl::AADLObject::Type::Connection:
+        case ivm::AADLObject::Type::Connection:
             itemType = ive::AADLConnectionGraphicsItem::Type;
             break;
-        case aadl::AADLObject::Type::ConnectionGroup:
+        case ivm::AADLObject::Type::ConnectionGroup:
             itemType = ive::AADLConnectionGroupGraphicsItem::Type;
             break;
-        case aadl::AADLObject::Type::Unknown:
+        case ivm::AADLObject::Type::Unknown:
             continue;
         }
         if (itemType != 0) {
@@ -415,24 +415,24 @@ QList<int> knownGraphicsItemTypes()
     return result;
 }
 
-qreal itemLevel(const aadl::AADLObject *const object, bool itemSelected)
+qreal itemLevel(const ivm::AADLObject *const object, bool itemSelected)
 {
     if (!object || itemSelected) {
         return ZOrder.Selected;
     }
 
     switch (object->aadlType()) {
-    case aadl::AADLObject::Type::Function:
-    case aadl::AADLObject::Type::FunctionType:
+    case ivm::AADLObject::Type::Function:
+    case ivm::AADLObject::Type::FunctionType:
         return ZOrder.Function;
-    case aadl::AADLObject::Type::InterfaceGroup:
-    case aadl::AADLObject::Type::RequiredInterface:
-    case aadl::AADLObject::Type::ProvidedInterface:
+    case ivm::AADLObject::Type::InterfaceGroup:
+    case ivm::AADLObject::Type::RequiredInterface:
+    case ivm::AADLObject::Type::ProvidedInterface:
         return ZOrder.Interface;
-    case aadl::AADLObject::Type::Comment:
+    case ivm::AADLObject::Type::Comment:
         return ZOrder.Comment;
-    case aadl::AADLObject::Type::ConnectionGroup:
-    case aadl::AADLObject::Type::Connection:
+    case ivm::AADLObject::Type::ConnectionGroup:
+    case ivm::AADLObject::Type::Connection:
         return ZOrder.Connection;
     default:
         return ZOrder.Selected;
@@ -919,15 +919,15 @@ bool comparePolygones(const QVector<QPointF> &v1, const QVector<QPointF> &v2)
     return true;
 }
 
-int nestingLevel(aadl::AADLObject *object)
+int nestingLevel(ivm::AADLObject *object)
 {
     int level = 0;
     if (!object)
         return level;
 
     while (auto parentObject = object->parentObject()) {
-        if (object->aadlType() == aadl::AADLObject::Type::Function
-                || object->aadlType() == aadl::AADLObject::Type::FunctionType) {
+        if (object->aadlType() == ivm::AADLObject::Type::Function
+                || object->aadlType() == ivm::AADLObject::Type::FunctionType) {
             ++level;
         }
         object = parentObject;

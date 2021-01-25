@@ -22,7 +22,7 @@
 
 class QBuffer;
 class QWidget;
-namespace aadl {
+namespace ivm {
 class AADLObject;
 }
 
@@ -44,7 +44,7 @@ public:
 
     static bool exportDoc(InterfaceDocument *doc, QBuffer *outBuffer, const QString &templatePath = QString());
     static bool exportObjects(
-            const QList<aadl::AADLObject *> &objects, QBuffer *outBuffer, const QString &templatePath = QString());
+            const QList<ivm::AADLObject *> &objects, QBuffer *outBuffer, const QString &templatePath = QString());
 
 private:
     XmlDocExporter();
@@ -62,7 +62,7 @@ private:
     };
 
     static QHash<QString, QVariant> collectInterfaceObjects(InterfaceDocument *doc);
-    static QHash<QString, QVariant> collectInterfaceObjects(const QList<aadl::AADLObject *> &objects);
+    static QHash<QString, QVariant> collectInterfaceObjects(const QList<ivm::AADLObject *> &objects);
 
     static bool exportDoc(InterfaceDocument *doc, QWidget *root, const QString &outPath, const QString &templatePath,
             InteractionPolicy interaction);

@@ -19,7 +19,7 @@
 
 #include <QUndoCommand>
 
-namespace aadl {
+namespace ivm {
 class AADLObjectConnection;
 class AADLObjectConnectionGroup;
 }
@@ -31,16 +31,16 @@ namespace cmd {
 class CmdConnectionGroupItemChange : public QUndoCommand
 {
 public:
-    explicit CmdConnectionGroupItemChange(aadl::AADLObjectConnectionGroup *group,
-                                          aadl::AADLObjectConnection *connection, bool add);
+    explicit CmdConnectionGroupItemChange(ivm::AADLObjectConnectionGroup *group,
+                                          ivm::AADLObjectConnection *connection, bool add);
 
     void redo() override;
     void undo() override;
     int id() const override;
 
 private:
-    aadl::AADLObjectConnectionGroup *m_group = nullptr;
-    aadl::AADLObjectConnection *m_connection = nullptr;
+    ivm::AADLObjectConnectionGroup *m_group = nullptr;
+    ivm::AADLObjectConnection *m_connection = nullptr;
     bool m_addConnection = true;
 };
 

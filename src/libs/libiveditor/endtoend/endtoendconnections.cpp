@@ -173,15 +173,15 @@ EndToEndConnections::Dataflow EndToEndConnections::readDataflow(const QString &f
     return {};
 }
 
-bool EndToEndConnections::isInDataflow(const Dataflow &dataflow, const QList<aadl::AADLConnectionChain *> &chains,
-        aadl::AADLObjectConnection *connection)
+bool EndToEndConnections::isInDataflow(const Dataflow &dataflow, const QList<ivm::AADLConnectionChain *> &chains,
+        ivm::AADLObjectConnection *connection)
 {
     // Just to be on the save side
     if (connection == nullptr) {
         return false;
     }
 
-    for (aadl::AADLConnectionChain *chain : chains) {
+    for (ivm::AADLConnectionChain *chain : chains) {
         for (const Connection &mscConnection : dataflow.connections) {
             if (chain->contains(connection)) {
                 if (chain->contains(mscConnection.message, mscConnection.from, mscConnection.to)) {

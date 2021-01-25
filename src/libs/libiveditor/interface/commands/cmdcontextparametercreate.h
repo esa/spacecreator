@@ -23,7 +23,7 @@
 #include <QUndoCommand>
 #include <QVector>
 
-namespace aadl {
+namespace ivm {
 class AADLObjectFunctionType;
 }
 
@@ -33,7 +33,7 @@ namespace cmd {
 class CmdContextParameterCreate : public QUndoCommand
 {
 public:
-    explicit CmdContextParameterCreate(aadl::AADLObjectFunctionType *entity, const aadl::ContextParameter &prop);
+    explicit CmdContextParameterCreate(ivm::AADLObjectFunctionType *entity, const ivm::ContextParameter &prop);
 
     void redo() override;
     void undo() override;
@@ -41,9 +41,9 @@ public:
     int id() const override;
 
 private:
-    QPointer<aadl::AADLObjectFunctionType> m_entity;
-    QVector<aadl::ContextParameter> m_newProps;
-    const QVector<aadl::ContextParameter> m_oldProps;
+    QPointer<ivm::AADLObjectFunctionType> m_entity;
+    QVector<ivm::ContextParameter> m_newProps;
+    const QVector<ivm::ContextParameter> m_oldProps;
 };
 
 }

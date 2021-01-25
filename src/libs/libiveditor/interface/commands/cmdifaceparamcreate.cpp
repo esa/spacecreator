@@ -25,10 +25,10 @@
 namespace ive {
 namespace cmd {
 
-CmdIfaceParamCreate::CmdIfaceParamCreate(aadl::AADLObject *entity, const aadl::IfaceParameter &param)
-    : CmdIfaceParamBase(entity ? entity->as<aadl::AADLObjectIface *>() : nullptr)
+CmdIfaceParamCreate::CmdIfaceParamCreate(ivm::AADLObject *entity, const ivm::IfaceParameter &param)
+    : CmdIfaceParamBase(entity ? entity->as<ivm::AADLObjectIface *>() : nullptr)
     , m_targetParams({ param })
-    , m_sourceParams(m_iface ? m_iface->params() : QVector<aadl::IfaceParameter>())
+    , m_sourceParams(m_iface ? m_iface->params() : QVector<ivm::IfaceParameter>())
 {
     setText(QObject::tr("Create Iface Parameter"));
 }
@@ -38,7 +38,7 @@ void CmdIfaceParamCreate::redo()
     if (!m_iface)
         return;
 
-    QVector<aadl::IfaceParameter> currParams = m_iface->params();
+    QVector<ivm::IfaceParameter> currParams = m_iface->params();
     currParams.append(m_targetParams);
     m_iface->setParams(currParams);
 

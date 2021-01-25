@@ -26,7 +26,7 @@ class Type;
 }
 }
 
-namespace aadl {
+namespace ivm {
 
 class BasicParameter
 {
@@ -138,6 +138,6 @@ protected:
 
 }
 
-Q_DECLARE_METATYPE(aadl::BasicParameter);
-Q_DECLARE_METATYPE(aadl::ContextParameter);
-Q_DECLARE_METATYPE(aadl::IfaceParameter);
+Q_DECLARE_METATYPE(ivm::BasicParameter);
+Q_DECLARE_METATYPE(ivm::ContextParameter);
+Q_DECLARE_METATYPE(ivm::IfaceParameter);

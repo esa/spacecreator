@@ -17,7 +17,7 @@
 
 #include "aadlcommonprops.h"
 
-namespace aadl {
+namespace ivm {
 namespace meta {
 
 const QHash<QString, Props::Token> Props::TokensByName = {

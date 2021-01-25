@@ -23,15 +23,15 @@
 namespace ive {
 namespace cmd {
 
-static inline QVariant getCurrentAttribute(const aadl::AADLObjectIface *entity, const QString &name)
+static inline QVariant getCurrentAttribute(const ivm::AADLObjectIface *entity, const QString &name)
 {
     return (entity && !name.isEmpty()) ? entity->attr(name) : QVariant();
 }
 
-CmdIfaceAttrChange::CmdIfaceAttrChange(aadl::AADLObjectIface *entity, const QString &attrName, const QVariant &value)
+CmdIfaceAttrChange::CmdIfaceAttrChange(ivm::AADLObjectIface *entity, const QString &attrName, const QVariant &value)
     : CmdIfaceDataChangeBase(entity, attrName, value, getCurrentAttribute(entity, attrName))
 {
-    if (m_targetToken == aadl::meta::Props::Token::kind) {
+    if (m_targetToken == ivm::meta::Props::Token::kind) {
         m_relatedConnections = getRelatedConnections();
         prepareRemoveConnectionCommands();
     }
@@ -40,7 +40,7 @@ CmdIfaceAttrChange::CmdIfaceAttrChange(aadl::AADLObjectIface *entity, const QStr
 void CmdIfaceAttrChange::redo()
 {
     switch (m_targetToken) {
-    case aadl::meta::Props::Token::kind: {
+    case ivm::meta::Props::Token::kind: {
         setKind(m_newValue);
         break;
     }
@@ -49,7 +49,7 @@ void CmdIfaceAttrChange::redo()
         break;
     }
 
-    if (m_targetToken == aadl::meta::Props::Token::name) {
+    if (m_targetToken == ivm::meta::Props::Token::name) {
         Q_EMIT nameChanged(m_iface, m_oldValue.toString(), this);
     }
     m_firstRedo = false;
@@ -58,7 +58,7 @@ void CmdIfaceAttrChange::redo()
 void CmdIfaceAttrChange::undo()
 {
     switch (m_targetToken) {
-    case aadl::meta::Props::Token::kind: {
+    case ivm::meta::Props::Token::kind: {
         setKind(m_oldValue);
         break;
     }
@@ -67,7 +67,7 @@ void CmdIfaceAttrChange::undo()
         break;
     }
 
-    if (m_targetToken == aadl::meta::Props::Token::name) {
+    if (m_targetToken == ivm::meta::Props::Token::name) {
         Q_EMIT nameChanged(m_iface, m_newValue.toString(), this);
     }
 }
@@ -102,16 +102,16 @@ void CmdIfaceAttrChange::restoreConnections()
         cmd->undo();
 }
 
-bool CmdIfaceAttrChange::connectionMustDie(const aadl::AADLObjectConnection *connection) const
+bool CmdIfaceAttrChange::connectionMustDie(const ivm::AADLObjectConnection *connection) const
 {
-    const aadl::AADLObjectIface *otherIface = getConnectionOtherSide(connection, m_iface);
+    const ivm::AADLObjectIface *otherIface = getConnectionOtherSide(connection, m_iface);
     if (!otherIface) {
         Q_UNREACHABLE();
         return true;
     }
 
-    const aadl::AADLObjectIface::OperationKind newKind = m_iface->kindFromString(m_newValue.toString());
-    return aadl::AADLObjectIface::OperationKind::Cyclic == newKind;
+    const ivm::AADLObjectIface::OperationKind newKind = m_iface->kindFromString(m_newValue.toString());
+    return ivm::AADLObjectIface::OperationKind::Cyclic == newKind;
 }
 
 }

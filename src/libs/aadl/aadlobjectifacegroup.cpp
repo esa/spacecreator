@@ -17,7 +17,7 @@
 
 #include "aadlobjectifacegroup.h"
 
-namespace aadl {
+namespace ivm {
 
 AADLObjectIfaceGroup::AADLObjectIfaceGroup(const CreationInfo &ci)
     : AADLObjectIface(AADLObject::Type::InterfaceGroup, ci)
@@ -59,4 +59,4 @@ QString AADLObjectIfaceGroup::ifaceLabel() const
     return {};
 }
 
-} // namespace aadl
+} // namespace ivm

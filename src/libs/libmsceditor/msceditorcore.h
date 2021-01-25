@@ -26,7 +26,7 @@
 #include <QVector>
 #include <memory>
 
-namespace aadl {
+namespace ivm {
 class AADLObjectConnection;
 class AADLObjectFunction;
 }
@@ -116,10 +116,10 @@ public:
     void changeMscInstanceName(const QString &oldName, const QString &name);
     void changeMscMessageName(
             const QString &oldName, const QString &newName, const QString &sourceName, const QString &targetName);
-    void removeMscInstances(aadl::AADLObjectFunction *aadlFunction);
-    void removeMscMessages(aadl::AADLObjectConnection *aadlConnection);
-    QList<msc::MscInstance *> correspondingInstances(aadl::AADLObjectFunction *aadlFunction) const;
-    QList<msc::MscMessage *> correspondingMessages(aadl::AADLObjectConnection *aadlConnection) const;
+    void removeMscInstances(ivm::AADLObjectFunction *aadlFunction);
+    void removeMscMessages(ivm::AADLObjectConnection *aadlConnection);
+    QList<msc::MscInstance *> correspondingInstances(ivm::AADLObjectFunction *aadlFunction) const;
+    QList<msc::MscMessage *> correspondingMessages(ivm::AADLObjectConnection *aadlConnection) const;
 
     QString filePath() const override;
     bool save() override;

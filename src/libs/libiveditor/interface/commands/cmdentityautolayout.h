@@ -21,7 +21,7 @@
 
 #include <QPointF>
 
-namespace aadl {
+namespace ivm {
 class AADLObject;
 }
 
@@ -31,7 +31,7 @@ namespace cmd {
 class CmdEntityAutoLayout : public CmdEntityGeometryChange
 {
 public:
-    explicit CmdEntityAutoLayout(const QList<QPair<aadl::AADLObject *, QVector<QPointF>>> &objectsData);
+    explicit CmdEntityAutoLayout(const QList<QPair<ivm::AADLObject *, QVector<QPointF>>> &objectsData);
     int id() const override;
 };
 

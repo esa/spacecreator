@@ -57,23 +57,23 @@ void tst_InterfaceDocument::init()
 void tst_InterfaceDocument::test_checkAllInterfacesForAsn1Compliance()
 {
     // see "asn1library/asn1resources/taste-types.asn" for the default
-    auto fn1 = new aadl::AADLObjectFunction("Fn1");
+    auto fn1 = new ivm::AADLObjectFunction("Fn1");
     ivDoc->objectsModel()->addObject(fn1);
 
     // Empty parameters results to true
-    auto if1 = aadl::testutils::createIface(fn1, aadl::AADLObjectIface::IfaceType::Provided, "If1");
+    auto if1 = ivm::testutils::createIface(fn1, ivm::AADLObjectIface::IfaceType::Provided, "If1");
     bool ok = ivDoc->checkAllInterfacesForAsn1Compliance();
     QCOMPARE(ok, true);
 
     // Used type is defined in ASN1
-    auto if2 = aadl::testutils::createIface(fn1, aadl::AADLObjectIface::IfaceType::Provided, "If2");
-    if2->addParam(aadl::IfaceParameter("IfaceParam", aadl::BasicParameter::Type::Other, "T-Int31"));
+    auto if2 = ivm::testutils::createIface(fn1, ivm::AADLObjectIface::IfaceType::Provided, "If2");
+    if2->addParam(ivm::IfaceParameter("IfaceParam", ivm::BasicParameter::Type::Other, "T-Int31"));
     ok = ivDoc->checkAllInterfacesForAsn1Compliance();
     QCOMPARE(ok, true);
 
     // Unknown type
-    auto if3 = aadl::testutils::createIface(fn1, aadl::AADLObjectIface::IfaceType::Provided, "If3");
-    if3->addParam(aadl::IfaceParameter("IfaceParam", aadl::BasicParameter::Type::Other, "InvalidType"));
+    auto if3 = ivm::testutils::createIface(fn1, ivm::AADLObjectIface::IfaceType::Provided, "If3");
+    if3->addParam(ivm::IfaceParameter("IfaceParam", ivm::BasicParameter::Type::Other, "InvalidType"));
     ok = ivDoc->checkAllInterfacesForAsn1Compliance();
     QCOMPARE(ok, false);
 }

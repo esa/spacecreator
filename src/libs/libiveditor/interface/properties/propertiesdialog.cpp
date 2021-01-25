@@ -47,7 +47,7 @@
 
 namespace ive {
 
-PropertiesDialog::PropertiesDialog(aadl::PropertyTemplateConfig *dynPropConfig, aadl::AADLObject *obj,
+PropertiesDialog::PropertiesDialog(ivm::PropertyTemplateConfig *dynPropConfig, ivm::AADLObject *obj,
         const QSharedPointer<Asn1Acn::File> &dataTypes, QWidget *parent)
     : QDialog(parent)
     , ui(new Ui::PropertiesDialog)
@@ -55,7 +55,7 @@ PropertiesDialog::PropertiesDialog(aadl::PropertyTemplateConfig *dynPropConfig, 
     , m_dynPropConfig(dynPropConfig)
     , m_cmdMacro(new cmd::CommandsStack::Macro(
               tr("Edit %1 - %2")
-                      .arg(aadl::AADLNameValidator::nameOfType(m_dataObject->aadlType()).trimmed(),
+                      .arg(ivm::AADLNameValidator::nameOfType(m_dataObject->aadlType()).trimmed(),
                               m_dataObject->titleUI())))
     , m_dataTypes(dataTypes)
 {
@@ -79,19 +79,19 @@ QString PropertiesDialog::objectTypeName() const
         return QString();
 
     switch (m_dataObject->aadlType()) {
-    case aadl::AADLObject::Type::FunctionType:
+    case ivm::AADLObject::Type::FunctionType:
         return tr("Function Type");
-    case aadl::AADLObject::Type::Function:
+    case ivm::AADLObject::Type::Function:
         return tr("Function");
-    case aadl::AADLObject::Type::RequiredInterface:
+    case ivm::AADLObject::Type::RequiredInterface:
         return tr("RI");
-    case aadl::AADLObject::Type::ProvidedInterface:
+    case ivm::AADLObject::Type::ProvidedInterface:
         return tr("PI");
-    case aadl::AADLObject::Type::Comment:
+    case ivm::AADLObject::Type::Comment:
         return tr("Comment");
-    case aadl::AADLObject::Type::Connection:
+    case ivm::AADLObject::Type::Connection:
         return tr("Connection");
-    case aadl::AADLObject::Type::ConnectionGroup:
+    case ivm::AADLObject::Type::ConnectionGroup:
         return tr("Connection Group");
     default:
         return QString();
@@ -115,24 +115,24 @@ void PropertiesDialog::initTabs()
         return;
 
     switch (m_dataObject->aadlType()) {
-    case aadl::AADLObject::Type::FunctionType:
-    case aadl::AADLObject::Type::Function: {
+    case ivm::AADLObject::Type::FunctionType:
+    case ivm::AADLObject::Type::Function: {
         initContextParams();
         initAttributesView();
         break;
     }
-    case aadl::AADLObject::Type::RequiredInterface:
-    case aadl::AADLObject::Type::ProvidedInterface: {
+    case ivm::AADLObject::Type::RequiredInterface:
+    case ivm::AADLObject::Type::ProvidedInterface: {
         initIfaceParams();
         initAttributesView();
         break;
     }
-    case aadl::AADLObject::Type::ConnectionGroup: {
+    case ivm::AADLObject::Type::ConnectionGroup: {
         initConnectionGroup();
         initAttributesView();
         break;
     }
-    case aadl::AADLObject::Type::Comment: {
+    case ivm::AADLObject::Type::Comment: {
         initCommentView();
         break;
     }
@@ -147,7 +147,7 @@ void PropertiesDialog::initTabs()
 void PropertiesDialog::initConnectionGroup()
 {
     auto model = new AADLConnectionGroupModel(
-            qobject_cast<aadl::AADLObjectConnectionGroup *>(m_dataObject), m_cmdMacro, this);
+            qobject_cast<ivm::AADLObjectConnectionGroup *>(m_dataObject), m_cmdMacro, this);
     auto connectionsView = new QListView;
     connectionsView->setModel(model);
     ui->tabWidget->insertTab(0, connectionsView, tr("Connections"));
@@ -159,12 +159,12 @@ void PropertiesDialog::initAttributesView()
     PropertiesListModel *modelAttrs { nullptr };
 
     switch (m_dataObject->aadlType()) {
-    case aadl::AADLObject::Type::Function: {
+    case ivm::AADLObject::Type::Function: {
         modelAttrs = new FunctionPropertiesListModel(m_cmdMacro, m_dynPropConfig, this);
         break;
     }
-    case aadl::AADLObject::Type::RequiredInterface:
-    case aadl::AADLObject::Type::ProvidedInterface: {
+    case ivm::AADLObject::Type::RequiredInterface:
+    case ivm::AADLObject::Type::ProvidedInterface: {
         modelAttrs = new InterfacePropertiesListModel(m_cmdMacro, m_dynPropConfig, this);
         break;
     }
@@ -210,8 +210,8 @@ void PropertiesDialog::initIfaceParams()
                     viewAttrs->tableView()));
     viewAttrs->tableView()->setItemDelegateForColumn(IfaceParametersModel::ColumnDirection,
             new StringListComboDelegate(
-                    { aadl::IfaceParameter::directionName(aadl::IfaceParameter::Direction::In),
-                            aadl::IfaceParameter::directionName(aadl::IfaceParameter::Direction::Out) },
+                    { ivm::IfaceParameter::directionName(ivm::IfaceParameter::Direction::In),
+                            ivm::IfaceParameter::directionName(ivm::IfaceParameter::Direction::Out) },
                     viewAttrs->tableView()));
     viewAttrs->tableView()->horizontalHeader()->show();
     viewAttrs->setModel(modelIfaceParams);
@@ -220,7 +220,7 @@ void PropertiesDialog::initIfaceParams()
 
 void PropertiesDialog::initCommentView()
 {
-    if (auto comment = qobject_cast<aadl::AADLObjectComment *>(m_dataObject)) {
+    if (auto comment = qobject_cast<ivm::AADLObjectComment *>(m_dataObject)) {
         auto commentEdit = new QPlainTextEdit(this);
         commentEdit->setPlainText(comment->titleUI());
         ui->tabWidget->insertTab(0, commentEdit, tr("Comment content"));
@@ -229,8 +229,8 @@ void PropertiesDialog::initCommentView()
             if (comment->titleUI() == text)
                 return;
 
-            const QString encodedText = aadl::AADLNameValidator::encodeName(comment->aadlType(), text);
-            const QVariantMap textArg { { aadl::meta::Props::token(aadl::meta::Props::Token::name), encodedText } };
+            const QString encodedText = ivm::AADLNameValidator::encodeName(comment->aadlType(), text);
+            const QVariantMap textArg { { ivm::meta::Props::token(ivm::meta::Props::Token::name), encodedText } };
             const QVariantList commentTextParams { QVariant::fromValue(comment), QVariant::fromValue(textArg) };
             auto commentTextCmd = cmd::CommandsFactory::create(cmd::ChangeEntityAttributes, commentTextParams);
             if (commentTextCmd) {

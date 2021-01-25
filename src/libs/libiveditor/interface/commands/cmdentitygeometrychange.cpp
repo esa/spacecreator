@@ -28,7 +28,7 @@ namespace ive {
 namespace cmd {
 
 CmdEntityGeometryChange::CmdEntityGeometryChange(
-        const QList<QPair<aadl::AADLObject *, QVector<QPointF>>> &objectsData, const QString &title)
+        const QList<QPair<ivm::AADLObject *, QVector<QPointF>>> &objectsData, const QString &title)
     : QUndoCommand(title.isEmpty() ? QObject::tr("Change item(s) geometry/position") : title)
     , m_internalData(objectsData)
     , m_data(convertData(m_internalData))
@@ -80,7 +80,7 @@ void CmdEntityGeometryChange::mergeCommand(QUndoCommand *command)
 }
 
 QList<CmdEntityGeometryChange::ObjectData> CmdEntityGeometryChange::convertData(
-        const QList<QPair<aadl::AADLObject *, QVector<QPointF>>> &objectsData)
+        const QList<QPair<ivm::AADLObject *, QVector<QPointF>>> &objectsData)
 {
     QList<ObjectData> result;
     for (const auto &objectData : objectsData)
@@ -96,7 +96,7 @@ QList<CmdEntityGeometryChange::ObjectData> CmdEntityGeometryChange::convertData(
     return result;
 }
 
-void CmdEntityGeometryChange::prepareData(const QList<QPair<aadl::AADLObject *, QVector<QPointF>>> &objectsData)
+void CmdEntityGeometryChange::prepareData(const QList<QPair<ivm::AADLObject *, QVector<QPointF>>> &objectsData)
 {
     m_data = convertData(objectsData);
 }

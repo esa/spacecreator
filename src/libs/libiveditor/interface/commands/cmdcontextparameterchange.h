@@ -22,7 +22,7 @@
 #include <QPointer>
 #include <QUndoCommand>
 
-namespace aadl {
+namespace ivm {
 class AADLObjectFunctionType;
 }
 
@@ -32,8 +32,8 @@ namespace cmd {
 class CmdContextParameterChange : public QUndoCommand
 {
 public:
-    explicit CmdContextParameterChange(aadl::AADLObjectFunctionType *entity, const aadl::ContextParameter &oldParam,
-            const aadl::ContextParameter &newParam);
+    explicit CmdContextParameterChange(ivm::AADLObjectFunctionType *entity, const ivm::ContextParameter &oldParam,
+            const ivm::ContextParameter &newParam);
 
     void redo() override;
     void undo() override;
@@ -41,11 +41,11 @@ public:
     int id() const override;
 
 private:
-    QPointer<aadl::AADLObjectFunctionType> m_entity;
-    aadl::ContextParameter m_newParam;
-    const aadl::ContextParameter m_oldParam;
+    QPointer<ivm::AADLObjectFunctionType> m_entity;
+    ivm::ContextParameter m_newParam;
+    const ivm::ContextParameter m_oldParam;
 
-    void swapParam(const aadl::ContextParameter &from, const aadl::ContextParameter &to);
+    void swapParam(const ivm::ContextParameter &from, const ivm::ContextParameter &to);
 };
 
 }

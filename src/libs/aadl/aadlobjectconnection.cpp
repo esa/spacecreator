@@ -27,7 +27,7 @@
 #include <QDebug>
 #include <QPointer>
 
-namespace aadl {
+namespace ivm {
 
 struct ConnectionHolder {
     AADLObjectConnection::EndPointInfo *m_from { nullptr };
@@ -369,7 +369,7 @@ QVector<IfaceParameter> AADLObjectConnection::params() const
 
 }
 
-QDebug operator<<(QDebug debug, const aadl::AADLObjectConnection &c)
+QDebug operator<<(QDebug debug, const ivm::AADLObjectConnection &c)
 {
     QDebugStateSaver saver(debug);
     debug.nospace() << QString("%1.%2<->%3.%4")

@@ -31,7 +31,7 @@ namespace ive {
 
 static const qreal kOffset = 2.0;
 
-AADLRectGraphicsItem::AADLRectGraphicsItem(aadl::AADLObject *entity, QGraphicsItem *parentGraphicsItem)
+AADLRectGraphicsItem::AADLRectGraphicsItem(ivm::AADLObject *entity, QGraphicsItem *parentGraphicsItem)
     : InteractiveObject(entity, parentGraphicsItem)
 {
     connect(this, &InteractiveObject::relocated, this, &AADLRectGraphicsItem::onGeometryChanged);
@@ -159,20 +159,20 @@ QRectF AADLRectGraphicsItem::adjustRectToParent(shared::ui::GripPoint *grip, con
 
 void AADLRectGraphicsItem::updateFromEntity()
 {
-    aadl::AADLObject *obj = aadlObject();
+    ivm::AADLObject *obj = aadlObject();
     Q_ASSERT(obj);
     if (!obj)
         return;
 
-    static const QList<aadl::meta::Props::Token> types { aadl::meta::Props::Token::coordinates,
-        aadl::meta::Props::Token::InnerCoordinates, aadl::meta::Props::Token::RootCoordinates };
+    static const QList<ivm::meta::Props::Token> types { ivm::meta::Props::Token::coordinates,
+        ivm::meta::Props::Token::InnerCoordinates, ivm::meta::Props::Token::RootCoordinates };
 
     QRectF itemSceneRect { ive::rect(obj->coordinates()) };
     int idx = 0;
     while (itemSceneRect.isNull() && idx < types.size()) {
-        const aadl::meta::Props::Token token = types.at(idx);
-        const QString strCoordinates = obj->prop(aadl::meta::Props::token(token)).toString();
-        itemSceneRect = ive::rect(aadl::AADLObject::coordinatesFromString(strCoordinates));
+        const ivm::meta::Props::Token token = types.at(idx);
+        const QString strCoordinates = obj->prop(ivm::meta::Props::token(token)).toString();
+        itemSceneRect = ive::rect(ivm::AADLObject::coordinatesFromString(strCoordinates));
         ++idx;
     }
     if (!itemSceneRect.isValid())

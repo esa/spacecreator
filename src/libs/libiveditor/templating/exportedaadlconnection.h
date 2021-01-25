@@ -21,7 +21,7 @@
 
 namespace taste3 {
 
-namespace aadl {
+namespace ivm{
 class AADLObjectConnection;
 }
 
@@ -43,7 +43,7 @@ class ExportedAADLConnection : public ExportedAADLObject
     Q_PROPERTY(bool tiIsProvided READ targetInterfaceIsProvided)
 
 public:
-    explicit ExportedAADLConnection(const aadl::AADLObjectConnection *connection = nullptr);
+    explicit ExportedAADLConnection(const ivm::AADLObjectConnection *connection = nullptr);
 
     QString sourceName() const;
     QString targetName() const;

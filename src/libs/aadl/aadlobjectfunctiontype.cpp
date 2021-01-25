@@ -27,7 +27,7 @@
 
 #include <QDebug>
 
-namespace aadl {
+namespace ivm {
 
 struct AADLObjectFunctionTypePrivate {
     QVector<AADLObject *> m_children {};

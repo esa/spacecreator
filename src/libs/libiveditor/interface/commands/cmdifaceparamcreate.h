@@ -21,7 +21,7 @@
 
 #include <QVector>
 
-namespace aadl {
+namespace ivm {
 class AADLObject;
 class IfaceParameter;
 }
@@ -32,15 +32,15 @@ namespace cmd {
 class CmdIfaceParamCreate : public CmdIfaceParamBase
 {
 public:
-    explicit CmdIfaceParamCreate(aadl::AADLObject *entity, const aadl::IfaceParameter &param);
+    explicit CmdIfaceParamCreate(ivm::AADLObject *entity, const ivm::IfaceParameter &param);
 
     void redo() override;
     void undo() override;
     int id() const override;
 
 protected:
-    QVector<aadl::IfaceParameter> m_targetParams;
-    const QVector<aadl::IfaceParameter> m_sourceParams;
+    QVector<ivm::IfaceParameter> m_targetParams;
+    const QVector<ivm::IfaceParameter> m_sourceParams;
 };
 
 }

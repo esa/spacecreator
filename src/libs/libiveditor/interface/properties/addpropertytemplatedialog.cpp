@@ -43,11 +43,11 @@ AddPropertyTemplateDialog::AddPropertyTemplateDialog(const QStringList &prohibit
 
     m_nameColorDefault = ui->leName->palette().color(QPalette::Text);
 
-    ui->comboTypes->addItem(tr("Integer"), QVariant::fromValue(aadl::PropertyTemplate::Type::Integer));
-    ui->comboTypes->addItem(tr("Real"), QVariant::fromValue(aadl::PropertyTemplate::Type::Real));
-    ui->comboTypes->addItem(tr("Boolean"), QVariant::fromValue(aadl::PropertyTemplate::Type::Boolean));
-    ui->comboTypes->addItem(tr("String"), QVariant::fromValue(aadl::PropertyTemplate::Type::String));
-    ui->comboTypes->addItem(tr("Enumeration"), QVariant::fromValue(aadl::PropertyTemplate::Type::Enumeration));
+    ui->comboTypes->addItem(tr("Integer"), QVariant::fromValue(ivm::PropertyTemplate::Type::Integer));
+    ui->comboTypes->addItem(tr("Real"), QVariant::fromValue(ivm::PropertyTemplate::Type::Real));
+    ui->comboTypes->addItem(tr("Boolean"), QVariant::fromValue(ivm::PropertyTemplate::Type::Boolean));
+    ui->comboTypes->addItem(tr("String"), QVariant::fromValue(ivm::PropertyTemplate::Type::String));
+    ui->comboTypes->addItem(tr("Enumeration"), QVariant::fromValue(ivm::PropertyTemplate::Type::Enumeration));
 
     ui->teValues->setVisible(false);
 
@@ -81,8 +81,8 @@ bool AddPropertyTemplateDialog::validateName(const bool showWarn)
 
 bool AddPropertyTemplateDialog::validateType()
 {
-    aadl::PropertyTemplate::Type t = static_cast<aadl::PropertyTemplate::Type>(ui->comboTypes->currentData().toInt());
-    const bool isEnum(t == aadl::PropertyTemplate::Type::Enumeration);
+    ivm::PropertyTemplate::Type t = static_cast<ivm::PropertyTemplate::Type>(ui->comboTypes->currentData().toInt());
+    const bool isEnum(t == ivm::PropertyTemplate::Type::Enumeration);
     ui->teValues->setVisible(isEnum);
 
     return true;
@@ -97,8 +97,8 @@ QStringList AddPropertyTemplateDialog::listValues() const
 bool AddPropertyTemplateDialog::validateValuesList()
 {
     QString warn;
-    aadl::PropertyTemplate::Type t = static_cast<aadl::PropertyTemplate::Type>(ui->comboTypes->currentData().toInt());
-    if (t == aadl::PropertyTemplate::Type::Enumeration && listValues().isEmpty())
+    ivm::PropertyTemplate::Type t = static_cast<ivm::PropertyTemplate::Type>(ui->comboTypes->currentData().toInt());
+    if (t == ivm::PropertyTemplate::Type::Enumeration && listValues().isEmpty())
         warn = tr("Please specify at least one Enum value.");
 
     const bool ok(warn.isEmpty());
@@ -134,30 +134,30 @@ void AddPropertyTemplateDialog::accept()
         return;
 
     const QString &name = ui->leName->text().trimmed();
-    const aadl::PropertyTemplate::Type t =
-            static_cast<aadl::PropertyTemplate::Type>(ui->comboTypes->currentData().toInt());
-    aadl::PropertyTemplate::Scopes s;
+    const ivm::PropertyTemplate::Type t =
+            static_cast<ivm::PropertyTemplate::Type>(ui->comboTypes->currentData().toInt());
+    ivm::PropertyTemplate::Scopes s;
     if (ui->cbFunction->isChecked())
-        s |= aadl::PropertyTemplate::Scope::Function;
+        s |= ivm::PropertyTemplate::Scope::Function;
     if (ui->cbReqIface->isChecked())
-        s |= aadl::PropertyTemplate::Scope::Required_Interface;
+        s |= ivm::PropertyTemplate::Scope::Required_Interface;
     if (ui->cbProvIface->isChecked())
-        s |= aadl::PropertyTemplate::Scope::Provided_Interface;
+        s |= ivm::PropertyTemplate::Scope::Provided_Interface;
     if (ui->cbComment->isChecked())
-        s |= aadl::PropertyTemplate::Scope::Comment;
+        s |= ivm::PropertyTemplate::Scope::Comment;
     if (ui->cbConnection->isChecked())
-        s |= aadl::PropertyTemplate::Scope::Connection;
+        s |= ivm::PropertyTemplate::Scope::Connection;
 
     QList<QVariant> list;
-    if (t == aadl::PropertyTemplate::Type::Enumeration)
+    if (t == ivm::PropertyTemplate::Type::Enumeration)
         for (const QString &str : listValues())
             list.append(str.trimmed());
 
     const QString &pattern = ui->leValidationPattern->text().trimmed();
 
-    const aadl::PropertyTemplate::Info i = ui->rbAttribute->isChecked() ? aadl::PropertyTemplate::Info::Attribute
-                                                                        : aadl::PropertyTemplate::Info::Property;
-    m_attr = new aadl::PropertyTemplate;
+    const ivm::PropertyTemplate::Info i = ui->rbAttribute->isChecked() ? ivm::PropertyTemplate::Info::Attribute
+                                                                        : ivm::PropertyTemplate::Info::Property;
+    m_attr = new ivm::PropertyTemplate;
     m_attr->setName(name);
     m_attr->setInfo(i);
     m_attr->setType(t);
@@ -167,7 +167,7 @@ void AddPropertyTemplateDialog::accept()
     QDialog::accept();
 }
 
-aadl::PropertyTemplate *AddPropertyTemplateDialog::attribute() const
+ivm::PropertyTemplate *AddPropertyTemplateDialog::attribute() const
 {
     return m_attr;
 }

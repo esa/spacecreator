@@ -21,7 +21,7 @@
 
 namespace taste3 {
 
-namespace aadl {
+namespace ivm{
 class AADLObjectIface;
 }
 
@@ -38,7 +38,7 @@ class TemplatedAADLIface : public ExportedAADLObject
     Q_PROPERTY(QVariantList params READ paramList)
 
 public:
-    explicit TemplatedAADLIface(const aadl::AADLObjectIface *iface = nullptr);
+    explicit TemplatedAADLIface(const ivm::AADLObjectIface *iface = nullptr);
 
     bool isProvided() const;
     bool isRequired() const;

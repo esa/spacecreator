@@ -30,14 +30,14 @@ class CreateConnectionGroupDialog : public QDialog
 
 public:
     explicit CreateConnectionGroupDialog(
-            const QList<aadl::AADLObjectConnectionGroup::CreationInfo> &groupCreationDataList,
+            const QList<ivm::AADLObjectConnectionGroup::CreationInfo> &groupCreationDataList,
             QWidget *parent = nullptr);
     ~CreateConnectionGroupDialog();
 
-    QList<aadl::AADLObjectConnectionGroup::CreationInfo> info() const;
+    QList<ivm::AADLObjectConnectionGroup::CreationInfo> info() const;
 
 private:
-    QList<aadl::AADLObjectConnectionGroup::CreationInfo> m_info;
+    QList<ivm::AADLObjectConnectionGroup::CreationInfo> m_info;
     QSignalMapper *m_signalMapper = nullptr;
 };
 

@@ -28,7 +28,7 @@ class AADLRectGraphicsItem : public InteractiveObject
 {
     Q_OBJECT
 public:
-    explicit AADLRectGraphicsItem(aadl::AADLObject *entity, QGraphicsItem *parentGraphicsItem = nullptr);
+    explicit AADLRectGraphicsItem(ivm::AADLObject *entity, QGraphicsItem *parentGraphicsItem = nullptr);
     virtual QSizeF minimalSize() const;
 
     void setRect(const QRectF &geometry);

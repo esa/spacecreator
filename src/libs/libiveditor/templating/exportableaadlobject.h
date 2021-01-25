@@ -21,7 +21,7 @@
 
 #include <QVariant>
 
-namespace aadl {
+namespace ivm {
 class AADLObject;
 }
 
@@ -40,12 +40,12 @@ class ExportableAADLObject : public templating::AbstractExportableObject
     Q_PROPERTY(QStringList path READ path)
 
 public:
-    explicit ExportableAADLObject(const aadl::AADLObject *aadlObject = nullptr);
+    explicit ExportableAADLObject(const ivm::AADLObject *aadlObject = nullptr);
 
     QString groupName() const override;
     QString name() const;
 
-    static QVariant createFrom(const aadl::AADLObject *aadlObject);
+    static QVariant createFrom(const ivm::AADLObject *aadlObject);
 
     QVariantList attributes() const;
     QVariantList properties() const;

@@ -19,7 +19,7 @@
 
 #include "aadlobjectfunctiontype.h"
 
-namespace aadl {
+namespace ivm {
 
 AADLObjectComment::AADLObjectComment(const QString &title, QObject *parent)
     : AADLObject(AADLObject::Type::Comment, title, parent)

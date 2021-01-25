@@ -36,9 +36,9 @@
 #include <QXmlStreamAttribute>
 #include <QXmlStreamReader>
 
-namespace aadl {
+namespace ivm {
 
-using namespace aadl::meta;
+using namespace ivm::meta;
 
 struct XmlAttribute {
     XmlAttribute(const QString &name = QString(), const QString &value = QString())
@@ -341,13 +341,13 @@ void AADLXMLReader::processTagOpen(QXmlStreamReader &xml)
         break;
     }
     case Props::Token::ContextParameter: {
-        auto function = qobject_cast<aadl::AADLObjectFunctionType *>(d->m_currentObject.get());
+        auto function = qobject_cast<ivm::AADLObjectFunctionType *>(d->m_currentObject.get());
         if (function) {
             const QString typeString = attrs.value(Props::token(Props::Token::type)).m_value;
-            aadl::BasicParameter::Type paramType = typeString == "Timer"
-                    ? aadl::BasicParameter::Type::Timer
-                    : (typeString == "Directive" ? aadl::BasicParameter::Type::Directive
-                                                 : aadl::BasicParameter::Type::Other);
+            ivm::BasicParameter::Type paramType = typeString == "Timer"
+                    ? ivm::BasicParameter::Type::Timer
+                    : (typeString == "Directive" ? ivm::BasicParameter::Type::Directive
+                                                 : ivm::BasicParameter::Type::Other);
             ContextParameter param(
                     nameAttr.m_value, paramType, typeString, attrs.value(Props::token(Props::Token::value)).m_value);
             function->addContextParam(param);

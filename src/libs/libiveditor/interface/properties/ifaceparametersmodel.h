@@ -23,7 +23,7 @@
 
 #include <QVector>
 
-namespace aadl {
+namespace ivm {
 class AADLObject;
 class IfaceParameter;
 }
@@ -50,8 +50,8 @@ public:
 
     bool setData(const QModelIndex &index, const QVariant &value, int role = Qt::EditRole) override;
 
-    void setDataObject(aadl::AADLObject *obj);
-    const aadl::AADLObject *dataObject() const override;
+    void setDataObject(ivm::AADLObject *obj);
+    const ivm::AADLObject *dataObject() const override;
 
     bool createProperty(const QString &propName) override;
     bool removeProperty(const QModelIndex &index) override;
@@ -65,10 +65,10 @@ public:
 
 private:
     cmd::CommandsStack::Macro *m_cmdMacro { nullptr };
-    aadl::AADLObject *m_dataObject { nullptr };
-    QVector<aadl::IfaceParameter> m_params;
+    ivm::AADLObject *m_dataObject { nullptr };
+    QVector<ivm::IfaceParameter> m_params;
 
-    void createNewRow(const aadl::IfaceParameter &param, int row);
+    void createNewRow(const ivm::IfaceParameter &param, int row);
 };
 
 }

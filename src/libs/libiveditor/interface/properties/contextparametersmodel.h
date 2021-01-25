@@ -28,7 +28,7 @@ namespace Asn1Acn {
 class File;
 }
 
-namespace aadl {
+namespace ivm {
 class AADLObject;
 class ContextParameter;
 }
@@ -56,8 +56,8 @@ public:
     // Editable:
     bool setData(const QModelIndex &index, const QVariant &value, int role = Qt::EditRole) override;
 
-    void setDataObject(aadl::AADLObject *obj);
-    const aadl::AADLObject *dataObject() const override;
+    void setDataObject(ivm::AADLObject *obj);
+    const ivm::AADLObject *dataObject() const override;
 
     void setDataTypes(const QSharedPointer<Asn1Acn::File> &dataTypes);
 
@@ -73,11 +73,11 @@ public:
 
 private:
     cmd::CommandsStack::Macro *m_cmdMacro { nullptr };
-    aadl::AADLObject *m_dataObject { nullptr };
-    QVector<aadl::ContextParameter> m_params;
+    ivm::AADLObject *m_dataObject { nullptr };
+    QVector<ivm::ContextParameter> m_params;
     QSharedPointer<Asn1Acn::File> m_dataTypes;
 
-    void createNewRow(const aadl::ContextParameter &param, int row);
+    void createNewRow(const ivm::ContextParameter &param, int row);
 };
 
 }

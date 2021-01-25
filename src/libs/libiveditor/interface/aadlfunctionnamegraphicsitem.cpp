@@ -55,7 +55,7 @@ void AADLFunctionNameGraphicsItem::mouseDoubleClickEvent(QGraphicsSceneMouseEven
 
 bool AADLFunctionNameGraphicsItem::validateText(const QString &text) const
 {
-    QRegularExpression re(aadl::AADLNameValidator::namePatternUI());
+    QRegularExpression re(ivm::AADLNameValidator::namePatternUI());
     return re.match(text).hasMatch();
 }
 

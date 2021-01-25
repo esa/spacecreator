@@ -23,7 +23,7 @@
 #include <QAbstractListModel>
 #include <QSet>
 
-namespace aadl {
+namespace ivm {
 class AADLObjectConnection;
 class AADLObjectConnectionGroup;
 }
@@ -34,7 +34,7 @@ class AADLConnectionGroupModel : public QAbstractListModel
 {
     Q_OBJECT
 public:
-    explicit AADLConnectionGroupModel(aadl::AADLObjectConnectionGroup *connectionGroup,
+    explicit AADLConnectionGroupModel(ivm::AADLObjectConnectionGroup *connectionGroup,
             cmd::CommandsStack::Macro *macro, QObject *parent = nullptr);
 
     QVariant data(const QModelIndex &index, int role = Qt::DisplayRole) const override;
@@ -46,9 +46,9 @@ private:
     bool isEnabled(const QModelIndex &index) const;
 
 private:
-    aadl::AADLObjectConnectionGroup *m_connectionGroup { nullptr };
+    ivm::AADLObjectConnectionGroup *m_connectionGroup { nullptr };
     cmd::CommandsStack::Macro *m_cmdMacro { nullptr };
-    QList<QPointer<aadl::AADLObjectConnection>> m_allConnections;
+    QList<QPointer<ivm::AADLObjectConnection>> m_allConnections;
     QSet<shared::Id> m_groupedConnetions;
 };
 

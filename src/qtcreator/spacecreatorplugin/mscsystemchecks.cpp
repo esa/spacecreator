@@ -96,7 +96,7 @@ void MscSystemChecks::changeMscInstanceName(const QString &oldName, const QStrin
 /*!
    Removes all instance that are corresponding to the function \p aaldFunction
  */
-void MscSystemChecks::removeMscInstances(aadl::AADLObjectFunction *aadlFunction)
+void MscSystemChecks::removeMscInstances(ivm::AADLObjectFunction *aadlFunction)
 {
     for (QSharedPointer<msc::MSCEditorCore> &mscCore : allMscCores()) {
         mscCore->removeMscInstances(aadlFunction);
@@ -106,7 +106,7 @@ void MscSystemChecks::removeMscInstances(aadl::AADLObjectFunction *aadlFunction)
 /*!
    Returns if there is at least one msc instance corresponding to \p aadlFunction
  */
-bool MscSystemChecks::hasCorrespondingInstances(aadl::AADLObjectFunction *aadlFunction) const
+bool MscSystemChecks::hasCorrespondingInstances(ivm::AADLObjectFunction *aadlFunction) const
 {
     for (QSharedPointer<msc::MSCEditorCore> &mscCore : allMscCores()) {
         if (!mscCore->correspondingInstances(aadlFunction).isEmpty()) {
@@ -152,7 +152,7 @@ void MscSystemChecks::changeMscMessageName(
 /*!
    Removes all messages that are corresponding to the connection \p aadlConnection
  */
-void MscSystemChecks::removeMscMessages(aadl::AADLObjectConnection *aadlConnection)
+void MscSystemChecks::removeMscMessages(ivm::AADLObjectConnection *aadlConnection)
 {
     for (QSharedPointer<msc::MSCEditorCore> &mscCore : allMscCores()) {
         mscCore->removeMscMessages(aadlConnection);
@@ -162,7 +162,7 @@ void MscSystemChecks::removeMscMessages(aadl::AADLObjectConnection *aadlConnecti
 /*!
    Returns if there is at least one msc message corresponding to \p aadlConnection
  */
-bool MscSystemChecks::hasCorrespondingMessages(aadl::AADLObjectConnection *aadlConnection) const
+bool MscSystemChecks::hasCorrespondingMessages(ivm::AADLObjectConnection *aadlConnection) const
 {
     for (QSharedPointer<msc::MSCEditorCore> &mscCore : allMscCores()) {
         if (!mscCore->correspondingMessages(aadlConnection).isEmpty()) {
@@ -325,7 +325,7 @@ QStringList MscSystemChecks::projectFiles(const QString &suffix)
 }
 
 void MscSystemChecks::onEntityNameChanged(
-        aadl::AADLObject *entity, const QString &oldName, shared::UndoCommand *command)
+        ivm::AADLObject *entity, const QString &oldName, shared::UndoCommand *command)
 {
     if (m_nameUpdateRunning) {
         return;
@@ -350,19 +350,19 @@ void MscSystemChecks::onEntityNameChanged(
 
     auto cmdIfaceAttribChange = dynamic_cast<ive::cmd::CmdIfaceAttrChange *>(command);
     if (cmdIfaceAttribChange) {
-        aadl::AADLObjectIface *interface = cmdIfaceAttribChange->interface();
+        ivm::AADLObjectIface *interface = cmdIfaceAttribChange->interface();
         QList<QStringList> messagesData;
-        if (interface->direction() == aadl::AADLObjectIface::IfaceType::Provided) {
+        if (interface->direction() == ivm::AADLObjectIface::IfaceType::Provided) {
             // Update from connections
-            QVector<aadl::AADLObjectConnection *> connections = cmdIfaceAttribChange->getRelatedConnections();
-            for (const aadl::AADLObjectConnection *connection : qAsConst(connections)) {
+            QVector<ivm::AADLObjectConnection *> connections = cmdIfaceAttribChange->getRelatedConnections();
+            for (const ivm::AADLObjectConnection *connection : qAsConst(connections)) {
                 if (mscMessagesExist(oldName, connection->sourceName(), connection->targetName())) {
                     messagesData << QStringList({ connection->sourceName(), connection->targetName() });
                 }
             }
             // Update from cyclic interfaces
-            aadl::AADLObjectFunctionType *func = interface->function();
-            if (func && interface->kind() == aadl::AADLObjectIface::OperationKind::Cyclic) {
+            ivm::AADLObjectFunctionType *func = interface->function();
+            if (func && interface->kind() == ivm::AADLObjectIface::OperationKind::Cyclic) {
                 if (mscMessagesExist(oldName, func->title(), "")) {
                     messagesData << QStringList({ func->title(), "" });
                 }
@@ -504,14 +504,14 @@ void MscSystemChecks::onMscEntityNameChanged(QObject *entity, const QString &old
 /*!
    Removes corresponding MSC entities when a AADL entity wasremoved
  */
-void MscSystemChecks::onEntityRemoved(aadl::AADLObject *entity, shared::UndoCommand *command)
+void MscSystemChecks::onEntityRemoved(ivm::AADLObject *entity, shared::UndoCommand *command)
 {
     if (!entity) {
         return;
     }
 
-    auto aadlFunction = dynamic_cast<aadl::AADLObjectFunction *>(entity);
-    auto aadlConnection = dynamic_cast<aadl::AADLObjectConnection *>(entity);
+    auto aadlFunction = dynamic_cast<ivm::AADLObjectFunction *>(entity);
+    auto aadlConnection = dynamic_cast<ivm::AADLObjectConnection *>(entity);
     if (!aadlFunction && !aadlConnection) {
         return;
     }

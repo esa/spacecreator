@@ -22,7 +22,7 @@
 #include <QHash>
 #include <QString>
 
-namespace aadl {
+namespace ivm {
 
 class AADLObjectFunction;
 class AADLObjectFunctionType;
@@ -50,7 +50,7 @@ public:
 
 private:
     static AADLNameValidator *m_instance;
-    const QHash<aadl::AADLObject::Type, QString> m_typePrefixes;
+    const QHash<ivm::AADLObject::Type, QString> m_typePrefixes;
 
     AADLNameValidator();
 

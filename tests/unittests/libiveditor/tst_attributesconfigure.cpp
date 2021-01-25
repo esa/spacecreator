@@ -33,13 +33,13 @@ private Q_SLOTS:
     void tst_loadImpl();
 
 private:
-    aadl::PropertyTemplateConfig *m_dynPropConfig;
+    ivm::PropertyTemplateConfig *m_dynPropConfig;
 };
 
 void tst_AttributesConfigure::initTestCase()
 {
     ive::initIvEditor();
-    m_dynPropConfig = aadl::PropertyTemplateConfig::instance();
+    m_dynPropConfig = ivm::PropertyTemplateConfig::instance();
     m_dynPropConfig->init(QLatin1String("default_attributes.xml"));
 }
 
@@ -50,29 +50,29 @@ void tst_AttributesConfigure::tst_attributesLoad()
     QString errMsg;
     int line;
     int column;
-    aadl::PropertyTemplateConfig::parseAttributesList(QString::fromUtf8(file.readAll()), &errMsg, &line, &column);
+    ivm::PropertyTemplateConfig::parseAttributesList(QString::fromUtf8(file.readAll()), &errMsg, &line, &column);
     QVERIFY2(errMsg.isEmpty(), QStringLiteral("ERROR [%1:%2]: %3").arg(line).arg(column).arg(errMsg).toUtf8().data());
 }
 
 void tst_AttributesConfigure::tst_loadImpl()
 {
-    aadl::PropertyTemplate dp;
+    ivm::PropertyTemplate dp;
     dp.setName(QLatin1String("test_name"));
-    dp.setInfo(aadl::PropertyTemplate::Info::Property);
-    dp.setType(aadl::PropertyTemplate::Type::Enumeration);
-    const auto scope = aadl::PropertyTemplate::Scope::Provided_Interface;
+    dp.setInfo(ivm::PropertyTemplate::Info::Property);
+    dp.setType(ivm::PropertyTemplate::Type::Enumeration);
+    const auto scope = ivm::PropertyTemplate::Scope::Provided_Interface;
     dp.setScope(scope);
     dp.setVisible(false);
     dp.setValuesList({ QVariant::fromValue(QString("value1")), QVariant::fromValue(QString("value2")) });
     dp.setValueValidatorPattern(QString("[\\d+]"));
-    dp.setAttrValidatorPattern(QMap<aadl::PropertyTemplate::Scope, QPair<QString, QString>> {
+    dp.setAttrValidatorPattern(QMap<ivm::PropertyTemplate::Scope, QPair<QString, QString>> {
             { scope, qMakePair(QString("attrName"), QString("value")) } });
 
     QDomDocument doc;
     doc.appendChild(dp.toXml(&doc));
 
     const auto element = doc.documentElement();
-    auto propPtr = aadl::PropertyTemplate::fromXml(element);
+    auto propPtr = ivm::PropertyTemplate::fromXml(element);
     QVERIFY(propPtr != nullptr);
     QVERIFY(propPtr->name() == dp.name());
     QVERIFY(propPtr->info() == dp.info());

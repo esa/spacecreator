@@ -38,12 +38,12 @@ IfaceParametersModel::IfaceParametersModel(cmd::CommandsStack::Macro *macro, QOb
 
 IfaceParametersModel::~IfaceParametersModel() { }
 
-void IfaceParametersModel::createNewRow(const aadl::IfaceParameter &param, int row)
+void IfaceParametersModel::createNewRow(const ivm::IfaceParameter &param, int row)
 {
     QStandardItem *titleItem = new QStandardItem(param.name());
     QStandardItem *typeItem = new QStandardItem(param.paramTypeName());
     QStandardItem *encodingItem = new QStandardItem(param.encoding());
-    QStandardItem *directionItem = new QStandardItem(aadl::IfaceParameter::directionName(param.direction()));
+    QStandardItem *directionItem = new QStandardItem(ivm::IfaceParameter::directionName(param.direction()));
 
     setItem(row, ColumnName, titleItem);
     setItem(row, ColumnType, typeItem);
@@ -53,7 +53,7 @@ void IfaceParametersModel::createNewRow(const aadl::IfaceParameter &param, int r
     m_params.insert(row, param);
 }
 
-void IfaceParametersModel::setDataObject(aadl::AADLObject *obj)
+void IfaceParametersModel::setDataObject(ivm::AADLObject *obj)
 {
     clear();
     m_params.clear();
@@ -62,14 +62,14 @@ void IfaceParametersModel::setDataObject(aadl::AADLObject *obj)
     if (!m_dataObject)
         return;
 
-    if (auto iface = qobject_cast<aadl::AADLObjectIface *>(m_dataObject)) {
-        const QVector<aadl::IfaceParameter> &params(iface->params());
+    if (auto iface = qobject_cast<ivm::AADLObjectIface *>(m_dataObject)) {
+        const QVector<ivm::IfaceParameter> &params(iface->params());
         const int paramsCount = params.size();
 
         beginInsertRows(QModelIndex(), 0, paramsCount);
 
         for (int i = 0; i < paramsCount; ++i) {
-            const aadl::IfaceParameter &param = params.at(i);
+            const ivm::IfaceParameter &param = params.at(i);
             createNewRow(param, i);
         }
 
@@ -77,7 +77,7 @@ void IfaceParametersModel::setDataObject(aadl::AADLObject *obj)
     }
 }
 
-const aadl::AADLObject *IfaceParametersModel::dataObject() const
+const ivm::AADLObject *IfaceParametersModel::dataObject() const
 {
     return m_dataObject;
 }
@@ -101,7 +101,7 @@ QVariant IfaceParametersModel::data(const QModelIndex &index, int role) const
     if (!index.isValid())
         return res;
 
-    const aadl::IfaceParameter &param = m_params.at(index.row());
+    const ivm::IfaceParameter &param = m_params.at(index.row());
     switch (role) {
     case Qt::DisplayRole:
     case Qt::EditRole: {
@@ -113,7 +113,7 @@ QVariant IfaceParametersModel::data(const QModelIndex &index, int role) const
         case ColumnEncoding:
             return param.encoding();
         case ColumnDirection:
-            return aadl::IfaceParameter::directionName(param.direction());
+            return ivm::IfaceParameter::directionName(param.direction());
         }
     }
     }
@@ -127,8 +127,8 @@ bool IfaceParametersModel::setData(const QModelIndex &index, const QVariant &val
         return false;
 
     if (role == Qt::EditRole) {
-        const aadl::IfaceParameter &paramOld = m_params.at(index.row());
-        aadl::IfaceParameter paramNew(paramOld);
+        const ivm::IfaceParameter &paramOld = m_params.at(index.row());
+        ivm::IfaceParameter paramNew(paramOld);
 
         switch (index.column()) {
         case ColumnName: {
@@ -147,7 +147,7 @@ bool IfaceParametersModel::setData(const QModelIndex &index, const QVariant &val
             break;
         }
         case ColumnDirection: {
-            if (!paramNew.setDirection(aadl::IfaceParameter::directionFromName(value.toString())))
+            if (!paramNew.setDirection(ivm::IfaceParameter::directionFromName(value.toString())))
                 return false;
             break;
         }
@@ -173,7 +173,7 @@ bool IfaceParametersModel::createProperty(const QString &propName)
 {
     bool res(false);
 
-    aadl::IfaceParameter param(propName);
+    ivm::IfaceParameter param(propName);
 
     const auto propsCmd = cmd::CommandsFactory::create(
             cmd::CreateIfaceParam, { QVariant::fromValue(m_dataObject), QVariant::fromValue(param) });
@@ -242,10 +242,10 @@ Qt::ItemFlags IfaceParametersModel::flags(const QModelIndex &index) const
 {
     Qt::ItemFlags flags = PropertiesModelBase::flags(index);
     if (m_dataObject)
-        if (auto iface = m_dataObject->as<const aadl::AADLObjectIface *>()) {
+        if (auto iface = m_dataObject->as<const ivm::AADLObjectIface *>()) {
             if (iface->isClone()) {
                 flags = flags & ~Qt::ItemIsEditable & ~Qt::ItemIsEnabled;
-            } else if (auto ri = iface->as<const aadl::AADLObjectIfaceRequired *>()) {
+            } else if (auto ri = iface->as<const ivm::AADLObjectIfaceRequired *>()) {
                 if (ri->hasPrototypePi())
                     flags = flags & ~Qt::ItemIsEditable & ~Qt::ItemIsEnabled;
             }

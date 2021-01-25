@@ -19,7 +19,7 @@
 
 #include "aadlobject.h"
 
-namespace aadl {
+namespace ivm {
 
 class AADLObjectComment : public AADLObject
 {

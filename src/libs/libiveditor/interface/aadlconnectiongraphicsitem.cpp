@@ -79,7 +79,7 @@ QPainterPath AADLConnectionGraphicsItem::GraphicsPathItem::shape() const
     return stroker.createStroke(path()).simplified();
 }
 
-AADLConnectionGraphicsItem::AADLConnectionGraphicsItem(aadl::AADLObjectConnection *connection,
+AADLConnectionGraphicsItem::AADLConnectionGraphicsItem(ivm::AADLObjectConnection *connection,
         AADLInterfaceGraphicsItem *startIface, AADLInterfaceGraphicsItem *endIface, QGraphicsItem *parentItem)
     : InteractiveObject(connection, parentItem)
     , m_startItem(startIface)
@@ -112,7 +112,7 @@ void AADLConnectionGraphicsItem::updateInterfaceConnectionsReference(IfaceConnec
 
 void AADLConnectionGraphicsItem::updateFromEntity()
 {
-    aadl::AADLObjectConnection *obj = entity();
+    ivm::AADLObjectConnection *obj = entity();
     Q_ASSERT(obj);
     if (!obj)
         return;
@@ -155,9 +155,9 @@ QVector<QPointF> AADLConnectionGraphicsItem::graphicsPoints() const
     return mapToScene(polygon);
 }
 
-aadl::AADLObjectConnection *AADLConnectionGraphicsItem::entity() const
+ivm::AADLObjectConnection *AADLConnectionGraphicsItem::entity() const
 {
-    return qobject_cast<aadl::AADLObjectConnection *>(aadlObject());
+    return qobject_cast<ivm::AADLObjectConnection *>(aadlObject());
 }
 
 QPainterPath AADLConnectionGraphicsItem::shape() const
@@ -621,13 +621,13 @@ bool AADLConnectionGraphicsItem::removeCollidedGrips(shared::ui::GripPoint *gp)
 QString AADLConnectionGraphicsItem::prepareTooltip() const
 {
     const QString sourceName =
-            aadl::AADLNameValidator::decodeName(aadl::AADLObject::Type::Function, entity()->sourceName());
-    const QString sourceInterfaceName = aadl::AADLNameValidator::decodeName(
-            aadl::AADLObject::Type::RequiredInterface, entity()->sourceInterfaceName());
+            ivm::AADLNameValidator::decodeName(ivm::AADLObject::Type::Function, entity()->sourceName());
+    const QString sourceInterfaceName = ivm::AADLNameValidator::decodeName(
+            ivm::AADLObject::Type::RequiredInterface, entity()->sourceInterfaceName());
     const QString targetName =
-            aadl::AADLNameValidator::decodeName(aadl::AADLObject::Type::Function, entity()->targetName());
-    const QString targetInterfaceName = aadl::AADLNameValidator::decodeName(
-            aadl::AADLObject::Type::ProvidedInterface, entity()->targetInterfaceName());
+            ivm::AADLNameValidator::decodeName(ivm::AADLObject::Type::Function, entity()->targetName());
+    const QString targetInterfaceName = ivm::AADLNameValidator::decodeName(
+            ivm::AADLObject::Type::ProvidedInterface, entity()->targetInterfaceName());
     const QString sign = entity()->sourceInterface()->isRequired() ? "->" : "<-";
     const QString tooltip =
             QString("%1.%2 %3 %4.%5").arg(sourceName, sourceInterfaceName, sign, targetName, targetInterfaceName);

@@ -23,7 +23,7 @@ class QGraphicsView;
 class QMouseEvent;
 class QContextMenuEvent;
 
-namespace aadl {
+namespace ivm {
 class AADLObject;
 }
 
@@ -61,7 +61,7 @@ public:
 
 Q_SIGNALS:
     void created();
-    void propertyEditorRequest(aadl::AADLObject *entity);
+    void propertyEditorRequest(ivm::AADLObject *entity);
     void informUser(const QString &title, const QString &message) const;
 
 protected:

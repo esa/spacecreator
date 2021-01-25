@@ -66,28 +66,28 @@ void tst_IVEditorCore::test_addConnection()
     ivCore->addFunction("f2");
     bool ok = ivCore->addConnection("m1", "f1", "f2");
     QCOMPARE(ok, true);
-    QVector<aadl::AADLObjectConnection *> connections =
-            ivCore->document()->objectsModel()->allObjectsByType<aadl::AADLObjectConnection>();
+    QVector<ivm::AADLObjectConnection *> connections =
+            ivCore->document()->objectsModel()->allObjectsByType<ivm::AADLObjectConnection>();
     QCOMPARE(connections.size(), 1);
     QCOMPARE(connections[0]->parentObject(), nullptr); // placed at root level
 }
 
 void tst_IVEditorCore::test_addConnectionFromEnv()
 {
-    aadl::AADLObjectsModel *aadlModel = ivCore->document()->objectsModel();
+    ivm::AADLObjectsModel *aadlModel = ivCore->document()->objectsModel();
     ivCore->addFunction("f1");
     bool ok = ivCore->addConnection("m1", "", "f1");
     QCOMPARE(ok, true);
-    QVector<aadl::AADLObjectConnection *> connections = aadlModel->allObjectsByType<aadl::AADLObjectConnection>();
+    QVector<ivm::AADLObjectConnection *> connections = aadlModel->allObjectsByType<ivm::AADLObjectConnection>();
     QCOMPARE(connections.size(), 0);
 
-    QVector<aadl::AADLObjectIface *> interfaces = aadlModel->allObjectsByType<aadl::AADLObjectIface>();
+    QVector<ivm::AADLObjectIface *> interfaces = aadlModel->allObjectsByType<ivm::AADLObjectIface>();
     QCOMPARE(interfaces.size(), 1);
 
     // Adding it again, fails
     ok = ivCore->addConnection("m1", "", "f1");
     QCOMPARE(ok, false);
-    interfaces = aadlModel->allObjectsByType<aadl::AADLObjectIface>();
+    interfaces = aadlModel->allObjectsByType<ivm::AADLObjectIface>();
     QCOMPARE(interfaces.size(), 1);
 }
 
@@ -117,16 +117,16 @@ void tst_IVEditorCore::test_addConnectionFails()
 
 void tst_IVEditorCore::test_renameAadlConnection()
 {
-    aadl::AADLObjectFunction *funcF1 = ivCore->addFunction("f1");
-    aadl::AADLObjectFunction *funcF2 = ivCore->addFunction("f2");
-    aadl::AADLObjectConnection *connection = aadl::testutils::createConnection(funcF1, funcF2, "init");
+    ivm::AADLObjectFunction *funcF1 = ivCore->addFunction("f1");
+    ivm::AADLObjectFunction *funcF2 = ivCore->addFunction("f2");
+    ivm::AADLObjectConnection *connection = ivm::testutils::createConnection(funcF1, funcF2, "init");
 
     bool ok = ivCore->renameAadlConnection("init", "doIt", "f1", "f2");
     QCOMPARE(ok, true);
     QCOMPARE(connection->name(), "doIt");
 
     // cyclic interface only
-    aadl::AADLObjectIface *interface = ivCore->addInterface("push", "f2");
+    ivm::AADLObjectIface *interface = ivCore->addInterface("push", "f2");
     ok = ivCore->renameAadlConnection("push", "call", "", "f2");
     QCOMPARE(ok, true);
     QCOMPARE(interface->title(), "call");
@@ -134,38 +134,38 @@ void tst_IVEditorCore::test_renameAadlConnection()
 
 void tst_IVEditorCore::test_addToNestedConnection()
 {
-    aadl::AADLObjectFunction *funcF1 = ivCore->addFunction("f1");
+    ivm::AADLObjectFunction *funcF1 = ivCore->addFunction("f1");
     ivCore->addFunction("f1a", funcF1);
     bool ok = ivCore->addConnection("m1", "f1", "f1a");
     QCOMPARE(ok, true);
-    QVector<aadl::AADLObjectConnection *> connections =
-            ivCore->document()->objectsModel()->allObjectsByType<aadl::AADLObjectConnection>();
+    QVector<ivm::AADLObjectConnection *> connections =
+            ivCore->document()->objectsModel()->allObjectsByType<ivm::AADLObjectConnection>();
     QCOMPARE(connections.size(), 1);
     QCOMPARE(connections[0]->parentObject(), funcF1); // placed as child of "f1"
 }
 
 void tst_IVEditorCore::test_addFromNestedConnection()
 {
-    aadl::AADLObjectFunction *funcF1 = ivCore->addFunction("f1");
+    ivm::AADLObjectFunction *funcF1 = ivCore->addFunction("f1");
     ivCore->addFunction("f1a", funcF1);
     bool ok = ivCore->addConnection("m1", "f1a", "f1");
     QCOMPARE(ok, true);
-    QVector<aadl::AADLObjectConnection *> connections =
-            ivCore->document()->objectsModel()->allObjectsByType<aadl::AADLObjectConnection>();
+    QVector<ivm::AADLObjectConnection *> connections =
+            ivCore->document()->objectsModel()->allObjectsByType<ivm::AADLObjectConnection>();
     QCOMPARE(connections.size(), 1);
     QCOMPARE(connections[0]->parentObject(), funcF1); // placed as child of "f1"
 }
 
 void tst_IVEditorCore::test_addRootToNestedConnections()
 {
-    aadl::AADLObjectFunction *funcF1 = ivCore->addFunction("f1");
+    ivm::AADLObjectFunction *funcF1 = ivCore->addFunction("f1");
     ivCore->addFunction("f1a", funcF1);
-    aadl::AADLObjectFunction *funcF2 = ivCore->addFunction("f2");
+    ivm::AADLObjectFunction *funcF2 = ivCore->addFunction("f2");
     ivCore->addFunction("f2a", funcF2);
     bool ok = ivCore->addConnection("m1", "f1a", "f2a");
     QCOMPARE(ok, true);
-    QVector<aadl::AADLObjectConnection *> connections =
-            ivCore->document()->objectsModel()->allObjectsByType<aadl::AADLObjectConnection>();
+    QVector<ivm::AADLObjectConnection *> connections =
+            ivCore->document()->objectsModel()->allObjectsByType<ivm::AADLObjectConnection>();
     QCOMPARE(connections.size(), 3);
 }
 
@@ -176,13 +176,13 @@ void tst_IVEditorCore::test_addToExistingInterface()
     ivCore->addFunction("f3");
     bool ok = ivCore->addConnection("m1", "f1", "f2");
     QCOMPARE(ok, true);
-    QVector<aadl::AADLObjectConnection *> connections =
-            ivCore->document()->objectsModel()->allObjectsByType<aadl::AADLObjectConnection>();
+    QVector<ivm::AADLObjectConnection *> connections =
+            ivCore->document()->objectsModel()->allObjectsByType<ivm::AADLObjectConnection>();
     QCOMPARE(connections.size(), 1);
 
     ok = ivCore->addConnection("m1", "f3", "f2");
     QCOMPARE(ok, true);
-    connections = ivCore->document()->objectsModel()->allObjectsByType<aadl::AADLObjectConnection>();
+    connections = ivCore->document()->objectsModel()->allObjectsByType<ivm::AADLObjectConnection>();
     QCOMPARE(connections.size(), 2);
 }
 

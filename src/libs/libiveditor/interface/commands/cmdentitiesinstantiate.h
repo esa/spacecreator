@@ -22,7 +22,7 @@
 #include <QUndoCommand>
 #include <QVector>
 
-namespace aadl {
+namespace ivm {
 class AADLObject;
 class AADLObjectFunction;
 class AADLObjectFunctionType;
@@ -36,8 +36,8 @@ class CmdEntityAttributeChange;
 class CmdEntitiesInstantiate : public QUndoCommand
 {
 public:
-    explicit CmdEntitiesInstantiate(aadl::AADLObjectFunctionType *entity, aadl::AADLObjectFunctionType *parent,
-            aadl::AADLObjectsModel *model, const QPointF &pos);
+    explicit CmdEntitiesInstantiate(ivm::AADLObjectFunctionType *entity, ivm::AADLObjectFunctionType *parent,
+            ivm::AADLObjectsModel *model, const QPointF &pos);
     ~CmdEntitiesInstantiate() override;
 
     void redo() override;
@@ -46,9 +46,9 @@ public:
     int id() const override;
 
 private:
-    QPointer<aadl::AADLObjectFunctionType> m_parent;
-    QPointer<aadl::AADLObjectsModel> m_model;
-    QPointer<aadl::AADLObjectFunction> m_instantiatedEntity;
+    QPointer<ivm::AADLObjectFunctionType> m_parent;
+    QPointer<ivm::AADLObjectsModel> m_model;
+    QPointer<ivm::AADLObjectFunction> m_instantiatedEntity;
     QPointF m_offset;
     CmdEntityAttributeChange *m_subCmd { nullptr };
 };

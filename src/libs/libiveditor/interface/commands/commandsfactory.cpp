@@ -141,9 +141,9 @@ QUndoCommand *CommandsFactory::createFunctionCommand(const QVariantList &params)
     const QVariant geometry = params.value(2);
     const QString name = params.size() == 4 ? params.value(3).toString() : "";
     if (geometry.isValid() && geometry.canConvert<QRectF>() && model.isValid()
-            && model.canConvert<aadl::AADLObjectsModel *>() && parent.canConvert<aadl::AADLObjectFunction *>())
-        return new CmdFunctionItemCreate(model.value<aadl::AADLObjectsModel *>(),
-                parent.value<aadl::AADLObjectFunction *>(), geometry.value<QRectF>(), name);
+            && model.canConvert<ivm::AADLObjectsModel *>() && parent.canConvert<ivm::AADLObjectFunction *>())
+        return new CmdFunctionItemCreate(model.value<ivm::AADLObjectsModel *>(),
+                parent.value<ivm::AADLObjectFunction *>(), geometry.value<QRectF>(), name);
 
     return nullptr;
 }
@@ -155,9 +155,9 @@ QUndoCommand *CommandsFactory::createFunctionTypeCommand(const QVariantList &par
     const QVariant parent = params.value(1);
     const QVariant geometry = params.value(2);
     if (geometry.isValid() && geometry.canConvert<QRectF>() && model.isValid()
-            && model.canConvert<aadl::AADLObjectsModel *>() && parent.canConvert<aadl::AADLObjectFunction *>())
-        return new CmdFunctionTypeItemCreate(model.value<aadl::AADLObjectsModel *>(),
-                parent.value<aadl::AADLObjectFunction *>(), geometry.value<QRectF>());
+            && model.canConvert<ivm::AADLObjectsModel *>() && parent.canConvert<ivm::AADLObjectFunction *>())
+        return new CmdFunctionTypeItemCreate(model.value<ivm::AADLObjectsModel *>(),
+                parent.value<ivm::AADLObjectFunction *>(), geometry.value<QRectF>());
 
     return nullptr;
 }
@@ -169,9 +169,9 @@ QUndoCommand *CommandsFactory::createCommentCommand(const QVariantList &params)
     const QVariant parent = params.value(1);
     const QVariant geometry = params.value(2);
     if (geometry.isValid() && geometry.canConvert<QRectF>() && model.isValid()
-            && model.canConvert<aadl::AADLObjectsModel *>())
-        return new CmdCommentItemCreate(model.value<aadl::AADLObjectsModel *>(),
-                parent.value<aadl::AADLObjectFunctionType *>(), geometry.value<QRectF>());
+            && model.canConvert<ivm::AADLObjectsModel *>())
+        return new CmdCommentItemCreate(model.value<ivm::AADLObjectsModel *>(),
+                parent.value<ivm::AADLObjectFunctionType *>(), geometry.value<QRectF>());
 
     return nullptr;
 }
@@ -180,8 +180,8 @@ QUndoCommand *CommandsFactory::createInterfaceCommand(const QVariantList &params
 {
     Q_ASSERT(params.size() == 1);
     const QVariant creationInfo = params.value(0);
-    if (creationInfo.isValid() && creationInfo.canConvert<aadl::AADLObjectIface::CreationInfo>())
-        return new CmdInterfaceItemCreate(creationInfo.value<aadl::AADLObjectIface::CreationInfo>());
+    if (creationInfo.isValid() && creationInfo.canConvert<ivm::AADLObjectIface::CreationInfo>())
+        return new CmdInterfaceItemCreate(creationInfo.value<ivm::AADLObjectIface::CreationInfo>());
 
     return nullptr;
 }
@@ -195,11 +195,11 @@ QUndoCommand *CommandsFactory::createConnectionCommand(const QVariantList &param
     const QVariant endIfaceId = params.value(3);
     const QVariant points = params.value(4);
     if (points.isValid() && points.canConvert<QVector<QPointF>>() && model.isValid()
-            && model.canConvert<aadl::AADLObjectsModel *>() && parentFunction.isValid()
-            && parentFunction.canConvert<aadl::AADLObjectFunction *>() && startIfaceId.isValid()
+            && model.canConvert<ivm::AADLObjectsModel *>() && parentFunction.isValid()
+            && parentFunction.canConvert<ivm::AADLObjectFunction *>() && startIfaceId.isValid()
             && startIfaceId.canConvert<shared::Id>() && endIfaceId.isValid() && endIfaceId.canConvert<shared::Id>()) {
-        return new CmdConnectionItemCreate(model.value<aadl::AADLObjectsModel *>(),
-                parentFunction.value<aadl::AADLObjectFunction *>(), startIfaceId.value<shared::Id>(),
+        return new CmdConnectionItemCreate(model.value<ivm::AADLObjectsModel *>(),
+                parentFunction.value<ivm::AADLObjectFunction *>(), startIfaceId.value<shared::Id>(),
                 endIfaceId.value<shared::Id>(), points.value<QVector<QPointF>>());
     }
 
@@ -210,8 +210,8 @@ QUndoCommand *CommandsFactory::createConnectionGroupCommand(const QVariantList &
 {
     Q_ASSERT(params.size() == 1);
     const QVariant creationInfo = params.value(0);
-    if (creationInfo.isValid() && creationInfo.canConvert<aadl::AADLObjectConnectionGroup::CreationInfo>())
-        return new CmdConnectionGroupItemCreate(creationInfo.value<aadl::AADLObjectConnectionGroup::CreationInfo>());
+    if (creationInfo.isValid() && creationInfo.canConvert<ivm::AADLObjectConnectionGroup::CreationInfo>())
+        return new CmdConnectionGroupItemCreate(creationInfo.value<ivm::AADLObjectConnectionGroup::CreationInfo>());
 
     return nullptr;
 }
@@ -222,11 +222,11 @@ QUndoCommand *CommandsFactory::changeConnectionGroupCommand(const QVariantList &
     const QVariant groupVar = params.value(0);
     const QVariant connectionVar = params.value(1);
     const QVariant addConnectionVar = params.value(2);
-    if (groupVar.isValid() && groupVar.canConvert<aadl::AADLObjectConnectionGroup *>() && connectionVar.isValid()
-            && connectionVar.canConvert<aadl::AADLObjectConnection *>() && addConnectionVar.isValid()
+    if (groupVar.isValid() && groupVar.canConvert<ivm::AADLObjectConnectionGroup *>() && connectionVar.isValid()
+            && connectionVar.canConvert<ivm::AADLObjectConnection *>() && addConnectionVar.isValid()
             && addConnectionVar.canConvert<bool>()) {
-        return new CmdConnectionGroupItemChange(groupVar.value<aadl::AADLObjectConnectionGroup *>(),
-                connectionVar.value<aadl::AADLObjectConnection *>(), addConnectionVar.value<bool>());
+        return new CmdConnectionGroupItemChange(groupVar.value<ivm::AADLObjectConnectionGroup *>(),
+                connectionVar.value<ivm::AADLObjectConnection *>(), addConnectionVar.value<bool>());
     }
 
     return nullptr;
@@ -234,7 +234,7 @@ QUndoCommand *CommandsFactory::changeConnectionGroupCommand(const QVariantList &
 
 QUndoCommand *CommandsFactory::changeGeometryCommand(const QVariantList &params)
 {
-    QList<QPair<aadl::AADLObject *, QVector<QPointF>>> objectsData;
+    QList<QPair<ivm::AADLObject *, QVector<QPointF>>> objectsData;
     for (const auto &param : params) {
         if (!param.isValid() || param.type() != QVariant::List)
             return nullptr;
@@ -246,9 +246,9 @@ QUndoCommand *CommandsFactory::changeGeometryCommand(const QVariantList &params)
         Q_ASSERT(objectDataList.size() == 2);
         const QVariant entity = objectDataList.value(0);
         const QVariant points = objectDataList.value(1);
-        if (entity.isValid() && entity.canConvert<aadl::AADLObject *>() && points.isValid()
+        if (entity.isValid() && entity.canConvert<ivm::AADLObject *>() && points.isValid()
                 && points.canConvert<QVector<QPointF>>()) {
-            objectsData.append(qMakePair(entity.value<aadl::AADLObject *>(), points.value<QVector<QPointF>>()));
+            objectsData.append(qMakePair(entity.value<ivm::AADLObject *>(), points.value<QVector<QPointF>>()));
         } else {
             return nullptr;
         }
@@ -261,9 +261,9 @@ QUndoCommand *CommandsFactory::removeEntityCommand(const QVariantList &params)
     Q_ASSERT(params.size() == 2);
     const QVariant entity = params.value(0);
     const QVariant model = params.value(1);
-    if (entity.isValid() && entity.canConvert<aadl::AADLObject *>() && model.isValid()
-            && model.canConvert<aadl::AADLObjectsModel *>()) {
-        return new CmdEntityRemove(entity.value<aadl::AADLObject *>(), model.value<aadl::AADLObjectsModel *>());
+    if (entity.isValid() && entity.canConvert<ivm::AADLObject *>() && model.isValid()
+            && model.canConvert<ivm::AADLObjectsModel *>()) {
+        return new CmdEntityRemove(entity.value<ivm::AADLObject *>(), model.value<ivm::AADLObjectsModel *>());
     }
 
     return nullptr;
@@ -276,11 +276,11 @@ QUndoCommand *CommandsFactory::importEntitiesCommand(const QVariantList &params)
     const QVariant parent = params.value(1);
     const QVariant model = params.value(2);
     const QVariant pos = params.value(3);
-    if (entity.isValid() && entity.canConvert<aadl::AADLObject *>() && parent.isValid()
-            && parent.canConvert<aadl::AADLObjectFunctionType *>() && model.isValid()
-            && model.canConvert<aadl::AADLObjectsModel *>() && pos.isValid() && pos.canConvert<QPointF>()) {
-        return new CmdEntitiesImport(entity.value<aadl::AADLObject *>(), parent.value<aadl::AADLObjectFunctionType *>(),
-                model.value<aadl::AADLObjectsModel *>(), pos.value<QPointF>());
+    if (entity.isValid() && entity.canConvert<ivm::AADLObject *>() && parent.isValid()
+            && parent.canConvert<ivm::AADLObjectFunctionType *>() && model.isValid()
+            && model.canConvert<ivm::AADLObjectsModel *>() && pos.isValid() && pos.canConvert<QPointF>()) {
+        return new CmdEntitiesImport(entity.value<ivm::AADLObject *>(), parent.value<ivm::AADLObjectFunctionType *>(),
+                model.value<ivm::AADLObjectsModel *>(), pos.value<QPointF>());
     }
 
     return nullptr;
@@ -293,11 +293,11 @@ QUndoCommand *CommandsFactory::instantiateEntitiesCommand(const QVariantList &pa
     const QVariant parent = params.value(1);
     const QVariant model = params.value(2);
     const QVariant pos = params.value(3);
-    if (entity.isValid() && entity.canConvert<aadl::AADLObjectFunctionType *>() && model.isValid() && parent.isValid()
-            && parent.canConvert<aadl::AADLObjectFunctionType *>() && model.canConvert<aadl::AADLObjectsModel *>()
+    if (entity.isValid() && entity.canConvert<ivm::AADLObjectFunctionType *>() && model.isValid() && parent.isValid()
+            && parent.canConvert<ivm::AADLObjectFunctionType *>() && model.canConvert<ivm::AADLObjectsModel *>()
             && pos.isValid() && pos.canConvert<QPointF>()) {
-        return new CmdEntitiesInstantiate(entity.value<aadl::AADLObjectFunctionType *>(),
-                parent.value<aadl::AADLObjectFunctionType *>(), model.value<aadl::AADLObjectsModel *>(),
+        return new CmdEntitiesInstantiate(entity.value<ivm::AADLObjectFunctionType *>(),
+                parent.value<ivm::AADLObjectFunctionType *>(), model.value<ivm::AADLObjectsModel *>(),
                 pos.value<QPointF>());
     }
 
@@ -309,8 +309,8 @@ QUndoCommand *CommandsFactory::addEntityPropertyCommand(const QVariantList &para
     Q_ASSERT(params.size() == 2);
     const QVariant entity = params.value(0);
     const QVariantHash properties = params.value(1).toHash();
-    if (entity.isValid() && entity.canConvert<aadl::AADLObject *>() && !properties.isEmpty())
-        return new CmdEntityPropertyCreate(entity.value<aadl::AADLObject *>(), properties);
+    if (entity.isValid() && entity.canConvert<ivm::AADLObject *>() && !properties.isEmpty())
+        return new CmdEntityPropertyCreate(entity.value<ivm::AADLObject *>(), properties);
 
     return nullptr;
 }
@@ -320,10 +320,10 @@ QUndoCommand *CommandsFactory::changeEntityPropertyCommand(const QVariantList &p
     Q_ASSERT(params.size() == 2);
     const QVariant entity = params.value(0);
     const QVariantHash properties = params.value(1).toHash();
-    if (entity.isValid() && entity.canConvert<aadl::AADLObject *>() && !properties.isEmpty()) {
-        if (auto aadlObject = entity.value<aadl::AADLObject *>()) {
+    if (entity.isValid() && entity.canConvert<ivm::AADLObject *>() && !properties.isEmpty()) {
+        if (auto aadlObject = entity.value<ivm::AADLObject *>()) {
             if (aadlObject->isInterface())
-                if (aadlObject->as<aadl::AADLObjectIfaceRequired *>()) {
+                if (aadlObject->as<ivm::AADLObjectIfaceRequired *>()) {
                     return changeRiPropertyCommand(params);
                 }
             return new CmdEntityPropertyChange(aadlObject, properties);
@@ -337,8 +337,8 @@ QUndoCommand *CommandsFactory::renameEntityPropertyCommand(const QVariantList &p
     Q_ASSERT(params.size() == 2);
     const QVariant entity = params.value(0);
     const QHash<QString, QString> properties = params.value(1).value<QHash<QString, QString>>();
-    if (entity.isValid() && entity.canConvert<aadl::AADLObject *>() && !properties.isEmpty())
-        return new CmdEntityPropertyRename(entity.value<aadl::AADLObject *>(), properties);
+    if (entity.isValid() && entity.canConvert<ivm::AADLObject *>() && !properties.isEmpty())
+        return new CmdEntityPropertyRename(entity.value<ivm::AADLObject *>(), properties);
 
     return nullptr;
 }
@@ -348,8 +348,8 @@ QUndoCommand *CommandsFactory::removeEntityPropertyCommand(const QVariantList &p
     Q_ASSERT(params.size() == 2);
     const QVariant entity = params.value(0);
     const QStringList properties = params.value(1).toStringList();
-    if (entity.isValid() && entity.canConvert<aadl::AADLObject *>() && !properties.isEmpty())
-        return new CmdEntityPropertyRemove(entity.value<aadl::AADLObject *>(), properties);
+    if (entity.isValid() && entity.canConvert<ivm::AADLObject *>() && !properties.isEmpty())
+        return new CmdEntityPropertyRemove(entity.value<ivm::AADLObject *>(), properties);
 
     return nullptr;
 }
@@ -359,8 +359,8 @@ QUndoCommand *CommandsFactory::changeEntityAttributesCommand(const QVariantList 
     Q_ASSERT(params.size() == 2);
     const QVariant entity = params.value(0);
     const QVariantHash attributes = params.value(1).toHash();
-    if (entity.isValid() && entity.canConvert<aadl::AADLObject *>() && !attributes.isEmpty()) {
-        if (auto aadlObject = entity.value<aadl::AADLObject *>()) {
+    if (entity.isValid() && entity.canConvert<ivm::AADLObject *>() && !attributes.isEmpty()) {
+        if (auto aadlObject = entity.value<ivm::AADLObject *>()) {
             if (aadlObject->hasAttributes(attributes)) {
                 return nullptr;
             }
@@ -379,9 +379,9 @@ QUndoCommand *CommandsFactory::createContextParameterCommand(const QVariantList 
 {
     Q_ASSERT(params.size() == 2);
     const QVariant entity = params.value(0);
-    auto param = params.at(1).value<aadl::ContextParameter>();
-    if (entity.isValid() && entity.canConvert<aadl::AADLObjectFunctionType *>())
-        return new CmdContextParameterCreate(entity.value<aadl::AADLObjectFunctionType *>(), param);
+    auto param = params.at(1).value<ivm::ContextParameter>();
+    if (entity.isValid() && entity.canConvert<ivm::AADLObjectFunctionType *>())
+        return new CmdContextParameterCreate(entity.value<ivm::AADLObjectFunctionType *>(), param);
 
     return nullptr;
 }
@@ -390,10 +390,10 @@ QUndoCommand *CommandsFactory::changeContextParameterCommand(const QVariantList 
 {
     Q_ASSERT(params.size() == 3);
     const QVariant entity = params.value(0);
-    auto paramOld = params.at(1).value<aadl::ContextParameter>();
-    auto paramNew = params.at(2).value<aadl::ContextParameter>();
-    if (entity.isValid() && entity.canConvert<aadl::AADLObjectFunctionType *>())
-        return new CmdContextParameterChange(entity.value<aadl::AADLObjectFunctionType *>(), paramOld, paramNew);
+    auto paramOld = params.at(1).value<ivm::ContextParameter>();
+    auto paramNew = params.at(2).value<ivm::ContextParameter>();
+    if (entity.isValid() && entity.canConvert<ivm::AADLObjectFunctionType *>())
+        return new CmdContextParameterChange(entity.value<ivm::AADLObjectFunctionType *>(), paramOld, paramNew);
 
     return nullptr;
 }
@@ -403,8 +403,8 @@ QUndoCommand *CommandsFactory::removeContextParameterCommand(const QVariantList 
     Q_ASSERT(params.size() == 2);
     const QVariant entity = params.value(0);
     const int id = params.at(1).toInt();
-    if (entity.isValid() && entity.canConvert<aadl::AADLObjectFunctionType *>())
-        return new CmdContextParameterRemove(entity.value<aadl::AADLObjectFunctionType *>(), id);
+    if (entity.isValid() && entity.canConvert<ivm::AADLObjectFunctionType *>())
+        return new CmdContextParameterRemove(entity.value<ivm::AADLObjectFunctionType *>(), id);
 
     return nullptr;
 }
@@ -413,9 +413,9 @@ QUndoCommand *CommandsFactory::createIfaceParamCommand(const QVariantList &param
 {
     Q_ASSERT(params.size() == 2);
     const QVariant entity = params.value(0);
-    auto param = params.at(1).value<aadl::IfaceParameter>();
-    if (entity.isValid() && entity.canConvert<aadl::AADLObjectIface *>())
-        return new CmdIfaceParamCreate(entity.value<aadl::AADLObjectIface *>(), param);
+    auto param = params.at(1).value<ivm::IfaceParameter>();
+    if (entity.isValid() && entity.canConvert<ivm::AADLObjectIface *>())
+        return new CmdIfaceParamCreate(entity.value<ivm::AADLObjectIface *>(), param);
 
     return nullptr;
 }
@@ -424,9 +424,9 @@ QUndoCommand *CommandsFactory::removeIfaceParamCommand(const QVariantList &param
 {
     Q_ASSERT(params.size() == 2);
     const QVariant entity = params.value(0);
-    auto param = params.at(1).value<aadl::IfaceParameter>();
-    if (entity.isValid() && entity.canConvert<aadl::AADLObjectIface *>())
-        return new CmdIfaceParamRemove(entity.value<aadl::AADLObjectIface *>(), param);
+    auto param = params.at(1).value<ivm::IfaceParameter>();
+    if (entity.isValid() && entity.canConvert<ivm::AADLObjectIface *>())
+        return new CmdIfaceParamRemove(entity.value<ivm::AADLObjectIface *>(), param);
 
     return nullptr;
 }
@@ -435,10 +435,10 @@ QUndoCommand *CommandsFactory::changeIfaceParamCommand(const QVariantList &param
 {
     Q_ASSERT(params.size() == 3);
     const QVariant entity = params.value(0);
-    auto paramOld = params.at(1).value<aadl::IfaceParameter>();
-    auto paramNew = params.at(2).value<aadl::IfaceParameter>();
-    if (entity.isValid() && entity.canConvert<aadl::AADLObjectIface *>())
-        return new CmdIfaceParamChange(entity.value<aadl::AADLObjectIface *>(), paramOld, paramNew);
+    auto paramOld = params.at(1).value<ivm::IfaceParameter>();
+    auto paramNew = params.at(2).value<ivm::IfaceParameter>();
+    if (entity.isValid() && entity.canConvert<ivm::AADLObjectIface *>())
+        return new CmdIfaceParamChange(entity.value<ivm::AADLObjectIface *>(), paramOld, paramNew);
 
     return nullptr;
 }
@@ -448,8 +448,8 @@ QUndoCommand *CommandsFactory::changeRiPropertyCommand(const QVariantList &param
     Q_ASSERT(params.size() == 2);
     const QVariant entity = params.value(0);
     const QVariantHash properties = params.value(1).toHash();
-    if (entity.isValid() && entity.canConvert<aadl::AADLObjectIfaceRequired *>() && !properties.isEmpty()) {
-        if (aadl::AADLObjectIfaceRequired *ri = entity.value<aadl::AADLObjectIfaceRequired *>()) {
+    if (entity.isValid() && entity.canConvert<ivm::AADLObjectIfaceRequired *>() && !properties.isEmpty()) {
+        if (ivm::AADLObjectIfaceRequired *ri = entity.value<ivm::AADLObjectIfaceRequired *>()) {
             const QString propName = properties.keys().first();
             return new CmdRequiredIfacePropertyChange(ri, propName, properties.value(propName));
         }
@@ -462,8 +462,8 @@ QUndoCommand *CommandsFactory::changeIfaceAttributeCommand(const QVariantList &p
     Q_ASSERT(params.size() == 2);
     const QVariant entity = params.value(0);
     const QVariantHash attrs = params.value(1).toHash();
-    if (entity.isValid() && entity.canConvert<aadl::AADLObjectIface *>() && !attrs.isEmpty()) {
-        if (auto iface = entity.value<aadl::AADLObjectIface *>()) {
+    if (entity.isValid() && entity.canConvert<ivm::AADLObjectIface *>() && !attrs.isEmpty()) {
+        if (auto iface = entity.value<ivm::AADLObjectIface *>()) {
             const QString attrName = attrs.keys().first();
             return new CmdIfaceAttrChange(iface, attrName, attrs.value(attrName));
         }
@@ -477,8 +477,8 @@ QUndoCommand *CommandsFactory::changeRootEntityCommand(const QVariantList &param
     const QVariant model = params.value(0);
     const QVariant id = params.value(1);
     if (id.isValid() && id.canConvert<shared::Id>() && model.isValid()
-            && model.canConvert<aadl::AADLObjectsModel *>()) {
-        return new CmdRootEntityChange(model.value<aadl::AADLObjectsModel *>(), id.value<shared::Id>());
+            && model.canConvert<ivm::AADLObjectsModel *>()) {
+        return new CmdRootEntityChange(model.value<ivm::AADLObjectsModel *>(), id.value<shared::Id>());
     }
 
     return nullptr;
@@ -486,7 +486,7 @@ QUndoCommand *CommandsFactory::changeRootEntityCommand(const QVariantList &param
 
 QUndoCommand *CommandsFactory::autoLayoutEntityCommand(const QVariantList &params)
 {
-    QList<QPair<aadl::AADLObject *, QVector<QPointF>>> objectsData;
+    QList<QPair<ivm::AADLObject *, QVector<QPointF>>> objectsData;
     for (const auto &param : params) {
         const QVariantList objectDataList = param.toList();
         if (objectDataList.isEmpty())
@@ -495,9 +495,9 @@ QUndoCommand *CommandsFactory::autoLayoutEntityCommand(const QVariantList &param
         Q_ASSERT(objectDataList.size() == 2);
         const QVariant entity = objectDataList.value(0);
         const QVariant points = objectDataList.value(1);
-        if (entity.isValid() && entity.canConvert<aadl::AADLObject *>() && points.isValid()
+        if (entity.isValid() && entity.canConvert<ivm::AADLObject *>() && points.isValid()
                 && points.canConvert<QVector<QPointF>>()) {
-            objectsData.append(qMakePair(entity.value<aadl::AADLObject *>(), points.value<QVector<QPointF>>()));
+            objectsData.append(qMakePair(entity.value<ivm::AADLObject *>(), points.value<QVector<QPointF>>()));
         } else {
             return nullptr;
         }

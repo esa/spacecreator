@@ -21,7 +21,7 @@
 #include <QUndoCommand>
 #include <QVector>
 
-namespace aadl {
+namespace ivm {
 class AADLObject;
 class AADLObjectFunctionType;
 class AADLObjectsModel;
@@ -33,8 +33,8 @@ namespace cmd {
 class CmdEntitiesImport : public QUndoCommand
 {
 public:
-    explicit CmdEntitiesImport(aadl::AADLObject *entity, aadl::AADLObjectFunctionType *parent,
-            aadl::AADLObjectsModel *model, const QPointF &pos);
+    explicit CmdEntitiesImport(ivm::AADLObject *entity, ivm::AADLObjectFunctionType *parent,
+            ivm::AADLObjectsModel *model, const QPointF &pos);
     ~CmdEntitiesImport() override;
 
     void redo() override;
@@ -43,10 +43,10 @@ public:
     int id() const override;
 
 private:
-    QPointer<aadl::AADLObjectsModel> m_model;
-    QPointer<aadl::AADLObjectFunctionType> m_parent;
-    QVector<QPointer<aadl::AADLObject>> m_rootEntities;
-    QVector<QPointer<aadl::AADLObject>> m_importedEntities;
+    QPointer<ivm::AADLObjectsModel> m_model;
+    QPointer<ivm::AADLObjectFunctionType> m_parent;
+    QVector<QPointer<ivm::AADLObject>> m_rootEntities;
+    QVector<QPointer<ivm::AADLObject>> m_importedEntities;
 };
 
 } // namespace ive

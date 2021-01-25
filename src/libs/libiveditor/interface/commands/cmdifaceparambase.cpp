@@ -25,9 +25,9 @@
 namespace ive {
 namespace cmd {
 
-QVector<QPointer<aadl::AADLObjectIface>> relatedIfaces(aadl::AADLObjectIface *iface)
+QVector<QPointer<ivm::AADLObjectIface>> relatedIfaces(ivm::AADLObjectIface *iface)
 {
-    QVector<QPointer<aadl::AADLObjectIface>> ifaces;
+    QVector<QPointer<ivm::AADLObjectIface>> ifaces;
 
     if (iface) {
         ifaces.append(iface);
@@ -39,18 +39,18 @@ QVector<QPointer<aadl::AADLObjectIface>> relatedIfaces(aadl::AADLObjectIface *if
     return ifaces;
 }
 
-QVector<aadl::AADLObjectConnection *> relatedConnections(aadl::AADLObjectIface *iface)
+QVector<ivm::AADLObjectConnection *> relatedConnections(ivm::AADLObjectIface *iface)
 {
-    QVector<aadl::AADLObjectConnection *> connections;
+    QVector<ivm::AADLObjectConnection *> connections;
 
     if (iface && iface->objectsModel())
-        for (aadl::AADLObjectIface *i : relatedIfaces(iface))
+        for (ivm::AADLObjectIface *i : relatedIfaces(iface))
             connections += i->objectsModel()->getConnectionsForIface(i->id());
 
     return connections;
 }
 
-CmdIfaceParamBase::CmdIfaceParamBase(aadl::AADLObjectIface *iface)
+CmdIfaceParamBase::CmdIfaceParamBase(ivm::AADLObjectIface *iface)
     : QUndoCommand()
     , m_iface(iface)
     , m_connections(relatedConnections(m_iface))

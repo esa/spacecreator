@@ -20,7 +20,7 @@
 #include "aadlobject.h"
 #include "aadlrectgraphicsitem.h"
 
-namespace aadl {
+namespace ivm {
 class AADLObjectFunctionType;
 }
 
@@ -32,14 +32,14 @@ class AADLFunctionTypeGraphicsItem : public AADLRectGraphicsItem
 {
     Q_OBJECT
 public:
-    explicit AADLFunctionTypeGraphicsItem(aadl::AADLObjectFunctionType *entity, QGraphicsItem *parentItem = nullptr);
+    explicit AADLFunctionTypeGraphicsItem(ivm::AADLObjectFunctionType *entity, QGraphicsItem *parentItem = nullptr);
     enum
     {
-        Type = UserType + static_cast<int>(aadl::AADLObject::Type::FunctionType)
+        Type = UserType + static_cast<int>(ivm::AADLObject::Type::FunctionType)
     };
     int type() const override { return Type; }
 
-    aadl::AADLObjectFunctionType *entity() const;
+    ivm::AADLObjectFunctionType *entity() const;
 
     void init() override;
 

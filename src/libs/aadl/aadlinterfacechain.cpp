@@ -24,7 +24,7 @@
 
 #include <QSet>
 
-namespace aadl {
+namespace ivm {
 
 QList<AADLInterfaceChain> AADLInterfaceChain::getNextChunk(
         const AADLInterfaceChain &currentChain, const AADLObjectIface *iface)
@@ -149,4 +149,4 @@ QStringList AADLInterfaceChain::targetEndPointPath() const
     return {};
 }
 
-} // namespace aadl
+} // namespace ivm

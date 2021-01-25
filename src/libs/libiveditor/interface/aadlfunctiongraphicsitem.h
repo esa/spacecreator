@@ -21,7 +21,7 @@
 
 class QSvgRenderer;
 
-namespace aadl {
+namespace ivm {
 class AADLObjectFunction;
 }
 
@@ -32,15 +32,15 @@ class AADLFunctionGraphicsItem : public AADLFunctionTypeGraphicsItem
 {
     Q_OBJECT
 public:
-    explicit AADLFunctionGraphicsItem(aadl::AADLObjectFunction *entity, QGraphicsItem *parent = nullptr);
+    explicit AADLFunctionGraphicsItem(ivm::AADLObjectFunction *entity, QGraphicsItem *parent = nullptr);
     enum
     {
-        Type = UserType + static_cast<int>(aadl::AADLObject::Type::Function)
+        Type = UserType + static_cast<int>(ivm::AADLObject::Type::Function)
     };
 
     void init() override;
 
-    aadl::AADLObjectFunction *entity() const;
+    ivm::AADLObjectFunction *entity() const;
 
     int type() const override { return Type; }
 

@@ -28,7 +28,7 @@
 
 #include <QtDebug>
 
-namespace aadl {
+namespace ivm {
 
 struct AADLObjectsModelPrivate {
     PropertyTemplateConfig *m_dynPropConfig { nullptr };
@@ -110,7 +110,7 @@ bool AADLObjectsModel::addObject(AADLObject *obj)
     if (addObjectImpl(obj)) {
         if (!obj->postInit()) {
             removeObject(obj);
-            if (auto parentObj = qobject_cast<aadl::AADLObjectFunctionType *>(obj->parentObject())) {
+            if (auto parentObj = qobject_cast<ivm::AADLObjectFunctionType *>(obj->parentObject())) {
                 parentObj->removeChild(obj);
             }
         } else {
@@ -119,9 +119,9 @@ bool AADLObjectsModel::addObject(AADLObject *obj)
                 if (currentValue.isNull()) {
                     const QVariant &defaultValue = attr->defaultValue();
                     if (!defaultValue.isNull()) {
-                        if (attr->info() == aadl::PropertyTemplate::Info::Attribute) {
+                        if (attr->info() == ivm::PropertyTemplate::Info::Attribute) {
                             obj->setAttr(attr->name(), defaultValue);
-                        } else if (attr->info() == aadl::PropertyTemplate::Info::Property) {
+                        } else if (attr->info() == ivm::PropertyTemplate::Info::Property) {
                             obj->setProp(attr->name(), defaultValue);
                         } else {
                             qWarning() << "Unknown dynamic property info:" << attr->info();
@@ -386,11 +386,11 @@ QList<AADLObject *> AADLObjectsModel::visibleObjects(shared::Id rootId) const
             if (!obj->isConnection() && !obj->isConnectionGroup()
                     && (shared::isAncestorOf(rootObj, obj) || rootObj == nullptr)) {
                 visibleObjects.append(obj);
-            } else if (auto connection = qobject_cast<aadl::AADLObjectConnection *>(obj)) {
+            } else if (auto connection = qobject_cast<ivm::AADLObjectConnection *>(obj)) {
                 const bool sourceIfaceAncestor =
-                        shared::isAncestorOf<aadl::AADLObject>(rootObj, connection->sourceInterface());
+                        shared::isAncestorOf<ivm::AADLObject>(rootObj, connection->sourceInterface());
                 const bool targetIfaceAncestor =
-                        shared::isAncestorOf<aadl::AADLObject>(rootObj, connection->targetInterface());
+                        shared::isAncestorOf<ivm::AADLObject>(rootObj, connection->targetInterface());
                 if ((sourceIfaceAncestor && targetIfaceAncestor) || rootObj == nullptr) {
                     visibleObjects.append(obj);
                 }

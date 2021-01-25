@@ -29,18 +29,18 @@ namespace cmd {
 class CmdInterfaceItemCreate : public CmdEntityGeometryChange
 {
 public:
-    explicit CmdInterfaceItemCreate(const aadl::AADLObjectIface::CreationInfo &creationInfo);
+    explicit CmdInterfaceItemCreate(const ivm::AADLObjectIface::CreationInfo &creationInfo);
     ~CmdInterfaceItemCreate() override;
 
     void redo() override;
     void undo() override;
     int id() const override;
 
-    aadl::AADLObjectIface *createdInterface() const;
+    ivm::AADLObjectIface *createdInterface() const;
 
 private:
-    const aadl::AADLObjectIface::CreationInfo m_ifaceInfo;
-    QPointer<aadl::AADLObjectIface> m_entity;
+    const ivm::AADLObjectIface::CreationInfo m_ifaceInfo;
+    QPointer<ivm::AADLObjectIface> m_entity;
     QVector<QUndoCommand *> m_cmdClones;
 };
 

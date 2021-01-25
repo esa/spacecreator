@@ -24,8 +24,8 @@ namespace ive {
 namespace cmd {
 
 
-CmdConnectionGroupItemChange::CmdConnectionGroupItemChange(aadl::AADLObjectConnectionGroup *group,
-                                                           aadl::AADLObjectConnection *connection,
+CmdConnectionGroupItemChange::CmdConnectionGroupItemChange(ivm::AADLObjectConnectionGroup *group,
+                                                           ivm::AADLObjectConnection *connection,
                                                            bool add)
     : QUndoCommand()
     , m_group(group)

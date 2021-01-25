@@ -26,15 +26,15 @@ namespace ive {
 namespace cmd {
 
 CmdIfaceParamChange::CmdIfaceParamChange(
-        aadl::AADLObject *entity, const aadl::IfaceParameter &from, const aadl::IfaceParameter &to)
-    : CmdIfaceParamBase(entity ? entity->as<aadl::AADLObjectIface *>() : nullptr)
+        ivm::AADLObject *entity, const ivm::IfaceParameter &from, const ivm::IfaceParameter &to)
+    : CmdIfaceParamBase(entity ? entity->as<ivm::AADLObjectIface *>() : nullptr)
     , m_newParam(to)
     , m_oldParam(from)
 {
     setText(QObject::tr("Change Iface Parameter"));
 }
 
-void CmdIfaceParamChange::swapParam(const aadl::IfaceParameter &from, const aadl::IfaceParameter &to)
+void CmdIfaceParamChange::swapParam(const ivm::IfaceParameter &from, const ivm::IfaceParameter &to)
 {
     if (!m_iface)
         return;

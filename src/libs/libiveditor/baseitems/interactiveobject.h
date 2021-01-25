@@ -25,7 +25,7 @@
 #include <QPen>
 #include <QPointer>
 
-namespace aadl {
+namespace ivm {
 class AADLObject;
 }
 
@@ -36,9 +36,9 @@ class InteractiveObject : public shared::ui::InteractiveObjectBase
     Q_OBJECT
 
 public:
-    explicit InteractiveObject(aadl::AADLObject *entity, QGraphicsItem *parent = nullptr);
+    explicit InteractiveObject(ivm::AADLObject *entity, QGraphicsItem *parent = nullptr);
 
-    aadl::AADLObject *aadlObject() const;
+    ivm::AADLObject *aadlObject() const;
 
     QPen pen() const;
     void setPen(const QPen &pen);
@@ -78,7 +78,7 @@ protected:
     virtual ColorHandler colorHandler() const;
 
 protected:
-    const QPointer<aadl::AADLObject> m_dataObject;
+    const QPointer<ivm::AADLObject> m_dataObject;
 
     QBrush m_brush;
     QPen m_pen;

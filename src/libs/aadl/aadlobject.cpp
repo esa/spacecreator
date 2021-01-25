@@ -23,7 +23,7 @@
 #include <QPointer>
 #include <QVector>
 
-namespace aadl {
+namespace ivm {
 
 /*!
  * \namespace aadl
@@ -92,7 +92,7 @@ bool AADLObject::aboutToBeRemoved()
 void AADLObject::sortObjectList(QList<AADLObject *> &objects)
 {
     std::stable_sort(objects.begin(), objects.end(),
-            [](aadl::AADLObject *obj1, aadl::AADLObject *obj2) { return obj1->aadlType() < obj2->aadlType(); });
+            [](ivm::AADLObject *obj1, ivm::AADLObject *obj2) { return obj1->aadlType() < obj2->aadlType(); });
 }
 
 shared::Id AADLObject::id() const
@@ -197,8 +197,8 @@ QStringList AADLObject::path(const AADLObject *obj)
     QStringList list { obj->title() };
     AADLObject *parent = obj->parentObject();
     while (parent) {
-        if (parent->aadlType() == aadl::AADLObject::Type::Function
-                || parent->aadlType() == aadl::AADLObject::Type::FunctionType) {
+        if (parent->aadlType() == ivm::AADLObject::Type::Function
+                || parent->aadlType() == ivm::AADLObject::Type::FunctionType) {
             list.prepend(parent->title());
         }
         parent = parent->parentObject();

@@ -40,13 +40,13 @@ QWidget *InterfaceAttrDelegate::createEditor(
             if (pModel->isAttr(index)) {
                 const QString &attrName =
                         pModel->data(pModel->index(PropertiesListModel::ColumnTitle, index.row())).toString();
-                const aadl::meta::Props::Token t = aadl::meta::Props::token(attrName);
+                const ivm::meta::Props::Token t = ivm::meta::Props::token(attrName);
 
-                auto iface = qobject_cast<const aadl::AADLObjectIface *>(pModel->dataObject());
+                auto iface = qobject_cast<const ivm::AADLObjectIface *>(pModel->dataObject());
                 Q_ASSERT(iface);
 
                 switch (t) {
-                case aadl::meta::Props::Token::kind: {
+                case ivm::meta::Props::Token::kind: {
                     auto names = iface->availableKindNames();
                     QComboBox *cb = new QComboBox(parent);
                     for (auto it = names.cbegin(); it != names.cend(); ++it) {
@@ -70,13 +70,13 @@ void InterfaceAttrDelegate::setEditorData(QWidget *editor, const QModelIndex &in
             if (pModel->isAttr(index)) {
                 const QString &attrName =
                         pModel->data(pModel->index(PropertiesListModel::ColumnTitle, index.row())).toString();
-                const aadl::meta::Props::Token t = aadl::meta::Props::token(attrName);
+                const ivm::meta::Props::Token t = ivm::meta::Props::token(attrName);
 
-                auto iface = qobject_cast<const aadl::AADLObjectIface *>(pModel->dataObject());
+                auto iface = qobject_cast<const ivm::AADLObjectIface *>(pModel->dataObject());
                 Q_ASSERT(iface);
 
                 switch (t) {
-                case aadl::meta::Props::Token::kind: {
+                case ivm::meta::Props::Token::kind: {
                     if (QComboBox *cb = qobject_cast<QComboBox *>(editor))
                         cb->setCurrentIndex(static_cast<int>(iface->kind()));
                 }

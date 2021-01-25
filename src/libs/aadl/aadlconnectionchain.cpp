@@ -23,7 +23,7 @@
 
 #include <QDebug>
 
-namespace aadl {
+namespace ivm {
 
 AADLConnectionChain::AADLConnectionChain() { }
 
@@ -46,10 +46,10 @@ bool containsChainAlready(AADLConnectionChain *chain, const QList<AADLConnection
    Creates a list of all connection chains in that model
    The caller has to take over the ownership of the objects in the list
  */
-QList<AADLConnectionChain *> AADLConnectionChain::build(const aadl::AADLObjectsModel &model)
+QList<AADLConnectionChain *> AADLConnectionChain::build(const ivm::AADLObjectsModel &model)
 {
     QList<AADLConnectionChain *> chains;
-    QList<AADLObjectConnection *> allConnections = model.allObjectsByType<aadl::AADLObjectConnection>().toList();
+    QList<AADLObjectConnection *> allConnections = model.allObjectsByType<ivm::AADLObjectConnection>().toList();
 
     for (AADLObjectConnection *connection : allConnections) {
         QList<AADLConnectionChain *> newChains = AADLConnectionChain::build(connection, allConnections);
@@ -345,7 +345,7 @@ QList<AADLConnectionChain *> AADLConnectionChain::findNext(
 /*!
    Debug output of a chain - used for debugging
  */
-QDebug operator<<(QDebug debug, const aadl::AADLConnectionChain &chain)
+QDebug operator<<(QDebug debug, const ivm::AADLConnectionChain &chain)
 {
     QDebugStateSaver saver(debug);
     if (chain.connections().isEmpty()) {
@@ -355,7 +355,7 @@ QDebug operator<<(QDebug debug, const aadl::AADLConnectionChain &chain)
         QString out;
         out += QString("%1.%2").arg(
                 chain.connections().first()->sourceName(), chain.connections().first()->sourceInterfaceName());
-        for (aadl::AADLObjectConnection *c : chain.connections()) {
+        for (ivm::AADLObjectConnection *c : chain.connections()) {
             out += QString("->%1.%2").arg(c->targetName(), c->targetInterfaceName());
         }
         debug.nospace() << out;

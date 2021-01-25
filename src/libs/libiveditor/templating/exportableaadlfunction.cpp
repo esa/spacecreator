@@ -28,7 +28,7 @@
 
 namespace ive {
 
-ExportableAADLFunction::ExportableAADLFunction(const aadl::AADLObjectFunctionType *function)
+ExportableAADLFunction::ExportableAADLFunction(const ivm::AADLObjectFunctionType *function)
     : ExportableAADLObject(function)
 {
 }
@@ -36,7 +36,7 @@ ExportableAADLFunction::ExportableAADLFunction(const aadl::AADLObjectFunctionTyp
 QVariantList ExportableAADLFunction::interfaces() const
 {
     QVariantList ifaces;
-    for (const auto iface : exportedObject<aadl::AADLObjectFunctionType>()->interfaces())
+    for (const auto iface : exportedObject<ivm::AADLObjectFunctionType>()->interfaces())
         ifaces << createFrom(iface);
     return ifaces;
 }
@@ -44,7 +44,7 @@ QVariantList ExportableAADLFunction::interfaces() const
 QVariantList ExportableAADLFunction::functions() const
 {
     QVariantList functions;
-    const aadl::AADLObjectFunctionType *o = exportedObject<aadl::AADLObjectFunctionType>();
+    const ivm::AADLObjectFunctionType *o = exportedObject<ivm::AADLObjectFunctionType>();
     for (const auto function : o->functionTypes())
         functions << createFrom(function);
     for (const auto function : o->functions())
@@ -55,7 +55,7 @@ QVariantList ExportableAADLFunction::functions() const
 QVariantList ExportableAADLFunction::comments() const
 {
     QVariantList comments;
-    for (const auto comment : exportedObject<aadl::AADLObjectFunctionType>()->comments())
+    for (const auto comment : exportedObject<ivm::AADLObjectFunctionType>()->comments())
         comments << createFrom(comment);
     return comments;
 }
@@ -63,7 +63,7 @@ QVariantList ExportableAADLFunction::comments() const
 QVariantList ExportableAADLFunction::connections() const
 {
     QVariantList connections;
-    for (const auto connection : exportedObject<aadl::AADLObjectFunctionType>()->connections())
+    for (const auto connection : exportedObject<ivm::AADLObjectFunctionType>()->connections())
         connections << createFrom(connection);
     return connections;
 }
@@ -71,16 +71,16 @@ QVariantList ExportableAADLFunction::connections() const
 QVariantList ExportableAADLFunction::connectionGroups() const
 {
     QVariantList connectionGroups;
-    for (const auto connectionGroup : exportedObject<aadl::AADLObjectFunctionType>()->connectionGroups())
+    for (const auto connectionGroup : exportedObject<ivm::AADLObjectFunctionType>()->connectionGroups())
         connectionGroups << createFrom(connectionGroup);
     return connectionGroups;
 }
 
 QVariantList ExportableAADLFunction::connectedFunctions() const
 {
-    const auto aadlFunction = exportedObject<aadl::AADLObjectFunction>();
+    const auto aadlFunction = exportedObject<ivm::AADLObjectFunction>();
     QVariantList list;
-    for (auto chain : aadl::AADLInterfaceChain::linkedFunctions(aadlFunction)) {
+    for (auto chain : ivm::AADLInterfaceChain::linkedFunctions(aadlFunction)) {
         list << qVariantFromValue(chain);
     }
     return list;
@@ -89,7 +89,7 @@ QVariantList ExportableAADLFunction::connectedFunctions() const
 QVariantList ExportableAADLFunction::contextParameters() const
 {
     QVariantList parameters;
-    for (const aadl::ContextParameter &param : exportedObject<aadl::AADLObjectFunctionType>()->contextParams()) {
+    for (const ivm::ContextParameter &param : exportedObject<ivm::AADLObjectFunctionType>()->contextParams()) {
         parameters << qVariantFromValue(param);
     }
     return parameters;

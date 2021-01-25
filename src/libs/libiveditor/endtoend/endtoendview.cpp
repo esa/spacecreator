@@ -177,10 +177,10 @@ bool EndToEndView::refreshView()
     qDeleteAll(d->scene->items());
 
     // Get the visible non-nested objects
-    QList<aadl::AADLObject *> objects = d->document->objectsModel()->visibleObjects({});
-    aadl::AADLObject::sortObjectList(objects);
+    QList<ivm::AADLObject *> objects = d->document->objectsModel()->visibleObjects({});
+    ivm::AADLObject::sortObjectList(objects);
 
-    const QList<aadl::AADLConnectionChain *> chains = aadl::AADLConnectionChain::build(*d->document->objectsModel());
+    const QList<ivm::AADLConnectionChain *> chains = ivm::AADLConnectionChain::build(*d->document->objectsModel());
 
     msc::MscDocument *doc = nullptr;
     if (d->ui->leafDocsView->currentIndex().isValid()) {
@@ -202,9 +202,9 @@ bool EndToEndView::refreshView()
 
         InteractiveObject *item = nullptr;
         switch (obj->aadlType()) {
-        case aadl::AADLObject::Type::InterfaceGroup:
+        case ivm::AADLObject::Type::InterfaceGroup:
             if (parentItem) {
-                if (auto ifaceGroup = qobject_cast<aadl::AADLObjectIfaceGroup *>(obj)) {
+                if (auto ifaceGroup = qobject_cast<ivm::AADLObjectIfaceGroup *>(obj)) {
                     // Add the Interface
                     auto graphicsItem = new AADLInterfaceGroupGraphicsItem(ifaceGroup, parentItem);
                     item = graphicsItem;
@@ -213,9 +213,9 @@ bool EndToEndView::refreshView()
                         // Check if this is part of an internal connection
                         QStringList labels;
                         for (auto iface : ifaceGroup->entities()) {
-                            if (iface->direction() == aadl::AADLObjectIface::IfaceType::Required) {
+                            if (iface->direction() == ivm::AADLObjectIface::IfaceType::Required) {
                                 const QStringList labelsOriginal =
-                                        iface->as<aadl::AADLObjectIfaceRequired *>()->ifaceLabelList();
+                                        iface->as<ivm::AADLObjectIfaceRequired *>()->ifaceLabelList();
                                 for (const auto &label : labelsOriginal) {
                                     labels << label.trimmed().toLower();
                                 }
@@ -226,9 +226,9 @@ bool EndToEndView::refreshView()
                                         internalConnection.ri = graphicsItem;
                                     }
                                 }
-                            } else if (iface->direction() == aadl::AADLObjectIface::IfaceType::Provided) {
+                            } else if (iface->direction() == ivm::AADLObjectIface::IfaceType::Provided) {
                                 const QString interface =
-                                        iface->as<aadl::AADLObjectIfaceProvided *>()->ifaceLabel().trimmed().toLower();
+                                        iface->as<ivm::AADLObjectIfaceProvided *>()->ifaceLabel().trimmed().toLower();
                                 const QString title = function->title().trimmed().toLower();
                                 for (auto &internalConnection : internalConnections) {
                                     if (title == internalConnection.connection.instance
@@ -245,9 +245,9 @@ bool EndToEndView::refreshView()
                 }
             }
             break;
-        case aadl::AADLObject::Type::RequiredInterface:
+        case ivm::AADLObject::Type::RequiredInterface:
             if (parentItem && !obj->isGrouped()) {
-                if (auto reqIface = qobject_cast<aadl::AADLObjectIfaceRequired *>(obj)) {
+                if (auto reqIface = qobject_cast<ivm::AADLObjectIfaceRequired *>(obj)) {
                     // Add the RI
                     auto graphicsItem = new AADLInterfaceGraphicsItem(reqIface, parentItem);
                     interfaceItems.append(graphicsItem);
@@ -271,9 +271,9 @@ bool EndToEndView::refreshView()
                 }
             }
             break;
-        case aadl::AADLObject::Type::ProvidedInterface:
+        case ivm::AADLObject::Type::ProvidedInterface:
             if (parentItem && !obj->isGrouped()) {
-                if (auto provIface = qobject_cast<aadl::AADLObjectIfaceProvided *>(obj)) {
+                if (auto provIface = qobject_cast<ivm::AADLObjectIfaceProvided *>(obj)) {
                     // Add the PI
                     auto graphicsItem = new AADLInterfaceGraphicsItem(provIface, parentItem);
                     interfaceItems.append(graphicsItem);
@@ -294,13 +294,13 @@ bool EndToEndView::refreshView()
                 }
             }
             break;
-        case aadl::AADLObject::Type::ConnectionGroup:
-        case aadl::AADLObject::Type::Connection:
-            if (auto connection = qobject_cast<aadl::AADLObjectConnection *>(obj)) {
-                auto findGroupObject = [&](aadl::AADLObjectIface *iface) {
-                    auto it = std::find_if(objects.cbegin(), objects.cend(), [iface](aadl::AADLObject *obj) {
-                        if (obj->aadlType() == aadl::AADLObject::Type::InterfaceGroup) {
-                            for (auto entity : obj->as<aadl::AADLObjectIfaceGroup *>()->entities()) {
+        case ivm::AADLObject::Type::ConnectionGroup:
+        case ivm::AADLObject::Type::Connection:
+            if (auto connection = qobject_cast<ivm::AADLObjectConnection *>(obj)) {
+                auto findGroupObject = [&](ivm::AADLObjectIface *iface) {
+                    auto it = std::find_if(objects.cbegin(), objects.cend(), [iface](ivm::AADLObject *obj) {
+                        if (obj->aadlType() == ivm::AADLObject::Type::InterfaceGroup) {
+                            for (auto entity : obj->as<ivm::AADLObjectIfaceGroup *>()->entities()) {
                                 if (entity->id() == iface->id()) {
                                     return true;
                                 }
@@ -308,35 +308,35 @@ bool EndToEndView::refreshView()
                         }
                         return false;
                     });
-                    return it != objects.cend() ? (*it)->as<aadl::AADLObjectIfaceGroup *>() : nullptr;
+                    return it != objects.cend() ? (*it)->as<ivm::AADLObjectIfaceGroup *>() : nullptr;
                 };
 
-                aadl::AADLObjectIface *ifaceStart = connection->sourceInterface();
-                if (ifaceStart->isGrouped() && ifaceStart->aadlType() != aadl::AADLObject::Type::InterfaceGroup) {
+                ivm::AADLObjectIface *ifaceStart = connection->sourceInterface();
+                if (ifaceStart->isGrouped() && ifaceStart->aadlType() != ivm::AADLObject::Type::InterfaceGroup) {
                     ifaceStart = findGroupObject(ifaceStart);
                 }
                 auto startItem = qgraphicsitem_cast<AADLInterfaceGraphicsItem *>(
                         ifaceStart ? items.value(ifaceStart->id()) : nullptr);
 
-                aadl::AADLObjectIface *ifaceEnd = connection->targetInterface();
-                if (ifaceEnd->isGrouped() && ifaceEnd->aadlType() != aadl::AADLObject::Type::InterfaceGroup) {
+                ivm::AADLObjectIface *ifaceEnd = connection->targetInterface();
+                if (ifaceEnd->isGrouped() && ifaceEnd->aadlType() != ivm::AADLObject::Type::InterfaceGroup) {
                     ifaceEnd = findGroupObject(ifaceEnd);
                 }
                 auto endItem = qgraphicsitem_cast<AADLInterfaceGraphicsItem *>(
                         ifaceEnd ? items.value(ifaceEnd->id()) : nullptr);
 
-                if (connection->aadlType() == aadl::AADLObject::Type::ConnectionGroup) {
-                    const QList<QPointer<aadl::AADLObjectConnection>> groupedConnections =
-                            connection->as<aadl::AADLObjectConnectionGroup *>()->groupedConnections();
+                if (connection->aadlType() == ivm::AADLObject::Type::ConnectionGroup) {
+                    const QList<QPointer<ivm::AADLObjectConnection>> groupedConnections =
+                            connection->as<ivm::AADLObjectConnectionGroup *>()->groupedConnections();
                     if (std::any_of(groupedConnections.cbegin(), groupedConnections.cend(),
-                                [&](const QPointer<aadl::AADLObjectConnection> &groupedConnection) {
+                                [&](const QPointer<ivm::AADLObjectConnection> &groupedConnection) {
                                     return !groupedConnection.isNull()
                                             && EndToEndConnections::isInDataflow(dataflow, chains, groupedConnection);
                                 })) {
                         item = new AADLFlowConnectionGraphicsItem(connection, startItem, endItem, parentItem);
                         foundConnection = true;
                     } else {
-                        item = new AADLConnectionGroupGraphicsItem(connection->as<aadl::AADLObjectConnectionGroup *>(),
+                        item = new AADLConnectionGroupGraphicsItem(connection->as<ivm::AADLObjectConnectionGroup *>(),
                                 qgraphicsitem_cast<AADLInterfaceGroupGraphicsItem *>(startItem),
                                 qgraphicsitem_cast<AADLInterfaceGroupGraphicsItem *>(endItem), parentItem);
                     }
@@ -350,8 +350,8 @@ bool EndToEndView::refreshView()
                 }
             }
             break;
-        case aadl::AADLObject::Type::Function:
-            item = new AADLFunctionGraphicsItem(qobject_cast<aadl::AADLObjectFunction *>(obj), parentItem);
+        case ivm::AADLObject::Type::Function:
+            item = new AADLFunctionGraphicsItem(qobject_cast<ivm::AADLObjectFunction *>(obj), parentItem);
             break;
         default:
             break;

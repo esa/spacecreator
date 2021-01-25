@@ -28,30 +28,30 @@ namespace ive {
 namespace cmd {
 
 CmdConnectionGroupItemCreate::CmdConnectionGroupItemCreate(
-        const aadl::AADLObjectConnectionGroup::CreationInfo &creationInfo)
+        const ivm::AADLObjectConnectionGroup::CreationInfo &creationInfo)
     : CmdEntityGeometryChange({}, QObject::tr("Create Connection Group"))
     , m_groupName(creationInfo.name)
     , m_model(creationInfo.model)
-    , m_parent(qobject_cast<aadl::AADLObjectFunction *>(creationInfo.parentObject))
-    , m_sourceIfaceParent(qobject_cast<aadl::AADLObjectFunction *>(creationInfo.sourceObject))
-    , m_targetIfaceParent(qobject_cast<aadl::AADLObjectFunction *>(creationInfo.targetObject))
+    , m_parent(qobject_cast<ivm::AADLObjectFunction *>(creationInfo.parentObject))
+    , m_sourceIfaceParent(qobject_cast<ivm::AADLObjectFunction *>(creationInfo.sourceObject))
+    , m_targetIfaceParent(qobject_cast<ivm::AADLObjectFunction *>(creationInfo.targetObject))
 {
     Q_ASSERT(creationInfo.model);
     Q_ASSERT(creationInfo.sourceObject);
     Q_ASSERT(creationInfo.targetObject);
     Q_ASSERT(!creationInfo.connections.isEmpty());
 
-    aadl::AADLObjectIface::CreationInfo sourceInfo;
+    ivm::AADLObjectIface::CreationInfo sourceInfo;
     sourceInfo.model = m_model;
     sourceInfo.function = m_sourceIfaceParent;
-    m_sourceIface = new aadl::AADLObjectIfaceGroup(sourceInfo);
+    m_sourceIface = new ivm::AADLObjectIfaceGroup(sourceInfo);
 
-    aadl::AADLObjectIface::CreationInfo targetInfo;
+    ivm::AADLObjectIface::CreationInfo targetInfo;
     targetInfo.model = m_model;
     targetInfo.function = m_targetIfaceParent;
-    m_targetIface = new aadl::AADLObjectIfaceGroup(targetInfo);
+    m_targetIface = new ivm::AADLObjectIfaceGroup(targetInfo);
 
-    m_entity = new aadl::AADLObjectConnectionGroup(
+    m_entity = new ivm::AADLObjectConnectionGroup(
             creationInfo.name, m_sourceIface, m_targetIface, {}, creationInfo.parentObject);
     prepareData({ qMakePair(m_entity, creationInfo.points) });
 

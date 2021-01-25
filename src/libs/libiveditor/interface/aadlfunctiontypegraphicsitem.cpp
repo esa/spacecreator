@@ -47,7 +47,7 @@ static const qreal kBorderWidth = 2;
 
 namespace ive {
 
-AADLFunctionTypeGraphicsItem::AADLFunctionTypeGraphicsItem(aadl::AADLObjectFunctionType *entity, QGraphicsItem *parent)
+AADLFunctionTypeGraphicsItem::AADLFunctionTypeGraphicsItem(ivm::AADLObjectFunctionType *entity, QGraphicsItem *parent)
     : AADLRectGraphicsItem(entity, parent)
     , m_textItem(new AADLFunctionNameGraphicsItem(this))
 {
@@ -55,9 +55,9 @@ AADLFunctionTypeGraphicsItem::AADLFunctionTypeGraphicsItem(aadl::AADLObjectFunct
     setZValue(ZOrder.Function);
 }
 
-aadl::AADLObjectFunctionType *AADLFunctionTypeGraphicsItem::entity() const
+ivm::AADLObjectFunctionType *AADLFunctionTypeGraphicsItem::entity() const
 {
-    return qobject_cast<aadl::AADLObjectFunctionType *>(aadlObject());
+    return qobject_cast<ivm::AADLObjectFunctionType *>(aadlObject());
 }
 
 void AADLFunctionTypeGraphicsItem::init()
@@ -68,9 +68,9 @@ void AADLFunctionTypeGraphicsItem::init()
     m_textItem->setFont(font());
 
     connect(m_textItem, &shared::ui::TextItem::edited, this, &AADLFunctionTypeGraphicsItem::updateNameFromUi);
-    connect(entity(), qOverload<aadl::meta::Props::Token>(&aadl::AADLObjectFunction::attributeChanged), this,
-            [this](aadl::meta::Props::Token attr) {
-                if (attr == aadl::meta::Props::Token::name) {
+    connect(entity(), qOverload<ivm::meta::Props::Token>(&ivm::AADLObjectFunction::attributeChanged), this,
+            [this](ivm::meta::Props::Token attr) {
+                if (attr == ivm::meta::Props::Token::name) {
                     const QString txt = entity()->titleUI();
                     if (m_textItem->toPlainText() != txt) {
                         m_textItem->setPlainText(txt);
@@ -78,8 +78,8 @@ void AADLFunctionTypeGraphicsItem::init()
                     }
                 }
             });
-    connect(entity(), &aadl::AADLObjectFunction::titleChanged, this, [this](const QString &text) {
-        m_textItem->setPlainText(aadl::AADLNameValidator::decodeName(m_dataObject->aadlType(), text));
+    connect(entity(), &ivm::AADLObjectFunction::titleChanged, this, [this](const QString &text) {
+        m_textItem->setPlainText(ivm::AADLNameValidator::decodeName(m_dataObject->aadlType(), text));
         instantLayoutUpdate();
     });
     connect(m_textItem, &AADLFunctionNameGraphicsItem::textChanged, this, [this]() { updateTextPosition(); });
@@ -162,8 +162,8 @@ void AADLFunctionTypeGraphicsItem::updateNameFromUi(const QString &name)
         return;
     }
 
-    const QString newName = aadl::AADLNameValidator::encodeName(aadlObject()->aadlType(), name);
-    if (!aadl::AADLNameValidator::isAcceptableName(entity(), newName)) {
+    const QString newName = ivm::AADLNameValidator::encodeName(aadlObject()->aadlType(), name);
+    if (!ivm::AADLNameValidator::isAcceptableName(entity(), newName)) {
         m_textItem->setPlainText(entity()->titleUI());
         return;
     }
@@ -172,7 +172,7 @@ void AADLFunctionTypeGraphicsItem::updateNameFromUi(const QString &name)
         return;
     }
 
-    const QVariantMap attributess = { { aadl::meta::Props::token(aadl::meta::Props::Token::name), newName } };
+    const QVariantMap attributess = { { ivm::meta::Props::token(ivm::meta::Props::Token::name), newName } };
     if (const auto attributesCmd = cmd::CommandsFactory::create(
                 cmd::ChangeEntityAttributes, { QVariant::fromValue(entity()), QVariant::fromValue(attributess) })) {
         cmd::CommandsStack::push(attributesCmd);
@@ -191,7 +191,7 @@ void AADLFunctionTypeGraphicsItem::onManualResizeProgress(
     }
     for (auto child : childItems()) {
         if (auto iface = qgraphicsitem_cast<AADLInterfaceGraphicsItem *>(child)) {
-            const aadl::AADLObjectIface *obj = iface->entity();
+            const ivm::AADLObjectIface *obj = iface->entity();
             Q_ASSERT(obj);
             if (!obj) {
                 return;
@@ -213,10 +213,10 @@ void AADLFunctionTypeGraphicsItem::onManualResizeProgress(
 
 QString AADLFunctionTypeGraphicsItem::prepareTooltip() const
 {
-    const QString title = uniteNames<aadl::AADLObjectFunctionType *>({ entity() }, QString());
-    const QString instances = uniteNames<QPointer<aadl::AADLObjectFunction>>(entity()->instances(), tr("Instances: "));
-    const QString ris = uniteNames<aadl::AADLObjectIface *>(entity()->ris(), tr("RI: "));
-    const QString pis = uniteNames<aadl::AADLObjectIface *>(entity()->pis(), tr("PI: "));
+    const QString title = uniteNames<ivm::AADLObjectFunctionType *>({ entity() }, QString());
+    const QString instances = uniteNames<QPointer<ivm::AADLObjectFunction>>(entity()->instances(), tr("Instances: "));
+    const QString ris = uniteNames<ivm::AADLObjectIface *>(entity()->ris(), tr("RI: "));
+    const QString pis = uniteNames<ivm::AADLObjectIface *>(entity()->pis(), tr("PI: "));
 
     return joinNonEmpty({ title, instances, ris, pis }, QStringLiteral("<br>"));
 }

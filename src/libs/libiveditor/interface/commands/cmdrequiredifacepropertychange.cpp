@@ -25,16 +25,16 @@
 namespace ive {
 namespace cmd {
 
-QVariant getCurrentProperty(const aadl::AADLObjectIfaceRequired *entity, const QString &name)
+QVariant getCurrentProperty(const ivm::AADLObjectIfaceRequired *entity, const QString &name)
 {
     return (entity && !name.isEmpty()) ? entity->prop(name) : QVariant();
 }
 
 CmdRequiredIfacePropertyChange::CmdRequiredIfacePropertyChange(
-        aadl::AADLObjectIfaceRequired *entity, const QString &propName, const QVariant &value)
+        ivm::AADLObjectIfaceRequired *entity, const QString &propName, const QVariant &value)
     : CmdIfaceDataChangeBase(entity, propName, value, getCurrentProperty(entity, propName))
 {
-    if (m_targetToken == aadl::meta::Props::Token::InheritPI) {
+    if (m_targetToken == ivm::meta::Props::Token::InheritPI) {
         const bool lostInheritance = !m_newValue.toBool();
         if (lostInheritance) {
             m_relatedConnections = getRelatedConnections();
@@ -46,7 +46,7 @@ CmdRequiredIfacePropertyChange::CmdRequiredIfacePropertyChange(
 void CmdRequiredIfacePropertyChange::redo()
 {
     switch (m_targetToken) {
-    case aadl::meta::Props::Token::InheritPI: {
+    case ivm::meta::Props::Token::InheritPI: {
         setInheritPI(m_newValue.toBool());
         break;
     }
@@ -59,7 +59,7 @@ void CmdRequiredIfacePropertyChange::redo()
 void CmdRequiredIfacePropertyChange::undo()
 {
     switch (m_targetToken) {
-    case aadl::meta::Props::Token::InheritPI: {
+    case ivm::meta::Props::Token::InheritPI: {
         setInheritPI(m_oldValue.toBool());
         break;
     }
@@ -102,9 +102,9 @@ void CmdRequiredIfacePropertyChange::setInheritPI(bool nowInherited)
     }
 }
 
-bool CmdRequiredIfacePropertyChange::connectionMustDie(const aadl::AADLObjectConnection *connection) const
+bool CmdRequiredIfacePropertyChange::connectionMustDie(const ivm::AADLObjectConnection *connection) const
 {
-    const aadl::AADLObjectIface *otherIface = getConnectionOtherSide(connection, m_iface);
+    const ivm::AADLObjectIface *otherIface = getConnectionOtherSide(connection, m_iface);
     if (!otherIface) {
         Q_UNREACHABLE();
         return true;
@@ -114,15 +114,15 @@ bool CmdRequiredIfacePropertyChange::connectionMustDie(const aadl::AADLObjectCon
     if (!sameParams)
         return true;
 
-    const aadl::AADLObjectIface::OperationKind newKind = m_iface->kindFromString(
-            m_iface->originalAttr(aadl::meta::Props::token(aadl::meta::Props::Token::kind)).toString());
-    if (aadl::AADLObjectIface::OperationKind::Cyclic == newKind) {
+    const ivm::AADLObjectIface::OperationKind newKind = m_iface->kindFromString(
+            m_iface->originalAttr(ivm::meta::Props::token(ivm::meta::Props::Token::kind)).toString());
+    if (ivm::AADLObjectIface::OperationKind::Cyclic == newKind) {
         Q_UNREACHABLE(); // m_iface is a RI
         return true;
     }
 
-    if (aadl::AADLObjectIface::OperationKind::Any != newKind
-            && aadl::AADLObjectIface::OperationKind::Any != otherIface->kind()) {
+    if (ivm::AADLObjectIface::OperationKind::Any != newKind
+            && ivm::AADLObjectIface::OperationKind::Any != otherIface->kind()) {
         return otherIface->kind() == newKind;
     }
 

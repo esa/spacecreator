@@ -27,11 +27,11 @@ namespace ive {
 namespace cmd {
 
 CmdCommentItemCreate::CmdCommentItemCreate(
-        aadl::AADLObjectsModel *model, aadl::AADLObjectFunctionType *parent, const QRectF &geometry)
+        ivm::AADLObjectsModel *model, ivm::AADLObjectFunctionType *parent, const QRectF &geometry)
     : CmdEntityGeometryChange({}, QObject::tr("Create Comment"))
     , m_model(model)
     , m_parent(parent)
-    , m_entity(new aadl::AADLObjectComment(
+    , m_entity(new ivm::AADLObjectComment(
               QString(), m_parent ? qobject_cast<QObject *>(m_parent) : qobject_cast<QObject *>(m_model)))
 {
     prepareData({ qMakePair(m_entity, QVector<QPointF> { geometry.topLeft(), geometry.bottomRight() }) });

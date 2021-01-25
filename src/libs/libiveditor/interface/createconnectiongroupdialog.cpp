@@ -28,7 +28,7 @@
 namespace ive {
 
 CreateConnectionGroupDialog::CreateConnectionGroupDialog(
-        const QList<aadl::AADLObjectConnectionGroup::CreationInfo> &groupCreationDataList, QWidget *parent)
+        const QList<ivm::AADLObjectConnectionGroup::CreationInfo> &groupCreationDataList, QWidget *parent)
     : QDialog(parent)
     , m_info(groupCreationDataList)
     , m_signalMapper(new QSignalMapper(this))
@@ -39,18 +39,18 @@ CreateConnectionGroupDialog::CreateConnectionGroupDialog(
         }
     });
 
-    auto labelConnection = [](const QList<QPointer<aadl::AADLObjectConnection>> connections) -> QString {
+    auto labelConnection = [](const QList<QPointer<ivm::AADLObjectConnection>> connections) -> QString {
         QStringList result;
         for (const auto &connection : connections) {
             if (connection) {
                 const QString sourceName =
-                        aadl::AADLNameValidator::decodeName(aadl::AADLObject::Type::Function, connection->sourceName());
-                const QString sourceInterfaceName = aadl::AADLNameValidator::decodeName(
-                        aadl::AADLObject::Type::RequiredInterface, connection->sourceInterfaceName());
+                        ivm::AADLNameValidator::decodeName(ivm::AADLObject::Type::Function, connection->sourceName());
+                const QString sourceInterfaceName = ivm::AADLNameValidator::decodeName(
+                        ivm::AADLObject::Type::RequiredInterface, connection->sourceInterfaceName());
                 const QString targetName =
-                        aadl::AADLNameValidator::decodeName(aadl::AADLObject::Type::Function, connection->targetName());
-                const QString targetInterfaceName = aadl::AADLNameValidator::decodeName(
-                        aadl::AADLObject::Type::ProvidedInterface, connection->targetInterfaceName());
+                        ivm::AADLNameValidator::decodeName(ivm::AADLObject::Type::Function, connection->targetName());
+                const QString targetInterfaceName = ivm::AADLNameValidator::decodeName(
+                        ivm::AADLObject::Type::ProvidedInterface, connection->targetInterfaceName());
                 result.append(QStringLiteral("%1.%2 <-> %3.%4")
                                       .arg(sourceName, sourceInterfaceName, targetName, targetInterfaceName));
             }
@@ -60,7 +60,7 @@ CreateConnectionGroupDialog::CreateConnectionGroupDialog(
 
     auto formLayout = new QFormLayout;
     for (int idx = 0; idx < groupCreationDataList.size(); ++idx) {
-        const aadl::AADLObjectConnectionGroup::CreationInfo &info = groupCreationDataList.value(idx);
+        const ivm::AADLObjectConnectionGroup::CreationInfo &info = groupCreationDataList.value(idx);
         auto textEdit = new QPlainTextEdit(this);
         connect(textEdit, &QPlainTextEdit::textChanged, m_signalMapper, qOverload<>(&QSignalMapper::map));
         m_signalMapper->setMapping(textEdit, idx);
@@ -79,7 +79,7 @@ CreateConnectionGroupDialog::CreateConnectionGroupDialog(
 
 CreateConnectionGroupDialog::~CreateConnectionGroupDialog() { }
 
-QList<aadl::AADLObjectConnectionGroup::CreationInfo> CreateConnectionGroupDialog::info() const
+QList<ivm::AADLObjectConnectionGroup::CreationInfo> CreateConnectionGroupDialog::info() const
 {
     return m_info;
 }

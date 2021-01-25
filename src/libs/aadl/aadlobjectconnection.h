@@ -23,7 +23,7 @@
 #include <QObject>
 #include <memory>
 
-namespace aadl {
+namespace ivm {
 
 struct AADLObjectConnectionPrivate;
 class AADLObjectConnection : public AADLObject
@@ -118,4 +118,4 @@ private:
 
 }
 
-QDebug operator<<(QDebug debug, const aadl::AADLObjectConnection &connection);
+QDebug operator<<(QDebug debug, const ivm::AADLObjectConnection &connection);

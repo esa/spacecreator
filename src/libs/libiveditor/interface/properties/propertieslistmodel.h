@@ -24,7 +24,7 @@
 
 #include <QVector>
 
-namespace aadl {
+namespace ivm {
 class AADLObject;
 class PropertyTemplateConfig;
 }
@@ -43,7 +43,7 @@ public:
     static const int ColumnValue { 1 };
 
     explicit PropertiesListModel(
-            cmd::CommandsStack::Macro *macro, aadl::PropertyTemplateConfig *dynPropConfig, QObject *parent = nullptr);
+            cmd::CommandsStack::Macro *macro, ivm::PropertyTemplateConfig *dynPropConfig, QObject *parent = nullptr);
     ~PropertiesListModel() override;
 
     int rowCount(const QModelIndex &parent = QModelIndex()) const override;
@@ -54,8 +54,8 @@ public:
     // Editable:
     bool setData(const QModelIndex &index, const QVariant &value, int role = Qt::EditRole) override;
 
-    void setDataObject(aadl::AADLObject *obj);
-    const aadl::AADLObject *dataObject() const override;
+    void setDataObject(ivm::AADLObject *obj);
+    const ivm::AADLObject *dataObject() const override;
 
     Qt::ItemFlags flags(const QModelIndex &index) const override;
 
@@ -67,12 +67,12 @@ public:
 
 protected:
     cmd::CommandsStack::Macro *m_cmdMacro { nullptr };
-    aadl::PropertyTemplateConfig *m_propTamplesConfig { nullptr };
-    aadl::AADLObject *m_dataObject { nullptr };
+    ivm::PropertyTemplateConfig *m_propTamplesConfig { nullptr };
+    ivm::AADLObject *m_dataObject { nullptr };
     QVector<QString> m_names;
 
     virtual bool isEditable(const QModelIndex &idx) const;
-    void createNewRow(int row, const QString &label, const QString &name, aadl::PropertyTemplate::Info info,
+    void createNewRow(int row, const QString &label, const QString &name, ivm::PropertyTemplate::Info info,
             const QVariant &value, const QVariant &editValue, const QVariant &defaulValue);
 
     void invalidateProperties(const QString &propName);
@@ -83,7 +83,7 @@ class FunctionPropertiesListModel : public PropertiesListModel
 {
 public:
     explicit FunctionPropertiesListModel(
-            cmd::CommandsStack::Macro *macro, aadl::PropertyTemplateConfig *dynPropConfig, QObject *parent = nullptr);
+            cmd::CommandsStack::Macro *macro, ivm::PropertyTemplateConfig *dynPropConfig, QObject *parent = nullptr);
 
 protected:
     bool isEditable(const QModelIndex &index) const override;
@@ -93,7 +93,7 @@ class InterfacePropertiesListModel : public PropertiesListModel
 {
 public:
     explicit InterfacePropertiesListModel(
-            cmd::CommandsStack::Macro *macro, aadl::PropertyTemplateConfig *dynPropConfig, QObject *parent = nullptr);
+            cmd::CommandsStack::Macro *macro, ivm::PropertyTemplateConfig *dynPropConfig, QObject *parent = nullptr);
 
     QVariant data(const QModelIndex &index, int role) const override;
 

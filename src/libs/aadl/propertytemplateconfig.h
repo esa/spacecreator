@@ -20,7 +20,7 @@
 #include <QVector>
 #include <memory>
 
-namespace aadl {
+namespace ivm {
 class AADLObject;
 class PropertyTemplate;
 
@@ -32,7 +32,7 @@ public:
 
     void init(const QString &configPath);
 
-    QHash<QString, PropertyTemplate *> propertyTemplatesForObject(const aadl::AADLObject *obj);
+    QHash<QString, PropertyTemplate *> propertyTemplatesForObject(const ivm::AADLObject *obj);
     QList<PropertyTemplate *> attributesForFunction();
     QList<PropertyTemplate *> attributesForRequiredInterface();
     QList<PropertyTemplate *> attributesForProvidedInterface();
@@ -51,4 +51,4 @@ private:
     std::unique_ptr<PropertyTemplateConfigPrivate> d;
 };
 
-} // namespace aadl
+} // namespace ivm

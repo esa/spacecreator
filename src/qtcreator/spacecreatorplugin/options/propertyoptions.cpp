@@ -35,7 +35,7 @@ PropertyOptions::PropertyOptions()
 QWidget *PropertyOptions::widget()
 {
     if (!m_widget) {
-        auto config = aadl::PropertyTemplateConfig::instance();
+        auto config = ivm::PropertyTemplateConfig::instance();
         config->init(ive::PropertyTemplateWidget::dynamicPropertiesFilePath());
         m_widget = new ive::PropertyTemplateWidget;
     }
@@ -45,7 +45,7 @@ QWidget *PropertyOptions::widget()
 void PropertyOptions::apply()
 {
     m_widget->save();
-    auto config = aadl::PropertyTemplateConfig::instance();
+    auto config = ivm::PropertyTemplateConfig::instance();
     config->init(ive::PropertyTemplateWidget::dynamicPropertiesFilePath());
 }
 

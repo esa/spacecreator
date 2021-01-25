@@ -25,7 +25,7 @@
 namespace ive {
 namespace cmd {
 
-CmdEntityPropertyRename::CmdEntityPropertyRename(aadl::AADLObject *entity, const QHash<QString, QString> &props)
+CmdEntityPropertyRename::CmdEntityPropertyRename(ivm::AADLObject *entity, const QHash<QString, QString> &props)
     : QUndoCommand()
     , m_entity(entity)
     , m_newProps(props)

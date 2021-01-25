@@ -4,7 +4,7 @@
 
 #include <QString>
 
-namespace aadl {
+namespace ivm {
 class AADLObjectConnection;
 class AADLObjectFunctionType;
 

@@ -24,7 +24,7 @@
 class QUndoCommand;
 class QUndoStack;
 
-namespace aadl {
+namespace ivm {
 class AADLObject;
 }
 
@@ -42,8 +42,8 @@ public:
     static bool push(QUndoCommand *command);
 
 Q_SIGNALS:
-    void nameChanged(aadl::AADLObject *entity, const QString &oldName, shared::UndoCommand *command);
-    void entityRemoved(aadl::AADLObject *entity, shared::UndoCommand *command);
+    void nameChanged(ivm::AADLObject *entity, const QString &oldName, shared::UndoCommand *command);
+    void entityRemoved(ivm::AADLObject *entity, shared::UndoCommand *command);
 };
 
 }

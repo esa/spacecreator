@@ -30,7 +30,7 @@
 #include <QVector>
 #include <memory>
 
-namespace aadl {
+namespace ivm {
 
 class AADLObjectFunction;
 class AADLObjectFunctionType;
@@ -137,8 +137,8 @@ Q_SIGNALS:
     void paramsChanged();
 
 protected Q_SLOTS:
-    void onReflectedAttrChanged(aadl::meta::Props::Token attr);
-    void onReflectedPropChanged(aadl::meta::Props::Token prop);
+    void onReflectedAttrChanged(ivm::meta::Props::Token attr);
+    void onReflectedPropChanged(ivm::meta::Props::Token prop);
     void onReflectedParamsChanged();
 
 protected:
@@ -235,5 +235,5 @@ typedef QVector<AADLObjectIface *> AADLIfacesVector;
 
 }
 
-Q_DECLARE_METATYPE(aadl::AADLObjectIface::IfaceType);
-Q_DECLARE_METATYPE(aadl::AADLObjectIface::CreationInfo);
+Q_DECLARE_METATYPE(ivm::AADLObjectIface::IfaceType);
+Q_DECLARE_METATYPE(ivm::AADLObjectIface::CreationInfo);

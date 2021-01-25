@@ -45,8 +45,8 @@ private Q_SLOTS:
 private:
     QHash<Qt::Alignment, QPainterPath> sidePaths;
     QGraphicsScene *scene = nullptr;
-    aadl::AADLObjectFunction *function = nullptr;
-    aadl::AADLObjectIfaceProvided *iface = nullptr;
+    ivm::AADLObjectFunction *function = nullptr;
+    ivm::AADLObjectIfaceProvided *iface = nullptr;
     ive::AADLFunctionGraphicsItem *functionItem = nullptr;
     ive::AADLInterfaceGraphicsItem *ifaceItem = nullptr;
 };
@@ -85,13 +85,13 @@ void tst_PositionLookupHelper::testOnSide(
 void tst_PositionLookupHelper::initTestCase()
 {
     scene = new QGraphicsScene;
-    function = new aadl::AADLObjectFunction("Function");
+    function = new ivm::AADLObjectFunction("Function");
     functionItem = new ive::AADLFunctionGraphicsItem(function);
     scene->addItem(functionItem);
     functionItem->setBoundingRect(QRectF(0, 0, 500, 500));
-    aadl::AADLObjectIface::CreationInfo ci;
+    ivm::AADLObjectIface::CreationInfo ci;
     ci.name = "PI";
-    iface = new aadl::AADLObjectIfaceProvided(ci);
+    iface = new ivm::AADLObjectIfaceProvided(ci);
     ifaceItem = new ive::AADLInterfaceGraphicsItem(iface, functionItem);
     ifaceItem->updateLabel();
 

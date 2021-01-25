@@ -20,7 +20,7 @@
 #include <QPointer>
 #include <QUndoCommand>
 
-namespace aadl {
+namespace ivm {
 class AADLObject;
 }
 
@@ -30,7 +30,7 @@ namespace cmd {
 class CmdEntityPropertyRemove : public QUndoCommand
 {
 public:
-    explicit CmdEntityPropertyRemove(aadl::AADLObject *entity, const QStringList &props);
+    explicit CmdEntityPropertyRemove(ivm::AADLObject *entity, const QStringList &props);
 
     void redo() override;
     void undo() override;
@@ -38,7 +38,7 @@ public:
     int id() const override;
 
 private:
-    QPointer<aadl::AADLObject> m_entity;
+    QPointer<ivm::AADLObject> m_entity;
     QStringList m_names;
     QVariantHash m_props;
 };

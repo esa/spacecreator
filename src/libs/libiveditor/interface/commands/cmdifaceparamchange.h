@@ -21,7 +21,7 @@
 
 #include <aadlparameter.h>
 
-namespace aadl {
+namespace ivm {
 class AADLObject;
 }
 
@@ -32,17 +32,17 @@ class CmdIfaceParamChange : public CmdIfaceParamBase
 {
 public:
     explicit CmdIfaceParamChange(
-            aadl::AADLObject *entity, const aadl::IfaceParameter &from, const aadl::IfaceParameter &to);
+            ivm::AADLObject *entity, const ivm::IfaceParameter &from, const ivm::IfaceParameter &to);
 
     void redo() override;
     void undo() override;
     int id() const override;
 
 protected:
-    aadl::IfaceParameter m_newParam;
-    aadl::IfaceParameter m_oldParam;
+    ivm::IfaceParameter m_newParam;
+    ivm::IfaceParameter m_oldParam;
 
-    void swapParam(const aadl::IfaceParameter &from, const aadl::IfaceParameter &to);
+    void swapParam(const ivm::IfaceParameter &from, const ivm::IfaceParameter &to);
 };
 
 }

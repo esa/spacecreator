@@ -23,7 +23,7 @@
 
 #include <QVector>
 
-namespace aadl {
+namespace ivm {
 class AADLObjectConnection;
 class AADLObjectFunction;
 }
@@ -57,9 +57,9 @@ public:
     QAction *actionExportType();
     QAction *actionToggleE2EView();
 
-    aadl::AADLObjectFunction *addFunction(const QString &name, aadl::AADLObjectFunction *parent = nullptr);
+    ivm::AADLObjectFunction *addFunction(const QString &name, ivm::AADLObjectFunction *parent = nullptr);
     bool addConnection(QString name, const QString &fromInstanceName, const QString &toInstanceName);
-    aadl::AADLObjectIface *addInterface(QString name, const QString &functionName);
+    ivm::AADLObjectIface *addInterface(QString name, const QString &functionName);
 
     bool renameAadlFunction(const QString &oldName, const QString &newName);
     bool renameAadlConnection(const QString &oldName, const QString &newName, const QString &fromInstanceName,
@@ -74,8 +74,8 @@ public:
     QString filePath() const override;
     bool save() override;
 
-    QVector<aadl::AADLObjectFunction *> allAadlFunctions() const;
-    QVector<aadl::AADLObjectConnection *> allAadlConnections() const;
+    QVector<ivm::AADLObjectFunction *> allAadlFunctions() const;
+    QVector<ivm::AADLObjectConnection *> allAadlConnections() const;
 
     QStringList aadlFunctionsNames() const;
     QStringList aadlConnectionNames() const;
@@ -85,8 +85,8 @@ public Q_SLOTS:
 
 private:
     void saveSceneRender(const QString &filePath) const;
-    aadl::AADLObjectIface *getInterface(
-            const QString &ifName, aadl::AADLObjectIface::IfaceType ifType, aadl::AADLObjectFunction *parentFunction);
+    ivm::AADLObjectIface *getInterface(
+            const QString &ifName, ivm::AADLObjectIface::IfaceType ifType, ivm::AADLObjectFunction *parentFunction);
     Q_SLOT void updateAadlItems();
 
     ive::InterfaceDocument *m_document { nullptr };
@@ -97,8 +97,8 @@ private:
     QAction *m_actionExportType { nullptr };
     QAction *m_actionToggleE2EView { nullptr };
 
-    QVector<aadl::AADLObjectFunction *> m_aadlFunctions;
-    QVector<aadl::AADLObjectConnection *> m_aadlConnections;
+    QVector<ivm::AADLObjectFunction *> m_aadlFunctions;
+    QVector<ivm::AADLObjectConnection *> m_aadlConnections;
 
     Qt::CaseSensitivity m_caseCheck = Qt::CaseInsensitive;
 };

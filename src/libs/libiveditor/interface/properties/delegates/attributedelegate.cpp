@@ -56,8 +56,8 @@ static QWidget *createConfiguredEditor(
     }
     case QVariant::String: {
         auto editor = new QLineEdit(parent);
-        if (attribute == aadl::meta::Props::token(aadl::meta::Props::Token::name)) {
-            QRegularExpression re(aadl::AADLNameValidator::namePatternUI());
+        if (attribute == ivm::meta::Props::token(ivm::meta::Props::Token::name)) {
+            QRegularExpression re(ivm::AADLNameValidator::namePatternUI());
             editor->setValidator(new QRegularExpressionValidator(re, editor));
         }
         editor->setText(displayValue.toString());

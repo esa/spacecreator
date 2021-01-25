@@ -23,7 +23,7 @@
 
 #include <QPointer>
 
-namespace aadl {
+namespace ivm {
 class AADLObject;
 class AADLObjectFunction;
 class AADLObjectFunctionType;
@@ -37,7 +37,7 @@ class CmdEntityAttributeChange : public shared::UndoCommand
     Q_OBJECT
 
 public:
-    explicit CmdEntityAttributeChange(aadl::AADLObject *entity, const QVariantHash &attrs);
+    explicit CmdEntityAttributeChange(ivm::AADLObject *entity, const QVariantHash &attrs);
     ~CmdEntityAttributeChange() override;
 
     void redo() override;
@@ -45,11 +45,11 @@ public:
     int id() const override;
 
 Q_SIGNALS:
-    void nameChanged(aadl::AADLObject *entity, const QString &oldName, shared::UndoCommand *command);
+    void nameChanged(ivm::AADLObject *entity, const QString &oldName, shared::UndoCommand *command);
 
 private:
-    QPointer<aadl::AADLObject> m_entity;
-    aadl::AADLObjectFunction *m_function { nullptr };
+    QPointer<ivm::AADLObject> m_entity;
+    ivm::AADLObjectFunction *m_function { nullptr };
 
     const QVariantHash m_newAttrs;
     const QVariantHash m_oldAttrs;
@@ -58,14 +58,14 @@ private:
     QHash<shared::Id, QVector<QUndoCommand *>> m_cmdUnset;
 
     void setAttrs(const QVariantHash &attrs, bool isRedo);
-    aadl::AADLObjectFunctionType *functionTypeByName(const QString &name) const;
+    ivm::AADLObjectFunctionType *functionTypeByName(const QString &name) const;
     void handleFunctionInstanceOf(const QVariant &attr, bool isRedo);
 
-    QVector<QUndoCommand *> commandsUnsetPrevFunctionType(const aadl::AADLObjectFunctionType *fnType);
-    QVector<QUndoCommand *> commandsSetNewFunctionType(const aadl::AADLObjectFunctionType *fnType);
+    QVector<QUndoCommand *> commandsUnsetPrevFunctionType(const ivm::AADLObjectFunctionType *fnType);
+    QVector<QUndoCommand *> commandsSetNewFunctionType(const ivm::AADLObjectFunctionType *fnType);
 
-    void prepareUnsetFunctionTypeCommands(const aadl::AADLObjectFunctionType *fnType);
-    void prepareSetFunctionTypeCommands(const aadl::AADLObjectFunctionType *fnType);
+    void prepareUnsetFunctionTypeCommands(const ivm::AADLObjectFunctionType *fnType);
+    void prepareSetFunctionTypeCommands(const ivm::AADLObjectFunctionType *fnType);
 };
 
 }

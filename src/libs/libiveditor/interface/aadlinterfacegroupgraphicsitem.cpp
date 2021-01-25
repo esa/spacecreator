@@ -23,7 +23,7 @@
 namespace ive {
 
 AADLInterfaceGroupGraphicsItem::AADLInterfaceGroupGraphicsItem(
-        aadl::AADLObjectIfaceGroup *entity, QGraphicsItem *parent)
+        ivm::AADLObjectIfaceGroup *entity, QGraphicsItem *parent)
     : AADLInterfaceGraphicsItem(entity, parent)
 {
 }
@@ -33,14 +33,14 @@ ColorManager::HandledColors AADLInterfaceGroupGraphicsItem::handledColorType() c
     return ColorManager::HandledColors::IfaceGroup;
 }
 
-aadl::AADLObjectIfaceGroup *AADLInterfaceGroupGraphicsItem::entity() const
+ivm::AADLObjectIfaceGroup *AADLInterfaceGroupGraphicsItem::entity() const
 {
-    return qobject_cast<aadl::AADLObjectIfaceGroup *>(aadlObject());
+    return qobject_cast<ivm::AADLObjectIfaceGroup *>(aadlObject());
 }
 
 QPainterPath AADLInterfaceGroupGraphicsItem::typePath() const
 {
-    auto iface = qobject_cast<aadl::AADLObjectIface *>(entity());
+    auto iface = qobject_cast<ivm::AADLObjectIface *>(entity());
     if (!iface)
         return {};
 

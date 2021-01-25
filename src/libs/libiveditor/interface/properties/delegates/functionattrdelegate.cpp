@@ -40,13 +40,13 @@ QWidget *FunctionAttrDelegate::createEditor(
             if (pModel->isAttr(index)) {
                 const QString &attrName =
                         pModel->data(pModel->index(PropertiesListModel::ColumnTitle, index.row())).toString();
-                const aadl::meta::Props::Token t = aadl::meta::Props::token(attrName);
+                const ivm::meta::Props::Token t = ivm::meta::Props::token(attrName);
 
-                auto objFn = qobject_cast<const aadl::AADLObjectFunction *>(pModel->dataObject());
+                auto objFn = qobject_cast<const ivm::AADLObjectFunction *>(pModel->dataObject());
                 Q_ASSERT(objFn);
 
                 switch (t) {
-                case aadl::meta::Props::Token::instance_of: {
+                case ivm::meta::Props::Token::instance_of: {
                     const QStringList &availableFnTypes = (QStringList() << QString())
                             + objFn->objectsModel()->getAvailableFunctionTypes(objFn).keys();
                     QComboBox *cb = new QComboBox(parent);

@@ -26,7 +26,7 @@
 #include <QDebug>
 #include <QMetaEnum>
 
-namespace aadl {
+namespace ivm {
 
 AADLObjectIface::CreationInfo::CreationInfo(AADLObjectsModel *model, AADLObjectFunctionType *function,
         const QPointF &position, AADLObjectIface::IfaceType type, const shared::Id &id,
@@ -155,7 +155,7 @@ QMap<AADLObjectIface::OperationKind, QString> AADLObjectIface::availableKindName
 {
     QMap<AADLObjectIface::OperationKind, QString> result;
     if (result.isEmpty()) {
-        const QMetaEnum &me = QMetaEnum::fromType<aadl::AADLObjectIface::OperationKind>();
+        const QMetaEnum &me = QMetaEnum::fromType<ivm::AADLObjectIface::OperationKind>();
         for (int i = 0; i < me.keyCount(); ++i) {
             const AADLObjectIface::OperationKind k = static_cast<AADLObjectIface::OperationKind>(me.value(i));
             if ((isProvided() && k == OperationKind::Any) || (isRequired() && k == OperationKind::Cyclic)) {
@@ -169,14 +169,14 @@ QMap<AADLObjectIface::OperationKind, QString> AADLObjectIface::availableKindName
 
 QString AADLObjectIface::kindToString(AADLObjectIface::OperationKind k)
 {
-    const QMetaEnum &me = QMetaEnum::fromType<aadl::AADLObjectIface::OperationKind>();
+    const QMetaEnum &me = QMetaEnum::fromType<ivm::AADLObjectIface::OperationKind>();
     return QString::fromLatin1(me.valueToKey(static_cast<int>(k)));
 }
 
 AADLObjectIface::OperationKind AADLObjectIface::kindFromString(
         const QString &k, AADLObjectIface::OperationKind defaultKind)
 {
-    const QMetaEnum &me = QMetaEnum::fromType<aadl::AADLObjectIface::OperationKind>();
+    const QMetaEnum &me = QMetaEnum::fromType<ivm::AADLObjectIface::OperationKind>();
     bool ok = false;
     const auto kind = static_cast<AADLObjectIface::OperationKind>(me.keyToValue(k.toLatin1().data(), &ok));
     return ok ? kind : defaultKind;
@@ -358,9 +358,9 @@ void AADLObjectIface::cloneInternals(const AADLObjectIface *from)
     if (storedKindDiffers())
         Q_EMIT attributeChanged(meta::Props::Token::kind);
 
-    connect(from, qOverload<aadl::meta::Props::Token>(&AADLObjectIface::attributeChanged), this,
+    connect(from, qOverload<ivm::meta::Props::Token>(&AADLObjectIface::attributeChanged), this,
             &AADLObjectIface::onReflectedAttrChanged, Qt::UniqueConnection);
-    connect(from, qOverload<aadl::meta::Props::Token>(&AADLObjectIface::propertyChanged), this,
+    connect(from, qOverload<ivm::meta::Props::Token>(&AADLObjectIface::propertyChanged), this,
             &AADLObjectIface::onReflectedPropChanged, Qt::UniqueConnection);
     connect(from, &AADLObjectIface::paramsChanged, this, &AADLObjectIface::onReflectedParamsChanged,
             Qt::UniqueConnection);
@@ -368,9 +368,9 @@ void AADLObjectIface::cloneInternals(const AADLObjectIface *from)
 
 void AADLObjectIface::restoreInternals(const AADLObjectIface *disconnectMe)
 {
-    disconnect(disconnectMe, qOverload<aadl::meta::Props::Token>(&AADLObjectIface::attributeChanged), this,
+    disconnect(disconnectMe, qOverload<ivm::meta::Props::Token>(&AADLObjectIface::attributeChanged), this,
             &AADLObjectIface::onReflectedAttrChanged);
-    disconnect(disconnectMe, qOverload<aadl::meta::Props::Token>(&AADLObjectIface::propertyChanged), this,
+    disconnect(disconnectMe, qOverload<ivm::meta::Props::Token>(&AADLObjectIface::propertyChanged), this,
             &AADLObjectIface::onReflectedPropChanged);
     disconnect(disconnectMe, &AADLObjectIface::paramsChanged, this, &AADLObjectIface::onReflectedParamsChanged);
 
@@ -416,13 +416,13 @@ QVector<IfaceParameter> AADLObjectIface::originalParams() const
     return m_originalFields.params;
 }
 
-void AADLObjectIface::onReflectedAttrChanged(aadl::meta::Props::Token /*attr*/)
+void AADLObjectIface::onReflectedAttrChanged(ivm::meta::Props::Token /*attr*/)
 {
     if (AADLObjectIface *iface = qobject_cast<AADLObjectIface *>(sender()))
         reflectAttrs(iface);
 }
 
-void AADLObjectIface::onReflectedPropChanged(aadl::meta::Props::Token /*prop*/)
+void AADLObjectIface::onReflectedPropChanged(ivm::meta::Props::Token /*prop*/)
 {
     if (AADLObjectIface *iface = qobject_cast<AADLObjectIface *>(sender()))
         reflectProps(iface);

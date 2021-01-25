@@ -22,7 +22,7 @@
 #include <QPointer>
 #include <QUndoCommand>
 
-namespace aadl {
+namespace ivm {
 class AADLObject;
 }
 
@@ -32,7 +32,7 @@ namespace cmd {
 class CmdEntityPropertyCreate : public QUndoCommand
 {
 public:
-    explicit CmdEntityPropertyCreate(aadl::AADLObject *entity, const QVariantHash &props);
+    explicit CmdEntityPropertyCreate(ivm::AADLObject *entity, const QVariantHash &props);
 
     void redo() override;
     void undo() override;
@@ -40,7 +40,7 @@ public:
     int id() const override;
 
 private:
-    QPointer<aadl::AADLObject> m_entity;
+    QPointer<ivm::AADLObject> m_entity;
     QVariantHash m_newProps;
     const QVariantHash m_oldProps;
 };

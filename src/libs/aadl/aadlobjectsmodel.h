@@ -24,7 +24,7 @@
 #include <QVector>
 #include <memory>
 
-namespace aadl {
+namespace ivm {
 
 class AADLObjectComment;
 class AADLObjectConnection;
@@ -89,7 +89,7 @@ public:
     QVector<T *> allObjectsByType() const
     {
         QVector<T *> result;
-        const QHash<shared::Id, aadl::AADLObject *> &aadlObjects = objects();
+        const QHash<shared::Id, ivm::AADLObject *> &aadlObjects = objects();
         for (auto obj : aadlObjects) {
             if (auto func = dynamic_cast<T *>(obj)) {
                 result.append(func);
@@ -102,14 +102,14 @@ private:
     bool addObjectImpl(AADLObject *obj);
 
 Q_SIGNALS:
-    void aadlObjectsAdded(const QVector<aadl::AADLObject *> &object);
-    void aadlObjectRemoved(aadl::AADLObject *object);
+    void aadlObjectsAdded(const QVector<ivm::AADLObject *> &object);
+    void aadlObjectRemoved(ivm::AADLObject *object);
     void rootObjectChanged(shared::Id rootId);
     void modelReset();
 
 public Q_SLOTS:
-    bool initFromObjects(const QVector<aadl::AADLObject *> &visibleObjects);
-    bool addObjects(const QVector<aadl::AADLObject *> &objects);
+    bool initFromObjects(const QVector<ivm::AADLObject *> &visibleObjects);
+    bool addObjects(const QVector<ivm::AADLObject *> &objects);
 
 private:
     const std::unique_ptr<AADLObjectsModelPrivate> d;

@@ -43,7 +43,7 @@ static QStringList asn1Names(const QSharedPointer<Asn1Acn::File> &dataTypes)
 
 static QStringList contextParamsNames(const QSharedPointer<Asn1Acn::File> &dataTypes)
 {
-    QStringList names = { aadl::BasicParameter::typeName(aadl::BasicParameter::Type::Timer) };
+    QStringList names = { ivm::BasicParameter::typeName(ivm::BasicParameter::Type::Timer) };
     names.append(asn1Names(dataTypes));
     return names;
 }

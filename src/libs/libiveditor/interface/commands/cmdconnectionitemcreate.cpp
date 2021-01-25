@@ -30,7 +30,7 @@
 namespace ive {
 namespace cmd {
 
-CmdConnectionItemCreate::CmdConnectionItemCreate(aadl::AADLObjectsModel *model, aadl::AADLObjectFunction *parent,
+CmdConnectionItemCreate::CmdConnectionItemCreate(ivm::AADLObjectsModel *model, ivm::AADLObjectFunction *parent,
         const shared::Id sourceIfaceId, const shared::Id &targetIfaceId, const QVector<QPointF> &points)
     : CmdEntityGeometryChange({}, QObject::tr("Create Connection"))
     , m_model(model)
@@ -40,9 +40,9 @@ CmdConnectionItemCreate::CmdConnectionItemCreate(aadl::AADLObjectsModel *model, 
     Q_ASSERT(!sourceIfaceId.isNull());
     Q_ASSERT(!targetIfaceId.isNull());
 
-    aadl::AADLObjectIface *sourceIface = m_model->getInterface(sourceIfaceId);
-    aadl::AADLObjectIface *targetIface = m_model->getInterface(targetIfaceId);
-    m_entity = new aadl::AADLObjectConnection(sourceIface, targetIface, parent);
+    ivm::AADLObjectIface *sourceIface = m_model->getInterface(sourceIfaceId);
+    ivm::AADLObjectIface *targetIface = m_model->getInterface(targetIfaceId);
+    m_entity = new ivm::AADLObjectConnection(sourceIface, targetIface, parent);
     prepareData({ qMakePair(m_entity, points) });
 }
 

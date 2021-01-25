@@ -21,7 +21,7 @@
 
 namespace taste3 {
 
-namespace aadl {
+namespace ivm{
 class AADLObjectFunctionType;
 }
 
@@ -39,7 +39,7 @@ class ExportedAADLFunction : public ExportedAADLObject
     Q_PROPERTY(QVariantList connections READ connections)
 
 public:
-    explicit ExportedAADLFunction(const aadl::AADLObjectFunctionType *function = nullptr);
+    explicit ExportedAADLFunction(const ivm::AADLObjectFunctionType *function = nullptr);
 
     QVariantList interfaces() const;
     QVariantList functions() const;

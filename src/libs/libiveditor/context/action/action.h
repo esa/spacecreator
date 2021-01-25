@@ -20,7 +20,7 @@
 
 #include <QJsonObject>
 
-namespace aadl {
+namespace ivm {
 class AADLObject;
 }
 
@@ -42,7 +42,7 @@ struct Action {
 
     Action &operator=(const Action &other);
 
-    bool isAcceptable(aadl::AADLObject *obj) const;
+    bool isAcceptable(ivm::AADLObject *obj) const;
 };
 
 }

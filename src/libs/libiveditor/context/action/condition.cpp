@@ -69,14 +69,14 @@ QJsonObject Condition::toJson() const
 QStringList Condition::knownTypes()
 {
     QStringList res;
-    QMetaEnum me = QMetaEnum::fromType<aadl::AADLObject::Type>();
+    QMetaEnum me = QMetaEnum::fromType<ivm::AADLObject::Type>();
     for (int i = 0; i < me.keyCount(); ++i)
-        if (aadl::AADLObject::Type(me.value(i)) != aadl::AADLObject::Type::Unknown)
+        if (ivm::AADLObject::Type(me.value(i)) != ivm::AADLObject::Type::Unknown)
             res.append(me.key(i));
     return res;
 }
 
-bool Condition::isAcceptable(aadl::AADLObject *obj) const
+bool Condition::isAcceptable(ivm::AADLObject *obj) const
 {
     if (m_itemType != "*") {
         static const QStringList &names = knownTypes();

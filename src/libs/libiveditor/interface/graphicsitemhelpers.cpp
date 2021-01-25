@@ -38,7 +38,7 @@
 namespace ive {
 namespace gi {
 
-aadl::AADLObjectFunction *functionObject(QGraphicsItem *item)
+ivm::AADLObjectFunction *functionObject(QGraphicsItem *item)
 {
     if (!item)
         return nullptr;
@@ -49,7 +49,7 @@ aadl::AADLObjectFunction *functionObject(QGraphicsItem *item)
     return nullptr;
 };
 
-aadl::AADLObjectFunctionType *functionTypeObject(QGraphicsItem *item)
+ivm::AADLObjectFunctionType *functionTypeObject(QGraphicsItem *item)
 {
     if (!item)
         return nullptr;
@@ -60,7 +60,7 @@ aadl::AADLObjectFunctionType *functionTypeObject(QGraphicsItem *item)
     return nullptr;
 };
 
-aadl::AADLObjectIface *interfaceObject(QGraphicsItem *item)
+ivm::AADLObjectIface *interfaceObject(QGraphicsItem *item)
 {
     if (!item)
         return nullptr;
@@ -71,7 +71,7 @@ aadl::AADLObjectIface *interfaceObject(QGraphicsItem *item)
     return nullptr;
 };
 
-aadl::AADLObjectComment *commentObject(QGraphicsItem *item)
+ivm::AADLObjectComment *commentObject(QGraphicsItem *item)
 {
     if (!item)
         return nullptr;
@@ -82,7 +82,7 @@ aadl::AADLObjectComment *commentObject(QGraphicsItem *item)
     return nullptr;
 };
 
-aadl::AADLObjectConnection *connectionObject(QGraphicsItem *item)
+ivm::AADLObjectConnection *connectionObject(QGraphicsItem *item)
 {
     if (!item)
         return nullptr;
@@ -130,7 +130,7 @@ bool canPlaceRect(QGraphicsScene *scene, const QGraphicsItem *upcomingItem, cons
     return true;
 }
 
-aadl::AADLObject *object(const QGraphicsItem *item)
+ivm::AADLObject *object(const QGraphicsItem *item)
 {
     if (!item)
         return nullptr;
@@ -141,7 +141,7 @@ aadl::AADLObject *object(const QGraphicsItem *item)
     return nullptr;
 }
 
-static bool isReversed(const aadl::ValidationResult &result)
+static bool isReversed(const ivm::ValidationResult &result)
 {
     bool isReversed { false };
 
@@ -175,13 +175,13 @@ static bool isReversed(const aadl::ValidationResult &result)
     return isReversed;
 }
 
-aadl::ValidationResult validateConnectionCreate(QGraphicsScene *scene, const QVector<QPointF> &points)
+ivm::ValidationResult validateConnectionCreate(QGraphicsScene *scene, const QVector<QPointF> &points)
 {
     const QPointF startPos { points.first() };
     const QPointF endPos { points.last() };
     const QLineF connectionLine = { startPos, endPos };
 
-    aadl::ValidationResult result;
+    ivm::ValidationResult result;
     result.connectionPoints = points;
     result.functionAtStartPos =
             ive::nearestItem(scene, ive::adjustFromPoint(startPos, kFunctionTolerance),
@@ -196,7 +196,7 @@ aadl::ValidationResult validateConnectionCreate(QGraphicsScene *scene, const QVe
             || (result.functionAtEndPos && result.functionAtEndPos->isAncestorOf(result.functionAtStartPos));
 
     if (!result.startObject) {
-        result.setFailed(aadl::ConnectionCreationValidator::FailReason::NoStartFunction);
+        result.setFailed(ivm::ConnectionCreationValidator::FailReason::NoStartFunction);
         return result;
     }
 
@@ -214,12 +214,12 @@ aadl::ValidationResult validateConnectionCreate(QGraphicsScene *scene, const QVe
                 startIfaceItem->connectionEndPoint(result.functionAtStartPos->isAncestorOf(result.functionAtEndPos));
     } else if (!shared::graphicsviewutils::intersects(
                        result.functionAtStartPos->sceneBoundingRect(), connectionLine, &result.startPointAdjusted)) {
-        result.setFailed(aadl::ConnectionCreationValidator::FailReason::CannotCreateStartIface);
+        result.setFailed(ivm::ConnectionCreationValidator::FailReason::CannotCreateStartIface);
         return result;
     }
 
     if (!result.endObject) {
-        result.setFailed(aadl::ConnectionCreationValidator::FailReason::NoEndFunction);
+        result.setFailed(ivm::ConnectionCreationValidator::FailReason::NoEndFunction);
         return result;
     }
 
@@ -237,38 +237,38 @@ aadl::ValidationResult validateConnectionCreate(QGraphicsScene *scene, const QVe
                 endIfaceItem->connectionEndPoint(result.functionAtEndPos->isAncestorOf(result.functionAtStartPos));
     } else if (!shared::graphicsviewutils::intersects(
                        result.functionAtEndPos->sceneBoundingRect(), connectionLine, &result.endPointAdjusted)) {
-        result.setFailed(aadl::ConnectionCreationValidator::FailReason::CannotCreateEndIface);
+        result.setFailed(ivm::ConnectionCreationValidator::FailReason::CannotCreateEndIface);
         return result;
     }
 
     if (result.startIface && result.endIface && result.isToOrFromNested) {
         if (result.startIface->direction() != result.endIface->direction()) {
-            result.setFailed(aadl::ConnectionCreationValidator::FailReason::ToFromNestedDifferentDirection);
+            result.setFailed(ivm::ConnectionCreationValidator::FailReason::ToFromNestedDifferentDirection);
             return result;
         }
     }
 
     if (result.startIface && result.endIface) {
         if (result.startIface->direction() == result.endIface->direction() && !result.isToOrFromNested) {
-            result.setFailed(aadl::ConnectionCreationValidator::FailReason::SameDirectionIfaceWrongParents);
+            result.setFailed(ivm::ConnectionCreationValidator::FailReason::SameDirectionIfaceWrongParents);
             return result;
         }
     }
 
     if (!result.startIface) {
-        if (auto fn = result.startObject->as<const aadl::AADLObjectFunction *>())
+        if (auto fn = result.startObject->as<const ivm::AADLObjectFunction *>())
             if (fn->instanceOf()) {
                 result.setFailed(
-                        aadl::ConnectionCreationValidator::FailReason::DirectIfaceCreationInInstanceOfFunctionType);
+                        ivm::ConnectionCreationValidator::FailReason::DirectIfaceCreationInInstanceOfFunctionType);
                 return result;
             }
     }
 
     if (!result.endIface) {
-        if (auto fn = result.endObject->as<const aadl::AADLObjectFunction *>())
+        if (auto fn = result.endObject->as<const ivm::AADLObjectFunction *>())
             if (fn->instanceOf()) {
                 result.setFailed(
-                        aadl::ConnectionCreationValidator::FailReason::DirectIfaceCreationInInstanceOfFunctionType);
+                        ivm::ConnectionCreationValidator::FailReason::DirectIfaceCreationInInstanceOfFunctionType);
                 return result;
             }
     }
@@ -284,7 +284,7 @@ aadl::ValidationResult validateConnectionCreate(QGraphicsScene *scene, const QVe
 
     result.startIfaceId = result.startIface ? result.startIface->id() : shared::createId();
     result.endIfaceId = result.endIface ? result.endIface->id() : shared::createId();
-    result.status = aadl::ConnectionCreationValidator::canConnect(
+    result.status = ivm::ConnectionCreationValidator::canConnect(
             result.startObject, result.endObject, result.startIface, result.endIface);
     return result;
 }

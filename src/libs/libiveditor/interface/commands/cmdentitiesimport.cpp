@@ -31,8 +31,8 @@
 namespace ive {
 namespace cmd {
 
-CmdEntitiesImport::CmdEntitiesImport(aadl::AADLObject *entity, aadl::AADLObjectFunctionType *parent,
-        aadl::AADLObjectsModel *model, const QPointF &pos)
+CmdEntitiesImport::CmdEntitiesImport(ivm::AADLObject *entity, ivm::AADLObjectFunctionType *parent,
+        ivm::AADLObjectsModel *model, const QPointF &pos)
     : QUndoCommand()
     , m_model(model)
     , m_parent(parent)
@@ -50,9 +50,9 @@ CmdEntitiesImport::CmdEntitiesImport(aadl::AADLObject *entity, aadl::AADLObjectF
     }
     buffer.close();
 
-    aadl::AADLXMLReader parser;
-    QObject::connect(&parser, &aadl::AADLXMLReader::objectsParsed, m_model,
-            [this, pos, parent](const QVector<aadl::AADLObject *> &objects) {
+    ivm::AADLXMLReader parser;
+    QObject::connect(&parser, &ivm::AADLXMLReader::objectsParsed, m_model,
+            [this, pos, parent](const QVector<ivm::AADLObject *> &objects) {
                 static const QPointF outOfScene { std::numeric_limits<qreal>::max(),
                     std::numeric_limits<qreal>::max() };
                 QPointF basePoint { outOfScene };
@@ -83,7 +83,7 @@ CmdEntitiesImport::CmdEntitiesImport(aadl::AADLObject *entity, aadl::AADLObjectF
                     m_importedEntities.append(obj);
                 }
             });
-    QObject::connect(&parser, &aadl::AADLXMLReader::error, [](const QString &msg) { qWarning() << msg; });
+    QObject::connect(&parser, &ivm::AADLXMLReader::error, [](const QString &msg) { qWarning() << msg; });
 
     if (buffer.open(QIODevice::ReadOnly)) {
         parser.read(&buffer);
@@ -93,8 +93,8 @@ CmdEntitiesImport::CmdEntitiesImport(aadl::AADLObject *entity, aadl::AADLObjectF
 
 CmdEntitiesImport::~CmdEntitiesImport()
 {
-    const QVector<QPointer<aadl::AADLObject>> &objects = m_rootEntities;
-    for (aadl::AADLObject *obj : objects)
+    const QVector<QPointer<ivm::AADLObject>> &objects = m_rootEntities;
+    for (ivm::AADLObject *obj : objects)
         if (obj && !obj->parent())
             delete obj;
 }
@@ -105,7 +105,7 @@ void CmdEntitiesImport::redo()
         return;
     }
 
-    QVector<aadl::AADLObject *> entities;
+    QVector<ivm::AADLObject *> entities;
     if (m_parent) {
         for (auto entity : m_rootEntities) {
             m_parent->addChild(entity);

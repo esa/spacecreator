@@ -40,33 +40,33 @@ private Q_SLOTS:
     void testConnectionQuery();
 
 private:
-    aadl::PropertyTemplateConfig *m_dynPropConfig;
-    QScopedPointer<aadl::AADLObjectsModel> m_model;
+    ivm::PropertyTemplateConfig *m_dynPropConfig;
+    QScopedPointer<ivm::AADLObjectsModel> m_model;
 };
 
 void tst_AADLObjectsModel::init()
 {
-    m_dynPropConfig = aadl::PropertyTemplateConfig::instance();
+    m_dynPropConfig = ivm::PropertyTemplateConfig::instance();
     m_dynPropConfig->init(QLatin1String("default_attributes.xml"));
-    m_model.reset(new aadl::AADLObjectsModel(m_dynPropConfig));
+    m_model.reset(new ivm::AADLObjectsModel(m_dynPropConfig));
 }
 
 void tst_AADLObjectsModel::testManageContainers()
 {
-    aadl::AADLObjectsModel model(m_dynPropConfig);
+    ivm::AADLObjectsModel model(m_dynPropConfig);
 
     QCOMPARE(model.objects().size(), 0);
 
-    aadl::AADLObjectFunction container1("Container1");
-    aadl::AADLObjectFunction container2("Container2");
+    ivm::AADLObjectFunction container1("Container1");
+    ivm::AADLObjectFunction container2("Container2");
     container1.addChild(&container2);
-    aadl::AADLObjectFunction container3("Container3");
+    ivm::AADLObjectFunction container3("Container3");
     container2.addChild(&container3);
 
-    const QVector<aadl::AADLObjectFunction *> containers { &container1, &container2, &container3 };
+    const QVector<ivm::AADLObjectFunction *> containers { &container1, &container2, &container3 };
     for (int i = 0; i < containers.size(); ++i) {
         auto container = containers.at(i);
-        QSignalSpy spyCommon(&model, &aadl::AADLObjectsModel::aadlObjectsAdded);
+        QSignalSpy spyCommon(&model, &ivm::AADLObjectsModel::aadlObjectsAdded);
 
         const bool added = model.addObject(container);
         QVERIFY(added);
@@ -76,7 +76,7 @@ void tst_AADLObjectsModel::testManageContainers()
     }
 
     {
-        QSignalSpy spyCommon(&model, &aadl::AADLObjectsModel::aadlObjectsAdded);
+        QSignalSpy spyCommon(&model, &ivm::AADLObjectsModel::aadlObjectsAdded);
 
         const bool nullAdded = model.addObject(nullptr);
         QVERIFY(!nullAdded);
@@ -86,7 +86,7 @@ void tst_AADLObjectsModel::testManageContainers()
     }
 
     {
-        QSignalSpy spyCommon(&model, &aadl::AADLObjectsModel::aadlObjectRemoved);
+        QSignalSpy spyCommon(&model, &ivm::AADLObjectsModel::aadlObjectRemoved);
 
         const bool nullRemoved = model.removeObject(nullptr);
         QVERIFY(!nullRemoved);
@@ -96,9 +96,9 @@ void tst_AADLObjectsModel::testManageContainers()
     }
 
     {
-        QSignalSpy spyCommon(&model, &aadl::AADLObjectsModel::aadlObjectRemoved);
+        QSignalSpy spyCommon(&model, &ivm::AADLObjectsModel::aadlObjectRemoved);
 
-        aadl::AADLObjectFunction dummy;
+        ivm::AADLObjectFunction dummy;
         const bool dummyRemoved = model.removeObject(&dummy);
         QVERIFY(!dummyRemoved);
         QCOMPARE(model.objects().size(), containers.size());
@@ -108,8 +108,8 @@ void tst_AADLObjectsModel::testManageContainers()
 
     for (int i = 0; i < containers.size(); ++i) {
         auto container = containers.at(i);
-        QSignalSpy spyConcrete(&model, &aadl::AADLObjectsModel::aadlObjectsAdded);
-        QSignalSpy spyCommon(&model, &aadl::AADLObjectsModel::aadlObjectRemoved);
+        QSignalSpy spyConcrete(&model, &ivm::AADLObjectsModel::aadlObjectsAdded);
+        QSignalSpy spyCommon(&model, &ivm::AADLObjectsModel::aadlObjectRemoved);
 
         const bool removed = model.removeObject(container);
         QVERIFY(removed);
@@ -124,18 +124,18 @@ void tst_AADLObjectsModel::testManageContainers()
 
 void tst_AADLObjectsModel::testManageFunctions()
 {
-    aadl::AADLObjectsModel model(m_dynPropConfig);
+    ivm::AADLObjectsModel model(m_dynPropConfig);
 
     QCOMPARE(model.objects().size(), 0);
 
-    aadl::AADLObjectFunction fn1("Fn1");
-    aadl::AADLObjectFunction fn2("Fn2", &model);
-    aadl::AADLObjectFunction fn3("Fn3", &model);
+    ivm::AADLObjectFunction fn1("Fn1");
+    ivm::AADLObjectFunction fn2("Fn2", &model);
+    ivm::AADLObjectFunction fn3("Fn3", &model);
 
-    const aadl::AADLFunctionsVector functions { &fn1, &fn2, &fn3 };
+    const ivm::AADLFunctionsVector functions { &fn1, &fn2, &fn3 };
     for (int i = 0; i < functions.size(); ++i) {
         auto function = functions.at(i);
-        QSignalSpy spyCommon(&model, &aadl::AADLObjectsModel::aadlObjectsAdded);
+        QSignalSpy spyCommon(&model, &ivm::AADLObjectsModel::aadlObjectsAdded);
 
         const bool added = model.addObject(function);
         QVERIFY(added);
@@ -145,7 +145,7 @@ void tst_AADLObjectsModel::testManageFunctions()
     }
 
     {
-        QSignalSpy spyCommon(&model, &aadl::AADLObjectsModel::aadlObjectsAdded);
+        QSignalSpy spyCommon(&model, &ivm::AADLObjectsModel::aadlObjectsAdded);
 
         const bool nullAdded = model.addObject(nullptr);
         QVERIFY(!nullAdded);
@@ -155,7 +155,7 @@ void tst_AADLObjectsModel::testManageFunctions()
     }
 
     {
-        QSignalSpy spyCommon(&model, &aadl::AADLObjectsModel::aadlObjectRemoved);
+        QSignalSpy spyCommon(&model, &ivm::AADLObjectsModel::aadlObjectRemoved);
 
         const bool nullRemoved = model.removeObject(nullptr);
         QVERIFY(!nullRemoved);
@@ -165,9 +165,9 @@ void tst_AADLObjectsModel::testManageFunctions()
     }
 
     {
-        QSignalSpy spyCommon(&model, &aadl::AADLObjectsModel::aadlObjectRemoved);
+        QSignalSpy spyCommon(&model, &ivm::AADLObjectsModel::aadlObjectRemoved);
 
-        aadl::AADLObjectFunction dummy;
+        ivm::AADLObjectFunction dummy;
         const bool dummyRemoved = model.removeObject(&dummy);
         QVERIFY(!dummyRemoved);
         QCOMPARE(model.objects().size(), functions.size());
@@ -177,7 +177,7 @@ void tst_AADLObjectsModel::testManageFunctions()
 
     for (int i = 0; i < functions.size(); ++i) {
         auto container = functions.at(i);
-        QSignalSpy spyCommon(&model, &aadl::AADLObjectsModel::aadlObjectRemoved);
+        QSignalSpy spyCommon(&model, &ivm::AADLObjectsModel::aadlObjectRemoved);
 
         const bool removed = model.removeObject(container);
         QVERIFY(removed);
@@ -191,26 +191,26 @@ void tst_AADLObjectsModel::testManageFunctions()
 
 void tst_AADLObjectsModel::testManageIfaces()
 {
-    aadl::AADLObjectsModel model(m_dynPropConfig);
+    ivm::AADLObjectsModel model(m_dynPropConfig);
 
     QCOMPARE(model.objects().size(), 0);
 
-    aadl::AADLObjectFunction fn("fn");
+    ivm::AADLObjectFunction fn("fn");
     model.addObject(&fn);
-    aadl::AADLObjectIface::CreationInfo ci1 = aadl::testutils::init(aadl::AADLObjectIface::IfaceType::Provided, &fn);
+    ivm::AADLObjectIface::CreationInfo ci1 = ivm::testutils::init(ivm::AADLObjectIface::IfaceType::Provided, &fn);
     ci1.name = "eth0";
-    aadl::AADLObjectIface::CreationInfo ci2 = aadl::testutils::init(aadl::AADLObjectIface::IfaceType::Required, &fn);
+    ivm::AADLObjectIface::CreationInfo ci2 = ivm::testutils::init(ivm::AADLObjectIface::IfaceType::Required, &fn);
     ci2.name = "wlan0";
-    aadl::AADLObjectIface::CreationInfo ci3 = aadl::testutils::init(aadl::AADLObjectIface::IfaceType::Provided, &fn);
+    ivm::AADLObjectIface::CreationInfo ci3 = ivm::testutils::init(ivm::AADLObjectIface::IfaceType::Provided, &fn);
     ci3.name = "ppp0";
 
-    QVector<aadl::AADLObjectIface *> createdIfaces;
-    const QVector<aadl::AADLObjectIface::CreationInfo> ifaces { ci1, ci2, ci3 };
+    QVector<ivm::AADLObjectIface *> createdIfaces;
+    const QVector<ivm::AADLObjectIface::CreationInfo> ifaces { ci1, ci2, ci3 };
     for (int i = 0; i < ifaces.size(); ++i) {
-        QSignalSpy spyCommon(&model, &aadl::AADLObjectsModel::aadlObjectsAdded);
+        QSignalSpy spyCommon(&model, &ivm::AADLObjectsModel::aadlObjectsAdded);
 
-        aadl::AADLObjectIface::CreationInfo ci = ifaces.at(i);
-        aadl::AADLObjectIface *iface = aadl::AADLObjectIface::createIface(ci);
+        ivm::AADLObjectIface::CreationInfo ci = ifaces.at(i);
+        ivm::AADLObjectIface *iface = ivm::AADLObjectIface::createIface(ci);
         createdIfaces.append(iface);
         const bool added1 = ci.function->addChild(iface);
         QVERIFY(added1);
@@ -222,7 +222,7 @@ void tst_AADLObjectsModel::testManageIfaces()
     }
 
     {
-        QSignalSpy spyCommon(&model, &aadl::AADLObjectsModel::aadlObjectsAdded);
+        QSignalSpy spyCommon(&model, &ivm::AADLObjectsModel::aadlObjectsAdded);
 
         const bool nullAdded = model.addObject(nullptr);
         QVERIFY(!nullAdded);
@@ -232,7 +232,7 @@ void tst_AADLObjectsModel::testManageIfaces()
     }
 
     {
-        QSignalSpy spyCommon(&model, &aadl::AADLObjectsModel::aadlObjectRemoved);
+        QSignalSpy spyCommon(&model, &ivm::AADLObjectsModel::aadlObjectRemoved);
 
         const bool nullRemoved = model.removeObject(nullptr);
         QVERIFY(!nullRemoved);
@@ -242,10 +242,10 @@ void tst_AADLObjectsModel::testManageIfaces()
     }
 
     {
-        QSignalSpy spyCommon(&model, &aadl::AADLObjectsModel::aadlObjectRemoved);
+        QSignalSpy spyCommon(&model, &ivm::AADLObjectsModel::aadlObjectRemoved);
 
-        aadl::AADLObjectIface *dummy = aadl::AADLObjectIface::createIface(
-                aadl::testutils::init(aadl::AADLObjectIface::IfaceType::Provided, nullptr));
+        ivm::AADLObjectIface *dummy = ivm::AADLObjectIface::createIface(
+                ivm::testutils::init(ivm::AADLObjectIface::IfaceType::Provided, nullptr));
         const bool dummyRemoved = model.removeObject(dummy);
         QVERIFY(!dummyRemoved);
         QCOMPARE(model.objects().size(), ifaces.size() + 1); // +function
@@ -255,14 +255,14 @@ void tst_AADLObjectsModel::testManageIfaces()
 
     for (int i = 0; i < createdIfaces.size(); ++i) {
         auto iface = createdIfaces.at(i);
-        QSignalSpy spyCommon(&model, &aadl::AADLObjectsModel::aadlObjectRemoved);
+        QSignalSpy spyCommon(&model, &ivm::AADLObjectsModel::aadlObjectRemoved);
 
         const bool removed = model.removeObject(iface);
         QVERIFY(removed);
         QCOMPARE(model.objects().size(), ifaces.size() - i); // +function
 
         QVERIFY(spyCommon.count() == 1);
-        if (auto parent = qobject_cast<aadl::AADLObjectFunction *>(iface->parentObject())) {
+        if (auto parent = qobject_cast<ivm::AADLObjectFunction *>(iface->parentObject())) {
             parent->removeChild(iface);
             delete iface;
             iface = nullptr;
@@ -274,29 +274,29 @@ void tst_AADLObjectsModel::testManageIfaces()
 
 void tst_AADLObjectsModel::testManageMixed()
 {
-    aadl::AADLObjectsModel model(m_dynPropConfig);
+    ivm::AADLObjectsModel model(m_dynPropConfig);
 
     QCOMPARE(model.objects().size(), 0);
 
-    aadl::AADLObjectFunction container1("Container1");
-    aadl::AADLObjectFunction container2("Container2", &container1);
-    aadl::AADLObjectFunction container3("Container3", &container2);
-    aadl::AADLObjectFunction fn1("Fn1");
-    aadl::AADLObjectFunction fn2("Fn2", &model);
-    aadl::AADLObjectFunction fn3("Fn3", &model);
+    ivm::AADLObjectFunction container1("Container1");
+    ivm::AADLObjectFunction container2("Container2", &container1);
+    ivm::AADLObjectFunction container3("Container3", &container2);
+    ivm::AADLObjectFunction fn1("Fn1");
+    ivm::AADLObjectFunction fn2("Fn2", &model);
+    ivm::AADLObjectFunction fn3("Fn3", &model);
     const int functionsCount = 6;
 
-    aadl::AADLObjectIface::CreationInfo ci1 = aadl::testutils::init(aadl::AADLObjectIface::IfaceType::Provided, &fn1);
+    ivm::AADLObjectIface::CreationInfo ci1 = ivm::testutils::init(ivm::AADLObjectIface::IfaceType::Provided, &fn1);
     ci1.name = "eth0";
-    aadl::AADLObjectIface *iface1 = aadl::AADLObjectIface::createIface(ci1);
-    aadl::AADLObjectIface::CreationInfo ci2 = aadl::testutils::init(aadl::AADLObjectIface::IfaceType::Required, &fn2);
+    ivm::AADLObjectIface *iface1 = ivm::AADLObjectIface::createIface(ci1);
+    ivm::AADLObjectIface::CreationInfo ci2 = ivm::testutils::init(ivm::AADLObjectIface::IfaceType::Required, &fn2);
     ci2.name = "wlan0";
-    aadl::AADLObjectIface *iface2 = aadl::AADLObjectIface::createIface(ci2);
-    aadl::AADLObjectIface::CreationInfo ci3 = aadl::testutils::init(aadl::AADLObjectIface::IfaceType::Provided, &fn3);
+    ivm::AADLObjectIface *iface2 = ivm::AADLObjectIface::createIface(ci2);
+    ivm::AADLObjectIface::CreationInfo ci3 = ivm::testutils::init(ivm::AADLObjectIface::IfaceType::Provided, &fn3);
     ci3.name = "ppp0";
-    aadl::AADLObjectIface *iface3 = aadl::AADLObjectIface::createIface(ci3);
+    ivm::AADLObjectIface *iface3 = ivm::AADLObjectIface::createIface(ci3);
 
-    const QVector<aadl::AADLObject *> objects { &container1, &fn1, iface1, &container2, &fn2, iface2, &container3, &fn3,
+    const QVector<ivm::AADLObject *> objects { &container1, &fn1, iface1, &container2, &fn2, iface2, &container3, &fn3,
         iface3 };
 
     for (auto object : objects)
@@ -312,11 +312,11 @@ void tst_AADLObjectsModel::testManageMixed()
 
 void tst_AADLObjectsModel::testConnectionQuery()
 {
-    auto fn1 = new aadl::AADLObjectFunction("Fn1");
+    auto fn1 = new ivm::AADLObjectFunction("Fn1");
     m_model->addObject(fn1);
-    auto fn2 = new aadl::AADLObjectFunction("Fn2");
+    auto fn2 = new ivm::AADLObjectFunction("Fn2");
     m_model->addObject(fn2);
-    aadl::AADLObjectConnection *connect1 = aadl::testutils::createConnection(fn1, fn2, "cnt1");
+    ivm::AADLObjectConnection *connect1 = ivm::testutils::createConnection(fn1, fn2, "cnt1");
     m_model->addObject(connect1);
 
     const Qt::CaseSensitivity m_caseCheck = Qt::CaseInsensitive;

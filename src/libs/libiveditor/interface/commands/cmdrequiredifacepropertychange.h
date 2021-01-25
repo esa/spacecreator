@@ -30,7 +30,7 @@ class CmdRequiredIfacePropertyChange : public CmdIfaceDataChangeBase
 {
 public:
     explicit CmdRequiredIfacePropertyChange(
-            aadl::AADLObjectIfaceRequired *entity, const QString &propName, const QVariant &value);
+            ivm::AADLObjectIfaceRequired *entity, const QString &propName, const QVariant &value);
     void redo() override;
     void undo() override;
     bool mergeWith(const QUndoCommand *command) override;
@@ -39,7 +39,7 @@ public:
 private:
     void setInheritPI(bool nowInherited);
 
-    bool connectionMustDie(const aadl::AADLObjectConnection *connection) const override;
+    bool connectionMustDie(const ivm::AADLObjectConnection *connection) const override;
 };
 
 }

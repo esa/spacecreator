@@ -21,7 +21,7 @@
 #include <QUndoCommand>
 #include <QVector>
 
-namespace aadl {
+namespace ivm {
 class AADLObjectIface;
 class AADLObjectConnection;
 }
@@ -40,12 +40,12 @@ public:
 
 protected:
     // NOT to be instantiated directly!
-    explicit CmdIfaceParamBase(aadl::AADLObjectIface *iface);
+    explicit CmdIfaceParamBase(ivm::AADLObjectIface *iface);
     int id() const override = 0;
 
 protected:
-    QPointer<aadl::AADLObjectIface> m_iface;
-    QVector<aadl::AADLObjectConnection *> m_connections;
+    QPointer<ivm::AADLObjectIface> m_iface;
+    QVector<ivm::AADLObjectConnection *> m_connections;
     QVector<QUndoCommand *> m_cmdRmConnections;
 
 private:

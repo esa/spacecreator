@@ -27,9 +27,9 @@ class QMutex;
 class QGraphicsItem;
 class QGraphicsScene;
 
-namespace aadl {
+namespace ivm {
 class AADLObject;
-} // namespace aadl
+} // namespace ivm
 
 namespace shared {
 class DelayedSignal;
@@ -59,7 +59,7 @@ public:
     };
     Q_ENUM(AADLRoles);
 
-    explicit AADLItemModel(aadl::AADLObjectsModel *model, QObject *parent = nullptr);
+    explicit AADLItemModel(ivm::AADLObjectsModel *model, QObject *parent = nullptr);
     ~AADLItemModel() override;
 
     QGraphicsScene *scene() const;
@@ -69,7 +69,7 @@ public:
 
     QGraphicsItem *getItem(const shared::Id id) const;
 
-    aadl::AADLObjectsModel *objectsModel() const;
+    ivm::AADLObjectsModel *objectsModel() const;
 
 Q_SIGNALS:
     void itemClicked(shared::Id id);
@@ -81,12 +81,12 @@ public Q_SLOTS:
     void clearScene();
 
 private Q_SLOTS:
-    void onAADLObjectAdded(aadl::AADLObject *object);
-    void onAADLObjectsAdded(const QVector<aadl::AADLObject *> &objects);
-    void onAADLObjectRemoved(aadl::AADLObject *object);
+    void onAADLObjectAdded(ivm::AADLObject *object);
+    void onAADLObjectsAdded(const QVector<ivm::AADLObject *> &objects);
+    void onAADLObjectRemoved(ivm::AADLObject *object);
     void onRootObjectChanged(shared::Id rootId);
-    void onConnectionAddedToGroup(aadl::AADLObjectConnection *connection);
-    void onConnectionRemovedFromGroup(aadl::AADLObjectConnection *connection);
+    void onConnectionAddedToGroup(ivm::AADLObjectConnection *connection);
+    void onConnectionRemovedFromGroup(ivm::AADLObjectConnection *connection);
 
     void onSceneSelectionChanged();
 
@@ -94,21 +94,21 @@ private Q_SLOTS:
     void updateInterfaceTexts();
 
 private:
-    QGraphicsItem *createItemForObject(aadl::AADLObject *obj);
+    QGraphicsItem *createItemForObject(ivm::AADLObject *obj);
     AADLFunctionGraphicsItem *rootItem() const;
     void updateItem(QGraphicsItem *item);
-    void removeItemForObject(aadl::AADLObject *object);
-    void setupInnerGeometry(aadl::AADLObject *obj) const;
+    void removeItemForObject(ivm::AADLObject *object);
+    void setupInnerGeometry(ivm::AADLObject *obj) const;
 
     template<typename T>
     T getItem(const shared::Id id) const;
 
 private:
-    aadl::AADLObjectsModel *m_model { nullptr };
+    ivm::AADLObjectsModel *m_model { nullptr };
     InterfaceTabGraphicsScene *m_graphicsScene { nullptr };
     QHash<shared::Id, QGraphicsItem *> m_items;
     QMutex *m_mutex { nullptr };
-    QQueue<aadl::AADLObject *> m_rmQueu;
+    QQueue<ivm::AADLObject *> m_rmQueu;
     QRectF m_desktopGeometry;
     QRectF m_prevItemsRect;
     shared::DelayedSignal *m_textUpdate = nullptr;

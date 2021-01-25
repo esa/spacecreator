@@ -20,7 +20,7 @@
 #include "aadlobjectconnection.h"
 #include "aadlobjectiface.h"
 
-namespace aadl {
+namespace ivm {
 class AADLObjectIfaceGroup;
 
 class AADLObjectConnectionGroup : public AADLObjectConnection
@@ -71,6 +71,6 @@ private:
     QList<shared::Id> m_initConnections;
 };
 
-} // namespace aadl
+} // namespace ivm
 
-Q_DECLARE_METATYPE(aadl::AADLObjectConnectionGroup::CreationInfo);
+Q_DECLARE_METATYPE(ivm::AADLObjectConnectionGroup::CreationInfo);

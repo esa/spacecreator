@@ -31,24 +31,24 @@
 namespace ive {
 
 AADLConnectionGroupModel::AADLConnectionGroupModel(
-        aadl::AADLObjectConnectionGroup *connectionGroup, cmd::CommandsStack::Macro *macro, QObject *parent)
+        ivm::AADLObjectConnectionGroup *connectionGroup, cmd::CommandsStack::Macro *macro, QObject *parent)
     : QAbstractListModel(parent)
     , m_connectionGroup(connectionGroup)
     , m_cmdMacro(macro)
 {
     const auto groupedConnections = connectionGroup->groupedConnections();
     std::for_each(groupedConnections.constBegin(), groupedConnections.constEnd(),
-            [this](aadl::AADLObjectConnection *c) { m_groupedConnetions.insert(c->id()); });
+            [this](ivm::AADLObjectConnection *c) { m_groupedConnetions.insert(c->id()); });
 
     if (auto model = connectionGroup->objectsModel()) {
-        const QList<aadl::AADLObjectIface *> targetIfaces = connectionGroup->targetFunctionInterfaces();
-        const QList<aadl::AADLObjectIface *> sourceIfaces = connectionGroup->sourceFunctionInterfaces();
+        const QList<ivm::AADLObjectIface *> targetIfaces = connectionGroup->targetFunctionInterfaces();
+        const QList<ivm::AADLObjectIface *> sourceIfaces = connectionGroup->sourceFunctionInterfaces();
 
         for (auto iface : sourceIfaces) {
             const auto ifaceConnections = model->getConnectionsForIface(iface->id());
 
             std::copy_if(ifaceConnections.constBegin(), ifaceConnections.constEnd(),
-                    std::back_inserter(m_allConnections), [&](const aadl::AADLObjectConnection *connection) {
+                    std::back_inserter(m_allConnections), [&](const ivm::AADLObjectConnection *connection) {
                         if (sourceIfaces.contains(connection->sourceInterface()))
                             return targetIfaces.contains(connection->targetInterface());
                         else if (sourceIfaces.contains(connection->targetInterface()))
@@ -61,23 +61,23 @@ AADLConnectionGroupModel::AADLConnectionGroupModel(
     auto updateEnableState = [this]() {
         if (m_groupedConnetions.size() == 1) {
             if (auto model = m_connectionGroup->objectsModel()) {
-                aadl::AADLObjectConnection *connection = model->getConnection(*m_groupedConnetions.begin());
+                ivm::AADLObjectConnection *connection = model->getConnection(*m_groupedConnetions.begin());
                 const QModelIndex idx = index(m_allConnections.indexOf(connection));
                 Q_EMIT dataChanged(idx, idx);
             }
         }
     };
 
-    connect(connectionGroup, &aadl::AADLObjectConnectionGroup::connectionAdded, this,
-            [this, updateEnableState](aadl::AADLObjectConnection *connection) {
+    connect(connectionGroup, &ivm::AADLObjectConnectionGroup::connectionAdded, this,
+            [this, updateEnableState](ivm::AADLObjectConnection *connection) {
                 updateEnableState();
                 m_groupedConnetions.insert(connection->id());
 
                 const QModelIndex idx = index(m_allConnections.indexOf(connection));
                 Q_EMIT dataChanged(idx, idx, { Qt::CheckStateRole });
             });
-    connect(connectionGroup, &aadl::AADLObjectConnectionGroup::connectionRemoved, this,
-            [this, updateEnableState](aadl::AADLObjectConnection *connection) {
+    connect(connectionGroup, &ivm::AADLObjectConnectionGroup::connectionRemoved, this,
+            [this, updateEnableState](ivm::AADLObjectConnection *connection) {
                 m_groupedConnetions.remove(connection->id());
                 updateEnableState();
 
@@ -97,7 +97,7 @@ QVariant AADLConnectionGroupModel::data(const QModelIndex &index, int role) cons
     }
 
     if (role == Qt::DisplayRole) {
-        return aadl::AADLNameValidator::nextNameFor(m_allConnections.at(index.row()));
+        return ivm::AADLNameValidator::nextNameFor(m_allConnections.at(index.row()));
     }
 
     if (role == Qt::CheckStateRole) {

@@ -45,14 +45,14 @@ void XMLReader::runReader(const XmlFileMock &xml)
     QBuffer buffer(&result);
     buffer.open(QIODevice::ReadOnly | QIODevice::Text);
 
-    aadl::AADLXMLReader reader;
-    connect(&reader, &aadl::AADLXMLReader::objectsParsed, this, [&xml](const QVector<aadl::AADLObject *> &objectsList) {
+    ivm::AADLXMLReader reader;
+    connect(&reader, &ivm::AADLXMLReader::objectsParsed, this, [&xml](const QVector<ivm::AADLObject *> &objectsList) {
         QCOMPARE(objectsList.size(), xml.expectedObjectCount());
     });
-    connect(&reader, &aadl::AADLXMLReader::error, [](const QString &msg) { qWarning() << msg; });
+    connect(&reader, &ivm::AADLXMLReader::error, [](const QString &msg) { qWarning() << msg; });
 
-    QSignalSpy spyObjectsParsed(&reader, &aadl::AADLXMLReader::objectsParsed);
-    QSignalSpy spyError(&reader, &aadl::AADLXMLReader::error);
+    QSignalSpy spyObjectsParsed(&reader, &ivm::AADLXMLReader::objectsParsed);
+    QSignalSpy spyError(&reader, &ivm::AADLXMLReader::error);
 
     const bool ok = reader.read(&buffer);
     QCOMPARE(ok, xml.m_canBeParsed);
@@ -64,7 +64,7 @@ void XMLReader::runReader(const XmlFileMock &xml)
 
     if (spyObjectsParsed.count()) {
         const QList<QVariant> &objectsList = spyObjectsParsed.takeFirst();
-        const QVector<aadl::AADLObject *> &aadlObjects = objectsList.first().value<QVector<aadl::AADLObject *>>();
+        const QVector<ivm::AADLObject *> &aadlObjects = objectsList.first().value<QVector<ivm::AADLObject *>>();
         QCOMPARE(aadlObjects.size(), xml.expectedObjectCount());
     }
 
@@ -106,11 +106,11 @@ void XMLReader::test_readMetaData()
     buffer.open(QIODevice::ReadOnly | QIODevice::Text);
 
     QVariantMap metadata;
-    aadl::AADLXMLReader reader;
-    connect(&reader, &aadl::AADLXMLReader::metaDataParsed, this,
+    ivm::AADLXMLReader reader;
+    connect(&reader, &ivm::AADLXMLReader::metaDataParsed, this,
             [&metadata](const QVariantMap &data) { metadata = data; });
 
-    QSignalSpy spyError(&reader, &aadl::AADLXMLReader::error);
+    QSignalSpy spyError(&reader, &ivm::AADLXMLReader::error);
 
     const bool ok = reader.read(&buffer);
     QVERIFY(ok);
@@ -132,15 +132,15 @@ void XMLReader::test_readFunction()
     QBuffer buffer(&xml);
     buffer.open(QIODevice::ReadOnly | QIODevice::Text);
 
-    aadl::AADLObjectFunction *function = nullptr;
-    aadl::AADLXMLReader reader;
-    connect(&reader, &aadl::AADLXMLReader::objectsParsed, this,
-            [&function](const QVector<aadl::AADLObject *> &objectsList) {
+    ivm::AADLObjectFunction *function = nullptr;
+    ivm::AADLXMLReader reader;
+    connect(&reader, &ivm::AADLXMLReader::objectsParsed, this,
+            [&function](const QVector<ivm::AADLObject *> &objectsList) {
                 QCOMPARE(objectsList.size(), 1);
-                function = qobject_cast<aadl::AADLObjectFunction *>(objectsList[0]);
+                function = qobject_cast<ivm::AADLObjectFunction *>(objectsList[0]);
             });
 
-    QSignalSpy spyError(&reader, &aadl::AADLXMLReader::error);
+    QSignalSpy spyError(&reader, &ivm::AADLXMLReader::error);
 
     const bool ok = reader.read(&buffer);
     QVERIFY(ok);
@@ -149,15 +149,15 @@ void XMLReader::test_readFunction()
     QVERIFY(function != nullptr);
     QCOMPARE(function->contextParams().size(), 2);
 
-    aadl::ContextParameter param1 = function->contextParam("duration");
+    ivm::ContextParameter param1 = function->contextParam("duration");
     QVERIFY(!param1.isNull());
-    QCOMPARE(param1.paramType(), aadl::BasicParameter::Type::Other);
+    QCOMPARE(param1.paramType(), ivm::BasicParameter::Type::Other);
     QCOMPARE(param1.paramTypeName(), QString("MyInt"));
     QCOMPARE(param1.defaultValue(), QVariant::fromValue(60));
 
-    aadl::ContextParameter param2 = function->contextParam("trigger");
+    ivm::ContextParameter param2 = function->contextParam("trigger");
     QVERIFY(!param2.isNull());
-    QCOMPARE(param2.paramType(), aadl::BasicParameter::Type::Timer);
+    QCOMPARE(param2.paramType(), ivm::BasicParameter::Type::Timer);
 }
 
 QTEST_APPLESS_MAIN(XMLReader)

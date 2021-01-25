@@ -42,7 +42,7 @@ ContextParametersModel::ContextParametersModel(cmd::CommandsStack::Macro *macro,
 
 ContextParametersModel::~ContextParametersModel() { }
 
-void ContextParametersModel::createNewRow(const aadl::ContextParameter &param, int row)
+void ContextParametersModel::createNewRow(const ivm::ContextParameter &param, int row)
 {
     QStandardItem *titleItem = new QStandardItem(param.name());
     QStandardItem *typeItem = new QStandardItem(param.paramTypeName());
@@ -56,7 +56,7 @@ void ContextParametersModel::createNewRow(const aadl::ContextParameter &param, i
     m_params.insert(row, param);
 }
 
-void ContextParametersModel::setDataObject(aadl::AADLObject *obj)
+void ContextParametersModel::setDataObject(ivm::AADLObject *obj)
 {
     clear();
     m_params.clear();
@@ -65,7 +65,7 @@ void ContextParametersModel::setDataObject(aadl::AADLObject *obj)
     if (!m_dataObject)
         return;
 
-    if (auto func = qobject_cast<aadl::AADLObjectFunctionType *>(m_dataObject)) {
+    if (auto func = qobject_cast<ivm::AADLObjectFunctionType *>(m_dataObject)) {
         const int paramsCount = func->contextParams().size();
 
         beginInsertRows(QModelIndex(), 0, paramsCount);
@@ -79,7 +79,7 @@ void ContextParametersModel::setDataObject(aadl::AADLObject *obj)
     }
 }
 
-const aadl::AADLObject *ContextParametersModel::dataObject() const
+const ivm::AADLObject *ContextParametersModel::dataObject() const
 {
     return m_dataObject;
 }
@@ -118,7 +118,7 @@ QVariant ContextParametersModel::data(const QModelIndex &index, int role) const
         case ColumnValue:
             return param.defaultValue();
         default:
-            return aadl::AADLNameValidator::decodeName(m_dataObject->aadlType(), param.name());
+            return ivm::AADLNameValidator::decodeName(m_dataObject->aadlType(), param.name());
         }
     }
     }
@@ -133,11 +133,11 @@ bool ContextParametersModel::setData(const QModelIndex &index, const QVariant &v
 
     if (role == Qt::EditRole) {
         auto paramOld = m_params.at(index.row());
-        aadl::ContextParameter paramNew(paramOld);
+        ivm::ContextParameter paramNew(paramOld);
 
         switch (index.column()) {
         case ColumnName: {
-            if (!paramNew.setName(aadl::AADLNameValidator::encodeName(m_dataObject->aadlType(), value.toString())))
+            if (!paramNew.setName(ivm::AADLNameValidator::encodeName(m_dataObject->aadlType(), value.toString())))
                 return false;
             break;
         }
@@ -178,8 +178,8 @@ bool ContextParametersModel::createProperty(const QString &propName)
 {
     bool res(false);
 
-    aadl::ContextParameter param(propName);
-    param.setParamType(aadl::BasicParameter::Type::Timer);
+    ivm::ContextParameter param(propName);
+    param.setParamType(ivm::BasicParameter::Type::Timer);
 
     const auto propsCmd = cmd::CommandsFactory::create(
             cmd::CreateContextParameter, { QVariant::fromValue(m_dataObject), QVariant::fromValue(param) });
@@ -230,7 +230,7 @@ bool ContextParametersModel::isProp(const QModelIndex & /*id*/) const
 Qt::ItemFlags ContextParametersModel::flags(const QModelIndex &index) const
 {
     Qt::ItemFlags flags = QStandardItemModel::flags(index);
-    if (index.column() == ColumnValue && m_params.at(index.row()).paramType() != aadl::BasicParameter::Type::Other)
+    if (index.column() == ColumnValue && m_params.at(index.row()).paramType() != ivm::BasicParameter::Type::Other)
         flags = flags & ~Qt::ItemIsEditable & ~Qt::ItemIsEnabled;
 
     if (!m_dataObject)
@@ -238,8 +238,8 @@ Qt::ItemFlags ContextParametersModel::flags(const QModelIndex &index) const
 
     if (flags.testFlag(Qt::ItemIsEditable) || flags.testFlag(Qt::ItemIsEnabled)) {
         switch (m_dataObject->aadlType()) {
-        case aadl::AADLObject::Type::Function: {
-            if (auto fn = m_dataObject->as<const aadl::AADLObjectFunction *>())
+        case ivm::AADLObject::Type::Function: {
+            if (auto fn = m_dataObject->as<const ivm::AADLObjectFunction *>())
                 if (fn->inheritsFunctionType())
                     flags = flags & ~Qt::ItemIsEditable & ~Qt::ItemIsEnabled;
 

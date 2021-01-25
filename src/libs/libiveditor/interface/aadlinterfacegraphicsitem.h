@@ -25,7 +25,7 @@
 
 class tst_PositionLookupHelper;
 
-namespace aadl {
+namespace ivm {
 class AADLObjectIface;
 }
 
@@ -38,13 +38,13 @@ class AADLInterfaceGraphicsItem : public InteractiveObject
 {
     Q_OBJECT
 public:
-    explicit AADLInterfaceGraphicsItem(aadl::AADLObjectIface *entity, QGraphicsItem *parent = nullptr);
+    explicit AADLInterfaceGraphicsItem(ivm::AADLObjectIface *entity, QGraphicsItem *parent = nullptr);
     enum
     {
-        Type = UserType + static_cast<int>(aadl::AADLObject::Type::RequiredInterface) // provided?
+        Type = UserType + static_cast<int>(ivm::AADLObject::Type::RequiredInterface) // provided?
     };
 
-    aadl::AADLObjectIface *entity() const;
+    ivm::AADLObjectIface *entity() const;
 
     void init() override;
     int type() const override { return Type; }
@@ -93,7 +93,7 @@ protected Q_SLOTS:
     virtual void applyColorScheme() override;
     void updateKind();
     void updateIface();
-    void onAttrOrPropChanged(aadl::meta::Props::Token t);
+    void onAttrOrPropChanged(ivm::meta::Props::Token t);
 
     virtual QPainterPath ifacePath() const;
     virtual QPainterPath typePath() const;

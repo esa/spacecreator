@@ -62,7 +62,7 @@ void tst_MSCEditorCore::testCorrespondingInstances()
 
     auto instance = new msc::MscInstance("dummy", m_chart);
     m_chart->addInstance(instance);
-    aadl::AADLObjectFunction fnct("foo");
+    ivm::AADLObjectFunction fnct("foo");
     QCOMPARE(m_mscCore->correspondingInstances(&fnct).size(), 0);
 
     fnct.setTitle("dummy");
@@ -80,9 +80,9 @@ void tst_MSCEditorCore::testCorrespondingMessages()
     auto message = new msc::MscMessage("ping", instance1, instance2, m_chart);
     m_chart->addInstanceEvent(message);
 
-    aadl::AADLObjectFunction f1("K1");
-    aadl::AADLObjectFunction f2("K2");
-    std::unique_ptr<aadl::AADLObjectConnection> connection(aadl::testutils::createConnection(&f1, &f2, "call"));
+    ivm::AADLObjectFunction f1("K1");
+    ivm::AADLObjectFunction f2("K2");
+    std::unique_ptr<ivm::AADLObjectConnection> connection(ivm::testutils::createConnection(&f1, &f2, "call"));
     QCOMPARE(m_mscCore->correspondingMessages(connection.get()).size(), 0);
 
     connection->targetInterface()->setTitle("ping");

@@ -38,7 +38,7 @@ static const qreal kMargins = 14 + kBorderWidth;
 
 namespace ive {
 
-AADLCommentGraphicsItem::AADLCommentGraphicsItem(aadl::AADLObjectComment *comment, QGraphicsItem *parent)
+AADLCommentGraphicsItem::AADLCommentGraphicsItem(ivm::AADLObjectComment *comment, QGraphicsItem *parent)
     : AADLRectGraphicsItem(comment, parent)
 {
     setFlag(QGraphicsItem::ItemIsSelectable);
@@ -49,7 +49,7 @@ AADLCommentGraphicsItem::AADLCommentGraphicsItem(aadl::AADLObjectComment *commen
 void AADLCommentGraphicsItem::init()
 {
     AADLRectGraphicsItem::init();
-    connect(entity(), &aadl::AADLObject::titleChanged, this, &InteractiveObject::updateGraphicsItem);
+    connect(entity(), &ivm::AADLObject::titleChanged, this, &InteractiveObject::updateGraphicsItem);
 }
 
 void AADLCommentGraphicsItem::updateFromEntity()
@@ -73,9 +73,9 @@ QString AADLCommentGraphicsItem::text() const
     return m_text;
 }
 
-aadl::AADLObjectComment *AADLCommentGraphicsItem::entity() const
+ivm::AADLObjectComment *AADLCommentGraphicsItem::entity() const
 {
-    return qobject_cast<aadl::AADLObjectComment *>(aadlObject());
+    return qobject_cast<ivm::AADLObjectComment *>(aadlObject());
 }
 
 void AADLCommentGraphicsItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget)

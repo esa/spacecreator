@@ -19,7 +19,7 @@
 
 #include "exportableaadlobject.h"
 
-namespace aadl {
+namespace ivm {
 class AADLObjectIface;
 }
 
@@ -37,7 +37,7 @@ class ExportableAADLIface : public ExportableAADLObject
     Q_PROPERTY(QVariantList connectedInterfaces READ connectedInterfaces)
 
 public:
-    explicit ExportableAADLIface(const aadl::AADLObjectIface *iface = nullptr);
+    explicit ExportableAADLIface(const ivm::AADLObjectIface *iface = nullptr);
 
     bool isProvided() const;
     bool isRequired() const;

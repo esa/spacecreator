@@ -43,7 +43,7 @@ PropertyTemplateManager::~PropertyTemplateManager()
 void PropertyTemplateManager::accept()
 {
     ui->widget->save();
-    auto config = aadl::PropertyTemplateConfig::instance();
+    auto config = ivm::PropertyTemplateConfig::instance();
     config->init(ive::PropertyTemplateWidget::dynamicPropertiesFilePath());
 
     QDialog::accept();

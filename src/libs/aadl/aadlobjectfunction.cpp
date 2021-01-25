@@ -27,7 +27,7 @@
 #include <QScopedPointer>
 #include <QUndoCommand>
 
-namespace aadl {
+namespace ivm {
 
 struct AADLObjectFunctionPrivate {
     QPointer<AADLObjectFunctionType> m_fnType;
@@ -66,9 +66,9 @@ void AADLObjectFunction::setInstanceOf(AADLObjectFunctionType *fnType)
 
             disconnect(d->m_fnType, &AADLObjectFunction::contextParamsChanged, this,
                     &AADLObjectFunction::reflectContextParam);
-            disconnect(d->m_fnType, qOverload<aadl::meta::Props::Token>(&AADLObjectFunction::propertyChanged), this,
+            disconnect(d->m_fnType, qOverload<ivm::meta::Props::Token>(&AADLObjectFunction::propertyChanged), this,
                     &AADLObjectFunction::reflectProp);
-            disconnect(d->m_fnType, qOverload<aadl::meta::Props::Token>(&AADLObjectFunction::attributeChanged), this,
+            disconnect(d->m_fnType, qOverload<ivm::meta::Props::Token>(&AADLObjectFunction::attributeChanged), this,
                     &AADLObjectFunction::reflectAttr);
 
             restoreInternals();
@@ -79,9 +79,9 @@ void AADLObjectFunction::setInstanceOf(AADLObjectFunctionType *fnType)
         if (d->m_fnType) {
             cloneInternals();
 
-            connect(d->m_fnType, qOverload<aadl::meta::Props::Token>(&AADLObjectFunction::attributeChanged), this,
+            connect(d->m_fnType, qOverload<ivm::meta::Props::Token>(&AADLObjectFunction::attributeChanged), this,
                     &AADLObjectFunction::reflectAttr);
-            connect(d->m_fnType, qOverload<aadl::meta::Props::Token>(&AADLObjectFunction::propertyChanged), this,
+            connect(d->m_fnType, qOverload<ivm::meta::Props::Token>(&AADLObjectFunction::propertyChanged), this,
                     &AADLObjectFunction::reflectProp);
             connect(d->m_fnType, &AADLObjectFunction::contextParamsChanged, this,
                     &AADLObjectFunction::reflectContextParam);
@@ -124,7 +124,7 @@ bool AADLObjectFunction::inheritsFunctionType() const
     return instanceOf();
 }
 
-void AADLObjectFunction::reflectAttr(aadl::meta::Props::Token attr)
+void AADLObjectFunction::reflectAttr(ivm::meta::Props::Token attr)
 {
     if (!d->m_fnType) {
         if (const AADLObjectFunctionType *fnType = dynamic_cast<const AADLObjectFunctionType *>(sender()))
@@ -163,7 +163,7 @@ void AADLObjectFunction::reflectAttrs(const QHash<QString, QVariant> &attrs)
     setAttrs(prepared);
 }
 
-void AADLObjectFunction::reflectProp(aadl::meta::Props::Token prop)
+void AADLObjectFunction::reflectProp(ivm::meta::Props::Token prop)
 {
     if (!d->m_fnType) {
         if (const AADLObjectFunctionType *fnType = dynamic_cast<const AADLObjectFunctionType *>(sender()))

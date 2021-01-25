@@ -89,12 +89,12 @@ private:
         QPointF providedIfacePoint() const { return points.at(static_cast<int>(EndPoint::Prov)); }
         QPointF emptyPoint() const { return points.at(static_cast<int>(EndPoint::Empty)); }
         QPointF point(const Data::EndPoint ep) const { return points.at(static_cast<int>(ep)); }
-        QPointF point(const aadl::AADLObjectIface::IfaceType type) const
+        QPointF point(const ivm::AADLObjectIface::IfaceType type) const
         {
             switch (type) {
-            case aadl::AADLObjectIface::IfaceType::Required:
+            case ivm::AADLObjectIface::IfaceType::Required:
                 return requiredIfacePoint();
-            case aadl::AADLObjectIface::IfaceType::Provided:
+            case ivm::AADLObjectIface::IfaceType::Provided:
                 return providedIfacePoint();
             default:
                 break;
@@ -116,22 +116,22 @@ private:
 
 void tst_ConnectionUtils::initTestCase()
 {
-    auto entity1 = new aadl::AADLObjectFunction("F1");
+    auto entity1 = new ivm::AADLObjectFunction("F1");
     f1 = new ive::AADLFunctionGraphicsItem(entity1);
     m_scene.addItem(f1);
     f1->setRect(QRectF(100, 100, 300, 300));
 
-    auto nestedEntity1 = new aadl::AADLObjectFunction("Nested_F1");
+    auto nestedEntity1 = new ivm::AADLObjectFunction("Nested_F1");
     entity1->addChild(nestedEntity1);
     nf1 = new ive::AADLFunctionGraphicsItem(nestedEntity1, f1);
     nf1->setRect(QRectF(150, 150, 100, 100));
 
-    auto entity2 = new aadl::AADLObjectFunction("F2");
+    auto entity2 = new ivm::AADLObjectFunction("F2");
     f2 = new ive::AADLFunctionGraphicsItem(entity2);
     m_scene.addItem(f2);
     f2->setRect(QRectF(600, 100, 300, 300));
 
-    auto nestedEntity2 = new aadl::AADLObjectFunction("Nested_F2");
+    auto nestedEntity2 = new ivm::AADLObjectFunction("Nested_F2");
     entity2->addChild(nestedEntity2);
     nf2 = new ive::AADLFunctionGraphicsItem(nestedEntity2, f2);
     nf2->setRect(QRectF(650, 150, 100, 100));
@@ -389,20 +389,20 @@ void tst_ConnectionUtils::tst_pathByPoints()
 
 void tst_ConnectionUtils::tst_endPoints()
 {
-    auto addIfaces = [this](const aadl::AADLObjectIface::IfaceType ifaceType) {
+    auto addIfaces = [this](const ivm::AADLObjectIface::IfaceType ifaceType) {
         for (int idx = 0; idx < data.size(); ++idx) {
-            aadl::AADLObjectIface::CreationInfo ci;
+            ivm::AADLObjectIface::CreationInfo ci;
             ci.function = data.at(idx).function()->entity();
             ci.name = ci.function->title();
             ci.position = data.at(idx).point(ifaceType);
             ci.type = ifaceType;
-            aadl::AADLObjectIface *iface { nullptr };
-            if (ifaceType == aadl::AADLObjectIface::IfaceType::Required) {
+            ivm::AADLObjectIface *iface { nullptr };
+            if (ifaceType == ivm::AADLObjectIface::IfaceType::Required) {
                 ci.name += QLatin1String("_ReqIface");
-                iface = new aadl::AADLObjectIfaceRequired(ci);
-            } else if (ifaceType == aadl::AADLObjectIface::IfaceType::Provided) {
+                iface = new ivm::AADLObjectIfaceRequired(ci);
+            } else if (ifaceType == ivm::AADLObjectIface::IfaceType::Provided) {
                 ci.name += QLatin1String("_ProvIface");
-                iface = new aadl::AADLObjectIfaceProvided(ci);
+                iface = new ivm::AADLObjectIfaceProvided(ci);
             } else {
                 qFatal("Test for Interface group isn't implemented yet");
             }
@@ -416,8 +416,8 @@ void tst_ConnectionUtils::tst_endPoints()
         }
     };
 
-    addIfaces(aadl::AADLObjectIface::IfaceType::Required);
-    addIfaces(aadl::AADLObjectIface::IfaceType::Provided);
+    addIfaces(ivm::AADLObjectIface::IfaceType::Required);
+    addIfaces(ivm::AADLObjectIface::IfaceType::Provided);
 
     /// Nested_F1-Empty <> F1-Empty
     checkEndPoints(nf1, Data::EndPoint::Empty, f1, Data::EndPoint::Empty, false, false);

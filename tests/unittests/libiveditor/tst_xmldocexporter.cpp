@@ -93,13 +93,13 @@ void tst_XmlDocExporter::testExportEmptyDoc()
 
 void tst_XmlDocExporter::testExportFunctions()
 {
-    auto testfunc1 = new aadl::AADLObjectFunction("TestFunc1", m_doc.get());
+    auto testfunc1 = new ivm::AADLObjectFunction("TestFunc1", m_doc.get());
     testfunc1->setAttr("foo", QVariant::fromValue(11));
     testfunc1->setProp("bar", QVariant::fromValue(22));
     testfunc1->addContextParam(
-            aadl::ContextParameter("Mo", aadl::BasicParameter::Type::Other, "MyInt", QVariant::fromValue(33)));
+            ivm::ContextParameter("Mo", ivm::BasicParameter::Type::Other, "MyInt", QVariant::fromValue(33)));
 
-    QVector<aadl::AADLObject *> objects;
+    QVector<ivm::AADLObject *> objects;
     objects.append(testfunc1);
     m_doc->setObjects(objects);
 
@@ -125,11 +125,11 @@ void tst_XmlDocExporter::testExportFunctions()
 
 void tst_XmlDocExporter::testExportComment()
 {
-    auto testcomment1 = new aadl::AADLObjectComment("TestComment1", m_doc.get());
+    auto testcomment1 = new ivm::AADLObjectComment("TestComment1", m_doc.get());
     testcomment1->setAttr("foo", QVariant::fromValue(11));
     testcomment1->setProperty("bar", QVariant::fromValue(22)); // ignored for comment
 
-    QVector<aadl::AADLObject *> objects;
+    QVector<ivm::AADLObject *> objects;
     objects.append(testcomment1);
     m_doc->setObjects(objects);
 
@@ -147,11 +147,11 @@ void tst_XmlDocExporter::testExportComment()
 
 void tst_XmlDocExporter::testExportNestedComment()
 {
-    auto testfunc1 = new aadl::AADLObjectFunction("TestFunc1", m_doc.get());
-    auto testcomment1 = new aadl::AADLObjectComment("TestComment1", testfunc1);
+    auto testfunc1 = new ivm::AADLObjectFunction("TestFunc1", m_doc.get());
+    auto testcomment1 = new ivm::AADLObjectComment("TestComment1", testfunc1);
     testfunc1->addChild(testcomment1);
 
-    QVector<aadl::AADLObject *> objects;
+    QVector<ivm::AADLObject *> objects;
     objects.append(testfunc1);
     m_doc->setObjects(objects);
 

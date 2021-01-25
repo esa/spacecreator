@@ -27,7 +27,7 @@
 #include <QDebug>
 #include <QRegularExpression>
 
-namespace aadl {
+namespace ivm {
 
 AADLNameValidator *AADLNameValidator::m_instance = nullptr;
 
@@ -65,8 +65,8 @@ QString AADLNameValidator::encodeName(const AADLObject::Type t, const QString &n
     case AADLObject::Type::Connection:
     case AADLObject::Type::Function:
     case AADLObject::Type::FunctionType:
-    case aadl::AADLObject::Type::ProvidedInterface:
-    case aadl::AADLObject::Type::RequiredInterface: {
+    case ivm::AADLObject::Type::ProvidedInterface:
+    case ivm::AADLObject::Type::RequiredInterface: {
         QString result;
         std::transform(name.cbegin(), name.cend(), std::back_inserter(result),
                 [](const QChar &ch) { return ch.isLetterOrNumber() ? ch : QLatin1Char('_'); });
@@ -100,8 +100,8 @@ QString AADLNameValidator::decodeName(const AADLObject::Type t, const QString &n
     case AADLObject::Type::Connection:
     case AADLObject::Type::Function:
     case AADLObject::Type::FunctionType:
-    case aadl::AADLObject::Type::ProvidedInterface:
-    case aadl::AADLObject::Type::RequiredInterface: {
+    case ivm::AADLObject::Type::ProvidedInterface:
+    case ivm::AADLObject::Type::RequiredInterface: {
         QString result;
         std::transform(name.cbegin(), name.cend(), std::back_inserter(result),
                 [](const QChar &ch) { return ch.isLetterOrNumber() ? ch : QLatin1Char(' '); });
@@ -134,7 +134,7 @@ bool AADLNameValidator::isValidName(const QString &name)
         return false;
     }
 
-    static QRegularExpression re(aadl::namePattern);
+    static QRegularExpression re(ivm::namePattern);
     QRegularExpressionMatch match = re.match(name);
     return match.hasMatch();
 }
@@ -144,7 +144,7 @@ bool AADLNameValidator::isValidName(const QString &name)
  */
 const QString &AADLNameValidator::namePattern()
 {
-    return aadl::namePattern;
+    return ivm::namePattern;
 }
 
 /*!
@@ -152,7 +152,7 @@ const QString &AADLNameValidator::namePattern()
  */
 const QString &AADLNameValidator::namePatternUI()
 {
-    return aadl::namePatternUI;
+    return ivm::namePatternUI;
 }
 
 /*!

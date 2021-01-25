@@ -21,7 +21,7 @@
 #include <QObject>
 #include <QString>
 
-namespace aadl {
+namespace ivm {
 namespace meta {
 
 struct Props {

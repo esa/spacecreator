@@ -19,7 +19,7 @@
 
 #include <QPointer>
 
-namespace aadl {
+namespace ivm {
 class AADLObjectIface;
 class AADLObjectFunction;
 
@@ -40,7 +40,7 @@ private:
             const AADLInterfaceChain &currentChain, const AADLObjectIface *iface);
 
 private:
-    QList<const aadl::AADLObjectIface *> ifaces;
+    QList<const ivm::AADLObjectIface *> ifaces;
 };
 
-} // namespace aadl
+} // namespace ivm

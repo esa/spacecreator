@@ -98,7 +98,7 @@ QString ActionsManager::storagePath()
  * Adds the appropriate actions into \a menu, managing its enablement based on action conditions and the \a currObj.
  * Initiates connection from QAction to the related handler slot.
  */
-void ActionsManager::populateMenu(QMenu *menu, aadl::AADLObject *currObj, InterfaceDocument *doc)
+void ActionsManager::populateMenu(QMenu *menu, ivm::AADLObject *currObj, InterfaceDocument *doc)
 {
     if (!menu)
         return;
@@ -118,7 +118,7 @@ void ActionsManager::populateMenu(QMenu *menu, aadl::AADLObject *currObj, Interf
                 if (!actHandler.m_internalActName.isEmpty())
                     triggerActionInternal(actHandler);
                 else if (!actHandler.m_externalApp.isEmpty()) {
-                    triggerActionExternal(actHandler, act ? act->data().value<aadl::AADLObject *>() : nullptr, doc);
+                    triggerActionExternal(actHandler, act ? act->data().value<ivm::AADLObject *>() : nullptr, doc);
                 } else {
                     QMessageBox::warning(nullptr, QObject::tr("Custom action"),
                             QObject::tr("No internal or external action provided by %1").arg(actHandler.m_title));
@@ -291,7 +291,7 @@ void ActionsManager::triggerActionInternal(const Action &act)
 }
 
 QString ActionsManager::replaceKeyHolder(
-        const QString &text, const aadl::AADLObject *aadlObj, const QString &projectDir)
+        const QString &text, const ivm::AADLObject *aadlObj, const QString &projectDir)
 {
     if (text.isEmpty() || text[0] != '$') {
         return text;
@@ -321,18 +321,18 @@ QString ActionsManager::replaceKeyHolder(
         case ExternalArgHolder::Param:
             if (text.startsWith(holder.key) && aadlObj) {
                 switch (aadlObj->aadlType()) {
-                case aadl::AADLObject::Type::RequiredInterface:
-                case aadl::AADLObject::Type::ProvidedInterface:
-                    if (const aadl::AADLObjectIface *iface = aadlObj->as<const aadl::AADLObjectIface *>()) {
-                        const aadl::IfaceParameter &ifaceParam = iface->param(name);
+                case ivm::AADLObject::Type::RequiredInterface:
+                case ivm::AADLObject::Type::ProvidedInterface:
+                    if (const ivm::AADLObjectIface *iface = aadlObj->as<const ivm::AADLObjectIface *>()) {
+                        const ivm::IfaceParameter &ifaceParam = iface->param(name);
                         if (!ifaceParam.isNull())
                             return ifaceParam.toString();
                     }
                     break;
-                case aadl::AADLObject::Type::Function:
-                case aadl::AADLObject::Type::FunctionType:
-                    if (const aadl::AADLObjectFunctionType *fn = aadlObj->as<const aadl::AADLObjectFunctionType *>()) {
-                        const aadl::ContextParameter &ctxParam = fn->contextParam(name);
+                case ivm::AADLObject::Type::Function:
+                case ivm::AADLObject::Type::FunctionType:
+                    if (const ivm::AADLObjectFunctionType *fn = aadlObj->as<const ivm::AADLObjectFunctionType *>()) {
+                        const ivm::ContextParameter &ctxParam = fn->contextParam(name);
                         if (!ctxParam.isNull())
                             return ctxParam.toString();
                     }
@@ -355,7 +355,7 @@ QString ActionsManager::replaceKeyHolder(
  * Replaces the keyholders by actual values of \a aadlObj's attributes or parameters.
  * Creates and shows an instance of ExtProcMonitor.
  */
-void ActionsManager::triggerActionExternal(const Action &act, const aadl::AADLObject *aadlObj, InterfaceDocument *doc)
+void ActionsManager::triggerActionExternal(const Action &act, const ivm::AADLObject *aadlObj, InterfaceDocument *doc)
 {
     if (!act.m_externalApp.isEmpty()) {
         if (doc->isDirty()) {

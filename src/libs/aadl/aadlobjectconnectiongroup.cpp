@@ -23,7 +23,7 @@
 
 #include <QtDebug>
 
-namespace aadl {
+namespace ivm {
 
 AADLObjectConnectionGroup::AADLObjectConnectionGroup(const QString &name, AADLObjectIfaceGroup *ifaceSource,
         AADLObjectIfaceGroup *ifaceTarget, const QList<QPointer<AADLObjectConnection>> &connections, QObject *parent)
@@ -189,4 +189,4 @@ QVariantList AADLObjectConnectionGroup::CreationInfo::toVarList() const
     return { QVariant::fromValue(*this) };
 }
 
-} // namespace aadl
+} // namespace ivm

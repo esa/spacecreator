@@ -66,10 +66,10 @@ IVEditorCore::IVEditorCore(QObject *parent)
     m_docToolBar->setAllowedAreas(Qt::AllToolBarAreas);
     m_docToolBar->setMovable(true);
 
-    if (aadl::AADLObjectsModel *model = document()->objectsModel()) {
-        connect(model, &aadl::AADLObjectsModel::aadlObjectsAdded, this, &ive::IVEditorCore::updateAadlItems);
-        connect(model, &aadl::AADLObjectsModel::aadlObjectRemoved, this, &ive::IVEditorCore::updateAadlItems);
-        connect(model, &aadl::AADLObjectsModel::rootObjectChanged, this, &ive::IVEditorCore::updateAadlItems);
+    if (ivm::AADLObjectsModel *model = document()->objectsModel()) {
+        connect(model, &ivm::AADLObjectsModel::aadlObjectsAdded, this, &ive::IVEditorCore::updateAadlItems);
+        connect(model, &ivm::AADLObjectsModel::aadlObjectRemoved, this, &ive::IVEditorCore::updateAadlItems);
+        connect(model, &ivm::AADLObjectsModel::rootObjectChanged, this, &ive::IVEditorCore::updateAadlItems);
     }
 }
 
@@ -142,7 +142,7 @@ QAction *IVEditorCore::actionToggleE2EView()
    Adds an aadl function with the given \p name
    @return Returns the newly created function. Or nullptr if the creation failed.
  */
-aadl::AADLObjectFunction *IVEditorCore::addFunction(const QString &name, aadl::AADLObjectFunction *parent)
+ivm::AADLObjectFunction *IVEditorCore::addFunction(const QString &name, ivm::AADLObjectFunction *parent)
 {
     auto cmd = new cmd::CmdFunctionItemCreate(
             m_document->objectsModel(), parent, QRectF(QPointF(10., 10.), DefaultGraphicsItemSize), name);
@@ -172,28 +172,28 @@ bool IVEditorCore::addConnection(QString name, const QString &fromInstanceName, 
         return addInterface(name, fromInstanceName) != nullptr;
     }
 
-    aadl::AADLObjectsModel *aadlModel = m_document->objectsModel();
+    ivm::AADLObjectsModel *aadlModel = m_document->objectsModel();
     if (aadlModel->getConnection(name, fromInstanceName, toInstanceName, m_caseCheck) != nullptr) {
         // The connection exists already
         return false;
     }
 
-    aadl::AADLObjectFunction *fromFunc = aadlModel->getFunction(fromInstanceName, m_caseCheck);
-    aadl::AADLObjectFunction *toFunc = aadlModel->getFunction(toInstanceName, m_caseCheck);
+    ivm::AADLObjectFunction *fromFunc = aadlModel->getFunction(fromInstanceName, m_caseCheck);
+    ivm::AADLObjectFunction *toFunc = aadlModel->getFunction(toInstanceName, m_caseCheck);
 
     if (!fromFunc || !toFunc) {
         qDebug() << Q_FUNC_INFO << "No function for the connection" << name;
         return false;
     }
 
-    aadl::AADLObjectIface *fromInterface = getInterface(name, aadl::AADLObjectIface::IfaceType::Required, fromFunc);
-    aadl::AADLObjectIface *toInterface = getInterface(name, aadl::AADLObjectIface::IfaceType::Provided, toFunc);
+    ivm::AADLObjectIface *fromInterface = getInterface(name, ivm::AADLObjectIface::IfaceType::Required, fromFunc);
+    ivm::AADLObjectIface *toInterface = getInterface(name, ivm::AADLObjectIface::IfaceType::Provided, toFunc);
 
     if (fromInterface && toInterface) {
         cmd::CommandsStack::Macro cmdMacro(tr("Create connection"));
 
-        auto createConnection = [aadlModel](aadl::AADLObjectFunction *parent, aadl::AADLObjectIface *inIf,
-                                        aadl::AADLObjectIface *outIf) {
+        auto createConnection = [aadlModel](ivm::AADLObjectFunction *parent, ivm::AADLObjectIface *inIf,
+                                        ivm::AADLObjectIface *outIf) {
             QVector<QPointF> points;
             points.append(ive::pos(inIf->coordinates()));
             points.append(ive::pos(outIf->coordinates()));
@@ -202,9 +202,9 @@ bool IVEditorCore::addConnection(QString name, const QString &fromInstanceName, 
         };
 
         // find all (nested/parent) functions for "source" and "target" connections
-        QList<aadl::AADLObjectFunction *> fromFunctions = fromInterface->functionsStack();
-        QList<aadl::AADLObjectFunction *> toFunctions = toInterface->functionsStack();
-        aadl::AADLObjectFunction *firstCommonFunction = nullptr;
+        QList<ivm::AADLObjectFunction *> fromFunctions = fromInterface->functionsStack();
+        QList<ivm::AADLObjectFunction *> toFunctions = toInterface->functionsStack();
+        ivm::AADLObjectFunction *firstCommonFunction = nullptr;
         while (!fromFunctions.isEmpty() && !toFunctions.isEmpty() && fromFunctions.last() == toFunctions.last()) {
             firstCommonFunction = fromFunctions.last();
             fromFunctions.takeLast();
@@ -213,10 +213,10 @@ bool IVEditorCore::addConnection(QString name, const QString &fromInstanceName, 
 
         // Create all connections on the "source" side
         while (fromFunctions.size() > 1) {
-            aadl::AADLObjectFunction *parentFunc = fromFunctions[1];
-            aadl::AADLObjectIface *sourceIf = fromInterface;
-            aadl::AADLObjectIface *targetIf =
-                    getInterface(name, aadl::AADLObjectIface::IfaceType::Required, parentFunc);
+            ivm::AADLObjectFunction *parentFunc = fromFunctions[1];
+            ivm::AADLObjectIface *sourceIf = fromInterface;
+            ivm::AADLObjectIface *targetIf =
+                    getInterface(name, ivm::AADLObjectIface::IfaceType::Required, parentFunc);
 
             createConnection(parentFunc, sourceIf, targetIf);
 
@@ -226,10 +226,10 @@ bool IVEditorCore::addConnection(QString name, const QString &fromInstanceName, 
 
         // Create all connections on the "target" side
         while (toFunctions.size() > 1) {
-            aadl::AADLObjectFunction *parentFunc = toFunctions[1];
-            aadl::AADLObjectIface *sourceIf = toInterface;
-            aadl::AADLObjectIface *targetIf =
-                    getInterface(name, aadl::AADLObjectIface::IfaceType::Provided, parentFunc);
+            ivm::AADLObjectFunction *parentFunc = toFunctions[1];
+            ivm::AADLObjectIface *sourceIf = toInterface;
+            ivm::AADLObjectIface *targetIf =
+                    getInterface(name, ivm::AADLObjectIface::IfaceType::Provided, parentFunc);
 
             createConnection(parentFunc, sourceIf, targetIf);
 
@@ -251,10 +251,10 @@ bool IVEditorCore::addConnection(QString name, const QString &fromInstanceName, 
    Adds an interface with name \p name to the function \p functionName to the model.
    Returns the newly returned interface, or nullptr in case of an error.
  */
-aadl::AADLObjectIface *IVEditorCore::addInterface(QString name, const QString &functionName)
+ivm::AADLObjectIface *IVEditorCore::addInterface(QString name, const QString &functionName)
 {
-    aadl::AADLObjectsModel *aadlModel = m_document->objectsModel();
-    aadl::AADLObjectFunction *func = aadlModel->getFunction(functionName, m_caseCheck);
+    ivm::AADLObjectsModel *aadlModel = m_document->objectsModel();
+    ivm::AADLObjectFunction *func = aadlModel->getFunction(functionName, m_caseCheck);
     if (!func) {
         qDebug() << Q_FUNC_INFO << "No function" << functionName << "for the interface" << name;
         return nullptr;
@@ -265,9 +265,9 @@ aadl::AADLObjectIface *IVEditorCore::addInterface(QString name, const QString &f
         return nullptr;
     }
 
-    aadl::AADLObjectIface::CreationInfo ci;
-    ci.kind = aadl::AADLObjectIface::OperationKind::Cyclic;
-    ci.type = aadl::AADLObjectIface::IfaceType::Provided;
+    ivm::AADLObjectIface::CreationInfo ci;
+    ci.kind = ivm::AADLObjectIface::OperationKind::Cyclic;
+    ci.type = ivm::AADLObjectIface::IfaceType::Provided;
     ci.function = func;
     ci.model = aadlModel;
     ci.name = name;
@@ -286,13 +286,13 @@ aadl::AADLObjectIface *IVEditorCore::addInterface(QString name, const QString &f
  */
 bool IVEditorCore::renameAadlFunction(const QString &oldName, const QString &newName)
 {
-    aadl::AADLObjectsModel *aadlModel = m_document->objectsModel();
-    aadl::AADLObjectFunction *aadlFunc = aadlModel->getFunction(oldName, m_caseCheck);
+    ivm::AADLObjectsModel *aadlModel = m_document->objectsModel();
+    ivm::AADLObjectFunction *aadlFunc = aadlModel->getFunction(oldName, m_caseCheck);
     if (!aadlFunc) {
         return false;
     }
 
-    const QVariantHash attributess = { { aadl::meta::Props::token(aadl::meta::Props::Token::name), newName } };
+    const QVariantHash attributess = { { ivm::meta::Props::token(ivm::meta::Props::Token::name), newName } };
     auto cmd = new cmd::CmdEntityAttributeChange(aadlFunc, attributess);
     cmd::CommandsStack::push(cmd);
 
@@ -318,15 +318,15 @@ bool IVEditorCore::renameAadlConnection(
         return renameCyclicInterface(oldName, newName, fromInstanceName);
     }
 
-    aadl::AADLObjectsModel *aadlModel = m_document->objectsModel();
-    aadl::AADLObjectConnection *aadlConnect =
+    ivm::AADLObjectsModel *aadlModel = m_document->objectsModel();
+    ivm::AADLObjectConnection *aadlConnect =
             aadlModel->getConnection(oldName, fromInstanceName, toInstanceName, m_caseCheck);
     if (!aadlConnect) {
         return false;
     }
 
     auto cmd = new cmd::CmdIfaceAttrChange(aadlConnect->targetInterface(),
-            aadl::meta::Props::token(aadl::meta::Props::Token::name), QVariant::fromValue(newName));
+            ivm::meta::Props::token(ivm::meta::Props::Token::name), QVariant::fromValue(newName));
     cmd::CommandsStack::push(cmd);
 
     Q_EMIT editedExternally(this);
@@ -335,18 +335,18 @@ bool IVEditorCore::renameAadlConnection(
 
 bool IVEditorCore::renameCyclicInterface(const QString &oldName, const QString &newName, const QString &functionName)
 {
-    aadl::AADLObjectsModel *aadlModel = m_document->objectsModel();
-    aadl::AADLObjectFunction *func = aadlModel->getFunction(functionName, m_caseCheck);
+    ivm::AADLObjectsModel *aadlModel = m_document->objectsModel();
+    ivm::AADLObjectFunction *func = aadlModel->getFunction(functionName, m_caseCheck);
     if (!func) {
         qDebug() << Q_FUNC_INFO << "No function" << functionName << "to rename the interface from" << newName << "to"
                  << oldName;
         return false;
     }
 
-    aadl::AADLObjectIface *interface =
-            aadlModel->getIfaceByName(oldName, aadl::AADLObjectIface::IfaceType::Required, func, m_caseCheck);
+    ivm::AADLObjectIface *interface =
+            aadlModel->getIfaceByName(oldName, ivm::AADLObjectIface::IfaceType::Required, func, m_caseCheck);
     if (!interface) {
-        interface = aadlModel->getIfaceByName(oldName, aadl::AADLObjectIface::IfaceType::Provided, func, m_caseCheck);
+        interface = aadlModel->getIfaceByName(oldName, ivm::AADLObjectIface::IfaceType::Provided, func, m_caseCheck);
     }
     if (!interface) {
         qDebug() << Q_FUNC_INFO << "No interface" << oldName << "to rname for function" << functionName;
@@ -354,7 +354,7 @@ bool IVEditorCore::renameCyclicInterface(const QString &oldName, const QString &
     }
 
     auto cmd = new cmd::CmdIfaceAttrChange(
-            interface, aadl::meta::Props::token(aadl::meta::Props::Token::name), QVariant::fromValue(newName));
+            interface, ivm::meta::Props::token(ivm::meta::Props::Token::name), QVariant::fromValue(newName));
     cmd::CommandsStack::push(cmd);
 
     Q_EMIT editedExternally(this);
@@ -402,12 +402,12 @@ bool IVEditorCore::save()
     return ive::XmlDocExporter::exportDocSilently(m_document, {}, {});
 }
 
-QVector<aadl::AADLObjectFunction *> IVEditorCore::allAadlFunctions() const
+QVector<ivm::AADLObjectFunction *> IVEditorCore::allAadlFunctions() const
 {
     return m_aadlFunctions;
 }
 
-QVector<aadl::AADLObjectConnection *> IVEditorCore::allAadlConnections() const
+QVector<ivm::AADLObjectConnection *> IVEditorCore::allAadlConnections() const
 {
     return m_aadlConnections;
 }
@@ -418,7 +418,7 @@ QVector<aadl::AADLObjectConnection *> IVEditorCore::allAadlConnections() const
 QStringList IVEditorCore::aadlFunctionsNames() const
 {
     QStringList functionNames;
-    for (const aadl::AADLObjectFunction *aadlFunction : m_aadlFunctions) {
+    for (const ivm::AADLObjectFunction *aadlFunction : m_aadlFunctions) {
         if (aadlFunction && !aadlFunction->title().isEmpty()) {
             functionNames << aadlFunction->title();
         }
@@ -432,7 +432,7 @@ QStringList IVEditorCore::aadlFunctionsNames() const
 QStringList IVEditorCore::aadlConnectionNames() const
 {
     QStringList connectionNames;
-    for (const aadl::AADLObjectConnection *aadlConnection : m_aadlConnections) {
+    for (const ivm::AADLObjectConnection *aadlConnection : m_aadlConnections) {
         if (aadlConnection && !aadlConnection->name().isEmpty()) {
             connectionNames << aadlConnection->name();
         }
@@ -489,27 +489,27 @@ void IVEditorCore::saveSceneRender(const QString &filePath) const
    Get the interface, or creates it if it does not exist. In case the \p parentFunction is a nullptr, a nullptr is
    returned
  */
-aadl::AADLObjectIface *IVEditorCore::getInterface(
-        const QString &ifName, aadl::AADLObjectIface::IfaceType ifType, aadl::AADLObjectFunction *parentFunction)
+ivm::AADLObjectIface *IVEditorCore::getInterface(
+        const QString &ifName, ivm::AADLObjectIface::IfaceType ifType, ivm::AADLObjectFunction *parentFunction)
 {
     if (parentFunction == nullptr) {
         return {};
     }
 
-    aadl::AADLObjectsModel *aadlModel = m_document->objectsModel();
+    ivm::AADLObjectsModel *aadlModel = m_document->objectsModel();
     if (!aadlModel) {
         return {};
     }
 
-    aadl::AADLObjectIface *interface = aadlModel->getIfaceByName(ifName, ifType, parentFunction, m_caseCheck);
+    ivm::AADLObjectIface *interface = aadlModel->getIfaceByName(ifName, ifType, parentFunction, m_caseCheck);
     if (!interface) {
         // create the interface
-        aadl::AADLObjectIface::CreationInfo createInfo(aadlModel, parentFunction);
+        ivm::AADLObjectIface::CreationInfo createInfo(aadlModel, parentFunction);
         createInfo.name = ifName;
         createInfo.type = ifType;
         QRectF funcRect = ive::rect(parentFunction->coordinates());
         QPointF ifPos(funcRect.left(), funcRect.center().y());
-        if (ifType == aadl::AADLObjectIface::IfaceType::Required) {
+        if (ifType == ivm::AADLObjectIface::IfaceType::Required) {
             ifPos.setX(funcRect.right());
         }
         createInfo.position = ifPos;
@@ -528,13 +528,13 @@ void IVEditorCore::updateAadlItems()
     m_aadlFunctions.clear();
     m_aadlConnections.clear();
 
-    aadl::AADLObjectsModel *aadlModel = m_document->objectsModel();
+    ivm::AADLObjectsModel *aadlModel = m_document->objectsModel();
     if (!aadlModel) {
         return;
     }
 
-    m_aadlFunctions = aadlModel->allObjectsByType<aadl::AADLObjectFunction>();
-    m_aadlConnections = aadlModel->allObjectsByType<aadl::AADLObjectConnection>();
+    m_aadlFunctions = aadlModel->allObjectsByType<ivm::AADLObjectFunction>();
+    m_aadlConnections = aadlModel->allObjectsByType<ivm::AADLObjectConnection>();
 }
 
 }

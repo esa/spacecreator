@@ -26,7 +26,7 @@
 class QGraphicsScene;
 class QGraphicsItem;
 
-namespace aadl {
+namespace ivm {
 
 class AADLObjectIface;
 class AADLObjectFunction;
@@ -68,17 +68,17 @@ private:
 };
 
 struct ValidationResult {
-    aadl::AADLObjectIface *startIface { nullptr };
-    aadl::AADLObjectIface *endIface { nullptr };
+    ivm::AADLObjectIface *startIface { nullptr };
+    ivm::AADLObjectIface *endIface { nullptr };
     shared::Id startIfaceId = {};
     shared::Id endIfaceId = {};
     QPointF startPointAdjusted {};
     QPointF endPointAdjusted {};
     QVector<QPointF> connectionPoints;
     QGraphicsItem *functionAtStartPos { nullptr };
-    aadl::AADLObjectFunction *startObject { nullptr };
+    ivm::AADLObjectFunction *startObject { nullptr };
     QGraphicsItem *functionAtEndPos { nullptr };
-    aadl::AADLObjectFunction *endObject { nullptr };
+    ivm::AADLObjectFunction *endObject { nullptr };
     bool isToOrFromNested { false };
 
     ConnectionCreationValidator::FailReason status { ConnectionCreationValidator::FailReason::NoScene };

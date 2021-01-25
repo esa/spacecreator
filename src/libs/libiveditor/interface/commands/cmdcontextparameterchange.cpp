@@ -27,8 +27,8 @@
 namespace ive {
 namespace cmd {
 
-CmdContextParameterChange::CmdContextParameterChange(aadl::AADLObjectFunctionType *entity,
-        const aadl::ContextParameter &oldParam, const aadl::ContextParameter &newParam)
+CmdContextParameterChange::CmdContextParameterChange(ivm::AADLObjectFunctionType *entity,
+        const ivm::ContextParameter &oldParam, const ivm::ContextParameter &newParam)
     : QUndoCommand()
     , m_entity(entity)
     , m_newParam(newParam)
@@ -37,12 +37,12 @@ CmdContextParameterChange::CmdContextParameterChange(aadl::AADLObjectFunctionTyp
     setText(QObject::tr("Change Context Parameter"));
 }
 
-void CmdContextParameterChange::swapParam(const aadl::ContextParameter &from, const aadl::ContextParameter &to)
+void CmdContextParameterChange::swapParam(const ivm::ContextParameter &from, const ivm::ContextParameter &to)
 {
     if (!m_entity)
         return;
 
-    QVector<aadl::ContextParameter> params = m_entity->contextParams();
+    QVector<ivm::ContextParameter> params = m_entity->contextParams();
 
     const int id = params.indexOf(from);
     if (id >= 0 && id < params.size()) {

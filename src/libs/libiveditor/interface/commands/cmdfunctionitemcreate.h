@@ -22,7 +22,7 @@
 #include <QPointer>
 #include <QRectF>
 
-namespace aadl {
+namespace ivm {
 class AADLObjectFunctionType;
 class AADLObjectFunction;
 class AADLObjectsModel;
@@ -34,7 +34,7 @@ namespace cmd {
 class CmdFunctionItemCreate : public CmdEntityGeometryChange
 {
 public:
-    explicit CmdFunctionItemCreate(aadl::AADLObjectsModel *model, aadl::AADLObjectFunction *parent,
+    explicit CmdFunctionItemCreate(ivm::AADLObjectsModel *model, ivm::AADLObjectFunction *parent,
             const QRectF &geometry, const QString &title = QString());
     ~CmdFunctionItemCreate() override;
 
@@ -42,12 +42,12 @@ public:
     void undo() override;
     int id() const override;
 
-    aadl::AADLObjectFunction *createdFunction() const;
+    ivm::AADLObjectFunction *createdFunction() const;
 
 private:
-    QPointer<aadl::AADLObjectsModel> m_model;
-    QPointer<aadl::AADLObjectFunctionType> m_parent;
-    QPointer<aadl::AADLObjectFunction> m_entity;
+    QPointer<ivm::AADLObjectsModel> m_model;
+    QPointer<ivm::AADLObjectFunctionType> m_parent;
+    QPointer<ivm::AADLObjectFunction> m_entity;
 };
 
 }

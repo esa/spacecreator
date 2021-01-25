@@ -35,7 +35,7 @@
 
 namespace ive {
 
-InteractiveObject::InteractiveObject(aadl::AADLObject *entity, QGraphicsItem *parent)
+InteractiveObject::InteractiveObject(ivm::AADLObject *entity, QGraphicsItem *parent)
     : shared::ui::InteractiveObjectBase(parent)
     , m_dataObject(entity)
 {
@@ -48,7 +48,7 @@ InteractiveObject::InteractiveObject(aadl::AADLObject *entity, QGraphicsItem *pa
     connect(ColorManager::instance(), &ColorManager::colorsUpdated, this, &InteractiveObject::applyColorScheme);
 }
 
-aadl::AADLObject *InteractiveObject::aadlObject() const
+ivm::AADLObject *InteractiveObject::aadlObject() const
 {
     return m_dataObject;
 }

@@ -6,7 +6,7 @@
 
 #include <algorithm>
 
-namespace aadl {
+namespace ivm {
 namespace testutils {
 
 AADLObjectIface::CreationInfo init(AADLObjectIface::IfaceType t, AADLObjectFunctionType *fn, const QString &name)
@@ -42,19 +42,19 @@ AADLObjectConnection *createConnection(
     const QVector<AADLObjectIface *> requiredInterfaces = target->ris();
     auto it = std::find_if(requiredInterfaces.begin(), requiredInterfaces.end(),
             [&name](AADLObjectIface *interface) { return interface->title() == name; });
-    aadl::AADLObjectIface *sourceIf = it != requiredInterfaces.end()
+    ivm::AADLObjectIface *sourceIf = it != requiredInterfaces.end()
             ? *it
-            : aadl::testutils::createIface(source, aadl::AADLObjectIface::IfaceType::Required, name);
+            : ivm::testutils::createIface(source, ivm::AADLObjectIface::IfaceType::Required, name);
 
     const QVector<AADLObjectIface *> providedInterfaces = target->pis();
     it = std::find_if(providedInterfaces.begin(), providedInterfaces.end(),
             [&name](AADLObjectIface *interface) { return interface->title() == name; });
-    aadl::AADLObjectIface *targetIf = it != providedInterfaces.end()
+    ivm::AADLObjectIface *targetIf = it != providedInterfaces.end()
             ? *it
-            : aadl::testutils::createIface(target, aadl::AADLObjectIface::IfaceType::Provided, name);
+            : ivm::testutils::createIface(target, ivm::AADLObjectIface::IfaceType::Provided, name);
 
-    auto connection = new aadl::AADLObjectConnection(targetIf, sourceIf);
-    aadl::AADLObjectsModel *aadlModel = source ? source->objectsModel() : target->objectsModel();
+    auto connection = new ivm::AADLObjectConnection(targetIf, sourceIf);
+    ivm::AADLObjectsModel *aadlModel = source ? source->objectsModel() : target->objectsModel();
     if (aadlModel) {
         aadlModel->addObject(connection);
     }

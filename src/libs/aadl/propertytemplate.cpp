@@ -20,7 +20,7 @@
 #include <QDomElement>
 #include <QMetaEnum>
 
-namespace aadl {
+namespace ivm {
 
 const QString kTagName = QLatin1String("Attr");
 
@@ -365,4 +365,4 @@ QVariant PropertyTemplate::convertData(const QVariant &value, PropertyTemplate::
     return typedValue;
 }
 
-} // namespace aadl
+} // namespace ivm

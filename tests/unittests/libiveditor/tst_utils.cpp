@@ -163,13 +163,13 @@ void tst_Utils::testSiblingSceneRects()
     QGraphicsScene scene;
     ive::AADLFunctionGraphicsItem *item { nullptr };
     for (int idx = 0; idx < existingRects.size(); ++idx) {
-        item = new ive::AADLFunctionGraphicsItem(new aadl::AADLObjectFunction);
+        item = new ive::AADLFunctionGraphicsItem(new ivm::AADLObjectFunction);
         scene.addItem(item);
         item->setRect(existingRects.at(idx));
     }
     ive::AADLFunctionGraphicsItem *child { nullptr };
     for (int idx = 0; idx < 3; ++idx) {
-        child = new ive::AADLFunctionGraphicsItem(new aadl::AADLObjectFunction, item);
+        child = new ive::AADLFunctionGraphicsItem(new ivm::AADLObjectFunction, item);
         child->setRect(existingRects.at(idx));
     }
     const auto siblingItems0 = ive::siblingSceneRects(item);

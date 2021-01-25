@@ -35,7 +35,7 @@ namespace Asn1Acn {
 class Asn1ModelStorage;
 }
 
-namespace aadl {
+namespace ivm {
 class AADLObject;
 class AADLObjectIface;
 class AADLObjectsModel;
@@ -93,16 +93,16 @@ public:
 
     QList<QAction *> customActions() const;
 
-    const QHash<shared::Id, aadl::AADLObject *> &objects() const;
-    aadl::AADLObjectsModel *objectsModel() const;
-    aadl::AADLObjectsModel *importModel() const;
+    const QHash<shared::Id, ivm::AADLObject *> &objects() const;
+    ivm::AADLObjectsModel *objectsModel() const;
+    ivm::AADLObjectsModel *importModel() const;
     AADLItemModel *itemsModel() const;
 
     Asn1Acn::Asn1ModelStorage *asn1DataTypes() const;
 
     QString supportedFileExtensions() const;
 
-    bool checkInterfaceAsn1Compliance(const aadl::AADLObjectIface *interface) const;
+    bool checkInterfaceAsn1Compliance(const ivm::AADLObjectIface *interface) const;
     bool checkAllInterfacesForAsn1Compliance();
 
 Q_SIGNALS:
@@ -116,7 +116,7 @@ Q_SIGNALS:
 
 public Q_SLOTS:
     void onSavedExternally(const QString &filePath, bool saved);
-    void setObjects(const QVector<aadl::AADLObject *> &objects);
+    void setObjects(const QVector<ivm::AADLObject *> &objects);
     void onAttributesManagerRequested();
     void onColorSchemeMenuInvoked();
     void onDynContextEditorMenuInvoked();
@@ -126,7 +126,7 @@ private Q_SLOTS:
     void onItemDoubleClicked(shared::Id id);
 
     void onDataTypesMenuInvoked();
-    void showPropertyEditor(aadl::AADLObject *obj);
+    void showPropertyEditor(ivm::AADLObject *obj);
     void showInfoMessage(const QString &title, const QString &message);
     void importEntity(const shared::Id &id, const QPointF &sceneDropPoint);
     void instantiateEntity(const shared::Id &id, const QPointF &sceneDropPoint);
@@ -134,11 +134,11 @@ private Q_SLOTS:
     void showContextMenuForAADLModel(const QPoint &pos);
 
 private:
-    bool exportImpl(const QString &path, const QList<aadl::AADLObject *> &objects);
+    bool exportImpl(const QString &path, const QList<ivm::AADLObject *> &objects);
     bool loadImpl(const QString &path);
     QString getComponentName(const QStringList &exportNames);
-    QList<aadl::AADLObject *> prepareSelectedObjectsForExport(QString &name);
-    static bool loadComponentModel(aadl::AADLObjectsModel *model, const QString &path);
+    QList<ivm::AADLObject *> prepareSelectedObjectsForExport(QString &name);
+    static bool loadComponentModel(ivm::AADLObjectsModel *model, const QString &path);
 
     QWidget *createGraphicsView();
     QTreeView *createModelView();

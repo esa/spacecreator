@@ -23,7 +23,7 @@
 #include "asn1/types/type.h"
 #include "asn1valueparser.h"
 
-namespace aadl {
+namespace ivm {
 
 const QString BasicParameter::ToStringDelemiter = QString("::");
 

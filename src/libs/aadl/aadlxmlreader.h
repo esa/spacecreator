@@ -27,7 +27,7 @@
 class QIODevice;
 class QXmlStreamReader;
 
-namespace aadl {
+namespace ivm {
 
 class AADLObjectIface;
 class AADLObjectFunctionType;
@@ -47,7 +47,7 @@ public:
     bool read(QIODevice *openForRead);
 
 Q_SIGNALS:
-    void objectsParsed(const QVector<aadl::AADLObject *> &objects);
+    void objectsParsed(const QVector<ivm::AADLObject *> &objects);
     void metaDataParsed(const QVariantMap &metadata);
     void error(const QString &msg);
 

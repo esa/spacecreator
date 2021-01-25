@@ -28,10 +28,10 @@ struct XmlFileMock {
     const QString m_xmlContent;
     int m_expectedErrorCount { 0 };
     bool m_canBeParsed { true };
-    QMap<aadl::AADLObject::Type, int> m_objectCountByType;
+    QMap<ivm::AADLObject::Type, int> m_objectCountByType;
 
-    int expectedObjectCount(aadl::AADLObject::Type t = aadl::AADLObject::Type::Unknown) const;
-    void setExpectedObjectCount(aadl::AADLObject::Type t, int count);
+    int expectedObjectCount(ivm::AADLObject::Type t = ivm::AADLObject::Type::Unknown) const;
+    void setExpectedObjectCount(ivm::AADLObject::Type t, int count);
 
     static XmlFileMock createEmptyFile();
     static XmlFileMock createEmptyDoc();

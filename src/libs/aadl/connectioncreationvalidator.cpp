@@ -28,15 +28,15 @@
 #include <QGraphicsScene>
 #include <QtMath>
 
-namespace aadl {
+namespace ivm {
 
 /*!
- * \class aadl::ConnectionCreationValidator
+ * \class ivm::ConnectionCreationValidator
  * The collection of static functions to detect if it's possible to connect two interfaces/scene points.
  */
 
 /*!
-    \enum class aadl::ConnectionCreationValidator::FailReason
+    \enum class ivm::ConnectionCreationValidator::FailReason
     This enum type specifies a reason of why the connection creation is prohibited:
 
         \value NotFail
