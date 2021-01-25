@@ -13,10 +13,13 @@ function(addQtTest TEST_NAME LIBRARY)
         ${TEST_NAME}.cpp
         ${EXTRA_SOURCES}
     )
+
     target_link_libraries(${TEST_NAME} PUBLIC
         ${LIBRARY}
         Qt5::Test
     )
-add_test(NAME ${TEST_NAME} COMMAND ${TEST_NAME} -xunitxml -o ${CMAKE_BINARY_DIR}/${TEST_NAME}.xml)
 
+    target_compile_definitions(${TEST_NAME} PUBLIC EXAMPLES_DIR=\"${CMAKE_SOURCE_DIR}/examples/\")
+
+    add_test(NAME ${TEST_NAME} COMMAND ${TEST_NAME} -xunitxml -o ${CMAKE_BINARY_DIR}/${TEST_NAME}.xml)
 endfunction()
