@@ -17,7 +17,7 @@
 
 #include "graphicsview.h"
 
-namespace deploymentinterface {
+namespace dve {
 
 GraphicsView::GraphicsView(QWidget *parent)
     : shared::ui::GraphicsViewBase(parent)
@@ -26,4 +26,4 @@ GraphicsView::GraphicsView(QWidget *parent)
     setResizeAnchor(QGraphicsView::AnchorUnderMouse);
 }
 
-} // namespace deploymentinterface
+} // namespace dve

@@ -17,7 +17,7 @@
 
 #include <QObject>
 
-namespace deploymentinterface {
+namespace dve {
 class DVEditorCore;
 }
 
@@ -29,7 +29,7 @@ class DeploymentModelStorage : public QObject
 public:
     explicit DeploymentModelStorage(QObject *parent = nullptr);
 
-    QSharedPointer<deploymentinterface::DVEditorCore> dvData(const QString &fileName);
+    QSharedPointer<dve::DVEditorCore> dvData(const QString &fileName);
 
     void remove(const QString &fileName);
 };

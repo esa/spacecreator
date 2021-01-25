@@ -19,7 +19,7 @@
 
 #include "ui/graphicsviewbase.h"
 
-namespace deploymentinterface {
+namespace dve {
 
 /*!
   \class GraphicsView
@@ -33,4 +33,4 @@ public:
     explicit GraphicsView(QWidget *parent = nullptr);
 };
 
-} // namespace deploymentinterface
+} // namespace dve

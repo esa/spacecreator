@@ -17,11 +17,11 @@
 
 #include "deploymentmodel.h"
 
-namespace deploymentinterface {
+namespace dve {
 
 DeploymentModel::DeploymentModel(QObject *parent)
     : QObject(parent)
 {
 }
 
-} // namespace deploymentinterface
+} // namespace dve

@@ -26,7 +26,7 @@ DeploymentModelStorage::DeploymentModelStorage(QObject *parent)
 {
 }
 
-QSharedPointer<deploymentinterface::DVEditorCore> DeploymentModelStorage::dvData(const QString &fileName)
+QSharedPointer<dve::DVEditorCore> DeploymentModelStorage::dvData(const QString &fileName)
 {
     Q_UNUSED(fileName)
     return {};

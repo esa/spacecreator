@@ -24,11 +24,11 @@ static void init_dv_editor_library()
     Q_INIT_RESOURCE(dveditorresources);
 }
 
-namespace deploymentinterface {
+namespace dve {
 
 void initDvEditor()
 {
     init_dv_editor_library();
 }
 
-} // namespace deploymentinterface
+} // namespace dve

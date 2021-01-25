@@ -26,7 +26,7 @@ namespace Ui {
 class MainWindow;
 }
 
-namespace deploymentinterface {
+namespace dve {
 
 class DVEditorCore;
 
@@ -35,7 +35,7 @@ class MainWindow : public QMainWindow
     Q_OBJECT
 
 public:
-    explicit MainWindow(deploymentinterface::DVEditorCore *core, QWidget *parent = nullptr);
+    explicit MainWindow(dve::DVEditorCore *core, QWidget *parent = nullptr);
     ~MainWindow() override;
 
 protected:
@@ -51,7 +51,7 @@ private:
     void onQuitRequested();
 
     Ui::MainWindow *ui { nullptr };
-    deploymentinterface::DVEditorCore *m_core { nullptr };
+    dve::DVEditorCore *m_core { nullptr };
 };
 
-} // namespace deploymentinterface
+} // namespace dve

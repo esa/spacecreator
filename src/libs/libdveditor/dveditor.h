@@ -17,8 +17,8 @@
 
 #pragma once
 
-namespace deploymentinterface {
+namespace dve {
 
 void initDvEditor();
 
-} // namespace deploymentinterface
+} // namespace dve

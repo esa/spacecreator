@@ -27,7 +27,7 @@
 int main(int argc, char *argv[])
 {
     shared::initSharedLibrary();
-    deploymentinterface::initDvEditor();
+    dve::initDvEditor();
 
     QApplication a(argc, argv);
     a.setOrganizationName(SC_ORGANISATION);
@@ -40,8 +40,8 @@ int main(int argc, char *argv[])
         QFontDatabase::addApplicationFont(dirIt.next());
     a.setFont(QFont(QLatin1String("Ubuntu"), 8));
 
-    deploymentinterface::DVEditorCore plugin;
-    deploymentinterface::MainWindow w(&plugin);
+    dve::DVEditorCore plugin;
+    dve::MainWindow w(&plugin);
     w.show();
 
     return a.exec();

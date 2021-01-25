@@ -23,9 +23,9 @@
 
 #include <QCloseEvent>
 
-namespace deploymentinterface {
+namespace dve {
 
-MainWindow::MainWindow(deploymentinterface::DVEditorCore *core, QWidget *parent)
+MainWindow::MainWindow(dve::DVEditorCore *core, QWidget *parent)
     : QMainWindow(parent)
     , ui(new Ui::MainWindow)
     , m_core(core)

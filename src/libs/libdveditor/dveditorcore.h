@@ -29,7 +29,7 @@ class GraphicsViewBase;
 }
 }
 
-namespace deploymentinterface {
+namespace dve {
 class DeploymentModel;
 namespace cmd {
 class CommandsStack;
@@ -60,4 +60,4 @@ private:
     std::unique_ptr<DeploymentInterfacePrivate> d;
 };
 
-} // namespace deploymentinterface
+} // namespace dve

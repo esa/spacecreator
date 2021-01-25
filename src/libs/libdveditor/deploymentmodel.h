@@ -19,7 +19,7 @@
 
 #include <QObject>
 
-namespace deploymentinterface {
+namespace dve {
 
 class DeploymentModel : public QObject
 {
@@ -28,4 +28,4 @@ public:
     explicit DeploymentModel(QObject *parent = nullptr);
 };
 
-} // namespace deploymentinterface
+} // namespace dve

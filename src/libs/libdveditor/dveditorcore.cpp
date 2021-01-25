@@ -23,7 +23,7 @@
 
 #include <QUndoCommand>
 
-namespace deploymentinterface {
+namespace dve {
 
 struct DVEditorCore::DeploymentInterfacePrivate {
     DeploymentInterfacePrivate(const DeploymentInterfacePrivate &) = delete;
@@ -32,7 +32,7 @@ struct DVEditorCore::DeploymentInterfacePrivate {
         : m_commandsStack(new QUndoStack)
         , m_scene(new QGraphicsScene)
         , m_model(new DeploymentModel)
-        , m_view(new deploymentinterface::GraphicsView)
+        , m_view(new dve::GraphicsView)
         , m_toolBar(new QToolBar)
     {
         m_toolBar->setObjectName("Document ToolBar");
@@ -51,8 +51,8 @@ struct DVEditorCore::DeploymentInterfacePrivate {
 
     QUndoStack *m_commandsStack { nullptr };
     QGraphicsScene *m_scene { nullptr };
-    std::unique_ptr<deploymentinterface::DeploymentModel> m_model;
-    QPointer<deploymentinterface::GraphicsView> m_view;
+    std::unique_ptr<dve::DeploymentModel> m_model;
+    QPointer<dve::GraphicsView> m_view;
     QPointer<QToolBar> m_toolBar;
 };
 
