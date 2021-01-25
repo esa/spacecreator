@@ -44,26 +44,15 @@ public:
     explicit EditorCore(QObject *parent = nullptr);
     virtual ~EditorCore();
 
-    // Override this to show or hide actions
-    virtual void setPluginActive(bool active) = 0;
-
     QWidget *minimapView() const;
     virtual ui::GraphicsViewBase *chartView() = 0;
     virtual QToolBar *mainToolBar();
     virtual void addToolBars(QMainWindow *window) = 0;
 
-    // Set up all the menus
-    void initMenus(QMainWindow *window);
-    virtual void addMenuFileActions(QMenu *menu, QMainWindow *window) = 0;
-    virtual void addMenuEditActions(QMenu *menu, QMainWindow *window) = 0;
-    virtual void addMenuViewActions(QMenu *menu, QMainWindow *window);
-    virtual void addMenuHelpActions(QMenu *menu, QMainWindow *window) = 0;
-
     QAction *actionNewFile();
     QAction *actionOpenFile();
     QAction *actionSaveFile();
     QAction *actionSaveFileAs();
-    QAction *actionOpenAadl();
     QAction *actionQuit();
     QAction *actionUndo();
     QAction *actionRedo();
@@ -90,7 +79,6 @@ Q_SIGNALS:
     void editedExternally(shared::EditorCore *);
 
 private:
-    QMainWindow *m_mainWindow = { nullptr };
     QPointer<QToolBar> m_mainToolBar { nullptr };
 
     QPointer<ui::MiniMap> m_miniMap { nullptr };
@@ -100,7 +88,6 @@ private:
     QAction *m_actionSaveFile { nullptr };
     QAction *m_actionSaveFileAs { nullptr };
     QAction *m_actionCloseFile { nullptr };
-    QAction *m_actionOpenAadl { nullptr };
     QAction *m_actionQuit { nullptr };
     QAction *m_actionUndo { nullptr };
     QAction *m_actionRedo { nullptr };

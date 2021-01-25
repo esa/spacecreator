@@ -33,6 +33,9 @@ MainWindow::MainWindow(deploymentinterface::DVEditorCore *core, QWidget *parent)
     ui->setupUi(this);
     initSettings();
 
+    initActions();
+    initMenus();
+
     setCentralWidget(core->chartView());
     addToolBar(core->toolBar());
 }
@@ -55,6 +58,24 @@ void MainWindow::closeEvent(QCloseEvent *e)
         QMainWindow::closeEvent(e);
     else
         e->ignore();
+}
+
+void MainWindow::initActions()
+{
+    // Connect the core actions
+    connect(m_core->actionQuit(), &QAction::triggered, this, [&]() { QApplication::quit(); });
+}
+
+void MainWindow::initMenus()
+{
+    // Initialize the file menu
+    auto menu = menuBar()->addMenu(tr("File"));
+    menu->addAction(m_core->actionQuit());
+
+    // Initialize the help menu
+    menu = menuBar()->addMenu(tr("&Help"));
+    menu->addAction(tr("About"), m_core, &shared::EditorCore::showAboutDialog);
+    menu->addAction(tr("About Qt"), qApp, &QApplication::aboutQt);
 }
 
 void MainWindow::onQuitRequested()

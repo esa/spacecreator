@@ -17,7 +17,6 @@
 
 #include "commandlineparser.h"
 #include "iveditorcore.h"
-#include "mainwindow.h"
 #include "msceditorcore.h"
 
 #include <QtTest>

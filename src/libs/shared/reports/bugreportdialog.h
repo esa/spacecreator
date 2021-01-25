@@ -40,7 +40,7 @@ private Q_SLOTS:
 
 private:
     struct BugreportDialogPrivate;
-    BugreportDialogPrivate *d;
+    BugreportDialogPrivate *d = nullptr;
 };
 
 }

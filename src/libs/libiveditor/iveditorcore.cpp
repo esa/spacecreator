@@ -34,7 +34,6 @@
 #include "interface/commands/commandsfactory.h"
 #include "interface/creatortool.h"
 #include "interface/interfacedocument.h"
-#include "mainwindow.h"
 #include "xmldocexporter.h"
 
 #include <QDateTime>
@@ -84,11 +83,6 @@ InterfaceDocument *IVEditorCore::document() const
     return m_document;
 }
 
-void IVEditorCore::setPluginActive(bool active)
-{
-    m_actionSaveSceneRender->setVisible(active);
-}
-
 shared::ui::GraphicsViewBase *IVEditorCore::chartView()
 {
     return m_document->graphicsView();
@@ -98,51 +92,6 @@ void IVEditorCore::addToolBars(QMainWindow *window)
 {
     window->addToolBar(mainToolBar());
     window->addToolBar(m_docToolBar);
-}
-
-/*!
- * \brief Fills the File menu with actions.
- */
-void IVEditorCore::addMenuFileActions(QMenu *menu, QMainWindow *window)
-{
-    menu->addSeparator();
-    menu->addAction(actionExportFunctions());
-    menu->addAction(actionExportType());
-    menu->addSeparator();
-
-    auto mainWindow = dynamic_cast<MainWindow *>(window);
-    m_actionSaveSceneRender = menu->addAction(QIcon(QLatin1String(":/tab_interface/toolbar/icns/render.svg")),
-            tr("Render Scene..."), this, &IVEditorCore::onSaveRenderRequested);
-    m_actionShowAsnDialog = menu->addAction(tr("ASN1 dialog..."), mainWindow, &MainWindow::openAsn1Dialog);
-
-    ActionsManager::registerAction(
-            Q_FUNC_INFO, m_actionSaveSceneRender, "Render", "Save current scene complete render.");
-    ActionsManager::registerAction(Q_FUNC_INFO, m_actionShowAsnDialog, "Asn1", "Edit the ASN1 file");
-}
-
-void IVEditorCore::addMenuEditActions(QMenu *menu, QMainWindow * /*window*/)
-{
-    QMenu *root = new QMenu(tr("Common Settings"));
-    root->addActions(document()->customActions());
-    menu->addMenu(root);
-}
-
-void IVEditorCore::addMenuViewActions(QMenu *menu, QMainWindow *window)
-{
-    menu->addAction(actionToggleMinimap());
-    menu->addAction(actionToggleE2EView());
-    menu->addSeparator();
-}
-
-/*!
- * \brief Fills the Help menu with actions.
- */
-void IVEditorCore::addMenuHelpActions(QMenu *menu, QMainWindow *window)
-{
-    auto mainWindow = dynamic_cast<MainWindow *>(window);
-    auto report = menu->addAction(tr("Send report..."), mainWindow, &MainWindow::onReportRequested);
-
-    ActionsManager::registerAction(Q_FUNC_INFO, report, "Report", "Send the debug information");
 }
 
 void IVEditorCore::registerBasicActions()

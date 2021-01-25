@@ -27,7 +27,6 @@
 #include "commands/cmdsetmessagedeclarations.h"
 #include "hierarchyviewmodel.h"
 #include "mainmodel.h"
-#include "mainwindow.h"
 #include "messagedeclarationsdialog.h"
 #include "mscchart.h"
 #include "msccommandsstack.h"
@@ -87,14 +86,6 @@ MSCEditorCore::~MSCEditorCore() { }
 MainModel *MSCEditorCore::mainModel() const
 {
     return m_model.get();
-}
-
-void MSCEditorCore::setPluginActive(bool active)
-{
-    m_actionScreenshot->setVisible(active);
-    m_editSeparator->setVisible(active);
-    m_actionCopy->setVisible(active);
-    m_actionPaste->setVisible(active);
 }
 
 void MSCEditorCore::setViews(
@@ -283,62 +274,6 @@ void MSCEditorCore::addToolBars(QMainWindow *window)
     window->addToolBar(Qt::LeftToolBarArea, hierarchyToolBar());
 }
 
-/*!
- * Fills the File menu with actions.
- */
-void MSCEditorCore::addMenuFileActions(QMenu *menu, QMainWindow *window)
-{
-    auto mainWindow = dynamic_cast<MainWindow *>(window);
-    menu->addSeparator();
-    m_actionScreenshot = menu->addAction(QIcon(QLatin1String(":/sharedresources/icons/save.svg")),
-            tr("Save Screenshot..."), mainWindow, &MainWindow::saveScreenshot, QKeySequence(Qt::ALT + Qt::Key_S));
-    menu->addSeparator();
-}
-
-void MSCEditorCore::addMenuEditActions(QMenu *menu, QMainWindow *window)
-{
-    auto mainWindow = dynamic_cast<MainWindow *>(window);
-
-    menu->addSeparator();
-    menu->addAction(m_deleteTool->action());
-    m_editSeparator = menu->addSeparator();
-    menu->addAction(createActionCopy(mainWindow));
-    menu->addAction(createActionPaste(mainWindow));
-}
-
-void MSCEditorCore::addMenuViewActions(QMenu *menu, QMainWindow *window)
-{
-    auto mainWindow = dynamic_cast<MainWindow *>(window);
-
-    menu->addAction(actionToggleMinimap());
-    menu->addSeparator();
-
-    m_actionShowDocument = menu->addAction(tr("Show &Document"), mainWindow, &MainWindow::showDocumentView, tr("F8"));
-    m_actionShowHierarchy =
-            menu->addAction(tr("Show &Hierarchy"), mainWindow, &MainWindow::showHierarchyView, tr("F9"));
-
-    m_actionShowDocument->setCheckable(true);
-    m_actionShowHierarchy->setCheckable(true);
-    auto group = new QActionGroup(menu);
-    group->addAction(m_actionShowDocument);
-    group->addAction(m_actionShowHierarchy);
-    m_actionShowDocument->setChecked(true);
-
-    menu->addSeparator();
-    menu->addAction(actionMessageDeclarations());
-
-    menu->addSeparator();
-    auto menuWindows = menu->addMenu("Windows");
-    menuWindows->addAction(mainWindow->dockWidgetDocumentToggleAction());
-    menuWindows->addAction(mainWindow->mscTextViewToggleAction());
-    menuWindows->addAction(mainWindow->dockWidgetAsn1ToggleAction());
-}
-
-void MSCEditorCore::addMenuHelpActions(QMenu * /*menu*/, QMainWindow * /*window*/)
-{
-    // Do nothing
-}
-
 QToolBar *MSCEditorCore::mscToolBar()
 {
     if (!m_mscToolBar) {
@@ -417,7 +352,7 @@ QVector<QAction *> MSCEditorCore::hierarchyActions() const
     return m_hierarchyActions;
 }
 
-QAction *MSCEditorCore::createActionCopy(MainWindow *window)
+QAction *MSCEditorCore::createActionCopy(QMainWindow *window)
 {
     if (m_actionCopy == nullptr) {
         if (window != nullptr) {
@@ -425,8 +360,9 @@ QAction *MSCEditorCore::createActionCopy(MainWindow *window)
             m_actionCopy->setIcon(QIcon::fromTheme("edit-copy"));
             m_actionCopy->setMenu(new QMenu(window));
             m_actionCopy->menu()->addAction(
-                    tr("Copy Diagram"), window, &MainWindow::copyCurrentChart, QKeySequence::Copy);
-            m_actionCopy->menu()->addAction(tr("Copy as Picture"), window, &MainWindow::copyCurrentChartAsPicture);
+                    tr("Copy Diagram"), m_model.get(), &msc::MainModel::copyCurrentChart, QKeySequence::Copy);
+            m_actionCopy->menu()->addAction(
+                    tr("Copy as Picture"), m_model.get(), &msc::MainModel::copyCurrentChartAsPicture);
         } else {
             m_actionCopy = new QAction(tr("Copy Diagram"), this);
             m_actionCopy->setShortcut(QKeySequence::Copy);
@@ -437,14 +373,14 @@ QAction *MSCEditorCore::createActionCopy(MainWindow *window)
     return m_actionCopy;
 }
 
-QAction *MSCEditorCore::createActionPaste(MainWindow *window)
+QAction *MSCEditorCore::createActionPaste(QMainWindow *window)
 {
     if (m_actionPaste == nullptr) {
         if (window) {
             m_actionPaste = new QAction(tr("Paste:"), window);
             m_actionPaste->setShortcut(QKeySequence::Paste);
             m_actionPaste->setIcon(QIcon::fromTheme("edit-paste"));
-            connect(m_actionPaste, &QAction::triggered, window, &MainWindow::pasteChart);
+            connect(m_actionPaste, &QAction::triggered, m_model.get(), &msc::MainModel::pasteChart);
         } else {
             m_actionPaste = new QAction(tr("Paste:"), this);
             m_actionPaste->setShortcut(QKeySequence::Paste);

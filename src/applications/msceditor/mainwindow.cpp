@@ -39,7 +39,6 @@
 #include "msceditorcore.h"
 #include "mscmessage.h"
 #include "mscmodel.h"
-#include "msctimer.h"
 #include "settings/appoptions.h"
 #include "textviewdialog.h"
 #include "tools/entitydeletetool.h"
@@ -87,6 +86,9 @@ struct MainWindow::MainWindowPrivate {
     msc::MSCEditorCore *m_core;
 
     QComboBox *m_zoomBox = nullptr;
+    QAction *m_actionShowDocument = nullptr;
+    QAction *m_actionShowHierarchy = nullptr;
+    QAction *m_actionOpenAadl { nullptr };
 
     msc::TextViewDialog *mscTextBrowser = nullptr;
 
@@ -380,7 +382,8 @@ void MainWindow::setupUi()
 
     d->m_core->initChartTools();
     d->m_core->initHierarchyViewActions();
-    d->m_core->initMenus(this);
+
+    initMenus();
     initMainToolbar();
 
     d->m_core->setupMiniMap();
@@ -417,13 +420,68 @@ void MainWindow::initActions()
     connect(d->m_core->actionOpenFile(), &QAction::triggered, this, &MainWindow::selectAndOpenFile);
     connect(d->m_core->actionSaveFile(), &QAction::triggered, this, &MainWindow::saveMsc);
     connect(d->m_core->actionSaveFileAs(), &QAction::triggered, this, &MainWindow::saveAsMsc);
-    connect(d->m_core->actionOpenAadl(), &QAction::triggered, this, &MainWindow::openAadlFile);
     connect(d->m_core->actionQuit(), &QAction::triggered, this, [&]() {
         if (this->saveDocument()) {
             this->saveSettings();
             QApplication::quit();
         }
     });
+}
+
+void MainWindow::initMenus()
+{
+    // Initialize the file menu
+    auto menu = menuBar()->addMenu(tr("File"));
+    menu->addAction(d->m_core->actionNewFile());
+    menu->addAction(d->m_core->actionOpenFile());
+    menu->addAction(d->m_core->actionSaveFile());
+    menu->addAction(d->m_core->actionSaveFileAs());
+    menu->addSeparator();
+    menu->addAction(tr("Open AADL file ..."), this, &MainWindow::openAadlFile);
+    menu->addSeparator();
+    menu->addAction(QIcon(QLatin1String(":/sharedresources/icons/save.svg")), tr("Save Screenshot..."), this,
+            &MainWindow::saveScreenshot, QKeySequence(Qt::ALT + Qt::Key_S));
+    menu->addSeparator();
+    menu->addAction(d->m_core->actionQuit());
+
+    // Initialize the edit menu
+    menu = menuBar()->addMenu(tr("Edit"));
+    QAction *undoAction = d->m_core->actionUndo();
+    undoAction->setShortcut(QKeySequence::Undo);
+    menu->addAction(undoAction);
+    QAction *redoAction = d->m_core->actionRedo();
+    redoAction->setShortcut(QKeySequence::Redo);
+    menu->addAction(redoAction);
+    menu->addSeparator();
+    menu->addAction(d->m_core->deleteTool()->action());
+    menu->addSeparator();
+    menu->addAction(d->m_core->createActionCopy(this));
+    menu->addAction(d->m_core->createActionPaste(this));
+
+    // Initialize the view menu
+    menu = menuBar()->addMenu(tr("&View"));
+    menu->addAction(d->m_core->actionToggleMinimap());
+    menu->addSeparator();
+    d->m_actionShowDocument = menu->addAction(tr("Show &Document"), this, &MainWindow::showDocumentView, tr("F8"));
+    d->m_actionShowHierarchy = menu->addAction(tr("Show &Hierarchy"), this, &MainWindow::showHierarchyView, tr("F9"));
+    d->m_actionShowDocument->setCheckable(true);
+    d->m_actionShowHierarchy->setCheckable(true);
+    auto group = new QActionGroup(menu);
+    group->addAction(d->m_actionShowDocument);
+    group->addAction(d->m_actionShowHierarchy);
+    d->m_actionShowDocument->setChecked(true);
+    menu->addSeparator();
+    menu->addAction(d->m_core->actionMessageDeclarations());
+    menu->addSeparator();
+    auto menuWindows = menu->addMenu("Windows");
+    menuWindows->addAction(dockWidgetDocumentToggleAction());
+    menuWindows->addAction(mscTextViewToggleAction());
+    menuWindows->addAction(dockWidgetAsn1ToggleAction());
+
+    // Initialize the help menu
+    menu = menuBar()->addMenu(tr("&Help"));
+    menu->addAction(tr("About"), d->m_core, &shared::EditorCore::showAboutDialog);
+    menu->addAction(tr("About Qt"), qApp, &QApplication::aboutQt);
 }
 
 void MainWindow::initMainToolbar()
@@ -510,21 +568,6 @@ QAction *MainWindow::dockWidgetAsn1ToggleAction()
     return d->ui->dockWidgetAsn1->toggleViewAction();
 }
 
-void MainWindow::copyCurrentChart()
-{
-    d->m_core->mainModel()->copyCurrentChart();
-}
-
-void MainWindow::copyCurrentChartAsPicture()
-{
-    d->m_core->mainModel()->copyCurrentChartAsPicture();
-}
-
-void MainWindow::pasteChart()
-{
-    d->m_core->mainModel()->pasteChart();
-}
-
 void MainWindow::keyPressEvent(QKeyEvent *e)
 {
     QMainWindow::keyPressEvent(e);
@@ -574,7 +617,7 @@ void MainWindow::loadSettings()
         showDocumentView(true);
     else
         showHierarchyView(true);
-    QAction *changeViewModeAction = isDocViewMode ? d->m_core->actionShowDocument() : d->m_core->actionShowHierarchy();
+    QAction *changeViewModeAction = isDocViewMode ? d->m_actionShowDocument : d->m_actionShowHierarchy;
     changeViewModeAction->setChecked(true);
 }
 

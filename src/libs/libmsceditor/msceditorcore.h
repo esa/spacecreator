@@ -74,8 +74,6 @@ public:
 
     msc::MainModel *mainModel() const;
 
-    void setPluginActive(bool active) override;
-
     void setViews(
             QStackedWidget *centerView, shared::ui::GraphicsViewBase *chartView, msc::GraphicsView *hierarchyView);
     QStackedWidget *centerView();
@@ -87,10 +85,6 @@ public:
     void initConnections();
 
     void addToolBars(QMainWindow *window) override;
-    void addMenuFileActions(QMenu *menu, QMainWindow *window) override;
-    void addMenuEditActions(QMenu *menu, QMainWindow *window) override;
-    void addMenuViewActions(QMenu *menu, QMainWindow *window) override;
-    void addMenuHelpActions(QMenu *menu, QMainWindow *window) override;
 
     QToolBar *mscToolBar();
     QToolBar *hierarchyToolBar();
@@ -103,15 +97,13 @@ public:
     msc::EntityDeleteTool *deleteTool() { return m_deleteTool; }
     msc::BaseTool *activeTool() const;
 
-    QAction *actionShowDocument() { return m_actionShowDocument; }
-    QAction *actionShowHierarchy() { return m_actionShowHierarchy; }
     QAction *actionMessageDeclarations();
 
     QVector<QAction *> chartActions() const;
     QVector<QAction *> hierarchyActions() const;
 
-    QAction *createActionCopy(MainWindow *window);
-    QAction *createActionPaste(MainWindow *window);
+    QAction *createActionCopy(QMainWindow *window);
+    QAction *createActionPaste(QMainWindow *window);
 
     msc::AadlSystemChecks *aadlChecker() const;
 
@@ -163,12 +155,8 @@ private:
     QPointer<QToolBar> m_mscToolBar = nullptr;
     QPointer<QToolBar> m_hierarchyToolBar = nullptr;
 
-    QAction *m_actionScreenshot = nullptr;
-    QAction *m_editSeparator = nullptr;
     QAction *m_actionCopy = nullptr;
     QAction *m_actionPaste = nullptr;
-    QAction *m_actionShowDocument = nullptr;
-    QAction *m_actionShowHierarchy = nullptr;
     QAction *m_actionMessageDeclarations = nullptr;
 
     QVector<msc::BaseTool *> m_tools;

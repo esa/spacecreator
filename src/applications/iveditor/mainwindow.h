@@ -20,6 +20,7 @@
 #include "commandlineparser.h"
 #include "common.h"
 
+#include <QAction>
 #include <QMainWindow>
 
 namespace Ui {
@@ -69,11 +70,14 @@ public Q_SLOTS:
     void showAsn1Errors(const QStringList &faultyInterfaces);
 
 private:
+    void initMenus();
     bool closeFile();
     bool prepareQuit();
 
     Ui::MainWindow *ui { nullptr };
     ZoomController *m_zoomCtrl { nullptr };
+    QAction *m_actionSaveSceneRender { nullptr };
+    QAction *m_actionShowAsnDialog { nullptr };
 
     bool m_dropUnsavedChangesSilently { false };
 

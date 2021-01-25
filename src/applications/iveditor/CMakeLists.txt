@@ -5,17 +5,13 @@ add_executable(${APP_NAME})
 
 target_sources(${APP_NAME} PRIVATE
     main.cpp
+    mainwindow.cpp
+    mainwindow.h
+    mainwindow.ui
 )
 
 target_link_libraries(${APP_NAME} PUBLIC
-    aadl
-    asn1library
     libiveditor
-    shared
-    templating
-    Qt5::Concurrent
-    Qt5::Network
-    Qt5::Svg
     Qt5::Widgets
 )
 

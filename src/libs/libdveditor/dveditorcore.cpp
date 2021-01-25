@@ -52,8 +52,8 @@ struct DVEditorCore::DeploymentInterfacePrivate {
     QUndoStack *m_commandsStack { nullptr };
     QGraphicsScene *m_scene { nullptr };
     std::unique_ptr<deploymentinterface::DeploymentModel> m_model;
-    deploymentinterface::GraphicsView *m_view { nullptr };
-    QToolBar *m_toolBar { nullptr };
+    QPointer<deploymentinterface::GraphicsView> m_view;
+    QPointer<QToolBar> m_toolBar;
 };
 
 DVEditorCore::DVEditorCore(QObject *parent)
@@ -64,15 +64,10 @@ DVEditorCore::DVEditorCore(QObject *parent)
 
 DVEditorCore::~DVEditorCore() { }
 
-void DVEditorCore::setPluginActive(bool active) { }
-
-void DVEditorCore::addMenuFileActions(QMenu *menu, QMainWindow *window) { }
-
-void DVEditorCore::addMenuEditActions(QMenu *menu, QMainWindow *window) { }
-
-void DVEditorCore::addMenuHelpActions(QMenu *menu, QMainWindow *window) { }
-
-void DVEditorCore::addToolBars(QMainWindow *window) { }
+void DVEditorCore::addToolBars(QMainWindow *window)
+{
+    Q_UNUSED(window)
+}
 
 shared::ui::GraphicsViewBase *DVEditorCore::chartView()
 {
@@ -89,12 +84,26 @@ QUndoStack *DVEditorCore::undoStack() const
     return d->m_commandsStack;
 }
 
-void DVEditorCore::populateCommandLineArguments(shared::CommandLineParser *parser) const { }
+void DVEditorCore::populateCommandLineArguments(shared::CommandLineParser *parser) const
+{
+    Q_UNUSED(parser)
+}
 
-bool DVEditorCore::renameAsnFile(const QString &oldName, const QString &newName) { }
+bool DVEditorCore::renameAsnFile(const QString &oldName, const QString &newName)
+{
+    Q_UNUSED(oldName)
+    Q_UNUSED(newName)
+    return false;
+}
 
-QString DVEditorCore::filePath() const { }
+QString DVEditorCore::filePath() const
+{
+    return {};
+}
 
-bool DVEditorCore::save() { }
+bool DVEditorCore::save()
+{
+    return false;
+}
 
 }

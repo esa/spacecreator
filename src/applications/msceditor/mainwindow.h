@@ -58,10 +58,6 @@ public:
     QAction *dockWidgetAsn1ToggleAction();
 
 public Q_SLOTS:
-    void copyCurrentChart();
-    void copyCurrentChartAsPicture();
-    void pasteChart();
-
     void createNewDocument();
     void selectAndOpenFile();
     void openAadlFile();
@@ -99,6 +95,7 @@ private:
 
     void setupUi();
     void initActions();
+    void initMenus();
     void initMainToolbar();
     void initConnections();
 

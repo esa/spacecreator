@@ -42,13 +42,14 @@ protected:
     void closeEvent(QCloseEvent *e) override;
 
 private:
+    void initActions();
+    void initMenus();
     void initSettings();
     bool prepareQuit();
     void updateWindowTitle();
     void onDocDirtyChanged(bool dirty);
     void onQuitRequested();
 
-private:
     Ui::MainWindow *ui { nullptr };
     deploymentinterface::DVEditorCore *m_core { nullptr };
 };

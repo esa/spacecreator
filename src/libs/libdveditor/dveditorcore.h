@@ -42,10 +42,6 @@ public:
     explicit DVEditorCore(QObject *parent = nullptr);
     ~DVEditorCore() override;
 
-    void setPluginActive(bool active) override;
-    void addMenuFileActions(QMenu *menu, QMainWindow *window) override;
-    void addMenuEditActions(QMenu *menu, QMainWindow *window) override;
-    void addMenuHelpActions(QMenu *menu, QMainWindow *window) override;
     void addToolBars(QMainWindow *window) override;
 
     shared::ui::GraphicsViewBase *chartView() override;

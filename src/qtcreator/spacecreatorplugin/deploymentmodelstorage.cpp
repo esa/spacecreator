@@ -26,8 +26,15 @@ DeploymentModelStorage::DeploymentModelStorage(QObject *parent)
 {
 }
 
-QSharedPointer<deploymentinterface::DVEditorCore> DeploymentModelStorage::dvData(const QString &fileName) { }
+QSharedPointer<deploymentinterface::DVEditorCore> DeploymentModelStorage::dvData(const QString &fileName)
+{
+    Q_UNUSED(fileName)
+    return {};
+}
 
-void DeploymentModelStorage::remove(const QString &fileName) { }
+void DeploymentModelStorage::remove(const QString &fileName)
+{
+    Q_UNUSED(fileName)
+}
 
 } // namespace spctr

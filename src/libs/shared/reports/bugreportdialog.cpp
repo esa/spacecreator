@@ -24,15 +24,10 @@
 #include <QFile>
 #include <QPushButton>
 
+namespace reports {
+
 static const char *defaultHost = "https://git.vikingsoftware.com";
 static const int defaultProjectID = 60;
-
-static const QString localName()
-{
-    return "GroupBugReport";
-}
-
-namespace reports {
 
 struct BugreportDialog::BugreportDialogPrivate {
     explicit BugreportDialogPrivate(BugreportDialog *dialog, const QString &logPath, const QList<QPixmap> &images)
@@ -43,20 +38,13 @@ struct BugreportDialog::BugreportDialogPrivate {
         , accessToken("GroupBugReport/AccessToken")
     {
         ui.setupUi(dialog);
-        connect(ui.buttonBox->button(QDialogButtonBox::Apply), &QPushButton::clicked, dialog,
-                &BugreportDialog::sendReport);
-        connect(ui.buttonBox->button(QDialogButtonBox::Cancel), &QPushButton::clicked, dialog, &QDialog::close);
-        connect(ui.titleLineEdit, &QLineEdit::textChanged, dialog, &BugreportDialog::updateButtonBox);
-        connect(ui.hostLineEdit, &QLineEdit::textChanged, dialog, &BugreportDialog::updateButtonBox);
-        connect(ui.accessTokenLineEdit, &QLineEdit::textChanged, dialog, &BugreportDialog::updateButtonBox);
-        connect(ui.projectLineEdit, &QLineEdit::textChanged, dialog, &BugreportDialog::updateButtonBox);
 
         const QString settingsHost = host.read().toString();
-        ui.hostLineEdit->setText(settingsHost.isEmpty() ? QString(::defaultHost) : settingsHost);
+        ui.hostLineEdit->setText(settingsHost.isEmpty() ? QString(defaultHost) : settingsHost);
 
         const QString settingsProjectID = projectID.read().toString();
         ui.projectLineEdit->setText(
-                settingsProjectID.isEmpty() ? QString::number(::defaultProjectID) : settingsProjectID);
+                settingsProjectID.isEmpty() ? QString::number(defaultProjectID) : settingsProjectID);
 
         ui.accessTokenLineEdit->setText(accessToken.read().toByteArray());
 
@@ -70,6 +58,14 @@ struct BugreportDialog::BugreportDialogPrivate {
             ui.logTextEdit->hide();
             ui.logTextEditLabel->hide();
         }
+
+        connect(ui.buttonBox->button(QDialogButtonBox::Apply), &QPushButton::clicked, dialog,
+                &BugreportDialog::sendReport);
+        connect(ui.buttonBox->button(QDialogButtonBox::Cancel), &QPushButton::clicked, dialog, &QDialog::close);
+        connect(ui.titleLineEdit, &QLineEdit::textChanged, dialog, &BugreportDialog::updateButtonBox);
+        connect(ui.hostLineEdit, &QLineEdit::textChanged, dialog, &BugreportDialog::updateButtonBox);
+        connect(ui.accessTokenLineEdit, &QLineEdit::textChanged, dialog, &BugreportDialog::updateButtonBox);
+        connect(ui.projectLineEdit, &QLineEdit::textChanged, dialog, &BugreportDialog::updateButtonBox);
     }
 
     Ui::BugreportDialog ui;
@@ -85,6 +81,7 @@ BugreportDialog::BugreportDialog(const QString &logPath, const QList<QPixmap> &i
     : QDialog(parent)
     , d(new BugreportDialogPrivate(this, logPath, images))
 {
+    updateButtonBox();
 }
 
 BugreportDialog::BugreportDialog(const QList<QPixmap> &images, QWidget *parent)

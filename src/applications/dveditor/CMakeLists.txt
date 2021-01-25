@@ -5,6 +5,9 @@ add_executable(${APP_NAME})
 
 target_sources(${APP_NAME} PRIVATE
     main.cpp
+    mainwindow.cpp
+    mainwindow.h
+    mainwindow.ui
 )
 
 target_link_libraries(${APP_NAME} PUBLIC

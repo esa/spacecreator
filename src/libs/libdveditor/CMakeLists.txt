@@ -10,9 +10,6 @@ target_sources(${LIB_NAME} PRIVATE
     dveditorcore.cpp
     dveditorcore.h
     dveditorresources.qrc
-    mainwindow.cpp
-    mainwindow.h
-    mainwindow.ui
     deploymentmodel.cpp
     deploymentmodel.h
 )

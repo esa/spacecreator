@@ -126,9 +126,6 @@ target_sources(${LIB_NAME} PRIVATE
     hierarchyview/hierarchyviewmodel.h
     mainmodel.cpp
     mainmodel.h
-    mainwindow.cpp
-    mainwindow.h
-    mainwindow.ui
     messagedeclarationsdialog.cpp
     messagedeclarationsdialog.h
     messagedeclarationsdialog.ui

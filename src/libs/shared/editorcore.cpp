@@ -60,48 +60,6 @@ QToolBar *EditorCore::mainToolBar()
     return m_mainToolBar;
 }
 
-/*!
- * \brief initMenus Initialize the menus. Calls each menu initialization
- */
-void EditorCore::initMenus(QMainWindow *window)
-{
-    m_mainWindow = window;
-    // Initialize the file menu
-    auto menu = window->menuBar()->addMenu(tr("File"));
-
-    menu->addAction(actionNewFile());
-    menu->addAction(actionOpenFile());
-    menu->addAction(actionSaveFile());
-    menu->addAction(actionSaveFileAs());
-    menu->addSeparator();
-    menu->addAction(actionOpenAadl());
-    addMenuFileActions(menu, window);
-    menu->addSeparator();
-    menu->addAction(actionQuit());
-
-    // Initialize the edit menu
-    menu = window->menuBar()->addMenu(tr("Edit"));
-    QAction *undoAction = actionUndo();
-    undoAction->setShortcut(QKeySequence::Undo);
-    menu->addAction(undoAction);
-    QAction *redoAction = actionRedo();
-    redoAction->setShortcut(QKeySequence::Redo);
-    menu->addAction(redoAction);
-    addMenuEditActions(menu, window);
-
-    // Initialize the view menu
-    menu = window->menuBar()->addMenu(tr("&View"));
-    addMenuViewActions(menu, window);
-
-    // Initialize the help menu
-    menu = window->menuBar()->addMenu(tr("&Help"));
-    addMenuHelpActions(menu, window);
-    menu->addAction(tr("About"), this, &EditorCore::showAboutDialog);
-    menu->addAction(tr("About Qt"), qApp, &QApplication::aboutQt);
-}
-
-void EditorCore::addMenuViewActions(QMenu * /*menu*/, QMainWindow * /*window*/) { }
-
 QAction *EditorCore::actionNewFile()
 {
     if (m_actionNewFile == nullptr) {
@@ -143,14 +101,6 @@ QAction *EditorCore::actionSaveFileAs()
         m_actionSaveFileAs->setShortcut(QKeySequence::SaveAs);
     }
     return m_actionSaveFileAs;
-}
-
-QAction *EditorCore::actionOpenAadl()
-{
-    if (m_actionOpenAadl == nullptr) {
-        m_actionOpenAadl = new QAction(tr("Open AADL file ..."), this);
-    }
-    return m_actionOpenAadl;
 }
 
 QAction *EditorCore::actionQuit()
@@ -201,7 +151,7 @@ void EditorCore::showAboutDialog()
     info += QString(" @%1").arg(VS_BUILD_HASH);
 #endif
 
-    QMessageBox::information(m_mainWindow, tr("About"), info);
+    QMessageBox::information(QApplication::activeWindow() ? QApplication::activeWindow() : nullptr, tr("About"), info);
 }
 
 void EditorCore::setupMiniMap()

@@ -199,9 +199,6 @@ target_sources(${LIB_NAME} PRIVATE
     iveditorcore.cpp
     iveditorcore.h
     iveditorresources.qrc
-    mainwindow.cpp
-    mainwindow.h
-    mainwindow.ui
     settings/appoptions.cpp
     settings/appoptions.h
     templating/exportableaadlconnection.cpp

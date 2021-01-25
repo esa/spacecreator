@@ -88,13 +88,12 @@ MainWindow::MainWindow(ive::IVEditorCore *core, QWidget *parent)
 
     connect(m_core->document(), &InterfaceDocument::dirtyChanged, this, &MainWindow::onDocDirtyChanged);
 
-    m_core->initMenus(this);
+    initMenus();
 
     m_core->document()->fillToolBar(m_core->docToolBar());
     if (auto view = m_core->chartView()) {
         m_zoomCtrl->setView(view);
-        connect(view, &ive::GraphicsView::mouseMoved, this, &MainWindow::onGraphicsViewInfo,
-                Qt::UniqueConnection);
+        connect(view, &ive::GraphicsView::mouseMoved, this, &MainWindow::onGraphicsViewInfo, Qt::UniqueConnection);
     }
 
     updateActions();
@@ -238,7 +237,7 @@ void MainWindow::updateActions()
     }
 
     m_core->actionSaveFile()->setEnabled(m_core->document()->isDirty());
-    m_core->actionSaveSceneRender()->setEnabled(renderAvailable);
+    m_actionSaveSceneRender->setEnabled(renderAvailable);
 }
 
 /*!
@@ -330,6 +329,53 @@ void MainWindow::showAsn1Errors(const QStringList &faultyInterfaces)
 {
     QMessageBox::warning(
             this, tr("ASN1 error"), tr("Following interfaces have ASN.1 errors:") + "\n" + faultyInterfaces.join("\n"));
+}
+
+void MainWindow::initMenus()
+{
+    // Initialize the file menu
+    auto menu = menuBar()->addMenu(tr("File"));
+    menu->addAction(m_core->actionNewFile());
+    menu->addAction(m_core->actionOpenFile());
+    menu->addAction(m_core->actionSaveFile());
+    menu->addAction(m_core->actionSaveFileAs());
+    menu->addSeparator();
+    menu->addSeparator();
+    menu->addAction(m_core->actionExportFunctions());
+    menu->addAction(m_core->actionExportType());
+    menu->addSeparator();
+    m_actionSaveSceneRender = menu->addAction(QIcon(QLatin1String(":/tab_interface/toolbar/icns/render.svg")),
+            tr("Render Scene..."), m_core, &IVEditorCore::onSaveRenderRequested);
+    ActionsManager::registerAction(
+            Q_FUNC_INFO, m_actionSaveSceneRender, "Render", "Save current scene complete render.");
+    m_actionShowAsnDialog = menu->addAction(tr("ASN1 dialog..."), this, &MainWindow::openAsn1Dialog);
+    ActionsManager::registerAction(Q_FUNC_INFO, m_actionShowAsnDialog, "Asn1", "Edit the ASN1 file");
+    menu->addSeparator();
+    menu->addAction(m_core->actionQuit());
+
+    // Initialize the edit menu
+    menu = menuBar()->addMenu(tr("Edit"));
+    QAction *undoAction = m_core->actionUndo();
+    undoAction->setShortcut(QKeySequence::Undo);
+    menu->addAction(undoAction);
+    QAction *redoAction = m_core->actionRedo();
+    redoAction->setShortcut(QKeySequence::Redo);
+    menu->addAction(redoAction);
+    QMenu *root = new QMenu(tr("Common Settings"));
+    root->addActions(m_core->document()->customActions());
+    menu->addMenu(root);
+
+    // Initialize the view menu
+    menu = menuBar()->addMenu(tr("&View"));
+    menu->addAction(m_core->actionToggleMinimap());
+    menu->addAction(m_core->actionToggleE2EView());
+
+    // Initialize the help menu
+    menu = menuBar()->addMenu(tr("&Help"));
+    auto report = menu->addAction(tr("Send report..."), this, &MainWindow::onReportRequested);
+    ActionsManager::registerAction(Q_FUNC_INFO, report, "Report", "Send the debug information");
+    menu->addAction(tr("About"), m_core, &shared::EditorCore::showAboutDialog);
+    menu->addAction(tr("About Qt"), qApp, &QApplication::aboutQt);
 }
 
 /*!
