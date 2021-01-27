@@ -23,10 +23,9 @@
 #include "aadlobject.h"
 #include "asn1/file.h"
 #include "commandsstack.h"
-#include "interface/commands/cmdentityattributechange.h"
-#include "interface/commands/cmdentitypropertychange.h"
-#include "interface/commands/cmdentitypropertycreate.h"
-#include "interface/commands/commandsfactory.h"
+#include "interface/commands/cmdcontextparameterchange.h"
+#include "interface/commands/cmdcontextparametercreate.h"
+#include "interface/commands/cmdcontextparameterremove.h"
 #include "propertytemplate.h"
 #include "propertytemplateconfig.h"
 
@@ -160,10 +159,8 @@ bool ContextParametersModel::setData(const QModelIndex &index, const QVariant &v
             return false;
         }
 
-        if (const auto attributesCmd = cmd::CommandsFactory::create(cmd::ChangeContextParameter,
-                    { QVariant::fromValue(m_dataObject), QVariant::fromValue(paramOld),
-                            QVariant::fromValue(paramNew) })) {
-
+        if (auto entity = qobject_cast<ivm::AADLFunctionType *>(m_dataObject)) {
+            auto attributesCmd = new cmd::CmdContextParameterChange(entity, paramOld, paramNew);
             m_cmdMacro->push(attributesCmd);
             m_params.replace(index.row(), paramNew);
         }
@@ -181,9 +178,8 @@ bool ContextParametersModel::createProperty(const QString &propName)
     ivm::ContextParameter param(propName);
     param.setParamType(ivm::BasicParameter::Type::Timer);
 
-    const auto propsCmd = cmd::CommandsFactory::create(
-            cmd::CreateContextParameter, { QVariant::fromValue(m_dataObject), QVariant::fromValue(param) });
-    if (propsCmd) {
+    if (auto entity = qobject_cast<ivm::AADLFunctionType *>(m_dataObject)) {
+        auto propsCmd = new cmd::CmdContextParameterCreate(entity, param);
         const int rows = rowCount();
         beginInsertRows(QModelIndex(), rows, rows);
 
@@ -204,9 +200,8 @@ bool ContextParametersModel::removeProperty(const QModelIndex &index)
         return res;
 
     const int row(index.row());
-    const auto propsCmd = cmd::CommandsFactory::create(
-            cmd::RemoveContextParameter, { QVariant::fromValue(m_dataObject), QVariant::fromValue(row) });
-    if (propsCmd) {
+    if (auto entity = qobject_cast<ivm::AADLFunctionType *>(m_dataObject)) {
+        auto propsCmd = new cmd::CmdContextParameterRemove(entity, row);
         m_cmdMacro->push(propsCmd);
         removeRow(row);
         m_params.removeAt(row);

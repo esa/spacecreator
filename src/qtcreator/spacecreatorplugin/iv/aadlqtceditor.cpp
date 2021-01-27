@@ -23,7 +23,7 @@
 #include "asn1dialog.h"
 #include "commandsstack.h"
 #include "endtoend/endtoendview.h"
-#include "interface/commands/commandsfactory.h"
+#include "interface/commands/cmdchangeasn1file.h"
 #include "interface/interfacedocument.h"
 #include "iveditorcore.h"
 #include "mainmodel.h"
@@ -106,11 +106,8 @@ void AadlQtCEditor::showAsn1Dialog()
     int result = dialog.exec();
     if (result == QDialog::Accepted) {
         if (plugin->document()->asn1FileName() != dialog.fileName()) {
-            QVariantList params { QVariant::fromValue(plugin->document()), QVariant::fromValue(dialog.fileName()) };
-            QUndoCommand *command = ive::cmd::CommandsFactory::create(ive::cmd::ChangeAsn1File, params);
-            if (command) {
-                plugin->commandsStack()->push(command);
-            }
+            auto command = new ive::cmd::CmdChangeAsn1File(plugin->document(), dialog.fileName());
+            plugin->commandsStack()->push(command);
         }
     }
 }

@@ -18,15 +18,16 @@
 #include "propertieslistmodel.h"
 
 #include "aadlcommonprops.h"
-#include "aadlnamevalidator.h"
-#include "aadlobject.h"
 #include "aadlfunction.h"
 #include "aadliface.h"
+#include "aadlnamevalidator.h"
+#include "aadlobject.h"
 #include "commandsstack.h"
 #include "interface/commands/cmdentityattributechange.h"
 #include "interface/commands/cmdentitypropertychange.h"
 #include "interface/commands/cmdentitypropertycreate.h"
-#include "interface/commands/commandsfactory.h"
+#include "interface/commands/cmdentitypropertyremove.h"
+#include "interface/commands/cmdentitypropertyrename.h"
 #include "propertytemplateconfig.h"
 
 #include <QDebug>
@@ -54,9 +55,9 @@ PropertiesListModel::PropertiesListModel(
 PropertiesListModel::~PropertiesListModel() { }
 
 void PropertiesListModel::createNewRow(int row, const QString &label, const QString &name,
-        ivm::PropertyTemplate::Info info, const QVariant &value, const QVariant &editValue,
-        const QVariant &defaulValue)
+        ivm::PropertyTemplate::Info info, const QVariant &value, const QVariant &editValue, const QVariant &defaulValue)
 {
+    Q_UNUSED(defaulValue);
     m_names.append(name);
     QStandardItem *titleItem = new QStandardItem(label.isEmpty() ? name : label);
     titleItem->setData(name, PropertyNameRole);
@@ -241,16 +242,14 @@ bool PropertiesListModel::setData(const QModelIndex &index, const QVariant &valu
                 break;
             }
 
-            const QVariantMap attributes = { { name, attributeValue } };
-            const auto attributesCmd = cmd::CommandsFactory::create(cmd::ChangeEntityAttributes,
-                    { QVariant::fromValue(m_dataObject), QVariant::fromValue(attributes) });
+            const QVariantHash attributes = { { name, attributeValue } };
+            auto attributesCmd = new cmd::CmdEntityAttributeChange(m_dataObject, attributes);
             m_cmdMacro->push(attributesCmd);
         } else if (isProp(index)) {
             switch (index.column()) {
             case ColumnValue: {
-                const QVariantMap props = { { name, value } };
-                const auto propsCmd = cmd::CommandsFactory::create(
-                        cmd::ChangeEntityProperty, { QVariant::fromValue(m_dataObject), QVariant::fromValue(props) });
+                const QVariantHash props = { { name, value } };
+                auto propsCmd = new cmd::CmdEntityPropertyChange(m_dataObject, props);
                 m_cmdMacro->push(propsCmd);
 
                 break;
@@ -260,8 +259,7 @@ bool PropertiesListModel::setData(const QModelIndex &index, const QVariant &valu
                 if (m_names.contains(newName))
                     return false;
                 const QHash<QString, QString> props = { { name, newName } };
-                const auto propsCmd = cmd::CommandsFactory::create(
-                        cmd::RenameEntityProperty, { QVariant::fromValue(m_dataObject), QVariant::fromValue(props) });
+                auto propsCmd = new cmd::CmdEntityPropertyRename(m_dataObject, props);
                 m_cmdMacro->push(propsCmd);
                 const int idx = m_names.indexOf(name);
                 if (idx >= 0) {
@@ -284,52 +282,43 @@ bool PropertiesListModel::setData(const QModelIndex &index, const QVariant &valu
 
 bool PropertiesListModel::createProperty(const QString &propName)
 {
-    bool res(false);
-    if (m_names.contains(propName))
-        return res;
+    if (m_names.contains(propName)) {
+        return false;
+    }
 
     beginInsertRows(QModelIndex(), rowCount(), rowCount());
 
-    const QVariantMap props = { { propName, QString() } };
-    const auto propsCmd = cmd::CommandsFactory::create(
-            cmd::CreateEntityProperty, { QVariant::fromValue(m_dataObject), QVariant::fromValue(props) });
-    if (propsCmd) {
-        m_cmdMacro->push(propsCmd);
-        res = true;
-    }
+    const QVariantHash props = { { propName, QString() } };
+    auto propsCmd = new cmd::CmdEntityPropertyCreate(m_dataObject, props);
+    m_cmdMacro->push(propsCmd);
 
     createNewRow(rowCount(), {}, propName, ivm::PropertyTemplate::Info::Property, QVariant(QVariant::String),
             QVariant(QVariant::String), QVariant(QVariant::String));
 
     endInsertRows();
 
-    return res;
+    return true;
 }
 
 bool PropertiesListModel::removeProperty(const QModelIndex &index)
 {
-    bool res(false);
-    if (!index.isValid())
-        return res;
+    if (!index.isValid()) {
+        return false;
+    }
 
     const int row(index.row());
     const QModelIndex &propId = this->index(row, ColumnTitle);
     if (isAttr(propId))
-        return res;
+        return false;
 
     const QString &propName = propId.data().toString();
     const QStringList props { propName };
-    const auto propsCmd = cmd::CommandsFactory::create(
-            cmd::RemoveEntityProperty, { QVariant::fromValue(m_dataObject), QVariant::fromValue(props) });
-    if (propsCmd) {
-        m_cmdMacro->push(propsCmd);
-        removeRow(row);
-        m_names.removeAt(row);
+    auto propsCmd = new cmd::CmdEntityPropertyRemove(m_dataObject, props);
+    m_cmdMacro->push(propsCmd);
+    removeRow(row);
+    m_names.removeAt(row);
 
-        res = true;
-    }
-
-    return res;
+    return true;
 }
 
 bool PropertiesListModel::isAttr(const QModelIndex &id) const
@@ -340,8 +329,7 @@ bool PropertiesListModel::isAttr(const QModelIndex &id) const
 
 bool PropertiesListModel::isProp(const QModelIndex &id) const
 {
-    return id.isValid()
-            && static_cast<int>(ivm::PropertyTemplate::Info::Property) == id.data(PropertyInfoRole).toInt();
+    return id.isValid() && static_cast<int>(ivm::PropertyTemplate::Info::Property) == id.data(PropertyInfoRole).toInt();
 }
 
 bool PropertiesListModel::isEditable(const QModelIndex &idx) const

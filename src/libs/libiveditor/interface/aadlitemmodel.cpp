@@ -24,8 +24,7 @@
 #include "aadliface.h"
 #include "aadlifacegroup.h"
 #include "baseitems/common/aadlutils.h"
-#include "commands/commandids.h"
-#include "commands/commandsfactory.h"
+#include "commands/cmdrootentitychange.h"
 #include "commandsstack.h"
 #include "delayedsignal.h"
 #include "interface/aadlcommentgraphicsitem.h"
@@ -444,8 +443,7 @@ void AADLItemModel::changeRootItem(shared::Id id)
         return;
     }
 
-    const QVariantList rootEntityParams { QVariant::fromValue(m_model), QVariant::fromValue(id) };
-    const auto geometryCmd = cmd::CommandsFactory::create(cmd::ChangeRootEntity, rootEntityParams);
+    const auto geometryCmd = new cmd::CmdRootEntityChange(m_model, id);
     m_commandsStack->push(geometryCmd);
 }
 

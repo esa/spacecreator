@@ -26,12 +26,12 @@
 #include "commandsstack.h"
 #include "connectioncreationvalidator.h"
 #include "context/action/actionsmanager.h"
+#include "interface/commands/cmdchangeasn1file.h"
 #include "interface/commands/cmdconnectionitemcreate.h"
 #include "interface/commands/cmdentityattributechange.h"
 #include "interface/commands/cmdfunctionitemcreate.h"
 #include "interface/commands/cmdifaceattrchange.h"
 #include "interface/commands/cmdinterfaceitemcreate.h"
-#include "interface/commands/commandsfactory.h"
 #include "interface/creatortool.h"
 #include "interface/interfacedocument.h"
 #include "xmldocexporter.h"
@@ -379,13 +379,10 @@ bool IVEditorCore::renameAsnFile(const QString &oldName, const QString &newName)
     const QString oldFileName = oldFile.fileName();
 
     if (document()->asn1FileName() == oldFileName) {
-        QVariantList params { QVariant::fromValue(document()), QVariant::fromValue(newName) };
-        QUndoCommand *command = cmd::CommandsFactory::create(cmd::ChangeAsn1File, params);
-        if (command) {
-            commandsStack()->push(command);
-            Q_EMIT editedExternally(this);
-            return true;
-        }
+        auto command = new cmd::CmdChangeAsn1File(document(), newName);
+        commandsStack()->push(command);
+        Q_EMIT editedExternally(this);
+        return true;
     }
 
     return false;
@@ -512,7 +509,7 @@ ivm::AADLIface *IVEditorCore::getInterface(
             ifPos.setX(funcRect.right());
         }
         createInfo.position = ifPos;
-        QUndoCommand *command = cmd::CommandsFactory::create(cmd::CreateInterfaceEntity, createInfo.toVarList());
+        auto *command = new cmd::CmdInterfaceItemCreate(createInfo);
         commandsStack()->push(command);
         interface = aadlModel->getIfaceByName(ifName, ifType, parentFunction, m_caseCheck);
     }

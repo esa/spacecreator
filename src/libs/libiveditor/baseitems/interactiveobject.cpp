@@ -22,8 +22,7 @@
 #include "baseitems/common/aadlutils.h"
 #include "commandsstack.h"
 #include "interface/commands/cmdentityautolayout.h"
-#include "interface/commands/commandids.h"
-#include "interface/commands/commandsfactory.h"
+#include "interface/commands/cmdentitygeometrychange.h"
 
 #include <QBrush>
 #include <QCursor>
@@ -86,11 +85,8 @@ void InteractiveObject::updateEntity()
         return;
     }
 
-    QList<QVariant> params;
-    const QList<QVariantList> preparedParams { prepareChangeCoordinatesCommandParams() };
-    std::transform(preparedParams.cbegin(), preparedParams.cend(), std::back_inserter(params),
-            [](const QVariantList entryParams) { return QVariant::fromValue(entryParams); });
-    const auto changeGeometryCmd = cmd::CommandsFactory::create(cmd::ChangeEntityGeometry, params);
+    const auto changeGeometryCmd = new cmd::CmdEntityGeometryChange(prepareChangeCoordinatesCommandParams());
+
     m_commandsStack->push(changeGeometryCmd);
 }
 
@@ -108,12 +104,7 @@ void InteractiveObject::mergeGeometry()
             }
         }
 
-        QList<QVariant> params;
-        const QList<QVariantList> preparedParams { prepareChangeCoordinatesCommandParams() };
-        std::transform(preparedParams.cbegin(), preparedParams.cend(), std::back_inserter(params),
-                [](const QVariantList entryParams) { return QVariant::fromValue(entryParams); });
-
-        QUndoCommand *autolayoutCmd = cmd::CommandsFactory::create(cmd::AutoLayoutEntity, params);
+        QUndoCommand *autolayoutCmd = new cmd::CmdEntityAutoLayout(prepareChangeCoordinatesCommandParams());
         autolayoutCmd->redo();
 
         const QUndoCommand *cmd = m_commandsStack->command(m_commandsStack->index() - 1);
@@ -124,9 +115,9 @@ void InteractiveObject::mergeGeometry()
     });
 }
 
-QList<QVariantList> InteractiveObject::prepareChangeCoordinatesCommandParams() const
+QList<QPair<ivm::AADLObject *, QVector<QPointF>>> InteractiveObject::prepareChangeCoordinatesCommandParams() const
 {
-    QList<QVariantList> params;
+    QList<QPair<ivm::AADLObject *, QVector<QPointF>>> params;
     auto children = childItems();
     std::stable_sort(children.begin(), children.end(),
             [](QGraphicsItem *item1, QGraphicsItem *item2) { return item1->type() < item2->type(); });

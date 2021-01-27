@@ -24,7 +24,7 @@
 #include "common.h"
 #include "context/action/actionsmanager.h"
 #include "endtoend/endtoendview.h"
-#include "interface/commands/commandsfactory.h"
+#include "interface/commands/cmdchangeasn1file.h"
 #include "interface/interfacedocument.h"
 #include "iveditorcore.h"
 #include "minimap.h"
@@ -316,11 +316,8 @@ void MainWindow::openAsn1Dialog()
     int result = dialog.exec();
     if (result == QDialog::Accepted) {
         if (m_core->document()->asn1FileName() != dialog.fileName()) {
-            QVariantList params { QVariant::fromValue(m_core->document()), QVariant::fromValue(dialog.fileName()) };
-            QUndoCommand *command = cmd::CommandsFactory::create(cmd::ChangeAsn1File, params);
-            if (command) {
-                m_core->commandsStack()->push(command);
-            }
+            auto command = new cmd::CmdChangeAsn1File(m_core->document(), dialog.fileName());
+            m_core->commandsStack()->push(command);
         }
     }
 }

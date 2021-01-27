@@ -32,8 +32,7 @@
 #include "delegates/propertytypedelegate.h"
 #include "ifaceparametersmodel.h"
 #include "interface/aadlconnectiongroupmodel.h"
-#include "interface/commands/commandids.h"
-#include "interface/commands/commandsfactory.h"
+#include "interface/commands/cmdentityattributechange.h"
 #include "propertieslistmodel.h"
 #include "propertiesviewbase.h"
 #include "ui_propertiesdialog.h"
@@ -230,13 +229,10 @@ void PropertiesDialog::initCommentView()
                 return;
 
             const QString encodedText = ivm::AADLNameValidator::encodeName(comment->aadlType(), text);
-            const QVariantMap textArg { { ivm::meta::Props::token(ivm::meta::Props::Token::name), encodedText } };
-            const QVariantList commentTextParams { QVariant::fromValue(comment), QVariant::fromValue(textArg) };
-            auto commentTextCmd = cmd::CommandsFactory::create(cmd::ChangeEntityAttributes, commentTextParams);
-            if (commentTextCmd) {
-                commentTextCmd->setText(tr("Edit Comment"));
-                m_commandsStack->push(commentTextCmd);
-            }
+            const QVariantHash textArg { { ivm::meta::Props::token(ivm::meta::Props::Token::name), encodedText } };
+            auto commentTextCmd = new cmd::CmdEntityAttributeChange(comment, textArg);
+            commentTextCmd->setText(tr("Edit Comment"));
+            m_commandsStack->push(commentTextCmd);
         });
     }
 }

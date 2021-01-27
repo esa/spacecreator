@@ -17,13 +17,14 @@
 
 #include "ifaceparametersmodel.h"
 
-#include "aadlobject.h"
 #include "aadliface.h"
+#include "aadlobject.h"
 #include "commandsstack.h"
+#include "interface/commands/cmdifaceparamchange.h"
+#include "interface/commands/cmdifaceparamcreate.h"
+#include "interface/commands/cmdifaceparamremove.h"
 #include "propertytemplate.h"
 #include "propertytemplateconfig.h"
-#include "interface/commands/cmdentitypropertycreate.h"
-#include "interface/commands/commandsfactory.h"
 
 #include <QDebug>
 #include <algorithm>
@@ -155,13 +156,9 @@ bool IfaceParametersModel::setData(const QModelIndex &index, const QVariant &val
             return false;
         }
 
-        if (const auto attributesCmd = cmd::CommandsFactory::create(cmd::ChangeIfaceParam,
-                    { QVariant::fromValue(m_dataObject), QVariant::fromValue(paramOld),
-                            QVariant::fromValue(paramNew) })) {
-
-            m_cmdMacro->push(attributesCmd);
-            m_params.replace(index.row(), paramNew);
-        }
+        auto attributesCmd = new cmd::CmdIfaceParamChange(m_dataObject, paramOld, paramNew);
+        m_cmdMacro->push(attributesCmd);
+        m_params.replace(index.row(), paramNew);
     }
 
     QStandardItemModel::setData(index, value, role);
@@ -171,44 +168,33 @@ bool IfaceParametersModel::setData(const QModelIndex &index, const QVariant &val
 
 bool IfaceParametersModel::createProperty(const QString &propName)
 {
-    bool res(false);
-
     ivm::IfaceParameter param(propName);
 
-    const auto propsCmd = cmd::CommandsFactory::create(
-            cmd::CreateIfaceParam, { QVariant::fromValue(m_dataObject), QVariant::fromValue(param) });
-    if (propsCmd) {
-        const int rows = rowCount();
-        beginInsertRows(QModelIndex(), rows, rows);
+    auto propsCmd = new cmd::CmdIfaceParamCreate(m_dataObject, param);
+    const int rows = rowCount();
+    beginInsertRows(QModelIndex(), rows, rows);
 
-        m_cmdMacro->push(propsCmd);
-        createNewRow(param, rows);
-        res = true;
+    m_cmdMacro->push(propsCmd);
+    createNewRow(param, rows);
 
-        endInsertRows();
-    }
+    endInsertRows();
 
-    return res;
+    return true;
 }
 
 bool IfaceParametersModel::removeProperty(const QModelIndex &index)
 {
-    bool res(false);
-    if (!index.isValid())
-        return res;
-
-    const int row(index.row());
-    const auto propsCmd = cmd::CommandsFactory::create(
-            cmd::RemoveIfaceParam, { QVariant::fromValue(m_dataObject), QVariant::fromValue(m_params.value(row)) });
-    if (propsCmd) {
-        m_cmdMacro->push(propsCmd);
-        removeRow(row);
-        m_params.removeAt(row);
-
-        res = true;
+    if (!index.isValid()) {
+        return false;
     }
 
-    return res;
+    const int row(index.row());
+    auto propsCmd = new cmd::CmdIfaceParamRemove(m_dataObject, m_params.value(row));
+    m_cmdMacro->push(propsCmd);
+    removeRow(row);
+    m_params.removeAt(row);
+
+    return true;
 }
 
 bool IfaceParametersModel::isAttr(const QModelIndex & /*id*/) const

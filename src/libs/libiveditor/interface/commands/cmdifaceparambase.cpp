@@ -19,8 +19,7 @@
 
 #include "aadlconnection.h"
 #include "aadlmodel.h"
-#include "commandids.h"
-#include "commandsfactory.h"
+#include "cmdentityremove.h"
 
 namespace ive {
 namespace cmd {
@@ -68,9 +67,8 @@ void CmdIfaceParamBase::prepareRmCommands()
         for (auto connection : m_connections) {
             if (connection->sourceInterface() && connection->targetInterface()) {
                 if (connection->sourceInterface()->params() != connection->targetInterface()->params()) {
-                    const QVariantList params = { QVariant::fromValue(connection), QVariant::fromValue(model) };
-                    if (QUndoCommand *cmdRm = cmd::CommandsFactory::create(cmd::RemoveEntity, params))
-                        m_cmdRmConnections.append(cmdRm);
+                    auto cmdRm = new cmd::CmdEntityRemove(connection, model);
+                    m_cmdRmConnections.append(cmdRm);
                 }
             }
         }

@@ -24,7 +24,6 @@
 #include "aadlnamevalidator.h"
 #include "commandsstack.h"
 #include "interface/commands/cmdconnectiongroupitemchange.h"
-#include "interface/commands/commandsfactory.h"
 
 #include <QSet>
 
@@ -127,13 +126,10 @@ bool AADLConnectionGroupModel::setData(const QModelIndex &index, const QVariant 
     const auto state = value.value<Qt::CheckState>();
     const auto connection = m_allConnections.at(index.row());
 
-    const QVariantList params { QVariant::fromValue(m_connectionGroup), QVariant::fromValue(connection.data()),
-        state == Qt::Checked };
-    if (const auto propsCmd = cmd::CommandsFactory::create(cmd::ChangeConnectionGroupEntity, params)) {
-        m_cmdMacro->push(propsCmd);
-        return true;
-    }
-    return false;
+    const auto propsCmd =
+            new cmd::CmdConnectionGroupItemChange(m_connectionGroup, connection.data(), state == Qt::Checked);
+    m_cmdMacro->push(propsCmd);
+    return true;
 }
 
 Qt::ItemFlags AADLConnectionGroupModel::flags(const QModelIndex &index) const

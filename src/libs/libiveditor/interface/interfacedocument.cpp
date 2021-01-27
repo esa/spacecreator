@@ -29,8 +29,8 @@
 #include "asn1modelstorage.h"
 #include "baseitems/common/aadlutils.h"
 #include "baseitems/graphicsview.h"
-#include "commands/commandids.h"
-#include "commands/commandsfactory.h"
+#include "commands/cmdentitiesimport.h"
+#include "commands/cmdentitiesinstantiate.h"
 #include "commandsstack.h"
 #include "commonvisualizationmodel.h"
 #include "context/action/actionsmanager.h"
@@ -712,11 +712,8 @@ void InterfaceDocument::importEntity(const shared::Id &id, const QPointF &sceneD
         itemAtScenePos = itemAtScenePos->parentItem();
     }
     ivm::AADLFunctionType *parentObject = gi::functionObject(itemAtScenePos);
-    const QVariantList params = { QVariant::fromValue(obj), QVariant::fromValue(parentObject),
-        QVariant::fromValue(d->objectsModel), QVariant::fromValue(sceneDropPoint) };
-    if (QUndoCommand *cmdImport = cmd::CommandsFactory::create(cmd::ImportEntities, params)) {
-        d->commandsStack->push(cmdImport);
-    }
+    auto cmdImport = new cmd::CmdEntitiesImport(obj, parentObject, d->objectsModel, sceneDropPoint);
+    d->commandsStack->push(cmdImport);
 }
 
 void InterfaceDocument::instantiateEntity(const shared::Id &id, const QPointF &sceneDropPoint)
@@ -730,11 +727,9 @@ void InterfaceDocument::instantiateEntity(const shared::Id &id, const QPointF &s
         itemAtScenePos = itemAtScenePos->parentItem();
     }
     ivm::AADLFunctionType *parentObject = gi::functionObject(itemAtScenePos);
-    const QVariantList params = { QVariant::fromValue(obj->as<ivm::AADLFunctionType *>()),
-        QVariant::fromValue(parentObject), QVariant::fromValue(d->objectsModel), QVariant::fromValue(sceneDropPoint) };
-    if (QUndoCommand *cmdInstantiate = cmd::CommandsFactory::create(cmd::InstantiateEntities, params)) {
-        d->commandsStack->push(cmdInstantiate);
-    }
+    auto cmdInstantiate = new cmd::CmdEntitiesInstantiate(
+            obj->as<ivm::AADLFunctionType *>(), parentObject, d->objectsModel, sceneDropPoint);
+    d->commandsStack->push(cmdInstantiate);
 }
 
 void InterfaceDocument::showContextMenuForAADLModel(const QPoint &pos)

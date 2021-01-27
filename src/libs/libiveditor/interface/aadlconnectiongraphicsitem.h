@@ -68,7 +68,7 @@ public:
     AADLFunctionGraphicsItem *sourceItem() const;
     AADLFunctionGraphicsItem *targetItem() const;
 
-    QList<QVariantList> prepareChangeCoordinatesCommandParams() const override;
+    QList<QPair<ivm::AADLObject*, QVector<QPointF> > > prepareChangeCoordinatesCommandParams() const override;
 
     QString prepareTooltip() const override;
 

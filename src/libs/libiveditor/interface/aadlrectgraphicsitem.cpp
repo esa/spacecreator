@@ -105,10 +105,9 @@ QRectF AADLRectGraphicsItem::adjustRectToParent(shared::ui::GripPoint *grip, con
     QRectF rect = mapRectToParent(boundingRect());
 
     auto parentObj = qobject_cast<InteractiveObject *>(parentObject());
-    const QRectF contentRect = parentObj
-            ? parentObj->boundingRect().marginsRemoved(
-                      parentObj->aadlObject()->isRootObject() ? kRootMargins : kContentMargins)
-            : QRectF();
+    const QRectF contentRect = parentObj ? parentObj->boundingRect().marginsRemoved(
+                                       parentObj->aadlObject()->isRootObject() ? kRootMargins : kContentMargins)
+                                         : QRectF();
     switch (grip->location()) {
     case shared::ui::GripPoint::Left: {
         const qreal left = rect.left() + shift.x();
@@ -175,11 +174,11 @@ void AADLRectGraphicsItem::updateFromEntity()
         layout();
 }
 
-QList<QVariantList> AADLRectGraphicsItem::prepareChangeCoordinatesCommandParams() const
+QList<QPair<ivm::AADLObject *, QVector<QPointF>>> AADLRectGraphicsItem::prepareChangeCoordinatesCommandParams() const
 {
-    QList<QVariantList> params;
+    QList<QPair<ivm::AADLObject *, QVector<QPointF>>> params;
     const QVector<QPointF> sceneGeometry { sceneBoundingRect().topLeft(), sceneBoundingRect().bottomRight() };
-    params.append({ QVariant::fromValue(aadlObject()), QVariant::fromValue(sceneGeometry) });
+    params.append({ aadlObject(), sceneGeometry });
     params.append(InteractiveObject::prepareChangeCoordinatesCommandParams());
     return params;
 }

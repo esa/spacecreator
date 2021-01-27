@@ -20,7 +20,6 @@
 #include "aadlconnection.h"
 #include "cmdentityremove.h"
 #include "commandids.h"
-#include "commandsfactory.h"
 
 namespace ive {
 namespace cmd {
@@ -121,8 +120,7 @@ bool CmdRequiredIfacePropertyChange::connectionMustDie(const ivm::AADLConnection
         return true;
     }
 
-    if (ivm::AADLIface::OperationKind::Any != newKind
-            && ivm::AADLIface::OperationKind::Any != otherIface->kind()) {
+    if (ivm::AADLIface::OperationKind::Any != newKind && ivm::AADLIface::OperationKind::Any != otherIface->kind()) {
         return otherIface->kind() == newKind;
     }
 

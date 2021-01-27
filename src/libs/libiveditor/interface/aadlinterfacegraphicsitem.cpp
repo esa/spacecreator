@@ -249,16 +249,17 @@ void AADLInterfaceGraphicsItem::onSelectionChanged(bool isSelected)
     m_iface->setBrush(isSelected ? kSelectedBackgroundColor : h.brush());
 }
 
-QList<QVariantList> AADLInterfaceGraphicsItem::prepareChangeCoordinatesCommandParams() const
+QList<QPair<ivm::AADLObject *, QVector<QPointF>>>
+AADLInterfaceGraphicsItem::prepareChangeCoordinatesCommandParams() const
 {
-    QList<QVariantList> params = { { QVariant::fromValue(entity()),
-            QVariant::fromValue(QVector<QPointF> { scenePos() }) } };
+    QVector<QPointF> pos;
+    pos.append(scenePos());
+    QList<QPair<ivm::AADLObject *, QVector<QPointF>>> params = { { entity(), pos } };
     for (const auto &connection : connectionItems()) {
         if (connection) {
-            params.append({ QVariant::fromValue(connection->entity()),
-                    QVariant::fromValue(
-                            connection->graphicsPoints()) }); // connection->prepareChangeCoordinatesCommandParams()
-                                                              // - will be fixed during work on Undo/Redo issues
+            params.append({ connection->entity(),
+                    connection->graphicsPoints() }); // connection->prepareChangeCoordinatesCommandParams()
+                                                     // - will be fixed during work on Undo/Redo issues
         }
     }
 

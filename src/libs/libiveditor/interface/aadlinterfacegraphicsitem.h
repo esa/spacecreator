@@ -64,7 +64,7 @@ public:
     QPainterPath shape() const override;
 
     void updateFromEntity() override;
-    QList<QVariantList> prepareChangeCoordinatesCommandParams() const override;
+    QList<QPair<ivm::AADLObject *, QVector<QPointF>>> prepareChangeCoordinatesCommandParams() const override;
 
     QString prepareTooltip() const override;
     void layout();

@@ -20,16 +20,15 @@
 #include "aadlfunction.h"
 #include "aadlmodel.h"
 #include "baseitems/common/aadlutils.h"
+#include "cmdinterfaceitemcreate.h"
 #include "commandids.h"
-#include "commandsfactory.h"
 
 #include <QDebug>
 
 namespace ive {
 namespace cmd {
 
-QVector<QUndoCommand *> fillCloneCommands(
-        ivm::AADLIface *iface, const ivm::AADLIface::CreationInfo &creationInfo)
+QVector<QUndoCommand *> fillCloneCommands(ivm::AADLIface *iface, const ivm::AADLIface::CreationInfo &creationInfo)
 {
     QVector<QUndoCommand *> clones;
 
@@ -42,8 +41,8 @@ QVector<QUndoCommand *> fillCloneCommands(
             // the cloned iface has not been stored yet,
             // so it has invalid pointer to the model
             clone.model = creationInfo.model;
-            if (QUndoCommand *cmdRm = cmd::CommandsFactory::create(cmd::CreateInterfaceEntity, clone.toVarList()))
-                clones.append(cmdRm);
+            auto cmd = new cmd::CmdInterfaceItemCreate(clone);
+            clones.append(cmd);
         }
 
     return clones;
@@ -52,7 +51,7 @@ QVector<QUndoCommand *> fillCloneCommands(
 CmdInterfaceItemCreate::CmdInterfaceItemCreate(const ivm::AADLIface::CreationInfo &creationInfo)
     : CmdEntityGeometryChange({},
             creationInfo.type == ivm::AADLIface::IfaceType::Provided ? QObject::tr("Create PI")
-                                                                            : QObject::tr("Create RI"))
+                                                                     : QObject::tr("Create RI"))
     , m_ifaceInfo(creationInfo)
     , m_entity(ivm::AADLIface::createIface(m_ifaceInfo))
     , m_cmdClones(fillCloneCommands(m_entity, m_ifaceInfo))

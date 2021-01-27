@@ -146,8 +146,6 @@ target_sources(${LIB_NAME} PRIVATE
     interface/commands/cmdrootentitychange.cpp
     interface/commands/cmdrootentitychange.h
     interface/commands/commandids.h
-    interface/commands/commandsfactory.cpp
-    interface/commands/commandsfactory.h
     interface/createconnectiongroupdialog.cpp
     interface/createconnectiongroupdialog.h
     interface/creatortool.cpp

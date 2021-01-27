@@ -19,8 +19,8 @@
 #include "cmdentityattributechange.h"
 
 #include "cmdentityremove.h"
+#include "cmdinterfaceitemcreate.h"
 #include "commandids.h"
-#include "commandsfactory.h"
 
 #include <QDebug>
 #include <aadlfunction.h>
@@ -200,10 +200,8 @@ void CmdEntityAttributeChange::prepareUnsetFunctionTypeCommands(const ivm::AADLF
                     fnIfaces.cbegin(), fnIfaces.cend(), [clone](ivm::AADLIface *fnIface) { return clone == fnIface; });
 
             if (found != fnIfaces.cend()) {
-                const QVariantList params = { QVariant::fromValue(clone.data()),
-                    QVariant::fromValue(clone->objectsModel()) };
-                if (QUndoCommand *cmdRm = cmd::CommandsFactory::create(cmd::RemoveEntity, params))
-                    cmdStorage.append(cmdRm);
+                auto cmdRm = new cmd::CmdEntityRemove(clone.data(), clone->objectsModel());
+                cmdStorage.append(cmdRm);
             }
         }
     }
@@ -242,8 +240,8 @@ void CmdEntityAttributeChange::prepareSetFunctionTypeCommands(const ivm::AADLFun
         } else {
             const ivm::AADLIface::CreationInfo clone =
                     ivm::AADLIface::CreationInfo::cloneIface(fnTypeIface, m_function);
-            if (QUndoCommand *cmdRm = cmd::CommandsFactory::create(cmd::CreateInterfaceEntity, clone.toVarList()))
-                cmdStorage.append(cmdRm);
+            auto cmdRm = new cmd::CmdInterfaceItemCreate(clone);
+            cmdStorage.append(cmdRm);
         }
     }
 }

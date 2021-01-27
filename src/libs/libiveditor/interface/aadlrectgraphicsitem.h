@@ -34,7 +34,7 @@ public:
     void setRect(const QRectF &geometry);
 
     void updateFromEntity() override;
-    QList<QVariantList> prepareChangeCoordinatesCommandParams() const override;
+    QList<QPair<ivm::AADLObject *, QVector<QPointF>>> prepareChangeCoordinatesCommandParams() const override;
 
     enum MoveStep
     {

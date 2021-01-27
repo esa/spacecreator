@@ -402,19 +402,22 @@ AADLFunctionGraphicsItem *AADLConnectionGraphicsItem::targetItem() const
     return m_endItem ? qgraphicsitem_cast<AADLFunctionGraphicsItem *>(m_endItem->targetItem()) : nullptr;
 }
 
-QList<QVariantList> AADLConnectionGraphicsItem::prepareChangeCoordinatesCommandParams() const
+QList<QPair<ivm::AADLObject *, QVector<QPointF>>>
+AADLConnectionGraphicsItem::prepareChangeCoordinatesCommandParams() const
 {
     if (!entity() || !m_startItem || !m_startItem->entity() || !m_endItem || !m_endItem->entity()) {
         return {};
     }
 
     // item->prepareChangeCoordinatesCommandParams() - will be fixed during work on Undo/Redo issues
-    auto prepareParams = [](AADLInterfaceGraphicsItem *item) -> QVariantList {
-        return { QVariant::fromValue(item->entity()), QVariant::fromValue<QVector<QPointF>>({ item->scenePos() }) };
+    auto prepareParams = [](AADLInterfaceGraphicsItem *item) -> QPair<ivm::AADLObject *, QVector<QPointF>> {
+        QVector<QPointF> pos;
+        pos.append(item->scenePos());
+        return { item->entity(), pos };
     };
 
-    QList<QVariantList> params;
-    params.append({ QVariant::fromValue(entity()), QVariant::fromValue(graphicsPoints()) });
+    QList<QPair<ivm::AADLObject *, QVector<QPointF>>> params;
+    params.append({ entity(), graphicsPoints() });
     params.append(prepareParams(m_startItem));
     params.append(prepareParams(m_endItem));
     return params;

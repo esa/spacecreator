@@ -29,9 +29,7 @@
 #include "aadlobject.h"
 #include "baseitems/common/aadlutils.h"
 #include "colors/colormanager.h"
-#include "commands/cmdfunctionitemcreate.h"
-#include "commands/commandids.h"
-#include "commands/commandsfactory.h"
+#include "commands/cmdentityattributechange.h"
 #include "commandsstack.h"
 #include "graphicsviewutils.h"
 #include "ui/textitem.h"
@@ -178,11 +176,9 @@ void AADLFunctionTypeGraphicsItem::updateNameFromUi(const QString &name)
         return;
     }
 
-    const QVariantMap attributess = { { ivm::meta::Props::token(ivm::meta::Props::Token::name), newName } };
-    if (const auto attributesCmd = cmd::CommandsFactory::create(
-                cmd::ChangeEntityAttributes, { QVariant::fromValue(entity()), QVariant::fromValue(attributess) })) {
-        m_commandsStack->push(attributesCmd);
-    }
+    const QVariantHash attributess = { { ivm::meta::Props::token(ivm::meta::Props::Token::name), newName } };
+    const auto attributesCmd = new cmd::CmdEntityAttributeChange(entity(), attributess);
+    m_commandsStack->push(attributesCmd);
 }
 
 void AADLFunctionTypeGraphicsItem::onManualResizeProgress(

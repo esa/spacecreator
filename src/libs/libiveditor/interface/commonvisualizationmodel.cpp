@@ -23,7 +23,7 @@
 #include "aadlnamevalidator.h"
 #include "aadlxmlreader.h"
 #include "commandsstack.h"
-#include "interface/commands/commandsfactory.h"
+#include "interface/commands/cmdentityattributechange.h"
 
 #include <QDebug>
 #include <QDirIterator>
@@ -280,10 +280,9 @@ void VisualizationModel::onDataChanged(
                     }
                     if (roles.contains(Qt::DisplayRole)) {
                         const QString name = ivm::AADLNameValidator::encodeName(obj->aadlType(), item->text());
-                        const QVariantMap attributes = { { ivm::meta::Props::token(ivm::meta::Props::Token::name),
+                        const QVariantHash attributes = { { ivm::meta::Props::token(ivm::meta::Props::Token::name),
                                 name } };
-                        const auto attributesCmd = cmd::CommandsFactory::create(cmd::ChangeEntityAttributes,
-                                { QVariant::fromValue(obj), QVariant::fromValue(attributes) });
+                        auto attributesCmd = new cmd::CmdEntityAttributeChange(obj, attributes);
                         m_commandsStack->push(attributesCmd);
                     }
                 }

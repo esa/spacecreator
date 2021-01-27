@@ -22,8 +22,11 @@
 #include "ui/interactiveobjectbase.h"
 
 #include <QFont>
+#include <QPair>
 #include <QPen>
+#include <QPointF>
 #include <QPointer>
+#include <QVector>
 
 namespace ivm {
 class AADLObject;
@@ -55,7 +58,7 @@ public:
     virtual void init();
     virtual void updateEntity();
     virtual void updateFromEntity() = 0;
-    virtual QList<QVariantList> prepareChangeCoordinatesCommandParams() const;
+    virtual QList<QPair<ivm::AADLObject *, QVector<QPointF>>> prepareChangeCoordinatesCommandParams() const;
 
     virtual QString prepareTooltip() const;
 

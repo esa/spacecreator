@@ -31,10 +31,13 @@
 #include "aadlitemmodel.h"
 #include "baseitems/common/aadlutils.h"
 #include "commands/cmdcommentitemcreate.h"
+#include "commands/cmdconnectiongroupitemcreate.h"
+#include "commands/cmdconnectionitemcreate.h"
+#include "commands/cmdentitygeometrychange.h"
+#include "commands/cmdentityremove.h"
 #include "commands/cmdfunctionitemcreate.h"
 #include "commands/cmdfunctiontypeitemcreate.h"
-#include "commands/commandids.h"
-#include "commands/commandsfactory.h"
+#include "commands/cmdinterfaceitemcreate.h"
 #include "commandsstack.h"
 #include "connectioncreationvalidator.h"
 #include "context/action/actionsmanager.h"
@@ -176,10 +179,8 @@ void CreatorTool::removeSelectedItems()
                             }
                         }
                     }
-                    const QVariantList params = { QVariant::fromValue(entity),
-                        QVariant::fromValue(d->model->objectsModel()) };
-                    if (QUndoCommand *cmdRm = cmd::CommandsFactory::create(cmd::RemoveEntity, params))
-                        d->doc->commandsStack()->push(cmdRm);
+                    auto cmdRm = new cmd::CmdEntityRemove(entity, d->model->objectsModel());
+                    d->doc->commandsStack()->push(cmdRm);
                 }
             }
         }
@@ -250,9 +251,9 @@ void CreatorTool::groupSelectedItems()
 
     CreateConnectionGroupDialog *dialog = new CreateConnectionGroupDialog(groupCreationDataList, d->view->window());
     if (dialog->exec() == QDialog::Accepted) {
-        for (auto data : dialog->info()) {
-            const auto undoCommand = cmd::CommandsFactory::create(cmd::CreateConnectionGroupEntity, data.toVarList());
-            d->doc->commandsStack()->push(undoCommand);
+        for (const ivm::AADLConnectionGroup::CreationInfo &data : dialog->info()) {
+            auto cmd = new cmd::CmdConnectionGroupItemCreate(data);
+            d->doc->commandsStack()->push(cmd);
         }
     }
     dialog->deleteLater();
@@ -762,9 +763,8 @@ void CreatorTool::CreatorToolPrivate::handleComment(QGraphicsScene *scene, const
                 itemSceneRect = QRectF();
             }
         }
-        const QVariantList params = { QVariant::fromValue(model->objectsModel()), QVariant::fromValue(parentObject),
-            itemSceneRect };
-        doc->commandsStack()->push(cmd::CommandsFactory::create(cmd::CreateCommentEntity, params));
+        auto cmd = new cmd::CmdCommentItemCreate(model->objectsModel(), parentObject, itemSceneRect);
+        doc->commandsStack()->push(cmd);
     }
 }
 
@@ -788,9 +788,8 @@ void CreatorTool::CreatorToolPrivate::handleFunctionType(QGraphicsScene *scene, 
 
         ivm::AADLFunction *parentObject = gi::functionObject(this->previewItem->parentItem());
 
-        const QVariantList params = { QVariant::fromValue(model->objectsModel()), QVariant::fromValue(parentObject),
-            itemSceneRect };
-        doc->commandsStack()->push(cmd::CommandsFactory::create(cmd::CreateFunctionTypeEntity, params));
+        auto cmd = new cmd::CmdFunctionTypeItemCreate(model->objectsModel(), parentObject, itemSceneRect);
+        doc->commandsStack()->push(cmd);
     }
 }
 
@@ -813,10 +812,9 @@ void CreatorTool::CreatorToolPrivate::handleFunction(QGraphicsScene *scene, cons
         }
 
         ivm::AADLFunction *parentObject = gi::functionObject(this->previewItem->parentItem());
-        const QVariantList params = { QVariant::fromValue(model->objectsModel()), QVariant::fromValue(parentObject),
-            itemSceneRect };
 
-        doc->commandsStack()->push(cmd::CommandsFactory::create(cmd::CreateFunctionEntity, params));
+        auto cmd = new cmd::CmdFunctionItemCreate(model->objectsModel(), parentObject, itemSceneRect);
+        doc->commandsStack()->push(cmd);
     }
 }
 
@@ -970,9 +968,9 @@ void CreatorTool::CreatorToolPrivate::handleConnection(const QVector<QPointF> &g
                 return;
         }
 
-        const QVariantList params = { QVariant::fromValue(model->objectsModel()), QVariant::fromValue(item->entity()),
-            prevStartIfaceId, ifaceCommons.id, QVariant::fromValue(points) };
-        if (!cmdMacro.push(cmd::CommandsFactory::create(cmd::CreateConnectionEntity, params)))
+        auto cmd = new cmd::CmdConnectionItemCreate(
+                model->objectsModel(), item->entity(), prevStartIfaceId, ifaceCommons.id, points);
+        if (!cmdMacro.push(cmd))
             return;
 
         firstExcludedPoint = endIt != points.constEnd() ? *endIt : QPointF();
@@ -1017,9 +1015,10 @@ void CreatorTool::CreatorToolPrivate::handleConnection(const QVector<QPointF> &g
             if (!cmdMacro.push(createInterfaceCommand(ifaceCommons)))
                 return;
         }
-        const QVariantList params = { QVariant::fromValue(model->objectsModel()), QVariant::fromValue(item->entity()),
-            prevEndIfaceId, ifaceCommons.id, QVariant::fromValue(points) };
-        if (!cmdMacro.push(cmd::CommandsFactory::create(cmd::CreateConnectionEntity, params)))
+
+        auto cmd = new cmd::CmdConnectionItemCreate(
+                model->objectsModel(), item->entity(), prevStartIfaceId, ifaceCommons.id, points);
+        if (!cmdMacro.push(cmd))
             return;
 
         lastExcludedPoint = endIt != info.connectionPoints.crend() ? *endIt : QPointF();
@@ -1038,10 +1037,10 @@ void CreatorTool::CreatorToolPrivate::handleConnection(const QVector<QPointF> &g
     resultPoints.append(endInterfacePoint);
     Q_ASSERT(resultPoints.size() >= 2);
     if (resultPoints.first() != resultPoints.last()) {
-        const QVariantList params = { QVariant::fromValue(model->objectsModel()),
-            QVariant::fromValue(parentForConnection ? parentForConnection->entity() : nullptr), prevStartIfaceId,
-            prevEndIfaceId, QVariant::fromValue(resultPoints) };
-        if (!cmdMacro.push(cmd::CommandsFactory::create(cmd::CreateConnectionEntity, params)))
+        auto cmd = new cmd::CmdConnectionItemCreate(model->objectsModel(),
+                parentForConnection ? parentForConnection->entity() : nullptr, prevStartIfaceId, ifaceCommons.id,
+                resultPoints);
+        if (!cmdMacro.push(cmd))
             return;
     }
 
@@ -1066,12 +1065,11 @@ void CreatorTool::CreatorToolPrivate::handleConnectionReCreate(const QVector<QPo
                     || connection->endItem()->entity()->id() != info.endIfaceId) {
                 return;
             }
-            const QVariantList params = { QVariant::fromValue(connection->entity()),
-                QVariant::fromValue(info.connectionPoints) };
-            QList<QVariant> paramsList;
-            paramsList.append(qVariantFromValue(params));
-            if (QUndoCommand *cmdRm = cmd::CommandsFactory::create(cmd::ChangeEntityGeometry, paramsList))
-                doc->commandsStack()->push(cmdRm);
+
+            QList<QPair<ivm::AADLObject *, QVector<QPointF>>> paramsList { { connection->entity(),
+                    info.connectionPoints } };
+            auto cmd = new cmd::CmdEntityGeometryChange(paramsList);
+            doc->commandsStack()->push(cmd);
         }
     }
 }
@@ -1129,7 +1127,7 @@ QUndoCommand *CreatorTool::CreatorToolPrivate::createInterfaceCommand(const ivm:
         }
     }
 
-    return cmd::CommandsFactory::create(cmd::CreateInterfaceEntity, info.toVarList());
+    return new cmd::CmdInterfaceItemCreate(info);
 }
 
 void CreatorTool::CreatorToolPrivate::clearPreviewItem()
