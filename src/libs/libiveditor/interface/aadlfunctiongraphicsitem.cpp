@@ -363,7 +363,8 @@ void AADLFunctionGraphicsItem::applyColorScheme()
     QBrush b = h.brush();
 
     if (auto parentFunction = qgraphicsitem_cast<AADLFunctionGraphicsItem *>(parentItem())) {
-        if (!parentFunction->entity()->props().contains("color") && !entity()->props().contains("color")
+        if (!parentFunction->entity()->hasProperty(QLatin1String("color"))
+                && !entity()->hasProperty(QLatin1String("color"))
                 && parentFunction->handledColorType() == ColorManager::HandledColors::FunctionRegular) { // [Hm...]
             b.setColor(parentFunction->brush().color().darker(125));
             p.setColor(parentFunction->pen().color().darker(125));

@@ -17,8 +17,8 @@
 
 #include "aadlrectgraphicsitem.h"
 
-#include "aadlobject.h"
 #include "aadlfunctiontype.h"
+#include "aadlobject.h"
 #include "baseitems/common/aadlutils.h"
 #include "commandsstack.h"
 #include "interface/graphicsitemhelpers.h"
@@ -105,9 +105,10 @@ QRectF AADLRectGraphicsItem::adjustRectToParent(shared::ui::GripPoint *grip, con
     QRectF rect = mapRectToParent(boundingRect());
 
     auto parentObj = qobject_cast<InteractiveObject *>(parentObject());
-    const QRectF contentRect = parentObj ? parentObj->boundingRect().marginsRemoved(
-                                       parentObj->aadlObject()->isRootObject() ? kRootMargins : kContentMargins)
-                                         : QRectF();
+    const QRectF contentRect = parentObj
+            ? parentObj->boundingRect().marginsRemoved(
+                      parentObj->aadlObject()->isRootObject() ? kRootMargins : kContentMargins)
+            : QRectF();
     switch (grip->location()) {
     case shared::ui::GripPoint::Left: {
         const qreal left = rect.left() + shift.x();
@@ -164,19 +165,9 @@ void AADLRectGraphicsItem::updateFromEntity()
     if (!obj)
         return;
 
-    static const QList<ivm::meta::Props::Token> types { ivm::meta::Props::Token::coordinates,
-        ivm::meta::Props::Token::InnerCoordinates, ivm::meta::Props::Token::RootCoordinates };
-
-    QRectF itemSceneRect { ive::rect(obj->coordinates()) };
-    int idx = 0;
-    while (itemSceneRect.isNull() && idx < types.size()) {
-        const ivm::meta::Props::Token token = types.at(idx);
-        const QString strCoordinates = obj->prop(ivm::meta::Props::token(token)).toString();
-        itemSceneRect = ive::rect(ivm::AADLObject::coordinatesFromString(strCoordinates));
-        ++idx;
-    }
+    const QRectF itemSceneRect { ive::rect(obj->coordinates()) };
     if (!itemSceneRect.isValid())
-        instantLayoutUpdate();
+        layout();
     else
         setRect(itemSceneRect);
 
@@ -195,13 +186,7 @@ QList<QVariantList> AADLRectGraphicsItem::prepareChangeCoordinatesCommandParams(
 
 void AADLRectGraphicsItem::rebuildLayout()
 {
-    const QRectF sceneRect = sceneBoundingRect();
-    if (auto graphicsItemParent = parentItem()) {
-        const QRectF parentRect = graphicsItemParent->sceneBoundingRect();
-        setVisible(parentRect.contains(sceneRect) && aadlObject()->isVisible());
-    } else {
-        setVisible(aadlObject()->isVisible());
-    }
+    updateSiblingVisibility();
     updateChildrenVisibility();
     updateGripPoints();
     applyColorScheme();

@@ -194,9 +194,9 @@ ColorHandler InteractiveObject::colorHandler() const
 {
     ColorHandler h = ColorManager::colorsForItem(handledColorType());
     if (auto aadlObj = aadlObject()) {
-        if (aadlObj->props().contains("color")) { // keep single custom color
+        if (aadlObj->hasProperty(QLatin1String("color"))) { // keep single custom color
             h.setFillType(ColorHandler::Color);
-            h.setBrushColor0(QColor(aadlObj->props().value("color").toString()));
+            h.setBrushColor0(QColor(aadlObj->prop(QLatin1String("color")).toString()));
         }
     }
 

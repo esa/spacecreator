@@ -755,8 +755,13 @@ void CreatorTool::CreatorToolPrivate::handleComment(QGraphicsScene *scene, const
         if (!parentObject)
             parentObject = gi::functionTypeObject(this->previewItem->parentItem());
 
-        const QRectF itemSceneRect =
+        QRectF itemSceneRect =
                 adjustToSize(this->previewItem->mapRectToScene(this->previewItem->rect()), DefaultGraphicsItemSize);
+        if (auto parentItem = previewItem->parentItem()) {
+            if (!parentItem->sceneBoundingRect().marginsRemoved(ive::kRootMargins).contains(itemSceneRect)) {
+                itemSceneRect = QRectF();
+            }
+        }
         const QVariantList params = { QVariant::fromValue(model->objectsModel()), QVariant::fromValue(parentObject),
             itemSceneRect };
         doc->commandsStack()->push(cmd::CommandsFactory::create(cmd::CreateCommentEntity, params));
@@ -769,11 +774,17 @@ void CreatorTool::CreatorToolPrivate::handleFunctionType(QGraphicsScene *scene, 
     Q_UNUSED(pos)
 
     if (this->previewItem) {
-        const QRectF itemSceneRect =
+        QRectF itemSceneRect =
                 adjustToSize(this->previewItem->mapRectToScene(this->previewItem->rect()), DefaultGraphicsItemSize);
 
         if (!gi::canPlaceRect(scene, this->previewItem, itemSceneRect, gi::RectOperation::Create))
             return;
+
+        if (auto parentItem = previewItem->parentItem()) {
+            if (!parentItem->sceneBoundingRect().marginsRemoved(ive::kRootMargins).contains(itemSceneRect)) {
+                itemSceneRect = QRectF();
+            }
+        }
 
         ivm::AADLFunction *parentObject = gi::functionObject(this->previewItem->parentItem());
 
@@ -789,11 +800,17 @@ void CreatorTool::CreatorToolPrivate::handleFunction(QGraphicsScene *scene, cons
     Q_UNUSED(pos)
 
     if (this->previewItem) {
-        const QRectF itemSceneRect =
+        QRectF itemSceneRect =
                 adjustToSize(this->previewItem->mapRectToScene(this->previewItem->rect()), DefaultGraphicsItemSize);
 
         if (!gi::canPlaceRect(scene, this->previewItem, itemSceneRect, gi::RectOperation::Create))
             return;
+
+        if (auto parentItem = previewItem->parentItem()) {
+            if (!parentItem->sceneBoundingRect().marginsRemoved(ive::kRootMargins).contains(itemSceneRect)) {
+                itemSceneRect = QRectF();
+            }
+        }
 
         ivm::AADLFunction *parentObject = gi::functionObject(this->previewItem->parentItem());
         const QVariantList params = { QVariant::fromValue(model->objectsModel()), QVariant::fromValue(parentObject),
