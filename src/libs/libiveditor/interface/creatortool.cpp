@@ -645,7 +645,7 @@ void CreatorTool::CreatorToolPrivate::populateContextMenu_propertiesDialog(QMenu
             ActionsManager::registerAction(Q_FUNC_INFO, action, "Properties", "Show AADL object properties editor");
         } else {
             menu->addSeparator();
-            QAction *action = menu->addAction(tr("Re=create path"));
+            QAction *action = menu->addAction(tr("Re-create path"));
             action->setEnabled(aadlObj);
 
             connect(action, &QAction::triggered, [gi]() {

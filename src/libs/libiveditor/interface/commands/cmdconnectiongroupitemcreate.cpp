@@ -27,8 +27,7 @@
 namespace ive {
 namespace cmd {
 
-CmdConnectionGroupItemCreate::CmdConnectionGroupItemCreate(
-        const ivm::AADLConnectionGroup::CreationInfo &creationInfo)
+CmdConnectionGroupItemCreate::CmdConnectionGroupItemCreate(const ivm::AADLConnectionGroup::CreationInfo &creationInfo)
     : CmdEntityGeometryChange({}, QObject::tr("Create Connection Group"))
     , m_groupName(creationInfo.name)
     , m_model(creationInfo.model)
@@ -53,7 +52,9 @@ CmdConnectionGroupItemCreate::CmdConnectionGroupItemCreate(
 
     m_entity = new ivm::AADLConnectionGroup(
             creationInfo.name, m_sourceIface, m_targetIface, {}, creationInfo.parentObject);
-    prepareData({ qMakePair(m_entity, creationInfo.points) });
+    prepareData({ qMakePair(m_sourceIface, QVector<QPointF> { creationInfo.points.value(0) }),
+            qMakePair(m_targetIface, QVector<QPointF> { creationInfo.points.value(creationInfo.points.size() - 1) }),
+            qMakePair(m_entity, creationInfo.points) });
 
     for (auto conn : creationInfo.connections) {
         if (conn) {

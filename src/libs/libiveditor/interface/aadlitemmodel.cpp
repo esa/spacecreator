@@ -74,7 +74,7 @@ static inline void dumpItem(QObject *obj, bool strict = false)
                  << ive::polygon(connection->entity()->coordinates()) << "\n";
         Q_ASSERT(!strict
                 || ive::comparePolygones(
-                        connection->graphicsPoints(), ive::polygon(connection->entity()->coordinates())));
+                           connection->graphicsPoints(), ive::polygon(connection->entity()->coordinates())));
         Q_ASSERT(!strict
                 || ive::comparePolygones(connection->points(), ive::polygon(connection->entity()->coordinates())));
     } else if (auto rectItem = qobject_cast<ive::AADLRectGraphicsItem *>(item)) {
@@ -166,8 +166,7 @@ void AADLItemModel::onAADLObjectAdded(ivm::AADLObject *object)
         });
         connect(object, &ivm::AADLObject::coordinatesChanged, this, propertyChanged);
         if (auto clickable = qobject_cast<InteractiveObject *>(item->toGraphicsObject())) {
-            connect(
-                    clickable, &InteractiveObject::clicked, this,
+            connect(clickable, &InteractiveObject::clicked, this,
                     [this, clickable]() {
 #ifdef AADL_ITEM_DUMP
                         dumpItem(sender());
@@ -177,8 +176,7 @@ void AADLItemModel::onAADLObjectAdded(ivm::AADLObject *object)
                         }
                     },
                     Qt::QueuedConnection);
-            connect(
-                    clickable, &InteractiveObject::doubleClicked, this,
+            connect(clickable, &InteractiveObject::doubleClicked, this,
                     [this, clickable]() {
                         if (auto entity = clickable->aadlObject()) {
                             if (auto function = qobject_cast<ivm::AADLFunction *>(entity)) {
@@ -253,8 +251,8 @@ void AADLItemModel::onConnectionAddedToGroup(ivm::AADLConnection *connection)
         auto ifaceObject = connectionGroupEndPoint->function()->id() == connection->source()->id()
                 ? connection->sourceInterface()
                 : connectionGroupEndPoint->function()->id() == connection->target()->id()
-                ? connection->targetInterface()
-                : nullptr;
+                        ? connection->targetInterface()
+                        : nullptr;
         if (auto ifaceItem = getItem<AADLInterfaceGraphicsItem *>(ifaceObject->id())) {
             for (auto ifaceConnection : ifaceItem->connectionItems()) {
                 if (ifaceConnection->entity()->id() == connection->id()) {
@@ -293,8 +291,8 @@ void AADLItemModel::onConnectionRemovedFromGroup(ivm::AADLConnection *connection
         auto ifaceObject = connectionGroupEndPoint->function()->id() == connection->source()->id()
                 ? connection->sourceInterface()
                 : connectionGroupEndPoint->function()->id() == connection->target()->id()
-                ? connection->targetInterface()
-                : nullptr;
+                        ? connection->targetInterface()
+                        : nullptr;
         if (auto ifaceItem = getItem<AADLInterfaceGraphicsItem *>(connectionGroupEndPoint->id())) {
             for (auto ifaceConnection : ifaceItem->connectionItems()) {
                 const bool currentHandledConnection = ifaceConnection->entity()->id() == connection->id();
@@ -380,7 +378,7 @@ void AADLItemModel::setupInnerGeometry(ivm::AADLObject *obj) const
 {
     if (!obj
             || !(obj->aadlType() == ivm::AADLObject::Type::Comment || obj->aadlType() == ivm::AADLObject::Type::Function
-                    || obj->aadlType() == ivm::AADLObject::Type::FunctionType)) {
+                       || obj->aadlType() == ivm::AADLObject::Type::FunctionType)) {
         return;
     }
     QVariant innerCoord = obj->prop(ivm::meta::Props::token(ivm::meta::Props::Token::InnerCoordinates));

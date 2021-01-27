@@ -45,12 +45,15 @@ namespace ive {
  */
 static inline QVector<QPointF> generateConnectionPath(AADLConnectionGraphicsItem *connection)
 {
+    if (!connection || !connection->scene())
+        return {};
+
     const AADLInterfaceGraphicsItem *startItem = connection->startItem();
     const AADLInterfaceGraphicsItem *endItem = connection->endItem();
     if (!startItem || !endItem)
         return {};
 
-    const QGraphicsScene *scene = startItem->scene();
+    const QGraphicsScene *scene = connection->scene();
     Q_ASSERT(startItem->scene() == endItem->scene() && scene);
 
     const bool isStartEndpointNested = startItem->targetItem()->isAncestorOf(endItem);
