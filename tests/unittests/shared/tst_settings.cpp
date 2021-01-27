@@ -15,12 +15,9 @@
    along with this program. If not, see <https://www.gnu.org/licenses/lgpl-2.1.html>.
 */
 
-#include "settings/appoptions.h"
-#include "settingsappoption.h"
+#include "settingsmanager.h"
 
-#include <QAction>
-#include <QCoreApplication>
-#include <QDockWidget>
+#include <QMainWindow>
 #include <QtTest>
 
 class tst_Settings : public QObject
@@ -28,49 +25,44 @@ class tst_Settings : public QObject
     Q_OBJECT
 public:
 private Q_SLOTS:
+    void initTestCase();
+    void cleanupTestCase();
     void testMainWindowGeometry();
     void testMainWindowState();
 
 private:
-    static const QByteArray TestDataEmpty;
-    static const QByteArray TestData1;
-    static const QByteArray TestData2;
-
-    void checkOption(shared::SettingsAppOption *option, const QVariant &data) const;
-    void checkOptionByteArray(shared::SettingsAppOption *option) const;
+    QMainWindow *mainwindow = nullptr;
 };
 
-const QByteArray tst_Settings::TestDataEmpty = { "" };
-const QByteArray tst_Settings::TestData1 = { "data1" };
-const QByteArray tst_Settings::TestData2 = { "data2" };
-
-void tst_Settings::checkOption(shared::SettingsAppOption *option, const QVariant &data) const
+void tst_Settings::initTestCase()
 {
-    option->write(data);
-    QCOMPARE(option->read(), data);
+    QStandardPaths::setTestModeEnabled(true);
+
+    mainwindow = new QMainWindow;
+    mainwindow->setGeometry(100, 100, 640, 480);
 }
 
-void tst_Settings::checkOptionByteArray(shared::SettingsAppOption *option) const
+void tst_Settings::cleanupTestCase()
 {
-    checkOption(option, TestData1);
-    checkOption(option, TestData2);
-    checkOption(option, TestDataEmpty);
+    delete mainwindow;
+    mainwindow = nullptr;
 }
 
 void tst_Settings::testMainWindowGeometry()
 {
-    // it stores result of QWidget::saveGeometry() - a QByteArray,
-    // so the actual geometry does not matter here
-
-    checkOptionByteArray(&ive::AppOptions::MainWindow.Geometry);
+    const QRect geometry = mainwindow->geometry();
+    shared::SettingsManager::store<QByteArray>(shared::SettingsManager::Common::Geometry, mainwindow->saveGeometry());
+    mainwindow->setGeometry(QRect());
+    mainwindow->restoreGeometry(shared::SettingsManager::load<QByteArray>(shared::SettingsManager::Common::Geometry));
+    QCOMPARE(geometry, mainwindow->geometry());
 }
 
 void tst_Settings::testMainWindowState()
 {
-    // it stores result of QMainWindow::saveState() - a QByteArray,
-    // so the actual data does not matter here
-
-    checkOptionByteArray(&ive::AppOptions::MainWindow.State);
+    const QByteArray state = mainwindow->saveState();
+    shared::SettingsManager::store<QByteArray>(shared::SettingsManager::Common::State, state);
+    const QByteArray bytes = shared::SettingsManager::load<QByteArray>(shared::SettingsManager::Common::State);
+    QVERIFY(state == bytes);
 }
 
 QTEST_MAIN(tst_Settings)

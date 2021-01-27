@@ -18,7 +18,7 @@
 #include "bugreportdialog.h"
 
 #include "bugreporthandler.h"
-#include "settingsappoption.h"
+#include "settingsmanager.h"
 #include "ui_bugreportdialog.h"
 
 #include <QFile>
@@ -33,20 +33,20 @@ struct BugreportDialog::BugreportDialogPrivate {
     explicit BugreportDialogPrivate(BugreportDialog *dialog, const QString &logPath, const QList<QPixmap> &images)
         : reportHandler(nullptr)
         , images(images)
-        , host("GroupBugReport/Host")
-        , projectID("GroupBugReport/ProjectID")
-        , accessToken("GroupBugReport/AccessToken")
     {
         ui.setupUi(dialog);
 
-        const QString settingsHost = host.read().toString();
-        ui.hostLineEdit->setText(settingsHost.isEmpty() ? QString(defaultHost) : settingsHost);
+        const QString host = shared::SettingsManager::load<QString>(
+                shared::SettingsManager::BugReport::Host, QString::fromLatin1(defaultHost));
+        ui.hostLineEdit->setText(host);
 
-        const QString settingsProjectID = projectID.read().toString();
-        ui.projectLineEdit->setText(
-                settingsProjectID.isEmpty() ? QString::number(defaultProjectID) : settingsProjectID);
+        const int projID =
+                shared::SettingsManager::load<int>(shared::SettingsManager::BugReport::ProjectID, defaultProjectID);
+        ui.projectLineEdit->setText(QString::number(projID));
 
-        ui.accessTokenLineEdit->setText(accessToken.read().toByteArray());
+        const QString accessToken =
+                shared::SettingsManager::load<QByteArray>(shared::SettingsManager::BugReport::AccessToken);
+        ui.accessTokenLineEdit->setText(accessToken);
 
         if (!logPath.isEmpty()) {
             QFile file(logPath);
@@ -71,10 +71,6 @@ struct BugreportDialog::BugreportDialogPrivate {
     Ui::BugreportDialog ui;
     reports::BugReportHandler *reportHandler;
     const QList<QPixmap> images;
-
-    shared::SettingsAppOption host;
-    shared::SettingsAppOption projectID;
-    shared::SettingsAppOption accessToken;
 };
 
 BugreportDialog::BugreportDialog(const QString &logPath, const QList<QPixmap> &images, QWidget *parent)
@@ -131,9 +127,11 @@ void BugreportDialog::reportSent(const QString &msg)
     d->ui.statusLabel->setText(link);
     d->ui.buttonBox->button(QDialogButtonBox::Apply)->setDisabled(true);
 
-    d->host.write(d->ui.hostLineEdit->text());
-    d->projectID.write(d->ui.projectLineEdit->text());
-    d->accessToken.write(d->ui.accessTokenLineEdit->text().toUtf8());
+    shared::SettingsManager::store<QString>(shared::SettingsManager::BugReport::Host, d->ui.hostLineEdit->text());
+    shared::SettingsManager::store<int>(
+            shared::SettingsManager::BugReport::ProjectID, d->ui.projectLineEdit->text().toInt());
+    shared::SettingsManager::store<QByteArray>(
+            shared::SettingsManager::BugReport::AccessToken, d->ui.accessTokenLineEdit->text().toUtf8());
 }
 
 void BugreportDialog::updateButtonBox()

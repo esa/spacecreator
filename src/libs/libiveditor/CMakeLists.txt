@@ -199,8 +199,6 @@ target_sources(${LIB_NAME} PRIVATE
     iveditorcore.cpp
     iveditorcore.h
     iveditorresources.qrc
-    settings/appoptions.cpp
-    settings/appoptions.h
     templating/exportableaadlconnection.cpp
     templating/exportableaadlconnection.h
     templating/exportableaadlconnectiongroup.cpp

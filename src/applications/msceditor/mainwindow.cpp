@@ -39,7 +39,7 @@
 #include "msceditorcore.h"
 #include "mscmessage.h"
 #include "mscmodel.h"
-#include "settings/appoptions.h"
+#include "settingsmanager.h"
 #include "textviewdialog.h"
 #include "tools/entitydeletetool.h"
 #include "ui/graphicsviewbase.h"
@@ -81,22 +81,22 @@ struct MainWindow::MainWindowPrivate {
 
     ~MainWindowPrivate() { delete ui; }
 
+    QSharedPointer<ive::IVEditorCore> m_ivCore { new ive::IVEditorCore() };
+
     Ui::MainWindow *ui = nullptr;
 
-    msc::MSCEditorCore *m_core;
+    msc::MSCEditorCore *m_core = nullptr;
 
     QComboBox *m_zoomBox = nullptr;
     QAction *m_actionShowDocument = nullptr;
     QAction *m_actionShowHierarchy = nullptr;
-    QAction *m_actionOpenAadl { nullptr };
+    QAction *m_actionOpenAadl = nullptr;
 
     msc::TextViewDialog *mscTextBrowser = nullptr;
 
     bool m_dropUnsavedChangesSilently = false;
 
-    QSharedPointer<ive::IVEditorCore> m_ivCore { new ive::IVEditorCore() };
-
-    Q_DISABLE_COPY(MainWindowPrivate);
+    Q_DISABLE_COPY(MainWindowPrivate)
 };
 
 /*!
@@ -606,27 +606,39 @@ void MainWindow::keyPressEvent(QKeyEvent *e)
 
 void MainWindow::loadSettings()
 {
-    restoreGeometry(AppOptions::MainWindow.Geometry->read().toByteArray());
-    restoreState(AppOptions::MainWindow.State->read().toByteArray());
+    using namespace shared;
+
+    restoreGeometry(SettingsManager::load<QByteArray>(SettingsManager::Common::Geometry));
+    restoreState(SettingsManager::load<QByteArray>(SettingsManager::Common::State));
 
     // the toolbar might be hidden from a streaming tool session
     d->m_core->mainToolBar()->show();
 
-    const bool isDocViewMode = 0 == AppOptions::MainWindow.DocOrHierarchyViewMode->read().toInt();
-    if (isDocViewMode)
+    const bool isDocViewMode = SettingsManager::load<bool>(SettingsManager::MSC::DocViewMode);
+    if (isDocViewMode) {
         showDocumentView(true);
-    else
+        d->m_actionShowDocument->setChecked(true);
+    } else {
         showHierarchyView(true);
-    QAction *changeViewModeAction = isDocViewMode ? d->m_actionShowDocument : d->m_actionShowHierarchy;
-    changeViewModeAction->setChecked(true);
+        d->m_actionShowHierarchy->setChecked(true);
+    }
 }
 
 void MainWindow::saveSettings()
 {
-    AppOptions::MainWindow.Geometry->write(saveGeometry());
-    AppOptions::MainWindow.State->write(saveState());
-    AppOptions::MainWindow.LastFilePath->write(d->m_core->mainModel()->currentFilePath());
-    AppOptions::MainWindow.DocOrHierarchyViewMode->write(d->m_core->centerView()->currentIndex());
+    using namespace shared;
+    SettingsManager::store<QByteArray>(SettingsManager::Common::Geometry, saveGeometry());
+    SettingsManager::store<QByteArray>(SettingsManager::Common::State, saveState());
+    SettingsManager::store<bool>(SettingsManager::MSC::DocViewMode, d->m_core->centerView()->currentIndex() == 0);
+    const QString path = d->m_core->mainModel()->currentFilePath();
+
+    auto files = SettingsManager::load<QStringList>(SettingsManager::MSC::RecentFiles);
+    files.removeAll(path);
+    files.prepend(path);
+    while (files.size() > 10) {
+        files.removeLast();
+    }
+    SettingsManager::store<QStringList>(SettingsManager::MSC::RecentFiles, files);
 }
 
 void MainWindow::closeEvent(QCloseEvent *e)

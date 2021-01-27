@@ -29,7 +29,7 @@
 #include "iveditorcore.h"
 #include "minimap.h"
 #include "reports/bugreportdialog.h"
-#include "settings/appoptions.h"
+#include "settingsmanager.h"
 #include "ui_mainwindow.h"
 #include "xmldocexporter.h"
 #include "zoomcontroller.h"
@@ -222,10 +222,10 @@ void MainWindow::onReportRequested()
 
 void MainWindow::initSettings()
 {
-    restoreGeometry(ive::AppOptions::MainWindow.Geometry.read().toByteArray());
-    restoreState(ive::AppOptions::MainWindow.State.read().toByteArray());
+    restoreGeometry(shared::SettingsManager::load<QByteArray>(shared::SettingsManager::Common::Geometry));
+    restoreState(shared::SettingsManager::load<QByteArray>(shared::SettingsManager::Common::State));
 
-    const bool showMinimap = false; // TODO: use a storable option
+    const bool showMinimap = shared::SettingsManager::load<bool>(shared::SettingsManager::Common::ShowMinimap);
     m_core->actionToggleMinimap()->setChecked(showMinimap);
 }
 
@@ -412,8 +412,8 @@ bool MainWindow::prepareQuit()
         return false;
     }
 
-    ive::AppOptions::MainWindow.State.write(saveState());
-    ive::AppOptions::MainWindow.Geometry.write(saveGeometry());
+    shared::SettingsManager::store<QByteArray>(shared::SettingsManager::Common::State, saveState());
+    shared::SettingsManager::store<QByteArray>(shared::SettingsManager::Common::Geometry, saveGeometry());
 
     return true;
 }

@@ -143,8 +143,6 @@ target_sources(${LIB_NAME} PRIVATE
     remotecontrol/remotecontrolhandler.h
     remotecontrol/remotecontrolwebserver.cpp
     remotecontrol/remotecontrolwebserver.h
-    settings/appoptions.cpp
-    settings/appoptions.h
     textviewdialog.cpp
     textviewdialog.h
     tools/actioncreatortool.cpp

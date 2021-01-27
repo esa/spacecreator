@@ -49,4 +49,4 @@ QSettings *SettingsManager::storage()
     return m_settings;
 }
 
-}
+} // namespace shared

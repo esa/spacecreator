@@ -19,7 +19,7 @@
 
 #include "baseitems/common/aadlutils.h"
 #include "common.h"
-#include "settings/appoptions.h"
+#include "settingsmanager.h"
 
 #include <QDebug>
 #include <QFile>
@@ -155,11 +155,8 @@ ColorManager::ColorManager(QObject *parent)
               { HandledColors::FunctionScale, ColorHandler() },
       })
 {
-    const QString defaultSourcePath = prepareDefaultSource();
-    QString sourcePath = AppOptions::Aadl.ColorSchemeFile.read().toString();
-    if (!QFile::exists(sourcePath)) {
-        sourcePath = defaultSourcePath;
-    }
+    const QString sourcePath = shared::SettingsManager::load<QString>(
+            shared::SettingsManager::Common::ColorSchemeFile, prepareDefaultSource());
 
     if (!sourcePath.isEmpty() && !setSourceFile(sourcePath)) { // source file can be corrupted
         shared::copyResourceFile(defaultColorsResourceFile(), sourcePath, shared::FileCopyingMode::Overwrite);
@@ -257,7 +254,7 @@ bool ColorManager::setSourceFile(const QString &from)
 
     if (loaded) {
         m_filePath = from;
-        AppOptions::Aadl.ColorSchemeFile.write(m_filePath);
+        shared::SettingsManager::store<QString>(shared::SettingsManager::Common::ColorSchemeFile, m_filePath);
         Q_EMIT colorsUpdated();
     }
 

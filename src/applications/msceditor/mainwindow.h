@@ -46,7 +46,7 @@ class MainWindow : public QMainWindow
 
 public:
     explicit MainWindow(msc::MSCEditorCore *core, QWidget *parent = nullptr);
-    ~MainWindow();
+    ~MainWindow() override;
 
     QGraphicsView *currentView() const;
 

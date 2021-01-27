@@ -42,8 +42,6 @@ target_sources(${LIB_NAME} PRIVATE
     graphicsviewutils.h
     minimap.h
     minimap.cpp
-    settingsappoption.cpp
-    settingsappoption.h
     settingsmanager.cpp
     settingsmanager.h
     sharedlibrary.cpp
