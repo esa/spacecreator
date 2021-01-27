@@ -17,10 +17,13 @@
 
 #pragma once
 
+#include "undocommand.h"
+
 #include <QObject>
+#include <QUndoStack>
+#include <memory>
 
 class QUndoCommand;
-class QUndoStack;
 
 namespace shared {
 class UndoCommand;
@@ -30,9 +33,17 @@ namespace cmd {
 class CommandsStackBase : public QObject
 {
     Q_OBJECT
+    Q_PROPERTY(bool active READ isActive WRITE setActive)
+    Q_PROPERTY(int undoLimit READ undoLimit WRITE setUndoLimit)
+    Q_PROPERTY(bool canUndo READ canUndo NOTIFY canUndoChanged)
+    Q_PROPERTY(bool canRedo READ canRedo NOTIFY canRedoChanged)
+    Q_PROPERTY(QString undoText READ undoText NOTIFY undoTextChanged)
+    Q_PROPERTY(QString redoText READ redoText NOTIFY redoTextChanged)
+    Q_PROPERTY(bool clean READ isClean NOTIFY cleanChanged)
+
 public:
     struct Macro {
-        explicit Macro(const QString &title = QString());
+        explicit Macro(QUndoStack *undoStack, const QString &title = QString());
         ~Macro();
 
         bool push(QUndoCommand *cmd) const;
@@ -42,26 +53,57 @@ public:
 
     private:
         bool m_keepMacro { false };
+        QUndoStack *m_undoStack = nullptr;
     };
 
-    static CommandsStackBase *instance();
+    explicit CommandsStackBase(QObject *parent = nullptr);
+    ~CommandsStackBase();
 
-    static void setCurrent(QUndoStack *stack);
-    static QUndoStack *current();
+    virtual bool push(QUndoCommand *command);
 
-    static bool push(QUndoCommand *command);
+    QUndoStack *undoStack();
+
+    void clear() { m_undoStack->clear(); }
+
+    bool canUndo() const { return m_undoStack->canUndo(); }
+    bool canRedo() const { return m_undoStack->canRedo(); }
+    QString undoText() const { return m_undoStack->undoText(); }
+    QString redoText() const { return m_undoStack->redoText(); }
+
+    int count() const { return m_undoStack->count(); }
+    int index() const { return m_undoStack->index(); }
+    QString text(int idx) const { return m_undoStack->text(idx); }
+
+    bool isActive() const { return m_undoStack->isActive(); }
+    bool isClean() const { return m_undoStack->isClean(); }
+    int cleanIndex() const { return m_undoStack->cleanIndex(); }
+
+    void beginMacro(const QString &text) { m_undoStack->beginMacro(text); }
+    void endMacro() { m_undoStack->endMacro(); }
+
+    void setUndoLimit(int limit) { m_undoStack->setUndoLimit(limit); }
+    int undoLimit() const { return m_undoStack->undoLimit(); }
+
+    const QUndoCommand *command(int index) const { return m_undoStack->command(index); }
+
+public Q_SLOTS:
+    void setClean() { m_undoStack->setClean(); }
+    void resetClean() { m_undoStack->resetClean(); }
+    void setIndex(int idx) { m_undoStack->setIndex(idx); }
+    void undo() { m_undoStack->undo(); }
+    void redo() { m_undoStack->redo(); }
+    void setActive(bool active = true) { m_undoStack->setActive(active); }
 
 Q_SIGNALS:
-    void currentStackChanged(QUndoStack *to);
+    void indexChanged(int idx);
+    void cleanChanged(bool clean);
+    void canUndoChanged(bool canUndo);
+    void canRedoChanged(bool canRedo);
+    void undoTextChanged(const QString &undoText);
+    void redoTextChanged(const QString &redoText);
 
-private:
-    explicit CommandsStackBase(QObject *parent = nullptr);
-
-    void setCurrentStack(QUndoStack *stack);
-    QUndoStack *currentStack() const;
-
-    static CommandsStackBase *m_instance;
-    QUndoStack *m_current = nullptr;
+protected:
+    std::unique_ptr<QUndoStack> m_undoStack;
 };
 
 } // cmd

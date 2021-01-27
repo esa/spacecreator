@@ -17,10 +17,10 @@
 
 #include "commonvisualizationmodel.h"
 
-#include "aadlnamevalidator.h"
 #include "aadlconnection.h"
 #include "aadlconnectiongroup.h"
 #include "aadlmodel.h"
+#include "aadlnamevalidator.h"
 #include "aadlxmlreader.h"
 #include "commandsstack.h"
 #include "interface/commands/commandsfactory.h"
@@ -31,9 +31,11 @@
 
 namespace ive {
 
-CommonVisualizationModel::CommonVisualizationModel(ivm::AADLModel *aadlModel, QObject *parent)
+CommonVisualizationModel::CommonVisualizationModel(
+        ivm::AADLModel *aadlModel, cmd::CommandsStack *commandsStack, QObject *parent)
     : QStandardItemModel(parent)
     , m_aadlModel(aadlModel)
+    , m_commandsStack(commandsStack)
 {
     connect(m_aadlModel, &ivm::AADLModel::modelReset, this, [this]() {
         m_itemCache.clear();
@@ -233,8 +235,8 @@ QStandardItem *CommonVisualizationModel::getItem(const shared::Id id)
     return id.isNull() ? nullptr : m_itemCache.value(id);
 }
 
-VisualizationModel::VisualizationModel(ivm::AADLModel *aadlModel, QObject *parent)
-    : CommonVisualizationModel(aadlModel, parent)
+VisualizationModel::VisualizationModel(ivm::AADLModel *aadlModel, cmd::CommandsStack *commandsStack, QObject *parent)
+    : CommonVisualizationModel(aadlModel, commandsStack, parent)
 {
     connect(this, &QStandardItemModel::dataChanged, this, &VisualizationModel::onDataChanged);
 }
@@ -259,6 +261,11 @@ QStandardItem *VisualizationModel::createItem(ivm::AADLObject *obj)
 void VisualizationModel::onDataChanged(
         const QModelIndex &topLeft, const QModelIndex &bottomRight, const QVector<int> &roles)
 {
+    if (!m_commandsStack) {
+        qWarning() << Q_FUNC_INFO << "No command stack set in VisualizationModel";
+        return;
+    }
+
     const QStandardItem *firstItem = itemFromIndex(topLeft);
     const QStandardItem *lastItem = itemFromIndex(bottomRight);
     Q_ASSERT(firstItem->parent() == lastItem->parent());
@@ -277,7 +284,7 @@ void VisualizationModel::onDataChanged(
                                 name } };
                         const auto attributesCmd = cmd::CommandsFactory::create(cmd::ChangeEntityAttributes,
                                 { QVariant::fromValue(obj), QVariant::fromValue(attributes) });
-                        cmd::CommandsStack::push(attributesCmd);
+                        m_commandsStack->push(attributesCmd);
                     }
                 }
             }

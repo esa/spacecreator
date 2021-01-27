@@ -17,11 +17,11 @@
 
 #include "propertiesdialog.h"
 
-#include "aadlnamevalidator.h"
-#include "aadlobject.h"
 #include "aadlcomment.h"
 #include "aadlconnectiongroup.h"
 #include "aadliface.h"
+#include "aadlnamevalidator.h"
+#include "aadlobject.h"
 #include "commandsstack.h"
 #include "contextparametersmodel.h"
 #include "delegates/asn1valuedelegate.h"
@@ -48,16 +48,17 @@
 namespace ive {
 
 PropertiesDialog::PropertiesDialog(ivm::PropertyTemplateConfig *dynPropConfig, ivm::AADLObject *obj,
-        const QSharedPointer<Asn1Acn::File> &dataTypes, QWidget *parent)
+        const QSharedPointer<Asn1Acn::File> &dataTypes, cmd::CommandsStack *commandsStack, QWidget *parent)
     : QDialog(parent)
     , ui(new Ui::PropertiesDialog)
     , m_dataObject(obj)
     , m_dynPropConfig(dynPropConfig)
-    , m_cmdMacro(new cmd::CommandsStack::Macro(
+    , m_cmdMacro(new cmd::CommandsStack::Macro(commandsStack->undoStack(),
               tr("Edit %1 - %2")
                       .arg(ivm::AADLNameValidator::nameOfType(m_dataObject->aadlType()).trimmed(),
                               m_dataObject->titleUI())))
     , m_dataTypes(dataTypes)
+    , m_commandsStack(commandsStack)
 {
     ui->setupUi(this);
 
@@ -146,8 +147,7 @@ void PropertiesDialog::initTabs()
 
 void PropertiesDialog::initConnectionGroup()
 {
-    auto model = new AADLConnectionGroupModel(
-            qobject_cast<ivm::AADLConnectionGroup *>(m_dataObject), m_cmdMacro, this);
+    auto model = new AADLConnectionGroupModel(qobject_cast<ivm::AADLConnectionGroup *>(m_dataObject), m_cmdMacro, this);
     auto connectionsView = new QListView;
     connectionsView->setModel(model);
     ui->tabWidget->insertTab(0, connectionsView, tr("Connections"));
@@ -224,7 +224,7 @@ void PropertiesDialog::initCommentView()
         auto commentEdit = new QPlainTextEdit(this);
         commentEdit->setPlainText(comment->titleUI());
         ui->tabWidget->insertTab(0, commentEdit, tr("Comment content"));
-        connect(this, &QDialog::accepted, this, [comment, commentEdit]() {
+        connect(this, &QDialog::accepted, this, [comment, commentEdit, this]() {
             const QString text = commentEdit->toPlainText();
             if (comment->titleUI() == text)
                 return;
@@ -235,7 +235,7 @@ void PropertiesDialog::initCommentView()
             auto commentTextCmd = cmd::CommandsFactory::create(cmd::ChangeEntityAttributes, commentTextParams);
             if (commentTextCmd) {
                 commentTextCmd->setText(tr("Edit Comment"));
-                cmd::CommandsStack::push(commentTextCmd);
+                m_commandsStack->push(commentTextCmd);
             }
         });
     }

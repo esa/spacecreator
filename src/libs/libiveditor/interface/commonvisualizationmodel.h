@@ -19,6 +19,7 @@
 
 #include "common.h"
 
+#include <QPointer>
 #include <QStandardItemModel>
 
 namespace ivm {
@@ -28,12 +29,16 @@ class AADLConnection;
 }
 
 namespace ive {
+namespace cmd {
+class CommandsStack;
+}
 
 class CommonVisualizationModel : public QStandardItemModel
 {
     Q_OBJECT
 public:
-    explicit CommonVisualizationModel(ivm::AADLModel *aadlModel, QObject *parent = nullptr);
+    explicit CommonVisualizationModel(
+            ivm::AADLModel *aadlModel, cmd::CommandsStack *commandsStack, QObject *parent = nullptr);
     enum ItemRole
     {
         IdRole = Qt::UserRole + 1,
@@ -58,13 +63,15 @@ private Q_SLOTS:
 protected:
     ivm::AADLModel *m_aadlModel { nullptr };
     QHash<shared::Id, QStandardItem *> m_itemCache;
+    QPointer<cmd::CommandsStack> m_commandsStack;
 };
 
 class VisualizationModel : public CommonVisualizationModel
 {
     Q_OBJECT
 public:
-    explicit VisualizationModel(ivm::AADLModel *aadlModel, QObject *parent = nullptr);
+    explicit VisualizationModel(
+            ivm::AADLModel *aadlModel, cmd::CommandsStack *commandsStack, QObject *parent = nullptr);
 
     void updateItemData(QStandardItem *item, ivm::AADLObject *obj) override;
     QStandardItem *createItem(ivm::AADLObject *obj) override;

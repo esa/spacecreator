@@ -18,15 +18,15 @@
 #include "aadlfunctiontypegraphicsitem.h"
 
 #include "aadlcommonprops.h"
+#include "aadlconnection.h"
 #include "aadlconnectiongraphicsitem.h"
+#include "aadlfunction.h"
 #include "aadlfunctiongraphicsitem.h"
 #include "aadlfunctionnamegraphicsitem.h"
 #include "aadlinterfacegraphicsitem.h"
+#include "aadlmodel.h"
 #include "aadlnamevalidator.h"
 #include "aadlobject.h"
-#include "aadlconnection.h"
-#include "aadlfunction.h"
-#include "aadlmodel.h"
 #include "baseitems/common/aadlutils.h"
 #include "colors/colormanager.h"
 #include "commands/cmdfunctionitemcreate.h"
@@ -162,6 +162,12 @@ void AADLFunctionTypeGraphicsItem::updateNameFromUi(const QString &name)
         return;
     }
 
+    Q_ASSERT(!m_commandsStack.isNull());
+    if (m_commandsStack.isNull()) {
+        qWarning() << "Command stack not set for AADLFunctionTypeGraphicsItem";
+        return;
+    }
+
     const QString newName = ivm::AADLNameValidator::encodeName(aadlObject()->aadlType(), name);
     if (!ivm::AADLNameValidator::isAcceptableName(entity(), newName)) {
         m_textItem->setPlainText(entity()->titleUI());
@@ -175,7 +181,7 @@ void AADLFunctionTypeGraphicsItem::updateNameFromUi(const QString &name)
     const QVariantMap attributess = { { ivm::meta::Props::token(ivm::meta::Props::Token::name), newName } };
     if (const auto attributesCmd = cmd::CommandsFactory::create(
                 cmd::ChangeEntityAttributes, { QVariant::fromValue(entity()), QVariant::fromValue(attributess) })) {
-        cmd::CommandsStack::push(attributesCmd);
+        m_commandsStack->push(attributesCmd);
     }
 }
 

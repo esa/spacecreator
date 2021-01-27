@@ -19,20 +19,16 @@
 #include "aadlinterfacegraphicsitem.h"
 
 #include "aadlcommentgraphicsitem.h"
+#include "aadlconnection.h"
 #include "aadlconnectiongraphicsitem.h"
+#include "aadlfunction.h"
 #include "aadlfunctiongraphicsitem.h"
 #include "aadlfunctiontypegraphicsitem.h"
-#include "aadlnamevalidator.h"
-#include "aadlconnection.h"
-#include "aadlfunction.h"
 #include "aadliface.h"
+#include "aadlnamevalidator.h"
 #include "baseitems/common/aadlutils.h"
 #include "baseitems/common/positionlookuphelper.h"
 #include "colors/colormanager.h"
-#include "commands/cmdentitygeometrychange.h"
-#include "commands/commandids.h"
-#include "commands/commandsfactory.h"
-#include "commandsstack.h"
 
 #include <QPainter>
 #include <QtDebug>
@@ -69,8 +65,7 @@ void AADLInterfaceGraphicsItem::init()
             &AADLInterfaceGraphicsItem::onAttrOrPropChanged);
     connect(entity(), &ivm::AADLIface::titleChanged, this, &AADLInterfaceGraphicsItem::updateLabel);
     if (auto ri = qobject_cast<ivm::AADLIfaceRequired *>(entity()))
-        connect(ri, &ivm::AADLIfaceRequired::inheritedLabelsChanged, this,
-                &AADLInterfaceGraphicsItem::updateLabel);
+        connect(ri, &ivm::AADLIfaceRequired::inheritedLabelsChanged, this, &AADLInterfaceGraphicsItem::updateLabel);
 
     updateLabel();
     updateIface();
@@ -292,9 +287,9 @@ void AADLInterfaceGraphicsItem::layout()
     }
 
     const auto parentFn = entity()->parentObject()->as<ivm::AADLFunctionType *>();
-    const QRectF fnRect = ive::rect(
-            ivm::AADLObject::coordinatesFromString(parentFn->prop(ivm::meta::Props::token(token)).toString()))
-                                  .normalized();
+    const QRectF fnRect =
+            ive::rect(ivm::AADLObject::coordinatesFromString(parentFn->prop(ivm::meta::Props::token(token)).toString()))
+                    .normalized();
     const auto side = getNearestSide(fnRect, pos);
     pos = getSidePosition(fnRect, pos, side);
 

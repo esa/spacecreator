@@ -17,12 +17,12 @@
 
 #include "interfacedocument.h"
 
-#include "aadlfunctiongraphicsitem.h"
-#include "aadlitemmodel.h"
 #include "aadlcomment.h"
 #include "aadlconnection.h"
 #include "aadlconnectiongroup.h"
 #include "aadlfunction.h"
+#include "aadlfunctiongraphicsitem.h"
+#include "aadlitemmodel.h"
 #include "aadlmodel.h"
 #include "aadlxmlreader.h"
 #include "actionsbar.h"
@@ -84,7 +84,7 @@ static inline QString sharedTypesPath()
 }
 
 struct InterfaceDocument::InterfaceDocumentPrivate {
-    QUndoStack *commandsStack { nullptr };
+    cmd::CommandsStack *commandsStack { nullptr };
 
     QString filePath;
 
@@ -125,8 +125,9 @@ InterfaceDocument::InterfaceDocument(QObject *parent)
     : QObject(parent)
     , d(new InterfaceDocumentPrivate)
 {
-    d->commandsStack = new QUndoStack(this);
-    connect(d->commandsStack, &QUndoStack::cleanChanged, this, [this](bool clean) { Q_EMIT dirtyChanged(!clean); });
+    d->commandsStack = new cmd::CommandsStack(this);
+    connect(d->commandsStack, &cmd::CommandsStack::cleanChanged, this,
+            [this](bool clean) { Q_EMIT dirtyChanged(!clean); });
 
     d->dynPropConfig = ivm::PropertyTemplateConfig::instance();
     d->dynPropConfig->init(PropertyTemplateWidget::dynamicPropertiesFilePath());
@@ -156,7 +157,7 @@ void InterfaceDocument::init()
         return;
     }
 
-    d->itemsModel = new AADLItemModel(d->objectsModel, this);
+    d->itemsModel = new AADLItemModel(d->objectsModel, d->commandsStack, this);
     connect(d->itemsModel, &AADLItemModel::itemClicked, this, &InterfaceDocument::onItemClicked);
     connect(d->itemsModel, &AADLItemModel::itemDoubleClicked, this, &InterfaceDocument::onItemDoubleClicked);
     connect(d->itemsModel, &AADLItemModel::itemsSelected, this, &InterfaceDocument::onSceneSelectionChanged);
@@ -200,8 +201,6 @@ void InterfaceDocument::init()
     splitter->setStretchFactor(1, 1);
     rootLayout->addWidget(splitter);
 
-    ive::cmd::CommandsStack::setCurrent(d->commandsStack);
-
     QTimer::singleShot(0, this, &InterfaceDocument::loadAvailableComponents);
 }
 
@@ -237,7 +236,13 @@ QWidget *InterfaceDocument::view() const
     return d->view;
 }
 
-QUndoStack *InterfaceDocument::commandsStack() const
+QUndoStack *InterfaceDocument::undoStack() const
+{
+    Q_ASSERT(d->commandsStack);
+    return d->commandsStack->undoStack();
+}
+
+cmd::CommandsStack *InterfaceDocument::commandsStack() const
 {
     return d->commandsStack;
 }
@@ -677,7 +682,7 @@ void InterfaceDocument::onDynContextEditorMenuInvoked()
 void InterfaceDocument::showPropertyEditor(ivm::AADLObject *obj)
 {
     ive::PropertiesDialog dialog(
-            d->dynPropConfig, obj, d->asnDataTypes->asn1DataTypes(asn1FilePath()), d->graphicsView);
+            d->dynPropConfig, obj, d->asnDataTypes->asn1DataTypes(asn1FilePath()), d->commandsStack, d->graphicsView);
     dialog.exec();
 }
 
@@ -710,7 +715,7 @@ void InterfaceDocument::importEntity(const shared::Id &id, const QPointF &sceneD
     const QVariantList params = { QVariant::fromValue(obj), QVariant::fromValue(parentObject),
         QVariant::fromValue(d->objectsModel), QVariant::fromValue(sceneDropPoint) };
     if (QUndoCommand *cmdImport = cmd::CommandsFactory::create(cmd::ImportEntities, params)) {
-        cmd::CommandsStack::push(cmdImport);
+        d->commandsStack->push(cmdImport);
     }
 }
 
@@ -728,7 +733,7 @@ void InterfaceDocument::instantiateEntity(const shared::Id &id, const QPointF &s
     const QVariantList params = { QVariant::fromValue(obj->as<ivm::AADLFunctionType *>()),
         QVariant::fromValue(parentObject), QVariant::fromValue(d->objectsModel), QVariant::fromValue(sceneDropPoint) };
     if (QUndoCommand *cmdInstantiate = cmd::CommandsFactory::create(cmd::InstantiateEntities, params)) {
-        cmd::CommandsStack::push(cmdInstantiate);
+        d->commandsStack->push(cmdInstantiate);
     }
 }
 
@@ -739,15 +744,14 @@ void InterfaceDocument::showContextMenuForAADLModel(const QPoint &pos)
         return;
     }
 
-    const auto obj = d->objectsModel->getObject(
-            idx.data(static_cast<int>(ive::CommonVisualizationModel::IdRole)).toUuid());
+    const auto obj =
+            d->objectsModel->getObject(idx.data(static_cast<int>(ive::CommonVisualizationModel::IdRole)).toUuid());
     if (!obj) {
         return;
     }
     QList<QAction *> actions;
 
-    if (obj->aadlType() == ivm::AADLObject::Type::Function
-            || obj->aadlType() == ivm::AADLObject::Type::FunctionType) {
+    if (obj->aadlType() == ivm::AADLObject::Type::Function || obj->aadlType() == ivm::AADLObject::Type::FunctionType) {
         QAction *actExportSelectedEntities = new QAction(tr("Export selected entities"));
         connect(actExportSelectedEntities, &QAction::triggered, this, &InterfaceDocument::exportSelectedFunctions);
         actions.append(actExportSelectedEntities);
@@ -998,7 +1002,7 @@ QTreeView *InterfaceDocument::createModelView()
     connect(d->objectsView, &QTreeView::customContextMenuRequested, this,
             &InterfaceDocument::showContextMenuForAADLModel);
 
-    d->objectsVisualizationModel = new VisualizationModel(d->objectsModel, d->objectsView);
+    d->objectsVisualizationModel = new VisualizationModel(d->objectsModel, d->commandsStack, d->objectsView);
     auto headerItem = new QStandardItem(tr("AADL Structure"));
     headerItem->setTextAlignment(Qt::AlignCenter);
     d->objectsVisualizationModel->setHorizontalHeaderItem(0, headerItem);
@@ -1021,7 +1025,7 @@ QTreeView *InterfaceDocument::createImportView()
     d->importView->setObjectName(QLatin1String("ImportView"));
     d->importView->setSelectionBehavior(QAbstractItemView::SelectionBehavior::SelectItems);
     d->importView->setSelectionMode(QAbstractItemView::SelectionMode::SingleSelection);
-    auto sourceModel = new CommonVisualizationModel(d->importModel, d->importView);
+    auto sourceModel = new CommonVisualizationModel(d->importModel, d->commandsStack, d->importView);
     auto headerItem = new QStandardItem(tr("Import Component"));
     headerItem->setTextAlignment(Qt::AlignCenter);
     sourceModel->setHorizontalHeaderItem(0, headerItem);
@@ -1039,7 +1043,7 @@ QTreeView *InterfaceDocument::createSharedView()
     d->sharedView->setObjectName(QLatin1String("SharedView"));
     d->sharedView->setSelectionBehavior(QAbstractItemView::SelectionBehavior::SelectItems);
     d->sharedView->setSelectionMode(QAbstractItemView::SelectionMode::SingleSelection);
-    auto sourceModel = new CommonVisualizationModel(d->sharedModel, d->sharedView);
+    auto sourceModel = new CommonVisualizationModel(d->sharedModel, d->commandsStack, d->sharedView);
     auto headerItem = new QStandardItem(tr("Shared Types"));
     headerItem->setTextAlignment(Qt::AlignCenter);
     sourceModel->setHorizontalHeaderItem(0, headerItem);

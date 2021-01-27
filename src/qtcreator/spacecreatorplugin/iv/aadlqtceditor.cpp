@@ -107,10 +107,9 @@ void AadlQtCEditor::showAsn1Dialog()
     if (result == QDialog::Accepted) {
         if (plugin->document()->asn1FileName() != dialog.fileName()) {
             QVariantList params { QVariant::fromValue(plugin->document()), QVariant::fromValue(dialog.fileName()) };
-            QUndoCommand *command =
-                    ive::cmd::CommandsFactory::create(ive::cmd::ChangeAsn1File, params);
+            QUndoCommand *command = ive::cmd::CommandsFactory::create(ive::cmd::ChangeAsn1File, params);
             if (command) {
-                ive::cmd::CommandsStack::push(command);
+                plugin->commandsStack()->push(command);
             }
         }
     }

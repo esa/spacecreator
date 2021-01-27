@@ -37,9 +37,10 @@ namespace cmd {
  * \sa CreatorTool::handleConnection(), PropertiesDialog
 
  */
-CommandsStackBase::Macro::Macro(const QString &title)
+CommandsStackBase::Macro::Macro(QUndoStack *undoStack, const QString &title)
+    : m_undoStack(undoStack)
 {
-    CommandsStackBase::current()->beginMacro(title);
+    m_undoStack->beginMacro(title);
 }
 
 /*!
@@ -62,21 +63,22 @@ CommandsStackBase::Macro::Macro(const QString &title)
  */
 CommandsStackBase::Macro::~Macro()
 {
-    CommandsStackBase::current()->endMacro();
+    m_undoStack->endMacro();
 
     int count = 0;
-    if (const auto cmd = CommandsStackBase::current()->command(CommandsStackBase::current()->index() - 1))
+    if (const auto cmd = m_undoStack->command(m_undoStack->index() - 1)) {
         count = cmd->childCount();
+    }
 
     if (!isComplete() || 0 == count) {
 
         // I found no other way to remove a macro from the stack:
-        const int posOfMacro = CommandsStackBase::current()->index() - 1;
-        if (auto macroCmd = const_cast<QUndoCommand *>(CommandsStackBase::current()->command(posOfMacro))) {
+        const int posOfMacro = m_undoStack->index() - 1;
+        if (auto macroCmd = const_cast<QUndoCommand *>(m_undoStack->command(posOfMacro))) {
             macroCmd->undo(); // unperform all the stuff
             macroCmd->setObsolete(true); // to be checked in QUndoStack::undo
         }
-        CommandsStackBase::current()->undo(); // just removes the history record
+        m_undoStack->undo(); // just removes the history record
     }
 }
 
@@ -87,7 +89,8 @@ CommandsStackBase::Macro::~Macro()
  */
 bool CommandsStackBase::Macro::push(QUndoCommand *cmd) const
 {
-    return CommandsStackBase::push(cmd);
+    m_undoStack->push(cmd);
+    return true;
 }
 
 /*!
@@ -109,36 +112,28 @@ bool CommandsStackBase::Macro::isComplete() const
     return m_keepMacro;
 }
 
-CommandsStackBase *CommandsStackBase::m_instance = nullptr;
-
 /*!
- * \brief CommandsStack::instance
- * Common accessor to the global instance.
+ * \brief CommandsStack::CommandsStack
+ * The constructor is private to force usage of static accessors.
  */
-CommandsStackBase *CommandsStackBase::instance()
+CommandsStackBase::CommandsStackBase(QObject *parent)
+    : QObject(parent)
+    , m_undoStack(new QUndoStack)
 {
-    if (!m_instance)
-        m_instance = new CommandsStackBase();
-
-    return m_instance;
+    connect(m_undoStack.get(), &QUndoStack::cleanChanged, this, &CommandsStackBase::cleanChanged);
+    connect(m_undoStack.get(), &QUndoStack::canUndoChanged, this, &CommandsStackBase::canUndoChanged);
+    connect(m_undoStack.get(), &QUndoStack::canRedoChanged, this, &CommandsStackBase::canRedoChanged);
+    connect(m_undoStack.get(), &QUndoStack::undoTextChanged, this, &CommandsStackBase::undoTextChanged);
+    connect(m_undoStack.get(), &QUndoStack::redoTextChanged, this, &CommandsStackBase::redoTextChanged);
+    connect(m_undoStack.get(), &QUndoStack::indexChanged, this, &CommandsStackBase::indexChanged);
 }
 
 /*!
- * \brief CommandsStack::setCurrent
- * Registers the \a stack as a current one.
+   \brief CommandsStackBase::~CommandsStackBase
  */
-void CommandsStackBase::setCurrent(QUndoStack *stack)
+CommandsStackBase::~CommandsStackBase()
 {
-    instance()->setCurrentStack(stack);
-}
-
-/*!
- * \brief CommandsStack::current
- * Returns pointer to the current (last registered) undo stack. May be null.
- */
-QUndoStack *CommandsStackBase::current()
-{
-    return instance()->currentStack();
+    m_undoStack->clear();
 }
 
 /*!
@@ -148,44 +143,13 @@ QUndoStack *CommandsStackBase::current()
  */
 bool CommandsStackBase::push(QUndoCommand *command)
 {
-    if (command && CommandsStackBase::current()) {
-        CommandsStackBase::current()->push(command);
-        return true;
-    }
-
-    return false;
+    m_undoStack->push(command);
+    return true;
 }
 
-/*!
- * \brief CommandsStack::CommandsStack
- * The constructor is private to force usage of static accessors.
- */
-CommandsStackBase::CommandsStackBase(QObject *parent)
-    : QObject(parent)
+QUndoStack *CommandsStackBase::undoStack()
 {
-}
-
-/*!
- * \brief CommandsStack::setCurrentStack
- * If \a stack differs from the current, set it as current end emit the notification.
- * The nullptr is allowed for \a stack here.
- */
-void CommandsStackBase::setCurrentStack(QUndoStack *stack)
-{
-    if (m_current == stack)
-        return;
-
-    m_current = stack;
-    Q_EMIT currentStackChanged(m_current);
-}
-
-/*!
- * \brief CommandsStack::currentStack
- * Returns pointer to the current (the last registered) undo stack.
- */
-QUndoStack *CommandsStackBase::currentStack() const
-{
-    return m_current;
+    return m_undoStack.get();
 }
 
 }

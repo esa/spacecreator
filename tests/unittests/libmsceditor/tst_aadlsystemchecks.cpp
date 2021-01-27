@@ -64,7 +64,6 @@ private Q_SLOTS:
 
 private:
     msc::ChartItem m_chartItem;
-    QUndoStack m_stack;
     std::unique_ptr<msc::AadlSystemChecks> m_checker;
     std::unique_ptr<msc::MSCEditorCore> m_mscCore;
 };
@@ -75,7 +74,6 @@ void tst_AadlSystemChecks::initTestCase()
     ive::initIvEditor();
     auto converter = msc::CoordinatesConverter::instance();
     converter->setDPI(QPointF(109., 109.), QPointF(96., 96.));
-    ive::cmd::CommandsStack::setCurrent(&m_stack);
 }
 
 void tst_AadlSystemChecks::init()
@@ -273,10 +271,8 @@ void tst_AadlSystemChecks::testCorrespondMessage()
     // Setup the connection
     auto sourceFunc = std::make_unique<AADLFunction>(sourceFuncName);
     auto targetFunc = std::make_unique<AADLFunction>(targetFuncName);
-    std::unique_ptr<AADLIface> sourceIf(
-            ivm::testutils::createIface(sourceFunc.get(), sourceIfType, sourceIfName));
-    std::unique_ptr<AADLIface> targetIf(
-            ivm::testutils::createIface(targetFunc.get(), targetIfType, targetIfName));
+    std::unique_ptr<AADLIface> sourceIf(ivm::testutils::createIface(sourceFunc.get(), sourceIfType, sourceIfName));
+    std::unique_ptr<AADLIface> targetIf(ivm::testutils::createIface(targetFunc.get(), targetIfType, targetIfName));
     auto connection = std::make_unique<AADLConnection>(sourceIf.get(), targetIf.get());
 
     const bool doCorrespond = m_checker->correspond(connection.get(), message.get());
@@ -328,8 +324,7 @@ void tst_AadlSystemChecks::testCheckMessage()
     chart->addInstanceEvent(message1);
     QCOMPARE(m_checker->checkMessage(message1), false);
     // Default interface is not ok
-    ivm::AADLIface *if1 =
-            ivm::testutils::createIface(sourceFunc, ivm::AADLIface::IfaceType::Provided, "Env1");
+    ivm::AADLIface *if1 = ivm::testutils::createIface(sourceFunc, ivm::AADLIface::IfaceType::Provided, "Env1");
     QCOMPARE(m_checker->checkMessage(message1), false);
     // interface type has to be "cyclic"
     if1->setKind(ivm::AADLIface::OperationKind::Cyclic);

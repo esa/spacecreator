@@ -75,8 +75,6 @@ void AadlMainWidget::init()
 
     m_plugin->setupMiniMap();
 
-    ive::cmd::CommandsStack::setCurrent(m_plugin->document()->commandsStack());
-
     connect(m_plugin->document(), &ive::InterfaceDocument::asn1ParameterErrorDetected, this,
             &AadlMainWidget::showAsn1Errors);
 }

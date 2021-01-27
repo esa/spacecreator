@@ -17,13 +17,10 @@
 
 #include "aadlcommentgraphicsitem.h"
 
-#include "aadlfunctiongraphicsitem.h"
 #include "aadlcomment.h"
+#include "aadlfunctiongraphicsitem.h"
 #include "baseitems/common/aadlutils.h"
 #include "colors/colormanager.h"
-#include "commands/commandids.h"
-#include "commands/commandsfactory.h"
-#include "commandsstack.h"
 #include "ui/textitem.h"
 
 #include <QApplication>

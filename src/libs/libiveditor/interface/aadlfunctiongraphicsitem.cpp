@@ -18,16 +18,14 @@
 #include "aadlfunctiongraphicsitem.h"
 
 #include "aadlcommentgraphicsitem.h"
+#include "aadlconnection.h"
 #include "aadlconnectiongraphicsitem.h"
+#include "aadlfunction.h"
 #include "aadlfunctionnamegraphicsitem.h"
 #include "aadlinterfacegraphicsitem.h"
-#include "aadlconnection.h"
-#include "aadlfunction.h"
 #include "aadlmodel.h"
 #include "baseitems/common/aadlutils.h"
 #include "colors/colormanager.h"
-#include "interface/commands/commandids.h"
-#include "interface/commands/commandsfactory.h"
 
 #include <QApplication>
 #include <QGraphicsScene>
@@ -42,8 +40,8 @@
 static const qreal kBorderWidth = 2.0;
 static const qreal kRadius = 10.0;
 static const qreal kOffset = kBorderWidth / 2.0;
-static const QList<int> kNestedTypes { ive::AADLFunctionGraphicsItem::Type,
-    ive::AADLFunctionTypeGraphicsItem::Type, ive::AADLCommentGraphicsItem::Type };
+static const QList<int> kNestedTypes { ive::AADLFunctionGraphicsItem::Type, ive::AADLFunctionTypeGraphicsItem::Type,
+    ive::AADLCommentGraphicsItem::Type };
 
 namespace ive {
 
@@ -286,8 +284,7 @@ void AADLFunctionGraphicsItem::drawInnerFunctions(QPainter *painter)
             }
         } else if (auto connection = qobject_cast<const ivm::AADLConnection *>(child)) {
             if (connection->source()->id() != entity()->id() && connection->target()->id() != entity()->id()) {
-                const QPolygonF itemScenePoints =
-                        ive::polygon(ivm::AADLObject::coordinatesFromString(strCoordinates));
+                const QPolygonF itemScenePoints = ive::polygon(ivm::AADLObject::coordinatesFromString(strCoordinates));
                 if (!itemScenePoints.isEmpty()) {
                     existingPolygons << itemScenePoints;
                 }
@@ -305,12 +302,11 @@ void AADLFunctionGraphicsItem::drawInnerFunctions(QPainter *painter)
         if (!view)
             return;
 
-        const int count =
-                std::count_if(childEntities.cbegin(), childEntities.cend(), [](const ivm::AADLObject *child) {
-                    return child->aadlType() == ivm::AADLObject::Type::Function
-                            || child->aadlType() == ivm::AADLObject::Type::FunctionType
-                            || child->aadlType() == ivm::AADLObject::Type::Comment;
-                });
+        const int count = std::count_if(childEntities.cbegin(), childEntities.cend(), [](const ivm::AADLObject *child) {
+            return child->aadlType() == ivm::AADLObject::Type::Function
+                    || child->aadlType() == ivm::AADLObject::Type::FunctionType
+                    || child->aadlType() == ivm::AADLObject::Type::Comment;
+        });
 
         const QRect viewportGeometry = view->viewport()->geometry().marginsRemoved(kContentMargins.toMargins());
         const QRectF mappedViewportGeometry =

@@ -20,6 +20,7 @@
 #include "aadlmodel.h"
 
 #include <QObject>
+#include <QPointer>
 #include <QQueue>
 #include <QRectF>
 
@@ -36,6 +37,10 @@ class DelayedSignal;
 }
 
 namespace ive {
+namespace cmd {
+class CommandsStack;
+}
+
 class InterfaceTabGraphicsScene;
 class AADLCommentGraphicsItem;
 class AADLInterfaceGraphicsItem;
@@ -59,7 +64,7 @@ public:
     };
     Q_ENUM(AADLRoles);
 
-    explicit AADLItemModel(ivm::AADLModel *model, QObject *parent = nullptr);
+    explicit AADLItemModel(ivm::AADLModel *model, cmd::CommandsStack *commandsStack, QObject *parent = nullptr);
     ~AADLItemModel() override;
 
     QGraphicsScene *scene() const;
@@ -112,6 +117,7 @@ private:
     QRectF m_desktopGeometry;
     QRectF m_prevItemsRect;
     shared::DelayedSignal *m_textUpdate = nullptr;
+    QPointer<cmd::CommandsStack> m_commandsStack;
 };
 
 } // namespace ive

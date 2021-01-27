@@ -28,26 +28,30 @@
 namespace ive {
 namespace cmd {
 
+CommandsStack::CommandsStack(QObject *parent)
+    : shared::cmd::CommandsStackBase(parent)
+{
+}
+
 bool CommandsStack::push(QUndoCommand *command)
 {
-    if (command && CommandsStack::current()) {
-        if (auto nameCommand = dynamic_cast<CmdEntityAttributeChange *>(command)) {
-            connect(nameCommand, &CmdEntityAttributeChange::nameChanged, static_cast<CommandsStack *>(instance()),
-                    &CommandsStack::nameChanged, Qt::UniqueConnection);
-        }
-        if (auto nameCommand = dynamic_cast<CmdIfaceAttrChange *>(command)) {
-            connect(nameCommand, &CmdIfaceAttrChange::nameChanged, static_cast<CommandsStack *>(instance()),
-                    &CommandsStack::nameChanged, Qt::UniqueConnection);
-        }
-        if (auto nameCommand = dynamic_cast<CmdEntityRemove *>(command)) {
-            connect(nameCommand, &CmdEntityRemove::entityRemoved, static_cast<CommandsStack *>(instance()),
-                    &CommandsStack::entityRemoved, Qt::UniqueConnection);
-        }
-        CommandsStack::current()->push(command);
-        return true;
+    if (!command) {
+        return false;
     }
 
-    return false;
+    if (auto nameCommand = dynamic_cast<CmdEntityAttributeChange *>(command)) {
+        connect(nameCommand, &CmdEntityAttributeChange::nameChanged, this, &CommandsStack::nameChanged,
+                Qt::UniqueConnection);
+    }
+    if (auto nameCommand = dynamic_cast<CmdIfaceAttrChange *>(command)) {
+        connect(nameCommand, &CmdIfaceAttrChange::nameChanged, this, &CommandsStack::nameChanged, Qt::UniqueConnection);
+    }
+    if (auto nameCommand = dynamic_cast<CmdEntityRemove *>(command)) {
+        connect(nameCommand, &CmdEntityRemove::entityRemoved, this, &CommandsStack::entityRemoved,
+                Qt::UniqueConnection);
+    }
+    m_undoStack->push(command);
+    return true;
 }
 
 }

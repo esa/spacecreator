@@ -146,7 +146,7 @@ ivm::AADLFunction *IVEditorCore::addFunction(const QString &name, ivm::AADLFunct
 {
     auto cmd = new cmd::CmdFunctionItemCreate(
             m_document->objectsModel(), parent, QRectF(QPointF(10., 10.), DefaultGraphicsItemSize), name);
-    bool ok = cmd::CommandsStack::push(cmd);
+    bool ok = commandsStack()->push(cmd);
     if (ok) {
         Q_EMIT editedExternally(this);
         return cmd->createdFunction();
@@ -190,15 +190,15 @@ bool IVEditorCore::addConnection(QString name, const QString &fromInstanceName, 
     ivm::AADLIface *toInterface = getInterface(name, ivm::AADLIface::IfaceType::Provided, toFunc);
 
     if (fromInterface && toInterface) {
-        cmd::CommandsStack::Macro cmdMacro(tr("Create connection"));
+        cmd::CommandsStack::Macro cmdMacro(undoStack(), tr("Create connection"));
 
-        auto createConnection = [aadlModel](ivm::AADLFunction *parent, ivm::AADLIface *inIf,
-                                        ivm::AADLIface *outIf) {
+        auto createConnection = [aadlModel, this](
+                                        ivm::AADLFunction *parent, ivm::AADLIface *inIf, ivm::AADLIface *outIf) {
             QVector<QPointF> points;
             points.append(ive::pos(inIf->coordinates()));
             points.append(ive::pos(outIf->coordinates()));
             auto command = new cmd::CmdConnectionItemCreate(aadlModel, parent, inIf->id(), outIf->id(), points);
-            cmd::CommandsStack::push(command);
+            commandsStack()->push(command);
         };
 
         // find all (nested/parent) functions for "source" and "target" connections
@@ -215,8 +215,7 @@ bool IVEditorCore::addConnection(QString name, const QString &fromInstanceName, 
         while (fromFunctions.size() > 1) {
             ivm::AADLFunction *parentFunc = fromFunctions[1];
             ivm::AADLIface *sourceIf = fromInterface;
-            ivm::AADLIface *targetIf =
-                    getInterface(name, ivm::AADLIface::IfaceType::Required, parentFunc);
+            ivm::AADLIface *targetIf = getInterface(name, ivm::AADLIface::IfaceType::Required, parentFunc);
 
             createConnection(parentFunc, sourceIf, targetIf);
 
@@ -228,8 +227,7 @@ bool IVEditorCore::addConnection(QString name, const QString &fromInstanceName, 
         while (toFunctions.size() > 1) {
             ivm::AADLFunction *parentFunc = toFunctions[1];
             ivm::AADLIface *sourceIf = toInterface;
-            ivm::AADLIface *targetIf =
-                    getInterface(name, ivm::AADLIface::IfaceType::Provided, parentFunc);
+            ivm::AADLIface *targetIf = getInterface(name, ivm::AADLIface::IfaceType::Provided, parentFunc);
 
             createConnection(parentFunc, sourceIf, targetIf);
 
@@ -273,7 +271,7 @@ ivm::AADLIface *IVEditorCore::addInterface(QString name, const QString &function
     ci.name = name;
 
     auto command = new cmd::CmdInterfaceItemCreate(ci);
-    cmd::CommandsStack::push(command);
+    commandsStack()->push(command);
 
     Q_EMIT editedExternally(this);
 
@@ -294,7 +292,7 @@ bool IVEditorCore::renameAadlFunction(const QString &oldName, const QString &new
 
     const QVariantHash attributess = { { ivm::meta::Props::token(ivm::meta::Props::Token::name), newName } };
     auto cmd = new cmd::CmdEntityAttributeChange(aadlFunc, attributess);
-    cmd::CommandsStack::push(cmd);
+    commandsStack()->push(cmd);
 
     Q_EMIT editedExternally(this);
     return true;
@@ -319,15 +317,14 @@ bool IVEditorCore::renameAadlConnection(
     }
 
     ivm::AADLModel *aadlModel = m_document->objectsModel();
-    ivm::AADLConnection *aadlConnect =
-            aadlModel->getConnection(oldName, fromInstanceName, toInstanceName, m_caseCheck);
+    ivm::AADLConnection *aadlConnect = aadlModel->getConnection(oldName, fromInstanceName, toInstanceName, m_caseCheck);
     if (!aadlConnect) {
         return false;
     }
 
     auto cmd = new cmd::CmdIfaceAttrChange(aadlConnect->targetInterface(),
             ivm::meta::Props::token(ivm::meta::Props::Token::name), QVariant::fromValue(newName));
-    cmd::CommandsStack::push(cmd);
+    commandsStack()->push(cmd);
 
     Q_EMIT editedExternally(this);
     return true;
@@ -355,7 +352,7 @@ bool IVEditorCore::renameCyclicInterface(const QString &oldName, const QString &
 
     auto cmd = new cmd::CmdIfaceAttrChange(
             interface, ivm::meta::Props::token(ivm::meta::Props::Token::name), QVariant::fromValue(newName));
-    cmd::CommandsStack::push(cmd);
+    commandsStack()->push(cmd);
 
     Q_EMIT editedExternally(this);
     return true;
@@ -363,12 +360,14 @@ bool IVEditorCore::renameCyclicInterface(const QString &oldName, const QString &
 
 QUndoStack *IVEditorCore::undoStack() const
 {
-    return m_document->commandsStack();
+    Q_ASSERT(m_document && m_document->undoStack());
+    return m_document->undoStack();
 }
 
 cmd::CommandsStack *IVEditorCore::commandsStack() const
 {
-    return static_cast<cmd::CommandsStack *>(cmd::CommandsStack::instance());
+    Q_ASSERT(m_document && m_document->commandsStack());
+    return m_document->commandsStack();
 }
 
 /*!
@@ -383,7 +382,7 @@ bool IVEditorCore::renameAsnFile(const QString &oldName, const QString &newName)
         QVariantList params { QVariant::fromValue(document()), QVariant::fromValue(newName) };
         QUndoCommand *command = cmd::CommandsFactory::create(cmd::ChangeAsn1File, params);
         if (command) {
-            cmd::CommandsStack::push(command);
+            commandsStack()->push(command);
             Q_EMIT editedExternally(this);
             return true;
         }
@@ -514,7 +513,7 @@ ivm::AADLIface *IVEditorCore::getInterface(
         }
         createInfo.position = ifPos;
         QUndoCommand *command = cmd::CommandsFactory::create(cmd::CreateInterfaceEntity, createInfo.toVarList());
-        cmd::CommandsStack::push(command);
+        commandsStack()->push(command);
         interface = aadlModel->getIfaceByName(ifName, ifType, parentFunction, m_caseCheck);
     }
     return interface;

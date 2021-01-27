@@ -81,17 +81,27 @@ void InteractiveObject::init()
 
 void InteractiveObject::updateEntity()
 {
+    if (!m_commandsStack) {
+        qWarning() << Q_FUNC_INFO << "No command stack set in InteractiveObject";
+        return;
+    }
+
     QList<QVariant> params;
     const QList<QVariantList> preparedParams { prepareChangeCoordinatesCommandParams() };
     std::transform(preparedParams.cbegin(), preparedParams.cend(), std::back_inserter(params),
             [](const QVariantList entryParams) { return QVariant::fromValue(entryParams); });
     const auto changeGeometryCmd = cmd::CommandsFactory::create(cmd::ChangeEntityGeometry, params);
-    cmd::CommandsStack::push(changeGeometryCmd);
+    m_commandsStack->push(changeGeometryCmd);
 }
 
 void InteractiveObject::mergeGeometry()
 {
     QTimer::singleShot(0, this, [this]() {
+        if (!m_commandsStack) {
+            qWarning() << Q_FUNC_INFO << "No command stack set in InteractiveObject";
+            return;
+        }
+
         for (auto child : childItems()) {
             if (auto io = qobject_cast<InteractiveObject *>(child->toGraphicsObject())) {
                 io->mergeGeometry();
@@ -106,7 +116,7 @@ void InteractiveObject::mergeGeometry()
         QUndoCommand *autolayoutCmd = cmd::CommandsFactory::create(cmd::AutoLayoutEntity, params);
         autolayoutCmd->redo();
 
-        const QUndoCommand *cmd = cmd::CommandsStack::current()->command(cmd::CommandsStack::current()->index() -1);
+        const QUndoCommand *cmd = m_commandsStack->command(m_commandsStack->index() - 1);
         if (auto prevGeometryBasedCmd = dynamic_cast<const cmd::CmdEntityGeometryChange *>(cmd))
             const_cast<cmd::CmdEntityGeometryChange *>(prevGeometryBasedCmd)->mergeCommand(autolayoutCmd);
         else
@@ -196,6 +206,11 @@ ColorHandler InteractiveObject::colorHandler() const
 QString InteractiveObject::prepareTooltip() const
 {
     return aadlObject() ? aadlObject()->titleUI() : QString();
+}
+
+void InteractiveObject::setCommandsStack(cmd::CommandsStack *commandsStack)
+{
+    m_commandsStack = commandsStack;
 }
 
 }

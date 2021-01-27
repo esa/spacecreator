@@ -42,6 +42,9 @@ class AADLModel;
 }
 
 namespace ive {
+namespace cmd {
+class CommandsStack;
+}
 
 class AADLItemModel;
 class AADLCommentGraphicsItem;
@@ -68,7 +71,9 @@ public:
     QGraphicsScene *scene() const;
     shared::ui::GraphicsViewBase *graphicsView() const;
     QWidget *view() const;
-    QUndoStack *commandsStack() const;
+
+    QUndoStack *undoStack() const;
+    cmd::CommandsStack *commandsStack() const;
 
     bool create(const QString &path = QString());
     bool load(const QString &path);

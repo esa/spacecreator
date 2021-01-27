@@ -24,25 +24,11 @@
 namespace msc {
 
 MscCommandsStack::MscCommandsStack(QObject *parent)
-    : QObject(parent)
-    , m_undoStack(new QUndoStack)
+    : shared::cmd::CommandsStackBase(parent)
 {
-    connect(m_undoStack.get(), &QUndoStack::cleanChanged, this, &msc::MscCommandsStack::cleanChanged);
-    connect(m_undoStack.get(), &QUndoStack::canUndoChanged, this, &msc::MscCommandsStack::canUndoChanged);
-    connect(m_undoStack.get(), &QUndoStack::canRedoChanged, this, &msc::MscCommandsStack::canRedoChanged);
-    connect(m_undoStack.get(), &QUndoStack::undoTextChanged, this, &msc::MscCommandsStack::undoTextChanged);
-    connect(m_undoStack.get(), &QUndoStack::redoTextChanged, this, &msc::MscCommandsStack::redoTextChanged);
-    connect(m_undoStack.get(), &QUndoStack::indexChanged, this, &msc::MscCommandsStack::indexChanged);
 }
 
-MscCommandsStack::~MscCommandsStack() { }
-
-void MscCommandsStack::clear()
-{
-    m_undoStack->clear();
-}
-
-void MscCommandsStack::push(QUndoCommand *command)
+bool MscCommandsStack::push(QUndoCommand *command)
 {
     // check connection for name connection
     if (command) {
@@ -52,116 +38,7 @@ void MscCommandsStack::push(QUndoCommand *command)
         }
     }
     m_undoStack->push(command);
+    return true;
 }
 
-bool MscCommandsStack::canUndo() const
-{
-    return m_undoStack->canUndo();
 }
-
-bool MscCommandsStack::canRedo() const
-{
-    return m_undoStack->canRedo();
-}
-
-QString MscCommandsStack::undoText() const
-{
-    return m_undoStack->undoText();
-}
-
-QString MscCommandsStack::redoText() const
-{
-    return m_undoStack->redoText();
-}
-
-int MscCommandsStack::count() const
-{
-    return m_undoStack->count();
-}
-
-int MscCommandsStack::index() const
-{
-    return m_undoStack->index();
-}
-
-QString MscCommandsStack::text(int idx) const
-{
-    return m_undoStack->text(idx);
-}
-
-bool MscCommandsStack::isActive() const
-{
-    return m_undoStack->isActive();
-}
-
-bool MscCommandsStack::isClean() const
-{
-    return m_undoStack->isClean();
-}
-
-int MscCommandsStack::cleanIndex() const
-{
-    return m_undoStack->cleanIndex();
-}
-
-void MscCommandsStack::beginMacro(const QString &text)
-{
-    m_undoStack->beginMacro(text);
-}
-
-void MscCommandsStack::endMacro()
-{
-    m_undoStack->endMacro();
-}
-
-void MscCommandsStack::setUndoLimit(int limit)
-{
-    m_undoStack->setUndoLimit(limit);
-}
-
-int MscCommandsStack::undoLimit() const
-{
-    return m_undoStack->undoLimit();
-}
-
-const QUndoCommand *MscCommandsStack::command(int index) const
-{
-    return m_undoStack->command(index);
-}
-
-QUndoStack *MscCommandsStack::undoStack()
-{
-    return m_undoStack.get();
-}
-
-void MscCommandsStack::setClean()
-{
-    m_undoStack->setClean();
-}
-
-void MscCommandsStack::resetClean()
-{
-    m_undoStack->resetClean();
-}
-
-void MscCommandsStack::setIndex(int idx)
-{
-    m_undoStack->setIndex(idx);
-}
-
-void MscCommandsStack::undo()
-{
-    m_undoStack->undo();
-}
-
-void MscCommandsStack::redo()
-{
-    m_undoStack->redo();
-}
-
-void MscCommandsStack::setActive(bool active)
-{
-    m_undoStack->setActive(active);
-}
-
-} // namespace msc

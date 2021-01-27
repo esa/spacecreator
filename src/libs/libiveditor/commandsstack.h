@@ -39,7 +39,9 @@ class CommandsStack : public shared::cmd::CommandsStackBase
 {
     Q_OBJECT
 public:
-    static bool push(QUndoCommand *command);
+    CommandsStack(QObject *parent = nullptr);
+
+    bool push(QUndoCommand *command) override;
 
 Q_SIGNALS:
     void nameChanged(ivm::AADLObject *entity, const QString &oldName, shared::UndoCommand *command);

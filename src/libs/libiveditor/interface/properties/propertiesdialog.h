@@ -37,6 +37,9 @@ class PropertyTemplateConfig;
 }
 
 namespace ive {
+namespace cmd {
+class CommandsStack;
+}
 
 class PropertiesDialog : public QDialog
 {
@@ -44,7 +47,8 @@ class PropertiesDialog : public QDialog
 
 public:
     explicit PropertiesDialog(ivm::PropertyTemplateConfig *dynPropConfig, ivm::AADLObject *obj,
-            const QSharedPointer<Asn1Acn::File> &dataTypes, QWidget *parent = nullptr);
+            const QSharedPointer<Asn1Acn::File> &dataTypes, cmd::CommandsStack *commandsStack,
+            QWidget *parent = nullptr);
     ~PropertiesDialog() override;
 
 public Q_SLOTS:
@@ -66,6 +70,7 @@ private:
     ivm::PropertyTemplateConfig *m_dynPropConfig { nullptr };
     cmd::CommandsStack::Macro *m_cmdMacro { nullptr };
     QSharedPointer<Asn1Acn::File> m_dataTypes;
+    QPointer<cmd::CommandsStack> m_commandsStack;
 };
 
 }

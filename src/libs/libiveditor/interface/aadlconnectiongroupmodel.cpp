@@ -17,11 +17,11 @@
 
 #include "aadlconnectiongroupmodel.h"
 
-#include "aadlnamevalidator.h"
 #include "aadlconnection.h"
 #include "aadlconnectiongroup.h"
 #include "aadlfunction.h"
 #include "aadlmodel.h"
+#include "aadlnamevalidator.h"
 #include "commandsstack.h"
 #include "interface/commands/cmdconnectiongroupitemchange.h"
 #include "interface/commands/commandsfactory.h"

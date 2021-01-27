@@ -30,6 +30,9 @@ class AADLObject;
 }
 
 namespace ive {
+namespace cmd {
+class CommandsStack;
+}
 
 class InteractiveObject : public shared::ui::InteractiveObjectBase
 {
@@ -55,6 +58,8 @@ public:
     virtual QList<QVariantList> prepareChangeCoordinatesCommandParams() const;
 
     virtual QString prepareTooltip() const;
+
+    void setCommandsStack(ive::cmd::CommandsStack *commandsStack);
 
 Q_SIGNALS:
     void clicked();
@@ -83,6 +88,8 @@ protected:
     QBrush m_brush;
     QPen m_pen;
     QFont m_font;
+
+    QPointer<ive::cmd::CommandsStack> m_commandsStack;
 };
 
 }
