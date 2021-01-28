@@ -32,15 +32,14 @@ namespace spctr {
 
 class AadlEditorDocument;
 class AadlMainWidget;
-class AadlModelStorage;
-class MscModelStorage;
+class ModelStorage;
 
 class AadlQtCEditor : public Core::IEditor
 {
     Q_OBJECT
 
 public:
-    AadlQtCEditor(AadlModelStorage *aadlStorage, MscModelStorage *mscStorage, const QList<QAction *> &ivActions);
+    AadlQtCEditor(ModelStorage *storage, const QList<QAction *> &ivActions);
     ~AadlQtCEditor();
 
     Core::IDocument *document() const override;
@@ -58,7 +57,7 @@ private:
     QPointer<QToolBar> m_toolbar = nullptr;
     AadlMainWidget *m_editorWidget = nullptr;
     QPointer<ive::EndToEndView> m_endToEndView;
-    QPointer<MscModelStorage> m_mscStorage;
+    QPointer<ModelStorage> m_storage;
     QList<QAction *> m_globalToolbarActions;
 };
 

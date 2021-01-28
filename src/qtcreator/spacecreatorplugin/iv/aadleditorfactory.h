@@ -28,18 +28,15 @@
 class QAction;
 
 namespace spctr {
-
 class AadlEditorData;
-class AadlModelStorage;
-class MscModelStorage;
+class ModelStorage;
 
 class AadlEditorFactory : public Core::IEditorFactory
 {
     Q_OBJECT
 
 public:
-    explicit AadlEditorFactory(AadlModelStorage *aadlStorage, MscModelStorage *mscStorage,
-            const QList<QAction *> &ivActions, QObject *parent);
+    explicit AadlEditorFactory(ModelStorage *storage, const QList<QAction *> &ivActions, QObject *parent);
 
     Core::IEditor *createEditor() override;
 
@@ -50,8 +47,7 @@ Q_SIGNALS:
 
 private:
     mutable AadlEditorData *m_editorData = nullptr;
-    QPointer<AadlModelStorage> m_aadlStorage;
-    QPointer<MscModelStorage> m_mscStorage;
+    QPointer<ModelStorage> m_storage;
     QList<QAction *> m_ivActions;
 };
 

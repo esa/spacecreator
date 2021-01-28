@@ -2,10 +2,6 @@ set(PLUGIN_NAME SpaceCreatorPlugin)
 
 set(SC_PLUGIN_SOURCES
     SpaceCreatorPlugin.json.in
-    aadlmodelstorage.cpp
-    aadlmodelstorage.h
-    deploymentmodelstorage.cpp
-    deploymentmodelstorage.h
     dv/deploymenteditordata.cpp
     dv/deploymenteditordata.h
     dv/deploymenteditorfactory.cpp
@@ -20,6 +16,8 @@ set(SC_PLUGIN_SOURCES
     iv/aadlmainwidget.h
     iv/aadlqtceditor.cpp
     iv/aadlqtceditor.h
+    modelstorage.cpp
+    modelstorage.h
     msc/msccontext.cpp
     msc/msccontext.h
     msc/msceditordata.cpp
@@ -43,8 +41,6 @@ set(SC_PLUGIN_SOURCES
     options/ivcoloroption.h
     options/propertyoptions.cpp
     options/propertyoptions.h
-    mscmodelstorage.cpp
-    mscmodelstorage.h
     mscsystemchecks.cpp
     mscsystemchecks.h
     spacecreatorplugin.cpp

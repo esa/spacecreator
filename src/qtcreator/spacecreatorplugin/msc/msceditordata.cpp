@@ -17,10 +17,10 @@
 
 #include "msceditordata.h"
 
+#include "modelstorage.h"
 #include "msccontext.h"
 #include "msceditorcore.h"
 #include "msceditordocument.h"
-#include "mscmodelstorage.h"
 #include "mscqtceditor.h"
 #include "spacecreatorpluginconstants.h"
 
@@ -36,10 +36,10 @@
 
 namespace spctr {
 
-MscEditorData::MscEditorData(MscModelStorage *mscStorage, const QList<QAction *> &mscActions, QObject *parent)
+MscEditorData::MscEditorData(ModelStorage *storage, const QList<QAction *> &mscActions, QObject *parent)
     : QObject(parent)
     , m_undoGroup(new QUndoGroup(this))
-    , m_mscStorage(mscStorage)
+    , m_storage(storage)
     , m_mscActions(mscActions)
 {
     Core::Context contexts;
@@ -73,7 +73,7 @@ MscEditorData::~MscEditorData()
 
 Core::IEditor *MscEditorData::createEditor()
 {
-    auto *mscEditor = new MscQtCEditor(m_mscStorage, m_mscActions);
+    auto *mscEditor = new MscQtCEditor(m_storage, m_mscActions);
 
     connect(mscEditor->mscDocument(), &spctr::MscEditorDocument::mscDataLoaded, this,
             [this](const QString &fileName, QSharedPointer<msc::MSCEditorCore> data) {

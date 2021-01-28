@@ -29,9 +29,7 @@ class MSCEditorCore;
 }
 
 namespace spctr {
-
-class MscModelStorage;
-
+class ModelStorage;
 class MscEditorData;
 
 class MscEditorFactory : public Core::IEditorFactory
@@ -39,7 +37,7 @@ class MscEditorFactory : public Core::IEditorFactory
     Q_OBJECT
 
 public:
-    MscEditorFactory(MscModelStorage *mscStorage, const QList<QAction *> &mscActions, QObject *parent);
+    MscEditorFactory(ModelStorage *mscStorage, const QList<QAction *> &mscActions, QObject *parent);
 
     Core::IEditor *createEditor() override;
 
@@ -50,7 +48,7 @@ Q_SIGNALS:
 
 private:
     mutable MscEditorData *m_editorData = nullptr;
-    QPointer<MscModelStorage> m_mscStorage;
+    QPointer<ModelStorage> m_storage;
     QList<QAction *> m_mscActions;
 };
 

@@ -40,8 +40,7 @@ class UndoCommand;
 }
 
 namespace spctr {
-class AadlModelStorage;
-class MscModelStorage;
+class ModelStorage;
 
 /*!
    Class to perform consistency checks for MSC against a AADL model
@@ -54,8 +53,7 @@ public:
     MscSystemChecks(QObject *parent = nullptr);
 
     // Setup functions
-    void setMscStorage(MscModelStorage *mscStorage);
-    void setAadlStorage(AadlModelStorage *aadlStorage);
+    void setStorage(ModelStorage *storage);
 
     // Check functions
     bool mscInstancesExist(const QString &name);
@@ -87,8 +85,7 @@ public Q_SLOTS:
     void onEntityRemoved(ivm::AADLObject *entity, shared::UndoCommand *command);
 
 private:
-    QPointer<MscModelStorage> m_mscStorage;
-    QPointer<AadlModelStorage> m_aadlStorage;
+    QPointer<ModelStorage> m_storage;
     Qt::CaseSensitivity m_caseCheck = Qt::CaseInsensitive;
     bool m_nameUpdateRunning = false;
 };

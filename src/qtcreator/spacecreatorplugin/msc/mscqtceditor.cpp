@@ -17,10 +17,10 @@
 
 #include "mscqtceditor.h"
 
+#include "modelstorage.h"
 #include "msceditorcore.h"
 #include "msceditordocument.h"
 #include "mscmainwidget.h"
-#include "mscmodelstorage.h"
 #include "spacecreatorpluginconstants.h"
 #include "tools/entitydeletetool.h"
 
@@ -29,9 +29,9 @@
 
 namespace spctr {
 
-MscQtCEditor::MscQtCEditor(MscModelStorage *mscStorage, const QList<QAction *> &toolbarActions)
+MscQtCEditor::MscQtCEditor(ModelStorage *storage, const QList<QAction *> &toolbarActions)
     : Core::IEditor()
-    , m_document(new MscEditorDocument(mscStorage, this))
+    , m_document(new MscEditorDocument(storage, this))
     , m_editorWidget(new MscMainWidget)
     , m_globalToolbarActions(toolbarActions)
 {

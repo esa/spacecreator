@@ -18,11 +18,10 @@
 #include "aadleditordata.h"
 
 #include "aadleditordocument.h"
-#include "aadlmodelstorage.h"
 #include "aadlqtceditor.h"
 #include "iveditorcore.h"
+#include "modelstorage.h"
 #include "msc/msccontext.h"
-#include "mscmodelstorage.h"
 #include "spacecreatorpluginconstants.h"
 
 #include <QUndoGroup>
@@ -37,12 +36,10 @@
 
 namespace spctr {
 
-AadlEditorData::AadlEditorData(
-        AadlModelStorage *aadlStorage, MscModelStorage *mscStorage, const QList<QAction *> &ivActions, QObject *parent)
+AadlEditorData::AadlEditorData(ModelStorage *storage, const QList<QAction *> &ivActions, QObject *parent)
     : QObject(parent)
     , m_undoGroup(new QUndoGroup(this))
-    , m_aadlStorage(aadlStorage)
-    , m_mscStorage(mscStorage)
+    , m_storage(storage)
     , m_ivActions(ivActions)
 {
     Core::Context contexts;
@@ -76,7 +73,7 @@ AadlEditorData::~AadlEditorData()
 
 Core::IEditor *AadlEditorData::createEditor()
 {
-    auto *ivEditor = new AadlQtCEditor(m_aadlStorage, m_mscStorage, m_ivActions);
+    auto *ivEditor = new AadlQtCEditor(m_storage, m_ivActions);
 
     connect(ivEditor->ivDocument(), &spctr::AadlEditorDocument::ivDataLoaded, this,
             [this](const QString &fileName, QSharedPointer<ive::IVEditorCore> data) {

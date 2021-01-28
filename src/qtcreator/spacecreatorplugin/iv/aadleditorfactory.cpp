@@ -18,8 +18,7 @@
 #include "aadleditorfactory.h"
 
 #include "aadleditordata.h"
-#include "aadlmodelstorage.h"
-#include "mscmodelstorage.h"
+#include "modelstorage.h"
 #include "spacecreatorpluginconstants.h"
 
 #include <QGuiApplication>
@@ -27,11 +26,9 @@
 
 namespace spctr {
 
-AadlEditorFactory::AadlEditorFactory(
-        AadlModelStorage *aadlStorage, MscModelStorage *mscStorage, const QList<QAction *> &ivActions, QObject *parent)
+AadlEditorFactory::AadlEditorFactory(ModelStorage *storage, const QList<QAction *> &ivActions, QObject *parent)
     : IEditorFactory(parent)
-    , m_aadlStorage(aadlStorage)
-    , m_mscStorage(mscStorage)
+    , m_storage(storage)
     , m_ivActions(ivActions)
 {
     setId(spctr::Constants::K_AADL_EDITOR_ID);
@@ -49,8 +46,7 @@ Core::IEditor *AadlEditorFactory::createEditor()
 AadlEditorData *AadlEditorFactory::editorData() const
 {
     if (!m_editorData) {
-        m_editorData =
-                new AadlEditorData(m_aadlStorage, m_mscStorage, m_ivActions, const_cast<AadlEditorFactory *>(this));
+        m_editorData = new AadlEditorData(m_storage, m_ivActions, const_cast<AadlEditorFactory *>(this));
         connect(m_editorData, &AadlEditorData::aadlDataLoaded, this, &AadlEditorFactory::aadlDataLoaded);
     }
     return m_editorData;

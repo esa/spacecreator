@@ -17,11 +17,9 @@
 
 #include "spacecreatorplugin.h"
 
-#include "aadlmodelstorage.h"
 #include "aadlsystemchecks.h"
 #include "asn1library.h"
 #include "context/action/actionsmanager.h"
-#include "deploymentmodelstorage.h"
 #include "dv/deploymenteditorfactory.h"
 #include "interface/interfacedocument.h"
 #include "iv/aadleditordata.h"
@@ -30,13 +28,13 @@
 #include "iveditor.h"
 #include "iveditorcore.h"
 #include "mainmodel.h"
+#include "modelstorage.h"
 #include "msc/msceditordata.h"
 #include "msc/msceditorfactory.h"
 #include "msc/mscqtceditor.h"
 #include "msceditor.h"
 #include "msceditorcore.h"
 #include "msclibrary.h"
-#include "mscmodelstorage.h"
 #include "mscsystemchecks.h"
 #include "sharedlibrary.h"
 #include "spacecreatorpluginconstants.h"
@@ -98,20 +96,12 @@ bool SpaceCreatorPlugin::initialize(const QStringList &arguments, QString *error
 
     auto editorManager = Core::EditorManager::instance();
 
-    m_aadlStorage = new AadlModelStorage(this);
-    connect(m_aadlStorage, &spctr::AadlModelStorage::editedExternally, this, &spctr::SpaceCreatorPlugin::saveIfNotOpen);
-    m_mscStorage = new MscModelStorage(this);
-    connect(m_mscStorage, &spctr::MscModelStorage::editedExternally, this, &spctr::SpaceCreatorPlugin::saveIfNotOpen);
-    m_deploymentStorage = new DeploymentModelStorage(this);
+    m_storage = new ModelStorage(this);
+    connect(m_storage, &spctr::ModelStorage::editedExternally, this, &spctr::SpaceCreatorPlugin::saveIfNotOpen);
 
     m_checks = new MscSystemChecks(this);
-    m_checks->setMscStorage(m_mscStorage);
-    m_checks->setAadlStorage(m_aadlStorage);
-    m_aadlStorage->setChecker(m_checks);
-
-    connect(m_mscStorage, &spctr::MscModelStorage::coreAdded, this, [this](QSharedPointer<msc::MSCEditorCore> mscCore) {
-        mscCore->aadlChecker()->setIvCore(m_checks->ivCore());
-    });
+    m_checks->setStorage(m_storage);
+    m_storage->setChecker(m_checks);
 
     // MSC
     m_messageDeclarationAction =
@@ -205,10 +195,10 @@ bool SpaceCreatorPlugin::initialize(const QStringList &arguments, QString *error
 
     QList<QAction *> mscActions;
     mscActions << m_showMinimapAction << m_checkInstancesAction << m_checkMessagesAction;
-    m_mscFactory = new MscEditorFactory(m_mscStorage, mscActions, this);
+    m_mscFactory = new MscEditorFactory(m_storage, mscActions, this);
     QList<QAction *> ivActions;
     ivActions << m_asn1DialogAction << m_showMinimapAction << m_showE2EDataflow << m_actionSaveSceneRender;
-    m_aadlFactory = new AadlEditorFactory(m_aadlStorage, m_mscStorage, ivActions, this);
+    m_aadlFactory = new AadlEditorFactory(m_storage, ivActions, this);
     m_deploymentFactory = new DeploymentEditorFactory(this);
 
     return true;
@@ -311,8 +301,7 @@ void SpaceCreatorPlugin::clearProjectData(ProjectExplorer::Project *project)
 
     const Utils::FileNameList files = project->files(ProjectExplorer::Project::AllFiles);
     for (const Utils::FileName &fileName : files) {
-        m_aadlStorage->remove(fileName.toString());
-        m_mscStorage->remove(fileName.toString());
+        m_storage->remove(fileName.toString());
     }
 }
 

@@ -18,9 +18,9 @@
 #include "aadleditordocument.h"
 
 #include "aadlmainwidget.h"
-#include "aadlmodelstorage.h"
 #include "interface/interfacedocument.h"
 #include "iveditorcore.h"
+#include "modelstorage.h"
 #include "spacecreatorpluginconstants.h"
 #include "xmldocexporter.h"
 
@@ -33,7 +33,7 @@ using namespace Utils;
 
 namespace spctr {
 
-AadlEditorDocument::AadlEditorDocument(AadlModelStorage *aadlStorage, QObject *parent)
+AadlEditorDocument::AadlEditorDocument(ModelStorage *aadlStorage, QObject *parent)
     : Core::IDocument(parent)
     , m_aadlStorage(aadlStorage)
 {

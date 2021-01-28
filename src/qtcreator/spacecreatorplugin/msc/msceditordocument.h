@@ -26,15 +26,14 @@ class MSCEditorCore;
 }
 
 namespace spctr {
-
-class MscModelStorage;
+class ModelStorage;
 
 class MscEditorDocument : public Core::IDocument
 {
     Q_OBJECT
 
 public:
-    explicit MscEditorDocument(MscModelStorage *mscStorage, QObject *parent = nullptr);
+    explicit MscEditorDocument(ModelStorage *storage, QObject *parent = nullptr);
 
     // IDocument
     OpenResult open(QString *errorString, const QString &fileName, const QString &realFileName) override;
@@ -53,7 +52,7 @@ Q_SIGNALS:
     void mscDataLoaded(const QString &fileName, QSharedPointer<msc::MSCEditorCore> data);
 
 private:
-    QPointer<MscModelStorage> m_mscStorage;
+    QPointer<ModelStorage> m_storage;
     QSharedPointer<msc::MSCEditorCore> m_plugin;
 };
 

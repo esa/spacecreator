@@ -18,9 +18,9 @@
 #include "msceditordocument.h"
 
 #include "mainmodel.h"
+#include "modelstorage.h"
 #include "msceditorcore.h"
 #include "mscmodel.h"
-#include "mscmodelstorage.h"
 #include "spacecreatorpluginconstants.h"
 
 #include <QFileInfo>
@@ -32,11 +32,11 @@ using namespace Utils;
 
 namespace spctr {
 
-MscEditorDocument::MscEditorDocument(MscModelStorage *mscStorage, QObject *parent)
+MscEditorDocument::MscEditorDocument(ModelStorage *storage, QObject *parent)
     : Core::IDocument(parent)
-    , m_mscStorage(mscStorage)
+    , m_storage(storage)
 {
-    Q_ASSERT(mscStorage);
+    Q_ASSERT(storage);
     setMimeType(QLatin1String(spctr::Constants::MSC_MIMETYPE));
     setId(Core::Id(spctr::Constants::K_MSC_EDITOR_ID));
 }
@@ -46,13 +46,13 @@ Core::IDocument::OpenResult MscEditorDocument::open(
 {
     Q_UNUSED(realFileName)
 
-    if (fileName.isEmpty() || !m_mscStorage) {
+    if (fileName.isEmpty() || !m_storage) {
         return OpenResult::ReadError;
     }
 
     const QFileInfo fi(fileName);
     const QString absfileName = fi.absoluteFilePath();
-    m_plugin = m_mscStorage->mscData(absfileName);
+    m_plugin = m_storage->mscData(absfileName);
     if (m_plugin.isNull()) {
         return OpenResult::ReadError;
     }

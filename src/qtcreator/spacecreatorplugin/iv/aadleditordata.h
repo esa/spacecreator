@@ -34,17 +34,14 @@ class IEditor;
 }
 
 namespace spctr {
-
-class AadlModelStorage;
+class ModelStorage;
 class MscContext;
-class MscModelStorage;
 
 class AadlEditorData : public QObject
 {
     Q_OBJECT
 public:
-    AadlEditorData(AadlModelStorage *aadlStorage, MscModelStorage *mscStorage, const QList<QAction *> &ivActions,
-            QObject *parent = nullptr);
+    AadlEditorData(ModelStorage *storage, const QList<QAction *> &ivActions, QObject *parent = nullptr);
     ~AadlEditorData() override;
 
     Core::IEditor *createEditor();
@@ -65,8 +62,7 @@ private:
 
     bool m_minimapVisible = false;
 
-    QPointer<AadlModelStorage> m_aadlStorage;
-    QPointer<MscModelStorage> m_mscStorage;
+    QPointer<ModelStorage> m_storage;
     QList<QAction *> m_ivActions;
 };
 

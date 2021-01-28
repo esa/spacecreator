@@ -17,9 +17,9 @@
 
 #include "msceditorfactory.h"
 
+#include "modelstorage.h"
 #include "msceditorcore.h"
 #include "msceditordata.h"
-#include "mscmodelstorage.h"
 #include "spacecreatorpluginconstants.h"
 
 #include <QDebug>
@@ -28,9 +28,9 @@
 
 namespace spctr {
 
-MscEditorFactory::MscEditorFactory(MscModelStorage *mscStorage, const QList<QAction *> &mscActions, QObject *parent)
+MscEditorFactory::MscEditorFactory(ModelStorage *storage, const QList<QAction *> &mscActions, QObject *parent)
     : IEditorFactory(parent)
-    , m_mscStorage(mscStorage)
+    , m_storage(storage)
     , m_mscActions(mscActions)
 {
     setId(Constants::K_MSC_EDITOR_ID);
@@ -48,7 +48,7 @@ Core::IEditor *MscEditorFactory::createEditor()
 MscEditorData *MscEditorFactory::editorData() const
 {
     if (!m_editorData) {
-        m_editorData = new MscEditorData(m_mscStorage, m_mscActions, const_cast<MscEditorFactory *>(this));
+        m_editorData = new MscEditorData(m_storage, m_mscActions, const_cast<MscEditorFactory *>(this));
         connect(m_editorData, &MscEditorData::mscDataLoaded, this, &MscEditorFactory::mscDataLoaded);
     }
 

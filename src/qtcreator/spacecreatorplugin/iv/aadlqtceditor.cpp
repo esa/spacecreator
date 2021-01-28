@@ -19,7 +19,6 @@
 
 #include "aadleditordocument.h"
 #include "aadlmainwidget.h"
-#include "aadlmodelstorage.h"
 #include "asn1dialog.h"
 #include "commandsstack.h"
 #include "endtoend/endtoendview.h"
@@ -27,8 +26,8 @@
 #include "interface/interfacedocument.h"
 #include "iveditorcore.h"
 #include "mainmodel.h"
+#include "modelstorage.h"
 #include "msceditorcore.h"
-#include "mscmodelstorage.h"
 #include "spacecreatorpluginconstants.h"
 
 #include <QFileInfo>
@@ -38,12 +37,11 @@
 
 namespace spctr {
 
-AadlQtCEditor::AadlQtCEditor(
-        AadlModelStorage *aadlStorage, MscModelStorage *mscStorage, const QList<QAction *> &ivActions)
+AadlQtCEditor::AadlQtCEditor(ModelStorage *storage, const QList<QAction *> &ivActions)
     : Core::IEditor()
-    , m_document(new AadlEditorDocument(aadlStorage, this))
+    , m_document(new AadlEditorDocument(storage, this))
     , m_editorWidget(new AadlMainWidget)
-    , m_mscStorage(mscStorage)
+    , m_storage(storage)
     , m_globalToolbarActions(ivActions)
 {
     setContext(Core::Context(spctr::Constants::K_AADL_EDITOR_ID));
@@ -123,8 +121,8 @@ void AadlQtCEditor::showE2EDataflow(const QStringList &mscFiles)
         m_endToEndView = new ive::EndToEndView(plugin->document(), nullptr);
         m_endToEndView->setAttribute(Qt::WA_DeleteOnClose);
         std::function<msc::MscModel *(QString fileName)> fetcher = [this](QString fileName) -> msc::MscModel * {
-            if (m_mscStorage) {
-                QSharedPointer<msc::MSCEditorCore> core = m_mscStorage->mscData(fileName);
+            if (m_storage) {
+                QSharedPointer<msc::MSCEditorCore> core = m_storage->mscData(fileName);
                 if (core) {
                     return core->mainModel()->mscModel();
                 }

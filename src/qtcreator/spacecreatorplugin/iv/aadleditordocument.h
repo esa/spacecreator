@@ -27,14 +27,14 @@ class IVEditorCore;
 
 namespace spctr {
 
-class AadlModelStorage;
+class ModelStorage;
 
 class AadlEditorDocument : public Core::IDocument
 {
     Q_OBJECT
 
 public:
-    explicit AadlEditorDocument(AadlModelStorage *aadlStorage, QObject *parent = nullptr);
+    explicit AadlEditorDocument(ModelStorage *aadlStorage, QObject *parent = nullptr);
 
     // IDocument
     OpenResult open(QString *errorString, const QString &fileName, const QString &realFileName) override;
@@ -53,7 +53,7 @@ Q_SIGNALS:
     void ivDataLoaded(const QString &fileName, QSharedPointer<ive::IVEditorCore> data);
 
 private:
-    QPointer<AadlModelStorage> m_aadlStorage;
+    QPointer<ModelStorage> m_aadlStorage;
     QSharedPointer<ive::IVEditorCore> m_plugin;
 };
 

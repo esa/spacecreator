@@ -32,14 +32,14 @@ namespace spctr {
 
 class MscEditorDocument;
 class MscMainWidget;
-class MscModelStorage;
+class ModelStorage;
 
 class MscQtCEditor : public Core::IEditor
 {
     Q_OBJECT
 
 public:
-    MscQtCEditor(MscModelStorage *mscStorage, const QList<QAction *> &toolbarActions);
+    MscQtCEditor(ModelStorage *storage, const QList<QAction *> &toolbarActions);
     ~MscQtCEditor();
 
     Core::IDocument *document() const override;

@@ -17,9 +17,8 @@
 
 #include "mscsystemchecks.h"
 
-#include "aadlconnectionchain.h"
-#include "aadlmodelstorage.h"
 #include "aadlconnection.h"
+#include "aadlconnectionchain.h"
 #include "aadlfunction.h"
 #include "aadliface.h"
 #include "aadlmodel.h"
@@ -30,12 +29,12 @@
 #include "interface/interfacedocument.h"
 #include "iveditorcore.h"
 #include "mainmodel.h"
+#include "modelstorage.h"
 #include "mscchart.h"
 #include "msceditorcore.h"
 #include "mscinstance.h"
 #include "mscmessage.h"
 #include "mscmodel.h"
-#include "mscmodelstorage.h"
 #include "undocommand.h"
 
 #include <QDebug>
@@ -53,17 +52,12 @@ MscSystemChecks::MscSystemChecks(QObject *parent)
 {
 }
 
-void MscSystemChecks::setMscStorage(MscModelStorage *mscStorage)
+void MscSystemChecks::setStorage(ModelStorage *storage)
 {
-    m_mscStorage = mscStorage;
-    connect(m_mscStorage, &spctr::MscModelStorage::coreAdded, this, [=](QSharedPointer<msc::MSCEditorCore> core) {
+    m_storage = storage;
+    connect(m_storage, &spctr::ModelStorage::mscCoreAdded, this, [=](QSharedPointer<msc::MSCEditorCore> core) {
         connect(core.data(), &msc::MSCEditorCore::nameChanged, this, &spctr::MscSystemChecks::onMscEntityNameChanged);
     });
-}
-
-void MscSystemChecks::setAadlStorage(AadlModelStorage *aadlStorage)
-{
-    m_aadlStorage = aadlStorage;
 }
 
 /*!
@@ -261,7 +255,7 @@ QSharedPointer<ive::IVEditorCore> MscSystemChecks::ivCore() const
         return {};
     }
 
-    return m_aadlStorage->ivData(aadlFiles.first());
+    return m_storage->ivData(aadlFiles.first());
 }
 
 /*!
@@ -272,7 +266,7 @@ QVector<QSharedPointer<msc::MSCEditorCore>> MscSystemChecks::allMscCores() const
     QStringList mscFiles = allMscFiles();
     QVector<QSharedPointer<msc::MSCEditorCore>> allMscCores;
     for (const QString &mscFile : mscFiles) {
-        QSharedPointer<msc::MSCEditorCore> core = m_mscStorage->mscData(mscFile);
+        QSharedPointer<msc::MSCEditorCore> core = m_storage->mscData(mscFile);
         if (core) {
             allMscCores.append(core);
         }
@@ -324,8 +318,7 @@ QStringList MscSystemChecks::projectFiles(const QString &suffix)
     return result;
 }
 
-void MscSystemChecks::onEntityNameChanged(
-        ivm::AADLObject *entity, const QString &oldName, shared::UndoCommand *command)
+void MscSystemChecks::onEntityNameChanged(ivm::AADLObject *entity, const QString &oldName, shared::UndoCommand *command)
 {
     if (m_nameUpdateRunning) {
         return;

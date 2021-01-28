@@ -48,12 +48,10 @@ class EditorCore;
 namespace spctr {
 
 class AadlEditorFactory;
-class AadlModelStorage;
 class DeploymentEditorFactory;
-class DeploymentModelStorage;
+class ModelStorage;
 class MscSystemChecks;
 class MscEditorFactory;
-class MscModelStorage;
 
 class SpaceCreatorPlugin : public ExtensionSystem::IPlugin
 {
@@ -90,9 +88,7 @@ private:
     QAction *m_actionSaveSceneRender = nullptr;
     QAction *m_showMinimapAction = nullptr;
     QAction *m_showE2EDataflow = nullptr;
-    AadlModelStorage *m_aadlStorage = nullptr;
-    MscModelStorage *m_mscStorage = nullptr;
-    DeploymentModelStorage *m_deploymentStorage = nullptr;
+    ModelStorage *m_storage = nullptr;
     QStringList m_asnFiles;
     MscSystemChecks *m_checks = nullptr;
 
