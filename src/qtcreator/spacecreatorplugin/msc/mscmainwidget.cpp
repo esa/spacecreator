@@ -25,11 +25,11 @@
 #include "documenttreeview.h"
 #include "graphicsview.h"
 #include "mainmodel.h"
+#include "modelstorage.h"
 #include "mscchart.h"
 #include "mscdocument.h"
 #include "msceditorcore.h"
 #include "mscmodel.h"
-#include "mscsystemchecks.h"
 
 #include <QAction>
 #include <QDebug>
@@ -230,7 +230,7 @@ void MscMainWidget::init()
     m_aadlSwitch = new QPushButton("Interface view", leftArea);
     m_aadlSwitch->setToolTip(tr("Open the file"));
     connect(m_aadlSwitch, &QPushButton::clicked, this, []() {
-        QStringList aadlFiles = MscSystemChecks::allAadlFiles();
+        QStringList aadlFiles = ModelStorage::allAadlFiles();
         if (!aadlFiles.isEmpty()) {
             Core::EditorManager::instance()->openEditor(aadlFiles.first());
         }

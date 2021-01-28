@@ -24,6 +24,7 @@
 #include "aadlmodel.h"
 #include "aadlsystemchecks.h"
 #include "chartlayoutmanager.h"
+#include "commandsstack.h"
 #include "interface/commands/cmdentityattributechange.h"
 #include "interface/commands/cmdifaceattrchange.h"
 #include "interface/interfacedocument.h"
@@ -41,9 +42,6 @@
 #include <QMessageBox>
 #include <QPushButton>
 #include <QUndoStack>
-#include <projectexplorer/project.h>
-#include <projectexplorer/projecttree.h>
-#include <utils/fileutils.h>
 
 namespace spctr {
 
@@ -55,8 +53,16 @@ MscSystemChecks::MscSystemChecks(QObject *parent)
 void MscSystemChecks::setStorage(ModelStorage *storage)
 {
     m_storage = storage;
+
     connect(m_storage, &spctr::ModelStorage::mscCoreAdded, this, [=](QSharedPointer<msc::MSCEditorCore> core) {
         connect(core.data(), &msc::MSCEditorCore::nameChanged, this, &spctr::MscSystemChecks::onMscEntityNameChanged);
+    });
+
+    connect(m_storage, &spctr::ModelStorage::ivCoreAdded, this, [this](QSharedPointer<ive::IVEditorCore> ivCore) {
+        connect(ivCore->commandsStack(), &ive::cmd::CommandsStack::nameChanged, this,
+                &spctr::MscSystemChecks::onEntityNameChanged);
+        connect(ivCore->commandsStack(), &ive::cmd::CommandsStack::entityRemoved, this,
+                &spctr::MscSystemChecks::onEntityRemoved);
     });
 }
 
@@ -65,7 +71,7 @@ void MscSystemChecks::setStorage(ModelStorage *storage)
  */
 bool MscSystemChecks::mscInstancesExist(const QString &name)
 {
-    for (QSharedPointer<msc::MSCEditorCore> &mscCore : allMscCores()) {
+    for (QSharedPointer<msc::MSCEditorCore> &mscCore : m_storage->allMscCores()) {
         for (msc::MscChart *chart : mscCore->mainModel()->mscModel()->allCharts()) {
             for (msc::MscInstance *instance : chart->instances()) {
                 if (instance->name() == name) {
@@ -82,7 +88,7 @@ bool MscSystemChecks::mscInstancesExist(const QString &name)
  */
 void MscSystemChecks::changeMscInstanceName(const QString &oldName, const QString &name)
 {
-    for (QSharedPointer<msc::MSCEditorCore> &mscCore : allMscCores()) {
+    for (QSharedPointer<msc::MSCEditorCore> &mscCore : m_storage->allMscCores()) {
         mscCore->changeMscInstanceName(oldName, name);
     }
 }
@@ -92,7 +98,7 @@ void MscSystemChecks::changeMscInstanceName(const QString &oldName, const QStrin
  */
 void MscSystemChecks::removeMscInstances(ivm::AADLFunction *aadlFunction)
 {
-    for (QSharedPointer<msc::MSCEditorCore> &mscCore : allMscCores()) {
+    for (QSharedPointer<msc::MSCEditorCore> &mscCore : m_storage->allMscCores()) {
         mscCore->removeMscInstances(aadlFunction);
     }
 }
@@ -102,7 +108,7 @@ void MscSystemChecks::removeMscInstances(ivm::AADLFunction *aadlFunction)
  */
 bool MscSystemChecks::hasCorrespondingInstances(ivm::AADLFunction *aadlFunction) const
 {
-    for (QSharedPointer<msc::MSCEditorCore> &mscCore : allMscCores()) {
+    for (QSharedPointer<msc::MSCEditorCore> &mscCore : m_storage->allMscCores()) {
         if (!mscCore->correspondingInstances(aadlFunction).isEmpty()) {
             return true;
         }
@@ -115,7 +121,7 @@ bool MscSystemChecks::hasCorrespondingInstances(ivm::AADLFunction *aadlFunction)
  */
 bool MscSystemChecks::mscMessagesExist(const QString &messageName, const QString &sourceName, const QString &targetName)
 {
-    for (QSharedPointer<msc::MSCEditorCore> &mscCore : allMscCores()) {
+    for (QSharedPointer<msc::MSCEditorCore> &mscCore : m_storage->allMscCores()) {
         for (msc::MscChart *chart : mscCore->mainModel()->mscModel()->allCharts()) {
             for (msc::MscMessage *message : chart->messages()) {
                 if (message->name() == messageName) {
@@ -138,7 +144,7 @@ bool MscSystemChecks::mscMessagesExist(const QString &messageName, const QString
 void MscSystemChecks::changeMscMessageName(
         const QString &oldName, const QString &newName, const QString &sourceName, const QString &targetName)
 {
-    for (QSharedPointer<msc::MSCEditorCore> &mscCore : allMscCores()) {
+    for (QSharedPointer<msc::MSCEditorCore> &mscCore : m_storage->allMscCores()) {
         mscCore->changeMscMessageName(oldName, newName, sourceName, targetName);
     }
 }
@@ -148,7 +154,7 @@ void MscSystemChecks::changeMscMessageName(
  */
 void MscSystemChecks::removeMscMessages(ivm::AADLConnection *aadlConnection)
 {
-    for (QSharedPointer<msc::MSCEditorCore> &mscCore : allMscCores()) {
+    for (QSharedPointer<msc::MSCEditorCore> &mscCore : m_storage->allMscCores()) {
         mscCore->removeMscMessages(aadlConnection);
     }
 }
@@ -158,7 +164,7 @@ void MscSystemChecks::removeMscMessages(ivm::AADLConnection *aadlConnection)
  */
 bool MscSystemChecks::hasCorrespondingMessages(ivm::AADLConnection *aadlConnection) const
 {
-    for (QSharedPointer<msc::MSCEditorCore> &mscCore : allMscCores()) {
+    for (QSharedPointer<msc::MSCEditorCore> &mscCore : m_storage->allMscCores()) {
         if (!mscCore->correspondingMessages(aadlConnection).isEmpty()) {
             return true;
         }
@@ -172,7 +178,7 @@ bool MscSystemChecks::hasCorrespondingMessages(ivm::AADLConnection *aadlConnecti
  */
 void MscSystemChecks::checkInstances()
 {
-    QVector<QSharedPointer<msc::MSCEditorCore>> mscCores = allMscCores();
+    QVector<QSharedPointer<msc::MSCEditorCore>> mscCores = m_storage->allMscCores();
 
     // Check for names
     QVector<QPair<msc::MscChart *, msc::MscInstance *>> resultNames;
@@ -222,7 +228,7 @@ void MscSystemChecks::checkInstances()
  */
 void MscSystemChecks::checkMessages()
 {
-    QVector<QSharedPointer<msc::MSCEditorCore>> mscCores = allMscCores();
+    QVector<QSharedPointer<msc::MSCEditorCore>> mscCores = m_storage->allMscCores();
 
     // check messages
     QVector<QPair<msc::MscChart *, msc::MscMessage *>> resultNames;
@@ -245,77 +251,6 @@ void MscSystemChecks::checkMessages()
     } else {
         QMessageBox::information(nullptr, tr("Non conforming messages"), text);
     }
-}
-
-QSharedPointer<ive::IVEditorCore> MscSystemChecks::ivCore() const
-{
-    QStringList aadlFiles = allAadlFiles();
-    if (aadlFiles.empty()) {
-        qWarning() << "No AADL file in the project";
-        return {};
-    }
-
-    return m_storage->ivData(aadlFiles.first());
-}
-
-/*!
-   Returns all MSCEditorCore objects, that are used in the current project
- */
-QVector<QSharedPointer<msc::MSCEditorCore>> MscSystemChecks::allMscCores() const
-{
-    QStringList mscFiles = allMscFiles();
-    QVector<QSharedPointer<msc::MSCEditorCore>> allMscCores;
-    for (const QString &mscFile : mscFiles) {
-        QSharedPointer<msc::MSCEditorCore> core = m_storage->mscData(mscFile);
-        if (core) {
-            allMscCores.append(core);
-        }
-    }
-    return allMscCores;
-}
-
-/*!
-   Returns all aald files of the current project
- */
-QStringList MscSystemChecks::allAadlFiles()
-{
-    return projectFiles("interfaceview.xml");
-}
-
-/*!
-   Returns all msc files of the current project
- */
-QStringList MscSystemChecks::allMscFiles()
-{
-    return projectFiles(".msc");
-}
-
-/*!
-   Returns all asn files of the current project
- */
-QStringList MscSystemChecks::allAsn1Files()
-{
-    return projectFiles(".asn");
-}
-
-/*!
-   Returns all files of the current project endig with the given \p suffix
- */
-QStringList MscSystemChecks::projectFiles(const QString &suffix)
-{
-    ProjectExplorer::Project *project = ProjectExplorer::ProjectTree::currentProject();
-    if (!project) {
-        return {};
-    }
-
-    QStringList result;
-    for (const Utils::FileName &fileName : project->files(ProjectExplorer::Project::AllFiles)) {
-        if (fileName.toString().endsWith(suffix, Qt::CaseInsensitive)) {
-            result.append(fileName.toString());
-        }
-    }
-
-    return result;
 }
 
 void MscSystemChecks::onEntityNameChanged(ivm::AADLObject *entity, const QString &oldName, shared::UndoCommand *command)
@@ -391,14 +326,15 @@ void MscSystemChecks::onMscEntityNameChanged(QObject *entity, const QString &old
     if (m_nameUpdateRunning) {
         return;
     }
-    if (!ivCore()) {
+    QSharedPointer<ive::IVEditorCore> ivCore = m_storage->ivCore();
+    if (!ivCore) {
         return;
     }
 
     auto instance = dynamic_cast<msc::MscInstance *>(entity);
     if (instance) {
-        const bool hasOldName = ivCore()->aadlFunctionsNames().contains(oldName, m_caseCheck);
-        const bool hasNewName = ivCore()->aadlFunctionsNames().contains(instance->name(), m_caseCheck);
+        const bool hasOldName = ivCore->aadlFunctionsNames().contains(oldName, m_caseCheck);
+        const bool hasNewName = ivCore->aadlFunctionsNames().contains(instance->name(), m_caseCheck);
 
         if (!hasOldName && !hasNewName) {
             const int result = QMessageBox::question(nullptr, tr("No AADL function"),
@@ -406,7 +342,7 @@ void MscSystemChecks::onMscEntityNameChanged(QObject *entity, const QString &old
                        "\nDo you want to add it to the AADL model?")
                             .arg(instance->name()));
             if (result == QMessageBox::Yes) {
-                ivCore()->addFunction(instance->name());
+                ivCore->addFunction(instance->name());
             }
         }
 
@@ -424,16 +360,16 @@ void MscSystemChecks::onMscEntityNameChanged(QObject *entity, const QString &old
                 box.exec();
                 if (box.clickedButton() == updateButton) {
                     m_nameUpdateRunning = true;
-                    ivCore()->renameAadlFunction(oldName, instance->name());
+                    ivCore->renameAadlFunction(oldName, instance->name());
                     changeMscInstanceName(oldName, instance->name());
                     m_nameUpdateRunning = false;
                 }
                 if (box.clickedButton() == addButton) {
-                    ivCore()->addFunction(instance->name());
+                    ivCore->addFunction(instance->name());
                 }
             } else {
                 m_nameUpdateRunning = true;
-                ivCore()->renameAadlFunction(oldName, instance->name());
+                ivCore->renameAadlFunction(oldName, instance->name());
                 changeMscInstanceName(oldName, instance->name());
                 m_nameUpdateRunning = false;
             }
@@ -441,12 +377,12 @@ void MscSystemChecks::onMscEntityNameChanged(QObject *entity, const QString &old
     }
 
     auto message = dynamic_cast<msc::MscMessage *>(entity);
-    if (message && ivCore() && ivCore()->document() && ivCore()->document()->objectsModel()) {
+    if (message && ivCore && ivCore->document() && ivCore->document()->objectsModel()) {
         // Check for names
         const QString fromName = message->sourceInstance() ? message->sourceInstance()->name() : "";
         const QString toName = message->targetInstance() ? message->targetInstance()->name() : "";
         msc::AadlSystemChecks aadlChecker;
-        aadlChecker.setIvCore(ivCore());
+        aadlChecker.setIvCore(ivCore);
         bool hasNewName = aadlChecker.checkMessage(message);
         msc::MscMessage oldMessage(oldName);
         oldMessage.setSourceInstance(message->sourceInstance());
@@ -459,7 +395,7 @@ void MscSystemChecks::onMscEntityNameChanged(QObject *entity, const QString &old
                        "\nDo you want to add it to the AADL model?")
                             .arg(message->name()));
             if (result == QMessageBox::Yes) {
-                ivCore()->addConnection(message->name(), fromName, toName);
+                ivCore->addConnection(message->name(), fromName, toName);
             }
         }
 
@@ -477,16 +413,16 @@ void MscSystemChecks::onMscEntityNameChanged(QObject *entity, const QString &old
                 box.exec();
                 if (box.clickedButton() == updateButton) {
                     m_nameUpdateRunning = true;
-                    ivCore()->renameAadlConnection(oldName, message->name(), fromName, toName);
+                    ivCore->renameAadlConnection(oldName, message->name(), fromName, toName);
                     changeMscMessageName(oldName, message->name(), fromName, toName);
                     m_nameUpdateRunning = false;
                 }
                 if (box.clickedButton() == addButton) {
-                    ivCore()->addConnection(message->name(), fromName, toName);
+                    ivCore->addConnection(message->name(), fromName, toName);
                 }
             } else {
                 m_nameUpdateRunning = true;
-                ivCore()->renameAadlConnection(oldName, message->name(), fromName, toName);
+                ivCore->renameAadlConnection(oldName, message->name(), fromName, toName);
                 changeMscMessageName(oldName, message->name(), fromName, toName);
                 m_nameUpdateRunning = false;
             }

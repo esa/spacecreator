@@ -70,15 +70,6 @@ public:
     void checkInstances();
     void checkMessages();
 
-    // Query functions
-    QSharedPointer<ive::IVEditorCore> ivCore() const;
-    QVector<QSharedPointer<msc::MSCEditorCore>> allMscCores() const;
-
-    static QStringList allAadlFiles();
-    static QStringList allMscFiles();
-    static QStringList allAsn1Files();
-    static QStringList projectFiles(const QString &suffix);
-
 public Q_SLOTS:
     void onEntityNameChanged(ivm::AADLObject *entity, const QString &oldName, shared::UndoCommand *command);
     void onMscEntityNameChanged(QObject *entity, const QString &oldName, shared::UndoCommand *command);

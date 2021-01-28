@@ -101,7 +101,6 @@ bool SpaceCreatorPlugin::initialize(const QStringList &arguments, QString *error
 
     m_checks = new MscSystemChecks(this);
     m_checks->setStorage(m_storage);
-    m_storage->setChecker(m_checks);
 
     // MSC
     m_messageDeclarationAction =
@@ -158,7 +157,7 @@ bool SpaceCreatorPlugin::initialize(const QStringList &arguments, QString *error
     ive::ActionsManager::registerAction(
             Q_FUNC_INFO, m_actionSaveSceneRender, "Render", "Save current scene complete render.");
     connect(m_actionSaveSceneRender, &QAction::triggered, this,
-            [this]() { m_checks->ivCore()->onSaveRenderRequested(); });
+            [this]() { m_storage->ivCore()->onSaveRenderRequested(); });
 
     connect(editorManager, &Core::EditorManager::currentEditorChanged, this, [&](Core::IEditor *editor) {
         if (editor && editor->document()) {
@@ -183,7 +182,7 @@ bool SpaceCreatorPlugin::initialize(const QStringList &arguments, QString *error
     connect(ProjectExplorer::ProjectTree::instance(), &ProjectExplorer::ProjectTree::currentProjectChanged, this,
             [this](ProjectExplorer::Project *project) {
                 if (project) {
-                    m_asnFiles = m_checks->allAsn1Files();
+                    m_asnFiles = m_storage->allAsn1Files();
                     connect(project, &ProjectExplorer::Project::fileListChanged, this,
                             &spctr::SpaceCreatorPlugin::checkAsnFileRename, Qt::UniqueConnection);
                 }
@@ -238,7 +237,7 @@ void SpaceCreatorPlugin::setMinimapVisible(bool visible)
 void SpaceCreatorPlugin::showE2EDataflow()
 {
     if (auto aadlEditor = qobject_cast<spctr::AadlQtCEditor *>(Core::EditorManager::currentEditor())) {
-        aadlEditor->showE2EDataflow(m_checks->allMscFiles());
+        aadlEditor->showE2EDataflow(m_storage->allMscFiles());
     }
 }
 
@@ -254,7 +253,7 @@ void SpaceCreatorPlugin::showAsn1Dialog()
  */
 void SpaceCreatorPlugin::checkAsnFileRename()
 {
-    QStringList asnFiles = m_checks->allAsn1Files();
+    QStringList asnFiles = m_storage->allAsn1Files();
 
     QStringList newAsnFiles;
     for (const QString &file : asnFiles) {
@@ -270,10 +269,10 @@ void SpaceCreatorPlugin::checkAsnFileRename()
     }
 
     if (newAsnFiles.size() == 1 && lostAsnFiles.size() == 1) {
-        for (QSharedPointer<msc::MSCEditorCore> &mscCore : m_checks->allMscCores()) {
+        for (QSharedPointer<msc::MSCEditorCore> &mscCore : m_storage->allMscCores()) {
             mscCore->renameAsnFile(lostAsnFiles[0], newAsnFiles[0]);
         }
-        m_checks->ivCore()->renameAsnFile(lostAsnFiles[0], newAsnFiles[0]);
+        m_storage->ivCore()->renameAsnFile(lostAsnFiles[0], newAsnFiles[0]);
     }
 
     m_asnFiles = asnFiles;

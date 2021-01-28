@@ -19,6 +19,8 @@
 #include <QObject>
 #include <QPointer>
 #include <QSharedPointer>
+#include <QStringList>
+#include <QVector>
 
 #pragma once
 
@@ -37,7 +39,6 @@ class EditorCore;
 }
 
 namespace spctr {
-class MscSystemChecks;
 
 /*!
    Stores shared pointers to all aadl/msc file objects. And creates a new one if needed
@@ -49,17 +50,24 @@ class ModelStorage : public QObject
 public:
     explicit ModelStorage(QObject *parent = nullptr);
 
-    void setChecker(MscSystemChecks *checks);
-
-    QSharedPointer<dve::DVEditorCore> dvData(const QString &fileName);
-    QSharedPointer<ive::IVEditorCore> ivData(const QString &fileName);
-    QSharedPointer<msc::MSCEditorCore> mscData(const QString &fileName);
+    QSharedPointer<dve::DVEditorCore> dvData(const QString &fileName) const;
+    QSharedPointer<ive::IVEditorCore> ivData(const QString &fileName) const;
+    QSharedPointer<msc::MSCEditorCore> mscData(const QString &fileName) const;
 
     void remove(const QString &fileName);
 
+    // Query functions
+    QSharedPointer<ive::IVEditorCore> ivCore() const;
+    QVector<QSharedPointer<msc::MSCEditorCore>> allMscCores() const;
+
+    static QStringList allAadlFiles();
+    static QStringList allMscFiles();
+    static QStringList allAsn1Files();
+    static QStringList projectFiles(const QString &suffix);
+
 Q_SIGNALS:
     void editedExternally(shared::EditorCore *);
-    void ivCoreAdded(QSharedPointer<ive::IVEditorCore> mscCore);
+    void ivCoreAdded(QSharedPointer<ive::IVEditorCore> ivCore);
     void mscCoreAdded(QSharedPointer<msc::MSCEditorCore> mscCore);
 
 private:
@@ -68,7 +76,6 @@ private:
 
     QHash<QString, QSharedPointer<ive::IVEditorCore>> m_ivStore;
     QHash<QString, QSharedPointer<msc::MSCEditorCore>> m_mscStore;
-    QPointer<MscSystemChecks> m_checks;
 };
 
 }
