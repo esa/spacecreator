@@ -18,9 +18,8 @@
 #pragma once
 
 #include <QList>
-#include <QPointer>
-#include <QSharedPointer>
 #include <coreplugin/editormanager/ieditorfactory.h>
+#include <memory>
 
 class QAction;
 
@@ -29,7 +28,7 @@ class MSCEditorCore;
 }
 
 namespace spctr {
-class ModelStorage;
+class SpaceCreatorProjectManager;
 class MscEditorData;
 
 class MscEditorFactory : public Core::IEditorFactory
@@ -37,19 +36,14 @@ class MscEditorFactory : public Core::IEditorFactory
     Q_OBJECT
 
 public:
-    MscEditorFactory(ModelStorage *mscStorage, const QList<QAction *> &mscActions, QObject *parent);
+    MscEditorFactory(SpaceCreatorProjectManager *projectManager, const QList<QAction *> &mscActions, QObject *parent);
 
     Core::IEditor *createEditor() override;
 
     MscEditorData *editorData() const;
 
-Q_SIGNALS:
-    void mscDataLoaded(const QString &fileName, QSharedPointer<msc::MSCEditorCore> data);
-
 private:
-    mutable MscEditorData *m_editorData = nullptr;
-    QPointer<ModelStorage> m_storage;
-    QList<QAction *> m_mscActions;
+    std::unique_ptr<MscEditorData> m_editorData;
 };
 
 }

@@ -22,6 +22,8 @@
 #include "iveditorcore.h"
 #include "modelstorage.h"
 #include "spacecreatorpluginconstants.h"
+#include "spacecreatorproject.h"
+#include "spacecreatorprojectmanager.h"
 #include "xmldocexporter.h"
 
 #include <QFileInfo>
@@ -33,9 +35,9 @@ using namespace Utils;
 
 namespace spctr {
 
-AadlEditorDocument::AadlEditorDocument(ModelStorage *aadlStorage, QObject *parent)
+AadlEditorDocument::AadlEditorDocument(SpaceCreatorProjectManager *projectManager, QObject *parent)
     : Core::IDocument(parent)
-    , m_aadlStorage(aadlStorage)
+    , m_projectManager(projectManager)
 {
     setMimeType(QLatin1String(spctr::Constants::AADL_MIMETYPE));
     setId(Core::Id(spctr::Constants::K_AADL_EDITOR_ID));
@@ -47,13 +49,18 @@ Core::IDocument::OpenResult AadlEditorDocument::open(
     Q_UNUSED(errorString)
     Q_UNUSED(realFileName)
 
-    if (fileName.isEmpty() || !m_aadlStorage) {
+    if (fileName.isEmpty() || !m_projectManager) {
         return OpenResult::ReadError;
     }
 
     const QFileInfo fi(fileName);
     const QString absfileName = fi.absoluteFilePath();
-    m_plugin = m_aadlStorage->ivData(absfileName);
+
+    SpaceCreatorProject *project = m_projectManager->project(absfileName);
+    ModelStorage *storage = project ? project->storage() : m_projectManager->orphanStorage();
+
+    m_plugin = storage->ivData(absfileName);
+
     if (m_plugin.isNull()) {
         return OpenResult::ReadError;
     }

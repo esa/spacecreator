@@ -34,22 +34,20 @@ class IEditor;
 namespace spctr {
 
 class MscContext;
-class ModelStorage;
+class SpaceCreatorProjectManager;
 
 class MscEditorData : public QObject
 {
     Q_OBJECT
 public:
-    MscEditorData(ModelStorage *storage, const QList<QAction *> &mscActions, QObject *parent = nullptr);
+    MscEditorData(
+            SpaceCreatorProjectManager *projectManager, const QList<QAction *> &mscActions, QObject *parent = nullptr);
     ~MscEditorData() override;
 
     Core::IEditor *createEditor();
 
 public Q_SLOTS:
     void setMinimapVisible(bool visible);
-
-Q_SIGNALS:
-    void mscDataLoaded(const QString &fileName, QSharedPointer<msc::MSCEditorCore> data);
 
 private Q_SLOTS:
     void onCurrentEditorChanged(Core::IEditor *editor);
@@ -60,7 +58,7 @@ private:
 
     bool m_minimapVisible = false;
 
-    QPointer<ModelStorage> m_storage;
+    QPointer<SpaceCreatorProjectManager> m_projectManager;
     QList<QAction *> m_mscActions;
 };
 

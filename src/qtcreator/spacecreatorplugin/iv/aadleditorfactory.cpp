@@ -20,16 +20,17 @@
 #include "aadleditordata.h"
 #include "modelstorage.h"
 #include "spacecreatorpluginconstants.h"
+#include "spacecreatorprojectmanager.h"
 
 #include <QGuiApplication>
 #include <coreplugin/fileiconprovider.h>
 
 namespace spctr {
 
-AadlEditorFactory::AadlEditorFactory(ModelStorage *storage, const QList<QAction *> &ivActions, QObject *parent)
+AadlEditorFactory::AadlEditorFactory(
+        SpaceCreatorProjectManager *projectManager, const QList<QAction *> &ivActions, QObject *parent)
     : IEditorFactory(parent)
-    , m_storage(storage)
-    , m_ivActions(ivActions)
+    , m_editorData(new AadlEditorData(projectManager, ivActions))
 {
     setId(spctr::Constants::K_AADL_EDITOR_ID);
     setDisplayName(QCoreApplication::translate("AADL Editor", spctr::Constants::C_AADLEDITOR_DISPLAY_NAME));
@@ -40,16 +41,12 @@ AadlEditorFactory::AadlEditorFactory(ModelStorage *storage, const QList<QAction 
 
 Core::IEditor *AadlEditorFactory::createEditor()
 {
-    return editorData()->createEditor();
+    return m_editorData->createEditor();
 }
 
 AadlEditorData *AadlEditorFactory::editorData() const
 {
-    if (!m_editorData) {
-        m_editorData = new AadlEditorData(m_storage, m_ivActions, const_cast<AadlEditorFactory *>(this));
-        connect(m_editorData, &AadlEditorData::aadlDataLoaded, this, &AadlEditorFactory::aadlDataLoaded);
-    }
-    return m_editorData;
+    return m_editorData.get();
 }
 
 }

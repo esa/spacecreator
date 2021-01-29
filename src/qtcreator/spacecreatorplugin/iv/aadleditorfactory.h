@@ -20,35 +20,29 @@
 #include "iveditorcore.h"
 
 #include <QList>
-#include <QPointer>
-#include <QSharedPointer>
-#include <QString>
 #include <coreplugin/editormanager/ieditorfactory.h>
+#include <memory>
 
 class QAction;
 
 namespace spctr {
 class AadlEditorData;
-class ModelStorage;
+class SpaceCreatorProjectManager;
 
 class AadlEditorFactory : public Core::IEditorFactory
 {
     Q_OBJECT
 
 public:
-    explicit AadlEditorFactory(ModelStorage *storage, const QList<QAction *> &ivActions, QObject *parent);
+    explicit AadlEditorFactory(
+            SpaceCreatorProjectManager *projectManager, const QList<QAction *> &ivActions, QObject *parent);
 
     Core::IEditor *createEditor() override;
 
     AadlEditorData *editorData() const;
 
-Q_SIGNALS:
-    void aadlDataLoaded(const QString &fileName, QSharedPointer<ive::IVEditorCore> data);
-
 private:
-    mutable AadlEditorData *m_editorData = nullptr;
-    QPointer<ModelStorage> m_storage;
-    QList<QAction *> m_ivActions;
+    std::unique_ptr<AadlEditorData> m_editorData;
 };
 
 }

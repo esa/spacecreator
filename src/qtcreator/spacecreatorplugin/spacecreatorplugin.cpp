@@ -21,13 +21,11 @@
 #include "asn1library.h"
 #include "context/action/actionsmanager.h"
 #include "dv/deploymenteditorfactory.h"
-#include "interface/interfacedocument.h"
 #include "iv/aadleditordata.h"
 #include "iv/aadleditorfactory.h"
 #include "iv/aadlqtceditor.h"
 #include "iveditor.h"
 #include "iveditorcore.h"
-#include "mainmodel.h"
 #include "modelstorage.h"
 #include "msc/msceditordata.h"
 #include "msc/msceditorfactory.h"
@@ -38,24 +36,17 @@
 #include "mscsystemchecks.h"
 #include "sharedlibrary.h"
 #include "spacecreatorpluginconstants.h"
+#include "spacecreatorproject.h"
+#include "spacecreatorprojectmanager.h"
 
 #include <QAction>
+#include <QMenu>
 #include <QMessageBox>
 #include <coreplugin/actionmanager/actioncontainer.h>
 #include <coreplugin/actionmanager/actionmanager.h>
-#include <coreplugin/designmode.h>
 #include <coreplugin/icore.h>
-#include <coreplugin/idocument.h>
-#include <editormanager/documentmodel.h>
 #include <editormanager/editormanager.h>
 #include <editormanager/ieditor.h>
-#include <extensionsystem/pluginmanager.h>
-#include <extensionsystem/pluginspec.h>
-#include <projectexplorer/project.h>
-#include <projectexplorer/projectexplorerconstants.h>
-#include <projectexplorer/projecttree.h>
-#include <projectexplorer/session.h>
-#include <utils/fileutils.h>
 
 void initMscResources()
 {
@@ -94,13 +85,7 @@ bool SpaceCreatorPlugin::initialize(const QStringList &arguments, QString *error
     Q_UNUSED(arguments)
     Q_UNUSED(errorString)
 
-    auto editorManager = Core::EditorManager::instance();
-
-    m_storage = new ModelStorage(this);
-    connect(m_storage, &spctr::ModelStorage::editedExternally, this, &spctr::SpaceCreatorPlugin::saveIfNotOpen);
-
-    m_checks = new MscSystemChecks(this);
-    m_checks->setStorage(m_storage);
+    m_projectsManager = new SpaceCreatorProjectManager(this);
 
     // MSC
     m_messageDeclarationAction =
@@ -113,12 +98,12 @@ bool SpaceCreatorPlugin::initialize(const QStringList &arguments, QString *error
     m_checkInstancesAction = new QAction(QIcon(QLatin1String(":/icons/check_yellow.svg")), tr("Check instances"), this);
     Core::Command *checkInstancesCmd = Core::ActionManager::registerAction(
             m_checkInstancesAction, Constants::CHECK_INSTANCES_ID, Core::Context(Core::Constants::C_GLOBAL));
-    connect(m_checkInstancesAction, &QAction::triggered, m_checks, &MscSystemChecks::checkInstances);
+    connect(m_checkInstancesAction, &QAction::triggered, this, &SpaceCreatorPlugin::checkInstancesForCurrentEditor);
 
     m_checkMessagesAction = new QAction(QIcon(QLatin1String(":/icons/check_blue.svg")), tr("Check messages"), this);
     Core::Command *checkMessagesCmd = Core::ActionManager::registerAction(
             m_checkMessagesAction, Constants::CHECK_MESSAGES_ID, Core::Context(Core::Constants::C_GLOBAL));
-    connect(m_checkMessagesAction, &QAction::triggered, m_checks, &MscSystemChecks::checkMessages);
+    connect(m_checkMessagesAction, &QAction::triggered, this, &SpaceCreatorPlugin::checkMesagesForCurrentEditor);
 
     m_showMinimapAction =
             new QAction(QIcon(QLatin1String(":/sharedresources/icons/minimap.svg")), tr("Show minimap"), this);
@@ -156,21 +141,15 @@ bool SpaceCreatorPlugin::initialize(const QStringList &arguments, QString *error
     Core::Command *renderCmd = Core::ActionManager::registerAction(m_actionSaveSceneRender, Constants::AADL_RENDER_ID);
     ive::ActionsManager::registerAction(
             Q_FUNC_INFO, m_actionSaveSceneRender, "Render", "Save current scene complete render.");
-    connect(m_actionSaveSceneRender, &QAction::triggered, this,
-            [this]() { m_storage->ivCore()->onSaveRenderRequested(); });
-
-    connect(editorManager, &Core::EditorManager::currentEditorChanged, this, [&](Core::IEditor *editor) {
-        if (editor && editor->document()) {
-            const bool isMsc = editor->document()->filePath().toString().endsWith(".msc", Qt::CaseInsensitive);
-            const bool isAadl =
-                    editor->document()->filePath().toString().endsWith("interfaceview.xml", Qt::CaseInsensitive);
-            m_messageDeclarationAction->setEnabled(isMsc);
-            m_asn1DialogAction->setEnabled(isAadl);
-            m_actionSaveSceneRender->setEnabled(isAadl);
-            m_showMinimapAction->setEnabled(isAadl || isMsc);
-            m_showE2EDataflow->setEnabled(isAadl);
+    connect(m_actionSaveSceneRender, &QAction::triggered, this, []() {
+        if (auto ivEditor = qobject_cast<spctr::AadlQtCEditor *>(Core::EditorManager::currentEditor())) {
+            ivEditor->ivPlugin()->onSaveRenderRequested();
         }
     });
+
+    connect(Core::EditorManager::instance(), &Core::EditorManager::currentEditorChanged, this,
+            &spctr::SpaceCreatorPlugin::updateActions);
+    updateActions();
 
     menu->addSeparator();
     menu->addAction(showAsn1Cmd);
@@ -178,26 +157,12 @@ bool SpaceCreatorPlugin::initialize(const QStringList &arguments, QString *error
     menu->menu()->setEnabled(true);
     Core::ActionManager::actionContainer(Core::Constants::M_TOOLS)->addMenu(menu);
 
-    // asn connection
-    connect(ProjectExplorer::ProjectTree::instance(), &ProjectExplorer::ProjectTree::currentProjectChanged, this,
-            [this](ProjectExplorer::Project *project) {
-                if (project) {
-                    m_asnFiles = m_storage->allAsn1Files();
-                    connect(project, &ProjectExplorer::Project::fileListChanged, this,
-                            &spctr::SpaceCreatorPlugin::checkAsnFileRename, Qt::UniqueConnection);
-                }
-            });
-
-    // QtCreator stuff
-    connect(ProjectExplorer::SessionManager::instance(), &ProjectExplorer::SessionManager::aboutToRemoveProject, this,
-            &spctr::SpaceCreatorPlugin::clearProjectData);
-
     QList<QAction *> mscActions;
     mscActions << m_showMinimapAction << m_checkInstancesAction << m_checkMessagesAction;
-    m_mscFactory = new MscEditorFactory(m_storage, mscActions, this);
+    m_mscFactory = new MscEditorFactory(m_projectsManager, mscActions, this);
     QList<QAction *> ivActions;
     ivActions << m_asn1DialogAction << m_showMinimapAction << m_showE2EDataflow << m_actionSaveSceneRender;
-    m_aadlFactory = new AadlEditorFactory(m_storage, ivActions, this);
+    m_aadlFactory = new AadlEditorFactory(m_projectsManager, ivActions, this);
     m_deploymentFactory = new DeploymentEditorFactory(this);
 
     return true;
@@ -237,7 +202,10 @@ void SpaceCreatorPlugin::setMinimapVisible(bool visible)
 void SpaceCreatorPlugin::showE2EDataflow()
 {
     if (auto aadlEditor = qobject_cast<spctr::AadlQtCEditor *>(Core::EditorManager::currentEditor())) {
-        aadlEditor->showE2EDataflow(m_storage->allMscFiles());
+        SpaceCreatorProject *project = m_projectsManager->project(aadlEditor->ivPlugin());
+        if (project) {
+            aadlEditor->showE2EDataflow(project->storage()->allMscFiles());
+        }
     }
 }
 
@@ -249,72 +217,42 @@ void SpaceCreatorPlugin::showAsn1Dialog()
 }
 
 /*!
-   Checks if one asn1 file was renamed. If yes, update the filename in all msc and aadl files.
+   Update the actiones enabled/disabled to represent the current editor
  */
-void SpaceCreatorPlugin::checkAsnFileRename()
+void SpaceCreatorPlugin::updateActions()
 {
-    QStringList asnFiles = m_storage->allAsn1Files();
-
-    QStringList newAsnFiles;
-    for (const QString &file : asnFiles) {
-        if (!m_asnFiles.contains(file)) {
-            newAsnFiles.append(file);
-        }
+    bool isMsc = false;
+    bool isAadl = false;
+    Core::IEditor *editor = Core::EditorManager::currentEditor();
+    if (editor && editor->document()) {
+        isMsc = editor->document()->filePath().toString().endsWith(".msc", Qt::CaseInsensitive);
+        isAadl = editor->document()->filePath().toString().endsWith("interfaceview.xml", Qt::CaseInsensitive);
     }
-    QStringList lostAsnFiles;
-    for (const QString &file : m_asnFiles) {
-        if (!asnFiles.contains(file)) {
-            lostAsnFiles.append(file);
-        }
-    }
-
-    if (newAsnFiles.size() == 1 && lostAsnFiles.size() == 1) {
-        for (QSharedPointer<msc::MSCEditorCore> &mscCore : m_storage->allMscCores()) {
-            mscCore->renameAsnFile(lostAsnFiles[0], newAsnFiles[0]);
-        }
-        m_storage->ivCore()->renameAsnFile(lostAsnFiles[0], newAsnFiles[0]);
-    }
-
-    m_asnFiles = asnFiles;
+    m_messageDeclarationAction->setEnabled(isMsc);
+    m_asn1DialogAction->setEnabled(isAadl);
+    m_actionSaveSceneRender->setEnabled(isAadl);
+    m_showMinimapAction->setEnabled(isAadl || isMsc);
+    m_showE2EDataflow->setEnabled(isAadl);
 }
 
-/*!
-   \brief SpaceCreatorPlugin::saveIfNotOpen
-   \param core
- */
-void SpaceCreatorPlugin::saveIfNotOpen(shared::EditorCore *core)
+void SpaceCreatorPlugin::checkInstancesForCurrentEditor()
 {
-    if (!isOpenInEditor(core)) {
-        core->save();
+    if (auto mscEditor = qobject_cast<spctr::MscQtCEditor *>(Core::EditorManager::currentEditor())) {
+        SpaceCreatorProject *project = m_projectsManager->project(mscEditor->mscEditorCore());
+        if (project) {
+            project->checks()->checkInstances();
+        }
     }
 }
 
-/*!
-   Clears all data of the given project
- */
-void SpaceCreatorPlugin::clearProjectData(ProjectExplorer::Project *project)
+void SpaceCreatorPlugin::checkMesagesForCurrentEditor()
 {
-    if (!project) {
-        return;
-    }
-
-    const Utils::FileNameList files = project->files(ProjectExplorer::Project::AllFiles);
-    for (const Utils::FileName &fileName : files) {
-        m_storage->remove(fileName.toString());
-    }
-}
-
-/*!
-   Returns true, if the file of the given /p core is open in an editor
- */
-bool SpaceCreatorPlugin::isOpenInEditor(shared::EditorCore *core) const
-{
-    QList<Core::IDocument *> openDocuments = Core::DocumentModel::openedDocuments();
-    for (Core::IDocument *doc : openDocuments) {
-        if (doc->filePath().toString() == core->filePath()) {
-            return true;
+    if (auto mscEditor = qobject_cast<spctr::MscQtCEditor *>(Core::EditorManager::currentEditor())) {
+        SpaceCreatorProject *project = m_projectsManager->project(mscEditor->mscEditorCore());
+        if (project) {
+            project->checks()->checkMessages();
         }
     }
-    return false;
 }
+
 }

@@ -49,9 +49,8 @@ namespace spctr {
 
 class AadlEditorFactory;
 class DeploymentEditorFactory;
-class ModelStorage;
-class MscSystemChecks;
 class MscEditorFactory;
+class SpaceCreatorProjectManager;
 
 class SpaceCreatorPlugin : public ExtensionSystem::IPlugin
 {
@@ -71,13 +70,11 @@ private Q_SLOTS:
     void setMinimapVisible(bool visible);
     void showE2EDataflow();
     void showAsn1Dialog();
-    void checkAsnFileRename();
-    void saveIfNotOpen(shared::EditorCore *core);
-    void clearProjectData(ProjectExplorer::Project *project);
+    void updateActions();
+    void checkInstancesForCurrentEditor();
+    void checkMesagesForCurrentEditor();
 
 private:
-    bool isOpenInEditor(shared::EditorCore *core) const;
-
     MscEditorFactory *m_mscFactory = nullptr;
     AadlEditorFactory *m_aadlFactory = nullptr;
     DeploymentEditorFactory *m_deploymentFactory = nullptr;
@@ -88,9 +85,7 @@ private:
     QAction *m_actionSaveSceneRender = nullptr;
     QAction *m_showMinimapAction = nullptr;
     QAction *m_showE2EDataflow = nullptr;
-    ModelStorage *m_storage = nullptr;
-    QStringList m_asnFiles;
-    MscSystemChecks *m_checks = nullptr;
+    SpaceCreatorProjectManager *m_projectsManager = nullptr;
 
     Asn1SccOption m_asnCommandOptions;
     IVColorOption m_ivColorOptions;

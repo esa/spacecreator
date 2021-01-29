@@ -1,0 +1,141 @@
+/*
+   Copyright (C) 2021 European Space Agency - <maxime.perrotin@esa.int>
+
+   This library is free software; you can redistribute it and/or
+   modify it under the terms of the GNU Library General Public
+   License as published by the Free Software Foundation; either
+   version 2 of the License, or (at your option) any later version.
+
+   This library is distributed in the hope that it will be useful,
+   but WITHOUT ANY WARRANTY; without even the implied warranty of
+   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+   Library General Public License for more details.
+
+   You should have received a copy of the GNU Library General Public License
+   along with this program. If not, see <https://www.gnu.org/licenses/lgpl-2.1.html>.
+*/
+
+#include "spacecreatorprojectmanager.h"
+
+#include "modelstorage.h"
+#include "spacecreatorproject.h"
+
+#include <projectexplorer/project.h>
+#include <projectexplorer/session.h>
+
+namespace spctr {
+
+SpaceCreatorProjectManager::SpaceCreatorProjectManager(QObject *parent)
+    : QObject(parent)
+    , m_orphanStorage(new ModelStorage(this))
+{
+    connect(ProjectExplorer::SessionManager::instance(), &ProjectExplorer::SessionManager::projectAdded, this,
+            &spctr::SpaceCreatorProjectManager::addProject);
+    connect(ProjectExplorer::SessionManager::instance(), &ProjectExplorer::SessionManager::aboutToRemoveProject, this,
+            &spctr::SpaceCreatorProjectManager::removeProject);
+}
+
+SpaceCreatorProjectManager::~SpaceCreatorProjectManager()
+{
+    qDeleteAll(m_projects);
+    m_projects.clear();
+}
+
+/*!
+   Returns tha editor core that represents the file fileName.
+   In case the core does not exist yet, it is created in the correct SpaceCreatorProject
+ */
+QSharedPointer<dve::DVEditorCore> SpaceCreatorProjectManager::dvData(const QString &fileName) const
+{
+    if (SpaceCreatorProject *data = project(fileName)) {
+        return data->storage()->dvData(fileName);
+    } else {
+        return m_orphanStorage->dvData(fileName);
+    }
+}
+
+/*!
+   Returns tha editor core that represents the file fileName.
+   In case the core does not exist yet, it is created in the correct SpaceCreatorProject
+ */
+QSharedPointer<ive::IVEditorCore> SpaceCreatorProjectManager::ivData(const QString &fileName) const
+{
+    if (SpaceCreatorProject *data = project(fileName)) {
+        return data->storage()->ivData(fileName);
+    } else {
+        return m_orphanStorage->ivData(fileName);
+    }
+}
+
+/*!
+   Returns tha editor core that represents the file fileName.
+   In case the core does not exist yet, it is created in the correct SpaceCreatorProject
+ */
+QSharedPointer<msc::MSCEditorCore> SpaceCreatorProjectManager::mscData(const QString &fileName) const
+{
+    if (SpaceCreatorProject *data = project(fileName)) {
+        return data->storage()->mscData(fileName);
+    } else {
+        return m_orphanStorage->mscData(fileName);
+    }
+}
+
+/*!
+   Returns the project, that contains the given \p fileName
+ */
+SpaceCreatorProject *SpaceCreatorProjectManager::project(const QString &fileName) const
+{
+    for (SpaceCreatorProject *project : m_projects) {
+        if (project->project()->isKnownFile(Utils::FileName::fromString(fileName))) {
+            return project;
+        }
+    }
+
+    return nullptr;
+}
+
+/*!
+   Returns the project, that contains the given \p editorCore
+ */
+SpaceCreatorProject *SpaceCreatorProjectManager::project(const QSharedPointer<shared::EditorCore> &core) const
+{
+    for (SpaceCreatorProject *project : m_projects) {
+        if (project->storage()->contains(core)) {
+            return project;
+        }
+    }
+
+    return nullptr;
+}
+
+/*!
+   Retruns the ModelStorage that is used to store all data/files that do not belong to one of the open projects
+ */
+ModelStorage *SpaceCreatorProjectManager::orphanStorage() const
+{
+    return m_orphanStorage.get();
+}
+
+/*!
+   Adds a new SpaceCreatorProject that represents the given QtCreator \p project
+ */
+void SpaceCreatorProjectManager::addProject(ProjectExplorer::Project *project)
+{
+    m_projects.append(new SpaceCreatorProject(project));
+}
+
+/*!
+   Removes a new SpaceCreatorProject that represents the given QtCreator \p project
+ */
+void SpaceCreatorProjectManager::removeProject(ProjectExplorer::Project *project)
+{
+    for (SpaceCreatorProject *data : qAsConst(m_projects)) {
+        if (data->project() == project) {
+            m_projects.removeAll(data);
+            delete data;
+            return;
+        }
+    }
+}
+
+} // namespace spctr

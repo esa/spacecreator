@@ -26,15 +26,14 @@ class IVEditorCore;
 }
 
 namespace spctr {
-
-class ModelStorage;
+class SpaceCreatorProjectManager;
 
 class AadlEditorDocument : public Core::IDocument
 {
     Q_OBJECT
 
 public:
-    explicit AadlEditorDocument(ModelStorage *aadlStorage, QObject *parent = nullptr);
+    explicit AadlEditorDocument(SpaceCreatorProjectManager *projectManager, QObject *parent = nullptr);
 
     // IDocument
     OpenResult open(QString *errorString, const QString &fileName, const QString &realFileName) override;
@@ -53,7 +52,7 @@ Q_SIGNALS:
     void ivDataLoaded(const QString &fileName, QSharedPointer<ive::IVEditorCore> data);
 
 private:
-    QPointer<ModelStorage> m_aadlStorage;
+    QPointer<SpaceCreatorProjectManager> m_projectManager;
     QSharedPointer<ive::IVEditorCore> m_plugin;
 };
 

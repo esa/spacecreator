@@ -34,14 +34,15 @@ class IEditor;
 }
 
 namespace spctr {
-class ModelStorage;
+class SpaceCreatorProjectManager;
 class MscContext;
 
 class AadlEditorData : public QObject
 {
     Q_OBJECT
 public:
-    AadlEditorData(ModelStorage *storage, const QList<QAction *> &ivActions, QObject *parent = nullptr);
+    AadlEditorData(
+            SpaceCreatorProjectManager *projectManager, const QList<QAction *> &ivActions, QObject *parent = nullptr);
     ~AadlEditorData() override;
 
     Core::IEditor *createEditor();
@@ -49,9 +50,6 @@ public:
     void showMinimap(bool visible);
 
     QSharedPointer<ive::IVEditorCore> ivPlugin(const QString &fileName);
-
-Q_SIGNALS:
-    void aadlDataLoaded(const QString &fileName, QSharedPointer<ive::IVEditorCore> data);
 
 private Q_SLOTS:
     void onCurrentEditorChanged(Core::IEditor *editor);
@@ -62,7 +60,7 @@ private:
 
     bool m_minimapVisible = false;
 
-    QPointer<ModelStorage> m_storage;
+    QPointer<SpaceCreatorProjectManager> m_projectManager;
     QList<QAction *> m_ivActions;
 };
 

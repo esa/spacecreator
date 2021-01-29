@@ -29,6 +29,7 @@
 #include "modelstorage.h"
 #include "msceditorcore.h"
 #include "spacecreatorpluginconstants.h"
+#include "spacecreatorprojectmanager.h"
 
 #include <QFileInfo>
 #include <QToolBar>
@@ -37,11 +38,11 @@
 
 namespace spctr {
 
-AadlQtCEditor::AadlQtCEditor(ModelStorage *storage, const QList<QAction *> &ivActions)
+AadlQtCEditor::AadlQtCEditor(SpaceCreatorProjectManager *projectManager, const QList<QAction *> &ivActions)
     : Core::IEditor()
-    , m_document(new AadlEditorDocument(storage, this))
+    , m_document(new AadlEditorDocument(projectManager, this))
     , m_editorWidget(new AadlMainWidget)
-    , m_storage(storage)
+    , m_projectManager(projectManager)
     , m_globalToolbarActions(ivActions)
 {
     setContext(Core::Context(spctr::Constants::K_AADL_EDITOR_ID));
@@ -121,8 +122,8 @@ void AadlQtCEditor::showE2EDataflow(const QStringList &mscFiles)
         m_endToEndView = new ive::EndToEndView(plugin->document(), nullptr);
         m_endToEndView->setAttribute(Qt::WA_DeleteOnClose);
         std::function<msc::MscModel *(QString fileName)> fetcher = [this](QString fileName) -> msc::MscModel * {
-            if (m_storage) {
-                QSharedPointer<msc::MSCEditorCore> core = m_storage->mscData(fileName);
+            if (m_projectManager) {
+                QSharedPointer<msc::MSCEditorCore> core = m_projectManager->mscData(fileName);
                 if (core) {
                     return core->mainModel()->mscModel();
                 }

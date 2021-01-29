@@ -23,6 +23,7 @@
 #include "modelstorage.h"
 #include "msc/msccontext.h"
 #include "spacecreatorpluginconstants.h"
+#include "spacecreatorprojectmanager.h"
 
 #include <QUndoGroup>
 #include <QUndoStack>
@@ -36,10 +37,11 @@
 
 namespace spctr {
 
-AadlEditorData::AadlEditorData(ModelStorage *storage, const QList<QAction *> &ivActions, QObject *parent)
+AadlEditorData::AadlEditorData(
+        SpaceCreatorProjectManager *projectManager, const QList<QAction *> &ivActions, QObject *parent)
     : QObject(parent)
     , m_undoGroup(new QUndoGroup(this))
-    , m_storage(storage)
+    , m_projectManager(projectManager)
     , m_ivActions(ivActions)
 {
     Core::Context contexts;
@@ -73,13 +75,12 @@ AadlEditorData::~AadlEditorData()
 
 Core::IEditor *AadlEditorData::createEditor()
 {
-    auto *ivEditor = new AadlQtCEditor(m_storage, m_ivActions);
+    auto *ivEditor = new AadlQtCEditor(m_projectManager, m_ivActions);
 
     connect(ivEditor->ivDocument(), &spctr::AadlEditorDocument::ivDataLoaded, this,
             [this](const QString &fileName, QSharedPointer<ive::IVEditorCore> data) {
                 data->minimapView()->setVisible(m_minimapVisible);
                 m_undoGroup->addStack(data->undoStack());
-                Q_EMIT aadlDataLoaded(fileName, data);
             });
 
     return ivEditor;

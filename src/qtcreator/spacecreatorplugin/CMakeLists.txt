@@ -47,6 +47,10 @@ set(SC_PLUGIN_SOURCES
     spacecreatorplugin.h
     spacecreatorplugin_global.h
     spacecreatorpluginconstants.h
+    spacecreatorproject.cpp
+    spacecreatorproject.h
+    spacecreatorprojectmanager.cpp
+    spacecreatorprojectmanager.h
 )
 
 set(SC_QTC_LIBRARIES

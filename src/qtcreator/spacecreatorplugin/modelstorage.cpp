@@ -116,6 +116,24 @@ QVector<QSharedPointer<msc::MSCEditorCore>> ModelStorage::allMscCores() const
 }
 
 /*!
+   Returns if the given \core is in this storage
+ */
+bool ModelStorage::contains(QSharedPointer<shared::EditorCore> core) const
+{
+    for (QSharedPointer<ive::IVEditorCore> ivCore : m_ivStore) {
+        if (core == ivCore) {
+            return true;
+        }
+    }
+    for (QSharedPointer<msc::MSCEditorCore> mscCore : m_mscStore) {
+        if (core == mscCore) {
+            return true;
+        }
+    }
+    return false;
+}
+
+/*!
    Returns all aald files of the current project
  */
 QStringList ModelStorage::allAadlFiles()

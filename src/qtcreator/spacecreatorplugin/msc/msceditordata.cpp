@@ -17,12 +17,12 @@
 
 #include "msceditordata.h"
 
-#include "modelstorage.h"
 #include "msccontext.h"
 #include "msceditorcore.h"
 #include "msceditordocument.h"
 #include "mscqtceditor.h"
 #include "spacecreatorpluginconstants.h"
+#include "spacecreatorprojectmanager.h"
 
 #include <QUndoGroup>
 #include <QUndoStack>
@@ -36,10 +36,11 @@
 
 namespace spctr {
 
-MscEditorData::MscEditorData(ModelStorage *storage, const QList<QAction *> &mscActions, QObject *parent)
+MscEditorData::MscEditorData(
+        SpaceCreatorProjectManager *projectManager, const QList<QAction *> &mscActions, QObject *parent)
     : QObject(parent)
     , m_undoGroup(new QUndoGroup(this))
-    , m_storage(storage)
+    , m_projectManager(projectManager)
     , m_mscActions(mscActions)
 {
     Core::Context contexts;
@@ -73,13 +74,12 @@ MscEditorData::~MscEditorData()
 
 Core::IEditor *MscEditorData::createEditor()
 {
-    auto *mscEditor = new MscQtCEditor(m_storage, m_mscActions);
+    auto *mscEditor = new MscQtCEditor(m_projectManager, m_mscActions);
 
     connect(mscEditor->mscDocument(), &spctr::MscEditorDocument::mscDataLoaded, this,
             [this](const QString &fileName, QSharedPointer<msc::MSCEditorCore> data) {
                 data->minimapView()->setVisible(m_minimapVisible);
                 m_undoGroup->addStack(data->undoStack());
-                Q_EMIT mscDataLoaded(fileName, data);
             });
 
     return mscEditor;

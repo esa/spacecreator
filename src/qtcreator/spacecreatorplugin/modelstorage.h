@@ -33,7 +33,6 @@ class IVEditorCore;
 namespace msc {
 class MSCEditorCore;
 }
-
 namespace shared {
 class EditorCore;
 }
@@ -59,6 +58,8 @@ public:
     // Query functions
     QSharedPointer<ive::IVEditorCore> ivCore() const;
     QVector<QSharedPointer<msc::MSCEditorCore>> allMscCores() const;
+
+    bool contains(QSharedPointer<shared::EditorCore> core) const;
 
     static QStringList allAadlFiles();
     static QStringList allMscFiles();
