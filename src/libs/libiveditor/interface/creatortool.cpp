@@ -477,7 +477,7 @@ bool CreatorTool::onMouseMove(QMouseEvent *e)
 
                     if (item->parentItem() == d->previewItem->parentItem()
                             || (d->previewItem->parentItem() == item
-                                       && !item->sceneBoundingRect().contains(expandedGeometry))) {
+                                    && !item->sceneBoundingRect().contains(expandedGeometry))) {
                         items.insert(iObjItem);
                     }
                 });
@@ -940,18 +940,17 @@ void CreatorTool::CreatorToolPrivate::handleConnection(const QVector<QPointF> &g
             parentForConnection = item;
             break;
         }
+        const QRectF rect = item->sceneBoundingRect();
         const QVector<QPointF> intersectionPoints =
-                shared::graphicsviewutils::intersectionPoints(item->sceneBoundingRect(), info.connectionPoints);
+                shared::graphicsviewutils::intersectionPoints(rect, info.connectionPoints);
         if (intersectionPoints.isEmpty() || intersectionPoints.size() % 2 == 0) {
             parentForConnection = item;
             break;
         }
 
-        const QRectF rect = item->sceneBoundingRect();
-        auto beginIt =
-                std::find(info.connectionPoints.constBegin(), info.connectionPoints.constEnd(), firstExcludedPoint);
-        auto endIt = std::find_if(info.connectionPoints.constBegin(), info.connectionPoints.constEnd(),
-                [&rect](const QPointF &point) { return !rect.contains(point); });
+        auto beginIt = std::find(info.connectionPoints.cbegin(), info.connectionPoints.cend(), firstExcludedPoint);
+        auto endIt = std::find_if(
+                beginIt, info.connectionPoints.cend(), [&rect](const QPointF &point) { return !rect.contains(point); });
         QVector<QPointF> points { startInterfacePoint };
         std::copy(beginIt, endIt, std::back_inserter(points));
         points.append(intersectionPoints.last());
@@ -989,20 +988,19 @@ void CreatorTool::CreatorToolPrivate::handleConnection(const QVector<QPointF> &g
             parentForConnection = item;
             break;
         }
-        auto intersectionPoints =
-                shared::graphicsviewutils::intersectionPoints(item->sceneBoundingRect(), info.connectionPoints);
+        const QRectF rect = item->sceneBoundingRect();
+        const auto intersectionPoints = shared::graphicsviewutils::intersectionPoints(rect, info.connectionPoints);
         if (intersectionPoints.isEmpty() || intersectionPoints.size() % 2 == 0) {
             Q_ASSERT(parentForConnection == item || parentForConnection == nullptr);
             parentForConnection = item;
             break;
         }
-        const QRectF rect = item->sceneBoundingRect();
         auto beginIt = std::find(info.connectionPoints.crbegin(), info.connectionPoints.crend(), lastExcludedPoint);
-        auto endIt = std::find_if(info.connectionPoints.crbegin(), info.connectionPoints.crend(),
+        auto endIt = std::find_if(beginIt, info.connectionPoints.crend(),
                 [&rect](const QPointF &point) { return !rect.contains(point); });
         QVector<QPointF> points { endInterfacePoint };
         std::copy(beginIt, endIt, std::back_inserter(points));
-        points.append(intersectionPoints.last());
+        points.append(intersectionPoints.first());
 
         if (item == info.functionAtStartPos) {
             ifaceCommons.id = info.startIfaceId;
@@ -1010,7 +1008,7 @@ void CreatorTool::CreatorToolPrivate::handleConnection(const QVector<QPointF> &g
             ifaceCommons.id = shared::createId();
 
             ifaceCommons.function = item->entity();
-            ifaceCommons.position = intersectionPoints.last();
+            ifaceCommons.position = intersectionPoints.first();
             ifaceCommons.type = info.endIface ? info.endIface->direction() : ivm::AADLIface::IfaceType::Provided;
 
             if (!cmdMacro.push(createInterfaceCommand(ifaceCommons)))
@@ -1018,20 +1016,20 @@ void CreatorTool::CreatorToolPrivate::handleConnection(const QVector<QPointF> &g
         }
 
         auto cmd = new cmd::CmdConnectionItemCreate(
-                model->objectsModel(), item->entity(), prevStartIfaceId, ifaceCommons.id, points);
+                model->objectsModel(), item->entity(), prevEndIfaceId, ifaceCommons.id, points);
         if (!cmdMacro.push(cmd))
             return;
 
         lastExcludedPoint = endIt != info.connectionPoints.crend() ? *endIt : QPointF();
-        endInterfacePoint = intersectionPoints.last();
+        endInterfacePoint = intersectionPoints.first();
         prevEndItem = item;
         prevEndIfaceId = ifaceCommons.id;
     }
 
-    auto beginIt = std::find(info.connectionPoints.constBegin(), info.connectionPoints.constEnd(), firstExcludedPoint);
-    auto endIt = std::find(beginIt, info.connectionPoints.constEnd(), lastExcludedPoint);
+    auto beginIt = std::find(info.connectionPoints.cbegin(), info.connectionPoints.cend(), firstExcludedPoint);
+    auto endIt = std::find(beginIt, info.connectionPoints.cend(), lastExcludedPoint);
     QVector<QPointF> resultPoints { startInterfacePoint };
-    if (endIt != info.connectionPoints.constEnd()) {
+    if (endIt != info.connectionPoints.cend()) {
         std::advance(endIt, 1);
         std::copy(beginIt, endIt, std::back_inserter(resultPoints));
     }
@@ -1039,7 +1037,7 @@ void CreatorTool::CreatorToolPrivate::handleConnection(const QVector<QPointF> &g
     Q_ASSERT(resultPoints.size() >= 2);
     if (resultPoints.first() != resultPoints.last()) {
         auto cmd = new cmd::CmdConnectionItemCreate(model->objectsModel(),
-                parentForConnection ? parentForConnection->entity() : nullptr, prevStartIfaceId, ifaceCommons.id,
+                parentForConnection ? parentForConnection->entity() : nullptr, prevStartIfaceId, prevEndIfaceId,
                 resultPoints);
         if (!cmdMacro.push(cmd))
             return;
