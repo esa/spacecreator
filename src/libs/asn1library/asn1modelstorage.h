@@ -59,10 +59,8 @@ private:
     bool loadFile(const QString &fileName);
     QSharedPointer<Asn1Acn::File> loadData(const QString &fileName) const;
     Q_SLOT void loadChangedFiles();
-    QSharedPointer<File> defaultTypes() const;
 
     QHash<QString, QSharedPointer<Asn1Acn::File>> m_store;
-    mutable QSharedPointer<Asn1Acn::File> m_defaultTypes;
     QFileSystemWatcher *m_asn1Watcher = nullptr;
     QTimer m_reloadTimer;
     QSet<QString> m_filesToReload;

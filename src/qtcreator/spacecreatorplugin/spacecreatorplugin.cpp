@@ -18,7 +18,6 @@
 #include "spacecreatorplugin.h"
 
 #include "aadlsystemchecks.h"
-#include "asn1library.h"
 #include "context/action/actionsmanager.h"
 #include "dv/deploymenteditorfactory.h"
 #include "interface/interfacedocument.h"
@@ -53,7 +52,6 @@ void initMscResources()
 {
     Q_INIT_RESOURCE(asn1_resources);
     shared::initSharedLibrary();
-    Asn1Acn::initAsn1Library();
     msc::initMscLibrary();
     msc::initMscEditor();
     ive::initIvEditor();

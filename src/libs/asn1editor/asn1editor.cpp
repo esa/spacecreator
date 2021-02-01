@@ -71,7 +71,7 @@ Asn1Editor::~Asn1Editor()
 void Asn1Editor::setValue(const QString &value)
 {
     const QString &currentType { ui->typesCB->currentText() };
-    if (value.isEmpty() || currentType.isEmpty()) {
+    if (value.isEmpty() || currentType.isEmpty() || !m_asn1Types) {
         return;
     }
 

@@ -33,28 +33,6 @@
 
 namespace Asn1Acn {
 
-QString ensureAsnFileExists()
-{
-    const QString asnFileName("taste-types.asn");
-    const QString targetDir = QStandardPaths::writableLocation(QStandardPaths::AppLocalDataLocation);
-
-    const bool ok = shared::ensureDirExists(targetDir);
-    if (!ok) {
-        qWarning() << "Unable to create directory" << targetDir;
-        return {};
-    }
-
-    QString asnFilePath = QString("%1/%2").arg(targetDir, asnFileName);
-
-    const QString &rscFilePath = QString(":/asn1resources/%1").arg(asnFileName);
-    if (shared::copyResourceFile(rscFilePath, asnFilePath, shared::FileCopyingMode::Overwrite)) {
-        return asnFilePath;
-    }
-
-    qWarning() << "Can't create default ASN datatypes file" << asnFilePath;
-    return QString();
-}
-
 /*!
    \brief Asn1ModelStorage::Asn1ModelStorage
  */
@@ -77,7 +55,7 @@ Asn1ModelStorage::~Asn1ModelStorage() { }
 QSharedPointer<Asn1Acn::File> Asn1ModelStorage::asn1DataTypes(const QString &fileName) const
 {
     if (fileName.isEmpty()) {
-        return defaultTypes();
+        return {};
     }
 
     if (!m_store.contains(fileName)) {
@@ -88,7 +66,7 @@ QSharedPointer<Asn1Acn::File> Asn1ModelStorage::asn1DataTypes(const QString &fil
     if (m_store.contains(fileName)) {
         return m_store[fileName];
     } else {
-        return defaultTypes();
+        return {};
     }
 }
 
@@ -156,15 +134,6 @@ void Asn1ModelStorage::loadChangedFiles()
         loadFile(fileName);
     }
     m_filesToReload.clear();
-}
-
-QSharedPointer<File> Asn1ModelStorage::defaultTypes() const
-{
-    if (m_defaultTypes.isNull()) {
-        const QString defaultFile = ensureAsnFileExists();
-        m_defaultTypes = loadData(defaultFile);
-    }
-    return m_defaultTypes;
 }
 
 }

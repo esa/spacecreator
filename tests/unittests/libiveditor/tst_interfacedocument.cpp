@@ -19,7 +19,6 @@
 #include "aadliface.h"
 #include "aadlmodel.h"
 #include "aadltestutils.h"
-#include "asn1library.h"
 #include "asn1modelstorage.h"
 #include "interface/interfacedocument.h"
 #include "iveditor.h"
@@ -44,7 +43,6 @@ private:
 
 void tst_InterfaceDocument::initTestCase()
 {
-    Asn1Acn::initAsn1Library();
     ive::initIvEditor();
     QStandardPaths::setTestModeEnabled(true);
 }
@@ -56,7 +54,9 @@ void tst_InterfaceDocument::init()
 
 void tst_InterfaceDocument::test_checkAllInterfacesForAsn1Compliance()
 {
-    // see "asn1library/asn1resources/taste-types.asn" for the default
+    ivDoc->setPath(QString(EXAMPLES_DIR).append("asn1/interfaceview.xml"));
+    ivDoc->setAsn1FileName("dataview-uniq.asn");
+
     auto fn1 = new ivm::AADLFunction("Fn1");
     ivDoc->objectsModel()->addObject(fn1);
 
@@ -67,7 +67,7 @@ void tst_InterfaceDocument::test_checkAllInterfacesForAsn1Compliance()
 
     // Used type is defined in ASN1
     auto if2 = ivm::testutils::createIface(fn1, ivm::AADLIface::IfaceType::Provided, "If2");
-    if2->addParam(ivm::IfaceParameter("IfaceParam", ivm::BasicParameter::Type::Other, "T-Int31"));
+    if2->addParam(ivm::IfaceParameter("IfaceParam", ivm::BasicParameter::Type::Other, "T-UInt32"));
     ok = ivDoc->checkAllInterfacesForAsn1Compliance();
     QCOMPARE(ok, true);
 
