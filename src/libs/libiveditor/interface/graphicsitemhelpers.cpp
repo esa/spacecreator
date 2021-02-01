@@ -17,12 +17,12 @@
 
 #include "graphicsitemhelpers.h"
 
-#include "aadlobject.h"
 #include "aadlcomment.h"
 #include "aadlconnection.h"
 #include "aadlfunction.h"
 #include "aadlfunctiontype.h"
 #include "aadliface.h"
+#include "aadlobject.h"
 #include "baseitems/common/aadlutils.h"
 #include "baseitems/interactiveobject.h"
 #include "connectioncreationvalidator.h"
@@ -183,12 +183,10 @@ ivm::ValidationResult validateConnectionCreate(QGraphicsScene *scene, const QVec
 
     ivm::ValidationResult result;
     result.connectionPoints = points;
-    result.functionAtStartPos =
-            ive::nearestItem(scene, ive::adjustFromPoint(startPos, kFunctionTolerance),
-                    { ive::AADLFunctionGraphicsItem::Type });
-    result.functionAtEndPos =
-            ive::nearestItem(scene, ive::adjustFromPoint(endPos, kFunctionTolerance),
-                    { ive::AADLFunctionGraphicsItem::Type });
+    result.functionAtStartPos = ive::nearestItem(
+            scene, ive::adjustFromPoint(startPos, kFunctionTolerance), { ive::AADLFunctionGraphicsItem::Type });
+    result.functionAtEndPos = ive::nearestItem(
+            scene, ive::adjustFromPoint(endPos, kFunctionTolerance), { ive::AADLFunctionGraphicsItem::Type });
     result.startObject = ive::gi::functionObject(result.functionAtStartPos);
     result.endObject = ive::gi::functionObject(result.functionAtEndPos);
     result.isToOrFromNested =
@@ -200,9 +198,8 @@ ivm::ValidationResult validateConnectionCreate(QGraphicsScene *scene, const QVec
         return result;
     }
 
-    const auto startIfaceItem = qgraphicsitem_cast<ive::AADLInterfaceGraphicsItem *>(
-            ive::nearestItem(scene, ive::adjustFromPoint(startPos, kInterfaceTolerance),
-                    { ive::AADLInterfaceGraphicsItem::Type }));
+    const auto startIfaceItem = qgraphicsitem_cast<ive::AADLInterfaceGraphicsItem *>(ive::nearestItem(
+            scene, ive::adjustFromPoint(startPos, kInterfaceTolerance), { ive::AADLInterfaceGraphicsItem::Type }));
     if (startIfaceItem
             && startIfaceItem->ifaceShape()
                        .boundingRect()
@@ -223,9 +220,8 @@ ivm::ValidationResult validateConnectionCreate(QGraphicsScene *scene, const QVec
         return result;
     }
 
-    const auto endIfaceItem = qgraphicsitem_cast<ive::AADLInterfaceGraphicsItem *>(
-            ive::nearestItem(scene, ive::adjustFromPoint(endPos, kInterfaceTolerance),
-                    { ive::AADLInterfaceGraphicsItem::Type }));
+    const auto endIfaceItem = qgraphicsitem_cast<ive::AADLInterfaceGraphicsItem *>(ive::nearestItem(
+            scene, ive::adjustFromPoint(endPos, kInterfaceTolerance), { ive::AADLInterfaceGraphicsItem::Type }));
     if (endIfaceItem
             && endIfaceItem->ifaceShape()
                        .boundingRect()

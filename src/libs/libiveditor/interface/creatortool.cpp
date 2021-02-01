@@ -844,7 +844,7 @@ bool CreatorTool::CreatorToolPrivate::handleConnectionCreate(const QPointF &pos)
     if (auto itemUnderCursor = qgraphicsitem_cast<AADLInterfaceGraphicsItem *>(
                 nearestItem(scene, pos, kInterfaceTolerance, { AADLInterfaceGraphicsItem::Type }))) {
         const QPointF finishPoint = itemUnderCursor->connectionEndPoint();
-        if (!itemUnderCursor->ifaceShape().contains(this->connectionPoints.front())) {
+        if (!itemUnderCursor->ifaceShape().boundingRect().contains(this->connectionPoints.front())) {
             this->connectionPoints.append(finishPoint);
             return true;
         }
@@ -907,7 +907,9 @@ void CreatorTool::CreatorToolPrivate::handleConnection(const QVector<QPointF> &g
         ifaceCommons.function = info.startObject;
         ifaceCommons.position = info.startPointAdjusted;
         ifaceCommons.id = info.startIfaceId;
-        ifaceCommons.type = ivm::AADLIface::IfaceType::Required;
+        ifaceCommons.type = info.isToOrFromNested && graphicPoints.last() == info.connectionPoints.first()
+                ? ivm::AADLIface::IfaceType::Provided
+                : ivm::AADLIface::IfaceType::Required;
         ifaceCommons.resetKind();
 
         if (!cmdMacro.push(createInterfaceCommand(ifaceCommons)))
@@ -916,8 +918,11 @@ void CreatorTool::CreatorToolPrivate::handleConnection(const QVector<QPointF> &g
         ifaceCommons.function = info.endObject;
         ifaceCommons.position = info.endPointAdjusted;
         ifaceCommons.id = info.endIfaceId;
-        ifaceCommons.type =
-                info.isToOrFromNested ? ivm::AADLIface::IfaceType::Required : ivm::AADLIface::IfaceType::Provided;
+        if (!info.isToOrFromNested) {
+            ifaceCommons.type = ifaceCommons.type == ivm::AADLIface::IfaceType::Provided
+                    ? ivm::AADLIface::IfaceType::Required
+                    : ivm::AADLIface::IfaceType::Provided;
+        }
         ifaceCommons.resetKind();
 
         if (!cmdMacro.push(createInterfaceCommand(ifaceCommons)))
@@ -955,8 +960,10 @@ void CreatorTool::CreatorToolPrivate::handleConnection(const QVector<QPointF> &g
         std::copy(beginIt, endIt, std::back_inserter(points));
         points.append(intersectionPoints.last());
 
-        ifaceCommons.type = info.startIface ? info.startIface->direction() : ivm::AADLIface::IfaceType::Required;
-
+        ifaceCommons.type = info.startIface
+                ? info.startIface->direction()
+                : (graphicPoints.last() == info.connectionPoints.first() ? ivm::AADLIface::IfaceType::Provided
+                                                                         : ivm::AADLIface::IfaceType::Required);
         if (item == info.functionAtEndPos) {
             ifaceCommons.id = info.endIfaceId;
         } else {
@@ -1009,7 +1016,11 @@ void CreatorTool::CreatorToolPrivate::handleConnection(const QVector<QPointF> &g
 
             ifaceCommons.function = item->entity();
             ifaceCommons.position = intersectionPoints.first();
-            ifaceCommons.type = info.endIface ? info.endIface->direction() : ivm::AADLIface::IfaceType::Provided;
+
+            ifaceCommons.type = info.endIface
+                    ? info.endIface->direction()
+                    : (graphicPoints.last() == info.connectionPoints.first() ? ivm::AADLIface::IfaceType::Required
+                                                                             : ivm::AADLIface::IfaceType::Provided);
 
             if (!cmdMacro.push(createInterfaceCommand(ifaceCommons)))
                 return;
@@ -1050,7 +1061,8 @@ void CreatorTool::CreatorToolPrivate::handleConnectionReCreate(const QVector<QPo
 {
     toolType = ToolType::Pointer;
     const auto info = ive::gi::validateConnectionCreate(view ? view->scene() : nullptr, graphicPoints);
-    if (info.status != ivm::ConnectionCreationValidator::FailReason::MulticastDisabled) {
+    if (info.status != ivm::ConnectionCreationValidator::FailReason::MulticastDisabled
+            && info.status != ivm::ConnectionCreationValidator::FailReason::NotFail) {
         return;
     }
     const shared::Id id = previewConnectionItem->data(Qt::UserRole).toUuid();
@@ -1084,8 +1096,9 @@ bool CreatorTool::CreatorToolPrivate::warnConnectionPreview(const QPointF &pos)
     auto info = ive::gi::validateConnectionCreate(this->view ? this->view->scene() : nullptr, connectionPoints);
     bool warn = true;
     if (toolType == ToolType::ReCreateConnection) {
-        if (info.status != ivm::ConnectionCreationValidator::FailReason::MulticastDisabled || !info.endIface
-                || !info.startIface) {
+        if ((info.status != ivm::ConnectionCreationValidator::FailReason::MulticastDisabled
+                    && info.status != ivm::ConnectionCreationValidator::FailReason::NotFail)
+                || !info.endIface || !info.startIface) {
             warn = true;
         } else {
             auto startItem = qgraphicsitem_cast<AADLInterfaceGraphicsItem *>(model->getItem(info.startIfaceId));
@@ -1093,8 +1106,8 @@ bool CreatorTool::CreatorToolPrivate::warnConnectionPreview(const QPointF &pos)
             if (!startItem || !endItem) {
                 warn = true;
             } else {
-                warn = !startItem->ifaceShape().contains(connectionPoints.first())
-                        && endItem->ifaceShape().contains(connectionPoints.last());
+                warn = !startItem->ifaceShape().boundingRect().contains(connectionPoints.first())
+                        && endItem->ifaceShape().boundingRect().contains(connectionPoints.last());
             }
         }
     } else {
