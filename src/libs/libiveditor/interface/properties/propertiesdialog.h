@@ -52,7 +52,6 @@ public:
     ~PropertiesDialog() override;
 
 public Q_SLOTS:
-    void open() override;
     void done(int r) override;
 
 private:

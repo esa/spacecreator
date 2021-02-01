@@ -120,7 +120,7 @@ void PropertiesListModel::setDataObject(ivm::AADLObject *obj)
     connect(m_dataObject, qOverload<const QString &>(&ivm::AADLObject::attributeChanged), this,
             &PropertiesListModel::invalidateAttributes, Qt::UniqueConnection);
 
-    auto initRows = [this](const QHash<QString, QVariant> &vals, ivm::PropertyTemplate::Info info, int offset,
+    auto initRows = [this](const QHash<QString, QVariant> &vals, ivm::PropertyTemplate::Info info,
                             const QHash<QString, ivm::PropertyTemplate *> &templates) {
         QList<QString> keys(vals.keys());
         std::sort(keys.begin(), keys.end());
@@ -132,8 +132,8 @@ void PropertiesListModel::setDataObject(ivm::AADLObject *obj)
             const QVariant propTemplatesValues = propertyPtr ? propertyPtr->valuesList() : QVariant();
             const ivm::PropertyTemplate::Type type =
                     propertyPtr ? propertyPtr->type() : ivm::PropertyTemplate::Type::String;
-            const QString title = propertyPtr ? propertyPtr->label() : QString();
-            createNewRow(i + offset, title, keys[i], info, vals[keys[i]],
+            const QString title = propertyPtr ? propertyPtr->label() : keys[i];
+            createNewRow(rowCount(), title, keys[i], info, vals[keys[i]],
                     propertyPtr ? ivm::PropertyTemplate::convertData(propTemplatesValues, type)
                                 : QVariant(QVariant::String),
                     propertyPtr ? propertyPtr->defaultValue() : QVariant(QVariant::String));
@@ -143,8 +143,8 @@ void PropertiesListModel::setDataObject(ivm::AADLObject *obj)
     const auto templates = m_propTamplesConfig->propertyTemplatesForObject(m_dataObject);
 
     beginResetModel();
-    initRows(m_dataObject->attrs(), ivm::PropertyTemplate::Info::Attribute, rowCount(), templates);
-    initRows(m_dataObject->props(), ivm::PropertyTemplate::Info::Property, rowCount(), templates);
+    initRows(m_dataObject->attrs(), ivm::PropertyTemplate::Info::Attribute, templates);
+    initRows(m_dataObject->props(), ivm::PropertyTemplate::Info::Property, templates);
 
     for (auto propTemplate : templates) {
         if (!m_names.contains(propTemplate->name()) && propTemplate->isVisible()) {
@@ -265,6 +265,7 @@ bool PropertiesListModel::setData(const QModelIndex &index, const QVariant &valu
                 if (idx >= 0) {
                     m_names.replace(idx, newName);
                 }
+                QStandardItemModel::setData(index, newName, PropertyNameRole);
                 break;
             }
             default: {

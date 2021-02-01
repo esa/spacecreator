@@ -98,11 +98,6 @@ QString PropertiesDialog::objectTypeName() const
     }
 }
 
-void PropertiesDialog::open()
-{
-    QDialog::open();
-}
-
 void PropertiesDialog::done(int r)
 {
     m_cmdMacro->setComplete(r == QDialog::Accepted);
