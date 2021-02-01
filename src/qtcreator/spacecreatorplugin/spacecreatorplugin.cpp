@@ -21,6 +21,7 @@
 #include "asn1library.h"
 #include "context/action/actionsmanager.h"
 #include "dv/deploymenteditorfactory.h"
+#include "interface/interfacedocument.h"
 #include "iv/aadleditordata.h"
 #include "iv/aadleditorfactory.h"
 #include "iv/aadlqtceditor.h"
@@ -147,6 +148,18 @@ bool SpaceCreatorPlugin::initialize(const QStringList &arguments, QString *error
         }
     });
 
+    m_exportSelectedIV = new QAction(QIcon(QLatin1String(":/tab_interface/toolbar/icns/export_selected.svg")),
+            tr("Export selected entity"), this);
+    Core::Command *exportElectedCmd = Core::ActionManager::registerAction(
+            m_exportSelectedIV, Constants::AADL_EXPORT_SELECTED_ID, Core::Context(Core::Constants::C_EDIT_MODE));
+    connect(m_exportSelectedIV, &QAction::triggered, this, &SpaceCreatorPlugin::exportSelectedIV);
+
+    m_exportIVType = new QAction(QIcon(QLatin1String(":/tab_interface/toolbar/icns/export_component_type.svg")),
+            tr("Export component type"), this);
+    Core::Command *exporttypeCmd = Core::ActionManager::registerAction(
+            m_exportIVType, Constants::AADL_EXPORT_IV_TYPE_ID, Core::Context(Core::Constants::C_EDIT_MODE));
+    connect(m_exportIVType, &QAction::triggered, this, &SpaceCreatorPlugin::exportComponentType);
+
     connect(Core::EditorManager::instance(), &Core::EditorManager::currentEditorChanged, this,
             &spctr::SpaceCreatorPlugin::updateActions);
     updateActions();
@@ -154,6 +167,8 @@ bool SpaceCreatorPlugin::initialize(const QStringList &arguments, QString *error
     menu->addSeparator();
     menu->addAction(showAsn1Cmd);
     menu->addAction(renderCmd);
+    menu->addAction(exportElectedCmd);
+    menu->addAction(exporttypeCmd);
     menu->menu()->setEnabled(true);
     Core::ActionManager::actionContainer(Core::Constants::M_TOOLS)->addMenu(menu);
 
@@ -161,7 +176,8 @@ bool SpaceCreatorPlugin::initialize(const QStringList &arguments, QString *error
     mscActions << m_showMinimapAction << m_checkInstancesAction << m_checkMessagesAction;
     m_mscFactory = new MscEditorFactory(m_projectsManager, mscActions, this);
     QList<QAction *> ivActions;
-    ivActions << m_asn1DialogAction << m_showMinimapAction << m_showE2EDataflow << m_actionSaveSceneRender;
+    ivActions << m_asn1DialogAction << m_showMinimapAction << m_showE2EDataflow << m_exportSelectedIV << m_exportIVType
+              << m_actionSaveSceneRender;
     m_aadlFactory = new AadlEditorFactory(m_projectsManager, ivActions, this);
     m_deploymentFactory = new DeploymentEditorFactory(this);
 
@@ -216,6 +232,26 @@ void SpaceCreatorPlugin::showAsn1Dialog()
     }
 }
 
+void SpaceCreatorPlugin::exportSelectedIV()
+{
+    if (auto ivEditor = qobject_cast<spctr::AadlQtCEditor *>(Core::EditorManager::currentEditor())) {
+        SpaceCreatorProject *project = m_projectsManager->project(ivEditor->ivPlugin());
+        if (project) {
+            ivEditor->ivPlugin()->document()->exportSelectedFunctions();
+        }
+    }
+}
+
+void SpaceCreatorPlugin::exportComponentType()
+{
+    if (auto ivEditor = qobject_cast<spctr::AadlQtCEditor *>(Core::EditorManager::currentEditor())) {
+        SpaceCreatorProject *project = m_projectsManager->project(ivEditor->ivPlugin());
+        if (project) {
+            ivEditor->ivPlugin()->document()->exportSelectedType();
+        }
+    }
+}
+
 /*!
    Update the actiones enabled/disabled to represent the current editor
  */
@@ -233,6 +269,8 @@ void SpaceCreatorPlugin::updateActions()
     m_actionSaveSceneRender->setEnabled(isAadl);
     m_showMinimapAction->setEnabled(isAadl || isMsc);
     m_showE2EDataflow->setEnabled(isAadl);
+    m_exportSelectedIV->setEnabled(isAadl);
+    m_exportIVType->setEnabled(isAadl);
 }
 
 void SpaceCreatorPlugin::checkInstancesForCurrentEditor()

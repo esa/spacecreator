@@ -48,6 +48,8 @@ const char AADL_RENDER_ID[] = "AadlEditor.RenderToFile";
 const char AADL_SHOW_COMMON_PROPS_ID[] = "AadlEditor.CommonProps";
 const char AADL_SHOW_COLOR_SCHEME_ID[] = "AadlEditor.ColorScheme";
 const char AADL_SHOW_DYN_CONTEXT_ID[] = "AadlEditor.DynContext";
+const char AADL_EXPORT_SELECTED_ID[] = "AadlEditor.ExportSelected";
+const char AADL_EXPORT_IV_TYPE_ID[] = "AadlEditor.ExportComponentType";
 
 // Settings
 const char SETTINGS_CATEGORY_DISPLAY[] = QT_TRANSLATE_NOOP("SpaceCreator", "SpaceCreator");

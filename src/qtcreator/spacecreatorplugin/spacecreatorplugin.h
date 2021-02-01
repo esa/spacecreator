@@ -70,6 +70,8 @@ private Q_SLOTS:
     void setMinimapVisible(bool visible);
     void showE2EDataflow();
     void showAsn1Dialog();
+    void exportSelectedIV();
+    void exportComponentType();
     void updateActions();
     void checkInstancesForCurrentEditor();
     void checkMesagesForCurrentEditor();
@@ -85,6 +87,8 @@ private:
     QAction *m_actionSaveSceneRender = nullptr;
     QAction *m_showMinimapAction = nullptr;
     QAction *m_showE2EDataflow = nullptr;
+    QAction *m_exportSelectedIV = nullptr;
+    QAction *m_exportIVType = nullptr;
     SpaceCreatorProjectManager *m_projectsManager = nullptr;
 
     Asn1SccOption m_asnCommandOptions;
