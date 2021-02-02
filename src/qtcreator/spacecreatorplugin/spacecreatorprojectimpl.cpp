@@ -15,11 +15,10 @@
    along with this program. If not, see <https://www.gnu.org/licenses/lgpl-2.1.html>.
 */
 
-#include "spacecreatorproject.h"
+#include "spacecreatorprojectimpl.h"
 
 #include "editorcore.h"
 #include "iveditorcore.h"
-#include "modelstorage.h"
 #include "msceditorcore.h"
 #include "mscsystemchecks.h"
 
@@ -28,29 +27,44 @@
 
 namespace spctr {
 
-SpaceCreatorProject::SpaceCreatorProject(ProjectExplorer::Project *project)
-    : m_project(project)
-    , m_storage(new ModelStorage)
+SpaceCreatorProjectImpl::SpaceCreatorProjectImpl(ProjectExplorer::Project *project, QObject *parent)
+    : scs::SpaceCreatorProject(parent)
+    , m_project(project)
     , m_checks(new scs::MscSystemChecks)
 {
     Q_ASSERT(m_project);
-    m_checks->setStorage(m_storage.get());
+    m_checks->setStorage(this);
 
-    connect(m_storage.get(), &spctr::ModelStorage::editedExternally, this, &spctr::SpaceCreatorProject::saveIfNotOpen);
+    connect(this, &scs::SpaceCreatorProject::editedExternally, this, &spctr::SpaceCreatorProjectImpl::saveIfNotOpen);
 
-    m_asnFiles = m_storage->allAsn1Files();
+    m_asnFiles = allAsn1Files();
     connect(m_project, &ProjectExplorer::Project::fileListChanged, this,
-            &spctr::SpaceCreatorProject::checkAsnFileRename);
+            &spctr::SpaceCreatorProjectImpl::checkAsnFileRename);
 }
 
-SpaceCreatorProject::~SpaceCreatorProject() { }
+SpaceCreatorProjectImpl::~SpaceCreatorProjectImpl() { }
+
+/*!
+   Returns all files of the current project endig with the given \p suffix
+ */
+QStringList SpaceCreatorProjectImpl::projectFiles(const QString &suffix) const
+{
+    QStringList result;
+    for (const Utils::FileName &fileName : m_project->files(ProjectExplorer::Project::AllFiles)) {
+        if (fileName.toString().endsWith(suffix, Qt::CaseInsensitive)) {
+            result.append(fileName.toString());
+        }
+    }
+
+    return result;
+}
 
 /*!
    Checks if one asn1 file was renamed. If yes, update the filename in all msc and aadl files.
  */
-void SpaceCreatorProject::checkAsnFileRename()
+void SpaceCreatorProjectImpl::checkAsnFileRename()
 {
-    QStringList asnFiles = m_storage->allAsn1Files();
+    QStringList asnFiles = allAsn1Files();
 
     QStringList newAsnFiles;
     for (const QString &file : qAsConst(asnFiles)) {
@@ -66,10 +80,10 @@ void SpaceCreatorProject::checkAsnFileRename()
     }
 
     if (newAsnFiles.size() == 1 && lostAsnFiles.size() == 1) {
-        for (QSharedPointer<msc::MSCEditorCore> &mscCore : m_storage->allMscCores()) {
+        for (QSharedPointer<msc::MSCEditorCore> &mscCore : allMscCores()) {
             mscCore->renameAsnFile(lostAsnFiles[0], newAsnFiles[0]);
         }
-        m_storage->ivCore()->renameAsnFile(lostAsnFiles[0], newAsnFiles[0]);
+        ivCore()->renameAsnFile(lostAsnFiles[0], newAsnFiles[0]);
     }
 
     m_asnFiles = asnFiles;
@@ -78,7 +92,7 @@ void SpaceCreatorProject::checkAsnFileRename()
 /*!
    Saves the data of the given \p core in case it is not open in one of the QtCretaor editors
  */
-void SpaceCreatorProject::saveIfNotOpen(shared::EditorCore *core)
+void SpaceCreatorProjectImpl::saveIfNotOpen(shared::EditorCore *core)
 {
     if (!isOpenInEditor(core)) {
         core->save();
@@ -88,7 +102,7 @@ void SpaceCreatorProject::saveIfNotOpen(shared::EditorCore *core)
 /*!
    Returns true, if the file of the given /p core is open in an editor
  */
-bool SpaceCreatorProject::isOpenInEditor(shared::EditorCore *core) const
+bool SpaceCreatorProjectImpl::isOpenInEditor(shared::EditorCore *core) const
 {
     QList<Core::IDocument *> openDocuments = Core::DocumentModel::openedDocuments();
     for (Core::IDocument *doc : qAsConst(openDocuments)) {

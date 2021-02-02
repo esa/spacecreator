@@ -20,9 +20,9 @@
 #include "aadlmainwidget.h"
 #include "interface/interfacedocument.h"
 #include "iveditorcore.h"
-#include "modelstorage.h"
 #include "spacecreatorpluginconstants.h"
 #include "spacecreatorproject.h"
+#include "spacecreatorprojectimpl.h"
 #include "spacecreatorprojectmanager.h"
 #include "xmldocexporter.h"
 
@@ -56,11 +56,9 @@ Core::IDocument::OpenResult AadlEditorDocument::open(
     const QFileInfo fi(fileName);
     const QString absfileName = fi.absoluteFilePath();
 
-    SpaceCreatorProject *project = m_projectManager->project(absfileName);
-    ModelStorage *storage = project ? project->storage() : m_projectManager->orphanStorage();
-
+    SpaceCreatorProjectImpl *project = m_projectManager->project(absfileName);
+    scs::SpaceCreatorProject *storage = project ? project : m_projectManager->orphanStorage();
     m_plugin = storage->ivData(absfileName);
-
     if (m_plugin.isNull()) {
         return OpenResult::ReadError;
     }

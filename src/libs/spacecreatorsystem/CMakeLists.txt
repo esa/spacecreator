@@ -3,12 +3,12 @@ set(LIB_NAME spacecreatorsystem)
 add_library(${LIB_NAME} STATIC)
 
 target_sources(${LIB_NAME} PRIVATE
-    editorcorequery.cpp
-    editorcorequery.h
     ivsystemchecks.cpp
     ivsystemchecks.h
     mscsystemchecks.cpp
     mscsystemchecks.h
+    spacecreatorproject.cpp
+    spacecreatorproject.h
 )
 
 target_include_directories(${LIB_NAME}

@@ -25,11 +25,11 @@
 #include "documenttreeview.h"
 #include "graphicsview.h"
 #include "mainmodel.h"
-#include "modelstorage.h"
 #include "mscchart.h"
 #include "mscdocument.h"
 #include "msceditorcore.h"
 #include "mscmodel.h"
+#include "spacecreatorprojectimpl.h"
 
 #include <QAction>
 #include <QDebug>
@@ -71,8 +71,9 @@ MscMainWidget::~MscMainWidget()
     }
 }
 
-bool MscMainWidget::init(QSharedPointer<msc::MSCEditorCore> plugin)
+bool MscMainWidget::init(QSharedPointer<msc::MSCEditorCore> plugin, SpaceCreatorProjectImpl *project)
 {
+    m_project = project;
     m_plugin = plugin;
     if (!m_plugin->chartView()) {
         init();
@@ -229,8 +230,11 @@ void MscMainWidget::init()
 
     m_aadlSwitch = new QPushButton("Interface view", leftArea);
     m_aadlSwitch->setToolTip(tr("Open the file"));
-    connect(m_aadlSwitch, &QPushButton::clicked, this, []() {
-        QStringList aadlFiles = ModelStorage::allAadlFiles();
+    connect(m_aadlSwitch, &QPushButton::clicked, this, [this]() {
+        if (!m_project) {
+            return;
+        }
+        QStringList aadlFiles = m_project->allAadlFiles();
         if (!aadlFiles.isEmpty()) {
             Core::EditorManager::instance()->openEditor(aadlFiles.first());
         }

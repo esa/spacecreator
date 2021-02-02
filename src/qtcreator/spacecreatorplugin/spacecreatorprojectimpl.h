@@ -17,6 +17,8 @@
 
 #pragma once
 
+#include "spacecreatorproject.h"
+
 #include <QObject>
 #include <memory>
 
@@ -31,20 +33,20 @@ class EditorCore;
 }
 
 namespace spctr {
-class ModelStorage;
 
 /*!
    Does contain everything to load/store/validate Space Creator models that belong to once QtCreator project
  */
-class SpaceCreatorProject : public QObject
+class SpaceCreatorProjectImpl : public scs::SpaceCreatorProject
 {
 public:
-    explicit SpaceCreatorProject(ProjectExplorer::Project *project);
-    ~SpaceCreatorProject();
+    explicit SpaceCreatorProjectImpl(ProjectExplorer::Project *project, QObject *parent = nullptr);
+    ~SpaceCreatorProjectImpl();
 
     ProjectExplorer::Project *project() const { return m_project; }
-    ModelStorage *storage() const { return m_storage.get(); }
     scs::MscSystemChecks *checks() const { return m_checks.get(); }
+
+    QStringList projectFiles(const QString &suffix) const override;
 
 private Q_SLOTS:
     void checkAsnFileRename();
@@ -54,7 +56,6 @@ private:
     bool isOpenInEditor(shared::EditorCore *core) const;
 
     ProjectExplorer::Project *m_project = nullptr;
-    std::unique_ptr<ModelStorage> m_storage;
     std::unique_ptr<scs::MscSystemChecks> m_checks;
     QStringList m_asnFiles;
 };

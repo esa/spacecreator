@@ -20,7 +20,6 @@
 #include "aadleditordocument.h"
 #include "aadlqtceditor.h"
 #include "iveditorcore.h"
-#include "modelstorage.h"
 #include "msc/msccontext.h"
 #include "spacecreatorpluginconstants.h"
 #include "spacecreatorprojectmanager.h"

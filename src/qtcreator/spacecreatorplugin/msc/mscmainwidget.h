@@ -41,7 +41,7 @@ class ActionsBar;
 }
 
 namespace spctr {
-class MscModelStorage;
+class SpaceCreatorProjectImpl;
 
 class MscMainWidget : public QWidget
 {
@@ -50,7 +50,7 @@ public:
     MscMainWidget(QWidget *parent = nullptr);
     ~MscMainWidget();
 
-    bool init(QSharedPointer<msc::MSCEditorCore> plugin);
+    bool init(QSharedPointer<msc::MSCEditorCore> plugin, SpaceCreatorProjectImpl *project);
 
     QSharedPointer<msc::MSCEditorCore> mscCore() const;
 
@@ -74,6 +74,7 @@ private:
     QPushButton *m_asn1Select = nullptr;
 
     QSharedPointer<msc::MSCEditorCore> m_plugin;
+    QPointer<SpaceCreatorProjectImpl> m_project;
 };
 
 }

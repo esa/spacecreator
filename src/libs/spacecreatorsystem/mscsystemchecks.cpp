@@ -24,7 +24,6 @@
 #include "aadlmodel.h"
 #include "chartlayoutmanager.h"
 #include "commandsstack.h"
-#include "editorcorequery.h"
 #include "interface/commands/cmdentityattributechange.h"
 #include "interface/commands/cmdifaceattrchange.h"
 #include "interface/interfacedocument.h"
@@ -36,6 +35,7 @@
 #include "mscinstance.h"
 #include "mscmessage.h"
 #include "mscmodel.h"
+#include "spacecreatorproject.h"
 #include "undocommand.h"
 
 #include <QDebug>
@@ -50,15 +50,15 @@ MscSystemChecks::MscSystemChecks(QObject *parent)
 {
 }
 
-void MscSystemChecks::setStorage(EditorCoreQuery *storage)
+void MscSystemChecks::setStorage(SpaceCreatorProject *storage)
 {
     m_storage = storage;
 
-    connect(m_storage, &scs::EditorCoreQuery::mscCoreAdded, this, [=](QSharedPointer<msc::MSCEditorCore> core) {
+    connect(m_storage, &scs::SpaceCreatorProject::mscCoreAdded, this, [=](QSharedPointer<msc::MSCEditorCore> core) {
         connect(core.data(), &msc::MSCEditorCore::nameChanged, this, &scs::MscSystemChecks::onMscEntityNameChanged);
     });
 
-    connect(m_storage, &scs::EditorCoreQuery::ivCoreAdded, this, [this](QSharedPointer<ive::IVEditorCore> ivCore) {
+    connect(m_storage, &scs::SpaceCreatorProject::ivCoreAdded, this, [this](QSharedPointer<ive::IVEditorCore> ivCore) {
         connect(ivCore->commandsStack(), &ive::cmd::CommandsStack::nameChanged, this,
                 &scs::MscSystemChecks::onEntityNameChanged);
         connect(ivCore->commandsStack(), &ive::cmd::CommandsStack::entityRemoved, this,

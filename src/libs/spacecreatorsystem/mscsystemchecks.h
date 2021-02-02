@@ -40,7 +40,7 @@ class UndoCommand;
 }
 
 namespace scs {
-class EditorCoreQuery;
+class SpaceCreatorProject;
 
 /*!
    Class to perform consistency checks for MSC against a AADL model
@@ -53,7 +53,7 @@ public:
     MscSystemChecks(QObject *parent = nullptr);
 
     // Setup functions
-    void setStorage(scs::EditorCoreQuery *storage);
+    void setStorage(scs::SpaceCreatorProject *storage);
 
     // Check functions
     bool mscInstancesExist(const QString &name);
@@ -76,7 +76,7 @@ public Q_SLOTS:
     void onEntityRemoved(ivm::AADLObject *entity, shared::UndoCommand *command);
 
 private:
-    QPointer<EditorCoreQuery> m_storage;
+    QPointer<SpaceCreatorProject> m_storage;
     Qt::CaseSensitivity m_caseCheck = Qt::CaseInsensitive;
     bool m_nameUpdateRunning = false;
 };

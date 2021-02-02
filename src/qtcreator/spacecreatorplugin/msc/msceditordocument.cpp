@@ -18,11 +18,11 @@
 #include "msceditordocument.h"
 
 #include "mainmodel.h"
-#include "modelstorage.h"
 #include "msceditorcore.h"
 #include "mscmodel.h"
 #include "spacecreatorpluginconstants.h"
 #include "spacecreatorproject.h"
+#include "spacecreatorprojectimpl.h"
 #include "spacecreatorprojectmanager.h"
 
 #include <QFileInfo>
@@ -55,9 +55,8 @@ Core::IDocument::OpenResult MscEditorDocument::open(
     const QFileInfo fi(fileName);
     const QString absfileName = fi.absoluteFilePath();
 
-    SpaceCreatorProject *project = m_projectManager->project(absfileName);
-    ModelStorage *storage = project ? project->storage() : m_projectManager->orphanStorage();
-
+    SpaceCreatorProjectImpl *project = m_projectManager->project(absfileName);
+    scs::SpaceCreatorProject *storage = project ? project : m_projectManager->orphanStorage();
     m_plugin = storage->mscData(absfileName);
     if (m_plugin.isNull()) {
         return OpenResult::ReadError;

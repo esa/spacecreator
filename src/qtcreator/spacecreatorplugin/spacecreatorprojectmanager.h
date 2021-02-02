@@ -38,10 +38,12 @@ class MSCEditorCore;
 namespace shared {
 class EditorCore;
 }
+namespace scs {
+class SpaceCreatorProject;
+}
 
 namespace spctr {
-class ModelStorage;
-class SpaceCreatorProject;
+class SpaceCreatorProjectImpl;
 
 /*!
    Manages all SpaceCreatorProject that are uses to store and ananlyse space creator data per project.
@@ -58,18 +60,18 @@ public:
     QSharedPointer<ive::IVEditorCore> ivData(const QString &fileName) const;
     QSharedPointer<msc::MSCEditorCore> mscData(const QString &fileName) const;
 
-    SpaceCreatorProject *project(const QString &fileName) const;
-    SpaceCreatorProject *project(const QSharedPointer<shared::EditorCore> &core) const;
+    SpaceCreatorProjectImpl *project(const QString &fileName) const;
+    SpaceCreatorProjectImpl *project(const QSharedPointer<shared::EditorCore> &core) const;
 
-    ModelStorage *orphanStorage() const;
+    scs::SpaceCreatorProject *orphanStorage() const;
 
 private Q_SLOTS:
     void addProject(ProjectExplorer::Project *project);
     void removeProject(ProjectExplorer::Project *project);
 
 private:
-    QList<SpaceCreatorProject *> m_projects;
-    std::unique_ptr<ModelStorage> m_orphanStorage;
+    QList<SpaceCreatorProjectImpl *> m_projects;
+    std::unique_ptr<scs::SpaceCreatorProject> m_orphanStorage;
 };
 
 } // namespace spctr

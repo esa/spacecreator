@@ -17,8 +17,7 @@
 
 #include "spacecreatorprojectmanager.h"
 
-#include "modelstorage.h"
-#include "spacecreatorproject.h"
+#include "spacecreatorprojectimpl.h"
 
 #include <projectexplorer/project.h>
 #include <projectexplorer/session.h>
@@ -27,7 +26,7 @@ namespace spctr {
 
 SpaceCreatorProjectManager::SpaceCreatorProjectManager(QObject *parent)
     : QObject(parent)
-    , m_orphanStorage(new ModelStorage(this))
+    , m_orphanStorage(new scs::SpaceCreatorProject(this))
 {
     connect(ProjectExplorer::SessionManager::instance(), &ProjectExplorer::SessionManager::projectAdded, this,
             &spctr::SpaceCreatorProjectManager::addProject);
@@ -47,8 +46,8 @@ SpaceCreatorProjectManager::~SpaceCreatorProjectManager()
  */
 QSharedPointer<dve::DVEditorCore> SpaceCreatorProjectManager::dvData(const QString &fileName) const
 {
-    if (SpaceCreatorProject *data = project(fileName)) {
-        return data->storage()->dvData(fileName);
+    if (SpaceCreatorProjectImpl *data = project(fileName)) {
+        return data->dvData(fileName);
     } else {
         return m_orphanStorage->dvData(fileName);
     }
@@ -60,8 +59,8 @@ QSharedPointer<dve::DVEditorCore> SpaceCreatorProjectManager::dvData(const QStri
  */
 QSharedPointer<ive::IVEditorCore> SpaceCreatorProjectManager::ivData(const QString &fileName) const
 {
-    if (SpaceCreatorProject *data = project(fileName)) {
-        return data->storage()->ivData(fileName);
+    if (SpaceCreatorProjectImpl *data = project(fileName)) {
+        return data->ivData(fileName);
     } else {
         return m_orphanStorage->ivData(fileName);
     }
@@ -73,8 +72,8 @@ QSharedPointer<ive::IVEditorCore> SpaceCreatorProjectManager::ivData(const QStri
  */
 QSharedPointer<msc::MSCEditorCore> SpaceCreatorProjectManager::mscData(const QString &fileName) const
 {
-    if (SpaceCreatorProject *data = project(fileName)) {
-        return data->storage()->mscData(fileName);
+    if (SpaceCreatorProjectImpl *data = project(fileName)) {
+        return data->mscData(fileName);
     } else {
         return m_orphanStorage->mscData(fileName);
     }
@@ -83,9 +82,9 @@ QSharedPointer<msc::MSCEditorCore> SpaceCreatorProjectManager::mscData(const QSt
 /*!
    Returns the project, that contains the given \p fileName
  */
-SpaceCreatorProject *SpaceCreatorProjectManager::project(const QString &fileName) const
+SpaceCreatorProjectImpl *SpaceCreatorProjectManager::project(const QString &fileName) const
 {
-    for (SpaceCreatorProject *project : m_projects) {
+    for (SpaceCreatorProjectImpl *project : m_projects) {
         if (project->project()->isKnownFile(Utils::FileName::fromString(fileName))) {
             return project;
         }
@@ -97,10 +96,10 @@ SpaceCreatorProject *SpaceCreatorProjectManager::project(const QString &fileName
 /*!
    Returns the project, that contains the given \p editorCore
  */
-SpaceCreatorProject *SpaceCreatorProjectManager::project(const QSharedPointer<shared::EditorCore> &core) const
+SpaceCreatorProjectImpl *SpaceCreatorProjectManager::project(const QSharedPointer<shared::EditorCore> &core) const
 {
-    for (SpaceCreatorProject *project : m_projects) {
-        if (project->storage()->contains(core)) {
+    for (SpaceCreatorProjectImpl *project : m_projects) {
+        if (project->contains(core)) {
             return project;
         }
     }
@@ -109,9 +108,9 @@ SpaceCreatorProject *SpaceCreatorProjectManager::project(const QSharedPointer<sh
 }
 
 /*!
-   Retruns the ModelStorage that is used to store all data/files that do not belong to one of the open projects
+   Retruns the project that is used to store all data/files that do not belong to one of the open projects
  */
-ModelStorage *SpaceCreatorProjectManager::orphanStorage() const
+scs::SpaceCreatorProject *SpaceCreatorProjectManager::orphanStorage() const
 {
     return m_orphanStorage.get();
 }
@@ -121,7 +120,7 @@ ModelStorage *SpaceCreatorProjectManager::orphanStorage() const
  */
 void SpaceCreatorProjectManager::addProject(ProjectExplorer::Project *project)
 {
-    m_projects.append(new SpaceCreatorProject(project));
+    m_projects.append(new SpaceCreatorProjectImpl(project, this));
 }
 
 /*!
@@ -129,7 +128,7 @@ void SpaceCreatorProjectManager::addProject(ProjectExplorer::Project *project)
  */
 void SpaceCreatorProjectManager::removeProject(ProjectExplorer::Project *project)
 {
-    for (SpaceCreatorProject *data : qAsConst(m_projects)) {
+    for (SpaceCreatorProjectImpl *data : qAsConst(m_projects)) {
         if (data->project() == project) {
             m_projects.removeAll(data);
             delete data;

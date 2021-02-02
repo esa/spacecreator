@@ -1,5 +1,5 @@
 /*
-   Copyright (C) 2020 European Space Agency - <maxime.perrotin@esa.int>
+   Copyright (C) 2021 European Space Agency - <maxime.perrotin@esa.int>
 
    This library is free software; you can redistribute it and/or
    modify it under the terms of the GNU Library General Public
@@ -15,11 +15,8 @@
    along with this program. If not, see <https://www.gnu.org/licenses/lgpl-2.1.html>.
 */
 
-#include "modelstorage.h"
+#include "spacecreatorproject.h"
 
-#include "commandsstack.h"
-#include "dveditorcore.h"
-#include "interface/commands/cmdentityattributechange.h"
 #include "interface/interfacedocument.h"
 #include "iveditorcore.h"
 #include "ivsystemchecks.h"
@@ -27,20 +24,19 @@
 #include "msceditorcore.h"
 
 #include <QDebug>
-#include <projectexplorer/project.h>
-#include <projectexplorer/projecttree.h>
-#include <utils/fileutils.h>
 
-namespace spctr {
+namespace scs {
 
-ModelStorage::ModelStorage(QObject *parent)
-    : scs::EditorCoreQuery(parent)
+SpaceCreatorProject::SpaceCreatorProject(QObject *parent)
+    : QObject(parent)
 {
 }
 
-QSharedPointer<dve::DVEditorCore> ModelStorage::dvData(const QString &fileName) const
+SpaceCreatorProject::~SpaceCreatorProject() { }
+
+QSharedPointer<dve::DVEditorCore> SpaceCreatorProject::dvData(const QString &fileName) const
 {
-    Q_UNUSED(fileName)
+    qErrnoWarning("SpaceCreatorProject::dvData() not implemented yet.");
     return {};
 }
 
@@ -48,7 +44,7 @@ QSharedPointer<dve::DVEditorCore> ModelStorage::dvData(const QString &fileName) 
    Returns the IVEditorCore object for the given file
    If the object does not exist yet, one will be created and the data be loaded
  */
-QSharedPointer<ive::IVEditorCore> ModelStorage::ivData(const QString &fileName) const
+QSharedPointer<ive::IVEditorCore> SpaceCreatorProject::ivData(const QString &fileName) const
 {
     if (!m_ivStore.contains(fileName)) {
         QSharedPointer<ive::IVEditorCore> data(new ive::IVEditorCore());
@@ -56,7 +52,7 @@ QSharedPointer<ive::IVEditorCore> ModelStorage::ivData(const QString &fileName) 
         data->document()->customActions(); // There some further actions are registered
 
         data->document()->load(fileName);
-        const_cast<ModelStorage *>(this)->setIvData(fileName, data);
+        const_cast<SpaceCreatorProject *>(this)->setIvData(fileName, data);
         return data;
     }
 
@@ -67,13 +63,13 @@ QSharedPointer<ive::IVEditorCore> ModelStorage::ivData(const QString &fileName) 
    Returns the MSCEditorCore object for the given file
    If the object does not exist yet, one will be created and the data be loaded
  */
-QSharedPointer<msc::MSCEditorCore> ModelStorage::mscData(const QString &fileName) const
+QSharedPointer<msc::MSCEditorCore> SpaceCreatorProject::mscData(const QString &fileName) const
 {
     if (!m_mscStore.contains(fileName)) {
         QSharedPointer<msc::MSCEditorCore> data(new msc::MSCEditorCore());
         data->showToolbars(false);
         data->mainModel()->loadFile(fileName);
-        const_cast<ModelStorage *>(this)->setMscData(fileName, data);
+        const_cast<SpaceCreatorProject *>(this)->setMscData(fileName, data);
         return data;
     }
 
@@ -83,12 +79,12 @@ QSharedPointer<msc::MSCEditorCore> ModelStorage::mscData(const QString &fileName
 /*!
    Removes the file \p fileName if included in the store
  */
-void ModelStorage::remove(const QString &fileName)
+void SpaceCreatorProject::remove(const QString &fileName)
 {
     m_ivStore.remove(fileName);
 }
 
-QSharedPointer<ive::IVEditorCore> ModelStorage::ivCore() const
+QSharedPointer<ive::IVEditorCore> SpaceCreatorProject::ivCore() const
 {
     QStringList aadlFiles = allAadlFiles();
     if (aadlFiles.empty()) {
@@ -102,7 +98,7 @@ QSharedPointer<ive::IVEditorCore> ModelStorage::ivCore() const
 /*!
    Returns all MSCEditorCore objects, that are used in the current project
  */
-QVector<QSharedPointer<msc::MSCEditorCore>> ModelStorage::allMscCores() const
+QVector<QSharedPointer<msc::MSCEditorCore>> SpaceCreatorProject::allMscCores() const
 {
     QStringList mscFiles = allMscFiles();
     QVector<QSharedPointer<msc::MSCEditorCore>> allMscCores;
@@ -118,7 +114,7 @@ QVector<QSharedPointer<msc::MSCEditorCore>> ModelStorage::allMscCores() const
 /*!
    Returns if the given \core is in this storage
  */
-bool ModelStorage::contains(QSharedPointer<shared::EditorCore> core) const
+bool SpaceCreatorProject::contains(QSharedPointer<shared::EditorCore> core) const
 {
     for (QSharedPointer<ive::IVEditorCore> ivCore : m_ivStore) {
         if (core == ivCore) {
@@ -136,7 +132,7 @@ bool ModelStorage::contains(QSharedPointer<shared::EditorCore> core) const
 /*!
    Returns all aald files of the current project
  */
-QStringList ModelStorage::allAadlFiles()
+QStringList SpaceCreatorProject::allAadlFiles() const
 {
     return projectFiles("interfaceview.xml");
 }
@@ -144,7 +140,7 @@ QStringList ModelStorage::allAadlFiles()
 /*!
    Returns all msc files of the current project
  */
-QStringList ModelStorage::allMscFiles()
+QStringList SpaceCreatorProject::allMscFiles() const
 {
     return projectFiles(".msc");
 }
@@ -152,36 +148,27 @@ QStringList ModelStorage::allMscFiles()
 /*!
    Returns all asn files of the current project
  */
-QStringList ModelStorage::allAsn1Files()
+QStringList SpaceCreatorProject::allAsn1Files() const
 {
     return projectFiles(".asn");
 }
 
 /*!
-   Returns all files of the current project endig with the given \p suffix
+   \brief SpaceCreatorProject::projectFiles
+   \param suffix
+   \return
  */
-QStringList ModelStorage::projectFiles(const QString &suffix)
+QStringList SpaceCreatorProject::projectFiles(const QString &suffix) const
 {
-    ProjectExplorer::Project *project = ProjectExplorer::ProjectTree::currentProject();
-    if (!project) {
-        return {};
-    }
-
-    QStringList result;
-    for (const Utils::FileName &fileName : project->files(ProjectExplorer::Project::AllFiles)) {
-        if (fileName.toString().endsWith(suffix, Qt::CaseInsensitive)) {
-            result.append(fileName.toString());
-        }
-    }
-
-    return result;
+    Q_UNUSED(suffix)
+    return {};
 }
 
 /*!
    Sets the IVEditorCore object for the given file.
    If the object was already used for another file, that old file/object connection is removed.
  */
-void ModelStorage::setIvData(const QString &fileName, QSharedPointer<ive::IVEditorCore> ivData)
+void SpaceCreatorProject::setIvData(const QString &fileName, QSharedPointer<ive::IVEditorCore> ivData)
 {
     const QString oldKey = m_ivStore.key(ivData, "");
     if (!oldKey.isEmpty()) {
@@ -193,7 +180,7 @@ void ModelStorage::setIvData(const QString &fileName, QSharedPointer<ive::IVEdit
     }
 
     m_ivStore[fileName] = ivData;
-    connect(ivData.data(), &shared::EditorCore::editedExternally, this, &spctr::ModelStorage::editedExternally);
+    connect(ivData.data(), &shared::EditorCore::editedExternally, this, &scs::SpaceCreatorProject::editedExternally);
     Q_EMIT ivCoreAdded(ivData);
 }
 
@@ -201,7 +188,7 @@ void ModelStorage::setIvData(const QString &fileName, QSharedPointer<ive::IVEdit
    Sets the MSCEditorCore object for the given file.
    If the object was already used for another file, that old file/object connection is removed.
  */
-void ModelStorage::setMscData(const QString &fileName, QSharedPointer<msc::MSCEditorCore> mscData)
+void SpaceCreatorProject::setMscData(const QString &fileName, QSharedPointer<msc::MSCEditorCore> mscData)
 {
     const QString oldKey = m_mscStore.key(mscData, "");
     if (!oldKey.isEmpty()) {
@@ -213,11 +200,11 @@ void ModelStorage::setMscData(const QString &fileName, QSharedPointer<msc::MSCEd
     }
 
     m_mscStore[fileName] = mscData;
-    connect(mscData.data(), &shared::EditorCore::editedExternally, this, &spctr::ModelStorage::editedExternally);
+    connect(mscData.data(), &shared::EditorCore::editedExternally, this, &scs::SpaceCreatorProject::editedExternally);
     auto checker = new scs::IvSystemChecks(mscData.data());
     checker->setIvCore(ivCore());
     mscData->setSystemChecker(checker);
     Q_EMIT mscCoreAdded(mscData);
 }
 
-}
+} // namespace scs

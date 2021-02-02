@@ -16,8 +16,6 @@ set(SC_PLUGIN_SOURCES
     iv/aadlmainwidget.h
     iv/aadlqtceditor.cpp
     iv/aadlqtceditor.h
-    modelstorage.cpp
-    modelstorage.h
     msc/msccontext.cpp
     msc/msccontext.h
     msc/msceditordata.cpp
@@ -45,8 +43,8 @@ set(SC_PLUGIN_SOURCES
     spacecreatorplugin.h
     spacecreatorplugin_global.h
     spacecreatorpluginconstants.h
-    spacecreatorproject.cpp
-    spacecreatorproject.h
+    spacecreatorprojectimpl.cpp
+    spacecreatorprojectimpl.h
     spacecreatorprojectmanager.cpp
     spacecreatorprojectmanager.h
 )

@@ -18,8 +18,8 @@
 #include "aadleditorfactory.h"
 
 #include "aadleditordata.h"
-#include "modelstorage.h"
 #include "spacecreatorpluginconstants.h"
+#include "spacecreatorproject.h"
 #include "spacecreatorprojectmanager.h"
 
 #include <QGuiApplication>

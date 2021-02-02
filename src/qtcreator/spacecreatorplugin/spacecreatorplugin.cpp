@@ -25,7 +25,6 @@
 #include "iv/aadlqtceditor.h"
 #include "iveditor.h"
 #include "iveditorcore.h"
-#include "modelstorage.h"
 #include "msc/msceditordata.h"
 #include "msc/msceditorfactory.h"
 #include "msc/mscqtceditor.h"
@@ -35,7 +34,7 @@
 #include "mscsystemchecks.h"
 #include "sharedlibrary.h"
 #include "spacecreatorpluginconstants.h"
-#include "spacecreatorproject.h"
+#include "spacecreatorprojectimpl.h"
 #include "spacecreatorprojectmanager.h"
 
 #include <QAction>
@@ -215,9 +214,9 @@ void SpaceCreatorPlugin::setMinimapVisible(bool visible)
 void SpaceCreatorPlugin::showE2EDataflow()
 {
     if (auto aadlEditor = qobject_cast<spctr::AadlQtCEditor *>(Core::EditorManager::currentEditor())) {
-        SpaceCreatorProject *project = m_projectsManager->project(aadlEditor->ivPlugin());
+        SpaceCreatorProjectImpl *project = m_projectsManager->project(aadlEditor->ivPlugin());
         if (project) {
-            aadlEditor->showE2EDataflow(project->storage()->allMscFiles());
+            aadlEditor->showE2EDataflow(project->allMscFiles());
         }
     }
 }
@@ -232,7 +231,7 @@ void SpaceCreatorPlugin::showAsn1Dialog()
 void SpaceCreatorPlugin::exportSelectedIV()
 {
     if (auto ivEditor = qobject_cast<spctr::AadlQtCEditor *>(Core::EditorManager::currentEditor())) {
-        SpaceCreatorProject *project = m_projectsManager->project(ivEditor->ivPlugin());
+        SpaceCreatorProjectImpl *project = m_projectsManager->project(ivEditor->ivPlugin());
         if (project) {
             ivEditor->ivPlugin()->document()->exportSelectedFunctions();
         }
@@ -242,7 +241,7 @@ void SpaceCreatorPlugin::exportSelectedIV()
 void SpaceCreatorPlugin::exportComponentType()
 {
     if (auto ivEditor = qobject_cast<spctr::AadlQtCEditor *>(Core::EditorManager::currentEditor())) {
-        SpaceCreatorProject *project = m_projectsManager->project(ivEditor->ivPlugin());
+        SpaceCreatorProjectImpl *project = m_projectsManager->project(ivEditor->ivPlugin());
         if (project) {
             ivEditor->ivPlugin()->document()->exportSelectedType();
         }
@@ -273,7 +272,7 @@ void SpaceCreatorPlugin::updateActions()
 void SpaceCreatorPlugin::checkInstancesForCurrentEditor()
 {
     if (auto mscEditor = qobject_cast<spctr::MscQtCEditor *>(Core::EditorManager::currentEditor())) {
-        SpaceCreatorProject *project = m_projectsManager->project(mscEditor->mscEditorCore());
+        SpaceCreatorProjectImpl *project = m_projectsManager->project(mscEditor->mscEditorCore());
         if (project) {
             project->checks()->checkInstances();
         }
@@ -283,7 +282,7 @@ void SpaceCreatorPlugin::checkInstancesForCurrentEditor()
 void SpaceCreatorPlugin::checkMesagesForCurrentEditor()
 {
     if (auto mscEditor = qobject_cast<spctr::MscQtCEditor *>(Core::EditorManager::currentEditor())) {
-        SpaceCreatorProject *project = m_projectsManager->project(mscEditor->mscEditorCore());
+        SpaceCreatorProjectImpl *project = m_projectsManager->project(mscEditor->mscEditorCore());
         if (project) {
             project->checks()->checkMessages();
         }

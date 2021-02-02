@@ -39,7 +39,9 @@ MscQtCEditor::MscQtCEditor(SpaceCreatorProjectManager *projectManager, const QLi
     setWidget(m_editorWidget);
 
     connect(m_document, &spctr::MscEditorDocument::mscDataLoaded, this,
-            [this](const QString &, QSharedPointer<msc::MSCEditorCore> data) { m_editorWidget->init(data); });
+            [this, projectManager](const QString &fileName, QSharedPointer<msc::MSCEditorCore> data) {
+                m_editorWidget->init(data, projectManager->project(fileName));
+            });
 }
 
 MscQtCEditor::~MscQtCEditor()

@@ -26,7 +26,6 @@
 #include "interface/interfacedocument.h"
 #include "iveditorcore.h"
 #include "mainmodel.h"
-#include "modelstorage.h"
 #include "msceditorcore.h"
 #include "spacecreatorpluginconstants.h"
 #include "spacecreatorprojectmanager.h"

@@ -1,5 +1,5 @@
 /*
-   Copyright (C) 2020 European Space Agency - <maxime.perrotin@esa.int>
+   Copyright (C) 2021 European Space Agency - <maxime.perrotin@esa.int>
 
    This library is free software; you can redistribute it and/or
    modify it under the terms of the GNU Library General Public
@@ -15,16 +15,11 @@
    along with this program. If not, see <https://www.gnu.org/licenses/lgpl-2.1.html>.
 */
 
-#include "editorcorequery.h"
-
-#include <QHash>
-#include <QObject>
-#include <QPointer>
-#include <QSharedPointer>
-#include <QStringList>
-#include <QVector>
-
 #pragma once
+
+#include <QObject>
+#include <QSharedPointer>
+#include <QVector>
 
 namespace dve {
 class DVEditorCore;
@@ -39,17 +34,14 @@ namespace shared {
 class EditorCore;
 }
 
-namespace spctr {
+namespace scs {
 
-/*!
-   Stores shared pointers to all aadl/msc file objects. And creates a new one if needed
- */
-class ModelStorage : public scs::EditorCoreQuery
+class SpaceCreatorProject : public QObject
 {
     Q_OBJECT
-
 public:
-    explicit ModelStorage(QObject *parent = nullptr);
+    SpaceCreatorProject(QObject *parent = nullptr);
+    virtual ~SpaceCreatorProject();
 
     // Load / access functions
     QSharedPointer<dve::DVEditorCore> dvData(const QString &fileName) const;
@@ -59,18 +51,20 @@ public:
     void remove(const QString &fileName);
 
     // Query functions
-    QSharedPointer<ive::IVEditorCore> ivCore() const override;
-    QVector<QSharedPointer<msc::MSCEditorCore>> allMscCores() const override;
+    virtual QSharedPointer<ive::IVEditorCore> ivCore() const;
+    virtual QVector<QSharedPointer<msc::MSCEditorCore>> allMscCores() const;
 
     bool contains(QSharedPointer<shared::EditorCore> core) const;
 
-    static QStringList allAadlFiles();
-    static QStringList allMscFiles();
-    static QStringList allAsn1Files();
-    static QStringList projectFiles(const QString &suffix);
+    virtual QStringList allAadlFiles() const;
+    virtual QStringList allMscFiles() const;
+    virtual QStringList allAsn1Files() const;
+    virtual QStringList projectFiles(const QString &suffix) const;
 
 Q_SIGNALS:
     void editedExternally(shared::EditorCore *);
+    void ivCoreAdded(QSharedPointer<ive::IVEditorCore> ivCore);
+    void mscCoreAdded(QSharedPointer<msc::MSCEditorCore> mscCore);
 
 private:
     void setIvData(const QString &fileName, QSharedPointer<ive::IVEditorCore> ivData);
@@ -80,4 +74,4 @@ private:
     QHash<QString, QSharedPointer<msc::MSCEditorCore>> m_mscStore;
 };
 
-}
+} // namespace scs
