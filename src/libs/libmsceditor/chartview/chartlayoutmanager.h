@@ -35,7 +35,6 @@ class InteractiveObjectBase;
 
 namespace msc {
 
-class AadlSystemChecks;
 class ActionItem;
 class ChartItem;
 class CommentItem;
@@ -44,6 +43,7 @@ class CoregionItem;
 class InstanceItem;
 class InteractiveObject;
 class MessageItem;
+class SystemChecks;
 class TimerItem;
 
 class MscAction;
@@ -121,8 +121,8 @@ public:
 
     QVector<MscInstanceEvent *> visuallySortedEvents() const;
 
-    void setAadlChecker(AadlSystemChecks *aadlChecker);
-    AadlSystemChecks *aadlChecker() const;
+    void setSystemChecker(msc::SystemChecks *checker);
+    msc::SystemChecks *systemChecker() const;
 
     bool layoutUpdatePending() const;
 

@@ -17,7 +17,6 @@
 
 #include "chartlayoutmanager.h"
 
-#include "aadlsystemchecks.h"
 #include "actionitem.h"
 #include "baseitems/common/coordinatesconverter.h"
 #include "baseitems/common/mscutils.h"
@@ -42,6 +41,7 @@
 #include "msccreate.h"
 #include "mscinstance.h"
 #include "msctimer.h"
+#include "systemchecks.h"
 #include "timeritem.h"
 #include "ui/graphicsscenebase.h"
 
@@ -103,7 +103,7 @@ struct ChartLayoutManagerPrivate {
     QVector<msc::InstanceItem *> m_instanceItemsSorted;
     QHash<QUuid, msc::InteractiveObject *> m_instanceEventItems;
     QVector<msc::InteractiveObject *> m_instanceEventItemsSorted;
-    QPointer<msc::AadlSystemChecks> m_aadlChecker;
+    QPointer<msc::SystemChecks> m_systemChecker;
     QPointer<MscCommandsStack> m_undoStack;
 
     QPointer<msc::MscChart> m_currentChart = nullptr;
@@ -1864,17 +1864,17 @@ QVector<msc::MscInstanceEvent *> ChartLayoutManager::visuallySortedEvents() cons
 /*!
    Sets the object to check if the msc entities correspond to the aadl model
  */
-void ChartLayoutManager::setAadlChecker(AadlSystemChecks *aadlChecker)
+void ChartLayoutManager::setSystemChecker(SystemChecks *checker)
 {
-    d->m_aadlChecker = aadlChecker;
+    d->m_systemChecker = checker;
 }
 
 /*!
    Returns the object to check if msc entities correspond to the aadl model
  */
-AadlSystemChecks *ChartLayoutManager::aadlChecker() const
+SystemChecks *ChartLayoutManager::systemChecker() const
 {
-    return d->m_aadlChecker.data();
+    return d->m_systemChecker.data();
 }
 
 /*!

@@ -24,11 +24,11 @@
 #include <memory>
 
 namespace msc {
-class AadlSystemChecks;
 class MscCommandsStack;
 class MscModel;
 class MscMessageDeclaration;
 class MscMessageDeclarationList;
+class SystemChecks;
 }
 
 namespace Ui {
@@ -41,7 +41,7 @@ class MessageDeclarationsDialog : public QDialog
 
 public:
     explicit MessageDeclarationsDialog(msc::MscMessageDeclarationList *model, msc::MscModel *mscModel,
-            msc::MscCommandsStack *undoStack, msc::AadlSystemChecks *checker, QWidget *parent = nullptr);
+            msc::MscCommandsStack *undoStack, msc::SystemChecks *checker, QWidget *parent = nullptr);
     ~MessageDeclarationsDialog();
 
     msc::MscMessageDeclarationList *declarations() const;
@@ -81,5 +81,5 @@ private:
     msc::MscModel *m_mscModel;
     QString m_fileName;
     QPointer<msc::MscCommandsStack> m_undoStack;
-    QPointer<msc::AadlSystemChecks> m_checker;
+    QPointer<msc::SystemChecks> m_checker;
 };

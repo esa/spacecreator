@@ -17,6 +17,8 @@
 
 #pragma once
 
+#include "systemchecks.h"
+
 #include <QObject>
 #include <QPair>
 #include <QPointer>
@@ -43,45 +45,47 @@ class MscInstance;
 class MscMessage;
 class MscMessageDeclaration;
 class MscModel;
+}
+
+namespace scs {
 
 /*!
-   \brief The AadlSystemChecks class is used to check consistency of a msc model with one aadl model
+   \brief The IvSystemChecks class is used to check consistency of a msc model with one aadl model
  */
-class AadlSystemChecks : public QObject
+class IvSystemChecks : public msc::SystemChecks
 {
     Q_OBJECT
 public:
-    explicit AadlSystemChecks(QObject *parent = nullptr);
-    ~AadlSystemChecks();
+    explicit IvSystemChecks(QObject *parent = nullptr);
+    ~IvSystemChecks();
 
     void setMscCore(msc::MSCEditorCore *mscCore);
     void setIvCore(QSharedPointer<ive::IVEditorCore> ivCore);
     const QSharedPointer<ive::IVEditorCore> &ivCore() const;
-    bool hasIvCore() const;
 
-    QVector<QPair<msc::MscChart *, msc::MscInstance *>> checkInstanceNames() const;
-    QVector<QPair<msc::MscChart *, msc::MscInstance *>> checkInstanceRelations() const;
-    bool checkInstance(const msc::MscInstance *instance) const;
-    QStringList functionsNames() const;
+    QVector<QPair<msc::MscChart *, msc::MscInstance *>> checkInstanceNames() const override;
+    QVector<QPair<msc::MscChart *, msc::MscInstance *>> checkInstanceRelations() const override;
+    bool checkInstance(const msc::MscInstance *instance) const override;
+    QStringList functionsNames() const override;
 
-    QVector<QPair<msc::MscChart *, msc::MscMessage *>> checkMessages() const;
-    bool checkMessage(const msc::MscMessage *message) const;
-    QStringList connectionNames() const;
-    QStringList connectionNamesFromTo(const QString &sourceName, const QString &targetName) const;
+    QVector<QPair<msc::MscChart *, msc::MscMessage *>> checkMessages() const override;
+    bool checkMessage(const msc::MscMessage *message) const override;
+    QStringList connectionNames() const override;
+    QStringList connectionNamesFromTo(const QString &sourceName, const QString &targetName) const override;
 
-    ivm::AADLFunction *correspondingFunction(const MscInstance *instance) const;
-    bool correspond(const ivm::AADLObject *aadlObj, const msc::MscInstance *instance) const;
-    bool correspond(const ivm::AADLFunction *aadlFunc, const msc::MscInstance *instance) const;
+    ivm::AADLFunction *correspondingFunction(const msc::MscInstance *instance) const;
+    bool correspond(const ivm::AADLObject *aadlObj, const msc::MscInstance *instance) const override;
+    bool correspond(const ivm::AADLFunction *aadlFunc, const msc::MscInstance *instance) const override;
+    bool correspond(const ivm::AADLConnection *connection, const msc::MscMessage *message) const override;
 
-    bool correspond(const ivm::AADLConnection *connection, const msc::MscMessage *message) const;
+    QVector<msc::MscMessageDeclaration *> allConnectionsAsDeclaration() const override;
 
-    QVector<msc::MscMessageDeclaration *> allConnectionsAsDeclaration() const;
+    Qt::CaseSensitivity stringSensitivity() const override;
 
-    Qt::CaseSensitivity stringSensitivity() const;
+    bool hasValidSystem() const override;
 
 Q_SIGNALS:
     void mscCoreChanged();
-    void ivCoreChanged();
 
 private:
     ivm::AADLModel *aadlModel() const;

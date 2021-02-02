@@ -17,12 +17,12 @@
 
 #include "modelstorage.h"
 
-#include "aadlsystemchecks.h"
 #include "commandsstack.h"
 #include "dveditorcore.h"
 #include "interface/commands/cmdentityattributechange.h"
 #include "interface/interfacedocument.h"
 #include "iveditorcore.h"
+#include "ivsystemchecks.h"
 #include "mainmodel.h"
 #include "msceditorcore.h"
 
@@ -34,7 +34,7 @@
 namespace spctr {
 
 ModelStorage::ModelStorage(QObject *parent)
-    : QObject(parent)
+    : scs::EditorCoreQuery(parent)
 {
 }
 
@@ -214,7 +214,9 @@ void ModelStorage::setMscData(const QString &fileName, QSharedPointer<msc::MSCEd
 
     m_mscStore[fileName] = mscData;
     connect(mscData.data(), &shared::EditorCore::editedExternally, this, &spctr::ModelStorage::editedExternally);
-    mscData->aadlChecker()->setIvCore(ivCore());
+    auto checker = new scs::IvSystemChecks(mscData.data());
+    checker->setIvCore(ivCore());
+    mscData->setSystemChecker(checker);
     Q_EMIT mscCoreAdded(mscData);
 }
 

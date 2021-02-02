@@ -24,6 +24,7 @@
 #include "msceditorcore.h"
 #include "mscinstance.h"
 #include "mscmodel.h"
+#include "systemchecks.h"
 
 #include <QPointer>
 #include <QtTest>
@@ -45,6 +46,24 @@ private:
     QPointer<msc::MscChart> m_chart;
 };
 
+class CheckerMock : public msc::SystemChecks
+{
+public:
+    CheckerMock(QObject *parent = nullptr)
+        : msc::SystemChecks(parent)
+    {
+    }
+    bool correspond(const ivm::AADLFunction *aadlFunc, const msc::MscInstance *instance) const override
+    {
+        return instance->name() == aadlFunc->title();
+    }
+    bool correspond(const ivm::AADLConnection *connection, const msc::MscMessage *message) const override
+    {
+        return message->name() == connection->name();
+    }
+    bool hasValidSystem() const override { return true; }
+};
+
 void tst_MSCEditorCore::initTestCase()
 {
     QStandardPaths::setTestModeEnabled(true);
@@ -53,6 +72,7 @@ void tst_MSCEditorCore::initTestCase()
 void tst_MSCEditorCore::init()
 {
     m_mscCore = std::make_unique<msc::MSCEditorCore>();
+    m_mscCore->setSystemChecker(new CheckerMock(m_mscCore.get()));
     m_chart = m_mscCore->mainModel()->mscModel()->allCharts().at(0);
 }
 

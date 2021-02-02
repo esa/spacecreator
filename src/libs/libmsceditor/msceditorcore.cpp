@@ -18,7 +18,7 @@
 #include "msceditorcore.h"
 
 #include "aadlconnection.h"
-#include "aadlsystemchecks.h"
+#include "aadlfunction.h"
 #include "commandlineparser.h"
 #include "commands/cmddeleteentity.h"
 #include "commands/cmddocumentcreate.h"
@@ -34,6 +34,7 @@
 #include "mscinstance.h"
 #include "mscmessagedeclarationlist.h"
 #include "mscmodel.h"
+#include "systemchecks.h"
 #include "tools/actioncreatortool.h"
 #include "tools/basetool.h"
 #include "tools/commentcreatortool.h"
@@ -72,11 +73,8 @@ static const char *HIERARCHY_TYPE_TAG = "hierarchyTag";
 MSCEditorCore::MSCEditorCore(QObject *parent)
     : shared::EditorCore(parent)
     , m_model(new msc::MainModel())
-    , m_aadlChecks(new AadlSystemChecks)
 {
-    m_aadlChecks->setMscCore(this);
-
-    m_model->chartViewModel().setAadlChecker(m_aadlChecks.get());
+    setSystemChecker(new SystemChecks(this));
 
     connect(m_model->commandsStack(), &msc::MscCommandsStack::nameChanged, this, &msc::MSCEditorCore::nameChanged);
 }
@@ -392,11 +390,27 @@ QAction *MSCEditorCore::createActionPaste(QMainWindow *window)
 }
 
 /*!
+   Sets the chekcer for aadl consostency
+ */
+void MSCEditorCore::setSystemChecker(SystemChecks *checker)
+{
+    if (checker == nullptr) {
+        return;
+    }
+
+    if (m_systemChecks && m_systemChecks->parent() == this) {
+        delete m_systemChecks;
+    }
+    m_systemChecks = checker;
+    m_model->chartViewModel().setSystemChecker(m_systemChecks);
+}
+
+/*!
    Returns the checker for aadl consistency
  */
-AadlSystemChecks *MSCEditorCore::aadlChecker() const
+SystemChecks *MSCEditorCore::systemChecker() const
 {
-    return m_aadlChecks.get();
+    return m_systemChecks;
 }
 
 MSCEditorCore::ViewMode MSCEditorCore::viewMode()
@@ -491,7 +505,7 @@ void MSCEditorCore::removeMscInstances(ivm::AADLFunction *aadlFunction)
     msc::MscCommandsStack *undo = commandsStack();
     for (msc::MscChart *chart : m_model->mscModel()->allCharts()) {
         for (msc::MscInstance *instance : chart->instances()) {
-            if (m_aadlChecks->correspond(aadlFunction, instance)) {
+            if (m_systemChecks->correspond(aadlFunction, instance)) {
                 auto cmd = new msc::cmd::CmdDeleteEntity({ instance }, chart);
                 undo->push(cmd);
                 updated = true;
@@ -513,7 +527,7 @@ void MSCEditorCore::removeMscMessages(ivm::AADLConnection *aadlConnection)
     msc::MscCommandsStack *undo = commandsStack();
     for (msc::MscChart *chart : m_model->mscModel()->allCharts()) {
         for (msc::MscMessage *message : chart->messages()) {
-            if (m_aadlChecks->correspond(aadlConnection, message)) {
+            if (m_systemChecks->correspond(aadlConnection, message)) {
                 auto cmd = new msc::cmd::CmdDeleteEntity({ message }, chart);
                 undo->push(cmd);
                 updated = true;
@@ -534,7 +548,7 @@ QList<MscInstance *> MSCEditorCore::correspondingInstances(ivm::AADLFunction *aa
     QList<MscInstance *> corresponds;
     for (msc::MscChart *chart : m_model->mscModel()->allCharts()) {
         for (msc::MscInstance *instance : chart->instances()) {
-            if (m_aadlChecks->correspond(aadlFunction, instance)) {
+            if (m_systemChecks->correspond(aadlFunction, instance)) {
                 corresponds.append(instance);
             }
         }
@@ -551,7 +565,7 @@ QList<MscMessage *> MSCEditorCore::correspondingMessages(ivm::AADLConnection *aa
     QList<MscMessage *> corresponds;
     for (msc::MscChart *chart : m_model->mscModel()->allCharts()) {
         for (msc::MscMessage *message : chart->messages()) {
-            if (m_aadlChecks->correspond(aadlConnection, message)) {
+            if (m_systemChecks->correspond(aadlConnection, message)) {
                 corresponds.append(message);
             }
         }
@@ -723,9 +737,9 @@ void MSCEditorCore::openMessageDeclarationEditor(QWidget *parentwidget)
     }
 
     MessageDeclarationsDialog dialog(
-            docs.at(0)->messageDeclarations(), model, commandsStack(), m_aadlChecks.get(), parentwidget);
+            docs.at(0)->messageDeclarations(), model, commandsStack(), m_systemChecks, parentwidget);
     dialog.setFileName(model->dataDefinitionString());
-    dialog.setAadlConnectionNames(m_aadlChecks->connectionNames());
+    dialog.setAadlConnectionNames(m_systemChecks->connectionNames());
     int result = dialog.exec();
     if (result == QDialog::Accepted) {
         commandsStack()->beginMacro("Edit message declarations");

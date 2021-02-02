@@ -15,7 +15,7 @@
    along with this program. If not, see <https://www.gnu.org/licenses/lgpl-2.1.html>.
 */
 
-#include "aadlsystemchecks.h"
+#include "ivsystemchecks.h"
 
 #include "aadlconnection.h"
 #include "aadlconnectionchain.h"
@@ -34,21 +34,21 @@
 #include <QDebug>
 #include <algorithm>
 
-namespace msc {
+namespace scs {
 
-AadlSystemChecks::AadlSystemChecks(QObject *parent)
-    : QObject((parent))
+IvSystemChecks::IvSystemChecks(QObject *parent)
+    : msc::SystemChecks(parent)
 {
 }
 
-AadlSystemChecks::~AadlSystemChecks() { }
+IvSystemChecks::~IvSystemChecks() { }
 
-void AadlSystemChecks::setMscCore(MSCEditorCore *mscCore)
+void IvSystemChecks::setMscCore(msc::MSCEditorCore *mscCore)
 {
     m_mscCore = mscCore;
 }
 
-void AadlSystemChecks::setIvCore(QSharedPointer<ive::IVEditorCore> ivCore)
+void IvSystemChecks::setIvCore(QSharedPointer<ive::IVEditorCore> ivCore)
 {
     if (ivCore == m_ivCore) {
         return;
@@ -59,31 +59,23 @@ void AadlSystemChecks::setIvCore(QSharedPointer<ive::IVEditorCore> ivCore)
     }
 
     m_ivCore = ivCore;
-    Q_EMIT ivCoreChanged();
+    Q_EMIT ivDataReset();
 }
 
 /*!
    Returns a pointer to the IV editor model
  */
-const QSharedPointer<ive::IVEditorCore> &AadlSystemChecks::ivCore() const
+const QSharedPointer<ive::IVEditorCore> &IvSystemChecks::ivCore() const
 {
     return m_ivCore;
 }
 
 /*!
-   Returns if the IV model has be set
- */
-bool AadlSystemChecks::hasIvCore() const
-{
-    return !m_ivCore.isNull();
-}
-
-/*!
    Checks all instances if they are defined in the IV model as function
  */
-QVector<QPair<MscChart *, MscInstance *>> AadlSystemChecks::checkInstanceNames() const
+QVector<QPair<msc::MscChart *, msc::MscInstance *>> IvSystemChecks::checkInstanceNames() const
 {
-    QVector<QPair<MscChart *, MscInstance *>> result;
+    QVector<QPair<msc::MscChart *, msc::MscInstance *>> result;
     if (!m_ivCore || !m_mscCore) {
         return result;
     }
@@ -93,7 +85,7 @@ QVector<QPair<MscChart *, MscInstance *>> AadlSystemChecks::checkInstanceNames()
         for (msc::MscInstance *instance : chart->instances()) {
             ivm::AADLFunction *aadlFunction = correspondingFunction(instance);
             if (!aadlFunction) {
-                result << QPair<MscChart *, MscInstance *>(chart, instance);
+                result << QPair<msc::MscChart *, msc::MscInstance *>(chart, instance);
             }
         }
     }
@@ -104,30 +96,30 @@ QVector<QPair<MscChart *, MscInstance *>> AadlSystemChecks::checkInstanceNames()
 /*!
    Checks if in a chart instances with parent/child relations re used
  */
-QVector<QPair<MscChart *, MscInstance *>> AadlSystemChecks::checkInstanceRelations() const
+QVector<QPair<msc::MscChart *, msc::MscInstance *>> IvSystemChecks::checkInstanceRelations() const
 {
-    QVector<QPair<MscChart *, MscInstance *>> result;
+    QVector<QPair<msc::MscChart *, msc::MscInstance *>> result;
     if (!m_ivCore || !m_mscCore) {
         return result;
     }
 
     QVector<msc::MscChart *> charts = m_mscCore->mainModel()->mscModel()->allCharts();
     for (msc::MscChart *chart : charts) {
-        QVector<QPair<MscInstance *, ivm::AADLFunction *>> pairs;
+        QVector<QPair<msc::MscInstance *, ivm::AADLFunction *>> pairs;
         for (msc::MscInstance *instance : chart->instances()) {
             ivm::AADLFunction *aadlFunction = correspondingFunction(instance);
             if (aadlFunction) {
-                pairs << QPair<MscInstance *, ivm::AADLFunction *>(instance, aadlFunction);
+                pairs << QPair<msc::MscInstance *, ivm::AADLFunction *>(instance, aadlFunction);
             }
         }
 
         QVector<ivm::AADLFunction *> aadlChartFunctions;
-        for (QPair<MscInstance *, ivm::AADLFunction *> pair : pairs) {
+        for (QPair<msc::MscInstance *, ivm::AADLFunction *> pair : pairs) {
             aadlChartFunctions.append(pair.second);
         }
-        for (QPair<MscInstance *, ivm::AADLFunction *> pair : pairs) {
+        for (QPair<msc::MscInstance *, ivm::AADLFunction *> pair : pairs) {
             if (hasAncestor(pair.second, aadlChartFunctions) || hasDescendant(pair.second, aadlChartFunctions)) {
-                result << QPair<MscChart *, MscInstance *>(chart, pair.first);
+                result << QPair<msc::MscChart *, msc::MscInstance *>(chart, pair.first);
             }
         }
     }
@@ -138,7 +130,7 @@ QVector<QPair<MscChart *, MscInstance *>> AadlSystemChecks::checkInstanceRelatio
 /*!
    Checks if the given MSC instance has a corresponding aadl function
  */
-bool AadlSystemChecks::checkInstance(const MscInstance *instance) const
+bool IvSystemChecks::checkInstance(const msc::MscInstance *instance) const
 {
     if (!m_ivCore) {
         return true;
@@ -151,7 +143,7 @@ bool AadlSystemChecks::checkInstance(const MscInstance *instance) const
 /*!
    Returns a list of the names of all functions in the aadl model
  */
-QStringList AadlSystemChecks::functionsNames() const
+QStringList IvSystemChecks::functionsNames() const
 {
     if (!m_ivCore) {
         return {};
@@ -164,9 +156,9 @@ QStringList AadlSystemChecks::functionsNames() const
    Checks all messages if they are defined in the IV model as connection
    Returns all messages with their chart, that are not part
  */
-QVector<QPair<MscChart *, MscMessage *>> AadlSystemChecks::checkMessages() const
+QVector<QPair<msc::MscChart *, msc::MscMessage *>> IvSystemChecks::checkMessages() const
 {
-    QVector<QPair<MscChart *, MscMessage *>> result;
+    QVector<QPair<msc::MscChart *, msc::MscMessage *>> result;
     if (!m_ivCore || !m_mscCore) {
         return result;
     }
@@ -176,7 +168,7 @@ QVector<QPair<MscChart *, MscMessage *>> AadlSystemChecks::checkMessages() const
         for (msc::MscInstanceEvent *event : chart->instanceEvents()) {
             if (auto message = qobject_cast<msc::MscMessage *>(event)) {
                 if (!checkMessage(message)) {
-                    result << QPair<MscChart *, MscMessage *>(chart, message);
+                    result << QPair<msc::MscChart *, msc::MscMessage *>(chart, message);
                 }
             }
         }
@@ -189,7 +181,7 @@ QVector<QPair<MscChart *, MscMessage *>> AadlSystemChecks::checkMessages() const
    Checks if the given MSC message has a corresponding aadl connection
    @return Returns false, if the message is not part of the aadl model
  */
-bool AadlSystemChecks::checkMessage(const MscMessage *message) const
+bool IvSystemChecks::checkMessage(const msc::MscMessage *message) const
 {
     if (!m_ivCore || !message) {
         return true;
@@ -239,7 +231,7 @@ bool AadlSystemChecks::checkMessage(const MscMessage *message) const
    Returns a list of the names of all connections in the aadl model
    \sa connectionNamesFromTo
  */
-QStringList AadlSystemChecks::connectionNames() const
+QStringList IvSystemChecks::connectionNames() const
 {
     if (!m_ivCore) {
         return {};
@@ -253,7 +245,7 @@ QStringList AadlSystemChecks::connectionNames() const
    \note the names are aadl encoded by this function
    \sa connectionNames
  */
-QStringList AadlSystemChecks::connectionNamesFromTo(const QString &sourceName, const QString &targetName) const
+QStringList IvSystemChecks::connectionNamesFromTo(const QString &sourceName, const QString &targetName) const
 {
     if (!m_ivCore) {
         return {};
@@ -272,7 +264,7 @@ QStringList AadlSystemChecks::connectionNamesFromTo(const QString &sourceName, c
 /*!
    Returns a pointer to the AADL model of the in-core
  */
-ivm::AADLModel *AadlSystemChecks::aadlModel() const
+ivm::AADLModel *IvSystemChecks::aadlModel() const
 {
     if (!m_ivCore) {
         return {};
@@ -289,7 +281,7 @@ ivm::AADLModel *AadlSystemChecks::aadlModel() const
 /*!
    Returns the aadl functions that corresponds to the given msc instance
  */
-ivm::AADLFunction *AadlSystemChecks::correspondingFunction(const MscInstance *instance) const
+ivm::AADLFunction *IvSystemChecks::correspondingFunction(const msc::MscInstance *instance) const
 {
     if (!instance) {
         return nullptr;
@@ -309,7 +301,7 @@ ivm::AADLFunction *AadlSystemChecks::correspondingFunction(const MscInstance *in
 /*!
    Return true, if the aadl object is a function and the msc instance are the same
  */
-bool AadlSystemChecks::correspond(const ivm::AADLObject *aadlObj, const MscInstance *instance) const
+bool IvSystemChecks::correspond(const ivm::AADLObject *aadlObj, const msc::MscInstance *instance) const
 {
     if (aadlObj == nullptr && instance == nullptr) {
         // if both are invalid, it the same
@@ -330,7 +322,7 @@ bool AadlSystemChecks::correspond(const ivm::AADLObject *aadlObj, const MscInsta
 /*!
    Return true, if the aadl function and the msc instance are the same
  */
-bool AadlSystemChecks::correspond(const ivm::AADLFunction *aadlFunc, const MscInstance *instance) const
+bool IvSystemChecks::correspond(const ivm::AADLFunction *aadlFunc, const msc::MscInstance *instance) const
 {
     if (aadlFunc == nullptr && instance == nullptr) {
         // if both are invalid, it the same
@@ -347,7 +339,7 @@ bool AadlSystemChecks::correspond(const ivm::AADLFunction *aadlFunc, const MscIn
 /*!
    Returns if the given aadl function \p func has an ancestor (is nested by) one of the functions
  */
-bool AadlSystemChecks::hasAncestor(ivm::AADLFunction *func, const QVector<ivm::AADLFunction *> allFunctions) const
+bool IvSystemChecks::hasAncestor(ivm::AADLFunction *func, const QVector<ivm::AADLFunction *> allFunctions) const
 {
     for (ivm::AADLFunction *f : allFunctions) {
         if (isAncestor(func, f)) {
@@ -360,7 +352,7 @@ bool AadlSystemChecks::hasAncestor(ivm::AADLFunction *func, const QVector<ivm::A
 /*!
    Returns if the given aadl function \p func has an descendant (is nesting by) at least one of the functions
  */
-bool AadlSystemChecks::hasDescendant(ivm::AADLFunction *func, const QVector<ivm::AADLFunction *> allFunctions) const
+bool IvSystemChecks::hasDescendant(ivm::AADLFunction *func, const QVector<ivm::AADLFunction *> allFunctions) const
 {
     for (ivm::AADLFunction *f : allFunctions) {
         if (isAncestor(f, func)) {
@@ -373,7 +365,7 @@ bool AadlSystemChecks::hasDescendant(ivm::AADLFunction *func, const QVector<ivm:
 /*!
    Returns if the given aadl function \p otherFunc is an ancestor (parent, grand-parent, ...) of the function \p func
  */
-bool AadlSystemChecks::isAncestor(ivm::AADLFunction *func, ivm::AADLFunction *otherFunc) const
+bool IvSystemChecks::isAncestor(ivm::AADLFunction *func, ivm::AADLFunction *otherFunc) const
 {
     if (!func || !otherFunc || func == otherFunc) {
         return false;
@@ -393,7 +385,7 @@ bool AadlSystemChecks::isAncestor(ivm::AADLFunction *func, ivm::AADLFunction *ot
 /**
    Returns if the aadl connection and the msc message are the same
  */
-bool AadlSystemChecks::correspond(const ivm::AADLConnection *connection, const MscMessage *message) const
+bool IvSystemChecks::correspond(const ivm::AADLConnection *connection, const msc::MscMessage *message) const
 {
     bool nameOk = true;
     if (!connection->name().isEmpty()) {
@@ -406,12 +398,12 @@ bool AadlSystemChecks::correspond(const ivm::AADLConnection *connection, const M
 /*!
    Returns all aadl connections as msc message declarations
  */
-QVector<MscMessageDeclaration *> AadlSystemChecks::allConnectionsAsDeclaration() const
+QVector<msc::MscMessageDeclaration *> IvSystemChecks::allConnectionsAsDeclaration() const
 {
-    QVector<MscMessageDeclaration *> result;
+    QVector<msc::MscMessageDeclaration *> result;
 
     for (ivm::AADLConnection *connection : m_ivCore->allAadlConnections()) {
-        auto declaration = new MscMessageDeclaration();
+        auto declaration = new msc::MscMessageDeclaration();
         declaration->setNames({ connection->name() });
         QStringList params;
         for (ivm::IfaceParameter p : connection->params()) {
@@ -427,9 +419,17 @@ QVector<MscMessageDeclaration *> AadlSystemChecks::allConnectionsAsDeclaration()
 /*!
    Returns if strings comparisons fo AADL and MSC string should be case sensitive
  */
-Qt::CaseSensitivity AadlSystemChecks::stringSensitivity() const
+Qt::CaseSensitivity IvSystemChecks::stringSensitivity() const
 {
     return m_caseCheck;
+}
+
+/*!
+   Returns if the IV model has be set
+ */
+bool IvSystemChecks::hasValidSystem() const
+{
+    return !m_ivCore.isNull();
 }
 
 }

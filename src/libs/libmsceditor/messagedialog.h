@@ -22,12 +22,12 @@
 #include <QStringList>
 
 namespace msc {
-class AadlSystemChecks;
 class ChartLayoutManager;
 class MscMessage;
 class MscMessageDeclaration;
 class MscMessageDeclarationList;
 class MscModel;
+class SystemChecks;
 }
 
 namespace Ui {
@@ -46,7 +46,7 @@ public:
     ~MessageDialog();
 
     void setAadlConnectionNames(const QStringList &names);
-    void setAadlChecker(msc::AadlSystemChecks *checker);
+    void setSystemChecker(msc::SystemChecks *checker);
 
 public Q_SLOTS:
     void accept() override;
@@ -79,6 +79,6 @@ private:
     QPointer<msc::MscMessageDeclaration> m_selectedDeclaration;
     bool m_isValid = true;
     QStringList m_connectionNames;
-    QPointer<msc::AadlSystemChecks> m_aadlChecker;
+    QPointer<msc::SystemChecks> m_checker;
     QPointer<msc::ChartLayoutManager> m_chartLayoutManager;
 };

@@ -17,7 +17,6 @@
 
 #include "messageitem.h"
 
-#include "aadlsystemchecks.h"
 #include "baseitems/arrowitem.h"
 #include "baseitems/common/coordinatesconverter.h"
 #include "baseitems/common/mscutils.h"
@@ -37,6 +36,7 @@
 #include "mscchart.h"
 #include "msccommandsstack.h"
 #include "mscinstance.h"
+#include "systemchecks.h"
 #include "ui/grippointshandler.h"
 
 #include <QBrush>
@@ -117,8 +117,8 @@ MessageItem::MessageItem(MscMessage *message, ChartLayoutManager *chartLayoutMan
         }
     });
 
-    if (m_chartLayoutManager && m_chartLayoutManager->aadlChecker()) {
-        connect(m_chartLayoutManager->aadlChecker(), &msc::AadlSystemChecks::ivCoreChanged, this,
+    if (m_chartLayoutManager && m_chartLayoutManager->systemChecker()) {
+        connect(m_chartLayoutManager->systemChecker(), &msc::SystemChecks::ivDataReset, this,
                 &msc::MessageItem::checkAadlConnection);
     }
 
@@ -148,7 +148,7 @@ void MessageItem::showMessageDialog()
             view = scene()->views().at(0);
         }
         MessageDialog dialog(m_message, m_chartLayoutManager, view);
-        dialog.setAadlChecker(m_chartLayoutManager->aadlChecker());
+        dialog.setSystemChecker(m_chartLayoutManager->systemChecker());
         dialog.exec();
         checkAadlConnection();
     }
@@ -1006,8 +1006,8 @@ bool MessageItem::wannabeGlobal() const
  */
 bool MessageItem::aadlConnectionOk() const
 {
-    if (m_chartLayoutManager && m_chartLayoutManager->aadlChecker()) {
-        return m_chartLayoutManager->aadlChecker()->checkMessage(m_message);
+    if (m_chartLayoutManager && m_chartLayoutManager->systemChecker()) {
+        return m_chartLayoutManager->systemChecker()->checkMessage(m_message);
     }
     return true;
 }

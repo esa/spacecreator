@@ -17,7 +17,6 @@
 
 #include "mainwindow.h"
 
-#include "aadlsystemchecks.h"
 #include "baseitems/common/coordinatesconverter.h"
 #include "chartitem.h"
 #include "chartlayoutmanager.h"
@@ -28,6 +27,7 @@
 #include "graphicsview.h"
 #include "interface/interfacedocument.h"
 #include "iveditorcore.h"
+#include "ivsystemchecks.h"
 #include "mainmodel.h"
 #include "minimap.h"
 #include "mscaction.h"
@@ -192,7 +192,9 @@ void MainWindow::openAadlFile()
             QFileDialog::getOpenFileName(this, tr("Open file"), "", d->m_ivCore->document()->supportedFileExtensions());
     if (!fileName.isEmpty()) {
         d->m_ivCore->document()->load(fileName);
-        d->m_core->aadlChecker()->setIvCore(d->m_ivCore);
+        if (auto checker = qobject_cast<scs::IvSystemChecks *>(d->m_core->systemChecker())) {
+            checker->setIvCore(d->m_ivCore);
+        }
     }
 }
 

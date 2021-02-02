@@ -1,4 +1,3 @@
-addQtTest(tst_aadlsystemchecks libmsceditor)
 addQtTest(tst_arrowitem libmsceditor)
 addQtTest(tst_arrowsign libmsceditor)
 addQtTest(tst_chartitem libmsceditor)

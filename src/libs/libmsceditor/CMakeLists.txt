@@ -3,8 +3,6 @@ set(LIB_NAME libmsceditor)
 add_library(${LIB_NAME} STATIC)
 
 target_sources(${LIB_NAME} PRIVATE
-    aadlsystemchecks.cpp
-    aadlsystemchecks.h
     baseitems/arrowitem.cpp
     baseitems/arrowitem.h
     baseitems/common/abstractinteractiveobject.h
@@ -143,6 +141,8 @@ target_sources(${LIB_NAME} PRIVATE
     remotecontrol/remotecontrolhandler.h
     remotecontrol/remotecontrolwebserver.cpp
     remotecontrol/remotecontrolwebserver.h
+    systemchecks.cpp
+    systemchecks.h
     textviewdialog.cpp
     textviewdialog.h
     tools/actioncreatortool.cpp
@@ -180,10 +180,11 @@ target_include_directories(${LIB_NAME}
 )
 
 target_link_libraries(${LIB_NAME}
-    shared
     msclibrary
+    asn1library
+    aadl
+    shared
     asn1editor
-    libiveditor
     ${QT_CORE}
     ${QT_GUI}
     ${QT_NETWORK}

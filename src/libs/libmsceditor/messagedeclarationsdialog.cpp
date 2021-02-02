@@ -17,7 +17,6 @@
 
 #include "messagedeclarationsdialog.h"
 
-#include "aadlsystemchecks.h"
 #include "asn1reader.h"
 #include "commands/cmdsetasn1file.h"
 #include "definitions.h"
@@ -27,6 +26,7 @@
 #include "mscmessagedeclarationlist.h"
 #include "mscmodel.h"
 #include "mscwriter.h"
+#include "systemchecks.h"
 #include "typeassignment.h"
 #include "ui_messagedeclarationsdialog.h"
 
@@ -39,7 +39,7 @@
 #include <QTimer>
 
 MessageDeclarationsDialog::MessageDeclarationsDialog(msc::MscMessageDeclarationList *model, msc::MscModel *mscModel,
-        msc::MscCommandsStack *undoStack, msc::AadlSystemChecks *checker, QWidget *parent)
+        msc::MscCommandsStack *undoStack, msc::SystemChecks *checker, QWidget *parent)
     : QDialog(parent)
     , ui(new Ui::MessageDeclarationsDialog)
     , m_model(model->clone())
@@ -82,7 +82,7 @@ MessageDeclarationsDialog::MessageDeclarationsDialog(msc::MscMessageDeclarationL
 
     connect(m_mscModel, &msc::MscModel::asn1DataChanged, this, &MessageDeclarationsDialog::updateAsn1TypesView);
 
-    ui->aadlImportButton->setEnabled(m_checker && m_checker->hasIvCore());
+    ui->aadlImportButton->setEnabled(m_checker && m_checker->hasValidSystem());
     connect(ui->aadlImportButton, &QPushButton::clicked, this, &MessageDeclarationsDialog::importFromAadl);
 
     updateDeclarationDetails();
@@ -301,7 +301,7 @@ void MessageDeclarationsDialog::checkforEmptyCompleter()
  */
 void MessageDeclarationsDialog::importFromAadl()
 {
-    if (!m_checker || !m_checker->hasIvCore()) {
+    if (!m_checker || !m_checker->hasValidSystem()) {
         return;
     }
 

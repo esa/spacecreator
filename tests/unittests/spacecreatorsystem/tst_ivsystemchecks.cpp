@@ -18,7 +18,6 @@
 #include "aadlconnection.h"
 #include "aadlfunction.h"
 #include "aadlmodel.h"
-#include "aadlsystemchecks.h"
 #include "aadltestutils.h"
 #include "baseitems/common/coordinatesconverter.h"
 #include "chartitem.h"
@@ -26,6 +25,7 @@
 #include "interface/interfacedocument.h"
 #include "iveditor.h"
 #include "iveditorcore.h"
+#include "ivsystemchecks.h"
 #include "mainmodel.h"
 #include "mscchart.h"
 #include "msceditorcore.h"
@@ -40,11 +40,11 @@
 
 using namespace msc;
 
-class tst_AadlSystemChecks : public QObject
+class tst_IvSystemChecks : public QObject
 {
     Q_OBJECT
 public:
-    tst_AadlSystemChecks()
+    tst_IvSystemChecks()
         : m_chartItem(nullptr, nullptr)
     {
     }
@@ -64,11 +64,11 @@ private Q_SLOTS:
 
 private:
     msc::ChartItem m_chartItem;
-    std::unique_ptr<msc::AadlSystemChecks> m_checker;
+    std::unique_ptr<scs::IvSystemChecks> m_checker;
     std::unique_ptr<msc::MSCEditorCore> m_mscCore;
 };
 
-void tst_AadlSystemChecks::initTestCase()
+void tst_IvSystemChecks::initTestCase()
 {
     QStandardPaths::setTestModeEnabled(true);
     ive::initIvEditor();
@@ -76,15 +76,15 @@ void tst_AadlSystemChecks::initTestCase()
     converter->setDPI(QPointF(109., 109.), QPointF(96., 96.));
 }
 
-void tst_AadlSystemChecks::init()
+void tst_IvSystemChecks::init()
 {
-    m_checker = std::make_unique<msc::AadlSystemChecks>();
+    m_checker = std::make_unique<scs::IvSystemChecks>();
     m_mscCore = std::make_unique<msc::MSCEditorCore>();
     m_mscCore->mainModel()->initialModel();
     m_checker->setMscCore(m_mscCore.get());
 }
 
-void tst_AadlSystemChecks::testCheckInstanceNames()
+void tst_IvSystemChecks::testCheckInstanceNames()
 {
     QVector<QPair<msc::MscChart *, msc::MscInstance *>> result = m_checker->checkInstanceNames();
     QCOMPARE(result.size(), 0);
@@ -126,7 +126,7 @@ void tst_AadlSystemChecks::testCheckInstanceNames()
     QCOMPARE(m_checker->checkInstance(instance), false);
 }
 
-void tst_AadlSystemChecks::testCheckInstanceRelations()
+void tst_IvSystemChecks::testCheckInstanceRelations()
 {
     QVector<QPair<msc::MscChart *, msc::MscInstance *>> result = m_checker->checkInstanceRelations();
     QCOMPARE(result.size(), 0);
@@ -172,7 +172,7 @@ void tst_AadlSystemChecks::testCheckInstanceRelations()
     QCOMPARE(result.size(), 2);
 }
 
-void tst_AadlSystemChecks::testCheckMessageNames()
+void tst_IvSystemChecks::testCheckMessageNames()
 {
     msc::MscChart *chart = m_mscCore->mainModel()->mscModel()->documents().at(0)->documents().at(0)->charts().at(0);
     QVERIFY(chart != nullptr);
@@ -222,7 +222,7 @@ void tst_AadlSystemChecks::testCheckMessageNames()
     QCOMPARE(result.size(), 0); // Everything is ok
 }
 
-void tst_AadlSystemChecks::testCorrespondMessage_data()
+void tst_IvSystemChecks::testCorrespondMessage_data()
 {
     using namespace ivm;
     QTest::addColumn<QString>("sourceFuncName");
@@ -250,7 +250,7 @@ void tst_AadlSystemChecks::testCorrespondMessage_data()
                                                 << "msg" << AADLIface::IfaceType::Required << true;
 }
 
-void tst_AadlSystemChecks::testCorrespondMessage()
+void tst_IvSystemChecks::testCorrespondMessage()
 {
     using namespace ivm;
     QFETCH(QString, sourceFuncName);
@@ -279,7 +279,7 @@ void tst_AadlSystemChecks::testCorrespondMessage()
     QCOMPARE(doCorrespond, expected);
 }
 
-void tst_AadlSystemChecks::testCheckMessage()
+void tst_IvSystemChecks::testCheckMessage()
 {
     msc::MscChart *chart = m_mscCore->mainModel()->mscModel()->documents().at(0)->documents().at(0)->charts().at(0);
 
@@ -331,6 +331,6 @@ void tst_AadlSystemChecks::testCheckMessage()
     QCOMPARE(m_checker->checkMessage(message1), true);
 }
 
-QTEST_MAIN(tst_AadlSystemChecks)
+QTEST_MAIN(tst_IvSystemChecks)
 
-#include "tst_aadlsystemchecks.moc"
+#include "tst_ivsystemchecks.moc"

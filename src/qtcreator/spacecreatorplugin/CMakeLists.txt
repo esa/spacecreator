@@ -41,8 +41,6 @@ set(SC_PLUGIN_SOURCES
     options/ivcoloroption.h
     options/propertyoptions.cpp
     options/propertyoptions.h
-    mscsystemchecks.cpp
-    mscsystemchecks.h
     spacecreatorplugin.cpp
     spacecreatorplugin.h
     spacecreatorplugin_global.h
@@ -69,7 +67,7 @@ set(SC_QTC_PLUGINS
 
 add_qtc_plugin(${PLUGIN_NAME}
     DEFINES SCPLUGIN_LIBRARY
-    DEPENDS libmsceditor libiveditor libdveditor ${QT_CORE} ${QT_GUI} ${QT_WIDGETS} ${SC_QTC_LIBRARIES} ${SC_QTC_PLUGINS}
+    DEPENDS spacecreatorsystem libmsceditor libiveditor libdveditor ${QT_CORE} ${QT_GUI} ${QT_WIDGETS} ${SC_QTC_LIBRARIES} ${SC_QTC_PLUGINS}
     PLUGIN_DEPENDS ${SC_QTC_PLUGINS}
     SOURCES ${SC_PLUGIN_SOURCES}
 )

@@ -17,7 +17,6 @@
 
 #include "spacecreatorplugin.h"
 
-#include "aadlsystemchecks.h"
 #include "context/action/actionsmanager.h"
 #include "dv/deploymenteditorfactory.h"
 #include "interface/interfacedocument.h"
@@ -48,7 +47,7 @@
 #include <editormanager/editormanager.h>
 #include <editormanager/ieditor.h>
 
-void initMscResources()
+void initSpaceCreatorResources()
 {
     Q_INIT_RESOURCE(asn1_resources);
     shared::initSharedLibrary();
@@ -63,7 +62,7 @@ namespace spctr {
 
 SpaceCreatorPlugin::SpaceCreatorPlugin()
 {
-    initMscResources();
+    initSpaceCreatorResources();
 }
 
 SpaceCreatorPlugin::~SpaceCreatorPlugin()

@@ -17,6 +17,7 @@
 
 #include "commandlineparser.h"
 #include "iveditor.h"
+#include "ivsystemchecks.h"
 #include "mainwindow.h"
 #include "msceditor.h"
 #include "msceditorcore.h"
@@ -47,13 +48,14 @@ int main(int argc, char *argv[])
         QFontDatabase::addApplicationFont(dirIt.next());
     a.setFont(QFont(QLatin1String("Ubuntu"), 10));
 
-    msc::MSCEditorCore plugin;
+    msc::MSCEditorCore editorCore;
+    editorCore.setSystemChecker(new scs::IvSystemChecks(&editorCore));
 
     shared::CommandLineParser cmdParser;
-    plugin.populateCommandLineArguments(&cmdParser);
+    editorCore.populateCommandLineArguments(&cmdParser);
     cmdParser.process(a.arguments());
 
-    msc::MainWindow w(&plugin);
+    msc::MainWindow w(&editorCore);
 
     const QVector<shared::CommandLineParser::Positional> args = cmdParser.positionalsSet();
     for (auto it = args.crbegin(); it != args.crend(); ++it) {

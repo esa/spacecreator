@@ -15,6 +15,8 @@
    along with this program. If not, see <https://www.gnu.org/licenses/lgpl-2.1.html>.
 */
 
+#include "editorcorequery.h"
+
 #include <QHash>
 #include <QObject>
 #include <QPointer>
@@ -42,13 +44,14 @@ namespace spctr {
 /*!
    Stores shared pointers to all aadl/msc file objects. And creates a new one if needed
  */
-class ModelStorage : public QObject
+class ModelStorage : public scs::EditorCoreQuery
 {
     Q_OBJECT
 
 public:
     explicit ModelStorage(QObject *parent = nullptr);
 
+    // Load / access functions
     QSharedPointer<dve::DVEditorCore> dvData(const QString &fileName) const;
     QSharedPointer<ive::IVEditorCore> ivData(const QString &fileName) const;
     QSharedPointer<msc::MSCEditorCore> mscData(const QString &fileName) const;
@@ -56,8 +59,8 @@ public:
     void remove(const QString &fileName);
 
     // Query functions
-    QSharedPointer<ive::IVEditorCore> ivCore() const;
-    QVector<QSharedPointer<msc::MSCEditorCore>> allMscCores() const;
+    QSharedPointer<ive::IVEditorCore> ivCore() const override;
+    QVector<QSharedPointer<msc::MSCEditorCore>> allMscCores() const override;
 
     bool contains(QSharedPointer<shared::EditorCore> core) const;
 
@@ -68,8 +71,6 @@ public:
 
 Q_SIGNALS:
     void editedExternally(shared::EditorCore *);
-    void ivCoreAdded(QSharedPointer<ive::IVEditorCore> ivCore);
-    void mscCoreAdded(QSharedPointer<msc::MSCEditorCore> mscCore);
 
 private:
     void setIvData(const QString &fileName, QSharedPointer<ive::IVEditorCore> ivData);

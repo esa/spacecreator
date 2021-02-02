@@ -17,7 +17,6 @@
 
 #include "instanceitem.h"
 
-#include "aadlsystemchecks.h"
 #include "baseitems/common/coordinatesconverter.h"
 #include "baseitems/common/mscutils.h"
 #include "baseitems/instanceenditem.h"
@@ -32,11 +31,11 @@
 #include "commands/cmdchangeinstanceposition.h"
 #include "commands/cmdentitynamechange.h"
 #include "commands/cmdinstancekindchange.h"
-#include "iveditorcore.h"
 #include "messageitem.h"
 #include "mscchart.h"
 #include "msccommandsstack.h"
 #include "mscinstance.h"
+#include "systemchecks.h"
 #include "ui/grippoint.h"
 #include "ui/grippointshandler.h"
 
@@ -92,9 +91,9 @@ InstanceItem::InstanceItem(
         Q_EMIT needUpdateLayout();
     });
 
-    if (m_chartLayoutManager && m_chartLayoutManager->aadlChecker()) {
-        m_headSymbol->setAadlChecker(m_chartLayoutManager->aadlChecker());
-        connect(m_chartLayoutManager->aadlChecker(), &msc::AadlSystemChecks::ivCoreChanged, this,
+    if (m_chartLayoutManager && m_chartLayoutManager->systemChecker()) {
+        m_headSymbol->setSystemChecker(m_chartLayoutManager->systemChecker());
+        connect(m_chartLayoutManager->systemChecker(), &msc::SystemChecks::ivDataReset, this,
                 &msc::InstanceItem::checkAadlFunction);
     }
 
@@ -544,8 +543,8 @@ QVector<QPoint> InstanceItem::prepareChangePositionCommand() const
 
 bool InstanceItem::aadlFunctionOk() const
 {
-    if (m_chartLayoutManager && m_chartLayoutManager->aadlChecker()) {
-        return m_chartLayoutManager->aadlChecker()->checkInstance(m_instance);
+    if (m_chartLayoutManager && m_chartLayoutManager->systemChecker()) {
+        return m_chartLayoutManager->systemChecker()->checkInstance(m_instance);
     }
     return true;
 }

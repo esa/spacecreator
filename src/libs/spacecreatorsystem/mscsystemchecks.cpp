@@ -22,15 +22,15 @@
 #include "aadlfunction.h"
 #include "aadliface.h"
 #include "aadlmodel.h"
-#include "aadlsystemchecks.h"
 #include "chartlayoutmanager.h"
 #include "commandsstack.h"
+#include "editorcorequery.h"
 #include "interface/commands/cmdentityattributechange.h"
 #include "interface/commands/cmdifaceattrchange.h"
 #include "interface/interfacedocument.h"
 #include "iveditorcore.h"
+#include "ivsystemchecks.h"
 #include "mainmodel.h"
-#include "modelstorage.h"
 #include "mscchart.h"
 #include "msceditorcore.h"
 #include "mscinstance.h"
@@ -43,26 +43,26 @@
 #include <QPushButton>
 #include <QUndoStack>
 
-namespace spctr {
+namespace scs {
 
 MscSystemChecks::MscSystemChecks(QObject *parent)
     : QObject(parent)
 {
 }
 
-void MscSystemChecks::setStorage(ModelStorage *storage)
+void MscSystemChecks::setStorage(EditorCoreQuery *storage)
 {
     m_storage = storage;
 
-    connect(m_storage, &spctr::ModelStorage::mscCoreAdded, this, [=](QSharedPointer<msc::MSCEditorCore> core) {
-        connect(core.data(), &msc::MSCEditorCore::nameChanged, this, &spctr::MscSystemChecks::onMscEntityNameChanged);
+    connect(m_storage, &scs::EditorCoreQuery::mscCoreAdded, this, [=](QSharedPointer<msc::MSCEditorCore> core) {
+        connect(core.data(), &msc::MSCEditorCore::nameChanged, this, &scs::MscSystemChecks::onMscEntityNameChanged);
     });
 
-    connect(m_storage, &spctr::ModelStorage::ivCoreAdded, this, [this](QSharedPointer<ive::IVEditorCore> ivCore) {
+    connect(m_storage, &scs::EditorCoreQuery::ivCoreAdded, this, [this](QSharedPointer<ive::IVEditorCore> ivCore) {
         connect(ivCore->commandsStack(), &ive::cmd::CommandsStack::nameChanged, this,
-                &spctr::MscSystemChecks::onEntityNameChanged);
+                &scs::MscSystemChecks::onEntityNameChanged);
         connect(ivCore->commandsStack(), &ive::cmd::CommandsStack::entityRemoved, this,
-                &spctr::MscSystemChecks::onEntityRemoved);
+                &scs::MscSystemChecks::onEntityRemoved);
     });
 }
 
@@ -183,13 +183,13 @@ void MscSystemChecks::checkInstances()
     // Check for names
     QVector<QPair<msc::MscChart *, msc::MscInstance *>> resultNames;
     for (QSharedPointer<msc::MSCEditorCore> &mplugin : mscCores) {
-        resultNames += mplugin->aadlChecker()->checkInstanceNames();
+        resultNames += mplugin->systemChecker()->checkInstanceNames();
     }
 
     // Check for nested functions usage
     QVector<QPair<msc::MscChart *, msc::MscInstance *>> resultRelations;
     for (QSharedPointer<msc::MSCEditorCore> &mplugin : mscCores) {
-        resultRelations += mplugin->aadlChecker()->checkInstanceRelations();
+        resultRelations += mplugin->systemChecker()->checkInstanceRelations();
     }
 
     QString text;
@@ -233,7 +233,7 @@ void MscSystemChecks::checkMessages()
     // check messages
     QVector<QPair<msc::MscChart *, msc::MscMessage *>> resultNames;
     for (const QSharedPointer<msc::MSCEditorCore> &mplugin : mscCores) {
-        resultNames += mplugin->aadlChecker()->checkMessages();
+        resultNames += mplugin->systemChecker()->checkMessages();
     }
 
     QString text;
@@ -381,13 +381,13 @@ void MscSystemChecks::onMscEntityNameChanged(QObject *entity, const QString &old
         // Check for names
         const QString fromName = message->sourceInstance() ? message->sourceInstance()->name() : "";
         const QString toName = message->targetInstance() ? message->targetInstance()->name() : "";
-        msc::AadlSystemChecks aadlChecker;
-        aadlChecker.setIvCore(ivCore);
-        bool hasNewName = aadlChecker.checkMessage(message);
+        scs::IvSystemChecks ivChecker;
+        ivChecker.setIvCore(ivCore);
+        bool hasNewName = ivChecker.checkMessage(message);
         msc::MscMessage oldMessage(oldName);
         oldMessage.setSourceInstance(message->sourceInstance());
         oldMessage.setTargetInstance(message->targetInstance());
-        bool hasOldName = aadlChecker.checkMessage(&oldMessage);
+        bool hasOldName = ivChecker.checkMessage(&oldMessage);
 
         if (!hasNewName && !hasOldName) {
             const int result = QMessageBox::question(nullptr, tr("No AADL connection"),

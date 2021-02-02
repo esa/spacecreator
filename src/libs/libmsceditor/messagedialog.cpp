@@ -17,7 +17,6 @@
 
 #include "messagedialog.h"
 
-#include "aadlsystemchecks.h"
 #include "asn1editor.h"
 #include "asn1valueparser.h"
 #include "chartlayoutmanager.h"
@@ -26,7 +25,6 @@
 #include "commands/cmdsetmessagedeclarations.h"
 #include "commands/cmdsetparameterlist.h"
 #include "file.h"
-#include "iveditorcore.h"
 #include "messagedeclarationsdialog.h"
 #include "mscchart.h"
 #include "msccommandsstack.h"
@@ -37,6 +35,7 @@
 #include "mscmodel.h"
 #include "mscreader.h"
 #include "mscwriter.h"
+#include "systemchecks.h"
 #include "ui_messagedialog.h"
 
 #include <QCompleter>
@@ -120,12 +119,12 @@ void MessageDialog::setAadlConnectionNames(const QStringList &names)
    \brief MessageDialog::setAadlChecker
    \param checker
  */
-void MessageDialog::setAadlChecker(msc::AadlSystemChecks *checker)
+void MessageDialog::setSystemChecker(msc::SystemChecks *checker)
 {
-    m_aadlChecker = checker;
+    m_checker = checker;
     const QString sourceName = m_message->sourceInstance() ? m_message->sourceInstance()->name() : "";
     const QString targetName = m_message->targetInstance() ? m_message->targetInstance()->name() : "";
-    setAadlConnectionNames(m_aadlChecker->connectionNamesFromTo(sourceName, targetName));
+    setAadlConnectionNames(m_checker->connectionNamesFromTo(sourceName, targetName));
 }
 
 void MessageDialog::accept()
@@ -216,7 +215,7 @@ void MessageDialog::editDeclarations()
     if (docs.isEmpty())
         return;
 
-    MessageDeclarationsDialog dialog(declarations, mscModel(), m_chartLayoutManager->undoStack(), m_aadlChecker, this);
+    MessageDeclarationsDialog dialog(declarations, mscModel(), m_chartLayoutManager->undoStack(), m_checker, this);
     dialog.setFileName(model->dataDefinitionString());
     dialog.setAadlConnectionNames(m_connectionNames);
 

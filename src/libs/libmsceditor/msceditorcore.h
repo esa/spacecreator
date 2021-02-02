@@ -36,7 +36,6 @@ class UndoCommand;
 }
 
 namespace msc {
-class AadlSystemChecks;
 class ActionCreatorTool;
 class BaseTool;
 class CommentCreatorTool;
@@ -52,6 +51,7 @@ class MscCommandsStack;
 class MscInstance;
 class MscMessage;
 class PointerTool;
+class SystemChecks;
 class TimerCreatorTool;
 
 class MainWindow;
@@ -105,7 +105,8 @@ public:
     QAction *createActionCopy(QMainWindow *window);
     QAction *createActionPaste(QMainWindow *window);
 
-    msc::AadlSystemChecks *aadlChecker() const;
+    void setSystemChecker(msc::SystemChecks *checker);
+    msc::SystemChecks *systemChecker() const;
 
     ViewMode viewMode();
 
@@ -144,7 +145,7 @@ private Q_SLOTS:
 
 private:
     std::unique_ptr<msc::MainModel> m_model;
-    std::unique_ptr<msc::AadlSystemChecks> m_aadlChecks;
+    msc::SystemChecks *m_systemChecks = nullptr;
 
     ViewMode m_viewMode = ViewMode::CHART;
 

@@ -23,13 +23,14 @@
 namespace ProjectExplorer {
 class Project;
 }
-
+namespace scs {
+class MscSystemChecks;
+}
 namespace shared {
 class EditorCore;
 }
 
 namespace spctr {
-class MscSystemChecks;
 class ModelStorage;
 
 /*!
@@ -43,7 +44,7 @@ public:
 
     ProjectExplorer::Project *project() const { return m_project; }
     ModelStorage *storage() const { return m_storage.get(); }
-    MscSystemChecks *checks() const { return m_checks.get(); }
+    scs::MscSystemChecks *checks() const { return m_checks.get(); }
 
 private Q_SLOTS:
     void checkAsnFileRename();
@@ -54,7 +55,7 @@ private:
 
     ProjectExplorer::Project *m_project = nullptr;
     std::unique_ptr<ModelStorage> m_storage;
-    std::unique_ptr<MscSystemChecks> m_checks;
+    std::unique_ptr<scs::MscSystemChecks> m_checks;
     QStringList m_asnFiles;
 };
 

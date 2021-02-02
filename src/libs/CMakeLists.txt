@@ -17,3 +17,6 @@ add_subdirectory(msclibrary)
 # deployment view editor
 add_subdirectory(deploy)
 add_subdirectory(libdveditor)
+
+# Total SpaceCreator system
+add_subdirectory(spacecreatorsystem)

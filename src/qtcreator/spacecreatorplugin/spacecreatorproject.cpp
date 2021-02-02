@@ -31,7 +31,7 @@ namespace spctr {
 SpaceCreatorProject::SpaceCreatorProject(ProjectExplorer::Project *project)
     : m_project(project)
     , m_storage(new ModelStorage)
-    , m_checks(new MscSystemChecks)
+    , m_checks(new scs::MscSystemChecks)
 {
     Q_ASSERT(m_project);
     m_checks->setStorage(m_storage.get());

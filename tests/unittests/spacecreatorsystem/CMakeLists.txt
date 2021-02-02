@@ -1,0 +1,1 @@
+addQtTest(tst_ivsystemchecks spacecreatorsystem)

@@ -17,12 +17,12 @@
 
 #include "instanceheaditem.h"
 
-#include "aadlsystemchecks.h"
 #include "baseitems/common/coordinatesconverter.h"
 #include "baseitems/common/mscutils.h"
 #include "baseitems/textitem.h"
 #include "mscchart.h"
 #include "mscinstance.h"
+#include "systemchecks.h"
 
 #include <QCursor>
 #include <QDebug>
@@ -343,9 +343,9 @@ QSizeF InstanceHeadItem::defaultSize()
 /*!
    Set the aadl checker to verify data with the aadl model
  */
-void InstanceHeadItem::setAadlChecker(AadlSystemChecks *checker)
+void InstanceHeadItem::setSystemChecker(SystemChecks *checker)
 {
-    m_aadlChecker = checker;
+    m_checker = checker;
 }
 
 /*!
@@ -353,8 +353,8 @@ void InstanceHeadItem::setAadlChecker(AadlSystemChecks *checker)
  */
 void InstanceHeadItem::showCompleter()
 {
-    if (m_aadlChecker) {
-        QStringList functionNames = m_aadlChecker->functionsNames();
+    if (m_checker) {
+        QStringList functionNames = m_checker->functionsNames();
         if (!m_chart.isNull()) {
             QStringList instanceNames;
             for (MscInstance *instance : m_chart->instances()) {
@@ -362,7 +362,7 @@ void InstanceHeadItem::showCompleter()
             }
             int i = 0;
             while (i < functionNames.size()) {
-                if (instanceNames.contains(functionNames[i], m_aadlChecker->stringSensitivity())) {
+                if (instanceNames.contains(functionNames[i], m_checker->stringSensitivity())) {
                     functionNames.removeAt(i);
                 } else {
                     ++i;
