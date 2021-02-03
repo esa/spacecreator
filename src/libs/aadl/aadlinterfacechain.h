@@ -21,13 +21,13 @@
 
 namespace ivm {
 class AADLIface;
-class AADLFunction;
+class AADLFunctionType;
 
 class AADLInterfaceChain
 {
 public:
     static QList<AADLInterfaceChain> build(const AADLIface *iface);
-    static QVector<QList<QString>> linkedFunctions(const AADLFunction *function);
+    static QVector<QList<QString>> linkedFunctions(const ivm::AADLFunctionType *function);
 
     QString sourceEndPointName() const;
     QString targetEndPointName() const;
@@ -36,8 +36,7 @@ public:
 
 private:
     static QList<AADLInterfaceChain> getNextChunk(const AADLInterfaceChain &currentChain, const AADLIface *iface);
-    static QList<AADLInterfaceChain> getPreviousChunk(
-            const AADLInterfaceChain &currentChain, const AADLIface *iface);
+    static QList<AADLInterfaceChain> getPreviousChunk(const AADLInterfaceChain &currentChain, const AADLIface *iface);
 
 private:
     QList<const ivm::AADLIface *> ifaces;

@@ -79,7 +79,7 @@ QList<AADLInterfaceChain> AADLInterfaceChain::build(const AADLIface *iface)
     return result;
 }
 
-QVector<QList<QString>> AADLInterfaceChain::linkedFunctions(const AADLFunction *function)
+QVector<QList<QString>> AADLInterfaceChain::linkedFunctions(const AADLFunctionType *function)
 {
     QVector<QList<QString>> result;
     for (AADLIface *iface : function->interfaces()) {

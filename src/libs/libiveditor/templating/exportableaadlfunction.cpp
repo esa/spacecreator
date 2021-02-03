@@ -17,13 +17,13 @@
 
 #include "exportableaadlfunction.h"
 
-#include "aadlinterfacechain.h"
 #include "aadlcomment.h"
 #include "aadlconnection.h"
 #include "aadlconnectiongroup.h"
 #include "aadlfunction.h"
 #include "aadlfunctiontype.h"
 #include "aadliface.h"
+#include "aadlinterfacechain.h"
 #include "aadlmodel.h"
 
 namespace ive {
@@ -78,7 +78,7 @@ QVariantList ExportableAADLFunction::connectionGroups() const
 
 QVariantList ExportableAADLFunction::connectedFunctions() const
 {
-    const auto aadlFunction = exportedObject<ivm::AADLFunction>();
+    const auto aadlFunction = exportedObject<ivm::AADLFunctionType>();
     QVariantList list;
     for (auto chain : ivm::AADLInterfaceChain::linkedFunctions(aadlFunction)) {
         list << qVariantFromValue(chain);
