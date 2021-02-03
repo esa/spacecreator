@@ -102,7 +102,7 @@
     </Attr>
     <Attr name="Taste::Autonamed" type="property">
         <Type>
-            <Boolean/>
+            <Boolean defaultValue="True"/>
         </Type>
         <Scopes>
             <Required_Interface/>
