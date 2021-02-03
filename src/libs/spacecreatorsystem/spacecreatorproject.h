@@ -17,9 +17,11 @@
 
 #pragma once
 
+#include <QHash>
 #include <QObject>
 #include <QSharedPointer>
 #include <QVector>
+#include <memory>
 
 namespace dve {
 class DVEditorCore;
@@ -35,7 +37,15 @@ class EditorCore;
 }
 
 namespace scs {
+class IvSystemChecks;
+class MscSystemChecks;
 
+/*!
+   \brief Contains all data of project (of all files).
+
+   - Has functions to query for all space creator related data and files.
+   - Contains checks for the system
+ */
 class SpaceCreatorProject : public QObject
 {
     Q_OBJECT
@@ -48,8 +58,6 @@ public:
     QSharedPointer<ive::IVEditorCore> ivData(const QString &fileName) const;
     QSharedPointer<msc::MSCEditorCore> mscData(const QString &fileName) const;
 
-    void remove(const QString &fileName);
-
     // Query functions
     virtual QSharedPointer<ive::IVEditorCore> ivCore() const;
     virtual QVector<QSharedPointer<msc::MSCEditorCore>> allMscCores() const;
@@ -61,17 +69,28 @@ public:
     virtual QStringList allAsn1Files() const;
     virtual QStringList projectFiles(const QString &suffix) const;
 
+    // System checks
+    /*!
+       Access to the msc checks done from aadl/iv
+       */
+    scs::MscSystemChecks *mscChecks() const { return m_mscChecks.get(); }
+    QVector<scs::IvSystemChecks *> ivChecks() const;
+
 Q_SIGNALS:
     void editedExternally(shared::EditorCore *);
     void ivCoreAdded(QSharedPointer<ive::IVEditorCore> ivCore);
     void mscCoreAdded(QSharedPointer<msc::MSCEditorCore> mscCore);
 
-private:
+protected Q_SLOTS:
+    void purgeNonProjectData();
+
+protected:
     void setIvData(const QString &fileName, QSharedPointer<ive::IVEditorCore> ivData);
     void setMscData(const QString &fileName, QSharedPointer<msc::MSCEditorCore> mscData);
 
     QHash<QString, QSharedPointer<ive::IVEditorCore>> m_ivStore;
     QHash<QString, QSharedPointer<msc::MSCEditorCore>> m_mscStore;
+    std::unique_ptr<scs::MscSystemChecks> m_mscChecks;
 };
 
 } // namespace scs

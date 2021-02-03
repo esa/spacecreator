@@ -20,13 +20,9 @@
 #include "spacecreatorproject.h"
 
 #include <QObject>
-#include <memory>
 
 namespace ProjectExplorer {
 class Project;
-}
-namespace scs {
-class MscSystemChecks;
 }
 namespace shared {
 class EditorCore;
@@ -44,7 +40,6 @@ public:
     ~SpaceCreatorProjectImpl();
 
     ProjectExplorer::Project *project() const { return m_project; }
-    scs::MscSystemChecks *checks() const { return m_checks.get(); }
 
     QStringList projectFiles(const QString &suffix) const override;
 
@@ -56,7 +51,6 @@ private:
     bool isOpenInEditor(shared::EditorCore *core) const;
 
     ProjectExplorer::Project *m_project = nullptr;
-    std::unique_ptr<scs::MscSystemChecks> m_checks;
     QStringList m_asnFiles;
 };
 

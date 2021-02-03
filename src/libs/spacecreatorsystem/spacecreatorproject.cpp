@@ -22,6 +22,7 @@
 #include "ivsystemchecks.h"
 #include "mainmodel.h"
 #include "msceditorcore.h"
+#include "mscsystemchecks.h"
 
 #include <QDebug>
 
@@ -29,7 +30,9 @@ namespace scs {
 
 SpaceCreatorProject::SpaceCreatorProject(QObject *parent)
     : QObject(parent)
+    , m_mscChecks(new MscSystemChecks)
 {
+    m_mscChecks->setStorage(this);
 }
 
 SpaceCreatorProject::~SpaceCreatorProject() { }
@@ -77,13 +80,8 @@ QSharedPointer<msc::MSCEditorCore> SpaceCreatorProject::mscData(const QString &f
 }
 
 /*!
-   Removes the file \p fileName if included in the store
+   Returns the iv/aadl data of the project
  */
-void SpaceCreatorProject::remove(const QString &fileName)
-{
-    m_ivStore.remove(fileName);
-}
-
 QSharedPointer<ive::IVEditorCore> SpaceCreatorProject::ivCore() const
 {
     QStringList aadlFiles = allAadlFiles();
@@ -112,7 +110,7 @@ QVector<QSharedPointer<msc::MSCEditorCore>> SpaceCreatorProject::allMscCores() c
 }
 
 /*!
-   Returns if the given \core is in this storage
+   Returns if the given \p core is in this storage
  */
 bool SpaceCreatorProject::contains(QSharedPointer<shared::EditorCore> core) const
 {
@@ -162,6 +160,46 @@ QStringList SpaceCreatorProject::projectFiles(const QString &suffix) const
 {
     Q_UNUSED(suffix)
     return {};
+}
+
+/*!
+   Access to the list of aadl/iv checks done from msc
+ */
+QVector<IvSystemChecks *> SpaceCreatorProject::ivChecks() const
+{
+    QVector<IvSystemChecks *> checks;
+    for (const QSharedPointer<msc::MSCEditorCore> &core : m_mscStore) {
+        if (auto ivChecker = qobject_cast<scs::IvSystemChecks *>(core->systemChecker())) {
+            checks.append(ivChecker);
+        }
+    }
+    return checks;
+}
+
+/*!
+   Removes all data that is stored here, but is not part of the project
+ */
+void SpaceCreatorProject::purgeNonProjectData()
+{
+    const QStringList aadlFiles = allAadlFiles();
+    auto ivIt = m_ivStore.begin();
+    while (ivIt != m_ivStore.end()) {
+        if (!aadlFiles.contains(ivIt.key())) {
+            ivIt = m_ivStore.erase(ivIt);
+        } else {
+            ++ivIt;
+        }
+    }
+
+    const QStringList mscFiles = allMscFiles();
+    auto mscIt = m_mscStore.begin();
+    while (mscIt != m_mscStore.end()) {
+        if (!mscFiles.contains(mscIt.key())) {
+            mscIt = m_mscStore.erase(mscIt);
+        } else {
+            ++mscIt;
+        }
+    }
 }
 
 /*!

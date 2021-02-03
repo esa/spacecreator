@@ -6,15 +6,17 @@
 
 ![Basic setup](architecture01.png)
 
-Space Creator consits of 3 major parts. The 3 editors are for firrerent file formats: aadl, asn.1 and msc.
+Space Creator consits of 3 major parts. The 3 editors are for different file formats: aadl, asn.1 and msc.
 Each of the editor is implemented in a separate library (or set of libraries). Common code that is used by
 more than one editor is in the libraries:
 
 ## Common used libraries
 
-* **shared** Generally useful code for all or at lesat 2 editor
+* **shared** Generally useful code for all or at least 2 editor
 
 * **templates** Common code to save data via grantlee.
+
+* **asn1editor** Is a UI editor to edit ASN.1 values
 
 
 ## AADL/IV editor
@@ -28,6 +30,8 @@ more than one editor is in the libraries:
 
 * **asn1library** Contains the data and parsing for ASN1 files.
 
+* **asn1plugin** The actual editor as a pure QtCtreator plugin
+
 
 ## MSC editor
 
@@ -40,10 +44,8 @@ This includes handling of CIF information for types and geometry, which is store
 central hub of the MSC editor.
 The charts are drawn using the QGraphicsScene framework. The layout of the more complex chart view is controlled by [msc::ChartLayoutManager](@ref msc::ChartLayoutManager).
 
-The library **asn1editor** will probably be replaced by the ASN.1 editor (asn1library).
 
-
-### Main building blocks {#MSCMainBuildingBlocks}
+### Main MSC building blocks {#MSCMainBuildingBlocks}
 
 [msc::MscModel](@ref msc::MscModel) holds the data of one .msc file. Whenever the data changes, a signal is emitted and the UI updates accordingly.
 Where the UI can be either the tre view showing the hierarchy of documents. The hierarchy showing the documents graphically.
@@ -52,3 +54,13 @@ The textual representaion of the whole data (like in a .msc file). Or one single
 The most complex view is the one for the chart. It's main class is [msc::ChartLayoutManager](@ref msc::ChartLayoutManager).
 
 For laoding and saving .msc files the classes [msc::MscReader](@ref msc::MscReader) and [msc::MscWriter](@ref msc::MscWriter) are used.
+
+
+## SpaceCreator
+
+SpaceCreator is combining everything (except the asn.1 plugin) in one plugin for QtCreator.
+
+* **spacecreatorsystem** Is one library to mainly do checks, suggestions, etc. based on the other parts of the system. 
+And put all files/data of one project in one common place.
+
+* **spacecreatorplugin** Is the actual plugin. mainly a rather thin wrapper around the existing parts.

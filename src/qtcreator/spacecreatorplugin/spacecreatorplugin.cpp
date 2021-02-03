@@ -274,7 +274,7 @@ void SpaceCreatorPlugin::checkInstancesForCurrentEditor()
     if (auto mscEditor = qobject_cast<spctr::MscQtCEditor *>(Core::EditorManager::currentEditor())) {
         SpaceCreatorProjectImpl *project = m_projectsManager->project(mscEditor->mscEditorCore());
         if (project) {
-            project->checks()->checkInstances();
+            project->mscChecks()->checkInstances();
         }
     }
 }
@@ -284,7 +284,7 @@ void SpaceCreatorPlugin::checkMesagesForCurrentEditor()
     if (auto mscEditor = qobject_cast<spctr::MscQtCEditor *>(Core::EditorManager::currentEditor())) {
         SpaceCreatorProjectImpl *project = m_projectsManager->project(mscEditor->mscEditorCore());
         if (project) {
-            project->checks()->checkMessages();
+            project->mscChecks()->checkMessages();
         }
     }
 }

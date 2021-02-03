@@ -30,12 +30,13 @@ namespace spctr {
 SpaceCreatorProjectImpl::SpaceCreatorProjectImpl(ProjectExplorer::Project *project, QObject *parent)
     : scs::SpaceCreatorProject(parent)
     , m_project(project)
-    , m_checks(new scs::MscSystemChecks)
 {
     Q_ASSERT(m_project);
-    m_checks->setStorage(this);
 
     connect(this, &scs::SpaceCreatorProject::editedExternally, this, &spctr::SpaceCreatorProjectImpl::saveIfNotOpen);
+
+    connect(m_project, &ProjectExplorer::Project::fileListChanged, this,
+            &spctr::SpaceCreatorProjectImpl::purgeNonProjectData);
 
     m_asnFiles = allAsn1Files();
     connect(m_project, &ProjectExplorer::Project::fileListChanged, this,
