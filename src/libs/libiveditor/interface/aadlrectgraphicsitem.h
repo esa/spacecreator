@@ -67,8 +67,6 @@ protected:
 private Q_SLOTS:
     void onGeometryChanged();
     void shiftBy(const QPointF &shift);
-    void updateChildrenVisibility();
-    void updateSiblingVisibility();
 
 private:
     QSet<InteractiveObject *> m_collidedItems;

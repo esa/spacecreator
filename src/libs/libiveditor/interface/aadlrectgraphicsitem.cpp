@@ -29,8 +29,6 @@
 
 namespace ive {
 
-static const qreal kOffset = 2.0;
-
 AADLRectGraphicsItem::AADLRectGraphicsItem(ivm::AADLObject *entity, QGraphicsItem *parentGraphicsItem)
     : InteractiveObject(entity, parentGraphicsItem)
 {
@@ -185,8 +183,6 @@ QList<QPair<ivm::AADLObject *, QVector<QPointF>>> AADLRectGraphicsItem::prepareC
 
 void AADLRectGraphicsItem::rebuildLayout()
 {
-    updateSiblingVisibility();
-    updateChildrenVisibility();
     updateGripPoints();
     applyColorScheme();
 }
@@ -310,26 +306,6 @@ void AADLRectGraphicsItem::shiftBy(const QPointF &shift)
     onManualMoveFinish(nullptr, pressedAt, releasedAt);
 }
 
-void AADLRectGraphicsItem::updateChildrenVisibility()
-{
-    const QRectF sceneRect = sceneBoundingRect();
-    const bool visible = sceneRect.contains(nestedItemsSceneBoundingRect());
-    for (auto child : childItems()) {
-        if (auto rectItem = qobject_cast<AADLRectGraphicsItem *>(child->toGraphicsObject())) {
-            rectItem->setVisible(visible && rectItem->aadlObject()->isVisible());
-        }
-    }
-}
-
-void AADLRectGraphicsItem::updateSiblingVisibility()
-{
-    if (auto parentRectObject = parentObject()) {
-        if (auto parentRectItem = qobject_cast<AADLRectGraphicsItem *>(parentRectObject)) {
-            parentRectItem->updateChildrenVisibility();
-        }
-    }
-}
-
 void AADLRectGraphicsItem::onGeometryChanged()
 {
     QSet<InteractiveObject *> items;
@@ -354,8 +330,6 @@ void AADLRectGraphicsItem::onGeometryChanged()
 
     if (m_collidedItems.isEmpty())
         clearHighlight();
-
-    updateSiblingVisibility();
 }
 
 static inline QList<QRectF> siblingRectsForItem(

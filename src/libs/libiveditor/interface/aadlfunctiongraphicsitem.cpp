@@ -133,9 +133,7 @@ void AADLFunctionGraphicsItem::paint(QPainter *painter, const QStyleOptionGraphi
         iconRect.moveTopRight(br.adjusted(kRadius, kRadius, -kRadius, -kRadius).topRight());
         m_svgRenderer->render(painter, iconRect);
 
-        if (!sceneBoundingRect().contains(nestedItemsSceneBoundingRect())) {
-            drawInnerFunctions(painter);
-        }
+        drawInnerFunctions(painter);
     }
 
     painter->restore();
