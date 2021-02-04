@@ -20,7 +20,4 @@
         <file>icns/zoom_in.svg</file>
         <file>icns/zoom_out.svg</file>
     </qresource>
-    <qresource prefix="/">
-        <file>colors/default_colors.json</file>
-    </qresource>
 </RCC>

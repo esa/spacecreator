@@ -17,7 +17,6 @@
 
 #include "colormanager.h"
 
-#include "baseitems/common/aadlutils.h"
 #include "common.h"
 #include "settingsmanager.h"
 
@@ -29,112 +28,7 @@
 #include <QMetaEnum>
 #include <QStandardPaths>
 
-namespace ive {
-
-ColorHandler::ColorHandler()
-    : d(new ColorHandlerData())
-{
-}
-
-ColorHandler::ColorHandler(const ColorHandler &other)
-    : d(other.d)
-{
-}
-
-QPen ColorHandler::pen() const
-{
-    return { penColor(), penWidth() };
-}
-
-QBrush ColorHandler::brush() const
-{
-    switch (fillType()) {
-    case FillType::Gradient: {
-        QLinearGradient gradient;
-        gradient.setCoordinateMode(QLinearGradient::ObjectBoundingMode);
-        gradient.setStart(0., 0.);
-        gradient.setFinalStop(0., 1.);
-        gradient.setColorAt(0., brushColor0());
-        gradient.setColorAt(1., brushColor1());
-
-        return QBrush(gradient);
-    }
-    default:
-        return QBrush(brushColor0());
-    }
-}
-
-ColorHandler::FillType ColorHandler::fillType() const
-{
-    return d->fillType;
-}
-
-void ColorHandler::setFillType(ColorHandler::FillType fillType)
-{
-    d->fillType = fillType;
-}
-
-qreal ColorHandler::penWidth() const
-{
-    return d->penWidth;
-}
-
-void ColorHandler::setPenWidth(qreal width)
-{
-    d->penWidth = width;
-}
-
-QColor ColorHandler::penColor() const
-{
-    return d->penColor;
-}
-
-void ColorHandler::setPenColor(const QColor &color)
-{
-    d->penColor = color;
-}
-
-QColor ColorHandler::brushColor0() const
-{
-    return d->brushColor0;
-}
-
-void ColorHandler::setBrushColor0(const QColor &color)
-{
-    d->brushColor0 = color;
-}
-
-QColor ColorHandler::brushColor1() const
-{
-    return d->brushColor1;
-}
-
-void ColorHandler::setBrushColor1(const QColor &color)
-{
-    d->brushColor1 = color;
-}
-
-ColorHandler ColorHandler::fromJson(const QJsonObject &jObj)
-{
-    ColorHandler h;
-    h.setFillType(ColorHandler::FillType(jObj["fill_type"].toInt(ColorHandler::FillType::Color)));
-    h.setPenWidth(jObj["pen_width"].toDouble(1.));
-    h.setPenColor(QColor(jObj["pen_color"].toString("black")));
-    h.setBrushColor0(QColor(jObj["brush_color0"].toString("lightGray")));
-    h.setBrushColor1(QColor(jObj["brush_color1"].toString("white")));
-    return h;
-}
-
-QJsonObject ColorHandler::toJson() const
-{
-    return {
-        { "fill_type", fillType() },
-        { "pen_width", penWidth() },
-        { "pen_color", penColor().name(QColor::HexArgb) },
-        { "brush_color0", brushColor0().name(QColor::HexArgb) },
-        { "brush_color1", brushColor1().name(QColor::HexArgb) },
-    };
-}
+namespace shared {
 
 ColorManager *ColorManager::m_instance = nullptr;
 const QString ColorManager::defaultColorschemeFileName = QStringLiteral("default_colors.json");
@@ -248,7 +142,7 @@ bool ColorManager::setSourceFile(const QString &from)
         qWarning() << "File open failed:" << from << jsonFile.errorString();
     }
 
-    if (m_colors.size() != QMetaEnum::fromType<ive::ColorManager::HandledColors>().keyCount() - 1) {
+    if (m_colors.size() != QMetaEnum::fromType<shared::ColorManager::HandledColors>().keyCount() - 1) {
         return false;
     }
 

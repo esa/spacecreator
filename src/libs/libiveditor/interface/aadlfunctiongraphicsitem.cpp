@@ -258,7 +258,8 @@ void AADLFunctionGraphicsItem::drawInnerFunctions(QPainter *painter)
 
     const QRectF br = boundingRect();
 
-    const ColorHandler ch = ColorManager::instance()->colorsForItem(ColorManager::FunctionScale);
+    const shared::ColorHandler ch =
+            shared::ColorManager::instance()->colorsForItem(shared::ColorManager::FunctionScale);
     painter->setBrush(ch.brush());
     painter->setPen(QPen(ch.penColor(), ch.penWidth()));
 
@@ -342,28 +343,29 @@ void AADLFunctionGraphicsItem::prepareTextRect(QRectF &textRect, const QRectF &t
     textRect.moveCenter(targetTextRect.center());
 }
 
-ColorManager::HandledColors AADLFunctionGraphicsItem::handledColorType() const
+shared::ColorManager::HandledColors AADLFunctionGraphicsItem::handledColorType() const
 {
     if (isRootItem())
-        return ColorManager::HandledColors::FunctionRoot;
+        return shared::ColorManager::HandledColors::FunctionRoot;
 
     const QRectF nestedRect = nestedItemsSceneBoundingRect();
     if (nestedRect.isValid() && !sceneBoundingRect().contains(nestedRect.marginsAdded(kContentMargins)))
-        return ColorManager::HandledColors::FunctionPartial;
+        return shared::ColorManager::HandledColors::FunctionPartial;
 
-    return ColorManager::HandledColors::FunctionRegular;
+    return shared::ColorManager::HandledColors::FunctionRegular;
 }
 
 void AADLFunctionGraphicsItem::applyColorScheme()
 {
-    const ColorHandler &h = colorHandler();
+    const shared::ColorHandler &h = colorHandler();
     QPen p = h.pen();
     QBrush b = h.brush();
 
     if (auto parentFunction = qgraphicsitem_cast<AADLFunctionGraphicsItem *>(parentItem())) {
         if (!parentFunction->entity()->hasProperty(QLatin1String("color"))
                 && !entity()->hasProperty(QLatin1String("color"))
-                && parentFunction->handledColorType() == ColorManager::HandledColors::FunctionRegular) { // [Hm...]
+                && parentFunction->handledColorType()
+                        == shared::ColorManager::HandledColors::FunctionRegular) { // [Hm...]
             b.setColor(parentFunction->brush().color().darker(125));
             p.setColor(parentFunction->pen().color().darker(125));
         }

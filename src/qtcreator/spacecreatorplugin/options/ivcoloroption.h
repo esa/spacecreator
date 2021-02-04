@@ -20,7 +20,7 @@
 #include <QPointer>
 #include <coreplugin/dialogs/ioptionspage.h>
 
-namespace ive {
+namespace shared {
 class ColorSettingsWidget;
 }
 
@@ -42,7 +42,7 @@ public Q_SLOTS:
 
 private:
     QPointer<QWidget> m_widget;
-    QPointer<ive::ColorSettingsWidget> m_colorWidget;
+    QPointer<shared::ColorSettingsWidget> m_colorWidget;
     QString m_originalFile;
     bool m_reset = true;
 };

@@ -31,7 +31,7 @@ public:
             AADLInterfaceGraphicsItem *ifaceEnd, QGraphicsItem *parent = nullptr);
 
 protected:
-    ColorManager::HandledColors handledColorType() const override;
+    shared::ColorManager::HandledColors handledColorType() const override;
 };
 
 }

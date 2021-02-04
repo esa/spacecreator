@@ -22,15 +22,14 @@
 
 namespace ive {
 
-AADLInterfaceGroupGraphicsItem::AADLInterfaceGroupGraphicsItem(
-        ivm::AADLIfaceGroup *entity, QGraphicsItem *parent)
+AADLInterfaceGroupGraphicsItem::AADLInterfaceGroupGraphicsItem(ivm::AADLIfaceGroup *entity, QGraphicsItem *parent)
     : AADLInterfaceGraphicsItem(entity, parent)
 {
 }
 
-ColorManager::HandledColors AADLInterfaceGroupGraphicsItem::handledColorType() const
+shared::ColorManager::HandledColors AADLInterfaceGroupGraphicsItem::handledColorType() const
 {
-    return ColorManager::HandledColors::IfaceGroup;
+    return shared::ColorManager::HandledColors::IfaceGroup;
 }
 
 ivm::AADLIfaceGroup *AADLInterfaceGroupGraphicsItem::entity() const

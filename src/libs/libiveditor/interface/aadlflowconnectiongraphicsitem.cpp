@@ -25,9 +25,9 @@ AADLFlowConnectionGraphicsItem::AADLFlowConnectionGraphicsItem(ivm::AADLConnecti
 {
 }
 
-ColorManager::HandledColors AADLFlowConnectionGraphicsItem::handledColorType() const
+shared::ColorManager::HandledColors AADLFlowConnectionGraphicsItem::handledColorType() const
 {
-    return ColorManager::HandledColors::ConnectionFlow;
+    return shared::ColorManager::HandledColors::ConnectionFlow;
 }
 
 }

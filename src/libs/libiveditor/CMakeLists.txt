@@ -74,19 +74,6 @@ target_sources(${LIB_NAME} PRIVATE
     interface/aadlobjectstreeview.h
     interface/aadlrectgraphicsitem.cpp
     interface/aadlrectgraphicsitem.h
-    interface/colors/colorhandlereditor.cpp
-    interface/colors/colorhandlereditor.h
-    interface/colors/colorhandlereditor.ui
-    interface/colors/colormanager.cpp
-    interface/colors/colormanager.h
-    interface/colors/colormanagerdialog.cpp
-    interface/colors/colormanagerdialog.h
-    interface/colors/colormanagerdialog.ui
-    interface/colors/colorselectorbutton.cpp
-    interface/colors/colorselectorbutton.h
-    interface/colors/colorsettingswidget.cpp
-    interface/colors/colorsettingswidget.h
-    interface/colors/colorsettingswidget.ui
     interface/commands/cmdchangeasn1file.cpp
     interface/commands/cmdchangeasn1file.h
     interface/commands/cmdcommentitemcreate.cpp

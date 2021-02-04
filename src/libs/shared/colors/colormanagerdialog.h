@@ -17,31 +17,32 @@
 
 #pragma once
 
-#include <QToolButton>
+#include <QDialog>
 
-namespace ive {
+class QAbstractButton;
 
-class ColorSelectorButton : public QToolButton
+namespace Ui {
+class ColorManagerDialog;
+}
+
+namespace shared {
+
+class ColorManagerDialog : public QDialog
 {
     Q_OBJECT
+
 public:
-    enum AcceptPolicy
-    {
-        AnyColors = 0,
-        ValidColors
-    };
-    ColorSelectorButton(QWidget *parent = nullptr);
-    QColor color() const;
-    void setColor(const QColor &color, AcceptPolicy accept = AcceptPolicy::AnyColors);
+    explicit ColorManagerDialog(QWidget *parent = nullptr);
+    ~ColorManagerDialog();
 
-Q_SIGNALS:
-    void colorChanged(const QColor &c);
-
-protected Q_SLOTS:
-    void onClicked();
+public Q_SLOTS:
+    void accept() override;
+    void reject() override;
+    void onDialogButtonClicked(QAbstractButton *button);
 
 private:
-    QColor m_color { Qt::transparent };
+    Ui::ColorManagerDialog *ui;
+    QString m_originalFile;
 };
 
 }

@@ -31,7 +31,7 @@ class AADLInterfaceGroupGraphicsItem : public AADLInterfaceGraphicsItem
     Q_OBJECT
 public:
     explicit AADLInterfaceGroupGraphicsItem(ivm::AADLIfaceGroup *entity, QGraphicsItem *parent = nullptr);
-    ColorManager::HandledColors handledColorType() const override;
+    shared::ColorManager::HandledColors handledColorType() const override;
 
     ivm::AADLIfaceGroup *entity() const;
 

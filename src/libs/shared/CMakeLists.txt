@@ -3,6 +3,21 @@ set(LIB_NAME shared)
 add_library(${LIB_NAME} STATIC)
 
 target_sources(${LIB_NAME} PRIVATE
+    colors/colorhandler.cpp
+    colors/colorhandler.h
+    colors/colorhandlereditor.cpp
+    colors/colorhandlereditor.h
+    colors/colorhandlereditor.ui
+    colors/colormanager.cpp
+    colors/colormanager.h
+    colors/colormanagerdialog.cpp
+    colors/colormanagerdialog.h
+    colors/colormanagerdialog.ui
+    colors/colorselectorbutton.cpp
+    colors/colorselectorbutton.h
+    colors/colorsettingswidget.cpp
+    colors/colorsettingswidget.h
+    colors/colorsettingswidget.ui
     reports/bugreportdialog.cpp
     reports/bugreportdialog.h
     reports/bugreportdialog.ui
@@ -46,6 +61,7 @@ target_sources(${LIB_NAME} PRIVATE
     settingsmanager.h
     sharedlibrary.cpp
     sharedlibrary.h
+    sharedresources/colors/default_colors.json
     sharedresources/sharedresources.qrc
     undocommand.cpp
     undocommand.h

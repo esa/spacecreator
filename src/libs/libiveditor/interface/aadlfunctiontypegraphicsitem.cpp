@@ -141,14 +141,14 @@ void AADLFunctionTypeGraphicsItem::updateTextPosition()
     m_textItem->setPos(textRect.topLeft());
 }
 
-ColorManager::HandledColors AADLFunctionTypeGraphicsItem::handledColorType() const
+shared::ColorManager::HandledColors AADLFunctionTypeGraphicsItem::handledColorType() const
 {
-    return ColorManager::HandledColors::FunctionType;
+    return shared::ColorManager::HandledColors::FunctionType;
 }
 
 void AADLFunctionTypeGraphicsItem::applyColorScheme()
 {
-    const ColorHandler &h = colorHandler();
+    const shared::ColorHandler &h = colorHandler();
     setPen(h.pen());
     setBrush(h.brush());
     update();

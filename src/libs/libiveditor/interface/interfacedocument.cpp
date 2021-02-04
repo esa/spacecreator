@@ -29,6 +29,7 @@
 #include "asn1modelstorage.h"
 #include "baseitems/common/aadlutils.h"
 #include "baseitems/graphicsview.h"
+#include "colors/colormanagerdialog.h"
 #include "commands/cmdentitiesimport.h"
 #include "commands/cmdentitiesinstantiate.h"
 #include "commandsstack.h"
@@ -39,7 +40,6 @@
 #include "file.h"
 #include "graphicsitemhelpers.h"
 #include "interface/aadlobjectstreeview.h"
-#include "interface/colors/colormanagerdialog.h"
 #include "interface/properties/propertiesdialog.h"
 #include "interface/properties/propertytemplatemanager.h"
 #include "interface/properties/propertytemplatewidget.h"
@@ -663,7 +663,7 @@ void InterfaceDocument::onDataTypesMenuInvoked()
 
 void InterfaceDocument::onColorSchemeMenuInvoked()
 {
-    ive::ColorManagerDialog *dialog = new ive::ColorManagerDialog(window());
+    shared::ColorManagerDialog *dialog = new shared::ColorManagerDialog(window());
     dialog->setAttribute(Qt::WA_DeleteOnClose);
     dialog->open();
 }

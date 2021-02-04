@@ -18,7 +18,7 @@
 
 #pragma once
 
-#include "interface/colors/colormanager.h"
+#include "colors/colormanager.h"
 #include "ui/interactiveobjectbase.h"
 
 #include <QFont>
@@ -82,8 +82,8 @@ protected:
 
     void mergeGeometry();
 
-    virtual ColorManager::HandledColors handledColorType() const = 0;
-    virtual ColorHandler colorHandler() const;
+    virtual shared::ColorManager::HandledColors handledColorType() const = 0;
+    virtual shared::ColorHandler colorHandler() const;
 
 protected:
     const QPointer<ivm::AADLObject> m_dataObject;

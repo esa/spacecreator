@@ -20,7 +20,7 @@
 #include "colormanager.h"
 #include "ui_colorhandlereditor.h"
 
-namespace ive {
+namespace shared {
 
 ColorHandlerEditor::ColorHandlerEditor(QWidget *parent)
     : QWidget(parent)

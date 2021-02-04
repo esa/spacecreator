@@ -55,7 +55,7 @@ protected Q_SLOTS:
 protected:
     void rebuildLayout() override;
     void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget) override;
-    virtual ColorManager::HandledColors handledColorType() const override;
+    virtual shared::ColorManager::HandledColors handledColorType() const override;
 
 private:
     QString m_text;

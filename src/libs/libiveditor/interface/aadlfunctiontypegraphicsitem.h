@@ -57,7 +57,7 @@ protected:
     void onManualResizeProgress(shared::ui::GripPoint *grip, const QPointF &from, const QPointF &to) override;
     void rebuildLayout() override;
     void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget) override;
-    ColorManager::HandledColors handledColorType() const override;
+    shared::ColorManager::HandledColors handledColorType() const override;
 
     virtual void updateTextPosition();
 

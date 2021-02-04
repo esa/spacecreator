@@ -27,7 +27,7 @@ namespace Ui {
 class ColorSettingsWidget;
 }
 
-namespace ive {
+namespace shared {
 
 class ColorSettingsWidget : public QWidget
 {

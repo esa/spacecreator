@@ -17,8 +17,8 @@
 
 #include "endtoendview.h"
 
-#include "aadlconnectionchain.h"
 #include "aadlconnection.h"
+#include "aadlconnectionchain.h"
 #include "aadlconnectiongroup.h"
 #include "aadlfunction.h"
 #include "aadlifacegroup.h"
@@ -368,7 +368,8 @@ bool EndToEndView::refreshView()
         }
     }
 
-    const ColorHandler colorHandler = ColorManager::colorsForItem(ColorManager::HandledColors::ConnectionFlow);
+    const shared::ColorHandler colorHandler =
+            shared::ColorManager::colorsForItem(shared::ColorManager::HandledColors::ConnectionFlow);
     for (const auto &internalConnection : internalConnections) {
         if (internalConnection.pi != nullptr && internalConnection.ri != nullptr) {
             auto item = new QGraphicsPathItem;

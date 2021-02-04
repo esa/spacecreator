@@ -17,58 +17,12 @@
 
 #pragma once
 
+#include "colorhandler.h"
+
 #include <QMap>
 #include <QObject>
-#include <QPen>
 
-namespace ive {
-
-struct ColorHandlerData;
-
-class ColorHandler
-{
-public:
-    enum FillType
-    {
-        Color = 0,
-        Gradient
-    };
-
-    ColorHandler();
-    ColorHandler(const ColorHandler &other);
-
-    QPen pen() const;
-    QBrush brush() const;
-
-    FillType fillType() const;
-    void setFillType(FillType fillType);
-
-    qreal penWidth() const;
-    void setPenWidth(qreal width);
-
-    QColor penColor() const;
-    void setPenColor(const QColor &color);
-
-    QColor brushColor0() const;
-    void setBrushColor0(const QColor &color);
-
-    QColor brushColor1() const;
-    void setBrushColor1(const QColor &color);
-
-    static ColorHandler fromJson(const QJsonObject &jObj);
-    QJsonObject toJson() const;
-
-private:
-    QExplicitlySharedDataPointer<ColorHandlerData> d;
-};
-
-struct ColorHandlerData : public QSharedData {
-    ColorHandler::FillType fillType { ColorHandler::FillType::Color };
-    qreal penWidth { 1.0 };
-    QColor penColor { Qt::black };
-    QColor brushColor0 { Qt::black };
-    QColor brushColor1 { Qt::white };
-};
+namespace shared {
 
 class ColorManager : public QObject
 {
@@ -121,5 +75,3 @@ private:
 };
 
 }
-
-Q_DECLARE_TYPEINFO(ive::ColorHandler, Q_MOVABLE_TYPE);

@@ -25,15 +25,15 @@
     </widget>
    </item>
    <item row="0" column="0">
-    <widget class="ive::ColorSettingsWidget" name="widget" native="true"/>
+    <widget class="shared::ColorSettingsWidget" name="widget" native="true"/>
    </item>
   </layout>
  </widget>
  <customwidgets>
   <customwidget>
-   <class>ive::ColorSettingsWidget</class>
+   <class>shared::ColorSettingsWidget</class>
    <extends>QWidget</extends>
-   <header>interface/colors/colorsettingswidget.h</header>
+   <header>colors/colorsettingswidget.h</header>
    <container>1</container>
   </customwidget>
  </customwidgets>

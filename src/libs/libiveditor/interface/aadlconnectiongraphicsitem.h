@@ -68,7 +68,7 @@ public:
     AADLFunctionGraphicsItem *sourceItem() const;
     AADLFunctionGraphicsItem *targetItem() const;
 
-    QList<QPair<ivm::AADLObject*, QVector<QPointF> > > prepareChangeCoordinatesCommandParams() const override;
+    QList<QPair<ivm::AADLObject *, QVector<QPointF>>> prepareChangeCoordinatesCommandParams() const override;
 
     QString prepareTooltip() const override;
 
@@ -87,7 +87,7 @@ protected:
     void onManualMoveProgress(shared::ui::GripPoint *gp, const QPointF &from, const QPointF &to) override;
     void onManualMoveFinish(shared::ui::GripPoint *gp, const QPointF &pressedAt, const QPointF &releasedAt) override;
 
-    ColorManager::HandledColors handledColorType() const override;
+    shared::ColorManager::HandledColors handledColorType() const override;
     virtual void updateBoundingRect();
 
 protected Q_SLOTS:

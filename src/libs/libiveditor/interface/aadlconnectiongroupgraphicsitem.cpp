@@ -17,8 +17,8 @@
 
 #include "aadlconnectiongroupgraphicsitem.h"
 
-#include "aadlinterfacegroupgraphicsitem.h"
 #include "aadlconnectiongroup.h"
+#include "aadlinterfacegroupgraphicsitem.h"
 
 #include <QFontMetrics>
 
@@ -34,9 +34,9 @@ AADLConnectionGroupGraphicsItem::AADLConnectionGroupGraphicsItem(ivm::AADLConnec
     connect(connection, &ivm::AADLObject::titleChanged, this, &AADLConnectionGroupGraphicsItem::updateLabel);
 }
 
-ColorManager::HandledColors AADLConnectionGroupGraphicsItem::handledColorType() const
+shared::ColorManager::HandledColors AADLConnectionGroupGraphicsItem::handledColorType() const
 {
-    return ColorManager::HandledColors::ConnectionGroup;
+    return shared::ColorManager::HandledColors::ConnectionGroup;
 }
 
 void AADLConnectionGroupGraphicsItem::init()

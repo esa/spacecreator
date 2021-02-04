@@ -23,7 +23,7 @@
 
 #include <QPushButton>
 
-namespace ive {
+namespace shared {
 
 ColorManagerDialog::ColorManagerDialog(QWidget *parent)
     : QDialog(parent)

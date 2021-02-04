@@ -82,7 +82,7 @@ protected:
     void onManualMoveFinish(shared::ui::GripPoint *grip, const QPointF &from, const QPointF &to) override;
 
     void updateInternalItems(Qt::Alignment alignment);
-    virtual ColorManager::HandledColors handledColorType() const override;
+    virtual shared::ColorManager::HandledColors handledColorType() const override;
     void adjustItem();
     qreal typeIconHeight() const;
     qreal baseLength() const;

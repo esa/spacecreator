@@ -365,7 +365,7 @@ void AADLConnectionGraphicsItem::updateOverlappedSections()
 
 void AADLConnectionGraphicsItem::onSelectionChanged(bool isSelected)
 {
-    const ColorHandler h = colorHandler();
+    const shared::ColorHandler h = colorHandler();
     QPen pen = h.pen();
     pen.setWidthF(isSelected ? 1.5 * pen.widthF() : pen.widthF());
     pen.setStyle(isSelected ? Qt::DotLine : Qt::SolidLine);
@@ -584,14 +584,14 @@ void AADLConnectionGraphicsItem::initGripPoints()
         gripPointsHandler()->createGripPoint(shared::ui::GripPoint::Absolute);
 }
 
-ColorManager::HandledColors AADLConnectionGraphicsItem::handledColorType() const
+shared::ColorManager::HandledColors AADLConnectionGraphicsItem::handledColorType() const
 {
-    return ColorManager::HandledColors::Connection;
+    return shared::ColorManager::HandledColors::Connection;
 }
 
 void AADLConnectionGraphicsItem::applyColorScheme()
 {
-    const ColorHandler &h = colorHandler();
+    const shared::ColorHandler &h = colorHandler();
     m_item->setPen(h.pen());
     update();
 }

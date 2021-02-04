@@ -60,7 +60,7 @@ protected:
 
     void prepareTextRect(QRectF &textRect, const QRectF &targetTextRect) const override;
 
-    virtual ColorManager::HandledColors handledColorType() const override;
+    virtual shared::ColorManager::HandledColors handledColorType() const override;
 
 protected Q_SLOTS:
     void applyColorScheme() override;

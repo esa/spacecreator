@@ -146,14 +146,14 @@ QSizeF AADLCommentGraphicsItem::minimalSize() const
     return DefaultGraphicsItemSize;
 }
 
-ColorManager::HandledColors AADLCommentGraphicsItem::handledColorType() const
+shared::ColorManager::HandledColors AADLCommentGraphicsItem::handledColorType() const
 {
-    return ColorManager::HandledColors::Comment;
+    return shared::ColorManager::HandledColors::Comment;
 }
 
 void AADLCommentGraphicsItem::applyColorScheme()
 {
-    const ColorHandler &h = colorHandler();
+    const shared::ColorHandler &h = colorHandler();
     QPen pen = h.pen();
     pen.setCapStyle(Qt::FlatCap);
     pen.setStyle(Qt::SolidLine);

@@ -245,7 +245,7 @@ void AADLInterfaceGraphicsItem::updateFromEntity()
 
 void AADLInterfaceGraphicsItem::onSelectionChanged(bool isSelected)
 {
-    const ColorHandler &h = colorHandler();
+    const shared::ColorHandler &h = colorHandler();
     m_iface->setBrush(isSelected ? kSelectedBackgroundColor : h.brush());
 }
 
@@ -402,9 +402,9 @@ void AADLInterfaceGraphicsItem::onManualMoveFinish(shared::ui::GripPoint *, cons
     updateEntity();
 }
 
-ColorManager::HandledColors AADLInterfaceGraphicsItem::handledColorType() const
+shared::ColorManager::HandledColors AADLInterfaceGraphicsItem::handledColorType() const
 {
-    return ColorManager::HandledColors::Iface;
+    return shared::ColorManager::HandledColors::Iface;
 }
 
 void AADLInterfaceGraphicsItem::adjustItem()
@@ -470,7 +470,7 @@ qreal AADLInterfaceGraphicsItem::baseLength() const
 
 void AADLInterfaceGraphicsItem::applyColorScheme()
 {
-    const ColorHandler &h = colorHandler();
+    const shared::ColorHandler &h = colorHandler();
     QPen pen = h.pen();
     m_type->setPen(pen);
     pen.setWidthF(pen.widthF() / 2.);

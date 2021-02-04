@@ -19,7 +19,7 @@
 
 #include <QColorDialog>
 
-namespace ive {
+namespace shared {
 
 ColorSelectorButton::ColorSelectorButton(QWidget *parent)
     : QToolButton(parent)
