@@ -184,7 +184,7 @@ void InteractiveObject::mouseDoubleClickEvent(QGraphicsSceneMouseEvent *event)
 
 shared::ColorHandler InteractiveObject::colorHandler() const
 {
-    shared::ColorHandler h = shared::ColorManager::colorsForItem(handledColorType());
+    shared::ColorHandler h = shared::ColorManager::instance()->colorsForItem(handledColorType());
     if (auto aadlObj = aadlObject()) {
         if (aadlObj->hasProperty(QLatin1String("color"))) { // keep single custom color
             h.setFillType(shared::ColorHandler::Color);

@@ -49,14 +49,14 @@ public:
     static QString handledColorTypeName(HandledColors t);
     static ColorManager *instance();
 
-    static ColorHandler colorsForItem(HandledColors t);
-
     static QString defaultColorsResourceFile();
 
 public:
     bool setSourceFile(const QString &from);
     QString sourceFile() const;
+    bool save(const QString &fileName) const;
 
+    ColorHandler colorsForItem(HandledColors t) const;
     QList<HandledColors> handledColors() const;
 
 Q_SIGNALS:

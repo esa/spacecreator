@@ -56,19 +56,8 @@ void ColorSettingsWidget::saveSettings()
 {
     const QString &filePath = ui->lePath->text();
 
-    QJsonArray ja;
-    for (auto ct : ColorManager::instance()->handledColors()) {
-        ColorHandler ch = ColorManager::instance()->colorsForItem(ct);
-        QJsonObject jObj = ch.toJson();
-        jObj["color_type"] = ct;
-        ja.append(jObj);
-    }
-
-    QFile out(filePath);
-    if (out.open(QIODevice::WriteOnly | QIODevice::Text | QIODevice::Truncate)) {
-        out.write(QJsonDocument(ja).toJson());
-        out.close();
-    } else {
+    const bool ok = ColorManager::instance()->save(filePath);
+    if (!ok) {
         QMessageBox::warning(this, tr("Error saving"), tr("Unable to save file %1").arg(filePath));
         return;
     }

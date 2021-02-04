@@ -369,7 +369,7 @@ bool EndToEndView::refreshView()
     }
 
     const shared::ColorHandler colorHandler =
-            shared::ColorManager::colorsForItem(shared::ColorManager::HandledColors::ConnectionFlow);
+            shared::ColorManager::instance()->colorsForItem(shared::ColorManager::HandledColors::ConnectionFlow);
     for (const auto &internalConnection : internalConnections) {
         if (internalConnection.pi != nullptr && internalConnection.ri != nullptr) {
             auto item = new QGraphicsPathItem;

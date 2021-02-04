@@ -27,6 +27,7 @@
 #include <QJsonObject>
 #include <QMetaEnum>
 #include <QStandardPaths>
+#include <QUrl>
 
 namespace shared {
 
@@ -35,20 +36,10 @@ const QString ColorManager::defaultColorschemeFileName = QStringLiteral("default
 
 ColorManager::ColorManager(QObject *parent)
     : QObject(parent)
-    , m_colors({
-              { HandledColors::FunctionRegular, ColorHandler() },
-              { HandledColors::FunctionRoot, ColorHandler() },
-              { HandledColors::FunctionPartial, ColorHandler() },
-              { HandledColors::FunctionType, ColorHandler() },
-              { HandledColors::Iface, ColorHandler() },
-              { HandledColors::Connection, ColorHandler() },
-              { HandledColors::ConnectionFlow, ColorHandler() },
-              { HandledColors::Comment, ColorHandler() },
-              { HandledColors::ConnectionGroup, ColorHandler() },
-              { HandledColors::IfaceGroup, ColorHandler() },
-              { HandledColors::FunctionScale, ColorHandler() },
-      })
 {
+    setSourceFile(defaultColorsResourceFile());
+    Q_ASSERT(m_colors.size() == QMetaEnum::fromType<shared::ColorManager::HandledColors>().keyCount() - 1);
+
     const QString sourcePath = shared::SettingsManager::load<QString>(
             shared::SettingsManager::Common::ColorSchemeFile, prepareDefaultSource());
 
@@ -60,15 +51,16 @@ ColorManager::ColorManager(QObject *parent)
 
 ColorManager *ColorManager::instance()
 {
-    if (!m_instance)
+    if (!m_instance) {
         m_instance = new ColorManager;
+    }
 
     return m_instance;
 }
 
-ColorHandler ColorManager::colorsForItem(HandledColors t)
+ColorHandler ColorManager::colorsForItem(HandledColors t) const
 {
-    return instance()->m_colors.value(t);
+    return m_colors.value(t);
 }
 
 QString ColorManager::defaultColorsResourceFile()
@@ -106,6 +98,9 @@ QString ColorManager::handledColorTypeName(HandledColors t)
     }
 }
 
+/*!
+   Does load the color scheme from \p from. And if succesful does set the file source.
+ */
 bool ColorManager::setSourceFile(const QString &from)
 {
     auto loadColorHandler = [this](const QJsonObject &jsonObject) {
@@ -147,8 +142,10 @@ bool ColorManager::setSourceFile(const QString &from)
     }
 
     if (loaded) {
-        m_filePath = from;
-        shared::SettingsManager::store<QString>(shared::SettingsManager::Common::ColorSchemeFile, m_filePath);
+        if (!from.startsWith(":")) {
+            m_filePath = from;
+            shared::SettingsManager::store<QString>(shared::SettingsManager::Common::ColorSchemeFile, m_filePath);
+        }
         Q_EMIT colorsUpdated();
     }
 
@@ -158,6 +155,26 @@ bool ColorManager::setSourceFile(const QString &from)
 QString ColorManager::sourceFile() const
 {
     return m_filePath;
+}
+
+bool ColorManager::save(const QString &fileName) const
+{
+    QJsonArray ja;
+    for (const ColorManager::HandledColors &ct : handledColors()) {
+        ColorHandler ch = colorsForItem(ct);
+        QJsonObject jObj = ch.toJson();
+        jObj["color_type"] = ct;
+        ja.append(jObj);
+    }
+
+    QFile out(fileName);
+    if (out.open(QIODevice::WriteOnly | QIODevice::Text | QIODevice::Truncate)) {
+        out.write(QJsonDocument(ja).toJson());
+        out.close();
+        return true;
+    } else {
+        return false;
+    }
 }
 
 QList<ColorManager::HandledColors> ColorManager::handledColors() const
