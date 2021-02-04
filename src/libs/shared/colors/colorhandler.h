@@ -58,6 +58,9 @@ public:
     QColor brushColor1() const;
     void setBrushColor1(const QColor &color);
 
+    QString group() const;
+    void setGroup(const QString &group);
+
     static ColorHandler fromJson(const QJsonObject &jObj);
     QJsonObject toJson() const;
 
@@ -71,6 +74,7 @@ struct ColorHandlerData : public QSharedData {
     QColor penColor { Qt::black };
     QColor brushColor0 { Qt::black };
     QColor brushColor1 { Qt::white };
+    QString group { "IVE" };
 };
 
 } // namespace shared

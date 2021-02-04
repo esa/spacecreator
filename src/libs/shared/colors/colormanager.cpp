@@ -28,6 +28,7 @@
 #include <QMetaEnum>
 #include <QStandardPaths>
 #include <QUrl>
+#include <QVersionNumber>
 
 namespace shared {
 
@@ -103,6 +104,8 @@ QString ColorManager::handledColorTypeName(HandledColors t)
  */
 bool ColorManager::setSourceFile(const QString &from)
 {
+    QVersionNumber version(0, 0);
+
     auto loadColorHandler = [this](const QJsonObject &jsonObject) {
         const ColorHandler &ch = ColorHandler::fromJson(jsonObject);
         const HandledColors colorType = HandledColors(jsonObject["color_type"].toInt(HandledColors::Unhandled));
@@ -123,8 +126,29 @@ bool ColorManager::setSourceFile(const QString &from)
         QJsonParseError jsonErrHandler;
         const QJsonDocument &jsonDoc = QJsonDocument::fromJson(jsonData, &jsonErrHandler);
         if (jsonErrHandler.error == QJsonParseError::NoError) {
-            const QJsonArray &jArr = jsonDoc.array();
-            for (const QJsonValue &jsonVal : jArr) {
+            QJsonArray jArr;
+            if (jsonDoc.isArray()) {
+                jArr = jsonDoc.array();
+            } else {
+                if (jsonDoc.isObject()) {
+                    QJsonObject jobj = jsonDoc.object();
+                    if (!jobj.contains("version")) {
+                        qWarning() << "JSON content does not have a version";
+                        return false;
+                    }
+                    if (!jobj.contains("colors")) {
+                        qWarning() << "JSON content does not have a colors array";
+                        return false;
+                    }
+                    version = QVersionNumber::fromString(jobj["version"].toString());
+                    jArr = jobj["colors"].toArray();
+                } else {
+                    qWarning() << "JSON content does not match";
+                    return false;
+                }
+            }
+
+            for (const QJsonValue &jsonVal : qAsConst(jArr)) {
                 const QJsonObject &jsonObj = jsonVal.toObject();
                 loaded = loadColorHandler(jsonObj);
                 if (!loaded)
@@ -159,6 +183,9 @@ QString ColorManager::sourceFile() const
 
 bool ColorManager::save(const QString &fileName) const
 {
+    QJsonObject jobj;
+    jobj.insert("version", "1.0");
+
     QJsonArray ja;
     for (const ColorManager::HandledColors &ct : handledColors()) {
         ColorHandler ch = colorsForItem(ct);
@@ -166,10 +193,11 @@ bool ColorManager::save(const QString &fileName) const
         jObj["color_type"] = ct;
         ja.append(jObj);
     }
+    jobj.insert("colors", ja);
 
     QFile out(fileName);
     if (out.open(QIODevice::WriteOnly | QIODevice::Text | QIODevice::Truncate)) {
-        out.write(QJsonDocument(ja).toJson());
+        out.write(QJsonDocument(jobj).toJson());
         out.close();
         return true;
     } else {

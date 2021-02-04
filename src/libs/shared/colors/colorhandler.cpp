@@ -102,10 +102,23 @@ void ColorHandler::setBrushColor1(const QColor &color)
     d->brushColor1 = color;
 }
 
+QString ColorHandler::group() const
+{
+    return d->group;
+}
+
+void ColorHandler::setGroup(const QString &group)
+{
+    d->group = group;
+}
+
 ColorHandler ColorHandler::fromJson(const QJsonObject &jObj)
 {
     ColorHandler h;
     h.setFillType(ColorHandler::FillType(jObj["fill_type"].toInt(ColorHandler::FillType::Color)));
+    if (jObj.contains("group")) {
+        h.setGroup(jObj["group"].toString());
+    }
     h.setPenWidth(jObj["pen_width"].toDouble(1.));
     h.setPenColor(QColor(jObj["pen_color"].toString("black")));
     h.setBrushColor0(QColor(jObj["brush_color0"].toString("lightGray")));
@@ -117,6 +130,7 @@ QJsonObject ColorHandler::toJson() const
 {
     return {
         { "fill_type", fillType() },
+        { "group", group() },
         { "pen_width", penWidth() },
         { "pen_color", penColor().name(QColor::HexArgb) },
         { "brush_color0", brushColor0().name(QColor::HexArgb) },

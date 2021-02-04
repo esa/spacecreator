@@ -1,90 +1,104 @@
-[
-    {
-        "brush_color0": "#ffffd11a",
-        "brush_color1": "#ffffd11a",
-        "color_type": 0,
-        "fill_type": 0,
-        "pen_color": "#ff7f690d",
-        "pen_width": 1
-    },
-    {
-        "brush_color0": "#fffafafa",
-        "brush_color1": "#ff000000",
-        "color_type": 1,
-        "fill_type": 0,
-        "pen_color": "#ff000000",
-        "pen_width": 1
-    },
-    {
-        "brush_color0": "#ffff5500",
-        "brush_color1": "#ffffffff",
-        "color_type": 2,
-        "fill_type": 0,
-        "pen_color": "#ff000000",
-        "pen_width": 1
-    },
-    {
-        "brush_color0": "#ffa8a8a8",
-        "brush_color1": "#ffa8a8a8",
-        "color_type": 3,
-        "fill_type": 0,
-        "pen_color": "#ff000000",
-        "pen_width": 1
-    },
-    {
-        "brush_color0": "#ff0000ff",
-        "brush_color1": "#ffffffff",
-        "color_type": 4,
-        "fill_type": 0,
-        "pen_color": "#ff0000ff",
-        "pen_width": 2
-    },
-    {
-        "brush_color0": "#ff000000",
-        "brush_color1": "#ffffffff",
-        "color_type": 5,
-        "fill_type": 0,
-        "pen_color": "#ff000000",
-        "pen_width": 1
-    },
-    {
-        "brush_color0": "#fff9e29c",
-        "brush_color1": "#fff9e29c",
-        "color_type": 6,
-        "fill_type": 0,
-        "pen_color": "#ff7c714e",
-        "pen_width": 2
-    },
-    {
-        "brush_color0": "#fff9e29c",
-        "brush_color1": "#fff9e29c",
-        "color_type": 7,
-        "fill_type": 0,
-        "pen_color": "#ff7c714e",
-        "pen_width": 4
-    },
-    {
-        "brush_color0": "#fff9e29c",
-        "brush_color1": "#fff9e29c",
-        "color_type": 8,
-        "fill_type": 0,
-        "pen_color": "#ff7c714e",
-        "pen_width": 1
-    },
-    {
-        "brush_color0": "#ff000000",
-        "brush_color1": "#ffffffff",
-        "color_type": 9,
-        "fill_type": 0,
-        "pen_color": "#ff000000",
-        "pen_width": 5
-    },
-    {
-        "brush_color0": "#ffc1c1c1",
-        "brush_color1": "#ffc1c1c1",
-        "color_type": 10,
-        "fill_type": 0,
-        "pen_color": "#ff7b7b7b",
-        "pen_width": 1
-    }
-]
+{
+    "version": "1.0",
+    "colors": [
+        {
+            "brush_color0": "#ffffd11a",
+            "brush_color1": "#ffffd11a",
+            "color_type": 0,
+            "fill_type": 0,
+            "group": "IVE",
+            "pen_color": "#ff7f690d",
+            "pen_width": 1
+        },
+        {
+            "brush_color0": "#fffafafa",
+            "brush_color1": "#ff000000",
+            "color_type": 1,
+            "fill_type": 0,
+            "group": "IVE",
+            "pen_color": "#ff000000",
+            "pen_width": 1
+        },
+        {
+            "brush_color0": "#ffff5500",
+            "brush_color1": "#ffffffff",
+            "color_type": 2,
+            "fill_type": 0,
+            "group": "IVE",
+            "pen_color": "#ff000000",
+            "pen_width": 1
+        },
+        {
+            "brush_color0": "#ffa8a8a8",
+            "brush_color1": "#ffa8a8a8",
+            "color_type": 3,
+            "fill_type": 0,
+            "group": "IVE",
+            "pen_color": "#ff000000",
+            "pen_width": 1
+        },
+        {
+            "brush_color0": "#ff0000ff",
+            "brush_color1": "#ffffffff",
+            "color_type": 4,
+            "fill_type": 0,
+            "group": "IVE",
+            "pen_color": "#ff0000ff",
+            "pen_width": 2
+        },
+        {
+            "brush_color0": "#ff000000",
+            "brush_color1": "#ffffffff",
+            "color_type": 5,
+            "fill_type": 0,
+            "group": "IVE",
+            "pen_color": "#ff000000",
+            "pen_width": 1
+        },
+        {
+            "brush_color0": "#fff9e29c",
+            "brush_color1": "#fff9e29c",
+            "color_type": 6,
+            "fill_type": 0,
+            "group": "IVE",
+            "pen_color": "#ff7c714e",
+            "pen_width": 2
+        },
+        {
+            "brush_color0": "#fff9e29c",
+            "brush_color1": "#fff9e29c",
+            "color_type": 7,
+            "fill_type": 0,
+            "group": "IVE",
+            "pen_color": "#ff7c714e",
+            "pen_width": 4
+        },
+        {
+            "brush_color0": "#fff9e29c",
+            "brush_color1": "#fff9e29c",
+            "color_type": 8,
+            "fill_type": 0,
+            "group": "IVE",
+            "pen_color": "#ff7c714e",
+            "pen_width": 1
+        },
+        {
+            "brush_color0": "#ff000000",
+            "brush_color1": "#ffffffff",
+            "color_type": 9,
+            "fill_type": 0,
+            "group": "IVE",
+            "pen_color": "#ff000000",
+            "pen_width": 5
+        },
+        {
+            "brush_color0": "#ffc1c1c1",
+            "brush_color1": "#ffc1c1c1",
+            "color_type": 10,
+            "fill_type": 0,
+            "group": "IVE",
+            "pen_color": "#ff7b7b7b",
+            "pen_width": 1
+        }
+    ]
+}
