@@ -41,6 +41,7 @@ public:
     static QString listRegisteredActions();
     static ActionsManager *instance();
     static QVector<Action> parseFile(const QString &filePath, QString *errorHandler = nullptr);
+    static bool saveFile(const QString &filePath, const QVector<Action> &actions);
     static QStringList listUserFiles();
     static QString storagePath();
     static QStringList scriptableActionNames();

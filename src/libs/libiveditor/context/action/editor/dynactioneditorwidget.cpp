@@ -139,19 +139,8 @@ bool DynActionEditorWidget::save()
 {
     commitCurrentAction();
 
-    QJsonArray jArr;
-    for (const Action &act : m_actions)
-        jArr.append(act.toJson());
-
     const QString &filePath = ui->leFilePath->text();
-    QFile f(filePath);
-    if (!f.open(QIODevice::WriteOnly | QIODevice::Truncate | QIODevice::Text)) {
-        qWarning() << "Can't open file" << filePath << "for writing:" << f.errorString();
-        return false;
-    }
-    f.write(QJsonDocument(jArr).toJson());
-
-    return true;
+    return ActionsManager::saveFile(filePath, m_actions);
 }
 
 void DynActionEditorWidget::on_btnInfo_clicked()

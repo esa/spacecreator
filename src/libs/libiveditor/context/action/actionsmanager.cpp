@@ -41,6 +41,7 @@
 #include <QObject>
 #include <QProcess>
 #include <QStandardPaths>
+#include <QVersionNumber>
 
 struct ExternalArgHolder {
     enum Type
@@ -221,11 +222,55 @@ QVector<Action> ActionsManager::parseFile(const QString &filePath, QString *erro
         return res;
     }
 
-    const QJsonArray &root = doc.array();
-    for (const auto &obj : root)
+    QVersionNumber version(0, 0);
+
+    QJsonArray jArr;
+    if (doc.isArray()) {
+        jArr = doc.array();
+    } else {
+        if (doc.isObject()) {
+            QJsonObject jObj = doc.object();
+            if (!jObj.contains("version")) {
+                qWarning() << "JSON content does not have a version";
+                return {};
+            }
+            if (jObj.contains("actions")) {
+                jArr = jObj["actions"].toArray();
+            }
+            version = QVersionNumber::fromString(jObj["version"].toString());
+            jArr = jObj["actions"].toArray();
+        } else {
+            qWarning() << "JSON content does not match";
+            return {};
+        }
+    }
+
+    for (const auto &obj : qAsConst(jArr)) {
         res.append(Action(obj.toObject()));
+    }
 
     return res;
+}
+
+bool ActionsManager::saveFile(const QString &filePath, const QVector<Action> &actions)
+{
+    QJsonObject jobj;
+    jobj.insert("version", "1.0");
+
+    QJsonArray jArr;
+    for (const Action &act : actions) {
+        jArr.append(act.toJson());
+    }
+    jobj.insert("actions", jArr);
+
+    QFile f(filePath);
+    if (!f.open(QIODevice::WriteOnly | QIODevice::Truncate | QIODevice::Text)) {
+        qWarning() << "Can't open file" << filePath << "for writing:" << f.errorString();
+        return false;
+    }
+    f.write(QJsonDocument(jobj).toJson());
+
+    return true;
 }
 
 /*!
