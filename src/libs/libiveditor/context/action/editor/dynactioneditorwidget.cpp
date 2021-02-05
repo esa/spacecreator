@@ -28,9 +28,11 @@
 #include <QDir>
 #include <QFile>
 #include <QFileDialog>
+#include <QFontDatabase>
 #include <QInputDialog>
 #include <QJsonArray>
 #include <QJsonDocument>
+#include <QMessageBox>
 #include <QStandardPaths>
 
 namespace ive {
@@ -102,19 +104,6 @@ bool DynActionEditorWidget::loadFile(const QString &filePath)
     return false;
 }
 
-void DynActionEditorWidget::onActionActivated(const QModelIndex &current, const QModelIndex &)
-{
-    commitCurrentAction();
-
-    if (current.isValid()) {
-        const int row = current.row();
-        if (row >= 0 && row < m_actions.size())
-            m_action = &m_actions[row];
-    }
-
-    displayAction(m_action);
-}
-
 void DynActionEditorWidget::displayAction(Action *action)
 {
     ui->gbActionDetails->setEnabled(action);
@@ -132,20 +121,6 @@ void DynActionEditorWidget::displayAction(Action *action)
     ui->leAppCwd->setText(isExternal ? action->m_externalAppCwd : QString());
 }
 
-void DynActionEditorWidget::on_cbActType_currentIndexChanged(int id)
-{
-    const bool isExternal = id != 0;
-    ui->labelAction->setVisible(!isExternal);
-    ui->labelApp->setVisible(isExternal);
-    ui->labelAppArgs->setVisible(isExternal);
-    ui->labelAppCwd->setVisible(isExternal);
-
-    ui->cbAction->setVisible(!isExternal);
-    ui->leApp->setVisible(isExternal);
-    ui->leAppArgs->setVisible(isExternal);
-    ui->leAppCwd->setVisible(isExternal);
-}
-
 void DynActionEditorWidget::commitCurrentAction()
 {
     if (!m_action)
@@ -158,6 +133,62 @@ void DynActionEditorWidget::commitCurrentAction()
     m_action->m_externalAppCwd = isExternal ? ui->leAppCwd->text() : QString();
 
     m_action = nullptr;
+}
+
+bool DynActionEditorWidget::save()
+{
+    commitCurrentAction();
+
+    QJsonArray jArr;
+    for (const Action &act : m_actions)
+        jArr.append(act.toJson());
+
+    const QString &filePath = ui->leFilePath->text();
+    QFile f(filePath);
+    if (!f.open(QIODevice::WriteOnly | QIODevice::Truncate | QIODevice::Text)) {
+        qWarning() << "Can't open file" << filePath << "for writing:" << f.errorString();
+        return false;
+    }
+    f.write(QJsonDocument(jArr).toJson());
+
+    return true;
+}
+
+void DynActionEditorWidget::on_btnInfo_clicked()
+{
+    QMessageBox *msg = new QMessageBox(QMessageBox::Information, QObject::tr("Scriptable Actions"),
+            listRegisteredActions(), QMessageBox::Ok, nullptr);
+    const QFont fixedFont = QFontDatabase::systemFont(QFontDatabase::FixedFont);
+    msg->setFont(fixedFont);
+    msg->setAttribute(Qt::WA_DeleteOnClose);
+    msg->exec();
+}
+
+void DynActionEditorWidget::onActionActivated(const QModelIndex &current, const QModelIndex &)
+{
+    commitCurrentAction();
+
+    if (current.isValid()) {
+        const int row = current.row();
+        if (row >= 0 && row < m_actions.size())
+            m_action = &m_actions[row];
+    }
+
+    displayAction(m_action);
+}
+
+void DynActionEditorWidget::on_cbActType_currentIndexChanged(int id)
+{
+    const bool isExternal = id != 0;
+    ui->labelAction->setVisible(!isExternal);
+    ui->labelApp->setVisible(isExternal);
+    ui->labelAppArgs->setVisible(isExternal);
+    ui->labelAppCwd->setVisible(isExternal);
+
+    ui->cbAction->setVisible(!isExternal);
+    ui->leApp->setVisible(isExternal);
+    ui->leAppArgs->setVisible(isExternal);
+    ui->leAppCwd->setVisible(isExternal);
 }
 
 void DynActionEditorWidget::on_btnCreateAction_clicked()
@@ -221,25 +252,6 @@ void DynActionEditorWidget::onConditionActivated(const QModelIndex &index)
     delete dlg;
 }
 
-bool DynActionEditorWidget::save()
-{
-    commitCurrentAction();
-
-    QJsonArray jArr;
-    for (const Action &act : m_actions)
-        jArr.append(act.toJson());
-
-    const QString &filePath = ui->leFilePath->text();
-    QFile f(filePath);
-    if (!f.open(QIODevice::WriteOnly | QIODevice::Truncate | QIODevice::Text)) {
-        qWarning() << "Can't open file" << filePath << "for writing:" << f.errorString();
-        return false;
-    }
-    f.write(QJsonDocument(jArr).toJson());
-
-    return true;
-}
-
 void DynActionEditorWidget::on_btnSelectFile_clicked()
 {
     const QString filePath =
@@ -262,6 +274,24 @@ void DynActionEditorWidget::on_btnCreateFile_clicked()
 
         ui->leFilePath->setText(filePath);
     }
+}
+
+QString DynActionEditorWidget::listRegisteredActions() const
+{
+    QString result = QObject::tr("Available actions:");
+
+    const QMap<QString, ActionsManager::ScriptableActionHandler> &actions = ActionsManager::scriptableActions();
+    const QStringList &names = actions.keys();
+    const int titleLength = std::max_element(names.cbegin(), names.cend(), [](const QString &lhs, const QString &rhs) {
+        return lhs.length() < rhs.length();
+    })->length();
+
+    for (const ActionsManager::ScriptableActionHandler &h : actions) {
+        QString padding;
+        padding.fill(' ', titleLength - h.m_title.length());
+        result += QString("\n%1%2 - %3").arg(h.m_title, padding, h.m_description);
+    }
+    return result;
 }
 
 }

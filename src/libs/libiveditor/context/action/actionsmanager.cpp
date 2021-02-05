@@ -17,9 +17,9 @@
 
 #include "actionsmanager.h"
 
-#include "aadlobject.h"
 #include "aadlfunction.h"
 #include "aadliface.h"
+#include "aadlobject.h"
 #include "common.h"
 #include "extprocmonitor.h"
 #include "interface/interfacedocument.h"
@@ -283,15 +283,13 @@ void ActionsManager::triggerActionInternal(const Action &act)
 {
     const QMap<QString, ActionsManager::ScriptableActionHandler> &actions = ActionsManager::scriptableActions();
     if (actions.contains(act.m_internalActName)) {
-        qDebug() << "Triggering action:" << act.m_internalActName;
         actions.value(act.m_internalActName).m_action->trigger();
     } else {
         qWarning() << "Scriptable action" << act.m_internalActName << "not found";
     }
 }
 
-QString ActionsManager::replaceKeyHolder(
-        const QString &text, const ivm::AADLObject *aadlObj, const QString &projectDir)
+QString ActionsManager::replaceKeyHolder(const QString &text, const ivm::AADLObject *aadlObj, const QString &projectDir)
 {
     if (text.isEmpty() || text[0] != '$') {
         return text;

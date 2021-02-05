@@ -50,13 +50,15 @@ public:
     static void registerAction(const QString &caller, QAction *action, const QString &title = QString(),
             const QString &description = QString());
 
-private:
     struct ScriptableActionHandler {
         QAction *m_action;
         QString m_title;
         QString m_description;
     };
 
+    static QMap<QString, ActionsManager::ScriptableActionHandler> scriptableActions();
+
+private:
     static ActionsManager *m_instance;
 
     ActionsManager();
@@ -69,8 +71,6 @@ private:
     static void triggerActionInternal(const Action &act);
     static void triggerActionExternal(const Action &act, const ivm::AADLObject *aadlObj, InterfaceDocument *doc);
     static bool triggerActionHidden(const Action &act);
-
-    static QMap<QString, ActionsManager::ScriptableActionHandler> scriptableActions();
 
     static QString replaceKeyHolder(const QString &text, const ivm::AADLObject *aadlObj, const QString &projectDir);
 

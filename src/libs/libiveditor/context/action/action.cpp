@@ -32,7 +32,6 @@ namespace ive {
  */
 
 static const char *JSON_FIELD_NAME_Title = "title";
-// static const char* JSON_FIELD_NAME_Tabs = "tabs";
 static const char *JSON_FIELD_NAME_Conditions = "conditions";
 static const char *JSON_FIELD_NAME_Action = "action";
 static const char *JSON_FIELD_NAME_App = "app";
@@ -69,7 +68,6 @@ Action &Action::operator=(const Action &other)
 
 Action::Action(const QJsonObject &jObj)
     : m_title(jObj[JSON_FIELD_NAME_Title].toString())
-    //    , m_tabsAllowed(stringListFromJArray(jObj[JSON_FIELD_NAME_Tabs].toArray()))
     , m_conditions(conditionsFromJArray(jObj[JSON_FIELD_NAME_Conditions].toArray()))
     , m_internalActName(jObj[JSON_FIELD_NAME_Action].toString())
     , m_externalApp(jObj[JSON_FIELD_NAME_App].toString())
@@ -86,7 +84,6 @@ QJsonObject Action::toJson() const
 
     return {
         { JSON_FIELD_NAME_Title, m_title },
-        //             { JSON_FIELD_NAME_Tabs, QJsonArray::fromStringList(m_tabsAllowed) },
         { JSON_FIELD_NAME_Conditions, res },
         { JSON_FIELD_NAME_Action, m_internalActName },
         { JSON_FIELD_NAME_App, m_externalApp },

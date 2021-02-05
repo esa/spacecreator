@@ -56,8 +56,11 @@ private Q_SLOTS:
     void on_btnRemoveCondition_clicked();
     void on_btnSelectFile_clicked();
     void on_btnCreateFile_clicked();
+    void on_btnInfo_clicked();
 
 private:
+    QString listRegisteredActions() const;
+
     Ui::DynActionEditorWidget *ui;
     QVector<Action> m_actions;
     Action *m_action { nullptr };

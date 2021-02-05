@@ -31,7 +31,6 @@ struct Action {
     QJsonObject toJson() const;
 
     QString m_title;
-    //    QStringList m_tabsAllowed;
     QVector<Condition> m_conditions;
 
     QString m_internalActName;
