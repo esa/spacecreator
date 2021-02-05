@@ -37,6 +37,8 @@
 #include <QtMath>
 
 static const qreal kSelectionOffset = 10;
+static const QList<int> kNestedTypes { ive::AADLFunctionGraphicsItem::Type, ive::AADLFunctionTypeGraphicsItem::Type,
+    ive::AADLCommentGraphicsItem::Type };
 
 namespace ive {
 
@@ -205,7 +207,7 @@ void AADLConnectionGraphicsItem::rebuildLayout()
     setVisible(true);
 }
 
-void AADLConnectionGraphicsItem::updateEdgePoint(const AADLInterfaceGraphicsItem *iface)
+void AADLConnectionGraphicsItem::updateEndPoint(const AADLInterfaceGraphicsItem *iface)
 {
     if (!iface || m_points.size() < 2)
         return;
@@ -251,8 +253,25 @@ bool AADLConnectionGraphicsItem::replaceInterface(
     }
 
     newIface->addConnection(this);
-    updateEndPoint(newIface);
+    transformToEndPoint(newIface);
     return true;
+}
+
+//! Updates all connections linked to \a ifaceItem and layout/rebuild them
+//! according to /a layoutPolicy and /a collisionsPolicy including \a includingNested if it's set to true
+void AADLConnectionGraphicsItem::layoutInterfaceConnections(AADLInterfaceGraphicsItem *ifaceItem,
+        AADLConnectionGraphicsItem::LayoutPolicy layoutPolicy,
+        AADLConnectionGraphicsItem::CollisionsPolicy collisionsPolicy, bool includingNested)
+{
+    for (AADLConnectionGraphicsItem *connection : ifaceItem->connectionItems()) {
+        Q_ASSERT(connection && connection->startItem() && connection->endItem());
+        if (!connection) {
+            continue;
+        }
+        if (includingNested || connection->parentItem() != ifaceItem->parentItem()) {
+            connection->layoutConnection(ifaceItem, layoutPolicy, collisionsPolicy);
+        }
+    }
 }
 
 //! Get list of graphics items intersected with \a connection
@@ -343,6 +362,38 @@ static inline QVector<QPointF> replaceIntersectedSegments(
         }
     }
     return simplifyPoints(points);
+}
+
+/*!
+ * \brief AADLConnectionGraphicsItem::layoutConnection changes path of connection
+ * \param ifaceItem Affected interface, path to which should be updated
+ * \param layoutPolicy \a AADLConnectionGraphicsItem::LayoutPolicy policy for connection layouting
+ * \param collisionsPolicy \a AADLConnectionGraphicsItem::CollisionsPolicy policy for connection
+ * rebuilding when it has collisions with other boxes
+ */
+void AADLConnectionGraphicsItem::layoutConnection(
+        AADLInterfaceGraphicsItem *ifaceItem, LayoutPolicy layoutPolicy, CollisionsPolicy collisionsPolicy)
+{
+    if (layoutPolicy == LayoutPolicy::Default) {
+        layout();
+        return;
+    } else if (layoutPolicy == LayoutPolicy::LastSegment) {
+        updateEndPoint(ifaceItem);
+    } else if (layoutPolicy == LayoutPolicy::Scaling) {
+        transformToEndPoint(ifaceItem);
+    }
+
+    if (CollisionsPolicy::Ignore == collisionsPolicy) {
+        return;
+    } else if (CollisionsPolicy::PartialRebuild == collisionsPolicy) {
+        updateOverlappedSections();
+    } else if (CollisionsPolicy::Rebuild == collisionsPolicy) {
+        const QList<QGraphicsItem *> overlappedItems = intersectedItems(this, kNestedTypes);
+        if (!overlappedItems.isEmpty()) {
+            layout();
+            return;
+        }
+    }
 }
 
 //! Replaces intersected segments of connection path with newly generated subpaths if any
@@ -510,9 +561,7 @@ void AADLConnectionGraphicsItem::onManualMoveProgress(shared::ui::GripPoint *gp,
 
         auto updateEdgeItem = [&](AADLInterfaceGraphicsItem *iface) {
             iface->setPos(iface->parentItem()->mapFromScene(to));
-            for (auto connection : iface->connectionItems())
-                if (connection != this)
-                    connection->updateEdgePoint(iface);
+            layoutInterfaceConnections(iface, LayoutPolicy::LastSegment, CollisionsPolicy::Ignore, false);
         };
         if (idx == 0)
             updateEdgeItem(m_startItem);
@@ -553,10 +602,10 @@ void AADLConnectionGraphicsItem::onManualMoveFinish(
     auto updateIfaceItem = [](AADLInterfaceGraphicsItem *ifaceItem) {
         if (ifaceItem) {
             ifaceItem->instantLayoutUpdate();
-            for (auto connectionItem : ifaceItem->connectionItems()) {
-                if (!connectionItem.isNull() && connectionItem->isVisible()) {
-                    connectionItem->updateLastChunk(ifaceItem);
-                }
+            if (ifaceItem->entity()->isRequired()) {
+                layoutInterfaceConnections(ifaceItem, LayoutPolicy::Default, CollisionsPolicy::Rebuild, true);
+            } else {
+                layoutInterfaceConnections(ifaceItem, LayoutPolicy::LastSegment, CollisionsPolicy::Rebuild, true);
             }
         }
     };
@@ -565,9 +614,10 @@ void AADLConnectionGraphicsItem::onManualMoveFinish(
         updateIfaceItem(m_startItem);
     } else if (idx == grips.size() - 1) {
         updateIfaceItem(m_endItem);
+    } else {
+        updateOverlappedSections();
     }
 
-    updateOverlappedSections();
     updateBoundingRect();
     updateEntity();
 }
@@ -636,7 +686,7 @@ QString AADLConnectionGraphicsItem::prepareTooltip() const
     return tooltip;
 }
 
-void AADLConnectionGraphicsItem::updateEndPoint(const AADLInterfaceGraphicsItem *iface)
+void AADLConnectionGraphicsItem::transformToEndPoint(const AADLInterfaceGraphicsItem *iface)
 {
     if (!iface || m_points.size() < 2) {
         return;
@@ -688,74 +738,7 @@ void AADLConnectionGraphicsItem::updateEndPoint(const AADLInterfaceGraphicsItem 
         m_points = initialPoints;
     }
 
-    if (iface == startItem()) {
-        m_points.first() = ifaceEndPoint;
-        m_points.last() = endItem()->connectionEndPoint(this);
-    } else if (iface == endItem()) {
-        m_points.first() = startItem()->connectionEndPoint(this);
-        m_points.last() = ifaceEndPoint;
-    }
-
-    updateBoundingRect();
-}
-
-/*!
- * Update last segment of \a AADLConnectionGraphicsItem as argument
- * gets \a AADLInterfaceGraphicsItem on moved/resized \a AADLFunctionGraphicsItem
- */
-void AADLConnectionGraphicsItem::updateLastChunk(const AADLInterfaceGraphicsItem *iface)
-{
-    if (!iface || m_points.size() < 2) {
-        return;
-    }
-
-    if (iface != startItem() && iface != endItem()) {
-        qWarning() << "Attempt to update from an unknown interface";
-        return;
-    }
-
-    const bool reverse = iface == startItem();
-    const auto itemRect = iface->targetItem()->sceneBoundingRect();
-    int pos = reverse ? 1 : m_points.size() - 2;
-    if (reverse) {
-        for (int idx = m_points.size() - 1; idx >= 0; --idx) {
-            if (idx - 1 >= 0) {
-                const QLineF line = QLineF(m_points.value(idx), m_points.value(idx - 1));
-                if (shared::graphicsviewutils::intersects(itemRect, line)) {
-                    pos = idx;
-                    break;
-                }
-            }
-        }
-    } else {
-        for (int idx = 0; idx < m_points.size(); ++idx) {
-            if (idx + 1 < m_points.size()) {
-                const QLineF line = QLineF(m_points.value(idx), m_points.value(idx + 1));
-                if (shared::graphicsviewutils::intersects(itemRect, line)) {
-                    pos = idx;
-                    break;
-                }
-            }
-        }
-    }
-    const QVector<QPointF> points = path(siblingSceneRects(this), m_points.value(pos), iface->connectionEndPoint(this));
-    if (!points.isEmpty()) {
-        if (reverse) {
-            m_points.remove(0, pos + 1);
-            for (const QPointF &point : points)
-                m_points.prepend(point);
-        } else {
-            m_points.remove(pos, m_points.size() - pos);
-            for (const QPointF &point : points)
-                m_points.append(point);
-        }
-        m_points = simplifyPoints(m_points);
-        updateGripPoints();
-    } else {
-        m_points = generateConnectionPath(this);
-    }
-
-    updateBoundingRect();
+    updateEndPoint(iface);
 }
 
 } // namespace ive

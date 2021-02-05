@@ -39,6 +39,19 @@ public:
     {
         Type = UserType + static_cast<int>(ivm::AADLObject::Type::Connection)
     };
+    enum CollisionsPolicy
+    {
+        Ignore = 0,
+        Rebuild,
+        PartialRebuild,
+    };
+    enum LayoutPolicy
+    {
+        Default,
+        LastSegment,
+        Scaling,
+    };
+
     int type() const override { return Type; }
 
     explicit AADLConnectionGraphicsItem(ivm::AADLConnection *connection, AADLInterfaceGraphicsItem *ifaceStart,
@@ -72,13 +85,14 @@ public:
 
     QString prepareTooltip() const override;
 
-    void updateEndPoint(const AADLInterfaceGraphicsItem *iface);
-    void updateLastChunk(const AADLInterfaceGraphicsItem *iface);
-    void updateEdgePoint(const AADLInterfaceGraphicsItem *iface);
-
     void layout();
 
     bool replaceInterface(AADLInterfaceGraphicsItem *ifaceToBeReplaced, AADLInterfaceGraphicsItem *newIface);
+
+    static void layoutInterfaceConnections(AADLInterfaceGraphicsItem *ifaceItem, LayoutPolicy layoutPolicy,
+            CollisionsPolicy collisionsPolicy, bool includingNested);
+    void layoutConnection(
+            AADLInterfaceGraphicsItem *ifaceItem, LayoutPolicy layoutPolicy, CollisionsPolicy collisionsPolicy);
 
     void updateOverlappedSections();
 
@@ -98,6 +112,10 @@ protected Q_SLOTS:
 private:
     bool removeCollidedGrips(shared::ui::GripPoint *gp);
     void simplify();
+
+    void transformToEndPoint(const AADLInterfaceGraphicsItem *iface);
+    void updateLastSegment(const AADLInterfaceGraphicsItem *iface);
+    void updateEndPoint(const AADLInterfaceGraphicsItem *iface);
 
     enum class IfaceConnectionReference
     {

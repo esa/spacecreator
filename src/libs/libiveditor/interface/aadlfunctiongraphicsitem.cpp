@@ -40,8 +40,6 @@
 static const qreal kBorderWidth = 2.0;
 static const qreal kRadius = 10.0;
 static const qreal kOffset = kBorderWidth / 2.0;
-static const QList<int> kNestedTypes { ive::AADLFunctionGraphicsItem::Type, ive::AADLFunctionTypeGraphicsItem::Type,
-    ive::AADLCommentGraphicsItem::Type };
 
 namespace ive {
 
@@ -143,7 +141,7 @@ void AADLFunctionGraphicsItem::onManualResizeProgress(
         shared::ui::GripPoint *grip, const QPointF &from, const QPointF &to)
 {
     AADLFunctionTypeGraphicsItem::onManualResizeProgress(grip, from, to);
-    layoutConnectionsOnResize(ConnectionLayoutPolicy::IgnoreCollisions);
+    layoutConnectionsOnResize(AADLConnectionGraphicsItem::CollisionsPolicy::Ignore);
 }
 
 void AADLFunctionGraphicsItem::onManualResizeFinish(
@@ -153,11 +151,11 @@ void AADLFunctionGraphicsItem::onManualResizeFinish(
         return;
 
     if (allowGeometryChange(pressedAt, releasedAt)) {
-        layoutConnectionsOnResize(ConnectionLayoutPolicy::PartialRebuildOnCollision);
+        layoutConnectionsOnResize(AADLConnectionGraphicsItem::CollisionsPolicy::PartialRebuild);
         updateEntity();
     } else { // Fallback to previous geometry in case colliding with items at the same level
         updateFromEntity();
-        layoutConnectionsOnResize(ConnectionLayoutPolicy::IgnoreCollisions);
+        layoutConnectionsOnResize(AADLConnectionGraphicsItem::CollisionsPolicy::Ignore);
     }
 }
 
@@ -167,7 +165,7 @@ void AADLFunctionGraphicsItem::onManualMoveProgress(shared::ui::GripPoint *grip,
         return;
 
     AADLFunctionTypeGraphicsItem::onManualMoveProgress(grip, from, to);
-    layoutConnectionsOnMove(ConnectionLayoutPolicy::IgnoreCollisions);
+    layoutConnectionsOnMove(AADLConnectionGraphicsItem::CollisionsPolicy::Ignore);
 }
 
 void AADLFunctionGraphicsItem::onManualMoveFinish(
@@ -180,48 +178,11 @@ void AADLFunctionGraphicsItem::onManualMoveFinish(
         return;
 
     if (allowGeometryChange(pressedAt, releasedAt)) {
-        layoutConnectionsOnMove(ConnectionLayoutPolicy::PartialRebuildOnCollision);
+        layoutConnectionsOnMove(AADLConnectionGraphicsItem::CollisionsPolicy::PartialRebuild);
         updateEntity();
     } else { // Fallback to previous geometry in case colliding with items at the same level
         updateFromEntity();
-        layoutConnectionsOnMove(ConnectionLayoutPolicy::IgnoreCollisions);
-    }
-}
-
-void AADLFunctionGraphicsItem::layoutConnectionsOnResize(ConnectionLayoutPolicy layoutPolicy)
-{
-    /// Changing inner and outer connections bound to current function item
-    for (auto item : childItems()) {
-        if (auto iface = qgraphicsitem_cast<AADLInterfaceGraphicsItem *>(item)) {
-            layoutConnection(iface, layoutPolicy, true);
-        } else if (auto connection = qgraphicsitem_cast<AADLConnectionGraphicsItem *>(item)) {
-            if (connection->sourceItem() != this && connection->targetItem() != this)
-                connection->layout();
-        }
-    }
-}
-
-void AADLFunctionGraphicsItem::layoutConnection(
-        AADLInterfaceGraphicsItem *ifaceItem, ConnectionLayoutPolicy layoutPolicy, bool includingNested)
-{
-    for (AADLConnectionGraphicsItem *connection : ifaceItem->connectionItems()) {
-        Q_ASSERT(connection->startItem() && connection->endItem());
-        if (includingNested || connection->parentItem() != this) {
-            if (ConnectionLayoutPolicy::IgnoreCollisions == layoutPolicy) {
-                connection->updateEndPoint(ifaceItem);
-            } else if (ConnectionLayoutPolicy::PartialRebuildOnCollision == layoutPolicy) {
-                connection->updateEndPoint(ifaceItem);
-                connection->updateOverlappedSections();
-            } else {
-                const auto collidingItems = scene()->collidingItems(connection);
-                if (std::any_of(
-                            collidingItems.begin(), collidingItems.end(), [this](const QGraphicsItem *collidingItem) {
-                                return kNestedTypes.contains(collidingItem->type()) && collidingItem != this;
-                            })) {
-                    connection->layout();
-                }
-            }
-        }
+        layoutConnectionsOnMove(AADLConnectionGraphicsItem::CollisionsPolicy::Ignore);
     }
 }
 
@@ -328,12 +289,27 @@ void AADLFunctionGraphicsItem::drawInnerFunctions(QPainter *painter)
     }
 }
 
-void AADLFunctionGraphicsItem::layoutConnectionsOnMove(ConnectionLayoutPolicy layoutPolicy)
+void AADLFunctionGraphicsItem::layoutConnectionsOnResize(AADLConnectionGraphicsItem::CollisionsPolicy collisionsPolicy)
+{
+    /// Changing inner and outer connections bound to current function item
+    for (const auto item : childItems()) {
+        if (auto iface = qgraphicsitem_cast<AADLInterfaceGraphicsItem *>(item)) {
+            AADLConnectionGraphicsItem::layoutInterfaceConnections(
+                    iface, AADLConnectionGraphicsItem::LayoutPolicy::Scaling, collisionsPolicy, true);
+        } else if (auto connection = qgraphicsitem_cast<AADLConnectionGraphicsItem *>(item)) {
+            if (connection->sourceItem() != this && connection->targetItem() != this)
+                connection->layout();
+        }
+    }
+}
+
+void AADLFunctionGraphicsItem::layoutConnectionsOnMove(AADLConnectionGraphicsItem::CollisionsPolicy collisionsPolicy)
 {
     /// Changing outer connections only cause inner stay unchanged as children of current item
-    for (auto item : childItems()) {
+    for (const auto item : childItems()) {
         if (auto iface = qgraphicsitem_cast<AADLInterfaceGraphicsItem *>(item)) {
-            layoutConnection(iface, layoutPolicy, false);
+            AADLConnectionGraphicsItem::layoutInterfaceConnections(
+                    iface, AADLConnectionGraphicsItem::LayoutPolicy::Scaling, collisionsPolicy, false);
         }
     }
 }

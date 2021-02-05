@@ -17,6 +17,7 @@
 
 #pragma once
 
+#include "aadlconnectiongraphicsitem.h"
 #include "aadlfunctiontypegraphicsitem.h"
 
 class QSvgRenderer;
@@ -66,16 +67,8 @@ protected Q_SLOTS:
     void applyColorScheme() override;
 
 private:
-    enum ConnectionLayoutPolicy
-    {
-        IgnoreCollisions = 0,
-        RebuildOnCollision,
-        PartialRebuildOnCollision
-    };
-    void layoutConnectionsOnMove(ConnectionLayoutPolicy layoutPolicy);
-    void layoutConnectionsOnResize(ConnectionLayoutPolicy layoutPolicy);
-    void layoutConnection(
-            AADLInterfaceGraphicsItem *ifaceItem, ConnectionLayoutPolicy layoutPolicy, bool includingNested);
+    void layoutConnectionsOnMove(AADLConnectionGraphicsItem::CollisionsPolicy collisionsPolicy);
+    void layoutConnectionsOnResize(AADLConnectionGraphicsItem::CollisionsPolicy collisionsPolicy);
 
     void drawInnerFunctions(QPainter *painter);
 

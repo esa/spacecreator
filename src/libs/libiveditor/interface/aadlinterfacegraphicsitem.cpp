@@ -383,12 +383,8 @@ void AADLInterfaceGraphicsItem::onManualMoveProgress(shared::ui::GripPoint *, co
 
     Q_EMIT needUpdateLayout();
 
-    for (auto connectionItem : m_connections) {
-        if (!connectionItem.isNull() && connectionItem->isVisible()) {
-            connectionItem->updateLastChunk(this);
-            connectionItem->updateOverlappedSections();
-        }
-    }
+    AADLConnectionGraphicsItem::layoutInterfaceConnections(this, AADLConnectionGraphicsItem::LayoutPolicy::LastSegment,
+            AADLConnectionGraphicsItem::CollisionsPolicy::Rebuild, true);
 
     Q_EMIT boundingBoxChanged();
 }
