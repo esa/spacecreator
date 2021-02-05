@@ -804,6 +804,27 @@ bool InterfaceDocument::exportImpl(const QString &targetDir, const QList<ivm::AA
     if (QFile::copy(asn1FilePath(), targetDir + QDir::separator() + asn1FileName())) {
         qWarning() << "Error during ASN.1 file copying:" << asn1FilePath();
     }
+
+    const QString relDirPath { QLatin1String("work") + QDir::separator() + fi.dir().dirName() };
+    const QDir targetExportDir { targetDir + QDir::separator() + relDirPath };
+    targetExportDir.mkpath(QLatin1String("."));
+    QDir sourceExportDir { QDir::currentPath() + QDir::separator() + relDirPath };
+    sourceExportDir.setFilter(QDir::NoDotAndDotDot | QDir::Dirs | QDir::Files);
+    QDirIterator it { sourceExportDir, QDirIterator::Subdirectories };
+    while (it.hasNext()) {
+        const QString filePath = it.next();
+        const QFileInfo fi = it.fileInfo();
+        const QString relPath = sourceExportDir.relativeFilePath(fi.absoluteFilePath());
+        if (fi.isDir()) {
+            targetExportDir.mkpath(relPath);
+        } else {
+            const bool result = QFile::copy(fi.absoluteFilePath(), targetExportDir.absoluteFilePath(relPath));
+            if (!result) {
+                qWarning() << "Error during source file copying:" << filePath;
+            }
+        }
+    }
+
     return true;
 }
 
