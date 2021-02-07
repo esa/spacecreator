@@ -158,8 +158,7 @@ protected:
 protected:
     struct OriginalPropsHolder {
         // TODO: unite with AADLFunction::OriginalPropsHolder
-
-        QString name;
+        QString name() const { return attrs.value(meta::Props::token(meta::Props::Token::name)).toString(); }
         QHash<QString, QVariant> attrs;
         QHash<QString, QVariant> props;
         QVector<IfaceParameter> params;
@@ -171,7 +170,6 @@ protected:
             if (m_collected || !src)
                 return;
 
-            name = src->title();
             attrs = src->attrs();
             props = src->props();
             params = src->params();
