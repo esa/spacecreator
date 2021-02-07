@@ -280,13 +280,13 @@ bool InterfaceDocument::loadAvailableComponents()
     bool result = true;
 
     d->importModel->clear();
-    QDirIterator importableIt(componentsLibraryPath());
+    QDirIterator importableIt(componentsLibraryPath(), QDir::Dirs | QDir::NoDotAndDotDot);
     while (importableIt.hasNext()) {
         result |= loadComponentModel(d->importModel, importableIt.next() + QDir::separator() + kDefaultFilename);
     }
 
     d->sharedModel->clear();
-    QDirIterator instantiatableIt(sharedTypesPath());
+    QDirIterator instantiatableIt(sharedTypesPath(), QDir::Dirs | QDir::NoDotAndDotDot);
     while (instantiatableIt.hasNext()) {
         result |= loadComponentModel(d->sharedModel, instantiatableIt.next() + QDir::separator() + kDefaultFilename);
     }
