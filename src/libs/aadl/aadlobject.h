@@ -94,7 +94,7 @@ public:
     QVariant attr(const QString &name, const QVariant &defaultValue = QVariant()) const;
     virtual void setAttr(const QString &name, const QVariant &val);
     void removeAttr(const QString &name);
-    bool hasAttribute(const QString &attributeName, const QVariant &value) const;
+    bool hasAttribute(const QString &attributeName, const QVariant &value = QVariant()) const;
     bool hasAttributes(const QHash<QString, QVariant> &attrs) const;
 
     // "properties" - XML children <Property>

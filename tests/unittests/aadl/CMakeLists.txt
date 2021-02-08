@@ -1,6 +1,7 @@
 addQtTest(tst_aadlconnectionchain aadl "connectionchains.xml;connectionchains01.xml;connectionchains02.xml;connectionchains03.xml;connectionchains04.xml")
 addQtTest(tst_aadlnamevalidator aadl)
 addQtTest(tst_aadlobject aadl)
+addQtTest(tst_aadliface aadl)
 addQtTest(tst_aadlconnection aadl)
 addQtTest(tst_aadlfunction aadl)
 addQtTest(tst_aadlfunctiontype aadl)

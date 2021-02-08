@@ -50,7 +50,7 @@ private:
     struct OriginalPropsHolder {
         // TODO: unite with AADLIface::OriginalPropsHolder
 
-        QString name;
+        QString name() const { return attrs.value(meta::Props::token(meta::Props::Token::name)).toString(); }
         QHash<QString, QVariant> attrs;
         QHash<QString, QVariant> props;
         QVector<ContextParameter> params;
@@ -62,7 +62,6 @@ private:
             if (m_collected || !src)
                 return;
 
-            name = src->title();
             attrs = src->attrs();
             props = src->props();
             params = src->contextParams();

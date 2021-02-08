@@ -17,8 +17,8 @@
 
 #include "aadlobject.h"
 
-#include "aadlnamevalidator.h"
 #include "aadlmodel.h"
+#include "aadlnamevalidator.h"
 
 #include <QPointer>
 #include <QVector>
@@ -65,7 +65,7 @@ AADLObject::AADLObject(const AADLObject::Type t, const QString &title, QObject *
     setAttr(meta::Props::token(meta::Props::Token::name), title);
 }
 
-AADLObject::~AADLObject() { }
+AADLObject::~AADLObject() {}
 
 QString AADLObject::title() const
 {
@@ -352,10 +352,14 @@ void AADLObject::removeAttr(const QString &name)
  */
 bool AADLObject::hasAttribute(const QString &attributeName, const QVariant &value) const
 {
-    if (!d->m_attrs.contains(attributeName)) {
+    const auto it = d->m_attrs.constFind(attributeName);
+    if (it == d->m_attrs.constEnd()) {
         return false;
     }
-    return d->m_attrs[attributeName] == value;
+    if (value.isNull()) {
+        return true;
+    }
+    return value == *it;
 }
 
 /*!
