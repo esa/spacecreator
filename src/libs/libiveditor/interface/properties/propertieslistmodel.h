@@ -67,15 +67,17 @@ public:
 
 protected:
     cmd::CommandsStack::Macro *m_cmdMacro { nullptr };
-    ivm::PropertyTemplateConfig *m_propTamplesConfig { nullptr };
+    ivm::PropertyTemplateConfig *m_propTemplatesConfig { nullptr };
     ivm::AADLObject *m_dataObject { nullptr };
     QVector<QString> m_names;
 
     virtual bool isEditable(const QModelIndex &idx) const;
-    void createNewRow(int row, const QString &label, const QString &name, ivm::PropertyTemplate::Info info,
+    void createNewRow(int row, const QString &name);
+    void updateRow(int row, const QString &label, const QString &name, ivm::PropertyTemplate::Info info,
             const QVariant &value, const QVariant &editValue, const QVariant &defaulValue);
 
-    void invalidateProperties(const QString &propName);
+    void updateRows(const QHash<QString, ivm::PropertyTemplate *> &templates);
+
     void invalidateAttributes(const QString &attrName);
 };
 
