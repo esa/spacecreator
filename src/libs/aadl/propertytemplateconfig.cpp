@@ -89,6 +89,47 @@ PropertyTemplateConfig::PropertyTemplateConfig()
 {
 }
 
+QList<PropertyTemplate *> PropertyTemplateConfig::systemAttributes() const
+{
+    QList<PropertyTemplate *> templates;
+    PropertyTemplate::Scopes scopeAll;
+    scopeAll.setFlag(PropertyTemplate::Scope::All);
+    {
+        auto nameProp = new PropertyTemplate();
+        nameProp->setName("name");
+        nameProp->setType(PropertyTemplate::Type::String);
+        nameProp->setValueValidatorPattern("[a-zA-Z0-9_]+");
+        nameProp->setDefaultValue("AAAA");
+        nameProp->setScope(scopeAll);
+        nameProp->setInfo(PropertyTemplate::Info::Attribute);
+        templates.append(nameProp);
+    }
+    {
+        auto valueProp = new PropertyTemplate();
+        valueProp->setName("value");
+        valueProp->setType(PropertyTemplate::Type::String);
+        valueProp->setValueValidatorPattern("[a-zA-Z0-9_]+");
+        valueProp->setDefaultValue("");
+        valueProp->setScope(scopeAll);
+        valueProp->setInfo(PropertyTemplate::Info::Attribute);
+        templates.append(valueProp);
+    }
+    {
+        auto kindProp = new PropertyTemplate();
+        kindProp->setName("kind");
+        kindProp->setType(PropertyTemplate::Type::Enumeration);
+        kindProp->setValuesList({ { "Cyclic" }, { "Sporadic" }, { "Protected" }, { "Unprotected" } });
+        kindProp->setDefaultValue("");
+        PropertyTemplate::Scopes scope;
+        scope.setFlag(PropertyTemplate::Scope::Provided_Interface);
+        scope.setFlag(PropertyTemplate::Scope::Required_Interface);
+        kindProp->setScope(scope);
+        kindProp->setInfo(PropertyTemplate::Info::Attribute);
+        templates.append(kindProp);
+    }
+    return templates;
+}
+
 PropertyTemplateConfig *PropertyTemplateConfig::instance()
 {
     if (m_instance == nullptr) {
@@ -98,11 +139,6 @@ PropertyTemplateConfig *PropertyTemplateConfig::instance()
 }
 
 PropertyTemplateConfig::~PropertyTemplateConfig() { }
-
-QString systemResourceConfigPath()
-{
-    return QLatin1String(":/defaults/interface/properties/resources/system_attributes.xml");
-}
 
 QString userResourceConfigPath()
 {
@@ -121,13 +157,7 @@ static bool ensureFileExists(const QString &filePath)
 
 void PropertyTemplateConfig::init(const QString &configPath)
 {
-    QList<PropertyTemplate *> systemAttributes;
-    QFile f(systemResourceConfigPath());
-    if (!f.open(QIODevice::ReadOnly | QIODevice::Text)) {
-        qWarning() << "Can't open file:" << configPath << f.errorString();
-        return;
-    }
-    systemAttributes = parseAttributesList(QString::fromUtf8(f.readAll()));
+    QList<PropertyTemplate *> attributes = systemAttributes();
 
     QList<PropertyTemplate *> userAttributes;
     if (ensureFileExists(configPath)) {
@@ -141,15 +171,15 @@ void PropertyTemplateConfig::init(const QString &configPath)
     }
 
     // merge configs
-    auto inSystemAttributes = [&systemAttributes](const QString &name) -> bool {
-        auto it = std::find_if(systemAttributes.begin(), systemAttributes.end(),
+    auto inSystemAttributes = [&attributes](const QString &name) -> bool {
+        auto it = std::find_if(attributes.begin(), attributes.end(),
                 [&name](PropertyTemplate *property) { return property->name() == name; });
-        return it != systemAttributes.end();
+        return it != attributes.end();
     };
     auto it = userAttributes.begin();
     while (it != userAttributes.end()) {
         if (!inSystemAttributes((*it)->name())) {
-            systemAttributes.append(*it);
+            attributes.append(*it);
             it = userAttributes.erase(it);
         } else {
             ++it;
@@ -157,7 +187,7 @@ void PropertyTemplateConfig::init(const QString &configPath)
     }
     qDeleteAll(userAttributes);
 
-    d->init(systemAttributes);
+    d->init(attributes);
 }
 
 QList<PropertyTemplate *> PropertyTemplateConfig::parseAttributesList(

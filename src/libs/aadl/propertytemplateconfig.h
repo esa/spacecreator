@@ -44,6 +44,7 @@ public:
 
 private:
     PropertyTemplateConfig();
+    QList<PropertyTemplate *> systemAttributes() const;
 
     static PropertyTemplateConfig *m_instance;
 
