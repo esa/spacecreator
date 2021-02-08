@@ -280,10 +280,12 @@ void VisualizationModel::onDataChanged(
                     }
                     if (roles.contains(Qt::DisplayRole)) {
                         const QString name = ivm::AADLNameValidator::encodeName(obj->aadlType(), item->text());
-                        const QVariantHash attributes = { { ivm::meta::Props::token(ivm::meta::Props::Token::name),
-                                name } };
-                        auto attributesCmd = new cmd::CmdEntityAttributeChange(obj, attributes);
-                        m_commandsStack->push(attributesCmd);
+                        if (name != obj->title()) {
+                            const QVariantHash attributes = { { ivm::meta::Props::token(ivm::meta::Props::Token::name),
+                                    name } };
+                            auto attributesCmd = new cmd::CmdEntityAttributeChange(obj, attributes);
+                            m_commandsStack->push(attributesCmd);
+                        }
                     }
                 }
             }
