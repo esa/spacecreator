@@ -90,6 +90,14 @@ SpaceCreatorProjectImpl *SpaceCreatorProjectManager::project(const QString &file
         }
     }
 
+    // Fallback needed during project startup, when the files are not all populated in the project
+    // Or when a new file is not yet added in the project (parsed)
+    for (SpaceCreatorProjectImpl *project : m_projects) {
+        if (fileName.startsWith(project->project()->projectDirectory().toString())) {
+            return project;
+        }
+    }
+
     return nullptr;
 }
 
