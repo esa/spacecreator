@@ -5,10 +5,9 @@
         </Scopes>
         <Type>
             <Enumeration defaultValue="SDL">
-                <Entry value="C"/>
-                <Entry value="ADA"/>
+                <Entry value="C++"/>
+                <Entry value="Ada"/>
                 <Entry value="SDL"/>
-                <Entry value="COBOL"/>
             </Enumeration>
         </Type>
     </Attr>
