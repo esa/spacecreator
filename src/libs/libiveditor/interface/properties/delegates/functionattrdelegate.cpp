@@ -19,6 +19,7 @@
 
 #include "aadlcommonprops.h"
 #include "aadlfunction.h"
+#include "aadlfunctiontype.h"
 #include "aadlmodel.h"
 #include "interface/properties/propertieslistmodel.h"
 
@@ -28,7 +29,7 @@
 namespace ive {
 
 FunctionAttrDelegate::FunctionAttrDelegate(QObject *parent)
-    : QStyledItemDelegate(parent)
+    : AttributeDelegate(parent)
 {
 }
 
@@ -41,7 +42,6 @@ QWidget *FunctionAttrDelegate::createEditor(
                 const QString &attrName =
                         pModel->data(pModel->index(PropertiesListModel::ColumnTitle, index.row())).toString();
                 const ivm::meta::Props::Token t = ivm::meta::Props::token(attrName);
-
                 auto objFn = qobject_cast<const ivm::AADLFunction *>(pModel->dataObject());
                 Q_ASSERT(objFn);
 
@@ -51,6 +51,9 @@ QWidget *FunctionAttrDelegate::createEditor(
                             + objFn->objectsModel()->getAvailableFunctionTypes(objFn).keys();
                     QComboBox *cb = new QComboBox(parent);
                     cb->addItems(availableFnTypes);
+                    if (auto type = objFn->instanceOf()) {
+                        cb->setCurrentText(type->title());
+                    }
                     return cb;
                 }
                 default:
@@ -60,7 +63,7 @@ QWidget *FunctionAttrDelegate::createEditor(
         }
     }
 
-    return QStyledItemDelegate::createEditor(parent, option, index);
+    return AttributeDelegate::createEditor(parent, option, index);
 }
 
 }

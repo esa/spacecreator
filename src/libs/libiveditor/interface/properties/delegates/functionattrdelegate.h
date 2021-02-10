@@ -17,22 +17,16 @@
 
 #pragma once
 
-#include <QStyledItemDelegate>
+#include "attributedelegate.h"
 
 namespace ive {
 
-class FunctionAttrDelegate : public QStyledItemDelegate
+class FunctionAttrDelegate : public AttributeDelegate
 {
 public:
-    FunctionAttrDelegate(QObject *parent = nullptr);
+    explicit FunctionAttrDelegate(QObject *parent = nullptr);
 
     QWidget *createEditor(QWidget *parent, const QStyleOptionViewItem &option, const QModelIndex &index) const override;
-
-private:
-    QStringList m_dataNamesUnavailable;
-    QStringList m_dataLanguagesAvailable;
-    const QStringList m_dataIsType;
-    QStringList m_dataTypesAvailabel;
 };
 
 }

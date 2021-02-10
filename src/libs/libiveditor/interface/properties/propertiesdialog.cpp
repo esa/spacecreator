@@ -151,26 +151,29 @@ void PropertiesDialog::initAttributesView()
 {
     auto viewAttrs = new PropertiesViewBase(this);
     PropertiesListModel *modelAttrs { nullptr };
+    QStyledItemDelegate *attrDelegate { nullptr };
 
     switch (m_dataObject->aadlType()) {
     case ivm::AADLObject::Type::Function: {
         modelAttrs = new FunctionPropertiesListModel(m_cmdMacro, m_dynPropConfig, this);
+        attrDelegate = new FunctionAttrDelegate(viewAttrs->tableView());
         break;
     }
     case ivm::AADLObject::Type::RequiredInterface:
     case ivm::AADLObject::Type::ProvidedInterface: {
         modelAttrs = new InterfacePropertiesListModel(m_cmdMacro, m_dynPropConfig, this);
+        attrDelegate = new AttributeDelegate(viewAttrs->tableView());
         break;
     }
     default:
         modelAttrs = new InterfacePropertiesListModel(m_cmdMacro, m_dynPropConfig, this);
+        attrDelegate = new AttributeDelegate(viewAttrs->tableView());
         break;
     }
 
     modelAttrs->setDataObject(m_dataObject);
     viewAttrs->setModel(modelAttrs);
-    viewAttrs->tableView()->setItemDelegateForColumn(
-            PropertiesListModel::ColumnValue, new AttributeDelegate(viewAttrs->tableView()));
+    viewAttrs->tableView()->setItemDelegateForColumn(PropertiesListModel::ColumnValue, attrDelegate);
 
     ui->tabWidget->insertTab(0, viewAttrs, tr("Attributes"));
 }
