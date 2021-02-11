@@ -21,6 +21,7 @@
 #include "baseitems/common/positionlookuphelper.h"
 #include "interface/aadlfunctiongraphicsitem.h"
 #include "interface/aadlinterfacegraphicsitem.h"
+#include "sharedlibrary.h"
 
 #include <QGraphicsScene>
 #include <QObject>
@@ -84,6 +85,7 @@ void tst_PositionLookupHelper::testOnSide(
 
 void tst_PositionLookupHelper::initTestCase()
 {
+    shared::initSharedLibrary();
     scene = new QGraphicsScene;
     function = new ivm::AADLFunction("Function");
     functionItem = new ive::AADLFunctionGraphicsItem(function);
@@ -91,6 +93,7 @@ void tst_PositionLookupHelper::initTestCase()
     functionItem->setBoundingRect(QRectF(0, 0, 500, 500));
     ivm::AADLIface::CreationInfo ci;
     ci.name = "PI";
+    ci.function = function;
     iface = new ivm::AADLIfaceProvided(ci);
     ifaceItem = new ive::AADLInterfaceGraphicsItem(iface, functionItem);
     ifaceItem->updateLabel();

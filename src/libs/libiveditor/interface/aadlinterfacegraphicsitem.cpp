@@ -198,7 +198,7 @@ void AADLInterfaceGraphicsItem::updateInternalItems(Qt::Alignment alignment)
 
 void AADLInterfaceGraphicsItem::rebuildLayout()
 {
-    setVisible(m_dataObject && m_dataObject->isVisible());
+    InteractiveObject::rebuildLayout();
 
     if (!targetItem()) {
         prepareGeometryChange();

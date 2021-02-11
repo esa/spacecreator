@@ -157,6 +157,13 @@ void InteractiveObject::updateGraphicsItem()
     update();
 }
 
+void InteractiveObject::rebuildLayout()
+{
+    setVisible(m_dataObject
+            && (nestingLevel(m_dataObject) >= ive::kNestingVisibilityLevel || m_dataObject->isRootObject())
+            && m_dataObject->isVisible());
+}
+
 void InteractiveObject::mouseMoveEvent(QGraphicsSceneMouseEvent *event)
 {
     QGraphicsObject::mouseMoveEvent(event);

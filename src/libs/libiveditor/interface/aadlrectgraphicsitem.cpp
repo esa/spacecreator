@@ -103,9 +103,10 @@ QRectF AADLRectGraphicsItem::adjustRectToParent(shared::ui::GripPoint *grip, con
     QRectF rect = mapRectToParent(boundingRect());
 
     auto parentObj = qobject_cast<InteractiveObject *>(parentObject());
-    const QRectF contentRect = parentObj ? parentObj->boundingRect().marginsRemoved(
-                                       parentObj->aadlObject()->isRootObject() ? kRootMargins : kContentMargins)
-                                         : QRectF();
+    const QRectF contentRect = parentObj
+            ? parentObj->boundingRect().marginsRemoved(
+                      parentObj->aadlObject()->isRootObject() ? kRootMargins : kContentMargins)
+            : QRectF();
     switch (grip->location()) {
     case shared::ui::GripPoint::Left: {
         const qreal left = rect.left() + shift.x();
@@ -183,6 +184,8 @@ QList<QPair<ivm::AADLObject *, QVector<QPointF>>> AADLRectGraphicsItem::prepareC
 
 void AADLRectGraphicsItem::rebuildLayout()
 {
+    InteractiveObject::rebuildLayout();
+
     updateGripPoints();
     applyColorScheme();
 }

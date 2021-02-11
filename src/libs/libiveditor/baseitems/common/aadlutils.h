@@ -44,6 +44,8 @@ static const QList<Qt::Alignment> kRectSides = { Qt::AlignLeft, Qt::AlignTop, Qt
 static const qreal kInterfaceLayoutOffset = 12.0;
 static const qreal kConnectionMargin = 16;
 static const qreal kMinLineLength = 20;
+static const int kNestingVisibilityLevel = 0;
+static_assert(kNestingVisibilityLevel >= 0, "Nesting level shouldn't be negative");
 
 /*!
  * \brief The tolerance used to find an AADLInterfaceGraphicsItem on scene (the size of a square used as a search area)
