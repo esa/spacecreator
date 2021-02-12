@@ -32,6 +32,7 @@
 #include "mscinstance.h"
 #include "mscmessage.h"
 #include "mscmodel.h"
+#include "sharedlibrary.h"
 
 #include <QGraphicsScene>
 #include <QUndoCommand>
@@ -72,6 +73,7 @@ void tst_IvSystemChecks::initTestCase()
 {
     QStandardPaths::setTestModeEnabled(true);
     ive::initIvEditor();
+    shared::initSharedLibrary();
     auto converter = msc::CoordinatesConverter::instance();
     converter->setDPI(QPointF(109., 109.), QPointF(96., 96.));
 }

@@ -408,9 +408,10 @@ void AADLConnectionGraphicsItem::updateOverlappedSections()
     const QList<QGraphicsItem *> cachedIntersectedItems = intersectedItems(this);
     /// Nothing to update without intersections with Function(Type) items
     if (cachedIntersectedItems.isEmpty()) {
-        return;
+        m_points = simplifyPoints(m_points);
+    } else {
+        m_points = replaceIntersectedSegments(cachedIntersectedItems, this);
     }
-    m_points = replaceIntersectedSegments(cachedIntersectedItems, this);
     updateBoundingRect();
 }
 

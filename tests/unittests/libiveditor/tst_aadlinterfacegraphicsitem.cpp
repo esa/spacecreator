@@ -20,6 +20,7 @@
 #include "interface/aadlfunctiontypegraphicsitem.h"
 #include "interface/aadlinterfacegraphicsitem.h"
 #include "iveditor.h"
+#include "sharedlibrary.h"
 
 #include <QDebug>
 #include <QGraphicsScene>
@@ -37,6 +38,7 @@ private Q_SLOTS:
 void tst_AADLInterfaceGraphicsItem::initTestCase()
 {
     ive::initIvEditor();
+    shared::initSharedLibrary();
     QStandardPaths::setTestModeEnabled(true);
 }
 

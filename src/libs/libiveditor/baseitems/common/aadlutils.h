@@ -43,7 +43,8 @@ static const QMarginsF kTextMargins = { 20, 20, 20, 20 };
 static const QList<Qt::Alignment> kRectSides = { Qt::AlignLeft, Qt::AlignTop, Qt::AlignRight, Qt::AlignBottom };
 static const qreal kInterfaceLayoutOffset = 12.0;
 static const qreal kConnectionMargin = 16;
-static const qreal kMinLineLength = 20;
+static const qreal kMinSegmentLength = 10.0;
+static const qreal kMinSegmentAngle = 5.0;
 static const int kNestingVisibilityLevel = 0;
 static_assert(kNestingVisibilityLevel >= 0, "Nesting level shouldn't be negative");
 

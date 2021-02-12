@@ -18,6 +18,7 @@
 #include "aadlfunction.h"
 #include "baseitems/common/aadlutils.h"
 #include "interface/aadlfunctiongraphicsitem.h"
+#include "sharedlibrary.h"
 
 #include <QGraphicsRectItem>
 #include <QMetaEnum>
@@ -28,6 +29,7 @@ class tst_Utils : public QObject
 {
     Q_OBJECT
 private Q_SLOTS:
+    void initTestCase();
     void testCheckCollision();
     void testSides();
     void testAdjustedRect();
@@ -36,6 +38,11 @@ private Q_SLOTS:
     void testSiblingSceneRects();
     void testFindGeometryForRect();
 };
+
+void tst_Utils::initTestCase()
+{
+    shared::initSharedLibrary();
+}
 
 void tst_Utils::testCheckCollision()
 {
@@ -77,14 +84,11 @@ void tst_Utils::testAdjustedRect()
 {
     const QRectF itemRect { 100, 100, 100, 100 };
     const QRectF intersectedItemRect { 150, 150, 100, 100 };
-    QVERIFY(ive::adjustedRect(itemRect, intersectedItemRect, Qt::AlignLeft, true).bottom()
-            < intersectedItemRect.top());
+    QVERIFY(ive::adjustedRect(itemRect, intersectedItemRect, Qt::AlignLeft, true).bottom() < intersectedItemRect.top());
     QVERIFY(ive::adjustedRect(itemRect, intersectedItemRect, Qt::AlignLeft, false).top()
             > intersectedItemRect.bottom());
-    QVERIFY(ive::adjustedRect(itemRect, intersectedItemRect, Qt::AlignTop, true).left()
-            > intersectedItemRect.right());
-    QVERIFY(ive::adjustedRect(itemRect, intersectedItemRect, Qt::AlignTop, false).right()
-            < intersectedItemRect.left());
+    QVERIFY(ive::adjustedRect(itemRect, intersectedItemRect, Qt::AlignTop, true).left() > intersectedItemRect.right());
+    QVERIFY(ive::adjustedRect(itemRect, intersectedItemRect, Qt::AlignTop, false).right() < intersectedItemRect.left());
     QVERIFY(ive::adjustedRect(itemRect, intersectedItemRect, Qt::AlignRight, true).top()
             > intersectedItemRect.bottom());
     QVERIFY(ive::adjustedRect(itemRect, intersectedItemRect, Qt::AlignRight, false).bottom()
@@ -125,12 +129,11 @@ void tst_Utils::testAlignRectToSide()
             QVERIFY(!ive::alignRectToSide(testData.boundingRect, {}, align, testData.offset).isValid());
 
             if (!ive::kRectSides.contains(align)) {
-                QVERIFY(!ive::alignRectToSide(
-                        testData.boundingRect, testData.itemRect, align, testData.offset)
+                QVERIFY(!ive::alignRectToSide(testData.boundingRect, testData.itemRect, align, testData.offset)
                                  .isValid());
             } else {
-                const QRectF alignedRect = ive::alignRectToSide(
-                        testData.boundingRect, testData.itemRect, align, testData.offset);
+                const QRectF alignedRect =
+                        ive::alignRectToSide(testData.boundingRect, testData.itemRect, align, testData.offset);
                 QVERIFY(alignedRect.isValid());
                 QVERIFY(testData.boundingRect.contains(alignedRect.topLeft() - testData.offset));
             }

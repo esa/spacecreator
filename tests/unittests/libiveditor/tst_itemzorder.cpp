@@ -15,7 +15,6 @@
    along with this program. If not, see <https://www.gnu.org/licenses/lgpl-2.1.html>.
 */
 
-#include "aadlobject.h"
 #include "aadlcomment.h"
 #include "aadlconnection.h"
 #include "aadlconnectiongroup.h"
@@ -23,6 +22,7 @@
 #include "aadlfunctiontype.h"
 #include "aadliface.h"
 #include "aadlifacegroup.h"
+#include "aadlobject.h"
 #include "baseitems/common/aadlutils.h"
 #include "baseitems/interactiveobject.h"
 #include "interface/aadlcommentgraphicsitem.h"
@@ -32,6 +32,7 @@
 #include "interface/aadlfunctiontypegraphicsitem.h"
 #include "interface/aadlinterfacegraphicsitem.h"
 #include "interface/aadlinterfacegroupgraphicsitem.h"
+#include "sharedlibrary.h"
 
 #include <QMetaEnum>
 #include <QObject>
@@ -66,6 +67,7 @@ private:
 void tst_ItemZOrder::initTestCase()
 {
     QStandardPaths::setTestModeEnabled(true);
+    shared::initSharedLibrary();
     m_itemTypesTested = 0;
 }
 
@@ -120,8 +122,7 @@ void tst_ItemZOrder::testItem_InterfaceGroup()
     ivm::AADLIface::CreationInfo ci;
     ci.function = &aadlFunction;
     ci.type = ivm::AADLIface::IfaceType::Grouped;
-    std::unique_ptr<ivm::AADLIfaceGroup> pIface =
-            std::unique_ptr<ivm::AADLIfaceGroup>(new ivm::AADLIfaceGroup(ci));
+    std::unique_ptr<ivm::AADLIfaceGroup> pIface = std::unique_ptr<ivm::AADLIfaceGroup>(new ivm::AADLIfaceGroup(ci));
     ive::AADLInterfaceGroupGraphicsItem item(pIface.get());
 
     checkItem(&item, ive::ZOrder.Interface);
@@ -133,8 +134,7 @@ void tst_ItemZOrder::testItem_RequiredInterface()
     ivm::AADLIface::CreationInfo ci;
     ci.function = &aadlFunction;
     ci.type = ivm::AADLIface::IfaceType::Required;
-    std::unique_ptr<ivm::AADLIface> pIface =
-            std::unique_ptr<ivm::AADLIface>(ivm::AADLIface::createIface(ci));
+    std::unique_ptr<ivm::AADLIface> pIface = std::unique_ptr<ivm::AADLIface>(ivm::AADLIface::createIface(ci));
     ive::AADLInterfaceGraphicsItem item(pIface.get());
 
     checkItem(&item, ive::ZOrder.Interface);
@@ -146,8 +146,7 @@ void tst_ItemZOrder::testItem_ProvidedInterface()
     ivm::AADLIface::CreationInfo ci;
     ci.function = &aadlFunction;
     ci.type = ivm::AADLIface::IfaceType::Provided;
-    std::unique_ptr<ivm::AADLIface> pIface =
-            std::unique_ptr<ivm::AADLIface>(ivm::AADLIface::createIface(ci));
+    std::unique_ptr<ivm::AADLIface> pIface = std::unique_ptr<ivm::AADLIface>(ivm::AADLIface::createIface(ci));
     ive::AADLInterfaceGraphicsItem item(pIface.get());
 
     checkItem(&item, ive::ZOrder.Interface);
@@ -161,15 +160,13 @@ void tst_ItemZOrder::testItem_Connection()
     ivm::AADLIface::CreationInfo ciA;
     ciA.function = &aadlFunctionA;
     ciA.type = ivm::AADLIface::IfaceType::Provided;
-    std::unique_ptr<ivm::AADLIface> pIfaceA =
-            std::unique_ptr<ivm::AADLIface>(ivm::AADLIface::createIface(ciA));
+    std::unique_ptr<ivm::AADLIface> pIfaceA = std::unique_ptr<ivm::AADLIface>(ivm::AADLIface::createIface(ciA));
     ive::AADLInterfaceGraphicsItem itemA(pIfaceA.get());
 
     ivm::AADLIface::CreationInfo ciB;
     ciB.function = &aadlFunctionA;
     ciB.type = ivm::AADLIface::IfaceType::Provided;
-    std::unique_ptr<ivm::AADLIface> pIfaceB =
-            std::unique_ptr<ivm::AADLIface>(ivm::AADLIface::createIface(ciB));
+    std::unique_ptr<ivm::AADLIface> pIfaceB = std::unique_ptr<ivm::AADLIface>(ivm::AADLIface::createIface(ciB));
     ive::AADLInterfaceGraphicsItem itemB(pIfaceB.get());
 
     ivm::AADLConnection aadlConnection(pIfaceA.get(), pIfaceB.get());
@@ -195,8 +192,7 @@ void tst_ItemZOrder::testItem_ConnectionGroup()
     std::unique_ptr<ivm::AADLIfaceGroup> pIfaceB = std::make_unique<ivm::AADLIfaceGroup>(ciB);
     ive::AADLInterfaceGroupGraphicsItem itemB(pIfaceB.get());
 
-    std::unique_ptr<ivm::AADLConnection> aadlConnection { new ivm::AADLConnection(
-            pIfaceA.get(), pIfaceB.get()) };
+    std::unique_ptr<ivm::AADLConnection> aadlConnection { new ivm::AADLConnection(pIfaceA.get(), pIfaceB.get()) };
 
     ivm::AADLConnectionGroup aadlConnectionGroup(
             QStringLiteral("TestConnectionGroup"), pIfaceA.get(), pIfaceB.get(), { aadlConnection.get() });

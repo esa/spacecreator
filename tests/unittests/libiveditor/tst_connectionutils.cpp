@@ -24,6 +24,7 @@
 #include "interface/aadlfunctiongraphicsitem.h"
 #include "interface/aadlinterfacegraphicsitem.h"
 #include "interface/graphicsitemhelpers.h"
+#include "sharedlibrary.h"
 
 #include <QObject>
 #include <QPainter>
@@ -116,6 +117,8 @@ private:
 
 void tst_ConnectionUtils::initTestCase()
 {
+    shared::initSharedLibrary();
+
     auto entity1 = new ivm::AADLFunction("F1");
     f1 = new ive::AADLFunctionGraphicsItem(entity1);
     m_scene.addItem(f1);
@@ -338,17 +341,15 @@ void tst_ConnectionUtils::tst_findSubPath()
     const QLineF startSegment = ive::ifaceSegment(r1, startPoint, endPoint);
     const QLineF endSegment = ive::ifaceSegment(r2, endPoint, startPoint);
 
-    const auto pathsFromStart =
-            ive::findSubPath(r1, QVector<QPointF> { startSegment.p1(), startSegment.p2() },
-                    QVector<QPointF> { endSegment.p1(), endSegment.p2() });
+    const auto pathsFromStart = ive::findSubPath(r1, QVector<QPointF> { startSegment.p1(), startSegment.p2() },
+            QVector<QPointF> { endSegment.p1(), endSegment.p2() });
     QVERIFY(!pathsFromStart.isEmpty());
 
     const auto pathsFromEnd = ive::findSubPath(r2, QVector<QPointF> { endSegment.p1(), endSegment.p2() },
             QVector<QPointF> { startSegment.p1(), startSegment.p2() });
     QVERIFY(!pathsFromEnd.isEmpty());
 
-    static const QList<int> types = { ive::AADLFunctionGraphicsItem::Type,
-        ive::AADLFunctionTypeGraphicsItem::Type };
+    static const QList<int> types = { ive::AADLFunctionGraphicsItem::Type, ive::AADLFunctionTypeGraphicsItem::Type };
     QList<QVector<QPointF>> paths;
     for (int p1idx = 0; p1idx < pathsFromStart.size(); ++p1idx) {
         for (int p2idx = 0; p2idx < pathsFromEnd.size(); ++p2idx) {
@@ -540,15 +541,14 @@ void tst_ConnectionUtils::checkEndPoints(ive::AADLFunctionGraphicsItem *startFn,
 
             const QPointF p = isReversed ? connectionPoints.last() : connectionPoints.first();
             if (startEp == Data::EndPoint::Empty) {
-                const bool validPoint = ive::isOnVerticalSide(start.rect(), p)
-                        || ive::isOnVerticalSide(start.rect(), p);
+                const bool validPoint =
+                        ive::isOnVerticalSide(start.rect(), p) || ive::isOnVerticalSide(start.rect(), p);
                 if (!validPoint) {
                     continue;
                 }
             }
             if (endEp == Data::EndPoint::Empty) {
-                const bool validPoint = ive::isOnVerticalSide(end.rect(), p)
-                        || ive::isOnVerticalSide(end.rect(), p);
+                const bool validPoint = ive::isOnVerticalSide(end.rect(), p) || ive::isOnVerticalSide(end.rect(), p);
                 if (!validPoint) {
                     continue;
                 }

@@ -23,6 +23,7 @@
 #include "interface/interfacedocument.h"
 #include "iveditor.h"
 #include "iveditorcore.h"
+#include "sharedlibrary.h"
 
 #include <QObject>
 #include <QtTest>
@@ -52,6 +53,7 @@ private:
 void tst_IVEditorCore::initTestCase()
 {
     ive::initIvEditor();
+    shared::initSharedLibrary();
     QStandardPaths::setTestModeEnabled(true);
 }
 

@@ -864,46 +864,30 @@ QVector<QPointF> createConnectionPath(const QList<QRectF> &existingRects, const 
 
 QVector<QPointF> simplifyPoints(const QVector<QPointF> &points)
 {
-    if (points.size() <= 3)
+    if (points.size() <= 2)
         return points;
 
-    /// TODO: optimize flow
-    QVector<QPointF> simplifiedPoints(points);
+    auto checkLines = [](const QLineF &line1, const QLineF &line2) -> bool {
+        if (line1.length() < kMinSegmentLength) {
+            return true;
+        }
+        const int simplifiedAngle = qAbs(qRound(line1.angleTo(line2)) % 180);
+        if (simplifiedAngle < kMinSegmentAngle || 180 - simplifiedAngle < kMinSegmentAngle) {
+            return true;
+        }
+        return false;
+    };
 
-    for (int idx = 0; idx < simplifiedPoints.size() - 1;) {
-        const QLineF currentLine { simplifiedPoints.value(idx), simplifiedPoints.value(idx + 1) };
-        if (qFuzzyIsNull(currentLine.length())) {
-            simplifiedPoints.removeAt(idx + 1);
+    QVector<QPointF> simplifiedPoints(points);
+    for (int idx = 1; idx < simplifiedPoints.size() - 1;) {
+        const QLineF currentLine { simplifiedPoints.value(idx), simplifiedPoints.value(idx - 1) };
+        const QLineF nextLine { simplifiedPoints.value(idx), simplifiedPoints.value(idx + 1) };
+        if (checkLines(currentLine, nextLine)) {
+            simplifiedPoints.removeAt(idx);
             continue;
         }
-        if (idx + 2 < simplifiedPoints.size()) {
-            const QLineF nextLine { simplifiedPoints.value(idx + 1), simplifiedPoints.value(idx + 2) };
-            if (qFuzzyIsNull(nextLine.length()) || qFuzzyCompare(currentLine.angle(), nextLine.angle())
-                    || int(currentLine.angleTo(nextLine)) % 180 == 0) {
-                simplifiedPoints.removeAt(idx + 1);
-                continue;
-            }
-        }
-
         ++idx;
     }
-    for (int idx = 1; idx < simplifiedPoints.size() - 2; ++idx) {
-        const QLineF currentLine { simplifiedPoints.value(idx), simplifiedPoints.value(idx + 1) };
-        const QLineF prevLine { simplifiedPoints.value(idx - 1), simplifiedPoints.value(idx) };
-        const QLineF nextLine { simplifiedPoints.value(idx + 1), simplifiedPoints.value(idx + 2) };
-
-        if (qFuzzyCompare(prevLine.angle(), nextLine.angle()) && currentLine.length() < kMinLineLength) {
-            const QPointF midPoint = currentLine.center();
-            const QPointF prevOffset = midPoint - currentLine.p1();
-            simplifiedPoints[idx - 1] = prevLine.p1() + prevOffset;
-            const QPointF nextOffset = midPoint - currentLine.p2();
-            simplifiedPoints[idx + 2] = nextLine.p2() + nextOffset;
-            simplifiedPoints.removeAt(idx + 1);
-            simplifiedPoints.removeAt(idx);
-        }
-    }
-    if (simplifiedPoints.size() == 2)
-        return { points.first(), points.last() };
     return simplifiedPoints;
 }
 

@@ -22,6 +22,7 @@
 #include "interface/aadlfunctiontypegraphicsitem.h"
 #include "interface/aadlinterfacegraphicsitem.h"
 #include "iveditor.h"
+#include "sharedlibrary.h"
 
 #include <QDebug>
 #include <QGraphicsScene>
@@ -43,6 +44,7 @@ private:
 void tst_AADLConnectionGraphicsItem::initTestCase()
 {
     ive::initIvEditor();
+    shared::initSharedLibrary();
     QStandardPaths::setTestModeEnabled(true);
 }
 
@@ -125,8 +127,8 @@ void tst_AADLConnectionGraphicsItem::tst_Overlapping()
 
 bool tst_AADLConnectionGraphicsItem::checkIntersections(ive::AADLConnectionGraphicsItem *connection)
 {
-    const QRectF itemRect = ive::getNearestIntersectedRect(ive::siblingSceneRects(connection),
-            connection->points(), ive::IntersectionType::Single);
+    const QRectF itemRect = ive::getNearestIntersectedRect(
+            ive::siblingSceneRects(connection), connection->points(), ive::IntersectionType::Single);
 
     return itemRect.isValid();
 }
