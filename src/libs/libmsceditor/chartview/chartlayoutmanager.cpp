@@ -63,7 +63,7 @@ namespace msc {
  */
 
 struct ChartViewLayoutInfo {
-    ChartViewLayoutInfo() { }
+    ChartViewLayoutInfo() {}
 
     ~ChartViewLayoutInfo() { clear(); }
 
@@ -96,7 +96,7 @@ private:
 };
 
 struct ChartLayoutManagerPrivate {
-    ChartLayoutManagerPrivate() { }
+    ChartLayoutManagerPrivate() {}
 
     shared::ui::GraphicsSceneBase m_scene;
     QHash<QUuid, msc::InstanceItem *> m_instanceItems;
@@ -395,6 +395,16 @@ void ChartLayoutManager::addInstanceItems()
         if (!item) {
             item = createDefaultInstanceItem(instance);
             storeEntityItem(item);
+
+            for (msc::InteractiveObject *instanceEventItem : d->m_instanceEventItems) {
+                if (instanceEventItem->modelEntity()->entityType() == msc::MscEntity::EntityType::Condition) {
+                    if (auto condition = qobject_cast<MscCondition *>(instanceEventItem->modelEntity())) {
+                        if (condition->shared()) {
+                            item->stackBefore(instanceEventItem);
+                        }
+                    }
+                }
+            }
         }
 
         item->setHighlightable(false);
