@@ -74,6 +74,7 @@ QSharedPointer<msc::MSCEditorCore> SpaceCreatorProject::mscData(const QString &f
     if (!m_mscStore.contains(fileName)) {
         QSharedPointer<msc::MSCEditorCore> data(new msc::MSCEditorCore());
         data->showToolbars(false);
+        data->mainModel()->setAsn1ModelStorage(m_asn1Storage.get());
         data->mainModel()->loadFile(fileName);
         const_cast<SpaceCreatorProject *>(this)->setMscData(fileName, data);
         return data;

@@ -99,9 +99,6 @@ void Asn1ModelStorage::clear()
 bool Asn1ModelStorage::loadFile(const QString &fileName)
 {
     QSharedPointer<Asn1Acn::File> asn1Data = loadData(fileName);
-    if (asn1Data.isNull()) {
-        return false;
-    }
 
     m_store[fileName] = asn1Data;
     Q_EMIT dataTypesChanged(fileName);
@@ -114,7 +111,7 @@ bool Asn1ModelStorage::loadFile(const QString &fileName)
             m_filesToReload.insert(path);
         });
     }
-    return true;
+    return !asn1Data.isNull();
 }
 
 QSharedPointer<File> Asn1ModelStorage::loadData(const QString &fileName)
@@ -123,7 +120,7 @@ QSharedPointer<File> Asn1ModelStorage::loadData(const QString &fileName)
     Asn1Acn::Asn1Reader parser;
     std::unique_ptr<Asn1Acn::File> asn1Data = parser.parseAsn1File(QFileInfo(fileName), &errorMessages);
     if (!errorMessages.isEmpty()) {
-        qWarning() << "Can't read file: " << fileName << errorMessages.join(", ");
+        qWarning() << "Can't read file" << fileName << ":" << errorMessages.join(", ");
         Q_EMIT error(fileName, errorMessages);
         return {};
     }

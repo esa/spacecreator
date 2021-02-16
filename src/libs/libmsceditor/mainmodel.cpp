@@ -17,6 +17,7 @@
 
 #include "mainmodel.h"
 
+#include "asn1modelstorage.h"
 #include "asn1reader.h"
 #include "astxmlparser.h"
 #include "chartlayoutmanager.h"
@@ -40,7 +41,6 @@
 #include <QDebug>
 #include <QDir>
 #include <QFileInfo>
-#include <QFileSystemWatcher>
 #include <QGraphicsScene>
 #include <QImage>
 #include <QMimeData>
@@ -79,7 +79,7 @@ struct MainModelPrivate {
     DocumentItemModel *m_documentItemModel = nullptr; /// model of the document tree
     QPointer<msc::MscDocument> m_selectedDocument;
     QString m_currentFilePath;
-    QFileSystemWatcher *m_asn1Watcher = nullptr;
+    Asn1Acn::Asn1ModelStorage *m_asnDataStore = nullptr;
 };
 
 /*!
@@ -96,6 +96,8 @@ MainModel::MainModel(QObject *parent)
     : QObject(parent)
     , d(new MainModelPrivate(this))
 {
+    setAsn1ModelStorage(new Asn1Acn::Asn1ModelStorage(this));
+
     connect(&d->m_hierarchyModel, &HierarchyViewModel::documentDoubleClicked, this, &MainModel::showChartFromDocument);
     connect(&d->m_hierarchyModel, &HierarchyViewModel::selectedDocumentChanged, this, &MainModel::setSelectedDocument);
 
@@ -413,42 +415,6 @@ void MainModel::showChartFromDocument(MscDocument *document)
 }
 
 /*!
-   Reads the ASN1 data from the file referenced in the MscModel and sets it in the model
- */
-void MainModel::readAsn1Types()
-{
-    const QFileInfo asn1FileInfo = asn1File();
-
-    if (d->m_asn1Watcher != nullptr) {
-        // Check if the directory is watched already
-        if (!d->m_asn1Watcher->files().contains(asn1FileInfo.absoluteFilePath())) {
-            disconnect(
-                    d->m_mscModel, &msc::MscModel::dataDefinitionStringChanged, this, &msc::MainModel::readAsn1Types);
-            disconnect(d->m_asn1Watcher, nullptr, this, nullptr);
-            d->m_asn1Watcher->deleteLater();
-            d->m_asn1Watcher = nullptr;
-        }
-    }
-
-    if (asn1FileInfo.exists()) {
-        Asn1Acn::Asn1Reader xmlParser;
-        QStringList errorMessages;
-        std::unique_ptr<Asn1Acn::File> asn1Data = xmlParser.parseAsn1File(asn1FileInfo, &errorMessages);
-        QSharedPointer<Asn1Acn::File> sharedAsn1Data(asn1Data.release());
-        if (errorMessages.isEmpty()) {
-            d->m_mscModel->setAsn1TypesData(sharedAsn1Data);
-        }
-    }
-
-    if (d->m_asn1Watcher == nullptr && asn1FileInfo.exists()) {
-        d->m_asn1Watcher = new QFileSystemWatcher(this);
-        d->m_asn1Watcher->addPath(asn1FileInfo.absoluteFilePath());
-        connect(d->m_asn1Watcher, &QFileSystemWatcher::fileChanged, this, &msc::MainModel::readAsn1Types,
-                Qt::UniqueConnection);
-    }
-}
-
-/*!
  * \brief MainModel::firstChart Get the first chart
  * \return First chart pointer or null
  */
@@ -531,8 +497,10 @@ void MainModel::setNewModel(MscModel *model)
     showFirstChart();
     d->m_hierarchyModel.setModel(d->m_mscModel);
 
-    readAsn1Types();
-    connect(d->m_mscModel, &msc::MscModel::dataDefinitionStringChanged, this, &msc::MainModel::readAsn1Types);
+    d->m_mscModel->setAsn1TypesData(d->m_asnDataStore->asn1DataTypes(asn1File().absoluteFilePath()));
+    connect(d->m_mscModel, &msc::MscModel::dataDefinitionStringChanged, this, [this](const QString &) {
+        d->m_mscModel->setAsn1TypesData(d->m_asnDataStore->asn1DataTypes(asn1File().absoluteFilePath()));
+    });
     connect(d->m_mscModel, &msc::MscModel::dataDefinitionStringChanged, this, &msc::MainModel::asn1FileNameChanged);
 
     Q_EMIT modelUpdated(d->m_mscModel);
@@ -546,6 +514,32 @@ QFileInfo MainModel::asn1File() const
     }
 
     return QFileInfo(QFileInfo(d->m_currentFilePath).absolutePath() + "/" + d->m_mscModel->dataDefinitionString());
+}
+
+Asn1Acn::Asn1ModelStorage *MainModel::asn1ModelStorage() const
+{
+    return d->m_asnDataStore;
+}
+
+void MainModel::setAsn1ModelStorage(Asn1Acn::Asn1ModelStorage *asn1Storage)
+{
+    if (!asn1Storage) {
+        return;
+    }
+
+    if (d->m_asnDataStore) {
+        disconnect(d->m_asnDataStore, nullptr, this, nullptr);
+        if (d->m_asnDataStore->parent() == this) {
+            d->m_asnDataStore->deleteLater();
+        }
+    }
+
+    d->m_asnDataStore = asn1Storage;
+    connect(d->m_asnDataStore, &Asn1Acn::Asn1ModelStorage::dataTypesChanged, this, [&](const QString &fileName) {
+        if (fileName == asn1File().absoluteFilePath()) {
+            d->m_mscModel->setAsn1TypesData(d->m_asnDataStore->asn1DataTypes(fileName));
+        }
+    });
 }
 
 }

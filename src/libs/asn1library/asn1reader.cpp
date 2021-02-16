@@ -374,9 +374,9 @@ bool Asn1Reader::convertToXML(const QString &asn1FileName, const QString &xmlFil
             [&](int, QProcess::ExitStatus exitStatus) {
                 if (exitStatus == QProcess::CrashExit) {
                     const QString message = tr("asn1scc compiler process crashed");
-                    qWarning() << message;
-                    if (errorMessages)
+                    if (errorMessages) {
                         errorMessages->append(message);
+                    }
                 }
             });
 
@@ -393,9 +393,9 @@ bool Asn1Reader::convertToXML(const QString &asn1FileName, const QString &xmlFil
 
     auto error = asn1Process.readAll();
     if (!error.isEmpty()) {
-        qWarning() << error;
-        if (errorMessages)
+        if (errorMessages) {
             errorMessages->append(error);
+        }
         QFile::remove(asn1XMLFileName);
         return false;
     }

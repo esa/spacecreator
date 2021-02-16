@@ -28,6 +28,9 @@ class QGraphicsScene;
 class QFileInfo;
 class QUndoStack;
 
+namespace Asn1Acn {
+class Asn1ModelStorage;
+}
 namespace msc {
 class ChartLayoutManager;
 class DocumentItemModel;
@@ -80,6 +83,8 @@ public:
     bool needSave() const;
 
     QFileInfo asn1File() const;
+    Asn1Acn::Asn1ModelStorage *asn1ModelStorage() const;
+    void setAsn1ModelStorage(Asn1Acn::Asn1ModelStorage *asn1Storage);
 
 Q_SIGNALS:
     void showChartVew();
@@ -100,7 +105,6 @@ public Q_SLOTS:
 
 private Q_SLOTS:
     void showChartFromDocument(msc::MscDocument *document);
-    void readAsn1Types();
 
 private:
     msc::MscChart *firstChart() const;
