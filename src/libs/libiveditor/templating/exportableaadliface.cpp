@@ -17,8 +17,8 @@
 
 #include "exportableaadliface.h"
 
-#include "aadlinterfacechain.h"
 #include "aadliface.h"
+#include "aadlinterfacechain.h"
 
 namespace ive {
 
@@ -40,7 +40,7 @@ bool ExportableAADLIface::isRequired() const
 QVariantList ExportableAADLIface::paramList() const
 {
     QVariantList list;
-    for (const auto &param : exportedObject<ivm::AADLIface>()->params())
+    for (const ivm::IfaceParameter &param : exportedObject<ivm::AADLIface>()->params())
         list << QVariant::fromValue(param);
     return list;
 }
@@ -49,8 +49,8 @@ QVariantList ExportableAADLIface::connectedInterfaces() const
 {
     QVariantList connectedInterfaces;
     auto iface = exportedObject<ivm::AADLIface>();
-    const auto chains = ivm::AADLInterfaceChain::build(iface);
-    for (auto chain : chains) {
+    const QList<ivm::AADLInterfaceChain> chains = ivm::AADLInterfaceChain::build(iface);
+    for (const ivm::AADLInterfaceChain &chain : chains) {
         connectedInterfaces << chain.targetEndPointPath();
     }
     return connectedInterfaces;

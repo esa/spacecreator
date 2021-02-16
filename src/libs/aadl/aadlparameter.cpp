@@ -50,6 +50,16 @@ bool BasicParameter::setName(const QString &name)
     return true;
 }
 
+/*!
+   Returns the name where " " characters are replaced by "_"
+   @see name
+ */
+QString BasicParameter::underscoredName() const
+{
+    QString converted = m_paramName;
+    return converted.replace(" ", "_");
+}
+
 BasicParameter::Type BasicParameter::paramType() const
 {
     return m_paramType;
@@ -103,6 +113,16 @@ bool BasicParameter::setParamTypeName(const QString &typeName)
         setParamType(BasicParameter::Type::Other);
 
     return true;
+}
+
+/*!
+   Returns the param type name where "-" characters are replaced by "_"
+   @see paramTypeName
+ */
+QString BasicParameter::underscoredType() const
+{
+    QString converted = m_typeName;
+    return converted.replace("-", "_");
 }
 
 bool BasicParameter::operator==(const BasicParameter &other) const

@@ -32,7 +32,10 @@ class BasicParameter
 {
     Q_GADGET
     Q_PROPERTY(QString name READ name WRITE setName)
+    Q_PROPERTY(QString underscoredName READ underscoredName)
     Q_PROPERTY(QString type READ paramTypeName WRITE setParamTypeName)
+    Q_PROPERTY(QString underscoredType READ underscoredType)
+
 public:
     enum class Type
     {
@@ -48,11 +51,15 @@ public:
     QString name() const;
     bool setName(const QString &name);
 
+    QString underscoredName() const;
+
     Type paramType() const;
     virtual bool setParamType(const Type &type);
 
     QString paramTypeName() const;
     virtual bool setParamTypeName(const QString &typeName);
+
+    QString underscoredType() const;
 
     bool operator==(const BasicParameter &other) const;
 

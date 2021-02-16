@@ -14,7 +14,9 @@ param                       :       |_ Instance of param
 param.isIn                  :           |_ Whether param is IN
 param.isOut                 :           |_ Whether param is OUT
 param.name                  :           |_ Name of param
+param.underscoredName       :           |_ Name of param with " " replaced by "_" (spaces repladed with underscore)
 param.type                  :           |_ Type of param
+param.underscoredType       :           |_ Type of param with "-" replaced by "_" (dashes repladed with underscore)
 param.encoding              :           |_ Encoding of param
 iface.properties            :   |_ List of all available properties
 prop                        :       |_ Instance of property
