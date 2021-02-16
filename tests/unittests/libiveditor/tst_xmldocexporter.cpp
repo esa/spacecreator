@@ -69,7 +69,7 @@ QByteArray tst_XmlDocExporter::testFileContent() const
 void tst_XmlDocExporter::init()
 {
     m_doc = std::make_unique<ive::InterfaceDocument>(this);
-    m_doc->asn1DataTypes()->clear();
+    m_doc->asn1ModelStorage()->clear();
     if (QFile::exists(testFilePath)) {
         QFile::remove(testFilePath);
     }

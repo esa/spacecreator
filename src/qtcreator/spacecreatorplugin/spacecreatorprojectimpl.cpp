@@ -17,11 +17,14 @@
 
 #include "spacecreatorprojectimpl.h"
 
+#include "asn1modelstorage.h"
 #include "editorcore.h"
 #include "iveditorcore.h"
 #include "msceditorcore.h"
 #include "mscsystemchecks.h"
 
+#include <QDateTime>
+#include <coreplugin/messagemanager.h>
 #include <editormanager/documentmodel.h>
 #include <projectexplorer/project.h>
 
@@ -41,6 +44,8 @@ SpaceCreatorProjectImpl::SpaceCreatorProjectImpl(ProjectExplorer::Project *proje
     m_asnFiles = allAsn1Files();
     connect(m_project, &ProjectExplorer::Project::fileListChanged, this,
             &spctr::SpaceCreatorProjectImpl::checkAsnFileRename);
+
+    connect(m_asn1Storage.get(), &Asn1Acn::Asn1ModelStorage::error, this, &SpaceCreatorProjectImpl::reportAsn1Error);
 }
 
 SpaceCreatorProjectImpl::~SpaceCreatorProjectImpl() { }
@@ -98,6 +103,13 @@ void SpaceCreatorProjectImpl::saveIfNotOpen(shared::EditorCore *core)
     if (!isOpenInEditor(core)) {
         core->save();
     }
+}
+
+void SpaceCreatorProjectImpl::reportAsn1Error(const QString &fileName, const QStringList &errors)
+{
+    const QString msg = QString("%1 ASN1 parsing error - %2\n * %3")
+                                .arg(QDateTime::currentDateTime().toString(), fileName, errors.join("\n * "));
+    Core::MessageManager::write(msg, Core::MessageManager::PrintToOutputPaneFlag::EnsureSizeHint);
 }
 
 /*!

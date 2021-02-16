@@ -17,6 +17,7 @@
 
 #include "spacecreatorproject.h"
 
+#include "asn1modelstorage.h"
 #include "interface/interfacedocument.h"
 #include "iveditorcore.h"
 #include "ivsystemchecks.h"
@@ -31,6 +32,7 @@ namespace scs {
 SpaceCreatorProject::SpaceCreatorProject(QObject *parent)
     : QObject(parent)
     , m_mscChecks(new MscSystemChecks)
+    , m_asn1Storage(new Asn1Acn::Asn1ModelStorage)
 {
     m_mscChecks->setStorage(this);
 }
@@ -53,6 +55,7 @@ QSharedPointer<ive::IVEditorCore> SpaceCreatorProject::ivData(const QString &fil
         QSharedPointer<ive::IVEditorCore> data(new ive::IVEditorCore());
         data->registerBasicActions();
         data->document()->customActions(); // There some further actions are registered
+        data->document()->setAsn1ModelStorage(m_asn1Storage.get());
 
         data->document()->load(fileName);
         const_cast<SpaceCreatorProject *>(this)->setIvData(fileName, data);

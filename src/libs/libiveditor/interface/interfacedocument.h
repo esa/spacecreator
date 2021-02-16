@@ -103,7 +103,8 @@ public:
     ivm::AADLModel *importModel() const;
     AADLItemModel *itemsModel() const;
 
-    Asn1Acn::Asn1ModelStorage *asn1DataTypes() const;
+    Asn1Acn::Asn1ModelStorage *asn1ModelStorage() const;
+    void setAsn1ModelStorage(Asn1Acn::Asn1ModelStorage *asn1Storage);
 
     QString supportedFileExtensions() const;
 

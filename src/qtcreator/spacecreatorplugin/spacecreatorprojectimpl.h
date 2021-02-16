@@ -46,6 +46,7 @@ public:
 private Q_SLOTS:
     void checkAsnFileRename();
     void saveIfNotOpen(shared::EditorCore *core);
+    void reportAsn1Error(const QString &fileName, const QStringList &errors);
 
 private:
     bool isOpenInEditor(shared::EditorCore *core) const;

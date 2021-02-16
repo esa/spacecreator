@@ -36,8 +36,9 @@ namespace Asn1Acn {
 /*!
    \brief Asn1ModelStorage::Asn1ModelStorage
  */
-Asn1ModelStorage::Asn1ModelStorage()
-    : m_asn1Watcher(new QFileSystemWatcher(this))
+Asn1ModelStorage::Asn1ModelStorage(QObject *parent)
+    : QObject(parent)
+    , m_asn1Watcher(new QFileSystemWatcher(this))
 {
     m_reloadTimer.setSingleShot(true);
     connect(&m_reloadTimer, &QTimer::timeout, this, &Asn1Acn::Asn1ModelStorage::loadChangedFiles);
@@ -116,13 +117,14 @@ bool Asn1ModelStorage::loadFile(const QString &fileName)
     return true;
 }
 
-QSharedPointer<File> Asn1ModelStorage::loadData(const QString &fileName) const
+QSharedPointer<File> Asn1ModelStorage::loadData(const QString &fileName)
 {
     QStringList errorMessages;
     Asn1Acn::Asn1Reader parser;
     std::unique_ptr<Asn1Acn::File> asn1Data = parser.parseAsn1File(QFileInfo(fileName), &errorMessages);
     if (!errorMessages.isEmpty()) {
-        qWarning() << "Can't read file:" << fileName << errorMessages.join(", ");
+        qWarning() << "Can't read file: " << fileName << errorMessages.join(", ");
+        Q_EMIT error(fileName, errorMessages);
         return {};
     }
     return QSharedPointer<Asn1Acn::File>(asn1Data.release());

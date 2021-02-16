@@ -23,6 +23,9 @@
 #include <QVector>
 #include <memory>
 
+namespace Asn1Acn {
+class Asn1ModelStorage;
+}
 namespace dve {
 class DVEditorCore;
 }
@@ -91,6 +94,7 @@ protected:
     QHash<QString, QSharedPointer<ive::IVEditorCore>> m_ivStore;
     QHash<QString, QSharedPointer<msc::MSCEditorCore>> m_mscStore;
     std::unique_ptr<scs::MscSystemChecks> m_mscChecks;
+    std::unique_ptr<Asn1Acn::Asn1ModelStorage> m_asn1Storage;
 };
 
 } // namespace scs

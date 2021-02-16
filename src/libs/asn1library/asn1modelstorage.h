@@ -44,7 +44,7 @@ class Asn1ModelStorage : public QObject
 {
     Q_OBJECT
 public:
-    Asn1ModelStorage();
+    Asn1ModelStorage(QObject *parent = nullptr);
     ~Asn1ModelStorage();
 
     QSharedPointer<File> asn1DataTypes(const QString &fileName) const;
@@ -54,10 +54,11 @@ public:
 
 Q_SIGNALS:
     void dataTypesChanged(const QString &fileName);
+    void error(const QString &fileName, const QStringList &errors);
 
 private:
     bool loadFile(const QString &fileName);
-    QSharedPointer<Asn1Acn::File> loadData(const QString &fileName) const;
+    QSharedPointer<Asn1Acn::File> loadData(const QString &fileName);
     Q_SLOT void loadChangedFiles();
 
     QHash<QString, QSharedPointer<Asn1Acn::File>> m_store;
