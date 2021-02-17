@@ -60,26 +60,25 @@ PropertiesListModel::PropertiesListModel(
 {
 }
 
-PropertiesListModel::~PropertiesListModel() { }
+PropertiesListModel::~PropertiesListModel() {}
 
 void PropertiesListModel::updateRow(int row, const QString &label, const QString &name,
         ivm::PropertyTemplate::Info info, const QVariant &value, const QVariant &editValue, const QVariant &defaulValue)
 {
     Q_UNUSED(defaulValue);
 
-    QStandardItem *titleItem = item(row, ColumnTitle);
-    if (!titleItem) {
-        titleItem = new QStandardItem;
-        setItem(row, ColumnTitle, titleItem);
+    const QString title = label.isEmpty() ? name : label;
+    if (row == -1 || row >= rowCount()) {
+        row = rowCount();
+        createNewRow(row, title);
     }
-    titleItem->setData(label.isEmpty() ? name : label, Qt::DisplayRole);
+
+    QStandardItem *titleItem = item(row, ColumnTitle);
+    titleItem->setData(title, Qt::DisplayRole);
+    titleItem->setData(title, Qt::EditRole);
     titleItem->setData(name, PropertyNameRole);
 
     QStandardItem *valueItem = item(row, ColumnValue);
-    if (!valueItem) {
-        valueItem = new QStandardItem;
-        setItem(row, ColumnValue, valueItem);
-    }
     valueItem->setData(value, Qt::DisplayRole);
     valueItem->setData(value, Qt::EditRole);
     valueItem->setData(editValue, PropertyDataRole);
@@ -88,6 +87,10 @@ void PropertiesListModel::updateRow(int row, const QString &label, const QString
 
 void PropertiesListModel::createNewRow(int row, const QString &name)
 {
+    if (name.isEmpty() || m_names.contains(name)) {
+        return;
+    }
+
     m_names.append(name);
 
     QStandardItem *titleItem = new QStandardItem();
@@ -115,11 +118,7 @@ void PropertiesListModel::invalidateAttributes(const QString &propName)
             value = propertyPtr->info() == ivm::PropertyTemplate::Info::Property ? m_dataObject->prop(autonameToken)
                                                                                  : m_dataObject->attr(autonameToken);
         }
-        int row = m_names.indexOf(autonameToken);
-        if (row == -1) {
-            row = rowCount();
-            createNewRow(row, autonameToken);
-        }
+        const int row = m_names.indexOf(autonameToken);
         updateRow(row, propertyPtr->label(), autonameToken, propertyPtr->info(), value,
                 ivm::PropertyTemplate::convertData(propertyPtr->valuesList(), propertyPtr->type()),
                 propertyPtr->defaultValue());
@@ -143,11 +142,7 @@ void PropertiesListModel::updateRows(const QHash<QString, ivm::PropertyTemplate 
                     propertyPtr ? propertyPtr->type() : ivm::PropertyTemplate::Type::String;
             const QString title = propertyPtr ? propertyPtr->label() : key;
 
-            int row = m_names.indexOf(key);
-            if (row < 0) {
-                row = rowCount();
-                createNewRow(row, key);
-            }
+            const int row = m_names.indexOf(key);
             updateRow(row, title, key, info, vals[key],
                     propertyPtr ? ivm::PropertyTemplate::convertData(propTemplatesValues, type)
                                 : QVariant(QVariant::String),
@@ -170,9 +165,7 @@ void PropertiesListModel::updateRows(const QHash<QString, ivm::PropertyTemplate 
                 value = propertyPtr->info() == ivm::PropertyTemplate::Info::Property ? m_dataObject->prop(key)
                                                                                      : m_dataObject->attr(key);
             }
-            const int row = rowCount();
-            createNewRow(row, key);
-            updateRow(row, propertyPtr->label(), key, propertyPtr->info(), value,
+            updateRow(rowCount(), propertyPtr->label(), key, propertyPtr->info(), value,
                     ivm::PropertyTemplate::convertData(propertyPtr->valuesList(), propertyPtr->type()),
                     propertyPtr->defaultValue());
         }
@@ -302,7 +295,7 @@ bool PropertiesListModel::setData(const QModelIndex &index, const QVariant &valu
             }
             case ColumnTitle: {
                 const QString &newName = value.toString();
-                if (m_names.contains(newName))
+                if (newName.isEmpty() || m_names.contains(newName))
                     return false;
                 const QHash<QString, QString> props = { { name, newName } };
                 auto propsCmd = new cmd::CmdEntityPropertyRename(m_dataObject, props);
@@ -333,17 +326,12 @@ bool PropertiesListModel::createProperty(const QString &propName)
         return false;
     }
 
-    beginInsertRows(QModelIndex(), rowCount(), rowCount());
-
     const QVariantHash props = { { propName, QString() } };
     auto propsCmd = new cmd::CmdEntityPropertyCreate(m_dataObject, props);
     m_cmdMacro->push(propsCmd);
 
-    createNewRow(rowCount(), propName);
     updateRow(rowCount(), {}, propName, ivm::PropertyTemplate::Info::Property, QVariant(QVariant::String),
             QVariant(QVariant::String), QVariant(QVariant::String));
-
-    endInsertRows();
 
     return true;
 }
