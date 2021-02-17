@@ -40,7 +40,15 @@ ivm::meta::Props::Token tokenFromIndex(const QModelIndex &index)
     if (!index.isValid())
         return ivm::meta::Props::Token::Unknown;
 
-    const QString name = index.model()->index(index.row(), PropertiesListModel::ColumnTitle).data().toString();
+    QString name;
+    if (index.column() == PropertiesListModel::ColumnTitle) {
+        name = index.data(PropertiesListModel::PropertyNameRole).toString();
+    } else {
+        const QModelIndex titleIndex = index.sibling(index.row(), PropertiesListModel::ColumnTitle);
+        if (titleIndex.isValid()) {
+            name = titleIndex.data(PropertiesListModel::PropertyNameRole).toString();
+        }
+    }
     return ivm::meta::Props::token(name);
 }
 
@@ -52,7 +60,7 @@ PropertiesListModel::PropertiesListModel(
 {
 }
 
-PropertiesListModel::~PropertiesListModel() {}
+PropertiesListModel::~PropertiesListModel() { }
 
 void PropertiesListModel::updateRow(int row, const QString &label, const QString &name,
         ivm::PropertyTemplate::Info info, const QVariant &value, const QVariant &editValue, const QVariant &defaulValue)
@@ -60,10 +68,18 @@ void PropertiesListModel::updateRow(int row, const QString &label, const QString
     Q_UNUSED(defaulValue);
 
     QStandardItem *titleItem = item(row, ColumnTitle);
+    if (!titleItem) {
+        titleItem = new QStandardItem;
+        setItem(row, ColumnTitle, titleItem);
+    }
     titleItem->setData(label.isEmpty() ? name : label, Qt::DisplayRole);
     titleItem->setData(name, PropertyNameRole);
 
     QStandardItem *valueItem = item(row, ColumnValue);
+    if (!valueItem) {
+        valueItem = new QStandardItem;
+        setItem(row, ColumnValue, valueItem);
+    }
     valueItem->setData(value, Qt::DisplayRole);
     valueItem->setData(value, Qt::EditRole);
     valueItem->setData(editValue, PropertyDataRole);
@@ -346,9 +362,9 @@ bool PropertiesListModel::removeProperty(const QModelIndex &index)
     const QString &propName = propId.data().toString();
     const QStringList props { propName };
     auto propsCmd = new cmd::CmdEntityPropertyRemove(m_dataObject, props);
-    m_cmdMacro->push(propsCmd);
     removeRow(row);
     m_names.removeAt(row);
+    m_cmdMacro->push(propsCmd);
 
     return true;
 }

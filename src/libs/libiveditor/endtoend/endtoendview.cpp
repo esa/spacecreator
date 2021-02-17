@@ -198,6 +198,9 @@ bool EndToEndView::refreshView()
     // Add new graphics items for each object
     QHash<shared::Id, QGraphicsItem *> items;
     for (auto obj : objects) {
+        if (ive::nestingLevel(obj) > ive::kNestingVisibilityLevel)
+            continue;
+
         QGraphicsItem *parentItem = obj->parentObject() ? items.value(obj->parentObject()->id()) : nullptr;
 
         InteractiveObject *item = nullptr;
