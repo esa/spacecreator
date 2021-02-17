@@ -131,7 +131,7 @@ void AADLFunctionGraphicsItem::paint(QPainter *painter, const QStyleOptionGraphi
         iconRect.moveTopRight(br.adjusted(kRadius, kRadius, -kRadius, -kRadius).topRight());
         m_svgRenderer->render(painter, iconRect);
 
-        drawInnerFunctions(painter);
+        drawNestedView(painter);
     }
 
     painter->restore();
@@ -211,7 +211,7 @@ static inline void drawItems(
     }
 };
 
-void AADLFunctionGraphicsItem::drawInnerFunctions(QPainter *painter)
+void AADLFunctionGraphicsItem::drawNestedView(QPainter *painter)
 {
     if (!entity()->hasNestedChildren()) {
         return;
@@ -227,9 +227,15 @@ void AADLFunctionGraphicsItem::drawInnerFunctions(QPainter *painter)
     QRectF nestedRect;
     const QVector<ivm::AADLObject *> childEntities = entity()->children();
     static const ivm::meta::Props::Token token = ivm::meta::Props::Token::InnerCoordinates;
-    int itemsCountWithoutGeometry = 0;
-    QList<QRectF> existingRects;
-    QList<QPolygonF> existingPolygons;
+    QList<shared::Id> itemsCountWithoutGeometry;
+    QHash<shared::Id, QRectF> existingRects;
+    QHash<shared::Id, QPolygonF> existingPolygons;
+    struct ConnectionData {
+        QPointF outerMappedScenePos;
+        QPointF innerScenePos;
+        shared::Id innerFunctionId;
+    };
+    QList<ConnectionData> parentConnections;
     for (const ivm::AADLObject *child : childEntities) {
         const QString strCoordinates = child->prop(ivm::meta::Props::token(token)).toString();
         if (child->aadlType() == ivm::AADLObject::Type::Function
@@ -238,23 +244,58 @@ void AADLFunctionGraphicsItem::drawInnerFunctions(QPainter *painter)
             const QRectF itemSceneRect = ive::rect(ivm::AADLObject::coordinatesFromString(strCoordinates));
             if (itemSceneRect.isValid()) {
                 nestedRect |= itemSceneRect;
-                existingRects << itemSceneRect;
+                existingRects.insert(child->id(), itemSceneRect);
             } else {
-                itemsCountWithoutGeometry += 1;
+                itemsCountWithoutGeometry.append(child->id());
             }
         } else if (auto connection = qobject_cast<const ivm::AADLConnection *>(child)) {
             if (connection->source()->id() != entity()->id() && connection->target()->id() != entity()->id()) {
                 const QPolygonF itemScenePoints = ive::polygon(ivm::AADLObject::coordinatesFromString(strCoordinates));
                 if (!itemScenePoints.isEmpty()) {
-                    existingPolygons << itemScenePoints;
+                    existingPolygons.insert(child->id(), itemScenePoints);
                 }
+            } else {
+                ivm::AADLObject *outerIface = connection->source()->id() == entity()->id()
+                        ? connection->sourceInterface()
+                        : connection->target()->id() == entity()->id() ? connection->targetInterface() : nullptr;
+
+                ivm::AADLObject *innerIface = connection->source()->id() == entity()->id()
+                        ? connection->targetInterface()
+                        : connection->target()->id() == entity()->id() ? connection->sourceInterface() : nullptr;
+
+                if (!outerIface || !innerIface) {
+                    continue;
+                }
+
+                const auto items = childItems();
+                auto it = std::find_if(
+                        items.cbegin(), items.cend(), [ifaceId = outerIface->id()](const QGraphicsItem *item) {
+                            if (item->type() != AADLInterfaceGraphicsItem::Type) {
+                                return false;
+                            } else if (auto iface = qgraphicsitem_cast<const AADLInterfaceGraphicsItem *>(item)) {
+                                return iface->entity()->id() == ifaceId;
+                            } else {
+                                return false;
+                            }
+                        });
+                if (it == items.cend()) {
+                    continue;
+                }
+
+                const QString ifaceStrCoordinates = innerIface->prop(ivm::meta::Props::token(token)).toString();
+                const QPointF innerIfacePos = ive::pos(ivm::AADLObject::coordinatesFromString(ifaceStrCoordinates));
+                ConnectionData cd { (*it)->scenePos(), innerIfacePos, innerIface->parentObject()->id() };
+                /// TODO: generate path between outer and inner ifaces
+                /// templorary using straight line to present it
+                parentConnections << cd;
             }
         }
     }
-    while (itemsCountWithoutGeometry-- > 0) {
+    while (!itemsCountWithoutGeometry.isEmpty()) {
+        const shared::Id id = itemsCountWithoutGeometry.takeLast();
         QRectF itemRect { QPointF(), DefaultGraphicsItemSize };
-        findGeometryForRect(itemRect, nestedRect, existingRects);
-        existingRects << itemRect;
+        findGeometryForRect(itemRect, nestedRect, existingRects.values());
+        existingRects.insert(id, itemRect);
     }
 
     if (!nestedRect.isValid()) {
@@ -280,11 +321,21 @@ void AADLFunctionGraphicsItem::drawInnerFunctions(QPainter *painter)
         const qreal sf = qMin(br.width() / contentRect.width(), br.height() / contentRect.height());
         const QTransform transform = QTransform::fromScale(sf, sf).translate(-contentRect.x(), -contentRect.y());
 
+        QList<QRectF> mappedRects;
         for (const QRectF &r : qAsConst(existingRects)) {
-            painter->drawRect(transform.mapRect(r));
+            const QRectF mappedRect = transform.mapRect(r);
+            mappedRects << mappedRect;
+            painter->drawRect(mappedRect);
         }
         for (const QPolygonF &p : qAsConst(existingPolygons)) {
             painter->drawPolyline(transform.map(p));
+        }
+        for (const ConnectionData &connectionData : qAsConst(parentConnections)) {
+            const QRectF innerRect = transform.mapRect(existingRects.value(connectionData.innerFunctionId));
+            const QPointF innerPos = transform.map(connectionData.innerScenePos);
+            const QRectF outerRect = mapRectFromScene(sceneBoundingRect());
+            const QPointF outerPos = mapFromScene(connectionData.outerMappedScenePos);
+            painter->drawPolyline(ive::createConnectionPath(mappedRects, outerPos, outerRect, innerPos, innerRect));
         }
     }
 }
@@ -354,9 +405,9 @@ void AADLFunctionGraphicsItem::applyColorScheme()
     setBrush(b);
 
     // During undo, a child can be updated before its parent,
-    // so on the step marked as [Hm...] above, the parent is still of type FunctionPartial and not the FunctionRegular.
-    // Thus, the child gets the "default" colour, instead of "parent.darker".
-    // For now, I can't see a better way but just to update children colours manually:
+    // so on the step marked as [Hm...] above, the parent is still of type FunctionPartial and not the
+    // FunctionRegular. Thus, the child gets the "default" colour, instead of "parent.darker". For now, I can't see
+    // a better way but just to update children colours manually:
     for (auto child : childItems())
         if (child->type() == AADLFunctionGraphicsItem::Type)
             if (auto nestedFunction = qobject_cast<AADLFunctionGraphicsItem *>(child->toGraphicsObject()))
@@ -375,5 +426,4 @@ QString AADLFunctionGraphicsItem::prepareTooltip() const
 
     return joinNonEmpty({ title, prototype, ris, pis }, QStringLiteral("<br>"));
 }
-
 }

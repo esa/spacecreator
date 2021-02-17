@@ -364,7 +364,7 @@ bool CreatorTool::onMousePress(QMouseEvent *e)
     }
 
     if (d->toolType == ToolType::DirectConnection && e->button() != Qt::RightButton) {
-        if (!nearestItem(scene, scenePos, { AADLFunctionGraphicsItem::Type })) {
+        if (!nearestItem(scene, scenePos, QList<int> { AADLFunctionGraphicsItem::Type })) {
             if (!nearestItem(scene, scenePos, kInterfaceTolerance, { AADLInterfaceGraphicsItem::Type }))
                 return false;
         }

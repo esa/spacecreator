@@ -70,7 +70,7 @@ private:
     void layoutConnectionsOnMove(AADLConnectionGraphicsItem::CollisionsPolicy collisionsPolicy);
     void layoutConnectionsOnResize(AADLConnectionGraphicsItem::CollisionsPolicy collisionsPolicy);
 
-    void drawInnerFunctions(QPainter *painter);
+    void drawNestedView(QPainter *painter);
 
 private:
     static QPointer<QSvgRenderer> m_svgRenderer;

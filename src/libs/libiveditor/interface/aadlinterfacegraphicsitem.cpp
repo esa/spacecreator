@@ -66,6 +66,11 @@ void AADLInterfaceGraphicsItem::init()
     connect(entity(), &ivm::AADLIface::titleChanged, this, &AADLInterfaceGraphicsItem::updateLabel);
     if (auto ri = qobject_cast<ivm::AADLIfaceRequired *>(entity()))
         connect(ri, &ivm::AADLIfaceRequired::inheritedLabelsChanged, this, &AADLInterfaceGraphicsItem::updateLabel);
+    connect(this, &AADLInterfaceGraphicsItem::needUpdateLayout, this, [this]() {
+        if (auto function = targetItem()) {
+            function->update();
+        }
+    });
 
     updateLabel();
     updateIface();
