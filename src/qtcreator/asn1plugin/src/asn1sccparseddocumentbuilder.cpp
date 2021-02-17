@@ -27,6 +27,7 @@
 
 #include "asn1/file.h"
 #include "asn1reader.h"
+#include "errormessageparser.h"
 
 namespace Asn1Acn {
 namespace Internal {
@@ -67,6 +68,7 @@ void Asn1SccParsedDocumentBuilder::handleResults()
     Q_ASSERT(m_worker != nullptr);
     if (m_worker->hadError()) {
         Q_EMIT errored();
+        return;
     }
     Q_EMIT finished();
 }
@@ -86,11 +88,20 @@ Asn1ReadWorker::Asn1ReadWorker(Asn1SccParsedDocumentBuilder *builder)
 {}
 
 /*!
+   Reports if the ASN parsing returned an error
+ */
+bool Asn1ReadWorker::hadError() const
+{
+    return !m_builder->m_errorMessages.empty();
+}
+
+/*!
    Does the parsing for all the files
  */
 void Asn1ReadWorker::doWork()
 {
     Asn1Reader reader;
+    m_builder->m_errorMessages.clear();
     for (auto it = m_builder->m_documentSources.begin(); it != m_builder->m_documentSources.end();
          ++it) {
         const QString &fileName = it.key();
@@ -104,8 +115,16 @@ void Asn1ReadWorker::doWork()
                 m_builder->m_errorMessages.push_back(
                     {{}, QString("Error reading file %1").arg(fileName)});
             } else {
+                const ErrorMessageParser errorParser;
                 for (const QString &error : qAsConst(errorMessages)) {
-                    m_builder->m_errorMessages.push_back({SourceLocation(fileName, 1, 1), error});
+                    Asn1Acn::ErrorMessage msg = errorParser.parse(error);
+                    if (msg.isValid()) {
+                        Asn1Acn::ErrorMessage msgFixed(SourceLocation(fileName,
+                                                                      msg.location().line(),
+                                                                      msg.location().column()),
+                                                       msg.message());
+                        m_builder->m_errorMessages.push_back(msgFixed);
+                    }
                 }
             }
         } else {

@@ -82,7 +82,7 @@ class Asn1ReadWorker : public QObject
     Q_OBJECT
 public:
     Asn1ReadWorker(Asn1SccParsedDocumentBuilder *builder);
-    bool hadError() const { return false; }
+    bool hadError() const;
 
 public Q_SLOTS:
     void doWork();
