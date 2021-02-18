@@ -315,14 +315,16 @@ bool EndToEndView::refreshView()
                 };
 
                 ivm::AADLIface *ifaceStart = connection->sourceInterface();
-                if (ifaceStart->isGrouped() && ifaceStart->aadlType() != ivm::AADLObject::Type::InterfaceGroup) {
+                if (ifaceStart && ifaceStart->isGrouped()
+                        && ifaceStart->aadlType() != ivm::AADLObject::Type::InterfaceGroup) {
                     ifaceStart = findGroupObject(ifaceStart);
                 }
                 auto startItem = qgraphicsitem_cast<AADLInterfaceGraphicsItem *>(
                         ifaceStart ? items.value(ifaceStart->id()) : nullptr);
 
                 ivm::AADLIface *ifaceEnd = connection->targetInterface();
-                if (ifaceEnd->isGrouped() && ifaceEnd->aadlType() != ivm::AADLObject::Type::InterfaceGroup) {
+                if (ifaceEnd && ifaceEnd->isGrouped()
+                        && ifaceEnd->aadlType() != ivm::AADLObject::Type::InterfaceGroup) {
                     ifaceEnd = findGroupObject(ifaceEnd);
                 }
                 auto endItem = qgraphicsitem_cast<AADLInterfaceGraphicsItem *>(

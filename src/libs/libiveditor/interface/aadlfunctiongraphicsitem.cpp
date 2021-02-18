@@ -322,10 +322,18 @@ void AADLFunctionGraphicsItem::drawNestedView(QPainter *painter)
         const QTransform transform = QTransform::fromScale(sf, sf).translate(-contentRect.x(), -contentRect.y());
 
         QList<QRectF> mappedRects;
-        for (const QRectF &r : qAsConst(existingRects)) {
+        const QFontMetricsF fm(painter->fontMetrics());
+        for (auto it = existingRects.cbegin(); it != existingRects.cend(); ++it) {
+            const QRectF r = it.value();
             const QRectF mappedRect = transform.mapRect(r);
             mappedRects << mappedRect;
             painter->drawRect(mappedRect);
+
+            const QString text = entity()->objectsModel()->getObject(it.key())->titleUI();
+            const QRectF textRect = fm.boundingRect(mappedRect, Qt::AlignCenter | Qt::TextDontClip, text);
+            if (mappedRect.contains(textRect)) {
+                painter->drawText(mappedRect, Qt::AlignCenter, text);
+            }
         }
         for (const QPolygonF &p : qAsConst(existingPolygons)) {
             painter->drawPolyline(transform.map(p));
