@@ -22,22 +22,23 @@
 ** along with this program.  If not, see <http://www.gnu.org/licenses/>.
 **
 ****************************************************************************/
-#pragma once
 
-#include <QMap>
-#include <QString>
+#include "errormessageparser.h"
 
-#include "asn1/errormessage.h"
+#include <QRegularExpression>
 
-namespace Asn1Acn {
-namespace Internal {
+using namespace Asn1Acn;
 
-class ErrorMessageParser
+ErrorMessageParser::ErrorMessageParser() { }
+
+Asn1Acn::ErrorMessage ErrorMessageParser::parse(const QString &message) const
 {
-public:
-    explicit ErrorMessageParser();
-    Asn1Acn::ErrorMessage parse(const QString &message) const;
-};
+    static const QRegularExpression regExp(R"(^(.+?):(\d+)(?::(\d+))?: error: (.*)$)");
 
-} // namespace Internal
-} // namespace Asn1Acn
+    const auto match = regExp.match(message);
+    if (!match.hasMatch())
+        return {};
+
+    const auto loc = Asn1Acn::SourceLocation(match.captured(1), match.captured(2).toInt(), match.captured(3).toInt());
+    return { loc, match.captured(4) };
+}

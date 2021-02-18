@@ -44,6 +44,8 @@ target_sources(${LIB_NAME} PRIVATE
     asn1/visitor.cpp
     asn1/visitor.h
     asn1/visitorwithvalue.h
+    errormessageparser.cpp
+    errormessageparser.h
 )
 
 target_include_directories(${LIB_NAME}

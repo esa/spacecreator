@@ -93,7 +93,6 @@ set(ASN1_SOURCES
     src/linkcreator.cpp
     src/referencefinder.cpp
     src/filesourcereader.cpp
-    src/errormessageparser.cpp
     src/typeslocator.cpp
     src/modelvalidityguard.cpp
     src/usagesfinder.cpp
@@ -216,7 +215,6 @@ set(ASN1_SOURCES
     src/documentprocessor.h
     src/sourcereader.h
     src/filesourcereader.h
-    src/errormessageparser.h
     src/typeslocator.h
     src/modelvalidityguard.h
     src/usagesfinder.h

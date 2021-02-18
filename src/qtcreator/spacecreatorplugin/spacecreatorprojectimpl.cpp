@@ -19,16 +19,18 @@
 
 #include "asn1modelstorage.h"
 #include "editorcore.h"
+#include "errormessageparser.h"
 #include "iveditorcore.h"
 #include "msceditorcore.h"
 #include "mscsystemchecks.h"
 
-#include <QDateTime>
-#include <coreplugin/messagemanager.h>
 #include <editormanager/documentmodel.h>
 #include <projectexplorer/project.h>
+#include <projectexplorer/taskhub.h>
 
 namespace spctr {
+
+const char TASK_CATEGORY_ASN_COMPILE[] = "Task.Category.ASNCompile";
 
 SpaceCreatorProjectImpl::SpaceCreatorProjectImpl(ProjectExplorer::Project *project, QObject *parent)
     : scs::SpaceCreatorProject(parent)
@@ -46,6 +48,12 @@ SpaceCreatorProjectImpl::SpaceCreatorProjectImpl(ProjectExplorer::Project *proje
             &spctr::SpaceCreatorProjectImpl::checkAsnFileRename);
 
     connect(m_asn1Storage.get(), &Asn1Acn::Asn1ModelStorage::error, this, &SpaceCreatorProjectImpl::reportAsn1Error);
+
+    static bool hubInitialized = false;
+    if (!hubInitialized) {
+        ProjectExplorer::TaskHub::instance()->addCategory(TASK_CATEGORY_ASN_COMPILE, tr("ASN error"));
+        hubInitialized = true;
+    }
 }
 
 SpaceCreatorProjectImpl::~SpaceCreatorProjectImpl() { }
@@ -107,9 +115,22 @@ void SpaceCreatorProjectImpl::saveIfNotOpen(shared::EditorCore *core)
 
 void SpaceCreatorProjectImpl::reportAsn1Error(const QString &fileName, const QStringList &errors)
 {
-    const QString msg = QString("%1 ASN1 parsing error - %2\n * %3")
-                                .arg(QDateTime::currentDateTime().toString(), fileName, errors.join("\n * "));
-    Core::MessageManager::write(msg, Core::MessageManager::PrintToOutputPaneFlag::EnsureSizeHint);
+    if (errors.isEmpty()) {
+        return;
+    }
+
+    ProjectExplorer::TaskHub::instance()->clearTasks(TASK_CATEGORY_ASN_COMPILE);
+
+    Asn1Acn::ErrorMessageParser parser;
+    for (const QString &message : errors) {
+        const Asn1Acn::ErrorMessage error = parser.parse(message);
+        if (error.isValid()) {
+            ProjectExplorer::TaskHub::addTask(ProjectExplorer::Task::Error, error.message(), TASK_CATEGORY_ASN_COMPILE,
+                    Utils::FileName::fromString(fileName), error.location().line());
+        }
+    }
+
+    ProjectExplorer::TaskHub::requestPopup();
 }
 
 /*!

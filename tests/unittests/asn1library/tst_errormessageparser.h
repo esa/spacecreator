@@ -24,8 +24,6 @@
 ****************************************************************************/
 #pragma once
 
-#include "errormessageparser.h"
-
 #include <QObject>
 
 namespace Asn1Acn {
