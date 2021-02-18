@@ -24,6 +24,7 @@
 ****************************************************************************/
 #include "kitinformation.h"
 
+#include "asn1reader.h"
 #include <QFileInfo>
 
 #include <coreplugin/icore.h>
@@ -70,8 +71,16 @@ void KitInformation::setAsn1Exe(Kit *k, const Utils::FileName &v)
 
 QVariant KitInformation::defaultValue(const Kit *k) const
 {
-    Q_UNUSED(k);
-    const QString path = Core::ICore::libexecPath() + QLatin1String("/asn1scc/asn1.exe");
+    Q_UNUSED(k)
+    Asn1Acn::Asn1Reader reader;
+    QString path = reader.checkforCompiler();
+
+    if (path.isEmpty()) {
+        path = Core::ICore::libexecPath() + QLatin1String("/asn1scc/asn1.exe");
+        if (!QFileInfo::exists(path)) {
+            path.clear();
+        }
+    }
     return path;
 }
 

@@ -267,6 +267,10 @@ QString Asn1Reader::asn1AsHtml(const QString &filename) const
     }
 }
 
+/*!
+   Does search in the system path for asn1.exe and returns the full file path.
+   An empty string is retunred if asn1.exe was not found.
+ */
 QString Asn1Reader::checkforCompiler() const
 {
 #ifdef Q_OS_WIN
