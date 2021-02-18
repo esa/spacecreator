@@ -282,8 +282,11 @@ void AADLFunctionGraphicsItem::drawNestedView(QPainter *painter)
                     continue;
                 }
 
-                const QString ifaceStrCoordinates = innerIface->prop(ivm::meta::Props::token(token)).toString();
-                const QPointF innerIfacePos = ive::pos(ivm::AADLObject::coordinatesFromString(ifaceStrCoordinates));
+                QPointF innerIfacePos;
+                if (innerIface->hasProperty(ivm::meta::Props::token(token))) {
+                    const QString ifaceStrCoordinates = innerIface->prop(ivm::meta::Props::token(token)).toString();
+                    innerIfacePos = ive::pos(ivm::AADLObject::coordinatesFromString(ifaceStrCoordinates));
+                }
                 ConnectionData cd { (*it)->scenePos(), innerIfacePos, innerIface->parentObject()->id() };
                 /// TODO: generate path between outer and inner ifaces
                 /// templorary using straight line to present it
@@ -340,9 +343,19 @@ void AADLFunctionGraphicsItem::drawNestedView(QPainter *painter)
         }
         for (const ConnectionData &connectionData : qAsConst(parentConnections)) {
             const QRectF innerRect = transform.mapRect(existingRects.value(connectionData.innerFunctionId));
-            const QPointF innerPos = transform.map(connectionData.innerScenePos);
             const QRectF outerRect = mapRectFromScene(sceneBoundingRect());
             const QPointF outerPos = mapFromScene(connectionData.outerMappedScenePos);
+            QPointF innerPos;
+            if (connectionData.innerScenePos.isNull()) {
+                const QPointF ratio { (outerRect.right() - outerPos.x()) / outerRect.width(),
+                    (outerRect.bottom() - outerPos.y()) / outerRect.height() };
+                const qreal x = innerRect.left() + innerRect.width() * ratio.x();
+                const qreal y = innerRect.top() + innerRect.height() * ratio.y();
+                const Qt::Alignment side = ive::getNearestSide(outerRect, outerPos);
+                innerPos = ive::getSidePosition(innerRect, QPointF(x, y), side);
+            } else {
+                innerPos = transform.map(connectionData.innerScenePos);
+            }
             painter->drawPolyline(ive::createConnectionPath(mappedRects, outerPos, outerRect, innerPos, innerRect));
         }
     }
