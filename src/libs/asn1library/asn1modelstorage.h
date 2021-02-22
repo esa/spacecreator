@@ -54,6 +54,7 @@ public:
 
 Q_SIGNALS:
     void dataTypesChanged(const QString &fileName);
+    void success(const QString &fileName);
     void error(const QString &fileName, const QStringList &errors);
 
 private:

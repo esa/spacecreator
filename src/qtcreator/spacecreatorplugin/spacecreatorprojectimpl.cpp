@@ -48,6 +48,8 @@ SpaceCreatorProjectImpl::SpaceCreatorProjectImpl(ProjectExplorer::Project *proje
             &spctr::SpaceCreatorProjectImpl::checkAsnFileRename);
 
     connect(m_asn1Storage.get(), &Asn1Acn::Asn1ModelStorage::error, this, &SpaceCreatorProjectImpl::reportAsn1Error);
+    connect(m_asn1Storage.get(), &Asn1Acn::Asn1ModelStorage::success, this,
+            []() { ProjectExplorer::TaskHub::instance()->clearTasks(TASK_CATEGORY_ASN_COMPILE); });
 
     static bool hubInitialized = false;
     if (!hubInitialized) {

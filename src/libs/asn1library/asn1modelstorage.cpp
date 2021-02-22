@@ -124,6 +124,7 @@ QSharedPointer<File> Asn1ModelStorage::loadData(const QString &fileName)
         Q_EMIT error(fileName, errorMessages);
         return {};
     }
+    Q_EMIT success(fileName);
     return QSharedPointer<Asn1Acn::File>(asn1Data.release());
 }
 
