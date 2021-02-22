@@ -37,6 +37,48 @@
 #include <QtDebug>
 #include <cmath>
 
+#if (QT_VERSION >= QT_VERSION_CHECK(5, 12, 0))
+#include <QScopeGuard>
+#else
+template<typename F>
+class QScopeGuard;
+template<typename F>
+QScopeGuard<F> qScopeGuard(F f);
+
+template<typename F>
+class QScopeGuard
+{
+public:
+    QScopeGuard(QScopeGuard &&other) Q_DECL_NOEXCEPT : m_func(std::move(other.m_func)), m_invoke(other.m_invoke)
+    {
+        other.dismiss();
+    }
+
+    ~QScopeGuard()
+    {
+        if (m_invoke)
+            m_func();
+    }
+
+    void dismiss() Q_DECL_NOEXCEPT { m_invoke = false; }
+
+private:
+    explicit QScopeGuard(F f) Q_DECL_NOEXCEPT : m_func(std::move(f)) { }
+
+    Q_DISABLE_COPY(QScopeGuard)
+
+    F m_func;
+    bool m_invoke = true;
+    friend QScopeGuard qScopeGuard<F>(F);
+};
+
+template<typename F>
+QScopeGuard<F> qScopeGuard(F f)
+{
+    return QScopeGuard<F>(std::move(f));
+}
+#endif
+
 static const qreal kBorderWidth = 2.0;
 static const qreal kRadius = 10.0;
 static const qreal kOffset = kBorderWidth / 2.0;
@@ -217,6 +259,9 @@ void AADLFunctionGraphicsItem::drawNestedView(QPainter *painter)
         return;
     }
 
+    painter->save();
+    auto cleanup = qScopeGuard([painter] { painter->restore(); });
+
     const QRectF br = boundingRect();
 
     const shared::ColorHandler ch =
@@ -325,7 +370,10 @@ void AADLFunctionGraphicsItem::drawNestedView(QPainter *painter)
         const QTransform transform = QTransform::fromScale(sf, sf).translate(-contentRect.x(), -contentRect.y());
 
         QList<QRectF> mappedRects;
-        const QFontMetricsF fm(painter->fontMetrics());
+        QFont painterFont = painter->font();
+        painterFont.setItalic(true);
+        painterFont.setPointSize(painterFont.pointSize() - 1);
+        const QFontMetricsF fm(painterFont);
         for (auto it = existingRects.cbegin(); it != existingRects.cend(); ++it) {
             const QRectF r = it.value();
             const QRectF mappedRect = transform.mapRect(r);
@@ -333,9 +381,11 @@ void AADLFunctionGraphicsItem::drawNestedView(QPainter *painter)
             painter->drawRect(mappedRect);
 
             const QString text = entity()->objectsModel()->getObject(it.key())->titleUI();
-            const QRectF textRect = fm.boundingRect(mappedRect, Qt::AlignCenter | Qt::TextDontClip, text);
+            const QRectF textRect = fm.boundingRect(
+                    mappedRect.adjusted(4, 4, -4, -4), Qt::AlignTop | Qt::AlignLeft | Qt::TextDontClip, text);
             if (mappedRect.contains(textRect)) {
-                painter->drawText(mappedRect, Qt::AlignCenter, text);
+                painter->setFont(painterFont);
+                painter->drawText(textRect, Qt::AlignTop | Qt::AlignLeft, text);
             }
         }
         for (const QPolygonF &p : qAsConst(existingPolygons)) {
