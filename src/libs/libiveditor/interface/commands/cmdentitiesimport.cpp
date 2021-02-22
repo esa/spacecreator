@@ -19,6 +19,7 @@
 
 #include "aadlfunctiontype.h"
 #include "aadlmodel.h"
+#include "aadlnamevalidator.h"
 #include "aadlxmlreader.h"
 #include "baseitems/common/aadlutils.h"
 #include "commandids.h"
@@ -31,34 +32,28 @@
 namespace ive {
 namespace cmd {
 
-CmdEntitiesImport::CmdEntitiesImport(ivm::AADLObject *entity, ivm::AADLFunctionType *parent,
-        ivm::AADLModel *model, const QPointF &pos)
+CmdEntitiesImport::CmdEntitiesImport(
+        const QByteArray &data, ivm::AADLFunctionType *parent, ivm::AADLModel *model, const QPointF &pos)
     : QUndoCommand()
     , m_model(model)
     , m_parent(parent)
 
 {
-    QBuffer buffer;
-    if (!buffer.open(QIODevice::WriteOnly)) {
-        qWarning() << "Can't open buffer for exporting:" << buffer.errorString();
-        return;
-    }
-
-    if (!XmlDocExporter::exportObjects({ entity }, &buffer)) {
-        qWarning() << "Error during component export";
-        return;
-    }
-    buffer.close();
-
     ivm::AADLXMLReader parser;
     QObject::connect(&parser, &ivm::AADLXMLReader::objectsParsed, m_model,
             [this, pos, parent](const QVector<ivm::AADLObject *> &objects) {
                 static const QPointF outOfScene { std::numeric_limits<qreal>::max(),
                     std::numeric_limits<qreal>::max() };
                 QPointF basePoint { outOfScene };
+                const QSet<QString> functionNames = m_model->nestedFunctionNames();
                 for (auto obj : objects) {
+                    obj->setObjectsModel(m_model);
                     if (obj->parentObject()) {
                         continue;
+                    }
+                    if (functionNames.contains(obj->title())) {
+                        obj->removeAttr(ivm::meta::Props::token(ivm::meta::Props::Token::name));
+                        obj->setTitle(ivm::AADLNameValidator::nextNameFor(obj));
                     }
                     QVector<QPointF> coordinates = ive::polygon(obj->coordinates());
                     std::for_each(coordinates.cbegin(), coordinates.cend(), [&basePoint](const QPointF &point) {
@@ -73,8 +68,7 @@ CmdEntitiesImport::CmdEntitiesImport(ivm::AADLObject *entity, ivm::AADLFunctionT
                 for (auto obj : objects) {
                     QVector<QPointF> coordinates = ive::polygon(obj->coordinates());
                     if (coordinates.isEmpty() && !obj->parentObject()) {
-                        obj->setCoordinates(
-                                ive::coordinates(QRectF(pos, ive::DefaultGraphicsItemSize)));
+                        obj->setCoordinates(ive::coordinates(QRectF(pos, ive::DefaultGraphicsItemSize)));
                     } else if (!offset.isNull()) {
                         std::for_each(
                                 coordinates.begin(), coordinates.end(), [offset](QPointF &point) { point += offset; });
@@ -84,19 +78,17 @@ CmdEntitiesImport::CmdEntitiesImport(ivm::AADLObject *entity, ivm::AADLFunctionT
                 }
             });
     QObject::connect(&parser, &ivm::AADLXMLReader::error, [](const QString &msg) { qWarning() << msg; });
-
-    if (buffer.open(QIODevice::ReadOnly)) {
-        parser.read(&buffer);
-    }
-    buffer.close();
+    parser.read(data);
 }
 
 CmdEntitiesImport::~CmdEntitiesImport()
 {
     const QVector<QPointer<ivm::AADLObject>> &objects = m_rootEntities;
-    for (ivm::AADLObject *obj : objects)
-        if (obj && !obj->parent())
+    for (ivm::AADLObject *obj : objects) {
+        if (obj && !obj->parent()) {
             delete obj;
+        }
+    }
 }
 
 void CmdEntitiesImport::redo()

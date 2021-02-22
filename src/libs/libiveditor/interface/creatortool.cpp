@@ -48,11 +48,14 @@
 #include "ui/grippointshandler.h"
 
 #include <QAction>
+#include <QApplication>
+#include <QClipboard>
 #include <QCursor>
 #include <QGraphicsItem>
 #include <QGraphicsView>
 #include <QItemSelectionModel>
 #include <QMenu>
+#include <QMimeData>
 #include <QMouseEvent>
 #include <QPointer>
 #include <QSet>
@@ -79,6 +82,7 @@ struct CreatorTool::CreatorToolPrivate {
 
     bool showContextMenu(const QPoint &globalPos);
     void populateContextMenu_commonCreate(QMenu *menu, const QPointF &scenePos);
+    void populateContextMenu_commonEdit(QMenu *menu, const QPointF &scenePos);
     void populateContextMenu_propertiesDialog(QMenu *menu);
     void populateContextMenu_user(QMenu *menu, const QPointF &scenePos);
 
@@ -477,7 +481,7 @@ bool CreatorTool::onMouseMove(QMouseEvent *e)
 
                     if (item->parentItem() == d->previewItem->parentItem()
                             || (d->previewItem->parentItem() == item
-                                    && !item->sceneBoundingRect().contains(expandedGeometry))) {
+                                       && !item->sceneBoundingRect().contains(expandedGeometry))) {
                         items.insert(iObjItem);
                     }
                 });
@@ -570,6 +574,7 @@ bool CreatorTool::CreatorToolPrivate::showContextMenu(const QPoint &globalPos)
 
     auto scenePos = cursorInScene(globalPos);
     populateContextMenu_commonCreate(menu, scenePos);
+    populateContextMenu_commonEdit(menu, scenePos);
     populateContextMenu_propertiesDialog(menu);
     populateContextMenu_user(menu, scenePos);
 
@@ -624,6 +629,26 @@ void CreatorTool::CreatorToolPrivate::populateContextMenu_commonCreate(QMenu *me
                 [](const QGraphicsItem *item) { return item->type() == AADLConnectionGraphicsItem::Type; });
         action->setEnabled(it != selectedItems.cend());
     }
+}
+
+void CreatorTool::CreatorToolPrivate::populateContextMenu_commonEdit(QMenu *menu, const QPointF &scenePos)
+{
+    const QList<QGraphicsItem *> selectedItems = view->scene()->selectedItems();
+    static const QList<int> kNestedTypes { ive::AADLFunctionGraphicsItem::Type, ive::AADLFunctionTypeGraphicsItem::Type,
+        ive::AADLCommentGraphicsItem::Type };
+    const bool copyable = std::any_of(selectedItems.cbegin(), selectedItems.cend(),
+            [](const QGraphicsItem *item) { return kNestedTypes.contains(item->type()); });
+    auto action = menu->addAction(QIcon(QLatin1String(":/tab_interface/toolbar/icns/copy.svg")), thisTool->tr("Copy"),
+            thisTool, [this]() { Q_EMIT thisTool->copyActionTriggered(); }, QKeySequence::Copy);
+    action->setEnabled(copyable);
+
+    action = menu->addAction(QIcon(QLatin1String(":/tab_interface/toolbar/icns/cut.svg")), thisTool->tr("Cut"),
+            thisTool, [this]() { Q_EMIT thisTool->cutActionTriggered(); }, QKeySequence::Cut);
+    action->setEnabled(copyable);
+
+    action = menu->addAction(QIcon(QLatin1String(":/tab_interface/toolbar/icns/paste.svg")), thisTool->tr("Paste"),
+            thisTool, [this, scenePos]() { Q_EMIT thisTool->pasteActionTriggered(scenePos); }, QKeySequence::Paste);
+    action->setEnabled(!QApplication::clipboard()->text().isEmpty());
 }
 
 void CreatorTool::CreatorToolPrivate::populateContextMenu_propertiesDialog(QMenu *menu)

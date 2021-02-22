@@ -45,6 +45,7 @@ public:
 
     bool readFile(const QString &file);
     bool read(QIODevice *openForRead);
+    bool read(const QByteArray &data);
 
 Q_SIGNALS:
     void objectsParsed(const QVector<ivm::AADLObject *> &objects);

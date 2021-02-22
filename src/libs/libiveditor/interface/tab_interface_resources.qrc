@@ -19,5 +19,8 @@
         <file>icns/ri.svg</file>
         <file>icns/zoom_in.svg</file>
         <file>icns/zoom_out.svg</file>
+        <file>icns/copy.svg</file>
+        <file>icns/paste.svg</file>
+        <file>icns/cut.svg</file>
     </qresource>
 </RCC>

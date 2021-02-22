@@ -47,6 +47,9 @@ Q_SIGNALS:
     void minZoomPercentChanged(qreal percent);
     void maxZoomPercentChanged(qreal percent);
     void zoomStepPercentChanged(qreal percent);
+    void cutItems();
+    void copyItems();
+    void pasteItems();
 
 public Q_SLOTS:
     void setZoom(double percent);

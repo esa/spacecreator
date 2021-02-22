@@ -17,8 +17,8 @@
 
 #include "aadlxmlreader.h"
 
-#include "aadlcommonprops.h"
 #include "aadlcomment.h"
+#include "aadlcommonprops.h"
 #include "aadlconnection.h"
 #include "aadlconnectiongroup.h"
 #include "aadlfunction.h"
@@ -173,6 +173,26 @@ bool AADLXMLReader::read(QIODevice *openForRead)
         }
     }
 
+    return false;
+}
+
+bool AADLXMLReader::read(const QByteArray &data)
+{
+    if (data.isEmpty()) {
+        return false;
+    }
+
+    QXmlStreamReader xml(data);
+    if (xml.readNext() == QXmlStreamReader::StartDocument) {
+        if (xml.readNext() == QXmlStreamReader::StartElement) {
+            if (Props::token(xml.name().toString()) == Props::Token::InterfaceView) {
+                if (readInterfaceView(xml)) {
+                    Q_EMIT objectsParsed(d->m_allObjects);
+                    return true;
+                }
+            }
+        }
+    }
     return false;
 }
 
@@ -392,7 +412,7 @@ AADLFunctionType *AADLXMLReader::addFunction(const QString &name, AADLObject::Ty
     const bool isFunctionType = fnType == AADLObject::Type::FunctionType;
 
     AADLFunctionType *fn = isFunctionType ? new AADLFunctionType(name, d->m_currentObject.get())
-                                                : new AADLFunction(name, d->m_currentObject.get());
+                                          : new AADLFunction(name, d->m_currentObject.get());
 
     if (d->m_currentObject.function())
         d->m_currentObject.function()->addChild(fn);

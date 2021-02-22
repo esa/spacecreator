@@ -64,6 +64,10 @@ Q_SIGNALS:
     void propertyEditorRequest(ivm::AADLObject *entity);
     void informUser(const QString &title, const QString &message) const;
 
+    void cutActionTriggered();
+    void copyActionTriggered();
+    void pasteActionTriggered(const QPointF &scenePos);
+
 protected:
     bool eventFilter(QObject *watched, QEvent *event) override;
 

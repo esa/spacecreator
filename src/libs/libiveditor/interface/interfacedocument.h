@@ -137,13 +137,18 @@ private Q_SLOTS:
     void importEntity(const shared::Id &id, const QPointF &sceneDropPoint);
     void instantiateEntity(const shared::Id &id, const QPointF &sceneDropPoint);
 
+    void copyItems();
+    void cutItems();
+    void pasteItems();
+    void pasteItems(const QPointF &sceneDropPoint);
+
     void showContextMenuForAADLModel(const QPoint &pos);
 
 private:
     bool exportImpl(const QString &path, const QList<ivm::AADLObject *> &objects);
     bool loadImpl(const QString &path);
     QString getComponentName(const QStringList &exportNames);
-    QList<ivm::AADLObject *> prepareSelectedObjectsForExport(QString &name);
+    QList<ivm::AADLObject *> prepareSelectedObjectsForExport(QString &name, bool silent = false);
     static bool loadComponentModel(ivm::AADLModel *model, const QString &path);
 
     QWidget *createGraphicsView();

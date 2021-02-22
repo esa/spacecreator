@@ -33,8 +33,8 @@ namespace cmd {
 class CmdEntitiesImport : public QUndoCommand
 {
 public:
-    explicit CmdEntitiesImport(ivm::AADLObject *entity, ivm::AADLFunctionType *parent,
-            ivm::AADLModel *model, const QPointF &pos);
+    explicit CmdEntitiesImport(
+            const QByteArray &data, ivm::AADLFunctionType *parent, ivm::AADLModel *model, const QPointF &pos);
     ~CmdEntitiesImport() override;
 
     void redo() override;

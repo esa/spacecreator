@@ -188,9 +188,14 @@ void GraphicsViewBase::keyPressEvent(QKeyEvent *event)
         setZoom(d->zoomPercent + (event->key() == Qt::Key_Plus ? zoomStepPercent() : -zoomStepPercent()));
         event->accept();
         return;
-    } else {
-        QGraphicsView::keyPressEvent(event);
+    } else if (event->matches(QKeySequence::Cut)) {
+        Q_EMIT cutItems();
+    } else if (event->matches(QKeySequence::Copy)) {
+        Q_EMIT copyItems();
+    } else if (event->matches(QKeySequence::Paste)) {
+        Q_EMIT pasteItems();
     }
+    QGraphicsView::keyPressEvent(event);
 }
 
 void GraphicsViewBase::drawBackground(QPainter *painter, const QRectF &rect)

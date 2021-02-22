@@ -47,7 +47,9 @@
 #include "xmldocexporter.h"
 
 #include <QAction>
+#include <QApplication>
 #include <QBuffer>
+#include <QClipboard>
 #include <QDebug>
 #include <QDialogButtonBox>
 #include <QDir>
@@ -56,6 +58,7 @@
 #include <QLineEdit>
 #include <QMenu>
 #include <QMessageBox>
+#include <QMimeData>
 #include <QSplitter>
 #include <QStandardPaths>
 #include <QToolBar>
@@ -313,7 +316,7 @@ QString InterfaceDocument::getComponentName(const QStringList &exportNames)
     return name;
 }
 
-QList<ivm::AADLObject *> InterfaceDocument::prepareSelectedObjectsForExport(QString &name)
+QList<ivm::AADLObject *> InterfaceDocument::prepareSelectedObjectsForExport(QString &name, bool silent)
 {
     QList<ivm::AADLObject *> objects;
     QStringList exportNames;
@@ -327,7 +330,7 @@ QList<ivm::AADLObject *> InterfaceDocument::prepareSelectedObjectsForExport(QStr
         }
     }
 
-    name = getComponentName(exportNames);
+    name = silent ? exportNames.join(QLatin1Char('_')) : getComponentName(exportNames);
     if (exportNames.size() > 1) {
         ivm::AADLFunction *dummyFunction = new ivm::AADLFunction(name);
         for (auto object : objects) {
@@ -732,8 +735,21 @@ void InterfaceDocument::importEntity(const shared::Id &id, const QPointF &sceneD
     while (itemAtScenePos && itemAtScenePos->type() != AADLFunctionGraphicsItem::Type) {
         itemAtScenePos = itemAtScenePos->parentItem();
     }
+
+    QBuffer buffer;
+    if (!buffer.open(QIODevice::WriteOnly)) {
+        qWarning() << "Can't open buffer for exporting:" << buffer.errorString();
+        return;
+    }
+
+    if (!XmlDocExporter::exportObjects({ obj }, &buffer)) {
+        qWarning() << "Error during component export";
+        return;
+    }
+    buffer.close();
+
     ivm::AADLFunctionType *parentObject = gi::functionObject(itemAtScenePos);
-    auto cmdImport = new cmd::CmdEntitiesImport(obj, parentObject, d->objectsModel, sceneDropPoint);
+    auto cmdImport = new cmd::CmdEntitiesImport(buffer.data(), parentObject, d->objectsModel, sceneDropPoint);
     d->commandsStack->push(cmdImport);
 }
 
@@ -751,6 +767,56 @@ void InterfaceDocument::instantiateEntity(const shared::Id &id, const QPointF &s
     auto cmdInstantiate = new cmd::CmdEntitiesInstantiate(
             obj->as<ivm::AADLFunctionType *>(), parentObject, d->objectsModel, sceneDropPoint);
     d->commandsStack->push(cmdInstantiate);
+}
+
+void InterfaceDocument::copyItems()
+{
+    QBuffer buffer;
+    if (!buffer.open(QIODevice::WriteOnly)) {
+        qWarning() << "Can't open buffer for exporting:" << buffer.errorString();
+        return;
+    }
+
+    QString name;
+    const QList<ivm::AADLObject *> objects = prepareSelectedObjectsForExport(name, true);
+    if (!XmlDocExporter::exportObjects(objects, &buffer)) {
+        qWarning() << "Error during component export";
+        return;
+    }
+    buffer.close();
+    QApplication::clipboard()->setText(QString::fromUtf8(buffer.data()));
+}
+
+void InterfaceDocument::cutItems()
+{
+    copyItems();
+    d->tool->removeSelectedItems();
+}
+
+void InterfaceDocument::pasteItems(const QPointF &sceneDropPoint)
+{
+    const QByteArray data = QApplication::clipboard()->text().toUtf8();
+    if (data.isEmpty()) {
+        return;
+    }
+
+    QGraphicsItem *itemAtScenePos = scene()->itemAt(sceneDropPoint, graphicsView()->transform());
+    while (itemAtScenePos && itemAtScenePos->type() != AADLFunctionGraphicsItem::Type) {
+        itemAtScenePos = itemAtScenePos->parentItem();
+    }
+    ivm::AADLFunctionType *parentObject = gi::functionObject(itemAtScenePos);
+    auto cmdImport = new cmd::CmdEntitiesImport(data, parentObject, d->objectsModel, sceneDropPoint);
+    d->commandsStack->push(cmdImport);
+}
+
+void InterfaceDocument::pasteItems()
+{
+    const QPoint viewportCursorPos = graphicsView()->viewport()->mapFromGlobal(QCursor::pos());
+    QPointF sceneDropPoint;
+    if (graphicsView()->viewport()->rect().marginsRemoved(kRootMargins.toMargins()).contains(viewportCursorPos)) {
+        sceneDropPoint = graphicsView()->mapToScene(viewportCursorPos);
+    }
+    pasteItems(sceneDropPoint);
 }
 
 void InterfaceDocument::showContextMenuForAADLModel(const QPoint &pos)
@@ -884,6 +950,10 @@ QVector<QAction *> InterfaceDocument::initActions()
     });
     connect(d->tool, &CreatorTool::propertyEditorRequest, this, &InterfaceDocument::showPropertyEditor);
     connect(d->tool, &CreatorTool::informUser, this, &InterfaceDocument::showInfoMessage);
+    connect(d->tool, &CreatorTool::copyActionTriggered, this, &InterfaceDocument::copyItems);
+    connect(d->tool, &CreatorTool::cutActionTriggered, this, &InterfaceDocument::cutItems);
+    connect(d->tool, &CreatorTool::pasteActionTriggered, this,
+            qOverload<const QPointF &>(&InterfaceDocument::pasteItems));
 
     auto actCreateFunctionType = new QAction(tr("Function Type"));
     ActionsManager::registerAction(Q_FUNC_INFO, actCreateFunctionType, "Function Type", "Create FunctionType object");
@@ -1018,6 +1088,9 @@ QWidget *InterfaceDocument::createGraphicsView()
 
         connect(d->graphicsView, &GraphicsView::importEntity, this, &InterfaceDocument::importEntity);
         connect(d->graphicsView, &GraphicsView::instantiateEntity, this, &InterfaceDocument::instantiateEntity);
+        connect(d->graphicsView, &GraphicsView::copyItems, this, &InterfaceDocument::copyItems);
+        connect(d->graphicsView, &GraphicsView::cutItems, this, &InterfaceDocument::cutItems);
+        connect(d->graphicsView, &GraphicsView::pasteItems, this, qOverload<>(&InterfaceDocument::pasteItems));
     }
     d->graphicsView->setScene(d->itemsModel->scene());
     d->graphicsView->setUpdatesEnabled(false);
