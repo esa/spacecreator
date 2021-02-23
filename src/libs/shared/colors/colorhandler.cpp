@@ -17,6 +17,8 @@
 
 #include "colorhandler.h"
 
+#include <QJsonObject>
+
 namespace shared {
 
 ColorHandler::ColorHandler()

@@ -20,9 +20,10 @@
 #include <QBrush>
 #include <QColor>
 #include <QExplicitlySharedDataPointer>
-#include <QJsonObject>
 #include <QPen>
 #include <QSharedData>
+
+class QJsonObject;
 
 namespace shared {
 
