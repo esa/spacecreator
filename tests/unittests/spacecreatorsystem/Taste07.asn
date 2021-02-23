@@ -1,0 +1,21 @@
+Taste07 DEFINITIONS ::= BEGIN
+
+MyInt ::= INTEGER (0..255)
+
+MyChoice ::= CHOICE { a MyInt, b BOOLEAN }
+
+TC-HEADER-SEQUENCE-FLAGS ::= ENUMERATED {green, blue, red}
+TM-DATA ::= INTEGER(0..512)
+
+    TM-PACKET ::= SEQUENCE {
+        header 	TM-HEADER,
+        data	TM-DATA OPTIONAL
+    }
+
+    TM-HEADER ::= SEQUENCE {
+        applicationProcessID	INTEGER(0..2047),
+        grouping-flags		TC-HEADER-SEQUENCE-FLAGS,
+        sequence-count		INTEGER(0..16383)
+       }
+
+END

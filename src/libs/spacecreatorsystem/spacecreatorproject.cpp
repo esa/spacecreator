@@ -162,8 +162,18 @@ QStringList SpaceCreatorProject::allAsn1Files() const
  */
 QStringList SpaceCreatorProject::projectFiles(const QString &suffix) const
 {
-    Q_UNUSED(suffix)
-    return {};
+    QStringList files;
+    for (QSharedPointer<ive::IVEditorCore> ivCore : m_ivStore) {
+        if (ivCore->filePath().endsWith(suffix)) {
+            files.append(ivCore->filePath());
+        }
+    }
+    for (const QSharedPointer<msc::MSCEditorCore> &mscCore : m_mscStore) {
+        if (mscCore->filePath().endsWith(suffix)) {
+            files.append(mscCore->filePath());
+        }
+    }
+    return files;
 }
 
 /*!
