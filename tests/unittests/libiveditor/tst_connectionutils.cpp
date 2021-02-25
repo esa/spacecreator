@@ -426,24 +426,24 @@ void tst_ConnectionUtils::tst_endPoints()
     checkEndPoints(f1, Data::EndPoint::Empty, nf1, Data::EndPoint::Empty, true, false);
 
     /// F1-Empty <> Nested_F1-Req
-    checkEndPoints(f1, Data::EndPoint::Empty, nf1, Data::EndPoint::Req, false, false);
+    checkEndPoints(f1, Data::EndPoint::Empty, nf1, Data::EndPoint::Req, true, false);
     /// Nested_F1-Req <> F1-Empty
     checkEndPoints(nf1, Data::EndPoint::Req, f1, Data::EndPoint::Empty, false, false);
 
     /// Nested_F1-Prov <> F1-Empty
     checkEndPoints(nf1, Data::EndPoint::Prov, f1, Data::EndPoint::Empty, true, false);
     /// F1-Empty <> Nested_F1-Prov
-    checkEndPoints(f1, Data::EndPoint::Empty, nf1, Data::EndPoint::Prov, true, false);
+    checkEndPoints(f1, Data::EndPoint::Empty, nf1, Data::EndPoint::Prov, false, false);
 
     /// F1-Req <> Nested_F1-Empty
     checkEndPoints(f1, Data::EndPoint::Req, nf1, Data::EndPoint::Empty, true, false);
     /// Nested_F1-Empty <> F1-Req
-    checkEndPoints(nf1, Data::EndPoint::Empty, f1, Data::EndPoint::Req, true, false);
+    checkEndPoints(nf1, Data::EndPoint::Empty, f1, Data::EndPoint::Req, false, false);
 
     /// F1-Prov <> Nested_F1-Empty
     checkEndPoints(f1, Data::EndPoint::Prov, nf1, Data::EndPoint::Empty, false, false);
     /// Nested_F1-Empty <> F1-Prov
-    checkEndPoints(nf1, Data::EndPoint::Empty, f1, Data::EndPoint::Prov, false, false);
+    checkEndPoints(nf1, Data::EndPoint::Empty, f1, Data::EndPoint::Prov, true, false);
 
     /// Nested_F1-Req <> F1-Req
     checkEndPoints(nf1, Data::EndPoint::Req, f1, Data::EndPoint::Req, false, false);
@@ -531,49 +531,24 @@ void tst_ConnectionUtils::checkEndPoints(ive::AADLFunctionGraphicsItem *startFn,
     const Data start(startFn);
     const Data end(endFn);
 
-    static const QVector<QPointF> offsets { QPointF(0, 0), QPointF(-2, 0), QPointF(0, -2), QPointF(2, 0),
-        QPointF(0, 2) };
-
-    for (int startIdx = 0; startIdx < offsets.size(); ++startIdx) {
-        for (int endIdx = 0; endIdx < offsets.size(); ++endIdx) {
-            const QVector<QPointF> connectionPoints { start.point(startEp) + offsets[startIdx],
-                end.point(endEp) + offsets[endIdx] };
-
-            const QPointF p = isReversed ? connectionPoints.last() : connectionPoints.first();
-            if (startEp == Data::EndPoint::Empty) {
-                const bool validPoint =
-                        ive::isOnVerticalSide(start.rect(), p) || ive::isOnVerticalSide(start.rect(), p);
-                if (!validPoint) {
-                    continue;
-                }
-            }
-            if (endEp == Data::EndPoint::Empty) {
-                const bool validPoint = ive::isOnVerticalSide(end.rect(), p) || ive::isOnVerticalSide(end.rect(), p);
-                if (!validPoint) {
-                    continue;
-                }
-            }
-
-            const auto result = ive::gi::validateConnectionCreate(&m_scene, connectionPoints);
-            QVERIFY(result.startIface != result.endIface
-                    || (result.startIface == nullptr && result.endIface == nullptr));
-            QCOMPARE(result.isToOrFromNested,
-                    (start.function()->isAncestorOf(end.function()) || end.function()->isAncestorOf(start.function())));
-            QCOMPARE(result.failed(), shouldFail);
-            if (!result.failed()) {
-                if (isReversed) {
-                    QVERIFY(result.connectionPoints.first() == connectionPoints.last()
-                            && result.connectionPoints.last() == connectionPoints.first());
-                } else {
-                    QCOMPARE(result.connectionPoints, connectionPoints);
-                }
-
-                const auto path = ive::createConnectionPath(existingRects(),
-                        isReversed ? result.connectionPoints.last() : result.connectionPoints.first(), start.rect(),
-                        isReversed ? result.connectionPoints.first() : result.connectionPoints.last(), end.rect());
-                QVERIFY(!path.isEmpty());
-            }
+    const QVector<QPointF> connectionPoints { start.point(startEp), end.point(endEp) };
+    const auto result = ive::gi::validateConnectionCreate(&m_scene, connectionPoints);
+    QVERIFY(result.startIface != result.endIface || (result.startIface == nullptr && result.endIface == nullptr));
+    QCOMPARE(result.isToOrFromNested,
+            (start.function()->isAncestorOf(end.function()) || end.function()->isAncestorOf(start.function())));
+    QCOMPARE(result.failed(), shouldFail);
+    if (!result.failed()) {
+        if (isReversed) {
+            QCOMPARE(result.connectionPoints.first(), connectionPoints.last());
+            QCOMPARE(result.connectionPoints.last(), connectionPoints.first());
+        } else {
+            QCOMPARE(result.connectionPoints, connectionPoints);
         }
+
+        const auto path = ive::createConnectionPath(existingRects(),
+                isReversed ? result.connectionPoints.last() : result.connectionPoints.first(), start.rect(),
+                isReversed ? result.connectionPoints.first() : result.connectionPoints.last(), end.rect());
+        QVERIFY(!path.isEmpty());
     }
 }
 

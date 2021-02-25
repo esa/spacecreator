@@ -120,22 +120,16 @@ ConnectionCreationValidator::FailReason ConnectionCreationValidator::canConnect(
     if (sourceIface == targetIface && sourceIface && targetIface)
         return FailReason::SameInterface;
 
-    // [6] - the RI is not connected to any other RIs
-    const bool maybeRiRi = !sourceIface || !targetIface
-            || (sourceIface && targetIface && sourceIface->direction() == targetIface->direction());
-    if (maybeRiRi)
-        for (auto iface : { sourceIface, targetIface }) {
-            if (iface) {
-                if (auto model = iface->objectsModel()) {
-                    for (auto connection : model->getConnectionsForIface(iface->id())) {
-                        if (connection->sourceInterface()->isRequired()
-                                && connection->targetInterface()->isRequired()) {
-                            return FailReason::MulticastDisabled;
-                        }
-                    }
+    // [6] - Multicast is disabled atm
+    if (sourceIface) {
+        if (auto model = sourceIface->objectsModel()) {
+            for (const auto connection : model->getConnectionsForIface(sourceIface->id())) {
+                if (connection->sourceInterface()->id() == sourceIface->id()) {
+                    return FailReason::MulticastDisabled;
                 }
             }
         }
+    }
 
     // [5] - both ifaces should be either (PI+RI|PI+PI|RI+RI) compatible by kind and params, or PI+RI.inheritPI=true
     if (sourceIface && targetIface)

@@ -154,8 +154,8 @@ static bool isReversed(const ivm::ValidationResult &result)
             isReversed = (result.startIface->isRequired() && shared::isAncestorOf(result.startObject, result.endObject))
                     || (result.startIface->isProvided() && shared::isAncestorOf(result.endObject, result.startObject));
         } else if (result.endIface) {
-            isReversed = (result.endIface->isProvided() && shared::isAncestorOf(result.startObject, result.endObject))
-                    || (result.endIface->isRequired() && shared::isAncestorOf(result.endObject, result.startObject));
+            isReversed = (result.endIface->isRequired() && shared::isAncestorOf(result.startObject, result.endObject))
+                    || (result.endIface->isProvided() && shared::isAncestorOf(result.endObject, result.startObject));
         } else {
             isReversed = shared::isAncestorOf(result.startObject, result.endObject);
         }
