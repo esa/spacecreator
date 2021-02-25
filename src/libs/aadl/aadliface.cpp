@@ -718,6 +718,15 @@ void AADLIfaceRequired::cloneInternals(const AADLIface *from)
 {
     AADLIface::cloneInternals(from);
 
+    if (const AADLFunctionType *fn = function()) {
+        const QVector<AADLIface *> ifaces = fn->allInterfaces();
+        const auto it = std::find_if(ifaces.cbegin(), ifaces.cend(),
+                [this](const AADLIface *iface) { return iface != this && iface->title() == title(); });
+        if (it != ifaces.cend()) {
+            setTitle(from->function()->title() + QLatin1Char('_') + from->title());
+        }
+    }
+
     if (const AADLIfaceRequired *ri = from->as<const AADLIfaceRequired *>())
         connect(ri, &AADLIfaceRequired::propChanged_InheritPI, this, &AADLIfaceRequired::propChanged_InheritPI,
                 Qt::UniqueConnection);
