@@ -705,6 +705,10 @@ void InterfaceDocument::showPropertyEditor(ivm::AADLObject *obj)
     Q_ASSERT(d->asnModelStorage);
     Q_ASSERT(d->commandsStack);
     Q_ASSERT(d->graphicsView);
+    if (!obj || obj->aadlType() == ivm::AADLObject::Type::InterfaceGroup) {
+        return;
+    }
+
     ive::PropertiesDialog dialog(d->dynPropConfig, obj, d->asnModelStorage->asn1DataTypes(asn1FilePath()),
             d->commandsStack, d->graphicsView);
     dialog.exec();
