@@ -74,7 +74,7 @@ static inline void dumpItem(QObject *obj, bool strict = false)
                  << ive::polygon(connection->entity()->coordinates()) << "\n";
         Q_ASSERT(!strict
                 || ive::comparePolygones(
-                           connection->graphicsPoints(), ive::polygon(connection->entity()->coordinates())));
+                        connection->graphicsPoints(), ive::polygon(connection->entity()->coordinates())));
         Q_ASSERT(!strict
                 || ive::comparePolygones(connection->points(), ive::polygon(connection->entity()->coordinates())));
     } else if (auto rectItem = qobject_cast<ive::AADLRectGraphicsItem *>(item)) {
@@ -145,7 +145,12 @@ void AADLItemModel::onAADLObjectAdded(ivm::AADLObject *object)
         }
     };
 
-    if (nestingLevel(object) > ive::kNestingVisibilityLevel) {
+    const int lowestLevel = nestingLevel(m_model->rootObject()) + 1;
+    const int objectLevel = nestingLevel(object);
+    const bool isRootOrRootChild = object->id() == m_model->rootObjectId()
+            || (m_model->rootObject() && object->parentObject() == m_model->rootObject());
+    if ((objectLevel < lowestLevel || objectLevel > (lowestLevel + ive::kNestingVisibilityLevel))
+            && !isRootOrRootChild) {
         return;
     }
 
@@ -173,7 +178,8 @@ void AADLItemModel::onAADLObjectAdded(ivm::AADLObject *object)
         });
         connect(object, &ivm::AADLObject::coordinatesChanged, this, propertyChanged);
         if (auto clickable = qobject_cast<InteractiveObject *>(item->toGraphicsObject())) {
-            connect(clickable, &InteractiveObject::clicked, this,
+            connect(
+                    clickable, &InteractiveObject::clicked, this,
                     [this, clickable]() {
 #ifdef AADL_ITEM_DUMP
                         dumpItem(sender());
@@ -183,7 +189,8 @@ void AADLItemModel::onAADLObjectAdded(ivm::AADLObject *object)
                         }
                     },
                     Qt::QueuedConnection);
-            connect(clickable, &InteractiveObject::doubleClicked, this,
+            connect(
+                    clickable, &InteractiveObject::doubleClicked, this,
                     [this, clickable]() {
                         if (auto entity = clickable->aadlObject()) {
                             if (auto function = qobject_cast<ivm::AADLFunction *>(entity)) {
@@ -385,7 +392,7 @@ void AADLItemModel::setupInnerGeometry(ivm::AADLObject *obj) const
 {
     if (!obj
             || !(obj->aadlType() == ivm::AADLObject::Type::Comment || obj->aadlType() == ivm::AADLObject::Type::Function
-                       || obj->aadlType() == ivm::AADLObject::Type::FunctionType)) {
+                    || obj->aadlType() == ivm::AADLObject::Type::FunctionType)) {
         return;
     }
     QVariant innerCoord = obj->prop(ivm::meta::Props::token(ivm::meta::Props::Token::InnerCoordinates));

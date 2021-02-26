@@ -905,7 +905,7 @@ bool comparePolygones(const QVector<QPointF> &v1, const QVector<QPointF> &v2)
 
 int nestingLevel(ivm::AADLObject *object)
 {
-    if (!object || object->isRootObject())
+    if (!object)
         return -1;
 
     if (object->aadlType() == ivm::AADLObject::Type::InterfaceGroup
@@ -916,9 +916,8 @@ int nestingLevel(ivm::AADLObject *object)
 
     int level = 0;
     while (auto parentObject = object->parentObject()) {
-        if (!parentObject->isRootObject()
-                && (parentObject->aadlType() == ivm::AADLObject::Type::Function
-                        || parentObject->aadlType() == ivm::AADLObject::Type::FunctionType)) {
+        if ((parentObject->aadlType() == ivm::AADLObject::Type::Function
+                    || parentObject->aadlType() == ivm::AADLObject::Type::FunctionType)) {
             ++level;
         }
         object = parentObject;

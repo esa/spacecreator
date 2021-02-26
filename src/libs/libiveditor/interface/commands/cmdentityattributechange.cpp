@@ -18,7 +18,7 @@
 
 #include "cmdentityattributechange.h"
 
-#include "cmdentityremove.h"
+#include "cmdentitiesremove.h"
 #include "cmdinterfaceitemcreate.h"
 #include "commandids.h"
 
@@ -194,16 +194,20 @@ void CmdEntityAttributeChange::prepareUnsetFunctionTypeCommands(const ivm::AADLF
     Commands &cmdStorage = m_cmdUnset[fnTypeId];
     const QVector<ivm::AADLIface *> &fnIfaces = m_function->interfaces();
     const QVector<ivm::AADLIface *> &fnTypeIfaces = fnType->interfaces();
+    QList<QPointer<ivm::AADLObject>> entities;
     for (auto fnTypeIface : fnTypeIfaces) {
         for (const auto &clone : fnTypeIface->clones()) {
             auto found = std::find_if(
                     fnIfaces.cbegin(), fnIfaces.cend(), [clone](ivm::AADLIface *fnIface) { return clone == fnIface; });
 
             if (found != fnIfaces.cend()) {
-                auto cmdRm = new cmd::CmdEntityRemove(clone.data(), clone->objectsModel());
-                cmdStorage.append(cmdRm);
+                entities.append(clone.data());
             }
         }
+    }
+    if (!entities.isEmpty()) {
+        auto cmdRm = new cmd::CmdEntitiesRemove(entities, fnType->objectsModel());
+        cmdStorage.append(cmdRm);
     }
 }
 

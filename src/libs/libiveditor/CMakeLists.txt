@@ -108,8 +108,8 @@ target_sources(${LIB_NAME} PRIVATE
     interface/commands/cmdentitypropertyremove.h
     interface/commands/cmdentitypropertyrename.cpp
     interface/commands/cmdentitypropertyrename.h
-    interface/commands/cmdentityremove.cpp
-    interface/commands/cmdentityremove.h
+    interface/commands/cmdentitiesremove.cpp
+    interface/commands/cmdentitiesremove.h
     interface/commands/cmdfunctionitemcreate.cpp
     interface/commands/cmdfunctionitemcreate.h
     interface/commands/cmdfunctiontypeitemcreate.cpp

@@ -18,7 +18,6 @@
 #include "cmdrequiredifacepropertychange.h"
 
 #include "aadlconnection.h"
-#include "cmdentityremove.h"
 #include "commandids.h"
 
 namespace ive {

@@ -33,8 +33,8 @@
 #include "commands/cmdcommentitemcreate.h"
 #include "commands/cmdconnectiongroupitemcreate.h"
 #include "commands/cmdconnectionitemcreate.h"
+#include "commands/cmdentitiesremove.h"
 #include "commands/cmdentitygeometrychange.h"
-#include "commands/cmdentityremove.h"
 #include "commands/cmdfunctionitemcreate.h"
 #include "commands/cmdfunctiontypeitemcreate.h"
 #include "commands/cmdinterfaceitemcreate.h"
@@ -164,15 +164,17 @@ void CreatorTool::removeSelectedItems()
 
     if (auto scene = d->view->scene()) {
         QStringList clonedIfaces;
-        cmd::CommandsStack::Macro cmdMacro(d->doc->undoStack(), tr("Remove selected item(s)"));
+        QList<QPointer<ivm::AADLObject>> entities;
+        d->clearPreviewItem();
         while (!scene->selectedItems().isEmpty()) {
-            d->clearPreviewItem();
-
             QGraphicsItem *item = scene->selectedItems().first();
             item->setSelected(false);
 
             if (auto iObj = qobject_cast<InteractiveObject *>(item->toGraphicsObject())) {
                 if (auto entity = iObj->aadlObject()) {
+                    if (entity->isRootObject()) {
+                        continue;
+                    }
                     if (entity->isInterface()) {
                         if (auto iface = entity->as<const ivm::AADLIface *>()) {
                             if (auto srcIface = iface->cloneOf()) {
@@ -183,12 +185,13 @@ void CreatorTool::removeSelectedItems()
                             }
                         }
                     }
-                    auto cmdRm = new cmd::CmdEntityRemove(entity, d->model->objectsModel());
-                    d->doc->commandsStack()->push(cmdRm);
+                    entities.append(entity);
                 }
             }
         }
-        cmdMacro.setComplete(true);
+        auto cmdRm = new cmd::CmdEntitiesRemove(entities, d->model->objectsModel());
+        cmdRm->setText(tr("Remove selected item(s)"));
+        d->doc->commandsStack()->push(cmdRm);
 
         if (!clonedIfaces.isEmpty()) {
             const QString names = clonedIfaces.join(QStringLiteral("<br>"));
@@ -481,7 +484,7 @@ bool CreatorTool::onMouseMove(QMouseEvent *e)
 
                     if (item->parentItem() == d->previewItem->parentItem()
                             || (d->previewItem->parentItem() == item
-                                       && !item->sceneBoundingRect().contains(expandedGeometry))) {
+                                    && !item->sceneBoundingRect().contains(expandedGeometry))) {
                         items.insert(iObjItem);
                     }
                 });
@@ -638,16 +641,19 @@ void CreatorTool::CreatorToolPrivate::populateContextMenu_commonEdit(QMenu *menu
         ive::AADLCommentGraphicsItem::Type };
     const bool copyable = std::any_of(selectedItems.cbegin(), selectedItems.cend(),
             [](const QGraphicsItem *item) { return kNestedTypes.contains(item->type()); });
-    auto action = menu->addAction(QIcon(QLatin1String(":/tab_interface/toolbar/icns/copy.svg")), thisTool->tr("Copy"),
-            thisTool, [this]() { Q_EMIT thisTool->copyActionTriggered(); }, QKeySequence::Copy);
+    auto action = menu->addAction(
+            QIcon(QLatin1String(":/tab_interface/toolbar/icns/copy.svg")), thisTool->tr("Copy"), thisTool,
+            [this]() { Q_EMIT thisTool->copyActionTriggered(); }, QKeySequence::Copy);
     action->setEnabled(copyable);
 
-    action = menu->addAction(QIcon(QLatin1String(":/tab_interface/toolbar/icns/cut.svg")), thisTool->tr("Cut"),
-            thisTool, [this]() { Q_EMIT thisTool->cutActionTriggered(); }, QKeySequence::Cut);
+    action = menu->addAction(
+            QIcon(QLatin1String(":/tab_interface/toolbar/icns/cut.svg")), thisTool->tr("Cut"), thisTool,
+            [this]() { Q_EMIT thisTool->cutActionTriggered(); }, QKeySequence::Cut);
     action->setEnabled(copyable);
 
-    action = menu->addAction(QIcon(QLatin1String(":/tab_interface/toolbar/icns/paste.svg")), thisTool->tr("Paste"),
-            thisTool, [this, scenePos]() { Q_EMIT thisTool->pasteActionTriggered(scenePos); }, QKeySequence::Paste);
+    action = menu->addAction(
+            QIcon(QLatin1String(":/tab_interface/toolbar/icns/paste.svg")), thisTool->tr("Paste"), thisTool,
+            [this, scenePos]() { Q_EMIT thisTool->pasteActionTriggered(scenePos); }, QKeySequence::Paste);
     action->setEnabled(!QApplication::clipboard()->text().isEmpty());
 }
 

@@ -33,26 +33,24 @@ class AADLFunctionType;
 namespace ive {
 namespace cmd {
 
-class CmdEntityRemove : public shared::UndoCommand
+class CmdEntitiesRemove : public shared::UndoCommand
 {
     Q_OBJECT
 public:
-    explicit CmdEntityRemove(ivm::AADLObject *entity, ivm::AADLModel *model);
-    ~CmdEntityRemove() override;
+    explicit CmdEntitiesRemove(const QList<QPointer<ivm::AADLObject>> &entities, ivm::AADLModel *model);
+    ~CmdEntitiesRemove() override;
 
     void redo() override;
     void undo() override;
     bool mergeWith(const QUndoCommand *command) override;
     int id() const override;
 
-    ivm::AADLObject *entity() const;
-
 Q_SIGNALS:
-    void entityRemoved(ivm::AADLObject *obj, shared::UndoCommand *command);
+    void entitiesRemoved(const QList<QPointer<ivm::AADLObject>> &entities, shared::UndoCommand *command);
 
 private:
     QPointer<ivm::AADLModel> m_model;
-    QPointer<ivm::AADLObject> m_entity;
+    QList<QPointer<ivm::AADLObject>> m_entities;
     QVector<QPointer<ivm::AADLObject>> m_relatedEntities;
     QVector<QPointer<ivm::AADLObject>> m_relatedConnections;
     QVector<QPointer<ivm::AADLObject>> m_relatedIfaces;

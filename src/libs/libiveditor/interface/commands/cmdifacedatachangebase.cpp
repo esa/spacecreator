@@ -20,7 +20,7 @@
 #include "aadlconnection.h"
 #include "aadliface.h"
 #include "aadlmodel.h"
-#include "cmdentityremove.h"
+#include "cmdentitiesremove.h"
 
 namespace ive {
 namespace cmd {
@@ -111,11 +111,15 @@ ivm::AADLIface *CmdIfaceDataChangeBase::getConnectionOtherSide(
 
 void CmdIfaceDataChangeBase::prepareRemoveConnectionCommands()
 {
-    for (const auto connection : m_relatedConnections) {
+    QList<QPointer<ivm::AADLObject>> entities;
+    for (const auto &connection : m_relatedConnections) {
         if (connectionMustDie(connection)) {
-            auto cmdRm = new cmd::CmdEntityRemove(connection, m_model);
-            m_cmdRmConnection.append(cmdRm);
+            entities.append(connection);
         }
+    }
+    if (!entities.isEmpty()) {
+        auto cmdRm = new cmd::CmdEntitiesRemove(entities, m_model);
+        m_cmdRmConnection.append(cmdRm);
     }
 }
 

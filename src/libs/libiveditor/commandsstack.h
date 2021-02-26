@@ -45,7 +45,7 @@ public:
 
 Q_SIGNALS:
     void nameChanged(ivm::AADLObject *entity, const QString &oldName, shared::UndoCommand *command);
-    void entityRemoved(ivm::AADLObject *entity, shared::UndoCommand *command);
+    void entitiesRemoved(const QList<QPointer<ivm::AADLObject>> &entities, shared::UndoCommand *command);
 };
 
 }

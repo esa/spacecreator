@@ -73,7 +73,7 @@ public:
 public Q_SLOTS:
     void onEntityNameChanged(ivm::AADLObject *entity, const QString &oldName, shared::UndoCommand *command);
     void onMscEntityNameChanged(QObject *entity, const QString &oldName, shared::UndoCommand *command);
-    void onEntityRemoved(ivm::AADLObject *entity, shared::UndoCommand *command);
+    void onEntitiesRemoved(const QList<QPointer<ivm::AADLObject>> &entities, shared::UndoCommand *command);
 
 private:
     QPointer<SpaceCreatorProject> m_storage;

@@ -15,31 +15,33 @@
   along with this program. If not, see <https://www.gnu.org/licenses/lgpl-2.1.html>.
 */
 
-#include "cmdentityremove.h"
+#include "cmdentitiesremove.h"
 
 #include "commandids.h"
 
-#include <aadlobject.h>
 #include <aadlconnection.h>
 #include <aadlconnectiongroup.h>
 #include <aadlfunction.h>
 #include <aadlfunctiontype.h>
 #include <aadliface.h>
 #include <aadlmodel.h>
+#include <aadlobject.h>
 namespace ive {
 namespace cmd {
 
-CmdEntityRemove::CmdEntityRemove(ivm::AADLObject *entity, ivm::AADLModel *model)
+CmdEntitiesRemove::CmdEntitiesRemove(const QList<QPointer<ivm::AADLObject>> &entities, ivm::AADLModel *model)
     : shared::UndoCommand()
     , m_model(model)
-    , m_entity(entity)
+    , m_entities(entities)
 {
     setText(QObject::tr("Remove"));
 
-    collectRelatedItems(m_entity);
+    for (const QPointer<ivm::AADLObject> &entity : entities) {
+        collectRelatedItems(entity);
+    }
 }
 
-CmdEntityRemove::~CmdEntityRemove()
+CmdEntitiesRemove::~CmdEntitiesRemove()
 {
     const QVector<QPointer<ivm::AADLObject>> objects = m_relatedIfaces + m_relatedConnections + m_relatedEntities;
     for (ivm::AADLObject *obj : objects)
@@ -47,7 +49,7 @@ CmdEntityRemove::~CmdEntityRemove()
             delete obj;
 }
 
-ivm::AADLFunctionType *CmdEntityRemove::putParentFunctionFor(const ivm::AADLObject *obj)
+ivm::AADLFunctionType *CmdEntitiesRemove::putParentFunctionFor(const ivm::AADLObject *obj)
 {
     if (!obj || !obj->parentObject())
         return nullptr;
@@ -59,12 +61,12 @@ ivm::AADLFunctionType *CmdEntityRemove::putParentFunctionFor(const ivm::AADLObje
     return m_parentFunctions[objId];
 }
 
-ivm::AADLFunctionType *CmdEntityRemove::popParentFunctionFor(const ivm::AADLObject *obj)
+ivm::AADLFunctionType *CmdEntitiesRemove::popParentFunctionFor(const ivm::AADLObject *obj)
 {
     return obj ? m_parentFunctions.take(obj->id()) : nullptr;
 }
 
-void CmdEntityRemove::advancedRemove(ivm::AADLObject *obj)
+void CmdEntitiesRemove::advancedRemove(ivm::AADLObject *obj)
 {
     if (!obj)
         return;
@@ -77,7 +79,7 @@ void CmdEntityRemove::advancedRemove(ivm::AADLObject *obj)
         fn->removeChild(obj);
 }
 
-void CmdEntityRemove::advancedRestore(ivm::AADLObject *obj)
+void CmdEntitiesRemove::advancedRestore(ivm::AADLObject *obj)
 {
     if (!obj)
         return;
@@ -89,7 +91,7 @@ void CmdEntityRemove::advancedRestore(ivm::AADLObject *obj)
         m_model->addObject(obj);
 }
 
-void CmdEntityRemove::redo()
+void CmdEntitiesRemove::redo()
 {
     if (!m_model)
         return;
@@ -109,10 +111,10 @@ void CmdEntityRemove::redo()
     removeAadlObjects(m_relatedIfaces);
     removeAadlObjects(m_relatedEntities);
 
-    Q_EMIT entityRemoved(m_entity, this);
+    Q_EMIT entitiesRemoved(m_entities, this);
 }
 
-void CmdEntityRemove::undo()
+void CmdEntitiesRemove::undo()
 {
     if (!m_model)
         return;
@@ -133,23 +135,18 @@ void CmdEntityRemove::undo()
     restoreAadlObjects(m_relatedConnections);
 }
 
-bool CmdEntityRemove::mergeWith(const QUndoCommand *command)
+bool CmdEntitiesRemove::mergeWith(const QUndoCommand *command)
 {
     Q_UNUSED(command);
     return false;
 }
 
-int CmdEntityRemove::id() const
+int CmdEntitiesRemove::id() const
 {
     return RemoveEntity;
 }
 
-ivm::AADLObject *CmdEntityRemove::entity() const
-{
-    return m_entity;
-}
-
-void CmdEntityRemove::collectRelatedItems(ivm::AADLObject *toBeRemoved)
+void CmdEntitiesRemove::collectRelatedItems(ivm::AADLObject *toBeRemoved)
 {
     if (!toBeRemoved)
         return;
@@ -167,7 +164,7 @@ void CmdEntityRemove::collectRelatedItems(ivm::AADLObject *toBeRemoved)
         if (auto *iface = qobject_cast<ivm::AADLIface *>(toBeRemoved)) {
             for (const auto &clone : iface->clones())
                 collectRelatedItems(clone);
-            if (auto connection = m_model->getConnectionForIface(iface->id()))
+            for (const auto &connection : m_model->getConnectionsForIface(iface->id()))
                 storeLinkedEntity(connection);
         }
         break;
@@ -178,8 +175,7 @@ void CmdEntityRemove::collectRelatedItems(ivm::AADLObject *toBeRemoved)
             for (auto iface : fnType->interfaces())
                 collectRelatedItems(iface);
 
-            for (auto child :
-                    toBeRemoved->findChildren<ivm::AADLFunction *>(QString(), Qt::FindDirectChildrenOnly))
+            for (auto child : toBeRemoved->findChildren<ivm::AADLFunction *>(QString(), Qt::FindDirectChildrenOnly))
                 collectRelatedItems(child);
         }
         break;
@@ -194,7 +190,7 @@ void CmdEntityRemove::collectRelatedItems(ivm::AADLObject *toBeRemoved)
     storeLinkedEntity(toBeRemoved);
 }
 
-void CmdEntityRemove::storeLinkedEntity(ivm::AADLObject *linkedEntity)
+void CmdEntitiesRemove::storeLinkedEntity(ivm::AADLObject *linkedEntity)
 {
     auto storeObject = [](ivm::AADLObject *obj, QVector<QPointer<ivm::AADLObject>> *collection) {
         if (obj && !collection->contains(obj))

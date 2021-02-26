@@ -18,8 +18,8 @@
 #include "commandsstack.h"
 
 #include "aadlobject.h"
+#include "interface/commands/cmdentitiesremove.h"
 #include "interface/commands/cmdentityattributechange.h"
-#include "interface/commands/cmdentityremove.h"
 #include "interface/commands/cmdifaceattrchange.h"
 #include "undocommand.h"
 
@@ -46,8 +46,8 @@ bool CommandsStack::push(QUndoCommand *command)
     if (auto nameCommand = dynamic_cast<CmdIfaceAttrChange *>(command)) {
         connect(nameCommand, &CmdIfaceAttrChange::nameChanged, this, &CommandsStack::nameChanged, Qt::UniqueConnection);
     }
-    if (auto nameCommand = dynamic_cast<CmdEntityRemove *>(command)) {
-        connect(nameCommand, &CmdEntityRemove::entityRemoved, this, &CommandsStack::entityRemoved,
+    if (auto nameCommand = dynamic_cast<CmdEntitiesRemove *>(command)) {
+        connect(nameCommand, &CmdEntitiesRemove::entitiesRemoved, this, &CommandsStack::entitiesRemoved,
                 Qt::UniqueConnection);
     }
     m_undoStack->push(command);

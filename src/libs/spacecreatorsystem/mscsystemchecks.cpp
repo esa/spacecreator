@@ -61,8 +61,8 @@ void MscSystemChecks::setStorage(SpaceCreatorProject *storage)
     connect(m_storage, &scs::SpaceCreatorProject::ivCoreAdded, this, [this](QSharedPointer<ive::IVEditorCore> ivCore) {
         connect(ivCore->commandsStack(), &ive::cmd::CommandsStack::nameChanged, this,
                 &scs::MscSystemChecks::onEntityNameChanged);
-        connect(ivCore->commandsStack(), &ive::cmd::CommandsStack::entityRemoved, this,
-                &scs::MscSystemChecks::onEntityRemoved);
+        connect(ivCore->commandsStack(), &ive::cmd::CommandsStack::entitiesRemoved, this,
+                &scs::MscSystemChecks::onEntitiesRemoved);
     });
 }
 
@@ -433,42 +433,50 @@ void MscSystemChecks::onMscEntityNameChanged(QObject *entity, const QString &old
 /*!
    Removes corresponding MSC entities when a AADL entity wasremoved
  */
-void MscSystemChecks::onEntityRemoved(ivm::AADLObject *entity, shared::UndoCommand *command)
+void MscSystemChecks::onEntitiesRemoved(const QList<QPointer<ivm::AADLObject>> &entities, shared::UndoCommand *command)
 {
-    if (!entity) {
+    if (entities.isEmpty()) {
         return;
     }
 
-    auto aadlFunction = dynamic_cast<ivm::AADLFunction *>(entity);
-    auto aadlConnection = dynamic_cast<ivm::AADLConnection *>(entity);
-    if (!aadlFunction && !aadlConnection) {
-        return;
+    QStringList removedNames;
+    QList<ivm::AADLFunction *> removedFunctions;
+    QList<ivm::AADLConnection *> removedConnections;
+    for (const QPointer<ivm::AADLObject> &entity : entities) {
+        if (!entity) {
+            continue;
+        }
+        if (entity->aadlType() == ivm::AADLObject::Type::Function) {
+            removedFunctions.append(qobject_cast<ivm::AADLFunction *>(entity));
+        } else if (entity->aadlType() == ivm::AADLObject::Type::Connection) {
+            removedConnections.append(qobject_cast<ivm::AADLConnection *>(entity));
+        } else {
+            continue;
+        }
+        removedNames.append(entity->title());
     }
-    if (aadlFunction && !hasCorrespondingInstances(aadlFunction)) {
-        return;
-    }
-    if (aadlConnection && !hasCorrespondingMessages(aadlConnection)) {
+
+    if (removedNames.isEmpty()) {
         return;
     }
 
     bool doRemove = true;
     if (command->isFirstChange()) {
         const int result = QMessageBox::question(nullptr, tr("Remove MSC entities"),
-                tr("The AADL entity %1 was removed."
+                tr("The AADL entity(ies) %1 was(were) removed."
                    "\nDo you want to remove the correlating MSC entities?")
-                        .arg(entity->title()));
+                        .arg(removedNames.join(QLatin1String(", "))));
         if (result != QMessageBox::Yes) {
             doRemove = false;
         }
     }
     if (doRemove) {
-        if (aadlFunction) {
+        for (auto aadlFunction : qAsConst(removedFunctions)) {
             removeMscInstances(aadlFunction);
         }
-        if (aadlConnection) {
+        for (auto aadlConnection : qAsConst(removedConnections)) {
             removeMscMessages(aadlConnection);
         }
     }
 }
-
 }
