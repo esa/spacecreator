@@ -63,7 +63,7 @@ namespace msc {
  */
 
 struct ChartViewLayoutInfo {
-    ChartViewLayoutInfo() {}
+    ChartViewLayoutInfo() { }
 
     ~ChartViewLayoutInfo() { clear(); }
 
@@ -96,7 +96,7 @@ private:
 };
 
 struct ChartLayoutManagerPrivate {
-    ChartLayoutManagerPrivate() {}
+    ChartLayoutManagerPrivate() { }
 
     shared::ui::GraphicsSceneBase m_scene;
     QHash<QUuid, msc::InstanceItem *> m_instanceItems;
@@ -1412,8 +1412,9 @@ TimerItem *ChartLayoutManager::addTimerItem(MscTimer *timer)
     qreal instanceVertiacalOffset(0);
     if (timer->instance()) {
         instance = itemForInstance(timer->instance());
-        if (instance)
-            instanceVertiacalOffset = instance->axis().p1().y();
+        if (instance) {
+            instanceVertiacalOffset = d->interMessageSpan();
+        }
     }
 
     TimerItem *item = itemForTimer(timer);
