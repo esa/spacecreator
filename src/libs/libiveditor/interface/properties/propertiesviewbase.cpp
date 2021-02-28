@@ -33,7 +33,8 @@ PropertiesViewBase::PropertiesViewBase(QWidget *parent)
     , ui(new Ui::PropertiesViewBase)
 {
     ui->setupUi(this);
-    ui->tableView->horizontalHeader()->setSectionResizeMode(QHeaderView::ResizeToContents);
+    ui->tableView->horizontalHeader()->setSectionResizeMode(QHeaderView::Interactive);
+
     setButtonsDisabled();
 }
 
