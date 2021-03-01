@@ -19,6 +19,7 @@
 
 #include "baseitems/common/coordinatesconverter.h"
 #include "baseitems/common/mscutils.h"
+#include "colors/colormanager.h"
 
 #include <QBrush>
 #include <QDebug>
@@ -53,11 +54,8 @@ void InstanceEndItem::setStop(bool stop)
 void InstanceEndItem::setStopImpl(bool stop)
 {
     m_stop = stop;
-    m_bgrColor = m_stop ? Qt::white : Qt::black;
-
-    setBrush(QBrush(m_bgrColor));
-
-    // Note: explicit update currently is not needed
+    setBrush(shared::ColorManager::instance()->colorsForItem(shared::ColorManager::InstanceEnd).brush());
+    setPen(shared::ColorManager::instance()->colorsForItem(shared::ColorManager::InstanceEnd).pen());
 }
 
 void InstanceEndItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget)
@@ -68,9 +66,7 @@ void InstanceEndItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *o
         const QVector<QPointF> linesHeads = { bounds.topLeft(), bounds.bottomRight(), bounds.bottomLeft(),
             bounds.topRight() };
 
-        QPen pen(this->pen());
-        pen.setWidthF(1.);
-        pen.setColor(Qt::black);
+        QPen pen = shared::ColorManager::instance()->colorsForItem(shared::ColorManager::InstanceEnd).pen();
         pen.setCapStyle(Qt::RoundCap);
 
         painter->save();

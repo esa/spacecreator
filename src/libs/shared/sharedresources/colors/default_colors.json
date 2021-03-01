@@ -99,6 +99,114 @@
             "group": "IVE",
             "pen_color": "#ff7b7b7b",
             "pen_width": 1
+        },
+        {
+            "brush_color0": "#ff999999",
+            "brush_color1": "#ff999999",
+            "color_type": 1001,
+            "fill_type": 0,
+            "group": "MSC",
+            "pen_color": "#ff999999",
+            "pen_width": 2
+        },
+        {
+            "brush_color0": "#ffff0000",
+            "brush_color1": "#ffff0000",
+            "color_type": 1002,
+            "fill_type": 0,
+            "group": "MSC",
+            "pen_color": "#ffff0000",
+            "pen_width": 2
+        },
+        {
+            "brush_color0": "#fefecc",
+            "brush_color1": "#e3e3b6",
+            "color_type": 1003,
+            "fill_type": 2,
+            "group": "MSC",
+            "pen_color": "#ff999999",
+            "pen_width": 1
+        },
+        {
+            "brush_color0": "#ff000000",
+            "brush_color1": "#ff000000",
+            "color_type": 1004,
+            "fill_type": 0,
+            "group": "MSC",
+            "pen_color": "#ff000000",
+            "pen_width": 1
+        },
+        {
+            "brush_color0": "#ff3e47e6",
+            "brush_color1": "#ff3e47e6",
+            "color_type": 1011,
+            "fill_type": 0,
+            "group": "MSC",
+            "pen_color": "#ff3e47e6",
+            "pen_width": 1
+        },
+        {
+            "brush_color0": "#ffff0000",
+            "brush_color1": "#ffff0000",
+            "color_type": 1012,
+            "fill_type": 0,
+            "group": "MSC",
+            "pen_color": "#ffff0000",
+            "pen_width": 1
+        },
+        {
+            "brush_color0": "#ffffffff",
+            "brush_color1": "#ffffffff",
+            "color_type": 1021,
+            "fill_type": 0,
+            "group": "MSC",
+            "pen_color": "#ff999999",
+            "pen_width": 1
+        },
+        {
+            "brush_color0": "#f9e29c",
+            "brush_color1": "#f9e29c",
+            "color_type": 1031,
+            "fill_type": 0,
+            "group": "MSC",
+            "pen_color": "#ff000000",
+            "pen_width": 1
+        },
+        {
+            "brush_color0": "#ffffffff",
+            "brush_color1": "#ffffffff",
+            "color_type": 1041,
+            "fill_type": 0,
+            "group": "MSC",
+            "pen_color": "#ff000000",
+            "pen_width": 1
+        },
+        {
+            "brush_color0": "#ff000000",
+            "brush_color1": "#ff000000",
+            "color_type": 1051,
+            "fill_type": 0,
+            "group": "MSC",
+            "pen_color": "#ff999999",
+            "pen_width": 2
+        },
+        {
+            "brush_color0": "#ffffffff",
+            "brush_color1": "#ffffffff",
+            "color_type": 1061,
+            "fill_type": 0,
+            "group": "MSC",
+            "pen_color": "#ff000000",
+            "pen_width": 1
+        },
+        {
+            "brush_color0": "#ffffffff",
+            "brush_color1": "#ffffffff",
+            "color_type": 1071,
+            "fill_type": 0,
+            "group": "MSC",
+            "pen_color": "#ff000000",
+            "pen_width": 1
         }
     ]
 }

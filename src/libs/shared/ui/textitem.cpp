@@ -52,65 +52,34 @@ TextItem::TextItem(QGraphicsItem *parent)
     connect(this, &TextItem::textChanged, this, &TextItem::updateCompleterText);
 }
 
-QBrush TextItem::background() const
+const QBrush &TextItem::background() const
 {
-    if (m_gradientUsed) {
-        const QRectF &bounds = boundingRect();
-        QLinearGradient gradient(m_gradient);
-        gradient.setStart(bounds.topLeft());
-        gradient.setFinalStop(bounds.bottomRight());
-        return m_gradient;
-    }
-    return m_bgrColor;
+    return m_background;
+    //    if (m_gradientUsed) {
+    //        const QRectF &bounds = boundingRect();
+    //        QLinearGradient gradient(m_gradient);
+    //        gradient.setStart(bounds.topLeft());
+    //        gradient.setFinalStop(bounds.bottomRight());
+    //        return m_gradient;
+    //    }
+    //    return m_bgrColor;
 }
 
-void TextItem::setBackgroundColor(const QColor &color)
+void TextItem::setBackground(const QBrush &brush)
 {
-    if (m_bgrColor == color)
-        return;
-
-    m_gradientUsed = false;
-
-    m_bgrColor = color;
+    m_background = brush;
     update();
 }
 
-void TextItem::setBackgroundGradient(const QLinearGradient &gradient)
+const QPen &TextItem::framePen() const
 {
-    if (gradient == m_gradient)
-        return;
+    return m_framePen;
+}
 
-    m_gradientUsed = true;
-
-    m_gradient = gradient;
+void TextItem::setFramePen(const QPen &pen)
+{
+    m_framePen = pen;
     update();
-}
-
-QColor TextItem::frameColor() const
-{
-    return m_frameColor;
-}
-
-void TextItem::setFrameColor(const QColor &color)
-{
-    if (color == m_frameColor)
-        return;
-
-    m_frameColor = color;
-    update();
-}
-
-qreal TextItem::frameWidth() const
-{
-    return m_frameWidth;
-}
-
-void TextItem::setFrameWidth(qreal w)
-{
-    if (qFuzzyCompare(m_frameWidth, w))
-        return;
-
-    m_frameWidth = w;
 }
 
 Qt::Alignment TextItem::textAlignment() const
@@ -159,10 +128,7 @@ void TextItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, 
     painter->fillRect(body, backColor);
 
     if (framed()) {
-        QPen pen(painter->pen());
-        pen.setWidthF(frameWidth());
-        pen.setColor(frameColor());
-        painter->setPen(pen);
+        painter->setPen(m_framePen);
         painter->drawRect(body);
     }
 

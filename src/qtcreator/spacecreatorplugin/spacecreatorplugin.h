@@ -18,8 +18,8 @@
 #pragma once
 
 #include "options/asn1sccoption.h"
+#include "options/coloroption.h"
 #include "options/dynamicactionoption.h"
-#include "options/ivcoloroption.h"
 #include "options/propertyoptions.h"
 #include "spacecreatorplugin_global.h"
 
@@ -92,7 +92,7 @@ private:
     SpaceCreatorProjectManager *m_projectsManager = nullptr;
 
     Asn1SccOption m_asnCommandOptions;
-    IVColorOption m_ivColorOptions;
+    ColorOption m_ivColorOptions;
     DynamicActionOption m_ivDynActionOptions;
     PropertyOptions m_propertyOptions;
 };

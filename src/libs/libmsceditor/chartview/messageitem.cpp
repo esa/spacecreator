@@ -27,6 +27,7 @@
 #include "cif/cifblockfactory.h"
 #include "cif/cifblocks.h"
 #include "cif/ciflines.h"
+#include "colors/colormanager.h"
 #include "commands/cmdentitynamechange.h"
 #include "commands/cmdmessageitemresize.h"
 #include "commands/cmdmessagepointsedit.h"
@@ -107,7 +108,6 @@ MessageItem::MessageItem(MscMessage *message, ChartLayoutManager *chartLayoutMan
     });
     setInstances(source, target);
 
-    m_arrowItem->setColor(MessageColor);
     m_arrowItem->setDashed(isCreator());
     checkAadlConnection();
 
@@ -781,7 +781,10 @@ void MessageItem::updateDisplayText()
  */
 void MessageItem::checkAadlConnection()
 {
-    QColor lineColor = aadlConnectionOk() ? msc::MessageColor : msc::AadlErrorColor;
+    const shared::ColorManager::HandledColors color =
+            aadlConnectionOk() ? shared::ColorManager::MessageRegular : shared::ColorManager::MessageError;
+    const shared::ColorHandler colorHandler = shared::ColorManager::instance()->colorsForItem(color);
+    QColor lineColor = colorHandler.penColor();
     if (lineColor != m_arrowItem->color()) {
         m_arrowItem->setColor(lineColor);
         updateTooltip();

@@ -33,7 +33,7 @@ AADLFunctionNameGraphicsItem::AADLFunctionNameGraphicsItem(QGraphicsItem *parent
     setEditable(true);
 
     setFont(QFont(qApp->font().family(), 11));
-    setBackgroundColor(Qt::transparent);
+    setBackground(Qt::transparent);
     setFlags(QGraphicsItem::ItemIsSelectable);
     setTextWrapMode(QTextOption::WrapAnywhere);
 

@@ -32,17 +32,33 @@ public:
     {
         Unhandled = -1,
 
-        FunctionRegular,
-        FunctionRoot,
-        FunctionPartial,
-        FunctionType,
-        Iface,
-        Connection,
-        Comment,
-        ConnectionGroup,
-        IfaceGroup,
-        ConnectionFlow,
-        FunctionScale,
+        // IVE
+        FunctionRegular = 0,
+        FunctionRoot = 1,
+        FunctionPartial = 2,
+        FunctionType = 3,
+        Iface = 4,
+        Connection = 5,
+        Comment = 6,
+        ConnectionGroup = 7,
+        IfaceGroup = 8,
+        ConnectionFlow = 9,
+        FunctionScale = 10,
+
+        // MSC
+        InstanceLine = 1001,
+        InstanceErrorLine = 1002,
+        InstanceHead = 1003,
+        InstanceEnd = 1004,
+        MessageRegular = 1011,
+        MessageError = 1012,
+        Action = 1021,
+        CommentMsc = 1031,
+        Condition = 1041,
+        CoRegion = 1051,
+        Timer = 1061,
+        Chart = 1071
+
     };
     Q_ENUM(HandledColors)
 

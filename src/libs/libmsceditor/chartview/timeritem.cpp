@@ -20,6 +20,7 @@
 #include "baseitems/textitem.h"
 #include "chartlayoutmanager.h"
 #include "chartview/mscchartviewconstants.h"
+#include "colors/colormanager.h"
 #include "commands/cmdentitynamechange.h"
 #include "instanceitem.h"
 #include "msccommandsstack.h"
@@ -63,8 +64,9 @@ TimerItem::TimerItem(msc::MscTimer *timer, ChartLayoutManager *chartLayoutManage
 
     connect(this, &TimerItem::relocated, this, &TimerItem::scheduleLayoutUpdate);
 
+    shared::ColorHandler color = shared::ColorManager::instance()->colorsForItem(shared::ColorManager::Timer);
     m_timerConnector->setVisible(m_timer->precedingTimer() != nullptr);
-    m_timerConnector->setPen(QPen(Qt::black, 1));
+    m_timerConnector->setPen(color.pen());
 
     QRectF br = TIMER_SYMBOL_SIZE;
     br.setWidth(TIMER_SYMBOL_SIZE.width() + m_textItem->boundingRect().width());
@@ -111,8 +113,8 @@ void TimerItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *option,
 {
     painter->save();
 
-    QPen pen(Qt::black, 1);
-    painter->setPen(pen);
+    shared::ColorHandler color = shared::ColorManager::instance()->colorsForItem(shared::ColorManager::Timer);
+    painter->setPen(color.pen());
 
     const QRectF br = boundingRect();
 

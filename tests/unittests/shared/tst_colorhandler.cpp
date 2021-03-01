@@ -31,7 +31,7 @@ private Q_SLOTS:
 void tst_ColorHandler::testSaveLoad()
 {
     shared::ColorHandler ch;
-    ch.setFillType(shared::ColorHandler::Gradient);
+    ch.setFillType(shared::ColorHandler::GradientVertical);
     ch.setPenWidth(2.5);
     ch.setPenColor(QColor(128, 128, 64));
     ch.setBrushColor0(QColor(255, 0, 64));

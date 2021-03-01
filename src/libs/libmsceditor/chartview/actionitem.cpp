@@ -20,6 +20,7 @@
 #include "baseitems/common/coordinatesconverter.h"
 #include "baseitems/textitem.h"
 #include "chartlayoutmanager.h"
+#include "colors/colormanager.h"
 #include "commands/cmdactioninformaltext.h"
 #include "datastatement.h"
 #include "instanceitem.h"
@@ -80,7 +81,10 @@ ActionItem::ActionItem(msc::MscAction *action, ChartLayoutManager *chartLayoutMa
 
     setFlags(ItemSendsGeometryChanges | ItemSendsScenePositionChanges | ItemIsSelectable);
 
+    shared::ColorHandler color = shared::ColorManager::instance()->colorsForItem(shared::ColorManager::Action);
     m_textItem->setFramed(true);
+    m_textItem->setFramePen(color.pen());
+    m_textItem->setBackground(color.brush());
     m_textItem->setEditable(true);
     m_textItem->setHtml(actionText());
     m_textItem->setFlag(QGraphicsItem::ItemStacksBehindParent, true);

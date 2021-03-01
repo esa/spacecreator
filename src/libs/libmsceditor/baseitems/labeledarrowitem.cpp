@@ -40,7 +40,7 @@ LabeledArrowItem::LabeledArrowItem(QGraphicsItem *parent)
     , m_selectionHighlighterPen(Qt::green)
 {
     m_itemText->setFramed(false);
-    m_itemText->setBackgroundColor(Qt::transparent);
+    m_itemText->setBackground(Qt::transparent);
     m_itemText->setEditable(true);
     m_itemText->setTextMargin(TextMargin);
     m_itemArrow->setStartSignShown(false);
@@ -112,7 +112,9 @@ void LabeledArrowItem::updatePoints(const QPointF &source, const QPointF &target
 
 void LabeledArrowItem::setColor(const QColor &color)
 {
-    m_itemArrow->setBodyPen(color);
+    QPen bodyPen = m_itemArrow->bodyPen();
+    bodyPen.setColor(color);
+    m_itemArrow->setBodyPen(bodyPen);
     m_itemArrow->setBodyBrush(color);
     m_itemArrow->setSourcePen(color);
     m_itemArrow->setSourceBrush(color);

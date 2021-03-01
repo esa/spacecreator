@@ -19,6 +19,7 @@
 
 #include "baseitems/textitem.h"
 #include "chartlayoutmanager.h"
+#include "colors/colormanager.h"
 #include "commands/cmdentitynamechange.h"
 #include "mscchartviewconstants.h"
 #include "msccommandsstack.h"
@@ -41,13 +42,15 @@ ConditionItem::ConditionItem(MscCondition *condition, ChartLayoutManager *chartL
 
     setFlags(ItemSendsGeometryChanges | ItemSendsScenePositionChanges | ItemIsSelectable);
 
-    m_polygonItem->setBrush(Qt::white);
+    shared::ColorHandler color = shared::ColorManager::instance()->colorsForItem(shared::ColorManager::Condition);
+    m_polygonItem->setPen(color.pen());
+    m_polygonItem->setBrush(color.brush());
     m_polygonItem->setFlag(QGraphicsItem::ItemStacksBehindParent, true);
 
     m_nameItem->setMscValidationTest(QString("msc c1;instance i1;condition %1;endinstance;endmsc;"));
     m_nameItem->setEditable(true);
     setName(m_condition->name());
-    m_nameItem->setBackgroundColor(Qt::transparent);
+    m_nameItem->setBackground(Qt::transparent);
     m_nameItem->setSendClickEvent(true);
 
     connect(m_condition, &msc::MscCondition::nameChanged, this, &msc::ConditionItem::setName);

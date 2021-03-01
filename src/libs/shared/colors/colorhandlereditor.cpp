@@ -29,7 +29,8 @@ ColorHandlerEditor::ColorHandlerEditor(QWidget *parent)
     ui->setupUi(this);
 
     ui->cbFillType->addItem(tr("Color"), ColorHandler::FillType::Color);
-    ui->cbFillType->addItem(tr("Gradient"), ColorHandler::FillType::Gradient);
+    ui->cbFillType->addItem(tr("Gradient Vertical"), ColorHandler::FillType::GradientVertical);
+    ui->cbFillType->addItem(tr("Gradient Horizontal"), ColorHandler::FillType::GradientHorizontal);
 
     setEnabled(false);
 }
@@ -49,7 +50,12 @@ void ColorHandlerEditor::setColorHandler(ColorHandler *h)
     QSignalBlocker block(this);
     ui->sbWidth->setValue(m_colorHandler->penWidth());
     ui->btnColorStroke->setColor(m_colorHandler->penColor());
-    ui->cbFillType->setCurrentIndex(m_colorHandler->fillType() == ColorHandler::FillType::Color ? 0 : 1);
+    for (int i = 0; i < ui->cbFillType->count(); ++i) {
+        if (ui->cbFillType->itemData(i).toInt() == m_colorHandler->fillType()) {
+            ui->cbFillType->setCurrentIndex(i);
+            break;
+        }
+    }
     ui->btnColor->setColor(m_colorHandler->brushColor0());
     ui->btnColorStop->setColor(m_colorHandler->brushColor1());
 }
@@ -78,7 +84,7 @@ void ColorHandlerEditor::on_btnColorStroke_colorChanged(const QColor &c)
 void ColorHandlerEditor::on_cbFillType_currentIndexChanged(int id)
 {
     ColorHandler::FillType ft = ColorHandler::FillType(ui->cbFillType->itemData(id).toInt());
-    const bool stopColorShown = ft == ColorHandler::FillType::Gradient;
+    const bool stopColorShown = ft != ColorHandler::FillType::Color;
 
     ui->labelColorStop->setVisible(stopColorShown);
     ui->btnColorStop->setVisible(stopColorShown);

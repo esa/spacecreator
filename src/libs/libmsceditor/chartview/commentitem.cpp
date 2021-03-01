@@ -26,6 +26,7 @@
 #include "cif/cifblockfactory.h"
 #include "cif/cifline.h"
 #include "cif/ciflines.h"
+#include "colors/colormanager.h"
 #include "commands/cmdcommentitemchangegeometry.h"
 #include "commands/cmdentitycommentchange.h"
 #include "mscchart.h"
@@ -58,7 +59,7 @@ CommentItem::CommentItem(MscChart *chart, ChartLayoutManager *chartLayoutManager
     m_textItem->setMscValidationTest(QString("msc c1;instance i1 comment '%1';endinstance;endmsc;"));
     m_textItem->setFramed(false);
     m_textItem->setEditable(true);
-    m_textItem->setBackgroundColor(Qt::transparent);
+    m_textItem->setBackground(Qt::transparent);
     m_textItem->setTextAlignment(Qt::AlignCenter);
     m_textItem->setTextWrapMode(QTextOption::WrapAtWordBoundaryOrAnywhere);
     connect(m_textItem, &TextItem::edited, this, &CommentItem::textEdited);
@@ -68,7 +69,10 @@ CommentItem::CommentItem(MscChart *chart, ChartLayoutManager *chartLayoutManager
         updateGripPoints();
     });
 
-    m_linkItem->setPen(QPen(Qt::black, COMMENT_BORDER_WIDTH, Qt::DotLine));
+    shared::ColorHandler color = shared::ColorManager::instance()->colorsForItem(shared::ColorManager::CommentMsc);
+    QPen pen = color.pen();
+    pen.setStyle(Qt::DotLine);
+    m_linkItem->setPen(pen);
 
     setHighlightable(false);
 }
@@ -157,15 +161,15 @@ void CommentItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *optio
     Q_UNUSED(option)
     Q_UNUSED(widget)
 
+    shared::ColorHandler color = shared::ColorManager::instance()->colorsForItem(shared::ColorManager::CommentMsc);
     painter->save();
     painter->setRenderHint(QPainter::Antialiasing);
-    QPen pen = painter->pen();
-    pen.setWidthF(COMMENT_BORDER_WIDTH);
+    QPen pen = color.pen();
     pen.setCapStyle(Qt::FlatCap);
     painter->setPen(pen);
     const QRectF br = mapRectFromItem(m_textItem, m_textItem->boundingRect());
     if ((m_iObj && isGlobal()) || (!m_iObj && m_isGlobalPreview)) {
-        painter->setBrush(QColor(0xf9e29c));
+        painter->setBrush(color.brush());
         painter->drawPolygon(QVector<QPointF> { br.topRight() - QPointF(COMMENT_MARIN, 0), br.topLeft(),
                 br.bottomLeft(), br.bottomRight(), br.topRight() + QPointF(0, COMMENT_MARIN),
                 br.topRight() - QPointF(COMMENT_MARIN, 0) });

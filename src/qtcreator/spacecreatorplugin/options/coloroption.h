@@ -26,12 +26,12 @@ class ColorSettingsWidget;
 
 namespace spctr {
 
-class IVColorOption : public Core::IOptionsPage
+class ColorOption : public Core::IOptionsPage
 {
     Q_OBJECT
 
 public:
-    IVColorOption(QObject *parent = nullptr);
+    ColorOption(QObject *parent = nullptr);
 
     QWidget *widget() override;
     void apply() override;

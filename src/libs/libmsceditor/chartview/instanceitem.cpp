@@ -27,6 +27,7 @@
 #include "cif/cifblockfactory.h"
 #include "cif/cifblocks.h"
 #include "cif/ciflines.h"
+#include "colors/colormanager.h"
 #include "commands/cmdchangeinstanceorder.h"
 #include "commands/cmdchangeinstanceposition.h"
 #include "commands/cmdentitynamechange.h"
@@ -357,8 +358,13 @@ void InstanceItem::onKindEdited(const QString &newKind)
 void InstanceItem::checkAadlFunction()
 {
     const bool aadlOk = aadlFunctionOk();
-    QPen axisPen(aadlOk ? Qt::darkGray : msc::AadlErrorColor);
-    axisPen.setWidthF(2.);
+
+    QPen axisPen;
+    if (aadlOk) {
+        axisPen = shared::ColorManager::instance()->colorsForItem(shared::ColorManager::InstanceLine).pen();
+    } else {
+        axisPen = shared::ColorManager::instance()->colorsForItem(shared::ColorManager::InstanceErrorLine).pen();
+    }
     m_axisSymbol->setPen(axisPen);
 }
 

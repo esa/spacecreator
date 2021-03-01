@@ -15,8 +15,7 @@
    along with this program. If not, see <https://www.gnu.org/licenses/lgpl-2.1.html>.
 */
 
-#include "ivcoloroption.h"
-
+#include "coloroption.h"
 #include "colors/colormanager.h"
 #include "colors/colorsettingswidget.h"
 #include "spacecreatorpluginconstants.h"
@@ -26,18 +25,18 @@
 
 namespace spctr {
 
-IVColorOption::IVColorOption(QObject *parent)
+ColorOption::ColorOption(QObject *parent)
     : Core::IOptionsPage(parent)
     , m_originalFile(shared::ColorManager::instance()->sourceFile())
 {
     setId(Constants::SETTINGS_IV_COLOR_ID);
-    setDisplayName(tr("IV color"));
+    setDisplayName(tr("Colors"));
     setCategory(Constants::SETTINGS_CATEGORY);
 
     setDisplayCategory(tr(Constants::SETTINGS_CATEGORY_DISPLAY));
 }
 
-QWidget *IVColorOption::widget()
+QWidget *ColorOption::widget()
 {
     if (!m_widget) {
         m_widget = new QWidget();
@@ -52,12 +51,12 @@ QWidget *IVColorOption::widget()
         auto restoreButton = new QPushButton(tr("Restore Defaults"), m_widget);
         buttonLayout->addWidget(restoreButton);
         buttonLayout->addStretch(1);
-        connect(restoreButton, &QPushButton::clicked, this, &IVColorOption::restoreDefaults);
+        connect(restoreButton, &QPushButton::clicked, this, &ColorOption::restoreDefaults);
     }
     return m_widget;
 }
 
-void IVColorOption::apply()
+void ColorOption::apply()
 {
     m_reset = false;
     if (m_colorWidget) {
@@ -65,7 +64,7 @@ void IVColorOption::apply()
     }
 }
 
-void IVColorOption::finish()
+void ColorOption::finish()
 {
     if (m_reset) {
         shared::ColorManager::instance()->setSourceFile(m_originalFile);
@@ -73,7 +72,7 @@ void IVColorOption::finish()
     delete m_widget;
 }
 
-void IVColorOption::restoreDefaults()
+void ColorOption::restoreDefaults()
 {
     if (m_colorWidget) {
         m_colorWidget->loadFile(shared::ColorManager::defaultColorsResourceFile());

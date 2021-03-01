@@ -35,7 +35,8 @@ public:
     enum FillType
     {
         Color = 0,
-        Gradient
+        GradientVertical,
+        GradientHorizontal,
     };
 
     ColorHandler();

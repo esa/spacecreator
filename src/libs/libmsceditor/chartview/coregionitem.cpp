@@ -19,6 +19,7 @@
 
 #include "baseitems/common/mscutils.h"
 #include "chartlayoutmanager.h"
+#include "colors/colormanager.h"
 #include "instanceitem.h"
 #include "messageitem.h"
 #include "mscchart.h"
@@ -47,16 +48,21 @@ void CoregionItem::setBegin(MscCoregion *begin)
 
 void CoregionItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget)
 {
+    shared::ColorHandler color = shared::ColorManager::instance()->colorsForItem(shared::ColorManager::CoRegion);
+    QColor penColor = color.pen().color();
+    qreal penWidth = color.pen().widthF();
+
     painter->save();
     const QRectF rect = boundingRect();
     const QLineF topLine = { rect.topLeft(), rect.topRight() };
     const QLineF bottomLine = { rect.bottomLeft(), rect.bottomRight() };
-    painter->setPen(QPen(Qt::darkGray, 2., Qt::SolidLine));
+    painter->setPen(QPen(penColor, penWidth, Qt::SolidLine));
     painter->drawLine(topLine);
     painter->drawLine(bottomLine);
-    painter->setPen(QPen(Qt::white, 3., Qt::SolidLine));
+    penWidth *= 1.5;
+    painter->setPen(QPen(Qt::white, penWidth, Qt::SolidLine));
     painter->drawLine(topLine.center(), bottomLine.center());
-    painter->setPen(QPen(Qt::darkGray, 3., Qt::DashLine));
+    painter->setPen(QPen(penColor, penWidth, Qt::DashLine));
     if (m_unorderedEntities) {
         painter->drawLine(topLine.center(), bottomLine.center());
     } else {
@@ -64,6 +70,7 @@ void CoregionItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *opti
         painter->drawLine(rect.topRight(), rect.bottomRight());
     }
     painter->restore();
+
     InteractiveObject::paint(painter, option, widget);
 }
 

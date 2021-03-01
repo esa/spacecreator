@@ -38,20 +38,31 @@ QPen ColorHandler::pen() const
 
 QBrush ColorHandler::brush() const
 {
-    switch (fillType()) {
-    case FillType::Gradient: {
-        QLinearGradient gradient;
-        gradient.setCoordinateMode(QLinearGradient::ObjectBoundingMode);
+    if (d->fillType == FillType::Color) {
+        return QBrush(brushColor0());
+    }
+
+    QLinearGradient gradient;
+    gradient.setCoordinateMode(QLinearGradient::ObjectBoundingMode);
+    gradient.setColorAt(0., brushColor0());
+    gradient.setColorAt(1., brushColor1());
+
+    switch (d->fillType) {
+    case FillType::GradientVertical: {
         gradient.setStart(0., 0.);
         gradient.setFinalStop(0., 1.);
-        gradient.setColorAt(0., brushColor0());
-        gradient.setColorAt(1., brushColor1());
-
-        return QBrush(gradient);
+        break;
+    }
+    case GradientHorizontal: {
+        gradient.setStart(0., 0.);
+        gradient.setFinalStop(1., 0.);
+        break;
     }
     default:
         return QBrush(brushColor0());
     }
+
+    return QBrush(gradient);
 }
 
 ColorHandler::FillType ColorHandler::fillType() const

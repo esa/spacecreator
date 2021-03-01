@@ -20,6 +20,7 @@
 #include "baseitems/common/coordinatesconverter.h"
 #include "baseitems/common/mscutils.h"
 #include "baseitems/textitem.h"
+#include "colors/colormanager.h"
 #include "mscchart.h"
 #include "mscinstance.h"
 #include "systemchecks.h"
@@ -38,52 +39,6 @@ namespace msc {
   Item showing the header of an instance
   */
 
-QLinearGradient InstanceHeadItem::createGradientForKind(const QGraphicsItem *itemKind)
-{
-    static QLinearGradient prototype;
-    if (!itemKind)
-        return prototype;
-
-    static bool prototypeFilled(false);
-
-    if (!prototypeFilled) {
-        // colors were colorpicked from https://git.vikingsoftware.com/esa/msceditor/issues/30
-        prototype.setColorAt(0.0, QColor("#fefef9"));
-        prototype.setColorAt(0.5, QColor("#fefeca"));
-        prototype.setColorAt(1.0, QColor("#dedbb4"));
-        prototypeFilled = true;
-    }
-
-    QLinearGradient gradient(prototype);
-    const QRectF &bounds = itemKind->boundingRect();
-    gradient.setStart(bounds.topLeft());
-    gradient.setFinalStop(bounds.bottomRight());
-    return gradient;
-}
-
-QLinearGradient InstanceHeadItem::createGradientForName(const QGraphicsItem *itemName)
-{
-    static QLinearGradient prototype;
-    if (!itemName)
-        return prototype;
-
-    static bool prototypeFilled(false);
-
-    if (!prototypeFilled) {
-        const QColor &whiteTransparent(QColor::fromRgbF(1., 1., 1., 0.25));
-        prototype.setColorAt(0.0, whiteTransparent);
-        prototype.setColorAt(0.5, Qt::white);
-        prototype.setColorAt(1.0, whiteTransparent);
-        prototypeFilled = true;
-    }
-
-    QLinearGradient gradient(prototype);
-    const QRectF &bounds = itemName->boundingRect();
-    gradient.setStart(bounds.topLeft());
-    gradient.setFinalStop(bounds.topRight());
-    return gradient;
-}
-
 InstanceHeadItem::InstanceHeadItem(MscChart *chart, QGraphicsItem *parent)
     : QGraphicsObject(parent)
     , m_textItemName(new NameItem(this))
@@ -91,10 +46,10 @@ InstanceHeadItem::InstanceHeadItem(MscChart *chart, QGraphicsItem *parent)
     , m_textItemKind(new TextItem(this))
     , m_chart(chart)
 {
-    m_textItemKind->setBackgroundColor(Qt::transparent);
+    m_textItemKind->setBackground(Qt::transparent);
     m_textItemKind->setEditable(true);
     m_textItemKind->setTextWrapMode(QTextOption::WrapAtWordBoundaryOrAnywhere);
-    m_textItemName->setBackgroundColor(Qt::transparent);
+    m_textItemName->setBackground(Qt::transparent);
     m_textItemName->setEditable(true);
     m_textItemName->setTextWrapMode(QTextOption::WrapAtWordBoundaryOrAnywhere);
 
@@ -217,7 +172,9 @@ void InstanceHeadItem::updateLayout()
     moveItem(m_rectItem, symbolRect.center());
 
     // update head gradient:
-    m_rectItem->setBrush(createGradientForKind(m_rectItem));
+    shared::ColorHandler color = shared::ColorManager::instance()->colorsForItem(shared::ColorManager::InstanceHead);
+    m_rectItem->setPen(color.pen());
+    m_rectItem->setBrush(color.brush());
 
     Q_EMIT layoutUpdated();
 }

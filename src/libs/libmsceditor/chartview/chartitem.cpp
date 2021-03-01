@@ -21,6 +21,7 @@
 #include "baseitems/common/mscutils.h"
 #include "baseitems/textitem.h"
 #include "chartlayoutmanager.h"
+#include "colors/colormanager.h"
 #include "commands/cmdchartitemchangegeometry.h"
 #include "commands/cmdentitynamechange.h"
 #include "graphicsviewutils.h"
@@ -51,17 +52,15 @@ ChartItem::ChartItem(MscChart *chart, ChartLayoutManager *chartLayoutManager, QG
     , m_contentArea(new QGraphicsRectItem(this))
     , m_textItemName(new NameItem(this))
 {
-    QPen framePen = m_rectItem->pen();
-    framePen.setColor(Qt::black);
-    framePen.setWidthF(1.);
-    m_rectItem->setPen(framePen);
-    m_rectItem->setBrush(Qt::white);
-    m_contentArea->setPen(QPen(Qt::white));
-    m_contentArea->setBrush(Qt::white);
+    shared::ColorHandler color = shared::ColorManager::instance()->colorsForItem(shared::ColorManager::Chart);
+    m_rectItem->setPen(color.pen());
+    m_rectItem->setBrush(color.brush());
+    m_contentArea->setPen(QPen(Qt::white, 0));
+    m_contentArea->setBrush(color.brush());
 
     m_textItemName->setEditable(true);
     m_textItemName->setTextWrapMode(QTextOption::NoWrap);
-    m_textItemName->setBackgroundColor(Qt::transparent);
+    m_textItemName->setBackground(Qt::transparent);
     connect(m_textItemName, &TextItem::edited, this, &ChartItem::onNameEdited);
 
     if (chart) {

@@ -94,6 +94,31 @@ QString ColorManager::handledColorTypeName(HandledColors t)
         return tr("Comment");
     case FunctionScale:
         return tr("Scaled nested content");
+
+    case InstanceLine:
+        return tr("Instance line");
+    case InstanceErrorLine:
+        return tr("Instance with error");
+    case InstanceEnd:
+        return tr("Instance end symbol");
+    case InstanceHead:
+        return tr("Instance head");
+    case MessageRegular:
+        return tr("Regular Message");
+    case MessageError:
+        return tr("Message with error");
+    case Action:
+        return tr("Action");
+    case CommentMsc:
+        return tr("MSC comment");
+    case Condition:
+        return tr("Condition");
+    case CoRegion:
+        return tr("Co-Region");
+    case Timer:
+        return tr("Timer");
+    case Chart:
+        return tr("Chart");
     default:
         return tr("Unknown");
     }

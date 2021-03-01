@@ -18,8 +18,10 @@
 
 #pragma once
 
+#include <QBrush>
 #include <QGraphicsTextItem>
 #include <QLinearGradient>
+#include <QPen>
 #include <QRegularExpression>
 #include <QTextOption>
 
@@ -36,15 +38,11 @@ class TextItem : public QGraphicsTextItem
 public:
     explicit TextItem(QGraphicsItem *parent = nullptr);
 
-    QBrush background() const;
-    void setBackgroundColor(const QColor &color);
-    void setBackgroundGradient(const QLinearGradient &color);
+    const QBrush &background() const;
+    void setBackground(const QBrush &brush);
 
-    QColor frameColor() const;
-    void setFrameColor(const QColor &color);
-
-    qreal frameWidth() const;
-    void setFrameWidth(qreal w);
+    const QPen &framePen() const;
+    void setFramePen(const QPen &pen);
 
     Qt::Alignment textAlignment() const;
     void setTextAlignment(Qt::Alignment alignment);
@@ -115,10 +113,8 @@ protected:
     void checkTextValidity();
 
 protected:
-    QColor m_bgrColor = Qt::white;
-    QLinearGradient m_gradient;
-    QColor m_frameColor = Qt::black;
-    qreal m_frameWidth = 0.5;
+    QBrush m_background = QBrush(Qt::white);
+    QPen m_framePen;
     bool m_showFrame = false;
     bool m_gradientUsed = false;
     bool m_editable = false;

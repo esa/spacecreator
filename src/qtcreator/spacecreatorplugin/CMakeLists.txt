@@ -33,10 +33,10 @@ set(SC_PLUGIN_SOURCES
     options/asn1sccoptionwidget.cpp
     options/asn1sccoptionwidget.h
     options/asn1sccoptionwidget.ui
+    options/coloroption.cpp
+    options/coloroption.h
     options/dynamicactionoption.cpp
     options/dynamicactionoption.h
-    options/ivcoloroption.cpp
-    options/ivcoloroption.h
     options/propertyoptions.cpp
     options/propertyoptions.h
     spacecreatorplugin.cpp
