@@ -20,8 +20,9 @@
 #include "colormanager.h"
 
 #include <QMap>
-#include <QStringListModel>
 #include <QWidget>
+
+class QStringListModel;
 
 namespace Ui {
 class ColorSettingsWidget;
@@ -41,15 +42,20 @@ public:
     bool loadFile(const QString &path);
     void openFile(const QString &path);
 
+    void setFilterGroup(const QString &group);
+
 private Q_SLOTS:
     void onColorHandlerSelected(const QModelIndex &id);
     void on_btnOpen_clicked();
     void on_btnCreateNew_clicked();
 
 private:
+    void fillModel();
+
     Ui::ColorSettingsWidget *ui;
     QMap<QString, ColorManager::HandledColors> m_colorNames;
     QStringListModel *m_namesModel { nullptr };
+    QString m_filterGroup; /// if set, only items of that group are shown
     ColorHandler m_color;
     QString m_originalFile;
 };

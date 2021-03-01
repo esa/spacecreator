@@ -27,6 +27,7 @@
 #include <QJsonDocument>
 #include <QJsonObject>
 #include <QMessageBox>
+#include <QStringListModel>
 
 namespace shared {
 
@@ -82,16 +83,26 @@ bool ColorSettingsWidget::loadFile(const QString &path)
 
     const int currentRow = ui->listView->currentIndex().isValid() ? ui->listView->currentIndex().row() : 0;
 
-    m_namesModel->setStringList(m_colorNames.keys());
+    fillModel();
 
     ui->listView->setCurrentIndex(ui->listView->model()->index(currentRow, 0));
-    return m_colorNames.size();
+    return !m_colorNames.empty();
 }
 
 void ColorSettingsWidget::openFile(const QString &path)
 {
     if (loadFile(path))
         ui->lePath->setText(path);
+}
+
+void ColorSettingsWidget::setFilterGroup(const QString &group)
+{
+    if (group == m_filterGroup) {
+        return;
+    }
+
+    m_filterGroup = group;
+    fillModel();
 }
 
 void ColorSettingsWidget::onColorHandlerSelected(const QModelIndex &id)
@@ -124,6 +135,18 @@ void ColorSettingsWidget::on_btnCreateNew_clicked()
             openFile(file);
         }
     }
+}
+
+void ColorSettingsWidget::fillModel()
+{
+    QStringList items;
+    for (auto it = m_colorNames.begin(); it != m_colorNames.end(); ++it) {
+        ColorHandler color = ColorManager::instance()->colorsForItem(it.value());
+        if (m_filterGroup.isEmpty() || color.group() == m_filterGroup) {
+            items.append(it.key());
+        }
+    }
+    m_namesModel->setStringList(items);
 }
 
 }

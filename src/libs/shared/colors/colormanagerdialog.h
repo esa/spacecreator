@@ -35,6 +35,8 @@ public:
     explicit ColorManagerDialog(QWidget *parent = nullptr);
     ~ColorManagerDialog();
 
+    void setFilterGroup(const QString &group);
+
 public Q_SLOTS:
     void accept() override;
     void reject() override;

@@ -40,6 +40,11 @@ ColorManagerDialog::~ColorManagerDialog()
     delete ui;
 }
 
+void ColorManagerDialog::setFilterGroup(const QString &group)
+{
+    ui->widget->setFilterGroup(group);
+}
+
 void ColorManagerDialog::accept()
 {
     ui->widget->saveSettings();
