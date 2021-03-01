@@ -83,6 +83,7 @@ public Q_SLOTS:
 
 private Q_SLOTS:
     void showAsn1Errors(const QStringList &faultyMessages);
+    void editColorScheme();
 
 private:
     static const QLatin1String DotMscFileExtensionLow;

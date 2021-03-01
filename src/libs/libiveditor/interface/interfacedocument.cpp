@@ -503,15 +503,15 @@ QString InterfaceDocument::title() const
 QList<QAction *> InterfaceDocument::customActions() const
 {
     QList<QAction *> actions;
-    QAction *actCommonProps = new QAction(tr("Common Properties"));
+    QAction *actCommonProps = new QAction(tr("Common Properties..."));
     actions.append(actCommonProps);
     connect(actCommonProps, &QAction::triggered, this, &InterfaceDocument::onAttributesManagerRequested);
     //    QAction *actDataTypes = root->addAction(tr("Data types"));
     //    connect(actDataTypes, &QAction::triggered, this, &InterfaceDocument::onDataTypesMenuInvoked);
-    QAction *actColorScheme = new QAction(tr("Color Scheme"));
+    QAction *actColorScheme = new QAction(tr("Color Scheme..."));
     actions.append(actColorScheme);
     connect(actColorScheme, &QAction::triggered, this, &InterfaceDocument::onColorSchemeMenuInvoked);
-    QAction *actDynContext = new QAction(tr("Context Actions"));
+    QAction *actDynContext = new QAction(tr("Context Actions..."));
     actions.append(actDynContext);
     connect(actDynContext, &QAction::triggered, this, &InterfaceDocument::onDynContextEditorMenuInvoked);
 
@@ -685,6 +685,7 @@ void InterfaceDocument::onDataTypesMenuInvoked()
 void InterfaceDocument::onColorSchemeMenuInvoked()
 {
     shared::ColorManagerDialog *dialog = new shared::ColorManagerDialog(window());
+    dialog->setFilterGroup("IVE");
     dialog->setAttribute(Qt::WA_DeleteOnClose);
     dialog->open();
 }

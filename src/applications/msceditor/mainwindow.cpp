@@ -20,6 +20,7 @@
 #include "baseitems/common/coordinatesconverter.h"
 #include "chartitem.h"
 #include "chartlayoutmanager.h"
+#include "colors/colormanagerdialog.h"
 #include "commandlineparser.h"
 #include "commands/cmdsetasn1file.h"
 #include "documentitemmodel.h"
@@ -479,6 +480,8 @@ void MainWindow::initMenus()
     menuWindows->addAction(dockWidgetDocumentToggleAction());
     menuWindows->addAction(mscTextViewToggleAction());
     menuWindows->addAction(dockWidgetAsn1ToggleAction());
+    menu->addSeparator();
+    menu->addAction(tr("Color Scheme..."), this, &MainWindow::editColorScheme);
 
     // Initialize the help menu
     menu = menuBar()->addMenu(tr("&Help"));
@@ -866,6 +869,14 @@ void MainWindow::showAsn1Errors(const QStringList &faultyMessages)
 {
     QMessageBox::warning(
             this, tr("ASN1 error"), tr("Following messages have ASN.1 errors:") + "\n" + faultyMessages.join("\n"));
+}
+
+void MainWindow::editColorScheme()
+{
+    shared::ColorManagerDialog *dialog = new shared::ColorManagerDialog(window());
+    dialog->setFilterGroup("MSC");
+    dialog->setAttribute(Qt::WA_DeleteOnClose);
+    dialog->open();
 }
 
 void MainWindow::saveSceneRender(const QString &filePath) const
