@@ -72,11 +72,11 @@ void ConditionCreatorTool::commitPreviewItem()
 
     auto condition = qobject_cast<msc::MscCondition *>(m_previewEntity.take());
     condition->setShared(m_shared);
+    startWaitForModelLayoutComplete(condition);
     auto instance = m_model->nearestInstance(m_previewItem->sceneBoundingRect().center());
     const int eventIndex = m_model->eventIndex(m_previewItem->y());
     m_model->undoStack()->push(new cmd::CmdConditionItemCreate(condition, instance, eventIndex, m_model));
 
-    startWaitForModelLayoutComplete(condition);
     removePreviewItem();
 
     Q_EMIT created();

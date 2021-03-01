@@ -64,11 +64,11 @@ void ActionCreatorTool::commitPreviewItem()
     }
 
     auto action = qobject_cast<msc::MscAction *>(m_previewEntity.take());
+    startWaitForModelLayoutComplete(action);
     auto instance = m_model->nearestInstance(m_previewItem->sceneBoundingRect().center());
     const int eventIndex = m_model->eventIndex(m_previewItem->y());
     m_model->undoStack()->push(new cmd::CmdActionItemCreate(action, instance, eventIndex, m_model));
 
-    startWaitForModelLayoutComplete(action);
     removePreviewItem();
 
     Q_EMIT created();

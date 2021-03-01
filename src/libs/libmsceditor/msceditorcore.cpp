@@ -185,7 +185,10 @@ void MSCEditorCore::initChartTools()
         tool->setAction(toolAction);
 
         if (msc::BaseCreatorTool *creatorTool = qobject_cast<msc::BaseCreatorTool *>(tool)) {
-            connect(creatorTool, &msc::BaseCreatorTool::created, this, &MSCEditorCore::activateDefaultTool);
+            connect(creatorTool, &msc::BaseCreatorTool::created, this, [&]() {
+                m_chartView->setFocus();
+                activateDefaultTool();
+            });
             connect(creatorTool, &msc::BaseCreatorTool::canceled, this, &MSCEditorCore::activateDefaultTool);
         }
 

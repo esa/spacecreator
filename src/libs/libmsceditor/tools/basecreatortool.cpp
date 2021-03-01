@@ -75,11 +75,13 @@ void BaseCreatorTool::onModelLayoutComplete()
 {
     dropModelLayoutUpdateConnection();
 
-    if (!m_scene || !m_addedEntity)
+    if (!m_scene || !m_addedEntity) {
         return;
+    }
 
-    if (auto item = m_model->itemForEntity(m_addedEntity))
+    if (InteractiveObject *item = m_model->itemForEntity(m_addedEntity)) {
         item->postCreatePolishing();
+    }
     m_addedEntity.clear();
 }
 
