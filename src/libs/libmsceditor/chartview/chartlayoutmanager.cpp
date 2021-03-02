@@ -1112,7 +1112,7 @@ MscInstance *ChartLayoutManager::nearestInstance(const QPointF &pos)
 
     qreal distance = std::numeric_limits<int>::max();
     MscInstance *instance = nullptr;
-    for (auto item : d->m_instanceItems) {
+    for (msc::InstanceItem *item : d->m_instanceItems) {
         const QRectF itemRect = item->sceneBoundingRect().marginsAdded(extra_margin);
         if (!itemRect.contains(pos)) {
             continue;
@@ -1584,7 +1584,8 @@ void ChartLayoutManager::onInstanceEventItemMoved(shared::ui::InteractiveObjectB
     }
 
     if (auto timerItem = qobject_cast<TimerItem *>(item)) {
-        MscInstance *newInstance = nearestInstance(timerItem->sceneBoundingRect().center());
+        const QRectF itemRect = timerItem->sceneBoundingRect();
+        MscInstance *newInstance = nearestInstance(QPointF(itemRect.left(), itemRect.center().y()));
         const int currentIdx = d->m_currentChart->instanceEvents().indexOf(timerItem->modelItem());
         const int newIdx = eventIndex(item->y());
         if (!newInstance || newInstance != timerItem->modelItem()->instance() || newIdx != currentIdx) {
