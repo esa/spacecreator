@@ -60,6 +60,7 @@
 #include <QToolBar>
 #include <QUndoGroup>
 #include <QUndoStack>
+#include <QUrl>
 
 namespace msc {
 
@@ -808,5 +809,10 @@ void MSCEditorCore::addDocument(MscDocument::HierarchyType type)
     commandsStack()->push(new cmd::CmdDocumentCreate(document, parentDoc));
 
     m_model->setSelectedDocument(document);
+}
+
+QUrl MSCEditorCore::helpPage() const
+{
+    return QUrl("https://taste.tuxfamily.org/wiki/index.php?title=MSC_tutorial");
 }
 }

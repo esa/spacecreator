@@ -27,6 +27,7 @@ class QAction;
 class QMainWindow;
 class QMenu;
 class QUndoStack;
+class QUrl;
 
 namespace shared {
 
@@ -73,12 +74,15 @@ public:
     virtual bool save() = 0;
 
 public Q_SLOTS:
+    void showHelp();
     void showAboutDialog();
 
 Q_SIGNALS:
     void editedExternally(shared::EditorCore *);
 
 private:
+    virtual QUrl helpPage() const;
+
     QPointer<QToolBar> m_mainToolBar { nullptr };
 
     QPointer<ui::MiniMap> m_miniMap { nullptr };

@@ -77,6 +77,8 @@ private Q_SLOTS:
     void checkMesagesForCurrentEditor();
 
 private:
+    void addHelp();
+
     MscEditorFactory *m_mscFactory = nullptr;
     AadlEditorFactory *m_aadlFactory = nullptr;
     DeploymentEditorFactory *m_deploymentFactory = nullptr;

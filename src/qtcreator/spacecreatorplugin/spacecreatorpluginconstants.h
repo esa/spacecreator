@@ -50,6 +50,8 @@ const char AADL_SHOW_COLOR_SCHEME_ID[] = "AadlEditor.ColorScheme";
 const char AADL_SHOW_DYN_CONTEXT_ID[] = "AadlEditor.DynContext";
 const char AADL_EXPORT_SELECTED_ID[] = "AadlEditor.ExportSelected";
 const char AADL_EXPORT_IV_TYPE_ID[] = "AadlEditor.ExportComponentType";
+const char MSC_HELP_ID[] = "MscEditor.Help";
+const char AADL_HELP_ID[] = "AadlEditor.Help";
 
 // Settings
 const char SETTINGS_CATEGORY_DISPLAY[] = QT_TRANSLATE_NOOP("SpaceCreator", "SpaceCreator");

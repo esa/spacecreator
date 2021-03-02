@@ -485,6 +485,8 @@ void MainWindow::initMenus()
 
     // Initialize the help menu
     menu = menuBar()->addMenu(tr("&Help"));
+    menu->addAction(tr("Help"), d->m_core, &shared::EditorCore::showHelp);
+    menu->addSeparator();
     menu->addAction(tr("About"), d->m_core, &shared::EditorCore::showAboutDialog);
     menu->addAction(tr("About Qt"), qApp, &QApplication::aboutQt);
 }

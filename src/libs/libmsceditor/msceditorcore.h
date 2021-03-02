@@ -144,6 +144,8 @@ private Q_SLOTS:
     void addDocument(msc::MscDocument::HierarchyType type);
 
 private:
+    QUrl helpPage() const override;
+
     std::unique_ptr<msc::MainModel> m_model;
     msc::SystemChecks *m_systemChecks = nullptr;
 

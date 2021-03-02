@@ -21,12 +21,15 @@
 
 #include <QAction>
 #include <QApplication>
+#include <QDebug>
+#include <QDesktopServices>
 #include <QKeySequence>
 #include <QMainWindow>
 #include <QMenuBar>
 #include <QMessageBox>
 #include <QToolBar>
 #include <QUndoStack>
+#include <QUrl>
 
 namespace shared {
 
@@ -160,6 +163,16 @@ void EditorCore::setupMiniMap()
     m_miniMap->setupSourceView(chartView());
     connect(actionToggleMinimap(), &QAction::toggled, m_miniMap, &shared::ui::MiniMap::setVisible);
     connect(m_miniMap, &shared::ui::MiniMap::visibilityChanged, actionToggleMinimap(), &QAction::setChecked);
+}
+
+void EditorCore::showHelp()
+{
+    QDesktopServices::openUrl(helpPage());
+}
+
+QUrl EditorCore::helpPage() const
+{
+    return QUrl("https://taste.tuxfamily.org/wiki/index.php?title=Main_Page");
 }
 
 }

@@ -88,6 +88,7 @@ private:
     ivm::AADLIface *getInterface(
             const QString &ifName, ivm::AADLIface::IfaceType ifType, ivm::AADLFunction *parentFunction);
     Q_SLOT void updateAadlItems();
+    QUrl helpPage() const override;
 
     ive::InterfaceDocument *m_document { nullptr };
 

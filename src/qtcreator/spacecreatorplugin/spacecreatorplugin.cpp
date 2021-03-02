@@ -177,6 +177,8 @@ bool SpaceCreatorPlugin::initialize(const QStringList &arguments, QString *error
     m_aadlFactory = new AadlEditorFactory(m_projectsManager, ivActions, this);
     m_deploymentFactory = new DeploymentEditorFactory(this);
 
+    addHelp();
+
     return true;
 }
 
@@ -287,6 +289,31 @@ void SpaceCreatorPlugin::checkMesagesForCurrentEditor()
             project->mscChecks()->checkMessages();
         }
     }
+}
+
+void SpaceCreatorPlugin::addHelp()
+{
+    Core::ActionContainer *actions = Core::ActionManager::actionContainer(Core::Constants::M_HELP);
+    Core::Context allContexts(
+            Core::Constants::C_WELCOME_MODE, Core::Constants::C_EDIT_MODE, Core::Constants::C_DESIGN_MODE);
+
+    auto mscHelpAction = new QAction(tr("MSC editor help"), this);
+    connect(mscHelpAction, &QAction::triggered, this, []() {
+        msc::MSCEditorCore core;
+        core.showHelp();
+    });
+    Core::Command *showMscHelp =
+            Core::ActionManager::registerAction(mscHelpAction, Constants::MSC_HELP_ID, allContexts);
+    actions->addAction(showMscHelp);
+
+    auto iveHelpAction = new QAction(tr("Interface editor help"), this);
+    connect(iveHelpAction, &QAction::triggered, this, []() {
+        ive::IVEditorCore core;
+        core.showHelp();
+    });
+    Core::Command *showIveHelp =
+            Core::ActionManager::registerAction(iveHelpAction, Constants::AADL_HELP_ID, allContexts);
+    actions->addAction(showIveHelp);
 }
 
 }

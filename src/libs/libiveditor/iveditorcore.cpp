@@ -47,6 +47,7 @@
 #include <QRectF>
 #include <QToolBar>
 #include <QUndoStack>
+#include <QUrl>
 
 namespace ive {
 
@@ -531,6 +532,11 @@ void IVEditorCore::updateAadlItems()
 
     m_aadlFunctions = aadlModel->allObjectsByType<ivm::AADLFunction>();
     m_aadlConnections = aadlModel->allObjectsByType<ivm::AADLConnection>();
+}
+
+QUrl IVEditorCore::helpPage() const
+{
+    return QUrl("https://taste.tuxfamily.org/wiki/index.php?title=Interface_view_tutorial");
 }
 
 }

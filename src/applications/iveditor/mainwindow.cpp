@@ -369,6 +369,8 @@ void MainWindow::initMenus()
 
     // Initialize the help menu
     menu = menuBar()->addMenu(tr("&Help"));
+    menu->addAction(tr("Help"), m_core, &shared::EditorCore::showHelp);
+    menu->addSeparator();
     auto report = menu->addAction(tr("Send report..."), this, &MainWindow::onReportRequested);
     ActionsManager::registerAction(Q_FUNC_INFO, report, "Report", "Send the debug information");
     menu->addAction(tr("About"), m_core, &shared::EditorCore::showAboutDialog);
