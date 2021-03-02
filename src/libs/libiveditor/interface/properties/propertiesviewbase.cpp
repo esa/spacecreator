@@ -76,19 +76,21 @@ void PropertiesViewBase::onCurrentRowChanged(const QModelIndex &current, const Q
     }
 }
 
+static inline QString generatePropertyName(QStandardItemModel *model)
+{
+    static const QString newNameTempl { QLatin1String("p%1") };
+    int duplicateCounter(1);
+    QString newName = newNameTempl.arg(duplicateCounter);
+    while (!model->findItems(newName).isEmpty()) {
+        newName = newNameTempl.arg(++duplicateCounter);
+    }
+    return newName;
+}
+
 void PropertiesViewBase::on_btnAdd_clicked()
 {
     if (m_model) {
-        const ivm::AADLObject::Type type = m_model->dataObject()->aadlType();
-        const bool isInterfaceType =
-                type == ivm::AADLObject::Type::ProvidedInterface || type == ivm::AADLObject::Type::RequiredInterface;
-        const QString newNameTmp = isInterfaceType ? tr("Parameter name") : tr("New_property");
-        QString newName(newNameTmp);
-        int duplicateCounter(0);
-        while (!m_model->findItems(newName).isEmpty())
-            newName = QString("%1 #%2").arg(newNameTmp, QString::number(++duplicateCounter));
-
-        if (m_model->createProperty(newName)) {
+        if (m_model->createProperty(generatePropertyName(m_model))) {
             const QModelIndex &added = m_model->index(m_model->rowCount() - 1, 0);
             ui->tableView->scrollToBottom();
             ui->tableView->edit(added);
