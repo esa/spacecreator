@@ -67,6 +67,9 @@ public:
     Info info() const;
     void setInfo(Info info);
 
+    bool isSystem() const;
+    void setSystem(bool value);
+
     Scopes scope() const;
     void setScope(const Scopes &s);
 

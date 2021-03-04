@@ -18,6 +18,7 @@
 #include "spacecreatorproject.h"
 
 #include "asn1modelstorage.h"
+#include "baseitems/common/aadlutils.h"
 #include "interface/interfacedocument.h"
 #include "iveditorcore.h"
 #include "ivsystemchecks.h"
@@ -37,7 +38,7 @@ SpaceCreatorProject::SpaceCreatorProject(QObject *parent)
     m_mscChecks->setStorage(this);
 }
 
-SpaceCreatorProject::~SpaceCreatorProject() { }
+SpaceCreatorProject::~SpaceCreatorProject() {}
 
 QSharedPointer<dve::DVEditorCore> SpaceCreatorProject::dvData(const QString &fileName) const
 {
@@ -136,7 +137,7 @@ bool SpaceCreatorProject::contains(QSharedPointer<shared::EditorCore> core) cons
  */
 QStringList SpaceCreatorProject::allAadlFiles() const
 {
-    return projectFiles("interfaceview.xml");
+    return projectFiles(ive::kDefaultFilename);
 }
 
 /*!

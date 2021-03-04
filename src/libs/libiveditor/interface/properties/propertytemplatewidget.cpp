@@ -96,14 +96,6 @@ bool PropertyTemplateWidget::hasError() const
     return m_error;
 }
 
-QString PropertyTemplateWidget::dynamicPropertiesFilePath()
-{
-    static const QString kDefaultPath = QStandardPaths::writableLocation(QStandardPaths::AppLocalDataLocation)
-            + QDir::separator() + QLatin1String("default_attributes.xml");
-
-    return qEnvironmentVariable("TASTE_DEFAULT_ATTRIBUTES_PATH", kDefaultPath);
-}
-
 void PropertyTemplateWidget::updateErrorInfo()
 {
     const QString &xmlData = ui->plainTextEdit->toPlainText();

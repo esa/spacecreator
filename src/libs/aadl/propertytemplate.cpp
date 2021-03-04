@@ -35,6 +35,7 @@ struct PropertyTemplate::PropertyTemplatePrivate {
     QString m_rxValueValidatorPattern;
     QMap<PropertyTemplate::Scope, QPair<QString, QString>> m_rxAttrValidatorPattern;
     bool m_isVisible = true;
+    bool m_isSystem = false;
 };
 
 PropertyTemplate::PropertyTemplate()
@@ -42,7 +43,7 @@ PropertyTemplate::PropertyTemplate()
 {
 }
 
-PropertyTemplate::~PropertyTemplate() { }
+PropertyTemplate::~PropertyTemplate() {}
 
 QString PropertyTemplate::name() const
 {
@@ -72,6 +73,16 @@ PropertyTemplate::Info PropertyTemplate::info() const
 void PropertyTemplate::setInfo(PropertyTemplate::Info info)
 {
     d->m_info = info;
+}
+
+bool PropertyTemplate::isSystem() const
+{
+    return d->m_isSystem;
+}
+
+void PropertyTemplate::setSystem(bool value)
+{
+    d->m_isSystem = value;
 }
 
 PropertyTemplate::Type PropertyTemplate::type() const

@@ -15,6 +15,9 @@
    along with this program. If not, see <https://www.gnu.org/licenses/lgpl-2.1.html>.
 */
 
+#include "aadlcommonprops.h"
+#include "aadliface.h"
+#include "baseitems/common/aadlutils.h"
 #include "iveditor.h"
 #include "propertytemplate.h"
 #include "propertytemplateconfig.h"
@@ -31,6 +34,7 @@ private Q_SLOTS:
     void initTestCase();
     void tst_attributesLoad();
     void tst_loadImpl();
+    void tst_systemAttrs();
 
 private:
     ivm::PropertyTemplateConfig *m_dynPropConfig;
@@ -39,8 +43,9 @@ private:
 void tst_AttributesConfigure::initTestCase()
 {
     ive::initIvEditor();
+    QStandardPaths::setTestModeEnabled(true);
     m_dynPropConfig = ivm::PropertyTemplateConfig::instance();
-    m_dynPropConfig->init(QLatin1String("default_attributes.xml"));
+    m_dynPropConfig->init(ive::dynamicPropertiesFilePath());
 }
 
 void tst_AttributesConfigure::tst_attributesLoad()
@@ -82,6 +87,129 @@ void tst_AttributesConfigure::tst_loadImpl()
     QVERIFY(propPtr->valuesList() == dp.valuesList());
     QVERIFY(propPtr->valueValidatorPattern() == dp.valueValidatorPattern());
     QVERIFY(propPtr->attrValidatorPatterns() == dp.attrValidatorPatterns());
+}
+
+void tst_AttributesConfigure::tst_systemAttrs()
+{
+    const auto sysAttrs = m_dynPropConfig->systemAttributes();
+    auto it = std::find_if(sysAttrs.cbegin(), sysAttrs.cend(),
+            [title = ivm::meta::Props::token(ivm::meta::Props::Token::name)](
+                    const ivm::PropertyTemplate *namePropTemplate) { return namePropTemplate->name() == title; });
+    QVERIFY(it != sysAttrs.cend());
+    if (it != sysAttrs.cend()) {
+        QVERIFY((*it)->scope().testFlag(ivm::PropertyTemplate::Scope::All));
+        QVERIFY((*it)->info() == ivm::PropertyTemplate::Info::Attribute);
+        QVERIFY((*it)->type() == ivm::PropertyTemplate::Type::String);
+        const QRegularExpression rx((*it)->valueValidatorPattern());
+        QString title = QLatin1String("name-1");
+        QRegularExpressionMatch match = rx.match(title);
+        QVERIFY(match.capturedLength() != title.length());
+        title = QLatin1String("name 1");
+        match = rx.match(title);
+        QVERIFY(match.capturedLength() != title.length());
+        title = QLatin1String("name_1");
+        match = rx.match(title);
+        QVERIFY(match.capturedLength() == title.length());
+        title = QLatin1String("1_name");
+        match = rx.match(title);
+        QVERIFY(match.capturedLength() != title.length());
+    }
+    it = std::find_if(sysAttrs.cbegin(), sysAttrs.cend(),
+            [title = ivm::meta::Props::token(ivm::meta::Props::Token::kind)](
+                    const ivm::PropertyTemplate *namePropTemplate) { return namePropTemplate->name() == title; });
+    if (it != sysAttrs.cend()) {
+        QVERIFY(int((*it)->scope())
+                == int(ivm::PropertyTemplate::Scope::Provided_Interface
+                           | ivm::PropertyTemplate::Scope::Required_Interface));
+        QVERIFY((*it)->type() == ivm::PropertyTemplate::Type::Enumeration);
+        QVERIFY((*it)->info() == ivm::PropertyTemplate::Info::Attribute);
+
+        const QMetaEnum &me = QMetaEnum::fromType<ivm::AADLIface::OperationKind>();
+        for (int i = 0; i < me.keyCount(); ++i) {
+            QVERIFY((*it)->valuesList().contains(qVariantFromValue(QString::fromLatin1(me.key(i)))));
+        }
+    }
+
+    it = std::find_if(sysAttrs.cbegin(), sysAttrs.cend(),
+            [title = ivm::meta::Props::token(ivm::meta::Props::Token::instance_of)](
+                    const ivm::PropertyTemplate *namePropTemplate) { return namePropTemplate->name() == title; });
+    QVERIFY(it != sysAttrs.cend());
+    if (it != sysAttrs.cend()) {
+        QVERIFY(int((*it)->scope()) == int(ivm::PropertyTemplate::Scope::Function));
+        QVERIFY((*it)->info() == ivm::PropertyTemplate::Info::Attribute);
+        QVERIFY((*it)->type() == ivm::PropertyTemplate::Type::String);
+        const QRegularExpression rx((*it)->valueValidatorPattern());
+        QString title = QLatin1String("name-1");
+        QRegularExpressionMatch match = rx.match(title);
+        QVERIFY(match.capturedLength() != title.length());
+        title = QLatin1String("name 1");
+        match = rx.match(title);
+        QVERIFY(match.capturedLength() != title.length());
+        title = QLatin1String("name_1");
+        match = rx.match(title);
+        QVERIFY(match.capturedLength() == title.length());
+        title = QLatin1String("1_name");
+        match = rx.match(title);
+        QVERIFY(match.capturedLength() != title.length());
+    }
+
+    it = std::find_if(sysAttrs.cbegin(), sysAttrs.cend(),
+            [title = ivm::meta::Props::token(ivm::meta::Props::Token::is_type)](
+                    const ivm::PropertyTemplate *namePropTemplate) { return namePropTemplate->name() == title; });
+    if (it != sysAttrs.cend()) {
+        QVERIFY(int((*it)->scope()) == int(ivm::PropertyTemplate::Scope::Function));
+        QVERIFY((*it)->type() == ivm::PropertyTemplate::Type::Enumeration);
+        QVERIFY((*it)->info() == ivm::PropertyTemplate::Info::Attribute);
+        QVERIFY((*it)->valuesList().contains(QLatin1String("YES"))
+                && (*it)->valuesList().contains(QLatin1String("NO")));
+    }
+
+    it = std::find_if(sysAttrs.cbegin(), sysAttrs.cend(),
+            [title = ivm::meta::Props::token(ivm::meta::Props::Token::InheritPI)](
+                    const ivm::PropertyTemplate *namePropTemplate) { return namePropTemplate->name() == title; });
+    if (it != sysAttrs.cend()) {
+        QVERIFY(int((*it)->scope()) == int(ivm::PropertyTemplate::Scope::Required_Interface));
+        QVERIFY((*it)->type() == ivm::PropertyTemplate::Type::Boolean);
+        QVERIFY((*it)->info() == ivm::PropertyTemplate::Info::Property);
+    }
+
+    it = std::find_if(sysAttrs.cbegin(), sysAttrs.cend(),
+            [title = ivm::meta::Props::token(ivm::meta::Props::Token::Autonamed)](
+                    const ivm::PropertyTemplate *namePropTemplate) { return namePropTemplate->name() == title; });
+    if (it != sysAttrs.cend()) {
+        QVERIFY(int((*it)->scope()) == int(ivm::PropertyTemplate::Scope::Required_Interface));
+        QVERIFY((*it)->type() == ivm::PropertyTemplate::Type::Boolean);
+        QVERIFY((*it)->info() == ivm::PropertyTemplate::Info::Property);
+    }
+
+    it = std::find_if(sysAttrs.cbegin(), sysAttrs.cend(),
+            [title = ivm::meta::Props::token(ivm::meta::Props::Token::coordinates)](
+                    const ivm::PropertyTemplate *namePropTemplate) { return namePropTemplate->name() == title; });
+    QVERIFY(it != sysAttrs.cend());
+    if (it != sysAttrs.cend()) {
+        QVERIFY(int((*it)->scope()) == int(ivm::PropertyTemplate::Scope::All));
+        QVERIFY((*it)->info() == ivm::PropertyTemplate::Info::Property);
+        QVERIFY((*it)->type() == ivm::PropertyTemplate::Type::String);
+        const QRegularExpression rx((*it)->valueValidatorPattern());
+        QString coordinates = QLatin1String("123 456 789 000");
+        QRegularExpressionMatch match = rx.match(coordinates);
+        QVERIFY(match.capturedLength() == coordinates.length());
+        coordinates = QLatin1String("ABC 123");
+        match = rx.match(coordinates);
+        QVERIFY(match.capturedLength() != coordinates.length());
+        coordinates = QLatin1String("ABC_1");
+        match = rx.match(coordinates);
+        QVERIFY(match.capturedLength() != coordinates.length());
+        coordinates = QLatin1String("1_ABC");
+        match = rx.match(coordinates);
+        QVERIFY(match.capturedLength() != coordinates.length());
+        coordinates = QLatin1String("1_ABC");
+        match = rx.match(coordinates);
+        QVERIFY(match.capturedLength() != coordinates.length());
+        coordinates = QLatin1String("123 ABD 789 QAZ");
+        match = rx.match(coordinates);
+        QVERIFY(match.capturedLength() != coordinates.length());
+    }
 }
 
 QTEST_MAIN(tst_AttributesConfigure)

@@ -42,9 +42,10 @@ public:
     static QList<PropertyTemplate *> parseAttributesList(
             const QString &fromData, QString *errorMsg = nullptr, int *errorLine = nullptr, int *errorColumn = nullptr);
 
+    static QList<PropertyTemplate *> systemAttributes();
+
 private:
     PropertyTemplateConfig();
-    QList<PropertyTemplate *> systemAttributes() const;
 
     static PropertyTemplateConfig *m_instance;
 

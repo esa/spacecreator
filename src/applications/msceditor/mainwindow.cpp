@@ -46,27 +46,16 @@
 #include "ui/graphicsviewbase.h"
 #include "ui_mainwindow.h"
 
-#include <QActionGroup>
-#include <QApplication>
 #include <QClipboard>
 #include <QComboBox>
 #include <QDateTime>
-#include <QDebug>
 #include <QFileDialog>
-#include <QFileInfo>
-#include <QIcon>
 #include <QImageWriter>
 #include <QInputDialog>
-#include <QItemSelectionModel>
 #include <QKeyEvent>
-#include <QKeySequence>
 #include <QMessageBox>
-#include <QMetaEnum>
 #include <QMimeData>
-#include <QScreen>
-#include <QToolBar>
-#include <QUndoGroup>
-#include <QVector>
+#include <QtDebug>
 
 namespace msc {
 

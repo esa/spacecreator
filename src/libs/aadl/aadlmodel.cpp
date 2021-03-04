@@ -17,11 +17,11 @@
 
 #include "aadlmodel.h"
 
-#include "aadlnamevalidator.h"
 #include "aadlcomment.h"
 #include "aadlconnection.h"
 #include "aadlfunction.h"
 #include "aadlfunctiontype.h"
+#include "aadlnamevalidator.h"
 #include "common.h"
 #include "propertytemplate.h"
 #include "propertytemplateconfig.h"
@@ -47,7 +47,7 @@ AADLModel::AADLModel(PropertyTemplateConfig *dynPropConfig, QObject *parent)
     d->m_dynPropConfig = dynPropConfig;
 }
 
-AADLModel::~AADLModel() { }
+AADLModel::~AADLModel() {}
 
 void AADLModel::setSharedTypesModel(AADLModel *sharedTypesModel)
 {
@@ -162,7 +162,6 @@ void AADLModel::setRootObject(shared::Id rootId)
         return;
     }
 
-    const auto oldRootId = d->m_rootObjectId;
     d->m_rootObjectId = rootId;
     d->m_visibleObjects = visibleObjects(rootId);
 
@@ -204,8 +203,8 @@ AADLObject *AADLModel::getObjectByName(
 /*!
    Returns the first interface found, that has the given \p name and \p dir
  */
-AADLIface *AADLModel::getIfaceByName(const QString &name, AADLIface::IfaceType dir,
-        const AADLFunctionType *parent, Qt::CaseSensitivity caseSensitivity) const
+AADLIface *AADLModel::getIfaceByName(const QString &name, AADLIface::IfaceType dir, const AADLFunctionType *parent,
+        Qt::CaseSensitivity caseSensitivity) const
 {
     if (name.isEmpty()) {
         return nullptr;
@@ -227,8 +226,7 @@ AADLIface *AADLModel::getIfaceByName(const QString &name, AADLIface::IfaceType d
 /*!
    Returns all interfaces with the given \p name
  */
-QList<AADLIface *> AADLModel::getIfacesByName(
-        const QString &name, Qt::CaseSensitivity caseSensitivity) const
+QList<AADLIface *> AADLModel::getIfacesByName(const QString &name, Qt::CaseSensitivity caseSensitivity) const
 {
     QList<AADLIface *> result;
     if (name.isEmpty()) {
@@ -265,8 +263,7 @@ AADLFunctionType *AADLModel::getFunctionType(const shared::Id &id) const
     return qobject_cast<AADLFunction *>(getObject(id));
 }
 
-QHash<QString, AADLFunctionType *> AADLModel::getAvailableFunctionTypes(
-        const AADLFunction *fnObj) const
+QHash<QString, AADLFunctionType *> AADLModel::getAvailableFunctionTypes(const AADLFunction *fnObj) const
 {
     QHash<QString, AADLFunctionType *> result;
     if (!fnObj)
@@ -417,8 +414,8 @@ void AADLModel::clear()
    Returns the connection with the given \p interfaceName connection from function \p source to function \p target
    If no such connection is found, a nullptr is returned.
  */
-AADLConnection *AADLModel::getConnection(const QString &interfaceName, const QString &source,
-        const QString &target, Qt::CaseSensitivity caseSensitivity) const
+AADLConnection *AADLModel::getConnection(const QString &interfaceName, const QString &source, const QString &target,
+        Qt::CaseSensitivity caseSensitivity) const
 {
     for (AADLObject *obj : d->m_objects) {
         if (obj->isConnection()) {

@@ -37,6 +37,12 @@ namespace ivm {
 
 PropertyTemplateConfig *PropertyTemplateConfig::m_instance = nullptr;
 
+const static QString kSysAttrsConfigFilePath =
+        QLatin1String(":/defaults/interface/properties/resources/system_attributes.xml");
+
+const static QString kUserAttrsResourceConfigPath =
+        QLatin1String(":/defaults/interface/properties/resources/default_attributes.xml");
+
 /*!
    Adds all attributes from \p attrs that are not already in \a storage to that data
  */
@@ -89,45 +95,18 @@ PropertyTemplateConfig::PropertyTemplateConfig()
 {
 }
 
-QList<PropertyTemplate *> PropertyTemplateConfig::systemAttributes() const
+QList<PropertyTemplate *> PropertyTemplateConfig::systemAttributes()
 {
-    QList<PropertyTemplate *> templates;
-    PropertyTemplate::Scopes scopeAll;
-    scopeAll.setFlag(PropertyTemplate::Scope::All);
-    {
-        auto nameProp = new PropertyTemplate();
-        nameProp->setName("name");
-        nameProp->setType(PropertyTemplate::Type::String);
-        nameProp->setValueValidatorPattern("[a-zA-Z0-9_]+");
-        nameProp->setDefaultValue("AAAA");
-        nameProp->setScope(scopeAll);
-        nameProp->setInfo(PropertyTemplate::Info::Attribute);
-        templates.append(nameProp);
+    QFile f(kSysAttrsConfigFilePath);
+    if (!f.open(QIODevice::ReadOnly | QIODevice::Text)) {
+        qWarning() << "Can't open file:" << kSysAttrsConfigFilePath << f.errorString();
+        return {};
     }
-    {
-        auto valueProp = new PropertyTemplate();
-        valueProp->setName("value");
-        valueProp->setType(PropertyTemplate::Type::String);
-        valueProp->setValueValidatorPattern("[a-zA-Z0-9_]+");
-        valueProp->setDefaultValue("");
-        valueProp->setScope(scopeAll);
-        valueProp->setInfo(PropertyTemplate::Info::Attribute);
-        templates.append(valueProp);
+    QList<PropertyTemplate *> sysAttrs = parseAttributesList(QString::fromUtf8(f.readAll()));
+    for (auto attr : sysAttrs) {
+        attr->setSystem(true);
     }
-    {
-        auto kindProp = new PropertyTemplate();
-        kindProp->setName("kind");
-        kindProp->setType(PropertyTemplate::Type::Enumeration);
-        kindProp->setValuesList({ { "Cyclic" }, { "Sporadic" }, { "Protected" }, { "Unprotected" } });
-        kindProp->setDefaultValue("");
-        PropertyTemplate::Scopes scope;
-        scope.setFlag(PropertyTemplate::Scope::Provided_Interface);
-        scope.setFlag(PropertyTemplate::Scope::Required_Interface);
-        kindProp->setScope(scope);
-        kindProp->setInfo(PropertyTemplate::Info::Attribute);
-        templates.append(kindProp);
-    }
-    return templates;
+    return sysAttrs;
 }
 
 PropertyTemplateConfig *PropertyTemplateConfig::instance()
@@ -140,16 +119,11 @@ PropertyTemplateConfig *PropertyTemplateConfig::instance()
 
 PropertyTemplateConfig::~PropertyTemplateConfig() { }
 
-QString userResourceConfigPath()
-{
-    return QLatin1String(":/defaults/interface/properties/resources/default_attributes.xml");
-}
-
 static bool ensureFileExists(const QString &filePath)
 {
-    if (!QFileInfo::exists(filePath) && !shared::copyResourceFile(userResourceConfigPath(), filePath)) {
+    if (!QFileInfo::exists(filePath) && !shared::copyResourceFile(kUserAttrsResourceConfigPath, filePath)) {
         qWarning() << "Can't create default storage for properties/attributes" << filePath
-                   << "from:" << userResourceConfigPath();
+                   << "from:" << kUserAttrsResourceConfigPath;
         return false;
     }
     return true;
@@ -239,33 +213,29 @@ QHash<QString, PropertyTemplate *> PropertyTemplateConfig::propertyTemplatesForO
         }
 
         const auto scopesValidators = property->attrValidatorPatterns();
-        for (auto it = scopesValidators.constBegin(); it != scopesValidators.constEnd(); ++it) {
-            if (it.key() != scope) {
-                continue;
-            }
+        if (scopesValidators.isEmpty()) {
+            return true;
+        }
 
-            ///
+        const auto it = scopesValidators.constFind(scope);
+        if (it != scopesValidators.constEnd()) {
             auto checkPattern = [](const QHash<QString, QVariant> &data, const QString &name, const QString &pattern) {
                 auto objPropIter = data.constFind(name);
                 if (objPropIter != data.constEnd()) {
                     const QRegularExpression rx(pattern);
-                    const QRegularExpressionMatch match = rx.match(objPropIter.value().toString());
-                    if (!match.hasMatch())
-                        return false;
+                    const QString value = objPropIter.value().toString();
+                    const QRegularExpressionMatch match = rx.match(value);
+                    return match.capturedLength() == value.length();
                 }
                 return true;
             };
             /// TODO: add type into XML storage for AttrValidator (PropValidator)
             /// to lookup in appropriate data set
             /// Add mandatory attribute for combined checks
-            if (!checkPattern(obj->props(), it->first, it->second))
-                return false;
-
-            if (!checkPattern(obj->attrs(), it->first, it->second))
-                return false;
+            return checkPattern(obj->props(), it->first, it->second)
+                    && checkPattern(obj->attrs(), it->first, it->second);
         }
-
-        return true;
+        return false;
     };
     std::for_each(properties.constBegin(), properties.constEnd(), [&result, validate](PropertyTemplate *property) {
         if (validate(property))

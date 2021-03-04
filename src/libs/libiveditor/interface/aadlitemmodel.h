@@ -100,6 +100,7 @@ private Q_SLOTS:
 
 private:
     QGraphicsItem *createItemForObject(ivm::AADLObject *obj);
+    void initItem(ivm::AADLObject *object, QGraphicsItem *item);
     AADLFunctionGraphicsItem *rootItem() const;
     void updateItem(QGraphicsItem *item);
     void removeItemForObject(ivm::AADLObject *object);

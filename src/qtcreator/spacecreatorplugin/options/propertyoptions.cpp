@@ -17,6 +17,7 @@
 
 #include "propertyoptions.h"
 
+#include "baseitems/common/aadlutils.h"
 #include "interface/properties/propertytemplatewidget.h"
 #include "propertytemplateconfig.h"
 #include "spacecreatorpluginconstants.h"
@@ -36,7 +37,7 @@ QWidget *PropertyOptions::widget()
 {
     if (!m_widget) {
         auto config = ivm::PropertyTemplateConfig::instance();
-        config->init(ive::PropertyTemplateWidget::dynamicPropertiesFilePath());
+        config->init(ive::dynamicPropertiesFilePath());
         m_widget = new ive::PropertyTemplateWidget;
     }
     return m_widget;
@@ -46,7 +47,7 @@ void PropertyOptions::apply()
 {
     m_widget->save();
     auto config = ivm::PropertyTemplateConfig::instance();
-    config->init(ive::PropertyTemplateWidget::dynamicPropertiesFilePath());
+    config->init(ive::dynamicPropertiesFilePath());
 }
 
 void PropertyOptions::finish()

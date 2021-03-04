@@ -34,7 +34,7 @@
     </Attr>
     <Attr name="period">
         <Type>
-            <String validator="\\d+"/>
+            <String validator="\d+"/>
         </Type>
         <Scopes>
             <Required_Interface>
@@ -47,7 +47,7 @@
     </Attr>
     <Attr name="wcet">
         <Type>
-            <String validator="\\d+"/>
+            <String validator="\d+"/>
         </Type>
         <Scopes>
             <Required_Interface>
@@ -60,7 +60,7 @@
     </Attr>
     <Attr name="queue_size">
         <Type>
-            <String validator="\\d+"/>
+            <String validator="\d+"/>
         </Type>
         <Scopes>
             <Required_Interface>

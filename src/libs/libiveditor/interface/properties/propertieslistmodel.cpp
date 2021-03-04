@@ -31,6 +31,7 @@
 #include "propertytemplateconfig.h"
 
 #include <QDebug>
+#include <QRegularExpression>
 #include <algorithm>
 
 namespace ive {
@@ -60,7 +61,7 @@ PropertiesListModel::PropertiesListModel(
 {
 }
 
-PropertiesListModel::~PropertiesListModel() {}
+PropertiesListModel::~PropertiesListModel() { }
 
 void PropertiesListModel::updateRow(int row, const QString &label, const QString &name,
         ivm::PropertyTemplate::Info info, const QVariant &value, const QVariant &editValue, const QVariant &defaulValue)
@@ -70,12 +71,12 @@ void PropertiesListModel::updateRow(int row, const QString &label, const QString
     const QString title = label.isEmpty() ? name : label;
     if (row == -1 || row >= rowCount()) {
         row = rowCount();
-        createNewRow(row, title);
+        createNewRow(row, name);
     }
 
     QStandardItem *titleItem = item(row, ColumnTitle);
     titleItem->setData(title, Qt::DisplayRole);
-    titleItem->setData(title, Qt::EditRole);
+    titleItem->setData(name, Qt::EditRole);
     titleItem->setData(name, PropertyNameRole);
 
     QStandardItem *valueItem = item(row, ColumnValue);
@@ -102,27 +103,12 @@ void PropertiesListModel::createNewRow(int row, const QString &name)
 
 void PropertiesListModel::invalidateAttributes(const QString &propName)
 {
+    Q_UNUSED(propName);
+
     if (!m_dataObject)
         return;
 
-    if (propName == ivm::meta::Props::token(ivm::meta::Props::Token::name) && m_dataObject->isRequiredInterface()) {
-        const QString autonameToken = ivm::meta::Props::token(ivm::meta::Props::Token::Autonamed);
-        const auto templates = m_propTemplatesConfig->propertyTemplatesForObject(m_dataObject);
-        auto propertyPtr = templates.value(autonameToken);
-        QVariant value;
-        if (propertyPtr->type() == ivm::PropertyTemplate::Type::Unknown) {
-            return;
-        } else if (propertyPtr->type() == ivm::PropertyTemplate::Type::Enumeration) {
-            value = propertyPtr->valuesList();
-        } else {
-            value = propertyPtr->info() == ivm::PropertyTemplate::Info::Property ? m_dataObject->prop(autonameToken)
-                                                                                 : m_dataObject->attr(autonameToken);
-        }
-        const int row = m_names.indexOf(autonameToken);
-        updateRow(row, propertyPtr->label(), autonameToken, propertyPtr->info(), value,
-                ivm::PropertyTemplate::convertData(propertyPtr->valuesList(), propertyPtr->type()),
-                propertyPtr->defaultValue());
-    }
+    setDataObject(m_dataObject);
 }
 
 void PropertiesListModel::updateRows(const QHash<QString, ivm::PropertyTemplate *> &templates)
@@ -133,8 +119,8 @@ void PropertiesListModel::updateRows(const QHash<QString, ivm::PropertyTemplate 
         std::sort(keys.begin(), keys.end());
         for (int i = 0; i < keys.size(); ++i) {
             const QString key = keys.at(i);
-            const auto propertyPtr = templates.value(key);
-            if (propertyPtr && !propertyPtr->isVisible())
+            const ivm::PropertyTemplate *propertyPtr = templates.value(key);
+            if (!propertyPtr || !propertyPtr->isVisible())
                 continue;
 
             const QVariant propTemplatesValues = propertyPtr ? propertyPtr->valuesList() : QVariant();
@@ -153,7 +139,7 @@ void PropertiesListModel::updateRows(const QHash<QString, ivm::PropertyTemplate 
     initRows(m_dataObject->attrs(), ivm::PropertyTemplate::Info::Attribute, templates);
     initRows(m_dataObject->props(), ivm::PropertyTemplate::Info::Property, templates);
 
-    for (auto propertyPtr : templates) {
+    for (ivm::PropertyTemplate *propertyPtr : templates) {
         if (propertyPtr && !m_names.contains(propertyPtr->name()) && propertyPtr->isVisible()) {
             const QString key = propertyPtr->name();
             QVariant value;
@@ -196,9 +182,7 @@ void PropertiesListModel::setDataObject(ivm::AADLObject *obj)
 
     const auto templates = m_propTemplatesConfig->propertyTemplatesForObject(m_dataObject);
 
-    beginResetModel();
     updateRows(templates);
-    endResetModel();
 }
 
 const ivm::AADLObject *PropertiesListModel::dataObject() const
@@ -266,6 +250,19 @@ bool PropertiesListModel::setData(const QModelIndex &index, const QVariant &valu
 
     if (role == Qt::EditRole) {
         const QString &name = this->index(index.row(), ColumnTitle).data(PropertyNameRole).toString();
+        auto isValueValid = [this](const QString &name, const QString &value) {
+            const auto templates = m_propTemplatesConfig->propertyTemplatesForObject(m_dataObject);
+            if (ivm::PropertyTemplate *propTemplate = templates.value(name)) {
+                const QString valuePattern = propTemplate->valueValidatorPattern();
+                if (!valuePattern.isEmpty()) {
+                    const QRegularExpression rx(valuePattern);
+                    const QRegularExpressionMatch match = rx.match(value);
+                    return match.capturedLength() == valuePattern.length();
+                }
+            }
+            return true;
+        };
+
         if (isAttr(index) && index.column() == ColumnValue) {
             QVariant attributeValue = value;
             switch (tokenFromIndex(index)) {
@@ -281,17 +278,33 @@ bool PropertiesListModel::setData(const QModelIndex &index, const QVariant &valu
                 break;
             }
 
+            if (m_dataObject->attr(name) == attributeValue) {
+                return false;
+            }
+
+            if (!isValueValid(name, attributeValue.toString())) {
+                return false;
+            }
+
             const QVariantHash attributes = { { name, attributeValue } };
             auto attributesCmd = new cmd::CmdEntityAttributeChange(m_dataObject, attributes);
             m_cmdMacro->push(attributesCmd);
+            return true;
         } else if (isProp(index)) {
             switch (index.column()) {
             case ColumnValue: {
+                if (m_dataObject->prop(name) == value) {
+                    return false;
+                }
+
+                if (!isValueValid(name, value.toString())) {
+                    return false;
+                }
+
                 const QVariantHash props = { { name, value } };
                 auto propsCmd = new cmd::CmdEntityPropertyChange(m_dataObject, props);
                 m_cmdMacro->push(propsCmd);
-
-                break;
+                return true;
             }
             case ColumnTitle: {
                 const QString &newName = value.toString();
@@ -305,7 +318,7 @@ bool PropertiesListModel::setData(const QModelIndex &index, const QVariant &valu
                     m_names.replace(idx, newName);
                 }
                 QStandardItemModel::setData(index, newName, PropertyNameRole);
-                break;
+                return true;
             }
             default: {
                 qWarning() << "Invalid column:" << index.column();
@@ -316,7 +329,9 @@ bool PropertiesListModel::setData(const QModelIndex &index, const QVariant &valu
     }
 
     QStandardItemModel::setData(index, value, role);
-    Q_EMIT dataChanged(index, index, { role, Qt::DisplayRole });
+    if (role != Qt::DisplayRole) {
+        Q_EMIT dataChanged(index, index, { role, Qt::DisplayRole });
+    }
     return true;
 }
 

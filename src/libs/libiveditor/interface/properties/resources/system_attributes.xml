@@ -1,0 +1,79 @@
+<Attrs>
+    <Attr name="is_type">
+        <Type>
+            <Enumeration defaultValue="NO">
+                <Entry value="YES"/>
+                <Entry value="NO"/>
+            </Enumeration>
+        </Type>
+        <Scopes>
+            <Function/>
+        </Scopes>
+    </Attr>
+    <Attr name="instance_of">
+        <Type>
+            <String validator="[a-zA-Z_]+[\d\w]*"/>
+        </Type>
+        <Scopes>
+            <Function>
+                <AttrValidator name="is_type" value="False"/>
+            </Function>
+        </Scopes>
+    </Attr>
+    <Attr name="name">
+        <Type>
+            <String validator="[a-zA-Z_]+[\d\w]*"/>
+        </Type>
+    </Attr>
+    <Attr name="kind">
+        <Type>
+            <Enumeration defaultValue="Sporadic">
+                <Entry value="Any"/>
+                <Entry value="Cyclic"/>
+                <Entry value="Sporadic"/>
+                <Entry value="Protected"/>
+                <Entry value="Unprotected"/>
+            </Enumeration>
+        </Type>
+        <Scopes>
+            <Required_Interface/>
+            <Provided_Interface/>
+        </Scopes>
+    </Attr>
+    <Attr name="Taste::coordinates" type="property" visible="false">
+        <Type>
+            <String validator="[0-9 ]+"/>
+        </Type>
+        <Scopes/>
+    </Attr>
+    <Attr name="Taste::InnerCoordinates" type="property" visible="false">
+        <Type>
+            <String validator="[0-9 ]+"/>
+        </Type>
+        <Scopes/>
+    </Attr>
+    <Attr name="Taste::RootCoordinates" type="property" visible="false">
+        <Type>
+            <String validator="[0-9 ]+"/>
+        </Type>
+        <Scopes>
+            <Function/>
+        </Scopes>
+    </Attr>
+    <Attr name="Taste::InheritPI" type="property">
+        <Type>
+            <Boolean/>
+        </Type>
+        <Scopes>
+            <Required_Interface/>
+        </Scopes>
+    </Attr>
+    <Attr name="Taste::Autonamed" type="property">
+        <Type>
+            <Boolean defaultValue="True"/>
+        </Type>
+        <Scopes>
+            <Required_Interface/>
+        </Scopes>
+    </Attr>
+</Attrs>

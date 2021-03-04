@@ -29,8 +29,10 @@
 #include "interface/aadlinterfacegraphicsitem.h"
 
 #include <QDebug>
+#include <QDir>
 #include <QGraphicsView>
 #include <QMetaEnum>
+#include <QStandardPaths>
 #include <QtGlobal>
 #include <QtMath>
 
@@ -929,14 +931,14 @@ bool isOnVerticalSide(const QRectF &rect, const QPointF &point)
 {
     return (qFuzzyCompare(rect.left(), point.x()) || qFuzzyCompare(rect.right(), point.x()))
             && ((rect.top() < point.y() && rect.bottom() > point.y()) || qFuzzyCompare(rect.top(), point.y())
-                    || qFuzzyCompare(rect.bottom(), point.y()));
+                       || qFuzzyCompare(rect.bottom(), point.y()));
 }
 
 bool isOnHorizontalSide(const QRectF &rect, const QPointF &point)
 {
     return (qFuzzyCompare(rect.top(), point.y()) || qFuzzyCompare(rect.bottom(), point.y()))
             && ((rect.left() < point.x() && rect.right() > point.x()) || qFuzzyCompare(rect.left(), point.x())
-                    || qFuzzyCompare(rect.right(), point.x()));
+                       || qFuzzyCompare(rect.right(), point.x()));
 }
 
 bool rectContainsPoint(const QRectF &rect, const QPointF &point, bool proper)
@@ -1026,6 +1028,30 @@ QList<QRectF> siblingSceneRects(QGraphicsItem *item)
             existingRects.append(graphicsItem->sceneBoundingRect());
     }
     return existingRects;
+}
+
+QString dynamicPropertiesFilePath()
+{
+    static const QString kDefaultPath = QStandardPaths::writableLocation(QStandardPaths::AppLocalDataLocation)
+            + QDir::separator() + QLatin1String("default_attributes.xml");
+
+    return qEnvironmentVariable("TASTE_DEFAULT_ATTRIBUTES_PATH", kDefaultPath);
+}
+
+QString componentsLibraryPath()
+{
+    static const QString kDefaultPath = QStandardPaths::writableLocation(QStandardPaths::AppLocalDataLocation)
+            + QDir::separator() + QLatin1String("components_library") + QDir::separator();
+
+    return qEnvironmentVariable("TASTE_COMPONENTS_LIBRARY", kDefaultPath);
+}
+
+QString sharedTypesPath()
+{
+    static const QString kDefaultPath = QStandardPaths::writableLocation(QStandardPaths::AppLocalDataLocation)
+            + QDir::separator() + QLatin1String("shared_types") + QDir::separator();
+
+    return qEnvironmentVariable("TASTE_SHARED_TYPES", kDefaultPath);
 }
 
 } // namespace ive

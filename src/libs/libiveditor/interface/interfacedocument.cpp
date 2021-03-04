@@ -68,24 +68,6 @@
 
 namespace ive {
 
-static const QString kDefaultFilename { QLatin1String("interfaceview.xml") };
-
-static inline QString componentsLibraryPath()
-{
-    static const QString kDefaultPath = QStandardPaths::writableLocation(QStandardPaths::AppLocalDataLocation)
-            + QDir::separator() + QLatin1String("components_library") + QDir::separator();
-
-    return qEnvironmentVariable("TASTE_COMPONENTS_LIBRARY", kDefaultPath);
-}
-
-static inline QString sharedTypesPath()
-{
-    static const QString kDefaultPath = QStandardPaths::writableLocation(QStandardPaths::AppLocalDataLocation)
-            + QDir::separator() + QLatin1String("shared_types") + QDir::separator();
-
-    return qEnvironmentVariable("TASTE_SHARED_TYPES", kDefaultPath);
-}
-
 struct InterfaceDocument::InterfaceDocumentPrivate {
     cmd::CommandsStack *commandsStack { nullptr };
 
@@ -135,7 +117,7 @@ InterfaceDocument::InterfaceDocument(QObject *parent)
             [this](bool clean) { Q_EMIT dirtyChanged(!clean); });
 
     d->dynPropConfig = ivm::PropertyTemplateConfig::instance();
-    d->dynPropConfig->init(PropertyTemplateWidget::dynamicPropertiesFilePath());
+    d->dynPropConfig->init(ive::dynamicPropertiesFilePath());
 
     d->importModel = new ivm::AADLModel(d->dynPropConfig, this);
     d->sharedModel = new ivm::AADLModel(d->dynPropConfig, this);
@@ -278,13 +260,13 @@ bool InterfaceDocument::loadAvailableComponents()
     bool result = true;
 
     d->importModel->clear();
-    QDirIterator importableIt(componentsLibraryPath(), QDir::Dirs | QDir::NoDotAndDotDot);
+    QDirIterator importableIt(ive::componentsLibraryPath(), QDir::Dirs | QDir::NoDotAndDotDot);
     while (importableIt.hasNext()) {
         result |= loadComponentModel(d->importModel, importableIt.next() + QDir::separator() + kDefaultFilename);
     }
 
     d->sharedModel->clear();
-    QDirIterator instantiatableIt(sharedTypesPath(), QDir::Dirs | QDir::NoDotAndDotDot);
+    QDirIterator instantiatableIt(ive::sharedTypesPath(), QDir::Dirs | QDir::NoDotAndDotDot);
     while (instantiatableIt.hasNext()) {
         result |= loadComponentModel(d->sharedModel, instantiatableIt.next() + QDir::separator() + kDefaultFilename);
     }

@@ -42,8 +42,6 @@ public:
 
     bool hasError() const;
 
-    static QString dynamicPropertiesFilePath();
-
 Q_SIGNALS:
     void hasErrorChanged();
 
