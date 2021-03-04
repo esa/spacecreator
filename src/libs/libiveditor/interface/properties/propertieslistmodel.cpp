@@ -257,7 +257,7 @@ bool PropertiesListModel::setData(const QModelIndex &index, const QVariant &valu
                 if (!valuePattern.isEmpty()) {
                     const QRegularExpression rx(valuePattern);
                     const QRegularExpressionMatch match = rx.match(value);
-                    return match.capturedLength() == valuePattern.length();
+                    return match.capturedLength() == value.length();
                 }
             }
             return true;
