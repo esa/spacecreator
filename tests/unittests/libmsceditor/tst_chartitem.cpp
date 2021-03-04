@@ -17,6 +17,7 @@
 
 #include "chartitem.h"
 #include "mscchart.h"
+#include "sharedlibrary.h"
 
 #include <QScopedPointer>
 #include <QtTest>
@@ -36,6 +37,7 @@ void tst_ChartItem::testChartName()
     static const QLatin1String name1("name1");
     static const QLatin1String name2("name2");
 
+    shared::initSharedLibrary();
     using namespace msc;
 
     QScopedPointer<MscChart> chart(new MscChart());

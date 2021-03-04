@@ -20,6 +20,7 @@
 #include "baseitems/common/objectslink.h"
 #include "instanceitem.h"
 #include "mscinstance.h"
+#include "sharedlibrary.h"
 
 #include <QGraphicsScene>
 #include <QtTest>
@@ -51,6 +52,7 @@ private:
 
 void tst_ObjectsLink::init()
 {
+    shared::initSharedLibrary();
     m_scene = new QGraphicsScene();
 
     m_itemA = new InstanceItem(new MscInstance("A", this), nullptr);

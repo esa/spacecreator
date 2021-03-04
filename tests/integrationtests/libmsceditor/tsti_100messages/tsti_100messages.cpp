@@ -24,6 +24,7 @@
 #include "msccommandsstack.h"
 #include "mscinstance.h"
 #include "mscmessage.h"
+#include "sharedlibrary.h"
 #include "syntheticinteraction.h"
 
 #include <QGraphicsScene>
@@ -71,6 +72,7 @@ constexpr bool tsti100messages::SkipBenchmark;
 
 void tsti100messages::initTestCase()
 {
+    shared::initSharedLibrary();
     vstest::saveMousePosition();
 
     m_undoStack.reset(new msc::MscCommandsStack);

@@ -17,6 +17,7 @@
 
 #include "instanceitem.h"
 #include "mscinstance.h"
+#include "sharedlibrary.h"
 
 #include <QtTest>
 
@@ -39,6 +40,7 @@ private:
 
 void tst_InstanceItem::init()
 {
+    shared::initSharedLibrary();
     m_instance = new MscInstance("INST1");
     m_instanceItem = new InstanceItem(m_instance, nullptr);
     m_instanceItem->setName(m_instance->name());

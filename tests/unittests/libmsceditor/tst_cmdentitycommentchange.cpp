@@ -20,6 +20,7 @@
 #include "mscchart.h"
 #include "msccommandsstack.h"
 #include "msccomment.h"
+#include "sharedlibrary.h"
 
 #include <QScopedPointer>
 #include <QVariant>
@@ -48,6 +49,7 @@ private:
 
 void tst_CmdEntityCommentChange::init()
 {
+    shared::initSharedLibrary();
     m_chart.reset(new msc::MscChart());
     m_undoStack.reset(new msc::MscCommandsStack);
     m_layoutManager.reset(new msc::ChartLayoutManager(m_undoStack.data()));

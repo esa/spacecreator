@@ -23,6 +23,7 @@
 #include "mscchart.h"
 #include "msccommandsstack.h"
 #include "mscinstance.h"
+#include "sharedlibrary.h"
 
 #include <QGraphicsScene>
 #include <QtTest>
@@ -60,6 +61,8 @@ private:
 
 void tst_ArrowItem::initTestCase()
 {
+    shared::initSharedLibrary();
+
     m_undoStack.reset(new msc::MscCommandsStack);
     m_model.reset(new ChartLayoutManager(m_undoStack.data()));
     m_chart.reset(new msc::MscChart);

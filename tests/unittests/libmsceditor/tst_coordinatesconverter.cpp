@@ -17,6 +17,7 @@
 
 #include "baseitems/common/coordinatesconverter.h"
 #include "chartitem.h"
+#include "sharedlibrary.h"
 
 #include <QGraphicsScene>
 #include <QObject>
@@ -33,6 +34,7 @@ private:
 
 void tst_CoordinatesConverter::testConversionCycle()
 {
+    shared::initSharedLibrary();
     QGraphicsView view;
     view.setGeometry(10, 10, 400, 400);
     QGraphicsScene scene;

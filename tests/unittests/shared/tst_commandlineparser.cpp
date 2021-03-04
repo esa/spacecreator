@@ -18,6 +18,7 @@
 #include "commandlineparser.h"
 #include "iveditorcore.h"
 #include "msceditorcore.h"
+#include "sharedlibrary.h"
 
 #include <QtTest>
 
@@ -50,6 +51,7 @@ private Q_SLOTS:
     void testCmdArgumentOpenStringTemplateFile();
     void testCmdArgumentExportToFile();
 
+    void initTestCase();
     void testCoverage();
 
 private:
@@ -203,6 +205,11 @@ void tst_CommandLineParser::testCmdArgumentExportToFile()
 
     const QString argFromParserAADL(parserAADL.value(CommandLineParser::Positional::ExportToFile));
     QCOMPARE(argFromParserAADL, fileName);
+}
+
+void tst_CommandLineParser::initTestCase()
+{
+    shared::initSharedLibrary();
 }
 
 void tst_CommandLineParser::testCoverage()

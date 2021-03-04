@@ -18,6 +18,7 @@
 #include "chartviewtestbase.h"
 #include "instanceitem.h"
 #include "messageitem.h"
+#include "sharedlibrary.h"
 #include "syntheticinteraction.h"
 
 #include <QtTest>
@@ -29,7 +30,11 @@ class tsti_MessageItem : public ChartViewTestBase
     Q_OBJECT
 
 private Q_SLOTS:
-    void initTestCase() { initTestCaseBase(); }
+    void initTestCase()
+    {
+        shared::initSharedLibrary();
+        initTestCaseBase();
+    }
     void init() { initBase(); }
     void cleanup() { cleanupBase(); }
 

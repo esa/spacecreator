@@ -26,6 +26,7 @@
 #include "mscmessage.h"
 #include "mscmodel.h"
 #include "mscreader.h"
+#include "sharedlibrary.h"
 #include "syntheticinteraction.h"
 
 #include <QGraphicsScene>
@@ -136,6 +137,7 @@ void tst_MessageItem::addCreate()
 
 void tst_MessageItem::init()
 {
+    shared::initSharedLibrary();
     vstest::saveMousePosition();
 
     m_undoStack.reset(new msc::MscCommandsStack);

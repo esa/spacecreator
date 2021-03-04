@@ -33,6 +33,7 @@
 #include "mscmodel.h"
 #include "mscreader.h"
 #include "msctimer.h"
+#include "sharedlibrary.h"
 #include "timeritem.h"
 
 #include <QDebug>
@@ -101,6 +102,7 @@ void tst_ChartLayoutManager::parseMsc(const QString &mscText)
 
 void tst_ChartLayoutManager::init()
 {
+    shared::initSharedLibrary();
     initBase();
 }
 

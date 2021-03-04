@@ -20,6 +20,7 @@
 #include "messageitem.h"
 #include "mscmessage.h"
 #include "msctimer.h"
+#include "sharedlibrary.h"
 #include "syntheticinteraction.h"
 #include "timeritem.h"
 
@@ -32,7 +33,11 @@ class tsti_TimerItem : public ChartViewTestBase
     Q_OBJECT
 
 private Q_SLOTS:
-    void initTestCase() { initTestCaseBase(); }
+    void initTestCase()
+    {
+        shared::initSharedLibrary();
+        initTestCaseBase();
+    }
     void init() { initBase(); }
     void cleanup() { cleanupBase(); }
 

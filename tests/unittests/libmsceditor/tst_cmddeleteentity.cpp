@@ -23,6 +23,7 @@
 #include "mscdocument.h"
 #include "mscmessage.h"
 #include "mscmodel.h"
+#include "sharedlibrary.h"
 
 #include <QtTest>
 
@@ -41,6 +42,7 @@ private Q_SLOTS:
 
 void tst_CmdDeleteEntity::init()
 {
+    shared::initSharedLibrary();
     initBase();
 }
 

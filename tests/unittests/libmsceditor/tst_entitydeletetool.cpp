@@ -21,6 +21,7 @@
 #include "mscchart.h"
 #include "msccoregion.h"
 #include "mscmodel.h"
+#include "sharedlibrary.h"
 #include "tools/entitydeletetool.h"
 
 #include <QGraphicsView>
@@ -40,6 +41,7 @@ private Q_SLOTS:
 
 void tst_EntityDeleteTool::init()
 {
+    shared::initSharedLibrary();
     initBase();
 }
 

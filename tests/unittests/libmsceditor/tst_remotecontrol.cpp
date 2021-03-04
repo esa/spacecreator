@@ -28,6 +28,7 @@
 #include "mscmodel.h"
 #include "remotecontrolhandler.h"
 #include "remotecontrolwebserver.h"
+#include "sharedlibrary.h"
 
 #include <QCoreApplication>
 #include <QGraphicsScene>
@@ -58,6 +59,7 @@ public:
 private Q_SLOTS:
     void initTestCase()
     {
+        shared::initSharedLibrary();
         m_view.setScene(m_model->graphicsScene());
         msc::CoordinatesConverter::init(m_model->graphicsScene(), &m_chartItem);
         auto converter = msc::CoordinatesConverter::instance();

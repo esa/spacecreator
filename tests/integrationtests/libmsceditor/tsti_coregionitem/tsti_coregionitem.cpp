@@ -30,6 +30,7 @@
 #include "mscinstance.h"
 #include "mscmessage.h"
 #include "mscmodel.h"
+#include "sharedlibrary.h"
 #include "syntheticinteraction.h"
 #include "ui/grippointshandler.h"
 
@@ -43,7 +44,11 @@ class tsti_CoregionItem : public ChartViewTestBase
     Q_OBJECT
 
 private Q_SLOTS:
-    void initTestCase() { initTestCaseBase(); }
+    void initTestCase()
+    {
+        shared::initSharedLibrary();
+        initTestCaseBase();
+    }
     void init() { initBase(); }
     void cleanup() { cleanupBase(); }
 

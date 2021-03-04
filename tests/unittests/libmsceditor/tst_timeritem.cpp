@@ -20,6 +20,7 @@
 #include "msccommandsstack.h"
 #include "mscinstance.h"
 #include "msctimer.h"
+#include "sharedlibrary.h"
 #include "timeritem.h"
 
 #include <QScopedPointer>
@@ -52,6 +53,8 @@ private:
 
 void tst_TimerItem::init()
 {
+    shared::initSharedLibrary();
+
     m_undoStack.reset(new msc::MscCommandsStack);
     m_model = new ChartLayoutManager(m_undoStack.data());
     m_instance = new MscInstance;

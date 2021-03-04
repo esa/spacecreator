@@ -18,6 +18,7 @@
 #include "baseitems/common/objectanchor.h"
 #include "instanceitem.h"
 #include "mscinstance.h"
+#include "sharedlibrary.h"
 
 #include <QGraphicsScene>
 #include <QtTest>
@@ -49,6 +50,7 @@ private:
 
 void tst_ObjectAnchor::init()
 {
+    shared::initSharedLibrary();
     m_scene = new QGraphicsScene();
     m_instanceItemA = new InstanceItem(new MscInstance("InstA", this), nullptr);
     m_instanceItemB = new InstanceItem(new MscInstance("InstB", this), nullptr);
