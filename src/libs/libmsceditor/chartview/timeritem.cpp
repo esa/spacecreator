@@ -78,13 +78,6 @@ MscTimer *TimerItem::modelItem() const
     return m_timer;
 }
 
-void TimerItem::connectObjects(InstanceItem *instance, qreal y)
-{
-    setY(y);
-    setInstance(instance);
-    scheduleLayoutUpdate();
-}
-
 void TimerItem::setInstance(InstanceItem *instance)
 {
     if (instance == m_instance) {

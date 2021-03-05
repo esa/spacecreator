@@ -43,7 +43,7 @@ public:
 
     QPainterPath shape() const override;
 
-    void connectObjects(InstanceItem *instance, qreal y, const QRectF &instancesRect);
+    void setInstance(InstanceItem *instance);
 
     static ConditionItem *createDefaultItem(
             MscCondition *condition, ChartLayoutManager *chartLayoutManager, const QPointF &pos);
@@ -66,9 +66,6 @@ protected:
     void onManualMoveFinish(shared::ui::GripPoint *gp, const QPointF &from, const QPointF &to) override;
 
     void initGripPoints() override;
-
-private:
-    void setInstance(InstanceItem *instance);
 
 private:
     MscCondition *m_condition = nullptr;

@@ -151,7 +151,7 @@ private Q_SLOTS:
 private:
     std::unique_ptr<ChartLayoutManagerPrivate> const d;
 
-    QVector<QGraphicsObject *> instanceEventItems(MscInstance *instance) const;
+    QVector<InteractiveObject *> instanceEventItems(MscInstance *instance) const;
 
     void checkHorizontalConstraints();
     void checkVerticalConstraints();

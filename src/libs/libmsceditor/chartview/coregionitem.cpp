@@ -186,12 +186,6 @@ void CoregionItem::onManualResizeFinish(shared::ui::GripPoint *gp, const QPointF
     Q_EMIT moved(this);
 }
 
-void CoregionItem::connectObjects(InstanceItem *instance, qreal y)
-{
-    setY(y);
-    setInstance(instance);
-}
-
 void CoregionItem::setInstance(InstanceItem *instance)
 {
     if (instance == m_instance)

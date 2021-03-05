@@ -224,6 +224,7 @@ void InteractiveObjectBase::instantLayoutUpdate()
 
     rebuildLayout();
     d->layoutDirty = false;
+    d->rebuildLayoutSignal->stop();
 
     if (oldBounds != boundingRect()) {
         Q_EMIT boundingBoxChanged();

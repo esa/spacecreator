@@ -24,6 +24,11 @@ void DelayedSignal::setInterval(int msec)
     m_timer->setInterval(msec);
 }
 
+void DelayedSignal::stop()
+{
+    m_timer->stop();
+}
+
 void DelayedSignal::triggerNow()
 {
     Q_EMIT triggered(parent());

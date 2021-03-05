@@ -56,7 +56,7 @@ public:
     MscInstance *instanceByName(const QString &name) const;
 
     const QVector<MscInstanceEvent *> &instanceEvents() const;
-    QVector<MscInstanceEvent *> eventsForInstance(MscInstance *instance) const;
+    QVector<MscInstanceEvent *> eventsForInstance(const MscInstance *instance) const;
     int addInstanceEvent(MscInstanceEvent *instanceEvent, int eventIndex = -1);
     void removeInstanceEvent(MscInstanceEvent *instanceEvent);
     int indexofEvent(MscInstanceEvent *instanceEvent) const;

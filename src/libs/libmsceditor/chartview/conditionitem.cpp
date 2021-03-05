@@ -80,16 +80,6 @@ QPainterPath ConditionItem::shape() const
     return result;
 }
 
-void ConditionItem::connectObjects(InstanceItem *instance, qreal y, const QRectF &instancesRect)
-{
-    m_InstancesRect = instancesRect;
-
-    setY(y);
-    setInstance(instance);
-
-    rebuildLayout();
-}
-
 void ConditionItem::setInstancesRect(const QRectF &instancesRect)
 {
     if (!modelItem()->shared()) {

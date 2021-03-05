@@ -160,7 +160,7 @@ const QVector<MscInstanceEvent *> &MscChart::instanceEvents() const
     return m_instanceEvents;
 }
 
-QVector<MscInstanceEvent *> MscChart::eventsForInstance(MscInstance *instance) const
+QVector<MscInstanceEvent *> MscChart::eventsForInstance(const MscInstance *instance) const
 {
     QVector<MscInstanceEvent *> events;
     if (instance)

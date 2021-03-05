@@ -40,7 +40,6 @@ public:
 
     void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget) override;
 
-    void connectObjects(InstanceItem *instance, qreal y);
     void setInstance(InstanceItem *instance);
 
 protected:

@@ -103,12 +103,6 @@ MscAction *ActionItem::modelItem() const
     return m_action;
 }
 
-void ActionItem::connectObjects(InstanceItem *instance, qreal y)
-{
-    setY(y);
-    setInstance(instance);
-}
-
 /*!
  * \brief ActionItem::setInstance Update the instance this action is placed on
  * \param instance

@@ -28,6 +28,8 @@ public Q_SLOTS:
     //! Update the delay to /a msec. Default is 0.
     void setInterval(int msec);
 
+    void stop();
+
 private Q_SLOTS:
     void triggerNow();
 

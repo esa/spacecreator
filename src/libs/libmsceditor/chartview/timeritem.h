@@ -42,7 +42,6 @@ public:
 
     MscTimer *modelItem() const;
 
-    void connectObjects(InstanceItem *instance, qreal y);
     void setInstance(InstanceItem *instance);
 
     void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget = nullptr) override;

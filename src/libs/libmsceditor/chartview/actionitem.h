@@ -36,7 +36,6 @@ public:
 
     MscAction *modelItem() const;
 
-    void connectObjects(InstanceItem *instance, qreal y);
     void setInstance(InstanceItem *instance);
 
     void applyCif() override;
