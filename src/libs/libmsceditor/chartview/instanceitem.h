@@ -77,12 +77,7 @@ public:
     void postCreatePolishing() override;
 
     void applyCif() override;
-
     void updateCif() override;
-
-    QPointF avoidOverlaps(InstanceItem *caller, const QPointF &delta, const QRectF &shiftedRect) const;
-
-    void setInitialXLocation(const QPointF &requested, const QRectF &chartRect, qreal horSpan);
 
     QRectF kindBox() const;
 

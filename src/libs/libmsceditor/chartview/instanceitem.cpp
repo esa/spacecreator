@@ -98,6 +98,9 @@ InstanceItem::InstanceItem(
                 &msc::InstanceItem::checkAadlFunction);
     }
 
+    setDenominatorAndKind(instance->denominatorAndKind());
+    setName(instance->name());
+
     scheduleLayoutUpdate();
 }
 
@@ -193,7 +196,6 @@ void InstanceItem::rebuildLayout()
 
     if (!qFuzzyIsNull(xOffset)) {
         moveSilentlyBy(QPointF(xOffset, 0));
-        avoidOverlaps(this, QPointF(xOffset, 0), QRectF());
         if (geometryManagedByCif())
             updateCif();
         Q_EMIT needUpdateLayout();
@@ -212,32 +214,6 @@ void InstanceItem::syncHeightToChartBox()
     const qreal deltaH = getChartContentBox().bottom() - sceneBoundingRect().bottom();
     if (!qFuzzyIsNull(deltaH)) {
         setAxisHeight(axisHeight() + deltaH);
-    }
-}
-
-/**
-    Applies the x-position of the instance if it is stored in the CIF information.
-    The y-values are ignored
- */
-void InstanceItem::applyCif()
-{
-    if (const cif::CifBlockShared &cifBlock = cifBlockByType(mainCifType())) {
-        const QVector<QPoint> &cifPoints = cifBlock->payload().value<QVector<QPoint>>();
-        if (cifPoints.size() == 3) {
-            bool converted(false);
-            const QVector<QPointF> &scenePoints = CoordinatesConverter::cifToScene(cifPoints, &converted);
-
-            const QPointF &textBoxTopLeft = scenePoints.at(0);
-            const QPointF &textBoxSize = scenePoints.at(1);
-
-            m_headSymbol->setTextboxSize({ textBoxSize.x(), textBoxSize.y() });
-            const QRectF currTextBox = m_headSymbol->textBoxSceneRect();
-            const QPointF shift = textBoxTopLeft - currTextBox.topLeft();
-            // TODO: should we check for overlap here?
-            moveBy(shift.x(), 0.0); // Only apply the horizontal value
-
-            rebuildLayout();
-        }
     }
 }
 
@@ -401,6 +377,32 @@ bool cifChangedEnough(const QVector<QPoint> &storedCif, const QVector<QPoint> ne
     return false;
 }
 
+/**
+    Applies the x-position of the instance if it is stored in the CIF information.
+    The y-values are ignored
+ */
+void InstanceItem::applyCif()
+{
+    if (const cif::CifBlockShared &cifBlock = cifBlockByType(mainCifType())) {
+        const QVector<QPoint> &cifPoints = cifBlock->payload().value<QVector<QPoint>>();
+        if (cifPoints.size() == 3) {
+            bool converted(false);
+            const QVector<QPointF> &scenePoints = CoordinatesConverter::cifToScene(cifPoints, &converted);
+
+            const QPointF &textBoxTopLeft = scenePoints.at(0);
+            const QPointF &textBoxSize = scenePoints.at(1);
+
+            m_headSymbol->setTextboxSize({ textBoxSize.x(), textBoxSize.y() });
+            const QRectF currTextBox = m_headSymbol->textBoxSceneRect();
+            const QPointF shift = textBoxTopLeft - currTextBox.topLeft();
+            // TODO: should we check for overlap here?
+            moveBy(shift.x(), 0.0); // Only apply the horizontal value
+
+            rebuildLayout();
+        }
+    }
+}
+
 void InstanceItem::updateCif()
 {
     using namespace cif;
@@ -438,38 +440,8 @@ void InstanceItem::updateCif()
     }
 }
 
-QPointF InstanceItem::avoidOverlaps(InstanceItem *caller, const QPointF &delta, const QRectF &shiftedRect) const
-{
-    if (delta.isNull())
-        return delta;
-
-    const QRectF &callerRect = shiftedRect.isNull() ? caller->sceneBoundingRect() : shiftedRect.translated(delta);
-    for (InstanceItem *otherItem :
-            shared::graphicsviewutils::itemByPos<InstanceItem, QRectF>(caller->scene(), callerRect)) {
-        if (otherItem != caller) {
-            const QRectF &otherRect = otherItem->sceneBoundingRect();
-            if (callerRect.intersects(otherRect)) {
-                qreal nextShiftX(0.);
-                if (delta.x() < 0)
-                    nextShiftX = otherRect.left() - callerRect.right();
-                else
-                    nextShiftX = otherRect.right() - callerRect.left();
-
-                const QPointF nextShift { nextShiftX, 0. };
-                return nextShift + avoidOverlaps(caller, nextShift, callerRect);
-            }
-        }
-    }
-
-    return QPointF(0., 0.);
-}
-
 void InstanceItem::onManualMoveFinish(shared::ui::GripPoint *, const QPointF &from, const QPointF &to)
 {
-    const QPointF &delta = avoidOverlaps(this, { (to - from).x(), 0. }, QRectF());
-    if (!delta.isNull())
-        setPos(pos() + delta);
-
     QVector<QPoint> points = prepareChangePositionCommand();
     if (!points.isEmpty()) {
         MscCommandsStack *undoStack = m_chartLayoutManager->undoStack();
@@ -553,19 +525,6 @@ bool InstanceItem::aadlFunctionOk() const
         return m_chartLayoutManager->systemChecker()->checkInstance(m_instance);
     }
     return true;
-}
-
-void InstanceItem::setInitialXLocation(const QPointF &requested, const QRectF &chartRect, qreal horSpan)
-{
-    const bool isFirstInstance = m_chart->instances().size() && m_chart->instances().first() == modelItem();
-    const qreal targetX = isFirstInstance ? chartRect.left() : (requested.x() + horSpan);
-    const QRectF &instanceRect = sceneBoundingRect();
-    const QPointF defaultShift { targetX, chartRect.top() - instanceRect.top() };
-    const QPointF &totalShift = avoidOverlaps(this, defaultShift, QRectF());
-    const QPointF &shift = (totalShift.x() > defaultShift.x() ? totalShift : defaultShift) - instanceRect.topLeft();
-
-    if (!shift.isNull())
-        moveBy(shift.x(), 0); // notify any attached message so it could update itself
 }
 
 QRectF InstanceItem::kindBox() const

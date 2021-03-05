@@ -387,13 +387,16 @@ void ChartLayoutManager::addInstanceItems()
     }
 
     QRectF newInstancesRect;
-    const QRectF &chartRect = d->m_layoutInfo.m_chartItem->contentRect();
 
+    InstanceItem *lastItem = nullptr;
     qreal maxHeight = 0.0;
     for (MscInstance *instance : d->m_currentChart->instances()) {
         InstanceItem *item = itemForInstance(instance);
         if (!item) {
             item = createDefaultInstanceItem(instance);
+            if (lastItem) {
+                item->setPos(lastItem->sceneBoundingRect().topRight() + QPointF(d->interInstanceSpan(), 0.0));
+            }
             storeEntityItem(item);
 
             for (msc::InteractiveObject *instanceEventItem : d->m_instanceEventItems) {
@@ -412,13 +415,8 @@ void ChartLayoutManager::addInstanceItems()
         const bool geomByCif = item->geometryManagedByCif();
         if (geomByCif) {
             item->applyCif();
-        } else {
-            item->setInitialXLocation(d->m_layoutInfo.m_pos, chartRect, d->interInstanceSpan());
         }
-        item->setDenominatorAndKind(instance->denominatorAndKind());
-        item->setName(instance->name());
 
-        d->m_layoutInfo.m_pos.rx() = item->sceneBoundingRect().right();
         newInstancesRect |= item->sceneBoundingRect();
 
         if (isStreamingModeEnabled() && instance->explicitStop()) {
@@ -443,6 +441,8 @@ void ChartLayoutManager::addInstanceItems()
             d->m_layoutInfo.m_pos.setY(std::max(d->m_layoutInfo.m_pos.y(), headBottom));
             maxHeight = qMax(maxHeight, headBottom - item->pos().y());
         }
+
+        lastItem = item;
     }
 
     for (InstanceItem *instanceItem : d->m_instanceItems) {
