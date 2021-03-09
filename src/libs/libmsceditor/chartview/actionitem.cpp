@@ -23,7 +23,6 @@
 #include "colors/colormanager.h"
 #include "commands/cmdactioninformaltext.h"
 #include "datastatement.h"
-#include "instanceitem.h"
 #include "mscaction.h"
 #include "mscchartviewconstants.h"
 #include "msccommandsstack.h"
@@ -73,7 +72,7 @@ protected:
  * This class shows an action
  */
 ActionItem::ActionItem(msc::MscAction *action, ChartLayoutManager *chartLayoutManager, QGraphicsItem *parent)
-    : InteractiveObject(action, chartLayoutManager, parent)
+    : EventItem(action, chartLayoutManager, parent)
     , m_action(action)
     , m_textItem(new ActionTextItem(this))
 {
@@ -101,31 +100,6 @@ ActionItem::ActionItem(msc::MscAction *action, ChartLayoutManager *chartLayoutMa
 MscAction *ActionItem::modelItem() const
 {
     return m_action;
-}
-
-/*!
- * \brief ActionItem::setInstance Update the instance this action is placed on
- * \param instance
- */
-void ActionItem::setInstance(InstanceItem *instance)
-{
-    if (instance == m_instance) {
-        return;
-    }
-
-    if (m_instance) {
-        disconnect(m_instance, nullptr, this, nullptr);
-    }
-
-    m_instance = instance;
-    if (m_instance) {
-        connect(m_instance, &InteractiveObject::relocated, this, &ActionItem::onInstanceMoved, Qt::DirectConnection);
-        m_action->setInstance(m_instance->modelItem());
-    } else {
-        m_action->setInstance(nullptr);
-    }
-
-    scheduleLayoutUpdate();
 }
 
 void ActionItem::setActionText(const QString &text)
@@ -182,9 +156,6 @@ void ActionItem::onTextEdited(const QString &text)
 
 void ActionItem::rebuildLayout()
 {
-    if (!m_instance)
-        return;
-
     m_textItem->setTextWrapMode(QTextOption::ManualWrap);
     const QSizeF nameSize(m_textItem->boundingRect().size());
     prepareGeometryChange();
@@ -195,17 +166,7 @@ void ActionItem::rebuildLayout()
     }
 
     setBoundingRect(m_textItem->boundingRect());
-    const double x = m_instance->centerInScene().x() - boundingRect().width() / 2;
-    if (std::abs(x - this->x()) > 1e-3) {
-        setX(x);
-    }
-}
-
-void ActionItem::onInstanceMoved(const QPointF &from, const QPointF &to)
-{
-    Q_UNUSED(from);
-    Q_UNUSED(to);
-    instantLayoutUpdate();
+    centerOnTargetH();
 }
 
 QString ActionItem::actionText() const

@@ -18,7 +18,7 @@
 #pragma once
 
 #include "baseitems/common/objectanchor.h"
-#include "baseitems/interactiveobject.h"
+#include "baseitems/eventitem.h"
 #include "chartlayoutmanager.h"
 #include "instanceitem.h"
 
@@ -28,7 +28,7 @@
 namespace msc {
 class LabeledArrowItem;
 
-class MessageItem : public InteractiveObject
+class MessageItem : public EventItem
 {
     Q_OBJECT
 public:
@@ -78,8 +78,6 @@ public:
 
     void performSnap();
 
-    void onSourceInstanceMoved(const QPointF &from, const QPointF &to);
-    void onTargetInstanceMoved(const QPointF &from, const QPointF &to);
     bool isCreator() const;
 
     void addMessagePoint(const QPointF &scenePoint);

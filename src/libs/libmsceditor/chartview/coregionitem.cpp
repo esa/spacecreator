@@ -34,7 +34,7 @@
 namespace msc {
 
 CoregionItem::CoregionItem(ChartLayoutManager *chartLayoutManager, QGraphicsItem *parent)
-    : InteractiveObject(nullptr, chartLayoutManager, parent)
+    : EventItem(nullptr, chartLayoutManager, parent)
 {
     setFlag(QGraphicsItem::ItemIsSelectable);
     setFlag(ItemClipsToShape, false);
@@ -158,6 +158,7 @@ void CoregionItem::rebuildLayout()
     rect.setHeight(height);
 
     setBoundingRect({ QPointF(0, top), rect.size() });
+    centerOnTargetH();
 }
 
 void CoregionItem::onManualResizeProgress(shared::ui::GripPoint *gp, const QPointF &from, const QPointF &to)
@@ -188,26 +189,11 @@ void CoregionItem::onManualResizeFinish(shared::ui::GripPoint *gp, const QPointF
 
 void CoregionItem::setInstance(InstanceItem *instance)
 {
-    if (instance == m_instance)
+    if (instance == m_instance) {
         return;
-
-    if (m_instance)
-        disconnect(m_instance, nullptr, this, nullptr);
-
-    m_instance = instance;
-
-    if (m_instance) {
-        connect(m_instance, &InteractiveObject::relocated, this, &CoregionItem::scheduleLayoutUpdate,
-                Qt::UniqueConnection);
-        connect(m_instance, &InteractiveObject::moved, this, &CoregionItem::scheduleLayoutUpdate, Qt::UniqueConnection);
     }
 
-    MscInstance *instanceEntity = m_instance ? m_instance->modelItem() : nullptr;
-    if (m_begin)
-        m_begin->setInstance(instanceEntity);
-    if (m_end)
-        m_end->setInstance(instanceEntity);
-    instantLayoutUpdate();
+    m_instance = instance;
 }
 
 } // namespace msc

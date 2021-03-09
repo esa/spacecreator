@@ -17,7 +17,7 @@
 
 #pragma once
 
-#include "baseitems/interactiveobject.h"
+#include "baseitems/eventitem.h"
 
 #include <QPointer>
 
@@ -26,7 +26,7 @@ class MscCoregion;
 class ChartLayoutManager;
 class InstanceItem;
 
-class CoregionItem : public InteractiveObject
+class CoregionItem : public EventItem
 {
     Q_OBJECT
 public:

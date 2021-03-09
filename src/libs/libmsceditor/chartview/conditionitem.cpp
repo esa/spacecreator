@@ -33,7 +33,7 @@
 namespace msc {
 
 ConditionItem::ConditionItem(MscCondition *condition, ChartLayoutManager *chartLayoutManager, QGraphicsItem *parent)
-    : InteractiveObject(condition, chartLayoutManager, parent)
+    : EventItem(condition, chartLayoutManager, parent)
     , m_condition(condition)
     , m_polygonItem(new QGraphicsPolygonItem(this))
     , m_nameItem(new TextItem(this))
@@ -89,23 +89,6 @@ void ConditionItem::setInstancesRect(const QRectF &instancesRect)
         m_InstancesRect = instancesRect;
         instantLayoutUpdate();
     }
-}
-
-void ConditionItem::setInstance(InstanceItem *instance)
-{
-    if (instance == m_instance) {
-        return;
-    }
-
-    if (m_instance) {
-        disconnect(m_instance, nullptr, this, nullptr);
-    }
-
-    m_instance = instance;
-    if (m_instance)
-        connect(m_instance, &InteractiveObject::relocated, this, &ConditionItem::onInstanceMoved, Qt::UniqueConnection);
-
-    scheduleLayoutUpdate();
 }
 
 ConditionItem *ConditionItem::createDefaultItem(
@@ -169,16 +152,15 @@ void ConditionItem::buildLayout()
     m_nameItem->setPos({ 0., 0. });
     m_nameItem->moveBy(nameDelta.x(), nameDelta.y());
 
-    double x = 0;
     if (modelItem()->shared()) {
+        double x = 0;
         if (m_InstancesRect.isValid()) {
             x = m_InstancesRect.x() - qAbs((m_InstancesRect.width() - br.width()) / 2);
         }
-    } else if (m_instance) {
-        x = m_instance->centerInScene().x() - br.width() / 2;
+        setX(x);
+    } else {
+        centerOnTargetH();
     }
-
-    setX(x);
 }
 
 void ConditionItem::onNameEdited(const QString &name)
@@ -224,13 +206,6 @@ void ConditionItem::initGripPoints()
 {
     InteractiveObject::initGripPoints();
     gripPointsHandler()->setUsedPoints({ shared::ui::GripPoint::Location::Center });
-}
-
-void ConditionItem::onInstanceMoved(const QPointF &from, const QPointF &to)
-{
-    Q_UNUSED(from);
-    Q_UNUSED(to);
-    scheduleLayoutUpdate();
 }
 
 } // namespace msc

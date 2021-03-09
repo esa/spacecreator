@@ -17,7 +17,7 @@
 
 #pragma once
 
-#include "baseitems/interactiveobject.h"
+#include "baseitems/eventitem.h"
 
 #include <QPointF>
 #include <QPointer>
@@ -30,19 +30,16 @@ class tst_TimerItem;
 namespace msc {
 
 class ChartLayoutManager;
-class InstanceItem;
 class MscTimer;
 class TextItem;
 
-class TimerItem : public InteractiveObject
+class TimerItem : public EventItem
 {
     Q_OBJECT
 public:
     explicit TimerItem(msc::MscTimer *timer, ChartLayoutManager *chartLayoutManager, QGraphicsItem *parent = nullptr);
 
     MscTimer *modelItem() const;
-
-    void setInstance(InstanceItem *instance);
 
     void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget = nullptr) override;
 
@@ -61,7 +58,6 @@ protected:
 private Q_SLOTS:
     void onTextEdited(const QString &text);
     void rebuildLayout() override;
-    void onInstanceMoved(const QPointF &from, const QPointF &to);
     void updateConnectorLineVisibility();
 
 private:
@@ -72,7 +68,6 @@ private:
     bool canConnectTimers(msc::MscTimer *targetTimer, const QPointF &targetPos);
 
     QPointer<msc::MscTimer> m_timer;
-    QPointer<InstanceItem> m_instance;
     TextItem *m_textItem = nullptr;
     QGraphicsLineItem *m_timerConnector = nullptr;
     msc::TimerItem *m_connectingItem = nullptr;

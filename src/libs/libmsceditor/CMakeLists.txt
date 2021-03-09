@@ -16,6 +16,8 @@ target_sources(${LIB_NAME} PRIVATE
     baseitems/common/objectanchor.h
     baseitems/common/objectslink.cpp
     baseitems/common/objectslink.h
+    baseitems/eventitem.cpp
+    baseitems/eventitem.h
     baseitems/instanceenditem.cpp
     baseitems/instanceenditem.h
     baseitems/instanceheaditem.cpp

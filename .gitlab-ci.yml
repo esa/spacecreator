@@ -69,7 +69,7 @@ test_coverage:
     - export QT_QPA_PLATFORM=offscreen
     - mkdir -p coverage ; cd coverage ; rm * -rf
     - cmake -G Ninja -DCOVERAGE_ENABLED=ON ..
-    - ninja ; ctest ; ninja coverage ; ninja coverage_html
+    - ninja ; ../scripts/run_tests.sh . ; ninja coverage ; ninja coverage_html
   cache:
     key: asn1scc
     paths:

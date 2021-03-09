@@ -67,7 +67,7 @@ MessageItem::GeometryNotificationBlocker ::~GeometryNotificationBlocker()
 
 MessageItem::MessageItem(MscMessage *message, ChartLayoutManager *chartLayoutManager, InstanceItem *source,
         InstanceItem *target, QGraphicsItem *parent)
-    : InteractiveObject(message, chartLayoutManager, parent)
+    : EventItem(message, chartLayoutManager, parent)
     , m_message(message)
     , m_arrowItem(new LabeledArrowItem(this))
 {
@@ -181,10 +181,6 @@ bool MessageItem::setSourceInstanceItem(InstanceItem *sourceInstance)
     }
 
     m_sourceInstance = sourceInstance;
-    if (m_sourceInstance) {
-        connect(m_sourceInstance, &InteractiveObject::relocated, this, &MessageItem::onSourceInstanceMoved,
-                Qt::DirectConnection);
-    }
 
     QVector<QPointF> points = messagePoints();
     if (messagePoints().size() > 1) {
@@ -217,10 +213,6 @@ bool MessageItem::setTargetInstanceItem(InstanceItem *targetInstance)
     }
 
     m_targetInstance = targetInstance;
-    if (m_targetInstance) {
-        connect(m_targetInstance, &InteractiveObject::relocated, this, &MessageItem::onTargetInstanceMoved,
-                Qt::DirectConnection);
-    }
 
     applyTargetPointFromInstance();
     updateTooltip();
@@ -440,40 +432,6 @@ void MessageItem::commitGeometryChange()
         prepareGeometryChange();
         setBoundingRect(newBounds);
     }
-}
-
-void MessageItem::onSourceInstanceMoved(const QPointF &from, const QPointF &to)
-{
-    const QPointF offset(to - from);
-    if (!qFuzzyIsNull(offset.x())) {
-        const QPointF &desitnation = m_arrowItem->arrow()->anchorPointSource() + QPointF(offset.x(), 0);
-        updateSource(desitnation, ObjectAnchor::Snap::SnapTo, m_sourceInstance);
-    }
-
-    if (!qFuzzyIsNull(offset.y()))
-        updateSourceAndTarget(QPointF(0, offset.y()));
-
-    scheduleLayoutUpdate();
-
-    if (geometryManagedByCif())
-        updateCif();
-}
-
-void MessageItem::onTargetInstanceMoved(const QPointF &from, const QPointF &to)
-{
-    const QPointF offset(to - from);
-    if (!qFuzzyIsNull(offset.x())) {
-        const QPointF &desitnation = m_arrowItem->arrow()->anchorPointTarget() + QPointF(offset.x(), 0);
-        updateTarget(desitnation, ObjectAnchor::Snap::SnapTo, m_targetInstance);
-    }
-
-    if (!qFuzzyIsNull(offset.y()))
-        updateSourceAndTarget(QPointF(0, offset.y()));
-
-    scheduleLayoutUpdate();
-
-    if (geometryManagedByCif())
-        updateCif();
 }
 
 /*!

@@ -22,7 +22,6 @@
 #include "chartview/mscchartviewconstants.h"
 #include "colors/colormanager.h"
 #include "commands/cmdentitynamechange.h"
-#include "instanceitem.h"
 #include "msccommandsstack.h"
 #include "msctimer.h"
 #include "ui/grippointshandler.h"
@@ -40,7 +39,7 @@ namespace msc {
  */
 
 TimerItem::TimerItem(msc::MscTimer *timer, ChartLayoutManager *chartLayoutManager, QGraphicsItem *parent)
-    : InteractiveObject(timer, chartLayoutManager, parent)
+    : EventItem(timer, chartLayoutManager, parent)
     , m_timer(timer)
     , m_textItem(new TextItem(this))
     , m_timerConnector(new QGraphicsLineItem(this))
@@ -76,30 +75,6 @@ TimerItem::TimerItem(msc::MscTimer *timer, ChartLayoutManager *chartLayoutManage
 MscTimer *TimerItem::modelItem() const
 {
     return m_timer;
-}
-
-void TimerItem::setInstance(InstanceItem *instance)
-{
-    if (instance == m_instance) {
-        return;
-    }
-
-    if (m_instance) {
-        disconnect(m_instance, nullptr, this, nullptr);
-    }
-
-    m_instance = instance;
-    if (m_instance) {
-        connect(m_instance, &InteractiveObject::relocated, this, &TimerItem::onInstanceMoved, Qt::DirectConnection);
-        m_timer->setInstance(m_instance->modelItem());
-    } else {
-        m_timer->setInstance(nullptr);
-    }
-
-    const qreal x = m_instance->centerInScene().x();
-    setX(x);
-
-    scheduleLayoutUpdate();
 }
 
 void TimerItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget)
@@ -214,10 +189,6 @@ void TimerItem::onTextEdited(const QString &text)
 
 void TimerItem::rebuildLayout()
 {
-    if (!m_instance) {
-        return;
-    }
-
     prepareGeometryChange();
 
     m_textItem->setX(TIMER_SYMBOL_SIZE.right());
@@ -246,16 +217,6 @@ void TimerItem::rebuildLayout()
     setBoundingRect(br);
 
     updateConnectorLineVisibility();
-
-    const qreal x = m_instance->centerInScene().x();
-    setX(x);
-}
-
-void TimerItem::onInstanceMoved(const QPointF &from, const QPointF &to)
-{
-    Q_UNUSED(from);
-    Q_UNUSED(to);
-    scheduleLayoutUpdate();
 }
 
 void TimerItem::updateConnectorLineVisibility()

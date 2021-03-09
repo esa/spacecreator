@@ -135,6 +135,7 @@ public Q_SLOTS:
     void updateContentToChartbox(const QRectF &chartBox);
     void removeInstanceItem(msc::MscInstance *instance);
     void removeEventItem(msc::MscInstanceEvent *event);
+    void syncItemsPosToInstance(const InstanceItem *instanceItem);
 
 Q_SIGNALS:
     void currentChartChanged(msc::MscChart *chart);
@@ -167,7 +168,7 @@ private:
     CommentItem *addCommentItem(MscComment *comment);
     MessageItem *addMessageItem(MscMessage *message);
     ActionItem *addActionItem(MscAction *action);
-    ConditionItem *addConditionItem(MscCondition *condition, ConditionItem *prevItem, QRectF &instancesRect);
+    ConditionItem *addConditionItem(MscCondition *condition, ConditionItem *prevItem, const QRectF& instancesRect);
     TimerItem *addTimerItem(MscTimer *timer);
     CoregionItem *addCoregionItem(MscCoregion *coregion);
 

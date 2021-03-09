@@ -17,8 +17,7 @@
 
 #pragma once
 
-#include "baseitems/interactiveobject.h"
-#include "instanceitem.h"
+#include "baseitems/eventitem.h"
 
 #include <QPointer>
 
@@ -27,7 +26,7 @@ namespace msc {
 class MscAction;
 class TextItem;
 
-class ActionItem : public InteractiveObject
+class ActionItem : public EventItem
 {
     Q_OBJECT
 public:
@@ -35,8 +34,6 @@ public:
             msc::MscAction *action, ChartLayoutManager *chartLayoutManager, QGraphicsItem *parent = nullptr);
 
     MscAction *modelItem() const;
-
-    void setInstance(InstanceItem *instance);
 
     void applyCif() override;
 
@@ -56,14 +53,12 @@ protected:
 private Q_SLOTS:
     void onTextEdited(const QString &text);
     void rebuildLayout() override;
-    void onInstanceMoved(const QPointF &from, const QPointF &to);
 
 private:
     QString actionText() const;
 
     QPointer<msc::MscAction> m_action;
     TextItem *m_textItem = nullptr;
-    QPointer<InstanceItem> m_instance = nullptr;
 };
 
 } // namespace msc

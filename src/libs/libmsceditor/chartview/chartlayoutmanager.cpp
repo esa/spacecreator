@@ -908,12 +908,13 @@ void ChartLayoutManager::checkHorizontalConstraints()
         // check if left overlaps with last right limit
         const qreal offset = leftXLimit - rect.x();
         if (offset > 0.0) {
-            // Move the instance (events "follow" the instance)
             instanceItem->moveBy(offset, 0.0);
             rect.translate(offset, 0.0);
         }
 
         leftXLimit = rect.right() + 1.0;
+
+        syncItemsPosToInstance(instanceItem);
     }
 }
 
@@ -1171,6 +1172,7 @@ QVector<InteractiveObject *> ChartLayoutManager::instanceEventItems(MscInstance 
     const QVector<MscInstanceEvent *> &events = currentChart()->eventsForInstance(instance);
     for (MscInstanceEvent *event : events) {
         switch (event->entityType()) {
+        case MscEntity::EntityType::Create:
         case MscEntity::EntityType::Message: {
             if (auto item = itemForMessage(static_cast<MscMessage *>(event))) {
                 res.append(item);
@@ -1225,6 +1227,11 @@ InstanceItem *ChartLayoutManager::createDefaultInstanceItem(MscInstance *orphanI
         }
         connect(d->m_layoutInfo.m_chartItem, &msc::ChartItem::contentRectChanged, instanceItem,
                 &msc::InstanceItem::syncHeightToChartBox);
+        connect(instanceItem, &InstanceItem::relocated, this, [this]() {
+            if (auto instanceI = qobject_cast<InstanceItem *>(sender())) {
+                syncItemsPosToInstance(instanceI);
+            }
+        });
         return instanceItem;
     }
     return nullptr;
@@ -1298,6 +1305,80 @@ void ChartLayoutManager::removeEventItem(MscInstanceEvent *event)
         removeSceneItem(item);
         delete item;
         updateLayout();
+    }
+}
+
+/*!
+   Horizontally aligns all events related to the instance \p instanceItem
+ */
+void ChartLayoutManager::syncItemsPosToInstance(const InstanceItem *instanceItem)
+{
+    if (!instanceItem) {
+        return;
+    }
+
+    const qreal instanceCenter = instanceItem->centerInScene().x();
+
+    QVector<InteractiveObject *> events = instanceEventItems(instanceItem->modelItem());
+    for (InteractiveObject *item : qAsConst(events)) {
+        EventItem *eventItem = qobject_cast<EventItem *>(item);
+        switch (item->modelEntity()->entityType()) {
+        case MscEntity::EntityType::Action:
+        case MscEntity::EntityType::Coregion: {
+            eventItem->setTargetHCenter(instanceCenter);
+            break;
+        }
+        case MscEntity::EntityType::Condition: {
+            auto condition = static_cast<MscCondition *>(item->modelEntity());
+            if (!condition->shared()) {
+                eventItem->setTargetHCenter(instanceCenter);
+            }
+            break;
+        }
+        case MscEntity::EntityType::Message: {
+            auto messageItem = static_cast<MessageItem *>(item);
+            auto message = static_cast<MscMessage *>(item->modelEntity());
+            if (message->sourceInstance() == instanceItem->modelItem()) {
+                QPointF sourcePt = messageItem->tail();
+                sourcePt.setX(instanceCenter);
+                messageItem->setTail(sourcePt, ObjectAnchor::Snap::SnapTo);
+            }
+            if (message->targetInstance() == instanceItem->modelItem()) {
+                QPointF targetPt = messageItem->head();
+                targetPt.setX(instanceCenter);
+                messageItem->setHead(targetPt, ObjectAnchor::Snap::SnapTo);
+            }
+            break;
+        }
+        case MscEntity::EntityType::Create: {
+            auto messageItem = static_cast<MessageItem *>(item);
+            auto message = static_cast<MscMessage *>(item->modelEntity());
+            if (message->sourceInstance() == instanceItem->modelItem()) {
+                QPointF sourcePt = messageItem->tail();
+                sourcePt.setX(instanceCenter);
+                messageItem->setTail(sourcePt, ObjectAnchor::Snap::SnapTo);
+            }
+            if (messageItem->targetInstanceItem() && messageItem->sourceInstanceItem()) {
+                QPointF targetPt = messageItem->head();
+                InstanceItem *targetItem = messageItem->targetInstanceItem();
+                const qreal targetCenter = targetItem->centerInScene().x();
+                const qreal sourceX = messageItem->sourceInstanceItem()->centerInScene().x();
+                if (sourceX < targetCenter) {
+                    targetPt.setX(targetItem->sceneBoundingRect().left());
+                } else {
+                    targetPt.setX(targetItem->sceneBoundingRect().right());
+                }
+                messageItem->setHead(targetPt, ObjectAnchor::Snap::SnapTo);
+            }
+            break;
+        }
+        case MscEntity::EntityType::Timer: {
+            item->setX(instanceCenter);
+            break;
+        }
+        default:
+            break;
+        }
     }
 }
 
@@ -1389,14 +1470,13 @@ ActionItem *ChartLayoutManager::addActionItem(MscAction *action)
         storeEntityItem(item);
     }
     item->setY(d->m_layoutInfo.m_pos.y() + instanceVerticalOffset);
-    item->setInstance(instance);
     item->instantLayoutUpdate();
 
     return item;
 }
 
 ConditionItem *ChartLayoutManager::addConditionItem(
-        MscCondition *condition, ConditionItem *prevItem, QRectF &instancesRect)
+        MscCondition *condition, ConditionItem *prevItem, const QRectF &instancesRect)
 {
     auto *item = itemForCondition(condition);
     if (!item) {
@@ -1413,7 +1493,6 @@ ConditionItem *ChartLayoutManager::addConditionItem(
             verticalOffset += prevItem->boundingRect().height() + d->interMessageSpan();
         }
         item->setY(d->m_layoutInfo.m_pos.y() + verticalOffset);
-        item->setInstance(instance);
         item->setInstancesRect(instancesRect);
         item->instantLayoutUpdate();
     }
@@ -1423,22 +1502,19 @@ ConditionItem *ChartLayoutManager::addConditionItem(
 
 TimerItem *ChartLayoutManager::addTimerItem(MscTimer *timer)
 {
-    InstanceItem *instance(nullptr);
-    qreal instanceVerticalOffset(0);
-    if (timer->instance()) {
-        instance = itemForInstance(timer->instance());
-        if (instance) {
-            instanceVerticalOffset = d->interMessageSpan();
-        }
-    }
-
     TimerItem *item = itemForTimer(timer);
     if (!item) {
         item = new TimerItem(timer, this);
         storeEntityItem(item);
     }
+
+    qreal instanceVerticalOffset(0);
+    InstanceItem *instance = itemForInstance(timer->instance());
+    if (instance) {
+        instanceVerticalOffset = d->interMessageSpan();
+    }
+
     item->setY(d->m_layoutInfo.m_pos.y() + instanceVerticalOffset);
-    item->setInstance(instance);
     item->instantLayoutUpdate();
 
     return item;

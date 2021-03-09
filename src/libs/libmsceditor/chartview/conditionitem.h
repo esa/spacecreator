@@ -17,8 +17,7 @@
 
 #pragma once
 
-#include "baseitems/interactiveobject.h"
-#include "instanceitem.h"
+#include "baseitems/eventitem.h"
 
 #include <QPointer>
 
@@ -29,7 +28,7 @@ namespace msc {
 class MscCondition;
 class TextItem;
 
-class ConditionItem : public InteractiveObject
+class ConditionItem : public EventItem
 {
     Q_OBJECT
 
@@ -43,8 +42,6 @@ public:
 
     QPainterPath shape() const override;
 
-    void setInstance(InstanceItem *instance);
-
     static ConditionItem *createDefaultItem(
             MscCondition *condition, ChartLayoutManager *chartLayoutManager, const QPointF &pos);
 
@@ -56,7 +53,6 @@ public Q_SLOTS:
 private Q_SLOTS:
     void onNameEdited(const QString &name);
     void rebuildLayout() override;
-    void onInstanceMoved(const QPointF &from, const QPointF &to);
 
 protected:
     void mousePressEvent(QGraphicsSceneMouseEvent *event) override;
@@ -72,7 +68,6 @@ private:
 
     QGraphicsPolygonItem *m_polygonItem = nullptr;
     TextItem *m_nameItem = nullptr;
-    QPointer<InstanceItem> m_instance = nullptr;
 
     QRectF m_InstancesRect = QRectF();
 };
