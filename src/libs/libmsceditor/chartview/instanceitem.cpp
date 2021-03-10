@@ -179,7 +179,7 @@ void InstanceItem::rebuildLayout()
     const qreal endSymbolHeight = m_endSymbol->height();
     prepareGeometryChange();
 
-    QRectF headRect(m_headSymbol->boundingRect());
+    QRect headRect = m_headSymbol->boundingRect().toRect();
     QRectF br = boundingRect();
     br.setWidth(headRect.width());
     br.setHeight(headRect.height() + m_axisHeight + endSymbolHeight);

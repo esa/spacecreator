@@ -889,8 +889,12 @@ void ChartLayoutManager::checkHorizontalConstraints()
 
     qreal leftXLimit = 0.0;
     for (MscInstance *instance : d->m_currentChart->instances()) {
+
         InstanceItem *instanceItem = itemForInstance(instance);
         Q_ASSERT(instanceItem != nullptr);
+
+        syncItemsPosToInstance(instanceItem);
+
         QRectF rect = instanceItem->sceneBoundingRect();
         // get width of instance + relevant events
         for (msc::ActionItem *actionItem : actionsOfInstance(instanceItem->modelItem())) {
@@ -910,11 +914,10 @@ void ChartLayoutManager::checkHorizontalConstraints()
         if (offset > 0.0) {
             instanceItem->moveBy(offset, 0.0);
             rect.translate(offset, 0.0);
+            syncItemsPosToInstance(instanceItem);
         }
 
         leftXLimit = rect.right() + 1.0;
-
-        syncItemsPosToInstance(instanceItem);
     }
 }
 

@@ -69,6 +69,7 @@ private Q_SLOTS:
     void testCreateSetsYOfStoppedInstance();
 
     void testShiftHorizontalIfNeeded();
+    void testNoHorizontalShiftOnEventAdd();
 
     void testShiftVerticalIfNeeded();
 
@@ -547,6 +548,50 @@ void tst_ChartLayoutManager::testShiftHorizontalIfNeeded()
     waitForLayoutUpdate();
     QVERIFY2(std::abs(instanceItem->scenePos().x()) > 5, "event is wide - instance got moved");
     QVERIFY2(actionItem->scenePos().x() >= 0.0, "event is wide - but still not negative");
+}
+
+void tst_ChartLayoutManager::testNoHorizontalShiftOnEventAdd()
+{
+    QString mscText = "mscdocument Untitled_Document /* MSC AND */;\
+                      mscdocument Untitled_Leaf /* MSC LEAF */;\
+                          msc Untitled_MSC;\
+                              instance Instance_1;\
+                              endinstance;\
+                              instance Instance_2;\
+                              endinstance;\
+                          endmsc;\
+                      endmscdocument;\
+                  endmscdocument;";
+    parseMsc(mscText);
+
+    waitForLayoutUpdate();
+
+    msc::InstanceItem *instanceItem1 = m_chartModel->instanceItems().at(0);
+    msc::InstanceItem *instanceItem2 = m_chartModel->instanceItems().at(1);
+
+    const QRectF originalReometry1 = instanceItem1->sceneBoundingRect();
+    const QRectF originalReometry2 = instanceItem2->sceneBoundingRect();
+
+    // add action at first instance
+    auto action = new msc::MscAction();
+    action->setInstance(instanceItem1->modelItem());
+    action->setName("A");
+    m_chart->addInstanceEvent(action);
+    waitForLayoutUpdate();
+
+    QCOMPARE(originalReometry1, instanceItem1->sceneBoundingRect());
+    QCOMPARE(originalReometry2, instanceItem2->sceneBoundingRect());
+
+    // add action at second instance
+    auto action2 = new msc::MscAction();
+    action2->setInstance(instanceItem2->modelItem());
+    action2->setName("B");
+    m_chart->addInstanceEvent(action2);
+    waitForLayoutUpdate();
+
+    QCOMPARE(originalReometry1.right(), instanceItem1->sceneBoundingRect().right());
+    QCOMPARE(originalReometry2.left(), instanceItem2->sceneBoundingRect().left());
+    QCOMPARE(originalReometry2.right(), instanceItem2->sceneBoundingRect().right());
 }
 
 void tst_ChartLayoutManager::testShiftVerticalIfNeeded()

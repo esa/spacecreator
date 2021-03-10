@@ -259,8 +259,8 @@ void tst_MessageItem::testPositionUpdateOnInstanceChange()
     MessageItem *messageItem = m_chartModel->itemForMessage(message);
     QVERIFY(messageItem != nullptr);
 
-    QVector<qreal> instanceAxesX { m_instanceItems[0]->axis().p1().x(), m_instanceItems[1]->axis().p1().x(),
-        m_instanceItems[2]->axis().p1().x() };
+    QVector<qreal> instanceAxesX { m_instanceItems[0]->centerInScene().x(), m_instanceItems[1]->centerInScene().x(),
+        m_instanceItems[2]->centerInScene().x() };
 
     QVector<QPointF> points = messageItem->messagePoints();
     QVERIFY(qFuzzyCompare(points[0].x(), instanceAxesX[0]));
