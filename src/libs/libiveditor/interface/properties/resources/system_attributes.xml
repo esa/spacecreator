@@ -20,12 +20,12 @@
             </Function>
         </Scopes>
     </Attr>
-    <Attr name="name">
+    <Attr name="name" label="Name">
         <Type>
             <String validator="[a-zA-Z][\w_]*(?(?&lt;=_)[a-zA-Z0-9])"/>
         </Type>
     </Attr>
-    <Attr name="kind">
+    <Attr name="kind" label="Kind">
         <Type>
             <Enumeration defaultValue="Sporadic">
                 <Entry value="Any"/>
