@@ -17,8 +17,11 @@
 
 #include "propertytemplate.h"
 
+#include "aadlobject.h"
+
 #include <QDomElement>
 #include <QMetaEnum>
+#include <QRegularExpressionMatch>
 
 namespace ivm {
 
@@ -43,7 +46,7 @@ PropertyTemplate::PropertyTemplate()
 {
 }
 
-PropertyTemplate::~PropertyTemplate() {}
+PropertyTemplate::~PropertyTemplate() { }
 
 QString PropertyTemplate::name() const
 {
@@ -208,7 +211,7 @@ QDomElement PropertyTemplate::toXml(QDomDocument *doc) const
         }
         return result;
     };
-    for (const auto scope : scopesToString(d->m_scope)) {
+    for (const QString &scope : scopesToString(d->m_scope)) {
         QDomElement scopeSubElement = doc->createElement(scope);
         for (auto it = d->m_rxAttrValidatorPattern.constBegin(); it != d->m_rxAttrValidatorPattern.constEnd(); ++it) {
             QDomElement attrValidatorElement = doc->createElement(QLatin1String("AttrValidator"));
@@ -374,6 +377,69 @@ QVariant PropertyTemplate::convertData(const QVariant &value, PropertyTemplate::
         break;
     }
     return typedValue;
+}
+
+static inline PropertyTemplate::Scope typeToScope(const AADLObject::Type &type)
+{
+    auto scope = PropertyTemplate::Scope::None;
+    switch (type) {
+    case ivm::AADLObject::Type::Connection:
+        scope = PropertyTemplate::Scope::Connection;
+        break;
+    case ivm::AADLObject::Type::Comment:
+        scope = PropertyTemplate::Scope::Comment;
+        break;
+    case ivm::AADLObject::Type::FunctionType:
+    case ivm::AADLObject::Type::Function:
+        scope = PropertyTemplate::Scope::Function;
+        break;
+    case ivm::AADLObject::Type::RequiredInterface:
+        scope = PropertyTemplate::Scope::Required_Interface;
+        break;
+    case ivm::AADLObject::Type::ProvidedInterface:
+        scope = PropertyTemplate::Scope::Provided_Interface;
+        break;
+    default:
+        break;
+    }
+    return scope;
+}
+
+/*!
+ * \brief PropertyTemplate::validate
+ * \param object which attributes to be checked
+ * \return
+ */
+bool PropertyTemplate::validate(const AADLObject *object) const
+{
+    const PropertyTemplate::Scope objectScope = typeToScope(object->aadlType());
+    if (!d->m_scope.testFlag(objectScope)) {
+        return false;
+    }
+
+    if (d->m_rxAttrValidatorPattern.isEmpty()) {
+        return true;
+    }
+
+    const auto it = d->m_rxAttrValidatorPattern.constFind(objectScope);
+    if (it != d->m_rxAttrValidatorPattern.constEnd()) {
+        auto checkPattern = [](const QHash<QString, QVariant> &data, const QString &name, const QString &pattern) {
+            auto objPropIter = data.constFind(name);
+            if (objPropIter != data.constEnd()) {
+                const QRegularExpression rx(pattern);
+                const QString value = objPropIter.value().toString();
+                const QRegularExpressionMatch match = rx.match(value);
+                return match.capturedLength() == value.length();
+            }
+            return true;
+        };
+        /// TODO: add type into XML storage for AttrValidator (PropValidator)
+        /// to lookup in appropriate data set
+        /// Add mandatory attribute for combined checks
+        return checkPattern(object->props(), it->first, it->second)
+                && checkPattern(object->attrs(), it->first, it->second);
+    }
+    return false;
 }
 
 } // namespace ivm

@@ -15,7 +15,11 @@
    along with this program. If not, see <https://www.gnu.org/licenses/lgpl-2.1.html>.
 */
 
+#include "aadlcomment.h"
 #include "aadlcommonprops.h"
+#include "aadlconnection.h"
+#include "aadlfunction.h"
+#include "aadlfunctiontype.h"
 #include "aadliface.h"
 #include "baseitems/common/aadlutils.h"
 #include "iveditor.h"
@@ -35,6 +39,8 @@ private Q_SLOTS:
     void tst_attributesLoad();
     void tst_loadImpl();
     void tst_systemAttrs();
+    void tst_scopeValidation();
+    void tst_attrValidators();
 
 private:
     ivm::PropertyTemplateConfig *m_dynPropConfig;
@@ -120,7 +126,7 @@ void tst_AttributesConfigure::tst_systemAttrs()
     if (it != sysAttrs.cend()) {
         QVERIFY(int((*it)->scope())
                 == int(ivm::PropertyTemplate::Scope::Provided_Interface
-                           | ivm::PropertyTemplate::Scope::Required_Interface));
+                        | ivm::PropertyTemplate::Scope::Required_Interface));
         QVERIFY((*it)->type() == ivm::PropertyTemplate::Type::Enumeration);
         QVERIFY((*it)->info() == ivm::PropertyTemplate::Info::Attribute);
 
@@ -210,6 +216,152 @@ void tst_AttributesConfigure::tst_systemAttrs()
         match = rx.match(coordinates);
         QVERIFY(match.capturedLength() != coordinates.length());
     }
+}
+
+void tst_AttributesConfigure::tst_scopeValidation()
+{
+    ivm::PropertyTemplate attrTemplate;
+    attrTemplate.setScope(ivm::PropertyTemplate::Scope::All);
+
+    ivm::AADLComment comment;
+    QVERIFY(attrTemplate.validate(&comment));
+
+    ivm::AADLFunctionType fnType;
+    QVERIFY(attrTemplate.validate(&fnType));
+
+    ivm::AADLFunction fn;
+    QVERIFY(attrTemplate.validate(&fn));
+
+    ivm::AADLIface::CreationInfo ci;
+    ci.function = &fn;
+
+    ci.type = ivm::AADLIface::IfaceType::Required;
+    ci.name = QLatin1String("reqIface");
+    ivm::AADLIfaceRequired reqIface(ci);
+    QVERIFY(attrTemplate.validate(&reqIface));
+
+    ci.type = ivm::AADLIface::IfaceType::Provided;
+    ci.name = QLatin1String("provIface");
+    ivm::AADLIfaceProvided provIface(ci);
+    QVERIFY(attrTemplate.validate(&provIface));
+
+    ivm::AADLConnection connection(&reqIface, &provIface);
+    QVERIFY(attrTemplate.validate(&connection));
+
+    attrTemplate.setScope(ivm::PropertyTemplate::Scope::Function);
+    QVERIFY(!attrTemplate.validate(&comment));
+    QVERIFY(!attrTemplate.validate(&connection));
+    QVERIFY(!attrTemplate.validate(&reqIface));
+    QVERIFY(!attrTemplate.validate(&provIface));
+    QVERIFY(attrTemplate.validate(&fn));
+    QVERIFY(attrTemplate.validate(&fnType));
+
+    attrTemplate.setScope(ivm::PropertyTemplate::Scope::Connection);
+    QVERIFY(!attrTemplate.validate(&comment));
+    QVERIFY(attrTemplate.validate(&connection));
+    QVERIFY(!attrTemplate.validate(&reqIface));
+    QVERIFY(!attrTemplate.validate(&provIface));
+    QVERIFY(!attrTemplate.validate(&fn));
+    QVERIFY(!attrTemplate.validate(&fnType));
+
+    attrTemplate.setScope(ivm::PropertyTemplate::Scope::Comment);
+    QVERIFY(attrTemplate.validate(&comment));
+    QVERIFY(!attrTemplate.validate(&connection));
+    QVERIFY(!attrTemplate.validate(&reqIface));
+    QVERIFY(!attrTemplate.validate(&provIface));
+    QVERIFY(!attrTemplate.validate(&fn));
+    QVERIFY(!attrTemplate.validate(&fnType));
+
+    attrTemplate.setScope(ivm::PropertyTemplate::Scope::Provided_Interface);
+    QVERIFY(!attrTemplate.validate(&comment));
+    QVERIFY(!attrTemplate.validate(&connection));
+    QVERIFY(!attrTemplate.validate(&reqIface));
+    QVERIFY(attrTemplate.validate(&provIface));
+    QVERIFY(!attrTemplate.validate(&fn));
+    QVERIFY(!attrTemplate.validate(&fnType));
+
+    attrTemplate.setScope(ivm::PropertyTemplate::Scope::Required_Interface);
+    QVERIFY(!attrTemplate.validate(&comment));
+    QVERIFY(!attrTemplate.validate(&connection));
+    QVERIFY(attrTemplate.validate(&reqIface));
+    QVERIFY(!attrTemplate.validate(&provIface));
+    QVERIFY(!attrTemplate.validate(&fn));
+    QVERIFY(!attrTemplate.validate(&fnType));
+}
+
+void tst_AttributesConfigure::tst_attrValidators()
+{
+    ivm::PropertyTemplate attrTemplate;
+
+    ivm::AADLComment comment;
+    comment.setAttr(QLatin1String("Custom_Comment_Attribute"), QStringLiteral("TextValue"));
+
+    ivm::AADLFunctionType fnType;
+    ivm::AADLFunction fn;
+
+    ivm::AADLIface::CreationInfo ci;
+    ci.function = &fn;
+
+    ci.type = ivm::AADLIface::IfaceType::Required;
+    ci.name = QLatin1String("reqIface");
+    ci.kind = ivm::AADLIface::OperationKind::Any;
+    ivm::AADLIfaceRequired reqIface(ci);
+
+    ci.type = ivm::AADLIface::IfaceType::Provided;
+    ci.name = QLatin1String("provIface");
+    ci.kind = ivm::AADLIface::OperationKind::Cyclic;
+    ivm::AADLIfaceProvided provIface(ci);
+
+    ivm::AADLConnection connection(&reqIface, &provIface);
+    comment.setAttr(QLatin1String("Custom_Connection_Attribute"), QStringLiteral("0123456789"));
+
+    const QMap<ivm::PropertyTemplate::Scope, QPair<QString, QString>> validators {
+        { ivm::PropertyTemplate::Scope::Function, { "name", "[a-zA-Z_]+[\\d\\w]*" } },
+        { ivm::PropertyTemplate::Scope::Provided_Interface, { "kind", "Protected" } },
+        { ivm::PropertyTemplate::Scope::Required_Interface, { "kind", "Any" } },
+        { ivm::PropertyTemplate::Scope::Comment, { "Custom_Comment_Attribute", "\\w+" } },
+        { ivm::PropertyTemplate::Scope::Connection, { "Custom_Connection_Attribute", "\\d+" } },
+    };
+    attrTemplate.setAttrValidatorPattern(validators);
+
+    attrTemplate.setScope(ivm::PropertyTemplate::Scope::Function);
+    QVERIFY(attrTemplate.validate(&fn));
+    fn.setTitle(QLatin1String("function 1"));
+    QVERIFY(!attrTemplate.validate(&fn));
+    fn.setTitle(QLatin1String("1 function"));
+    QVERIFY(!attrTemplate.validate(&fn));
+    fn.setTitle(QLatin1String("function_1"));
+    QVERIFY(attrTemplate.validate(&fn));
+    fn.setTitle(QLatin1String("function-1"));
+    QVERIFY(!attrTemplate.validate(&fn));
+
+    attrTemplate.setScope(ivm::PropertyTemplate::Scope::Provided_Interface);
+    QVERIFY(!attrTemplate.validate(&provIface));
+    provIface.setKind(ivm::AADLIface::OperationKind::Cyclic);
+    QVERIFY(!attrTemplate.validate(&provIface));
+    provIface.setKind(ivm::AADLIface::OperationKind::Protected);
+    QVERIFY(attrTemplate.validate(&provIface));
+
+    attrTemplate.setScope(ivm::PropertyTemplate::Scope::Required_Interface);
+    QVERIFY(attrTemplate.validate(&reqIface));
+    reqIface.setKind(ivm::AADLIface::OperationKind::Cyclic);
+    QVERIFY(!attrTemplate.validate(&reqIface));
+    reqIface.setKind(ivm::AADLIface::OperationKind::Any);
+    QVERIFY(attrTemplate.validate(&reqIface));
+
+    attrTemplate.setScope(ivm::PropertyTemplate::Scope::Comment);
+    QVERIFY(attrTemplate.validate(&comment));
+    comment.setAttr(QLatin1String("Custom_Comment_Attribute"), QStringLiteral("23663 sdbsdfn 457"));
+    QVERIFY(!attrTemplate.validate(&comment));
+    comment.setAttr(QLatin1String("Custom_Comment_Attribute"), QStringLiteral("dfzdfbxdbfSFB457"));
+    QVERIFY(attrTemplate.validate(&comment));
+
+    attrTemplate.setScope(ivm::PropertyTemplate::Scope::Connection);
+    QVERIFY(attrTemplate.validate(&connection));
+    connection.setAttr(QLatin1String("Custom_Connection_Attribute"), QStringLiteral("23663457"));
+    QVERIFY(attrTemplate.validate(&connection));
+    connection.setAttr(QLatin1String("Custom_Connection_Attribute"), QStringLiteral("dfzdf bxdbfSFB 457"));
+    QVERIFY(!attrTemplate.validate(&connection));
 }
 
 QTEST_MAIN(tst_AttributesConfigure)

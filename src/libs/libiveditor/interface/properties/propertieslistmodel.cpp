@@ -75,11 +75,19 @@ void PropertiesListModel::updateRow(int row, const QString &label, const QString
     }
 
     QStandardItem *titleItem = item(row, ColumnTitle);
+    Q_ASSERT(titleItem);
+    if (!titleItem) {
+        return;
+    }
     titleItem->setData(title, Qt::DisplayRole);
     titleItem->setData(name, Qt::EditRole);
     titleItem->setData(name, PropertyNameRole);
 
     QStandardItem *valueItem = item(row, ColumnValue);
+    Q_ASSERT(valueItem);
+    if (!valueItem) {
+        return;
+    }
     valueItem->setData(value, Qt::DisplayRole);
     valueItem->setData(value, Qt::EditRole);
     valueItem->setData(editValue, PropertyDataRole);
@@ -120,7 +128,7 @@ void PropertiesListModel::updateRows(const QHash<QString, ivm::PropertyTemplate 
         for (int i = 0; i < keys.size(); ++i) {
             const QString key = keys.at(i);
             const ivm::PropertyTemplate *propertyPtr = templates.value(key);
-            if (!propertyPtr || !propertyPtr->isVisible())
+            if (propertyPtr && (!propertyPtr->isVisible() || !propertyPtr->validate(m_dataObject)))
                 continue;
 
             const QVariant propTemplatesValues = propertyPtr ? propertyPtr->valuesList() : QVariant();
@@ -140,7 +148,8 @@ void PropertiesListModel::updateRows(const QHash<QString, ivm::PropertyTemplate 
     initRows(m_dataObject->props(), ivm::PropertyTemplate::Info::Property, templates);
 
     for (ivm::PropertyTemplate *propertyPtr : templates) {
-        if (propertyPtr && !m_names.contains(propertyPtr->name()) && propertyPtr->isVisible()) {
+        if (propertyPtr && !m_names.contains(propertyPtr->name()) && propertyPtr->isVisible()
+                && propertyPtr->validate(m_dataObject)) {
             const QString key = propertyPtr->name();
             QVariant value;
             if (propertyPtr->type() == ivm::PropertyTemplate::Type::Unknown) {
@@ -317,7 +326,6 @@ bool PropertiesListModel::setData(const QModelIndex &index, const QVariant &valu
                 if (idx >= 0) {
                     m_names.replace(idx, newName);
                 }
-                QStandardItemModel::setData(index, newName, PropertyNameRole);
                 return true;
             }
             default: {
@@ -343,12 +351,7 @@ bool PropertiesListModel::createProperty(const QString &propName)
 
     const QVariantHash props = { { propName, QString() } };
     auto propsCmd = new cmd::CmdEntityPropertyCreate(m_dataObject, props);
-    m_cmdMacro->push(propsCmd);
-
-    updateRow(rowCount(), {}, propName, ivm::PropertyTemplate::Info::Property, QVariant(QVariant::String),
-            QVariant(QVariant::String), QVariant(QVariant::String));
-
-    return true;
+    return m_cmdMacro->push(propsCmd);
 }
 
 bool PropertiesListModel::removeProperty(const QModelIndex &index)

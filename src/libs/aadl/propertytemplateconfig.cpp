@@ -187,61 +187,17 @@ QList<PropertyTemplate *> PropertyTemplateConfig::parseAttributesList(
 
 QHash<QString, PropertyTemplate *> PropertyTemplateConfig::propertyTemplatesForObject(const ivm::AADLObject *obj)
 {
-    auto scope = PropertyTemplate::Scope::None;
-    QList<PropertyTemplate *> properties;
     switch (obj->aadlType()) {
     case ivm::AADLObject::Type::FunctionType:
     case ivm::AADLObject::Type::Function:
-        scope = PropertyTemplate::Scope::Function;
-        properties = attributesForFunction();
-        break;
+        return d->m_function;
     case ivm::AADLObject::Type::RequiredInterface:
-        scope = PropertyTemplate::Scope::Required_Interface;
-        properties = attributesForRequiredInterface();
-        break;
+        return d->m_reqIface;
     case ivm::AADLObject::Type::ProvidedInterface:
-        scope = PropertyTemplate::Scope::Provided_Interface;
-        properties = attributesForProvidedInterface();
-        break;
+        return d->m_provIface;
     default:
         return {};
     }
-    QHash<QString, PropertyTemplate *> result;
-    auto validate = [obj, scope](PropertyTemplate *property) {
-        if (!property->scope().testFlag(scope)) {
-            return false;
-        }
-
-        const auto scopesValidators = property->attrValidatorPatterns();
-        if (scopesValidators.isEmpty()) {
-            return true;
-        }
-
-        const auto it = scopesValidators.constFind(scope);
-        if (it != scopesValidators.constEnd()) {
-            auto checkPattern = [](const QHash<QString, QVariant> &data, const QString &name, const QString &pattern) {
-                auto objPropIter = data.constFind(name);
-                if (objPropIter != data.constEnd()) {
-                    const QRegularExpression rx(pattern);
-                    const QString value = objPropIter.value().toString();
-                    const QRegularExpressionMatch match = rx.match(value);
-                    return match.capturedLength() == value.length();
-                }
-                return true;
-            };
-            /// TODO: add type into XML storage for AttrValidator (PropValidator)
-            /// to lookup in appropriate data set
-            /// Add mandatory attribute for combined checks
-            return checkPattern(obj->props(), it->first, it->second)
-                    && checkPattern(obj->attrs(), it->first, it->second);
-        }
-        return false;
-    };
-    std::for_each(properties.constBegin(), properties.constEnd(), [&result, validate](PropertyTemplate *property) {
-        if (validate(property))
-            result.insert(property->name(), property);
-    });
-    return result;
 }
 
 QList<PropertyTemplate *> PropertyTemplateConfig::attributesForFunction()
