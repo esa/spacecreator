@@ -61,7 +61,7 @@ PropertiesListModel::PropertiesListModel(
 {
 }
 
-PropertiesListModel::~PropertiesListModel() { }
+PropertiesListModel::~PropertiesListModel() {}
 
 void PropertiesListModel::updateRow(int row, const QString &label, const QString &name,
         ivm::PropertyTemplate::Info info, const QVariant &value, const QVariant &editValue, const QVariant &defaulValue)
@@ -80,7 +80,6 @@ void PropertiesListModel::updateRow(int row, const QString &label, const QString
         return;
     }
     titleItem->setData(title, Qt::DisplayRole);
-    titleItem->setData(name, Qt::EditRole);
     titleItem->setData(name, PropertyNameRole);
 
     QStandardItem *valueItem = item(row, ColumnValue);
@@ -89,7 +88,6 @@ void PropertiesListModel::updateRow(int row, const QString &label, const QString
         return;
     }
     valueItem->setData(value, Qt::DisplayRole);
-    valueItem->setData(value, Qt::EditRole);
     valueItem->setData(editValue, PropertyDataRole);
     valueItem->setData(static_cast<int>(info), PropertyInfoRole);
 }
@@ -232,9 +230,8 @@ QVariant PropertiesListModel::data(const QModelIndex &index, int role) const
     case Qt::DisplayRole:
     case Qt::EditRole: {
         const QString &title = m_names.at(index.row());
-
         if (index.column() == ColumnTitle)
-            return res;
+            return role == Qt::EditRole ? title : res;
 
         if (isAttr(index)) {
             QVariant value = m_dataObject->attr(title);
