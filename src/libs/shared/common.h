@@ -48,6 +48,8 @@ void setWidgetFontColor(QWidget *widget, const QColor &color);
 
 bool ensureDirExists(const QString &path);
 
+bool ensureFileExists(const QString &filePath, const QString &defaultFilePath);
+
 template<typename T>
 bool isAncestorOf(const T *const parent, T *object)
 {

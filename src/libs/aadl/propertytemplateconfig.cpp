@@ -102,7 +102,17 @@ QList<PropertyTemplate *> PropertyTemplateConfig::systemAttributes()
         qWarning() << "Can't open file:" << kSysAttrsConfigFilePath << f.errorString();
         return {};
     }
-    QList<PropertyTemplate *> sysAttrs = parseAttributesList(QString::fromUtf8(f.readAll()));
+    QString errorMsg;
+    int errorLine = -1;
+    int errorColumn = -1;
+
+    QList<PropertyTemplate *> sysAttrs =
+            parseAttributesList(QString::fromUtf8(f.readAll()), &errorMsg, &errorLine, &errorColumn);
+    if (sysAttrs.isEmpty()) {
+        qCritical() << "Can't load system attributes:"
+                    << QStringLiteral("%1:%2 => %3").arg(errorLine).arg(errorColumn).arg(errorMsg);
+        return {};
+    }
     for (auto attr : sysAttrs) {
         attr->setSystem(true);
     }
@@ -117,24 +127,14 @@ PropertyTemplateConfig *PropertyTemplateConfig::instance()
     return m_instance;
 }
 
-PropertyTemplateConfig::~PropertyTemplateConfig() { }
-
-static bool ensureFileExists(const QString &filePath)
-{
-    if (!QFileInfo::exists(filePath) && !shared::copyResourceFile(kUserAttrsResourceConfigPath, filePath)) {
-        qWarning() << "Can't create default storage for properties/attributes" << filePath
-                   << "from:" << kUserAttrsResourceConfigPath;
-        return false;
-    }
-    return true;
-}
+PropertyTemplateConfig::~PropertyTemplateConfig() {}
 
 void PropertyTemplateConfig::init(const QString &configPath)
 {
     QList<PropertyTemplate *> attributes = systemAttributes();
 
     QList<PropertyTemplate *> userAttributes;
-    if (ensureFileExists(configPath)) {
+    if (shared::ensureFileExists(configPath, kUserAttrsResourceConfigPath)) {
         d->m_configPath = configPath;
         QFile f(configPath);
         if (!f.open(QIODevice::ReadOnly | QIODevice::Text)) {

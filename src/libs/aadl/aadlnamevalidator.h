@@ -38,7 +38,6 @@ public:
     static QString nextNameFor(const AADLObject *object);
 
     static bool isValidName(const QString &name);
-    static const QString &namePattern();
     static const QString &namePatternUI();
     static bool isAcceptableName(const AADLObject *object, const QString &name);
 

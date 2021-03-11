@@ -15,7 +15,9 @@
    along with this program. If not, see <https://www.gnu.org/licenses/lgpl-2.1.html>.
 */
 
+#include "aadllibrary.h"
 #include "commandlineparser.h"
+#include "iveditor.h"
 #include "iveditorcore.h"
 #include "msceditorcore.h"
 #include "sharedlibrary.h"
@@ -209,6 +211,7 @@ void tst_CommandLineParser::testCmdArgumentExportToFile()
 
 void tst_CommandLineParser::initTestCase()
 {
+    ive::initIvEditor();
     shared::initSharedLibrary();
 }
 

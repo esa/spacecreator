@@ -18,9 +18,9 @@
 #include "attributedelegate.h"
 
 #include "aadlcommonprops.h"
+#include "aadlmodel.h"
 #include "aadlnamevalidator.h"
 #include "aadlobject.h"
-#include "aadlmodel.h"
 #include "interface/properties/propertieslistmodel.h"
 #include "propertytemplate.h"
 #include "propertytemplateconfig.h"

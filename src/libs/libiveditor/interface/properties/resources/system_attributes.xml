@@ -12,7 +12,7 @@
     </Attr>
     <Attr name="instance_of">
         <Type>
-            <String validator="[a-zA-Z_]+[\d\w]*"/>
+            <String validator="[a-zA-Z][\w_]*(?(?&lt;=_)[a-zA-Z0-9])"/>
         </Type>
         <Scopes>
             <Function>
@@ -22,7 +22,7 @@
     </Attr>
     <Attr name="name">
         <Type>
-            <String validator="[a-zA-Z_]+[\d\w]*"/>
+            <String validator="[a-zA-Z][\w_]*(?(?&lt;=_)[a-zA-Z0-9])"/>
         </Type>
     </Attr>
     <Attr name="kind">

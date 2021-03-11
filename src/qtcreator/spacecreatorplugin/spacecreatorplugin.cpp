@@ -17,6 +17,7 @@
 
 #include "spacecreatorplugin.h"
 
+#include "aadllibrary.h"
 #include "context/action/actionsmanager.h"
 #include "dv/deploymenteditorfactory.h"
 #include "interface/interfacedocument.h"
@@ -53,6 +54,7 @@ void initSpaceCreatorResources()
     msc::initMscLibrary();
     msc::initMscEditor();
     ive::initIvEditor();
+    ivm::initAadlLibrary();
 }
 
 using namespace Core;

@@ -1,0 +1,5 @@
+<RCC>
+    <qresource prefix="/defaults">
+        <file>resources/forbidden_names.txt</file>
+    </qresource>
+</RCC>

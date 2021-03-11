@@ -20,6 +20,7 @@
 #include <QDebug>
 #include <QDir>
 #include <QFile>
+#include <QFileInfo>
 #include <QPalette>
 #include <QWidget>
 
@@ -133,6 +134,15 @@ bool ensureDirExists(const QString &path)
         }
     }
 
+    return true;
+}
+
+bool ensureFileExists(const QString &filePath, const QString &defaultFilePath)
+{
+    if (!QFileInfo::exists(filePath) && !copyResourceFile(defaultFilePath, filePath)) {
+        qWarning() << "Can't create default file path:" << filePath << "from:" << defaultFilePath;
+        return false;
+    }
     return true;
 }
 

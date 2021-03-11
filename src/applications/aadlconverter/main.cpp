@@ -15,6 +15,7 @@
   along with this program. If not, see <https://www.gnu.org/licenses/lgpl-2.1.html>.
 */
 
+#include "aadllibrary.h"
 #include "commandlineparser.h"
 #include "interface/interfacedocument.h"
 #include "iveditor.h"
@@ -26,6 +27,7 @@
 
 int main(int argc, char *argv[])
 {
+    ivm::initAadlLibrary();
     ive::initIvEditor();
     shared::initSharedLibrary();
 

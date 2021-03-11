@@ -15,9 +15,11 @@
    along with this program. If not, see <https://www.gnu.org/licenses/lgpl-2.1.html>.
 */
 
-#include "aadlnamevalidator.h"
 #include "aadlfunction.h"
+#include "aadllibrary.h"
+#include "aadlnamevalidator.h"
 
+#include <QStandardPaths>
 #include <QTest>
 
 class tst_AADLNameValidator : public QObject
@@ -25,9 +27,16 @@ class tst_AADLNameValidator : public QObject
     Q_OBJECT
 
 private Q_SLOTS:
+    void initTestCase();
     void test_functionName_data();
     void test_functionName();
 };
+
+void tst_AADLNameValidator::initTestCase()
+{
+    QStandardPaths::setTestModeEnabled(true);
+    ivm::initAadlLibrary();
+}
 
 void tst_AADLNameValidator::test_functionName_data()
 {
@@ -43,6 +52,10 @@ void tst_AADLNameValidator::test_functionName_data()
     QTest::newRow("Unicode") << QString("Obs\u00F6rver") << false;
     QTest::newRow("Underscore at start") << QString("_Observer") << false;
     QTest::newRow("Underscore at end") << QString("Observer_") << false;
+    QTest::newRow("Reserved word 1") << QString("class") << false;
+    QTest::newRow("Reserved word 2") << QString("struct") << false;
+    QTest::newRow("Reserved word 3") << QString("static") << false;
+    QTest::newRow("Reserved word 4") << QString("void") << false;
 }
 
 void tst_AADLNameValidator::test_functionName()

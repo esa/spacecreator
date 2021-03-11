@@ -17,22 +17,22 @@
 
 #include "aadlnamevalidator.h"
 
-#include "aadlobject.h"
 #include "aadlconnection.h"
 #include "aadlconnectiongroup.h"
 #include "aadlfunction.h"
 #include "aadlfunctiontype.h"
 #include "aadlmodel.h"
+#include "aadlobject.h"
 
 #include <QDebug>
+#include <QDir>
 #include <QRegularExpression>
+#include <QStandardPaths>
 
 namespace ivm {
 
 AADLNameValidator *AADLNameValidator::m_instance = nullptr;
-
-static const QString namePattern("^[a-zA-Z][a-zA-Z0-9_]*[a-zA-Z0-9]$");
-static const QString namePatternUI("^[a-zA-Z][a-zA-Z0-9 ]*[a-zA-Z0-9]$");
+static const QString namePatternUI("^[a-zA-Z][\\w ]*(?(?<=_)[a-zA-Z0-9])$");
 
 AADLNameValidator::AADLNameValidator()
     : m_typePrefixes {
@@ -126,7 +126,32 @@ QString AADLNameValidator::decodeName(const AADLObject::Type t, const QString &n
 }
 
 /*!
-   Returns is the gieven \p name is usable as name in general.
+    Returns ths set of words couldn't be used as entity name
+ */
+static inline QSet<QString> forbiddenNamesSet()
+{
+    static const QString kFilePath = QStandardPaths::writableLocation(QStandardPaths::AppLocalDataLocation)
+            + QDir::separator() + QLatin1String("forbidden_names.txt");
+    static const QString kDefaultPath = QLatin1String(":/defaults/resources/forbidden_names.txt");
+    if (shared::ensureFileExists(kFilePath, kDefaultPath)) {
+        QFile f(kFilePath);
+        if (!f.open(QIODevice::ReadOnly | QIODevice::Text)) {
+            qWarning() << "Can't open file:" << kFilePath << f.errorString();
+            return {};
+        }
+        QSet<QString> names;
+        QTextStream stream(&f);
+        QString line;
+        while (stream.readLineInto(&line)) {
+            names << line.trimmed();
+        }
+        return names;
+    }
+    return {};
+}
+
+/*!
+   Returns is the given \p name is usable as name in general.
  */
 bool AADLNameValidator::isValidName(const QString &name)
 {
@@ -134,21 +159,18 @@ bool AADLNameValidator::isValidName(const QString &name)
         return false;
     }
 
-    static QRegularExpression re(ivm::namePattern);
+    static const QSet<QString> reservedWords = forbiddenNamesSet();
+    if (reservedWords.contains(name.trimmed())) {
+        return false;
+    }
+
+    static QRegularExpression re(ivm::namePatternUI);
     QRegularExpressionMatch match = re.match(name);
     return match.hasMatch();
 }
 
 /*!
-   The regualr expression pattern for aadl names, used for raw/system/model
- */
-const QString &AADLNameValidator::namePattern()
-{
-    return ivm::namePattern;
-}
-
-/*!
-   The regualr expression pattern for aadl names, used for the UI (encoded name)
+   The regular expression pattern for aadl names, used for the UI (encoded name)
  */
 const QString &AADLNameValidator::namePatternUI()
 {
@@ -422,10 +444,10 @@ QString AADLNameValidator::nameConnection(const AADLObject *connection) const
                         connectionPtr->targetInterfaceName());
     } else if (auto connectionPtr = qobject_cast<const AADLConnectionGroup *>(connection)) {
         QStringList sourceNames, targetNames;
-        for (const auto sourceIface : connectionPtr->groupedSourceInterfaces()) {
+        for (const auto &sourceIface : connectionPtr->groupedSourceInterfaces()) {
             sourceNames.append(sourceIface->title());
         }
-        for (const auto targetIface : connectionPtr->groupedTargetInterfaces()) {
+        for (const auto &targetIface : connectionPtr->groupedTargetInterfaces()) {
             targetNames.append(targetIface->title());
         }
         return QString("%1.{%2} <-> %3.{%4}")

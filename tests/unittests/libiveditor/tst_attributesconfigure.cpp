@@ -119,6 +119,15 @@ void tst_AttributesConfigure::tst_systemAttrs()
         title = QLatin1String("1_name");
         match = rx.match(title);
         QVERIFY(match.capturedLength() != title.length());
+        title = QLatin1String("C");
+        match = rx.match(title);
+        QVERIFY(match.capturedLength() == title.length());
+        title = QLatin1String("name");
+        match = rx.match(title);
+        QVERIFY(match.capturedLength() == title.length());
+        title = QLatin1String("1");
+        match = rx.match(title);
+        QVERIFY(match.capturedLength() != title.length());
     }
     it = std::find_if(sysAttrs.cbegin(), sysAttrs.cend(),
             [title = ivm::meta::Props::token(ivm::meta::Props::Token::kind)](
@@ -155,6 +164,15 @@ void tst_AttributesConfigure::tst_systemAttrs()
         match = rx.match(title);
         QVERIFY(match.capturedLength() == title.length());
         title = QLatin1String("1_name");
+        match = rx.match(title);
+        QVERIFY(match.capturedLength() != title.length());
+        title = QLatin1String("C");
+        match = rx.match(title);
+        QVERIFY(match.capturedLength() == title.length());
+        title = QLatin1String("name");
+        match = rx.match(title);
+        QVERIFY(match.capturedLength() == title.length());
+        title = QLatin1String("1");
         match = rx.match(title);
         QVERIFY(match.capturedLength() != title.length());
     }

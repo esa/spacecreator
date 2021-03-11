@@ -15,6 +15,7 @@
    along with this program. If not, see <https://www.gnu.org/licenses/lgpl-2.1.html>.
 */
 
+#include "aadllibrary.h"
 #include "commandlineparser.h"
 #include "iveditor.h"
 #include "ivsystemchecks.h"
@@ -36,6 +37,7 @@ int main(int argc, char *argv[])
     msc::initMscLibrary();
     msc::initMscEditor();
     ive::initIvEditor();
+    ivm::initAadlLibrary();
 
     QApplication a(argc, argv);
     a.setOrganizationName(SC_ORGANISATION);
