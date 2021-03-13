@@ -167,18 +167,19 @@ void InteractiveObject::rebuildLayout()
 void InteractiveObject::mouseMoveEvent(QGraphicsSceneMouseEvent *event)
 {
     QGraphicsObject::mouseMoveEvent(event);
-    onManualMoveProgress(nullptr, event->lastScenePos(), event->scenePos());
+    onManualMoveProgress(gripPointItem(shared::ui::GripPoint::Center), event->lastScenePos(), event->scenePos());
 }
 
 void InteractiveObject::mousePressEvent(QGraphicsSceneMouseEvent *event)
 {
     QGraphicsObject::mousePressEvent(event);
-    onManualMoveStart(nullptr, event->scenePos());
+    onManualMoveStart(gripPointItem(shared::ui::GripPoint::Center), event->scenePos());
 }
 
 void InteractiveObject::mouseReleaseEvent(QGraphicsSceneMouseEvent *event)
 {
-    onManualMoveFinish(nullptr, event->buttonDownScenePos(event->button()), event->scenePos());
+    onManualMoveFinish(gripPointItem(shared::ui::GripPoint::Center), event->buttonDownScenePos(event->button()),
+            event->scenePos());
     Q_EMIT clicked();
     QGraphicsObject::mouseReleaseEvent(event);
 }

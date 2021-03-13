@@ -102,6 +102,10 @@ QRectF AADLRectGraphicsItem::adjustRectToParent(shared::ui::GripPoint *grip, con
     const QPointF shift = QPointF(to - from);
     QRectF rect = mapRectToParent(boundingRect());
 
+    if (!grip) {
+        return rect;
+    }
+
     auto parentObj = qobject_cast<InteractiveObject *>(parentObject());
     const QRectF contentRect = parentObj
             ? parentObj->boundingRect().marginsRemoved(
@@ -190,14 +194,14 @@ void AADLRectGraphicsItem::rebuildLayout()
     applyColorScheme();
 }
 
-bool AADLRectGraphicsItem::allowGeometryChange(const QPointF &from, const QPointF &to)
+bool AADLRectGraphicsItem::allowGeometryChange(shared::ui::GripPoint *grip, const QPointF &from, const QPointF &to)
 {
     const QPointF delta { to - from };
     if (delta.isNull())
         return false;
 
-    const QRectF currentBounds = sceneBoundingRect().marginsAdded(kContentMargins);
-    return gi::canPlaceRect(scene(), this, currentBounds, gi::RectOperation::Edit);
+    const QRectF upcomingItemRect = adjustRectToParent(grip, from, to);
+    return gi::canPlaceRect(scene(), this, upcomingItemRect, gi::RectOperation::Edit);
 }
 
 void AADLRectGraphicsItem::onManualMoveProgress(shared::ui::GripPoint *, const QPointF &from, const QPointF &to)
@@ -234,23 +238,22 @@ void AADLRectGraphicsItem::onManualResizeProgress(shared::ui::GripPoint *grip, c
 void AADLRectGraphicsItem::onManualResizeFinish(
         shared::ui::GripPoint *grip, const QPointF &pressedAt, const QPointF &releasedAt)
 {
-    Q_UNUSED(grip)
-    handleGeometryChange(pressedAt, releasedAt);
+    handleGeometryChange(grip, pressedAt, releasedAt);
 }
 
 void AADLRectGraphicsItem::onManualMoveFinish(
         shared::ui::GripPoint *grip, const QPointF &pressedAt, const QPointF &releasedAt)
 {
-    Q_UNUSED(grip)
-    handleGeometryChange(pressedAt, releasedAt);
+    handleGeometryChange(grip, pressedAt, releasedAt);
 }
 
-void AADLRectGraphicsItem::handleGeometryChange(const QPointF &pressedAt, const QPointF &releasedAt)
+void AADLRectGraphicsItem::handleGeometryChange(
+        shared::ui::GripPoint *grip, const QPointF &pressedAt, const QPointF &releasedAt)
 {
     if (pressedAt == releasedAt)
         return;
 
-    if (allowGeometryChange(pressedAt, releasedAt))
+    if (allowGeometryChange(grip, pressedAt, releasedAt))
         updateEntity();
     else // Fallback to previous geometry in case colliding with items at the same level
         updateFromEntity();

@@ -63,7 +63,7 @@ public:
     void dismiss() Q_DECL_NOEXCEPT { m_invoke = false; }
 
 private:
-    explicit QScopeGuard(F f) Q_DECL_NOEXCEPT : m_func(std::move(f)) { }
+    explicit QScopeGuard(F f) Q_DECL_NOEXCEPT : m_func(std::move(f)) {}
 
     Q_DISABLE_COPY(QScopeGuard)
 
@@ -187,12 +187,12 @@ void AADLFunctionGraphicsItem::onManualResizeProgress(
 }
 
 void AADLFunctionGraphicsItem::onManualResizeFinish(
-        shared::ui::GripPoint *, const QPointF &pressedAt, const QPointF &releasedAt)
+        shared::ui::GripPoint *grip, const QPointF &pressedAt, const QPointF &releasedAt)
 {
     if (pressedAt == releasedAt)
         return;
 
-    if (allowGeometryChange(pressedAt, releasedAt)) {
+    if (allowGeometryChange(grip, pressedAt, releasedAt)) {
         layoutConnectionsOnResize(AADLConnectionGraphicsItem::CollisionsPolicy::PartialRebuild);
         updateEntity();
     } else { // Fallback to previous geometry in case colliding with items at the same level
@@ -211,7 +211,7 @@ void AADLFunctionGraphicsItem::onManualMoveProgress(shared::ui::GripPoint *grip,
 }
 
 void AADLFunctionGraphicsItem::onManualMoveFinish(
-        shared::ui::GripPoint *, const QPointF &pressedAt, const QPointF &releasedAt)
+        shared::ui::GripPoint *grip, const QPointF &pressedAt, const QPointF &releasedAt)
 {
     if (isRootItem())
         return;
@@ -219,7 +219,7 @@ void AADLFunctionGraphicsItem::onManualMoveFinish(
     if (pressedAt == releasedAt)
         return;
 
-    if (allowGeometryChange(pressedAt, releasedAt)) {
+    if (allowGeometryChange(grip, pressedAt, releasedAt)) {
         layoutConnectionsOnMove(AADLConnectionGraphicsItem::CollisionsPolicy::PartialRebuild);
         updateEntity();
     } else { // Fallback to previous geometry in case colliding with items at the same level
