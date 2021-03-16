@@ -149,7 +149,8 @@ private:
     bool loadImpl(const QString &path);
     QString getComponentName(const QStringList &exportNames);
     QList<ivm::AADLObject *> prepareSelectedObjectsForExport(QString &name, bool silent = false);
-    static bool loadComponentModel(ivm::AADLModel *model, const QString &path);
+    bool loadComponentModel(ivm::AADLModel *model, const QString &path);
+    QString componentNameForObject(ivm::AADLObject *object) const;
 
     QWidget *createGraphicsView();
     QTreeView *createModelView();
