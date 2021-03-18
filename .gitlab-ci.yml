@@ -11,6 +11,7 @@ build_debian10_gcc:
   stage: build
   image: taste-buster:latest
   script:
+    - apt install ninja-build
     - mkdir -p build; cd build
     - cmake -GNinja ..
     - ninja
