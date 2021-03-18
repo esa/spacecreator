@@ -11,7 +11,7 @@ build_debian10_gcc:
   stage: build
   tags:
     - docker
-  image: registry.git.vikingsoftware.com/esa/taste3-ci-image:latest
+  image: taste-buster:latest
   script:
     - mkdir -p build; cd build
     - cmake -GNinja ..
@@ -25,15 +25,15 @@ build_debian10_gcc:
       - build
     expire_in: 1 day
 
-build_windows:
-  stage: build
-  tags:
-    - docker-windows
-  image: registry.git.vikingsoftware.com/esa/esa-ci-image-windows:latest
-  script:
-    - mkdir build; cd build
-    - cmake -GNinja -DCMAKE_PREFIX_PATH="$Env:QTDIR" -DQT_QMAKE_EXECUTABLE="$Env:QTDIR/bin/qmake.exe" ..
-    - ninja
+#build_windows:
+# stage: build
+# tags:
+#   - docker-windows
+# image: registry.git.vikingsoftware.com/esa/esa-ci-image-windows:latest
+# script:
+#   - mkdir build; cd build
+#   - cmake -GNinja -DCMAKE_PREFIX_PATH="$Env:QTDIR" -DQT_QMAKE_EXECUTABLE="$Env:QTDIR/bin/qmake.exe" ..
+#   - ninja
 
 ##################
 # TEST
@@ -42,7 +42,7 @@ unit_tests:
   stage: test
   tags:
     - docker
-  image: registry.git.vikingsoftware.com/esa/taste3-ci-image:latest
+  image: taste-buster:latest
   script:
     - ./scripts/run_tests.sh build
   dependencies:
@@ -62,7 +62,7 @@ test_coverage:
   stage: analysis
   tags:
     - docker
-  image: registry.git.vikingsoftware.com/esa/taste3-ci-image:latest
+  image: taste-buster:latest
   variables:
   script:
     - export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/usr/lib/x86_64-linux-gnu/qtcreator:/usr/lib/x86_64-linux-gnu/qtcreator/plugins
@@ -82,7 +82,7 @@ documentation:
   stage: deploy
   tags:
     - docker
-  image: registry.git.vikingsoftware.com/esa/taste3-ci-image:latest
+  image: taste-buster:latest
   script:
     - ./scripts/generate_documentation.sh
   cache:
@@ -100,7 +100,7 @@ debian_package:
   stage: deploy
   tags:
     - docker
-  image: registry.git.vikingsoftware.com/esa/taste3-ci-image:latest
+  image: taste-buster:latest
   script:
   - mkdir -p build; cd build
   - cmake -GNinja .. -DBUILD_PATCH_NUMBER=$CI_BUILD_ID -DENABLE_TESTS=OFF
