@@ -87,7 +87,7 @@ void TimerCreatorTool::commitPreviewItem()
     auto timer = qobject_cast<msc::MscTimer *>(m_previewEntity.take());
     startWaitForModelLayoutComplete(timer);
     auto instance = m_model->nearestInstance(m_previewItem->sceneBoundingRect().center());
-    const int eventIndex = m_model->eventIndex(m_previewItem->y());
+    const int eventIndex = m_model->eventIndex(m_previewItem->pos());
     m_model->undoStack()->push(new cmd::CmdTimerItemCreate(timer, m_timerType, instance, eventIndex, m_model));
 
     removePreviewItem();

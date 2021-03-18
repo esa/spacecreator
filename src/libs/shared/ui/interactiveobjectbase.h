@@ -46,7 +46,7 @@ public:
     void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget) override;
 
     QRectF boundingRect() const override;
-    void setBoundingRect(const QRectF newRect);
+    void setBoundingRect(const QRectF &newRect);
 
     GripPointsHandler *gripPointsHandler() const;
     GripPoint *gripPointItem(GripPoint::Location location) const;

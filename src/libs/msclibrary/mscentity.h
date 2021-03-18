@@ -73,6 +73,7 @@ public:
     MscComment *setCommentString(const QString &comment);
 
     virtual MscEntity::EntityType entityType() const = 0;
+    QString entityTypeName() const;
 
     QVector<cif::CifBlockShared> cifs() const;
     void setCifs(const QVector<cif::CifBlockShared> &cifs);
@@ -84,6 +85,7 @@ public:
 #ifdef QT_DEBUG
     void dbgShowCifs() const;
 #endif
+    virtual QString toDbgString() const;
 
 Q_SIGNALS:
     void dataChanged();
@@ -103,3 +105,6 @@ private:
 }
 
 Q_DECLARE_METATYPE(msc::MscEntity *)
+
+QDebug operator<<(QDebug debug, const msc::MscEntity &entity);
+QDebug operator<<(QDebug debug, const msc::MscEntity *entity);

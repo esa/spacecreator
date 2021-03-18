@@ -444,10 +444,36 @@ QPointF MessageItem::head() const
 
 void MessageItem::setHead(const QPointF &head, ObjectAnchor::Snap snap)
 {
-    if (head == this->head() && snap == ObjectAnchor::Snap::NoSnap)
+    if (head == this->head() && snap == ObjectAnchor::Snap::NoSnap) {
         return;
+    }
 
     updateTarget(head, snap);
+}
+
+/*!
+   Sets the position of the head/tip to the given scene position \p head.
+   The tail is moved as well, if the message is horizontal, or if the tail would be after/below the head.
+ */
+void MessageItem::setHeadPosition(const QPointF &head)
+{
+    if (head == this->head()) {
+        return;
+    }
+
+    QVector<QPointF> points = messagePoints();
+    if (points.size() < 2) {
+        return;
+    }
+
+    const bool horizontal = isHorizontal();
+    points.last() = head;
+
+    if (horizontal || points.first().y() > head.y()) {
+        points.first().setY(head.y());
+    }
+
+    setMessagePoints(points);
 }
 
 /*!
@@ -460,10 +486,49 @@ QPointF MessageItem::tail() const
 
 void MessageItem::setTail(const QPointF &tail, ObjectAnchor::Snap snap)
 {
-    if (tail == this->tail() && snap == ObjectAnchor::Snap::NoSnap)
+    if (tail == this->tail() && snap == ObjectAnchor::Snap::NoSnap) {
         return;
+    }
 
     updateSource(tail, snap);
+}
+
+/*!
+   Sets the position of the tail to the given scene position \p tail.
+   The head is moved as well, if the message is horizontal, or if the head would be before/above the tail.
+ */
+void MessageItem::setTailPosition(const QPointF &tail)
+{
+    if (tail == this->tail()) {
+        return;
+    }
+
+    QVector<QPointF> points = messagePoints();
+    if (points.size() < 2) {
+        return;
+    }
+
+    const bool horizontal = isHorizontal();
+    points.first() = tail;
+
+    if (horizontal || points.last().y() < tail.y()) {
+        points.last().setY(tail.y());
+    }
+
+    setMessagePoints(points);
+}
+
+/*!
+   Returns true if the arrow is straight and is horizontal
+ */
+bool MessageItem::isHorizontal() const
+{
+    const QVector<QPointF> points = messagePoints();
+    if (points.size() != 2) {
+        return false;
+    }
+
+    return std::abs(points[0].y() - points[1].y()) < 1e-6;
 }
 
 bool MessageItem::isAutoResizable() const
@@ -604,19 +669,19 @@ void MessageItem::onManualGeometryChangeFinished(shared::ui::GripPoint *gp, cons
     }
 
     if (sourceChanged) {
-        const int newIdx = m_chartLayoutManager->eventIndex(tail().y());
+        const int newIdx = m_chartLayoutManager->eventIndex(tail());
         undoStack->push(new cmd::CmdMessageItemResize(m_message, newIdx,
                 sourceInstanceItem() ? sourceInstanceItem()->modelItem() : nullptr, MscMessage::EndType::SOURCE_TAIL,
                 m_chartLayoutManager));
     }
     if (targetChanged) {
-        const int newIdx = m_chartLayoutManager->eventIndex(head().y());
+        const int newIdx = m_chartLayoutManager->eventIndex(head());
         undoStack->push(new cmd::CmdMessageItemResize(m_message, newIdx,
                 targetInstanceItem() ? targetInstanceItem()->modelItem() : nullptr, MscMessage::EndType::TARGET_HEAD,
                 m_chartLayoutManager));
     }
 
-    const qreal newPos = (gp && gp->location() == shared::ui::GripPoint::Center) ? to.y() : tail().y();
+    const QPointF newPos = (gp && gp->location() == shared::ui::GripPoint::Center) ? to : tail();
     int newIdx = m_chartLayoutManager->eventIndex(newPos, m_message);
     undoStack->push(new cmd::CmdMessagePointsEdit(m_message, oldPointsCif, newPointsCif, newIdx, m_chartLayoutManager));
     undoStack->endMacro();

@@ -258,10 +258,3 @@ QString MscMessage::paramString() const
 }
 
 } // namespace msc
-
-QDebug operator<<(QDebug dbg, const msc::MscMessage &message)
-{
-    QDebugStateSaver saver(dbg);
-    dbg << message.toDbgString();
-    return dbg;
-}

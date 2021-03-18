@@ -67,8 +67,12 @@ public:
 
     QPointF head() const;
     void setHead(const QPointF &head, ObjectAnchor::Snap snap);
+    void setHeadPosition(const QPointF &head);
     QPointF tail() const;
     void setTail(const QPointF &tail, ObjectAnchor::Snap snap);
+    void setTailPosition(const QPointF &head);
+
+    bool isHorizontal() const;
 
     bool isAutoResizable() const;
     void setAutoResizable(bool resizable);

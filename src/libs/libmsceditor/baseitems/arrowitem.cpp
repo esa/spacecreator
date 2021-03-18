@@ -129,8 +129,9 @@ void ArrowItem::setTurnPoints(const QVector<QPointF> &scenePoints)
 {
     QVector<QPointF> newPolyLine;
     newPolyLine.reserve(scenePoints.size());
-    for (const QPointF &scenePoint : scenePoints)
+    for (const QPointF &scenePoint : scenePoints) {
         newPolyLine << mapFromScene(scenePoint);
+    }
 
     if (m_polyLine != newPolyLine) {
         m_polyLine = newPolyLine;
@@ -167,7 +168,7 @@ void ArrowItem::updateLine(const QLineF &newLine)
 
 void ArrowItem::updatePath()
 {
-    prepareGeometryChange();
+    const QRectF oldBounds = m_bounds;
 
     m_bodyPath = QPainterPath();
     const int pointsCount = m_polyLine.size();
@@ -191,7 +192,10 @@ void ArrowItem::updatePath()
         m_bounds |= m_symbols.Target.boundingRect();
 
     consistencyCheck();
-    Q_EMIT geometryChanged(boundingRect());
+    if (m_bounds != oldBounds) {
+        prepareGeometryChange();
+        Q_EMIT geometryChanged(boundingRect());
+    }
 }
 
 QPainterPath ArrowItem::bodyPath() const

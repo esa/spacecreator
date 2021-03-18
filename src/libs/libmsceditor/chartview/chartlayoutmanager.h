@@ -93,7 +93,7 @@ public:
 
     msc::MscEntity *nearestEntity(const QPointF &pos);
     msc::MscInstance *nearestInstance(const QPointF &pos);
-    int eventIndex(qreal y, MscInstanceEvent *ignoreEvent = nullptr);
+    int eventIndex(const QPointF &pt, MscInstanceEvent *ignoreEvent = nullptr);
     int indexOfEvent(MscInstanceEvent *instanceEvent) const;
     msc::MscInstanceEvent *eventAtPosition(const QPointF &pos);
 
@@ -168,7 +168,7 @@ private:
     CommentItem *addCommentItem(MscComment *comment);
     MessageItem *addMessageItem(MscMessage *message);
     ActionItem *addActionItem(MscAction *action);
-    ConditionItem *addConditionItem(MscCondition *condition, ConditionItem *prevItem, const QRectF& instancesRect);
+    ConditionItem *addConditionItem(MscCondition *condition, ConditionItem *prevItem, const QRectF &instancesRect);
     TimerItem *addTimerItem(MscTimer *timer);
     CoregionItem *addCoregionItem(MscCoregion *coregion);
 

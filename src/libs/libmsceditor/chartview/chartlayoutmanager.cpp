@@ -1132,14 +1132,14 @@ MscInstance *ChartLayoutManager::nearestInstance(const QPointF &pos)
    Returns the index an event would have if it was placed at Y-position \p y.
    @param y the Y-position in scene coordinates
  */
-int ChartLayoutManager::eventIndex(qreal y, MscInstanceEvent *ignoreEvent)
+int ChartLayoutManager::eventIndex(const QPointF &pt, MscInstanceEvent *ignoreEvent)
 {
     int idx = 0;
     for (msc::InteractiveObject *item : d->m_instanceEventItemsSorted) {
-        if (item->modelEntity() != ignoreEvent && item->sceneBoundingRect().y() < y) {
+        if (item->modelEntity() != ignoreEvent && item->sceneBoundingRect().y() < pt.y()) {
             ++idx;
             if (auto coregionItem = qobject_cast<CoregionItem *>(item)) {
-                if (coregionItem->sceneBoundingRect().bottom() < y)
+                if (coregionItem->sceneBoundingRect().bottom() < pt.y())
                     ++idx;
             }
         }
@@ -1662,7 +1662,7 @@ void ChartLayoutManager::onInstanceEventItemMoved(shared::ui::InteractiveObjectB
     if (auto actionItem = qobject_cast<ActionItem *>(item)) {
         MscInstance *newInstance = nearestInstance(actionItem->sceneBoundingRect().center());
         const int currentIdx = d->m_currentChart->instanceEvents().indexOf(actionItem->modelItem());
-        const int newIdx = eventIndex(item->y());
+        const int newIdx = eventIndex(item->pos());
         if (!newInstance || newInstance != actionItem->modelItem()->instance() || newIdx != currentIdx) {
             d->m_undoStack->push(new cmd::CmdActionItemMove(actionItem->modelItem(), newIdx, newInstance, this));
         }
@@ -1674,7 +1674,7 @@ void ChartLayoutManager::onInstanceEventItemMoved(shared::ui::InteractiveObjectB
             newInstance = conditionItem->modelItem()->instance();
         }
         const int currentIdx = d->m_currentChart->instanceEvents().indexOf(conditionItem->modelItem());
-        const int newIdx = eventIndex(item->y());
+        const int newIdx = eventIndex(item->pos());
         if (!newInstance || newInstance != conditionItem->modelItem()->instance() || newIdx != currentIdx) {
             d->m_undoStack->push(new cmd::CmdConditionItemMove(conditionItem->modelItem(), newIdx, newInstance, this));
         }
@@ -1684,7 +1684,7 @@ void ChartLayoutManager::onInstanceEventItemMoved(shared::ui::InteractiveObjectB
         const QRectF itemRect = timerItem->sceneBoundingRect();
         MscInstance *newInstance = nearestInstance(QPointF(itemRect.left(), itemRect.center().y()));
         const int currentIdx = d->m_currentChart->instanceEvents().indexOf(timerItem->modelItem());
-        const int newIdx = eventIndex(item->y());
+        const int newIdx = eventIndex(item->pos());
         if (!newInstance || newInstance != timerItem->modelItem()->instance() || newIdx != currentIdx) {
             d->m_undoStack->push(new cmd::CmdTimerItemMove(timerItem->modelItem(), newIdx, newInstance, this));
         }
@@ -1694,8 +1694,8 @@ void ChartLayoutManager::onInstanceEventItemMoved(shared::ui::InteractiveObjectB
         MscInstance *newInstance = nearestInstance(coregionItem->sceneBoundingRect().center());
         const int currentBeginIdx = d->m_currentChart->instanceEvents().indexOf(coregionItem->begin());
         const int currentEndIdx = d->m_currentChart->instanceEvents().indexOf(coregionItem->end());
-        const int newIdxBegin = eventIndex(item->sceneBoundingRect().top());
-        const int newIdxEnd = eventIndex(item->sceneBoundingRect().bottom());
+        const int newIdxBegin = eventIndex(item->sceneBoundingRect().topLeft());
+        const int newIdxEnd = eventIndex(item->sceneBoundingRect().bottomLeft());
         if (!newInstance || newInstance != coregionItem->begin()->instance() || currentBeginIdx != newIdxBegin
                 || currentEndIdx != newIdxEnd) {
             d->m_undoStack->push(new cmd::CmdCoRegionItemMove(
@@ -1723,7 +1723,7 @@ void ChartLayoutManager::onMessageRetargeted(MessageItem *item, const QPointF &p
         otherInstance = message->sourceInstance();
     }
     const int currentIdx = d->m_currentChart->instanceEvents().indexOf(message);
-    const int newIdx = eventIndex(pos.y());
+    const int newIdx = eventIndex(pos);
     if (((newInstance != currentInstance && newInstance != otherInstance) || newIdx != currentIdx)
             && (newInstance || otherInstance)) {
 
