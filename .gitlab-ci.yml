@@ -1,55 +1,36 @@
 stages:
-  - deps
-  - build
-  - test
-  - analysis
-  - deploy
+  - build-test-and-bundle
 
 
-install-dependencies:
-  stage: deps
+space-creator:
+  stage: build-test-and-bundle
   image: taste-buster:latest
   script:
+    # dependencies
     - apt install -y -y build-essential git g++ clang cmake cmake-data ninja-build make qtbase5-dev-tools qtbase5-dev qtdeclarative5-dev qtlocation5-dev qtpositioning5-dev libqt5svg5-dev libqt5websockets5-dev qt5-default qbs qtwebengine5-dev clang-format clang-tidy clazy cppcheck gcovr lcov ccache cccc doxygen graphviz zip p7zip curl wget default-jre uuid-dev pkg-config
     - curl -L https://github.com/steveire/grantlee/archive/v5.2.0.tar.gz | tar xz ; cd grantlee-*; patch -p1 < ../patches/grantlee_fix_escape.diff; mkdir build; cd build; cmake -DCMAKE_INSTALL_PREFIX=$(qmake -query QT_INSTALL_PREFIX) ..; cmake --build .; cmake --build . --target install; cd ../..
-
-##################
-# Build
-##################
-build_debian10_gcc:
-  stage: build
-  image: taste-buster:latest
-  script:
+    # build space creator
     - mkdir -p build; cd build
     - cmake -GNinja ..
     - ninja
-  dependencies:
-    - install-dependencies
-  cache:
-    key: asn1scc
-    paths:
-      - build/asn1scc_bin
-
-#build_windows:
-# stage: build
-# tags:
-#   - docker-windows
-# image: registry.git.vikingsoftware.com/esa/esa-ci-image-windows:latest
-# script:
-#   - mkdir build; cd build
-#   - cmake -GNinja -DCMAKE_PREFIX_PATH="$Env:QTDIR" -DQT_QMAKE_EXECUTABLE="$Env:QTDIR/bin/qmake.exe" ..
-#   - ninja
-
-##################
-# TEST
-##################
-unit_tests:
-  stage: test
-  image: taste-buster:latest
-  script:
+    - cd ..
+    # unit tests
     - ./scripts/run_tests.sh build
-  dependencies:
-    - build_debian10_gcc
+    # coverage
+    - export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/usr/lib/x86_64-linux-gnu/qtcreator:/usr/lib/x86_64-linux-gnu/qtcreator/plugins
+    - export QT_QPA_PLATFORM=offscreen
+    - mkdir -p coverage ; cd coverage ; rm * -rf
+    - cmake -G Ninja -DCOVERAGE_ENABLED=ON ..
+    - ninja ; ../scripts/run_tests.sh . ; ninja coverage ; ninja coverage_html
+    - cd ..
+    # documentation
+    - ./scripts/generate_documentation.sh
+    # debian package
+    - cd build
+    - cmake -GNinja .. -DBUILD_PATCH_NUMBER=$CI_BUILD_ID -DENABLE_TESTS=OFF
+    - cmake --build . --target all
+    - cpack
+    - cd ..; mkdir -p package; cp build/*.deb package
   cache:
     key: asn1scc
     paths:
@@ -57,66 +38,7 @@ unit_tests:
   artifacts:
     reports:
       junit: build/tst_*-result.xml
-
-##################
-# Analysis
-##################
-test_coverage:
-  stage: analysis
-  image: taste-buster:latest
-  variables:
-  script:
-    - export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/usr/lib/x86_64-linux-gnu/qtcreator:/usr/lib/x86_64-linux-gnu/qtcreator/plugins
-    - export QT_QPA_PLATFORM=offscreen
-    - mkdir -p coverage ; cd coverage ; rm * -rf
-    - cmake -G Ninja -DCOVERAGE_ENABLED=ON ..
-    - ninja ; ../scripts/run_tests.sh . ; ninja coverage ; ninja coverage_html
-  dependencies:
-    - install-dependencies
-  cache:
-    key: asn1scc
-    paths:
-      - build/asn1scc_bin
-
-##################
-# Deployment
-##################
-documentation:
-  stage: deploy
-  image: taste-buster:latest
-  script:
-    - ./scripts/generate_documentation.sh
-  dependencies:
-    - install-dependencies
-  cache:
-    key: asn1scc
-    paths:
-      - build/asn1scc_bin
-  artifacts:
     paths:
       - doc/doxygen/html
-    expire_in: 4 weeks
-  only:
-    - master
-
-debian_package:
-  stage: deploy
-  image: taste-buster:latest
-  script:
-  - mkdir -p build; cd build
-  - cmake -GNinja .. -DBUILD_PATCH_NUMBER=$CI_BUILD_ID -DENABLE_TESTS=OFF
-  - cmake --build . --target all
-  - cpack
-  - cd ..; mkdir -p package; cp build/*.deb package
-  dependencies:
-    - install-dependencies
-  cache:
-    key: asn1scc
-    paths:
-      - build/asn1scc_bin
-  artifacts:
-    paths:
       - package
     expire_in: 4 weeks
-  only:
-    - master
