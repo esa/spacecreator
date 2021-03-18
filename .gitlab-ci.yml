@@ -20,9 +20,6 @@ build_debian10_gcc:
     key: asn1scc
     paths:
       - build/asn1scc_bin
-  artifacts:
-    paths:
-      - build
     expire_in: 1 day
 
 #build_windows:
