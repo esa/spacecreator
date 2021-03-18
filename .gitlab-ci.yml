@@ -9,8 +9,6 @@ stages:
 ##################
 build_debian10_gcc:
   stage: build
-  tags:
-    - docker
   image: taste-buster:latest
   script:
     - mkdir -p build; cd build
@@ -40,8 +38,6 @@ build_debian10_gcc:
 ##################
 unit_tests:
   stage: test
-  tags:
-    - docker
   image: taste-buster:latest
   script:
     - ./scripts/run_tests.sh build
@@ -60,8 +56,6 @@ unit_tests:
 ##################
 test_coverage:
   stage: analysis
-  tags:
-    - docker
   image: taste-buster:latest
   variables:
   script:
@@ -80,8 +74,6 @@ test_coverage:
 ##################
 documentation:
   stage: deploy
-  tags:
-    - docker
   image: taste-buster:latest
   script:
     - ./scripts/generate_documentation.sh
@@ -98,8 +90,6 @@ documentation:
 
 debian_package:
   stage: deploy
-  tags:
-    - docker
   image: taste-buster:latest
   script:
   - mkdir -p build; cd build
