@@ -33,4 +33,4 @@ do
     fi
 done
 
-return $EXIT_CODE
+exit $EXIT_CODE
