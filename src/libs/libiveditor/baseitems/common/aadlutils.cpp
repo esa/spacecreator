@@ -18,15 +18,8 @@
 #include "aadlutils.h"
 
 #include "aadlobject.h"
-#include "baseitems/interactiveobject.h"
 #include "connectioncreationvalidator.h"
 #include "graphicsviewutils.h"
-#include "interface/aadlcommentgraphicsitem.h"
-#include "interface/aadlconnectiongraphicsitem.h"
-#include "interface/aadlconnectiongroupgraphicsitem.h"
-#include "interface/aadlfunctiongraphicsitem.h"
-#include "interface/aadlfunctiontypegraphicsitem.h"
-#include "interface/aadlinterfacegraphicsitem.h"
 
 #include <QDebug>
 #include <QDir>
@@ -377,46 +370,6 @@ QRectF adjustFromPoint(const QPointF &pos, const qreal &adjustment)
     return QRectF { pos - adjustmentPoint, pos + adjustmentPoint };
 }
 
-QList<int> knownGraphicsItemTypes()
-{
-    QList<int> result;
-
-    const QMetaEnum &me = QMetaEnum::fromType<ivm::AADLObject::Type>();
-    for (int i = 0; i < me.keyCount(); ++i) {
-        int itemType = 0;
-        const ivm::AADLObject::Type objectType = static_cast<ivm::AADLObject::Type>(me.value(i));
-        switch (objectType) {
-        case ivm::AADLObject::Type::Function:
-            itemType = ive::AADLFunctionGraphicsItem::Type;
-            break;
-        case ivm::AADLObject::Type::FunctionType:
-            itemType = ive::AADLFunctionTypeGraphicsItem::Type;
-            break;
-        case ivm::AADLObject::Type::InterfaceGroup:
-        case ivm::AADLObject::Type::ProvidedInterface:
-        case ivm::AADLObject::Type::RequiredInterface:
-            itemType = ive::AADLInterfaceGraphicsItem::Type;
-            break;
-        case ivm::AADLObject::Type::Comment:
-            itemType = ive::AADLCommentGraphicsItem::Type;
-            break;
-        case ivm::AADLObject::Type::Connection:
-            itemType = ive::AADLConnectionGraphicsItem::Type;
-            break;
-        case ivm::AADLObject::Type::ConnectionGroup:
-            itemType = ive::AADLConnectionGroupGraphicsItem::Type;
-            break;
-        case ivm::AADLObject::Type::Unknown:
-            continue;
-        }
-        if (itemType != 0) {
-            result.append(itemType);
-        }
-    }
-
-    return result;
-}
-
 qreal itemLevel(const ivm::AADLObject *const object, bool itemSelected)
 {
     if (!object || itemSelected) {
@@ -542,7 +495,7 @@ int indexFromSide(Qt::Alignment side)
  * and assign first intersection to \a collidingRect
  */
 
-bool checkCollision(const QList<QRectF> &itemRects, const QRectF &itemRect, QRectF *collidingRect)
+bool isCollided(const QList<QRectF> &itemRects, const QRectF &itemRect, QRectF *collidingRect)
 {
     auto it = std::find_if(itemRects.cbegin(), itemRects.cend(),
             [itemRect](const QRectF &siblingRect) { return siblingRect.intersects(itemRect); });
@@ -1011,25 +964,6 @@ void findGeometryForRect(
     boundedRect = newBoundingRect.marginsAdded(margins);
 }
 
-/*!
- * Gets geometries of all AADLFunctionGraphicsItems and AADLFunctionTypeGraphicsItem
- * with the same level as \a item in scene coordinates
- */
-QList<QRectF> siblingSceneRects(QGraphicsItem *item)
-{
-    Q_ASSERT(item && item->scene());
-
-    QList<QRectF> existingRects;
-    static const QList<int> kNonIntersectableTypes = { AADLFunctionGraphicsItem::Type,
-        AADLFunctionTypeGraphicsItem::Type };
-    for (auto graphicsItem : item->scene()->items()) {
-        if (item != graphicsItem && graphicsItem->parentItem() == item->parentItem()
-                && kNonIntersectableTypes.contains(graphicsItem->type()))
-            existingRects.append(graphicsItem->sceneBoundingRect());
-    }
-    return existingRects;
-}
-
 QString dynamicPropertiesFilePath()
 {
     static const QString kDefaultPath = QStandardPaths::writableLocation(QStandardPaths::AppLocalDataLocation)
@@ -1052,6 +986,32 @@ QString sharedTypesPath()
             + QDir::separator() + QLatin1String("shared_types") + QDir::separator();
 
     return qEnvironmentVariable("TASTE_SHARED_TYPES", kDefaultPath);
+}
+
+/*!
+ * Gets geometries of all graphic items with types listed in 'a acceptableItemTypes
+ * with the same level as \a item in scene coordinates with \a margins added
+ */
+QList<QRectF> siblingItemsRects(const QGraphicsItem *item, const QList<int> &acceptableItemTypes)
+{
+    if (!item) {
+        return {};
+    }
+
+    const QGraphicsScene *scene = item->scene();
+    if (!scene) {
+        return {};
+    }
+
+    QList<QRectF> rects;
+    const QList<QGraphicsItem *> siblingItems = item->parentItem() ? item->parentItem()->childItems() : scene->items();
+    for (auto siblingItem : siblingItems) {
+        if (item != siblingItem && acceptableItemTypes.contains(siblingItem->type())
+                && siblingItem->parentItem() == item->parentItem()) {
+            rects.append(siblingItem->sceneBoundingRect());
+        }
+    }
+    return rects;
 }
 
 } // namespace ive

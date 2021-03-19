@@ -1,4 +1,4 @@
-/*
+﻿/*
   Copyright (C) 2020 European Space Agency - <maxime.perrotin@esa.int>
 
   This library is free software; you can redistribute it and/or
@@ -29,14 +29,19 @@
 #include "graphicsviewutils.h"
 #include "interface/aadlcommentgraphicsitem.h"
 #include "interface/aadlconnectiongraphicsitem.h"
+#include "interface/aadlconnectiongroupgraphicsitem.h"
 #include "interface/aadlfunctiongraphicsitem.h"
 #include "interface/aadlfunctiontypegraphicsitem.h"
 #include "interface/aadlinterfacegraphicsitem.h"
 
 #include <QGraphicsScene>
+#include <QMetaEnum>
 
 namespace ive {
 namespace gi {
+
+static const QList<int> kRectTypes { AADLCommentGraphicsItem::Type, AADLFunctionGraphicsItem::Type,
+    AADLFunctionTypeGraphicsItem::Type };
 
 ivm::AADLFunction *functionObject(QGraphicsItem *item)
 {
@@ -54,8 +59,8 @@ ivm::AADLFunctionType *functionTypeObject(QGraphicsItem *item)
     if (!item)
         return nullptr;
 
-    if (auto function = qobject_cast<AADLFunctionTypeGraphicsItem *>(item->toGraphicsObject()))
-        return function->entity();
+    if (auto functionType = qobject_cast<AADLFunctionTypeGraphicsItem *>(item->toGraphicsObject()))
+        return functionType->entity();
 
     return nullptr;
 };
@@ -65,8 +70,8 @@ ivm::AADLIface *interfaceObject(QGraphicsItem *item)
     if (!item)
         return nullptr;
 
-    if (auto function = qobject_cast<AADLInterfaceGraphicsItem *>(item->toGraphicsObject()))
-        return function->entity();
+    if (auto iface = qobject_cast<AADLInterfaceGraphicsItem *>(item->toGraphicsObject()))
+        return iface->entity();
 
     return nullptr;
 };
@@ -76,8 +81,8 @@ ivm::AADLComment *commentObject(QGraphicsItem *item)
     if (!item)
         return nullptr;
 
-    if (auto function = qobject_cast<AADLCommentGraphicsItem *>(item->toGraphicsObject()))
-        return function->entity();
+    if (auto comment = qobject_cast<AADLCommentGraphicsItem *>(item->toGraphicsObject()))
+        return comment->entity();
 
     return nullptr;
 };
@@ -87,8 +92,8 @@ ivm::AADLConnection *connectionObject(QGraphicsItem *item)
     if (!item)
         return nullptr;
 
-    if (auto function = qobject_cast<AADLConnectionGraphicsItem *>(item->toGraphicsObject()))
-        return function->entity();
+    if (auto connection = qobject_cast<AADLConnectionGraphicsItem *>(item->toGraphicsObject()))
+        return connection->entity();
 
     return nullptr;
 };
@@ -105,29 +110,6 @@ bool isOwnConnection(const QGraphicsItem *owner, const QGraphicsItem *connection
                     return true;
 
     return false;
-}
-
-bool canPlaceRect(QGraphicsScene *scene, const QGraphicsItem *upcomingItem, const QRectF &upcomingItemRect,
-        const RectOperation action)
-{
-    if (!scene || upcomingItemRect.isEmpty() || !upcomingItem)
-        return false;
-
-    for (auto item : scene->items(upcomingItemRect)) {
-        if (item == upcomingItem || item->type() < QGraphicsItem::UserType)
-            continue;
-
-        const int itemType = item->type();
-        if (itemType <= QGraphicsItem::UserType)
-            continue;
-        if (AADLConnectionGraphicsItem::Type == itemType && isOwnConnection(upcomingItem, item))
-            continue;
-
-        if (action == RectOperation::Edit && upcomingItem->parentItem() == item->parentItem())
-            return false;
-    }
-
-    return true;
 }
 
 ivm::AADLObject *object(const QGraphicsItem *item)
@@ -283,6 +265,80 @@ ivm::ValidationResult validateConnectionCreate(QGraphicsScene *scene, const QVec
     result.status = ivm::ConnectionCreationValidator::canConnect(
             result.startObject, result.endObject, result.startIface, result.endIface);
     return result;
+}
+
+QList<int> rectangularTypes()
+{
+    return kRectTypes;
+}
+
+QList<int> knownGraphicsItemTypes()
+{
+    QList<int> result;
+
+    const QMetaEnum &me = QMetaEnum::fromType<ivm::AADLObject::Type>();
+    for (int i = 0; i < me.keyCount(); ++i) {
+        int itemType = 0;
+        const ivm::AADLObject::Type objectType = static_cast<ivm::AADLObject::Type>(me.value(i));
+        switch (objectType) {
+        case ivm::AADLObject::Type::Function:
+            itemType = ive::AADLFunctionGraphicsItem::Type;
+            break;
+        case ivm::AADLObject::Type::FunctionType:
+            itemType = ive::AADLFunctionTypeGraphicsItem::Type;
+            break;
+        case ivm::AADLObject::Type::InterfaceGroup:
+        case ivm::AADLObject::Type::ProvidedInterface:
+        case ivm::AADLObject::Type::RequiredInterface:
+            itemType = ive::AADLInterfaceGraphicsItem::Type;
+            break;
+        case ivm::AADLObject::Type::Comment:
+            itemType = ive::AADLCommentGraphicsItem::Type;
+            break;
+        case ivm::AADLObject::Type::Connection:
+            itemType = ive::AADLConnectionGraphicsItem::Type;
+            break;
+        case ivm::AADLObject::Type::ConnectionGroup:
+            itemType = ive::AADLConnectionGroupGraphicsItem::Type;
+            break;
+        case ivm::AADLObject::Type::Unknown:
+            continue;
+        }
+        if (itemType != 0) {
+            result.append(itemType);
+        }
+    }
+
+    return result;
+}
+
+bool isCollided(const QGraphicsItem *upcomingItem, const QRectF &upcomingItemRect)
+{
+    if (!upcomingItem || !upcomingItemRect.isValid()) {
+        return false;
+    }
+
+    const QList<QRectF> siblingRects = siblingItemsRects(upcomingItem, gi::rectangularTypes());
+    return ive::isCollided(siblingRects, upcomingItemRect.marginsAdded(kContentMargins));
+}
+
+bool isBounded(const QGraphicsItem *upcomingItem, const QRectF &upcomingItemRect)
+{
+    if (!upcomingItem || !upcomingItemRect.isValid()) {
+        return false;
+    }
+
+    if (auto iObj = qobject_cast<const AADLRectGraphicsItem *>(upcomingItem->toGraphicsObject())) {
+        const auto parentObj = qobject_cast<const InteractiveObject *>(iObj->parentObject());
+        if (parentObj && parentObj->aadlObject()) {
+            const QMarginsF margins = parentObj->aadlObject()->isRootObject() ? kRootMargins : kContentMargins;
+            const QRectF outerRect = parentObj->sceneBoundingRect().marginsRemoved(margins);
+            return outerRect.contains(upcomingItemRect);
+        } else if (iObj->aadlObject()->isRootObject()) {
+            return upcomingItemRect.marginsRemoved(kRootMargins).contains(iObj->nestedItemsSceneBoundingRect());
+        }
+    }
+    return true;
 }
 
 } // namespace gi

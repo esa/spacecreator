@@ -16,8 +16,11 @@
 */
 
 #include "aadlfunction.h"
+#include "aadllibrary.h"
 #include "baseitems/common/aadlutils.h"
 #include "interface/aadlfunctiongraphicsitem.h"
+#include "interface/graphicsitemhelpers.h"
+#include "iveditor.h"
 #include "sharedlibrary.h"
 
 #include <QGraphicsRectItem>
@@ -41,6 +44,8 @@ private Q_SLOTS:
 
 void tst_Utils::initTestCase()
 {
+    ivm::initAadlLibrary();
+    ive::initIvEditor();
     shared::initSharedLibrary();
 }
 
@@ -56,9 +61,9 @@ void tst_Utils::testCheckCollision()
     const QRectF rectNotCollided { 225, 225, 50, 50 };
     QRectF intersected;
     QRectF notIntersected;
-    QVERIFY(ive::checkCollision(rects, rectCollided, &intersected));
+    QVERIFY(ive::isCollided(rects, rectCollided, &intersected));
     QVERIFY(intersected == rects.at(3));
-    QVERIFY(ive::checkCollision(rects, rectNotCollided, &notIntersected) == false);
+    QVERIFY(ive::isCollided(rects, rectNotCollided, &notIntersected) == false);
     QVERIFY(!notIntersected.isValid());
 }
 
@@ -175,7 +180,7 @@ void tst_Utils::testSiblingSceneRects()
         child = new ive::AADLFunctionGraphicsItem(new ivm::AADLFunction, item);
         child->setRect(existingRects.at(idx));
     }
-    const auto siblingItems0 = ive::siblingSceneRects(item);
+    const auto siblingItems0 = ive::siblingItemsRects(item, ive::gi::rectangularTypes());
     QCOMPARE(siblingItems0.size(), 3);
     for (auto itemRect : siblingItems0) {
         const auto it = std::find(existingRects.cbegin(), existingRects.cend(), itemRect);
@@ -183,7 +188,7 @@ void tst_Utils::testSiblingSceneRects()
         QVERIFY(std::distance(existingRects.cbegin(), it) != 3);
     }
 
-    const auto siblingItems1 = ive::siblingSceneRects(child);
+    const auto siblingItems1 = ive::siblingItemsRects(child, ive::gi::rectangularTypes());
     QCOMPARE(siblingItems1.size(), 2);
     for (auto itemRect : siblingItems1) {
         const auto it = std::find(existingRects.cbegin(), existingRects.cend(), itemRect);
@@ -205,12 +210,12 @@ void tst_Utils::testFindGeometryForRect()
         br |= r;
 
     QRectF boundingRect { br };
-    ive::findGeometryForRect(itemRect, boundingRect, existingRects, {});
+    ive::findGeometryForRect(itemRect, boundingRect, existingRects, QMarginsF());
     QVERIFY(boundingRect.contains(itemRect));
     QVERIFY(br == boundingRect);
 
     existingRects << itemRect;
-    ive::findGeometryForRect(itemRect, boundingRect, existingRects, {});
+    ive::findGeometryForRect(itemRect, boundingRect, existingRects, QMarginsF());
     QVERIFY(boundingRect.contains(itemRect));
     QVERIFY(br != boundingRect);
 }

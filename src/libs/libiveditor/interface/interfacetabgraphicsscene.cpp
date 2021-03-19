@@ -19,6 +19,7 @@
 
 #include "baseitems/common/aadlutils.h"
 #include "baseitems/interactiveobject.h"
+#include "interface/graphicsitemhelpers.h"
 
 #include <QGraphicsSceneHelpEvent>
 #include <QToolTip>
@@ -32,7 +33,7 @@ InterfaceTabGraphicsScene::InterfaceTabGraphicsScene(QObject *parent)
 
 void InterfaceTabGraphicsScene::helpEvent(QGraphicsSceneHelpEvent *event)
 {
-    if (QGraphicsItem *hovered = nearestItem(this, event->scenePos(), knownGraphicsItemTypes())) {
+    if (QGraphicsItem *hovered = nearestItem(this, event->scenePos(), gi::knownGraphicsItemTypes())) {
         if (auto item = qobject_cast<InteractiveObject *>(hovered->toGraphicsObject())) {
             const QString &tooltip = item->prepareTooltip();
             if (!tooltip.isEmpty()) {

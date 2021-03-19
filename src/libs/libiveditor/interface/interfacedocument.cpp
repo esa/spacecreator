@@ -1091,12 +1091,16 @@ QVector<QAction *> InterfaceDocument::initActions()
         actCreateRequiredInterface, actCreateComment, actCreateConnection, d->actCreateConnectionGroup, d->actRemove,
         d->actZoomIn, d->actZoomOut, d->actExitToRoot, d->actExitToParent };
 
-    connect(d->objectsModel, &ivm::AADLModel::rootObjectChanged, this, [this]() {
+    connect(d->objectsModel, &ivm::AADLModel::rootObjectChanged, this, [this](const shared::Id &rootId) {
         if (d->actExitToRoot) {
             d->actExitToRoot->setEnabled(nullptr != d->objectsModel->rootObject());
         }
         if (d->actExitToParent) {
             d->actExitToParent->setEnabled(nullptr != d->objectsModel->rootObject());
+        }
+
+        if (const QGraphicsItem *item = d->itemsModel->getItem(rootId)) {
+            d->graphicsView->centerOn(item->sceneBoundingRect().center());
         }
     });
     connect(d->objectsSelectionModel, &QItemSelectionModel::selectionChanged, this,

@@ -157,7 +157,7 @@ QRectF adjustedRect(
 Qt::Alignment sideFromIndex(const int idx);
 int indexFromSide(Qt::Alignment side);
 
-bool checkCollision(const QList<QRectF> &itemRects, const QRectF &itemRect, QRectF *collidingRect = nullptr);
+bool isCollided(const QList<QRectF> &itemRects, const QRectF &itemRect, QRectF *collidingRect = nullptr);
 
 QList<QVector<QPointF>> generateSegments(const QPointF &startPoint, const QPointF &endPoint);
 
@@ -191,7 +191,8 @@ bool isOnVerticalSide(const QRectF &rect, const QPointF &point);
 bool isOnHorizontalSide(const QRectF &rect, const QPointF &point);
 bool rectContainsPoint(const QRectF &rect, const QPointF &point, bool proper = true);
 
-QList<QRectF> siblingSceneRects(QGraphicsItem *item);
+QList<QRectF> siblingItemsRects(const QGraphicsItem *item, const QList<int> &acceptableItemTypes);
+
 QRectF collidingRect(const QRectF &rect, const QList<QRectF> &existingRects);
 void findGeometryForRect(QRectF &itemRect, QRectF &boundedRect, const QList<QRectF> &existingRects = {},
         const QMarginsF &margins = kRootMargins);

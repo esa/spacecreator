@@ -26,6 +26,7 @@
 #include "aadlmodel.h"
 #include "baseitems/common/aadlutils.h"
 #include "colors/colormanager.h"
+#include "graphicsitemhelpers.h"
 
 #include <QApplication>
 #include <QGraphicsScene>
@@ -63,7 +64,7 @@ public:
     void dismiss() Q_DECL_NOEXCEPT { m_invoke = false; }
 
 private:
-    explicit QScopeGuard(F f) Q_DECL_NOEXCEPT : m_func(std::move(f)) {}
+    explicit QScopeGuard(F f) Q_DECL_NOEXCEPT : m_func(std::move(f)) { }
 
     Q_DISABLE_COPY(QScopeGuard)
 
@@ -120,38 +121,6 @@ QPainterPath AADLFunctionGraphicsItem::shape() const
     return pp;
 }
 
-void AADLFunctionGraphicsItem::rebuildLayout()
-{
-    auto view = scene()->views().value(0);
-    if (!view)
-        return;
-
-    if (isRootItem()) {
-        QRectF nestedItemsInternalRect = nestedItemsSceneBoundingRect();
-
-        const QRect viewportGeometry = view->viewport()->geometry().marginsRemoved(kContentMargins.toMargins());
-        const QRectF mappedViewportGeometry =
-                QRectF(view->mapToScene(viewportGeometry.topLeft()), view->mapToScene(viewportGeometry.bottomRight()));
-
-        QRectF itemRect = sceneBoundingRect();
-        if (!nestedItemsInternalRect.isValid() || !itemRect.isValid()) {
-            itemRect = mappedViewportGeometry;
-
-            if (nestedItemsInternalRect.isValid()) {
-                itemRect.moveCenter(nestedItemsInternalRect.center());
-                itemRect |= nestedItemsInternalRect.marginsAdded(kRootMargins);
-            }
-        } else {
-            itemRect |= nestedItemsInternalRect.marginsAdded(kRootMargins);
-        }
-
-        if (setGeometry(itemRect))
-            mergeGeometry();
-    }
-
-    AADLFunctionTypeGraphicsItem::rebuildLayout();
-}
-
 void AADLFunctionGraphicsItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget)
 {
     Q_UNUSED(option)
@@ -180,19 +149,43 @@ void AADLFunctionGraphicsItem::paint(QPainter *painter, const QStyleOptionGraphi
 }
 
 void AADLFunctionGraphicsItem::onManualResizeProgress(
-        shared::ui::GripPoint *grip, const QPointF &from, const QPointF &to)
-{
-    AADLFunctionTypeGraphicsItem::onManualResizeProgress(grip, from, to);
-    layoutConnectionsOnResize(AADLConnectionGraphicsItem::CollisionsPolicy::Ignore);
-}
-
-void AADLFunctionGraphicsItem::onManualResizeFinish(
         shared::ui::GripPoint *grip, const QPointF &pressedAt, const QPointF &releasedAt)
 {
     if (pressedAt == releasedAt)
         return;
 
-    if (allowGeometryChange(grip, pressedAt, releasedAt)) {
+    const QRectF rect = transformedRect(grip, pressedAt, releasedAt);
+    if (gi::isBounded(this, rect)) {
+        AADLFunctionTypeGraphicsItem::onManualResizeProgress(grip, pressedAt, releasedAt);
+        layoutConnectionsOnResize(AADLConnectionGraphicsItem::CollisionsPolicy::Ignore);
+    }
+}
+
+void AADLFunctionGraphicsItem::onManualMoveProgress(
+        shared::ui::GripPoint *grip, const QPointF &pressedAt, const QPointF &releasedAt)
+{
+    if (isRootItem())
+        return;
+
+    if (pressedAt == releasedAt)
+        return;
+
+    const QRectF rect = transformedRect(grip, pressedAt, releasedAt);
+    if (gi::isBounded(this, rect)) {
+        AADLFunctionTypeGraphicsItem::onManualMoveProgress(grip, pressedAt, releasedAt);
+        layoutConnectionsOnMove(AADLConnectionGraphicsItem::CollisionsPolicy::Ignore);
+    }
+}
+
+void AADLFunctionGraphicsItem::onManualResizeFinish(
+        shared::ui::GripPoint *grip, const QPointF &pressedAt, const QPointF &releasedAt)
+{
+    Q_UNUSED(grip)
+
+    if (pressedAt == releasedAt)
+        return;
+
+    if (gi::isBounded(this, sceneBoundingRect()) && !gi::isCollided(this, sceneBoundingRect())) {
         layoutConnectionsOnResize(AADLConnectionGraphicsItem::CollisionsPolicy::PartialRebuild);
         updateEntity();
     } else { // Fallback to previous geometry in case colliding with items at the same level
@@ -201,25 +194,18 @@ void AADLFunctionGraphicsItem::onManualResizeFinish(
     }
 }
 
-void AADLFunctionGraphicsItem::onManualMoveProgress(shared::ui::GripPoint *grip, const QPointF &from, const QPointF &to)
-{
-    if (isRootItem())
-        return;
-
-    AADLFunctionTypeGraphicsItem::onManualMoveProgress(grip, from, to);
-    layoutConnectionsOnMove(AADLConnectionGraphicsItem::CollisionsPolicy::Ignore);
-}
-
 void AADLFunctionGraphicsItem::onManualMoveFinish(
         shared::ui::GripPoint *grip, const QPointF &pressedAt, const QPointF &releasedAt)
 {
+    Q_UNUSED(grip)
+
     if (isRootItem())
         return;
 
     if (pressedAt == releasedAt)
         return;
 
-    if (allowGeometryChange(grip, pressedAt, releasedAt)) {
+    if (gi::isBounded(this, sceneBoundingRect()) && !gi::isCollided(this, sceneBoundingRect())) {
         layoutConnectionsOnMove(AADLConnectionGraphicsItem::CollisionsPolicy::PartialRebuild);
         updateEntity();
     } else { // Fallback to previous geometry in case colliding with items at the same level
@@ -302,11 +288,13 @@ void AADLFunctionGraphicsItem::drawNestedView(QPainter *painter)
             } else {
                 ivm::AADLObject *outerIface = connection->source()->id() == entity()->id()
                         ? connection->sourceInterface()
-                        : connection->target()->id() == entity()->id() ? connection->targetInterface() : nullptr;
+                        : connection->target()->id() == entity()->id() ? connection->targetInterface()
+                                                                       : nullptr;
 
                 ivm::AADLObject *innerIface = connection->source()->id() == entity()->id()
                         ? connection->targetInterface()
-                        : connection->target()->id() == entity()->id() ? connection->sourceInterface() : nullptr;
+                        : connection->target()->id() == entity()->id() ? connection->sourceInterface()
+                                                                       : nullptr;
 
                 if (!outerIface || !innerIface) {
                     continue;

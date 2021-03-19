@@ -809,7 +809,7 @@ void CreatorTool::CreatorToolPrivate::handleFunctionType(QGraphicsScene *scene, 
         QRectF itemSceneRect =
                 adjustToSize(this->previewItem->mapRectToScene(this->previewItem->rect()), DefaultGraphicsItemSize);
 
-        if (!gi::canPlaceRect(scene, this->previewItem, itemSceneRect, gi::RectOperation::Create))
+        if (!gi::isBounded(this->previewItem, itemSceneRect))
             return;
 
         if (auto parentItem = previewItem->parentItem()) {
@@ -834,7 +834,7 @@ void CreatorTool::CreatorToolPrivate::handleFunction(QGraphicsScene *scene, cons
         QRectF itemSceneRect =
                 adjustToSize(this->previewItem->mapRectToScene(this->previewItem->rect()), DefaultGraphicsItemSize);
 
-        if (!gi::canPlaceRect(scene, this->previewItem, itemSceneRect, gi::RectOperation::Create))
+        if (!gi::isBounded(this->previewItem, itemSceneRect))
             return;
 
         if (auto parentItem = previewItem->parentItem()) {

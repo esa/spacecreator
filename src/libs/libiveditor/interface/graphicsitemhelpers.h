@@ -35,7 +35,12 @@ struct ValidationResult;
 }
 
 namespace ive {
+
 namespace gi {
+
+QList<int> knownGraphicsItemTypes();
+
+QList<int> rectangularTypes();
 
 ivm::AADLFunction *functionObject(QGraphicsItem *item);
 
@@ -54,8 +59,9 @@ enum RectOperation
     Create,
     Edit
 };
-bool canPlaceRect(QGraphicsScene *scene, const QGraphicsItem *upcomingItem, const QRectF &upcomingItemRect,
-        const RectOperation action);
+
+bool isBounded(const QGraphicsItem *upcomingItem, const QRectF &upcomingItemRect);
+bool isCollided(const QGraphicsItem *upcomingItem, const QRectF &upcomingItemRect);
 
 /*!
  * \brief Performs the validation to detect if it's possible to connect the \a scene's items located in \a startPos and

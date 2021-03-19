@@ -50,7 +50,6 @@ public:
     QString prepareTooltip() const override;
 
 protected:
-    void rebuildLayout() override;
     void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget) override;
 
     void onManualResizeProgress(shared::ui::GripPoint *grip, const QPointF &from, const QPointF &to) override;

@@ -28,6 +28,7 @@
 #include "baseitems/common/aadlutils.h"
 #include "colors/colormanager.h"
 #include "graphicsviewutils.h"
+#include "interface/graphicsitemhelpers.h"
 #include "ui/grippointshandler.h"
 
 #include <QGuiApplication>
@@ -61,9 +62,9 @@ static inline QVector<QPointF> generateConnectionPath(AADLConnectionGraphicsItem
     const bool isStartEndpointNested = startItem->targetItem()->isAncestorOf(endItem);
     const bool isEndEndpointNested = endItem->targetItem()->isAncestorOf(startItem);
 
-    return createConnectionPath(siblingSceneRects(connection), startItem->connectionEndPoint(isStartEndpointNested),
-            startItem->targetItem()->sceneBoundingRect(), endItem->connectionEndPoint(isEndEndpointNested),
-            endItem->targetItem()->sceneBoundingRect());
+    return createConnectionPath(siblingItemsRects(connection, gi::rectangularTypes()),
+            startItem->connectionEndPoint(isStartEndpointNested), startItem->targetItem()->sceneBoundingRect(),
+            endItem->connectionEndPoint(isEndEndpointNested), endItem->targetItem()->sceneBoundingRect());
 }
 
 AADLConnectionGraphicsItem::GraphicsPathItem::GraphicsPathItem(QGraphicsItem *parent)
@@ -341,7 +342,7 @@ static inline QVector<QPointF> replaceIntersectedSegments(
         }
     }
     sections.erase(std::unique(sections.begin(), sections.end()), sections.end());
-    const QList<QRectF> existingRects = siblingSceneRects(connection);
+    const QList<QRectF> existingRects = siblingItemsRects(connection, gi::rectangularTypes());
     for (auto chunk : sections) {
         const QVector<QPointF> subPath = path(existingRects, chunk.first, chunk.second);
         if (!points.isEmpty()) {
