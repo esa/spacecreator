@@ -333,9 +333,10 @@ bool isBounded(const QGraphicsItem *upcomingItem, const QRectF &upcomingItemRect
         if (parentObj && parentObj->aadlObject()) {
             const QMarginsF margins = parentObj->aadlObject()->isRootObject() ? kRootMargins : kContentMargins;
             const QRectF outerRect = parentObj->sceneBoundingRect().marginsRemoved(margins);
-            return outerRect.contains(upcomingItemRect);
+            return ive::isRectBounded(outerRect, upcomingItemRect);
         } else if (iObj->aadlObject()->isRootObject()) {
-            return upcomingItemRect.marginsRemoved(kRootMargins).contains(iObj->nestedItemsSceneBoundingRect());
+            return ive::isRectBounded(
+                    upcomingItemRect.marginsRemoved(kRootMargins), iObj->nestedItemsSceneBoundingRect());
         }
     }
     return true;

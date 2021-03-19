@@ -197,4 +197,6 @@ QRectF collidingRect(const QRectF &rect, const QList<QRectF> &existingRects);
 void findGeometryForRect(QRectF &itemRect, QRectF &boundedRect, const QList<QRectF> &existingRects = {},
         const QMarginsF &margins = kRootMargins);
 
+bool isRectBounded(const QRectF &outerRect, const QRectF &innerRect);
+
 } // namespace ive
