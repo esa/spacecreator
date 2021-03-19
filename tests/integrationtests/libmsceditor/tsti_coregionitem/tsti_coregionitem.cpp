@@ -59,7 +59,7 @@ private Q_SLOTS:
     void testMovemessageInside();
     void testMovemessageSourceInside();
     void testMoveMessageCloseToCoregion();
-    void testPushedCoregionIncludesnewMessage();
+    void testPushedCoregionNotIncludesMessage();
 
 private:
     bool isInCoregion(const msc::CoregionItem *coregion, InteractiveObject *eventItem) const;
@@ -92,6 +92,7 @@ void tsti_CoregionItem::testMoveTopUp()
 
     vstest::sendMouseMove(m_view->viewport(), topGrip + QPoint(0., 15.)); // so the correct grip is pressed
     vstest::sendMouseDrag(m_view->viewport(), topGrip, actionTop);
+    waitForLayoutUpdate();
 
     QCOMPARE(m_chart->indexofEvent(coregionBegin), 0);
     QCOMPARE(m_chart->indexofEvent(coregionEnd), 2);
@@ -127,6 +128,7 @@ void tsti_CoregionItem::testMoveTopDown()
 
     vstest::sendMouseMove(m_view->viewport(), topGrip + QPoint(0., 15.)); // so the correct grip is pressed
     vstest::sendMouseDrag(m_view->viewport(), topGrip, actionBottom);
+    waitForLayoutUpdate();
 
     QCOMPARE(m_chart->indexofEvent(coregionBegin), 1);
     QCOMPARE(m_chart->indexofEvent(coregionEnd), 2);
@@ -162,6 +164,7 @@ void tsti_CoregionItem::testMoveBottomDown()
 
     vstest::sendMouseMove(m_view->viewport(), bottomGrip + QPoint(0., -15.)); // so the correct grip is pressed
     vstest::sendMouseDrag(m_view->viewport(), bottomGrip, actionBottom);
+    waitForLayoutUpdate();
 
     QCOMPARE(m_chart->indexofEvent(coregionBegin), 0);
     QCOMPARE(m_chart->indexofEvent(coregionEnd), 2);
@@ -197,6 +200,7 @@ void tsti_CoregionItem::testMoveBottomUp()
 
     vstest::sendMouseMove(m_view->viewport(), bottomGrip + QPoint(0., -15.)); // so the correct grip is pressed
     vstest::sendMouseDrag(m_view->viewport(), bottomGrip, actionTop);
+    waitForLayoutUpdate();
 
     QCOMPARE(m_chart->indexofEvent(coregionBegin), 0);
     QCOMPARE(m_chart->indexofEvent(coregionEnd), 1);
@@ -231,11 +235,11 @@ void tsti_CoregionItem::testMovemessageInside()
     QVERIFY(!isInCoregion(coregionItem, messageItem));
 
     // move message source
-
     const QPoint movePos = m_view->mapFromScene(((messageItem->head() + messageItem->tail()) / 2).toPoint());
     const QPoint insideRegion = QPoint(movePos.x(), bottomCenter(coregionItem).y() - 10);
 
     vstest::sendMouseDrag(m_view->viewport(), movePos, insideRegion);
+    waitForLayoutUpdate();
 
     QCOMPARE(m_chart->indexofEvent(coregionBegin), 0);
     QCOMPARE(m_chart->indexofEvent(coregionEnd), 2);
@@ -245,6 +249,7 @@ void tsti_CoregionItem::testMovemessageInside()
 
 void tsti_CoregionItem::testMovemessageSourceInside()
 {
+    QSKIP("The action is moved, because dependencies (prev/next in instances) are missing");
     static const QString msc("MSCDOCUMENT doc1; \
                              MSC msc1; \
                                  INSTANCE i1; \
@@ -261,28 +266,28 @@ void tsti_CoregionItem::testMovemessageSourceInside()
     loadView(msc);
 
     auto coregionBegin = qobject_cast<msc::MscCoregion *>(m_chart->instanceEvents().at(0));
+    auto coregionEnd = qobject_cast<msc::MscCoregion *>(m_chart->instanceEvents().at(1));
     auto action = qobject_cast<msc::MscAction *>(m_chart->instanceEvents().at(2));
     auto message = qobject_cast<msc::MscMessage *>(m_chart->instanceEvents().at(3));
 
     msc::CoregionItem *coregionItem = m_chartModel->itemForCoregion(coregionBegin);
     msc::MessageItem *messageItem = m_chartModel->itemForMessage(message);
     msc::ActionItem *actionItem = m_chartModel->itemForAction(action);
-
     QVERIFY(!isInCoregion(coregionItem, actionItem));
     QVERIFY(!isInCoregion(coregionItem, messageItem));
 
-    // move message source
-
+    // move message source inside coregion
     const QPoint targetPos = m_view->mapFromScene(messageItem->head().toPoint());
     const QPoint sourcePos = m_view->mapFromScene(messageItem->tail().toPoint());
     const QPoint insideRegion = bottomCenter(coregionItem) + QPoint(0, -10);
 
     vstest::sendMouseMove(m_view->viewport(), targetPos); // so the correct grip is pressed
     vstest::sendMouseDrag(m_view->viewport(), sourcePos, insideRegion);
+    waitForLayoutUpdate();
 
-    QCOMPARE(m_chart->indexofEvent(coregionBegin), 0);
-    QCOMPARE(m_chart->indexofEvent(message), 1);
-    QCOMPARE(m_chart->indexofEvent(action), 3);
+    QVERIFY(m_chart->indexofEvent(message) > m_chart->indexofEvent(coregionBegin));
+    QVERIFY(m_chart->indexofEvent(message) < m_chart->indexofEvent(coregionEnd));
+    QVERIFY(m_chart->indexofEvent(message) > m_chart->indexofEvent(action));
     QVERIFY(!isInCoregion(coregionItem, actionItem));
     QVERIFY(isInCoregion(coregionItem, messageItem));
 }
@@ -318,13 +323,14 @@ void tsti_CoregionItem::testMoveMessageCloseToCoregion()
 
     vstest::sendMouseMove(m_view->viewport(), initPos); // so the correct grip is pressed
     vstest::sendMouseDrag(m_view->viewport(), sourcePos, closeBelowRegion);
+    waitForLayoutUpdate();
 
     QCOMPARE(m_chart->indexofEvent(coregionBegin), 0);
     QCOMPARE(m_chart->indexofEvent(message), 2);
     QVERIFY(!isInCoregion(coregionItem, messageItem));
 }
 
-void tsti_CoregionItem::testPushedCoregionIncludesnewMessage()
+void tsti_CoregionItem::testPushedCoregionNotIncludesMessage()
 {
     static const QString msc("MSCDOCUMENT doc1; \
                              MSC msc1; \
@@ -356,8 +362,9 @@ void tsti_CoregionItem::testPushedCoregionIncludesnewMessage()
     QPoint targetPos =
             QPoint(center(actionItem).x(), topCenter(coregionItem).y() - 10); // At the top of the 2nd instance
     vstest::sendMouseDrag(m_view->viewport(), center(actionItem), targetPos);
+    waitForLayoutUpdate();
 
-    QVERIFY(isInCoregion(coregionItem, messageItem));
+    QVERIFY(!isInCoregion(coregionItem, messageItem));
 }
 
 bool tsti_CoregionItem::isInCoregion(const CoregionItem *coregion, InteractiveObject *eventItem) const

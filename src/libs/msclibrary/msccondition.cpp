@@ -67,6 +67,10 @@ MscEntity::EntityType MscCondition::entityType() const
 
 bool MscCondition::relatesTo(const MscInstance *instance) const
 {
+    if (m_shared) {
+        return true;
+    }
+
     return m_instance == instance;
 }
 

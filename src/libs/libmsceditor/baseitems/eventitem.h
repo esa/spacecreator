@@ -21,6 +21,7 @@
 
 namespace msc {
 
+class MscInstance;
 class MscInstanceEvent;
 
 /*!
@@ -35,6 +36,9 @@ public:
 
     void setTargetHCenter(qreal x);
     void centerOnTargetH();
+
+    virtual qreal instanceTopArea(MscInstance *instance) const;
+    virtual qreal instanceBottomArea(MscInstance *instance) const;
 
 private:
     qreal m_targetHCenter = -9.9e12;

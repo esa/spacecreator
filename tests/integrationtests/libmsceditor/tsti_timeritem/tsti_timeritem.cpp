@@ -67,11 +67,11 @@ void tsti_TimerItem::testMoveMessageOutOfStartStopTimer()
     // Move the message "below" the stop timer
     const QPoint startPos = center(messageItem->gripPointItem(shared::ui::GripPoint::Center));
     const QPoint moveFromPos = startPos;
-    const QPoint moveToPos(bottomCenter(timeoutItem) + QPoint(0, 30));
+    const QPoint moveToPos(bottomCenter(timeoutItem) + QPoint(0, 20));
     vstest::sendMouseMove(m_view.data()->viewport(), startPos); // To grab the message
     vstest::sendMouseDrag(m_view.data()->viewport(), moveFromPos, moveToPos);
 
-    QVERIFY(messageItem->sceneBoundingRect().top() > timeoutItem->sceneBoundingRect().bottom());
+    QVERIFY(messageItem->tail().y() > timeoutItem->sceneBoundingRect().bottom());
 }
 
 void tsti_TimerItem::testMoveMessageInsideOfStartStopTimer()
@@ -97,14 +97,12 @@ void tsti_TimerItem::testMoveMessageInsideOfStartStopTimer()
     // Move the message "between" the start and stop timer
     const QPoint startPos = center(messageItem->gripPointItem(shared::ui::GripPoint::Center));
     const QPoint moveFromPos = startPos;
-    auto p1 = topCenter(startItem);
-    auto p2 = bottomCenter(timeoutItem);
     const QPoint moveToPos((topCenter(startItem) + bottomCenter(timeoutItem)) / 2);
     vstest::sendMouseMove(m_view.data()->viewport(), startPos); // To grab the message
     vstest::sendMouseDrag(m_view.data()->viewport(), moveFromPos, moveToPos);
 
-    QVERIFY(messageItem->sceneBoundingRect().top() > startItem->sceneBoundingRect().top());
-    QVERIFY(messageItem->sceneBoundingRect().bottom() < timeoutItem->sceneBoundingRect().bottom());
+    QVERIFY(messageItem->tail().y() > startItem->sceneBoundingRect().top());
+    QVERIFY(messageItem->tail().y() < timeoutItem->sceneBoundingRect().bottom());
 }
 
 QTEST_MAIN(tsti_TimerItem)

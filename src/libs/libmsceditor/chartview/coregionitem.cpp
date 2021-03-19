@@ -33,11 +33,16 @@
 
 namespace msc {
 
+static const qreal kCoregionWidth = 50;
+static const qreal kDefaultHeight = 40;
+
 CoregionItem::CoregionItem(ChartLayoutManager *chartLayoutManager, QGraphicsItem *parent)
     : EventItem(nullptr, chartLayoutManager, parent)
 {
     setFlag(QGraphicsItem::ItemIsSelectable);
     setFlag(ItemClipsToShape, false);
+
+    setBoundingRect(QRectF(QPointF(0, 0), QSizeF(kCoregionWidth, kDefaultHeight)));
 }
 
 void CoregionItem::setBegin(MscCoregion *begin)
@@ -82,15 +87,11 @@ void CoregionItem::initGripPoints()
 
 void CoregionItem::rebuildLayout()
 {
-    static const qreal kCoregionWidth = 50;
-    static const qreal kOffset = 20;
-    static const qreal kDefaultHeight = 40;
-
     if (m_instance) {
         m_instance->stackBefore(this);
     }
 
-    prepareGeometryChange();
+    //    prepareGeometryChange();
     if (!m_begin || !m_end || !m_instance || m_begin->instance() != m_instance->modelItem()
             || m_end->instance() != m_instance->modelItem()) {
         // Not fully defined. Set the default size
@@ -98,72 +99,21 @@ void CoregionItem::rebuildLayout()
         return;
     }
 
-    QRectF rect;
-    const QVector<MscInstanceEvent *> &events =
-            m_chartLayoutManager->currentChart()->eventsForInstance(m_instance->modelItem());
-    auto it = std::next(std::find(events.constBegin(), events.constEnd(), m_begin));
-    auto itEnd = std::find(events.constBegin(), events.constEnd(), m_end);
-    while (it != events.end() && it != itEnd) {
-        Q_ASSERT(*it);
-
-        if (InteractiveObject *iObj = m_chartLayoutManager->itemForEntity(*it)) {
-            auto messageItem = qobject_cast<MessageItem *>(iObj);
-            if (messageItem != nullptr) {
-                // insert the messages source or target - depending which is in the co-region
-                QPointF pos;
-                msc::InstanceItem *sourceItem = messageItem->sourceInstanceItem();
-                if (sourceItem && (m_instance->modelItem() == sourceItem->modelItem())) {
-                    pos = messageItem->messagePoints().first();
-                }
-                msc::InstanceItem *targetItem = messageItem->targetInstanceItem();
-                if (targetItem && (m_instance.data()->modelItem() == targetItem->modelItem())) {
-                    pos = messageItem->messagePoints().last();
-                }
-                rect |= QRectF(pos.x() - 1, pos.y() - 1, 2, 2);
-            } else {
-                rect |= iObj->sceneBoundingRect();
-            }
-            stackBefore(iObj);
-        }
-        ++it;
-    }
-
-    const QRectF instanceRect = m_instance->sceneBoundingRect();
-    if (!rect.isValid()) {
-        // No events inside this co-region. Set default size
-        const qreal top = std::min(m_topMove.y(), kDefaultHeight - 1.);
-        const qreal bottom = std::max(m_bottomMove.y(), 1.);
-        const qreal height = m_bottomMove.isNull() ? kDefaultHeight - top : (bottom - top);
-        setBoundingRect(QRectF(QPointF(0, top), QSizeF(kCoregionWidth, height)));
-        setX(instanceRect.x() + (instanceRect.width() - kCoregionWidth) / 2);
+    if (m_topMove.isNull() && m_bottomMove.isNull()) {
         return;
     }
 
-    // Set size from the events
-    rect.setWidth(kCoregionWidth);
-    rect.adjust(0, -kOffset, 0, kOffset);
-    rect.translate(instanceRect.center().x() - rect.center().x(), 0);
-    const QLineF axis = m_instance->axis();
-    if (rect.top() < axis.y1())
-        rect.setTop(axis.y1());
-    if (rect.bottom() > axis.y2())
-        rect.setBottom(axis.y2());
-
-    setPos(rect.topLeft());
-
-    // adapt height and top, when being resized
-    const qreal top = std::min(m_topMove.y(), rect.height());
-    const qreal bottom = std::max(m_bottomMove.y(), -rect.height());
-    const qreal height = m_bottomMove.isNull() ? rect.height() - top : (bottom - top);
+    QRectF rect = boundingRect();
+    const qreal top = m_topMove.isNull() ? 0. : m_topMove.y();
+    const qreal bottom = m_bottomMove.isNull() ? rect.bottom() : m_bottomMove.y();
+    const qreal height = std::max(bottom - top, kDefaultHeight / 2);
     rect.setHeight(height);
-
     setBoundingRect({ QPointF(0, top), rect.size() });
-    centerOnTargetH();
 }
 
 void CoregionItem::onManualResizeProgress(shared::ui::GripPoint *gp, const QPointF &from, const QPointF &to)
 {
-    Q_UNUSED(from);
+    Q_UNUSED(from)
     if (gp->location() == shared::ui::GripPoint::Top) {
         m_topMove = mapFromScene(to);
     }

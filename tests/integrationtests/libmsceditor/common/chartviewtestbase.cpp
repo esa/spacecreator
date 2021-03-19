@@ -71,10 +71,13 @@ void ChartViewTestBase::loadView(const QString &mscDoc)
 
 void ChartViewTestBase::waitForLayoutUpdate()
 {
+    QTest::qWait(1);
     QApplication::processEvents();
-    while (m_chartModel && m_chartModel->layoutUpdatePending()) {
-        QTest::qWait(2);
+    int count = 0;
+    while (m_chartModel->layoutUpdatePending() && count < 200) {
+        QTest::qWait(1);
         QApplication::processEvents();
+        ++count;
     }
 }
 

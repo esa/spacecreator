@@ -162,59 +162,62 @@ const QVector<MscInstanceEvent *> &MscChart::instanceEvents() const
 
 QVector<MscInstanceEvent *> MscChart::eventsForInstance(const MscInstance *instance) const
 {
+    if (!instance) {
+        return {};
+    }
+
     QVector<MscInstanceEvent *> events;
-    if (instance)
-        for (MscInstanceEvent *instanceEvent : instanceEvents()) {
-            switch (instanceEvent->entityType()) {
-            case MscEntity::EntityType::Document:
-            case MscEntity::EntityType::Chart:
-            case MscEntity::EntityType::Instance:
-                continue;
-            case MscEntity::EntityType::Create: // A synthetic MscMessage is used instead
-            case MscEntity::EntityType::Message: {
-                auto message = static_cast<MscMessage *>(instanceEvent);
-                if (message->relatesTo(instance))
-                    events.append(instanceEvent);
-                break;
-            }
-            case MscEntity::EntityType::Condition: {
-                auto condition = static_cast<MscCondition *>(instanceEvent);
-                if (condition->instance() == instance)
-                    events.append(instanceEvent);
-                break;
-            }
-            case MscEntity::EntityType::Gate: {
-                auto gate = static_cast<MscGate *>(instanceEvent);
-                if (gate->instance() == instance)
-                    events.append(instanceEvent);
-                break;
-            }
-            case MscEntity::EntityType::Action: {
-                auto action = static_cast<MscAction *>(instanceEvent);
-                if (action->instance() == instance)
-                    events.append(instanceEvent);
-                break;
-            }
-            case MscEntity::EntityType::Timer: {
-                auto timer = static_cast<MscTimer *>(instanceEvent);
-                if (timer->instance() == instance)
-                    events.append(instanceEvent);
-                break;
-            }
-            case MscEntity::EntityType::Coregion: {
-                auto coregion = static_cast<MscCoregion *>(instanceEvent);
-                if (coregion->relatesTo(instance))
-                    events.append(instanceEvent);
-                break;
-            }
-            case MscEntity::EntityType::Comment:
-                break;
-            default: {
-                qWarning() << Q_FUNC_INFO << "ignored type:" << instanceEvent->entityType();
-                break;
-            }
-            }
+    for (MscInstanceEvent *instanceEvent : instanceEvents()) {
+        switch (instanceEvent->entityType()) {
+        case MscEntity::EntityType::Document:
+        case MscEntity::EntityType::Chart:
+        case MscEntity::EntityType::Instance:
+            continue;
+        case MscEntity::EntityType::Create: // A synthetic MscMessage is used instead
+        case MscEntity::EntityType::Message: {
+            auto message = static_cast<MscMessage *>(instanceEvent);
+            if (message->relatesTo(instance))
+                events.append(instanceEvent);
+            break;
         }
+        case MscEntity::EntityType::Condition: {
+            auto condition = static_cast<MscCondition *>(instanceEvent);
+            if (condition->relatesTo(instance))
+                events.append(instanceEvent);
+            break;
+        }
+        case MscEntity::EntityType::Gate: {
+            auto gate = static_cast<MscGate *>(instanceEvent);
+            if (gate->instance() == instance)
+                events.append(instanceEvent);
+            break;
+        }
+        case MscEntity::EntityType::Action: {
+            auto action = static_cast<MscAction *>(instanceEvent);
+            if (action->relatesTo(instance))
+                events.append(instanceEvent);
+            break;
+        }
+        case MscEntity::EntityType::Timer: {
+            auto timer = static_cast<MscTimer *>(instanceEvent);
+            if (timer->relatesTo(instance))
+                events.append(instanceEvent);
+            break;
+        }
+        case MscEntity::EntityType::Coregion: {
+            auto coregion = static_cast<MscCoregion *>(instanceEvent);
+            if (coregion->relatesTo(instance))
+                events.append(instanceEvent);
+            break;
+        }
+        case MscEntity::EntityType::Comment:
+            break;
+        default: {
+            qWarning() << Q_FUNC_INFO << "ignored type:" << instanceEvent->entityType();
+            break;
+        }
+        }
+    }
 
     return events;
 }

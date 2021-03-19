@@ -70,7 +70,8 @@ public:
     void setHeadPosition(const QPointF &head);
     QPointF tail() const;
     void setTail(const QPointF &tail, ObjectAnchor::Snap snap);
-    void setTailPosition(const QPointF &head);
+    void setTailPosition(const QPointF &tail);
+    void moveToYPosition(qreal yPos);
 
     bool isHorizontal() const;
 
@@ -94,6 +95,9 @@ public:
     QString displayedText() const;
 
     QPointF extendToNearestEdge(const QPointF &shiftMe) const;
+
+    qreal instanceTopArea(MscInstance *instance) const override;
+    qreal instanceBottomArea(MscInstance *instance) const override;
 
 Q_SIGNALS:
     void retargeted(msc::MessageItem *, const QPointF &pos, msc::MscMessage::EndType endType);

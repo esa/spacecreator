@@ -69,8 +69,12 @@ void ChartLayoutTestBase::parseMsc(const QString &mscDoc)
 void ChartLayoutTestBase::waitForLayoutUpdate()
 {
     QApplication::processEvents();
-    QTest::qWait(2);
-    QApplication::processEvents();
+    int count = 0;
+    while (m_chartModel->layoutUpdatePending() && count < 200) {
+        QTest::qWait(1);
+        QApplication::processEvents();
+        ++count;
+    }
 }
 
 }

@@ -58,8 +58,6 @@ private Q_SLOTS:
     void testNearestInstanceCreate();
 
     void testTimerPositionWithCifInstance();
-    void testLoadedMessagePosition();
-    void testLoadedCifMessagePosition();
     void testDefaultChartSize();
     void testInstanceCifExtendedChartWidth();
     void testAddTwoMessages();
@@ -74,6 +72,8 @@ private Q_SLOTS:
     void testShiftVerticalIfNeeded();
 
     void testMessageWithCifInformation();
+
+    void testEventIndex();
 
 protected:
     void parseMsc(const QString &mscDoc) override;
@@ -203,76 +203,6 @@ void tst_ChartLayoutManager::testTimerPositionWithCifInstance()
     // Check that the timer is below the instance head
     const QPointF instanceHeadBottom = m_instanceItems[0]->axis().p1();
     QVERIFY(watchdogItem->scenePos().y() > instanceHeadBottom.y());
-}
-
-void tst_ChartLayoutManager::testLoadedMessagePosition()
-{
-    QSKIP("Disabled dew some problems in GUI-less environment (CI)");
-
-    QString mscText = "mscdocument Untitled_Document /* MSC AND */;\
-                      mscdocument Untitled_Leaf /* MSC LEAF */;\
-                          msc Untitled_MSC;\
-                              instance A;\
-                                  out AE to env;\
-                              endinstance;\
-                          endmsc;\
-                      endmscdocument;\
-                  endmscdocument;";
-    parseMsc(mscText);
-    QCOMPARE(m_instanceItems.size(), 1);
-    QCOMPARE(m_chart->instanceEvents().size(), 1);
-
-    ChartItem *chartItem = m_chartModel->chartItem();
-    MscMessage *message = qobject_cast<MscMessage *>(m_chart->instanceEvents().at(0));
-    MessageItem *messageItem = m_chartModel->itemForMessage(message);
-    QVERIFY(messageItem != nullptr);
-
-    // Check that the message is below the instance head
-    const QPointF instanceHeadBottom = m_instanceItems[0]->axis().p1();
-    QVERIFY(messageItem->scenePos().y() > instanceHeadBottom.y());
-    // Check that the message is above the instance end
-    const QPointF instanceEndTop = m_instanceItems[0]->axis().p2();
-    QVERIFY(messageItem->sceneBoundingRect().bottom() < instanceEndTop.y());
-
-    // Chart geometry is forced to default minimum (200)
-    QVERIFY(qFuzzyCompare(chartItem->contentRect().width(), defaultSize.width()));
-    QVERIFY(chartItem->contentRect().height() <= defaultSize.height());
-    // message points to the left
-    QVector<QPointF> points = messageItem->messagePoints();
-    QVERIFY(qFuzzyCompare(points.at(0).x(), m_instanceItems[0]->axis().p1().x()));
-    QVERIFY(qFuzzyCompare(points.at(1).x(), chartItem->sceneBoundingRect().left()));
-}
-
-void tst_ChartLayoutManager::testLoadedCifMessagePosition()
-{
-    QSKIP("Force to 200x200 does not work");
-
-    QString mscText = "msc Untitled_MSC;\
-                            instance Instance_1;\
-                            /* CIF MESSAGE (37, 208) (3002, 681) */\
-                                out A to env;\
-                            endinstance;\
-                        endmsc;";
-    parseMsc(mscText);
-    QCOMPARE(m_instanceItems.size(), 1);
-    QCOMPARE(m_chart->instanceEvents().size(), 1);
-
-    ChartItem *chartItem = m_chartModel->chartItem();
-    MscMessage *message = qobject_cast<MscMessage *>(m_chart->instanceEvents().at(0));
-    MessageItem *messageItem = m_chartModel->itemForMessage(message);
-    QVERIFY(messageItem != nullptr);
-
-    const QRectF msgRect = messageItem->sceneBoundingRect().normalized();
-    const QRectF insRect = m_instanceItems[0]->sceneBoundingRect().normalized();
-    QVERIFY(qFuzzyCompare(chartItem->contentRect().height(), (msgRect | insRect).height()));
-    QVERIFY(qFuzzyCompare(insRect.height(), chartItem->contentRect().height()));
-
-    // message should be non horizontal (from instance to the right edge)
-    const QVector<QPointF> &points = messageItem->messagePoints();
-    const QPointF &center = insRect.center();
-
-    QVERIFY(std::abs(points.at(0).x() - center.x()) <= m_maxOffset);
-    QVERIFY(qFuzzyCompare(points.at(1).x(), chartItem->sceneBoundingRect().right()));
 }
 
 void tst_ChartLayoutManager::testDefaultChartSize()
@@ -655,6 +585,39 @@ void tst_ChartLayoutManager::testMessageWithCifInformation()
     // Check that the message is pointing bottom right
     qreal widthHeightRatio = std::abs(loadedGeometry.width() / loadedGeometry.height());
     QVERIFY(widthHeightRatio > 0.7 && widthHeightRatio < 1.3);
+}
+
+void tst_ChartLayoutManager::testEventIndex()
+{
+    const QString msc("/* CIF MSCDOCUMENT (0, 0) (1027, 718) */\
+        mscdocument Untitled_Leaf /* MSC LEAF */;\
+            msc Untitled_MSC;\
+                /* CIF INSTANCE (0, 43) (146, 68) (800, 611) */\
+                instance Instance_1;\
+                    /* CIF MESSAGE (74, 146) (721, 440) */\
+                    out Message to Instance_2;\
+                endinstance;\
+                /* CIF INSTANCE (647, 43) (146, 68) (800, 611) */\
+                instance Instance_2;\
+                    /* CIF MESSAGE (74, 146) (721, 440) */\
+                    in Message from Instance_1;\
+                    action 'Action_1';\
+                endinstance;\
+            endmsc;\
+        endmscdocument;");
+
+    parseMsc(msc);
+
+    auto message = qobject_cast<msc::MscMessage *>(m_chart->instanceEvents().at(0));
+    auto action = qobject_cast<msc::MscAction *>(m_chart->instanceEvents().at(1));
+    msc::MessageItem *messageItem = m_chartModel->itemForMessage(message);
+    msc::ActionItem *actionItem = m_chartModel->itemForAction(action);
+
+    const QPointF messageCenter = messageItem->sceneBoundingRect().center();
+    const QPointF actionCenter = actionItem->sceneBoundingRect().center();
+
+    int idx = m_chartModel->eventIndex(QPointF(actionCenter.x(), messageCenter.y()), action);
+    QCOMPARE(idx, 0);
 }
 
 QTEST_MAIN(tst_ChartLayoutManager)

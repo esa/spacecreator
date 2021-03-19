@@ -269,7 +269,7 @@ MessageItem *ChartLayoutManager::fillMessageItem(
 {
     MessageItem *item = itemForMessage(message);
     if (!item) {
-        item = new MessageItem(message, this);
+        item = new MessageItem(message, this, sourceItem, targetItem);
         connect(item, &MessageItem::retargeted, this, &ChartLayoutManager::onMessageRetargeted, Qt::UniqueConnection);
         connect(d->m_layoutInfo.m_chartItem, &msc::ChartItem::contentRectChanged, item,
                 &msc::MessageItem::onChartBoxChanged);
@@ -361,7 +361,11 @@ void ChartLayoutManager::doLayout()
     addInstanceEventItems();
     disconnectItems();
     checkHorizontalConstraints();
-    checkVerticalConstraints();
+    if (isStreamingModeEnabled()) {
+        checkStreamingVerticalConstraints();
+    } else {
+        checkVerticalConstraints();
+    }
     actualizeInstancesHeights(d->m_layoutInfo.m_pos.y() + d->interMessageSpan());
     updateChartboxToContent();
     connectItems();
@@ -486,12 +490,17 @@ void ChartLayoutManager::addInstanceEventItems()
         Q_ASSERT(instanceEvent);
 
         switch (instanceEvent->entityType()) {
-        case MscEntity::EntityType::Comment: {
-            instanceEventItem = addCommentItem(static_cast<MscComment *>(instanceEvent));
+        case MscEntity::EntityType::Action: {
+            instanceEventItem = addActionItem(static_cast<MscAction *>(instanceEvent));
             break;
         }
-        case MscEntity::EntityType::Message: {
-            instanceEventItem = addMessageItem(static_cast<MscMessage *>(instanceEvent));
+        case MscEntity::EntityType::Condition: {
+            instanceEventItem =
+                    addConditionItem(static_cast<MscCondition *>(instanceEvent), d->m_layoutInfo.m_instancesRect);
+            break;
+        }
+        case MscEntity::EntityType::Comment: {
+            instanceEventItem = addCommentItem(static_cast<MscComment *>(instanceEvent));
             break;
         }
         case MscEntity::EntityType::Create: {
@@ -503,14 +512,8 @@ void ChartLayoutManager::addInstanceEventItems()
             instanceEventItem = addCoregionItem(static_cast<MscCoregion *>(instanceEvent));
             break;
         }
-        case MscEntity::EntityType::Action: {
-            instanceEventItem = addActionItem(static_cast<MscAction *>(instanceEvent));
-            break;
-        }
-        case MscEntity::EntityType::Condition: {
-            ConditionItem *prevItem = qobject_cast<ConditionItem *>(instanceEventItem);
-            instanceEventItem = addConditionItem(
-                    static_cast<MscCondition *>(instanceEvent), prevItem, d->m_layoutInfo.m_instancesRect);
+        case MscEntity::EntityType::Message: {
+            instanceEventItem = addMessageItem(static_cast<MscMessage *>(instanceEvent));
             break;
         }
         case MscEntity::EntityType::Timer: {
@@ -522,85 +525,9 @@ void ChartLayoutManager::addInstanceEventItems()
             break;
         }
         }
-
-        if (instanceEventItem) {
-            polishAddedEventItem(instanceEvent, instanceEventItem);
-        }
     }
 
     Q_ASSERT(d->m_instanceEventItems.size() == d->m_instanceEventItemsSorted.size());
-}
-
-void ChartLayoutManager::polishAddedEventItem(MscInstanceEvent *event, InteractiveObject *item)
-{
-    auto moveNewItem = [&]() {
-        qreal deltaY = 0.;
-        if (item->geometryManagedByCif()) {
-            if (!qFuzzyIsNull(d->m_layoutInfo.m_instancesCommonAxisOffset)) {
-                if (auto msgItem = qobject_cast<MessageItem *>(item)) {
-                    QVector<QPointF> points = msgItem->messagePoints();
-                    for (QPointF &point : points)
-                        point.ry() += d->m_layoutInfo.m_instancesCommonAxisOffset;
-                    msgItem->setMessagePoints(points);
-                    msgItem->updateCif();
-                }
-            } else {
-                item->applyCif();
-            }
-        } else {
-            const QRectF srcRect = item->sceneBoundingRect();
-            const qreal targetTop = d->m_layoutInfo.m_pos.y() + d->interMessageSpan();
-            deltaY = targetTop - srcRect.top();
-            item->moveSilentlyBy({ 0., deltaY });
-        }
-        d->m_layoutInfo.m_pos.ry() = item->sceneBoundingRect().bottom();
-
-        return deltaY;
-    };
-
-    switch (event->entityType()) {
-    case MscEntity::EntityType::Comment: {
-    } break;
-    case MscEntity::EntityType::Coregion: {
-        MscCoregion *coregion = static_cast<MscCoregion *>(event);
-        if (coregion->type() == MscCoregion::Type::Begin) {
-            const qreal targetTop = d->m_layoutInfo.m_pos.y() + d->interMessageSpan();
-            item->setY(targetTop);
-            d->m_layoutInfo.m_pos.ry() += 2 * d->interMessageSpan();
-        } else {
-            qobject_cast<CoregionItem *>(item)->instantLayoutUpdate();
-            d->m_layoutInfo.m_pos.ry() = item->sceneBoundingRect().bottom();
-        }
-    } break;
-    case MscEntity::EntityType::Message:
-    case MscEntity::EntityType::Create: {
-        MscMessage *message = static_cast<MscMessage *>(event);
-        MessageItem *messageItem = dynamic_cast<MessageItem *>(item);
-        Q_ASSERT(messageItem != nullptr);
-
-        const bool relatedToDynamicInstance =
-                (message->sourceInstance() && message->sourceInstance()->explicitCreator())
-                || (message->targetInstance() && message->targetInstance()->explicitCreator());
-        const qreal deltaY = moveNewItem();
-        if (!qFuzzyIsNull(deltaY) && relatedToDynamicInstance) {
-            // After a message has been moved its connection (an arrow to an instance) is broken
-            InstanceItem *creatorInstanceItem = itemForInstance(message->sourceInstance());
-            InstanceItem *createdInstanceItem = itemForInstance(message->targetInstance());
-            if (createdInstanceItem && creatorInstanceItem && messageItem) {
-                if (event->entityType() == MscEntity::EntityType::Create) {
-                    if (!createdInstanceItem->geometryManagedByCif())
-                        createdInstanceItem->moveSilentlyBy({ 0., deltaY });
-                }
-                messageItem->setInstances(creatorInstanceItem, createdInstanceItem);
-            }
-        }
-        break;
-    }
-    default: {
-        moveNewItem();
-        break;
-    }
-    }
 }
 
 QRectF shrinkChartMargins(const QRectF &from, bool left, bool right)
@@ -658,21 +585,19 @@ QRectF ChartLayoutManager::minimalContentRect() const
             return currRect;
 
         MscMessage *message = static_cast<MscMessage *>(item->modelEntity());
-        if (message->isGlobal()) {
-            if (MessageItem *messageItem = dynamic_cast<MessageItem *>(item)) {
+        if (MessageItem *messageItem = dynamic_cast<MessageItem *>(item)) {
+            if (message->isGlobal()) {
                 // TODO: add support for complex global message
                 // TODO: include name rect into min bounding box
-                if (message->isGlobal()) {
-                    InstanceItem *instanceItem = messageItem->sourceInstanceItem() ? messageItem->sourceInstanceItem()
-                                                                                   : messageItem->targetInstanceItem();
-                    if (instanceItem)
-                        currRect = instanceItem->sceneBoundingRect().intersected(currRect);
-                    else
-                        currRect = currChartBox.intersected(currRect);
-                }
+                InstanceItem *instanceItem = messageItem->sourceInstanceItem() ? messageItem->sourceInstanceItem()
+                                                                               : messageItem->targetInstanceItem();
+                if (instanceItem)
+                    currRect = instanceItem->sceneBoundingRect().intersected(currRect);
+                else
+                    currRect = currChartBox.intersected(currRect);
             }
         }
-        return currRect;
+        return QRectF(currRect.toRect());
     };
 
     auto effectiveRectEvents = [&eventEffectiveRect](const QVector<InteractiveObject *> &events) {
@@ -930,45 +855,141 @@ void ChartLayoutManager::checkVerticalConstraints()
         return;
     }
 
-    QRectF lastBox;
-    for (MscInstanceEvent *event : d->m_currentChart->instanceEvents()) {
-        InteractiveObject *item = itemForEntity(event);
-        if (!item) {
+    static qreal minSpace = 3.;
+    bool itemMoved = true;
+    int loopCount = 0;
+
+    while (itemMoved && loopCount < 99) {
+        itemMoved = false;
+
+        for (MscInstance *instance : d->m_currentChart->instances()) {
+            InstanceItem *instanceItem = itemForInstance(instance);
+            Q_ASSERT(instanceItem);
+            qreal minY = instanceItem->headerItem()->sceneBoundingRect().bottom() + minSpace;
+
+            CoregionItem *activeCoregionItem = nullptr;
+
+            for (MscInstanceEvent *event : d->m_currentChart->eventsForInstance(instance)) {
+                auto eventItem = qobject_cast<msc::EventItem *>(d->m_instanceEventItems.value(event->internalId()));
+                if (!eventItem) {
+                    // Check if this is the end of a coregion
+                    if (activeCoregionItem != nullptr && activeCoregionItem->end() == event) {
+                        eventItem = activeCoregionItem;
+                    } else {
+                        continue;
+                    }
+                }
+
+                if (eventItem->geometryManagedByCif()) {
+                    eventItem->applyCif();
+                }
+
+                switch (event->entityType()) {
+                case MscEntity::EntityType::Action:
+                case MscEntity::EntityType::Condition:
+                case MscEntity::EntityType::Timer:
+                    if (eventItem->instanceTopArea(instance) < minY) {
+                        eventItem->setY(minY + d->interMessageSpan());
+                        itemMoved = true;
+                    }
+                    minY = eventItem->instanceBottomArea(instance) + minSpace;
+                    break;
+                case MscEntity::EntityType::Create:
+                case MscEntity::EntityType::Message: {
+                    auto messageItem = static_cast<MessageItem *>(eventItem);
+                    qreal ptOffset = messageItem->sceneBoundingRect().top();
+                    ptOffset = std::min(messageItem->tail().y() - ptOffset, messageItem->head().y() - ptOffset);
+                    if (eventItem->instanceTopArea(instance) < minY) {
+                        if (messageItem->modelItem()->sourceInstance() == instance) {
+                            messageItem->setTailPosition(
+                                    QPointF(messageItem->tail().x(), minY + d->interMessageSpan() + ptOffset));
+                        }
+                        if (messageItem->modelItem()->targetInstance() == instance) {
+                            messageItem->setHeadPosition(
+                                    QPointF(messageItem->head().x(), minY + d->interMessageSpan() + ptOffset));
+                        }
+                        itemMoved = true;
+                    }
+                    minY = eventItem->instanceBottomArea(instance) + minSpace;
+                    break;
+                }
+                case MscEntity::EntityType::Coregion: {
+                    auto coregion = static_cast<MscCoregion *>(event);
+                    if (coregion->type() == MscCoregion::Type::Begin) {
+                        Q_ASSERT(activeCoregionItem == nullptr);
+                        activeCoregionItem = static_cast<CoregionItem *>(eventItem);
+                        if (eventItem->instanceTopArea(instance) < minY) {
+                            eventItem->setY(minY + d->interMessageSpan());
+                            itemMoved = true;
+                        }
+                        minY = eventItem->instanceTopArea(instance) + minSpace;
+                    } else {
+                        Q_ASSERT(activeCoregionItem != nullptr);
+                        // check if end is below last included item
+                        if (activeCoregionItem->instanceBottomArea(instance) < minY) {
+                            QRectF bbox = activeCoregionItem->boundingRect();
+                            bbox.setHeight((minY + d->interMessageSpan()) - activeCoregionItem->y());
+                            activeCoregionItem->setBoundingRect(bbox);
+                            itemMoved = true;
+                        }
+                        minY = activeCoregionItem->instanceBottomArea(instance) + minSpace;
+                        activeCoregionItem = nullptr;
+                    }
+                    break;
+                }
+                default:
+                    qDebug() << "Type" << event->entityType() << "unhandled yet" << Q_FUNC_INFO;
+                    break;
+                }
+            }
+        }
+        ++loopCount;
+    }
+}
+
+/*!
+   Simpler vertical layout of the events in streaming mode
+ */
+void ChartLayoutManager::checkStreamingVerticalConstraints()
+{
+    if (!d->m_currentChart) {
+        return;
+    }
+
+    double yPos = 0;
+    for (InstanceItem *item : d->m_instanceItems) {
+        if (!item->modelItem()->isCreated()) {
+            yPos = std::max(yPos, item->headerItem()->sceneBoundingRect().bottom() + d->interMessageSpan());
+        }
+    }
+
+    for (MscInstanceEvent *event : visibleEvents()) {
+        auto eventItem = qobject_cast<msc::EventItem *>(d->m_instanceEventItems.value(event->internalId()));
+        if (!eventItem) {
             continue;
         }
-        // Ignore comments
-        if (auto commentItem = qobject_cast<CommentItem *>(item)) {
-            continue;
+
+        switch (event->entityType()) {
+        case MscEntity::EntityType::Action:
+        case MscEntity::EntityType::Condition:
+        case MscEntity::EntityType::Timer: {
+            eventItem->setY(yPos);
+            yPos = eventItem->sceneBoundingRect().bottom() + d->interMessageSpan();
+            break;
         }
-
-        bool updateBox = true;
-        bool shiftIfNeeded = true;
-
-        MscEntity::EntityType currentType = event->entityType();
-        if (currentType == MscEntity::EntityType::Message) {
-            updateBox = false;
+        case MscEntity::EntityType::Create:
+        case MscEntity::EntityType::Message: {
+            auto messageItem = static_cast<MessageItem *>(eventItem);
+            messageItem->moveToYPosition(yPos);
+            yPos = eventItem->sceneBoundingRect().bottom() + d->interMessageSpan();
+            break;
         }
-        if (currentType == MscEntity::EntityType::Coregion) {
-            auto coregion = qobject_cast<msc::MscCoregion *>(event);
-            if (coregion->type() == msc::MscCoregion::Type::Begin) {
-                updateBox = false;
-            }
-            if (coregion->type() == msc::MscCoregion::Type::Begin) {
-                shiftIfNeeded = false;
-            }
+        case MscEntity::EntityType::Coregion: {
+            // Coregions are not handled in RemoteControlWebServer / RemoteControlHandler
+            break;
         }
-
-        QRectF currentBox = item->sceneBoundingRect();
-
-        if (shiftIfNeeded) {
-            if (currentBox.top() < lastBox.bottom()) {
-                item->moveBy(0.0, lastBox.bottom() - currentBox.top());
-                currentBox = item->sceneBoundingRect();
-            }
-        }
-
-        if (updateBox) {
-            lastBox = currentBox;
+        default:
+            break;
         }
     }
 }
@@ -1136,11 +1157,37 @@ int ChartLayoutManager::eventIndex(const QPointF &pt, MscInstanceEvent *ignoreEv
 {
     int idx = 0;
     for (msc::InteractiveObject *item : d->m_instanceEventItemsSorted) {
-        if (item->modelEntity() != ignoreEvent && item->sceneBoundingRect().y() < pt.y()) {
-            ++idx;
-            if (auto coregionItem = qobject_cast<CoregionItem *>(item)) {
-                if (coregionItem->sceneBoundingRect().bottom() < pt.y())
+        if (item->modelEntity() == ignoreEvent) {
+            continue;
+        }
+        auto event = dynamic_cast<MscInstanceEvent *>(item->modelEntity());
+        if (!event) {
+            continue;
+        }
+        auto messageItem = qobject_cast<MessageItem *>(item);
+        if (messageItem) {
+            const QPointF tailPos = messageItem->tail();
+            const QPointF headPos = messageItem->head();
+            const qreal tailDist = std::abs(tailPos.x() - pt.x());
+            const qreal headDist = std::abs(headPos.x() - pt.x());
+            if (headDist < tailDist) {
+                if (headPos.y() < pt.y()) {
                     ++idx;
+                }
+            } else {
+                if (tailPos.y() < pt.y()) {
+                    ++idx;
+                }
+            }
+        } else {
+            const QRectF sceneBBox = item->sceneBoundingRect();
+            if (sceneBBox.y() < pt.y()) {
+                ++idx;
+                if (auto coregionItem = qobject_cast<CoregionItem *>(item)) {
+                    if (sceneBBox.bottom() < pt.y()) {
+                        ++idx;
+                    }
+                }
             }
         }
     }
@@ -1344,12 +1391,12 @@ void ChartLayoutManager::syncItemsPosToInstance(const InstanceItem *instanceItem
             if (message->sourceInstance() == instanceItem->modelItem()) {
                 QPointF sourcePt = messageItem->tail();
                 sourcePt.setX(instanceCenter);
-                messageItem->setTail(sourcePt, ObjectAnchor::Snap::SnapTo);
+                messageItem->setTailPosition(sourcePt);
             }
             if (message->targetInstance() == instanceItem->modelItem()) {
                 QPointF targetPt = messageItem->head();
                 targetPt.setX(instanceCenter);
-                messageItem->setHead(targetPt, ObjectAnchor::Snap::SnapTo);
+                messageItem->setHeadPosition(targetPt);
             }
             break;
         }
@@ -1359,7 +1406,7 @@ void ChartLayoutManager::syncItemsPosToInstance(const InstanceItem *instanceItem
             if (message->sourceInstance() == instanceItem->modelItem()) {
                 QPointF sourcePt = messageItem->tail();
                 sourcePt.setX(instanceCenter);
-                messageItem->setTail(sourcePt, ObjectAnchor::Snap::SnapTo);
+                messageItem->setTailPosition(sourcePt);
             }
             if (messageItem->targetInstanceItem() && messageItem->sourceInstanceItem()) {
                 QPointF targetPt = messageItem->head();
@@ -1371,7 +1418,7 @@ void ChartLayoutManager::syncItemsPosToInstance(const InstanceItem *instanceItem
                 } else {
                     targetPt.setX(targetItem->sceneBoundingRect().right());
                 }
-                messageItem->setHead(targetPt, ObjectAnchor::Snap::SnapTo);
+                messageItem->setHeadPosition(targetPt);
             }
             break;
         }
@@ -1451,51 +1498,31 @@ MessageItem *ChartLayoutManager::addMessageItem(MscMessage *message)
         return res;
     };
 
-    InstanceItem *sourceInstance(findInstanceItem(message->sourceInstance()));
-    InstanceItem *targetInstance(findInstanceItem(message->targetInstance()));
+    InstanceItem *sourceInstance = findInstanceItem(message->sourceInstance());
+    InstanceItem *targetInstance = findInstanceItem(message->targetInstance());
 
     return fillMessageItem(message, sourceInstance, targetInstance, instanceVertiacalOffset);
 }
 
 ActionItem *ChartLayoutManager::addActionItem(MscAction *action)
 {
-    InstanceItem *instance(nullptr);
-    qreal instanceVerticalOffset(0);
-    if (action->instance()) {
-        instance = itemForInstance(action->instance());
-        if (instance)
-            instanceVerticalOffset = instance->axis().p1().y();
-    }
-
     ActionItem *item = itemForAction(action);
     if (!item) {
         item = new ActionItem(action, this);
         storeEntityItem(item);
+        item->instantLayoutUpdate();
     }
-    item->setY(d->m_layoutInfo.m_pos.y() + instanceVerticalOffset);
-    item->instantLayoutUpdate();
 
     return item;
 }
 
-ConditionItem *ChartLayoutManager::addConditionItem(
-        MscCondition *condition, ConditionItem *prevItem, const QRectF &instancesRect)
+ConditionItem *ChartLayoutManager::addConditionItem(MscCondition *condition, const QRectF &instancesRect)
 {
     auto *item = itemForCondition(condition);
     if (!item) {
         item = new ConditionItem(condition, this);
         connect(this, &msc::ChartLayoutManager::instancesRectChanged, item, &msc::ConditionItem::setInstancesRect);
         storeEntityItem(item);
-    }
-
-    InstanceItem *instance = itemForInstance(condition->instance());
-    if (instance) {
-        qreal verticalOffset = instance->axis().p1().y();
-        if (prevItem
-                && (prevItem->modelItem()->instance() == condition->instance() || prevItem->modelItem()->shared())) {
-            verticalOffset += prevItem->boundingRect().height() + d->interMessageSpan();
-        }
-        item->setY(d->m_layoutInfo.m_pos.y() + verticalOffset);
         item->setInstancesRect(instancesRect);
         item->instantLayoutUpdate();
     }
@@ -1509,16 +1536,8 @@ TimerItem *ChartLayoutManager::addTimerItem(MscTimer *timer)
     if (!item) {
         item = new TimerItem(timer, this);
         storeEntityItem(item);
+        item->instantLayoutUpdate();
     }
-
-    qreal instanceVerticalOffset(0);
-    InstanceItem *instance = itemForInstance(timer->instance());
-    if (instance) {
-        instanceVerticalOffset = d->interMessageSpan();
-    }
-
-    item->setY(d->m_layoutInfo.m_pos.y() + instanceVerticalOffset);
-    item->instantLayoutUpdate();
 
     return item;
 }
@@ -1751,28 +1770,6 @@ QSizeF ChartLayoutManager::preferredChartBoxSize() const
 void ChartLayoutManager::setPreferredChartBoxSize(const QSizeF &size)
 {
     d->m_layoutInfo.m_preferredBox = size;
-}
-
-int ChartLayoutManager::instanceOrderFromPos(const QPointF &scenePos)
-{
-    if (d->m_instanceItemsSorted.isEmpty())
-        return -1;
-
-    QMap<qreal, QPair<QLineF, InstanceItem *>> instanceByDistance;
-    for (InstanceItem *instanceItem : d->m_instanceItemsSorted) {
-        const QRectF &currInstanceRect = instanceItem->sceneBoundingRect();
-        const QLineF line(currInstanceRect.center(), scenePos);
-        instanceByDistance.insert(line.length(), qMakePair(line, instanceItem));
-    }
-
-    const QPair<QLineF, InstanceItem *> &nearestPair = instanceByDistance.first();
-
-    const QLineF distance = nearestPair.first;
-    const int existentId = currentChart()->instances().indexOf(nearestPair.second->modelItem());
-    if (-1 == existentId)
-        return -1; // otherwise it could be prepended
-
-    return existentId + (distance.dx() <= 0. ? 0 : 1);
 }
 
 void ChartLayoutManager::setVisibleItemLimit(int number)
@@ -2011,6 +2008,32 @@ void ChartLayoutManager::setInstancesRect(const QRectF &rect)
 
     d->m_layoutInfo.m_instancesRect = rect;
     Q_EMIT instancesRectChanged(d->m_layoutInfo.m_instancesRect);
+}
+
+/*!
+  Returns the msc events that are to be shown.
+  This depends on the visible item limit.
+ */
+QVector<MscInstanceEvent *> ChartLayoutManager::visibleEvents() const
+{
+    if (!d->m_currentChart) {
+        return {};
+    }
+
+    const QVector<MscInstanceEvent *> &allEvents = d->m_currentChart->instanceEvents();
+
+    if (d->m_visibleItemLimit <= 0 || allEvents.size() <= d->m_visibleItemLimit) {
+        return d->m_currentChart->instanceEvents();
+    }
+
+    QVector<MscInstanceEvent *> lastEvents;
+    lastEvents.reserve(allEvents.size());
+    auto it = d->m_currentChart->instanceEvents().begin();
+    it += allEvents.size() - d->m_visibleItemLimit;
+    for (; it < allEvents.end(); ++it) {
+        lastEvents.push_back(*it);
+    }
+    return lastEvents;
 }
 
 } // namespace msc

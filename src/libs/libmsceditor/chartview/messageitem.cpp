@@ -173,8 +173,9 @@ void MessageItem::setInstances(InstanceItem *sourceInstance, InstanceItem *targe
 
 bool MessageItem::setSourceInstanceItem(InstanceItem *sourceInstance)
 {
-    if (sourceInstance == m_sourceInstance || (sourceInstance && sourceInstance == m_targetInstance))
+    if (sourceInstance == m_sourceInstance || (sourceInstance && sourceInstance == m_targetInstance)) {
         return false;
+    }
 
     if (m_sourceInstance) {
         disconnect(m_sourceInstance, nullptr, this, nullptr);
@@ -519,6 +520,24 @@ void MessageItem::setTailPosition(const QPointF &tail)
 }
 
 /*!
+   Move the message points, so the message scne bounding rect is at the given \p yPos position
+   X-position is not affected
+ */
+void MessageItem::moveToYPosition(qreal yPos)
+{
+    QVector<QPointF> points = messagePoints();
+    if (messagePoints().size() < 2) {
+        return;
+    }
+
+    const qreal offset = yPos - sceneBoundingRect().top();
+    for (QPointF &pt : points) {
+        pt.setY(pt.y() + offset);
+    }
+    setMessagePoints(points);
+}
+
+/*!
    Returns true if the arrow is straight and is horizontal
  */
 bool MessageItem::isHorizontal() const
@@ -614,7 +633,7 @@ void MessageItem::onManualResizeProgress(shared::ui::GripPoint *gp, const QPoint
 
 void MessageItem::onManualGeometryChangeFinished(shared::ui::GripPoint *gp, const QPointF &from, const QPointF &to)
 {
-    Q_UNUSED(to);
+    Q_UNUSED(to)
     if (m_sourceInstance == m_targetInstance) {
         GeometryNotificationBlocker keepSilent(this);
         m_originalMessagePoints.clear();
@@ -846,10 +865,9 @@ cif::CifBlockShared MessageItem::positionCifBlock() const
 void MessageItem::setMessagePoints(const QVector<QPointF> &scenePoints)
 {
     const QVector<QPointF> &arrowPoints = messagePoints();
-    if (scenePoints.size() < 2 || scenePoints == arrowPoints)
+    if (scenePoints.size() < 2 || scenePoints == arrowPoints) {
         return;
-
-    Q_ASSERT(!scenePoints.isEmpty());
+    }
 
     GeometryNotificationBlocker keepSilent(this);
     setPos(QLineF(scenePoints.first(), scenePoints.last()).center());
@@ -1010,6 +1028,30 @@ QPointF MessageItem::extendToNearestEdge(const QPointF &shiftMe) const
     } else {
         return QPointF(boxRect.right(), shiftMe.y());
     }
+}
+
+qreal MessageItem::instanceTopArea(MscInstance *instance) const
+{
+    static const qreal space = 3.;
+    if (m_sourceInstance && instance == m_sourceInstance->modelItem()) {
+        return tail().y() - space;
+    }
+    if (m_targetInstance && instance == m_targetInstance->modelItem()) {
+        return head().y() - space;
+    }
+    return 0.;
+}
+
+qreal MessageItem::instanceBottomArea(MscInstance *instance) const
+{
+    static const qreal space = 3.;
+    if (m_sourceInstance && instance == m_sourceInstance->modelItem()) {
+        return tail().y() + space;
+    }
+    if (m_targetInstance && instance == m_targetInstance->modelItem()) {
+        return head().y() + space;
+    }
+    return 0.;
 }
 
 /*

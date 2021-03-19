@@ -15,9 +15,11 @@
    along with this program. If not, see <https://www.gnu.org/licenses/lgpl-2.1.html>.
 */
 
+#include "actionitem.h"
 #include "chartviewtestbase.h"
 #include "instanceitem.h"
 #include "messageitem.h"
+#include "mscaction.h"
 #include "sharedlibrary.h"
 #include "syntheticinteraction.h"
 
@@ -39,6 +41,7 @@ private Q_SLOTS:
     void cleanup() { cleanupBase(); }
 
     void testConnectToStoppedInstance();
+    void testMoveActionInMessage();
 };
 
 void tsti_MessageItem::testConnectToStoppedInstance()
@@ -76,6 +79,43 @@ void tsti_MessageItem::testConnectToStoppedInstance()
     QCOMPARE(message->targetInstance(), instanceB);
     const QRectF rectB = itemB->sceneBoundingRect();
     QVERIFY(rectB.bottom() > rectBOrig.bottom());
+}
+
+void tsti_MessageItem::testMoveActionInMessage()
+{
+    const QString msc("/* CIF MSCDOCUMENT (0, 0) (1027, 718) */\
+        mscdocument Untitled_Leaf /* MSC LEAF */;\
+            msc Untitled_MSC;\
+                /* CIF INSTANCE (0, 43) (146, 68) (800, 611) */\
+                instance Instance_1;\
+                    /* CIF MESSAGE (74, 146) (721, 440) */\
+                    out Message to Instance_2;\
+                endinstance;\
+                /* CIF INSTANCE (647, 43) (146, 68) (800, 611) */\
+                instance Instance_2;\
+                    /* CIF MESSAGE (74, 146) (721, 440) */\
+                    in Message from Instance_1;\
+                    action 'Action_1';\
+                endinstance;\
+            endmsc;\
+        endmscdocument;");
+    loadView(msc);
+
+    auto message = qobject_cast<msc::MscMessage *>(m_chart->instanceEvents().at(0));
+    auto action = qobject_cast<msc::MscAction *>(m_chart->instanceEvents().at(1));
+    msc::MessageItem *messageItem = m_chartModel->itemForMessage(message);
+    msc::ActionItem *actionItem = m_chartModel->itemForAction(action);
+
+    QVERIFY(bottomCenter(messageItem).y() < topCenter(actionItem).y());
+
+    const QPoint startPos(center(messageItem).x(), center(actionItem).y());
+    const QPoint moveFromPos = center(actionItem);
+    const QPoint moveToPos(center(actionItem).x(), center(messageItem).y());
+    vstest::sendMouseMove(m_view.data()->viewport(), startPos); // To grab the action
+    vstest::sendMouseDrag(m_view.data()->viewport(), moveFromPos, moveToPos);
+
+    QVERIFY(topCenter(messageItem).y() < topCenter(actionItem).y());
+    QVERIFY(bottomCenter(messageItem).y() > bottomCenter(actionItem).y());
 }
 
 QTEST_MAIN(tsti_MessageItem)

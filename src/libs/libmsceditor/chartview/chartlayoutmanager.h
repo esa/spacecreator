@@ -100,8 +100,6 @@ public:
     QSizeF preferredChartBoxSize() const;
     void setPreferredChartBoxSize(const QSizeF &size);
 
-    int instanceOrderFromPos(const QPointF &scenePos);
-
     void setVisibleItemLimit(int number);
     bool isStreamingModeEnabled() const;
 
@@ -156,6 +154,7 @@ private:
 
     void checkHorizontalConstraints();
     void checkVerticalConstraints();
+    void checkStreamingVerticalConstraints();
     void actualizeInstancesHeights(qreal height) const;
     void updateStoppedInstanceHeight(InstanceItem *instanceItem, qreal totalH) const;
     void updateCreatedInstanceHeight(InstanceItem *instanceItem, qreal totalH) const;
@@ -168,13 +167,11 @@ private:
     CommentItem *addCommentItem(MscComment *comment);
     MessageItem *addMessageItem(MscMessage *message);
     ActionItem *addActionItem(MscAction *action);
-    ConditionItem *addConditionItem(MscCondition *condition, ConditionItem *prevItem, const QRectF &instancesRect);
+    ConditionItem *addConditionItem(MscCondition *condition, const QRectF &instancesRect);
     TimerItem *addTimerItem(MscTimer *timer);
     CoregionItem *addCoregionItem(MscCoregion *coregion);
 
     MessageItem *creatorItemOfInstance(MscInstance *instance) const;
-
-    void polishAddedEventItem(MscInstanceEvent *event, InteractiveObject *item);
 
     void addInstanceItems();
     void addInstanceEventItems();
@@ -197,6 +194,8 @@ private:
     void forceCifForAll();
 
     void setInstancesRect(const QRectF &rect);
+
+    QVector<MscInstanceEvent *> visibleEvents() const;
 };
 
 } // namespace msc
