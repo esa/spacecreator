@@ -48,6 +48,7 @@
 #include <QPainter>
 #include <QPolygonF>
 #include <QTimer>
+#include <cmath>
 
 namespace msc {
 

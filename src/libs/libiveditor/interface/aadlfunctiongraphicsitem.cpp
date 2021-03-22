@@ -288,13 +288,11 @@ void AADLFunctionGraphicsItem::drawNestedView(QPainter *painter)
             } else {
                 ivm::AADLObject *outerIface = connection->source()->id() == entity()->id()
                         ? connection->sourceInterface()
-                        : connection->target()->id() == entity()->id() ? connection->targetInterface()
-                                                                       : nullptr;
+                        : connection->target()->id() == entity()->id() ? connection->targetInterface() : nullptr;
 
                 ivm::AADLObject *innerIface = connection->source()->id() == entity()->id()
                         ? connection->targetInterface()
-                        : connection->target()->id() == entity()->id() ? connection->sourceInterface()
-                                                                       : nullptr;
+                        : connection->target()->id() == entity()->id() ? connection->sourceInterface() : nullptr;
 
                 if (!outerIface || !innerIface) {
                     continue;

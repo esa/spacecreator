@@ -197,9 +197,17 @@ bool EndToEndView::refreshView()
 
     // Add new graphics items for each object
     QHash<shared::Id, QGraphicsItem *> items;
+    InteractiveObject *rootItem = nullptr;
     for (auto obj : objects) {
-        if (ive::nestingLevel(obj) > ive::kNestingVisibilityLevel)
+        const int lowestLevel = nestingLevel(d->document->objectsModel()->rootObject()) + 1;
+        const int objectLevel = nestingLevel(obj);
+        const bool isRootOrRootChild = obj->id() == d->document->objectsModel()->rootObjectId()
+                || (d->document->objectsModel()->rootObject()
+                        && obj->parentObject() == d->document->objectsModel()->rootObject());
+        if ((objectLevel < lowestLevel || objectLevel > (lowestLevel + ive::kNestingVisibilityLevel))
+                && !isRootOrRootChild) {
             continue;
+        }
 
         QGraphicsItem *parentItem = obj->parentObject() ? items.value(obj->parentObject()->id()) : nullptr;
 
@@ -357,6 +365,9 @@ bool EndToEndView::refreshView()
             break;
         case ivm::AADLObject::Type::Function:
             item = new AADLFunctionGraphicsItem(qobject_cast<ivm::AADLFunction *>(obj), parentItem);
+            if (obj->isRootObject()) {
+                rootItem = item;
+            }
             break;
         default:
             break;
@@ -390,6 +401,9 @@ bool EndToEndView::refreshView()
 
     for (AADLInterfaceGraphicsItem *ifItem : interfaceItems) {
         ifItem->updateLabel();
+    }
+    if (rootItem) {
+        rootItem->rebuildLayout();
     }
 
     // Set the scene rect based on what we show
