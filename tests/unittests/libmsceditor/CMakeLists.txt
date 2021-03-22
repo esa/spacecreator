@@ -7,6 +7,7 @@ addQtTest(tst_cmddeleteentity libmsceditor "common/chartlayouttestbase.cpp;commo
 addQtTest(tst_cmdentitycommentchange libmsceditor)
 addQtTest(tst_cmdinstanceitemcreate libmsceditor)
 addQtTest(tst_cmdmessageitemcreate libmsceditor)
+addQtTest(tst_conditionitem libmsceditor)
 addQtTest(tst_coordinatesconverter libmsceditor)
 addQtTest(tst_documentitemmodel libmsceditor)
 addQtTest(tst_entitydeletetool libmsceditor "common/chartlayouttestbase.cpp;common/chartlayouttestbase.h")

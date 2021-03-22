@@ -99,7 +99,9 @@ CifBlockShared CifBlockFactory::createBlockComment(const QVector<CifLineShared> 
 CifBlockShared CifBlockFactory::createBlockCondition(const QVector<CifLineShared> &lines)
 {
     CifBlockShared block(new CifBlockCondition());
-    block->setLines(lines);
+    if (!lines.isEmpty()) {
+        block->setLines(lines);
+    }
     return block;
 }
 

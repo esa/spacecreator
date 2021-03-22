@@ -45,6 +45,9 @@ public:
     static ConditionItem *createDefaultItem(
             MscCondition *condition, ChartLayoutManager *chartLayoutManager, const QPointF &pos);
 
+    void applyCif() override;
+    void updateCif() override;
+
 public Q_SLOTS:
     void setName(const QString &name);
     void setInstancesRect(const QRectF &instancesRect);
@@ -62,6 +65,7 @@ protected:
     void onManualMoveFinish(shared::ui::GripPoint *gp, const QPointF &from, const QPointF &to) override;
 
     void initGripPoints() override;
+    cif::CifLine::CifType mainCifType() const override;
 
 private:
     MscCondition *m_condition = nullptr;

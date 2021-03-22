@@ -33,7 +33,7 @@ public:
     static CifBlockShared createBlockAction(const QVector<CifLineShared> &lines = QVector<CifLineShared>());
     static CifBlockShared createBlockCall(const QVector<CifLineShared> &lines);
     static CifBlockShared createBlockComment(const QVector<CifLineShared> &lines);
-    static CifBlockShared createBlockCondition(const QVector<CifLineShared> &lines);
+    static CifBlockShared createBlockCondition(const QVector<CifLineShared> &lines = QVector<CifLineShared>());
     static CifBlockShared createBlockCreate(const QVector<CifLineShared> &lines = QVector<CifLineShared>());
     static CifBlockShared createBlockInstance(const QVector<CifLineShared> &lines = QVector<CifLineShared>());
     static CifBlockShared createBlockImport(const QVector<CifLineShared> &lines);
