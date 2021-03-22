@@ -362,21 +362,6 @@ cif::CifLine::CifType InstanceItem::mainCifType() const
     return cif::CifLine::CifType::Instance;
 }
 
-bool cifChangedEnough(const QVector<QPoint> &storedCif, const QVector<QPoint> newCif)
-{
-    if (storedCif.size() != newCif.size())
-        return true;
-
-    static constexpr int HARDCODED_TOLERANCE { 10 }; // 1mm
-    for (int i = 0; i < storedCif.size(); ++i) {
-        const QPoint &delta = storedCif.at(i) - newCif.at(i);
-        if (qAbs(delta.x()) > HARDCODED_TOLERANCE || qAbs(delta.y()) > HARDCODED_TOLERANCE) {
-            return true;
-        }
-    }
-    return false;
-}
-
 /**
     Applies the x-position of the instance if it is stored in the CIF information.
     The y-values are ignored

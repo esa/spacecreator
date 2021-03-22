@@ -894,6 +894,27 @@ void MessageItem::applyCif()
     }
 }
 
+void MessageItem::updateCif()
+{
+    using namespace cif;
+
+    const cif::CifLine::CifType usedCifType = mainCifType();
+    const QVector<QPoint> &pointsCif = CoordinatesConverter::sceneToCif(messagePoints());
+    if (!geometryManagedByCif()) {
+        const CifBlockShared &emptyCif =
+                isCreator() ? CifBlockFactory::createBlockCreate() : CifBlockFactory::createBlockMessage();
+        m_message->addCif(emptyCif);
+    }
+
+    const CifBlockShared &msgCif = mainCifBlock();
+    if (!msgCif->hasPayloadFor(usedCifType))
+        msgCif->addLine(isCreator() ? CifLineShared(new CifLineCreate()) : CifLineShared(new CifLineMessage()));
+
+    const QVector<QPoint> &pointsCifStored = msgCif->payload(mainCifType()).value<QVector<QPoint>>();
+    if (pointsCifStored != pointsCif)
+        msgCif->setPayload(QVariant::fromValue(pointsCif), usedCifType);
+}
+
 QString MessageItem::displayedText() const
 {
     return m_arrowItem->text();
@@ -941,27 +962,6 @@ QVariant MessageItem::itemChange(QGraphicsItem::GraphicsItemChange change, const
     }
 
     return InteractiveObject::itemChange(change, value);
-}
-
-void MessageItem::updateCif()
-{
-    using namespace cif;
-
-    const cif::CifLine::CifType usedCifType = mainCifType();
-    const QVector<QPoint> &pointsCif = CoordinatesConverter::sceneToCif(messagePoints());
-    if (!geometryManagedByCif()) {
-        const CifBlockShared &emptyCif =
-                isCreator() ? CifBlockFactory::createBlockCreate() : CifBlockFactory::createBlockMessage();
-        m_message->addCif(emptyCif);
-    }
-
-    const CifBlockShared &msgCif = mainCifBlock();
-    if (!msgCif->hasPayloadFor(usedCifType))
-        msgCif->addLine(isCreator() ? CifLineShared(new CifLineCreate()) : CifLineShared(new CifLineMessage()));
-
-    const QVector<QPoint> &pointsCifStored = msgCif->payload(mainCifType()).value<QVector<QPoint>>();
-    if (pointsCifStored != pointsCif)
-        msgCif->setPayload(QVariant::fromValue(pointsCif), usedCifType);
 }
 
 void MessageItem::extendGlobalMessage()

@@ -26,7 +26,6 @@ class CifBlockAction : public CifBlock
 {
 public:
     CifLine::CifType blockType() const override;
-    void setLines(const QVector<CifLineShared> &lines) override;
 };
 
 class CifBlockCall : public CifBlock

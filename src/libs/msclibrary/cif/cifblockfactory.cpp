@@ -76,7 +76,9 @@ CifBlockShared CifBlockFactory::createBlock(const QVector<CifLineShared> &lines)
 CifBlockShared CifBlockFactory::createBlockAction(const QVector<CifLineShared> &lines)
 {
     CifBlockShared block(new CifBlockAction());
-    block->setLines(lines);
+    if (!lines.isEmpty()) {
+        block->setLines(lines);
+    }
     return block;
 }
 

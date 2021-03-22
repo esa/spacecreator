@@ -44,11 +44,10 @@ public:
     void postCreatePolishing() override;
 
     virtual void applyCif();
-
+    virtual void updateCif();
     virtual bool geometryManagedByCif() const;
 
     virtual void moveSilentlyBy(const QPointF &shift);
-    virtual void updateCif();
 
 Q_SIGNALS:
     void cifChanged();
@@ -59,6 +58,8 @@ protected:
 
     cif::CifBlockShared cifBlockByType(cif::CifLine::CifType type) const;
     virtual cif::CifLine::CifType mainCifType() const;
+
+    bool cifChangedEnough(const QVector<QPoint> &storedCif, const QVector<QPoint> newCif);
 
     QRectF getChartContentBox() const;
     QRectF getChartBox() const;

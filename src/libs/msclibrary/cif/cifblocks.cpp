@@ -26,14 +26,6 @@ CifLine::CifType CifBlockAction::blockType() const
 {
     return CifLine::CifType::Action;
 }
-void CifBlockAction::setLines(const QVector<CifLineShared> &lines)
-{
-    CifBlock::setLines(lines);
-
-    if (!m_linesByType.contains(CifLine::CifType::Action))
-        addLine(CifLineShared(new CifLineAction()));
-}
-
 CifLine::CifType CifBlockCall::blockType() const
 {
     return CifLine::CifType::Call;

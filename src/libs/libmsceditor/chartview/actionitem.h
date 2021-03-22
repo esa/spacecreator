@@ -36,6 +36,7 @@ public:
     MscAction *modelItem() const;
 
     void applyCif() override;
+    void updateCif() override;
 
 public Q_SLOTS:
     void setActionText(const QString &text);
