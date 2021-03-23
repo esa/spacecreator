@@ -44,7 +44,7 @@ public:
     static CifBlockShared createBlockStop(const QVector<CifLineShared> &lines);
     static CifBlockShared createBlockSubmsc(const QVector<CifLineShared> &lines);
     static CifBlockShared createBlockText(const QVector<CifLineShared> &lines);
-    static CifBlockShared createBlockTimeout(const QVector<CifLineShared> &lines);
+    static CifBlockShared createBlockTimeout(const QVector<CifLineShared> &lines = QVector<CifLineShared>());
 
 private:
     CifBlockFactory() = delete;

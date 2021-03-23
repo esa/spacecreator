@@ -179,7 +179,9 @@ CifBlockShared CifBlockFactory::createBlockText(const QVector<CifLineShared> &li
 CifBlockShared CifBlockFactory::createBlockTimeout(const QVector<CifLineShared> &lines)
 {
     CifBlockShared block(new CifBlockTimeout());
-    block->setLines(lines);
+    if (!lines.isEmpty()) {
+        block->setLines(lines);
+    }
     return block;
 }
 

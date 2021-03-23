@@ -37,7 +37,7 @@ class tst_ActionItem : public QObject
 private Q_SLOTS:
     void init();
     void cleanup();
-    void testNameUpdate();
+    void testCifUpdate();
 
 private:
     MscAction *m_action = nullptr;
@@ -73,7 +73,7 @@ void tst_ActionItem::cleanup()
     m_chartModel = nullptr;
 }
 
-void tst_ActionItem::testNameUpdate()
+void tst_ActionItem::testCifUpdate()
 {
     m_action = new MscAction();
     m_action->setName("Hello_again");

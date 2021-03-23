@@ -37,7 +37,7 @@ class tst_ConditionItem : public QObject
 private Q_SLOTS:
     void init();
     void cleanup();
-    void testNameUpdate();
+    void testCifUpdate();
 
 private:
     MscCondition *m_condition = nullptr;
@@ -73,7 +73,7 @@ void tst_ConditionItem::cleanup()
     m_chartModel = nullptr;
 }
 
-void tst_ConditionItem::testNameUpdate()
+void tst_ConditionItem::testCifUpdate()
 {
     m_condition = new MscCondition();
     m_condition->setName("Hello_again");
