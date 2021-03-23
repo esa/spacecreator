@@ -42,6 +42,11 @@ CifLine::CifType CifLineComment::lineType() const
     return CifLine::CifType::Comment;
 }
 
+CifLine::CifType CifLineConcurrent::lineType() const
+{
+    return CifLine::CifType::Concurrent;
+}
+
 CifLine::CifType CifLineCondition::lineType() const
 {
     return CifLine::CifType::Condition;

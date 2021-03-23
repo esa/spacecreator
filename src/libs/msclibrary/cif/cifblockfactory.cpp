@@ -27,9 +27,11 @@ namespace cif {
 QVector<CifBlockShared> CifBlockFactory::createBlocks(const QVector<QVector<CifLineShared>> &lines)
 {
     QVector<CifBlockShared> blocks;
-    for (const QVector<CifLineShared> &blockLines : lines)
-        if (const CifBlockShared &block = createBlock(blockLines))
+    for (const QVector<CifLineShared> &blockLines : lines) {
+        if (const CifBlockShared &block = createBlock(blockLines)) {
             blocks.append(block);
+        }
+    }
     return blocks;
 }
 
@@ -43,6 +45,8 @@ CifBlockShared CifBlockFactory::createBlock(const QVector<CifLineShared> &lines)
             return createBlockCall(lines);
         case CifLine::CifType::Comment:
             return createBlockComment(lines);
+        case CifLine::CifType::Concurrent:
+            return createBlockConcurrent(lines);
         case CifLine::CifType::Condition:
             return createBlockCondition(lines);
         case CifLine::CifType::Create:
@@ -93,6 +97,15 @@ CifBlockShared CifBlockFactory::createBlockComment(const QVector<CifLineShared> 
 {
     CifBlockShared block(new CifBlockComment());
     block->setLines(lines);
+    return block;
+}
+
+CifBlockShared CifBlockFactory::createBlockConcurrent(const QVector<CifLineShared> &lines)
+{
+    CifBlockShared block(new CifBlockConcurrent());
+    if (!lines.isEmpty()) {
+        block->setLines(lines);
+    }
     return block;
 }
 

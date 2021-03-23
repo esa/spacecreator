@@ -37,6 +37,11 @@ class CifLineComment : public CifLinePointsHolder
 public:
     CifLine::CifType lineType() const override;
 };
+class CifLineConcurrent : public CifLineTwoPointsHolder
+{
+public:
+    CifLine::CifType lineType() const override;
+};
 class CifLineCondition : public CifLineTwoPointsHolder
 {
 public:

@@ -106,7 +106,7 @@ MscAction *ActionItem::modelItem() const
 
 void ActionItem::applyCif()
 {
-    if (const cif::CifBlockShared &cifBlock = cifBlockByType(cif::CifLine::CifType::Action)) {
+    if (const cif::CifBlockShared &cifBlock = cifBlockByType(mainCifType())) {
         const QVector<QPoint> &cifPoints = cifBlock->payload().value<QVector<QPoint>>();
         if (cifPoints.size() == 2) {
             bool converted(false);
@@ -140,7 +140,7 @@ void ActionItem::updateCif()
     const QVector<QPoint> &storedCif = cifBlock->payload().value<QVector<QPoint>>();
     const QVector<QPoint> newCif { bBoxCif.topLeft(), QPoint(bBoxCif.width(), bBoxCif.height()) };
     if (cifChangedEnough(storedCif, newCif)) {
-        cifBlock->setPayload(QVariant::fromValue(newCif), cif::CifLine::CifType::Action);
+        cifBlock->setPayload(QVariant::fromValue(newCif), mainCifType());
         Q_EMIT cifChanged();
     }
 }

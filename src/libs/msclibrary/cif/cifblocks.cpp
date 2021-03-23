@@ -36,6 +36,11 @@ CifLine::CifType CifBlockComment::blockType() const
     return CifLine::CifType::Comment;
 }
 
+CifLine::CifType CifBlockConcurrent::blockType() const
+{
+    return CifLine::CifType::Concurrent;
+}
+
 CifLine::CifType CifBlockCondition::blockType() const
 {
     return CifLine::CifType::Condition;

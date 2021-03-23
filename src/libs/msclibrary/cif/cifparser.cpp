@@ -61,6 +61,8 @@ CifLineShared CifParser::readCifLine(const QString &line) const
         return readCifLineComment(line);
     case CifLine::CifType::Condition:
         return readCifLineCondition(line);
+    case CifLine::CifType::Concurrent:
+        return readCifLineConcurrent(line);
     case CifLine::CifType::Create:
         return readCifLineCreate(line);
     case CifLine::CifType::Collapsed:
@@ -199,6 +201,15 @@ CifLineShared CifParser::readCifLineCall(const QString &from) const
 CifLineShared CifParser::readCifLineComment(const QString &from) const
 {
     CifLineShared cif(new CifLineComment());
+    if (!cif->initFrom(from)) {
+        cif.reset();
+    }
+    return cif;
+}
+
+CifLineShared CifParser::readCifLineConcurrent(const QString &from) const
+{
+    CifLineShared cif(new CifLineConcurrent());
     if (!cif->initFrom(from)) {
         cif.reset();
     }

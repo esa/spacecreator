@@ -46,6 +46,7 @@ private:
     CifLineShared readCifLineAction(const QString &from) const;
     CifLineShared readCifLineCall(const QString &from) const;
     CifLineShared readCifLineComment(const QString &from) const;
+    CifLineShared readCifLineConcurrent(const QString &from) const;
     CifLineShared readCifLineCondition(const QString &from) const;
     CifLineShared readCifLineCreate(const QString &from) const;
     CifLineShared readCifLineCollapsed(const QString &from) const;

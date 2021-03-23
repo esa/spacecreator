@@ -42,11 +42,16 @@ public:
 
     void setInstance(InstanceItem *instance);
 
+    void applyCif() override;
+    void updateCif() override;
+
 protected:
     void initGripPoints() override;
     void rebuildLayout() override;
     void onManualResizeProgress(shared::ui::GripPoint *gp, const QPointF &from, const QPointF &to) override;
     void onManualResizeFinish(shared::ui::GripPoint *gp, const QPointF &pressedAt, const QPointF &releasedAt) override;
+
+    cif::CifLine::CifType mainCifType() const override;
 
 private:
     QPointer<InstanceItem> m_instance;

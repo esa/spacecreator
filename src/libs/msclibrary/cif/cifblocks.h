@@ -40,6 +40,12 @@ public:
     CifLine::CifType blockType() const override;
 };
 
+class CifBlockConcurrent : public CifBlock
+{
+public:
+    CifLine::CifType blockType() const override;
+};
+
 class CifBlockCondition : public CifBlock
 {
 public:

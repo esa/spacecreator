@@ -1,5 +1,6 @@
 addQtTest(tst_ciflineaction msclibrary "cifcommon/ciflinepointstestbase.h;cifcommon/ciflinepointstestbase.cpp")
 addQtTest(tst_ciflinecall msclibrary "cifcommon/ciflinepointstestbase.h;cifcommon/ciflinepointstestbase.cpp")
+addQtTest(tst_ciflineconcurrent msclibrary "cifcommon/ciflinepointstestbase.h;cifcommon/ciflinepointstestbase.cpp")
 addQtTest(tst_ciflinecondition msclibrary "cifcommon/ciflinepointstestbase.h;cifcommon/ciflinepointstestbase.cpp")
 addQtTest(tst_ciflinecreate msclibrary "cifcommon/ciflinepointstestbase.h;cifcommon/ciflinepointstestbase.cpp")
 addQtTest(tst_ciflineinstance msclibrary "cifcommon/ciflinepointstestbase.h;cifcommon/ciflinepointstestbase.cpp")

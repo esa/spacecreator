@@ -62,6 +62,7 @@ public:
         TextMode,
         TextName,
         GlobalComment,
+        Concurrent,
         Unknown
     };
     Q_ENUM(CifType)

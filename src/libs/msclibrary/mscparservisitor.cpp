@@ -824,11 +824,13 @@ antlrcpp::Any MscParserVisitor::visitCoregion(MscParser::CoregionContext *contex
 
     if (context->CONCURRENT()) {
         MscCoregion *coregion = new MscCoregion(MscCoregion::Type::Begin);
+        m_currentEvent = coregion;
         coregion->setInstance(m_currentInstance);
         m_instanceEvents.append(coregion);
     }
     if (context->ENDCONCURRENT()) {
         MscCoregion *coregion = new MscCoregion(MscCoregion::Type::End);
+        m_currentEvent = coregion;
         coregion->setInstance(m_currentInstance);
         m_instanceEvents.append(coregion);
     }
@@ -1095,11 +1097,11 @@ antlrcpp::Any MscParserVisitor::visitEnd(MscParser::EndContext *ctx)
     // dbg output below may be useful for upcoming CIF improvements/tuning.
     // Please keep it as a dead code for a while
     // TODO: Remove after completing (more or less) CIF support
-    //    if (antlr4::ParserRuleContext *pParentRule = dynamic_cast<antlr4::ParserRuleContext *>(ctx->parent)) {
-    //        qDebug() << "visitEnd of:" << msc_dbg::ruleNameFromIndex(pParentRule->getRuleIndex());
-    //    } else {
-    //        qDebug() << "visitEnd of:" << msc_dbg::ruleNameFromIndex(ctx->getRuleIndex());
-    //    }
+    // if (antlr4::ParserRuleContext *pParentRule = dynamic_cast<antlr4::ParserRuleContext *>(ctx->parent)) {
+    //     qDebug() << "visitEnd of:" << msc_dbg::ruleNameFromIndex(pParentRule->getRuleIndex());
+    // } else {
+    //     qDebug() << "visitEnd of:" << msc_dbg::ruleNameFromIndex(ctx->getRuleIndex());
+    // }
 
     if (!m_cifBlocks.isEmpty()) {
         int ctr(0);
@@ -1148,9 +1150,11 @@ msc::MscEntity *MscParserVisitor::cifTarget() const
 {
     const QVector<MscEntity *> possibleTargets = { m_currentMessage, m_currentEvent, m_currentInstance, m_currentChart,
         m_currentDocument };
-    for (MscEntity *target : possibleTargets)
-        if (target)
+    for (MscEntity *target : possibleTargets) {
+        if (target) {
             return target;
+        }
+    }
     return nullptr;
 }
 
