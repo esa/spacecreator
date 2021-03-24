@@ -29,9 +29,6 @@ public:
     explicit AADLFunctionNameGraphicsItem(QGraphicsItem *parent = nullptr);
 
 protected:
-    void mousePressEvent(QGraphicsSceneMouseEvent *event) override;
-    void mouseDoubleClickEvent(QGraphicsSceneMouseEvent *event) override;
-
     bool validateText(const QString &text) const override;
 };
 

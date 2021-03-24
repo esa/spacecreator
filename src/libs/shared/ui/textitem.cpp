@@ -144,7 +144,7 @@ bool TextItem::isEditable() const
 
 bool TextItem::isEditing() const
 {
-    return isEditable() && textInteractionFlags() != Qt::NoTextInteraction;
+    return isEditable() && textInteractionFlags().testFlag(Qt::TextEditable);
 }
 
 void TextItem::setEditable(bool editable)
@@ -164,7 +164,7 @@ void TextItem::enableEditMode()
 
     selectText(true);
 
-    setTextInteractionFlags(Qt::TextEditorInteraction | Qt::TextEditable);
+    setTextInteractionFlags(textInteractionFlags() | Qt::TextEditable);
 
     // Bugfix for issue #284
     // Inspired by workaround from https://bugreports.qt.io/browse/QTBUG-8188
@@ -198,7 +198,7 @@ void TextItem::disableEditMode()
     }
     selectText(false);
     m_prevText.clear();
-    setTextInteractionFlags(Qt::NoTextInteraction);
+    setTextInteractionFlags(textInteractionFlags() & ~Qt::TextEditable);
 
     m_disableEditingGuard = false;
     Q_EMIT editingModeOff();
@@ -249,7 +249,7 @@ void TextItem::keyPressEvent(QKeyEvent *event)
 
     if (m_explicitSize.isValid()
             && (QGraphicsTextItem::boundingRect().width() > m_explicitSize.width()
-                       || QGraphicsTextItem::boundingRect().height() > m_explicitSize.height())) {
+                    || QGraphicsTextItem::boundingRect().height() > m_explicitSize.height())) {
         prepareGeometryChange();
         m_explicitSize = QGraphicsTextItem::boundingRect().size();
     }

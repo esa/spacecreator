@@ -48,6 +48,7 @@ public:
 
         // attrs:
         name,
+        url,
         language,
         is_type,
         instance_of,

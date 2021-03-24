@@ -36,21 +36,10 @@ AADLFunctionNameGraphicsItem::AADLFunctionNameGraphicsItem(QGraphicsItem *parent
     setBackground(Qt::transparent);
     setFlags(QGraphicsItem::ItemIsSelectable);
     setTextWrapMode(QTextOption::WrapAnywhere);
+    setTextInteractionFlags(Qt::TextBrowserInteraction);
+    setOpenExternalLinks(true);
 
     setInputValidationPattern("[a-zA-Z0-9 ]");
-}
-
-void AADLFunctionNameGraphicsItem::mousePressEvent(QGraphicsSceneMouseEvent *event)
-{
-    if (isSelected())
-        enableEditMode();
-    else
-        QGraphicsTextItem::mousePressEvent(event);
-}
-
-void AADLFunctionNameGraphicsItem::mouseDoubleClickEvent(QGraphicsSceneMouseEvent *event)
-{
-    QGraphicsTextItem::mouseDoubleClickEvent(event);
 }
 
 bool AADLFunctionNameGraphicsItem::validateText(const QString &text) const

@@ -52,6 +52,7 @@ public:
 protected Q_SLOTS:
     void applyColorScheme() override;
     void updateNameFromUi(const QString &name);
+    void updateText();
 
 protected:
     void onManualResizeProgress(shared::ui::GripPoint *grip, const QPointF &from, const QPointF &to) override;
