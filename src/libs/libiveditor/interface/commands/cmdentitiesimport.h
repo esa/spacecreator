@@ -17,10 +17,13 @@
 
 #pragma once
 
+#include "common.h"
+
 #include <QPointer>
 #include <QUndoCommand>
 #include <QVector>
 
+class QTemporaryDir;
 namespace ivm {
 class AADLObject;
 class AADLFunctionType;
@@ -33,8 +36,8 @@ namespace cmd {
 class CmdEntitiesImport : public QUndoCommand
 {
 public:
-    explicit CmdEntitiesImport(
-            const QByteArray &data, ivm::AADLFunctionType *parent, ivm::AADLModel *model, const QPointF &pos);
+    explicit CmdEntitiesImport(const QByteArray &data, ivm::AADLFunctionType *parent, ivm::AADLModel *model,
+            const QPointF &pos, const QString &destPath);
     ~CmdEntitiesImport() override;
 
     void redo() override;
@@ -43,10 +46,18 @@ public:
     int id() const override;
 
 private:
+    void redoSourceCloning(const ivm::AADLObject *object);
+    void undoSourceCloning(const ivm::AADLObject *object);
+    QString relativePathForObject(const ivm::AADLObject *object) const;
+
     QPointer<ivm::AADLModel> m_model;
+    QPointer<ivm::AADLModel> m_importModel;
     QPointer<ivm::AADLFunctionType> m_parent;
     QVector<QPointer<ivm::AADLObject>> m_rootEntities;
     QVector<QPointer<ivm::AADLObject>> m_importedEntities;
+
+    QString m_destPath;
+    QScopedPointer<QTemporaryDir> m_tempDir;
 };
 
 } // namespace ive

@@ -41,6 +41,8 @@ enum FileCopyingMode
     Overwrite
 };
 
+void copyDir(const QString &source, const QString &dest);
+
 bool copyResourceFile(
         const QString &source, const QString &target, FileCopyingMode replaceMode = FileCopyingMode::Keep);
 
