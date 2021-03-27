@@ -33,7 +33,7 @@ struct PropertyTemplate::PropertyTemplatePrivate {
     PropertyTemplate::Info m_info;
     PropertyTemplate::Type m_type;
     PropertyTemplate::Scopes m_scope;
-    QList<QVariant> m_vals;
+    QVariant m_value;
     QVariant m_defaultValue;
     QString m_rxValueValidatorPattern;
     QMap<PropertyTemplate::Scope, QPair<QString, QString>> m_rxAttrValidatorPattern;
@@ -46,7 +46,7 @@ PropertyTemplate::PropertyTemplate()
 {
 }
 
-PropertyTemplate::~PropertyTemplate() { }
+PropertyTemplate::~PropertyTemplate() {}
 
 QString PropertyTemplate::name() const
 {
@@ -118,14 +118,14 @@ void PropertyTemplate::setVisible(bool value)
     d->m_isVisible = value;
 }
 
-QList<QVariant> PropertyTemplate::valuesList() const
+QVariant PropertyTemplate::value() const
 {
-    return d->m_vals;
+    return d->m_value;
 }
 
-void PropertyTemplate::setValuesList(const QList<QVariant> &range)
+void PropertyTemplate::setValue(const QVariant &value)
 {
-    d->m_vals = range;
+    d->m_value = value;
 }
 
 QVariant PropertyTemplate::defaultValue() const
@@ -182,7 +182,7 @@ QDomElement PropertyTemplate::toXml(QDomDocument *doc) const
         typeSubElement.setAttribute(QLatin1String("validator"), d->m_rxValueValidatorPattern);
     }
     if (d->m_type == PropertyTemplate::Type::Enumeration) {
-        for (auto entry : d->m_vals) {
+        for (auto entry : d->m_value.toList()) {
             QDomElement entryElement = doc->createElement(QLatin1String("Entry"));
             entryElement.setAttribute(QLatin1String("value"), entry.toString());
             typeSubElement.appendChild(entryElement);
@@ -316,7 +316,7 @@ PropertyTemplate *PropertyTemplate::fromXml(const QDomElement &element)
     propertyTemplate->setInfo(i);
     propertyTemplate->setType(t);
     propertyTemplate->setScope(s);
-    propertyTemplate->setValuesList(enumVals);
+    propertyTemplate->setValue(enumVals);
     propertyTemplate->setDefaultValue(defaultValue);
     propertyTemplate->setAttrValidatorPattern(attrValidators);
     propertyTemplate->setValueValidatorPattern(typeValidator);

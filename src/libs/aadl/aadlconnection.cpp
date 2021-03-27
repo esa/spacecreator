@@ -35,7 +35,7 @@ struct ConnectionHolder {
 };
 
 struct AADLConnectionPrivate {
-    AADLConnectionPrivate() { }
+    AADLConnectionPrivate() {}
     AADLConnectionPrivate(AADLIface *ifaceSource, AADLIface *ifaceTarget) { setData(ifaceSource, ifaceTarget); }
 
     void setData(AADLIface *ifaceSource, AADLIface *ifaceTarget)
@@ -160,7 +160,7 @@ void AADLConnection::handleInheritPIChange(AADLConnection::InheritPIChange inher
     if (!pi || !ri)
         return;
 
-    if (!ri->isInheritPI())
+    if (!ri->isInheritPI() && !ri->hasPrototypePi())
         return;
 
     const bool rmLabel = inheritance == AADLConnection::InheritPIChange::NotInherit;

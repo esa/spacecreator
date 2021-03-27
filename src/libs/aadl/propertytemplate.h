@@ -77,8 +77,8 @@ public:
     bool isVisible() const;
     void setVisible(bool value);
 
-    QList<QVariant> valuesList() const;
-    void setValuesList(const QList<QVariant> &range);
+    QVariant value() const;
+    void setValue(const QVariant &value);
 
     QVariant defaultValue() const;
     void setDefaultValue(const QVariant &value);

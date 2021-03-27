@@ -628,27 +628,31 @@ void InterfaceDocument::onSavedExternally(const QString &filePath, bool saved)
  */
 void InterfaceDocument::setObjects(const QVector<ivm::AADLObject *> &objects)
 {
-    if (d->objectsModel->initFromObjects(objects)) {
-        d->objectsModel->setRootObject({});
-    }
+    d->objectsModel->initFromObjects(objects);
+    d->objectsModel->setRootObject({});
 }
 
-void InterfaceDocument::onItemClicked(shared::Id id)
+void InterfaceDocument::onItemClicked(const shared::Id &id)
 {
     Q_UNUSED(id)
 }
 
-void InterfaceDocument::onItemDoubleClicked(shared::Id id)
+void InterfaceDocument::onItemDoubleClicked(const shared::Id &id)
 {
     if (id.isNull()) {
         return;
     }
 
-    if (auto entity = d->objectsModel->getObject(id)) {
-        if (entity->aadlType() != ivm::AADLObject::Type::Connection) {
-            showPropertyEditor(entity);
-        }
+    showPropertyEditor(id);
+}
+
+void InterfaceDocument::onItemCreated(const shared::Id &id)
+{
+    if (id.isNull()) {
+        return;
     }
+
+    showPropertyEditor(id);
 }
 
 void InterfaceDocument::onAttributesManagerRequested()
@@ -683,12 +687,18 @@ void InterfaceDocument::onDynContextEditorMenuInvoked()
     }
 }
 
-void InterfaceDocument::showPropertyEditor(ivm::AADLObject *obj)
+void InterfaceDocument::showPropertyEditor(const shared::Id &id)
 {
     Q_ASSERT(d->asnModelStorage);
     Q_ASSERT(d->commandsStack);
     Q_ASSERT(d->graphicsView);
-    if (!obj || obj->aadlType() == ivm::AADLObject::Type::InterfaceGroup) {
+    if (id.isNull()) {
+        return;
+    }
+
+    ivm::AADLObject *obj = d->objectsModel->getObject(id);
+    if (!obj || obj->aadlType() == ivm::AADLObject::Type::InterfaceGroup
+            || obj->aadlType() == ivm::AADLObject::Type::Connection) {
         return;
     }
 
@@ -927,7 +937,8 @@ QVector<QAction *> InterfaceDocument::initActions()
             currentAction->setChecked(false);
         d->tool->setCurrentToolType(CreatorTool::ToolType::Pointer);
     });
-    connect(d->tool, &CreatorTool::propertyEditorRequest, this, &InterfaceDocument::showPropertyEditor);
+    connect(d->tool, &CreatorTool::propertyEditorRequest, this, &InterfaceDocument::showPropertyEditor,
+            Qt::QueuedConnection);
     connect(d->tool, &CreatorTool::informUser, this, &InterfaceDocument::showInfoMessage);
     connect(d->tool, &CreatorTool::copyActionTriggered, this, &InterfaceDocument::copyItems);
     connect(d->tool, &CreatorTool::cutActionTriggered, this, &InterfaceDocument::cutItems);

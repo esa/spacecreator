@@ -15,12 +15,12 @@
    along with this program. If not, see <https://www.gnu.org/licenses/lgpl-2.1.html>.
 */
 
-#include "aadlobject.h"
 #include "aadlconnection.h"
 #include "aadlfunction.h"
 #include "aadlfunctiontype.h"
 #include "aadliface.h"
 #include "aadlmodel.h"
+#include "aadlobject.h"
 #include "aadltestutils.h"
 #include "propertytemplateconfig.h"
 
@@ -68,8 +68,7 @@ void tst_AADLModel::testManageContainers()
         auto container = containers.at(i);
         QSignalSpy spyCommon(&model, &ivm::AADLModel::aadlObjectsAdded);
 
-        const bool added = model.addObject(container);
-        QVERIFY(added);
+        QVERIFY(model.addObject(container));
         QCOMPARE(model.objects().size(), i + 1);
 
         QVERIFY(spyCommon.count() == 1);
@@ -78,8 +77,7 @@ void tst_AADLModel::testManageContainers()
     {
         QSignalSpy spyCommon(&model, &ivm::AADLModel::aadlObjectsAdded);
 
-        const bool nullAdded = model.addObject(nullptr);
-        QVERIFY(!nullAdded);
+        QVERIFY(!model.addObject(nullptr));
         QCOMPARE(model.objects().size(), containers.size());
 
         QVERIFY(spyCommon.count() == 0);
@@ -137,8 +135,7 @@ void tst_AADLModel::testManageFunctions()
         auto function = functions.at(i);
         QSignalSpy spyCommon(&model, &ivm::AADLModel::aadlObjectsAdded);
 
-        const bool added = model.addObject(function);
-        QVERIFY(added);
+        QVERIFY(model.addObject(function));
         QCOMPARE(model.objects().size(), i + 1);
 
         QVERIFY(spyCommon.count() == 1);
@@ -147,8 +144,7 @@ void tst_AADLModel::testManageFunctions()
     {
         QSignalSpy spyCommon(&model, &ivm::AADLModel::aadlObjectsAdded);
 
-        const bool nullAdded = model.addObject(nullptr);
-        QVERIFY(!nullAdded);
+        QVERIFY(!model.addObject(nullptr));
         QCOMPARE(model.objects().size(), functions.size());
 
         QVERIFY(spyCommon.count() == 0);
@@ -196,7 +192,7 @@ void tst_AADLModel::testManageIfaces()
     QCOMPARE(model.objects().size(), 0);
 
     ivm::AADLFunction fn("fn");
-    model.addObject(&fn);
+    QVERIFY(model.addObject(&fn));
     ivm::AADLIface::CreationInfo ci1 = ivm::testutils::init(ivm::AADLIface::IfaceType::Provided, &fn);
     ci1.name = "eth0";
     ivm::AADLIface::CreationInfo ci2 = ivm::testutils::init(ivm::AADLIface::IfaceType::Required, &fn);
@@ -224,8 +220,7 @@ void tst_AADLModel::testManageIfaces()
     {
         QSignalSpy spyCommon(&model, &ivm::AADLModel::aadlObjectsAdded);
 
-        const bool nullAdded = model.addObject(nullptr);
-        QVERIFY(!nullAdded);
+        QVERIFY(!model.addObject(nullptr));
         QCOMPARE(model.objects().size(), ifaces.size() + 1); // + function
 
         QVERIFY(spyCommon.count() == 0);
@@ -244,8 +239,8 @@ void tst_AADLModel::testManageIfaces()
     {
         QSignalSpy spyCommon(&model, &ivm::AADLModel::aadlObjectRemoved);
 
-        ivm::AADLIface *dummy = ivm::AADLIface::createIface(
-                ivm::testutils::init(ivm::AADLIface::IfaceType::Provided, nullptr));
+        ivm::AADLIface *dummy =
+                ivm::AADLIface::createIface(ivm::testutils::init(ivm::AADLIface::IfaceType::Provided, nullptr));
         const bool dummyRemoved = model.removeObject(dummy);
         QVERIFY(!dummyRemoved);
         QCOMPARE(model.objects().size(), ifaces.size() + 1); // +function
@@ -299,8 +294,7 @@ void tst_AADLModel::testManageMixed()
     const QVector<ivm::AADLObject *> objects { &container1, &fn1, iface1, &container2, &fn2, iface2, &container3, &fn3,
         iface3 };
 
-    for (auto object : objects)
-        QVERIFY(model.addObject(object));
+    model.addObjects(objects);
 
     QCOMPARE(model.objects().size(), 3 + functionsCount);
 
@@ -313,11 +307,9 @@ void tst_AADLModel::testManageMixed()
 void tst_AADLModel::testConnectionQuery()
 {
     auto fn1 = new ivm::AADLFunction("Fn1");
-    m_model->addObject(fn1);
     auto fn2 = new ivm::AADLFunction("Fn2");
-    m_model->addObject(fn2);
     ivm::AADLConnection *connect1 = ivm::testutils::createConnection(fn1, fn2, "cnt1");
-    m_model->addObject(connect1);
+    m_model->addObjects({ fn1, fn2, connect1 });
 
     const Qt::CaseSensitivity m_caseCheck = Qt::CaseInsensitive;
     QCOMPARE(m_model->getConnection("Dummy", "Fn1", "Fn2", m_caseCheck), nullptr);

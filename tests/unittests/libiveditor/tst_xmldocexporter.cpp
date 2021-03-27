@@ -17,6 +17,7 @@
 
 #include "aadlcomment.h"
 #include "aadlfunction.h"
+#include "aadllibrary.h"
 #include "aadlparameter.h"
 #include "asn1modelstorage.h"
 #include "interface/interfacedocument.h"
@@ -27,19 +28,84 @@
 #include <QObject>
 #include <QtTest>
 
+class XmlData
+{
+public:
+    struct Node {
+        QString type;
+        QVariant data;
+        QVariantHash attrs;
+        QList<Node> children;
+
+        bool operator==(const Node &n)
+        {
+            return n.type == type && n.data == data && n.attrs == attrs && n.children == children;
+        }
+    };
+
+    explicit XmlData(const QByteArray &data)
+    {
+        QXmlStreamReader xml(data);
+        processXml(xml);
+    }
+    explicit XmlData(const QString &path)
+    {
+        QFile file(path);
+        if (!file.open(QIODevice::ReadOnly)) {
+            qFatal(qUtf8Printable(file.errorString()));
+            return;
+        }
+
+        QXmlStreamReader xml(&file);
+        processXml(xml);
+    }
+
+    bool operator==(const XmlData &other) { return other.nodes == nodes; }
+
+private:
+    Node parseNode(QXmlStreamReader &xml)
+    {
+        Node node;
+        node.type = xml.name().toString();
+        node.data = xml.text().toString();
+        for (const QXmlStreamAttribute &attr : xml.attributes()) {
+            node.attrs.insert(attr.name().toString(), attr.value().toString());
+        }
+        while (xml.readNextStartElement()) {
+            node.children.append(parseNode(xml));
+        }
+        return node;
+    }
+
+    void processXml(QXmlStreamReader &xml)
+    {
+        while (!xml.atEnd() && !xml.hasError()) {
+            const QXmlStreamReader::TokenType token = xml.readNext();
+            if (token == QXmlStreamReader::StartDocument) {
+                continue;
+            }
+            while (xml.readNextStartElement()) {
+                nodes.append(parseNode(xml));
+            }
+        }
+    }
+
+private:
+    QList<Node> nodes;
+};
+
 static QString testFilePath = QStandardPaths::writableLocation(QStandardPaths::TempLocation) + "/tst_xmldocex.xml";
 
 class tst_XmlDocExporter : public QObject
 {
     Q_OBJECT
-public:
-    tst_XmlDocExporter();
 
 private:
     QByteArray testFileContent() const;
     std::unique_ptr<ive::InterfaceDocument> m_doc;
 
 private Q_SLOTS:
+    void initTestCase();
     void init();
     void cleanup();
 
@@ -51,11 +117,6 @@ private Q_SLOTS:
     void testExportToBuffer();
 };
 
-tst_XmlDocExporter::tst_XmlDocExporter()
-{
-    ive::initIvEditor();
-}
-
 QByteArray tst_XmlDocExporter::testFileContent() const
 {
     QFile file(testFilePath);
@@ -64,6 +125,12 @@ QByteArray tst_XmlDocExporter::testFileContent() const
     }
 
     return QByteArray();
+}
+
+void tst_XmlDocExporter::initTestCase()
+{
+    ivm::initAadlLibrary();
+    ive::initIvEditor();
 }
 
 void tst_XmlDocExporter::init()
@@ -85,10 +152,9 @@ void tst_XmlDocExporter::cleanup()
 void tst_XmlDocExporter::testExportEmptyDoc()
 {
     ive::XmlDocExporter::exportDocSilently(m_doc.get(), testFilePath);
-    QByteArray text = testFileContent();
-    QByteArray expectedRaw = "<InterfaceView>\n</InterfaceView>";
-    QByteArray expectedFormatted = "<?xml version=\"1.0\"?>\n<InterfaceView/>";
-    QVERIFY(text == expectedRaw || text == expectedFormatted);
+    const QByteArray text = testFileContent();
+    const QByteArray expected = "<?xml version=\"1.0\"?>\n<InterfaceView/>";
+    QVERIFY(XmlData(expected) == XmlData(text));
 }
 
 void tst_XmlDocExporter::testExportFunctions()
@@ -104,23 +170,15 @@ void tst_XmlDocExporter::testExportFunctions()
     m_doc->setObjects(objects);
 
     ive::XmlDocExporter::exportDocSilently(m_doc.get(), testFilePath);
-    QByteArray text = testFileContent();
-
-    QByteArray expectedFormatted =
+    const QByteArray text = testFileContent();
+    const QByteArray expected =
             "<?xml version=\"1.0\"?>\n<InterfaceView>\n"
-            "    <Function name=\"TestFunc1\" language=\"\" is_type=\"NO\" instance_of=\"\" foo=\"11\">\n"
+            "    <Function name=\"TestFunc1\" is_type=\"NO\" instance_of=\"\" language=\"SDL\" foo=\"11\">\n"
             "        <Property name=\"bar\" value=\"22\"/>\n"
             "        <ContextParameter name=\"Mo\" type=\"MyInt\" value=\"33\"/>\n"
             "    </Function>\n"
             "</InterfaceView>";
-    QByteArray expectedRaw = "<InterfaceView>\n"
-                             "<Function name=\"TestFunc1\" language=\"\" is_type=\"NO\" instance_of=\"\" foo=\"11\">\n"
-                             "    <Property name=\"bar\" value=\"22\"/>\n"
-                             "    <ContextParameter name=\"Mo\" type=\"MyInt\" value=\"33\"/>\n"
-                             "</Function>\n\n"
-                             "</InterfaceView>";
-    qDebug() << text;
-    QVERIFY(text == expectedRaw || text == expectedFormatted);
+    QVERIFY(XmlData(expected) == XmlData(text));
 }
 
 void tst_XmlDocExporter::testExportComment()
@@ -134,15 +192,11 @@ void tst_XmlDocExporter::testExportComment()
     m_doc->setObjects(objects);
 
     ive::XmlDocExporter::exportDocSilently(m_doc.get(), testFilePath);
-    QByteArray text = testFileContent();
-
-    QByteArray expectedFormatted = "<?xml version=\"1.0\"?>\n<InterfaceView>\n"
-                                   "    <Comment name=\"TestComment1\" foo=\"11\"/>\n"
-                                   "</InterfaceView>";
-    QByteArray expectedRaw =
-            "<InterfaceView>\n<Comment name=\"TestComment1\" foo=\"11\">\n</Comment>\n\n</InterfaceView>";
-    qDebug() << text;
-    QVERIFY(text == expectedRaw || text == expectedFormatted);
+    const QByteArray text = testFileContent();
+    const QByteArray expected = "<?xml version=\"1.0\"?>\n<InterfaceView>\n"
+                                "    <Comment name=\"TestComment1\" foo=\"11\"/>\n"
+                                "</InterfaceView>";
+    QVERIFY(XmlData(expected) == XmlData(text));
 }
 
 void tst_XmlDocExporter::testExportNestedComment()
@@ -156,30 +210,22 @@ void tst_XmlDocExporter::testExportNestedComment()
     m_doc->setObjects(objects);
 
     ive::XmlDocExporter::exportDocSilently(m_doc.get(), testFilePath);
-    QByteArray text = testFileContent();
-
-    QByteArray expectedFormatted = "<?xml version=\"1.0\"?>\n<InterfaceView>\n"
-                                   "    <Function name=\"TestFunc1\" language=\"\" is_type=\"NO\" instance_of=\"\">\n"
-                                   "        <Comment name=\"TestComment1\"/>\n"
-                                   "    </Function>\n"
-                                   "</InterfaceView>";
-    QByteArray expectedRaw =
-            "<InterfaceView>\n<Function name=\"TestFunc1\" language=\"\" is_type=\"NO\" instance_of=\"\">\n<Comment "
-            "name=\"TestComment1\">\n</Comment>\n\n</Function>\n\n</InterfaceView>";
-    qDebug() << text;
-    QVERIFY(text == expectedRaw || text == expectedFormatted);
+    const QByteArray text = testFileContent();
+    const QByteArray expected = "<?xml version=\"1.0\"?>\n<InterfaceView>\n"
+                                "    <Function name=\"TestFunc1\" is_type=\"NO\" instance_of=\"\" language=\"SDL\">\n"
+                                "        <Comment name=\"TestComment1\"/>\n"
+                                "    </Function>\n"
+                                "</InterfaceView>";
+    QVERIFY(XmlData(expected) == XmlData(text));
 }
 
 void tst_XmlDocExporter::testExportAsn1File()
 {
     m_doc->setAsn1FileName("fake.asn");
     ive::XmlDocExporter::exportDocSilently(m_doc.get(), testFilePath);
-    QByteArray text = testFileContent();
-
-    QByteArray expectedFormatted = "<?xml version=\"1.0\"?>\n<InterfaceView asn1file=\"fake.asn\"/>";
-    QByteArray expectedRaw = "<InterfaceView asn1file=\"fake.asn\">\n</InterfaceView>";
-
-    QVERIFY(text == expectedRaw || text == expectedFormatted);
+    const QByteArray text = testFileContent();
+    const QByteArray expected = "<?xml version=\"1.0\"?>\n<InterfaceView asn1file=\"fake.asn\"/>";
+    QVERIFY(XmlData(expected) == XmlData(text));
 }
 
 void tst_XmlDocExporter::testExportToBuffer()
@@ -188,9 +234,8 @@ void tst_XmlDocExporter::testExportToBuffer()
     buffer.open(QIODevice::ReadWrite);
     bool ok = ive::XmlDocExporter::exportDoc(m_doc.get(), &buffer);
     QCOMPARE(ok, true);
-    QByteArray expectedRaw = "<InterfaceView>\n</InterfaceView>";
-    QByteArray expectedFormatted = "<?xml version=\"1.0\"?>\n<InterfaceView/>";
-    QVERIFY(buffer.data() == expectedRaw || buffer.data() == expectedFormatted);
+    const QByteArray expected = "<?xml version=\"1.0\"?>\n<InterfaceView/>";
+    QVERIFY(XmlData(expected) == XmlData(buffer.data()));
 }
 
 QTEST_MAIN(tst_XmlDocExporter)

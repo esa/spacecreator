@@ -37,11 +37,9 @@ namespace ivm {
 
 PropertyTemplateConfig *PropertyTemplateConfig::m_instance = nullptr;
 
-const static QString kSysAttrsConfigFilePath =
-        QLatin1String(":/defaults/interface/properties/resources/system_attributes.xml");
+const static QString kSysAttrsConfigFilePath = QLatin1String(":/defaults/resources/system_attributes.xml");
 
-const static QString kUserAttrsResourceConfigPath =
-        QLatin1String(":/defaults/interface/properties/resources/default_attributes.xml");
+const static QString kUserAttrsResourceConfigPath = QLatin1String(":/defaults/resources/default_attributes.xml");
 
 /*!
    Adds all attributes from \p attrs that are not already in \a storage to that data

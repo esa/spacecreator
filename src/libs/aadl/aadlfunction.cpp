@@ -18,10 +18,9 @@
 #include "aadlfunction.h"
 
 #include "aadlcommonprops.h"
-#include "aadlobject.h"
 #include "aadliface.h"
 #include "aadlmodel.h"
-//#include "interface/commands/commandsfactory.h"
+#include "aadlobject.h"
 
 #include <QDebug>
 #include <QScopedPointer>
@@ -41,21 +40,10 @@ AADLFunction::AADLFunction(const QString &title, QObject *parent)
     setAttr(meta::Props::token(meta::Props::Token::instance_of), QVariant());
 }
 
-AADLFunction::~AADLFunction() { }
+AADLFunction::~AADLFunction() {}
 
 bool AADLFunction::postInit()
 {
-#ifdef FIXME_BEFORE_MR
-    const QString attrName = meta::Props::token(meta::Props::Token::instance_of);
-    const QString attrValue = attr(attrName, QVariant()).toString();
-    if (!attrValue.isEmpty()) {
-        const QVariantMap attributes = { { attrName, attrValue } };
-        const QVariantList cmdParams = { QVariant::fromValue(this), QVariant::fromValue(attributes) };
-        QScopedPointer<QUndoCommand> cmd(cmd::CommandsFactory::create(cmd::ChangeEntityAttributes, cmdParams));
-        if (cmd)
-            cmd->redo();
-    }
-#endif
     return true;
 }
 

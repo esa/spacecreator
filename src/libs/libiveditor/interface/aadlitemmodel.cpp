@@ -211,8 +211,8 @@ void AADLItemModel::onConnectionAddedToGroup(ivm::AADLConnection *connection)
         auto ifaceObject = connectionGroupEndPoint->function()->id() == connection->source()->id()
                 ? connection->sourceInterface()
                 : connectionGroupEndPoint->function()->id() == connection->target()->id()
-                ? connection->targetInterface()
-                : nullptr;
+                        ? connection->targetInterface()
+                        : nullptr;
         if (auto ifaceItem = getItem<AADLInterfaceGraphicsItem *>(ifaceObject->id())) {
             for (auto ifaceConnection : ifaceItem->connectionItems()) {
                 if (ifaceConnection->entity()->id() == connection->id()) {
@@ -251,8 +251,8 @@ void AADLItemModel::onConnectionRemovedFromGroup(ivm::AADLConnection *connection
         auto ifaceObject = connectionGroupEndPoint->function()->id() == connection->source()->id()
                 ? connection->sourceInterface()
                 : connectionGroupEndPoint->function()->id() == connection->target()->id()
-                ? connection->targetInterface()
-                : nullptr;
+                        ? connection->targetInterface()
+                        : nullptr;
         if (auto ifaceItem = getItem<AADLInterfaceGraphicsItem *>(connectionGroupEndPoint->id())) {
             for (auto ifaceConnection : ifaceItem->connectionItems()) {
                 const bool currentHandledConnection = ifaceConnection->entity()->id() == connection->id();
@@ -565,6 +565,7 @@ QGraphicsItem *AADLItemModel::createItemForObject(ivm::AADLObject *obj)
         iObj->setCommandsStack(m_commandsStack);
         iObj->init();
     }
+
     return iObj;
 }
 

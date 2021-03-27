@@ -97,8 +97,9 @@ public:
         return result;
     }
 
-private:
-    bool addObjectImpl(AADLObject *obj);
+public Q_SLOTS:
+    void initFromObjects(const QVector<ivm::AADLObject *> &visibleObjects);
+    void addObjects(const QVector<ivm::AADLObject *> &objects);
 
 Q_SIGNALS:
     void aadlObjectsAdded(const QVector<ivm::AADLObject *> &object);
@@ -106,9 +107,8 @@ Q_SIGNALS:
     void rootObjectChanged(shared::Id rootId);
     void modelReset();
 
-public Q_SLOTS:
-    bool initFromObjects(const QVector<ivm::AADLObject *> &visibleObjects);
-    bool addObjects(const QVector<ivm::AADLObject *> &objects);
+private:
+    bool addObjectImpl(AADLObject *obj);
 
 private:
     const std::unique_ptr<AADLModelPrivate> d;

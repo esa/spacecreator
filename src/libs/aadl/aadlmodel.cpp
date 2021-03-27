@@ -47,39 +47,44 @@ AADLModel::AADLModel(PropertyTemplateConfig *dynPropConfig, QObject *parent)
     d->m_dynPropConfig = dynPropConfig;
 }
 
-AADLModel::~AADLModel() {}
+AADLModel::~AADLModel() { }
 
 void AADLModel::setSharedTypesModel(AADLModel *sharedTypesModel)
 {
     d->m_sharedTypesModel = sharedTypesModel;
 }
 
-bool AADLModel::initFromObjects(const QVector<AADLObject *> &objects)
+void AADLModel::initFromObjects(const QVector<AADLObject *> &objects)
 {
     clear();
-    return addObjects(objects);
+    addObjects(objects);
 }
 
-bool AADLModel::addObjects(const QVector<AADLObject *> &objects)
+void AADLModel::addObjects(const QVector<AADLObject *> &objects)
 {
+    QVector<AADLObject *> addedObjects;
     for (auto obj : objects) {
-        addObjectImpl(obj);
+        if (addObjectImpl(obj)) {
+            addedObjects.append(obj);
+        }
     }
 
-    for (auto obj : objects) {
-        if (!obj->postInit()) {
-            if (obj->aadlType() == AADLObject::Type::Connection) {
-                if (AADLFunction *parentFn = qobject_cast<AADLFunction *>(obj->parentObject())) {
+    for (auto it = addedObjects.begin(); it != addedObjects.end(); ++it) {
+        if (AADLObject *obj = *it) {
+            if (!obj->postInit()) {
+                if (AADLFunctionType *parentFn = qobject_cast<AADLFunction *>(obj->parentObject())) {
                     parentFn->removeChild(obj);
                 }
-            } else {
-                removeObject(obj);
+                if (removeObject(obj)) {
+                    it = addedObjects.erase(it);
+                }
             }
         }
     }
 
-    Q_EMIT aadlObjectsAdded(objects);
-    return true;
+    if (!addedObjects.isEmpty()) {
+        Q_EMIT aadlObjectsAdded(addedObjects);
+    }
 }
 
 bool AADLModel::addObjectImpl(AADLObject *obj)
@@ -102,6 +107,24 @@ bool AADLModel::addObjectImpl(AADLObject *obj)
     d->m_objectsOrder.append(id);
     d->m_visibleObjects.append(obj);
 
+    for (auto attr : d->m_dynPropConfig->propertyTemplatesForObject(obj)) {
+        if (attr->validate(obj)) {
+            const QVariant &currentValue = obj->attr(attr->name());
+            if (currentValue.isNull()) {
+                const QVariant &defaultValue = attr->defaultValue();
+                if (!defaultValue.isNull()) {
+                    if (attr->info() == ivm::PropertyTemplate::Info::Attribute) {
+                        obj->setAttr(attr->name(), defaultValue);
+                    } else if (attr->info() == ivm::PropertyTemplate::Info::Property) {
+                        obj->setProp(attr->name(), defaultValue);
+                    } else {
+                        qWarning() << "Unknown dynamic property info:" << attr->info();
+                    }
+                }
+            }
+        }
+    }
+
     return true;
 }
 
@@ -114,22 +137,6 @@ bool AADLModel::addObject(AADLObject *obj)
                 parentObj->removeChild(obj);
             }
         } else {
-            for (auto attr : d->m_dynPropConfig->propertyTemplatesForObject(obj)) {
-                const QVariant &currentValue = obj->attr(attr->name());
-                if (currentValue.isNull()) {
-                    const QVariant &defaultValue = attr->defaultValue();
-                    if (!defaultValue.isNull()) {
-                        if (attr->info() == ivm::PropertyTemplate::Info::Attribute) {
-                            obj->setAttr(attr->name(), defaultValue);
-                        } else if (attr->info() == ivm::PropertyTemplate::Info::Property) {
-                            obj->setProp(attr->name(), defaultValue);
-                        } else {
-                            qWarning() << "Unknown dynamic property info:" << attr->info();
-                        }
-                    }
-                }
-            }
-
             Q_EMIT aadlObjectsAdded({ obj });
             return true;
         }
@@ -484,5 +491,4 @@ QSet<QStringList> AADLModel::nestedFunctionPaths(const AADLFunctionType *fnt) co
 
     return paths;
 }
-
 }

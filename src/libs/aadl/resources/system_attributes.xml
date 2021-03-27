@@ -16,7 +16,7 @@
         </Type>
         <Scopes>
             <Function>
-                <AttrValidator name="is_type" value="False"/>
+                <AttrValidator name="is_type" value="NO"/>
             </Function>
         </Scopes>
     </Attr>
@@ -64,19 +64,17 @@
         <Type>
             <String validator="[0-9 ]+"/>
         </Type>
-        <Scopes>
-            <Function/>
-        </Scopes>
+        <Scopes/>
     </Attr>
-    <Attr name="Taste::InheritPI" type="property">
+    <Attr name="Taste::InheritPI" label="Inherit from PI" type="property">
         <Type>
-            <Boolean/>
+            <Boolean defaultValue="True"/>
         </Type>
         <Scopes>
             <Required_Interface/>
         </Scopes>
     </Attr>
-    <Attr name="Taste::Autonamed" type="property">
+    <Attr name="Taste::Autonamed" type="property" visible="false">
         <Type>
             <Boolean defaultValue="True"/>
         </Type>

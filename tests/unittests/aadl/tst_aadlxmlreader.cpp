@@ -15,8 +15,8 @@
   along with this program. If not, see <https://www.gnu.org/licenses/lgpl-2.1.html>.
 */
 
-#include "aadlobject.h"
 #include "aadlfunction.h"
+#include "aadlobject.h"
 #include "aadlxmlreader.h"
 #include "xmlcommon.h"
 

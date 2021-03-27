@@ -128,11 +128,12 @@ public Q_SLOTS:
     void onDynContextEditorMenuInvoked();
 
 private Q_SLOTS:
-    void onItemClicked(shared::Id id);
-    void onItemDoubleClicked(shared::Id id);
+    void onItemClicked(const shared::Id &id);
+    void onItemDoubleClicked(const shared::Id &id);
+    void onItemCreated(const shared::Id &id);
 
     void onDataTypesMenuInvoked();
-    void showPropertyEditor(ivm::AADLObject *obj);
+    void showPropertyEditor(const shared::Id &id);
     void showInfoMessage(const QString &title, const QString &message);
     void importEntity(const shared::Id &id, const QPointF &sceneDropPoint);
     void instantiateEntity(const shared::Id &id, const QPointF &sceneDropPoint);
