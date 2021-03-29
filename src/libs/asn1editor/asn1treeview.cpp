@@ -267,9 +267,11 @@ int Asn1TreeView::itemChoiceIndex(const QStandardItem *item, const QString &name
 {
     int choiceIndex = 0;
 
-    for (choiceIndex = 0; choiceIndex < item->rowCount(); ++choiceIndex)
-        if (name == item->child(choiceIndex, MODEL_NAME_INDEX)->text())
+    for (choiceIndex = 0; choiceIndex < item->rowCount(); ++choiceIndex) {
+        if (name == item->child(choiceIndex, MODEL_NAME_INDEX)->text()) {
             break;
+        }
+    }
 
     return choiceIndex;
 }
@@ -282,6 +284,10 @@ int Asn1TreeView::itemChoiceIndex(const QStandardItem *item, const QString &name
  */
 QString Asn1TreeView::getItemValue(const QStandardItem *item, const QString &separator) const
 {
+    if (!item) {
+        return {};
+    }
+
     QString itemValue = "";
 
     QStandardItemModel *model = qobject_cast<QStandardItemModel *>(this->model());
@@ -292,16 +298,17 @@ QString Asn1TreeView::getItemValue(const QStandardItem *item, const QString &sep
 
     QString asnValue;
     modelIndex = itemIndex.sibling(item->row(), MODEL_VALUE_INDEX);
-    if (modelIndex.isValid())
+    if (modelIndex.isValid()) {
         asnValue = model->itemFromIndex(modelIndex)->text();
+    }
 
     if (!separator.isEmpty() && !item->text().isEmpty()) {
         itemValue = QString("%1%2 ").arg(item->text(), separator);
     }
 
-    if (asnType.startsWith("bool", Qt::CaseInsensitive))
+    if (asnType.startsWith("bool", Qt::CaseInsensitive)) {
         itemValue += asnValue.toUpper();
-    else if (asnType.startsWith("choice", Qt::CaseInsensitive)) {
+    } else if (asnType.startsWith("choice", Qt::CaseInsensitive)) {
         itemValue += getItemValue(item->child(itemChoiceIndex(item, asnValue)), " :");
     } else if (asnType.startsWith("sequenceOf", Qt::CaseInsensitive)
             || asnType.startsWith("sequence of", Qt::CaseInsensitive)) {
@@ -309,8 +316,9 @@ QString Asn1TreeView::getItemValue(const QStandardItem *item, const QString &sep
         int childCount = asnValue.toInt();
         for (int x = 0; x < childCount; ++x) {
             itemValue += getItemValue(item->child(x), "");
-            if (x < childCount - 1)
+            if (x < childCount - 1) {
                 itemValue += ", ";
+            }
         }
         itemValue += " }";
     } else if (asnType.startsWith("sequence", Qt::CaseInsensitive)) {
@@ -318,8 +326,9 @@ QString Asn1TreeView::getItemValue(const QStandardItem *item, const QString &sep
         int childCount = item->rowCount();
         for (int x = 0; x < childCount; ++x) {
             itemValue += getItemValue(item->child(x), " ");
-            if (x < childCount - 1)
+            if (x < childCount - 1) {
                 itemValue += ", ";
+            }
         }
         itemValue += " }";
     } else if (asnType.startsWith("string", Qt::CaseInsensitive)) {

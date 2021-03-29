@@ -298,14 +298,21 @@ void tst_Asn1ValueParser::testSequenceValue()
     type->addChild(std::move(sequence2));
     auto sequence3 = std::make_unique<Asn1Acn::Types::Boolean>("boolVal");
     type->addChild(std::move(sequence3));
+    auto sequence4 = std::make_unique<Asn1Acn::Types::Choice>("choiceVal");
+    auto choice1 = std::make_unique<Asn1Acn::Types::Boolean>("choice1");
+    sequence4->addChild(std::move(choice1));
+    auto choice2 = std::make_unique<Asn1Acn::Types::Integer>("choice2");
+    sequence4->addChild(std::move(choice2));
+    type->addChild(std::move(sequence4));
     auto assignment = std::make_unique<Asn1Acn::TypeAssignment>("MySequence", location, std::move(type));
-    auto valueMap = valueParser->parseAsn1Value(assignment.get(), "{ intVal 3107, realVal 31.07 }");
+    auto valueMap = valueParser->parseAsn1Value(
+            assignment.get(), "{ intVal 3107, realVal 31.07, boolVal TRUE, choiceVal choice1 : FALSE }");
 
     QCOMPARE(valueMap.size(), 2);
     QCOMPARE(valueMap["name"].toString(), QString("MySequence"));
 
     auto childrenValue = valueMap["children"].toList();
-    QCOMPARE(childrenValue.size(), 2);
+    QCOMPARE(childrenValue.size(), 4);
 
     auto childValue = childrenValue.at(0).toMap();
     QCOMPARE(childValue.size(), 2);
@@ -316,6 +323,19 @@ void tst_Asn1ValueParser::testSequenceValue()
     QCOMPARE(childValue.size(), 2);
     QCOMPARE(childValue["name"].toString(), QString("realVal"));
     QCOMPARE(childValue["value"].toDouble(), 31.07);
+
+    childValue = childrenValue.at(2).toMap();
+    QCOMPARE(childValue.size(), 2);
+    QCOMPARE(childValue["name"].toString(), QString("boolVal"));
+    QCOMPARE(childValue["value"].toBool(), true);
+
+    childValue = childrenValue.at(3).toMap();
+    QCOMPARE(childValue.size(), 2);
+    QCOMPARE(childValue["name"].toString(), QString("choiceVal"));
+    QVariantMap choiceMap = childValue["choice"].toMap();
+    QCOMPARE(choiceMap.size(), 2);
+    QCOMPARE(choiceMap["name"].toString(), QString("choice1"));
+    QCOMPARE(choiceMap["value"].toBool(), false);
 }
 
 void tst_Asn1ValueParser::testSequenceValueError()

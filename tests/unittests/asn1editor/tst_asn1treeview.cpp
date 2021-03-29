@@ -17,6 +17,7 @@
 
 #include "asn1reader.h"
 #include "asn1treeview.h"
+#include "asn1valueparser.h"
 #include "definitions.h"
 #include "file.h"
 #include "typeassignment.h"
@@ -34,14 +35,24 @@ private Q_SLOTS:
     void init();
     void cleanup();
     void testSetAsn1Value();
+    void testSetIntValue();
+    void testSetSequenceValue();
 
 private:
     Asn1TreeView *m_treeView = nullptr;
+    Asn1Acn::Asn1Reader m_parser;
+    std::unique_ptr<Asn1Acn::File> m_types;
+    const Asn1Acn::Definitions *m_definitions = nullptr;
+    Asn1Acn::Asn1ValueParser m_valueParser;
 };
 
 void tst_Asn1TreeView::init()
 {
     m_treeView = new Asn1TreeView;
+
+    m_types = m_parser.parseAsn1XmlFile(QFINDTESTDATA("DataView.xml"));
+    m_definitions = m_types->definitions("DataView");
+    QVERIFY(m_definitions != nullptr);
 }
 
 void tst_Asn1TreeView::cleanup()
@@ -52,14 +63,7 @@ void tst_Asn1TreeView::cleanup()
 
 void tst_Asn1TreeView::testSetAsn1Value()
 {
-    Asn1Acn::Asn1Reader parser;
-    std::unique_ptr<Asn1Acn::File> types = parser.parseAsn1XmlFile(QFINDTESTDATA("DataView.xml"));
-
-    const Asn1Acn::Definitions *definitions = types->definitions("DataView");
-    QVERIFY(definitions != nullptr);
-    const std::unique_ptr<Asn1Acn::TypeAssignment> &assignment = definitions->types().at(1);
-    QVERIFY(assignment);
-
+    const std::unique_ptr<Asn1Acn::TypeAssignment> &assignment = m_definitions->types().at(1);
     m_treeView->setAsn1Model(assignment);
 
     QVariantMap subValue1;
@@ -82,6 +86,27 @@ void tst_Asn1TreeView::testSetAsn1Value()
     m_treeView->setAsn1Value(asn1Value);
 
     QCOMPARE(m_treeView->getAsn1Value(), QString("{ field-a  FALSE, field-b  choice1 : FALSE }"));
+}
+
+void tst_Asn1TreeView::testSetIntValue()
+{
+    const QString value = "16";
+    const std::unique_ptr<Asn1Acn::TypeAssignment> &intType = m_definitions->types().at(0);
+    m_treeView->setAsn1Model(intType);
+    QVariantMap valueMap = m_valueParser.parseAsn1Value(intType.get(), value);
+    m_treeView->setAsn1Value(valueMap);
+    QCOMPARE(m_treeView->getAsn1Value(), value);
+}
+
+void tst_Asn1TreeView::testSetSequenceValue()
+{
+    const QString value = "{ field-a  TRUE, field-b  choice1 : TRUE }";
+    const std::unique_ptr<Asn1Acn::TypeAssignment> &assignment = m_definitions->types().at(1);
+    m_treeView->setAsn1Model(assignment);
+    QVariantMap valueMap = m_valueParser.parseAsn1Value(assignment.get(), value);
+    QCOMPARE(valueMap.size(), 2);
+    m_treeView->setAsn1Value(valueMap);
+    QCOMPARE(m_treeView->getAsn1Value(), value);
 }
 
 QTEST_MAIN(tst_Asn1TreeView)
