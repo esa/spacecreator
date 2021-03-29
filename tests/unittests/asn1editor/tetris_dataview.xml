@@ -1,0 +1,298 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ASN1AST>
+    <Asn1File FileName="tetris_dataview.asn">
+        <Asn1Module ID="TETRIS-DATAVIEW">
+        <ExportedTypes>
+            <ExportedType Name="Coordinates" />
+            <ExportedType Name="Color" />
+            <ExportedType Name="Pixels-Line" />
+            <ExportedType Name="Pixels" />
+            <ExportedType Name="Sprite" />
+            <ExportedType Name="Move-Status" />
+            <ExportedType Name="Move-Command" />
+            <ExportedType Name="Timer-Duration" />
+            <ExportedType Name="Line" />
+            <ExportedType Name="Grid" /> 
+        </ExportedTypes>
+        <ExportedVariables>
+            <ExportedVariable Name="cols" />
+            <ExportedVariable Name="rows" />
+            <ExportedVariable Name="empty-line" />
+            <ExportedVariable Name="t-shape" />
+            <ExportedVariable Name="l-shape" />
+            <ExportedVariable Name="j-shape" />
+            <ExportedVariable Name="s-shape" />
+            <ExportedVariable Name="z-shape" />
+            <ExportedVariable Name="i-shape" />
+            <ExportedVariable Name="o-shape" /> 
+        </ExportedVariables>
+        <ImportedModules>
+            <ImportedModule ID="TASTE-BasicTypes">
+                <ImportedTypes>
+                    <ImportedType Name="T-Int32" />
+                    <ImportedType Name="T-UInt32" />
+                    <ImportedType Name="T-Int8" />
+                    <ImportedType Name="T-UInt8" />
+                    <ImportedType Name="T-Boolean" />
+                </ImportedTypes>
+                <ImportedVariables>
+                </ImportedVariables>
+            </ImportedModule>
+        </ImportedModules>
+        <TypeAssignments>
+            <TypeAssignment Name="Coordinates" Line="9" CharPositionInLine="18">
+                <Type Line="9" CharPositionInLine="18" Asn1File="tetris_dataview.asn">
+                    <SequenceType>
+                        <SequenceOrSetChild VarName="x" CName="x" AdaName="x" Optional="False" Line="10" CharPositionInLine="5" bAlwaysPresent = "True" bAlwaysAbsent="False">
+                            <Type Line="10" CharPositionInLine="7" Asn1File="tetris_dataview.asn">
+                                <IntegerType Min="-1" Max="11"/>
+                            </Type>
+                        </SequenceOrSetChild>
+                        <SequenceOrSetChild VarName="y" CName="y" AdaName="y" Optional="False" Line="11" CharPositionInLine="5" bAlwaysPresent = "True" bAlwaysAbsent="False">
+                            <Type Line="11" CharPositionInLine="7" Asn1File="tetris_dataview.asn">
+                                <IntegerType Min="-1" Max="21"/>
+                            </Type>
+                        </SequenceOrSetChild>
+                    </SequenceType>
+                </Type>
+            </TypeAssignment>
+            <TypeAssignment Name="Color" Line="15" CharPositionInLine="12">
+                <Type Line="15" CharPositionInLine="12" Asn1File="tetris_dataview.asn">
+                    <EnumeratedType Extensible="False" ValuesAutoCalculated="False">
+                        <EnumValues>
+                            <EnumValue StringValue="empty" IntValue="0" Line="16" CharPositionInLine="5" EnumID ="empty" />
+                            <EnumValue StringValue="blue" IntValue="1" Line="17" CharPositionInLine="5" EnumID ="blue" />
+                            <EnumValue StringValue="green" IntValue="2" Line="18" CharPositionInLine="5" EnumID ="green" />
+                            <EnumValue StringValue="red" IntValue="3" Line="19" CharPositionInLine="5" EnumID ="red" />
+                        </EnumValues>
+                    </EnumeratedType>
+                </Type>
+            </TypeAssignment>
+            <TypeAssignment Name="Pixels-Line" Line="23" CharPositionInLine="18">
+                <Type Line="23" CharPositionInLine="18" Asn1File="tetris_dataview.asn">
+                    <SequenceOfType Min="4" Max="4">
+                        <Type Line="23" CharPositionInLine="41" Asn1File="tetris_dataview.asn">
+                            <ReferenceType ReferencedTypeName="Color">
+                                <Type Line="15" CharPositionInLine="12" Asn1File="tetris_dataview.asn">
+                                    <EnumeratedType Extensible="False" ValuesAutoCalculated="False">
+                                        <EnumValues>
+                                            <EnumValue StringValue="empty" IntValue="0" Line="16" CharPositionInLine="5" EnumID ="empty" />
+                                            <EnumValue StringValue="blue" IntValue="1" Line="17" CharPositionInLine="5" EnumID ="blue" />
+                                            <EnumValue StringValue="green" IntValue="2" Line="18" CharPositionInLine="5" EnumID ="green" />
+                                            <EnumValue StringValue="red" IntValue="3" Line="19" CharPositionInLine="5" EnumID ="red" />
+                                        </EnumValues>
+                                    </EnumeratedType>
+                                </Type>
+                            </ReferenceType>
+
+                        </Type>
+                    </SequenceOfType>
+                </Type>
+            </TypeAssignment>
+            <TypeAssignment Name="Pixels" Line="24" CharPositionInLine="13">
+                <Type Line="24" CharPositionInLine="13" Asn1File="tetris_dataview.asn">
+                    <SequenceOfType Min="4" Max="4">
+                        <Type Line="24" CharPositionInLine="36" Asn1File="tetris_dataview.asn">
+                            <ReferenceType ReferencedTypeName="Pixels-Line" Min="4" Max="4"/>
+                        </Type>
+                    </SequenceOfType>
+                </Type>
+            </TypeAssignment>
+            <TypeAssignment Name="Sprite" Line="25" CharPositionInLine="13">
+                <Type Line="25" CharPositionInLine="13" Asn1File="tetris_dataview.asn">
+                    <SequenceType>
+                        <SequenceOrSetChild VarName="origin" CName="origin" AdaName="origin" Optional="False" Line="26" CharPositionInLine="5" bAlwaysPresent = "True" bAlwaysAbsent="False">
+                            <Type Line="26" CharPositionInLine="12" Asn1File="tetris_dataview.asn">
+                                <ReferenceType ReferencedTypeName="Coordinates">
+                                    <Type Line="9" CharPositionInLine="18" Asn1File="tetris_dataview.asn">
+                                        <SequenceType>
+                                            <SequenceOrSetChild VarName="x" CName="x" AdaName="x" Optional="False" Line="10" CharPositionInLine="5" bAlwaysPresent = "True" bAlwaysAbsent="False">
+                                                <Type Line="10" CharPositionInLine="7" Asn1File="tetris_dataview.asn">
+                                                    <IntegerType Min="-1" Max="11"/>
+                                                </Type>
+                                            </SequenceOrSetChild>
+                                            <SequenceOrSetChild VarName="y" CName="y" AdaName="y" Optional="False" Line="11" CharPositionInLine="5" bAlwaysPresent = "True" bAlwaysAbsent="False">
+                                                <Type Line="11" CharPositionInLine="7" Asn1File="tetris_dataview.asn">
+                                                    <IntegerType Min="-1" Max="21"/>
+                                                </Type>
+                                            </SequenceOrSetChild>
+                                        </SequenceType>
+                                    </Type>
+                                </ReferenceType>
+
+                            </Type>
+                        </SequenceOrSetChild>
+                        <SequenceOrSetChild VarName="shape" CName="shape" AdaName="shape" Optional="False" Line="27" CharPositionInLine="5" bAlwaysPresent = "True" bAlwaysAbsent="False">
+                            <Type Line="27" CharPositionInLine="12" Asn1File="tetris_dataview.asn">
+                                <ReferenceType ReferencedTypeName="Pixels" Min="4" Max="4"/>
+                            </Type>
+                        </SequenceOrSetChild>
+                    </SequenceType>
+                </Type>
+            </TypeAssignment>
+            <TypeAssignment Name="Move-Status" Line="30" CharPositionInLine="18">
+                <Type Line="30" CharPositionInLine="18" Asn1File="tetris_dataview.asn">
+                    <EnumeratedType Extensible="False" ValuesAutoCalculated="False">
+                        <EnumValues>
+                            <EnumValue StringValue="ok" IntValue="0" Line="30" CharPositionInLine="31" EnumID ="ok" />
+                            <EnumValue StringValue="rejected" IntValue="1" Line="30" CharPositionInLine="35" EnumID ="rejected" />
+                        </EnumValues>
+                    </EnumeratedType>
+                </Type>
+            </TypeAssignment>
+            <TypeAssignment Name="Move-Command" Line="32" CharPositionInLine="19">
+                <Type Line="32" CharPositionInLine="19" Asn1File="tetris_dataview.asn">
+                    <EnumeratedType Extensible="False" ValuesAutoCalculated="False">
+                        <EnumValues>
+                            <EnumValue StringValue="down" IntValue="0" Line="32" CharPositionInLine="32" EnumID ="down" />
+                            <EnumValue StringValue="right" IntValue="1" Line="32" CharPositionInLine="38" EnumID ="right" />
+                            <EnumValue StringValue="left" IntValue="2" Line="32" CharPositionInLine="45" EnumID ="left" />
+                            <EnumValue StringValue="rotate" IntValue="3" Line="32" CharPositionInLine="51" EnumID ="rotate" />
+                        </EnumValues>
+                    </EnumeratedType>
+                </Type>
+            </TypeAssignment>
+            <TypeAssignment Name="Timer-Duration" Line="34" CharPositionInLine="21">
+                <Type Line="34" CharPositionInLine="21" Asn1File="tetris_dataview.asn">
+                    <IntegerType Min="0" Max="2000"/>
+                </Type>
+            </TypeAssignment>
+            <TypeAssignment Name="Line" Line="37" CharPositionInLine="11">
+                <Type Line="37" CharPositionInLine="11" Asn1File="tetris_dataview.asn">
+                    <SequenceOfType Min="10" Max="10">
+                        <Type Line="37" CharPositionInLine="37" Asn1File="tetris_dataview.asn">
+                            <ReferenceType ReferencedTypeName="Color">
+                                <Type Line="15" CharPositionInLine="12" Asn1File="tetris_dataview.asn">
+                                    <EnumeratedType Extensible="False" ValuesAutoCalculated="False">
+                                        <EnumValues>
+                                            <EnumValue StringValue="empty" IntValue="0" Line="16" CharPositionInLine="5" EnumID ="empty" />
+                                            <EnumValue StringValue="blue" IntValue="1" Line="17" CharPositionInLine="5" EnumID ="blue" />
+                                            <EnumValue StringValue="green" IntValue="2" Line="18" CharPositionInLine="5" EnumID ="green" />
+                                            <EnumValue StringValue="red" IntValue="3" Line="19" CharPositionInLine="5" EnumID ="red" />
+                                        </EnumValues>
+                                    </EnumeratedType>
+                                </Type>
+                            </ReferenceType>
+
+                        </Type>
+                    </SequenceOfType>
+                </Type>
+            </TypeAssignment>
+            <TypeAssignment Name="Grid" Line="38" CharPositionInLine="11">
+                <Type Line="38" CharPositionInLine="11" Asn1File="tetris_dataview.asn">
+                    <SequenceOfType Min="20" Max="20">
+                        <Type Line="38" CharPositionInLine="37" Asn1File="tetris_dataview.asn">
+                            <ReferenceType ReferencedTypeName="Line" Min="10" Max="10"/>
+                        </Type>
+                    </SequenceOfType>
+                </Type>
+            </TypeAssignment>
+        </TypeAssignments>
+        <VariablesAssignments>
+            <VariableAssignment Name="cols" Line="6" CharPositionInLine="2">
+                <Type Line="6" CharPositionInLine="7" Asn1File="tetris_dataview.asn">
+                    <IntegerType Min="MIN" Max="MAX"/>
+                </Type>
+                <Value>10</Value>
+            </VariableAssignment>
+            <VariableAssignment Name="rows" Line="7" CharPositionInLine="2">
+                <Type Line="7" CharPositionInLine="7" Asn1File="tetris_dataview.asn">
+                    <IntegerType Min="MIN" Max="MAX"/>
+                </Type>
+                <Value>20</Value>
+            </VariableAssignment>
+            <VariableAssignment Name="empty-line" Line="40" CharPositionInLine="2">
+                <Type Line="40" CharPositionInLine="13" Asn1File="tetris_dataview.asn">
+                    <ReferenceType ReferencedTypeName="Pixels-Line" Min="4" Max="4"/>
+                </Type>
+                <Value>{empty, empty, empty, empty}</Value>
+            </VariableAssignment>
+            <VariableAssignment Name="t-shape" Line="43" CharPositionInLine="2">
+                <Type Line="43" CharPositionInLine="10" Asn1File="tetris_dataview.asn">
+                    <ReferenceType ReferencedTypeName="Pixels" Min="4" Max="4"/>
+                </Type>
+                <Value>{empty-line, empty-line, {empty, red, empty, empty}, {red, red, red, empty}}</Value>
+            </VariableAssignment>
+            <VariableAssignment Name="l-shape" Line="50" CharPositionInLine="2">
+                <Type Line="50" CharPositionInLine="10" Asn1File="tetris_dataview.asn">
+                    <ReferenceType ReferencedTypeName="Pixels" Min="4" Max="4"/>
+                </Type>
+                <Value>{empty-line, {red, empty, empty, empty}, {red, empty, empty, empty}, {red, red, empty, empty}}</Value>
+            </VariableAssignment>
+            <VariableAssignment Name="j-shape" Line="57" CharPositionInLine="2">
+                <Type Line="57" CharPositionInLine="10" Asn1File="tetris_dataview.asn">
+                    <ReferenceType ReferencedTypeName="Pixels" Min="4" Max="4"/>
+                </Type>
+                <Value>{empty-line, {empty, blue, empty, empty}, {empty, blue, empty, empty}, {blue, blue, empty, empty}}</Value>
+            </VariableAssignment>
+            <VariableAssignment Name="s-shape" Line="64" CharPositionInLine="2">
+                <Type Line="64" CharPositionInLine="10" Asn1File="tetris_dataview.asn">
+                    <ReferenceType ReferencedTypeName="Pixels" Min="4" Max="4"/>
+                </Type>
+                <Value>{empty-line, empty-line, {empty, green, green, empty}, {green, green, empty, empty}}</Value>
+            </VariableAssignment>
+            <VariableAssignment Name="z-shape" Line="71" CharPositionInLine="2">
+                <Type Line="71" CharPositionInLine="10" Asn1File="tetris_dataview.asn">
+                    <ReferenceType ReferencedTypeName="Pixels" Min="4" Max="4"/>
+                </Type>
+                <Value>{empty-line, empty-line, {blue, blue, empty, empty}, {empty, blue, blue, empty}}</Value>
+            </VariableAssignment>
+            <VariableAssignment Name="i-shape" Line="78" CharPositionInLine="2">
+                <Type Line="78" CharPositionInLine="10" Asn1File="tetris_dataview.asn">
+                    <ReferenceType ReferencedTypeName="Pixels" Min="4" Max="4"/>
+                </Type>
+                <Value>{{red, empty, empty, empty}, {red, empty, empty, empty}, {red, empty, empty, empty}, {red, empty, empty, empty}}</Value>
+            </VariableAssignment>
+            <VariableAssignment Name="o-shape" Line="85" CharPositionInLine="2">
+                <Type Line="85" CharPositionInLine="10" Asn1File="tetris_dataview.asn">
+                    <ReferenceType ReferencedTypeName="Pixels" Min="4" Max="4"/>
+                </Type>
+                <Value>{empty-line, empty-line, {green, green, empty, empty}, {green, green, empty, empty}}</Value>
+            </VariableAssignment>
+        </VariablesAssignments>
+        </Asn1Module>
+        <Asn1Module ID="TASTE-BasicTypes">
+        <ExportedTypes>
+            <ExportedType Name="T-Int32" />
+            <ExportedType Name="T-UInt32" />
+            <ExportedType Name="T-Int8" />
+            <ExportedType Name="T-UInt8" />
+            <ExportedType Name="T-Boolean" /> 
+        </ExportedTypes>
+        <ExportedVariables>
+         
+        </ExportedVariables>
+        <ImportedModules>
+        </ImportedModules>
+        <TypeAssignments>
+            <TypeAssignment Name="T-Int32" Line="99" CharPositionInLine="13">
+                <Type Line="99" CharPositionInLine="13" Asn1File="tetris_dataview.asn">
+                    <IntegerType Min="-2147483648" Max="2147483647"/>
+                </Type>
+            </TypeAssignment>
+            <TypeAssignment Name="T-UInt32" Line="101" CharPositionInLine="13">
+                <Type Line="101" CharPositionInLine="13" Asn1File="tetris_dataview.asn">
+                    <IntegerType Min="0" Max="4294967295"/>
+                </Type>
+            </TypeAssignment>
+            <TypeAssignment Name="T-Int8" Line="103" CharPositionInLine="11">
+                <Type Line="103" CharPositionInLine="11" Asn1File="tetris_dataview.asn">
+                    <IntegerType Min="-128" Max="127"/>
+                </Type>
+            </TypeAssignment>
+            <TypeAssignment Name="T-UInt8" Line="105" CharPositionInLine="12">
+                <Type Line="105" CharPositionInLine="12" Asn1File="tetris_dataview.asn">
+                    <IntegerType Min="0" Max="255"/>
+                </Type>
+            </TypeAssignment>
+            <TypeAssignment Name="T-Boolean" Line="107" CharPositionInLine="14">
+                <Type Line="107" CharPositionInLine="14" Asn1File="tetris_dataview.asn">
+                    <BooleanType />
+                </Type>
+            </TypeAssignment>
+        </TypeAssignments>
+        <VariablesAssignments>
+        </VariablesAssignments>
+        </Asn1Module>
+    </Asn1File>
+</ASN1AST>

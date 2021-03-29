@@ -73,10 +73,10 @@ void Asn1TreeView::setAsn1Value(const QVariantMap &asn1Value)
         return;
     }
 
-    auto *nameItem = m_ItemModel->item(0, 0);
+    QStandardItem *nameItem = m_ItemModel->item(0, 0);
 
     int row = nameItem->row();
-    auto asnType = m_ItemModel->item(row, MODEL_TYPE_INDEX)->text();
+    QString asnType = m_ItemModel->item(row, MODEL_TYPE_INDEX)->text();
 
     if (asnType.startsWith("sequenceOf", Qt::CaseInsensitive)) {
         int seqOfSize = asn1Value["seqofvalue"].toList().count();
@@ -90,12 +90,13 @@ void Asn1TreeView::setAsn1Value(const QVariantMap &asn1Value)
         setChildValue(nameItem, asn1Value["choice"], -1, itemChoiceIndex(nameItem, choiceValue));
     } else if (asnType.startsWith("integer", Qt::CaseInsensitive) || asnType.startsWith("double", Qt::CaseInsensitive)
             || asnType.startsWith("real", Qt::CaseInsensitive) || asnType.startsWith("string", Qt::CaseInsensitive)
-            || asnType.startsWith("enumerated", Qt::CaseInsensitive))
+            || asnType.startsWith("enumerated", Qt::CaseInsensitive)) {
         m_ItemModel->item(row, MODEL_VALUE_INDEX)->setText(asn1Value["value"].toString());
-    else if (asnType.startsWith("bool", Qt::CaseInsensitive))
+    } else if (asnType.startsWith("bool", Qt::CaseInsensitive)) {
         m_ItemModel->item(row, MODEL_VALUE_INDEX)->setText(asn1Value["value"].toString().toLower());
-    else if (asnType.startsWith("sequence", Qt::CaseInsensitive))
+    } else if (asnType.startsWith("sequence", Qt::CaseInsensitive)) {
         setChildValue(nameItem, asn1Value["children"]);
+    }
 
     hideExtraFields(nameItem, true, row);
     expandAll();
@@ -184,13 +185,17 @@ void Asn1TreeView::setChildRowValue(const QStandardItem *rootItem, int childInde
         child->setText(value.toMap()["value"].toString());
     else if (asnType.startsWith("bool", Qt::CaseInsensitive))
         child->setText(value.toMap()["value"].toString().toLower());
-    else if (asnType.startsWith("sequenceOf", Qt::CaseInsensitive)) {
+    else if (asnType.startsWith("sequenceOf", Qt::CaseInsensitive)
+            || asnType.startsWith("sequence of", Qt::CaseInsensitive)) {
         int seqOfSize = value.toMap()["seqofvalue"].toList().count();
         child->setText(QString::number(seqOfSize));
         setChildValue(rootItem->child(childIndex), value.toMap()["seqofvalue"], seqOfSize);
-    } else if (asnType.startsWith("sequence", Qt::CaseInsensitive))
+    } else if (asnType.startsWith("sequence", Qt::CaseInsensitive)) {
+        if (value.toMap().contains("children")) {
+            value = value.toMap()["children"];
+        }
         setChildValue(rootItem->child(childIndex), value);
-    else if (asnType.startsWith("choice", Qt::CaseInsensitive)) {
+    } else if (asnType.startsWith("choice", Qt::CaseInsensitive)) {
         value = value.toMap()["choice"];
         QString choiceValue = value.toMap()["name"].toString();
 
