@@ -7,7 +7,7 @@ space-creator:
   image: taste-buster:latest
   script:
     # dependencies
-    - apt install -y -y build-essential git g++ clang cmake cmake-data ninja-build make qtbase5-dev-tools qtbase5-dev qtdeclarative5-dev qtlocation5-dev qtpositioning5-dev libqt5svg5-dev libqt5websockets5-dev qt5-default qbs qtwebengine5-dev clang-format clang-tidy clazy cppcheck gcovr lcov ccache cccc doxygen graphviz zip p7zip curl wget default-jre uuid-dev pkg-config
+    - apt install -y -y build-essential git g++ clang cmake cmake-data ninja-build make qtbase5-dev-tools qtbase5-dev qtdeclarative5-dev qtlocation5-dev qtpositioning5-dev libqt5svg5-dev libqt5websockets5-dev qt5-default qbs qtwebengine5-dev clang-format clang-tidy clazy cppcheck gcovr lcov ccache cccc doxygen graphviz zip p7zip curl wget default-jre uuid-dev pkg-config qtcreator
     - curl -L https://github.com/steveire/grantlee/archive/v5.2.0.tar.gz | tar xz ; cd grantlee-*; patch -p1 < ../patches/grantlee_fix_escape.diff; mkdir build; cd build; cmake -DCMAKE_INSTALL_PREFIX=$(qmake -query QT_INSTALL_PREFIX) ..; cmake --build .; cmake --build . --target install; cd ../..
     - wget -q -O - https://github.com/ttsiodras/asn1scc/releases/download/4.2.4.4f/asn1scc-bin-4.2.4.4f.tar.bz2 | tar jxvf -
     - export PATH=$PATH:$(pwd)/asn1scc
@@ -28,6 +28,20 @@ space-creator:
     # documentation
     - ./scripts/generate_documentation.sh
     # debian package
+    # install qtcreator sources
+    - PWD=$(pwd)
+    - export ENV_QTC_VERSION_SHORT=4.8
+    - export ENV_QTC_VERSION=4.8.2
+    - export DOWNLOAD_DIR=/opt/qt-creator-dev
+    - export QTC_BUILD_DIR=${DOWNLOAD_DIR}/build-debug
+    - mkdir -p "${DOWNLOAD_DIR}"
+    - cd "${DOWNLOAD_DIR}"
+    - QTC_SOURCE_FILE=qt-creator-opensource-src-${ENV_QTC_VERSION}.tar.gz
+    - curl -L "http://download.qt-project.org/official_releases/qtcreator/${ENV_QTC_VERSION_SHORT}/${ENV_QTC_VERSION}/qt-creator-opensource-src-${ENV_QTC_VERSION}.tar.gz" -o ${QTC_SOURCE_FILE} -s
+    - tar xzf qt-creator-opensource-src-${ENV_QTC_VERSION}.tar.gz || exit 1
+    - mv qt-creator-opensource-src-${ENV_QTC_VERSION} qt-creator
+    - cd "$PWD"
+    # build the plugin
     - cd build
     - cmake -GNinja .. -DBUILD_PATCH_NUMBER=$CI_BUILD_ID -DENABLE_TESTS=OFF
     - cmake --build . --target all
