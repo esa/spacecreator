@@ -48,6 +48,7 @@ private Q_SLOTS:
     void testParsingCifLineAction();
     void testParsingCifLineCall();
     void testParsingCifLineComment();
+    void testParsingCifLineConcurrent();
     void testParsingCifLineCondition();
     void testParsingCifLineCreate();
     void testParsingCifLineCollapsed();
@@ -77,6 +78,7 @@ private Q_SLOTS:
     void testParsingCifBlockAction();
     void testParsingCifBlockCall();
     void testParsingCifBlockComment();
+    void testParsingCifBlockConcurrent();
     void testParsingCifBlockCondition();
     void testParsingCifBlockCreate();
     void testParsingCifBlockCollapsed();
@@ -144,6 +146,10 @@ void tst_CifParser::createCifLine(CifLine::CifType cif, QString &outLine)
         break;
     case CifLine::CifType::Comment:
         cifLine = lineTemplate.arg(QString("%1 (1, 1), (2, 2)").arg(CifLine::nameForType(CifLine::CifType::Comment)));
+        break;
+    case CifLine::CifType::Concurrent:
+        cifLine =
+                lineTemplate.arg(QString("%1 (1, 1), (2, 2)").arg(CifLine::nameForType(CifLine::CifType::Concurrent)));
         break;
     case CifLine::CifType::Condition:
         cifLine = lineTemplate.arg(QString("%1 (1, 1), (2, 2)").arg(CifLine::nameForType(CifLine::CifType::Condition)));
@@ -307,6 +313,12 @@ void tst_CifParser::testParsingCifLineComment()
 {
     testParsingCifLine(CifLine::CifType::Comment);
 }
+
+void tst_CifParser::testParsingCifLineConcurrent()
+{
+    testParsingCifLine(CifLine::CifType::Concurrent);
+}
+
 void tst_CifParser::testParsingCifLineCondition()
 {
     testParsingCifLine(CifLine::CifType::Condition);
@@ -432,7 +444,7 @@ void tst_CifParser::testParsingCifBlock(const QVector<QVector<CifLine::CifType>>
     }
 
     const QVector<CifBlockShared> &cifs = m_cifParser->readCifBlocks(cifLinesClean);
-    QVERIFY(cifs.size() == blocks.size());
+    QCOMPARE(cifs.size(), blocks.size());
     if (cifs.size()) {
         QVERIFY(cifs.first() != nullptr);
     }
@@ -467,6 +479,13 @@ void tst_CifParser::testParsingCifBlockComment()
     /* CIF Modified */
 
     testParsingCifBlock({ { CifLine::CifType::Comment, CifLine::CifType::TextMode, CifLine::CifType::Modified } });
+}
+
+void tst_CifParser::testParsingCifBlockConcurrent()
+{
+    QSKIP(qPrintable(QString("Not implemented yet")));
+    /* CIF CONCURRENT (29, 333) (90, 594)) */
+    testParsingCifBlock({ { CifLine::CifType::Concurrent } });
 }
 
 void tst_CifParser::testParsingCifBlockCondition()

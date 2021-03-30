@@ -17,6 +17,7 @@
 
 #include "eventitem.h"
 
+#include "mscinstance.h"
 #include "mscinstanceevent.h"
 
 namespace msc {
@@ -44,6 +45,24 @@ void EventItem::centerOnTargetH()
     if (m_targetHCenter > -9.8e12) {
         setX(m_targetHCenter - boundingRect().width() / 2);
     }
+}
+
+/*!
+   Returns the top limit of the item at the given instance area
+ */
+qreal EventItem::instanceTopArea(MscInstance *instance) const
+{
+    Q_UNUSED(instance)
+    return sceneBoundingRect().top();
+}
+
+/*!
+   Returns the bottom limit of the item at the given instance area
+ */
+qreal EventItem::instanceBottomArea(MscInstance *instance) const
+{
+    Q_UNUSED(instance)
+    return sceneBoundingRect().bottom();
 }
 
 } // namespace msc

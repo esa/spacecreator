@@ -672,7 +672,7 @@ void CreatorTool::CreatorToolPrivate::populateContextMenu_propertiesDialog(QMenu
             action->setEnabled(aadlObj);
 
             connect(action, &QAction::triggered,
-                    [this, aadlObj]() { Q_EMIT thisTool->propertyEditorRequest(aadlObj); });
+                    [this, aadlObj]() { Q_EMIT thisTool->propertyEditorRequest(aadlObj->id()); });
             ActionsManager::registerAction(Q_FUNC_INFO, action, "Properties", "Show AADL object properties editor");
         } else {
             menu->addSeparator();
@@ -809,7 +809,7 @@ void CreatorTool::CreatorToolPrivate::handleFunctionType(QGraphicsScene *scene, 
         QRectF itemSceneRect =
                 adjustToSize(this->previewItem->mapRectToScene(this->previewItem->rect()), DefaultGraphicsItemSize);
 
-        if (!gi::canPlaceRect(scene, this->previewItem, itemSceneRect, gi::RectOperation::Create))
+        if (!gi::isBounded(this->previewItem, itemSceneRect))
             return;
 
         if (auto parentItem = previewItem->parentItem()) {
@@ -834,7 +834,7 @@ void CreatorTool::CreatorToolPrivate::handleFunction(QGraphicsScene *scene, cons
         QRectF itemSceneRect =
                 adjustToSize(this->previewItem->mapRectToScene(this->previewItem->rect()), DefaultGraphicsItemSize);
 
-        if (!gi::canPlaceRect(scene, this->previewItem, itemSceneRect, gi::RectOperation::Create))
+        if (!gi::isBounded(this->previewItem, itemSceneRect))
             return;
 
         if (auto parentItem = previewItem->parentItem()) {
@@ -855,7 +855,7 @@ void CreatorTool::CreatorToolPrivate::handleInterface(
 {
     if (auto parentItem = nearestItem(scene, adjustFromPoint(pos, kInterfaceTolerance), kFunctionTypes)) {
         ivm::AADLFunctionType *parentObject = gi::functionTypeObject(parentItem);
-        ivm::AADLIface::CreationInfo ifaceDescr(model->objectsModel(), parentObject, pos, type, shared::InvalidId);
+        ivm::AADLIface::CreationInfo ifaceDescr(model->objectsModel(), parentObject, pos, type, shared::createId());
         ifaceDescr.resetKind();
 
         if (auto cmd = createInterfaceCommand(ifaceDescr))
@@ -1168,6 +1168,9 @@ QUndoCommand *CreatorTool::CreatorToolPrivate::createInterfaceCommand(const ivm:
                 return nullptr;
             }
         }
+    }
+    if (info.type == ivm::AADLIface::IfaceType::Provided) {
+        Q_EMIT thisTool->propertyEditorRequest(info.id);
     }
 
     return new cmd::CmdInterfaceItemCreate(info);

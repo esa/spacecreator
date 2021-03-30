@@ -21,6 +21,7 @@
 #include "aadlfunction.h"
 #include "aadlfunctiontype.h"
 #include "aadliface.h"
+#include "aadllibrary.h"
 #include "baseitems/common/aadlutils.h"
 #include "iveditor.h"
 #include "propertytemplate.h"
@@ -48,6 +49,7 @@ private:
 
 void tst_AttributesConfigure::initTestCase()
 {
+    ivm::initAadlLibrary();
     ive::initIvEditor();
     QStandardPaths::setTestModeEnabled(true);
     m_dynPropConfig = ivm::PropertyTemplateConfig::instance();
@@ -74,7 +76,7 @@ void tst_AttributesConfigure::tst_loadImpl()
     const auto scope = ivm::PropertyTemplate::Scope::Provided_Interface;
     dp.setScope(scope);
     dp.setVisible(false);
-    dp.setValuesList({ QVariant::fromValue(QString("value1")), QVariant::fromValue(QString("value2")) });
+    dp.setValue(QList<QVariant> { QVariant::fromValue(QString("value1")), QVariant::fromValue(QString("value2")) });
     dp.setValueValidatorPattern(QString("[\\d+]"));
     dp.setAttrValidatorPattern(QMap<ivm::PropertyTemplate::Scope, QPair<QString, QString>> {
             { scope, qMakePair(QString("attrName"), QString("value")) } });
@@ -90,7 +92,7 @@ void tst_AttributesConfigure::tst_loadImpl()
     QVERIFY(propPtr->type() == dp.type());
     QVERIFY(propPtr->scope() == dp.scope());
     QVERIFY(propPtr->isVisible() == dp.isVisible());
-    QVERIFY(propPtr->valuesList() == dp.valuesList());
+    QVERIFY(propPtr->value() == dp.value());
     QVERIFY(propPtr->valueValidatorPattern() == dp.valueValidatorPattern());
     QVERIFY(propPtr->attrValidatorPatterns() == dp.attrValidatorPatterns());
 }
@@ -135,13 +137,13 @@ void tst_AttributesConfigure::tst_systemAttrs()
     if (it != sysAttrs.cend()) {
         QVERIFY(int((*it)->scope())
                 == int(ivm::PropertyTemplate::Scope::Provided_Interface
-                        | ivm::PropertyTemplate::Scope::Required_Interface));
+                           | ivm::PropertyTemplate::Scope::Required_Interface));
         QVERIFY((*it)->type() == ivm::PropertyTemplate::Type::Enumeration);
         QVERIFY((*it)->info() == ivm::PropertyTemplate::Info::Attribute);
 
         const QMetaEnum &me = QMetaEnum::fromType<ivm::AADLIface::OperationKind>();
         for (int i = 0; i < me.keyCount(); ++i) {
-            QVERIFY((*it)->valuesList().contains(qVariantFromValue(QString::fromLatin1(me.key(i)))));
+            QVERIFY((*it)->value().toList().contains(qVariantFromValue(QString::fromLatin1(me.key(i)))));
         }
     }
 
@@ -184,8 +186,8 @@ void tst_AttributesConfigure::tst_systemAttrs()
         QVERIFY(int((*it)->scope()) == int(ivm::PropertyTemplate::Scope::Function));
         QVERIFY((*it)->type() == ivm::PropertyTemplate::Type::Enumeration);
         QVERIFY((*it)->info() == ivm::PropertyTemplate::Info::Attribute);
-        QVERIFY((*it)->valuesList().contains(QLatin1String("YES"))
-                && (*it)->valuesList().contains(QLatin1String("NO")));
+        QVERIFY((*it)->value().toList().contains(QLatin1String("YES"))
+                && (*it)->value().toList().contains(QLatin1String("NO")));
     }
 
     it = std::find_if(sysAttrs.cbegin(), sysAttrs.cend(),

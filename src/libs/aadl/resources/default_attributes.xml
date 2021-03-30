@@ -1,13 +1,20 @@
 <Attrs>
-    <Attr name="language">
+    <Attr label="Language" name="language">
         <Scopes>
-            <Function/>
+            <Function>
+                <AttrValidator name="is_type" value="NO"/>
+            </Function>
         </Scopes>
         <Type>
             <Enumeration defaultValue="SDL">
-                <Entry value="C++"/>
                 <Entry value="Ada"/>
+                <Entry value="CPP"/>
+                <Entry value="C"/>
+                <Entry value="GUI"/>
                 <Entry value="SDL"/>
+                <Entry value="Simulink"/>
+                <Entry value="Blackbox_Device"/>
+                <Entry value="VHDL"/>
             </Enumeration>
         </Type>
     </Attr>
@@ -22,13 +29,27 @@
             <Function/>
         </Scopes>
     </Attr>
+    <Attr label="Language" name="type_language">
+        <Scopes>
+            <Function>
+                <AttrValidator name="is_type" value="YES"/>
+            </Function>
+        </Scopes>
+        <Type>
+            <Enumeration defaultValue="SDL">
+                <Entry value="Ada"/>
+                <Entry value="CPP"/>
+                <Entry value="SDL"/>
+            </Enumeration>
+        </Type>
+    </Attr>
     <Attr name="instance_of">
         <Type>
             <String validator="[a-zA-Z0-9_]+"/>
         </Type>
         <Scopes>
             <Function>
-                <AttrValidator name="is_type" value="False"/>
+                <AttrValidator name="is_type" value="NO"/>
             </Function>
         </Scopes>
     </Attr>

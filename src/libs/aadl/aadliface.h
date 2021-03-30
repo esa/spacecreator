@@ -143,7 +143,6 @@ protected Q_SLOTS:
 
 protected:
     explicit AADLIface(AADLObject::Type ifaceType, const CreationInfo &ci);
-    void setupInitialAttrs();
 
     void rememberClone(AADLIface *clone);
     void forgetClone(AADLIface *clone);

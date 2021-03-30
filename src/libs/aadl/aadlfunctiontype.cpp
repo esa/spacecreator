@@ -53,11 +53,10 @@ AADLFunctionType::AADLFunctionType(const AADLObject::Type t, const QString &titl
     : AADLObject(t, title, parent)
     , d(new AADLFunctionTypePrivate)
 {
-    setAttr(meta::Props::token(meta::Props::Token::language), QVariant());
     setAttr(meta::Props::token(meta::Props::Token::is_type), QStringLiteral("YES"));
 }
 
-AADLFunctionType::~AADLFunctionType() { }
+AADLFunctionType::~AADLFunctionType() {}
 
 QVector<AADLObject *> AADLFunctionType::children() const
 {

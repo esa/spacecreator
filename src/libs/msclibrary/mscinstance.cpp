@@ -159,6 +159,14 @@ void MscInstance::setExplicitCreator(MscInstance *creator)
     Q_EMIT explicitCreatorChanged(m_explicitCreator);
 }
 
+/*!
+   Returns if this instance is created by another instance
+ */
+bool MscInstance::isCreated() const
+{
+    return m_explicitCreator != nullptr;
+}
+
 bool MscInstance::explicitStop() const
 {
     return m_explicitStop;

@@ -38,7 +38,7 @@ PositionLookupHelper::PositionLookupHelper(const QHash<Qt::Alignment, QPainterPa
     , m_sideIdx(m_initialSideIdx)
     , m_clockwise(clockwise)
 {
-    ive::checkCollision(m_siblingsRects, m_itemRect, &m_intersectedRect);
+    ive::isCollided(m_siblingsRects, m_itemRect, &m_intersectedRect);
 }
 
 bool PositionLookupHelper::lookup()
@@ -56,7 +56,7 @@ bool PositionLookupHelper::lookup()
 
 bool PositionLookupHelper::isReady() const
 {
-    return isBounded() && !ive::checkCollision(m_siblingsRects, m_itemRect);
+    return isBounded() && !ive::isCollided(m_siblingsRects, m_itemRect);
 }
 
 bool PositionLookupHelper::hasNext() const
@@ -66,7 +66,7 @@ bool PositionLookupHelper::hasNext() const
 
 bool PositionLookupHelper::nextRect()
 {
-    if (ive::checkCollision(m_siblingsRects, m_itemRect, &m_intersectedRect)) {
+    if (ive::isCollided(m_siblingsRects, m_itemRect, &m_intersectedRect)) {
         m_itemRect = adjustedRect(m_itemRect, m_intersectedRect, ive::sideFromIndex(m_sideIdx), m_clockwise);
         return true;
     }

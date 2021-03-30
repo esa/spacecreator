@@ -107,8 +107,6 @@ AADLIface::AADLIface(AADLObject::Type ifaceType, const CreationInfo &ci)
                       : Type::RequiredInterface == ifaceType ? AADLIface::IfaceType::Required
                                                              : AADLIface::IfaceType::Provided))
 {
-    setupInitialAttrs();
-
     setKind(ci.kind);
     setParams(ci.parameters);
 
@@ -120,18 +118,6 @@ AADLIface::~AADLIface()
 {
     if (d->m_cloneOf)
         d->m_cloneOf->forgetClone(this);
-}
-
-void AADLIface::setupInitialAttrs()
-{
-    setAttr(meta::Props::token(meta::Props::Token::kind), kindToString(defaultKind()));
-    if (isProvided()) {
-        setAttr(meta::Props::token(meta::Props::Token::period), QVariant());
-        setAttr(meta::Props::token(meta::Props::Token::wcet), QVariant());
-        setAttr(meta::Props::token(meta::Props::Token::queue_size), QVariant());
-    } else {
-        setProp(meta::Props::token(meta::Props::Token::InheritPI), true);
-    }
 }
 
 AADLIface::IfaceType AADLIface::direction() const

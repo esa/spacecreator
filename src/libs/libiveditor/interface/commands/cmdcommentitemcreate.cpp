@@ -26,8 +26,7 @@
 namespace ive {
 namespace cmd {
 
-CmdCommentItemCreate::CmdCommentItemCreate(
-        ivm::AADLModel *model, ivm::AADLFunctionType *parent, const QRectF &geometry)
+CmdCommentItemCreate::CmdCommentItemCreate(ivm::AADLModel *model, ivm::AADLFunctionType *parent, const QRectF &geometry)
     : CmdEntityGeometryChange({}, QObject::tr("Create Comment"))
     , m_model(model)
     , m_parent(parent)

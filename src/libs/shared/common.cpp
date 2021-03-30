@@ -19,6 +19,7 @@
 
 #include <QDebug>
 #include <QDir>
+#include <QDirIterator>
 #include <QFile>
 #include <QFileInfo>
 #include <QPalette>
@@ -144,6 +145,33 @@ bool ensureFileExists(const QString &filePath, const QString &defaultFilePath)
         return false;
     }
     return true;
+}
+
+void copyDir(const QString &source, const QString &dest)
+{
+    static const QDir::Filters filters = QDir::NoDotAndDotDot | QDir::Dirs | QDir::Files;
+    QDir sourceExportDir { source };
+    if (sourceExportDir.isEmpty(filters)) {
+        return;
+    }
+    sourceExportDir.setFilter(filters);
+    const QDir targetExportDir { dest };
+    targetExportDir.mkpath(QLatin1String("."));
+    QDirIterator it { sourceExportDir, QDirIterator::Subdirectories };
+    while (it.hasNext()) {
+        const QString filePath = it.next();
+        const QFileInfo fileInfo = it.fileInfo();
+        const QString relPath = sourceExportDir.relativeFilePath(fileInfo.absoluteFilePath());
+        if (fileInfo.isDir()) {
+            targetExportDir.mkpath(relPath);
+        } else {
+            const bool result = QFile::copy(fileInfo.absoluteFilePath(), targetExportDir.absoluteFilePath(relPath));
+            if (!result) {
+                qWarning() << "Error during source file copying:" << filePath
+                           << targetExportDir.absoluteFilePath(relPath);
+            }
+        }
+    }
 }
 
 }

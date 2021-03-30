@@ -17,10 +17,10 @@
 
 #include "cmdentitiesinstantiate.h"
 
-#include "aadlnamevalidator.h"
 #include "aadlfunction.h"
 #include "aadlfunctiontype.h"
 #include "aadlmodel.h"
+#include "aadlnamevalidator.h"
 #include "baseitems/common/aadlutils.h"
 #include "cmdentityattributechange.h"
 #include "commandids.h"
@@ -45,16 +45,16 @@ static inline void shiftObjects(const QVector<ivm::AADLObject *> &objects, const
 namespace ive {
 namespace cmd {
 
-CmdEntitiesInstantiate::CmdEntitiesInstantiate(ivm::AADLFunctionType *entity,
-        ivm::AADLFunctionType *parent, ivm::AADLModel *model, const QPointF &pos)
+CmdEntitiesInstantiate::CmdEntitiesInstantiate(
+        ivm::AADLFunctionType *entity, ivm::AADLFunctionType *parent, ivm::AADLModel *model, const QPointF &pos)
     : QUndoCommand()
     , m_parent(parent)
     , m_model(model)
 
 {
     Q_ASSERT(entity);
-    m_instantiatedEntity = new ivm::AADLFunction(
-            {}, m_parent ? qobject_cast<QObject *>(m_parent) : qobject_cast<QObject *>(m_model));
+    m_instantiatedEntity =
+            new ivm::AADLFunction({}, m_parent ? qobject_cast<QObject *>(m_parent) : qobject_cast<QObject *>(m_model));
     m_instantiatedEntity->setTitle(ivm::AADLNameValidator::nameForInstance(
             m_instantiatedEntity, entity->title() + QLatin1String("_Instance_")));
     m_instantiatedEntity->setCoordinates(entity->coordinates());

@@ -48,6 +48,7 @@
 #include <QPainter>
 #include <QPolygonF>
 #include <QTimer>
+#include <cmath>
 
 namespace msc {
 
@@ -173,8 +174,9 @@ void MessageItem::setInstances(InstanceItem *sourceInstance, InstanceItem *targe
 
 bool MessageItem::setSourceInstanceItem(InstanceItem *sourceInstance)
 {
-    if (sourceInstance == m_sourceInstance || (sourceInstance && sourceInstance == m_targetInstance))
+    if (sourceInstance == m_sourceInstance || (sourceInstance && sourceInstance == m_targetInstance)) {
         return false;
+    }
 
     if (m_sourceInstance) {
         disconnect(m_sourceInstance, nullptr, this, nullptr);
@@ -444,10 +446,36 @@ QPointF MessageItem::head() const
 
 void MessageItem::setHead(const QPointF &head, ObjectAnchor::Snap snap)
 {
-    if (head == this->head() && snap == ObjectAnchor::Snap::NoSnap)
+    if (head == this->head() && snap == ObjectAnchor::Snap::NoSnap) {
         return;
+    }
 
     updateTarget(head, snap);
+}
+
+/*!
+   Sets the position of the head/tip to the given scene position \p head.
+   The tail is moved as well, if the message is horizontal, or if the tail would be after/below the head.
+ */
+void MessageItem::setHeadPosition(const QPointF &head)
+{
+    if (head == this->head()) {
+        return;
+    }
+
+    QVector<QPointF> points = messagePoints();
+    if (points.size() < 2) {
+        return;
+    }
+
+    const bool horizontal = isHorizontal();
+    points.last() = head;
+
+    if (horizontal || points.first().y() > head.y()) {
+        points.first().setY(head.y());
+    }
+
+    setMessagePoints(points);
 }
 
 /*!
@@ -460,10 +488,67 @@ QPointF MessageItem::tail() const
 
 void MessageItem::setTail(const QPointF &tail, ObjectAnchor::Snap snap)
 {
-    if (tail == this->tail() && snap == ObjectAnchor::Snap::NoSnap)
+    if (tail == this->tail() && snap == ObjectAnchor::Snap::NoSnap) {
         return;
+    }
 
     updateSource(tail, snap);
+}
+
+/*!
+   Sets the position of the tail to the given scene position \p tail.
+   The head is moved as well, if the message is horizontal, or if the head would be before/above the tail.
+ */
+void MessageItem::setTailPosition(const QPointF &tail)
+{
+    if (tail == this->tail()) {
+        return;
+    }
+
+    QVector<QPointF> points = messagePoints();
+    if (points.size() < 2) {
+        return;
+    }
+
+    const bool horizontal = isHorizontal();
+    points.first() = tail;
+
+    if (horizontal || points.last().y() < tail.y()) {
+        points.last().setY(tail.y());
+    }
+
+    setMessagePoints(points);
+}
+
+/*!
+   Move the message points, so the message scne bounding rect is at the given \p yPos position
+   X-position is not affected
+ */
+void MessageItem::moveToYPosition(qreal yPos)
+{
+    QVector<QPointF> points = messagePoints();
+    if (messagePoints().size() < 2) {
+        return;
+    }
+
+    const qreal offset = yPos - sceneBoundingRect().top();
+    for (QPointF &pt : points) {
+        pt.setY(pt.y() + offset);
+    }
+    setMessagePoints(points);
+}
+
+/*!
+   Returns true if the arrow is straight and is horizontal
+ */
+bool MessageItem::isHorizontal() const
+{
+    const QVector<QPointF> points = messagePoints();
+    if (points.size() != 2) {
+        return false;
+    }
+
+    return std::abs(points[0].y() - points[1].y()) < 1e-6;
 }
 
 bool MessageItem::isAutoResizable() const
@@ -549,7 +634,7 @@ void MessageItem::onManualResizeProgress(shared::ui::GripPoint *gp, const QPoint
 
 void MessageItem::onManualGeometryChangeFinished(shared::ui::GripPoint *gp, const QPointF &from, const QPointF &to)
 {
-    Q_UNUSED(to);
+    Q_UNUSED(to)
     if (m_sourceInstance == m_targetInstance) {
         GeometryNotificationBlocker keepSilent(this);
         m_originalMessagePoints.clear();
@@ -604,19 +689,19 @@ void MessageItem::onManualGeometryChangeFinished(shared::ui::GripPoint *gp, cons
     }
 
     if (sourceChanged) {
-        const int newIdx = m_chartLayoutManager->eventIndex(tail().y());
+        const int newIdx = m_chartLayoutManager->eventIndex(tail());
         undoStack->push(new cmd::CmdMessageItemResize(m_message, newIdx,
                 sourceInstanceItem() ? sourceInstanceItem()->modelItem() : nullptr, MscMessage::EndType::SOURCE_TAIL,
                 m_chartLayoutManager));
     }
     if (targetChanged) {
-        const int newIdx = m_chartLayoutManager->eventIndex(head().y());
+        const int newIdx = m_chartLayoutManager->eventIndex(head());
         undoStack->push(new cmd::CmdMessageItemResize(m_message, newIdx,
                 targetInstanceItem() ? targetInstanceItem()->modelItem() : nullptr, MscMessage::EndType::TARGET_HEAD,
                 m_chartLayoutManager));
     }
 
-    const qreal newPos = (gp && gp->location() == shared::ui::GripPoint::Center) ? to.y() : tail().y();
+    const QPointF newPos = (gp && gp->location() == shared::ui::GripPoint::Center) ? to : tail();
     int newIdx = m_chartLayoutManager->eventIndex(newPos, m_message);
     undoStack->push(new cmd::CmdMessagePointsEdit(m_message, oldPointsCif, newPointsCif, newIdx, m_chartLayoutManager));
     undoStack->endMacro();
@@ -781,10 +866,9 @@ cif::CifBlockShared MessageItem::positionCifBlock() const
 void MessageItem::setMessagePoints(const QVector<QPointF> &scenePoints)
 {
     const QVector<QPointF> &arrowPoints = messagePoints();
-    if (scenePoints.size() < 2 || scenePoints == arrowPoints)
+    if (scenePoints.size() < 2 || scenePoints == arrowPoints) {
         return;
-
-    Q_ASSERT(!scenePoints.isEmpty());
+    }
 
     GeometryNotificationBlocker keepSilent(this);
     setPos(QLineF(scenePoints.first(), scenePoints.last()).center());
@@ -808,6 +892,27 @@ void MessageItem::applyCif()
         const QVector<QPointF> &pointsScene = CoordinatesConverter::cifToScene(pointsCif, &converted);
         setMessagePoints(pointsScene);
     }
+}
+
+void MessageItem::updateCif()
+{
+    using namespace cif;
+
+    const cif::CifLine::CifType usedCifType = mainCifType();
+    const QVector<QPoint> &pointsCif = CoordinatesConverter::sceneToCif(messagePoints());
+    if (!geometryManagedByCif()) {
+        const CifBlockShared &emptyCif =
+                isCreator() ? CifBlockFactory::createBlockCreate() : CifBlockFactory::createBlockMessage();
+        m_message->addCif(emptyCif);
+    }
+
+    const CifBlockShared &msgCif = mainCifBlock();
+    if (!msgCif->hasPayloadFor(usedCifType))
+        msgCif->addLine(isCreator() ? CifLineShared(new CifLineCreate()) : CifLineShared(new CifLineMessage()));
+
+    const QVector<QPoint> &pointsCifStored = msgCif->payload(mainCifType()).value<QVector<QPoint>>();
+    if (pointsCifStored != pointsCif)
+        msgCif->setPayload(QVariant::fromValue(pointsCif), usedCifType);
 }
 
 QString MessageItem::displayedText() const
@@ -857,27 +962,6 @@ QVariant MessageItem::itemChange(QGraphicsItem::GraphicsItemChange change, const
     }
 
     return InteractiveObject::itemChange(change, value);
-}
-
-void MessageItem::updateCif()
-{
-    using namespace cif;
-
-    const cif::CifLine::CifType usedCifType = mainCifType();
-    const QVector<QPoint> &pointsCif = CoordinatesConverter::sceneToCif(messagePoints());
-    if (!geometryManagedByCif()) {
-        const CifBlockShared &emptyCif =
-                isCreator() ? CifBlockFactory::createBlockCreate() : CifBlockFactory::createBlockMessage();
-        m_message->addCif(emptyCif);
-    }
-
-    const CifBlockShared &msgCif = mainCifBlock();
-    if (!msgCif->hasPayloadFor(usedCifType))
-        msgCif->addLine(isCreator() ? CifLineShared(new CifLineCreate()) : CifLineShared(new CifLineMessage()));
-
-    const QVector<QPoint> &pointsCifStored = msgCif->payload(mainCifType()).value<QVector<QPoint>>();
-    if (pointsCifStored != pointsCif)
-        msgCif->setPayload(QVariant::fromValue(pointsCif), usedCifType);
 }
 
 void MessageItem::extendGlobalMessage()
@@ -945,6 +1029,30 @@ QPointF MessageItem::extendToNearestEdge(const QPointF &shiftMe) const
     } else {
         return QPointF(boxRect.right(), shiftMe.y());
     }
+}
+
+qreal MessageItem::instanceTopArea(MscInstance *instance) const
+{
+    static const qreal space = 3.;
+    if (m_sourceInstance && instance == m_sourceInstance->modelItem()) {
+        return tail().y() - space;
+    }
+    if (m_targetInstance && instance == m_targetInstance->modelItem()) {
+        return head().y() - space;
+    }
+    return 0.;
+}
+
+qreal MessageItem::instanceBottomArea(MscInstance *instance) const
+{
+    static const qreal space = 3.;
+    if (m_sourceInstance && instance == m_sourceInstance->modelItem()) {
+        return tail().y() + space;
+    }
+    if (m_targetInstance && instance == m_targetInstance->modelItem()) {
+        return head().y() + space;
+    }
+    return 0.;
 }
 
 /*

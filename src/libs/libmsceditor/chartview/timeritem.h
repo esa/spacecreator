@@ -43,6 +43,9 @@ public:
 
     void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget = nullptr) override;
 
+    void applyCif() override;
+    void updateCif() override;
+
 public Q_SLOTS:
     void setName(const QString &text);
 
@@ -54,6 +57,8 @@ protected:
     void onManualMoveProgress(shared::ui::GripPoint *gp, const QPointF &from, const QPointF &to) override;
     void onManualMoveFinish(shared::ui::GripPoint *gp, const QPointF &from, const QPointF &to) override;
     void initGripPoints() override;
+
+    cif::CifLine::CifType mainCifType() const override;
 
 private Q_SLOTS:
     void onTextEdited(const QString &text);

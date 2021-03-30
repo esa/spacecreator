@@ -432,7 +432,7 @@ void AADLInterfaceGraphicsItem::adjustItem()
     const QRectF parentRect = parentItem()->boundingRect();
 
     QRectF intersectedRect;
-    if (checkCollision(siblingsRects, itemRect, &intersectedRect) && parentRect.isValid()) {
+    if (isCollided(siblingsRects, itemRect, &intersectedRect) && parentRect.isValid()) {
         const QHash<Qt::Alignment, QPainterPath> kSidePaths {
             { Qt::AlignLeft, itemPath(Qt::AlignLeft) },
             { Qt::AlignTop, itemPath(Qt::AlignTop) },

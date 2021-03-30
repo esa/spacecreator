@@ -80,7 +80,8 @@ void Asn1Editor::setValue(const QString &value)
 
     const std::unique_ptr<Asn1Acn::TypeAssignment> &asn1Item = m_asn1Types->typeAssignment(currentType);
     if (asn1Item) {
-        m_asn1TreeView->setAsn1Value(valueParser.parseAsn1Value(asn1Item.get(), value));
+        const QVariantMap valueData = valueParser.parseAsn1Value(asn1Item.get(), value);
+        m_asn1TreeView->setAsn1Value(valueData);
     }
 }
 

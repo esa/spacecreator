@@ -76,7 +76,7 @@ QRectF InteractiveObjectBase::boundingRect() const
     return d->boundingRect;
 }
 
-void InteractiveObjectBase::setBoundingRect(const QRectF newRect)
+void InteractiveObjectBase::setBoundingRect(const QRectF &newRect)
 {
     if (newRect == d->boundingRect) {
         return;

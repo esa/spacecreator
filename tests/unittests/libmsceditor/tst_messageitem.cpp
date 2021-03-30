@@ -263,8 +263,8 @@ void tst_MessageItem::testPositionUpdateOnInstanceChange()
         m_instanceItems[2]->centerInScene().x() };
 
     QVector<QPointF> points = messageItem->messagePoints();
-    QVERIFY(qFuzzyCompare(points[0].x(), instanceAxesX[0]));
-    QVERIFY(qFuzzyCompare(points[1].x(), instanceAxesX[1]));
+    QVERIFY(std::abs(points[0].x() - instanceAxesX[0]) < m_maxOffset);
+    QVERIFY(std::abs(points[1].x() - instanceAxesX[1]) < m_maxOffset);
 
     message->setTargetInstance(m_instances[2]);
     waitForLayoutUpdate();

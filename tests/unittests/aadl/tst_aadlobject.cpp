@@ -16,9 +16,10 @@
 */
 
 #include "aadlcommonprops.h"
-#include "aadlobject.h"
 #include "aadlfunction.h"
+#include "aadllibrary.h"
 #include "aadlmodel.h"
+#include "aadlobject.h"
 #include "propertytemplateconfig.h"
 
 #include <QSignalSpy>
@@ -40,6 +41,7 @@ class tst_AADLObject : public QObject
     Q_OBJECT
 
 private Q_SLOTS:
+    void initTestCase();
     void test_defaultConstructor();
     void test_paramConstructor();
     void test_setTitle();
@@ -48,6 +50,11 @@ private Q_SLOTS:
     void test_hasAttributes();
     void test_hasProperties();
 };
+
+void tst_AADLObject::initTestCase()
+{
+    ivm::initAadlLibrary();
+}
 
 void tst_AADLObject::test_defaultConstructor()
 {
@@ -130,10 +137,10 @@ void tst_AADLObject::test_coordinatesType()
     ivm::AADLFunction fn2("Fn2", &fn1);
     ivm::AADLFunction fn3("Fn3", &fn2);
 
-    const QVector<ivm::AADLObject *> objects { &fn1, &fn2, &fn3 };
-
-    for (auto object : objects)
-        QVERIFY(model.addObject(object));
+    QSignalSpy spy(&model, &ivm::AADLModel::aadlObjectsAdded);
+    model.addObjects({ &fn1, &fn2, &fn3 });
+    QVERIFY(spy.count() == 1);
+    QVERIFY(model.objects().size() == 3);
 
     QCOMPARE(fn1.coordinatesType(), ivm::meta::Props::Token::coordinates);
     QCOMPARE(fn2.coordinatesType(), ivm::meta::Props::Token::coordinates);

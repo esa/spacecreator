@@ -451,7 +451,7 @@ QVariantList MessageCreatorTool::prepareMessage()
             if (message->sourceInstance() == message->targetInstance())
                 message->setTargetInstance(nullptr);
 
-            const int eventIndex = m_model->eventIndex(m_messageItem->tail().y());
+            const int eventIndex = m_model->eventIndex(m_messageItem->tail());
             const QVector<QPoint> &arrowPoints = getCif(m_messageItem->messagePoints());
             args = { QVariant::fromValue<msc::MscMessage *>(message), eventIndex,
                 QVariant::fromValue<QVector<QPoint>>(arrowPoints) };

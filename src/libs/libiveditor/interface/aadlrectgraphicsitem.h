@@ -58,11 +58,12 @@ protected:
             shared::ui::GripPoint *grip, const QPointF &pressedAt, const QPointF &releasedAt) override;
     void onManualMoveFinish(shared::ui::GripPoint *grip, const QPointF &pressedAt, const QPointF &releasedAt) override;
 
-    QRectF adjustRectToParent(shared::ui::GripPoint *grip, const QPointF &from, const QPointF &to);
-    virtual bool allowGeometryChange(shared::ui::GripPoint *grip, const QPointF &from, const QPointF &to);
+    QRectF transformedRect(shared::ui::GripPoint *grip, const QPointF &from, const QPointF &to);
 
     bool setGeometry(const QRectF &sceneGeometry);
-    void handleGeometryChange(shared::ui::GripPoint *grip, const QPointF &from, const QPointF &releasedAt);
+
+    void handleGeometryChanged(shared::ui::GripPoint *grip, const QPointF &from, const QPointF &releasedAt);
+    void handleGeometryChanging(shared::ui::GripPoint *grip, const QPointF &from, const QPointF &releasedAt);
 
 private Q_SLOTS:
     void onGeometryChanged();

@@ -115,6 +115,15 @@ MscComment *MscEntity::setCommentString(const QString &comment)
     return m_comment;
 }
 
+/*!
+   Return the type of this entity as string
+ */
+QString MscEntity::entityTypeName() const
+{
+    const QMetaEnum &e = QMetaEnum::fromType<MscEntity::EntityType>();
+    return e.valueToKey(int(entityType()));
+}
+
 QVector<cif::CifBlockShared> MscEntity::cifs() const
 {
     return m_cifs;
@@ -171,9 +180,7 @@ QString MscEntity::cifText(int tabsSize) const
 #ifdef QT_DEBUG
 void MscEntity::dbgShowCifs() const
 {
-    const QMetaEnum &e = QMetaEnum::fromType<MscEntity::EntityType>();
-    const QString currTypeName(e.valueToKey(int(entityType())));
-    qDebug() << QString("%1[%2]->CIFs %3:").arg(name(), currTypeName).arg(m_cifs.size());
+    qDebug() << QString("%1[%2]->CIFs %3:").arg(name(), entityTypeName()).arg(m_cifs.size());
     for (int i = 0; i < m_cifs.size(); ++i) {
         qDebug() << QString("\t CIF # %1/%2").arg(i).arg(m_cifs.size());
         const cif::CifBlockShared &cifBlock = m_cifs.at(i);
@@ -186,4 +193,27 @@ void MscEntity::dbgShowCifs() const
 }
 #endif
 
+QString MscEntity::toDbgString() const
+{
+    return QString("%1('%2')").arg(entityTypeName(), m_name);
+}
+
 } // namespace msc
+
+QDebug operator<<(QDebug debug, const msc::MscEntity &entity)
+{
+    QDebugStateSaver saver(debug);
+    debug << entity.toDbgString();
+    return debug;
+}
+
+QDebug operator<<(QDebug debug, const msc::MscEntity *entity)
+{
+    QDebugStateSaver saver(debug);
+    if (entity) {
+        debug << entity->toDbgString();
+    } else {
+        debug << QString("%1(nullptr)").arg(msc::MscEntity::staticMetaObject.className());
+    }
+    return debug;
+}

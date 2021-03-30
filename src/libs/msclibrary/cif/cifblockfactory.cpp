@@ -27,9 +27,11 @@ namespace cif {
 QVector<CifBlockShared> CifBlockFactory::createBlocks(const QVector<QVector<CifLineShared>> &lines)
 {
     QVector<CifBlockShared> blocks;
-    for (const QVector<CifLineShared> &blockLines : lines)
-        if (const CifBlockShared &block = createBlock(blockLines))
+    for (const QVector<CifLineShared> &blockLines : lines) {
+        if (const CifBlockShared &block = createBlock(blockLines)) {
             blocks.append(block);
+        }
+    }
     return blocks;
 }
 
@@ -43,6 +45,8 @@ CifBlockShared CifBlockFactory::createBlock(const QVector<CifLineShared> &lines)
             return createBlockCall(lines);
         case CifLine::CifType::Comment:
             return createBlockComment(lines);
+        case CifLine::CifType::Concurrent:
+            return createBlockConcurrent(lines);
         case CifLine::CifType::Condition:
             return createBlockCondition(lines);
         case CifLine::CifType::Create:
@@ -76,7 +80,9 @@ CifBlockShared CifBlockFactory::createBlock(const QVector<CifLineShared> &lines)
 CifBlockShared CifBlockFactory::createBlockAction(const QVector<CifLineShared> &lines)
 {
     CifBlockShared block(new CifBlockAction());
-    block->setLines(lines);
+    if (!lines.isEmpty()) {
+        block->setLines(lines);
+    }
     return block;
 }
 
@@ -94,10 +100,21 @@ CifBlockShared CifBlockFactory::createBlockComment(const QVector<CifLineShared> 
     return block;
 }
 
+CifBlockShared CifBlockFactory::createBlockConcurrent(const QVector<CifLineShared> &lines)
+{
+    CifBlockShared block(new CifBlockConcurrent());
+    if (!lines.isEmpty()) {
+        block->setLines(lines);
+    }
+    return block;
+}
+
 CifBlockShared CifBlockFactory::createBlockCondition(const QVector<CifLineShared> &lines)
 {
     CifBlockShared block(new CifBlockCondition());
-    block->setLines(lines);
+    if (!lines.isEmpty()) {
+        block->setLines(lines);
+    }
     return block;
 }
 
@@ -175,7 +192,9 @@ CifBlockShared CifBlockFactory::createBlockText(const QVector<CifLineShared> &li
 CifBlockShared CifBlockFactory::createBlockTimeout(const QVector<CifLineShared> &lines)
 {
     CifBlockShared block(new CifBlockTimeout());
-    block->setLines(lines);
+    if (!lines.isEmpty()) {
+        block->setLines(lines);
+    }
     return block;
 }
 

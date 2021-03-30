@@ -81,7 +81,6 @@ void tsti_Chartitem::testKeepSpaceAtBottom()
 
     const QRectF newRect = chartItem->sceneBoundingRect();
 
-    QTest::qWait(500);
     waitForLayoutUpdate();
 
     // The chart increases it's height, so a new item can be added easily (space at the bottom)

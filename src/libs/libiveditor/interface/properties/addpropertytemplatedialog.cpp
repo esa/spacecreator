@@ -162,7 +162,7 @@ void AddPropertyTemplateDialog::accept()
     m_attr->setInfo(i);
     m_attr->setType(t);
     m_attr->setScope(s);
-    m_attr->setValuesList(list);
+    m_attr->setValue(list);
     m_attr->setValueValidatorPattern(pattern);
     QDialog::accept();
 }

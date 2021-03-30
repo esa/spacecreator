@@ -32,11 +32,6 @@
             </Provided_Interface>
         </Function>
         <Connection>
-            <Source func_name="MiniB1" pi_name="PI_1"/>
-            <Target func_name="BlockB" pi_name="PI_1"/>
-            <Property name="Taste::coordinates" value="78500 19600 73000 19600 73000 29900 67500 29900"/>
-        </Connection>
-        <Connection>
             <Source func_name="BlockB" pi_name="PI_1"/>
             <Target func_name="MiniB2" pi_name="PI_1"/>
             <Property name="Taste::coordinates" value="67500 29900 73700 29900 73700 37700 80500 37600"/>

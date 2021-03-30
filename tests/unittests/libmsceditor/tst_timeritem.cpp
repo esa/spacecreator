@@ -15,6 +15,7 @@
    along with this program. If not, see <https://www.gnu.org/licenses/lgpl-2.1.html>.
 */
 
+#include "baseitems/common/coordinatesconverter.h"
 #include "chartlayoutmanager.h"
 #include "exceptions.h"
 #include "msccommandsstack.h"
@@ -23,6 +24,7 @@
 #include "sharedlibrary.h"
 #include "timeritem.h"
 
+#include <QGraphicsView>
 #include <QScopedPointer>
 #include <QtTest>
 
@@ -33,6 +35,7 @@ class tst_TimerItem : public QObject
     Q_OBJECT
 
 private Q_SLOTS:
+    void initTestCase();
     void init();
     void cleanup();
     void testBlockDifferentInsatncesConnection();
@@ -42,6 +45,7 @@ private Q_SLOTS:
     void testAllowStartBeforeStopConnection();
     void testBlockStartAfterStopConnection();
     void testBlockTimeoutBeforeStopConnection();
+    void testCifUpdate();
 
 private:
     MscTimer *m_timer = nullptr;
@@ -49,12 +53,16 @@ private:
     MscInstance *m_instance = nullptr;
     ChartLayoutManager *m_model = nullptr;
     QScopedPointer<msc::MscCommandsStack> m_undoStack;
+    QGraphicsView *m_view = nullptr;
 };
+
+void tst_TimerItem::initTestCase()
+{
+    shared::initSharedLibrary();
+}
 
 void tst_TimerItem::init()
 {
-    shared::initSharedLibrary();
-
     m_undoStack.reset(new msc::MscCommandsStack);
     m_model = new ChartLayoutManager(m_undoStack.data());
     m_instance = new MscInstance;
@@ -64,6 +72,11 @@ void tst_TimerItem::init()
     m_timer->setName("T1");
     m_timer->setTimerType(msc::MscTimer::TimerType::Start);
     m_timerItem = new TimerItem(m_timer, m_model, nullptr);
+
+    m_view = new QGraphicsView();
+    m_view->setScene(m_model->graphicsScene());
+    CoordinatesConverter::setDPI(QPointF(128., 128.), QPointF(96., 96.));
+    CoordinatesConverter::instance()->setScene(m_model->graphicsScene());
 }
 
 void tst_TimerItem::cleanup()
@@ -151,6 +164,22 @@ void tst_TimerItem::testBlockTimeoutBeforeStopConnection()
     t2.setInstance(m_instance);
 
     QCOMPARE(m_timerItem->canConnectTimers(&t2, QPointF(8, 8)), false);
+}
+
+void tst_TimerItem::testCifUpdate()
+{
+    m_timer = new MscTimer();
+    m_timer->setName("start");
+    m_timerItem = new TimerItem(m_timer, m_model);
+    m_timerItem->setPos({ 50, 70 });
+    m_timerItem->updateCif();
+
+    auto timerItem2 = new TimerItem(m_timer, m_model);
+    QCOMPARE(timerItem2->pos(), QPointF(0., 0.));
+
+    timerItem2->applyCif();
+    // check that Y-position is restored
+    QCOMPARE(timerItem2->pos(), QPointF(0., 70.));
 }
 
 QTEST_MAIN(tst_TimerItem)

@@ -211,6 +211,7 @@ void tst_CommandLineParser::testCmdArgumentExportToFile()
 
 void tst_CommandLineParser::initTestCase()
 {
+    ivm::initAadlLibrary();
     ive::initIvEditor();
     shared::initSharedLibrary();
 }

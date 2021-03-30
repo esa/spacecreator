@@ -20,6 +20,8 @@
 #include "baseitems/common/coordinatesconverter.h"
 #include "baseitems/textitem.h"
 #include "chartlayoutmanager.h"
+#include "cif/cifblockfactory.h"
+#include "cif/ciflines.h"
 #include "colors/colormanager.h"
 #include "commands/cmdactioninformaltext.h"
 #include "datastatement.h"
@@ -102,6 +104,47 @@ MscAction *ActionItem::modelItem() const
     return m_action;
 }
 
+void ActionItem::applyCif()
+{
+    if (const cif::CifBlockShared &cifBlock = cifBlockByType(mainCifType())) {
+        const QVector<QPoint> &cifPoints = cifBlock->payload().value<QVector<QPoint>>();
+        if (cifPoints.size() == 2) {
+            bool converted(false);
+            const QVector<QPointF> &scenePoints = CoordinatesConverter::cifToScene(cifPoints, &converted);
+
+            // All we care about is the Y - the rest is handled automatically
+            setY(scenePoints.at(0).y());
+            rebuildLayout();
+        }
+    }
+}
+
+void ActionItem::updateCif()
+{
+    if (!geometryManagedByCif()) {
+        cif::CifBlockShared emptyCif = cif::CifBlockFactory::createBlockAction();
+        emptyCif->addLine(cif::CifLineShared(new cif::CifLineAction()));
+        m_entity->addCif(emptyCif);
+    }
+
+    const QRectF currentBBox = sceneBoundingRect();
+    QRect bBoxCif;
+    if (!CoordinatesConverter::sceneToCif(currentBBox, bBoxCif)) {
+        qWarning() << Q_FUNC_INFO << "Can't convert bounding box coordinates to CIF";
+        return;
+    }
+
+    cif::CifBlockShared cifBlock = cifBlockByType(mainCifType());
+    Q_ASSERT(cifBlock != nullptr);
+
+    const QVector<QPoint> &storedCif = cifBlock->payload().value<QVector<QPoint>>();
+    const QVector<QPoint> newCif { bBoxCif.topLeft(), QPoint(bBoxCif.width(), bBoxCif.height()) };
+    if (cifChangedEnough(storedCif, newCif)) {
+        cifBlock->setPayload(QVariant::fromValue(newCif), mainCifType());
+        Q_EMIT cifChanged();
+    }
+}
+
 void ActionItem::setActionText(const QString &text)
 {
     if (!m_action) {
@@ -135,6 +178,7 @@ void ActionItem::onManualMoveProgress(shared::ui::GripPoint *, const QPointF &fr
 
 void ActionItem::onManualMoveFinish(shared::ui::GripPoint *, const QPointF &, const QPointF &)
 {
+    updateCif();
     Q_EMIT moved(this);
 }
 
@@ -198,28 +242,6 @@ QString ActionItem::actionText() const
 cif::CifLine::CifType ActionItem::mainCifType() const
 {
     return cif::CifLine::CifType::Action;
-}
-
-void ActionItem::applyCif()
-{
-    if (const cif::CifBlockShared &cifBlock = cifBlockByType(cif::CifLine::CifType::Action)) {
-        const QVector<QPoint> &cifPoints = cifBlock->payload().value<QVector<QPoint>>();
-        if (cifPoints.size() == 2) {
-            bool converted(false);
-            const QVector<QPointF> &scenePoints = CoordinatesConverter::cifToScene(cifPoints, &converted);
-
-            const QPointF &textBoxTopLeft = scenePoints.at(0);
-            const QPointF &textBoxSize = scenePoints.at(1);
-
-            QSignalBlocker keepSilent(this);
-            setBoundingRect(m_textItem->boundingRect());
-
-            m_textItem->setExplicitSize({ textBoxSize.x(), textBoxSize.y() });
-            const QPointF shift = textBoxTopLeft - pos();
-
-            moveBy(shift.x(), shift.y());
-        }
-    }
 }
 
 } // namespace msc

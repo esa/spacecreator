@@ -48,14 +48,11 @@ public:
 
         // attrs:
         name,
-        language,
+        url,
         is_type,
         instance_of,
         value,
         kind,
-        period,
-        wcet,
-        queue_size,
         type,
         encoding,
         ri_name,

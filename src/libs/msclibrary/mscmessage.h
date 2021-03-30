@@ -98,7 +98,7 @@ public:
     bool isConnected() const;
     // End of parsing helper block
 
-    QString toDbgString() const;
+    QString toDbgString() const override;
 
     cif::CifBlockShared cifMessage() const;
     QVector<QPoint> cifPoints() const;
@@ -124,5 +124,3 @@ private:
     MscParameterList m_parameters;
 };
 } // msc
-
-QDebug operator<<(QDebug dbg, const msc::MscMessage &message);

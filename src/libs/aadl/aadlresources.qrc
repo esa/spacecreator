@@ -1,5 +1,7 @@
 <RCC>
     <qresource prefix="/defaults">
         <file>resources/forbidden_names.txt</file>
+        <file>resources/system_attributes.xml</file>
+        <file>resources/default_attributes.xml</file>
     </qresource>
 </RCC>

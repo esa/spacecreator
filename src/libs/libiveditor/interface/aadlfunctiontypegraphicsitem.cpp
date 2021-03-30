@@ -61,25 +61,18 @@ ivm::AADLFunctionType *AADLFunctionTypeGraphicsItem::entity() const
 void AADLFunctionTypeGraphicsItem::init()
 {
     AADLRectGraphicsItem::init();
-    m_textItem->setPlainText(entity()->titleUI());
     m_textItem->setTextAlignment(Qt::AlignLeft | Qt::AlignTop);
     m_textItem->setFont(font());
+    updateText();
 
     connect(m_textItem, &shared::ui::TextItem::edited, this, &AADLFunctionTypeGraphicsItem::updateNameFromUi);
     connect(entity(), qOverload<ivm::meta::Props::Token>(&ivm::AADLFunction::attributeChanged), this,
             [this](ivm::meta::Props::Token attr) {
-                if (attr == ivm::meta::Props::Token::name) {
-                    const QString txt = entity()->titleUI();
-                    if (m_textItem->toPlainText() != txt) {
-                        m_textItem->setPlainText(txt);
-                        updateTextPosition();
-                    }
+                if (attr == ivm::meta::Props::Token::name || attr == ivm::meta::Props::Token::url) {
+                    updateText();
                 }
             });
-    connect(entity(), &ivm::AADLFunction::titleChanged, this, [this](const QString &text) {
-        m_textItem->setPlainText(ivm::AADLNameValidator::decodeName(m_dataObject->aadlType(), text));
-        instantLayoutUpdate();
-    });
+    connect(entity(), &ivm::AADLFunction::titleChanged, this, &AADLFunctionTypeGraphicsItem::updateText);
     connect(m_textItem, &AADLFunctionNameGraphicsItem::textChanged, this, [this]() { updateTextPosition(); });
 }
 
@@ -168,17 +161,34 @@ void AADLFunctionTypeGraphicsItem::updateNameFromUi(const QString &name)
 
     const QString newName = ivm::AADLNameValidator::encodeName(aadlObject()->aadlType(), name);
     if (!ivm::AADLNameValidator::isAcceptableName(entity(), newName)) {
-        m_textItem->setPlainText(entity()->titleUI());
+        updateText();
         return;
     }
     if (entity()->objectsModel()->nestedFunctionNames().contains(newName)) {
-        m_textItem->setPlainText(entity()->titleUI());
+        updateText();
         return;
     }
 
     const QVariantHash attributess = { { ivm::meta::Props::token(ivm::meta::Props::Token::name), newName } };
     const auto attributesCmd = new cmd::CmdEntityAttributeChange(entity(), attributess);
     m_commandsStack->push(attributesCmd);
+}
+
+void AADLFunctionTypeGraphicsItem::updateText()
+{
+    const QString text = entity()->titleUI();
+    static const QString urlAttrName { ivm::meta::Props::token(ivm::meta::Props::Token::url) };
+    if (m_dataObject->hasAttribute(urlAttrName)) {
+        const QString url = m_dataObject->attr(urlAttrName).toString();
+        const QString html = QStringLiteral("<a href=\"%1\">%2</a>").arg(url, text);
+        if (html != m_textItem->toHtml()) {
+            m_textItem->setHtml(html);
+            updateTextPosition();
+        }
+    } else if (text != m_textItem->toPlainText()) {
+        m_textItem->setPlainText(entity()->titleUI());
+        updateTextPosition();
+    }
 }
 
 void AADLFunctionTypeGraphicsItem::onManualResizeProgress(

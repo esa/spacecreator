@@ -26,18 +26,21 @@
 #include "xmldocexporter.h"
 
 #include <QBuffer>
+#include <QDir>
 #include <QPointF>
+#include <QStandardPaths>
+#include <QTemporaryDir>
 #include <QtDebug>
 
 namespace ive {
 namespace cmd {
 
-CmdEntitiesImport::CmdEntitiesImport(
-        const QByteArray &data, ivm::AADLFunctionType *parent, ivm::AADLModel *model, const QPointF &pos)
+CmdEntitiesImport::CmdEntitiesImport(const QByteArray &data, ivm::AADLFunctionType *parent, ivm::AADLModel *model,
+        const QPointF &pos, const QString &destPath)
     : QUndoCommand()
     , m_model(model)
     , m_parent(parent)
-
+    , m_destPath(destPath)
 {
     ivm::AADLXMLReader parser;
     QObject::connect(&parser, &ivm::AADLXMLReader::objectsParsed, m_model,
@@ -99,23 +102,32 @@ void CmdEntitiesImport::redo()
 
     QVector<ivm::AADLObject *> entities;
     if (m_parent) {
-        for (auto entity : m_rootEntities) {
+        for (ivm::AADLObject *entity : qAsConst(m_rootEntities)) {
             m_parent->addChild(entity);
         }
     }
-    for (auto entity : m_importedEntities) {
+
+    for (ivm::AADLObject *entity : qAsConst(m_importedEntities)) {
         Q_ASSERT(entity);
         if (entity) {
             entities.append(entity);
         }
+        redoSourceCloning(entity);
+    }
+    if (!m_tempDir.isNull()) {
+        m_tempDir.reset();
     }
     m_model->addObjects(entities);
 }
 
 void CmdEntitiesImport::undo()
 {
+    m_tempDir.reset(new QTemporaryDir(QStandardPaths::writableLocation(QStandardPaths::CacheLocation)
+            + QDir::separator() + QLatin1String("import")));
+
     for (auto it = m_importedEntities.crbegin(); it != m_importedEntities.crend(); ++it) {
         m_model->removeObject(*it);
+        undoSourceCloning(*it);
     }
     for (auto it = m_rootEntities.crbegin(); it != m_rootEntities.crend(); ++it) {
         if (m_parent) {
@@ -135,6 +147,37 @@ bool CmdEntitiesImport::mergeWith(const QUndoCommand *command)
 int CmdEntitiesImport::id() const
 {
     return ImportEntities;
+}
+
+void CmdEntitiesImport::redoSourceCloning(const ivm::AADLObject *object)
+{
+    if (!object || object->aadlType() != ivm::AADLObject::Type::Function) {
+        return;
+    }
+
+    const QString subPath = relativePathForObject(object);
+    const QString sourcePrefix = m_tempDir.isNull() ? componentsLibraryPath() : m_tempDir->path();
+    const QString sourcePath { sourcePrefix + QDir::separator() + subPath };
+    const QString destPath { m_destPath + QDir::separator() + subPath };
+    shared::copyDir(sourcePath, destPath);
+}
+
+void CmdEntitiesImport::undoSourceCloning(const ivm::AADLObject *object)
+{
+    if (!object || object->aadlType() != ivm::AADLObject::Type::Function) {
+        return;
+    }
+    const QString subPath = relativePathForObject(object);
+    const QString sourcePath = m_tempDir->path() + QDir::separator() + subPath;
+    const QString destPath { m_destPath + QDir::separator() + subPath };
+    shared::copyDir(destPath, sourcePath);
+    QDir destDir(destPath);
+    destDir.removeRecursively();
+}
+
+QString CmdEntitiesImport::relativePathForObject(const ivm::AADLObject *object) const
+{
+    return QStringLiteral("work/%1").arg(object->title()).toLower();
 }
 
 } // namespace ive

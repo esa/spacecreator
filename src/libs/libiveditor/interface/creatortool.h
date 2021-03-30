@@ -17,6 +17,8 @@
 
 #pragma once
 
+#include "common.h"
+
 #include <QObject>
 
 class QGraphicsView;
@@ -61,7 +63,7 @@ public:
 
 Q_SIGNALS:
     void created();
-    void propertyEditorRequest(ivm::AADLObject *entity);
+    void propertyEditorRequest(const shared::Id &id);
     void informUser(const QString &title, const QString &message) const;
 
     void cutActionTriggered();

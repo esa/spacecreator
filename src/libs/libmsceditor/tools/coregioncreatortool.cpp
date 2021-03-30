@@ -69,7 +69,7 @@ void CoregionCreatorTool::commitPreviewItem()
 
     auto coregion = qobject_cast<msc::CoregionItem *>(m_previewItem);
     auto instance = m_model->nearestInstance(m_previewItem->sceneBoundingRect().center());
-    const int eventIndex = m_model->eventIndex(m_previewItem->y());
+    const int eventIndex = m_model->eventIndex(m_previewItem->pos());
     m_model->undoStack()->push(
             new cmd::CmdCoregionItemCreate(coregion->begin(), coregion->end(), instance, eventIndex, m_model));
 

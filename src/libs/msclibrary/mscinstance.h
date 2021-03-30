@@ -57,6 +57,7 @@ public:
 
     MscInstance *explicitCreator() const;
     void setExplicitCreator(MscInstance *creator);
+    bool isCreated() const;
 
     bool explicitStop() const;
     void setExplicitStop(bool stop);

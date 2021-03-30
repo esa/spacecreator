@@ -21,6 +21,7 @@
 #include "interface/aadlfunctiongraphicsitem.h"
 #include "interface/aadlfunctiontypegraphicsitem.h"
 #include "interface/aadlinterfacegraphicsitem.h"
+#include "interface/graphicsitemhelpers.h"
 #include "iveditor.h"
 #include "sharedlibrary.h"
 
@@ -127,8 +128,9 @@ void tst_AADLConnectionGraphicsItem::tst_Overlapping()
 
 bool tst_AADLConnectionGraphicsItem::checkIntersections(ive::AADLConnectionGraphicsItem *connection)
 {
-    const QRectF itemRect = ive::getNearestIntersectedRect(
-            ive::siblingSceneRects(connection), connection->points(), ive::IntersectionType::Single);
+    const QRectF itemRect =
+            ive::getNearestIntersectedRect(ive::siblingItemsRects(connection, ive::gi::rectangularTypes()),
+                    connection->points(), ive::IntersectionType::Single);
 
     return itemRect.isValid();
 }

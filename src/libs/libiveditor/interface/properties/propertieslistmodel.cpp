@@ -69,6 +69,7 @@ void PropertiesListModel::updateRow(int row, const QString &label, const QString
     Q_UNUSED(defaulValue);
 
     const QString title = label.isEmpty() ? name : label;
+
     if (row == -1 || row >= rowCount()) {
         row = rowCount();
         createNewRow(row, name);
@@ -88,7 +89,7 @@ void PropertiesListModel::updateRow(int row, const QString &label, const QString
         return;
     }
     valueItem->setData(value, Qt::DisplayRole);
-    valueItem->setData(editValue, PropertyDataRole);
+    valueItem->setData(editValue.isNull() ? value : editValue, PropertyDataRole);
     valueItem->setData(static_cast<int>(info), PropertyInfoRole);
 }
 
@@ -129,14 +130,14 @@ void PropertiesListModel::updateRows(const QHash<QString, ivm::PropertyTemplate 
             if (propertyPtr && (!propertyPtr->isVisible() || !propertyPtr->validate(m_dataObject)))
                 continue;
 
-            const QVariant propTemplatesValues = propertyPtr ? propertyPtr->valuesList() : QVariant();
+            const QVariant propTemplatesValue = propertyPtr ? propertyPtr->value() : QVariant();
             const ivm::PropertyTemplate::Type type =
                     propertyPtr ? propertyPtr->type() : ivm::PropertyTemplate::Type::String;
             const QString title = propertyPtr ? propertyPtr->label() : key;
 
             const int row = m_names.indexOf(key);
             updateRow(row, title, key, info, vals[key],
-                    propertyPtr ? ivm::PropertyTemplate::convertData(propTemplatesValues, type)
+                    propertyPtr ? ivm::PropertyTemplate::convertData(propTemplatesValue, type)
                                 : QVariant(QVariant::String),
                     propertyPtr ? propertyPtr->defaultValue() : QVariant(QVariant::String));
         }
@@ -153,13 +154,13 @@ void PropertiesListModel::updateRows(const QHash<QString, ivm::PropertyTemplate 
             if (propertyPtr->type() == ivm::PropertyTemplate::Type::Unknown) {
                 continue;
             } else if (propertyPtr->type() == ivm::PropertyTemplate::Type::Enumeration) {
-                value = propertyPtr->valuesList();
+                value = propertyPtr->value();
             } else {
                 value = propertyPtr->info() == ivm::PropertyTemplate::Info::Property ? m_dataObject->prop(key)
                                                                                      : m_dataObject->attr(key);
             }
             updateRow(rowCount(), propertyPtr->label(), key, propertyPtr->info(), value,
-                    ivm::PropertyTemplate::convertData(propertyPtr->valuesList(), propertyPtr->type()),
+                    ivm::PropertyTemplate::convertData(propertyPtr->value(), propertyPtr->type()),
                     propertyPtr->defaultValue());
         }
     }
@@ -483,30 +484,23 @@ bool InterfacePropertiesListModel::isEditable(const QModelIndex &index) const
     if (!dataObject() || !index.isValid() || !PropertiesListModel::isEditable(index))
         return false;
 
-    bool editable = true;
     if (auto iface = m_dataObject->as<const ivm::AADLIface *>()) {
         const bool isClone = iface->isClone();
         switch (tokenFromIndex(index)) {
-        case ivm::meta::Props::Token::Autonamed: {
-            editable = false;
-            break;
-        }
         case ivm::meta::Props::Token::name:
-        case ivm::meta::Props::Token::InheritPI: {
-            editable = !isClone;
-            break;
-        }
-        default: {
-            bool isInheritedRI = false;
-            if (iface->isRequired())
-                if (auto ri = iface->as<const ivm::AADLIfaceRequired *>())
-                    isInheritedRI = ri->hasPrototypePi();
-            editable = !isClone && !isInheritedRI;
-            break;
-        }
+        case ivm::meta::Props::Token::InheritPI:
+            return !isClone;
+        default:
+            if (iface->isRequired()) {
+                if (auto ri = iface->as<const ivm::AADLIfaceRequired *>()) {
+                    return !isClone && !ri->hasPrototypePi();
+                }
+            }
+            return !isClone;
         }
     }
 
-    return editable;
+    return true;
 }
+
 }

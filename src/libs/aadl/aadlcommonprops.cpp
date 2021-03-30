@@ -39,14 +39,11 @@ const QHash<QString, Props::Token> Props::TokensByName = {
 
     // attrs:
     { "name", Token::name },
-    { "language", Token::language },
+    { "url", Token::url },
     { "is_type", Token::is_type },
     { "instance_of", Token::instance_of },
     { "value", Token::value },
     { "kind", Token::kind },
-    { "period", Token::period },
-    { "wcet", Token::wcet },
-    { "queue_size", Token::queue_size },
     { "type", Token::type },
     { "encoding", Token::encoding },
     { "ri_name", Token::ri_name },

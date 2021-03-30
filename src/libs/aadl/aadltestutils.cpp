@@ -36,8 +36,7 @@ AADLIface *createIface(AADLFunctionType *fn, AADLIface::IfaceType t, const QStri
     return interface;
 }
 
-AADLConnection *createConnection(
-        AADLFunctionType *source, AADLFunctionType *target, const QString &name)
+AADLConnection *createConnection(AADLFunctionType *source, AADLFunctionType *target, const QString &name)
 {
     const QVector<AADLIface *> requiredInterfaces = target->ris();
     auto it = std::find_if(requiredInterfaces.begin(), requiredInterfaces.end(),

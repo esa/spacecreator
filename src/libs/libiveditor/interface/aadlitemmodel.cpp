@@ -336,11 +336,13 @@ void AADLItemModel::removeItemForObject(ivm::AADLObject *object)
 
 void AADLItemModel::setupInnerGeometry(ivm::AADLObject *obj) const
 {
-    if (!obj
-            || !(obj->aadlType() == ivm::AADLObject::Type::Comment || obj->aadlType() == ivm::AADLObject::Type::Function
-                    || obj->aadlType() == ivm::AADLObject::Type::FunctionType)) {
+    static const QSet<ivm::AADLObject::Type> kTypes { ivm::AADLObject::Type::FunctionType,
+        ivm::AADLObject::Type::Function, ivm::AADLObject::Type::Comment };
+
+    if (!obj || !kTypes.contains(obj->aadlType())) {
         return;
     }
+
     QVariant innerCoord = obj->prop(ivm::meta::Props::token(ivm::meta::Props::Token::InnerCoordinates));
     if (innerCoord.isValid()) {
         return;
@@ -354,26 +356,35 @@ void AADLItemModel::setupInnerGeometry(ivm::AADLObject *obj) const
     const QVariant rootCoord = parentObj->prop(ivm::meta::Props::token(ivm::meta::Props::Token::RootCoordinates));
     if (rootCoord.isValid()) {
         rootGeometry = ive::rect(ivm::AADLObject::coordinatesFromString(rootCoord.toString()));
-    } else if (const QGraphicsView *view = m_graphicsScene->views().value(0)) {
-        const QRect viewportGeometry = view->viewport()->geometry().marginsRemoved(kContentMargins.toMargins());
-        rootGeometry = QRectF(view->mapToScene(QPoint(0, 0)),
-                view->mapToScene(QPoint(viewportGeometry.width(), viewportGeometry.height())));
     }
     QList<QRectF> existingRects;
-    for (const auto child : parentObj->children()) {
-        if (child->aadlType() == ivm::AADLObject::Type::Comment || child->aadlType() == ivm::AADLObject::Type::Function
-                || child->aadlType() == ivm::AADLObject::Type::FunctionType) {
+    QRectF innerItemsGeometry;
+    for (const ivm::AADLObject *child : parentObj->children()) {
+        if (kTypes.contains(child->aadlType())) {
             innerCoord = child->prop(ivm::meta::Props::token(ivm::meta::Props::Token::InnerCoordinates));
             if (!innerCoord.isValid()) {
                 continue;
             }
             const QRectF innerRect = ive::rect(ivm::AADLObject::coordinatesFromString(innerCoord.toString()));
-            rootGeometry |= innerRect;
+            innerItemsGeometry |= innerRect;
             existingRects.append(innerRect);
         }
     }
     QRectF innerGeometry;
-    findGeometryForRect(innerGeometry, rootGeometry, existingRects);
+    QRectF newRootGeometry { rootGeometry };
+    findGeometryForRect(innerGeometry, newRootGeometry, existingRects);
+    if (!rootCoord.isValid()) {
+        QRectF mappedViewportGeometry;
+        if (const QGraphicsView *view = m_graphicsScene->views().value(0)) {
+            const QRect viewportGeometry = view->viewport()->geometry().marginsRemoved(kContentMargins.toMargins());
+            mappedViewportGeometry = QRectF(view->mapToScene(QPoint(0, 0)),
+                    view->mapToScene(QPoint(viewportGeometry.width(), viewportGeometry.height())));
+        }
+        mappedViewportGeometry.moveCenter(rootGeometry.center());
+        rootGeometry |= mappedViewportGeometry;
+    } else {
+        rootGeometry |= newRootGeometry;
+    }
 
     const QString strRootCoord = ivm::AADLObject::coordinatesToString(ive::coordinates(rootGeometry));
     parentObj->setProp(ivm::meta::Props::token(ivm::meta::Props::Token::RootCoordinates), strRootCoord);
@@ -452,11 +463,11 @@ void AADLItemModel::updateSceneRect()
     }
 
     if (itemsRect != m_prevItemsRect) {
-        const QRectF sceneRect = m_graphicsScene->sceneRect();
+        const QRectF sceneRect = m_graphicsScene->sceneRect().marginsRemoved(ive::kRootMargins);
         const QRectF updated = sceneRect.united(itemsRect);
 
         if (sceneRect != updated) {
-            m_graphicsScene->setSceneRect(updated);
+            m_graphicsScene->setSceneRect(updated.marginsAdded(ive::kRootMargins));
             m_prevItemsRect = itemsRect;
         }
     }
@@ -554,6 +565,7 @@ QGraphicsItem *AADLItemModel::createItemForObject(ivm::AADLObject *obj)
         iObj->setCommandsStack(m_commandsStack);
         iObj->init();
     }
+
     return iObj;
 }
 

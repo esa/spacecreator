@@ -69,6 +69,7 @@ QVariantMap Asn1ValueParser::parseAsn1Value(
     }
 
     QString value = asn1Value.trimmed();
+
     valueMap["name"] = type->identifier();
     const QVariantMap &asn1Values = type->parameters();
 
@@ -215,12 +216,14 @@ bool Asn1ValueParser::parseSequenceValue(
         if (childType) {
             auto childValue = parseAsn1Value(childType, field.toMap()["value"].toString());
 
-            if (childValue.size())
+            if (!childValue.isEmpty()) {
                 children.append(childValue);
-            else
+            } else {
                 return false;
-        } else
+            }
+        } else {
             return false;
+        }
     }
 
     valueMap["children"] = children;

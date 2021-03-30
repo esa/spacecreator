@@ -17,8 +17,11 @@
 
 #include "coregionitem.h"
 
+#include "baseitems/common/coordinatesconverter.h"
 #include "baseitems/common/mscutils.h"
 #include "chartlayoutmanager.h"
+#include "cif/cifblockfactory.h"
+#include "cif/ciflines.h"
 #include "colors/colormanager.h"
 #include "instanceitem.h"
 #include "messageitem.h"
@@ -33,11 +36,16 @@
 
 namespace msc {
 
+static const qreal kCoregionWidth = 50;
+static const qreal kDefaultHeight = 40;
+
 CoregionItem::CoregionItem(ChartLayoutManager *chartLayoutManager, QGraphicsItem *parent)
     : EventItem(nullptr, chartLayoutManager, parent)
 {
     setFlag(QGraphicsItem::ItemIsSelectable);
     setFlag(ItemClipsToShape, false);
+
+    setBoundingRect(QRectF(QPointF(0, 0), QSizeF(kCoregionWidth, kDefaultHeight)));
 }
 
 void CoregionItem::setBegin(MscCoregion *begin)
@@ -82,15 +90,11 @@ void CoregionItem::initGripPoints()
 
 void CoregionItem::rebuildLayout()
 {
-    static const qreal kCoregionWidth = 50;
-    static const qreal kOffset = 20;
-    static const qreal kDefaultHeight = 40;
-
     if (m_instance) {
         m_instance->stackBefore(this);
     }
 
-    prepareGeometryChange();
+    //    prepareGeometryChange();
     if (!m_begin || !m_end || !m_instance || m_begin->instance() != m_instance->modelItem()
             || m_end->instance() != m_instance->modelItem()) {
         // Not fully defined. Set the default size
@@ -98,72 +102,21 @@ void CoregionItem::rebuildLayout()
         return;
     }
 
-    QRectF rect;
-    const QVector<MscInstanceEvent *> &events =
-            m_chartLayoutManager->currentChart()->eventsForInstance(m_instance->modelItem());
-    auto it = std::next(std::find(events.constBegin(), events.constEnd(), m_begin));
-    auto itEnd = std::find(events.constBegin(), events.constEnd(), m_end);
-    while (it != events.end() && it != itEnd) {
-        Q_ASSERT(*it);
-
-        if (InteractiveObject *iObj = m_chartLayoutManager->itemForEntity(*it)) {
-            auto messageItem = qobject_cast<MessageItem *>(iObj);
-            if (messageItem != nullptr) {
-                // insert the messages source or target - depending which is in the co-region
-                QPointF pos;
-                msc::InstanceItem *sourceItem = messageItem->sourceInstanceItem();
-                if (sourceItem && (m_instance->modelItem() == sourceItem->modelItem())) {
-                    pos = messageItem->messagePoints().first();
-                }
-                msc::InstanceItem *targetItem = messageItem->targetInstanceItem();
-                if (targetItem && (m_instance.data()->modelItem() == targetItem->modelItem())) {
-                    pos = messageItem->messagePoints().last();
-                }
-                rect |= QRectF(pos.x() - 1, pos.y() - 1, 2, 2);
-            } else {
-                rect |= iObj->sceneBoundingRect();
-            }
-            stackBefore(iObj);
-        }
-        ++it;
-    }
-
-    const QRectF instanceRect = m_instance->sceneBoundingRect();
-    if (!rect.isValid()) {
-        // No events inside this co-region. Set default size
-        const qreal top = std::min(m_topMove.y(), kDefaultHeight - 1.);
-        const qreal bottom = std::max(m_bottomMove.y(), 1.);
-        const qreal height = m_bottomMove.isNull() ? kDefaultHeight - top : (bottom - top);
-        setBoundingRect(QRectF(QPointF(0, top), QSizeF(kCoregionWidth, height)));
-        setX(instanceRect.x() + (instanceRect.width() - kCoregionWidth) / 2);
+    if (m_topMove.isNull() && m_bottomMove.isNull()) {
         return;
     }
 
-    // Set size from the events
-    rect.setWidth(kCoregionWidth);
-    rect.adjust(0, -kOffset, 0, kOffset);
-    rect.translate(instanceRect.center().x() - rect.center().x(), 0);
-    const QLineF axis = m_instance->axis();
-    if (rect.top() < axis.y1())
-        rect.setTop(axis.y1());
-    if (rect.bottom() > axis.y2())
-        rect.setBottom(axis.y2());
-
-    setPos(rect.topLeft());
-
-    // adapt height and top, when being resized
-    const qreal top = std::min(m_topMove.y(), rect.height());
-    const qreal bottom = std::max(m_bottomMove.y(), -rect.height());
-    const qreal height = m_bottomMove.isNull() ? rect.height() - top : (bottom - top);
+    QRectF rect = boundingRect();
+    const qreal top = m_topMove.isNull() ? 0. : m_topMove.y();
+    const qreal bottom = m_bottomMove.isNull() ? rect.bottom() : m_bottomMove.y();
+    const qreal height = std::max(bottom - top, kDefaultHeight / 2);
     rect.setHeight(height);
-
     setBoundingRect({ QPointF(0, top), rect.size() });
-    centerOnTargetH();
 }
 
 void CoregionItem::onManualResizeProgress(shared::ui::GripPoint *gp, const QPointF &from, const QPointF &to)
 {
-    Q_UNUSED(from);
+    Q_UNUSED(from)
     if (gp->location() == shared::ui::GripPoint::Top) {
         m_topMove = mapFromScene(to);
     }
@@ -184,7 +137,14 @@ void CoregionItem::onManualResizeFinish(shared::ui::GripPoint *gp, const QPointF
     m_topMove = QPointF();
     m_bottomMove = QPointF();
 
+    instantLayoutUpdate();
+    updateCif();
     Q_EMIT moved(this);
+}
+
+cif::CifLine::CifType CoregionItem::mainCifType() const
+{
+    return cif::CifLine::CifType::Concurrent;
 }
 
 void CoregionItem::setInstance(InstanceItem *instance)
@@ -194,6 +154,50 @@ void CoregionItem::setInstance(InstanceItem *instance)
     }
 
     m_instance = instance;
+}
+
+void CoregionItem::applyCif()
+{
+    if (const cif::CifBlockShared &cifBlock = cifBlockByType(mainCifType())) {
+        const QVector<QPoint> &cifPoints = cifBlock->payload().value<QVector<QPoint>>();
+        if (cifPoints.size() == 2) {
+            bool converted(false);
+            const QVector<QPointF> &scenePoints = CoordinatesConverter::cifToScene(cifPoints, &converted);
+
+            // All we care about is the vertical geometry - the rest is handled automatically
+            setY(scenePoints.at(0).y());
+            QRectF rect = boundingRect();
+            rect.setTop(0.);
+            rect.setHeight(scenePoints.at(1).y());
+            setBoundingRect(rect);
+        }
+    }
+}
+
+void CoregionItem::updateCif()
+{
+    if (!geometryManagedByCif()) {
+        cif::CifBlockShared emptyCif = cif::CifBlockFactory::createBlockConcurrent();
+        emptyCif->addLine(cif::CifLineShared(new cif::CifLineConcurrent()));
+        m_entity->addCif(emptyCif);
+    }
+
+    const QRectF currentBBox = sceneBoundingRect();
+    QRect bBoxCif;
+    if (!CoordinatesConverter::sceneToCif(currentBBox, bBoxCif)) {
+        qWarning() << Q_FUNC_INFO << "Can't convert bounding box coordinates to CIF";
+        return;
+    }
+
+    cif::CifBlockShared cifBlock = cifBlockByType(mainCifType());
+    Q_ASSERT(cifBlock != nullptr);
+
+    const QVector<QPoint> &storedCif = cifBlock->payload().value<QVector<QPoint>>();
+    const QVector<QPoint> newCif { bBoxCif.topLeft(), QPoint(bBoxCif.width(), bBoxCif.height()) };
+    if (cifChangedEnough(storedCif, newCif)) {
+        cifBlock->setPayload(QVariant::fromValue(newCif), mainCifType());
+        Q_EMIT cifChanged();
+    }
 }
 
 } // namespace msc

@@ -85,7 +85,6 @@ struct InterfaceDocument::InterfaceDocumentPrivate {
     ivm::AADLModel *importModel { nullptr };
     AADLObjectsTreeView *sharedView { nullptr };
     ivm::AADLModel *sharedModel { nullptr };
-    QHash<shared::Id, QString> componentMappings;
 
     QAction *actCreateConnectionGroup { nullptr };
     QAction *actRemove { nullptr };
@@ -375,13 +374,7 @@ bool InterfaceDocument::loadComponentModel(ivm::AADLModel *model, const QString 
     }
 
     ivm::AADLXMLReader parser;
-    connect(&parser, &ivm::AADLXMLReader::objectsParsed, model,
-            [this, model, path](const QVector<ivm::AADLObject *> objects) {
-                for (const ivm::AADLObject *obj : objects) {
-                    d->componentMappings.insert(obj->id(), path);
-                }
-                model->addObjects(objects);
-            });
+    connect(&parser, &ivm::AADLXMLReader::objectsParsed, model, &ivm::AADLModel::addObjects);
     connect(&parser, &ivm::AADLXMLReader::error, [](const QString &msg) { qWarning() << msg; });
 
     return parser.readFile(path);
@@ -635,27 +628,31 @@ void InterfaceDocument::onSavedExternally(const QString &filePath, bool saved)
  */
 void InterfaceDocument::setObjects(const QVector<ivm::AADLObject *> &objects)
 {
-    if (d->objectsModel->initFromObjects(objects)) {
-        d->objectsModel->setRootObject({});
-    }
+    d->objectsModel->initFromObjects(objects);
+    d->objectsModel->setRootObject({});
 }
 
-void InterfaceDocument::onItemClicked(shared::Id id)
+void InterfaceDocument::onItemClicked(const shared::Id &id)
 {
     Q_UNUSED(id)
 }
 
-void InterfaceDocument::onItemDoubleClicked(shared::Id id)
+void InterfaceDocument::onItemDoubleClicked(const shared::Id &id)
 {
     if (id.isNull()) {
         return;
     }
 
-    if (auto entity = d->objectsModel->getObject(id)) {
-        if (entity->aadlType() != ivm::AADLObject::Type::Connection) {
-            showPropertyEditor(entity);
-        }
+    showPropertyEditor(id);
+}
+
+void InterfaceDocument::onItemCreated(const shared::Id &id)
+{
+    if (id.isNull()) {
+        return;
     }
+
+    showPropertyEditor(id);
 }
 
 void InterfaceDocument::onAttributesManagerRequested()
@@ -690,12 +687,18 @@ void InterfaceDocument::onDynContextEditorMenuInvoked()
     }
 }
 
-void InterfaceDocument::showPropertyEditor(ivm::AADLObject *obj)
+void InterfaceDocument::showPropertyEditor(const shared::Id &id)
 {
     Q_ASSERT(d->asnModelStorage);
     Q_ASSERT(d->commandsStack);
     Q_ASSERT(d->graphicsView);
-    if (!obj || obj->aadlType() == ivm::AADLObject::Type::InterfaceGroup) {
+    if (id.isNull()) {
+        return;
+    }
+
+    ivm::AADLObject *obj = d->objectsModel->getObject(id);
+    if (!obj || obj->aadlType() == ivm::AADLObject::Type::InterfaceGroup
+            || obj->aadlType() == ivm::AADLObject::Type::Connection) {
         return;
     }
 
@@ -707,23 +710,6 @@ void InterfaceDocument::showPropertyEditor(ivm::AADLObject *obj)
 void InterfaceDocument::showInfoMessage(const QString &title, const QString &message)
 {
     QMessageBox::information(qobject_cast<QWidget *>(parent()), title, message);
-}
-
-QString InterfaceDocument::componentNameForObject(ivm::AADLObject *object) const
-{
-    if (!object) {
-        return {};
-    }
-
-    while (auto parentFunction = object->parentObject()) {
-        if (parentFunction->aadlType() == ivm::AADLObject::Type::Function
-                || parentFunction->aadlType() == ivm::AADLObject::Type::FunctionType) {
-            object = parentFunction;
-        }
-    }
-
-    const QString componentPath = d->componentMappings.value(object->id());
-    return QFileInfo(componentPath).dir().dirName();
 }
 
 void InterfaceDocument::importEntity(const shared::Id &id, const QPointF &sceneDropPoint)
@@ -759,30 +745,9 @@ void InterfaceDocument::importEntity(const shared::Id &id, const QPointF &sceneD
     }
     buffer.close();
 
-    const QFileInfo ivPath(path());
-    const QString subPath = QStringLiteral("work/%1").arg(obj->title()).toLower();
-    const QDir targetExportDir { ivPath.absolutePath() + QDir::separator() + subPath };
-    targetExportDir.mkpath(QLatin1String("."));
-    QDir sourceExportDir { componentsLibraryPath() + componentNameForObject(obj) + QDir::separator() + subPath };
-    sourceExportDir.setFilter(QDir::NoDotAndDotDot | QDir::Dirs | QDir::Files);
-    QDirIterator it { sourceExportDir, QDirIterator::Subdirectories };
-    while (it.hasNext()) {
-        const QString filePath = it.next();
-        const QFileInfo fileInfo = it.fileInfo();
-        const QString relPath = sourceExportDir.relativeFilePath(fileInfo.absoluteFilePath());
-        if (fileInfo.isDir()) {
-            targetExportDir.mkpath(relPath);
-        } else {
-            const bool result = QFile::copy(fileInfo.absoluteFilePath(), targetExportDir.absoluteFilePath(relPath));
-            if (!result) {
-                qWarning() << "Error during source file copying:" << filePath
-                           << targetExportDir.absoluteFilePath(relPath);
-            }
-        }
-    }
-
     ivm::AADLFunctionType *parentObject = gi::functionObject(itemAtScenePos);
-    auto cmdImport = new cmd::CmdEntitiesImport(buffer.data(), parentObject, d->objectsModel, sceneDropPoint);
+    auto cmdImport = new cmd::CmdEntitiesImport(
+            buffer.data(), parentObject, d->objectsModel, sceneDropPoint, QFileInfo(path()).absolutePath());
     d->commandsStack->push(cmdImport);
 }
 
@@ -838,7 +803,8 @@ void InterfaceDocument::pasteItems(const QPointF &sceneDropPoint)
         itemAtScenePos = itemAtScenePos->parentItem();
     }
     ivm::AADLFunctionType *parentObject = gi::functionObject(itemAtScenePos);
-    auto cmdImport = new cmd::CmdEntitiesImport(data, parentObject, d->objectsModel, sceneDropPoint);
+    auto cmdImport = new cmd::CmdEntitiesImport(
+            data, parentObject, d->objectsModel, sceneDropPoint, QFileInfo(path()).absolutePath());
     d->commandsStack->push(cmdImport);
 }
 
@@ -927,24 +893,11 @@ bool InterfaceDocument::exportImpl(const QString &targetDir, const QList<ivm::AA
 
     const QFileInfo ivPath(path());
     for (ivm::AADLObject *object : objects) {
-        const QString subPath = QStringLiteral("work/%1").arg(object->title()).toLower();
-        const QDir targetExportDir { targetDir + QDir::separator() + subPath };
-        targetExportDir.mkpath(QLatin1String("."));
-        QDir sourceExportDir { ivPath.absolutePath() + QDir::separator() + subPath };
-        sourceExportDir.setFilter(QDir::NoDotAndDotDot | QDir::Dirs | QDir::Files);
-        QDirIterator it { sourceExportDir, QDirIterator::Subdirectories };
-        while (it.hasNext()) {
-            const QString filePath = it.next();
-            const QFileInfo fileInfo = it.fileInfo();
-            const QString relPath = sourceExportDir.relativeFilePath(fileInfo.absoluteFilePath());
-            if (fileInfo.isDir()) {
-                targetExportDir.mkpath(relPath);
-            } else {
-                const bool result = QFile::copy(fileInfo.absoluteFilePath(), targetExportDir.absoluteFilePath(relPath));
-                if (!result) {
-                    qWarning() << "Error during source file copying:" << filePath;
-                }
-            }
+        if (object->aadlType() == ivm::AADLObject::Type::Function) {
+            const QString subPath = QStringLiteral("work/%1").arg(object->title()).toLower();
+            const QString targetExportDir { componentsLibraryPath() + QDir::separator() + subPath };
+            const QString sourceExportDir { ivPath.absolutePath() + QDir::separator() + subPath };
+            shared::copyDir(sourceExportDir, targetExportDir);
         }
     }
 
@@ -984,7 +937,8 @@ QVector<QAction *> InterfaceDocument::initActions()
             currentAction->setChecked(false);
         d->tool->setCurrentToolType(CreatorTool::ToolType::Pointer);
     });
-    connect(d->tool, &CreatorTool::propertyEditorRequest, this, &InterfaceDocument::showPropertyEditor);
+    connect(d->tool, &CreatorTool::propertyEditorRequest, this, &InterfaceDocument::showPropertyEditor,
+            Qt::QueuedConnection);
     connect(d->tool, &CreatorTool::informUser, this, &InterfaceDocument::showInfoMessage);
     connect(d->tool, &CreatorTool::copyActionTriggered, this, &InterfaceDocument::copyItems);
     connect(d->tool, &CreatorTool::cutActionTriggered, this, &InterfaceDocument::cutItems);
@@ -1091,12 +1045,16 @@ QVector<QAction *> InterfaceDocument::initActions()
         actCreateRequiredInterface, actCreateComment, actCreateConnection, d->actCreateConnectionGroup, d->actRemove,
         d->actZoomIn, d->actZoomOut, d->actExitToRoot, d->actExitToParent };
 
-    connect(d->objectsModel, &ivm::AADLModel::rootObjectChanged, this, [this]() {
+    connect(d->objectsModel, &ivm::AADLModel::rootObjectChanged, this, [this](const shared::Id &rootId) {
         if (d->actExitToRoot) {
             d->actExitToRoot->setEnabled(nullptr != d->objectsModel->rootObject());
         }
         if (d->actExitToParent) {
             d->actExitToParent->setEnabled(nullptr != d->objectsModel->rootObject());
+        }
+
+        if (const QGraphicsItem *item = d->itemsModel->getItem(rootId)) {
+            d->graphicsView->centerOn(item->sceneBoundingRect().center());
         }
     });
     connect(d->objectsSelectionModel, &QItemSelectionModel::selectionChanged, this,
