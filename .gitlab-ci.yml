@@ -29,18 +29,18 @@ space-creator:
     - ./scripts/generate_documentation.sh
     # debian package
     # install qtcreator sources
-    - PWD=$(pwd)
+    - export PWD=$(pwd)
     - export ENV_QTC_VERSION_SHORT=4.8
     - export ENV_QTC_VERSION=4.8.2
     - export DOWNLOAD_DIR=/opt/qt-creator-dev
     - export QTC_BUILD_DIR=${DOWNLOAD_DIR}/build-debug
     - mkdir -p "${DOWNLOAD_DIR}"
     - cd "${DOWNLOAD_DIR}"
-    - QTC_SOURCE_FILE=qt-creator-opensource-src-${ENV_QTC_VERSION}.tar.gz
+    - export QTC_SOURCE_FILE=qt-creator-opensource-src-${ENV_QTC_VERSION}.tar.gz
     - curl -L "http://download.qt-project.org/official_releases/qtcreator/${ENV_QTC_VERSION_SHORT}/${ENV_QTC_VERSION}/qt-creator-opensource-src-${ENV_QTC_VERSION}.tar.gz" -o ${QTC_SOURCE_FILE} -s
     - tar xzf qt-creator-opensource-src-${ENV_QTC_VERSION}.tar.gz || exit 1
     - mv qt-creator-opensource-src-${ENV_QTC_VERSION} qt-creator
-    - cd "$PWD"
+    - cd $PWD
     # build the plugin
     - cd build
     - cmake -GNinja .. -DBUILD_PATCH_NUMBER=$CI_BUILD_ID -DENABLE_TESTS=OFF
