@@ -44,12 +44,13 @@ const static QString kUserAttrsResourceConfigPath = QLatin1String(":/defaults/re
 /*!
    Adds all attributes from \p attrs that are not already in \a storage to that data
  */
-void collectUniqeAttributes(
-        const QHash<QString, PropertyTemplate *> &attrs, QHash<PropertyTemplate *, PropertyTemplate *> &storage)
+void collectUniqeAttributes(const QList<PropertyTemplate *> &attrs, QList<PropertyTemplate *> &storage)
 {
     for (auto attr : attrs) {
-        if (!storage.contains(attr)) {
-            storage.insert(attr, attr);
+        auto it = std::find_if(storage.constBegin(), storage.constEnd(),
+                [name = attr->name()](PropertyTemplate *propTemplate) { return propTemplate->name() == name; });
+        if (storage.constEnd() == it) {
+            storage.append(attr);
         }
     }
 };
@@ -57,7 +58,7 @@ void collectUniqeAttributes(
 struct PropertyTemplateConfig::PropertyTemplateConfigPrivate {
     void init(const QList<PropertyTemplate *> &attrs)
     {
-        QHash<PropertyTemplate *, PropertyTemplate *> uniqeAttrs;
+        QList<PropertyTemplate *> uniqeAttrs;
         collectUniqeAttributes(m_function, uniqeAttrs);
         collectUniqeAttributes(m_reqIface, uniqeAttrs);
         collectUniqeAttributes(m_provIface, uniqeAttrs);
@@ -72,20 +73,20 @@ struct PropertyTemplateConfig::PropertyTemplateConfigPrivate {
                 continue;
 
             if (attr->scope().testFlag(PropertyTemplate::Scope::Function))
-                m_function.insert(attr->name(), attr);
+                m_function.append(attr);
 
             if (attr->scope().testFlag(PropertyTemplate::Scope::Required_Interface))
-                m_reqIface.insert(attr->name(), attr);
+                m_reqIface.append(attr);
 
             if (attr->scope().testFlag(PropertyTemplate::Scope::Provided_Interface))
-                m_provIface.insert(attr->name(), attr);
+                m_provIface.append(attr);
         }
     }
 
     QString m_configPath;
-    QHash<QString, PropertyTemplate *> m_function;
-    QHash<QString, PropertyTemplate *> m_reqIface;
-    QHash<QString, PropertyTemplate *> m_provIface;
+    QList<PropertyTemplate *> m_function;
+    QList<PropertyTemplate *> m_reqIface;
+    QList<PropertyTemplate *> m_provIface;
 };
 
 PropertyTemplateConfig::PropertyTemplateConfig()
@@ -125,7 +126,7 @@ PropertyTemplateConfig *PropertyTemplateConfig::instance()
     return m_instance;
 }
 
-PropertyTemplateConfig::~PropertyTemplateConfig() {}
+PropertyTemplateConfig::~PropertyTemplateConfig() { }
 
 void PropertyTemplateConfig::init(const QString &configPath)
 {
@@ -162,6 +163,21 @@ void PropertyTemplateConfig::init(const QString &configPath)
     d->init(attributes);
 }
 
+bool PropertyTemplateConfig::hasPropertyTemplateForObject(const AADLObject *obj, const QString &name) const
+{
+    return propertyTemplateForObject(obj, name) != nullptr;
+}
+
+PropertyTemplate *PropertyTemplateConfig::propertyTemplateForObject(const AADLObject *obj, const QString &name) const
+{
+    const QList<PropertyTemplate *> templates = propertyTemplatesForObject(obj);
+    auto it = std::find_if(templates.constBegin(), templates.constEnd(), [name](PropertyTemplate *propTemplate) {
+        return propTemplate->name() == name;
+        ;
+    });
+    return it == templates.constEnd() ? nullptr : *it;
+}
+
 QList<PropertyTemplate *> PropertyTemplateConfig::parseAttributesList(
         const QString &fromData, QString *errorMsg, int *errorLine, int *errorColumn)
 {
@@ -183,7 +199,7 @@ QList<PropertyTemplate *> PropertyTemplateConfig::parseAttributesList(
     return attrs;
 }
 
-QHash<QString, PropertyTemplate *> PropertyTemplateConfig::propertyTemplatesForObject(const ivm::AADLObject *obj)
+QList<PropertyTemplate *> PropertyTemplateConfig::propertyTemplatesForObject(const ivm::AADLObject *obj) const
 {
     switch (obj->aadlType()) {
     case ivm::AADLObject::Type::FunctionType:
@@ -198,19 +214,19 @@ QHash<QString, PropertyTemplate *> PropertyTemplateConfig::propertyTemplatesForO
     }
 }
 
-QList<PropertyTemplate *> PropertyTemplateConfig::attributesForFunction()
+QList<PropertyTemplate *> PropertyTemplateConfig::attributesForFunction() const
 {
-    return d->m_function.values();
+    return d->m_function;
 }
 
-QList<PropertyTemplate *> PropertyTemplateConfig::attributesForRequiredInterface()
+QList<PropertyTemplate *> PropertyTemplateConfig::attributesForRequiredInterface() const
 {
-    return d->m_reqIface.values();
+    return d->m_reqIface;
 }
 
-QList<PropertyTemplate *> PropertyTemplateConfig::attributesForProvidedInterface()
+QList<PropertyTemplate *> PropertyTemplateConfig::attributesForProvidedInterface() const
 {
-    return d->m_provIface.values();
+    return d->m_provIface;
 }
 
 QString PropertyTemplateConfig::configPath() const
