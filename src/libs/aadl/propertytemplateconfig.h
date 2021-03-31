@@ -32,10 +32,12 @@ public:
 
     void init(const QString &configPath);
 
-    QHash<QString, PropertyTemplate *> propertyTemplatesForObject(const ivm::AADLObject *obj);
-    QList<PropertyTemplate *> attributesForFunction();
-    QList<PropertyTemplate *> attributesForRequiredInterface();
-    QList<PropertyTemplate *> attributesForProvidedInterface();
+    bool hasPropertyTemplateForObject(const ivm::AADLObject *obj, const QString &name) const;
+    PropertyTemplate *propertyTemplateForObject(const ivm::AADLObject *obj, const QString &name) const;
+    QList<PropertyTemplate *> propertyTemplatesForObject(const ivm::AADLObject *obj) const;
+    QList<PropertyTemplate *> attributesForFunction() const;
+    QList<PropertyTemplate *> attributesForRequiredInterface() const;
+    QList<PropertyTemplate *> attributesForProvidedInterface() const;
 
     QString configPath() const;
 

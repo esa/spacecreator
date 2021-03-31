@@ -137,13 +137,13 @@ void tst_AttributesConfigure::tst_systemAttrs()
     if (it != sysAttrs.cend()) {
         QVERIFY(int((*it)->scope())
                 == int(ivm::PropertyTemplate::Scope::Provided_Interface
-                           | ivm::PropertyTemplate::Scope::Required_Interface));
+                        | ivm::PropertyTemplate::Scope::Required_Interface));
         QVERIFY((*it)->type() == ivm::PropertyTemplate::Type::Enumeration);
         QVERIFY((*it)->info() == ivm::PropertyTemplate::Info::Attribute);
 
         const QMetaEnum &me = QMetaEnum::fromType<ivm::AADLIface::OperationKind>();
         for (int i = 0; i < me.keyCount(); ++i) {
-            QVERIFY((*it)->value().toList().contains(qVariantFromValue(QString::fromLatin1(me.key(i)))));
+            QVERIFY((*it)->value().toList().contains(QVariant::fromValue(QString::fromLatin1(me.key(i)))));
         }
     }
 

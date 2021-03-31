@@ -61,18 +61,14 @@ PropertiesListModel::PropertiesListModel(
 {
 }
 
-PropertiesListModel::~PropertiesListModel() {}
+PropertiesListModel::~PropertiesListModel() { }
 
-void PropertiesListModel::updateRow(int row, const QString &label, const QString &name,
-        ivm::PropertyTemplate::Info info, const QVariant &value, const QVariant &editValue, const QVariant &defaulValue)
+void PropertiesListModel::updateRow(const RowData &data)
 {
-    Q_UNUSED(defaulValue);
-
-    const QString title = label.isEmpty() ? name : label;
-
+    int row = data.row;
     if (row == -1 || row >= rowCount()) {
         row = rowCount();
-        createNewRow(row, name);
+        createNewRow(row, data.name);
     }
 
     QStandardItem *titleItem = item(row, ColumnTitle);
@@ -80,17 +76,31 @@ void PropertiesListModel::updateRow(int row, const QString &label, const QString
     if (!titleItem) {
         return;
     }
-    titleItem->setData(title, Qt::DisplayRole);
-    titleItem->setData(name, PropertyNameRole);
+    titleItem->setData(data.label, Qt::DisplayRole);
+    titleItem->setData(data.name, PropertyNameRole);
 
     QStandardItem *valueItem = item(row, ColumnValue);
     Q_ASSERT(valueItem);
     if (!valueItem) {
         return;
     }
-    valueItem->setData(value, Qt::DisplayRole);
-    valueItem->setData(editValue.isNull() ? value : editValue, PropertyDataRole);
-    valueItem->setData(static_cast<int>(info), PropertyInfoRole);
+    valueItem->setData(data.value, Qt::DisplayRole);
+    valueItem->setData(data.editValue.isNull() ? data.value : data.editValue, PropertyDataRole);
+    valueItem->setData(static_cast<int>(data.info), PropertyInfoRole);
+}
+
+QStringList PropertiesListModel::sortedKeys(const QList<ivm::PropertyTemplate *> &templates) const
+{
+    QStringList templateKeys;
+    for (ivm::PropertyTemplate *propTemplate : templates) {
+        templateKeys.append(propTemplate->name());
+    }
+    QStringList keys { m_dataObject->attrs().keys() << m_dataObject->props().keys() };
+    std::sort(keys.begin(), keys.end(),
+            [](const QString &s1, const QString &s2) { return s1.compare(s2, Qt::CaseInsensitive) < 0; });
+    templateKeys << keys;
+    templateKeys.removeDuplicates();
+    return templateKeys;
 }
 
 void PropertiesListModel::createNewRow(int row, const QString &name)
@@ -118,52 +128,44 @@ void PropertiesListModel::invalidateAttributes(const QString &propName)
     setDataObject(m_dataObject);
 }
 
-void PropertiesListModel::updateRows(const QHash<QString, ivm::PropertyTemplate *> &templates)
+void PropertiesListModel::updateRows(const QList<ivm::PropertyTemplate *> &templates)
 {
-    auto initRows = [this](const QHash<QString, QVariant> &vals, ivm::PropertyTemplate::Info info,
-                            const QHash<QString, ivm::PropertyTemplate *> &templates) {
-        QList<QString> keys(vals.keys());
-        std::sort(keys.begin(), keys.end());
-        for (int i = 0; i < keys.size(); ++i) {
-            const QString key = keys.at(i);
-            const ivm::PropertyTemplate *propertyPtr = templates.value(key);
-            if (propertyPtr && (!propertyPtr->isVisible() || !propertyPtr->validate(m_dataObject)))
+    auto init = [this](const QStringList &keys) {
+        int row = -1;
+        for (const QString &key : keys) {
+            ivm::PropertyTemplate *propTemplate = m_propTemplatesConfig->propertyTemplateForObject(m_dataObject, key);
+            if (propTemplate && (!propTemplate->isVisible() || !propTemplate->validate(m_dataObject)))
                 continue;
 
-            const QVariant propTemplatesValue = propertyPtr ? propertyPtr->value() : QVariant();
+            RowData rd;
+            rd.row = ++row;
+            rd.name = key;
             const ivm::PropertyTemplate::Type type =
-                    propertyPtr ? propertyPtr->type() : ivm::PropertyTemplate::Type::String;
-            const QString title = propertyPtr ? propertyPtr->label() : key;
+                    propTemplate ? propTemplate->type() : ivm::PropertyTemplate::Type::String;
+            if (propTemplate) {
+                rd.label = propTemplate->label().isEmpty() ? key : propTemplate->label();
+                rd.editValue = ivm::PropertyTemplate::convertData(propTemplate->value(), type);
+            } else {
+                rd.label = key;
+                rd.editValue = QVariant(QVariant::String);
+            }
 
-            const int row = m_names.indexOf(key);
-            updateRow(row, title, key, info, vals[key],
-                    propertyPtr ? ivm::PropertyTemplate::convertData(propTemplatesValue, type)
-                                : QVariant(QVariant::String),
-                    propertyPtr ? propertyPtr->defaultValue() : QVariant(QVariant::String));
+            if (m_dataObject->hasAttribute(key)) {
+                rd.value = m_dataObject->attr(key);
+                rd.info = ivm::PropertyTemplate::Info::Attribute;
+            } else if (m_dataObject->hasProperty(key)) {
+                rd.value = m_dataObject->prop(key);
+                rd.info = ivm::PropertyTemplate::Info::Property;
+            } else if (propTemplate) {
+                rd.info = propTemplate->info();
+                if (propTemplate->value().isValid())
+                    rd.value = propTemplate->value();
+            }
+            updateRow(rd);
         }
     };
 
-    initRows(m_dataObject->attrs(), ivm::PropertyTemplate::Info::Attribute, templates);
-    initRows(m_dataObject->props(), ivm::PropertyTemplate::Info::Property, templates);
-
-    for (ivm::PropertyTemplate *propertyPtr : templates) {
-        if (propertyPtr && !m_names.contains(propertyPtr->name()) && propertyPtr->isVisible()
-                && propertyPtr->validate(m_dataObject)) {
-            const QString key = propertyPtr->name();
-            QVariant value;
-            if (propertyPtr->type() == ivm::PropertyTemplate::Type::Unknown) {
-                continue;
-            } else if (propertyPtr->type() == ivm::PropertyTemplate::Type::Enumeration) {
-                value = propertyPtr->value();
-            } else {
-                value = propertyPtr->info() == ivm::PropertyTemplate::Info::Property ? m_dataObject->prop(key)
-                                                                                     : m_dataObject->attr(key);
-            }
-            updateRow(rowCount(), propertyPtr->label(), key, propertyPtr->info(), value,
-                    ivm::PropertyTemplate::convertData(propertyPtr->value(), propertyPtr->type()),
-                    propertyPtr->defaultValue());
-        }
-    }
+    init(sortedKeys(templates));
 }
 
 void PropertiesListModel::setDataObject(ivm::AADLObject *obj)
@@ -188,9 +190,7 @@ void PropertiesListModel::setDataObject(ivm::AADLObject *obj)
     connect(m_dataObject, qOverload<const QString &>(&ivm::AADLObject::attributeChanged), this,
             &PropertiesListModel::invalidateAttributes, Qt::UniqueConnection);
 
-    const auto templates = m_propTemplatesConfig->propertyTemplatesForObject(m_dataObject);
-
-    updateRows(templates);
+    updateRows(m_propTemplatesConfig->propertyTemplatesForObject(m_dataObject));
 }
 
 const ivm::AADLObject *PropertiesListModel::dataObject() const
@@ -209,6 +209,21 @@ int PropertiesListModel::rowCount(const QModelIndex &parent) const
 int PropertiesListModel::columnCount(const QModelIndex &) const
 {
     return 2;
+}
+
+QVariant PropertiesListModel::headerData(int section, Qt::Orientation orientation, int role) const
+{
+    if (role == Qt::DisplayRole && orientation == Qt::Horizontal) {
+        switch (section) {
+        case ColumnTitle:
+            return tr("Name");
+        case ColumnValue:
+            return tr("Value");
+        default:
+            break;
+        }
+    }
+    return QVariant();
 }
 
 QVariant PropertiesListModel::data(const QModelIndex &index, int role) const
@@ -258,8 +273,8 @@ bool PropertiesListModel::setData(const QModelIndex &index, const QVariant &valu
     if (role == Qt::EditRole) {
         const QString &name = this->index(index.row(), ColumnTitle).data(PropertyNameRole).toString();
         auto isValueValid = [this](const QString &name, const QString &value) {
-            const auto templates = m_propTemplatesConfig->propertyTemplatesForObject(m_dataObject);
-            if (ivm::PropertyTemplate *propTemplate = templates.value(name)) {
+            if (ivm::PropertyTemplate *propTemplate =
+                            m_propTemplatesConfig->propertyTemplateForObject(m_dataObject, name)) {
                 const QString valuePattern = propTemplate->valueValidatorPattern();
                 if (!valuePattern.isEmpty()) {
                     const QRegularExpression rx(valuePattern);
@@ -388,8 +403,7 @@ bool PropertiesListModel::isEditable(const QModelIndex &idx) const
 {
     if (idx.column() == ColumnTitle) {
         const QString propName = m_names.value(idx.row());
-        const auto templates = m_propTemplatesConfig->propertyTemplatesForObject(m_dataObject);
-        if (templates.contains(propName)) {
+        if (m_propTemplatesConfig->hasPropertyTemplateForObject(m_dataObject, propName)) {
             return false;
         }
         return index(idx.row(), ColumnValue).data().isNull();

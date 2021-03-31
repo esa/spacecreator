@@ -65,6 +65,8 @@ public:
     bool isAttr(const QModelIndex &id) const override;
     bool isProp(const QModelIndex &id) const override;
 
+    QVariant headerData(int section, Qt::Orientation orientation, int role) const override;
+
 protected:
     cmd::CommandsStack::Macro *m_cmdMacro { nullptr };
     ivm::PropertyTemplateConfig *m_propTemplatesConfig { nullptr };
@@ -73,12 +75,23 @@ protected:
 
     virtual bool isEditable(const QModelIndex &idx) const;
     void createNewRow(int row, const QString &name);
-    void updateRow(int row, const QString &label, const QString &name, ivm::PropertyTemplate::Info info,
-            const QVariant &value, const QVariant &editValue, const QVariant &defaulValue);
-
-    void updateRows(const QHash<QString, ivm::PropertyTemplate *> &templates);
+    void updateRows(const QList<ivm::PropertyTemplate *> &templates);
 
     void invalidateAttributes(const QString &attrName);
+
+private:
+    struct RowData {
+        int row { -1 };
+        ivm::PropertyTemplate::Info info;
+        QString label;
+        QString name;
+        QVariant value;
+        QVariant editValue;
+    };
+
+private:
+    void updateRow(const RowData &data);
+    QStringList sortedKeys(const QList<ivm::PropertyTemplate *> &templates) const;
 };
 
 class FunctionPropertiesListModel : public PropertiesListModel
