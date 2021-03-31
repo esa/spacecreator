@@ -40,7 +40,7 @@ space-creator:
     - curl -L "http://download.qt-project.org/official_releases/qtcreator/${ENV_QTC_VERSION_SHORT}/${ENV_QTC_VERSION}/qt-creator-opensource-src-${ENV_QTC_VERSION}.tar.gz" -o ${QTC_SOURCE_FILE} -s
     - tar xzf qt-creator-opensource-src-${ENV_QTC_VERSION}.tar.gz || exit 1
     - mv qt-creator-opensource-src-${ENV_QTC_VERSION} qt-creator
-    - cd $PWD
+    - cd -
     # build the plugin
     - cd build
     - cmake -GNinja .. -DBUILD_PATCH_NUMBER=$CI_BUILD_ID -DENABLE_TESTS=OFF
