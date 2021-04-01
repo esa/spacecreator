@@ -238,16 +238,16 @@ void InstanceHeadItem::mouseReleaseEvent(QGraphicsSceneMouseEvent *event)
 
 void InstanceHeadItem::mouseDoubleClickEvent(QGraphicsSceneMouseEvent *event)
 {
-    auto activateTextEdit = [this](TextItem *textItem, const QPointF &scenePos) {
-        if (textItem->contains(textItem->mapFromScene(scenePos))) {
-            textItem->enableEditMode();
-            showCompleter();
-            return true;
-        }
-        return false;
-    };
+    // Check for click in for the name
+    if (m_textItemName->contains(m_textItemName->mapFromScene(event->scenePos()))) {
+        m_textItemName->enableEditMode();
+        showCompleter();
+        m_manualMovementFrom = m_manualMovementTo = QPointF();
+    }
 
-    if (activateTextEdit(m_textItemKind, event->scenePos()) || activateTextEdit(m_textItemName, event->scenePos())) {
+    // Check for click in for the kind
+    if (m_rectItem->contains(m_rectItem->mapFromScene(event->scenePos()))) {
+        m_textItemKind->enableEditMode();
         m_manualMovementFrom = m_manualMovementTo = QPointF();
     }
 }
