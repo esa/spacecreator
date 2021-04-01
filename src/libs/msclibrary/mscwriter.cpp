@@ -199,11 +199,9 @@ QString MscWriter::serialize(
             break;
         case MscEntity::EntityType::Condition: {
             auto condition = static_cast<MscCondition *>(instanceEvent);
-
-            if (condition->instance() == instance) {
+            if (condition->relatesTo(instance)) {
                 events += serialize(condition, tabsSize);
             }
-
             break;
         }
         default:

@@ -19,6 +19,8 @@
 
 #include "cif/cifblockfactory.h"
 #include "cif/ciflines.h"
+#include "mscchart.h"
+#include "mscinstanceevent.h"
 
 #include <QDebug>
 #include <QStringList>
@@ -220,6 +222,19 @@ QVector<QPoint> MscInstance::cifGeometry() const
     }
 
     return QVector<QPoint>();
+}
+
+/*!
+   If being part of a MscChart, it returnes all events belonging to this instance
+ */
+QVector<MscInstanceEvent *> MscInstance::events() const
+{
+    auto chart = qobject_cast<MscChart *>(parent());
+    if (chart) {
+        return chart->eventsForInstance(this);
+    }
+
+    return {};
 }
 
 } // namespace msc

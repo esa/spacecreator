@@ -19,6 +19,8 @@
 
 #include "mscentity.h"
 
+#include <QVector>
+
 namespace msc {
 
 class MscInstance;
@@ -37,3 +39,4 @@ public:
 }
 
 Q_DECLARE_METATYPE(msc::MscInstanceEvent *)
+Q_DECLARE_METATYPE(QVector<msc::MscInstanceEvent *>)

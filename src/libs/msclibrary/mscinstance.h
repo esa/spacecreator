@@ -18,11 +18,14 @@
 #pragma once
 
 #include "mscentity.h"
+#include "mscinstanceevent.h"
 
 #include <QPoint>
 #include <QVector>
 
 namespace msc {
+
+class MscInstanceEvent;
 
 class MscInstance : public MscEntity
 {
@@ -35,6 +38,7 @@ class MscInstance : public MscEntity
     Q_PROPERTY(msc::MscInstance *explicitCreator READ explicitCreator WRITE setExplicitCreator NOTIFY
                     explicitCreatorChanged)
     Q_PROPERTY(bool explicitStop READ explicitStop WRITE setExplicitStop NOTIFY explicitStopChanged)
+    Q_PROPERTY(QVector<MscInstanceEvent *> events READ events NOTIFY eventsChanged)
 
 public:
     explicit MscInstance(QObject *parent = nullptr);
@@ -65,6 +69,8 @@ public:
     void setCifGeometry(const QVector<QPoint> &cifGeometry);
     QVector<QPoint> cifGeometry() const;
 
+    QVector<MscInstanceEvent *> events() const;
+
 Q_SIGNALS:
     void denominatorChanged(const QString &denominator);
     void kindChanged(const QString &kind);
@@ -72,6 +78,7 @@ Q_SIGNALS:
     void inheritanceChanged(const QString &inheritance);
     void explicitCreatorChanged(msc::MscInstance *creator);
     void explicitStopChanged(bool value);
+    void eventsChanged();
     void cifGeometryChanged();
 
 private:

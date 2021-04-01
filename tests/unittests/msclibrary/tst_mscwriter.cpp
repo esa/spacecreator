@@ -484,6 +484,8 @@ void tst_MscWriter::testSerializeMscConditions_data()
     chart = new MscChart("Chart_1");
     instance = new MscInstance("Inst_1");
     chart->addInstance(instance);
+    instance2 = new MscInstance("Inst_2");
+    chart->addInstance(instance2);
     condition = new MscCondition("Con_1");
     condition->setShared(true);
     condition->setInstance(instance);
@@ -491,6 +493,9 @@ void tst_MscWriter::testSerializeMscConditions_data()
     model->addChart(chart);
     result = QString("msc Chart_1;\n"
                      "    instance Inst_1;\n"
+                     "        condition Con_1 shared all;\n"
+                     "    endinstance;\n"
+                     "    instance Inst_2;\n"
                      "        condition Con_1 shared all;\n"
                      "    endinstance;\n"
                      "endmsc;\n");
