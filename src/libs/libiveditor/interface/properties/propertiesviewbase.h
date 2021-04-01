@@ -49,12 +49,42 @@ protected Q_SLOTS:
 
 protected:
     PropertiesModelBase *m_model { nullptr };
+    QList<int> m_delegatesColumns;
     bool m_buttonsVisible { true };
 
+protected:
     bool setButtonsDisabled();
+    void rowsInserted(const QModelIndex &parent, int first, int last);
 
 private:
     Ui::PropertiesViewBase *ui { nullptr };
+};
+
+class AttributesView : public PropertiesViewBase
+{
+    Q_OBJECT
+
+public:
+    explicit AttributesView(QWidget *widget = nullptr);
+    ~AttributesView() override = default;
+};
+
+class ContextParametersView : public PropertiesViewBase
+{
+    Q_OBJECT
+
+public:
+    explicit ContextParametersView(QWidget *widget = nullptr);
+    ~ContextParametersView() override = default;
+};
+
+class IfaceParametersView : public PropertiesViewBase
+{
+    Q_OBJECT
+
+public:
+    explicit IfaceParametersView(QWidget *widget = nullptr);
+    ~IfaceParametersView() override = default;
 };
 
 }

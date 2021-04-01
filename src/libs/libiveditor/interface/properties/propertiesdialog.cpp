@@ -149,7 +149,7 @@ void PropertiesDialog::initConnectionGroup()
 
 void PropertiesDialog::initAttributesView()
 {
-    auto viewAttrs = new PropertiesViewBase(this);
+    auto viewAttrs = new AttributesView(this);
     PropertiesListModel *modelAttrs { nullptr };
     QStyledItemDelegate *attrDelegate { nullptr };
 
@@ -172,8 +172,8 @@ void PropertiesDialog::initAttributesView()
     }
 
     modelAttrs->setDataObject(m_dataObject);
-    viewAttrs->setModel(modelAttrs);
     viewAttrs->tableView()->setItemDelegateForColumn(PropertiesListModel::ColumnValue, attrDelegate);
+    viewAttrs->setModel(modelAttrs);
 
     ui->tabWidget->insertTab(0, viewAttrs, tr("Attributes"));
 }
@@ -184,7 +184,7 @@ void PropertiesDialog::initContextParams()
     modelCtxParams->setDataTypes(m_dataTypes);
     modelCtxParams->setDataObject(m_dataObject);
 
-    PropertiesViewBase *viewAttrs = new PropertiesViewBase(this);
+    PropertiesViewBase *viewAttrs = new ContextParametersView(this);
     viewAttrs->tableView()->setItemDelegateForColumn(
             ContextParametersModel::ColumnType, new ContextParametersTypeDelegate(m_dataTypes, viewAttrs->tableView()));
     viewAttrs->tableView()->setItemDelegateForColumn(
@@ -199,7 +199,7 @@ void PropertiesDialog::initIfaceParams()
     IfaceParametersModel *modelIfaceParams = new IfaceParametersModel(m_cmdMacro, this);
     modelIfaceParams->setDataObject(m_dataObject);
 
-    PropertiesViewBase *viewAttrs = new PropertiesViewBase(this);
+    PropertiesViewBase *viewAttrs = new IfaceParametersView(this);
     viewAttrs->tableView()->setItemDelegateForColumn(
             IfaceParametersModel::ColumnType, new IfaceParametersTypeDelegate(m_dataTypes, viewAttrs->tableView()));
     viewAttrs->tableView()->setItemDelegateForColumn(IfaceParametersModel::ColumnEncoding,

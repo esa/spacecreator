@@ -72,6 +72,7 @@ static QWidget *createConfiguredEditor(
     }
     case QVariant::Bool: {
         auto editor = new QCheckBox(parent);
+        editor->setFocusPolicy(Qt::StrongFocus);
         editor->setChecked(QString::compare(displayValue.toString(), QLatin1String("YES"), Qt::CaseInsensitive)
                 || QString::compare(displayValue.toString(), QLatin1String("true"), Qt::CaseInsensitive));
         return editor;
@@ -94,9 +95,13 @@ QWidget *AttributeDelegate::createEditor(
     if (index.column() == PropertiesListModel::ColumnValue) {
         if (const auto pModel = qobject_cast<const QStandardItemModel *>(index.model())) {
             if (QStandardItem *item = pModel->itemFromIndex(index)) {
-                QModelIndex attrIdx = index.siblingAtColumn(PropertiesListModel::ColumnTitle);
-                return createConfiguredEditor(item->data(Qt::EditRole),
+                const QModelIndex attrIdx = index.siblingAtColumn(PropertiesListModel::ColumnTitle);
+                QWidget *editor = createConfiguredEditor(item->data(Qt::EditRole),
                         item->data(PropertiesListModel::PropertyDataRole), parent, attrIdx.data().toString());
+                if (editor) {
+                    editor->setEnabled(index.flags().testFlag(Qt::ItemIsEnabled));
+                }
+                return editor;
             }
         }
     }

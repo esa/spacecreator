@@ -19,6 +19,8 @@
 
 #include "aadlfunction.h"
 #include "aadliface.h"
+#include "contextparametersmodel.h"
+#include "ifaceparametersmodel.h"
 #include "propertieslistmodel.h"
 #include "ui_propertiesviewbase.h"
 
@@ -49,20 +51,28 @@ void PropertiesViewBase::setModel(PropertiesModelBase *model)
     if (model == m_model)
         return;
 
-    if (tableView()->selectionModel())
+    if (tableView()->selectionModel()) {
         disconnect(tableView()->selectionModel(), &QItemSelectionModel::currentRowChanged, this,
                 &PropertiesViewBase::onCurrentRowChanged);
+    }
+    if (m_model) {
+        disconnect(m_model, &QStandardItemModel::rowsInserted, this, &PropertiesViewBase::rowsInserted);
+    }
 
     m_model = model;
     tableView()->setModel(m_model);
-    if (m_model->rowCount())
-        tableView()->resizeColumnsToContents();
+    connect(m_model, &QStandardItemModel::rowsInserted, this, &PropertiesViewBase::rowsInserted, Qt::QueuedConnection);
 
-    if (tableView()->selectionModel())
+    if (m_model->rowCount()) {
+        tableView()->resizeColumnsToContents();
+    }
+
+    if (tableView()->selectionModel()) {
         connect(tableView()->selectionModel(), &QItemSelectionModel::currentRowChanged, this,
                 &PropertiesViewBase::onCurrentRowChanged);
-
+    }
     setButtonsDisabled();
+    rowsInserted(QModelIndex(), 0, m_model->rowCount() - 1);
 }
 
 QTableView *PropertiesViewBase::tableView() const
@@ -107,6 +117,18 @@ void PropertiesViewBase::on_btnDel_clicked()
     }
 }
 
+void PropertiesViewBase::rowsInserted(const QModelIndex &parent, int first, int last)
+{
+    for (int idx = first; idx <= last; ++idx) {
+        for (const int column : m_delegatesColumns) {
+            const QModelIndex index = m_model->index(idx, column, parent);
+            if (index.isValid()) {
+                tableView()->openPersistentEditor(index);
+            }
+        }
+    }
+}
+
 bool PropertiesViewBase::setButtonsDisabled()
 {
     if (!m_model)
@@ -146,4 +168,23 @@ bool PropertiesViewBase::setButtonsDisabled()
     return disabled;
 }
 
+ContextParametersView::ContextParametersView(QWidget *widget)
+    : PropertiesViewBase(widget)
+{
+    m_delegatesColumns = { ContextParametersModel::ColumnType, ContextParametersModel::ColumnValue };
 }
+
+IfaceParametersView::IfaceParametersView(QWidget *widget)
+    : PropertiesViewBase(widget)
+{
+    m_delegatesColumns = { IfaceParametersModel::ColumnType, IfaceParametersModel::ColumnEncoding,
+        IfaceParametersModel::ColumnDirection };
+}
+
+AttributesView::AttributesView(QWidget *widget)
+    : PropertiesViewBase(widget)
+{
+    m_delegatesColumns = { PropertiesListModel::ColumnValue };
+}
+
+} // namespace ive

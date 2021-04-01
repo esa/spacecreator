@@ -61,7 +61,7 @@ PropertiesListModel::PropertiesListModel(
 {
 }
 
-PropertiesListModel::~PropertiesListModel() { }
+PropertiesListModel::~PropertiesListModel() {}
 
 void PropertiesListModel::updateRow(const RowData &data)
 {
@@ -245,12 +245,15 @@ QVariant PropertiesListModel::data(const QModelIndex &index, int role) const
     }
     case Qt::DisplayRole:
     case Qt::EditRole: {
+        if (index.column() == ColumnValue && role == Qt::DisplayRole)
+            return {};
+
         const QString &title = m_names.at(index.row());
         if (index.column() == ColumnTitle)
             return role == Qt::EditRole ? title : res;
 
         if (isAttr(index)) {
-            QVariant value = m_dataObject->attr(title);
+            const QVariant value = m_dataObject->attr(title);
             if (title == ivm::meta::Props::token(ivm::meta::Props::Token::name)) {
                 return QVariant::fromValue(
                         ivm::AADLNameValidator::decodeName(m_dataObject->aadlType(), value.toString()));
