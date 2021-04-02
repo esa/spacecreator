@@ -116,6 +116,21 @@ void MscChart::addInstance(MscInstance *instance, int index)
         m_instances.insert(index, instance);
     }
     connect(instance, &MscInstance::dataChanged, this, &MscChart::dataChanged);
+
+    if (!m_events.contains(instance)) {
+        m_events[instance] = {};
+    }
+    for (MscInstanceEvent *ev : qAsConst(m_instanceEvents)) {
+        if (relatedInstances(ev).contains(instance)) {
+            if (m_events[instance].contains(ev)) {
+                qFatal("Instance add failed - event already there!");
+            }
+            m_events[instance].append(ev);
+        }
+    }
+
+    eventsCheck();
+
     Q_EMIT instanceAdded(instance, m_instances.indexOf(instance));
     Q_EMIT instancesChanged();
     Q_EMIT dataChanged();
@@ -138,6 +153,9 @@ void MscChart::removeInstance(MscInstance *instance)
         if (instance->parent() == this) {
             instance->setParent(nullptr);
         }
+
+        m_events.remove(instance);
+
         Q_EMIT instanceRemoved(instance);
         Q_EMIT instancesChanged();
         Q_EMIT dataChanged();
@@ -168,55 +186,16 @@ QVector<MscInstanceEvent *> MscChart::eventsForInstance(const MscInstance *insta
 
     QVector<MscInstanceEvent *> events;
     for (MscInstanceEvent *instanceEvent : instanceEvents()) {
-        switch (instanceEvent->entityType()) {
-        case MscEntity::EntityType::Document:
-        case MscEntity::EntityType::Chart:
-        case MscEntity::EntityType::Instance:
-            continue;
-        case MscEntity::EntityType::Create: // A synthetic MscMessage is used instead
-        case MscEntity::EntityType::Message: {
-            auto message = static_cast<MscMessage *>(instanceEvent);
-            if (message->relatesTo(instance))
+        if (auto event = qobject_cast<MscInstanceEvent *>(instanceEvent)) {
+            if (event->relatesTo(instance)) {
                 events.append(instanceEvent);
-            break;
+            }
         }
-        case MscEntity::EntityType::Condition: {
-            auto condition = static_cast<MscCondition *>(instanceEvent);
-            if (condition->relatesTo(instance))
-                events.append(instanceEvent);
-            break;
-        }
-        case MscEntity::EntityType::Gate: {
-            auto gate = static_cast<MscGate *>(instanceEvent);
-            if (gate->instance() == instance)
-                events.append(instanceEvent);
-            break;
-        }
-        case MscEntity::EntityType::Action: {
-            auto action = static_cast<MscAction *>(instanceEvent);
-            if (action->relatesTo(instance))
-                events.append(instanceEvent);
-            break;
-        }
-        case MscEntity::EntityType::Timer: {
-            auto timer = static_cast<MscTimer *>(instanceEvent);
-            if (timer->relatesTo(instance))
-                events.append(instanceEvent);
-            break;
-        }
-        case MscEntity::EntityType::Coregion: {
-            auto coregion = static_cast<MscCoregion *>(instanceEvent);
-            if (coregion->relatesTo(instance))
-                events.append(instanceEvent);
-            break;
-        }
-        case MscEntity::EntityType::Comment:
-            break;
-        default: {
-            qWarning() << Q_FUNC_INFO << "ignored type:" << instanceEvent->entityType();
-            break;
-        }
-        }
+    }
+
+    if (events != m_events.value(instance)) {
+        qWarning() << "Missmatch in events per instance! :(";
+        qFatal("Missmatch in events");
     }
 
     return events;
@@ -269,6 +248,44 @@ int MscChart::addInstanceEvent(MscInstanceEvent *instanceEvent, int eventIndex)
         resetTimerRelations(timer);
     }
 
+    QVector<MscInstance *> instances = relatedInstances(instanceEvent);
+    for (MscInstance *inst : qAsConst(instances)) {
+        if (!m_events.contains(inst)) {
+            continue;
+        }
+        // Create messages havte to be the first one for instances created
+        if (instanceEvent->entityType() == msc::MscEntity::EntityType::Create) {
+            if (MscMessage *message = static_cast<MscMessage *>(instanceEvent)) {
+                if (inst == message->targetInstance()) {
+                    if (m_events[inst].contains(instanceEvent)) {
+                        qFatal("event add failed - event already there! A");
+                    }
+                    m_events[inst].prepend(instanceEvent);
+                    break;
+                }
+            }
+        }
+
+        // normal insert
+        QVector<MscInstanceEvent *> &events = m_events[inst];
+        int idx = 0;
+        while (events.size() > idx && m_instanceEvents.indexOf(events[idx]) < eventIndex) {
+            ++idx;
+        }
+        if (events.contains(instanceEvent)) {
+            qFatal("event add failed - event already there! B");
+        }
+        events.insert(idx, instanceEvent);
+    }
+    connect(instanceEvent, &msc::MscInstanceEvent::instanceRelationChanged, this,
+            [this](MscInstance *addedInstance, MscInstance *removedInstance) {
+                if (auto ev = qobject_cast<MscInstanceEvent *>(sender())) {
+                    msc::MscChart::eventInstanceChange(ev, addedInstance, removedInstance);
+                }
+            });
+
+    eventsCheck();
+
     Q_EMIT instanceEventAdded(instanceEvent);
     Q_EMIT instanceEventsChanged();
     Q_EMIT dataChanged();
@@ -285,6 +302,11 @@ void MscChart::removeInstanceEvent(MscInstanceEvent *instanceEvent)
     if (instanceEvent == nullptr) {
         return;
     }
+
+    for (QVector<MscInstanceEvent *> &events : m_events) {
+        events.removeOne(instanceEvent);
+    }
+
     if (!m_instanceEvents.contains(instanceEvent)) {
         return;
     }
@@ -301,6 +323,10 @@ void MscChart::removeInstanceEvent(MscInstanceEvent *instanceEvent)
             instanceEvent->setParent(nullptr);
         }
         disconnect(instanceEvent, nullptr, this, nullptr);
+
+        for (QVector<MscInstanceEvent *> evPerInstance : qAsConst(m_events)) {
+            evPerInstance.removeOne(instanceEvent);
+        }
 
         Q_EMIT instanceEventRemoved(instanceEvent);
         Q_EMIT instanceEventsChanged();
@@ -512,13 +538,43 @@ void MscChart::updateTimerPos(MscTimer *timer, MscInstance *newInstance, int eve
  */
 bool MscChart::moveEvent(MscInstanceEvent *event, int newIndex)
 {
-    const int currentPos = m_instanceEvents.indexOf(event);
-    if (newIndex != currentPos && currentPos >= 0 && newIndex >= 0 && newIndex < m_instanceEvents.size()) {
-        m_instanceEvents.removeAt(currentPos);
-        m_instanceEvents.insert(newIndex, event);
-        return true;
+    if (event == nullptr || newIndex < 0 || newIndex >= m_instanceEvents.size()) {
+        return false;
     }
-    return false;
+
+    const int currentPos = m_instanceEvents.indexOf(event);
+    if (newIndex == currentPos || currentPos < 0) {
+        return false;
+    }
+
+    m_instanceEvents.removeAt(currentPos);
+
+    // Move in list per instance
+    for (MscInstance *instance : relatedInstances(event)) {
+        Q_ASSERT(m_events.contains(instance));
+        int newIdx = 0;
+        m_events[instance].removeOne(event);
+        bool inserted = false;
+        for (MscInstanceEvent *ev : m_events[instance]) {
+            const int otherIdx = m_instanceEvents.indexOf(ev);
+            if (otherIdx >= newIndex) {
+                m_events[instance].insert(newIdx, event);
+                inserted = true;
+                break;
+            }
+            newIdx++;
+        }
+        if (!inserted) {
+            m_events[instance].append(event);
+        }
+    }
+
+    // Move in global list
+    m_instanceEvents.insert(newIndex, event);
+
+    eventsCheck();
+
+    return true;
 }
 
 /*!
@@ -683,10 +739,94 @@ void MscChart::updateFollowingTimer(MscTimer *timer, int idx)
     timer->setFollowingTimer(nullptr);
 }
 
+/*!
+   \brief msc::MscChart::eventInstanceChange
+   \param event
+   \param addedInstance
+   \param removedInstance
+ */
+void msc::MscChart::eventInstanceChange(
+        msc::MscInstanceEvent *event, msc::MscInstance *addedInstance, msc::MscInstance *removedInstance)
+{
+    if (removedInstance) {
+        if (m_events.contains(removedInstance)) {
+            m_events[removedInstance].removeOne(event);
+        }
+    }
+
+    if (addedInstance) {
+        m_events[addedInstance].append(event);
+    }
+}
+
 cif::CifBlockShared MscChart::cifMscDoc() const
 {
     return parentDocument() ? parentDocument()->cifBlockByType(cif::CifLine::CifType::MscDocument)
                             : cif::CifBlockShared();
+}
+
+QVector<MscInstance *> MscChart::relatedInstances(MscInstanceEvent *event) const
+{
+    QVector<MscInstance *> result;
+    switch (event->entityType()) {
+    case MscEntity::EntityType::Action: {
+        auto action = static_cast<MscAction *>(event);
+        if (action->instance()) {
+            result.append(action->instance());
+        }
+        break;
+    }
+    case MscEntity::EntityType::Condition: {
+        auto condition = static_cast<MscCondition *>(event);
+        if (condition->shared()) {
+            return m_instances;
+        } else {
+            if (condition->instance()) {
+                result.append(condition->instance());
+            }
+        }
+        break;
+    }
+    case MscEntity::EntityType::Coregion: {
+        auto coregion = static_cast<MscCoregion *>(event);
+        if (coregion->instance()) {
+            result.append(coregion->instance());
+        }
+        break;
+    }
+    case MscEntity::EntityType::Create:
+    case MscEntity::EntityType::Message: {
+        auto message = static_cast<MscMessage *>(event);
+        if (message->sourceInstance()) {
+            result.append(message->sourceInstance());
+        }
+        if (message->targetInstance()) {
+            result.append(message->targetInstance());
+        }
+        break;
+    }
+    case MscEntity::EntityType::Timer: {
+        auto timer = static_cast<MscTimer *>(event);
+        if (timer->instance()) {
+            result.append(timer->instance());
+        }
+        break;
+    }
+    default:
+        break;
+    }
+
+    return result;
+}
+
+bool MscChart::eventsCheck() const
+{
+    for (MscInstance *inst : m_instances) {
+        if (m_events[inst] != eventsForInstance(inst)) {
+            return false;
+        }
+    }
+    return true;
 }
 
 QRect MscChart::cifRect() const

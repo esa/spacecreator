@@ -20,6 +20,7 @@
 #include "mscentity.h"
 #include "mscmessage.h"
 
+#include <QHash>
 #include <QObject>
 #include <QRect>
 #include <QString>
@@ -114,6 +115,9 @@ Q_SIGNALS:
     void globalCommentTextChanged(const QString &text, const QString &hash);
     void globalCommentRectChanged(const QRect rect, const QString &hash);
 
+private Q_SLOTS:
+    void eventInstanceChange(MscInstanceEvent *event, MscInstance *addedInstance, MscInstance *removedInstance);
+
 private:
     /*!
        Return a QVector with all events in this chart of the given type
@@ -129,11 +133,14 @@ private:
         return events;
     }
 
+    cif::CifBlockShared cifMscDoc() const;
+    QVector<MscInstance *> relatedInstances(MscInstanceEvent *event) const;
+    bool eventsCheck() const;
+
     QVector<MscInstance *> m_instances;
     QVector<MscInstanceEvent *> m_instanceEvents;
+    QHash<const MscInstance *, QVector<MscInstanceEvent *>> m_events;
     QVector<MscGate *> m_gates;
-
-    cif::CifBlockShared cifMscDoc() const;
 };
 
 }

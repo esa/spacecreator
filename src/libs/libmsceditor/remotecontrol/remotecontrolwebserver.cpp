@@ -159,9 +159,6 @@ void RemoteControlWebServer::onNewConnection()
 void RemoteControlWebServer::processTextMessage(const QString &message)
 {
     QWebSocket *pClient = qobject_cast<QWebSocket *>(sender());
-#ifdef QT_DEBUG
-    qDebug() << "Message received:" << message << pClient;
-#endif
     QJsonParseError error;
     const QJsonDocument doc = QJsonDocument::fromJson(message.toUtf8(), &error);
     if (QJsonParseError::NoError != error.error) {

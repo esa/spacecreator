@@ -106,6 +106,8 @@ private Q_SLOTS:
         QCOMPARE(m_textMessageReceived.count(), 1);
         QJsonObject resultObj = takeFirstResultMessage();
         QVERIFY(resultObj.value(QLatin1String("result")).toBool());
+        waitForLayoutUpdate();
+        QCOMPARE(m_model->chartViewModel().instanceItems().size(), 1);
 
         /// Testing creating second instance with the same name,
         /// command should fail
@@ -114,19 +116,22 @@ private Q_SLOTS:
         QCOMPARE(m_textMessageReceived.count(), 1);
         resultObj = takeFirstResultMessage();
         QVERIFY(!resultObj.value(QLatin1String("result")).toBool());
+        waitForLayoutUpdate();
+        QCOMPARE(m_model->chartViewModel().instanceItems().size(), 1);
 
         /// Testing creating second instance with the another name,
         params[QLatin1String("name")] = QLatin1String("B");
         obj[QLatin1String("Parameters")] = params;
         json = QJsonDocument(obj).toJson();
         m_socket->sendTextMessage(json);
-
         QVERIFY(m_textMessageReceived.wait(1000));
         QCOMPARE(m_textMessageReceived.count(), 1);
         resultObj = takeFirstResultMessage();
         QVERIFY(resultObj.value(QLatin1String("result")).toBool());
+        waitForLayoutUpdate();
+        QCOMPARE(m_model->chartViewModel().instanceItems().size(), 2);
 
-        /// Testing creating third instance at pos 1 - pushing instance B to the right
+        /// Testing creating third instance at pos 1 - pushing instance B to the right - result (A C B)
         params[QLatin1String("name")] = QLatin1String("C");
         params[QLatin1String("kind")] = QLatin1String("instaaa");
         const QVector<msc::InstanceItem *> &instanceItems = m_model->chartViewModel().instanceItems();
@@ -141,6 +146,8 @@ private Q_SLOTS:
         QCOMPARE(m_textMessageReceived.count(), 1);
         resultObj = takeFirstResultMessage();
         QVERIFY(resultObj.value(QLatin1String("result")).toBool());
+        waitForLayoutUpdate();
+        QCOMPARE(m_model->chartViewModel().instanceItems().size(), 3);
 
         msc::MscChart *chart = m_model->mscModel()->documents().at(0)->documents().at(0)->charts().at(0);
         msc::MscInstance *instanceC = chart->instances().at(1);
@@ -534,6 +541,17 @@ private:
         chart->addInstance(instanceA);
         auto instanceB = new msc::MscInstance("B");
         chart->addInstance(instanceB);
+    }
+
+    void waitForLayoutUpdate()
+    {
+        QApplication::processEvents();
+        int count = 0;
+        while (m_model->chartViewModel().layoutUpdatePending() && count < 200) {
+            QTest::qWait(1);
+            QApplication::processEvents();
+            ++count;
+        }
     }
 
     msc::RemoteControlWebServer *m_server = nullptr;

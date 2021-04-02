@@ -35,6 +35,9 @@ public:
     ~MscInstanceEvent() override;
 
     virtual bool relatesTo(const MscInstance *instance) const = 0;
+
+Q_SIGNALS:
+    void instanceRelationChanged(MscInstance *addedInstance, MscInstance *removedInstance);
 };
 }
 

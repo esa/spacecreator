@@ -71,8 +71,10 @@ void MscTimer::setInstance(MscInstance *instance)
         return;
     }
 
+    MscInstance *oldInstance = m_instance;
     m_instance = instance;
     Q_EMIT instanceChanged();
+    Q_EMIT instanceRelationChanged(m_instance, oldInstance);
     Q_EMIT dataChanged();
 }
 

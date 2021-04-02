@@ -187,6 +187,7 @@ bool RemoteControlHandler::handleInstanceCommand(const QVariantMap &params, QStr
     m_model->undoStack()->push(new msc::cmd::CmdInstanceItemCreate(mscInstance, instanceIdx, chartViewModel()));
 
     if (pos >= 0) {
+        m_model->chartViewModel().doLayout(); // makes sure to have cif geometry
         QVector<QPoint> geometryCif = mscInstance->cifGeometry();
         if (!geometryCif.isEmpty()) {
             QPoint posCif = msc::CoordinatesConverter::sceneToCif(QPointF(pos, 10.));

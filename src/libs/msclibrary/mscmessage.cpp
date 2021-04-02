@@ -87,12 +87,14 @@ MscInstance *MscMessage::sourceInstance() const
 
 void MscMessage::setSourceInstance(MscInstance *source)
 {
-    if (source == m_source) {
+    if (source == m_source || source == m_target) {
         return;
     }
 
+    MscInstance *oldInstance = m_source;
     m_source = source;
     Q_EMIT sourceChanged(m_source);
+    Q_EMIT instanceRelationChanged(m_source, oldInstance);
     Q_EMIT dataChanged();
 }
 
@@ -103,12 +105,14 @@ MscInstance *MscMessage::targetInstance() const
 
 void MscMessage::setTargetInstance(MscInstance *target)
 {
-    if (target == m_target) {
+    if (target == m_target || target == m_source) {
         return;
     }
 
+    MscInstance *oldInstance = m_target;
     m_target = target;
     Q_EMIT targetChanged(m_target);
+    Q_EMIT instanceRelationChanged(m_target, oldInstance);
     Q_EMIT dataChanged();
 }
 

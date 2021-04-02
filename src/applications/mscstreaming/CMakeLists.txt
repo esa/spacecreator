@@ -3,7 +3,7 @@ project(${APP_NAME})
 
 add_executable(${APP_NAME})
 
-target_sources(${APP_NAME} PUBLIC
+target_sources(${APP_NAME} PRIVATE
     main.cpp
     streamingwindow.cpp
     streamingwindow.h
