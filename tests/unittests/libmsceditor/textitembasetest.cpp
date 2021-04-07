@@ -48,8 +48,13 @@ void TextItemBaseTest::initImpl()
 
     // This could be useful during local development,
     // but fails the test in CI environment:
-    if (isLocalBuild)
+    if (isLocalBuild) {
         m_view->show();
+    } else {
+        QApplication::processEvents();
+        QTest::qWait(1);
+        QApplication::processEvents();
+    }
 }
 
 void TextItemBaseTest::cleanupImpl()

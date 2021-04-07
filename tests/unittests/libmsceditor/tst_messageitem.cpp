@@ -83,6 +83,8 @@ void tst_MessageItem::enterText(const QString &text)
     if (!m_view)
         return;
 
+    waitForLayoutUpdate();
+
     QTest::mouseMove(m_view->viewport());
     QTest::mouseDClick(m_view->viewport(), Qt::LeftButton);
     QTest::keyClicks(m_view->viewport(), text);
