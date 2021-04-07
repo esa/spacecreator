@@ -173,7 +173,7 @@ MscInstance *MscChart::instanceByName(const QString &name) const
     return nullptr;
 }
 
-const QVector<MscInstanceEvent *> &MscChart::instanceEvents() const
+QVector<MscInstanceEvent *> MscChart::instanceEvents() const
 {
     return m_instanceEvents;
 }

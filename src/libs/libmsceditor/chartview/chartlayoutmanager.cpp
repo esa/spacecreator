@@ -476,7 +476,7 @@ void ChartLayoutManager::addInstanceEventItems()
     }
 
     InteractiveObject *instanceEventItem(nullptr);
-    const QVector<MscInstanceEvent *> &chartEvents = d->m_currentChart->instanceEvents();
+    const QVector<MscInstanceEvent *> chartEvents = d->m_currentChart->instanceEvents();
     auto it = chartEvents.begin();
     if (isStreamingModeEnabled()) {
         for (; it != chartEvents.end(); ++it) {
@@ -1219,7 +1219,7 @@ QVector<InteractiveObject *> ChartLayoutManager::instanceEventItems(MscInstance 
 
     QVector<InteractiveObject *> res;
 
-    const QVector<MscInstanceEvent *> &events = currentChart()->eventsForInstance(instance);
+    const QVector<MscInstanceEvent *> events = currentChart()->eventsForInstance(instance);
     for (MscInstanceEvent *event : events) {
         switch (event->entityType()) {
         case MscEntity::EntityType::Create:
@@ -1566,7 +1566,7 @@ CoregionItem *ChartLayoutManager::addCoregionItem(MscCoregion *coregion)
             return static_cast<MscCoregion *>(event)->type() == MscCoregion::Type::Begin;
         };
 
-        const QVector<MscInstanceEvent *> &events = currentChart()->instanceEvents();
+        const QVector<MscInstanceEvent *> events = currentChart()->instanceEvents();
         auto it = std::find(events.rbegin(), events.rend(), coregion);
         auto res = std::find_if(it, events.rend(), isCoregionBegin);
         if (res == events.rend())
@@ -2020,7 +2020,7 @@ QVector<MscInstanceEvent *> ChartLayoutManager::visibleEvents() const
         return {};
     }
 
-    const QVector<MscInstanceEvent *> &allEvents = d->m_currentChart->instanceEvents();
+    const QVector<MscInstanceEvent *> allEvents = d->m_currentChart->instanceEvents();
 
     if (d->m_visibleItemLimit <= 0 || allEvents.size() <= d->m_visibleItemLimit) {
         return d->m_currentChart->instanceEvents();
@@ -2028,7 +2028,7 @@ QVector<MscInstanceEvent *> ChartLayoutManager::visibleEvents() const
 
     QVector<MscInstanceEvent *> lastEvents;
     lastEvents.reserve(allEvents.size());
-    auto it = d->m_currentChart->instanceEvents().begin();
+    auto it = allEvents.begin();
     it += allEvents.size() - d->m_visibleItemLimit;
     for (; it < allEvents.end(); ++it) {
         lastEvents.push_back(*it);
