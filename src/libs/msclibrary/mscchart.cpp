@@ -29,6 +29,7 @@
 
 #include <QDebug>
 #include <QVector>
+#include <set>
 
 namespace msc {
 
@@ -175,7 +176,7 @@ MscInstance *MscChart::instanceByName(const QString &name) const
 
 QVector<MscInstanceEvent *> MscChart::instanceEvents() const
 {
-    return m_instanceEvents;
+    return allEvents();
 }
 
 QVector<MscInstanceEvent *> MscChart::eventsForInstance(const MscInstance *instance) const
@@ -183,6 +184,8 @@ QVector<MscInstanceEvent *> MscChart::eventsForInstance(const MscInstance *insta
     if (!instance) {
         return {};
     }
+
+    Q_ASSERT(m_events.contains(instance));
 
     QVector<MscInstanceEvent *> events;
     for (MscInstanceEvent *instanceEvent : instanceEvents()) {
@@ -198,7 +201,7 @@ QVector<MscInstanceEvent *> MscChart::eventsForInstance(const MscInstance *insta
         qFatal("Missmatch in events");
     }
 
-    return events;
+    return m_events.value(instance);
 }
 
 /*!
@@ -277,6 +280,9 @@ int MscChart::addInstanceEvent(MscInstanceEvent *instanceEvent, int eventIndex)
         }
         events.insert(idx, instanceEvent);
     }
+    if (instances.isEmpty()) {
+        m_orphanEvents.append(instanceEvent);
+    }
     connect(instanceEvent, &msc::MscInstanceEvent::instanceRelationChanged, this,
             [this](MscInstance *addedInstance, MscInstance *removedInstance) {
                 if (auto ev = qobject_cast<MscInstanceEvent *>(sender())) {
@@ -306,6 +312,7 @@ void MscChart::removeInstanceEvent(MscInstanceEvent *instanceEvent)
     for (QVector<MscInstanceEvent *> &events : m_events) {
         events.removeOne(instanceEvent);
     }
+    m_orphanEvents.removeAll(instanceEvent);
 
     if (!m_instanceEvents.contains(instanceEvent)) {
         return;
@@ -372,6 +379,14 @@ MscInstanceEvent *MscChart::firstEventOfInstance(MscInstance *instance) const
     }
 
     return nullptr;
+}
+
+/*!
+   Returns the total number of events in this chart
+ */
+int MscChart::totalEventNumber() const
+{
+    return allEvents().size();
 }
 
 /*!
@@ -827,6 +842,72 @@ bool MscChart::eventsCheck() const
         }
     }
     return true;
+}
+
+// Used for function MscChart::allEvents()
+void addTopUntil(MscInstance *instance, MscInstanceEvent *untilEvent, QVector<MscInstance *> instances,
+        const QHash<const MscInstance *, QVector<MscInstanceEvent *>> &events, QVector<MscInstanceEvent *> &result,
+        MscInstanceEvent *noRecurEvent)
+{
+    if (!events.contains(instance)) {
+        return;
+    }
+
+    for (MscInstanceEvent *event : events[instance]) {
+        if (!result.contains(event)) {
+            // check depending on type if other stacks need to be added before
+            if (event->entityType() == MscEntity::EntityType::Message) {
+                auto message = static_cast<MscMessage *>(event);
+                if (message->sourceInstance() != nullptr && message->sourceInstance() != instance
+                        && event != noRecurEvent) {
+                    addTopUntil(message->sourceInstance(), event, instances, events, result, event);
+                }
+                if (message->targetInstance() != nullptr && message->targetInstance() != instance
+                        && event != noRecurEvent) {
+                    addTopUntil(message->targetInstance(), event, instances, events, result, event);
+                }
+            }
+            if (event->entityType() == MscEntity::EntityType::Condition) {
+                auto condition = static_cast<MscCondition *>(event);
+                if (condition->shared() && event != noRecurEvent) {
+                    for (MscInstance *inst : qAsConst(instances)) {
+                        addTopUntil(inst, event, instances, events, result, event);
+                    }
+                }
+            }
+            if (event->entityType() == MscEntity::EntityType::Create) {
+                auto create = static_cast<MscMessage *>(event);
+                if (create->targetInstance() != nullptr && create->targetInstance() == instance) {
+                    addTopUntil(create->targetInstance(), event, instances, events, result, event);
+                }
+            }
+
+            if (!result.contains(event)) {
+                result.append(event);
+            }
+            if (event == untilEvent) {
+                return;
+            }
+        }
+    }
+};
+
+/*!
+   Creates a sorted list of events from the event list per instance
+ */
+QVector<MscInstanceEvent *> MscChart::allEvents() const
+{
+    if (m_instances.isEmpty()) {
+        return m_orphanEvents;
+    }
+
+    QVector<MscInstanceEvent *> result;
+    for (MscInstance *instance : m_instances) {
+        addTopUntil(instance, nullptr, m_instances, m_events, result, nullptr);
+    }
+    result.append(m_orphanEvents);
+
+    return result;
 }
 
 QRect MscChart::cifRect() const

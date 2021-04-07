@@ -47,7 +47,7 @@ void ActionCreatorTool::createPreviewItem()
     }
 
     auto orphanAction = new MscAction(this);
-    orphanAction->setInformalAction(tr("Action_%1").arg(m_model->currentChart()->instanceEvents().size()));
+    orphanAction->setInformalAction(tr("Action_%1").arg(m_model->currentChart()->totalEventNumber()));
     auto actionItem = new ActionItem(orphanAction, m_model);
 
     m_previewItem = actionItem;

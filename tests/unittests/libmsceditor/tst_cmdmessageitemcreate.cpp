@@ -21,11 +21,13 @@
 #include "messageitem.h"
 #include "mscchart.h"
 #include "msccommandsstack.h"
+#include "mscinstance.h"
 #include "mscmessage.h"
 #include "sharedlibrary.h"
 
 #include <QAction>
 #include <QGraphicsScene>
+#include <QPointer>
 #include <QVariant>
 #include <QVariantList>
 #include <QVector>
@@ -53,6 +55,7 @@ private:
     static constexpr bool SkipBenchmark = true; // not a really usefull thing to be run on the CI server
     msc::MscChart *m_chart = nullptr;
     QScopedPointer<msc::MscCommandsStack> m_undoStack;
+    QPointer<MscInstance> m_instance;
 
     static const QVariant m_dummyCif;
 
@@ -72,6 +75,9 @@ void tst_CmdMessageItemCreate::initTestCase()
     m_chartModel.reset(new msc::ChartLayoutManager(m_undoStack.data()));
     m_chartModel->setCurrentChart(m_chart);
     m_undoStack->setUndoLimit(CommandsCount);
+
+    m_instance = new MscInstance("Tower");
+    m_chart->addInstance(m_instance);
 }
 
 void tst_CmdMessageItemCreate::cleanupTestCase()
@@ -82,7 +88,8 @@ void tst_CmdMessageItemCreate::cleanupTestCase()
 void tst_CmdMessageItemCreate::testCreate()
 {
     for (int i = 0; i < CommandsCount; ++i) {
-        auto cmd = new msc::cmd::CmdMessageItemCreate(nullptr, -1, m_chartModel.data());
+        auto message = new MscMessage(QString("M%").arg(i), m_instance, nullptr, nullptr);
+        auto cmd = new msc::cmd::CmdMessageItemCreate(message, -1, m_chartModel.data());
         m_undoStack->push(cmd);
     }
 
@@ -156,7 +163,7 @@ void tst_CmdMessageItemCreate::testPerformance()
 
 int tst_CmdMessageItemCreate::itemsCount()
 {
-    return m_chart->instanceEvents().size();
+    return m_chart->totalEventNumber();
 }
 
 void tst_CmdMessageItemCreate::testInsertingOrder()
@@ -171,11 +178,12 @@ void tst_CmdMessageItemCreate::testInsertingOrder()
     QCOMPARE(itemsCount(), 0);
 
     for (const QString &name : names) {
-        auto cmd = new msc::cmd::CmdMessageItemCreate(new msc::MscMessage(name), 0, m_chartModel.data());
+        auto cmd = new msc::cmd::CmdMessageItemCreate(
+                new msc::MscMessage(name, m_instance, nullptr, nullptr), 0, m_chartModel.data());
         m_undoStack->push(cmd);
     }
 
-    QCOMPARE(m_chart->instanceEvents().size(), names.size());
+    QCOMPARE(m_chart->totalEventNumber(), names.size());
 
     int i = names.size() - 1;
     for (msc::MscInstanceEvent *event : m_chart->instanceEvents())

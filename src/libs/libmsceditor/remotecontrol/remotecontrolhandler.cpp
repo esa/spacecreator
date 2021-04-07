@@ -260,7 +260,7 @@ bool RemoteControlHandler::handleMessageCommand(const QVariantMap &params, QStri
     const msc::MscMessage::MessageType messageType = static_cast<msc::MscMessage::MessageType>(msgTypeInt);
 
     const int pos = params.value(QLatin1String("pos"), -1).toInt();
-    const int messageIdx = mscChart->instanceEvents().size();
+    const int messageIdx = mscChart->totalEventNumber();
     const QString name = params.value(QLatin1String("name"),
                                        messageType == msc::MscMessage::MessageType::Message
                                                ? QStringLiteral("Message_%1").arg(messageIdx)
@@ -311,7 +311,7 @@ bool RemoteControlHandler::handleTimerCommand(const QVariantMap &params, QString
         return false;
     }
 
-    const int timerIdx = mscChart->instanceEvents().size();
+    const int timerIdx = mscChart->totalEventNumber();
     const msc::MscTimer::TimerType timerType = static_cast<msc::MscTimer::TimerType>(timerTypeInt);
     const QString name = params.value(QLatin1String("name"), QStringLiteral("Timer_%1").arg(timerIdx)).toString();
     msc::MscTimer *mscTimer = new msc::MscTimer(name, timerType, mscChart);
@@ -342,7 +342,7 @@ bool RemoteControlHandler::handleActionCommand(const QVariantMap &params, QStrin
     const int pos = params.value(QLatin1String("pos"), -1).toInt();
 
     msc::MscAction *mscAction = new msc::MscAction(mscChart);
-    const int actionIdx = mscChart->instanceEvents().size();
+    const int actionIdx = mscChart->totalEventNumber();
     const QString name = params.value(QLatin1String("name"), QStringLiteral("Action_%1").arg(actionIdx)).toString();
     mscAction->setInformalAction(name);
     mscAction->setInstance(mscInstance);
@@ -370,7 +370,7 @@ bool RemoteControlHandler::handleConditionCommand(const QVariantMap &params, QSt
     }
 
     const int pos = params.value(QLatin1String("pos"), -1).toInt();
-    const int conditionIdx = mscChart->instanceEvents().size();
+    const int conditionIdx = mscChart->totalEventNumber();
     const QString name =
             params.value(QLatin1String("name"), QStringLiteral("Condition_%1").arg(conditionIdx)).toString();
     msc::MscCondition *mscCondition = new msc::MscCondition(name, mscChart);

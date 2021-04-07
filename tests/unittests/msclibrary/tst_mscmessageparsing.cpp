@@ -46,7 +46,7 @@ void tst_MscReader::testMessage()
     QCOMPARE(chart->instances().size(), 1);
     MscInstance *instance = chart->instances().at(0);
 
-    QCOMPARE(chart->instanceEvents().size(), 3);
+    QCOMPARE(chart->totalEventNumber(), 3);
     MscMessage *message1 = dynamic_cast<MscMessage *>(chart->instanceEvents().at(0));
     QVERIFY(message1 != nullptr);
     QCOMPARE(message1->name(), QString("ICONreq"));
@@ -70,7 +70,7 @@ void tst_MscReader::testSameMessageInTwoInstances()
     QCOMPARE(model->charts().size(), 1);
     MscChart *chart = model->charts().at(0);
     QCOMPARE(chart->instances().size(), 2);
-    QCOMPARE(chart->instanceEvents().size(), 1);
+    QCOMPARE(chart->totalEventNumber(), 1);
     delete model;
 }
 
@@ -93,7 +93,7 @@ void tst_MscReader::testMessageWithParameters()
     QVERIFY(model->charts().size() == 1);
     MscChart *chart = model->charts().at(0);
 
-    QVERIFY(chart->instanceEvents().size() == 8);
+    QVERIFY(chart->totalEventNumber() == 8);
 
     auto *message = dynamic_cast<MscMessage *>(chart->instanceEvents().at(0));
     QVERIFY(message != nullptr);
@@ -137,7 +137,7 @@ void tst_MscReader::testMessageParameterWildcard()
     MscChart *chart = model->charts().at(0);
 
     QCOMPARE(chart->instances().size(), 2);
-    QCOMPARE(chart->instanceEvents().size(), 3);
+    QCOMPARE(chart->totalEventNumber(), 3);
 }
 
 void tst_MscReader::testMessageParameterExpression()
@@ -159,7 +159,7 @@ void tst_MscReader::testMessageParameterExpression()
     MscChart *chart = model->charts().at(0);
 
     QCOMPARE(chart->instances().size(), 2);
-    QCOMPARE(chart->instanceEvents().size(), 2);
+    QCOMPARE(chart->totalEventNumber(), 2);
 
     auto message = qobject_cast<MscMessage *>(chart->instanceEvents().at(1));
     QVERIFY(message != nullptr);
@@ -184,7 +184,7 @@ void tst_MscReader::testMultiParameters()
     MscChart *chart = model->charts().at(0);
 
     QCOMPARE(chart->instances().size(), 2);
-    QCOMPARE(chart->instanceEvents().size(), 1);
+    QCOMPARE(chart->totalEventNumber(), 1);
     auto *message = static_cast<MscCreate *>(chart->instanceEvents().at(0));
     QCOMPARE(message->name(), QString("hello"));
     MscParameterList parameters = message->parameters();
@@ -224,9 +224,9 @@ void tst_MscReader::testMessageParametersCurlyBraces()
     MscChart *chart = model->charts().at(0);
 
     QCOMPARE(chart->instances().size(), 2);
-    QCOMPARE(chart->instanceEvents().size(), params.size());
+    QCOMPARE(chart->totalEventNumber(), params.size());
 
-    for (int i = 0; i < chart->instanceEvents().size(); ++i)
+    for (int i = 0; i < chart->totalEventNumber(); ++i)
         if (MscMessage *message = dynamic_cast<MscMessage *>(chart->instanceEvents().at(i)))
             QCOMPARE(message->paramString(), params.at(i));
 }
@@ -240,7 +240,7 @@ void tst_MscReader::testMessageChoiceParameter()
     QCOMPARE(model->charts().size(), 1);
     MscChart *chart = model->charts().at(0);
     QCOMPARE(chart->instances().size(), 1);
-    QCOMPARE(chart->instanceEvents().size(), 1);
+    QCOMPARE(chart->totalEventNumber(), 1);
     auto message = qobject_cast<MscMessage *>(chart->instanceEvents().at(0));
     QVERIFY(message != nullptr);
     QCOMPARE(message->parameters().size(), 1);
@@ -273,7 +273,7 @@ void tst_MscReader::testMessageComplexParameter()
     MscChart *chart = doc->charts().at(0);
 
     QCOMPARE(chart->instances().size(), 2);
-    QCOMPARE(chart->instanceEvents().size(), 2);
+    QCOMPARE(chart->totalEventNumber(), 2);
     auto message = qobject_cast<MscMessage *>(chart->instanceEvents().at(0));
     QVERIFY(message != nullptr);
     QCOMPARE(message->parameters().size(), 1);
@@ -306,7 +306,7 @@ void tst_MscReader::testMessageAsn1SequenceChoiceParameter()
     MscChart *chart = doc->charts().at(0);
 
     QCOMPARE(chart->instances().size(), 2);
-    QCOMPARE(chart->instanceEvents().size(), 3);
+    QCOMPARE(chart->totalEventNumber(), 3);
     auto message = qobject_cast<MscMessage *>(chart->instanceEvents().at(0));
     QVERIFY(message != nullptr);
     QCOMPARE(message->parameters().size(), 1);
@@ -344,7 +344,7 @@ void tst_MscReader::testMessageAsn1SequenceOfSecencesParameter()
     MscChart *chart = doc->charts().at(0);
 
     QCOMPARE(chart->instances().size(), 2);
-    QCOMPARE(chart->instanceEvents().size(), 1);
+    QCOMPARE(chart->totalEventNumber(), 1);
     auto message = qobject_cast<MscMessage *>(chart->instanceEvents().at(0));
     QVERIFY(message != nullptr);
     QCOMPARE(message->parameters().size(), 1);
@@ -374,7 +374,7 @@ void tst_MscReader::testMessageAsn1OctetString()
     MscChart *chart = doc->charts().at(0);
 
     QCOMPARE(chart->instances().size(), 2);
-    QCOMPARE(chart->instanceEvents().size(), 2);
+    QCOMPARE(chart->totalEventNumber(), 2);
     auto message = qobject_cast<MscMessage *>(chart->instanceEvents().at(0));
     QVERIFY(message != nullptr);
     QCOMPARE(message->parameters().size(), 1);
@@ -402,7 +402,7 @@ void tst_MscReader::testMessageAsn1SequenceOfInSequence()
     MscChart *chart = doc->charts().at(0);
 
     QCOMPARE(chart->instances().size(), 1);
-    QCOMPARE(chart->instanceEvents().size(), 1);
+    QCOMPARE(chart->totalEventNumber(), 1);
     auto message = qobject_cast<MscMessage *>(chart->instanceEvents().at(0));
     QVERIFY(message != nullptr);
     QCOMPARE(message->parameters().size(), 1);
@@ -436,7 +436,7 @@ void tst_MscReader::testSortedMessage()
     MscInstance *initiator = chart->instances().at(0);
     MscInstance *responder = chart->instances().at(1);
 
-    QCOMPARE(chart->instanceEvents().size(), 6);
+    QCOMPARE(chart->totalEventNumber(), 6);
 
     MscMessage *message = dynamic_cast<MscMessage *>(chart->instanceEvents().at(0));
     QVERIFY(message != nullptr);
@@ -523,7 +523,7 @@ void tst_MscReader::testSortedMessageTwoCharts()
         MscInstance *initiator = chart->instances().at(0);
         MscInstance *responder = chart->instances().at(1);
 
-        QCOMPARE(chart->instanceEvents().size(), 6);
+        QCOMPARE(chart->totalEventNumber(), 6);
 
         MscMessage *message = dynamic_cast<MscMessage *>(chart->instanceEvents().at(0));
         QVERIFY(message != nullptr);
@@ -594,7 +594,7 @@ void tst_MscReader::testSortedInstanceEvents()
     MscInstance *initiator = chart->instances().at(0);
     MscInstance *responder = chart->instances().at(1);
 
-    QCOMPARE(chart->instanceEvents().size(), 10);
+    QCOMPARE(chart->totalEventNumber(), 10);
 
     int eventNr = -1;
 
@@ -699,7 +699,7 @@ void tst_MscReader::testSortedMessageCreate()
     MscChart *chart = model->charts().at(0);
 
     QCOMPARE(chart->instances().size(), 5);
-    QCOMPARE(chart->instanceEvents().size(), 12);
+    QCOMPARE(chart->totalEventNumber(), 12);
     QCOMPARE(chart->instanceEvents().at(0)->name(), QString("CA_1"));
     QCOMPARE(chart->instanceEvents().at(1)->name(), QString("AC_2"));
     QCOMPARE(chart->instanceEvents().at(2)->name(), QString("BA_3"));
@@ -799,7 +799,7 @@ void tst_MscReader::testConditionDublicate()
     MscInstance *initiator = chart->instances().at(0);
     MscInstance *responder = chart->instances().at(1);
 
-    QCOMPARE(chart->instanceEvents().size(), 4);
+    QCOMPARE(chart->totalEventNumber(), 4);
 
     auto event = dynamic_cast<MscCondition *>(chart->instanceEvents().at(0));
     QVERIFY(event != nullptr);
@@ -851,7 +851,7 @@ void tst_MscReader::testTestMessageInstanceName()
     MscChart *chart = model->documents().at(0)->charts().at(0);
 
     QCOMPARE(chart->instances().size(), 2);
-    QCOMPARE(chart->instanceEvents().size(), 2);
+    QCOMPARE(chart->totalEventNumber(), 2);
 }
 
 void tst_MscReader::testSameNameDifferentInstances()
@@ -872,7 +872,7 @@ void tst_MscReader::testSameNameDifferentInstances()
     QCOMPARE(model->charts().size(), 1);
     MscChart *chart = model->charts().at(0);
     QCOMPARE(chart->instances().size(), 3);
-    QCOMPARE(chart->instanceEvents().size(), 2);
+    QCOMPARE(chart->totalEventNumber(), 2);
 }
 
 void tst_MscReader::testDifferentParameter()
@@ -893,7 +893,7 @@ void tst_MscReader::testDifferentParameter()
     MscChart *chart = model->charts().at(0);
 
     QCOMPARE(chart->instances().size(), 2);
-    QCOMPARE(chart->instanceEvents().size(), 2);
+    QCOMPARE(chart->totalEventNumber(), 2);
 }
 
 void tst_MscReader::testMultiMessageOccurrence()
@@ -916,7 +916,7 @@ void tst_MscReader::testMultiMessageOccurrence()
     MscChart *chart = model->charts().at(0);
 
     QCOMPARE(chart->instances().size(), 2);
-    QCOMPARE(chart->instanceEvents().size(), 3);
+    QCOMPARE(chart->totalEventNumber(), 3);
 }
 
 void tst_MscReader::testNonStandardVia()
@@ -934,5 +934,5 @@ void tst_MscReader::testNonStandardVia()
     MscChart *chart = model->charts().at(0);
 
     QCOMPARE(chart->instances().size(), 1);
-    QCOMPARE(chart->instanceEvents().size(), 2);
+    QCOMPARE(chart->totalEventNumber(), 2);
 }

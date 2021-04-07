@@ -137,7 +137,7 @@ struct ChartLayoutManagerPrivate {
         if (m_instanceItems.isEmpty()) {
             static const qreal oneMessageHeight = CoordinatesConverter::heightInScene(100);
             const int eventsCount = qMax(1,
-                    m_visibleItemLimit == -1 ? m_currentChart->instanceEvents().size()
+                    m_visibleItemLimit == -1 ? m_currentChart->totalEventNumber()
                                              : qMin(m_visibleItemLimit, m_instanceEventItems.size()));
             return eventsCount * (oneMessageHeight + interMessageSpan());
         }
@@ -1301,7 +1301,7 @@ msc::MessageItem *ChartLayoutManager::createDefaultMessageItem(msc::MscMessage *
 {
     if (currentChart()) {
         if (!orphanMessage) {
-            orphanMessage = new MscMessage(tr("Message_%1").arg(currentChart()->instanceEvents().size()));
+            orphanMessage = new MscMessage(tr("Message_%1").arg(currentChart()->totalEventNumber()));
             currentChart()->addInstanceEvent(orphanMessage);
         }
 

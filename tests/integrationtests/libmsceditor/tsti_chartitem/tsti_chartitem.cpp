@@ -104,7 +104,7 @@ void tsti_Chartitem::testItemLimit()
     m_chartModel->setVisibleItemLimit(3);
     loadView(msc);
 
-    QCOMPARE(m_chart->instanceEvents().size(), 3);
+    QCOMPARE(m_chart->totalEventNumber(), 3);
     QCOMPARE(m_chartModel->instanceEventItems().size(), 3);
     InteractiveObject *action0 = m_chartModel->itemForEntity(m_chart->instanceEvents().at(0));
     QVERIFY(action0 != nullptr);
@@ -118,7 +118,7 @@ void tsti_Chartitem::testItemLimit()
     auto addCommand = new cmd::CmdActionItemCreate(nullptr, instanceA, -1, m_chartModel.data());
     m_undoStack->push(addCommand);
     waitForLayoutUpdate();
-    QCOMPARE(m_chart->instanceEvents().size(), 4);
+    QCOMPARE(m_chart->totalEventNumber(), 4);
     const QVector<InteractiveObject *> &items = m_chartModel->instanceEventItems();
     QCOMPARE(items.size(), 3);
     QVERIFY(!items.contains(action0)); // action0 is not shown anymore
@@ -131,7 +131,7 @@ void tsti_Chartitem::testItemLimit()
     addCommand = new cmd::CmdActionItemCreate(nullptr, instanceA, -1, m_chartModel.data());
     m_undoStack->push(addCommand);
     waitForLayoutUpdate();
-    QCOMPARE(m_chart->instanceEvents().size(), 5);
+    QCOMPARE(m_chart->totalEventNumber(), 5);
     QCOMPARE(items.size(), 3);
     QVERIFY(!items.contains(action0)); // action0 is not shown anymore
     QVERIFY(!items.contains(action1)); // action1 is not shown anymore

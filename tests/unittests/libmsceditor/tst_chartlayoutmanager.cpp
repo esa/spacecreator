@@ -194,7 +194,7 @@ void tst_ChartLayoutManager::testTimerPositionWithCifInstance()
 
     parseMsc(mscText);
     QCOMPARE(m_instanceItems.size(), 1);
-    QCOMPARE(m_chart->instanceEvents().size(), 1);
+    QCOMPARE(m_chart->totalEventNumber(), 1);
 
     MscTimer *watchdogEntity = qobject_cast<MscTimer *>(m_chart->instanceEvents().at(0));
     TimerItem *watchdogItem = m_chartModel->itemForTimer(watchdogEntity);

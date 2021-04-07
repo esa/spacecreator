@@ -41,7 +41,7 @@ void CmdConditionItemCreate::redo()
 {
     if (!m_condition) {
         m_condition = new MscCondition();
-        m_condition->setName(QObject::tr("Condition_%1").arg(m_chart->instanceEvents().size()));
+        m_condition->setName(QObject::tr("Condition_%1").arg(m_chart->totalEventNumber()));
         m_modelItem = m_condition;
     }
     if (m_instance) {

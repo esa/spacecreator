@@ -52,6 +52,7 @@ CmdMessageItemCreate::CmdMessageItemCreate(
     , m_targetGeometryPrev(initGeometryHolder(
               (layoutManager && m_message) ? layoutManager->itemForInstance(m_message->targetInstance()) : nullptr))
 {
+    Q_ASSERT(m_message);
     Q_ASSERT(m_chart.data());
 
     setText(QObject::tr("Add message"));
@@ -61,10 +62,6 @@ void CmdMessageItemCreate::redo()
 {
     Q_ASSERT(m_chart.data());
 
-    if (!m_message) {
-        m_message = new MscMessage(QObject::tr("Message_%1").arg(m_chart->instanceEvents().size()));
-        m_modelItem = m_message;
-    }
     if (m_message->messageType() == MscMessage::MessageType::Create && m_message->targetInstance())
         m_message->targetInstance()->setExplicitCreator(m_message->sourceInstance());
 

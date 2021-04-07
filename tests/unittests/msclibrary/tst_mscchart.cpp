@@ -137,7 +137,7 @@ void tst_MscChart::testDestructor()
     }
 
     QCOMPARE(chart->instances().size(), 1);
-    QCOMPARE(chart->instanceEvents().size(), 7);
+    QCOMPARE(chart->totalEventNumber(), 7);
     QCOMPARE(chart->gates().size(), 1);
 
     delete chart;
@@ -198,30 +198,30 @@ void tst_MscChart::testInstanceByName()
 
 void tst_MscChart::testAddMessage()
 {
-    QCOMPARE(m_chart->instanceEvents().size(), 0);
+    QCOMPARE(m_chart->totalEventNumber(), 0);
 
     auto message1 = new MscMessage("IN", m_chart);
     m_chart->addInstanceEvent(message1);
     auto message2 = new MscMessage("OUT", m_chart);
     m_chart->addInstanceEvent(message2);
-    QCOMPARE(m_chart->instanceEvents().size(), 2);
+    QCOMPARE(m_chart->totalEventNumber(), 2);
 }
 
 void tst_MscChart::testRemoveMessage()
 {
-    QCOMPARE(m_chart->instanceEvents().size(), 0);
+    QCOMPARE(m_chart->totalEventNumber(), 0);
 
     QScopedPointer<MscMessage> message1(new MscMessage("IN", m_chart));
     QScopedPointer<MscMessage> message2(new MscMessage("OUT", m_chart));
 
     m_chart->addInstanceEvent(message1.data());
     m_chart->addInstanceEvent(message2.data());
-    QCOMPARE(m_chart->instanceEvents().size(), 2);
+    QCOMPARE(m_chart->totalEventNumber(), 2);
 
     m_chart->removeInstanceEvent(message1.data());
-    QCOMPARE(m_chart->instanceEvents().size(), 1);
+    QCOMPARE(m_chart->totalEventNumber(), 1);
     m_chart->removeInstanceEvent(message2.data());
-    QCOMPARE(m_chart->instanceEvents().size(), 0);
+    QCOMPARE(m_chart->totalEventNumber(), 0);
 }
 
 void tst_MscChart::testNoDuplicateMessage()
@@ -229,13 +229,13 @@ void tst_MscChart::testNoDuplicateMessage()
     auto message = new MscMessage("IN", m_chart);
     m_chart->addInstanceEvent(message);
     m_chart->addInstanceEvent(message);
-    QCOMPARE(m_chart->instanceEvents().size(), 1);
+    QCOMPARE(m_chart->totalEventNumber(), 1);
 }
 
 void tst_MscChart::testNoNullPtrMessage()
 {
     m_chart->addInstanceEvent(nullptr);
-    QCOMPARE(m_chart->instanceEvents().size(), 0);
+    QCOMPARE(m_chart->totalEventNumber(), 0);
 }
 
 void tst_MscChart::testMessageByName()
@@ -278,13 +278,13 @@ void tst_MscChart::testAddCondition()
     auto condition = new MscCondition("Condition_1", m_chart);
 
     m_chart->addInstanceEvent(condition);
-    QCOMPARE(m_chart->instanceEvents().size(), 1);
+    QCOMPARE(m_chart->totalEventNumber(), 1);
 
     m_chart->addInstanceEvent(condition);
-    QCOMPARE(m_chart->instanceEvents().size(), 1);
+    QCOMPARE(m_chart->totalEventNumber(), 1);
 
     m_chart->addInstanceEvent(nullptr);
-    QCOMPARE(m_chart->instanceEvents().size(), 1);
+    QCOMPARE(m_chart->totalEventNumber(), 1);
 }
 
 void tst_MscChart::testRemoveCondition()
@@ -294,17 +294,17 @@ void tst_MscChart::testRemoveCondition()
     MscCondition *condition2 = new MscCondition("Condition_2", m_chart);
     m_chart->addInstanceEvent(condition2);
 
-    QCOMPARE(m_chart->instanceEvents().size(), 2);
+    QCOMPARE(m_chart->totalEventNumber(), 2);
 
     m_chart->removeInstanceEvent(nullptr);
-    QCOMPARE(m_chart->instanceEvents().size(), 2);
+    QCOMPARE(m_chart->totalEventNumber(), 2);
 
     auto condition = m_chart->instanceEvents().first();
     m_chart->removeInstanceEvent(condition);
-    QCOMPARE(m_chart->instanceEvents().size(), 1);
+    QCOMPARE(m_chart->totalEventNumber(), 1);
 
     m_chart->removeInstanceEvent(condition);
-    QCOMPARE(m_chart->instanceEvents().size(), 1);
+    QCOMPARE(m_chart->totalEventNumber(), 1);
 }
 
 void tst_MscChart::testTimerRelation()

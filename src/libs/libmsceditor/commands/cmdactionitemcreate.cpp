@@ -41,7 +41,7 @@ void CmdActionItemCreate::redo()
 {
     if (!m_action) {
         m_action = new MscAction();
-        m_action->setInformalAction(QObject::tr("Action_%1").arg(m_chart->instanceEvents().size()));
+        m_action->setInformalAction(QObject::tr("Action_%1").arg(m_chart->totalEventNumber()));
         m_modelItem = m_action;
     }
     if (m_instance) {

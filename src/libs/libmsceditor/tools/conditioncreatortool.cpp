@@ -54,7 +54,7 @@ void ConditionCreatorTool::createPreviewItem()
     }
 
     auto orphanCondition = new MscCondition(this);
-    orphanCondition->setName(tr("Condition_%1").arg(m_model->currentChart()->instanceEvents().size()));
+    orphanCondition->setName(tr("Condition_%1").arg(m_model->currentChart()->totalEventNumber()));
     auto item = new ConditionItem(orphanCondition, m_model);
 
     m_previewItem = item;

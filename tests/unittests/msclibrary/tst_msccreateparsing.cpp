@@ -45,7 +45,7 @@ void tst_MscReader::testInstanceCreate()
     MscChart *chart = model->charts().at(0);
 
     QCOMPARE(chart->instances().size(), 2);
-    QCOMPARE(chart->instanceEvents().size(), 2);
+    QCOMPARE(chart->totalEventNumber(), 2);
 
     auto *create = static_cast<MscCreate *>(chart->instanceEvents().at(1));
     QCOMPARE(create->name(), QString());
@@ -74,7 +74,7 @@ void tst_MscReader::testInstanceCreateNoParameter()
     MscChart *chart = model->charts().at(0);
 
     QCOMPARE(chart->instances().size(), 2);
-    QCOMPARE(chart->instanceEvents().size(), 1);
+    QCOMPARE(chart->totalEventNumber(), 1);
 
     auto *create = static_cast<MscCreate *>(chart->instanceEvents().at(0));
     QCOMPARE(create->name(), QString());
@@ -101,7 +101,7 @@ void tst_MscReader::testInstanceCreateMultiParameter()
     MscChart *chart = model->charts().at(0);
 
     QCOMPARE(chart->instances().size(), 2);
-    QCOMPARE(chart->instanceEvents().size(), 1);
+    QCOMPARE(chart->totalEventNumber(), 1);
 
     auto *create = static_cast<MscCreate *>(chart->instanceEvents().at(0));
     QCOMPARE(create->name(), QString());
@@ -137,7 +137,7 @@ void tst_MscReader::testInstanceCreateEmptyParameter()
     MscChart *chart = model->charts().at(0);
 
     QCOMPARE(chart->instances().size(), 2);
-    QCOMPARE(chart->instanceEvents().size(), 1);
+    QCOMPARE(chart->totalEventNumber(), 1);
 
     auto *msg = static_cast<MscCreate *>(chart->instanceEvents().at(0));
     QCOMPARE(msg->fullName(), QString("Heartbeat,120"));
@@ -211,9 +211,9 @@ void tst_MscReader::testMessageCreateInstance()
     MscChart *chart = model->documents().first()->charts().first();
     QCOMPARE(chart->instances().size(), 3);
 
-    QCOMPARE(chart->instanceEvents().size(), 6);
+    QCOMPARE(chart->totalEventNumber(), 6);
 
-    for (int i = 0; i < chart->instanceEvents().size(); ++i) {
+    for (int i = 0; i < chart->totalEventNumber(); ++i) {
         if (MscMessage *message = dynamic_cast<MscMessage *>(chart->instanceEvents().at(i))) {
             const MscMessage::MessageType expectedType =
                     i == 1 ? MscMessage::MessageType::Create : MscMessage::MessageType::Message;

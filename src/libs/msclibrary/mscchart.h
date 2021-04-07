@@ -63,6 +63,7 @@ public:
     int indexofEvent(MscInstanceEvent *instanceEvent) const;
     MscMessage *messageByName(const QString &name) const;
     MscInstanceEvent *firstEventOfInstance(MscInstance *instance) const;
+    int totalEventNumber() const;
 
     QVector<MscMessage *> messages() const;
 
@@ -136,10 +137,12 @@ private:
     cif::CifBlockShared cifMscDoc() const;
     QVector<MscInstance *> relatedInstances(MscInstanceEvent *event) const;
     bool eventsCheck() const;
+    QVector<MscInstanceEvent *> allEvents() const;
 
     QVector<MscInstance *> m_instances;
     QVector<MscInstanceEvent *> m_instanceEvents;
     QHash<const MscInstance *, QVector<MscInstanceEvent *>> m_events;
+    QVector<MscInstanceEvent *> m_orphanEvents;
     QVector<MscGate *> m_gates;
 };
 

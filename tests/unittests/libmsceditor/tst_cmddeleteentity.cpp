@@ -72,12 +72,12 @@ void tst_CmdDeleteEntity::testUndoMessageDelete()
     // delete the message
     auto deleteCmd = new msc::cmd::CmdDeleteEntity({ message }, nullptr, m_chartModel.get());
     m_undoStack->push(deleteCmd);
-    QCOMPARE(m_chart->instanceEvents().size(), 0);
+    QCOMPARE(m_chart->totalEventNumber(), 0);
 
     // undo
     m_undoStack->undo();
     waitForLayoutUpdate();
-    QCOMPARE(m_chart->instanceEvents().size(), 1);
+    QCOMPARE(m_chart->totalEventNumber(), 1);
     message = qobject_cast<msc::MscMessage *>(m_chart->instanceEvents().at(0));
     messageItem = m_chartModel->itemForMessage(message);
 
