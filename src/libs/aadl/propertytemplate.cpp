@@ -46,7 +46,7 @@ PropertyTemplate::PropertyTemplate()
 {
 }
 
-PropertyTemplate::~PropertyTemplate() {}
+PropertyTemplate::~PropertyTemplate() { }
 
 QString PropertyTemplate::name() const
 {
@@ -251,7 +251,7 @@ PropertyTemplate *PropertyTemplate::fromXml(const QDomElement &element)
     PropertyTemplate::Type t = PropertyTemplate::Type::Unknown;
 
     QVariant defaultValue { QVariant::String };
-    QList<QVariant> enumVals;
+    QVariant value;
     QString typeValidator;
     if (!typeElement.isNull()) {
         const QDomElement typeSubElement = typeElement.firstChildElement();
@@ -264,11 +264,13 @@ PropertyTemplate *PropertyTemplate::fromXml(const QDomElement &element)
             if (t == PropertyTemplate::Type::Enumeration) {
                 defaultValue = typeSubElement.attribute(QLatin1String("defaultValue"));
                 QDomElement typeEntryElement = typeSubElement.firstChildElement(QLatin1String("Entry"));
+                QList<QVariant> values;
                 while (!typeEntryElement.isNull()) {
-                    const QVariant value = typeEntryElement.attribute(QLatin1String("value"));
-                    enumVals.append(value);
+                    const QVariant enumValue = typeEntryElement.attribute(QLatin1String("value"));
+                    values.append(enumValue);
                     typeEntryElement = typeEntryElement.nextSiblingElement(typeEntryElement.tagName());
                 }
+                value = values;
             } else {
                 defaultValue = convertData(typeSubElement.attribute(QLatin1String("defaultValue")), t);
             }
@@ -316,7 +318,7 @@ PropertyTemplate *PropertyTemplate::fromXml(const QDomElement &element)
     propertyTemplate->setInfo(i);
     propertyTemplate->setType(t);
     propertyTemplate->setScope(s);
-    propertyTemplate->setValue(enumVals);
+    propertyTemplate->setValue(value);
     propertyTemplate->setDefaultValue(defaultValue);
     propertyTemplate->setAttrValidatorPattern(attrValidators);
     propertyTemplate->setValueValidatorPattern(typeValidator);

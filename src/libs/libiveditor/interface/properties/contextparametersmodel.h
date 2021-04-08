@@ -40,10 +40,16 @@ class ContextParametersModel : public PropertiesModelBase
     Q_OBJECT
 
 public:
-    static const int ItemTypeRole { Qt::UserRole + 2 };
-    static const int ColumnName { 0 };
-    static const int ColumnType { 1 };
-    static const int ColumnValue { 2 };
+    enum Roles
+    {
+        ItemTypeRole = Qt::UserRole + 2,
+    };
+    enum Column
+    {
+        Name = 0,
+        Type,
+        Value,
+    };
 
     explicit ContextParametersModel(cmd::CommandsStack::Macro *macro, QObject *parent = nullptr);
     ~ContextParametersModel() override;

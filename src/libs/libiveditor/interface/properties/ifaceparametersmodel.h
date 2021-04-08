@@ -34,11 +34,17 @@ class IfaceParametersModel : public PropertiesModelBase
 {
     Q_OBJECT
 public:
-    static const int ItemTypeRole { Qt::UserRole + 2 };
-    static const int ColumnName { 0 };
-    static const int ColumnType { 1 };
-    static const int ColumnEncoding { 2 };
-    static const int ColumnDirection { 3 };
+    enum Roles
+    {
+        ItemTypeRole = Qt::UserRole + 2,
+    };
+    enum Column
+    {
+        Name = 0,
+        Type,
+        Encoding,
+        Direction,
+    };
 
     explicit IfaceParametersModel(cmd::CommandsStack::Macro *macro, QObject *parent = nullptr);
     ~IfaceParametersModel() override;

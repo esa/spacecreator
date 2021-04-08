@@ -40,70 +40,114 @@ AttributeDelegate::AttributeDelegate(QObject *parent)
 {
 }
 
-static QWidget *createConfiguredEditor(
-        const QVariant &displayValue, const QVariant &editValue, QWidget *parent, const QString &attribute)
+static void setConfiguredEditorData(QWidget *editor, const QVariant &displayValue, const QVariant::Type type)
 {
-    if (editValue.type() == QVariant::Invalid)
+    if (type == QVariant::Invalid)
+        return;
+
+    switch (type) {
+    case QVariant::Bool:
+        if (auto checkBox = qobject_cast<QCheckBox *>(editor)) {
+            checkBox->setChecked(
+                    QString::compare(displayValue.toString(), QLatin1String("true"), Qt::CaseInsensitive) == 0);
+        }
+        break;
+    case QVariant::Int:
+        if (auto spinBox = qobject_cast<QSpinBox *>(editor)) {
+            spinBox->setValue(displayValue.toInt());
+        }
+        break;
+    case QVariant::Double:
+        if (auto doubleSpinBox = qobject_cast<QDoubleSpinBox *>(editor)) {
+            doubleSpinBox->setValue(displayValue.toDouble());
+        }
+        break;
+    case QVariant::String:
+        if (auto lineEdit = qobject_cast<QLineEdit *>(editor)) {
+            lineEdit->setText(displayValue.toString());
+        }
+        break;
+    case QVariant::StringList:
+        if (auto comboBox = qobject_cast<QComboBox *>(editor)) {
+            comboBox->setCurrentText(displayValue.toString());
+        }
+        break;
+    default:
+        break;
+    }
+}
+
+static QWidget *createConfiguredEditor(
+        const QString &attribute, const QVariant &editValue, const QVariant &validator, QWidget *parent)
+{
+    if (!editValue.isValid())
         return nullptr;
 
+    QWidget *editor { nullptr };
     switch (editValue.type()) {
     case QVariant::Int: {
-        auto editor = new QSpinBox(parent);
-        editor->setMinimum(std::numeric_limits<int>::min());
-        editor->setMaximum(std::numeric_limits<int>::max());
-        editor->setValue(displayValue.toInt());
-        return editor;
+        auto spinBox = new QSpinBox(parent);
+        if (!validator.isNull() && validator.canConvert<QPair<int, int>>()) {
+            const auto limits = validator.value<QPair<int, int>>();
+            spinBox->setMinimum(limits.first);
+            spinBox->setMaximum(limits.second);
+        }
+        editor = spinBox;
+        break;
     }
     case QVariant::String: {
-        auto editor = new QLineEdit(parent);
+        auto lineEdit = new QLineEdit(parent);
+        QRegularExpression re;
         if (attribute == ivm::meta::Props::token(ivm::meta::Props::Token::name)) {
-            QRegularExpression re(ivm::AADLNameValidator::namePatternUI());
-            editor->setValidator(new QRegularExpressionValidator(re, editor));
+            re.setPattern(ivm::AADLNameValidator::namePatternUI());
+        } else if (!validator.isNull() && validator.canConvert<QString>()) {
+            re.setPattern(validator.toString());
         }
-        editor->setText(displayValue.toString());
-        return editor;
+        lineEdit->setValidator(new QRegularExpressionValidator(re, lineEdit));
+        editor = lineEdit;
+        break;
     }
     case QVariant::Double: {
-        auto editor = new QDoubleSpinBox(parent);
-        editor->setMinimum(std::numeric_limits<double>::min());
-        editor->setMaximum(std::numeric_limits<double>::max());
-        editor->setValue(displayValue.toDouble());
-        return editor;
+        auto doubleSpinBox = new QDoubleSpinBox(parent);
+        if (!validator.isNull() && validator.canConvert<QPair<qreal, qreal>>()) {
+            const auto limits = validator.value<QPair<qreal, qreal>>();
+            doubleSpinBox->setMinimum(limits.first);
+            doubleSpinBox->setMaximum(limits.second);
+        }
+        editor = doubleSpinBox;
+        break;
     }
     case QVariant::Bool: {
-        auto editor = new QCheckBox(parent);
-        editor->setFocusPolicy(Qt::StrongFocus);
-        editor->setChecked(QString::compare(displayValue.toString(), QLatin1String("YES"), Qt::CaseInsensitive)
-                || QString::compare(displayValue.toString(), QLatin1String("true"), Qt::CaseInsensitive));
-        return editor;
+        editor = new QCheckBox(parent);
+        break;
     }
     case QVariant::StringList: {
-        auto editor = new QComboBox(parent);
-        const QStringList items = editValue.toStringList();
-        editor->addItems(items);
-        editor->setCurrentText(displayValue.toString());
-        return editor;
+        auto comboBox = new QComboBox(parent);
+        comboBox->addItems(editValue.toStringList());
+        editor = comboBox;
+        break;
     }
     default:
         return nullptr;
     }
+    Q_ASSERT(editor);
+    if (editor) {
+        editor->setFocusPolicy(Qt::StrongFocus);
+    }
+    return editor;
 }
 
 QWidget *AttributeDelegate::createEditor(
         QWidget *parent, const QStyleOptionViewItem &option, const QModelIndex &index) const
 {
-    if (index.column() == PropertiesListModel::ColumnValue) {
-        if (const auto pModel = qobject_cast<const QStandardItemModel *>(index.model())) {
-            if (QStandardItem *item = pModel->itemFromIndex(index)) {
-                const QModelIndex attrIdx = index.siblingAtColumn(PropertiesListModel::ColumnTitle);
-                QWidget *editor = createConfiguredEditor(item->data(Qt::EditRole),
-                        item->data(PropertiesListModel::PropertyDataRole), parent, attrIdx.data().toString());
-                if (editor) {
-                    editor->setEnabled(index.flags().testFlag(Qt::ItemIsEnabled));
-                }
-                return editor;
-            }
+    if (index.column() == PropertiesListModel::Column::Value) {
+        const QModelIndex attrIdx = index.siblingAtColumn(PropertiesListModel::Column::Title);
+        QWidget *editor = createConfiguredEditor(attrIdx.data(PropertiesListModel::NameRole).toString(),
+                index.data(PropertiesListModel::EditRole), index.data(PropertiesListModel::ValidatorRole), parent);
+        if (editor) {
+            editor->setEnabled(index.flags().testFlag(Qt::ItemIsEnabled));
         }
+        return editor;
     }
 
     return QStyledItemDelegate::createEditor(parent, option, index);
@@ -111,19 +155,61 @@ QWidget *AttributeDelegate::createEditor(
 
 void AttributeDelegate::setEditorData(QWidget *editor, const QModelIndex &index) const
 {
-    if (index.column() == PropertiesListModel::ColumnValue) {
-        if (const auto pModel = qobject_cast<const QStandardItemModel *>(index.model())) {
-            if (QStandardItem *item = pModel->itemFromIndex(index)) {
-                if (item->data(PropertiesListModel::PropertyDataRole).type() == QVariant::StringList) {
-                    if (QComboBox *cb = qobject_cast<QComboBox *>(editor)) {
-                        cb->setCurrentText(item->data(Qt::EditRole).toString());
-                    }
-                }
-            }
-        }
+    if (index.column() == PropertiesListModel::Column::Value) {
+        setConfiguredEditorData(
+                editor, index.data(PropertiesListModel::DataRole), index.data(PropertiesListModel::EditRole).type());
+        return;
     }
 
     return QStyledItemDelegate::setEditorData(editor, index);
+}
+
+void AttributeDelegate::setModelData(QWidget *editor, QAbstractItemModel *model, const QModelIndex &index) const
+{
+    if (index.column() == PropertiesListModel::Column::Value) {
+        QVariant data;
+        switch (index.data(PropertiesListModel::EditRole).type()) {
+        case QVariant::Bool:
+            if (auto checkBox = qobject_cast<QCheckBox *>(editor)) {
+                data = checkBox->isChecked();
+            }
+            break;
+        case QVariant::Int:
+            if (auto spinBox = qobject_cast<QSpinBox *>(editor)) {
+                spinBox->interpretText();
+                data = spinBox->value();
+            }
+            break;
+        case QVariant::Double:
+            if (auto doubleSpibBox = qobject_cast<QDoubleSpinBox *>(editor)) {
+                doubleSpibBox->interpretText();
+                data = doubleSpibBox->value();
+            }
+            break;
+        case QVariant::String:
+            if (auto lineEdit = qobject_cast<QLineEdit *>(editor)) {
+                data = lineEdit->text();
+            }
+            break;
+        case QVariant::StringList:
+            if (auto comboBox = qobject_cast<QComboBox *>(editor)) {
+                data = comboBox->currentText();
+            }
+            break;
+        default:
+            return;
+        }
+        if (data.isValid()) {
+            model->setData(index, data, PropertiesListModel::DataRole);
+        }
+        return;
+    } else if (index.column() == PropertiesListModel::Column::Title) {
+        if (auto lineEdit = qobject_cast<QLineEdit *>(editor)) {
+            model->setData(index, lineEdit->text(), PropertiesListModel::DataRole);
+            return;
+        }
+    }
+    return QStyledItemDelegate::setModelData(editor, model, index);
 }
 
 } // namespace ive

@@ -154,10 +154,6 @@ target_sources(${LIB_NAME} PRIVATE
     interface/properties/delegates/attributedelegate.h
     interface/properties/delegates/comboboxdelegate.cpp
     interface/properties/delegates/comboboxdelegate.h
-    interface/properties/delegates/functionattrdelegate.cpp
-    interface/properties/delegates/functionattrdelegate.h
-    interface/properties/delegates/interfaceattrdelegate.cpp
-    interface/properties/delegates/interfaceattrdelegate.h
     interface/properties/delegates/propertytypedelegate.cpp
     interface/properties/delegates/propertytypedelegate.h
     interface/properties/propertytemplatemanager.cpp

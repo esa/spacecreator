@@ -27,8 +27,6 @@
 #include "delegates/asn1valuedelegate.h"
 #include "delegates/attributedelegate.h"
 #include "delegates/comboboxdelegate.h"
-#include "delegates/functionattrdelegate.h"
-#include "delegates/interfaceattrdelegate.h"
 #include "delegates/propertytypedelegate.h"
 #include "ifaceparametersmodel.h"
 #include "interface/aadlconnectiongroupmodel.h"
@@ -151,28 +149,25 @@ void PropertiesDialog::initAttributesView()
 {
     auto viewAttrs = new AttributesView(this);
     PropertiesListModel *modelAttrs { nullptr };
-    QStyledItemDelegate *attrDelegate { nullptr };
+    QStyledItemDelegate *attrDelegate = new AttributeDelegate(viewAttrs->tableView());
 
     switch (m_dataObject->aadlType()) {
     case ivm::AADLObject::Type::Function: {
         modelAttrs = new FunctionPropertiesListModel(m_cmdMacro, m_dynPropConfig, this);
-        attrDelegate = new FunctionAttrDelegate(viewAttrs->tableView());
         break;
     }
     case ivm::AADLObject::Type::RequiredInterface:
     case ivm::AADLObject::Type::ProvidedInterface: {
         modelAttrs = new InterfacePropertiesListModel(m_cmdMacro, m_dynPropConfig, this);
-        attrDelegate = new AttributeDelegate(viewAttrs->tableView());
         break;
     }
     default:
         modelAttrs = new InterfacePropertiesListModel(m_cmdMacro, m_dynPropConfig, this);
-        attrDelegate = new AttributeDelegate(viewAttrs->tableView());
         break;
     }
 
     modelAttrs->setDataObject(m_dataObject);
-    viewAttrs->tableView()->setItemDelegateForColumn(PropertiesListModel::ColumnValue, attrDelegate);
+    viewAttrs->tableView()->setItemDelegateForColumn(PropertiesListModel::Column::Value, attrDelegate);
     viewAttrs->setModel(modelAttrs);
 
     ui->tabWidget->insertTab(0, viewAttrs, tr("Attributes"));
@@ -185,10 +180,10 @@ void PropertiesDialog::initContextParams()
     modelCtxParams->setDataObject(m_dataObject);
 
     PropertiesViewBase *viewAttrs = new ContextParametersView(this);
+    viewAttrs->tableView()->setItemDelegateForColumn(ContextParametersModel::Column::Type,
+            new ContextParametersTypeDelegate(m_dataTypes, viewAttrs->tableView()));
     viewAttrs->tableView()->setItemDelegateForColumn(
-            ContextParametersModel::ColumnType, new ContextParametersTypeDelegate(m_dataTypes, viewAttrs->tableView()));
-    viewAttrs->tableView()->setItemDelegateForColumn(
-            ContextParametersModel::ColumnValue, new Asn1ValueDelegate(m_dataTypes, viewAttrs->tableView()));
+            ContextParametersModel::Column::Value, new Asn1ValueDelegate(m_dataTypes, viewAttrs->tableView()));
     viewAttrs->tableView()->horizontalHeader()->show();
     viewAttrs->setModel(modelCtxParams);
     ui->tabWidget->insertTab(0, viewAttrs, tr("Context Parameters"));
@@ -201,11 +196,11 @@ void PropertiesDialog::initIfaceParams()
 
     PropertiesViewBase *viewAttrs = new IfaceParametersView(this);
     viewAttrs->tableView()->setItemDelegateForColumn(
-            IfaceParametersModel::ColumnType, new IfaceParametersTypeDelegate(m_dataTypes, viewAttrs->tableView()));
-    viewAttrs->tableView()->setItemDelegateForColumn(IfaceParametersModel::ColumnEncoding,
+            IfaceParametersModel::Column::Type, new IfaceParametersTypeDelegate(m_dataTypes, viewAttrs->tableView()));
+    viewAttrs->tableView()->setItemDelegateForColumn(IfaceParametersModel::Column::Encoding,
             new StringListComboDelegate({ tr("NATIVE"), tr("UPER"), tr("ACN") }, // TODO: is it configurable?
                     viewAttrs->tableView()));
-    viewAttrs->tableView()->setItemDelegateForColumn(IfaceParametersModel::ColumnDirection,
+    viewAttrs->tableView()->setItemDelegateForColumn(IfaceParametersModel::Column::Direction,
             new StringListComboDelegate(
                     { ivm::IfaceParameter::directionName(ivm::IfaceParameter::Direction::In),
                             ivm::IfaceParameter::directionName(ivm::IfaceParameter::Direction::Out) },

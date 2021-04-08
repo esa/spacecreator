@@ -48,9 +48,9 @@ void ContextParametersModel::createNewRow(const ivm::ContextParameter &param, in
     QStandardItem *valueItem = new QStandardItem();
     valueItem->setData(param.defaultValue(), Qt::EditRole);
 
-    setItem(row, ColumnName, titleItem);
-    setItem(row, ColumnType, typeItem);
-    setItem(row, ColumnValue, valueItem);
+    setItem(row, Column::Name, titleItem);
+    setItem(row, Column::Type, typeItem);
+    setItem(row, Column::Value, valueItem);
 
     m_params.insert(row, param);
 }
@@ -112,9 +112,9 @@ QVariant ContextParametersModel::data(const QModelIndex &index, int role) const
     case Qt::DisplayRole:
     case Qt::EditRole: {
         switch (index.column()) {
-        case ColumnType:
+        case Column::Type:
             return param.paramTypeName();
-        case ColumnValue:
+        case Column::Value:
             return param.defaultValue();
         default:
             return ivm::AADLNameValidator::decodeName(m_dataObject->aadlType(), param.name());
@@ -135,17 +135,17 @@ bool ContextParametersModel::setData(const QModelIndex &index, const QVariant &v
         ivm::ContextParameter paramNew(paramOld);
 
         switch (index.column()) {
-        case ColumnName: {
+        case Column::Name: {
             if (!paramNew.setName(ivm::AADLNameValidator::encodeName(m_dataObject->aadlType(), value.toString())))
                 return false;
             break;
         }
-        case ColumnType: {
+        case Column::Type: {
             if (!paramNew.setParamTypeName(value.toString()))
                 return false;
             break;
         }
-        case ColumnValue: {
+        case Column::Value: {
             if (!m_dataTypes.data()) {
                 return true;
             }
@@ -225,7 +225,7 @@ bool ContextParametersModel::isProp(const QModelIndex & /*id*/) const
 Qt::ItemFlags ContextParametersModel::flags(const QModelIndex &index) const
 {
     Qt::ItemFlags flags = QStandardItemModel::flags(index);
-    if (index.column() == ColumnValue && m_params.at(index.row()).paramType() != ivm::BasicParameter::Type::Other)
+    if (index.column() == Column::Value && m_params.at(index.row()).paramType() != ivm::BasicParameter::Type::Other)
         flags = flags & ~Qt::ItemIsEditable & ~Qt::ItemIsEnabled;
 
     if (!m_dataObject)
@@ -252,11 +252,11 @@ QVariant ContextParametersModel::headerData(int section, Qt::Orientation orienta
 {
     if (role == Qt::DisplayRole && orientation == Qt::Horizontal) {
         switch (section) {
-        case ColumnName:
+        case Column::Name:
             return tr("Name");
-        case ColumnType:
+        case Column::Type:
             return tr("Type");
-        case ColumnValue:
+        case Column::Value:
             return tr("Value");
         }
     }

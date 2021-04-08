@@ -171,20 +171,20 @@ bool PropertiesViewBase::setButtonsDisabled()
 ContextParametersView::ContextParametersView(QWidget *widget)
     : PropertiesViewBase(widget)
 {
-    m_delegatesColumns = { ContextParametersModel::ColumnType, ContextParametersModel::ColumnValue };
+    m_delegatesColumns = { ContextParametersModel::Column::Type, ContextParametersModel::Column::Value };
 }
 
 IfaceParametersView::IfaceParametersView(QWidget *widget)
     : PropertiesViewBase(widget)
 {
-    m_delegatesColumns = { IfaceParametersModel::ColumnType, IfaceParametersModel::ColumnEncoding,
-        IfaceParametersModel::ColumnDirection };
+    m_delegatesColumns = { IfaceParametersModel::Column::Type, IfaceParametersModel::Column::Encoding,
+        IfaceParametersModel::Column::Direction };
 }
 
 AttributesView::AttributesView(QWidget *widget)
     : PropertiesViewBase(widget)
 {
-    m_delegatesColumns = { PropertiesListModel::ColumnValue };
+    m_delegatesColumns = { PropertiesListModel::Column::Value };
 }
 
 } // namespace ive

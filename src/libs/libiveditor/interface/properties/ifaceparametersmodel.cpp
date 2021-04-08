@@ -46,10 +46,10 @@ void IfaceParametersModel::createNewRow(const ivm::IfaceParameter &param, int ro
     QStandardItem *encodingItem = new QStandardItem(param.encoding());
     QStandardItem *directionItem = new QStandardItem(ivm::IfaceParameter::directionName(param.direction()));
 
-    setItem(row, ColumnName, titleItem);
-    setItem(row, ColumnType, typeItem);
-    setItem(row, ColumnEncoding, encodingItem);
-    setItem(row, ColumnDirection, directionItem);
+    setItem(row, Column::Name, titleItem);
+    setItem(row, Column::Type, typeItem);
+    setItem(row, Column::Encoding, encodingItem);
+    setItem(row, Column::Direction, directionItem);
 
     m_params.insert(row, param);
 }
@@ -107,13 +107,13 @@ QVariant IfaceParametersModel::data(const QModelIndex &index, int role) const
     case Qt::DisplayRole:
     case Qt::EditRole: {
         switch (index.column()) {
-        case ColumnName:
+        case Column::Name:
             return param.name();
-        case ColumnType:
+        case Column::Type:
             return param.paramTypeName();
-        case ColumnEncoding:
+        case Column::Encoding:
             return param.encoding();
-        case ColumnDirection:
+        case Column::Direction:
             return ivm::IfaceParameter::directionName(param.direction());
         }
     }
@@ -132,22 +132,22 @@ bool IfaceParametersModel::setData(const QModelIndex &index, const QVariant &val
         ivm::IfaceParameter paramNew(paramOld);
 
         switch (index.column()) {
-        case ColumnName: {
+        case Column::Name: {
             if (!paramNew.setName(value.toString()))
                 return false;
             break;
         }
-        case ColumnType: {
+        case Column::Type: {
             if (!paramNew.setParamTypeName(value.toString()))
                 return false;
             break;
         }
-        case ColumnEncoding: {
+        case Column::Encoding: {
             if (!paramNew.setEncoding(value.toString()))
                 return false;
             break;
         }
-        case ColumnDirection: {
+        case Column::Direction: {
             if (!paramNew.setDirection(ivm::IfaceParameter::directionFromName(value.toString())))
                 return false;
             break;
@@ -211,13 +211,13 @@ QVariant IfaceParametersModel::headerData(int section, Qt::Orientation orientati
 {
     if (role == Qt::DisplayRole && orientation == Qt::Horizontal) {
         switch (section) {
-        case ColumnName:
+        case Column::Name:
             return tr("Name");
-        case ColumnType:
+        case Column::Type:
             return tr("Type");
-        case ColumnEncoding:
+        case Column::Encoding:
             return tr("Encoding Protocol");
-        case ColumnDirection:
+        case Column::Direction:
             return tr("Direction");
         }
     }
