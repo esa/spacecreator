@@ -206,7 +206,7 @@ void CmdEntityAttributeChange::prepareUnsetFunctionTypeCommands(const ivm::AADLF
         }
     }
     if (!entities.isEmpty()) {
-        auto cmdRm = new cmd::CmdEntitiesRemove(entities, fnType->objectsModel());
+        auto cmdRm = new cmd::CmdEntitiesRemove(entities, m_function->objectsModel());
         cmdStorage.append(cmdRm);
     }
 }
