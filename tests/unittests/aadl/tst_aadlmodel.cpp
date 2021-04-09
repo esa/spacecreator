@@ -19,6 +19,7 @@
 #include "aadlfunction.h"
 #include "aadlfunctiontype.h"
 #include "aadliface.h"
+#include "aadllibrary.h"
 #include "aadlmodel.h"
 #include "aadlobject.h"
 #include "aadltestutils.h"
@@ -32,7 +33,7 @@ class tst_AADLModel : public QObject
     Q_OBJECT
 
 private Q_SLOTS:
-    void init();
+    void initTestCase();
     void testManageContainers();
     void testManageFunctions();
     void testManageIfaces();
@@ -44,8 +45,9 @@ private:
     QScopedPointer<ivm::AADLModel> m_model;
 };
 
-void tst_AADLModel::init()
+void tst_AADLModel::initTestCase()
 {
+    ivm::initAadlLibrary();
     m_dynPropConfig = ivm::PropertyTemplateConfig::instance();
     m_dynPropConfig->init(QLatin1String("default_attributes.xml"));
     m_model.reset(new ivm::AADLModel(m_dynPropConfig));

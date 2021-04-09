@@ -312,6 +312,7 @@ AADLIface *AADLIface::createIface(const CreationInfo &descr)
     else
         iface = new AADLIfaceRequired(descr);
     iface->setKind(descr.kind);
+    iface->setTitle(descr.name);
 
     return iface;
 }
@@ -499,6 +500,14 @@ void AADLIfaceRequired::setAttr(const QString &name, const QVariant &val)
                         autoName = true;
                     } else {
                         autoName = false;
+                    }
+                    if (!AADLNameValidator::isAcceptableName(this, usedName)) {
+                        if (it != m_prototypes.cend()) {
+                            usedName = (*it)->function()->title() + QLatin1Char('_') + (*it)->title();
+                            autoName = true;
+                        } else {
+                            return;
+                        }
                     }
                 } else {
                     autoName = false;
@@ -705,9 +714,10 @@ void AADLIfaceRequired::cloneInternals(const AADLIface *from)
     AADLIface::cloneInternals(from);
 
     if (const AADLFunctionType *fn = function()) {
-        const QVector<AADLIface *> ifaces = fn->allInterfaces();
-        const auto it = std::find_if(ifaces.cbegin(), ifaces.cend(),
-                [this](const AADLIface *iface) { return iface != this && iface->title() == title(); });
+        const QVector<AADLIface *> ifaces = fn->interfaces();
+        const auto it = std::find_if(ifaces.cbegin(), ifaces.cend(), [this](const AADLIface *iface) {
+            return iface != this && iface->isRequired() && iface->title() == title();
+        });
         if (it != ifaces.cend()) {
             setTitle(from->function()->title() + QLatin1Char('_') + from->title());
         }

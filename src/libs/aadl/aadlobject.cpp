@@ -65,7 +65,7 @@ AADLObject::AADLObject(const AADLObject::Type t, const QString &title, QObject *
     setAttr(meta::Props::token(meta::Props::Token::name), title);
 }
 
-AADLObject::~AADLObject() {}
+AADLObject::~AADLObject() { }
 
 QString AADLObject::title() const
 {

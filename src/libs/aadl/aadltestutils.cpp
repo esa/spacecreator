@@ -29,7 +29,6 @@ AADLIface::CreationInfo init(AADLIface::IfaceType t, AADLFunctionType *fn, const
 AADLIface *createIface(AADLFunctionType *fn, AADLIface::IfaceType t, const QString &name)
 {
     AADLIface *interface = AADLIface::createIface(init(t, fn, name));
-
     if (fn->objectsModel()) {
         fn->objectsModel()->addObject(interface);
     }
@@ -58,6 +57,16 @@ AADLConnection *createConnection(AADLFunctionType *source, AADLFunctionType *tar
         aadlModel->addObject(connection);
     }
     return connection;
+}
+
+AADLIfaceRequired *createRequiredIface(AADLFunctionType *fn, const QString &name)
+{
+    return createIface(fn, ivm::AADLIface::IfaceType::Required, name)->as<AADLIfaceRequired *>();
+}
+
+AADLIfaceProvided *createProvidedIface(AADLFunctionType *fn, const QString &name)
+{
+    return createIface(fn, ivm::AADLIface::IfaceType::Provided, name)->as<AADLIfaceProvided *>();
 }
 
 }

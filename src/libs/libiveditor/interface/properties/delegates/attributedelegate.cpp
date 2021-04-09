@@ -200,12 +200,18 @@ void AttributeDelegate::setModelData(QWidget *editor, QAbstractItemModel *model,
             return;
         }
         if (data.isValid()) {
-            model->setData(index, data, PropertiesListModel::DataRole);
+            if (!model->setData(index, data, PropertiesListModel::DataRole)) {
+                setConfiguredEditorData(editor, index.data(PropertiesListModel::DataRole),
+                        index.data(PropertiesListModel::EditRole).type());
+            }
         }
         return;
     } else if (index.column() == PropertiesListModel::Column::Title) {
         if (auto lineEdit = qobject_cast<QLineEdit *>(editor)) {
-            model->setData(index, lineEdit->text(), PropertiesListModel::DataRole);
+            if (!model->setData(index, lineEdit->text(), PropertiesListModel::DataRole)) {
+                setConfiguredEditorData(editor, index.data(PropertiesListModel::DataRole),
+                        index.data(PropertiesListModel::EditRole).type());
+            }
             return;
         }
     }
