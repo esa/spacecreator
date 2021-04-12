@@ -171,7 +171,7 @@ bool PropertiesViewBase::setButtonsDisabled()
 ContextParametersView::ContextParametersView(QWidget *widget)
     : PropertiesViewBase(widget)
 {
-    m_delegatesColumns = { ContextParametersModel::Column::Type, ContextParametersModel::Column::Value };
+    m_delegatesColumns = { ContextParametersModel::Column::Type };
 }
 
 IfaceParametersView::IfaceParametersView(QWidget *widget)

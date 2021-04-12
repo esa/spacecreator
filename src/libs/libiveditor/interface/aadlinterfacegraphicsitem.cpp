@@ -30,6 +30,7 @@
 #include "baseitems/common/positionlookuphelper.h"
 #include "colors/colormanager.h"
 
+#include <QGraphicsScene>
 #include <QPainter>
 #include <QtDebug>
 

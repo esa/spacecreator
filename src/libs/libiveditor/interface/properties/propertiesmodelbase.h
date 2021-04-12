@@ -28,8 +28,18 @@ namespace ive {
 class PropertiesModelBase : public QStandardItemModel
 {
 public:
+    enum Roles
+    {
+        DataRole = Qt::UserRole + 2,
+        EditRole,
+        ValidatorRole,
+        InfoRole,
+    };
+
     explicit PropertiesModelBase(QObject *parent = nullptr);
-    ~PropertiesModelBase() override;
+    ~PropertiesModelBase() override = default;
+
+    virtual void setDataObject(ivm::AADLObject *obj) = 0;
 
     virtual bool createProperty(const QString &propName) = 0;
     virtual bool removeProperty(const QModelIndex &index) = 0;
@@ -37,7 +47,10 @@ public:
     virtual bool isAttr(const QModelIndex &id) const = 0;
     virtual bool isProp(const QModelIndex &id) const = 0;
 
-    virtual const ivm::AADLObject *dataObject() const = 0;
+    const ivm::AADLObject *dataObject() const;
+
+protected:
+    ivm::AADLObject *m_dataObject { nullptr };
 };
 
 }

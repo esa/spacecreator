@@ -17,6 +17,7 @@
 
 #pragma once
 
+#include <QMetaEnum>
 #include <QMetaType>
 #include <QObject>
 #include <QUuid>
@@ -32,6 +33,8 @@ enum class DropType
 typedef QUuid Id;
 
 static const Id InvalidId = Id();
+
+const QString kStringDelemiter = QString("::");
 
 Id createId();
 
@@ -70,6 +73,20 @@ bool isAncestorOf(const T *const parent, T *object)
     }
 
     return false;
+}
+
+template<typename E>
+QString typeName(const E &e)
+{
+    static const QMetaEnum &me = QMetaEnum::fromType<E>();
+    return QString::fromLatin1(me.valueToKey(static_cast<int>(e))).section(kStringDelemiter, -1);
+}
+
+template<typename E>
+E typeFromName(const QString &name)
+{
+    static const QMetaEnum &me = QMetaEnum::fromType<E>();
+    return static_cast<E>(me.keyToValue(name.toLatin1()));
 }
 
 }

@@ -34,10 +34,6 @@ class IfaceParametersModel : public PropertiesModelBase
 {
     Q_OBJECT
 public:
-    enum Roles
-    {
-        ItemTypeRole = Qt::UserRole + 2,
-    };
     enum Column
     {
         Name = 0,
@@ -45,19 +41,16 @@ public:
         Encoding,
         Direction,
     };
+    Q_ENUM(Column)
 
-    explicit IfaceParametersModel(cmd::CommandsStack::Macro *macro, QObject *parent = nullptr);
+    explicit IfaceParametersModel(
+            cmd::CommandsStack::Macro *macro, const QStringList &asn1Names, QObject *parent = nullptr);
     ~IfaceParametersModel() override;
 
-    int rowCount(const QModelIndex &parent = QModelIndex()) const override;
-    int columnCount(const QModelIndex &parent = QModelIndex()) const override;
-
-    QVariant data(const QModelIndex &index, int role = Qt::DisplayRole) const override;
-
     bool setData(const QModelIndex &index, const QVariant &value, int role = Qt::EditRole) override;
+    void setDataObject(ivm::AADLObject *obj) override;
 
-    void setDataObject(ivm::AADLObject *obj);
-    const ivm::AADLObject *dataObject() const override;
+    int columnCount(const QModelIndex &) const override;
 
     bool createProperty(const QString &propName) override;
     bool removeProperty(const QModelIndex &index) override;
@@ -70,11 +63,13 @@ public:
     Qt::ItemFlags flags(const QModelIndex &index) const override;
 
 private:
+    void createNewRow(const ivm::IfaceParameter &param, int row);
+
+private:
+    const QStringList m_asn1Names;
+    QVector<ivm::IfaceParameter> m_params;
     cmd::CommandsStack::Macro *m_cmdMacro { nullptr };
     ivm::AADLObject *m_dataObject { nullptr };
-    QVector<ivm::IfaceParameter> m_params;
-
-    void createNewRow(const ivm::IfaceParameter &param, int row);
 };
 
 }

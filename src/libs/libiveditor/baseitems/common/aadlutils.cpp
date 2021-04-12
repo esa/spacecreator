@@ -18,6 +18,8 @@
 #include "aadlutils.h"
 
 #include "aadlobject.h"
+#include "asn1/definitions.h"
+#include "asn1/file.h"
 #include "connectioncreationvalidator.h"
 #include "graphicsviewutils.h"
 
@@ -1022,6 +1024,19 @@ bool isRectBounded(const QRectF &outerRect, const QRectF &innerRect)
         return false;
     }
     return outerRect.contains(innerRect);
+}
+
+QStringList asn1Names(const Asn1Acn::File *dataTypes)
+{
+    QStringList names;
+    if (dataTypes) {
+        for (const std::unique_ptr<Asn1Acn::Definitions> &definitions : dataTypes->definitionsList()) {
+            for (const std::unique_ptr<Asn1Acn::TypeAssignment> &assignment : definitions->types()) {
+                names.append(assignment->name());
+            }
+        }
+    }
+    return names;
 }
 
 } // namespace ive

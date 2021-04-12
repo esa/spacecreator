@@ -22,6 +22,7 @@
 #include "aadlnamevalidator.h"
 #include "aadlobject.h"
 #include "asn1/file.h"
+#include "baseitems/common/aadlutils.h"
 #include "commandsstack.h"
 #include "interface/commands/cmdcontextparameterchange.h"
 #include "interface/commands/cmdcontextparametercreate.h"
@@ -43,16 +44,22 @@ ContextParametersModel::~ContextParametersModel() { }
 
 void ContextParametersModel::createNewRow(const ivm::ContextParameter &param, int row)
 {
-    QStandardItem *titleItem = new QStandardItem(param.name());
-    QStandardItem *typeItem = new QStandardItem(param.paramTypeName());
-    QStandardItem *valueItem = new QStandardItem();
-    valueItem->setData(param.defaultValue(), Qt::EditRole);
-
-    setItem(row, Column::Name, titleItem);
-    setItem(row, Column::Type, typeItem);
-    setItem(row, Column::Value, valueItem);
-
     m_params.insert(row, param);
+
+    const QString name = ivm::AADLNameValidator::decodeName(m_dataObject->aadlType(), param.name());
+    QStandardItem *titleItem = new QStandardItem(row, Column::Name);
+    titleItem->setData(name, Qt::DisplayRole);
+    titleItem->setData(name, DataRole);
+    setItem(row, Column::Name, titleItem);
+
+    QStandardItem *typeItem = new QStandardItem(row, Column::Type);
+    typeItem->setData(param.paramTypeName(), DataRole);
+    typeItem->setData(m_asn1Names, EditRole);
+    setItem(row, Column::Type, typeItem);
+
+    QStandardItem *valueItem = new QStandardItem(row, Column::Value);
+    valueItem->setData(param.defaultValue(), DataRole);
+    setItem(row, Column::Value, valueItem);
 }
 
 void ContextParametersModel::setDataObject(ivm::AADLObject *obj)
@@ -67,70 +74,38 @@ void ContextParametersModel::setDataObject(ivm::AADLObject *obj)
     if (auto func = qobject_cast<ivm::AADLFunctionType *>(m_dataObject)) {
         const int paramsCount = func->contextParams().size();
 
-        beginInsertRows(QModelIndex(), 0, paramsCount);
-
         for (int i = 0; i < paramsCount; ++i) {
             auto param = func->contextParams().at(i);
             createNewRow(param, i);
         }
-
-        endInsertRows();
     }
-}
-
-const ivm::AADLObject *ContextParametersModel::dataObject() const
-{
-    return m_dataObject;
 }
 
 void ContextParametersModel::setDataTypes(const QSharedPointer<Asn1Acn::File> &dataTypes)
 {
+    if (m_dataTypes == dataTypes)
+        return;
+
     m_dataTypes = dataTypes;
-}
-
-int ContextParametersModel::rowCount(const QModelIndex &parent) const
-{
-    if (parent.isValid())
-        return 0;
-
-    return m_dataObject ? m_params.size() : 0;
+    if (m_dataTypes) {
+        m_asn1Names = asn1Names(m_dataTypes.get());
+    }
 }
 
 int ContextParametersModel::columnCount(const QModelIndex &) const
 {
-    return 3;
-}
-
-QVariant ContextParametersModel::data(const QModelIndex &index, int role) const
-{
-    const QVariant &res = QStandardItemModel::data(index, role);
-    if (!index.isValid())
-        return res;
-
-    auto param = m_params.at(index.row());
-    switch (role) {
-    case Qt::DisplayRole:
-    case Qt::EditRole: {
-        switch (index.column()) {
-        case Column::Type:
-            return param.paramTypeName();
-        case Column::Value:
-            return param.defaultValue();
-        default:
-            return ivm::AADLNameValidator::decodeName(m_dataObject->aadlType(), param.name());
-        }
-    }
-    }
-
-    return res;
+    static const QMetaEnum &me = QMetaEnum::fromType<Column>();
+    return me.keyCount();
 }
 
 bool ContextParametersModel::setData(const QModelIndex &index, const QVariant &value, int role)
 {
-    if (!index.isValid() || data(index, role) == value)
+    if (!index.isValid() || data(index, role) == value || !m_dataObject
+            || !(m_dataObject->isFunction() || m_dataObject->isFunctionType())) {
         return false;
+    }
 
-    if (role == Qt::EditRole) {
+    if (role == DataRole || role == Qt::EditRole) {
         auto paramOld = m_params.at(index.row());
         ivm::ContextParameter paramNew(paramOld);
 
@@ -146,8 +121,8 @@ bool ContextParametersModel::setData(const QModelIndex &index, const QVariant &v
             break;
         }
         case Column::Value: {
-            if (!m_dataTypes.data()) {
-                return true;
+            if (!m_dataTypes) {
+                return false;
             }
             const Asn1Acn::Types::Type *basicDataType = m_dataTypes->typeFromName(paramNew.paramTypeName());
             if (!paramNew.setDefaultValue(basicDataType, value)) {
@@ -165,10 +140,7 @@ bool ContextParametersModel::setData(const QModelIndex &index, const QVariant &v
             m_params.replace(index.row(), paramNew);
         }
     }
-
-    QStandardItemModel::setData(index, value, role);
-    Q_EMIT dataChanged(index, index, { role, Qt::DisplayRole });
-    return true;
+    return QStandardItemModel::setData(index, value, role);
 }
 
 bool ContextParametersModel::createProperty(const QString &propName)
@@ -181,13 +153,10 @@ bool ContextParametersModel::createProperty(const QString &propName)
     if (auto entity = qobject_cast<ivm::AADLFunctionType *>(m_dataObject)) {
         auto propsCmd = new cmd::CmdContextParameterCreate(entity, param);
         const int rows = rowCount();
-        beginInsertRows(QModelIndex(), rows, rows);
 
-        m_cmdMacro->push(propsCmd);
         createNewRow(param, rows);
+        m_cmdMacro->push(propsCmd);
         res = true;
-
-        endInsertRows();
     }
 
     return res;
@@ -202,9 +171,9 @@ bool ContextParametersModel::removeProperty(const QModelIndex &index)
     const int row(index.row());
     if (auto entity = qobject_cast<ivm::AADLFunctionType *>(m_dataObject)) {
         auto propsCmd = new cmd::CmdContextParameterRemove(entity, row);
-        m_cmdMacro->push(propsCmd);
         removeRow(row);
         m_params.removeAt(row);
+        m_cmdMacro->push(propsCmd);
 
         res = true;
     }
@@ -262,5 +231,4 @@ QVariant ContextParametersModel::headerData(int section, Qt::Orientation orienta
     }
     return QVariant();
 }
-
 }

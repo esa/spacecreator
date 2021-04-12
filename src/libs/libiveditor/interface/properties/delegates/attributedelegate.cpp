@@ -140,9 +140,8 @@ static QWidget *createConfiguredEditor(
 QWidget *AttributeDelegate::createEditor(
         QWidget *parent, const QStyleOptionViewItem &option, const QModelIndex &index) const
 {
-    if (index.column() == PropertiesListModel::Column::Value) {
-        const QModelIndex attrIdx = index.siblingAtColumn(PropertiesListModel::Column::Title);
-        QWidget *editor = createConfiguredEditor(attrIdx.data(PropertiesListModel::NameRole).toString(),
+    if (index.isValid()) {
+        QWidget *editor = createConfiguredEditor(PropertiesListModel::tokenNameFromIndex(index),
                 index.data(PropertiesListModel::EditRole), index.data(PropertiesListModel::ValidatorRole), parent);
         if (editor) {
             editor->setEnabled(index.flags().testFlag(Qt::ItemIsEnabled));
@@ -155,7 +154,7 @@ QWidget *AttributeDelegate::createEditor(
 
 void AttributeDelegate::setEditorData(QWidget *editor, const QModelIndex &index) const
 {
-    if (index.column() == PropertiesListModel::Column::Value) {
+    if (index.isValid()) {
         setConfiguredEditorData(
                 editor, index.data(PropertiesListModel::DataRole), index.data(PropertiesListModel::EditRole).type());
         return;
@@ -166,56 +165,46 @@ void AttributeDelegate::setEditorData(QWidget *editor, const QModelIndex &index)
 
 void AttributeDelegate::setModelData(QWidget *editor, QAbstractItemModel *model, const QModelIndex &index) const
 {
-    if (index.column() == PropertiesListModel::Column::Value) {
-        QVariant data;
-        switch (index.data(PropertiesListModel::EditRole).type()) {
-        case QVariant::Bool:
-            if (auto checkBox = qobject_cast<QCheckBox *>(editor)) {
-                data = checkBox->isChecked();
-            }
-            break;
-        case QVariant::Int:
-            if (auto spinBox = qobject_cast<QSpinBox *>(editor)) {
-                spinBox->interpretText();
-                data = spinBox->value();
-            }
-            break;
-        case QVariant::Double:
-            if (auto doubleSpibBox = qobject_cast<QDoubleSpinBox *>(editor)) {
-                doubleSpibBox->interpretText();
-                data = doubleSpibBox->value();
-            }
-            break;
-        case QVariant::String:
-            if (auto lineEdit = qobject_cast<QLineEdit *>(editor)) {
-                data = lineEdit->text();
-            }
-            break;
-        case QVariant::StringList:
-            if (auto comboBox = qobject_cast<QComboBox *>(editor)) {
-                data = comboBox->currentText();
-            }
-            break;
-        default:
-            return;
+    QVariant data;
+    switch (index.data(PropertiesListModel::EditRole).type()) {
+    case QVariant::Bool:
+        if (auto checkBox = qobject_cast<QCheckBox *>(editor)) {
+            data = checkBox->isChecked();
         }
-        if (data.isValid()) {
-            if (!model->setData(index, data, PropertiesListModel::DataRole)) {
-                setConfiguredEditorData(editor, index.data(PropertiesListModel::DataRole),
-                        index.data(PropertiesListModel::EditRole).type());
-            }
+        break;
+    case QVariant::Int:
+        if (auto spinBox = qobject_cast<QSpinBox *>(editor)) {
+            spinBox->interpretText();
+            data = spinBox->value();
         }
-        return;
-    } else if (index.column() == PropertiesListModel::Column::Title) {
+        break;
+    case QVariant::Double:
+        if (auto doubleSpibBox = qobject_cast<QDoubleSpinBox *>(editor)) {
+            doubleSpibBox->interpretText();
+            data = doubleSpibBox->value();
+        }
+        break;
+    case QVariant::String:
         if (auto lineEdit = qobject_cast<QLineEdit *>(editor)) {
-            if (!model->setData(index, lineEdit->text(), PropertiesListModel::DataRole)) {
-                setConfiguredEditorData(editor, index.data(PropertiesListModel::DataRole),
-                        index.data(PropertiesListModel::EditRole).type());
-            }
-            return;
+            data = lineEdit->text();
         }
+        break;
+    case QVariant::StringList:
+        if (auto comboBox = qobject_cast<QComboBox *>(editor)) {
+            data = comboBox->currentText();
+        }
+        break;
+    default:
+        break;
     }
-    return QStyledItemDelegate::setModelData(editor, model, index);
+    if (data.isValid()) {
+        if (!model->setData(index, data, PropertiesListModel::DataRole)) {
+            setConfiguredEditorData(editor, index.data(PropertiesListModel::DataRole),
+                    index.data(PropertiesListModel::EditRole).type());
+        }
+    } else {
+        QStyledItemDelegate::setModelData(editor, model, index);
+    }
 }
 
 } // namespace ive

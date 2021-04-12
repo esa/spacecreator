@@ -24,6 +24,9 @@ PropertiesModelBase::PropertiesModelBase(QObject *parent)
 {
 }
 
-PropertiesModelBase::~PropertiesModelBase() { }
+const ivm::AADLObject *PropertiesModelBase::dataObject() const
+{
+    return m_dataObject;
+}
 
 }

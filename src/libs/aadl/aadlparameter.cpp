@@ -23,9 +23,9 @@
 #include "asn1/types/type.h"
 #include "asn1valueparser.h"
 
-namespace ivm {
+#include <QMetaEnum>
 
-const QString BasicParameter::ToStringDelemiter = QString("::");
+namespace ivm {
 
 BasicParameter::BasicParameter(const QString &name, Type t, const QString &paramTypeName)
     : m_paramName(name)
@@ -65,20 +65,6 @@ BasicParameter::Type BasicParameter::paramType() const
     return m_paramType;
 }
 
-QString BasicParameter::typeName(const BasicParameter::Type &type)
-{
-    switch (type) {
-    case BasicParameter::Type::Timer: {
-        return QObject::tr("Timer");
-    }
-    case BasicParameter::Type::Directive: {
-        return QObject::tr("Directive");
-    }
-    default:
-        return QObject::tr("Other");
-    }
-}
-
 bool BasicParameter::setParamType(const BasicParameter::Type &type)
 {
     if (m_paramType == type) {
@@ -88,7 +74,7 @@ bool BasicParameter::setParamType(const BasicParameter::Type &type)
     m_paramType = type;
 
     if (m_paramType != BasicParameter::Type::Other) {
-        setParamTypeName(typeName(m_paramType));
+        setParamTypeName(shared::typeName(m_paramType));
     }
 
     return true;
@@ -105,9 +91,9 @@ bool BasicParameter::setParamTypeName(const QString &typeName)
         return false;
 
     m_typeName = typeName;
-    if (m_typeName == BasicParameter::typeName(BasicParameter::Type::Timer))
+    if (m_typeName == shared::typeName(BasicParameter::Type::Timer))
         setParamType(BasicParameter::Type::Timer);
-    else if (m_typeName == BasicParameter::typeName(BasicParameter::Type::Directive))
+    else if (m_typeName == shared::typeName(BasicParameter::Type::Directive))
         setParamType(BasicParameter::Type::Directive);
     else
         setParamType(BasicParameter::Type::Other);
@@ -149,7 +135,7 @@ QString BasicParameter::toString() const
     const QStringList fields = { paramTypeName(), name() };
     for (const QString &field : fields) {
         if (!result.isEmpty())
-            result += ToStringDelemiter;
+            result += shared::kStringDelemiter;
         result += field;
     }
 
@@ -216,7 +202,7 @@ QString ContextParameter::toString() const
     const QStringList fields = { defaultValue().toString() };
     for (const QString &field : fields) {
         if (!result.isEmpty())
-            result += ToStringDelemiter;
+            result += shared::kStringDelemiter;
 
         result += field;
     }
@@ -267,25 +253,6 @@ bool IfaceParameter::setDirection(IfaceParameter::Direction dir)
     return true;
 }
 
-QString IfaceParameter::directionName(IfaceParameter::Direction dir)
-{
-    static const QStringList names { QObject::tr("IN"), QObject::tr("OUT") };
-    switch (dir) {
-    case IfaceParameter::Direction::In:
-        return names.first();
-    default:
-        return names.last();
-    }
-}
-
-IfaceParameter::Direction IfaceParameter::directionFromName(const QString &dir)
-{
-    static const QMap<QString, IfaceParameter::Direction> names { { QObject::tr("IN"), IfaceParameter::Direction::In },
-        { QObject::tr("OUT"), IfaceParameter::Direction::Out } };
-    const QString &name = dir.toUpper();
-    return names.contains(name) ? names.value(name) : names.first();
-}
-
 bool IfaceParameter::operator==(const IfaceParameter &other) const
 {
     return BasicParameter::operator==(other) && m_encoding == other.m_encoding && m_direction == other.m_direction;
@@ -295,10 +262,10 @@ QString IfaceParameter::toString() const
 {
     QString result = BasicParameter::toString();
 
-    const QStringList fields = { directionName(direction()), encoding() };
+    const QStringList fields = { shared::typeName(direction()), encoding() };
     for (const QString &field : fields) {
         if (!result.isEmpty())
-            result += ToStringDelemiter;
+            result += shared::kStringDelemiter;
 
         result += field;
     }

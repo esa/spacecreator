@@ -322,7 +322,7 @@ void AADLXMLReader::processTagOpen(QXmlStreamReader &xml)
         Q_ASSERT(d->m_currentObject.iface() != nullptr);
 
         const IfaceParameter param = addIfaceParameter(nameAttr.m_value, attrs,
-                t == Props::Token::Input_Parameter ? IfaceParameter::Direction::In : IfaceParameter::Direction::Out);
+                t == Props::Token::Input_Parameter ? IfaceParameter::Direction::IN : IfaceParameter::Direction::OUT);
         d->m_currentObject.iface()->addParam(param);
         break;
     }

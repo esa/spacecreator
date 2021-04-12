@@ -43,6 +43,8 @@ public:
     virtual IndexUpdater *createSynchronizedIndexUpdater(Model *model,
                                                          QObject *parent = nullptr) const = 0;
 
+    virtual ~IndexUpdaterFactory() = default;
+
     IndexUpdater *createUnsynchronozedIndexUpdater(QTreeView *treeView,
                                                    Model *model,
                                                    QObject *parent = nullptr) const

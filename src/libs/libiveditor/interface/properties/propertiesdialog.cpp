@@ -22,12 +22,13 @@
 #include "aadliface.h"
 #include "aadlnamevalidator.h"
 #include "aadlobject.h"
+#include "asn1/file.h"
+#include "asn1/types/builtintypes.h"
+#include "baseitems/common/aadlutils.h"
 #include "commandsstack.h"
 #include "contextparametersmodel.h"
 #include "delegates/asn1valuedelegate.h"
 #include "delegates/attributedelegate.h"
-#include "delegates/comboboxdelegate.h"
-#include "delegates/propertytypedelegate.h"
 #include "ifaceparametersmodel.h"
 #include "interface/aadlconnectiongroupmodel.h"
 #include "interface/commands/cmdentityattributechange.h"
@@ -180,8 +181,8 @@ void PropertiesDialog::initContextParams()
     modelCtxParams->setDataObject(m_dataObject);
 
     PropertiesViewBase *viewAttrs = new ContextParametersView(this);
-    viewAttrs->tableView()->setItemDelegateForColumn(ContextParametersModel::Column::Type,
-            new ContextParametersTypeDelegate(m_dataTypes, viewAttrs->tableView()));
+    viewAttrs->tableView()->setItemDelegateForColumn(
+            ContextParametersModel::Column::Type, new AttributeDelegate(viewAttrs->tableView()));
     viewAttrs->tableView()->setItemDelegateForColumn(
             ContextParametersModel::Column::Value, new Asn1ValueDelegate(m_dataTypes, viewAttrs->tableView()));
     viewAttrs->tableView()->horizontalHeader()->show();
@@ -191,20 +192,16 @@ void PropertiesDialog::initContextParams()
 
 void PropertiesDialog::initIfaceParams()
 {
-    IfaceParametersModel *modelIfaceParams = new IfaceParametersModel(m_cmdMacro, this);
+    IfaceParametersModel *modelIfaceParams = new IfaceParametersModel(m_cmdMacro, asn1Names(m_dataTypes.get()), this);
     modelIfaceParams->setDataObject(m_dataObject);
 
     PropertiesViewBase *viewAttrs = new IfaceParametersView(this);
     viewAttrs->tableView()->setItemDelegateForColumn(
-            IfaceParametersModel::Column::Type, new IfaceParametersTypeDelegate(m_dataTypes, viewAttrs->tableView()));
-    viewAttrs->tableView()->setItemDelegateForColumn(IfaceParametersModel::Column::Encoding,
-            new StringListComboDelegate({ tr("NATIVE"), tr("UPER"), tr("ACN") }, // TODO: is it configurable?
-                    viewAttrs->tableView()));
-    viewAttrs->tableView()->setItemDelegateForColumn(IfaceParametersModel::Column::Direction,
-            new StringListComboDelegate(
-                    { ivm::IfaceParameter::directionName(ivm::IfaceParameter::Direction::In),
-                            ivm::IfaceParameter::directionName(ivm::IfaceParameter::Direction::Out) },
-                    viewAttrs->tableView()));
+            IfaceParametersModel::Column::Type, new AttributeDelegate(viewAttrs->tableView()));
+    viewAttrs->tableView()->setItemDelegateForColumn(
+            IfaceParametersModel::Column::Encoding, new AttributeDelegate(viewAttrs->tableView()));
+    viewAttrs->tableView()->setItemDelegateForColumn(
+            IfaceParametersModel::Column::Direction, new AttributeDelegate(viewAttrs->tableView()));
     viewAttrs->tableView()->horizontalHeader()->show();
     viewAttrs->setModel(modelIfaceParams);
     ui->tabWidget->insertTab(0, viewAttrs, tr("Parameters"));

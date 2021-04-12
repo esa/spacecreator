@@ -38,15 +38,15 @@
 
 namespace ive {
 
-static QString tokenNameFromIndex(const QModelIndex &index)
+QString PropertiesListModel::tokenNameFromIndex(const QModelIndex &index)
 {
     QString name;
-    if (index.column() == PropertiesListModel::Column::Title) {
-        name = index.data(PropertiesListModel::NameRole).toString();
+    if (index.column() == PropertiesListModel::Column::Name) {
+        name = index.data(PropertiesListModel::DataRole).toString();
     } else {
-        const QModelIndex titleIndex = index.siblingAtColumn(PropertiesListModel::Column::Title);
+        const QModelIndex titleIndex = index.siblingAtColumn(PropertiesListModel::Column::Name);
         if (titleIndex.isValid()) {
-            name = titleIndex.data(PropertiesListModel::NameRole).toString();
+            name = titleIndex.data(PropertiesListModel::DataRole).toString();
         }
     }
     return name;
@@ -78,13 +78,13 @@ void PropertiesListModel::updateRow(const RowData &data)
         createNewRow(row, data.name);
     }
 
-    QStandardItem *titleItem = item(row, Column::Title);
+    QStandardItem *titleItem = item(row, Column::Name);
     Q_ASSERT(titleItem);
     if (!titleItem) {
         return;
     }
     titleItem->setData(data.label, Qt::DisplayRole);
-    titleItem->setData(data.name, NameRole);
+    titleItem->setData(data.name, DataRole);
 
     QFont font = qApp->font();
     font.setBold(true);
@@ -125,7 +125,7 @@ void PropertiesListModel::createNewRow(int row, const QString &name)
     m_names.append(name);
 
     QStandardItem *titleItem = new QStandardItem();
-    setItem(row, Column::Title, titleItem);
+    setItem(row, Column::Name, titleItem);
 
     QStandardItem *valueItem = new QStandardItem();
     setItem(row, Column::Value, valueItem);
@@ -206,11 +206,6 @@ void PropertiesListModel::setDataObject(ivm::AADLObject *obj)
     updateRows(m_propTemplatesConfig->propertyTemplatesForObject(m_dataObject));
 }
 
-const ivm::AADLObject *PropertiesListModel::dataObject() const
-{
-    return m_dataObject;
-}
-
 int PropertiesListModel::rowCount(const QModelIndex &parent) const
 {
     if (parent.isValid())
@@ -228,7 +223,7 @@ QVariant PropertiesListModel::headerData(int section, Qt::Orientation orientatio
 {
     if (role == Qt::DisplayRole && orientation == Qt::Horizontal) {
         switch (section) {
-        case Column::Title:
+        case Column::Name:
             return tr("Name");
         case Column::Value:
             return tr("Value");
@@ -251,8 +246,8 @@ bool PropertiesListModel::setData(const QModelIndex &index, const QVariant &valu
         }
     }
 
-    if (role == DataRole) {
-        const QString &name = index.siblingAtColumn(PropertiesListModel::Column::Title).data(NameRole).toString();
+    if (role == DataRole || role == Qt::EditRole) {
+        const QString &name = tokenNameFromIndex(index);
         auto isValueValid = [this](const QString &name, const QString &value) {
             if (ivm::PropertyTemplate *propTemplate =
                             m_propTemplatesConfig->propertyTemplateForObject(m_dataObject, name)) {
@@ -309,7 +304,7 @@ bool PropertiesListModel::setData(const QModelIndex &index, const QVariant &valu
                 m_cmdMacro->push(propsCmd);
                 return true;
             }
-            case Column::Title: {
+            case Column::Name: {
                 const QString &newName = value.toString();
                 if (newName.isEmpty() || m_names.contains(newName))
                     return false;
@@ -352,7 +347,7 @@ bool PropertiesListModel::removeProperty(const QModelIndex &index)
     }
 
     const int row(index.row());
-    const QModelIndex &propId = this->index(row, Column::Title);
+    const QModelIndex &propId = this->index(row, Column::Name);
     if (isAttr(propId))
         return false;
 
@@ -378,7 +373,7 @@ bool PropertiesListModel::isProp(const QModelIndex &id) const
 
 bool PropertiesListModel::isEditable(const QModelIndex &idx) const
 {
-    if (idx.column() == Column::Title) {
+    if (idx.column() == Column::Name) {
         const QString propName = m_names.value(idx.row());
         if (m_propTemplatesConfig->hasPropertyTemplateForObject(m_dataObject, propName)) {
             return false;
@@ -449,7 +444,7 @@ bool FunctionPropertiesListModel::isEditable(const QModelIndex &index) const
         break;
     }
     case ivm::meta::Props::Token::instance_of: {
-        if (dataObject()->isFunctionType() || index.column() == Column::Title)
+        if (dataObject()->isFunctionType() || index.column() == Column::Name)
             editable = false;
         else {
             if (auto fn = dataObject()->as<const ivm::AADLFunction *>()) {

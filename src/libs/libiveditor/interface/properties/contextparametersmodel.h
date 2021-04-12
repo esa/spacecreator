@@ -40,31 +40,23 @@ class ContextParametersModel : public PropertiesModelBase
     Q_OBJECT
 
 public:
-    enum Roles
-    {
-        ItemTypeRole = Qt::UserRole + 2,
-    };
     enum Column
     {
         Name = 0,
         Type,
         Value,
     };
+    Q_ENUM(Column)
 
     explicit ContextParametersModel(cmd::CommandsStack::Macro *macro, QObject *parent = nullptr);
     ~ContextParametersModel() override;
 
-    int rowCount(const QModelIndex &parent = QModelIndex()) const override;
     int columnCount(const QModelIndex &parent = QModelIndex()) const override;
-
-    QVariant data(const QModelIndex &index, int role = Qt::DisplayRole) const override;
 
     // Editable:
     bool setData(const QModelIndex &index, const QVariant &value, int role = Qt::EditRole) override;
 
-    void setDataObject(ivm::AADLObject *obj);
-    const ivm::AADLObject *dataObject() const override;
-
+    void setDataObject(ivm::AADLObject *obj) override;
     void setDataTypes(const QSharedPointer<Asn1Acn::File> &dataTypes);
 
     bool createProperty(const QString &propName) override;
@@ -82,6 +74,7 @@ private:
     ivm::AADLObject *m_dataObject { nullptr };
     QVector<ivm::ContextParameter> m_params;
     QSharedPointer<Asn1Acn::File> m_dataTypes;
+    QStringList m_asn1Names;
 
     void createNewRow(const ivm::ContextParameter &param, int row);
 };

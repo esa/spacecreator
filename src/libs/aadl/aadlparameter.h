@@ -17,6 +17,8 @@
 
 #pragma once
 
+#include "common.h"
+
 #include <QString>
 #include <QVariant>
 
@@ -43,6 +45,7 @@ public:
         Timer,
         Directive
     };
+    Q_ENUM(Type)
 
     BasicParameter(const QString &name = QString(), Type t = BasicParameter::Type::Other,
             const QString &paramTypeName = QString());
@@ -63,13 +66,10 @@ public:
 
     bool operator==(const BasicParameter &other) const;
 
-    static QString typeName(const Type &type);
-
     virtual QString toString() const;
     virtual bool isNull() const;
 
 protected:
-    static const QString ToStringDelemiter;
     QString m_paramName = {};
     Type m_paramType = { Type::Other };
     QString m_typeName = {};
@@ -83,7 +83,7 @@ class ContextParameter : public BasicParameter
     Q_PROPERTY(QVariant defaultValue READ defaultValue)
 public:
     ContextParameter(const QString &name = QString(), Type t = BasicParameter::Type::Timer,
-            const QString &paramTypeName = BasicParameter::typeName(BasicParameter::Type::Timer),
+            const QString &paramTypeName = shared::typeName(BasicParameter::Type::Timer),
             const QVariant &val = QVariant());
     ~ContextParameter() override;
 
@@ -111,15 +111,15 @@ class IfaceParameter : public BasicParameter
 public:
     enum class Direction
     {
-        In = 0,
-        Out
+        IN = 0,
+        OUT
     };
 
     Q_ENUM(Direction)
 
     IfaceParameter(const QString &name = QObject::tr("IfaceParam"), Type t = BasicParameter::Type::Other,
             const QString &paramTypeName = {}, const QString &encoding = QObject::tr("NATIVE"),
-            Direction dir = IfaceParameter::Direction::In);
+            Direction dir = IfaceParameter::Direction::IN);
     ~IfaceParameter() override;
 
     QString encoding() const;
@@ -127,11 +127,9 @@ public:
 
     Direction direction() const;
     bool setDirection(Direction dir);
-    static QString directionName(Direction dir);
-    static Direction directionFromName(const QString &dir);
 
-    inline bool isInDirection() const { return direction() == Direction::In; }
-    inline bool isOutDirection() const { return direction() == Direction::Out; }
+    inline bool isInDirection() const { return direction() == Direction::IN; }
+    inline bool isOutDirection() const { return direction() == Direction::OUT; }
 
     bool operator==(const IfaceParameter &other) const;
 
@@ -140,7 +138,7 @@ public:
 
 protected:
     QString m_encoding = {};
-    Direction m_direction = { Direction::In };
+    Direction m_direction = { Direction::IN };
 };
 
 }

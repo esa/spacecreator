@@ -152,10 +152,6 @@ target_sources(${LIB_NAME} PRIVATE
     interface/properties/delegates/asn1valuedelegate.h
     interface/properties/delegates/attributedelegate.cpp
     interface/properties/delegates/attributedelegate.h
-    interface/properties/delegates/comboboxdelegate.cpp
-    interface/properties/delegates/comboboxdelegate.h
-    interface/properties/delegates/propertytypedelegate.cpp
-    interface/properties/delegates/propertytypedelegate.h
     interface/properties/propertytemplatemanager.cpp
     interface/properties/propertytemplatemanager.h
     interface/properties/propertytemplatemanager.ui

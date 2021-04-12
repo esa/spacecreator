@@ -31,9 +31,11 @@
 
 namespace ive {
 
-IfaceParametersModel::IfaceParametersModel(cmd::CommandsStack::Macro *macro, QObject *parent)
+IfaceParametersModel::IfaceParametersModel(
+        cmd::CommandsStack::Macro *macro, const QStringList &asn1Names, QObject *parent)
     : PropertiesModelBase(parent)
     , m_cmdMacro(macro)
+    , m_asn1Names(asn1Names)
 {
 }
 
@@ -41,17 +43,29 @@ IfaceParametersModel::~IfaceParametersModel() { }
 
 void IfaceParametersModel::createNewRow(const ivm::IfaceParameter &param, int row)
 {
-    QStandardItem *titleItem = new QStandardItem(param.name());
-    QStandardItem *typeItem = new QStandardItem(param.paramTypeName());
-    QStandardItem *encodingItem = new QStandardItem(param.encoding());
-    QStandardItem *directionItem = new QStandardItem(ivm::IfaceParameter::directionName(param.direction()));
-
-    setItem(row, Column::Name, titleItem);
-    setItem(row, Column::Type, typeItem);
-    setItem(row, Column::Encoding, encodingItem);
-    setItem(row, Column::Direction, directionItem);
-
     m_params.insert(row, param);
+
+    QStandardItem *titleItem = new QStandardItem(row, Column::Name);
+    titleItem->setData(param.name(), Qt::DisplayRole);
+    titleItem->setData(param.name(), DataRole);
+    setItem(row, Column::Name, titleItem);
+
+    QStandardItem *typeItem = new QStandardItem(row, Column::Type);
+    typeItem->setData(param.paramTypeName(), DataRole);
+    typeItem->setData(m_asn1Names, EditRole);
+    setItem(row, Column::Type, typeItem);
+
+    QStandardItem *encodingItem = new QStandardItem(row, Column::Encoding);
+    encodingItem->setData(param.encoding(), DataRole);
+    encodingItem->setData(QStringList { tr("NATIVE"), tr("UPER"), tr("ACN") }, EditRole); // TODO: is it configurable?
+    setItem(row, Column::Encoding, encodingItem);
+
+    QStandardItem *directionItem = new QStandardItem(row, Column::Direction);
+    directionItem->setData(shared::typeName(param.direction()), DataRole);
+    directionItem->setData(QStringList { shared::typeName(ivm::IfaceParameter::Direction::IN),
+                                   shared::typeName(ivm::IfaceParameter::Direction::OUT) },
+            EditRole);
+    setItem(row, Column::Direction, directionItem);
 }
 
 void IfaceParametersModel::setDataObject(ivm::AADLObject *obj)
@@ -67,68 +81,26 @@ void IfaceParametersModel::setDataObject(ivm::AADLObject *obj)
         const QVector<ivm::IfaceParameter> &params(iface->params());
         const int paramsCount = params.size();
 
-        beginInsertRows(QModelIndex(), 0, paramsCount);
-
         for (int i = 0; i < paramsCount; ++i) {
             const ivm::IfaceParameter &param = params.at(i);
             createNewRow(param, i);
         }
-
-        endInsertRows();
     }
-}
-
-const ivm::AADLObject *IfaceParametersModel::dataObject() const
-{
-    return m_dataObject;
-}
-
-int IfaceParametersModel::rowCount(const QModelIndex &parent) const
-{
-    if (parent.isValid())
-        return 0;
-
-    return m_dataObject ? m_params.size() : 0;
 }
 
 int IfaceParametersModel::columnCount(const QModelIndex &) const
 {
-    return 4;
-}
-
-QVariant IfaceParametersModel::data(const QModelIndex &index, int role) const
-{
-    const QVariant &res = QStandardItemModel::data(index, role);
-    if (!index.isValid())
-        return res;
-
-    const ivm::IfaceParameter &param = m_params.at(index.row());
-    switch (role) {
-    case Qt::DisplayRole:
-    case Qt::EditRole: {
-        switch (index.column()) {
-        case Column::Name:
-            return param.name();
-        case Column::Type:
-            return param.paramTypeName();
-        case Column::Encoding:
-            return param.encoding();
-        case Column::Direction:
-            return ivm::IfaceParameter::directionName(param.direction());
-        }
-    }
-    }
-
-    return res;
+    static const QMetaEnum &me = QMetaEnum::fromType<Column>();
+    return me.keyCount();
 }
 
 bool IfaceParametersModel::setData(const QModelIndex &index, const QVariant &value, int role)
 {
-    if (!index.isValid() || data(index, role) == value)
+    if (!index.isValid() || data(index, role) == value || !m_dataObject)
         return false;
 
-    if (role == Qt::EditRole) {
-        const ivm::IfaceParameter &paramOld = m_params.at(index.row());
+    if (role == DataRole || role == Qt::EditRole) {
+        const ivm::IfaceParameter &paramOld = m_params.value(index.row());
         ivm::IfaceParameter paramNew(paramOld);
 
         switch (index.column()) {
@@ -148,7 +120,7 @@ bool IfaceParametersModel::setData(const QModelIndex &index, const QVariant &val
             break;
         }
         case Column::Direction: {
-            if (!paramNew.setDirection(ivm::IfaceParameter::directionFromName(value.toString())))
+            if (!paramNew.setDirection(shared::typeFromName<ivm::IfaceParameter::Direction>(value.toString())))
                 return false;
             break;
         }
@@ -161,9 +133,7 @@ bool IfaceParametersModel::setData(const QModelIndex &index, const QVariant &val
         m_params.replace(index.row(), paramNew);
     }
 
-    QStandardItemModel::setData(index, value, role);
-    Q_EMIT dataChanged(index, index, { role, Qt::DisplayRole });
-    return true;
+    return QStandardItemModel::setData(index, value, role);
 }
 
 bool IfaceParametersModel::createProperty(const QString &propName)
@@ -172,12 +142,9 @@ bool IfaceParametersModel::createProperty(const QString &propName)
 
     auto propsCmd = new cmd::CmdIfaceParamCreate(m_dataObject, param);
     const int rows = rowCount();
-    beginInsertRows(QModelIndex(), rows, rows);
 
-    m_cmdMacro->push(propsCmd);
     createNewRow(param, rows);
-
-    endInsertRows();
+    m_cmdMacro->push(propsCmd);
 
     return true;
 }
@@ -190,9 +157,9 @@ bool IfaceParametersModel::removeProperty(const QModelIndex &index)
 
     const int row(index.row());
     auto propsCmd = new cmd::CmdIfaceParamRemove(m_dataObject, m_params.value(row));
-    m_cmdMacro->push(propsCmd);
     removeRow(row);
     m_params.removeAt(row);
+    m_cmdMacro->push(propsCmd);
 
     return true;
 }

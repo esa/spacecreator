@@ -16,10 +16,19 @@
 */
 #pragma once
 
-#include <QGraphicsScene>
+#include <QList>
+#include <QMarginsF>
+#include <QRectF>
+#include <QSizeF>
 
 class QLineF;
 class QPointF;
+class QGraphicsScene;
+class QGraphicsItem;
+
+namespace Asn1Acn {
+class File;
+}
 
 namespace ivm {
 class AADLObject;
@@ -198,5 +207,7 @@ void findGeometryForRect(QRectF &itemRect, QRectF &boundedRect, const QList<QRec
         const QMarginsF &margins = kRootMargins);
 
 bool isRectBounded(const QRectF &outerRect, const QRectF &innerRect);
+
+QStringList asn1Names(const Asn1Acn::File *dataTypes);
 
 } // namespace ive

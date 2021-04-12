@@ -36,18 +36,9 @@ class PropertiesListModel : public PropertiesModelBase
     Q_OBJECT
 
 public:
-    enum Roles
-    {
-        InfoRole = Qt::UserRole + 2,
-        NameRole,
-        DataRole,
-        EditRole,
-        ValidatorRole,
-    };
-
     enum Column
     {
-        Title = 0,
+        Name = 0,
         Value
     };
 
@@ -61,8 +52,7 @@ public:
     // Editable:
     bool setData(const QModelIndex &index, const QVariant &value, int role = DataRole) override;
 
-    void setDataObject(ivm::AADLObject *obj);
-    const ivm::AADLObject *dataObject() const override;
+    void setDataObject(ivm::AADLObject *obj) override;
 
     Qt::ItemFlags flags(const QModelIndex &index) const override;
 
@@ -74,12 +64,12 @@ public:
 
     QVariant headerData(int section, Qt::Orientation orientation, int role) const override;
 
+    static QString tokenNameFromIndex(const QModelIndex &index);
     static ivm::meta::Props::Token tokenFromIndex(const QModelIndex &index);
 
 protected:
     cmd::CommandsStack::Macro *m_cmdMacro { nullptr };
     ivm::PropertyTemplateConfig *m_propTemplatesConfig { nullptr };
-    ivm::AADLObject *m_dataObject { nullptr };
     QVector<QString> m_names;
 
     virtual bool isEditable(const QModelIndex &idx) const;

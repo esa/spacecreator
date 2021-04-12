@@ -24,6 +24,7 @@
 #include "interface/graphicsitemhelpers.h"
 #include "ui/grippointshandler.h"
 
+#include <QGraphicsScene>
 #include <QKeyEvent>
 #include <QtDebug>
 

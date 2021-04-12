@@ -24,6 +24,7 @@
 #include "sharedlibrary.h"
 
 #include <QGraphicsRectItem>
+#include <QGraphicsScene>
 #include <QMetaEnum>
 #include <QObject>
 #include <QtTest>
