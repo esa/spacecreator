@@ -540,8 +540,10 @@ void tst_MscChart::testMoveCoregion()
     m_chart->updateCoregionPos(coregionBegin, coregionEnd, instance2, 1, 3);
     QCOMPARE(coregionBegin->instance(), instance2);
     QCOMPARE(coregionEnd->instance(), instance2);
-    QCOMPARE(m_chart->indexofEvent(coregionBegin), 1);
-    QCOMPARE(m_chart->indexofEvent(coregionEnd), 3);
+    QCOMPARE(m_chart->indexofEventAtInstance(coregionBegin, instance1), -1);
+    QCOMPARE(m_chart->indexofEventAtInstance(coregionBegin, instance2), 1);
+    QCOMPARE(m_chart->indexofEventAtInstance(coregionEnd, instance1), -1);
+    QCOMPARE(m_chart->indexofEventAtInstance(coregionEnd, instance2), 3);
 }
 
 void tst_MscChart::testAddCreateAfterMessage()

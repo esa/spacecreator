@@ -244,13 +244,6 @@ int MscChart::addInstanceEvent(MscInstanceEvent *instanceEvent, int eventIndex)
     }
     connect(instanceEvent, &MscInstanceEvent::dataChanged, this, &MscChart::dataChanged);
 
-    if (instanceEvent->entityType() == MscEntity::EntityType::Timer) {
-        MscTimer *timer = static_cast<MscTimer *>(instanceEvent);
-        connect(timer, &MscTimer::instanceChanged, this, [this, timer]() { resetTimerRelations(timer); });
-        connect(timer, &MscTimer::nameChanged, this, [this, timer]() { resetTimerRelations(timer); });
-        resetTimerRelations(timer);
-    }
-
     QVector<MscInstance *> instances = relatedInstances(instanceEvent);
     for (MscInstance *inst : qAsConst(instances)) {
         if (!m_events.contains(inst)) {
@@ -289,6 +282,13 @@ int MscChart::addInstanceEvent(MscInstanceEvent *instanceEvent, int eventIndex)
                     msc::MscChart::eventInstanceChange(ev, addedInstance, removedInstance);
                 }
             });
+
+    if (instanceEvent->entityType() == MscEntity::EntityType::Timer) {
+        MscTimer *timer = static_cast<MscTimer *>(instanceEvent);
+        connect(timer, &MscTimer::instanceChanged, this, [this, timer]() { resetTimerRelations(timer); });
+        connect(timer, &MscTimer::nameChanged, this, [this, timer]() { resetTimerRelations(timer); });
+        resetTimerRelations(timer);
+    }
 
     eventsCheck();
 
@@ -346,7 +346,20 @@ void MscChart::removeInstanceEvent(MscInstanceEvent *instanceEvent)
  */
 int MscChart::indexofEvent(MscInstanceEvent *instanceEvent) const
 {
-    return m_instanceEvents.indexOf(instanceEvent);
+    return allEvents().indexOf(instanceEvent);
+}
+
+/*!
+   Returns the psotion of an event for a given instance
+   If the event is not part of the instance, -1 is returned
+ */
+int MscChart::indexofEventAtInstance(MscInstanceEvent *instanceEvent, MscInstance *instance) const
+{
+    if (!m_events.contains(instance)) {
+        return -1;
+    }
+
+    return m_events[instance].indexOf(instanceEvent);
 }
 
 /*!
@@ -354,9 +367,9 @@ int MscChart::indexofEvent(MscInstanceEvent *instanceEvent) const
  */
 MscMessage *MscChart::messageByName(const QString &name) const
 {
-    for (MscInstanceEvent *message : m_instanceEvents) {
-        if (message->entityType() == MscEntity::EntityType::Message && message->name() == name) {
-            return static_cast<MscMessage *>(message);
+    for (MscMessage *message : allEventsOfType<msc::MscMessage>()) {
+        if (message->name() == name) {
+            return message;
         }
     }
     return nullptr;
@@ -372,9 +385,9 @@ MscInstanceEvent *MscChart::firstEventOfInstance(MscInstance *instance) const
         return nullptr;
     }
 
-    for (MscInstanceEvent *event : m_instanceEvents) {
-        if (event->relatesTo(instance)) {
-            return event;
+    if (m_events.contains(instance)) {
+        if (!m_events[instance].isEmpty()) {
+            return m_events[instance].first();
         }
     }
 
@@ -394,13 +407,7 @@ int MscChart::totalEventNumber() const
  */
 QVector<MscMessage *> MscChart::messages() const
 {
-    QVector<MscMessage *> result;
-    for (MscInstanceEvent *event : m_instanceEvents) {
-        if (event->entityType() == msc::MscEntity::EntityType::Message) {
-            result.append(static_cast<msc::MscMessage *>(event));
-        }
-    }
-    return result;
+    return allEventsOfType<msc::MscMessage>();
 }
 
 const QVector<MscGate *> &MscChart::gates() const
@@ -463,7 +470,7 @@ MscEntity::EntityType MscChart::entityType() const
 
 bool MscChart::isEmpty() const
 {
-    return m_instances.isEmpty() && m_instanceEvents.isEmpty();
+    return m_instances.isEmpty() && m_events.isEmpty() && m_orphanEvents.isEmpty();
 }
 
 void MscChart::updateInstanceOrder(MscInstance *instance, int pos)
@@ -481,18 +488,6 @@ void MscChart::updateInstanceOrder(MscInstance *instance, int pos)
     Q_EMIT instanceOrderChanged(instance, currPos, pos);
     Q_EMIT instancesChanged();
     Q_EMIT dataChanged();
-}
-
-template<class T>
-bool setEventInstance(T *event, MscInstance *newInstance)
-{
-    Q_ASSERT(event);
-    Q_ASSERT(newInstance);
-    if (event->instance() != newInstance) {
-        event->setInstance(newInstance);
-        return true;
-    }
-    return false;
 }
 
 void MscChart::updateActionPos(MscAction *action, MscInstance *newInstance, int eventPos)
@@ -598,7 +593,7 @@ bool MscChart::moveEvent(MscInstanceEvent *event, int newIndex)
  */
 void MscChart::rearrangeEvents(const QVector<MscInstanceEvent *> &sortedEvents)
 {
-    if (sortedEvents == m_instanceEvents) {
+    if (sortedEvents == allEvents()) {
         return;
     }
 
@@ -645,7 +640,7 @@ void MscChart::updateMessageTarget(
 int MscChart::maxInstanceNameNumber() const
 {
     int num = 1;
-    for (const MscInstanceEvent *event : m_instanceEvents) {
+    for (const MscInstanceEvent *event : allEvents()) {
         int nameNum = -1;
         if (event->entityType() == MscEntity::EntityType::Message) {
             auto msg = static_cast<const MscMessage *>(event);
@@ -669,7 +664,7 @@ int MscChart::maxInstanceNameNumber() const
  */
 int MscChart::setInstanceNameNumbers(int nextNumber)
 {
-    QVector<MscMessage *> messages = allEvents<MscMessage>();
+    QVector<MscMessage *> messages = allEventsOfType<MscMessage>();
     for (auto msg = messages.begin(); msg != messages.end(); ++msg) {
         for (auto msg2 = msg + 1; msg2 != messages.end(); ++msg2) {
             // now check if they are not unique
@@ -697,7 +692,7 @@ void MscChart::resetTimerRelations(MscTimer *timer)
     timer->setFollowingTimer(nullptr);
     timer->setPrecedingTimer(nullptr);
 
-    const int idx = m_instanceEvents.indexOf(timer);
+    const int idx = indexofEventAtInstance(timer, timer->instance());
     if (idx == -1)
         return;
 
@@ -710,17 +705,24 @@ void MscChart::resetTimerRelations(MscTimer *timer)
 
 void MscChart::updatePrecedingTimer(MscTimer *timer, int idx)
 {
-    if (idx == -1)
-        idx = m_instanceEvents.indexOf(timer);
+    if (!m_events.contains(timer->instance())) {
+        return;
+    }
+
+    const QVector<MscInstanceEvent *> events = m_events[timer->instance()];
+    if (idx == -1) {
+        idx = events.indexOf(timer);
+    }
 
     if (idx != -1) {
         for (int timerIdx = idx - 1; timerIdx >= 0; --timerIdx) {
-            MscInstanceEvent *event = m_instanceEvents.value(timerIdx);
-            if (event->entityType() != MscEntity::EntityType::Timer)
+            MscInstanceEvent *event = events.value(timerIdx);
+            if (event->entityType() != MscEntity::EntityType::Timer) {
                 continue;
+            }
 
             MscTimer *mscTimer = static_cast<MscTimer *>(event);
-            if (mscTimer->fullName() == timer->fullName() && mscTimer->instance() == timer->instance()) {
+            if (mscTimer->fullName() == timer->fullName()) {
                 timer->setPrecedingTimer(mscTimer);
                 mscTimer->setFollowingTimer(timer);
                 return;
@@ -733,17 +735,24 @@ void MscChart::updatePrecedingTimer(MscTimer *timer, int idx)
 
 void MscChart::updateFollowingTimer(MscTimer *timer, int idx)
 {
-    if (idx == -1)
-        idx = m_instanceEvents.indexOf(timer);
+    if (!m_events.contains(timer->instance())) {
+        return;
+    }
+
+    const QVector<MscInstanceEvent *> events = m_events[timer->instance()];
+    if (idx == -1) {
+        idx = events.indexOf(timer);
+    }
 
     if (idx != -1) {
-        for (int timerIdx = idx + 1; timerIdx < m_instanceEvents.size(); ++timerIdx) {
-            MscInstanceEvent *event = m_instanceEvents.value(timerIdx);
-            if (event->entityType() != MscEntity::EntityType::Timer)
+        for (int timerIdx = idx + 1; timerIdx < events.size(); ++timerIdx) {
+            MscInstanceEvent *event = events.value(timerIdx);
+            if (event->entityType() != MscEntity::EntityType::Timer) {
                 continue;
+            }
 
             MscTimer *mscTimer = static_cast<MscTimer *>(event);
-            if (mscTimer->fullName() == timer->fullName() && mscTimer->instance() == timer->instance()) {
+            if (mscTimer->fullName() == timer->fullName()) {
                 timer->setFollowingTimer(mscTimer);
                 mscTimer->setPrecedingTimer(timer);
                 return;

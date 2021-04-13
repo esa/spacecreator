@@ -59,8 +59,10 @@ public:
     QVector<MscInstanceEvent *> instanceEvents() const;
     QVector<MscInstanceEvent *> eventsForInstance(const MscInstance *instance) const;
     int addInstanceEvent(MscInstanceEvent *instanceEvent, int eventIndex = -1);
+    int addInstanceEvent(MscInstanceEvent *instanceEvent, MscInstance *instance, int eventIndex = -1);
     void removeInstanceEvent(MscInstanceEvent *instanceEvent);
     int indexofEvent(MscInstanceEvent *instanceEvent) const;
+    int indexofEventAtInstance(MscInstanceEvent *instanceEvent, MscInstance *instance) const;
     MscMessage *messageByName(const QString &name) const;
     MscInstanceEvent *firstEventOfInstance(MscInstance *instance) const;
     int totalEventNumber() const;
@@ -124,14 +126,39 @@ private:
        Return a QVector with all events in this chart of the given type
      */
     template<typename T>
-    QVector<T *> allEvents()
+    QVector<T *> allEventsOfType() const
     {
-        QVector<T *> events;
-        for (auto ev : m_instanceEvents) {
-            if (auto obj = qobject_cast<T *>(ev))
-                events.append(obj);
+        QVector<T *> typeEvents;
+        for (auto events : m_events) {
+            for (auto ev : events) {
+                if (auto obj = qobject_cast<T *>(ev)) {
+                    if (!typeEvents.contains(obj)) {
+                        typeEvents.append(obj);
+                    }
+                }
+            }
         }
-        return events;
+        for (auto ev : m_orphanEvents) {
+            if (auto obj = qobject_cast<T *>(ev)) {
+                if (!typeEvents.contains(obj)) {
+                    typeEvents.append(obj);
+                }
+            }
+        }
+        return typeEvents;
+    }
+    template<class T>
+    bool setEventInstance(T *event, MscInstance *newInstance)
+    {
+        Q_ASSERT(event);
+        Q_ASSERT(newInstance);
+        if (event->instance() != newInstance) {
+            removeInstanceEvent(event);
+            event->setInstance(newInstance);
+            addInstanceEvent(event);
+            return true;
+        }
+        return false;
     }
 
     cif::CifBlockShared cifMscDoc() const;
