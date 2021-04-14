@@ -1,4 +1,4 @@
-set(LIB_NAME msclibrary)
+set(LIB_NAME msccore)
 
 # Generate ANTL parser files
 set(PARSER_FILE ${CMAKE_CURRENT_SOURCE_DIR}/parser/Msc.g4)

@@ -3,7 +3,7 @@ add_subdirectory(asn1editor)
 add_subdirectory(asn1library)
 add_subdirectory(libiveditor)
 add_subdirectory(libmsceditor)
-add_subdirectory(msclibrary)
+add_subdirectory(msccore)
 add_subdirectory(shared)
 add_subdirectory(spacecreatorsystem)
 

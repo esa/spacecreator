@@ -182,7 +182,7 @@ target_include_directories(${LIB_NAME}
 )
 
 target_link_libraries(${LIB_NAME}
-    msclibrary
+    msccore
     asn1library
     aadl
     shared

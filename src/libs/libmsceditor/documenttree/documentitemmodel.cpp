@@ -33,7 +33,7 @@ namespace msc {
   \class msc::DocumentItemModel
   \brief ItemModel of the documents and charts to be used in a QAbstractItemView
 
-  \ingroup MscLibrary
+  \ingroup MscCore
 */
 
 DocumentItemModel::DocumentItemModel(QObject *parent)

@@ -33,7 +33,7 @@
 
 /*!
   \class MscReader
-  \ingroup MscLibrary
+  \ingroup MscCore
 
   The class to load MSC files
 */

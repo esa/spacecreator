@@ -37,7 +37,7 @@ more than one editor is in the libraries:
 
 The MSC editor code is separated in 3 different libraries:
 
-* **msclibrary** Handling the .msc file and data structure. For parsing .msc files [ANTLR4](https://www.antlr.org) is used. For writing .msc files, [Grantlee](https://github.com/steveire/grantlee) is used.
+* **msccore** Handling the .msc file and data structure. For parsing .msc files [ANTLR4](https://www.antlr.org) is used. For writing .msc files, [Grantlee](https://github.com/steveire/grantlee) is used.
 This includes handling of CIF information for types and geometry, which is stored as comments of the msc elements.
 
 * **libmsceditor** Has the Ui elements an the application itself. With the class [msc::MainModel](@ref msc::MainModel) as the

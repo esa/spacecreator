@@ -8,7 +8,7 @@ target_sources(${APP_NAME} PRIVATE
 )
 
 target_link_libraries(${APP_NAME} PUBLIC
-    msclibrary
+    msccore
     shared
     ${QT_CORE}
 )

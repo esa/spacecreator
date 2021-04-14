@@ -12,7 +12,7 @@ add_subdirectory(libiveditor)
 # msc editor
 add_subdirectory(asn1editor)
 add_subdirectory(libmsceditor)
-add_subdirectory(msclibrary)
+add_subdirectory(msccore)
 
 # deployment view editor
 add_subdirectory(deploy)

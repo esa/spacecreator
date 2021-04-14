@@ -199,7 +199,7 @@ target_link_libraries(${LIB_NAME}
     asn1library
     shared
     templating
-    msclibrary
+    msccore
     ${QT_CONCURRENT}
     ${QT_NETWORK}
     ${QT_SVG}

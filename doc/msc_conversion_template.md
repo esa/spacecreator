@@ -12,7 +12,7 @@ The template system used to save the msc file is Grantlee https://github.com/ste
 Grantlee uses the syntax of the Django template system (https://docs.djangoproject.com/en/3.0/topics/templates/ and http://www.grantlee.org/apidox/differences_django.html).
 The Q_PROPERTY of the MSC objects can be used as variables. If a property is an enum, then the usage is described in http://www.grantlee.org/apidox/for_app_dev.html.
 
-Have a look at _src/libs/msclibrary/mscresources_ to see the template used to save in msc format.
+Have a look at _src/libs/msccore/mscresources_ to see the template used to save in msc format.
 
 ### XML example
 

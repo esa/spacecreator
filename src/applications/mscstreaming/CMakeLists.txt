@@ -14,7 +14,7 @@ target_link_libraries(${APP_NAME} PUBLIC
     libmsceditor
     libiveditor
     asn1editor
-    msclibrary
+    msccore
     ${QT_CORE}
     ${QT_GUI}
     ${QT_WIDGETS}
