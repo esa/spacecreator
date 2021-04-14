@@ -82,6 +82,7 @@ public:
     QRectF kindBox() const;
 
     InstanceHeadItem *headerItem() const;
+    InstanceEndItem *endItem() const;
 
     static qreal defaultAxisHeight();
 

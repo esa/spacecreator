@@ -121,8 +121,10 @@ QString InstanceItem::kind() const
 
 void InstanceItem::setAxisHeight(qreal height)
 {
-    if (qFuzzyCompare(1. + height, 1. + m_axisHeight))
+    Q_ASSERT(height >= 0);
+    if (qFuzzyCompare(1. + height, 1. + m_axisHeight)) {
         return;
+    }
 
     m_axisHeight = height;
 
@@ -183,11 +185,11 @@ void InstanceItem::rebuildLayout()
     QRectF br = boundingRect();
     br.setWidth(headRect.width());
     br.setHeight(headRect.height() + m_axisHeight + endSymbolHeight);
-    setBoundingRect(br);
+    setBoundingRect(br.toRect());
 
     // move end symbol to the bottom:
     QRectF footerRect(br.x(), br.bottom() - endSymbolHeight, br.width(), endSymbolHeight);
-    m_endSymbol->setRect(footerRect);
+    m_endSymbol->setRect(footerRect.toRect());
 
     // line between the head and end symbols:
     const QPointF p1(headRect.center().x(), headRect.bottom());
@@ -520,6 +522,11 @@ QRectF InstanceItem::kindBox() const
 InstanceHeadItem *InstanceItem::headerItem() const
 {
     return m_headSymbol;
+}
+
+InstanceEndItem *InstanceItem::endItem() const
+{
+    return m_endSymbol;
 }
 
 qreal InstanceItem::defaultAxisHeight()

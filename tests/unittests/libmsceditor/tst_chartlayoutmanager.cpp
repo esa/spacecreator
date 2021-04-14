@@ -18,6 +18,7 @@
 #include "actionitem.h"
 #include "baseitems/common/coordinatesconverter.h"
 #include "baseitems/common/mscutils.h"
+#include "baseitems/instanceenditem.h"
 #include "baseitems/instanceheaditem.h"
 #include "chartitem.h"
 #include "chartlayoutmanager.h"
@@ -436,10 +437,16 @@ void tst_ChartLayoutManager::testCreateSetsYOfStoppedInstance()
 
     // Check that the create message points to the instance head
     QCOMPARE(instanceItemB->leftCreatorTarget(), createItem->messagePoints().last());
-    // The created instance should be below the action event
+    // The created instance should be below the first action event
     QVERIFY(instanceItemB->sceneBoundingRect().top() > actionItem->sceneBoundingRect().top());
     // The stop should be above the unstopped
     QVERIFY(instanceItemB->sceneBoundingRect().bottom() < instanceItemA->sceneBoundingRect().bottom());
+
+    // Stop symbol is below the head symbol
+    QRectF headRect = instanceItemB->headerItem()->sceneBoundingRect();
+    QRectF endRect = instanceItemB->endItem()->sceneBoundingRect();
+
+    QVERIFY(endRect.top() > headRect.bottom());
 }
 
 void tst_ChartLayoutManager::testShiftHorizontalIfNeeded()
@@ -605,7 +612,6 @@ void tst_ChartLayoutManager::testEventIndex()
                 endinstance;\
             endmsc;\
         endmscdocument;");
-
     parseMsc(msc);
 
     auto message = qobject_cast<msc::MscMessage *>(m_chart->instanceEvents().at(0));

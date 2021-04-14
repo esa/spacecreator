@@ -366,7 +366,9 @@ void ChartLayoutManager::doLayout()
     } else {
         checkVerticalConstraints();
     }
-    actualizeInstancesHeights(d->m_layoutInfo.m_pos.y() + d->interMessageSpan());
+
+    qreal lastY = eventsBottom();
+    actualizeInstancesHeights(lastY + d->interMessageSpan());
     updateChartboxToContent();
     connectItems();
 
@@ -903,12 +905,14 @@ void ChartLayoutManager::checkVerticalConstraints()
                         if (messageItem->modelItem()->sourceInstance() == instance) {
                             messageItem->setTailPosition(
                                     QPointF(messageItem->tail().x(), minY + d->interMessageSpan() + ptOffset));
+                            itemMoved = true;
                         }
-                        if (messageItem->modelItem()->targetInstance() == instance) {
+                        if (event->entityType() == MscEntity::EntityType::Message
+                                && messageItem->modelItem()->targetInstance() == instance) {
                             messageItem->setHeadPosition(
                                     QPointF(messageItem->head().x(), minY + d->interMessageSpan() + ptOffset));
+                            itemMoved = true;
                         }
-                        itemMoved = true;
                     }
                     minY = eventItem->instanceBottomArea(instance) + minSpace;
                     break;
@@ -1036,9 +1040,11 @@ void ChartLayoutManager::updateCreatedInstanceHeight(InstanceItem *instanceItem,
         return;
     }
     qreal currentTargetY = instanceItem->leftCreatorTarget().y();
-    const qreal deltaY = createItem->messagePoints().last().y() - currentTargetY;
+    const qreal deltaY = createItem->head().y() - currentTargetY;
     instanceItem->moveSilentlyBy(QPointF(0.0, deltaY));
-    instanceItem->setAxisHeight(totalH - instanceItem->headerItem()->sceneBoundingRect().bottom());
+    const qreal height =
+            std::max(totalH - instanceItem->headerItem()->sceneBoundingRect().bottom(), d->interMessageSpan());
+    instanceItem->setAxisHeight(height);
 }
 
 InstanceItem *ChartLayoutManager::itemForInstance(msc::MscInstance *instance) const
@@ -2034,6 +2040,15 @@ QVector<MscInstanceEvent *> ChartLayoutManager::visibleEvents() const
         lastEvents.push_back(*it);
     }
     return lastEvents;
+}
+
+qreal ChartLayoutManager::eventsBottom() const
+{
+    qreal bottom = 0;
+    for (msc::InteractiveObject *eventItem : d->m_instanceEventItemsSorted) {
+        bottom = std::max(eventItem->sceneBoundingRect().y(), bottom);
+    }
+    return bottom;
 }
 
 } // namespace msc

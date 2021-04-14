@@ -196,6 +196,8 @@ private:
     void setInstancesRect(const QRectF &rect);
 
     QVector<MscInstanceEvent *> visibleEvents() const;
+
+    qreal eventsBottom() const;
 };
 
 } // namespace msc
