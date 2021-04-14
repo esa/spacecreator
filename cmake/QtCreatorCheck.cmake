@@ -21,7 +21,8 @@ if(LINUX)
     find_path(QTC_LIB_DIR libExtensionSystem.so
         "$ENV{QTC_INSTALL}/lib/qtcreator"
         /opt/qt-creator-dev/build-debug/lib/qtcreator
-        /usr/lib/x86_64-linux-gnu/qtcreator)
+        /usr/lib/x86_64-linux-gnu/qtcreator
+        /usr/lib/aarch64-linux-gnu/qtcreator)
 elseif(APPLE)
     find_path(QTC_LIB_DIR libExtensionSystem.dylib
         "$ENV{QTC_INSTALL}/Qt\ Creator.app/Contents/Frameworks")
@@ -35,7 +36,8 @@ if(LINUX)
         "$ENV{QTC_LIB_DIR}/plugins"
         "$ENV{QTC_INSTALL}/lib/qtcreator/plugins"
         /opt/qt-creator-dev/build-debug/lib/qtcreator/plugins
-        /usr/lib/x86_64-linux-gnu/qtcreator/plugins)
+        /usr/lib/x86_64-linux-gnu/qtcreator/plugins
+        /usr/lib/aarch64-linux-gnu/qtcreator/plugins)
 elseif(APPLE)
     find_path(QTC_PLUGINS_DIR libCore.dylib
         "$ENV{QTC_INSTALL}/Qt\ Creator.app/Contents/PlugIns")
