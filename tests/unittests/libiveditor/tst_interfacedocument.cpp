@@ -43,7 +43,7 @@ private:
 
 void tst_InterfaceDocument::initTestCase()
 {
-    ive::initIvEditor();
+    ive::initIVEditor();
     QStandardPaths::setTestModeEnabled(true);
 }
 

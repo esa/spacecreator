@@ -70,10 +70,10 @@ private:
     void loadActions(const QString &fromFile);
 
     static void triggerActionInternal(const Action &act);
-    static void triggerActionExternal(const Action &act, const ivm::IVObject *aadlObj, InterfaceDocument *doc);
+    static void triggerActionExternal(const Action &act, const ivm::IVObject *ivObj, InterfaceDocument *doc);
     static bool triggerActionHidden(const Action &act);
 
-    static QString replaceKeyHolder(const QString &text, const ivm::IVObject *aadlObj, const QString &projectDir);
+    static QString replaceKeyHolder(const QString &text, const ivm::IVObject *ivObj, const QString &projectDir);
 
     QVector<Action> m_actions;
     QMap<QString, ScriptableActionHandler> m_qactions;

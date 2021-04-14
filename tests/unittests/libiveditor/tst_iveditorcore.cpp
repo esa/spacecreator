@@ -40,7 +40,7 @@ private Q_SLOTS:
     void test_addConnection();
     void test_addConnectionFromEnv();
     void test_addConnectionFails();
-    void test_renameAadlConnection();
+    void test_renameIVConnection();
     void test_addToNestedConnection();
     void test_addFromNestedConnection();
     void test_addRootToNestedConnections();
@@ -52,7 +52,7 @@ private:
 
 void tst_IVEditorCore::initTestCase()
 {
-    ive::initIvEditor();
+    ive::initIVEditor();
     shared::initSharedLibrary();
     QStandardPaths::setTestModeEnabled(true);
 }
@@ -76,20 +76,20 @@ void tst_IVEditorCore::test_addConnection()
 
 void tst_IVEditorCore::test_addConnectionFromEnv()
 {
-    ivm::IVModel *aadlModel = ivCore->document()->objectsModel();
+    ivm::IVModel *ivModel = ivCore->document()->objectsModel();
     ivCore->addFunction("f1");
     bool ok = ivCore->addConnection("m1", "", "f1");
     QCOMPARE(ok, true);
-    QVector<ivm::IVConnection *> connections = aadlModel->allObjectsByType<ivm::IVConnection>();
+    QVector<ivm::IVConnection *> connections = ivModel->allObjectsByType<ivm::IVConnection>();
     QCOMPARE(connections.size(), 0);
 
-    QVector<ivm::IVInterface *> interfaces = aadlModel->allObjectsByType<ivm::IVInterface>();
+    QVector<ivm::IVInterface *> interfaces = ivModel->allObjectsByType<ivm::IVInterface>();
     QCOMPARE(interfaces.size(), 1);
 
     // Adding it again, fails
     ok = ivCore->addConnection("m1", "", "f1");
     QCOMPARE(ok, false);
-    interfaces = aadlModel->allObjectsByType<ivm::IVInterface>();
+    interfaces = ivModel->allObjectsByType<ivm::IVInterface>();
     QCOMPARE(interfaces.size(), 1);
 }
 
@@ -117,19 +117,19 @@ void tst_IVEditorCore::test_addConnectionFails()
     QCOMPARE(ok, false);
 }
 
-void tst_IVEditorCore::test_renameAadlConnection()
+void tst_IVEditorCore::test_renameIVConnection()
 {
     ivm::IVFunction *funcF1 = ivCore->addFunction("f1");
     ivm::IVFunction *funcF2 = ivCore->addFunction("f2");
     ivm::IVConnection *connection = ivm::testutils::createConnection(funcF1, funcF2, "init");
 
-    bool ok = ivCore->renameAadlConnection("init", "doIt", "f1", "f2");
+    bool ok = ivCore->renameIVConnection("init", "doIt", "f1", "f2");
     QCOMPARE(ok, true);
     QCOMPARE(connection->name(), "doIt");
 
     // cyclic interface only
     ivm::IVInterface *interface = ivCore->addInterface("push", "f2");
-    ok = ivCore->renameAadlConnection("push", "call", "", "f2");
+    ok = ivCore->renameIVConnection("push", "call", "", "f2");
     QCOMPARE(ok, true);
     QCOMPARE(interface->title(), "call");
 }

@@ -29,7 +29,7 @@
 #include "ivinterface.h"
 #include "aadlinterfacegraphicsitem.h"
 #include "aadlitemmodel.h"
-#include "baseitems/common/aadlutils.h"
+#include "baseitems/common/ivutils.h"
 #include "commands/cmdcommentitemcreate.h"
 #include "commands/cmdconnectiongroupitemcreate.h"
 #include "commands/cmdconnectionitemcreate.h"
@@ -665,19 +665,19 @@ void CreatorTool::CreatorToolPrivate::populateContextMenu_propertiesDialog(QMenu
     }
 
     QGraphicsItem *gi = scene->selectedItems().isEmpty() ? nullptr : scene->selectedItems().first();
-    if (ivm::IVObject *aadlObj = gi::object(gi)) {
-        if (aadlObj->type() != ivm::IVObject::Type::Connection) {
+    if (ivm::IVObject *ivObj = gi::object(gi)) {
+        if (ivObj->type() != ivm::IVObject::Type::Connection) {
             menu->addSeparator();
             QAction *action = menu->addAction(tr("Properties"));
-            action->setEnabled(aadlObj);
+            action->setEnabled(ivObj);
 
             connect(action, &QAction::triggered,
-                    [this, aadlObj]() { Q_EMIT thisTool->propertyEditorRequest(aadlObj->id()); });
-            ActionsManager::registerAction(Q_FUNC_INFO, action, "Properties", "Show AADL object properties editor");
+                    [this, ivObj]() { Q_EMIT thisTool->propertyEditorRequest(ivObj->id()); });
+            ActionsManager::registerAction(Q_FUNC_INFO, action, "Properties", "Show IV object properties editor");
         } else {
             menu->addSeparator();
             QAction *action = menu->addAction(tr("Re-create path"));
-            action->setEnabled(aadlObj);
+            action->setEnabled(ivObj);
 
             connect(action, &QAction::triggered, [gi]() {
                 if (auto connectionItem = qgraphicsitem_cast<AADLConnectionGraphicsItem *>(gi)) {
@@ -700,30 +700,30 @@ void CreatorTool::CreatorToolPrivate::populateContextMenu_user(QMenu *menu, cons
     static const QList<int> showProps { AADLInterfaceGraphicsItem::Type, AADLFunctionTypeGraphicsItem::Type,
         AADLFunctionGraphicsItem::Type, AADLCommentGraphicsItem::Type, AADLConnectionGraphicsItem::Type };
 
-    ivm::IVObject *aadlObj { nullptr };
+    ivm::IVObject *ivObj { nullptr };
     if (QGraphicsItem *gi = scene->selectedItems().size() == 1
                     ? scene->selectedItems().first()
                     : nearestItem(scene, scenePos, kContextMenuItemTolerance, showProps)) {
 
         switch (gi->type()) {
         case AADLFunctionTypeGraphicsItem::Type: {
-            aadlObj = gi::functionTypeObject(gi);
+            ivObj = gi::functionTypeObject(gi);
             break;
         }
         case AADLFunctionGraphicsItem::Type: {
-            aadlObj = gi::functionObject(gi);
+            ivObj = gi::functionObject(gi);
             break;
         }
         case AADLInterfaceGraphicsItem::Type: {
-            aadlObj = gi::interfaceObject(gi);
+            ivObj = gi::interfaceObject(gi);
             break;
         }
         case AADLCommentGraphicsItem::Type: {
-            aadlObj = gi::commentObject(gi);
+            ivObj = gi::commentObject(gi);
             break;
         }
         case AADLConnectionGraphicsItem::Type: {
-            aadlObj = gi::connectionObject(gi);
+            ivObj = gi::connectionObject(gi);
             break;
         }
         default:
@@ -731,7 +731,7 @@ void CreatorTool::CreatorToolPrivate::populateContextMenu_user(QMenu *menu, cons
         }
     }
 
-    ActionsManager::populateMenu(menu, aadlObj, doc);
+    ActionsManager::populateMenu(menu, ivObj, doc);
 }
 
 void CreatorTool::CreatorToolPrivate::handleToolType(CreatorTool::ToolType type, const QPointF &pos)

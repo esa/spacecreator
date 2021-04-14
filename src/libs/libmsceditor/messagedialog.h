@@ -45,7 +45,7 @@ public:
             msc::MscMessage *message, msc::ChartLayoutManager *charlayoutManager, QWidget *parent = nullptr);
     ~MessageDialog();
 
-    void setAadlConnectionNames(const QStringList &names);
+    void setIVConnectionNames(const QStringList &names);
     void setSystemChecker(msc::SystemChecks *checker);
 
 public Q_SLOTS:

@@ -69,7 +69,7 @@ private:
     shared::ActionsBar *m_documentToolBar = nullptr;
 
     msc::DocumentTreeView *m_documentTree = nullptr;
-    QPushButton *m_aadlSwitch = nullptr;
+    QPushButton *m_ivSwitch = nullptr;
     QPushButton *m_asn1Switch = nullptr;
     QPushButton *m_asn1Select = nullptr;
 

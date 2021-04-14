@@ -17,12 +17,12 @@
 
 #include "contextparametersmodel.h"
 
-#include "aadlcommonprops.h"
+#include "ivcommonprops.h"
 #include "ivfunction.h"
 #include "ivnamevalidator.h"
 #include "ivobject.h"
 #include "asn1/file.h"
-#include "baseitems/common/aadlutils.h"
+#include "baseitems/common/ivutils.h"
 #include "commandsstack.h"
 #include "interface/commands/cmdcontextparameterchange.h"
 #include "interface/commands/cmdcontextparametercreate.h"

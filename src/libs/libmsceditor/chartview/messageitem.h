@@ -126,7 +126,7 @@ private Q_SLOTS:
     void onRenamed(const QString &title);
     void onManualGeometryChangeFinished(shared::ui::GripPoint *gp, const QPointF &from, const QPointF &to);
     void updateDisplayText();
-    void checkAadlConnection();
+    void checkIVConnection();
 
 private:
     QString displayTextFromModel() const;
@@ -152,7 +152,7 @@ private:
     bool wannabeGlobal() const;
     QPointF validatePoint(const QPointF &requestedPoint, bool isSource, const QPointF &oppositePoint);
 
-    bool aadlConnectionOk() const;
+    bool ivConnectionOk() const;
 
     QPointer<msc::MscMessage> m_message = nullptr;
     LabeledArrowItem *m_arrowItem = nullptr;

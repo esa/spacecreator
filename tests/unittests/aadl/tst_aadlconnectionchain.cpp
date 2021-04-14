@@ -17,7 +17,7 @@
 
 #include "ivconnection.h"
 #include "ivconnectionchain.h"
-#include "aadllibrary.h"
+#include "ivlibrary.h"
 #include "ivmodel.h"
 #include "ivxmlreader.h"
 #include "propertytemplateconfig.h"
@@ -91,7 +91,7 @@ bool tst_AADLConnectionChain::checkChain(ivm::IVConnectionChain *chain, const QS
 // MiniA -> BlockA -> BlockB ->MiniB
 void tst_AADLConnectionChain::initTestCase()
 {
-    ivm::initAadlLibrary();
+    ivm::initIVLibrary();
     conf = ivm::PropertyTemplateConfig::instance();
     conf->init(QLatin1String("default_attrinbutes.xml"));
 }

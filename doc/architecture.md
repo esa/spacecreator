@@ -19,9 +19,9 @@ more than one editor is in the libraries:
 * **asn1editor** Is a UI editor to edit ASN.1 values
 
 
-## AADL/IV editor
+## IV editor
 
-* **aadl** Contains the data strucures for aadl.
+* **ivcore** Contains the data structures for InterfaceView.
 
 * **libivedtor** Contains the application, including: UI, graphics elments, file handling
 

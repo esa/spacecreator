@@ -16,13 +16,13 @@
 */
 
 #include "ivcomment.h"
-#include "aadlcommonprops.h"
+#include "ivcommonprops.h"
 #include "ivconnection.h"
 #include "ivfunction.h"
 #include "ivfunctiontype.h"
 #include "ivinterface.h"
-#include "aadllibrary.h"
-#include "baseitems/common/aadlutils.h"
+#include "ivlibrary.h"
+#include "baseitems/common/ivutils.h"
 #include "iveditor.h"
 #include "propertytemplate.h"
 #include "propertytemplateconfig.h"
@@ -49,8 +49,8 @@ private:
 
 void tst_AttributesConfigure::initTestCase()
 {
-    ivm::initAadlLibrary();
-    ive::initIvEditor();
+    ivm::initIVLibrary();
+    ive::initIVEditor();
     QStandardPaths::setTestModeEnabled(true);
     m_dynPropConfig = ivm::PropertyTemplateConfig::instance();
     m_dynPropConfig->init(ive::dynamicPropertiesFilePath());

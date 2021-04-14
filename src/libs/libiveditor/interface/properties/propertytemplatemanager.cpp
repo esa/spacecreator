@@ -17,7 +17,7 @@
 
 #include "propertytemplatemanager.h"
 
-#include "baseitems/common/aadlutils.h"
+#include "baseitems/common/ivutils.h"
 #include "propertytemplateconfig.h"
 #include "ui_propertytemplatemanager.h"
 

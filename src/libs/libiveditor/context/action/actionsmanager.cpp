@@ -334,7 +334,7 @@ void ActionsManager::triggerActionInternal(const Action &act)
     }
 }
 
-QString ActionsManager::replaceKeyHolder(const QString &text, const ivm::IVObject *aadlObj, const QString &projectDir)
+QString ActionsManager::replaceKeyHolder(const QString &text, const ivm::IVObject *ivObj, const QString &projectDir)
 {
     if (text.isEmpty() || text[0] != '$') {
         return text;
@@ -352,21 +352,21 @@ QString ActionsManager::replaceKeyHolder(const QString &text, const ivm::IVObjec
                 return qApp->applicationDirPath();
             break;
         case ExternalArgHolder::Attr:
-            if (text.startsWith(holder.key) && aadlObj) {
-                return aadlObj->attr(name).toString();
+            if (text.startsWith(holder.key) && ivObj) {
+                return ivObj->attr(name).toString();
             }
             break;
         case ExternalArgHolder::Prop:
-            if (text.startsWith(holder.key) && aadlObj) {
-                return aadlObj->prop(name).toString();
+            if (text.startsWith(holder.key) && ivObj) {
+                return ivObj->prop(name).toString();
             }
             break;
         case ExternalArgHolder::Param:
-            if (text.startsWith(holder.key) && aadlObj) {
-                switch (aadlObj->type()) {
+            if (text.startsWith(holder.key) && ivObj) {
+                switch (ivObj->type()) {
                 case ivm::IVObject::Type::RequiredInterface:
                 case ivm::IVObject::Type::ProvidedInterface:
-                    if (const ivm::IVInterface *iface = aadlObj->as<const ivm::IVInterface *>()) {
+                    if (const ivm::IVInterface *iface = ivObj->as<const ivm::IVInterface *>()) {
                         const ivm::InterfaceParameter &ifaceParam = iface->param(name);
                         if (!ifaceParam.isNull())
                             return ifaceParam.toString();
@@ -374,7 +374,7 @@ QString ActionsManager::replaceKeyHolder(const QString &text, const ivm::IVObjec
                     break;
                 case ivm::IVObject::Type::Function:
                 case ivm::IVObject::Type::FunctionType:
-                    if (const ivm::IVFunctionType *fn = aadlObj->as<const ivm::IVFunctionType *>()) {
+                    if (const ivm::IVFunctionType *fn = ivObj->as<const ivm::IVFunctionType *>()) {
                         const ivm::ContextParameter &ctxParam = fn->contextParam(name);
                         if (!ctxParam.isNull())
                             return ctxParam.toString();
@@ -395,10 +395,10 @@ QString ActionsManager::replaceKeyHolder(const QString &text, const ivm::IVObjec
  * \brief ActionsManager::triggerActionExternal
  * Handler for "external" actions.
  * Used to launch the external process with arguments, both are from \a act.
- * Replaces the keyholders by actual values of \a aadlObj's attributes or parameters.
+ * Replaces the keyholders by actual values of \a ivObj's attributes or parameters.
  * Creates and shows an instance of ExtProcMonitor.
  */
-void ActionsManager::triggerActionExternal(const Action &act, const ivm::IVObject *aadlObj, InterfaceDocument *doc)
+void ActionsManager::triggerActionExternal(const Action &act, const ivm::IVObject *ivObj, InterfaceDocument *doc)
 {
     if (!act.m_externalApp.isEmpty()) {
         if (doc->isDirty()) {
@@ -420,10 +420,10 @@ void ActionsManager::triggerActionExternal(const Action &act, const ivm::IVObjec
         QStringList params;
         for (const QString &param : act.m_externalAppParams) {
             if (!param.isEmpty()) {
-                params.append(replaceKeyHolder(param, aadlObj, doc->path()));
+                params.append(replaceKeyHolder(param, ivObj, doc->path()));
             }
         }
-        const QString cwd = replaceKeyHolder(act.m_externalAppCwd, aadlObj, doc->path());
+        const QString cwd = replaceKeyHolder(act.m_externalAppCwd, ivObj, doc->path());
 
         QWidget *mainWindow(nullptr);
         for (auto w : qApp->topLevelWidgets())

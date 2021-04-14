@@ -96,7 +96,7 @@ void CmdEntitiesRemove::redo()
     if (!m_model)
         return;
 
-    auto removeAadlObjects = [this](const QVector<QPointer<ivm::IVObject>> &collection) {
+    auto removeIVObjects = [this](const QVector<QPointer<ivm::IVObject>> &collection) {
         for (auto it = collection.cbegin(); it != collection.cend(); ++it) {
             if ((*it)->type() == ivm::IVObject::Type::Connection) {
                 if (auto *connection = qobject_cast<ivm::IVConnection *>(*it)) {
@@ -107,9 +107,9 @@ void CmdEntitiesRemove::redo()
         }
     };
 
-    removeAadlObjects(m_relatedConnections);
-    removeAadlObjects(m_relatedIfaces);
-    removeAadlObjects(m_relatedEntities);
+    removeIVObjects(m_relatedConnections);
+    removeIVObjects(m_relatedIfaces);
+    removeIVObjects(m_relatedEntities);
 
     Q_EMIT entitiesRemoved(m_entities, this);
 }
@@ -119,7 +119,7 @@ void CmdEntitiesRemove::undo()
     if (!m_model)
         return;
 
-    auto restoreAadlObjects = [this](const QVector<QPointer<ivm::IVObject>> &collection) {
+    auto restoreIVObjects = [this](const QVector<QPointer<ivm::IVObject>> &collection) {
         for (auto it = collection.crbegin(); it != collection.crend(); ++it) {
             if ((*it)->type() == ivm::IVObject::Type::Connection) {
                 if (auto *connection = qobject_cast<ivm::IVConnection *>(*it)) {
@@ -130,9 +130,9 @@ void CmdEntitiesRemove::undo()
         }
     };
 
-    restoreAadlObjects(m_relatedEntities);
-    restoreAadlObjects(m_relatedIfaces);
-    restoreAadlObjects(m_relatedConnections);
+    restoreIVObjects(m_relatedEntities);
+    restoreIVObjects(m_relatedIfaces);
+    restoreIVObjects(m_relatedConnections);
 }
 
 bool CmdEntitiesRemove::mergeWith(const QUndoCommand *command)

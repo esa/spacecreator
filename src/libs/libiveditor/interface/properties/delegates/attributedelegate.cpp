@@ -17,7 +17,7 @@
 
 #include "attributedelegate.h"
 
-#include "aadlcommonprops.h"
+#include "ivcommonprops.h"
 #include "ivmodel.h"
 #include "ivnamevalidator.h"
 #include "ivobject.h"

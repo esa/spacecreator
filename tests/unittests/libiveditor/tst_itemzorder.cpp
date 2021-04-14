@@ -23,7 +23,7 @@
 #include "ivinterface.h"
 #include "ivinterfacegroup.h"
 #include "ivobject.h"
-#include "baseitems/common/aadlutils.h"
+#include "baseitems/common/ivutils.h"
 #include "baseitems/interactiveobject.h"
 #include "interface/aadlcommentgraphicsitem.h"
 #include "interface/aadlconnectiongraphicsitem.h"
@@ -94,33 +94,33 @@ void tst_ItemZOrder::checkItem(ive::InteractiveObject *item, const qreal expecte
 
 void tst_ItemZOrder::testItem_FunctionType()
 {
-    ivm::IVFunctionType aadlObject(QStringLiteral("TestFunctionType"));
-    ive::AADLFunctionTypeGraphicsItem item(&aadlObject);
+    ivm::IVFunctionType ivObject(QStringLiteral("TestFunctionType"));
+    ive::AADLFunctionTypeGraphicsItem item(&ivObject);
 
     checkItem(&item, ive::ZOrder.Function);
 }
 
 void tst_ItemZOrder::testItem_Function()
 {
-    ivm::IVFunction aadlObject(QStringLiteral("TestFunction"));
-    ive::AADLFunctionGraphicsItem item(&aadlObject);
+    ivm::IVFunction ivObject(QStringLiteral("TestFunction"));
+    ive::AADLFunctionGraphicsItem item(&ivObject);
 
     checkItem(&item, ive::ZOrder.Function);
 }
 
 void tst_ItemZOrder::testItem_Comment()
 {
-    ivm::IVComment aadlObject(QStringLiteral("TestComment"));
-    ive::AADLCommentGraphicsItem item(&aadlObject);
+    ivm::IVComment ivObject(QStringLiteral("TestComment"));
+    ive::AADLCommentGraphicsItem item(&ivObject);
 
     checkItem(&item, ive::ZOrder.Comment);
 }
 
 void tst_ItemZOrder::testItem_InterfaceGroup()
 {
-    ivm::IVFunction aadlFunction(QStringLiteral("TestFunction"));
+    ivm::IVFunction ivFunction(QStringLiteral("TestFunction"));
     ivm::IVInterface::CreationInfo ci;
-    ci.function = &aadlFunction;
+    ci.function = &ivFunction;
     ci.type = ivm::IVInterface::InterfaceType::Grouped;
     std::unique_ptr<ivm::IVInterfaceGroup> pIface = std::unique_ptr<ivm::IVInterfaceGroup>(new ivm::IVInterfaceGroup(ci));
     ive::AADLInterfaceGroupGraphicsItem item(pIface.get());
@@ -130,9 +130,9 @@ void tst_ItemZOrder::testItem_InterfaceGroup()
 
 void tst_ItemZOrder::testItem_RequiredInterface()
 {
-    ivm::IVFunction aadlFunction(QStringLiteral("TestFunction"));
+    ivm::IVFunction ivFunction(QStringLiteral("TestFunction"));
     ivm::IVInterface::CreationInfo ci;
-    ci.function = &aadlFunction;
+    ci.function = &ivFunction;
     ci.type = ivm::IVInterface::InterfaceType::Required;
     std::unique_ptr<ivm::IVInterface> pIface = std::unique_ptr<ivm::IVInterface>(ivm::IVInterface::createIface(ci));
     ive::AADLInterfaceGraphicsItem item(pIface.get());
@@ -142,9 +142,9 @@ void tst_ItemZOrder::testItem_RequiredInterface()
 
 void tst_ItemZOrder::testItem_ProvidedInterface()
 {
-    ivm::IVFunction aadlFunction(QStringLiteral("TestFunction"));
+    ivm::IVFunction ivFunction(QStringLiteral("TestFunction"));
     ivm::IVInterface::CreationInfo ci;
-    ci.function = &aadlFunction;
+    ci.function = &ivFunction;
     ci.type = ivm::IVInterface::InterfaceType::Provided;
     std::unique_ptr<ivm::IVInterface> pIface = std::unique_ptr<ivm::IVInterface>(ivm::IVInterface::createIface(ci));
     ive::AADLInterfaceGraphicsItem item(pIface.get());
@@ -154,54 +154,54 @@ void tst_ItemZOrder::testItem_ProvidedInterface()
 
 void tst_ItemZOrder::testItem_Connection()
 {
-    ivm::IVFunction aadlFunctionA(QStringLiteral("TestFunctionA"));
-    ivm::IVFunction aadlFunctionB(QStringLiteral("TestFunctionB"));
+    ivm::IVFunction ivFunctionA(QStringLiteral("TestFunctionA"));
+    ivm::IVFunction ivFunctionB(QStringLiteral("TestFunctionB"));
 
     ivm::IVInterface::CreationInfo ciA;
-    ciA.function = &aadlFunctionA;
+    ciA.function = &ivFunctionA;
     ciA.type = ivm::IVInterface::InterfaceType::Provided;
     std::unique_ptr<ivm::IVInterface> pIfaceA = std::unique_ptr<ivm::IVInterface>(ivm::IVInterface::createIface(ciA));
     ive::AADLInterfaceGraphicsItem itemA(pIfaceA.get());
 
     ivm::IVInterface::CreationInfo ciB;
-    ciB.function = &aadlFunctionA;
+    ciB.function = &ivFunctionA;
     ciB.type = ivm::IVInterface::InterfaceType::Provided;
     std::unique_ptr<ivm::IVInterface> pIfaceB = std::unique_ptr<ivm::IVInterface>(ivm::IVInterface::createIface(ciB));
     ive::AADLInterfaceGraphicsItem itemB(pIfaceB.get());
 
-    ivm::IVConnection aadlConnection(pIfaceA.get(), pIfaceB.get());
-    ive::AADLConnectionGraphicsItem connectionItem(&aadlConnection, &itemA, &itemB);
+    ivm::IVConnection ivConnection(pIfaceA.get(), pIfaceB.get());
+    ive::AADLConnectionGraphicsItem connectionItem(&ivConnection, &itemA, &itemB);
 
     checkItem(&connectionItem, ive::ZOrder.Connection);
 }
 
 void tst_ItemZOrder::testItem_ConnectionGroup()
 {
-    ivm::IVFunction aadlFunctionA(QStringLiteral("TestFunctionA"));
-    ivm::IVFunction aadlFunctionB(QStringLiteral("TestFunctionB"));
+    ivm::IVFunction ivFunctionA(QStringLiteral("TestFunctionA"));
+    ivm::IVFunction ivFunctionB(QStringLiteral("TestFunctionB"));
 
     ivm::IVInterface::CreationInfo ciA;
-    ciA.function = &aadlFunctionA;
+    ciA.function = &ivFunctionA;
     ciA.type = ivm::IVInterface::InterfaceType::Provided;
     std::unique_ptr<ivm::IVInterfaceGroup> pIfaceA = std::make_unique<ivm::IVInterfaceGroup>(ciA);
     ive::AADLInterfaceGroupGraphicsItem itemA(pIfaceA.get());
 
     ivm::IVInterface::CreationInfo ciB;
-    ciB.function = &aadlFunctionA;
+    ciB.function = &ivFunctionA;
     ciB.type = ivm::IVInterface::InterfaceType::Provided;
     std::unique_ptr<ivm::IVInterfaceGroup> pIfaceB = std::make_unique<ivm::IVInterfaceGroup>(ciB);
     ive::AADLInterfaceGroupGraphicsItem itemB(pIfaceB.get());
 
-    std::unique_ptr<ivm::IVConnection> aadlConnection { new ivm::IVConnection(pIfaceA.get(), pIfaceB.get()) };
+    std::unique_ptr<ivm::IVConnection> ivConnection { new ivm::IVConnection(pIfaceA.get(), pIfaceB.get()) };
 
-    ivm::IVConnectionGroup aadlConnectionGroup(
-            QStringLiteral("TestConnectionGroup"), pIfaceA.get(), pIfaceB.get(), { aadlConnection.get() });
+    ivm::IVConnectionGroup ivConnectionGroup(
+            QStringLiteral("TestConnectionGroup"), pIfaceA.get(), pIfaceB.get(), { ivConnection.get() });
 
-    ive::AADLConnectionGroupGraphicsItem connectionItem(&aadlConnectionGroup, &itemA, &itemB);
+    ive::AADLConnectionGroupGraphicsItem connectionItem(&ivConnectionGroup, &itemA, &itemB);
 
     checkItem(&connectionItem, ive::ZOrder.Connection);
-    aadlConnectionGroup.removeConnection(aadlConnection.get());
-    QVERIFY(aadlConnectionGroup.groupedConnections().isEmpty());
+    ivConnectionGroup.removeConnection(ivConnection.get());
+    QVERIFY(ivConnectionGroup.groupedConnections().isEmpty());
 }
 
 void tst_ItemZOrder::testItem_CheckCoverage()

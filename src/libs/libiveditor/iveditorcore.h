@@ -61,8 +61,8 @@ public:
     bool addConnection(QString name, const QString &fromInstanceName, const QString &toInstanceName);
     ivm::IVInterface *addInterface(QString name, const QString &functionName);
 
-    bool renameAadlFunction(const QString &oldName, const QString &newName);
-    bool renameAadlConnection(const QString &oldName, const QString &newName, const QString &fromInstanceName,
+    bool renameIVFunction(const QString &oldName, const QString &newName);
+    bool renameIVConnection(const QString &oldName, const QString &newName, const QString &fromInstanceName,
             const QString &toInstanceName);
     bool renameCyclicInterface(const QString &oldName, const QString &newName, const QString &functionName);
 
@@ -74,20 +74,22 @@ public:
     QString filePath() const override;
     bool save() override;
 
-    QVector<ivm::IVFunction *> allAadlFunctions() const;
-    QVector<ivm::IVConnection *> allAadlConnections() const;
+    QVector<ivm::IVFunction *> allIVFunctions() const;
+    QVector<ivm::IVConnection *> allIVConnections() const;
 
-    QStringList aadlFunctionsNames() const;
-    QStringList aadlConnectionNames() const;
+    QStringList ivFunctionsNames() const;
+    QStringList ivConnectionNames() const;
 
 public Q_SLOTS:
     void onSaveRenderRequested();
+
+private Q_SLOTS:
+    void updateIVItems();
 
 private:
     void saveSceneRender(const QString &filePath) const;
     ivm::IVInterface *getInterface(
             const QString &ifName, ivm::IVInterface::InterfaceType ifType, ivm::IVFunction *parentFunction);
-    Q_SLOT void updateAadlItems();
     QUrl helpPage() const override;
 
     ive::InterfaceDocument *m_document { nullptr };
@@ -98,8 +100,8 @@ private:
     QAction *m_actionExportType { nullptr };
     QAction *m_actionToggleE2EView { nullptr };
 
-    QVector<ivm::IVFunction *> m_aadlFunctions;
-    QVector<ivm::IVConnection *> m_aadlConnections;
+    QVector<ivm::IVFunction *> m_ivFunctions;
+    QVector<ivm::IVConnection *> m_ivConnections;
 
     Qt::CaseSensitivity m_caseCheck = Qt::CaseInsensitive;
 };

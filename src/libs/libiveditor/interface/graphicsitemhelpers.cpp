@@ -23,7 +23,7 @@
 #include "ivfunctiontype.h"
 #include "ivinterface.h"
 #include "ivobject.h"
-#include "baseitems/common/aadlutils.h"
+#include "baseitems/common/ivutils.h"
 #include "baseitems/interactiveobject.h"
 #include "connectioncreationvalidator.h"
 #include "graphicsviewutils.h"

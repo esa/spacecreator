@@ -19,7 +19,7 @@
 #include "ivfunction.h"
 #include "ivfunctiontype.h"
 #include "ivinterface.h"
-#include "aadllibrary.h"
+#include "ivlibrary.h"
 #include "ivmodel.h"
 #include "ivobject.h"
 #include "ivtestutils.h"
@@ -47,7 +47,7 @@ private:
 
 void tst_AADLModel::initTestCase()
 {
-    ivm::initAadlLibrary();
+    ivm::initIVLibrary();
     m_dynPropConfig = ivm::PropertyTemplateConfig::instance();
     m_dynPropConfig->init(QLatin1String("default_attributes.xml"));
     m_model.reset(new ivm::IVModel(m_dynPropConfig));
@@ -132,7 +132,7 @@ void tst_AADLModel::testManageFunctions()
     ivm::IVFunction fn2("Fn2", &model);
     ivm::IVFunction fn3("Fn3", &model);
 
-    const ivm::AADLFunctionsVector functions { &fn1, &fn2, &fn3 };
+    const QVector<ivm::IVFunction *> functions { &fn1, &fn2, &fn3 };
     for (int i = 0; i < functions.size(); ++i) {
         auto function = functions.at(i);
         QSignalSpy spyCommon(&model, &ivm::IVModel::objectsAdded);

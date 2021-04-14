@@ -80,7 +80,7 @@ struct MainWindow::MainWindowPrivate {
     QComboBox *m_zoomBox = nullptr;
     QAction *m_actionShowDocument = nullptr;
     QAction *m_actionShowHierarchy = nullptr;
-    QAction *m_actionOpenAadl = nullptr;
+    QAction *m_actionOpenInterfaceView = nullptr;
 
     msc::TextViewDialog *mscTextBrowser = nullptr;
 
@@ -176,7 +176,7 @@ void MainWindow::selectAndOpenFile()
     }
 }
 
-void MainWindow::openAadlFile()
+void MainWindow::openIVFile()
 {
     const QString &fileName =
             QFileDialog::getOpenFileName(this, tr("Open file"), "", d->m_ivCore->document()->supportedFileExtensions());
@@ -429,7 +429,7 @@ void MainWindow::initMenus()
     menu->addAction(d->m_core->actionSaveFile());
     menu->addAction(d->m_core->actionSaveFileAs());
     menu->addSeparator();
-    menu->addAction(tr("Open AADL file ..."), this, &MainWindow::openAadlFile);
+    menu->addAction(tr("Open IV file ..."), this, &MainWindow::openIVFile);
     menu->addSeparator();
     menu->addAction(QIcon(QLatin1String(":/sharedresources/icons/save.svg")), tr("Save Screenshot..."), this,
             &MainWindow::saveScreenshot, QKeySequence(Qt::ALT + Qt::Key_S));

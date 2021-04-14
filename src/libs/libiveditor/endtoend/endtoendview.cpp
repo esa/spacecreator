@@ -23,7 +23,7 @@
 #include "ivfunction.h"
 #include "ivinterfacegroup.h"
 #include "ivmodel.h"
-#include "baseitems/common/aadlutils.h"
+#include "baseitems/common/ivutils.h"
 #include "endtoendconnections.h"
 #include "interface/aadlconnectiongraphicsitem.h"
 #include "interface/aadlconnectiongroupgraphicsitem.h"
@@ -95,7 +95,7 @@ EndToEndView::EndToEndView(InterfaceDocument *document, QWidget *parent)
             bool match = refreshView();
             if (!match) {
                 QMessageBox::information(
-                        this, tr("File mismatch"), tr("The AADL file and the MSC file do not seem to match."));
+                        this, tr("File mismatch"), tr("The IV file and the MSC file do not seem to match."));
             }
         }
     });

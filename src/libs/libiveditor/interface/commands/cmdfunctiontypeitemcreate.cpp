@@ -20,7 +20,7 @@
 #include "ivfunction.h"
 #include "ivfunctiontype.h"
 #include "ivmodel.h"
-#include "baseitems/common/aadlutils.h"
+#include "baseitems/common/ivutils.h"
 #include "commandids.h"
 
 namespace ive {

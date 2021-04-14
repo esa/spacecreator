@@ -49,8 +49,8 @@ class AADLFunctionTypeGraphicsItem;
 class AADLConnectionGraphicsItem;
 
 /*!
-   \class AADLItemModel is the model represents the scene graph of the currently selected/visible
-   AADL model. It handles all changes with existing entities and reflects them on graphic scene.
+   \class IVItemModel is the model represents the scene graph of the currently selected/visible
+   IV model. It handles all changes with existing entities and reflects them on graphic scene.
  */
 
 class AADLItemModel : public QObject

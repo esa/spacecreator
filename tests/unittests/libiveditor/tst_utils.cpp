@@ -16,8 +16,8 @@
 */
 
 #include "ivfunction.h"
-#include "aadllibrary.h"
-#include "baseitems/common/aadlutils.h"
+#include "ivlibrary.h"
+#include "baseitems/common/ivutils.h"
 #include "interface/aadlfunctiongraphicsitem.h"
 #include "interface/graphicsitemhelpers.h"
 #include "iveditor.h"
@@ -45,8 +45,8 @@ private Q_SLOTS:
 
 void tst_Utils::initTestCase()
 {
-    ivm::initAadlLibrary();
-    ive::initIvEditor();
+    ivm::initIVLibrary();
+    ive::initIVEditor();
     shared::initSharedLibrary();
 }
 

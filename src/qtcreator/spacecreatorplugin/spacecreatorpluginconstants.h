@@ -24,7 +24,7 @@ namespace spctr {
 namespace Constants {
 
 const char MSC_MIMETYPE[] = "text/vnd.msc";
-const char AADL_MIMETYPE[] = "application/xml";
+const char IV_MIMETYPE[] = "application/xml";
 
 const char INFO_READ_ONLY[] = "SpaceCreator.ReadOnly";
 
@@ -32,9 +32,9 @@ const char K_MSC_EDITOR_ID[] = "SpaceCreator.MscEditor";
 
 const char C_MSCEDITOR_DISPLAY_NAME[] = QT_TRANSLATE_NOOP("OpenWith::Editors", "Msc Editor");
 
-const char K_AADL_EDITOR_ID[] = "SpaceCreator.AadlEditor";
+const char K_IV_EDITOR_ID[] = "SpaceCreator.IVEditor";
 
-const char C_AADLEDITOR_DISPLAY_NAME[] = QT_TRANSLATE_NOOP("OpenWith::Editors", "AADL Editor");
+const char C_IVEDITOR_DISPLAY_NAME[] = QT_TRANSLATE_NOOP("OpenWith::Editors", "IV Editor");
 
 // Menu
 const char MENU_ID[] = "SpaceCreator.Menu";
@@ -43,15 +43,15 @@ const char SHOW_E2E_ID[] = "SpaceCreator.E2EDataflow";
 const char MESSAGE_DECLARATIONS_ID[] = "MscEditor.MessageDeclarations";
 const char CHECK_INSTANCES_ID[] = "MscEditor.CheckInstances";
 const char CHECK_MESSAGES_ID[] = "MscEditor.CheckMessages";
-const char AADL_SHOW_ASN1_ID[] = "AadlEditor.ShowAsn1";
-const char AADL_RENDER_ID[] = "AadlEditor.RenderToFile";
-const char AADL_SHOW_COMMON_PROPS_ID[] = "AadlEditor.CommonProps";
-const char AADL_SHOW_COLOR_SCHEME_ID[] = "AadlEditor.ColorScheme";
-const char AADL_SHOW_DYN_CONTEXT_ID[] = "AadlEditor.DynContext";
-const char AADL_EXPORT_SELECTED_ID[] = "AadlEditor.ExportSelected";
-const char AADL_EXPORT_IV_TYPE_ID[] = "AadlEditor.ExportComponentType";
+const char IV_SHOW_ASN1_ID[] = "IVEditor.ShowAsn1";
+const char IV_RENDER_ID[] = "IVEditor.RenderToFile";
+const char IV_SHOW_COMMON_PROPS_ID[] = "IVEditor.CommonProps";
+const char IV_SHOW_COLOR_SCHEME_ID[] = "IVEditor.ColorScheme";
+const char IV_SHOW_DYN_CONTEXT_ID[] = "IVEditor.DynContext";
+const char IV_EXPORT_SELECTED_ID[] = "IVEditor.ExportSelected";
+const char IV_EXPORT_IV_TYPE_ID[] = "IVEditor.ExportComponentType";
 const char MSC_HELP_ID[] = "MscEditor.Help";
-const char AADL_HELP_ID[] = "AadlEditor.Help";
+const char IV_HELP_ID[] = "IVEditor.Help";
 
 // Settings
 const char SETTINGS_CATEGORY_DISPLAY[] = QT_TRANSLATE_NOOP("SpaceCreator", "SpaceCreator");

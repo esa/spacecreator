@@ -15,7 +15,7 @@
    along with this program. If not, see <https://www.gnu.org/licenses/lgpl-2.1.html>.
 */
 
-#include "aadllibrary.h"
+#include "ivlibrary.h"
 #include "commandlineparser.h"
 #include "iveditor.h"
 #include "iveditorcore.h"
@@ -45,8 +45,8 @@ private Q_SLOTS:
     void testCmdArgumentOpenMsc();
     void testCmdArgumentRemoteControl();
 
-    // The AADL only arguments
-    void testCmdArgumentOpenAADLXMLFile();
+    // The IV only arguments
+    void testCmdArgumentOpenIVFile();
     void testCmdArgumentListScriptableActions();
 
     // Arguments valid for both. Skipping Unknown and DropUnsavedChangesSilently
@@ -58,7 +58,7 @@ private Q_SLOTS:
 
 private:
     msc::MSCEditorCore m_pluginMSC;
-    ive::IVEditorCore m_pluginAADL;
+    ive::IVEditorCore m_pluginIV;
 };
 
 void tst_CommandLineParser::testCmdArgumentOpenMsc()
@@ -110,29 +110,29 @@ void tst_CommandLineParser::testCmdArgumentRemoteControl()
     QCOMPARE(argFromParser1.toUShort(), port);
 }
 
-void tst_CommandLineParser::testCmdArgumentOpenAADLXMLFile()
+void tst_CommandLineParser::testCmdArgumentOpenIVFile()
 {
-    const QCommandLineOption cmdOpenAADLXML =
-            CommandLineParser::positionalArg(CommandLineParser::Positional::OpenAADLXMLFile);
+    const QCommandLineOption cmdOpenIV =
+            CommandLineParser::positionalArg(CommandLineParser::Positional::OpenIVFile);
     const QString fileName(QString(EXAMPLES_DIR).append("msc/sample.xml"));
     const QString noFileName("./no-such-file.xml");
 
     CommandLineParser parser;
-    m_pluginAADL.populateCommandLineArguments(&parser);
+    m_pluginIV.populateCommandLineArguments(&parser);
     QStringList args = { QApplication::instance()->applicationFilePath(),
-        QString("-%1=%2").arg(cmdOpenAADLXML.names().first(), fileName) };
+        QString("-%1=%2").arg(cmdOpenIV.names().first(), fileName) };
     parser.process(args);
 
     QVERIFY(!parser.isSet(CommandLineParser::Positional::Unknown));
-    QVERIFY(parser.isSet(CommandLineParser::Positional::OpenAADLXMLFile));
+    QVERIFY(parser.isSet(CommandLineParser::Positional::OpenIVFile));
 
-    const QString argFromParser1(parser.value(CommandLineParser::Positional::OpenAADLXMLFile));
+    const QString argFromParser1(parser.value(CommandLineParser::Positional::OpenIVFile));
     QCOMPARE(argFromParser1, fileName);
 
     parser.process({ QApplication::instance()->applicationFilePath(),
-            QString("-%1=%2").arg(cmdOpenAADLXML.names().first(), noFileName) });
-    QVERIFY(parser.isSet(CommandLineParser::Positional::OpenAADLXMLFile));
-    const QString argFromParser2(parser.value(CommandLineParser::Positional::OpenAADLXMLFile));
+            QString("-%1=%2").arg(cmdOpenIV.names().first(), noFileName) });
+    QVERIFY(parser.isSet(CommandLineParser::Positional::OpenIVFile));
+    const QString argFromParser2(parser.value(CommandLineParser::Positional::OpenIVFile));
     QCOMPARE(argFromParser2, noFileName);
 }
 
@@ -142,7 +142,7 @@ void tst_CommandLineParser::testCmdArgumentListScriptableActions()
             CommandLineParser::positionalArg(CommandLineParser::Positional::ListScriptableActions);
 
     CommandLineParser parser;
-    m_pluginAADL.populateCommandLineArguments(&parser);
+    m_pluginIV.populateCommandLineArguments(&parser);
     QStringList args = { QApplication::instance()->applicationFilePath(),
         QString("-%1").arg(cmdListScriptableActions.names().first()) };
     parser.process(args);
@@ -160,7 +160,7 @@ void tst_CommandLineParser::testCmdArgumentOpenStringTemplateFile()
         QString("-%1=%2").arg(cmdOpenStringTemplateFile.names().first(), dirName) };
 
     CommandLineParser parserMSC;
-    m_pluginAADL.populateCommandLineArguments(&parserMSC);
+    m_pluginIV.populateCommandLineArguments(&parserMSC);
     parserMSC.process(args);
 
     QVERIFY(!parserMSC.isSet(CommandLineParser::Positional::Unknown));
@@ -169,15 +169,15 @@ void tst_CommandLineParser::testCmdArgumentOpenStringTemplateFile()
     const QString argFromParserMSC(parserMSC.value(CommandLineParser::Positional::OpenStringTemplateFile));
     QCOMPARE(argFromParserMSC, dirName);
 
-    CommandLineParser parserAADL;
-    m_pluginAADL.populateCommandLineArguments(&parserAADL);
-    parserAADL.process(args);
+    CommandLineParser parserIV;
+    m_pluginIV.populateCommandLineArguments(&parserIV);
+    parserIV.process(args);
 
-    QVERIFY(!parserAADL.isSet(CommandLineParser::Positional::Unknown));
-    QVERIFY(parserAADL.isSet(CommandLineParser::Positional::OpenStringTemplateFile));
+    QVERIFY(!parserIV.isSet(CommandLineParser::Positional::Unknown));
+    QVERIFY(parserIV.isSet(CommandLineParser::Positional::OpenStringTemplateFile));
 
-    const QString argFromParserAADL(parserAADL.value(CommandLineParser::Positional::OpenStringTemplateFile));
-    QCOMPARE(argFromParserAADL, dirName);
+    const QString argFromParserIV(parserIV.value(CommandLineParser::Positional::OpenStringTemplateFile));
+    QCOMPARE(argFromParserIV, dirName);
 }
 
 void tst_CommandLineParser::testCmdArgumentExportToFile()
@@ -189,7 +189,7 @@ void tst_CommandLineParser::testCmdArgumentExportToFile()
         QString("-%1=%2").arg(cmdExportToFile.names().first(), fileName) };
 
     CommandLineParser parserMSC;
-    m_pluginAADL.populateCommandLineArguments(&parserMSC);
+    m_pluginIV.populateCommandLineArguments(&parserMSC);
     parserMSC.process(args);
 
     QVERIFY(!parserMSC.isSet(CommandLineParser::Positional::Unknown));
@@ -198,21 +198,21 @@ void tst_CommandLineParser::testCmdArgumentExportToFile()
     const QString argFromParserMSC(parserMSC.value(CommandLineParser::Positional::ExportToFile));
     QCOMPARE(argFromParserMSC, fileName);
 
-    CommandLineParser parserAADL;
-    m_pluginAADL.populateCommandLineArguments(&parserAADL);
-    parserAADL.process(args);
+    CommandLineParser parserIV;
+    m_pluginIV.populateCommandLineArguments(&parserIV);
+    parserIV.process(args);
 
-    QVERIFY(!parserAADL.isSet(CommandLineParser::Positional::Unknown));
-    QVERIFY(parserAADL.isSet(CommandLineParser::Positional::ExportToFile));
+    QVERIFY(!parserIV.isSet(CommandLineParser::Positional::Unknown));
+    QVERIFY(parserIV.isSet(CommandLineParser::Positional::ExportToFile));
 
-    const QString argFromParserAADL(parserAADL.value(CommandLineParser::Positional::ExportToFile));
-    QCOMPARE(argFromParserAADL, fileName);
+    const QString argFromParserIV(parserIV.value(CommandLineParser::Positional::ExportToFile));
+    QCOMPARE(argFromParserIV, fileName);
 }
 
 void tst_CommandLineParser::initTestCase()
 {
-    ivm::initAadlLibrary();
-    ive::initIvEditor();
+    ivm::initIVLibrary();
+    ive::initIVEditor();
     shared::initSharedLibrary();
 }
 

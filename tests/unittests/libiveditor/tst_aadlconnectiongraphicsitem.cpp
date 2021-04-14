@@ -15,7 +15,7 @@
    along with this program. If not, see <https://www.gnu.org/licenses/lgpl-2.1.html>.
 */
 
-#include "baseitems/common/aadlutils.h"
+#include "baseitems/common/ivutils.h"
 #include "graphicsviewutils.h"
 #include "interface/aadlconnectiongraphicsitem.h"
 #include "interface/aadlfunctiongraphicsitem.h"
@@ -44,7 +44,7 @@ private:
 
 void tst_AADLConnectionGraphicsItem::initTestCase()
 {
-    ive::initIvEditor();
+    ive::initIVEditor();
     shared::initSharedLibrary();
     QStandardPaths::setTestModeEnabled(true);
 }

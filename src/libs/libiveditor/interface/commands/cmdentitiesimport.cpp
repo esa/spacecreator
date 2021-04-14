@@ -21,7 +21,7 @@
 #include "ivmodel.h"
 #include "ivnamevalidator.h"
 #include "ivxmlreader.h"
-#include "baseitems/common/aadlutils.h"
+#include "baseitems/common/ivutils.h"
 #include "commandids.h"
 #include "xmldocexporter.h"
 

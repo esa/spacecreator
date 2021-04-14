@@ -97,7 +97,7 @@ bool XmlDocExporter::exportDocInteractive(
 
 /**
    @brief XmlDocExporter::exportDoc writes the document as xml to the given buffer
-   @param doc the AADL document
+   @param doc the IV(AADL) document
    @param outBuffer the buffer that is open and ready to be written to
    @param templatePath the grantlee template to use for the export. If empty, the default one is used
    @return true when the export was successful.
@@ -114,13 +114,13 @@ bool XmlDocExporter::exportDoc(InterfaceDocument *doc, QBuffer *outBuffer, const
         usedTemplatePath = XmlDocExporter::interfaceDefaultTemplate();
     }
 
-    const QHash<QString, QVariant> aadlObjects = collectInterfaceObjects(doc);
+    const QHash<QString, QVariant> ivObjects = collectInterfaceObjects(doc);
     QScopedPointer<templating::StringTemplate> strTemplate(templating::StringTemplate::create());
-    return strTemplate->parseFile(aadlObjects, usedTemplatePath, outBuffer);
+    return strTemplate->parseFile(ivObjects, usedTemplatePath, outBuffer);
 }
 /**
    @brief XmlDocExporter::exportObjects writes the document as xml to the given buffer
-   @param doc the set of AADL entities
+   @param doc the set of IV(AADL) entities
    @param outBuffer the buffer that is open and ready to be written to
    @param templatePath the grantlee template to use for the export. If empty, the default one is used
    @return true when the export was successful.
@@ -138,9 +138,9 @@ bool XmlDocExporter::exportObjects(
         usedTemplatePath = XmlDocExporter::interfaceDefaultTemplate();
     }
 
-    const QHash<QString, QVariant> aadlObjects = collectInterfaceObjects(objects);
+    const QHash<QString, QVariant> ivObjects = collectInterfaceObjects(objects);
     QScopedPointer<templating::StringTemplate> strTemplate(templating::StringTemplate::create());
-    return strTemplate->parseFile(aadlObjects, usedTemplatePath, outBuffer);
+    return strTemplate->parseFile(ivObjects, usedTemplatePath, outBuffer);
 }
 
 bool XmlDocExporter::exportDoc(InterfaceDocument *doc, QWidget *root, const QString &outPath,
@@ -190,12 +190,12 @@ bool XmlDocExporter::exportDocInterface(InterfaceDocument *doc, QWidget *parentW
     if (templatePath.isEmpty())
         usedTemplatePath = XmlDocExporter::interfaceDefaultTemplate();
 
-    QHash<QString, QVariant> aadlObjects = collectInterfaceObjects(doc);
+    QHash<QString, QVariant> ivObjects = collectInterfaceObjects(doc);
 
     if (InteractionPolicy::Silently == interaction)
-        return runExportSilently(doc, aadlObjects, usedTemplatePath, savePath);
+        return runExportSilently(doc, ivObjects, usedTemplatePath, savePath);
     else
-        return showExportDialog(doc, parentWindow, aadlObjects, usedTemplatePath, savePath);
+        return showExportDialog(doc, parentWindow, ivObjects, usedTemplatePath, savePath);
 }
 
 bool XmlDocExporter::runExportSilently(InterfaceDocument *doc, const QHash<QString, QVariant> &content,
@@ -241,8 +241,8 @@ QHash<QString, QVariant> XmlDocExporter::collectInterfaceObjects(const QList<ivm
 {
     QHash<QString, QVariant> grouppedObjects;
 
-    for (const auto aadlObject : objects) {
-        const ivm::IVObject::Type t = aadlObject->type();
+    for (const auto ivObject : objects) {
+        const ivm::IVObject::Type t = ivObject->type();
         switch (t) {
         case ivm::IVObject::Type::InterfaceGroup:
             continue;
@@ -252,14 +252,14 @@ QHash<QString, QVariant> XmlDocExporter::collectInterfaceObjects(const QList<ivm
         case ivm::IVObject::Type::ConnectionGroup:
         case ivm::IVObject::Type::Connection:
         case ivm::IVObject::Type::Unknown: {
-            if (t == ivm::IVObject::Type::Unknown || (aadlObject->isNested() && objects.size() > 1))
+            if (t == ivm::IVObject::Type::Unknown || (ivObject->isNested() && objects.size() > 1))
                 continue;
             break;
         }
         default:
             break;
         }
-        const QVariant &exportedObject = ExportableAADLObject::createFrom(aadlObject);
+        const QVariant &exportedObject = ExportableAADLObject::createFrom(ivObject);
         const auto &o = exportedObject.value<ExportableAADLObject>();
         const QString groupName = o.groupName();
         if (!grouppedObjects.contains(groupName)) {

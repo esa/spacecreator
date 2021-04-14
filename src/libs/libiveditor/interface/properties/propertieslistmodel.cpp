@@ -17,7 +17,7 @@
 
 #include "propertieslistmodel.h"
 
-#include "aadlcommonprops.h"
+#include "ivcommonprops.h"
 #include "ivfunction.h"
 #include "ivinterface.h"
 #include "ivmodel.h"

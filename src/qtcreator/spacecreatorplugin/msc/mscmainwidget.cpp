@@ -228,19 +228,19 @@ void MscMainWidget::init()
     m_documentTree->header()->setVisible(true);
     leftVerticalLayout->addWidget(m_documentTree);
 
-    m_aadlSwitch = new QPushButton("Interface view", leftArea);
-    m_aadlSwitch->setToolTip(tr("Open the file"));
-    connect(m_aadlSwitch, &QPushButton::clicked, this, [this]() {
+    m_ivSwitch = new QPushButton("Interface view", leftArea);
+    m_ivSwitch->setToolTip(tr("Open the file"));
+    connect(m_ivSwitch, &QPushButton::clicked, this, [this]() {
         if (!m_project) {
             return;
         }
-        QStringList aadlFiles = m_project->allAadlFiles();
-        if (!aadlFiles.isEmpty()) {
-            Core::EditorManager::instance()->openEditor(aadlFiles.first());
+        const QStringList ivFiles = m_project->allIVFiles();
+        if (!ivFiles.isEmpty()) {
+            Core::EditorManager::instance()->openEditor(ivFiles.first());
         }
     });
-    m_aadlSwitch->setSizePolicy(QSizePolicy::MinimumExpanding, QSizePolicy::Minimum);
-    leftVerticalLayout->addWidget(m_aadlSwitch);
+    m_ivSwitch->setSizePolicy(QSizePolicy::MinimumExpanding, QSizePolicy::Minimum);
+    leftVerticalLayout->addWidget(m_ivSwitch);
 
     auto asn1Widget = new QWidget(leftArea);
     asn1Widget->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Minimum);

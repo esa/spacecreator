@@ -24,7 +24,7 @@
 #include "ivobject.h"
 #include "asn1/file.h"
 #include "asn1/types/builtintypes.h"
-#include "baseitems/common/aadlutils.h"
+#include "baseitems/common/ivutils.h"
 #include "commandsstack.h"
 #include "contextparametersmodel.h"
 #include "delegates/asn1valuedelegate.h"

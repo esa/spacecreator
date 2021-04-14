@@ -96,20 +96,20 @@ void MscSystemChecks::changeMscInstanceName(const QString &oldName, const QStrin
 /*!
    Removes all instance that are corresponding to the function \p aaldFunction
  */
-void MscSystemChecks::removeMscInstances(ivm::IVFunction *aadlFunction)
+void MscSystemChecks::removeMscInstances(ivm::IVFunction *ivFunction)
 {
     for (QSharedPointer<msc::MSCEditorCore> &mscCore : m_storage->allMscCores()) {
-        mscCore->removeMscInstances(aadlFunction);
+        mscCore->removeMscInstances(ivFunction);
     }
 }
 
 /*!
-   Returns if there is at least one msc instance corresponding to \p aadlFunction
+   Returns if there is at least one msc instance corresponding to \p ivFunction
  */
-bool MscSystemChecks::hasCorrespondingInstances(ivm::IVFunction *aadlFunction) const
+bool MscSystemChecks::hasCorrespondingInstances(ivm::IVFunction *ivFunction) const
 {
     for (QSharedPointer<msc::MSCEditorCore> &mscCore : m_storage->allMscCores()) {
-        if (!mscCore->correspondingInstances(aadlFunction).isEmpty()) {
+        if (!mscCore->correspondingInstances(ivFunction).isEmpty()) {
             return true;
         }
     }
@@ -150,22 +150,22 @@ void MscSystemChecks::changeMscMessageName(
 }
 
 /*!
-   Removes all messages that are corresponding to the connection \p aadlConnection
+   Removes all messages that are corresponding to the connection \p ivConnection
  */
-void MscSystemChecks::removeMscMessages(ivm::IVConnection *aadlConnection)
+void MscSystemChecks::removeMscMessages(ivm::IVConnection *ivConnection)
 {
     for (QSharedPointer<msc::MSCEditorCore> &mscCore : m_storage->allMscCores()) {
-        mscCore->removeMscMessages(aadlConnection);
+        mscCore->removeMscMessages(ivConnection);
     }
 }
 
 /*!
-   Returns if there is at least one msc message corresponding to \p aadlConnection
+   Returns if there is at least one msc message corresponding to \p ivConnection
  */
-bool MscSystemChecks::hasCorrespondingMessages(ivm::IVConnection *aadlConnection) const
+bool MscSystemChecks::hasCorrespondingMessages(ivm::IVConnection *ivConnection) const
 {
     for (QSharedPointer<msc::MSCEditorCore> &mscCore : m_storage->allMscCores()) {
-        if (!mscCore->correspondingMessages(aadlConnection).isEmpty()) {
+        if (!mscCore->correspondingMessages(ivConnection).isEmpty()) {
             return true;
         }
     }
@@ -173,7 +173,7 @@ bool MscSystemChecks::hasCorrespondingMessages(ivm::IVConnection *aadlConnection
 }
 
 /*!
-   Checks if all instances have corresponding functions in the aadl model
+   Checks if all instances have corresponding functions in the iv model
    Errors are reported in a message box
  */
 void MscSystemChecks::checkInstances()
@@ -194,7 +194,7 @@ void MscSystemChecks::checkInstances()
 
     QString text;
     if (!resultNames.isEmpty()) {
-        text += tr("Following instances have no corresponding aadl function:\n");
+        text += tr("Following instances have no corresponding iv function:\n");
         for (auto item : resultNames) {
             if (!text.isEmpty()) {
                 text += "\n";
@@ -223,7 +223,7 @@ void MscSystemChecks::checkInstances()
 }
 
 /*!
-   Checks if all messages have corresponding connections in the aadl model
+   Checks if all messages have corresponding connections in the iv model
    Errors are reported in a message box
  */
 void MscSystemChecks::checkMessages()
@@ -238,7 +238,7 @@ void MscSystemChecks::checkMessages()
 
     QString text;
     if (!resultNames.isEmpty()) {
-        text += tr("Following messages have no corresponding aadl connection:\n");
+        text += tr("Following messages have no corresponding iv connection:\n");
         for (auto item : resultNames) {
             if (!text.isEmpty()) {
                 text += "\n";
@@ -319,7 +319,7 @@ void MscSystemChecks::onEntityNameChanged(ivm::IVObject *entity, const QString &
 }
 
 /*!
-   Checks if aadl function and connection needs to be updated/added
+   Checks if iv function and connection needs to be updated/added
  */
 void MscSystemChecks::onMscEntityNameChanged(QObject *entity, const QString &oldName, shared::UndoCommand *command)
 {
@@ -333,13 +333,13 @@ void MscSystemChecks::onMscEntityNameChanged(QObject *entity, const QString &old
 
     auto instance = dynamic_cast<msc::MscInstance *>(entity);
     if (instance) {
-        const bool hasOldName = ivCore->aadlFunctionsNames().contains(oldName, m_caseCheck);
-        const bool hasNewName = ivCore->aadlFunctionsNames().contains(instance->name(), m_caseCheck);
+        const bool hasOldName = ivCore->ivFunctionsNames().contains(oldName, m_caseCheck);
+        const bool hasNewName = ivCore->ivFunctionsNames().contains(instance->name(), m_caseCheck);
 
         if (!hasOldName && !hasNewName) {
-            const int result = QMessageBox::question(nullptr, tr("No AADL function"),
-                    tr("The AADL model doesn't contain a function called:\n%1\n"
-                       "\nDo you want to add it to the AADL model?")
+            const int result = QMessageBox::question(nullptr, tr("No IV function"),
+                    tr("The IV model doesn't contain a function called:\n%1\n"
+                       "\nDo you want to add it to the IV model?")
                             .arg(instance->name()));
             if (result == QMessageBox::Yes) {
                 ivCore->addFunction(instance->name());
@@ -349,10 +349,10 @@ void MscSystemChecks::onMscEntityNameChanged(QObject *entity, const QString &old
         if (hasOldName && !hasNewName) {
             if (command->isFirstChange()) {
                 QMessageBox box;
-                box.setWindowTitle(tr("Update AADL function"));
-                box.setText(tr("The AADL function should be updated."
+                box.setWindowTitle(tr("Update IV function"));
+                box.setText(tr("The IV function should be updated."
                                "\nDo you want to update it?"
-                               "\nDo you want to add it to the AADL model?"));
+                               "\nDo you want to add it to the IV model?"));
                 QPushButton *updateButton = box.addButton(tr("Update"), QMessageBox::AcceptRole);
                 QPushButton *addButton = box.addButton(tr("Add"), QMessageBox::AcceptRole);
                 box.addButton(tr("Ignore"), QMessageBox::RejectRole);
@@ -360,7 +360,7 @@ void MscSystemChecks::onMscEntityNameChanged(QObject *entity, const QString &old
                 box.exec();
                 if (box.clickedButton() == updateButton) {
                     m_nameUpdateRunning = true;
-                    ivCore->renameAadlFunction(oldName, instance->name());
+                    ivCore->renameIVFunction(oldName, instance->name());
                     changeMscInstanceName(oldName, instance->name());
                     m_nameUpdateRunning = false;
                 }
@@ -369,7 +369,7 @@ void MscSystemChecks::onMscEntityNameChanged(QObject *entity, const QString &old
                 }
             } else {
                 m_nameUpdateRunning = true;
-                ivCore->renameAadlFunction(oldName, instance->name());
+                ivCore->renameIVFunction(oldName, instance->name());
                 changeMscInstanceName(oldName, instance->name());
                 m_nameUpdateRunning = false;
             }
@@ -390,9 +390,9 @@ void MscSystemChecks::onMscEntityNameChanged(QObject *entity, const QString &old
         bool hasOldName = ivChecker.checkMessage(&oldMessage);
 
         if (!hasNewName && !hasOldName) {
-            const int result = QMessageBox::question(nullptr, tr("No AADL connection"),
-                    tr("The AADL model doesn't contain a connection called:\n%1\n"
-                       "\nDo you want to add it to the AADL model?")
+            const int result = QMessageBox::question(nullptr, tr("No IV connection"),
+                    tr("The IV model doesn't contain a connection called:\n%1\n"
+                       "\nDo you want to add it to the IV model?")
                             .arg(message->name()));
             if (result == QMessageBox::Yes) {
                 ivCore->addConnection(message->name(), fromName, toName);
@@ -402,10 +402,10 @@ void MscSystemChecks::onMscEntityNameChanged(QObject *entity, const QString &old
         if (hasOldName && !hasNewName) {
             if (command->isFirstChange()) {
                 QMessageBox box;
-                box.setWindowTitle(tr("Update AADL connection"));
-                box.setText(tr("The AADL connection should be updated."
+                box.setWindowTitle(tr("Update IV connection"));
+                box.setText(tr("The IV connection should be updated."
                                "\nDo you want to update it?"
-                               "\nDo you want to add it to the AADL model?"));
+                               "\nDo you want to add it to the IV model?"));
                 QPushButton *updateButton = box.addButton(tr("Update"), QMessageBox::AcceptRole);
                 QPushButton *addButton = box.addButton(tr("Add"), QMessageBox::AcceptRole);
                 box.addButton(tr("Ignore"), QMessageBox::RejectRole);
@@ -413,7 +413,7 @@ void MscSystemChecks::onMscEntityNameChanged(QObject *entity, const QString &old
                 box.exec();
                 if (box.clickedButton() == updateButton) {
                     m_nameUpdateRunning = true;
-                    ivCore->renameAadlConnection(oldName, message->name(), fromName, toName);
+                    ivCore->renameIVConnection(oldName, message->name(), fromName, toName);
                     changeMscMessageName(oldName, message->name(), fromName, toName);
                     m_nameUpdateRunning = false;
                 }
@@ -422,7 +422,7 @@ void MscSystemChecks::onMscEntityNameChanged(QObject *entity, const QString &old
                 }
             } else {
                 m_nameUpdateRunning = true;
-                ivCore->renameAadlConnection(oldName, message->name(), fromName, toName);
+                ivCore->renameIVConnection(oldName, message->name(), fromName, toName);
                 changeMscMessageName(oldName, message->name(), fromName, toName);
                 m_nameUpdateRunning = false;
             }
@@ -431,7 +431,7 @@ void MscSystemChecks::onMscEntityNameChanged(QObject *entity, const QString &old
 }
 
 /*!
-   Removes corresponding MSC entities when a AADL entity wasremoved
+   Removes corresponding MSC entities when a IV entity was removed
  */
 void MscSystemChecks::onEntitiesRemoved(const QList<QPointer<ivm::IVObject>> &entities, shared::UndoCommand *command)
 {
@@ -463,7 +463,7 @@ void MscSystemChecks::onEntitiesRemoved(const QList<QPointer<ivm::IVObject>> &en
     bool doRemove = true;
     if (command->isFirstChange()) {
         const int result = QMessageBox::question(nullptr, tr("Remove MSC entities"),
-                tr("The AADL entity(ies) %1 was(were) removed."
+                tr("The IV entity(ies) %1 was(were) removed."
                    "\nDo you want to remove the correlating MSC entities?")
                         .arg(removedNames.join(QLatin1String(", "))));
         if (result != QMessageBox::Yes) {
@@ -471,11 +471,11 @@ void MscSystemChecks::onEntitiesRemoved(const QList<QPointer<ivm::IVObject>> &en
         }
     }
     if (doRemove) {
-        for (auto aadlFunction : qAsConst(removedFunctions)) {
-            removeMscInstances(aadlFunction);
+        for (auto ivFunction : qAsConst(removedFunctions)) {
+            removeMscInstances(ivFunction);
         }
-        for (auto aadlConnection : qAsConst(removedConnections)) {
-            removeMscMessages(aadlConnection);
+        for (auto ivConnection : qAsConst(removedConnections)) {
+            removeMscMessages(ivConnection);
         }
     }
 }

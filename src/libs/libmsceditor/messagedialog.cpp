@@ -103,7 +103,7 @@ MessageDialog::~MessageDialog()
 /*!
    Sets the auto completion list for the name line edit
  */
-void MessageDialog::setAadlConnectionNames(const QStringList &names)
+void MessageDialog::setIVConnectionNames(const QStringList &names)
 {
     if (ui->nameLineEdit->completer()) {
         ui->nameLineEdit->completer()->deleteLater();
@@ -116,7 +116,7 @@ void MessageDialog::setAadlConnectionNames(const QStringList &names)
 }
 
 /*!
-   \brief MessageDialog::setAadlChecker
+   \brief MessageDialog::setSystemChecker
    \param checker
  */
 void MessageDialog::setSystemChecker(msc::SystemChecks *checker)
@@ -124,7 +124,7 @@ void MessageDialog::setSystemChecker(msc::SystemChecks *checker)
     m_checker = checker;
     const QString sourceName = m_message->sourceInstance() ? m_message->sourceInstance()->name() : "";
     const QString targetName = m_message->targetInstance() ? m_message->targetInstance()->name() : "";
-    setAadlConnectionNames(m_checker->connectionNamesFromTo(sourceName, targetName));
+    setIVConnectionNames(m_checker->connectionNamesFromTo(sourceName, targetName));
 }
 
 void MessageDialog::accept()
@@ -217,7 +217,7 @@ void MessageDialog::editDeclarations()
 
     MessageDeclarationsDialog dialog(declarations, mscModel(), m_chartLayoutManager->undoStack(), m_checker, this);
     dialog.setFileName(model->dataDefinitionString());
-    dialog.setAadlConnectionNames(m_connectionNames);
+    dialog.setIVConnectionNames(m_connectionNames);
 
     int result = dialog.exec();
 

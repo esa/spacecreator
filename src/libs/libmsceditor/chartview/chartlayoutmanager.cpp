@@ -1974,7 +1974,7 @@ QVector<msc::MscInstanceEvent *> ChartLayoutManager::visuallySortedEvents() cons
 }
 
 /*!
-   Sets the object to check if the msc entities correspond to the aadl model
+   Sets the object to check if the msc entities correspond to the iv model
  */
 void ChartLayoutManager::setSystemChecker(SystemChecks *checker)
 {
@@ -1982,7 +1982,7 @@ void ChartLayoutManager::setSystemChecker(SystemChecks *checker)
 }
 
 /*!
-   Returns the object to check if msc entities correspond to the aadl model
+   Returns the object to check if msc entities correspond to the iv model
  */
 SystemChecks *ChartLayoutManager::systemChecker() const
 {

@@ -49,7 +49,7 @@ private:
 void tst_SpaceCreatorProject::initTestCase()
 {
     QStandardPaths::setTestModeEnabled(true);
-    ive::initIvEditor();
+    ive::initIVEditor();
     shared::initSharedLibrary();
 }
 

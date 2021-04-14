@@ -184,7 +184,7 @@ target_include_directories(${LIB_NAME}
 target_link_libraries(${LIB_NAME}
     msccore
     asn1library
-    aadl
+    ivcore
     shared
     asn1editor
     ${QT_CORE}

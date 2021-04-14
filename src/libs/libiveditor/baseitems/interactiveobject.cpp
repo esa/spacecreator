@@ -19,7 +19,7 @@
 #include "interactiveobject.h"
 
 #include "ivobject.h"
-#include "baseitems/common/aadlutils.h"
+#include "baseitems/common/ivutils.h"
 #include "commandsstack.h"
 #include "interface/commands/cmdentityautolayout.h"
 #include "interface/commands/cmdentitygeometrychange.h"
@@ -193,10 +193,10 @@ void InteractiveObject::mouseDoubleClickEvent(QGraphicsSceneMouseEvent *event)
 shared::ColorHandler InteractiveObject::colorHandler() const
 {
     shared::ColorHandler h = shared::ColorManager::instance()->colorsForItem(handledColorType());
-    if (auto aadlObj = entity()) {
-        if (aadlObj->hasProperty(QLatin1String("color"))) { // keep single custom color
+    if (auto ivObj = entity()) {
+        if (ivObj->hasProperty(QLatin1String("color"))) { // keep single custom color
             h.setFillType(shared::ColorHandler::Color);
-            h.setBrushColor0(QColor(aadlObj->prop(QLatin1String("color")).toString()));
+            h.setBrushColor0(QColor(ivObj->prop(QLatin1String("color")).toString()));
         }
     }
 

@@ -82,8 +82,8 @@ MessageDeclarationsDialog::MessageDeclarationsDialog(msc::MscMessageDeclarationL
 
     connect(m_mscModel, &msc::MscModel::asn1DataChanged, this, &MessageDeclarationsDialog::updateAsn1TypesView);
 
-    ui->aadlImportButton->setEnabled(m_checker && m_checker->hasValidSystem());
-    connect(ui->aadlImportButton, &QPushButton::clicked, this, &MessageDeclarationsDialog::importFromAadl);
+    ui->ivImportButton->setEnabled(m_checker && m_checker->hasValidSystem());
+    connect(ui->ivImportButton, &QPushButton::clicked, this, &MessageDeclarationsDialog::importFromIV);
 
     updateDeclarationDetails();
 }
@@ -115,7 +115,7 @@ const QString &MessageDeclarationsDialog::fileName() const
 /*!
    Sets the auto completion list for the name line edit
  */
-void MessageDeclarationsDialog::setAadlConnectionNames(const QStringList &names)
+void MessageDeclarationsDialog::setIVConnectionNames(const QStringList &names)
 {
     if (ui->nameLineEdit->completer()) {
         ui->nameLineEdit->completer()->deleteLater();
@@ -297,18 +297,18 @@ void MessageDeclarationsDialog::checkforEmptyCompleter()
 }
 
 /*!
-   Adds all missing declarations from the aadl model
+   Adds all missing declarations from the iv model
  */
-void MessageDeclarationsDialog::importFromAadl()
+void MessageDeclarationsDialog::importFromIV()
 {
     if (!m_checker || !m_checker->hasValidSystem()) {
         return;
     }
 
-    QVector<msc::MscMessageDeclaration *> aadlDeclarations = m_checker->allConnectionsAsDeclaration();
+    QVector<msc::MscMessageDeclaration *> ivDeclarations = m_checker->allConnectionsAsDeclaration();
 
-    while (!aadlDeclarations.isEmpty()) {
-        msc::MscMessageDeclaration *declaration = aadlDeclarations.takeFirst();
+    while (!ivDeclarations.isEmpty()) {
+        msc::MscMessageDeclaration *declaration = ivDeclarations.takeFirst();
         if (!m_model->exists(declaration)) {
             m_model->append(declaration);
         } else {

@@ -15,7 +15,7 @@
   along with this program. If not, see <https://www.gnu.org/licenses/lgpl-2.1.html>.
 */
 
-#include "aadllibrary.h"
+#include "ivlibrary.h"
 #include "commandlineparser.h"
 #include "iveditor.h"
 #include "iveditorcore.h"
@@ -30,8 +30,8 @@ int main(int argc, char *argv[])
 {
     Q_INIT_RESOURCE(asn1_resources);
     shared::initSharedLibrary();
-    ive::initIvEditor();
-    ivm::initAadlLibrary();
+    ive::initIVEditor();
+    ivm::initIVLibrary();
 
     QApplication a(argc, argv);
     a.setOrganizationName(SC_ORGANISATION);

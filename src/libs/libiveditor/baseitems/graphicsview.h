@@ -27,7 +27,7 @@ namespace ive {
 
 /*!
   \class GraphicsView
-  \brief The QGraphicsView wrapper for displaying the AADL.
+  \brief The QGraphicsView wrapper for displaying the IV diagrams.
 */
 class GraphicsView : public shared::ui::GraphicsViewBase
 {

@@ -47,7 +47,7 @@ class EditorCore;
 
 namespace spctr {
 
-class AadlEditorFactory;
+class IVEditorFactory;
 class DeploymentEditorFactory;
 class MscEditorFactory;
 class SpaceCreatorProjectManager;
@@ -80,7 +80,7 @@ private:
     void addHelp();
 
     MscEditorFactory *m_mscFactory = nullptr;
-    AadlEditorFactory *m_aadlFactory = nullptr;
+    IVEditorFactory *m_ivFactory = nullptr;
     DeploymentEditorFactory *m_deploymentFactory = nullptr;
     QAction *m_messageDeclarationAction = nullptr;
     QAction *m_checkInstancesAction = nullptr;

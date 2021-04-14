@@ -32,17 +32,17 @@
 namespace ive {
 
 CommonVisualizationModel::CommonVisualizationModel(
-        ivm::IVModel *aadlModel, cmd::CommandsStack *commandsStack, QObject *parent)
+        ivm::IVModel *ivModel, cmd::CommandsStack *commandsStack, QObject *parent)
     : QStandardItemModel(parent)
-    , m_aadlModel(aadlModel)
+    , m_ivModel(ivModel)
     , m_commandsStack(commandsStack)
 {
-    connect(m_aadlModel, &ivm::IVModel::modelReset, this, [this]() {
+    connect(m_ivModel, &ivm::IVModel::modelReset, this, [this]() {
         m_itemCache.clear();
         removeRows(0, rowCount());
     });
-    connect(m_aadlModel, &ivm::IVModel::objectsAdded, this, &CommonVisualizationModel::addItems);
-    connect(m_aadlModel, &ivm::IVModel::objectRemoved, this, &CommonVisualizationModel::removeItem);
+    connect(m_ivModel, &ivm::IVModel::objectsAdded, this, &CommonVisualizationModel::addItems);
+    connect(m_ivModel, &ivm::IVModel::objectRemoved, this, &CommonVisualizationModel::removeItem);
     setSortRole(TypeRole);
 }
 
@@ -235,8 +235,8 @@ QStandardItem *CommonVisualizationModel::getItem(const shared::Id id)
     return id.isNull() ? nullptr : m_itemCache.value(id);
 }
 
-VisualizationModel::VisualizationModel(ivm::IVModel *aadlModel, cmd::CommandsStack *commandsStack, QObject *parent)
-    : CommonVisualizationModel(aadlModel, commandsStack, parent)
+VisualizationModel::VisualizationModel(ivm::IVModel *ivModel, cmd::CommandsStack *commandsStack, QObject *parent)
+    : CommonVisualizationModel(ivModel, commandsStack, parent)
 {
     connect(this, &QStandardItemModel::dataChanged, this, &VisualizationModel::onDataChanged);
 }
@@ -274,7 +274,7 @@ void VisualizationModel::onDataChanged(
         if (auto item = parent->child(row)) {
             if (roles.contains(Qt::CheckStateRole) || roles.contains(Qt::DisplayRole) || roles.isEmpty()) {
                 const shared::Id id = item->data(IdRole).toUuid();
-                if (auto obj = m_aadlModel->getObject(id)) {
+                if (auto obj = m_ivModel->getObject(id)) {
                     if (item->isCheckable() && roles.contains(Qt::CheckStateRole)) {
                         obj->setVisible(item->checkState() == Qt::Checked);
                     }

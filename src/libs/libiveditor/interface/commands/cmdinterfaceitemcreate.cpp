@@ -19,7 +19,7 @@
 
 #include "ivfunction.h"
 #include "ivmodel.h"
-#include "baseitems/common/aadlutils.h"
+#include "baseitems/common/ivutils.h"
 #include "cmdinterfaceitemcreate.h"
 #include "commandids.h"
 

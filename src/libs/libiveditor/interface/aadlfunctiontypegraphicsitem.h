@@ -59,12 +59,12 @@ protected:
 
     virtual void updateTextPosition();
 
-    template<class AADLType>
-    static QString uniteNames(const QVector<AADLType> &collection, const QString &prefix)
+    template<class Type>
+    static QString uniteNames(const QVector<Type> &collection, const QString &prefix)
     {
         QStringList result;
         std::transform(collection.cbegin(), collection.cend(), std::back_inserter(result),
-                [](AADLType obj) { return obj ? obj->titleUI() : QString(); });
+                [](Type obj) { return obj ? obj->titleUI() : QString(); });
         const QString line = joinNonEmpty(result, QStringLiteral(", "));
         return line.isEmpty() ? QString() : QString("<b>%1</b>%2").arg(prefix, line);
     }

@@ -19,7 +19,7 @@
 
 #include "ivfunctiontype.h"
 #include "asn1dialog.h"
-#include "baseitems/common/aadlutils.h"
+#include "baseitems/common/ivutils.h"
 #include "commandsstack.h"
 #include "common.h"
 #include "context/action/actionsmanager.h"
@@ -253,7 +253,7 @@ bool MainWindow::processCommandLineArg(shared::CommandLineParser::Positional arg
         m_dropUnsavedChangesSilently = true;
         return true;
     }
-    case shared::CommandLineParser::Positional::OpenAADLXMLFile: {
+    case shared::CommandLineParser::Positional::OpenIVFile: {
         if (!value.isEmpty() && m_core->document() != nullptr) {
             return m_core->document()->load(value);
         };

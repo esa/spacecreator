@@ -1,5 +1,5 @@
 add_subdirectory(iveditor)
-add_subdirectory(aadlconverter)
+add_subdirectory(ivconverter)
 add_subdirectory(mscconverter)
 add_subdirectory(msceditor)
 add_subdirectory(mscstreaming)

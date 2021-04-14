@@ -32,18 +32,18 @@ class IMode;
 
 namespace spctr {
 
-class AadlQtCEditor;
+class QtCIVEditor;
 
-class AadlEditorStack : public QStackedWidget
+class IVEditorStack : public QStackedWidget
 {
     Q_OBJECT
 
 public:
-    AadlEditorStack(QWidget *parent = nullptr);
+    IVEditorStack(QWidget *parent = nullptr);
 
-    void add(AadlQtCEditor *editor, QWidget *widget);
-    QWidget *widgetForEditor(AadlQtCEditor *editor);
-    void removeAadlTextEditor(QObject *);
+    void add(QtCIVEditor *editor, QWidget *widget);
+    QWidget *widgetForEditor(QtCIVEditor *editor);
+    void removeIVTextEditor(QObject *);
     bool setVisibleEditor(Core::IEditor *xmlEditor);
 
     QSharedPointer<ive::IVEditorCore> ivPlugin(const QString &fileName) const;
@@ -51,7 +51,7 @@ public:
 private:
     void modeAboutToChange(Core::Id m);
 
-    QVector<AadlQtCEditor *> m_editors;
+    QVector<QtCIVEditor *> m_editors;
 };
 
 }

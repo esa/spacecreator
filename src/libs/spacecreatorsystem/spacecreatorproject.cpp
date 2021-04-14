@@ -18,7 +18,7 @@
 #include "spacecreatorproject.h"
 
 #include "asn1modelstorage.h"
-#include "baseitems/common/aadlutils.h"
+#include "baseitems/common/ivutils.h"
 #include "interface/interfacedocument.h"
 #include "iveditorcore.h"
 #include "ivsystemchecks.h"
@@ -85,17 +85,17 @@ QSharedPointer<msc::MSCEditorCore> SpaceCreatorProject::mscData(const QString &f
 }
 
 /*!
-   Returns the iv/aadl data of the project
+   Returns the iv data of the project
  */
 QSharedPointer<ive::IVEditorCore> SpaceCreatorProject::ivCore() const
 {
-    QStringList aadlFiles = allAadlFiles();
-    if (aadlFiles.empty()) {
-        qWarning() << "No AADL file in the project";
+    const QStringList ivFiles = allIVFiles();
+    if (ivFiles.empty()) {
+        qWarning() << "No IV file in the project";
         return {};
     }
 
-    return ivData(aadlFiles.first());
+    return ivData(ivFiles.first());
 }
 
 /*!
@@ -103,7 +103,7 @@ QSharedPointer<ive::IVEditorCore> SpaceCreatorProject::ivCore() const
  */
 QVector<QSharedPointer<msc::MSCEditorCore>> SpaceCreatorProject::allMscCores() const
 {
-    QStringList mscFiles = allMscFiles();
+    const QStringList mscFiles = allMscFiles();
     QVector<QSharedPointer<msc::MSCEditorCore>> allMscCores;
     for (const QString &mscFile : mscFiles) {
         QSharedPointer<msc::MSCEditorCore> core = mscData(mscFile);
@@ -135,7 +135,7 @@ bool SpaceCreatorProject::contains(QSharedPointer<shared::EditorCore> core) cons
 /*!
    Returns all aald files of the current project
  */
-QStringList SpaceCreatorProject::allAadlFiles() const
+QStringList SpaceCreatorProject::allIVFiles() const
 {
     return projectFiles(ive::kDefaultFilename);
 }
@@ -178,7 +178,7 @@ QStringList SpaceCreatorProject::projectFiles(const QString &suffix) const
 }
 
 /*!
-   Access to the list of aadl/iv checks done from msc
+   Access to the list of iv checks done from msc
  */
 QVector<IvSystemChecks *> SpaceCreatorProject::ivChecks() const
 {
@@ -196,10 +196,10 @@ QVector<IvSystemChecks *> SpaceCreatorProject::ivChecks() const
  */
 void SpaceCreatorProject::purgeNonProjectData()
 {
-    const QStringList aadlFiles = allAadlFiles();
+    const QStringList ivFiles = allIVFiles();
     auto ivIt = m_ivStore.begin();
     while (ivIt != m_ivStore.end()) {
-        if (!aadlFiles.contains(ivIt.key())) {
+        if (!ivFiles.contains(ivIt.key())) {
             ivIt = m_ivStore.erase(ivIt);
         } else {
             ++ivIt;

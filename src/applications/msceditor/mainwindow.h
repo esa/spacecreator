@@ -60,7 +60,7 @@ public:
 public Q_SLOTS:
     void createNewDocument();
     void selectAndOpenFile();
-    void openAadlFile();
+    void openIVFile();
 
 Q_SIGNALS:
     void currentGraphicsViewChanged(QGraphicsView *view);

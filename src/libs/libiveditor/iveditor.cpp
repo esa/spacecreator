@@ -27,7 +27,7 @@ static void init_iv_editor_library()
 
 namespace ive {
 
-void initIvEditor()
+void initIVEditor()
 {
     init_iv_editor_library();
 }

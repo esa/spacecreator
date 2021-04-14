@@ -43,7 +43,7 @@ namespace scs {
 class SpaceCreatorProject;
 
 /*!
-   Class to perform consistency checks for MSC against a AADL model
+   Class to perform consistency checks for MSC against a IV model
  */
 class MscSystemChecks : public QObject
 {
@@ -58,14 +58,14 @@ public:
     // Check functions
     bool mscInstancesExist(const QString &name);
     void changeMscInstanceName(const QString &oldName, const QString &name);
-    void removeMscInstances(ivm::IVFunction *aadlFunction);
-    bool hasCorrespondingInstances(ivm::IVFunction *aadlFunction) const;
+    void removeMscInstances(ivm::IVFunction *ivFunction);
+    bool hasCorrespondingInstances(ivm::IVFunction *ivFunction) const;
 
     bool mscMessagesExist(const QString &messageName, const QString &sourceName, const QString &targetName);
     void changeMscMessageName(
             const QString &oldName, const QString &name, const QString &sourceName, const QString &targetName);
-    void removeMscMessages(ivm::IVConnection *aadlConnection);
-    bool hasCorrespondingMessages(ivm::IVConnection *aadlConnection) const;
+    void removeMscMessages(ivm::IVConnection *ivConnection);
+    bool hasCorrespondingMessages(ivm::IVConnection *ivConnection) const;
 
     void checkInstances();
     void checkMessages();

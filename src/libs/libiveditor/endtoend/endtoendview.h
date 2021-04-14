@@ -29,7 +29,7 @@ namespace ive {
 class InterfaceDocument;
 
 /*!
- * \brief The EndToEndView class shows the MSC message sequence through the AADL view
+ * \brief The EndToEndView class shows the MSC message sequence through the interface view
  */
 class EndToEndView : public QDialog
 {

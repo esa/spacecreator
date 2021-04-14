@@ -117,10 +117,10 @@ public:
     void changeMscInstanceName(const QString &oldName, const QString &name);
     void changeMscMessageName(
             const QString &oldName, const QString &newName, const QString &sourceName, const QString &targetName);
-    void removeMscInstances(ivm::IVFunction *aadlFunction);
-    void removeMscMessages(ivm::IVConnection *aadlConnection);
-    QList<msc::MscInstance *> correspondingInstances(ivm::IVFunction *aadlFunction) const;
-    QList<msc::MscMessage *> correspondingMessages(ivm::IVConnection *aadlConnection) const;
+    void removeMscInstances(ivm::IVFunction *ivFunction);
+    void removeMscMessages(ivm::IVConnection *ivConnection);
+    QList<msc::MscInstance *> correspondingInstances(ivm::IVFunction *ivFunction) const;
+    QList<msc::MscMessage *> correspondingMessages(ivm::IVConnection *ivConnection) const;
 
     QString filePath() const override;
     bool save() override;

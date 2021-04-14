@@ -24,7 +24,7 @@
 #include "aadlfunctionnamegraphicsitem.h"
 #include "aadlinterfacegraphicsitem.h"
 #include "ivmodel.h"
-#include "baseitems/common/aadlutils.h"
+#include "baseitems/common/ivutils.h"
 #include "colors/colormanager.h"
 #include "graphicsitemhelpers.h"
 

@@ -143,7 +143,7 @@ private Q_SLOTS:
     void pasteItems();
     void pasteItems(const QPointF &sceneDropPoint);
 
-    void showContextMenuForAADLModel(const QPoint &pos);
+    void showContextMenuForIVModel(const QPoint &pos);
 
 private:
     bool exportImpl(const QString &path, const QList<ivm::IVObject *> &objects);

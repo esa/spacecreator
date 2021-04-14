@@ -22,7 +22,7 @@
 #include "ivfunctiontype.h"
 #include "ivinterface.h"
 #include "ivmodel.h"
-#include "baseitems/common/aadlutils.h"
+#include "baseitems/common/ivutils.h"
 #include "commandids.h"
 
 #include <QtMath>

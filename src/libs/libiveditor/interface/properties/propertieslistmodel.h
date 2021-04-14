@@ -17,7 +17,7 @@
 
 #pragma once
 
-#include "aadlcommonprops.h"
+#include "ivcommonprops.h"
 #include "commandsstack.h"
 #include "propertiesmodelbase.h"
 #include "propertytemplate.h"

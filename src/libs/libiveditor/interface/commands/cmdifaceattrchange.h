@@ -17,7 +17,7 @@
 
 #pragma once
 
-#include "aadlcommonprops.h"
+#include "ivcommonprops.h"
 #include "ivmodel.h"
 #include "cmdifacedatachangebase.h"
 

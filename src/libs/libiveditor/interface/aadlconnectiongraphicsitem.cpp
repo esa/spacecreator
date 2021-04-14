@@ -25,7 +25,7 @@
 #include "ivinterface.h"
 #include "aadlinterfacegraphicsitem.h"
 #include "ivnamevalidator.h"
-#include "baseitems/common/aadlutils.h"
+#include "baseitems/common/ivutils.h"
 #include "colors/colormanager.h"
 #include "graphicsviewutils.h"
 #include "interface/graphicsitemhelpers.h"

@@ -67,14 +67,14 @@ public:
 
     bool contains(QSharedPointer<shared::EditorCore> core) const;
 
-    virtual QStringList allAadlFiles() const;
+    virtual QStringList allIVFiles() const;
     virtual QStringList allMscFiles() const;
     virtual QStringList allAsn1Files() const;
     virtual QStringList projectFiles(const QString &suffix) const;
 
     // System checks
     /*!
-       Access to the msc checks done from aadl/iv
+       Access to the msc checks done from iv
        */
     scs::MscSystemChecks *mscChecks() const { return m_mscChecks.get(); }
     QVector<scs::IvSystemChecks *> ivChecks() const;

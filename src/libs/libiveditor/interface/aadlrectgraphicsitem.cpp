@@ -19,7 +19,7 @@
 
 #include "ivfunctiontype.h"
 #include "ivobject.h"
-#include "baseitems/common/aadlutils.h"
+#include "baseitems/common/ivutils.h"
 #include "commandsstack.h"
 #include "interface/graphicsitemhelpers.h"
 #include "ui/grippointshandler.h"

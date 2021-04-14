@@ -15,10 +15,10 @@
    along with this program. If not, see <https://www.gnu.org/licenses/lgpl-2.1.html>.
 */
 
-#include "aadleditorstack.h"
+#include "iveditorstack.h"
 
-#include "aadleditordocument.h"
-#include "aadlqtceditor.h"
+#include "iveditordocument.h"
+#include "qtciveditor.h"
 #include "iveditorcore.h"
 
 #include <coreplugin/coreconstants.h>
@@ -27,25 +27,25 @@
 
 namespace spctr {
 
-AadlEditorStack::AadlEditorStack(QWidget *parent)
+IVEditorStack::IVEditorStack(QWidget *parent)
     : QStackedWidget(parent)
 {
-    setObjectName("AadlEditorStack");
+    setObjectName("IVEditorStack");
 }
 
-void AadlEditorStack::add(AadlQtCEditor *editor, QWidget *w)
+void IVEditorStack::add(QtCIVEditor *editor, QWidget *w)
 {
     connect(Core::ModeManager::instance(), &Core::ModeManager::currentModeAboutToChange, this,
-            &AadlEditorStack::modeAboutToChange);
+            &IVEditorStack::modeAboutToChange);
 
     m_editors.append(editor);
     addWidget(w);
-    connect(editor, &AadlQtCEditor::destroyed, this, &AadlEditorStack::removeAadlTextEditor);
+    connect(editor, &QtCIVEditor::destroyed, this, &IVEditorStack::removeIVTextEditor);
 }
 
-void AadlEditorStack::removeAadlTextEditor(QObject *xmlEditor)
+void IVEditorStack::removeIVTextEditor(QObject *xmlEditor)
 {
-    const int i = m_editors.indexOf(static_cast<AadlQtCEditor *>(xmlEditor));
+    const int i = m_editors.indexOf(static_cast<QtCIVEditor *>(xmlEditor));
     QTC_ASSERT(i >= 0, return );
 
     QWidget *widget = this->widget(i);
@@ -56,9 +56,9 @@ void AadlEditorStack::removeAadlTextEditor(QObject *xmlEditor)
     m_editors.removeAt(i);
 }
 
-bool AadlEditorStack::setVisibleEditor(Core::IEditor *xmlEditor)
+bool IVEditorStack::setVisibleEditor(Core::IEditor *xmlEditor)
 {
-    const int i = m_editors.indexOf(static_cast<AadlQtCEditor *>(xmlEditor));
+    const int i = m_editors.indexOf(static_cast<QtCIVEditor *>(xmlEditor));
     QTC_ASSERT(i >= 0, return false);
 
     if (i != currentIndex()) {
@@ -68,9 +68,9 @@ bool AadlEditorStack::setVisibleEditor(Core::IEditor *xmlEditor)
     return true;
 }
 
-QSharedPointer<aadlinterface::IVEditorCore> AadlEditorStack::ivPlugin(const QString &fileName) const
+QSharedPointer<ive::IVEditorCore> IVEditorStack::ivPlugin(const QString &fileName) const
 {
-    for (AadlQtCEditor *editor : m_editors) {
+    for (QtCIVEditor *editor : m_editors) {
         if (editor->fileName() == fileName) {
             return editor->ivPlugin();
         }
@@ -78,7 +78,7 @@ QSharedPointer<aadlinterface::IVEditorCore> AadlEditorStack::ivPlugin(const QStr
     return nullptr;
 }
 
-QWidget *AadlEditorStack::widgetForEditor(AadlQtCEditor *xmlEditor)
+QWidget *IVEditorStack::widgetForEditor(QtCIVEditor *xmlEditor)
 {
     const int i = m_editors.indexOf(xmlEditor);
     QTC_ASSERT(i >= 0, return nullptr);
@@ -86,12 +86,12 @@ QWidget *AadlEditorStack::widgetForEditor(AadlQtCEditor *xmlEditor)
     return widget(i);
 }
 
-void AadlEditorStack::modeAboutToChange(Core::Id m)
+void IVEditorStack::modeAboutToChange(Core::Id m)
 {
     // Sync the editor when entering edit mode
     if (m == Core::Constants::MODE_EDIT) {
         for (auto editor : qAsConst(m_editors)) {
-            if (auto document = qobject_cast<AadlEditorDocument *>(editor->textDocument())) {
+            if (auto document = qobject_cast<IVEditorDocument *>(editor->textDocument())) {
                 document->syncXmlFromDesignWidget();
             }
         }

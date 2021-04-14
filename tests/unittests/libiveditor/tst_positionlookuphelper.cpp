@@ -17,7 +17,7 @@
 
 #include "ivfunction.h"
 #include "ivinterface.h"
-#include "baseitems/common/aadlutils.h"
+#include "baseitems/common/ivutils.h"
 #include "baseitems/common/positionlookuphelper.h"
 #include "interface/aadlfunctiongraphicsitem.h"
 #include "interface/aadlinterfacegraphicsitem.h"

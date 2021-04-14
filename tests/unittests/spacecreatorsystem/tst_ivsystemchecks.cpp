@@ -72,7 +72,7 @@ private:
 void tst_IvSystemChecks::initTestCase()
 {
     QStandardPaths::setTestModeEnabled(true);
-    ive::initIvEditor();
+    ive::initIVEditor();
     shared::initSharedLibrary();
     auto converter = msc::CoordinatesConverter::instance();
     converter->setDPI(QPointF(109., 109.), QPointF(96., 96.));
@@ -108,9 +108,9 @@ void tst_IvSystemChecks::testCheckInstanceNames()
 
     // Add function with different name
     ive::InterfaceDocument *doc = ivPlugin->document();
-    ivm::IVModel *aadlModel = doc->objectsModel();
-    auto aadlFnct = new ivm::IVFunction("init");
-    aadlModel->addObject(aadlFnct);
+    ivm::IVModel *ivModel = doc->objectsModel();
+    auto ivFnct = new ivm::IVFunction("init");
+    ivModel->addObject(ivFnct);
     result = m_checker->checkInstanceNames();
     QCOMPARE(result.size(), 1);
     QCOMPARE(m_checker->checkInstance(instance), false);
@@ -121,8 +121,8 @@ void tst_IvSystemChecks::testCheckInstanceNames()
     QCOMPARE(result.size(), 0);
     QCOMPARE(m_checker->checkInstance(instance), true);
 
-    // Renaming the aadl function invalidates again
-    aadlFnct->setTitle("Foo");
+    // Renaming the iv function invalidates again
+    ivFnct->setTitle("Foo");
     result = m_checker->checkInstanceNames();
     QCOMPARE(result.size(), 1);
     QCOMPARE(m_checker->checkInstance(instance), false);
@@ -152,11 +152,11 @@ void tst_IvSystemChecks::testCheckInstanceRelations()
 
     // Add function for the instances
     ive::InterfaceDocument *doc = ivPlugin->document();
-    ivm::IVModel *aadlModel = doc->objectsModel();
+    ivm::IVModel *ivModel = doc->objectsModel();
     auto function1 = new ivm::IVFunction("init");
-    aadlModel->addObject(function1);
+    ivModel->addObject(function1);
     auto function2 = new ivm::IVFunction("reset");
-    aadlModel->addObject(function2);
+    ivModel->addObject(function2);
     result = m_checker->checkInstanceRelations();
     QCOMPARE(result.size(), 0);
 
@@ -167,7 +167,7 @@ void tst_IvSystemChecks::testCheckInstanceRelations()
 
     // Make function2 be nested by function1 via another one
     auto function15 = new ivm::IVFunction("init");
-    aadlModel->addObject(function15);
+    ivModel->addObject(function15);
     function15->setParent(function1);
     function2->setParent(function15);
     result = m_checker->checkInstanceRelations();
@@ -201,20 +201,20 @@ void tst_IvSystemChecks::testCheckMessageNames()
 
     // Add function with different source/target
     ive::InterfaceDocument *doc = ivPlugin->document();
-    ivm::IVModel *aadlModel = doc->objectsModel();
-    auto aadlfFuncA = new ivm::IVFunction("Instance A");
-    aadlModel->addObject(aadlfFuncA);
-    auto aadlfFuncB = new ivm::IVFunction("Instance B");
-    aadlModel->addObject(aadlfFuncB);
+    ivm::IVModel *ivModel = doc->objectsModel();
+    auto ivFuncA = new ivm::IVFunction("Instance A");
+    ivModel->addObject(ivFuncA);
+    auto ivFuncB = new ivm::IVFunction("Instance B");
+    ivModel->addObject(ivFuncB);
 
     ivm::IVInterface *requiredInterface =
-            ivm::testutils::createIface(aadlfFuncA, ivm::IVInterface::InterfaceType::Required, "DummyA");
-    aadlModel->addObject(requiredInterface);
+            ivm::testutils::createIface(ivFuncA, ivm::IVInterface::InterfaceType::Required, "DummyA");
+    ivModel->addObject(requiredInterface);
 
     ivm::IVInterface *providedInterface =
-            ivm::testutils::createIface(aadlfFuncB, ivm::IVInterface::InterfaceType::Provided, "DummyB");
-    aadlModel->addObject(providedInterface);
-    aadlModel->addObject(new ivm::IVConnection(requiredInterface, providedInterface));
+            ivm::testutils::createIface(ivFuncB, ivm::IVInterface::InterfaceType::Provided, "DummyB");
+    ivModel->addObject(providedInterface);
+    ivModel->addObject(new ivm::IVConnection(requiredInterface, providedInterface));
     result = m_checker->checkMessages();
     QCOMPARE(result.size(), 1);
 
@@ -304,16 +304,16 @@ void tst_IvSystemChecks::testCheckMessage()
     m_checker->setIvCore(ivPlugin);
     QCOMPARE(m_checker->checkMessage(message), false);
 
-    // Create corresponding aadl model
+    // Create corresponding iv model
     ive::InterfaceDocument *doc = ivPlugin->document();
-    ivm::IVModel *aadlModel = doc->objectsModel();
+    ivm::IVModel *ivModel = doc->objectsModel();
     auto sourceFunc = new ivm::IVFunction("Dummy1");
-    aadlModel->addObject(sourceFunc);
+    ivModel->addObject(sourceFunc);
     auto targetFunc = new ivm::IVFunction("Dummy2");
-    aadlModel->addObject(targetFunc);
+    ivModel->addObject(targetFunc);
     ivm::IVConnection *connection = ivm::testutils::createConnection(sourceFunc, targetFunc, "Msg1");
     QCOMPARE(m_checker->checkMessage(message), true);
-    aadlModel->removeObject(connection);
+    ivModel->removeObject(connection);
     delete connection;
 
     // Reverse direction fails

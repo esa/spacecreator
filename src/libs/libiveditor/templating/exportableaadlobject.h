@@ -28,7 +28,7 @@ class IVObject;
 namespace ive {
 
 /**
- * @brief The ExportableAADLObject is a common class to export AADLObject and its successors
+ * @brief The ExportableAADLObject is a common class to export ivm::IVObject and its successors
  */
 class ExportableAADLObject : public templating::AbstractExportableObject
 {
@@ -40,12 +40,12 @@ class ExportableAADLObject : public templating::AbstractExportableObject
     Q_PROPERTY(QStringList path READ path)
 
 public:
-    explicit ExportableAADLObject(const ivm::IVObject *aadlObject = nullptr);
+    explicit ExportableAADLObject(const ivm::IVObject *ivObject = nullptr);
 
     QString groupName() const override;
     QString name() const;
 
-    static QVariant createFrom(const ivm::IVObject *aadlObject);
+    static QVariant createFrom(const ivm::IVObject *ivObject);
 
     QVariantList attributes() const;
     QVariantList properties() const;

@@ -54,9 +54,9 @@ public:
         : msc::SystemChecks(parent)
     {
     }
-    bool correspond(const ivm::IVFunction *aadlFunc, const msc::MscInstance *instance) const override
+    bool correspond(const ivm::IVFunction *ivFunc, const msc::MscInstance *instance) const override
     {
-        return instance->name() == aadlFunc->title();
+        return instance->name() == ivFunc->title();
     }
     bool correspond(const ivm::IVConnection *connection, const msc::MscMessage *message) const override
     {

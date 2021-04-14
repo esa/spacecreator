@@ -50,7 +50,7 @@ class MscModel;
 namespace scs {
 
 /*!
-   \brief The IvSystemChecks class is used to check consistency of a msc model with one aadl model
+   \brief The IvSystemChecks class is used to check consistency of a msc model with one iv model
  */
 class IvSystemChecks : public msc::SystemChecks
 {
@@ -74,8 +74,8 @@ public:
     QStringList connectionNamesFromTo(const QString &sourceName, const QString &targetName) const override;
 
     ivm::IVFunction *correspondingFunction(const msc::MscInstance *instance) const;
-    bool correspond(const ivm::IVObject *aadlObj, const msc::MscInstance *instance) const override;
-    bool correspond(const ivm::IVFunction *aadlFunc, const msc::MscInstance *instance) const override;
+    bool correspond(const ivm::IVObject *ivObj, const msc::MscInstance *instance) const override;
+    bool correspond(const ivm::IVFunction *ivFunc, const msc::MscInstance *instance) const override;
     bool correspond(const ivm::IVConnection *connection, const msc::MscMessage *message) const override;
 
     QVector<msc::MscMessageDeclaration *> allConnectionsAsDeclaration() const override;
@@ -88,7 +88,7 @@ Q_SIGNALS:
     void mscCoreChanged();
 
 private:
-    ivm::IVModel *aadlModel() const;
+    ivm::IVModel *ivModel() const;
     bool hasAncestor(ivm::IVFunction *func, const QVector<ivm::IVFunction *> allFunctions) const;
     bool hasDescendant(ivm::IVFunction *func, const QVector<ivm::IVFunction *> allFunctions) const;
     bool isAncestor(ivm::IVFunction *func, ivm::IVFunction *otherFunc) const;

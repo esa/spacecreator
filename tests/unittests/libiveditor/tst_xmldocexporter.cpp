@@ -17,7 +17,7 @@
 
 #include "ivcomment.h"
 #include "ivfunction.h"
-#include "aadllibrary.h"
+#include "ivlibrary.h"
 #include "parameter.h"
 #include "asn1modelstorage.h"
 #include "interface/interfacedocument.h"
@@ -129,8 +129,8 @@ QByteArray tst_XmlDocExporter::testFileContent() const
 
 void tst_XmlDocExporter::initTestCase()
 {
-    ivm::initAadlLibrary();
-    ive::initIvEditor();
+    ivm::initIVLibrary();
+    ive::initIVEditor();
 }
 
 void tst_XmlDocExporter::init()

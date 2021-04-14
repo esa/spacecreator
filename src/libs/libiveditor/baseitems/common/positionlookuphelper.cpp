@@ -17,7 +17,7 @@
 
 #include "positionlookuphelper.h"
 
-#include "baseitems/common/aadlutils.h"
+#include "baseitems/common/ivutils.h"
 
 #include <QTransform>
 #include <QtDebug>

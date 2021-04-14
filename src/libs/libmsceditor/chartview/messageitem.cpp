@@ -77,7 +77,7 @@ MessageItem::MessageItem(MscMessage *message, ChartLayoutManager *chartLayoutMan
 
     setFlags(ItemSendsGeometryChanges | ItemSendsScenePositionChanges | ItemIsSelectable);
 
-    connect(m_message, &msc::MscMessage::dataChanged, this, &msc::MessageItem::checkAadlConnection,
+    connect(m_message, &msc::MscMessage::dataChanged, this, &msc::MessageItem::checkIVConnection,
             Qt::QueuedConnection);
     connect(m_message, &msc::MscMessage::dataChanged, this, &msc::MessageItem::updateDisplayText);
     updateDisplayText();
@@ -110,7 +110,7 @@ MessageItem::MessageItem(MscMessage *message, ChartLayoutManager *chartLayoutMan
     setInstances(source, target);
 
     m_arrowItem->setDashed(isCreator());
-    checkAadlConnection();
+    checkIVConnection();
 
     connect(this, &InteractiveObjectBase::relocated, [this](const QPointF &from, const QPointF &to) {
         if (proceedPositionChange()) {
@@ -120,7 +120,7 @@ MessageItem::MessageItem(MscMessage *message, ChartLayoutManager *chartLayoutMan
 
     if (m_chartLayoutManager && m_chartLayoutManager->systemChecker()) {
         connect(m_chartLayoutManager->systemChecker(), &msc::SystemChecks::ivDataReset, this,
-                &msc::MessageItem::checkAadlConnection);
+                &msc::MessageItem::checkIVConnection);
     }
 
     if (!isCreator()) {
@@ -137,7 +137,7 @@ void MessageItem::onTextChanged()
         gph->updateLayout();
     }
 
-    QTimer::singleShot(1, this, &msc::MessageItem::checkAadlConnection);
+    QTimer::singleShot(1, this, &msc::MessageItem::checkIVConnection);
     update();
 }
 
@@ -151,7 +151,7 @@ void MessageItem::showMessageDialog()
         MessageDialog dialog(m_message, m_chartLayoutManager, view);
         dialog.setSystemChecker(m_chartLayoutManager->systemChecker());
         dialog.exec();
-        checkAadlConnection();
+        checkIVConnection();
     }
 }
 
@@ -231,13 +231,13 @@ InstanceItem *MessageItem::targetInstanceItem() const
 void MessageItem::updateTooltip()
 {
     const QString env(tr("Env"));
-    QString aadlMessage;
-    if (!aadlConnectionOk()) {
-        aadlMessage = "\n\n" + tr("This message does not have a corresponding AADL connection in the aadl model.");
+    QString ivMessage;
+    if (!ivConnectionOk()) {
+        ivMessage = "\n\n" + tr("This message does not have a corresponding IV connection in the iv model.");
     }
     setToolTip(tr("%1: %2→%3%4")
                        .arg(name(), m_sourceInstance ? m_sourceInstance->name() : env,
-                               m_targetInstance ? m_targetInstance->name() : env, aadlMessage));
+                               m_targetInstance ? m_targetInstance->name() : env, ivMessage));
 }
 
 QString MessageItem::name() const
@@ -820,12 +820,12 @@ void MessageItem::updateDisplayText()
 }
 
 /*!
-   Checks in the aadl model, if there is a corresponding connection
+   Checks in the iv model, if there is a corresponding connection
  */
-void MessageItem::checkAadlConnection()
+void MessageItem::checkIVConnection()
 {
     const shared::ColorManager::HandledColors color =
-            aadlConnectionOk() ? shared::ColorManager::MessageRegular : shared::ColorManager::MessageError;
+            ivConnectionOk() ? shared::ColorManager::MessageRegular : shared::ColorManager::MessageError;
     const shared::ColorHandler colorHandler = shared::ColorManager::instance()->colorsForItem(color);
     QColor lineColor = colorHandler.penColor();
     if (lineColor != m_arrowItem->color()) {
@@ -1071,9 +1071,9 @@ bool MessageItem::wannabeGlobal() const
 }
 
 /*!
-   Returns, if the message has a corresponding aadl connection
+   Returns, if the message has a corresponding iv connection
  */
-bool MessageItem::aadlConnectionOk() const
+bool MessageItem::ivConnectionOk() const
 {
     if (m_chartLayoutManager && m_chartLayoutManager->systemChecker()) {
         return m_chartLayoutManager->systemChecker()->checkMessage(m_message);

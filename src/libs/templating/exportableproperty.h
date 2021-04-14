@@ -31,8 +31,8 @@ namespace templating {
  *      <Property name="{{ key }}" value="{{ value }}"/>
  *  {% endfor %}
  * @endcode
- * Therefore AADLObject has a property "properties" and "attributes"
- * which are lists of ExportedAADLProperty
+ * Therefore IVObject has a property "properties" and "attributes"
+ * which are lists of ExportableProperty
  * and thus it's possible to write like this:
  * @code
  *  {% for property in iface.properties %}

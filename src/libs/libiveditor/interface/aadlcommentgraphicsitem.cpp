@@ -19,7 +19,7 @@
 
 #include "ivcomment.h"
 #include "aadlfunctiongraphicsitem.h"
-#include "baseitems/common/aadlutils.h"
+#include "baseitems/common/ivutils.h"
 #include "colors/colormanager.h"
 #include "ui/textitem.h"
 

@@ -16,7 +16,7 @@
 */
 
 #include "ivfunction.h"
-#include "aadllibrary.h"
+#include "ivlibrary.h"
 #include "ivnamevalidator.h"
 
 #include <QStandardPaths>
@@ -35,7 +35,7 @@ private Q_SLOTS:
 void tst_AADLNameValidator::initTestCase()
 {
     QStandardPaths::setTestModeEnabled(true);
-    ivm::initAadlLibrary();
+    ivm::initIVLibrary();
 }
 
 void tst_AADLNameValidator::test_functionName_data()

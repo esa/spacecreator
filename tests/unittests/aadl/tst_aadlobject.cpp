@@ -15,9 +15,9 @@
    along with this program. If not, see <https://www.gnu.org/licenses/lgpl-2.1.html>.
 */
 
-#include "aadlcommonprops.h"
+#include "ivcommonprops.h"
 #include "ivfunction.h"
-#include "aadllibrary.h"
+#include "ivlibrary.h"
 #include "ivmodel.h"
 #include "ivobject.h"
 #include "propertytemplateconfig.h"
@@ -53,7 +53,7 @@ private Q_SLOTS:
 
 void tst_AADLObject::initTestCase()
 {
-    ivm::initAadlLibrary();
+    ivm::initIVLibrary();
 }
 
 void tst_AADLObject::test_defaultConstructor()

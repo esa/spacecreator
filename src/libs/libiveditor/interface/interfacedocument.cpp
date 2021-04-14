@@ -27,7 +27,7 @@
 #include "ivxmlreader.h"
 #include "actionsbar.h"
 #include "asn1modelstorage.h"
-#include "baseitems/common/aadlutils.h"
+#include "baseitems/common/ivutils.h"
 #include "baseitems/graphicsview.h"
 #include "colors/colormanagerdialog.h"
 #include "commands/cmdentitiesimport.h"
@@ -103,7 +103,7 @@ struct InterfaceDocument::InterfaceDocumentPrivate {
 
 /*!
 \class ive::InterfaceDocument
-\brief ive::InterfaceDocument is the document for graphical AADL data (loaded from the XML).
+\brief ive::InterfaceDocument is the document for graphical IV data (loaded from the XML).
 */
 
 InterfaceDocument::InterfaceDocument(QObject *parent)
@@ -402,7 +402,7 @@ void InterfaceDocument::setPath(const QString &path)
 
 /*!
   Sets the filename of the used asn1 file. This is only the file name without a path. The File is expected to be next
-   to the aadl file
+   to the iv file
  */
 void InterfaceDocument::setAsn1FileName(const QString &asnfile)
 {
@@ -447,7 +447,7 @@ QString InterfaceDocument::asn1FilePath() const
 
 /*!
    Sets the name of the associated msc file. This is only the file name without a path. The File is expected to be next
-   to the aadl file
+   to the iv file
  */
 void InterfaceDocument::setMscFileName(const QString &mscFile)
 {
@@ -461,7 +461,7 @@ void InterfaceDocument::setMscFileName(const QString &mscFile)
 
 /*!
    Returns the name of the associated msc file. This is only the file name without a path. The File is expected to be
-   next to the aadl file
+   next to the iv file
  */
 const QString &InterfaceDocument::mscFileName() const
 {
@@ -818,7 +818,7 @@ void InterfaceDocument::pasteItems()
     pasteItems(sceneDropPoint);
 }
 
-void InterfaceDocument::showContextMenuForAADLModel(const QPoint &pos)
+void InterfaceDocument::showContextMenuForIVModel(const QPoint &pos)
 {
     const QModelIndex idx = d->objectsView->indexAt(pos);
     if (!idx.isValid()) {
@@ -1099,15 +1099,15 @@ QTreeView *InterfaceDocument::createModelView()
         return d->objectsView;
 
     d->objectsView = new QTreeView;
-    d->objectsView->setObjectName(QLatin1String("AADLModelView"));
+    d->objectsView->setObjectName(QLatin1String("IVModelView"));
     d->objectsView->setSelectionBehavior(QAbstractItemView::SelectionBehavior::SelectItems);
     d->objectsView->setSelectionMode(QAbstractItemView::SelectionMode::ExtendedSelection);
     d->objectsView->setContextMenuPolicy(Qt::ContextMenuPolicy::CustomContextMenu);
     connect(d->objectsView, &QTreeView::customContextMenuRequested, this,
-            &InterfaceDocument::showContextMenuForAADLModel);
+            &InterfaceDocument::showContextMenuForIVModel);
 
     d->objectsVisualizationModel = new VisualizationModel(d->objectsModel, d->commandsStack, d->objectsView);
-    auto headerItem = new QStandardItem(tr("AADL Structure"));
+    auto headerItem = new QStandardItem(tr("IV Structure"));
     headerItem->setTextAlignment(Qt::AlignCenter);
     d->objectsVisualizationModel->setHorizontalHeaderItem(0, headerItem);
     d->objectsView->setModel(d->objectsVisualizationModel);

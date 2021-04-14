@@ -17,7 +17,7 @@
 
 #pragma once
 
-#include "aadlcommonprops.h" // for Props, Props::Token
+#include "ivcommonprops.h" // for Props, Props::Token
 #include "undocommand.h"
 
 #include <QPointer>

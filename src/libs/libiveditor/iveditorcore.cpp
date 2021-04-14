@@ -21,7 +21,7 @@
 #include "ivfunction.h"
 #include "ivinterface.h"
 #include "ivmodel.h"
-#include "baseitems/common/aadlutils.h"
+#include "baseitems/common/ivutils.h"
 #include "commandlineparser.h"
 #include "commandsstack.h"
 #include "connectioncreationvalidator.h"
@@ -68,9 +68,9 @@ IVEditorCore::IVEditorCore(QObject *parent)
     m_docToolBar->setMovable(true);
 
     if (ivm::IVModel *model = document()->objectsModel()) {
-        connect(model, &ivm::IVModel::objectsAdded, this, &ive::IVEditorCore::updateAadlItems);
-        connect(model, &ivm::IVModel::objectRemoved, this, &ive::IVEditorCore::updateAadlItems);
-        connect(model, &ivm::IVModel::rootObjectChanged, this, &ive::IVEditorCore::updateAadlItems);
+        connect(model, &ivm::IVModel::objectsAdded, this, &ive::IVEditorCore::updateIVItems);
+        connect(model, &ivm::IVModel::objectRemoved, this, &ive::IVEditorCore::updateIVItems);
+        connect(model, &ivm::IVModel::rootObjectChanged, this, &ive::IVEditorCore::updateIVItems);
     }
 }
 
@@ -107,7 +107,7 @@ void IVEditorCore::registerBasicActions()
 
 void IVEditorCore::populateCommandLineArguments(shared::CommandLineParser *parser) const
 {
-    parser->handlePositional(shared::CommandLineParser::Positional::OpenAADLXMLFile);
+    parser->handlePositional(shared::CommandLineParser::Positional::OpenIVFile);
     parser->handlePositional(shared::CommandLineParser::Positional::OpenStringTemplateFile);
     parser->handlePositional(shared::CommandLineParser::Positional::ExportToFile);
     parser->handlePositional(shared::CommandLineParser::Positional::ListScriptableActions);
@@ -140,7 +140,7 @@ QAction *IVEditorCore::actionToggleE2EView()
 }
 
 /*!
-   Adds an aadl function with the given \p name
+   Adds an iv function with the given \p name
    @return Returns the newly created function. Or nullptr if the creation failed.
  */
 ivm::IVFunction *IVEditorCore::addFunction(const QString &name, ivm::IVFunction *parent)
@@ -173,14 +173,14 @@ bool IVEditorCore::addConnection(QString name, const QString &fromInstanceName, 
         return addInterface(name, fromInstanceName) != nullptr;
     }
 
-    ivm::IVModel *aadlModel = m_document->objectsModel();
-    if (aadlModel->getConnection(name, fromInstanceName, toInstanceName, m_caseCheck) != nullptr) {
+    ivm::IVModel *ivModel = m_document->objectsModel();
+    if (ivModel->getConnection(name, fromInstanceName, toInstanceName, m_caseCheck) != nullptr) {
         // The connection exists already
         return false;
     }
 
-    ivm::IVFunction *fromFunc = aadlModel->getFunction(fromInstanceName, m_caseCheck);
-    ivm::IVFunction *toFunc = aadlModel->getFunction(toInstanceName, m_caseCheck);
+    ivm::IVFunction *fromFunc = ivModel->getFunction(fromInstanceName, m_caseCheck);
+    ivm::IVFunction *toFunc = ivModel->getFunction(toInstanceName, m_caseCheck);
 
     if (!fromFunc || !toFunc) {
         qDebug() << Q_FUNC_INFO << "No function for the connection" << name;
@@ -193,12 +193,12 @@ bool IVEditorCore::addConnection(QString name, const QString &fromInstanceName, 
     if (fromInterface && toInterface) {
         cmd::CommandsStack::Macro cmdMacro(undoStack(), tr("Create connection"));
 
-        auto createConnection = [aadlModel, this](
+        auto createConnection = [ivModel, this](
                                         ivm::IVFunction *parent, ivm::IVInterface *inIf, ivm::IVInterface *outIf) {
             QVector<QPointF> points;
             points.append(ive::pos(inIf->coordinates()));
             points.append(ive::pos(outIf->coordinates()));
-            auto command = new cmd::CmdConnectionItemCreate(aadlModel, parent, inIf->id(), outIf->id(), points);
+            auto command = new cmd::CmdConnectionItemCreate(ivModel, parent, inIf->id(), outIf->id(), points);
             commandsStack()->push(command);
         };
 
@@ -252,8 +252,8 @@ bool IVEditorCore::addConnection(QString name, const QString &fromInstanceName, 
  */
 ivm::IVInterface *IVEditorCore::addInterface(QString name, const QString &functionName)
 {
-    ivm::IVModel *aadlModel = m_document->objectsModel();
-    ivm::IVFunction *func = aadlModel->getFunction(functionName, m_caseCheck);
+    ivm::IVModel *ivModel = m_document->objectsModel();
+    ivm::IVFunction *func = ivModel->getFunction(functionName, m_caseCheck);
     if (!func) {
         qDebug() << Q_FUNC_INFO << "No function" << functionName << "for the interface" << name;
         return nullptr;
@@ -268,7 +268,7 @@ ivm::IVInterface *IVEditorCore::addInterface(QString name, const QString &functi
     ci.kind = ivm::IVInterface::OperationKind::Cyclic;
     ci.type = ivm::IVInterface::InterfaceType::Provided;
     ci.function = func;
-    ci.model = aadlModel;
+    ci.model = ivModel;
     ci.name = name;
 
     auto command = new cmd::CmdInterfaceItemCreate(ci);
@@ -283,16 +283,16 @@ ivm::IVInterface *IVEditorCore::addInterface(QString name, const QString &functi
    Renames the function with current name \p oldName to \p newName.
    If \p updateSystem is true, the user is asked to check the .msc models to be updated as well
  */
-bool IVEditorCore::renameAadlFunction(const QString &oldName, const QString &newName)
+bool IVEditorCore::renameIVFunction(const QString &oldName, const QString &newName)
 {
-    ivm::IVModel *aadlModel = m_document->objectsModel();
-    ivm::IVFunction *aadlFunc = aadlModel->getFunction(oldName, m_caseCheck);
-    if (!aadlFunc) {
+    ivm::IVModel *ivModel = m_document->objectsModel();
+    ivm::IVFunction *ivFunc = ivModel->getFunction(oldName, m_caseCheck);
+    if (!ivFunc) {
         return false;
     }
 
     const QVariantHash attributess = { { ivm::meta::Props::token(ivm::meta::Props::Token::name), newName } };
-    auto cmd = new cmd::CmdEntityAttributeChange(aadlFunc, attributess);
+    auto cmd = new cmd::CmdEntityAttributeChange(ivFunc, attributess);
     commandsStack()->push(cmd);
 
     Q_EMIT editedExternally(this);
@@ -300,14 +300,14 @@ bool IVEditorCore::renameAadlFunction(const QString &oldName, const QString &new
 }
 
 /*!
-   \brief IVEditorCore::addAadlConnection
+   \brief IVEditorCore::renameIVConnection
    \param oldName
    \param newName
    \param fromInstanceName
    \param toInstanceName
    \return
  */
-bool IVEditorCore::renameAadlConnection(
+bool IVEditorCore::renameIVConnection(
         const QString &oldName, const QString &newName, const QString &fromInstanceName, const QString &toInstanceName)
 {
     if (fromInstanceName.isEmpty()) {
@@ -317,13 +317,13 @@ bool IVEditorCore::renameAadlConnection(
         return renameCyclicInterface(oldName, newName, fromInstanceName);
     }
 
-    ivm::IVModel *aadlModel = m_document->objectsModel();
-    ivm::IVConnection *aadlConnect = aadlModel->getConnection(oldName, fromInstanceName, toInstanceName, m_caseCheck);
-    if (!aadlConnect) {
+    ivm::IVModel *ivModel = m_document->objectsModel();
+    ivm::IVConnection *ivConnect = ivModel->getConnection(oldName, fromInstanceName, toInstanceName, m_caseCheck);
+    if (!ivConnect) {
         return false;
     }
 
-    auto cmd = new cmd::CmdIfaceAttrChange(aadlConnect->targetInterface(),
+    auto cmd = new cmd::CmdIfaceAttrChange(ivConnect->targetInterface(),
             ivm::meta::Props::token(ivm::meta::Props::Token::name), QVariant::fromValue(newName));
     commandsStack()->push(cmd);
 
@@ -333,18 +333,18 @@ bool IVEditorCore::renameAadlConnection(
 
 bool IVEditorCore::renameCyclicInterface(const QString &oldName, const QString &newName, const QString &functionName)
 {
-    ivm::IVModel *aadlModel = m_document->objectsModel();
-    ivm::IVFunction *func = aadlModel->getFunction(functionName, m_caseCheck);
-    if (!func) {
+    ivm::IVModel *ivModel = m_document->objectsModel();
+    ivm::IVFunction *ivFunc = ivModel->getFunction(functionName, m_caseCheck);
+    if (!ivFunc) {
         qDebug() << Q_FUNC_INFO << "No function" << functionName << "to rename the interface from" << newName << "to"
                  << oldName;
         return false;
     }
 
     ivm::IVInterface *interface =
-            aadlModel->getIfaceByName(oldName, ivm::IVInterface::InterfaceType::Required, func, m_caseCheck);
+            ivModel->getIfaceByName(oldName, ivm::IVInterface::InterfaceType::Required, ivFunc, m_caseCheck);
     if (!interface) {
-        interface = aadlModel->getIfaceByName(oldName, ivm::IVInterface::InterfaceType::Provided, func, m_caseCheck);
+        interface = ivModel->getIfaceByName(oldName, ivm::IVInterface::InterfaceType::Provided, ivFunc, m_caseCheck);
     }
     if (!interface) {
         qDebug() << Q_FUNC_INFO << "No interface" << oldName << "to rname for function" << functionName;
@@ -399,39 +399,39 @@ bool IVEditorCore::save()
     return ive::XmlDocExporter::exportDocSilently(m_document, {}, {});
 }
 
-QVector<ivm::IVFunction *> IVEditorCore::allAadlFunctions() const
+QVector<ivm::IVFunction *> IVEditorCore::allIVFunctions() const
 {
-    return m_aadlFunctions;
+    return m_ivFunctions;
 }
 
-QVector<ivm::IVConnection *> IVEditorCore::allAadlConnections() const
+QVector<ivm::IVConnection *> IVEditorCore::allIVConnections() const
 {
-    return m_aadlConnections;
+    return m_ivConnections;
 }
 
 /*!
-   Returns a list of the names of all functions in the aadl model
+   Returns a list of the names of all functions in the iv model
  */
-QStringList IVEditorCore::aadlFunctionsNames() const
+QStringList IVEditorCore::ivFunctionsNames() const
 {
     QStringList functionNames;
-    for (const ivm::IVFunction *aadlFunction : m_aadlFunctions) {
-        if (aadlFunction && !aadlFunction->title().isEmpty()) {
-            functionNames << aadlFunction->title();
+    for (const ivm::IVFunction *ivFunction : m_ivFunctions) {
+        if (ivFunction && !ivFunction->title().isEmpty()) {
+            functionNames << ivFunction->title();
         }
     }
     return functionNames;
 }
 
 /*!
-   Returns a list of the names of all connections in the aadl model
+   Returns a list of the names of all connections in the iv model
  */
-QStringList IVEditorCore::aadlConnectionNames() const
+QStringList IVEditorCore::ivConnectionNames() const
 {
     QStringList connectionNames;
-    for (const ivm::IVConnection *aadlConnection : m_aadlConnections) {
-        if (aadlConnection && !aadlConnection->name().isEmpty()) {
-            connectionNames << aadlConnection->name();
+    for (const ivm::IVConnection *ivConnection : m_ivConnections) {
+        if (ivConnection && !ivConnection->name().isEmpty()) {
+            connectionNames << ivConnection->name();
         }
     }
     connectionNames.removeDuplicates();
@@ -493,15 +493,15 @@ ivm::IVInterface *IVEditorCore::getInterface(
         return {};
     }
 
-    ivm::IVModel *aadlModel = m_document->objectsModel();
-    if (!aadlModel) {
+    ivm::IVModel *ivModel = m_document->objectsModel();
+    if (!ivModel) {
         return {};
     }
 
-    ivm::IVInterface *interface = aadlModel->getIfaceByName(ifName, ifType, parentFunction, m_caseCheck);
+    ivm::IVInterface *interface = ivModel->getIfaceByName(ifName, ifType, parentFunction, m_caseCheck);
     if (!interface) {
         // create the interface
-        ivm::IVInterface::CreationInfo createInfo(aadlModel, parentFunction);
+        ivm::IVInterface::CreationInfo createInfo(ivModel, parentFunction);
         createInfo.name = ifName;
         createInfo.type = ifType;
         QRectF funcRect = ive::rect(parentFunction->coordinates());
@@ -512,26 +512,26 @@ ivm::IVInterface *IVEditorCore::getInterface(
         createInfo.position = ifPos;
         auto *command = new cmd::CmdInterfaceItemCreate(createInfo);
         commandsStack()->push(command);
-        interface = aadlModel->getIfaceByName(ifName, ifType, parentFunction, m_caseCheck);
+        interface = ivModel->getIfaceByName(ifName, ifType, parentFunction, m_caseCheck);
     }
     return interface;
 }
 
 /*!
-   Updates the list of functions and connections from the aadl model
+   Updates the list of functions and connections from the iv model
  */
-void IVEditorCore::updateAadlItems()
+void IVEditorCore::updateIVItems()
 {
-    m_aadlFunctions.clear();
-    m_aadlConnections.clear();
+    m_ivFunctions.clear();
+    m_ivConnections.clear();
 
-    ivm::IVModel *aadlModel = m_document->objectsModel();
-    if (!aadlModel) {
+    ivm::IVModel *ivModel = m_document->objectsModel();
+    if (!ivModel) {
         return;
     }
 
-    m_aadlFunctions = aadlModel->allObjectsByType<ivm::IVFunction>();
-    m_aadlConnections = aadlModel->allObjectsByType<ivm::IVConnection>();
+    m_ivFunctions = ivModel->allObjectsByType<ivm::IVFunction>();
+    m_ivConnections = ivModel->allObjectsByType<ivm::IVConnection>();
 }
 
 QUrl IVEditorCore::helpPage() const

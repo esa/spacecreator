@@ -17,7 +17,7 @@
 
 #include "ivfunction.h"
 #include "ivinterface.h"
-#include "baseitems/common/aadlutils.h"
+#include "baseitems/common/ivutils.h"
 #include "common.h"
 #include "connectioncreationvalidator.h"
 #include "graphicsviewutils.h"

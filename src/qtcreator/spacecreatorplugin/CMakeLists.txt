@@ -6,16 +6,16 @@ set(SC_PLUGIN_SOURCES
     dv/deploymenteditordata.h
     dv/deploymenteditorfactory.cpp
     dv/deploymenteditorfactory.h
-    iv/aadleditordata.cpp
-    iv/aadleditordata.h
-    iv/aadleditordocument.cpp
-    iv/aadleditordocument.h
-    iv/aadleditorfactory.cpp
-    iv/aadleditorfactory.h
-    iv/aadlmainwidget.cpp
-    iv/aadlmainwidget.h
-    iv/aadlqtceditor.cpp
-    iv/aadlqtceditor.h
+    iv/iveditordata.cpp
+    iv/iveditordata.h
+    iv/iveditordocument.cpp
+    iv/iveditordocument.h
+    iv/iveditorfactory.cpp
+    iv/iveditorfactory.h
+    iv/ivmainwidget.cpp
+    iv/ivmainwidget.h
+    iv/qtciveditor.cpp
+    iv/qtciveditor.h
     msc/msccontext.cpp
     msc/msccontext.h
     msc/msceditordata.cpp

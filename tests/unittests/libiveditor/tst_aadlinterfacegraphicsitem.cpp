@@ -37,7 +37,7 @@ private Q_SLOTS:
 
 void tst_AADLInterfaceGraphicsItem::initTestCase()
 {
-    ive::initIvEditor();
+    ive::initIVEditor();
     shared::initSharedLibrary();
     QStandardPaths::setTestModeEnabled(true);
 }

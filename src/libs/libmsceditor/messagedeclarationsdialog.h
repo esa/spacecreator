@@ -49,7 +49,7 @@ public:
     void setFileName(const QString &fileName);
     const QString &fileName() const;
 
-    void setAadlConnectionNames(const QStringList &names);
+    void setIVConnectionNames(const QStringList &names);
 
 protected:
     void keyPressEvent(QKeyEvent *event) override;
@@ -70,7 +70,7 @@ private Q_SLOTS:
 
     void checkforEmptyCompleter();
 
-    void importFromAadl();
+    void importFromIV();
 
 private:
     void updateAsn1TypesView();

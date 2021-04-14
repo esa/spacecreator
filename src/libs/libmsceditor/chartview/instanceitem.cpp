@@ -95,7 +95,7 @@ InstanceItem::InstanceItem(
     if (m_chartLayoutManager && m_chartLayoutManager->systemChecker()) {
         m_headSymbol->setSystemChecker(m_chartLayoutManager->systemChecker());
         connect(m_chartLayoutManager->systemChecker(), &msc::SystemChecks::ivDataReset, this,
-                &msc::InstanceItem::checkAadlFunction);
+                &msc::InstanceItem::checkIVFunction);
     }
 
     setDenominatorAndKind(instance->denominatorAndKind());
@@ -145,7 +145,7 @@ void InstanceItem::setName(const QString &name)
 {
     updatePropertyString(QLatin1String("name"), name);
     m_headSymbol->setName(name);
-    QTimer::singleShot(1, this, &msc::InstanceItem::checkAadlFunction);
+    QTimer::singleShot(1, this, &msc::InstanceItem::checkIVFunction);
 }
 
 void InstanceItem::setDenominatorAndKind(const QString &kind)
@@ -319,7 +319,7 @@ void InstanceItem::onNameEdited(const QString &newName)
     } else {
         m_chartLayoutManager->undoStack()->push(
                 new cmd::CmdEntityNameChange(modelEntity(), newName, m_chartLayoutManager));
-        checkAadlFunction();
+        checkIVFunction();
     }
 }
 
@@ -331,14 +331,14 @@ void InstanceItem::onKindEdited(const QString &newKind)
 }
 
 /*!
-   Checks in the aadl model, if there is a corresponding function
+   Checks in the iv model, if there is a corresponding function
  */
-void InstanceItem::checkAadlFunction()
+void InstanceItem::checkIVFunction()
 {
-    const bool aadlOk = aadlFunctionOk();
+    const bool isOk = ivFunctionOk();
 
     QPen axisPen;
-    if (aadlOk) {
+    if (isOk) {
         axisPen = shared::ColorManager::instance()->colorsForItem(shared::ColorManager::InstanceLine).pen();
     } else {
         axisPen = shared::ColorManager::instance()->colorsForItem(shared::ColorManager::InstanceErrorLine).pen();
@@ -473,8 +473,8 @@ void InstanceItem::hoverMoveEvent(QGraphicsSceneHoverEvent *event)
                 + QString::number(axisFromCif.y()) + "\nme mbr: " + rectToStr(boundingRect())
                 + "\nme bb: " + rectToStr(boundingRect()) + "\nme sbr: " + rectToStr(sceneBoundingRect());
 
-        if (!aadlFunctionOk()) {
-            tt += "\n\n" + tr("This instance does not have a corresponding AADL function in the aadl model.");
+        if (!ivFunctionOk()) {
+            tt += "\n\n" + tr("This instance does not have a corresponding IV function in the iv model.");
         }
         setToolTip(tt);
     }
@@ -506,7 +506,7 @@ QVector<QPoint> InstanceItem::prepareChangePositionCommand() const
     return geometryHolder;
 }
 
-bool InstanceItem::aadlFunctionOk() const
+bool InstanceItem::ivFunctionOk() const
 {
     if (m_chartLayoutManager && m_chartLayoutManager->systemChecker()) {
         return m_chartLayoutManager->systemChecker()->checkInstance(m_instance);

@@ -19,6 +19,6 @@
 
 namespace ive {
 
-void initIvEditor();
+void initIVEditor();
 
 }

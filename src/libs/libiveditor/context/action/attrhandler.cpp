@@ -25,7 +25,7 @@ namespace ive {
 
 /*!
  * \class ive::AttrHandler
- * \brief The serializable wrapper for AADLObject's attribute to be used with Action
+ * \brief The serializable wrapper for IVObject's attribute to be used with Action
  */
 static const char *JSON_FIELD_NAME_Title = "title";
 static const char *JSON_FIELD_NAME_Value = "value";

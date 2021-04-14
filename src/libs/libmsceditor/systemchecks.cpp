@@ -70,16 +70,16 @@ QStringList SystemChecks::connectionNamesFromTo(const QString &sourceName, const
     return {};
 }
 
-bool SystemChecks::correspond(const ivm::IVObject *aadlObj, const MscInstance *instance) const
+bool SystemChecks::correspond(const ivm::IVObject *ivObj, const MscInstance *instance) const
 {
-    Q_UNUSED(aadlObj)
+    Q_UNUSED(ivObj)
     Q_UNUSED(instance)
     return true;
 }
 
-bool SystemChecks::correspond(const ivm::IVFunction *aadlFunc, const MscInstance *instance) const
+bool SystemChecks::correspond(const ivm::IVFunction *ivFunc, const MscInstance *instance) const
 {
-    Q_UNUSED(aadlFunc)
+    Q_UNUSED(ivFunc)
     Q_UNUSED(instance)
     return true;
 }

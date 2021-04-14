@@ -29,8 +29,8 @@
 
 namespace ive {
 
-ExportableAADLObject::ExportableAADLObject(const ivm::IVObject *aadlObject)
-    : AbstractExportableObject(aadlObject)
+ExportableAADLObject::ExportableAADLObject(const ivm::IVObject *ivObject)
+    : AbstractExportableObject(ivObject)
 {
 }
 
@@ -68,26 +68,26 @@ QString ExportableAADLObject::name() const
  * @param aadlObject exported object
  * @return created exported object as QVariant
  */
-QVariant ExportableAADLObject::createFrom(const ivm::IVObject *aadlObject)
+QVariant ExportableAADLObject::createFrom(const ivm::IVObject *ivObject)
 {
-    switch (aadlObject->type()) {
+    switch (ivObject->type()) {
     case ivm::IVObject::Type::InterfaceGroup:
         return {};
     case ivm::IVObject::Type::Function:
     case ivm::IVObject::Type::FunctionType:
         return QVariant::fromValue(
-                ExportableAADLFunction(static_cast<const ivm::IVFunctionType *>(aadlObject)));
+                ExportableAADLFunction(static_cast<const ivm::IVFunctionType *>(ivObject)));
     case ivm::IVObject::Type::RequiredInterface:
     case ivm::IVObject::Type::ProvidedInterface:
-        return QVariant::fromValue(ExportableAADLIface(static_cast<const ivm::IVInterface *>(aadlObject)));
+        return QVariant::fromValue(ExportableAADLIface(static_cast<const ivm::IVInterface *>(ivObject)));
     case ivm::IVObject::Type::Comment:
-        return QVariant::fromValue(ExportableAADLObject(aadlObject));
+        return QVariant::fromValue(ExportableAADLObject(ivObject));
     case ivm::IVObject::Type::Connection:
         return QVariant::fromValue(
-                ExportableAADLConnection(static_cast<const ivm::IVConnection *>(aadlObject)));
+                ExportableAADLConnection(static_cast<const ivm::IVConnection *>(ivObject)));
     case ivm::IVObject::Type::ConnectionGroup:
         return QVariant::fromValue(
-                ExportableAADLConnectionGroup(static_cast<const ivm::IVConnectionGroup *>(aadlObject)));
+                ExportableAADLConnectionGroup(static_cast<const ivm::IVConnectionGroup *>(ivObject)));
     default:
         Q_UNREACHABLE();
     }

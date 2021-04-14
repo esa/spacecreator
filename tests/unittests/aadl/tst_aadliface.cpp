@@ -15,10 +15,10 @@
    along with this program. If not, see <https://www.gnu.org/licenses/lgpl-2.1.html>.
 */
 
-#include "aadlcommonprops.h"
+#include "ivcommonprops.h"
 #include "ivfunction.h"
 #include "ivinterface.h"
-#include "aadllibrary.h"
+#include "ivlibrary.h"
 #include "ivmodel.h"
 #include "ivnamevalidator.h"
 #include "ivtestutils.h"
@@ -41,7 +41,7 @@ private Q_SLOTS:
 
 void tst_AADLIface::initTestCase()
 {
-    ivm::initAadlLibrary();
+    ivm::initIVLibrary();
     cfg = ivm::PropertyTemplateConfig::instance();
     cfg->init(QLatin1String("default_attributes.xml"));
 }

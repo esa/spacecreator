@@ -110,7 +110,7 @@ protected:
 private Q_SLOTS:
     void onNameEdited(const QString &newName);
     void onKindEdited(const QString &newKind);
-    void checkAadlFunction();
+    void checkIVFunction();
 
 private:
     qreal m_axisHeight = defaultAxisHeight();
@@ -121,7 +121,7 @@ private:
 
     QVector<QPoint> prepareChangePositionCommand() const;
 
-    bool aadlFunctionOk() const;
+    bool ivFunctionOk() const;
 
     msc::MscInstance *m_instance = nullptr;
     QPointer<msc::MscChart> m_chart;

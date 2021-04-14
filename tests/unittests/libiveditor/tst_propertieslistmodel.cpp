@@ -16,7 +16,7 @@
 */
 
 #include "ivfunction.h"
-#include "baseitems/common/aadlutils.h"
+#include "baseitems/common/ivutils.h"
 #include "interface/properties/propertieslistmodel.h"
 #include "propertytemplateconfig.h"
 

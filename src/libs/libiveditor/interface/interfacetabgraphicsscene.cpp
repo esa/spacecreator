@@ -17,7 +17,7 @@
 
 #include "interfacetabgraphicsscene.h"
 
-#include "baseitems/common/aadlutils.h"
+#include "baseitems/common/ivutils.h"
 #include "baseitems/interactiveobject.h"
 #include "interface/graphicsitemhelpers.h"
 

@@ -33,9 +33,9 @@ The ASN.1 editor is implemented as a pure QtCreator plugin. It features
 
 For reading .asn files, asn1scc is used (transforming into XML).
 
-## AADL editor
+## IV editor
 
-[AADL Wiki Page](https://en.wikipedia.org/wiki/Architecture_Analysis_%26_Design_Language).
+[IV Wiki Page](https://en.wikipedia.org/wiki/Architecture_Analysis_%26_Design_Language).
 
 ## MSC editor
 

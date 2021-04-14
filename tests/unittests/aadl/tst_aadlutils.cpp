@@ -17,7 +17,7 @@
 
 #include "ivfunction.h"
 #include "ivinterface.h"
-#include "aadllibrary.h"
+#include "ivlibrary.h"
 
 #include <QCryptographicHash>
 #include <QDirIterator>
@@ -40,7 +40,7 @@ private Q_SLOTS:
 void tst_AADLUtils::initTestCase()
 {
     QStandardPaths::setTestModeEnabled(true);
-    ivm::initAadlLibrary();
+    ivm::initIVLibrary();
 }
 
 static inline QByteArray fileHash(const QString &filepath)

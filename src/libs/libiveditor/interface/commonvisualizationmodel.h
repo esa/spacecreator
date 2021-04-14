@@ -38,7 +38,7 @@ class CommonVisualizationModel : public QStandardItemModel
     Q_OBJECT
 public:
     explicit CommonVisualizationModel(
-            ivm::IVModel *aadlModel, cmd::CommandsStack *commandsStack, QObject *parent = nullptr);
+            ivm::IVModel *ivModel, cmd::CommandsStack *commandsStack, QObject *parent = nullptr);
     enum ItemRole
     {
         IdRole = Qt::UserRole + 1,
@@ -61,7 +61,7 @@ private Q_SLOTS:
     void updateConnectionItem(ivm::IVConnection *connection);
 
 protected:
-    ivm::IVModel *m_aadlModel { nullptr };
+    ivm::IVModel *m_ivModel { nullptr };
     QHash<shared::Id, QStandardItem *> m_itemCache;
     QPointer<cmd::CommandsStack> m_commandsStack;
 };
@@ -70,8 +70,7 @@ class VisualizationModel : public CommonVisualizationModel
 {
     Q_OBJECT
 public:
-    explicit VisualizationModel(
-            ivm::IVModel *aadlModel, cmd::CommandsStack *commandsStack, QObject *parent = nullptr);
+    explicit VisualizationModel(ivm::IVModel *ivModel, cmd::CommandsStack *commandsStack, QObject *parent = nullptr);
 
     void updateItemData(QStandardItem *item, ivm::IVObject *obj) override;
     QStandardItem *createItem(ivm::IVObject *obj) override;

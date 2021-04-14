@@ -17,7 +17,7 @@
 
 #include "propertyoptions.h"
 
-#include "baseitems/common/aadlutils.h"
+#include "baseitems/common/ivutils.h"
 #include "interface/properties/propertytemplatewidget.h"
 #include "propertytemplateconfig.h"
 #include "spacecreatorpluginconstants.h"

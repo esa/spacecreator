@@ -64,8 +64,8 @@ void XMLReader::runReader(const XmlFileMock &xml)
 
     if (spyObjectsParsed.count()) {
         const QList<QVariant> &objectsList = spyObjectsParsed.takeFirst();
-        const QVector<ivm::IVObject *> &aadlObjects = objectsList.first().value<QVector<ivm::IVObject *>>();
-        QCOMPARE(aadlObjects.size(), xml.expectedObjectCount());
+        const QVector<ivm::IVObject *> &ivObjects = objectsList.first().value<QVector<ivm::IVObject *>>();
+        QCOMPARE(ivObjects.size(), xml.expectedObjectCount());
     }
 
     if (xml.m_canBeParsed)

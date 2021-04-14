@@ -35,7 +35,7 @@ class MscMessage;
 class MscMessageDeclaration;
 
 /*!
-   Base class to check MSC data against a aadl system
+   Base class to check MSC data against a iv system
    The actual checks are to be implemented in a derived class
  */
 class SystemChecks : public QObject
@@ -58,8 +58,8 @@ public:
 
     virtual QStringList connectionNamesFromTo(const QString &sourceName, const QString &targetName) const;
 
-    virtual bool correspond(const ivm::IVObject *aadlObj, const msc::MscInstance *instance) const;
-    virtual bool correspond(const ivm::IVFunction *aadlFunc, const msc::MscInstance *instance) const;
+    virtual bool correspond(const ivm::IVObject *ivObj, const msc::MscInstance *instance) const;
+    virtual bool correspond(const ivm::IVFunction *ivFunc, const msc::MscInstance *instance) const;
     virtual bool correspond(const ivm::IVConnection *connection, const msc::MscMessage *message) const;
 
     virtual QVector<msc::MscMessageDeclaration *> allConnectionsAsDeclaration() const;

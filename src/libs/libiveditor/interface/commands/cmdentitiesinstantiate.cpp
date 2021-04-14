@@ -21,7 +21,7 @@
 #include "ivfunctiontype.h"
 #include "ivmodel.h"
 #include "ivnamevalidator.h"
-#include "baseitems/common/aadlutils.h"
+#include "baseitems/common/ivutils.h"
 #include "cmdentityattributechange.h"
 #include "commandids.h"
 

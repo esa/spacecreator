@@ -6,8 +6,8 @@ target_sources(${LIB_NAME} PRIVATE
     asn1dialog.cpp
     asn1dialog.h
     asn1dialog.ui
-    baseitems/common/aadlutils.cpp
-    baseitems/common/aadlutils.h
+    baseitems/common/ivutils.cpp
+    baseitems/common/ivutils.h
     baseitems/common/positionlookuphelper.cpp
     baseitems/common/positionlookuphelper.h
     baseitems/graphicsview.cpp
@@ -195,7 +195,7 @@ target_sources(${LIB_NAME} PRIVATE
 )
 
 target_link_libraries(${LIB_NAME}
-    aadl
+    ivcore
     asn1library
     shared
     templating

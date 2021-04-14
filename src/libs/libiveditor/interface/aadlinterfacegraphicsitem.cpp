@@ -26,7 +26,7 @@
 #include "aadlfunctiontypegraphicsitem.h"
 #include "ivinterface.h"
 #include "ivnamevalidator.h"
-#include "baseitems/common/aadlutils.h"
+#include "baseitems/common/ivutils.h"
 #include "baseitems/common/positionlookuphelper.h"
 #include "colors/colormanager.h"
 

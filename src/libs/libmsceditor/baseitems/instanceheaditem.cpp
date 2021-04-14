@@ -298,7 +298,7 @@ QSizeF InstanceHeadItem::defaultSize()
 }
 
 /*!
-   Set the aadl checker to verify data with the aadl model
+   Set the iv checker to verify data with the iv model
  */
 void InstanceHeadItem::setSystemChecker(SystemChecks *checker)
 {

@@ -40,8 +40,8 @@ public:
         DbgOpenMscExamplesChain,
         StartRemoteControl,
 
-        // AADL editor
-        OpenAADLXMLFile,
+        // IV editor
+        OpenIVFile,
         ListScriptableActions,
 
         // Both

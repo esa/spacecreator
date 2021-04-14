@@ -23,7 +23,7 @@
 #include "ivfunction.h"
 #include "ivinterface.h"
 #include "ivinterfacegroup.h"
-#include "baseitems/common/aadlutils.h"
+#include "baseitems/common/ivutils.h"
 #include "commands/cmdrootentitychange.h"
 #include "commandsstack.h"
 #include "delayedsignal.h"

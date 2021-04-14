@@ -76,7 +76,7 @@ QStringList SpaceCreatorProjectImpl::projectFiles(const QString &suffix) const
 }
 
 /*!
-   Checks if one asn1 file was renamed. If yes, update the filename in all msc and aadl files.
+   Checks if one asn1 file was renamed. If yes, update the filename in all msc and iv files.
  */
 void SpaceCreatorProjectImpl::checkAsnFileRename()
 {

@@ -17,13 +17,13 @@
 
 #include "spacecreatorplugin.h"
 
-#include "aadllibrary.h"
+#include "ivlibrary.h"
 #include "context/action/actionsmanager.h"
 #include "dv/deploymenteditorfactory.h"
 #include "interface/interfacedocument.h"
-#include "iv/aadleditordata.h"
-#include "iv/aadleditorfactory.h"
-#include "iv/aadlqtceditor.h"
+#include "iv/iveditordata.h"
+#include "iv/iveditorfactory.h"
+#include "iv/qtciveditor.h"
 #include "iveditor.h"
 #include "iveditorcore.h"
 #include "msc/msceditordata.h"
@@ -53,8 +53,8 @@ void initSpaceCreatorResources()
     shared::initSharedLibrary();
     msc::initMscLibrary();
     msc::initMscEditor();
-    ive::initIvEditor();
-    ivm::initAadlLibrary();
+    ive::initIVEditor();
+    ivm::initIVLibrary();
 }
 
 using namespace Core;
@@ -127,21 +127,21 @@ bool SpaceCreatorPlugin::initialize(const QStringList &arguments, QString *error
     menu->addAction(checkMessagesCmd);
     Core::ActionManager::actionContainer(Core::Constants::M_TOOLS)->addMenu(menu);
 
-    // AADL
+    // IV
     m_asn1DialogAction = new QAction(
             QIcon(QLatin1String(":/tab_interface/toolbar/icns/asn1.png")), tr("Show ASN1 dialog ..."), this);
-    Core::Command *showAsn1Cmd = Core::ActionManager::registerAction(m_asn1DialogAction, Constants::AADL_SHOW_ASN1_ID);
+    Core::Command *showAsn1Cmd = Core::ActionManager::registerAction(m_asn1DialogAction, Constants::IV_SHOW_ASN1_ID);
     ive::ActionsManager::registerAction(Q_FUNC_INFO, m_asn1DialogAction, "Asn1", "Edit the ASN1 file");
     connect(m_asn1DialogAction, &QAction::triggered, this, &SpaceCreatorPlugin::showAsn1Dialog);
     m_asn1DialogAction->setEnabled(false);
 
     m_actionSaveSceneRender =
             new QAction(QIcon(QLatin1String(":/tab_interface/toolbar/icns/render.svg")), tr("Render Scene..."), this);
-    Core::Command *renderCmd = Core::ActionManager::registerAction(m_actionSaveSceneRender, Constants::AADL_RENDER_ID);
+    Core::Command *renderCmd = Core::ActionManager::registerAction(m_actionSaveSceneRender, Constants::IV_RENDER_ID);
     ive::ActionsManager::registerAction(
             Q_FUNC_INFO, m_actionSaveSceneRender, "Render", "Save current scene complete render.");
     connect(m_actionSaveSceneRender, &QAction::triggered, this, []() {
-        if (auto ivEditor = qobject_cast<spctr::AadlQtCEditor *>(Core::EditorManager::currentEditor())) {
+        if (auto ivEditor = qobject_cast<spctr::QtCIVEditor *>(Core::EditorManager::currentEditor())) {
             ivEditor->ivPlugin()->onSaveRenderRequested();
         }
     });
@@ -149,13 +149,13 @@ bool SpaceCreatorPlugin::initialize(const QStringList &arguments, QString *error
     m_exportSelectedIV = new QAction(QIcon(QLatin1String(":/tab_interface/toolbar/icns/export_selected.svg")),
             tr("Export selected entity"), this);
     Core::Command *exportElectedCmd = Core::ActionManager::registerAction(
-            m_exportSelectedIV, Constants::AADL_EXPORT_SELECTED_ID, Core::Context(Core::Constants::C_EDIT_MODE));
+            m_exportSelectedIV, Constants::IV_EXPORT_SELECTED_ID, Core::Context(Core::Constants::C_EDIT_MODE));
     connect(m_exportSelectedIV, &QAction::triggered, this, &SpaceCreatorPlugin::exportSelectedIV);
 
     m_exportIVType = new QAction(QIcon(QLatin1String(":/tab_interface/toolbar/icns/export_component_type.svg")),
             tr("Export component type"), this);
     Core::Command *exporttypeCmd = Core::ActionManager::registerAction(
-            m_exportIVType, Constants::AADL_EXPORT_IV_TYPE_ID, Core::Context(Core::Constants::C_EDIT_MODE));
+            m_exportIVType, Constants::IV_EXPORT_IV_TYPE_ID, Core::Context(Core::Constants::C_EDIT_MODE));
     connect(m_exportIVType, &QAction::triggered, this, &SpaceCreatorPlugin::exportComponentType);
 
     connect(Core::EditorManager::instance(), &Core::EditorManager::currentEditorChanged, this,
@@ -176,7 +176,7 @@ bool SpaceCreatorPlugin::initialize(const QStringList &arguments, QString *error
     QList<QAction *> ivActions;
     ivActions << m_asn1DialogAction << m_showMinimapAction << m_showE2EDataflow << m_exportSelectedIV << m_exportIVType
               << m_actionSaveSceneRender;
-    m_aadlFactory = new AadlEditorFactory(m_projectsManager, ivActions, this);
+    m_ivFactory = new IVEditorFactory(m_projectsManager, ivActions, this);
     m_deploymentFactory = new DeploymentEditorFactory(this);
 
     addHelp();
@@ -212,29 +212,29 @@ void SpaceCreatorPlugin::showMessageDeclarations()
 void SpaceCreatorPlugin::setMinimapVisible(bool visible)
 {
     m_mscFactory->editorData()->setMinimapVisible(visible);
-    m_aadlFactory->editorData()->showMinimap(visible);
+    m_ivFactory->editorData()->showMinimap(visible);
 }
 
 void SpaceCreatorPlugin::showE2EDataflow()
 {
-    if (auto aadlEditor = qobject_cast<spctr::AadlQtCEditor *>(Core::EditorManager::currentEditor())) {
-        SpaceCreatorProjectImpl *project = m_projectsManager->project(aadlEditor->ivPlugin());
+    if (auto ivEditor = qobject_cast<spctr::QtCIVEditor *>(Core::EditorManager::currentEditor())) {
+        SpaceCreatorProjectImpl *project = m_projectsManager->project(ivEditor->ivPlugin());
         if (project) {
-            aadlEditor->showE2EDataflow(project->allMscFiles());
+            ivEditor->showE2EDataflow(project->allMscFiles());
         }
     }
 }
 
 void SpaceCreatorPlugin::showAsn1Dialog()
 {
-    if (auto aadlEditor = qobject_cast<spctr::AadlQtCEditor *>(Core::EditorManager::currentEditor())) {
-        aadlEditor->showAsn1Dialog();
+    if (auto ivEditor = qobject_cast<spctr::QtCIVEditor *>(Core::EditorManager::currentEditor())) {
+        ivEditor->showAsn1Dialog();
     }
 }
 
 void SpaceCreatorPlugin::exportSelectedIV()
 {
-    if (auto ivEditor = qobject_cast<spctr::AadlQtCEditor *>(Core::EditorManager::currentEditor())) {
+    if (auto ivEditor = qobject_cast<spctr::QtCIVEditor *>(Core::EditorManager::currentEditor())) {
         SpaceCreatorProjectImpl *project = m_projectsManager->project(ivEditor->ivPlugin());
         if (project) {
             ivEditor->ivPlugin()->document()->exportSelectedFunctions();
@@ -244,7 +244,7 @@ void SpaceCreatorPlugin::exportSelectedIV()
 
 void SpaceCreatorPlugin::exportComponentType()
 {
-    if (auto ivEditor = qobject_cast<spctr::AadlQtCEditor *>(Core::EditorManager::currentEditor())) {
+    if (auto ivEditor = qobject_cast<spctr::QtCIVEditor *>(Core::EditorManager::currentEditor())) {
         SpaceCreatorProjectImpl *project = m_projectsManager->project(ivEditor->ivPlugin());
         if (project) {
             ivEditor->ivPlugin()->document()->exportSelectedType();
@@ -258,19 +258,19 @@ void SpaceCreatorPlugin::exportComponentType()
 void SpaceCreatorPlugin::updateActions()
 {
     bool isMsc = false;
-    bool isAadl = false;
+    bool isIV = false;
     Core::IEditor *editor = Core::EditorManager::currentEditor();
     if (editor && editor->document()) {
         isMsc = editor->document()->filePath().toString().endsWith(".msc", Qt::CaseInsensitive);
-        isAadl = editor->document()->filePath().toString().endsWith("interfaceview.xml", Qt::CaseInsensitive);
+        isIV = editor->document()->filePath().toString().endsWith("interfaceview.xml", Qt::CaseInsensitive);
     }
     m_messageDeclarationAction->setEnabled(isMsc);
-    m_asn1DialogAction->setEnabled(isAadl);
-    m_actionSaveSceneRender->setEnabled(isAadl);
-    m_showMinimapAction->setEnabled(isAadl || isMsc);
-    m_showE2EDataflow->setEnabled(isAadl);
-    m_exportSelectedIV->setEnabled(isAadl);
-    m_exportIVType->setEnabled(isAadl);
+    m_asn1DialogAction->setEnabled(isIV);
+    m_actionSaveSceneRender->setEnabled(isIV);
+    m_showMinimapAction->setEnabled(isIV || isMsc);
+    m_showE2EDataflow->setEnabled(isIV);
+    m_exportSelectedIV->setEnabled(isIV);
+    m_exportIVType->setEnabled(isIV);
 }
 
 void SpaceCreatorPlugin::checkInstancesForCurrentEditor()
@@ -314,7 +314,7 @@ void SpaceCreatorPlugin::addHelp()
         core.showHelp();
     });
     Core::Command *showIveHelp =
-            Core::ActionManager::registerAction(iveHelpAction, Constants::AADL_HELP_ID, allContexts);
+            Core::ActionManager::registerAction(iveHelpAction, Constants::IV_HELP_ID, allContexts);
     actions->addAction(showIveHelp);
 }
 

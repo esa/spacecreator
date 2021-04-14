@@ -17,7 +17,7 @@
 
 #include "addpropertytemplatedialog.h"
 
-#include "baseitems/common/aadlutils.h"
+#include "baseitems/common/ivutils.h"
 #include "common.h"
 #include "propertytemplate.h"
 #include "ui_addpropertytemplatedialog.h"

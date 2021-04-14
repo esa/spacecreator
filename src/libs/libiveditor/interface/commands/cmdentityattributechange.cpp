@@ -222,7 +222,7 @@ void CmdEntityAttributeChange::prepareSetFunctionTypeCommands(const ivm::IVFunct
 
     // Detect an iface which has been just created instead of being properly cloned (the XML file loading).
     // For now it's only a name- and direction-based check. In case there are two or more ifaces with the same name,
-    // the first one found in AADLFunctionType::interfaces is used.
+    // the first one found in IVFunctionType::interfaces is used.
     auto findExistingClone = [this](ivm::IVInterface *protoIface) -> ivm::IVInterface * {
         auto mayBeClone = [protoIface](const ivm::IVInterface *iface) {
             return iface->direction() == protoIface->direction() && iface->title() == protoIface->title();
