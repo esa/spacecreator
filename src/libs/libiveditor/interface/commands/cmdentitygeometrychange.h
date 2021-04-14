@@ -23,7 +23,7 @@
 #include <QVector>
 
 namespace ivm {
-class AADLObject;
+class IVObject;
 }
 
 namespace ive {
@@ -34,7 +34,7 @@ class CmdEntityGeometryChange : public QUndoCommand
 
 public:
     explicit CmdEntityGeometryChange(
-            const QList<QPair<ivm::AADLObject *, QVector<QPointF>>> &objectsData, const QString &title = {});
+            const QList<QPair<ivm::IVObject *, QVector<QPointF>>> &objectsData, const QString &title = {});
     ~CmdEntityGeometryChange() override;
 
     void redo() override;
@@ -45,18 +45,18 @@ public:
 
 protected:
     struct ObjectData {
-        QPointer<ivm::AADLObject> entity;
+        QPointer<ivm::IVObject> entity;
         QVector<qint32> prevCoordinates;
         QVector<qint32> newCoordinates;
     };
 
-    void prepareData(const QList<QPair<ivm::AADLObject *, QVector<QPointF>>> &objectsData);
+    void prepareData(const QList<QPair<ivm::IVObject *, QVector<QPointF>>> &objectsData);
 
 private:
-    static QList<ObjectData> convertData(const QList<QPair<ivm::AADLObject *, QVector<QPointF>>> &objectsData);
+    static QList<ObjectData> convertData(const QList<QPair<ivm::IVObject *, QVector<QPointF>>> &objectsData);
 
 private:
-    QList<QPair<ivm::AADLObject *, QVector<QPointF>>> m_internalData;
+    QList<QPair<ivm::IVObject *, QVector<QPointF>>> m_internalData;
     QList<ObjectData> m_data;
     QList<QUndoCommand *> m_mergedCmds;
 };

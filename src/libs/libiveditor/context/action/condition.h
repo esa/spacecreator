@@ -25,7 +25,7 @@
 #include <QVector>
 
 namespace ivm {
-class AADLObject;
+class IVObject;
 }
 
 namespace ive {
@@ -42,7 +42,7 @@ struct Condition {
 
     static QStringList knownTypes();
 
-    bool isAcceptable(ivm::AADLObject *obj) const;
+    bool isAcceptable(ivm::IVObject *obj) const;
 };
 
 }

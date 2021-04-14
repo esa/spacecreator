@@ -21,7 +21,7 @@
 #include <QJsonObject>
 
 namespace ivm {
-class AADLObject;
+class IVObject;
 }
 
 namespace ive {
@@ -41,7 +41,7 @@ struct Action {
 
     Action &operator=(const Action &other);
 
-    bool isAcceptable(ivm::AADLObject *obj) const;
+    bool isAcceptable(ivm::IVObject *obj) const;
 };
 
 }

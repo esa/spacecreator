@@ -24,7 +24,7 @@
 class QAction;
 
 namespace ivm {
-class AADLObject;
+class IVObject;
 }
 
 class QMenu;
@@ -36,7 +36,7 @@ class InterfaceDocument;
 class ActionsManager
 {
 public:
-    static void populateMenu(QMenu *menu, ivm::AADLObject *currObj, InterfaceDocument *doc);
+    static void populateMenu(QMenu *menu, ivm::IVObject *currObj, InterfaceDocument *doc);
     static bool registerScriptableAction(QAction *action, const QString &key, const QString &description);
     static QString listRegisteredActions();
     static ActionsManager *instance();
@@ -70,10 +70,10 @@ private:
     void loadActions(const QString &fromFile);
 
     static void triggerActionInternal(const Action &act);
-    static void triggerActionExternal(const Action &act, const ivm::AADLObject *aadlObj, InterfaceDocument *doc);
+    static void triggerActionExternal(const Action &act, const ivm::IVObject *aadlObj, InterfaceDocument *doc);
     static bool triggerActionHidden(const Action &act);
 
-    static QString replaceKeyHolder(const QString &text, const ivm::AADLObject *aadlObj, const QString &projectDir);
+    static QString replaceKeyHolder(const QString &text, const ivm::IVObject *aadlObj, const QString &projectDir);
 
     QVector<Action> m_actions;
     QMap<QString, ScriptableActionHandler> m_qactions;

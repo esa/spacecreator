@@ -17,7 +17,7 @@
 
 #include "condition.h"
 
-#include "aadlobject.h"
+#include "ivobject.h"
 
 #include <QDebug>
 #include <QJsonArray>
@@ -69,14 +69,14 @@ QJsonObject Condition::toJson() const
 QStringList Condition::knownTypes()
 {
     QStringList res;
-    QMetaEnum me = QMetaEnum::fromType<ivm::AADLObject::Type>();
+    QMetaEnum me = QMetaEnum::fromType<ivm::IVObject::Type>();
     for (int i = 0; i < me.keyCount(); ++i)
-        if (ivm::AADLObject::Type(me.value(i)) != ivm::AADLObject::Type::Unknown)
+        if (ivm::IVObject::Type(me.value(i)) != ivm::IVObject::Type::Unknown)
             res.append(me.key(i));
     return res;
 }
 
-bool Condition::isAcceptable(ivm::AADLObject *obj) const
+bool Condition::isAcceptable(ivm::IVObject *obj) const
 {
     if (m_itemType != "*") {
         static const QStringList &names = knownTypes();

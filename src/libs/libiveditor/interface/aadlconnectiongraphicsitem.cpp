@@ -18,13 +18,13 @@
 #include "aadlconnectiongraphicsitem.h"
 
 #include "aadlcommentgraphicsitem.h"
-#include "aadlconnection.h"
-#include "aadlfunction.h"
+#include "ivconnection.h"
+#include "ivfunction.h"
 #include "aadlfunctiongraphicsitem.h"
 #include "aadlfunctiontypegraphicsitem.h"
-#include "aadliface.h"
+#include "ivinterface.h"
 #include "aadlinterfacegraphicsitem.h"
-#include "aadlnamevalidator.h"
+#include "ivnamevalidator.h"
 #include "baseitems/common/aadlutils.h"
 #include "colors/colormanager.h"
 #include "graphicsviewutils.h"
@@ -81,7 +81,7 @@ QPainterPath AADLConnectionGraphicsItem::GraphicsPathItem::shape() const
     return stroker.createStroke(path()).simplified();
 }
 
-AADLConnectionGraphicsItem::AADLConnectionGraphicsItem(ivm::AADLConnection *connection,
+AADLConnectionGraphicsItem::AADLConnectionGraphicsItem(ivm::IVConnection *connection,
         AADLInterfaceGraphicsItem *startIface, AADLInterfaceGraphicsItem *endIface, QGraphicsItem *parentItem)
     : InteractiveObject(connection, parentItem)
     , m_startItem(startIface)
@@ -114,7 +114,7 @@ void AADLConnectionGraphicsItem::updateInterfaceConnectionsReference(IfaceConnec
 
 void AADLConnectionGraphicsItem::updateFromEntity()
 {
-    ivm::AADLConnection *obj = entity();
+    ivm::IVConnection *obj = entity();
     Q_ASSERT(obj);
     if (!obj)
         return;
@@ -157,9 +157,9 @@ QVector<QPointF> AADLConnectionGraphicsItem::graphicsPoints() const
     return mapToScene(polygon);
 }
 
-ivm::AADLConnection *AADLConnectionGraphicsItem::entity() const
+ivm::IVConnection *AADLConnectionGraphicsItem::entity() const
 {
-    return qobject_cast<ivm::AADLConnection *>(aadlObject());
+    return qobject_cast<ivm::IVConnection *>(m_dataObject);
 }
 
 QPainterPath AADLConnectionGraphicsItem::shape() const
@@ -458,7 +458,7 @@ AADLFunctionGraphicsItem *AADLConnectionGraphicsItem::targetItem() const
     return m_endItem ? qgraphicsitem_cast<AADLFunctionGraphicsItem *>(m_endItem->targetItem()) : nullptr;
 }
 
-QList<QPair<ivm::AADLObject *, QVector<QPointF>>>
+QList<QPair<ivm::IVObject *, QVector<QPointF>>>
 AADLConnectionGraphicsItem::prepareChangeCoordinatesCommandParams() const
 {
     if (!entity() || !m_startItem || !m_startItem->entity() || !m_endItem || !m_endItem->entity()) {
@@ -466,13 +466,13 @@ AADLConnectionGraphicsItem::prepareChangeCoordinatesCommandParams() const
     }
 
     // item->prepareChangeCoordinatesCommandParams() - will be fixed during work on Undo/Redo issues
-    auto prepareParams = [](AADLInterfaceGraphicsItem *item) -> QPair<ivm::AADLObject *, QVector<QPointF>> {
+    auto prepareParams = [](AADLInterfaceGraphicsItem *item) -> QPair<ivm::IVObject *, QVector<QPointF>> {
         QVector<QPointF> pos;
         pos.append(item->scenePos());
         return { item->entity(), pos };
     };
 
-    QList<QPair<ivm::AADLObject *, QVector<QPointF>>> params;
+    QList<QPair<ivm::IVObject *, QVector<QPointF>>> params;
     params.append({ entity(), graphicsPoints() });
     params.append(prepareParams(m_startItem));
     params.append(prepareParams(m_endItem));
@@ -675,13 +675,13 @@ bool AADLConnectionGraphicsItem::removeCollidedGrips(shared::ui::GripPoint *gp)
 QString AADLConnectionGraphicsItem::prepareTooltip() const
 {
     const QString sourceName =
-            ivm::AADLNameValidator::decodeName(ivm::AADLObject::Type::Function, entity()->sourceName());
-    const QString sourceInterfaceName = ivm::AADLNameValidator::decodeName(
-            ivm::AADLObject::Type::RequiredInterface, entity()->sourceInterfaceName());
+            ivm::IVNameValidator::decodeName(ivm::IVObject::Type::Function, entity()->sourceName());
+    const QString sourceInterfaceName = ivm::IVNameValidator::decodeName(
+            ivm::IVObject::Type::RequiredInterface, entity()->sourceInterfaceName());
     const QString targetName =
-            ivm::AADLNameValidator::decodeName(ivm::AADLObject::Type::Function, entity()->targetName());
-    const QString targetInterfaceName = ivm::AADLNameValidator::decodeName(
-            ivm::AADLObject::Type::ProvidedInterface, entity()->targetInterfaceName());
+            ivm::IVNameValidator::decodeName(ivm::IVObject::Type::Function, entity()->targetName());
+    const QString targetInterfaceName = ivm::IVNameValidator::decodeName(
+            ivm::IVObject::Type::ProvidedInterface, entity()->targetInterfaceName());
     const QString sign = entity()->sourceInterface()->isRequired() ? "->" : "<-";
     const QString tooltip =
             QString("%1.%2 %3 %4.%5").arg(sourceName, sourceInterfaceName, sign, targetName, targetInterfaceName);

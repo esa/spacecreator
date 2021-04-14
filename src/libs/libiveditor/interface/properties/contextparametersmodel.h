@@ -17,7 +17,7 @@
 
 #pragma once
 
-#include "aadlparameter.h"
+#include "parameter.h"
 #include "commandsstack.h"
 #include "propertiesmodelbase.h"
 
@@ -29,7 +29,7 @@ class File;
 }
 
 namespace ivm {
-class AADLObject;
+class IVObject;
 class ContextParameter;
 }
 
@@ -56,7 +56,7 @@ public:
     // Editable:
     bool setData(const QModelIndex &index, const QVariant &value, int role = Qt::EditRole) override;
 
-    void setDataObject(ivm::AADLObject *obj) override;
+    void setDataObject(ivm::IVObject *obj) override;
     void setDataTypes(const QSharedPointer<Asn1Acn::File> &dataTypes);
 
     bool createProperty(const QString &propName) override;
@@ -71,7 +71,7 @@ public:
 
 private:
     cmd::CommandsStack::Macro *m_cmdMacro { nullptr };
-    ivm::AADLObject *m_dataObject { nullptr };
+    ivm::IVObject *m_dataObject { nullptr };
     QVector<ivm::ContextParameter> m_params;
     QSharedPointer<Asn1Acn::File> m_dataTypes;
     QStringList m_asn1Names;

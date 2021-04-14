@@ -17,18 +17,18 @@
 
 #include "exportableaadlfunction.h"
 
-#include "aadlcomment.h"
-#include "aadlconnection.h"
-#include "aadlconnectiongroup.h"
-#include "aadlfunction.h"
-#include "aadlfunctiontype.h"
-#include "aadliface.h"
-#include "aadlinterfacechain.h"
-#include "aadlmodel.h"
+#include "ivcomment.h"
+#include "ivconnection.h"
+#include "ivconnectiongroup.h"
+#include "ivfunction.h"
+#include "ivfunctiontype.h"
+#include "ivinterface.h"
+#include "ivinterfacechain.h"
+#include "ivmodel.h"
 
 namespace ive {
 
-ExportableAADLFunction::ExportableAADLFunction(const ivm::AADLFunctionType *function)
+ExportableAADLFunction::ExportableAADLFunction(const ivm::IVFunctionType *function)
     : ExportableAADLObject(function)
 {
 }
@@ -36,7 +36,7 @@ ExportableAADLFunction::ExportableAADLFunction(const ivm::AADLFunctionType *func
 QVariantList ExportableAADLFunction::interfaces() const
 {
     QVariantList ifaces;
-    for (const auto iface : exportedObject<ivm::AADLFunctionType>()->interfaces())
+    for (const auto iface : exportedObject<ivm::IVFunctionType>()->interfaces())
         ifaces << createFrom(iface);
     return ifaces;
 }
@@ -44,7 +44,7 @@ QVariantList ExportableAADLFunction::interfaces() const
 QVariantList ExportableAADLFunction::functions() const
 {
     QVariantList functions;
-    const ivm::AADLFunctionType *o = exportedObject<ivm::AADLFunctionType>();
+    const ivm::IVFunctionType *o = exportedObject<ivm::IVFunctionType>();
     for (const auto function : o->functionTypes())
         functions << createFrom(function);
     for (const auto function : o->functions())
@@ -55,7 +55,7 @@ QVariantList ExportableAADLFunction::functions() const
 QVariantList ExportableAADLFunction::comments() const
 {
     QVariantList comments;
-    for (const auto comment : exportedObject<ivm::AADLFunctionType>()->comments())
+    for (const auto comment : exportedObject<ivm::IVFunctionType>()->comments())
         comments << createFrom(comment);
     return comments;
 }
@@ -63,7 +63,7 @@ QVariantList ExportableAADLFunction::comments() const
 QVariantList ExportableAADLFunction::connections() const
 {
     QVariantList connections;
-    for (const auto connection : exportedObject<ivm::AADLFunctionType>()->connections())
+    for (const auto connection : exportedObject<ivm::IVFunctionType>()->connections())
         connections << createFrom(connection);
     return connections;
 }
@@ -71,16 +71,16 @@ QVariantList ExportableAADLFunction::connections() const
 QVariantList ExportableAADLFunction::connectionGroups() const
 {
     QVariantList connectionGroups;
-    for (const auto connectionGroup : exportedObject<ivm::AADLFunctionType>()->connectionGroups())
+    for (const auto connectionGroup : exportedObject<ivm::IVFunctionType>()->connectionGroups())
         connectionGroups << createFrom(connectionGroup);
     return connectionGroups;
 }
 
 QVariantList ExportableAADLFunction::connectedFunctions() const
 {
-    const auto aadlFunction = exportedObject<ivm::AADLFunctionType>();
+    const auto aadlFunction = exportedObject<ivm::IVFunctionType>();
     QVariantList list;
-    for (auto chain : ivm::AADLInterfaceChain::linkedFunctions(aadlFunction)) {
+    for (auto chain : ivm::IVInterfaceChain::linkedFunctions(aadlFunction)) {
         list << qVariantFromValue(chain);
     }
     return list;
@@ -89,7 +89,7 @@ QVariantList ExportableAADLFunction::connectedFunctions() const
 QVariantList ExportableAADLFunction::contextParameters() const
 {
     QVariantList parameters;
-    for (const ivm::ContextParameter &param : exportedObject<ivm::AADLFunctionType>()->contextParams()) {
+    for (const ivm::ContextParameter &param : exportedObject<ivm::IVFunctionType>()->contextParams()) {
         parameters << qVariantFromValue(param);
     }
     return parameters;

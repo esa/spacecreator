@@ -17,40 +17,40 @@
 
 #pragma once
 
-#include "aadlobject.h"
-#include "aadliface.h"
+#include "ivobject.h"
+#include "ivinterface.h"
 
 #include <QObject>
 #include <memory>
 
 namespace ivm {
 
-struct AADLConnectionPrivate;
-class AADLConnection : public AADLObject
+struct IVConnectionPrivate;
+class IVConnection : public IVObject
 {
     Q_OBJECT
 
 public:
-    explicit AADLConnection(AADLIface *ifaceSource, AADLIface *ifaceTarget, QObject *parent = nullptr);
-    ~AADLConnection() override;
+    explicit IVConnection(IVInterface *ifaceSource, IVInterface *ifaceTarget, QObject *parent = nullptr);
+    ~IVConnection() override;
 
     QString sourceName() const;
-    AADLObject *source() const;
+    IVObject *source() const;
 
     QString targetName() const;
-    AADLObject *target() const;
+    IVObject *target() const;
 
     QString sourceInterfaceName() const;
-    AADLIface *sourceInterface() const;
+    IVInterface *sourceInterface() const;
 
     QString targetInterfaceName() const;
-    AADLIface *targetInterface() const;
+    IVInterface *targetInterface() const;
 
     void setInheritPI();
     void unsetInheritPI();
 
     template<class T>
-    static inline T selectIface(AADLIface *a, AADLIface *b)
+    static inline T selectIface(IVInterface *a, IVInterface *b)
     {
         T ptr { nullptr };
         if (a)
@@ -72,12 +72,12 @@ public:
     struct EndPointInfo {
         QString m_functionName;
         QString m_interfaceName;
-        AADLIface::IfaceType m_ifaceDirection;
+        IVInterface::InterfaceType m_ifaceDirection;
         inline bool isReady() const { return !m_functionName.isEmpty() && !m_interfaceName.isEmpty(); }
     };
 
-    void setDelayedStart(AADLConnection::EndPointInfo *start);
-    void setDelayedEnd(AADLConnection::EndPointInfo *end);
+    void setDelayedStart(IVConnection::EndPointInfo *start);
+    void setDelayedEnd(IVConnection::EndPointInfo *end);
 
     enum class ConnectionType
     {
@@ -87,28 +87,28 @@ public:
         RI2RI,
         PI2PI
     };
-    AADLConnection::ConnectionType connectionType() const;
+    IVConnection::ConnectionType connectionType() const;
 
     bool isOneDirection() const;
 
     QString name() const;
-    QVector<IfaceParameter> params() const;
+    QVector<InterfaceParameter> params() const;
 
 protected:
-    explicit AADLConnection(const AADLObject::Type t, AADLIface *ifaceSource, AADLIface *ifaceTarget,
+    explicit IVConnection(const IVObject::Type t, IVInterface *ifaceSource, IVInterface *ifaceTarget,
             QObject *parent = nullptr);
     bool lookupEndpointsPostponed();
     bool needPostponedInit() const;
 
 private:
-    const std::unique_ptr<AADLConnectionPrivate> d;
+    const std::unique_ptr<IVConnectionPrivate> d;
 
     enum class InheritPIChange
     {
         Inherit = 0,
         NotInherit
     };
-    void handleInheritPIChange(AADLConnection::InheritPIChange inheritance);
+    void handleInheritPIChange(IVConnection::InheritPIChange inheritance);
     void handleProvidedTitleChanged(const QString &title);
     void handleInheritPIChange(bool enabled);
 
@@ -117,4 +117,4 @@ private:
 
 }
 
-QDebug operator<<(QDebug debug, const ivm::AADLConnection &connection);
+QDebug operator<<(QDebug debug, const ivm::IVConnection &connection);

@@ -15,7 +15,7 @@
   along with this program. If not, see <https://www.gnu.org/licenses/lgpl-2.1.html>.
 */
 
-#include "aadlparameter.h"
+#include "parameter.h"
 
 #include "asn1/definitions.h"
 #include "asn1/file.h"
@@ -215,7 +215,7 @@ bool ContextParameter::isNull() const
     return BasicParameter::isNull() || this->operator==({});
 }
 
-IfaceParameter::IfaceParameter(
+InterfaceParameter::InterfaceParameter(
         const QString &name, Type t, const QString &paramTypeName, const QString &encoding, Direction dir)
     : BasicParameter(name, t, paramTypeName)
     , m_encoding(encoding)
@@ -223,14 +223,14 @@ IfaceParameter::IfaceParameter(
 {
 }
 
-IfaceParameter::~IfaceParameter() { }
+InterfaceParameter::~InterfaceParameter() { }
 
-QString IfaceParameter::encoding() const
+QString InterfaceParameter::encoding() const
 {
     return m_encoding;
 }
 
-bool IfaceParameter::setEncoding(const QString &encoding)
+bool InterfaceParameter::setEncoding(const QString &encoding)
 {
     if (m_encoding == encoding)
         return false;
@@ -239,12 +239,12 @@ bool IfaceParameter::setEncoding(const QString &encoding)
     return true;
 }
 
-IfaceParameter::Direction IfaceParameter::direction() const
+InterfaceParameter::Direction InterfaceParameter::direction() const
 {
     return m_direction;
 }
 
-bool IfaceParameter::setDirection(IfaceParameter::Direction dir)
+bool InterfaceParameter::setDirection(InterfaceParameter::Direction dir)
 {
     if (m_direction == dir)
         return false;
@@ -253,12 +253,12 @@ bool IfaceParameter::setDirection(IfaceParameter::Direction dir)
     return true;
 }
 
-bool IfaceParameter::operator==(const IfaceParameter &other) const
+bool InterfaceParameter::operator==(const InterfaceParameter &other) const
 {
     return BasicParameter::operator==(other) && m_encoding == other.m_encoding && m_direction == other.m_direction;
 }
 
-QString IfaceParameter::toString() const
+QString InterfaceParameter::toString() const
 {
     QString result = BasicParameter::toString();
 
@@ -273,7 +273,7 @@ QString IfaceParameter::toString() const
     return result;
 }
 
-bool IfaceParameter::isNull() const
+bool InterfaceParameter::isNull() const
 {
     return BasicParameter::isNull() || this->operator==({});
 }

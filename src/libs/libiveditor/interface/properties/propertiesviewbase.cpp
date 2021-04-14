@@ -17,8 +17,8 @@
 
 #include "propertiesviewbase.h"
 
-#include "aadlfunction.h"
-#include "aadliface.h"
+#include "ivfunction.h"
+#include "ivinterface.h"
 #include "contextparametersmodel.h"
 #include "ifaceparametersmodel.h"
 #include "propertieslistmodel.h"
@@ -136,19 +136,19 @@ bool PropertiesViewBase::setButtonsDisabled()
 
     bool disabled = false;
 
-    if (auto dataObject = m_model->dataObject()) {
-        switch (dataObject->aadlType()) {
-        case ivm::AADLObject::Type::Function: {
-            if (auto fn = dataObject->as<const ivm::AADLFunction *>())
+    if (auto dataObject = m_model->entity()) {
+        switch (dataObject->type()) {
+        case ivm::IVObject::Type::Function: {
+            if (auto fn = dataObject->as<const ivm::IVFunction *>())
                 disabled = fn->inheritsFunctionType();
             break;
         }
-        case ivm::AADLObject::Type::RequiredInterface:
-        case ivm::AADLObject::Type::ProvidedInterface: {
-            if (auto iface = dataObject->as<const ivm::AADLIface *>()) {
+        case ivm::IVObject::Type::RequiredInterface:
+        case ivm::IVObject::Type::ProvidedInterface: {
+            if (auto iface = dataObject->as<const ivm::IVInterface *>()) {
                 disabled = iface->isClone();
                 if (!disabled && iface->isRequired()) {
-                    if (auto ri = iface->as<const ivm::AADLIfaceRequired *>())
+                    if (auto ri = iface->as<const ivm::IVInterfaceRequired *>())
                         disabled = ri->hasPrototypePi();
                 }
             }

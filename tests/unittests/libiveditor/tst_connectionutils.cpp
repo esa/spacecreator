@@ -15,8 +15,8 @@
    along with this program. If not, see <https://www.gnu.org/licenses/lgpl-2.1.html>.
 */
 
-#include "aadlfunction.h"
-#include "aadliface.h"
+#include "ivfunction.h"
+#include "ivinterface.h"
 #include "baseitems/common/aadlutils.h"
 #include "common.h"
 #include "connectioncreationvalidator.h"
@@ -90,12 +90,12 @@ private:
         QPointF providedIfacePoint() const { return points.at(static_cast<int>(EndPoint::Prov)); }
         QPointF emptyPoint() const { return points.at(static_cast<int>(EndPoint::Empty)); }
         QPointF point(const Data::EndPoint ep) const { return points.at(static_cast<int>(ep)); }
-        QPointF point(const ivm::AADLIface::IfaceType type) const
+        QPointF point(const ivm::IVInterface::InterfaceType type) const
         {
             switch (type) {
-            case ivm::AADLIface::IfaceType::Required:
+            case ivm::IVInterface::InterfaceType::Required:
                 return requiredIfacePoint();
-            case ivm::AADLIface::IfaceType::Provided:
+            case ivm::IVInterface::InterfaceType::Provided:
                 return providedIfacePoint();
             default:
                 break;
@@ -119,22 +119,22 @@ void tst_ConnectionUtils::initTestCase()
 {
     shared::initSharedLibrary();
 
-    auto entity1 = new ivm::AADLFunction("F1");
+    auto entity1 = new ivm::IVFunction("F1");
     f1 = new ive::AADLFunctionGraphicsItem(entity1);
     m_scene.addItem(f1);
     f1->setRect(QRectF(100, 100, 300, 300));
 
-    auto nestedEntity1 = new ivm::AADLFunction("Nested_F1");
+    auto nestedEntity1 = new ivm::IVFunction("Nested_F1");
     entity1->addChild(nestedEntity1);
     nf1 = new ive::AADLFunctionGraphicsItem(nestedEntity1, f1);
     nf1->setRect(QRectF(150, 150, 100, 100));
 
-    auto entity2 = new ivm::AADLFunction("F2");
+    auto entity2 = new ivm::IVFunction("F2");
     f2 = new ive::AADLFunctionGraphicsItem(entity2);
     m_scene.addItem(f2);
     f2->setRect(QRectF(600, 100, 300, 300));
 
-    auto nestedEntity2 = new ivm::AADLFunction("Nested_F2");
+    auto nestedEntity2 = new ivm::IVFunction("Nested_F2");
     entity2->addChild(nestedEntity2);
     nf2 = new ive::AADLFunctionGraphicsItem(nestedEntity2, f2);
     nf2->setRect(QRectF(650, 150, 100, 100));
@@ -390,20 +390,20 @@ void tst_ConnectionUtils::tst_pathByPoints()
 
 void tst_ConnectionUtils::tst_endPoints()
 {
-    auto addIfaces = [this](const ivm::AADLIface::IfaceType ifaceType) {
+    auto addIfaces = [this](const ivm::IVInterface::InterfaceType ifaceType) {
         for (int idx = 0; idx < data.size(); ++idx) {
-            ivm::AADLIface::CreationInfo ci;
+            ivm::IVInterface::CreationInfo ci;
             ci.function = data.at(idx).function()->entity();
             ci.name = ci.function->title();
             ci.position = data.at(idx).point(ifaceType);
             ci.type = ifaceType;
-            ivm::AADLIface *iface { nullptr };
-            if (ifaceType == ivm::AADLIface::IfaceType::Required) {
+            ivm::IVInterface *iface { nullptr };
+            if (ifaceType == ivm::IVInterface::InterfaceType::Required) {
                 ci.name += QLatin1String("_ReqIface");
-                iface = new ivm::AADLIfaceRequired(ci);
-            } else if (ifaceType == ivm::AADLIface::IfaceType::Provided) {
+                iface = new ivm::IVInterfaceRequired(ci);
+            } else if (ifaceType == ivm::IVInterface::InterfaceType::Provided) {
                 ci.name += QLatin1String("_ProvIface");
-                iface = new ivm::AADLIfaceProvided(ci);
+                iface = new ivm::IVInterfaceProvided(ci);
             } else {
                 qFatal("Test for Interface group isn't implemented yet");
             }
@@ -417,8 +417,8 @@ void tst_ConnectionUtils::tst_endPoints()
         }
     };
 
-    addIfaces(ivm::AADLIface::IfaceType::Required);
-    addIfaces(ivm::AADLIface::IfaceType::Provided);
+    addIfaces(ivm::IVInterface::InterfaceType::Required);
+    addIfaces(ivm::IVInterface::InterfaceType::Provided);
 
     /// Nested_F1-Empty <> F1-Empty
     checkEndPoints(nf1, Data::EndPoint::Empty, f1, Data::EndPoint::Empty, false, false);

@@ -25,7 +25,7 @@ class QUndoCommand;
 class QUndoStack;
 
 namespace ivm {
-class AADLObject;
+class IVObject;
 }
 
 namespace shared {
@@ -44,8 +44,8 @@ public:
     bool push(QUndoCommand *command) override;
 
 Q_SIGNALS:
-    void nameChanged(ivm::AADLObject *entity, const QString &oldName, shared::UndoCommand *command);
-    void entitiesRemoved(const QList<QPointer<ivm::AADLObject>> &entities, shared::UndoCommand *command);
+    void nameChanged(ivm::IVObject *entity, const QString &oldName, shared::UndoCommand *command);
+    void entitiesRemoved(const QList<QPointer<ivm::IVObject>> &entities, shared::UndoCommand *command);
 };
 
 }

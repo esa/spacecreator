@@ -31,7 +31,7 @@ class File;
 }
 
 namespace ivm {
-class AADLObject;
+class IVObject;
 }
 
 namespace ive {
@@ -155,7 +155,7 @@ QRectF adjustFromPoint(const QPointF &pos, const qreal &adjustment);
 
 QList<int> knownGraphicsItemTypes();
 
-qreal itemLevel(const ivm::AADLObject *const object, bool itemSelected);
+qreal itemLevel(const ivm::IVObject *const object, bool itemSelected);
 
 QRectF alignRectToSide(
         const QRectF &boundingRect, const QRectF &itemRect, Qt::Alignment side, const QPointF &originPointOffset);
@@ -191,7 +191,7 @@ QVector<QPointF> simplifyPoints(const QVector<QPointF> &points);
 
 bool comparePolygones(const QVector<QPointF> &v1, const QVector<QPointF> &v2);
 
-int nestingLevel(ivm::AADLObject *object);
+int nestingLevel(ivm::IVObject *object);
 
 QRectF getNearestIntersectedRect(
         const QList<QRectF> &existingRects, const QVector<QPointF> &points, IntersectionType intersectionType);

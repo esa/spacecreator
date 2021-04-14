@@ -15,12 +15,12 @@
   along with this program. If not, see <https://www.gnu.org/licenses/lgpl-2.1.html>.
 */
 
-#include "aadlfunction.h"
+#include "ivfunction.h"
 
 #include "aadlcommonprops.h"
-#include "aadliface.h"
-#include "aadlmodel.h"
-#include "aadlobject.h"
+#include "ivinterface.h"
+#include "ivmodel.h"
+#include "ivobject.h"
 
 #include <QDebug>
 #include <QScopedPointer>
@@ -28,35 +28,35 @@
 
 namespace ivm {
 
-struct AADLFunctionPrivate {
-    QPointer<AADLFunctionType> m_fnType;
+struct IVFunctionPrivate {
+    QPointer<IVFunctionType> m_fnType;
 };
 
-AADLFunction::AADLFunction(const QString &title, QObject *parent)
-    : AADLFunctionType(AADLObject::Type::Function, title, parent)
-    , d(new AADLFunctionPrivate)
+IVFunction::IVFunction(const QString &title, QObject *parent)
+    : IVFunctionType(IVObject::Type::Function, title, parent)
+    , d(new IVFunctionPrivate)
 {
     setAttr(meta::Props::token(meta::Props::Token::is_type), QStringLiteral("NO"));
     setAttr(meta::Props::token(meta::Props::Token::instance_of), QVariant());
 }
 
-AADLFunction::~AADLFunction() {}
+IVFunction::~IVFunction() {}
 
-bool AADLFunction::postInit()
+bool IVFunction::postInit()
 {
     return true;
 }
 
-void AADLFunction::setInstanceOf(AADLFunctionType *fnType)
+void IVFunction::setInstanceOf(IVFunctionType *fnType)
 {
     if (d->m_fnType != fnType) {
         if (d->m_fnType) {
 
-            disconnect(d->m_fnType, &AADLFunction::contextParamsChanged, this, &AADLFunction::reflectContextParam);
-            disconnect(d->m_fnType, qOverload<ivm::meta::Props::Token>(&AADLFunction::propertyChanged), this,
-                    &AADLFunction::reflectProp);
-            disconnect(d->m_fnType, qOverload<ivm::meta::Props::Token>(&AADLFunction::attributeChanged), this,
-                    &AADLFunction::reflectAttr);
+            disconnect(d->m_fnType, &IVFunction::contextParamsChanged, this, &IVFunction::reflectContextParam);
+            disconnect(d->m_fnType, qOverload<ivm::meta::Props::Token>(&IVFunction::propertyChanged), this,
+                    &IVFunction::reflectProp);
+            disconnect(d->m_fnType, qOverload<ivm::meta::Props::Token>(&IVFunction::attributeChanged), this,
+                    &IVFunction::reflectAttr);
 
             restoreInternals();
         }
@@ -66,16 +66,16 @@ void AADLFunction::setInstanceOf(AADLFunctionType *fnType)
         if (d->m_fnType) {
             cloneInternals();
 
-            connect(d->m_fnType, qOverload<ivm::meta::Props::Token>(&AADLFunction::attributeChanged), this,
-                    &AADLFunction::reflectAttr);
-            connect(d->m_fnType, qOverload<ivm::meta::Props::Token>(&AADLFunction::propertyChanged), this,
-                    &AADLFunction::reflectProp);
-            connect(d->m_fnType, &AADLFunction::contextParamsChanged, this, &AADLFunction::reflectContextParam);
+            connect(d->m_fnType, qOverload<ivm::meta::Props::Token>(&IVFunction::attributeChanged), this,
+                    &IVFunction::reflectAttr);
+            connect(d->m_fnType, qOverload<ivm::meta::Props::Token>(&IVFunction::propertyChanged), this,
+                    &IVFunction::reflectProp);
+            connect(d->m_fnType, &IVFunction::contextParamsChanged, this, &IVFunction::reflectContextParam);
         }
     }
 }
 
-void AADLFunction::cloneInternals()
+void IVFunction::cloneInternals()
 {
     m_originalFields.collect(this);
 
@@ -88,7 +88,7 @@ void AADLFunction::cloneInternals()
     }
 }
 
-void AADLFunction::restoreInternals()
+void IVFunction::restoreInternals()
 {
     if (d->m_fnType)
         d->m_fnType->forgetInstance(this);
@@ -100,20 +100,20 @@ void AADLFunction::restoreInternals()
     }
 }
 
-const AADLFunctionType *AADLFunction::instanceOf() const
+const IVFunctionType *IVFunction::instanceOf() const
 {
     return d->m_fnType;
 }
 
-bool AADLFunction::inheritsFunctionType() const
+bool IVFunction::inheritsFunctionType() const
 {
     return instanceOf();
 }
 
-void AADLFunction::reflectAttr(ivm::meta::Props::Token attr)
+void IVFunction::reflectAttr(ivm::meta::Props::Token attr)
 {
     if (!d->m_fnType) {
-        if (const AADLFunctionType *fnType = dynamic_cast<const AADLFunctionType *>(sender()))
+        if (const IVFunctionType *fnType = dynamic_cast<const IVFunctionType *>(sender()))
             qWarning() << QString("The Function type \"%1\" (%2) has not been disconnected, it seems")
                                   .arg(fnType->title(), fnType->id().toString());
         return;
@@ -136,7 +136,7 @@ void AADLFunction::reflectAttr(ivm::meta::Props::Token attr)
     }
 }
 
-void AADLFunction::reflectAttrs(const QHash<QString, QVariant> &attrs)
+void IVFunction::reflectAttrs(const QHash<QString, QVariant> &attrs)
 {
     QHash<QString, QVariant> prepared(attrs);
     for (meta::Props::Token t :
@@ -149,10 +149,10 @@ void AADLFunction::reflectAttrs(const QHash<QString, QVariant> &attrs)
     setAttrs(prepared);
 }
 
-void AADLFunction::reflectProp(ivm::meta::Props::Token prop)
+void IVFunction::reflectProp(ivm::meta::Props::Token prop)
 {
     if (!d->m_fnType) {
-        if (const AADLFunctionType *fnType = dynamic_cast<const AADLFunctionType *>(sender()))
+        if (const IVFunctionType *fnType = dynamic_cast<const IVFunctionType *>(sender()))
             qWarning() << QString("The Function type \"%1\" (%2) has not been disconnected, it seems")
                                   .arg(fnType->title(), fnType->id().toString());
         return;
@@ -174,7 +174,7 @@ void AADLFunction::reflectProp(ivm::meta::Props::Token prop)
     }
 }
 
-void AADLFunction::reflectProps(const QHash<QString, QVariant> &props)
+void IVFunction::reflectProps(const QHash<QString, QVariant> &props)
 {
     QHash<QString, QVariant> prepared(props);
     for (meta::Props::Token t : { meta::Props::Token::InnerCoordinates, meta::Props::Token::coordinates }) {
@@ -186,10 +186,10 @@ void AADLFunction::reflectProps(const QHash<QString, QVariant> &props)
     setProps(prepared);
 }
 
-void AADLFunction::reflectContextParam()
+void IVFunction::reflectContextParam()
 {
     if (!d->m_fnType) {
-        if (const AADLFunctionType *fnType = dynamic_cast<const AADLFunctionType *>(sender()))
+        if (const IVFunctionType *fnType = dynamic_cast<const IVFunctionType *>(sender()))
             qWarning() << QString("The Function type \"%1\" (%2) has not been disconnected, it seems")
                                   .arg(fnType->title(), fnType->id().toString());
         return;
@@ -198,7 +198,7 @@ void AADLFunction::reflectContextParam()
     reflectContextParams(d->m_fnType->contextParams());
 }
 
-void AADLFunction::reflectContextParams(const QVector<ContextParameter> &params)
+void IVFunction::reflectContextParams(const QVector<ContextParameter> &params)
 {
     setContextParams(params);
 }

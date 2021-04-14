@@ -25,9 +25,9 @@
 
 class QTemporaryDir;
 namespace ivm {
-class AADLObject;
-class AADLFunctionType;
-class AADLModel;
+class IVObject;
+class IVFunctionType;
+class IVModel;
 }
 
 namespace ive {
@@ -36,7 +36,7 @@ namespace cmd {
 class CmdEntitiesImport : public QUndoCommand
 {
 public:
-    explicit CmdEntitiesImport(const QByteArray &data, ivm::AADLFunctionType *parent, ivm::AADLModel *model,
+    explicit CmdEntitiesImport(const QByteArray &data, ivm::IVFunctionType *parent, ivm::IVModel *model,
             const QPointF &pos, const QString &destPath);
     ~CmdEntitiesImport() override;
 
@@ -46,15 +46,15 @@ public:
     int id() const override;
 
 private:
-    void redoSourceCloning(const ivm::AADLObject *object);
-    void undoSourceCloning(const ivm::AADLObject *object);
-    QString relativePathForObject(const ivm::AADLObject *object) const;
+    void redoSourceCloning(const ivm::IVObject *object);
+    void undoSourceCloning(const ivm::IVObject *object);
+    QString relativePathForObject(const ivm::IVObject *object) const;
 
-    QPointer<ivm::AADLModel> m_model;
-    QPointer<ivm::AADLModel> m_importModel;
-    QPointer<ivm::AADLFunctionType> m_parent;
-    QVector<QPointer<ivm::AADLObject>> m_rootEntities;
-    QVector<QPointer<ivm::AADLObject>> m_importedEntities;
+    QPointer<ivm::IVModel> m_model;
+    QPointer<ivm::IVModel> m_importModel;
+    QPointer<ivm::IVFunctionType> m_parent;
+    QVector<QPointer<ivm::IVObject>> m_rootEntities;
+    QVector<QPointer<ivm::IVObject>> m_importedEntities;
 
     QString m_destPath;
     QScopedPointer<QTemporaryDir> m_tempDir;

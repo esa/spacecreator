@@ -15,7 +15,7 @@
    along with this program. If not, see <https://www.gnu.org/licenses/lgpl-2.1.html>.
 */
 
-#include "aadlfunction.h"
+#include "ivfunction.h"
 #include "baseitems/common/aadlutils.h"
 #include "interface/properties/propertieslistmodel.h"
 #include "propertytemplateconfig.h"
@@ -52,7 +52,7 @@ void tst_PropertiesListModel::tst_object()
         { QLatin1String("Attr5"), QStringLiteral("value_5") },
     };
 
-    ivm::AADLFunction fn;
+    ivm::IVFunction fn;
     fn.setAttrs(attrs);
 
     ive::PropertiesListModel plmodel(m_macro, m_config);

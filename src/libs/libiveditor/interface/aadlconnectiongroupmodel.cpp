@@ -17,11 +17,11 @@
 
 #include "aadlconnectiongroupmodel.h"
 
-#include "aadlconnection.h"
-#include "aadlconnectiongroup.h"
-#include "aadlfunction.h"
-#include "aadlmodel.h"
-#include "aadlnamevalidator.h"
+#include "ivconnection.h"
+#include "ivconnectiongroup.h"
+#include "ivfunction.h"
+#include "ivmodel.h"
+#include "ivnamevalidator.h"
 #include "commandsstack.h"
 #include "interface/commands/cmdconnectiongroupitemchange.h"
 
@@ -30,24 +30,24 @@
 namespace ive {
 
 AADLConnectionGroupModel::AADLConnectionGroupModel(
-        ivm::AADLConnectionGroup *connectionGroup, cmd::CommandsStack::Macro *macro, QObject *parent)
+        ivm::IVConnectionGroup *connectionGroup, cmd::CommandsStack::Macro *macro, QObject *parent)
     : QAbstractListModel(parent)
     , m_connectionGroup(connectionGroup)
     , m_cmdMacro(macro)
 {
     const auto groupedConnections = connectionGroup->groupedConnections();
     std::for_each(groupedConnections.constBegin(), groupedConnections.constEnd(),
-            [this](ivm::AADLConnection *c) { m_groupedConnetions.insert(c->id()); });
+            [this](ivm::IVConnection *c) { m_groupedConnetions.insert(c->id()); });
 
-    if (auto model = connectionGroup->objectsModel()) {
-        const QList<ivm::AADLIface *> targetIfaces = connectionGroup->targetFunctionInterfaces();
-        const QList<ivm::AADLIface *> sourceIfaces = connectionGroup->sourceFunctionInterfaces();
+    if (auto model = connectionGroup->model()) {
+        const QList<ivm::IVInterface *> targetIfaces = connectionGroup->targetFunctionInterfaces();
+        const QList<ivm::IVInterface *> sourceIfaces = connectionGroup->sourceFunctionInterfaces();
 
         for (auto iface : sourceIfaces) {
             const auto ifaceConnections = model->getConnectionsForIface(iface->id());
 
             std::copy_if(ifaceConnections.constBegin(), ifaceConnections.constEnd(),
-                    std::back_inserter(m_allConnections), [&](const ivm::AADLConnection *connection) {
+                    std::back_inserter(m_allConnections), [&](const ivm::IVConnection *connection) {
                         if (sourceIfaces.contains(connection->sourceInterface()))
                             return targetIfaces.contains(connection->targetInterface());
                         else if (sourceIfaces.contains(connection->targetInterface()))
@@ -59,24 +59,24 @@ AADLConnectionGroupModel::AADLConnectionGroupModel(
 
     auto updateEnableState = [this]() {
         if (m_groupedConnetions.size() == 1) {
-            if (auto model = m_connectionGroup->objectsModel()) {
-                ivm::AADLConnection *connection = model->getConnection(*m_groupedConnetions.begin());
+            if (auto model = m_connectionGroup->model()) {
+                ivm::IVConnection *connection = model->getConnection(*m_groupedConnetions.begin());
                 const QModelIndex idx = index(m_allConnections.indexOf(connection));
                 Q_EMIT dataChanged(idx, idx);
             }
         }
     };
 
-    connect(connectionGroup, &ivm::AADLConnectionGroup::connectionAdded, this,
-            [this, updateEnableState](ivm::AADLConnection *connection) {
+    connect(connectionGroup, &ivm::IVConnectionGroup::connectionAdded, this,
+            [this, updateEnableState](ivm::IVConnection *connection) {
                 updateEnableState();
                 m_groupedConnetions.insert(connection->id());
 
                 const QModelIndex idx = index(m_allConnections.indexOf(connection));
                 Q_EMIT dataChanged(idx, idx, { Qt::CheckStateRole });
             });
-    connect(connectionGroup, &ivm::AADLConnectionGroup::connectionRemoved, this,
-            [this, updateEnableState](ivm::AADLConnection *connection) {
+    connect(connectionGroup, &ivm::IVConnectionGroup::connectionRemoved, this,
+            [this, updateEnableState](ivm::IVConnection *connection) {
                 m_groupedConnetions.remove(connection->id());
                 updateEnableState();
 
@@ -96,7 +96,7 @@ QVariant AADLConnectionGroupModel::data(const QModelIndex &index, int role) cons
     }
 
     if (role == Qt::DisplayRole) {
-        return ivm::AADLNameValidator::nextNameFor(m_allConnections.at(index.row()));
+        return ivm::IVNameValidator::nextNameFor(m_allConnections.at(index.row()));
     }
 
     if (role == Qt::CheckStateRole) {

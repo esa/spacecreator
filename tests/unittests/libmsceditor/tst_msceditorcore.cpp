@@ -15,9 +15,9 @@
    along with this program. If not, see <https://www.gnu.org/licenses/lgpl-2.1.html>.
 */
 
-#include "aadlconnection.h"
-#include "aadlfunction.h"
-#include "aadltestutils.h"
+#include "ivconnection.h"
+#include "ivfunction.h"
+#include "ivtestutils.h"
 #include "mainmodel.h"
 #include "mscchart.h"
 #include "mscdocument.h"
@@ -54,11 +54,11 @@ public:
         : msc::SystemChecks(parent)
     {
     }
-    bool correspond(const ivm::AADLFunction *aadlFunc, const msc::MscInstance *instance) const override
+    bool correspond(const ivm::IVFunction *aadlFunc, const msc::MscInstance *instance) const override
     {
         return instance->name() == aadlFunc->title();
     }
-    bool correspond(const ivm::AADLConnection *connection, const msc::MscMessage *message) const override
+    bool correspond(const ivm::IVConnection *connection, const msc::MscMessage *message) const override
     {
         return message->name() == connection->name();
     }
@@ -84,7 +84,7 @@ void tst_MSCEditorCore::testCorrespondingInstances()
 
     auto instance = new msc::MscInstance("dummy", m_chart);
     m_chart->addInstance(instance);
-    ivm::AADLFunction fnct("foo");
+    ivm::IVFunction fnct("foo");
     QCOMPARE(m_mscCore->correspondingInstances(&fnct).size(), 0);
 
     fnct.setTitle("dummy");
@@ -102,9 +102,9 @@ void tst_MSCEditorCore::testCorrespondingMessages()
     auto message = new msc::MscMessage("ping", instance1, instance2, m_chart);
     m_chart->addInstanceEvent(message);
 
-    ivm::AADLFunction f1("K1");
-    ivm::AADLFunction f2("K2");
-    std::unique_ptr<ivm::AADLConnection> connection(ivm::testutils::createConnection(&f1, &f2, "call"));
+    ivm::IVFunction f1("K1");
+    ivm::IVFunction f2("K2");
+    std::unique_ptr<ivm::IVConnection> connection(ivm::testutils::createConnection(&f1, &f2, "call"));
     QCOMPARE(m_mscCore->correspondingMessages(connection.get()).size(), 0);
 
     connection->targetInterface()->setTitle("ping");

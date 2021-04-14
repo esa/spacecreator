@@ -15,8 +15,8 @@
    along with this program. If not, see <https://www.gnu.org/licenses/lgpl-2.1.html>.
 */
 
-#include "aadlfunction.h"
-#include "aadliface.h"
+#include "ivfunction.h"
+#include "ivinterface.h"
 #include "aadllibrary.h"
 
 #include <QCryptographicHash>
@@ -123,34 +123,34 @@ void tst_AADLUtils::tst_ensureFileExists()
 
 void tst_AADLUtils::tst_isAncestorOf()
 {
-    ivm::AADLFunction fn(QLatin1String("fn"));
-    ivm::AADLFunction sibling(QLatin1String("sibling"));
+    ivm::IVFunction fn(QLatin1String("fn"));
+    ivm::IVFunction sibling(QLatin1String("sibling"));
     QVERIFY(!shared::isAncestorOf(&fn, &sibling));
     QVERIFY(!shared::isAncestorOf(&sibling, &fn));
 
-    ivm::AADLFunction nestedFn(QLatin1String("nestedFn"), &fn);
+    ivm::IVFunction nestedFn(QLatin1String("nestedFn"), &fn);
     QVERIFY(shared::isAncestorOf(&fn, &nestedFn));
     QVERIFY(!shared::isAncestorOf(&nestedFn, &fn));
 
-    ivm::AADLIface::CreationInfo ci;
+    ivm::IVInterface::CreationInfo ci;
 
-    ci.type = ivm::AADLIface::IfaceType::Required;
+    ci.type = ivm::IVInterface::InterfaceType::Required;
     ci.name = QLatin1String("reqIface");
     ci.function = &nestedFn;
-    ivm::AADLIfaceRequired reqIface(ci);
-    QVERIFY(shared::isAncestorOf<ivm::AADLObject>(&fn, &reqIface));
-    QVERIFY(shared::isAncestorOf<ivm::AADLObject>(&nestedFn, &reqIface));
-    QVERIFY(!shared::isAncestorOf<ivm::AADLObject>(&reqIface, &fn));
-    QVERIFY(!shared::isAncestorOf<ivm::AADLObject>(&reqIface, &nestedFn));
+    ivm::IVInterfaceRequired reqIface(ci);
+    QVERIFY(shared::isAncestorOf<ivm::IVObject>(&fn, &reqIface));
+    QVERIFY(shared::isAncestorOf<ivm::IVObject>(&nestedFn, &reqIface));
+    QVERIFY(!shared::isAncestorOf<ivm::IVObject>(&reqIface, &fn));
+    QVERIFY(!shared::isAncestorOf<ivm::IVObject>(&reqIface, &nestedFn));
 
-    ci.type = ivm::AADLIface::IfaceType::Provided;
+    ci.type = ivm::IVInterface::InterfaceType::Provided;
     ci.name = QLatin1String("provIface");
     ci.function = &nestedFn;
-    ivm::AADLIfaceProvided provIface(ci);
-    QVERIFY(shared::isAncestorOf<ivm::AADLObject>(&fn, &provIface));
-    QVERIFY(shared::isAncestorOf<ivm::AADLObject>(&nestedFn, &provIface));
-    QVERIFY(!shared::isAncestorOf<ivm::AADLObject>(&provIface, &fn));
-    QVERIFY(!shared::isAncestorOf<ivm::AADLObject>(&provIface, &nestedFn));
+    ivm::IVInterfaceProvided provIface(ci);
+    QVERIFY(shared::isAncestorOf<ivm::IVObject>(&fn, &provIface));
+    QVERIFY(shared::isAncestorOf<ivm::IVObject>(&nestedFn, &provIface));
+    QVERIFY(!shared::isAncestorOf<ivm::IVObject>(&provIface, &fn));
+    QVERIFY(!shared::isAncestorOf<ivm::IVObject>(&provIface, &nestedFn));
 }
 
 QTEST_APPLESS_MAIN(tst_AADLUtils)

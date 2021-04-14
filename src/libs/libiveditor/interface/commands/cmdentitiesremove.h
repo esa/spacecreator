@@ -25,9 +25,9 @@
 #include <QVector>
 
 namespace ivm {
-class AADLObject;
-class AADLModel;
-class AADLFunctionType;
+class IVObject;
+class IVModel;
+class IVFunctionType;
 }
 
 namespace ive {
@@ -37,7 +37,7 @@ class CmdEntitiesRemove : public shared::UndoCommand
 {
     Q_OBJECT
 public:
-    explicit CmdEntitiesRemove(const QList<QPointer<ivm::AADLObject>> &entities, ivm::AADLModel *model);
+    explicit CmdEntitiesRemove(const QList<QPointer<ivm::IVObject>> &entities, ivm::IVModel *model);
     ~CmdEntitiesRemove() override;
 
     void redo() override;
@@ -46,23 +46,23 @@ public:
     int id() const override;
 
 Q_SIGNALS:
-    void entitiesRemoved(const QList<QPointer<ivm::AADLObject>> &entities, shared::UndoCommand *command);
+    void entitiesRemoved(const QList<QPointer<ivm::IVObject>> &entities, shared::UndoCommand *command);
 
 private:
-    QPointer<ivm::AADLModel> m_model;
-    QList<QPointer<ivm::AADLObject>> m_entities;
-    QVector<QPointer<ivm::AADLObject>> m_relatedEntities;
-    QVector<QPointer<ivm::AADLObject>> m_relatedConnections;
-    QVector<QPointer<ivm::AADLObject>> m_relatedIfaces;
-    QHash<shared::Id, QPointer<ivm::AADLFunctionType>> m_parentFunctions;
+    QPointer<ivm::IVModel> m_model;
+    QList<QPointer<ivm::IVObject>> m_entities;
+    QVector<QPointer<ivm::IVObject>> m_relatedEntities;
+    QVector<QPointer<ivm::IVObject>> m_relatedConnections;
+    QVector<QPointer<ivm::IVObject>> m_relatedIfaces;
+    QHash<shared::Id, QPointer<ivm::IVFunctionType>> m_parentFunctions;
 
-    void collectRelatedItems(ivm::AADLObject *toBeRemoved);
-    void storeLinkedEntity(ivm::AADLObject *linkedEntity);
+    void collectRelatedItems(ivm::IVObject *toBeRemoved);
+    void storeLinkedEntity(ivm::IVObject *linkedEntity);
 
-    ivm::AADLFunctionType *putParentFunctionFor(const ivm::AADLObject *obj);
-    ivm::AADLFunctionType *popParentFunctionFor(const ivm::AADLObject *obj);
-    void advancedRemove(ivm::AADLObject *obj);
-    void advancedRestore(ivm::AADLObject *obj);
+    ivm::IVFunctionType *putParentFunctionFor(const ivm::IVObject *obj);
+    ivm::IVFunctionType *popParentFunctionFor(const ivm::IVObject *obj);
+    void advancedRemove(ivm::IVObject *obj);
+    void advancedRestore(ivm::IVObject *obj);
 };
 
 }

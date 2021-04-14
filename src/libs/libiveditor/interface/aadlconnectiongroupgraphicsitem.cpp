@@ -17,7 +17,7 @@
 
 #include "aadlconnectiongroupgraphicsitem.h"
 
-#include "aadlconnectiongroup.h"
+#include "ivconnectiongroup.h"
 #include "aadlinterfacegroupgraphicsitem.h"
 
 #include <QFontMetrics>
@@ -26,12 +26,12 @@ const qreal kConnectionGroupTitleMaxLength = 200;
 
 namespace ive {
 
-AADLConnectionGroupGraphicsItem::AADLConnectionGroupGraphicsItem(ivm::AADLConnectionGroup *connection,
+AADLConnectionGroupGraphicsItem::AADLConnectionGroupGraphicsItem(ivm::IVConnectionGroup *connection,
         AADLInterfaceGroupGraphicsItem *ifaceStart, AADLInterfaceGroupGraphicsItem *ifaceEnd, QGraphicsItem *parent)
     : AADLConnectionGraphicsItem(connection, ifaceStart, ifaceEnd, parent)
     , m_textItem(new QGraphicsTextItem(this))
 {
-    connect(connection, &ivm::AADLObject::titleChanged, this, &AADLConnectionGroupGraphicsItem::updateLabel);
+    connect(connection, &ivm::IVObject::titleChanged, this, &AADLConnectionGroupGraphicsItem::updateLabel);
 }
 
 shared::ColorManager::HandledColors AADLConnectionGroupGraphicsItem::handledColorType() const

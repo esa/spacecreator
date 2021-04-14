@@ -20,7 +20,7 @@
 class QSignalMapper;
 
 #include <QDialog>
-#include <aadlconnectiongroup.h>
+#include <ivconnectiongroup.h>
 
 namespace ive {
 
@@ -30,14 +30,14 @@ class CreateConnectionGroupDialog : public QDialog
 
 public:
     explicit CreateConnectionGroupDialog(
-            const QList<ivm::AADLConnectionGroup::CreationInfo> &groupCreationDataList,
+            const QList<ivm::IVConnectionGroup::CreationInfo> &groupCreationDataList,
             QWidget *parent = nullptr);
     ~CreateConnectionGroupDialog();
 
-    QList<ivm::AADLConnectionGroup::CreationInfo> info() const;
+    QList<ivm::IVConnectionGroup::CreationInfo> info() const;
 
 private:
-    QList<ivm::AADLConnectionGroup::CreationInfo> m_info;
+    QList<ivm::IVConnectionGroup::CreationInfo> m_info;
     QSignalMapper *m_signalMapper = nullptr;
 };
 

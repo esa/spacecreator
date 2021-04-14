@@ -17,16 +17,16 @@
 
 #include "cmdifaceparambase.h"
 
-#include "aadlconnection.h"
-#include "aadlmodel.h"
+#include "ivconnection.h"
+#include "ivmodel.h"
 #include "cmdentitiesremove.h"
 
 namespace ive {
 namespace cmd {
 
-QVector<QPointer<ivm::AADLIface>> relatedIfaces(ivm::AADLIface *iface)
+QVector<QPointer<ivm::IVInterface>> relatedIfaces(ivm::IVInterface *iface)
 {
-    QVector<QPointer<ivm::AADLIface>> ifaces;
+    QVector<QPointer<ivm::IVInterface>> ifaces;
 
     if (iface) {
         ifaces.append(iface);
@@ -38,18 +38,18 @@ QVector<QPointer<ivm::AADLIface>> relatedIfaces(ivm::AADLIface *iface)
     return ifaces;
 }
 
-QVector<ivm::AADLConnection *> relatedConnections(ivm::AADLIface *iface)
+QVector<ivm::IVConnection *> relatedConnections(ivm::IVInterface *iface)
 {
-    QVector<ivm::AADLConnection *> connections;
+    QVector<ivm::IVConnection *> connections;
 
-    if (iface && iface->objectsModel())
-        for (ivm::AADLIface *i : relatedIfaces(iface))
-            connections += i->objectsModel()->getConnectionsForIface(i->id());
+    if (iface && iface->model())
+        for (ivm::IVInterface *i : relatedIfaces(iface))
+            connections += i->model()->getConnectionsForIface(i->id());
 
     return connections;
 }
 
-CmdIfaceParamBase::CmdIfaceParamBase(ivm::AADLIface *iface)
+CmdIfaceParamBase::CmdIfaceParamBase(ivm::IVInterface *iface)
     : QUndoCommand()
     , m_iface(iface)
     , m_connections(relatedConnections(m_iface))
@@ -63,8 +63,8 @@ CmdIfaceParamBase::~CmdIfaceParamBase()
 
 void CmdIfaceParamBase::prepareRmCommands()
 {
-    QList<QPointer<ivm::AADLObject>> entities;
-    if (auto model = m_iface->objectsModel()) {
+    QList<QPointer<ivm::IVObject>> entities;
+    if (auto model = m_iface->model()) {
         for (auto connection : m_connections) {
             if (connection->sourceInterface() && connection->targetInterface()) {
                 if (connection->sourceInterface()->params() != connection->targetInterface()->params()) {

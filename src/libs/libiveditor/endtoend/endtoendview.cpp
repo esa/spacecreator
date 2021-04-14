@@ -17,12 +17,12 @@
 
 #include "endtoendview.h"
 
-#include "aadlconnection.h"
-#include "aadlconnectionchain.h"
-#include "aadlconnectiongroup.h"
-#include "aadlfunction.h"
-#include "aadlifacegroup.h"
-#include "aadlmodel.h"
+#include "ivconnection.h"
+#include "ivconnectionchain.h"
+#include "ivconnectiongroup.h"
+#include "ivfunction.h"
+#include "ivinterfacegroup.h"
+#include "ivmodel.h"
 #include "baseitems/common/aadlutils.h"
 #include "endtoendconnections.h"
 #include "interface/aadlconnectiongraphicsitem.h"
@@ -177,10 +177,10 @@ bool EndToEndView::refreshView()
     qDeleteAll(d->scene->items());
 
     // Get the visible non-nested objects
-    QList<ivm::AADLObject *> objects = d->document->objectsModel()->visibleObjects({});
-    ivm::AADLObject::sortObjectList(objects);
+    QList<ivm::IVObject *> objects = d->document->objectsModel()->visibleObjects({});
+    ivm::IVObject::sortObjectList(objects);
 
-    const QList<ivm::AADLConnectionChain *> chains = ivm::AADLConnectionChain::build(*d->document->objectsModel());
+    const QList<ivm::IVConnectionChain *> chains = ivm::IVConnectionChain::build(*d->document->objectsModel());
 
     msc::MscDocument *doc = nullptr;
     if (d->ui->leafDocsView->currentIndex().isValid()) {
@@ -212,10 +212,10 @@ bool EndToEndView::refreshView()
         QGraphicsItem *parentItem = obj->parentObject() ? items.value(obj->parentObject()->id()) : nullptr;
 
         InteractiveObject *item = nullptr;
-        switch (obj->aadlType()) {
-        case ivm::AADLObject::Type::InterfaceGroup:
+        switch (obj->type()) {
+        case ivm::IVObject::Type::InterfaceGroup:
             if (parentItem) {
-                if (auto ifaceGroup = qobject_cast<ivm::AADLIfaceGroup *>(obj)) {
+                if (auto ifaceGroup = qobject_cast<ivm::IVInterfaceGroup *>(obj)) {
                     // Add the Interface
                     auto graphicsItem = new AADLInterfaceGroupGraphicsItem(ifaceGroup, parentItem);
                     item = graphicsItem;
@@ -224,9 +224,9 @@ bool EndToEndView::refreshView()
                         // Check if this is part of an internal connection
                         QStringList labels;
                         for (auto iface : ifaceGroup->entities()) {
-                            if (iface->direction() == ivm::AADLIface::IfaceType::Required) {
+                            if (iface->direction() == ivm::IVInterface::InterfaceType::Required) {
                                 const QStringList labelsOriginal =
-                                        iface->as<ivm::AADLIfaceRequired *>()->ifaceLabelList();
+                                        iface->as<ivm::IVInterfaceRequired *>()->ifaceLabelList();
                                 for (const auto &label : labelsOriginal) {
                                     labels << label.trimmed().toLower();
                                 }
@@ -237,9 +237,9 @@ bool EndToEndView::refreshView()
                                         internalConnection.ri = graphicsItem;
                                     }
                                 }
-                            } else if (iface->direction() == ivm::AADLIface::IfaceType::Provided) {
+                            } else if (iface->direction() == ivm::IVInterface::InterfaceType::Provided) {
                                 const QString interface =
-                                        iface->as<ivm::AADLIfaceProvided *>()->ifaceLabel().trimmed().toLower();
+                                        iface->as<ivm::IVInterfaceProvided *>()->ifaceLabel().trimmed().toLower();
                                 const QString title = function->title().trimmed().toLower();
                                 for (auto &internalConnection : internalConnections) {
                                     if (title == internalConnection.connection.instance
@@ -256,9 +256,9 @@ bool EndToEndView::refreshView()
                 }
             }
             break;
-        case ivm::AADLObject::Type::RequiredInterface:
+        case ivm::IVObject::Type::RequiredInterface:
             if (parentItem && !obj->isGrouped()) {
-                if (auto reqIface = qobject_cast<ivm::AADLIfaceRequired *>(obj)) {
+                if (auto reqIface = qobject_cast<ivm::IVInterfaceRequired *>(obj)) {
                     // Add the RI
                     auto graphicsItem = new AADLInterfaceGraphicsItem(reqIface, parentItem);
                     interfaceItems.append(graphicsItem);
@@ -282,9 +282,9 @@ bool EndToEndView::refreshView()
                 }
             }
             break;
-        case ivm::AADLObject::Type::ProvidedInterface:
+        case ivm::IVObject::Type::ProvidedInterface:
             if (parentItem && !obj->isGrouped()) {
-                if (auto provIface = qobject_cast<ivm::AADLIfaceProvided *>(obj)) {
+                if (auto provIface = qobject_cast<ivm::IVInterfaceProvided *>(obj)) {
                     // Add the PI
                     auto graphicsItem = new AADLInterfaceGraphicsItem(provIface, parentItem);
                     interfaceItems.append(graphicsItem);
@@ -305,13 +305,13 @@ bool EndToEndView::refreshView()
                 }
             }
             break;
-        case ivm::AADLObject::Type::ConnectionGroup:
-        case ivm::AADLObject::Type::Connection:
-            if (auto connection = qobject_cast<ivm::AADLConnection *>(obj)) {
-                auto findGroupObject = [&](ivm::AADLIface *iface) {
-                    auto it = std::find_if(objects.cbegin(), objects.cend(), [iface](ivm::AADLObject *obj) {
-                        if (obj->aadlType() == ivm::AADLObject::Type::InterfaceGroup) {
-                            for (auto entity : obj->as<ivm::AADLIfaceGroup *>()->entities()) {
+        case ivm::IVObject::Type::ConnectionGroup:
+        case ivm::IVObject::Type::Connection:
+            if (auto connection = qobject_cast<ivm::IVConnection *>(obj)) {
+                auto findGroupObject = [&](ivm::IVInterface *iface) {
+                    auto it = std::find_if(objects.cbegin(), objects.cend(), [iface](ivm::IVObject *obj) {
+                        if (obj->type() == ivm::IVObject::Type::InterfaceGroup) {
+                            for (auto entity : obj->as<ivm::IVInterfaceGroup *>()->entities()) {
                                 if (entity->id() == iface->id()) {
                                     return true;
                                 }
@@ -319,37 +319,37 @@ bool EndToEndView::refreshView()
                         }
                         return false;
                     });
-                    return it != objects.cend() ? (*it)->as<ivm::AADLIfaceGroup *>() : nullptr;
+                    return it != objects.cend() ? (*it)->as<ivm::IVInterfaceGroup *>() : nullptr;
                 };
 
-                ivm::AADLIface *ifaceStart = connection->sourceInterface();
+                ivm::IVInterface *ifaceStart = connection->sourceInterface();
                 if (ifaceStart && ifaceStart->isGrouped()
-                        && ifaceStart->aadlType() != ivm::AADLObject::Type::InterfaceGroup) {
+                        && ifaceStart->type() != ivm::IVObject::Type::InterfaceGroup) {
                     ifaceStart = findGroupObject(ifaceStart);
                 }
                 auto startItem = qgraphicsitem_cast<AADLInterfaceGraphicsItem *>(
                         ifaceStart ? items.value(ifaceStart->id()) : nullptr);
 
-                ivm::AADLIface *ifaceEnd = connection->targetInterface();
+                ivm::IVInterface *ifaceEnd = connection->targetInterface();
                 if (ifaceEnd && ifaceEnd->isGrouped()
-                        && ifaceEnd->aadlType() != ivm::AADLObject::Type::InterfaceGroup) {
+                        && ifaceEnd->type() != ivm::IVObject::Type::InterfaceGroup) {
                     ifaceEnd = findGroupObject(ifaceEnd);
                 }
                 auto endItem = qgraphicsitem_cast<AADLInterfaceGraphicsItem *>(
                         ifaceEnd ? items.value(ifaceEnd->id()) : nullptr);
 
-                if (connection->aadlType() == ivm::AADLObject::Type::ConnectionGroup) {
-                    const QList<QPointer<ivm::AADLConnection>> groupedConnections =
-                            connection->as<ivm::AADLConnectionGroup *>()->groupedConnections();
+                if (connection->type() == ivm::IVObject::Type::ConnectionGroup) {
+                    const QList<QPointer<ivm::IVConnection>> groupedConnections =
+                            connection->as<ivm::IVConnectionGroup *>()->groupedConnections();
                     if (std::any_of(groupedConnections.cbegin(), groupedConnections.cend(),
-                                [&](const QPointer<ivm::AADLConnection> &groupedConnection) {
+                                [&](const QPointer<ivm::IVConnection> &groupedConnection) {
                                     return !groupedConnection.isNull()
                                             && EndToEndConnections::isInDataflow(dataflow, chains, groupedConnection);
                                 })) {
                         item = new AADLFlowConnectionGraphicsItem(connection, startItem, endItem, parentItem);
                         foundConnection = true;
                     } else {
-                        item = new AADLConnectionGroupGraphicsItem(connection->as<ivm::AADLConnectionGroup *>(),
+                        item = new AADLConnectionGroupGraphicsItem(connection->as<ivm::IVConnectionGroup *>(),
                                 qgraphicsitem_cast<AADLInterfaceGroupGraphicsItem *>(startItem),
                                 qgraphicsitem_cast<AADLInterfaceGroupGraphicsItem *>(endItem), parentItem);
                     }
@@ -363,8 +363,8 @@ bool EndToEndView::refreshView()
                 }
             }
             break;
-        case ivm::AADLObject::Type::Function:
-            item = new AADLFunctionGraphicsItem(qobject_cast<ivm::AADLFunction *>(obj), parentItem);
+        case ivm::IVObject::Type::Function:
+            item = new AADLFunctionGraphicsItem(qobject_cast<ivm::IVFunction *>(obj), parentItem);
             if (obj->isRootObject()) {
                 rootItem = item;
             }

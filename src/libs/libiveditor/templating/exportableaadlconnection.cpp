@@ -17,56 +17,56 @@
 
 #include "exportableaadlconnection.h"
 
-#include "aadlconnection.h"
+#include "ivconnection.h"
 
 namespace ive {
 
-ExportableAADLConnection::ExportableAADLConnection(const ivm::AADLConnection *connection)
+ExportableAADLConnection::ExportableAADLConnection(const ivm::IVConnection *connection)
     : ExportableAADLObject(connection)
 {
 }
 
 QString ExportableAADLConnection::sourceName() const
 {
-    return exportedObject<ivm::AADLConnection>()->sourceName();
+    return exportedObject<ivm::IVConnection>()->sourceName();
 }
 
 QString ExportableAADLConnection::targetName() const
 {
-    return exportedObject<ivm::AADLConnection>()->targetName();
+    return exportedObject<ivm::IVConnection>()->targetName();
 }
 
 QString ExportableAADLConnection::sourceInterfaceName() const
 {
-    return exportedObject<ivm::AADLConnection>()->sourceInterfaceName();
+    return exportedObject<ivm::IVConnection>()->sourceInterfaceName();
 }
 
 QString ExportableAADLConnection::targetInterfaceName() const
 {
-    return exportedObject<ivm::AADLConnection>()->targetInterfaceName();
+    return exportedObject<ivm::IVConnection>()->targetInterfaceName();
 }
 
 bool ExportableAADLConnection::sourceInterfaceIsRequired() const
 {
-    auto o = exportedObject<ivm::AADLConnection>();
+    auto o = exportedObject<ivm::IVConnection>();
     return o->sourceInterface() ? o->sourceInterface()->isRequired() : false;
 }
 
 bool ExportableAADLConnection::sourceInterfaceIsProvided() const
 {
-    auto o = exportedObject<ivm::AADLConnection>();
+    auto o = exportedObject<ivm::IVConnection>();
     return o->sourceInterface() ? o->sourceInterface()->isProvided() : false;
 }
 
 bool ExportableAADLConnection::targetInterfaceIsRequired() const
 {
-    auto o = exportedObject<ivm::AADLConnection>();
+    auto o = exportedObject<ivm::IVConnection>();
     return o->targetInterface() ? o->targetInterface()->isRequired() : false;
 }
 
 bool ExportableAADLConnection::targetInterfaceIsProvided() const
 {
-    auto o = exportedObject<ivm::AADLConnection>();
+    auto o = exportedObject<ivm::IVConnection>();
     return o->targetInterface() ? o->targetInterface()->isProvided() : false;
 }
 

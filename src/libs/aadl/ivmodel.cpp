@@ -15,13 +15,13 @@
   along with this program. If not, see <https://www.gnu.org/licenses/lgpl-2.1.html>.
 */
 
-#include "aadlmodel.h"
+#include "ivmodel.h"
 
-#include "aadlcomment.h"
-#include "aadlconnection.h"
-#include "aadlfunction.h"
-#include "aadlfunctiontype.h"
-#include "aadlnamevalidator.h"
+#include "ivcomment.h"
+#include "ivconnection.h"
+#include "ivfunction.h"
+#include "ivfunctiontype.h"
+#include "ivnamevalidator.h"
 #include "common.h"
 #include "propertytemplate.h"
 #include "propertytemplateconfig.h"
@@ -30,39 +30,39 @@
 
 namespace ivm {
 
-struct AADLModelPrivate {
+struct IVModelPrivate {
     PropertyTemplateConfig *m_dynPropConfig { nullptr };
-    AADLModel *m_sharedTypesModel { nullptr };
+    IVModel *m_sharedTypesModel { nullptr };
     shared::Id m_rootObjectId;
     QList<shared::Id> m_objectsOrder;
-    QHash<shared::Id, AADLObject *> m_objects;
-    QList<AADLObject *> m_visibleObjects;
+    QHash<shared::Id, IVObject *> m_objects;
+    QList<IVObject *> m_visibleObjects;
     QVector<QString> m_headerTitles;
 };
 
-AADLModel::AADLModel(PropertyTemplateConfig *dynPropConfig, QObject *parent)
+IVModel::IVModel(PropertyTemplateConfig *dynPropConfig, QObject *parent)
     : QObject(parent)
-    , d(new AADLModelPrivate)
+    , d(new IVModelPrivate)
 {
     d->m_dynPropConfig = dynPropConfig;
 }
 
-AADLModel::~AADLModel() { }
+IVModel::~IVModel() { }
 
-void AADLModel::setSharedTypesModel(AADLModel *sharedTypesModel)
+void IVModel::setSharedTypesModel(IVModel *sharedTypesModel)
 {
     d->m_sharedTypesModel = sharedTypesModel;
 }
 
-void AADLModel::initFromObjects(const QVector<AADLObject *> &objects)
+void IVModel::initFromObjects(const QVector<IVObject *> &objects)
 {
     clear();
     addObjects(objects);
 }
 
-void AADLModel::addObjects(const QVector<AADLObject *> &objects)
+void IVModel::addObjects(const QVector<IVObject *> &objects)
 {
-    QVector<AADLObject *> addedObjects;
+    QVector<IVObject *> addedObjects;
     for (auto obj : objects) {
         if (addObjectImpl(obj)) {
             addedObjects.append(obj);
@@ -70,9 +70,9 @@ void AADLModel::addObjects(const QVector<AADLObject *> &objects)
     }
 
     for (auto it = addedObjects.begin(); it != addedObjects.end(); ++it) {
-        if (AADLObject *obj = *it) {
+        if (IVObject *obj = *it) {
             if (!obj->postInit()) {
-                if (AADLFunctionType *parentFn = qobject_cast<AADLFunction *>(obj->parentObject())) {
+                if (IVFunctionType *parentFn = qobject_cast<IVFunction *>(obj->parentObject())) {
                     parentFn->removeChild(obj);
                 }
                 if (removeObject(obj)) {
@@ -83,11 +83,11 @@ void AADLModel::addObjects(const QVector<AADLObject *> &objects)
     }
 
     if (!addedObjects.isEmpty()) {
-        Q_EMIT aadlObjectsAdded(addedObjects);
+        Q_EMIT objectsAdded(addedObjects);
     }
 }
 
-bool AADLModel::addObjectImpl(AADLObject *obj)
+bool IVModel::addObjectImpl(IVObject *obj)
 {
     if (!obj)
         return false;
@@ -128,23 +128,23 @@ bool AADLModel::addObjectImpl(AADLObject *obj)
     return true;
 }
 
-bool AADLModel::addObject(AADLObject *obj)
+bool IVModel::addObject(IVObject *obj)
 {
     if (addObjectImpl(obj)) {
         if (!obj->postInit()) {
             removeObject(obj);
-            if (auto parentObj = qobject_cast<ivm::AADLFunctionType *>(obj->parentObject())) {
+            if (auto parentObj = qobject_cast<ivm::IVFunctionType *>(obj->parentObject())) {
                 parentObj->removeChild(obj);
             }
         } else {
-            Q_EMIT aadlObjectsAdded({ obj });
+            Q_EMIT objectsAdded({ obj });
             return true;
         }
     }
     return false;
 }
 
-bool AADLModel::removeObject(AADLObject *obj)
+bool IVModel::removeObject(IVObject *obj)
 {
     if (!obj)
         return false;
@@ -159,11 +159,11 @@ bool AADLModel::removeObject(AADLObject *obj)
     d->m_objectsOrder.removeAll(id);
     d->m_visibleObjects.removeAll(obj);
 
-    Q_EMIT aadlObjectRemoved(obj);
+    Q_EMIT objectRemoved(obj);
     return true;
 }
 
-void AADLModel::setRootObject(shared::Id rootId)
+void IVModel::setRootObject(shared::Id rootId)
 {
     if (d->m_rootObjectId == rootId) {
         return;
@@ -175,17 +175,17 @@ void AADLModel::setRootObject(shared::Id rootId)
     Q_EMIT rootObjectChanged(d->m_rootObjectId);
 }
 
-AADLObject *AADLModel::rootObject() const
+IVObject *IVModel::rootObject() const
 {
     return getObject(d->m_rootObjectId);
 }
 
-shared::Id AADLModel::rootObjectId() const
+shared::Id IVModel::rootObjectId() const
 {
     return d->m_rootObjectId;
 }
 
-AADLObject *AADLModel::getObject(const shared::Id &id) const
+IVObject *IVModel::getObject(const shared::Id &id) const
 {
     if (id.isNull()) {
         return nullptr;
@@ -194,14 +194,14 @@ AADLObject *AADLModel::getObject(const shared::Id &id) const
     return d->m_objects.value(id, nullptr);
 }
 
-AADLObject *AADLModel::getObjectByName(
-        const QString &name, AADLObject::Type type, Qt::CaseSensitivity caseSensitivity) const
+IVObject *IVModel::getObjectByName(
+        const QString &name, IVObject::Type type, Qt::CaseSensitivity caseSensitivity) const
 {
     if (name.isEmpty())
         return nullptr;
 
     for (auto obj : d->m_objects)
-        if ((type == AADLObject::Type::Unknown || type == obj->aadlType())
+        if ((type == IVObject::Type::Unknown || type == obj->type())
                 && obj->title().compare(name, caseSensitivity) == 0)
             return obj;
     return nullptr;
@@ -210,7 +210,7 @@ AADLObject *AADLModel::getObjectByName(
 /*!
    Returns the first interface found, that has the given \p name and \p dir
  */
-AADLIface *AADLModel::getIfaceByName(const QString &name, AADLIface::IfaceType dir, const AADLFunctionType *parent,
+IVInterface *IVModel::getIfaceByName(const QString &name, IVInterface::InterfaceType dir, const IVFunctionType *parent,
         Qt::CaseSensitivity caseSensitivity) const
 {
     if (name.isEmpty()) {
@@ -219,7 +219,7 @@ AADLIface *AADLModel::getIfaceByName(const QString &name, AADLIface::IfaceType d
 
     for (auto obj : qAsConst(d->m_objects)) {
         if (obj->isInterface() && obj->title().compare(name, caseSensitivity) == 0) {
-            if (AADLIface *iface = obj->as<AADLIface *>()) {
+            if (IVInterface *iface = obj->as<IVInterface *>()) {
                 if (iface->direction() == dir && (!parent || iface->parentObject() == parent)) {
                     return iface;
                 }
@@ -233,16 +233,16 @@ AADLIface *AADLModel::getIfaceByName(const QString &name, AADLIface::IfaceType d
 /*!
    Returns all interfaces with the given \p name
  */
-QList<AADLIface *> AADLModel::getIfacesByName(const QString &name, Qt::CaseSensitivity caseSensitivity) const
+QList<IVInterface *> IVModel::getIfacesByName(const QString &name, Qt::CaseSensitivity caseSensitivity) const
 {
-    QList<AADLIface *> result;
+    QList<IVInterface *> result;
     if (name.isEmpty()) {
         return result;
     }
 
     for (auto obj : qAsConst(d->m_objects)) {
         if (obj->isInterface() && obj->title().compare(name, caseSensitivity) == 0) {
-            if (AADLIface *iface = obj->as<AADLIface *>()) {
+            if (IVInterface *iface = obj->as<IVInterface *>()) {
                 result << iface;
             }
         }
@@ -251,38 +251,38 @@ QList<AADLIface *> AADLModel::getIfacesByName(const QString &name, Qt::CaseSensi
     return result;
 }
 
-AADLFunction *AADLModel::getFunction(const shared::Id &id) const
+IVFunction *IVModel::getFunction(const shared::Id &id) const
 {
-    return qobject_cast<AADLFunction *>(getObject(id));
+    return qobject_cast<IVFunction *>(getObject(id));
 }
 
 /*!
    Returns the function with the given name.
    If no such function exists nullptr is returned.
  */
-AADLFunction *AADLModel::getFunction(const QString &name, Qt::CaseSensitivity caseSensitivity) const
+IVFunction *IVModel::getFunction(const QString &name, Qt::CaseSensitivity caseSensitivity) const
 {
-    return qobject_cast<AADLFunction *>(getObjectByName(name, AADLObject::Type::Unknown, caseSensitivity));
+    return qobject_cast<IVFunction *>(getObjectByName(name, IVObject::Type::Unknown, caseSensitivity));
 }
 
-AADLFunctionType *AADLModel::getFunctionType(const shared::Id &id) const
+IVFunctionType *IVModel::getFunctionType(const shared::Id &id) const
 {
-    return qobject_cast<AADLFunction *>(getObject(id));
+    return qobject_cast<IVFunction *>(getObject(id));
 }
 
-QHash<QString, AADLFunctionType *> AADLModel::getAvailableFunctionTypes(const AADLFunction *fnObj) const
+QHash<QString, IVFunctionType *> IVModel::getAvailableFunctionTypes(const IVFunction *fnObj) const
 {
-    QHash<QString, AADLFunctionType *> result;
+    QHash<QString, IVFunctionType *> result;
     if (!fnObj)
         return result;
 
-    auto isValid = [](const AADLFunctionType *objFnType, const AADLFunction *objFn) {
-        AADLObject *objFnTypeParent = objFnType->parentObject();
+    auto isValid = [](const IVFunctionType *objFnType, const IVFunction *objFn) {
+        IVObject *objFnTypeParent = objFnType->parentObject();
 
         if (!objFnTypeParent) // it's a global FunctionType
             return true;
 
-        AADLObject *objFnParent = objFn->parentObject();
+        IVObject *objFnParent = objFn->parentObject();
         while (objFnParent) {
             if (objFnParent == objFnTypeParent)
                 return true;
@@ -291,9 +291,9 @@ QHash<QString, AADLFunctionType *> AADLModel::getAvailableFunctionTypes(const AA
         return false;
     };
 
-    for (AADLObject *obj : d->m_objects) {
+    for (IVObject *obj : d->m_objects) {
         if (obj->isFunctionType()) {
-            if (AADLFunctionType *objFnType = qobject_cast<AADLFunctionType *>(obj)) {
+            if (IVFunctionType *objFnType = qobject_cast<IVFunctionType *>(obj)) {
                 if (isValid(objFnType, fnObj)) {
                     result.insert(objFnType->title(), objFnType);
                 }
@@ -304,7 +304,7 @@ QHash<QString, AADLFunctionType *> AADLModel::getAvailableFunctionTypes(const AA
     const auto sharedObjects = d->m_sharedTypesModel->objects();
     for (auto sharedObject : sharedObjects) {
         if (sharedObject->isFunctionType() && sharedObject->parentObject() == nullptr) {
-            if (auto fnType = sharedObject->as<AADLFunctionType *>()) {
+            if (auto fnType = sharedObject->as<IVFunctionType *>()) {
                 result[fnType->title()] = fnType;
             }
         }
@@ -313,35 +313,35 @@ QHash<QString, AADLFunctionType *> AADLModel::getAvailableFunctionTypes(const AA
     return result;
 }
 
-AADLIface *AADLModel::getInterface(const shared::Id &id) const
+IVInterface *IVModel::getInterface(const shared::Id &id) const
 {
-    return qobject_cast<AADLIface *>(getObject(id));
+    return qobject_cast<IVInterface *>(getObject(id));
 }
 
-AADLIfaceRequired *AADLModel::getRequiredInterface(const shared::Id &id) const
+IVInterfaceRequired *IVModel::getRequiredInterface(const shared::Id &id) const
 {
-    return qobject_cast<AADLIfaceRequired *>(getObject(id));
+    return qobject_cast<IVInterfaceRequired *>(getObject(id));
 }
 
-AADLIfaceProvided *AADLModel::getProvidedInterface(const shared::Id &id) const
+IVInterfaceProvided *IVModel::getProvidedInterface(const shared::Id &id) const
 {
-    return qobject_cast<AADLIfaceProvided *>(getObject(id));
+    return qobject_cast<IVInterfaceProvided *>(getObject(id));
 }
 
-AADLConnection *AADLModel::getConnection(const shared::Id &id) const
+IVConnection *IVModel::getConnection(const shared::Id &id) const
 {
-    return qobject_cast<AADLConnection *>(getObject(id));
+    return qobject_cast<IVConnection *>(getObject(id));
 }
 
-AADLComment *AADLModel::getCommentById(const shared::Id &id) const
+IVComment *IVModel::getCommentById(const shared::Id &id) const
 {
-    return qobject_cast<AADLComment *>(getObject(id));
+    return qobject_cast<IVComment *>(getObject(id));
 }
 
-AADLConnection *AADLModel::getConnectionForIface(const shared::Id &id) const
+IVConnection *IVModel::getConnectionForIface(const shared::Id &id) const
 {
     for (auto it = d->m_objects.constBegin(); it != d->m_objects.constEnd(); ++it) {
-        if (auto connection = qobject_cast<AADLConnection *>(it.value())) {
+        if (auto connection = qobject_cast<IVConnection *>(it.value())) {
             Q_ASSERT(connection->sourceInterface() != nullptr);
             Q_ASSERT(connection->targetInterface() != nullptr);
             if (connection->sourceInterface()->id() == id || connection->targetInterface()->id() == id)
@@ -351,18 +351,18 @@ AADLConnection *AADLModel::getConnectionForIface(const shared::Id &id) const
     return nullptr;
 }
 
-const QHash<shared::Id, AADLObject *> &AADLModel::objects() const
+const QHash<shared::Id, IVObject *> &IVModel::objects() const
 {
     return d->m_objects;
 }
 
-QVector<AADLConnection *> AADLModel::getConnectionsForIface(const shared::Id &id) const
+QVector<IVConnection *> IVModel::getConnectionsForIface(const shared::Id &id) const
 {
-    QVector<AADLConnection *> result;
+    QVector<IVConnection *> result;
 
     for (auto it = d->m_objects.cbegin(); it != d->m_objects.cend(); ++it)
-        if (it.value()->aadlType() == AADLObject::Type::Connection)
-            if (auto connection = qobject_cast<AADLConnection *>(it.value()))
+        if (it.value()->type() == IVObject::Type::Connection)
+            if (auto connection = qobject_cast<IVConnection *>(it.value()))
                 if ((connection->sourceInterface() && connection->sourceInterface()->id() == id)
                         || (connection->targetInterface() && connection->targetInterface()->id() == id))
                     result.append(connection);
@@ -370,16 +370,16 @@ QVector<AADLConnection *> AADLModel::getConnectionsForIface(const shared::Id &id
     return result;
 }
 
-QList<AADLObject *> AADLModel::visibleObjects() const
+QList<IVObject *> IVModel::visibleObjects() const
 {
     return d->m_visibleObjects;
 }
 
 //! Get the visible objects with this root id
-QList<AADLObject *> AADLModel::visibleObjects(shared::Id rootId) const
+QList<IVObject *> IVModel::visibleObjects(shared::Id rootId) const
 {
-    QList<AADLObject *> visibleObjects;
-    AADLObject *rootObj = d->m_objects.value(rootId);
+    QList<IVObject *> visibleObjects;
+    IVObject *rootObj = d->m_objects.value(rootId);
     for (const auto &id : d->m_objectsOrder) {
         if (auto obj = getObject(id)) {
             if (rootId.isNull()) {
@@ -390,11 +390,11 @@ QList<AADLObject *> AADLModel::visibleObjects(shared::Id rootId) const
             if (!obj->isConnection() && !obj->isConnectionGroup()
                     && (shared::isAncestorOf(rootObj, obj) || rootObj == nullptr)) {
                 visibleObjects.append(obj);
-            } else if (auto connection = qobject_cast<ivm::AADLConnection *>(obj)) {
+            } else if (auto connection = qobject_cast<ivm::IVConnection *>(obj)) {
                 const bool sourceIfaceAncestor =
-                        shared::isAncestorOf<ivm::AADLObject>(rootObj, connection->sourceInterface());
+                        shared::isAncestorOf<ivm::IVObject>(rootObj, connection->sourceInterface());
                 const bool targetIfaceAncestor =
-                        shared::isAncestorOf<ivm::AADLObject>(rootObj, connection->targetInterface());
+                        shared::isAncestorOf<ivm::IVObject>(rootObj, connection->targetInterface());
                 if ((sourceIfaceAncestor && targetIfaceAncestor) || rootObj == nullptr) {
                     visibleObjects.append(obj);
                 }
@@ -404,7 +404,7 @@ QList<AADLObject *> AADLModel::visibleObjects(shared::Id rootId) const
     return visibleObjects;
 }
 
-void AADLModel::clear()
+void IVModel::clear()
 {
     for (auto object : d->m_objects.values())
         object->deleteLater();
@@ -421,12 +421,12 @@ void AADLModel::clear()
    Returns the connection with the given \p interfaceName connection from function \p source to function \p target
    If no such connection is found, a nullptr is returned.
  */
-AADLConnection *AADLModel::getConnection(const QString &interfaceName, const QString &source, const QString &target,
+IVConnection *IVModel::getConnection(const QString &interfaceName, const QString &source, const QString &target,
         Qt::CaseSensitivity caseSensitivity) const
 {
-    for (AADLObject *obj : d->m_objects) {
+    for (IVObject *obj : d->m_objects) {
         if (obj->isConnection()) {
-            if (AADLConnection *connection = qobject_cast<AADLConnection *>(obj)) {
+            if (IVConnection *connection = qobject_cast<IVConnection *>(obj)) {
                 if (connection->targetInterfaceName().compare(interfaceName, caseSensitivity) == 0
                         && connection->sourceName().compare(source, caseSensitivity) == 0
                         && connection->targetName().compare(target, caseSensitivity) == 0) {
@@ -438,13 +438,13 @@ AADLConnection *AADLModel::getConnection(const QString &interfaceName, const QSt
     return nullptr;
 }
 
-static inline QVector<AADLFunctionType *> nestedFunctions(const AADLFunctionType *fnt)
+static inline QVector<IVFunctionType *> nestedFunctions(const IVFunctionType *fnt)
 {
     if (!fnt) {
         return {};
     }
 
-    QVector<AADLFunctionType *> children = fnt->functionTypes();
+    QVector<IVFunctionType *> children = fnt->functionTypes();
     for (const auto fn : fnt->functions()) {
         children.append(fn);
     }
@@ -454,12 +454,12 @@ static inline QVector<AADLFunctionType *> nestedFunctions(const AADLFunctionType
     return children;
 }
 
-QSet<QString> AADLModel::nestedFunctionNames(const AADLFunctionType *fnt) const
+QSet<QString> IVModel::nestedFunctionNames(const IVFunctionType *fnt) const
 {
     QSet<QString> names;
     if (!fnt) {
-        for (AADLObject *obj : d->m_objects) {
-            if (obj->aadlType() == AADLObject::Type::Function || obj->aadlType() == AADLObject::Type::FunctionType) {
+        for (IVObject *obj : d->m_objects) {
+            if (obj->type() == IVObject::Type::Function || obj->type() == IVObject::Type::FunctionType) {
                 names.insert(obj->title());
             }
         }
@@ -473,12 +473,12 @@ QSet<QString> AADLModel::nestedFunctionNames(const AADLFunctionType *fnt) const
     return names;
 }
 
-QSet<QStringList> AADLModel::nestedFunctionPaths(const AADLFunctionType *fnt) const
+QSet<QStringList> IVModel::nestedFunctionPaths(const IVFunctionType *fnt) const
 {
     QSet<QStringList> paths;
     if (!fnt) {
-        for (AADLObject *obj : d->m_objects) {
-            if (obj->aadlType() == AADLObject::Type::Function || obj->aadlType() == AADLObject::Type::FunctionType) {
+        for (IVObject *obj : d->m_objects) {
+            if (obj->type() == IVObject::Type::Function || obj->type() == IVObject::Type::FunctionType) {
                 paths.insert(obj->path());
             }
         }

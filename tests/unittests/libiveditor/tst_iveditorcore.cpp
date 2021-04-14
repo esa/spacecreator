@@ -15,11 +15,11 @@
    along with this program. If not, see <https://www.gnu.org/licenses/lgpl-2.1.html>.
 */
 
-#include "aadlconnection.h"
-#include "aadlfunction.h"
-#include "aadliface.h"
-#include "aadlmodel.h"
-#include "aadltestutils.h"
+#include "ivconnection.h"
+#include "ivfunction.h"
+#include "ivinterface.h"
+#include "ivmodel.h"
+#include "ivtestutils.h"
 #include "interface/interfacedocument.h"
 #include "iveditor.h"
 #include "iveditorcore.h"
@@ -68,28 +68,28 @@ void tst_IVEditorCore::test_addConnection()
     ivCore->addFunction("f2");
     bool ok = ivCore->addConnection("m1", "f1", "f2");
     QCOMPARE(ok, true);
-    QVector<ivm::AADLConnection *> connections =
-            ivCore->document()->objectsModel()->allObjectsByType<ivm::AADLConnection>();
+    QVector<ivm::IVConnection *> connections =
+            ivCore->document()->objectsModel()->allObjectsByType<ivm::IVConnection>();
     QCOMPARE(connections.size(), 1);
     QCOMPARE(connections[0]->parentObject(), nullptr); // placed at root level
 }
 
 void tst_IVEditorCore::test_addConnectionFromEnv()
 {
-    ivm::AADLModel *aadlModel = ivCore->document()->objectsModel();
+    ivm::IVModel *aadlModel = ivCore->document()->objectsModel();
     ivCore->addFunction("f1");
     bool ok = ivCore->addConnection("m1", "", "f1");
     QCOMPARE(ok, true);
-    QVector<ivm::AADLConnection *> connections = aadlModel->allObjectsByType<ivm::AADLConnection>();
+    QVector<ivm::IVConnection *> connections = aadlModel->allObjectsByType<ivm::IVConnection>();
     QCOMPARE(connections.size(), 0);
 
-    QVector<ivm::AADLIface *> interfaces = aadlModel->allObjectsByType<ivm::AADLIface>();
+    QVector<ivm::IVInterface *> interfaces = aadlModel->allObjectsByType<ivm::IVInterface>();
     QCOMPARE(interfaces.size(), 1);
 
     // Adding it again, fails
     ok = ivCore->addConnection("m1", "", "f1");
     QCOMPARE(ok, false);
-    interfaces = aadlModel->allObjectsByType<ivm::AADLIface>();
+    interfaces = aadlModel->allObjectsByType<ivm::IVInterface>();
     QCOMPARE(interfaces.size(), 1);
 }
 
@@ -119,16 +119,16 @@ void tst_IVEditorCore::test_addConnectionFails()
 
 void tst_IVEditorCore::test_renameAadlConnection()
 {
-    ivm::AADLFunction *funcF1 = ivCore->addFunction("f1");
-    ivm::AADLFunction *funcF2 = ivCore->addFunction("f2");
-    ivm::AADLConnection *connection = ivm::testutils::createConnection(funcF1, funcF2, "init");
+    ivm::IVFunction *funcF1 = ivCore->addFunction("f1");
+    ivm::IVFunction *funcF2 = ivCore->addFunction("f2");
+    ivm::IVConnection *connection = ivm::testutils::createConnection(funcF1, funcF2, "init");
 
     bool ok = ivCore->renameAadlConnection("init", "doIt", "f1", "f2");
     QCOMPARE(ok, true);
     QCOMPARE(connection->name(), "doIt");
 
     // cyclic interface only
-    ivm::AADLIface *interface = ivCore->addInterface("push", "f2");
+    ivm::IVInterface *interface = ivCore->addInterface("push", "f2");
     ok = ivCore->renameAadlConnection("push", "call", "", "f2");
     QCOMPARE(ok, true);
     QCOMPARE(interface->title(), "call");
@@ -136,38 +136,38 @@ void tst_IVEditorCore::test_renameAadlConnection()
 
 void tst_IVEditorCore::test_addToNestedConnection()
 {
-    ivm::AADLFunction *funcF1 = ivCore->addFunction("f1");
+    ivm::IVFunction *funcF1 = ivCore->addFunction("f1");
     ivCore->addFunction("f1a", funcF1);
     bool ok = ivCore->addConnection("m1", "f1", "f1a");
     QCOMPARE(ok, true);
-    QVector<ivm::AADLConnection *> connections =
-            ivCore->document()->objectsModel()->allObjectsByType<ivm::AADLConnection>();
+    QVector<ivm::IVConnection *> connections =
+            ivCore->document()->objectsModel()->allObjectsByType<ivm::IVConnection>();
     QCOMPARE(connections.size(), 1);
     QCOMPARE(connections[0]->parentObject(), funcF1); // placed as child of "f1"
 }
 
 void tst_IVEditorCore::test_addFromNestedConnection()
 {
-    ivm::AADLFunction *funcF1 = ivCore->addFunction("f1");
+    ivm::IVFunction *funcF1 = ivCore->addFunction("f1");
     ivCore->addFunction("f1a", funcF1);
     bool ok = ivCore->addConnection("m1", "f1a", "f1");
     QCOMPARE(ok, true);
-    QVector<ivm::AADLConnection *> connections =
-            ivCore->document()->objectsModel()->allObjectsByType<ivm::AADLConnection>();
+    QVector<ivm::IVConnection *> connections =
+            ivCore->document()->objectsModel()->allObjectsByType<ivm::IVConnection>();
     QCOMPARE(connections.size(), 1);
     QCOMPARE(connections[0]->parentObject(), funcF1); // placed as child of "f1"
 }
 
 void tst_IVEditorCore::test_addRootToNestedConnections()
 {
-    ivm::AADLFunction *funcF1 = ivCore->addFunction("f1");
+    ivm::IVFunction *funcF1 = ivCore->addFunction("f1");
     ivCore->addFunction("f1a", funcF1);
-    ivm::AADLFunction *funcF2 = ivCore->addFunction("f2");
+    ivm::IVFunction *funcF2 = ivCore->addFunction("f2");
     ivCore->addFunction("f2a", funcF2);
     bool ok = ivCore->addConnection("m1", "f1a", "f2a");
     QCOMPARE(ok, true);
-    QVector<ivm::AADLConnection *> connections =
-            ivCore->document()->objectsModel()->allObjectsByType<ivm::AADLConnection>();
+    QVector<ivm::IVConnection *> connections =
+            ivCore->document()->objectsModel()->allObjectsByType<ivm::IVConnection>();
     QCOMPARE(connections.size(), 3);
 }
 
@@ -178,13 +178,13 @@ void tst_IVEditorCore::test_addToExistingInterface()
     ivCore->addFunction("f3");
     bool ok = ivCore->addConnection("m1", "f1", "f2");
     QCOMPARE(ok, true);
-    QVector<ivm::AADLConnection *> connections =
-            ivCore->document()->objectsModel()->allObjectsByType<ivm::AADLConnection>();
+    QVector<ivm::IVConnection *> connections =
+            ivCore->document()->objectsModel()->allObjectsByType<ivm::IVConnection>();
     QCOMPARE(connections.size(), 1);
 
     ok = ivCore->addConnection("m1", "f3", "f2");
     QCOMPARE(ok, true);
-    connections = ivCore->document()->objectsModel()->allObjectsByType<ivm::AADLConnection>();
+    connections = ivCore->document()->objectsModel()->allObjectsByType<ivm::IVConnection>();
     QCOMPARE(connections.size(), 2);
 }
 

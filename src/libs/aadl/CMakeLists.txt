@@ -5,36 +5,36 @@ add_library(${LIB_NAME} STATIC)
 target_sources(${LIB_NAME} PRIVATE
     aadlcommonprops.cpp
     aadlcommonprops.h
-    aadlconnectionchain.cpp
-    aadlconnectionchain.h
-    aadlinterfacechain.cpp
-    aadlinterfacechain.h
-    aadlnamevalidator.cpp
-    aadlnamevalidator.h
-    aadlobject.cpp
-    aadlobject.h
-    aadlcomment.cpp
-    aadlcomment.h
-    aadlconnection.cpp
-    aadlconnection.h
-    aadlconnectiongroup.cpp
-    aadlconnectiongroup.h
-    aadlfunction.cpp
-    aadlfunction.h
-    aadlfunctiontype.cpp
-    aadlfunctiontype.h
-    aadliface.cpp
-    aadliface.h
-    aadlifacegroup.cpp
-    aadlifacegroup.h
-    aadlmodel.cpp
-    aadlmodel.h
-    aadlparameter.cpp
-    aadlparameter.h
-    aadltestutils.cpp
-    aadltestutils.h
-    aadlxmlreader.cpp
-    aadlxmlreader.h
+    ivconnectionchain.cpp
+    ivconnectionchain.h
+    ivinterfacechain.cpp
+    ivinterfacechain.h
+    ivnamevalidator.cpp
+    ivnamevalidator.h
+    ivobject.cpp
+    ivobject.h
+    ivcomment.cpp
+    ivcomment.h
+    ivconnection.cpp
+    ivconnection.h
+    ivconnectiongroup.cpp
+    ivconnectiongroup.h
+    ivfunction.cpp
+    ivfunction.h
+    ivfunctiontype.cpp
+    ivfunctiontype.h
+    ivinterface.cpp
+    ivinterface.h
+    ivinterfacegroup.cpp
+    ivinterfacegroup.h
+    ivmodel.cpp
+    ivmodel.h
+    parameter.cpp
+    parameter.h
+    ivtestutils.cpp
+    ivtestutils.h
+    ivxmlreader.cpp
+    ivxmlreader.h
     connectioncreationvalidator.cpp
     connectioncreationvalidator.h
     propertytemplate.cpp

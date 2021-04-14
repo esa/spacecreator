@@ -24,8 +24,8 @@
 #include <QVector>
 
 namespace ivm {
-class AADLConnectionChain;
-class AADLConnection;
+class IVConnectionChain;
+class IVConnection;
 }
 
 namespace msc {
@@ -93,8 +93,8 @@ public:
     static Dataflow readDataflow(const QString &file, bool isFile);
     static Dataflow readDataFlowFromDocument(msc::MscDocument *document);
 
-    static bool isInDataflow(const Dataflow &dataflow, const QList<ivm::AADLConnectionChain *> &chains,
-            ivm::AADLConnection *connection);
+    static bool isInDataflow(const Dataflow &dataflow, const QList<ivm::IVConnectionChain *> &chains,
+            ivm::IVConnection *connection);
 
 Q_SIGNALS:
     void pathChanged(const QString &path);

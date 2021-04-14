@@ -17,7 +17,7 @@
 
 #include "aadlutils.h"
 
-#include "aadlobject.h"
+#include "ivobject.h"
 #include "asn1/definitions.h"
 #include "asn1/file.h"
 #include "connectioncreationvalidator.h"
@@ -372,24 +372,24 @@ QRectF adjustFromPoint(const QPointF &pos, const qreal &adjustment)
     return QRectF { pos - adjustmentPoint, pos + adjustmentPoint };
 }
 
-qreal itemLevel(const ivm::AADLObject *const object, bool itemSelected)
+qreal itemLevel(const ivm::IVObject *const object, bool itemSelected)
 {
     if (!object || itemSelected) {
         return ZOrder.Selected;
     }
 
-    switch (object->aadlType()) {
-    case ivm::AADLObject::Type::Function:
-    case ivm::AADLObject::Type::FunctionType:
+    switch (object->type()) {
+    case ivm::IVObject::Type::Function:
+    case ivm::IVObject::Type::FunctionType:
         return ZOrder.Function;
-    case ivm::AADLObject::Type::InterfaceGroup:
-    case ivm::AADLObject::Type::RequiredInterface:
-    case ivm::AADLObject::Type::ProvidedInterface:
+    case ivm::IVObject::Type::InterfaceGroup:
+    case ivm::IVObject::Type::RequiredInterface:
+    case ivm::IVObject::Type::ProvidedInterface:
         return ZOrder.Interface;
-    case ivm::AADLObject::Type::Comment:
+    case ivm::IVObject::Type::Comment:
         return ZOrder.Comment;
-    case ivm::AADLObject::Type::ConnectionGroup:
-    case ivm::AADLObject::Type::Connection:
+    case ivm::IVObject::Type::ConnectionGroup:
+    case ivm::IVObject::Type::Connection:
         return ZOrder.Connection;
     default:
         return ZOrder.Selected;
@@ -860,21 +860,21 @@ bool comparePolygones(const QVector<QPointF> &v1, const QVector<QPointF> &v2)
     return true;
 }
 
-int nestingLevel(ivm::AADLObject *object)
+int nestingLevel(ivm::IVObject *object)
 {
     if (!object)
         return -1;
 
-    if (object->aadlType() == ivm::AADLObject::Type::InterfaceGroup
-            || object->aadlType() == ivm::AADLObject::Type::ProvidedInterface
-            || object->aadlType() == ivm::AADLObject::Type::RequiredInterface) {
+    if (object->type() == ivm::IVObject::Type::InterfaceGroup
+            || object->type() == ivm::IVObject::Type::ProvidedInterface
+            || object->type() == ivm::IVObject::Type::RequiredInterface) {
         object = object->parentObject();
     }
 
     int level = 0;
     while (auto parentObject = object->parentObject()) {
-        if ((parentObject->aadlType() == ivm::AADLObject::Type::Function
-                    || parentObject->aadlType() == ivm::AADLObject::Type::FunctionType)) {
+        if ((parentObject->type() == ivm::IVObject::Type::Function
+                    || parentObject->type() == ivm::IVObject::Type::FunctionType)) {
             ++level;
         }
         object = parentObject;

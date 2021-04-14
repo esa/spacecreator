@@ -27,9 +27,9 @@
 
 namespace ivm {
 
-struct AADLObjectPrivate;
-class AADLModel;
-class AADLObject : public QObject
+struct IVObjectPrivate;
+class IVModel;
+class IVObject : public QObject
 {
     Q_OBJECT
     Q_PROPERTY(QString title READ title WRITE setTitle NOTIFY titleChanged)
@@ -51,24 +51,24 @@ public:
     };
     Q_ENUM(Type)
 
-    explicit AADLObject(const AADLObject::Type t, const QString &title = QString(), QObject *parent = nullptr,
+    explicit IVObject(const IVObject::Type t, const QString &title = QString(), QObject *parent = nullptr,
             const shared::Id &id = shared::InvalidId);
-    virtual ~AADLObject();
+    virtual ~IVObject();
 
     QString title() const;
     QString titleUI() const;
     shared::Id id() const;
 
-    AADLObject::Type aadlType() const;
+    IVObject::Type type() const;
 
     QVector<qint32> coordinates() const;
     void setCoordinates(const QVector<qint32> &coordinates);
     meta::Props::Token coordinatesType() const;
 
     QStringList path() const;
-    static QStringList path(const AADLObject *obj);
+    static QStringList path(const IVObject *obj);
 
-    AADLObject *parentObject() const;
+    IVObject *parentObject() const;
     bool isFunction() const;
     bool isFunctionType() const;
     bool isInterfaceGroup() const;
@@ -106,8 +106,8 @@ public:
     bool hasProperty(const QString &propertyName, const QVariant &value = QVariant()) const;
     bool hasProperties(const QHash<QString, QVariant> &props) const;
 
-    void setObjectsModel(AADLModel *model);
-    AADLModel *objectsModel() const;
+    void setObjectsModel(IVModel *model);
+    IVModel *model() const;
 
     bool isRootObject() const;
 
@@ -131,7 +131,7 @@ public:
         return qobject_cast<const T>(this);
     }
 
-    static void sortObjectList(QList<ivm::AADLObject *> &objects);
+    static void sortObjectList(QList<ivm::IVObject *> &objects);
     static QVector<qint32> coordinatesFromString(const QString &strCoordinates);
     static QString coordinatesToString(const QVector<qint32> &coordinates);
 
@@ -147,13 +147,13 @@ Q_SIGNALS:
 
 public Q_SLOTS:
     bool setTitle(const QString &title);
-    bool setParentObject(ivm::AADLObject *parentObject);
+    bool setParentObject(ivm::IVObject *parentObject);
 
 private:
-    const std::unique_ptr<AADLObjectPrivate> d;
+    const std::unique_ptr<IVObjectPrivate> d;
 };
 
-inline uint qHash(const AADLObject::Type &key, uint seed)
+inline uint qHash(const IVObject::Type &key, uint seed)
 {
     return ::qHash(static_cast<uint>(key), seed);
 }

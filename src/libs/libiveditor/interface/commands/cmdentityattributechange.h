@@ -24,9 +24,9 @@
 #include <QPointer>
 
 namespace ivm {
-class AADLObject;
-class AADLFunction;
-class AADLFunctionType;
+class IVObject;
+class IVFunction;
+class IVFunctionType;
 }
 
 namespace ive {
@@ -37,7 +37,7 @@ class CmdEntityAttributeChange : public shared::UndoCommand
     Q_OBJECT
 
 public:
-    explicit CmdEntityAttributeChange(ivm::AADLObject *entity, const QVariantHash &attrs);
+    explicit CmdEntityAttributeChange(ivm::IVObject *entity, const QVariantHash &attrs);
     ~CmdEntityAttributeChange() override;
 
     void redo() override;
@@ -45,11 +45,11 @@ public:
     int id() const override;
 
 Q_SIGNALS:
-    void nameChanged(ivm::AADLObject *entity, const QString &oldName, shared::UndoCommand *command);
+    void nameChanged(ivm::IVObject *entity, const QString &oldName, shared::UndoCommand *command);
 
 private:
-    QPointer<ivm::AADLObject> m_entity;
-    ivm::AADLFunction *m_function { nullptr };
+    QPointer<ivm::IVObject> m_entity;
+    ivm::IVFunction *m_function { nullptr };
 
     const QVariantHash m_newAttrs;
     const QVariantHash m_oldAttrs;
@@ -58,14 +58,14 @@ private:
     QHash<shared::Id, QVector<QUndoCommand *>> m_cmdUnset;
 
     void setAttrs(const QVariantHash &attrs, bool isRedo);
-    ivm::AADLFunctionType *functionTypeByName(const QString &name) const;
+    ivm::IVFunctionType *functionTypeByName(const QString &name) const;
     void handleFunctionInstanceOf(const QVariant &attr, bool isRedo);
 
-    QVector<QUndoCommand *> commandsUnsetPrevFunctionType(const ivm::AADLFunctionType *fnType);
-    QVector<QUndoCommand *> commandsSetNewFunctionType(const ivm::AADLFunctionType *fnType);
+    QVector<QUndoCommand *> commandsUnsetPrevFunctionType(const ivm::IVFunctionType *fnType);
+    QVector<QUndoCommand *> commandsSetNewFunctionType(const ivm::IVFunctionType *fnType);
 
-    void prepareUnsetFunctionTypeCommands(const ivm::AADLFunctionType *fnType);
-    void prepareSetFunctionTypeCommands(const ivm::AADLFunctionType *fnType);
+    void prepareUnsetFunctionTypeCommands(const ivm::IVFunctionType *fnType);
+    void prepareSetFunctionTypeCommands(const ivm::IVFunctionType *fnType);
 };
 
 }

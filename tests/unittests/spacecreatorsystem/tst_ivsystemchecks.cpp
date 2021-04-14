@@ -15,10 +15,10 @@
    along with this program. If not, see <https://www.gnu.org/licenses/lgpl-2.1.html>.
 */
 
-#include "aadlconnection.h"
-#include "aadlfunction.h"
-#include "aadlmodel.h"
-#include "aadltestutils.h"
+#include "ivconnection.h"
+#include "ivfunction.h"
+#include "ivmodel.h"
+#include "ivtestutils.h"
 #include "baseitems/common/coordinatesconverter.h"
 #include "chartitem.h"
 #include "commandsstack.h"
@@ -108,8 +108,8 @@ void tst_IvSystemChecks::testCheckInstanceNames()
 
     // Add function with different name
     ive::InterfaceDocument *doc = ivPlugin->document();
-    ivm::AADLModel *aadlModel = doc->objectsModel();
-    auto aadlFnct = new ivm::AADLFunction("init");
+    ivm::IVModel *aadlModel = doc->objectsModel();
+    auto aadlFnct = new ivm::IVFunction("init");
     aadlModel->addObject(aadlFnct);
     result = m_checker->checkInstanceNames();
     QCOMPARE(result.size(), 1);
@@ -152,10 +152,10 @@ void tst_IvSystemChecks::testCheckInstanceRelations()
 
     // Add function for the instances
     ive::InterfaceDocument *doc = ivPlugin->document();
-    ivm::AADLModel *aadlModel = doc->objectsModel();
-    auto function1 = new ivm::AADLFunction("init");
+    ivm::IVModel *aadlModel = doc->objectsModel();
+    auto function1 = new ivm::IVFunction("init");
     aadlModel->addObject(function1);
-    auto function2 = new ivm::AADLFunction("reset");
+    auto function2 = new ivm::IVFunction("reset");
     aadlModel->addObject(function2);
     result = m_checker->checkInstanceRelations();
     QCOMPARE(result.size(), 0);
@@ -166,7 +166,7 @@ void tst_IvSystemChecks::testCheckInstanceRelations()
     QCOMPARE(result.size(), 2);
 
     // Make function2 be nested by function1 via another one
-    auto function15 = new ivm::AADLFunction("init");
+    auto function15 = new ivm::IVFunction("init");
     aadlModel->addObject(function15);
     function15->setParent(function1);
     function2->setParent(function15);
@@ -201,20 +201,20 @@ void tst_IvSystemChecks::testCheckMessageNames()
 
     // Add function with different source/target
     ive::InterfaceDocument *doc = ivPlugin->document();
-    ivm::AADLModel *aadlModel = doc->objectsModel();
-    auto aadlfFuncA = new ivm::AADLFunction("Instance A");
+    ivm::IVModel *aadlModel = doc->objectsModel();
+    auto aadlfFuncA = new ivm::IVFunction("Instance A");
     aadlModel->addObject(aadlfFuncA);
-    auto aadlfFuncB = new ivm::AADLFunction("Instance B");
+    auto aadlfFuncB = new ivm::IVFunction("Instance B");
     aadlModel->addObject(aadlfFuncB);
 
-    ivm::AADLIface *requiredInterface =
-            ivm::testutils::createIface(aadlfFuncA, ivm::AADLIface::IfaceType::Required, "DummyA");
+    ivm::IVInterface *requiredInterface =
+            ivm::testutils::createIface(aadlfFuncA, ivm::IVInterface::InterfaceType::Required, "DummyA");
     aadlModel->addObject(requiredInterface);
 
-    ivm::AADLIface *providedInterface =
-            ivm::testutils::createIface(aadlfFuncB, ivm::AADLIface::IfaceType::Provided, "DummyB");
+    ivm::IVInterface *providedInterface =
+            ivm::testutils::createIface(aadlfFuncB, ivm::IVInterface::InterfaceType::Provided, "DummyB");
     aadlModel->addObject(providedInterface);
-    aadlModel->addObject(new ivm::AADLConnection(requiredInterface, providedInterface));
+    aadlModel->addObject(new ivm::IVConnection(requiredInterface, providedInterface));
     result = m_checker->checkMessages();
     QCOMPARE(result.size(), 1);
 
@@ -229,27 +229,27 @@ void tst_IvSystemChecks::testCorrespondMessage_data()
     using namespace ivm;
     QTest::addColumn<QString>("sourceFuncName");
     QTest::addColumn<QString>("sourceIfName");
-    QTest::addColumn<AADLIface::IfaceType>("sourceIfType");
+    QTest::addColumn<IVInterface::InterfaceType>("sourceIfType");
     QTest::addColumn<QString>("targetFuncName");
     QTest::addColumn<QString>("targetIfName");
-    QTest::addColumn<AADLIface::IfaceType>("targetIfType");
+    QTest::addColumn<IVInterface::InterfaceType>("targetIfType");
     QTest::addColumn<bool>("expected");
 
     QTest::newRow("Correct") << "A"
-                             << "msg" << AADLIface::IfaceType::Required << "B"
-                             << "msg" << AADLIface::IfaceType::Provided << true;
+                             << "msg" << IVInterface::InterfaceType::Required << "B"
+                             << "msg" << IVInterface::InterfaceType::Provided << true;
     QTest::newRow("Source IF name ignored") << "A"
-                                            << "IGNORED" << AADLIface::IfaceType::Required << "B"
-                                            << "msg" << AADLIface::IfaceType::Provided << true;
+                                            << "IGNORED" << IVInterface::InterfaceType::Required << "B"
+                                            << "msg" << IVInterface::InterfaceType::Provided << true;
     QTest::newRow("From name wrong") << "ERROR"
-                                     << "msg" << AADLIface::IfaceType::Required << "B"
-                                     << "msg" << AADLIface::IfaceType::Provided << false;
+                                     << "msg" << IVInterface::InterfaceType::Required << "B"
+                                     << "msg" << IVInterface::InterfaceType::Provided << false;
     QTest::newRow("To name wrong") << "A"
-                                   << "msg" << AADLIface::IfaceType::Required << "ERROR"
-                                   << "msg" << AADLIface::IfaceType::Provided << false;
+                                   << "msg" << IVInterface::InterfaceType::Required << "ERROR"
+                                   << "msg" << IVInterface::InterfaceType::Provided << false;
     QTest::newRow("Source/targe flip irgnored") << "B"
-                                                << "msg" << AADLIface::IfaceType::Provided << "A"
-                                                << "msg" << AADLIface::IfaceType::Required << true;
+                                                << "msg" << IVInterface::InterfaceType::Provided << "A"
+                                                << "msg" << IVInterface::InterfaceType::Required << true;
 }
 
 void tst_IvSystemChecks::testCorrespondMessage()
@@ -257,10 +257,10 @@ void tst_IvSystemChecks::testCorrespondMessage()
     using namespace ivm;
     QFETCH(QString, sourceFuncName);
     QFETCH(QString, sourceIfName);
-    QFETCH(AADLIface::IfaceType, sourceIfType);
+    QFETCH(IVInterface::InterfaceType, sourceIfType);
     QFETCH(QString, targetFuncName);
     QFETCH(QString, targetIfName);
-    QFETCH(AADLIface::IfaceType, targetIfType);
+    QFETCH(IVInterface::InterfaceType, targetIfType);
     QFETCH(bool, expected);
 
     // Setup message "msg" from "A" to "B"
@@ -271,11 +271,11 @@ void tst_IvSystemChecks::testCorrespondMessage()
     message->setTargetInstance(instanceTo.get());
 
     // Setup the connection
-    auto sourceFunc = std::make_unique<AADLFunction>(sourceFuncName);
-    auto targetFunc = std::make_unique<AADLFunction>(targetFuncName);
-    std::unique_ptr<AADLIface> sourceIf(ivm::testutils::createIface(sourceFunc.get(), sourceIfType, sourceIfName));
-    std::unique_ptr<AADLIface> targetIf(ivm::testutils::createIface(targetFunc.get(), targetIfType, targetIfName));
-    auto connection = std::make_unique<AADLConnection>(sourceIf.get(), targetIf.get());
+    auto sourceFunc = std::make_unique<IVFunction>(sourceFuncName);
+    auto targetFunc = std::make_unique<IVFunction>(targetFuncName);
+    std::unique_ptr<IVInterface> sourceIf(ivm::testutils::createIface(sourceFunc.get(), sourceIfType, sourceIfName));
+    std::unique_ptr<IVInterface> targetIf(ivm::testutils::createIface(targetFunc.get(), targetIfType, targetIfName));
+    auto connection = std::make_unique<IVConnection>(sourceIf.get(), targetIf.get());
 
     const bool doCorrespond = m_checker->correspond(connection.get(), message.get());
     QCOMPARE(doCorrespond, expected);
@@ -306,12 +306,12 @@ void tst_IvSystemChecks::testCheckMessage()
 
     // Create corresponding aadl model
     ive::InterfaceDocument *doc = ivPlugin->document();
-    ivm::AADLModel *aadlModel = doc->objectsModel();
-    auto sourceFunc = new ivm::AADLFunction("Dummy1");
+    ivm::IVModel *aadlModel = doc->objectsModel();
+    auto sourceFunc = new ivm::IVFunction("Dummy1");
     aadlModel->addObject(sourceFunc);
-    auto targetFunc = new ivm::AADLFunction("Dummy2");
+    auto targetFunc = new ivm::IVFunction("Dummy2");
     aadlModel->addObject(targetFunc);
-    ivm::AADLConnection *connection = ivm::testutils::createConnection(sourceFunc, targetFunc, "Msg1");
+    ivm::IVConnection *connection = ivm::testutils::createConnection(sourceFunc, targetFunc, "Msg1");
     QCOMPARE(m_checker->checkMessage(message), true);
     aadlModel->removeObject(connection);
     delete connection;
@@ -326,10 +326,10 @@ void tst_IvSystemChecks::testCheckMessage()
     chart->addInstanceEvent(message1);
     QCOMPARE(m_checker->checkMessage(message1), false);
     // Default interface is not ok
-    ivm::AADLIface *if1 = ivm::testutils::createIface(sourceFunc, ivm::AADLIface::IfaceType::Provided, "Env1");
+    ivm::IVInterface *if1 = ivm::testutils::createIface(sourceFunc, ivm::IVInterface::InterfaceType::Provided, "Env1");
     QCOMPARE(m_checker->checkMessage(message1), false);
     // interface type has to be "cyclic"
-    if1->setKind(ivm::AADLIface::OperationKind::Cyclic);
+    if1->setKind(ivm::IVInterface::OperationKind::Cyclic);
     QCOMPARE(m_checker->checkMessage(message1), true);
 }
 

@@ -17,10 +17,10 @@
 
 #include "cmdentitiesimport.h"
 
-#include "aadlfunctiontype.h"
-#include "aadlmodel.h"
-#include "aadlnamevalidator.h"
-#include "aadlxmlreader.h"
+#include "ivfunctiontype.h"
+#include "ivmodel.h"
+#include "ivnamevalidator.h"
+#include "ivxmlreader.h"
 #include "baseitems/common/aadlutils.h"
 #include "commandids.h"
 #include "xmldocexporter.h"
@@ -35,16 +35,16 @@
 namespace ive {
 namespace cmd {
 
-CmdEntitiesImport::CmdEntitiesImport(const QByteArray &data, ivm::AADLFunctionType *parent, ivm::AADLModel *model,
+CmdEntitiesImport::CmdEntitiesImport(const QByteArray &data, ivm::IVFunctionType *parent, ivm::IVModel *model,
         const QPointF &pos, const QString &destPath)
     : QUndoCommand()
     , m_model(model)
     , m_parent(parent)
     , m_destPath(destPath)
 {
-    ivm::AADLXMLReader parser;
-    QObject::connect(&parser, &ivm::AADLXMLReader::objectsParsed, m_model,
-            [this, pos, parent](const QVector<ivm::AADLObject *> &objects) {
+    ivm::IVXMLReader parser;
+    QObject::connect(&parser, &ivm::IVXMLReader::objectsParsed, m_model,
+            [this, pos, parent](const QVector<ivm::IVObject *> &objects) {
                 static const QPointF outOfScene { std::numeric_limits<qreal>::max(),
                     std::numeric_limits<qreal>::max() };
                 QPointF basePoint { outOfScene };
@@ -56,7 +56,7 @@ CmdEntitiesImport::CmdEntitiesImport(const QByteArray &data, ivm::AADLFunctionTy
                     }
                     if (functionNames.contains(obj->title())) {
                         obj->removeAttr(ivm::meta::Props::token(ivm::meta::Props::Token::name));
-                        obj->setTitle(ivm::AADLNameValidator::nextNameFor(obj));
+                        obj->setTitle(ivm::IVNameValidator::nextNameFor(obj));
                     }
                     QVector<QPointF> coordinates = ive::polygon(obj->coordinates());
                     std::for_each(coordinates.cbegin(), coordinates.cend(), [&basePoint](const QPointF &point) {
@@ -80,14 +80,14 @@ CmdEntitiesImport::CmdEntitiesImport(const QByteArray &data, ivm::AADLFunctionTy
                     m_importedEntities.append(obj);
                 }
             });
-    QObject::connect(&parser, &ivm::AADLXMLReader::error, [](const QString &msg) { qWarning() << msg; });
+    QObject::connect(&parser, &ivm::IVXMLReader::error, [](const QString &msg) { qWarning() << msg; });
     parser.read(data);
 }
 
 CmdEntitiesImport::~CmdEntitiesImport()
 {
-    const QVector<QPointer<ivm::AADLObject>> &objects = m_rootEntities;
-    for (ivm::AADLObject *obj : objects) {
+    const QVector<QPointer<ivm::IVObject>> &objects = m_rootEntities;
+    for (ivm::IVObject *obj : objects) {
         if (obj && !obj->parent()) {
             delete obj;
         }
@@ -100,14 +100,14 @@ void CmdEntitiesImport::redo()
         return;
     }
 
-    QVector<ivm::AADLObject *> entities;
+    QVector<ivm::IVObject *> entities;
     if (m_parent) {
-        for (ivm::AADLObject *entity : qAsConst(m_rootEntities)) {
+        for (ivm::IVObject *entity : qAsConst(m_rootEntities)) {
             m_parent->addChild(entity);
         }
     }
 
-    for (ivm::AADLObject *entity : qAsConst(m_importedEntities)) {
+    for (ivm::IVObject *entity : qAsConst(m_importedEntities)) {
         Q_ASSERT(entity);
         if (entity) {
             entities.append(entity);
@@ -149,9 +149,9 @@ int CmdEntitiesImport::id() const
     return ImportEntities;
 }
 
-void CmdEntitiesImport::redoSourceCloning(const ivm::AADLObject *object)
+void CmdEntitiesImport::redoSourceCloning(const ivm::IVObject *object)
 {
-    if (!object || object->aadlType() != ivm::AADLObject::Type::Function) {
+    if (!object || object->type() != ivm::IVObject::Type::Function) {
         return;
     }
 
@@ -162,9 +162,9 @@ void CmdEntitiesImport::redoSourceCloning(const ivm::AADLObject *object)
     shared::copyDir(sourcePath, destPath);
 }
 
-void CmdEntitiesImport::undoSourceCloning(const ivm::AADLObject *object)
+void CmdEntitiesImport::undoSourceCloning(const ivm::IVObject *object)
 {
-    if (!object || object->aadlType() != ivm::AADLObject::Type::Function) {
+    if (!object || object->type() != ivm::IVObject::Type::Function) {
         return;
     }
     const QString subPath = relativePathForObject(object);
@@ -175,7 +175,7 @@ void CmdEntitiesImport::undoSourceCloning(const ivm::AADLObject *object)
     destDir.removeRecursively();
 }
 
-QString CmdEntitiesImport::relativePathForObject(const ivm::AADLObject *object) const
+QString CmdEntitiesImport::relativePathForObject(const ivm::IVObject *object) const
 {
     return QStringLiteral("work/%1").arg(object->title()).toLower();
 }

@@ -15,19 +15,19 @@
   along with this program. If not, see <https://www.gnu.org/licenses/lgpl-2.1.html>.
 */
 
-#include "aadlcomment.h"
+#include "ivcomment.h"
 
-#include "aadlfunctiontype.h"
+#include "ivfunctiontype.h"
 
 namespace ivm {
 
-AADLComment::AADLComment(const QString &title, QObject *parent)
-    : AADLObject(AADLObject::Type::Comment, title, parent)
+IVComment::IVComment(const QString &title, QObject *parent)
+    : IVObject(IVObject::Type::Comment, title, parent)
 {
-    if (AADLFunctionType *root = qobject_cast<AADLFunctionType *>(parent))
+    if (IVFunctionType *root = qobject_cast<IVFunctionType *>(parent))
         root->addChild(this);
 }
 
-AADLComment::~AADLComment() { }
+IVComment::~IVComment() { }
 
 }

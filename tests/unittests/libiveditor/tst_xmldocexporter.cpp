@@ -15,10 +15,10 @@
    along with this program. If not, see <https://www.gnu.org/licenses/lgpl-2.1.html>.
 */
 
-#include "aadlcomment.h"
-#include "aadlfunction.h"
+#include "ivcomment.h"
+#include "ivfunction.h"
 #include "aadllibrary.h"
-#include "aadlparameter.h"
+#include "parameter.h"
 #include "asn1modelstorage.h"
 #include "interface/interfacedocument.h"
 #include "iveditor.h"
@@ -159,13 +159,13 @@ void tst_XmlDocExporter::testExportEmptyDoc()
 
 void tst_XmlDocExporter::testExportFunctions()
 {
-    auto testfunc1 = new ivm::AADLFunction("TestFunc1", m_doc.get());
+    auto testfunc1 = new ivm::IVFunction("TestFunc1", m_doc.get());
     testfunc1->setAttr("foo", QVariant::fromValue(11));
     testfunc1->setProp("bar", QVariant::fromValue(22));
     testfunc1->addContextParam(
             ivm::ContextParameter("Mo", ivm::BasicParameter::Type::Other, "MyInt", QVariant::fromValue(33)));
 
-    QVector<ivm::AADLObject *> objects;
+    QVector<ivm::IVObject *> objects;
     objects.append(testfunc1);
     m_doc->setObjects(objects);
 
@@ -183,11 +183,11 @@ void tst_XmlDocExporter::testExportFunctions()
 
 void tst_XmlDocExporter::testExportComment()
 {
-    auto testcomment1 = new ivm::AADLComment("TestComment1", m_doc.get());
+    auto testcomment1 = new ivm::IVComment("TestComment1", m_doc.get());
     testcomment1->setAttr("foo", QVariant::fromValue(11));
     testcomment1->setProperty("bar", QVariant::fromValue(22)); // ignored for comment
 
-    QVector<ivm::AADLObject *> objects;
+    QVector<ivm::IVObject *> objects;
     objects.append(testcomment1);
     m_doc->setObjects(objects);
 
@@ -201,11 +201,11 @@ void tst_XmlDocExporter::testExportComment()
 
 void tst_XmlDocExporter::testExportNestedComment()
 {
-    auto testfunc1 = new ivm::AADLFunction("TestFunc1", m_doc.get());
-    auto testcomment1 = new ivm::AADLComment("TestComment1", testfunc1);
+    auto testfunc1 = new ivm::IVFunction("TestFunc1", m_doc.get());
+    auto testcomment1 = new ivm::IVComment("TestComment1", testfunc1);
     testfunc1->addChild(testcomment1);
 
-    QVector<ivm::AADLObject *> objects;
+    QVector<ivm::IVObject *> objects;
     objects.append(testfunc1);
     m_doc->setObjects(objects);
 

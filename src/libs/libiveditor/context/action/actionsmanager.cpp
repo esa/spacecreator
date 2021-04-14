@@ -17,9 +17,9 @@
 
 #include "actionsmanager.h"
 
-#include "aadlfunction.h"
-#include "aadliface.h"
-#include "aadlobject.h"
+#include "ivfunction.h"
+#include "ivinterface.h"
+#include "ivobject.h"
 #include "common.h"
 #include "extprocmonitor.h"
 #include "interface/interfacedocument.h"
@@ -99,7 +99,7 @@ QString ActionsManager::storagePath()
  * Adds the appropriate actions into \a menu, managing its enablement based on action conditions and the \a currObj.
  * Initiates connection from QAction to the related handler slot.
  */
-void ActionsManager::populateMenu(QMenu *menu, ivm::AADLObject *currObj, InterfaceDocument *doc)
+void ActionsManager::populateMenu(QMenu *menu, ivm::IVObject *currObj, InterfaceDocument *doc)
 {
     if (!menu)
         return;
@@ -119,7 +119,7 @@ void ActionsManager::populateMenu(QMenu *menu, ivm::AADLObject *currObj, Interfa
                 if (!actHandler.m_internalActName.isEmpty())
                     triggerActionInternal(actHandler);
                 else if (!actHandler.m_externalApp.isEmpty()) {
-                    triggerActionExternal(actHandler, act ? act->data().value<ivm::AADLObject *>() : nullptr, doc);
+                    triggerActionExternal(actHandler, act ? act->data().value<ivm::IVObject *>() : nullptr, doc);
                 } else {
                     QMessageBox::warning(nullptr, QObject::tr("Custom action"),
                             QObject::tr("No internal or external action provided by %1").arg(actHandler.m_title));
@@ -334,7 +334,7 @@ void ActionsManager::triggerActionInternal(const Action &act)
     }
 }
 
-QString ActionsManager::replaceKeyHolder(const QString &text, const ivm::AADLObject *aadlObj, const QString &projectDir)
+QString ActionsManager::replaceKeyHolder(const QString &text, const ivm::IVObject *aadlObj, const QString &projectDir)
 {
     if (text.isEmpty() || text[0] != '$') {
         return text;
@@ -363,18 +363,18 @@ QString ActionsManager::replaceKeyHolder(const QString &text, const ivm::AADLObj
             break;
         case ExternalArgHolder::Param:
             if (text.startsWith(holder.key) && aadlObj) {
-                switch (aadlObj->aadlType()) {
-                case ivm::AADLObject::Type::RequiredInterface:
-                case ivm::AADLObject::Type::ProvidedInterface:
-                    if (const ivm::AADLIface *iface = aadlObj->as<const ivm::AADLIface *>()) {
-                        const ivm::IfaceParameter &ifaceParam = iface->param(name);
+                switch (aadlObj->type()) {
+                case ivm::IVObject::Type::RequiredInterface:
+                case ivm::IVObject::Type::ProvidedInterface:
+                    if (const ivm::IVInterface *iface = aadlObj->as<const ivm::IVInterface *>()) {
+                        const ivm::InterfaceParameter &ifaceParam = iface->param(name);
                         if (!ifaceParam.isNull())
                             return ifaceParam.toString();
                     }
                     break;
-                case ivm::AADLObject::Type::Function:
-                case ivm::AADLObject::Type::FunctionType:
-                    if (const ivm::AADLFunctionType *fn = aadlObj->as<const ivm::AADLFunctionType *>()) {
+                case ivm::IVObject::Type::Function:
+                case ivm::IVObject::Type::FunctionType:
+                    if (const ivm::IVFunctionType *fn = aadlObj->as<const ivm::IVFunctionType *>()) {
                         const ivm::ContextParameter &ctxParam = fn->contextParam(name);
                         if (!ctxParam.isNull())
                             return ctxParam.toString();
@@ -398,7 +398,7 @@ QString ActionsManager::replaceKeyHolder(const QString &text, const ivm::AADLObj
  * Replaces the keyholders by actual values of \a aadlObj's attributes or parameters.
  * Creates and shows an instance of ExtProcMonitor.
  */
-void ActionsManager::triggerActionExternal(const Action &act, const ivm::AADLObject *aadlObj, InterfaceDocument *doc)
+void ActionsManager::triggerActionExternal(const Action &act, const ivm::IVObject *aadlObj, InterfaceDocument *doc)
 {
     if (!act.m_externalApp.isEmpty()) {
         if (doc->isDirty()) {

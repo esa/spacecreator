@@ -17,14 +17,11 @@
 
 #pragma once
 
-#include "aadlobject.h"
+#include "ivobject.h"
+#include "ivconnection.h"
 #include "baseitems/interactiveobject.h"
 
 #include <QPointer>
-
-namespace ivm {
-class AADLConnection;
-}
 
 namespace ive {
 
@@ -37,7 +34,7 @@ class AADLConnectionGraphicsItem : public InteractiveObject
 public:
     enum
     {
-        Type = UserType + static_cast<int>(ivm::AADLObject::Type::Connection)
+        Type = UserType + static_cast<int>(ivm::IVObject::Type::Connection)
     };
     enum CollisionsPolicy
     {
@@ -54,7 +51,7 @@ public:
 
     int type() const override { return Type; }
 
-    explicit AADLConnectionGraphicsItem(ivm::AADLConnection *connection, AADLInterfaceGraphicsItem *ifaceStart,
+    explicit AADLConnectionGraphicsItem(ivm::IVConnection *connection, AADLInterfaceGraphicsItem *ifaceStart,
             AADLInterfaceGraphicsItem *ifaceEnd, QGraphicsItem *parent = nullptr);
     ~AADLConnectionGraphicsItem() override;
 
@@ -63,7 +60,7 @@ public:
 
     QVector<QPointF> graphicsPoints() const;
 
-    ivm::AADLConnection *entity() const;
+    ivm::IVConnection *entity() const override;
     void updateFromEntity() override;
 
     void init() override;
@@ -81,7 +78,7 @@ public:
     AADLFunctionGraphicsItem *sourceItem() const;
     AADLFunctionGraphicsItem *targetItem() const;
 
-    QList<QPair<ivm::AADLObject *, QVector<QPointF>>> prepareChangeCoordinatesCommandParams() const override;
+    QList<QPair<ivm::IVObject *, QVector<QPointF>>> prepareChangeCoordinatesCommandParams() const override;
 
     QString prepareTooltip() const override;
 

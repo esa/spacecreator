@@ -18,7 +18,7 @@
 
 #include "interactiveobject.h"
 
-#include "aadlobject.h"
+#include "ivobject.h"
 #include "baseitems/common/aadlutils.h"
 #include "commandsstack.h"
 #include "interface/commands/cmdentityautolayout.h"
@@ -34,7 +34,7 @@
 
 namespace ive {
 
-InteractiveObject::InteractiveObject(ivm::AADLObject *entity, QGraphicsItem *parent)
+InteractiveObject::InteractiveObject(ivm::IVObject *entity, QGraphicsItem *parent)
     : shared::ui::InteractiveObjectBase(parent)
     , m_dataObject(entity)
 {
@@ -48,14 +48,14 @@ InteractiveObject::InteractiveObject(ivm::AADLObject *entity, QGraphicsItem *par
             &InteractiveObject::applyColorScheme);
 }
 
-ivm::AADLObject *InteractiveObject::aadlObject() const
+ivm::IVObject *InteractiveObject::entity() const
 {
     return m_dataObject;
 }
 
 void InteractiveObject::onSelectionChanged(bool isSelected)
 {
-    setZValue(itemLevel(aadlObject(), isSelected));
+    setZValue(itemLevel(entity(), isSelected));
     if (isSelected) {
         showGripPoints();
         updateGripPoints();
@@ -116,9 +116,9 @@ void InteractiveObject::mergeGeometry()
     });
 }
 
-QList<QPair<ivm::AADLObject *, QVector<QPointF>>> InteractiveObject::prepareChangeCoordinatesCommandParams() const
+QList<QPair<ivm::IVObject *, QVector<QPointF>>> InteractiveObject::prepareChangeCoordinatesCommandParams() const
 {
-    QList<QPair<ivm::AADLObject *, QVector<QPointF>>> params;
+    QList<QPair<ivm::IVObject *, QVector<QPointF>>> params;
     auto children = childItems();
     std::stable_sort(children.begin(), children.end(),
             [](QGraphicsItem *item1, QGraphicsItem *item2) { return item1->type() < item2->type(); });
@@ -193,7 +193,7 @@ void InteractiveObject::mouseDoubleClickEvent(QGraphicsSceneMouseEvent *event)
 shared::ColorHandler InteractiveObject::colorHandler() const
 {
     shared::ColorHandler h = shared::ColorManager::instance()->colorsForItem(handledColorType());
-    if (auto aadlObj = aadlObject()) {
+    if (auto aadlObj = entity()) {
         if (aadlObj->hasProperty(QLatin1String("color"))) { // keep single custom color
             h.setFillType(shared::ColorHandler::Color);
             h.setBrushColor0(QColor(aadlObj->prop(QLatin1String("color")).toString()));
@@ -205,7 +205,7 @@ shared::ColorHandler InteractiveObject::colorHandler() const
 
 QString InteractiveObject::prepareTooltip() const
 {
-    return aadlObject() ? aadlObject()->titleUI() : QString();
+    return entity() ? entity()->titleUI() : QString();
 }
 
 void InteractiveObject::setCommandsStack(cmd::CommandsStack *commandsStack)

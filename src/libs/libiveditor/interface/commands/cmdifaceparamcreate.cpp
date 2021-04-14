@@ -20,15 +20,15 @@
 
 #include "commandids.h"
 
-#include <aadlmodel.h>
+#include <ivmodel.h>
 
 namespace ive {
 namespace cmd {
 
-CmdIfaceParamCreate::CmdIfaceParamCreate(ivm::AADLObject *entity, const ivm::IfaceParameter &param)
-    : CmdIfaceParamBase(entity ? entity->as<ivm::AADLIface *>() : nullptr)
+CmdIfaceParamCreate::CmdIfaceParamCreate(ivm::IVObject *entity, const ivm::InterfaceParameter &param)
+    : CmdIfaceParamBase(entity ? entity->as<ivm::IVInterface *>() : nullptr)
     , m_targetParams({ param })
-    , m_sourceParams(m_iface ? m_iface->params() : QVector<ivm::IfaceParameter>())
+    , m_sourceParams(m_iface ? m_iface->params() : QVector<ivm::InterfaceParameter>())
 {
     setText(QObject::tr("Create Iface Parameter"));
 }
@@ -38,7 +38,7 @@ void CmdIfaceParamCreate::redo()
     if (!m_iface)
         return;
 
-    QVector<ivm::IfaceParameter> currParams = m_iface->params();
+    QVector<ivm::InterfaceParameter> currParams = m_iface->params();
     currParams.append(m_targetParams);
     m_iface->setParams(currParams);
 

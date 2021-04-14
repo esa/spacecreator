@@ -17,11 +17,11 @@
 
 #include "propertiesdialog.h"
 
-#include "aadlcomment.h"
-#include "aadlconnectiongroup.h"
-#include "aadliface.h"
-#include "aadlnamevalidator.h"
-#include "aadlobject.h"
+#include "ivcomment.h"
+#include "ivconnectiongroup.h"
+#include "ivinterface.h"
+#include "ivnamevalidator.h"
+#include "ivobject.h"
 #include "asn1/file.h"
 #include "asn1/types/builtintypes.h"
 #include "baseitems/common/aadlutils.h"
@@ -45,7 +45,7 @@
 
 namespace ive {
 
-PropertiesDialog::PropertiesDialog(ivm::PropertyTemplateConfig *dynPropConfig, ivm::AADLObject *obj,
+PropertiesDialog::PropertiesDialog(ivm::PropertyTemplateConfig *dynPropConfig, ivm::IVObject *obj,
         const QSharedPointer<Asn1Acn::File> &dataTypes, cmd::CommandsStack *commandsStack, QWidget *parent)
     : QDialog(parent)
     , ui(new Ui::PropertiesDialog)
@@ -53,7 +53,7 @@ PropertiesDialog::PropertiesDialog(ivm::PropertyTemplateConfig *dynPropConfig, i
     , m_dynPropConfig(dynPropConfig)
     , m_cmdMacro(new cmd::CommandsStack::Macro(commandsStack->undoStack(),
               tr("Edit %1 - %2")
-                      .arg(ivm::AADLNameValidator::nameOfType(m_dataObject->aadlType()).trimmed(),
+                      .arg(ivm::IVNameValidator::nameOfType(m_dataObject->type()).trimmed(),
                               m_dataObject->titleUI())))
     , m_dataTypes(dataTypes)
     , m_commandsStack(commandsStack)
@@ -77,20 +77,20 @@ QString PropertiesDialog::objectTypeName() const
     if (!m_dataObject)
         return QString();
 
-    switch (m_dataObject->aadlType()) {
-    case ivm::AADLObject::Type::FunctionType:
+    switch (m_dataObject->type()) {
+    case ivm::IVObject::Type::FunctionType:
         return tr("Function Type");
-    case ivm::AADLObject::Type::Function:
+    case ivm::IVObject::Type::Function:
         return tr("Function");
-    case ivm::AADLObject::Type::RequiredInterface:
+    case ivm::IVObject::Type::RequiredInterface:
         return tr("RI");
-    case ivm::AADLObject::Type::ProvidedInterface:
+    case ivm::IVObject::Type::ProvidedInterface:
         return tr("PI");
-    case ivm::AADLObject::Type::Comment:
+    case ivm::IVObject::Type::Comment:
         return tr("Comment");
-    case ivm::AADLObject::Type::Connection:
+    case ivm::IVObject::Type::Connection:
         return tr("Connection");
-    case ivm::AADLObject::Type::ConnectionGroup:
+    case ivm::IVObject::Type::ConnectionGroup:
         return tr("Connection Group");
     default:
         return QString();
@@ -108,25 +108,25 @@ void PropertiesDialog::initTabs()
     if (!m_dataObject)
         return;
 
-    switch (m_dataObject->aadlType()) {
-    case ivm::AADLObject::Type::FunctionType:
-    case ivm::AADLObject::Type::Function: {
+    switch (m_dataObject->type()) {
+    case ivm::IVObject::Type::FunctionType:
+    case ivm::IVObject::Type::Function: {
         initContextParams();
         initAttributesView();
         break;
     }
-    case ivm::AADLObject::Type::RequiredInterface:
-    case ivm::AADLObject::Type::ProvidedInterface: {
+    case ivm::IVObject::Type::RequiredInterface:
+    case ivm::IVObject::Type::ProvidedInterface: {
         initIfaceParams();
         initAttributesView();
         break;
     }
-    case ivm::AADLObject::Type::ConnectionGroup: {
+    case ivm::IVObject::Type::ConnectionGroup: {
         initConnectionGroup();
         initAttributesView();
         break;
     }
-    case ivm::AADLObject::Type::Comment: {
+    case ivm::IVObject::Type::Comment: {
         initCommentView();
         break;
     }
@@ -140,7 +140,7 @@ void PropertiesDialog::initTabs()
 
 void PropertiesDialog::initConnectionGroup()
 {
-    auto model = new AADLConnectionGroupModel(qobject_cast<ivm::AADLConnectionGroup *>(m_dataObject), m_cmdMacro, this);
+    auto model = new AADLConnectionGroupModel(qobject_cast<ivm::IVConnectionGroup *>(m_dataObject), m_cmdMacro, this);
     auto connectionsView = new QListView;
     connectionsView->setModel(model);
     ui->tabWidget->insertTab(0, connectionsView, tr("Connections"));
@@ -152,13 +152,13 @@ void PropertiesDialog::initAttributesView()
     PropertiesListModel *modelAttrs { nullptr };
     QStyledItemDelegate *attrDelegate = new AttributeDelegate(viewAttrs->tableView());
 
-    switch (m_dataObject->aadlType()) {
-    case ivm::AADLObject::Type::Function: {
+    switch (m_dataObject->type()) {
+    case ivm::IVObject::Type::Function: {
         modelAttrs = new FunctionPropertiesListModel(m_cmdMacro, m_dynPropConfig, this);
         break;
     }
-    case ivm::AADLObject::Type::RequiredInterface:
-    case ivm::AADLObject::Type::ProvidedInterface: {
+    case ivm::IVObject::Type::RequiredInterface:
+    case ivm::IVObject::Type::ProvidedInterface: {
         modelAttrs = new InterfacePropertiesListModel(m_cmdMacro, m_dynPropConfig, this);
         break;
     }
@@ -209,7 +209,7 @@ void PropertiesDialog::initIfaceParams()
 
 void PropertiesDialog::initCommentView()
 {
-    if (auto comment = qobject_cast<ivm::AADLComment *>(m_dataObject)) {
+    if (auto comment = qobject_cast<ivm::IVComment *>(m_dataObject)) {
         auto commentEdit = new QPlainTextEdit(this);
         commentEdit->setPlainText(comment->titleUI());
         ui->tabWidget->insertTab(0, commentEdit, tr("Comment content"));
@@ -218,7 +218,7 @@ void PropertiesDialog::initCommentView()
             if (comment->titleUI() == text)
                 return;
 
-            const QString encodedText = ivm::AADLNameValidator::encodeName(comment->aadlType(), text);
+            const QString encodedText = ivm::IVNameValidator::encodeName(comment->type(), text);
             const QVariantHash textArg { { ivm::meta::Props::token(ivm::meta::Props::Token::name), encodedText } };
             auto commentTextCmd = new cmd::CmdEntityAttributeChange(comment, textArg);
             commentTextCmd->setText(tr("Edit Comment"));

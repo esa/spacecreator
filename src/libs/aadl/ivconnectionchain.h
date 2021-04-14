@@ -20,44 +20,44 @@
 #include <QList>
 
 namespace ivm {
-class AADLConnection;
-class AADLModel;
+class IVConnection;
+class IVModel;
 
 /*!
    Represents a chain of connections
    Calls can not only be done using one single connection,but is going through a whole chain of connections
  */
-class AADLConnectionChain
+class IVConnectionChain
 {
 public:
-    AADLConnectionChain();
+    IVConnectionChain();
 
-    static QList<AADLConnectionChain *> build(const ivm::AADLModel &model);
-    static QList<AADLConnectionChain *> build(
-            AADLConnection *connection, const QList<AADLConnection *> &allConnections);
+    static QList<IVConnectionChain *> build(const ivm::IVModel &model);
+    static QList<IVConnectionChain *> build(
+            IVConnection *connection, const QList<IVConnection *> &allConnections);
 
-    const QList<AADLConnection *> &connections() const;
+    const QList<IVConnection *> &connections() const;
 
-    bool prepend(AADLConnection *connection);
-    bool append(AADLConnection *connection);
-    bool append(AADLConnectionChain *chain);
+    bool prepend(IVConnection *connection);
+    bool append(IVConnection *connection);
+    bool append(IVConnectionChain *chain);
 
-    bool contains(AADLConnection *connection) const;
+    bool contains(IVConnection *connection) const;
     bool contains(const QString &connectionName, const QString &sourceName, const QString &targetName) const;
 
     QStringList connectionNames(const QString &sourceName, const QString &targetName) const;
 
-    bool operator==(const AADLConnectionChain &other) const;
+    bool operator==(const IVConnectionChain &other) const;
 
 private:
-    static QList<AADLConnectionChain *> findPrevious(
-            AADLConnection *connection, const QList<AADLConnection *> &allConnections);
-    static QList<AADLConnectionChain *> findNext(
-            AADLConnection *connection, const QList<AADLConnection *> &allConnections);
+    static QList<IVConnectionChain *> findPrevious(
+            IVConnection *connection, const QList<IVConnection *> &allConnections);
+    static QList<IVConnectionChain *> findNext(
+            IVConnection *connection, const QList<IVConnection *> &allConnections);
 
-    QList<AADLConnection *> m_chain;
+    QList<IVConnection *> m_chain;
 };
 
 }
 
-QDebug operator<<(QDebug debug, const ivm::AADLConnectionChain &chain);
+QDebug operator<<(QDebug debug, const ivm::IVConnectionChain &chain);

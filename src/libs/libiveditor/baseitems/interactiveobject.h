@@ -29,7 +29,7 @@
 #include <QVector>
 
 namespace ivm {
-class AADLObject;
+class IVObject;
 }
 
 namespace ive {
@@ -42,9 +42,9 @@ class InteractiveObject : public shared::ui::InteractiveObjectBase
     Q_OBJECT
 
 public:
-    explicit InteractiveObject(ivm::AADLObject *entity, QGraphicsItem *parent = nullptr);
+    explicit InteractiveObject(ivm::IVObject *entity, QGraphicsItem *parent = nullptr);
 
-    ivm::AADLObject *aadlObject() const;
+    virtual ivm::IVObject *entity() const;
 
     QPen pen() const;
     void setPen(const QPen &pen);
@@ -58,7 +58,7 @@ public:
     virtual void init();
     virtual void updateEntity();
     virtual void updateFromEntity() = 0;
-    virtual QList<QPair<ivm::AADLObject *, QVector<QPointF>>> prepareChangeCoordinatesCommandParams() const;
+    virtual QList<QPair<ivm::IVObject *, QVector<QPointF>>> prepareChangeCoordinatesCommandParams() const;
 
     virtual QString prepareTooltip() const;
 
@@ -87,7 +87,7 @@ protected:
     virtual shared::ColorHandler colorHandler() const;
 
 protected:
-    const QPointer<ivm::AADLObject> m_dataObject;
+    const QPointer<ivm::IVObject> m_dataObject;
 
     QBrush m_brush;
     QPen m_pen;

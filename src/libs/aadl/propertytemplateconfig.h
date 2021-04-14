@@ -21,7 +21,7 @@
 #include <memory>
 
 namespace ivm {
-class AADLObject;
+class IVObject;
 class PropertyTemplate;
 
 class PropertyTemplateConfig
@@ -32,9 +32,9 @@ public:
 
     void init(const QString &configPath);
 
-    bool hasPropertyTemplateForObject(const ivm::AADLObject *obj, const QString &name) const;
-    PropertyTemplate *propertyTemplateForObject(const ivm::AADLObject *obj, const QString &name) const;
-    QList<PropertyTemplate *> propertyTemplatesForObject(const ivm::AADLObject *obj) const;
+    bool hasPropertyTemplateForObject(const ivm::IVObject *obj, const QString &name) const;
+    PropertyTemplate *propertyTemplateForObject(const ivm::IVObject *obj, const QString &name) const;
+    QList<PropertyTemplate *> propertyTemplatesForObject(const ivm::IVObject *obj) const;
     QList<PropertyTemplate *> attributesForFunction() const;
     QList<PropertyTemplate *> attributesForRequiredInterface() const;
     QList<PropertyTemplate *> attributesForProvidedInterface() const;

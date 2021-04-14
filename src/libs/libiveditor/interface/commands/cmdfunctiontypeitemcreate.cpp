@@ -17,9 +17,9 @@
 
 #include "cmdfunctiontypeitemcreate.h"
 
-#include "aadlfunction.h"
-#include "aadlfunctiontype.h"
-#include "aadlmodel.h"
+#include "ivfunction.h"
+#include "ivfunctiontype.h"
+#include "ivmodel.h"
 #include "baseitems/common/aadlutils.h"
 #include "commandids.h"
 
@@ -27,11 +27,11 @@ namespace ive {
 namespace cmd {
 
 CmdFunctionTypeItemCreate::CmdFunctionTypeItemCreate(
-        ivm::AADLModel *model, ivm::AADLFunction *parent, const QRectF &geometry)
+        ivm::IVModel *model, ivm::IVFunction *parent, const QRectF &geometry)
     : CmdEntityGeometryChange({}, QObject::tr("Create Function Type"))
     , m_model(model)
     , m_parent(parent)
-    , m_entity(new ivm::AADLFunctionType(
+    , m_entity(new ivm::IVFunctionType(
               QString(), m_parent ? qobject_cast<QObject *>(m_parent) : qobject_cast<QObject *>(m_model)))
 {
     prepareData({ qMakePair(m_entity, QVector<QPointF> { geometry.topLeft(), geometry.bottomRight() }) });

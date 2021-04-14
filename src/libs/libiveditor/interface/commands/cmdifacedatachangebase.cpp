@@ -17,19 +17,19 @@
 
 #include "cmdifacedatachangebase.h"
 
-#include "aadlconnection.h"
-#include "aadliface.h"
-#include "aadlmodel.h"
+#include "ivconnection.h"
+#include "ivinterface.h"
+#include "ivmodel.h"
 #include "cmdentitiesremove.h"
 
 namespace ive {
 namespace cmd {
 
-CmdIfaceDataChangeBase::CmdIfaceDataChangeBase(ivm::AADLIface *iface, const QString &targetName,
+CmdIfaceDataChangeBase::CmdIfaceDataChangeBase(ivm::IVInterface *iface, const QString &targetName,
         const QVariant &targetValue, const QVariant &prevValue, QUndoCommand *parent)
     : shared::UndoCommand(parent)
     , m_iface(iface)
-    , m_model(m_iface ? m_iface->objectsModel() : nullptr)
+    , m_model(m_iface ? m_iface->model() : nullptr)
     , m_relatedConnections()
     , m_targetName(targetName)
     , m_targetToken(ivm::meta::Props::token(m_targetName))
@@ -45,9 +45,9 @@ CmdIfaceDataChangeBase::~CmdIfaceDataChangeBase()
     qDeleteAll(m_cmdRmConnection);
 }
 
-QVector<QPointer<ivm::AADLIface>> CmdIfaceDataChangeBase::getRelatedIfaces()
+QVector<QPointer<ivm::IVInterface>> CmdIfaceDataChangeBase::getRelatedIfaces()
 {
-    QVector<QPointer<ivm::AADLIface>> ifaces;
+    QVector<QPointer<ivm::IVInterface>> ifaces;
 
     if (m_iface) {
         ifaces.append(m_iface);
@@ -58,9 +58,9 @@ QVector<QPointer<ivm::AADLIface>> CmdIfaceDataChangeBase::getRelatedIfaces()
     return ifaces;
 }
 
-QVector<ivm::AADLConnection *> CmdIfaceDataChangeBase::getRelatedConnections()
+QVector<ivm::IVConnection *> CmdIfaceDataChangeBase::getRelatedConnections()
 {
-    QVector<ivm::AADLConnection *> affected;
+    QVector<ivm::IVConnection *> affected;
 
     if (m_iface && m_model)
         for (const auto &i : getRelatedIfaces())
@@ -69,24 +69,24 @@ QVector<ivm::AADLConnection *> CmdIfaceDataChangeBase::getRelatedConnections()
     return affected;
 }
 
-ivm::AADLIface *CmdIfaceDataChangeBase::interface() const
+ivm::IVInterface *CmdIfaceDataChangeBase::interface() const
 {
     return m_iface;
 }
 
-ivm::AADLIface *CmdIfaceDataChangeBase::getConnectionOtherSide(
-        const ivm::AADLConnection *connection, ivm::AADLIface *changedIface)
+ivm::IVInterface *CmdIfaceDataChangeBase::getConnectionOtherSide(
+        const ivm::IVConnection *connection, ivm::IVInterface *changedIface)
 {
     if (connection && changedIface) {
         switch (connection->connectionType()) {
-        case ivm::AADLConnection::ConnectionType::RI2PI: {
+        case ivm::IVConnection::ConnectionType::RI2PI: {
             return changedIface->isRequired() ? connection->targetInterface() : changedIface;
         }
-        case ivm::AADLConnection::ConnectionType::PI2RI: {
+        case ivm::IVConnection::ConnectionType::PI2RI: {
             return changedIface->isProvided() ? connection->targetInterface() : changedIface;
         }
-        case ivm::AADLConnection::ConnectionType::PI2PI:
-        case ivm::AADLConnection::ConnectionType::RI2RI: {
+        case ivm::IVConnection::ConnectionType::PI2PI:
+        case ivm::IVConnection::ConnectionType::RI2RI: {
             if (connection->sourceInterface() == changedIface
                     || connection->sourceInterface()->cloneOf() == changedIface) {
                 return connection->targetInterface();
@@ -111,7 +111,7 @@ ivm::AADLIface *CmdIfaceDataChangeBase::getConnectionOtherSide(
 
 void CmdIfaceDataChangeBase::prepareRemoveConnectionCommands()
 {
-    QList<QPointer<ivm::AADLObject>> entities;
+    QList<QPointer<ivm::IVObject>> entities;
     for (const auto &connection : m_relatedConnections) {
         if (connectionMustDie(connection)) {
             entities.append(connection);

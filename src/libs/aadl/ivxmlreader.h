@@ -17,7 +17,7 @@
 
 #pragma once
 
-#include "aadlobject.h"
+#include "ivobject.h"
 
 #include <QObject>
 #include <QVariantMap>
@@ -29,31 +29,31 @@ class QXmlStreamReader;
 
 namespace ivm {
 
-class AADLIface;
-class AADLFunctionType;
-class AADLComment;
-class AADLConnection;
-class AADLConnectionGroup;
-struct AADLXMLReaderPrivate;
-class AADLXMLReader : public QObject
+class IVInterface;
+class IVFunctionType;
+class IVComment;
+class IVConnection;
+class IVConnectionGroup;
+struct IVXMLReaderPrivate;
+class IVXMLReader : public QObject
 {
     Q_OBJECT
 
 public:
-    explicit AADLXMLReader(QObject *parent = nullptr);
-    ~AADLXMLReader() override;
+    explicit IVXMLReader(QObject *parent = nullptr);
+    ~IVXMLReader() override;
 
     bool readFile(const QString &file);
     bool read(QIODevice *openForRead);
     bool read(const QByteArray &data);
 
 Q_SIGNALS:
-    void objectsParsed(const QVector<ivm::AADLObject *> &objects);
+    void objectsParsed(const QVector<ivm::IVObject *> &objects);
     void metaDataParsed(const QVariantMap &metadata);
     void error(const QString &msg);
 
 private:
-    const std::unique_ptr<AADLXMLReaderPrivate> d;
+    const std::unique_ptr<IVXMLReaderPrivate> d;
 
     bool readXml(QIODevice *in);
 
@@ -61,11 +61,11 @@ private:
     void processTagOpen(QXmlStreamReader &xml);
     void processTagClose(QXmlStreamReader &xml);
 
-    AADLFunctionType *addFunction(const QString &name, AADLObject::Type fnType);
-    AADLIface *addIface(const QString &name, bool isRI);
-    AADLComment *addComment(const QString &text);
-    AADLConnection *addConnection();
-    AADLConnectionGroup *addConnectionGroup(const QString &groupName);
+    IVFunctionType *addFunction(const QString &name, IVObject::Type fnType);
+    IVInterface *addIface(const QString &name, bool isRI);
+    IVComment *addComment(const QString &text);
+    IVConnection *addConnection();
+    IVConnectionGroup *addConnectionGroup(const QString &groupName);
 };
 
 }

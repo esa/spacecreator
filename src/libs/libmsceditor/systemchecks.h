@@ -23,9 +23,9 @@
 #include <QVector>
 
 namespace ivm {
-class AADLObject;
-class AADLFunction;
-class AADLConnection;
+class IVObject;
+class IVFunction;
+class IVConnection;
 }
 
 namespace msc {
@@ -58,9 +58,9 @@ public:
 
     virtual QStringList connectionNamesFromTo(const QString &sourceName, const QString &targetName) const;
 
-    virtual bool correspond(const ivm::AADLObject *aadlObj, const msc::MscInstance *instance) const;
-    virtual bool correspond(const ivm::AADLFunction *aadlFunc, const msc::MscInstance *instance) const;
-    virtual bool correspond(const ivm::AADLConnection *connection, const msc::MscMessage *message) const;
+    virtual bool correspond(const ivm::IVObject *aadlObj, const msc::MscInstance *instance) const;
+    virtual bool correspond(const ivm::IVFunction *aadlFunc, const msc::MscInstance *instance) const;
+    virtual bool correspond(const ivm::IVConnection *connection, const msc::MscMessage *message) const;
 
     virtual QVector<msc::MscMessageDeclaration *> allConnectionsAsDeclaration() const;
 

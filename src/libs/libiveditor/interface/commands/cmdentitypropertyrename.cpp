@@ -20,12 +20,12 @@
 
 #include "commandids.h"
 
-#include <aadlmodel.h>
+#include <ivmodel.h>
 
 namespace ive {
 namespace cmd {
 
-CmdEntityPropertyRename::CmdEntityPropertyRename(ivm::AADLObject *entity, const QHash<QString, QString> &props)
+CmdEntityPropertyRename::CmdEntityPropertyRename(ivm::IVObject *entity, const QHash<QString, QString> &props)
     : QUndoCommand()
     , m_entity(entity)
     , m_newProps(props)

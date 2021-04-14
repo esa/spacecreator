@@ -15,14 +15,14 @@
   along with this program. If not, see <https://www.gnu.org/licenses/lgpl-2.1.html>.
 */
 
-#include "aadlnamevalidator.h"
+#include "ivnamevalidator.h"
 
-#include "aadlconnection.h"
-#include "aadlconnectiongroup.h"
-#include "aadlfunction.h"
-#include "aadlfunctiontype.h"
-#include "aadlmodel.h"
-#include "aadlobject.h"
+#include "ivconnection.h"
+#include "ivconnectiongroup.h"
+#include "ivfunction.h"
+#include "ivfunctiontype.h"
+#include "ivmodel.h"
+#include "ivobject.h"
 
 #include <QDebug>
 #include <QDir>
@@ -31,53 +31,53 @@
 
 namespace ivm {
 
-AADLNameValidator *AADLNameValidator::m_instance = nullptr;
+IVNameValidator *IVNameValidator::m_instance = nullptr;
 static const QString namePatternUI("^[a-zA-Z][\\w ]*(?(?<=_)[a-zA-Z0-9])$");
 
-AADLNameValidator::AADLNameValidator()
+IVNameValidator::IVNameValidator()
     : m_typePrefixes {
-        { AADLObject::Type::FunctionType, QObject::tr("Function_Type_") },
-        { AADLObject::Type::Function, QObject::tr("Function_") },
-        { AADLObject::Type::RequiredInterface, QObject::tr("RI_") },
-        { AADLObject::Type::ProvidedInterface, QObject::tr("PI_") },
-        { AADLObject::Type::InterfaceGroup, QObject::tr("Interface_Group_") },
-        { AADLObject::Type::Comment, QObject::tr("Comment_") },
-        { AADLObject::Type::Connection, QObject::tr("Connection_") },
-        { AADLObject::Type::ConnectionGroup, QObject::tr("Connection_Group_") },
+        { IVObject::Type::FunctionType, QObject::tr("Function_Type_") },
+        { IVObject::Type::Function, QObject::tr("Function_") },
+        { IVObject::Type::RequiredInterface, QObject::tr("RI_") },
+        { IVObject::Type::ProvidedInterface, QObject::tr("PI_") },
+        { IVObject::Type::InterfaceGroup, QObject::tr("Interface_Group_") },
+        { IVObject::Type::Comment, QObject::tr("Comment_") },
+        { IVObject::Type::Connection, QObject::tr("Connection_") },
+        { IVObject::Type::ConnectionGroup, QObject::tr("Connection_Group_") },
     }
 {
 }
 
-AADLNameValidator *AADLNameValidator::instance()
+IVNameValidator *IVNameValidator::instance()
 {
     if (!m_instance)
-        m_instance = new AADLNameValidator;
+        m_instance = new IVNameValidator;
     return m_instance;
 }
 
-QString AADLNameValidator::encodeName(const AADLObject::Type t, const QString &name)
+QString IVNameValidator::encodeName(const IVObject::Type t, const QString &name)
 {
     if (name.isEmpty())
         return QString();
 
     switch (t) {
-    case AADLObject::Type::ConnectionGroup:
-    case AADLObject::Type::Connection:
-    case AADLObject::Type::Function:
-    case AADLObject::Type::FunctionType:
-    case ivm::AADLObject::Type::ProvidedInterface:
-    case ivm::AADLObject::Type::RequiredInterface: {
+    case IVObject::Type::ConnectionGroup:
+    case IVObject::Type::Connection:
+    case IVObject::Type::Function:
+    case IVObject::Type::FunctionType:
+    case ivm::IVObject::Type::ProvidedInterface:
+    case ivm::IVObject::Type::RequiredInterface: {
         QString result;
         std::transform(name.cbegin(), name.cend(), std::back_inserter(result),
                 [](const QChar &ch) { return ch.isLetterOrNumber() ? ch : QLatin1Char('_'); });
         return result;
     }
-    case AADLObject::Type::Comment: {
+    case IVObject::Type::Comment: {
         QString result(name);
         result.replace('\n', "\\n");
         return result;
     }
-    case AADLObject::Type::Unknown: {
+    case IVObject::Type::Unknown: {
         qWarning() << "Unknown object does not support naming";
         break;
     }
@@ -90,29 +90,29 @@ QString AADLNameValidator::encodeName(const AADLObject::Type t, const QString &n
     return name;
 }
 
-QString AADLNameValidator::decodeName(const AADLObject::Type t, const QString &name)
+QString IVNameValidator::decodeName(const IVObject::Type t, const QString &name)
 {
     if (name.isEmpty())
         return QString();
 
     switch (t) {
-    case AADLObject::Type::ConnectionGroup:
-    case AADLObject::Type::Connection:
-    case AADLObject::Type::Function:
-    case AADLObject::Type::FunctionType:
-    case ivm::AADLObject::Type::ProvidedInterface:
-    case ivm::AADLObject::Type::RequiredInterface: {
+    case IVObject::Type::ConnectionGroup:
+    case IVObject::Type::Connection:
+    case IVObject::Type::Function:
+    case IVObject::Type::FunctionType:
+    case ivm::IVObject::Type::ProvidedInterface:
+    case ivm::IVObject::Type::RequiredInterface: {
         QString result;
         std::transform(name.cbegin(), name.cend(), std::back_inserter(result),
                 [](const QChar &ch) { return ch.isLetterOrNumber() ? ch : QLatin1Char(' '); });
         return result;
     }
-    case AADLObject::Type::Comment: {
+    case IVObject::Type::Comment: {
         QString result(name);
         result.replace("\\n", "\n");
         return result;
     }
-    case AADLObject::Type::Unknown: {
+    case IVObject::Type::Unknown: {
         qWarning() << "Unknown object does not support naming";
         break;
     }
@@ -153,7 +153,7 @@ static inline QSet<QString> forbiddenNamesSet()
 /*!
    Returns is the given \p name is usable as name in general.
  */
-bool AADLNameValidator::isValidName(const QString &name)
+bool IVNameValidator::isValidName(const QString &name)
 {
     if (name.isEmpty()) {
         return false;
@@ -172,7 +172,7 @@ bool AADLNameValidator::isValidName(const QString &name)
 /*!
    The regular expression pattern for aadl names, used for the UI (encoded name)
  */
-const QString &AADLNameValidator::namePatternUI()
+const QString &IVNameValidator::namePatternUI()
 {
     return ivm::namePatternUI;
 }
@@ -181,35 +181,35 @@ const QString &AADLNameValidator::namePatternUI()
    Check if the name can be used for that object.
    It checks if the name is usable at all, and if the names is used already by another relevant object
  */
-bool AADLNameValidator::isAcceptableName(const AADLObject *object, const QString &name)
+bool IVNameValidator::isAcceptableName(const IVObject *object, const QString &name)
 {
     if (!object || !isValidName(name)) {
         return false;
     }
 
-    const AADLObject::Type t = object->aadlType();
+    const IVObject::Type t = object->type();
     switch (t) {
-    case AADLObject::Type::FunctionType: {
+    case IVObject::Type::FunctionType: {
         return instance()->isFunctionTypeNameUsed(name, object);
     }
-    case AADLObject::Type::Function: {
+    case IVObject::Type::Function: {
         return instance()->isFunctionNameUsed(name, object);
     }
-    case AADLObject::Type::RequiredInterface: {
-        auto parent = object->parentObject() ? object->parentObject()->as<const AADLFunctionType *>() : nullptr;
+    case IVObject::Type::RequiredInterface: {
+        auto parent = object->parentObject() ? object->parentObject()->as<const IVFunctionType *>() : nullptr;
         return instance()->isRequiredInterfaceNameUsed(name, parent);
     }
-    case AADLObject::Type::ProvidedInterface: {
-        auto parent = object->parentObject() ? object->parentObject()->as<const AADLFunctionType *>() : nullptr;
+    case IVObject::Type::ProvidedInterface: {
+        auto parent = object->parentObject() ? object->parentObject()->as<const IVFunctionType *>() : nullptr;
         return instance()->isProvidedInterfaceNameUsed(name, parent);
     }
-    case AADLObject::Type::InterfaceGroup:
-    case AADLObject::Type::ConnectionGroup:
-    case AADLObject::Type::Connection:
-    case AADLObject::Type::Comment: {
+    case IVObject::Type::InterfaceGroup:
+    case IVObject::Type::ConnectionGroup:
+    case IVObject::Type::Connection:
+    case IVObject::Type::Comment: {
         return true;
     }
-    case AADLObject::Type::Unknown: {
+    case IVObject::Type::Unknown: {
         qWarning() << "Unsupported object type" << t;
         return false;
     }
@@ -223,7 +223,7 @@ bool AADLNameValidator::isAcceptableName(const AADLObject *object, const QString
     return false;
 }
 
-bool AADLNameValidator::isAutogeneratedName(const AADLObject *object, const QString &nameForCheck)
+bool IVNameValidator::isAutogeneratedName(const IVObject *object, const QString &nameForCheck)
 {
     if (!object)
         return false;
@@ -232,13 +232,13 @@ bool AADLNameValidator::isAutogeneratedName(const AADLObject *object, const QStr
     if (name.isEmpty())
         return false;
 
-    const AADLObject::Type t = object->aadlType();
+    const IVObject::Type t = object->type();
     switch (t) {
-    case AADLObject::Type::Function:
-    case AADLObject::Type::FunctionType:
-    case AADLObject::Type::RequiredInterface:
-    case AADLObject::Type::ProvidedInterface:
-    case AADLObject::Type::Comment: {
+    case IVObject::Type::Function:
+    case IVObject::Type::FunctionType:
+    case IVObject::Type::RequiredInterface:
+    case IVObject::Type::ProvidedInterface:
+    case IVObject::Type::Comment: {
         const QString preffix = instance()->m_typePrefixes[t];
         if (!name.startsWith(preffix))
             return false;
@@ -252,12 +252,12 @@ bool AADLNameValidator::isAutogeneratedName(const AADLObject *object, const QStr
 
         return true;
     }
-    case AADLObject::Type::ConnectionGroup:
-    case AADLObject::Type::InterfaceGroup:
-    case AADLObject::Type::Connection: {
+    case IVObject::Type::ConnectionGroup:
+    case IVObject::Type::InterfaceGroup:
+    case IVObject::Type::Connection: {
         return false;
     }
-    case AADLObject::Type::Unknown: {
+    case IVObject::Type::Unknown: {
         qWarning() << "unknown object type";
         return false;
     }
@@ -271,7 +271,7 @@ bool AADLNameValidator::isAutogeneratedName(const AADLObject *object, const QStr
     return false;
 }
 
-QString AADLNameValidator::nameForInstance(const AADLFunction *object, const QString &suggestedName)
+QString IVNameValidator::nameForInstance(const IVFunction *object, const QString &suggestedName)
 {
     if (suggestedName.isEmpty()) {
         return nextNameFor(object);
@@ -281,20 +281,20 @@ QString AADLNameValidator::nameForInstance(const AADLFunction *object, const QSt
     return instance()->makeCountedName(object, suggestedName, 2);
 }
 
-QString AADLNameValidator::nameOfType(AADLObject::Type t)
+QString IVNameValidator::nameOfType(IVObject::Type t)
 {
     switch (t) {
-    case AADLObject::Type::Function:
-    case AADLObject::Type::FunctionType:
-    case AADLObject::Type::InterfaceGroup:
-    case AADLObject::Type::RequiredInterface:
-    case AADLObject::Type::ProvidedInterface:
-    case AADLObject::Type::Comment:
-    case AADLObject::Type::ConnectionGroup:
-    case AADLObject::Type::Connection: {
+    case IVObject::Type::Function:
+    case IVObject::Type::FunctionType:
+    case IVObject::Type::InterfaceGroup:
+    case IVObject::Type::RequiredInterface:
+    case IVObject::Type::ProvidedInterface:
+    case IVObject::Type::Comment:
+    case IVObject::Type::ConnectionGroup:
+    case IVObject::Type::Connection: {
         return instance()->m_typePrefixes[t];
     }
-    case AADLObject::Type::Unknown: {
+    case IVObject::Type::Unknown: {
         const QString wrn = QObject::tr("Unknown object type");
         qWarning() << wrn;
         return wrn;
@@ -309,34 +309,34 @@ QString AADLNameValidator::nameOfType(AADLObject::Type t)
     return QString();
 }
 
-QString AADLNameValidator::nextNameFor(const AADLObject *object)
+QString IVNameValidator::nextNameFor(const IVObject *object)
 {
     return instance()->nextName(object);
 }
 
-QString AADLNameValidator::nextName(const AADLObject *object) const
+QString IVNameValidator::nextName(const IVObject *object) const
 {
     if (!object) {
         return QString();
     }
 
-    const AADLObject::Type t = object->aadlType();
+    const IVObject::Type t = object->type();
     switch (t) {
-    case AADLObject::Type::Function:
+    case IVObject::Type::Function:
         return nameFunction(object);
-    case AADLObject::Type::FunctionType:
+    case IVObject::Type::FunctionType:
         return nameFunctionType(object);
-    case AADLObject::Type::RequiredInterface:
+    case IVObject::Type::RequiredInterface:
         return nameRequiredInterface(object);
-    case AADLObject::Type::ProvidedInterface:
+    case IVObject::Type::ProvidedInterface:
         return nameProvidedInterface(object);
-    case AADLObject::Type::Comment:
+    case IVObject::Type::Comment:
         return nameComment(object);
-    case AADLObject::Type::ConnectionGroup:
-    case AADLObject::Type::Connection:
+    case IVObject::Type::ConnectionGroup:
+    case IVObject::Type::Connection:
         return nameConnection(object);
-    case AADLObject::Type::InterfaceGroup:
-    case AADLObject::Type::Unknown:
+    case IVObject::Type::InterfaceGroup:
+    case IVObject::Type::Unknown:
         return QString();
     default:
         break;
@@ -346,7 +346,7 @@ QString AADLNameValidator::nextName(const AADLObject *object) const
     return QString();
 }
 
-QString AADLNameValidator::makeCountedName(const AADLObject *object, const QString &nameTemplate, int counter) const
+QString IVNameValidator::makeCountedName(const IVObject *object, const QString &nameTemplate, int counter) const
 {
     QString name = nameTemplate + QString::number(counter);
     while (!isAcceptableName(object, name)) {
@@ -355,14 +355,14 @@ QString AADLNameValidator::makeCountedName(const AADLObject *object, const QStri
     return name;
 }
 
-QString AADLNameValidator::nameFunctionType(const AADLObject *functionType) const
+QString IVNameValidator::nameFunctionType(const IVObject *functionType) const
 {
     const QString nameTemplate =
-            functionType->title().isEmpty() ? m_typePrefixes[functionType->aadlType()] : functionType->title();
+            functionType->title().isEmpty() ? m_typePrefixes[functionType->type()] : functionType->title();
 
     int counter = 0;
-    if (functionType && functionType->objectsModel()) {
-        for (const auto fn : functionType->objectsModel()->objects()) {
+    if (functionType && functionType->model()) {
+        for (const auto fn : functionType->model()->objects()) {
             if (fn->isFunctionType()) {
                 ++counter;
             }
@@ -375,13 +375,13 @@ QString AADLNameValidator::nameFunctionType(const AADLObject *functionType) cons
     return makeCountedName(functionType, nameTemplate, counter);
 }
 
-QString AADLNameValidator::nameFunction(const AADLObject *function) const
+QString IVNameValidator::nameFunction(const IVObject *function) const
 {
-    const QString nameTemplate = function->title().isEmpty() ? m_typePrefixes[function->aadlType()] : function->title();
+    const QString nameTemplate = function->title().isEmpty() ? m_typePrefixes[function->type()] : function->title();
 
     int counter = 0;
-    if (function && function->objectsModel()) {
-        for (const auto fn : function->objectsModel()->objects()) {
+    if (function && function->model()) {
+        for (const auto fn : function->model()->objects()) {
             if (fn->isFunction()) {
                 ++counter;
             }
@@ -394,39 +394,39 @@ QString AADLNameValidator::nameFunction(const AADLObject *function) const
     return makeCountedName(function, nameTemplate, counter);
 }
 
-QString AADLNameValidator::nameRequiredInterface(const AADLObject *iface) const
+QString IVNameValidator::nameRequiredInterface(const IVObject *iface) const
 {
     Q_ASSERT(iface);
 
-    const QString nameTemplate = m_typePrefixes[iface->aadlType()];
+    const QString nameTemplate = m_typePrefixes[iface->type()];
 
-    const auto parent = iface->parentObject()->as<const AADLFunctionType *>();
+    const auto parent = iface->parentObject()->as<const IVFunctionType *>();
     int counter = parent ? parent->ris().size() : 0;
     ++counter;
 
     return makeCountedName(iface, nameTemplate, counter);
 }
 
-QString AADLNameValidator::nameProvidedInterface(const AADLObject *iface) const
+QString IVNameValidator::nameProvidedInterface(const IVObject *iface) const
 {
     Q_ASSERT(iface);
 
-    const QString nameTemplate = m_typePrefixes[iface->aadlType()];
+    const QString nameTemplate = m_typePrefixes[iface->type()];
 
-    const auto parent = iface->parentObject()->as<const AADLFunctionType *>();
+    const auto parent = iface->parentObject()->as<const IVFunctionType *>();
     int counter = parent ? parent->pis().size() : 0;
     ++counter;
 
     return makeCountedName(iface, nameTemplate, counter);
 }
 
-QString AADLNameValidator::nameComment(const AADLObject *comment) const
+QString IVNameValidator::nameComment(const IVObject *comment) const
 {
-    const QString nameTemplate = m_typePrefixes[comment->aadlType()];
+    const QString nameTemplate = m_typePrefixes[comment->type()];
 
     int counter = 0;
-    if (comment && comment->objectsModel()) {
-        for (const auto fn : comment->objectsModel()->objects())
+    if (comment && comment->model()) {
+        for (const auto fn : comment->model()->objects())
             if (fn->isComment())
                 ++counter;
     } else
@@ -436,13 +436,13 @@ QString AADLNameValidator::nameComment(const AADLObject *comment) const
     return makeCountedName(comment, nameTemplate, counter);
 }
 
-QString AADLNameValidator::nameConnection(const AADLObject *connection) const
+QString IVNameValidator::nameConnection(const IVObject *connection) const
 {
-    if (auto connectionPtr = qobject_cast<const AADLConnection *>(connection)) {
+    if (auto connectionPtr = qobject_cast<const IVConnection *>(connection)) {
         return QString("%1.%2 <-> %3.%4")
                 .arg(connectionPtr->sourceName(), connectionPtr->sourceInterfaceName(), connectionPtr->targetName(),
                         connectionPtr->targetInterfaceName());
-    } else if (auto connectionPtr = qobject_cast<const AADLConnectionGroup *>(connection)) {
+    } else if (auto connectionPtr = qobject_cast<const IVConnectionGroup *>(connection)) {
         QStringList sourceNames, targetNames;
         for (const auto &sourceIface : connectionPtr->groupedSourceInterfaces()) {
             sourceNames.append(sourceIface->title());
@@ -457,14 +457,14 @@ QString AADLNameValidator::nameConnection(const AADLObject *connection) const
     return {};
 }
 
-bool AADLNameValidator::isFunctionTypeNameUsed(const QString &name, const AADLObject *fnType) const
+bool IVNameValidator::isFunctionTypeNameUsed(const QString &name, const IVObject *fnType) const
 {
     if (name.isEmpty() || !fnType) {
         return false;
     }
 
-    if (fnType->objectsModel()) {
-        for (const auto fn : fnType->objectsModel()->objects()) {
+    if (fnType->model()) {
+        for (const auto fn : fnType->model()->objects()) {
             if (fn->isFunctionType()) {
                 if (fn->title() == name) {
                     return false;
@@ -476,7 +476,7 @@ bool AADLNameValidator::isFunctionTypeNameUsed(const QString &name, const AADLOb
     }
 
     if (fnType->parentObject()) {
-        if (const AADLFunction *parent = fnType->parentObject()->as<const AADLFunction *>()) {
+        if (const IVFunction *parent = fnType->parentObject()->as<const IVFunction *>()) {
             for (const auto c : parent->children()) {
                 if (c->isFunctionType()) {
                     if (c->title() == name) {
@@ -490,14 +490,14 @@ bool AADLNameValidator::isFunctionTypeNameUsed(const QString &name, const AADLOb
     return true;
 }
 
-bool AADLNameValidator::isFunctionNameUsed(const QString &name, const AADLObject *function) const
+bool IVNameValidator::isFunctionNameUsed(const QString &name, const IVObject *function) const
 {
     if (name.isEmpty() || !function) {
         return false;
     }
 
-    if (function->objectsModel()) {
-        for (const auto fn : function->objectsModel()->objects()) {
+    if (function->model()) {
+        for (const auto fn : function->model()->objects()) {
             if (fn->isFunction()) {
                 if (fn->title() == name) {
                     return false;
@@ -508,7 +508,7 @@ bool AADLNameValidator::isFunctionNameUsed(const QString &name, const AADLObject
         return true;
     }
 
-    if (auto fn = function->as<const AADLFunction *>()) {
+    if (auto fn = function->as<const IVFunction *>()) {
         for (const auto c : fn->children()) {
             if (c->isFunction()) {
                 if (c->title() == name) {
@@ -521,7 +521,7 @@ bool AADLNameValidator::isFunctionNameUsed(const QString &name, const AADLObject
     return true;
 }
 
-bool AADLNameValidator::isRequiredInterfaceNameUsed(const QString &name, const AADLFunctionType *parent) const
+bool IVNameValidator::isRequiredInterfaceNameUsed(const QString &name, const IVFunctionType *parent) const
 {
     if (name.isEmpty()) {
         return false;
@@ -536,7 +536,7 @@ bool AADLNameValidator::isRequiredInterfaceNameUsed(const QString &name, const A
     return true;
 }
 
-bool AADLNameValidator::isProvidedInterfaceNameUsed(const QString &name, const AADLFunctionType *parent) const
+bool IVNameValidator::isProvidedInterfaceNameUsed(const QString &name, const IVFunctionType *parent) const
 {
     if (name.isEmpty()) {
         return false;

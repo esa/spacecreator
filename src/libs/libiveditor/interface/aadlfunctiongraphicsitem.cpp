@@ -18,12 +18,12 @@
 #include "aadlfunctiongraphicsitem.h"
 
 #include "aadlcommentgraphicsitem.h"
-#include "aadlconnection.h"
+#include "ivconnection.h"
 #include "aadlconnectiongraphicsitem.h"
-#include "aadlfunction.h"
+#include "ivfunction.h"
 #include "aadlfunctionnamegraphicsitem.h"
 #include "aadlinterfacegraphicsitem.h"
-#include "aadlmodel.h"
+#include "ivmodel.h"
 #include "baseitems/common/aadlutils.h"
 #include "colors/colormanager.h"
 #include "graphicsitemhelpers.h"
@@ -88,7 +88,7 @@ namespace ive {
 
 QPointer<QSvgRenderer> AADLFunctionGraphicsItem::m_svgRenderer = {};
 
-AADLFunctionGraphicsItem::AADLFunctionGraphicsItem(ivm::AADLFunction *entity, QGraphicsItem *parent)
+AADLFunctionGraphicsItem::AADLFunctionGraphicsItem(ivm::IVFunction *entity, QGraphicsItem *parent)
     : AADLFunctionTypeGraphicsItem(entity, parent)
 {
     m_textItem->setVisible(!isRootItem());
@@ -101,13 +101,13 @@ AADLFunctionGraphicsItem::AADLFunctionGraphicsItem(ivm::AADLFunction *entity, QG
 void AADLFunctionGraphicsItem::init()
 {
     AADLFunctionTypeGraphicsItem::init();
-    connect(entity(), &ivm::AADLFunction::childAdded, this, [this]() { update(); });
-    connect(entity(), &ivm::AADLFunction::childRemoved, this, [this]() { update(); });
+    connect(entity(), &ivm::IVFunction::childAdded, this, [this]() { update(); });
+    connect(entity(), &ivm::IVFunction::childRemoved, this, [this]() { update(); });
 }
 
-ivm::AADLFunction *AADLFunctionGraphicsItem::entity() const
+ivm::IVFunction *AADLFunctionGraphicsItem::entity() const
 {
-    return qobject_cast<ivm::AADLFunction *>(aadlObject());
+    return qobject_cast<ivm::IVFunction *>(m_dataObject);
 }
 
 QPainterPath AADLFunctionGraphicsItem::shape() const
@@ -256,7 +256,7 @@ void AADLFunctionGraphicsItem::drawNestedView(QPainter *painter)
     painter->setPen(QPen(ch.penColor(), ch.penWidth()));
 
     QRectF nestedRect;
-    const QVector<ivm::AADLObject *> childEntities = entity()->children();
+    const QVector<ivm::IVObject *> childEntities = entity()->children();
     static const ivm::meta::Props::Token token = ivm::meta::Props::Token::InnerCoordinates;
     QList<shared::Id> itemsCountWithoutGeometry;
     QHash<shared::Id, QRectF> existingRects;
@@ -267,30 +267,30 @@ void AADLFunctionGraphicsItem::drawNestedView(QPainter *painter)
         shared::Id innerFunctionId;
     };
     QList<ConnectionData> parentConnections;
-    for (const ivm::AADLObject *child : childEntities) {
+    for (const ivm::IVObject *child : childEntities) {
         const QString strCoordinates = child->prop(ivm::meta::Props::token(token)).toString();
-        if (child->aadlType() == ivm::AADLObject::Type::Function
-                || child->aadlType() == ivm::AADLObject::Type::FunctionType
-                || child->aadlType() == ivm::AADLObject::Type::Comment) {
-            const QRectF itemSceneRect = ive::rect(ivm::AADLObject::coordinatesFromString(strCoordinates));
+        if (child->type() == ivm::IVObject::Type::Function
+                || child->type() == ivm::IVObject::Type::FunctionType
+                || child->type() == ivm::IVObject::Type::Comment) {
+            const QRectF itemSceneRect = ive::rect(ivm::IVObject::coordinatesFromString(strCoordinates));
             if (itemSceneRect.isValid()) {
                 nestedRect |= itemSceneRect;
                 existingRects.insert(child->id(), itemSceneRect);
             } else {
                 itemsCountWithoutGeometry.append(child->id());
             }
-        } else if (auto connection = qobject_cast<const ivm::AADLConnection *>(child)) {
+        } else if (auto connection = qobject_cast<const ivm::IVConnection *>(child)) {
             if (connection->source()->id() != entity()->id() && connection->target()->id() != entity()->id()) {
-                const QPolygonF itemScenePoints = ive::polygon(ivm::AADLObject::coordinatesFromString(strCoordinates));
+                const QPolygonF itemScenePoints = ive::polygon(ivm::IVObject::coordinatesFromString(strCoordinates));
                 if (!itemScenePoints.isEmpty()) {
                     existingPolygons.insert(child->id(), itemScenePoints);
                 }
             } else {
-                ivm::AADLObject *outerIface = connection->source()->id() == entity()->id()
+                ivm::IVObject *outerIface = connection->source()->id() == entity()->id()
                         ? connection->sourceInterface()
                         : connection->target()->id() == entity()->id() ? connection->targetInterface() : nullptr;
 
-                ivm::AADLObject *innerIface = connection->source()->id() == entity()->id()
+                ivm::IVObject *innerIface = connection->source()->id() == entity()->id()
                         ? connection->targetInterface()
                         : connection->target()->id() == entity()->id() ? connection->sourceInterface() : nullptr;
 
@@ -316,7 +316,7 @@ void AADLFunctionGraphicsItem::drawNestedView(QPainter *painter)
                 QPointF innerIfacePos;
                 if (innerIface->hasProperty(ivm::meta::Props::token(token))) {
                     const QString ifaceStrCoordinates = innerIface->prop(ivm::meta::Props::token(token)).toString();
-                    innerIfacePos = ive::pos(ivm::AADLObject::coordinatesFromString(ifaceStrCoordinates));
+                    innerIfacePos = ive::pos(ivm::IVObject::coordinatesFromString(ifaceStrCoordinates));
                 }
                 ConnectionData cd { (*it)->scenePos(), innerIfacePos, innerIface->parentObject()->id() };
                 /// TODO: generate path between outer and inner ifaces
@@ -337,10 +337,10 @@ void AADLFunctionGraphicsItem::drawNestedView(QPainter *painter)
         if (!view)
             return;
 
-        const int count = std::count_if(childEntities.cbegin(), childEntities.cend(), [](const ivm::AADLObject *child) {
-            return child->aadlType() == ivm::AADLObject::Type::Function
-                    || child->aadlType() == ivm::AADLObject::Type::FunctionType
-                    || child->aadlType() == ivm::AADLObject::Type::Comment;
+        const int count = std::count_if(childEntities.cbegin(), childEntities.cend(), [](const ivm::IVObject *child) {
+            return child->type() == ivm::IVObject::Type::Function
+                    || child->type() == ivm::IVObject::Type::FunctionType
+                    || child->type() == ivm::IVObject::Type::Comment;
         });
 
         const QRect viewportGeometry = view->viewport()->geometry().marginsRemoved(kContentMargins.toMargins());
@@ -366,7 +366,7 @@ void AADLFunctionGraphicsItem::drawNestedView(QPainter *painter)
             mappedRects << mappedRect;
             painter->drawRect(mappedRect);
 
-            const QString text = entity()->objectsModel()->getObject(it.key())->titleUI();
+            const QString text = entity()->model()->getObject(it.key())->titleUI();
             const QRectF textRect = fm.boundingRect(
                     mappedRect.adjusted(4, 4, -4, -4), Qt::AlignTop | Qt::AlignLeft | Qt::TextDontClip, text);
             if (mappedRect.contains(textRect)) {
@@ -475,11 +475,11 @@ void AADLFunctionGraphicsItem::applyColorScheme()
 
 QString AADLFunctionGraphicsItem::prepareTooltip() const
 {
-    const QString title = uniteNames<ivm::AADLFunctionType *>({ entity() }, QString());
+    const QString title = uniteNames<ivm::IVFunctionType *>({ entity() }, QString());
     const QString prototype =
-            uniteNames<const ivm::AADLFunctionType *>({ entity()->instanceOf() }, tr("Instance of: "));
-    const QString ris = uniteNames<ivm::AADLIface *>(entity()->ris(), tr("RI: "));
-    const QString pis = uniteNames<ivm::AADLIface *>(entity()->pis(), tr("PI: "));
+            uniteNames<const ivm::IVFunctionType *>({ entity()->instanceOf() }, tr("Instance of: "));
+    const QString ris = uniteNames<ivm::IVInterface *>(entity()->ris(), tr("RI: "));
+    const QString pis = uniteNames<ivm::IVInterface *>(entity()->pis(), tr("PI: "));
 
     return joinNonEmpty({ title, prototype, ris, pis }, QStringLiteral("<br>"));
 }

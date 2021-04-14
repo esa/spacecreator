@@ -17,7 +17,7 @@
 
 #include "propertytemplate.h"
 
-#include "aadlobject.h"
+#include "ivobject.h"
 
 #include <QDomElement>
 #include <QMetaEnum>
@@ -381,24 +381,24 @@ QVariant PropertyTemplate::convertData(const QVariant &value, PropertyTemplate::
     return typedValue;
 }
 
-static inline PropertyTemplate::Scope typeToScope(const AADLObject::Type &type)
+static inline PropertyTemplate::Scope typeToScope(const IVObject::Type &type)
 {
     auto scope = PropertyTemplate::Scope::None;
     switch (type) {
-    case ivm::AADLObject::Type::Connection:
+    case ivm::IVObject::Type::Connection:
         scope = PropertyTemplate::Scope::Connection;
         break;
-    case ivm::AADLObject::Type::Comment:
+    case ivm::IVObject::Type::Comment:
         scope = PropertyTemplate::Scope::Comment;
         break;
-    case ivm::AADLObject::Type::FunctionType:
-    case ivm::AADLObject::Type::Function:
+    case ivm::IVObject::Type::FunctionType:
+    case ivm::IVObject::Type::Function:
         scope = PropertyTemplate::Scope::Function;
         break;
-    case ivm::AADLObject::Type::RequiredInterface:
+    case ivm::IVObject::Type::RequiredInterface:
         scope = PropertyTemplate::Scope::Required_Interface;
         break;
-    case ivm::AADLObject::Type::ProvidedInterface:
+    case ivm::IVObject::Type::ProvidedInterface:
         scope = PropertyTemplate::Scope::Provided_Interface;
         break;
     default:
@@ -412,9 +412,9 @@ static inline PropertyTemplate::Scope typeToScope(const AADLObject::Type &type)
  * \param object which attributes to be checked
  * \return
  */
-bool PropertyTemplate::validate(const AADLObject *object) const
+bool PropertyTemplate::validate(const IVObject *object) const
 {
-    const PropertyTemplate::Scope objectScope = typeToScope(object->aadlType());
+    const PropertyTemplate::Scope objectScope = typeToScope(object->type());
     if (!d->m_scope.testFlag(objectScope)) {
         return false;
     }

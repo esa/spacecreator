@@ -17,15 +17,15 @@
 
 #include "cmdentitiesinstantiate.h"
 
-#include "aadlfunction.h"
-#include "aadlfunctiontype.h"
-#include "aadlmodel.h"
-#include "aadlnamevalidator.h"
+#include "ivfunction.h"
+#include "ivfunctiontype.h"
+#include "ivmodel.h"
+#include "ivnamevalidator.h"
 #include "baseitems/common/aadlutils.h"
 #include "cmdentityattributechange.h"
 #include "commandids.h"
 
-static inline void shiftObjects(const QVector<ivm::AADLObject *> &objects, const QPointF &offset)
+static inline void shiftObjects(const QVector<ivm::IVObject *> &objects, const QPointF &offset)
 {
     for (auto obj : objects) {
         if (!obj) {
@@ -35,9 +35,9 @@ static inline void shiftObjects(const QVector<ivm::AADLObject *> &objects, const
         std::transform(
                 points.cbegin(), points.cend(), points.begin(), [offset](const QPointF &p) { return p + offset; });
         obj->setCoordinates(ive::coordinates(points));
-        if (obj->aadlType() == ivm::AADLObject::Type::FunctionType
-                || obj->aadlType() == ivm::AADLObject::Type::Function) {
-            shiftObjects(obj->as<ivm::AADLFunctionType *>()->children(), offset);
+        if (obj->type() == ivm::IVObject::Type::FunctionType
+                || obj->type() == ivm::IVObject::Type::Function) {
+            shiftObjects(obj->as<ivm::IVFunctionType *>()->children(), offset);
         }
     }
 }
@@ -46,7 +46,7 @@ namespace ive {
 namespace cmd {
 
 CmdEntitiesInstantiate::CmdEntitiesInstantiate(
-        ivm::AADLFunctionType *entity, ivm::AADLFunctionType *parent, ivm::AADLModel *model, const QPointF &pos)
+        ivm::IVFunctionType *entity, ivm::IVFunctionType *parent, ivm::IVModel *model, const QPointF &pos)
     : QUndoCommand()
     , m_parent(parent)
     , m_model(model)
@@ -54,8 +54,8 @@ CmdEntitiesInstantiate::CmdEntitiesInstantiate(
 {
     Q_ASSERT(entity);
     m_instantiatedEntity =
-            new ivm::AADLFunction({}, m_parent ? qobject_cast<QObject *>(m_parent) : qobject_cast<QObject *>(m_model));
-    m_instantiatedEntity->setTitle(ivm::AADLNameValidator::nameForInstance(
+            new ivm::IVFunction({}, m_parent ? qobject_cast<QObject *>(m_parent) : qobject_cast<QObject *>(m_model));
+    m_instantiatedEntity->setTitle(ivm::IVNameValidator::nameForInstance(
             m_instantiatedEntity, entity->title() + QLatin1String("_Instance_")));
     m_instantiatedEntity->setCoordinates(entity->coordinates());
 

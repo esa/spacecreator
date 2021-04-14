@@ -28,13 +28,13 @@ class AADLRectGraphicsItem : public InteractiveObject
 {
     Q_OBJECT
 public:
-    explicit AADLRectGraphicsItem(ivm::AADLObject *entity, QGraphicsItem *parentGraphicsItem = nullptr);
+    explicit AADLRectGraphicsItem(ivm::IVObject *entity, QGraphicsItem *parentGraphicsItem = nullptr);
     virtual QSizeF minimalSize() const;
 
     void setRect(const QRectF &geometry);
 
     void updateFromEntity() override;
-    QList<QPair<ivm::AADLObject *, QVector<QPointF>>> prepareChangeCoordinatesCommandParams() const override;
+    QList<QPair<ivm::IVObject *, QVector<QPointF>>> prepareChangeCoordinatesCommandParams() const override;
 
     enum MoveStep
     {

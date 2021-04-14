@@ -102,7 +102,7 @@ protected:
     QVariant m_defaultValue = {};
 };
 
-class IfaceParameter : public BasicParameter
+class InterfaceParameter : public BasicParameter
 {
     Q_GADGET
     Q_PROPERTY(bool isIn READ isInDirection)
@@ -117,10 +117,10 @@ public:
 
     Q_ENUM(Direction)
 
-    IfaceParameter(const QString &name = QObject::tr("IfaceParam"), Type t = BasicParameter::Type::Other,
+    InterfaceParameter(const QString &name = QObject::tr("IfaceParam"), Type t = BasicParameter::Type::Other,
             const QString &paramTypeName = {}, const QString &encoding = QObject::tr("NATIVE"),
-            Direction dir = IfaceParameter::Direction::IN);
-    ~IfaceParameter() override;
+            Direction dir = InterfaceParameter::Direction::IN);
+    ~InterfaceParameter() override;
 
     QString encoding() const;
     bool setEncoding(const QString &encoding);
@@ -131,7 +131,7 @@ public:
     inline bool isInDirection() const { return direction() == Direction::IN; }
     inline bool isOutDirection() const { return direction() == Direction::OUT; }
 
-    bool operator==(const IfaceParameter &other) const;
+    bool operator==(const InterfaceParameter &other) const;
 
     QString toString() const override;
     bool isNull() const override;
@@ -145,4 +145,4 @@ protected:
 
 Q_DECLARE_METATYPE(ivm::BasicParameter);
 Q_DECLARE_METATYPE(ivm::ContextParameter);
-Q_DECLARE_METATYPE(ivm::IfaceParameter);
+Q_DECLARE_METATYPE(ivm::InterfaceParameter);

@@ -22,7 +22,7 @@
 #include <QPointF>
 
 namespace ivm {
-class AADLObject;
+class IVObject;
 }
 
 namespace ive {
@@ -31,7 +31,7 @@ namespace cmd {
 class CmdEntityAutoLayout : public CmdEntityGeometryChange
 {
 public:
-    explicit CmdEntityAutoLayout(const QList<QPair<ivm::AADLObject *, QVector<QPointF>>> &objectsData);
+    explicit CmdEntityAutoLayout(const QList<QPair<ivm::IVObject *, QVector<QPointF>>> &objectsData);
     int id() const override;
 };
 

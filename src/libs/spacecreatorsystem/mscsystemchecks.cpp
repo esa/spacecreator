@@ -17,11 +17,11 @@
 
 #include "mscsystemchecks.h"
 
-#include "aadlconnection.h"
-#include "aadlconnectionchain.h"
-#include "aadlfunction.h"
-#include "aadliface.h"
-#include "aadlmodel.h"
+#include "ivconnection.h"
+#include "ivconnectionchain.h"
+#include "ivfunction.h"
+#include "ivinterface.h"
+#include "ivmodel.h"
 #include "chartlayoutmanager.h"
 #include "commandsstack.h"
 #include "interface/commands/cmdentityattributechange.h"
@@ -96,7 +96,7 @@ void MscSystemChecks::changeMscInstanceName(const QString &oldName, const QStrin
 /*!
    Removes all instance that are corresponding to the function \p aaldFunction
  */
-void MscSystemChecks::removeMscInstances(ivm::AADLFunction *aadlFunction)
+void MscSystemChecks::removeMscInstances(ivm::IVFunction *aadlFunction)
 {
     for (QSharedPointer<msc::MSCEditorCore> &mscCore : m_storage->allMscCores()) {
         mscCore->removeMscInstances(aadlFunction);
@@ -106,7 +106,7 @@ void MscSystemChecks::removeMscInstances(ivm::AADLFunction *aadlFunction)
 /*!
    Returns if there is at least one msc instance corresponding to \p aadlFunction
  */
-bool MscSystemChecks::hasCorrespondingInstances(ivm::AADLFunction *aadlFunction) const
+bool MscSystemChecks::hasCorrespondingInstances(ivm::IVFunction *aadlFunction) const
 {
     for (QSharedPointer<msc::MSCEditorCore> &mscCore : m_storage->allMscCores()) {
         if (!mscCore->correspondingInstances(aadlFunction).isEmpty()) {
@@ -152,7 +152,7 @@ void MscSystemChecks::changeMscMessageName(
 /*!
    Removes all messages that are corresponding to the connection \p aadlConnection
  */
-void MscSystemChecks::removeMscMessages(ivm::AADLConnection *aadlConnection)
+void MscSystemChecks::removeMscMessages(ivm::IVConnection *aadlConnection)
 {
     for (QSharedPointer<msc::MSCEditorCore> &mscCore : m_storage->allMscCores()) {
         mscCore->removeMscMessages(aadlConnection);
@@ -162,7 +162,7 @@ void MscSystemChecks::removeMscMessages(ivm::AADLConnection *aadlConnection)
 /*!
    Returns if there is at least one msc message corresponding to \p aadlConnection
  */
-bool MscSystemChecks::hasCorrespondingMessages(ivm::AADLConnection *aadlConnection) const
+bool MscSystemChecks::hasCorrespondingMessages(ivm::IVConnection *aadlConnection) const
 {
     for (QSharedPointer<msc::MSCEditorCore> &mscCore : m_storage->allMscCores()) {
         if (!mscCore->correspondingMessages(aadlConnection).isEmpty()) {
@@ -253,7 +253,7 @@ void MscSystemChecks::checkMessages()
     }
 }
 
-void MscSystemChecks::onEntityNameChanged(ivm::AADLObject *entity, const QString &oldName, shared::UndoCommand *command)
+void MscSystemChecks::onEntityNameChanged(ivm::IVObject *entity, const QString &oldName, shared::UndoCommand *command)
 {
     if (m_nameUpdateRunning) {
         return;
@@ -278,19 +278,19 @@ void MscSystemChecks::onEntityNameChanged(ivm::AADLObject *entity, const QString
 
     auto cmdIfaceAttribChange = dynamic_cast<ive::cmd::CmdIfaceAttrChange *>(command);
     if (cmdIfaceAttribChange) {
-        ivm::AADLIface *interface = cmdIfaceAttribChange->interface();
+        ivm::IVInterface *interface = cmdIfaceAttribChange->interface();
         QList<QStringList> messagesData;
-        if (interface->direction() == ivm::AADLIface::IfaceType::Provided) {
+        if (interface->direction() == ivm::IVInterface::InterfaceType::Provided) {
             // Update from connections
-            QVector<ivm::AADLConnection *> connections = cmdIfaceAttribChange->getRelatedConnections();
-            for (const ivm::AADLConnection *connection : qAsConst(connections)) {
+            QVector<ivm::IVConnection *> connections = cmdIfaceAttribChange->getRelatedConnections();
+            for (const ivm::IVConnection *connection : qAsConst(connections)) {
                 if (mscMessagesExist(oldName, connection->sourceName(), connection->targetName())) {
                     messagesData << QStringList({ connection->sourceName(), connection->targetName() });
                 }
             }
             // Update from cyclic interfaces
-            ivm::AADLFunctionType *func = interface->function();
-            if (func && interface->kind() == ivm::AADLIface::OperationKind::Cyclic) {
+            ivm::IVFunctionType *func = interface->function();
+            if (func && interface->kind() == ivm::IVInterface::OperationKind::Cyclic) {
                 if (mscMessagesExist(oldName, func->title(), "")) {
                     messagesData << QStringList({ func->title(), "" });
                 }
@@ -433,23 +433,23 @@ void MscSystemChecks::onMscEntityNameChanged(QObject *entity, const QString &old
 /*!
    Removes corresponding MSC entities when a AADL entity wasremoved
  */
-void MscSystemChecks::onEntitiesRemoved(const QList<QPointer<ivm::AADLObject>> &entities, shared::UndoCommand *command)
+void MscSystemChecks::onEntitiesRemoved(const QList<QPointer<ivm::IVObject>> &entities, shared::UndoCommand *command)
 {
     if (entities.isEmpty()) {
         return;
     }
 
     QStringList removedNames;
-    QList<ivm::AADLFunction *> removedFunctions;
-    QList<ivm::AADLConnection *> removedConnections;
-    for (const QPointer<ivm::AADLObject> &entity : entities) {
+    QList<ivm::IVFunction *> removedFunctions;
+    QList<ivm::IVConnection *> removedConnections;
+    for (const QPointer<ivm::IVObject> &entity : entities) {
         if (!entity) {
             continue;
         }
-        if (entity->aadlType() == ivm::AADLObject::Type::Function) {
-            removedFunctions.append(qobject_cast<ivm::AADLFunction *>(entity));
-        } else if (entity->aadlType() == ivm::AADLObject::Type::Connection) {
-            removedConnections.append(qobject_cast<ivm::AADLConnection *>(entity));
+        if (entity->type() == ivm::IVObject::Type::Function) {
+            removedFunctions.append(qobject_cast<ivm::IVFunction *>(entity));
+        } else if (entity->type() == ivm::IVObject::Type::Connection) {
+            removedConnections.append(qobject_cast<ivm::IVConnection *>(entity));
         } else {
             continue;
         }

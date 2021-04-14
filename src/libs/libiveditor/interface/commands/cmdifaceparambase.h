@@ -22,8 +22,8 @@
 #include <QVector>
 
 namespace ivm {
-class AADLIface;
-class AADLConnection;
+class IVInterface;
+class IVConnection;
 }
 
 namespace ive {
@@ -40,12 +40,12 @@ public:
 
 protected:
     // NOT to be instantiated directly!
-    explicit CmdIfaceParamBase(ivm::AADLIface *iface);
+    explicit CmdIfaceParamBase(ivm::IVInterface *iface);
     int id() const override = 0;
 
 protected:
-    QPointer<ivm::AADLIface> m_iface;
-    QVector<ivm::AADLConnection *> m_connections;
+    QPointer<ivm::IVInterface> m_iface;
+    QVector<ivm::IVConnection *> m_connections;
     QVector<QUndoCommand *> m_cmdRmConnections;
 
 private:

@@ -17,13 +17,13 @@
 
 #pragma once
 
-#include "aadlobject.h"
+#include "ivobject.h"
 
 #include <QPointer>
 #include <QUndoCommand>
 
 namespace ivm {
-class AADLObject;
+class IVObject;
 }
 
 namespace ive {
@@ -32,7 +32,7 @@ namespace cmd {
 class CmdEntityPropertyCreate : public QUndoCommand
 {
 public:
-    explicit CmdEntityPropertyCreate(ivm::AADLObject *entity, const QVariantHash &props);
+    explicit CmdEntityPropertyCreate(ivm::IVObject *entity, const QVariantHash &props);
 
     void redo() override;
     void undo() override;
@@ -40,7 +40,7 @@ public:
     int id() const override;
 
 private:
-    QPointer<ivm::AADLObject> m_entity;
+    QPointer<ivm::IVObject> m_entity;
     QVariantHash m_newProps;
     const QVariantHash m_oldProps;
 };

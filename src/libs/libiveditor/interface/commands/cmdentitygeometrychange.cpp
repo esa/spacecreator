@@ -17,7 +17,7 @@
 
 #include "cmdentitygeometrychange.h"
 
-#include "aadlmodel.h"
+#include "ivmodel.h"
 #include "baseitems/common/aadlutils.h"
 #include "commandids.h"
 #include "commandsstack.h"
@@ -28,7 +28,7 @@ namespace ive {
 namespace cmd {
 
 CmdEntityGeometryChange::CmdEntityGeometryChange(
-        const QList<QPair<ivm::AADLObject *, QVector<QPointF>>> &objectsData, const QString &title)
+        const QList<QPair<ivm::IVObject *, QVector<QPointF>>> &objectsData, const QString &title)
     : QUndoCommand(title.isEmpty() ? QObject::tr("Change item(s) geometry/position") : title)
     , m_internalData(objectsData)
     , m_data(convertData(m_internalData))
@@ -80,23 +80,23 @@ void CmdEntityGeometryChange::mergeCommand(QUndoCommand *command)
 }
 
 QList<CmdEntityGeometryChange::ObjectData> CmdEntityGeometryChange::convertData(
-        const QList<QPair<ivm::AADLObject *, QVector<QPointF>>> &objectsData)
+        const QList<QPair<ivm::IVObject *, QVector<QPointF>>> &objectsData)
 {
     QList<ObjectData> result;
     for (const auto &objectData : objectsData)
         result.append({ objectData.first, objectData.first->coordinates(), coordinates(objectData.second) });
 
     std::stable_sort(result.begin(), result.end(), [](const ObjectData &data1, const ObjectData &data2) {
-        if (data1.entity->aadlType() == data2.entity->aadlType())
+        if (data1.entity->type() == data2.entity->type())
             return ive::nestingLevel(data1.entity) < ive::nestingLevel(data2.entity);
 
-        return data1.entity->aadlType() < data2.entity->aadlType();
+        return data1.entity->type() < data2.entity->type();
     });
 
     return result;
 }
 
-void CmdEntityGeometryChange::prepareData(const QList<QPair<ivm::AADLObject *, QVector<QPointF>>> &objectsData)
+void CmdEntityGeometryChange::prepareData(const QList<QPair<ivm::IVObject *, QVector<QPointF>>> &objectsData)
 {
     m_data = convertData(objectsData);
 }

@@ -25,7 +25,7 @@
 namespace ive {
 namespace cmd {
 
-CmdEntityAutoLayout::CmdEntityAutoLayout(const QList<QPair<ivm::AADLObject *, QVector<QPointF>>> &objectsData)
+CmdEntityAutoLayout::CmdEntityAutoLayout(const QList<QPair<ivm::IVObject *, QVector<QPointF>>> &objectsData)
     : CmdEntityGeometryChange(objectsData, QObject::tr("Auto layout items"))
 {
 }

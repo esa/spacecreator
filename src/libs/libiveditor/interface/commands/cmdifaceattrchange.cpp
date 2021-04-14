@@ -17,18 +17,18 @@
 
 #include "cmdifaceattrchange.h"
 
-#include "aadlconnection.h"
+#include "ivconnection.h"
 #include "commandids.h"
 
 namespace ive {
 namespace cmd {
 
-static inline QVariant getCurrentAttribute(const ivm::AADLIface *entity, const QString &name)
+static inline QVariant getCurrentAttribute(const ivm::IVInterface *entity, const QString &name)
 {
     return (entity && !name.isEmpty()) ? entity->attr(name) : QVariant();
 }
 
-CmdIfaceAttrChange::CmdIfaceAttrChange(ivm::AADLIface *entity, const QString &attrName, const QVariant &value)
+CmdIfaceAttrChange::CmdIfaceAttrChange(ivm::IVInterface *entity, const QString &attrName, const QVariant &value)
     : CmdIfaceDataChangeBase(entity, attrName, value, getCurrentAttribute(entity, attrName))
 {
     if (m_targetToken == ivm::meta::Props::Token::kind) {
@@ -102,16 +102,16 @@ void CmdIfaceAttrChange::restoreConnections()
         cmd->undo();
 }
 
-bool CmdIfaceAttrChange::connectionMustDie(const ivm::AADLConnection *connection) const
+bool CmdIfaceAttrChange::connectionMustDie(const ivm::IVConnection *connection) const
 {
-    const ivm::AADLIface *otherIface = getConnectionOtherSide(connection, m_iface);
+    const ivm::IVInterface *otherIface = getConnectionOtherSide(connection, m_iface);
     if (!otherIface) {
         Q_UNREACHABLE();
         return true;
     }
 
-    const ivm::AADLIface::OperationKind newKind = m_iface->kindFromString(m_newValue.toString());
-    return ivm::AADLIface::OperationKind::Cyclic == newKind;
+    const ivm::IVInterface::OperationKind newKind = m_iface->kindFromString(m_newValue.toString());
+    return ivm::IVInterface::OperationKind::Cyclic == newKind;
 }
 
 }

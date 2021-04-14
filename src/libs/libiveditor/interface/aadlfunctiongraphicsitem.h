@@ -17,14 +17,11 @@
 
 #pragma once
 
+#include "ivfunction.h"
 #include "aadlconnectiongraphicsitem.h"
 #include "aadlfunctiontypegraphicsitem.h"
 
 class QSvgRenderer;
-
-namespace ivm {
-class AADLFunction;
-}
 
 namespace ive {
 class AADLInterfaceGraphicsItem;
@@ -33,15 +30,15 @@ class AADLFunctionGraphicsItem : public AADLFunctionTypeGraphicsItem
 {
     Q_OBJECT
 public:
-    explicit AADLFunctionGraphicsItem(ivm::AADLFunction *entity, QGraphicsItem *parent = nullptr);
+    explicit AADLFunctionGraphicsItem(ivm::IVFunction *entity, QGraphicsItem *parent = nullptr);
     enum
     {
-        Type = UserType + static_cast<int>(ivm::AADLObject::Type::Function)
+        Type = UserType + static_cast<int>(ivm::IVObject::Type::Function)
     };
 
     void init() override;
 
-    ivm::AADLFunction *entity() const;
+    ivm::IVFunction *entity() const override;
 
     int type() const override { return Type; }
 

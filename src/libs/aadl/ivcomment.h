@@ -17,16 +17,16 @@
 
 #pragma once
 
-#include "aadlobject.h"
+#include "ivobject.h"
 
 namespace ivm {
 
-class AADLComment : public AADLObject
+class IVComment : public IVObject
 {
     Q_OBJECT
 public:
-    explicit AADLComment(const QString &comment = QString(), QObject *parent = nullptr);
-    ~AADLComment() override;
+    explicit IVComment(const QString &comment = QString(), QObject *parent = nullptr);
+    ~IVComment() override;
 };
 
 }

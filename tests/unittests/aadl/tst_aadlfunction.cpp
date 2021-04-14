@@ -15,10 +15,10 @@
    along with this program. If not, see <https://www.gnu.org/licenses/lgpl-2.1.html>.
 */
 
-#include "aadlfunction.h"
-#include "aadliface.h"
-#include "aadlobject.h"
-#include "aadltestutils.h"
+#include "ivfunction.h"
+#include "ivinterface.h"
+#include "ivobject.h"
+#include "ivtestutils.h"
 
 #include <QtTest>
 
@@ -35,18 +35,18 @@ private Q_SLOTS:
 
 void tst_AADLFunction::testAadlType()
 {
-    ivm::AADLFunction obj;
+    ivm::IVFunction obj;
 
-    QCOMPARE(obj.aadlType(), ivm::AADLObject::Type::Function);
+    QCOMPARE(obj.type(), ivm::IVObject::Type::Function);
 }
 
 void tst_AADLFunction::testRequiredInterfacesManagement() const
 {
-    ivm::AADLFunction obj;
+    ivm::IVFunction obj;
 
     QCOMPARE(obj.ris().size(), 0);
 
-    auto ifaceType = ivm::AADLIface::IfaceType::Required;
+    auto ifaceType = ivm::IVInterface::InterfaceType::Required;
     const int ifacesCount = 10;
     for (int i = 0; i < ifacesCount; ++i) {
         auto ri = ivm::testutils::createIface(&obj, ifaceType);
@@ -66,11 +66,11 @@ void tst_AADLFunction::testRequiredInterfacesManagement() const
 
 void tst_AADLFunction::testProvidedInterfacesManagement() const
 {
-    ivm::AADLFunction obj;
+    ivm::IVFunction obj;
 
     QCOMPARE(obj.ris().size(), 0);
 
-    auto ifaceType = ivm::AADLIface::IfaceType::Provided;
+    auto ifaceType = ivm::IVInterface::InterfaceType::Provided;
     const int ifacesCount = 10;
     for (int i = 0; i < ifacesCount; ++i) {
         auto pi = ivm::testutils::createIface(&obj, ifaceType);
@@ -94,15 +94,15 @@ void tst_AADLFunction::testProvidedInterfacesManagement() const
 
 void tst_AADLFunction::testCommonInterfacesManagement() const
 {
-    ivm::AADLFunction obj;
+    ivm::IVFunction obj;
 
     QCOMPARE(obj.ris().size(), 0);
 
     const int ifacesCountHalf = 5;
-    auto itProvided = ivm::AADLIface::IfaceType::Provided;
-    auto itRequired = ivm::AADLIface::IfaceType::Required;
+    auto itProvided = ivm::IVInterface::InterfaceType::Provided;
+    auto itRequired = ivm::IVInterface::InterfaceType::Required;
 
-    QVector<ivm::AADLIface *> ifaces;
+    QVector<ivm::IVInterface *> ifaces;
     for (int i = 0; i < ifacesCountHalf; ++i) {
         ifaces << ivm::testutils::createIface(&obj, itProvided) << ivm::testutils::createIface(&obj, itRequired);
     }
@@ -118,7 +118,7 @@ void tst_AADLFunction::testCommonInterfacesManagement() const
     QCOMPARE(obj.pis().size(), ifacesCountHalf);
 
     while (ifaces.size()) {
-        if (ivm::AADLIface *iface = ifaces.takeLast()) {
+        if (ivm::IVInterface *iface = ifaces.takeLast()) {
             const int prevCount = iface->isProvided() ? obj.pis().size() : obj.ris().size();
             const bool ok = obj.removeChild(iface);
             QVERIFY(ok);

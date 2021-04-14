@@ -17,13 +17,14 @@
 
 #pragma once
 
-#include "aadlobject.h"
+#include "ivobject.h"
+#include "ivcomment.h"
 #include "aadlrectgraphicsitem.h"
 
 #include <QScopedPointer>
 
 namespace ivm {
-class AADLComment;
+class IVComment;
 }
 
 namespace ive {
@@ -33,10 +34,10 @@ class AADLCommentGraphicsItem : public AADLRectGraphicsItem
     Q_OBJECT
 
 public:
-    explicit AADLCommentGraphicsItem(ivm::AADLComment *comment, QGraphicsItem *parent = nullptr);
+    explicit AADLCommentGraphicsItem(ivm::IVComment *comment, QGraphicsItem *parent = nullptr);
     enum
     {
-        Type = UserType + static_cast<int>(ivm::AADLObject::Type::Comment)
+        Type = UserType + static_cast<int>(ivm::IVObject::Type::Comment)
     };
     int type() const override { return Type; }
 
@@ -45,7 +46,7 @@ public:
     void setText(const QString &text);
     QString text() const;
 
-    ivm::AADLComment *entity() const;
+    ivm::IVComment *entity() const override;
     QSizeF minimalSize() const override;
     void updateFromEntity() override;
 

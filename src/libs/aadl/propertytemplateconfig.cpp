@@ -17,7 +17,7 @@
 
 #include "propertytemplateconfig.h"
 
-#include "aadlobject.h"
+#include "ivobject.h"
 #include "common.h"
 #include "propertytemplate.h"
 
@@ -163,12 +163,12 @@ void PropertyTemplateConfig::init(const QString &configPath)
     d->init(attributes);
 }
 
-bool PropertyTemplateConfig::hasPropertyTemplateForObject(const AADLObject *obj, const QString &name) const
+bool PropertyTemplateConfig::hasPropertyTemplateForObject(const IVObject *obj, const QString &name) const
 {
     return propertyTemplateForObject(obj, name) != nullptr;
 }
 
-PropertyTemplate *PropertyTemplateConfig::propertyTemplateForObject(const AADLObject *obj, const QString &name) const
+PropertyTemplate *PropertyTemplateConfig::propertyTemplateForObject(const IVObject *obj, const QString &name) const
 {
     const QList<PropertyTemplate *> templates = propertyTemplatesForObject(obj);
     auto it = std::find_if(templates.constBegin(), templates.constEnd(), [name](PropertyTemplate *propTemplate) {
@@ -199,15 +199,15 @@ QList<PropertyTemplate *> PropertyTemplateConfig::parseAttributesList(
     return attrs;
 }
 
-QList<PropertyTemplate *> PropertyTemplateConfig::propertyTemplatesForObject(const ivm::AADLObject *obj) const
+QList<PropertyTemplate *> PropertyTemplateConfig::propertyTemplatesForObject(const ivm::IVObject *obj) const
 {
-    switch (obj->aadlType()) {
-    case ivm::AADLObject::Type::FunctionType:
-    case ivm::AADLObject::Type::Function:
+    switch (obj->type()) {
+    case ivm::IVObject::Type::FunctionType:
+    case ivm::IVObject::Type::Function:
         return d->m_function;
-    case ivm::AADLObject::Type::RequiredInterface:
+    case ivm::IVObject::Type::RequiredInterface:
         return d->m_reqIface;
-    case ivm::AADLObject::Type::ProvidedInterface:
+    case ivm::IVObject::Type::ProvidedInterface:
         return d->m_provIface;
     default:
         return {};

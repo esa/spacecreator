@@ -26,7 +26,7 @@ class QMouseEvent;
 class QContextMenuEvent;
 
 namespace ivm {
-class AADLObject;
+class IVObject;
 }
 
 namespace ive {

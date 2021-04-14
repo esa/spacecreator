@@ -17,8 +17,8 @@
 
 #include "endtoendconnections.h"
 
-#include "aadlconnectionchain.h"
-#include "aadlconnection.h"
+#include "ivconnectionchain.h"
+#include "ivconnection.h"
 #include "mscchart.h"
 #include "mscdocument.h"
 #include "mscinstance.h"
@@ -173,15 +173,15 @@ EndToEndConnections::Dataflow EndToEndConnections::readDataflow(const QString &f
     return {};
 }
 
-bool EndToEndConnections::isInDataflow(const Dataflow &dataflow, const QList<ivm::AADLConnectionChain *> &chains,
-        ivm::AADLConnection *connection)
+bool EndToEndConnections::isInDataflow(const Dataflow &dataflow, const QList<ivm::IVConnectionChain *> &chains,
+        ivm::IVConnection *connection)
 {
     // Just to be on the save side
     if (connection == nullptr) {
         return false;
     }
 
-    for (ivm::AADLConnectionChain *chain : chains) {
+    for (ivm::IVConnectionChain *chain : chains) {
         for (const Connection &mscConnection : dataflow.connections) {
             if (chain->contains(connection)) {
                 if (chain->contains(mscConnection.message, mscConnection.from, mscConnection.to)) {

@@ -15,23 +15,23 @@
    along with this program. If not, see <https://www.gnu.org/licenses/lgpl-2.1.html>.
 */
 
-#include "aadlinterfacechain.h"
+#include "ivinterfacechain.h"
 
-#include "aadlconnection.h"
-#include "aadlfunction.h"
-#include "aadliface.h"
-#include "aadlmodel.h"
+#include "ivconnection.h"
+#include "ivfunction.h"
+#include "ivinterface.h"
+#include "ivmodel.h"
 
 #include <QSet>
 
 namespace ivm {
 
-QList<AADLInterfaceChain> AADLInterfaceChain::getNextChunk(
-        const AADLInterfaceChain &currentChain, const AADLIface *iface)
+QList<IVInterfaceChain> IVInterfaceChain::getNextChunk(
+        const IVInterfaceChain &currentChain, const IVInterface *iface)
 {
-    QList<AADLInterfaceChain> chains;
-    for (auto connection : iface->objectsModel()->getConnectionsForIface(iface->id())) {
-        AADLInterfaceChain chain(currentChain);
+    QList<IVInterfaceChain> chains;
+    for (auto connection : iface->model()->getConnectionsForIface(iface->id())) {
+        IVInterfaceChain chain(currentChain);
         if (connection->targetInterface()->id() == iface->id()) {
             continue;
         }
@@ -39,15 +39,15 @@ QList<AADLInterfaceChain> AADLInterfaceChain::getNextChunk(
         chains << getNextChunk(chain, connection->targetInterface());
     }
 
-    return chains.isEmpty() ? QList<AADLInterfaceChain> { currentChain } : chains;
+    return chains.isEmpty() ? QList<IVInterfaceChain> { currentChain } : chains;
 }
 
-QList<AADLInterfaceChain> AADLInterfaceChain::getPreviousChunk(
-        const AADLInterfaceChain &currentChain, const AADLIface *iface)
+QList<IVInterfaceChain> IVInterfaceChain::getPreviousChunk(
+        const IVInterfaceChain &currentChain, const IVInterface *iface)
 {
-    QList<AADLInterfaceChain> chains;
-    for (auto connection : iface->objectsModel()->getConnectionsForIface(iface->id())) {
-        AADLInterfaceChain chain(currentChain);
+    QList<IVInterfaceChain> chains;
+    for (auto connection : iface->model()->getConnectionsForIface(iface->id())) {
+        IVInterfaceChain chain(currentChain);
         if (connection->sourceInterface()->id() == iface->id()) {
             continue;
         }
@@ -55,21 +55,21 @@ QList<AADLInterfaceChain> AADLInterfaceChain::getPreviousChunk(
         chains << getPreviousChunk(chain, connection->sourceInterface());
     }
 
-    return chains.isEmpty() ? QList<AADLInterfaceChain> { currentChain } : chains;
+    return chains.isEmpty() ? QList<IVInterfaceChain> { currentChain } : chains;
 }
 
-QList<AADLInterfaceChain> AADLInterfaceChain::build(const AADLIface *iface)
+QList<IVInterfaceChain> IVInterfaceChain::build(const IVInterface *iface)
 {
     if (!iface) {
         return {};
     }
 
-    QList<AADLInterfaceChain> result;
-    const QList<AADLInterfaceChain> prevItems = getPreviousChunk({}, iface);
-    const QList<AADLInterfaceChain> nextItems = getNextChunk({}, iface);
+    QList<IVInterfaceChain> result;
+    const QList<IVInterfaceChain> prevItems = getPreviousChunk({}, iface);
+    const QList<IVInterfaceChain> nextItems = getNextChunk({}, iface);
     for (auto prevChain : prevItems) {
         for (auto nextChain : nextItems) {
-            AADLInterfaceChain chain;
+            IVInterfaceChain chain;
             std::copy(prevChain.ifaces.cbegin(), prevChain.ifaces.cend(), std::back_inserter(chain.ifaces));
             chain.ifaces.append(iface);
             std::copy(nextChain.ifaces.cbegin(), nextChain.ifaces.cend(), std::back_inserter(chain.ifaces));
@@ -79,11 +79,11 @@ QList<AADLInterfaceChain> AADLInterfaceChain::build(const AADLIface *iface)
     return result;
 }
 
-QVector<QList<QString>> AADLInterfaceChain::linkedFunctions(const AADLFunctionType *function)
+QVector<QList<QString>> IVInterfaceChain::linkedFunctions(const IVFunctionType *function)
 {
     QVector<QList<QString>> result;
-    for (AADLIface *iface : function->interfaces()) {
-        const QList<AADLInterfaceChain> chains = build(iface);
+    for (IVInterface *iface : function->interfaces()) {
+        const QList<IVInterfaceChain> chains = build(iface);
         for (auto chain : chains) {
             if (!chain.ifaces.isEmpty()) {
                 result.append(chain.ifaces.front()->function()->path());
@@ -105,7 +105,7 @@ QVector<QList<QString>> AADLInterfaceChain::linkedFunctions(const AADLFunctionTy
     return result;
 }
 
-QString AADLInterfaceChain::sourceEndPointName() const
+QString IVInterfaceChain::sourceEndPointName() const
 {
     if (ifaces.isEmpty()) {
         return {};
@@ -116,7 +116,7 @@ QString AADLInterfaceChain::sourceEndPointName() const
     return {};
 }
 
-QString AADLInterfaceChain::targetEndPointName() const
+QString IVInterfaceChain::targetEndPointName() const
 {
     if (ifaces.isEmpty()) {
         return {};
@@ -127,7 +127,7 @@ QString AADLInterfaceChain::targetEndPointName() const
     return {};
 }
 
-QStringList AADLInterfaceChain::sourceEndPointPath() const
+QStringList IVInterfaceChain::sourceEndPointPath() const
 {
     if (ifaces.isEmpty()) {
         return {};
@@ -138,7 +138,7 @@ QStringList AADLInterfaceChain::sourceEndPointPath() const
     return {};
 }
 
-QStringList AADLInterfaceChain::targetEndPointPath() const
+QStringList IVInterfaceChain::targetEndPointPath() const
 {
     if (ifaces.isEmpty()) {
         return {};

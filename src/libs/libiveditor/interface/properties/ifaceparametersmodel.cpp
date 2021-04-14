@@ -17,8 +17,8 @@
 
 #include "ifaceparametersmodel.h"
 
-#include "aadliface.h"
-#include "aadlobject.h"
+#include "ivinterface.h"
+#include "ivobject.h"
 #include "commandsstack.h"
 #include "interface/commands/cmdifaceparamchange.h"
 #include "interface/commands/cmdifaceparamcreate.h"
@@ -41,7 +41,7 @@ IfaceParametersModel::IfaceParametersModel(
 
 IfaceParametersModel::~IfaceParametersModel() { }
 
-void IfaceParametersModel::createNewRow(const ivm::IfaceParameter &param, int row)
+void IfaceParametersModel::createNewRow(const ivm::InterfaceParameter &param, int row)
 {
     m_params.insert(row, param);
 
@@ -62,13 +62,13 @@ void IfaceParametersModel::createNewRow(const ivm::IfaceParameter &param, int ro
 
     QStandardItem *directionItem = new QStandardItem(row, Column::Direction);
     directionItem->setData(shared::typeName(param.direction()), DataRole);
-    directionItem->setData(QStringList { shared::typeName(ivm::IfaceParameter::Direction::IN),
-                                   shared::typeName(ivm::IfaceParameter::Direction::OUT) },
+    directionItem->setData(QStringList { shared::typeName(ivm::InterfaceParameter::Direction::IN),
+                                   shared::typeName(ivm::InterfaceParameter::Direction::OUT) },
             EditRole);
     setItem(row, Column::Direction, directionItem);
 }
 
-void IfaceParametersModel::setDataObject(ivm::AADLObject *obj)
+void IfaceParametersModel::setDataObject(ivm::IVObject *obj)
 {
     clear();
     m_params.clear();
@@ -77,12 +77,12 @@ void IfaceParametersModel::setDataObject(ivm::AADLObject *obj)
     if (!m_dataObject)
         return;
 
-    if (auto iface = qobject_cast<ivm::AADLIface *>(m_dataObject)) {
-        const QVector<ivm::IfaceParameter> &params(iface->params());
+    if (auto iface = qobject_cast<ivm::IVInterface *>(m_dataObject)) {
+        const QVector<ivm::InterfaceParameter> &params(iface->params());
         const int paramsCount = params.size();
 
         for (int i = 0; i < paramsCount; ++i) {
-            const ivm::IfaceParameter &param = params.at(i);
+            const ivm::InterfaceParameter &param = params.at(i);
             createNewRow(param, i);
         }
     }
@@ -100,8 +100,8 @@ bool IfaceParametersModel::setData(const QModelIndex &index, const QVariant &val
         return false;
 
     if (role == DataRole || role == Qt::EditRole) {
-        const ivm::IfaceParameter &paramOld = m_params.value(index.row());
-        ivm::IfaceParameter paramNew(paramOld);
+        const ivm::InterfaceParameter &paramOld = m_params.value(index.row());
+        ivm::InterfaceParameter paramNew(paramOld);
 
         switch (index.column()) {
         case Column::Name: {
@@ -120,7 +120,7 @@ bool IfaceParametersModel::setData(const QModelIndex &index, const QVariant &val
             break;
         }
         case Column::Direction: {
-            if (!paramNew.setDirection(shared::typeFromName<ivm::IfaceParameter::Direction>(value.toString())))
+            if (!paramNew.setDirection(shared::typeFromName<ivm::InterfaceParameter::Direction>(value.toString())))
                 return false;
             break;
         }
@@ -138,7 +138,7 @@ bool IfaceParametersModel::setData(const QModelIndex &index, const QVariant &val
 
 bool IfaceParametersModel::createProperty(const QString &propName)
 {
-    ivm::IfaceParameter param(propName);
+    ivm::InterfaceParameter param(propName);
 
     auto propsCmd = new cmd::CmdIfaceParamCreate(m_dataObject, param);
     const int rows = rowCount();
@@ -195,10 +195,10 @@ Qt::ItemFlags IfaceParametersModel::flags(const QModelIndex &index) const
 {
     Qt::ItemFlags flags = PropertiesModelBase::flags(index);
     if (m_dataObject)
-        if (auto iface = m_dataObject->as<const ivm::AADLIface *>()) {
+        if (auto iface = m_dataObject->as<const ivm::IVInterface *>()) {
             if (iface->isClone()) {
                 flags = flags & ~Qt::ItemIsEditable & ~Qt::ItemIsEnabled;
-            } else if (auto ri = iface->as<const ivm::AADLIfaceRequired *>()) {
+            } else if (auto ri = iface->as<const ivm::IVInterfaceRequired *>()) {
                 if (ri->hasPrototypePi())
                     flags = flags & ~Qt::ItemIsEditable & ~Qt::ItemIsEnabled;
             }

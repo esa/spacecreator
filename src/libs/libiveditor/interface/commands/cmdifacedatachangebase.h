@@ -25,10 +25,10 @@
 #include <QVector>
 
 namespace ivm {
-class AADLObject;
-class AADLConnection;
-class AADLIface;
-class AADLModel;
+class IVObject;
+class IVConnection;
+class IVInterface;
+class IVModel;
 }
 
 namespace ive {
@@ -41,30 +41,30 @@ class CmdIfaceDataChangeBase : public shared::UndoCommand
 public:
     ~CmdIfaceDataChangeBase() override;
 
-    virtual QVector<ivm::AADLConnection *> getRelatedConnections();
-    ivm::AADLIface *interface() const;
+    virtual QVector<ivm::IVConnection *> getRelatedConnections();
+    ivm::IVInterface *interface() const;
 
 Q_SIGNALS:
-    void nameChanged(ivm::AADLObject *entity, const QString &oldName, shared::UndoCommand *command);
+    void nameChanged(ivm::IVObject *entity, const QString &oldName, shared::UndoCommand *command);
 
 protected:
     CmdIfaceDataChangeBase() = delete;
     CmdIfaceDataChangeBase(const CmdIfaceDataChangeBase &other) = delete;
-    explicit CmdIfaceDataChangeBase(ivm::AADLIface *iface, const QString &targetName,
+    explicit CmdIfaceDataChangeBase(ivm::IVInterface *iface, const QString &targetName,
             const QVariant &targetValue, const QVariant &prevValue, QUndoCommand *parent = nullptr);
 
-    QPointer<ivm::AADLIface> m_iface;
-    QPointer<ivm::AADLModel> m_model;
-    QVector<ivm::AADLConnection *> m_relatedConnections;
+    QPointer<ivm::IVInterface> m_iface;
+    QPointer<ivm::IVModel> m_model;
+    QVector<ivm::IVConnection *> m_relatedConnections;
     const QString m_targetName;
     const ivm::meta::Props::Token m_targetToken;
     const QVariant m_oldValue, m_newValue;
     QVector<QUndoCommand *> m_cmdRmConnection;
 
-    virtual QVector<QPointer<ivm::AADLIface>> getRelatedIfaces();
-    virtual bool connectionMustDie(const ivm::AADLConnection *connection) const = 0;
-    static ivm::AADLIface *getConnectionOtherSide(
-            const ivm::AADLConnection *connection, ivm::AADLIface *changedIface);
+    virtual QVector<QPointer<ivm::IVInterface>> getRelatedIfaces();
+    virtual bool connectionMustDie(const ivm::IVConnection *connection) const = 0;
+    static ivm::IVInterface *getConnectionOtherSide(
+            const ivm::IVConnection *connection, ivm::IVInterface *changedIface);
 
     void prepareRemoveConnectionCommands();
 };

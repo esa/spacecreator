@@ -17,10 +17,10 @@
 
 #include "iveditorcore.h"
 
-#include "aadlconnection.h"
-#include "aadlfunction.h"
-#include "aadliface.h"
-#include "aadlmodel.h"
+#include "ivconnection.h"
+#include "ivfunction.h"
+#include "ivinterface.h"
+#include "ivmodel.h"
 #include "baseitems/common/aadlutils.h"
 #include "commandlineparser.h"
 #include "commandsstack.h"
@@ -67,10 +67,10 @@ IVEditorCore::IVEditorCore(QObject *parent)
     m_docToolBar->setAllowedAreas(Qt::AllToolBarAreas);
     m_docToolBar->setMovable(true);
 
-    if (ivm::AADLModel *model = document()->objectsModel()) {
-        connect(model, &ivm::AADLModel::aadlObjectsAdded, this, &ive::IVEditorCore::updateAadlItems);
-        connect(model, &ivm::AADLModel::aadlObjectRemoved, this, &ive::IVEditorCore::updateAadlItems);
-        connect(model, &ivm::AADLModel::rootObjectChanged, this, &ive::IVEditorCore::updateAadlItems);
+    if (ivm::IVModel *model = document()->objectsModel()) {
+        connect(model, &ivm::IVModel::objectsAdded, this, &ive::IVEditorCore::updateAadlItems);
+        connect(model, &ivm::IVModel::objectRemoved, this, &ive::IVEditorCore::updateAadlItems);
+        connect(model, &ivm::IVModel::rootObjectChanged, this, &ive::IVEditorCore::updateAadlItems);
     }
 }
 
@@ -143,7 +143,7 @@ QAction *IVEditorCore::actionToggleE2EView()
    Adds an aadl function with the given \p name
    @return Returns the newly created function. Or nullptr if the creation failed.
  */
-ivm::AADLFunction *IVEditorCore::addFunction(const QString &name, ivm::AADLFunction *parent)
+ivm::IVFunction *IVEditorCore::addFunction(const QString &name, ivm::IVFunction *parent)
 {
     auto cmd = new cmd::CmdFunctionItemCreate(
             m_document->objectsModel(), parent, QRectF(QPointF(10., 10.), DefaultGraphicsItemSize), name);
@@ -173,28 +173,28 @@ bool IVEditorCore::addConnection(QString name, const QString &fromInstanceName, 
         return addInterface(name, fromInstanceName) != nullptr;
     }
 
-    ivm::AADLModel *aadlModel = m_document->objectsModel();
+    ivm::IVModel *aadlModel = m_document->objectsModel();
     if (aadlModel->getConnection(name, fromInstanceName, toInstanceName, m_caseCheck) != nullptr) {
         // The connection exists already
         return false;
     }
 
-    ivm::AADLFunction *fromFunc = aadlModel->getFunction(fromInstanceName, m_caseCheck);
-    ivm::AADLFunction *toFunc = aadlModel->getFunction(toInstanceName, m_caseCheck);
+    ivm::IVFunction *fromFunc = aadlModel->getFunction(fromInstanceName, m_caseCheck);
+    ivm::IVFunction *toFunc = aadlModel->getFunction(toInstanceName, m_caseCheck);
 
     if (!fromFunc || !toFunc) {
         qDebug() << Q_FUNC_INFO << "No function for the connection" << name;
         return false;
     }
 
-    ivm::AADLIface *fromInterface = getInterface(name, ivm::AADLIface::IfaceType::Required, fromFunc);
-    ivm::AADLIface *toInterface = getInterface(name, ivm::AADLIface::IfaceType::Provided, toFunc);
+    ivm::IVInterface *fromInterface = getInterface(name, ivm::IVInterface::InterfaceType::Required, fromFunc);
+    ivm::IVInterface *toInterface = getInterface(name, ivm::IVInterface::InterfaceType::Provided, toFunc);
 
     if (fromInterface && toInterface) {
         cmd::CommandsStack::Macro cmdMacro(undoStack(), tr("Create connection"));
 
         auto createConnection = [aadlModel, this](
-                                        ivm::AADLFunction *parent, ivm::AADLIface *inIf, ivm::AADLIface *outIf) {
+                                        ivm::IVFunction *parent, ivm::IVInterface *inIf, ivm::IVInterface *outIf) {
             QVector<QPointF> points;
             points.append(ive::pos(inIf->coordinates()));
             points.append(ive::pos(outIf->coordinates()));
@@ -203,9 +203,9 @@ bool IVEditorCore::addConnection(QString name, const QString &fromInstanceName, 
         };
 
         // find all (nested/parent) functions for "source" and "target" connections
-        QList<ivm::AADLFunction *> fromFunctions = fromInterface->functionsStack();
-        QList<ivm::AADLFunction *> toFunctions = toInterface->functionsStack();
-        ivm::AADLFunction *firstCommonFunction = nullptr;
+        QList<ivm::IVFunction *> fromFunctions = fromInterface->functionsStack();
+        QList<ivm::IVFunction *> toFunctions = toInterface->functionsStack();
+        ivm::IVFunction *firstCommonFunction = nullptr;
         while (!fromFunctions.isEmpty() && !toFunctions.isEmpty() && fromFunctions.last() == toFunctions.last()) {
             firstCommonFunction = fromFunctions.last();
             fromFunctions.takeLast();
@@ -214,9 +214,9 @@ bool IVEditorCore::addConnection(QString name, const QString &fromInstanceName, 
 
         // Create all connections on the "source" side
         while (fromFunctions.size() > 1) {
-            ivm::AADLFunction *parentFunc = fromFunctions[1];
-            ivm::AADLIface *sourceIf = fromInterface;
-            ivm::AADLIface *targetIf = getInterface(name, ivm::AADLIface::IfaceType::Required, parentFunc);
+            ivm::IVFunction *parentFunc = fromFunctions[1];
+            ivm::IVInterface *sourceIf = fromInterface;
+            ivm::IVInterface *targetIf = getInterface(name, ivm::IVInterface::InterfaceType::Required, parentFunc);
 
             createConnection(parentFunc, sourceIf, targetIf);
 
@@ -226,9 +226,9 @@ bool IVEditorCore::addConnection(QString name, const QString &fromInstanceName, 
 
         // Create all connections on the "target" side
         while (toFunctions.size() > 1) {
-            ivm::AADLFunction *parentFunc = toFunctions[1];
-            ivm::AADLIface *sourceIf = toInterface;
-            ivm::AADLIface *targetIf = getInterface(name, ivm::AADLIface::IfaceType::Provided, parentFunc);
+            ivm::IVFunction *parentFunc = toFunctions[1];
+            ivm::IVInterface *sourceIf = toInterface;
+            ivm::IVInterface *targetIf = getInterface(name, ivm::IVInterface::InterfaceType::Provided, parentFunc);
 
             createConnection(parentFunc, sourceIf, targetIf);
 
@@ -250,10 +250,10 @@ bool IVEditorCore::addConnection(QString name, const QString &fromInstanceName, 
    Adds an interface with name \p name to the function \p functionName to the model.
    Returns the newly returned interface, or nullptr in case of an error.
  */
-ivm::AADLIface *IVEditorCore::addInterface(QString name, const QString &functionName)
+ivm::IVInterface *IVEditorCore::addInterface(QString name, const QString &functionName)
 {
-    ivm::AADLModel *aadlModel = m_document->objectsModel();
-    ivm::AADLFunction *func = aadlModel->getFunction(functionName, m_caseCheck);
+    ivm::IVModel *aadlModel = m_document->objectsModel();
+    ivm::IVFunction *func = aadlModel->getFunction(functionName, m_caseCheck);
     if (!func) {
         qDebug() << Q_FUNC_INFO << "No function" << functionName << "for the interface" << name;
         return nullptr;
@@ -264,9 +264,9 @@ ivm::AADLIface *IVEditorCore::addInterface(QString name, const QString &function
         return nullptr;
     }
 
-    ivm::AADLIface::CreationInfo ci;
-    ci.kind = ivm::AADLIface::OperationKind::Cyclic;
-    ci.type = ivm::AADLIface::IfaceType::Provided;
+    ivm::IVInterface::CreationInfo ci;
+    ci.kind = ivm::IVInterface::OperationKind::Cyclic;
+    ci.type = ivm::IVInterface::InterfaceType::Provided;
     ci.function = func;
     ci.model = aadlModel;
     ci.name = name;
@@ -285,8 +285,8 @@ ivm::AADLIface *IVEditorCore::addInterface(QString name, const QString &function
  */
 bool IVEditorCore::renameAadlFunction(const QString &oldName, const QString &newName)
 {
-    ivm::AADLModel *aadlModel = m_document->objectsModel();
-    ivm::AADLFunction *aadlFunc = aadlModel->getFunction(oldName, m_caseCheck);
+    ivm::IVModel *aadlModel = m_document->objectsModel();
+    ivm::IVFunction *aadlFunc = aadlModel->getFunction(oldName, m_caseCheck);
     if (!aadlFunc) {
         return false;
     }
@@ -317,8 +317,8 @@ bool IVEditorCore::renameAadlConnection(
         return renameCyclicInterface(oldName, newName, fromInstanceName);
     }
 
-    ivm::AADLModel *aadlModel = m_document->objectsModel();
-    ivm::AADLConnection *aadlConnect = aadlModel->getConnection(oldName, fromInstanceName, toInstanceName, m_caseCheck);
+    ivm::IVModel *aadlModel = m_document->objectsModel();
+    ivm::IVConnection *aadlConnect = aadlModel->getConnection(oldName, fromInstanceName, toInstanceName, m_caseCheck);
     if (!aadlConnect) {
         return false;
     }
@@ -333,18 +333,18 @@ bool IVEditorCore::renameAadlConnection(
 
 bool IVEditorCore::renameCyclicInterface(const QString &oldName, const QString &newName, const QString &functionName)
 {
-    ivm::AADLModel *aadlModel = m_document->objectsModel();
-    ivm::AADLFunction *func = aadlModel->getFunction(functionName, m_caseCheck);
+    ivm::IVModel *aadlModel = m_document->objectsModel();
+    ivm::IVFunction *func = aadlModel->getFunction(functionName, m_caseCheck);
     if (!func) {
         qDebug() << Q_FUNC_INFO << "No function" << functionName << "to rename the interface from" << newName << "to"
                  << oldName;
         return false;
     }
 
-    ivm::AADLIface *interface =
-            aadlModel->getIfaceByName(oldName, ivm::AADLIface::IfaceType::Required, func, m_caseCheck);
+    ivm::IVInterface *interface =
+            aadlModel->getIfaceByName(oldName, ivm::IVInterface::InterfaceType::Required, func, m_caseCheck);
     if (!interface) {
-        interface = aadlModel->getIfaceByName(oldName, ivm::AADLIface::IfaceType::Provided, func, m_caseCheck);
+        interface = aadlModel->getIfaceByName(oldName, ivm::IVInterface::InterfaceType::Provided, func, m_caseCheck);
     }
     if (!interface) {
         qDebug() << Q_FUNC_INFO << "No interface" << oldName << "to rname for function" << functionName;
@@ -399,12 +399,12 @@ bool IVEditorCore::save()
     return ive::XmlDocExporter::exportDocSilently(m_document, {}, {});
 }
 
-QVector<ivm::AADLFunction *> IVEditorCore::allAadlFunctions() const
+QVector<ivm::IVFunction *> IVEditorCore::allAadlFunctions() const
 {
     return m_aadlFunctions;
 }
 
-QVector<ivm::AADLConnection *> IVEditorCore::allAadlConnections() const
+QVector<ivm::IVConnection *> IVEditorCore::allAadlConnections() const
 {
     return m_aadlConnections;
 }
@@ -415,7 +415,7 @@ QVector<ivm::AADLConnection *> IVEditorCore::allAadlConnections() const
 QStringList IVEditorCore::aadlFunctionsNames() const
 {
     QStringList functionNames;
-    for (const ivm::AADLFunction *aadlFunction : m_aadlFunctions) {
+    for (const ivm::IVFunction *aadlFunction : m_aadlFunctions) {
         if (aadlFunction && !aadlFunction->title().isEmpty()) {
             functionNames << aadlFunction->title();
         }
@@ -429,7 +429,7 @@ QStringList IVEditorCore::aadlFunctionsNames() const
 QStringList IVEditorCore::aadlConnectionNames() const
 {
     QStringList connectionNames;
-    for (const ivm::AADLConnection *aadlConnection : m_aadlConnections) {
+    for (const ivm::IVConnection *aadlConnection : m_aadlConnections) {
         if (aadlConnection && !aadlConnection->name().isEmpty()) {
             connectionNames << aadlConnection->name();
         }
@@ -486,27 +486,27 @@ void IVEditorCore::saveSceneRender(const QString &filePath) const
    Get the interface, or creates it if it does not exist. In case the \p parentFunction is a nullptr, a nullptr is
    returned
  */
-ivm::AADLIface *IVEditorCore::getInterface(
-        const QString &ifName, ivm::AADLIface::IfaceType ifType, ivm::AADLFunction *parentFunction)
+ivm::IVInterface *IVEditorCore::getInterface(
+        const QString &ifName, ivm::IVInterface::InterfaceType ifType, ivm::IVFunction *parentFunction)
 {
     if (parentFunction == nullptr) {
         return {};
     }
 
-    ivm::AADLModel *aadlModel = m_document->objectsModel();
+    ivm::IVModel *aadlModel = m_document->objectsModel();
     if (!aadlModel) {
         return {};
     }
 
-    ivm::AADLIface *interface = aadlModel->getIfaceByName(ifName, ifType, parentFunction, m_caseCheck);
+    ivm::IVInterface *interface = aadlModel->getIfaceByName(ifName, ifType, parentFunction, m_caseCheck);
     if (!interface) {
         // create the interface
-        ivm::AADLIface::CreationInfo createInfo(aadlModel, parentFunction);
+        ivm::IVInterface::CreationInfo createInfo(aadlModel, parentFunction);
         createInfo.name = ifName;
         createInfo.type = ifType;
         QRectF funcRect = ive::rect(parentFunction->coordinates());
         QPointF ifPos(funcRect.left(), funcRect.center().y());
-        if (ifType == ivm::AADLIface::IfaceType::Required) {
+        if (ifType == ivm::IVInterface::InterfaceType::Required) {
             ifPos.setX(funcRect.right());
         }
         createInfo.position = ifPos;
@@ -525,13 +525,13 @@ void IVEditorCore::updateAadlItems()
     m_aadlFunctions.clear();
     m_aadlConnections.clear();
 
-    ivm::AADLModel *aadlModel = m_document->objectsModel();
+    ivm::IVModel *aadlModel = m_document->objectsModel();
     if (!aadlModel) {
         return;
     }
 
-    m_aadlFunctions = aadlModel->allObjectsByType<ivm::AADLFunction>();
-    m_aadlConnections = aadlModel->allObjectsByType<ivm::AADLConnection>();
+    m_aadlFunctions = aadlModel->allObjectsByType<ivm::IVFunction>();
+    m_aadlConnections = aadlModel->allObjectsByType<ivm::IVConnection>();
 }
 
 QUrl IVEditorCore::helpPage() const

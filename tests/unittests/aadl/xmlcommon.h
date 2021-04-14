@@ -17,7 +17,7 @@
 
 #pragma once
 
-#include "aadlobject.h"
+#include "ivobject.h"
 
 #include <QMap>
 
@@ -28,10 +28,10 @@ struct XmlFileMock {
     const QString m_xmlContent;
     int m_expectedErrorCount { 0 };
     bool m_canBeParsed { true };
-    QMap<ivm::AADLObject::Type, int> m_objectCountByType;
+    QMap<ivm::IVObject::Type, int> m_objectCountByType;
 
-    int expectedObjectCount(ivm::AADLObject::Type t = ivm::AADLObject::Type::Unknown) const;
-    void setExpectedObjectCount(ivm::AADLObject::Type t, int count);
+    int expectedObjectCount(ivm::IVObject::Type t = ivm::IVObject::Type::Unknown) const;
+    void setExpectedObjectCount(ivm::IVObject::Type t, int count);
 
     static XmlFileMock createEmptyFile();
     static XmlFileMock createEmptyDoc();

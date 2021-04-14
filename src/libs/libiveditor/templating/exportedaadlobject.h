@@ -24,7 +24,7 @@
 namespace taste3 {
 
 namespace ivm{
-class AADLObject;
+class IVObject;
 }
 
 namespace templating {
@@ -39,9 +39,9 @@ class ExportedAADLObject : public GenericExportedObject
     Q_PROPERTY(QVariantList properties READ properties)
 
 public:
-    explicit ExportedAADLObject(const ivm::AADLObject *aadlObject = nullptr);
+    explicit ExportedAADLObject(const ivm::IVObject *aadlObject = nullptr);
 
-    static QVariant createFrom(const ivm::AADLObject *aadlObject);
+    static QVariant createFrom(const ivm::IVObject *aadlObject);
 
     QVariantList attributes() const;
     QVariantList properties() const;

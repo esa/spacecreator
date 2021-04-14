@@ -15,10 +15,10 @@
    along with this program. If not, see <https://www.gnu.org/licenses/lgpl-2.1.html>.
 */
 
-#include "aadlconnection.h"
-#include "aadlfunction.h"
-#include "aadliface.h"
-#include "aadltestutils.h"
+#include "ivconnection.h"
+#include "ivfunction.h"
+#include "ivinterface.h"
+#include "ivtestutils.h"
 
 #include <QtTest>
 
@@ -33,7 +33,7 @@ private Q_SLOTS:
 
 void tst_AADLConnection::testPostInitEmptyConnection()
 {
-    ivm::AADLConnection connection(nullptr, nullptr);
+    ivm::IVConnection connection(nullptr, nullptr);
     const bool result = connection.postInit();
     // postInit() for connections without source/target fails
     QCOMPARE(result, false);
@@ -41,60 +41,60 @@ void tst_AADLConnection::testPostInitEmptyConnection()
 
 void tst_AADLConnection::testCorrectConnectionSourceTarget()
 {
-    ivm::AADLFunction fn1("Fn1");
-    ivm::AADLIface *rifn1 = ivm::testutils::createIface(&fn1, ivm::AADLIface::IfaceType::Required, "RI1");
-    ivm::AADLIface *pifn1 = ivm::testutils::createIface(&fn1, ivm::AADLIface::IfaceType::Provided, "PI1");
-    ivm::AADLFunction fn2("Fn2");
-    ivm::AADLIface *rifn2 = ivm::testutils::createIface(&fn2, ivm::AADLIface::IfaceType::Required, "RI1");
-    ivm::AADLIface *pifn2 = ivm::testutils::createIface(&fn2, ivm::AADLIface::IfaceType::Provided, "PI1");
+    ivm::IVFunction fn1("Fn1");
+    ivm::IVInterface *rifn1 = ivm::testutils::createIface(&fn1, ivm::IVInterface::InterfaceType::Required, "RI1");
+    ivm::IVInterface *pifn1 = ivm::testutils::createIface(&fn1, ivm::IVInterface::InterfaceType::Provided, "PI1");
+    ivm::IVFunction fn2("Fn2");
+    ivm::IVInterface *rifn2 = ivm::testutils::createIface(&fn2, ivm::IVInterface::InterfaceType::Required, "RI1");
+    ivm::IVInterface *pifn2 = ivm::testutils::createIface(&fn2, ivm::IVInterface::InterfaceType::Provided, "PI1");
 
     // Correct as is (PI/RI)
-    ivm::AADLConnection c1(rifn1, pifn2);
+    ivm::IVConnection c1(rifn1, pifn2);
     QCOMPARE(c1.sourceInterface(), rifn1);
     QCOMPARE(c1.targetInterface(), pifn2);
-    ivm::AADLConnection c2(rifn2, pifn1);
+    ivm::IVConnection c2(rifn2, pifn1);
     QCOMPARE(c2.sourceInterface(), rifn2);
     QCOMPARE(c2.targetInterface(), pifn1);
     // Corrected simple PI/RI
-    ivm::AADLConnection c3(pifn2, rifn1);
+    ivm::IVConnection c3(pifn2, rifn1);
     QCOMPARE(c3.sourceInterface(), rifn1);
     QCOMPARE(c3.targetInterface(), pifn2);
-    ivm::AADLConnection c4(pifn1, rifn2);
+    ivm::IVConnection c4(pifn1, rifn2);
     QCOMPARE(c4.sourceInterface(), rifn2);
     QCOMPARE(c4.targetInterface(), pifn1);
 
     // Parent child relations
-    ivm::AADLFunction childFn1("ChildFn1", &fn1);
-    ivm::AADLIface *childFnRI = ivm::testutils::createIface(&childFn1, ivm::AADLIface::IfaceType::Required, "RI1");
-    ivm::AADLIface *childFnPI = ivm::testutils::createIface(&childFn1, ivm::AADLIface::IfaceType::Provided, "PI1");
+    ivm::IVFunction childFn1("ChildFn1", &fn1);
+    ivm::IVInterface *childFnRI = ivm::testutils::createIface(&childFn1, ivm::IVInterface::InterfaceType::Required, "RI1");
+    ivm::IVInterface *childFnPI = ivm::testutils::createIface(&childFn1, ivm::IVInterface::InterfaceType::Provided, "PI1");
     // Correct as is (RI/PI connections)
-    ivm::AADLConnection c5(childFnRI, pifn1);
+    ivm::IVConnection c5(childFnRI, pifn1);
     QCOMPARE(c5.sourceInterface(), childFnRI);
     QCOMPARE(c5.targetInterface(), pifn1);
-    ivm::AADLConnection c6(rifn1, childFnPI);
+    ivm::IVConnection c6(rifn1, childFnPI);
     QCOMPARE(c6.sourceInterface(), rifn1);
     QCOMPARE(c6.targetInterface(), childFnPI);
     // Correct child-parent (PI/RI connections)
-    ivm::AADLConnection c7(childFnPI, rifn1);
+    ivm::IVConnection c7(childFnPI, rifn1);
     QCOMPARE(c7.sourceInterface(), rifn1);
     QCOMPARE(c7.targetInterface(), childFnPI);
-    ivm::AADLConnection c8(pifn1, childFnRI);
+    ivm::IVConnection c8(pifn1, childFnRI);
     QCOMPARE(c8.sourceInterface(), childFnRI);
     QCOMPARE(c8.targetInterface(), pifn1);
 
     // PI/PI connection
-    ivm::AADLConnection c9(childFnPI, pifn1);
+    ivm::IVConnection c9(childFnPI, pifn1);
     QCOMPARE(c9.sourceInterface(), pifn1);
     QCOMPARE(c9.targetInterface(), childFnPI);
-    ivm::AADLConnection c10(pifn1, childFnPI);
+    ivm::IVConnection c10(pifn1, childFnPI);
     QCOMPARE(c10.sourceInterface(), pifn1);
     QCOMPARE(c10.targetInterface(), childFnPI);
 
     // RI/RI connection
-    ivm::AADLConnection c11(rifn1, childFnRI);
+    ivm::IVConnection c11(rifn1, childFnRI);
     QCOMPARE(c11.sourceInterface(), childFnRI);
     QCOMPARE(c11.targetInterface(), rifn1);
-    ivm::AADLConnection c12(childFnRI, rifn1);
+    ivm::IVConnection c12(childFnRI, rifn1);
     QCOMPARE(c12.sourceInterface(), childFnRI);
     QCOMPARE(c12.targetInterface(), rifn1);
 }

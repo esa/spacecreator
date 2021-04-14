@@ -17,7 +17,7 @@
 
 #include "mainwindow.h"
 
-#include "aadlfunctiontype.h"
+#include "ivfunctiontype.h"
 #include "asn1dialog.h"
 #include "baseitems/common/aadlutils.h"
 #include "commandsstack.h"

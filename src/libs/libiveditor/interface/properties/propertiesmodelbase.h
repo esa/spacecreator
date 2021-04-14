@@ -20,7 +20,7 @@
 #include <QStandardItemModel>
 
 namespace ivm {
-class AADLObject;
+class IVObject;
 }
 
 namespace ive {
@@ -39,7 +39,7 @@ public:
     explicit PropertiesModelBase(QObject *parent = nullptr);
     ~PropertiesModelBase() override = default;
 
-    virtual void setDataObject(ivm::AADLObject *obj) = 0;
+    virtual void setDataObject(ivm::IVObject *obj) = 0;
 
     virtual bool createProperty(const QString &propName) = 0;
     virtual bool removeProperty(const QModelIndex &index) = 0;
@@ -47,10 +47,10 @@ public:
     virtual bool isAttr(const QModelIndex &id) const = 0;
     virtual bool isProp(const QModelIndex &id) const = 0;
 
-    const ivm::AADLObject *dataObject() const;
+    const ivm::IVObject *entity() const;
 
 protected:
-    ivm::AADLObject *m_dataObject { nullptr };
+    ivm::IVObject *m_dataObject { nullptr };
 };
 
 }

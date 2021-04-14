@@ -25,12 +25,12 @@ class QRectF;
 class QPointF;
 
 namespace ivm {
-class AADLFunction;
-class AADLFunctionType;
-class AADLIface;
-class AADLComment;
-class AADLConnection;
-class AADLObject;
+class IVFunction;
+class IVFunctionType;
+class IVInterface;
+class IVComment;
+class IVConnection;
+class IVObject;
 struct ValidationResult;
 }
 
@@ -42,17 +42,17 @@ QList<int> knownGraphicsItemTypes();
 
 QList<int> rectangularTypes();
 
-ivm::AADLFunction *functionObject(QGraphicsItem *item);
+ivm::IVFunction *functionObject(QGraphicsItem *item);
 
-ivm::AADLFunctionType *functionTypeObject(QGraphicsItem *item);
+ivm::IVFunctionType *functionTypeObject(QGraphicsItem *item);
 
-ivm::AADLIface *interfaceObject(QGraphicsItem *item);
+ivm::IVInterface *interfaceObject(QGraphicsItem *item);
 
-ivm::AADLComment *commentObject(QGraphicsItem *item);
+ivm::IVComment *commentObject(QGraphicsItem *item);
 
-ivm::AADLConnection *connectionObject(QGraphicsItem *item);
+ivm::IVConnection *connectionObject(QGraphicsItem *item);
 
-ivm::AADLObject *object(const QGraphicsItem *item);
+ivm::IVObject *object(const QGraphicsItem *item);
 
 enum RectOperation
 {

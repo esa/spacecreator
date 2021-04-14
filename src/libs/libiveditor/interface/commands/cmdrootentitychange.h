@@ -23,7 +23,7 @@
 #include <QPointer>
 
 namespace ivm {
-class AADLModel;
+class IVModel;
 }
 
 namespace ive {
@@ -32,14 +32,14 @@ namespace cmd {
 class CmdRootEntityChange : public CmdEntityGeometryChange
 {
 public:
-    explicit CmdRootEntityChange(ivm::AADLModel *model, const shared::Id &id);
+    explicit CmdRootEntityChange(ivm::IVModel *model, const shared::Id &id);
 
     void redo() override;
     void undo() override;
     int id() const override;
 
 private:
-    QPointer<ivm::AADLModel> m_model;
+    QPointer<ivm::IVModel> m_model;
     shared::Id m_newId;
     shared::Id m_prevId;
 };

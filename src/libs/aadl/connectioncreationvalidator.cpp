@@ -17,11 +17,11 @@
 
 #include "connectioncreationvalidator.h"
 
-#include "aadlconnection.h"
-#include "aadlfunction.h"
-#include "aadlfunctiontype.h"
-#include "aadliface.h"
-#include "aadlmodel.h"
+#include "ivconnection.h"
+#include "ivfunction.h"
+#include "ivfunctiontype.h"
+#include "ivinterface.h"
+#include "ivmodel.h"
 
 #include <QDebug>
 #include <QGraphicsItem>
@@ -91,27 +91,27 @@ namespace ivm {
  * Anything except the FailReason::NotFail means that the connection creation is prohibited.
  */
 ConnectionCreationValidator::FailReason ConnectionCreationValidator::canConnect(
-        AADLFunction *sourceFunction, AADLFunction *targetFunction, AADLIface *sourceIface, AADLIface *targetIface)
+        IVFunction *sourceFunction, IVFunction *targetFunction, IVInterface *sourceIface, IVInterface *targetIface)
 {
     // [1] - the edge functions are not FunctionType
-    for (const AADLFunction *function : { sourceFunction, targetFunction })
+    for (const IVFunction *function : { sourceFunction, targetFunction })
         if (function && function->isFunctionType())
             return FailReason::IsFunctionType;
 
     // [2] - the edge interfaces parents are not FunctionType
-    for (const AADLIface *iface : { sourceIface, targetIface })
+    for (const IVInterface *iface : { sourceIface, targetIface })
         if (iface && iface->isNestedInFunctionType())
             return FailReason::ParentIsFunctionType;
 
     // [3] - an iface kind is not Cyclic
-    for (const AADLIface *iface : { sourceIface, targetIface })
-        if (iface && iface->kind() == AADLIface::OperationKind::Cyclic)
+    for (const IVInterface *iface : { sourceIface, targetIface })
+        if (iface && iface->kind() == IVInterface::OperationKind::Cyclic)
             return FailReason::IsCyclic;
 
     // [4] - parent of the source and target interface differs
-    const AADLObject *srcParent =
+    const IVObject *srcParent =
             sourceFunction ? sourceFunction : (sourceIface ? sourceIface->parentObject() : nullptr);
-    const AADLObject *dstParent =
+    const IVObject *dstParent =
             targetFunction ? targetFunction : (targetIface ? targetIface->parentObject() : nullptr);
     if ((srcParent || dstParent) && srcParent == dstParent)
         return FailReason::SameParent;
@@ -122,7 +122,7 @@ ConnectionCreationValidator::FailReason ConnectionCreationValidator::canConnect(
 
     // [6] - Multicast is disabled atm
     if (sourceIface) {
-        if (auto model = sourceIface->objectsModel()) {
+        if (auto model = sourceIface->model()) {
             for (const auto connection : model->getConnectionsForIface(sourceIface->id())) {
                 if (connection->sourceInterface()->id() == sourceIface->id()) {
                     return FailReason::MulticastDisabled;
@@ -149,14 +149,14 @@ ConnectionCreationValidator::FailReason ConnectionCreationValidator::canConnect(
  * means that the connection creation is prohibited.
  */
 ConnectionCreationValidator::FailReason ConnectionCreationValidator::checkKindAndParams(
-        AADLIface *sourceIface, AADLIface *targetIface)
+        IVInterface *sourceIface, IVInterface *targetIface)
 {
-    if (auto ri = AADLConnection::selectIface<const AADLIfaceRequired *>(sourceIface, targetIface))
-        if (AADLConnection::selectIface<const AADLIfaceProvided *>(sourceIface, targetIface)) {
+    if (auto ri = IVConnection::selectIface<const IVInterfaceRequired *>(sourceIface, targetIface))
+        if (IVConnection::selectIface<const IVInterfaceProvided *>(sourceIface, targetIface)) {
 #ifndef AADL_MULTICAST_CONNECTION
-            if (AADLModel *model = ri->objectsModel()) {
-                const QVector<AADLConnection *> riConnections = model->getConnectionsForIface(ri->id());
-                for (const AADLConnection *riConnection : riConnections)
+            if (IVModel *model = ri->model()) {
+                const QVector<IVConnection *> riConnections = model->getConnectionsForIface(ri->id());
+                for (const IVConnection *riConnection : riConnections)
                     if ((riConnection->sourceInterface() && riConnection->sourceInterface()->isProvided())
                             || (riConnection->targetInterface() && riConnection->targetInterface()->isProvided()))
                         return FailReason::MulticastDisabled;
@@ -167,8 +167,8 @@ ConnectionCreationValidator::FailReason ConnectionCreationValidator::checkKindAn
                 return FailReason::NotFail;
         }
 
-    const bool weakKind = sourceIface->kind() == AADLIface::OperationKind::Any
-            || targetIface->kind() == AADLIface::OperationKind::Any;
+    const bool weakKind = sourceIface->kind() == IVInterface::OperationKind::Any
+            || targetIface->kind() == IVInterface::OperationKind::Any;
     if (!weakKind && sourceIface->kind() != targetIface->kind())
         return FailReason::KindDiffer;
 

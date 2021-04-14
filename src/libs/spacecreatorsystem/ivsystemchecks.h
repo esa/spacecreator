@@ -28,10 +28,10 @@
 #include <QWeakPointer>
 
 namespace ivm {
-class AADLObject;
-class AADLConnection;
-class AADLFunction;
-class AADLModel;
+class IVObject;
+class IVConnection;
+class IVFunction;
+class IVModel;
 }
 
 namespace ive {
@@ -73,10 +73,10 @@ public:
     QStringList connectionNames() const override;
     QStringList connectionNamesFromTo(const QString &sourceName, const QString &targetName) const override;
 
-    ivm::AADLFunction *correspondingFunction(const msc::MscInstance *instance) const;
-    bool correspond(const ivm::AADLObject *aadlObj, const msc::MscInstance *instance) const override;
-    bool correspond(const ivm::AADLFunction *aadlFunc, const msc::MscInstance *instance) const override;
-    bool correspond(const ivm::AADLConnection *connection, const msc::MscMessage *message) const override;
+    ivm::IVFunction *correspondingFunction(const msc::MscInstance *instance) const;
+    bool correspond(const ivm::IVObject *aadlObj, const msc::MscInstance *instance) const override;
+    bool correspond(const ivm::IVFunction *aadlFunc, const msc::MscInstance *instance) const override;
+    bool correspond(const ivm::IVConnection *connection, const msc::MscMessage *message) const override;
 
     QVector<msc::MscMessageDeclaration *> allConnectionsAsDeclaration() const override;
 
@@ -88,10 +88,10 @@ Q_SIGNALS:
     void mscCoreChanged();
 
 private:
-    ivm::AADLModel *aadlModel() const;
-    bool hasAncestor(ivm::AADLFunction *func, const QVector<ivm::AADLFunction *> allFunctions) const;
-    bool hasDescendant(ivm::AADLFunction *func, const QVector<ivm::AADLFunction *> allFunctions) const;
-    bool isAncestor(ivm::AADLFunction *func, ivm::AADLFunction *otherFunc) const;
+    ivm::IVModel *aadlModel() const;
+    bool hasAncestor(ivm::IVFunction *func, const QVector<ivm::IVFunction *> allFunctions) const;
+    bool hasDescendant(ivm::IVFunction *func, const QVector<ivm::IVFunction *> allFunctions) const;
+    bool isAncestor(ivm::IVFunction *func, ivm::IVFunction *otherFunc) const;
 
     QPointer<msc::MSCEditorCore> m_mscCore;
     QSharedPointer<ive::IVEditorCore> m_ivCore;

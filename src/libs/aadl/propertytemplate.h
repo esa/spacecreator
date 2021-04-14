@@ -10,7 +10,7 @@ class QDomDocument;
 class QDomElement;
 
 namespace ivm {
-class AADLObject;
+class IVObject;
 
 class PropertyTemplate
 {
@@ -94,7 +94,7 @@ public:
     static QString tagName();
     static QVariant convertData(const QVariant &value, PropertyTemplate::Type type);
 
-    bool validate(const AADLObject *object) const;
+    bool validate(const IVObject *object) const;
 
 private:
     struct PropertyTemplatePrivate;

@@ -23,9 +23,9 @@
 #include <QStandardItemModel>
 
 namespace ivm {
-class AADLObject;
-class AADLModel;
-class AADLConnection;
+class IVObject;
+class IVModel;
+class IVConnection;
 }
 
 namespace ive {
@@ -38,7 +38,7 @@ class CommonVisualizationModel : public QStandardItemModel
     Q_OBJECT
 public:
     explicit CommonVisualizationModel(
-            ivm::AADLModel *aadlModel, cmd::CommandsStack *commandsStack, QObject *parent = nullptr);
+            ivm::IVModel *aadlModel, cmd::CommandsStack *commandsStack, QObject *parent = nullptr);
     enum ItemRole
     {
         IdRole = Qt::UserRole + 1,
@@ -48,20 +48,20 @@ public:
     QStandardItem *getItem(const shared::Id id);
 
 protected:
-    virtual void updateItemData(QStandardItem *item, ivm::AADLObject *obj);
-    virtual QStandardItem *createItem(ivm::AADLObject *obj);
-    QStandardItem *getParentItem(ivm::AADLObject *obj);
-    QStandardItem *getItem(ivm::AADLObject *obj);
-    void addItem(ivm::AADLObject *obj);
+    virtual void updateItemData(QStandardItem *item, ivm::IVObject *obj);
+    virtual QStandardItem *createItem(ivm::IVObject *obj);
+    QStandardItem *getParentItem(ivm::IVObject *obj);
+    QStandardItem *getItem(ivm::IVObject *obj);
+    void addItem(ivm::IVObject *obj);
 
 private Q_SLOTS:
-    void addItems(const QVector<ivm::AADLObject *> &objects);
-    void removeItem(ivm::AADLObject *object);
+    void addItems(const QVector<ivm::IVObject *> &objects);
+    void removeItem(ivm::IVObject *object);
     void updateItem();
-    void updateConnectionItem(ivm::AADLConnection *connection);
+    void updateConnectionItem(ivm::IVConnection *connection);
 
 protected:
-    ivm::AADLModel *m_aadlModel { nullptr };
+    ivm::IVModel *m_aadlModel { nullptr };
     QHash<shared::Id, QStandardItem *> m_itemCache;
     QPointer<cmd::CommandsStack> m_commandsStack;
 };
@@ -71,10 +71,10 @@ class VisualizationModel : public CommonVisualizationModel
     Q_OBJECT
 public:
     explicit VisualizationModel(
-            ivm::AADLModel *aadlModel, cmd::CommandsStack *commandsStack, QObject *parent = nullptr);
+            ivm::IVModel *aadlModel, cmd::CommandsStack *commandsStack, QObject *parent = nullptr);
 
-    void updateItemData(QStandardItem *item, ivm::AADLObject *obj) override;
-    QStandardItem *createItem(ivm::AADLObject *obj) override;
+    void updateItemData(QStandardItem *item, ivm::IVObject *obj) override;
+    QStandardItem *createItem(ivm::IVObject *obj) override;
 
 private Q_SLOTS:
     void onDataChanged(const QModelIndex &topLeft, const QModelIndex &bottomRight, const QVector<int> &roles);

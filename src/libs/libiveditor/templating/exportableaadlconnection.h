@@ -20,7 +20,7 @@
 #include "exportableaadlobject.h"
 
 namespace ivm {
-class AADLConnection;
+class IVConnection;
 }
 
 namespace ive {
@@ -41,7 +41,7 @@ class ExportableAADLConnection : public ExportableAADLObject
     Q_PROPERTY(bool tiIsProvided READ targetInterfaceIsProvided)
 
 public:
-    explicit ExportableAADLConnection(const ivm::AADLConnection *connection = nullptr);
+    explicit ExportableAADLConnection(const ivm::IVConnection *connection = nullptr);
 
     QString sourceName() const;
     QString targetName() const;

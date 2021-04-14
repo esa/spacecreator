@@ -17,7 +17,7 @@
 
 #include "action.h"
 
-#include "aadlobject.h"
+#include "ivobject.h"
 
 #include <QJsonArray>
 
@@ -92,7 +92,7 @@ QJsonObject Action::toJson() const
     };
 }
 
-bool Action::isAcceptable(ivm::AADLObject *obj) const
+bool Action::isAcceptable(ivm::IVObject *obj) const
 {
     for (const Condition &condition : m_conditions)
         if (!condition.isAcceptable(obj))

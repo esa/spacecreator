@@ -36,9 +36,9 @@ class Asn1ModelStorage;
 }
 
 namespace ivm {
-class AADLObject;
-class AADLIface;
-class AADLModel;
+class IVObject;
+class IVInterface;
+class IVModel;
 }
 
 namespace ive {
@@ -98,9 +98,9 @@ public:
 
     QList<QAction *> customActions() const;
 
-    const QHash<shared::Id, ivm::AADLObject *> &objects() const;
-    ivm::AADLModel *objectsModel() const;
-    ivm::AADLModel *importModel() const;
+    const QHash<shared::Id, ivm::IVObject *> &objects() const;
+    ivm::IVModel *objectsModel() const;
+    ivm::IVModel *importModel() const;
     AADLItemModel *itemsModel() const;
 
     Asn1Acn::Asn1ModelStorage *asn1ModelStorage() const;
@@ -108,7 +108,7 @@ public:
 
     QString supportedFileExtensions() const;
 
-    bool checkInterfaceAsn1Compliance(const ivm::AADLIface *interface) const;
+    bool checkInterfaceAsn1Compliance(const ivm::IVInterface *interface) const;
     bool checkAllInterfacesForAsn1Compliance();
 
 Q_SIGNALS:
@@ -122,7 +122,7 @@ Q_SIGNALS:
 
 public Q_SLOTS:
     void onSavedExternally(const QString &filePath, bool saved);
-    void setObjects(const QVector<ivm::AADLObject *> &objects);
+    void setObjects(const QVector<ivm::IVObject *> &objects);
     void onAttributesManagerRequested();
     void onColorSchemeMenuInvoked();
     void onDynContextEditorMenuInvoked();
@@ -146,11 +146,11 @@ private Q_SLOTS:
     void showContextMenuForAADLModel(const QPoint &pos);
 
 private:
-    bool exportImpl(const QString &path, const QList<ivm::AADLObject *> &objects);
+    bool exportImpl(const QString &path, const QList<ivm::IVObject *> &objects);
     bool loadImpl(const QString &path);
     QString getComponentName(const QStringList &exportNames);
-    QList<ivm::AADLObject *> prepareSelectedObjectsForExport(QString &name, bool silent = false);
-    bool loadComponentModel(ivm::AADLModel *model, const QString &path);
+    QList<ivm::IVObject *> prepareSelectedObjectsForExport(QString &name, bool silent = false);
+    bool loadComponentModel(ivm::IVModel *model, const QString &path);
 
     QWidget *createGraphicsView();
     QTreeView *createModelView();

@@ -20,13 +20,13 @@
 
 #include "commandids.h"
 
-#include <aadlmodel.h>
-#include <aadlparameter.h>
+#include <ivmodel.h>
+#include <parameter.h>
 
 namespace ive {
 namespace cmd {
 
-CmdIfaceParamRemove::CmdIfaceParamRemove(ivm::AADLObject *entity, const ivm::IfaceParameter &param)
+CmdIfaceParamRemove::CmdIfaceParamRemove(ivm::IVObject *entity, const ivm::InterfaceParameter &param)
     : CmdIfaceParamCreate(entity, param)
 {
     setText(QObject::tr("Remove Iface Parameter"));
@@ -37,8 +37,8 @@ void CmdIfaceParamRemove::redo()
     if (!m_iface)
         return;
 
-    QVector<ivm::IfaceParameter> currParams = m_iface->params();
-    for (const ivm::IfaceParameter &param : m_targetParams)
+    QVector<ivm::InterfaceParameter> currParams = m_iface->params();
+    for (const ivm::InterfaceParameter &param : m_targetParams)
         currParams.removeAll(param);
     m_iface->setParams(currParams);
 

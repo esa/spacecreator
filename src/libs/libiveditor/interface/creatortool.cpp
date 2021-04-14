@@ -17,16 +17,16 @@
 
 #include "creatortool.h"
 
-#include "aadlcomment.h"
+#include "ivcomment.h"
 #include "aadlcommentgraphicsitem.h"
-#include "aadlconnection.h"
+#include "ivconnection.h"
 #include "aadlconnectiongraphicsitem.h"
-#include "aadlconnectiongroup.h"
-#include "aadlfunction.h"
+#include "ivconnectiongroup.h"
+#include "ivfunction.h"
 #include "aadlfunctiongraphicsitem.h"
-#include "aadlfunctiontype.h"
+#include "ivfunctiontype.h"
 #include "aadlfunctiontypegraphicsitem.h"
-#include "aadliface.h"
+#include "ivinterface.h"
 #include "aadlinterfacegraphicsitem.h"
 #include "aadlitemmodel.h"
 #include "baseitems/common/aadlutils.h"
@@ -90,7 +90,7 @@ struct CreatorTool::CreatorToolPrivate {
     void handleComment(QGraphicsScene *scene, const QPointF &pos);
     void handleFunctionType(QGraphicsScene *scene, const QPointF &pos);
     void handleFunction(QGraphicsScene *scene, const QPointF &pos);
-    void handleInterface(QGraphicsScene *scene, ivm::AADLIface::IfaceType type, const QPointF &pos);
+    void handleInterface(QGraphicsScene *scene, ivm::IVInterface::InterfaceType type, const QPointF &pos);
     bool handleConnectionCreate(const QPointF &pos);
     void handleDirectConnection(const QPointF &pos);
     void handleConnectionReCreate(const QVector<QPointF> &graphicPoints);
@@ -98,7 +98,7 @@ struct CreatorTool::CreatorToolPrivate {
 
     bool warnConnectionPreview(const QPointF &pos);
 
-    QUndoCommand *createInterfaceCommand(const ivm::AADLIface::CreationInfo &info) const;
+    QUndoCommand *createInterfaceCommand(const ivm::IVInterface::CreationInfo &info) const;
 
     void clearPreviewItem();
 
@@ -164,19 +164,19 @@ void CreatorTool::removeSelectedItems()
 
     if (auto scene = d->view->scene()) {
         QStringList clonedIfaces;
-        QList<QPointer<ivm::AADLObject>> entities;
+        QList<QPointer<ivm::IVObject>> entities;
         d->clearPreviewItem();
         while (!scene->selectedItems().isEmpty()) {
             QGraphicsItem *item = scene->selectedItems().first();
             item->setSelected(false);
 
             if (auto iObj = qobject_cast<InteractiveObject *>(item->toGraphicsObject())) {
-                if (auto entity = iObj->aadlObject()) {
+                if (auto entity = iObj->entity()) {
                     if (entity->isRootObject()) {
                         continue;
                     }
                     if (entity->isInterface()) {
-                        if (auto iface = entity->as<const ivm::AADLIface *>()) {
+                        if (auto iface = entity->as<const ivm::IVInterface *>()) {
                             if (auto srcIface = iface->cloneOf()) {
                                 clonedIfaces.append(QStringLiteral("%1's %2 is from %3")
                                                             .arg(iface->parentObject()->title(), iface->title(),
@@ -206,11 +206,11 @@ void CreatorTool::removeSelectedItems()
 
 void CreatorTool::groupSelectedItems()
 {
-    QList<ivm::AADLConnectionGroup::CreationInfo> groupCreationDataList;
+    QList<ivm::IVConnectionGroup::CreationInfo> groupCreationDataList;
 
-    auto processConnection = [&](ivm::AADLConnection *connection) {
+    auto processConnection = [&](ivm::IVConnection *connection) {
         auto it = std::find_if(groupCreationDataList.begin(), groupCreationDataList.end(),
-                [connection](const ivm::AADLConnectionGroup::CreationInfo &data) {
+                [connection](const ivm::IVConnectionGroup::CreationInfo &data) {
                     const bool functionMatch = data.sourceObject->id() == connection->source()->id()
                             && data.targetObject->id() == connection->target()->id();
                     const bool functionMatchReversed = data.targetObject->id() == connection->source()->id()
@@ -249,7 +249,7 @@ void CreatorTool::groupSelectedItems()
     for (const auto item : d->view->scene()->selectedItems()) {
         if (item->type() == AADLConnectionGraphicsItem::Type) {
             if (auto connectionItem = qgraphicsitem_cast<AADLConnectionGraphicsItem *>(item)) {
-                if (ivm::AADLConnection *connectionObj = connectionItem->entity()) {
+                if (ivm::IVConnection *connectionObj = connectionItem->entity()) {
                     processConnection(connectionObj);
                 }
             }
@@ -258,7 +258,7 @@ void CreatorTool::groupSelectedItems()
 
     CreateConnectionGroupDialog *dialog = new CreateConnectionGroupDialog(groupCreationDataList, d->view->window());
     if (dialog->exec() == QDialog::Accepted) {
-        for (const ivm::AADLConnectionGroup::CreationInfo &data : dialog->info()) {
+        for (const ivm::IVConnectionGroup::CreationInfo &data : dialog->info()) {
             auto cmd = new cmd::CmdConnectionGroupItemCreate(data);
             d->doc->commandsStack()->push(cmd);
         }
@@ -665,8 +665,8 @@ void CreatorTool::CreatorToolPrivate::populateContextMenu_propertiesDialog(QMenu
     }
 
     QGraphicsItem *gi = scene->selectedItems().isEmpty() ? nullptr : scene->selectedItems().first();
-    if (ivm::AADLObject *aadlObj = gi::object(gi)) {
-        if (aadlObj->aadlType() != ivm::AADLObject::Type::Connection) {
+    if (ivm::IVObject *aadlObj = gi::object(gi)) {
+        if (aadlObj->type() != ivm::IVObject::Type::Connection) {
             menu->addSeparator();
             QAction *action = menu->addAction(tr("Properties"));
             action->setEnabled(aadlObj);
@@ -700,7 +700,7 @@ void CreatorTool::CreatorToolPrivate::populateContextMenu_user(QMenu *menu, cons
     static const QList<int> showProps { AADLInterfaceGraphicsItem::Type, AADLFunctionTypeGraphicsItem::Type,
         AADLFunctionGraphicsItem::Type, AADLCommentGraphicsItem::Type, AADLConnectionGraphicsItem::Type };
 
-    ivm::AADLObject *aadlObj { nullptr };
+    ivm::IVObject *aadlObj { nullptr };
     if (QGraphicsItem *gi = scene->selectedItems().size() == 1
                     ? scene->selectedItems().first()
                     : nearestItem(scene, scenePos, kContextMenuItemTolerance, showProps)) {
@@ -751,10 +751,10 @@ void CreatorTool::CreatorToolPrivate::handleToolType(CreatorTool::ToolType type,
             handleFunction(scene, pos);
             break;
         case ToolType::ProvidedInterface:
-            handleInterface(scene, ivm::AADLIface::IfaceType::Provided, pos);
+            handleInterface(scene, ivm::IVInterface::InterfaceType::Provided, pos);
             break;
         case ToolType::RequiredInterface:
-            handleInterface(scene, ivm::AADLIface::IfaceType::Required, pos);
+            handleInterface(scene, ivm::IVInterface::InterfaceType::Required, pos);
             break;
         case ToolType::MultiPointConnection:
             if (!handleConnectionCreate(pos))
@@ -784,7 +784,7 @@ void CreatorTool::CreatorToolPrivate::handleComment(QGraphicsScene *scene, const
     Q_UNUSED(pos)
 
     if (this->previewItem) {
-        ivm::AADLFunctionType *parentObject = gi::functionObject(this->previewItem->parentItem());
+        ivm::IVFunctionType *parentObject = gi::functionObject(this->previewItem->parentItem());
         if (!parentObject)
             parentObject = gi::functionTypeObject(this->previewItem->parentItem());
 
@@ -818,7 +818,7 @@ void CreatorTool::CreatorToolPrivate::handleFunctionType(QGraphicsScene *scene, 
             }
         }
 
-        ivm::AADLFunction *parentObject = gi::functionObject(this->previewItem->parentItem());
+        ivm::IVFunction *parentObject = gi::functionObject(this->previewItem->parentItem());
 
         auto cmd = new cmd::CmdFunctionTypeItemCreate(model->objectsModel(), parentObject, itemSceneRect);
         doc->commandsStack()->push(cmd);
@@ -843,7 +843,7 @@ void CreatorTool::CreatorToolPrivate::handleFunction(QGraphicsScene *scene, cons
             }
         }
 
-        ivm::AADLFunction *parentObject = gi::functionObject(this->previewItem->parentItem());
+        ivm::IVFunction *parentObject = gi::functionObject(this->previewItem->parentItem());
 
         auto cmd = new cmd::CmdFunctionItemCreate(model->objectsModel(), parentObject, itemSceneRect);
         doc->commandsStack()->push(cmd);
@@ -851,11 +851,11 @@ void CreatorTool::CreatorToolPrivate::handleFunction(QGraphicsScene *scene, cons
 }
 
 void CreatorTool::CreatorToolPrivate::handleInterface(
-        QGraphicsScene *scene, ivm::AADLIface::IfaceType type, const QPointF &pos)
+        QGraphicsScene *scene, ivm::IVInterface::InterfaceType type, const QPointF &pos)
 {
     if (auto parentItem = nearestItem(scene, adjustFromPoint(pos, kInterfaceTolerance), kFunctionTypes)) {
-        ivm::AADLFunctionType *parentObject = gi::functionTypeObject(parentItem);
-        ivm::AADLIface::CreationInfo ifaceDescr(model->objectsModel(), parentObject, pos, type, shared::createId());
+        ivm::IVFunctionType *parentObject = gi::functionTypeObject(parentItem);
+        ivm::IVInterface::CreationInfo ifaceDescr(model->objectsModel(), parentObject, pos, type, shared::createId());
         ifaceDescr.resetKind();
 
         if (auto cmd = createInterfaceCommand(ifaceDescr))
@@ -909,24 +909,24 @@ void CreatorTool::CreatorToolPrivate::handleConnection(const QVector<QPointF> &g
     const AADLFunctionGraphicsItem *parentForConnection = nullptr;
     QPointF startInterfacePoint { info.startPointAdjusted };
     QPointF endInterfacePoint { info.endPointAdjusted };
-    ivm::AADLIface::CreationInfo ifaceCommons;
+    ivm::IVInterface::CreationInfo ifaceCommons;
     cmd::CommandsStack::Macro cmdMacro(doc->undoStack(), tr("Create connection"));
 
     if (info.startIface && !info.endIface) {
-        ifaceCommons = ivm::AADLIface::CreationInfo::fromIface(info.startIface);
+        ifaceCommons = ivm::IVInterface::CreationInfo::fromIface(info.startIface);
         ifaceCommons.function = info.endObject;
         ifaceCommons.position = info.endPointAdjusted;
-        ifaceCommons.type = info.isToOrFromNested ? info.startIface->direction() : ivm::AADLIface::IfaceType::Provided;
+        ifaceCommons.type = info.isToOrFromNested ? info.startIface->direction() : ivm::IVInterface::InterfaceType::Provided;
         ifaceCommons.id = info.endIfaceId;
         ifaceCommons.resetKind();
 
         if (!cmdMacro.push(createInterfaceCommand(ifaceCommons)))
             return;
     } else if (info.endIface && !info.startIface) {
-        ifaceCommons = ivm::AADLIface::CreationInfo::fromIface(info.endIface);
+        ifaceCommons = ivm::IVInterface::CreationInfo::fromIface(info.endIface);
         ifaceCommons.function = info.startObject;
         ifaceCommons.position = info.startPointAdjusted;
-        ifaceCommons.type = info.isToOrFromNested ? info.endIface->direction() : ivm::AADLIface::IfaceType::Required;
+        ifaceCommons.type = info.isToOrFromNested ? info.endIface->direction() : ivm::IVInterface::InterfaceType::Required;
         ifaceCommons.id = info.startIfaceId;
         ifaceCommons.resetKind();
 
@@ -939,8 +939,8 @@ void CreatorTool::CreatorToolPrivate::handleConnection(const QVector<QPointF> &g
         ifaceCommons.position = info.startPointAdjusted;
         ifaceCommons.id = info.startIfaceId;
         ifaceCommons.type = info.isToOrFromNested && graphicPoints.last() == info.connectionPoints.first()
-                ? ivm::AADLIface::IfaceType::Provided
-                : ivm::AADLIface::IfaceType::Required;
+                ? ivm::IVInterface::InterfaceType::Provided
+                : ivm::IVInterface::InterfaceType::Required;
         ifaceCommons.resetKind();
 
         if (!cmdMacro.push(createInterfaceCommand(ifaceCommons)))
@@ -950,19 +950,19 @@ void CreatorTool::CreatorToolPrivate::handleConnection(const QVector<QPointF> &g
         ifaceCommons.position = info.endPointAdjusted;
         ifaceCommons.id = info.endIfaceId;
         if (!info.isToOrFromNested) {
-            ifaceCommons.type = ifaceCommons.type == ivm::AADLIface::IfaceType::Provided
-                    ? ivm::AADLIface::IfaceType::Required
-                    : ivm::AADLIface::IfaceType::Provided;
+            ifaceCommons.type = ifaceCommons.type == ivm::IVInterface::InterfaceType::Provided
+                    ? ivm::IVInterface::InterfaceType::Required
+                    : ivm::IVInterface::InterfaceType::Provided;
         }
         ifaceCommons.resetKind();
 
         if (!cmdMacro.push(createInterfaceCommand(ifaceCommons)))
             return;
     } else {
-        ivm::AADLIface *pi = ivm::AADLConnection::selectIface<ivm::AADLIfaceProvided *>(info.startIface, info.endIface);
+        ivm::IVInterface *pi = ivm::IVConnection::selectIface<ivm::IVInterfaceProvided *>(info.startIface, info.endIface);
         if (!pi)
             pi = info.startIface;
-        ifaceCommons = ivm::AADLIface::CreationInfo::fromIface(pi);
+        ifaceCommons = ivm::IVInterface::CreationInfo::fromIface(pi);
         ifaceCommons.resetKind();
         ifaceCommons.name.clear();
     }
@@ -993,8 +993,8 @@ void CreatorTool::CreatorToolPrivate::handleConnection(const QVector<QPointF> &g
 
         ifaceCommons.type = info.startIface
                 ? info.startIface->direction()
-                : (graphicPoints.last() == info.connectionPoints.first() ? ivm::AADLIface::IfaceType::Provided
-                                                                         : ivm::AADLIface::IfaceType::Required);
+                : (graphicPoints.last() == info.connectionPoints.first() ? ivm::IVInterface::InterfaceType::Provided
+                                                                         : ivm::IVInterface::InterfaceType::Required);
         if (item == info.functionAtEndPos) {
             ifaceCommons.id = info.endIfaceId;
         } else {
@@ -1050,8 +1050,8 @@ void CreatorTool::CreatorToolPrivate::handleConnection(const QVector<QPointF> &g
 
             ifaceCommons.type = info.endIface
                     ? info.endIface->direction()
-                    : (graphicPoints.last() == info.connectionPoints.first() ? ivm::AADLIface::IfaceType::Required
-                                                                             : ivm::AADLIface::IfaceType::Provided);
+                    : (graphicPoints.last() == info.connectionPoints.first() ? ivm::IVInterface::InterfaceType::Required
+                                                                             : ivm::IVInterface::InterfaceType::Provided);
 
             if (!cmdMacro.push(createInterfaceCommand(ifaceCommons)))
                 return;
@@ -1108,7 +1108,7 @@ void CreatorTool::CreatorToolPrivate::handleConnectionReCreate(const QVector<QPo
                 return;
             }
 
-            QList<QPair<ivm::AADLObject *, QVector<QPointF>>> paramsList { { connection->entity(),
+            QList<QPair<ivm::IVObject *, QVector<QPointF>>> paramsList { { connection->entity(),
                     info.connectionPoints } };
             auto cmd = new cmd::CmdEntityGeometryChange(paramsList);
             doc->commandsStack()->push(cmd);
@@ -1153,14 +1153,14 @@ bool CreatorTool::CreatorToolPrivate::warnConnectionPreview(const QPointF &pos)
     return warn;
 }
 
-QUndoCommand *CreatorTool::CreatorToolPrivate::createInterfaceCommand(const ivm::AADLIface::CreationInfo &info) const
+QUndoCommand *CreatorTool::CreatorToolPrivate::createInterfaceCommand(const ivm::IVInterface::CreationInfo &info) const
 {
     if (!info.function)
         return nullptr;
 
     if (info.function->isFunction()) {
-        if (auto fn = info.function->as<const ivm::AADLFunction *>()) {
-            if (const ivm::AADLFunctionType *fnType = fn->instanceOf()) {
+        if (auto fn = info.function->as<const ivm::IVFunction *>()) {
+            if (const ivm::IVFunctionType *fnType = fn->instanceOf()) {
                 const QString message = thisTool->tr("Can't add interface directly in <b>%1</b>.<br>"
                                                      "Please edit the related <b>%2</b> instead.")
                                                 .arg(fn->titleUI(), fnType->titleUI());
@@ -1169,7 +1169,7 @@ QUndoCommand *CreatorTool::CreatorToolPrivate::createInterfaceCommand(const ivm:
             }
         }
     }
-    if (info.type == ivm::AADLIface::IfaceType::Provided) {
+    if (info.type == ivm::IVInterface::InterfaceType::Provided) {
         Q_EMIT thisTool->propertyEditorRequest(info.id);
     }
 

@@ -19,10 +19,10 @@
 
 #include "cmdifaceparambase.h"
 
-#include <aadlparameter.h>
+#include <parameter.h>
 
 namespace ivm {
-class AADLObject;
+class IVObject;
 }
 
 namespace ive {
@@ -32,17 +32,17 @@ class CmdIfaceParamChange : public CmdIfaceParamBase
 {
 public:
     explicit CmdIfaceParamChange(
-            ivm::AADLObject *entity, const ivm::IfaceParameter &from, const ivm::IfaceParameter &to);
+            ivm::IVObject *entity, const ivm::InterfaceParameter &from, const ivm::InterfaceParameter &to);
 
     void redo() override;
     void undo() override;
     int id() const override;
 
 protected:
-    ivm::IfaceParameter m_newParam;
-    ivm::IfaceParameter m_oldParam;
+    ivm::InterfaceParameter m_newParam;
+    ivm::InterfaceParameter m_oldParam;
 
-    void swapParam(const ivm::IfaceParameter &from, const ivm::IfaceParameter &to);
+    void swapParam(const ivm::InterfaceParameter &from, const ivm::InterfaceParameter &to);
 };
 
 }

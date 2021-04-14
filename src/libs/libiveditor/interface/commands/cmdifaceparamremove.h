@@ -20,8 +20,8 @@
 #include "cmdifaceparamcreate.h"
 
 namespace ivm {
-class AADLObject;
-class IfaceParameter;
+class IVObject;
+class InterfaceParameter;
 }
 
 namespace ive {
@@ -30,7 +30,7 @@ namespace cmd {
 class CmdIfaceParamRemove : public CmdIfaceParamCreate
 {
 public:
-    explicit CmdIfaceParamRemove(ivm::AADLObject *entity, const ivm::IfaceParameter &param);
+    explicit CmdIfaceParamRemove(ivm::IVObject *entity, const ivm::InterfaceParameter &param);
 
     void redo() override;
     void undo() override;

@@ -19,7 +19,7 @@
 
 namespace ive {
 
-AADLFlowConnectionGraphicsItem::AADLFlowConnectionGraphicsItem(ivm::AADLConnection *connection,
+AADLFlowConnectionGraphicsItem::AADLFlowConnectionGraphicsItem(ivm::IVConnection *connection,
         AADLInterfaceGraphicsItem *startIface, AADLInterfaceGraphicsItem *endIface, QGraphicsItem *parentItem)
     : AADLConnectionGraphicsItem(connection, startIface, endIface, parentItem)
 {

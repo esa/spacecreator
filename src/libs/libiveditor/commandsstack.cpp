@@ -17,7 +17,7 @@
 
 #include "commandsstack.h"
 
-#include "aadlobject.h"
+#include "ivobject.h"
 #include "interface/commands/cmdentitiesremove.h"
 #include "interface/commands/cmdentityattributechange.h"
 #include "interface/commands/cmdifaceattrchange.h"

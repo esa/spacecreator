@@ -15,17 +15,17 @@
   along with this program. If not, see <https://www.gnu.org/licenses/lgpl-2.1.html>.
 */
 
-#include "aadlxmlreader.h"
+#include "ivxmlreader.h"
 
-#include "aadlcomment.h"
+#include "ivcomment.h"
 #include "aadlcommonprops.h"
-#include "aadlconnection.h"
-#include "aadlconnectiongroup.h"
-#include "aadlfunction.h"
-#include "aadlfunctiontype.h"
-#include "aadliface.h"
-#include "aadlifacegroup.h"
-#include "aadlparameter.h"
+#include "ivconnection.h"
+#include "ivconnectiongroup.h"
+#include "ivfunction.h"
+#include "ivfunctiontype.h"
+#include "ivinterface.h"
+#include "ivinterfacegroup.h"
+#include "parameter.h"
 
 #include <QDebug>
 #include <QFile>
@@ -66,49 +66,49 @@ struct XmlAttribute {
 typedef QHash<QString, XmlAttribute> XmlAttributes;
 
 struct CurrentObjectHolder {
-    void set(AADLObject *object)
+    void set(IVObject *object)
     {
         m_object = object;
-        m_function = m_object ? m_object->as<AADLFunctionType *>() : nullptr;
-        m_iface = m_object ? m_object->as<AADLIface *>() : nullptr;
-        m_comment = m_object ? m_object->as<AADLComment *>() : nullptr;
-        m_connection = m_object ? m_object->as<AADLConnection *>() : nullptr;
-        m_connectionGroup = m_object ? m_object->as<AADLConnectionGroup *>() : nullptr;
+        m_function = m_object ? m_object->as<IVFunctionType *>() : nullptr;
+        m_iface = m_object ? m_object->as<IVInterface *>() : nullptr;
+        m_comment = m_object ? m_object->as<IVComment *>() : nullptr;
+        m_connection = m_object ? m_object->as<IVConnection *>() : nullptr;
+        m_connectionGroup = m_object ? m_object->as<IVConnectionGroup *>() : nullptr;
     }
 
-    QPointer<AADLObject> get() { return m_object; }
-    QPointer<AADLFunctionType> function() { return m_function; }
-    QPointer<AADLIface> iface() { return m_iface; }
-    QPointer<AADLComment> comment() { return m_comment; }
-    QPointer<AADLConnection> connection() { return m_connection; }
-    QPointer<AADLConnectionGroup> connectionGroup() { return m_connectionGroup; }
+    QPointer<IVObject> get() { return m_object; }
+    QPointer<IVFunctionType> function() { return m_function; }
+    QPointer<IVInterface> iface() { return m_iface; }
+    QPointer<IVComment> comment() { return m_comment; }
+    QPointer<IVConnection> connection() { return m_connection; }
+    QPointer<IVConnectionGroup> connectionGroup() { return m_connectionGroup; }
 
 private:
-    QPointer<AADLObject> m_object { nullptr };
-    QPointer<AADLFunctionType> m_function { nullptr };
-    QPointer<AADLIface> m_iface { nullptr };
-    QPointer<AADLComment> m_comment { nullptr };
-    QPointer<AADLConnection> m_connection { nullptr };
-    QPointer<AADLConnectionGroup> m_connectionGroup { nullptr };
+    QPointer<IVObject> m_object { nullptr };
+    QPointer<IVFunctionType> m_function { nullptr };
+    QPointer<IVInterface> m_iface { nullptr };
+    QPointer<IVComment> m_comment { nullptr };
+    QPointer<IVConnection> m_connection { nullptr };
+    QPointer<IVConnectionGroup> m_connectionGroup { nullptr };
 };
 
-typedef QHash<QString, QHash<QString, AADLIface *>> IfacesByFunction; // { Function[Type]Id, {IfaceName, Iface} }
-struct AADLXMLReaderPrivate {
-    QVector<AADLObject *> m_allObjects {};
+typedef QHash<QString, QHash<QString, IVInterface *>> IfacesByFunction; // { Function[Type]Id, {IfaceName, Iface} }
+struct IVXMLReaderPrivate {
+    QVector<IVObject *> m_allObjects {};
     QVariantMap m_metaData;
-    QHash<QString, AADLFunctionType *> m_functionNames {};
+    QHash<QString, IVFunctionType *> m_functionNames {};
     IfacesByFunction m_ifaceRequiredNames {};
     IfacesByFunction m_ifaceProvidedNames {};
-    QHash<QString, AADLConnection *> m_connectionsById {};
+    QHash<QString, IVConnection *> m_connectionsById {};
     struct GroupInfo {
         QList<shared::Id> m_connectionIds;
-        QList<AADLIface *> m_interfaces;
+        QList<IVInterface *> m_interfaces;
     };
 
     QHash<QString, GroupInfo> m_connectionGroups;
 
     CurrentObjectHolder m_currentObject;
-    void setCurrentObject(AADLObject *obj)
+    void setCurrentObject(IVObject *obj)
     {
         m_currentObject.set(obj);
         if (!m_currentObject.get())
@@ -117,24 +117,24 @@ struct AADLXMLReaderPrivate {
         if (!m_allObjects.contains(m_currentObject.get()))
             m_allObjects.append(m_currentObject.get());
 
-        if (AADLFunctionType *fn = m_currentObject.function()) {
+        if (IVFunctionType *fn = m_currentObject.function()) {
             const QString &fnTitle = fn->title();
             if (!m_functionNames.contains(fnTitle))
                 m_functionNames.insert(fnTitle, fn);
         }
 
-        if (AADLIface *iface = m_currentObject.iface()) {
+        if (IVInterface *iface = m_currentObject.iface()) {
             Q_ASSERT(iface->parentObject() != nullptr);
 
             const QString &parentId = iface->parentObject()->id().toString();
             const QString &ifaceTitle = iface->title();
-            QHash<QString, AADLIface *> &ifacesCollection =
+            QHash<QString, IVInterface *> &ifacesCollection =
                     iface->isRequired() ? m_ifaceRequiredNames[parentId] : m_ifaceProvidedNames[parentId];
             if (!ifacesCollection.contains(ifaceTitle))
                 ifacesCollection[ifaceTitle] = iface;
         }
 
-        if (AADLConnection *conn = m_currentObject.connection()) {
+        if (IVConnection *conn = m_currentObject.connection()) {
             const QString connId = conn->id().toString();
             if (!m_connectionsById.contains(connId))
                 m_connectionsById[connId] = conn;
@@ -142,15 +142,15 @@ struct AADLXMLReaderPrivate {
     }
 };
 
-AADLXMLReader::AADLXMLReader(QObject *parent)
+IVXMLReader::IVXMLReader(QObject *parent)
     : QObject(parent)
-    , d(new AADLXMLReaderPrivate)
+    , d(new IVXMLReaderPrivate)
 {
 }
 
-AADLXMLReader::~AADLXMLReader() { }
+IVXMLReader::~IVXMLReader() { }
 
-bool AADLXMLReader::readFile(const QString &file)
+bool IVXMLReader::readFile(const QString &file)
 {
     QFile in(file);
     if (in.exists(file) && in.open(QFile::ReadOnly | QFile::Text))
@@ -163,7 +163,7 @@ bool AADLXMLReader::readFile(const QString &file)
     return false;
 }
 
-bool AADLXMLReader::read(QIODevice *openForRead)
+bool IVXMLReader::read(QIODevice *openForRead)
 {
     if (openForRead && openForRead->isOpen() && openForRead->isReadable()) {
         if (readXml(openForRead)) {
@@ -176,7 +176,7 @@ bool AADLXMLReader::read(QIODevice *openForRead)
     return false;
 }
 
-bool AADLXMLReader::read(const QByteArray &data)
+bool IVXMLReader::read(const QByteArray &data)
 {
     if (data.isEmpty()) {
         return false;
@@ -196,7 +196,7 @@ bool AADLXMLReader::read(const QByteArray &data)
     return false;
 }
 
-bool AADLXMLReader::readXml(QIODevice *in)
+bool IVXMLReader::readXml(QIODevice *in)
 {
     if (!in)
         return false;
@@ -210,7 +210,7 @@ bool AADLXMLReader::readXml(QIODevice *in)
     return false;
 }
 
-bool AADLXMLReader::readInterfaceView(QXmlStreamReader &xml)
+bool IVXMLReader::readInterfaceView(QXmlStreamReader &xml)
 {
     for (const QXmlStreamAttribute &attribute : xml.attributes()) {
         d->m_metaData[attribute.name().toString()] = QVariant::fromValue(attribute.value().toString());
@@ -244,10 +244,10 @@ bool AADLXMLReader::readInterfaceView(QXmlStreamReader &xml)
     return true;
 }
 
-IfaceParameter addIfaceParameter(
-        const QString &name, const XmlAttributes &otherAttrs, IfaceParameter::Direction direction)
+InterfaceParameter addIfaceParameter(
+        const QString &name, const XmlAttributes &otherAttrs, InterfaceParameter::Direction direction)
 {
-    IfaceParameter param;
+    InterfaceParameter param;
 
     for (const XmlAttribute &attr : otherAttrs) {
         switch (attr.m_token) {
@@ -272,29 +272,29 @@ IfaceParameter addIfaceParameter(
     return param;
 }
 
-AADLConnection::EndPointInfo *addConnectionPart(const XmlAttributes &otherAttrs)
+IVConnection::EndPointInfo *addConnectionPart(const XmlAttributes &otherAttrs)
 {
     const QString attrRiName = Props::token(Props::Token::ri_name);
     const bool isRI = otherAttrs.contains(attrRiName);
 
-    AADLConnection::EndPointInfo *info = new AADLConnection::EndPointInfo();
+    IVConnection::EndPointInfo *info = new IVConnection::EndPointInfo();
     info->m_functionName = otherAttrs.value(Props::token(Props::Token::func_name)).m_value;
     info->m_interfaceName =
             isRI ? otherAttrs.value(attrRiName).m_value : otherAttrs.value(Props::token(Props::Token::pi_name)).m_value;
-    info->m_ifaceDirection = isRI ? AADLIface::IfaceType::Required : AADLIface::IfaceType::Provided;
+    info->m_ifaceDirection = isRI ? IVInterface::InterfaceType::Required : IVInterface::InterfaceType::Provided;
 
     Q_ASSERT(info->isReady());
     return info;
 }
 
-void AADLXMLReader::processTagOpen(QXmlStreamReader &xml)
+void IVXMLReader::processTagOpen(QXmlStreamReader &xml)
 {
     const QString &tagName = xml.name().toString();
     const QString &attrName = Props::token(Props::Token::name);
     XmlAttributes attrs = XmlAttribute::wrapp(xml.attributes());
     const XmlAttribute &nameAttr = attrs.take(attrName);
 
-    AADLObject *obj { nullptr };
+    IVObject *obj { nullptr };
     const Props::Token t = Props::token(tagName);
     switch (t) {
     case Props::Token::Function: {
@@ -303,7 +303,7 @@ void AADLXMLReader::processTagOpen(QXmlStreamReader &xml)
                 == QStringLiteral("yes");
 
         obj = addFunction(
-                nameAttr.m_value, isFunctionType ? AADLObject::Type::FunctionType : AADLObject::Type::Function);
+                nameAttr.m_value, isFunctionType ? IVObject::Type::FunctionType : IVObject::Type::Function);
         break;
     }
     case Props::Token::Provided_Interface:
@@ -321,8 +321,8 @@ void AADLXMLReader::processTagOpen(QXmlStreamReader &xml)
     case Props::Token::Input_Parameter: {
         Q_ASSERT(d->m_currentObject.iface() != nullptr);
 
-        const IfaceParameter param = addIfaceParameter(nameAttr.m_value, attrs,
-                t == Props::Token::Input_Parameter ? IfaceParameter::Direction::IN : IfaceParameter::Direction::OUT);
+        const InterfaceParameter param = addIfaceParameter(nameAttr.m_value, attrs,
+                t == Props::Token::Input_Parameter ? InterfaceParameter::Direction::IN : InterfaceParameter::Direction::OUT);
         d->m_currentObject.iface()->addParam(param);
         break;
     }
@@ -342,7 +342,7 @@ void AADLXMLReader::processTagOpen(QXmlStreamReader &xml)
         Q_ASSERT(d->m_currentObject.connection() != nullptr);
 
         if (d->m_currentObject.connection()) {
-            if (AADLConnection::EndPointInfo *info = addConnectionPart(attrs)) {
+            if (IVConnection::EndPointInfo *info = addConnectionPart(attrs)) {
                 if (t == Props::Token::Source) {
                     d->m_currentObject.connection()->setDelayedStart(info);
                 } else {
@@ -361,7 +361,7 @@ void AADLXMLReader::processTagOpen(QXmlStreamReader &xml)
         break;
     }
     case Props::Token::ContextParameter: {
-        auto function = qobject_cast<ivm::AADLFunctionType *>(d->m_currentObject.get());
+        auto function = qobject_cast<ivm::IVFunctionType *>(d->m_currentObject.get());
         if (function) {
             const QString typeString = attrs.value(Props::token(Props::Token::type)).m_value;
             ivm::BasicParameter::Type paramType = typeString == "Timer"
@@ -389,7 +389,7 @@ void AADLXMLReader::processTagOpen(QXmlStreamReader &xml)
     }
 }
 
-void AADLXMLReader::processTagClose(QXmlStreamReader &xml)
+void IVXMLReader::processTagClose(QXmlStreamReader &xml)
 {
     const QString &tagName = xml.name().toString();
     switch (Props::token(tagName)) {
@@ -407,12 +407,12 @@ void AADLXMLReader::processTagClose(QXmlStreamReader &xml)
     }
 }
 
-AADLFunctionType *AADLXMLReader::addFunction(const QString &name, AADLObject::Type fnType)
+IVFunctionType *IVXMLReader::addFunction(const QString &name, IVObject::Type fnType)
 {
-    const bool isFunctionType = fnType == AADLObject::Type::FunctionType;
+    const bool isFunctionType = fnType == IVObject::Type::FunctionType;
 
-    AADLFunctionType *fn = isFunctionType ? new AADLFunctionType(name, d->m_currentObject.get())
-                                          : new AADLFunction(name, d->m_currentObject.get());
+    IVFunctionType *fn = isFunctionType ? new IVFunctionType(name, d->m_currentObject.get())
+                                          : new IVFunction(name, d->m_currentObject.get());
 
     if (d->m_currentObject.function())
         d->m_currentObject.function()->addChild(fn);
@@ -420,55 +420,55 @@ AADLFunctionType *AADLXMLReader::addFunction(const QString &name, AADLObject::Ty
     return fn;
 }
 
-AADLIface *AADLXMLReader::addIface(const QString &name, bool isRI)
+IVInterface *IVXMLReader::addIface(const QString &name, bool isRI)
 {
     Q_ASSERT(d->m_currentObject.function() != nullptr);
 
-    AADLIface *iface { nullptr };
+    IVInterface *iface { nullptr };
     if (d->m_currentObject.function()) {
 
-        AADLIface::CreationInfo ci;
+        IVInterface::CreationInfo ci;
         ci.function = d->m_currentObject.function();
         ci.name = name;
 
         if (isRI)
-            iface = new AADLIfaceRequired(ci);
+            iface = new IVInterfaceRequired(ci);
         else
-            iface = new AADLIfaceProvided(ci);
+            iface = new IVInterfaceProvided(ci);
 
         d->m_currentObject.function()->addChild(iface);
     }
     return iface;
 }
 
-AADLComment *AADLXMLReader::addComment(const QString &text)
+IVComment *IVXMLReader::addComment(const QString &text)
 {
-    AADLComment *comment = new AADLComment(text, d->m_currentObject.get());
+    IVComment *comment = new IVComment(text, d->m_currentObject.get());
     if (d->m_currentObject.function())
         d->m_currentObject.function()->addChild(comment);
 
     return comment;
 }
 
-AADLConnection *AADLXMLReader::addConnection()
+IVConnection *IVXMLReader::addConnection()
 {
-    AADLConnection *connection = new AADLConnection(nullptr, nullptr, d->m_currentObject.get());
+    IVConnection *connection = new IVConnection(nullptr, nullptr, d->m_currentObject.get());
     if (d->m_currentObject.function())
         d->m_currentObject.function()->addChild(connection);
 
     return connection;
 }
 
-AADLConnectionGroup *AADLXMLReader::addConnectionGroup(const QString &groupName)
+IVConnectionGroup *IVXMLReader::addConnectionGroup(const QString &groupName)
 {
-    QHash<shared::Id, AADLIfaceGroup *> mappings;
+    QHash<shared::Id, IVInterfaceGroup *> mappings;
     for (const auto iface : d->m_connectionGroups.value(groupName).m_interfaces) {
         Q_ASSERT(iface->parentObject());
         auto it = mappings.find(iface->parentObject()->id());
         if (it != mappings.end()) {
             it.value()->addEntity(iface);
         } else {
-            auto ifaceGroup = new AADLIfaceGroup({});
+            auto ifaceGroup = new IVInterfaceGroup({});
             ifaceGroup->setParentObject(iface->parentObject());
             ifaceGroup->setGroupName(groupName);
             ifaceGroup->addEntity(iface);
@@ -482,8 +482,8 @@ AADLConnectionGroup *AADLXMLReader::addConnectionGroup(const QString &groupName)
     d->m_allObjects.append(sourceIfaceGroup);
     d->m_allObjects.append(targetIfaceGroup);
 
-    AADLConnectionGroup *connection =
-            new AADLConnectionGroup(groupName, sourceIfaceGroup, targetIfaceGroup, {}, d->m_currentObject.get());
+    IVConnectionGroup *connection =
+            new IVConnectionGroup(groupName, sourceIfaceGroup, targetIfaceGroup, {}, d->m_currentObject.get());
     connection->initConnections(d->m_connectionGroups.value(groupName).m_connectionIds);
     if (d->m_currentObject.function())
         d->m_currentObject.function()->addChild(connection);

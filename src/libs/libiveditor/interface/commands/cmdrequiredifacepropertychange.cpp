@@ -17,19 +17,19 @@
 
 #include "cmdrequiredifacepropertychange.h"
 
-#include "aadlconnection.h"
+#include "ivconnection.h"
 #include "commandids.h"
 
 namespace ive {
 namespace cmd {
 
-QVariant getCurrentProperty(const ivm::AADLIfaceRequired *entity, const QString &name)
+QVariant getCurrentProperty(const ivm::IVInterfaceRequired *entity, const QString &name)
 {
     return (entity && !name.isEmpty()) ? entity->prop(name) : QVariant();
 }
 
 CmdRequiredIfacePropertyChange::CmdRequiredIfacePropertyChange(
-        ivm::AADLIfaceRequired *entity, const QString &propName, const QVariant &value)
+        ivm::IVInterfaceRequired *entity, const QString &propName, const QVariant &value)
     : CmdIfaceDataChangeBase(entity, propName, value, getCurrentProperty(entity, propName))
 {
     if (m_targetToken == ivm::meta::Props::Token::InheritPI) {
@@ -100,9 +100,9 @@ void CmdRequiredIfacePropertyChange::setInheritPI(bool nowInherited)
     }
 }
 
-bool CmdRequiredIfacePropertyChange::connectionMustDie(const ivm::AADLConnection *connection) const
+bool CmdRequiredIfacePropertyChange::connectionMustDie(const ivm::IVConnection *connection) const
 {
-    const ivm::AADLIface *otherIface = getConnectionOtherSide(connection, m_iface);
+    const ivm::IVInterface *otherIface = getConnectionOtherSide(connection, m_iface);
     if (!otherIface) {
         Q_UNREACHABLE();
         return true;
@@ -112,14 +112,14 @@ bool CmdRequiredIfacePropertyChange::connectionMustDie(const ivm::AADLConnection
     if (!sameParams)
         return true;
 
-    const ivm::AADLIface::OperationKind newKind = m_iface->kindFromString(
+    const ivm::IVInterface::OperationKind newKind = m_iface->kindFromString(
             m_iface->originalAttr(ivm::meta::Props::token(ivm::meta::Props::Token::kind)).toString());
-    if (ivm::AADLIface::OperationKind::Cyclic == newKind) {
+    if (ivm::IVInterface::OperationKind::Cyclic == newKind) {
         Q_UNREACHABLE(); // m_iface is a RI
         return true;
     }
 
-    if (ivm::AADLIface::OperationKind::Any != newKind && ivm::AADLIface::OperationKind::Any != otherIface->kind()) {
+    if (ivm::IVInterface::OperationKind::Any != newKind && ivm::IVInterface::OperationKind::Any != otherIface->kind()) {
         return otherIface->kind() == newKind;
     }
 

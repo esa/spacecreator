@@ -17,8 +17,8 @@
 
 #pragma once
 
-#include "aadlobject.h"
-#include "aadlparameter.h"
+#include "ivobject.h"
+#include "parameter.h"
 
 #include <QObject>
 #include <QVector>
@@ -26,37 +26,37 @@
 
 namespace ivm {
 
-class AADLFunction;
-class AADLConnection;
-class AADLComment;
-class AADLIface;
-class AADLIfaceGroup;
-class AADLConnectionGroup;
+class IVFunction;
+class IVConnection;
+class IVComment;
+class IVInterface;
+class IVInterfaceGroup;
+class IVConnectionGroup;
 
-struct AADLFunctionTypePrivate;
+struct IVFunctionTypePrivate;
 
-class AADLFunctionType : public AADLObject
+class IVFunctionType : public IVObject
 {
     Q_OBJECT
 
 public:
-    explicit AADLFunctionType(const QString &title = QString(), QObject *parent = nullptr);
-    ~AADLFunctionType() override;
+    explicit IVFunctionType(const QString &title = QString(), QObject *parent = nullptr);
+    ~IVFunctionType() override;
 
-    QVector<AADLObject *> children() const;
-    bool addChild(AADLObject *child);
-    bool removeChild(AADLObject *child);
+    QVector<IVObject *> children() const;
+    bool addChild(IVObject *child);
+    bool removeChild(IVObject *child);
 
-    QVector<AADLFunctionType *> functionTypes() const;
-    QVector<AADLFunction *> functions() const;
-    QVector<AADLConnection *> connections() const;
-    QVector<AADLConnectionGroup *> connectionGroups() const;
-    QVector<AADLComment *> comments() const;
-    QVector<AADLIface *> interfaces() const;
-    QVector<AADLIface *> allInterfaces() const;
-    QVector<AADLIface *> ris() const;
-    QVector<AADLIface *> pis() const;
-    QVector<AADLIfaceGroup *> interfaceGroups() const;
+    QVector<IVFunctionType *> functionTypes() const;
+    QVector<IVFunction *> functions() const;
+    QVector<IVConnection *> connections() const;
+    QVector<IVConnectionGroup *> connectionGroups() const;
+    QVector<IVComment *> comments() const;
+    QVector<IVInterface *> interfaces() const;
+    QVector<IVInterface *> allInterfaces() const;
+    QVector<IVInterface *> ris() const;
+    QVector<IVInterface *> pis() const;
+    QVector<IVInterfaceGroup *> interfaceGroups() const;
     bool hasNestedChildren() const;
     bool hasInterface(const QString &name, Qt::CaseSensitivity caseSensitivity = Qt::CaseInsensitive) const;
 
@@ -67,9 +67,9 @@ public:
     void clearContextParams();
     void setContextParams(const QVector<ContextParameter> &params);
 
-    QVector<QPointer<AADLFunction>> instances() const;
-    void rememberInstance(AADLFunction *function);
-    void forgetInstance(AADLFunction *function);
+    QVector<QPointer<IVFunction>> instances() const;
+    void rememberInstance(IVFunction *function);
+    void forgetInstance(IVFunction *function);
 
 Q_SIGNALS:
     void contextParamsChanged();
@@ -77,13 +77,13 @@ Q_SIGNALS:
     void childRemoved(const shared::Id &id);
 
 protected:
-    explicit AADLFunctionType(
-            const AADLObject::Type t, const QString &title = QString(), QObject *parent = nullptr);
+    explicit IVFunctionType(
+            const IVObject::Type t, const QString &title = QString(), QObject *parent = nullptr);
 
 private:
-    const std::unique_ptr<AADLFunctionTypePrivate> d;
+    const std::unique_ptr<IVFunctionTypePrivate> d;
 };
 
-typedef QVector<AADLFunctionType *> AADLFunctionTypeVector;
+typedef QVector<IVFunctionType *> AADLFunctionTypeVector;
 
 }

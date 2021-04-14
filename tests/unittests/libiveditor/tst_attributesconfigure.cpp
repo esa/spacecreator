@@ -15,12 +15,12 @@
    along with this program. If not, see <https://www.gnu.org/licenses/lgpl-2.1.html>.
 */
 
-#include "aadlcomment.h"
+#include "ivcomment.h"
 #include "aadlcommonprops.h"
-#include "aadlconnection.h"
-#include "aadlfunction.h"
-#include "aadlfunctiontype.h"
-#include "aadliface.h"
+#include "ivconnection.h"
+#include "ivfunction.h"
+#include "ivfunctiontype.h"
+#include "ivinterface.h"
 #include "aadllibrary.h"
 #include "baseitems/common/aadlutils.h"
 #include "iveditor.h"
@@ -141,7 +141,7 @@ void tst_AttributesConfigure::tst_systemAttrs()
         QVERIFY((*it)->type() == ivm::PropertyTemplate::Type::Enumeration);
         QVERIFY((*it)->info() == ivm::PropertyTemplate::Info::Attribute);
 
-        const QMetaEnum &me = QMetaEnum::fromType<ivm::AADLIface::OperationKind>();
+        const QMetaEnum &me = QMetaEnum::fromType<ivm::IVInterface::OperationKind>();
         for (int i = 0; i < me.keyCount(); ++i) {
             QVERIFY((*it)->value().toList().contains(QVariant::fromValue(QString::fromLatin1(me.key(i)))));
         }
@@ -243,29 +243,29 @@ void tst_AttributesConfigure::tst_scopeValidation()
     ivm::PropertyTemplate attrTemplate;
     attrTemplate.setScope(ivm::PropertyTemplate::Scope::All);
 
-    ivm::AADLComment comment;
+    ivm::IVComment comment;
     QVERIFY(attrTemplate.validate(&comment));
 
-    ivm::AADLFunctionType fnType;
+    ivm::IVFunctionType fnType;
     QVERIFY(attrTemplate.validate(&fnType));
 
-    ivm::AADLFunction fn;
+    ivm::IVFunction fn;
     QVERIFY(attrTemplate.validate(&fn));
 
-    ivm::AADLIface::CreationInfo ci;
+    ivm::IVInterface::CreationInfo ci;
     ci.function = &fn;
 
-    ci.type = ivm::AADLIface::IfaceType::Required;
+    ci.type = ivm::IVInterface::InterfaceType::Required;
     ci.name = QLatin1String("reqIface");
-    ivm::AADLIfaceRequired reqIface(ci);
+    ivm::IVInterfaceRequired reqIface(ci);
     QVERIFY(attrTemplate.validate(&reqIface));
 
-    ci.type = ivm::AADLIface::IfaceType::Provided;
+    ci.type = ivm::IVInterface::InterfaceType::Provided;
     ci.name = QLatin1String("provIface");
-    ivm::AADLIfaceProvided provIface(ci);
+    ivm::IVInterfaceProvided provIface(ci);
     QVERIFY(attrTemplate.validate(&provIface));
 
-    ivm::AADLConnection connection(&reqIface, &provIface);
+    ivm::IVConnection connection(&reqIface, &provIface);
     QVERIFY(attrTemplate.validate(&connection));
 
     attrTemplate.setScope(ivm::PropertyTemplate::Scope::Function);
@@ -313,26 +313,26 @@ void tst_AttributesConfigure::tst_attrValidators()
 {
     ivm::PropertyTemplate attrTemplate;
 
-    ivm::AADLComment comment;
+    ivm::IVComment comment;
     comment.setAttr(QLatin1String("Custom_Comment_Attribute"), QStringLiteral("TextValue"));
 
-    ivm::AADLFunctionType fnType;
-    ivm::AADLFunction fn;
+    ivm::IVFunctionType fnType;
+    ivm::IVFunction fn;
 
-    ivm::AADLIface::CreationInfo ci;
+    ivm::IVInterface::CreationInfo ci;
     ci.function = &fn;
 
-    ci.type = ivm::AADLIface::IfaceType::Required;
+    ci.type = ivm::IVInterface::InterfaceType::Required;
     ci.name = QLatin1String("reqIface");
-    ci.kind = ivm::AADLIface::OperationKind::Any;
-    ivm::AADLIfaceRequired reqIface(ci);
+    ci.kind = ivm::IVInterface::OperationKind::Any;
+    ivm::IVInterfaceRequired reqIface(ci);
 
-    ci.type = ivm::AADLIface::IfaceType::Provided;
+    ci.type = ivm::IVInterface::InterfaceType::Provided;
     ci.name = QLatin1String("provIface");
-    ci.kind = ivm::AADLIface::OperationKind::Cyclic;
-    ivm::AADLIfaceProvided provIface(ci);
+    ci.kind = ivm::IVInterface::OperationKind::Cyclic;
+    ivm::IVInterfaceProvided provIface(ci);
 
-    ivm::AADLConnection connection(&reqIface, &provIface);
+    ivm::IVConnection connection(&reqIface, &provIface);
     comment.setAttr(QLatin1String("Custom_Connection_Attribute"), QStringLiteral("0123456789"));
 
     const QMap<ivm::PropertyTemplate::Scope, QPair<QString, QString>> validators {
@@ -357,16 +357,16 @@ void tst_AttributesConfigure::tst_attrValidators()
 
     attrTemplate.setScope(ivm::PropertyTemplate::Scope::Provided_Interface);
     QVERIFY(!attrTemplate.validate(&provIface));
-    provIface.setKind(ivm::AADLIface::OperationKind::Cyclic);
+    provIface.setKind(ivm::IVInterface::OperationKind::Cyclic);
     QVERIFY(!attrTemplate.validate(&provIface));
-    provIface.setKind(ivm::AADLIface::OperationKind::Protected);
+    provIface.setKind(ivm::IVInterface::OperationKind::Protected);
     QVERIFY(attrTemplate.validate(&provIface));
 
     attrTemplate.setScope(ivm::PropertyTemplate::Scope::Required_Interface);
     QVERIFY(attrTemplate.validate(&reqIface));
-    reqIface.setKind(ivm::AADLIface::OperationKind::Cyclic);
+    reqIface.setKind(ivm::IVInterface::OperationKind::Cyclic);
     QVERIFY(!attrTemplate.validate(&reqIface));
-    reqIface.setKind(ivm::AADLIface::OperationKind::Any);
+    reqIface.setKind(ivm::IVInterface::OperationKind::Any);
     QVERIFY(attrTemplate.validate(&reqIface));
 
     attrTemplate.setScope(ivm::PropertyTemplate::Scope::Comment);

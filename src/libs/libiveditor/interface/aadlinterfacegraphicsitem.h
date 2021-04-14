@@ -18,16 +18,13 @@
 
 #pragma once
 
-#include "aadlobject.h"
+#include "ivobject.h"
+#include "ivinterface.h"
 #include "baseitems/interactiveobject.h"
 
 #include <QPointer>
 
 class tst_PositionLookupHelper;
-
-namespace ivm {
-class AADLIface;
-}
 
 namespace ive {
 class AADLConnectionGraphicsItem;
@@ -38,13 +35,13 @@ class AADLInterfaceGraphicsItem : public InteractiveObject
 {
     Q_OBJECT
 public:
-    explicit AADLInterfaceGraphicsItem(ivm::AADLIface *entity, QGraphicsItem *parent = nullptr);
+    explicit AADLInterfaceGraphicsItem(ivm::IVInterface *entity, QGraphicsItem *parent = nullptr);
     enum
     {
-        Type = UserType + static_cast<int>(ivm::AADLObject::Type::RequiredInterface) // provided?
+        Type = UserType + static_cast<int>(ivm::IVObject::Type::RequiredInterface) // provided?
     };
 
-    ivm::AADLIface *entity() const;
+    ivm::IVInterface *entity() const override;
 
     void init() override;
     int type() const override { return Type; }
@@ -64,7 +61,7 @@ public:
     QPainterPath shape() const override;
 
     void updateFromEntity() override;
-    QList<QPair<ivm::AADLObject *, QVector<QPointF>>> prepareChangeCoordinatesCommandParams() const override;
+    QList<QPair<ivm::IVObject *, QVector<QPointF>>> prepareChangeCoordinatesCommandParams() const override;
 
     QString prepareTooltip() const override;
     void layout();

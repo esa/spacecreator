@@ -21,7 +21,7 @@
 #include <QUndoCommand>
 
 namespace ivm {
-class AADLObject;
+class IVObject;
 }
 
 namespace ive {
@@ -30,7 +30,7 @@ namespace cmd {
 class CmdEntityPropertyRemove : public QUndoCommand
 {
 public:
-    explicit CmdEntityPropertyRemove(ivm::AADLObject *entity, const QStringList &props);
+    explicit CmdEntityPropertyRemove(ivm::IVObject *entity, const QStringList &props);
 
     void redo() override;
     void undo() override;
@@ -38,7 +38,7 @@ public:
     int id() const override;
 
 private:
-    QPointer<ivm::AADLObject> m_entity;
+    QPointer<ivm::IVObject> m_entity;
     QStringList m_names;
     QVariantHash m_props;
 };

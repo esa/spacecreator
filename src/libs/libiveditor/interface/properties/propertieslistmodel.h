@@ -25,7 +25,7 @@
 #include <QVector>
 
 namespace ivm {
-class AADLObject;
+class IVObject;
 class PropertyTemplateConfig;
 }
 
@@ -52,7 +52,7 @@ public:
     // Editable:
     bool setData(const QModelIndex &index, const QVariant &value, int role = DataRole) override;
 
-    void setDataObject(ivm::AADLObject *obj) override;
+    void setDataObject(ivm::IVObject *obj) override;
 
     Qt::ItemFlags flags(const QModelIndex &index) const override;
 

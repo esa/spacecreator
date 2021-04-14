@@ -17,7 +17,7 @@
 
 #pragma once
 
-#include "aadlmodel.h"
+#include "ivmodel.h"
 
 #include <QObject>
 #include <QPointer>
@@ -29,7 +29,7 @@ class QGraphicsItem;
 class QGraphicsScene;
 
 namespace ivm {
-class AADLObject;
+class IVObject;
 } // namespace ivm
 
 namespace shared {
@@ -64,7 +64,7 @@ public:
     };
     Q_ENUM(AADLRoles);
 
-    explicit AADLItemModel(ivm::AADLModel *model, cmd::CommandsStack *commandsStack, QObject *parent = nullptr);
+    explicit AADLItemModel(ivm::IVModel *model, cmd::CommandsStack *commandsStack, QObject *parent = nullptr);
     ~AADLItemModel() override;
 
     QGraphicsScene *scene() const;
@@ -74,7 +74,7 @@ public:
 
     QGraphicsItem *getItem(const shared::Id id) const;
 
-    ivm::AADLModel *objectsModel() const;
+    ivm::IVModel *objectsModel() const;
 
 Q_SIGNALS:
     void itemClicked(shared::Id id);
@@ -86,12 +86,12 @@ public Q_SLOTS:
     void clearScene();
 
 private Q_SLOTS:
-    void onAADLObjectAdded(ivm::AADLObject *object);
-    void onAADLObjectsAdded(const QVector<ivm::AADLObject *> &objects);
-    void onAADLObjectRemoved(ivm::AADLObject *object);
+    void onAADLObjectAdded(ivm::IVObject *object);
+    void onobjectsAdded(const QVector<ivm::IVObject *> &objects);
+    void onobjectRemoved(ivm::IVObject *object);
     void onRootObjectChanged(shared::Id rootId);
-    void onConnectionAddedToGroup(ivm::AADLConnection *connection);
-    void onConnectionRemovedFromGroup(ivm::AADLConnection *connection);
+    void onConnectionAddedToGroup(ivm::IVConnection *connection);
+    void onConnectionRemovedFromGroup(ivm::IVConnection *connection);
 
     void onSceneSelectionChanged();
 
@@ -99,22 +99,22 @@ private Q_SLOTS:
     void updateInterfaceTexts();
 
 private:
-    QGraphicsItem *createItemForObject(ivm::AADLObject *obj);
-    void initItem(ivm::AADLObject *object, QGraphicsItem *item);
+    QGraphicsItem *createItemForObject(ivm::IVObject *obj);
+    void initItem(ivm::IVObject *object, QGraphicsItem *item);
     AADLFunctionGraphicsItem *rootItem() const;
     void updateItem(QGraphicsItem *item);
-    void removeItemForObject(ivm::AADLObject *object);
-    void setupInnerGeometry(ivm::AADLObject *obj) const;
+    void removeItemForObject(ivm::IVObject *object);
+    void setupInnerGeometry(ivm::IVObject *obj) const;
 
     template<typename T>
     T getItem(const shared::Id id) const;
 
 private:
-    ivm::AADLModel *m_model { nullptr };
+    ivm::IVModel *m_model { nullptr };
     InterfaceTabGraphicsScene *m_graphicsScene { nullptr };
     QHash<shared::Id, QGraphicsItem *> m_items;
     QMutex *m_mutex { nullptr };
-    QQueue<ivm::AADLObject *> m_rmQueu;
+    QQueue<ivm::IVObject *> m_rmQueu;
     QRectF m_desktopGeometry;
     QRectF m_prevItemsRect;
     shared::DelayedSignal *m_textUpdate = nullptr;

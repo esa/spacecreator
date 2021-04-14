@@ -18,7 +18,7 @@
 #pragma once
 
 #include "aadlcommonprops.h"
-#include "aadlmodel.h"
+#include "ivmodel.h"
 #include "cmdifacedatachangebase.h"
 
 #include <QVariant>
@@ -30,7 +30,7 @@ class CmdRequiredIfacePropertyChange : public CmdIfaceDataChangeBase
 {
 public:
     explicit CmdRequiredIfacePropertyChange(
-            ivm::AADLIfaceRequired *entity, const QString &propName, const QVariant &value);
+            ivm::IVInterfaceRequired *entity, const QString &propName, const QVariant &value);
     void redo() override;
     void undo() override;
     bool mergeWith(const QUndoCommand *command) override;
@@ -39,7 +39,7 @@ public:
 private:
     void setInheritPI(bool nowInherited);
 
-    bool connectionMustDie(const ivm::AADLConnection *connection) const override;
+    bool connectionMustDie(const ivm::IVConnection *connection) const override;
 };
 
 }

@@ -18,9 +18,9 @@
 #include "attributedelegate.h"
 
 #include "aadlcommonprops.h"
-#include "aadlmodel.h"
-#include "aadlnamevalidator.h"
-#include "aadlobject.h"
+#include "ivmodel.h"
+#include "ivnamevalidator.h"
+#include "ivobject.h"
 #include "interface/properties/propertieslistmodel.h"
 #include "propertytemplate.h"
 #include "propertytemplateconfig.h"
@@ -99,7 +99,7 @@ static QWidget *createConfiguredEditor(
         auto lineEdit = new QLineEdit(parent);
         QRegularExpression re;
         if (attribute == ivm::meta::Props::token(ivm::meta::Props::Token::name)) {
-            re.setPattern(ivm::AADLNameValidator::namePatternUI());
+            re.setPattern(ivm::IVNameValidator::namePatternUI());
         } else if (!validator.isNull() && validator.canConvert<QString>()) {
             re.setPattern(validator.toString());
         }

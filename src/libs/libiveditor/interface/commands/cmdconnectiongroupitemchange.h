@@ -20,8 +20,8 @@
 #include <QUndoCommand>
 
 namespace ivm {
-class AADLConnection;
-class AADLConnectionGroup;
+class IVConnection;
+class IVConnectionGroup;
 }
 
 namespace ive {
@@ -31,16 +31,16 @@ namespace cmd {
 class CmdConnectionGroupItemChange : public QUndoCommand
 {
 public:
-    explicit CmdConnectionGroupItemChange(ivm::AADLConnectionGroup *group,
-                                          ivm::AADLConnection *connection, bool add);
+    explicit CmdConnectionGroupItemChange(ivm::IVConnectionGroup *group,
+                                          ivm::IVConnection *connection, bool add);
 
     void redo() override;
     void undo() override;
     int id() const override;
 
 private:
-    ivm::AADLConnectionGroup *m_group = nullptr;
-    ivm::AADLConnection *m_connection = nullptr;
+    ivm::IVConnectionGroup *m_group = nullptr;
+    ivm::IVConnection *m_connection = nullptr;
     bool m_addConnection = true;
 };
 

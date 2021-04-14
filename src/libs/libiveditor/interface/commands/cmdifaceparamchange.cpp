@@ -20,21 +20,21 @@
 
 #include "commandids.h"
 
-#include <aadlmodel.h>
+#include <ivmodel.h>
 
 namespace ive {
 namespace cmd {
 
 CmdIfaceParamChange::CmdIfaceParamChange(
-        ivm::AADLObject *entity, const ivm::IfaceParameter &from, const ivm::IfaceParameter &to)
-    : CmdIfaceParamBase(entity ? entity->as<ivm::AADLIface *>() : nullptr)
+        ivm::IVObject *entity, const ivm::InterfaceParameter &from, const ivm::InterfaceParameter &to)
+    : CmdIfaceParamBase(entity ? entity->as<ivm::IVInterface *>() : nullptr)
     , m_newParam(to)
     , m_oldParam(from)
 {
     setText(QObject::tr("Change Iface Parameter"));
 }
 
-void CmdIfaceParamChange::swapParam(const ivm::IfaceParameter &from, const ivm::IfaceParameter &to)
+void CmdIfaceParamChange::swapParam(const ivm::InterfaceParameter &from, const ivm::InterfaceParameter &to)
 {
     if (!m_iface)
         return;

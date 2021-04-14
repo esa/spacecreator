@@ -17,15 +17,15 @@
 
 #pragma once
 
-#include "aadliface.h"
+#include "ivinterface.h"
 #include "editorcore.h"
 #include "ui/graphicsviewbase.h"
 
 #include <QVector>
 
 namespace ivm {
-class AADLConnection;
-class AADLFunction;
+class IVConnection;
+class IVFunction;
 }
 
 namespace ive {
@@ -57,9 +57,9 @@ public:
     QAction *actionExportType();
     QAction *actionToggleE2EView();
 
-    ivm::AADLFunction *addFunction(const QString &name, ivm::AADLFunction *parent = nullptr);
+    ivm::IVFunction *addFunction(const QString &name, ivm::IVFunction *parent = nullptr);
     bool addConnection(QString name, const QString &fromInstanceName, const QString &toInstanceName);
-    ivm::AADLIface *addInterface(QString name, const QString &functionName);
+    ivm::IVInterface *addInterface(QString name, const QString &functionName);
 
     bool renameAadlFunction(const QString &oldName, const QString &newName);
     bool renameAadlConnection(const QString &oldName, const QString &newName, const QString &fromInstanceName,
@@ -74,8 +74,8 @@ public:
     QString filePath() const override;
     bool save() override;
 
-    QVector<ivm::AADLFunction *> allAadlFunctions() const;
-    QVector<ivm::AADLConnection *> allAadlConnections() const;
+    QVector<ivm::IVFunction *> allAadlFunctions() const;
+    QVector<ivm::IVConnection *> allAadlConnections() const;
 
     QStringList aadlFunctionsNames() const;
     QStringList aadlConnectionNames() const;
@@ -85,8 +85,8 @@ public Q_SLOTS:
 
 private:
     void saveSceneRender(const QString &filePath) const;
-    ivm::AADLIface *getInterface(
-            const QString &ifName, ivm::AADLIface::IfaceType ifType, ivm::AADLFunction *parentFunction);
+    ivm::IVInterface *getInterface(
+            const QString &ifName, ivm::IVInterface::InterfaceType ifType, ivm::IVFunction *parentFunction);
     Q_SLOT void updateAadlItems();
     QUrl helpPage() const override;
 
@@ -98,8 +98,8 @@ private:
     QAction *m_actionExportType { nullptr };
     QAction *m_actionToggleE2EView { nullptr };
 
-    QVector<ivm::AADLFunction *> m_aadlFunctions;
-    QVector<ivm::AADLConnection *> m_aadlConnections;
+    QVector<ivm::IVFunction *> m_aadlFunctions;
+    QVector<ivm::IVConnection *> m_aadlConnections;
 
     Qt::CaseSensitivity m_caseCheck = Qt::CaseInsensitive;
 };

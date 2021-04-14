@@ -20,7 +20,7 @@
 #include "exportableaadlobject.h"
 
 namespace ivm {
-class AADLConnectionGroup;
+class IVConnectionGroup;
 }
 
 namespace ive {
@@ -35,7 +35,7 @@ class ExportableAADLConnectionGroup : public ExportableAADLObject
     Q_PROPERTY(QVariantMap tifaces READ targetInterfaces)
 
 public:
-    ExportableAADLConnectionGroup(const ivm::AADLConnectionGroup *connection = nullptr);
+    ExportableAADLConnectionGroup(const ivm::IVConnectionGroup *connection = nullptr);
 
     QString connectionGroupName() const;
     QString sourceName() const;

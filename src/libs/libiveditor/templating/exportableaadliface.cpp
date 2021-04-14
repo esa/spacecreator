@@ -17,30 +17,30 @@
 
 #include "exportableaadliface.h"
 
-#include "aadliface.h"
-#include "aadlinterfacechain.h"
+#include "ivinterface.h"
+#include "ivinterfacechain.h"
 
 namespace ive {
 
-ExportableAADLIface::ExportableAADLIface(const ivm::AADLIface *iface)
+ExportableAADLIface::ExportableAADLIface(const ivm::IVInterface *iface)
     : ExportableAADLObject(iface)
 {
 }
 
 bool ExportableAADLIface::isProvided() const
 {
-    return exportedObject<ivm::AADLIface>()->isProvided();
+    return exportedObject<ivm::IVInterface>()->isProvided();
 }
 
 bool ExportableAADLIface::isRequired() const
 {
-    return exportedObject<ivm::AADLIface>()->isRequired();
+    return exportedObject<ivm::IVInterface>()->isRequired();
 }
 
 QVariantList ExportableAADLIface::paramList() const
 {
     QVariantList list;
-    for (const ivm::IfaceParameter &param : exportedObject<ivm::AADLIface>()->params())
+    for (const ivm::InterfaceParameter &param : exportedObject<ivm::IVInterface>()->params())
         list << QVariant::fromValue(param);
     return list;
 }
@@ -48,9 +48,9 @@ QVariantList ExportableAADLIface::paramList() const
 QVariantList ExportableAADLIface::connectedInterfaces() const
 {
     QVariantList connectedInterfaces;
-    auto iface = exportedObject<ivm::AADLIface>();
-    const QList<ivm::AADLInterfaceChain> chains = ivm::AADLInterfaceChain::build(iface);
-    for (const ivm::AADLInterfaceChain &chain : chains) {
+    auto iface = exportedObject<ivm::IVInterface>();
+    const QList<ivm::IVInterfaceChain> chains = ivm::IVInterfaceChain::build(iface);
+    for (const ivm::IVInterfaceChain &chain : chains) {
         connectedInterfaces << chain.targetEndPointPath();
     }
     return connectedInterfaces;

@@ -15,29 +15,29 @@
    along with this program. If not, see <https://www.gnu.org/licenses/lgpl-2.1.html>.
 */
 
-#include "aadlifacegroup.h"
+#include "ivinterfacegroup.h"
 
 namespace ivm {
 
-AADLIfaceGroup::AADLIfaceGroup(const CreationInfo &ci)
-    : AADLIface(AADLObject::Type::InterfaceGroup, ci)
+IVInterfaceGroup::IVInterfaceGroup(const CreationInfo &ci)
+    : IVInterface(IVObject::Type::InterfaceGroup, ci)
 {
 }
 
-void AADLIfaceGroup::removeEntity(AADLIface *iface)
+void IVInterfaceGroup::removeEntity(IVInterface *iface)
 {
     m_entities.removeAll(iface);
     iface->setGroupName(QString());
 }
 
-void AADLIfaceGroup::addEntity(AADLIface *iface)
+void IVInterfaceGroup::addEntity(IVInterface *iface)
 {
     iface->setGroupName(groupName());
     if (!m_entities.contains(iface))
         m_entities.append(iface);
 }
 
-void AADLIfaceGroup::setAttr(const QString &name, const QVariant &val)
+void IVInterfaceGroup::setAttr(const QString &name, const QVariant &val)
 {
     if (name.isEmpty()) {
         return;
@@ -45,16 +45,16 @@ void AADLIfaceGroup::setAttr(const QString &name, const QVariant &val)
 
     const meta::Props::Token t = meta::Props::token(name);
     if (t != meta::Props::Token::name) {
-        AADLIface::setAttr(name, val);
+        IVInterface::setAttr(name, val);
     }
 }
 
-QList<QPointer<AADLIface>> AADLIfaceGroup::entities() const
+QList<QPointer<IVInterface>> IVInterfaceGroup::entities() const
 {
     return m_entities;
 }
 
-QString AADLIfaceGroup::ifaceLabel() const
+QString IVInterfaceGroup::ifaceLabel() const
 {
     return {};
 }

@@ -17,8 +17,8 @@
 
 #include "aadlrectgraphicsitem.h"
 
-#include "aadlfunctiontype.h"
-#include "aadlobject.h"
+#include "ivfunctiontype.h"
+#include "ivobject.h"
 #include "baseitems/common/aadlutils.h"
 #include "commandsstack.h"
 #include "interface/graphicsitemhelpers.h"
@@ -30,7 +30,7 @@
 
 namespace ive {
 
-AADLRectGraphicsItem::AADLRectGraphicsItem(ivm::AADLObject *entity, QGraphicsItem *parentGraphicsItem)
+AADLRectGraphicsItem::AADLRectGraphicsItem(ivm::IVObject *entity, QGraphicsItem *parentGraphicsItem)
     : InteractiveObject(entity, parentGraphicsItem)
 {
     connect(this, &InteractiveObject::relocated, this, &AADLRectGraphicsItem::onGeometryChanged);
@@ -100,7 +100,7 @@ void AADLRectGraphicsItem::initGripPoints()
 
 void AADLRectGraphicsItem::updateFromEntity()
 {
-    ivm::AADLObject *obj = aadlObject();
+    ivm::IVObject *obj = entity();
     Q_ASSERT(obj);
     if (!obj)
         return;
@@ -115,11 +115,11 @@ void AADLRectGraphicsItem::updateFromEntity()
         layout();
 }
 
-QList<QPair<ivm::AADLObject *, QVector<QPointF>>> AADLRectGraphicsItem::prepareChangeCoordinatesCommandParams() const
+QList<QPair<ivm::IVObject *, QVector<QPointF>>> AADLRectGraphicsItem::prepareChangeCoordinatesCommandParams() const
 {
-    QList<QPair<ivm::AADLObject *, QVector<QPointF>>> params;
+    QList<QPair<ivm::IVObject *, QVector<QPointF>>> params;
     const QVector<QPointF> sceneGeometry { sceneBoundingRect().topLeft(), sceneBoundingRect().bottomRight() };
-    params.append({ aadlObject(), sceneGeometry });
+    params.append({ entity(), sceneGeometry });
     params.append(InteractiveObject::prepareChangeCoordinatesCommandParams());
     return params;
 }

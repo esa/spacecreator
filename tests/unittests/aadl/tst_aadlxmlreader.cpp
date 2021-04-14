@@ -15,9 +15,9 @@
   along with this program. If not, see <https://www.gnu.org/licenses/lgpl-2.1.html>.
 */
 
-#include "aadlfunction.h"
-#include "aadlobject.h"
-#include "aadlxmlreader.h"
+#include "ivfunction.h"
+#include "ivobject.h"
+#include "ivxmlreader.h"
 #include "xmlcommon.h"
 
 #include <QBuffer>
@@ -45,14 +45,14 @@ void XMLReader::runReader(const XmlFileMock &xml)
     QBuffer buffer(&result);
     buffer.open(QIODevice::ReadOnly | QIODevice::Text);
 
-    ivm::AADLXMLReader reader;
-    connect(&reader, &ivm::AADLXMLReader::objectsParsed, this, [&xml](const QVector<ivm::AADLObject *> &objectsList) {
+    ivm::IVXMLReader reader;
+    connect(&reader, &ivm::IVXMLReader::objectsParsed, this, [&xml](const QVector<ivm::IVObject *> &objectsList) {
         QCOMPARE(objectsList.size(), xml.expectedObjectCount());
     });
-    connect(&reader, &ivm::AADLXMLReader::error, [](const QString &msg) { qWarning() << msg; });
+    connect(&reader, &ivm::IVXMLReader::error, [](const QString &msg) { qWarning() << msg; });
 
-    QSignalSpy spyObjectsParsed(&reader, &ivm::AADLXMLReader::objectsParsed);
-    QSignalSpy spyError(&reader, &ivm::AADLXMLReader::error);
+    QSignalSpy spyObjectsParsed(&reader, &ivm::IVXMLReader::objectsParsed);
+    QSignalSpy spyError(&reader, &ivm::IVXMLReader::error);
 
     const bool ok = reader.read(&buffer);
     QCOMPARE(ok, xml.m_canBeParsed);
@@ -64,7 +64,7 @@ void XMLReader::runReader(const XmlFileMock &xml)
 
     if (spyObjectsParsed.count()) {
         const QList<QVariant> &objectsList = spyObjectsParsed.takeFirst();
-        const QVector<ivm::AADLObject *> &aadlObjects = objectsList.first().value<QVector<ivm::AADLObject *>>();
+        const QVector<ivm::IVObject *> &aadlObjects = objectsList.first().value<QVector<ivm::IVObject *>>();
         QCOMPARE(aadlObjects.size(), xml.expectedObjectCount());
     }
 
@@ -106,11 +106,11 @@ void XMLReader::test_readMetaData()
     buffer.open(QIODevice::ReadOnly | QIODevice::Text);
 
     QVariantMap metadata;
-    ivm::AADLXMLReader reader;
-    connect(&reader, &ivm::AADLXMLReader::metaDataParsed, this,
+    ivm::IVXMLReader reader;
+    connect(&reader, &ivm::IVXMLReader::metaDataParsed, this,
             [&metadata](const QVariantMap &data) { metadata = data; });
 
-    QSignalSpy spyError(&reader, &ivm::AADLXMLReader::error);
+    QSignalSpy spyError(&reader, &ivm::IVXMLReader::error);
 
     const bool ok = reader.read(&buffer);
     QVERIFY(ok);
@@ -132,15 +132,15 @@ void XMLReader::test_readFunction()
     QBuffer buffer(&xml);
     buffer.open(QIODevice::ReadOnly | QIODevice::Text);
 
-    ivm::AADLFunction *function = nullptr;
-    ivm::AADLXMLReader reader;
-    connect(&reader, &ivm::AADLXMLReader::objectsParsed, this,
-            [&function](const QVector<ivm::AADLObject *> &objectsList) {
+    ivm::IVFunction *function = nullptr;
+    ivm::IVXMLReader reader;
+    connect(&reader, &ivm::IVXMLReader::objectsParsed, this,
+            [&function](const QVector<ivm::IVObject *> &objectsList) {
                 QCOMPARE(objectsList.size(), 1);
-                function = qobject_cast<ivm::AADLFunction *>(objectsList[0]);
+                function = qobject_cast<ivm::IVFunction *>(objectsList[0]);
             });
 
-    QSignalSpy spyError(&reader, &ivm::AADLXMLReader::error);
+    QSignalSpy spyError(&reader, &ivm::IVXMLReader::error);
 
     const bool ok = reader.read(&buffer);
     QVERIFY(ok);

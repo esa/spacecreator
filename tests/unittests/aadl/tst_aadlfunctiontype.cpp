@@ -15,11 +15,11 @@
    along with this program. If not, see <https://www.gnu.org/licenses/lgpl-2.1.html>.
 */
 
-#include "aadlobject.h"
-#include "aadlfunction.h"
-#include "aadlfunctiontype.h"
-#include "aadliface.h"
-#include "aadltestutils.h"
+#include "ivobject.h"
+#include "ivfunction.h"
+#include "ivfunctiontype.h"
+#include "ivinterface.h"
+#include "ivtestutils.h"
 
 #include <QDebug>
 #include <QtTest>
@@ -39,29 +39,29 @@ private Q_SLOTS:
     void testChildrenManagementMixed();
 
 private:
-    void testChildrenManagement(ivm::AADLFunctionType *obj, const QVector<ivm::AADLObject *> &children,
+    void testChildrenManagement(ivm::IVFunctionType *obj, const QVector<ivm::IVObject *> &children,
             bool addedOnCreation = false);
 };
 
 void tst_AADLFunctionType::testAadlType()
 {
-    ivm::AADLFunctionType obj;
+    ivm::IVFunctionType obj;
 
-    QCOMPARE(obj.aadlType(), ivm::AADLObject::Type::FunctionType);
+    QCOMPARE(obj.type(), ivm::IVObject::Type::FunctionType);
 }
 
 void tst_AADLFunctionType::testRequiredInterfacesManagement()
 {
-    ivm::AADLFunctionType obj;
+    ivm::IVFunctionType obj;
 
     QCOMPARE(obj.ris().size(), 0);
 
-    auto ifaceType = ivm::AADLIface::IfaceType::Required;
+    auto ifaceType = ivm::IVInterface::InterfaceType::Required;
     const int ifacesCount = 10;
     auto ciRI = ivm::testutils::init(ifaceType, &obj);
     for (int i = 0; i < ifacesCount; ++i) {
         ciRI.name = QString("test required iface #%1").arg(i);
-        auto ri = ivm::AADLIface::createIface(ciRI);
+        auto ri = ivm::IVInterface::createIface(ciRI);
         const bool ok = obj.addChild(ri);
         QVERIFY(ok);
         QCOMPARE(obj.ris().size(), i + 1);
@@ -78,16 +78,16 @@ void tst_AADLFunctionType::testRequiredInterfacesManagement()
 
 void tst_AADLFunctionType::testProvidedInterfacesManagement()
 {
-    ivm::AADLFunctionType obj;
+    ivm::IVFunctionType obj;
 
     QCOMPARE(obj.ris().size(), 0);
 
-    auto ifaceType = ivm::AADLIface::IfaceType::Provided;
+    auto ifaceType = ivm::IVInterface::InterfaceType::Provided;
     const int ifacesCount = 10;
     auto ciPI = ivm::testutils::init(ifaceType, &obj);
     for (int i = 0; i < ifacesCount; ++i) {
         ciPI.name = QString("test provided iface #%1").arg(i);
-        auto pi = ivm::AADLIface::createIface(ciPI);
+        auto pi = ivm::IVInterface::createIface(ciPI);
         const bool ok = obj.addChild(pi);
         QVERIFY(ok);
         QCOMPARE(obj.pis().size(), i + 1);
@@ -108,21 +108,21 @@ void tst_AADLFunctionType::testProvidedInterfacesManagement()
 
 void tst_AADLFunctionType::testCommonInterfacesManagement()
 {
-    ivm::AADLFunction obj;
+    ivm::IVFunction obj;
 
     QCOMPARE(obj.ris().size(), 0);
 
     const int ifacesCountHalf = 5;
 
-    QVector<ivm::AADLIface *> ifaces;
+    QVector<ivm::IVInterface *> ifaces;
     for (int i = 0; i < ifacesCountHalf; ++i) {
-        auto ci = ivm::testutils::init(ivm::AADLIface::IfaceType::Provided, &obj);
+        auto ci = ivm::testutils::init(ivm::IVInterface::InterfaceType::Provided, &obj);
         ci.name = QString("test provided iface #%1").arg(i);
-        ifaces << ivm::AADLIface::createIface(ci);
+        ifaces << ivm::IVInterface::createIface(ci);
 
-        ci = ivm::testutils::init(ivm::AADLIface::IfaceType::Required, &obj);
+        ci = ivm::testutils::init(ivm::IVInterface::InterfaceType::Required, &obj);
         ci.name = QString("test required iface #%1").arg(i);
-        ifaces << ivm::AADLIface::createIface(ci);
+        ifaces << ivm::IVInterface::createIface(ci);
     }
 
     QCOMPARE(ifaces.size(), ifacesCountHalf * 2);
@@ -152,26 +152,26 @@ void tst_AADLFunctionType::testCommonInterfacesManagement()
 
 void tst_AADLFunctionType::testChildrenManagementFunction()
 {
-    ivm::AADLFunctionType obj;
+    ivm::IVFunctionType obj;
 
-    auto itProvided = ivm::AADLIface::IfaceType::Provided;
-    auto itRequired = ivm::AADLIface::IfaceType::Required;
+    auto itProvided = ivm::IVInterface::InterfaceType::Provided;
+    auto itRequired = ivm::IVInterface::InterfaceType::Required;
 
-    ivm::AADLFunction fn0("Fn0", &obj);
-    ivm::AADLFunction fn1("Fn1", &obj);
+    ivm::IVFunction fn0("Fn0", &obj);
+    ivm::IVFunction fn1("Fn1", &obj);
     fn1.addChild(ivm::testutils::createIface(&fn1, itProvided));
-    ivm::AADLFunction fn2("Fn2", &obj);
+    ivm::IVFunction fn2("Fn2", &obj);
     fn2.addChild(ivm::testutils::createIface(&fn2, itRequired));
-    ivm::AADLFunction fn3("Fn3", &obj);
+    ivm::IVFunction fn3("Fn3", &obj);
     fn3.addChild(ivm::testutils::createIface(&fn3, itRequired));
     fn3.addChild(ivm::testutils::createIface(&fn3, itProvided));
 
-    const QVector<ivm::AADLObject *> functions { &fn0, &fn1, &fn2, &fn3 };
+    const QVector<ivm::IVObject *> functions { &fn0, &fn1, &fn2, &fn3 };
     testChildrenManagement(&obj, functions);
 }
 
 void tst_AADLFunctionType::testChildrenManagement(
-        ivm::AADLFunctionType *obj, const QVector<ivm::AADLObject *> &children, bool addedOnCreation)
+        ivm::IVFunctionType *obj, const QVector<ivm::IVObject *> &children, bool addedOnCreation)
 {
     QCOMPARE(obj->children().size(), addedOnCreation ? children.size() : 0);
 
@@ -220,61 +220,61 @@ void tst_AADLFunctionType::testChildrenManagement(
 
 void tst_AADLFunctionType::testChildrenManagementContainer()
 {
-    ivm::AADLFunctionType obj;
+    ivm::IVFunctionType obj;
 
-    auto itProvided = ivm::AADLIface::IfaceType::Provided;
-    auto itRequired = ivm::AADLIface::IfaceType::Required;
+    auto itProvided = ivm::IVInterface::InterfaceType::Provided;
+    auto itRequired = ivm::IVInterface::InterfaceType::Required;
 
-    ivm::AADLFunctionType fnType0("FnType0", &obj);
+    ivm::IVFunctionType fnType0("FnType0", &obj);
     obj.addChild(&fnType0);
 
-    ivm::AADLFunctionType fnType1("FnType1", &obj);
+    ivm::IVFunctionType fnType1("FnType1", &obj);
     obj.addChild(&fnType1);
     fnType1.addChild(ivm::testutils::createIface(&fnType1, itProvided));
 
-    ivm::AADLFunctionType fnType2("FnType2", &obj);
+    ivm::IVFunctionType fnType2("FnType2", &obj);
     obj.addChild(&fnType2);
     fnType2.addChild(ivm::testutils::createIface(&fnType2, itRequired));
 
-    ivm::AADLFunctionType fnType3("FnType3", &obj);
+    ivm::IVFunctionType fnType3("FnType3", &obj);
     obj.addChild(&fnType3);
     fnType3.addChild(ivm::testutils::createIface(&fnType3, itRequired));
     fnType3.addChild(ivm::testutils::createIface(&fnType3, itProvided));
 
-    const QVector<ivm::AADLObject *> functionTypes { &fnType0, &fnType1, &fnType2, &fnType3 };
+    const QVector<ivm::IVObject *> functionTypes { &fnType0, &fnType1, &fnType2, &fnType3 };
     testChildrenManagement(&obj, functionTypes, true);
 }
 
 void tst_AADLFunctionType::testChildrenManagementMixed()
 {
-    auto itProvided = ivm::AADLIface::IfaceType::Provided;
-    auto itRequired = ivm::AADLIface::IfaceType::Required;
+    auto itProvided = ivm::IVInterface::InterfaceType::Provided;
+    auto itRequired = ivm::IVInterface::InterfaceType::Required;
 
-    ivm::AADLFunctionType obj;
+    ivm::IVFunctionType obj;
 
-    ivm::AADLFunction fn0("Fn0", &obj);
-    ivm::AADLFunction fn1("Fn1", &obj);
+    ivm::IVFunction fn0("Fn0", &obj);
+    ivm::IVFunction fn1("Fn1", &obj);
     fn1.addChild(ivm::testutils::createIface(&fn1, itProvided));
 
-    ivm::AADLFunction fn2("Fn2", &obj);
+    ivm::IVFunction fn2("Fn2", &obj);
     fn1.addChild(ivm::testutils::createIface(&fn2, itRequired));
 
-    ivm::AADLFunction fn3("Fn3", &obj);
+    ivm::IVFunction fn3("Fn3", &obj);
     fn3.addChild(ivm::testutils::createIface(&fn3, itRequired));
     fn3.addChild(ivm::testutils::createIface(&fn3, itProvided));
 
-    ivm::AADLFunctionType fnType0("FnType0", &obj);
-    ivm::AADLFunctionType fnType1("FnType1", &obj);
+    ivm::IVFunctionType fnType0("FnType0", &obj);
+    ivm::IVFunctionType fnType1("FnType1", &obj);
     fnType1.addChild(ivm::testutils::createIface(&fnType1, itProvided));
 
-    ivm::AADLFunctionType fnType2("FnType2", &obj);
+    ivm::IVFunctionType fnType2("FnType2", &obj);
     fnType2.addChild(ivm::testutils::createIface(&fnType2, itRequired));
 
-    ivm::AADLFunctionType fnType3("FnType3", &obj);
+    ivm::IVFunctionType fnType3("FnType3", &obj);
     fnType3.addChild(ivm::testutils::createIface(&fnType3, itRequired));
     fnType3.addChild(ivm::testutils::createIface(&fnType3, itProvided));
 
-    const QVector<ivm::AADLObject *> children { &fnType0, &fn0, &fnType1, &fn1, &fnType2, &fn3, &fnType3, &fn2 };
+    const QVector<ivm::IVObject *> children { &fnType0, &fn0, &fnType1, &fn1, &fnType2, &fn3, &fnType3, &fn2 };
     testChildrenManagement(&obj, children);
 }
 

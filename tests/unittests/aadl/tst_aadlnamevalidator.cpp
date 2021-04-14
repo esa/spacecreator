@@ -15,9 +15,9 @@
    along with this program. If not, see <https://www.gnu.org/licenses/lgpl-2.1.html>.
 */
 
-#include "aadlfunction.h"
+#include "ivfunction.h"
 #include "aadllibrary.h"
-#include "aadlnamevalidator.h"
+#include "ivnamevalidator.h"
 
 #include <QStandardPaths>
 #include <QTest>
@@ -63,7 +63,7 @@ void tst_AADLNameValidator::test_functionName()
     QFETCH(QString, name);
     QFETCH(bool, expectedResult);
 
-    const bool ok = ivm::AADLNameValidator::isValidName(name);
+    const bool ok = ivm::IVNameValidator::isValidName(name);
     QCOMPARE(ok, expectedResult);
 }
 

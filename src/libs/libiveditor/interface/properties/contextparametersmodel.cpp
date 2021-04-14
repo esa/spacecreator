@@ -18,9 +18,9 @@
 #include "contextparametersmodel.h"
 
 #include "aadlcommonprops.h"
-#include "aadlfunction.h"
-#include "aadlnamevalidator.h"
-#include "aadlobject.h"
+#include "ivfunction.h"
+#include "ivnamevalidator.h"
+#include "ivobject.h"
 #include "asn1/file.h"
 #include "baseitems/common/aadlutils.h"
 #include "commandsstack.h"
@@ -46,7 +46,7 @@ void ContextParametersModel::createNewRow(const ivm::ContextParameter &param, in
 {
     m_params.insert(row, param);
 
-    const QString name = ivm::AADLNameValidator::decodeName(m_dataObject->aadlType(), param.name());
+    const QString name = ivm::IVNameValidator::decodeName(m_dataObject->type(), param.name());
     QStandardItem *titleItem = new QStandardItem(row, Column::Name);
     titleItem->setData(name, Qt::DisplayRole);
     titleItem->setData(name, DataRole);
@@ -62,7 +62,7 @@ void ContextParametersModel::createNewRow(const ivm::ContextParameter &param, in
     setItem(row, Column::Value, valueItem);
 }
 
-void ContextParametersModel::setDataObject(ivm::AADLObject *obj)
+void ContextParametersModel::setDataObject(ivm::IVObject *obj)
 {
     clear();
     m_params.clear();
@@ -71,7 +71,7 @@ void ContextParametersModel::setDataObject(ivm::AADLObject *obj)
     if (!m_dataObject)
         return;
 
-    if (auto func = qobject_cast<ivm::AADLFunctionType *>(m_dataObject)) {
+    if (auto func = qobject_cast<ivm::IVFunctionType *>(m_dataObject)) {
         const int paramsCount = func->contextParams().size();
 
         for (int i = 0; i < paramsCount; ++i) {
@@ -111,7 +111,7 @@ bool ContextParametersModel::setData(const QModelIndex &index, const QVariant &v
 
         switch (index.column()) {
         case Column::Name: {
-            if (!paramNew.setName(ivm::AADLNameValidator::encodeName(m_dataObject->aadlType(), value.toString())))
+            if (!paramNew.setName(ivm::IVNameValidator::encodeName(m_dataObject->type(), value.toString())))
                 return false;
             break;
         }
@@ -134,7 +134,7 @@ bool ContextParametersModel::setData(const QModelIndex &index, const QVariant &v
             return false;
         }
 
-        if (auto entity = qobject_cast<ivm::AADLFunctionType *>(m_dataObject)) {
+        if (auto entity = qobject_cast<ivm::IVFunctionType *>(m_dataObject)) {
             auto attributesCmd = new cmd::CmdContextParameterChange(entity, paramOld, paramNew);
             m_cmdMacro->push(attributesCmd);
             m_params.replace(index.row(), paramNew);
@@ -150,7 +150,7 @@ bool ContextParametersModel::createProperty(const QString &propName)
     ivm::ContextParameter param(propName);
     param.setParamType(ivm::BasicParameter::Type::Timer);
 
-    if (auto entity = qobject_cast<ivm::AADLFunctionType *>(m_dataObject)) {
+    if (auto entity = qobject_cast<ivm::IVFunctionType *>(m_dataObject)) {
         auto propsCmd = new cmd::CmdContextParameterCreate(entity, param);
         const int rows = rowCount();
 
@@ -169,7 +169,7 @@ bool ContextParametersModel::removeProperty(const QModelIndex &index)
         return res;
 
     const int row(index.row());
-    if (auto entity = qobject_cast<ivm::AADLFunctionType *>(m_dataObject)) {
+    if (auto entity = qobject_cast<ivm::IVFunctionType *>(m_dataObject)) {
         auto propsCmd = new cmd::CmdContextParameterRemove(entity, row);
         removeRow(row);
         m_params.removeAt(row);
@@ -201,9 +201,9 @@ Qt::ItemFlags ContextParametersModel::flags(const QModelIndex &index) const
         return flags;
 
     if (flags.testFlag(Qt::ItemIsEditable) || flags.testFlag(Qt::ItemIsEnabled)) {
-        switch (m_dataObject->aadlType()) {
-        case ivm::AADLObject::Type::Function: {
-            if (auto fn = m_dataObject->as<const ivm::AADLFunction *>())
+        switch (m_dataObject->type()) {
+        case ivm::IVObject::Type::Function: {
+            if (auto fn = m_dataObject->as<const ivm::IVFunction *>())
                 if (fn->inheritsFunctionType())
                     flags = flags & ~Qt::ItemIsEditable & ~Qt::ItemIsEnabled;
 

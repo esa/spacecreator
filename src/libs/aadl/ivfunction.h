@@ -17,7 +17,7 @@
 
 #pragma once
 
-#include "aadlfunctiontype.h"
+#include "ivfunctiontype.h"
 
 #include <QHash>
 #include <QObject>
@@ -25,18 +25,18 @@
 
 namespace ivm {
 
-struct AADLFunctionPrivate;
-class AADLFunction : public AADLFunctionType
+struct IVFunctionPrivate;
+class IVFunction : public IVFunctionType
 {
     Q_OBJECT
 public:
-    explicit AADLFunction(const QString &title = QString(), QObject *parent = nullptr);
-    ~AADLFunction() override;
+    explicit IVFunction(const QString &title = QString(), QObject *parent = nullptr);
+    ~IVFunction() override;
 
     bool postInit() override;
 
-    void setInstanceOf(AADLFunctionType *fnType);
-    const AADLFunctionType *instanceOf() const;
+    void setInstanceOf(IVFunctionType *fnType);
+    const IVFunctionType *instanceOf() const;
     bool inheritsFunctionType() const;
 
 protected Q_SLOTS:
@@ -45,7 +45,7 @@ protected Q_SLOTS:
     void reflectContextParam();
 
 private:
-    const std::unique_ptr<AADLFunctionPrivate> d;
+    const std::unique_ptr<IVFunctionPrivate> d;
 
     struct OriginalPropsHolder {
         // TODO: unite with AADLIface::OriginalPropsHolder
@@ -57,7 +57,7 @@ private:
 
         inline bool collected() const { return m_collected; }
 
-        inline void collect(const AADLFunction *src)
+        inline void collect(const IVFunction *src)
         {
             if (m_collected || !src)
                 return;
@@ -81,6 +81,6 @@ private:
     void reflectContextParams(const QVector<ContextParameter> &params);
 };
 
-typedef QVector<AADLFunction *> AADLFunctionsVector;
+typedef QVector<IVFunction *> AADLFunctionsVector;
 
 }

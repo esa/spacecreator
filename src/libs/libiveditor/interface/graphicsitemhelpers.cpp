@@ -17,12 +17,12 @@
 
 #include "graphicsitemhelpers.h"
 
-#include "aadlcomment.h"
-#include "aadlconnection.h"
-#include "aadlfunction.h"
-#include "aadlfunctiontype.h"
-#include "aadliface.h"
-#include "aadlobject.h"
+#include "ivcomment.h"
+#include "ivconnection.h"
+#include "ivfunction.h"
+#include "ivfunctiontype.h"
+#include "ivinterface.h"
+#include "ivobject.h"
 #include "baseitems/common/aadlutils.h"
 #include "baseitems/interactiveobject.h"
 #include "connectioncreationvalidator.h"
@@ -43,7 +43,7 @@ namespace gi {
 static const QList<int> kRectTypes { AADLCommentGraphicsItem::Type, AADLFunctionGraphicsItem::Type,
     AADLFunctionTypeGraphicsItem::Type };
 
-ivm::AADLFunction *functionObject(QGraphicsItem *item)
+ivm::IVFunction *functionObject(QGraphicsItem *item)
 {
     if (!item)
         return nullptr;
@@ -54,7 +54,7 @@ ivm::AADLFunction *functionObject(QGraphicsItem *item)
     return nullptr;
 };
 
-ivm::AADLFunctionType *functionTypeObject(QGraphicsItem *item)
+ivm::IVFunctionType *functionTypeObject(QGraphicsItem *item)
 {
     if (!item)
         return nullptr;
@@ -65,7 +65,7 @@ ivm::AADLFunctionType *functionTypeObject(QGraphicsItem *item)
     return nullptr;
 };
 
-ivm::AADLIface *interfaceObject(QGraphicsItem *item)
+ivm::IVInterface *interfaceObject(QGraphicsItem *item)
 {
     if (!item)
         return nullptr;
@@ -76,7 +76,7 @@ ivm::AADLIface *interfaceObject(QGraphicsItem *item)
     return nullptr;
 };
 
-ivm::AADLComment *commentObject(QGraphicsItem *item)
+ivm::IVComment *commentObject(QGraphicsItem *item)
 {
     if (!item)
         return nullptr;
@@ -87,7 +87,7 @@ ivm::AADLComment *commentObject(QGraphicsItem *item)
     return nullptr;
 };
 
-ivm::AADLConnection *connectionObject(QGraphicsItem *item)
+ivm::IVConnection *connectionObject(QGraphicsItem *item)
 {
     if (!item)
         return nullptr;
@@ -112,13 +112,13 @@ bool isOwnConnection(const QGraphicsItem *owner, const QGraphicsItem *connection
     return false;
 }
 
-ivm::AADLObject *object(const QGraphicsItem *item)
+ivm::IVObject *object(const QGraphicsItem *item)
 {
     if (!item)
         return nullptr;
 
     if (auto interactiveObject = qobject_cast<const InteractiveObject *>(item->toGraphicsObject()))
-        return interactiveObject->aadlObject();
+        return interactiveObject->entity();
 
     return nullptr;
 }
@@ -234,7 +234,7 @@ ivm::ValidationResult validateConnectionCreate(QGraphicsScene *scene, const QVec
     }
 
     if (!result.startIface) {
-        if (auto fn = result.startObject->as<const ivm::AADLFunction *>())
+        if (auto fn = result.startObject->as<const ivm::IVFunction *>())
             if (fn->instanceOf()) {
                 result.setFailed(
                         ivm::ConnectionCreationValidator::FailReason::DirectIfaceCreationInInstanceOfFunctionType);
@@ -243,7 +243,7 @@ ivm::ValidationResult validateConnectionCreate(QGraphicsScene *scene, const QVec
     }
 
     if (!result.endIface) {
-        if (auto fn = result.endObject->as<const ivm::AADLFunction *>())
+        if (auto fn = result.endObject->as<const ivm::IVFunction *>())
             if (fn->instanceOf()) {
                 result.setFailed(
                         ivm::ConnectionCreationValidator::FailReason::DirectIfaceCreationInInstanceOfFunctionType);
@@ -276,32 +276,32 @@ QList<int> knownGraphicsItemTypes()
 {
     QList<int> result;
 
-    const QMetaEnum &me = QMetaEnum::fromType<ivm::AADLObject::Type>();
+    const QMetaEnum &me = QMetaEnum::fromType<ivm::IVObject::Type>();
     for (int i = 0; i < me.keyCount(); ++i) {
         int itemType = 0;
-        const ivm::AADLObject::Type objectType = static_cast<ivm::AADLObject::Type>(me.value(i));
+        const ivm::IVObject::Type objectType = static_cast<ivm::IVObject::Type>(me.value(i));
         switch (objectType) {
-        case ivm::AADLObject::Type::Function:
+        case ivm::IVObject::Type::Function:
             itemType = ive::AADLFunctionGraphicsItem::Type;
             break;
-        case ivm::AADLObject::Type::FunctionType:
+        case ivm::IVObject::Type::FunctionType:
             itemType = ive::AADLFunctionTypeGraphicsItem::Type;
             break;
-        case ivm::AADLObject::Type::InterfaceGroup:
-        case ivm::AADLObject::Type::ProvidedInterface:
-        case ivm::AADLObject::Type::RequiredInterface:
+        case ivm::IVObject::Type::InterfaceGroup:
+        case ivm::IVObject::Type::ProvidedInterface:
+        case ivm::IVObject::Type::RequiredInterface:
             itemType = ive::AADLInterfaceGraphicsItem::Type;
             break;
-        case ivm::AADLObject::Type::Comment:
+        case ivm::IVObject::Type::Comment:
             itemType = ive::AADLCommentGraphicsItem::Type;
             break;
-        case ivm::AADLObject::Type::Connection:
+        case ivm::IVObject::Type::Connection:
             itemType = ive::AADLConnectionGraphicsItem::Type;
             break;
-        case ivm::AADLObject::Type::ConnectionGroup:
+        case ivm::IVObject::Type::ConnectionGroup:
             itemType = ive::AADLConnectionGroupGraphicsItem::Type;
             break;
-        case ivm::AADLObject::Type::Unknown:
+        case ivm::IVObject::Type::Unknown:
             continue;
         }
         if (itemType != 0) {
@@ -330,11 +330,11 @@ bool isBounded(const QGraphicsItem *upcomingItem, const QRectF &upcomingItemRect
 
     if (auto iObj = qobject_cast<const AADLRectGraphicsItem *>(upcomingItem->toGraphicsObject())) {
         const auto parentObj = qobject_cast<const InteractiveObject *>(iObj->parentObject());
-        if (parentObj && parentObj->aadlObject()) {
-            const QMarginsF margins = parentObj->aadlObject()->isRootObject() ? kRootMargins : kContentMargins;
+        if (parentObj && parentObj->entity()) {
+            const QMarginsF margins = parentObj->entity()->isRootObject() ? kRootMargins : kContentMargins;
             const QRectF outerRect = parentObj->sceneBoundingRect().marginsRemoved(margins);
             return ive::isRectBounded(outerRect, upcomingItemRect);
-        } else if (iObj->aadlObject()->isRootObject()) {
+        } else if (iObj->entity()->isRootObject()) {
             return ive::isRectBounded(
                     upcomingItemRect.marginsRemoved(kRootMargins), iObj->nestedItemsSceneBoundingRect());
         }

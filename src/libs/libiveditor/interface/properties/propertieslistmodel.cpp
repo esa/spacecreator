@@ -18,11 +18,11 @@
 #include "propertieslistmodel.h"
 
 #include "aadlcommonprops.h"
-#include "aadlfunction.h"
-#include "aadliface.h"
-#include "aadlmodel.h"
-#include "aadlnamevalidator.h"
-#include "aadlobject.h"
+#include "ivfunction.h"
+#include "ivinterface.h"
+#include "ivmodel.h"
+#include "ivnamevalidator.h"
+#include "ivobject.h"
 #include "commandsstack.h"
 #include "interface/commands/cmdentityattributechange.h"
 #include "interface/commands/cmdentitypropertychange.h"
@@ -155,7 +155,7 @@ void PropertiesListModel::updateRows(const QList<ivm::PropertyTemplate *> &templ
             rd.name = key;
             const ivm::PropertyTemplate::Type type =
                     propTemplate ? propTemplate->type() : ivm::PropertyTemplate::Type::String;
-            const QString decodedKey = ivm::AADLNameValidator::decodeName(m_dataObject->aadlType(), key);
+            const QString decodedKey = ivm::IVNameValidator::decodeName(m_dataObject->type(), key);
             if (propTemplate) {
                 rd.rxValidator = propTemplate->valueValidatorPattern();
                 rd.label = propTemplate->label().isEmpty() ? decodedKey : propTemplate->label();
@@ -181,15 +181,15 @@ void PropertiesListModel::updateRows(const QList<ivm::PropertyTemplate *> &templ
     init(sortedKeys(templates));
 }
 
-void PropertiesListModel::setDataObject(ivm::AADLObject *obj)
+void PropertiesListModel::setDataObject(ivm::IVObject *obj)
 {
     clear();
     m_names.clear();
 
     if (m_dataObject) {
-        disconnect(m_dataObject, qOverload<const QString &>(&ivm::AADLObject::propertyChanged), this,
+        disconnect(m_dataObject, qOverload<const QString &>(&ivm::IVObject::propertyChanged), this,
                 &PropertiesListModel::invalidateAttributes);
-        disconnect(m_dataObject, qOverload<const QString &>(&ivm::AADLObject::attributeChanged), this,
+        disconnect(m_dataObject, qOverload<const QString &>(&ivm::IVObject::attributeChanged), this,
                 &PropertiesListModel::invalidateAttributes);
     }
 
@@ -198,9 +198,9 @@ void PropertiesListModel::setDataObject(ivm::AADLObject *obj)
     if (!m_dataObject)
         return;
 
-    connect(m_dataObject, qOverload<const QString &>(&ivm::AADLObject::propertyChanged), this,
+    connect(m_dataObject, qOverload<const QString &>(&ivm::IVObject::propertyChanged), this,
             &PropertiesListModel::invalidateAttributes, Qt::UniqueConnection);
-    connect(m_dataObject, qOverload<const QString &>(&ivm::AADLObject::attributeChanged), this,
+    connect(m_dataObject, qOverload<const QString &>(&ivm::IVObject::attributeChanged), this,
             &PropertiesListModel::invalidateAttributes, Qt::UniqueConnection);
 
     updateRows(m_propTemplatesConfig->propertyTemplatesForObject(m_dataObject));
@@ -265,8 +265,8 @@ bool PropertiesListModel::setData(const QModelIndex &index, const QVariant &valu
             QVariant attributeValue = value;
             switch (tokenFromIndex(index)) {
             case ivm::meta::Props::Token::name: {
-                const QString newName = ivm::AADLNameValidator::encodeName(m_dataObject->aadlType(), value.toString());
-                if (!ivm::AADLNameValidator::isAcceptableName(m_dataObject, newName)) {
+                const QString newName = ivm::IVNameValidator::encodeName(m_dataObject->type(), value.toString());
+                if (!ivm::IVNameValidator::isAcceptableName(m_dataObject, newName)) {
                     return false;
                 }
                 attributeValue = newName;
@@ -419,8 +419,8 @@ QVariant FunctionPropertiesListModel::data(const QModelIndex &index, int role) c
     if (index.column() == Column::Value && role == EditRole
             && tokenFromIndex(index) == ivm::meta::Props::Token::instance_of) {
         QStringList availableFnTypes { QString() };
-        if (auto fn = m_dataObject->as<const ivm::AADLFunction *>()) {
-            availableFnTypes << fn->objectsModel()->getAvailableFunctionTypes(fn).keys();
+        if (auto fn = m_dataObject->as<const ivm::IVFunction *>()) {
+            availableFnTypes << fn->model()->getAvailableFunctionTypes(fn).keys();
         }
         return availableFnTypes;
     }
@@ -430,7 +430,7 @@ QVariant FunctionPropertiesListModel::data(const QModelIndex &index, int role) c
 
 bool FunctionPropertiesListModel::isEditable(const QModelIndex &index) const
 {
-    if (!dataObject() || !index.isValid() || !PropertiesListModel::isEditable(index))
+    if (!entity() || !index.isValid() || !PropertiesListModel::isEditable(index))
         return false;
 
     bool editable = true;
@@ -444,17 +444,17 @@ bool FunctionPropertiesListModel::isEditable(const QModelIndex &index) const
         break;
     }
     case ivm::meta::Props::Token::instance_of: {
-        if (dataObject()->isFunctionType() || index.column() == Column::Name)
+        if (entity()->isFunctionType() || index.column() == Column::Name)
             editable = false;
         else {
-            if (auto fn = dataObject()->as<const ivm::AADLFunction *>()) {
+            if (auto fn = entity()->as<const ivm::IVFunction *>()) {
                 editable = fn->instanceOf() || fn->interfaces().isEmpty();
             }
         }
         break;
     }
     default:
-        if (auto fn = dataObject()->as<const ivm::AADLFunction *>())
+        if (auto fn = entity()->as<const ivm::IVFunction *>())
             editable = !fn->inheritsFunctionType();
         break;
     }
@@ -472,9 +472,9 @@ QVariant InterfacePropertiesListModel::data(const QModelIndex &index, int role) 
 {
     if ((role == PropertiesListModel::DataRole || role == PropertiesListModel::EditRole)
             && index.column() == Column::Value) {
-        if (m_dataObject->aadlType() == ivm::AADLObject::Type::RequiredInterface
+        if (m_dataObject->type() == ivm::IVObject::Type::RequiredInterface
                 && tokenFromIndex(index) == ivm::meta::Props::Token::name) {
-            return m_dataObject->as<ivm::AADLIfaceRequired *>()->ifaceLabel();
+            return m_dataObject->as<ivm::IVInterfaceRequired *>()->ifaceLabel();
         }
     }
     return PropertiesListModel::data(index, role);
@@ -482,10 +482,10 @@ QVariant InterfacePropertiesListModel::data(const QModelIndex &index, int role) 
 
 bool InterfacePropertiesListModel::isEditable(const QModelIndex &index) const
 {
-    if (!dataObject() || !index.isValid() || !PropertiesListModel::isEditable(index))
+    if (!entity() || !index.isValid() || !PropertiesListModel::isEditable(index))
         return false;
 
-    if (auto iface = m_dataObject->as<const ivm::AADLIface *>()) {
+    if (auto iface = m_dataObject->as<const ivm::IVInterface *>()) {
         const bool isClone = iface->isClone();
         switch (tokenFromIndex(index)) {
         case ivm::meta::Props::Token::name:
@@ -493,7 +493,7 @@ bool InterfacePropertiesListModel::isEditable(const QModelIndex &index) const
             return !isClone;
         default:
             if (iface->isRequired()) {
-                if (auto ri = iface->as<const ivm::AADLIfaceRequired *>()) {
+                if (auto ri = iface->as<const ivm::IVInterfaceRequired *>()) {
                     return !isClone && !ri->hasPrototypePi();
                 }
             }

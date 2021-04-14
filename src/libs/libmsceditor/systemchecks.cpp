@@ -70,21 +70,21 @@ QStringList SystemChecks::connectionNamesFromTo(const QString &sourceName, const
     return {};
 }
 
-bool SystemChecks::correspond(const ivm::AADLObject *aadlObj, const MscInstance *instance) const
+bool SystemChecks::correspond(const ivm::IVObject *aadlObj, const MscInstance *instance) const
 {
     Q_UNUSED(aadlObj)
     Q_UNUSED(instance)
     return true;
 }
 
-bool SystemChecks::correspond(const ivm::AADLFunction *aadlFunc, const MscInstance *instance) const
+bool SystemChecks::correspond(const ivm::IVFunction *aadlFunc, const MscInstance *instance) const
 {
     Q_UNUSED(aadlFunc)
     Q_UNUSED(instance)
     return true;
 }
 
-bool SystemChecks::correspond(const ivm::AADLConnection *connection, const MscMessage *message) const
+bool SystemChecks::correspond(const ivm::IVConnection *connection, const MscMessage *message) const
 {
     Q_UNUSED(connection)
     Q_UNUSED(message)

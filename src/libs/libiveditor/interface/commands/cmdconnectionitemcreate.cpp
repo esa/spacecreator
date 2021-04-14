@@ -17,11 +17,11 @@
 
 #include "cmdconnectionitemcreate.h"
 
-#include "aadlconnection.h"
-#include "aadlfunction.h"
-#include "aadlfunctiontype.h"
-#include "aadliface.h"
-#include "aadlmodel.h"
+#include "ivconnection.h"
+#include "ivfunction.h"
+#include "ivfunctiontype.h"
+#include "ivinterface.h"
+#include "ivmodel.h"
 #include "baseitems/common/aadlutils.h"
 #include "commandids.h"
 
@@ -30,7 +30,7 @@
 namespace ive {
 namespace cmd {
 
-CmdConnectionItemCreate::CmdConnectionItemCreate(ivm::AADLModel *model, ivm::AADLFunction *parent,
+CmdConnectionItemCreate::CmdConnectionItemCreate(ivm::IVModel *model, ivm::IVFunction *parent,
         const shared::Id sourceIfaceId, const shared::Id &targetIfaceId, const QVector<QPointF> &points)
     : CmdEntityGeometryChange({}, QObject::tr("Create Connection"))
     , m_model(model)
@@ -40,9 +40,9 @@ CmdConnectionItemCreate::CmdConnectionItemCreate(ivm::AADLModel *model, ivm::AAD
     Q_ASSERT(!sourceIfaceId.isNull());
     Q_ASSERT(!targetIfaceId.isNull());
 
-    ivm::AADLIface *sourceIface = m_model->getInterface(sourceIfaceId);
-    ivm::AADLIface *targetIface = m_model->getInterface(targetIfaceId);
-    m_entity = new ivm::AADLConnection(sourceIface, targetIface, parent);
+    ivm::IVInterface *sourceIface = m_model->getInterface(sourceIfaceId);
+    ivm::IVInterface *targetIface = m_model->getInterface(targetIfaceId);
+    m_entity = new ivm::IVConnection(sourceIface, targetIface, parent);
     prepareData({ qMakePair(m_entity, points) });
 }
 

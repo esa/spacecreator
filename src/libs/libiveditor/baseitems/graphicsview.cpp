@@ -17,7 +17,7 @@
 
 #include "graphicsview.h"
 
-#include "aadlobject.h"
+#include "ivobject.h"
 #include "baseitems/common/aadlutils.h"
 #include "baseitems/interactiveobject.h"
 #include "interface/aadlrectgraphicsitem.h"
@@ -46,7 +46,7 @@ QList<QPair<QPointF, QString>> GraphicsView::mouseMoveCoordinates(
     for (QGraphicsItem *item : itemsUnderCursor) {
         if (auto iObj = qobject_cast<ive::InteractiveObject *>(item->toGraphicsObject())) {
             coords.push_back({ item->mapFromScene(scenePos),
-                    iObj->aadlObject() ? iObj->aadlObject()->objectName() : QLatin1String("None") });
+                    iObj->entity() ? iObj->entity()->objectName() : QLatin1String("None") });
         }
     }
     return coords;

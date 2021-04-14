@@ -22,7 +22,7 @@
 #include <QUndoCommand>
 
 namespace ivm {
-class AADLObject;
+class IVObject;
 }
 
 namespace ive {
@@ -31,7 +31,7 @@ namespace cmd {
 class CmdEntityPropertyRename : public QUndoCommand
 {
 public:
-    explicit CmdEntityPropertyRename(ivm::AADLObject *entity, const QHash<QString, QString> &props);
+    explicit CmdEntityPropertyRename(ivm::IVObject *entity, const QHash<QString, QString> &props);
 
     void redo() override;
     void undo() override;
@@ -39,7 +39,7 @@ public:
     int id() const override;
 
 private:
-    QPointer<ivm::AADLObject> m_entity;
+    QPointer<ivm::IVObject> m_entity;
     QHash<QString, QString> m_newProps;
 };
 

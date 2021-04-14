@@ -23,10 +23,10 @@
 #include <QVector>
 
 namespace ivm {
-class AADLObject;
-class AADLFunction;
-class AADLFunctionType;
-class AADLModel;
+class IVObject;
+class IVFunction;
+class IVFunctionType;
+class IVModel;
 }
 
 namespace ive {
@@ -36,8 +36,8 @@ class CmdEntityAttributeChange;
 class CmdEntitiesInstantiate : public QUndoCommand
 {
 public:
-    explicit CmdEntitiesInstantiate(ivm::AADLFunctionType *entity, ivm::AADLFunctionType *parent,
-            ivm::AADLModel *model, const QPointF &pos);
+    explicit CmdEntitiesInstantiate(ivm::IVFunctionType *entity, ivm::IVFunctionType *parent,
+            ivm::IVModel *model, const QPointF &pos);
     ~CmdEntitiesInstantiate() override;
 
     void redo() override;
@@ -46,9 +46,9 @@ public:
     int id() const override;
 
 private:
-    QPointer<ivm::AADLFunctionType> m_parent;
-    QPointer<ivm::AADLModel> m_model;
-    QPointer<ivm::AADLFunction> m_instantiatedEntity;
+    QPointer<ivm::IVFunctionType> m_parent;
+    QPointer<ivm::IVModel> m_model;
+    QPointer<ivm::IVFunction> m_instantiatedEntity;
     QPointF m_offset;
     CmdEntityAttributeChange *m_subCmd { nullptr };
 };

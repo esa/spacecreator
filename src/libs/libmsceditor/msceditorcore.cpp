@@ -17,8 +17,8 @@
 
 #include "msceditorcore.h"
 
-#include "aadlconnection.h"
-#include "aadlfunction.h"
+#include "ivconnection.h"
+#include "ivfunction.h"
 #include "commandlineparser.h"
 #include "commands/cmddeleteentity.h"
 #include "commands/cmddocumentcreate.h"
@@ -503,7 +503,7 @@ void MSCEditorCore::changeMscMessageName(
 /*!
    Removes all instance that are corresponding to the function \p aadlFunction
  */
-void MSCEditorCore::removeMscInstances(ivm::AADLFunction *aadlFunction)
+void MSCEditorCore::removeMscInstances(ivm::IVFunction *aadlFunction)
 {
     bool updated = false;
     msc::MscCommandsStack *undo = commandsStack();
@@ -525,7 +525,7 @@ void MSCEditorCore::removeMscInstances(ivm::AADLFunction *aadlFunction)
 /*!
    Removes all messages that are corresponding to the connection \p aadlConnection
  */
-void MSCEditorCore::removeMscMessages(ivm::AADLConnection *aadlConnection)
+void MSCEditorCore::removeMscMessages(ivm::IVConnection *aadlConnection)
 {
     bool updated = false;
     msc::MscCommandsStack *undo = commandsStack();
@@ -547,7 +547,7 @@ void MSCEditorCore::removeMscMessages(ivm::AADLConnection *aadlConnection)
 /*!
    Returns a list of all corresponding instances for aadl function \p aadlFunction.
  */
-QList<MscInstance *> MSCEditorCore::correspondingInstances(ivm::AADLFunction *aadlFunction) const
+QList<MscInstance *> MSCEditorCore::correspondingInstances(ivm::IVFunction *aadlFunction) const
 {
     QList<MscInstance *> corresponds;
     for (msc::MscChart *chart : m_model->mscModel()->allCharts()) {
@@ -564,7 +564,7 @@ QList<MscInstance *> MSCEditorCore::correspondingInstances(ivm::AADLFunction *aa
 /*!
    Returns a list of all corresponding messages for aadl connection \p aadlConnection.
  */
-QList<MscMessage *> MSCEditorCore::correspondingMessages(ivm::AADLConnection *aadlConnection) const
+QList<MscMessage *> MSCEditorCore::correspondingMessages(ivm::IVConnection *aadlConnection) const
 {
     QList<MscMessage *> corresponds;
     for (msc::MscChart *chart : m_model->mscModel()->allCharts()) {

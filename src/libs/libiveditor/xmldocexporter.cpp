@@ -17,12 +17,12 @@
 
 #include "xmldocexporter.h"
 
-#include "aadlobject.h"
-#include "aadlcomment.h"
-#include "aadlconnection.h"
-#include "aadlfunction.h"
-#include "aadlfunctiontype.h"
-#include "aadliface.h"
+#include "ivobject.h"
+#include "ivcomment.h"
+#include "ivconnection.h"
+#include "ivfunction.h"
+#include "ivfunctiontype.h"
+#include "ivinterface.h"
 #include "common.h"
 #include "interface/interfacedocument.h"
 #include "stringtemplate.h"
@@ -126,7 +126,7 @@ bool XmlDocExporter::exportDoc(InterfaceDocument *doc, QBuffer *outBuffer, const
    @return true when the export was successful.
  */
 bool XmlDocExporter::exportObjects(
-        const QList<ivm::AADLObject *> &objects, QBuffer *outBuffer, const QString &templatePath)
+        const QList<ivm::IVObject *> &objects, QBuffer *outBuffer, const QString &templatePath)
 {
     if (objects.isEmpty() || !outBuffer || !outBuffer->isWritable()) {
         return false;
@@ -237,22 +237,22 @@ QHash<QString, QVariant> XmlDocExporter::collectInterfaceObjects(InterfaceDocume
     return grouppedObjects;
 }
 
-QHash<QString, QVariant> XmlDocExporter::collectInterfaceObjects(const QList<ivm::AADLObject *> &objects)
+QHash<QString, QVariant> XmlDocExporter::collectInterfaceObjects(const QList<ivm::IVObject *> &objects)
 {
     QHash<QString, QVariant> grouppedObjects;
 
     for (const auto aadlObject : objects) {
-        const ivm::AADLObject::Type t = aadlObject->aadlType();
+        const ivm::IVObject::Type t = aadlObject->type();
         switch (t) {
-        case ivm::AADLObject::Type::InterfaceGroup:
+        case ivm::IVObject::Type::InterfaceGroup:
             continue;
-        case ivm::AADLObject::Type::FunctionType:
-        case ivm::AADLObject::Type::Function:
-        case ivm::AADLObject::Type::Comment:
-        case ivm::AADLObject::Type::ConnectionGroup:
-        case ivm::AADLObject::Type::Connection:
-        case ivm::AADLObject::Type::Unknown: {
-            if (t == ivm::AADLObject::Type::Unknown || (aadlObject->isNested() && objects.size() > 1))
+        case ivm::IVObject::Type::FunctionType:
+        case ivm::IVObject::Type::Function:
+        case ivm::IVObject::Type::Comment:
+        case ivm::IVObject::Type::ConnectionGroup:
+        case ivm::IVObject::Type::Connection:
+        case ivm::IVObject::Type::Unknown: {
+            if (t == ivm::IVObject::Type::Unknown || (aadlObject->isNested() && objects.size() > 1))
                 continue;
             break;
         }

@@ -19,10 +19,7 @@
 #pragma once
 
 #include "aadlinterfacegraphicsitem.h"
-
-namespace ivm {
-class AADLIfaceGroup;
-}
+#include "ivinterfacegroup.h"
 
 namespace ive {
 
@@ -30,10 +27,10 @@ class AADLInterfaceGroupGraphicsItem : public AADLInterfaceGraphicsItem
 {
     Q_OBJECT
 public:
-    explicit AADLInterfaceGroupGraphicsItem(ivm::AADLIfaceGroup *entity, QGraphicsItem *parent = nullptr);
+    explicit AADLInterfaceGroupGraphicsItem(ivm::IVInterfaceGroup *entity, QGraphicsItem *parent = nullptr);
     shared::ColorManager::HandledColors handledColorType() const override;
 
-    ivm::AADLIfaceGroup *entity() const;
+    ivm::IVInterfaceGroup *entity() const override;
 
 protected:
     QPainterPath typePath() const override;

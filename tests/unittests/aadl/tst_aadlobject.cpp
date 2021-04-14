@@ -16,22 +16,22 @@
 */
 
 #include "aadlcommonprops.h"
-#include "aadlfunction.h"
+#include "ivfunction.h"
 #include "aadllibrary.h"
-#include "aadlmodel.h"
-#include "aadlobject.h"
+#include "ivmodel.h"
+#include "ivobject.h"
 #include "propertytemplateconfig.h"
 
 #include <QSignalSpy>
 #include <QTest>
 #include <QVariant>
 
-class AADLObjectImp : public ivm::AADLObject
+class AADLObjectImp : public ivm::IVObject
 {
     Q_OBJECT
 public:
     explicit AADLObjectImp(const QString &title = QString(), QObject *parent = nullptr)
-        : AADLObject(AADLObject::Type::Function, title, parent)
+        : IVObject(IVObject::Type::Function, title, parent)
     {
     }
 };
@@ -90,7 +90,7 @@ void tst_AADLObject::test_setTitle()
     auto nameToken = ivm::meta::Props::token(ivm::meta::Props::Token::name);
 
     AADLObjectImp obj1;
-    QSignalSpy spy1(&obj1, &ivm::AADLObject::titleChanged);
+    QSignalSpy spy1(&obj1, &ivm::IVObject::titleChanged);
     QVERIFY(obj1.title() != "Test_Object_Title");
     obj1.setTitle("Test_Object_Title");
     QCOMPARE(obj1.attrs().value(nameToken).toString(), QString("Test_Object_Title"));
@@ -102,7 +102,7 @@ void tst_AADLObject::test_setTitle()
     QCOMPARE(arguments.at(0).value<QString>(), QString("Test_Object_Title"));
 
     AADLObjectImp obj2;
-    QSignalSpy spy2(&obj2, &ivm::AADLObject::titleChanged);
+    QSignalSpy spy2(&obj2, &ivm::IVObject::titleChanged);
     QVERIFY(obj2.title() != "Test_Object_Title");
     obj2.setTitle("Test_Object_Title");
     QCOMPARE(obj2.attrs().value(nameToken).toString(), QString("Test_Object_Title"));
@@ -116,13 +116,13 @@ void tst_AADLObject::test_setTitle()
 
 void tst_AADLObject::test_coordinatesConverting()
 {
-    QVector<qint32> coordinates = ivm::AADLObject::coordinatesFromString("");
+    QVector<qint32> coordinates = ivm::IVObject::coordinatesFromString("");
     QVERIFY(coordinates.isEmpty());
     coordinates << 100 << 100 << 200 << 200;
-    QString coordinatesStr = ivm::AADLObject::coordinatesToString(coordinates);
+    QString coordinatesStr = ivm::IVObject::coordinatesToString(coordinates);
     QCOMPARE(coordinatesStr.compare("10000 10000 20000 20000"), 0);
     coordinatesStr.append(" 30000 30000 40000 40000");
-    QVector<qint32> coordinatesEx = ivm::AADLObject::coordinatesFromString(coordinatesStr);
+    QVector<qint32> coordinatesEx = ivm::IVObject::coordinatesFromString(coordinatesStr);
     coordinates << 300 << 300 << 400 << 400;
     QCOMPARE(coordinates, coordinatesEx);
 }
@@ -131,13 +131,13 @@ void tst_AADLObject::test_coordinatesType()
 {
     ivm::PropertyTemplateConfig *dynPropConfig = ivm::PropertyTemplateConfig::instance();
     dynPropConfig->init(QLatin1String("default_attributes.xml"));
-    ivm::AADLModel model(dynPropConfig);
+    ivm::IVModel model(dynPropConfig);
 
-    ivm::AADLFunction fn1("Fn1");
-    ivm::AADLFunction fn2("Fn2", &fn1);
-    ivm::AADLFunction fn3("Fn3", &fn2);
+    ivm::IVFunction fn1("Fn1");
+    ivm::IVFunction fn2("Fn2", &fn1);
+    ivm::IVFunction fn3("Fn3", &fn2);
 
-    QSignalSpy spy(&model, &ivm::AADLModel::aadlObjectsAdded);
+    QSignalSpy spy(&model, &ivm::IVModel::objectsAdded);
     model.addObjects({ &fn1, &fn2, &fn3 });
     QVERIFY(spy.count() == 1);
     QVERIFY(model.objects().size() == 3);

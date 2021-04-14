@@ -22,9 +22,9 @@
 #include <QVector>
 
 namespace ivm {
-class AADLObject;
-class AADLConnection;
-class AADLFunction;
+class IVObject;
+class IVConnection;
+class IVFunction;
 }
 
 namespace ive {
@@ -58,22 +58,22 @@ public:
     // Check functions
     bool mscInstancesExist(const QString &name);
     void changeMscInstanceName(const QString &oldName, const QString &name);
-    void removeMscInstances(ivm::AADLFunction *aadlFunction);
-    bool hasCorrespondingInstances(ivm::AADLFunction *aadlFunction) const;
+    void removeMscInstances(ivm::IVFunction *aadlFunction);
+    bool hasCorrespondingInstances(ivm::IVFunction *aadlFunction) const;
 
     bool mscMessagesExist(const QString &messageName, const QString &sourceName, const QString &targetName);
     void changeMscMessageName(
             const QString &oldName, const QString &name, const QString &sourceName, const QString &targetName);
-    void removeMscMessages(ivm::AADLConnection *aadlConnection);
-    bool hasCorrespondingMessages(ivm::AADLConnection *aadlConnection) const;
+    void removeMscMessages(ivm::IVConnection *aadlConnection);
+    bool hasCorrespondingMessages(ivm::IVConnection *aadlConnection) const;
 
     void checkInstances();
     void checkMessages();
 
 public Q_SLOTS:
-    void onEntityNameChanged(ivm::AADLObject *entity, const QString &oldName, shared::UndoCommand *command);
+    void onEntityNameChanged(ivm::IVObject *entity, const QString &oldName, shared::UndoCommand *command);
     void onMscEntityNameChanged(QObject *entity, const QString &oldName, shared::UndoCommand *command);
-    void onEntitiesRemoved(const QList<QPointer<ivm::AADLObject>> &entities, shared::UndoCommand *command);
+    void onEntitiesRemoved(const QList<QPointer<ivm::IVObject>> &entities, shared::UndoCommand *command);
 
 private:
     QPointer<SpaceCreatorProject> m_storage;

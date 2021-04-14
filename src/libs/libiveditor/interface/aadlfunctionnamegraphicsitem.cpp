@@ -18,7 +18,7 @@
 
 #include "aadlfunctionnamegraphicsitem.h"
 
-#include "aadlnamevalidator.h"
+#include "ivnamevalidator.h"
 
 #include <QApplication>
 #include <QFont>
@@ -44,7 +44,7 @@ AADLFunctionNameGraphicsItem::AADLFunctionNameGraphicsItem(QGraphicsItem *parent
 
 bool AADLFunctionNameGraphicsItem::validateText(const QString &text) const
 {
-    QRegularExpression re(ivm::AADLNameValidator::namePatternUI());
+    QRegularExpression re(ivm::IVNameValidator::namePatternUI());
     return re.match(text).hasMatch();
 }
 

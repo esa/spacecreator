@@ -20,12 +20,12 @@
 
 #include "commandids.h"
 
-#include <aadlmodel.h>
+#include <ivmodel.h>
 
 namespace ive {
 namespace cmd {
 
-static inline QVariantHash getCurrentProperties(ivm::AADLObject *entity, const QVariantHash &props)
+static inline QVariantHash getCurrentProperties(ivm::IVObject *entity, const QVariantHash &props)
 {
     QVariantHash result;
     for (auto it = props.constBegin(); it != props.constEnd(); ++it)
@@ -33,7 +33,7 @@ static inline QVariantHash getCurrentProperties(ivm::AADLObject *entity, const Q
     return result;
 }
 
-CmdEntityPropertyCreate::CmdEntityPropertyCreate(ivm::AADLObject *entity, const QVariantHash &props)
+CmdEntityPropertyCreate::CmdEntityPropertyCreate(ivm::IVObject *entity, const QVariantHash &props)
     : QUndoCommand()
     , m_entity(entity)
     , m_newProps(props)

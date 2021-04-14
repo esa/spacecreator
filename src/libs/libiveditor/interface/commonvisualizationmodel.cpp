@@ -17,11 +17,11 @@
 
 #include "commonvisualizationmodel.h"
 
-#include "aadlconnection.h"
-#include "aadlconnectiongroup.h"
-#include "aadlmodel.h"
-#include "aadlnamevalidator.h"
-#include "aadlxmlreader.h"
+#include "ivconnection.h"
+#include "ivconnectiongroup.h"
+#include "ivmodel.h"
+#include "ivnamevalidator.h"
+#include "ivxmlreader.h"
 #include "commandsstack.h"
 #include "interface/commands/cmdentityattributechange.h"
 
@@ -32,21 +32,21 @@
 namespace ive {
 
 CommonVisualizationModel::CommonVisualizationModel(
-        ivm::AADLModel *aadlModel, cmd::CommandsStack *commandsStack, QObject *parent)
+        ivm::IVModel *aadlModel, cmd::CommandsStack *commandsStack, QObject *parent)
     : QStandardItemModel(parent)
     , m_aadlModel(aadlModel)
     , m_commandsStack(commandsStack)
 {
-    connect(m_aadlModel, &ivm::AADLModel::modelReset, this, [this]() {
+    connect(m_aadlModel, &ivm::IVModel::modelReset, this, [this]() {
         m_itemCache.clear();
         removeRows(0, rowCount());
     });
-    connect(m_aadlModel, &ivm::AADLModel::aadlObjectsAdded, this, &CommonVisualizationModel::addItems);
-    connect(m_aadlModel, &ivm::AADLModel::aadlObjectRemoved, this, &CommonVisualizationModel::removeItem);
+    connect(m_aadlModel, &ivm::IVModel::objectsAdded, this, &CommonVisualizationModel::addItems);
+    connect(m_aadlModel, &ivm::IVModel::objectRemoved, this, &CommonVisualizationModel::removeItem);
     setSortRole(TypeRole);
 }
 
-void CommonVisualizationModel::updateItemData(QStandardItem *item, ivm::AADLObject *obj)
+void CommonVisualizationModel::updateItemData(QStandardItem *item, ivm::IVObject *obj)
 {
     Q_ASSERT(item);
     Q_ASSERT(obj);
@@ -58,51 +58,51 @@ void CommonVisualizationModel::updateItemData(QStandardItem *item, ivm::AADLObje
     QPixmap pix;
     QFont font;
 
-    switch (obj->aadlType()) {
-    case ivm::AADLObject::Type::Unknown:
+    switch (obj->type()) {
+    case ivm::IVObject::Type::Unknown:
         return;
-    case ivm::AADLObject::Type::RequiredInterface: {
+    case ivm::IVObject::Type::RequiredInterface: {
         static const QPixmap icon = QIcon(QLatin1String(":/tab_interface/toolbar/icns/ri.svg")).pixmap(16, 16);
         pix = icon;
     } break;
 
-    case ivm::AADLObject::Type::ProvidedInterface: {
+    case ivm::IVObject::Type::ProvidedInterface: {
         static const QPixmap icon = QIcon(QLatin1String(":/tab_interface/toolbar/icns/pi.svg")).pixmap(16, 16);
         pix = icon;
     } break;
-    case ivm::AADLObject::Type::Connection: {
+    case ivm::IVObject::Type::Connection: {
         static const QPixmap iconHidden =
                 QIcon(QLatin1String(":/tab_interface/toolbar/icns/connection.svg")).pixmap(16, 16, QIcon::Disabled);
         static const QPixmap icon = QIcon(QLatin1String(":/tab_interface/toolbar/icns/connection.svg")).pixmap(16, 16);
         pix = obj->isGrouped() ? iconHidden : icon;
 
-        if (auto connectionPtr = qobject_cast<ivm::AADLConnection *>(obj)) {
+        if (auto connectionPtr = qobject_cast<ivm::IVConnection *>(obj)) {
             const QString sourceName =
-                    ivm::AADLNameValidator::decodeName(ivm::AADLObject::Type::Function, connectionPtr->sourceName());
-            const QString sourceInterfaceName = ivm::AADLNameValidator::decodeName(
-                    ivm::AADLObject::Type::RequiredInterface, connectionPtr->sourceInterfaceName());
+                    ivm::IVNameValidator::decodeName(ivm::IVObject::Type::Function, connectionPtr->sourceName());
+            const QString sourceInterfaceName = ivm::IVNameValidator::decodeName(
+                    ivm::IVObject::Type::RequiredInterface, connectionPtr->sourceInterfaceName());
             const QString targetName =
-                    ivm::AADLNameValidator::decodeName(ivm::AADLObject::Type::Function, connectionPtr->targetName());
-            const QString targetInterfaceName = ivm::AADLNameValidator::decodeName(
-                    ivm::AADLObject::Type::ProvidedInterface, connectionPtr->targetInterfaceName());
+                    ivm::IVNameValidator::decodeName(ivm::IVObject::Type::Function, connectionPtr->targetName());
+            const QString targetInterfaceName = ivm::IVNameValidator::decodeName(
+                    ivm::IVObject::Type::ProvidedInterface, connectionPtr->targetInterfaceName());
             title = QStringLiteral("%1.%2 <-> %3.%4")
                             .arg(sourceName, sourceInterfaceName, targetName, targetInterfaceName);
         }
     } break;
-    case ivm::AADLObject::Type::Function: {
+    case ivm::IVObject::Type::Function: {
         static const QPixmap icon = QIcon(QLatin1String(":/tab_interface/toolbar/icns/function.svg")).pixmap(16, 16);
         pix = icon;
     } break;
-    case ivm::AADLObject::Type::FunctionType: {
+    case ivm::IVObject::Type::FunctionType: {
         static const QPixmap icon =
                 QIcon(QLatin1String(":/tab_interface/toolbar/icns/function_type.svg")).pixmap(16, 16);
         pix = icon;
     } break;
-    case ivm::AADLObject::Type::Comment: {
+    case ivm::IVObject::Type::Comment: {
         static const QPixmap icon = QIcon(QLatin1String(":/tab_interface/toolbar/icns/comment.svg")).pixmap(16, 16);
         pix = icon;
     } break;
-    case ivm::AADLObject::Type::ConnectionGroup: {
+    case ivm::IVObject::Type::ConnectionGroup: {
         static const QPixmap icon =
                 QIcon(QLatin1String(":/tab_interface/toolbar/icns/connection_group.svg")).pixmap(16, 16);
         pix = icon;
@@ -129,7 +129,7 @@ void CommonVisualizationModel::updateItemData(QStandardItem *item, ivm::AADLObje
     item->setData(pix, Qt::DecorationRole);
 }
 
-QStandardItem *CommonVisualizationModel::createItem(ivm::AADLObject *obj)
+QStandardItem *CommonVisualizationModel::createItem(ivm::IVObject *obj)
 {
     if (!obj) {
         return nullptr;
@@ -138,18 +138,18 @@ QStandardItem *CommonVisualizationModel::createItem(ivm::AADLObject *obj)
     auto item = new QStandardItem(obj->titleUI());
     item->setDragEnabled(true);
     item->setData(obj->id(), IdRole);
-    item->setData(static_cast<int>(obj->aadlType()), TypeRole);
+    item->setData(static_cast<int>(obj->type()), TypeRole);
 
-    connect(obj, &ivm::AADLObject::titleChanged, this, &CommonVisualizationModel::updateItem);
-    connect(obj, &ivm::AADLObject::visibilityChanged, this, &CommonVisualizationModel::updateItem);
-    connect(obj, &ivm::AADLObject::groupChanged, this, &CommonVisualizationModel::updateItem);
+    connect(obj, &ivm::IVObject::titleChanged, this, &CommonVisualizationModel::updateItem);
+    connect(obj, &ivm::IVObject::visibilityChanged, this, &CommonVisualizationModel::updateItem);
+    connect(obj, &ivm::IVObject::groupChanged, this, &CommonVisualizationModel::updateItem);
     updateItemData(item, obj);
     return item;
 }
 
-void CommonVisualizationModel::addItem(ivm::AADLObject *obj)
+void CommonVisualizationModel::addItem(ivm::IVObject *obj)
 {
-    if (obj->aadlType() == ivm::AADLObject::Type::InterfaceGroup) {
+    if (obj->type() == ivm::IVObject::Type::InterfaceGroup) {
         return;
     }
 
@@ -162,11 +162,11 @@ void CommonVisualizationModel::addItem(ivm::AADLObject *obj)
         parentItem->appendRow(item);
         parentItem->sortChildren(0);
         m_itemCache.insert(obj->id(), item);
-        if (obj->aadlType() == ivm::AADLObject::Type::ConnectionGroup) {
-            if (auto connectionGroupObj = obj->as<ivm::AADLConnectionGroup *>()) {
-                connect(connectionGroupObj, &ivm::AADLConnectionGroup::connectionAdded, this,
+        if (obj->type() == ivm::IVObject::Type::ConnectionGroup) {
+            if (auto connectionGroupObj = obj->as<ivm::IVConnectionGroup *>()) {
+                connect(connectionGroupObj, &ivm::IVConnectionGroup::connectionAdded, this,
                         &CommonVisualizationModel::updateConnectionItem, Qt::UniqueConnection);
-                connect(connectionGroupObj, &ivm::AADLConnectionGroup::connectionRemoved, this,
+                connect(connectionGroupObj, &ivm::IVConnectionGroup::connectionRemoved, this,
                         &CommonVisualizationModel::updateConnectionItem, Qt::UniqueConnection);
                 for (auto connection : connectionGroupObj->groupedConnections()) {
                     updateConnectionItem(connection);
@@ -176,7 +176,7 @@ void CommonVisualizationModel::addItem(ivm::AADLObject *obj)
     }
 }
 
-void CommonVisualizationModel::updateConnectionItem(ivm::AADLConnection *connection)
+void CommonVisualizationModel::updateConnectionItem(ivm::IVConnection *connection)
 {
     if (QStandardItem *groupedConnectionItem = getItem(connection->id())) {
         QStandardItem *groupedConnectionParentItem =
@@ -186,14 +186,14 @@ void CommonVisualizationModel::updateConnectionItem(ivm::AADLConnection *connect
     }
 }
 
-void CommonVisualizationModel::addItems(const QVector<ivm::AADLObject *> &objects)
+void CommonVisualizationModel::addItems(const QVector<ivm::IVObject *> &objects)
 {
     for (auto obj : objects) {
         addItem(obj);
     }
 }
 
-void CommonVisualizationModel::removeItem(ivm::AADLObject *obj)
+void CommonVisualizationModel::removeItem(ivm::IVObject *obj)
 {
     const QStandardItem *item = m_itemCache.take(obj->id());
     obj->disconnect(this);
@@ -209,14 +209,14 @@ void CommonVisualizationModel::removeItem(ivm::AADLObject *obj)
 
 void CommonVisualizationModel::updateItem()
 {
-    if (auto obj = qobject_cast<ivm::AADLObject *>(sender())) {
+    if (auto obj = qobject_cast<ivm::IVObject *>(sender())) {
         if (auto item = getItem(obj->id())) {
             updateItemData(item, obj);
         }
     }
 }
 
-QStandardItem *CommonVisualizationModel::getParentItem(ivm::AADLObject *obj)
+QStandardItem *CommonVisualizationModel::getParentItem(ivm::IVObject *obj)
 {
     if (!obj) {
         return nullptr;
@@ -225,7 +225,7 @@ QStandardItem *CommonVisualizationModel::getParentItem(ivm::AADLObject *obj)
     return obj->parentObject() ? getItem(obj->parentObject()) : invisibleRootItem();
 }
 
-QStandardItem *CommonVisualizationModel::getItem(ivm::AADLObject *obj)
+QStandardItem *CommonVisualizationModel::getItem(ivm::IVObject *obj)
 {
     return obj ? getItem(obj->id()) : nullptr;
 }
@@ -235,13 +235,13 @@ QStandardItem *CommonVisualizationModel::getItem(const shared::Id id)
     return id.isNull() ? nullptr : m_itemCache.value(id);
 }
 
-VisualizationModel::VisualizationModel(ivm::AADLModel *aadlModel, cmd::CommandsStack *commandsStack, QObject *parent)
+VisualizationModel::VisualizationModel(ivm::IVModel *aadlModel, cmd::CommandsStack *commandsStack, QObject *parent)
     : CommonVisualizationModel(aadlModel, commandsStack, parent)
 {
     connect(this, &QStandardItemModel::dataChanged, this, &VisualizationModel::onDataChanged);
 }
 
-void VisualizationModel::updateItemData(QStandardItem *item, ivm::AADLObject *obj)
+void VisualizationModel::updateItemData(QStandardItem *item, ivm::IVObject *obj)
 {
     CommonVisualizationModel::updateItemData(item, obj);
     if ((item->checkState() == Qt::Checked) != obj->isVisible()) {
@@ -249,7 +249,7 @@ void VisualizationModel::updateItemData(QStandardItem *item, ivm::AADLObject *ob
     }
 }
 
-QStandardItem *VisualizationModel::createItem(ivm::AADLObject *obj)
+QStandardItem *VisualizationModel::createItem(ivm::IVObject *obj)
 {
     auto item = CommonVisualizationModel::createItem(obj);
     item->setEditable(true);
@@ -279,9 +279,9 @@ void VisualizationModel::onDataChanged(
                         obj->setVisible(item->checkState() == Qt::Checked);
                     }
                     if (roles.contains(Qt::DisplayRole)) {
-                        const QString name = ivm::AADLNameValidator::encodeName(obj->aadlType(), item->text());
+                        const QString name = ivm::IVNameValidator::encodeName(obj->type(), item->text());
                         if (name != obj->title()) {
-                            if (ivm::AADLNameValidator::isAcceptableName(obj, name)) {
+                            if (ivm::IVNameValidator::isAcceptableName(obj, name)) {
                                 const QVariantHash attributes = {
                                     { ivm::meta::Props::token(ivm::meta::Props::Token::name), name }
                                 };

@@ -17,26 +17,26 @@
 
 #pragma once
 
-#include "aadliface.h"
+#include "ivinterface.h"
 
 namespace ivm {
 
-class AADLIfaceGroup : public AADLIface
+class IVInterfaceGroup : public IVInterface
 {
     Q_OBJECT
 public:
-    explicit AADLIfaceGroup(const CreationInfo &ci);
+    explicit IVInterfaceGroup(const CreationInfo &ci);
 
-    void removeEntity(AADLIface *iface);
-    void addEntity(AADLIface *iface);
-    QList<QPointer<AADLIface>> entities() const;
+    void removeEntity(IVInterface *iface);
+    void addEntity(IVInterface *iface);
+    QList<QPointer<IVInterface>> entities() const;
 
     QString ifaceLabel() const override;
 
     void setAttr(const QString &name, const QVariant &val) override;
 
 private:
-    QList<QPointer<AADLIface>> m_entities;
+    QList<QPointer<IVInterface>> m_entities;
 };
 
 } // namespace ivm

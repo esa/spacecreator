@@ -17,14 +17,14 @@
 
 #pragma once
 
-#include "aadlparameter.h"
+#include "parameter.h"
 
 #include <QPointer>
 #include <QUndoCommand>
 #include <QVector>
 
 namespace ivm {
-class AADLFunctionType;
+class IVFunctionType;
 }
 
 namespace ive {
@@ -33,7 +33,7 @@ namespace cmd {
 class CmdContextParameterCreate : public QUndoCommand
 {
 public:
-    explicit CmdContextParameterCreate(ivm::AADLFunctionType *entity, const ivm::ContextParameter &prop);
+    explicit CmdContextParameterCreate(ivm::IVFunctionType *entity, const ivm::ContextParameter &prop);
 
     void redo() override;
     void undo() override;
@@ -41,7 +41,7 @@ public:
     int id() const override;
 
 private:
-    QPointer<ivm::AADLFunctionType> m_entity;
+    QPointer<ivm::IVFunctionType> m_entity;
     QVector<ivm::ContextParameter> m_newProps;
     const QVector<ivm::ContextParameter> m_oldProps;
 };
