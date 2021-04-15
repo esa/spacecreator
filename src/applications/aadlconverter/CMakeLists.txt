@@ -1,4 +1,4 @@
-set(APP_NAME ivconverter)
+set(APP_NAME aadlconverter)
 project(${APP_NAME})
 
 add_executable(${APP_NAME})
