@@ -174,9 +174,9 @@ void InstanceItem::updatePropertyString(const QLatin1String &property, const QSt
 
 void InstanceItem::rebuildLayout()
 {
-    const qreal xOffset = geometryManagedByCif() && boundingRect().isValid()
-            ? (boundingRect().width() - m_headSymbol->boundingRect().width()) / 2
-            : 0.0;
+    const int xOffset = geometryManagedByCif() && boundingRect().isValid()
+            ? qRound((boundingRect().width() - m_headSymbol->boundingRect().width()) / 2)
+            : 0;
 
     const qreal endSymbolHeight = m_endSymbol->height();
     prepareGeometryChange();
@@ -196,8 +196,8 @@ void InstanceItem::rebuildLayout()
     const QPointF p2 = m_endSymbol->isStop() ? footerRect.center() : QPointF(footerRect.center().x(), footerRect.top());
     m_axisSymbol->setLine(QLineF(p1, p2));
 
-    if (!qFuzzyIsNull(xOffset)) {
-        moveSilentlyBy(QPointF(xOffset, 0));
+    if (xOffset != 0) {
+        moveSilentlyBy(QPointF(xOffset, 0.));
         if (geometryManagedByCif())
             updateCif();
         Q_EMIT needUpdateLayout();
@@ -376,16 +376,16 @@ void InstanceItem::applyCif()
             bool converted(false);
             const QVector<QPointF> &scenePoints = CoordinatesConverter::cifToScene(cifPoints, &converted);
 
-            const QPointF &textBoxTopLeft = scenePoints.at(0);
-            const QPointF &textBoxSize = scenePoints.at(1);
+            const QPoint textBoxTopLeft = scenePoints.at(0).toPoint();
+            const QPoint textBoxSize = scenePoints.at(1).toPoint();
 
-            m_headSymbol->setTextboxSize({ textBoxSize.x(), textBoxSize.y() });
-            const QRectF currTextBox = m_headSymbol->textBoxSceneRect();
-            const QPointF shift = textBoxTopLeft - currTextBox.topLeft();
-            // TODO: should we check for overlap here?
-            moveBy(shift.x(), 0.0); // Only apply the horizontal value
-
-            rebuildLayout();
+            m_headSymbol->setTextboxSize(QSizeF(textBoxSize.x(), textBoxSize.y()));
+            const QRect currTextBox = m_headSymbol->textBoxSceneRect().toRect();
+            const QPoint shift = textBoxTopLeft - currTextBox.topLeft();
+            if (shift.x() != 0) {
+                moveBy(shift.x(), 0.0); // Only apply the horizontal value
+                rebuildLayout();
+            }
         }
     }
 }
