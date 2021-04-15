@@ -17,17 +17,17 @@
 
 #include "mscsystemchecks.h"
 
-#include "ivconnection.h"
-#include "ivconnectionchain.h"
-#include "ivfunction.h"
-#include "ivinterface.h"
-#include "ivmodel.h"
 #include "chartlayoutmanager.h"
 #include "commandsstack.h"
 #include "interface/commands/cmdentityattributechange.h"
 #include "interface/commands/cmdifaceattrchange.h"
 #include "interface/interfacedocument.h"
+#include "ivconnection.h"
+#include "ivconnectionchain.h"
 #include "iveditorcore.h"
+#include "ivfunction.h"
+#include "ivinterface.h"
+#include "ivmodel.h"
 #include "ivsystemchecks.h"
 #include "mainmodel.h"
 #include "mscchart.h"
@@ -378,11 +378,20 @@ void MscSystemChecks::onMscEntityNameChanged(QObject *entity, const QString &old
 
     auto message = dynamic_cast<msc::MscMessage *>(entity);
     if (message && ivCore && ivCore->document() && ivCore->document()->objectsModel()) {
+        scs::IvSystemChecks ivChecker;
+        ivChecker.setIvCore(ivCore);
+        // Check if source/target are in IV model
+        if (message->sourceInstance() && !ivChecker.checkInstance(message->sourceInstance())) {
+            return;
+        }
+        if (message->targetInstance() && !ivChecker.checkInstance(message->targetInstance())) {
+            return;
+        }
+
         // Check for names
         const QString fromName = message->sourceInstance() ? message->sourceInstance()->name() : "";
         const QString toName = message->targetInstance() ? message->targetInstance()->name() : "";
-        scs::IvSystemChecks ivChecker;
-        ivChecker.setIvCore(ivCore);
+
         bool hasNewName = ivChecker.checkMessage(message);
         msc::MscMessage oldMessage(oldName);
         oldMessage.setSourceInstance(message->sourceInstance());
