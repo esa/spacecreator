@@ -17,8 +17,6 @@
 
 #include "msceditorcore.h"
 
-#include "ivconnection.h"
-#include "ivfunction.h"
 #include "commandlineparser.h"
 #include "commands/cmddeleteentity.h"
 #include "commands/cmddocumentcreate.h"
@@ -26,6 +24,8 @@
 #include "commands/cmdsetasn1file.h"
 #include "commands/cmdsetmessagedeclarations.h"
 #include "hierarchyviewmodel.h"
+#include "ivconnection.h"
+#include "ivfunction.h"
 #include "mainmodel.h"
 #include "messagedeclarationsdialog.h"
 #include "mscchart.h"

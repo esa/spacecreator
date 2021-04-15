@@ -38,7 +38,7 @@ SpaceCreatorProject::SpaceCreatorProject(QObject *parent)
     m_mscChecks->setStorage(this);
 }
 
-SpaceCreatorProject::~SpaceCreatorProject() {}
+SpaceCreatorProject::~SpaceCreatorProject() { }
 
 QSharedPointer<dve::DVEditorCore> SpaceCreatorProject::dvData(const QString &fileName) const
 {
@@ -255,6 +255,7 @@ void SpaceCreatorProject::setMscData(const QString &fileName, QSharedPointer<msc
     m_mscStore[fileName] = mscData;
     connect(mscData.data(), &shared::EditorCore::editedExternally, this, &scs::SpaceCreatorProject::editedExternally);
     auto checker = new scs::IvSystemChecks(mscData.data());
+    checker->setMscCore(mscData.data());
     checker->setIvCore(ivCore());
     mscData->setSystemChecker(checker);
     Q_EMIT mscCoreAdded(mscData);

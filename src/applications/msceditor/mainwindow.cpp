@@ -183,6 +183,7 @@ void MainWindow::openIVFile()
     if (!fileName.isEmpty()) {
         d->m_ivCore->document()->load(fileName);
         if (auto checker = qobject_cast<scs::IvSystemChecks *>(d->m_core->systemChecker())) {
+            checker->setMscCore(d->m_core);
             checker->setIvCore(d->m_ivCore);
         }
     }

@@ -18,7 +18,9 @@
 #include "interface/interfacedocument.h"
 #include "iveditor.h"
 #include "iveditorcore.h"
+#include "ivsystemchecks.h"
 #include "msceditorcore.h"
+#include "mscsystemchecks.h"
 #include "sharedlibrary.h"
 #include "spacecreatorproject.h"
 
@@ -41,6 +43,7 @@ private Q_SLOTS:
 
     void testIvCores();
     void testMscCores();
+    void testCheckInstancesMessages();
 
 private:
     std::unique_ptr<scs::SpaceCreatorProject> m_project;
@@ -77,6 +80,19 @@ void tst_SpaceCreatorProject::testMscCores()
     QSharedPointer<msc::MSCEditorCore> mscData = m_project->mscData(mscFileName);
 
     QCOMPARE(m_project->allMscCores().size(), 1);
+}
+
+void tst_SpaceCreatorProject::testCheckInstancesMessages()
+{
+    const QString ivFileName = QFINDTESTDATA("/interfaceview.xml");
+    m_project->ivData(ivFileName);
+    const QString mscFileName = QFINDTESTDATA("/Taste07.msc");
+    m_project->mscData(mscFileName);
+
+    QCOMPARE(m_project->ivChecks().size(), 1);
+    scs::IvSystemChecks *checker = m_project->ivChecks().first();
+    QCOMPARE(checker->checkInstanceNames().size(), 1);
+    QCOMPARE(checker->checkMessages().size(), 1);
 }
 
 QTEST_MAIN(tst_SpaceCreatorProject)
