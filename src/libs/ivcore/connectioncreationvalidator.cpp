@@ -42,37 +42,37 @@ namespace ivm {
         \value NotFail
             Not prohibited, the connection can be setup for checked interfaces/points.
         \value IsFunctionType
-            The start or end item is the AADLFunctionTypeGraphicsItem.
+            The start or end item is the IVFunctionTypeGraphicsItem.
         \value MulticastDisabled
             Attempt to connect the same RI to more than one PI.
         \value KindDiffer
-            No one of interfaces neither has kind AADLIface::OperationKind::Any, nor their kinds are the same.
+            No one of interfaces neither has kind IVInterface::OperationKind::Any, nor their kinds are the same.
         \value ParamsDiffer
             The checked interfaces have different parameters and no one is a RI with InheritPi property set.
         \value ParentIsFunctionType
-            Attempt to directly connect a AADLFunctionTypeGraphicsItem.
+            Attempt to directly connect a IVFunctionTypeGraphicsItem.
         \value IsCyclic
-            Attempt to make a connection with a PI which kind is AADLIface::OperationKind::Cyclic.
+            Attempt to make a connection with a PI which kind is IVInterface::OperationKind::Cyclic.
         \value SameParent
-            The source and target AADLFunctionGraphicsItem is the same instance.
+            The source and target IVFunctionGraphicsItem is the same instance.
         \value SameInterface
-            The source and target AADLInterfaceGraphicsItem is the same instance.
+            The source and target IVInterfaceGraphicsItem is the same instance.
         \value NoScene
             Invalid pointer to the QGraphicsScene. The default initial value for ValidationResult::status.
         \value NoStartFunction
-            Can not detect a AADLFunctionGraphicsItem at specified start position.
+            Can not detect a IVFunctionGraphicsItem at specified start position.
         \value CannotCreateStartIface
-            The predicted AADLFunctionGraphicsItem to create Interface in can not be found in specified position.
+            The predicted IVFunctionGraphicsItem to create Interface in can not be found in specified position.
         \value NoEndFunction
-            Can not detect a AADLFunctionGraphicsItem at specified end position.
+            Can not detect a IVFunctionGraphicsItem at specified end position.
         \value CannotCreateEndIface
-            The predicted AADLFunctionGraphicsItem to create Interface in can not be found in specified position.
+            The predicted IVFunctionGraphicsItem to create Interface in can not be found in specified position.
         \value SameDirectionIfaceWrongParents
             Attempt to connect PI to PI or RI to RI when parent Functions are not direct ancestors.
         \value ToFromNestedDifferentDirection
-            Attempt to connect PI to RI when parent AADLFunctionGraphicsItems are direct ancestors.
+            Attempt to connect PI to RI when parent IVFunctionGraphicsItems are direct ancestors.
         \value DirectIfaceCreationInInstanceOfFunctionType
-            The start or end item is the AADLFunctionGraphicsItem which is an instance of AADLFunctionTypeGraphicsItem.
+            The start or end item is the IVFunctionGraphicsItem which is an instance of IVFunctionTypeGraphicsItem.
  */
 
 /*!
@@ -80,8 +80,8 @@ namespace ivm {
  * can be used to setup a connection to the \a targetFunction winch contains the \a targetIface.
  *
  * Ensure that:
- * 1. the items on edges are not the AADLFunctionTypeGraphicsItem;
- * 2. interface parents are not the AADLFunctionTypeGraphicsItem
+ * 1. the items on edges are not the IVFunctionTypeGraphicsItem;
+ * 2. interface parents are not the IVFunctionTypeGraphicsItem
  * 3. an iface kind is not IVInterface::OperationKind::Cyclic;
  * 4. parent of the source and target interface differs;
  * 5. both ifaces are either (PI+RI|PI+PI|RI+RI) compatible by kind and params, or PI+RI.inheritPI=true;
@@ -153,7 +153,7 @@ ConnectionCreationValidator::FailReason ConnectionCreationValidator::checkKindAn
 {
     if (auto ri = IVConnection::selectIface<const IVInterfaceRequired *>(sourceIface, targetIface))
         if (IVConnection::selectIface<const IVInterfaceProvided *>(sourceIface, targetIface)) {
-#ifndef AADL_MULTICAST_CONNECTION
+#ifndef IV_MULTICAST_CONNECTION
             if (IVModel *model = ri->model()) {
                 const QVector<IVConnection *> riConnections = model->getConnectionsForIface(ri->id());
                 for (const IVConnection *riConnection : riConnections)
@@ -161,7 +161,7 @@ ConnectionCreationValidator::FailReason ConnectionCreationValidator::checkKindAn
                             || (riConnection->targetInterface() && riConnection->targetInterface()->isProvided()))
                         return FailReason::MulticastDisabled;
             }
-#endif // AADL_MULTICAST_CONNECTION
+#endif // IV_MULTICAST_CONNECTION
 
             if (ri->isInheritPI())
                 return FailReason::NotFail;

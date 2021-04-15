@@ -58,12 +58,12 @@ static const int kNestingVisibilityLevel = 0;
 static_assert(kNestingVisibilityLevel >= 0, "Nesting level shouldn't be negative");
 
 /*!
- * \brief The tolerance used to find an AADLInterfaceGraphicsItem on scene (the size of a square used as a search area)
+ * \brief The tolerance used to find an IVInterfaceGraphicsItem on scene (the size of a square used as a search area)
  */
 static const qreal kInterfaceTolerance = 5.;
 
 /*!
- * \brief The tolerance used to find an AADLFunction(Type)GraphicsItem on scene (the size of a square used as a search
+ * \brief The tolerance used to find an IVFunction(Type)GraphicsItem on scene (the size of a square used as a search
  * area)
  */
 static const qreal kFunctionTolerance = 20.;
@@ -82,13 +82,13 @@ static const qreal kFunctionTolerance = 20.;
   existent/selected items.
 
     \var Function
-        Z level of AADLFunctionGraphicsItem and AADLFunctionTypeGraphicsItem.
+        Z level of IVFunctionGraphicsItem and IVFunctionTypeGraphicsItem.
     \var Connection
-        Z level of AADLConnectionGraphicsItem.
+        Z level of IVConnectionGraphicsItem.
     \var Interface
-        Z level of AADLInterfaceGraphicsItem.
+        Z level of IVInterfaceGraphicsItem.
     \var Comment
-        Z level of AADLCommentGraphicsItem.
+        Z level of IVCommentGraphicsItem.
     \var GripPoint
         Z level of GripPoint item — alias for Selected (almost-the-topmost).
  */

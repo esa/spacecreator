@@ -21,8 +21,8 @@
 #include "common.h"
 #include "connectioncreationvalidator.h"
 #include "graphicsviewutils.h"
-#include "interface/aadlfunctiongraphicsitem.h"
-#include "interface/aadlinterfacegraphicsitem.h"
+#include "interface/ivfunctiongraphicsitem.h"
+#include "interface/ivinterfacegraphicsitem.h"
 #include "interface/graphicsitemhelpers.h"
 #include "sharedlibrary.h"
 
@@ -54,8 +54,8 @@ private:
     {
         QList<QRectF> rects;
         for (auto item : m_scene.items()) {
-            if (item->type() == ive::AADLFunctionTypeGraphicsItem::Type
-                    || item->type() == ive::AADLFunctionGraphicsItem::Type) {
+            if (item->type() == ive::IVFunctionTypeGraphicsItem::Type
+                    || item->type() == ive::IVFunctionGraphicsItem::Type) {
                 rects.append(item->sceneBoundingRect());
             }
         }
@@ -63,10 +63,10 @@ private:
     }
 
     QGraphicsScene m_scene;
-    ive::AADLFunctionGraphicsItem *f1 { nullptr };
-    ive::AADLFunctionGraphicsItem *f2 { nullptr };
-    ive::AADLFunctionGraphicsItem *nf1 { nullptr };
-    ive::AADLFunctionGraphicsItem *nf2 { nullptr };
+    ive::IVFunctionGraphicsItem *f1 { nullptr };
+    ive::IVFunctionGraphicsItem *f2 { nullptr };
+    ive::IVFunctionGraphicsItem *nf1 { nullptr };
+    ive::IVFunctionGraphicsItem *nf2 { nullptr };
 
     struct Data {
         enum class EndPoint
@@ -76,7 +76,7 @@ private:
             Empty
         };
 
-        Data(ive::AADLFunctionGraphicsItem *function)
+        Data(ive::IVFunctionGraphicsItem *function)
             : fn(function)
         {
             const QRectF r = rect();
@@ -85,7 +85,7 @@ private:
         }
 
         QRectF rect() const { return fn->sceneBoundingRect(); }
-        ive::AADLFunctionGraphicsItem *function() const { return fn; }
+        ive::IVFunctionGraphicsItem *function() const { return fn; }
         QPointF requiredIfacePoint() const { return points.at(static_cast<int>(EndPoint::Req)); }
         QPointF providedIfacePoint() const { return points.at(static_cast<int>(EndPoint::Prov)); }
         QPointF emptyPoint() const { return points.at(static_cast<int>(EndPoint::Empty)); }
@@ -104,15 +104,15 @@ private:
         }
 
     private:
-        ive::AADLFunctionGraphicsItem *fn;
+        ive::IVFunctionGraphicsItem *fn;
         QList<QPointF> points;
     };
 
     QVector<Data> data;
 
 private:
-    void checkEndPoints(ive::AADLFunctionGraphicsItem *startFn, Data::EndPoint startEp,
-            ive::AADLFunctionGraphicsItem *endFn, Data::EndPoint endEp, bool isReversed, bool shouldFail);
+    void checkEndPoints(ive::IVFunctionGraphicsItem *startFn, Data::EndPoint startEp,
+            ive::IVFunctionGraphicsItem *endFn, Data::EndPoint endEp, bool isReversed, bool shouldFail);
 };
 
 void tst_ConnectionUtils::initTestCase()
@@ -120,23 +120,23 @@ void tst_ConnectionUtils::initTestCase()
     shared::initSharedLibrary();
 
     auto entity1 = new ivm::IVFunction("F1");
-    f1 = new ive::AADLFunctionGraphicsItem(entity1);
+    f1 = new ive::IVFunctionGraphicsItem(entity1);
     m_scene.addItem(f1);
     f1->setRect(QRectF(100, 100, 300, 300));
 
     auto nestedEntity1 = new ivm::IVFunction("Nested_F1");
     entity1->addChild(nestedEntity1);
-    nf1 = new ive::AADLFunctionGraphicsItem(nestedEntity1, f1);
+    nf1 = new ive::IVFunctionGraphicsItem(nestedEntity1, f1);
     nf1->setRect(QRectF(150, 150, 100, 100));
 
     auto entity2 = new ivm::IVFunction("F2");
-    f2 = new ive::AADLFunctionGraphicsItem(entity2);
+    f2 = new ive::IVFunctionGraphicsItem(entity2);
     m_scene.addItem(f2);
     f2->setRect(QRectF(600, 100, 300, 300));
 
     auto nestedEntity2 = new ivm::IVFunction("Nested_F2");
     entity2->addChild(nestedEntity2);
-    nf2 = new ive::AADLFunctionGraphicsItem(nestedEntity2, f2);
+    nf2 = new ive::IVFunctionGraphicsItem(nestedEntity2, f2);
     nf2->setRect(QRectF(650, 150, 100, 100));
 
     data = { Data(f1), Data(nf1), Data(f2), Data(nf2) };
@@ -349,7 +349,7 @@ void tst_ConnectionUtils::tst_findSubPath()
             QVector<QPointF> { startSegment.p1(), startSegment.p2() });
     QVERIFY(!pathsFromEnd.isEmpty());
 
-    static const QList<int> types = { ive::AADLFunctionGraphicsItem::Type, ive::AADLFunctionTypeGraphicsItem::Type };
+    static const QList<int> types = { ive::IVFunctionGraphicsItem::Type, ive::IVFunctionTypeGraphicsItem::Type };
     QList<QVector<QPointF>> paths;
     for (int p1idx = 0; p1idx < pathsFromStart.size(); ++p1idx) {
         for (int p2idx = 0; p2idx < pathsFromEnd.size(); ++p2idx) {
@@ -410,7 +410,7 @@ void tst_ConnectionUtils::tst_endPoints()
             iface->setCoordinates(ive::coordinates(ci.position));
             iface->postInit();
             if (ci.function->addChild(iface)) {
-                auto ifaceItem = new ive::AADLInterfaceGraphicsItem(iface, data.at(idx).function());
+                auto ifaceItem = new ive::IVInterfaceGraphicsItem(iface, data.at(idx).function());
                 ifaceItem->init();
                 ifaceItem->setTargetItem(data.at(idx).function(), ci.position);
             }
@@ -525,8 +525,8 @@ void tst_ConnectionUtils::tst_path()
     QVERIFY(!path.isEmpty());
 }
 
-void tst_ConnectionUtils::checkEndPoints(ive::AADLFunctionGraphicsItem *startFn, Data::EndPoint startEp,
-        ive::AADLFunctionGraphicsItem *endFn, Data::EndPoint endEp, bool isReversed, bool shouldFail)
+void tst_ConnectionUtils::checkEndPoints(ive::IVFunctionGraphicsItem *startFn, Data::EndPoint startEp,
+        ive::IVFunctionGraphicsItem *endFn, Data::EndPoint endEp, bool isReversed, bool shouldFail)
 {
     const Data start(startFn);
     const Data end(endFn);

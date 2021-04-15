@@ -1,26 +1,26 @@
-set(LIB_NAME deploy)
+set(LIB_NAME dvcore)
 
 add_library(${LIB_NAME} STATIC)
 
 target_sources(${LIB_NAME} PRIVATE
-    deployobject.cpp
-    deployobject.h
-    deployobjectsmodel.cpp
-    deployobjectsmodel.h
-    deploynode.cpp
-    deploynode.h
-    deployprocessor.cpp
-    deployprocessor.h
-    deploypartition.cpp
-    deploypartition.h
-    deploydevice.cpp
-    deploydevice.h
-    deploybus.cpp
-    deploybus.h
-    deploylink.cpp
-    deploylink.h
-    deploybinding.cpp
-    deploybinding.h
+    dvobject.cpp
+    dvobject.h
+    dvmodel.cpp
+    dvmodel.h
+    dvnode.cpp
+    dvnode.h
+    dvprocessor.cpp
+    dvprocessor.h
+    dvpartition.cpp
+    dvpartition.h
+    dvdevice.cpp
+    dvdevice.h
+    dvbus.cpp
+    dvbus.h
+    dvlink.cpp
+    dvlink.h
+    dvbinding.cpp
+    dvbinding.h
     prop.cpp
     prop.h
 )

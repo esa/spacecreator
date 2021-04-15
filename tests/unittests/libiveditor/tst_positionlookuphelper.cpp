@@ -19,8 +19,8 @@
 #include "ivinterface.h"
 #include "baseitems/common/ivutils.h"
 #include "baseitems/common/positionlookuphelper.h"
-#include "interface/aadlfunctiongraphicsitem.h"
-#include "interface/aadlinterfacegraphicsitem.h"
+#include "interface/ivfunctiongraphicsitem.h"
+#include "interface/ivinterfacegraphicsitem.h"
 #include "sharedlibrary.h"
 
 #include <QGraphicsScene>
@@ -48,8 +48,8 @@ private:
     QGraphicsScene *scene = nullptr;
     ivm::IVFunction *function = nullptr;
     ivm::IVInterfaceProvided *iface = nullptr;
-    ive::AADLFunctionGraphicsItem *functionItem = nullptr;
-    ive::AADLInterfaceGraphicsItem *ifaceItem = nullptr;
+    ive::IVFunctionGraphicsItem *functionItem = nullptr;
+    ive::IVInterfaceGraphicsItem *ifaceItem = nullptr;
 };
 
 void tst_PositionLookupHelper::testOnSide(
@@ -88,14 +88,14 @@ void tst_PositionLookupHelper::initTestCase()
     shared::initSharedLibrary();
     scene = new QGraphicsScene;
     function = new ivm::IVFunction("Function");
-    functionItem = new ive::AADLFunctionGraphicsItem(function);
+    functionItem = new ive::IVFunctionGraphicsItem(function);
     scene->addItem(functionItem);
     functionItem->setBoundingRect(QRectF(0, 0, 500, 500));
     ivm::IVInterface::CreationInfo ci;
     ci.name = "PI";
     ci.function = function;
     iface = new ivm::IVInterfaceProvided(ci);
-    ifaceItem = new ive::AADLInterfaceGraphicsItem(iface, functionItem);
+    ifaceItem = new ive::IVInterfaceGraphicsItem(iface, functionItem);
     ifaceItem->updateLabel();
 
     sidePaths = {

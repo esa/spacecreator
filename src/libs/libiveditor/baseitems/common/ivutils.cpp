@@ -510,10 +510,10 @@ bool isCollided(const QList<QRectF> &itemRects, const QRectF &itemRect, QRectF *
 }
 
 /*!
- * Generates angled segments for \a AADLConnectionGraphicsItem from \a startPoint to \a endPoint
+ * Generates angled segments for \a IVConnectionGraphicsItem from \a startPoint to \a endPoint
  * \param startDirection as previous point for generated one
  * \param endDirection as next point for generated one
- * \return set of points as segment for \a AADLConnectionGraphicsItem connects \a startPoint and \a endPoint
+ * \return set of points as segment for \a IVConnectionGraphicsItem connects \a startPoint and \a endPoint
  */
 QList<QVector<QPointF>> generateSegments(const QPointF &startPoint, const QPointF &endPoint)
 {
@@ -528,10 +528,10 @@ QList<QVector<QPointF>> generateSegments(const QPointF &startPoint, const QPoint
 }
 
 /*!
- * Generates angled segments for \a AADLConnectionGraphicsItem from \a startDirection to \a endDirection
+ * Generates angled segments for \a IVConnectionGraphicsItem from \a startDirection to \a endDirection
  * \param startDirection as previous segment for generated one
  * \param endDirection as next segment for generated one
- * \return set of points as segment for \a AADLConnectionGraphicsItem connects \a startDirection and \a endDirection
+ * \return set of points as segment for \a IVConnectionGraphicsItem connects \a startDirection and \a endDirection
  */
 QVector<QPointF> generateSegments(const QLineF &startDirection, const QLineF &endDirection)
 {
@@ -591,11 +591,11 @@ static inline QLineF getDirection(const QRectF &sceneRect, const QPointF &point)
 };
 
 /*!
- * Generates the segments for \a AADLConnectionGraphicsItem from \a firstEndPoint with direction to \a lastEndPoint
- * \param sceneRect as a geometry of an item where connected \a AADLInterfaceGraphicsItem is placed
+ * Generates the segments for \a IVConnectionGraphicsItem from \a firstEndPoint with direction to \a lastEndPoint
+ * \param sceneRect as a geometry of an item where connected \a IVInterfaceGraphicsItem is placed
  * \param firstEndPoint as starting point
  * \param lastEndPoint as point used to find direction of segment (into/out the \a sceneRect)
- * \return last segment for \a AADLConnectionGraphicsItem linked to \a AADLInterfaceGraphicsItem
+ * \return last segment for \a IVConnectionGraphicsItem linked to \a IVInterfaceGraphicsItem
  */
 QLineF ifaceSegment(const QRectF &sceneRect, const QPointF &firstEndPoint, const QPointF &lastEndPoint)
 {
@@ -613,7 +613,7 @@ QLineF ifaceSegment(const QRectF &sceneRect, const QPointF &firstEndPoint, const
 }
 
 /*!
- * Generates the path for \a AADLConnectionGraphicsItem from \a startPoint to \a endPoint
+ * Generates the path for \a IVConnectionGraphicsItem from \a startPoint to \a endPoint
  * \param existingRects existing items geometries in scene coordinates shouldn't been overlapped
  * \param startPoint as first polyline node
  * \param endDirection as last polyline node
@@ -671,7 +671,7 @@ QVector<QPointF> path(const QList<QRectF> &existingRects, const QPointF &startPo
 }
 
 /*!
- * Generates the segments for \a AADLConnectionGraphicsItem from \a prevPoints to \a nextPoints
+ * Generates the segments for \a IVConnectionGraphicsItem from \a prevPoints to \a nextPoints
  * \param itemRect geometry of intersected item bounding box
  * \param prevPoints as starting points
  * \param nextPoints as points generated segments should be connected to
@@ -719,7 +719,7 @@ QList<QVector<QPointF>> findSubPath(
 }
 
 /*!
- * Generates the path for \a AADLConnectionGraphicsItem from \a startPoint to \a endPoint
+ * Generates the path for \a IVConnectionGraphicsItem from \a startPoint to \a endPoint
  * \param existingRects geometries of existing items in scene coordinates that should be checked on collisions
  * \param startDirection as first polyline segment
  * \param endDirection as last polyline segment
@@ -740,7 +740,7 @@ QVector<QPointF> findPath(const QList<QRectF> &existingRects, const QLineF &star
 }
 
 /*!
- * Generates the whole path for \a AADLConnectionGraphicsItem
+ * Generates the whole path for \a IVConnectionGraphicsItem
  * \param existingRects geometries of existing items in scene coordinates that should be checked on collisions
  * \param startDirection as first polyline segment
  * \param endDirection as last polyline segment

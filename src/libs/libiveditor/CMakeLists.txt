@@ -48,32 +48,32 @@ target_sources(${LIB_NAME} PRIVATE
     endtoend/endtoendview.ui
     endtoend/leafdocumentsmodel.cpp
     endtoend/leafdocumentsmodel.h
-    interface/aadlcommentgraphicsitem.cpp
-    interface/aadlcommentgraphicsitem.h
-    interface/aadlconnectiongraphicsitem.cpp
-    interface/aadlconnectiongraphicsitem.h
-    interface/aadlconnectiongroupgraphicsitem.cpp
-    interface/aadlconnectiongroupgraphicsitem.h
-    interface/aadlconnectiongroupmodel.cpp
-    interface/aadlconnectiongroupmodel.h
-    interface/aadlflowconnectiongraphicsitem.cpp
-    interface/aadlflowconnectiongraphicsitem.h
-    interface/aadlfunctiongraphicsitem.cpp
-    interface/aadlfunctiongraphicsitem.h
-    interface/aadlfunctionnamegraphicsitem.cpp
-    interface/aadlfunctionnamegraphicsitem.h
-    interface/aadlfunctiontypegraphicsitem.cpp
-    interface/aadlfunctiontypegraphicsitem.h
-    interface/aadlinterfacegraphicsitem.cpp
-    interface/aadlinterfacegraphicsitem.h
-    interface/aadlinterfacegroupgraphicsitem.cpp
-    interface/aadlinterfacegroupgraphicsitem.h
-    interface/aadlitemmodel.cpp
-    interface/aadlitemmodel.h
-    interface/aadlobjectstreeview.cpp
-    interface/aadlobjectstreeview.h
-    interface/aadlrectgraphicsitem.cpp
-    interface/aadlrectgraphicsitem.h
+    interface/ivcommentgraphicsitem.cpp
+    interface/ivcommentgraphicsitem.h
+    interface/ivconnectiongraphicsitem.cpp
+    interface/ivconnectiongraphicsitem.h
+    interface/ivconnectiongroupgraphicsitem.cpp
+    interface/ivconnectiongroupgraphicsitem.h
+    interface/ivconnectiongroupmodel.cpp
+    interface/ivconnectiongroupmodel.h
+    interface/ivflowconnectiongraphicsitem.cpp
+    interface/ivflowconnectiongraphicsitem.h
+    interface/ivfunctiongraphicsitem.cpp
+    interface/ivfunctiongraphicsitem.h
+    interface/ivfunctionnamegraphicsitem.cpp
+    interface/ivfunctionnamegraphicsitem.h
+    interface/ivfunctiontypegraphicsitem.cpp
+    interface/ivfunctiontypegraphicsitem.h
+    interface/ivinterfacegraphicsitem.cpp
+    interface/ivinterfacegraphicsitem.h
+    interface/ivinterfacegroupgraphicsitem.cpp
+    interface/ivinterfacegroupgraphicsitem.h
+    interface/ivitemmodel.cpp
+    interface/ivitemmodel.h
+    interface/objectstreeview.cpp
+    interface/objectstreeview.h
+    interface/ivrectgraphicsitem.cpp
+    interface/ivrectgraphicsitem.h
     interface/commands/cmdchangeasn1file.cpp
     interface/commands/cmdchangeasn1file.h
     interface/commands/cmdcommentitemcreate.cpp
@@ -176,16 +176,16 @@ target_sources(${LIB_NAME} PRIVATE
     iveditorcore.cpp
     iveditorcore.h
     iveditorresources.qrc
-    templating/exportableaadlconnection.cpp
-    templating/exportableaadlconnection.h
-    templating/exportableaadlconnectiongroup.cpp
-    templating/exportableaadlconnectiongroup.h
-    templating/exportableaadlfunction.cpp
-    templating/exportableaadlfunction.h
-    templating/exportableaadliface.cpp
-    templating/exportableaadliface.h
-    templating/exportableaadlobject.cpp
-    templating/exportableaadlobject.h
+    templating/exportableivconnection.cpp
+    templating/exportableivconnection.h
+    templating/exportableivconnectiongroup.cpp
+    templating/exportableivconnectiongroup.h
+    templating/exportableivfunction.cpp
+    templating/exportableivfunction.h
+    templating/exportableivinterface.cpp
+    templating/exportableivinterface.h
+    templating/exportableivobject.cpp
+    templating/exportableivobject.h
     xmldocexporter.cpp
     xmldocexporter.h
     zoomcontroller.cpp

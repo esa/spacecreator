@@ -21,8 +21,8 @@
 #include "ivconnection.h"
 #include "ivconnectiongroup.h"
 #include "ivfunction.h"
-#include "aadlfunctiongraphicsitem.h"
-#include "aadlitemmodel.h"
+#include "ivfunctiongraphicsitem.h"
+#include "ivitemmodel.h"
 #include "ivmodel.h"
 #include "ivxmlreader.h"
 #include "actionsbar.h"
@@ -39,7 +39,7 @@
 #include "creatortool.h"
 #include "file.h"
 #include "graphicsitemhelpers.h"
-#include "interface/aadlobjectstreeview.h"
+#include "interface/objectstreeview.h"
 #include "interface/properties/propertiesdialog.h"
 #include "interface/properties/propertytemplatemanager.h"
 #include "interface/properties/propertytemplatewidget.h"
@@ -77,13 +77,13 @@ struct InterfaceDocument::InterfaceDocumentPrivate {
     ive::GraphicsView *graphicsView { nullptr };
     ivm::PropertyTemplateConfig *dynPropConfig { nullptr };
     QTreeView *objectsView { nullptr };
-    AADLItemModel *itemsModel { nullptr };
+    IVItemModel *itemsModel { nullptr };
     CommonVisualizationModel *objectsVisualizationModel { nullptr };
     QItemSelectionModel *objectsSelectionModel { nullptr };
     ivm::IVModel *objectsModel { nullptr };
-    AADLObjectsTreeView *importView { nullptr };
+    ObjectsTreeView *importView { nullptr };
     ivm::IVModel *importModel { nullptr };
-    AADLObjectsTreeView *sharedView { nullptr };
+    ObjectsTreeView *sharedView { nullptr };
     ivm::IVModel *sharedModel { nullptr };
 
     QAction *actCreateConnectionGroup { nullptr };
@@ -137,10 +137,10 @@ void InterfaceDocument::init()
         return;
     }
 
-    d->itemsModel = new AADLItemModel(d->objectsModel, d->commandsStack, this);
-    connect(d->itemsModel, &AADLItemModel::itemClicked, this, &InterfaceDocument::onItemClicked);
-    connect(d->itemsModel, &AADLItemModel::itemDoubleClicked, this, &InterfaceDocument::onItemDoubleClicked);
-    connect(d->itemsModel, &AADLItemModel::itemsSelected, this, &InterfaceDocument::onSceneSelectionChanged);
+    d->itemsModel = new IVItemModel(d->objectsModel, d->commandsStack, this);
+    connect(d->itemsModel, &IVItemModel::itemClicked, this, &InterfaceDocument::onItemClicked);
+    connect(d->itemsModel, &IVItemModel::itemDoubleClicked, this, &InterfaceDocument::onItemDoubleClicked);
+    connect(d->itemsModel, &IVItemModel::itemsSelected, this, &InterfaceDocument::onSceneSelectionChanged);
 
     d->view = new QWidget;
     auto rootLayout = new QVBoxLayout;
@@ -165,12 +165,12 @@ void InterfaceDocument::init()
     editorLayout->setMargin(0);
     editorLayout->setSpacing(0);
     editorWidget->setLayout(editorLayout);
-    auto aadlToolBar = new shared::ActionsBar(editorWidget);
+    auto ivToolBar = new shared::ActionsBar(editorWidget);
     initActions();
     for (QAction *action : qAsConst(d->m_toolbarActions)) {
-        aadlToolBar->addAction(action);
+        ivToolBar->addAction(action);
     }
-    editorLayout->addWidget(aadlToolBar);
+    editorLayout->addWidget(ivToolBar);
     editorLayout->addWidget(editorView);
 
     auto splitter = new QSplitter(Qt::Horizontal, d->view);
@@ -523,7 +523,7 @@ ivm::IVModel *InterfaceDocument::importModel() const
     return d->importModel;
 }
 
-AADLItemModel *InterfaceDocument::itemsModel() const
+IVItemModel *InterfaceDocument::itemsModel() const
 {
     return d->itemsModel;
 }
@@ -729,7 +729,7 @@ void InterfaceDocument::importEntity(const shared::Id &id, const QPointF &sceneD
         return;
     }
     QGraphicsItem *itemAtScenePos = scene()->itemAt(sceneDropPoint, graphicsView()->transform());
-    while (itemAtScenePos && itemAtScenePos->type() != AADLFunctionGraphicsItem::Type) {
+    while (itemAtScenePos && itemAtScenePos->type() != IVFunctionGraphicsItem::Type) {
         itemAtScenePos = itemAtScenePos->parentItem();
     }
 
@@ -758,7 +758,7 @@ void InterfaceDocument::instantiateEntity(const shared::Id &id, const QPointF &s
         return;
     }
     QGraphicsItem *itemAtScenePos = scene()->itemAt(sceneDropPoint, graphicsView()->transform());
-    while (itemAtScenePos && itemAtScenePos->type() != AADLFunctionGraphicsItem::Type) {
+    while (itemAtScenePos && itemAtScenePos->type() != IVFunctionGraphicsItem::Type) {
         itemAtScenePos = itemAtScenePos->parentItem();
     }
     ivm::IVFunctionType *parentObject = gi::functionObject(itemAtScenePos);
@@ -799,7 +799,7 @@ void InterfaceDocument::pasteItems(const QPointF &sceneDropPoint)
     }
 
     QGraphicsItem *itemAtScenePos = scene()->itemAt(sceneDropPoint, graphicsView()->transform());
-    while (itemAtScenePos && itemAtScenePos->type() != AADLFunctionGraphicsItem::Type) {
+    while (itemAtScenePos && itemAtScenePos->type() != IVFunctionGraphicsItem::Type) {
         itemAtScenePos = itemAtScenePos->parentItem();
     }
     ivm::IVFunctionType *parentObject = gi::functionObject(itemAtScenePos);
@@ -1125,7 +1125,7 @@ QTreeView *InterfaceDocument::createImportView()
     if (d->importView)
         return d->importView;
 
-    d->importView = new AADLObjectsTreeView(shared::DropType::ImportableType);
+    d->importView = new ObjectsTreeView(shared::DropType::ImportableType);
     d->importView->setObjectName(QLatin1String("ImportView"));
     d->importView->setSelectionBehavior(QAbstractItemView::SelectionBehavior::SelectItems);
     d->importView->setSelectionMode(QAbstractItemView::SelectionMode::SingleSelection);
@@ -1143,7 +1143,7 @@ QTreeView *InterfaceDocument::createSharedView()
     if (d->sharedView)
         return d->sharedView;
 
-    d->sharedView = new AADLObjectsTreeView(shared::DropType::InstantiatableType);
+    d->sharedView = new ObjectsTreeView(shared::DropType::InstantiatableType);
     d->sharedView->setObjectName(QLatin1String("SharedView"));
     d->sharedView->setSelectionBehavior(QAbstractItemView::SelectionBehavior::SelectItems);
     d->sharedView->setSelectionMode(QAbstractItemView::SelectionMode::SingleSelection);

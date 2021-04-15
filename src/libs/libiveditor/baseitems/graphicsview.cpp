@@ -20,7 +20,7 @@
 #include "ivobject.h"
 #include "baseitems/common/ivutils.h"
 #include "baseitems/interactiveobject.h"
-#include "interface/aadlrectgraphicsitem.h"
+#include "interface/ivrectgraphicsitem.h"
 
 #include <QGraphicsItem>
 #include <QMimeData>
@@ -61,11 +61,11 @@ void GraphicsView::keyPressEvent(QKeyEvent *event)
     case Qt::Key_Up:
     case Qt::Key_Down: {
         for (QGraphicsItem *item : scene()->selectedItems()) {
-            if (ive::AADLRectGraphicsItem *rectItem =
-                            // Not the qgraphicsitem_cast due its "successful" cast of AADLFunctionName/Text Graphics
+            if (ive::IVRectGraphicsItem *rectItem =
+                            // Not the qgraphicsitem_cast due its "successful" cast of IVFunctionName/Text Graphics
                             // Items
-                    qobject_cast<ive::AADLRectGraphicsItem *>(item->toGraphicsObject())) {
-                rectItem->singleStepMove(ive::AADLRectGraphicsItem::MoveStep(event->key()));
+                    qobject_cast<ive::IVRectGraphicsItem *>(item->toGraphicsObject())) {
+                rectItem->singleStepMove(ive::IVRectGraphicsItem::MoveStep(event->key()));
                 keyHandled = true;
             }
         }

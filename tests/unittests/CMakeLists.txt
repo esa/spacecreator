@@ -1,4 +1,4 @@
-add_subdirectory(aadl)
+add_subdirectory(ivcore)
 add_subdirectory(asn1editor)
 add_subdirectory(asn1library)
 add_subdirectory(libiveditor)

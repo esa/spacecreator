@@ -10,8 +10,8 @@ target_sources(${LIB_NAME} PRIVATE
     dveditorcore.cpp
     dveditorcore.h
     dveditorresources.qrc
-    deploymentmodel.cpp
-    deploymentmodel.h
+    dvitemmodel.cpp
+    dvitemmodel.h
 )
 
 target_link_libraries(${LIB_NAME}

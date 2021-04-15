@@ -30,7 +30,7 @@
 #include "delegates/asn1valuedelegate.h"
 #include "delegates/attributedelegate.h"
 #include "ifaceparametersmodel.h"
-#include "interface/aadlconnectiongroupmodel.h"
+#include "interface/ivconnectiongroupmodel.h"
 #include "interface/commands/cmdentityattributechange.h"
 #include "propertieslistmodel.h"
 #include "propertiesviewbase.h"
@@ -140,7 +140,7 @@ void PropertiesDialog::initTabs()
 
 void PropertiesDialog::initConnectionGroup()
 {
-    auto model = new AADLConnectionGroupModel(qobject_cast<ivm::IVConnectionGroup *>(m_dataObject), m_cmdMacro, this);
+    auto model = new IVConnectionGroupModel(qobject_cast<ivm::IVConnectionGroup *>(m_dataObject), m_cmdMacro, this);
     auto connectionsView = new QListView;
     connectionsView->setModel(model);
     ui->tabWidget->insertTab(0, connectionsView, tr("Connections"));

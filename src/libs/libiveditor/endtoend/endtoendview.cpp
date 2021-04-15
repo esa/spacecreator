@@ -25,12 +25,12 @@
 #include "ivmodel.h"
 #include "baseitems/common/ivutils.h"
 #include "endtoendconnections.h"
-#include "interface/aadlconnectiongraphicsitem.h"
-#include "interface/aadlconnectiongroupgraphicsitem.h"
-#include "interface/aadlflowconnectiongraphicsitem.h"
-#include "interface/aadlfunctiongraphicsitem.h"
-#include "interface/aadlinterfacegraphicsitem.h"
-#include "interface/aadlinterfacegroupgraphicsitem.h"
+#include "interface/ivconnectiongraphicsitem.h"
+#include "interface/ivconnectiongroupgraphicsitem.h"
+#include "interface/ivflowconnectiongraphicsitem.h"
+#include "interface/ivfunctiongraphicsitem.h"
+#include "interface/ivinterfacegraphicsitem.h"
+#include "interface/ivinterfacegroupgraphicsitem.h"
 #include "interface/interfacedocument.h"
 #include "leafdocumentsmodel.h"
 #include "mscmodel.h"
@@ -168,8 +168,8 @@ bool EndToEndView::refreshView()
 {
     struct InternalConnection {
         EndToEndConnections::ConnectionInsideFunction connection;
-        AADLInterfaceGraphicsItem *ri { nullptr };
-        AADLInterfaceGraphicsItem *pi { nullptr };
+        IVInterfaceGraphicsItem *ri { nullptr };
+        IVInterfaceGraphicsItem *pi { nullptr };
     };
     QVector<InternalConnection> internalConnections;
 
@@ -193,7 +193,7 @@ bool EndToEndView::refreshView()
     };
 
     bool foundConnection = false;
-    QVector<AADLInterfaceGraphicsItem *> interfaceItems;
+    QVector<IVInterfaceGraphicsItem *> interfaceItems;
 
     // Add new graphics items for each object
     QHash<shared::Id, QGraphicsItem *> items;
@@ -217,7 +217,7 @@ bool EndToEndView::refreshView()
             if (parentItem) {
                 if (auto ifaceGroup = qobject_cast<ivm::IVInterfaceGroup *>(obj)) {
                     // Add the Interface
-                    auto graphicsItem = new AADLInterfaceGroupGraphicsItem(ifaceGroup, parentItem);
+                    auto graphicsItem = new IVInterfaceGroupGraphicsItem(ifaceGroup, parentItem);
                     item = graphicsItem;
 
                     if (auto function = ifaceGroup->function()) {
@@ -260,7 +260,7 @@ bool EndToEndView::refreshView()
             if (parentItem && !obj->isGrouped()) {
                 if (auto reqIface = qobject_cast<ivm::IVInterfaceRequired *>(obj)) {
                     // Add the RI
-                    auto graphicsItem = new AADLInterfaceGraphicsItem(reqIface, parentItem);
+                    auto graphicsItem = new IVInterfaceGraphicsItem(reqIface, parentItem);
                     interfaceItems.append(graphicsItem);
                     item = graphicsItem;
 
@@ -286,7 +286,7 @@ bool EndToEndView::refreshView()
             if (parentItem && !obj->isGrouped()) {
                 if (auto provIface = qobject_cast<ivm::IVInterfaceProvided *>(obj)) {
                     // Add the PI
-                    auto graphicsItem = new AADLInterfaceGraphicsItem(provIface, parentItem);
+                    auto graphicsItem = new IVInterfaceGraphicsItem(provIface, parentItem);
                     interfaceItems.append(graphicsItem);
                     item = graphicsItem;
 
@@ -327,7 +327,7 @@ bool EndToEndView::refreshView()
                         && ifaceStart->type() != ivm::IVObject::Type::InterfaceGroup) {
                     ifaceStart = findGroupObject(ifaceStart);
                 }
-                auto startItem = qgraphicsitem_cast<AADLInterfaceGraphicsItem *>(
+                auto startItem = qgraphicsitem_cast<IVInterfaceGraphicsItem *>(
                         ifaceStart ? items.value(ifaceStart->id()) : nullptr);
 
                 ivm::IVInterface *ifaceEnd = connection->targetInterface();
@@ -335,7 +335,7 @@ bool EndToEndView::refreshView()
                         && ifaceEnd->type() != ivm::IVObject::Type::InterfaceGroup) {
                     ifaceEnd = findGroupObject(ifaceEnd);
                 }
-                auto endItem = qgraphicsitem_cast<AADLInterfaceGraphicsItem *>(
+                auto endItem = qgraphicsitem_cast<IVInterfaceGraphicsItem *>(
                         ifaceEnd ? items.value(ifaceEnd->id()) : nullptr);
 
                 if (connection->type() == ivm::IVObject::Type::ConnectionGroup) {
@@ -346,25 +346,25 @@ bool EndToEndView::refreshView()
                                     return !groupedConnection.isNull()
                                             && EndToEndConnections::isInDataflow(dataflow, chains, groupedConnection);
                                 })) {
-                        item = new AADLFlowConnectionGraphicsItem(connection, startItem, endItem, parentItem);
+                        item = new IVFlowConnectionGraphicsItem(connection, startItem, endItem, parentItem);
                         foundConnection = true;
                     } else {
-                        item = new AADLConnectionGroupGraphicsItem(connection->as<ivm::IVConnectionGroup *>(),
-                                qgraphicsitem_cast<AADLInterfaceGroupGraphicsItem *>(startItem),
-                                qgraphicsitem_cast<AADLInterfaceGroupGraphicsItem *>(endItem), parentItem);
+                        item = new IVConnectionGroupGraphicsItem(connection->as<ivm::IVConnectionGroup *>(),
+                                qgraphicsitem_cast<IVInterfaceGroupGraphicsItem *>(startItem),
+                                qgraphicsitem_cast<IVInterfaceGroupGraphicsItem *>(endItem), parentItem);
                     }
                 } else if (!obj->isGrouped()) {
                     if (EndToEndConnections::isInDataflow(dataflow, chains, connection)) {
-                        item = new AADLFlowConnectionGraphicsItem(connection, startItem, endItem, parentItem);
+                        item = new IVFlowConnectionGraphicsItem(connection, startItem, endItem, parentItem);
                         foundConnection = true;
                     } else {
-                        item = new AADLConnectionGraphicsItem(connection, startItem, endItem, parentItem);
+                        item = new IVConnectionGraphicsItem(connection, startItem, endItem, parentItem);
                     }
                 }
             }
             break;
         case ivm::IVObject::Type::Function:
-            item = new AADLFunctionGraphicsItem(qobject_cast<ivm::IVFunction *>(obj), parentItem);
+            item = new IVFunctionGraphicsItem(qobject_cast<ivm::IVFunction *>(obj), parentItem);
             if (obj->isRootObject()) {
                 rootItem = item;
             }
@@ -399,7 +399,7 @@ bool EndToEndView::refreshView()
         }
     }
 
-    for (AADLInterfaceGraphicsItem *ifItem : interfaceItems) {
+    for (IVInterfaceGraphicsItem *ifItem : interfaceItems) {
         ifItem->updateLabel();
     }
     if (rootItem) {

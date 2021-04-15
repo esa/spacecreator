@@ -30,7 +30,7 @@ class IVObject;
 }
 
 namespace ive {
-class AADLItemModel;
+class IVItemModel;
 class InterfaceDocument;
 class InteractiveObject;
 

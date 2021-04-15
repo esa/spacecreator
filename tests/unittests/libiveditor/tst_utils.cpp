@@ -18,7 +18,7 @@
 #include "ivfunction.h"
 #include "ivlibrary.h"
 #include "baseitems/common/ivutils.h"
-#include "interface/aadlfunctiongraphicsitem.h"
+#include "interface/ivfunctiongraphicsitem.h"
 #include "interface/graphicsitemhelpers.h"
 #include "iveditor.h"
 #include "sharedlibrary.h"
@@ -170,15 +170,15 @@ void tst_Utils::testSiblingSceneRects()
     };
 
     QGraphicsScene scene;
-    ive::AADLFunctionGraphicsItem *item { nullptr };
+    ive::IVFunctionGraphicsItem *item { nullptr };
     for (int idx = 0; idx < existingRects.size(); ++idx) {
-        item = new ive::AADLFunctionGraphicsItem(new ivm::IVFunction);
+        item = new ive::IVFunctionGraphicsItem(new ivm::IVFunction);
         scene.addItem(item);
         item->setRect(existingRects.at(idx));
     }
-    ive::AADLFunctionGraphicsItem *child { nullptr };
+    ive::IVFunctionGraphicsItem *child { nullptr };
     for (int idx = 0; idx < 3; ++idx) {
-        child = new ive::AADLFunctionGraphicsItem(new ivm::IVFunction, item);
+        child = new ive::IVFunctionGraphicsItem(new ivm::IVFunction, item);
         child->setRect(existingRects.at(idx));
     }
     const auto siblingItems0 = ive::siblingItemsRects(item, ive::gi::rectangularTypes());

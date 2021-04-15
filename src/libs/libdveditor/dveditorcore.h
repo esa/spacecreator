@@ -30,7 +30,7 @@ class GraphicsViewBase;
 }
 
 namespace dve {
-class DeploymentModel;
+class DVItemModel;
 namespace cmd {
 class CommandsStack;
 }

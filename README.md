@@ -148,7 +148,7 @@ The current implementation is based on the [Grantlee string template library](ht
 `        templating/templatehighlighter.cpp \`<br>
 `        templating/xmlhighlighter.cpp \`<br>
 `        templating/templatesyntaxhelpdialog.cpp`
-*  Write a successor of `AbstractExportableObject` as a lightweight wrapper to export your QObject-derived objects. Use implementation of `ExportableAADLObject` and its successors as a reference.
+*  Write a successor of `AbstractExportableObject` as a lightweight wrapper to export your QObject-derived objects. Use implementation of `ExportableIVObject` and its successors as a reference.
 *  Create exportable an object, cast it to `QVariant` and append it in `QHash<QString, QVariantList>` by using a `groupName()` as a key. Then invoke `StringTemplate::parseFile()` for parsing a template. Use implementation of `XmlDocExporter` from *src/libs/libiveditor/* as a reference.
 
 # Import of existing editors

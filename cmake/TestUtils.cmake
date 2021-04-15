@@ -5,7 +5,7 @@
 # LIBRARY is the LIBRARY (a list is possible as well)the test depends on
 # Optionally you can add a list of aditional source files
 #
-# Example: addQtTest(tst_aadlobj ivcore "extra01.xml;extra02.xml;extra03.xml")
+# Example: addQtTest(tst_ivobject ivcore "extra01.xml;extra02.xml;extra03.xml")
 #
 function(addQtTest TEST_NAME LIBRARY)
     set(EXTRA_SOURCES ${ARGV2})

@@ -18,7 +18,7 @@
 #include "dveditorcore.h"
 
 #include "baseitems/graphicsview.h"
-#include "deploymentmodel.h"
+#include "dvitemmodel.h"
 #include "ui/graphicsviewbase.h"
 
 #include <QUndoCommand>
@@ -31,7 +31,7 @@ struct DVEditorCore::DeploymentInterfacePrivate {
     DeploymentInterfacePrivate()
         : m_commandsStack(new QUndoStack)
         , m_scene(new QGraphicsScene)
-        , m_model(new DeploymentModel)
+        , m_model(new DVItemModel)
         , m_view(new dve::GraphicsView)
         , m_toolBar(new QToolBar)
     {
@@ -51,7 +51,7 @@ struct DVEditorCore::DeploymentInterfacePrivate {
 
     QUndoStack *m_commandsStack { nullptr };
     QGraphicsScene *m_scene { nullptr };
-    std::unique_ptr<dve::DeploymentModel> m_model;
+    std::unique_ptr<dve::DVItemModel> m_model;
     QPointer<dve::GraphicsView> m_view;
     QPointer<QToolBar> m_toolBar;
 };

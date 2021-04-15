@@ -18,17 +18,17 @@
 #include "creatortool.h"
 
 #include "ivcomment.h"
-#include "aadlcommentgraphicsitem.h"
+#include "ivcommentgraphicsitem.h"
 #include "ivconnection.h"
-#include "aadlconnectiongraphicsitem.h"
+#include "ivconnectiongraphicsitem.h"
 #include "ivconnectiongroup.h"
 #include "ivfunction.h"
-#include "aadlfunctiongraphicsitem.h"
+#include "ivfunctiongraphicsitem.h"
 #include "ivfunctiontype.h"
-#include "aadlfunctiontypegraphicsitem.h"
+#include "ivfunctiontypegraphicsitem.h"
 #include "ivinterface.h"
-#include "aadlinterfacegraphicsitem.h"
-#include "aadlitemmodel.h"
+#include "ivinterfacegraphicsitem.h"
+#include "ivitemmodel.h"
 #include "baseitems/common/ivutils.h"
 #include "commands/cmdcommentitemcreate.h"
 #include "commands/cmdconnectiongroupitemcreate.h"
@@ -65,8 +65,8 @@
 #include <limits>
 
 static const qreal kContextMenuItemTolerance = 10.;
-static const QList<int> kFunctionTypes = { ive::AADLFunctionGraphicsItem::Type,
-    ive::AADLFunctionTypeGraphicsItem::Type };
+static const QList<int> kFunctionTypes = { ive::IVFunctionGraphicsItem::Type,
+    ive::IVFunctionTypeGraphicsItem::Type };
 static const qreal kPreviewItemPenWidth = 2.;
 
 namespace ive {
@@ -109,7 +109,7 @@ struct CreatorTool::CreatorToolPrivate {
 
     QPointer<InterfaceDocument> doc;
     QPointer<QGraphicsView> view;
-    QPointer<AADLItemModel> model;
+    QPointer<IVItemModel> model;
     QGraphicsRectItem *previewItem = nullptr;
     QGraphicsPathItem *previewConnectionItem = nullptr;
     QVector<QPointF> connectionPoints;
@@ -247,8 +247,8 @@ void CreatorTool::groupSelectedItems()
     };
 
     for (const auto item : d->view->scene()->selectedItems()) {
-        if (item->type() == AADLConnectionGraphicsItem::Type) {
-            if (auto connectionItem = qgraphicsitem_cast<AADLConnectionGraphicsItem *>(item)) {
+        if (item->type() == IVConnectionGraphicsItem::Type) {
+            if (auto connectionItem = qgraphicsitem_cast<IVConnectionGraphicsItem *>(item)) {
                 if (ivm::IVConnection *connectionObj = connectionItem->entity()) {
                     processConnection(connectionObj);
                 }
@@ -332,11 +332,11 @@ bool CreatorTool::onMousePress(QMouseEvent *e)
             && e->button() != Qt::RightButton) {
         if (!d->previewConnectionItem) {
             QGraphicsItem *item =
-                    nearestItem(scene, scenePos, kInterfaceTolerance, { AADLInterfaceGraphicsItem::Type });
-            if (!item || item->type() != AADLInterfaceGraphicsItem::Type)
+                    nearestItem(scene, scenePos, kInterfaceTolerance, { IVInterfaceGraphicsItem::Type });
+            if (!item || item->type() != IVInterfaceGraphicsItem::Type)
                 return false;
 
-            auto interfaceItem = qgraphicsitem_cast<const AADLInterfaceGraphicsItem *>(item);
+            auto interfaceItem = qgraphicsitem_cast<const IVInterfaceGraphicsItem *>(item);
             if (!interfaceItem)
                 return false;
 
@@ -371,8 +371,8 @@ bool CreatorTool::onMousePress(QMouseEvent *e)
     }
 
     if (d->toolType == ToolType::DirectConnection && e->button() != Qt::RightButton) {
-        if (!nearestItem(scene, scenePos, QList<int> { AADLFunctionGraphicsItem::Type })) {
-            if (!nearestItem(scene, scenePos, kInterfaceTolerance, { AADLInterfaceGraphicsItem::Type }))
+        if (!nearestItem(scene, scenePos, QList<int> { IVFunctionGraphicsItem::Type })) {
+            if (!nearestItem(scene, scenePos, kInterfaceTolerance, { IVInterfaceGraphicsItem::Type }))
                 return false;
         }
 
@@ -389,7 +389,7 @@ bool CreatorTool::onMousePress(QMouseEvent *e)
     } else if (d->toolType == ToolType::MultiPointConnection && e->button() != Qt::RightButton) {
         if (!d->previewConnectionItem) {
             QGraphicsItem *item =
-                    nearestItem(scene, scenePos, kInterfaceTolerance, { AADLInterfaceGraphicsItem::Type });
+                    nearestItem(scene, scenePos, kInterfaceTolerance, { IVInterfaceGraphicsItem::Type });
             if (!item)
                 return false;
 
@@ -406,8 +406,8 @@ bool CreatorTool::onMousePress(QMouseEvent *e)
             || (d->toolType != ToolType::RequiredInterface && d->toolType != ToolType::ProvidedInterface)) {
         if (!d->previewItem) {
             QGraphicsItem *parentItem = d->view->itemAt(e->pos());
-            while (parentItem != nullptr && parentItem->type() != AADLFunctionGraphicsItem::Type
-                    && parentItem->type() != AADLFunctionTypeGraphicsItem::Type) {
+            while (parentItem != nullptr && parentItem->type() != IVFunctionGraphicsItem::Type
+                    && parentItem->type() != IVFunctionTypeGraphicsItem::Type) {
                 parentItem = parentItem->parentItem();
             }
             d->previewItem = new QGraphicsRectItem(parentItem);
@@ -475,7 +475,7 @@ bool CreatorTool::onMouseMove(QMouseEvent *e)
         QList<QGraphicsItem *> newCollidedItems = d->view->scene()->items(expandedGeometry);
         std::for_each(newCollidedItems.begin(), newCollidedItems.end(),
                 [this, &items, expandedGeometry](QGraphicsItem *item) {
-                    if (item->type() == AADLInterfaceGraphicsItem::Type || item->type() == d->previewItem->type())
+                    if (item->type() == IVInterfaceGraphicsItem::Type || item->type() == d->previewItem->type())
                         return;
 
                     auto iObjItem = qobject_cast<InteractiveObject *>(item->toGraphicsObject());
@@ -629,7 +629,7 @@ void CreatorTool::CreatorToolPrivate::populateContextMenu_commonCreate(QMenu *me
                 thisTool->tr("Connection group"), thisTool, [this]() { thisTool->groupSelectedItems(); });
         const auto selectedItems = previewItem->scene()->selectedItems();
         const auto it = std::find_if(selectedItems.cbegin(), selectedItems.cend(),
-                [](const QGraphicsItem *item) { return item->type() == AADLConnectionGraphicsItem::Type; });
+                [](const QGraphicsItem *item) { return item->type() == IVConnectionGraphicsItem::Type; });
         action->setEnabled(it != selectedItems.cend());
     }
 }
@@ -637,8 +637,8 @@ void CreatorTool::CreatorToolPrivate::populateContextMenu_commonCreate(QMenu *me
 void CreatorTool::CreatorToolPrivate::populateContextMenu_commonEdit(QMenu *menu, const QPointF &scenePos)
 {
     const QList<QGraphicsItem *> selectedItems = view->scene()->selectedItems();
-    static const QList<int> kNestedTypes { ive::AADLFunctionGraphicsItem::Type, ive::AADLFunctionTypeGraphicsItem::Type,
-        ive::AADLCommentGraphicsItem::Type };
+    static const QList<int> kNestedTypes { ive::IVFunctionGraphicsItem::Type, ive::IVFunctionTypeGraphicsItem::Type,
+        ive::IVCommentGraphicsItem::Type };
     const bool copyable = std::any_of(selectedItems.cbegin(), selectedItems.cend(),
             [](const QGraphicsItem *item) { return kNestedTypes.contains(item->type()); });
     auto action = menu->addAction(
@@ -680,7 +680,7 @@ void CreatorTool::CreatorToolPrivate::populateContextMenu_propertiesDialog(QMenu
             action->setEnabled(ivObj);
 
             connect(action, &QAction::triggered, [gi]() {
-                if (auto connectionItem = qgraphicsitem_cast<AADLConnectionGraphicsItem *>(gi)) {
+                if (auto connectionItem = qgraphicsitem_cast<IVConnectionGraphicsItem *>(gi)) {
                     connectionItem->layout();
                     connectionItem->updateEntity();
                 }
@@ -697,8 +697,8 @@ void CreatorTool::CreatorToolPrivate::populateContextMenu_user(QMenu *menu, cons
     if (!scene)
         return;
 
-    static const QList<int> showProps { AADLInterfaceGraphicsItem::Type, AADLFunctionTypeGraphicsItem::Type,
-        AADLFunctionGraphicsItem::Type, AADLCommentGraphicsItem::Type, AADLConnectionGraphicsItem::Type };
+    static const QList<int> showProps { IVInterfaceGraphicsItem::Type, IVFunctionTypeGraphicsItem::Type,
+        IVFunctionGraphicsItem::Type, IVCommentGraphicsItem::Type, IVConnectionGraphicsItem::Type };
 
     ivm::IVObject *ivObj { nullptr };
     if (QGraphicsItem *gi = scene->selectedItems().size() == 1
@@ -706,23 +706,23 @@ void CreatorTool::CreatorToolPrivate::populateContextMenu_user(QMenu *menu, cons
                     : nearestItem(scene, scenePos, kContextMenuItemTolerance, showProps)) {
 
         switch (gi->type()) {
-        case AADLFunctionTypeGraphicsItem::Type: {
+        case IVFunctionTypeGraphicsItem::Type: {
             ivObj = gi::functionTypeObject(gi);
             break;
         }
-        case AADLFunctionGraphicsItem::Type: {
+        case IVFunctionGraphicsItem::Type: {
             ivObj = gi::functionObject(gi);
             break;
         }
-        case AADLInterfaceGraphicsItem::Type: {
+        case IVInterfaceGraphicsItem::Type: {
             ivObj = gi::interfaceObject(gi);
             break;
         }
-        case AADLCommentGraphicsItem::Type: {
+        case IVCommentGraphicsItem::Type: {
             ivObj = gi::commentObject(gi);
             break;
         }
-        case AADLConnectionGraphicsItem::Type: {
+        case IVConnectionGraphicsItem::Type: {
             ivObj = gi::connectionObject(gi);
             break;
         }
@@ -872,8 +872,8 @@ bool CreatorTool::CreatorToolPrivate::handleConnectionCreate(const QPointF &pos)
     if (!this->previewConnectionItem)
         return false;
 
-    if (auto itemUnderCursor = qgraphicsitem_cast<AADLInterfaceGraphicsItem *>(
-                nearestItem(scene, pos, kInterfaceTolerance, { AADLInterfaceGraphicsItem::Type }))) {
+    if (auto itemUnderCursor = qgraphicsitem_cast<IVInterfaceGraphicsItem *>(
+                nearestItem(scene, pos, kInterfaceTolerance, { IVInterfaceGraphicsItem::Type }))) {
         const QPointF finishPoint = itemUnderCursor->connectionEndPoint();
         if (!itemUnderCursor->ifaceShape().boundingRect().contains(this->connectionPoints.front())) {
             this->connectionPoints.append(finishPoint);
@@ -906,7 +906,7 @@ void CreatorTool::CreatorToolPrivate::handleConnection(const QVector<QPointF> &g
     if (info.failed())
         return;
 
-    const AADLFunctionGraphicsItem *parentForConnection = nullptr;
+    const IVFunctionGraphicsItem *parentForConnection = nullptr;
     QPointF startInterfacePoint { info.startPointAdjusted };
     QPointF endInterfacePoint { info.endPointAdjusted };
     ivm::IVInterface::CreationInfo ifaceCommons;
@@ -967,11 +967,11 @@ void CreatorTool::CreatorToolPrivate::handleConnection(const QVector<QPointF> &g
         ifaceCommons.name.clear();
     }
 
-    AADLFunctionGraphicsItem *prevStartItem =
-            qgraphicsitem_cast<ive::AADLFunctionGraphicsItem *>(info.functionAtStartPos);
+    IVFunctionGraphicsItem *prevStartItem =
+            qgraphicsitem_cast<ive::IVFunctionGraphicsItem *>(info.functionAtStartPos);
     QPointF firstExcludedPoint = *std::next(info.connectionPoints.constBegin());
     shared::Id prevStartIfaceId = info.startIfaceId;
-    while (auto item = qgraphicsitem_cast<ive::AADLFunctionGraphicsItem *>(prevStartItem->parentItem())) {
+    while (auto item = qgraphicsitem_cast<ive::IVFunctionGraphicsItem *>(prevStartItem->parentItem())) {
         if (item == info.functionAtEndPos && info.endIface) {
             parentForConnection = item;
             break;
@@ -1018,9 +1018,9 @@ void CreatorTool::CreatorToolPrivate::handleConnection(const QVector<QPointF> &g
     }
 
     QPointF lastExcludedPoint = *std::next(info.connectionPoints.crbegin());
-    auto prevEndItem = qgraphicsitem_cast<ive::AADLFunctionGraphicsItem *>(info.functionAtEndPos);
+    auto prevEndItem = qgraphicsitem_cast<ive::IVFunctionGraphicsItem *>(info.functionAtEndPos);
     shared::Id prevEndIfaceId = info.endIfaceId;
-    while (auto item = qgraphicsitem_cast<ive::AADLFunctionGraphicsItem *>(prevEndItem->parentItem())) {
+    while (auto item = qgraphicsitem_cast<ive::IVFunctionGraphicsItem *>(prevEndItem->parentItem())) {
         if (item == info.functionAtStartPos && info.startIface) {
             Q_ASSERT(parentForConnection == item || parentForConnection == nullptr);
             parentForConnection = item;
@@ -1102,7 +1102,7 @@ void CreatorTool::CreatorToolPrivate::handleConnectionReCreate(const QVector<QPo
     }
 
     if (auto item = model->getItem(id)) {
-        if (auto connection = qgraphicsitem_cast<AADLConnectionGraphicsItem *>(item)) {
+        if (auto connection = qgraphicsitem_cast<IVConnectionGraphicsItem *>(item)) {
             if (connection->startItem()->entity()->id() != info.startIfaceId
                     || connection->endItem()->entity()->id() != info.endIfaceId) {
                 return;
@@ -1132,8 +1132,8 @@ bool CreatorTool::CreatorToolPrivate::warnConnectionPreview(const QPointF &pos)
                 || !info.endIface || !info.startIface) {
             warn = true;
         } else {
-            auto startItem = qgraphicsitem_cast<AADLInterfaceGraphicsItem *>(model->getItem(info.startIfaceId));
-            auto endItem = qgraphicsitem_cast<AADLInterfaceGraphicsItem *>(model->getItem(info.endIfaceId));
+            auto startItem = qgraphicsitem_cast<IVInterfaceGraphicsItem *>(model->getItem(info.startIfaceId));
+            auto endItem = qgraphicsitem_cast<IVInterfaceGraphicsItem *>(model->getItem(info.endIfaceId));
             if (!startItem || !endItem) {
                 warn = true;
             } else {

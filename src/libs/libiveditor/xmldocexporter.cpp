@@ -27,7 +27,7 @@
 #include "interface/interfacedocument.h"
 #include "stringtemplate.h"
 #include "templateeditor.h"
-#include "templating/exportableaadlobject.h"
+#include "templating/exportableivobject.h"
 
 #include <QBuffer>
 #include <QDebug>
@@ -259,8 +259,8 @@ QHash<QString, QVariant> XmlDocExporter::collectInterfaceObjects(const QList<ivm
         default:
             break;
         }
-        const QVariant &exportedObject = ExportableAADLObject::createFrom(ivObject);
-        const auto &o = exportedObject.value<ExportableAADLObject>();
+        const QVariant &exportedObject = ExportableIVObject::createFrom(ivObject);
+        const auto &o = exportedObject.value<ExportableIVObject>();
         const QString groupName = o.groupName();
         if (!grouppedObjects.contains(groupName)) {
             grouppedObjects[groupName] = QVariant::fromValue(QList<QVariant>());

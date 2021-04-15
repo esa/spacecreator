@@ -27,12 +27,12 @@
 #include "baseitems/interactiveobject.h"
 #include "connectioncreationvalidator.h"
 #include "graphicsviewutils.h"
-#include "interface/aadlcommentgraphicsitem.h"
-#include "interface/aadlconnectiongraphicsitem.h"
-#include "interface/aadlconnectiongroupgraphicsitem.h"
-#include "interface/aadlfunctiongraphicsitem.h"
-#include "interface/aadlfunctiontypegraphicsitem.h"
-#include "interface/aadlinterfacegraphicsitem.h"
+#include "interface/ivcommentgraphicsitem.h"
+#include "interface/ivconnectiongraphicsitem.h"
+#include "interface/ivconnectiongroupgraphicsitem.h"
+#include "interface/ivfunctiongraphicsitem.h"
+#include "interface/ivfunctiontypegraphicsitem.h"
+#include "interface/ivinterfacegraphicsitem.h"
 
 #include <QGraphicsScene>
 #include <QMetaEnum>
@@ -40,15 +40,15 @@
 namespace ive {
 namespace gi {
 
-static const QList<int> kRectTypes { AADLCommentGraphicsItem::Type, AADLFunctionGraphicsItem::Type,
-    AADLFunctionTypeGraphicsItem::Type };
+static const QList<int> kRectTypes { IVCommentGraphicsItem::Type, IVFunctionGraphicsItem::Type,
+    IVFunctionTypeGraphicsItem::Type };
 
 ivm::IVFunction *functionObject(QGraphicsItem *item)
 {
     if (!item)
         return nullptr;
 
-    if (auto function = qobject_cast<AADLFunctionGraphicsItem *>(item->toGraphicsObject()))
+    if (auto function = qobject_cast<IVFunctionGraphicsItem *>(item->toGraphicsObject()))
         return function->entity();
 
     return nullptr;
@@ -59,7 +59,7 @@ ivm::IVFunctionType *functionTypeObject(QGraphicsItem *item)
     if (!item)
         return nullptr;
 
-    if (auto functionType = qobject_cast<AADLFunctionTypeGraphicsItem *>(item->toGraphicsObject()))
+    if (auto functionType = qobject_cast<IVFunctionTypeGraphicsItem *>(item->toGraphicsObject()))
         return functionType->entity();
 
     return nullptr;
@@ -70,7 +70,7 @@ ivm::IVInterface *interfaceObject(QGraphicsItem *item)
     if (!item)
         return nullptr;
 
-    if (auto iface = qobject_cast<AADLInterfaceGraphicsItem *>(item->toGraphicsObject()))
+    if (auto iface = qobject_cast<IVInterfaceGraphicsItem *>(item->toGraphicsObject()))
         return iface->entity();
 
     return nullptr;
@@ -81,7 +81,7 @@ ivm::IVComment *commentObject(QGraphicsItem *item)
     if (!item)
         return nullptr;
 
-    if (auto comment = qobject_cast<AADLCommentGraphicsItem *>(item->toGraphicsObject()))
+    if (auto comment = qobject_cast<IVCommentGraphicsItem *>(item->toGraphicsObject()))
         return comment->entity();
 
     return nullptr;
@@ -92,7 +92,7 @@ ivm::IVConnection *connectionObject(QGraphicsItem *item)
     if (!item)
         return nullptr;
 
-    if (auto connection = qobject_cast<AADLConnectionGraphicsItem *>(item->toGraphicsObject()))
+    if (auto connection = qobject_cast<IVConnectionGraphicsItem *>(item->toGraphicsObject()))
         return connection->entity();
 
     return nullptr;
@@ -103,9 +103,9 @@ bool isOwnConnection(const QGraphicsItem *owner, const QGraphicsItem *connection
     if (!owner || !connection)
         return false;
 
-    if (auto con = qobject_cast<const AADLConnectionGraphicsItem *>(connection->toGraphicsObject()))
+    if (auto con = qobject_cast<const IVConnectionGraphicsItem *>(connection->toGraphicsObject()))
         for (auto item : owner->childItems())
-            if (AADLInterfaceGraphicsItem::Type == item->type())
+            if (IVInterfaceGraphicsItem::Type == item->type())
                 if (con->startItem() == item || con->endItem() == item)
                     return true;
 
@@ -166,9 +166,9 @@ ivm::ValidationResult validateConnectionCreate(QGraphicsScene *scene, const QVec
     ivm::ValidationResult result;
     result.connectionPoints = points;
     result.functionAtStartPos = ive::nearestItem(
-            scene, ive::adjustFromPoint(startPos, kFunctionTolerance), { ive::AADLFunctionGraphicsItem::Type });
+            scene, ive::adjustFromPoint(startPos, kFunctionTolerance), { ive::IVFunctionGraphicsItem::Type });
     result.functionAtEndPos = ive::nearestItem(
-            scene, ive::adjustFromPoint(endPos, kFunctionTolerance), { ive::AADLFunctionGraphicsItem::Type });
+            scene, ive::adjustFromPoint(endPos, kFunctionTolerance), { ive::IVFunctionGraphicsItem::Type });
     result.startObject = ive::gi::functionObject(result.functionAtStartPos);
     result.endObject = ive::gi::functionObject(result.functionAtEndPos);
     result.isToOrFromNested =
@@ -180,8 +180,8 @@ ivm::ValidationResult validateConnectionCreate(QGraphicsScene *scene, const QVec
         return result;
     }
 
-    const auto startIfaceItem = qgraphicsitem_cast<ive::AADLInterfaceGraphicsItem *>(ive::nearestItem(
-            scene, ive::adjustFromPoint(startPos, kInterfaceTolerance), { ive::AADLInterfaceGraphicsItem::Type }));
+    const auto startIfaceItem = qgraphicsitem_cast<ive::IVInterfaceGraphicsItem *>(ive::nearestItem(
+            scene, ive::adjustFromPoint(startPos, kInterfaceTolerance), { ive::IVInterfaceGraphicsItem::Type }));
     if (startIfaceItem
             && startIfaceItem->ifaceShape()
                        .boundingRect()
@@ -202,8 +202,8 @@ ivm::ValidationResult validateConnectionCreate(QGraphicsScene *scene, const QVec
         return result;
     }
 
-    const auto endIfaceItem = qgraphicsitem_cast<ive::AADLInterfaceGraphicsItem *>(ive::nearestItem(
-            scene, ive::adjustFromPoint(endPos, kInterfaceTolerance), { ive::AADLInterfaceGraphicsItem::Type }));
+    const auto endIfaceItem = qgraphicsitem_cast<ive::IVInterfaceGraphicsItem *>(ive::nearestItem(
+            scene, ive::adjustFromPoint(endPos, kInterfaceTolerance), { ive::IVInterfaceGraphicsItem::Type }));
     if (endIfaceItem
             && endIfaceItem->ifaceShape()
                        .boundingRect()
@@ -282,24 +282,24 @@ QList<int> knownGraphicsItemTypes()
         const ivm::IVObject::Type objectType = static_cast<ivm::IVObject::Type>(me.value(i));
         switch (objectType) {
         case ivm::IVObject::Type::Function:
-            itemType = ive::AADLFunctionGraphicsItem::Type;
+            itemType = ive::IVFunctionGraphicsItem::Type;
             break;
         case ivm::IVObject::Type::FunctionType:
-            itemType = ive::AADLFunctionTypeGraphicsItem::Type;
+            itemType = ive::IVFunctionTypeGraphicsItem::Type;
             break;
         case ivm::IVObject::Type::InterfaceGroup:
         case ivm::IVObject::Type::ProvidedInterface:
         case ivm::IVObject::Type::RequiredInterface:
-            itemType = ive::AADLInterfaceGraphicsItem::Type;
+            itemType = ive::IVInterfaceGraphicsItem::Type;
             break;
         case ivm::IVObject::Type::Comment:
-            itemType = ive::AADLCommentGraphicsItem::Type;
+            itemType = ive::IVCommentGraphicsItem::Type;
             break;
         case ivm::IVObject::Type::Connection:
-            itemType = ive::AADLConnectionGraphicsItem::Type;
+            itemType = ive::IVConnectionGraphicsItem::Type;
             break;
         case ivm::IVObject::Type::ConnectionGroup:
-            itemType = ive::AADLConnectionGroupGraphicsItem::Type;
+            itemType = ive::IVConnectionGroupGraphicsItem::Type;
             break;
         case ivm::IVObject::Type::Unknown:
             continue;
@@ -328,7 +328,7 @@ bool isBounded(const QGraphicsItem *upcomingItem, const QRectF &upcomingItemRect
         return false;
     }
 
-    if (auto iObj = qobject_cast<const AADLRectGraphicsItem *>(upcomingItem->toGraphicsObject())) {
+    if (auto iObj = qobject_cast<const IVRectGraphicsItem *>(upcomingItem->toGraphicsObject())) {
         const auto parentObj = qobject_cast<const InteractiveObject *>(iObj->parentObject());
         if (parentObj && parentObj->entity()) {
             const QMarginsF margins = parentObj->entity()->isRootObject() ? kRootMargins : kContentMargins;

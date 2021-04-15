@@ -46,12 +46,12 @@ namespace cmd {
 class CommandsStack;
 }
 
-class AADLItemModel;
-class AADLCommentGraphicsItem;
-class AADLConnectionGraphicsItem;
-class AADLFunctionGraphicsItem;
-class AADLFunctionTypeGraphicsItem;
-class AADLInterfaceGraphicsItem;
+class IVItemModel;
+class IVCommentGraphicsItem;
+class IVConnectionGraphicsItem;
+class IVFunctionGraphicsItem;
+class IVFunctionTypeGraphicsItem;
+class IVInterfaceGraphicsItem;
 class InterfaceTabGraphicsScene;
 
 class InterfaceDocument : public QObject
@@ -101,7 +101,7 @@ public:
     const QHash<shared::Id, ivm::IVObject *> &objects() const;
     ivm::IVModel *objectsModel() const;
     ivm::IVModel *importModel() const;
-    AADLItemModel *itemsModel() const;
+    IVItemModel *itemsModel() const;
 
     Asn1Acn::Asn1ModelStorage *asn1ModelStorage() const;
     void setAsn1ModelStorage(Asn1Acn::Asn1ModelStorage *asn1Storage);
