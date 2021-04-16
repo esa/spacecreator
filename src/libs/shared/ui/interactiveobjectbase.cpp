@@ -81,6 +81,7 @@ void InteractiveObjectBase::setBoundingRect(const QRectF &newRect)
     if (newRect == d->boundingRect) {
         return;
     }
+    prepareGeometryChange();
 
     d->boundingRect = newRect;
     updateGripPoints();

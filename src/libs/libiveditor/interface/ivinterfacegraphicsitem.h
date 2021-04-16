@@ -18,9 +18,9 @@
 
 #pragma once
 
-#include "ivobject.h"
-#include "ivinterface.h"
 #include "baseitems/interactiveobject.h"
+#include "ivinterface.h"
+#include "ivobject.h"
 
 #include <QPointer>
 

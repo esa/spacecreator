@@ -18,6 +18,9 @@
 
 #include "ivinterfacegraphicsitem.h"
 
+#include "baseitems/common/ivutils.h"
+#include "baseitems/common/positionlookuphelper.h"
+#include "colors/colormanager.h"
 #include "ivcommentgraphicsitem.h"
 #include "ivconnection.h"
 #include "ivconnectiongraphicsitem.h"
@@ -26,9 +29,6 @@
 #include "ivfunctiontypegraphicsitem.h"
 #include "ivinterface.h"
 #include "ivnamevalidator.h"
-#include "baseitems/common/ivutils.h"
-#include "baseitems/common/positionlookuphelper.h"
-#include "colors/colormanager.h"
 
 #include <QGraphicsScene>
 #include <QPainter>
@@ -194,12 +194,10 @@ QPainterPath IVInterfaceGraphicsItem::ifaceShape() const
 
 void IVInterfaceGraphicsItem::updateInternalItems(Qt::Alignment alignment)
 {
-    prepareGeometryChange();
-
     m_iface->setTransform(ifaceTransform(alignment));
     m_type->setTransform(typeTransform(alignment));
     m_shape = composeShape();
-    setBoundingRect(childrenBoundingRect());
+    setBoundingRect(shape().boundingRect());
 }
 
 void IVInterfaceGraphicsItem::rebuildLayout()
@@ -255,8 +253,7 @@ void IVInterfaceGraphicsItem::onSelectionChanged(bool isSelected)
     m_iface->setBrush(isSelected ? kSelectedBackgroundColor : h.brush());
 }
 
-QList<QPair<ivm::IVObject *, QVector<QPointF>>>
-IVInterfaceGraphicsItem::prepareChangeCoordinatesCommandParams() const
+QList<QPair<ivm::IVObject *, QVector<QPointF>>> IVInterfaceGraphicsItem::prepareChangeCoordinatesCommandParams() const
 {
     QVector<QPointF> pos;
     pos.append(scenePos());
@@ -645,8 +642,8 @@ QPainterPath IVInterfaceGraphicsItem::typePath() const
 QPainterPath IVInterfaceGraphicsItem::itemPath(Qt::Alignment alignment) const
 {
     QPainterPath path = m_text->shape();
-    path.addPath(typeTransform(alignment).map(m_type->path()));
-    path.addPath(ifaceTransform(alignment).map(m_iface->path()));
+    path = path.united(typeTransform(alignment).map(m_type->path()));
+    path = path.united(ifaceTransform(alignment).map(m_iface->path()));
     return path;
 }
 
@@ -654,18 +651,29 @@ QPainterPath IVInterfaceGraphicsItem::composeShape() const
 {
     QPainterPath path = m_text->shape();
     for (auto sub : { m_type, m_iface }) {
-        QPainterPath subPath = sub->transform().map(sub->path()).simplified();
+        QPainterPath subPath = sub->transform().map(sub->path());
         subPath.translate(sub->pos());
-        path.addPath(subPath);
+        path = path.united(subPath);
     }
-    return path;
+
+    QPainterPath strokeBasePath = m_iface->transform().map(m_iface->path());
+    strokeBasePath.translate(m_iface->pos());
+
+    QPainterPathStroker pathStroker;
+    pathStroker.setCapStyle(Qt::PenCapStyle::RoundCap);
+    pathStroker.setJoinStyle(Qt::PenJoinStyle::RoundJoin);
+    pathStroker.setWidth(kBase);
+    const QPainterPath strokePath = pathStroker.createStroke(strokeBasePath);
+    path = path.united(strokePath);
+
+    return path.simplified();
 }
 
 QVariant IVInterfaceGraphicsItem::itemChange(GraphicsItemChange change, const QVariant &value)
 {
     switch (change) {
     case QGraphicsItem::ItemVisibleHasChanged: {
-        for (const auto &connection : m_connections)
+        for (IVConnectionGraphicsItem *connection : qAsConst(m_connections))
             connection->setVisible(connection->startItem()->isVisible() && connection->endItem()->isVisible());
         break;
     }
