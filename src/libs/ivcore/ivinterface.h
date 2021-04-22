@@ -67,9 +67,8 @@ public:
             Init = 0,
             Clone
         };
-        CreationInfo(IVModel *model = nullptr, IVFunctionType *function = nullptr,
-                const QPointF &position = QPointF(), IVInterface::InterfaceType type = DefaultDirection,
-                const shared::Id &id = shared::createId(),
+        CreationInfo(IVModel *model = nullptr, IVFunctionType *function = nullptr, const QPointF &position = QPointF(),
+                IVInterface::InterfaceType type = DefaultDirection, const shared::Id &id = shared::createId(),
                 const QVector<InterfaceParameter> &parameters = QVector<InterfaceParameter>(),
                 OperationKind kind = OperationKind::Sporadic, const QString &name = QString(),
                 const CreationInfo::Policy policy = CreationInfo::Policy::Init, IVInterface *toBeCloned = nullptr);
@@ -123,8 +122,7 @@ public:
 
     static IVInterface *createIface(const CreationInfo &descr);
 
-    QVariant originalAttr(const QString &name) const;
-    QVariant originalProp(const QString &name) const;
+    QVariant originalAttributeValue(const QString &name) const;
     QVector<InterfaceParameter> originalParams() const;
 
     void setCloneOrigin(IVInterface *source);
@@ -137,8 +135,7 @@ Q_SIGNALS:
     void paramsChanged();
 
 protected Q_SLOTS:
-    void onReflectedAttrChanged(ivm::meta::Props::Token attr);
-    void onReflectedPropChanged(ivm::meta::Props::Token prop);
+    void onReflectedAttrChanged(const QString &attrName);
     void onReflectedParamsChanged();
 
 protected:
@@ -151,17 +148,19 @@ protected:
     virtual void restoreInternals(const IVInterface *disconnectMe);
 
     void reflectAttrs(const IVInterface *from);
-    void reflectProps(const IVInterface *from);
     void reflectParams(const IVInterface *from);
 
 protected:
     struct OriginalPropsHolder {
         // TODO: unite with IVFunction::OriginalPropsHolder
-        QString name() const { return attrs.value(meta::Props::token(meta::Props::Token::name)).toString(); }
-        QHash<QString, QVariant> attrs;
-        QHash<QString, QVariant> props;
+        EntityAttributes attrs;
         QVector<InterfaceParameter> params;
 
+        inline QString name() const
+        {
+            const QString attrName = meta::Props::token(meta::Props::Token::name);
+            return attrs.value(attrName).value().value<QString>();
+        }
         inline bool collected() const { return m_collected; }
 
         inline void collect(const IVInterface *src)
@@ -169,8 +168,7 @@ protected:
             if (m_collected || !src)
                 return;
 
-            attrs = src->attrs();
-            props = src->props();
+            attrs = src->entityAttributes();
             params = src->params();
 
             m_collected = true;
@@ -199,9 +197,6 @@ class IVInterfaceRequired : public IVInterface
 public:
     explicit IVInterfaceRequired(const CreationInfo &ci);
 
-    virtual void setAttr(const QString &name, const QVariant &val) override;
-    virtual void setProp(const QString &name, const QVariant &val) override;
-
     bool isInheritPI() const;
     bool hasPrototypePi() const;
 
@@ -221,6 +216,7 @@ protected:
 
     void cloneInternals(const IVInterface *from) override;
     void restoreInternals(const IVInterface *disconnectMe) override;
+    void setAttributeImpl(const QString &name, const QVariant &value, EntityAttribute::Type type) override;
 
 private:
     QStringList collectInheritedLabels() const;

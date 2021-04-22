@@ -17,18 +17,18 @@
 
 #include "propertieslistmodel.h"
 
-#include "ivcommonprops.h"
-#include "ivfunction.h"
-#include "ivinterface.h"
-#include "ivmodel.h"
-#include "ivnamevalidator.h"
-#include "ivobject.h"
 #include "commandsstack.h"
 #include "interface/commands/cmdentityattributechange.h"
 #include "interface/commands/cmdentitypropertychange.h"
 #include "interface/commands/cmdentitypropertycreate.h"
 #include "interface/commands/cmdentitypropertyremove.h"
 #include "interface/commands/cmdentitypropertyrename.h"
+#include "ivcommonprops.h"
+#include "ivfunction.h"
+#include "ivinterface.h"
+#include "ivmodel.h"
+#include "ivnamevalidator.h"
+#include "ivobject.h"
 #include "propertytemplateconfig.h"
 
 #include <QApplication>
@@ -108,7 +108,7 @@ QStringList PropertiesListModel::sortedKeys(const QList<ivm::PropertyTemplate *>
     for (ivm::PropertyTemplate *propTemplate : templates) {
         templateKeys.append(propTemplate->name());
     }
-    QStringList keys { m_dataObject->attrs().keys() << m_dataObject->props().keys() };
+    QStringList keys { m_dataObject->entityAttributes().keys() };
     std::sort(keys.begin(), keys.end(),
             [](const QString &s1, const QString &s2) { return s1.compare(s2, Qt::CaseInsensitive) < 0; });
     templateKeys << keys;
@@ -165,15 +165,15 @@ void PropertiesListModel::updateRows(const QList<ivm::PropertyTemplate *> &templ
                 rd.editValue = QVariant(QVariant::String);
             }
 
-            if (m_dataObject->hasAttribute(key)) {
-                rd.value = m_dataObject->attr(key);
-                rd.info = ivm::PropertyTemplate::Info::Attribute;
-            } else if (m_dataObject->hasProperty(key)) {
-                rd.value = m_dataObject->prop(key);
-                rd.info = ivm::PropertyTemplate::Info::Property;
-            } else if (propTemplate) {
+            const EntityAttribute attr = m_dataObject->entityAttribute(key);
+            if (!attr.isValid()) {
                 rd.info = propTemplate->info();
+            } else {
+                rd.value = attr.value();
+                rd.info = attr.isProperty() ? ivm::PropertyTemplate::Info::Property
+                                            : ivm::PropertyTemplate::Info::Attribute;
             }
+
             updateRow(rd);
         }
     };
@@ -187,10 +187,7 @@ void PropertiesListModel::setDataObject(ivm::IVObject *obj)
     m_names.clear();
 
     if (m_dataObject) {
-        disconnect(m_dataObject, qOverload<const QString &>(&ivm::IVObject::propertyChanged), this,
-                &PropertiesListModel::invalidateAttributes);
-        disconnect(m_dataObject, qOverload<const QString &>(&ivm::IVObject::attributeChanged), this,
-                &PropertiesListModel::invalidateAttributes);
+        disconnect(m_dataObject, &ivm::IVObject::attributeChanged, this, &PropertiesListModel::invalidateAttributes);
     }
 
     m_dataObject = obj;
@@ -198,10 +195,8 @@ void PropertiesListModel::setDataObject(ivm::IVObject *obj)
     if (!m_dataObject)
         return;
 
-    connect(m_dataObject, qOverload<const QString &>(&ivm::IVObject::propertyChanged), this,
-            &PropertiesListModel::invalidateAttributes, Qt::UniqueConnection);
-    connect(m_dataObject, qOverload<const QString &>(&ivm::IVObject::attributeChanged), this,
-            &PropertiesListModel::invalidateAttributes, Qt::UniqueConnection);
+    connect(m_dataObject, &ivm::IVObject::attributeChanged, this, &PropertiesListModel::invalidateAttributes,
+            Qt::UniqueConnection);
 
     updateRows(m_propTemplatesConfig->propertyTemplatesForObject(m_dataObject));
 }
@@ -276,7 +271,7 @@ bool PropertiesListModel::setData(const QModelIndex &index, const QVariant &valu
                 break;
             }
 
-            if (m_dataObject->attr(name) == attributeValue) {
+            if (m_dataObject->entityAttributeValue(name) == attributeValue) {
                 return false;
             }
 
@@ -291,7 +286,7 @@ bool PropertiesListModel::setData(const QModelIndex &index, const QVariant &valu
         } else if (isProp(index)) {
             switch (index.column()) {
             case Column::Value: {
-                if (m_dataObject->prop(name) == value) {
+                if (m_dataObject->entityAttributeValue(name) == value) {
                     return false;
                 }
 

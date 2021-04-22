@@ -40,8 +40,7 @@ public:
     bool inheritsFunctionType() const;
 
 protected Q_SLOTS:
-    void reflectAttr(ivm::meta::Props::Token attr);
-    void reflectProp(ivm::meta::Props::Token prop);
+    void reflectAttr(const QString &attrName);
     void reflectContextParam();
 
 private:
@@ -49,21 +48,21 @@ private:
 
     struct OriginalPropsHolder {
         // TODO: unite with IVInterface::OriginalPropsHolder
-
-        QString name() const { return attrs.value(meta::Props::token(meta::Props::Token::name)).toString(); }
-        QHash<QString, QVariant> attrs;
-        QHash<QString, QVariant> props;
+        EntityAttributes attrs;
         QVector<ContextParameter> params;
 
+        QString name() const
+        {
+            const QString attrName = meta::Props::token(meta::Props::Token::name);
+            return attrs.value(attrName).value<QString>();
+        }
         inline bool collected() const { return m_collected; }
-
         inline void collect(const IVFunction *src)
         {
             if (m_collected || !src)
                 return;
 
-            attrs = src->attrs();
-            props = src->props();
+            attrs = src->entityAttributes();
             params = src->contextParams();
 
             m_collected = true;
@@ -76,8 +75,7 @@ private:
     void cloneInternals();
     void restoreInternals();
 
-    void reflectAttrs(const QHash<QString, QVariant> &attrs);
-    void reflectProps(const QHash<QString, QVariant> &props);
+    void reflectAttrs(const EntityAttributes &attrs);
     void reflectContextParams(const QVector<ContextParameter> &params);
 };
 

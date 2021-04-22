@@ -20,7 +20,7 @@ IVInterface::CreationInfo init(IVInterface::InterfaceType t, IVFunctionType *fn,
         const bool isRI = t == IVInterface::InterfaceType::Required;
         const QString directionName = isRI ? QLatin1String("RI") : QLatin1String("PI");
         const int number = fn ? (isRI ? fn->ris().size() : fn->pis().size()) : -1;
-        ci.name = QString("%1 #%2").arg(directionName, QString::number(number));
+        ci.name = QString("%1_%2").arg(directionName, QString::number(number));
     }
 
     return ci;

@@ -27,6 +27,9 @@ class IVComment : public IVObject
 public:
     explicit IVComment(const QString &comment = QString(), QObject *parent = nullptr);
     ~IVComment() override;
+
+protected:
+    void setAttributeImpl(const QString &name, const QVariant &value, EntityAttribute::Type type) override;
 };
 
 }

@@ -81,7 +81,7 @@ QVariantList ExportableIVFunction::connectedFunctions() const
     const auto ivFunction = exportedObject<ivm::IVFunctionType>();
     QVariantList list;
     for (auto chain : ivm::IVInterfaceChain::linkedFunctions(ivFunction)) {
-        list << qVariantFromValue(chain);
+        list << QVariant::fromValue(chain);
     }
     return list;
 }
@@ -90,7 +90,7 @@ QVariantList ExportableIVFunction::contextParameters() const
 {
     QVariantList parameters;
     for (const ivm::ContextParameter &param : exportedObject<ivm::IVFunctionType>()->contextParams()) {
-        parameters << qVariantFromValue(param);
+        parameters << QVariant::fromValue(param);
     }
     return parameters;
 }

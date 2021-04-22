@@ -17,15 +17,15 @@
 
 #include "cmdrequiredifacepropertychange.h"
 
-#include "ivconnection.h"
 #include "commandids.h"
+#include "ivconnection.h"
 
 namespace ive {
 namespace cmd {
 
 QVariant getCurrentProperty(const ivm::IVInterfaceRequired *entity, const QString &name)
 {
-    return (entity && !name.isEmpty()) ? entity->prop(name) : QVariant();
+    return (entity && !name.isEmpty()) ? entity->entityAttributeValue(name) : QVariant();
 }
 
 CmdRequiredIfacePropertyChange::CmdRequiredIfacePropertyChange(
@@ -49,7 +49,7 @@ void CmdRequiredIfacePropertyChange::redo()
         break;
     }
     default:
-        m_iface->setProp(m_targetName, m_newValue);
+        m_iface->setEntityProperty(m_targetName, m_newValue);
         break;
     }
 }
@@ -62,7 +62,7 @@ void CmdRequiredIfacePropertyChange::undo()
         break;
     }
     default:
-        m_iface->setProp(m_targetName, m_oldValue);
+        m_iface->setEntityProperty(m_targetName, m_oldValue);
         break;
     }
 }
@@ -84,7 +84,7 @@ void CmdRequiredIfacePropertyChange::setInheritPI(bool nowInherited)
         return;
 
     if (nowInherited) {
-        m_iface->setProp(m_targetName, nowInherited);
+        m_iface->setEntityProperty(m_targetName, nowInherited);
 
         for (auto cmd : m_cmdRmConnection)
             cmd->undo();
@@ -96,7 +96,7 @@ void CmdRequiredIfacePropertyChange::setInheritPI(bool nowInherited)
         for (auto cmd : m_cmdRmConnection)
             cmd->redo();
 
-        m_iface->setProp(m_targetName, nowInherited);
+        m_iface->setEntityProperty(m_targetName, nowInherited);
     }
 }
 
@@ -113,7 +113,7 @@ bool CmdRequiredIfacePropertyChange::connectionMustDie(const ivm::IVConnection *
         return true;
 
     const ivm::IVInterface::OperationKind newKind = m_iface->kindFromString(
-            m_iface->originalAttr(ivm::meta::Props::token(ivm::meta::Props::Token::kind)).toString());
+            m_iface->originalAttributeValue(ivm::meta::Props::token(ivm::meta::Props::Token::kind)).toString());
     if (ivm::IVInterface::OperationKind::Cyclic == newKind) {
         Q_UNREACHABLE(); // m_iface is a RI
         return true;

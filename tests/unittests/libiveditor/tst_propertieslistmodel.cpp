@@ -15,9 +15,9 @@
    along with this program. If not, see <https://www.gnu.org/licenses/lgpl-2.1.html>.
 */
 
-#include "ivfunction.h"
 #include "baseitems/common/ivutils.h"
 #include "interface/properties/propertieslistmodel.h"
+#include "ivfunction.h"
 #include "propertytemplateconfig.h"
 
 #include <QObject>
@@ -44,16 +44,26 @@ void tst_PropertiesListModel::initTestCase()
 
 void tst_PropertiesListModel::tst_object()
 {
-    const QHash<QString, QVariant> attrs {
-        { QLatin1String("Attr1"), QStringLiteral("value_1") },
-        { QLatin1String("Attr2"), QStringLiteral("value_2") },
-        { QLatin1String("Attr3"), QStringLiteral("value_3") },
-        { QLatin1String("Attr4"), QStringLiteral("value_4") },
-        { QLatin1String("Attr5"), QStringLiteral("value_5") },
+    const QHash<QString, EntityAttribute> attrs {
+        { QLatin1String("Attr1"),
+                EntityAttribute {
+                        QLatin1String("Attr1"), QStringLiteral("value_1"), EntityAttribute::Type::Attribute } },
+        { QLatin1String("Attr2"),
+                EntityAttribute {
+                        QLatin1String("Attr2"), QStringLiteral("value_2"), EntityAttribute::Type::Attribute } },
+        { QLatin1String("Attr3"),
+                EntityAttribute {
+                        QLatin1String("Attr3"), QStringLiteral("value_3"), EntityAttribute::Type::Attribute } },
+        { QLatin1String("Attr4"),
+                EntityAttribute {
+                        QLatin1String("Attr4"), QStringLiteral("value_4"), EntityAttribute::Type::Attribute } },
+        { QLatin1String("Attr5"),
+                EntityAttribute {
+                        QLatin1String("Attr5"), QStringLiteral("value_5"), EntityAttribute::Type::Attribute } },
     };
 
     ivm::IVFunction fn;
-    fn.setAttrs(attrs);
+    fn.setEntityAttributes(attrs);
 
     ive::PropertiesListModel plmodel(m_macro, m_config);
     plmodel.setDataObject(&fn);

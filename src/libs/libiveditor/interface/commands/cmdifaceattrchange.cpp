@@ -17,15 +17,15 @@
 
 #include "cmdifaceattrchange.h"
 
-#include "ivconnection.h"
 #include "commandids.h"
+#include "ivconnection.h"
 
 namespace ive {
 namespace cmd {
 
 static inline QVariant getCurrentAttribute(const ivm::IVInterface *entity, const QString &name)
 {
-    return (entity && !name.isEmpty()) ? entity->attr(name) : QVariant();
+    return (entity && !name.isEmpty()) ? entity->entityAttributeValue(name) : QVariant();
 }
 
 CmdIfaceAttrChange::CmdIfaceAttrChange(ivm::IVInterface *entity, const QString &attrName, const QVariant &value)
@@ -45,7 +45,7 @@ void CmdIfaceAttrChange::redo()
         break;
     }
     default:
-        m_iface->setAttr(m_targetName, m_newValue);
+        m_iface->setEntityAttribute(m_targetName, m_newValue);
         break;
     }
 
@@ -63,7 +63,7 @@ void CmdIfaceAttrChange::undo()
         break;
     }
     default:
-        m_iface->setAttr(m_targetName, m_oldValue);
+        m_iface->setEntityAttribute(m_targetName, m_oldValue);
         break;
     }
 
@@ -87,7 +87,7 @@ void CmdIfaceAttrChange::setKind(const QVariant &kind)
     else
         restoreConnections();
 
-    m_iface->setAttr(m_targetName, kind);
+    m_iface->setEntityAttribute(m_targetName, kind);
 }
 
 void CmdIfaceAttrChange::removeConnections()

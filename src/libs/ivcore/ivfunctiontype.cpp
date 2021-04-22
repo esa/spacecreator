@@ -53,10 +53,10 @@ IVFunctionType::IVFunctionType(const IVObject::Type t, const QString &title, QOb
     : IVObject(t, title, parent)
     , d(new IVFunctionTypePrivate)
 {
-    setAttr(meta::Props::token(meta::Props::Token::is_type), QStringLiteral("YES"));
+    setEntityAttribute(meta::Props::token(meta::Props::Token::is_type), QStringLiteral("YES"));
 }
 
-IVFunctionType::~IVFunctionType() {}
+IVFunctionType::~IVFunctionType() { }
 
 QVector<IVObject *> IVFunctionType::children() const
 {

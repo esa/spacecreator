@@ -36,11 +36,11 @@ IVFunction::IVFunction(const QString &title, QObject *parent)
     : IVFunctionType(IVObject::Type::Function, title, parent)
     , d(new IVFunctionPrivate)
 {
-    setAttr(meta::Props::token(meta::Props::Token::is_type), QStringLiteral("NO"));
-    setAttr(meta::Props::token(meta::Props::Token::instance_of), QVariant());
+    setEntityAttribute(meta::Props::token(meta::Props::Token::is_type), QStringLiteral("NO"));
+    setEntityAttribute(meta::Props::token(meta::Props::Token::instance_of), QVariant());
 }
 
-IVFunction::~IVFunction() {}
+IVFunction::~IVFunction() { }
 
 bool IVFunction::postInit()
 {
@@ -51,12 +51,8 @@ void IVFunction::setInstanceOf(IVFunctionType *fnType)
 {
     if (d->m_fnType != fnType) {
         if (d->m_fnType) {
-
             disconnect(d->m_fnType, &IVFunction::contextParamsChanged, this, &IVFunction::reflectContextParam);
-            disconnect(d->m_fnType, qOverload<ivm::meta::Props::Token>(&IVFunction::propertyChanged), this,
-                    &IVFunction::reflectProp);
-            disconnect(d->m_fnType, qOverload<ivm::meta::Props::Token>(&IVFunction::attributeChanged), this,
-                    &IVFunction::reflectAttr);
+            disconnect(d->m_fnType, &IVFunction::attributeChanged, this, &IVFunction::reflectAttr);
 
             restoreInternals();
         }
@@ -66,10 +62,7 @@ void IVFunction::setInstanceOf(IVFunctionType *fnType)
         if (d->m_fnType) {
             cloneInternals();
 
-            connect(d->m_fnType, qOverload<ivm::meta::Props::Token>(&IVFunction::attributeChanged), this,
-                    &IVFunction::reflectAttr);
-            connect(d->m_fnType, qOverload<ivm::meta::Props::Token>(&IVFunction::propertyChanged), this,
-                    &IVFunction::reflectProp);
+            connect(d->m_fnType, &IVFunction::attributeChanged, this, &IVFunction::reflectAttr);
             connect(d->m_fnType, &IVFunction::contextParamsChanged, this, &IVFunction::reflectContextParam);
         }
     }
@@ -82,8 +75,7 @@ void IVFunction::cloneInternals()
     if (d->m_fnType) {
         d->m_fnType->rememberInstance(this);
 
-        reflectAttrs(d->m_fnType->attrs());
-        reflectProps(d->m_fnType->props());
+        reflectAttrs(d->m_fnType->entityAttributes());
         reflectContextParams(d->m_fnType->contextParams());
     }
 }
@@ -95,7 +87,6 @@ void IVFunction::restoreInternals()
 
     if (m_originalFields.collected()) {
         reflectAttrs(m_originalFields.attrs);
-        reflectProps(m_originalFields.props);
         reflectContextParams(m_originalFields.params);
     }
 }
@@ -110,7 +101,22 @@ bool IVFunction::inheritsFunctionType() const
     return instanceOf();
 }
 
-void IVFunction::reflectAttr(ivm::meta::Props::Token attr)
+void IVFunction::reflectAttrs(const EntityAttributes &attributes)
+{
+    EntityAttributes prepared { attributes };
+    static const QList<meta::Props::Token> excludeTokens = { meta::Props::Token::is_type,
+        meta::Props::Token::instance_of, meta::Props::Token::name, meta::Props::Token::InnerCoordinates,
+        meta::Props::Token::coordinates };
+    for (meta::Props::Token t : excludeTokens) {
+        const QString name = meta::Props::token(t);
+        prepared[name] = entityAttribute(name);
+    }
+
+    setEntityAttributes(prepared);
+}
+
+void IVFunction::reflectAttr(const QString &attrName)
+
 {
     if (!d->m_fnType) {
         if (const IVFunctionType *fnType = dynamic_cast<const IVFunctionType *>(sender()))
@@ -118,72 +124,24 @@ void IVFunction::reflectAttr(ivm::meta::Props::Token attr)
                                   .arg(fnType->title(), fnType->id().toString());
         return;
     }
+    const meta::Props::Token attr = meta::Props::token(attrName);
 
     switch (attr) {
     case meta::Props::Token::is_type:
     case meta::Props::Token::instance_of:
     case meta::Props::Token::name:
-        break;
-    case meta::Props::Token::Unknown: {
-        reflectAttrs(d->m_fnType->attrs());
-        break;
-    }
-    default: {
-        const QString &attrName = meta::Props::token(attr);
-        setAttr(attrName, d->m_fnType->attr(attrName));
-        break;
-    }
-    }
-}
-
-void IVFunction::reflectAttrs(const QHash<QString, QVariant> &attrs)
-{
-    QHash<QString, QVariant> prepared(attrs);
-    for (meta::Props::Token t :
-            { meta::Props::Token::is_type, meta::Props::Token::instance_of, meta::Props::Token::name }) {
-        const QString name = meta::Props::token(t);
-        if (prepared.contains(name))
-            prepared.insert(name, attr(name));
-    }
-
-    setAttrs(prepared);
-}
-
-void IVFunction::reflectProp(ivm::meta::Props::Token prop)
-{
-    if (!d->m_fnType) {
-        if (const IVFunctionType *fnType = dynamic_cast<const IVFunctionType *>(sender()))
-            qWarning() << QString("The Function type \"%1\" (%2) has not been disconnected, it seems")
-                                  .arg(fnType->title(), fnType->id().toString());
-        return;
-    }
-
-    switch (prop) {
-    case meta::Props::Token::Unknown: {
-        reflectProps(d->m_fnType->props());
-        break;
-    }
     case meta::Props::Token::InnerCoordinates:
     case meta::Props::Token::coordinates:
         break;
+    case meta::Props::Token::Unknown: {
+        reflectAttrs(d->m_fnType->entityAttributes());
+        break;
+    }
     default: {
-        const QString &propName = meta::Props::token(prop);
-        setProp(propName, d->m_fnType->prop(propName));
+        setEntityAttribute(d->m_fnType->entityAttribute(attrName));
         break;
     }
     }
-}
-
-void IVFunction::reflectProps(const QHash<QString, QVariant> &props)
-{
-    QHash<QString, QVariant> prepared(props);
-    for (meta::Props::Token t : { meta::Props::Token::InnerCoordinates, meta::Props::Token::coordinates }) {
-        const QString name = meta::Props::token(t);
-        if (prepared.contains(name))
-            prepared.insert(name, prop(name));
-    }
-
-    setProps(prepared);
 }
 
 void IVFunction::reflectContextParam()

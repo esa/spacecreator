@@ -37,7 +37,7 @@ void IVInterfaceGroup::addEntity(IVInterface *iface)
         m_entities.append(iface);
 }
 
-void IVInterfaceGroup::setAttr(const QString &name, const QVariant &val)
+void IVInterfaceGroup::setAttributeImpl(const QString &name, const QVariant &value, EntityAttribute::Type type)
 {
     if (name.isEmpty()) {
         return;
@@ -45,7 +45,7 @@ void IVInterfaceGroup::setAttr(const QString &name, const QVariant &val)
 
     const meta::Props::Token t = meta::Props::token(name);
     if (t != meta::Props::Token::name) {
-        IVInterface::setAttr(name, val);
+        IVInterface::setAttributeImpl(name, value, type);
     }
 }
 

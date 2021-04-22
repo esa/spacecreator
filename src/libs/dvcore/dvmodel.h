@@ -15,12 +15,14 @@
    along with this program. If not, see <https://www.gnu.org/licenses/lgpl-2.1.html>.
 */
 
+#include "vemodel.h"
+
 #include <QObject>
 #include <memory>
 
 namespace dvm {
 struct DVModelPrivate;
-class DVModel : public QObject
+class DVModel : public shared::VEModel
 {
     Q_OBJECT
 public:

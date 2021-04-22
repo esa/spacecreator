@@ -68,7 +68,7 @@ void UsagesFinder::findUsages(const QString &module, const QString &type)
     connect(search, &SearchResult::searchAgainRequested, this, &UsagesFinder::searchAgain);
 
     UsagesFinderParameters params{module, type};
-    search->setUserData(qVariantFromValue(params));
+    search->setUserData(QVariant::fromValue(params));
 
     findAll(search, params);
 }

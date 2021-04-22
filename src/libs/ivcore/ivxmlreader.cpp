@@ -302,8 +302,7 @@ void IVXMLReader::processTagOpen(QXmlStreamReader &xml)
                 attrs.value(Props::token(Props::Token::is_type), QStringLiteral("no")).m_value.toLower()
                 == QStringLiteral("yes");
 
-        obj = addFunction(
-                nameAttr.m_value, isFunctionType ? IVObject::Type::FunctionType : IVObject::Type::Function);
+        obj = addFunction(nameAttr.m_value, isFunctionType ? IVObject::Type::FunctionType : IVObject::Type::Function);
         break;
     }
     case Props::Token::Provided_Interface:
@@ -322,7 +321,8 @@ void IVXMLReader::processTagOpen(QXmlStreamReader &xml)
         Q_ASSERT(d->m_currentObject.iface() != nullptr);
 
         const InterfaceParameter param = addIfaceParameter(nameAttr.m_value, attrs,
-                t == Props::Token::Input_Parameter ? InterfaceParameter::Direction::IN : InterfaceParameter::Direction::OUT);
+                t == Props::Token::Input_Parameter ? InterfaceParameter::Direction::IN
+                                                   : InterfaceParameter::Direction::OUT);
         d->m_currentObject.iface()->addParam(param);
         break;
     }
@@ -357,7 +357,7 @@ void IVXMLReader::processTagOpen(QXmlStreamReader &xml)
         break;
     }
     case Props::Token::Property: {
-        d->m_currentObject.get()->setProp(nameAttr.m_value, attrs.value(Props::token(Props::Token::value)).m_value);
+        d->m_currentObject.get()->setEntityProperty(nameAttr.m_value, attrs.value(Props::token(Props::Token::value)).m_value);
         break;
     }
     case Props::Token::ContextParameter: {
@@ -382,9 +382,9 @@ void IVXMLReader::processTagOpen(QXmlStreamReader &xml)
     }
 
     if (obj) {
-        for (const XmlAttribute &xmlAttr : attrs)
-            obj->setAttr(xmlAttr.m_name, xmlAttr.m_value);
-
+        for (const XmlAttribute &xmlAttr : attrs) {
+            obj->setEntityAttribute(xmlAttr.m_name, xmlAttr.m_value);
+        }
         d->setCurrentObject(obj);
     }
 }
@@ -412,7 +412,7 @@ IVFunctionType *IVXMLReader::addFunction(const QString &name, IVObject::Type fnT
     const bool isFunctionType = fnType == IVObject::Type::FunctionType;
 
     IVFunctionType *fn = isFunctionType ? new IVFunctionType(name, d->m_currentObject.get())
-                                          : new IVFunction(name, d->m_currentObject.get());
+                                        : new IVFunction(name, d->m_currentObject.get());
 
     if (d->m_currentObject.function())
         d->m_currentObject.function()->addChild(fn);

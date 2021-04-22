@@ -29,7 +29,7 @@ static inline QVariantHash getCurrentProperties(ivm::IVObject *entity, const QVa
 {
     QVariantHash result;
     for (auto it = props.constBegin(); it != props.constEnd(); ++it)
-        result.insert(it.key(), entity->prop(it.key()));
+        result.insert(it.key(), entity->entityAttributeValue(it.key()));
     return result;
 }
 
@@ -45,13 +45,13 @@ CmdEntityPropertyChange::CmdEntityPropertyChange(ivm::IVObject *entity, const QV
 void CmdEntityPropertyChange::redo()
 {
     for (auto it = m_newProps.constBegin(); it != m_newProps.constEnd(); ++it)
-        m_entity->setProp(it.key(), it.value());
+        m_entity->setEntityProperty(it.key(), it.value());
 }
 
 void CmdEntityPropertyChange::undo()
 {
     for (auto it = m_oldProps.constBegin(); it != m_oldProps.constEnd(); ++it)
-        m_entity->setProp(it.key(), it.value());
+        m_entity->setEntityProperty(it.key(), it.value());
 }
 
 bool CmdEntityPropertyChange::mergeWith(const QUndoCommand *command)

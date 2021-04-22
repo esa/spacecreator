@@ -17,12 +17,12 @@
 
 #include "ivmodel.h"
 
+#include "common.h"
 #include "ivcomment.h"
 #include "ivconnection.h"
 #include "ivfunction.h"
 #include "ivfunctiontype.h"
 #include "ivnamevalidator.h"
-#include "common.h"
 #include "propertytemplate.h"
 #include "propertytemplateconfig.h"
 
@@ -41,7 +41,7 @@ struct IVModelPrivate {
 };
 
 IVModel::IVModel(PropertyTemplateConfig *dynPropConfig, QObject *parent)
-    : QObject(parent)
+    : shared::VEModel(parent)
     , d(new IVModelPrivate)
 {
     d->m_dynPropConfig = dynPropConfig;
@@ -101,22 +101,22 @@ bool IVModel::addObjectImpl(IVObject *obj)
         obj->setParent(this);
     }
 
-    obj->setObjectsModel(this);
+    obj->setModel(this);
 
     d->m_objects.insert(id, obj);
     d->m_objectsOrder.append(id);
     d->m_visibleObjects.append(obj);
 
-    for (auto attr : d->m_dynPropConfig->propertyTemplatesForObject(obj)) {
+    for (const auto attr : d->m_dynPropConfig->propertyTemplatesForObject(obj)) {
         if (attr->validate(obj)) {
-            const QVariant &currentValue = obj->attr(attr->name());
+            const QVariant &currentValue = obj->entityAttributeValue(attr->name());
             if (currentValue.isNull()) {
                 const QVariant &defaultValue = attr->defaultValue();
                 if (!defaultValue.isNull()) {
                     if (attr->info() == ivm::PropertyTemplate::Info::Attribute) {
-                        obj->setAttr(attr->name(), defaultValue);
+                        obj->setEntityAttribute(attr->name(), defaultValue);
                     } else if (attr->info() == ivm::PropertyTemplate::Info::Property) {
-                        obj->setProp(attr->name(), defaultValue);
+                        obj->setEntityProperty(attr->name(), defaultValue);
                     } else {
                         qWarning() << "Unknown dynamic property info:" << attr->info();
                     }
@@ -194,8 +194,7 @@ IVObject *IVModel::getObject(const shared::Id &id) const
     return d->m_objects.value(id, nullptr);
 }
 
-IVObject *IVModel::getObjectByName(
-        const QString &name, IVObject::Type type, Qt::CaseSensitivity caseSensitivity) const
+IVObject *IVModel::getObjectByName(const QString &name, IVObject::Type type, Qt::CaseSensitivity caseSensitivity) const
 {
     if (name.isEmpty())
         return nullptr;

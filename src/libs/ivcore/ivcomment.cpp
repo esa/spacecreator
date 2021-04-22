@@ -30,4 +30,11 @@ IVComment::IVComment(const QString &title, QObject *parent)
 
 IVComment::~IVComment() { }
 
+void IVComment::setAttributeImpl(const QString &name, const QVariant &value, EntityAttribute::Type type)
+{
+    if (type == EntityAttribute::Type::Attribute) {
+        IVObject::setAttributeImpl(name, value, type);
+    }
+}
+
 }

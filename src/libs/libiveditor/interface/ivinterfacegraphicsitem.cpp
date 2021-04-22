@@ -62,8 +62,7 @@ ivm::IVInterface *IVInterfaceGraphicsItem::entity() const
 void IVInterfaceGraphicsItem::init()
 {
     InteractiveObject::init();
-    connect(entity(), qOverload<ivm::meta::Props::Token>(&ivm::IVObject::attributeChanged), this,
-            &IVInterfaceGraphicsItem::onAttrOrPropChanged);
+    connect(entity(), &ivm::IVObject::attributeChanged, this, &IVInterfaceGraphicsItem::onAttrOrPropChanged);
     connect(entity(), &ivm::IVInterface::titleChanged, this, &IVInterfaceGraphicsItem::updateLabel);
     if (auto ri = qobject_cast<ivm::IVInterfaceRequired *>(entity()))
         connect(ri, &ivm::IVInterfaceRequired::inheritedLabelsChanged, this, &IVInterfaceGraphicsItem::updateLabel);
@@ -279,7 +278,7 @@ void IVInterfaceGraphicsItem::layout()
     ivm::meta::Props::Token token = entity()->coordinatesType();
     while (pos.isNull() && idx < types.size()) {
         token = types.at(idx);
-        const QString strCoordinates = entity()->prop(ivm::meta::Props::token(token)).toString();
+        const QString strCoordinates = entity()->entityAttributeValue<QString>(ivm::meta::Props::token(token));
         pos = ive::pos(ivm::IVObject::coordinatesFromString(strCoordinates));
         ++idx;
     }
@@ -291,9 +290,9 @@ void IVInterfaceGraphicsItem::layout()
     }
 
     const auto parentFn = entity()->parentObject()->as<ivm::IVFunctionType *>();
-    const QRectF fnRect =
-            ive::rect(ivm::IVObject::coordinatesFromString(parentFn->prop(ivm::meta::Props::token(token)).toString()))
-                    .normalized();
+    const QRectF fnRect = ive::rect(
+            ivm::IVObject::coordinatesFromString(parentFn->entityAttributeValue<QString>(ivm::meta::Props::token(token))))
+                                  .normalized();
     const auto side = getNearestSide(fnRect, pos);
     pos = getSidePosition(fnRect, pos, side);
 
@@ -452,8 +451,10 @@ void IVInterfaceGraphicsItem::adjustItem()
                 break;
             }
         }
-        for (auto connection : m_connections) {
-            connection->layout();
+        for (IVConnectionGraphicsItem *connection : qAsConst(m_connections)) {
+            if (connection) {
+                connection->layout();
+            }
         }
     }
 }
@@ -520,8 +521,9 @@ QString IVInterfaceGraphicsItem::prepareTooltip() const
     return toolTip;
 }
 
-void IVInterfaceGraphicsItem::onAttrOrPropChanged(ivm::meta::Props::Token t)
+void IVInterfaceGraphicsItem::onAttrOrPropChanged(const QString &attrName)
 {
+    const ivm::meta::Props::Token t = ivm::meta::Props::token(attrName);
     switch (t) {
         //    ivm::meta::Props::Token::name: // handled in IVInterfaceGraphicsItem::updateLabel
     case ivm::meta::Props::Token::InheritPI: {

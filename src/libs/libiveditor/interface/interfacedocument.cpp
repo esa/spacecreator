@@ -17,14 +17,6 @@
 
 #include "interfacedocument.h"
 
-#include "ivcomment.h"
-#include "ivconnection.h"
-#include "ivconnectiongroup.h"
-#include "ivfunction.h"
-#include "ivfunctiongraphicsitem.h"
-#include "ivitemmodel.h"
-#include "ivmodel.h"
-#include "ivxmlreader.h"
 #include "actionsbar.h"
 #include "asn1modelstorage.h"
 #include "baseitems/common/ivutils.h"
@@ -43,6 +35,14 @@
 #include "interface/properties/propertiesdialog.h"
 #include "interface/properties/propertytemplatemanager.h"
 #include "interface/properties/propertytemplatewidget.h"
+#include "ivcomment.h"
+#include "ivconnection.h"
+#include "ivconnectiongroup.h"
+#include "ivfunction.h"
+#include "ivfunctiongraphicsitem.h"
+#include "ivitemmodel.h"
+#include "ivmodel.h"
+#include "ivxmlreader.h"
 #include "propertytemplateconfig.h"
 #include "xmldocexporter.h"
 
@@ -306,7 +306,7 @@ QList<ivm::IVObject *> InterfaceDocument::prepareSelectedObjectsForExport(QStrin
         const int role = static_cast<int>(ive::CommonVisualizationModel::IdRole);
         if (ivm::IVObject *object = d->objectsModel->getObject(id.data(role).toUuid())) {
             if (object->isFunction() && object->parentObject() == nullptr) {
-                exportNames.append(object->attr(QLatin1String("name")).toString());
+                exportNames.append(object->entityAttributeValue<QString>(QLatin1String("name")));
             }
             objects.append(object);
         }
@@ -697,8 +697,7 @@ void InterfaceDocument::showPropertyEditor(const shared::Id &id)
     }
 
     ivm::IVObject *obj = d->objectsModel->getObject(id);
-    if (!obj || obj->type() == ivm::IVObject::Type::InterfaceGroup
-            || obj->type() == ivm::IVObject::Type::Connection) {
+    if (!obj || obj->type() == ivm::IVObject::Type::InterfaceGroup || obj->type() == ivm::IVObject::Type::Connection) {
         return;
     }
 

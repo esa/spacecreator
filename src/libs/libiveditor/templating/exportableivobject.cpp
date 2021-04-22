@@ -17,15 +17,15 @@
 
 #include "exportableivobject.h"
 
-#include "ivobject.h"
-#include "ivconnection.h"
-#include "ivconnectiongroup.h"
-#include "ivfunctiontype.h"
 #include "exportableivconnection.h"
 #include "exportableivconnectiongroup.h"
 #include "exportableivfunction.h"
 #include "exportableivinterface.h"
 #include "exportableproperty.h"
+#include "ivconnection.h"
+#include "ivconnectiongroup.h"
+#include "ivfunctiontype.h"
+#include "ivobject.h"
 
 namespace ive {
 
@@ -75,19 +75,16 @@ QVariant ExportableIVObject::createFrom(const ivm::IVObject *ivObject)
         return {};
     case ivm::IVObject::Type::Function:
     case ivm::IVObject::Type::FunctionType:
-        return QVariant::fromValue(
-                ExportableIVFunction(static_cast<const ivm::IVFunctionType *>(ivObject)));
+        return QVariant::fromValue(ExportableIVFunction(static_cast<const ivm::IVFunctionType *>(ivObject)));
     case ivm::IVObject::Type::RequiredInterface:
     case ivm::IVObject::Type::ProvidedInterface:
         return QVariant::fromValue(ExportableIVInterface(static_cast<const ivm::IVInterface *>(ivObject)));
     case ivm::IVObject::Type::Comment:
         return QVariant::fromValue(ExportableIVObject(ivObject));
     case ivm::IVObject::Type::Connection:
-        return QVariant::fromValue(
-                ExportableIVConnection(static_cast<const ivm::IVConnection *>(ivObject)));
+        return QVariant::fromValue(ExportableIVConnection(static_cast<const ivm::IVConnection *>(ivObject)));
     case ivm::IVObject::Type::ConnectionGroup:
-        return QVariant::fromValue(
-                ExportableIVConnectionGroup(static_cast<const ivm::IVConnectionGroup *>(ivObject)));
+        return QVariant::fromValue(ExportableIVConnectionGroup(static_cast<const ivm::IVConnectionGroup *>(ivObject)));
     default:
         Q_UNREACHABLE();
     }
@@ -100,7 +97,7 @@ QVariant ExportableIVObject::createFrom(const ivm::IVObject *ivObject)
  */
 QVariantList ExportableIVObject::attributes() const
 {
-    return generateProperties(exportedObject<ivm::IVObject>()->attrs());
+    return generateProperties(exportedObject<ivm::IVObject>()->entityAttributes(), false);
 }
 
 /**
@@ -109,7 +106,7 @@ QVariantList ExportableIVObject::attributes() const
  */
 QVariantList ExportableIVObject::properties() const
 {
-    return generateProperties(exportedObject<ivm::IVObject>()->props());
+    return generateProperties(exportedObject<ivm::IVObject>()->entityAttributes(), true);
 }
 
 QStringList ExportableIVObject::path() const
@@ -122,11 +119,14 @@ QStringList ExportableIVObject::path() const
  * @param props can be hash of attributes or properties of IVObject.
  * @return sorted QVariantList which can be used in string templates
  */
-QVariantList ExportableIVObject::generateProperties(const QHash<QString, QVariant> &props)
+QVariantList ExportableIVObject::generateProperties(const EntityAttributes &attributes, bool isProperty)
 {
     QVariantList result;
-    for (auto it = props.cbegin(); it != props.cend(); ++it)
-        result << QVariant::fromValue(templating::ExportableProperty(it.key(), it.value()));
+    for (auto it = attributes.cbegin(); it != attributes.cend(); ++it) {
+        if (it.value().isProperty() == isProperty) {
+            result << QVariant::fromValue(templating::ExportableProperty(it.key(), it.value().value()));
+        }
+    }
 
     std::sort(result.begin(), result.end(), [](const QVariant &left_val, const QVariant &right_val) {
         const auto &r = right_val.value<templating::ExportableProperty>();

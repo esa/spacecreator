@@ -65,7 +65,6 @@ InteractiveObjectBase::~InteractiveObjectBase()
 void InteractiveObjectBase::paint(QPainter *painter, const QStyleOptionGraphicsItem *, QWidget *)
 {
     if (isSelected()) {
-        auto pen = painter->pen();
         painter->setPen(d->selectedPen);
         painter->drawRect(d->boundingRect);
     }

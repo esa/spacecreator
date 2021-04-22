@@ -29,7 +29,7 @@ static inline QVariantHash getCurrentProperties(ivm::IVObject *entity, const QSt
 {
     QVariantHash result;
     for (const QString &prop : props)
-        result.insert(prop, entity->prop(prop));
+        result.insert(prop, entity->entityAttributeValue(prop));
     return result;
 }
 
@@ -44,18 +44,18 @@ CmdEntityPropertyRemove::CmdEntityPropertyRemove(ivm::IVObject *entity, const QS
 
 void CmdEntityPropertyRemove::redo()
 {
-    QVariantHash props = m_entity->props();
+    EntityAttributes props = m_entity->entityAttributes();
     for (const QString &name : m_names)
         props.remove(name);
-    m_entity->setProps(props);
+    m_entity->setEntityAttributes(props);
 }
 
 void CmdEntityPropertyRemove::undo()
 {
-    QVariantHash props = m_entity->props();
+    EntityAttributes props = m_entity->entityAttributes();
     for (auto it = m_props.constBegin(); it != m_props.constEnd(); ++it)
-        props[it.key()] = it.value();
-    m_entity->setProps(props);
+        props[it.key()].setValue(it.value());
+    m_entity->setEntityAttributes(props);
 }
 
 bool CmdEntityPropertyRemove::mergeWith(const QUndoCommand *)

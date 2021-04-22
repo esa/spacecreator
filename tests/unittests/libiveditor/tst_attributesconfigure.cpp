@@ -15,15 +15,15 @@
    along with this program. If not, see <https://www.gnu.org/licenses/lgpl-2.1.html>.
 */
 
+#include "baseitems/common/ivutils.h"
 #include "ivcomment.h"
 #include "ivcommonprops.h"
 #include "ivconnection.h"
+#include "iveditor.h"
 #include "ivfunction.h"
 #include "ivfunctiontype.h"
 #include "ivinterface.h"
 #include "ivlibrary.h"
-#include "baseitems/common/ivutils.h"
-#include "iveditor.h"
 #include "propertytemplate.h"
 #include "propertytemplateconfig.h"
 
@@ -314,7 +314,7 @@ void tst_AttributesConfigure::tst_attrValidators()
     ivm::PropertyTemplate attrTemplate;
 
     ivm::IVComment comment;
-    comment.setAttr(QLatin1String("Custom_Comment_Attribute"), QStringLiteral("TextValue"));
+    comment.setEntityAttribute(QLatin1String("Custom_Comment_Attribute"), QStringLiteral("TextValue"));
 
     ivm::IVFunctionType fnType;
     ivm::IVFunction fn;
@@ -333,7 +333,7 @@ void tst_AttributesConfigure::tst_attrValidators()
     ivm::IVInterfaceProvided provIface(ci);
 
     ivm::IVConnection connection(&reqIface, &provIface);
-    comment.setAttr(QLatin1String("Custom_Connection_Attribute"), QStringLiteral("0123456789"));
+    comment.setEntityAttribute(QLatin1String("Custom_Connection_Attribute"), QStringLiteral("0123456789"));
 
     const QMap<ivm::PropertyTemplate::Scope, QPair<QString, QString>> validators {
         { ivm::PropertyTemplate::Scope::Function, { "name", "[a-zA-Z_]+[\\d\\w]*" } },
@@ -371,16 +371,16 @@ void tst_AttributesConfigure::tst_attrValidators()
 
     attrTemplate.setScope(ivm::PropertyTemplate::Scope::Comment);
     QVERIFY(attrTemplate.validate(&comment));
-    comment.setAttr(QLatin1String("Custom_Comment_Attribute"), QStringLiteral("23663 sdbsdfn 457"));
+    comment.setEntityAttribute(QLatin1String("Custom_Comment_Attribute"), QStringLiteral("23663 sdbsdfn 457"));
     QVERIFY(!attrTemplate.validate(&comment));
-    comment.setAttr(QLatin1String("Custom_Comment_Attribute"), QStringLiteral("dfzdfbxdbfSFB457"));
+    comment.setEntityAttribute(QLatin1String("Custom_Comment_Attribute"), QStringLiteral("dfzdfbxdbfSFB457"));
     QVERIFY(attrTemplate.validate(&comment));
 
     attrTemplate.setScope(ivm::PropertyTemplate::Scope::Connection);
     QVERIFY(attrTemplate.validate(&connection));
-    connection.setAttr(QLatin1String("Custom_Connection_Attribute"), QStringLiteral("23663457"));
+    connection.setEntityAttribute(QLatin1String("Custom_Connection_Attribute"), QStringLiteral("23663457"));
     QVERIFY(attrTemplate.validate(&connection));
-    connection.setAttr(QLatin1String("Custom_Connection_Attribute"), QStringLiteral("dfzdf bxdbfSFB 457"));
+    connection.setEntityAttribute(QLatin1String("Custom_Connection_Attribute"), QStringLiteral("dfzdf bxdbfSFB 457"));
     QVERIFY(!attrTemplate.validate(&connection));
 }
 

@@ -87,7 +87,7 @@ bool Condition::isAcceptable(ivm::IVObject *obj) const
 
     for (const AttrHandler &attr : m_attrs) {
         if (attr.m_value != "*")
-            if (obj && obj->attr(attr.m_title, QString()).toString() != attr.m_value)
+            if (obj && obj->entityAttributeValue<QString>(attr.m_title) != attr.m_value)
                 return false;
     }
 

@@ -17,12 +17,6 @@
 
 #include "ivitemmodel.h"
 
-#include "ivcomment.h"
-#include "ivconnection.h"
-#include "ivconnectiongroup.h"
-#include "ivfunction.h"
-#include "ivinterface.h"
-#include "ivinterfacegroup.h"
 #include "baseitems/common/ivutils.h"
 #include "commands/cmdrootentitychange.h"
 #include "commandsstack.h"
@@ -35,6 +29,12 @@
 #include "interface/ivinterfacegraphicsitem.h"
 #include "interface/ivinterfacegroupgraphicsitem.h"
 #include "interfacetabgraphicsscene.h"
+#include "ivcomment.h"
+#include "ivconnection.h"
+#include "ivconnectiongroup.h"
+#include "ivfunction.h"
+#include "ivinterface.h"
+#include "ivinterfacegroup.h"
 
 #include <QGraphicsView>
 #include <QGuiApplication>
@@ -50,9 +50,7 @@ static inline void dumpItem(QObject *obj, bool strict = false)
     if (!item)
         return;
 
-    qDebug() << item->metaObject()->className() << "\n"
-             << item->entity()->props() << "\n"
-             << item->entity()->attrs();
+    qDebug() << item->metaObject()->className() << "\n" << item->entity()->props() << "\n" << item->entity()->attrs();
 
     if (auto iface = qobject_cast<ive::IVInterfaceGraphicsItem *>(item)) {
         qDebug() << "\nGraphics Iface geometry:\n" << iface->scenePos() << "\n" << iface->sceneBoundingRect() << "\n";
@@ -211,8 +209,8 @@ void IVItemModel::onConnectionAddedToGroup(ivm::IVConnection *connection)
         auto ifaceObject = connectionGroupEndPoint->function()->id() == connection->source()->id()
                 ? connection->sourceInterface()
                 : connectionGroupEndPoint->function()->id() == connection->target()->id()
-                        ? connection->targetInterface()
-                        : nullptr;
+                ? connection->targetInterface()
+                : nullptr;
         if (auto ifaceItem = getItem<IVInterfaceGraphicsItem *>(ifaceObject->id())) {
             for (auto ifaceConnection : ifaceItem->connectionItems()) {
                 if (ifaceConnection->entity()->id() == connection->id()) {
@@ -251,8 +249,8 @@ void IVItemModel::onConnectionRemovedFromGroup(ivm::IVConnection *connection)
         auto ifaceObject = connectionGroupEndPoint->function()->id() == connection->source()->id()
                 ? connection->sourceInterface()
                 : connectionGroupEndPoint->function()->id() == connection->target()->id()
-                        ? connection->targetInterface()
-                        : nullptr;
+                ? connection->targetInterface()
+                : nullptr;
         if (auto ifaceItem = getItem<IVInterfaceGraphicsItem *>(connectionGroupEndPoint->id())) {
             for (auto ifaceConnection : ifaceItem->connectionItems()) {
                 const bool currentHandledConnection = ifaceConnection->entity()->id() == connection->id();
@@ -336,24 +334,24 @@ void IVItemModel::removeItemForObject(ivm::IVObject *object)
 
 void IVItemModel::setupInnerGeometry(ivm::IVObject *obj) const
 {
-    static const QSet<ivm::IVObject::Type> kTypes { ivm::IVObject::Type::FunctionType,
-        ivm::IVObject::Type::Function, ivm::IVObject::Type::Comment };
+    static const QSet<ivm::IVObject::Type> kTypes { ivm::IVObject::Type::FunctionType, ivm::IVObject::Type::Function,
+        ivm::IVObject::Type::Comment };
 
     if (!obj || !kTypes.contains(obj->type())) {
         return;
     }
 
-    QVariant innerCoord = obj->prop(ivm::meta::Props::token(ivm::meta::Props::Token::InnerCoordinates));
+    QVariant innerCoord = obj->entityAttributeValue(ivm::meta::Props::token(ivm::meta::Props::Token::InnerCoordinates));
     if (innerCoord.isValid()) {
         return;
     }
-    ivm::IVFunctionType *parentObj =
-            obj->parentObject() ? obj->parentObject()->as<ivm::IVFunctionType *>() : nullptr;
+    ivm::IVFunctionType *parentObj = obj->parentObject() ? obj->parentObject()->as<ivm::IVFunctionType *>() : nullptr;
     if (!parentObj) {
         return;
     }
     QRectF rootGeometry;
-    const QVariant rootCoord = parentObj->prop(ivm::meta::Props::token(ivm::meta::Props::Token::RootCoordinates));
+    const QVariant rootCoord =
+            parentObj->entityAttributeValue(ivm::meta::Props::token(ivm::meta::Props::Token::RootCoordinates));
     if (rootCoord.isValid()) {
         rootGeometry = ive::rect(ivm::IVObject::coordinatesFromString(rootCoord.toString()));
     }
@@ -361,7 +359,7 @@ void IVItemModel::setupInnerGeometry(ivm::IVObject *obj) const
     QRectF innerItemsGeometry;
     for (const ivm::IVObject *child : parentObj->children()) {
         if (kTypes.contains(child->type())) {
-            innerCoord = child->prop(ivm::meta::Props::token(ivm::meta::Props::Token::InnerCoordinates));
+            innerCoord = child->entityAttributeValue(ivm::meta::Props::token(ivm::meta::Props::Token::InnerCoordinates));
             if (!innerCoord.isValid()) {
                 continue;
             }
@@ -387,10 +385,10 @@ void IVItemModel::setupInnerGeometry(ivm::IVObject *obj) const
     }
 
     const QString strRootCoord = ivm::IVObject::coordinatesToString(ive::coordinates(rootGeometry));
-    parentObj->setProp(ivm::meta::Props::token(ivm::meta::Props::Token::RootCoordinates), strRootCoord);
+    parentObj->setEntityProperty(ivm::meta::Props::token(ivm::meta::Props::Token::RootCoordinates), strRootCoord);
 
     const QString strCoord = ivm::IVObject::coordinatesToString(ive::coordinates(innerGeometry));
-    obj->setProp(ivm::meta::Props::token(ivm::meta::Props::Token::InnerCoordinates), strCoord);
+    obj->setEntityProperty(ivm::meta::Props::token(ivm::meta::Props::Token::InnerCoordinates), strCoord);
 }
 
 void IVItemModel::clearScene()

@@ -90,7 +90,7 @@ protected Q_SLOTS:
     virtual void applyColorScheme() override;
     void updateKind();
     void updateIface();
-    void onAttrOrPropChanged(ivm::meta::Props::Token t);
+    void onAttrOrPropChanged(const QString &attrName);
 
     virtual QPainterPath ifacePath() const;
     virtual QPainterPath typePath() const;

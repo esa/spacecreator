@@ -22,6 +22,7 @@
 
 #include <QPointer>
 #include <QVector>
+#include <QtDebug>
 
 namespace ivm {
 
@@ -32,44 +33,30 @@ namespace ivm {
 
 struct IVObjectPrivate {
     IVObjectPrivate(const shared::Id &id, const IVObject::Type t)
-        : m_id(id == shared::InvalidId ? shared::createId() : id)
-        , m_attrs()
-        , m_props()
-        , m_model(nullptr)
-        , m_type(t)
+        : m_type(t)
     {
     }
 
-    const shared::Id m_id;
-    QHash<QString, QVariant> m_attrs;
-    QHash<QString, QVariant> m_props;
-    IVModel *m_model;
     const IVObject::Type m_type;
 };
 
 IVObject::IVObject(const IVObject::Type t, const QString &title, QObject *parent, const shared::Id &id)
-    : QObject(parent)
+    : shared::VEObject(id, parent)
     , d(new IVObjectPrivate(id, t))
 {
-    connect(this, qOverload<const QString &>(&IVObject::propertyChanged), this,
-            [this](const QString &token) { Q_EMIT propertyChanged(meta::Props::token(token)); });
-
-    connect(this, qOverload<const QString &>(&IVObject::attributeChanged), this,
-            [this](const QString &token) { Q_EMIT attributeChanged(meta::Props::token(token)); });
-
     if (const IVObject *parentObject = qobject_cast<const IVObject *>(parent))
-        setObjectsModel(parentObject->model());
+        setModel(parentObject->model());
     else if (IVModel *model = qobject_cast<IVModel *>(parent))
-        setObjectsModel(model);
+        setModel(model);
 
-    setAttr(meta::Props::token(meta::Props::Token::name), title);
+    setEntityAttribute(meta::Props::token(meta::Props::Token::name), title);
 }
 
 IVObject::~IVObject() { }
 
 QString IVObject::title() const
 {
-    return attr(meta::Props::token(meta::Props::Token::name)).toString();
+    return entityAttributeValue<QString>(meta::Props::token(meta::Props::Token::name));
 }
 
 QString IVObject::titleUI() const
@@ -95,11 +82,6 @@ void IVObject::sortObjectList(QList<IVObject *> &objects)
             [](ivm::IVObject *obj1, ivm::IVObject *obj2) { return obj1->type() < obj2->type(); });
 }
 
-shared::Id IVObject::id() const
-{
-    return d->m_id;
-}
-
 IVObject::Type IVObject::type() const
 {
     return d->m_type;
@@ -108,47 +90,16 @@ IVObject::Type IVObject::type() const
 bool IVObject::setTitle(const QString &title)
 {
     if (!title.isEmpty() && title != this->title()) {
-        setAttr(meta::Props::token(meta::Props::Token::name), title);
+        setEntityAttribute(meta::Props::token(meta::Props::Token::name), title);
         return true;
     }
     return false;
 }
 
-bool IVObject::setParentObject(IVObject *parentObject)
-{
-    if (parent() == parentObject)
-        return false;
-
-    setParent(parentObject);
-    return true;
-}
-
-QVector<qint32> IVObject::coordinatesFromString(const QString &strCoordinates)
-{
-    const QStringList &strCoords = strCoordinates.split(' ', QString::SkipEmptyParts);
-    const int coordsCount = strCoords.size();
-    QVector<qint32> coords(coordsCount);
-    for (int i = 0; i < coordsCount; ++i)
-        coords[i] = strCoords[i].toLong() / 100;
-    return coords;
-}
-
-QString IVObject::coordinatesToString(const QVector<qint32> &coordinates)
-{
-    QString coordString;
-    for (auto coord : coordinates) {
-        if (!coordString.isEmpty())
-            coordString.append(' ');
-        coordString.append(QString::number(coord * 100));
-    }
-
-    return coordString;
-}
-
 QVector<qint32> IVObject::coordinates() const
 {
     const meta::Props::Token token = coordinatesType();
-    const QVariant varCoord = prop(meta::Props::token(token));
+    const QVariant varCoord = entityAttributeValue(meta::Props::token(token));
     return coordinatesFromString(varCoord.toString());
 }
 
@@ -158,7 +109,7 @@ void IVObject::setCoordinates(const QVector<qint32> &coordinates)
         return;
 
     const meta::Props::Token token = coordinatesType();
-    setProp(meta::Props::token(token), coordinatesToString(coordinates));
+    setEntityProperty(meta::Props::token(token), coordinatesToString(coordinates));
     Q_EMIT coordinatesChanged(coordinates);
 }
 
@@ -197,8 +148,7 @@ QStringList IVObject::path(const IVObject *obj)
     QStringList list { obj->title() };
     IVObject *parent = obj->parentObject();
     while (parent) {
-        if (parent->type() == ivm::IVObject::Type::Function
-                || parent->type() == ivm::IVObject::Type::FunctionType) {
+        if (parent->type() == ivm::IVObject::Type::Function || parent->type() == ivm::IVObject::Type::FunctionType) {
             list.prepend(parent->title());
         }
         parent = parent->parentObject();
@@ -277,180 +227,77 @@ bool IVObject::isNested() const
 
 QString IVObject::groupName() const
 {
-    return attr(meta::Props::token(meta::Props::Token::group_name)).toString();
+    return entityAttributeValue<QString>(meta::Props::token(meta::Props::Token::group_name));
 }
 
 void IVObject::setGroupName(const QString &groupName)
 {
     if (groupName.isEmpty()) {
-        removeAttr(meta::Props::token(meta::Props::Token::group_name));
+        removeEntityAttribute(meta::Props::token(meta::Props::Token::group_name));
     } else {
-        setAttr(meta::Props::token(meta::Props::Token::group_name), groupName);
+        setEntityAttribute(meta::Props::token(meta::Props::Token::group_name), groupName);
     }
 }
 
-QHash<QString, QVariant> IVObject::attrs() const
+void IVObject::setEntityAttributes(const EntityAttributes &attributes)
 {
-    return d->m_attrs;
-}
+    clearAttributes();
+    QList<EntityAttribute> attrs = attributes.values();
+    std::sort(attrs.begin(), attrs.end(), [](const EntityAttribute &a1, const EntityAttribute &a2) {
+        return meta::Props::token(a1.name()) > meta::Props::token(a2.name());
+    });
 
-void IVObject::setAttrs(const QHash<QString, QVariant> &attrs)
-{
-    if (d->m_attrs != attrs) {
-        d->m_attrs.clear();
-
-        for (auto i = attrs.cbegin(); i != attrs.cend(); ++i)
-            setAttr(i.key(), i.value());
+    for (const EntityAttribute &attribute : qAsConst(attrs)) {
+        setEntityAttribute(attribute);
     }
 }
 
-QVariant IVObject::attr(const QString &name, const QVariant &defaultValue) const
+void IVObject::setAttributeImpl(const QString &attributeName, const QVariant &value, EntityAttribute::Type type)
 {
-    return d->m_attrs.value(name, defaultValue);
-}
-
-void IVObject::setAttr(const QString &name, const QVariant &val)
-{
-    if (!name.isEmpty() && val != d->m_attrs[name]) {
-        const meta::Props::Token t = meta::Props::token(name);
+    if (!attributeName.isEmpty()) {
+        EntityAttribute attr = entityAttribute(attributeName);
+        if (attr.isValid() && attr.value() == value) {
+            return;
+        }
+        attr = EntityAttribute { attributeName, value, type };
+        const meta::Props::Token t = meta::Props::token(attributeName);
         switch (t) {
         case meta::Props::Token::is_visible: {
-            d->m_attrs[name] = val;
-            Q_EMIT visibilityChanged(val.toBool());
+            VEObject::setAttributeImpl(attr.name(), attr.value(), attr.type());
+            Q_EMIT visibilityChanged(value.value<bool>());
             break;
         }
         case meta::Props::Token::group_name: {
-            d->m_attrs[name] = val;
-            Q_EMIT groupChanged(val.toString());
+            VEObject::setAttributeImpl(attr.name(), attr.value(), attr.type());
+            Q_EMIT groupChanged(value.value<QString>());
             break;
         }
         case meta::Props::Token::name: {
-            QString usedName = val.toString();
-            if (usedName.isEmpty())
+            QString usedName = value.value<QString>();
+            if (usedName.isEmpty()) {
                 usedName = IVNameValidator::nextNameFor(this);
-
-            d->m_attrs[name] = usedName;
+                attr.setValue(usedName);
+            }
+            VEObject::setAttributeImpl(attr.name(), attr.value(), attr.type());
             Q_EMIT titleChanged(usedName);
             break;
         }
         default:
-            d->m_attrs[name] = val;
+            VEObject::setAttributeImpl(attr.name(), attr.value(), attr.type());
             break;
         }
-        Q_EMIT attributeChanged(name);
+        Q_EMIT attributeChanged(attributeName);
     }
-}
-
-void IVObject::removeAttr(const QString &name)
-{
-    if (!name.isEmpty() && d->m_attrs.remove(name))
-        Q_EMIT attributeChanged(name);
-}
-
-/*!
-   Returns true, when the object has an attribute wit the given \p key and the given \p value
- */
-bool IVObject::hasAttribute(const QString &attributeName, const QVariant &value) const
-{
-    const auto it = d->m_attrs.constFind(attributeName);
-    if (it == d->m_attrs.constEnd()) {
-        return false;
-    }
-    if (value.isNull()) {
-        return true;
-    }
-    return value == *it;
-}
-
-/*!
-   Returns true, if the object contains all the given attributes with exactly the same value
- */
-bool IVObject::hasAttributes(const QHash<QString, QVariant> &attrs) const
-{
-    for (auto it = attrs.cbegin(); it != attrs.end(); ++it) {
-        if (!hasAttribute(it.key(), it.value())) {
-            return false;
-        }
-    }
-    return true;
-}
-
-QHash<QString, QVariant> IVObject::props() const
-{
-    return d->m_props;
-}
-
-void IVObject::setProps(const QHash<QString, QVariant> &props)
-{
-    if (props != d->m_props) {
-        d->m_props.clear();
-
-        for (auto i = props.cbegin(); i != props.cend(); ++i)
-            setProp(i.key(), i.value());
-    }
-}
-
-QVariant IVObject::prop(const QString &name, const QVariant &defaultValue) const
-{
-    return d->m_props.value(name, defaultValue);
-}
-
-void IVObject::setProp(const QString &name, const QVariant &val)
-{
-    if (!name.isEmpty() && val != d->m_props[name]) {
-        d->m_props[name] = val;
-        Q_EMIT propertyChanged(name);
-    }
-}
-
-void IVObject::removeProp(const QString &name)
-{
-    if (!name.isEmpty() && d->m_props.remove(name)) {
-        Q_EMIT propertyChanged(name);
-    }
-}
-
-/*!
-   Returns true, when the object has a property with the given \p key and the given \p value
- */
-bool IVObject::hasProperty(const QString &propertyName, const QVariant &value) const
-{
-    const auto it = d->m_props.constFind(propertyName);
-    if (it == d->m_props.constEnd()) {
-        return false;
-    }
-    if (value.isNull()) {
-        return true;
-    }
-    return value == *it;
-}
-
-/*!
-   Returns true, if the object contains all the given properties with exactly the same value
- */
-bool IVObject::hasProperties(const QHash<QString, QVariant> &props) const
-{
-    for (auto it = props.cbegin(); it != props.end(); ++it) {
-        if (!hasProperty(it.key(), it.value())) {
-            return false;
-        }
-    }
-    return true;
-}
-
-void IVObject::setObjectsModel(IVModel *model)
-{
-    d->m_model = model;
 }
 
 IVModel *IVObject::model() const
 {
-    return d->m_model;
+    return qobject_cast<IVModel *>(shared::VEObject::model());
 }
 
 bool IVObject::isRootObject() const
 {
-    return d->m_model ? d->m_model->rootObject() == this : false;
+    return model() ? model()->rootObject() == this : false;
 }
 
 bool IVObject::isGrouped() const
@@ -460,7 +307,7 @@ bool IVObject::isGrouped() const
 
 void IVObject::setVisible(bool isVisible)
 {
-    setAttr(meta::Props::token(meta::Props::Token::is_visible), isVisible);
+    setEntityAttribute(meta::Props::token(meta::Props::Token::is_visible), isVisible);
 }
 
 /*!
@@ -469,7 +316,7 @@ void IVObject::setVisible(bool isVisible)
  */
 bool IVObject::isVisible() const
 {
-    return d->m_attrs.value(meta::Props::token(meta::Props::Token::is_visible), true).toBool();
+    return entityAttributeValue(meta::Props::token(meta::Props::Token::is_visible), true);
 }
 
 }

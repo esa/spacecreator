@@ -15,25 +15,13 @@
    along with this program. If not, see <https://www.gnu.org/licenses/lgpl-2.1.html>.
 */
 
-#include "dvmodel.h"
+#include "vemodel.h"
 
-#include "common.h"
-#include "dvobject.h"
+namespace shared {
 
-#include <QHash>
-
-namespace dvm {
-
-struct DVModelPrivate {
-    QHash<shared::Id, DVObject *> m_items;
-};
-
-DVModel::DVModel(QObject *parent)
-    : shared::VEModel(parent)
-    , d(std::make_unique<DVModelPrivate>())
+VEModel::VEModel(QObject *parent)
+    : QObject(parent)
 {
 }
 
-DVModel::~DVModel() { }
-
-} // namespace deploy
+} // namespace shared

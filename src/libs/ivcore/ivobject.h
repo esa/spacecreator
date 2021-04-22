@@ -17,8 +17,10 @@
 
 #pragma once
 
-#include "ivcommonprops.h"
 #include "common.h"
+#include "entityattribute.h"
+#include "ivcommonprops.h"
+#include "veobject.h"
 
 #include <QObject>
 #include <QVariant>
@@ -26,14 +28,12 @@
 #include <memory>
 
 namespace ivm {
-
-struct IVObjectPrivate;
 class IVModel;
-class IVObject : public QObject
+struct IVObjectPrivate;
+class IVObject : public shared::VEObject
 {
     Q_OBJECT
     Q_PROPERTY(QString title READ title WRITE setTitle NOTIFY titleChanged)
-    Q_PROPERTY(shared::Id id READ id CONSTANT)
 
 public:
     enum class Type
@@ -53,22 +53,21 @@ public:
 
     explicit IVObject(const IVObject::Type t, const QString &title = QString(), QObject *parent = nullptr,
             const shared::Id &id = shared::InvalidId);
-    virtual ~IVObject();
+    virtual ~IVObject() override;
 
     QString title() const;
     QString titleUI() const;
-    shared::Id id() const;
 
     IVObject::Type type() const;
 
-    QVector<qint32> coordinates() const;
-    void setCoordinates(const QVector<qint32> &coordinates);
+    QVector<qint32> coordinates() const override;
+    void setCoordinates(const QVector<qint32> &coordinates) override;
     meta::Props::Token coordinatesType() const;
 
     QStringList path() const;
     static QStringList path(const IVObject *obj);
 
-    IVObject *parentObject() const;
+    IVObject *parentObject() const override;
     bool isFunction() const;
     bool isFunctionType() const;
     bool isInterfaceGroup() const;
@@ -85,28 +84,8 @@ public:
     QString groupName() const;
     void setGroupName(const QString &groupName);
 
-    // "attributes" - payload data in the opening XML tag,
-    // like "name" and "kind" below:
-    // <Required_Interface name="run_forrest" kind="Sporadic">
+    void setEntityAttributes(const EntityAttributes &attributes);
 
-    QHash<QString, QVariant> attrs() const;
-    void setAttrs(const QHash<QString, QVariant> &attrs);
-    QVariant attr(const QString &name, const QVariant &defaultValue = QVariant()) const;
-    virtual void setAttr(const QString &name, const QVariant &val);
-    void removeAttr(const QString &name);
-    bool hasAttribute(const QString &attributeName, const QVariant &value = QVariant()) const;
-    bool hasAttributes(const QHash<QString, QVariant> &attrs) const;
-
-    // "properties" - XML children <Property>
-    QHash<QString, QVariant> props() const;
-    void setProps(const QHash<QString, QVariant> &props);
-    QVariant prop(const QString &name, const QVariant &defaultValue = QVariant()) const;
-    virtual void setProp(const QString &name, const QVariant &val);
-    void removeProp(const QString &name);
-    bool hasProperty(const QString &propertyName, const QVariant &value = QVariant()) const;
-    bool hasProperties(const QHash<QString, QVariant> &props) const;
-
-    void setObjectsModel(IVModel *model);
     IVModel *model() const;
 
     bool isRootObject() const;
@@ -116,38 +95,22 @@ public:
     void setVisible(bool isVisible);
     bool isVisible() const;
 
-    virtual bool postInit();
-    virtual bool aboutToBeRemoved();
-
-    template<class T>
-    inline T as()
-    {
-        return qobject_cast<T>(this);
-    }
-
-    template<class T>
-    inline const T as() const
-    {
-        return qobject_cast<const T>(this);
-    }
+    bool postInit() override;
+    bool aboutToBeRemoved() override;
 
     static void sortObjectList(QList<ivm::IVObject *> &objects);
-    static QVector<qint32> coordinatesFromString(const QString &strCoordinates);
-    static QString coordinatesToString(const QVector<qint32> &coordinates);
 
 Q_SIGNALS:
     void titleChanged(const QString &title);
     void coordinatesChanged(const QVector<qint32> &coordinates);
     void visibilityChanged(bool visible);
     void groupChanged(const QString &groupName);
-    void attributeChanged(const QString &name);
-    void propertyChanged(const QString &name);
-    void attributeChanged(ivm::meta::Props::Token attr = ivm::meta::Props::Token::Unknown);
-    void propertyChanged(ivm::meta::Props::Token prop = ivm::meta::Props::Token::Unknown);
 
 public Q_SLOTS:
     bool setTitle(const QString &title);
-    bool setParentObject(ivm::IVObject *parentObject);
+
+protected:
+    void setAttributeImpl(const QString &name, const QVariant &value, EntityAttribute::Type type) override;
 
 private:
     const std::unique_ptr<IVObjectPrivate> d;

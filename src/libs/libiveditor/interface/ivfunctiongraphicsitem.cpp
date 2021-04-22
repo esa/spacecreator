@@ -17,6 +17,9 @@
 
 #include "ivfunctiongraphicsitem.h"
 
+#include "baseitems/common/ivutils.h"
+#include "colors/colormanager.h"
+#include "graphicsitemhelpers.h"
 #include "ivcommentgraphicsitem.h"
 #include "ivconnection.h"
 #include "ivconnectiongraphicsitem.h"
@@ -24,9 +27,6 @@
 #include "ivfunctionnamegraphicsitem.h"
 #include "ivinterfacegraphicsitem.h"
 #include "ivmodel.h"
-#include "baseitems/common/ivutils.h"
-#include "colors/colormanager.h"
-#include "graphicsitemhelpers.h"
 
 #include <QApplication>
 #include <QGraphicsScene>
@@ -268,9 +268,8 @@ void IVFunctionGraphicsItem::drawNestedView(QPainter *painter)
     };
     QList<ConnectionData> parentConnections;
     for (const ivm::IVObject *child : childEntities) {
-        const QString strCoordinates = child->prop(ivm::meta::Props::token(token)).toString();
-        if (child->type() == ivm::IVObject::Type::Function
-                || child->type() == ivm::IVObject::Type::FunctionType
+        const QString strCoordinates = child->entityAttributeValue<QString>(ivm::meta::Props::token(token));
+        if (child->type() == ivm::IVObject::Type::Function || child->type() == ivm::IVObject::Type::FunctionType
                 || child->type() == ivm::IVObject::Type::Comment) {
             const QRectF itemSceneRect = ive::rect(ivm::IVObject::coordinatesFromString(strCoordinates));
             if (itemSceneRect.isValid()) {
@@ -314,8 +313,9 @@ void IVFunctionGraphicsItem::drawNestedView(QPainter *painter)
                 }
 
                 QPointF innerIfacePos;
-                if (innerIface->hasProperty(ivm::meta::Props::token(token))) {
-                    const QString ifaceStrCoordinates = innerIface->prop(ivm::meta::Props::token(token)).toString();
+                if (innerIface->hasEntityAttribute(ivm::meta::Props::token(token))) {
+                    const QString ifaceStrCoordinates =
+                            innerIface->entityAttributeValue<QString>(ivm::meta::Props::token(token));
                     innerIfacePos = ive::pos(ivm::IVObject::coordinatesFromString(ifaceStrCoordinates));
                 }
                 ConnectionData cd { (*it)->scenePos(), innerIfacePos, innerIface->parentObject()->id() };
@@ -338,8 +338,7 @@ void IVFunctionGraphicsItem::drawNestedView(QPainter *painter)
             return;
 
         const int count = std::count_if(childEntities.cbegin(), childEntities.cend(), [](const ivm::IVObject *child) {
-            return child->type() == ivm::IVObject::Type::Function
-                    || child->type() == ivm::IVObject::Type::FunctionType
+            return child->type() == ivm::IVObject::Type::Function || child->type() == ivm::IVObject::Type::FunctionType
                     || child->type() == ivm::IVObject::Type::Comment;
         });
 
@@ -446,8 +445,8 @@ void IVFunctionGraphicsItem::applyColorScheme()
     QBrush b = h.brush();
 
     if (auto parentFunction = qgraphicsitem_cast<IVFunctionGraphicsItem *>(parentItem())) {
-        if (!parentFunction->entity()->hasProperty(QLatin1String("color"))
-                && !entity()->hasProperty(QLatin1String("color"))
+        if (!parentFunction->entity()->hasEntityAttribute(QLatin1String("color"))
+                && !entity()->hasEntityAttribute(QLatin1String("color"))
                 && parentFunction->handledColorType()
                         == shared::ColorManager::HandledColors::FunctionRegular) { // [Hm...]
             b.setColor(parentFunction->brush().color().darker(125));
@@ -476,8 +475,7 @@ void IVFunctionGraphicsItem::applyColorScheme()
 QString IVFunctionGraphicsItem::prepareTooltip() const
 {
     const QString title = uniteNames<ivm::IVFunctionType *>({ entity() }, QString());
-    const QString prototype =
-            uniteNames<const ivm::IVFunctionType *>({ entity()->instanceOf() }, tr("Instance of: "));
+    const QString prototype = uniteNames<const ivm::IVFunctionType *>({ entity()->instanceOf() }, tr("Instance of: "));
     const QString ris = uniteNames<ivm::IVInterface *>(entity()->ris(), tr("RI: "));
     const QString pis = uniteNames<ivm::IVInterface *>(entity()->pis(), tr("PI: "));
 

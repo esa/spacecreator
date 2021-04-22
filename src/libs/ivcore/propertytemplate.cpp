@@ -425,21 +425,17 @@ bool PropertyTemplate::validate(const IVObject *object) const
 
     const auto it = d->m_rxAttrValidatorPattern.constFind(objectScope);
     if (it != d->m_rxAttrValidatorPattern.constEnd()) {
-        auto checkPattern = [](const QHash<QString, QVariant> &data, const QString &name, const QString &pattern) {
-            auto objPropIter = data.constFind(name);
-            if (objPropIter != data.constEnd()) {
+        auto checkPattern = [](const EntityAttributes &data, const QString &name, const QString &pattern) {
+            auto objAttrIter = data.constFind(name);
+            if (objAttrIter != data.constEnd()) {
                 const QRegularExpression rx(pattern);
-                const QString value = objPropIter.value().toString();
+                const QString value = objAttrIter.value().value<QString>();
                 const QRegularExpressionMatch match = rx.match(value);
                 return match.capturedLength() == value.length();
             }
             return true;
         };
-        /// TODO: add type into XML storage for AttrValidator (PropValidator)
-        /// to lookup in appropriate data set
-        /// Add mandatory attribute for combined checks
-        return checkPattern(object->props(), it->first, it->second)
-                && checkPattern(object->attrs(), it->first, it->second);
+        return checkPattern(object->entityAttributes(), it->first, it->second);
     }
     return false;
 }

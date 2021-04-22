@@ -72,14 +72,16 @@ void tst_IVObject::test_paramConstructor()
 
     auto obj = new IVObjectImp("Some_name", this);
     QCOMPARE(obj->parent(), this);
-    QCOMPARE(obj->attrs().value(nameToken).toString(), QString("Some_name")); // This is the stored value
+    QCOMPARE(obj->entityAttributes().value(nameToken).value<QString>(),
+            QString("Some_name")); // This is the stored value
     QCOMPARE(obj->title(), "Some_name"); // This is the stored value
     QCOMPARE(obj->titleUI(), "Some name"); // This is what the user sees
     QVERIFY(!obj->id().toString().isEmpty());
 
     obj = new IVObjectImp("Another_name", this);
     QCOMPARE(obj->parent(), this);
-    QCOMPARE(obj->attrs().value(nameToken).toString(), QString("Another_name")); // This is the stored value
+    QCOMPARE(obj->entityAttributes().value(nameToken).value<QString>(),
+            QString("Another_name")); // This is the stored value
     QCOMPARE(obj->title(), "Another_name"); // This is the stored value
     QCOMPARE(obj->titleUI(), "Another name"); // This is what the user sees
     QVERIFY(!obj->id().toString().isEmpty());
@@ -93,7 +95,7 @@ void tst_IVObject::test_setTitle()
     QSignalSpy spy1(&obj1, &ivm::IVObject::titleChanged);
     QVERIFY(obj1.title() != "Test_Object_Title");
     obj1.setTitle("Test_Object_Title");
-    QCOMPARE(obj1.attrs().value(nameToken).toString(), QString("Test_Object_Title"));
+    QCOMPARE(obj1.entityAttributes().value(nameToken).value<QString>(), QString("Test_Object_Title"));
     QCOMPARE(obj1.titleUI(), QString("Test Object Title"));
     QVERIFY(spy1.count() == 1);
     auto arguments = spy1.takeFirst();
@@ -105,7 +107,7 @@ void tst_IVObject::test_setTitle()
     QSignalSpy spy2(&obj2, &ivm::IVObject::titleChanged);
     QVERIFY(obj2.title() != "Test_Object_Title");
     obj2.setTitle("Test_Object_Title");
-    QCOMPARE(obj2.attrs().value(nameToken).toString(), QString("Test_Object_Title"));
+    QCOMPARE(obj2.entityAttributes().value(nameToken).value<QString>(), QString("Test_Object_Title"));
     QCOMPARE(obj2.titleUI(), QString("Test Object Title"));
     QVERIFY(spy2.count() == 1);
     arguments = spy2.takeFirst();
@@ -160,91 +162,95 @@ void tst_IVObject::test_coordinatesType()
 void tst_IVObject::test_hasAttributes()
 {
     IVObjectImp obj;
-    QHash<QString, QVariant> attributes = { { "foo", QVariant::fromValue(11) },
-        { "bar", QVariant::fromValue(QString("dummy")) } };
-    QCOMPARE(obj.hasAttributes(attributes), false);
-    const int attrsCount = obj.attrs().size();
+    const QHash<QString, EntityAttribute> attributes = {
+        { "foo", EntityAttribute("foo", QVariant::fromValue(11), EntityAttribute::Type::Attribute) },
+        { "bar", EntityAttribute("bar", QVariant::fromValue(QString("dummy")), EntityAttribute::Type::Attribute) }
+    };
+    QCOMPARE(obj.hasEntityAttributes(attributes), false);
+    const int attrsCount = obj.entityAttributes().size();
 
-    obj.setAttr("foo", QVariant::fromValue(999));
-    QCOMPARE(obj.hasAttributes(attributes), false);
-    QCOMPARE(obj.hasAttribute("foo", 11), false);
-    QCOMPARE(obj.hasAttribute("foo", 999), true);
-    QCOMPARE(obj.hasAttribute("bar", "empty"), false);
-    QCOMPARE(obj.hasAttribute("bar", "dummy"), false);
+    obj.setEntityAttribute(QLatin1String("foo"), QVariant::fromValue(999));
+    QCOMPARE(obj.hasEntityAttributes(attributes), false);
+    QCOMPARE(obj.hasEntityAttribute("foo", 11), false);
+    QCOMPARE(obj.hasEntityAttribute("foo", 999), true);
+    QCOMPARE(obj.hasEntityAttribute("bar", "empty"), false);
+    QCOMPARE(obj.hasEntityAttribute("bar", "dummy"), false);
 
-    obj.setAttr("bar", QVariant::fromValue(QString("dummy")));
-    QCOMPARE(obj.hasAttributes(attributes), false);
-    QCOMPARE(obj.hasAttribute("foo", 11), false);
-    QCOMPARE(obj.hasAttribute("foo", 999), true);
-    QCOMPARE(obj.hasAttribute("bar", "empty"), false);
-    QCOMPARE(obj.hasAttribute("bar", "dummy"), true);
+    obj.setEntityAttribute(QLatin1String("bar"), QVariant::fromValue(QString("dummy")));
+    QCOMPARE(obj.hasEntityAttributes(attributes), false);
+    QCOMPARE(obj.hasEntityAttribute("foo", 11), false);
+    QCOMPARE(obj.hasEntityAttribute("foo", 999), true);
+    QCOMPARE(obj.hasEntityAttribute("bar", "empty"), false);
+    QCOMPARE(obj.hasEntityAttribute("bar", "dummy"), true);
 
-    obj.setAttr("foo", QVariant::fromValue(11));
-    QCOMPARE(obj.hasAttributes(attributes), true);
-    QCOMPARE(obj.hasAttribute("foo", 11), true);
-    QCOMPARE(obj.hasAttribute("foo", 999), false);
-    QCOMPARE(obj.hasAttribute("bar", "empty"), false);
-    QCOMPARE(obj.hasAttribute("bar", "dummy"), true);
+    obj.setEntityAttribute(QLatin1String("foo"), QVariant::fromValue(11));
+    QCOMPARE(obj.hasEntityAttributes(attributes), true);
+    QCOMPARE(obj.hasEntityAttribute("foo", 11), true);
+    QCOMPARE(obj.hasEntityAttribute("foo", 999), false);
+    QCOMPARE(obj.hasEntityAttribute("bar", "empty"), false);
+    QCOMPARE(obj.hasEntityAttribute("bar", "dummy"), true);
 
-    obj.removeAttr("foo");
-    QCOMPARE(obj.hasAttributes(attributes), false);
-    QCOMPARE(obj.hasAttribute("foo", 11), false);
-    QCOMPARE(obj.hasAttribute("foo", 999), false);
-    QCOMPARE(obj.hasAttribute("bar", "empty"), false);
-    QCOMPARE(obj.hasAttribute("bar", "dummy"), true);
+    obj.removeEntityAttribute("foo");
+    QCOMPARE(obj.hasEntityAttributes(attributes), false);
+    QCOMPARE(obj.hasEntityAttribute("foo", 11), false);
+    QCOMPARE(obj.hasEntityAttribute("foo", 999), false);
+    QCOMPARE(obj.hasEntityAttribute("bar", "empty"), false);
+    QCOMPARE(obj.hasEntityAttribute("bar", "dummy"), true);
 
-    obj.removeAttr("bar");
-    QCOMPARE(obj.hasAttributes(attributes), false);
-    QCOMPARE(obj.hasAttribute("foo", 11), false);
-    QCOMPARE(obj.hasAttribute("foo", 999), false);
-    QCOMPARE(obj.hasAttribute("bar", "empty"), false);
-    QCOMPARE(obj.hasAttribute("bar", "dummy"), false);
-    QCOMPARE(obj.attrs().size(), attrsCount);
+    obj.removeEntityAttribute("bar");
+    QCOMPARE(obj.hasEntityAttributes(attributes), false);
+    QCOMPARE(obj.hasEntityAttribute("foo", 11), false);
+    QCOMPARE(obj.hasEntityAttribute("foo", 999), false);
+    QCOMPARE(obj.hasEntityAttribute("bar", "empty"), false);
+    QCOMPARE(obj.hasEntityAttribute("bar", "dummy"), false);
+    QCOMPARE(obj.entityAttributes().size(), attrsCount);
 }
 
 void tst_IVObject::test_hasProperties()
 {
     IVObjectImp obj;
-    QHash<QString, QVariant> properties = { { "foo", QVariant::fromValue(11) },
-        { "bar", QVariant::fromValue(QString("dummy")) } };
-    QCOMPARE(obj.hasProperties(properties), false);
-    const int propsCount = obj.props().size();
+    const QHash<QString, EntityAttribute> attributes = {
+        { "foo", EntityAttribute("foo", QVariant::fromValue(11), EntityAttribute::Type::Property) },
+        { "bar", EntityAttribute("bar", QVariant::fromValue(QString("dummy")), EntityAttribute::Type::Property) }
+    };
+    QCOMPARE(obj.hasEntityAttributes(attributes), false);
+    const int propsCount = obj.entityAttributes().size();
 
-    obj.setProp("foo", QVariant::fromValue(999));
-    QCOMPARE(obj.hasProperties(properties), false);
-    QCOMPARE(obj.hasProperty("foo", 11), false);
-    QCOMPARE(obj.hasProperty("foo", 999), true);
-    QCOMPARE(obj.hasProperty("bar", "empty"), false);
-    QCOMPARE(obj.hasProperty("bar", "dummy"), false);
+    obj.setEntityProperty(QLatin1String("foo"), QVariant::fromValue(999));
+    QCOMPARE(obj.hasEntityAttributes(attributes), false);
+    QCOMPARE(obj.hasEntityAttribute("foo", 11), false);
+    QCOMPARE(obj.hasEntityAttribute("foo", 999), true);
+    QCOMPARE(obj.hasEntityAttribute("bar", "empty"), false);
+    QCOMPARE(obj.hasEntityAttribute("bar", "dummy"), false);
 
-    obj.setProp("bar", QVariant::fromValue(QString("dummy")));
-    QCOMPARE(obj.hasProperties(properties), false);
-    QCOMPARE(obj.hasProperty("foo", 11), false);
-    QCOMPARE(obj.hasProperty("foo", 999), true);
-    QCOMPARE(obj.hasProperty("bar", "empty"), false);
-    QCOMPARE(obj.hasProperty("bar", "dummy"), true);
+    obj.setEntityProperty(QLatin1String("bar"), QVariant::fromValue(QString("dummy")));
+    QCOMPARE(obj.hasEntityAttributes(attributes), false);
+    QCOMPARE(obj.hasEntityAttribute("foo", 11), false);
+    QCOMPARE(obj.hasEntityAttribute("foo", 999), true);
+    QCOMPARE(obj.hasEntityAttribute("bar", "empty"), false);
+    QCOMPARE(obj.hasEntityAttribute("bar", "dummy"), true);
 
-    obj.setProp("foo", QVariant::fromValue(11));
-    QCOMPARE(obj.hasProperties(properties), true);
-    QCOMPARE(obj.hasProperty("foo", 11), true);
-    QCOMPARE(obj.hasProperty("foo", 999), false);
-    QCOMPARE(obj.hasProperty("bar", "empty"), false);
-    QCOMPARE(obj.hasProperty("bar", "dummy"), true);
+    obj.setEntityProperty(QLatin1String("foo"), QVariant::fromValue(11));
+    QCOMPARE(obj.hasEntityAttributes(attributes), true);
+    QCOMPARE(obj.hasEntityAttribute("foo", 11), true);
+    QCOMPARE(obj.hasEntityAttribute("foo", 999), false);
+    QCOMPARE(obj.hasEntityAttribute("bar", "empty"), false);
+    QCOMPARE(obj.hasEntityAttribute("bar", "dummy"), true);
 
-    obj.removeProp("foo");
-    QCOMPARE(obj.hasProperties(properties), false);
-    QCOMPARE(obj.hasProperty("foo", 11), false);
-    QCOMPARE(obj.hasProperty("foo", 999), false);
-    QCOMPARE(obj.hasProperty("bar", "empty"), false);
-    QCOMPARE(obj.hasProperty("bar", "dummy"), true);
+    obj.removeEntityAttribute("foo");
+    QCOMPARE(obj.hasEntityAttributes(attributes), false);
+    QCOMPARE(obj.hasEntityAttribute("foo", 11), false);
+    QCOMPARE(obj.hasEntityAttribute("foo", 999), false);
+    QCOMPARE(obj.hasEntityAttribute("bar", "empty"), false);
+    QCOMPARE(obj.hasEntityAttribute("bar", "dummy"), true);
 
-    obj.removeProp("bar");
-    QCOMPARE(obj.hasProperties(properties), false);
-    QCOMPARE(obj.hasProperty("foo", 11), false);
-    QCOMPARE(obj.hasProperty("foo", 999), false);
-    QCOMPARE(obj.hasProperty("bar", "empty"), false);
-    QCOMPARE(obj.hasProperty("bar", "dummy"), false);
-    QCOMPARE(obj.props().size(), propsCount);
+    obj.removeEntityAttribute("bar");
+    QCOMPARE(obj.hasEntityAttributes(attributes), false);
+    QCOMPARE(obj.hasEntityAttribute("foo", 11), false);
+    QCOMPARE(obj.hasEntityAttribute("foo", 999), false);
+    QCOMPARE(obj.hasEntityAttribute("bar", "empty"), false);
+    QCOMPARE(obj.hasEntityAttribute("bar", "dummy"), false);
+    QCOMPARE(obj.entityAttributes().size(), propsCount);
 }
 
 QTEST_APPLESS_MAIN(tst_IVObject)

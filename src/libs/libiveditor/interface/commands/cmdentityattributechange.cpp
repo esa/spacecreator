@@ -36,7 +36,7 @@ static inline QVariantHash getCurrentAttributes(ivm::IVObject *entity, const QVa
 {
     QVariantHash result;
     for (auto it = attrs.constBegin(); it != attrs.constEnd(); ++it)
-        result.insert(it.key(), entity->attr(it.key()));
+        result.insert(it.key(), entity->entityAttributeValue(it.key()));
     return result;
 }
 
@@ -103,11 +103,11 @@ void CmdEntityAttributeChange::setAttrs(const QVariantHash &attrs, bool isRedo)
             if (m_function)
                 handleFunctionInstanceOf(val, isRedo);
             else
-                m_entity->setAttr(name, val);
+                m_entity->setEntityAttribute(name, val);
             break;
         }
         default: {
-            m_entity->setAttr(name, val);
+            m_entity->setEntityAttribute(name, val);
             break;
         }
         }
@@ -145,7 +145,7 @@ void CmdEntityAttributeChange::handleFunctionInstanceOf(const QVariant &attr, bo
         performCommands(commandsSetNewFunctionType(newInstanceOf));
 
     m_function->setInstanceOf(newInstanceOf);
-    m_function->setAttr(ivm::meta::Props::token(ivm::meta::Props::Token::instance_of), attr);
+    m_function->setEntityAttribute(ivm::meta::Props::token(ivm::meta::Props::Token::instance_of), attr);
 }
 
 Commands getCommands(const ivm::IVFunctionType *fnType, const CommandsStorage &cmdStorage,
@@ -197,8 +197,8 @@ void CmdEntityAttributeChange::prepareUnsetFunctionTypeCommands(const ivm::IVFun
     QList<QPointer<ivm::IVObject>> entities;
     for (auto fnTypeIface : fnTypeIfaces) {
         for (const auto &clone : fnTypeIface->clones()) {
-            auto found = std::find_if(
-                    fnIfaces.cbegin(), fnIfaces.cend(), [clone](ivm::IVInterface *fnIface) { return clone == fnIface; });
+            auto found = std::find_if(fnIfaces.cbegin(), fnIfaces.cend(),
+                    [clone](ivm::IVInterface *fnIface) { return clone == fnIface; });
 
             if (found != fnIfaces.cend()) {
                 entities.append(clone.data());

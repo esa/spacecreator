@@ -17,12 +17,12 @@
 
 #include "cmdentitiesimport.h"
 
+#include "baseitems/common/ivutils.h"
+#include "commandids.h"
 #include "ivfunctiontype.h"
 #include "ivmodel.h"
 #include "ivnamevalidator.h"
 #include "ivxmlreader.h"
-#include "baseitems/common/ivutils.h"
-#include "commandids.h"
 #include "xmldocexporter.h"
 
 #include <QBuffer>
@@ -50,12 +50,12 @@ CmdEntitiesImport::CmdEntitiesImport(const QByteArray &data, ivm::IVFunctionType
                 QPointF basePoint { outOfScene };
                 const QSet<QString> functionNames = m_model->nestedFunctionNames();
                 for (auto obj : objects) {
-                    obj->setObjectsModel(m_model);
+                    obj->setModel(m_model);
                     if (obj->parentObject()) {
                         continue;
                     }
                     if (functionNames.contains(obj->title())) {
-                        obj->removeAttr(ivm::meta::Props::token(ivm::meta::Props::Token::name));
+                        obj->removeEntityAttribute(ivm::meta::Props::token(ivm::meta::Props::Token::name));
                         obj->setTitle(ivm::IVNameValidator::nextNameFor(obj));
                     }
                     QVector<QPointF> coordinates = ive::polygon(obj->coordinates());

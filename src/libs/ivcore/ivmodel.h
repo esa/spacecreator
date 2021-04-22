@@ -19,6 +19,7 @@
 
 #include "ivinterface.h"
 #include "ivobject.h"
+#include "vemodel.h"
 
 #include <QAbstractItemModel>
 #include <QVector>
@@ -33,7 +34,7 @@ class IVFunctionType;
 class PropertyTemplateConfig;
 
 struct IVModelPrivate;
-class IVModel : public QObject
+class IVModel : public shared::VEModel
 {
     Q_OBJECT
 public:
@@ -52,8 +53,8 @@ public:
     IVObject *getObject(const shared::Id &id) const;
     IVObject *getObjectByName(const QString &name, IVObject::Type type = IVObject::Type::Unknown,
             Qt::CaseSensitivity caseSensitivity = Qt::CaseInsensitive) const;
-    IVInterface *getIfaceByName(const QString &name, IVInterface::InterfaceType dir, const IVFunctionType *parent = nullptr,
-            Qt::CaseSensitivity caseSensitivity = Qt::CaseInsensitive) const;
+    IVInterface *getIfaceByName(const QString &name, IVInterface::InterfaceType dir,
+            const IVFunctionType *parent = nullptr, Qt::CaseSensitivity caseSensitivity = Qt::CaseInsensitive) const;
     QList<IVInterface *> getIfacesByName(
             const QString &name, Qt::CaseSensitivity caseSensitivity = Qt::CaseInsensitive) const;
     IVFunction *getFunction(const shared::Id &id) const;

@@ -17,12 +17,12 @@
 
 #include "actionsmanager.h"
 
-#include "ivfunction.h"
-#include "ivinterface.h"
-#include "ivobject.h"
 #include "common.h"
 #include "extprocmonitor.h"
 #include "interface/interfacedocument.h"
+#include "ivfunction.h"
+#include "ivinterface.h"
+#include "ivobject.h"
 #include "xmldocexporter.h"
 
 #include <QAction>
@@ -353,12 +353,12 @@ QString ActionsManager::replaceKeyHolder(const QString &text, const ivm::IVObjec
             break;
         case ExternalArgHolder::Attr:
             if (text.startsWith(holder.key) && ivObj) {
-                return ivObj->attr(name).toString();
+                return ivObj->entityAttributeValue<QString>(name);
             }
             break;
         case ExternalArgHolder::Prop:
             if (text.startsWith(holder.key) && ivObj) {
-                return ivObj->prop(name).toString();
+                return ivObj->entityAttributeValue<QString>(name);
             }
             break;
         case ExternalArgHolder::Param:

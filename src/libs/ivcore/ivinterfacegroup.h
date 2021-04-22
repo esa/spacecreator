@@ -33,7 +33,8 @@ public:
 
     QString ifaceLabel() const override;
 
-    void setAttr(const QString &name, const QVariant &val) override;
+protected:
+    void setAttributeImpl(const QString &name, const QVariant &value, EntityAttribute::Type type) override;
 
 private:
     QList<QPointer<IVInterface>> m_entities;

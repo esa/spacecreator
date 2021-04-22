@@ -18,11 +18,11 @@
 
 #include "interactiveobject.h"
 
-#include "ivobject.h"
 #include "baseitems/common/ivutils.h"
 #include "commandsstack.h"
 #include "interface/commands/cmdentityautolayout.h"
 #include "interface/commands/cmdentitygeometrychange.h"
+#include "ivobject.h"
 
 #include <QBrush>
 #include <QCursor>
@@ -194,9 +194,9 @@ shared::ColorHandler InteractiveObject::colorHandler() const
 {
     shared::ColorHandler h = shared::ColorManager::instance()->colorsForItem(handledColorType());
     if (auto ivObj = entity()) {
-        if (ivObj->hasProperty(QLatin1String("color"))) { // keep single custom color
+        if (ivObj->hasEntityAttribute(QLatin1String("color"))) { // keep single custom color
             h.setFillType(shared::ColorHandler::Color);
-            h.setBrushColor0(QColor(ivObj->prop(QLatin1String("color")).toString()));
+            h.setBrushColor0(QColor(ivObj->entityAttributeValue<QString>(QLatin1String("color"))));
         }
     }
 

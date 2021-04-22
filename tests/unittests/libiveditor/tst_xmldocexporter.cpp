@@ -15,13 +15,13 @@
    along with this program. If not, see <https://www.gnu.org/licenses/lgpl-2.1.html>.
 */
 
+#include "asn1modelstorage.h"
+#include "interface/interfacedocument.h"
 #include "ivcomment.h"
+#include "iveditor.h"
 #include "ivfunction.h"
 #include "ivlibrary.h"
 #include "parameter.h"
-#include "asn1modelstorage.h"
-#include "interface/interfacedocument.h"
-#include "iveditor.h"
 #include "xmldocexporter.h"
 
 #include <QFile>
@@ -160,8 +160,8 @@ void tst_XmlDocExporter::testExportEmptyDoc()
 void tst_XmlDocExporter::testExportFunctions()
 {
     auto testfunc1 = new ivm::IVFunction("TestFunc1", m_doc.get());
-    testfunc1->setAttr("foo", QVariant::fromValue(11));
-    testfunc1->setProp("bar", QVariant::fromValue(22));
+    testfunc1->setEntityAttribute(QLatin1String("foo"), QVariant::fromValue(11));
+    testfunc1->setEntityProperty(QLatin1String("bar"), QVariant::fromValue(22));
     testfunc1->addContextParam(
             ivm::ContextParameter("Mo", ivm::BasicParameter::Type::Other, "MyInt", QVariant::fromValue(33)));
 
@@ -184,8 +184,8 @@ void tst_XmlDocExporter::testExportFunctions()
 void tst_XmlDocExporter::testExportComment()
 {
     auto testcomment1 = new ivm::IVComment("TestComment1", m_doc.get());
-    testcomment1->setAttr("foo", QVariant::fromValue(11));
-    testcomment1->setProperty("bar", QVariant::fromValue(22)); // ignored for comment
+    testcomment1->setEntityAttribute(QLatin1String("foo"), QVariant::fromValue(11));
+    testcomment1->setEntityProperty(QLatin1String("bar"), QVariant::fromValue(22)); // ignored for comment
 
     QVector<ivm::IVObject *> objects;
     objects.append(testcomment1);

@@ -35,26 +35,26 @@ CmdEntityPropertyRename::CmdEntityPropertyRename(ivm::IVObject *entity, const QH
 
 void CmdEntityPropertyRename::redo()
 {
-    QVariantHash props = m_entity->props();
+    EntityAttributes props = m_entity->entityAttributes();
     for (auto it = m_newProps.constBegin(); it != m_newProps.constEnd(); ++it) {
         const QString &from = it.key();
         const QString &to = it.value();
-        const QVariant &value = props.take(from);
-        props.insert(to, value);
+        const EntityAttribute &attr = props.take(from);
+        props.insert(to, EntityAttribute(to, attr.value(), attr.type()));
     }
-    m_entity->setProps(props);
+    m_entity->setEntityAttributes(props);
 }
 
 void CmdEntityPropertyRename::undo()
 {
-    QVariantHash props = m_entity->props();
+    EntityAttributes props = m_entity->entityAttributes();
     for (auto it = m_newProps.constBegin(); it != m_newProps.constEnd(); ++it) {
         const QString &from = it.value();
         const QString &to = it.key();
-        const QVariant &value = props.take(from);
-        props.insert(to, value);
+        const EntityAttribute &attr = props.take(from);
+        props.insert(to, EntityAttribute(to, attr.value(), attr.type()));
     }
-    m_entity->setProps(props);
+    m_entity->setEntityAttributes(props);
 }
 
 bool CmdEntityPropertyRename::mergeWith(const QUndoCommand *)

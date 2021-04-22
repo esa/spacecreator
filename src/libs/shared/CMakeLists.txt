@@ -67,6 +67,12 @@ target_sources(${LIB_NAME} PRIVATE
     undocommand.h
     commandsstackbase.cpp
     commandsstackbase.h
+    veobject.cpp
+    veobject.h
+    vemodel.cpp
+    vemodel.h
+    entityattribute.cpp
+    entityattribute.h
 )
 
 target_include_directories(${LIB_NAME} PUBLIC .)

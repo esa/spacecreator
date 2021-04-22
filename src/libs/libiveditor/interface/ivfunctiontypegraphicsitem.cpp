@@ -17,6 +17,11 @@
 
 #include "ivfunctiontypegraphicsitem.h"
 
+#include "baseitems/common/ivutils.h"
+#include "colors/colormanager.h"
+#include "commands/cmdentityattributechange.h"
+#include "commandsstack.h"
+#include "graphicsviewutils.h"
 #include "ivcommonprops.h"
 #include "ivconnection.h"
 #include "ivconnectiongraphicsitem.h"
@@ -27,11 +32,6 @@
 #include "ivmodel.h"
 #include "ivnamevalidator.h"
 #include "ivobject.h"
-#include "baseitems/common/ivutils.h"
-#include "colors/colormanager.h"
-#include "commands/cmdentityattributechange.h"
-#include "commandsstack.h"
-#include "graphicsviewutils.h"
 #include "ui/textitem.h"
 
 #include <QApplication>
@@ -66,12 +66,12 @@ void IVFunctionTypeGraphicsItem::init()
     updateText();
 
     connect(m_textItem, &shared::ui::TextItem::edited, this, &IVFunctionTypeGraphicsItem::updateNameFromUi);
-    connect(entity(), qOverload<ivm::meta::Props::Token>(&ivm::IVFunction::attributeChanged), this,
-            [this](ivm::meta::Props::Token attr) {
-                if (attr == ivm::meta::Props::Token::name || attr == ivm::meta::Props::Token::url) {
-                    updateText();
-                }
-            });
+    connect(entity(), &ivm::IVFunction::attributeChanged, this, [this](const QString &token) {
+        const ivm::meta::Props::Token attr = ivm::meta::Props::token(token);
+        if (attr == ivm::meta::Props::Token::name || attr == ivm::meta::Props::Token::url) {
+            updateText();
+        }
+    });
     connect(entity(), &ivm::IVFunction::titleChanged, this, &IVFunctionTypeGraphicsItem::updateText);
     connect(m_textItem, &IVFunctionNameGraphicsItem::textChanged, this, [this]() { updateTextPosition(); });
 }
@@ -178,8 +178,8 @@ void IVFunctionTypeGraphicsItem::updateText()
 {
     const QString text = entity()->titleUI();
     static const QString urlAttrName { ivm::meta::Props::token(ivm::meta::Props::Token::url) };
-    if (m_dataObject->hasAttribute(urlAttrName)) {
-        const QString url = m_dataObject->attr(urlAttrName).toString();
+    if (m_dataObject->hasEntityAttribute(urlAttrName)) {
+        const QString url = m_dataObject->entityAttributeValue<QString>(urlAttrName);
         const QString html = QStringLiteral("<a href=\"%1\">%2</a>").arg(url, text);
         if (html != m_textItem->toHtml()) {
             m_textItem->setHtml(html);

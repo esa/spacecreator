@@ -18,6 +18,7 @@
 #pragma once
 
 #include "abstractexportableobject.h"
+#include "entityattribute.h"
 
 #include <QVariant>
 
@@ -52,7 +53,7 @@ public:
     QStringList path() const;
 
 protected:
-    static QVariantList generateProperties(const QHash<QString, QVariant> &props);
+    static QVariantList generateProperties(const EntityAttributes &attributes, bool isProperty);
 };
 
 }
