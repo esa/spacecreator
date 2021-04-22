@@ -17,11 +17,6 @@
 
 #include "propertiesdialog.h"
 
-#include "ivcomment.h"
-#include "ivconnectiongroup.h"
-#include "ivinterface.h"
-#include "ivnamevalidator.h"
-#include "ivobject.h"
 #include "asn1/file.h"
 #include "asn1/types/builtintypes.h"
 #include "baseitems/common/ivutils.h"
@@ -30,8 +25,13 @@
 #include "delegates/asn1valuedelegate.h"
 #include "delegates/attributedelegate.h"
 #include "ifaceparametersmodel.h"
-#include "interface/ivconnectiongroupmodel.h"
 #include "interface/commands/cmdentityattributechange.h"
+#include "interface/ivconnectiongroupmodel.h"
+#include "ivcomment.h"
+#include "ivconnectiongroup.h"
+#include "ivinterface.h"
+#include "ivnamevalidator.h"
+#include "ivobject.h"
 #include "propertieslistmodel.h"
 #include "propertiesviewbase.h"
 #include "ui_propertiesdialog.h"
@@ -41,6 +41,7 @@
 #include <QListView>
 #include <QPlainTextEdit>
 #include <QTableView>
+#include <QTimer>
 #include <QUndoCommand>
 
 namespace ive {
@@ -53,8 +54,7 @@ PropertiesDialog::PropertiesDialog(ivm::PropertyTemplateConfig *dynPropConfig, i
     , m_dynPropConfig(dynPropConfig)
     , m_cmdMacro(new cmd::CommandsStack::Macro(commandsStack->undoStack(),
               tr("Edit %1 - %2")
-                      .arg(ivm::IVNameValidator::nameOfType(m_dataObject->type()).trimmed(),
-                              m_dataObject->titleUI())))
+                      .arg(ivm::IVNameValidator::nameOfType(m_dataObject->type()).trimmed(), m_dataObject->titleUI())))
     , m_dataTypes(dataTypes)
     , m_commandsStack(commandsStack)
 {
@@ -157,11 +157,6 @@ void PropertiesDialog::initAttributesView()
         modelAttrs = new FunctionPropertiesListModel(m_cmdMacro, m_dynPropConfig, this);
         break;
     }
-    case ivm::IVObject::Type::RequiredInterface:
-    case ivm::IVObject::Type::ProvidedInterface: {
-        modelAttrs = new InterfacePropertiesListModel(m_cmdMacro, m_dynPropConfig, this);
-        break;
-    }
     default:
         modelAttrs = new InterfacePropertiesListModel(m_cmdMacro, m_dynPropConfig, this);
         break;
@@ -172,6 +167,19 @@ void PropertiesDialog::initAttributesView()
     viewAttrs->setModel(modelAttrs);
 
     ui->tabWidget->insertTab(0, viewAttrs, tr("Attributes"));
+
+    QTimer::singleShot(0, viewAttrs, [this, viewAttrs, modelAttrs]() {
+        const int nameColumn = m_dataObject->isFunction() ? FunctionPropertiesListModel::Column::Name
+                                                          : InterfacePropertiesListModel::Column::Name;
+        const int valueColumn = m_dataObject->isFunction() ? FunctionPropertiesListModel::Column::Value
+                                                           : InterfacePropertiesListModel::Column::Value;
+
+        const QModelIndexList indexes = modelAttrs->match(modelAttrs->index(0, nameColumn),
+                FunctionPropertiesListModel::DataRole, ivm::meta::Props::token(ivm::meta::Props::Token::name));
+        if (!indexes.isEmpty()) {
+            viewAttrs->tableView()->edit(indexes.front().siblingAtColumn(valueColumn));
+        }
+    });
 }
 
 void PropertiesDialog::initContextParams()
