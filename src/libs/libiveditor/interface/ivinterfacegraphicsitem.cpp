@@ -290,8 +290,8 @@ void IVInterfaceGraphicsItem::layout()
     }
 
     const auto parentFn = entity()->parentObject()->as<ivm::IVFunctionType *>();
-    const QRectF fnRect = ive::rect(
-            ivm::IVObject::coordinatesFromString(parentFn->entityAttributeValue<QString>(ivm::meta::Props::token(token))))
+    const QRectF fnRect = ive::rect(ivm::IVObject::coordinatesFromString(
+                                            parentFn->entityAttributeValue<QString>(ivm::meta::Props::token(token))))
                                   .normalized();
     const auto side = getNearestSide(fnRect, pos);
     pos = getSidePosition(fnRect, pos, side);
@@ -371,22 +371,17 @@ void IVInterfaceGraphicsItem::onManualMoveProgress(shared::ui::GripPoint *, cons
     if (shift.isNull())
         return;
 
-    QPointF newPos = scenePos() + shift;
-    if (parentItem()) {
-        const QRectF contentRect = parentItem()->sceneBoundingRect();
-
-        newPos.setX(qBound(contentRect.left(), newPos.x(), contentRect.right()));
-        newPos.setY(qBound(contentRect.top(), newPos.y(), contentRect.bottom()));
-    }
+    const QPointF newPos = scenePos() + shift;
+    const QRectF parentRect = targetItem()->boundingRect();
+    const Qt::Alignment alignment = getNearestSide(parentRect, newPos);
+    updateInternalItems(alignment);
     setPos(mapToParent(mapFromScene(newPos)));
-
-    rebuildLayout();
     updateGripPoints();
 
     Q_EMIT needUpdateLayout();
 
     IVConnectionGraphicsItem::layoutInterfaceConnections(this, IVConnectionGraphicsItem::LayoutPolicy::LastSegment,
-            IVConnectionGraphicsItem::CollisionsPolicy::Rebuild, true);
+            IVConnectionGraphicsItem::CollisionsPolicy::Ignore, true);
 
     Q_EMIT boundingBoxChanged();
 }
@@ -397,6 +392,9 @@ void IVInterfaceGraphicsItem::onManualMoveFinish(shared::ui::GripPoint *, const 
     if (shift.isNull())
         return;
 
+    rebuildLayout();
+    IVConnectionGraphicsItem::layoutInterfaceConnections(this, IVConnectionGraphicsItem::LayoutPolicy::Default,
+            IVConnectionGraphicsItem::CollisionsPolicy::Rebuild, true);
     updateEntity();
 }
 
