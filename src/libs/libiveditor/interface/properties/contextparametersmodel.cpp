@@ -17,16 +17,16 @@
 
 #include "contextparametersmodel.h"
 
-#include "ivcommonprops.h"
-#include "ivfunction.h"
-#include "ivnamevalidator.h"
-#include "ivobject.h"
 #include "asn1/file.h"
 #include "baseitems/common/ivutils.h"
 #include "commandsstack.h"
 #include "interface/commands/cmdcontextparameterchange.h"
 #include "interface/commands/cmdcontextparametercreate.h"
 #include "interface/commands/cmdcontextparameterremove.h"
+#include "ivcommonprops.h"
+#include "ivfunction.h"
+#include "ivnamevalidator.h"
+#include "ivobject.h"
 #include "propertytemplate.h"
 #include "propertytemplateconfig.h"
 
@@ -54,7 +54,9 @@ void ContextParametersModel::createNewRow(const ivm::ContextParameter &param, in
 
     QStandardItem *typeItem = new QStandardItem(row, Column::Type);
     typeItem->setData(param.paramTypeName(), DataRole);
-    typeItem->setData(m_asn1Names, EditRole);
+    QStringList typesList = { m_asn1Names };
+    typesList.append(shared::typeName(ivm::BasicParameter::Type::Timer));
+    typeItem->setData(typesList, EditRole);
     setItem(row, Column::Type, typeItem);
 
     QStandardItem *valueItem = new QStandardItem(row, Column::Value);
