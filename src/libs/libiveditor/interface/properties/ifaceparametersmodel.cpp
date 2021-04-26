@@ -17,12 +17,12 @@
 
 #include "ifaceparametersmodel.h"
 
-#include "ivinterface.h"
-#include "ivobject.h"
 #include "commandsstack.h"
 #include "interface/commands/cmdifaceparamchange.h"
 #include "interface/commands/cmdifaceparamcreate.h"
 #include "interface/commands/cmdifaceparamremove.h"
+#include "ivinterface.h"
+#include "ivobject.h"
 #include "propertytemplate.h"
 #include "propertytemplateconfig.h"
 
@@ -139,6 +139,9 @@ bool IfaceParametersModel::setData(const QModelIndex &index, const QVariant &val
 bool IfaceParametersModel::createProperty(const QString &propName)
 {
     ivm::InterfaceParameter param(propName);
+    if (!m_asn1Names.isEmpty()) {
+        param.setParamTypeName(m_asn1Names.front());
+    }
 
     auto propsCmd = new cmd::CmdIfaceParamCreate(m_dataObject, param);
     const int rows = rowCount();
