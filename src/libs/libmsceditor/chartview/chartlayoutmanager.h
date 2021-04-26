@@ -140,6 +140,7 @@ Q_SIGNALS:
     void layoutComplete();
     void cifDataChanged();
     void instancesRectChanged(const QRectF &rect);
+    void initialNameAccepted(MscEntity *entity);
 
 private Q_SLOTS:
     void onInstanceGeometryChanged();

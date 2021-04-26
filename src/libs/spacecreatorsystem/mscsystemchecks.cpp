@@ -347,7 +347,7 @@ void MscSystemChecks::onMscEntityNameChanged(QObject *entity, const QString &old
         }
 
         if (hasOldName && !hasNewName) {
-            if (command->isFirstChange()) {
+            if (command && command->isFirstChange()) {
                 QMessageBox box;
                 box.setWindowTitle(tr("Update IV function"));
                 box.setText(tr("The IV function should be updated."

@@ -91,6 +91,7 @@ InstanceItem::InstanceItem(
         instantLayoutUpdate();
         Q_EMIT needUpdateLayout();
     });
+    connect(m_headSymbol, &InstanceHeadItem::editingModeOff, this, &InstanceItem::checkforInitialName);
 
     if (m_chartLayoutManager && m_chartLayoutManager->systemChecker()) {
         m_headSymbol->setSystemChecker(m_chartLayoutManager->systemChecker());
@@ -289,6 +290,7 @@ QPair<QPointF, bool> InstanceItem::commentPoint() const
 void InstanceItem::postCreatePolishing()
 {
     InteractiveObject::postCreatePolishing();
+    m_initialName = m_instance->name();
     m_headSymbol->showCompleter();
 }
 
@@ -328,6 +330,18 @@ void InstanceItem::onKindEdited(const QString &newKind)
     m_chartLayoutManager->undoStack()->push(new cmd::CmdInstanceKindChange(m_instance, newKind, m_chartLayoutManager));
     // Update to have the bold text correct
     m_headSymbol->setKind(m_instance->denominatorAndKind());
+}
+
+/*!
+   Check if the user did not change the initial name (directly after creating the instance)
+ */
+void InstanceItem::checkforInitialName()
+{
+    if (!m_initialName.isEmpty() && m_instance->name() == m_initialName) {
+        Q_EMIT initialNameAccepted(m_instance);
+        checkIVFunction();
+    }
+    m_initialName.clear();
 }
 
 /*!

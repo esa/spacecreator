@@ -247,6 +247,10 @@ void MSCEditorCore::initHierarchyViewActions()
 
 void MSCEditorCore::initConnections()
 {
+    if (m_connectionsDone) {
+        return;
+    }
+
     Q_ASSERT(m_chartView != nullptr);
 
     if (auto chartview = qobject_cast<GraphicsView *>(m_chartView)) {
@@ -259,6 +263,13 @@ void MSCEditorCore::initConnections()
 
     connect(&(m_model->chartViewModel()), &msc::ChartLayoutManager::currentChartChanged, this,
             &MSCEditorCore::selectCurrentChart);
+    connect(&(m_model->chartViewModel()), &msc::ChartLayoutManager::initialNameAccepted, this,
+            [this](MscEntity *entity) {
+                if (!entity) {
+                    return;
+                }
+                Q_EMIT nameChanged(entity, entity->name(), nullptr);
+            });
 
     connect(m_model.get(), &msc::MainModel::showChartVew, this, [this]() { showDocumentView(true); });
 
@@ -267,6 +278,8 @@ void MSCEditorCore::initConnections()
     connect(this, &msc::MSCEditorCore::viewModeChanged, this, &msc::MSCEditorCore::updateHierarchyActions);
     connect(&(m_model->hierarchyViewModel()), &msc::HierarchyViewModel::hierarchyTypeChanged, this,
             &msc::MSCEditorCore::updateHierarchyActions);
+
+    m_connectionsDone = true;
 }
 
 void MSCEditorCore::addToolBars(QMainWindow *window)

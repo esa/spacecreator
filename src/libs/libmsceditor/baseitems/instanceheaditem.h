@@ -66,6 +66,7 @@ Q_SIGNALS:
     void manualMoveFinished(const QPointF &sceneFrom, const QPointF &sceneTo);
     void layoutUpdated();
     void textChanged();
+    void editingModeOff();
 
 protected Q_SLOTS:
     void updateLayout();

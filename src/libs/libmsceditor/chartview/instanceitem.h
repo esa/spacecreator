@@ -96,6 +96,9 @@ public Q_SLOTS:
     void rebuildLayout() override;
     void syncHeightToChartBox();
 
+Q_SIGNALS:
+    void initialNameAccepted(MscEntity *entity);
+
 protected:
     void onManualMoveProgress(shared::ui::GripPoint *gp, const QPointF &from, const QPointF &to) override;
     void onManualMoveFinish(shared::ui::GripPoint *gp, const QPointF &from, const QPointF &to) override;
@@ -110,6 +113,7 @@ protected:
 private Q_SLOTS:
     void onNameEdited(const QString &newName);
     void onKindEdited(const QString &newKind);
+    void checkforInitialName();
     void checkIVFunction();
 
 private:
@@ -128,6 +132,7 @@ private:
     QGraphicsLineItem *m_axisSymbol = nullptr;
     InstanceHeadItem *m_headSymbol = nullptr;
     InstanceEndItem *m_endSymbol = nullptr;
+    QString m_initialName;
 };
 
 } // namespace msc

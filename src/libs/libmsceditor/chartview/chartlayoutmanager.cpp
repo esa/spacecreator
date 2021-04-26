@@ -1288,6 +1288,9 @@ InstanceItem *ChartLayoutManager::createDefaultInstanceItem(MscInstance *orphanI
                 syncItemsPosToInstance(instanceI);
             }
         });
+        connect(instanceItem, &InstanceItem::initialNameAccepted, this, &ChartLayoutManager::initialNameAccepted,
+                Qt::UniqueConnection);
+
         return instanceItem;
     }
     return nullptr;

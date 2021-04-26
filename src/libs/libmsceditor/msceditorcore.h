@@ -183,6 +183,7 @@ private:
     QVector<QAction *> m_hierarchyActions;
 
     bool m_toolbarsVisible = true;
+    bool m_connectionsDone = false;
 };
 
 }

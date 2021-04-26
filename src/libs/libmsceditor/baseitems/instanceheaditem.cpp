@@ -70,6 +70,8 @@ InstanceHeadItem::InstanceHeadItem(MscChart *chart, QGraphicsItem *parent)
     connect(m_textItemName, &shared::ui::TextItem::textChanged, this, &InstanceHeadItem::updateGeometryOnTextChange);
     connect(m_textItemKind, &shared::ui::TextItem::textChanged, this, &InstanceHeadItem::updateGeometryOnTextChange);
 
+    connect(m_textItemName, &shared::ui::TextItem::editingModeOff, this, &InstanceHeadItem::editingModeOff);
+
     m_rectItem->setCursor(Qt::SizeAllCursor);
     m_textItemKind->setCursor(Qt::SizeAllCursor); // TODO: restore regular cursor for editing
 }
