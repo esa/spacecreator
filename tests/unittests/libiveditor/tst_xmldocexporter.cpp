@@ -185,7 +185,6 @@ void tst_XmlDocExporter::testExportComment()
 {
     auto testcomment1 = new ivm::IVComment("TestComment1", m_doc.get());
     testcomment1->setEntityAttribute(QLatin1String("foo"), QVariant::fromValue(11));
-    testcomment1->setEntityProperty(QLatin1String("bar"), QVariant::fromValue(22)); // ignored for comment
 
     QVector<ivm::IVObject *> objects;
     objects.append(testcomment1);
