@@ -63,6 +63,7 @@ public:
 
 Q_SIGNALS:
     void created();
+    void functionCreated(const shared::Id &id);
     void propertyEditorRequest(const shared::Id &id);
     void informUser(const QString &title, const QString &message) const;
 

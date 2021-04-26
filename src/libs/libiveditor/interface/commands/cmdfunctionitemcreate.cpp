@@ -17,24 +17,24 @@
 
 #include "cmdfunctionitemcreate.h"
 
+#include "baseitems/common/ivutils.h"
+#include "commandids.h"
 #include "ivfunction.h"
 #include "ivfunctiontype.h"
 #include "ivmodel.h"
-#include "baseitems/common/ivutils.h"
-#include "commandids.h"
 
 #include <QtDebug>
 
 namespace ive {
 namespace cmd {
 
-CmdFunctionItemCreate::CmdFunctionItemCreate(
-        ivm::IVModel *model, ivm::IVFunction *parent, const QRectF &geometry, const QString &title)
+CmdFunctionItemCreate::CmdFunctionItemCreate(ivm::IVModel *model, ivm::IVFunction *parent, const QRectF &geometry,
+        const QString &title, const shared::Id &id)
     : CmdEntityGeometryChange({}, QObject::tr("Create Function"))
     , m_model(model)
     , m_parent(parent)
     , m_entity(new ivm::IVFunction(
-              title, m_parent ? qobject_cast<QObject *>(m_parent) : qobject_cast<QObject *>(m_model)))
+              title, m_parent ? qobject_cast<QObject *>(m_parent) : qobject_cast<QObject *>(m_model), id))
 {
     prepareData({ qMakePair(m_entity, QVector<QPointF> { geometry.topLeft(), geometry.bottomRight() }) });
 }

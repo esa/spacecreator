@@ -17,8 +17,8 @@
 
 #pragma once
 
-#include "ivfunction.h"
 #include "ivconnectiongraphicsitem.h"
+#include "ivfunction.h"
 #include "ivfunctiontypegraphicsitem.h"
 
 class QSvgRenderer;

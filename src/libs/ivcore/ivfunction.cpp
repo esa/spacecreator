@@ -32,8 +32,8 @@ struct IVFunctionPrivate {
     QPointer<IVFunctionType> m_fnType;
 };
 
-IVFunction::IVFunction(const QString &title, QObject *parent)
-    : IVFunctionType(IVObject::Type::Function, title, parent)
+IVFunction::IVFunction(const QString &title, QObject *parent, const shared::Id &id)
+    : IVFunctionType(IVObject::Type::Function, title, parent, id)
     , d(new IVFunctionPrivate)
 {
     setEntityAttribute(meta::Props::token(meta::Props::Token::is_type), QStringLiteral("NO"));

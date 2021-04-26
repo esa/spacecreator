@@ -64,7 +64,6 @@ void IVFunctionTypeGraphicsItem::init()
     m_textItem->setTextAlignment(Qt::AlignLeft | Qt::AlignTop);
     m_textItem->setFont(font());
     updateText();
-    m_textItem->enableEditMode();
 
     connect(m_textItem, &shared::ui::TextItem::edited, this, &IVFunctionTypeGraphicsItem::updateNameFromUi);
     connect(entity(), &ivm::IVFunction::attributeChanged, this, [this](const QString &token) {
@@ -75,6 +74,11 @@ void IVFunctionTypeGraphicsItem::init()
     });
     connect(entity(), &ivm::IVFunction::titleChanged, this, &IVFunctionTypeGraphicsItem::updateText);
     connect(m_textItem, &IVFunctionNameGraphicsItem::textChanged, this, [this]() { updateTextPosition(); });
+}
+
+void IVFunctionTypeGraphicsItem::enableEditMode()
+{
+    m_textItem->enableEditMode();
 }
 
 void IVFunctionTypeGraphicsItem::rebuildLayout()

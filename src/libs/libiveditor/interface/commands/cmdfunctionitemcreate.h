@@ -18,6 +18,7 @@
 #pragma once
 
 #include "cmdentitygeometrychange.h"
+#include "common.h"
 
 #include <QPointer>
 #include <QRectF>
@@ -34,8 +35,8 @@ namespace cmd {
 class CmdFunctionItemCreate : public CmdEntityGeometryChange
 {
 public:
-    explicit CmdFunctionItemCreate(ivm::IVModel *model, ivm::IVFunction *parent,
-            const QRectF &geometry, const QString &title = QString());
+    explicit CmdFunctionItemCreate(ivm::IVModel *model, ivm::IVFunction *parent, const QRectF &geometry,
+            const QString &title = QString(), const shared::Id &id = shared::InvalidId);
     ~CmdFunctionItemCreate() override;
 
     void redo() override;

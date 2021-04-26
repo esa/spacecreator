@@ -17,9 +17,9 @@
 
 #pragma once
 
+#include "ivfunctiontype.h"
 #include "ivobject.h"
 #include "ivrectgraphicsitem.h"
-#include "ivfunctiontype.h"
 
 namespace ive {
 
@@ -39,6 +39,8 @@ public:
     ivm::IVFunctionType *entity() const override;
 
     void init() override;
+
+    void enableEditMode() override;
 
     QSizeF minimalSize() const override;
 

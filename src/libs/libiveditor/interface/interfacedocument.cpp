@@ -668,6 +668,15 @@ void InterfaceDocument::onDataTypesMenuInvoked()
         showNIYGUI(act->text());
 }
 
+void InterfaceDocument::prepareEntityNameForEditing(const shared::Id &id)
+{
+    if (auto entity = d->itemsModel->getItem(id)) {
+        if (auto iObj = qobject_cast<InteractiveObject *>(entity->toGraphicsObject())) {
+            iObj->enableEditMode();
+        }
+    }
+}
+
 void InterfaceDocument::onColorSchemeMenuInvoked()
 {
     shared::ColorManagerDialog *dialog = new shared::ColorManagerDialog(window());
@@ -936,6 +945,8 @@ QVector<QAction *> InterfaceDocument::initActions()
             currentAction->setChecked(false);
         d->tool->setCurrentToolType(CreatorTool::ToolType::Pointer);
     });
+    connect(d->tool, &CreatorTool::functionCreated, this, &InterfaceDocument::prepareEntityNameForEditing,
+            Qt::QueuedConnection);
     connect(d->tool, &CreatorTool::propertyEditorRequest, this, &InterfaceDocument::showPropertyEditor,
             Qt::QueuedConnection);
     connect(d->tool, &CreatorTool::informUser, this, &InterfaceDocument::showInfoMessage);

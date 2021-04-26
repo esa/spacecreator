@@ -133,6 +133,7 @@ private Q_SLOTS:
     void onItemCreated(const shared::Id &id);
 
     void onDataTypesMenuInvoked();
+    void prepareEntityNameForEditing(const shared::Id &id);
     void showPropertyEditor(const shared::Id &id);
     void showInfoMessage(const QString &title, const QString &message);
     void importEntity(const shared::Id &id, const QPointF &sceneDropPoint);

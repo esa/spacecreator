@@ -46,6 +46,8 @@ public:
 
     virtual ivm::IVObject *entity() const;
 
+    virtual void enableEditMode() {};
+
     QPen pen() const;
     void setPen(const QPen &pen);
 

@@ -40,7 +40,8 @@ class IVFunctionType : public IVObject
     Q_OBJECT
 
 public:
-    explicit IVFunctionType(const QString &title = QString(), QObject *parent = nullptr);
+    explicit IVFunctionType(
+            const QString &title = QString(), QObject *parent = nullptr, const shared::Id &id = shared::InvalidId);
     ~IVFunctionType() override;
 
     QVector<IVObject *> children() const;
@@ -77,8 +78,8 @@ Q_SIGNALS:
     void childRemoved(const shared::Id &id);
 
 protected:
-    explicit IVFunctionType(
-            const IVObject::Type t, const QString &title = QString(), QObject *parent = nullptr);
+    explicit IVFunctionType(const IVObject::Type t, const QString &title = QString(), QObject *parent = nullptr,
+            const shared::Id &id = shared::InvalidId);
 
 private:
     const std::unique_ptr<IVFunctionTypePrivate> d;

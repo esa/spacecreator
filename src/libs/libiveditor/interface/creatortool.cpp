@@ -17,18 +17,6 @@
 
 #include "creatortool.h"
 
-#include "ivcomment.h"
-#include "ivcommentgraphicsitem.h"
-#include "ivconnection.h"
-#include "ivconnectiongraphicsitem.h"
-#include "ivconnectiongroup.h"
-#include "ivfunction.h"
-#include "ivfunctiongraphicsitem.h"
-#include "ivfunctiontype.h"
-#include "ivfunctiontypegraphicsitem.h"
-#include "ivinterface.h"
-#include "ivinterfacegraphicsitem.h"
-#include "ivitemmodel.h"
 #include "baseitems/common/ivutils.h"
 #include "commands/cmdcommentitemcreate.h"
 #include "commands/cmdconnectiongroupitemcreate.h"
@@ -45,6 +33,18 @@
 #include "graphicsviewutils.h"
 #include "interface/createconnectiongroupdialog.h"
 #include "interfacedocument.h"
+#include "ivcomment.h"
+#include "ivcommentgraphicsitem.h"
+#include "ivconnection.h"
+#include "ivconnectiongraphicsitem.h"
+#include "ivconnectiongroup.h"
+#include "ivfunction.h"
+#include "ivfunctiongraphicsitem.h"
+#include "ivfunctiontype.h"
+#include "ivfunctiontypegraphicsitem.h"
+#include "ivinterface.h"
+#include "ivinterfacegraphicsitem.h"
+#include "ivitemmodel.h"
 #include "ui/grippointshandler.h"
 
 #include <QAction>
@@ -65,8 +65,7 @@
 #include <limits>
 
 static const qreal kContextMenuItemTolerance = 10.;
-static const QList<int> kFunctionTypes = { ive::IVFunctionGraphicsItem::Type,
-    ive::IVFunctionTypeGraphicsItem::Type };
+static const QList<int> kFunctionTypes = { ive::IVFunctionGraphicsItem::Type, ive::IVFunctionTypeGraphicsItem::Type };
 static const qreal kPreviewItemPenWidth = 2.;
 
 namespace ive {
@@ -331,8 +330,7 @@ bool CreatorTool::onMousePress(QMouseEvent *e)
     if ((d->toolType == ToolType::ReCreateConnection || e->modifiers() & Qt::ShiftModifier)
             && e->button() != Qt::RightButton) {
         if (!d->previewConnectionItem) {
-            QGraphicsItem *item =
-                    nearestItem(scene, scenePos, kInterfaceTolerance, { IVInterfaceGraphicsItem::Type });
+            QGraphicsItem *item = nearestItem(scene, scenePos, kInterfaceTolerance, { IVInterfaceGraphicsItem::Type });
             if (!item || item->type() != IVInterfaceGraphicsItem::Type)
                 return false;
 
@@ -388,8 +386,7 @@ bool CreatorTool::onMousePress(QMouseEvent *e)
         return true;
     } else if (d->toolType == ToolType::MultiPointConnection && e->button() != Qt::RightButton) {
         if (!d->previewConnectionItem) {
-            QGraphicsItem *item =
-                    nearestItem(scene, scenePos, kInterfaceTolerance, { IVInterfaceGraphicsItem::Type });
+            QGraphicsItem *item = nearestItem(scene, scenePos, kInterfaceTolerance, { IVInterfaceGraphicsItem::Type });
             if (!item)
                 return false;
 
@@ -819,9 +816,11 @@ void CreatorTool::CreatorToolPrivate::handleFunctionType(QGraphicsScene *scene, 
         }
 
         ivm::IVFunction *parentObject = gi::functionObject(this->previewItem->parentItem());
-
-        auto cmd = new cmd::CmdFunctionTypeItemCreate(model->objectsModel(), parentObject, itemSceneRect);
-        doc->commandsStack()->push(cmd);
+        const shared::Id id = shared::createId();
+        auto cmd = new cmd::CmdFunctionTypeItemCreate(model->objectsModel(), parentObject, itemSceneRect, id);
+        if (doc->commandsStack()->push(cmd)) {
+            Q_EMIT thisTool->functionCreated(id);
+        }
     }
 }
 
@@ -844,9 +843,11 @@ void CreatorTool::CreatorToolPrivate::handleFunction(QGraphicsScene *scene, cons
         }
 
         ivm::IVFunction *parentObject = gi::functionObject(this->previewItem->parentItem());
-
-        auto cmd = new cmd::CmdFunctionItemCreate(model->objectsModel(), parentObject, itemSceneRect);
-        doc->commandsStack()->push(cmd);
+        const shared::Id id = shared::createId();
+        auto cmd = new cmd::CmdFunctionItemCreate(model->objectsModel(), parentObject, itemSceneRect, QString(), id);
+        if (doc->commandsStack()->push(cmd)) {
+            Q_EMIT thisTool->functionCreated(id);
+        }
     }
 }
 
@@ -916,7 +917,8 @@ void CreatorTool::CreatorToolPrivate::handleConnection(const QVector<QPointF> &g
         ifaceCommons = ivm::IVInterface::CreationInfo::fromIface(info.startIface);
         ifaceCommons.function = info.endObject;
         ifaceCommons.position = info.endPointAdjusted;
-        ifaceCommons.type = info.isToOrFromNested ? info.startIface->direction() : ivm::IVInterface::InterfaceType::Provided;
+        ifaceCommons.type =
+                info.isToOrFromNested ? info.startIface->direction() : ivm::IVInterface::InterfaceType::Provided;
         ifaceCommons.id = info.endIfaceId;
         ifaceCommons.resetKind();
 
@@ -926,7 +928,8 @@ void CreatorTool::CreatorToolPrivate::handleConnection(const QVector<QPointF> &g
         ifaceCommons = ivm::IVInterface::CreationInfo::fromIface(info.endIface);
         ifaceCommons.function = info.startObject;
         ifaceCommons.position = info.startPointAdjusted;
-        ifaceCommons.type = info.isToOrFromNested ? info.endIface->direction() : ivm::IVInterface::InterfaceType::Required;
+        ifaceCommons.type =
+                info.isToOrFromNested ? info.endIface->direction() : ivm::IVInterface::InterfaceType::Required;
         ifaceCommons.id = info.startIfaceId;
         ifaceCommons.resetKind();
 
@@ -959,7 +962,8 @@ void CreatorTool::CreatorToolPrivate::handleConnection(const QVector<QPointF> &g
         if (!cmdMacro.push(createInterfaceCommand(ifaceCommons)))
             return;
     } else {
-        ivm::IVInterface *pi = ivm::IVConnection::selectIface<ivm::IVInterfaceProvided *>(info.startIface, info.endIface);
+        ivm::IVInterface *pi =
+                ivm::IVConnection::selectIface<ivm::IVInterfaceProvided *>(info.startIface, info.endIface);
         if (!pi)
             pi = info.startIface;
         ifaceCommons = ivm::IVInterface::CreationInfo::fromIface(pi);
@@ -967,8 +971,7 @@ void CreatorTool::CreatorToolPrivate::handleConnection(const QVector<QPointF> &g
         ifaceCommons.name.clear();
     }
 
-    IVFunctionGraphicsItem *prevStartItem =
-            qgraphicsitem_cast<ive::IVFunctionGraphicsItem *>(info.functionAtStartPos);
+    IVFunctionGraphicsItem *prevStartItem = qgraphicsitem_cast<ive::IVFunctionGraphicsItem *>(info.functionAtStartPos);
     QPointF firstExcludedPoint = *std::next(info.connectionPoints.constBegin());
     shared::Id prevStartIfaceId = info.startIfaceId;
     while (auto item = qgraphicsitem_cast<ive::IVFunctionGraphicsItem *>(prevStartItem->parentItem())) {
@@ -1048,10 +1051,10 @@ void CreatorTool::CreatorToolPrivate::handleConnection(const QVector<QPointF> &g
             ifaceCommons.function = item->entity();
             ifaceCommons.position = intersectionPoints.first();
 
-            ifaceCommons.type = info.endIface
-                    ? info.endIface->direction()
-                    : (graphicPoints.last() == info.connectionPoints.first() ? ivm::IVInterface::InterfaceType::Required
-                                                                             : ivm::IVInterface::InterfaceType::Provided);
+            ifaceCommons.type = info.endIface ? info.endIface->direction()
+                                              : (graphicPoints.last() == info.connectionPoints.first()
+                                                              ? ivm::IVInterface::InterfaceType::Required
+                                                              : ivm::IVInterface::InterfaceType::Provided);
 
             if (!cmdMacro.push(createInterfaceCommand(ifaceCommons)))
                 return;
