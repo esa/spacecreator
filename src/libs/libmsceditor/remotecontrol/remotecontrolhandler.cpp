@@ -277,7 +277,6 @@ bool RemoteControlHandler::handleMessageCommand(const QVariantMap &params, QStri
         mscTargetInstance->setExplicitCreator(mscSourceInstance);
     message->setTargetInstance(mscTargetInstance);
     message->setSourceInstance(mscSourceInstance);
-    mscChart->addInstanceEvent(message, pos);
 
     m_model->undoStack()->push(new msc::cmd::CmdMessageItemCreate(message, pos, chartViewModel()));
 
@@ -316,7 +315,6 @@ bool RemoteControlHandler::handleTimerCommand(const QVariantMap &params, QString
     const QString name = params.value(QLatin1String("name"), QStringLiteral("Timer_%1").arg(timerIdx)).toString();
     msc::MscTimer *mscTimer = new msc::MscTimer(name, timerType, mscChart);
     mscTimer->setInstance(mscInstance);
-    mscChart->addInstanceEvent(mscTimer, pos);
 
     m_model->undoStack()->push(
             new msc::cmd::CmdTimerItemCreate(mscTimer, timerType, mscInstance, pos, chartViewModel()));
@@ -346,7 +344,6 @@ bool RemoteControlHandler::handleActionCommand(const QVariantMap &params, QStrin
     const QString name = params.value(QLatin1String("name"), QStringLiteral("Action_%1").arg(actionIdx)).toString();
     mscAction->setInformalAction(name);
     mscAction->setInstance(mscInstance);
-    mscChart->addInstanceEvent(mscAction, pos);
 
     m_model->undoStack()->push(new msc::cmd::CmdActionItemCreate(mscAction, mscInstance, pos, chartViewModel()));
 
@@ -376,7 +373,6 @@ bool RemoteControlHandler::handleConditionCommand(const QVariantMap &params, QSt
     msc::MscCondition *mscCondition = new msc::MscCondition(name, mscChart);
     mscCondition->setInstance(mscInstance);
     mscCondition->setShared(params.value(QLatin1String("shared")).toBool());
-    mscChart->addInstanceEvent(mscCondition, pos);
 
     m_model->undoStack()->push(new msc::cmd::CmdConditionItemCreate(mscCondition, mscInstance, pos, chartViewModel()));
 

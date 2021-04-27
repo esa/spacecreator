@@ -44,6 +44,7 @@ private Q_SLOTS:
     void testNoDuplicateInstance();
     void testNoNullPtrInstance();
     void testInstanceByName();
+    void testAddActions();
     void testAddMessage();
     void testRemoveMessage();
     void testNoDuplicateMessage();
@@ -194,6 +195,49 @@ void tst_MscChart::testInstanceByName()
     m_chart->addInstance(instance);
     QCOMPARE(m_chart->instanceByName("IN"), instance);
     QCOMPARE(m_chart->instanceByName("OUT"), static_cast<MscInstance *>(nullptr));
+}
+
+void tst_MscChart::testAddActions()
+{
+    auto instance1 = new MscInstance("Sender", m_chart);
+    m_chart->addInstance(instance1);
+    auto instance2 = new MscInstance("Receiver", m_chart);
+    m_chart->addInstance(instance2);
+
+    auto actionA1 = new MscAction("Start");
+    actionA1->setInstance(instance1);
+    m_chart->addInstanceEvent(actionA1, { { instance1, 0 } });
+    QCOMPARE(m_chart->eventsForInstance(instance1).size(), 1);
+    QCOMPARE(m_chart->eventsForInstance(instance2).size(), 0);
+
+    auto action_fail = new MscAction("Ooops");
+    action_fail->setInstance(instance1);
+    m_chart->addInstanceEvent(action_fail, { { instance2, 0 } }); // ignored as using the wrong instance
+    QCOMPARE(m_chart->eventsForInstance(instance1).size(), 1);
+    QCOMPARE(m_chart->eventsForInstance(instance2).size(), 0);
+
+    auto actionB1 = new MscAction("Wait");
+    actionB1->setInstance(instance2);
+    m_chart->addInstanceEvent(actionB1, { { instance2, -1 } });
+    QCOMPARE(m_chart->eventsForInstance(instance1).size(), 1);
+    QCOMPARE(m_chart->eventsForInstance(instance2).size(), 1);
+
+    auto actionA2 = new MscAction("Stop");
+    actionA2->setInstance(instance1);
+    m_chart->addInstanceEvent(actionA2, { { instance1, 1 } });
+    auto actionA3 = new MscAction("ReStart");
+    actionA3->setInstance(instance1);
+    m_chart->addInstanceEvent(actionA3, { { instance1, 1 } }); // insert between other actions
+    QCOMPARE(m_chart->eventsForInstance(instance1).size(), 3);
+    QCOMPARE(m_chart->eventsForInstance(instance2).size(), 1);
+
+    const QVector<MscInstanceEvent *> events1 = m_chart->eventsForInstance(instance1);
+    const QVector<MscInstanceEvent *> ev1 = { actionA1, actionA3, actionA2 };
+    QCOMPARE(events1, ev1);
+
+    const QVector<MscInstanceEvent *> events2 = m_chart->eventsForInstance(instance2);
+    const QVector<MscInstanceEvent *> ev2 = { actionB1 };
+    QCOMPARE(events2, ev2);
 }
 
 void tst_MscChart::testAddMessage()

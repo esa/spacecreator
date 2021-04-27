@@ -300,6 +300,57 @@ int MscChart::addInstanceEvent(MscInstanceEvent *instanceEvent, int eventIndex)
 }
 
 /*!
+   \brief MscChart::addInstanceEvent
+   \param instanceEvent
+   \param instance
+   \param eventIndex
+   \return
+ */
+void MscChart::addInstanceEvent(MscInstanceEvent *event, const QHash<MscInstance *, int> &instanceIndexes)
+{
+    // Consistency check
+    for (auto it = instanceIndexes.begin(); it != instanceIndexes.end(); ++it) {
+        if (!event->relatesTo(it.key())) {
+            qCritical("Instance for adding the event");
+            return;
+        }
+        if (!m_events.contains(it.key())) {
+            qCritical("Instance missing for adding the event there");
+            return;
+        }
+    }
+
+    // Add event
+    for (auto it = instanceIndexes.begin(); it != instanceIndexes.end(); ++it) {
+        int idx = it.value();
+        QVector<MscInstanceEvent *> &list = m_events[it.key()];
+        if (idx < 0 || idx >= list.size()) {
+            idx = list.size();
+        }
+        list.insert(idx, event);
+    }
+    if (instanceIndexes.isEmpty()) {
+        m_orphanEvents.append(event);
+    }
+
+    m_instanceEvents = allEvents();
+
+    event->setParent(this);
+
+    connect(event, &MscInstanceEvent::dataChanged, this, &MscChart::dataChanged);
+    connect(event, &msc::MscInstanceEvent::instanceRelationChanged, this,
+            [this](MscInstance *addedInstance, MscInstance *removedInstance) {
+                if (auto ev = qobject_cast<MscInstanceEvent *>(sender())) {
+                    msc::MscChart::eventInstanceChange(ev, addedInstance, removedInstance);
+                }
+            });
+
+    Q_EMIT instanceEventAdded(event);
+    Q_EMIT instanceEventsChanged();
+    Q_EMIT dataChanged();
+}
+
+/*!
    Removes the instance event, but does not delete it.
    Removes the parentship of this chart.
  */

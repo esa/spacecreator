@@ -40,8 +40,11 @@ public:
     virtual qreal instanceTopArea(MscInstance *instance) const;
     virtual qreal instanceBottomArea(MscInstance *instance) const;
 
+    msc::MscInstanceEvent *eventEntity() const;
+
 private:
     qreal m_targetHCenter = -9.9e12;
+    QPointer<msc::MscInstanceEvent> m_event;
 };
 
 } // namespace msc

@@ -32,6 +32,7 @@ CmdActionItemCreate::CmdActionItemCreate(
     , m_instance(instance)
     , m_eventIndex(eventIndex)
 {
+    Q_ASSERT(action != nullptr);
     Q_ASSERT(m_chart.data());
 
     setText(QObject::tr("Add action"));
@@ -39,11 +40,6 @@ CmdActionItemCreate::CmdActionItemCreate(
 
 void CmdActionItemCreate::redo()
 {
-    if (!m_action) {
-        m_action = new MscAction();
-        m_action->setInformalAction(QObject::tr("Action_%1").arg(m_chart->totalEventNumber()));
-        m_modelItem = m_action;
-    }
     if (m_instance) {
         m_action->setInstance(m_instance.data());
     } else if (!m_action->instance() && !m_chart->instances().empty()) {
@@ -51,7 +47,9 @@ void CmdActionItemCreate::redo()
     }
 
     // The chart takes over parent-/owner-ship
-    m_chart->addInstanceEvent(m_action, m_eventIndex);
+    QHash<MscInstance *, int> instanceIndexes;
+    instanceIndexes[m_instance] = m_eventIndex;
+    m_chart->addInstanceEvent(m_action, instanceIndexes);
 
     checkVisualSorting();
 }

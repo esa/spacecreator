@@ -1200,6 +1200,34 @@ int ChartLayoutManager::eventIndex(const QPointF &pt, MscInstanceEvent *ignoreEv
     return idx;
 }
 
+/*!
+   Returns the index of event for the given \p instance for the given position \pt.
+   It checks the existing the event items along the
+ */
+int ChartLayoutManager::eventInstanceIndex(const QPointF &pt, MscInstance *instance, MscInstanceEvent *ignoreEvent)
+{
+    int idx = 0;
+    for (msc::InteractiveObject *item : qAsConst(d->m_instanceEventItemsSorted)) {
+        auto eventItem = qobject_cast<msc::EventItem *>(item);
+        if (!eventItem) {
+            continue;
+        }
+        if (!eventItem->eventEntity()->relatesTo(instance)) {
+            continue;
+        }
+        if (eventItem->modelEntity() == ignoreEvent) {
+            continue;
+        }
+
+        const qreal bottomY = eventItem->instanceBottomArea(instance);
+        if (bottomY < pt.y()) {
+            ++idx;
+        }
+    }
+
+    return idx;
+}
+
 int ChartLayoutManager::indexOfEvent(MscInstanceEvent *instanceEvent) const
 {
     if (!d->m_currentChart) {
@@ -1308,12 +1336,7 @@ bool ChartLayoutManager::removeInstanceItem(msc::InstanceItem *item)
 
 msc::MessageItem *ChartLayoutManager::createDefaultMessageItem(msc::MscMessage *orphanMessage, const QPointF &pos)
 {
-    if (currentChart()) {
-        if (!orphanMessage) {
-            orphanMessage = new MscMessage(tr("Message_%1").arg(currentChart()->totalEventNumber()));
-            currentChart()->addInstanceEvent(orphanMessage);
-        }
-
+    if (currentChart() && orphanMessage != nullptr) {
         return MessageItem::createDefaultItem(orphanMessage, this, pos);
     }
     return nullptr;

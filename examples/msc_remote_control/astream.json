@@ -19,6 +19,13 @@
             }
         },
         {
+            "CommandType": "Action",
+            "Parameters": {
+                "name": "Action_0",
+                "instanceName": "Instance_B"
+            }
+        },
+        {
             "CommandType": "Instance",
             "Parameters": {
                 "name": "Instance_C"
@@ -63,6 +70,13 @@
             }
         },
         {
+            "CommandType": "Action",
+            "Parameters": {
+                "name": "Action_1",
+                "instanceName": "Instance_C"
+            }
+        },
+        {
             "CommandType": "Timer",
             "Parameters": {
                 "name": "Timer_C_1",
@@ -76,6 +90,13 @@
                 "name": "Timer_A_1",
                 "instanceName": "Instance_A",
                 "TimerType": "Timeout"
+            }
+        },
+        {
+            "CommandType": "Action",
+            "Parameters": {
+                "name": "Action_2",
+                "instanceName": "Instance_A"
             }
         },
         {

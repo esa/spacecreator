@@ -46,6 +46,7 @@ public:
     Q_ENUM(ActionType)
 
     explicit MscAction(QObject *parent = nullptr);
+    MscAction(const QString &name, QObject *parent = nullptr);
 
     MscEntity::EntityType entityType() const override { return MscEntity::EntityType::Action; }
 

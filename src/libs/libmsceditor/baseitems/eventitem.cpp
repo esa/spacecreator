@@ -24,6 +24,7 @@ namespace msc {
 
 EventItem::EventItem(msc::MscInstanceEvent *entity, msc::ChartLayoutManager *chartLayoutManager, QGraphicsItem *parent)
     : InteractiveObject(entity, chartLayoutManager, parent)
+    , m_event(entity)
 {
 }
 
@@ -63,6 +64,14 @@ qreal EventItem::instanceBottomArea(MscInstance *instance) const
 {
     Q_UNUSED(instance)
     return sceneBoundingRect().bottom();
+}
+
+/*!
+   Returns the isntance event representent by this item
+ */
+MscInstanceEvent *EventItem::eventEntity() const
+{
+    return m_event;
 }
 
 } // namespace msc

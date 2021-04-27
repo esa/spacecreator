@@ -29,6 +29,11 @@ MscAction::MscAction(QObject *parent)
 {
 }
 
+MscAction::MscAction(const QString &name, QObject *parent)
+    : MscInstanceEvent(name, parent)
+{
+}
+
 void MscAction::setActionType(MscAction::ActionType type)
 {
     if (type == m_actionType) {

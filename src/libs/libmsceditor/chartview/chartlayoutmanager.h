@@ -94,6 +94,7 @@ public:
     msc::MscEntity *nearestEntity(const QPointF &pos);
     msc::MscInstance *nearestInstance(const QPointF &pos);
     int eventIndex(const QPointF &pt, MscInstanceEvent *ignoreEvent = nullptr);
+    int eventInstanceIndex(const QPointF &pt, MscInstance *instance, MscInstanceEvent *ignoreEvent = nullptr);
     int indexOfEvent(MscInstanceEvent *instanceEvent) const;
     msc::MscInstanceEvent *eventAtPosition(const QPointF &pos);
 
