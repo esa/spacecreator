@@ -32,7 +32,7 @@ namespace ivm {
  */
 
 struct IVObjectPrivate {
-    IVObjectPrivate(const shared::Id &id, const IVObject::Type t)
+    IVObjectPrivate(const IVObject::Type t)
         : m_type(t)
     {
     }
@@ -42,7 +42,7 @@ struct IVObjectPrivate {
 
 IVObject::IVObject(const IVObject::Type t, const QString &title, QObject *parent, const shared::Id &id)
     : shared::VEObject(id, parent)
-    , d(new IVObjectPrivate(id, t))
+    , d(new IVObjectPrivate(t))
 {
     if (const IVObject *parentObject = qobject_cast<const IVObject *>(parent))
         setModel(parentObject->model());

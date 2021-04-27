@@ -103,10 +103,9 @@ struct IVInterfacePrivate {
 
 IVInterface::IVInterface(IVObject::Type ifaceType, const CreationInfo &ci)
     : IVObject(ifaceType, ci.name, ci.function, ci.toBeCloned ? shared::createId() : ci.id)
-    , d(new IVInterfacePrivate(Type::InterfaceGroup == ifaceType
-                      ? ci.type
-                      : Type::RequiredInterface == ifaceType ? IVInterface::InterfaceType::Required
-                                                             : IVInterface::InterfaceType::Provided))
+    , d(new IVInterfacePrivate(Type::InterfaceGroup == ifaceType ? ci.type
+                      : Type::RequiredInterface == ifaceType     ? IVInterface::InterfaceType::Required
+                                                                 : IVInterface::InterfaceType::Provided))
 {
     setKind(ci.kind);
     setParams(ci.parameters);
@@ -498,7 +497,7 @@ void IVInterfaceRequired::setAttributeImpl(
                 if (!autoName)
                     m_originalFields.attrs[attributeName].setValue(usedName);
             } else {
-                IVInterface::setEntityAttribute(autonamedPropName, autoName);
+                IVInterface::setEntityProperty(autonamedPropName, autoName);
             }
             IVInterface::setAttributeImpl(attributeName, usedName, type);
             return;
