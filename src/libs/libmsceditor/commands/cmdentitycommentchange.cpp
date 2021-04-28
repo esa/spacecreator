@@ -50,7 +50,8 @@ void CmdEntityCommentChange::redo()
         if (!comment) {
             comment = m_modelItem->setCommentString(m_newComment);
         }
-        m_chart->addInstanceEvent(comment);
+        QHash<MscInstance *, int> instanceIndexes;
+        m_chart->addInstanceEvent(comment, instanceIndexes);
         comment->setText(m_newComment);
     }
 
