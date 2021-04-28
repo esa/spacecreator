@@ -345,6 +345,13 @@ void MscChart::addInstanceEvent(MscInstanceEvent *event, const QHash<MscInstance
                 }
             });
 
+    if (event->entityType() == MscEntity::EntityType::Timer) {
+        MscTimer *timer = static_cast<MscTimer *>(event);
+        connect(timer, &MscTimer::instanceChanged, this, [this, timer]() { resetTimerRelations(timer); });
+        connect(timer, &MscTimer::nameChanged, this, [this, timer]() { resetTimerRelations(timer); });
+        resetTimerRelations(timer);
+    }
+
     Q_EMIT instanceEventAdded(event);
     Q_EMIT instanceEventsChanged();
     Q_EMIT dataChanged();

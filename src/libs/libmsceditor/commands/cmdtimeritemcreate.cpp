@@ -32,6 +32,7 @@ CmdTimerItemCreate::CmdTimerItemCreate(MscTimer *timer, MscTimer::TimerType time
     , m_eventIndex(eventIndex)
     , m_timerType(m_timer ? m_timer->timerType() : timerType)
 {
+    Q_ASSERT(m_timer != nullptr);
     Q_ASSERT(m_chart.data());
 
     setText(QObject::tr("Add timer"));
@@ -39,10 +40,6 @@ CmdTimerItemCreate::CmdTimerItemCreate(MscTimer *timer, MscTimer::TimerType time
 
 void CmdTimerItemCreate::redo()
 {
-    if (!m_timer) {
-        m_timer = new MscTimer(tr("New_timer"), m_timerType);
-        m_modelItem = m_timer;
-    }
     if (m_instance) {
         m_timer->setInstance(m_instance.data());
     } else if (!m_timer->instance() && !m_chart->instances().empty()) {
@@ -50,7 +47,9 @@ void CmdTimerItemCreate::redo()
     }
 
     // The chart takes over parent-/owner-ship
-    m_chart->addInstanceEvent(m_timer, m_eventIndex);
+    QHash<MscInstance *, int> instanceIndexes;
+    instanceIndexes[m_instance] = m_eventIndex;
+    m_chart->addInstanceEvent(m_timer, instanceIndexes);
 
     checkVisualSorting();
 }
