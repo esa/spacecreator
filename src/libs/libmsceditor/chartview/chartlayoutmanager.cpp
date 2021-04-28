@@ -1219,6 +1219,12 @@ int ChartLayoutManager::eventInstanceIndex(const QPointF &pt, MscInstance *insta
             continue;
         }
 
+        if (eventItem->eventEntity()->entityType() == MscEntity::EntityType::Coregion) {
+            const qreal topY = eventItem->instanceTopArea(instance);
+            if (topY < pt.y()) {
+                ++idx;
+            }
+        }
         const qreal bottomY = eventItem->instanceBottomArea(instance);
         if (bottomY < pt.y()) {
             ++idx;

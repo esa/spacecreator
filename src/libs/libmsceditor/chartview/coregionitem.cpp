@@ -52,6 +52,7 @@ void CoregionItem::setBegin(MscCoregion *begin)
 {
     m_begin = begin;
     m_entity = begin;
+    m_event = begin;
 }
 
 void CoregionItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget)

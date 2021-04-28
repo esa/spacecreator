@@ -23,10 +23,12 @@
 #include "chartitem.h"
 #include "chartlayoutmanager.h"
 #include "common/chartlayouttestbase.h"
+#include "coregionitem.h"
 #include "instanceitem.h"
 #include "messageitem.h"
 #include "mscaction.h"
 #include "mscchart.h"
+#include "msccoregion.h"
 #include "msccreate.h"
 #include "mscdocument.h"
 #include "mscinstance.h"
@@ -75,6 +77,7 @@ private Q_SLOTS:
     void testMessageWithCifInformation();
 
     void testEventIndex();
+    void testInstanceEventIndex();
 
 protected:
     void parseMsc(const QString &mscDoc) override;
@@ -624,6 +627,41 @@ void tst_ChartLayoutManager::testEventIndex()
 
     int idx = m_chartModel->eventIndex(QPointF(actionCenter.x(), messageCenter.y()), action);
     QCOMPARE(idx, 0);
+}
+
+void tst_ChartLayoutManager::testInstanceEventIndex()
+{
+    const QString msc("mscdocument Untitled_Leaf;\
+            msc Untitled_MSC;\
+                instance Instance_1;\
+                    action 'Woohooo';\
+                    concurrent;\
+                    action 'Woohooo';\
+                    endconcurrent;\
+                endinstance;\
+            endmsc;\
+        endmscdocument;");
+    parseMsc(msc);
+
+    msc::MscInstance *instance = m_chart->instances().at(0);
+    auto action1 = qobject_cast<msc::MscAction *>(m_chart->eventsForInstance(instance).at(0));
+    auto begin = qobject_cast<msc::MscCoregion *>(m_chart->eventsForInstance(instance).at(1));
+    msc::ActionItem *action1Item = m_chartModel->itemForAction(action1);
+    msc::CoregionItem *coregionItem = m_chartModel->itemForCoregion(begin);
+
+    QPointF pt = action1Item->sceneBoundingRect().center();
+
+    pt.setY(action1Item->sceneBoundingRect().bottom() + 2);
+    QCOMPARE(m_chartModel->eventInstanceIndex(pt, instance), 1);
+
+    pt.setY(coregionItem->sceneBoundingRect().top() + 2);
+    QCOMPARE(m_chartModel->eventInstanceIndex(pt, instance), 2);
+
+    pt.setY(coregionItem->sceneBoundingRect().bottom() - 2);
+    QCOMPARE(m_chartModel->eventInstanceIndex(pt, instance), 3);
+
+    pt.setY(coregionItem->sceneBoundingRect().bottom() + 2);
+    QCOMPARE(m_chartModel->eventInstanceIndex(pt, instance), 4);
 }
 
 QTEST_MAIN(tst_ChartLayoutManager)

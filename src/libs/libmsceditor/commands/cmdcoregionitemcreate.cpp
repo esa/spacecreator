@@ -33,24 +33,21 @@ CmdCoregionItemCreate::CmdCoregionItemCreate(msc::MscCoregion *begin, msc::MscCo
     , m_instance(instance)
     , m_eventIndex(eventIndex)
 {
+    Q_ASSERT(m_begin != nullptr);
+    Q_ASSERT(m_end != nullptr);
 }
 
 void CmdCoregionItemCreate::redo()
 {
-    if (!m_begin) {
-        m_begin = new MscCoregion();
-        m_begin->setType(MscCoregion::Type::Begin);
-    }
-    if (!m_end) {
-        m_end = new MscCoregion();
-        m_end->setType(MscCoregion::Type::End);
-    }
     m_begin->setInstance(m_instance.data());
     m_end->setInstance(m_instance.data());
 
     // The chart takes over parent-/owner-ship
-    m_chart->addInstanceEvent(m_begin, m_eventIndex);
-    m_chart->addInstanceEvent(m_end, m_eventIndex + 1);
+    QHash<MscInstance *, int> instanceIndexes;
+    instanceIndexes[m_instance] = m_eventIndex;
+    m_chart->addInstanceEvent(m_begin, instanceIndexes);
+    instanceIndexes[m_instance] = m_eventIndex + 1;
+    m_chart->addInstanceEvent(m_end, instanceIndexes);
 
     checkVisualSorting();
 }

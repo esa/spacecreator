@@ -42,9 +42,11 @@ public:
 
     msc::MscInstanceEvent *eventEntity() const;
 
+protected:
+    QPointer<msc::MscInstanceEvent> m_event;
+
 private:
     qreal m_targetHCenter = -9.9e12;
-    QPointer<msc::MscInstanceEvent> m_event;
 };
 
 } // namespace msc
