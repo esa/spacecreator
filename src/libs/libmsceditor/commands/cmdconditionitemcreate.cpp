@@ -25,13 +25,14 @@
 namespace msc {
 namespace cmd {
 
-CmdConditionItemCreate::CmdConditionItemCreate(
-        MscCondition *condition, msc::MscInstance *instance, int eventIndex, ChartLayoutManager *layoutManager)
+CmdConditionItemCreate::CmdConditionItemCreate(MscCondition *condition, msc::MscInstance *instance,
+        QHash<MscInstance *, int> instanceIndexes, ChartLayoutManager *layoutManager)
     : ChartBaseCommand(condition, layoutManager)
     , m_condition(condition)
     , m_instance(instance)
-    , m_eventIndex(eventIndex)
+    , m_instanceIndexes(instanceIndexes)
 {
+    Q_ASSERT(m_condition != nullptr);
     Q_ASSERT(m_chart.data());
 
     setText(QObject::tr("Add condition"));
@@ -39,11 +40,6 @@ CmdConditionItemCreate::CmdConditionItemCreate(
 
 void CmdConditionItemCreate::redo()
 {
-    if (!m_condition) {
-        m_condition = new MscCondition();
-        m_condition->setName(QObject::tr("Condition_%1").arg(m_chart->totalEventNumber()));
-        m_modelItem = m_condition;
-    }
     if (m_instance) {
         m_condition->setInstance(m_instance.data());
     } else if (!m_condition->instance() && !m_chart->instances().empty()) {
@@ -51,7 +47,7 @@ void CmdConditionItemCreate::redo()
     }
 
     // The chart takes over parent-/owner-ship
-    m_chart->addInstanceEvent(m_condition, m_eventIndex);
+    m_chart->addInstanceEvent(m_condition, m_instanceIndexes);
 
     checkVisualSorting();
 }

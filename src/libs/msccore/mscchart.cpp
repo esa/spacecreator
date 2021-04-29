@@ -912,7 +912,7 @@ bool MscChart::eventsCheck() const
 }
 
 // Used for function MscChart::allEvents()
-void addTopUntil(MscInstance *instance, MscInstanceEvent *untilEvent, QVector<MscInstance *> instances,
+void addTopUntil(MscInstance *instance, MscInstanceEvent *untilEvent, const QVector<MscInstance *> &instances,
         const QHash<const MscInstance *, QVector<MscInstanceEvent *>> &events, QVector<MscInstanceEvent *> &result,
         MscInstanceEvent *noRecurEvent)
 {
@@ -922,6 +922,8 @@ void addTopUntil(MscInstance *instance, MscInstanceEvent *untilEvent, QVector<Ms
 
     for (MscInstanceEvent *event : events[instance]) {
         if (!result.contains(event)) {
+            QVector<MscInstance *> otherInstances = instances;
+            otherInstances.removeAll(instance);
             // check depending on type if other stacks need to be added before
             if (event->entityType() == MscEntity::EntityType::Message) {
                 auto message = static_cast<MscMessage *>(event);
@@ -936,9 +938,9 @@ void addTopUntil(MscInstance *instance, MscInstanceEvent *untilEvent, QVector<Ms
             }
             if (event->entityType() == MscEntity::EntityType::Condition) {
                 auto condition = static_cast<MscCondition *>(event);
-                if (condition->shared() && event != noRecurEvent) {
-                    for (MscInstance *inst : qAsConst(instances)) {
-                        addTopUntil(inst, event, instances, events, result, event);
+                if (condition->shared()) {
+                    for (MscInstance *inst : qAsConst(otherInstances)) {
+                        addTopUntil(inst, event, otherInstances, events, result, noRecurEvent);
                     }
                 }
             }

@@ -53,6 +53,8 @@ private Q_SLOTS:
     void testAddGate();
     void testRemoveGate();
     void testAddCondition();
+    void testAddSharedCondition();
+    void testAddSharedConditionMix();
     void testRemoveCondition();
     void testTimerRelation();
     void testInvalidTimerRelation();
@@ -329,6 +331,67 @@ void tst_MscChart::testAddCondition()
 
     m_chart->addInstanceEvent(nullptr);
     QCOMPARE(m_chart->totalEventNumber(), 1);
+}
+
+void tst_MscChart::testAddSharedCondition()
+{
+    auto instanceA = new MscInstance("IA");
+    m_chart->addInstance(instanceA);
+    auto instanceB = new MscInstance("IB");
+    m_chart->addInstance(instanceB);
+
+    auto condition1 = new MscCondition("C_1");
+    condition1->setInstance(instanceB);
+    QHash<MscInstance *, int> indexes = { { instanceB, -1 } };
+    m_chart->addInstanceEvent(condition1, indexes);
+    QCOMPARE(m_chart->totalEventNumber(), 1);
+
+    auto condition2 = new MscCondition("C_S1");
+    condition2->setInstance(instanceA);
+    condition2->setShared(true);
+    indexes = { { instanceA, 0 }, { instanceB, 1 } };
+    m_chart->addInstanceEvent(condition2, indexes);
+    QCOMPARE(m_chart->totalEventNumber(), 2);
+
+    QVector<MscInstanceEvent *> events = m_chart->instanceEvents();
+    QCOMPARE(events.at(0), condition1);
+    QCOMPARE(events.at(1), condition2);
+}
+
+void tst_MscChart::testAddSharedConditionMix()
+{
+    auto instanceA = new MscInstance("IA");
+    m_chart->addInstance(instanceA);
+    auto instanceB = new MscInstance("IB");
+    m_chart->addInstance(instanceB);
+    auto instanceC = new MscInstance("IC");
+    m_chart->addInstance(instanceC);
+
+    MscTimer *timer1 = new MscTimer("T1", MscTimer::TimerType::Stop);
+    timer1->setInstance(instanceC);
+    QHash<MscInstance *, int> indexes = { { instanceC, -1 } };
+    m_chart->addInstanceEvent(timer1);
+
+    auto condition1 = new MscCondition("C_1");
+    condition1->setInstance(instanceB);
+    indexes = { { instanceB, -1 } };
+    m_chart->addInstanceEvent(condition1, indexes);
+    QCOMPARE(m_chart->totalEventNumber(), 2);
+    QVector<MscInstanceEvent *> events = m_chart->instanceEvents();
+    QCOMPARE(events.at(0), condition1);
+    QCOMPARE(events.at(1), timer1);
+
+    auto condition2 = new MscCondition("C_S1");
+    condition2->setInstance(instanceB);
+    condition2->setShared(true);
+    indexes = { { instanceA, 0 }, { instanceB, 1 }, { instanceC, 1 } };
+    m_chart->addInstanceEvent(condition2, indexes);
+    QCOMPARE(m_chart->totalEventNumber(), 3);
+
+    events = m_chart->instanceEvents();
+    QCOMPARE(events.at(0), condition1);
+    QCOMPARE(events.at(1), timer1);
+    QCOMPARE(events.at(2), condition2);
 }
 
 void tst_MscChart::testRemoveCondition()

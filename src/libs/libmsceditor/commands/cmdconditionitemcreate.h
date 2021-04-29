@@ -19,6 +19,7 @@
 
 #include "chartbasecommand.h"
 
+#include <QHash>
 #include <QPointer>
 
 namespace msc {
@@ -32,7 +33,8 @@ namespace cmd {
 class CmdConditionItemCreate : public ChartBaseCommand
 {
 public:
-    CmdConditionItemCreate(msc::MscCondition *condition, msc::MscInstance *instance, int eventIndex, ChartLayoutManager *layoutManager);
+    CmdConditionItemCreate(msc::MscCondition *condition, msc::MscInstance *instance,
+            QHash<MscInstance *, int> instanceIndexes, ChartLayoutManager *layoutManager);
 
     void redo() override;
     void undo() override;
@@ -42,7 +44,7 @@ public:
 private:
     MscCondition *m_condition = nullptr;
     QPointer<MscInstance> m_instance;
-    int m_eventIndex = -1;
+    QHash<MscInstance *, int> m_instanceIndexes;
 };
 
 } // namespace cmd

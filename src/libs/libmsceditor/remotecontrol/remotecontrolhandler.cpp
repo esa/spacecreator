@@ -374,7 +374,17 @@ bool RemoteControlHandler::handleConditionCommand(const QVariantMap &params, QSt
     mscCondition->setInstance(mscInstance);
     mscCondition->setShared(params.value(QLatin1String("shared")).toBool());
 
-    m_model->undoStack()->push(new msc::cmd::CmdConditionItemCreate(mscCondition, mscInstance, pos, chartViewModel()));
+    QHash<MscInstance *, int> instanceIndexes;
+    if (mscCondition->shared()) {
+        for (msc::MscInstance *instance : mscChart->instances()) {
+            instanceIndexes[instance] = mscChart->eventsForInstance(instance).size();
+        }
+    } else {
+        instanceIndexes[mscInstance] = pos;
+    }
+
+    m_model->undoStack()->push(
+            new msc::cmd::CmdConditionItemCreate(mscCondition, mscInstance, instanceIndexes, chartViewModel()));
 
     return true;
 }

@@ -74,8 +74,17 @@ void ConditionCreatorTool::commitPreviewItem()
     condition->setShared(m_shared);
     startWaitForModelLayoutComplete(condition);
     auto instance = m_model->nearestInstance(m_previewItem->sceneBoundingRect().center());
-    const int eventIndex = m_model->eventIndex(m_previewItem->pos());
-    m_model->undoStack()->push(new cmd::CmdConditionItemCreate(condition, instance, eventIndex, m_model));
+
+    QHash<MscInstance *, int> instanceIndexes;
+    if (m_shared) {
+        for (msc::MscInstance *inst : m_model->currentChart()->instances()) {
+            instanceIndexes[inst] = m_model->eventInstanceIndex(m_previewItem->pos(), inst);
+        }
+    } else {
+        instanceIndexes[instance] = m_model->eventInstanceIndex(m_previewItem->pos(), instance);
+    }
+
+    m_model->undoStack()->push(new cmd::CmdConditionItemCreate(condition, instance, instanceIndexes, m_model));
 
     removePreviewItem();
 
