@@ -41,11 +41,11 @@ CmdMessageItemCreate::InstanceGeometry CmdMessageItemCreate::initGeometryHolder(
     return geometry;
 }
 
-CmdMessageItemCreate::CmdMessageItemCreate(
-        msc::MscMessage *message, int eventIndex, ChartLayoutManager *layoutManager, const QVector<QPoint> &points)
+CmdMessageItemCreate::CmdMessageItemCreate(msc::MscMessage *message, QHash<MscInstance *, int> instanceIndexes,
+        ChartLayoutManager *layoutManager, const QVector<QPoint> &points)
     : ChartBaseCommand(message, layoutManager)
     , m_message(message)
-    , m_eventIndex(eventIndex)
+    , m_instanceIndexes(instanceIndexes)
     , m_msgPoints(points)
     , m_sourceGeometryPrev(initGeometryHolder(
               (layoutManager && m_message) ? layoutManager->itemForInstance(m_message->sourceInstance()) : nullptr))
@@ -73,7 +73,7 @@ void CmdMessageItemCreate::redo()
         }
 
     // The chart takes over parent-/owner-ship
-    m_chart->addInstanceEvent(m_message, m_eventIndex);
+    m_chart->addInstanceEvent(m_message, m_instanceIndexes);
 
     checkVisualSorting();
 }

@@ -244,12 +244,21 @@ void tst_MscChart::testAddActions()
 
 void tst_MscChart::testAddMessage()
 {
+    auto instanceA = new MscInstance("Sender", m_chart);
+    m_chart->addInstance(instanceA);
+    auto instanceB = new MscInstance("Receiver", m_chart);
+    m_chart->addInstance(instanceB);
+
     QCOMPARE(m_chart->totalEventNumber(), 0);
 
-    auto message1 = new MscMessage("IN", m_chart);
-    m_chart->addInstanceEvent(message1);
-    auto message2 = new MscMessage("OUT", m_chart);
-    m_chart->addInstanceEvent(message2);
+    auto message1 = new MscMessage("IN", instanceA, instanceB, m_chart);
+    QHash<MscInstance *, int> instanceIndexes = { { instanceA, 0 }, { instanceB, 0 } };
+    m_chart->addInstanceEvent(message1, instanceIndexes);
+
+    // crossing message
+    auto message2 = new MscMessage("OUT", instanceB, instanceA, m_chart);
+    instanceIndexes = { { instanceA, 1 }, { instanceB, 0 } };
+    m_chart->addInstanceEvent(message2, instanceIndexes);
     QCOMPARE(m_chart->totalEventNumber(), 2);
 }
 

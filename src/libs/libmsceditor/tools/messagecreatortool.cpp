@@ -147,13 +147,22 @@ void MessageCreatorTool::commitPreviewItem()
         if (isValid) {
             const QVariantList &cmdParams = prepareMessage();
             if (!cmdParams.isEmpty()) {
+                QHash<MscInstance *, int> instanceIndexes;
+                if (m_message->sourceInstance()) {
+                    instanceIndexes[m_message->sourceInstance()] =
+                            m_model->eventInstanceIndex(m_messageItem->tail(), m_message->sourceInstance());
+                }
+                if (m_message->targetInstance()) {
+                    instanceIndexes[m_message->targetInstance()] =
+                            m_model->eventInstanceIndex(m_messageItem->head(), m_message->targetInstance());
+                }
+
                 startWaitForModelLayoutComplete(m_message);
                 removePreviewItem(); // Remove the preview item before the real one is added
 
-                const int eventIndex = cmdParams.at(1).toInt();
                 const QVector<QPoint> &points =
                         cmdParams.size() == 3 ? cmdParams.at(2).value<QVector<QPoint>>() : QVector<QPoint>();
-                m_model->undoStack()->push(new cmd::CmdMessageItemCreate(m_message, eventIndex, m_model, points));
+                m_model->undoStack()->push(new cmd::CmdMessageItemCreate(m_message, instanceIndexes, m_model, points));
 
                 Q_EMIT created(); // to deactivate toobar's item
                 m_message.clear();

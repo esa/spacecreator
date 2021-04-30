@@ -46,13 +46,11 @@ private Q_SLOTS:
     void testCreate();
     void testUndo();
     void testRedo();
-    void testPerformance();
     void testInsertingOrder();
 
 private:
     QScopedPointer<ChartLayoutManager> m_chartModel;
     static constexpr int CommandsCount = 10;
-    static constexpr bool SkipBenchmark = true; // not a really usefull thing to be run on the CI server
     msc::MscChart *m_chart = nullptr;
     QScopedPointer<msc::MscCommandsStack> m_undoStack;
     QPointer<MscInstance> m_instance;
@@ -64,7 +62,6 @@ private:
 
 // make cpp11 happy for ODR-use:
 constexpr int tst_CmdMessageItemCreate::CommandsCount;
-constexpr bool tst_CmdMessageItemCreate::SkipBenchmark;
 const QVariant tst_CmdMessageItemCreate::m_dummyCif = QVariant::fromValue<QVector<QPoint>>(QVector<QPoint>());
 
 void tst_CmdMessageItemCreate::initTestCase()
@@ -89,7 +86,7 @@ void tst_CmdMessageItemCreate::testCreate()
 {
     for (int i = 0; i < CommandsCount; ++i) {
         auto message = new MscMessage(QString("M%").arg(i), m_instance, nullptr, nullptr);
-        auto cmd = new msc::cmd::CmdMessageItemCreate(message, -1, m_chartModel.data());
+        auto cmd = new msc::cmd::CmdMessageItemCreate(message, { { m_instance, -1 } }, m_chartModel.data());
         m_undoStack->push(cmd);
     }
 
@@ -122,45 +119,6 @@ void tst_CmdMessageItemCreate::testRedo()
     QCOMPARE(redone, CommandsCount);
 }
 
-void tst_CmdMessageItemCreate::testPerformance()
-{
-    if (SkipBenchmark)
-        QSKIP(qPrintable(QString("This benchmark detects the time spent to perform %1 "
-                                 "CreateMessage commands (create, undo, redo).\n"
-                                 "It's intended for manual testing, so skipped here.")
-                                 .arg(CommandsCount)));
-
-    m_chartModel->clearScene();
-    m_undoStack->clear();
-
-    QCOMPARE(itemsCount(), 0);
-
-    QBENCHMARK {
-        m_chartModel->graphicsScene()->setSceneRect(
-                -CommandsCount, -CommandsCount, 2. * CommandsCount, 2. * CommandsCount);
-
-        // create:
-        for (int i = 0; i < CommandsCount; ++i) {
-            auto cmd = new msc::cmd::CmdMessageItemCreate(nullptr, -1, m_chartModel.data());
-            m_undoStack->push(cmd);
-        }
-
-        // undo:
-        int undone(0);
-        while (m_undoStack->canUndo()) {
-            m_undoStack->undo();
-            ++undone;
-        }
-
-        // redo:
-        int redone(0);
-        while (m_undoStack->canRedo()) {
-            m_undoStack->redo();
-            ++redone;
-        }
-    }
-}
-
 int tst_CmdMessageItemCreate::itemsCount()
 {
     return m_chart->totalEventNumber();
@@ -179,7 +137,7 @@ void tst_CmdMessageItemCreate::testInsertingOrder()
 
     for (const QString &name : names) {
         auto cmd = new msc::cmd::CmdMessageItemCreate(
-                new msc::MscMessage(name, m_instance, nullptr, nullptr), 0, m_chartModel.data());
+                new msc::MscMessage(name, m_instance, nullptr, nullptr), { { m_instance, 0 } }, m_chartModel.data());
         m_undoStack->push(cmd);
     }
 

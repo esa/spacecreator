@@ -44,8 +44,6 @@ private Q_SLOTS:
     void init();
     void cleanup();
 
-    void testPerformance();
-
 private:
     void waitForLayoutUpdate()
     {
@@ -60,7 +58,6 @@ private:
     QPointer<QGraphicsView> m_view;
     QPointer<InstanceItem> m_instanceItem;
     static constexpr int CommandsCount = 100;
-    static constexpr bool SkipBenchmark = true; // not a really useful thing to be run on the CI server
     static constexpr bool IsLocalBuild = false; // show the view and process events after each action to see the result
 
     void moveInstance(const QPoint &from);
@@ -68,7 +65,6 @@ private:
 
 // make cpp11 happy for ODR-use:
 constexpr int tsti100messages::CommandsCount;
-constexpr bool tsti100messages::SkipBenchmark;
 
 void tsti100messages::initTestCase()
 {
@@ -102,42 +98,6 @@ void tsti100messages::init()
 void tsti100messages::cleanup()
 {
     vstest::restoreMousePosition();
-}
-
-void tsti100messages::testPerformance()
-{
-    if (SkipBenchmark)
-        QSKIP(qPrintable(QString("This benchmark detects the time spent on:\n\t"
-                                 "- Create %1 MessageItems connected to a single InstanceItem;\n\t"
-                                 "- Move that InstanceItem by mouse;\n\t"
-                                 "- Undo messages creation.\n"
-                                 "Could be used to test the general smoothness of processes where "
-                                 "the user interaction is involved.\n"
-                                 "It's intended for manual testing, so skipped here.")
-                                 .arg(CommandsCount)));
-    QBENCHMARK {
-        const QPointF &instacneCenter = m_instanceItem->boundingRect().translated(m_instanceItem->pos()).center();
-
-        QVariantList params = { QVariant::fromValue<QGraphicsScene *>(m_model->graphicsScene()), QPointF() };
-
-        for (int j = 0; j < CommandsCount / 2; ++j) {
-            m_undoStack->push(new msc::cmd::CmdMessageItemCreate(nullptr, -1, m_model.data()));
-            m_undoStack->push(new msc::cmd::CmdMessageItemCreate(nullptr, -1, m_model.data()));
-
-            if (IsLocalBuild) {
-                waitForLayoutUpdate();
-            }
-        }
-
-        moveInstance(m_view->mapFromScene(instacneCenter));
-
-        while (m_undoStack->canUndo()) {
-            m_undoStack->undo();
-            if (IsLocalBuild) {
-                waitForLayoutUpdate();
-            }
-        }
-    }
 }
 
 void tsti100messages::moveInstance(const QPoint &pntMove)

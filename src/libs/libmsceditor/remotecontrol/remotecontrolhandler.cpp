@@ -259,7 +259,6 @@ bool RemoteControlHandler::handleMessageCommand(const QVariantMap &params, QStri
     const int msgTypeInt = qtEnum.keyToValue(msgTypeStr.toLocal8Bit().constData());
     const msc::MscMessage::MessageType messageType = static_cast<msc::MscMessage::MessageType>(msgTypeInt);
 
-    const int pos = params.value(QLatin1String("pos"), -1).toInt();
     const int messageIdx = mscChart->totalEventNumber();
     const QString name = params.value(QLatin1String("name"),
                                        messageType == msc::MscMessage::MessageType::Message
@@ -278,7 +277,15 @@ bool RemoteControlHandler::handleMessageCommand(const QVariantMap &params, QStri
     message->setTargetInstance(mscTargetInstance);
     message->setSourceInstance(mscSourceInstance);
 
-    m_model->undoStack()->push(new msc::cmd::CmdMessageItemCreate(message, pos, chartViewModel()));
+    QHash<MscInstance *, int> instanceIndexes;
+    if (message->sourceInstance()) {
+        instanceIndexes[message->sourceInstance()] = -1;
+    }
+    if (message->targetInstance()) {
+        instanceIndexes[message->targetInstance()] = -1;
+    }
+
+    m_model->undoStack()->push(new msc::cmd::CmdMessageItemCreate(message, instanceIndexes, chartViewModel()));
 
     return true;
 }

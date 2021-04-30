@@ -181,24 +181,8 @@ QVector<MscInstanceEvent *> MscChart::instanceEvents() const
 
 QVector<MscInstanceEvent *> MscChart::eventsForInstance(const MscInstance *instance) const
 {
-    if (!instance) {
+    if (!instance || !m_events.contains(instance)) {
         return {};
-    }
-
-    Q_ASSERT(m_events.contains(instance));
-
-    QVector<MscInstanceEvent *> events;
-    for (MscInstanceEvent *instanceEvent : instanceEvents()) {
-        if (auto event = qobject_cast<MscInstanceEvent *>(instanceEvent)) {
-            if (event->relatesTo(instance)) {
-                events.append(instanceEvent);
-            }
-        }
-    }
-
-    if (events != m_events.value(instance)) {
-        qWarning() << "Missmatch in events per instance! :(";
-        qFatal("Missmatch in events");
     }
 
     return m_events.value(instance);
@@ -928,12 +912,12 @@ void addTopUntil(MscInstance *instance, MscInstanceEvent *untilEvent, const QVec
             if (event->entityType() == MscEntity::EntityType::Message) {
                 auto message = static_cast<MscMessage *>(event);
                 if (message->sourceInstance() != nullptr && message->sourceInstance() != instance
-                        && event != noRecurEvent) {
-                    addTopUntil(message->sourceInstance(), event, instances, events, result, event);
+                        && instances.contains(message->sourceInstance()) && event != noRecurEvent) {
+                    addTopUntil(message->sourceInstance(), event, otherInstances, events, result, event);
                 }
                 if (message->targetInstance() != nullptr && message->targetInstance() != instance
-                        && event != noRecurEvent) {
-                    addTopUntil(message->targetInstance(), event, instances, events, result, event);
+                        && instances.contains(message->targetInstance()) && event != noRecurEvent) {
+                    addTopUntil(message->targetInstance(), event, otherInstances, events, result, event);
                 }
             }
             if (event->entityType() == MscEntity::EntityType::Condition) {
@@ -947,7 +931,7 @@ void addTopUntil(MscInstance *instance, MscInstanceEvent *untilEvent, const QVec
             if (event->entityType() == MscEntity::EntityType::Create) {
                 auto create = static_cast<MscMessage *>(event);
                 if (create->targetInstance() != nullptr && create->targetInstance() == instance) {
-                    addTopUntil(create->targetInstance(), event, instances, events, result, event);
+                    addTopUntil(create->targetInstance(), event, otherInstances, events, result, event);
                 }
             }
 

@@ -19,6 +19,7 @@
 
 #include "chartbasecommand.h"
 
+#include <QHash>
 #include <QPointF>
 #include <QPointer>
 #include <QVector>
@@ -27,6 +28,7 @@ namespace msc {
 
 class ChartLayoutManager;
 class MscChart;
+class MscInstance;
 class MscMessage;
 class InstanceItem;
 
@@ -35,7 +37,7 @@ namespace cmd {
 class CmdMessageItemCreate : public ChartBaseCommand
 {
 public:
-    CmdMessageItemCreate(msc::MscMessage *message, int eventIndex,
+    CmdMessageItemCreate(msc::MscMessage *message, QHash<MscInstance *, int> instanceIndexes,
             ChartLayoutManager *layoutManager, const QVector<QPoint> &points = QVector<QPoint>());
 
     void redo() override;
@@ -45,7 +47,7 @@ public:
 
 private:
     MscMessage *m_message = nullptr;
-    int m_eventIndex;
+    QHash<MscInstance *, int> m_instanceIndexes;
     QVector<QPoint> m_msgPoints;
 
     struct InstanceGeometry {
