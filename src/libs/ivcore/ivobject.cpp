@@ -241,6 +241,10 @@ void IVObject::setGroupName(const QString &groupName)
 
 void IVObject::setEntityAttributes(const EntityAttributes &attributes)
 {
+    if (attributes == entityAttributes()) {
+        return;
+    }
+
     clearAttributes();
     QList<EntityAttribute> attrs = attributes.values();
     std::sort(attrs.begin(), attrs.end(), [](const EntityAttribute &a1, const EntityAttribute &a2) {

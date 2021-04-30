@@ -199,10 +199,10 @@ QVector<IVInterface *> IVFunctionType::interfaces() const
 {
     QVector<IVInterface *> result;
 
-    for (auto i : d->m_pis)
+    for (auto i : qAsConst(d->m_pis))
         result.append(i->as<IVInterface *>());
 
-    for (auto i : d->m_ris)
+    for (auto i : qAsConst(d->m_ris))
         result.append(i->as<IVInterface *>());
 
     return result;
@@ -212,13 +212,13 @@ QVector<IVInterface *> IVFunctionType::allInterfaces() const
 {
     QVector<IVInterface *> result;
 
-    for (auto i : d->m_pis)
+    for (auto i : qAsConst(d->m_pis))
         result.append(i->as<IVInterface *>());
 
-    for (auto i : d->m_ris)
+    for (auto i : qAsConst(d->m_ris))
         result.append(i->as<IVInterface *>());
 
-    for (auto i : d->m_ifaceGroups)
+    for (auto i : qAsConst(d->m_ifaceGroups))
         result.append(i->as<IVInterface *>());
 
     return result;

@@ -80,14 +80,15 @@ void tst_IVInterface::tst_setAttr_Autoname()
     std::unique_ptr<ivm::IVInterfaceProvided> provIface = std::make_unique<ivm::IVInterfaceProvided>(ci);
     model.addObject(provIface.get());
     reqIface->setPrototype(provIface.get());
-    QVERIFY(!reqIface->hasEntityAttribute(autonamedPropName));
+    QVERIFY(reqIface->hasEntityAttribute(autonamedPropName));
+    QVERIFY(reqIface->entityAttributeValue<bool>(autonamedPropName));
 
     provIface->setTitle(QLatin1String("ProvIfaceName"));
     QCOMPARE(provIface->title(), reqIface->title());
 
     reqIface->setTitle(QLatin1String("NewNameForReqIface"));
     QVERIFY(provIface->title() != reqIface->title());
-    QVERIFY(!reqIface->hasEntityAttribute(autonamedPropName));
+    QVERIFY(!reqIface->entityAttributeValue<bool>(autonamedPropName));
 
     reqIface->unsetPrototype(provIface.get());
     QVERIFY(provIface->title() != reqIface->title());
@@ -154,7 +155,6 @@ void tst_IVInterface::tst_reqIfaceAutorename()
 
     title = QLatin1String("P1");
     provIface5->setTitle(title);
-    QEXPECT_FAIL("", "It needs to be decided where name validation should be implemented", Continue);
     QVERIFY(provIface5->title() != title);
 }
 

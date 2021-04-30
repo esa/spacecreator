@@ -17,10 +17,10 @@
 
 #include "graphicsview.h"
 
-#include "ivobject.h"
 #include "baseitems/common/ivutils.h"
 #include "baseitems/interactiveobject.h"
 #include "interface/ivrectgraphicsitem.h"
+#include "ivobject.h"
 
 #include <QGraphicsItem>
 #include <QMimeData>
@@ -50,35 +50,6 @@ QList<QPair<QPointF, QString>> GraphicsView::mouseMoveCoordinates(
         }
     }
     return coords;
-}
-
-void GraphicsView::keyPressEvent(QKeyEvent *event)
-{
-    bool keyHandled(false);
-    switch (event->key()) {
-    case Qt::Key_Left:
-    case Qt::Key_Right:
-    case Qt::Key_Up:
-    case Qt::Key_Down: {
-        for (QGraphicsItem *item : scene()->selectedItems()) {
-            if (ive::IVRectGraphicsItem *rectItem =
-                            // Not the qgraphicsitem_cast due its "successful" cast of IVFunctionName/Text Graphics
-                            // Items
-                    qobject_cast<ive::IVRectGraphicsItem *>(item->toGraphicsObject())) {
-                rectItem->singleStepMove(ive::IVRectGraphicsItem::MoveStep(event->key()));
-                keyHandled = true;
-            }
-        }
-        break;
-    }
-    default:
-        break;
-    }
-
-    if (keyHandled)
-        event->accept();
-    else
-        GraphicsViewBase::keyPressEvent(event);
 }
 
 void GraphicsView::dragEnterEvent(QDragEnterEvent *event)

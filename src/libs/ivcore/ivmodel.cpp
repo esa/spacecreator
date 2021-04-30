@@ -261,7 +261,12 @@ IVFunction *IVModel::getFunction(const shared::Id &id) const
  */
 IVFunction *IVModel::getFunction(const QString &name, Qt::CaseSensitivity caseSensitivity) const
 {
-    return qobject_cast<IVFunction *>(getObjectByName(name, IVObject::Type::Unknown, caseSensitivity));
+    return qobject_cast<IVFunction *>(getObjectByName(name, IVObject::Type::Function, caseSensitivity));
+}
+
+IVFunctionType *IVModel::getFunctionType(const QString &name, Qt::CaseSensitivity caseSensitivity) const
+{
+    return qobject_cast<IVFunctionType *>(getObjectByName(name, IVObject::Type::FunctionType, caseSensitivity));
 }
 
 IVFunctionType *IVModel::getFunctionType(const shared::Id &id) const

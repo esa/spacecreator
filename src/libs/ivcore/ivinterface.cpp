@@ -103,9 +103,10 @@ struct IVInterfacePrivate {
 
 IVInterface::IVInterface(IVObject::Type ifaceType, const CreationInfo &ci)
     : IVObject(ifaceType, ci.name, ci.function, ci.toBeCloned ? shared::createId() : ci.id)
-    , d(new IVInterfacePrivate(Type::InterfaceGroup == ifaceType ? ci.type
-                      : Type::RequiredInterface == ifaceType     ? IVInterface::InterfaceType::Required
-                                                                 : IVInterface::InterfaceType::Provided))
+    , d(new IVInterfacePrivate(Type::InterfaceGroup == ifaceType
+                      ? ci.type
+                      : Type::RequiredInterface == ifaceType ? IVInterface::InterfaceType::Required
+                                                             : IVInterface::InterfaceType::Provided))
 {
     setKind(ci.kind);
     setParams(ci.parameters);
@@ -292,6 +293,23 @@ void IVInterface::forgetClone(IVInterface *clone)
     d->m_clones.removeAll(clone);
 }
 
+void IVInterface::setAttributeImpl(const QString &name, const QVariant &value, EntityAttribute::Type type)
+{
+    if (meta::Props::token(name) == meta::Props::Token::name && value.isValid()) {
+        const QString newName = value.toString();
+        if (auto fn = function()) {
+            for (IVInterface *iface : isRequiredInterface() ? fn->ris() : fn->pis()) {
+                if (iface->title() == newName && iface != this) {
+                    IVObject::setAttributeImpl(name, IVNameValidator::nextNameFor(iface), type);
+                    return;
+                }
+            }
+        }
+    }
+
+    IVObject::setAttributeImpl(name, value, type);
+}
+
 IVInterfaceProvided::IVInterfaceProvided(const CreationInfo &ci)
     : IVInterface(IVObject::Type::ProvidedInterface, ci)
 {
@@ -306,11 +324,12 @@ IVInterfaceRequired::IVInterfaceRequired(const CreationInfo &ci)
 IVInterface *IVInterface::createIface(const CreationInfo &descr)
 {
     IVInterface *iface { nullptr };
-    const bool isProvided = descr.type == IVInterface::InterfaceType::Provided;
-    if (isProvided)
+    if (descr.type == IVInterface::InterfaceType::Provided)
         iface = new IVInterfaceProvided(descr);
-    else
+    else if (descr.type == IVInterface::InterfaceType::Required)
         iface = new IVInterfaceRequired(descr);
+    else
+        qFatal("Unsupported interface type");
     iface->setKind(descr.kind);
     iface->setTitle(descr.name);
 
@@ -424,8 +443,8 @@ void IVInterface::reflectAttrs(const IVInterface *from)
     if (keepName)
         revertAttribute(meta::Props::Token::name, newAttrs, m_originalFields.attrs);
 
-    for (auto t :
-            { meta::Props::Token::InheritPI, meta::Props::Token::coordinates, meta::Props::Token::InnerCoordinates }) {
+    for (auto t : { meta::Props::Token::InheritPI, meta::Props::Token::coordinates,
+                 meta::Props::Token::InnerCoordinates, meta::Props::Token::Autonamed }) {
         const bool isInheritPIFlag = t == meta::Props::Token::InheritPI;
         const bool isInheritedPI = !isFunctionTypeInherited && isRequired() && from->isProvided();
         if (!isInheritPIFlag || isInheritedPI)
@@ -496,9 +515,8 @@ void IVInterfaceRequired::setAttributeImpl(
                 m_originalFields.attrs[autonamedPropName].setValue(autoName);
                 if (!autoName)
                     m_originalFields.attrs[attributeName].setValue(usedName);
-            } else {
-                IVInterface::setEntityProperty(autonamedPropName, autoName);
             }
+            IVInterface::setEntityProperty(autonamedPropName, autoName);
             IVInterface::setAttributeImpl(attributeName, usedName, type);
             return;
         }

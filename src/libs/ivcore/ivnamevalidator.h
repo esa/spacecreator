@@ -66,8 +66,8 @@ private:
 
     bool isFunctionTypeNameUsed(const QString &name, const IVObject *fnType) const;
     bool isFunctionNameUsed(const QString &name, const IVObject *fn) const;
-    bool isRequiredInterfaceNameUsed(const QString &name, const IVFunctionType *parent) const;
-    bool isProvidedInterfaceNameUsed(const QString &name, const IVFunctionType *parent) const;
+    bool isRequiredInterfaceNameUsed(const QString &name, const IVObject *reqIface) const;
+    bool isProvidedInterfaceNameUsed(const QString &name, const IVObject *parent) const;
 };
 
 }

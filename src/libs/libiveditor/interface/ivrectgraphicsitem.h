@@ -36,14 +36,6 @@ public:
     void updateFromEntity() override;
     QList<QPair<ivm::IVObject *, QVector<QPointF>>> prepareChangeCoordinatesCommandParams() const override;
 
-    enum MoveStep
-    {
-        Left = Qt::Key_Left,
-        Right = Qt::Key_Right,
-        Up = Qt::Key_Up,
-        Down = Qt::Key_Down
-    };
-    void singleStepMove(MoveStep direction);
     /// PUBLIC FOR TESTING PURPOSE, MOVE TO PRIVATE
     QRectF nestedItemsSceneBoundingRect() const;
     bool itemNeedsToBeRelayout() const;
@@ -67,7 +59,6 @@ protected:
 
 private Q_SLOTS:
     void onGeometryChanged();
-    void shiftBy(const QPointF &shift);
 
 private:
     QSet<InteractiveObject *> m_collidedItems;

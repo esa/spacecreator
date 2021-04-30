@@ -190,18 +190,16 @@ bool IVNameValidator::isAcceptableName(const IVObject *object, const QString &na
     const IVObject::Type t = object->type();
     switch (t) {
     case IVObject::Type::FunctionType: {
-        return instance()->isFunctionTypeNameUsed(name, object);
+        return !instance()->isFunctionTypeNameUsed(name, object);
     }
     case IVObject::Type::Function: {
-        return instance()->isFunctionNameUsed(name, object);
+        return !instance()->isFunctionNameUsed(name, object);
     }
     case IVObject::Type::RequiredInterface: {
-        auto parent = object->parentObject() ? object->parentObject()->as<const IVFunctionType *>() : nullptr;
-        return instance()->isRequiredInterfaceNameUsed(name, parent);
+        return !instance()->isRequiredInterfaceNameUsed(name, object);
     }
     case IVObject::Type::ProvidedInterface: {
-        auto parent = object->parentObject() ? object->parentObject()->as<const IVFunctionType *>() : nullptr;
-        return instance()->isProvidedInterfaceNameUsed(name, parent);
+        return !instance()->isProvidedInterfaceNameUsed(name, object);
     }
     case IVObject::Type::InterfaceGroup:
     case IVObject::Type::ConnectionGroup:
@@ -463,31 +461,19 @@ bool IVNameValidator::isFunctionTypeNameUsed(const QString &name, const IVObject
         return false;
     }
 
-    if (fnType->model()) {
-        for (const auto fn : fnType->model()->objects()) {
-            if (fn->isFunctionType()) {
-                if (fn->title() == name) {
-                    return false;
-                }
-            }
-        }
-
-        return true;
+    if (auto model = fnType->model()) {
+        IVFunctionType *fn = model->getFunctionType(name, Qt::CaseSensitive);
+        return fn != fnType && fn != nullptr;
     }
 
-    if (fnType->parentObject()) {
-        if (const IVFunction *parent = fnType->parentObject()->as<const IVFunction *>()) {
-            for (const auto c : parent->children()) {
-                if (c->isFunctionType()) {
-                    if (c->title() == name) {
-                        return false;
-                    }
-                }
-            }
-        }
+    if (auto fn = fnType->as<const IVFunctionType *>()) {
+        const QVector<IVFunctionType *> nestedFunctionTypes = fn->functionTypes();
+        auto it = std::find_if(nestedFunctionTypes.cbegin(), nestedFunctionTypes.cend(),
+                [=](IVFunctionType *fn) { return fn->title() == name && fn != fnType; });
+        return it != nestedFunctionTypes.cend();
     }
 
-    return true;
+    return false;
 }
 
 bool IVNameValidator::isFunctionNameUsed(const QString &name, const IVObject *function) const
@@ -496,59 +482,53 @@ bool IVNameValidator::isFunctionNameUsed(const QString &name, const IVObject *fu
         return false;
     }
 
-    if (function->model()) {
-        for (const auto fn : function->model()->objects()) {
-            if (fn->isFunction()) {
-                if (fn->title() == name) {
-                    return false;
-                }
-            }
-        }
-
-        return true;
+    if (auto model = function->model()) {
+        IVFunction *fn = model->getFunction(name, Qt::CaseSensitive);
+        return fn != function && fn != nullptr;
     }
 
     if (auto fn = function->as<const IVFunction *>()) {
-        for (const auto c : fn->children()) {
-            if (c->isFunction()) {
-                if (c->title() == name) {
-                    return false;
-                }
-            }
-        }
+        const QVector<IVFunction *> nestedFunctions = fn->functions();
+        auto it = std::find_if(nestedFunctions.cbegin(), nestedFunctions.cend(),
+                [=](IVFunction *fn) { return fn->title() == name && fn != function; });
+        return it != nestedFunctions.cend();
     }
 
-    return true;
+    return false;
 }
 
-bool IVNameValidator::isRequiredInterfaceNameUsed(const QString &name, const IVFunctionType *parent) const
+bool IVNameValidator::isRequiredInterfaceNameUsed(const QString &name, const IVObject *reqIface) const
 {
-    if (name.isEmpty()) {
+    if (name.isEmpty() || !reqIface) {
         return false;
     }
 
-    for (const auto ri : parent->ris()) {
-        if (ri->title() == name) {
-            return false;
-        }
-    }
-
-    return true;
-}
-
-bool IVNameValidator::isProvidedInterfaceNameUsed(const QString &name, const IVFunctionType *parent) const
-{
-    if (name.isEmpty()) {
+    auto parent = reqIface->parentObject() ? reqIface->parentObject()->as<const IVFunctionType *>() : nullptr;
+    if (!parent) {
         return false;
     }
 
-    for (const auto pi : parent->pis()) {
-        if (pi->title() == name) {
-            return false;
-        }
+    const QVector<IVInterface *> &requiredIfaces = parent->ris();
+    auto it = std::find_if(requiredIfaces.cbegin(), requiredIfaces.cend(),
+            [=](IVInterface *iface) { return iface->title() == name && iface != reqIface; });
+    return it != requiredIfaces.cend();
+}
+
+bool IVNameValidator::isProvidedInterfaceNameUsed(const QString &name, const IVObject *provIface) const
+{
+    if (name.isEmpty() || !provIface) {
+        return false;
     }
 
-    return true;
+    auto parent = provIface->parentObject() ? provIface->parentObject()->as<const IVFunctionType *>() : nullptr;
+    if (!parent) {
+        return false;
+    }
+
+    const QVector<IVInterface *> &providedIfaces = parent->pis();
+    auto it = std::find_if(providedIfaces.cbegin(), providedIfaces.cend(),
+            [=](IVInterface *iface) { return iface->title() == name && iface != provIface; });
+    return it != providedIfaces.cend();
 }
 
 }

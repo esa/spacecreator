@@ -65,3 +65,8 @@ bool EntityAttribute::isNull() const
 {
     return m_value.isNull();
 }
+
+bool operator==(const EntityAttribute &lhs, const EntityAttribute &rhs)
+{
+    return lhs.name() == rhs.name() && lhs.value() == rhs.value() && lhs.type() == rhs.type();
+}

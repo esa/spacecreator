@@ -144,6 +144,7 @@ protected:
     void rememberClone(IVInterface *clone);
     void forgetClone(IVInterface *clone);
 
+    void setAttributeImpl(const QString &name, const QVariant &value, EntityAttribute::Type type) override;
     virtual void cloneInternals(const IVInterface *from);
     virtual void restoreInternals(const IVInterface *disconnectMe);
 

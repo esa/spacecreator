@@ -17,15 +17,14 @@
 
 #include "ivrectgraphicsitem.h"
 
-#include "ivfunctiontype.h"
-#include "ivobject.h"
 #include "baseitems/common/ivutils.h"
 #include "commandsstack.h"
 #include "interface/graphicsitemhelpers.h"
+#include "ivfunctiontype.h"
+#include "ivobject.h"
 #include "ui/grippointshandler.h"
 
 #include <QGraphicsScene>
-#include <QKeyEvent>
 #include <QtDebug>
 
 namespace ive {
@@ -237,33 +236,6 @@ void IVRectGraphicsItem::handleGeometryChanging(
     }
 }
 
-void IVRectGraphicsItem::singleStepMove(MoveStep direction)
-{
-    static constexpr qreal delta = 1.;
-
-    QPointF shift;
-    switch (direction) {
-    case MoveStep::Left: {
-        shift.setX(-delta);
-        break;
-    }
-    case Right: {
-        shift.setX(delta);
-        break;
-    }
-    case MoveStep::Up: {
-        shift.setY(-delta);
-        break;
-    }
-    case MoveStep::Down: {
-        shift.setY(delta);
-        break;
-    }
-    }
-
-    shiftBy(shift);
-}
-
 QRectF IVRectGraphicsItem::nestedItemsSceneBoundingRect() const
 {
     QRectF nestedItemsBoundingRect;
@@ -275,21 +247,6 @@ QRectF IVRectGraphicsItem::nestedItemsSceneBoundingRect() const
         }
     }
     return nestedItemsBoundingRect;
-}
-
-void IVRectGraphicsItem::shiftBy(const QPointF &shift)
-{
-    if (shift.isNull())
-        return;
-
-    if (auto grip = gripPointItem(shared::ui::GripPoint::Location::Center)) {
-        const QPointF pressedAt = sceneBoundingRect().center();
-        const QPointF releasedAt = pressedAt + shift;
-
-        onManualMoveStart(grip, pressedAt);
-        onManualMoveProgress(grip, pressedAt, releasedAt);
-        onManualMoveFinish(grip, pressedAt, releasedAt);
-    }
 }
 
 void IVRectGraphicsItem::onGeometryChanged()

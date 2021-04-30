@@ -22,7 +22,8 @@
 class EntityAttribute
 {
 public:
-    enum class Type {
+    enum class Type
+    {
         Attribute,
         Property
     };
@@ -51,5 +52,7 @@ private:
     QVariant m_value;
     Type m_type { Type::Attribute };
 };
+
+bool operator==(const EntityAttribute &lhs, const EntityAttribute &rhs);
 
 typedef QHash<QString, EntityAttribute> EntityAttributes;
