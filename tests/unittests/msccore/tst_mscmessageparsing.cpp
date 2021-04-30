@@ -783,7 +783,7 @@ void tst_MscReader::testConditionDublicate()
                     instance Initiator; \
                         condition Disconnected shared all; \
                         in ICONreq from env; \
-                        condition Wait_forResp shared all; \
+                        condition Wait_forResp; \
                     endinstance; \
                     instance Responder; \
                         condition Disconnected shared all; \
@@ -804,7 +804,7 @@ void tst_MscReader::testConditionDublicate()
     auto event = dynamic_cast<MscCondition *>(chart->instanceEvents().at(0));
     QVERIFY(event != nullptr);
     QCOMPARE(event->name(), QString("Disconnected"));
-    QVERIFY(event->shared());
+    QCOMPARE(event->shared(), true);
     QCOMPARE(event->instance(), initiator);
 
     auto message = dynamic_cast<MscMessage *>(chart->instanceEvents().at(1));
@@ -816,13 +816,13 @@ void tst_MscReader::testConditionDublicate()
     event = dynamic_cast<MscCondition *>(chart->instanceEvents().at(2));
     QVERIFY(event != nullptr);
     QCOMPARE(event->name(), QString("Wait_forResp"));
-    QVERIFY(event->shared());
+    QCOMPARE(event->shared(), false);
     QCOMPARE(event->instance(), initiator);
 
     event = dynamic_cast<MscCondition *>(chart->instanceEvents().at(3));
     QVERIFY(event != nullptr);
     QCOMPARE(event->name(), QString("Wait_forResp"));
-    QVERIFY(event->shared() == false);
+    QCOMPARE(event->shared(), false);
     QCOMPARE(event->instance(), responder);
 
     delete model;

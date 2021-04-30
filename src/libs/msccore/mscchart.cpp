@@ -45,12 +45,6 @@ MscChart::MscChart(const QString &name, QObject *parent)
 
 MscChart::~MscChart()
 {
-    qDeleteAll(m_instances);
-    m_instances.clear();
-
-    qDeleteAll(m_instanceEvents);
-    m_instanceEvents.clear();
-
     qDeleteAll(m_gates);
     m_gates.clear();
 }
@@ -341,6 +335,43 @@ void MscChart::addInstanceEvent(MscInstanceEvent *event, const QHash<MscInstance
     Q_EMIT dataChanged();
 }
 
+void MscChart::setInstanceEvents(QHash<const MscInstance *, QVector<MscInstanceEvent *>> events)
+{
+    for (auto it = m_events.begin(); it != m_events.end(); ++it) {
+        for (MscInstanceEvent *event : it.value()) {
+            delete event;
+        }
+    }
+    m_events.clear();
+
+    m_events = events;
+    m_instanceEvents = allEvents();
+
+    for (auto it = m_events.begin(); it != m_events.end(); ++it) {
+        for (MscInstanceEvent *event : it.value()) {
+            event->setParent(this);
+
+            connect(event, &MscInstanceEvent::dataChanged, this, &MscChart::dataChanged);
+            connect(event, &msc::MscInstanceEvent::instanceRelationChanged, this,
+                    [this](MscInstance *addedInstance, MscInstance *removedInstance) {
+                        if (auto ev = qobject_cast<MscInstanceEvent *>(sender())) {
+                            msc::MscChart::eventInstanceChange(ev, addedInstance, removedInstance);
+                        }
+                    });
+
+            if (event->entityType() == MscEntity::EntityType::Timer) {
+                MscTimer *timer = static_cast<MscTimer *>(event);
+                connect(timer, &MscTimer::instanceChanged, this, [this, timer]() { resetTimerRelations(timer); });
+                connect(timer, &MscTimer::nameChanged, this, [this, timer]() { resetTimerRelations(timer); });
+                resetTimerRelations(timer);
+            }
+        }
+    }
+
+    Q_EMIT instanceEventsChanged();
+    Q_EMIT dataChanged();
+}
+
 /*!
    Removes the instance event, but does not delete it.
    Removes the parentship of this chart.
@@ -563,7 +594,10 @@ void MscChart::updateCoregionPos(
 
 void MscChart::updateConditionPos(MscCondition *condition, MscInstance *newInstance, int eventPos)
 {
-    bool changed = setEventInstance(condition, newInstance);
+    bool changed = false;
+    if (!condition->shared()) {
+        changed = setEventInstance(condition, newInstance);
+    }
     changed |= moveEvent(condition, eventPos);
 
     if (changed) {

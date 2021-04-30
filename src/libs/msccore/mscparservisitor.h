@@ -78,7 +78,7 @@ private:
     void addInstance(const QString &name);
 
     void resetInstanceEvents();
-    void orderInstanceEvents();
+    void insertInstanceEvents();
 
     QString denominatorString(const QString &name) const;
 
@@ -92,6 +92,7 @@ private:
 
     typedef QVector<msc::MscInstanceEvent *> InstanceEvents;
 
+    InstanceEvents m_comments;
     InstanceEvents m_instanceEvents;
     QVector<InstanceEvents> m_instanceEventsList;
 

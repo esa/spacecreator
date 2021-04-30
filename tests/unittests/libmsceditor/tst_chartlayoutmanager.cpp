@@ -274,7 +274,7 @@ void tst_ChartLayoutManager::testAddTwoMessages()
     auto message1 = new MscMessage("Msg1");
     message1->setSourceInstance(instanceA);
     message1->setTargetInstance(instanceB);
-    m_chart->addInstanceEvent(message1);
+    m_chart->addInstanceEvent(message1, { { instanceA, -1 }, { instanceB, -1 } });
     waitForLayoutUpdate();
 
     InstanceItem *instanceItemA = m_chartModel->instanceItems().at(0);
@@ -287,7 +287,7 @@ void tst_ChartLayoutManager::testAddTwoMessages()
     auto message2 = new msc::MscMessage("Msg2");
     message2->setSourceInstance(instanceA);
     message2->setTargetInstance(instanceB);
-    m_chart->addInstanceEvent(message2);
+    m_chart->addInstanceEvent(message2, { { instanceA, -1 }, { instanceB, -1 } });
     waitForLayoutUpdate();
 
     // Message 1 still at same y position? - check from issue #65
