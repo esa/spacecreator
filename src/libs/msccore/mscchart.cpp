@@ -124,8 +124,6 @@ void MscChart::addInstance(MscInstance *instance, int index)
         }
     }
 
-    eventsCheck();
-
     Q_EMIT instanceAdded(instance, m_instances.indexOf(instance));
     Q_EMIT instancesChanged();
     Q_EMIT dataChanged();
@@ -180,101 +178,6 @@ QVector<MscInstanceEvent *> MscChart::eventsForInstance(MscInstance *instance) c
     }
 
     return m_events.value(instance);
-}
-
-/*!
-   Adds an instance event, and takes over parentship.
-   @param instanceEvent The event (message/action/...) to add.
-   @param eventIndex is the vertical position of the new event. If it is < 0, then the new event is appended.
-   @return Returns the actual index, this event was inserted (might differ because of MSC constraints)
- */
-int MscChart::addInstanceEvent(MscInstanceEvent *instanceEvent, int eventIndex)
-{
-    if (instanceEvent == nullptr) {
-        return -1;
-    }
-    if (m_instanceEvents.contains(instanceEvent)) {
-        return -1;
-    }
-
-    if (eventIndex < 0) {
-        eventIndex = m_instanceEvents.size();
-    }
-
-    if (instanceEvent->entityType() == msc::MscEntity::EntityType::Create) {
-        if (MscMessage *message = static_cast<MscMessage *>(instanceEvent)) {
-            if (MscInstance *createdInstance = message->targetInstance()) {
-                createdInstance->setExplicitCreator(message->sourceInstance());
-                MscInstanceEvent *topEvent = firstEventOfInstance(createdInstance);
-                int topIndex = m_instanceEvents.indexOf(topEvent);
-                if (topIndex >= 0) {
-                    eventIndex = std::min(topIndex, eventIndex);
-                }
-            }
-        }
-    }
-
-    instanceEvent->setParent(this);
-    if (eventIndex < 0 || eventIndex >= m_instanceEvents.size()) {
-        m_instanceEvents.append(instanceEvent);
-    } else {
-        m_instanceEvents.insert(eventIndex, instanceEvent);
-    }
-    connect(instanceEvent, &MscInstanceEvent::dataChanged, this, &MscChart::dataChanged);
-
-    QVector<MscInstance *> instances = relatedInstances(instanceEvent);
-    for (MscInstance *inst : qAsConst(instances)) {
-        if (!m_events.contains(inst)) {
-            continue;
-        }
-        // Create messages havte to be the first one for instances created
-        if (instanceEvent->entityType() == msc::MscEntity::EntityType::Create) {
-            if (MscMessage *message = static_cast<MscMessage *>(instanceEvent)) {
-                if (inst == message->targetInstance()) {
-                    if (m_events[inst].contains(instanceEvent)) {
-                        qFatal("event add failed - event already there! A");
-                    }
-                    m_events[inst].prepend(instanceEvent);
-                    break;
-                }
-            }
-        }
-
-        // normal insert
-        QVector<MscInstanceEvent *> &events = m_events[inst];
-        int idx = 0;
-        while (events.size() > idx && m_instanceEvents.indexOf(events[idx]) < eventIndex) {
-            ++idx;
-        }
-        if (events.contains(instanceEvent)) {
-            qFatal("event add failed - event already there! B");
-        }
-        events.insert(idx, instanceEvent);
-    }
-    if (instances.isEmpty()) {
-        m_orphanEvents.append(instanceEvent);
-    }
-    connect(instanceEvent, &msc::MscInstanceEvent::instanceRelationChanged, this,
-            [this](MscInstance *addedInstance, MscInstance *removedInstance) {
-                if (auto ev = qobject_cast<MscInstanceEvent *>(sender())) {
-                    msc::MscChart::eventInstanceChange(ev, addedInstance, removedInstance);
-                }
-            });
-
-    if (instanceEvent->entityType() == MscEntity::EntityType::Timer) {
-        MscTimer *timer = static_cast<MscTimer *>(instanceEvent);
-        connect(timer, &MscTimer::instanceChanged, this, [this, timer]() { resetTimerRelations(timer); });
-        connect(timer, &MscTimer::nameChanged, this, [this, timer]() { resetTimerRelations(timer); });
-        resetTimerRelations(timer);
-    }
-
-    eventsCheck();
-
-    Q_EMIT instanceEventAdded(instanceEvent);
-    Q_EMIT instanceEventsChanged();
-    Q_EMIT dataChanged();
-
-    return m_instanceEvents.indexOf(instanceEvent);
 }
 
 /*!
@@ -722,8 +625,6 @@ bool MscChart::moveEvent(MscInstanceEvent *event, int newIndex)
     // Move in global list
     m_instanceEvents.insert(newIndex, event);
 
-    eventsCheck();
-
     return true;
 }
 
@@ -981,16 +882,6 @@ QVector<MscInstance *> MscChart::relatedInstances(MscInstanceEvent *event) const
     }
 
     return result;
-}
-
-bool MscChart::eventsCheck() const
-{
-    for (MscInstance *inst : m_instances) {
-        if (m_events[inst] != eventsForInstance(inst)) {
-            return false;
-        }
-    }
-    return true;
 }
 
 // Used for function MscChart::allEvents()

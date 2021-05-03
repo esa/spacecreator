@@ -58,7 +58,6 @@ public:
 
     QVector<MscInstanceEvent *> instanceEvents() const;
     QVector<MscInstanceEvent *> eventsForInstance(MscInstance *instance) const;
-    int addInstanceEvent(MscInstanceEvent *instanceEvent, int eventIndex = -1);
     void addInstanceEvent(MscInstanceEvent *event, QHash<MscInstance *, int> instanceIndexes);
     void setInstanceEvents(
             QHash<MscInstance *, QVector<MscInstanceEvent *>> events, QVector<MscInstanceEvent *> orphanEvents);
@@ -168,7 +167,6 @@ private:
 
     cif::CifBlockShared cifMscDoc() const;
     QVector<MscInstance *> relatedInstances(MscInstanceEvent *event) const;
-    bool eventsCheck() const;
     QVector<MscInstanceEvent *> allEvents() const;
 
     QVector<MscInstance *> m_instances;
