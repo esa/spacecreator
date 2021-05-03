@@ -231,7 +231,7 @@ QVector<MscInstanceEvent *> MscInstance::events() const
 {
     auto chart = qobject_cast<MscChart *>(parent());
     if (chart) {
-        return chart->eventsForInstance(this);
+        return chart->eventsForInstance(const_cast<MscInstance *>(this));
     }
 
     return {};

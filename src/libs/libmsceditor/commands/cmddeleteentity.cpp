@@ -58,18 +58,18 @@ CmdDeleteEntity::CmdDeleteEntity(QVector<MscEntity *> items, MscChart *chart)
 void CmdDeleteEntity::redo()
 {
     if (m_chart) {
-        for (auto event : m_events) {
+        for (auto event : qAsConst(m_deleteEvents)) {
             m_chart->removeInstanceEvent(event);
         }
 
-        for (auto instance : m_entities) {
+        for (auto instance : qAsConst(m_entities)) {
             m_chart->removeInstance(dynamic_cast<MscInstance *>(instance));
         }
         checkVisualSorting();
     }
 
     if (m_document) {
-        for (auto document : m_entities) {
+        for (auto document : qAsConst(m_entities)) {
             m_document->removeDocument(dynamic_cast<MscDocument *>(document), false);
         }
 
@@ -88,11 +88,7 @@ void CmdDeleteEntity::undo()
             m_chart->addInstance(instance, idx);
         }
 
-        for (auto it = m_events.cbegin(); it != m_events.cend(); ++it) {
-            const int idx = it.key();
-            MscInstanceEvent *event = it.value();
-            m_chart->addInstanceEvent(event, idx);
-        }
+        m_chart->setInstanceEvents(m_events, m_orphanEvents);
         undoVisualSorting();
     }
 
@@ -113,7 +109,7 @@ void CmdDeleteEntity::undo()
 
 bool CmdDeleteEntity::mergeWith(const QUndoCommand *command)
 {
-    Q_UNUSED(command);
+    Q_UNUSED(command)
     return false;
 }
 
@@ -128,18 +124,21 @@ void CmdDeleteEntity::initChartData(const QVector<MscEntity *> &items)
         return;
     }
 
+    m_orphanEvents = m_chart->orphanEvents();
+    m_events = m_chart->rawEvents();
+
     auto fetchRelatedComments = [this](MscEntity *entity) {
-        if (MscInstanceEvent *commentEntity = entity->comment()) {
-            const int idx = m_chart->instanceEvents().indexOf(commentEntity);
-            m_events[idx] = commentEntity;
+        if (entity) {
+            if (MscInstanceEvent *commentEntity = entity->comment()) {
+                m_deleteEvents.append(commentEntity);
+            }
         }
     };
 
     for (auto item : items) {
         auto event = dynamic_cast<MscInstanceEvent *>(item);
         if (event) {
-            const int idx = m_chart->instanceEvents().indexOf(event);
-            m_events[idx] = event;
+            m_deleteEvents.append(event);
         }
         auto instance = dynamic_cast<MscInstance *>(item);
         if (instance) {
@@ -150,13 +149,12 @@ void CmdDeleteEntity::initChartData(const QVector<MscEntity *> &items)
     }
 
     // now add all events that depend on instances that are deleted
-    for (auto entity : m_entities) {
+    for (auto entity : qAsConst(m_entities)) {
         auto instance = dynamic_cast<MscInstance *>(entity);
         m_chart->removeInstance(instance);
         for (auto event : m_chart->instanceEvents()) {
             if (event->relatesTo(instance)) {
-                const int idx = m_chart->instanceEvents().indexOf(event);
-                m_events[idx] = event;
+                m_deleteEvents.append(event);
                 fetchRelatedComments(event);
             }
         }

@@ -19,6 +19,7 @@
 
 #include "chartbasecommand.h"
 
+#include <QHash>
 #include <QMap>
 #include <QPointer>
 #include <QUndoCommand>
@@ -29,6 +30,7 @@ namespace msc {
 class MscChart;
 class MscDocument;
 class MscEntity;
+class MscInstance;
 class MscInstanceEvent;
 
 namespace cmd {
@@ -47,7 +49,9 @@ public:
 private:
     void initChartData(const QVector<MscEntity *> &items);
 
-    QMap<int, MscInstanceEvent *> m_events;
+    QHash<MscInstance *, QVector<MscInstanceEvent *>> m_events;
+    QVector<MscInstanceEvent *> m_orphanEvents;
+    QVector<MscInstanceEvent *> m_deleteEvents;
     QMap<int, MscEntity *> m_entities;
     QPointer<MscDocument> m_document;
 };

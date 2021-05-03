@@ -173,7 +173,7 @@ QVector<MscInstanceEvent *> MscChart::instanceEvents() const
     return allEvents();
 }
 
-QVector<MscInstanceEvent *> MscChart::eventsForInstance(const MscInstance *instance) const
+QVector<MscInstanceEvent *> MscChart::eventsForInstance(MscInstance *instance) const
 {
     if (!instance || !m_events.contains(instance)) {
         return {};
@@ -359,16 +359,29 @@ void MscChart::addInstanceEvent(MscInstanceEvent *event, QHash<MscInstance *, in
     Q_EMIT dataChanged();
 }
 
-void MscChart::setInstanceEvents(QHash<const MscInstance *, QVector<MscInstanceEvent *>> events)
+void MscChart::setInstanceEvents(
+        QHash<MscInstance *, QVector<MscInstanceEvent *>> events, QVector<MscInstanceEvent *> orphanEvents)
 {
     for (auto it = m_events.begin(); it != m_events.end(); ++it) {
         for (MscInstanceEvent *event : it.value()) {
+            if (events.contains(it.key()) && events[it.key()].contains(event)) {
+                disconnect(event, nullptr, this, nullptr);
+            } else {
+                delete event;
+            }
+        }
+    }
+    for (MscInstanceEvent *event : orphanEvents) {
+        if (m_orphanEvents.contains(event)) {
+            disconnect(event, nullptr, this, nullptr);
+        } else {
             delete event;
         }
     }
     m_events.clear();
 
     m_events = events;
+    m_orphanEvents = orphanEvents;
     m_instanceEvents = allEvents();
 
     for (auto it = m_events.begin(); it != m_events.end(); ++it) {
@@ -447,6 +460,23 @@ int MscChart::indexofEvent(MscInstanceEvent *instanceEvent) const
 }
 
 /*!
+   \brief MscChart::indicesOfEvent
+   \param instanceEvent
+   \return
+ */
+QHash<MscInstance *, int> MscChart::indicesOfEvent(MscInstanceEvent *event) const
+{
+    QHash<MscInstance *, int> indices;
+    for (auto it = m_events.begin(); it != m_events.end(); ++it) {
+        const int idx = it.value().indexOf(event);
+        if (idx >= 0) {
+            indices[it.key()] = idx;
+        }
+    }
+    return indices;
+}
+
+/*!
    Returns the psotion of an event for a given instance
    If the event is not part of the instance, -1 is returned
  */
@@ -497,6 +527,16 @@ MscInstanceEvent *MscChart::firstEventOfInstance(MscInstance *instance) const
 int MscChart::totalEventNumber() const
 {
     return allEvents().size();
+}
+
+QHash<MscInstance *, QVector<MscInstanceEvent *>> MscChart::rawEvents() const
+{
+    return m_events;
+}
+
+QVector<MscInstanceEvent *> MscChart::orphanEvents() const
+{
+    return m_orphanEvents;
 }
 
 /*!
@@ -955,7 +995,7 @@ bool MscChart::eventsCheck() const
 
 // Used for function MscChart::allEvents()
 void addTopUntil(MscInstance *instance, MscInstanceEvent *untilEvent, const QVector<MscInstance *> &instances,
-        const QHash<const MscInstance *, QVector<MscInstanceEvent *>> &events, QVector<MscInstanceEvent *> &result,
+        const QHash<MscInstance *, QVector<MscInstanceEvent *>> &events, QVector<MscInstanceEvent *> &result,
         MscInstanceEvent *noRecurEvent)
 {
     if (!events.contains(instance)) {

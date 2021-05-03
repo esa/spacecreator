@@ -57,16 +57,20 @@ public:
     MscInstance *instanceByName(const QString &name) const;
 
     QVector<MscInstanceEvent *> instanceEvents() const;
-    QVector<MscInstanceEvent *> eventsForInstance(const MscInstance *instance) const;
+    QVector<MscInstanceEvent *> eventsForInstance(MscInstance *instance) const;
     int addInstanceEvent(MscInstanceEvent *instanceEvent, int eventIndex = -1);
     void addInstanceEvent(MscInstanceEvent *event, QHash<MscInstance *, int> instanceIndexes);
-    void setInstanceEvents(QHash<const MscInstance *, QVector<MscInstanceEvent *>> events);
+    void setInstanceEvents(
+            QHash<MscInstance *, QVector<MscInstanceEvent *>> events, QVector<MscInstanceEvent *> orphanEvents);
     void removeInstanceEvent(MscInstanceEvent *instanceEvent);
     int indexofEvent(MscInstanceEvent *instanceEvent) const;
+    QHash<MscInstance *, int> indicesOfEvent(MscInstanceEvent *event) const;
     int indexofEventAtInstance(MscInstanceEvent *instanceEvent, MscInstance *instance) const;
     MscMessage *messageByName(const QString &name) const;
     MscInstanceEvent *firstEventOfInstance(MscInstance *instance) const;
     int totalEventNumber() const;
+    QHash<MscInstance *, QVector<MscInstanceEvent *>> rawEvents() const;
+    QVector<MscInstanceEvent *> orphanEvents() const;
 
     QVector<MscMessage *> messages() const;
 
@@ -169,7 +173,7 @@ private:
 
     QVector<MscInstance *> m_instances;
     QVector<MscInstanceEvent *> m_instanceEvents;
-    QHash<const MscInstance *, QVector<MscInstanceEvent *>> m_events;
+    QHash<MscInstance *, QVector<MscInstanceEvent *>> m_events;
     QVector<MscInstanceEvent *> m_orphanEvents;
     QVector<MscGate *> m_gates;
 };

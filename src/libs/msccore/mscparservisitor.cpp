@@ -918,7 +918,7 @@ void MscParserVisitor::insertInstanceEvents()
     }
 
     // Set all the events in the chart
-    QHash<const MscInstance *, QVector<MscInstanceEvent *>> events;
+    QHash<MscInstance *, QVector<MscInstanceEvent *>> events;
     for (int i = 0; i < m_instanceEventsList.size(); ++i) {
         MscInstance *instance = m_currentChart->instances().at(i);
         events[instance] = {};
@@ -926,7 +926,8 @@ void MscParserVisitor::insertInstanceEvents()
             events[instance].append(event);
         }
     }
-    m_currentChart->setInstanceEvents(events);
+    QVector<MscInstanceEvent *> orphans = m_currentChart->orphanEvents();
+    m_currentChart->setInstanceEvents(events, orphans);
 
     m_instanceEventsList.clear();
 

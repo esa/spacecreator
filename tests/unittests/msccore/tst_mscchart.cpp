@@ -62,6 +62,7 @@ private Q_SLOTS:
     void testSetInstanceNameNumber();
     void testMoveCoregion();
     void testAddCreateAfterMessage();
+    void testIndicesOfEvent();
 
 private:
     MscChart *m_chart = nullptr;
@@ -717,6 +718,27 @@ void tst_MscChart::testAddCreateAfterMessage()
     QCOMPARE(idx, 1);
     idx = m_chart->eventsForInstance(instance2).indexOf(create1);
     QCOMPARE(idx, 0);
+}
+
+void tst_MscChart::testIndicesOfEvent()
+{
+    auto instance1 = new MscInstance("Inst1", m_chart);
+    m_chart->addInstance(instance1);
+    auto instance2 = new MscInstance("Inst2", m_chart);
+    m_chart->addInstance(instance2);
+
+    auto message1 = new MscMessage("Msg", m_chart);
+    message1->setTargetInstance(instance1);
+    m_chart->addInstanceEvent(message1, { { instance1, -1 } });
+    QHash<MscInstance *, int> indices = { { instance1, 0 } };
+    QCOMPARE(m_chart->indicesOfEvent(message1), indices);
+
+    auto message2 = new MscMessage("Msg", m_chart);
+    message2->setSourceInstance(instance1);
+    message2->setTargetInstance(instance2);
+    m_chart->addInstanceEvent(message2, { { instance1, -1 }, { instance2, -1 } });
+    indices = { { instance1, 1 }, { instance1, 0 } };
+    QCOMPARE(m_chart->indicesOfEvent(message1), indices);
 }
 
 QTEST_APPLESS_MAIN(tst_MscChart)
