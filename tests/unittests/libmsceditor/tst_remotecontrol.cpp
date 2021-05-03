@@ -220,17 +220,27 @@ private Q_SLOTS:
         QCOMPARE(m_textMessageReceived.count(), 1);
         resultObj = takeFirstResultMessage();
         QVERIFY(resultObj.value(QLatin1String("result")).toBool());
+    }
 
-        /// Adding msc::MscMessage::MessageType::Create
+    void testCreateCommand()
+    {
+        addTestInstances();
+
+        QJsonObject obj;
+        obj.insert(QLatin1String("CommandType"), QLatin1String("Message"));
+        QJsonObject params;
         params.insert(QLatin1String("MessageType"), QLatin1String("Create"));
+        params.insert(QLatin1String("name"), QLatin1String("start"));
+        params.insert(QLatin1String("srcName"), QLatin1String("A"));
+        params.insert(QLatin1String("dstName"), QLatin1String("B"));
         obj[QLatin1String("Parameters")] = params;
 
-        json = QJsonDocument(obj).toJson();
+        QByteArray json = QJsonDocument(obj).toJson();
         m_socket->sendTextMessage(json);
 
         QVERIFY(m_textMessageReceived.wait(1000));
         QCOMPARE(m_textMessageReceived.count(), 1);
-        resultObj = takeFirstResultMessage();
+        QJsonObject resultObj = takeFirstResultMessage();
         QVERIFY(resultObj.value(QLatin1String("result")).toBool());
     }
 

@@ -365,7 +365,7 @@ void tst_MscWriter::testSerializeMscActions_data()
     action->setActionType(MscAction::ActionType::Informal);
     action->setInformalAction("informal_stop");
     action->setInstance(instance);
-    chart->addInstanceEvent(action);
+    chart->addInstanceEvent(action, { { instance, -1 } });
     model->addChart(chart);
     auto result = QString("msc Chart_1;\n"
                           "    instance Inst_1;\n"
@@ -391,7 +391,7 @@ void tst_MscWriter::testSerializeMscActions_data()
     statement2->setVariableString("digit2");
     action->addDataStatement(statement2);
     action->setInstance(instance);
-    chart->addInstanceEvent(action);
+    chart->addInstanceEvent(action, { { instance, -1 } });
     model->addChart(chart);
     result = QString("msc Chart_2;\n"
                      "    instance Inst_2;\n"
@@ -409,7 +409,7 @@ void tst_MscWriter::testSerializeMscActions_data()
     action->setInformalAction("doX");
     action->setCommentString("Very important");
     action->setInstance(instance);
-    chart->addInstanceEvent(action);
+    chart->addInstanceEvent(action, { { instance, -1 } });
     model->addChart(chart);
     result = QString("msc Chart_3;\n"
                      "    instance Inst_3;\n"
@@ -428,7 +428,7 @@ void tst_MscWriter::testSerializeMscActions_data()
     action->setCommentString("Very important");
     action->comment()->setRect(QRect(50, 30, 20, 15));
     action->setInstance(instance);
-    chart->addInstanceEvent(action);
+    chart->addInstanceEvent(action, { { instance, -1 } });
     model->addChart(chart);
     result = QString("msc Chart_3;\n"
                      "    instance Inst_3;\n"
@@ -469,7 +469,7 @@ void tst_MscWriter::testSerializeMscConditions_data()
     chart->addInstance(instance2);
     auto condition = new MscCondition("Con_1");
     condition->setInstance(instance);
-    chart->addInstanceEvent(condition);
+    chart->addInstanceEvent(condition, { { instance, -1 } });
     model->addChart(chart);
     auto result = QString("msc Chart_1;\n"
                           "    instance Inst_1;\n"
@@ -489,7 +489,7 @@ void tst_MscWriter::testSerializeMscConditions_data()
     condition = new MscCondition("Con_1");
     condition->setShared(true);
     condition->setInstance(instance);
-    chart->addInstanceEvent(condition);
+    chart->addInstanceEvent(condition, { { instance, -1 }, { instance2, -1 } });
     model->addChart(chart);
     result = QString("msc Chart_1;\n"
                      "    instance Inst_1;\n"
@@ -508,7 +508,7 @@ void tst_MscWriter::testSerializeMscConditions_data()
     condition = new MscCondition("Con_1");
     condition->setInstance(instance);
     condition->setCommentString("Hey ho");
-    chart->addInstanceEvent(condition);
+    chart->addInstanceEvent(condition, { { instance, -1 } });
     model->addChart(chart);
     result = QString("msc Chart_1;\n"
                      "    instance Inst_1;\n"
@@ -525,7 +525,7 @@ void tst_MscWriter::testSerializeMscConditions_data()
     condition->setInstance(instance);
     condition->setCommentString("Hey ho");
     condition->comment()->setRect(QRect(50, 30, 20, 15));
-    chart->addInstanceEvent(condition);
+    chart->addInstanceEvent(condition, { { instance, -1 } });
     model->addChart(chart);
     result = QString("msc Chart_1;\n"
                      "    instance Inst_1;\n"
@@ -562,14 +562,14 @@ void tst_MscWriter::testSerializeMscCoregion_data()
     auto chart = new MscChart("Chart_1");
     auto instance = new MscInstance("Inst_1");
     auto instance2 = new MscInstance("Inst_2");
-    auto region1 = new MscCoregion(MscCoregion::Type::Begin);
-    region1->setInstance(instance);
-    chart->addInstanceEvent(region1);
-    auto region2 = new MscCoregion(MscCoregion::Type::End);
-    region2->setInstance(instance);
-    chart->addInstanceEvent(region2);
     chart->addInstance(instance);
     chart->addInstance(instance2);
+    auto region1 = new MscCoregion(MscCoregion::Type::Begin);
+    region1->setInstance(instance);
+    chart->addInstanceEvent(region1, { { instance, -1 } });
+    auto region2 = new MscCoregion(MscCoregion::Type::End);
+    region2->setInstance(instance);
+    chart->addInstanceEvent(region2, { { instance, -1 } });
     model->addChart(chart);
     auto result = QString("msc Chart_1;\n"
                           "    instance Inst_1;\n"
@@ -584,15 +584,15 @@ void tst_MscWriter::testSerializeMscCoregion_data()
     model = new MscModel(this);
     chart = new MscChart("Chart_1");
     instance = new MscInstance("Inst_1");
+    chart->addInstance(instance);
     region1 = new MscCoregion(MscCoregion::Type::Begin);
     region1->setCommentString("parallel begin");
     region1->setInstance(instance);
-    chart->addInstanceEvent(region1);
+    chart->addInstanceEvent(region1, { { instance, -1 } });
     region2 = new MscCoregion(MscCoregion::Type::End);
     region2->setCommentString("parallel end");
     region2->setInstance(instance);
-    chart->addInstanceEvent(region2);
-    chart->addInstance(instance);
+    chart->addInstanceEvent(region2, { { instance, -1 } });
     model->addChart(chart);
     result = QString("msc Chart_1;\n"
                      "    instance Inst_1;\n"
@@ -605,17 +605,17 @@ void tst_MscWriter::testSerializeMscCoregion_data()
     model = new MscModel(this);
     chart = new MscChart("Chart_1");
     instance = new MscInstance("Inst_1");
+    chart->addInstance(instance);
     region1 = new MscCoregion(MscCoregion::Type::Begin);
     region1->setCommentString("parallel begin");
     region1->comment()->setRect(QRect(50, 30, 20, 15));
     region1->setInstance(instance);
-    chart->addInstanceEvent(region1);
+    chart->addInstanceEvent(region1, { { instance, -1 } });
     region2 = new MscCoregion(MscCoregion::Type::End);
     region2->setCommentString("parallel end");
     region2->comment()->setRect(QRect(60, 90, 30, 15));
     region2->setInstance(instance);
-    chart->addInstanceEvent(region2);
-    chart->addInstance(instance);
+    chart->addInstanceEvent(region2, { { instance, -1 } });
     model->addChart(chart);
     result = QString("msc Chart_1;\n"
                      "    instance Inst_1;\n"
@@ -662,7 +662,7 @@ void tst_MscWriter::testSerializeCreate_data()
     auto create = new MscCreate("");
     create->setSourceInstance(instance);
     create->setTargetInstance(instance2);
-    chart->addInstanceEvent(create);
+    chart->addInstanceEvent(create, { { instance, -1 }, { instance2, 1 } });
     model->addChart(chart);
     auto result = QString("msc Chart_1;\n"
                           "    instance Inst_1;\n"
@@ -691,7 +691,7 @@ void tst_MscWriter::testSerializeCreate_data()
     parameter.setPattern("data2");
     parameters << parameter;
     create->setParameters(parameters);
-    chart->addInstanceEvent(create);
+    chart->addInstanceEvent(create, { { instance, -1 }, { instance2, 1 } });
     model->addChart(chart);
     result = QString("msc Chart_1;\n"
                      "    instance Inst_1;\n"
@@ -712,7 +712,7 @@ void tst_MscWriter::testSerializeCreate_data()
     create->setSourceInstance(instance);
     create->setTargetInstance(instance2);
     create->setCommentString("Let there be an instance");
-    chart->addInstanceEvent(create);
+    chart->addInstanceEvent(create, { { instance, -1 }, { instance2, 1 } });
     model->addChart(chart);
     result = QString("msc Chart_1;\n"
                      "    instance Inst_1;\n"
@@ -734,7 +734,7 @@ void tst_MscWriter::testSerializeCreate_data()
     create->setTargetInstance(instance2);
     create->setCommentString("Let there be an instance");
     create->comment()->setRect(QRect(50, 30, 20, 15));
-    chart->addInstanceEvent(create);
+    chart->addInstanceEvent(create, { { instance, -1 }, { instance2, 1 } });
     model->addChart(chart);
     result = QString("msc Chart_1;\n"
                      "    instance Inst_1;\n"
@@ -778,7 +778,7 @@ void tst_MscWriter::testSerializeMscMessage_data()
     auto message = new MscMessage("Msg_1");
     message->setSourceInstance(instance1);
     message->setTargetInstance(instance2);
-    chart->addInstanceEvent(message);
+    chart->addInstanceEvent(message, { { instance1, -1 }, { instance2, 1 } });
     model->addChart(chart);
     auto result = QString("msc Chart_1;\n"
                           "    instance Inst_1;\n"
@@ -798,10 +798,10 @@ void tst_MscWriter::testSerializeMscMessage_data()
     chart->addInstance(instance2);
     message = new MscMessage("Msg_1");
     message->setSourceInstance(instance1);
-    chart->addInstanceEvent(message);
+    chart->addInstanceEvent(message, { { instance1, -1 } });
     auto message2 = new MscMessage("Msg_2");
     message2->setTargetInstance(instance2);
-    chart->addInstanceEvent(message2);
+    chart->addInstanceEvent(message2, { { instance2, -1 } });
     model->addChart(chart);
     result = QString("msc Chart_1;\n"
                      "    instance Inst_1;\n"
@@ -823,7 +823,7 @@ void tst_MscWriter::testSerializeMscMessage_data()
     message->setSourceInstance(instance1);
     message->setTargetInstance(instance2);
     message->setMessageInstanceName("a");
-    chart->addInstanceEvent(message);
+    chart->addInstanceEvent(message, { { instance1, -1 }, { instance2, 1 } });
     model->addChart(chart);
     result = QString("msc Chart_1;\n"
                      "    instance Inst_1;\n"
@@ -846,12 +846,12 @@ void tst_MscWriter::testSerializeMscMessage_data()
     message->setTargetInstance(instance2);
     message->setMessageInstanceName("a");
     message->setParameters({ { "longitude:-174.0", "" } });
-    chart->addInstanceEvent(message);
+    chart->addInstanceEvent(message, { { instance1, -1 }, { instance2, 1 } });
     message2 = new MscMessage("Msg_2");
     message2->setSourceInstance(instance2);
     message2->setTargetInstance(instance1);
     message2->setParameters({ { "{tc-id '4143545f494555'H, report success}", "" } });
-    chart->addInstanceEvent(message2);
+    chart->addInstanceEvent(message2, { { instance1, -1 }, { instance2, 1 } });
     model->addChart(chart);
     result = QString("msc Chart_1;\n"
                      "    instance Inst_1;\n"
@@ -876,7 +876,7 @@ void tst_MscWriter::testSerializeMscMessage_data()
     message->setTargetInstance(instance2);
     message->setMessageInstanceName("a");
     message->setParameters({ { "longitude:-174.0", "" }, { "", "init" } });
-    chart->addInstanceEvent(message);
+    chart->addInstanceEvent(message, { { instance1, -1 }, { instance2, 1 } });
     model->addChart(chart);
     result = QString("msc Chart_1;\n"
                      "    instance Inst_1;\n"
@@ -895,7 +895,7 @@ void tst_MscWriter::testSerializeMscMessage_data()
     message = new MscMessage("Msg_1");
     message->setSourceInstance(instance1);
     message->setCommentString("Shout out");
-    chart->addInstanceEvent(message);
+    chart->addInstanceEvent(message, { { instance1, -1 } });
     model->addChart(chart);
     result = QString("msc Chart_1;\n"
                      "    instance Inst_1;\n"
@@ -911,7 +911,7 @@ void tst_MscWriter::testSerializeMscMessage_data()
     message = new MscMessage("Msg_1");
     message->setSourceInstance(instance1);
     message->setCifPoints({ QPoint(125, 50), QPoint(90, 150) });
-    chart->addInstanceEvent(message);
+    chart->addInstanceEvent(message, { { instance1, -1 } });
     model->addChart(chart);
     result = QString("msc Chart_1;\n"
                      "    instance Inst_1;\n"
@@ -930,7 +930,7 @@ void tst_MscWriter::testSerializeMscMessage_data()
     message->setCommentString("Shout out");
     message->setCifPoints({ QPoint(125, 50), QPoint(90, 150) });
     message->comment()->setRect(QRect(50, 30, 20, 15));
-    chart->addInstanceEvent(message);
+    chart->addInstanceEvent(message, { { instance1, -1 } });
     model->addChart(chart);
     result = QString("msc Chart_1;\n"
                      "    instance Inst_1;\n"
@@ -972,7 +972,7 @@ void tst_MscWriter::testSerializeMscTimer_data()
     chart->addInstance(instance2);
     auto timer = new MscTimer("T1", MscTimer::TimerType::Start);
     timer->setInstance(instance);
-    chart->addInstanceEvent(timer);
+    chart->addInstanceEvent(timer, { { instance, -1 } });
     model->addChart(chart);
     auto result = QString("msc Chart_1;\n"
                           "    instance Inst_1;\n"
@@ -989,7 +989,7 @@ void tst_MscWriter::testSerializeMscTimer_data()
     chart->addInstance(instance);
     timer = new MscTimer("T1", MscTimer::TimerType::Stop);
     timer->setInstance(instance);
-    chart->addInstanceEvent(timer);
+    chart->addInstanceEvent(timer, { { instance, -1 } });
     model->addChart(chart);
     result = QString("msc Chart_1;\n"
                      "    instance Inst_1;\n"
@@ -1004,7 +1004,7 @@ void tst_MscWriter::testSerializeMscTimer_data()
     chart->addInstance(instance);
     timer = new MscTimer("T1", MscTimer::TimerType::Timeout);
     timer->setInstance(instance);
-    chart->addInstanceEvent(timer);
+    chart->addInstanceEvent(timer, { { instance, -1 } });
     model->addChart(chart);
     result = QString("msc Chart_1;\n"
                      "    instance Inst_1;\n"
@@ -1020,7 +1020,7 @@ void tst_MscWriter::testSerializeMscTimer_data()
     timer = new MscTimer("T1", MscTimer::TimerType::Start);
     timer->setTimerInstanceName("a");
     timer->setInstance(instance);
-    chart->addInstanceEvent(timer);
+    chart->addInstanceEvent(timer, { { instance, -1 } });
     model->addChart(chart);
     result = QString("msc Chart_1;\n"
                      "    instance Inst_1;\n"
@@ -1036,7 +1036,7 @@ void tst_MscWriter::testSerializeMscTimer_data()
     timer = new MscTimer("T1", MscTimer::TimerType::Start);
     timer->setCommentString("Go go go");
     timer->setInstance(instance);
-    chart->addInstanceEvent(timer);
+    chart->addInstanceEvent(timer, { { instance, -1 } });
     model->addChart(chart);
     result = QString("msc Chart_1;\n"
                      "    instance Inst_1;\n"
@@ -1053,7 +1053,7 @@ void tst_MscWriter::testSerializeMscTimer_data()
     timer->setCommentString("Go go go");
     timer->comment()->setRect(QRect(50, 30, 20, 15));
     timer->setInstance(instance);
-    chart->addInstanceEvent(timer);
+    chart->addInstanceEvent(timer, { { instance, -1 } });
     model->addChart(chart);
     result = QString("msc Chart_1;\n"
                      "    instance Inst_1;\n"

@@ -15,17 +15,17 @@
    along with this program. If not, see <https://www.gnu.org/licenses/lgpl-2.1.html>.
 */
 
-#include "ivconnection.h"
-#include "ivfunction.h"
-#include "ivmodel.h"
-#include "ivtestutils.h"
 #include "baseitems/common/coordinatesconverter.h"
 #include "chartitem.h"
 #include "commandsstack.h"
 #include "interface/interfacedocument.h"
+#include "ivconnection.h"
 #include "iveditor.h"
 #include "iveditorcore.h"
+#include "ivfunction.h"
+#include "ivmodel.h"
 #include "ivsystemchecks.h"
+#include "ivtestutils.h"
 #include "mainmodel.h"
 #include "mscchart.h"
 #include "msceditorcore.h"
@@ -189,7 +189,7 @@ void tst_IvSystemChecks::testCheckMessageNames()
     chart->addInstance(instanceA);
     auto message = new msc::MscMessage("Msg1", chart);
     message->setSourceInstance(instanceA);
-    chart->addInstanceEvent(message);
+    chart->addInstanceEvent(message, { { instanceA, -1 } });
 
     // Add Instance 'B'
     auto instanceB = new msc::MscInstance("Instance B", chart);
@@ -294,7 +294,7 @@ void tst_IvSystemChecks::testCheckMessage()
     auto message = new msc::MscMessage("Msg1", chart);
     message->setSourceInstance(instance1);
     message->setTargetInstance(instance2);
-    chart->addInstanceEvent(message);
+    chart->addInstanceEvent(message, { { instance1, -1 }, { instance2, -1 } });
 
     // Having no IVEditorCore, is ok for all messages
     QCOMPARE(m_checker->checkMessage(message), true);
@@ -323,7 +323,7 @@ void tst_IvSystemChecks::testCheckMessage()
     // Message from the environment
     auto message1 = new msc::MscMessage("Env1", chart);
     message1->setTargetInstance(instance1);
-    chart->addInstanceEvent(message1);
+    chart->addInstanceEvent(message1, { { instance1, -1 } });
     QCOMPARE(m_checker->checkMessage(message1), false);
     // Default interface is not ok
     ivm::IVInterface *if1 = ivm::testutils::createIface(sourceFunc, ivm::IVInterface::InterfaceType::Provided, "Env1");

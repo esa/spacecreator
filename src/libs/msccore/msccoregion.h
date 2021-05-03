@@ -37,6 +37,7 @@ public:
 
     explicit MscCoregion(QObject *parent = nullptr);
     explicit MscCoregion(Type type, QObject *parent = nullptr);
+    explicit MscCoregion(MscInstance *instance, Type type, QObject *parent = nullptr);
 
     MscEntity::EntityType entityType() const override { return MscEntity::EntityType::Coregion; }
 

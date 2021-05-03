@@ -43,7 +43,8 @@ void CmdCommentItemChangeGeometry::redo()
     auto comment = m_modelItem->comment();
     if (!comment) {
         comment = m_modelItem->setCommentString(QString());
-        m_chart->addInstanceEvent(comment);
+        QHash<MscInstance *, int> indexes;
+        m_chart->addInstanceEvent(comment, indexes);
     }
     comment->setRect(m_newRect);
 
@@ -58,7 +59,8 @@ void CmdCommentItemChangeGeometry::undo()
     auto comment = m_modelItem->comment();
     if (!comment) {
         comment = m_modelItem->setCommentString(QString());
-        m_chart->addInstanceEvent(comment);
+        QHash<MscInstance *, int> indexes;
+        m_chart->addInstanceEvent(comment, indexes);
     }
     comment->setRect(m_oldRect);
 

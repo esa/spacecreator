@@ -284,8 +284,12 @@ int MscChart::addInstanceEvent(MscInstanceEvent *instanceEvent, int eventIndex)
    \param eventIndex
    \return
  */
-void MscChart::addInstanceEvent(MscInstanceEvent *event, const QHash<MscInstance *, int> &instanceIndexes)
+void MscChart::addInstanceEvent(MscInstanceEvent *event, QHash<MscInstance *, int> instanceIndexes)
 {
+    if (!event) {
+        return;
+    }
+
     // Consistency check
     for (auto it = instanceIndexes.begin(); it != instanceIndexes.end(); ++it) {
         if (!event->relatesTo(it.key())) {
@@ -295,6 +299,26 @@ void MscChart::addInstanceEvent(MscInstanceEvent *event, const QHash<MscInstance
         if (!m_events.contains(it.key())) {
             qCritical("Instance missing for adding the event there");
             return;
+        }
+    }
+
+    // create messages are the first event of created instances
+    if (event->entityType() == msc::MscEntity::EntityType::Create) {
+        if (MscMessage *message = static_cast<MscMessage *>(event)) {
+            if (MscInstance *createdInstance = message->targetInstance()) {
+                createdInstance->setExplicitCreator(message->sourceInstance());
+                instanceIndexes[createdInstance] = 0;
+            }
+            // check if source index needs to be adapted
+            for (MscInstanceEvent *ev : m_events[message->sourceInstance()]) {
+                if (MscMessage *msg = qobject_cast<MscMessage *>(ev)) {
+                    if (msg->targetInstance() == message->targetInstance()) {
+                        // put it before the message, as create has to be before first message to a created instance
+                        instanceIndexes[msg->sourceInstance()] = m_events[msg->sourceInstance()].indexOf(msg);
+                        break;
+                    }
+                }
+            }
         }
     }
 

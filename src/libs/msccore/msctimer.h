@@ -45,6 +45,7 @@ public:
 
     explicit MscTimer(QObject *parent = nullptr);
     MscTimer(const QString &name, TimerType type, QObject *parent = nullptr);
+    MscTimer(const QString &name, MscInstance *instance, TimerType type, QObject *parent = nullptr);
 
     MscEntity::EntityType entityType() const override;
 

@@ -44,6 +44,14 @@ MscTimer::MscTimer(const QString &name, TimerType type, QObject *parent)
     setTimerType(type);
 }
 
+MscTimer::MscTimer(const QString &name, MscInstance *instance, MscTimer::TimerType type, QObject *parent)
+    : MscTimer(parent)
+{
+    setName(name);
+    setTimerType(type);
+    setInstance(instance);
+}
+
 MscEntity::EntityType MscTimer::entityType() const
 {
     return MscEntity::EntityType::Timer;

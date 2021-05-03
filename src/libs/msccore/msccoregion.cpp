@@ -32,6 +32,12 @@ MscCoregion::MscCoregion(Type type, QObject *parent)
 {
 }
 
+MscCoregion::MscCoregion(MscInstance *instance, MscCoregion::Type type, QObject *parent)
+    : MscCoregion(type, parent)
+{
+    setInstance(instance);
+}
+
 void MscCoregion::setType(MscCoregion::Type type)
 {
     if (type == m_type)

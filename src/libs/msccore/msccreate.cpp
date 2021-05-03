@@ -32,6 +32,12 @@ MscCreate::MscCreate(const QString &name, QObject *parent)
     m_msgType = MscMessage::MessageType::Create;
 }
 
+MscCreate::MscCreate(const QString &name, MscInstance *source, MscInstance *target, QObject *parent)
+    : MscMessage(name, source, target, parent)
+{
+    m_msgType = MscMessage::MessageType::Create;
+}
+
 MscEntity::EntityType MscCreate::entityType() const
 {
     return MscEntity::EntityType::Create;

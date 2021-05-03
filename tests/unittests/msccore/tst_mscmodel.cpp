@@ -124,12 +124,12 @@ void tst_MscModel::testMessageCompliance()
     doc->addChart(chart);
     auto inst = new MscInstance("Instance01", chart);
     chart->addInstance(inst);
-    auto message = new MscMessage("sendTo", chart);
+    auto message = new MscMessage("sendTo", inst, nullptr, chart);
     message->setSourceInstance(inst);
     MscParameterList parameters;
     parameters.append(MscParameter("5"));
     message->setParameters(parameters);
-    chart->addInstanceEvent(message);
+    chart->addInstanceEvent(message, { { inst, -1 } });
 
     // Check without declarations - defaults to "ok"
     bool ok = m_model->checkMessageAsn1Compliance(*message);
@@ -180,7 +180,7 @@ void tst_MscModel::testAllMessagesCompliance()
     MscParameterList parameters;
     parameters.append(MscParameter("5"));
     message1->setParameters(parameters);
-    chart1->addInstanceEvent(message1);
+    chart1->addInstanceEvent(message1, { { inst1, -1 } });
 
     auto doc2 = new MscDocument("Doc02", m_model);
     m_model->addDocument(doc2);
@@ -193,7 +193,7 @@ void tst_MscModel::testAllMessagesCompliance()
     MscParameterList parameters2;
     parameters2.append(MscParameter("8"));
     message2->setParameters(parameters2);
-    chart2->addInstanceEvent(message2);
+    chart2->addInstanceEvent(message2, { { inst2, -1 } });
 
     addAsn1Types();
     bool ok = m_model->checkAllMessagesForAsn1Compliance();

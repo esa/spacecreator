@@ -323,13 +323,13 @@ void tst_ChartLayoutManager::testMaxVisibleItems()
     auto message1 = new MscMessage("Msg1");
     message1->setSourceInstance(instanceA);
     message1->setTargetInstance(instanceB);
-    m_chart->addInstanceEvent(message1);
+    m_chart->addInstanceEvent(message1, { { instanceA, -1 }, { instanceB, -1 } });
     waitForLayoutUpdate();
 
     auto message2 = new MscMessage("Msg2");
     message2->setSourceInstance(instanceA);
     message2->setTargetInstance(instanceB);
-    m_chart->addInstanceEvent(message2);
+    m_chart->addInstanceEvent(message2, { { instanceA, -1 }, { instanceB, -1 } });
     waitForLayoutUpdate();
 
     MessageItem *msgItem1 = m_chartModel->itemForMessage(message1);
@@ -341,7 +341,7 @@ void tst_ChartLayoutManager::testMaxVisibleItems()
     auto message3 = new MscMessage("Msg3");
     message3->setSourceInstance(instanceA);
     message3->setTargetInstance(instanceB);
-    m_chart->addInstanceEvent(message3);
+    m_chart->addInstanceEvent(message3, { { instanceA, -1 }, { instanceB, -1 } });
     waitForLayoutUpdate();
 
     msgItem1 = m_chartModel->itemForMessage(message1);
@@ -382,7 +382,7 @@ void tst_ChartLayoutManager::testCreateSetsInstanceY()
     msc::MscCreate *create = new msc::MscCreate(chart);
     create->setSourceInstance(instance1);
     create->setTargetInstance(instance2);
-    chart->addInstanceEvent(create);
+    chart->addInstanceEvent(create, { { instance1, -1 }, { instance2, -1 } });
 
     waitForLayoutUpdate();
 
@@ -401,7 +401,7 @@ void tst_ChartLayoutManager::testCreateSetsInstanceY()
     const QRectF createRectbefore = createItem->sceneBoundingRect();
     auto action = new msc::MscAction(chart);
     action->setInstance(instance1);
-    chart->addInstanceEvent(action, 0); // insert before create
+    chart->addInstanceEvent(action, { { instance1, 0 } }); // insert before create
     waitForLayoutUpdate();
     QVERIFY(createItem->sceneBoundingRect().top() > createRectbefore.top()); // Create item got pushed down
     QCOMPARE(instanceItem2->leftCreatorTarget(), createItem->messagePoints().last());
@@ -473,7 +473,7 @@ void tst_ChartLayoutManager::testShiftHorizontalIfNeeded()
     auto action = new msc::MscAction();
     action->setInstance(instanceItem->modelItem());
     action->setName("A");
-    m_chart->addInstanceEvent(action);
+    m_chart->addInstanceEvent(action, { { action->instance(), -1 } });
 
     waitForLayoutUpdate();
 
@@ -516,7 +516,7 @@ void tst_ChartLayoutManager::testNoHorizontalShiftOnEventAdd()
     auto action = new msc::MscAction();
     action->setInstance(instanceItem1->modelItem());
     action->setName("A");
-    m_chart->addInstanceEvent(action);
+    m_chart->addInstanceEvent(action, { { action->instance(), -1 } });
     waitForLayoutUpdate();
 
     QCOMPARE(originalReometry1, instanceItem1->sceneBoundingRect());
@@ -526,7 +526,7 @@ void tst_ChartLayoutManager::testNoHorizontalShiftOnEventAdd()
     auto action2 = new msc::MscAction();
     action2->setInstance(instanceItem2->modelItem());
     action2->setName("B");
-    m_chart->addInstanceEvent(action2);
+    m_chart->addInstanceEvent(action2, { { action2->instance(), -1 } });
     waitForLayoutUpdate();
 
     QCOMPARE(originalReometry1.right(), instanceItem1->sceneBoundingRect().right());
@@ -553,9 +553,8 @@ void tst_ChartLayoutManager::testShiftVerticalIfNeeded()
     msc::InstanceItem *instanceItem2 = m_chartModel->instanceItems().at(1);
 
     auto message = new msc::MscMessage("Message1");
-    message->setSourceInstance(instanceItem1->modelItem());
     message->setTargetInstance(instanceItem2->modelItem());
-    m_chart->addInstanceEvent(message);
+    m_chart->addInstanceEvent(message, { { message->targetInstance(), -1 } });
 
     waitForLayoutUpdate();
 
@@ -564,7 +563,7 @@ void tst_ChartLayoutManager::testShiftVerticalIfNeeded()
     auto create = new msc::MscCreate("Create");
     create->setSourceInstance(instanceItem1->modelItem());
     create->setTargetInstance(instanceItem2->modelItem());
-    m_chart->addInstanceEvent(create);
+    m_chart->addInstanceEvent(create, { { create->sourceInstance(), -1 }, { create->targetInstance(), -1 } });
 
     waitForLayoutUpdate();
 

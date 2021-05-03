@@ -77,7 +77,8 @@ void CmdEntityCommentChange::undo()
         if (!comment) {
             comment = m_modelItem->setCommentString(m_oldComment);
         }
-        m_chart->addInstanceEvent(comment);
+        QHash<MscInstance *, int> indexes;
+        m_chart->addInstanceEvent(comment, indexes);
         comment->setText(m_oldComment);
     }
 

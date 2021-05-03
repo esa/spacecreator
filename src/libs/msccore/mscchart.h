@@ -59,7 +59,7 @@ public:
     QVector<MscInstanceEvent *> instanceEvents() const;
     QVector<MscInstanceEvent *> eventsForInstance(const MscInstance *instance) const;
     int addInstanceEvent(MscInstanceEvent *instanceEvent, int eventIndex = -1);
-    void addInstanceEvent(MscInstanceEvent *event, const QHash<MscInstance *, int> &instanceIndexes);
+    void addInstanceEvent(MscInstanceEvent *event, QHash<MscInstance *, int> instanceIndexes);
     void setInstanceEvents(QHash<const MscInstance *, QVector<MscInstanceEvent *>> events);
     void removeInstanceEvent(MscInstanceEvent *instanceEvent);
     int indexofEvent(MscInstanceEvent *instanceEvent) const;

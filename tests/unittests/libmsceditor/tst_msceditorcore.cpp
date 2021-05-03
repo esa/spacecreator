@@ -100,7 +100,7 @@ void tst_MSCEditorCore::testCorrespondingMessages()
     auto instance2 = new msc::MscInstance("K2", m_chart);
     m_chart->addInstance(instance2);
     auto message = new msc::MscMessage("ping", instance1, instance2, m_chart);
-    m_chart->addInstanceEvent(message);
+    m_chart->addInstanceEvent(message, { { instance1, -1 }, { instance2, -1 } });
 
     ivm::IVFunction f1("K1");
     ivm::IVFunction f2("K2");

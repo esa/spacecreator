@@ -28,6 +28,7 @@ class MscCreate : public MscMessage
 public:
     explicit MscCreate(QObject *parent = nullptr);
     explicit MscCreate(const QString &name, QObject *parent = nullptr);
+    MscCreate(const QString &name, MscInstance *source, MscInstance *target, QObject *parent = nullptr);
 
     MscEntity::EntityType entityType() const override;
 };
