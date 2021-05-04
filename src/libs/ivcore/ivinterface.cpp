@@ -59,9 +59,8 @@ IVInterface::CreationInfo IVInterface::CreationInfo::initFromIface(
         return coordinates.size() < 2 ? QPointF() : QPointF(coordinates.front(), coordinates.back());
     };
 
-    return { iface->model(), (iface->parentObject() ? iface->parentObject()->as<IVFunctionType *>() : nullptr),
-        getIfacePos(iface->coordinates()), iface->direction(), iface->id(), iface->params(), iface->kind(),
-        iface->title(), policy, iface };
+    return { iface->model(), (iface->parentObject() ? iface->parentObject()->as<IVFunctionType *>() : nullptr), {},
+        iface->direction(), iface->id(), iface->params(), iface->kind(), iface->title(), policy, iface };
 }
 
 IVInterface::CreationInfo IVInterface::CreationInfo::fromIface(IVInterface *iface)

@@ -199,6 +199,35 @@ void IVInterfaceGraphicsItem::updateInternalItems(Qt::Alignment alignment)
     setBoundingRect(shape().boundingRect());
 }
 
+static inline QPointF mapPositionFromOrigin(ivm::IVInterface *iface, ivm::meta::Props::Token coordinateToken,
+        const QRectF &functionRect, Qt::Alignment *side)
+{
+    const auto parentFn = iface->parentObject()->as<ivm::IVFunctionType *>();
+    const QRectF fnRect = ive::rect(ivm::IVObject::coordinatesFromString(parentFn->entityAttributeValue<QString>(
+                                            ivm::meta::Props::token(coordinateToken))))
+                                  .normalized();
+    const QString strCoordinates = iface->entityAttributeValue<QString>(ivm::meta::Props::token(coordinateToken));
+    QPointF pos = ive::pos(ivm::IVObject::coordinatesFromString(strCoordinates));
+
+    *side = getNearestSide(fnRect, pos);
+
+    pos = getSidePosition(fnRect, pos, *side);
+    if (qFuzzyCompare(fnRect.top(), pos.y())) {
+        const qreal sf = (pos.x() - fnRect.left()) / (fnRect.right() - fnRect.left());
+        pos = QLineF(functionRect.topLeft(), functionRect.topRight()).pointAt(sf);
+    } else if (qFuzzyCompare(fnRect.bottom(), pos.y())) {
+        const qreal sf = (pos.x() - fnRect.left()) / (fnRect.right() - fnRect.left());
+        pos = QLineF(functionRect.bottomLeft(), functionRect.bottomRight()).pointAt(sf);
+    } else if (qFuzzyCompare(fnRect.left(), pos.x())) {
+        const qreal sf = (pos.y() - fnRect.top()) / (fnRect.bottom() - fnRect.top());
+        pos = QLineF(functionRect.topLeft(), functionRect.bottomLeft()).pointAt(sf);
+    } else if (qFuzzyCompare(fnRect.right(), pos.x())) {
+        const qreal sf = (pos.y() - fnRect.top()) / (fnRect.bottom() - fnRect.top());
+        pos = QLineF(functionRect.topRight(), functionRect.bottomRight()).pointAt(sf);
+    }
+    return pos;
+}
+
 void IVInterfaceGraphicsItem::rebuildLayout()
 {
     InteractiveObject::rebuildLayout();
@@ -209,17 +238,22 @@ void IVInterfaceGraphicsItem::rebuildLayout()
         return;
     }
 
-    const QPointF ifacePos = pos();
     const QRectF parentRect = targetItem()->boundingRect();
-    const Qt::Alignment alignment = getNearestSide(parentRect, ifacePos);
-    updateInternalItems(alignment);
+    QPointF ifacePos = pos();
+    Qt::Alignment side = Qt::AlignCenter;
     if (entity() && ive::pos(entity()->coordinates()).isNull()) {
-        layout();
-        return;
+        if (auto origin = entity()->cloneOf()) {
+            ifacePos = mapPositionFromOrigin(origin, ivm::meta::Props::Token::coordinates, parentRect, &side);
+        } else {
+            layout();
+            return;
+        }
+    } else {
+        side = getNearestSide(parentRect, ifacePos);
     }
-
-    const QPointF stickyPos = getSidePosition(parentRect, ifacePos, alignment);
+    const QPointF stickyPos = getSidePosition(parentRect, ifacePos, side);
     setPos(stickyPos);
+    updateInternalItems(side);
 }
 
 QPainterPath IVInterfaceGraphicsItem::shape() const
@@ -289,27 +323,9 @@ void IVInterfaceGraphicsItem::layout()
         return;
     }
 
-    const auto parentFn = entity()->parentObject()->as<ivm::IVFunctionType *>();
-    const QRectF fnRect = ive::rect(ivm::IVObject::coordinatesFromString(
-                                            parentFn->entityAttributeValue<QString>(ivm::meta::Props::token(token))))
-                                  .normalized();
-    const auto side = getNearestSide(fnRect, pos);
-    pos = getSidePosition(fnRect, pos, side);
-
+    Qt::Alignment side = Qt::AlignCenter;
     const QRectF sceneParentFnRect = targetItem()->sceneBoundingRect();
-    if (qFuzzyCompare(fnRect.top(), pos.y())) {
-        const qreal sf = (pos.x() - fnRect.left()) / (fnRect.right() - fnRect.left());
-        pos = QLineF(sceneParentFnRect.topLeft(), sceneParentFnRect.topRight()).pointAt(sf);
-    } else if (qFuzzyCompare(fnRect.bottom(), pos.y())) {
-        const qreal sf = (pos.x() - fnRect.left()) / (fnRect.right() - fnRect.left());
-        pos = QLineF(sceneParentFnRect.bottomLeft(), sceneParentFnRect.bottomRight()).pointAt(sf);
-    } else if (qFuzzyCompare(fnRect.left(), pos.x())) {
-        const qreal sf = (pos.y() - fnRect.top()) / (fnRect.bottom() - fnRect.top());
-        pos = QLineF(sceneParentFnRect.topLeft(), sceneParentFnRect.bottomLeft()).pointAt(sf);
-    } else if (qFuzzyCompare(fnRect.right(), pos.x())) {
-        const qreal sf = (pos.y() - fnRect.top()) / (fnRect.bottom() - fnRect.top());
-        pos = QLineF(sceneParentFnRect.topRight(), sceneParentFnRect.bottomRight()).pointAt(sf);
-    }
+    pos = mapPositionFromOrigin(entity(), token, sceneParentFnRect, &side);
     updateInternalItems(side);
     setPos(targetItem()->mapFromScene(pos));
 }
