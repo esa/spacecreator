@@ -18,6 +18,7 @@
 #include "remotecontrolhandler.h"
 
 #include "baseitems/common/coordinatesconverter.h"
+#include "chartindex.h"
 #include "chartlayoutmanager.h"
 #include "commands/cmdactionitemcreate.h"
 #include "commands/cmdchangeinstanceposition.h"
@@ -277,12 +278,12 @@ bool RemoteControlHandler::handleMessageCommand(const QVariantMap &params, QStri
     message->setTargetInstance(mscTargetInstance);
     message->setSourceInstance(mscSourceInstance);
 
-    QHash<MscInstance *, int> instanceIndexes;
+    msc::ChartIndexList instanceIndexes;
     if (message->sourceInstance()) {
-        instanceIndexes[message->sourceInstance()] = -1;
+        instanceIndexes.set(message->sourceInstance(), -1);
     }
     if (message->targetInstance()) {
-        instanceIndexes[message->targetInstance()] = -1;
+        instanceIndexes.set(message->targetInstance(), -1);
     }
 
     m_model->undoStack()->push(new msc::cmd::CmdMessageItemCreate(message, instanceIndexes, chartViewModel()));
@@ -381,13 +382,13 @@ bool RemoteControlHandler::handleConditionCommand(const QVariantMap &params, QSt
     mscCondition->setInstance(mscInstance);
     mscCondition->setShared(params.value(QLatin1String("shared")).toBool());
 
-    QHash<MscInstance *, int> instanceIndexes;
+    msc::ChartIndexList instanceIndexes;
     if (mscCondition->shared()) {
         for (msc::MscInstance *instance : mscChart->instances()) {
-            instanceIndexes[instance] = mscChart->eventsForInstance(instance).size();
+            instanceIndexes.set(instance, mscChart->eventsForInstance(instance).size());
         }
     } else {
-        instanceIndexes[mscInstance] = pos;
+        instanceIndexes.set(mscInstance, pos);
     }
 
     m_model->undoStack()->push(

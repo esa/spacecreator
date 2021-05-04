@@ -187,19 +187,19 @@ QVector<MscInstanceEvent *> MscChart::eventsForInstance(MscInstance *instance) c
    \param eventIndex
    \return
  */
-void MscChart::addInstanceEvent(MscInstanceEvent *event, QHash<MscInstance *, int> instanceIndexes)
+void MscChart::addInstanceEvent(MscInstanceEvent *event, ChartIndexList instanceIndexes)
 {
     if (!event) {
         return;
     }
 
     // Consistency check
-    for (auto it = instanceIndexes.begin(); it != instanceIndexes.end(); ++it) {
-        if (!event->relatesTo(it.key())) {
+    for (const ChartIndex &idx : instanceIndexes) {
+        if (!event->relatesTo(idx.instance())) {
             qCritical("Instance for adding the event");
             return;
         }
-        if (!m_events.contains(it.key())) {
+        if (!m_events.contains(idx.instance())) {
             qCritical("Instance missing for adding the event there");
             return;
         }
@@ -210,14 +210,14 @@ void MscChart::addInstanceEvent(MscInstanceEvent *event, QHash<MscInstance *, in
         if (MscMessage *message = static_cast<MscMessage *>(event)) {
             if (MscInstance *createdInstance = message->targetInstance()) {
                 createdInstance->setExplicitCreator(message->sourceInstance());
-                instanceIndexes[createdInstance] = 0;
+                instanceIndexes.set(createdInstance, 0);
             }
             // check if source index needs to be adapted
             for (MscInstanceEvent *ev : m_events[message->sourceInstance()]) {
                 if (MscMessage *msg = qobject_cast<MscMessage *>(ev)) {
                     if (msg->targetInstance() == message->targetInstance()) {
                         // put it before the message, as create has to be before first message to a created instance
-                        instanceIndexes[msg->sourceInstance()] = m_events[msg->sourceInstance()].indexOf(msg);
+                        instanceIndexes.set(msg->sourceInstance(), m_events[msg->sourceInstance()].indexOf(msg));
                         break;
                     }
                 }
@@ -226,13 +226,12 @@ void MscChart::addInstanceEvent(MscInstanceEvent *event, QHash<MscInstance *, in
     }
 
     // Add event
-    for (auto it = instanceIndexes.begin(); it != instanceIndexes.end(); ++it) {
-        int idx = it.value();
-        QVector<MscInstanceEvent *> &list = m_events[it.key()];
-        if (idx < 0 || idx >= list.size()) {
-            idx = list.size();
+    for (ChartIndex &idx : instanceIndexes) {
+        QVector<MscInstanceEvent *> &list = m_events[idx.instance()];
+        if (idx.columnIndex() < 0 || idx.columnIndex() >= list.size()) {
+            idx.setIndex(list.size());
         }
-        list.insert(idx, event);
+        list.insert(idx.index(), event);
     }
     if (instanceIndexes.isEmpty()) {
         m_orphanEvents.append(event);
@@ -367,13 +366,13 @@ int MscChart::indexofEvent(MscInstanceEvent *instanceEvent) const
    \param instanceEvent
    \return
  */
-QHash<MscInstance *, int> MscChart::indicesOfEvent(MscInstanceEvent *event) const
+ChartIndexList MscChart::indicesOfEvent(MscInstanceEvent *event) const
 {
-    QHash<MscInstance *, int> indices;
+    ChartIndexList indices;
     for (auto it = m_events.begin(); it != m_events.end(); ++it) {
         const int idx = it.value().indexOf(event);
         if (idx >= 0) {
-            indices[it.key()] = idx;
+            indices.set(it.key(), idx);
         }
     }
     return indices;

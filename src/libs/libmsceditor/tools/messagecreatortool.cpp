@@ -147,14 +147,14 @@ void MessageCreatorTool::commitPreviewItem()
         if (isValid) {
             const QVariantList &cmdParams = prepareMessage();
             if (!cmdParams.isEmpty()) {
-                QHash<MscInstance *, int> instanceIndexes;
+                ChartIndexList instanceIndexes;
                 if (m_message->sourceInstance()) {
-                    instanceIndexes[m_message->sourceInstance()] =
-                            m_model->eventInstanceIndex(m_messageItem->tail(), m_message->sourceInstance());
+                    instanceIndexes.set(m_message->sourceInstance(),
+                            m_model->eventInstanceIndex(m_messageItem->tail(), m_message->sourceInstance()));
                 }
                 if (m_message->targetInstance()) {
-                    instanceIndexes[m_message->targetInstance()] =
-                            m_model->eventInstanceIndex(m_messageItem->head(), m_message->targetInstance());
+                    instanceIndexes.set(m_message->targetInstance(),
+                            m_model->eventInstanceIndex(m_messageItem->head(), m_message->targetInstance()));
                 }
 
                 startWaitForModelLayoutComplete(m_message);

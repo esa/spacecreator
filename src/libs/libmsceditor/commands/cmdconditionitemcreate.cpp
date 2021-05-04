@@ -26,7 +26,7 @@ namespace msc {
 namespace cmd {
 
 CmdConditionItemCreate::CmdConditionItemCreate(MscCondition *condition, msc::MscInstance *instance,
-        QHash<MscInstance *, int> instanceIndexes, ChartLayoutManager *layoutManager)
+        const ChartIndexList &instanceIndexes, ChartLayoutManager *layoutManager)
     : ChartBaseCommand(condition, layoutManager)
     , m_condition(condition)
     , m_instance(instance)

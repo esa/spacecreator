@@ -43,10 +43,9 @@ void CmdCoregionItemCreate::redo()
     m_end->setInstance(m_instance.data());
 
     // The chart takes over parent-/owner-ship
-    QHash<MscInstance *, int> instanceIndexes;
-    instanceIndexes[m_instance] = m_eventIndex;
+    ChartIndexList instanceIndexes { { m_instance, m_eventIndex } };
     m_chart->addInstanceEvent(m_begin, instanceIndexes);
-    instanceIndexes[m_instance] = m_eventIndex + 1;
+    instanceIndexes = { { m_instance, m_eventIndex + 1 } };
     m_chart->addInstanceEvent(m_end, instanceIndexes);
 
     checkVisualSorting();

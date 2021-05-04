@@ -17,6 +17,7 @@
 
 #pragma once
 
+#include "chartindex.h"
 #include "mscentity.h"
 #include "mscmessage.h"
 
@@ -58,12 +59,12 @@ public:
 
     QVector<MscInstanceEvent *> instanceEvents() const;
     QVector<MscInstanceEvent *> eventsForInstance(MscInstance *instance) const;
-    void addInstanceEvent(MscInstanceEvent *event, QHash<MscInstance *, int> instanceIndexes);
+    void addInstanceEvent(MscInstanceEvent *event, ChartIndexList instanceIndexes);
     void setInstanceEvents(
             QHash<MscInstance *, QVector<MscInstanceEvent *>> events, QVector<MscInstanceEvent *> orphanEvents);
     void removeInstanceEvent(MscInstanceEvent *instanceEvent);
     int indexofEvent(MscInstanceEvent *instanceEvent) const;
-    QHash<MscInstance *, int> indicesOfEvent(MscInstanceEvent *event) const;
+    ChartIndexList indicesOfEvent(MscInstanceEvent *event) const;
     int indexofEventAtInstance(MscInstanceEvent *instanceEvent, MscInstance *instance) const;
     MscMessage *messageByName(const QString &name) const;
     MscInstanceEvent *firstEventOfInstance(MscInstance *instance) const;

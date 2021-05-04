@@ -724,15 +724,15 @@ void tst_MscChart::testIndicesOfEvent()
     auto message1 = new MscMessage("Msg", m_chart);
     message1->setTargetInstance(instance1);
     m_chart->addInstanceEvent(message1, { { instance1, -1 } });
-    QHash<MscInstance *, int> indices = { { instance1, 0 } };
+    ChartIndexList indices { { instance1, 0 } };
     QCOMPARE(m_chart->indicesOfEvent(message1), indices);
 
     auto message2 = new MscMessage("Msg", m_chart);
     message2->setSourceInstance(instance1);
     message2->setTargetInstance(instance2);
     m_chart->addInstanceEvent(message2, { { instance1, -1 }, { instance2, -1 } });
-    indices = { { instance1, 1 }, { instance1, 0 } };
-    QCOMPARE(m_chart->indicesOfEvent(message1), indices);
+    indices = { { instance1, 1 }, { instance2, 0 } };
+    QCOMPARE(m_chart->indicesOfEvent(message2), indices);
 }
 
 QTEST_APPLESS_MAIN(tst_MscChart)

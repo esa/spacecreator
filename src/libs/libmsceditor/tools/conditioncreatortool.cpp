@@ -18,6 +18,7 @@
 #include "conditioncreatortool.h"
 
 #include "baseitems/common/mscutils.h"
+#include "chartindex.h"
 #include "chartlayoutmanager.h"
 #include "commands/cmdconditionitemcreate.h"
 #include "conditionitem.h"
@@ -75,13 +76,13 @@ void ConditionCreatorTool::commitPreviewItem()
     startWaitForModelLayoutComplete(condition);
     auto instance = m_model->nearestInstance(m_previewItem->sceneBoundingRect().center());
 
-    QHash<MscInstance *, int> instanceIndexes;
+    ChartIndexList instanceIndexes;
     if (m_shared) {
         for (msc::MscInstance *inst : m_model->currentChart()->instances()) {
-            instanceIndexes[inst] = m_model->eventInstanceIndex(m_previewItem->pos(), inst);
+            instanceIndexes.set(inst, m_model->eventInstanceIndex(m_previewItem->pos(), inst));
         }
     } else {
-        instanceIndexes[instance] = m_model->eventInstanceIndex(m_previewItem->pos(), instance);
+        instanceIndexes.set(instance, m_model->eventInstanceIndex(m_previewItem->pos(), instance));
     }
 
     m_model->undoStack()->push(new cmd::CmdConditionItemCreate(condition, instance, instanceIndexes, m_model));

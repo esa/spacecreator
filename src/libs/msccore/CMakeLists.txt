@@ -45,6 +45,8 @@ target_sources(${LIB_NAME} PRIVATE
     cif/ciflines.h
     cif/cifparser.cpp
     cif/cifparser.h
+    chartindex.cpp
+    chartindex.h
     datastatement.cpp
     datastatement.h
     exceptions.cpp

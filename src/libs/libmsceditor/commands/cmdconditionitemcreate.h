@@ -18,6 +18,7 @@
 #pragma once
 
 #include "chartbasecommand.h"
+#include "chartindex.h"
 
 #include <QHash>
 #include <QPointer>
@@ -34,7 +35,7 @@ class CmdConditionItemCreate : public ChartBaseCommand
 {
 public:
     CmdConditionItemCreate(msc::MscCondition *condition, msc::MscInstance *instance,
-            QHash<MscInstance *, int> instanceIndexes, ChartLayoutManager *layoutManager);
+            const ChartIndexList &instanceIndexes, ChartLayoutManager *layoutManager);
 
     void redo() override;
     void undo() override;
@@ -44,7 +45,7 @@ public:
 private:
     MscCondition *m_condition = nullptr;
     QPointer<MscInstance> m_instance;
-    QHash<MscInstance *, int> m_instanceIndexes;
+    ChartIndexList m_instanceIndexes;
 };
 
 } // namespace cmd

@@ -47,8 +47,7 @@ void CmdActionItemCreate::redo()
     }
 
     // The chart takes over parent-/owner-ship
-    QHash<MscInstance *, int> instanceIndexes;
-    instanceIndexes[m_instance] = m_eventIndex;
+    ChartIndexList instanceIndexes { { m_instance, m_eventIndex } };
     m_chart->addInstanceEvent(m_action, instanceIndexes);
 
     checkVisualSorting();
