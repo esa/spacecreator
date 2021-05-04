@@ -50,8 +50,7 @@ void CmdEntityCommentChange::redo()
         if (!comment) {
             comment = m_modelItem->setCommentString(m_newComment);
         }
-        QHash<MscInstance *, int> instanceIndexes;
-        m_chart->addInstanceEvent(comment, instanceIndexes);
+        m_chart->addInstanceEvent(comment, {});
         comment->setText(m_newComment);
     }
 
@@ -77,8 +76,7 @@ void CmdEntityCommentChange::undo()
         if (!comment) {
             comment = m_modelItem->setCommentString(m_oldComment);
         }
-        QHash<MscInstance *, int> indexes;
-        m_chart->addInstanceEvent(comment, indexes);
+        m_chart->addInstanceEvent(comment, {});
         comment->setText(m_oldComment);
     }
 

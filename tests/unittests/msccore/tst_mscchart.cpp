@@ -261,13 +261,11 @@ void tst_MscChart::testAddMessage()
     QCOMPARE(m_chart->totalEventNumber(), 0);
 
     auto message1 = new MscMessage("IN", instanceA, instanceB, m_chart);
-    QHash<MscInstance *, int> instanceIndexes = { { instanceA, 0 }, { instanceB, 0 } };
-    m_chart->addInstanceEvent(message1, instanceIndexes);
+    m_chart->addInstanceEvent(message1, { { instanceA, 0 }, { instanceB, 0 } });
 
     // crossing message
     auto message2 = new MscMessage("OUT", instanceB, instanceA, m_chart);
-    instanceIndexes = { { instanceA, 1 }, { instanceB, 0 } };
-    m_chart->addInstanceEvent(message2, instanceIndexes);
+    m_chart->addInstanceEvent(message2, { { instanceA, 1 }, { instanceB, 0 } });
     QCOMPARE(m_chart->totalEventNumber(), 2);
 }
 
@@ -374,15 +372,13 @@ void tst_MscChart::testAddSharedCondition()
 
     auto condition1 = new MscCondition("C_1");
     condition1->setInstance(instanceB);
-    QHash<MscInstance *, int> indexes = { { instanceB, -1 } };
-    m_chart->addInstanceEvent(condition1, indexes);
+    m_chart->addInstanceEvent(condition1, { { instanceB, -1 } });
     QCOMPARE(m_chart->totalEventNumber(), 1);
 
     auto condition2 = new MscCondition("C_S1");
     condition2->setInstance(instanceA);
     condition2->setShared(true);
-    indexes = { { instanceA, 0 }, { instanceB, 1 } };
-    m_chart->addInstanceEvent(condition2, indexes);
+    m_chart->addInstanceEvent(condition2, { { instanceA, 0 }, { instanceB, 1 } });
     QCOMPARE(m_chart->totalEventNumber(), 2);
 
     QVector<MscInstanceEvent *> events = m_chart->instanceEvents();
@@ -406,8 +402,7 @@ void tst_MscChart::testAddSharedConditionMix()
 
     auto condition1 = new MscCondition("C_1");
     condition1->setInstance(instanceB);
-    indexes = { { instanceB, -1 } };
-    m_chart->addInstanceEvent(condition1, indexes);
+    m_chart->addInstanceEvent(condition1, { { instanceB, -1 } });
     QCOMPARE(m_chart->totalEventNumber(), 2);
     QVector<MscInstanceEvent *> events = m_chart->instanceEvents();
     QCOMPARE(events.at(0), condition1);
@@ -416,8 +411,7 @@ void tst_MscChart::testAddSharedConditionMix()
     auto condition2 = new MscCondition("C_S1");
     condition2->setInstance(instanceB);
     condition2->setShared(true);
-    indexes = { { instanceA, 0 }, { instanceB, 1 }, { instanceC, 1 } };
-    m_chart->addInstanceEvent(condition2, indexes);
+    m_chart->addInstanceEvent(condition2, { { instanceA, 0 }, { instanceB, 1 }, { instanceC, 1 } });
     QCOMPARE(m_chart->totalEventNumber(), 3);
 
     events = m_chart->instanceEvents();

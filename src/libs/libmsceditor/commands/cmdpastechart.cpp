@@ -61,8 +61,7 @@ void CmdPasteChart::redo()
             }
 
             for (auto instanceEvent : mscChart->instanceEvents()) {
-                QHash<MscInstance *, int> indexes;
-                m_chart->addInstanceEvent(instanceEvent, indexes);
+                m_chart->addInstanceEvent(instanceEvent, {});
             }
 
             for (auto gate : mscChart->gates()) {
