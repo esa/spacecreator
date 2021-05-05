@@ -16,6 +16,7 @@ Expected results:
     * Open previously saved file
 
 Expected results:
+
 * all items should have the same position/geometry as in previous check step
 
 

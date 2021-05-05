@@ -14,7 +14,7 @@ Have a variable SOURCEDIR pointing to the checked out repository.
 
 Run the command:
 
-`$BUILDIR/mscconverter -m $SOURCEDIR/examples/msc/test8.msc -t $SOURCEDIR/src/libs/msclibrary/mscresources/mscmodel.tmplt -x test8_conv.msc`
+`$BUILDIR/mscconverter -m $SOURCEDIR/examples/msc/test8.msc -t $SOURCEDIR/src/libs/msccore/mscresources/mscmodel.tmplt -x test8_conv.msc`
 
 **Check for**
 

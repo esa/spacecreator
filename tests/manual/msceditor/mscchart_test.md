@@ -73,7 +73,10 @@ Same as in 2, but before saving:
 **Steps**
 
 * Create a doc with 2 instances
-* Provide CIF for all items, including the Chart (resize chart, move instance1 a bit to the right, move instance2 close to the right edge of Chart)
+* Provide CIF for all items, including the Chart
+  - resize chart
+  - move instance1 a bit to the right
+  - move instance2 close to the right edge of Chart
 * Save file
 * Load file
 
