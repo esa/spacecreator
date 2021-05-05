@@ -61,6 +61,7 @@ private Q_SLOTS:
     void testMaxInstanceNameNumber();
     void testSetInstanceNameNumber();
     void testMoveCoregion();
+    void testCreateMessage();
     void testAddCreateAfterMessage();
     void testIndicesOfEvent();
 
@@ -681,6 +682,30 @@ void tst_MscChart::testMoveCoregion()
     QCOMPARE(m_chart->indexofEventAtInstance(coregionBegin, instance2), 1);
     QCOMPARE(m_chart->indexofEventAtInstance(coregionEnd, instance1), -1);
     QCOMPARE(m_chart->indexofEventAtInstance(coregionEnd, instance2), 3);
+}
+
+void tst_MscChart::testCreateMessage()
+{
+    auto instance1 = new MscInstance("Inst1", m_chart);
+    m_chart->addInstance(instance1);
+    auto instance2 = new MscInstance("Inst2", m_chart);
+    m_chart->addInstance(instance2);
+
+    auto action = new MscAction("DoIt");
+    action->setInstance(instance1);
+    m_chart->addInstanceEvent(action, { { instance1, -1 } });
+
+    auto create1 = new MscCreate("Create", m_chart);
+    create1->setSourceInstance(instance2);
+    create1->setTargetInstance(instance1);
+    m_chart->addInstanceEvent(create1, { { instance1, -1 }, { instance2, -1 } });
+
+    int idx = m_chart->eventsForInstance(instance1).indexOf(action);
+    QCOMPARE(idx, 1);
+    idx = m_chart->eventsForInstance(instance1).indexOf(create1);
+    QCOMPARE(idx, 0);
+    idx = m_chart->eventsForInstance(instance2).indexOf(create1);
+    QCOMPARE(idx, 0);
 }
 
 void tst_MscChart::testAddCreateAfterMessage()

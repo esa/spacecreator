@@ -918,7 +918,8 @@ void addTopUntil(MscInstance *instance, MscInstanceEvent *untilEvent, const QVec
             }
             if (event->entityType() == MscEntity::EntityType::Create) {
                 auto create = static_cast<MscMessage *>(event);
-                if (create->targetInstance() != nullptr && create->targetInstance() == instance) {
+                if (create->targetInstance() != nullptr && create->targetInstance() == instance
+                        && otherInstances.contains(instance)) {
                     addTopUntil(create->targetInstance(), event, otherInstances, events, result, event);
                 }
             }
