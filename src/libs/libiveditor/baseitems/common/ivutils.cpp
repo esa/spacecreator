@@ -17,16 +17,15 @@
 
 #include "ivutils.h"
 
-#include "ivobject.h"
 #include "asn1/definitions.h"
 #include "asn1/file.h"
-#include "connectioncreationvalidator.h"
 #include "graphicsviewutils.h"
+#include "ivobject.h"
 
 #include <QDebug>
 #include <QDir>
-#include <QGraphicsView>
-#include <QMetaEnum>
+#include <QGraphicsItem>
+#include <QGraphicsScene>
 #include <QStandardPaths>
 #include <QtGlobal>
 #include <QtMath>

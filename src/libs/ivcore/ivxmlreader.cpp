@@ -95,7 +95,6 @@ private:
 typedef QHash<QString, QHash<QString, IVInterface *>> IfacesByFunction; // { Function[Type]Id, {IfaceName, Iface} }
 struct IVXMLReaderPrivate {
     QVector<IVObject *> m_allObjects {};
-    QVariantMap m_metaData;
     QHash<QString, IVFunctionType *> m_functionNames {};
     IfacesByFunction m_ifaceRequiredNames {};
     IfacesByFunction m_ifaceProvidedNames {};
@@ -143,105 +142,16 @@ struct IVXMLReaderPrivate {
 };
 
 IVXMLReader::IVXMLReader(QObject *parent)
-    : QObject(parent)
+    : shared::XmlReader(parent)
     , d(new IVXMLReaderPrivate)
 {
 }
 
 IVXMLReader::~IVXMLReader() { }
 
-bool IVXMLReader::readFile(const QString &file)
+QVector<IVObject *> IVXMLReader::parsedObjects() const
 {
-    QFile in(file);
-    if (in.exists(file) && in.open(QFile::ReadOnly | QFile::Text))
-        return read(&in);
-
-    const QString &errMsg = QString("Can't open file %1: %2").arg(file, in.errorString());
-    qWarning() << errMsg;
-    Q_EMIT error(errMsg);
-
-    return false;
-}
-
-bool IVXMLReader::read(QIODevice *openForRead)
-{
-    if (openForRead && openForRead->isOpen() && openForRead->isReadable()) {
-        if (readXml(openForRead)) {
-            Q_EMIT objectsParsed(d->m_allObjects);
-            Q_EMIT metaDataParsed(d->m_metaData);
-            return true;
-        }
-    }
-
-    return false;
-}
-
-bool IVXMLReader::read(const QByteArray &data)
-{
-    if (data.isEmpty()) {
-        return false;
-    }
-
-    QXmlStreamReader xml(data);
-    if (xml.readNext() == QXmlStreamReader::StartDocument) {
-        if (xml.readNext() == QXmlStreamReader::StartElement) {
-            if (Props::token(xml.name().toString()) == Props::Token::InterfaceView) {
-                if (readInterfaceView(xml)) {
-                    Q_EMIT objectsParsed(d->m_allObjects);
-                    return true;
-                }
-            }
-        }
-    }
-    return false;
-}
-
-bool IVXMLReader::readXml(QIODevice *in)
-{
-    if (!in)
-        return false;
-
-    QXmlStreamReader xml(in);
-    if (xml.readNext() == QXmlStreamReader::StartDocument)
-        if (xml.readNext() == QXmlStreamReader::StartElement)
-            if (Props::token(xml.name().toString()) == Props::Token::InterfaceView)
-                return readInterfaceView(xml);
-
-    return false;
-}
-
-bool IVXMLReader::readInterfaceView(QXmlStreamReader &xml)
-{
-    for (const QXmlStreamAttribute &attribute : xml.attributes()) {
-        d->m_metaData[attribute.name().toString()] = QVariant::fromValue(attribute.value().toString());
-    }
-
-    while (!xml.atEnd()) {
-        if (xml.hasError()) {
-            qWarning() << xml.errorString();
-            Q_EMIT error(xml.errorString());
-            return false;
-        }
-
-        switch (xml.readNext()) {
-        case QXmlStreamReader::TokenType::StartElement:
-            processTagOpen(xml);
-            break;
-        case QXmlStreamReader::TokenType::EndElement:
-            processTagClose(xml);
-            break;
-        default:
-            break;
-        }
-    }
-
-    if (xml.hasError()) {
-        qWarning() << xml.errorString();
-        Q_EMIT error(xml.errorString());
-        return false;
-    }
-
-    return true;
+    return d->m_allObjects;
 }
 
 InterfaceParameter addIfaceParameter(
@@ -357,7 +267,8 @@ void IVXMLReader::processTagOpen(QXmlStreamReader &xml)
         break;
     }
     case Props::Token::Property: {
-        d->m_currentObject.get()->setEntityProperty(nameAttr.m_value, attrs.value(Props::token(Props::Token::value)).m_value);
+        d->m_currentObject.get()->setEntityProperty(
+                nameAttr.m_value, attrs.value(Props::token(Props::Token::value)).m_value);
         break;
     }
     case Props::Token::ContextParameter: {
@@ -405,6 +316,11 @@ void IVXMLReader::processTagClose(QXmlStreamReader &xml)
     default:
         break;
     }
+}
+
+QString IVXMLReader::rootElementName() const
+{
+    return Props::token(Props::Token::InterfaceView);
 }
 
 IVFunctionType *IVXMLReader::addFunction(const QString &name, IVObject::Type fnType)

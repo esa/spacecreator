@@ -18,6 +18,7 @@
 #pragma once
 
 #include "ivobject.h"
+#include "xmlreader.h"
 
 #include <QObject>
 #include <QVariantMap>
@@ -35,31 +36,22 @@ class IVComment;
 class IVConnection;
 class IVConnectionGroup;
 struct IVXMLReaderPrivate;
-class IVXMLReader : public QObject
+class IVXMLReader : public shared::XmlReader
 {
     Q_OBJECT
-
 public:
     explicit IVXMLReader(QObject *parent = nullptr);
     ~IVXMLReader() override;
 
-    bool readFile(const QString &file);
-    bool read(QIODevice *openForRead);
-    bool read(const QByteArray &data);
+    QVector<IVObject *> parsedObjects() const;
 
-Q_SIGNALS:
-    void objectsParsed(const QVector<ivm::IVObject *> &objects);
-    void metaDataParsed(const QVariantMap &metadata);
-    void error(const QString &msg);
+protected:
+    void processTagOpen(QXmlStreamReader &xml) override;
+    void processTagClose(QXmlStreamReader &xml) override;
+    QString rootElementName() const override;
 
 private:
     const std::unique_ptr<IVXMLReaderPrivate> d;
-
-    bool readXml(QIODevice *in);
-
-    bool readInterfaceView(QXmlStreamReader &xml);
-    void processTagOpen(QXmlStreamReader &xml);
-    void processTagClose(QXmlStreamReader &xml);
 
     IVFunctionType *addFunction(const QString &name, IVObject::Type fnType);
     IVInterface *addIface(const QString &name, bool isRI);

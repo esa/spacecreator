@@ -96,4 +96,14 @@ DVModel *DVObject::model() const
     return qobject_cast<DVModel *>(VEObject::model());
 }
 
+bool DVObject::postInit()
+{
+    return true;
+}
+
+bool DVObject::aboutToBeRemoved()
+{
+    return true;
+}
+
 } // namespace deploy

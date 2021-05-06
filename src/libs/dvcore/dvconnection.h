@@ -21,11 +21,11 @@
 
 namespace dvm {
 
-class DVLink : public DVObject
+class DVConnection : public DVObject
 {
     Q_OBJECT
 public:
-    explicit DVLink(DVObject *parent = nullptr);
+    explicit DVConnection(DVObject *parent = nullptr);
 };
 
 } // namespace deploy

@@ -46,31 +46,14 @@ void IVXMLReader::runReader(const XmlFileMock &xml)
     buffer.open(QIODevice::ReadOnly | QIODevice::Text);
 
     ivm::IVXMLReader reader;
-    connect(&reader, &ivm::IVXMLReader::objectsParsed, this, [&xml](const QVector<ivm::IVObject *> &objectsList) {
-        QCOMPARE(objectsList.size(), xml.expectedObjectCount());
-    });
-    connect(&reader, &ivm::IVXMLReader::error, [](const QString &msg) { qWarning() << msg; });
-
-    QSignalSpy spyObjectsParsed(&reader, &ivm::IVXMLReader::objectsParsed);
-    QSignalSpy spyError(&reader, &ivm::IVXMLReader::error);
-
     const bool ok = reader.read(&buffer);
     QCOMPARE(ok, xml.m_canBeParsed);
-
-    if (xml.m_canBeParsed)
-        QCOMPARE(spyObjectsParsed.count(), 1);
-
-    QCOMPARE(spyError.count(), xml.m_expectedErrorCount);
-
-    if (spyObjectsParsed.count()) {
-        const QList<QVariant> &objectsList = spyObjectsParsed.takeFirst();
-        const QVector<ivm::IVObject *> &ivObjects = objectsList.first().value<QVector<ivm::IVObject *>>();
-        QCOMPARE(ivObjects.size(), xml.expectedObjectCount());
+    if (ok) {
+        const QVector<ivm::IVObject *> objectsList = reader.parsedObjects();
+        QCOMPARE(objectsList.size(), xml.expectedObjectCount());
+    } else {
+        qWarning() << reader.errorString();
     }
-
-    if (xml.m_canBeParsed)
-        while (spyError.count())
-            qWarning() << spyError.takeFirst().first().toString();
 }
 
 void IVXMLReader::test_emptyInterfaceViewDoc()
@@ -105,18 +88,11 @@ void IVXMLReader::test_readMetaData()
     QBuffer buffer(&xml);
     buffer.open(QIODevice::ReadOnly | QIODevice::Text);
 
-    QVariantMap metadata;
     ivm::IVXMLReader reader;
-    connect(&reader, &ivm::IVXMLReader::metaDataParsed, this,
-            [&metadata](const QVariantMap &data) { metadata = data; });
-
-    QSignalSpy spyError(&reader, &ivm::IVXMLReader::error);
-
     const bool ok = reader.read(&buffer);
     QVERIFY(ok);
 
-    QCOMPARE(spyError.count(), 0);
-    QCOMPARE(metadata.count(), 2);
+    const QVariantMap metadata = reader.metaData();
     QCOMPARE(metadata["asn1file"].toString(), QString("dataview.asn"));
     QCOMPARE(metadata["mscfile"].toString(), QString("newfile.msc"));
 }
@@ -132,19 +108,13 @@ void IVXMLReader::test_readFunction()
     QBuffer buffer(&xml);
     buffer.open(QIODevice::ReadOnly | QIODevice::Text);
 
-    ivm::IVFunction *function = nullptr;
     ivm::IVXMLReader reader;
-    connect(&reader, &ivm::IVXMLReader::objectsParsed, this,
-            [&function](const QVector<ivm::IVObject *> &objectsList) {
-                QCOMPARE(objectsList.size(), 1);
-                function = qobject_cast<ivm::IVFunction *>(objectsList[0]);
-            });
-
-    QSignalSpy spyError(&reader, &ivm::IVXMLReader::error);
 
     const bool ok = reader.read(&buffer);
     QVERIFY(ok);
-    QCOMPARE(spyError.count(), 0);
+    const QVector<ivm::IVObject *> objectsList = reader.parsedObjects();
+    QCOMPARE(objectsList.size(), 1);
+    ivm::IVFunction *function = qobject_cast<ivm::IVFunction *>(objectsList[0]);
 
     QVERIFY(function != nullptr);
     QCOMPARE(function->contextParams().size(), 2);

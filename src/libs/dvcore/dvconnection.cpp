@@ -15,12 +15,12 @@
    along with this program. If not, see <https://www.gnu.org/licenses/lgpl-2.1.html>.
 */
 
-#include "dvlink.h"
+#include "dvconnection.h"
 
 namespace dvm {
 
-DVLink::DVLink(DVObject *parent)
-    : DVObject(DVObject::Type::Link, {}, parent)
+DVConnection::DVConnection(DVObject *parent)
+    : DVObject(DVObject::Type::Connection, {}, parent)
 {
 }
 

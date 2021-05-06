@@ -43,51 +43,48 @@ CmdEntitiesImport::CmdEntitiesImport(const QByteArray &data, ivm::IVFunctionType
     , m_destPath(destPath)
 {
     ivm::IVXMLReader parser;
-    QObject::connect(&parser, &ivm::IVXMLReader::objectsParsed, m_model,
-            [this, pos, parent](const QVector<ivm::IVObject *> &objects) {
-                static const QPointF outOfScene { std::numeric_limits<qreal>::max(),
-                    std::numeric_limits<qreal>::max() };
-                QPointF basePoint { outOfScene };
-                const QSet<QString> functionNames = m_model->nestedFunctionNames();
-                for (auto obj : objects) {
-                    obj->setModel(m_model);
-                    if (obj->parentObject()) {
-                        continue;
-                    }
-                    if (functionNames.contains(obj->title())) {
-                        obj->removeEntityAttribute(ivm::meta::Props::token(ivm::meta::Props::Token::name));
-                        obj->setTitle(ivm::IVNameValidator::nextNameFor(obj));
-                    }
-                    QVector<QPointF> coordinates = ive::polygon(obj->coordinates());
-                    std::for_each(coordinates.cbegin(), coordinates.cend(), [&basePoint](const QPointF &point) {
-                        if (point.x() < basePoint.x())
-                            basePoint.setX(point.x());
-                        if (point.y() < basePoint.y())
-                            basePoint.setY(point.y());
-                    });
-                    m_rootEntities.append(obj);
-                }
-                const QPointF offset = basePoint == outOfScene ? QPointF() : pos - basePoint;
-                for (auto obj : objects) {
-                    QVector<QPointF> coordinates = ive::polygon(obj->coordinates());
-                    if (coordinates.isEmpty() && !obj->parentObject()) {
-                        obj->setCoordinates(ive::coordinates(QRectF(pos, ive::DefaultGraphicsItemSize)));
-                    } else if (!offset.isNull()) {
-                        std::for_each(
-                                coordinates.begin(), coordinates.end(), [offset](QPointF &point) { point += offset; });
-                        obj->setCoordinates(ive::coordinates(coordinates));
-                    }
-                    m_importedEntities.append(obj);
-                }
+    if (parser.read(data)) {
+        const QVector<ivm::IVObject *> objects = parser.parsedObjects();
+        static const QPointF outOfScene { std::numeric_limits<qreal>::max(), std::numeric_limits<qreal>::max() };
+        QPointF basePoint { outOfScene };
+        const QSet<QString> functionNames = m_model->nestedFunctionNames();
+        for (ivm::IVObject *obj : objects) {
+            obj->setModel(m_model);
+            if (obj->parentObject()) {
+                continue;
+            }
+            if (functionNames.contains(obj->title())) {
+                obj->removeEntityAttribute(ivm::meta::Props::token(ivm::meta::Props::Token::name));
+                obj->setTitle(ivm::IVNameValidator::nextNameFor(obj));
+            }
+            QVector<QPointF> coordinates = ive::polygon(obj->coordinates());
+            std::for_each(coordinates.cbegin(), coordinates.cend(), [&basePoint](const QPointF &point) {
+                if (point.x() < basePoint.x())
+                    basePoint.setX(point.x());
+                if (point.y() < basePoint.y())
+                    basePoint.setY(point.y());
             });
-    QObject::connect(&parser, &ivm::IVXMLReader::error, [](const QString &msg) { qWarning() << msg; });
-    parser.read(data);
+            m_rootEntities.append(obj);
+        }
+        const QPointF offset = basePoint == outOfScene ? QPointF() : pos - basePoint;
+        for (ivm::IVObject *obj : objects) {
+            QVector<QPointF> coordinates = ive::polygon(obj->coordinates());
+            if (coordinates.isEmpty() && !obj->parentObject()) {
+                obj->setCoordinates(ive::coordinates(QRectF(pos, ive::DefaultGraphicsItemSize)));
+            } else if (!offset.isNull()) {
+                std::for_each(coordinates.begin(), coordinates.end(), [offset](QPointF &point) { point += offset; });
+                obj->setCoordinates(ive::coordinates(coordinates));
+            }
+            m_importedEntities.append(obj);
+        }
+    } else {
+        qWarning() << parser.errorString();
+    }
 }
 
 CmdEntitiesImport::~CmdEntitiesImport()
 {
-    const QVector<QPointer<ivm::IVObject>> &objects = m_rootEntities;
-    for (ivm::IVObject *obj : objects) {
+    for (ivm::IVObject *obj : qAsConst(m_rootEntities)) {
         if (obj && !obj->parent()) {
             delete obj;
         }

@@ -374,10 +374,13 @@ bool InterfaceDocument::loadComponentModel(ivm::IVModel *model, const QString &p
     }
 
     ivm::IVXMLReader parser;
-    connect(&parser, &ivm::IVXMLReader::objectsParsed, model, &ivm::IVModel::addObjects);
-    connect(&parser, &ivm::IVXMLReader::error, [](const QString &msg) { qWarning() << msg; });
+    if (!parser.readFile(path)) {
+        qWarning() << parser.errorString();
+        return false;
+    }
 
-    return parser.readFile(path);
+    model->addObjects(parser.parsedObjects());
+    return true;
 }
 
 void InterfaceDocument::close()
@@ -920,14 +923,16 @@ bool InterfaceDocument::loadImpl(const QString &path)
     }
 
     ivm::IVXMLReader parser;
-    connect(&parser, &ivm::IVXMLReader::objectsParsed, this, &InterfaceDocument::setObjects);
-    connect(&parser, &ivm::IVXMLReader::metaDataParsed, this, [this, path](const QVariantMap &metadata) {
-        setAsn1FileName(metadata["asn1file"].toString());
-        setMscFileName(metadata["mscfile"].toString());
-    });
-    connect(&parser, &ivm::IVXMLReader::error, [](const QString &msg) { qWarning() << msg; });
+    if (!parser.readFile(path)) {
+        qWarning() << parser.errorString();
+        return false;
+    }
 
-    return parser.readFile(path);
+    setObjects(parser.parsedObjects());
+    const QVariantMap metadata = parser.metaData();
+    setAsn1FileName(metadata["asn1file"].toString());
+    setMscFileName(metadata["mscfile"].toString());
+    return true;
 }
 
 QVector<QAction *> InterfaceDocument::initActions()

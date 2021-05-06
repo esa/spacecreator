@@ -17,12 +17,14 @@ target_sources(${LIB_NAME} PRIVATE
     dvdevice.h
     dvbus.cpp
     dvbus.h
-    dvlink.cpp
-    dvlink.h
+    dvconnection.cpp
+    dvconnection.h
     dvbinding.cpp
     dvbinding.h
-    prop.cpp
-    prop.h
+    dvxmlreader.cpp
+    dvxmlreader.h
+    dvcommonprops.cpp
+    dvcommonprops.h
 )
 
 target_include_directories(${LIB_NAME} PUBLIC .)

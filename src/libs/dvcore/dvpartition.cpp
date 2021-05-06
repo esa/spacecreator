@@ -19,9 +19,26 @@
 
 namespace dvm {
 
+struct DVPartitionPrivate {
+    QStringList functions;
+};
+
 DVPartition::DVPartition(DVObject *parent)
     : DVObject(DVObject::Type::Partition, {}, parent)
+    , d(new DVPartitionPrivate)
 {
+}
+
+DVPartition::~DVPartition() { }
+
+void DVPartition::addFunction(const QString &function)
+{
+    d->functions.append(function);
+}
+
+QStringList DVPartition::functions() const
+{
+    return d->functions;
 }
 
 } // namespace deploy

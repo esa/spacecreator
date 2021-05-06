@@ -73,6 +73,8 @@ target_sources(${LIB_NAME} PRIVATE
     vemodel.h
     entityattribute.cpp
     entityattribute.h
+    xmlreader.cpp
+    xmlreader.h
 )
 
 target_include_directories(${LIB_NAME} PUBLIC .)

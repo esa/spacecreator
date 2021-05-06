@@ -102,8 +102,8 @@ void tst_IVConnectionChain::test3StraightConnections()
 
     ivm::IVModel model(conf);
     ivm::IVXMLReader parser;
-    connect(&parser, &ivm::IVXMLReader::objectsParsed, &model, &ivm::IVModel::initFromObjects);
-    parser.readFile(QFINDTESTDATA("connectionchains01.xml"));
+    QVERIFY(parser.readFile(QFINDTESTDATA("connectionchains01.xml")));
+    model.initFromObjects(parser.parsedObjects());
     QCOMPARE(model.objects().size(), 11);
 
     QList<ivm::IVConnection *> allConnections = model.allObjectsByType<ivm::IVConnection>().toList();
@@ -141,8 +141,8 @@ void tst_IVConnectionChain::testTargetSplitsIntoTwo()
 {
     ivm::IVModel model(conf);
     ivm::IVXMLReader parser;
-    connect(&parser, &ivm::IVXMLReader::objectsParsed, &model, &ivm::IVModel::initFromObjects);
-    parser.readFile(QFINDTESTDATA("connectionchains02.xml"));
+    QVERIFY(parser.readFile(QFINDTESTDATA("connectionchains02.xml")));
+    model.initFromObjects(parser.parsedObjects());
     QCOMPARE(model.objects().size(), 18);
 
     QList<ivm::IVConnection *> allConnections = model.allObjectsByType<ivm::IVConnection>().toList();
@@ -159,8 +159,8 @@ void tst_IVConnectionChain::testTargetJoinIntone()
 
     ivm::IVModel model(conf);
     ivm::IVXMLReader parser;
-    connect(&parser, &ivm::IVXMLReader::objectsParsed, &model, &ivm::IVModel::initFromObjects);
-    parser.readFile(QFINDTESTDATA("connectionchains03.xml"));
+    QVERIFY(parser.readFile(QFINDTESTDATA("connectionchains03.xml")));
+    model.initFromObjects(parser.parsedObjects());
     QCOMPARE(model.objects().size(), 20);
 
     QList<ivm::IVConnection *> allConnections = model.allObjectsByType<ivm::IVConnection>().toList();
@@ -179,8 +179,8 @@ void tst_IVConnectionChain::testChainCreationMultiChainOnInterfaces()
 {
     ivm::IVModel model(conf);
     ivm::IVXMLReader parser;
-    connect(&parser, &ivm::IVXMLReader::objectsParsed, &model, &ivm::IVModel::initFromObjects);
-    parser.readFile(QFINDTESTDATA("connectionchains04.xml"));
+    QVERIFY(parser.readFile(QFINDTESTDATA("connectionchains04.xml")));
+    model.initFromObjects(parser.parsedObjects());
     QCOMPARE(model.objects().size(), 21);
 
     QList<ivm::IVConnection *> allConnections = model.allObjectsByType<ivm::IVConnection>().toList();
@@ -196,8 +196,8 @@ void tst_IVConnectionChain::testContains()
 
     ivm::IVModel model(conf);
     ivm::IVXMLReader parser;
-    connect(&parser, &ivm::IVXMLReader::objectsParsed, &model, &ivm::IVModel::initFromObjects);
-    parser.readFile(QFINDTESTDATA("connectionchains01.xml"));
+    QVERIFY(parser.readFile(QFINDTESTDATA("connectionchains01.xml")));
+    model.initFromObjects(parser.parsedObjects());
     QCOMPARE(model.objects().size(), 11);
 
     QList<ivm::IVConnectionChain *> chains = ivm::IVConnectionChain::build(model);
@@ -227,8 +227,8 @@ void tst_IVConnectionChain::testGetNames()
 
     ivm::IVModel model(conf);
     ivm::IVXMLReader parser;
-    connect(&parser, &ivm::IVXMLReader::objectsParsed, &model, &ivm::IVModel::initFromObjects);
-    parser.readFile(QFINDTESTDATA("connectionchains01.xml"));
+    QVERIFY(parser.readFile(QFINDTESTDATA("connectionchains01.xml")));
+    model.initFromObjects(parser.parsedObjects());
 
     QList<ivm::IVConnectionChain *> chains = ivm::IVConnectionChain::build(model);
     QCOMPARE(chains.size(), 1);

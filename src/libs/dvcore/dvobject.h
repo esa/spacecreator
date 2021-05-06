@@ -18,7 +18,7 @@
 #pragma once
 
 #include "common.h"
-#include "prop.h"
+#include "dvcommonprops.h"
 #include "veobject.h"
 
 #include <QObject>
@@ -43,7 +43,7 @@ public:
         Binding,
         Device,
         Bus,
-        Link
+        Connection
     };
     Q_ENUM(Type)
 
@@ -61,6 +61,9 @@ public:
     DVObject *parentObject() const override;
 
     DVModel *model() const;
+
+    bool postInit() override;
+    bool aboutToBeRemoved() override;
 
 Q_SIGNALS:
     void titleChanged(const QString &title);

@@ -19,13 +19,23 @@
 
 #include "dvobject.h"
 
+#include <memory>
+
 namespace dvm {
+struct DVPartitionPrivate;
 
 class DVPartition : public DVObject
 {
     Q_OBJECT
 public:
     explicit DVPartition(DVObject *parent = nullptr);
+    ~DVPartition() override;
+
+    void addFunction(const QString &function);
+    QStringList functions() const;
+
+private:
+    std::unique_ptr<DVPartitionPrivate> d;
 };
 
 } // namespace deploy

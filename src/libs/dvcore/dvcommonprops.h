@@ -1,5 +1,5 @@
 /*
-  Copyright (C) 2019 European Space Agency - <maxime.perrotin@esa.int>
+  Copyright (C) 2021 European Space Agency - <maxime.perrotin@esa.int>
 
   This library is free software; you can redistribute it and/or
   modify it under the terms of the GNU Library General Public
@@ -21,7 +21,7 @@
 #include <QObject>
 #include <QString>
 
-namespace ivm {
+namespace dvm {
 namespace meta {
 
 struct Props {
@@ -30,43 +30,45 @@ public:
     enum class Token
     {
         Unknown = 0,
-        InterfaceView,
+        DeploymentView,
 
         // tags:
-        Function,
-        Property,
-        ContextParameter,
-        Provided_Interface,
-        Input_Parameter,
-        Output_Parameter,
-        Required_Interface,
+        Node,
+        Partition,
+        Device,
         Connection,
-        ConnectionGroup,
-        Comment,
-        Source,
-        Target,
+        Function,
 
         // attrs:
         name,
-        url,
-        is_type,
-        instance_of,
-        value,
-        kind,
-        type,
-        encoding,
-        ri_name,
-        pi_name,
-        group_name,
-        func_name,
-        is_visible,
+        from_node,
+        from_port,
+        to_bus,
+        to_node,
+        to_port,
 
-        // KNOWN TASTE props:
+        coverage,
+        package,
+        cpu,
+        cou_platform,
+        cpu_classifier,
+        vp_name,
+        vp_platform,
+        vp_classifier,
+        ada_runtime,
+
+        pkg,
+        classifier,
+        proc,
+        config,
+        bus,
+        port,
+        asn1file,
+        asn1type,
+        asn1module,
+
+        // TASTE props:
         coordinates,
-        InnerCoordinates,
-        RootCoordinates,
-        InheritPI,
-        Autonamed,
     };
     Q_ENUM(Token)
 
@@ -78,4 +80,4 @@ public:
 };
 
 } // namespace meta
-} // namespace ivm
+} // namespace dvm

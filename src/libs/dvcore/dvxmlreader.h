@@ -1,5 +1,5 @@
 /*
-  Copyright (C) 2021 European Space Agency - <maxime.perrotin@esa.int>
+  Copyright (C) 2019 European Space Agency - <maxime.perrotin@esa.int>
 
   This library is free software; you can redistribute it and/or
   modify it under the terms of the GNU Library General Public
@@ -17,32 +17,34 @@
 
 #pragma once
 
-#include <QHash>
+#include "xmlreader.h"
+
 #include <QObject>
-#include <QString>
+#include <QVector>
+#include <memory>
+
+class QXmlStreamReader;
 
 namespace dvm {
-namespace meta {
+class DVObject;
+struct DVXMLReaderPrivate;
 
-struct Props {
-    Q_GADGET
-
+class DVXMLReader : public shared::XmlReader
+{
+    Q_OBJECT
 public:
-    enum class Token
-    {
-        Unknown = 0,
+    explicit DVXMLReader(QObject *parent = nullptr);
+    ~DVXMLReader() override;
 
-        name,
-        coordinates,
-    };
-    Q_ENUM(Token)
+    QVector<DVObject *> parsedObjects() const;
 
-    static const QHash<QString, Props::Token> TokensByName;
+protected:
+    void processTagOpen(QXmlStreamReader &xml) override;
+    void processTagClose(QXmlStreamReader &xml) override;
+    QString rootElementName() const override;
 
-    static Props::Token token(const QString &fromString);
-
-    static QString token(Props::Token tag);
+private:
+    const std::unique_ptr<DVXMLReaderPrivate> d;
 };
 
-}
-}
+} // namespace dvm

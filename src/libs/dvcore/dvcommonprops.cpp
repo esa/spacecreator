@@ -15,14 +15,28 @@
   along with this program. If not, see <https://www.gnu.org/licenses/lgpl-2.1.html>.
 */
 
-#include "prop.h"
+#include "dvcommonprops.h"
 
 namespace dvm {
 namespace meta {
 
 const QHash<QString, Props::Token> Props::TokensByName = {
+    { "DeploymentView", Token::DeploymentView },
+
+    // tags:
+    { "Node", Token::Node },
+    { "Partition", Token::Partition },
+    { "Device", Token::Device },
+    { "Connection", Token::Connection },
+    { "function", Token::Function },
+
     // attrs:
     { "name", Token::name },
+    { "from_node", Token::from_node },
+    { "from_port", Token::from_port },
+    { "to_bus", Token::to_bus },
+    { "to_node", Token::to_node },
+    { "to_port", Token::to_port },
 
     // TASTE props:
     { "Taste::coordinates", Token::coordinates },
