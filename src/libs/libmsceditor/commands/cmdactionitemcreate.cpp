@@ -49,8 +49,6 @@ void CmdActionItemCreate::redo()
     // The chart takes over parent-/owner-ship
     ChartIndexList instanceIndexes { { m_instance, m_eventIndex } };
     m_chart->addInstanceEvent(m_action, instanceIndexes);
-
-    checkVisualSorting();
 }
 
 void CmdActionItemCreate::undo()
@@ -60,8 +58,6 @@ void CmdActionItemCreate::undo()
 
     // this command takes over ownership
     m_action->setParent(this);
-
-    undoVisualSorting();
 }
 
 bool CmdActionItemCreate::mergeWith(const QUndoCommand *command)

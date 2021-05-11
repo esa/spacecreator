@@ -17,8 +17,10 @@
 
 #pragma once
 
+#include "chartindex.h"
 #include "chartbasecommand.h"
 
+#include <QPair>
 #include <QPointer>
 
 namespace msc {
@@ -44,10 +46,8 @@ public:
 
 private:
     QPointer<msc::MscAction> m_action;
-    int m_oldIndex = -1;
-    int m_newIndex = -1;
-    QPointer<msc::MscInstance> m_oldInstance;
-    QPointer<msc::MscInstance> m_newInstance;
+    ChartIndex m_newIndexes;
+    ChartIndex m_oldIndexes;
 };
 
 } // namespace cmd

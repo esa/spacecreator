@@ -34,7 +34,6 @@ CmdMessageItemResize::CmdMessageItemResize(MscMessage *message, int newPos, MscI
               endType == msc::MscMessage::EndType::SOURCE_TAIL ? message->sourceInstance() : message->targetInstance())
     , m_newInstance(newInsance)
     , m_endType(endType)
-
 {
     setText(QObject::tr("ReTarget message"));
 }
@@ -43,15 +42,14 @@ void CmdMessageItemResize::redo()
 {
     if (m_message && m_chart) {
         m_chart->updateMessageTarget(m_message, m_newInstance, m_newIndex, m_endType);
-        checkVisualSorting();
     }
 }
 
 void CmdMessageItemResize::undo()
 {
     if (m_message && m_chart) {
+        QHash<MscInstance *, int> indices;
         m_chart->updateMessageTarget(m_message, m_oldInstance, m_oldIndex, m_endType);
-        undoVisualSorting();
     }
 }
 

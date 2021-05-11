@@ -38,7 +38,6 @@ void CmdChangeInstanceOrder::redo()
 {
     if (m_chart && m_instance) {
         m_chart->updateInstanceOrder(m_instance, m_posTo);
-        checkVisualSorting();
     }
 }
 
@@ -46,7 +45,6 @@ void CmdChangeInstanceOrder::undo()
 {
     if (m_chart && m_instance) {
         m_chart->updateInstanceOrder(m_instance, m_posFrom);
-        undoVisualSorting();
     }
 }
 

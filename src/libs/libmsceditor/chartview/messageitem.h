@@ -99,6 +99,8 @@ public:
     qreal instanceTopArea(MscInstance *instance) const override;
     qreal instanceBottomArea(MscInstance *instance) const override;
 
+    QHash<msc::MscInstance *, int> visualIndices() const override;
+
 Q_SIGNALS:
     void retargeted(msc::MessageItem *, const QPointF &pos, msc::MscMessage::EndType endType);
 

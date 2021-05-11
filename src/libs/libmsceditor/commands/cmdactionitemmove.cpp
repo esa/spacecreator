@@ -23,36 +23,33 @@
 #include "mscchart.h"
 #include "mscinstance.h"
 
-#include <QDebug>
-
 namespace msc {
 namespace cmd {
 
 CmdActionItemMove::CmdActionItemMove(
-        MscAction *action, int newPos, MscInstance *newInsance, ChartLayoutManager *layoutManager)
+        MscAction *action, int newPos, MscInstance *newInstance, ChartLayoutManager *layoutManager)
     : ChartBaseCommand(action, layoutManager)
     , m_action(action)
-    , m_oldIndex(m_chart->instanceEvents().indexOf(action))
-    , m_newIndex(newPos)
-    , m_oldInstance(action->instance())
-    , m_newInstance(newInsance)
 {
+    m_newIndexes = { newInstance, newPos };
+    ChartIndexList indices = m_chart->indicesOfEvent(m_action);
+    if (!indices.isEmpty()) {
+        m_oldIndexes = indices.first();
+    }
     setText(QObject::tr("Move action"));
 }
 
 void CmdActionItemMove::redo()
 {
-    if (m_action && m_chart && m_newInstance) {
-        m_chart->updateActionPos(m_action, m_newInstance, m_newIndex);
-        checkVisualSorting();
+    if (m_action && m_chart && m_newIndexes.isValid()) {
+        m_chart->updateActionPos(m_action, m_newIndexes.instance(), m_newIndexes.index());
     }
 }
 
 void CmdActionItemMove::undo()
 {
-    if (m_action && m_chart && m_oldInstance) {
-        m_chart->updateActionPos(m_action, m_oldInstance, m_oldIndex);
-        undoVisualSorting();
+    if (m_action && m_chart && m_oldIndexes.isValid()) {
+        m_chart->updateActionPos(m_action, m_oldIndexes.instance(), m_oldIndexes.index());
     }
 }
 
@@ -60,8 +57,7 @@ bool CmdActionItemMove::mergeWith(const QUndoCommand *command)
 {
     const CmdActionItemMove *other = dynamic_cast<const CmdActionItemMove *>(command);
     if (canMergeWith(other)) {
-        m_newIndex = other->m_newIndex;
-        m_newInstance = other->m_newInstance;
+        m_newIndexes = other->m_newIndexes;
         return true;
     }
 

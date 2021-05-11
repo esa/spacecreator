@@ -36,7 +36,6 @@ void CmdActionInformalText::redo()
 {
     if (m_action) {
         m_action->setInformalAction(m_newText);
-        checkVisualSorting();
     }
 }
 
@@ -44,7 +43,6 @@ void CmdActionInformalText::undo()
 {
     if (m_action) {
         m_action->setInformalAction(m_oldText);
-        undoVisualSorting();
     }
 }
 

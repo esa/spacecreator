@@ -36,9 +36,6 @@ public:
     ChartBaseCommand(MscEntity *item, ChartLayoutManager *layoutManager, QUndoCommand *parent = nullptr);
 
 protected:
-    void checkVisualSorting();
-    void undoVisualSorting();
-
     QPointer<msc::MscChart> m_chart;
     QPointer<msc::ChartLayoutManager> m_layoutManager;
     QVector<msc::MscInstanceEvent *> m_newSortedEvents;

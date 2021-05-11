@@ -28,13 +28,13 @@ namespace msc {
 namespace cmd {
 
 CmdMessagePointsEdit::CmdMessagePointsEdit(MscMessage *message, const QVector<QPoint> &cifPointsOld,
-        const QVector<QPoint> &cifPointsNew, int newIdx, ChartLayoutManager *layoutManager)
+        const QVector<QPoint> &cifPointsNew, ChartIndexList indices, ChartLayoutManager *layoutManager)
     : ChartBaseCommand(message, layoutManager)
     , m_message(message)
     , m_newCif(cifPointsNew)
     , m_oldCif(cifPointsOld)
-    , m_newIdx(newIdx)
-    , m_oldIdx(m_chart->instanceEvents().indexOf(m_message))
+    , m_newIndexes(indices)
+    , m_oldIndexes(m_chart->indicesOfEvent(m_message))
 {
     setText(QObject::tr("Edit message trajectory"));
 }
@@ -42,28 +42,24 @@ CmdMessagePointsEdit::CmdMessagePointsEdit(MscMessage *message, const QVector<QP
 void CmdMessagePointsEdit::redo()
 {
     if (m_chart)
-        m_chart->moveEvent(m_message, m_newIdx);
+        m_chart->moveEvent(m_message, m_newIndexes);
 
     if (m_message)
         m_message->setCifPoints(m_newCif);
-
-    checkVisualSorting();
 }
 
 void CmdMessagePointsEdit::undo()
 {
     if (m_chart)
-        m_chart->moveEvent(m_message, m_oldIdx);
+        m_chart->moveEvent(m_message, m_oldIndexes);
 
     if (m_message)
         m_message->setCifPoints(m_oldCif);
-
-    undoVisualSorting();
 }
 
 bool CmdMessagePointsEdit::mergeWith(const QUndoCommand *command)
 {
-    Q_UNUSED(command);
+    Q_UNUSED(command)
     return false;
 }
 

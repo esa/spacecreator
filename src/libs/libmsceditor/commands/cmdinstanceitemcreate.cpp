@@ -45,8 +45,6 @@ void CmdInstanceItemCreate::redo()
 
     // The chart takes over parent-/owner-ship
     m_chart->addInstance(m_instance, m_instanceOrderNum);
-
-    checkVisualSorting();
 }
 
 void CmdInstanceItemCreate::undo()
@@ -56,8 +54,6 @@ void CmdInstanceItemCreate::undo()
 
     // this command takes over ownership
     m_instance->setParent(this);
-
-    undoVisualSorting();
 }
 
 bool CmdInstanceItemCreate::mergeWith(const QUndoCommand *command)

@@ -77,8 +77,7 @@ MessageItem::MessageItem(MscMessage *message, ChartLayoutManager *chartLayoutMan
 
     setFlags(ItemSendsGeometryChanges | ItemSendsScenePositionChanges | ItemIsSelectable);
 
-    connect(m_message, &msc::MscMessage::dataChanged, this, &msc::MessageItem::checkIVConnection,
-            Qt::QueuedConnection);
+    connect(m_message, &msc::MscMessage::dataChanged, this, &msc::MessageItem::checkIVConnection, Qt::QueuedConnection);
     connect(m_message, &msc::MscMessage::dataChanged, this, &msc::MessageItem::updateDisplayText);
     updateDisplayText();
 
@@ -689,21 +688,29 @@ void MessageItem::onManualGeometryChangeFinished(shared::ui::GripPoint *gp, cons
     }
 
     if (sourceChanged) {
-        const int newIdx = m_chartLayoutManager->eventIndex(tail());
-        undoStack->push(new cmd::CmdMessageItemResize(m_message, newIdx,
-                sourceInstanceItem() ? sourceInstanceItem()->modelItem() : nullptr, MscMessage::EndType::SOURCE_TAIL,
-                m_chartLayoutManager));
+        MscInstance *instance = sourceInstanceItem() ? sourceInstanceItem()->modelItem() : nullptr;
+        const int newIdx = instance ? m_chartLayoutManager->eventInstanceIndex(tail(), instance, m_message) : -1;
+        undoStack->push(new cmd::CmdMessageItemResize(
+                m_message, newIdx, instance, MscMessage::EndType::SOURCE_TAIL, m_chartLayoutManager));
     }
     if (targetChanged) {
-        const int newIdx = m_chartLayoutManager->eventIndex(head());
-        undoStack->push(new cmd::CmdMessageItemResize(m_message, newIdx,
-                targetInstanceItem() ? targetInstanceItem()->modelItem() : nullptr, MscMessage::EndType::TARGET_HEAD,
-                m_chartLayoutManager));
+        MscInstance *instance = targetInstanceItem() ? targetInstanceItem()->modelItem() : nullptr;
+        const int newIdx = instance ? m_chartLayoutManager->eventInstanceIndex(head(), instance, m_message) : -1;
+        undoStack->push(new cmd::CmdMessageItemResize(
+                m_message, newIdx, instance, MscMessage::EndType::TARGET_HEAD, m_chartLayoutManager));
     }
 
-    const QPointF newPos = (gp && gp->location() == shared::ui::GripPoint::Center) ? to : tail();
-    int newIdx = m_chartLayoutManager->eventIndex(newPos, m_message);
-    undoStack->push(new cmd::CmdMessagePointsEdit(m_message, oldPointsCif, newPointsCif, newIdx, m_chartLayoutManager));
+    ChartIndexList indices;
+    if (m_message->sourceInstance()) {
+        indices.set(m_message->sourceInstance(),
+                m_chartLayoutManager->eventInstanceIndex(tail(), m_message->sourceInstance(), m_message));
+    }
+    if (m_message->targetInstance()) {
+        indices.set(m_message->targetInstance(),
+                m_chartLayoutManager->eventInstanceIndex(head(), m_message->targetInstance(), m_message));
+    }
+    undoStack->push(
+            new cmd::CmdMessagePointsEdit(m_message, oldPointsCif, newPointsCif, indices, m_chartLayoutManager));
     undoStack->endMacro();
 
     if (auto item = m_chartLayoutManager->itemForComment(m_message->comment())) {
@@ -1053,6 +1060,24 @@ qreal MessageItem::instanceBottomArea(MscInstance *instance) const
         return head().y() + space;
     }
     return 0.;
+}
+
+QHash<MscInstance *, int> MessageItem::visualIndices() const
+{
+    QHash<MscInstance *, int> result;
+    if (m_sourceInstance) {
+        const int idx = m_chartLayoutManager->eventInstanceIndex(tail(), m_sourceInstance->modelItem(), m_message);
+        if (idx >= 0) {
+            result[m_sourceInstance->modelItem()] = idx;
+        }
+    }
+    if (m_targetInstance) {
+        const int idx = m_chartLayoutManager->eventInstanceIndex(head(), m_targetInstance->modelItem(), m_message);
+        if (idx >= 0) {
+            result[m_targetInstance->modelItem()] = idx;
+        }
+    }
+    return result;
 }
 
 /*

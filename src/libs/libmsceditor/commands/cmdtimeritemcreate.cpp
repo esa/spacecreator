@@ -49,8 +49,6 @@ void CmdTimerItemCreate::redo()
     // The chart takes over parent-/owner-ship
     ChartIndexList instanceIndexes { { m_instance, m_eventIndex } };
     m_chart->addInstanceEvent(m_timer, instanceIndexes);
-
-    checkVisualSorting();
 }
 
 void CmdTimerItemCreate::undo()
@@ -60,13 +58,11 @@ void CmdTimerItemCreate::undo()
 
     // this command takes over ownership
     m_timer->setParent(this);
-
-    undoVisualSorting();
 }
 
 bool CmdTimerItemCreate::mergeWith(const QUndoCommand *command)
 {
-    Q_UNUSED(command);
+    Q_UNUSED(command)
     return false;
 }
 

@@ -42,7 +42,6 @@ void CmdTimerItemMove::redo()
 {
     if (m_timer && m_chart && m_newInstance) {
         m_chart->updateTimerPos(m_timer, m_newInstance, m_newIndex);
-        checkVisualSorting();
     }
 }
 
@@ -50,7 +49,6 @@ void CmdTimerItemMove::undo()
 {
     if (m_timer && m_chart && m_oldInstance) {
         m_chart->updateTimerPos(m_timer, m_oldInstance, m_oldIndex);
-        undoVisualSorting();
     }
 }
 

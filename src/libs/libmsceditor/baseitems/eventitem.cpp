@@ -17,6 +17,8 @@
 
 #include "eventitem.h"
 
+#include "chartlayoutmanager.h"
+#include "mscchart.h"
 #include "mscinstance.h"
 #include "mscinstanceevent.h"
 
@@ -72,6 +74,23 @@ qreal EventItem::instanceBottomArea(MscInstance *instance) const
 MscInstanceEvent *EventItem::eventEntity() const
 {
     return m_event;
+}
+
+/*!
+   Returns the indices of this item as  it is currently shown.
+   One index per instance it is related to
+ */
+QHash<MscInstance *, int> EventItem::visualIndices() const
+{
+    QHash<MscInstance *, int> result;
+    QVector<MscInstance *> instances = m_chartLayoutManager->currentChart()->relatedInstances(m_event);
+    for (MscInstance *instance : instances) {
+        const int idx = m_chartLayoutManager->eventInstanceIndex(sceneBoundingRect().topLeft(), instance, m_event);
+        if (idx >= 0) {
+            result[instance] = idx;
+        }
+    }
+    return result;
 }
 
 } // namespace msc

@@ -65,7 +65,6 @@ void CmdDeleteEntity::redo()
         for (auto instance : qAsConst(m_entities)) {
             m_chart->removeInstance(dynamic_cast<MscInstance *>(instance));
         }
-        checkVisualSorting();
     }
 
     if (m_document) {
@@ -89,7 +88,6 @@ void CmdDeleteEntity::undo()
         }
 
         m_chart->setInstanceEvents(m_events, m_orphanEvents);
-        undoVisualSorting();
     }
 
     if (m_document) {

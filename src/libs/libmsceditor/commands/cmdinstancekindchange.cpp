@@ -36,7 +36,6 @@ void CmdInstanceKindChange::redo()
 {
     if (m_instance) {
         m_instance->setDenominatorAndKind(m_newValue);
-        checkVisualSorting();
     }
 }
 
@@ -44,7 +43,6 @@ void CmdInstanceKindChange::undo()
 {
     if (m_instance) {
         m_instance->setDenominatorAndKind(m_oldValue);
-        undoVisualSorting();
     }
 }
 

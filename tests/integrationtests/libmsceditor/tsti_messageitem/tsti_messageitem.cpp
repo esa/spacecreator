@@ -61,8 +61,9 @@ void tsti_MessageItem::testConnectToStoppedInstance()
                      ENDMSCDOCUMENT;");
     loadView(msc);
 
+    MscInstance *instanceA = m_chartModel->currentChart()->instances().at(0);
     MscInstance *instanceB = m_chartModel->currentChart()->instances().at(1);
-    auto message = qobject_cast<msc::MscMessage *>(m_chart->instanceEvents().at(2));
+    auto message = qobject_cast<msc::MscMessage *>(m_chart->eventsForInstance(instanceA).at(2));
 
     InstanceItem *itemB = m_chartModel->itemForInstance(instanceB);
     msc::MessageItem *messageItem = m_chartModel->itemForMessage(message);

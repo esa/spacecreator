@@ -1716,6 +1716,8 @@ void ChartLayoutManager::onInstanceGeometryChanged()
 
 void ChartLayoutManager::onInstanceEventItemMoved(shared::ui::InteractiveObjectBase *item)
 {
+    updateLayout();
+
     if (auto actionItem = qobject_cast<ActionItem *>(item)) {
         MscInstance *newInstance = nearestInstance(actionItem->sceneBoundingRect().center());
         const int currentIdx = d->m_currentChart->instanceEvents().indexOf(actionItem->modelItem());
@@ -1723,28 +1725,33 @@ void ChartLayoutManager::onInstanceEventItemMoved(shared::ui::InteractiveObjectB
         if (!newInstance || newInstance != actionItem->modelItem()->instance() || newIdx != currentIdx) {
             d->m_undoStack->push(new cmd::CmdActionItemMove(actionItem->modelItem(), newIdx, newInstance, this));
         }
+        return;
     }
 
     if (auto conditionItem = qobject_cast<ConditionItem *>(item)) {
+        MscCondition *condition = conditionItem->modelItem();
         MscInstance *newInstance = nearestInstance(conditionItem->sceneBoundingRect().center());
         if (newInstance == nullptr && conditionItem->modelItem()->shared()) {
             newInstance = conditionItem->modelItem()->instance();
         }
-        const int currentIdx = d->m_currentChart->instanceEvents().indexOf(conditionItem->modelItem());
-        const int newIdx = eventIndex(item->pos());
+        const int currentIdx = d->m_currentChart->indexofEventAtInstance(condition, condition->instance());
+        const int newIdx = eventInstanceIndex(item->pos(), newInstance, condition);
         if (!newInstance || newInstance != conditionItem->modelItem()->instance() || newIdx != currentIdx) {
             d->m_undoStack->push(new cmd::CmdConditionItemMove(conditionItem->modelItem(), newIdx, newInstance, this));
         }
+        return;
     }
 
     if (auto timerItem = qobject_cast<TimerItem *>(item)) {
         const QRectF itemRect = timerItem->sceneBoundingRect();
+        MscTimer *timer = timerItem->modelItem();
         MscInstance *newInstance = nearestInstance(QPointF(itemRect.left(), itemRect.center().y()));
-        const int currentIdx = d->m_currentChart->instanceEvents().indexOf(timerItem->modelItem());
-        const int newIdx = eventIndex(item->pos());
+        const int currentIdx = d->m_currentChart->indexofEventAtInstance(timer, timer->instance());
+        const int newIdx = eventInstanceIndex(item->pos(), newInstance, timer);
         if (!newInstance || newInstance != timerItem->modelItem()->instance() || newIdx != currentIdx) {
             d->m_undoStack->push(new cmd::CmdTimerItemMove(timerItem->modelItem(), newIdx, newInstance, this));
         }
+        return;
     }
 
     if (auto coregionItem = qobject_cast<CoregionItem *>(item)) {
@@ -1758,9 +1765,8 @@ void ChartLayoutManager::onInstanceEventItemMoved(shared::ui::InteractiveObjectB
             d->m_undoStack->push(new cmd::CmdCoRegionItemMove(
                     coregionItem->begin(), coregionItem->end(), newIdxBegin, newIdxEnd, newInstance, this));
         }
+        return;
     }
-
-    updateLayout();
 }
 
 void ChartLayoutManager::onMessageRetargeted(MessageItem *item, const QPointF &pos, MscMessage::EndType endType)

@@ -71,6 +71,7 @@ public:
     int totalEventNumber() const;
     QHash<MscInstance *, QVector<MscInstanceEvent *>> rawEvents() const;
     QVector<MscInstanceEvent *> orphanEvents() const;
+    QVector<MscInstance *> relatedInstances(MscInstanceEvent *event) const;
 
     QVector<MscMessage *> messages() const;
 
@@ -90,7 +91,7 @@ public:
             MscCoregion *regionBegin, MscCoregion *regionEnd, MscInstance *newInstance, int beginPos, int endPos);
     void updateConditionPos(MscCondition *condition, MscInstance *newInstance, int eventPos);
     void updateTimerPos(MscTimer *timer, MscInstance *newInstance, int eventPos);
-    void updateMessageTarget(MscMessage *message, MscInstance *newInstance, int eventPos, MscMessage::EndType endType);
+    void updateMessageTarget(MscMessage *message, MscInstance *newInstance, int newPos, MscMessage::EndType endType);
 
     QRect cifRect() const;
     void setCifRect(const QRect &rect);
@@ -98,9 +99,9 @@ public:
     int setInstanceNameNumbers(int nextNumber);
 
     QString createUniqueInstanceName() const;
-    bool moveEvent(MscInstanceEvent *event, int newIndex);
+    bool moveEvent(MscInstanceEvent *event, ChartIndexList indices);
 
-    void rearrangeEvents(const QVector<msc::MscInstanceEvent *> &sortedEvents);
+    //    void rearrangeEvents(const QVector<msc::MscInstanceEvent *> &sortedEvents);
 
 public Q_SLOTS:
     void resetTimerRelations(msc::MscTimer *timer);
@@ -167,7 +168,6 @@ private:
     }
 
     cif::CifBlockShared cifMscDoc() const;
-    QVector<MscInstance *> relatedInstances(MscInstanceEvent *event) const;
     QVector<MscInstanceEvent *> allEvents() const;
 
     QVector<MscInstance *> m_instances;

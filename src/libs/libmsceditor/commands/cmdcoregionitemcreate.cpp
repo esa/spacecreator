@@ -47,8 +47,6 @@ void CmdCoregionItemCreate::redo()
     m_chart->addInstanceEvent(m_begin, instanceIndexes);
     instanceIndexes = { { m_instance, m_eventIndex + 1 } };
     m_chart->addInstanceEvent(m_end, instanceIndexes);
-
-    checkVisualSorting();
 }
 
 void CmdCoregionItemCreate::undo()
@@ -60,8 +58,6 @@ void CmdCoregionItemCreate::undo()
     // this command takes over ownership
     m_begin->setParent(this);
     m_end->setParent(this);
-
-    undoVisualSorting();
 }
 
 bool CmdCoregionItemCreate::mergeWith(const QUndoCommand *command)

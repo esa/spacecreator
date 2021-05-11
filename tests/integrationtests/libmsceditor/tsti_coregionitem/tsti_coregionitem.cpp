@@ -249,7 +249,6 @@ void tsti_CoregionItem::testMovemessageInside()
 
 void tsti_CoregionItem::testMovemessageSourceInside()
 {
-    QSKIP("The action is moved, because dependencies (prev/next in instances) are missing");
     static const QString msc("MSCDOCUMENT doc1; \
                              MSC msc1; \
                                  INSTANCE i1; \

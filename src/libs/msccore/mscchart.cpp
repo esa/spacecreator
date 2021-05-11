@@ -441,6 +441,60 @@ QVector<MscInstanceEvent *> MscChart::orphanEvents() const
     return m_orphanEvents;
 }
 
+QVector<MscInstance *> MscChart::relatedInstances(MscInstanceEvent *event) const
+{
+    QVector<MscInstance *> result;
+    switch (event->entityType()) {
+    case MscEntity::EntityType::Action: {
+        auto action = static_cast<MscAction *>(event);
+        if (action->instance()) {
+            result.append(action->instance());
+        }
+        break;
+    }
+    case MscEntity::EntityType::Condition: {
+        auto condition = static_cast<MscCondition *>(event);
+        if (condition->shared()) {
+            return m_instances;
+        } else {
+            if (condition->instance()) {
+                result.append(condition->instance());
+            }
+        }
+        break;
+    }
+    case MscEntity::EntityType::Coregion: {
+        auto coregion = static_cast<MscCoregion *>(event);
+        if (coregion->instance()) {
+            result.append(coregion->instance());
+        }
+        break;
+    }
+    case MscEntity::EntityType::Create:
+    case MscEntity::EntityType::Message: {
+        auto message = static_cast<MscMessage *>(event);
+        if (message->sourceInstance()) {
+            result.append(message->sourceInstance());
+        }
+        if (message->targetInstance()) {
+            result.append(message->targetInstance());
+        }
+        break;
+    }
+    case MscEntity::EntityType::Timer: {
+        auto timer = static_cast<MscTimer *>(event);
+        if (timer->instance()) {
+            result.append(timer->instance());
+        }
+        break;
+    }
+    default:
+        break;
+    }
+
+    return result;
+}
+
 /*!
    Returns all messages of this chart
  */
@@ -532,7 +586,7 @@ void MscChart::updateInstanceOrder(MscInstance *instance, int pos)
 void MscChart::updateActionPos(MscAction *action, MscInstance *newInstance, int eventPos)
 {
     bool changed = setEventInstance(action, newInstance);
-    changed |= moveEvent(action, eventPos);
+    changed |= moveEvent(action, { { newInstance, eventPos } });
 
     if (changed) {
         Q_EMIT eventMoved();
@@ -549,8 +603,8 @@ void MscChart::updateCoregionPos(
 
     bool changed = setEventInstance(regionBegin, newInstance);
     changed |= setEventInstance(regionEnd, newInstance);
-    changed |= moveEvent(regionBegin, beginPos);
-    changed |= moveEvent(regionEnd, endPos);
+    changed |= moveEvent(regionBegin, { { newInstance, beginPos } });
+    changed |= moveEvent(regionEnd, { { newInstance, endPos } });
 
     if (changed) {
         Q_EMIT eventMoved();
@@ -564,7 +618,7 @@ void MscChart::updateConditionPos(MscCondition *condition, MscInstance *newInsta
     if (!condition->shared()) {
         changed = setEventInstance(condition, newInstance);
     }
-    changed |= moveEvent(condition, eventPos);
+    changed |= moveEvent(condition, { { newInstance, eventPos } });
 
     if (changed) {
         Q_EMIT eventMoved();
@@ -575,7 +629,7 @@ void MscChart::updateConditionPos(MscCondition *condition, MscInstance *newInsta
 void MscChart::updateTimerPos(MscTimer *timer, MscInstance *newInstance, int eventPos)
 {
     bool changed = setEventInstance(timer, newInstance);
-    changed |= moveEvent(timer, eventPos);
+    changed |= moveEvent(timer, { { newInstance, eventPos } });
 
     if (changed) {
         resetTimerRelations(timer);
@@ -588,49 +642,32 @@ void MscChart::updateTimerPos(MscTimer *timer, MscInstance *newInstance, int eve
    Move the given event vertically to the given position in the event sequence.
    Return true, if the event was moved.
  */
-bool MscChart::moveEvent(MscInstanceEvent *event, int newIndex)
+bool MscChart::moveEvent(MscInstanceEvent *event, ChartIndexList indices)
 {
-    if (event == nullptr || newIndex < 0 || newIndex >= m_instanceEvents.size()) {
+    if (event == nullptr) {
         return false;
     }
 
-    const int currentPos = m_instanceEvents.indexOf(event);
-    if (newIndex == currentPos || currentPos < 0) {
+    if (indicesOfEvent(event) == indices) {
         return false;
     }
 
-    m_instanceEvents.removeAt(currentPos);
-
-    // Move in list per instance
-    for (MscInstance *instance : relatedInstances(event)) {
-        Q_ASSERT(m_events.contains(instance));
-        int newIdx = 0;
-        m_events[instance].removeOne(event);
-        bool inserted = false;
-        for (MscInstanceEvent *ev : m_events[instance]) {
-            const int otherIdx = m_instanceEvents.indexOf(ev);
-            if (otherIdx >= newIndex) {
-                m_events[instance].insert(newIdx, event);
-                inserted = true;
-                break;
-            }
-            newIdx++;
-        }
-        if (!inserted) {
-            m_events[instance].append(event);
-        }
+    for (auto it = indices.begin(); it != indices.end(); ++it) {
+        QVector<MscInstanceEvent *> &instanceList = m_events[it->instance()];
+        instanceList.removeAll(event);
+        instanceList.insert(it->index(), event);
     }
 
     // Move in global list
-    m_instanceEvents.insert(newIndex, event);
+    m_instanceEvents = allEvents();
 
     return true;
 }
 
 /*!
-   Does set the sorting of the events of this chart at once. Be careful to have the same set of events, as already
-   available
- */
+   Does set the sorting of the events of this chart at once. Be careful to have the same set of events, as
+already available
+ *
 void MscChart::rearrangeEvents(const QVector<MscInstanceEvent *> &sortedEvents)
 {
     if (sortedEvents == allEvents()) {
@@ -648,10 +685,10 @@ void MscChart::rearrangeEvents(const QVector<MscInstanceEvent *> &sortedEvents)
         Q_EMIT eventMoved();
         Q_EMIT dataChanged();
     }
-}
+}*/
 
 void MscChart::updateMessageTarget(
-        MscMessage *message, MscInstance *newInstance, int eventPos, msc::MscMessage::EndType endType)
+        MscMessage *message, MscInstance *newInstance, int newPos, msc::MscMessage::EndType endType)
 {
     Q_ASSERT(message);
 
@@ -665,7 +702,20 @@ void MscChart::updateMessageTarget(
         changed = true;
     }
 
-    changed |= moveEvent(message, eventPos);
+    ChartIndexList indices;
+    if (message->sourceInstance()) {
+        indices.set(message->sourceInstance(), newPos);
+        if (message->targetInstance()) {
+            indices.set(message->targetInstance(), indexofEventAtInstance(message, message->targetInstance()));
+        }
+    }
+    if (message->targetInstance()) {
+        indices.set(message->targetInstance(), newPos);
+        if (message->sourceInstance()) {
+            indices.set(message->sourceInstance(), indexofEventAtInstance(message, message->sourceInstance()));
+        }
+    }
+    changed |= moveEvent(message, indices);
 
     if (changed) {
         Q_EMIT messageRetargeted();
@@ -827,60 +877,6 @@ cif::CifBlockShared MscChart::cifMscDoc() const
 {
     return parentDocument() ? parentDocument()->cifBlockByType(cif::CifLine::CifType::MscDocument)
                             : cif::CifBlockShared();
-}
-
-QVector<MscInstance *> MscChart::relatedInstances(MscInstanceEvent *event) const
-{
-    QVector<MscInstance *> result;
-    switch (event->entityType()) {
-    case MscEntity::EntityType::Action: {
-        auto action = static_cast<MscAction *>(event);
-        if (action->instance()) {
-            result.append(action->instance());
-        }
-        break;
-    }
-    case MscEntity::EntityType::Condition: {
-        auto condition = static_cast<MscCondition *>(event);
-        if (condition->shared()) {
-            return m_instances;
-        } else {
-            if (condition->instance()) {
-                result.append(condition->instance());
-            }
-        }
-        break;
-    }
-    case MscEntity::EntityType::Coregion: {
-        auto coregion = static_cast<MscCoregion *>(event);
-        if (coregion->instance()) {
-            result.append(coregion->instance());
-        }
-        break;
-    }
-    case MscEntity::EntityType::Create:
-    case MscEntity::EntityType::Message: {
-        auto message = static_cast<MscMessage *>(event);
-        if (message->sourceInstance()) {
-            result.append(message->sourceInstance());
-        }
-        if (message->targetInstance()) {
-            result.append(message->targetInstance());
-        }
-        break;
-    }
-    case MscEntity::EntityType::Timer: {
-        auto timer = static_cast<MscTimer *>(event);
-        if (timer->instance()) {
-            result.append(timer->instance());
-        }
-        break;
-    }
-    default:
-        break;
-    }
-
-    return result;
 }
 
 // Used for function MscChart::allEvents()

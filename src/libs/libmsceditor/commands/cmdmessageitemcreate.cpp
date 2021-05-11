@@ -74,8 +74,6 @@ void CmdMessageItemCreate::redo()
 
     // The chart takes over parent-/owner-ship
     m_chart->addInstanceEvent(m_message, m_instanceIndexes);
-
-    checkVisualSorting();
 }
 
 void CmdMessageItemCreate::undo()
@@ -108,8 +106,6 @@ void CmdMessageItemCreate::undo()
     if (m_message->messageType() == MscMessage::MessageType::Create && m_message->targetInstance()) {
         m_message->targetInstance()->setExplicitCreator(nullptr);
     }
-
-    undoVisualSorting();
 }
 
 bool CmdMessageItemCreate::mergeWith(const QUndoCommand *command)

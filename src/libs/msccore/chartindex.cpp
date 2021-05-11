@@ -44,6 +44,11 @@ bool ChartIndex::operator==(const ChartIndex &other) const
     return m_instance == other.instance() && m_index == other.index();
 }
 
+bool ChartIndex::isValid() const
+{
+    return m_instance != nullptr && m_index >= 0;
+}
+
 ChartIndexList::ChartIndexList() { }
 
 ChartIndexList::ChartIndexList(std::initializer_list<ChartIndex> args)

@@ -46,7 +46,6 @@ void CmdCoRegionItemMove::redo()
     if (m_coregionBegin && m_coregionEnd && m_chart && m_newInstance) {
         m_chart->updateCoregionPos(
                 m_coregionBegin.data(), m_coregionEnd.data(), m_newInstance, m_newBeginIndex, m_newEndIndex);
-        checkVisualSorting();
     }
 }
 
@@ -55,7 +54,6 @@ void CmdCoRegionItemMove::undo()
     if (m_coregionBegin && m_coregionEnd && m_chart && m_oldInstance) {
         m_chart->updateCoregionPos(
                 m_coregionBegin.data(), m_coregionEnd.data(), m_oldInstance, m_oldBeginIndex, m_oldEndIndex);
-        undoVisualSorting();
     }
 }
 

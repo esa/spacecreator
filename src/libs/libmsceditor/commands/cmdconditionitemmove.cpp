@@ -28,30 +28,29 @@ namespace msc {
 namespace cmd {
 
 CmdConditionItemMove::CmdConditionItemMove(
-        MscCondition *condition, int newPos, MscInstance *newInsance, ChartLayoutManager *layoutManager)
+        MscCondition *condition, int newPos, MscInstance *newInstance, ChartLayoutManager *layoutManager)
     : ChartBaseCommand(condition, layoutManager)
     , m_condition(condition)
-    , m_oldIndex(m_chart->instanceEvents().indexOf(condition))
-    , m_newIndex(newPos)
-    , m_oldInstance(condition->instance())
-    , m_newInstance(newInsance)
 {
+    m_newIndexes = { newInstance, newPos };
+    ChartIndexList indices = m_chart->indicesOfEvent(m_condition);
+    if (!indices.isEmpty()) {
+        m_oldIndexes = indices.first();
+    }
     setText(QObject::tr("Move condition"));
 }
 
 void CmdConditionItemMove::redo()
 {
-    if (m_condition && m_chart && m_newInstance) {
-        m_chart->updateConditionPos(m_condition, m_newInstance, m_newIndex);
-        checkVisualSorting();
+    if (m_condition && m_chart && m_newIndexes.isValid()) {
+        m_chart->updateConditionPos(m_condition, m_newIndexes.instance(), m_newIndexes.index());
     }
 }
 
 void CmdConditionItemMove::undo()
 {
-    if (m_condition && m_chart && m_newInstance) {
-        m_chart->updateConditionPos(m_condition, m_oldInstance, m_oldIndex);
-        undoVisualSorting();
+    if (m_condition && m_chart && m_oldIndexes.isValid()) {
+        m_chart->updateConditionPos(m_condition, m_oldIndexes.instance(), m_oldIndexes.index());
     }
 }
 
@@ -59,8 +58,7 @@ bool CmdConditionItemMove::mergeWith(const QUndoCommand *command)
 {
     const CmdConditionItemMove *other = static_cast<const CmdConditionItemMove *>(command);
     if (canMergeWith(other)) {
-        m_newIndex = other->m_newIndex;
-        m_newInstance = other->m_newInstance;
+        m_newIndexes = other->m_newIndexes;
         return true;
     }
 

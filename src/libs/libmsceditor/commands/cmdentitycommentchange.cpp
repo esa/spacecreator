@@ -53,8 +53,6 @@ void CmdEntityCommentChange::redo()
         m_chart->addInstanceEvent(comment, {});
         comment->setText(m_newComment);
     }
-
-    checkVisualSorting();
 }
 
 void CmdEntityCommentChange::undo()
@@ -79,8 +77,6 @@ void CmdEntityCommentChange::undo()
         m_chart->addInstanceEvent(comment, {});
         comment->setText(m_oldComment);
     }
-
-    undoVisualSorting();
 }
 
 bool CmdEntityCommentChange::mergeWith(const QUndoCommand *command)

@@ -48,8 +48,6 @@ void CmdConditionItemCreate::redo()
 
     // The chart takes over parent-/owner-ship
     m_chart->addInstanceEvent(m_condition, m_instanceIndexes);
-
-    checkVisualSorting();
 }
 
 void CmdConditionItemCreate::undo()
@@ -59,8 +57,6 @@ void CmdConditionItemCreate::undo()
 
     // this command takes over ownership
     m_condition->setParent(this);
-
-    undoVisualSorting();
 }
 
 bool CmdConditionItemCreate::mergeWith(const QUndoCommand *command)

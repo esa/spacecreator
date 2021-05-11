@@ -46,8 +46,6 @@ void CmdCommentItemChangeGeometry::redo()
         m_chart->addInstanceEvent(comment, {});
     }
     comment->setRect(m_newRect);
-
-    checkVisualSorting();
 }
 
 void CmdCommentItemChangeGeometry::undo()
@@ -61,8 +59,6 @@ void CmdCommentItemChangeGeometry::undo()
         m_chart->addInstanceEvent(comment, {});
     }
     comment->setRect(m_oldRect);
-
-    undoVisualSorting();
 }
 
 bool CmdCommentItemChangeGeometry::mergeWith(const QUndoCommand *command)

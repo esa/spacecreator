@@ -18,7 +18,9 @@
 #pragma once
 
 #include "chartbasecommand.h"
+#include "chartindex.h"
 
+#include <QHash>
 #include <QPoint>
 #include <QPointer>
 #include <QVector>
@@ -35,7 +37,7 @@ class CmdMessagePointsEdit : public ChartBaseCommand
 {
 public:
     CmdMessagePointsEdit(MscMessage *message, const QVector<QPoint> &cifPointsOld, const QVector<QPoint> &cifPointsNew,
-            int newIdx, ChartLayoutManager *layoutManager);
+            ChartIndexList indices, ChartLayoutManager *layoutManager);
 
     void redo() override;
     void undo() override;
@@ -46,8 +48,8 @@ private:
     QPointer<MscMessage> m_message;
     QVector<QPoint> m_newCif;
     const QVector<QPoint> m_oldCif;
-    const int m_newIdx;
-    const int m_oldIdx;
+    const ChartIndexList m_newIndexes;
+    const ChartIndexList m_oldIndexes;
 };
 
 } // ns cmd

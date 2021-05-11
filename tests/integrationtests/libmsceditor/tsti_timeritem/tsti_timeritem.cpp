@@ -79,6 +79,9 @@ void tsti_TimerItem::testMoveMessageInsideOfStartStopTimer()
     const QString msc("MSCDOCUMENT doc1; \
                          MSC msc1; \
                              INSTANCE A; \
+                                action 'wait'; \
+                             ENDINSTANCE; \
+                             INSTANCE B; \
                                 starttimer T1;\
                                 timeout T1;\
                                 out Message to env;\
@@ -87,11 +90,12 @@ void tsti_TimerItem::testMoveMessageInsideOfStartStopTimer()
                      ENDMSCDOCUMENT;");
     loadView(msc);
 
-    auto start = qobject_cast<msc::MscTimer *>(m_chart->instanceEvents().at(0));
+    msc::MscInstance *instanceB = m_chart->instances().at(1);
+    auto start = qobject_cast<msc::MscTimer *>(m_chart->eventsForInstance(instanceB).at(0));
     msc::TimerItem *startItem = m_chartModel->itemForTimer(start);
-    auto timeout = qobject_cast<msc::MscTimer *>(m_chart->instanceEvents().at(1));
+    auto timeout = qobject_cast<msc::MscTimer *>(m_chart->eventsForInstance(instanceB).at(1));
     msc::TimerItem *timeoutItem = m_chartModel->itemForTimer(timeout);
-    auto message = qobject_cast<msc::MscMessage *>(m_chart->instanceEvents().at(2));
+    auto message = qobject_cast<msc::MscMessage *>(m_chart->eventsForInstance(instanceB).at(2));
     msc::MessageItem *messageItem = m_chartModel->itemForMessage(message);
 
     // Move the message "between" the start and stop timer

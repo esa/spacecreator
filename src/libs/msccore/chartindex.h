@@ -42,6 +42,8 @@ public:
 
     bool operator==(const ChartIndex &other) const;
 
+    bool isValid() const;
+
 private:
     MscInstance *m_instance = nullptr;
     int m_index = -1;

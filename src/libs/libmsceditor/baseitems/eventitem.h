@@ -42,6 +42,8 @@ public:
 
     msc::MscInstanceEvent *eventEntity() const;
 
+    virtual QHash<msc::MscInstance *, int> visualIndices() const;
+
 protected:
     QPointer<msc::MscInstanceEvent> m_event;
 

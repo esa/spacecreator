@@ -32,34 +32,5 @@ ChartBaseCommand::ChartBaseCommand(MscEntity *item, ChartLayoutManager *layoutMa
 {
 }
 
-/*!
-   Checks if the visual sorting/order of events got changed (might have as messages are fixed to their cif geometry)
- */
-void ChartBaseCommand::checkVisualSorting()
-{
-    if (m_layoutManager && m_layoutManager->isStreamingModeEnabled()) {
-        // Don't do a visual check, as in streaming mode, only a subset of events might be shown
-        return;
-    }
-
-    if (m_newSortedEvents.isEmpty() && m_layoutManager) {
-        m_layoutManager->doLayout();
-        m_newSortedEvents = m_layoutManager->visuallySortedEvents();
-    }
-    if (m_chart && (m_newSortedEvents != m_oldSortedEvents)) {
-        m_chart->rearrangeEvents(m_newSortedEvents);
-    }
-}
-
-/*!
-   Undos any change done in \sa checkVisualSorting()
- */
-void ChartBaseCommand::undoVisualSorting()
-{
-    if (m_chart && (m_newSortedEvents != m_oldSortedEvents)) {
-        m_chart->rearrangeEvents(m_oldSortedEvents);
-    }
-}
-
 } // namespace cmd
 } // namespace msc

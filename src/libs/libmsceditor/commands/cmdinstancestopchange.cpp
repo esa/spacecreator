@@ -34,7 +34,6 @@ void CmdInstanceStopChange::redo()
 {
     if (m_instance) {
         m_instance->setExplicitStop(m_newExStop);
-        checkVisualSorting();
     }
 }
 
@@ -42,7 +41,6 @@ void CmdInstanceStopChange::undo()
 {
     if (m_instance) {
         m_instance->setExplicitStop(!m_newExStop);
-        undoVisualSorting();
     }
 }
 
