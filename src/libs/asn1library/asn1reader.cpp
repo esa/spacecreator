@@ -37,9 +37,9 @@ QString Asn1Reader::m_mono;
 QCache<QString, QString> Asn1Reader::m_cache {};
 
 #ifdef Q_OS_WIN
-static const QString defaultParameter("-customStg \"%1xml.stg\"::");
+static const QString defaultParameter("--field-prefix AUTO -customStg \"%1xml.stg\"::");
 #else
-static const QString defaultParameter("-customStg %1/xml.stg:");
+static const QString defaultParameter("--field-prefix AUTO -customStg %1/xml.stg:");
 #endif
 
 Asn1Reader::Asn1Reader(QObject *parent)
