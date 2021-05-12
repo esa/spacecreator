@@ -690,14 +690,16 @@ void MessageItem::onManualGeometryChangeFinished(shared::ui::GripPoint *gp, cons
     if (sourceChanged) {
         MscInstance *instance = sourceInstanceItem() ? sourceInstanceItem()->modelItem() : nullptr;
         const int newIdx = instance ? m_chartLayoutManager->eventInstanceIndex(tail(), instance, m_message) : -1;
+        ChartIndex newChartIndex(instance, newIdx);
         undoStack->push(new cmd::CmdMessageItemResize(
-                m_message, newIdx, instance, MscMessage::EndType::SOURCE_TAIL, m_chartLayoutManager));
+                m_message, newChartIndex, MscMessage::EndType::SOURCE_TAIL, m_chartLayoutManager));
     }
     if (targetChanged) {
         MscInstance *instance = targetInstanceItem() ? targetInstanceItem()->modelItem() : nullptr;
         const int newIdx = instance ? m_chartLayoutManager->eventInstanceIndex(head(), instance, m_message) : -1;
+        ChartIndex newChartIndex(instance, newIdx);
         undoStack->push(new cmd::CmdMessageItemResize(
-                m_message, newIdx, instance, MscMessage::EndType::TARGET_HEAD, m_chartLayoutManager));
+                m_message, newChartIndex, MscMessage::EndType::TARGET_HEAD, m_chartLayoutManager));
     }
 
     ChartIndexList indices;

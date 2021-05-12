@@ -18,6 +18,7 @@
 #pragma once
 
 #include "chartbasecommand.h"
+#include "chartindex.h"
 
 #include <QPointer>
 
@@ -32,7 +33,7 @@ namespace cmd {
 class CmdTimerItemMove : public ChartBaseCommand
 {
 public:
-    CmdTimerItemMove(msc::MscTimer *timer, int newPos, msc::MscInstance *newInsance, ChartLayoutManager *layoutManager);
+    CmdTimerItemMove(msc::MscTimer *timer, const ChartIndex &newChartIndex, ChartLayoutManager *layoutManager);
 
     void redo() override;
     void undo() override;
@@ -41,10 +42,8 @@ public:
 
 private:
     QPointer<msc::MscTimer> m_timer;
-    int m_oldIndex = -1;
-    int m_newIndex = -1;
-    QPointer<msc::MscInstance> m_oldInstance;
-    QPointer<msc::MscInstance> m_newInstance;
+    ChartIndex m_newIndex;
+    ChartIndex m_oldIndex;
 };
 
 } // namespace cmd

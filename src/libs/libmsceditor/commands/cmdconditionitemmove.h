@@ -33,8 +33,7 @@ namespace cmd {
 class CmdConditionItemMove : public ChartBaseCommand
 {
 public:
-    CmdConditionItemMove(
-            MscCondition *condition, int newPos, msc::MscInstance *newInstance, ChartLayoutManager *layoutManager);
+    CmdConditionItemMove(MscCondition *condition, const ChartIndex &newChartIndex, ChartLayoutManager *layoutManager);
 
     void redo() override;
     void undo() override;
@@ -43,8 +42,8 @@ public:
 
 private:
     QPointer<msc::MscCondition> m_condition;
-    ChartIndex m_newIndexes;
-    ChartIndex m_oldIndexes;
+    ChartIndex m_newIndex;
+    ChartIndex m_oldIndex;
 };
 
 } // ns cmd

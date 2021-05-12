@@ -573,10 +573,10 @@ void MscChart::updateInstanceOrder(MscInstance *instance, int pos)
     Q_EMIT dataChanged();
 }
 
-void MscChart::updateActionPos(MscAction *action, MscInstance *newInstance, int eventPos)
+void MscChart::updateActionPos(MscAction *action, const ChartIndex &newChartIndex)
 {
-    bool changed = setEventInstance(action, newInstance);
-    changed |= moveEvent(action, { { newInstance, eventPos } });
+    bool changed = setEventInstance(action, newChartIndex.instance());
+    changed |= moveEvent(action, { newChartIndex });
 
     if (changed) {
         Q_EMIT eventMoved();
@@ -602,13 +602,13 @@ void MscChart::updateCoregionPos(
     }
 }
 
-void MscChart::updateConditionPos(MscCondition *condition, MscInstance *newInstance, int eventPos)
+void MscChart::updateConditionPos(MscCondition *condition, const ChartIndex &newChartIndex)
 {
     bool changed = false;
     if (!condition->shared()) {
-        changed = setEventInstance(condition, newInstance);
+        changed = setEventInstance(condition, newChartIndex.instance());
     }
-    changed |= moveEvent(condition, { { newInstance, eventPos } });
+    changed |= moveEvent(condition, { newChartIndex });
 
     if (changed) {
         Q_EMIT eventMoved();
@@ -616,10 +616,10 @@ void MscChart::updateConditionPos(MscCondition *condition, MscInstance *newInsta
     }
 }
 
-void MscChart::updateTimerPos(MscTimer *timer, MscInstance *newInstance, int eventPos)
+void MscChart::updateTimerPos(MscTimer *timer, const ChartIndex &newChartIndex)
 {
-    bool changed = setEventInstance(timer, newInstance);
-    changed |= moveEvent(timer, { { newInstance, eventPos } });
+    bool changed = setEventInstance(timer, newChartIndex.instance());
+    changed |= moveEvent(timer, { newChartIndex });
 
     if (changed) {
         resetTimerRelations(timer);
@@ -651,53 +651,30 @@ bool MscChart::moveEvent(MscInstanceEvent *event, ChartIndexList indices)
     return true;
 }
 
-/*!
-   Does set the sorting of the events of this chart at once. Be careful to have the same set of events, as
-already available
- *
-void MscChart::rearrangeEvents(const QVector<MscInstanceEvent *> &sortedEvents)
-{
-    if (sortedEvents == allEvents()) {
-        return;
-    }
-
-    int idx = 0;
-    bool changed = false;
-    for (MscInstanceEvent *event : sortedEvents) {
-        changed |= moveEvent(event, idx);
-        idx++;
-    }
-
-    if (changed) {
-        Q_EMIT eventMoved();
-        Q_EMIT dataChanged();
-    }
-}*/
-
 void MscChart::updateMessageTarget(
-        MscMessage *message, MscInstance *newInstance, int newPos, msc::MscMessage::EndType endType)
+        MscMessage *message, const ChartIndex &newChartIndex, msc::MscMessage::EndType endType)
 {
     Q_ASSERT(message);
 
     bool changed = false;
-    if (!message->relatesTo(newInstance)) {
+    if (!message->relatesTo(newChartIndex.instance())) {
         if (endType == msc::MscMessage::EndType::SOURCE_TAIL) {
-            message->setSourceInstance(newInstance);
+            message->setSourceInstance(newChartIndex.instance());
         } else {
-            message->setTargetInstance(newInstance);
+            message->setTargetInstance(newChartIndex.instance());
         }
         changed = true;
     }
 
     ChartIndexList indices;
     if (message->sourceInstance()) {
-        indices.set(message->sourceInstance(), newPos);
+        indices.set(message->sourceInstance(), newChartIndex.index());
         if (message->targetInstance()) {
             indices.set(message->targetInstance(), indexofEventAtInstance(message, message->targetInstance()));
         }
     }
     if (message->targetInstance()) {
-        indices.set(message->targetInstance(), newPos);
+        indices.set(message->targetInstance(), newChartIndex.index());
         if (message->sourceInstance()) {
             indices.set(message->sourceInstance(), indexofEventAtInstance(message, message->sourceInstance()));
         }

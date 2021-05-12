@@ -27,29 +27,29 @@ namespace msc {
 namespace cmd {
 
 CmdActionItemMove::CmdActionItemMove(
-        MscAction *action, int newPos, MscInstance *newInstance, ChartLayoutManager *layoutManager)
+        MscAction *action, const ChartIndex &newChartIndex, ChartLayoutManager *layoutManager)
     : ChartBaseCommand(action, layoutManager)
     , m_action(action)
+    , m_newIndex(newChartIndex)
 {
-    m_newIndexes = { newInstance, newPos };
     ChartIndexList indices = m_chart->indicesOfEvent(m_action);
     if (!indices.isEmpty()) {
-        m_oldIndexes = indices.first();
+        m_oldIndex = indices.first();
     }
     setText(QObject::tr("Move action"));
 }
 
 void CmdActionItemMove::redo()
 {
-    if (m_action && m_chart && m_newIndexes.isValid()) {
-        m_chart->updateActionPos(m_action, m_newIndexes.instance(), m_newIndexes.index());
+    if (m_action && m_chart && m_newIndex.isValid()) {
+        m_chart->updateActionPos(m_action, m_newIndex);
     }
 }
 
 void CmdActionItemMove::undo()
 {
-    if (m_action && m_chart && m_oldIndexes.isValid()) {
-        m_chart->updateActionPos(m_action, m_oldIndexes.instance(), m_oldIndexes.index());
+    if (m_action && m_chart && m_oldIndex.isValid()) {
+        m_chart->updateActionPos(m_action, m_oldIndex);
     }
 }
 
@@ -57,7 +57,7 @@ bool CmdActionItemMove::mergeWith(const QUndoCommand *command)
 {
     const CmdActionItemMove *other = dynamic_cast<const CmdActionItemMove *>(command);
     if (canMergeWith(other)) {
-        m_newIndexes = other->m_newIndexes;
+        m_newIndex = other->m_newIndex;
         return true;
     }
 

@@ -17,8 +17,8 @@
 
 #pragma once
 
-#include "chartindex.h"
 #include "chartbasecommand.h"
+#include "chartindex.h"
 
 #include <QPair>
 #include <QPointer>
@@ -36,8 +36,7 @@ namespace cmd {
 class CmdActionItemMove : public ChartBaseCommand
 {
 public:
-    CmdActionItemMove(
-            msc::MscAction *action, int newPos, msc::MscInstance *newInsance, ChartLayoutManager *layoutManager);
+    CmdActionItemMove(msc::MscAction *action, const ChartIndex &newChartIndex, ChartLayoutManager *layoutManager);
 
     void redo() override;
     void undo() override;
@@ -46,8 +45,8 @@ public:
 
 private:
     QPointer<msc::MscAction> m_action;
-    ChartIndex m_newIndexes;
-    ChartIndex m_oldIndexes;
+    ChartIndex m_newIndex;
+    ChartIndex m_oldIndex;
 };
 
 } // namespace cmd

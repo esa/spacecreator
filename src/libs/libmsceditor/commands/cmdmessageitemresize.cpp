@@ -24,38 +24,43 @@
 namespace msc {
 namespace cmd {
 
-CmdMessageItemResize::CmdMessageItemResize(MscMessage *message, int newPos, MscInstance *newInsance,
+CmdMessageItemResize::CmdMessageItemResize(MscMessage *message, const ChartIndex &newChartIndex,
         MscMessage::EndType endType, ChartLayoutManager *layoutManager)
     : ChartBaseCommand(message, layoutManager)
     , m_message(message)
-    , m_oldIndex(m_chart->instanceEvents().indexOf(message))
-    , m_newIndex(newPos)
-    , m_oldInstance(
-              endType == msc::MscMessage::EndType::SOURCE_TAIL ? message->sourceInstance() : message->targetInstance())
-    , m_newInstance(newInsance)
+    , m_newIndex(newChartIndex)
     , m_endType(endType)
 {
+    MscInstance *instance = nullptr;
+    if (m_endType == msc::MscMessage::EndType::SOURCE_TAIL) {
+        instance = m_message->sourceInstance();
+    } else {
+        instance = m_message->targetInstance();
+    }
+    if (instance) {
+        m_oldIndex = ChartIndex(instance, m_chart->indexofEventAtInstance(m_message, instance));
+    }
+
     setText(QObject::tr("ReTarget message"));
 }
 
 void CmdMessageItemResize::redo()
 {
     if (m_message && m_chart) {
-        m_chart->updateMessageTarget(m_message, m_newInstance, m_newIndex, m_endType);
+        m_chart->updateMessageTarget(m_message, m_newIndex, m_endType);
     }
 }
 
 void CmdMessageItemResize::undo()
 {
     if (m_message && m_chart) {
-        QHash<MscInstance *, int> indices;
-        m_chart->updateMessageTarget(m_message, m_oldInstance, m_oldIndex, m_endType);
+        m_chart->updateMessageTarget(m_message, m_oldIndex, m_endType);
     }
 }
 
 bool CmdMessageItemResize::mergeWith(const QUndoCommand *command)
 {
-    Q_UNUSED(command);
+    Q_UNUSED(command)
     return false;
 }
 

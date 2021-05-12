@@ -18,6 +18,7 @@
 #pragma once
 
 #include "chartbasecommand.h"
+#include "chartindex.h"
 #include "mscmessage.h"
 
 #include <QPointer>
@@ -32,8 +33,8 @@ namespace cmd {
 class CmdMessageItemResize : public ChartBaseCommand
 {
 public:
-    CmdMessageItemResize(MscMessage *message, int newPos, msc::MscInstance *newInsance,
-            msc::MscMessage::EndType endType, ChartLayoutManager *layoutManager);
+    CmdMessageItemResize(MscMessage *message, const ChartIndex &newChartIndex, msc::MscMessage::EndType endType,
+            ChartLayoutManager *layoutManager);
 
     void redo() override;
     void undo() override;
@@ -42,10 +43,8 @@ public:
 
 private:
     QPointer<MscMessage> m_message;
-    int m_oldIndex = -1;
-    int m_newIndex = -1;
-    QPointer<msc::MscInstance> m_oldInstance;
-    QPointer<msc::MscInstance> m_newInstance;
+    ChartIndex m_newIndex;
+    ChartIndex m_oldIndex;
     msc::MscMessage::EndType m_endType = msc::MscMessage::EndType::SOURCE_TAIL;
 };
 

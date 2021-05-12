@@ -27,28 +27,29 @@ namespace msc {
 namespace cmd {
 
 CmdTimerItemMove::CmdTimerItemMove(
-        msc::MscTimer *timer, int newPos, MscInstance *newInsance, ChartLayoutManager *layoutManager)
+        msc::MscTimer *timer, const ChartIndex &newChartIndex, ChartLayoutManager *layoutManager)
     : ChartBaseCommand(timer, layoutManager)
     , m_timer(timer)
-    , m_oldIndex(m_chart->instanceEvents().indexOf(timer))
-    , m_newIndex(newPos)
-    , m_oldInstance(timer->instance())
-    , m_newInstance(newInsance)
+    , m_newIndex(newChartIndex)
 {
+    ChartIndexList indices = m_chart->indicesOfEvent(m_timer);
+    if (!indices.isEmpty()) {
+        m_oldIndex = indices.first();
+    }
     setText(QObject::tr("Move timer"));
 }
 
 void CmdTimerItemMove::redo()
 {
-    if (m_timer && m_chart && m_newInstance) {
-        m_chart->updateTimerPos(m_timer, m_newInstance, m_newIndex);
+    if (m_timer && m_chart && m_newIndex.isValid()) {
+        m_chart->updateTimerPos(m_timer, m_newIndex);
     }
 }
 
 void CmdTimerItemMove::undo()
 {
-    if (m_timer && m_chart && m_oldInstance) {
-        m_chart->updateTimerPos(m_timer, m_oldInstance, m_oldIndex);
+    if (m_timer && m_chart && m_oldIndex.isValid()) {
+        m_chart->updateTimerPos(m_timer, m_oldIndex);
     }
 }
 
@@ -57,7 +58,6 @@ bool CmdTimerItemMove::mergeWith(const QUndoCommand *command)
     const CmdTimerItemMove *other = dynamic_cast<const CmdTimerItemMove *>(command);
     if (canMergeWith(other)) {
         m_newIndex = other->m_newIndex;
-        m_newInstance = other->m_newInstance;
         return true;
     }
 

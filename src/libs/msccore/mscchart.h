@@ -86,12 +86,12 @@ public:
     bool isEmpty() const;
 
     void updateInstanceOrder(MscInstance *instance, int pos);
-    void updateActionPos(MscAction *action, MscInstance *newInstance, int eventPos);
+    void updateActionPos(MscAction *action, const ChartIndex &newChartIndex);
     void updateCoregionPos(
             MscCoregion *regionBegin, MscCoregion *regionEnd, MscInstance *newInstance, int beginPos, int endPos);
-    void updateConditionPos(MscCondition *condition, MscInstance *newInstance, int eventPos);
-    void updateTimerPos(MscTimer *timer, MscInstance *newInstance, int eventPos);
-    void updateMessageTarget(MscMessage *message, MscInstance *newInstance, int newPos, MscMessage::EndType endType);
+    void updateConditionPos(MscCondition *condition, const ChartIndex &newChartIndex);
+    void updateTimerPos(MscTimer *timer, const ChartIndex &newChartIndex);
+    void updateMessageTarget(MscMessage *message, const ChartIndex &newChartIndex, MscMessage::EndType endType);
 
     QRect cifRect() const;
     void setCifRect(const QRect &rect);
