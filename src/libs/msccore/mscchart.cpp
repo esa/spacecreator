@@ -115,7 +115,7 @@ void MscChart::addInstance(MscInstance *instance, int index)
     if (!m_events.contains(instance)) {
         m_events[instance] = {};
     }
-    for (MscInstanceEvent *ev : qAsConst(m_instanceEvents)) {
+    for (MscInstanceEvent *ev : qAsConst(m_orphanEvents)) {
         if (relatedInstances(ev).contains(instance)) {
             if (m_events[instance].contains(ev)) {
                 qFatal("Instance add failed - event already there!");
@@ -237,8 +237,6 @@ void MscChart::addInstanceEvent(MscInstanceEvent *event, ChartIndexList instance
         m_orphanEvents.append(event);
     }
 
-    m_instanceEvents = allEvents();
-
     event->setParent(this);
 
     connect(event, &MscInstanceEvent::dataChanged, this, &MscChart::dataChanged);
@@ -284,7 +282,6 @@ void MscChart::setInstanceEvents(
 
     m_events = events;
     m_orphanEvents = orphanEvents;
-    m_instanceEvents = allEvents();
 
     for (auto it = m_events.begin(); it != m_events.end(); ++it) {
         for (MscInstanceEvent *event : it.value()) {
@@ -321,14 +318,11 @@ void MscChart::removeInstanceEvent(MscInstanceEvent *instanceEvent)
         return;
     }
 
+    int removed = 0;
     for (QVector<MscInstanceEvent *> &events : m_events) {
-        events.removeOne(instanceEvent);
+        removed += events.removeAll(instanceEvent);
     }
-    m_orphanEvents.removeAll(instanceEvent);
-
-    if (!m_instanceEvents.contains(instanceEvent)) {
-        return;
-    }
+    removed += m_orphanEvents.removeAll(instanceEvent);
 
     if (instanceEvent->entityType() == msc::MscEntity::EntityType::Create) {
         if (MscMessage *message = static_cast<MscMessage *>(instanceEvent)) {
@@ -337,15 +331,11 @@ void MscChart::removeInstanceEvent(MscInstanceEvent *instanceEvent)
         }
     }
 
-    if (m_instanceEvents.removeAll(instanceEvent)) {
+    if (removed > 0) {
         if (instanceEvent->parent() == this) {
             instanceEvent->setParent(nullptr);
         }
         disconnect(instanceEvent, nullptr, this, nullptr);
-
-        for (QVector<MscInstanceEvent *> evPerInstance : qAsConst(m_events)) {
-            evPerInstance.removeOne(instanceEvent);
-        }
 
         Q_EMIT instanceEventRemoved(instanceEvent);
         Q_EMIT instanceEventsChanged();
@@ -657,9 +647,6 @@ bool MscChart::moveEvent(MscInstanceEvent *event, ChartIndexList indices)
         instanceList.removeAll(event);
         instanceList.insert(it->index(), event);
     }
-
-    // Move in global list
-    m_instanceEvents = allEvents();
 
     return true;
 }

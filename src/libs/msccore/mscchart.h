@@ -171,7 +171,6 @@ private:
     QVector<MscInstanceEvent *> allEvents() const;
 
     QVector<MscInstance *> m_instances;
-    QVector<MscInstanceEvent *> m_instanceEvents;
     QHash<MscInstance *, QVector<MscInstanceEvent *>> m_events;
     QVector<MscInstanceEvent *> m_orphanEvents;
     QVector<MscGate *> m_gates;

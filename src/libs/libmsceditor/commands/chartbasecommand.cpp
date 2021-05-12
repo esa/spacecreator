@@ -28,7 +28,6 @@ ChartBaseCommand::ChartBaseCommand(MscEntity *item, ChartLayoutManager *layoutMa
     : BaseCommand(item, parent)
     , m_chart(layoutManager ? layoutManager->currentChart() : nullptr)
     , m_layoutManager(layoutManager)
-    , m_oldSortedEvents(m_chart ? m_chart->instanceEvents() : QVector<msc::MscInstanceEvent *>())
 {
 }
 

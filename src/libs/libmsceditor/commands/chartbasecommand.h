@@ -38,8 +38,6 @@ public:
 protected:
     QPointer<msc::MscChart> m_chart;
     QPointer<msc::ChartLayoutManager> m_layoutManager;
-    QVector<msc::MscInstanceEvent *> m_newSortedEvents;
-    QVector<msc::MscInstanceEvent *> m_oldSortedEvents;
 };
 
 } // namespace cmd
