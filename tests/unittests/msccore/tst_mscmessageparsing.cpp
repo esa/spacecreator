@@ -47,13 +47,13 @@ void tst_MscReader::testMessage()
     MscInstance *instance = chart->instances().at(0);
 
     QCOMPARE(chart->totalEventNumber(), 3);
-    MscMessage *message1 = dynamic_cast<MscMessage *>(chart->instanceEvents().at(0));
+    MscMessage *message1 = dynamic_cast<MscMessage *>(chart->eventsForInstance(instance).at(0));
     QVERIFY(message1 != nullptr);
     QCOMPARE(message1->name(), QString("ICONreq"));
     QCOMPARE(message1->sourceInstance(), static_cast<MscInstance *>(nullptr));
     QCOMPARE(message1->targetInstance(), instance);
 
-    MscMessage *message2 = dynamic_cast<MscMessage *>(chart->instanceEvents().at(2));
+    MscMessage *message2 = dynamic_cast<MscMessage *>(chart->eventsForInstance(instance).at(2));
     QVERIFY(message2 != nullptr);
     QCOMPARE(message2->name(), QString("ICON"));
     QCOMPARE(message2->sourceInstance(), instance);
@@ -93,9 +93,10 @@ void tst_MscReader::testMessageWithParameters()
     QVERIFY(model->charts().size() == 1);
     MscChart *chart = model->charts().at(0);
 
+    MscInstance *initiator = chart->instances().at(0);
     QVERIFY(chart->totalEventNumber() == 8);
 
-    auto *message = dynamic_cast<MscMessage *>(chart->instanceEvents().at(0));
+    auto *message = dynamic_cast<MscMessage *>(chart->eventsForInstance(initiator).at(0));
     QVERIFY(message != nullptr);
     QCOMPARE(message->messageInstanceName(), QString("a"));
     MscParameterList parameters = message->parameters();
@@ -103,13 +104,13 @@ void tst_MscReader::testMessageWithParameters()
     QCOMPARE(parameters.at(0).expression(), QString("longitude:-174.0"));
 
 #ifndef __clang_analyzer__
-    message = dynamic_cast<MscMessage *>(chart->instanceEvents().at(1));
+    message = dynamic_cast<MscMessage *>(chart->eventsForInstance(initiator).at(1));
     QVERIFY(message != nullptr);
     QVERIFY(message->messageInstanceName().isEmpty());
     parameters = message->parameters();
     QCOMPARE(parameters.at(0).pattern(), QString("12"));
 
-    message = dynamic_cast<MscMessage *>(chart->instanceEvents().at(6));
+    message = dynamic_cast<MscMessage *>(chart->eventsForInstance(initiator).at(6));
     QVERIFY(message != nullptr);
     parameters = message->parameters();
     QCOMPARE(parameters.size(), 1);
@@ -159,9 +160,10 @@ void tst_MscReader::testMessageParameterExpression()
     MscChart *chart = model->charts().at(0);
 
     QCOMPARE(chart->instances().size(), 2);
+    MscInstance *instance1 = chart->instances().at(0);
     QCOMPARE(chart->totalEventNumber(), 2);
 
-    auto message = qobject_cast<MscMessage *>(chart->instanceEvents().at(1));
+    auto message = qobject_cast<MscMessage *>(chart->eventsForInstance(instance1).at(1));
     QVERIFY(message != nullptr);
     QCOMPARE(message->parameters().size(), 1);
     QCOMPARE(message->parameters().at(0).parameter(),
@@ -184,8 +186,9 @@ void tst_MscReader::testMultiParameters()
     MscChart *chart = model->charts().at(0);
 
     QCOMPARE(chart->instances().size(), 2);
+    MscInstance *instance1 = chart->instances().at(0);
     QCOMPARE(chart->totalEventNumber(), 1);
-    auto *message = static_cast<MscCreate *>(chart->instanceEvents().at(0));
+    auto *message = static_cast<MscMessage *>(chart->eventsForInstance(instance1).at(0));
     QCOMPARE(message->name(), QString("hello"));
     MscParameterList parameters = message->parameters();
     QCOMPARE(parameters.size(), 2);
@@ -224,10 +227,11 @@ void tst_MscReader::testMessageParametersCurlyBraces()
     MscChart *chart = model->charts().at(0);
 
     QCOMPARE(chart->instances().size(), 2);
+    MscInstance *instanceA = chart->instances().at(0);
     QCOMPARE(chart->totalEventNumber(), params.size());
 
-    for (int i = 0; i < chart->totalEventNumber(); ++i)
-        if (MscMessage *message = dynamic_cast<MscMessage *>(chart->instanceEvents().at(i)))
+    for (int i = 0; i < chart->eventsForInstance(instanceA).size(); ++i)
+        if (MscMessage *message = dynamic_cast<MscMessage *>(chart->eventsForInstance(instanceA).at(i)))
             QCOMPARE(message->paramString(), params.at(i));
 }
 
@@ -240,8 +244,9 @@ void tst_MscReader::testMessageChoiceParameter()
     QCOMPARE(model->charts().size(), 1);
     MscChart *chart = model->charts().at(0);
     QCOMPARE(chart->instances().size(), 1);
+    MscInstance *instance1 = chart->instances().at(0);
     QCOMPARE(chart->totalEventNumber(), 1);
-    auto message = qobject_cast<MscMessage *>(chart->instanceEvents().at(0));
+    auto message = qobject_cast<MscMessage *>(chart->eventsForInstance(instance1).at(0));
     QVERIFY(message != nullptr);
     QCOMPARE(message->parameters().size(), 1);
     QCOMPARE(message->parameters().at(0).parameter(), QString("act:heater:nominal"));
@@ -273,8 +278,9 @@ void tst_MscReader::testMessageComplexParameter()
     MscChart *chart = doc->charts().at(0);
 
     QCOMPARE(chart->instances().size(), 2);
+    MscInstance *instanceObsw = chart->instances().at(0);
     QCOMPARE(chart->totalEventNumber(), 2);
-    auto message = qobject_cast<MscMessage *>(chart->instanceEvents().at(0));
+    auto message = qobject_cast<MscMessage *>(chart->eventsForInstance(instanceObsw).at(0));
     QVERIFY(message != nullptr);
     QCOMPARE(message->parameters().size(), 1);
     QCOMPARE(message->parameters().at(0).parameter(), QString("{tc-id '4143545f494555'H, report success}"));
@@ -306,18 +312,19 @@ void tst_MscReader::testMessageAsn1SequenceChoiceParameter()
     MscChart *chart = doc->charts().at(0);
 
     QCOMPARE(chart->instances().size(), 2);
+    MscInstance *instance1 = chart->instances().at(0);
     QCOMPARE(chart->totalEventNumber(), 3);
-    auto message = qobject_cast<MscMessage *>(chart->instanceEvents().at(0));
+    auto message = qobject_cast<MscMessage *>(chart->eventsForInstance(instance1).at(0));
     QVERIFY(message != nullptr);
     QCOMPARE(message->parameters().size(), 1);
     QCOMPARE(message->parameters().at(0).parameter(), QString("{ field-a  FALSE, field-b  choice1 : FALSE }"));
 
-    message = qobject_cast<MscMessage *>(chart->instanceEvents().at(1));
+    message = qobject_cast<MscMessage *>(chart->eventsForInstance(instance1).at(1));
     QVERIFY(message != nullptr);
     QCOMPARE(message->parameters().size(), 1);
     QCOMPARE(message->parameters().at(0).parameter(), QString("{destination displayer, action display:'48656c6c6f'H}"));
 
-    message = qobject_cast<MscMessage *>(chart->instanceEvents().at(2));
+    message = qobject_cast<MscMessage *>(chart->eventsForInstance(instance1).at(2));
     QVERIFY(message != nullptr);
     QCOMPARE(message->parameters().size(), 1);
     QCOMPARE(message->parameters().at(0).parameter(), QString("{destination displayer, action display: \"Hello\"}"));
@@ -344,8 +351,9 @@ void tst_MscReader::testMessageAsn1SequenceOfSecencesParameter()
     MscChart *chart = doc->charts().at(0);
 
     QCOMPARE(chart->instances().size(), 2);
+    MscInstance *instance1 = chart->instances().at(0);
     QCOMPARE(chart->totalEventNumber(), 1);
-    auto message = qobject_cast<MscMessage *>(chart->instanceEvents().at(0));
+    auto message = qobject_cast<MscMessage *>(chart->eventsForInstance(instance1).at(0));
     QVERIFY(message != nullptr);
     QCOMPARE(message->parameters().size(), 1);
     QCOMPARE(message->parameters().at(0).parameter(), QString("{{empty, empty, empty}, {empty, red, empty}}"));
@@ -374,12 +382,13 @@ void tst_MscReader::testMessageAsn1OctetString()
     MscChart *chart = doc->charts().at(0);
 
     QCOMPARE(chart->instances().size(), 2);
+    MscInstance *instance1 = chart->instances().at(0);
     QCOMPARE(chart->totalEventNumber(), 2);
-    auto message = qobject_cast<MscMessage *>(chart->instanceEvents().at(0));
+    auto message = qobject_cast<MscMessage *>(chart->eventsForInstance(instance1).at(0));
     QVERIFY(message != nullptr);
     QCOMPARE(message->parameters().size(), 1);
     QCOMPARE(message->parameters().at(0).parameter(), QString("'4143545f494555'H"));
-    message = qobject_cast<MscMessage *>(chart->instanceEvents().at(1));
+    message = qobject_cast<MscMessage *>(chart->eventsForInstance(instance1).at(1));
     QCOMPARE(message->parameters().size(), 1);
     QCOMPARE(message->parameters().at(0).parameter(), QString("{'4143545f494555'H, '4143545f494555'H}"));
 }
@@ -402,8 +411,9 @@ void tst_MscReader::testMessageAsn1SequenceOfInSequence()
     MscChart *chart = doc->charts().at(0);
 
     QCOMPARE(chart->instances().size(), 1);
+    MscInstance *instance = chart->instances().at(0);
     QCOMPARE(chart->totalEventNumber(), 1);
-    auto message = qobject_cast<MscMessage *>(chart->instanceEvents().at(0));
+    auto message = qobject_cast<MscMessage *>(chart->eventsForInstance(instance).at(0));
     QVERIFY(message != nullptr);
     QCOMPARE(message->parameters().size(), 1);
     QCOMPARE(message->parameters().at(0).parameter(),
@@ -438,41 +448,47 @@ void tst_MscReader::testSortedMessage()
 
     QCOMPARE(chart->totalEventNumber(), 6);
 
-    MscMessage *message = dynamic_cast<MscMessage *>(chart->instanceEvents().at(0));
-    QVERIFY(message != nullptr);
-    QCOMPARE(message->name(), QString("ICONreq"));
-    QCOMPARE(message->sourceInstance(), static_cast<MscInstance *>(nullptr));
-    QCOMPARE(message->targetInstance(), initiator);
+    MscMessage *messageI1 = dynamic_cast<MscMessage *>(chart->eventsForInstance(initiator).at(0));
+    QVERIFY(messageI1 != nullptr);
+    QCOMPARE(messageI1->name(), QString("ICONreq"));
+    QCOMPARE(messageI1->sourceInstance(), static_cast<MscInstance *>(nullptr));
+    QCOMPARE(messageI1->targetInstance(), initiator);
 
-    message = dynamic_cast<MscMessage *>(chart->instanceEvents().at(1));
-    QVERIFY(message != nullptr);
-    QCOMPARE(message->name(), QString("ICON"));
-    QCOMPARE(message->sourceInstance(), initiator);
-    QCOMPARE(message->targetInstance(), responder);
+    MscMessage *messageI2 = dynamic_cast<MscMessage *>(chart->eventsForInstance(initiator).at(1));
+    QVERIFY(messageI2 != nullptr);
+    QCOMPARE(messageI2->name(), QString("ICON"));
+    QCOMPARE(messageI2->sourceInstance(), initiator);
+    QCOMPARE(messageI2->targetInstance(), responder);
 
-    message = dynamic_cast<MscMessage *>(chart->instanceEvents().at(2));
-    QVERIFY(message != nullptr);
-    QCOMPARE(message->name(), QString("ICONind"));
-    QCOMPARE(message->sourceInstance(), responder);
-    QCOMPARE(message->targetInstance(), static_cast<MscInstance *>(nullptr));
+    MscMessage *messageI3 = dynamic_cast<MscMessage *>(chart->eventsForInstance(initiator).at(2));
+    QVERIFY(messageI3 != nullptr);
+    QCOMPARE(messageI3->name(), QString("ICONF"));
+    QCOMPARE(messageI3->sourceInstance(), responder);
+    QCOMPARE(messageI3->targetInstance(), initiator);
 
-    message = dynamic_cast<MscMessage *>(chart->instanceEvents().at(3));
-    QVERIFY(message != nullptr);
-    QCOMPARE(message->name(), QString("ICONresp"));
-    QCOMPARE(message->sourceInstance(), static_cast<MscInstance *>(nullptr));
-    QCOMPARE(message->targetInstance(), responder);
+    MscMessage *messageI4 = dynamic_cast<MscMessage *>(chart->eventsForInstance(initiator).at(3));
+    QVERIFY(messageI4 != nullptr);
+    QCOMPARE(messageI4->name(), QString("ICONconf"));
+    QCOMPARE(messageI4->sourceInstance(), initiator);
+    QCOMPARE(messageI4->targetInstance(), static_cast<MscInstance *>(nullptr));
 
-    message = dynamic_cast<MscMessage *>(chart->instanceEvents().at(4));
-    QVERIFY(message != nullptr);
-    QCOMPARE(message->name(), QString("ICONF"));
-    QCOMPARE(message->sourceInstance(), responder);
-    QCOMPARE(message->targetInstance(), initiator);
+    MscMessage *messageR1 = dynamic_cast<MscMessage *>(chart->eventsForInstance(responder).at(0));
+    QCOMPARE(messageR1, messageI2);
 
-    message = dynamic_cast<MscMessage *>(chart->instanceEvents().at(5));
-    QVERIFY(message != nullptr);
-    QCOMPARE(message->name(), QString("ICONconf"));
-    QCOMPARE(message->sourceInstance(), initiator);
-    QCOMPARE(message->targetInstance(), static_cast<MscInstance *>(nullptr));
+    MscMessage *messageR2 = dynamic_cast<MscMessage *>(chart->eventsForInstance(responder).at(1));
+    QVERIFY(messageR2 != nullptr);
+    QCOMPARE(messageR2->name(), QString("ICONind"));
+    QCOMPARE(messageR2->sourceInstance(), responder);
+    QCOMPARE(messageR2->targetInstance(), static_cast<MscInstance *>(nullptr));
+
+    MscMessage *messageR3 = dynamic_cast<MscMessage *>(chart->eventsForInstance(responder).at(2));
+    QVERIFY(messageR3 != nullptr);
+    QCOMPARE(messageR3->name(), QString("ICONresp"));
+    QCOMPARE(messageR3->sourceInstance(), static_cast<MscInstance *>(nullptr));
+    QCOMPARE(messageR3->targetInstance(), responder);
+
+    MscMessage *messageR4 = dynamic_cast<MscMessage *>(chart->eventsForInstance(responder).at(3));
+    QCOMPARE(messageR4, messageI3);
 
     delete model;
 }
@@ -497,7 +513,6 @@ void tst_MscReader::testSortedInstanceEvents()
                           out ICONF to Initiator; \
                       endinstance; \
                   endmsc;");
-
     MscModel *model = m_reader->parseText(msc);
     QCOMPARE(model->charts().size(), 1);
 
@@ -509,62 +524,68 @@ void tst_MscReader::testSortedInstanceEvents()
     QCOMPARE(chart->totalEventNumber(), 10);
 
     int eventNr = -1;
+    auto timerI1 = dynamic_cast<MscTimer *>(chart->eventsForInstance(initiator).at(++eventNr));
+    QVERIFY(timerI1 != nullptr);
+    QCOMPARE(timerI1->timerType(), MscTimer::TimerType::Start);
+    QCOMPARE(timerI1->name(), QString("T1"));
 
-    MscTimer *timer = dynamic_cast<MscTimer *>(chart->instanceEvents().at(++eventNr));
-    QVERIFY(timer != nullptr);
-    QCOMPARE(timer->timerType(), MscTimer::TimerType::Start);
-    QCOMPARE(timer->name(), QString("T1"));
+    auto messageI1 = dynamic_cast<MscMessage *>(chart->eventsForInstance(initiator).at(++eventNr));
+    QVERIFY(messageI1 != nullptr);
+    QCOMPARE(messageI1->name(), QString("ICONreq"));
+    QCOMPARE(messageI1->sourceInstance(), static_cast<MscInstance *>(nullptr));
+    QCOMPARE(messageI1->targetInstance(), initiator);
 
-    MscMessage *message = dynamic_cast<MscMessage *>(chart->instanceEvents().at(++eventNr));
-    QVERIFY(message != nullptr);
-    QCOMPARE(message->name(), QString("ICONreq"));
-    QCOMPARE(message->sourceInstance(), static_cast<MscInstance *>(nullptr));
-    QCOMPARE(message->targetInstance(), initiator);
+    auto messageI2 = dynamic_cast<MscMessage *>(chart->eventsForInstance(initiator).at(++eventNr));
+    QVERIFY(messageI2 != nullptr);
+    QCOMPARE(messageI2->name(), QString("ICON"));
+    QCOMPARE(messageI2->sourceInstance(), initiator);
+    QCOMPARE(messageI2->targetInstance(), responder);
 
-    message = dynamic_cast<MscMessage *>(chart->instanceEvents().at(++eventNr));
-    QVERIFY(message != nullptr);
-    QCOMPARE(message->name(), QString("ICON"));
-    QCOMPARE(message->sourceInstance(), initiator);
-    QCOMPARE(message->targetInstance(), responder);
+    auto timerI2 = dynamic_cast<MscTimer *>(chart->eventsForInstance(initiator).at(++eventNr));
+    QVERIFY(timerI2 != nullptr);
+    QCOMPARE(timerI2->timerType(), MscTimer::TimerType::Stop);
+    QCOMPARE(timerI2->name(), QString("T1"));
 
-    timer = dynamic_cast<MscTimer *>(chart->instanceEvents().at(++eventNr));
-    QVERIFY(timer != nullptr);
-    QCOMPARE(timer->timerType(), MscTimer::TimerType::Stop);
-    QCOMPARE(timer->name(), QString("T1"));
+    auto messageI3 = dynamic_cast<MscMessage *>(chart->eventsForInstance(initiator).at(++eventNr));
+    QVERIFY(messageI3 != nullptr);
+    QCOMPARE(messageI3->name(), QString("ICONF"));
+    QCOMPARE(messageI3->sourceInstance(), responder);
+    QCOMPARE(messageI3->targetInstance(), initiator);
 
-    message = dynamic_cast<MscMessage *>(chart->instanceEvents().at(++eventNr));
-    QVERIFY(message != nullptr);
-    QCOMPARE(message->name(), QString("ICONind"));
-    QCOMPARE(message->sourceInstance(), responder);
-    QCOMPARE(message->targetInstance(), static_cast<MscInstance *>(nullptr));
+    auto messageI4 = dynamic_cast<MscMessage *>(chart->eventsForInstance(initiator).at(++eventNr));
+    QVERIFY(messageI4 != nullptr);
+    QCOMPARE(messageI4->name(), QString("ICONconf"));
+    QCOMPARE(messageI4->sourceInstance(), initiator);
+    QCOMPARE(messageI4->targetInstance(), static_cast<MscInstance *>(nullptr));
 
-    timer = dynamic_cast<MscTimer *>(chart->instanceEvents().at(++eventNr));
-    QVERIFY(timer != nullptr);
-    QCOMPARE(timer->timerType(), MscTimer::TimerType::Start);
-    QCOMPARE(timer->name(), QString("T2"));
+    auto timerI3 = dynamic_cast<MscTimer *>(chart->eventsForInstance(initiator).at(++eventNr));
+    QVERIFY(timerI3 != nullptr);
+    QCOMPARE(timerI3->timerType(), MscTimer::TimerType::Timeout);
+    QCOMPARE(timerI3->name(), QString("T1"));
 
-    message = dynamic_cast<MscMessage *>(chart->instanceEvents().at(++eventNr));
-    QVERIFY(message != nullptr);
-    QCOMPARE(message->name(), QString("ICONresp"));
-    QCOMPARE(message->sourceInstance(), static_cast<MscInstance *>(nullptr));
-    QCOMPARE(message->targetInstance(), responder);
+    eventNr = -1;
+    auto messageR1 = dynamic_cast<MscMessage *>(chart->eventsForInstance(responder).at(++eventNr));
+    QCOMPARE(messageR1, messageI2);
 
-    message = dynamic_cast<MscMessage *>(chart->instanceEvents().at(++eventNr));
-    QVERIFY(message != nullptr);
-    QCOMPARE(message->name(), QString("ICONF"));
-    QCOMPARE(message->sourceInstance(), responder);
-    QCOMPARE(message->targetInstance(), initiator);
+    auto messageR2 = dynamic_cast<MscMessage *>(chart->eventsForInstance(responder).at(++eventNr));
+    QVERIFY(messageR2 != nullptr);
+    QCOMPARE(messageR2->name(), QString("ICONind"));
+    QCOMPARE(messageR2->sourceInstance(), responder);
+    QCOMPARE(messageR2->targetInstance(), static_cast<MscInstance *>(nullptr));
 
-    message = dynamic_cast<MscMessage *>(chart->instanceEvents().at(++eventNr));
-    QVERIFY(message != nullptr);
-    QCOMPARE(message->name(), QString("ICONconf"));
-    QCOMPARE(message->sourceInstance(), initiator);
-    QCOMPARE(message->targetInstance(), static_cast<MscInstance *>(nullptr));
+    auto timerR1 = dynamic_cast<MscTimer *>(chart->eventsForInstance(responder).at(++eventNr));
+    QVERIFY(timerR1 != nullptr);
+    QCOMPARE(timerR1->timerType(), MscTimer::TimerType::Start);
+    QCOMPARE(timerR1->name(), QString("T2"));
 
-    timer = dynamic_cast<MscTimer *>(chart->instanceEvents().at(++eventNr));
-    QVERIFY(timer != nullptr);
-    QCOMPARE(timer->timerType(), MscTimer::TimerType::Timeout);
-    QCOMPARE(timer->name(), QString("T1"));
+    auto messageR3 = dynamic_cast<MscMessage *>(chart->eventsForInstance(responder).at(++eventNr));
+    QVERIFY(messageR3 != nullptr);
+    QCOMPARE(messageR3->name(), QString("ICONresp"));
+    QCOMPARE(messageR3->sourceInstance(), static_cast<MscInstance *>(nullptr));
+    QCOMPARE(messageR3->targetInstance(), responder);
+
+    auto messageR4 = dynamic_cast<MscMessage *>(chart->eventsForInstance(responder).at(++eventNr));
+    QCOMPARE(messageR4, messageI3);
 
     delete model;
 }
@@ -611,19 +632,41 @@ void tst_MscReader::testSortedMessageCreate()
     MscChart *chart = model->charts().at(0);
 
     QCOMPARE(chart->instances().size(), 5);
+    MscInstance *Instance_B = chart->instances().at(0);
+    MscInstance *NEW_INSTANCE2 = chart->instances().at(1);
+    MscInstance *Instance_C = chart->instances().at(2);
+    MscInstance *NEW_INSTANCE = chart->instances().at(3);
+    MscInstance *Instance_A = chart->instances().at(4);
+
     QCOMPARE(chart->totalEventNumber(), 12);
-    QCOMPARE(chart->instanceEvents().at(0)->name(), QString("CA_1"));
-    QCOMPARE(chart->instanceEvents().at(1)->name(), QString("AC_2"));
-    QCOMPARE(chart->instanceEvents().at(2)->name(), QString("BA_3"));
-    QCOMPARE(chart->instanceEvents().at(3)->name(), QString("AB_4"));
-    QVERIFY(chart->instanceEvents().at(4)->entityType() == msc::MscEntity::EntityType::Create);
-    QCOMPARE(chart->instanceEvents().at(5)->name(), QString("BC_6")); // "NA_5" would be valid as well
-    QCOMPARE(chart->instanceEvents().at(6)->name(), QString("NA_5"));
-    QCOMPARE(chart->instanceEvents().at(7)->name(), QString("BN_7"));
-    QCOMPARE(chart->instanceEvents().at(8)->name(), QString("NB_8"));
-    QVERIFY(chart->instanceEvents().at(9)->entityType() == msc::MscEntity::EntityType::Create);
-    QCOMPARE(chart->instanceEvents().at(10)->name(), QString("BN2_9"));
-    QCOMPARE(chart->instanceEvents().at(11)->name(), QString("NB2_10"));
+    QCOMPARE(chart->eventsForInstance(Instance_B).at(0)->name(), QString("BA_3"));
+    QCOMPARE(chart->eventsForInstance(Instance_B).at(1)->name(), QString("AB_4"));
+    QVERIFY(chart->eventsForInstance(Instance_B).at(2)->entityType() == msc::MscEntity::EntityType::Create);
+    QCOMPARE(chart->eventsForInstance(Instance_B).at(3)->name(), QString("BC_6")); // "NA_5" would be valid as well
+    QCOMPARE(chart->eventsForInstance(Instance_B).at(4)->name(), QString("BN_7"));
+    QCOMPARE(chart->eventsForInstance(Instance_B).at(5)->name(), QString("NB_8"));
+    QVERIFY(chart->eventsForInstance(Instance_B).at(6)->entityType() == msc::MscEntity::EntityType::Create);
+    QCOMPARE(chart->eventsForInstance(Instance_B).at(7)->name(), QString("BN2_9"));
+    QCOMPARE(chart->eventsForInstance(Instance_B).at(8)->name(), QString("NB2_10"));
+
+    QVERIFY(chart->eventsForInstance(NEW_INSTANCE2).at(0)->entityType() == msc::MscEntity::EntityType::Create);
+    QCOMPARE(chart->eventsForInstance(NEW_INSTANCE2).at(1)->name(), QString("BN2_9"));
+    QCOMPARE(chart->eventsForInstance(NEW_INSTANCE2).at(2)->name(), QString("NB2_10"));
+
+    QCOMPARE(chart->eventsForInstance(Instance_C).at(0)->name(), QString("CA_1"));
+    QCOMPARE(chart->eventsForInstance(Instance_C).at(1)->name(), QString("AC_2"));
+    QCOMPARE(chart->eventsForInstance(Instance_C).at(2)->name(), QString("BC_6"));
+
+    QVERIFY(chart->eventsForInstance(NEW_INSTANCE).at(0)->entityType() == msc::MscEntity::EntityType::Create);
+    QCOMPARE(chart->eventsForInstance(NEW_INSTANCE).at(1)->name(), QString("NA_5"));
+    QCOMPARE(chart->eventsForInstance(NEW_INSTANCE).at(2)->name(), QString("BN_7"));
+    QCOMPARE(chart->eventsForInstance(NEW_INSTANCE).at(3)->name(), QString("NB_8"));
+
+    QCOMPARE(chart->eventsForInstance(Instance_A).at(0)->name(), QString("CA_1"));
+    QCOMPARE(chart->eventsForInstance(Instance_A).at(1)->name(), QString("AC_2"));
+    QCOMPARE(chart->eventsForInstance(Instance_A).at(2)->name(), QString("BA_3"));
+    QCOMPARE(chart->eventsForInstance(Instance_A).at(3)->name(), QString("AB_4"));
+    QCOMPARE(chart->eventsForInstance(Instance_A).at(4)->name(), QString("NA_5"));
 }
 
 void tst_MscReader::testSortingDeadlock()
@@ -713,25 +756,28 @@ void tst_MscReader::testConditionDublicate()
 
     QCOMPARE(chart->totalEventNumber(), 4);
 
-    auto event = dynamic_cast<MscCondition *>(chart->instanceEvents().at(0));
-    QVERIFY(event != nullptr);
-    QCOMPARE(event->name(), QString("Disconnected"));
-    QCOMPARE(event->shared(), true);
-    QCOMPARE(event->instance(), initiator);
+    auto sharedCondition = dynamic_cast<MscCondition *>(chart->eventsForInstance(initiator).at(0));
+    QVERIFY(sharedCondition != nullptr);
+    QCOMPARE(sharedCondition->name(), QString("Disconnected"));
+    QCOMPARE(sharedCondition->shared(), true);
+    QCOMPARE(sharedCondition->instance(), initiator);
 
-    auto message = dynamic_cast<MscMessage *>(chart->instanceEvents().at(1));
+    auto message = dynamic_cast<MscMessage *>(chart->eventsForInstance(initiator).at(1));
     QVERIFY(message != nullptr);
     QCOMPARE(message->name(), QString("ICONreq"));
     QCOMPARE(message->sourceInstance(), static_cast<MscInstance *>(nullptr));
     QCOMPARE(message->targetInstance(), initiator);
 
-    event = dynamic_cast<MscCondition *>(chart->instanceEvents().at(2));
+    auto event = dynamic_cast<MscCondition *>(chart->eventsForInstance(initiator).at(2));
     QVERIFY(event != nullptr);
     QCOMPARE(event->name(), QString("Wait_forResp"));
     QCOMPARE(event->shared(), false);
     QCOMPARE(event->instance(), initiator);
 
-    event = dynamic_cast<MscCondition *>(chart->instanceEvents().at(3));
+    auto sharedCondition2 = dynamic_cast<MscCondition *>(chart->eventsForInstance(responder).at(0));
+    QCOMPARE(sharedCondition, sharedCondition2);
+
+    event = dynamic_cast<MscCondition *>(chart->eventsForInstance(responder).at(1));
     QVERIFY(event != nullptr);
     QCOMPARE(event->name(), QString("Wait_forResp"));
     QCOMPARE(event->shared(), false);

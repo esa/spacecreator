@@ -42,7 +42,6 @@ class MscChart : public MscEntity
 {
     Q_OBJECT
     Q_PROPERTY(QVector<msc::MscInstance *> instances READ instances NOTIFY instancesChanged)
-    Q_PROPERTY(QVector<msc::MscInstanceEvent *> instanceEvents READ instanceEvents NOTIFY instanceEventsChanged)
 
 public:
     explicit MscChart(QObject *parent = nullptr);
@@ -63,7 +62,6 @@ public:
     void setInstanceEvents(
             QHash<MscInstance *, QVector<MscInstanceEvent *>> events, QVector<MscInstanceEvent *> orphanEvents);
     void removeInstanceEvent(MscInstanceEvent *instanceEvent);
-    int indexofEvent(MscInstanceEvent *instanceEvent) const;
     ChartIndexList indicesOfEvent(MscInstanceEvent *event) const;
     int indexofEventAtInstance(MscInstanceEvent *instanceEvent, MscInstance *instance) const;
     MscMessage *messageByName(const QString &name) const;
@@ -74,6 +72,7 @@ public:
     QVector<MscInstance *> relatedInstances(MscInstanceEvent *event) const;
 
     QVector<MscMessage *> messages() const;
+    QVector<MscCoregion *> coregions() const;
 
     const QVector<MscGate *> &gates() const;
     void addGate(MscGate *gate);
@@ -100,8 +99,6 @@ public:
 
     QString createUniqueInstanceName() const;
     bool moveEvent(MscInstanceEvent *event, ChartIndexList indices);
-
-    //    void rearrangeEvents(const QVector<msc::MscInstanceEvent *> &sortedEvents);
 
 public Q_SLOTS:
     void resetTimerRelations(msc::MscTimer *timer);

@@ -200,7 +200,8 @@ void tst_ChartLayoutManager::testTimerPositionWithCifInstance()
     QCOMPARE(m_instanceItems.size(), 1);
     QCOMPARE(m_chart->totalEventNumber(), 1);
 
-    MscTimer *watchdogEntity = qobject_cast<MscTimer *>(m_chart->instanceEvents().at(0));
+    MscInstance *instance = m_chart->instances().at(0);
+    MscTimer *watchdogEntity = qobject_cast<MscTimer *>(m_chart->eventsForInstance(instance).at(0));
     TimerItem *watchdogItem = m_chartModel->itemForTimer(watchdogEntity);
     QVERIFY(watchdogItem != nullptr);
 
@@ -430,9 +431,10 @@ void tst_ChartLayoutManager::testCreateSetsYOfStoppedInstance()
     msc::InstanceItem *instanceItemA = m_chartModel->instanceItems().at(0);
     msc::InstanceItem *instanceItemB = m_chartModel->instanceItems().at(1);
 
-    MscAction *action = qobject_cast<MscAction *>(m_chart->instanceEvents().at(0));
+    MscInstance *instanceA = m_chart->instances().at(0);
+    MscAction *action = qobject_cast<MscAction *>(m_chart->eventsForInstance(instanceA).at(0));
     QVERIFY(action);
-    MscMessage *create = qobject_cast<MscMessage *>(m_chart->instanceEvents().at(1));
+    MscMessage *create = qobject_cast<MscMessage *>(m_chart->eventsForInstance(instanceA).at(1));
     QVERIFY(create);
 
     msc::ActionItem *actionItem = m_chartModel->itemForAction(action);
@@ -588,7 +590,8 @@ void tst_ChartLayoutManager::testMessageWithCifInformation()
                        endmscdocument;");
     parseMsc(msc);
 
-    auto message = qobject_cast<msc::MscMessage *>(m_chart->instanceEvents().at(0));
+    MscInstance *instance = m_chart->instances().at(0);
+    auto message = qobject_cast<msc::MscMessage *>(m_chart->eventsForInstance(instance).at(0));
     msc::MessageItem *messageItem = m_chartModel->itemForMessage(message);
     const QRectF loadedGeometry = messageItem->sceneBoundingRect();
     // Check that the message is pointing bottom right
@@ -616,8 +619,9 @@ void tst_ChartLayoutManager::testEventIndex()
         endmscdocument;");
     parseMsc(msc);
 
-    auto message = qobject_cast<msc::MscMessage *>(m_chart->instanceEvents().at(0));
-    auto action = qobject_cast<msc::MscAction *>(m_chart->instanceEvents().at(1));
+    MscInstance *instance = m_chart->instances().at(1);
+    auto message = qobject_cast<msc::MscMessage *>(m_chart->eventsForInstance(instance).at(0));
+    auto action = qobject_cast<msc::MscAction *>(m_chart->eventsForInstance(instance).at(1));
     msc::MessageItem *messageItem = m_chartModel->itemForMessage(message);
     msc::ActionItem *actionItem = m_chartModel->itemForAction(action);
 

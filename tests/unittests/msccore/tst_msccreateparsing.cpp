@@ -45,9 +45,10 @@ void tst_MscReader::testInstanceCreate()
     MscChart *chart = model->charts().at(0);
 
     QCOMPARE(chart->instances().size(), 2);
+    MscInstance *instance = chart->instances().at(0);
     QCOMPARE(chart->totalEventNumber(), 2);
 
-    auto *create = static_cast<MscCreate *>(chart->instanceEvents().at(1));
+    auto *create = static_cast<MscCreate *>(chart->eventsForInstance(instance).at(1));
     QCOMPARE(create->name(), QString());
     QCOMPARE(create->sourceInstance()->name(), QString("Inst_1"));
     QCOMPARE(create->targetInstance()->name(), QString("subscriber"));
@@ -74,9 +75,10 @@ void tst_MscReader::testInstanceCreateNoParameter()
     MscChart *chart = model->charts().at(0);
 
     QCOMPARE(chart->instances().size(), 2);
+    MscInstance *instance = chart->instances().at(0);
     QCOMPARE(chart->totalEventNumber(), 1);
 
-    auto *create = static_cast<MscCreate *>(chart->instanceEvents().at(0));
+    auto *create = static_cast<MscCreate *>(chart->eventsForInstance(instance).at(0));
     QCOMPARE(create->name(), QString());
     QCOMPARE(create->sourceInstance()->name(), QString("Inst_1"));
     QCOMPARE(create->targetInstance()->name(), QString("subscriber"));
@@ -101,9 +103,10 @@ void tst_MscReader::testInstanceCreateMultiParameter()
     MscChart *chart = model->charts().at(0);
 
     QCOMPARE(chart->instances().size(), 2);
+    MscInstance *instance = chart->instances().at(0);
     QCOMPARE(chart->totalEventNumber(), 1);
 
-    auto *create = static_cast<MscCreate *>(chart->instanceEvents().at(0));
+    auto *create = static_cast<MscCreate *>(chart->eventsForInstance(instance).at(0));
     QCOMPARE(create->name(), QString());
     QCOMPARE(create->sourceInstance()->name(), QString("Inst_1"));
     QCOMPARE(create->targetInstance()->name(), QString("subscriber"));
@@ -137,9 +140,10 @@ void tst_MscReader::testInstanceCreateEmptyParameter()
     MscChart *chart = model->charts().at(0);
 
     QCOMPARE(chart->instances().size(), 2);
+    MscInstance *instance = chart->instances().at(0);
     QCOMPARE(chart->totalEventNumber(), 1);
 
-    auto *msg = static_cast<MscCreate *>(chart->instanceEvents().at(0));
+    auto *msg = static_cast<MscCreate *>(chart->eventsForInstance(instance).at(0));
     QCOMPARE(msg->fullName(), QString("Heartbeat,120"));
     QVERIFY(msg->parameters().isEmpty());
 }
@@ -196,30 +200,18 @@ void tst_MscReader::testMessageCreateInstance()
               endmscdocument;")
                                        .arg(msgNames[0], msgNames[2], msgNames[3], msgNames[4], msgNames[5]);
 
-    // expected messages order is:
-    // 0 / 6 "Msg01"
-    // 1 / 6 "" // create New_Instance1
-    // 2 / 6 "Msg02"
-    // 3 / 6 "Msg03"
-    // 4 / 6 "Msg04"
-    // 5 / 6 "Msg05"
-
     QScopedPointer<MscModel> model(m_reader->parseText(msc));
     QCOMPARE(model->documents().size(), 1);
     QCOMPARE(model->documents().first()->charts().size(), 1);
 
     MscChart *chart = model->documents().first()->charts().first();
     QCOMPARE(chart->instances().size(), 3);
+    MscInstance *instance1 = chart->instances().at(1);
 
     QCOMPARE(chart->totalEventNumber(), 6);
-
-    for (int i = 0; i < chart->totalEventNumber(); ++i) {
-        if (MscMessage *message = dynamic_cast<MscMessage *>(chart->instanceEvents().at(i))) {
-            const MscMessage::MessageType expectedType =
-                    i == 1 ? MscMessage::MessageType::Create : MscMessage::MessageType::Message;
-
-            QCOMPARE(message->name(), msgNames.at(i));
-            QCOMPARE(message->messageType(), expectedType);
-        }
-    }
+    QVector<MscInstanceEvent *> events = chart->eventsForInstance(instance1);
+    QCOMPARE(events.size(), 4);
+    MscMessage *message = dynamic_cast<MscMessage *>(events.at(0));
+    QVERIFY(message != nullptr);
+    QCOMPARE(message->messageType(), MscMessage::MessageType::Create);
 }

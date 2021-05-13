@@ -135,7 +135,7 @@ void tst_MscReader::testEntityComments()
     QCOMPARE(instance->comment()->text(), QString("instance comment"));
 
     QCOMPARE(chart->totalEventNumber(), 5);
-    MscInstanceEvent *event = chart->instanceEvents().at(0);
+    MscInstanceEvent *event = chart->eventsForInstance(instance).at(0);
     QCOMPARE(event->comment()->text(), QString("msg comment"));
 }
 
@@ -255,13 +255,14 @@ void tst_MscReader::testCondition()
     MscChart *chart = model->charts().at(0);
 
     QCOMPARE(chart->instances().size(), 1);
+    MscInstance *instance = chart->instances().at(0);
     QCOMPARE(chart->totalEventNumber(), 2);
 
-    auto *condition = static_cast<MscCondition *>(chart->instanceEvents().at(0));
+    auto *condition = static_cast<MscCondition *>(chart->eventsForInstance(instance).at(0));
     QCOMPARE(condition->name(), QString("Con_1"));
     QCOMPARE(condition->shared(), true);
 
-    condition = static_cast<MscCondition *>(chart->instanceEvents().at(1));
+    condition = static_cast<MscCondition *>(chart->eventsForInstance(instance).at(1));
     QCOMPARE(condition->name(), QString("Con_2"));
     QCOMPARE(condition->shared(), false);
 
@@ -284,19 +285,20 @@ void tst_MscReader::testCoregion()
     MscChart *chart = model->charts().at(0);
 
     QCOMPARE(chart->instances().size(), 1);
+    MscInstance *instance = chart->instances().at(0);
     QCOMPARE(chart->totalEventNumber(), 4);
 
-    auto event = chart->instanceEvents().at(0);
+    auto event = chart->eventsForInstance(instance).at(0);
     QCOMPARE(event->entityType(), MscEntity::EntityType::Coregion);
     auto coregion = static_cast<MscCoregion *>(event);
     QCOMPARE(coregion->type(), MscCoregion::Type::Begin);
 
-    event = chart->instanceEvents().at(1);
+    event = chart->eventsForInstance(instance).at(1);
     QCOMPARE(event->entityType(), MscEntity::EntityType::Timer);
-    event = chart->instanceEvents().at(2);
+    event = chart->eventsForInstance(instance).at(2);
     QCOMPARE(event->entityType(), MscEntity::EntityType::Message);
 
-    event = chart->instanceEvents().at(3);
+    event = chart->eventsForInstance(instance).at(3);
     QCOMPARE(event->entityType(), MscEntity::EntityType::Coregion);
     coregion = static_cast<MscCoregion *>(event);
     QCOMPARE(coregion->type(), MscCoregion::Type::End);
@@ -321,28 +323,29 @@ void tst_MscReader::testTimer()
     MscChart *chart = model->charts().at(0);
 
     QCOMPARE(chart->instances().size(), 1);
+    MscInstance *instance = chart->instances().at(0);
     QCOMPARE(chart->totalEventNumber(), 5);
 
-    auto event = chart->instanceEvents().at(0);
+    auto event = chart->eventsForInstance(instance).at(0);
     QVERIFY(event->entityType() == MscEntity::EntityType::Timer);
     auto timer = static_cast<MscTimer *>(event);
     QCOMPARE(timer->name(), QString("T1"));
     QCOMPARE(timer->timerType(), MscTimer::TimerType::Start);
 
-    event = chart->instanceEvents().at(1);
+    event = chart->eventsForInstance(instance).at(1);
     QVERIFY(event->entityType() == MscEntity::EntityType::Timer);
     timer = static_cast<MscTimer *>(event);
     QCOMPARE(timer->name(), QString("T2"));
     QCOMPARE(timer->timerType(), MscTimer::TimerType::Stop);
 
-    event = chart->instanceEvents().at(2);
+    event = chart->eventsForInstance(instance).at(2);
     QVERIFY(event->entityType() == MscEntity::EntityType::Timer);
     timer = static_cast<MscTimer *>(event);
     QCOMPARE(timer->name(), QString("T3"));
     QCOMPARE(timer->timerType(), MscTimer::TimerType::Timeout);
 
     // check for timer instance name
-    event = chart->instanceEvents().at(3);
+    event = chart->eventsForInstance(instance).at(3);
     QVERIFY(event->entityType() == MscEntity::EntityType::Timer);
     timer = static_cast<MscTimer *>(event);
     QCOMPARE(timer->name(), QString("T1"));
@@ -351,7 +354,7 @@ void tst_MscReader::testTimer()
     QCOMPARE(timer->fullName(), QString("T1,1"));
 
     // check if a timer can have the name "timer"
-    event = chart->instanceEvents().at(4);
+    event = chart->eventsForInstance(instance).at(4);
     QVERIFY(event->entityType() == MscEntity::EntityType::Timer);
     timer = static_cast<MscTimer *>(event);
     QCOMPARE(timer->name(), QString("timer"));
@@ -375,14 +378,16 @@ void tst_MscReader::testTimerRelation()
     MscChart *chart = model->charts().at(0);
 
     QCOMPARE(chart->instances().size(), 2);
+    MscInstance *instance1 = chart->instances().at(0);
+    MscInstance *instance2 = chart->instances().at(1);
     QCOMPARE(chart->totalEventNumber(), 4);
-    auto event = chart->instanceEvents().at(0);
+    auto event = chart->eventsForInstance(instance1).at(0);
     QVERIFY(event->entityType() == MscEntity::EntityType::Timer);
     auto timer1 = static_cast<MscTimer *>(event);
-    event = chart->instanceEvents().at(1);
+    event = chart->eventsForInstance(instance1).at(1);
     QVERIFY(event->entityType() == MscEntity::EntityType::Timer);
     auto timer2 = static_cast<MscTimer *>(event);
-    event = chart->instanceEvents().at(2);
+    event = chart->eventsForInstance(instance1).at(2);
     QVERIFY(event->entityType() == MscEntity::EntityType::Timer);
     auto timer3 = static_cast<MscTimer *>(event);
 
@@ -395,7 +400,7 @@ void tst_MscReader::testTimerRelation()
     QVERIFY(timer3->precedingTimer() == nullptr);
     QVERIFY(timer3->followingTimer() == nullptr);
 
-    event = chart->instanceEvents().at(3);
+    event = chart->eventsForInstance(instance2).at(0);
     QVERIFY(event->entityType() == MscEntity::EntityType::Timer);
     auto timer4 = static_cast<MscTimer *>(event);
     QVERIFY(timer4->precedingTimer() == nullptr);
@@ -427,11 +432,13 @@ void tst_MscReader::testTimerRelation()
     model.reset(m_reader->parseText(msc));
     QCOMPARE(model->charts().size(), 1);
     chart = model->charts().at(0);
+    MscInstance *instance = chart->instances().at(0);
     QCOMPARE(chart->totalEventNumber(), 18);
 
     QVector<msc::MscTimer *> timers;
-    for (int i = 0; i < chart->totalEventNumber(); ++i)
-        timers.append(qobject_cast<MscTimer *>(chart->instanceEvents().at(i)));
+    for (int i = 0; i < chart->totalEventNumber(); ++i) {
+        timers.append(qobject_cast<MscTimer *>(chart->eventsForInstance(instance).at(i)));
+    }
 
     QVERIFY(timers[0]->precedingTimer() == nullptr);
     QVERIFY(timers[0]->followingTimer() == timers[1]);
@@ -469,21 +476,22 @@ void tst_MscReader::testAction()
     MscChart *chart = model->charts().at(0);
 
     QCOMPARE(chart->instances().size(), 1);
+    MscInstance *instance = chart->instances().at(0);
     QCOMPARE(chart->totalEventNumber(), 5);
 
-    auto action = static_cast<MscAction *>(chart->instanceEvents().at(0));
+    auto action = static_cast<MscAction *>(chart->eventsForInstance(instance).at(0));
     QVERIFY(action != nullptr);
     QCOMPARE(action->actionType(), MscAction::ActionType::Informal);
     QCOMPARE(action->informalAction(), QString("Stop"));
     QCOMPARE(action->instance(), chart->instances().at(0));
 
-    action = static_cast<MscAction *>(chart->instanceEvents().at(1));
+    action = static_cast<MscAction *>(chart->eventsForInstance(instance).at(1));
     QVERIFY(action != nullptr);
     QCOMPARE(action->actionType(), MscAction::ActionType::Formal);
     QCOMPARE(action->dataStatements().size(), 2);
     QCOMPARE(action->instance(), chart->instances().at(0));
 
-    action = static_cast<MscAction *>(chart->instanceEvents().at(3));
+    action = static_cast<MscAction *>(chart->eventsForInstance(instance).at(3));
     QVERIFY(action != nullptr);
     QCOMPARE(action->actionType(), MscAction::ActionType::Informal);
     QCOMPARE(action->informalAction(),
@@ -755,6 +763,6 @@ void tst_MscReader::testNameFiltering()
     auto *instance2 = static_cast<MscInstance *>(chart->instances().at(1));
     QCOMPARE(instance2->name(), QString("`FLX`Inst_2`"));
 
-    auto *condition = static_cast<MscCondition *>(chart->instanceEvents().at(0));
+    auto *condition = static_cast<MscCondition *>(chart->eventsForInstance(instance1).at(0));
     QCOMPARE(condition->name(), QString("Con_2"));
 }

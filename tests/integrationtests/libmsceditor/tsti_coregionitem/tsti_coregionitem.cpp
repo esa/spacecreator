@@ -78,9 +78,10 @@ void tsti_CoregionItem::testMoveTopUp()
                          ENDMSCDOCUMENT;");
     loadView(msc);
 
-    auto action = qobject_cast<msc::MscAction *>(m_chart->instanceEvents().at(0));
-    auto coregionBegin = qobject_cast<msc::MscCoregion *>(m_chart->instanceEvents().at(1));
-    auto coregionEnd = qobject_cast<msc::MscCoregion *>(m_chart->instanceEvents().at(2));
+    MscInstance *instance = m_chart->instances().at(0);
+    auto action = qobject_cast<msc::MscAction *>(m_chart->eventsForInstance(instance).at(0));
+    auto coregionBegin = qobject_cast<msc::MscCoregion *>(m_chart->eventsForInstance(instance).at(1));
+    auto coregionEnd = qobject_cast<msc::MscCoregion *>(m_chart->eventsForInstance(instance).at(2));
 
     msc::ActionItem *actionItem = m_chartModel->itemForAction(action);
     msc::CoregionItem *coregionItem = m_chartModel->itemForCoregion(coregionBegin);
@@ -94,9 +95,9 @@ void tsti_CoregionItem::testMoveTopUp()
     vstest::sendMouseDrag(m_view->viewport(), topGrip, actionTop);
     waitForLayoutUpdate();
 
-    QCOMPARE(m_chart->indexofEvent(coregionBegin), 0);
-    QCOMPARE(m_chart->indexofEvent(coregionEnd), 2);
-    QCOMPARE(m_chart->indexofEvent(action), 1);
+    QCOMPARE(m_chart->indexofEventAtInstance(coregionBegin, instance), 0);
+    QCOMPARE(m_chart->indexofEventAtInstance(coregionEnd, instance), 2);
+    QCOMPARE(m_chart->indexofEventAtInstance(action, instance), 1);
     QVERIFY(vstest::isVerticalInside(actionItem, coregionItem));
     QVERIFY(isInCoregion(coregionItem, actionItem));
 }
@@ -114,9 +115,10 @@ void tsti_CoregionItem::testMoveTopDown()
                          ENDMSCDOCUMENT;");
     loadView(msc);
 
-    auto action = qobject_cast<msc::MscAction *>(m_chart->instanceEvents().at(1));
-    auto coregionBegin = qobject_cast<msc::MscCoregion *>(m_chart->instanceEvents().at(0));
-    auto coregionEnd = qobject_cast<msc::MscCoregion *>(m_chart->instanceEvents().at(2));
+    MscInstance *instance = m_chart->instances().at(0);
+    auto action = qobject_cast<msc::MscAction *>(m_chart->eventsForInstance(instance).at(1));
+    auto coregionBegin = qobject_cast<msc::MscCoregion *>(m_chart->eventsForInstance(instance).at(0));
+    auto coregionEnd = qobject_cast<msc::MscCoregion *>(m_chart->eventsForInstance(instance).at(2));
 
     msc::ActionItem *actionItem = m_chartModel->itemForAction(action);
     msc::CoregionItem *coregionItem = m_chartModel->itemForCoregion(coregionBegin);
@@ -130,9 +132,9 @@ void tsti_CoregionItem::testMoveTopDown()
     vstest::sendMouseDrag(m_view->viewport(), topGrip, actionBottom);
     waitForLayoutUpdate();
 
-    QCOMPARE(m_chart->indexofEvent(coregionBegin), 1);
-    QCOMPARE(m_chart->indexofEvent(coregionEnd), 2);
-    QCOMPARE(m_chart->indexofEvent(action), 0);
+    QCOMPARE(m_chart->indexofEventAtInstance(coregionBegin, instance), 1);
+    QCOMPARE(m_chart->indexofEventAtInstance(coregionEnd, instance), 2);
+    QCOMPARE(m_chart->indexofEventAtInstance(action, instance), 0);
     QVERIFY(vstest::isAbove(actionItem, coregionItem));
     QVERIFY(!isInCoregion(coregionItem, actionItem));
 }
@@ -150,9 +152,10 @@ void tsti_CoregionItem::testMoveBottomDown()
                          ENDMSCDOCUMENT;");
     loadView(msc);
 
-    auto action = qobject_cast<msc::MscAction *>(m_chart->instanceEvents().at(2));
-    auto coregionBegin = qobject_cast<msc::MscCoregion *>(m_chart->instanceEvents().at(0));
-    auto coregionEnd = qobject_cast<msc::MscCoregion *>(m_chart->instanceEvents().at(1));
+    MscInstance *instance = m_chart->instances().at(0);
+    auto action = qobject_cast<msc::MscAction *>(m_chart->eventsForInstance(instance).at(2));
+    auto coregionBegin = qobject_cast<msc::MscCoregion *>(m_chart->eventsForInstance(instance).at(0));
+    auto coregionEnd = qobject_cast<msc::MscCoregion *>(m_chart->eventsForInstance(instance).at(1));
 
     msc::ActionItem *actionItem = m_chartModel->itemForAction(action);
     msc::CoregionItem *coregionItem = m_chartModel->itemForCoregion(coregionBegin);
@@ -166,9 +169,9 @@ void tsti_CoregionItem::testMoveBottomDown()
     vstest::sendMouseDrag(m_view->viewport(), bottomGrip, actionBottom);
     waitForLayoutUpdate();
 
-    QCOMPARE(m_chart->indexofEvent(coregionBegin), 0);
-    QCOMPARE(m_chart->indexofEvent(coregionEnd), 2);
-    QCOMPARE(m_chart->indexofEvent(action), 1);
+    QCOMPARE(m_chart->indexofEventAtInstance(coregionBegin, instance), 0);
+    QCOMPARE(m_chart->indexofEventAtInstance(coregionEnd, instance), 2);
+    QCOMPARE(m_chart->indexofEventAtInstance(action, instance), 1);
     QVERIFY(vstest::isVerticalInside(actionItem, coregionItem));
     QVERIFY(isInCoregion(coregionItem, actionItem));
 }
@@ -186,9 +189,10 @@ void tsti_CoregionItem::testMoveBottomUp()
                          ENDMSCDOCUMENT;");
     loadView(msc);
 
-    auto action = qobject_cast<msc::MscAction *>(m_chart->instanceEvents().at(1));
-    auto coregionBegin = qobject_cast<msc::MscCoregion *>(m_chart->instanceEvents().at(0));
-    auto coregionEnd = qobject_cast<msc::MscCoregion *>(m_chart->instanceEvents().at(2));
+    MscInstance *instance = m_chart->instances().at(0);
+    auto action = qobject_cast<msc::MscAction *>(m_chart->eventsForInstance(instance).at(1));
+    auto coregionBegin = qobject_cast<msc::MscCoregion *>(m_chart->eventsForInstance(instance).at(0));
+    auto coregionEnd = qobject_cast<msc::MscCoregion *>(m_chart->eventsForInstance(instance).at(2));
 
     msc::ActionItem *actionItem = m_chartModel->itemForAction(action);
     msc::CoregionItem *coregionItem = m_chartModel->itemForCoregion(coregionBegin);
@@ -202,9 +206,9 @@ void tsti_CoregionItem::testMoveBottomUp()
     vstest::sendMouseDrag(m_view->viewport(), bottomGrip, actionTop);
     waitForLayoutUpdate();
 
-    QCOMPARE(m_chart->indexofEvent(coregionBegin), 0);
-    QCOMPARE(m_chart->indexofEvent(coregionEnd), 1);
-    QCOMPARE(m_chart->indexofEvent(action), 2);
+    QCOMPARE(m_chart->indexofEventAtInstance(coregionBegin, instance), 0);
+    QCOMPARE(m_chart->indexofEventAtInstance(coregionEnd, instance), 1);
+    QCOMPARE(m_chart->indexofEventAtInstance(action, instance), 2);
     QVERIFY(vstest::isBelow(actionItem, coregionItem));
     QVERIFY(!isInCoregion(coregionItem, actionItem));
 }
@@ -225,9 +229,10 @@ void tsti_CoregionItem::testMovemessageInside()
                          ENDMSCDOCUMENT;");
     loadView(msc);
 
-    auto coregionBegin = qobject_cast<msc::MscCoregion *>(m_chart->instanceEvents().at(0));
-    auto coregionEnd = qobject_cast<msc::MscCoregion *>(m_chart->instanceEvents().at(1));
-    auto message = qobject_cast<msc::MscMessage *>(m_chart->instanceEvents().at(2));
+    MscInstance *instance = m_chart->instances().at(0);
+    auto coregionBegin = qobject_cast<msc::MscCoregion *>(m_chart->eventsForInstance(instance).at(0));
+    auto coregionEnd = qobject_cast<msc::MscCoregion *>(m_chart->eventsForInstance(instance).at(1));
+    auto message = qobject_cast<msc::MscMessage *>(m_chart->eventsForInstance(instance).at(2));
 
     msc::CoregionItem *coregionItem = m_chartModel->itemForCoregion(coregionBegin);
     msc::MessageItem *messageItem = m_chartModel->itemForMessage(message);
@@ -241,9 +246,9 @@ void tsti_CoregionItem::testMovemessageInside()
     vstest::sendMouseDrag(m_view->viewport(), movePos, insideRegion);
     waitForLayoutUpdate();
 
-    QCOMPARE(m_chart->indexofEvent(coregionBegin), 0);
-    QCOMPARE(m_chart->indexofEvent(coregionEnd), 2);
-    QCOMPARE(m_chart->indexofEvent(message), 1);
+    QCOMPARE(m_chart->indexofEventAtInstance(coregionBegin, instance), 0);
+    QCOMPARE(m_chart->indexofEventAtInstance(coregionEnd, instance), 2);
+    QCOMPARE(m_chart->indexofEventAtInstance(message, instance), 1);
     QVERIFY(isInCoregion(coregionItem, messageItem));
 }
 
@@ -264,10 +269,12 @@ void tsti_CoregionItem::testMovemessageSourceInside()
                          ENDMSCDOCUMENT;");
     loadView(msc);
 
-    auto coregionBegin = qobject_cast<msc::MscCoregion *>(m_chart->instanceEvents().at(0));
-    auto coregionEnd = qobject_cast<msc::MscCoregion *>(m_chart->instanceEvents().at(1));
-    auto action = qobject_cast<msc::MscAction *>(m_chart->instanceEvents().at(2));
-    auto message = qobject_cast<msc::MscMessage *>(m_chart->instanceEvents().at(3));
+    MscInstance *instance1 = m_chart->instances().at(0);
+    MscInstance *instance2 = m_chart->instances().at(1);
+    auto coregionBegin = qobject_cast<msc::MscCoregion *>(m_chart->eventsForInstance(instance1).at(0));
+    auto coregionEnd = qobject_cast<msc::MscCoregion *>(m_chart->eventsForInstance(instance1).at(1));
+    auto action = qobject_cast<msc::MscAction *>(m_chart->eventsForInstance(instance2).at(0));
+    auto message = qobject_cast<msc::MscMessage *>(m_chart->eventsForInstance(instance2).at(1));
 
     msc::CoregionItem *coregionItem = m_chartModel->itemForCoregion(coregionBegin);
     msc::MessageItem *messageItem = m_chartModel->itemForMessage(message);
@@ -284,9 +291,11 @@ void tsti_CoregionItem::testMovemessageSourceInside()
     vstest::sendMouseDrag(m_view->viewport(), sourcePos, insideRegion);
     waitForLayoutUpdate();
 
-    QVERIFY(m_chart->indexofEvent(message) > m_chart->indexofEvent(coregionBegin));
-    QVERIFY(m_chart->indexofEvent(message) < m_chart->indexofEvent(coregionEnd));
-    QVERIFY(m_chart->indexofEvent(message) > m_chart->indexofEvent(action));
+    QVERIFY(m_chart->indexofEventAtInstance(message, instance1)
+            > m_chart->indexofEventAtInstance(coregionBegin, instance1));
+    QVERIFY(m_chart->indexofEventAtInstance(message, instance1)
+            < m_chart->indexofEventAtInstance(coregionEnd, instance1));
+    QVERIFY(m_chart->indexofEventAtInstance(message, instance1) > m_chart->indexofEventAtInstance(action, instance1));
     QVERIFY(!isInCoregion(coregionItem, actionItem));
     QVERIFY(isInCoregion(coregionItem, messageItem));
 }
@@ -307,8 +316,9 @@ void tsti_CoregionItem::testMoveMessageCloseToCoregion()
                          ENDMSCDOCUMENT;");
     loadView(msc);
 
-    auto coregionBegin = qobject_cast<msc::MscCoregion *>(m_chart->instanceEvents().at(0));
-    auto message = qobject_cast<msc::MscMessage *>(m_chart->instanceEvents().at(2));
+    MscInstance *instance = m_chart->instances().at(0);
+    auto coregionBegin = qobject_cast<msc::MscCoregion *>(m_chart->eventsForInstance(instance).at(0));
+    auto message = qobject_cast<msc::MscMessage *>(m_chart->eventsForInstance(instance).at(2));
 
     msc::CoregionItem *coregionItem = m_chartModel->itemForCoregion(coregionBegin);
     msc::MessageItem *messageItem = m_chartModel->itemForMessage(message);
@@ -324,8 +334,8 @@ void tsti_CoregionItem::testMoveMessageCloseToCoregion()
     vstest::sendMouseDrag(m_view->viewport(), sourcePos, closeBelowRegion);
     waitForLayoutUpdate();
 
-    QCOMPARE(m_chart->indexofEvent(coregionBegin), 0);
-    QCOMPARE(m_chart->indexofEvent(message), 2);
+    QCOMPARE(m_chart->indexofEventAtInstance(coregionBegin, instance), 0);
+    QCOMPARE(m_chart->indexofEventAtInstance(message, instance), 2);
     QVERIFY(!isInCoregion(coregionItem, messageItem));
 }
 
@@ -346,9 +356,11 @@ void tsti_CoregionItem::testPushedCoregionNotIncludesMessage()
                          ENDMSCDOCUMENT;");
     loadView(msc);
 
-    auto coregionBegin = qobject_cast<msc::MscCoregion *>(m_chart->instanceEvents().at(0));
-    auto message = qobject_cast<msc::MscMessage *>(m_chart->instanceEvents().at(2));
-    auto action = qobject_cast<msc::MscAction *>(m_chart->instanceEvents().at(3));
+    MscInstance *instance1 = m_chart->instances().at(0);
+    MscInstance *instance2 = m_chart->instances().at(1);
+    auto coregionBegin = qobject_cast<msc::MscCoregion *>(m_chart->eventsForInstance(instance1).at(0));
+    auto message = qobject_cast<msc::MscMessage *>(m_chart->eventsForInstance(instance1).at(2));
+    auto action = qobject_cast<msc::MscAction *>(m_chart->eventsForInstance(instance2).at(1));
 
     msc::CoregionItem *coregionItem = m_chartModel->itemForCoregion(coregionBegin);
     msc::MessageItem *messageItem = m_chartModel->itemForMessage(message);
@@ -384,9 +396,13 @@ bool tsti_CoregionItem::isInCoregion(const CoregionItem *coregion, InteractiveOb
 
     // Check in the model
     auto event = qobject_cast<MscInstanceEvent *>(eventItem->modelEntity());
-    const int beginIdx = m_chart->indexofEvent(coregion->begin());
-    const int endIdx = m_chart->indexofEvent(coregion->end());
-    const int eventIdx = m_chart->indexofEvent(event);
+    if (!event->relatesTo(coregion->begin()->instance())) {
+        return false;
+    }
+
+    const int beginIdx = m_chart->indexofEventAtInstance(coregion->begin(), coregion->begin()->instance());
+    const int endIdx = m_chart->indexofEventAtInstance(coregion->end(), coregion->end()->instance());
+    const int eventIdx = m_chart->indexofEventAtInstance(event, coregion->begin()->instance());
     return (beginIdx < eventIdx) && (endIdx > eventIdx) && event->relatesTo(coregion->begin()->instance());
 }
 

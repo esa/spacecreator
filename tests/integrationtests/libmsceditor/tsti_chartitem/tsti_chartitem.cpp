@@ -66,7 +66,8 @@ void tsti_Chartitem::testKeepSpaceAtBottom()
     msc::ChartItem *chartItem = m_chartModel->itemForChart();
     const QRectF oldRect = chartItem->sceneBoundingRect();
 
-    auto message = qobject_cast<msc::MscMessage *>(m_chart->instanceEvents().at(0));
+    auto instanceA = qobject_cast<msc::MscInstance *>(m_chart->instances().at(0));
+    auto message = qobject_cast<msc::MscMessage *>(m_chart->eventsForInstance(instanceA).at(0));
     msc::MessageItem *messageItem = m_chartModel->itemForMessage(message);
 
     auto instanceB = qobject_cast<msc::MscInstance *>(m_chart->instances().at(1));
@@ -104,17 +105,18 @@ void tsti_Chartitem::testItemLimit()
     m_chartModel->setVisibleItemLimit(3);
     loadView(msc);
 
+    auto instanceA = qobject_cast<msc::MscInstance *>(m_chart->instances().at(0));
+    auto instanceB = qobject_cast<msc::MscInstance *>(m_chart->instances().at(1));
     QCOMPARE(m_chart->totalEventNumber(), 3);
     QCOMPARE(m_chartModel->instanceEventItems().size(), 3);
-    InteractiveObject *action0 = m_chartModel->itemForEntity(m_chart->instanceEvents().at(0));
+    InteractiveObject *action0 = m_chartModel->itemForEntity(m_chart->eventsForInstance(instanceA).at(0));
     QVERIFY(action0 != nullptr);
-    InteractiveObject *action1 = m_chartModel->itemForEntity(m_chart->instanceEvents().at(1));
+    InteractiveObject *action1 = m_chartModel->itemForEntity(m_chart->eventsForInstance(instanceB).at(0));
     QVERIFY(action1 != nullptr);
-    InteractiveObject *message2 = m_chartModel->itemForEntity(m_chart->instanceEvents().at(2));
+    InteractiveObject *message2 = m_chartModel->itemForEntity(m_chart->eventsForInstance(instanceA).at(1));
     QVERIFY(message2 != nullptr);
 
     // append one action
-    auto instanceA = qobject_cast<msc::MscInstance *>(m_chart->instances().at(0));
     auto action2 = new msc::MscAction("Action02");
     action2->setInstance(instanceA);
     auto addCommand = new cmd::CmdActionItemCreate(action2, instanceA, -1, m_chartModel.data());
@@ -126,7 +128,7 @@ void tsti_Chartitem::testItemLimit()
     QVERIFY(!items.contains(action0)); // action0 is not shown anymore
     QVERIFY(items.contains(action1));
     QVERIFY(items.contains(message2));
-    InteractiveObject *action3Item = m_chartModel->itemForEntity(m_chart->instanceEvents().at(3));
+    InteractiveObject *action3Item = m_chartModel->itemForEntity(m_chart->eventsForInstance(instanceA).at(1));
     QVERIFY(action3Item != nullptr);
 
     // append one more action, pushing the message to the top

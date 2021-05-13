@@ -102,8 +102,10 @@ void tsti_MessageItem::testMoveActionInMessage()
         endmscdocument;");
     loadView(msc);
 
-    auto message = qobject_cast<msc::MscMessage *>(m_chart->instanceEvents().at(0));
-    auto action = qobject_cast<msc::MscAction *>(m_chart->instanceEvents().at(1));
+    MscInstance *instance2 = m_chart->instances().at(1);
+
+    auto message = qobject_cast<msc::MscMessage *>(m_chart->eventsForInstance(instance2).at(0));
+    auto action = qobject_cast<msc::MscAction *>(m_chart->eventsForInstance(instance2).at(1));
     msc::MessageItem *messageItem = m_chartModel->itemForMessage(message);
     msc::ActionItem *actionItem = m_chartModel->itemForAction(action);
 

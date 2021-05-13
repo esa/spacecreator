@@ -282,7 +282,7 @@ bool MscModel::checkAllMessagesForAsn1Compliance(QStringList *faultyMessages) co
         appendMessages(childDoc, messages);
     }
     for (msc::MscChart *childChart : m_charts) {
-        appendMessages(childChart, messages);
+        messages.append(childChart->messages());
     }
 
     bool ok = true;
@@ -305,16 +305,7 @@ void MscModel::appendMessages(msc::MscDocument *doc, QVector<msc::MscMessage *> 
         appendMessages(childDoc, messages);
     }
     for (msc::MscChart *childChart : doc->charts()) {
-        appendMessages(childChart, messages);
-    }
-}
-
-void MscModel::appendMessages(msc::MscChart *chart, QVector<msc::MscMessage *> &messages) const
-{
-    for (msc::MscInstanceEvent *event : chart->instanceEvents()) {
-        if (auto message = qobject_cast<msc::MscMessage *>(event)) {
-            messages.append(message);
-        }
+        messages.append(childChart->messages());
     }
 }
 

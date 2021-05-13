@@ -62,8 +62,9 @@ void tst_EntityDeleteTool::testDeleteCoregion()
                          ENDMSCDOCUMENT;");
     parseMsc(msc);
 
+    MscInstance *instance = m_chart->instances().at(0);
     QCOMPARE(m_chart->totalEventNumber(), 2); // Coregion has a begin- and end-event.
-    auto coregion = qobject_cast<msc::MscCoregion *>(m_chart->instanceEvents().at(0));
+    auto coregion = qobject_cast<msc::MscCoregion *>(m_chart->eventsForInstance(instance).at(0));
     msc::CoregionItem *regionItem = m_chartModel->itemForCoregion(coregion);
     regionItem->setSelected(true);
 

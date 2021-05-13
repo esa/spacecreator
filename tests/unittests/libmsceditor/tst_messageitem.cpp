@@ -255,9 +255,10 @@ void tst_MessageItem::testPositionUpdateOnInstanceChange()
                     ENDMSCDOCUMENT;";
     parseMsc(mscText);
     QCOMPARE(m_instanceItems.size(), 3);
+    MscInstance *instance = m_chart->instances().at(0);
     QCOMPARE(m_chart->totalEventNumber(), 1);
 
-    MscMessage *message = qobject_cast<MscMessage *>(m_chart->instanceEvents().at(0));
+    MscMessage *message = qobject_cast<MscMessage *>(m_chart->eventsForInstance(instance).at(0));
     MessageItem *messageItem = m_chartModel->itemForMessage(message);
     QVERIFY(messageItem != nullptr);
 
@@ -310,9 +311,10 @@ void tst_MessageItem::testFirstMessagePosition()
     ENDMSCDOCUMENT;";
     parseMsc(mscText);
     QCOMPARE(m_instanceItems.size(), 5);
+    MscInstance *instance1 = m_chart->instances().at(0);
     QCOMPARE(m_chart->totalEventNumber(), 7);
 
-    MscMessage *message = qobject_cast<MscMessage *>(m_chart->instanceEvents().at(0));
+    MscMessage *message = qobject_cast<MscMessage *>(m_chart->eventsForInstance(instance1).at(0));
     MessageItem *messageItem = m_chartModel->itemForMessage(message);
     QVERIFY(messageItem != nullptr);
     ChartItem *chartItem = m_chartModel->chartItem();

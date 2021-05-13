@@ -58,10 +58,12 @@ void tsti_TimerItem::testMoveMessageOutOfStartStopTimer()
                      ENDMSCDOCUMENT;");
     loadView(msc);
 
-    auto message = qobject_cast<msc::MscMessage *>(m_chart->instanceEvents().at(1));
+    MscInstance *instanceA = m_chart->instances().at(0);
+
+    auto message = qobject_cast<msc::MscMessage *>(m_chart->eventsForInstance(instanceA).at(1));
     msc::MessageItem *messageItem = m_chartModel->itemForMessage(message);
 
-    auto timeout = qobject_cast<msc::MscTimer *>(m_chart->instanceEvents().at(2));
+    auto timeout = qobject_cast<msc::MscTimer *>(m_chart->eventsForInstance(instanceA).at(2));
     msc::TimerItem *timeoutItem = m_chartModel->itemForTimer(timeout);
 
     // Move the message "below" the stop timer

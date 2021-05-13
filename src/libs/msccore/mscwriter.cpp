@@ -444,8 +444,9 @@ QString MscWriter::serialize(const MscChart *chart, int tabsSize)
 
     QString instances;
 
-    for (const auto *instance : chart->instances())
-        instances += serialize(instance, chart->instanceEvents(), tabsSize + 1);
+    for (auto instance : chart->instances()) {
+        instances += serialize(instance, chart->eventsForInstance(instance), tabsSize + 1);
+    }
 
     const QString &tabString = tabs(tabsSize);
     const QString chartSerialized(QString("%1msc %2%4;%5\n%3%1endmsc;\n")

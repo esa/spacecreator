@@ -95,7 +95,6 @@ public:
     msc::MscInstance *nearestInstance(const QPointF &pos);
     int eventIndex(const QPointF &pt, MscInstanceEvent *ignoreEvent = nullptr);
     int eventInstanceIndex(const QPointF &pt, MscInstance *instance, MscInstanceEvent *ignoreEvent = nullptr);
-    int indexOfEvent(MscInstanceEvent *instanceEvent) const;
     msc::MscInstanceEvent *eventAtPosition(const QPointF &pos);
 
     QSizeF preferredChartBoxSize() const;
@@ -117,8 +116,6 @@ public:
     const QVector<msc::TimerItem *> timersOfInstance(const MscInstance *instance) const;
 
     const QRectF &instancesRect() const;
-
-    QVector<MscInstanceEvent *> visuallySortedEvents() const;
 
     void setSystemChecker(msc::SystemChecks *checker);
     msc::SystemChecks *systemChecker() const;

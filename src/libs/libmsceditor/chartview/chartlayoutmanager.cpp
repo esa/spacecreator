@@ -215,7 +215,7 @@ void ChartLayoutManager::setCurrentChart(MscChart *chart)
             const QRectF &preferredRectCif = d->m_layoutInfo.m_chartItem->storedCustomRect();
             const QRectF &preferredRectDefault = QRectF({ 0., 0. }, preferredChartBoxSize());
             const bool emptyDoc =
-                    d->m_currentChart->instances().isEmpty() && d->m_currentChart->instanceEvents().isEmpty();
+                    d->m_currentChart->instances().isEmpty() && d->m_currentChart->totalEventNumber() == 0;
             applyContentRect(preferredRectCif.isNull() ? preferredRectDefault : preferredRectCif);
             if (preferredRectCif.isNull() && emptyDoc) {
                 QSignalBlocker suppressCifChangeNotifycation(d->m_layoutInfo.m_chartItem);
@@ -1234,14 +1234,6 @@ int ChartLayoutManager::eventInstanceIndex(const QPointF &pt, MscInstance *insta
     return idx;
 }
 
-int ChartLayoutManager::indexOfEvent(MscInstanceEvent *instanceEvent) const
-{
-    if (!d->m_currentChart) {
-        return -1;
-    }
-    return d->m_currentChart->indexofEvent(instanceEvent);
-}
-
 MscInstanceEvent *ChartLayoutManager::eventAtPosition(const QPointF &scenePos)
 {
     for (auto eventItem : d->m_instanceEventItems) {
@@ -1604,7 +1596,7 @@ CoregionItem *ChartLayoutManager::addCoregionItem(MscCoregion *coregion)
             return static_cast<MscCoregion *>(event)->type() == MscCoregion::Type::Begin;
         };
 
-        const QVector<MscInstanceEvent *> events = currentChart()->instanceEvents();
+        const QVector<MscCoregion *> events = currentChart()->coregions();
         auto it = std::find(events.rbegin(), events.rend(), coregion);
         auto res = std::find_if(it, events.rend(), isCoregionBegin);
         if (res == events.rend())
@@ -1790,8 +1782,8 @@ void ChartLayoutManager::onMessageRetargeted(MessageItem *item, const QPointF &p
         currentInstance = message->targetInstance();
         otherInstance = message->sourceInstance();
     }
-    const int currentIdx = d->m_currentChart->instanceEvents().indexOf(message);
-    const int newIdx = eventIndex(pos);
+    const int currentIdx = d->m_currentChart->indexofEventAtInstance(message, currentInstance);
+    const int newIdx = eventInstanceIndex(pos, newInstance, message);
     if (((newInstance != currentInstance && newInstance != otherInstance) || newIdx != currentIdx)
             && (newInstance || otherInstance)) {
 
@@ -1991,31 +1983,6 @@ void insertEntity(QMap<int, msc::MscInstanceEvent *> &events, int key, msc::MscI
     }
 }
 
-QVector<msc::MscInstanceEvent *> ChartLayoutManager::visuallySortedEvents() const
-{
-    QMap<int, msc::MscInstanceEvent *> events;
-
-    for (msc::InteractiveObject *eventitem : d->m_instanceEventItemsSorted) {
-        if (auto coregionItem = qobject_cast<CoregionItem *>(eventitem)) {
-            insertEntity(events, coregionItem->sceneBoundingRect().top(), coregionItem->begin(),
-                    d->m_currentChart->instanceEvents());
-            insertEntity(events, coregionItem->sceneBoundingRect().bottom(), coregionItem->end(),
-                    d->m_currentChart->instanceEvents());
-        } else {
-            auto eventEntity = static_cast<msc::MscInstanceEvent *>(eventitem->modelEntity());
-            qreal eventReference = eventitem->sceneBoundingRect().top();
-            if (eventitem->modelEntity()->entityType() == msc::MscEntity::EntityType::Message
-                    || eventitem->modelEntity()->entityType() == msc::MscEntity::EntityType::Create) {
-                auto messageItem = static_cast<MessageItem *>(eventitem);
-                eventReference = messageItem->tail().y();
-            }
-            insertEntity(events, eventReference, eventEntity, d->m_currentChart->instanceEvents());
-        }
-    }
-
-    return events.values().toVector();
-}
-
 /*!
    Sets the object to check if the msc entities correspond to the iv model
  */
@@ -2072,7 +2039,7 @@ QVector<MscInstanceEvent *> ChartLayoutManager::visibleEvents() const
     const QVector<MscInstanceEvent *> allEvents = d->m_currentChart->instanceEvents();
 
     if (d->m_visibleItemLimit <= 0 || allEvents.size() <= d->m_visibleItemLimit) {
-        return d->m_currentChart->instanceEvents();
+        return allEvents;
     }
 
     QVector<MscInstanceEvent *> lastEvents;

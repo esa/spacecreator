@@ -144,8 +144,9 @@ void tst_CmdMessageItemCreate::testInsertingOrder()
     QCOMPARE(m_chart->totalEventNumber(), names.size());
 
     int i = names.size() - 1;
-    for (msc::MscInstanceEvent *event : m_chart->instanceEvents())
+    for (msc::MscInstanceEvent *event : m_chart->eventsForInstance(m_instance)) {
         QCOMPARE(event->name(), names.at(i--));
+    }
 }
 
 QTEST_MAIN(tst_CmdMessageItemCreate)

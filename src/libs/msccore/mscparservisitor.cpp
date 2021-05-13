@@ -955,21 +955,18 @@ void MscParserVisitor::checkMessagesDoubleNotation() const
                         instanceName(missedIn ? message->targetInstance() : message->sourceInstance()));
     };
 
-    for (const MscInstanceEvent *event : m_currentChart->instanceEvents()) {
-        if (event->entityType() == MscEntity::EntityType::Message) {
-            const MscMessage *message = static_cast<const MscMessage *>(event);
-            if (!message->isGlobal()) { // Ignore messages to/from Env
-                QString errorMessage;
-                if (!message->m_descrIn.isComplete()) {
-                    errorMessage = prepareErrorMessage(message, message->m_descrOut);
-                }
-                if (!message->m_descrOut.isComplete()) {
-                    errorMessage = prepareErrorMessage(message, message->m_descrIn);
-                }
-
-                if (!errorMessage.isEmpty())
-                    throw ParserException(errorMessage);
+    for (const MscMessage *message : m_currentChart->messages()) {
+        if (!message->isGlobal()) { // Ignore messages to/from Env
+            QString errorMessage;
+            if (!message->m_descrIn.isComplete()) {
+                errorMessage = prepareErrorMessage(message, message->m_descrOut);
             }
+            if (!message->m_descrOut.isComplete()) {
+                errorMessage = prepareErrorMessage(message, message->m_descrIn);
+            }
+
+            if (!errorMessage.isEmpty())
+                throw ParserException(errorMessage);
         }
     }
 }

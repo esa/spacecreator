@@ -344,14 +344,6 @@ void MscChart::removeInstanceEvent(MscInstanceEvent *instanceEvent)
 }
 
 /*!
-   Return the index (vertical) of the given event
- */
-int MscChart::indexofEvent(MscInstanceEvent *instanceEvent) const
-{
-    return allEvents().indexOf(instanceEvent);
-}
-
-/*!
    \brief MscChart::indicesOfEvent
    \param instanceEvent
    \return
@@ -418,7 +410,17 @@ MscInstanceEvent *MscChart::firstEventOfInstance(MscInstance *instance) const
  */
 int MscChart::totalEventNumber() const
 {
-    return allEvents().size();
+    QSet<MscInstanceEvent *> events;
+    for (auto it = m_events.begin(); it != m_events.end(); ++it) {
+        for (MscInstanceEvent *event : it.value()) {
+            events.insert(event);
+        }
+    }
+    for (MscInstanceEvent *event : m_orphanEvents) {
+        events.insert(event);
+    }
+
+    return events.size();
 }
 
 QHash<MscInstance *, QVector<MscInstanceEvent *>> MscChart::rawEvents() const
@@ -491,6 +493,14 @@ QVector<MscInstance *> MscChart::relatedInstances(MscInstanceEvent *event) const
 QVector<MscMessage *> MscChart::messages() const
 {
     return allEventsOfType<msc::MscMessage>();
+}
+
+/*!
+   Returns all co-regions of this chart
+ */
+QVector<MscCoregion *> MscChart::coregions() const
+{
+    return allEventsOfType<msc::MscCoregion>();
 }
 
 const QVector<MscGate *> &MscChart::gates() const

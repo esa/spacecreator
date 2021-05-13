@@ -92,54 +92,64 @@ void tst_MscChart::testDestructor()
         case MscEntity::EntityType::Chart:
         case MscEntity::EntityType::Document:
             break;
-        case MscEntity::EntityType::Instance:
+        case MscEntity::EntityType::Instance: {
             instance = new MscInstance();
             chart->addInstance(instance);
-            chartEntities.append(chart->instances().first());
+            chartEntities.append(instance);
             break;
-        case MscEntity::EntityType::Message:
-            chart->addInstanceEvent(new MscMessage("name", instance, nullptr), { { instance, -1 } });
-            chartEntities.append(chart->instanceEvents().first());
+        }
+        case MscEntity::EntityType::Message: {
+            auto message = new MscMessage("name", instance, nullptr);
+            chart->addInstanceEvent(message, { { instance, -1 } });
+            chartEntities.append(message);
             break;
-        case MscEntity::EntityType::Timer:
-            chart->addInstanceEvent(new MscTimer("name", instance, MscTimer::TimerType::Start), { { instance, -1 } });
-            chartEntities.append(chart->instanceEvents().first());
+        }
+        case MscEntity::EntityType::Timer: {
+            auto timer = new MscTimer("name", instance, MscTimer::TimerType::Start);
+            chart->addInstanceEvent(timer, { { instance, -1 } });
+            chartEntities.append(timer);
             break;
-        case MscEntity::EntityType::Gate:
-            chart->addGate(new MscGate());
+        }
+        case MscEntity::EntityType::Gate: {
+            auto gate = new MscGate();
+            chart->addGate(gate);
             chartEntities.append(chart->gates().first());
             break;
+        }
         case MscEntity::EntityType::Condition: {
             auto condition = new MscCondition();
             condition->setInstance(instance);
             chart->addInstanceEvent(condition, { { instance, -1 } });
-            chartEntities.append(chart->instanceEvents().first());
+            chartEntities.append(condition);
             break;
         }
         case MscEntity::EntityType::Action: {
             auto action = new MscAction;
             action->setInstance(instance);
             chart->addInstanceEvent(action, { { instance, -1 } });
-            chartEntities.append(chart->instanceEvents().first());
+            chartEntities.append(action);
             break;
         }
-        case MscEntity::EntityType::Coregion:
-            chart->addInstanceEvent(new MscCoregion(instance, MscCoregion::Type::Begin), { { instance, -1 } });
-            chartEntities.append(chart->instanceEvents().first());
+        case MscEntity::EntityType::Coregion: {
+            auto coregion = new MscCoregion(instance, MscCoregion::Type::Begin);
+            chart->addInstanceEvent(coregion, { { instance, -1 } });
+            chartEntities.append(coregion);
             break;
-        case MscEntity::EntityType::Create:
-            chart->addInstanceEvent(new MscCreate("start", instance, nullptr), { { instance, -1 } });
-            chartEntities.append(chart->instanceEvents().first());
+        }
+        case MscEntity::EntityType::Create: {
+            auto create = new MscCreate("start", instance, nullptr);
+            chart->addInstanceEvent(create, { { instance, -1 } });
+            chartEntities.append(create);
             break;
+        }
         case MscEntity::EntityType::Comment: {
             auto comment = new MscComment;
-            auto instance = chart->instances().first();
             Q_ASSERT(instance);
             comment->setCommentString(QLatin1String("Text Comment for the First Instance"));
             comment->attachTo(instance);
             instance->setComment(comment);
             chart->addInstanceEvent(comment, {});
-            chartEntities.append(chart->instanceEvents().first());
+            chartEntities.append(comment);
         } break;
         default:
             QFAIL("It seems a new MscEntity::EntityType has been introduced,\n"
@@ -382,7 +392,9 @@ void tst_MscChart::testAddSharedCondition()
     m_chart->addInstanceEvent(condition2, { { instanceA, 0 }, { instanceB, 1 } });
     QCOMPARE(m_chart->totalEventNumber(), 2);
 
-    QVector<MscInstanceEvent *> events = m_chart->instanceEvents();
+    QVector<MscInstanceEvent *> events = m_chart->eventsForInstance(instanceA);
+    QCOMPARE(events.at(0), condition2);
+    events = m_chart->eventsForInstance(instanceB);
     QCOMPARE(events.at(0), condition1);
     QCOMPARE(events.at(1), condition2);
 }
@@ -405,9 +417,7 @@ void tst_MscChart::testAddSharedConditionMix()
     condition1->setInstance(instanceB);
     m_chart->addInstanceEvent(condition1, { { instanceB, -1 } });
     QCOMPARE(m_chart->totalEventNumber(), 2);
-    QVector<MscInstanceEvent *> events = m_chart->instanceEvents();
-    QCOMPARE(events.at(0), condition1);
-    QCOMPARE(events.at(1), timer1);
+    QCOMPARE(m_chart->totalEventNumber(), 2);
 
     auto condition2 = new MscCondition("C_S1");
     condition2->setInstance(instanceB);
@@ -415,10 +425,14 @@ void tst_MscChart::testAddSharedConditionMix()
     m_chart->addInstanceEvent(condition2, { { instanceA, 0 }, { instanceB, 1 }, { instanceC, 1 } });
     QCOMPARE(m_chart->totalEventNumber(), 3);
 
-    events = m_chart->instanceEvents();
+    QVector<MscInstanceEvent *> events = m_chart->eventsForInstance(instanceA);
+    QCOMPARE(events.at(0), condition2);
+    events = m_chart->eventsForInstance(instanceB);
     QCOMPARE(events.at(0), condition1);
-    QCOMPARE(events.at(1), timer1);
-    QCOMPARE(events.at(2), condition2);
+    QCOMPARE(events.at(1), condition2);
+    events = m_chart->eventsForInstance(instanceC);
+    QCOMPARE(events.at(0), timer1);
+    QCOMPARE(events.at(1), condition2);
 }
 
 void tst_MscChart::testRemoveCondition()
@@ -437,11 +451,10 @@ void tst_MscChart::testRemoveCondition()
     m_chart->removeInstanceEvent(nullptr);
     QCOMPARE(m_chart->totalEventNumber(), 2);
 
-    auto condition = m_chart->instanceEvents().first();
-    m_chart->removeInstanceEvent(condition);
+    m_chart->removeInstanceEvent(condition1.get());
     QCOMPARE(m_chart->totalEventNumber(), 1);
 
-    m_chart->removeInstanceEvent(condition);
+    m_chart->removeInstanceEvent(condition1.get());
     QCOMPARE(m_chart->totalEventNumber(), 1);
 }
 
@@ -646,33 +659,33 @@ void tst_MscChart::testMoveCoregion()
     message3->setTargetInstance(instance2);
     m_chart->addInstanceEvent(message3, { { instance1, -1 }, { instance2, -1 } });
 
-    QCOMPARE(m_chart->indexofEvent(coregionBegin), 1);
-    QCOMPARE(m_chart->indexofEvent(coregionEnd), 3);
+    QCOMPARE(m_chart->indexofEventAtInstance(coregionBegin, instance1), 1);
+    QCOMPARE(m_chart->indexofEventAtInstance(coregionEnd, instance1), 3);
 
     // Move begin up
     m_chart->updateCoregionPos(coregionBegin, coregionEnd, instance1, 0, 3);
-    QCOMPARE(m_chart->indexofEvent(coregionBegin), 0);
-    QCOMPARE(m_chart->indexofEvent(coregionEnd), 3);
+    QCOMPARE(m_chart->indexofEventAtInstance(coregionBegin, instance1), 0);
+    QCOMPARE(m_chart->indexofEventAtInstance(coregionEnd, instance1), 3);
 
     // Move begin down
     m_chart->updateCoregionPos(coregionBegin, coregionEnd, instance1, 1, 3);
-    QCOMPARE(m_chart->indexofEvent(coregionBegin), 1);
-    QCOMPARE(m_chart->indexofEvent(coregionEnd), 3);
+    QCOMPARE(m_chart->indexofEventAtInstance(coregionBegin, instance1), 1);
+    QCOMPARE(m_chart->indexofEventAtInstance(coregionEnd, instance1), 3);
 
     // Move end down
     m_chart->updateCoregionPos(coregionBegin, coregionEnd, instance1, 1, 4);
-    QCOMPARE(m_chart->indexofEvent(coregionBegin), 1);
-    QCOMPARE(m_chart->indexofEvent(coregionEnd), 4);
+    QCOMPARE(m_chart->indexofEventAtInstance(coregionBegin, instance1), 1);
+    QCOMPARE(m_chart->indexofEventAtInstance(coregionEnd, instance1), 4);
 
     // Move end up
     m_chart->updateCoregionPos(coregionBegin, coregionEnd, instance1, 1, 3);
-    QCOMPARE(m_chart->indexofEvent(coregionBegin), 1);
-    QCOMPARE(m_chart->indexofEvent(coregionEnd), 3);
+    QCOMPARE(m_chart->indexofEventAtInstance(coregionBegin, instance1), 1);
+    QCOMPARE(m_chart->indexofEventAtInstance(coregionEnd, instance1), 3);
 
     // end has to be after begin
     m_chart->updateCoregionPos(coregionBegin, coregionEnd, instance1, 4, 0);
-    QCOMPARE(m_chart->indexofEvent(coregionBegin), 1);
-    QCOMPARE(m_chart->indexofEvent(coregionEnd), 3);
+    QCOMPARE(m_chart->indexofEventAtInstance(coregionBegin, instance1), 1);
+    QCOMPARE(m_chart->indexofEventAtInstance(coregionEnd, instance1), 3);
 
     // Move to other instance
     m_chart->updateCoregionPos(coregionBegin, coregionEnd, instance2, 1, 3);

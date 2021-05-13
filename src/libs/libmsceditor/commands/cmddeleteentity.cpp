@@ -150,7 +150,7 @@ void CmdDeleteEntity::initChartData(const QVector<MscEntity *> &items)
     for (auto entity : qAsConst(m_entities)) {
         auto instance = dynamic_cast<MscInstance *>(entity);
         m_chart->removeInstance(instance);
-        for (auto event : m_chart->instanceEvents()) {
+        for (auto event : m_chart->messages()) {
             if (event->relatesTo(instance)) {
                 m_deleteEvents.append(event);
                 fetchRelatedComments(event);

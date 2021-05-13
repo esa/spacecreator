@@ -17,12 +17,12 @@
 
 #include "ivsystemchecks.h"
 
+#include "interface/interfacedocument.h"
 #include "ivconnection.h"
 #include "ivconnectionchain.h"
+#include "iveditorcore.h"
 #include "ivfunction.h"
 #include "ivmodel.h"
-#include "interface/interfacedocument.h"
-#include "iveditorcore.h"
 #include "mainmodel.h"
 #include "mscchart.h"
 #include "msceditorcore.h"
@@ -165,11 +165,9 @@ QVector<QPair<msc::MscChart *, msc::MscMessage *>> IvSystemChecks::checkMessages
 
     QVector<msc::MscChart *> charts = m_mscCore->mainModel()->mscModel()->allCharts();
     for (msc::MscChart *chart : qAsConst(charts)) {
-        for (msc::MscInstanceEvent *event : chart->instanceEvents()) {
-            if (auto message = qobject_cast<msc::MscMessage *>(event)) {
-                if (!checkMessage(message)) {
-                    result << QPair<msc::MscChart *, msc::MscMessage *>(chart, message);
-                }
+        for (msc::MscMessage *message : chart->messages()) {
+            if (!checkMessage(message)) {
+                result << QPair<msc::MscChart *, msc::MscMessage *>(chart, message);
             }
         }
     }

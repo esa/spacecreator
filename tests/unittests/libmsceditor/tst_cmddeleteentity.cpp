@@ -65,7 +65,8 @@ void tst_CmdDeleteEntity::testUndoMessageDelete()
     parseMsc(msc);
 
     // store message geometry
-    auto message = qobject_cast<msc::MscMessage *>(m_chart->instanceEvents().at(0));
+    MscInstance *instance = m_chart->instances().at(0);
+    auto message = qobject_cast<msc::MscMessage *>(m_chart->eventsForInstance(instance).at(0));
     msc::MessageItem *messageItem = m_chartModel->itemForMessage(message);
     const QRectF loadedGeometry = messageItem->sceneBoundingRect();
 
@@ -78,7 +79,7 @@ void tst_CmdDeleteEntity::testUndoMessageDelete()
     m_undoStack->undo();
     waitForLayoutUpdate();
     QCOMPARE(m_chart->totalEventNumber(), 1);
-    message = qobject_cast<msc::MscMessage *>(m_chart->instanceEvents().at(0));
+    message = qobject_cast<msc::MscMessage *>(m_chart->eventsForInstance(instance).at(0));
     messageItem = m_chartModel->itemForMessage(message);
 
     // check the geometry is the same as the stored one

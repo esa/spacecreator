@@ -86,7 +86,6 @@ Q_SIGNALS:
 
 private:
     void appendMessages(msc::MscDocument *doc, QVector<msc::MscMessage *> &messages) const;
-    void appendMessages(msc::MscChart *chart, QVector<msc::MscMessage *> &messages) const;
 
     QVector<MscDocument *> m_documents;
     QVector<MscChart *> m_charts;
