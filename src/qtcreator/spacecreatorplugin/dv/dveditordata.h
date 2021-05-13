@@ -25,11 +25,11 @@ class IEditor;
 
 namespace spctr {
 
-class DeploymentEditorData : public QObject
+class DVEditorData : public QObject
 {
     Q_OBJECT
 public:
-    explicit DeploymentEditorData(QObject *parent = nullptr);
+    explicit DVEditorData(QObject *parent = nullptr);
 
     void fullInit();
     Core::IEditor *createEditor();

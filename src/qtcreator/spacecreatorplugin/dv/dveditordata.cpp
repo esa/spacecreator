@@ -15,17 +15,17 @@
    along with this program. If not, see <https://www.gnu.org/licenses/lgpl-2.1.html>.
 */
 
-#include "deploymenteditordata.h"
+#include "dveditordata.h"
 
 namespace spctr {
 
-DeploymentEditorData::DeploymentEditorData(QObject *parent)
+DVEditorData::DVEditorData(QObject *parent)
     : QObject(parent)
 {
 }
 
-void DeploymentEditorData::fullInit() { }
+void DVEditorData::fullInit() { }
 
-Core::IEditor *DeploymentEditorData::createEditor() { }
+Core::IEditor *DVEditorData::createEditor() { }
 
 } // namespace spctr

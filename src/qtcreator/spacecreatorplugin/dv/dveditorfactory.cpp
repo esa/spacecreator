@@ -15,28 +15,33 @@
    along with this program. If not, see <https://www.gnu.org/licenses/lgpl-2.1.html>.
 */
 
-#pragma once
+#include "dveditorfactory.h"
 
-#include "dveditorcore.h"
+#include "dveditordata.h"
 
-#include <QObject>
-#include <coreplugin/editormanager/ieditorfactory.h>
+#include <QGuiApplication>
 
 namespace spctr {
-class DeploymentEditorData;
 
-class DeploymentEditorFactory : public Core::IEditorFactory
+DVEditorFactory::DVEditorFactory(QObject *parent)
+    : IEditorFactory(parent)
 {
-    Q_OBJECT
-public:
-    explicit DeploymentEditorFactory(QObject *parent = nullptr);
+}
 
-    Core::IEditor *createEditor() override;
+Core::IEditor *spctr::DVEditorFactory::createEditor()
+{
+    return editorData()->createEditor();
+}
 
-    DeploymentEditorData *editorData() const;
-
-private:
-    mutable DeploymentEditorData *m_editorData = nullptr;
-};
+DVEditorData *DVEditorFactory::editorData() const
+{
+    if (!m_editorData) {
+        m_editorData = new DVEditorData;
+        QGuiApplication::setOverrideCursor(Qt::WaitCursor);
+        m_editorData->fullInit();
+        QGuiApplication::restoreOverrideCursor();
+    }
+    return m_editorData;
+}
 
 } // namespace spctr

@@ -17,15 +17,15 @@
 
 #include "spacecreatorplugin.h"
 
-#include "ivlibrary.h"
 #include "context/action/actionsmanager.h"
-#include "dv/deploymenteditorfactory.h"
+#include "dv/dveditorfactory.h"
 #include "interface/interfacedocument.h"
 #include "iv/iveditordata.h"
 #include "iv/iveditorfactory.h"
 #include "iv/qtciveditor.h"
 #include "iveditor.h"
 #include "iveditorcore.h"
+#include "ivlibrary.h"
 #include "msc/msceditordata.h"
 #include "msc/msceditorfactory.h"
 #include "msc/mscqtceditor.h"
@@ -177,7 +177,7 @@ bool SpaceCreatorPlugin::initialize(const QStringList &arguments, QString *error
     ivActions << m_asn1DialogAction << m_showMinimapAction << m_showE2EDataflow << m_exportSelectedIV << m_exportIVType
               << m_actionSaveSceneRender;
     m_ivFactory = new IVEditorFactory(m_projectsManager, ivActions, this);
-    m_deploymentFactory = new DeploymentEditorFactory(this);
+    m_deploymentFactory = new DVEditorFactory(this);
 
     addHelp();
 
@@ -313,8 +313,7 @@ void SpaceCreatorPlugin::addHelp()
         ive::IVEditorCore core;
         core.showHelp();
     });
-    Core::Command *showIveHelp =
-            Core::ActionManager::registerAction(iveHelpAction, Constants::IV_HELP_ID, allContexts);
+    Core::Command *showIveHelp = Core::ActionManager::registerAction(iveHelpAction, Constants::IV_HELP_ID, allContexts);
     actions->addAction(showIveHelp);
 }
 

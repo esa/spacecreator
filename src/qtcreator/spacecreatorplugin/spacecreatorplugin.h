@@ -48,7 +48,7 @@ class EditorCore;
 namespace spctr {
 
 class IVEditorFactory;
-class DeploymentEditorFactory;
+class DVEditorFactory;
 class MscEditorFactory;
 class SpaceCreatorProjectManager;
 
@@ -81,7 +81,7 @@ private:
 
     MscEditorFactory *m_mscFactory = nullptr;
     IVEditorFactory *m_ivFactory = nullptr;
-    DeploymentEditorFactory *m_deploymentFactory = nullptr;
+    DVEditorFactory *m_deploymentFactory = nullptr;
     QAction *m_messageDeclarationAction = nullptr;
     QAction *m_checkInstancesAction = nullptr;
     QAction *m_checkMessagesAction = nullptr;

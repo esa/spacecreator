@@ -2,10 +2,10 @@ set(PLUGIN_NAME SpaceCreatorPlugin)
 
 set(SC_PLUGIN_SOURCES
     SpaceCreatorPlugin.json.in
-    dv/deploymenteditordata.cpp
-    dv/deploymenteditordata.h
-    dv/deploymenteditorfactory.cpp
-    dv/deploymenteditorfactory.h
+    dv/dveditordata.cpp
+    dv/dveditordata.h
+    dv/dveditorfactory.cpp
+    dv/dveditorfactory.h
     iv/iveditordata.cpp
     iv/iveditordata.h
     iv/iveditordocument.cpp
