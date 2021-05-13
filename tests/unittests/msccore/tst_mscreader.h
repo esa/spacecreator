@@ -82,7 +82,6 @@ private Q_SLOTS:
     void testMessageAsn1OctetString();
     void testMessageAsn1SequenceOfInSequence();
     void testSortedMessage();
-    void testSortedMessageTwoCharts();
     void testSortedInstanceEvents();
     void testSortedMessageCreate();
     void testSortingDeadlock();

@@ -34,7 +34,7 @@ textDefinition
 // 3 Message Sequence Chart document
 
 mscDocument
-    : documentHead (containingClause | messageDeclClause | mscDocument | mscDefinition)* ENDMSCDOCUMENT end definingMscReference*
+    : documentHead (containingClause | messageDeclClause | mscDocument)* mscDefinition? ENDMSCDOCUMENT end definingMscReference*
     | MSCDOCUMENT NAME REFERENCED end // not in the spec
     ;
 

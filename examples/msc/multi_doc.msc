@@ -19,10 +19,6 @@ MSCDOCUMENT CU_level;
         INSTANCE inst_2;
         ENDINSTANCE;
       ENDMSC;
-      MSC nominal2;
-        INSTANCE nononono;
-        ENDINSTANCE;
-      ENDMSC;
     ENDMSCDOCUMENT;
   ENDMSCDOCUMENT;
 
