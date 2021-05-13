@@ -81,7 +81,7 @@ private:
 
     MscEditorFactory *m_mscFactory = nullptr;
     IVEditorFactory *m_ivFactory = nullptr;
-    DVEditorFactory *m_deploymentFactory = nullptr;
+    DVEditorFactory *m_dvFactory = nullptr;
     QAction *m_messageDeclarationAction = nullptr;
     QAction *m_checkInstancesAction = nullptr;
     QAction *m_checkMessagesAction = nullptr;

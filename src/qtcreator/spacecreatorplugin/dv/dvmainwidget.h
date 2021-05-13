@@ -1,5 +1,5 @@
 /*
-   Copyright (C) 2021 European Space Agency - <maxime.perrotin@esa.int>
+   Copyright (C) 2020 European Space Agency - <maxime.perrotin@esa.int>
 
    This library is free software; you can redistribute it and/or
    modify it under the terms of the GNU Library General Public
@@ -17,31 +17,36 @@
 
 #pragma once
 
-#include "dveditorcore.h"
-
-#include <QList>
-#include <coreplugin/editormanager/ieditorfactory.h>
-#include <memory>
+#include <QSharedPointer>
+#include <QVector>
+#include <QWidget>
 
 class QAction;
 
-namespace spctr {
-class DVEditorData;
-class SpaceCreatorProjectManager;
+namespace dve {
+class DVEditorCore;
+}
 
-class DVEditorFactory : public Core::IEditorFactory
+namespace spctr {
+
+class DVMainWidget : public QWidget
 {
     Q_OBJECT
 public:
-    DVEditorFactory(
-            SpaceCreatorProjectManager *projectManager, const QList<QAction *> &dvActions, QObject *parent = nullptr);
+    DVMainWidget(QWidget *parent = nullptr);
+    ~DVMainWidget();
 
-    Core::IEditor *createEditor() override;
+    bool init(QSharedPointer<dve::DVEditorCore> data);
 
-    DVEditorData *editorData() const;
+    QSharedPointer<dve::DVEditorCore> dvPlugin() const;
+
+private Q_SLOTS:
+    void showAsn1Errors(const QStringList &faultyInterfaces);
 
 private:
-    std::unique_ptr<DVEditorData> m_editorData;
+    void init();
+
+    QSharedPointer<dve::DVEditorCore> m_plugin;
 };
 
-} // namespace spctr
+}

@@ -4,8 +4,14 @@ set(SC_PLUGIN_SOURCES
     SpaceCreatorPlugin.json.in
     dv/dveditordata.cpp
     dv/dveditordata.h
+    dv/dveditordocument.cpp
+    dv/dveditordocument.h
     dv/dveditorfactory.cpp
     dv/dveditorfactory.h
+    dv/dvmainwidget.cpp
+    dv/dvmainwidget.h
+    dv/dvqtceditor.cpp
+    dv/dvqtceditor.h
     iv/iveditordata.cpp
     iv/iveditordata.h
     iv/iveditordocument.cpp

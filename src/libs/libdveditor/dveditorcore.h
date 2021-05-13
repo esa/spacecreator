@@ -47,6 +47,8 @@ public:
     shared::ui::GraphicsViewBase *chartView() override;
     QToolBar *toolBar();
 
+    void registerBasicActions();
+
     QUndoStack *undoStack() const override;
 
     void populateCommandLineArguments(shared::CommandLineParser *parser) const override;

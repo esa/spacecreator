@@ -15,43 +15,49 @@
    along with this program. If not, see <https://www.gnu.org/licenses/lgpl-2.1.html>.
 */
 
-#pragma once
+#include "dvmainwidget.h"
 
-#include <QSharedPointer>
-#include <QStackedWidget>
-#include <coreplugin/id.h>
+#include "actionsbar.h"
+#include "commandsstack.h"
+#include "dveditorcore.h"
 
-namespace ive {
-class IVEditorCore;
-}
-
-namespace Core {
-class IEditor;
-class IMode;
-}
+#include <QHBoxLayout>
+#include <QMessageBox>
 
 namespace spctr {
 
-class QtCIVEditor;
-
-class IVEditorStack : public QStackedWidget
+DVMainWidget::DVMainWidget(QWidget *parent)
+    : QWidget(parent)
 {
-    Q_OBJECT
+}
 
-public:
-    IVEditorStack(QWidget *parent = nullptr);
+DVMainWidget::~DVMainWidget() { }
 
-    void add(QtCIVEditor *editor, QWidget *widget);
-    QWidget *widgetForEditor(QtCIVEditor *editor);
-    void removeIVTextEditor(QObject *);
-    bool setVisibleEditor(Core::IEditor *xmlEditor);
+bool DVMainWidget::init(QSharedPointer<dve::DVEditorCore> data)
+{
+    m_plugin = data;
+    init();
+    return true;
+}
 
-    QSharedPointer<ive::IVEditorCore> ivPlugin(const QString &fileName) const;
+QSharedPointer<dve::DVEditorCore> DVMainWidget::dvPlugin() const
+{
+    return m_plugin;
+}
 
-private:
-    void modeAboutToChange(Core::Id m);
+void DVMainWidget::init()
+{
+    if (m_plugin.isNull()) {
+        return;
+    }
 
-    QVector<QtCIVEditor *> m_editors;
-};
+    // @todo add the VD UI
+}
+
+void DVMainWidget::showAsn1Errors(const QStringList &faultyInterfaces)
+{
+    QMessageBox::warning(
+            this, tr("ASN1 error"), tr("Following interfaces have ASN.1 errors:") + "\n" + faultyInterfaces.join("\n"));
+}
 
 }

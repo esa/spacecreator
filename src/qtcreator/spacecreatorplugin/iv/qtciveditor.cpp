@@ -17,14 +17,14 @@
 
 #include "qtciveditor.h"
 
-#include "iveditordocument.h"
-#include "ivmainwidget.h"
 #include "asn1dialog.h"
 #include "commandsstack.h"
 #include "endtoend/endtoendview.h"
 #include "interface/commands/cmdchangeasn1file.h"
 #include "interface/interfacedocument.h"
 #include "iveditorcore.h"
+#include "iveditordocument.h"
+#include "ivmainwidget.h"
 #include "mainmodel.h"
 #include "msceditorcore.h"
 #include "spacecreatorpluginconstants.h"

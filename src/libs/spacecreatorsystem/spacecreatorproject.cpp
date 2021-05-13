@@ -19,6 +19,7 @@
 
 #include "asn1modelstorage.h"
 #include "baseitems/common/ivutils.h"
+#include "dveditorcore.h"
 #include "interface/interfacedocument.h"
 #include "iveditorcore.h"
 #include "ivsystemchecks.h"
@@ -40,10 +41,24 @@ SpaceCreatorProject::SpaceCreatorProject(QObject *parent)
 
 SpaceCreatorProject::~SpaceCreatorProject() { }
 
+/*!
+   Returns the DVEditorCore object for the given file
+   If the object does not exist yet, one will be created and the data be loaded
+ */
 QSharedPointer<dve::DVEditorCore> SpaceCreatorProject::dvData(const QString &fileName) const
 {
-    qErrnoWarning("SpaceCreatorProject::dvData() not implemented yet.");
-    return {};
+    if (!m_dvStore.contains(fileName)) {
+        QSharedPointer<dve::DVEditorCore> data(new dve::DVEditorCore());
+        data->registerBasicActions();
+        // data->document()->customActions(); // There some further actions are registered
+        // data->document()->setAsn1ModelStorage(m_asn1Storage.get());
+
+        // data->document()->load(fileName);
+        const_cast<SpaceCreatorProject *>(this)->setDvData(fileName, data);
+        return data;
+    }
+
+    return m_dvStore[fileName];
 }
 
 /*!
@@ -99,6 +114,22 @@ QSharedPointer<ive::IVEditorCore> SpaceCreatorProject::ivCore() const
 }
 
 /*!
+   Returns all deployment view objects, that are used in the current project
+ */
+QVector<QSharedPointer<dve::DVEditorCore>> SpaceCreatorProject::allDVCores() const
+{
+    const QStringList dvFiles = allDVFiles();
+    QVector<QSharedPointer<dve::DVEditorCore>> allDvCores;
+    for (const QString &dvFile : dvFiles) {
+        QSharedPointer<dve::DVEditorCore> core = dvData(dvFile);
+        if (core) {
+            allDvCores.append(core);
+        }
+    }
+    return allDvCores;
+}
+
+/*!
    Returns all MSCEditorCore objects, that are used in the current project
  */
 QVector<QSharedPointer<msc::MSCEditorCore>> SpaceCreatorProject::allMscCores() const
@@ -119,6 +150,11 @@ QVector<QSharedPointer<msc::MSCEditorCore>> SpaceCreatorProject::allMscCores() c
  */
 bool SpaceCreatorProject::contains(QSharedPointer<shared::EditorCore> core) const
 {
+    for (QSharedPointer<dve::DVEditorCore> dvCore : m_dvStore) {
+        if (core == dvCore) {
+            return true;
+        }
+    }
     for (QSharedPointer<ive::IVEditorCore> ivCore : m_ivStore) {
         if (core == ivCore) {
             return true;
@@ -130,6 +166,14 @@ bool SpaceCreatorProject::contains(QSharedPointer<shared::EditorCore> core) cons
         }
     }
     return false;
+}
+
+/*!
+   Returns all deployment view files of the current project
+ */
+QStringList SpaceCreatorProject::allDVFiles() const
+{
+    return projectFiles(".dv.xml");
 }
 
 /*!
@@ -215,6 +259,26 @@ void SpaceCreatorProject::purgeNonProjectData()
             ++mscIt;
         }
     }
+}
+
+/*!
+   Sets the DVEditorCore object for the given file.
+   If the object was already used for another file, that old file/object connection is removed.
+ */
+void SpaceCreatorProject::setDvData(const QString &fileName, QSharedPointer<dve::DVEditorCore> dvData)
+{
+    const QString oldKey = m_dvStore.key(dvData, "");
+    if (!oldKey.isEmpty()) {
+        if (m_dvStore[fileName] == dvData) {
+            return;
+        }
+        QSharedPointer<dve::DVEditorCore> oldData = m_dvStore.take(oldKey);
+        disconnect(oldData.data(), nullptr, this, nullptr);
+    }
+
+    m_dvStore[fileName] = dvData;
+    connect(dvData.data(), &shared::EditorCore::editedExternally, this, &scs::SpaceCreatorProject::editedExternally);
+    Q_EMIT dvCoreAdded(dvData);
 }
 
 /*!

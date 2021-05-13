@@ -18,14 +18,24 @@
 #include "dveditorfactory.h"
 
 #include "dveditordata.h"
+#include "spacecreatorpluginconstants.h"
+#include "spacecreatorprojectmanager.h"
 
 #include <QGuiApplication>
+#include <coreplugin/fileiconprovider.h>
 
 namespace spctr {
 
-DVEditorFactory::DVEditorFactory(QObject *parent)
+DVEditorFactory::DVEditorFactory(
+        SpaceCreatorProjectManager *projectManager, const QList<QAction *> &dvActions, QObject *parent)
     : IEditorFactory(parent)
+    , m_editorData(new DVEditorData(projectManager, dvActions))
 {
+    setId(spctr::Constants::K_DV_EDITOR_ID);
+    setDisplayName(QCoreApplication::translate("DV Editor", spctr::Constants::C_DVEDITOR_DISPLAY_NAME));
+    addMimeType(spctr::Constants::DV_MIMETYPE);
+
+    Core::FileIconProvider::registerIconOverlayForSuffix(":/projectexplorer/images/fileoverlay_scxml.png", "xml");
 }
 
 Core::IEditor *spctr::DVEditorFactory::createEditor()
@@ -35,13 +45,7 @@ Core::IEditor *spctr::DVEditorFactory::createEditor()
 
 DVEditorData *DVEditorFactory::editorData() const
 {
-    if (!m_editorData) {
-        m_editorData = new DVEditorData;
-        QGuiApplication::setOverrideCursor(Qt::WaitCursor);
-        m_editorData->fullInit();
-        QGuiApplication::restoreOverrideCursor();
-    }
-    return m_editorData;
+    return m_editorData.get();
 }
 
 } // namespace spctr

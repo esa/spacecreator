@@ -79,7 +79,7 @@ void IVMainWidget::init()
             &IVMainWidget::showAsn1Errors);
 }
 
-void spctr::IVMainWidget::showAsn1Errors(const QStringList &faultyInterfaces)
+void IVMainWidget::showAsn1Errors(const QStringList &faultyInterfaces)
 {
     QMessageBox::warning(
             this, tr("ASN1 error"), tr("Following interfaces have ASN.1 errors:") + "\n" + faultyInterfaces.join("\n"));

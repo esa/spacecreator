@@ -1,5 +1,5 @@
 /*
-   Copyright (C) 2021 European Space Agency - <maxime.perrotin@esa.int>
+   Copyright (C) 2020 European Space Agency - <maxime.perrotin@esa.int>
 
    This library is free software; you can redistribute it and/or
    modify it under the terms of the GNU Library General Public
@@ -17,44 +17,46 @@
 
 #pragma once
 
-#include <QList>
-#include <QObject>
 #include <QPointer>
+#include <QSharedPointer>
+#include <editormanager/ieditor.h>
 
-class QAction;
-class QUndoGroup;
+class QToolBar;
 
 namespace dve {
 class DVEditorCore;
 }
 
-namespace Core {
-class IEditor;
-}
-
 namespace spctr {
-class SpaceCreatorProjectManager;
-class MscContext;
 
-class DVEditorData : public QObject
+class DVEditorDocument;
+class DVMainWidget;
+class SpaceCreatorProjectManager;
+
+class DVQtCEditor : public Core::IEditor
 {
     Q_OBJECT
+
 public:
-    DVEditorData(
-            SpaceCreatorProjectManager *projectManager, const QList<QAction *> &dvActions, QObject *parent = nullptr);
-    ~DVEditorData() override;
+    DVQtCEditor(SpaceCreatorProjectManager *projectManager, const QList<QAction *> &dvActions);
+    ~DVQtCEditor();
 
-    Core::IEditor *createEditor();
+    Core::IDocument *document() const override;
+    DVEditorDocument *dvDocument() const;
+    QSharedPointer<dve::DVEditorCore> dvPlugin() const;
 
-private Q_SLOTS:
-    void onCurrentEditorChanged(Core::IEditor *editor);
+    QWidget *toolBar() override;
+
+public Q_SLOTS:
+    void showAsn1Dialog();
+    void showE2EDataflow(const QStringList &mscFiles);
 
 private:
-    MscContext *m_context = nullptr;
-    QUndoGroup *m_undoGroup = nullptr;
-
+    DVEditorDocument *m_document = nullptr;
+    QPointer<QToolBar> m_toolbar = nullptr;
+    DVMainWidget *m_editorWidget = nullptr;
     QPointer<SpaceCreatorProjectManager> m_projectManager;
-    QList<QAction *> m_dvActions;
+    QList<QAction *> m_globalToolbarActions;
 };
 
-} // namespace spctr
+}

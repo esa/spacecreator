@@ -63,10 +63,12 @@ public:
 
     // Query functions
     virtual QSharedPointer<ive::IVEditorCore> ivCore() const;
+    virtual QVector<QSharedPointer<dve::DVEditorCore>> allDVCores() const;
     virtual QVector<QSharedPointer<msc::MSCEditorCore>> allMscCores() const;
 
     bool contains(QSharedPointer<shared::EditorCore> core) const;
 
+    virtual QStringList allDVFiles() const;
     virtual QStringList allIVFiles() const;
     virtual QStringList allMscFiles() const;
     virtual QStringList allAsn1Files() const;
@@ -81,6 +83,7 @@ public:
 
 Q_SIGNALS:
     void editedExternally(shared::EditorCore *);
+    void dvCoreAdded(QSharedPointer<dve::DVEditorCore> dvCore);
     void ivCoreAdded(QSharedPointer<ive::IVEditorCore> ivCore);
     void mscCoreAdded(QSharedPointer<msc::MSCEditorCore> mscCore);
 
@@ -88,9 +91,11 @@ protected Q_SLOTS:
     void purgeNonProjectData();
 
 protected:
+    void setDvData(const QString &fileName, QSharedPointer<dve::DVEditorCore> dvData);
     void setIvData(const QString &fileName, QSharedPointer<ive::IVEditorCore> ivData);
     void setMscData(const QString &fileName, QSharedPointer<msc::MSCEditorCore> mscData);
 
+    QHash<QString, QSharedPointer<dve::DVEditorCore>> m_dvStore;
     QHash<QString, QSharedPointer<ive::IVEditorCore>> m_ivStore;
     QHash<QString, QSharedPointer<msc::MSCEditorCore>> m_mscStore;
     std::unique_ptr<scs::MscSystemChecks> m_mscChecks;

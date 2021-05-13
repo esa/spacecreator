@@ -19,7 +19,6 @@
 
 #include <QList>
 #include <QPointer>
-#include <QSharedPointer>
 
 class QAction;
 class QUndoGroup;
@@ -29,7 +28,6 @@ class IVEditorCore;
 }
 
 namespace Core {
-class EditorToolBar;
 class IEditor;
 }
 

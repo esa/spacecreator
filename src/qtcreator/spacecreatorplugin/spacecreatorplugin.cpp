@@ -177,7 +177,8 @@ bool SpaceCreatorPlugin::initialize(const QStringList &arguments, QString *error
     ivActions << m_asn1DialogAction << m_showMinimapAction << m_showE2EDataflow << m_exportSelectedIV << m_exportIVType
               << m_actionSaveSceneRender;
     m_ivFactory = new IVEditorFactory(m_projectsManager, ivActions, this);
-    m_deploymentFactory = new DVEditorFactory(this);
+    QList<QAction *> dvActions;
+    m_dvFactory = new DVEditorFactory(m_projectsManager, dvActions, this);
 
     addHelp();
 

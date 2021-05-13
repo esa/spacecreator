@@ -23,18 +23,19 @@
 namespace spctr {
 namespace Constants {
 
-const char MSC_MIMETYPE[] = "text/vnd.msc";
+const char DV_MIMETYPE[] = "application/dvxml";
 const char IV_MIMETYPE[] = "application/xml";
+const char MSC_MIMETYPE[] = "text/vnd.msc";
 
 const char INFO_READ_ONLY[] = "SpaceCreator.ReadOnly";
 
+const char K_DV_EDITOR_ID[] = "SpaceCreator.DVEditor";
+const char K_IV_EDITOR_ID[] = "SpaceCreator.IVEditor";
 const char K_MSC_EDITOR_ID[] = "SpaceCreator.MscEditor";
 
-const char C_MSCEDITOR_DISPLAY_NAME[] = QT_TRANSLATE_NOOP("OpenWith::Editors", "Msc Editor");
-
-const char K_IV_EDITOR_ID[] = "SpaceCreator.IVEditor";
-
+const char C_DVEDITOR_DISPLAY_NAME[] = QT_TRANSLATE_NOOP("OpenWith::Editors", "DV Editor");
 const char C_IVEDITOR_DISPLAY_NAME[] = QT_TRANSLATE_NOOP("OpenWith::Editors", "IV Editor");
+const char C_MSCEDITOR_DISPLAY_NAME[] = QT_TRANSLATE_NOOP("OpenWith::Editors", "Msc Editor");
 
 // Menu
 const char MENU_ID[] = "SpaceCreator.Menu";

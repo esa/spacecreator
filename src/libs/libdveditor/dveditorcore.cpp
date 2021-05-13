@@ -79,6 +79,12 @@ QToolBar *DVEditorCore::toolBar()
     return d->m_toolBar;
 }
 
+void DVEditorCore::registerBasicActions()
+{
+    // @todo
+    // register undo/redo/...
+}
+
 QUndoStack *DVEditorCore::undoStack() const
 {
     return d->m_commandsStack;
