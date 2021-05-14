@@ -51,7 +51,12 @@ void DVMainWidget::init()
         return;
     }
 
-    // @todo add the VD UI
+    auto layout = new QHBoxLayout(this);
+    layout->setMargin(0);
+    layout->setSpacing(0);
+    setLayout(layout);
+    m_plugin->mainwidget()->setParent(this);
+    layout->addWidget(m_plugin->mainwidget());
 }
 
 void DVMainWidget::showAsn1Errors(const QStringList &faultyInterfaces)

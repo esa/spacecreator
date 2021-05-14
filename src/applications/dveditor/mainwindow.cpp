@@ -36,7 +36,7 @@ MainWindow::MainWindow(dve::DVEditorCore *core, QWidget *parent)
     initActions();
     initMenus();
 
-    setCentralWidget(core->chartView());
+    setCentralWidget(core->mainwidget());
     addToolBar(core->toolBar());
 }
 

@@ -46,6 +46,7 @@ public:
 
     shared::ui::GraphicsViewBase *chartView() override;
     QToolBar *toolBar();
+    QWidget *mainwidget();
 
     void registerBasicActions();
 

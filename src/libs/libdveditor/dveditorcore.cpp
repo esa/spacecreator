@@ -21,6 +21,9 @@
 #include "dvitemmodel.h"
 #include "ui/graphicsviewbase.h"
 
+#include <QBoxLayout>
+#include <QSplitter>
+#include <QTreeView>
 #include <QUndoCommand>
 
 namespace dve {
@@ -54,6 +57,7 @@ struct DVEditorCore::DeploymentInterfacePrivate {
     std::unique_ptr<dve::DVItemModel> m_model;
     QPointer<dve::GraphicsView> m_view;
     QPointer<QToolBar> m_toolBar;
+    QWidget *m_mainWidget { nullptr };
 };
 
 DVEditorCore::DVEditorCore(QObject *parent)
@@ -77,6 +81,26 @@ shared::ui::GraphicsViewBase *DVEditorCore::chartView()
 QToolBar *DVEditorCore::toolBar()
 {
     return d->m_toolBar;
+}
+
+QWidget *DVEditorCore::mainwidget()
+{
+    if (!d->m_mainWidget) {
+        d->m_mainWidget = new QWidget;
+        auto rootLayout = new QVBoxLayout;
+        rootLayout->setMargin(0);
+        d->m_mainWidget->setLayout(rootLayout);
+
+        QSplitter *splitter = new QSplitter(Qt::Horizontal, d->m_mainWidget);
+        splitter->setHandleWidth(1);
+        auto treeView = new QTreeView(d->m_mainWidget);
+        splitter->addWidget(treeView);
+        splitter->addWidget(d->m_view);
+        splitter->setStretchFactor(0, 0);
+        splitter->setStretchFactor(1, 1);
+        rootLayout->addWidget(splitter);
+    }
+    return d->m_mainWidget;
 }
 
 void DVEditorCore::registerBasicActions()
