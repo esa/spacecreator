@@ -17,9 +17,9 @@
 
 #include "iveditordata.h"
 
-#include "iveditordocument.h"
-#include "qtciveditor.h"
 #include "iveditorcore.h"
+#include "iveditordocument.h"
+#include "ivqtceditor.h"
 #include "msc/msccontext.h"
 #include "spacecreatorpluginconstants.h"
 #include "spacecreatorprojectmanager.h"
@@ -74,7 +74,7 @@ IVEditorData::~IVEditorData()
 
 Core::IEditor *IVEditorData::createEditor()
 {
-    auto *ivEditor = new QtCIVEditor(m_projectManager, m_ivActions);
+    auto *ivEditor = new IVQtCEditor(m_projectManager, m_ivActions);
 
     connect(ivEditor->ivDocument(), &spctr::IVEditorDocument::ivDataLoaded, this,
             [this](const QString &fileName, QSharedPointer<ive::IVEditorCore> data) {
@@ -100,7 +100,7 @@ void IVEditorData::showMinimap(bool visible)
 
 void IVEditorData::onCurrentEditorChanged(Core::IEditor *editor)
 {
-    if (auto ivEditor = qobject_cast<QtCIVEditor *>(editor)) {
+    if (auto ivEditor = qobject_cast<IVQtCEditor *>(editor)) {
         m_undoGroup->setActiveStack(ivEditor->ivPlugin()->undoStack());
     }
 }

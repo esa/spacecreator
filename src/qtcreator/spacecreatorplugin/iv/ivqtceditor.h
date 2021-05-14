@@ -34,13 +34,13 @@ class IVEditorDocument;
 class IVMainWidget;
 class SpaceCreatorProjectManager;
 
-class QtCIVEditor : public Core::IEditor
+class IVQtCEditor : public Core::IEditor
 {
     Q_OBJECT
 
 public:
-    QtCIVEditor(SpaceCreatorProjectManager *projectManager, const QList<QAction *> &ivActions);
-    ~QtCIVEditor();
+    IVQtCEditor(SpaceCreatorProjectManager *projectManager, const QList<QAction *> &ivActions);
+    ~IVQtCEditor();
 
     Core::IDocument *document() const override;
     IVEditorDocument *ivDocument() const;

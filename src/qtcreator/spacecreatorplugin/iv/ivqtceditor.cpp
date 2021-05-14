@@ -15,7 +15,7 @@
    along with this program. If not, see <https://www.gnu.org/licenses/lgpl-2.1.html>.
 */
 
-#include "qtciveditor.h"
+#include "ivqtceditor.h"
 
 #include "asn1dialog.h"
 #include "commandsstack.h"
@@ -37,7 +37,7 @@
 
 namespace spctr {
 
-QtCIVEditor::QtCIVEditor(SpaceCreatorProjectManager *projectManager, const QList<QAction *> &ivActions)
+IVQtCEditor::IVQtCEditor(SpaceCreatorProjectManager *projectManager, const QList<QAction *> &ivActions)
     : Core::IEditor()
     , m_document(new IVEditorDocument(projectManager, this))
     , m_editorWidget(new IVMainWidget)
@@ -51,27 +51,27 @@ QtCIVEditor::QtCIVEditor(SpaceCreatorProjectManager *projectManager, const QList
             [this](const QString &, QSharedPointer<ive::IVEditorCore> data) { m_editorWidget->init(data); });
 }
 
-QtCIVEditor::~QtCIVEditor()
+IVQtCEditor::~IVQtCEditor()
 {
     m_editorWidget->deleteLater();
 }
 
-Core::IDocument *QtCIVEditor::document() const
+Core::IDocument *IVQtCEditor::document() const
 {
     return m_document;
 }
 
-IVEditorDocument *QtCIVEditor::ivDocument() const
+IVEditorDocument *IVQtCEditor::ivDocument() const
 {
     return m_document;
 }
 
-QSharedPointer<ive::IVEditorCore> QtCIVEditor::ivPlugin() const
+QSharedPointer<ive::IVEditorCore> IVQtCEditor::ivPlugin() const
 {
     return m_document->ivEditorCore();
 }
 
-QWidget *QtCIVEditor::toolBar()
+QWidget *IVQtCEditor::toolBar()
 {
     QSharedPointer<ive::IVEditorCore> ivCore = m_document->ivEditorCore();
     if (m_toolbar == nullptr && !ivCore.isNull()) {
@@ -90,7 +90,7 @@ QWidget *QtCIVEditor::toolBar()
 /*!
    Show the dialog to display and edit the used ASN1 file
  */
-void QtCIVEditor::showAsn1Dialog()
+void IVQtCEditor::showAsn1Dialog()
 {
     if (ivPlugin().isNull()) {
         return;
@@ -110,7 +110,7 @@ void QtCIVEditor::showAsn1Dialog()
     }
 }
 
-void QtCIVEditor::showE2EDataflow(const QStringList &mscFiles)
+void IVQtCEditor::showE2EDataflow(const QStringList &mscFiles)
 {
     if (ivPlugin().isNull()) {
         return;

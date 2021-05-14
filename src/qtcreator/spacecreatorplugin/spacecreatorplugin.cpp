@@ -22,7 +22,7 @@
 #include "interface/interfacedocument.h"
 #include "iv/iveditordata.h"
 #include "iv/iveditorfactory.h"
-#include "iv/qtciveditor.h"
+#include "iv/ivqtceditor.h"
 #include "iveditor.h"
 #include "iveditorcore.h"
 #include "ivlibrary.h"
@@ -141,7 +141,7 @@ bool SpaceCreatorPlugin::initialize(const QStringList &arguments, QString *error
     ive::ActionsManager::registerAction(
             Q_FUNC_INFO, m_actionSaveSceneRender, "Render", "Save current scene complete render.");
     connect(m_actionSaveSceneRender, &QAction::triggered, this, []() {
-        if (auto ivEditor = qobject_cast<spctr::QtCIVEditor *>(Core::EditorManager::currentEditor())) {
+        if (auto ivEditor = qobject_cast<spctr::IVQtCEditor *>(Core::EditorManager::currentEditor())) {
             ivEditor->ivPlugin()->onSaveRenderRequested();
         }
     });
@@ -218,7 +218,7 @@ void SpaceCreatorPlugin::setMinimapVisible(bool visible)
 
 void SpaceCreatorPlugin::showE2EDataflow()
 {
-    if (auto ivEditor = qobject_cast<spctr::QtCIVEditor *>(Core::EditorManager::currentEditor())) {
+    if (auto ivEditor = qobject_cast<spctr::IVQtCEditor *>(Core::EditorManager::currentEditor())) {
         SpaceCreatorProjectImpl *project = m_projectsManager->project(ivEditor->ivPlugin());
         if (project) {
             ivEditor->showE2EDataflow(project->allMscFiles());
@@ -228,14 +228,14 @@ void SpaceCreatorPlugin::showE2EDataflow()
 
 void SpaceCreatorPlugin::showAsn1Dialog()
 {
-    if (auto ivEditor = qobject_cast<spctr::QtCIVEditor *>(Core::EditorManager::currentEditor())) {
+    if (auto ivEditor = qobject_cast<spctr::IVQtCEditor *>(Core::EditorManager::currentEditor())) {
         ivEditor->showAsn1Dialog();
     }
 }
 
 void SpaceCreatorPlugin::exportSelectedIV()
 {
-    if (auto ivEditor = qobject_cast<spctr::QtCIVEditor *>(Core::EditorManager::currentEditor())) {
+    if (auto ivEditor = qobject_cast<spctr::IVQtCEditor *>(Core::EditorManager::currentEditor())) {
         SpaceCreatorProjectImpl *project = m_projectsManager->project(ivEditor->ivPlugin());
         if (project) {
             ivEditor->ivPlugin()->document()->exportSelectedFunctions();
@@ -245,7 +245,7 @@ void SpaceCreatorPlugin::exportSelectedIV()
 
 void SpaceCreatorPlugin::exportComponentType()
 {
-    if (auto ivEditor = qobject_cast<spctr::QtCIVEditor *>(Core::EditorManager::currentEditor())) {
+    if (auto ivEditor = qobject_cast<spctr::IVQtCEditor *>(Core::EditorManager::currentEditor())) {
         SpaceCreatorProjectImpl *project = m_projectsManager->project(ivEditor->ivPlugin());
         if (project) {
             ivEditor->ivPlugin()->document()->exportSelectedType();

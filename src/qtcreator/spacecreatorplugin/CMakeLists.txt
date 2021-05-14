@@ -20,8 +20,8 @@ set(SC_PLUGIN_SOURCES
     iv/iveditorfactory.h
     iv/ivmainwidget.cpp
     iv/ivmainwidget.h
-    iv/qtciveditor.cpp
-    iv/qtciveditor.h
+    iv/ivqtceditor.cpp
+    iv/ivqtceditor.h
     msc/msccontext.cpp
     msc/msccontext.h
     msc/msceditordata.cpp
