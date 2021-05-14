@@ -18,6 +18,7 @@
 #include "dveditorcore.h"
 
 #include "baseitems/graphicsview.h"
+#include "dvappmodel.h"
 #include "dvitemmodel.h"
 #include "ui/graphicsviewbase.h"
 
@@ -32,8 +33,8 @@ struct DVEditorCore::DeploymentInterfacePrivate {
     DeploymentInterfacePrivate(const DeploymentInterfacePrivate &) = delete;
     DeploymentInterfacePrivate &operator=(const DeploymentInterfacePrivate &) = delete;
     DeploymentInterfacePrivate()
-        : m_commandsStack(new QUndoStack)
-        , m_scene(new QGraphicsScene)
+        : m_scene(new QGraphicsScene)
+        , m_appModel(new DVAppModel)
         , m_model(new DVItemModel)
         , m_view(new dve::GraphicsView)
         , m_toolBar(new QToolBar)
@@ -49,11 +50,10 @@ struct DVEditorCore::DeploymentInterfacePrivate {
     {
         delete m_toolBar;
         delete m_view;
-        delete m_commandsStack;
     }
 
-    QUndoStack *m_commandsStack { nullptr };
     QGraphicsScene *m_scene { nullptr };
+    std::unique_ptr<dve::DVAppModel> m_appModel;
     std::unique_ptr<dve::DVItemModel> m_model;
     QPointer<dve::GraphicsView> m_view;
     QPointer<QToolBar> m_toolBar;
@@ -67,6 +67,14 @@ DVEditorCore::DVEditorCore(QObject *parent)
 }
 
 DVEditorCore::~DVEditorCore() { }
+
+/*!
+   Returns the deployment view data model
+ */
+DVAppModel *DVEditorCore::appModel() const
+{
+    return d->m_appModel.get();
+}
 
 void DVEditorCore::addToolBars(QMainWindow *window)
 {
@@ -111,7 +119,12 @@ void DVEditorCore::registerBasicActions()
 
 QUndoStack *DVEditorCore::undoStack() const
 {
-    return d->m_commandsStack;
+    return d->m_appModel->undoStack();
+}
+
+shared::cmd::CommandsStackBase *DVEditorCore::commandsStack() const
+{
+    return d->m_appModel->commandsStack();
 }
 
 void DVEditorCore::populateCommandLineArguments(shared::CommandLineParser *parser) const
@@ -121,14 +134,12 @@ void DVEditorCore::populateCommandLineArguments(shared::CommandLineParser *parse
 
 bool DVEditorCore::renameAsnFile(const QString &oldName, const QString &newName)
 {
-    Q_UNUSED(oldName)
-    Q_UNUSED(newName)
     return false;
 }
 
 QString DVEditorCore::filePath() const
 {
-    return {};
+    return d->m_appModel->path();
 }
 
 bool DVEditorCore::save()

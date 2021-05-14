@@ -18,10 +18,14 @@
 #include "mainwindow.h"
 
 #include "baseitems/graphicsview.h"
+#include "dvappmodel.h"
 #include "dveditorcore.h"
+#include "settingsmanager.h"
 #include "ui_mainwindow.h"
 
 #include <QCloseEvent>
+#include <QFileDialog>
+#include <QMessageBox>
 
 namespace dve {
 
@@ -38,6 +42,8 @@ MainWindow::MainWindow(dve::DVEditorCore *core, QWidget *parent)
 
     setCentralWidget(core->mainwidget());
     addToolBar(core->toolBar());
+
+    connect(m_core->actionOpenFile(), &QAction::triggered, this, &MainWindow::onOpenFileRequested);
 }
 
 /*!
@@ -46,6 +52,17 @@ MainWindow::MainWindow(dve::DVEditorCore *core, QWidget *parent)
 MainWindow::~MainWindow()
 {
     delete ui;
+}
+
+void MainWindow::onOpenFileRequested()
+{
+    const QString prevPath(m_core->appModel()->path());
+    const QString &fileName = QFileDialog::getOpenFileName(
+            this, tr("Open file"), prevPath, m_core->appModel()->supportedFileExtensions());
+    if (!fileName.isEmpty() && closeFile()) {
+        m_core->appModel()->load(fileName);
+    }
+    m_core->actionSaveFile()->setEnabled(m_core->appModel()->isDirty());
 }
 
 /*!
@@ -70,7 +87,18 @@ void MainWindow::initMenus()
 {
     // Initialize the file menu
     auto menu = menuBar()->addMenu(tr("File"));
+    menu->addAction(m_core->actionOpenFile());
+    menu->addSeparator();
     menu->addAction(m_core->actionQuit());
+
+    // Initialize the edit menu
+    menu = menuBar()->addMenu(tr("Edit"));
+    QAction *undoAction = m_core->actionUndo();
+    undoAction->setShortcut(QKeySequence::Undo);
+    menu->addAction(undoAction);
+    QAction *redoAction = m_core->actionRedo();
+    redoAction->setShortcut(QKeySequence::Redo);
+    menu->addAction(redoAction);
 
     // Initialize the help menu
     menu = menuBar()->addMenu(tr("&Help"));
@@ -80,13 +108,33 @@ void MainWindow::initMenus()
 
 void MainWindow::onQuitRequested()
 {
-    if (prepareQuit())
+    if (prepareQuit()) {
         qApp->quit();
+    }
 }
 
 void MainWindow::initSettings()
 {
-    /// Load geometry
+    restoreGeometry(shared::SettingsManager::load<QByteArray>(shared::SettingsManager::Common::Geometry));
+    restoreState(shared::SettingsManager::load<QByteArray>(shared::SettingsManager::Common::State));
+}
+
+bool MainWindow::closeFile()
+{
+    if (m_core->appModel()->isDirty()) {
+        const QMessageBox::StandardButtons btns(QMessageBox::Save | QMessageBox::No | QMessageBox::Cancel);
+        auto btn = QMessageBox::question(this, tr("Document closing"),
+                tr("There are unsaved changes.\nWould you like to save the document?"), btns);
+        if (btn == QMessageBox::Save) {
+            // @todo implement save
+        } else if (btn == QMessageBox::Cancel) {
+            return false;
+        }
+    }
+
+    m_core->appModel()->close();
+
+    return true;
 }
 
 /*!
@@ -109,7 +157,11 @@ void MainWindow::updateWindowTitle()
  */
 bool MainWindow::prepareQuit()
 {
-    /// Save geometry
+    if (!closeFile()) {
+        return false;
+    }
+    shared::SettingsManager::store<QByteArray>(shared::SettingsManager::Common::State, saveState());
+    shared::SettingsManager::store<QByteArray>(shared::SettingsManager::Common::Geometry, saveGeometry());
 
     return true;
 }

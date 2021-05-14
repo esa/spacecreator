@@ -5,6 +5,8 @@ add_library(${LIB_NAME} STATIC)
 target_sources(${LIB_NAME} PRIVATE
     baseitems/graphicsview.cpp
     baseitems/graphicsview.h
+    dvappmodel.cpp
+    dvappmodel.h
     dveditor.cpp
     dveditor.h
     dveditorcore.cpp
@@ -16,6 +18,7 @@ target_sources(${LIB_NAME} PRIVATE
 
 target_link_libraries(${LIB_NAME}
     shared
+    dvcore
     ${QT_SVG}
     ${QT_WIDGETS}
     ${QT_XML}

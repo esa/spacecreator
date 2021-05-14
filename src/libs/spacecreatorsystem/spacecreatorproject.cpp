@@ -19,6 +19,7 @@
 
 #include "asn1modelstorage.h"
 #include "baseitems/common/ivutils.h"
+#include "dvappmodel.h"
 #include "dveditorcore.h"
 #include "interface/interfacedocument.h"
 #include "iveditorcore.h"
@@ -50,10 +51,7 @@ QSharedPointer<dve::DVEditorCore> SpaceCreatorProject::dvData(const QString &fil
     if (!m_dvStore.contains(fileName)) {
         QSharedPointer<dve::DVEditorCore> data(new dve::DVEditorCore());
         data->registerBasicActions();
-        // data->document()->customActions(); // There some further actions are registered
-        // data->document()->setAsn1ModelStorage(m_asn1Storage.get());
-
-        // data->document()->load(fileName);
+        data->appModel()->load(fileName);
         const_cast<SpaceCreatorProject *>(this)->setDvData(fileName, data);
         return data;
     }

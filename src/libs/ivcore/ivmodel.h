@@ -46,7 +46,7 @@ public:
     bool addObject(IVObject *obj);
     bool removeObject(IVObject *obj);
 
-    void setRootObject(shared::Id id);
+    void setRootObject(shared::Id rootId);
     IVObject *rootObject() const;
     shared::Id rootObjectId() const;
 
@@ -100,7 +100,7 @@ public:
     }
 
 public Q_SLOTS:
-    void initFromObjects(const QVector<ivm::IVObject *> &visibleObjects);
+    void initFromObjects(const QVector<ivm::IVObject *> &objects);
     void addObjects(const QVector<ivm::IVObject *> &objects);
 
 Q_SIGNALS:

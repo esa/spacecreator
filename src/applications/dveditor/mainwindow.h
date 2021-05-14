@@ -38,6 +38,9 @@ public:
     explicit MainWindow(dve::DVEditorCore *core, QWidget *parent = nullptr);
     ~MainWindow() override;
 
+public Q_SLOTS:
+    void onOpenFileRequested();
+
 protected:
     void closeEvent(QCloseEvent *e) override;
 
@@ -45,6 +48,7 @@ private:
     void initActions();
     void initMenus();
     void initSettings();
+    bool closeFile();
     bool prepareQuit();
     void updateWindowTitle();
     void onDocDirtyChanged(bool dirty);

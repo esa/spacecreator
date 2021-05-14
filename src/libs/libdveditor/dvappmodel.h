@@ -17,53 +17,56 @@
 
 #pragma once
 
-#include "editorcore.h"
+#include <QObject>
+#include <memory>
 
 class QUndoStack;
-class QToolBar;
+
+namespace dvm {
+class DVModel;
+}
 
 namespace shared {
-class CommandLineParser;
 namespace cmd {
 class CommandsStackBase;
-}
-namespace ui {
-class GraphicsViewBase;
 }
 }
 
 namespace dve {
-class DVAppModel;
 
-class DVEditorCore : public shared::EditorCore
+/*!
+   Main Class of the deployment view editor managing all data
+ */
+class DVAppModel : public QObject
 {
     Q_OBJECT
+    Q_PROPERTY(QString path READ path WRITE setPath NOTIFY titleChanged)
+
 public:
-    explicit DVEditorCore(QObject *parent = nullptr);
-    ~DVEditorCore() override;
+    explicit DVAppModel(QObject *parent = nullptr);
 
-    dve::DVAppModel *appModel() const;
-
-    void addToolBars(QMainWindow *window) override;
-
-    shared::ui::GraphicsViewBase *chartView() override;
-    QToolBar *toolBar();
-    QWidget *mainwidget();
-
-    void registerBasicActions();
-
-    QUndoStack *undoStack() const override;
+    QUndoStack *undoStack() const;
     shared::cmd::CommandsStackBase *commandsStack() const;
 
-    void populateCommandLineArguments(shared::CommandLineParser *parser) const override;
-    bool renameAsnFile(const QString &oldName, const QString &newName) override;
+    bool load(const QString &path);
+    void close();
 
-    QString filePath() const override;
-    bool save() override;
+    QString path() const;
+    void setPath(const QString &path);
+
+    dvm::DVModel *objectsModel() const;
+
+    bool isDirty() const;
+
+    QString supportedFileExtensions() const;
+
+Q_SIGNALS:
+    void dirtyChanged(bool dirty);
+    void titleChanged();
 
 private:
-    struct DeploymentInterfacePrivate;
-    std::unique_ptr<DeploymentInterfacePrivate> d;
+    struct DVAppModelPrivate;
+    DVAppModelPrivate *d;
 };
 
 } // namespace dve
