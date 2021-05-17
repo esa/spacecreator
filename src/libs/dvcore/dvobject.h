@@ -37,6 +37,7 @@ public:
     enum class Type
     {
         Unknown = 0,
+
         Node,
         Processor,
         Partition,
@@ -53,7 +54,7 @@ public:
 
     QString title() const;
 
-    DVObject::Type deployType() const;
+    DVObject::Type type() const;
 
     QVector<qint32> coordinates() const override;
     void setCoordinates(const QVector<qint32> &coordinates) override;

@@ -49,7 +49,6 @@ public:
 
 public Q_SLOTS:
     void showAsn1Dialog();
-    void showE2EDataflow(const QStringList &mscFiles);
 
 private:
     DVEditorDocument *m_document = nullptr;

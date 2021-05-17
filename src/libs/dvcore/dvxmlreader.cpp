@@ -80,7 +80,7 @@ void DVXMLReader::processTagOpen(QXmlStreamReader &xml)
         obj = new dvm::DVDevice(d->m_currentObject);
     } break;
     case meta::Props::Token::Function: {
-        if (d->m_currentObject && d->m_currentObject->deployType() == DVObject::Type::Partition) {
+        if (d->m_currentObject && d->m_currentObject->type() == DVObject::Type::Partition) {
             if (auto partition = d->m_currentObject->as<DVPartition *>()) {
                 partition->addFunction(xml.readElementText());
             }

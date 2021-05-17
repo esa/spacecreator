@@ -17,14 +17,14 @@
 
 #include "iveditordocument.h"
 
-#include "ivmainwidget.h"
 #include "interface/interfacedocument.h"
 #include "iveditorcore.h"
+#include "ivexporter.h"
+#include "ivmainwidget.h"
 #include "spacecreatorpluginconstants.h"
 #include "spacecreatorproject.h"
 #include "spacecreatorprojectimpl.h"
 #include "spacecreatorprojectmanager.h"
-#include "xmldocexporter.h"
 
 #include <QFileInfo>
 #include <QUndoStack>
@@ -87,14 +87,14 @@ bool IVEditorDocument::save(QString *errorString, const QString &name, bool auto
 
     ive::InterfaceDocument *ivDocument = m_plugin->document();
     ivDocument->setPath(actualName.toString());
-    if (!ive::XmlDocExporter::exportDocSilently(m_plugin->document(), actualName.toString(), {})) {
+    if (!ivDocument->exporter()->exportDocSilently(m_plugin->document(), actualName.toString())) {
         ivDocument->setPath(oldFileName.toString());
         return false;
     }
 
     if (autoSave) {
         ivDocument->setPath(oldFileName.toString());
-        ive::XmlDocExporter::exportDocSilently(m_plugin->document(), actualName.toString(), {});
+        ivDocument->exporter()->exportDocSilently(m_plugin->document(), actualName.toString());
         return true;
     }
 

@@ -90,7 +90,7 @@ void DVXMLReaderTest::tst_functions()
 {
     auto findPartition = [](const QVector<dvm::DVObject *> &objects) -> dvm::DVPartition * {
         auto it = std::find_if(objects.begin(), objects.end(),
-                [](const dvm::DVObject *obj) { return obj->deployType() == dvm::DVObject::Type::Partition; });
+                [](const dvm::DVObject *obj) { return obj->type() == dvm::DVObject::Type::Partition; });
         if (it != objects.end()) {
             return (*it)->as<dvm::DVPartition *>();
         }

@@ -122,21 +122,16 @@ bool StringTemplate::parseFile(
     Grantlee::Context context;
     for (auto it = grouppedObjects.cbegin(); it != grouppedObjects.cend(); ++it) {
         const QString &name = it.key();
-        QVariant v = it.value();
-        bool isObject = false;
+        const QVariant v = it.value();
         if (v.canConvert<QVariantList>()) {
-            QVariantList list = v.value<QVariantList>();
-            if (list.size() == 1) {
-                if (list[0].canConvert<QObject *>()) {
-                    QObject *obj = list[0].value<QObject *>();
-                    context.insert(name, obj);
-                    isObject = true;
-                }
+            const QVariantList list = v.value<QVariantList>();
+            if (list.size() == 1 && list[0].canConvert<QObject *>()) {
+                QObject *obj = list[0].value<QObject *>();
+                context.insert(name, obj);
+                continue;
             }
         }
-        if (!isObject) {
-            context.insert(name, v);
-        }
+        context.insert(name, v);
     }
 
     const Grantlee::Template stringTemplate = m_engine->loadByName(fileInfo.fileName());

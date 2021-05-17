@@ -1,0 +1,5 @@
+{% comment %}
+Template for generation of XML scheme of the whole deployment view.
+{% endcomment %}
+<DeploymentView>
+</DeploymentView>

@@ -44,10 +44,9 @@ enum FileCopyingMode
     Overwrite
 };
 
-void copyDir(const QString &source, const QString &dest);
+void copyDir(const QString &source, const QString &dest, FileCopyingMode replaceMode = FileCopyingMode::Keep);
 
-bool copyResourceFile(
-        const QString &source, const QString &target, FileCopyingMode replaceMode = FileCopyingMode::Keep);
+bool copyFile(const QString &source, const QString &target, FileCopyingMode replaceMode = FileCopyingMode::Keep);
 
 void setWidgetFontColor(QWidget *widget, const QColor &color);
 

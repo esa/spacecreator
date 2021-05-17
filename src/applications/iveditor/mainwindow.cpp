@@ -17,7 +17,6 @@
 
 #include "mainwindow.h"
 
-#include "ivfunctiontype.h"
 #include "asn1dialog.h"
 #include "baseitems/common/ivutils.h"
 #include "commandsstack.h"
@@ -27,11 +26,12 @@
 #include "interface/commands/cmdchangeasn1file.h"
 #include "interface/interfacedocument.h"
 #include "iveditorcore.h"
+#include "ivexporter.h"
+#include "ivfunctiontype.h"
 #include "minimap.h"
 #include "reports/bugreportdialog.h"
 #include "settingsmanager.h"
 #include "ui_mainwindow.h"
-#include "xmldocexporter.h"
 #include "zoomcontroller.h"
 
 #include <QCloseEvent>
@@ -107,6 +107,9 @@ MainWindow::MainWindow(ive::IVEditorCore *core, QWidget *parent)
 
     connect(m_core->document(), &InterfaceDocument::asn1ParameterErrorDetected, this, &MainWindow::showAsn1Errors);
 
+    connect(m_core->document()->exporter(), &IVExporter::exported, m_core->document(),
+            &InterfaceDocument::onSavedExternally);
+
     // Create the E2E view and add the action
     auto endToEndView = new EndToEndView(m_core->document(), this);
     endToEndView->hide();
@@ -175,7 +178,7 @@ void MainWindow::onExportTypeRequested()
  */
 bool MainWindow::exportXml(const QString &savePath, const QString &templatePath)
 {
-    return XmlDocExporter::exportDocSilently(m_core->document(), savePath, templatePath);
+    return m_core->document()->exporter()->exportDocSilently(m_core->document(), savePath, templatePath);
 }
 
 /*!
@@ -186,7 +189,7 @@ bool MainWindow::exportXml(const QString &savePath, const QString &templatePath)
  */
 bool MainWindow::exportXmlAs(const QString &savePath, const QString &templatePath)
 {
-    return XmlDocExporter::exportDocInteractive(m_core->document(), this, savePath, templatePath);
+    return m_core->document()->exporter()->exportDocInteractively(m_core->document(), savePath, templatePath);
 }
 
 void MainWindow::onQuitRequested()

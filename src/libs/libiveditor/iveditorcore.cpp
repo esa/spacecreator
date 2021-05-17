@@ -17,10 +17,6 @@
 
 #include "iveditorcore.h"
 
-#include "ivconnection.h"
-#include "ivfunction.h"
-#include "ivinterface.h"
-#include "ivmodel.h"
 #include "baseitems/common/ivutils.h"
 #include "commandlineparser.h"
 #include "commandsstack.h"
@@ -34,7 +30,11 @@
 #include "interface/commands/cmdinterfaceitemcreate.h"
 #include "interface/creatortool.h"
 #include "interface/interfacedocument.h"
-#include "xmldocexporter.h"
+#include "ivconnection.h"
+#include "ivexporter.h"
+#include "ivfunction.h"
+#include "ivinterface.h"
+#include "ivmodel.h"
 
 #include <QDateTime>
 #include <QDebug>
@@ -396,7 +396,7 @@ QString IVEditorCore::filePath() const
 
 bool IVEditorCore::save()
 {
-    return ive::XmlDocExporter::exportDocSilently(m_document, {}, {});
+    return m_document->exporter()->exportDocSilently(m_document);
 }
 
 QVector<ivm::IVFunction *> IVEditorCore::allIVFunctions() const

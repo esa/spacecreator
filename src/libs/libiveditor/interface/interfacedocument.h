@@ -46,6 +46,7 @@ namespace cmd {
 class CommandsStack;
 }
 
+class IVExporter;
 class IVItemModel;
 class IVCommentGraphicsItem;
 class IVConnectionGraphicsItem;
@@ -67,6 +68,8 @@ public:
     QVector<QAction *> initActions();
 
     void fillToolBar(QToolBar *toolBar);
+
+    IVExporter *exporter() const;
 
     QGraphicsScene *scene() const;
     shared::ui::GraphicsViewBase *graphicsView() const;

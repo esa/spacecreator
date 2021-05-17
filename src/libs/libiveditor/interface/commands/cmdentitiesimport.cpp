@@ -23,7 +23,7 @@
 #include "ivmodel.h"
 #include "ivnamevalidator.h"
 #include "ivxmlreader.h"
-#include "xmldocexporter.h"
+#include "ivexporter.h"
 
 #include <QBuffer>
 #include <QDir>

@@ -186,8 +186,8 @@ target_sources(${LIB_NAME} PRIVATE
     templating/exportableivinterface.h
     templating/exportableivobject.cpp
     templating/exportableivobject.h
-    xmldocexporter.cpp
-    xmldocexporter.h
+    ivexporter.cpp
+    ivexporter.h
     zoomcontroller.cpp
     zoomcontroller.h
     interface/commonvisualizationmodel.cpp

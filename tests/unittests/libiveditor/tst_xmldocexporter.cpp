@@ -19,10 +19,10 @@
 #include "interface/interfacedocument.h"
 #include "ivcomment.h"
 #include "iveditor.h"
+#include "ivexporter.h"
 #include "ivfunction.h"
 #include "ivlibrary.h"
 #include "parameter.h"
-#include "xmldocexporter.h"
 
 #include <QFile>
 #include <QObject>
@@ -151,7 +151,7 @@ void tst_XmlDocExporter::cleanup()
 
 void tst_XmlDocExporter::testExportEmptyDoc()
 {
-    ive::XmlDocExporter::exportDocSilently(m_doc.get(), testFilePath);
+    m_doc->exporter()->exportDocSilently(m_doc.get(), testFilePath);
     const QByteArray text = testFileContent();
     const QByteArray expected = "<?xml version=\"1.0\"?>\n<InterfaceView/>";
     QVERIFY(XmlData(expected) == XmlData(text));
@@ -169,7 +169,7 @@ void tst_XmlDocExporter::testExportFunctions()
     objects.append(testfunc1);
     m_doc->setObjects(objects);
 
-    ive::XmlDocExporter::exportDocSilently(m_doc.get(), testFilePath);
+    QVERIFY(m_doc->exporter()->exportDocSilently(m_doc.get(), testFilePath));
     const QByteArray text = testFileContent();
     const QByteArray expected =
             "<?xml version=\"1.0\"?>\n<InterfaceView>\n"
@@ -190,7 +190,7 @@ void tst_XmlDocExporter::testExportComment()
     objects.append(testcomment1);
     m_doc->setObjects(objects);
 
-    ive::XmlDocExporter::exportDocSilently(m_doc.get(), testFilePath);
+    QVERIFY(m_doc->exporter()->exportDocSilently(m_doc.get(), testFilePath));
     const QByteArray text = testFileContent();
     const QByteArray expected = "<?xml version=\"1.0\"?>\n<InterfaceView>\n"
                                 "    <Comment name=\"TestComment1\" foo=\"11\"/>\n"
@@ -208,7 +208,7 @@ void tst_XmlDocExporter::testExportNestedComment()
     objects.append(testfunc1);
     m_doc->setObjects(objects);
 
-    ive::XmlDocExporter::exportDocSilently(m_doc.get(), testFilePath);
+    QVERIFY(m_doc->exporter()->exportDocSilently(m_doc.get(), testFilePath));
     const QByteArray text = testFileContent();
     const QByteArray expected = "<?xml version=\"1.0\"?>\n<InterfaceView>\n"
                                 "    <Function name=\"TestFunc1\" is_type=\"NO\" instance_of=\"\" language=\"SDL\">\n"
@@ -221,7 +221,7 @@ void tst_XmlDocExporter::testExportNestedComment()
 void tst_XmlDocExporter::testExportAsn1File()
 {
     m_doc->setAsn1FileName("fake.asn");
-    ive::XmlDocExporter::exportDocSilently(m_doc.get(), testFilePath);
+    QVERIFY(m_doc->exporter()->exportDocSilently(m_doc.get(), testFilePath));
     const QByteArray text = testFileContent();
     const QByteArray expected = "<?xml version=\"1.0\"?>\n<InterfaceView asn1file=\"fake.asn\"/>";
     QVERIFY(XmlData(expected) == XmlData(text));
@@ -231,8 +231,7 @@ void tst_XmlDocExporter::testExportToBuffer()
 {
     QBuffer buffer;
     buffer.open(QIODevice::ReadWrite);
-    bool ok = ive::XmlDocExporter::exportDoc(m_doc.get(), &buffer);
-    QCOMPARE(ok, true);
+    m_doc->exporter()->exportObjects(m_doc->objects().values(), &buffer);
     const QByteArray expected = "<?xml version=\"1.0\"?>\n<InterfaceView/>";
     QVERIFY(XmlData(expected) == XmlData(buffer.data()));
 }

@@ -14,9 +14,29 @@ target_sources(${LIB_NAME} PRIVATE
     dveditorresources.qrc
     dvitemmodel.cpp
     dvitemmodel.h
+    templating/exportabledvobject.cpp
+    templating/exportabledvobject.h
+    templating/exportabledvnode.cpp
+    templating/exportabledvnode.h
+    templating/exportabledvprocessor.cpp
+    templating/exportabledvprocessor.h
+    templating/exportabledvpartition.cpp
+    templating/exportabledvpartition.h
+    templating/exportabledvbinding.cpp
+    templating/exportabledvbinding.h
+    templating/exportabledvbus.cpp
+    templating/exportabledvbus.h
+    templating/exportabledvconnection.cpp
+    templating/exportabledvconnection.h
+    templating/exportabledvdevice.cpp
+    templating/exportabledvdevice.h
+    dvexporter.cpp
+    dvexporter.h
 )
 
 target_link_libraries(${LIB_NAME}
+    dvcore
+    templating
     shared
     dvcore
     ${QT_SVG}

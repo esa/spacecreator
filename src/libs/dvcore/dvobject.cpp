@@ -46,7 +46,7 @@ QString DVObject::title() const
     return entityAttributeValue<QString>(meta::Props::token(meta::Props::Token::name));
 }
 
-DVObject::Type DVObject::deployType() const
+DVObject::Type DVObject::type() const
 {
     return d->m_type;
 }

@@ -45,7 +45,7 @@ ColorManager::ColorManager(QObject *parent)
             shared::SettingsManager::Common::ColorSchemeFile, prepareDefaultSource());
 
     if (!sourcePath.isEmpty() && !setSourceFile(sourcePath)) { // source file can be corrupted
-        shared::copyResourceFile(defaultColorsResourceFile(), sourcePath, shared::FileCopyingMode::Overwrite);
+        shared::copyFile(defaultColorsResourceFile(), sourcePath, shared::FileCopyingMode::Overwrite);
         setSourceFile(sourcePath);
     }
 }
@@ -247,7 +247,7 @@ QString ColorManager::prepareDefaultSource() const
     if (QFile::exists(jsonFilePath))
         return jsonFilePath;
 
-    if (shared::copyResourceFile(defaultColorsResourceFile(), jsonFilePath))
+    if (shared::copyFile(defaultColorsResourceFile(), jsonFilePath))
         return jsonFilePath;
 
     qWarning() << "Can't create default colors file" << jsonFilePath;

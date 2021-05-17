@@ -15,13 +15,14 @@
    along with this program. If not, see <https://www.gnu.org/licenses/lgpl-2.1.html>.
 */
 
-#include "ivfunction.h"
-#include "ivinterface.h"
-#include "ivmodel.h"
-#include "ivtestutils.h"
 #include "asn1modelstorage.h"
 #include "interface/interfacedocument.h"
 #include "iveditor.h"
+#include "ivfunction.h"
+#include "ivinterface.h"
+#include "ivlibrary.h"
+#include "ivmodel.h"
+#include "ivtestutils.h"
 
 #include <QObject>
 #include <QtTest>
@@ -43,6 +44,7 @@ private:
 
 void tst_InterfaceDocument::initTestCase()
 {
+    ivm::initIVLibrary();
     ive::initIVEditor();
     QStandardPaths::setTestModeEnabled(true);
 }

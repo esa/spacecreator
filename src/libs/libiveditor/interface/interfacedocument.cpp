@@ -38,13 +38,13 @@
 #include "ivcomment.h"
 #include "ivconnection.h"
 #include "ivconnectiongroup.h"
+#include "ivexporter.h"
 #include "ivfunction.h"
 #include "ivfunctiongraphicsitem.h"
 #include "ivitemmodel.h"
 #include "ivmodel.h"
 #include "ivxmlreader.h"
 #include "propertytemplateconfig.h"
-#include "xmldocexporter.h"
 
 #include <QAction>
 #include <QApplication>
@@ -85,6 +85,7 @@ struct InterfaceDocument::InterfaceDocumentPrivate {
     ivm::IVModel *importModel { nullptr };
     ObjectsTreeView *sharedView { nullptr };
     ivm::IVModel *sharedModel { nullptr };
+    IVExporter *exporter { nullptr };
 
     QAction *actCreateConnectionGroup { nullptr };
     QAction *actRemove { nullptr };
@@ -110,6 +111,8 @@ InterfaceDocument::InterfaceDocument(QObject *parent)
     : QObject(parent)
     , d(new InterfaceDocumentPrivate)
 {
+    d->exporter = new IVExporter(this);
+
     setAsn1ModelStorage(new Asn1Acn::Asn1ModelStorage(this));
 
     d->commandsStack = new cmd::CommandsStack(this);
@@ -199,6 +202,11 @@ void InterfaceDocument::fillToolBar(QToolBar *toolBar)
     }
 
     toolBar->setUpdatesEnabled(true);
+}
+
+IVExporter *InterfaceDocument::exporter() const
+{
+    return d->exporter;
 }
 
 QGraphicsScene *InterfaceDocument::scene() const
@@ -750,7 +758,7 @@ void InterfaceDocument::importEntity(const shared::Id &id, const QPointF &sceneD
         return;
     }
 
-    if (!XmlDocExporter::exportObjects({ obj }, &buffer)) {
+    if (!d->exporter->exportObjects({ obj }, &buffer)) {
         qWarning() << "Error during component export";
         return;
     }
@@ -788,7 +796,7 @@ void InterfaceDocument::copyItems()
 
     QString name;
     const QList<ivm::IVObject *> objects = prepareSelectedObjectsForExport(name, true);
-    if (!XmlDocExporter::exportObjects(objects, &buffer)) {
+    if (!d->exporter->exportObjects(objects, &buffer)) {
         qWarning() << "Error during component export";
         return;
     }
@@ -885,7 +893,7 @@ bool InterfaceDocument::exportImpl(const QString &targetDir, const QList<ivm::IV
         qWarning() << "Can't open buffer for exporting:" << buffer.errorString();
         return false;
     }
-    if (!XmlDocExporter::exportObjects(objects, &buffer)) {
+    if (!d->exporter->exportObjects(objects, &buffer)) {
         qWarning() << "Error during component export";
         return false;
     }

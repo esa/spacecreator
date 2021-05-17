@@ -23,7 +23,6 @@
 #include "spacecreatorproject.h"
 #include "spacecreatorprojectimpl.h"
 #include "spacecreatorprojectmanager.h"
-#include "xmldocexporter.h"
 
 #include <QFileInfo>
 #include <QUndoStack>

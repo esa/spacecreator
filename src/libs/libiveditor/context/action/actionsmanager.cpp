@@ -20,10 +20,10 @@
 #include "common.h"
 #include "extprocmonitor.h"
 #include "interface/interfacedocument.h"
+#include "ivexporter.h"
 #include "ivfunction.h"
 #include "ivinterface.h"
 #include "ivobject.h"
-#include "xmldocexporter.h"
 
 #include <QAction>
 #include <QApplication>
@@ -158,7 +158,7 @@ void ActionsManager::deployDefaults()
     shared::ensureDirExists(targetDir);
 
     if (!QFileInfo::exists(targetFilePath)) {
-        shared::copyResourceFile(":/defaults/resources/" + targetFile, targetFilePath);
+        shared::copyFile(":/defaults/resources/" + targetFile, targetFilePath);
     }
 }
 
@@ -406,7 +406,8 @@ void ActionsManager::triggerActionExternal(const Action &act, const ivm::IVObjec
             auto btn = QMessageBox::question(nullptr, QObject::tr("Document closing"),
                     QObject::tr("There are unsaved changes.\nWould you like to save the document?"), btns);
             if (btn == QMessageBox::Save) {
-                const bool ok = XmlDocExporter::exportDocSilently(doc);
+                IVExporter exporter;
+                const bool ok = exporter.exportDocSilently(doc);
                 if (!ok) {
                     QMessageBox::warning(
                             nullptr, QObject::tr("Save error"), QObject::tr("Unable to save the document.\nAborting"));

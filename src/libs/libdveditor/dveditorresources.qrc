@@ -1,3 +1,5 @@
 <RCC>
-    <qresource prefix="/defaults"/>
+    <qresource prefix="/defaults">
+        <file>templating/xml_templates/deploymentview.tmplt</file>
+    </qresource>
 </RCC>

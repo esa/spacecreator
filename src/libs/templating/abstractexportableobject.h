@@ -17,6 +17,8 @@
 
 #pragma once
 
+#include "veobject.h"
+
 #include <QObject>
 #include <QPointer>
 
@@ -35,14 +37,6 @@ public:
     }
 
     virtual ~AbstractExportableObject() = default;
-
-    /**
-     * @brief groupName is a logical name of a group of objects which given object belongs to.
-     * Exportable objects are grouped by the group name and kept in QVariantList.
-     * Then the group name is used in the string template to retrieve all grouped objects.
-     * @return name of the group
-     */
-    virtual QString groupName() const = 0;
 
 protected:
     /**

@@ -70,7 +70,7 @@ void tst_IVUtils::tst_copyResourceFile()
         return;
     }
 
-    QVERIFY(shared::copyResourceFile(filePath, destFilePath));
+    QVERIFY(shared::copyFile(filePath, destFilePath));
     const auto hash = fileHash(destFilePath);
 
     while (it.hasNext()) {
@@ -82,7 +82,7 @@ void tst_IVUtils::tst_copyResourceFile()
     if (!QFile::exists(filePath)) {
         return;
     }
-    QVERIFY(!shared::copyResourceFile(filePath, destFilePath, shared::FileCopyingMode::Keep));
+    QVERIFY(!shared::copyFile(filePath, destFilePath, shared::FileCopyingMode::Keep));
     QVERIFY(hash == fileHash(destFilePath));
 
     while (it.hasNext()) {
@@ -94,7 +94,7 @@ void tst_IVUtils::tst_copyResourceFile()
     if (!QFile::exists(filePath)) {
         return;
     }
-    QVERIFY(shared::copyResourceFile(filePath, destFilePath, shared::FileCopyingMode::Overwrite));
+    QVERIFY(shared::copyFile(filePath, destFilePath, shared::FileCopyingMode::Overwrite));
     QVERIFY(hash != fileHash(destFilePath));
 
     QFile::remove(destFilePath);

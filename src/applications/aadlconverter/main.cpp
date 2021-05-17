@@ -15,12 +15,12 @@
   along with this program. If not, see <https://www.gnu.org/licenses/lgpl-2.1.html>.
 */
 
-#include "ivlibrary.h"
 #include "commandlineparser.h"
 #include "interface/interfacedocument.h"
 #include "iveditor.h"
+#include "ivexporter.h"
+#include "ivlibrary.h"
 #include "sharedlibrary.h"
-#include "xmldocexporter.h"
 
 #include <QCoreApplication>
 #include <QDebug>
@@ -57,7 +57,7 @@ int main(int argc, char *argv[])
             qCritical() << "Unable to load file" << inputFile;
             return -1;
         }
-        const bool convertOk = ive::XmlDocExporter::exportDocSilently(&doc, outputFile, templateFile);
+        const bool convertOk = doc.exporter()->exportDocSilently(&doc, outputFile, templateFile);
         if (!convertOk) {
             qCritical() << "Error converting " << inputFile << "to" << outputFile;
             return -1;

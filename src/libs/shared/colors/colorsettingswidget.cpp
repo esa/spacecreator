@@ -130,7 +130,7 @@ void ColorSettingsWidget::on_btnCreateNew_clicked()
     dialog.setDefaultSuffix(".json");
     if (dialog.exec() == QDialog::Accepted) {
         const QString file = dialog.selectedUrls().value(0).toLocalFile();
-        if (shared::copyResourceFile(
+        if (shared::copyFile(
                     ColorManager::defaultColorsResourceFile(), file, shared::FileCopyingMode::Overwrite)) {
             openFile(file);
         }

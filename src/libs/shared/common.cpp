@@ -71,7 +71,7 @@ Id createId()
  * If the \a target file already exists, this function will not overwrite
  * and return \c false;
  */
-bool copyResourceFile(const QString &source, const QString &target, FileCopyingMode replaceMode)
+bool copyFile(const QString &source, const QString &target, FileCopyingMode replaceMode)
 {
     if (source.isEmpty() || target.isEmpty()) {
         return false;
@@ -140,14 +140,14 @@ bool ensureDirExists(const QString &path)
 
 bool ensureFileExists(const QString &filePath, const QString &defaultFilePath)
 {
-    if (!QFileInfo::exists(filePath) && !copyResourceFile(defaultFilePath, filePath)) {
+    if (!QFileInfo::exists(filePath) && !copyFile(defaultFilePath, filePath)) {
         qWarning() << "Can't create default file path:" << filePath << "from:" << defaultFilePath;
         return false;
     }
     return true;
 }
 
-void copyDir(const QString &source, const QString &dest)
+void copyDir(const QString &source, const QString &dest, FileCopyingMode replaceMode)
 {
     static const QDir::Filters filters = QDir::NoDotAndDotDot | QDir::Dirs | QDir::Files;
     QDir sourceExportDir { source };
@@ -165,7 +165,8 @@ void copyDir(const QString &source, const QString &dest)
         if (fileInfo.isDir()) {
             targetExportDir.mkpath(relPath);
         } else {
-            const bool result = QFile::copy(fileInfo.absoluteFilePath(), targetExportDir.absoluteFilePath(relPath));
+            const bool result =
+                    copyFile(fileInfo.absoluteFilePath(), targetExportDir.absoluteFilePath(relPath), replaceMode);
             if (!result) {
                 qWarning() << "Error during source file copying:" << filePath
                            << targetExportDir.absoluteFilePath(relPath);

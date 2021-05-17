@@ -34,30 +34,6 @@ ExportableIVObject::ExportableIVObject(const ivm::IVObject *ivObject)
 {
 }
 
-QString ExportableIVObject::groupName() const
-{
-    const ivm::IVObject *ivObject = exportedObject<ivm::IVObject>();
-    switch (ivObject->type()) {
-    case ivm::IVObject::Type::InterfaceGroup:
-        return {};
-    case ivm::IVObject::Type::Function:
-    case ivm::IVObject::Type::FunctionType:
-        return QStringLiteral("Functions");
-    case ivm::IVObject::Type::RequiredInterface:
-    case ivm::IVObject::Type::ProvidedInterface:
-        return QStringLiteral("Interfaces");
-    case ivm::IVObject::Type::Comment:
-        return QStringLiteral("Comments");
-    case ivm::IVObject::Type::Connection:
-        return QStringLiteral("Connections");
-    case ivm::IVObject::Type::ConnectionGroup:
-        return QStringLiteral("ConnectionGroups");
-    default:
-        Q_UNREACHABLE();
-    }
-    return QString();
-}
-
 QString ExportableIVObject::name() const
 {
     return exportedObject<ivm::IVObject>()->title();
@@ -90,7 +66,6 @@ QVariant ExportableIVObject::createFrom(const ivm::IVObject *ivObject)
     }
     return QVariant();
 }
-
 /**
  * @brief ExportableIVObject::attributes returns list of attributes for using in string templates.
  * @return list of attributes.

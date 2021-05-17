@@ -15,6 +15,8 @@ target_sources(${LIB_NAME} PRIVATE
     templatesyntaxhelpdialog.h
     xmlhighlighter.cpp
     xmlhighlighter.h
+    objectsexporter.cpp
+    objectsexporter.h
     template_syntax_help.qrc
 )
 
@@ -25,6 +27,7 @@ target_link_libraries(${LIB_NAME}
     ${QT_GUI}
     ${QT_WIDGETS}
     Grantlee5::Templates
+    shared
 )
 
 source_group("Designer Files" REGULAR_EXPRESSION ".*.ui$")
