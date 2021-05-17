@@ -17,7 +17,12 @@
 
 #pragma once
 
-#include <QObject>
+#include <QPointer>
+
+class QUndoStack;
+namespace dvm {
+class DVModel;
+}
 
 namespace dve {
 
@@ -25,7 +30,11 @@ class DVItemModel : public QObject
 {
     Q_OBJECT
 public:
-    explicit DVItemModel(QObject *parent = nullptr);
+    explicit DVItemModel(dvm::DVModel *model, QUndoStack *undoStack, QObject *parent = nullptr);
+
+private:
+    QPointer<dvm::DVModel> m_model;
+    QPointer<QUndoStack> m_undoStack;
 };
 
 } // namespace dve

@@ -28,7 +28,7 @@ namespace cmd {
 
 CmdFunctionTypeItemCreate::CmdFunctionTypeItemCreate(
         ivm::IVModel *model, ivm::IVFunction *parent, const QRectF &geometry, const shared::Id &id)
-    : CmdEntityGeometryChange({}, QObject::tr("Create Function Type"))
+    : shared::cmd::CmdEntityGeometryChange({}, QObject::tr("Create Function Type"))
     , m_model(model)
     , m_parent(parent)
     , m_entity(new ivm::IVFunctionType(
@@ -46,7 +46,7 @@ CmdFunctionTypeItemCreate::~CmdFunctionTypeItemCreate()
 
 void CmdFunctionTypeItemCreate::redo()
 {
-    CmdEntityGeometryChange::redo();
+    shared::cmd::CmdEntityGeometryChange::redo();
 
     if (m_parent)
         m_parent->addChild(m_entity);
@@ -56,7 +56,7 @@ void CmdFunctionTypeItemCreate::redo()
 
 void CmdFunctionTypeItemCreate::undo()
 {
-    CmdEntityGeometryChange::undo();
+    shared::cmd::CmdEntityGeometryChange::undo();
 
     if (m_model)
         m_model->removeObject(m_entity);

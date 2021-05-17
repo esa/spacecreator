@@ -35,8 +35,10 @@ struct ValidationResult;
 }
 
 namespace ive {
-
 namespace gi {
+
+static const int kNestingVisibilityLevel = 0;
+static_assert(kNestingVisibilityLevel >= 0, "Nesting level shouldn't be negative");
 
 QList<int> knownGraphicsItemTypes();
 
@@ -54,14 +56,9 @@ ivm::IVConnection *connectionObject(QGraphicsItem *item);
 
 ivm::IVObject *object(const QGraphicsItem *item);
 
-enum RectOperation
-{
-    Create,
-    Edit
-};
+qreal itemLevel(const ivm::IVObject *const object, bool itemSelected);
 
-bool isBounded(const QGraphicsItem *upcomingItem, const QRectF &upcomingItemRect);
-bool isCollided(const QGraphicsItem *upcomingItem, const QRectF &upcomingItemRect);
+int nestingLevel(ivm::IVObject *object);
 
 /*!
  * \brief Performs the validation to detect if it's possible to connect the \a scene's items located in \a startPos and

@@ -17,21 +17,22 @@
 
 #include "endtoendview.h"
 
-#include "ivconnection.h"
-#include "ivconnectionchain.h"
-#include "ivconnectiongroup.h"
-#include "ivfunction.h"
-#include "ivinterfacegroup.h"
-#include "ivmodel.h"
 #include "baseitems/common/ivutils.h"
 #include "endtoendconnections.h"
+#include "interface/graphicsitemhelpers.h"
+#include "interface/interfacedocument.h"
 #include "interface/ivconnectiongraphicsitem.h"
 #include "interface/ivconnectiongroupgraphicsitem.h"
 #include "interface/ivflowconnectiongraphicsitem.h"
 #include "interface/ivfunctiongraphicsitem.h"
 #include "interface/ivinterfacegraphicsitem.h"
 #include "interface/ivinterfacegroupgraphicsitem.h"
-#include "interface/interfacedocument.h"
+#include "ivconnection.h"
+#include "ivconnectionchain.h"
+#include "ivconnectiongroup.h"
+#include "ivfunction.h"
+#include "ivinterfacegroup.h"
+#include "ivmodel.h"
 #include "leafdocumentsmodel.h"
 #include "mscmodel.h"
 #include "mscreader.h"
@@ -197,21 +198,21 @@ bool EndToEndView::refreshView()
 
     // Add new graphics items for each object
     QHash<shared::Id, QGraphicsItem *> items;
-    InteractiveObject *rootItem = nullptr;
+    shared::ui::VEInteractiveObject *rootItem = nullptr;
     for (auto obj : objects) {
-        const int lowestLevel = nestingLevel(d->document->objectsModel()->rootObject()) + 1;
-        const int objectLevel = nestingLevel(obj);
+        const int lowestLevel = gi::nestingLevel(d->document->objectsModel()->rootObject()) + 1;
+        const int objectLevel = gi::nestingLevel(obj);
         const bool isRootOrRootChild = obj->id() == d->document->objectsModel()->rootObjectId()
                 || (d->document->objectsModel()->rootObject()
                         && obj->parentObject() == d->document->objectsModel()->rootObject());
-        if ((objectLevel < lowestLevel || objectLevel > (lowestLevel + ive::kNestingVisibilityLevel))
+        if ((objectLevel < lowestLevel || objectLevel > (lowestLevel + gi::kNestingVisibilityLevel))
                 && !isRootOrRootChild) {
             continue;
         }
 
         QGraphicsItem *parentItem = obj->parentObject() ? items.value(obj->parentObject()->id()) : nullptr;
 
-        InteractiveObject *item = nullptr;
+        shared::ui::VEInteractiveObject *item = nullptr;
         switch (obj->type()) {
         case ivm::IVObject::Type::InterfaceGroup:
             if (parentItem) {
@@ -331,12 +332,11 @@ bool EndToEndView::refreshView()
                         ifaceStart ? items.value(ifaceStart->id()) : nullptr);
 
                 ivm::IVInterface *ifaceEnd = connection->targetInterface();
-                if (ifaceEnd && ifaceEnd->isGrouped()
-                        && ifaceEnd->type() != ivm::IVObject::Type::InterfaceGroup) {
+                if (ifaceEnd && ifaceEnd->isGrouped() && ifaceEnd->type() != ivm::IVObject::Type::InterfaceGroup) {
                     ifaceEnd = findGroupObject(ifaceEnd);
                 }
-                auto endItem = qgraphicsitem_cast<IVInterfaceGraphicsItem *>(
-                        ifaceEnd ? items.value(ifaceEnd->id()) : nullptr);
+                auto endItem =
+                        qgraphicsitem_cast<IVInterfaceGraphicsItem *>(ifaceEnd ? items.value(ifaceEnd->id()) : nullptr);
 
                 if (connection->type() == ivm::IVObject::Type::ConnectionGroup) {
                     const QList<QPointer<ivm::IVConnection>> groupedConnections =
@@ -403,7 +403,7 @@ bool EndToEndView::refreshView()
         ifItem->updateLabel();
     }
     if (rootItem) {
-        rootItem->rebuildLayout();
+        rootItem->instantLayoutUpdate();
     }
 
     // Set the scene rect based on what we show

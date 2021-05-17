@@ -17,7 +17,7 @@
 
 #pragma once
 
-#include "cmdentitygeometrychange.h"
+#include "commands/cmdentitygeometrychange.h"
 #include "common.h"
 
 #include <QPointer>
@@ -29,7 +29,7 @@ class IVModel;
 namespace ive {
 namespace cmd {
 
-class CmdRootEntityChange : public CmdEntityGeometryChange
+class CmdRootEntityChange : public shared::cmd::CmdEntityGeometryChange
 {
 public:
     explicit CmdRootEntityChange(ivm::IVModel *model, const shared::Id &id);

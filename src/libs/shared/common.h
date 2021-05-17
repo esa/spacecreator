@@ -34,7 +34,7 @@ typedef QUuid Id;
 
 static const Id InvalidId = Id();
 
-const QString kStringDelemiter = QString("::");
+static const QString kStringDelemiter = QStringLiteral("::");
 
 Id createId();
 

@@ -19,13 +19,13 @@
 
 #include "ivfunctiontype.h"
 #include "ivobject.h"
-#include "ivrectgraphicsitem.h"
+#include "ui/verectgraphicsitem.h"
 
 namespace ive {
 
 class IVFunctionNameGraphicsItem;
 
-class IVFunctionTypeGraphicsItem : public IVRectGraphicsItem
+class IVFunctionTypeGraphicsItem : public shared::ui::VERectGraphicsItem
 {
     Q_OBJECT
 public:
@@ -47,6 +47,8 @@ public:
     QString prepareTooltip() const override;
 
     bool isRootItem() const;
+
+    int itemLevel(bool isSelected) const override;
 
 protected Q_SLOTS:
     void applyColorScheme() override;

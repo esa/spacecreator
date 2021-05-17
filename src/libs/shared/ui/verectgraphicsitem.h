@@ -1,5 +1,5 @@
 /*
- Copyright (C) 2018-2020 European Space Agency - <maxime.perrotin@esa.int>
+ Copyright (C) 2018-2021 European Space Agency - <maxime.perrotin@esa.int>
 
  This library is free software; you can redistribute it and/or
  modify it under the terms of the GNU Library General Public
@@ -17,24 +17,27 @@
 
 #pragma once
 
-#include "baseitems/interactiveobject.h"
+#include "veinteractiveobject.h"
 
 #include <QPointer>
 #include <QSet>
 
-namespace ive {
+namespace shared {
+class VEObject;
 
-class IVRectGraphicsItem : public InteractiveObject
+namespace ui {
+
+class VERectGraphicsItem : public VEInteractiveObject
 {
     Q_OBJECT
 public:
-    explicit IVRectGraphicsItem(ivm::IVObject *entity, QGraphicsItem *parentGraphicsItem = nullptr);
+    explicit VERectGraphicsItem(shared::VEObject *entity, QGraphicsItem *parentGraphicsItem = nullptr);
     virtual QSizeF minimalSize() const;
 
     void setRect(const QRectF &geometry);
 
     void updateFromEntity() override;
-    QList<QPair<ivm::IVObject *, QVector<QPointF>>> prepareChangeCoordinatesCommandParams() const override;
+    QList<QPair<shared::VEObject *, QVector<QPointF>>> prepareChangeCoordinatesCommandParams() const override;
 
     /// PUBLIC FOR TESTING PURPOSE, MOVE TO PRIVATE
     QRectF nestedItemsSceneBoundingRect() const;
@@ -61,7 +64,9 @@ private Q_SLOTS:
     void onGeometryChanged();
 
 private:
-    QSet<InteractiveObject *> m_collidedItems;
+    QSet<VEInteractiveObject *> m_collidedItems;
 };
+
+}
 
 }

@@ -176,7 +176,7 @@ void InteractiveObjectBase::setHighlightable(bool highlightable)
 }
 
 /*!
-  \brief InteractiveObject::postCreatePolishing
+  \brief shared::ui::VEInteractiveObject::postCreatePolishing
   Entry point for new (manually added) item fine customization - show configuration dialog.
   Designed to be called from a class derived from BaseCreatorTool.
   Default implementation tries to found a TextItem child. If found, current item
@@ -200,8 +200,9 @@ QPen InteractiveObjectBase::selectedPen() const
    \brief InteractiveObjectBase::scheduleLayoutUpdate
    Triggers a geometry update of that item. That might be needed if for example the underlying entity changes some of
    it's data.
-   The actual update is done in the derived items in the virtual function \see InteractiveObject::rebuildLayout.
-   To perform update instantly use the \see InteractiveObject::instantLayoutUpdate
+   The actual update is done in the derived items in the virtual function \see
+   shared::ui::VEInteractiveObject::rebuildLayout. To perform update instantly use the \see
+   shared::ui::VEInteractiveObject::instantLayoutUpdate
  */
 void InteractiveObjectBase::scheduleLayoutUpdate()
 {
@@ -216,7 +217,7 @@ void InteractiveObjectBase::scheduleLayoutUpdate()
    \brief InteractiveObjectBase::instantLayoutUpdate
    Triggers a geometry update of that item. That might be needed if for example the underlying entity changes some of
    it's data.
-   Unlike the \see InteractiveObject::scheduleLayoutUpdate actual update is performed instantly
+   Unlike the \see shared::ui::VEInteractiveObject::scheduleLayoutUpdate actual update is performed instantly
  */
 void InteractiveObjectBase::instantLayoutUpdate()
 {
@@ -308,7 +309,7 @@ QVariant InteractiveObjectBase::itemChange(GraphicsItemChange change, const QVar
 /*!
    \brief InteractiveObjectBase::rebuildLayout
    In this function updates to the geometry, content etc. is done
-   This is usually triggered by the function \see InteractiveObject::updateLayout
+   This is usually triggered by the function \see shared::ui::VEInteractiveObject::updateLayout
  */
 void InteractiveObjectBase::rebuildLayout() { }
 

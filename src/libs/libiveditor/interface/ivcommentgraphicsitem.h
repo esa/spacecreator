@@ -17,9 +17,9 @@
 
 #pragma once
 
-#include "ivobject.h"
 #include "ivcomment.h"
-#include "ivrectgraphicsitem.h"
+#include "ivobject.h"
+#include "ui/verectgraphicsitem.h"
 
 #include <QScopedPointer>
 
@@ -29,7 +29,7 @@ class IVComment;
 
 namespace ive {
 
-class IVCommentGraphicsItem : public IVRectGraphicsItem
+class IVCommentGraphicsItem : public shared::ui::VERectGraphicsItem
 {
     Q_OBJECT
 
@@ -49,6 +49,8 @@ public:
     ivm::IVComment *entity() const override;
     QSizeF minimalSize() const override;
     void updateFromEntity() override;
+
+    int itemLevel(bool isSelected) const override;
 
 protected Q_SLOTS:
     virtual void applyColorScheme() override;

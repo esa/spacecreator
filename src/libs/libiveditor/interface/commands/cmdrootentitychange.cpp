@@ -25,7 +25,7 @@ namespace ive {
 namespace cmd {
 
 CmdRootEntityChange::CmdRootEntityChange(ivm::IVModel *model, const shared::Id &id)
-    : CmdEntityGeometryChange({}, QObject::tr("Change root item"))
+    : shared::cmd::CmdEntityGeometryChange({}, QObject::tr("Change root item"))
     , m_model(model)
     , m_newId(id)
     , m_prevId(model->rootObjectId())
@@ -38,12 +38,12 @@ void CmdRootEntityChange::redo()
     if (m_model)
         m_model->setRootObject(m_newId);
 
-    CmdEntityGeometryChange::redo();
+    shared::cmd::CmdEntityGeometryChange::redo();
 }
 
 void CmdRootEntityChange::undo()
 {
-    CmdEntityGeometryChange::undo();
+    shared::cmd::CmdEntityGeometryChange::undo();
 
     if (m_model)
         m_model->setRootObject(m_prevId);

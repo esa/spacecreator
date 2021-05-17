@@ -38,7 +38,6 @@ target_link_libraries(${LIB_NAME}
     dvcore
     templating
     shared
-    dvcore
     ${QT_SVG}
     ${QT_WIDGETS}
     ${QT_XML}

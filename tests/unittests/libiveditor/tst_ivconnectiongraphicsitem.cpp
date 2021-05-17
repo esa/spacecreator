@@ -17,11 +17,11 @@
 
 #include "baseitems/common/ivutils.h"
 #include "graphicsviewutils.h"
+#include "interface/graphicsitemhelpers.h"
 #include "interface/ivconnectiongraphicsitem.h"
 #include "interface/ivfunctiongraphicsitem.h"
 #include "interface/ivfunctiontypegraphicsitem.h"
 #include "interface/ivinterfacegraphicsitem.h"
-#include "interface/graphicsitemhelpers.h"
 #include "iveditor.h"
 #include "sharedlibrary.h"
 
@@ -128,9 +128,9 @@ void tst_IVConnectionGraphicsItem::tst_Overlapping()
 
 bool tst_IVConnectionGraphicsItem::checkIntersections(ive::IVConnectionGraphicsItem *connection)
 {
-    const QRectF itemRect =
-            ive::getNearestIntersectedRect(ive::siblingItemsRects(connection, ive::gi::rectangularTypes()),
-                    connection->points(), ive::IntersectionType::Single);
+    const QRectF itemRect = shared::graphicsviewutils::getNearestIntersectedRect(
+            shared::graphicsviewutils::siblingItemsRects(connection), connection->points(),
+            shared::graphicsviewutils::IntersectionType::Single);
 
     return itemRect.isValid();
 }

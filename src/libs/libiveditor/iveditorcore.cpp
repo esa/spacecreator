@@ -22,6 +22,7 @@
 #include "commandsstack.h"
 #include "connectioncreationvalidator.h"
 #include "context/action/actionsmanager.h"
+#include "graphicsviewutils.h"
 #include "interface/commands/cmdchangeasn1file.h"
 #include "interface/commands/cmdconnectionitemcreate.h"
 #include "interface/commands/cmdentityattributechange.h"
@@ -145,8 +146,8 @@ QAction *IVEditorCore::actionToggleE2EView()
  */
 ivm::IVFunction *IVEditorCore::addFunction(const QString &name, ivm::IVFunction *parent)
 {
-    auto cmd = new cmd::CmdFunctionItemCreate(
-            m_document->objectsModel(), parent, QRectF(QPointF(10., 10.), DefaultGraphicsItemSize), name);
+    auto cmd = new cmd::CmdFunctionItemCreate(m_document->objectsModel(), parent,
+            QRectF(QPointF(10., 10.), shared::graphicsviewutils::kDefaultGraphicsItemSize), name);
     bool ok = commandsStack()->push(cmd);
     if (ok) {
         Q_EMIT editedExternally(this);
@@ -196,8 +197,8 @@ bool IVEditorCore::addConnection(QString name, const QString &fromInstanceName, 
         auto createConnection = [ivModel, this](
                                         ivm::IVFunction *parent, ivm::IVInterface *inIf, ivm::IVInterface *outIf) {
             QVector<QPointF> points;
-            points.append(ive::pos(inIf->coordinates()));
-            points.append(ive::pos(outIf->coordinates()));
+            points.append(shared::graphicsviewutils::pos(inIf->coordinates()));
+            points.append(shared::graphicsviewutils::pos(outIf->coordinates()));
             auto command = new cmd::CmdConnectionItemCreate(ivModel, parent, inIf->id(), outIf->id(), points);
             commandsStack()->push(command);
         };
@@ -504,7 +505,7 @@ ivm::IVInterface *IVEditorCore::getInterface(
         ivm::IVInterface::CreationInfo createInfo(ivModel, parentFunction);
         createInfo.name = ifName;
         createInfo.type = ifType;
-        QRectF funcRect = ive::rect(parentFunction->coordinates());
+        QRectF funcRect = shared::graphicsviewutils::rect(parentFunction->coordinates());
         QPointF ifPos(funcRect.left(), funcRect.center().y());
         if (ifType == ivm::IVInterface::InterfaceType::Required) {
             ifPos.setX(funcRect.right());

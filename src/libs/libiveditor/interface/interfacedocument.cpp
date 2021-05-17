@@ -31,6 +31,7 @@
 #include "creatortool.h"
 #include "file.h"
 #include "graphicsitemhelpers.h"
+#include "graphicsviewutils.h"
 #include "interface/objectstreeview.h"
 #include "interface/properties/propertiesdialog.h"
 #include "interface/properties/propertytemplatemanager.h"
@@ -270,13 +271,15 @@ bool InterfaceDocument::loadAvailableComponents()
     d->importModel->clear();
     QDirIterator importableIt(ive::componentsLibraryPath(), QDir::Dirs | QDir::NoDotAndDotDot);
     while (importableIt.hasNext()) {
-        result |= loadComponentModel(d->importModel, importableIt.next() + QDir::separator() + kDefaultFilename);
+        result |= loadComponentModel(
+                d->importModel, importableIt.next() + QDir::separator() + kDefaultInterfaceViewFileName);
     }
 
     d->sharedModel->clear();
     QDirIterator instantiatableIt(ive::sharedTypesPath(), QDir::Dirs | QDir::NoDotAndDotDot);
     while (instantiatableIt.hasNext()) {
-        result |= loadComponentModel(d->sharedModel, instantiatableIt.next() + QDir::separator() + kDefaultFilename);
+        result |= loadComponentModel(
+                d->sharedModel, instantiatableIt.next() + QDir::separator() + kDefaultInterfaceViewFileName);
     }
 
     return result;
@@ -340,7 +343,7 @@ bool InterfaceDocument::exportSelectedFunctions()
     d->objectsSelectionModel->clearSelection();
     const QString path = componentsLibraryPath() + name;
     if (exportImpl(path, objects)) {
-        return loadComponentModel(d->importModel, path + QDir::separator() + kDefaultFilename);
+        return loadComponentModel(d->importModel, path + QDir::separator() + kDefaultInterfaceViewFileName);
     }
     return false;
 }
@@ -369,7 +372,7 @@ bool InterfaceDocument::exportSelectedType()
     d->objectsSelectionModel->clearSelection();
     const QString path = sharedTypesPath() + QDir::separator() + rootType->title();
     if (exportImpl(path, { rootType })) {
-        return loadComponentModel(d->sharedModel, path + QDir::separator() + kDefaultFilename);
+        return loadComponentModel(d->sharedModel, path + QDir::separator() + kDefaultInterfaceViewFileName);
     }
     return false;
 }
@@ -682,7 +685,7 @@ void InterfaceDocument::onDataTypesMenuInvoked()
 void InterfaceDocument::prepareEntityNameForEditing(const shared::Id &id)
 {
     if (auto entity = d->itemsModel->getItem(id)) {
-        if (auto iObj = qobject_cast<InteractiveObject *>(entity->toGraphicsObject())) {
+        if (auto iObj = qobject_cast<shared::ui::VEInteractiveObject *>(entity->toGraphicsObject())) {
             iObj->enableEditMode();
         }
     }
@@ -831,7 +834,11 @@ void InterfaceDocument::pasteItems()
 {
     const QPoint viewportCursorPos = graphicsView()->viewport()->mapFromGlobal(QCursor::pos());
     QPointF sceneDropPoint;
-    if (graphicsView()->viewport()->rect().marginsRemoved(kRootMargins.toMargins()).contains(viewportCursorPos)) {
+    if (graphicsView()
+                    ->viewport()
+                    ->rect()
+                    .marginsRemoved(shared::graphicsviewutils::kRootMargins.toMargins())
+                    .contains(viewportCursorPos)) {
         sceneDropPoint = graphicsView()->mapToScene(viewportCursorPos);
     }
     pasteItems(sceneDropPoint);
@@ -880,7 +887,7 @@ bool InterfaceDocument::exportImpl(const QString &targetDir, const QList<ivm::IV
         return {};
     }
 
-    const QString exportFilePath = QString("%1/%2").arg(targetDir, kDefaultFilename);
+    const QString exportFilePath = QString("%1/%2").arg(targetDir, kDefaultInterfaceViewFileName);
 
     const QFileInfo exportFileInfo(exportFilePath);
     if (exportFileInfo.exists()) {

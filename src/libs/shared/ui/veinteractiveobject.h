@@ -1,5 +1,5 @@
 /*
-   Copyright (C) 2018-2019 European Space Agency - <maxime.perrotin@esa.int>
+   Copyright (C) 2018-2021 European Space Agency - <maxime.perrotin@esa.int>
 
    This library is free software; you can redistribute it and/or
    modify it under the terms of the GNU Library General Public
@@ -22,31 +22,21 @@
 #include "ui/interactiveobjectbase.h"
 
 #include <QFont>
-#include <QPair>
 #include <QPen>
-#include <QPointF>
 #include <QPointer>
-#include <QVector>
 
-namespace ivm {
-class IVObject;
-}
-
-namespace ive {
+namespace shared {
 namespace cmd {
-class CommandsStack;
+class CommandsStackBase;
 }
+class VEObject;
+namespace ui {
 
-class InteractiveObject : public shared::ui::InteractiveObjectBase
+class VEInteractiveObject : public ui::InteractiveObjectBase
 {
     Q_OBJECT
-
 public:
-    explicit InteractiveObject(ivm::IVObject *entity, QGraphicsItem *parent = nullptr);
-
-    virtual ivm::IVObject *entity() const;
-
-    virtual void enableEditMode() {};
+    explicit VEInteractiveObject(VEObject *entity, QGraphicsItem *parent = nullptr);
 
     QPen pen() const;
     void setPen(const QPen &pen);
@@ -57,14 +47,17 @@ public:
     QFont font() const;
     void setFont(const QFont &font);
 
+    void setCommandsStack(cmd::CommandsStackBase *commandsStack);
+
+    virtual int itemLevel(bool isSelected) const = 0;
+    virtual VEObject *entity() const;
     virtual void init();
     virtual void updateEntity();
     virtual void updateFromEntity() = 0;
-    virtual QList<QPair<ivm::IVObject *, QVector<QPointF>>> prepareChangeCoordinatesCommandParams() const;
+    virtual QList<QPair<VEObject *, QVector<QPointF>>> prepareChangeCoordinatesCommandParams() const;
 
     virtual QString prepareTooltip() const;
-
-    void setCommandsStack(ive::cmd::CommandsStack *commandsStack);
+    virtual void enableEditMode() {};
 
 Q_SIGNALS:
     void clicked();
@@ -73,7 +66,6 @@ Q_SIGNALS:
 public Q_SLOTS:
     virtual void applyColorScheme() = 0;
     virtual void updateGraphicsItem();
-    void rebuildLayout() override;
 
 protected:
     void mouseMoveEvent(QGraphicsSceneMouseEvent *event) override;
@@ -85,17 +77,18 @@ protected:
 
     void mergeGeometry();
 
-    virtual shared::ColorManager::HandledColors handledColorType() const = 0;
-    virtual shared::ColorHandler colorHandler() const;
+    virtual ColorManager::HandledColors handledColorType() const = 0;
+    virtual ColorHandler colorHandler() const;
 
 protected:
-    const QPointer<ivm::IVObject> m_dataObject;
+    const QPointer<VEObject> m_dataObject;
+    QPointer<cmd::CommandsStackBase> m_commandsStack;
 
     QBrush m_brush;
     QPen m_pen;
     QFont m_font;
-
-    QPointer<ive::cmd::CommandsStack> m_commandsStack;
 };
+
+}
 
 }

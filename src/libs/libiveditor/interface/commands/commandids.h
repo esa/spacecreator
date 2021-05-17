@@ -29,10 +29,8 @@ enum Id
     CreateConnectionEntity,
     CreateConnectionGroupEntity,
     ChangeConnectionGroupEntity,
-    ChangeEntityGeometry,
     RemoveEntity,
     ChangeRootEntity,
-    AutoLayoutEntity,
 
     CreateEntityProperty,
     ChangeEntityProperty,

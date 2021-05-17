@@ -17,11 +17,11 @@
 
 #include "cmdinterfaceitemcreate.h"
 
-#include "ivfunction.h"
-#include "ivmodel.h"
 #include "baseitems/common/ivutils.h"
 #include "cmdinterfaceitemcreate.h"
 #include "commandids.h"
+#include "ivfunction.h"
+#include "ivmodel.h"
 
 #include <QDebug>
 
@@ -49,9 +49,9 @@ QVector<QUndoCommand *> fillCloneCommands(ivm::IVInterface *iface, const ivm::IV
 }
 
 CmdInterfaceItemCreate::CmdInterfaceItemCreate(const ivm::IVInterface::CreationInfo &creationInfo)
-    : CmdEntityGeometryChange({},
+    : shared::cmd::CmdEntityGeometryChange({},
             creationInfo.type == ivm::IVInterface::InterfaceType::Provided ? QObject::tr("Create PI")
-                                                                     : QObject::tr("Create RI"))
+                                                                           : QObject::tr("Create RI"))
     , m_ifaceInfo(creationInfo)
     , m_entity(ivm::IVInterface::createIface(m_ifaceInfo))
     , m_cmdClones(fillCloneCommands(m_entity, m_ifaceInfo))
@@ -69,7 +69,7 @@ CmdInterfaceItemCreate::~CmdInterfaceItemCreate()
 
 void CmdInterfaceItemCreate::redo()
 {
-    CmdEntityGeometryChange::redo();
+    shared::cmd::CmdEntityGeometryChange::redo();
 
     if (m_ifaceInfo.function)
         m_ifaceInfo.function->addChild(m_entity);
@@ -82,7 +82,7 @@ void CmdInterfaceItemCreate::redo()
 
 void CmdInterfaceItemCreate::undo()
 {
-    CmdEntityGeometryChange::undo();
+    shared::cmd::CmdEntityGeometryChange::undo();
 
     if (m_ifaceInfo.function)
         m_ifaceInfo.function->removeChild(m_entity);

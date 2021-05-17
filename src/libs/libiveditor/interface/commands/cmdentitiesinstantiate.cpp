@@ -17,13 +17,14 @@
 
 #include "cmdentitiesinstantiate.h"
 
+#include "baseitems/common/ivutils.h"
+#include "cmdentityattributechange.h"
+#include "commandids.h"
+#include "graphicsviewutils.h"
 #include "ivfunction.h"
 #include "ivfunctiontype.h"
 #include "ivmodel.h"
 #include "ivnamevalidator.h"
-#include "baseitems/common/ivutils.h"
-#include "cmdentityattributechange.h"
-#include "commandids.h"
 
 static inline void shiftObjects(const QVector<ivm::IVObject *> &objects, const QPointF &offset)
 {
@@ -31,12 +32,11 @@ static inline void shiftObjects(const QVector<ivm::IVObject *> &objects, const Q
         if (!obj) {
             continue;
         }
-        auto points = ive::polygon(obj->coordinates());
+        auto points = shared::graphicsviewutils::polygon(obj->coordinates());
         std::transform(
                 points.cbegin(), points.cend(), points.begin(), [offset](const QPointF &p) { return p + offset; });
-        obj->setCoordinates(ive::coordinates(points));
-        if (obj->type() == ivm::IVObject::Type::FunctionType
-                || obj->type() == ivm::IVObject::Type::Function) {
+        obj->setCoordinates(shared::graphicsviewutils::coordinates(points));
+        if (obj->type() == ivm::IVObject::Type::FunctionType || obj->type() == ivm::IVObject::Type::Function) {
             shiftObjects(obj->as<ivm::IVFunctionType *>()->children(), offset);
         }
     }
@@ -55,11 +55,11 @@ CmdEntitiesInstantiate::CmdEntitiesInstantiate(
     Q_ASSERT(entity);
     m_instantiatedEntity =
             new ivm::IVFunction({}, m_parent ? qobject_cast<QObject *>(m_parent) : qobject_cast<QObject *>(m_model));
-    m_instantiatedEntity->setTitle(ivm::IVNameValidator::nameForInstance(
-            m_instantiatedEntity, entity->title() + QLatin1String("_Instance_")));
+    m_instantiatedEntity->setTitle(
+            ivm::IVNameValidator::nameForInstance(m_instantiatedEntity, entity->title() + QLatin1String("_Instance_")));
     m_instantiatedEntity->setCoordinates(entity->coordinates());
 
-    const QRectF typeGeometry = ive::rect(entity->coordinates());
+    const QRectF typeGeometry = shared::graphicsviewutils::rect(entity->coordinates());
     m_offset = pos - typeGeometry.topLeft();
     const QString nameKey = ivm::meta::Props::token(ivm::meta::Props::Token::instance_of);
     m_subCmd = new CmdEntityAttributeChange(m_instantiatedEntity, { { nameKey, entity->title() } });

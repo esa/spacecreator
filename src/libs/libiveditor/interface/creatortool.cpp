@@ -115,7 +115,7 @@ struct CreatorTool::CreatorToolPrivate {
     QPointF clickScenePos;
     QCursor cursor;
     CreatorTool::ToolType toolType = ToolType::Pointer;
-    QSet<InteractiveObject *> collidedItems;
+    QSet<shared::ui::VEInteractiveObject *> collidedItems;
 };
 
 CreatorTool::CreatorTool(InterfaceDocument *doc)
@@ -169,8 +169,8 @@ void CreatorTool::removeSelectedItems()
             QGraphicsItem *item = scene->selectedItems().first();
             item->setSelected(false);
 
-            if (auto iObj = qobject_cast<InteractiveObject *>(item->toGraphicsObject())) {
-                if (auto entity = iObj->entity()) {
+            if (auto iObj = qobject_cast<shared::ui::VEInteractiveObject *>(item->toGraphicsObject())) {
+                if (auto entity = iObj->entity() ? iObj->entity()->as<ivm::IVObject *>() : nullptr) {
                     if (entity->isRootObject()) {
                         continue;
                     }
@@ -221,7 +221,7 @@ void CreatorTool::groupSelectedItems()
         if (it != groupCreationDataList.end()) {
             it->connections.append(connection);
         } else {
-            QVector<QPointF> points = ive::polygon(connection->coordinates());
+            QVector<QPointF> points = shared::graphicsviewutils::polygon(connection->coordinates());
             if (points.isEmpty()) {
                 const QGraphicsItem *sourceItem = d->model->getItem(connection->source()->id());
                 const QGraphicsItem *targetItem = d->model->getItem(connection->target()->id());
@@ -330,7 +330,8 @@ bool CreatorTool::onMousePress(QMouseEvent *e)
     if ((d->toolType == ToolType::ReCreateConnection || e->modifiers() & Qt::ShiftModifier)
             && e->button() != Qt::RightButton) {
         if (!d->previewConnectionItem) {
-            QGraphicsItem *item = nearestItem(scene, scenePos, kInterfaceTolerance, { IVInterfaceGraphicsItem::Type });
+            QGraphicsItem *item = shared::graphicsviewutils::nearestItem(
+                    scene, scenePos, shared::graphicsviewutils::kInterfaceTolerance, { IVInterfaceGraphicsItem::Type });
             if (!item || item->type() != IVInterfaceGraphicsItem::Type)
                 return false;
 
@@ -369,8 +370,9 @@ bool CreatorTool::onMousePress(QMouseEvent *e)
     }
 
     if (d->toolType == ToolType::DirectConnection && e->button() != Qt::RightButton) {
-        if (!nearestItem(scene, scenePos, QList<int> { IVFunctionGraphicsItem::Type })) {
-            if (!nearestItem(scene, scenePos, kInterfaceTolerance, { IVInterfaceGraphicsItem::Type }))
+        if (!shared::graphicsviewutils::nearestItem(scene, scenePos, QList<int> { IVFunctionGraphicsItem::Type })) {
+            if (!shared::graphicsviewutils::nearestItem(scene, scenePos, shared::graphicsviewutils::kInterfaceTolerance,
+                        { IVInterfaceGraphicsItem::Type }))
                 return false;
         }
 
@@ -386,7 +388,8 @@ bool CreatorTool::onMousePress(QMouseEvent *e)
         return true;
     } else if (d->toolType == ToolType::MultiPointConnection && e->button() != Qt::RightButton) {
         if (!d->previewConnectionItem) {
-            QGraphicsItem *item = nearestItem(scene, scenePos, kInterfaceTolerance, { IVInterfaceGraphicsItem::Type });
+            QGraphicsItem *item = shared::graphicsviewutils::nearestItem(
+                    scene, scenePos, shared::graphicsviewutils::kInterfaceTolerance, { IVInterfaceGraphicsItem::Type });
             if (!item)
                 return false;
 
@@ -467,15 +470,15 @@ bool CreatorTool::onMouseMove(QMouseEvent *e)
         if (!newGeometry.isValid())
             return true;
 
-        QSet<InteractiveObject *> items;
-        const QRectF expandedGeometry { newGeometry.marginsAdded(kContentMargins) };
+        QSet<shared::ui::VEInteractiveObject *> items;
+        const QRectF expandedGeometry { newGeometry.marginsAdded(shared::graphicsviewutils::kContentMargins) };
         QList<QGraphicsItem *> newCollidedItems = d->view->scene()->items(expandedGeometry);
         std::for_each(newCollidedItems.begin(), newCollidedItems.end(),
                 [this, &items, expandedGeometry](QGraphicsItem *item) {
                     if (item->type() == IVInterfaceGraphicsItem::Type || item->type() == d->previewItem->type())
                         return;
 
-                    auto iObjItem = qobject_cast<InteractiveObject *>(item->toGraphicsObject());
+                    auto iObjItem = qobject_cast<shared::ui::VEInteractiveObject *>(item->toGraphicsObject());
                     if (!iObjItem)
                         return;
 
@@ -485,12 +488,12 @@ bool CreatorTool::onMouseMove(QMouseEvent *e)
                         items.insert(iObjItem);
                     }
                 });
-        QSet<InteractiveObject *> newItems(items);
+        QSet<shared::ui::VEInteractiveObject *> newItems(items);
         newItems.subtract(d->collidedItems);
         for (auto item : newItems)
             item->doHighlighting(Qt::red, true);
 
-        QSet<InteractiveObject *> oldItems(d->collidedItems);
+        QSet<shared::ui::VEInteractiveObject *> oldItems(d->collidedItems);
         oldItems.subtract(items);
 
         for (auto item : oldItems)
@@ -700,7 +703,7 @@ void CreatorTool::CreatorToolPrivate::populateContextMenu_user(QMenu *menu, cons
     ivm::IVObject *ivObj { nullptr };
     if (QGraphicsItem *gi = scene->selectedItems().size() == 1
                     ? scene->selectedItems().first()
-                    : nearestItem(scene, scenePos, kContextMenuItemTolerance, showProps)) {
+                    : shared::graphicsviewutils::nearestItem(scene, scenePos, kContextMenuItemTolerance, showProps)) {
 
         switch (gi->type()) {
         case IVFunctionTypeGraphicsItem::Type: {
@@ -785,10 +788,12 @@ void CreatorTool::CreatorToolPrivate::handleComment(QGraphicsScene *scene, const
         if (!parentObject)
             parentObject = gi::functionTypeObject(this->previewItem->parentItem());
 
-        QRectF itemSceneRect =
-                adjustToSize(this->previewItem->mapRectToScene(this->previewItem->rect()), DefaultGraphicsItemSize);
+        QRectF itemSceneRect = adjustToSize(this->previewItem->mapRectToScene(this->previewItem->rect()),
+                shared::graphicsviewutils::kDefaultGraphicsItemSize);
         if (auto parentItem = previewItem->parentItem()) {
-            if (!parentItem->sceneBoundingRect().marginsRemoved(ive::kRootMargins).contains(itemSceneRect)) {
+            if (!parentItem->sceneBoundingRect()
+                            .marginsRemoved(shared::graphicsviewutils::kRootMargins)
+                            .contains(itemSceneRect)) {
                 itemSceneRect = QRectF();
             }
         }
@@ -803,14 +808,16 @@ void CreatorTool::CreatorToolPrivate::handleFunctionType(QGraphicsScene *scene, 
     Q_UNUSED(pos)
 
     if (this->previewItem) {
-        QRectF itemSceneRect =
-                adjustToSize(this->previewItem->mapRectToScene(this->previewItem->rect()), DefaultGraphicsItemSize);
+        QRectF itemSceneRect = adjustToSize(this->previewItem->mapRectToScene(this->previewItem->rect()),
+                shared::graphicsviewutils::kDefaultGraphicsItemSize);
 
-        if (!gi::isBounded(this->previewItem, itemSceneRect))
+        if (!shared::graphicsviewutils::isBounded(this->previewItem, itemSceneRect))
             return;
 
         if (auto parentItem = previewItem->parentItem()) {
-            if (!parentItem->sceneBoundingRect().marginsRemoved(ive::kRootMargins).contains(itemSceneRect)) {
+            if (!parentItem->sceneBoundingRect()
+                            .marginsRemoved(shared::graphicsviewutils::kRootMargins)
+                            .contains(itemSceneRect)) {
                 itemSceneRect = QRectF();
             }
         }
@@ -829,20 +836,22 @@ void CreatorTool::CreatorToolPrivate::handleFunction(QGraphicsScene *scene, cons
     Q_UNUSED(scene)
     Q_UNUSED(pos)
 
-    if (this->previewItem) {
-        QRectF itemSceneRect =
-                adjustToSize(this->previewItem->mapRectToScene(this->previewItem->rect()), DefaultGraphicsItemSize);
+    if (previewItem) {
+        QRectF itemSceneRect = adjustToSize(
+                previewItem->mapRectToScene(previewItem->rect()), shared::graphicsviewutils::kDefaultGraphicsItemSize);
 
-        if (!gi::isBounded(this->previewItem, itemSceneRect))
+        if (!shared::graphicsviewutils::isBounded(previewItem, itemSceneRect))
             return;
 
         if (auto parentItem = previewItem->parentItem()) {
-            if (!parentItem->sceneBoundingRect().marginsRemoved(ive::kRootMargins).contains(itemSceneRect)) {
+            if (!parentItem->sceneBoundingRect()
+                            .marginsRemoved(shared::graphicsviewutils::kRootMargins)
+                            .contains(itemSceneRect)) {
                 itemSceneRect = QRectF();
             }
         }
 
-        ivm::IVFunction *parentObject = gi::functionObject(this->previewItem->parentItem());
+        ivm::IVFunction *parentObject = gi::functionObject(previewItem->parentItem());
         const shared::Id id = shared::createId();
         auto cmd = new cmd::CmdFunctionItemCreate(model->objectsModel(), parentObject, itemSceneRect, QString(), id);
         if (doc->commandsStack()->push(cmd)) {
@@ -854,7 +863,9 @@ void CreatorTool::CreatorToolPrivate::handleFunction(QGraphicsScene *scene, cons
 void CreatorTool::CreatorToolPrivate::handleInterface(
         QGraphicsScene *scene, ivm::IVInterface::InterfaceType type, const QPointF &pos)
 {
-    if (auto parentItem = nearestItem(scene, adjustFromPoint(pos, kInterfaceTolerance), kFunctionTypes)) {
+    if (auto parentItem = shared::graphicsviewutils::nearestItem(scene,
+                shared::graphicsviewutils::adjustFromPoint(pos, shared::graphicsviewutils::kInterfaceTolerance),
+                kFunctionTypes)) {
         ivm::IVFunctionType *parentObject = gi::functionTypeObject(parentItem);
         ivm::IVInterface::CreationInfo ifaceDescr(model->objectsModel(), parentObject, pos, type, shared::createId());
         ifaceDescr.resetKind();
@@ -873,8 +884,8 @@ bool CreatorTool::CreatorToolPrivate::handleConnectionCreate(const QPointF &pos)
     if (!this->previewConnectionItem)
         return false;
 
-    if (auto itemUnderCursor = qgraphicsitem_cast<IVInterfaceGraphicsItem *>(
-                nearestItem(scene, pos, kInterfaceTolerance, { IVInterfaceGraphicsItem::Type }))) {
+    if (auto itemUnderCursor = qgraphicsitem_cast<IVInterfaceGraphicsItem *>(shared::graphicsviewutils::nearestItem(
+                scene, pos, shared::graphicsviewutils::kInterfaceTolerance, { IVInterfaceGraphicsItem::Type }))) {
         const QPointF finishPoint = itemUnderCursor->connectionEndPoint();
         if (!itemUnderCursor->ifaceShape().boundingRect().contains(this->connectionPoints.front())) {
             this->connectionPoints.append(finishPoint);
@@ -1111,9 +1122,9 @@ void CreatorTool::CreatorToolPrivate::handleConnectionReCreate(const QVector<QPo
                 return;
             }
 
-            QList<QPair<ivm::IVObject *, QVector<QPointF>>> paramsList { { connection->entity(),
+            QList<QPair<shared::VEObject *, QVector<QPointF>>> paramsList { { connection->entity(),
                     info.connectionPoints } };
-            auto cmd = new cmd::CmdEntityGeometryChange(paramsList);
+            auto cmd = new shared::cmd::CmdEntityGeometryChange(paramsList);
             doc->commandsStack()->push(cmd);
         }
     }

@@ -21,6 +21,8 @@
 #include "commands/cmdrootentitychange.h"
 #include "commandsstack.h"
 #include "delayedsignal.h"
+#include "graphicsitemhelpers.h"
+#include "graphicsviewutils.h"
 #include "interface/ivcommentgraphicsitem.h"
 #include "interface/ivconnectiongraphicsitem.h"
 #include "interface/ivconnectiongroupgraphicsitem.h"
@@ -46,7 +48,7 @@
 #ifdef IV_ITEM_DUMP
 static inline void dumpItem(QObject *obj, bool strict = false)
 {
-    auto item = qobject_cast<ive::InteractiveObject *>(obj);
+    auto item = qobject_cast<shared::ui::VEInteractiveObject *>(obj);
     if (!item)
         return;
 
@@ -75,7 +77,7 @@ static inline void dumpItem(QObject *obj, bool strict = false)
                         connection->graphicsPoints(), ive::polygon(connection->entity()->coordinates())));
         Q_ASSERT(!strict
                 || ive::comparePolygones(connection->points(), ive::polygon(connection->entity()->coordinates())));
-    } else if (auto rectItem = qobject_cast<ive::IVRectGraphicsItem *>(item)) {
+    } else if (auto rectItem = qobject_cast<shared::ui::VERectGraphicsItem *>(item)) {
         qDebug() << "\nGraphics" << rectItem->metaObject()->className() << "geometry:\n"
                  << rectItem->sceneBoundingRect() << "\n";
         qDebug() << "\nInternal Function data:\n"
@@ -138,11 +140,11 @@ void IVItemModel::onIVObjectAdded(ivm::IVObject *object)
         return;
     }
 
-    const int lowestLevel = nestingLevel(m_model->rootObject()) + 1;
-    const int objectLevel = nestingLevel(object);
+    const int lowestLevel = gi::nestingLevel(m_model->rootObject()) + 1;
+    const int objectLevel = gi::nestingLevel(object);
     const bool isRootOrRootChild = object->id() == m_model->rootObjectId()
             || (m_model->rootObject() && object->parentObject() == m_model->rootObject());
-    if ((objectLevel < lowestLevel || objectLevel > (lowestLevel + ive::kNestingVisibilityLevel))
+    if ((objectLevel < lowestLevel || objectLevel > (lowestLevel + gi::kNestingVisibilityLevel))
             && !isRootOrRootChild) {
         return;
     }
@@ -276,7 +278,7 @@ void IVItemModel::onSceneSelectionChanged()
 {
     QList<shared::Id> ids;
     for (auto item : m_graphicsScene->selectedItems()) {
-        if (auto iObj = qobject_cast<InteractiveObject *>(item->toGraphicsObject())) {
+        if (auto iObj = qobject_cast<shared::ui::VEInteractiveObject *>(item->toGraphicsObject())) {
             ids.append(iObj->entity()->id());
         }
     }
@@ -314,7 +316,7 @@ void IVItemModel::updateItem(QGraphicsItem *item)
     if (!item)
         return;
 
-    if (auto iObj = qobject_cast<InteractiveObject *>(item->toGraphicsObject())) {
+    if (auto iObj = qobject_cast<shared::ui::VEInteractiveObject *>(item->toGraphicsObject())) {
         iObj->updateFromEntity();
     }
     if (m_mutex->tryLock()) {
@@ -353,28 +355,31 @@ void IVItemModel::setupInnerGeometry(ivm::IVObject *obj) const
     const QVariant rootCoord =
             parentObj->entityAttributeValue(ivm::meta::Props::token(ivm::meta::Props::Token::RootCoordinates));
     if (rootCoord.isValid()) {
-        rootGeometry = ive::rect(ivm::IVObject::coordinatesFromString(rootCoord.toString()));
+        rootGeometry = shared::graphicsviewutils::rect(ivm::IVObject::coordinatesFromString(rootCoord.toString()));
     }
     QList<QRectF> existingRects;
     QRectF innerItemsGeometry;
     for (const ivm::IVObject *child : parentObj->children()) {
         if (kTypes.contains(child->type())) {
-            innerCoord = child->entityAttributeValue(ivm::meta::Props::token(ivm::meta::Props::Token::InnerCoordinates));
+            innerCoord =
+                    child->entityAttributeValue(ivm::meta::Props::token(ivm::meta::Props::Token::InnerCoordinates));
             if (!innerCoord.isValid()) {
                 continue;
             }
-            const QRectF innerRect = ive::rect(ivm::IVObject::coordinatesFromString(innerCoord.toString()));
+            const QRectF innerRect =
+                    shared::graphicsviewutils::rect(ivm::IVObject::coordinatesFromString(innerCoord.toString()));
             innerItemsGeometry |= innerRect;
             existingRects.append(innerRect);
         }
     }
     QRectF innerGeometry;
     QRectF newRootGeometry { rootGeometry };
-    findGeometryForRect(innerGeometry, newRootGeometry, existingRects);
+    shared::graphicsviewutils::findGeometryForRect(innerGeometry, newRootGeometry, existingRects);
     if (!rootCoord.isValid()) {
         QRectF mappedViewportGeometry;
         if (const QGraphicsView *view = m_graphicsScene->views().value(0)) {
-            const QRect viewportGeometry = view->viewport()->geometry().marginsRemoved(kContentMargins.toMargins());
+            const QRect viewportGeometry =
+                    view->viewport()->geometry().marginsRemoved(shared::graphicsviewutils::kContentMargins.toMargins());
             mappedViewportGeometry = QRectF(view->mapToScene(QPoint(0, 0)),
                     view->mapToScene(QPoint(viewportGeometry.width(), viewportGeometry.height())));
         }
@@ -384,10 +389,11 @@ void IVItemModel::setupInnerGeometry(ivm::IVObject *obj) const
         rootGeometry |= newRootGeometry;
     }
 
-    const QString strRootCoord = ivm::IVObject::coordinatesToString(ive::coordinates(rootGeometry));
+    const QString strRootCoord =
+            ivm::IVObject::coordinatesToString(shared::graphicsviewutils::coordinates(rootGeometry));
     parentObj->setEntityProperty(ivm::meta::Props::token(ivm::meta::Props::Token::RootCoordinates), strRootCoord);
 
-    const QString strCoord = ivm::IVObject::coordinatesToString(ive::coordinates(innerGeometry));
+    const QString strCoord = ivm::IVObject::coordinatesToString(shared::graphicsviewutils::coordinates(innerGeometry));
     obj->setEntityProperty(ivm::meta::Props::token(ivm::meta::Props::Token::InnerCoordinates), strCoord);
 }
 
@@ -417,7 +423,7 @@ void IVItemModel::changeRootItem(shared::Id id)
 void IVItemModel::zoomChanged()
 {
     for (auto item : m_graphicsScene->selectedItems()) {
-        if (auto iObj = qobject_cast<ive::InteractiveObject *>(item->toGraphicsObject())) {
+        if (auto iObj = qobject_cast<shared::ui::VEInteractiveObject *>(item->toGraphicsObject())) {
             iObj->updateGripPoints();
         }
     }
@@ -461,11 +467,11 @@ void IVItemModel::updateSceneRect()
     }
 
     if (itemsRect != m_prevItemsRect) {
-        const QRectF sceneRect = m_graphicsScene->sceneRect().marginsRemoved(ive::kRootMargins);
+        const QRectF sceneRect = m_graphicsScene->sceneRect().marginsRemoved(shared::graphicsviewutils::kRootMargins);
         const QRectF updated = sceneRect.united(itemsRect);
 
         if (sceneRect != updated) {
-            m_graphicsScene->setSceneRect(updated.marginsAdded(ive::kRootMargins));
+            m_graphicsScene->setSceneRect(updated.marginsAdded(shared::graphicsviewutils::kRootMargins));
             m_prevItemsRect = itemsRect;
         }
     }
@@ -479,15 +485,15 @@ QGraphicsItem *IVItemModel::createItemForObject(ivm::IVObject *obj)
     }
 
     QGraphicsItem *parentItem = obj->parentObject() ? m_items.value(obj->parentObject()->id()) : nullptr;
-    auto nestedGeomtryConnect = [this](QGraphicsItem *parentItem, InteractiveObject *child) {
+    auto nestedGeomtryConnect = [this](QGraphicsItem *parentItem, shared::ui::VEInteractiveObject *child) {
         if (parentItem) {
-            if (auto iObjParent = qobject_cast<InteractiveObject *>(parentItem->toGraphicsObject()))
-                this->connect(child, &InteractiveObject::boundingBoxChanged, iObjParent,
-                        &InteractiveObject::scheduleLayoutUpdate, Qt::QueuedConnection);
+            if (auto iObjParent = qobject_cast<shared::ui::VEInteractiveObject *>(parentItem->toGraphicsObject()))
+                this->connect(child, &shared::ui::VEInteractiveObject::boundingBoxChanged, iObjParent,
+                        &shared::ui::VEInteractiveObject::scheduleLayoutUpdate, Qt::QueuedConnection);
         }
     };
 
-    InteractiveObject *iObj = nullptr;
+    shared::ui::VEInteractiveObject *iObj = nullptr;
     switch (obj->type()) {
     case ivm::IVObject::Type::Comment: {
         auto comment = new IVCommentGraphicsItem(qobject_cast<ivm::IVComment *>(obj), parentItem);
@@ -589,15 +595,15 @@ void IVItemModel::initItem(ivm::IVObject *object, QGraphicsItem *item)
         }
     }
     connect(object, &ivm::IVObject::visibilityChanged, this, [this, id = object->id()](bool) {
-        if (auto item = dynamic_cast<InteractiveObject *>(m_items.value(id))) {
+        if (auto item = dynamic_cast<shared::ui::VEInteractiveObject *>(m_items.value(id))) {
             item->scheduleLayoutUpdate();
             scheduleInterfaceTextUpdate();
         }
     });
     connect(object, &ivm::IVObject::coordinatesChanged, this, propertyChanged);
-    if (auto clickable = qobject_cast<InteractiveObject *>(item->toGraphicsObject())) {
+    if (auto clickable = qobject_cast<shared::ui::VEInteractiveObject *>(item->toGraphicsObject())) {
         connect(
-                clickable, &InteractiveObject::clicked, this,
+                clickable, &shared::ui::VEInteractiveObject::clicked, this,
                 [this, clickable]() {
 #ifdef IV_ITEM_DUMP
                     dumpItem(sender());
@@ -608,7 +614,7 @@ void IVItemModel::initItem(ivm::IVObject *object, QGraphicsItem *item)
                 },
                 Qt::QueuedConnection);
         connect(
-                clickable, &InteractiveObject::doubleClicked, this,
+                clickable, &shared::ui::VEInteractiveObject::doubleClicked, this,
                 [this, clickable]() {
                     if (auto entity = clickable->entity()) {
                         if (auto function = qobject_cast<ivm::IVFunction *>(entity)) {

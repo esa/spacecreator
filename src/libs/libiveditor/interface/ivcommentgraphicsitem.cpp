@@ -17,10 +17,12 @@
 
 #include "ivcommentgraphicsitem.h"
 
-#include "ivcomment.h"
-#include "ivfunctiongraphicsitem.h"
 #include "baseitems/common/ivutils.h"
 #include "colors/colormanager.h"
+#include "graphicsitemhelpers.h"
+#include "graphicsviewutils.h"
+#include "ivcomment.h"
+#include "ivfunctiongraphicsitem.h"
 #include "ui/textitem.h"
 
 #include <QApplication>
@@ -36,7 +38,7 @@ static const qreal kMargins = 14 + kBorderWidth;
 namespace ive {
 
 IVCommentGraphicsItem::IVCommentGraphicsItem(ivm::IVComment *comment, QGraphicsItem *parent)
-    : IVRectGraphicsItem(comment, parent)
+    : shared::ui::VERectGraphicsItem(comment, parent)
 {
     setFlag(QGraphicsItem::ItemIsSelectable);
     setFont(qApp->font());
@@ -45,14 +47,19 @@ IVCommentGraphicsItem::IVCommentGraphicsItem(ivm::IVComment *comment, QGraphicsI
 
 void IVCommentGraphicsItem::init()
 {
-    IVRectGraphicsItem::init();
-    connect(entity(), &ivm::IVObject::titleChanged, this, &InteractiveObject::updateGraphicsItem);
+    shared::ui::VERectGraphicsItem::init();
+    connect(entity(), &ivm::IVObject::titleChanged, this, &shared::ui::VEInteractiveObject::updateGraphicsItem);
 }
 
 void IVCommentGraphicsItem::updateFromEntity()
 {
-    IVRectGraphicsItem::updateFromEntity();
+    shared::ui::VERectGraphicsItem::updateFromEntity();
     setText(entity()->titleUI());
+}
+
+int IVCommentGraphicsItem::itemLevel(bool isSelected) const
+{
+    return gi::itemLevel(entity(), isSelected);
 }
 
 void IVCommentGraphicsItem::setText(const QString &text)
@@ -132,18 +139,20 @@ void IVCommentGraphicsItem::paint(QPainter *painter, const QStyleOptionGraphicsI
     }
 
     painter->restore();
-    IVRectGraphicsItem::paint(painter, option, widget);
+    shared::ui::VERectGraphicsItem::paint(painter, option, widget);
 }
 
 void IVCommentGraphicsItem::rebuildLayout()
 {
-    IVRectGraphicsItem::rebuildLayout();
+    shared::ui::VERectGraphicsItem::rebuildLayout();
+    setVisible(entity() && (gi::nestingLevel(entity()) >= gi::kNestingVisibilityLevel || entity()->isRootObject())
+            && entity()->isVisible());
     update();
 }
 
 QSizeF IVCommentGraphicsItem::minimalSize() const
 {
-    return DefaultGraphicsItemSize;
+    return shared::graphicsviewutils::kDefaultGraphicsItemSize;
 }
 
 shared::ColorManager::HandledColors IVCommentGraphicsItem::handledColorType() const

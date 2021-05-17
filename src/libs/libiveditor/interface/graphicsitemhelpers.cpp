@@ -17,14 +17,7 @@
 
 #include "graphicsitemhelpers.h"
 
-#include "ivcomment.h"
-#include "ivconnection.h"
-#include "ivfunction.h"
-#include "ivfunctiontype.h"
-#include "ivinterface.h"
-#include "ivobject.h"
 #include "baseitems/common/ivutils.h"
-#include "baseitems/interactiveobject.h"
 #include "connectioncreationvalidator.h"
 #include "graphicsviewutils.h"
 #include "interface/ivcommentgraphicsitem.h"
@@ -33,12 +26,21 @@
 #include "interface/ivfunctiongraphicsitem.h"
 #include "interface/ivfunctiontypegraphicsitem.h"
 #include "interface/ivinterfacegraphicsitem.h"
+#include "ivcomment.h"
+#include "ivconnection.h"
+#include "ivfunction.h"
+#include "ivfunctiontype.h"
+#include "ivinterface.h"
+#include "ivobject.h"
+#include "ui/veinteractiveobject.h"
 
 #include <QGraphicsScene>
 #include <QMetaEnum>
 
 namespace ive {
 namespace gi {
+
+namespace utils = shared::graphicsviewutils;
 
 static const QList<int> kRectTypes { IVCommentGraphicsItem::Type, IVFunctionGraphicsItem::Type,
     IVFunctionTypeGraphicsItem::Type };
@@ -117,8 +119,8 @@ ivm::IVObject *object(const QGraphicsItem *item)
     if (!item)
         return nullptr;
 
-    if (auto interactiveObject = qobject_cast<const InteractiveObject *>(item->toGraphicsObject()))
-        return interactiveObject->entity();
+    if (auto interactiveObject = qobject_cast<const shared::ui::VEInteractiveObject *>(item->toGraphicsObject()))
+        return interactiveObject->entity() ? interactiveObject->entity()->as<ivm::IVObject *>() : nullptr;
 
     return nullptr;
 }
@@ -157,6 +159,46 @@ static bool isReversed(const ivm::ValidationResult &result)
     return isReversed;
 }
 
+QList<int> knownGraphicsItemTypes()
+{
+    QList<int> result;
+
+    const QMetaEnum &me = QMetaEnum::fromType<ivm::IVObject::Type>();
+    for (int i = 0; i < me.keyCount(); ++i) {
+        int itemType = 0;
+        const ivm::IVObject::Type objectType = static_cast<ivm::IVObject::Type>(me.value(i));
+        switch (objectType) {
+        case ivm::IVObject::Type::Function:
+            itemType = ive::IVFunctionGraphicsItem::Type;
+            break;
+        case ivm::IVObject::Type::FunctionType:
+            itemType = ive::IVFunctionTypeGraphicsItem::Type;
+            break;
+        case ivm::IVObject::Type::InterfaceGroup:
+        case ivm::IVObject::Type::ProvidedInterface:
+        case ivm::IVObject::Type::RequiredInterface:
+            itemType = ive::IVInterfaceGraphicsItem::Type;
+            break;
+        case ivm::IVObject::Type::Comment:
+            itemType = ive::IVCommentGraphicsItem::Type;
+            break;
+        case ivm::IVObject::Type::Connection:
+            itemType = ive::IVConnectionGraphicsItem::Type;
+            break;
+        case ivm::IVObject::Type::ConnectionGroup:
+            itemType = ive::IVConnectionGroupGraphicsItem::Type;
+            break;
+        case ivm::IVObject::Type::Unknown:
+            continue;
+        }
+        if (itemType != 0) {
+            result.append(itemType);
+        }
+    }
+
+    return result;
+}
+
 ivm::ValidationResult validateConnectionCreate(QGraphicsScene *scene, const QVector<QPointF> &points)
 {
     const QPointF startPos { points.first() };
@@ -165,10 +207,10 @@ ivm::ValidationResult validateConnectionCreate(QGraphicsScene *scene, const QVec
 
     ivm::ValidationResult result;
     result.connectionPoints = points;
-    result.functionAtStartPos = ive::nearestItem(
-            scene, ive::adjustFromPoint(startPos, kFunctionTolerance), { ive::IVFunctionGraphicsItem::Type });
-    result.functionAtEndPos = ive::nearestItem(
-            scene, ive::adjustFromPoint(endPos, kFunctionTolerance), { ive::IVFunctionGraphicsItem::Type });
+    result.functionAtStartPos = utils::nearestItem(
+            scene, utils::adjustFromPoint(startPos, utils::kFunctionTolerance), { ive::IVFunctionGraphicsItem::Type });
+    result.functionAtEndPos = utils::nearestItem(
+            scene, utils::adjustFromPoint(endPos, utils::kFunctionTolerance), { ive::IVFunctionGraphicsItem::Type });
     result.startObject = ive::gi::functionObject(result.functionAtStartPos);
     result.endObject = ive::gi::functionObject(result.functionAtEndPos);
     result.isToOrFromNested =
@@ -180,18 +222,18 @@ ivm::ValidationResult validateConnectionCreate(QGraphicsScene *scene, const QVec
         return result;
     }
 
-    const auto startIfaceItem = qgraphicsitem_cast<ive::IVInterfaceGraphicsItem *>(ive::nearestItem(
-            scene, ive::adjustFromPoint(startPos, kInterfaceTolerance), { ive::IVInterfaceGraphicsItem::Type }));
+    const auto startIfaceItem = qgraphicsitem_cast<ive::IVInterfaceGraphicsItem *>(utils::nearestItem(scene,
+            utils::adjustFromPoint(startPos, utils::kInterfaceTolerance), { ive::IVInterfaceGraphicsItem::Type }));
+
+    static const QMarginsF kToleranceMargins = { utils::kInterfaceTolerance / 2, utils::kInterfaceTolerance / 2,
+        utils::kInterfaceTolerance / 2, utils::kInterfaceTolerance / 2 };
+
     if (startIfaceItem
-            && startIfaceItem->ifaceShape()
-                       .boundingRect()
-                       .adjusted(-kInterfaceTolerance / 2, -kInterfaceTolerance / 2, kInterfaceTolerance / 2,
-                               kInterfaceTolerance / 2)
-                       .contains(startPos)) {
+            && startIfaceItem->ifaceShape().boundingRect().marginsAdded(kToleranceMargins).contains(startPos)) {
         result.startIface = startIfaceItem->entity();
         result.startPointAdjusted =
                 startIfaceItem->connectionEndPoint(result.functionAtStartPos->isAncestorOf(result.functionAtEndPos));
-    } else if (!shared::graphicsviewutils::intersects(
+    } else if (!utils::intersects(
                        result.functionAtStartPos->sceneBoundingRect(), connectionLine, &result.startPointAdjusted)) {
         result.setFailed(ivm::ConnectionCreationValidator::FailReason::CannotCreateStartIface);
         return result;
@@ -202,18 +244,13 @@ ivm::ValidationResult validateConnectionCreate(QGraphicsScene *scene, const QVec
         return result;
     }
 
-    const auto endIfaceItem = qgraphicsitem_cast<ive::IVInterfaceGraphicsItem *>(ive::nearestItem(
-            scene, ive::adjustFromPoint(endPos, kInterfaceTolerance), { ive::IVInterfaceGraphicsItem::Type }));
-    if (endIfaceItem
-            && endIfaceItem->ifaceShape()
-                       .boundingRect()
-                       .adjusted(-kInterfaceTolerance / 2, -kInterfaceTolerance / 2, kInterfaceTolerance / 2,
-                               kInterfaceTolerance / 2)
-                       .contains(endPos)) {
+    const auto endIfaceItem = qgraphicsitem_cast<ive::IVInterfaceGraphicsItem *>(utils::nearestItem(
+            scene, utils::adjustFromPoint(endPos, utils::kInterfaceTolerance), { ive::IVInterfaceGraphicsItem::Type }));
+    if (endIfaceItem && endIfaceItem->ifaceShape().boundingRect().marginsAdded(kToleranceMargins).contains(endPos)) {
         result.endIface = endIfaceItem->entity();
         result.endPointAdjusted =
                 endIfaceItem->connectionEndPoint(result.functionAtEndPos->isAncestorOf(result.functionAtStartPos));
-    } else if (!shared::graphicsviewutils::intersects(
+    } else if (!utils::intersects(
                        result.functionAtEndPos->sceneBoundingRect(), connectionLine, &result.endPointAdjusted)) {
         result.setFailed(ivm::ConnectionCreationValidator::FailReason::CannotCreateEndIface);
         return result;
@@ -272,74 +309,50 @@ QList<int> rectangularTypes()
     return kRectTypes;
 }
 
-QList<int> knownGraphicsItemTypes()
+qreal itemLevel(const ivm::IVObject *const object, bool itemSelected)
 {
-    QList<int> result;
-
-    const QMetaEnum &me = QMetaEnum::fromType<ivm::IVObject::Type>();
-    for (int i = 0; i < me.keyCount(); ++i) {
-        int itemType = 0;
-        const ivm::IVObject::Type objectType = static_cast<ivm::IVObject::Type>(me.value(i));
-        switch (objectType) {
-        case ivm::IVObject::Type::Function:
-            itemType = ive::IVFunctionGraphicsItem::Type;
-            break;
-        case ivm::IVObject::Type::FunctionType:
-            itemType = ive::IVFunctionTypeGraphicsItem::Type;
-            break;
-        case ivm::IVObject::Type::InterfaceGroup:
-        case ivm::IVObject::Type::ProvidedInterface:
-        case ivm::IVObject::Type::RequiredInterface:
-            itemType = ive::IVInterfaceGraphicsItem::Type;
-            break;
-        case ivm::IVObject::Type::Comment:
-            itemType = ive::IVCommentGraphicsItem::Type;
-            break;
-        case ivm::IVObject::Type::Connection:
-            itemType = ive::IVConnectionGraphicsItem::Type;
-            break;
-        case ivm::IVObject::Type::ConnectionGroup:
-            itemType = ive::IVConnectionGroupGraphicsItem::Type;
-            break;
-        case ivm::IVObject::Type::Unknown:
-            continue;
-        }
-        if (itemType != 0) {
-            result.append(itemType);
-        }
+    if (!object || itemSelected) {
+        return ZOrder.Selected;
     }
 
-    return result;
+    switch (object->type()) {
+    case ivm::IVObject::Type::Function:
+    case ivm::IVObject::Type::FunctionType:
+        return ZOrder.Function;
+    case ivm::IVObject::Type::InterfaceGroup:
+    case ivm::IVObject::Type::RequiredInterface:
+    case ivm::IVObject::Type::ProvidedInterface:
+        return ZOrder.Interface;
+    case ivm::IVObject::Type::Comment:
+        return ZOrder.Comment;
+    case ivm::IVObject::Type::ConnectionGroup:
+    case ivm::IVObject::Type::Connection:
+        return ZOrder.Connection;
+    default:
+        return ZOrder.Selected;
+    }
 }
 
-bool isCollided(const QGraphicsItem *upcomingItem, const QRectF &upcomingItemRect)
+int nestingLevel(ivm::IVObject *object)
 {
-    if (!upcomingItem || !upcomingItemRect.isValid()) {
-        return false;
+    if (!object)
+        return -1;
+
+    if (object->type() == ivm::IVObject::Type::InterfaceGroup
+            || object->type() == ivm::IVObject::Type::ProvidedInterface
+            || object->type() == ivm::IVObject::Type::RequiredInterface) {
+        object = object->parentObject();
     }
 
-    const QList<QRectF> siblingRects = siblingItemsRects(upcomingItem, gi::rectangularTypes());
-    return ive::isCollided(siblingRects, upcomingItemRect.marginsAdded(kContentMargins));
-}
-
-bool isBounded(const QGraphicsItem *upcomingItem, const QRectF &upcomingItemRect)
-{
-    if (!upcomingItem || !upcomingItemRect.isValid()) {
-        return false;
-    }
-
-    if (auto iObj = qobject_cast<const IVRectGraphicsItem *>(upcomingItem->toGraphicsObject())) {
-        const auto parentObj = qobject_cast<const InteractiveObject *>(iObj->parentObject());
-        if (parentObj && parentObj->entity()) {
-            const QMarginsF margins = parentObj->entity()->isRootObject() ? kRootMargins : kContentMargins;
-            const QRectF outerRect = parentObj->sceneBoundingRect().marginsRemoved(margins);
-            return ive::isRectBounded(outerRect, upcomingItemRect);
-        } else if (iObj->entity()->isRootObject()) {
-            return ive::isRectBounded(
-                    upcomingItemRect.marginsRemoved(kRootMargins), iObj->nestedItemsSceneBoundingRect());
+    int level = 0;
+    while (auto parentObject = object->parentObject()) {
+        if ((parentObject->type() == ivm::IVObject::Type::Function
+                    || parentObject->type() == ivm::IVObject::Type::FunctionType)) {
+            ++level;
         }
+        object = parentObject;
     }
-    return true;
+    return level;
 }
 
 } // namespace gi

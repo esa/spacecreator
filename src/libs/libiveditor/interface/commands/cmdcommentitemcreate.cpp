@@ -17,17 +17,19 @@
 
 #include "cmdcommentitemcreate.h"
 
+#include "baseitems/common/ivutils.h"
+#include "commandids.h"
 #include "ivcomment.h"
 #include "ivfunctiontype.h"
 #include "ivmodel.h"
-#include "baseitems/common/ivutils.h"
-#include "commandids.h"
+
+#include <QRectF>
 
 namespace ive {
 namespace cmd {
 
 CmdCommentItemCreate::CmdCommentItemCreate(ivm::IVModel *model, ivm::IVFunctionType *parent, const QRectF &geometry)
-    : CmdEntityGeometryChange({}, QObject::tr("Create Comment"))
+    : shared::cmd::CmdEntityGeometryChange({}, QObject::tr("Create Comment"))
     , m_model(model)
     , m_parent(parent)
     , m_entity(new ivm::IVComment(
@@ -45,7 +47,7 @@ CmdCommentItemCreate::~CmdCommentItemCreate()
 
 void CmdCommentItemCreate::redo()
 {
-    CmdEntityGeometryChange::redo();
+    shared::cmd::CmdEntityGeometryChange::redo();
 
     if (m_parent)
         m_parent->addChild(m_entity);
@@ -55,7 +57,7 @@ void CmdCommentItemCreate::redo()
 
 void CmdCommentItemCreate::undo()
 {
-    CmdEntityGeometryChange::undo();
+    shared::cmd::CmdEntityGeometryChange::undo();
 
     if (m_model)
         m_model->removeObject(m_entity);

@@ -20,6 +20,7 @@
 #include "baseitems/graphicsview.h"
 #include "dvappmodel.h"
 #include "dvitemmodel.h"
+#include "dvmodel.h"
 #include "ui/graphicsviewbase.h"
 
 #include <QBoxLayout>
@@ -35,7 +36,7 @@ struct DVEditorCore::DeploymentInterfacePrivate {
     DeploymentInterfacePrivate()
         : m_scene(new QGraphicsScene)
         , m_appModel(new DVAppModel)
-        , m_model(new DVItemModel)
+        , m_model(new DVItemModel(m_appModel->objectsModel(), m_appModel->undoStack()))
         , m_view(new dve::GraphicsView)
         , m_toolBar(new QToolBar)
     {

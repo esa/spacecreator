@@ -1,5 +1,5 @@
 /*
- Copyright (C) 2018-2020 European Space Agency - <maxime.perrotin@esa.int>
+ Copyright (C) 2018-2021 European Space Agency - <maxime.perrotin@esa.int>
 
  This library is free software; you can redistribute it and/or
  modify it under the terms of the GNU Library General Public
@@ -15,29 +15,28 @@
  along with this program. If not, see <https://www.gnu.org/licenses/lgpl-2.1.html>.
 */
 
-#include "ivrectgraphicsitem.h"
-
-#include "baseitems/common/ivutils.h"
-#include "commandsstack.h"
-#include "interface/graphicsitemhelpers.h"
-#include "ivfunctiontype.h"
-#include "ivobject.h"
+#include "commandsstackbase.h"
+#include "graphicsviewutils.h"
+//#include "interface/graphicsitemhelpers.h"
 #include "ui/grippointshandler.h"
+#include "veobject.h"
+#include "verectgraphicsitem.h"
 
 #include <QGraphicsScene>
 #include <QtDebug>
 
-namespace ive {
+namespace shared {
+namespace ui {
 
-IVRectGraphicsItem::IVRectGraphicsItem(ivm::IVObject *entity, QGraphicsItem *parentGraphicsItem)
-    : InteractiveObject(entity, parentGraphicsItem)
+VERectGraphicsItem::VERectGraphicsItem(shared::VEObject *entity, QGraphicsItem *parentGraphicsItem)
+    : VEInteractiveObject(entity, parentGraphicsItem)
 {
-    connect(this, &InteractiveObject::relocated, this, &IVRectGraphicsItem::onGeometryChanged);
-    connect(this, &InteractiveObject::boundingBoxChanged, this, &IVRectGraphicsItem::onGeometryChanged);
+    connect(this, &VEInteractiveObject::relocated, this, &VERectGraphicsItem::onGeometryChanged);
+    connect(this, &VEInteractiveObject::boundingBoxChanged, this, &VERectGraphicsItem::onGeometryChanged);
     setHighlightable(true);
 }
 
-QSizeF IVRectGraphicsItem::minimalSize() const
+QSizeF VERectGraphicsItem::minimalSize() const
 {
     return QSizeF();
 }
@@ -54,7 +53,7 @@ static QPointF shiftChildren(const QRectF &sourceRect, const QRectF &destRect)
     return shift;
 }
 
-bool IVRectGraphicsItem::setGeometry(const QRectF &sceneGeometry)
+bool VERectGraphicsItem::setGeometry(const QRectF &sceneGeometry)
 {
     if (sceneGeometry == sceneBoundingRect())
         return false;
@@ -64,7 +63,7 @@ bool IVRectGraphicsItem::setGeometry(const QRectF &sceneGeometry)
     setPos(mapToParent(mapFromScene(sceneGeometry.topLeft())));
     if (!shift.isNull()) {
         for (QGraphicsItem *child : childItems()) {
-            if (auto iObj = qobject_cast<IVRectGraphicsItem *>(child->toGraphicsObject()))
+            if (auto iObj = qobject_cast<VERectGraphicsItem *>(child->toGraphicsObject()))
                 iObj->moveBy(shift.x(), shift.y());
         }
     }
@@ -82,29 +81,29 @@ bool IVRectGraphicsItem::setGeometry(const QRectF &sceneGeometry)
     return true;
 }
 
-void IVRectGraphicsItem::setRect(const QRectF &geometry)
+void VERectGraphicsItem::setRect(const QRectF &geometry)
 {
     if (setGeometry(geometry))
         instantLayoutUpdate();
 }
 
-void IVRectGraphicsItem::initGripPoints()
+void VERectGraphicsItem::initGripPoints()
 {
-    InteractiveObject::initGripPoints();
-    gripPointsHandler()->setUsedPoints({ shared::ui::GripPoint::Location::Top, shared::ui::GripPoint::Location::Left,
-            shared::ui::GripPoint::Location::Bottom, shared::ui::GripPoint::Location::Right,
-            shared::ui::GripPoint::Location::TopLeft, shared::ui::GripPoint::Location::BottomLeft,
-            shared::ui::GripPoint::Location::TopRight, shared::ui::GripPoint::Location::BottomRight });
+    VEInteractiveObject::initGripPoints();
+    gripPointsHandler()->setUsedPoints({ ui::GripPoint::Location::Top, ui::GripPoint::Location::Left,
+            ui::GripPoint::Location::Bottom, ui::GripPoint::Location::Right, ui::GripPoint::Location::TopLeft,
+            ui::GripPoint::Location::BottomLeft, ui::GripPoint::Location::TopRight,
+            ui::GripPoint::Location::BottomRight });
 }
 
-void IVRectGraphicsItem::updateFromEntity()
+void VERectGraphicsItem::updateFromEntity()
 {
-    ivm::IVObject *obj = entity();
+    shared::VEObject *obj = entity();
     Q_ASSERT(obj);
     if (!obj)
         return;
 
-    const QRectF itemSceneRect { ive::rect(obj->coordinates()) };
+    const QRectF itemSceneRect { graphicsviewutils::rect(obj->coordinates()) };
     if (!itemSceneRect.isValid())
         layout();
     else
@@ -114,48 +113,48 @@ void IVRectGraphicsItem::updateFromEntity()
         layout();
 }
 
-QList<QPair<ivm::IVObject *, QVector<QPointF>>> IVRectGraphicsItem::prepareChangeCoordinatesCommandParams() const
+QList<QPair<shared::VEObject *, QVector<QPointF>>> VERectGraphicsItem::prepareChangeCoordinatesCommandParams() const
 {
-    QList<QPair<ivm::IVObject *, QVector<QPointF>>> params;
+    QList<QPair<shared::VEObject *, QVector<QPointF>>> params;
     const QVector<QPointF> sceneGeometry { sceneBoundingRect().topLeft(), sceneBoundingRect().bottomRight() };
     params.append({ entity(), sceneGeometry });
-    params.append(InteractiveObject::prepareChangeCoordinatesCommandParams());
+    params.append(VEInteractiveObject::prepareChangeCoordinatesCommandParams());
     return params;
 }
 
-void IVRectGraphicsItem::rebuildLayout()
+void VERectGraphicsItem::rebuildLayout()
 {
-    InteractiveObject::rebuildLayout();
+    VEInteractiveObject::rebuildLayout();
 
     updateGripPoints();
     applyColorScheme();
 }
 
-void IVRectGraphicsItem::onManualMoveProgress(
+void VERectGraphicsItem::onManualMoveProgress(
         shared::ui::GripPoint *grip, const QPointF &pressedAt, const QPointF &releasedAt)
 {
     handleGeometryChanging(grip, pressedAt, releasedAt);
 }
 
-void IVRectGraphicsItem::onManualResizeProgress(
+void VERectGraphicsItem::onManualResizeProgress(
         shared::ui::GripPoint *grip, const QPointF &pressedAt, const QPointF &releasedAt)
 {
     handleGeometryChanging(grip, pressedAt, releasedAt);
 }
 
-void IVRectGraphicsItem::onManualResizeFinish(
+void VERectGraphicsItem::onManualResizeFinish(
         shared::ui::GripPoint *grip, const QPointF &pressedAt, const QPointF &releasedAt)
 {
     handleGeometryChanged(grip, pressedAt, releasedAt);
 }
 
-void IVRectGraphicsItem::onManualMoveFinish(
+void VERectGraphicsItem::onManualMoveFinish(
         shared::ui::GripPoint *grip, const QPointF &pressedAt, const QPointF &releasedAt)
 {
     handleGeometryChanged(grip, pressedAt, releasedAt);
 }
 
-QRectF IVRectGraphicsItem::transformedRect(shared::ui::GripPoint *grip, const QPointF &from, const QPointF &to)
+QRectF VERectGraphicsItem::transformedRect(shared::ui::GripPoint *grip, const QPointF &from, const QPointF &to)
 {
     const QPointF shift = QPointF(to - from);
     QRectF rect = sceneBoundingRect();
@@ -210,7 +209,7 @@ QRectF IVRectGraphicsItem::transformedRect(shared::ui::GripPoint *grip, const QP
     return rect.normalized();
 }
 
-void IVRectGraphicsItem::handleGeometryChanged(
+void VERectGraphicsItem::handleGeometryChanged(
         shared::ui::GripPoint *grip, const QPointF &pressedAt, const QPointF &releasedAt)
 {
     Q_UNUSED(grip)
@@ -218,30 +217,32 @@ void IVRectGraphicsItem::handleGeometryChanged(
     if (pressedAt == releasedAt)
         return;
 
-    if (gi::isBounded(this, sceneBoundingRect()) && !gi::isCollided(this, sceneBoundingRect()))
+    if (graphicsviewutils::isBounded(this, sceneBoundingRect())
+            && !graphicsviewutils::isCollided(this, sceneBoundingRect()))
         updateEntity();
     else // Fallback to previous geometry in case colliding with items at the same level
         updateFromEntity();
 }
 
-void IVRectGraphicsItem::handleGeometryChanging(
+void VERectGraphicsItem::handleGeometryChanging(
         shared::ui::GripPoint *grip, const QPointF &pressedAt, const QPointF &releasedAt)
 {
     if (pressedAt == releasedAt)
         return;
 
     const QRectF rect = transformedRect(grip, pressedAt, releasedAt);
-    if (rect.width() >= minimalSize().width() && rect.height() >= minimalSize().height() && gi::isBounded(this, rect)) {
+    if (rect.width() >= minimalSize().width() && rect.height() >= minimalSize().height()
+            && graphicsviewutils::isBounded(this, rect)) {
         setRect(rect);
     }
 }
 
-QRectF IVRectGraphicsItem::nestedItemsSceneBoundingRect() const
+QRectF VERectGraphicsItem::nestedItemsSceneBoundingRect() const
 {
     QRectF nestedItemsBoundingRect;
     for (const QGraphicsItem *item : childItems()) {
-        if (gi::rectangularTypes().contains(item->type())) {
-            const QRectF nestedRect = item->sceneBoundingRect();
+        if (auto rectItem = qobject_cast<const VERectGraphicsItem *>(item->toGraphicsObject())) {
+            const QRectF nestedRect = rectItem->sceneBoundingRect();
             if (nestedRect.isValid())
                 nestedItemsBoundingRect |= nestedRect;
         }
@@ -249,21 +250,22 @@ QRectF IVRectGraphicsItem::nestedItemsSceneBoundingRect() const
     return nestedItemsBoundingRect;
 }
 
-void IVRectGraphicsItem::onGeometryChanged()
+void VERectGraphicsItem::onGeometryChanged()
 {
-    QSet<InteractiveObject *> items;
-    QList<QGraphicsItem *> collidedItems = scene()->items(sceneBoundingRect().marginsAdded(kContentMargins));
+    QSet<VEInteractiveObject *> items;
+    QList<QGraphicsItem *> collidedItems =
+            scene()->items(sceneBoundingRect().marginsAdded(graphicsviewutils::kContentMargins));
     std::for_each(collidedItems.begin(), collidedItems.end(), [this, &items](QGraphicsItem *item) {
-        auto rectItem = qobject_cast<IVRectGraphicsItem *>(item->toGraphicsObject());
+        auto rectItem = qobject_cast<VERectGraphicsItem *>(item->toGraphicsObject());
         if (rectItem && item != this && item->parentItem() == parentItem())
             items.insert(rectItem);
     });
-    QSet<InteractiveObject *> newItems(items);
+    QSet<VEInteractiveObject *> newItems(items);
     newItems.subtract(m_collidedItems);
     for (auto item : newItems)
         item->doHighlighting(Qt::red, false);
 
-    QSet<InteractiveObject *> oldItems(m_collidedItems);
+    QSet<VEInteractiveObject *> oldItems(m_collidedItems);
     oldItems.subtract(items);
 
     for (auto item : oldItems)
@@ -275,27 +277,29 @@ void IVRectGraphicsItem::onGeometryChanged()
         clearHighlight();
 }
 
-void IVRectGraphicsItem::layout()
+void VERectGraphicsItem::layout()
 {
     if (itemNeedsToBeRelayout()) {
-        const auto parentFunction = qobject_cast<IVRectGraphicsItem *>(parentObject());
+        const auto parentFunction = qobject_cast<VERectGraphicsItem *>(parentObject());
         QRectF boundedRect =
                 QRectF(parentFunction ? parentFunction->sceneBoundingRect() : scene()->itemsBoundingRect());
-        QRectF itemRect = QRectF(QPointF(0, 0), DefaultGraphicsItemSize);
+        QRectF itemRect = QRectF(QPointF(0, 0), graphicsviewutils::kDefaultGraphicsItemSize);
         itemRect.moveTopLeft(boundedRect.topLeft());
-        findGeometryForRect(itemRect, boundedRect, siblingItemsRects(this, gi::rectangularTypes()), kContentMargins);
+        graphicsviewutils::findGeometryForRect(
+                itemRect, boundedRect, graphicsviewutils::siblingItemsRects(this), graphicsviewutils::kContentMargins);
         setRect(itemRect);
         mergeGeometry();
     }
 }
 
-bool IVRectGraphicsItem::itemNeedsToBeRelayout() const
+bool VERectGraphicsItem::itemNeedsToBeRelayout() const
 {
     const QRectF currentRect = sceneBoundingRect();
     if (!currentRect.isValid())
         return true;
 
-    return gi::isCollided(this, currentRect) || !gi::isBounded(this, currentRect);
+    return graphicsviewutils::isCollided(this, currentRect) || !graphicsviewutils::isBounded(this, currentRect);
 }
 
+}
 }

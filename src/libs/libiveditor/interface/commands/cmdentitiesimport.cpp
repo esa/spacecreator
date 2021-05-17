@@ -19,6 +19,7 @@
 
 #include "baseitems/common/ivutils.h"
 #include "commandids.h"
+#include "graphicsviewutils.h"
 #include "ivfunctiontype.h"
 #include "ivmodel.h"
 #include "ivnamevalidator.h"
@@ -57,7 +58,7 @@ CmdEntitiesImport::CmdEntitiesImport(const QByteArray &data, ivm::IVFunctionType
                 obj->removeEntityAttribute(ivm::meta::Props::token(ivm::meta::Props::Token::name));
                 obj->setTitle(ivm::IVNameValidator::nextNameFor(obj));
             }
-            QVector<QPointF> coordinates = ive::polygon(obj->coordinates());
+            QVector<QPointF> coordinates = shared::graphicsviewutils::polygon(obj->coordinates());
             std::for_each(coordinates.cbegin(), coordinates.cend(), [&basePoint](const QPointF &point) {
                 if (point.x() < basePoint.x())
                     basePoint.setX(point.x());
@@ -68,12 +69,13 @@ CmdEntitiesImport::CmdEntitiesImport(const QByteArray &data, ivm::IVFunctionType
         }
         const QPointF offset = basePoint == outOfScene ? QPointF() : pos - basePoint;
         for (ivm::IVObject *obj : objects) {
-            QVector<QPointF> coordinates = ive::polygon(obj->coordinates());
+            QVector<QPointF> coordinates = shared::graphicsviewutils::polygon(obj->coordinates());
             if (coordinates.isEmpty() && !obj->parentObject()) {
-                obj->setCoordinates(ive::coordinates(QRectF(pos, ive::DefaultGraphicsItemSize)));
+                obj->setCoordinates(shared::graphicsviewutils::coordinates(
+                        QRectF(pos, shared::graphicsviewutils::kDefaultGraphicsItemSize)));
             } else if (!offset.isNull()) {
                 std::for_each(coordinates.begin(), coordinates.end(), [offset](QPointF &point) { point += offset; });
-                obj->setCoordinates(ive::coordinates(coordinates));
+                obj->setCoordinates(shared::graphicsviewutils::coordinates(coordinates));
             }
             m_importedEntities.append(obj);
         }

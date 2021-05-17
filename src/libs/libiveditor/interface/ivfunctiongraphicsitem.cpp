@@ -20,6 +20,7 @@
 #include "baseitems/common/ivutils.h"
 #include "colors/colormanager.h"
 #include "graphicsitemhelpers.h"
+#include "graphicsviewutils.h"
 #include "ivcommentgraphicsitem.h"
 #include "ivconnection.h"
 #include "ivconnectiongraphicsitem.h"
@@ -155,7 +156,7 @@ void IVFunctionGraphicsItem::onManualResizeProgress(
         return;
 
     const QRectF rect = transformedRect(grip, pressedAt, releasedAt);
-    if (gi::isBounded(this, rect)) {
+    if (shared::graphicsviewutils::isBounded(this, rect)) {
         IVFunctionTypeGraphicsItem::onManualResizeProgress(grip, pressedAt, releasedAt);
         layoutConnectionsOnResize(IVConnectionGraphicsItem::CollisionsPolicy::Ignore);
     }
@@ -171,7 +172,7 @@ void IVFunctionGraphicsItem::onManualMoveProgress(
         return;
 
     const QRectF rect = transformedRect(grip, pressedAt, releasedAt);
-    if (gi::isBounded(this, rect)) {
+    if (shared::graphicsviewutils::isBounded(this, rect)) {
         IVFunctionTypeGraphicsItem::onManualMoveProgress(grip, pressedAt, releasedAt);
         layoutConnectionsOnMove(IVConnectionGraphicsItem::CollisionsPolicy::Ignore);
     }
@@ -185,7 +186,8 @@ void IVFunctionGraphicsItem::onManualResizeFinish(
     if (pressedAt == releasedAt)
         return;
 
-    if (gi::isBounded(this, sceneBoundingRect()) && !gi::isCollided(this, sceneBoundingRect())) {
+    if (shared::graphicsviewutils::isBounded(this, sceneBoundingRect())
+            && !shared::graphicsviewutils::isCollided(this, sceneBoundingRect())) {
         layoutConnectionsOnResize(IVConnectionGraphicsItem::CollisionsPolicy::PartialRebuild);
         updateEntity();
     } else { // Fallback to previous geometry in case colliding with items at the same level
@@ -205,7 +207,8 @@ void IVFunctionGraphicsItem::onManualMoveFinish(
     if (pressedAt == releasedAt)
         return;
 
-    if (gi::isBounded(this, sceneBoundingRect()) && !gi::isCollided(this, sceneBoundingRect())) {
+    if (shared::graphicsviewutils::isBounded(this, sceneBoundingRect())
+            && !shared::graphicsviewutils::isCollided(this, sceneBoundingRect())) {
         layoutConnectionsOnMove(IVConnectionGraphicsItem::CollisionsPolicy::PartialRebuild);
         updateEntity();
     } else { // Fallback to previous geometry in case colliding with items at the same level
@@ -217,9 +220,11 @@ void IVFunctionGraphicsItem::onManualMoveFinish(
 static inline void drawItems(
         const QRectF &boundingRect, const QList<QRectF> &existingRects, int count, const qreal sf, QPainter *painter)
 {
-    QRectF childRect { QPointF(), DefaultGraphicsItemSize * sf };
-    const qreal yOffset = sf * (kContentMargins.top() + kContentMargins.bottom());
-    const qreal xOffset = sf * (kContentMargins.left() + kContentMargins.right());
+    QRectF childRect { QPointF(), shared::graphicsviewutils::kDefaultGraphicsItemSize * sf };
+    const qreal yOffset = sf
+            * (shared::graphicsviewutils::kContentMargins.top() + shared::graphicsviewutils::kContentMargins.bottom());
+    const qreal xOffset = sf
+            * (shared::graphicsviewutils::kContentMargins.left() + shared::graphicsviewutils::kContentMargins.right());
     const int column = boundingRect.width() / (childRect.width() + xOffset);
     const int row = boundingRect.height() / (childRect.height() + yOffset);
     if (!count || !column || !row) {
@@ -271,7 +276,8 @@ void IVFunctionGraphicsItem::drawNestedView(QPainter *painter)
         const QString strCoordinates = child->entityAttributeValue<QString>(ivm::meta::Props::token(token));
         if (child->type() == ivm::IVObject::Type::Function || child->type() == ivm::IVObject::Type::FunctionType
                 || child->type() == ivm::IVObject::Type::Comment) {
-            const QRectF itemSceneRect = ive::rect(ivm::IVObject::coordinatesFromString(strCoordinates));
+            const QRectF itemSceneRect =
+                    shared::graphicsviewutils::rect(ivm::IVObject::coordinatesFromString(strCoordinates));
             if (itemSceneRect.isValid()) {
                 nestedRect |= itemSceneRect;
                 existingRects.insert(child->id(), itemSceneRect);
@@ -280,18 +286,19 @@ void IVFunctionGraphicsItem::drawNestedView(QPainter *painter)
             }
         } else if (auto connection = qobject_cast<const ivm::IVConnection *>(child)) {
             if (connection->source()->id() != entity()->id() && connection->target()->id() != entity()->id()) {
-                const QPolygonF itemScenePoints = ive::polygon(ivm::IVObject::coordinatesFromString(strCoordinates));
+                const QPolygonF itemScenePoints =
+                        shared::graphicsviewutils::polygon(ivm::IVObject::coordinatesFromString(strCoordinates));
                 if (!itemScenePoints.isEmpty()) {
                     existingPolygons.insert(child->id(), itemScenePoints);
                 }
             } else {
-                ivm::IVObject *outerIface = connection->source()->id() == entity()->id()
-                        ? connection->sourceInterface()
-                        : connection->target()->id() == entity()->id() ? connection->targetInterface() : nullptr;
+                ivm::IVObject *outerIface = connection->source()->id() == entity()->id() ? connection->sourceInterface()
+                        : connection->target()->id() == entity()->id()                   ? connection->targetInterface()
+                                                                                         : nullptr;
 
-                ivm::IVObject *innerIface = connection->source()->id() == entity()->id()
-                        ? connection->targetInterface()
-                        : connection->target()->id() == entity()->id() ? connection->sourceInterface() : nullptr;
+                ivm::IVObject *innerIface = connection->source()->id() == entity()->id() ? connection->targetInterface()
+                        : connection->target()->id() == entity()->id()                   ? connection->sourceInterface()
+                                                                                         : nullptr;
 
                 if (!outerIface || !innerIface) {
                     continue;
@@ -316,7 +323,8 @@ void IVFunctionGraphicsItem::drawNestedView(QPainter *painter)
                 if (innerIface->hasEntityAttribute(ivm::meta::Props::token(token))) {
                     const QString ifaceStrCoordinates =
                             innerIface->entityAttributeValue<QString>(ivm::meta::Props::token(token));
-                    innerIfacePos = ive::pos(ivm::IVObject::coordinatesFromString(ifaceStrCoordinates));
+                    innerIfacePos =
+                            shared::graphicsviewutils::pos(ivm::IVObject::coordinatesFromString(ifaceStrCoordinates));
                 }
                 ConnectionData cd { (*it)->scenePos(), innerIfacePos, innerIface->parentObject()->id() };
                 /// TODO: generate path between outer and inner ifaces
@@ -327,8 +335,8 @@ void IVFunctionGraphicsItem::drawNestedView(QPainter *painter)
     }
     while (!itemsCountWithoutGeometry.isEmpty()) {
         const shared::Id id = itemsCountWithoutGeometry.takeLast();
-        QRectF itemRect { QPointF(), DefaultGraphicsItemSize };
-        findGeometryForRect(itemRect, nestedRect, existingRects.values());
+        QRectF itemRect { QPointF(), shared::graphicsviewutils::kDefaultGraphicsItemSize };
+        shared::graphicsviewutils::findGeometryForRect(itemRect, nestedRect, existingRects.values());
         existingRects.insert(id, itemRect);
     }
 
@@ -342,7 +350,8 @@ void IVFunctionGraphicsItem::drawNestedView(QPainter *painter)
                     || child->type() == ivm::IVObject::Type::Comment;
         });
 
-        const QRect viewportGeometry = view->viewport()->geometry().marginsRemoved(kContentMargins.toMargins());
+        const QRect viewportGeometry =
+                view->viewport()->geometry().marginsRemoved(shared::graphicsviewutils::kContentMargins.toMargins());
         const QRectF mappedViewportGeometry =
                 QRectF(view->mapToScene(viewportGeometry.topLeft()), view->mapToScene(viewportGeometry.bottomRight()));
 
@@ -350,7 +359,7 @@ void IVFunctionGraphicsItem::drawNestedView(QPainter *painter)
                 qMin(br.width() / mappedViewportGeometry.width(), br.height() / mappedViewportGeometry.height());
         drawItems(br, {}, count, sf, painter);
     } else {
-        const QRectF contentRect { nestedRect.marginsAdded(kRootMargins) };
+        const QRectF contentRect { nestedRect.marginsAdded(shared::graphicsviewutils::kRootMargins) };
         const qreal sf = qMin(br.width() / contentRect.width(), br.height() / contentRect.height());
         const QTransform transform = QTransform::fromScale(sf, sf).translate(-contentRect.x(), -contentRect.y());
 
@@ -386,12 +395,13 @@ void IVFunctionGraphicsItem::drawNestedView(QPainter *painter)
                     (outerRect.bottom() - outerPos.y()) / outerRect.height() };
                 const qreal x = innerRect.left() + innerRect.width() * ratio.x();
                 const qreal y = innerRect.top() + innerRect.height() * ratio.y();
-                const Qt::Alignment side = ive::getNearestSide(outerRect, outerPos);
-                innerPos = ive::getSidePosition(innerRect, QPointF(x, y), side);
+                const Qt::Alignment side = shared::graphicsviewutils::getNearestSide(outerRect, outerPos);
+                innerPos = shared::graphicsviewutils::getSidePosition(innerRect, QPointF(x, y), side);
             } else {
                 innerPos = transform.map(connectionData.innerScenePos);
             }
-            painter->drawPolyline(ive::createConnectionPath(mappedRects, outerPos, outerRect, innerPos, innerRect));
+            painter->drawPolyline(shared::graphicsviewutils::createConnectionPath(
+                    mappedRects, outerPos, outerRect, innerPos, innerRect));
         }
     }
 }
@@ -432,7 +442,8 @@ shared::ColorManager::HandledColors IVFunctionGraphicsItem::handledColorType() c
         return shared::ColorManager::HandledColors::FunctionRoot;
 
     const QRectF nestedRect = nestedItemsSceneBoundingRect();
-    if (nestedRect.isValid() && !sceneBoundingRect().contains(nestedRect.marginsAdded(kContentMargins)))
+    if (nestedRect.isValid()
+            && !sceneBoundingRect().contains(nestedRect.marginsAdded(shared::graphicsviewutils::kContentMargins)))
         return shared::ColorManager::HandledColors::FunctionPartial;
 
     return shared::ColorManager::HandledColors::FunctionRegular;

@@ -75,6 +75,14 @@ target_sources(${LIB_NAME} PRIVATE
     entityattribute.h
     xmlreader.cpp
     xmlreader.h
+    commands/cmdentitygeometrychange.cpp
+    commands/cmdentitygeometrychange.h
+    commands/cmdentityautolayout.cpp
+    commands/cmdentityautolayout.h
+    ui/veinteractiveobject.cpp
+    ui/veinteractiveobject.h
+    ui/verectgraphicsitem.cpp
+    ui/verectgraphicsitem.h
 )
 
 target_include_directories(${LIB_NAME} PUBLIC .)

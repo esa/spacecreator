@@ -15,12 +15,13 @@
    along with this program. If not, see <https://www.gnu.org/licenses/lgpl-2.1.html>.
 */
 
+#include "baseitems/common/ivutils.h"
+#include "graphicsviewutils.h"
+#include "interface/graphicsitemhelpers.h"
+#include "interface/ivfunctiongraphicsitem.h"
+#include "iveditor.h"
 #include "ivfunction.h"
 #include "ivlibrary.h"
-#include "baseitems/common/ivutils.h"
-#include "interface/ivfunctiongraphicsitem.h"
-#include "interface/graphicsitemhelpers.h"
-#include "iveditor.h"
 #include "sharedlibrary.h"
 
 #include <QGraphicsRectItem>
@@ -62,9 +63,9 @@ void tst_Utils::testCheckCollision()
     const QRectF rectNotCollided { 225, 225, 50, 50 };
     QRectF intersected;
     QRectF notIntersected;
-    QVERIFY(ive::isCollided(rects, rectCollided, &intersected));
+    QVERIFY(shared::graphicsviewutils::isCollided(rects, rectCollided, &intersected));
     QVERIFY(intersected == rects.at(3));
-    QVERIFY(ive::isCollided(rects, rectNotCollided, &notIntersected) == false);
+    QVERIFY(shared::graphicsviewutils::isCollided(rects, rectNotCollided, &notIntersected) == false);
     QVERIFY(!notIntersected.isValid());
 }
 
@@ -73,42 +74,49 @@ void tst_Utils::testSides()
     const QMetaEnum me = QMetaEnum::fromType<Qt::Alignment>();
     for (int idx = 0; idx < me.keyCount(); ++idx) {
         const auto align = static_cast<Qt::Alignment>(me.value(idx));
-        const int sideIdx = ive::indexFromSide(align);
-        if (ive::kRectSides.contains(align)) {
-            QVERIFY(align == ive::sideFromIndex(sideIdx));
+        const int sideIdx = shared::graphicsviewutils::indexFromSide(align);
+        if (shared::graphicsviewutils::kRectSides.contains(align)) {
+            QVERIFY(align == shared::graphicsviewutils::sideFromIndex(sideIdx));
         } else {
             QCOMPARE(sideIdx, -1);
         }
     }
-    QCOMPARE(ive::sideFromIndex(-1), ive::sideFromIndex(ive::kRectSides.size() - 1));
-    QCOMPARE(ive::sideFromIndex(-2), ive::sideFromIndex(ive::kRectSides.size() - 2));
-    QCOMPARE(ive::sideFromIndex(-3), ive::sideFromIndex(ive::kRectSides.size() - 3));
-    QCOMPARE(ive::sideFromIndex(-4), ive::sideFromIndex(ive::kRectSides.size() - 4));
+    QCOMPARE(shared::graphicsviewutils::sideFromIndex(-1),
+            shared::graphicsviewutils::sideFromIndex(shared::graphicsviewutils::kRectSides.size() - 1));
+    QCOMPARE(shared::graphicsviewutils::sideFromIndex(-2),
+            shared::graphicsviewutils::sideFromIndex(shared::graphicsviewutils::kRectSides.size() - 2));
+    QCOMPARE(shared::graphicsviewutils::sideFromIndex(-3),
+            shared::graphicsviewutils::sideFromIndex(shared::graphicsviewutils::kRectSides.size() - 3));
+    QCOMPARE(shared::graphicsviewutils::sideFromIndex(-4),
+            shared::graphicsviewutils::sideFromIndex(shared::graphicsviewutils::kRectSides.size() - 4));
 }
 
 void tst_Utils::testAdjustedRect()
 {
     const QRectF itemRect { 100, 100, 100, 100 };
     const QRectF intersectedItemRect { 150, 150, 100, 100 };
-    QVERIFY(ive::adjustedRect(itemRect, intersectedItemRect, Qt::AlignLeft, true).bottom() < intersectedItemRect.top());
-    QVERIFY(ive::adjustedRect(itemRect, intersectedItemRect, Qt::AlignLeft, false).top()
-            > intersectedItemRect.bottom());
-    QVERIFY(ive::adjustedRect(itemRect, intersectedItemRect, Qt::AlignTop, true).left() > intersectedItemRect.right());
-    QVERIFY(ive::adjustedRect(itemRect, intersectedItemRect, Qt::AlignTop, false).right() < intersectedItemRect.left());
-    QVERIFY(ive::adjustedRect(itemRect, intersectedItemRect, Qt::AlignRight, true).top()
-            > intersectedItemRect.bottom());
-    QVERIFY(ive::adjustedRect(itemRect, intersectedItemRect, Qt::AlignRight, false).bottom()
+    QVERIFY(shared::graphicsviewutils::adjustedRect(itemRect, intersectedItemRect, Qt::AlignLeft, true).bottom()
             < intersectedItemRect.top());
-    QVERIFY(ive::adjustedRect(itemRect, intersectedItemRect, Qt::AlignBottom, true).right()
+    QVERIFY(shared::graphicsviewutils::adjustedRect(itemRect, intersectedItemRect, Qt::AlignLeft, false).top()
+            > intersectedItemRect.bottom());
+    QVERIFY(shared::graphicsviewutils::adjustedRect(itemRect, intersectedItemRect, Qt::AlignTop, true).left()
+            > intersectedItemRect.right());
+    QVERIFY(shared::graphicsviewutils::adjustedRect(itemRect, intersectedItemRect, Qt::AlignTop, false).right()
             < intersectedItemRect.left());
-    QVERIFY(ive::adjustedRect(itemRect, intersectedItemRect, Qt::AlignBottom, false).left()
+    QVERIFY(shared::graphicsviewutils::adjustedRect(itemRect, intersectedItemRect, Qt::AlignRight, true).top()
+            > intersectedItemRect.bottom());
+    QVERIFY(shared::graphicsviewutils::adjustedRect(itemRect, intersectedItemRect, Qt::AlignRight, false).bottom()
+            < intersectedItemRect.top());
+    QVERIFY(shared::graphicsviewutils::adjustedRect(itemRect, intersectedItemRect, Qt::AlignBottom, true).right()
+            < intersectedItemRect.left());
+    QVERIFY(shared::graphicsviewutils::adjustedRect(itemRect, intersectedItemRect, Qt::AlignBottom, false).left()
             > intersectedItemRect.right());
 
     const QMetaEnum me = QMetaEnum::fromType<Qt::Alignment>();
     for (int idx = 0; idx < me.keyCount(); ++idx) {
         const auto align = static_cast<Qt::Alignment>(me.value(idx));
-        if (!ive::kRectSides.contains(align)) {
-            QVERIFY(!ive::adjustedRect(itemRect, intersectedItemRect, align, true).isValid());
+        if (!shared::graphicsviewutils::kRectSides.contains(align)) {
+            QVERIFY(!shared::graphicsviewutils::adjustedRect(itemRect, intersectedItemRect, align, true).isValid());
         }
     }
 }
@@ -131,15 +139,18 @@ void tst_Utils::testAlignRectToSide()
         const QMetaEnum me = QMetaEnum::fromType<Qt::Alignment>();
         for (int idx = 0; idx < me.keyCount(); ++idx) {
             const auto align = static_cast<Qt::Alignment>(me.value(idx));
-            QVERIFY(!ive::alignRectToSide({}, testData.itemRect, align, testData.offset).isValid());
-            QVERIFY(!ive::alignRectToSide(testData.boundingRect, {}, align, testData.offset).isValid());
+            QVERIFY(!shared::graphicsviewutils::alignRectToSide({}, testData.itemRect, align, testData.offset)
+                             .isValid());
+            QVERIFY(!shared::graphicsviewutils::alignRectToSide(testData.boundingRect, {}, align, testData.offset)
+                             .isValid());
 
-            if (!ive::kRectSides.contains(align)) {
-                QVERIFY(!ive::alignRectToSide(testData.boundingRect, testData.itemRect, align, testData.offset)
+            if (!shared::graphicsviewutils::kRectSides.contains(align)) {
+                QVERIFY(!shared::graphicsviewutils::alignRectToSide(
+                        testData.boundingRect, testData.itemRect, align, testData.offset)
                                  .isValid());
             } else {
-                const QRectF alignedRect =
-                        ive::alignRectToSide(testData.boundingRect, testData.itemRect, align, testData.offset);
+                const QRectF alignedRect = shared::graphicsviewutils::alignRectToSide(
+                        testData.boundingRect, testData.itemRect, align, testData.offset);
                 QVERIFY(alignedRect.isValid());
                 QVERIFY(testData.boundingRect.contains(alignedRect.topLeft() - testData.offset));
             }
@@ -154,10 +165,10 @@ void tst_Utils::testCollidingRect()
         { 200, 200, 100, 100 },
         { 0, 200, 100, 100 },
     };
-    QVERIFY(ive::collidingRect(QRectF(200, 0, 100, 100), existingRects).isNull());
-    QCOMPARE(ive::collidingRect(QRectF(150, 150, 100, 100), existingRects), existingRects.at(1));
-    QCOMPARE(ive::collidingRect(QRectF(-50, 150, 300, 300), existingRects), existingRects.at(1));
-    QCOMPARE(ive::collidingRect(QRectF(-50, 150, 200, 200), existingRects), existingRects.at(2));
+    QVERIFY(shared::graphicsviewutils::collidingRect(QRectF(200, 0, 100, 100), existingRects).isNull());
+    QCOMPARE(shared::graphicsviewutils::collidingRect(QRectF(150, 150, 100, 100), existingRects), existingRects.at(1));
+    QCOMPARE(shared::graphicsviewutils::collidingRect(QRectF(-50, 150, 300, 300), existingRects), existingRects.at(1));
+    QCOMPARE(shared::graphicsviewutils::collidingRect(QRectF(-50, 150, 200, 200), existingRects), existingRects.at(2));
 }
 
 void tst_Utils::testSiblingSceneRects()
@@ -181,7 +192,7 @@ void tst_Utils::testSiblingSceneRects()
         child = new ive::IVFunctionGraphicsItem(new ivm::IVFunction, item);
         child->setRect(existingRects.at(idx));
     }
-    const auto siblingItems0 = ive::siblingItemsRects(item, ive::gi::rectangularTypes());
+    const auto siblingItems0 = shared::graphicsviewutils::siblingItemsRects(item);
     QCOMPARE(siblingItems0.size(), 3);
     for (auto itemRect : siblingItems0) {
         const auto it = std::find(existingRects.cbegin(), existingRects.cend(), itemRect);
@@ -189,7 +200,7 @@ void tst_Utils::testSiblingSceneRects()
         QVERIFY(std::distance(existingRects.cbegin(), it) != 3);
     }
 
-    const auto siblingItems1 = ive::siblingItemsRects(child, ive::gi::rectangularTypes());
+    const auto siblingItems1 = shared::graphicsviewutils::siblingItemsRects(child);
     QCOMPARE(siblingItems1.size(), 2);
     for (auto itemRect : siblingItems1) {
         const auto it = std::find(existingRects.cbegin(), existingRects.cend(), itemRect);
@@ -211,12 +222,12 @@ void tst_Utils::testFindGeometryForRect()
         br |= r;
 
     QRectF boundingRect { br };
-    ive::findGeometryForRect(itemRect, boundingRect, existingRects, QMarginsF());
+    shared::graphicsviewutils::findGeometryForRect(itemRect, boundingRect, existingRects, QMarginsF());
     QVERIFY(boundingRect.contains(itemRect));
     QVERIFY(br == boundingRect);
 
     existingRects << itemRect;
-    ive::findGeometryForRect(itemRect, boundingRect, existingRects, QMarginsF());
+    shared::graphicsviewutils::findGeometryForRect(itemRect, boundingRect, existingRects, QMarginsF());
     QVERIFY(boundingRect.contains(itemRect));
     QVERIFY(br != boundingRect);
 }

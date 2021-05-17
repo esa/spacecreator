@@ -39,8 +39,8 @@ public:
     shared::Id id() const;
     void setModel(VEModel *model);
 
-    //    template<typename E>
-    //    E type() const;
+    virtual QString title() const = 0;
+    virtual QString titleUI() const = 0;
 
     virtual QVector<qint32> coordinates() const = 0;
     virtual void setCoordinates(const QVector<qint32> &coordinates) = 0;

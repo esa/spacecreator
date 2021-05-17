@@ -15,15 +15,15 @@
    along with this program. If not, see <https://www.gnu.org/licenses/lgpl-2.1.html>.
 */
 
-#include "ivfunction.h"
-#include "ivinterface.h"
 #include "baseitems/common/ivutils.h"
 #include "common.h"
 #include "connectioncreationvalidator.h"
 #include "graphicsviewutils.h"
+#include "interface/graphicsitemhelpers.h"
 #include "interface/ivfunctiongraphicsitem.h"
 #include "interface/ivinterfacegraphicsitem.h"
-#include "interface/graphicsitemhelpers.h"
+#include "ivfunction.h"
+#include "ivinterface.h"
 #include "sharedlibrary.h"
 
 #include <QObject>
@@ -159,11 +159,11 @@ void tst_ConnectionUtils::tst_segmentGenerationByPoints()
 {
     QPointF startPoint { 100, 100 };
     QPointF endPoint { startPoint };
-    auto segments = ive::generateSegments(startPoint, endPoint);
+    auto segments = shared::graphicsviewutils::generateSegments(startPoint, endPoint);
     QVERIFY(segments.isEmpty());
 
     endPoint += QPointF(200, 200);
-    segments = ive::generateSegments(startPoint, endPoint);
+    segments = shared::graphicsviewutils::generateSegments(startPoint, endPoint);
     QVERIFY(!segments.isEmpty());
     for (auto segment : segments) {
         QVERIFY(segment.startsWith(startPoint));
@@ -173,52 +173,52 @@ void tst_ConnectionUtils::tst_segmentGenerationByPoints()
 
 void tst_ConnectionUtils::tst_segmentGeneration()
 {
-    auto segments = ive::generateSegments(QLineF(), QLineF());
+    auto segments = shared::graphicsviewutils::generateSegments(QLineF(), QLineF());
     QVERIFY(segments.isEmpty());
     QLineF startSegment { QPointF(100, 100), QPointF(100, 200) };
-    segments = ive::generateSegments(startSegment, QLineF());
+    segments = shared::graphicsviewutils::generateSegments(startSegment, QLineF());
     QVERIFY(segments.isEmpty());
     QLineF endSegment { QPointF(300, 200), QPointF(300, 100) };
-    segments = ive::generateSegments(QLineF(), endSegment);
+    segments = shared::graphicsviewutils::generateSegments(QLineF(), endSegment);
     QVERIFY(segments.isEmpty());
 
     // ||
-    segments = ive::generateSegments(startSegment, endSegment);
+    segments = shared::graphicsviewutils::generateSegments(startSegment, endSegment);
     QVERIFY(segments.size() >= 3);
     QVERIFY(segments.first() == startSegment.p2());
     QVERIFY(segments.last() == endSegment.p2());
 
     // |_
     endSegment.setP2(QPointF(200, 200));
-    segments = ive::generateSegments(startSegment, endSegment);
+    segments = shared::graphicsviewutils::generateSegments(startSegment, endSegment);
     QVERIFY(segments.size() >= 3);
     QVERIFY(segments.first() == startSegment.p2());
     QVERIFY(segments.last() == endSegment.p2());
 
     // \_
     startSegment.setP1(QPointF(0, 0));
-    segments = ive::generateSegments(startSegment, endSegment);
+    segments = shared::graphicsviewutils::generateSegments(startSegment, endSegment);
     QVERIFY(segments.size() >= 3);
     QVERIFY(segments.first() == startSegment.p2());
     QVERIFY(segments.last() == endSegment.p2());
 
     // \|
     endSegment.setP1(QPointF(200, 100));
-    segments = ive::generateSegments(startSegment, endSegment);
+    segments = shared::graphicsviewutils::generateSegments(startSegment, endSegment);
     QVERIFY(segments.size() >= 3);
     QVERIFY(segments.first() == startSegment.p2());
     QVERIFY(segments.last() == endSegment.p2());
 
     // /|
     startSegment.setP1(QPointF(100, 100));
-    segments = ive::generateSegments(startSegment, endSegment);
+    segments = shared::graphicsviewutils::generateSegments(startSegment, endSegment);
     QVERIFY(segments.size() >= 3);
     QVERIFY(segments.first() == startSegment.p2());
     QVERIFY(segments.last() == endSegment.p2());
 
     // /_
     endSegment.setP1(QPointF(300, 200));
-    segments = ive::generateSegments(startSegment, endSegment);
+    segments = shared::graphicsviewutils::generateSegments(startSegment, endSegment);
     QVERIFY(segments.size() >= 3);
     QVERIFY(segments.first() == startSegment.p2());
     QVERIFY(segments.last() == endSegment.p2());
@@ -226,24 +226,24 @@ void tst_ConnectionUtils::tst_segmentGeneration()
 
 void tst_ConnectionUtils::tst_ifaceSegment()
 {
-    auto line = ive::ifaceSegment(QRectF(), QPointF(), QPointF());
+    auto line = shared::graphicsviewutils::ifaceSegment(QRectF(), QPointF(), QPointF());
     QVERIFY(line.isNull());
 
     QRectF rect { 100, 100, 300, 300 };
     QPointF first, last;
-    line = ive::ifaceSegment(rect, first, last);
+    line = shared::graphicsviewutils::ifaceSegment(rect, first, last);
 
     first = QPointF(200, 100);
     Q_ASSERT(rect.contains(first));
 
     last = QPointF(200, 0);
-    line = ive::ifaceSegment(rect, first, last);
+    line = shared::graphicsviewutils::ifaceSegment(rect, first, last);
     QVERIFY(!line.isNull());
     QVERIFY(line.p1() != line.p2());
     QVERIFY(rect.contains(last) == rect.contains(line.p2()));
 
     last = QPointF(200, 200);
-    line = ive::ifaceSegment(rect, first, last);
+    line = shared::graphicsviewutils::ifaceSegment(rect, first, last);
     QVERIFY(!line.isNull());
     QVERIFY(line.p1() != line.p2());
     QVERIFY(rect.contains(last) == rect.contains(line.p2()));
@@ -252,13 +252,13 @@ void tst_ConnectionUtils::tst_ifaceSegment()
     Q_ASSERT(rect.contains(first));
 
     last = QPointF(200, 200);
-    line = ive::ifaceSegment(rect, first, last);
+    line = shared::graphicsviewutils::ifaceSegment(rect, first, last);
     QVERIFY(!line.isNull());
     QVERIFY(line.p1() != line.p2());
     QVERIFY(rect.contains(last) == rect.contains(line.p2()));
 
     last = QPointF(600, 200);
-    line = ive::ifaceSegment(rect, first, last);
+    line = shared::graphicsviewutils::ifaceSegment(rect, first, last);
     QVERIFY(!line.isNull());
     QVERIFY(line.p1() != line.p2());
     QVERIFY(rect.contains(last) == rect.contains(line.p2()));
@@ -267,13 +267,13 @@ void tst_ConnectionUtils::tst_ifaceSegment()
     Q_ASSERT(rect.contains(first));
 
     last = QPointF(200, 600);
-    line = ive::ifaceSegment(rect, first, last);
+    line = shared::graphicsviewutils::ifaceSegment(rect, first, last);
     QVERIFY(!line.isNull());
     QVERIFY(line.p1() != line.p2());
     QVERIFY(rect.contains(last) == rect.contains(line.p2()));
 
     last = QPointF(200, 200);
-    line = ive::ifaceSegment(rect, first, last);
+    line = shared::graphicsviewutils::ifaceSegment(rect, first, last);
     QVERIFY(!line.isNull());
     QVERIFY(line.p1() != line.p2());
     QVERIFY(rect.contains(last) == rect.contains(line.p2()));
@@ -282,13 +282,13 @@ void tst_ConnectionUtils::tst_ifaceSegment()
     Q_ASSERT(rect.contains(first));
 
     last = QPointF(0, 300);
-    line = ive::ifaceSegment(rect, first, last);
+    line = shared::graphicsviewutils::ifaceSegment(rect, first, last);
     QVERIFY(!line.isNull());
     QVERIFY(line.p1() != line.p2());
     QVERIFY(rect.contains(last) == rect.contains(line.p2()));
 
     last = QPointF(200, 200);
-    line = ive::ifaceSegment(rect, first, last);
+    line = shared::graphicsviewutils::ifaceSegment(rect, first, last);
     QVERIFY(!line.isNull());
     QVERIFY(line.p1() != line.p2());
     QVERIFY(rect.contains(last) == rect.contains(line.p2()));
@@ -298,14 +298,14 @@ void tst_ConnectionUtils::tst_createConnectionPath()
 {
     const QRectF r1 = f1->sceneBoundingRect();
     const QRectF r2 = f2->sceneBoundingRect();
-    QVector<QPointF> path = ive::createConnectionPath(
+    QVector<QPointF> path = shared::graphicsviewutils::createConnectionPath(
             existingRects(), QPointF(r1.x(), r1.y() + 100), r1, QPointF(r2.right(), r2.y() + 100), r2);
     QVERIFY(!path.isEmpty());
     path.append(path.last());
     path.append(path.last());
     path.prepend(path.first());
     path.prepend(path.first());
-    auto simplifiedPath = ive::simplifyPoints(path);
+    auto simplifiedPath = shared::graphicsviewutils::simplifyPoints(path);
     QCOMPARE(simplifiedPath.size() + 4, path.size());
 }
 
@@ -316,16 +316,16 @@ void tst_ConnectionUtils::tst_findPath()
     const QPointF startPoint(r1.x(), r1.y() + 100);
     const QPointF endPoint(r2.right(), r2.y() + 100);
 
-    const QLineF startSegment = ive::ifaceSegment(r1, startPoint, endPoint);
-    const QLineF endSegment = ive::ifaceSegment(r2, endPoint, startPoint);
+    const QLineF startSegment = shared::graphicsviewutils::ifaceSegment(r1, startPoint, endPoint);
+    const QLineF endSegment = shared::graphicsviewutils::ifaceSegment(r2, endPoint, startPoint);
 
     QRectF intersectedRect;
-    auto path = ive::findPath(existingRects(), startSegment, endSegment, &intersectedRect);
+    auto path = shared::graphicsviewutils::findPath(existingRects(), startSegment, endSegment, &intersectedRect);
     QVERIFY(!intersectedRect.isNull());
     QVERIFY(path.isEmpty());
 
     intersectedRect = {};
-    path = ive::findPath(existingRects(), QLineF(r1.topLeft(), r1.topRight()),
+    path = shared::graphicsviewutils::findPath(existingRects(), QLineF(r1.topLeft(), r1.topRight()),
             QLineF(r2.bottomRight(), r2.bottomLeft()), &intersectedRect);
     QVERIFY(intersectedRect.isNull());
     QVERIFY(!path.isEmpty());
@@ -338,15 +338,17 @@ void tst_ConnectionUtils::tst_findSubPath()
     const QPointF startPoint(r1.x(), r1.y() + 100);
     const QPointF endPoint(r2.right(), r2.y() + 100);
 
-    const QLineF startSegment = ive::ifaceSegment(r1, startPoint, endPoint);
-    const QLineF endSegment = ive::ifaceSegment(r2, endPoint, startPoint);
+    const QLineF startSegment = shared::graphicsviewutils::ifaceSegment(r1, startPoint, endPoint);
+    const QLineF endSegment = shared::graphicsviewutils::ifaceSegment(r2, endPoint, startPoint);
 
-    const auto pathsFromStart = ive::findSubPath(r1, QVector<QPointF> { startSegment.p1(), startSegment.p2() },
-            QVector<QPointF> { endSegment.p1(), endSegment.p2() });
+    const auto pathsFromStart =
+            shared::graphicsviewutils::findSubPath(r1, QVector<QPointF> { startSegment.p1(), startSegment.p2() },
+                    QVector<QPointF> { endSegment.p1(), endSegment.p2() });
     QVERIFY(!pathsFromStart.isEmpty());
 
-    const auto pathsFromEnd = ive::findSubPath(r2, QVector<QPointF> { endSegment.p1(), endSegment.p2() },
-            QVector<QPointF> { startSegment.p1(), startSegment.p2() });
+    const auto pathsFromEnd =
+            shared::graphicsviewutils::findSubPath(r2, QVector<QPointF> { endSegment.p1(), endSegment.p2() },
+                    QVector<QPointF> { startSegment.p1(), startSegment.p2() });
     QVERIFY(!pathsFromEnd.isEmpty());
 
     static const QList<int> types = { ive::IVFunctionGraphicsItem::Type, ive::IVFunctionTypeGraphicsItem::Type };
@@ -367,7 +369,7 @@ void tst_ConnectionUtils::tst_findSubPath()
         }
     }
     for (auto path : paths) {
-        path = ive::simplifyPoints(path);
+        path = shared::graphicsviewutils::simplifyPoints(path);
         auto items = m_scene.items(path);
         auto it = std::find_if(items.constBegin(), items.constEnd(), [path](QGraphicsItem *item) {
             return types.contains(item->type())
@@ -384,7 +386,7 @@ void tst_ConnectionUtils::tst_pathByPoints()
     const QPointF startPoint(r1.x() - 100, r1.center().y());
     const QPointF endPoint(r2.right() + 100, r2.center().y());
 
-    auto path = ive::path(existingRects(), startPoint, endPoint);
+    auto path = shared::graphicsviewutils::path(existingRects(), startPoint, endPoint);
     QVERIFY(!path.isEmpty());
 }
 
@@ -407,7 +409,7 @@ void tst_ConnectionUtils::tst_endPoints()
             } else {
                 qFatal("Test for Interface group isn't implemented yet");
             }
-            iface->setCoordinates(ive::coordinates(ci.position));
+            iface->setCoordinates(shared::graphicsviewutils::coordinates(ci.position));
             iface->postInit();
             if (ci.function->addChild(iface)) {
                 auto ifaceItem = new ive::IVInterfaceGraphicsItem(iface, data.at(idx).function());
@@ -518,10 +520,10 @@ void tst_ConnectionUtils::tst_path()
     const QPointF startPoint(r1.x() - 100, r1.center().y());
     const QPointF endPoint(r2.right() + 100, r2.center().y());
 
-    const QLineF startSegment = ive::ifaceSegment(r1, startPoint, endPoint);
-    const QLineF endSegment = ive::ifaceSegment(r2, endPoint, startPoint);
+    const QLineF startSegment = shared::graphicsviewutils::ifaceSegment(r1, startPoint, endPoint);
+    const QLineF endSegment = shared::graphicsviewutils::ifaceSegment(r2, endPoint, startPoint);
 
-    auto path = ive::path(existingRects(), startSegment, endSegment);
+    auto path = shared::graphicsviewutils::path(existingRects(), startSegment, endSegment);
     QVERIFY(!path.isEmpty());
 }
 
@@ -545,7 +547,7 @@ void tst_ConnectionUtils::checkEndPoints(ive::IVFunctionGraphicsItem *startFn, D
             QCOMPARE(result.connectionPoints, connectionPoints);
         }
 
-        const auto path = ive::createConnectionPath(existingRects(),
+        const auto path = shared::graphicsviewutils::createConnectionPath(existingRects(),
                 isReversed ? result.connectionPoints.last() : result.connectionPoints.first(), start.rect(),
                 isReversed ? result.connectionPoints.first() : result.connectionPoints.last(), end.rect());
         QVERIFY(!path.isEmpty());

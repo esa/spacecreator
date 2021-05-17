@@ -21,6 +21,7 @@
 #include "colors/colormanager.h"
 #include "commands/cmdentityattributechange.h"
 #include "commandsstack.h"
+#include "graphicsitemhelpers.h"
 #include "graphicsviewutils.h"
 #include "ivcommonprops.h"
 #include "ivconnection.h"
@@ -46,7 +47,7 @@ static const qreal kBorderWidth = 2;
 namespace ive {
 
 IVFunctionTypeGraphicsItem::IVFunctionTypeGraphicsItem(ivm::IVFunctionType *entity, QGraphicsItem *parent)
-    : IVRectGraphicsItem(entity, parent)
+    : shared::ui::VERectGraphicsItem(entity, parent)
     , m_textItem(new IVFunctionNameGraphicsItem(this))
 {
     setFlag(QGraphicsItem::ItemIsSelectable);
@@ -60,7 +61,7 @@ ivm::IVFunctionType *IVFunctionTypeGraphicsItem::entity() const
 
 void IVFunctionTypeGraphicsItem::init()
 {
-    IVRectGraphicsItem::init();
+    shared::ui::VERectGraphicsItem::init();
     m_textItem->setTextAlignment(Qt::AlignLeft | Qt::AlignTop);
     m_textItem->setFont(font());
     updateText();
@@ -83,12 +84,20 @@ void IVFunctionTypeGraphicsItem::enableEditMode()
 
 void IVFunctionTypeGraphicsItem::rebuildLayout()
 {
-    IVRectGraphicsItem::rebuildLayout();
+    shared::ui::VERectGraphicsItem::rebuildLayout();
+    setVisible(entity() && (gi::nestingLevel(entity()) >= gi::kNestingVisibilityLevel || entity()->isRootObject())
+            && entity()->isVisible());
+
     updateTextPosition();
     for (auto child : childItems()) {
         if (auto iface = qgraphicsitem_cast<IVInterfaceGraphicsItem *>(child))
             iface->instantLayoutUpdate();
     }
+}
+
+int IVFunctionTypeGraphicsItem::itemLevel(bool isSelected) const
+{
+    return gi::itemLevel(entity(), isSelected);
 }
 
 void IVFunctionTypeGraphicsItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget)
@@ -117,8 +126,8 @@ void IVFunctionTypeGraphicsItem::paint(QPainter *painter, const QStyleOptionGrap
 QSizeF IVFunctionTypeGraphicsItem::minimalSize() const
 {
     const QSizeF textSize = m_textItem->boundingRect().size();
-    return { qMax(textSize.width(), DefaultGraphicsItemSize.width()),
-        qMax(textSize.height(), DefaultGraphicsItemSize.height()) };
+    return { qMax(textSize.width(), shared::graphicsviewutils::kDefaultGraphicsItemSize.width()),
+        qMax(textSize.height(), shared::graphicsviewutils::kDefaultGraphicsItemSize.height()) };
 }
 
 void IVFunctionTypeGraphicsItem::updateTextPosition()
@@ -126,7 +135,7 @@ void IVFunctionTypeGraphicsItem::updateTextPosition()
     m_textItem->adjustSize();
 
     QRectF textRect = m_textItem->boundingRect();
-    const QRectF targetTextRect = boundingRect().marginsRemoved(kTextMargins);
+    const QRectF targetTextRect = boundingRect().marginsRemoved(shared::graphicsviewutils::kTextMargins);
 
     const QSizeF maxTxtSize = targetTextRect.size();
     const QSizeF txtSize = textRect.size();
@@ -201,7 +210,7 @@ void IVFunctionTypeGraphicsItem::onManualResizeProgress(
 {
     const QRectF rect = sceneBoundingRect();
 
-    IVRectGraphicsItem::onManualResizeProgress(grip, from, to);
+    shared::ui::VERectGraphicsItem::onManualResizeProgress(grip, from, to);
     const QPointF delta = to - from;
     if (delta.isNull()) {
         return;
@@ -214,15 +223,15 @@ void IVFunctionTypeGraphicsItem::onManualResizeProgress(
                 return;
             }
 
-            const QPointF storedPos = ive::pos(obj->coordinates());
+            const QPointF storedPos = shared::graphicsviewutils::pos(obj->coordinates());
             if (storedPos.isNull() || !grip) {
                 iface->instantLayoutUpdate();
                 continue;
             }
 
-            const Qt::Alignment side = getNearestSide(rect, storedPos);
+            const Qt::Alignment side = shared::graphicsviewutils::getNearestSide(rect, storedPos);
             const QRectF sceneRect = sceneBoundingRect();
-            const QPointF pos = getSidePosition(sceneRect, storedPos, side);
+            const QPointF pos = shared::graphicsviewutils::getSidePosition(sceneRect, storedPos, side);
             iface->setPos(iface->parentItem()->mapFromScene(pos));
         }
     }

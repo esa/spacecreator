@@ -17,7 +17,7 @@
 
 #pragma once
 
-#include "cmdentitygeometrychange.h"
+#include "commands/cmdentitygeometrychange.h"
 #include "common.h"
 
 #include <QPointF>
@@ -33,11 +33,11 @@ class IVModel;
 namespace ive {
 namespace cmd {
 
-class CmdConnectionItemCreate : public CmdEntityGeometryChange
+class CmdConnectionItemCreate : public shared::cmd::CmdEntityGeometryChange
 {
 public:
-    explicit CmdConnectionItemCreate(ivm::IVModel *model, ivm::IVFunction *parent,
-            const shared::Id sourceIfaceId, const shared::Id &targetIfaceId, const QVector<QPointF> &points);
+    explicit CmdConnectionItemCreate(ivm::IVModel *model, ivm::IVFunction *parent, const shared::Id sourceIfaceId,
+            const shared::Id &targetIfaceId, const QVector<QPointF> &points);
     ~CmdConnectionItemCreate() override;
 
     void redo() override;

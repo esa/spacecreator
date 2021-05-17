@@ -17,9 +17,9 @@
 
 #pragma once
 
-#include "ivobject.h"
 #include "ivconnection.h"
-#include "baseitems/interactiveobject.h"
+#include "ivobject.h"
+#include "ui/veinteractiveobject.h"
 
 #include <QPointer>
 
@@ -28,7 +28,7 @@ namespace ive {
 class IVInterfaceGraphicsItem;
 class IVFunctionGraphicsItem;
 
-class IVConnectionGraphicsItem : public InteractiveObject
+class IVConnectionGraphicsItem : public shared::ui::VEInteractiveObject
 {
     Q_OBJECT
 public:
@@ -78,7 +78,7 @@ public:
     IVFunctionGraphicsItem *sourceItem() const;
     IVFunctionGraphicsItem *targetItem() const;
 
-    QList<QPair<ivm::IVObject *, QVector<QPointF>>> prepareChangeCoordinatesCommandParams() const override;
+    QList<QPair<shared::VEObject *, QVector<QPointF>>> prepareChangeCoordinatesCommandParams() const override;
 
     QString prepareTooltip() const override;
 
@@ -92,6 +92,8 @@ public:
             IVInterfaceGraphicsItem *ifaceItem, LayoutPolicy layoutPolicy, CollisionsPolicy collisionsPolicy);
 
     void updateOverlappedSections();
+
+    int itemLevel(bool isSelected) const override;
 
 protected:
     void onManualMoveStart(shared::ui::GripPoint *gp, const QPointF &at) override;

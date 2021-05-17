@@ -15,6 +15,14 @@
    along with this program. If not, see <https://www.gnu.org/licenses/lgpl-2.1.html>.
 */
 
+#include "baseitems/common/ivutils.h"
+#include "interface/ivcommentgraphicsitem.h"
+#include "interface/ivconnectiongraphicsitem.h"
+#include "interface/ivconnectiongroupgraphicsitem.h"
+#include "interface/ivfunctiongraphicsitem.h"
+#include "interface/ivfunctiontypegraphicsitem.h"
+#include "interface/ivinterfacegraphicsitem.h"
+#include "interface/ivinterfacegroupgraphicsitem.h"
 #include "ivcomment.h"
 #include "ivconnection.h"
 #include "ivconnectiongroup.h"
@@ -23,16 +31,8 @@
 #include "ivinterface.h"
 #include "ivinterfacegroup.h"
 #include "ivobject.h"
-#include "baseitems/common/ivutils.h"
-#include "baseitems/interactiveobject.h"
-#include "interface/ivcommentgraphicsitem.h"
-#include "interface/ivconnectiongraphicsitem.h"
-#include "interface/ivconnectiongroupgraphicsitem.h"
-#include "interface/ivfunctiongraphicsitem.h"
-#include "interface/ivfunctiontypegraphicsitem.h"
-#include "interface/ivinterfacegraphicsitem.h"
-#include "interface/ivinterfacegroupgraphicsitem.h"
 #include "sharedlibrary.h"
+#include "ui/veinteractiveobject.h"
 
 #include <QMetaEnum>
 #include <QObject>
@@ -43,7 +43,7 @@ class tst_ItemZOrder : public QObject
 {
     Q_OBJECT
 private:
-    void checkItem(ive::InteractiveObject *item, const qreal expectedZ);
+    void checkItem(shared::ui::VEInteractiveObject *item, const qreal expectedZ);
 
 private Q_SLOTS:
     void initTestCase();
@@ -76,20 +76,32 @@ void tst_ItemZOrder::cleanupTestCase()
     QStandardPaths::setTestModeEnabled(false);
 }
 
-void tst_ItemZOrder::checkItem(ive::InteractiveObject *item, const qreal expectedZ)
+void tst_ItemZOrder::checkItem(shared::ui::VEInteractiveObject *item, const qreal expectedZ)
 {
-    if (!item || !item->entity() || item->entity()->type() == ivm::IVObject::Type::Unknown)
+    if (!item) {
         return;
+    }
+    auto entity = item->entity();
+    if (!entity) {
+        return;
+    }
+    if (auto ivObj = entity->as<ivm::IVObject *>()) {
+        if (ivObj->type() == ivm::IVObject::Type::Unknown) {
+            return;
+        }
+    } else {
+        return;
+    }
 
     ++m_itemTypesTested;
 
     item->setSelected(false);
     QVERIFY(item->isSelected() == false);
-    QCOMPARE(ive::itemLevel(item->entity(), item->isSelected()), expectedZ);
+    QCOMPARE(item->itemLevel(item->isSelected()), expectedZ);
 
     item->setSelected(true);
     QVERIFY(item->isSelected() == true);
-    QCOMPARE(ive::itemLevel(item->entity(), item->isSelected()), ive::ZOrder.Selected);
+    QCOMPARE(item->itemLevel(item->isSelected()), ive::ZOrder.Selected);
 }
 
 void tst_ItemZOrder::testItem_FunctionType()
@@ -122,7 +134,8 @@ void tst_ItemZOrder::testItem_InterfaceGroup()
     ivm::IVInterface::CreationInfo ci;
     ci.function = &ivFunction;
     ci.type = ivm::IVInterface::InterfaceType::Grouped;
-    std::unique_ptr<ivm::IVInterfaceGroup> pIface = std::unique_ptr<ivm::IVInterfaceGroup>(new ivm::IVInterfaceGroup(ci));
+    std::unique_ptr<ivm::IVInterfaceGroup> pIface =
+            std::unique_ptr<ivm::IVInterfaceGroup>(new ivm::IVInterfaceGroup(ci));
     ive::IVInterfaceGroupGraphicsItem item(pIface.get());
 
     checkItem(&item, ive::ZOrder.Interface);

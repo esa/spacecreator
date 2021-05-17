@@ -29,10 +29,15 @@ namespace ivm {
 class IVObject;
 }
 
+namespace shared {
+namespace ui {
+class VEInteractiveObject;
+}
+}
+
 namespace ive {
 class IVItemModel;
 class InterfaceDocument;
-class InteractiveObject;
 
 class CreatorTool : public QObject
 {

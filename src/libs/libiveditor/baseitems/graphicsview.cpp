@@ -18,9 +18,8 @@
 #include "graphicsview.h"
 
 #include "baseitems/common/ivutils.h"
-#include "baseitems/interactiveobject.h"
-#include "interface/ivrectgraphicsitem.h"
 #include "ivobject.h"
+#include "ui/veinteractiveobject.h"
 
 #include <QGraphicsItem>
 #include <QMimeData>
@@ -44,7 +43,7 @@ QList<QPair<QPointF, QString>> GraphicsView::mouseMoveCoordinates(
     QList<QPair<QPointF, QString>> coords;
     QList<QGraphicsItem *> itemsUnderCursor = items(screenPos);
     for (QGraphicsItem *item : itemsUnderCursor) {
-        if (auto iObj = qobject_cast<ive::InteractiveObject *>(item->toGraphicsObject())) {
+        if (auto iObj = qobject_cast<shared::ui::VEInteractiveObject *>(item->toGraphicsObject())) {
             coords.push_back({ item->mapFromScene(scenePos),
                     iObj->entity() ? iObj->entity()->objectName() : QLatin1String("None") });
         }

@@ -18,8 +18,9 @@
 #include "interfacetabgraphicsscene.h"
 
 #include "baseitems/common/ivutils.h"
-#include "baseitems/interactiveobject.h"
+#include "graphicsviewutils.h"
 #include "interface/graphicsitemhelpers.h"
+#include "ui/veinteractiveobject.h"
 
 #include <QGraphicsSceneHelpEvent>
 #include <QToolTip>
@@ -33,8 +34,9 @@ InterfaceTabGraphicsScene::InterfaceTabGraphicsScene(QObject *parent)
 
 void InterfaceTabGraphicsScene::helpEvent(QGraphicsSceneHelpEvent *event)
 {
-    if (QGraphicsItem *hovered = nearestItem(this, event->scenePos(), gi::knownGraphicsItemTypes())) {
-        if (auto item = qobject_cast<InteractiveObject *>(hovered->toGraphicsObject())) {
+    if (QGraphicsItem *hovered =
+                    shared::graphicsviewutils::nearestItem(this, event->scenePos(), gi::knownGraphicsItemTypes())) {
+        if (auto item = qobject_cast<shared::ui::VEInteractiveObject *>(hovered->toGraphicsObject())) {
             const QString &tooltip = item->prepareTooltip();
             if (!tooltip.isEmpty()) {
                 QToolTip::showText(event->screenPos(), tooltip, event->widget());

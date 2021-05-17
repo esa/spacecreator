@@ -17,13 +17,13 @@
 
 #pragma once
 
+#include "commands/cmdentitygeometrychange.h"
 #include "ivconnectiongroup.h"
-#include "cmdentitygeometrychange.h"
 
 namespace ive {
 namespace cmd {
 
-class CmdConnectionGroupItemCreate : public CmdEntityGeometryChange
+class CmdConnectionGroupItemCreate : public shared::cmd::CmdEntityGeometryChange
 {
 public:
     explicit CmdConnectionGroupItemCreate(const ivm::IVConnectionGroup::CreationInfo &creationInfo);

@@ -18,9 +18,9 @@
 
 #pragma once
 
-#include "baseitems/interactiveobject.h"
 #include "ivinterface.h"
 #include "ivobject.h"
+#include "ui/veinteractiveobject.h"
 
 #include <QPointer>
 
@@ -31,7 +31,7 @@ class IVConnectionGraphicsItem;
 class IVFunctionGraphicsItem;
 class IVFunctionTypeGraphicsItem;
 
-class IVInterfaceGraphicsItem : public InteractiveObject
+class IVInterfaceGraphicsItem : public shared::ui::VEInteractiveObject
 {
     Q_OBJECT
 public:
@@ -61,12 +61,14 @@ public:
     QPainterPath shape() const override;
 
     void updateFromEntity() override;
-    QList<QPair<ivm::IVObject *, QVector<QPointF>>> prepareChangeCoordinatesCommandParams() const override;
+    QList<QPair<shared::VEObject *, QVector<QPointF>>> prepareChangeCoordinatesCommandParams() const override;
 
     QString prepareTooltip() const override;
     void layout();
 
     qreal maxWidth() const;
+
+    int itemLevel(bool isSelected) const override;
 
 public Q_SLOTS:
     void updateLabel();

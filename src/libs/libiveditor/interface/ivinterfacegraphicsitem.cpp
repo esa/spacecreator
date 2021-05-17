@@ -21,6 +21,8 @@
 #include "baseitems/common/ivutils.h"
 #include "baseitems/common/positionlookuphelper.h"
 #include "colors/colormanager.h"
+#include "graphicsitemhelpers.h"
+#include "graphicsviewutils.h"
 #include "ivcommentgraphicsitem.h"
 #include "ivconnection.h"
 #include "ivconnectiongraphicsitem.h"
@@ -44,7 +46,7 @@ static const int kTextMargin = 2;
 namespace ive {
 
 IVInterfaceGraphicsItem::IVInterfaceGraphicsItem(ivm::IVInterface *entity, QGraphicsItem *parent)
-    : InteractiveObject(entity, parent)
+    : shared::ui::VEInteractiveObject(entity, parent)
     , m_type(new QGraphicsPathItem(this))
     , m_iface(new QGraphicsPathItem(this))
     , m_text(new QGraphicsTextItem(this))
@@ -61,7 +63,7 @@ ivm::IVInterface *IVInterfaceGraphicsItem::entity() const
 
 void IVInterfaceGraphicsItem::init()
 {
-    InteractiveObject::init();
+    shared::ui::VEInteractiveObject::init();
     connect(entity(), &ivm::IVObject::attributeChanged, this, &IVInterfaceGraphicsItem::onAttrOrPropChanged);
     connect(entity(), &ivm::IVInterface::titleChanged, this, &IVInterfaceGraphicsItem::updateLabel);
     if (auto ri = qobject_cast<ivm::IVInterfaceRequired *>(entity()))
@@ -142,7 +144,7 @@ QPointF IVInterfaceGraphicsItem::connectionEndPoint(const bool nestedConnection)
     }
     if (auto parentGraphicsItem = parentItem()) {
         const QRectF parentRect = parentGraphicsItem->boundingRect();
-        const Qt::Alignment alignment = getNearestSide(parentRect, pos());
+        const Qt::Alignment alignment = shared::graphicsviewutils::getNearestSide(parentRect, pos());
         switch (alignment) {
         case Qt::AlignLeft:
             if (nestedConnection) {
@@ -187,7 +189,7 @@ QPointF IVInterfaceGraphicsItem::connectionEndPoint(IVConnectionGraphicsItem *co
 QPainterPath IVInterfaceGraphicsItem::ifaceShape() const
 {
     const QRectF parentRect = parentItem()->boundingRect();
-    const Qt::Alignment alignment = getNearestSide(parentRect, pos());
+    const Qt::Alignment alignment = shared::graphicsviewutils::getNearestSide(parentRect, pos());
     return mapToScene(ifaceTransform(alignment).map(ifacePath()));
 }
 
@@ -203,15 +205,16 @@ static inline QPointF mapPositionFromOrigin(ivm::IVInterface *iface, ivm::meta::
         const QRectF &functionRect, Qt::Alignment *side)
 {
     const auto parentFn = iface->parentObject()->as<ivm::IVFunctionType *>();
-    const QRectF fnRect = ive::rect(ivm::IVObject::coordinatesFromString(parentFn->entityAttributeValue<QString>(
-                                            ivm::meta::Props::token(coordinateToken))))
+    const QRectF fnRect = shared::graphicsviewutils::rect(
+            ivm::IVObject::coordinatesFromString(
+                    parentFn->entityAttributeValue<QString>(ivm::meta::Props::token(coordinateToken))))
                                   .normalized();
     const QString strCoordinates = iface->entityAttributeValue<QString>(ivm::meta::Props::token(coordinateToken));
-    QPointF pos = ive::pos(ivm::IVObject::coordinatesFromString(strCoordinates));
+    QPointF pos = shared::graphicsviewutils::pos(ivm::IVObject::coordinatesFromString(strCoordinates));
 
-    *side = getNearestSide(fnRect, pos);
+    *side = shared::graphicsviewutils::getNearestSide(fnRect, pos);
 
-    pos = getSidePosition(fnRect, pos, *side);
+    pos = shared::graphicsviewutils::getSidePosition(fnRect, pos, *side);
     if (qFuzzyCompare(fnRect.top(), pos.y())) {
         const qreal sf = (pos.x() - fnRect.left()) / (fnRect.right() - fnRect.left());
         pos = QLineF(functionRect.topLeft(), functionRect.topRight()).pointAt(sf);
@@ -228,9 +231,16 @@ static inline QPointF mapPositionFromOrigin(ivm::IVInterface *iface, ivm::meta::
     return pos;
 }
 
+int IVInterfaceGraphicsItem::itemLevel(bool isSelected) const
+{
+    return gi::itemLevel(entity(), isSelected);
+}
+
 void IVInterfaceGraphicsItem::rebuildLayout()
 {
-    InteractiveObject::rebuildLayout();
+    shared::ui::VEInteractiveObject::rebuildLayout();
+    setVisible(entity() && (gi::nestingLevel(entity()) >= gi::kNestingVisibilityLevel || entity()->isRootObject())
+            && entity()->isVisible());
 
     if (!targetItem()) {
         prepareGeometryChange();
@@ -241,7 +251,7 @@ void IVInterfaceGraphicsItem::rebuildLayout()
     const QRectF parentRect = targetItem()->boundingRect();
     QPointF ifacePos = pos();
     Qt::Alignment side = Qt::AlignCenter;
-    if (entity() && ive::pos(entity()->coordinates()).isNull()) {
+    if (entity() && shared::graphicsviewutils::pos(entity()->coordinates()).isNull()) {
         if (auto origin = entity()->cloneOf()) {
             ifacePos = mapPositionFromOrigin(origin, ivm::meta::Props::Token::coordinates, parentRect, &side);
         } else {
@@ -249,9 +259,9 @@ void IVInterfaceGraphicsItem::rebuildLayout()
             return;
         }
     } else {
-        side = getNearestSide(parentRect, ifacePos);
+        side = shared::graphicsviewutils::getNearestSide(parentRect, ifacePos);
     }
-    const QPointF stickyPos = getSidePosition(parentRect, ifacePos, side);
+    const QPointF stickyPos = shared::graphicsviewutils::getSidePosition(parentRect, ifacePos, side);
     setPos(stickyPos);
     updateInternalItems(side);
 }
@@ -272,7 +282,7 @@ void IVInterfaceGraphicsItem::updateFromEntity()
         return;
 
     setInterfaceName(ifaceLabel());
-    const QPointF coordinates = ive::pos(obj->coordinates());
+    const QPointF coordinates = shared::graphicsviewutils::pos(obj->coordinates());
     if (coordinates.isNull())
         instantLayoutUpdate();
     else
@@ -286,11 +296,12 @@ void IVInterfaceGraphicsItem::onSelectionChanged(bool isSelected)
     m_iface->setBrush(isSelected ? kSelectedBackgroundColor : h.brush());
 }
 
-QList<QPair<ivm::IVObject *, QVector<QPointF>>> IVInterfaceGraphicsItem::prepareChangeCoordinatesCommandParams() const
+QList<QPair<shared::VEObject *, QVector<QPointF>>>
+IVInterfaceGraphicsItem::prepareChangeCoordinatesCommandParams() const
 {
     QVector<QPointF> pos;
     pos.append(scenePos());
-    QList<QPair<ivm::IVObject *, QVector<QPointF>>> params = { { entity(), pos } };
+    QList<QPair<shared::VEObject *, QVector<QPointF>>> params = { { entity(), pos } };
     for (const auto &connection : connectionItems()) {
         if (connection) {
             params.append({ connection->entity(),
@@ -307,13 +318,13 @@ void IVInterfaceGraphicsItem::layout()
     static const QList<ivm::meta::Props::Token> types { ivm::meta::Props::Token::coordinates,
         ivm::meta::Props::Token::InnerCoordinates, ivm::meta::Props::Token::RootCoordinates };
 
-    QPointF pos = ive::pos(entity()->coordinates());
+    QPointF pos = shared::graphicsviewutils::pos(entity()->coordinates());
     int idx = 0;
     ivm::meta::Props::Token token = entity()->coordinatesType();
     while (pos.isNull() && idx < types.size()) {
         token = types.at(idx);
         const QString strCoordinates = entity()->entityAttributeValue<QString>(ivm::meta::Props::token(token));
-        pos = ive::pos(ivm::IVObject::coordinatesFromString(strCoordinates));
+        pos = shared::graphicsviewutils::pos(ivm::IVObject::coordinatesFromString(strCoordinates));
         ++idx;
     }
     if (pos.isNull()) {
@@ -389,7 +400,7 @@ void IVInterfaceGraphicsItem::onManualMoveProgress(shared::ui::GripPoint *, cons
 
     const QPointF newPos = scenePos() + shift;
     const QRectF parentRect = targetItem()->boundingRect();
-    const Qt::Alignment alignment = getNearestSide(parentRect, newPos);
+    const Qt::Alignment alignment = shared::graphicsviewutils::getNearestSide(parentRect, newPos);
     updateInternalItems(alignment);
     setPos(mapToParent(mapFromScene(newPos)));
     updateGripPoints();
@@ -443,7 +454,7 @@ void IVInterfaceGraphicsItem::adjustItem()
     const QRectF parentRect = parentItem()->boundingRect();
 
     QRectF intersectedRect;
-    if (isCollided(siblingsRects, itemRect, &intersectedRect) && parentRect.isValid()) {
+    if (shared::graphicsviewutils::isCollided(siblingsRects, itemRect, &intersectedRect) && parentRect.isValid()) {
         const QHash<Qt::Alignment, QPainterPath> kSidePaths {
             { Qt::AlignLeft, itemPath(Qt::AlignLeft) },
             { Qt::AlignTop, itemPath(Qt::AlignTop) },
@@ -520,7 +531,7 @@ QString IVInterfaceGraphicsItem::ifaceLabel() const
 
 QString IVInterfaceGraphicsItem::prepareTooltip() const
 {
-    QString toolTip = InteractiveObject::prepareTooltip();
+    QString toolTip = shared::ui::VEInteractiveObject::prepareTooltip();
     if (entity()->isProvided())
         return toolTip;
 
@@ -696,7 +707,7 @@ QVariant IVInterfaceGraphicsItem::itemChange(GraphicsItemChange change, const QV
     default:
         break;
     }
-    return InteractiveObject::itemChange(change, value);
+    return shared::ui::VEInteractiveObject::itemChange(change, value);
 }
 
 }

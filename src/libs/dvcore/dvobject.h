@@ -52,7 +52,8 @@ public:
             const shared::Id &id = shared::InvalidId);
     virtual ~DVObject() override;
 
-    QString title() const;
+    QString title() const override;
+    QString titleUI() const override;
 
     DVObject::Type type() const;
 

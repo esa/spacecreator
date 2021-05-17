@@ -17,18 +17,18 @@
 
 #include "cmdconnectiongroupitemcreate.h"
 
+#include "cmdconnectiongroupitemchange.h"
+#include "commandids.h"
 #include "ivconnectiongroup.h"
 #include "ivfunction.h"
 #include "ivinterfacegroup.h"
 #include "ivmodel.h"
-#include "cmdconnectiongroupitemchange.h"
-#include "commandids.h"
 
 namespace ive {
 namespace cmd {
 
 CmdConnectionGroupItemCreate::CmdConnectionGroupItemCreate(const ivm::IVConnectionGroup::CreationInfo &creationInfo)
-    : CmdEntityGeometryChange({}, QObject::tr("Create Connection Group"))
+    : shared::cmd::CmdEntityGeometryChange({}, QObject::tr("Create Connection Group"))
     , m_groupName(creationInfo.name)
     , m_model(creationInfo.model)
     , m_parent(qobject_cast<ivm::IVFunction *>(creationInfo.parentObject))
@@ -50,8 +50,8 @@ CmdConnectionGroupItemCreate::CmdConnectionGroupItemCreate(const ivm::IVConnecti
     targetInfo.function = m_targetIfaceParent;
     m_targetIface = new ivm::IVInterfaceGroup(targetInfo);
 
-    m_entity = new ivm::IVConnectionGroup(
-            creationInfo.name, m_sourceIface, m_targetIface, {}, creationInfo.parentObject);
+    m_entity =
+            new ivm::IVConnectionGroup(creationInfo.name, m_sourceIface, m_targetIface, {}, creationInfo.parentObject);
     prepareData({ qMakePair(m_sourceIface, QVector<QPointF> { creationInfo.points.value(0) }),
             qMakePair(m_targetIface, QVector<QPointF> { creationInfo.points.value(creationInfo.points.size() - 1) }),
             qMakePair(m_entity, creationInfo.points) });
@@ -81,7 +81,7 @@ CmdConnectionGroupItemCreate::~CmdConnectionGroupItemCreate()
 
 void CmdConnectionGroupItemCreate::redo()
 {
-    CmdEntityGeometryChange::redo();
+    shared::cmd::CmdEntityGeometryChange::redo();
 
     if (m_sourceIfaceParent) {
         m_sourceIfaceParent->addChild(m_sourceIface);
@@ -108,7 +108,7 @@ void CmdConnectionGroupItemCreate::undo()
         (*it)->undo();
     }
 
-    CmdEntityGeometryChange::undo();
+    shared::cmd::CmdEntityGeometryChange::undo();
 
     m_model->removeObject(m_entity);
     m_model->removeObject(m_targetIface);

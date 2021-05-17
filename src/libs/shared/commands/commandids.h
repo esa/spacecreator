@@ -1,5 +1,5 @@
 /*
-  Copyright (C) 2019 European Space Agency - <maxime.perrotin@esa.int>
+  Copyright (C) 2021 European Space Agency - <maxime.perrotin@esa.int>
 
   This library is free software; you can redistribute it and/or
   modify it under the terms of the GNU Library General Public
@@ -15,25 +15,17 @@
   along with this program. If not, see <https://www.gnu.org/licenses/lgpl-2.1.html>.
 */
 
-#include "cmdentityautolayout.h"
+#pragma once
 
-#include "commandids.h"
-#include "commandsstack.h"
-
-#include <QtDebug>
-
-namespace ive {
+namespace shared {
 namespace cmd {
 
-CmdEntityAutoLayout::CmdEntityAutoLayout(const QList<QPair<ivm::IVObject *, QVector<QPointF>>> &objectsData)
-    : CmdEntityGeometryChange(objectsData, QObject::tr("Auto layout items"))
+enum Id
 {
-}
-
-int CmdEntityAutoLayout::id() const
-{
-    return AutoLayoutEntity;
-}
+    ChangeEntityGeometry,
+    AutoLayoutEntity,
+    LastId
+};
 
 }
 }

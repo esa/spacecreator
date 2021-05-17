@@ -17,6 +17,10 @@
 
 #include "ivconnectiongraphicsitem.h"
 
+#include "baseitems/common/ivutils.h"
+#include "colors/colormanager.h"
+#include "graphicsviewutils.h"
+#include "interface/graphicsitemhelpers.h"
 #include "ivcommentgraphicsitem.h"
 #include "ivconnection.h"
 #include "ivfunction.h"
@@ -25,10 +29,6 @@
 #include "ivinterface.h"
 #include "ivinterfacegraphicsitem.h"
 #include "ivnamevalidator.h"
-#include "baseitems/common/ivutils.h"
-#include "colors/colormanager.h"
-#include "graphicsviewutils.h"
-#include "interface/graphicsitemhelpers.h"
 #include "ui/grippointshandler.h"
 
 #include <QGuiApplication>
@@ -62,7 +62,7 @@ static inline QVector<QPointF> generateConnectionPath(IVConnectionGraphicsItem *
     const bool isStartEndpointNested = startItem->targetItem()->isAncestorOf(endItem);
     const bool isEndEndpointNested = endItem->targetItem()->isAncestorOf(startItem);
 
-    return createConnectionPath(siblingItemsRects(connection, gi::rectangularTypes()),
+    return shared::graphicsviewutils::createConnectionPath(shared::graphicsviewutils::siblingItemsRects(connection),
             startItem->connectionEndPoint(isStartEndpointNested), startItem->targetItem()->sceneBoundingRect(),
             endItem->connectionEndPoint(isEndEndpointNested), endItem->targetItem()->sceneBoundingRect());
 }
@@ -81,9 +81,9 @@ QPainterPath IVConnectionGraphicsItem::GraphicsPathItem::shape() const
     return stroker.createStroke(path()).simplified();
 }
 
-IVConnectionGraphicsItem::IVConnectionGraphicsItem(ivm::IVConnection *connection,
-        IVInterfaceGraphicsItem *startIface, IVInterfaceGraphicsItem *endIface, QGraphicsItem *parentItem)
-    : InteractiveObject(connection, parentItem)
+IVConnectionGraphicsItem::IVConnectionGraphicsItem(ivm::IVConnection *connection, IVInterfaceGraphicsItem *startIface,
+        IVInterfaceGraphicsItem *endIface, QGraphicsItem *parentItem)
+    : shared::ui::VEInteractiveObject(connection, parentItem)
     , m_startItem(startIface)
     , m_endItem(endIface)
     , m_item(new GraphicsPathItem(this))
@@ -119,12 +119,12 @@ void IVConnectionGraphicsItem::updateFromEntity()
     if (!obj)
         return;
 
-    setPoints(polygon(obj->coordinates()));
+    setPoints(shared::graphicsviewutils::polygon(obj->coordinates()));
 }
 
 void IVConnectionGraphicsItem::init()
 {
-    InteractiveObject::init();
+    shared::ui::VEInteractiveObject::init();
     updateInterfaceConnectionsReference(IfaceConnectionReference::Set);
 }
 
@@ -138,7 +138,7 @@ void IVConnectionGraphicsItem::setPoints(const QVector<QPointF> &points)
         return;
     }
 
-    if (!comparePolygones(m_points, points)) {
+    if (!shared::graphicsviewutils::comparePolygones(m_points, points)) {
         m_points = points;
         instantLayoutUpdate();
     }
@@ -179,10 +179,16 @@ void IVConnectionGraphicsItem::paint(QPainter *painter, const QStyleOptionGraphi
     Q_UNUSED(widget)
 }
 
+int IVConnectionGraphicsItem::itemLevel(bool isSelected) const
+{
+    return gi::itemLevel(entity(), isSelected);
+}
+
 void IVConnectionGraphicsItem::rebuildLayout()
 {
-    if (!m_startItem || !m_startItem->isVisible() || !m_endItem || !m_endItem->isVisible() || !m_dataObject
-            || !m_dataObject->isVisible()) {
+    if (!m_startItem || !m_startItem->isVisible() || !m_endItem || !m_endItem->isVisible() || !entity()
+            || !entity()->isVisible()
+            || (gi::nestingLevel(entity()) < gi::kNestingVisibilityLevel && !entity()->isRootObject())) {
         setVisible(false);
         return;
     }
@@ -342,9 +348,9 @@ static inline QVector<QPointF> replaceIntersectedSegments(
         }
     }
     sections.erase(std::unique(sections.begin(), sections.end()), sections.end());
-    const QList<QRectF> existingRects = siblingItemsRects(connection, gi::rectangularTypes());
+    const QList<QRectF> existingRects = shared::graphicsviewutils::siblingItemsRects(connection);
     for (auto chunk : sections) {
-        const QVector<QPointF> subPath = path(existingRects, chunk.first, chunk.second);
+        const QVector<QPointF> subPath = shared::graphicsviewutils::path(existingRects, chunk.first, chunk.second);
         if (!points.isEmpty()) {
             /// Remove overlapped chunk
             const int idxStart = points.indexOf(chunk.first);
@@ -362,7 +368,7 @@ static inline QVector<QPointF> replaceIntersectedSegments(
             break;
         }
     }
-    return simplifyPoints(points);
+    return shared::graphicsviewutils::simplifyPoints(points);
 }
 
 /*!
@@ -409,7 +415,7 @@ void IVConnectionGraphicsItem::updateOverlappedSections()
     const QList<QGraphicsItem *> cachedIntersectedItems = intersectedItems(this);
     /// Nothing to update without intersections with Function(Type) items
     if (cachedIntersectedItems.isEmpty()) {
-        m_points = simplifyPoints(m_points);
+        m_points = shared::graphicsviewutils::simplifyPoints(m_points);
     } else {
         m_points = replaceIntersectedSegments(cachedIntersectedItems, this);
     }
@@ -424,7 +430,7 @@ void IVConnectionGraphicsItem::onSelectionChanged(bool isSelected)
     pen.setStyle(isSelected ? Qt::DotLine : Qt::SolidLine);
     m_item->setPen(pen);
 
-    InteractiveObject::onSelectionChanged(isSelected);
+    shared::ui::VEInteractiveObject::onSelectionChanged(isSelected);
 }
 
 void IVConnectionGraphicsItem::updateBoundingRect()
@@ -458,7 +464,7 @@ IVFunctionGraphicsItem *IVConnectionGraphicsItem::targetItem() const
     return m_endItem ? qgraphicsitem_cast<IVFunctionGraphicsItem *>(m_endItem->targetItem()) : nullptr;
 }
 
-QList<QPair<ivm::IVObject *, QVector<QPointF>>>
+QList<QPair<shared::VEObject *, QVector<QPointF>>>
 IVConnectionGraphicsItem::prepareChangeCoordinatesCommandParams() const
 {
     if (!entity() || !m_startItem || !m_startItem->entity() || !m_endItem || !m_endItem->entity()) {
@@ -466,13 +472,13 @@ IVConnectionGraphicsItem::prepareChangeCoordinatesCommandParams() const
     }
 
     // item->prepareChangeCoordinatesCommandParams() - will be fixed during work on Undo/Redo issues
-    auto prepareParams = [](IVInterfaceGraphicsItem *item) -> QPair<ivm::IVObject *, QVector<QPointF>> {
+    auto prepareParams = [](IVInterfaceGraphicsItem *item) -> QPair<shared::VEObject *, QVector<QPointF>> {
         QVector<QPointF> pos;
         pos.append(item->scenePos());
         return { item->entity(), pos };
     };
 
-    QList<QPair<ivm::IVObject *, QVector<QPointF>>> params;
+    QList<QPair<shared::VEObject *, QVector<QPointF>>> params;
     params.append({ entity(), graphicsPoints() });
     params.append(prepareParams(m_startItem));
     params.append(prepareParams(m_endItem));
@@ -539,7 +545,7 @@ void IVConnectionGraphicsItem::updateGripPoints()
             gripPointsHandler()->setGripPointPos(grip, points.value(idx));
         }
     }
-    InteractiveObject::updateGripPoints();
+    shared::ui::VEInteractiveObject::updateGripPoints();
 }
 
 void IVConnectionGraphicsItem::onManualMoveProgress(shared::ui::GripPoint *gp, const QPointF &from, const QPointF &to)
@@ -592,11 +598,11 @@ void IVConnectionGraphicsItem::onManualMoveFinish(
     QPointF intersectionPoint { releasedAt };
     if (idx > 0 && idx < m_points.size() - 1) {
         QLineF prevLine = { m_points.value(idx - 1), intersectionPoint };
-        if (alignedLine(prevLine))
+        if (shared::graphicsviewutils::alignedLine(prevLine))
             intersectionPoint = prevLine.p2();
 
         QLineF nextLine = { m_points.value(idx + 1), intersectionPoint };
-        if (alignedLine(nextLine))
+        if (shared::graphicsviewutils::alignedLine(nextLine))
             intersectionPoint = nextLine.p2();
     }
     m_points[idx] = intersectionPoint;
@@ -626,12 +632,12 @@ void IVConnectionGraphicsItem::onManualMoveFinish(
 
 void IVConnectionGraphicsItem::simplify()
 {
-    m_points = simplifyPoints(m_points);
+    m_points = shared::graphicsviewutils::simplifyPoints(m_points);
 }
 
 void IVConnectionGraphicsItem::initGripPoints()
 {
-    InteractiveObject::initGripPoints();
+    shared::ui::VEInteractiveObject::initGripPoints();
     for (int idx = 0; idx < m_points.size(); ++idx)
         gripPointsHandler()->createGripPoint(shared::ui::GripPoint::Absolute);
 }
@@ -674,14 +680,12 @@ bool IVConnectionGraphicsItem::removeCollidedGrips(shared::ui::GripPoint *gp)
 
 QString IVConnectionGraphicsItem::prepareTooltip() const
 {
-    const QString sourceName =
-            ivm::IVNameValidator::decodeName(ivm::IVObject::Type::Function, entity()->sourceName());
-    const QString sourceInterfaceName = ivm::IVNameValidator::decodeName(
-            ivm::IVObject::Type::RequiredInterface, entity()->sourceInterfaceName());
-    const QString targetName =
-            ivm::IVNameValidator::decodeName(ivm::IVObject::Type::Function, entity()->targetName());
-    const QString targetInterfaceName = ivm::IVNameValidator::decodeName(
-            ivm::IVObject::Type::ProvidedInterface, entity()->targetInterfaceName());
+    const QString sourceName = ivm::IVNameValidator::decodeName(ivm::IVObject::Type::Function, entity()->sourceName());
+    const QString sourceInterfaceName =
+            ivm::IVNameValidator::decodeName(ivm::IVObject::Type::RequiredInterface, entity()->sourceInterfaceName());
+    const QString targetName = ivm::IVNameValidator::decodeName(ivm::IVObject::Type::Function, entity()->targetName());
+    const QString targetInterfaceName =
+            ivm::IVNameValidator::decodeName(ivm::IVObject::Type::ProvidedInterface, entity()->targetInterfaceName());
     const QString sign = entity()->sourceInterface()->isRequired() ? "->" : "<-";
     const QString tooltip =
             QString("%1.%2 %3 %4.%5").arg(sourceName, sourceInterfaceName, sign, targetName, targetInterfaceName);
@@ -700,7 +704,7 @@ void IVConnectionGraphicsItem::transformToEndPoint(const IVInterfaceGraphicsItem
     }
 
     if (m_points.size() > 2) {
-        QVector<QPointF> initialPoints = ive::polygon(entity()->coordinates());
+        QVector<QPointF> initialPoints = shared::graphicsviewutils::polygon(entity()->coordinates());
         const QRectF currentRect = QRectF(initialPoints.first(), initialPoints.last());
         QRectF newRect;
         if (iface == startItem()) {

@@ -17,10 +17,16 @@
 
 #include "dvitemmodel.h"
 
+#include "dvmodel.h"
+
+#include <QUndoStack>
+
 namespace dve {
 
-DVItemModel::DVItemModel(QObject *parent)
+DVItemModel::DVItemModel(dvm::DVModel *model, QUndoStack *undoStack, QObject *parent)
     : QObject(parent)
+    , m_model(model)
+    , m_undoStack(undoStack)
 {
 }
 

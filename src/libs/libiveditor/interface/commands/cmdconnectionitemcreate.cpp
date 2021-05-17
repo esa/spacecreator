@@ -17,13 +17,13 @@
 
 #include "cmdconnectionitemcreate.h"
 
+#include "baseitems/common/ivutils.h"
+#include "commandids.h"
 #include "ivconnection.h"
 #include "ivfunction.h"
 #include "ivfunctiontype.h"
 #include "ivinterface.h"
 #include "ivmodel.h"
-#include "baseitems/common/ivutils.h"
-#include "commandids.h"
 
 #include <QtMath>
 
@@ -32,7 +32,7 @@ namespace cmd {
 
 CmdConnectionItemCreate::CmdConnectionItemCreate(ivm::IVModel *model, ivm::IVFunction *parent,
         const shared::Id sourceIfaceId, const shared::Id &targetIfaceId, const QVector<QPointF> &points)
-    : CmdEntityGeometryChange({}, QObject::tr("Create Connection"))
+    : shared::cmd::CmdEntityGeometryChange({}, QObject::tr("Create Connection"))
     , m_model(model)
     , m_parent(parent)
 {
@@ -55,7 +55,7 @@ CmdConnectionItemCreate::~CmdConnectionItemCreate()
 
 void CmdConnectionItemCreate::redo()
 {
-    CmdEntityGeometryChange::redo();
+    shared::cmd::CmdEntityGeometryChange::redo();
 
     if (m_parent)
         m_parent->addChild(m_entity);
@@ -65,7 +65,7 @@ void CmdConnectionItemCreate::redo()
 
 void CmdConnectionItemCreate::undo()
 {
-    CmdEntityGeometryChange::undo();
+    shared::cmd::CmdEntityGeometryChange::undo();
 
     m_entity->unsetInheritPI();
     m_model->removeObject(m_entity);

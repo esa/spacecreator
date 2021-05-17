@@ -1,5 +1,5 @@
 /*
-  Copyright (C) 2018-2019 European Space Agency - <maxime.perrotin@esa.int>
+  Copyright (C) 2018-2021 European Space Agency - <maxime.perrotin@esa.int>
 
   This library is free software; you can redistribute it and/or
   modify it under the terms of the GNU Library General Public
@@ -16,26 +16,22 @@
   <https://www.gnu.org/licenses/lgpl-2.1.html>.
 */
 
-#include "interactiveobject.h"
+#include "veinteractiveobject.h"
 
-#include "baseitems/common/ivutils.h"
-#include "commandsstack.h"
-#include "interface/commands/cmdentityautolayout.h"
-#include "interface/commands/cmdentitygeometrychange.h"
-#include "ivobject.h"
+#include "commands/cmdentityautolayout.h"
+#include "commands/cmdentitygeometrychange.h"
+#include "commandsstackbase.h"
+#include "veobject.h"
 
-#include <QBrush>
-#include <QCursor>
 #include <QDebug>
-#include <QGraphicsScene>
 #include <QGraphicsSceneMouseEvent>
 #include <QTimer>
-#include <functional>
 
-namespace ive {
+namespace shared {
+namespace ui {
 
-InteractiveObject::InteractiveObject(ivm::IVObject *entity, QGraphicsItem *parent)
-    : shared::ui::InteractiveObjectBase(parent)
+VEInteractiveObject::VEInteractiveObject(VEObject *entity, QGraphicsItem *parent)
+    : ui::InteractiveObjectBase(parent)
     , m_dataObject(entity)
 {
     setAcceptHoverEvents(true);
@@ -45,17 +41,17 @@ InteractiveObject::InteractiveObject(ivm::IVObject *entity, QGraphicsItem *paren
     setCursor(Qt::ArrowCursor);
 
     connect(shared::ColorManager::instance(), &shared::ColorManager::colorsUpdated, this,
-            &InteractiveObject::applyColorScheme);
+            &VEInteractiveObject::applyColorScheme);
 }
 
-ivm::IVObject *InteractiveObject::entity() const
+shared::VEObject *VEInteractiveObject::entity() const
 {
     return m_dataObject;
 }
 
-void InteractiveObject::onSelectionChanged(bool isSelected)
+void VEInteractiveObject::onSelectionChanged(bool isSelected)
 {
-    setZValue(itemLevel(entity(), isSelected));
+    setZValue(itemLevel(isSelected));
     if (isSelected) {
         showGripPoints();
         updateGripPoints();
@@ -64,43 +60,16 @@ void InteractiveObject::onSelectionChanged(bool isSelected)
     }
 }
 
-QFont InteractiveObject::font() const
-{
-    return m_font;
-}
-
-void InteractiveObject::setFont(const QFont &font)
-{
-    m_font = font;
-}
-
-void InteractiveObject::init()
-{
-    applyColorScheme();
-}
-
-void InteractiveObject::updateEntity()
-{
-    if (!m_commandsStack) {
-        qWarning() << Q_FUNC_INFO << "No command stack set in InteractiveObject";
-        return;
-    }
-
-    const auto changeGeometryCmd = new cmd::CmdEntityGeometryChange(prepareChangeCoordinatesCommandParams());
-
-    m_commandsStack->push(changeGeometryCmd);
-}
-
-void InteractiveObject::mergeGeometry()
+void VEInteractiveObject::mergeGeometry()
 {
     QTimer::singleShot(0, this, [this]() {
         if (!m_commandsStack) {
-            qWarning() << Q_FUNC_INFO << "No command stack set in InteractiveObject";
+            qWarning() << Q_FUNC_INFO << "No command stack set in shared::ui::VEInteractiveObject";
             return;
         }
 
         for (auto child : childItems()) {
-            if (auto io = qobject_cast<InteractiveObject *>(child->toGraphicsObject())) {
+            if (auto io = qobject_cast<VEInteractiveObject *>(child->toGraphicsObject())) {
                 io->mergeGeometry();
             }
         }
@@ -116,67 +85,86 @@ void InteractiveObject::mergeGeometry()
     });
 }
 
-QList<QPair<ivm::IVObject *, QVector<QPointF>>> InteractiveObject::prepareChangeCoordinatesCommandParams() const
+QFont VEInteractiveObject::font() const
 {
-    QList<QPair<ivm::IVObject *, QVector<QPointF>>> params;
+    return m_font;
+}
+
+void VEInteractiveObject::setFont(const QFont &font)
+{
+    m_font = font;
+}
+
+void VEInteractiveObject::init()
+{
+    applyColorScheme();
+}
+
+void VEInteractiveObject::updateEntity()
+{
+    if (!m_commandsStack) {
+        qWarning() << Q_FUNC_INFO << "No command stack set in shared::ui::VEInteractiveObject";
+        return;
+    }
+
+    const auto changeGeometryCmd = new cmd::CmdEntityGeometryChange(prepareChangeCoordinatesCommandParams());
+    m_commandsStack->push(changeGeometryCmd);
+}
+
+QList<QPair<shared::VEObject *, QVector<QPointF>>> VEInteractiveObject::prepareChangeCoordinatesCommandParams() const
+{
+    QList<QPair<shared::VEObject *, QVector<QPointF>>> params;
     auto children = childItems();
     std::stable_sort(children.begin(), children.end(),
             [](QGraphicsItem *item1, QGraphicsItem *item2) { return item1->type() < item2->type(); });
 
-    for (auto item : children) {
-        if (auto iObj = qobject_cast<InteractiveObject *>(item->toGraphicsObject()))
+    for (auto item : qAsConst(children)) {
+        if (auto iObj = qobject_cast<VEInteractiveObject *>(item->toGraphicsObject()))
             params.append(iObj->prepareChangeCoordinatesCommandParams());
     }
     params.erase(std::unique(params.begin(), params.end()), params.end());
     return params;
 }
 
-QBrush InteractiveObject::brush() const
+QBrush VEInteractiveObject::brush() const
 {
     return m_brush;
 }
 
-void InteractiveObject::setBrush(const QBrush &brush)
+void VEInteractiveObject::setBrush(const QBrush &brush)
 {
     m_brush = brush;
 }
 
-QPen InteractiveObject::pen() const
+QPen VEInteractiveObject::pen() const
 {
     return m_pen;
 }
 
-void InteractiveObject::setPen(const QPen &pen)
+void VEInteractiveObject::setPen(const QPen &pen)
 {
     m_pen = pen;
 }
 
-void InteractiveObject::updateGraphicsItem()
+void VEInteractiveObject::updateGraphicsItem()
 {
     updateFromEntity();
     update();
 }
 
-void InteractiveObject::rebuildLayout()
-{
-    setVisible(m_dataObject
-            && (nestingLevel(m_dataObject) >= ive::kNestingVisibilityLevel || m_dataObject->isRootObject())
-            && m_dataObject->isVisible());
-}
-
-void InteractiveObject::mouseMoveEvent(QGraphicsSceneMouseEvent *event)
+void VEInteractiveObject::mouseMoveEvent(QGraphicsSceneMouseEvent *event)
 {
     QGraphicsObject::mouseMoveEvent(event);
     onManualMoveProgress(gripPointItem(shared::ui::GripPoint::Center), event->lastScenePos(), event->scenePos());
 }
 
-void InteractiveObject::mousePressEvent(QGraphicsSceneMouseEvent *event)
+void VEInteractiveObject::mousePressEvent(QGraphicsSceneMouseEvent *event)
 {
     QGraphicsObject::mousePressEvent(event);
     onManualMoveStart(gripPointItem(shared::ui::GripPoint::Center), event->scenePos());
 }
 
-void InteractiveObject::mouseReleaseEvent(QGraphicsSceneMouseEvent *event)
+void VEInteractiveObject::mouseReleaseEvent(QGraphicsSceneMouseEvent *event)
 {
     onManualMoveFinish(gripPointItem(shared::ui::GripPoint::Center), event->buttonDownScenePos(event->button()),
             event->scenePos());
@@ -184,13 +172,13 @@ void InteractiveObject::mouseReleaseEvent(QGraphicsSceneMouseEvent *event)
     QGraphicsObject::mouseReleaseEvent(event);
 }
 
-void InteractiveObject::mouseDoubleClickEvent(QGraphicsSceneMouseEvent *event)
+void VEInteractiveObject::mouseDoubleClickEvent(QGraphicsSceneMouseEvent *event)
 {
     Q_EMIT doubleClicked();
     QGraphicsObject::mouseDoubleClickEvent(event);
 }
 
-shared::ColorHandler InteractiveObject::colorHandler() const
+shared::ColorHandler VEInteractiveObject::colorHandler() const
 {
     shared::ColorHandler h = shared::ColorManager::instance()->colorsForItem(handledColorType());
     if (auto ivObj = entity()) {
@@ -203,14 +191,16 @@ shared::ColorHandler InteractiveObject::colorHandler() const
     return h;
 }
 
-QString InteractiveObject::prepareTooltip() const
+void VEInteractiveObject::setCommandsStack(cmd::CommandsStackBase *commandsStack)
+{
+    m_commandsStack = commandsStack;
+}
+
+QString VEInteractiveObject::prepareTooltip() const
 {
     return entity() ? entity()->titleUI() : QString();
 }
 
-void InteractiveObject::setCommandsStack(cmd::CommandsStack *commandsStack)
-{
-    m_commandsStack = commandsStack;
 }
 
 }

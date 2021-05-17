@@ -1,5 +1,5 @@
 /*
- Copyright (C) 2019 European Space Agency - <maxime.perrotin@esa.int>
+ Copyright (C) 2019-2021 European Space Agency - <maxime.perrotin@esa.int>
 
  This library is free software; you can redistribute it and/or
  modify it under the terms of the GNU Library General Public
@@ -21,17 +21,17 @@
 
 #include <QPointF>
 
-namespace ivm {
-class IVObject;
+namespace shared {
+class VEObject;
 }
 
-namespace ive {
+namespace shared {
 namespace cmd {
 
 class CmdEntityAutoLayout : public CmdEntityGeometryChange
 {
 public:
-    explicit CmdEntityAutoLayout(const QList<QPair<ivm::IVObject *, QVector<QPointF>>> &objectsData);
+    explicit CmdEntityAutoLayout(const QList<QPair<shared::VEObject *, QVector<QPointF>>> &objectsData);
     int id() const override;
 };
 

@@ -12,8 +12,6 @@ target_sources(${LIB_NAME} PRIVATE
     baseitems/common/positionlookuphelper.h
     baseitems/graphicsview.cpp
     baseitems/graphicsview.h
-    baseitems/interactiveobject.cpp
-    baseitems/interactiveobject.h
     commandsstack.cpp
     commandsstack.h
     context/action/action.cpp
@@ -72,8 +70,6 @@ target_sources(${LIB_NAME} PRIVATE
     interface/ivitemmodel.h
     interface/objectstreeview.cpp
     interface/objectstreeview.h
-    interface/ivrectgraphicsitem.cpp
-    interface/ivrectgraphicsitem.h
     interface/commands/cmdchangeasn1file.cpp
     interface/commands/cmdchangeasn1file.h
     interface/commands/cmdcommentitemcreate.cpp
@@ -96,10 +92,6 @@ target_sources(${LIB_NAME} PRIVATE
     interface/commands/cmdentitiesinstantiate.h
     interface/commands/cmdentityattributechange.cpp
     interface/commands/cmdentityattributechange.h
-    interface/commands/cmdentityautolayout.cpp
-    interface/commands/cmdentityautolayout.h
-    interface/commands/cmdentitygeometrychange.cpp
-    interface/commands/cmdentitygeometrychange.h
     interface/commands/cmdentitypropertychange.cpp
     interface/commands/cmdentitypropertychange.h
     interface/commands/cmdentitypropertycreate.cpp

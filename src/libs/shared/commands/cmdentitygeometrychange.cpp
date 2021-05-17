@@ -17,18 +17,16 @@
 
 #include "cmdentitygeometrychange.h"
 
-#include "ivmodel.h"
-#include "baseitems/common/ivutils.h"
 #include "commandids.h"
-#include "commandsstack.h"
+#include "commandsstackbase.h"
+#include "veobject.h"
+#include "graphicsviewutils.h"
 
-#include <QtDebug>
-
-namespace ive {
+namespace shared {
 namespace cmd {
 
 CmdEntityGeometryChange::CmdEntityGeometryChange(
-        const QList<QPair<ivm::IVObject *, QVector<QPointF>>> &objectsData, const QString &title)
+        const QList<QPair<shared::VEObject *, QVector<QPointF>>> &objectsData, const QString &title)
     : QUndoCommand(title.isEmpty() ? QObject::tr("Change item(s) geometry/position") : title)
     , m_internalData(objectsData)
     , m_data(convertData(m_internalData))
@@ -80,23 +78,23 @@ void CmdEntityGeometryChange::mergeCommand(QUndoCommand *command)
 }
 
 QList<CmdEntityGeometryChange::ObjectData> CmdEntityGeometryChange::convertData(
-        const QList<QPair<ivm::IVObject *, QVector<QPointF>>> &objectsData)
+        const QList<QPair<shared::VEObject *, QVector<QPointF>>> &objectsData)
 {
     QList<ObjectData> result;
     for (const auto &objectData : objectsData)
-        result.append({ objectData.first, objectData.first->coordinates(), coordinates(objectData.second) });
+        result.append({ objectData.first, objectData.first->coordinates(), shared::graphicsviewutils::coordinates(objectData.second) });
 
-    std::stable_sort(result.begin(), result.end(), [](const ObjectData &data1, const ObjectData &data2) {
-        if (data1.entity->type() == data2.entity->type())
-            return ive::nestingLevel(data1.entity) < ive::nestingLevel(data2.entity);
+    //    std::stable_sort(result.begin(), result.end(), [](const ObjectData &data1, const ObjectData &data2) {
+    //        if (data1.entity->type() == data2.entity->type())
+    //            return ive::nestingLevel(data1.entity) < ive::nestingLevel(data2.entity);
 
-        return data1.entity->type() < data2.entity->type();
-    });
+    //        return data1.entity->type() < data2.entity->type();
+    //    });
 
     return result;
 }
 
-void CmdEntityGeometryChange::prepareData(const QList<QPair<ivm::IVObject *, QVector<QPointF>>> &objectsData)
+void CmdEntityGeometryChange::prepareData(const QList<QPair<shared::VEObject *, QVector<QPointF>>> &objectsData)
 {
     m_data = convertData(objectsData);
 }
