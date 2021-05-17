@@ -467,10 +467,9 @@ void MessageItem::setHeadPosition(const QPointF &head)
         return;
     }
 
-    const bool horizontal = isHorizontal();
     points.last() = head;
 
-    if (horizontal || points.first().y() > head.y()) {
+    if (points.first().y() > head.y()) {
         points.first().setY(head.y());
     }
 
@@ -509,10 +508,9 @@ void MessageItem::setTailPosition(const QPointF &tail)
         return;
     }
 
-    const bool horizontal = isHorizontal();
     points.first() = tail;
 
-    if (horizontal || points.last().y() < tail.y()) {
+    if (points.last().y() < tail.y()) {
         points.last().setY(tail.y());
     }
 

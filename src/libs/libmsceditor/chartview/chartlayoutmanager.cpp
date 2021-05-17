@@ -899,22 +899,24 @@ void ChartLayoutManager::checkVerticalConstraints()
                 case MscEntity::EntityType::Create:
                 case MscEntity::EntityType::Message: {
                     auto messageItem = static_cast<MessageItem *>(eventItem);
-                    qreal ptOffset = messageItem->sceneBoundingRect().top();
-                    ptOffset = std::min(messageItem->tail().y() - ptOffset, messageItem->head().y() - ptOffset);
-                    if (eventItem->instanceTopArea(instance) < minY) {
-                        if (messageItem->modelItem()->sourceInstance() == instance) {
+                    static const int offset = 8;
+                    const int messageMinY = minY + offset;
+                    if (messageItem->modelItem()->sourceInstance() == instance) {
+                        if (messageItem->tail().y() < messageMinY) {
                             messageItem->setTailPosition(
-                                    QPointF(messageItem->tail().x(), minY + d->interMessageSpan() + ptOffset));
+                                    QPointF(messageItem->tail().x(), messageMinY + d->interMessageSpan()));
                             itemMoved = true;
                         }
-                        if (event->entityType() == MscEntity::EntityType::Message
-                                && messageItem->modelItem()->targetInstance() == instance) {
-                            messageItem->setHeadPosition(
-                                    QPointF(messageItem->head().x(), minY + d->interMessageSpan() + ptOffset));
-                            itemMoved = true;
-                        }
+                        minY = messageItem->tail().y() + minSpace + offset;
                     }
-                    minY = eventItem->instanceBottomArea(instance) + minSpace;
+                    if (messageItem->modelItem()->targetInstance() == instance) {
+                        if (messageItem->head().y() < messageMinY) {
+                            messageItem->setHeadPosition(
+                                    QPointF(messageItem->head().x(), messageMinY + d->interMessageSpan()));
+                            itemMoved = true;
+                        }
+                        minY = messageItem->head().y() + minSpace + offset;
+                    }
                     break;
                 }
                 case MscEntity::EntityType::Coregion: {

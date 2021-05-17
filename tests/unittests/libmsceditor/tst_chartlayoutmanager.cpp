@@ -76,6 +76,8 @@ private Q_SLOTS:
 
     void testMessageWithCifInformation();
 
+    void testCrossingMessages();
+
     void testEventIndex();
     void testInstanceEventIndex();
 
@@ -283,6 +285,8 @@ void tst_ChartLayoutManager::testAddTwoMessages()
     InstanceHeadItem *headItem = instanceItemA->headerItem();
     const QRectF headRect = headItem->sceneBoundingRect();
     const QRectF message1Rect = msgItem1->sceneBoundingRect();
+    qDebug() << headRect;
+    qDebug() << message1Rect;
     QVERIFY2(headRect.bottom() <= message1Rect.top(), "The message top is not below the instance head");
 
     auto message2 = new msc::MscMessage("Msg2");
@@ -570,11 +574,10 @@ void tst_ChartLayoutManager::testShiftVerticalIfNeeded()
     waitForLayoutUpdate();
 
     msc::MessageItem *createItem = m_chartModel->itemForMessage(create);
-    const QRectF createRect = createItem->sceneBoundingRect();
-    const QRectF messageRect = messageItem->sceneBoundingRect();
 
     // the message has to be after/below the create
-    QVERIFY(createRect.bottom() <= messageRect.top());
+    QVERIFY(createItem->head().y() <= messageItem->head().y());
+    QVERIFY(instanceItem2->headerItem()->sceneBoundingRect().bottom() <= messageItem->head().y());
 }
 
 void tst_ChartLayoutManager::testMessageWithCifInformation()
@@ -597,6 +600,41 @@ void tst_ChartLayoutManager::testMessageWithCifInformation()
     // Check that the message is pointing bottom right
     qreal widthHeightRatio = std::abs(loadedGeometry.width() / loadedGeometry.height());
     QVERIFY(widthHeightRatio > 0.7 && widthHeightRatio < 1.3);
+}
+
+void tst_ChartLayoutManager::testCrossingMessages()
+{
+    QString mscText = "mscdocument Untitled_Document /* MSC AND */;\
+                      mscdocument Untitled_Leaf /* MSC LEAF */;\
+                          msc Untitled_MSC;\
+                              instance Instance_1;\
+                                  out MsgA to Instance_2;\
+                              endinstance;\
+                              instance Instance_2;\
+                                  in MsgA from Instance_1;\
+                              endinstance;\
+                          endmsc;\
+                      endmscdocument;\
+                  endmscdocument;";
+    parseMsc(mscText);
+
+    QPointer<ChartItem> chartItem = m_chartModel->chartItem();
+    msc::InstanceItem *instanceItem1 = m_chartModel->instanceItems().at(0);
+    msc::InstanceItem *instanceItem2 = m_chartModel->instanceItems().at(1);
+    auto messageA = qobject_cast<msc::MscMessage *>(m_chart->eventsForInstance(instanceItem1->modelItem()).at(0));
+    msc::MessageItem *messageAItem = m_chartModel->itemForMessage(messageA);
+
+    // Add a message that crosses messageA
+    auto messageB = new msc::MscMessage("MsgB");
+    messageB->setSourceInstance(instanceItem2->modelItem());
+    messageB->setTargetInstance(instanceItem1->modelItem());
+    m_chart->addInstanceEvent(messageB, { { messageB->targetInstance(), 1 }, { messageB->sourceInstance(), 0 } });
+
+    waitForLayoutUpdate();
+
+    msc::MessageItem *messageBItem = m_chartModel->itemForMessage(messageB);
+    QVERIFY(messageAItem->tail().y() < messageBItem->head().y());
+    QVERIFY(messageBItem->tail().y() < messageAItem->head().y());
 }
 
 void tst_ChartLayoutManager::testEventIndex()
