@@ -207,6 +207,69 @@
             "group": "MSC",
             "pen_color": "#ff000000",
             "pen_width": 1
+        },
+        {
+            "brush_color0": "#ffffffff",
+            "brush_color1": "#ffffffff",
+            "color_type": 10001,
+            "fill_type": 0,
+            "group": "DVE",
+            "pen_color": "#ff000000",
+            "pen_width": 1
+        },
+        {
+            "brush_color0": "#ffffffff",
+            "brush_color1": "#ffffffff",
+            "color_type": 10002,
+            "fill_type": 0,
+            "group": "DVE",
+            "pen_color": "#ff000000",
+            "pen_width": 1
+        },
+        {
+            "brush_color0": "#ffffffff",
+            "brush_color1": "#ffffffff",
+            "color_type": 10003,
+            "fill_type": 0,
+            "group": "DVE",
+            "pen_color": "#ff000000",
+            "pen_width": 1
+        },
+        {
+            "brush_color0": "#ffffffff",
+            "brush_color1": "#ffffffff",
+            "color_type": 10004,
+            "fill_type": 0,
+            "group": "DVE",
+            "pen_color": "#ff000000",
+            "pen_width": 1
+        },
+        {
+            "brush_color0": "#ffffffff",
+            "brush_color1": "#ffffffff",
+            "color_type": 10005,
+            "fill_type": 0,
+            "group": "DVE",
+            "pen_color": "#ff000000",
+            "pen_width": 1
+        },
+        {
+            "brush_color0": "#ffffffff",
+            "brush_color1": "#ffffffff",
+            "color_type": 10006,
+            "fill_type": 0,
+            "group": "DVE",
+            "pen_color": "#ff000000",
+            "pen_width": 1
+        },
+        {
+            "brush_color0": "#ffffffff",
+            "brush_color1": "#ffffffff",
+            "color_type": 10007,
+            "fill_type": 0,
+            "group": "DVE",
+            "pen_color": "#ff000000",
+            "pen_width": 1
         }
     ]
 }

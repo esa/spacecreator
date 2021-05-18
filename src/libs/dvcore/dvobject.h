@@ -41,10 +41,12 @@ public:
         Node,
         Processor,
         Partition,
+        Function,
         Binding,
         Device,
         Bus,
-        Connection
+        Connection,
+        Interface,
     };
     Q_ENUM(Type)
 

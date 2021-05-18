@@ -15,32 +15,17 @@
    along with this program. If not, see <https://www.gnu.org/licenses/lgpl-2.1.html>.
 */
 
-#include "dvpartition.h"
+#pragma once
 
-#include <QStringList>
+#include "dvobject.h"
 
 namespace dvm {
 
-struct DVPartitionPrivate {
-    QStringList functions;
+class DVInterface : public DVObject
+{
+    Q_OBJECT
+public:
+    explicit DVInterface(DVObject *parent = nullptr);
 };
-
-DVPartition::DVPartition(DVObject *parent)
-    : DVObject(DVObject::Type::Partition, {}, parent)
-    , d(new DVPartitionPrivate)
-{
-}
-
-DVPartition::~DVPartition() { }
-
-void DVPartition::addFunction(const QString &function)
-{
-    d->functions.append(function);
-}
-
-QStringList DVPartition::functions() const
-{
-    return d->functions;
-}
 
 } // namespace deploy

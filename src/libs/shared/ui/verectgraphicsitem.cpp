@@ -15,12 +15,12 @@
  along with this program. If not, see <https://www.gnu.org/licenses/lgpl-2.1.html>.
 */
 
+#include "verectgraphicsitem.h"
+
 #include "commandsstackbase.h"
 #include "graphicsviewutils.h"
-//#include "interface/graphicsitemhelpers.h"
 #include "ui/grippointshandler.h"
 #include "veobject.h"
-#include "verectgraphicsitem.h"
 
 #include <QGraphicsScene>
 #include <QtDebug>

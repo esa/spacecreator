@@ -32,6 +32,22 @@ target_sources(${LIB_NAME} PRIVATE
     templating/exportabledvdevice.h
     dvexporter.cpp
     dvexporter.h
+    dvnodegraphicsitem.cpp
+    dvnodegraphicsitem.h
+    dvprocessorgraphicsitem.cpp
+    dvprocessorgraphicsitem.h
+    dvpartitiongraphicsitem.cpp
+    dvpartitiongraphicsitem.h
+    dvdevicegraphicsitem.cpp
+    dvdevicegraphicsitem.h
+    dvbusgraphicsitem.cpp
+    dvbusgraphicsitem.h
+    dvconnectiongraphicsitem.cpp
+    dvconnectiongraphicsitem.h
+    dvbindinggraphicsitem.cpp
+    dvbindinggraphicsitem.h
+    dvinterfacegraphicsitem.cpp
+    dvinterfacegraphicsitem.h
 )
 
 target_link_libraries(${LIB_NAME}

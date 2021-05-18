@@ -15,32 +15,33 @@
    along with this program. If not, see <https://www.gnu.org/licenses/lgpl-2.1.html>.
 */
 
-#include "dvpartition.h"
+#pragma once
 
-#include <QStringList>
+#include "dvinterface.h"
+#include "ui/veinteractiveobject.h"
 
-namespace dvm {
+namespace dve {
 
-struct DVPartitionPrivate {
-    QStringList functions;
+class DVInterfaceGraphicsItem : public shared::ui::VEInteractiveObject
+{
+    Q_OBJECT
+public:
+    explicit DVInterfaceGraphicsItem(dvm::DVInterface *interface, QGraphicsItem *parent = nullptr);
+    enum
+    {
+        Type = UserType + static_cast<int>(dvm::DVObject::Type::Interface)
+    };
+
+    dvm::DVInterface *entity() const override;
+
+    int type() const override { return Type; }
+
+protected Q_SLOTS:
+    void applyColorScheme() override;
+
+protected:
+    void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget) override;
+    shared::ColorManager::HandledColors handledColorType() const override;
 };
 
-DVPartition::DVPartition(DVObject *parent)
-    : DVObject(DVObject::Type::Partition, {}, parent)
-    , d(new DVPartitionPrivate)
-{
-}
-
-DVPartition::~DVPartition() { }
-
-void DVPartition::addFunction(const QString &function)
-{
-    d->functions.append(function);
-}
-
-QStringList DVPartition::functions() const
-{
-    return d->functions;
-}
-
-} // namespace deploy
+} // namespace dve

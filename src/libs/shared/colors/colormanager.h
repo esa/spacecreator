@@ -57,8 +57,16 @@ public:
         Condition = 1041,
         CoRegion = 1051,
         Timer = 1061,
-        Chart = 1071
+        Chart = 1071,
 
+        // DVE
+        Node = 10001,
+        Processor,
+        Partition,
+        Bus,
+        BusConnection,
+        Device,
+        Binding,
     };
     Q_ENUM(HandledColors)
 

@@ -25,6 +25,8 @@ target_sources(${LIB_NAME} PRIVATE
     dvxmlreader.h
     dvcommonprops.cpp
     dvcommonprops.h
+    dvinterface.cpp
+    dvinterface.h
 )
 
 target_include_directories(${LIB_NAME} PUBLIC .)

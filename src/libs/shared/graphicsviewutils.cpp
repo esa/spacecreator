@@ -1039,11 +1039,10 @@ QList<QRectF> siblingItemsRects(const QGraphicsItem *item)
 
     QList<QRectF> rects;
     const QList<QGraphicsItem *> siblingItems = item->parentItem() ? item->parentItem()->childItems() : scene->items();
-    for (QGraphicsItem *siblingItem : qAsConst(siblingItems)) {
-        if (auto rectItem = qobject_cast<ui::VERectGraphicsItem *>(siblingItem->toGraphicsObject())) {
-            if (rectItem != item && rectItem->parentItem() == item->parentItem()) {
-                rects.append(rectItem->sceneBoundingRect());
-            }
+    for (auto siblingItem : siblingItems) {
+        if (item != siblingItem && qobject_cast<ui::VERectGraphicsItem *>(siblingItem->toGraphicsObject()) != nullptr
+                && siblingItem->parentItem() == item->parentItem()) {
+            rects.append(siblingItem->sceneBoundingRect());
         }
     }
     return rects;
@@ -1075,16 +1074,18 @@ bool isBounded(const QGraphicsItem *upcomingItem, const QRectF &upcomingItemRect
         return false;
     }
 
-    if (auto iObj = qobject_cast<const ui::VERectGraphicsItem *>(upcomingItem->toGraphicsObject())) {
-        if (auto parentObj = iObj->parentItem()) {
+    if (auto rectItem = qobject_cast<const ui::VERectGraphicsItem *>(upcomingItem->toGraphicsObject())) {
+        if (auto parentObj = rectItem->parentItem()) {
             const QRectF outerRect = parentObj->sceneBoundingRect().marginsRemoved(kRootMargins);
             return isRectBounded(outerRect, upcomingItemRect);
         } else {
-            return isRectBounded(upcomingItemRect.marginsRemoved(kRootMargins), iObj->nestedItemsSceneBoundingRect());
+            return isRectBounded(
+                    upcomingItemRect.marginsRemoved(kRootMargins), rectItem->nestedItemsSceneBoundingRect());
         }
     }
     return true;
 }
 
 }
+
 }
