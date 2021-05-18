@@ -83,6 +83,8 @@ struct CurrentObjectHolder {
     QPointer<IVConnection> connection() { return m_connection; }
     QPointer<IVConnectionGroup> connectionGroup() { return m_connectionGroup; }
 
+    bool isValid() const { return !m_object.isNull(); }
+
 private:
     QPointer<IVObject> m_object { nullptr };
     QPointer<IVFunctionType> m_function { nullptr };
@@ -267,8 +269,10 @@ void IVXMLReader::processTagOpen(QXmlStreamReader &xml)
         break;
     }
     case Props::Token::Property: {
-        d->m_currentObject.get()->setEntityProperty(
-                nameAttr.m_value, attrs.value(Props::token(Props::Token::value)).m_value);
+        if (d->m_currentObject.isValid()) {
+            d->m_currentObject.get()->setEntityProperty(
+                    nameAttr.m_value, attrs.value(Props::token(Props::Token::value)).m_value);
+        }
         break;
     }
     case Props::Token::ContextParameter: {
@@ -391,7 +395,9 @@ IVConnectionGroup *IVXMLReader::addConnectionGroup(const QString &groupName)
             mappings.insert(iface->parentObject()->id(), ifaceGroup);
         }
     }
-    Q_ASSERT(mappings.size() == 2);
+    if (mappings.size() != 2) {
+        return nullptr;
+    }
     auto sourceIfaceGroup = *mappings.begin();
     auto targetIfaceGroup = *std::next(mappings.begin());
 
