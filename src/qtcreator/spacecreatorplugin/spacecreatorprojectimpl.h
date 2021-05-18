@@ -20,6 +20,8 @@
 #include "spacecreatorproject.h"
 
 #include <QObject>
+#include <QVector>
+#include <projectexplorer/task.h>
 
 namespace ProjectExplorer {
 class Project;
@@ -47,12 +49,14 @@ private Q_SLOTS:
     void checkAsnFileRename();
     void saveIfNotOpen(shared::EditorCore *core);
     void reportAsn1Error(const QString &fileName, const QStringList &errors);
+    void clearTasksForFile(const QString &fileName);
 
 private:
     bool isOpenInEditor(shared::EditorCore *core) const;
 
     ProjectExplorer::Project *m_project = nullptr;
     QStringList m_asnFiles;
+    QVector<ProjectExplorer::Task> m_errors;
 };
 
 } // namespace spctr

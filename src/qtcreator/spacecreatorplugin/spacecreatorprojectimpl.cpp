@@ -24,6 +24,8 @@
 #include "msceditorcore.h"
 #include "mscsystemchecks.h"
 
+#include <QDebug>
+#include <algorithm>
 #include <editormanager/documentmodel.h>
 #include <projectexplorer/project.h>
 #include <projectexplorer/taskhub.h>
@@ -49,7 +51,7 @@ SpaceCreatorProjectImpl::SpaceCreatorProjectImpl(ProjectExplorer::Project *proje
 
     connect(m_asn1Storage.get(), &Asn1Acn::Asn1ModelStorage::error, this, &SpaceCreatorProjectImpl::reportAsn1Error);
     connect(m_asn1Storage.get(), &Asn1Acn::Asn1ModelStorage::success, this,
-            []() { ProjectExplorer::TaskHub::instance()->clearTasks(TASK_CATEGORY_ASN_COMPILE); });
+            &SpaceCreatorProjectImpl::clearTasksForFile);
 
     static bool hubInitialized = false;
     if (!hubInitialized) {
@@ -121,18 +123,32 @@ void SpaceCreatorProjectImpl::reportAsn1Error(const QString &fileName, const QSt
         return;
     }
 
-    ProjectExplorer::TaskHub::instance()->clearTasks(TASK_CATEGORY_ASN_COMPILE);
+    clearTasksForFile(fileName);
 
     Asn1Acn::ErrorMessageParser parser;
     for (const QString &message : errors) {
         const Asn1Acn::ErrorMessage error = parser.parse(message);
         if (error.isValid()) {
-            ProjectExplorer::TaskHub::addTask(ProjectExplorer::Task::Error, error.message(), TASK_CATEGORY_ASN_COMPILE,
-                    Utils::FileName::fromString(fileName), error.location().line());
+            ProjectExplorer::Task task(ProjectExplorer::Task::Error, error.message(),
+                    Utils::FileName::fromString(fileName), error.location().line(), TASK_CATEGORY_ASN_COMPILE);
+            m_errors.append(task);
+            ProjectExplorer::TaskHub::instance()->addTask(task);
         }
     }
 
     ProjectExplorer::TaskHub::requestPopup();
+}
+
+void SpaceCreatorProjectImpl::clearTasksForFile(const QString &fileName)
+{
+    auto it = std::remove_if(m_errors.begin(), m_errors.end(), [fileName](const ProjectExplorer::Task &task) {
+        const bool same = task.file.toString() == fileName;
+        if (same) {
+            ProjectExplorer::TaskHub::instance()->removeTask(task);
+        }
+        return same;
+    });
+    m_errors.erase(it, m_errors.end());
 }
 
 /*!
