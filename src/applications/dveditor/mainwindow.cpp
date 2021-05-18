@@ -18,6 +18,7 @@
 #include "mainwindow.h"
 
 #include "baseitems/graphicsview.h"
+#include "colors/colormanagerdialog.h"
 #include "dvappmodel.h"
 #include "dveditorcore.h"
 #include "settingsmanager.h"
@@ -65,6 +66,14 @@ void MainWindow::onOpenFileRequested()
     m_core->actionSaveFile()->setEnabled(m_core->appModel()->isDirty());
 }
 
+void MainWindow::showColorScheme()
+{
+    shared::ColorManagerDialog *dialog = new shared::ColorManagerDialog(window());
+    dialog->setFilterGroup("DVE");
+    dialog->setAttribute(Qt::WA_DeleteOnClose);
+    dialog->open();
+}
+
 /*!
  * \brief perform check for unsaved changes.
  * \a e - the event to be bypassed to the basic implementation.
@@ -80,7 +89,7 @@ void MainWindow::closeEvent(QCloseEvent *e)
 void MainWindow::initActions()
 {
     // Connect the core actions
-    connect(m_core->actionQuit(), &QAction::triggered, this, [&]() { QApplication::quit(); });
+    connect(m_core->actionQuit(), &QAction::triggered, this, &MainWindow::onQuitRequested);
 }
 
 void MainWindow::initMenus()
@@ -99,6 +108,9 @@ void MainWindow::initMenus()
     QAction *redoAction = m_core->actionRedo();
     redoAction->setShortcut(QKeySequence::Redo);
     menu->addAction(redoAction);
+    menu->addSeparator();
+    QAction *colorAction = menu->addAction(tr("Color Scheme..."));
+    connect(colorAction, &QAction::triggered, this, &MainWindow::showColorScheme);
 
     // Initialize the help menu
     menu = menuBar()->addMenu(tr("&Help"));

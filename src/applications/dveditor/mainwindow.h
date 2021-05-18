@@ -40,6 +40,7 @@ public:
 
 public Q_SLOTS:
     void onOpenFileRequested();
+    void showColorScheme();
 
 protected:
     void closeEvent(QCloseEvent *e) override;
