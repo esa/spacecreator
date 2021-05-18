@@ -20,12 +20,21 @@
 #include "dvobject.h"
 
 namespace dvm {
+struct DVBusPrivate;
+class DVConnection;
 
 class DVBus : public DVObject
 {
     Q_OBJECT
 public:
     explicit DVBus(DVObject *parent = nullptr);
+    ~DVBus() override;
+
+    void addConnection(DVConnection *connection);
+    QList<QPointer<DVConnection>> connections() const;
+
+private:
+    std::unique_ptr<DVBusPrivate> d;
 };
 
 } // namespace deploy

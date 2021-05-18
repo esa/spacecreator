@@ -24,4 +24,15 @@ DVConnection::DVConnection(DVObject *parent)
 {
 }
 
+QString DVConnection::titleUI() const
+{
+    QStringList parts {
+        entityAttributeValue(QLatin1String("from_node")).toString(),
+        entityAttributeValue(QLatin1String("from_port")).toString(),
+        entityAttributeValue(QLatin1String("to_node")).toString(),
+        entityAttributeValue(QLatin1String("to_port")).toString(),
+    };
+    return parts.join(QLatin1Char('_'));
+}
+
 } // namespace deploy

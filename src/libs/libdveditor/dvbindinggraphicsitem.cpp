@@ -32,6 +32,8 @@ DVBindingGraphicsItem::DVBindingGraphicsItem(dvm::DVBinding *binding, QGraphicsI
 {
 }
 
+DVBindingGraphicsItem::~DVBindingGraphicsItem() { }
+
 dvm::DVBinding *dve::DVBindingGraphicsItem::entity() const
 {
     return m_dataObject.isNull() ? nullptr : m_dataObject->as<dvm::DVBinding *>();

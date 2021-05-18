@@ -32,35 +32,6 @@ class DVModel : public shared::VEModel
 public:
     explicit DVModel(QObject *parent = nullptr);
     ~DVModel() override;
-
-    bool addObject(DVObject *obj);
-    bool removeObject(DVObject *obj);
-
-    void setRootObject(shared::Id rootId);
-    DVObject *rootObject() const;
-    shared::Id rootObjectId() const;
-
-    DVObject *getObject(const shared::Id &id) const;
-
-    QList<DVObject *> visibleObjects() const;
-    QList<DVObject *> visibleObjects(shared::Id rootId) const;
-
-    void clear();
-
-public Q_SLOTS:
-    void initFromObjects(const QVector<dvm::DVObject *> &objects);
-    void addObjects(const QVector<dvm::DVObject *> &objects);
-
-Q_SIGNALS:
-    void objectsAdded(const QVector<dvm::DVObject *> &object);
-    void objectRemoved(dvm::DVObject *object);
-    void rootObjectChanged(shared::Id rootId);
-    void modelReset();
-
-private:
-    bool addObjectImpl(DVObject *obj);
-
-    const std::unique_ptr<DVModelPrivate> d;
 };
 
 } // namespace deploy

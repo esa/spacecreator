@@ -44,27 +44,27 @@ void tst_DVModel::init()
 
 void tst_DVModel::testAddObject()
 {
-    QCOMPARE(m_model->visibleObjects().size(), 0);
+    QCOMPARE(m_model->objects().size(), 0);
 
     auto obj = new dvm::DVNode();
     bool ok = m_model->addObject(obj);
     QCOMPARE(ok, true);
-    QCOMPARE(m_model->visibleObjects().size(), 1);
+    QCOMPARE(m_model->objects().size(), 1);
     QCOMPARE(m_model->getObject(obj->id()), obj);
 
     // Do not add the same object twice
     ok = m_model->addObject(obj);
     QCOMPARE(ok, false);
-    QCOMPARE(m_model->visibleObjects().size(), 1);
+    QCOMPARE(m_model->objects().size(), 1);
 }
 
 void tst_DVModel::testAddObjects()
 {
-    m_model->addObjects({ new dvm::DVNode(), new dvm::DVNode() });
-    QCOMPARE(m_model->visibleObjects().size(), 2);
+    m_model->addObjects<dvm::DVObject *>({ new dvm::DVNode(), new dvm::DVNode() });
+    QCOMPARE(m_model->objects().size(), 2);
 
-    m_model->addObjects({ new dvm::DVNode(), new dvm::DVNode(), new dvm::DVNode() });
-    QCOMPARE(m_model->visibleObjects().size(), 5);
+    m_model->addObjects<dvm::DVObject *>({ new dvm::DVNode(), new dvm::DVNode(), new dvm::DVNode() });
+    QCOMPARE(m_model->objects().size(), 5);
 }
 
 void tst_DVModel::testRemoveObject()
@@ -86,24 +86,19 @@ void tst_DVModel::testClear()
 {
     auto obj = new dvm::DVNode();
     m_model->addObject(obj);
-    m_model->setRootObject(obj->id());
-    QCOMPARE(m_model->visibleObjects().size(), 1);
-    QCOMPARE(m_model->rootObject(), obj);
+    QCOMPARE(m_model->objects().size(), 1);
 
     m_model->clear();
-    QCOMPARE(m_model->visibleObjects().size(), 0);
-    QCOMPARE(m_model->rootObject(), nullptr);
+    QCOMPARE(m_model->objects().size(), 0);
 }
 
 void tst_DVModel::testInitFromObjects()
 {
     auto obj = new dvm::DVNode();
     m_model->addObject(obj);
-    m_model->setRootObject(obj->id());
 
-    m_model->initFromObjects({ new dvm::DVNode(), new dvm::DVNode() });
-    QCOMPARE(m_model->visibleObjects().size(), 2);
-    QCOMPARE(m_model->rootObject(), nullptr);
+    m_model->initFromObjects<dvm::DVObject *>({ new dvm::DVNode(), new dvm::DVNode() });
+    QCOMPARE(m_model->objects().size(), 2);
 }
 
 QTEST_APPLESS_MAIN(tst_DVModel)

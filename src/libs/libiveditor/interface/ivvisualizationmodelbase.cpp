@@ -1,5 +1,5 @@
 /*
-  Copyright (C) 2020 European Space Agency - <maxime.perrotin@esa.int>
+  Copyright (C) 2020-2021 European Space Agency - <maxime.perrotin@esa.int>
 
   This library is free software; you can redistribute it and/or
   modify it under the terms of the GNU Library General Public
@@ -15,15 +15,15 @@
   along with this program. If not, see <https://www.gnu.org/licenses/lgpl-2.1.html>.
 */
 
-#include "commonvisualizationmodel.h"
+#include "ivvisualizationmodelbase.h"
 
+#include "commandsstack.h"
+#include "interface/commands/cmdentityattributechange.h"
 #include "ivconnection.h"
 #include "ivconnectiongroup.h"
 #include "ivmodel.h"
 #include "ivnamevalidator.h"
 #include "ivxmlreader.h"
-#include "commandsstack.h"
-#include "interface/commands/cmdentityattributechange.h"
 
 #include <QDebug>
 #include <QDirIterator>
@@ -31,23 +31,15 @@
 
 namespace ive {
 
-CommonVisualizationModel::CommonVisualizationModel(
+IVVisualizationModelBase::IVVisualizationModelBase(
         ivm::IVModel *ivModel, cmd::CommandsStack *commandsStack, QObject *parent)
-    : QStandardItemModel(parent)
-    , m_ivModel(ivModel)
-    , m_commandsStack(commandsStack)
+    : shared::AbstractVisualizationModel(ivModel, commandsStack, parent)
 {
-    connect(m_ivModel, &ivm::IVModel::modelReset, this, [this]() {
-        m_itemCache.clear();
-        removeRows(0, rowCount());
-    });
-    connect(m_ivModel, &ivm::IVModel::objectsAdded, this, &CommonVisualizationModel::addItems);
-    connect(m_ivModel, &ivm::IVModel::objectRemoved, this, &CommonVisualizationModel::removeItem);
-    setSortRole(TypeRole);
 }
 
-void CommonVisualizationModel::updateItemData(QStandardItem *item, ivm::IVObject *obj)
+void IVVisualizationModelBase::updateItemData(QStandardItem *item, shared::VEObject *object)
 {
+    ivm::IVObject *obj = qobject_cast<ivm::IVObject *>(object);
     Q_ASSERT(item);
     Q_ASSERT(obj);
     if (!item || !obj) {
@@ -129,54 +121,41 @@ void CommonVisualizationModel::updateItemData(QStandardItem *item, ivm::IVObject
     item->setData(pix, Qt::DecorationRole);
 }
 
-QStandardItem *CommonVisualizationModel::createItem(ivm::IVObject *obj)
+QStandardItem *IVVisualizationModelBase::createItem(shared::VEObject *object)
 {
+    ivm::IVObject *obj = qobject_cast<ivm::IVObject *>(object);
     if (!obj) {
         return nullptr;
     }
 
-    auto item = new QStandardItem(obj->titleUI());
-    item->setDragEnabled(true);
-    item->setData(obj->id(), IdRole);
+    if (obj->type() == ivm::IVObject::Type::InterfaceGroup) {
+        return nullptr;
+    }
+
+    auto item = AbstractVisualizationModel::createItem(obj);
     item->setData(static_cast<int>(obj->type()), TypeRole);
 
-    connect(obj, &ivm::IVObject::titleChanged, this, &CommonVisualizationModel::updateItem);
-    connect(obj, &ivm::IVObject::visibilityChanged, this, &CommonVisualizationModel::updateItem);
-    connect(obj, &ivm::IVObject::groupChanged, this, &CommonVisualizationModel::updateItem);
+    connect(obj, &ivm::IVObject::titleChanged, this, &IVVisualizationModelBase::updateItem);
+    connect(obj, &ivm::IVObject::visibilityChanged, this, &IVVisualizationModelBase::updateItem);
+    connect(obj, &ivm::IVObject::groupChanged, this, &IVVisualizationModelBase::updateItem);
+
+    if (obj->type() == ivm::IVObject::Type::ConnectionGroup) {
+        if (auto connectionGroupObj = obj->as<ivm::IVConnectionGroup *>()) {
+            connect(connectionGroupObj, &ivm::IVConnectionGroup::connectionAdded, this,
+                    &IVVisualizationModelBase::updateConnectionItem, Qt::UniqueConnection);
+            connect(connectionGroupObj, &ivm::IVConnectionGroup::connectionRemoved, this,
+                    &IVVisualizationModelBase::updateConnectionItem, Qt::UniqueConnection);
+            for (auto connection : connectionGroupObj->groupedConnections()) {
+                updateConnectionItem(connection);
+            }
+        }
+    }
+
     updateItemData(item, obj);
     return item;
 }
 
-void CommonVisualizationModel::addItem(ivm::IVObject *obj)
-{
-    if (obj->type() == ivm::IVObject::Type::InterfaceGroup) {
-        return;
-    }
-
-    if (m_itemCache.contains(obj->id())) {
-        return;
-    }
-
-    const auto item = createItem(obj);
-    if (auto parentItem = getParentItem(obj)) {
-        parentItem->appendRow(item);
-        parentItem->sortChildren(0);
-        m_itemCache.insert(obj->id(), item);
-        if (obj->type() == ivm::IVObject::Type::ConnectionGroup) {
-            if (auto connectionGroupObj = obj->as<ivm::IVConnectionGroup *>()) {
-                connect(connectionGroupObj, &ivm::IVConnectionGroup::connectionAdded, this,
-                        &CommonVisualizationModel::updateConnectionItem, Qt::UniqueConnection);
-                connect(connectionGroupObj, &ivm::IVConnectionGroup::connectionRemoved, this,
-                        &CommonVisualizationModel::updateConnectionItem, Qt::UniqueConnection);
-                for (auto connection : connectionGroupObj->groupedConnections()) {
-                    updateConnectionItem(connection);
-                }
-            }
-        }
-    }
-}
-
-void CommonVisualizationModel::updateConnectionItem(ivm::IVConnection *connection)
+void IVVisualizationModelBase::updateConnectionItem(ivm::IVConnection *connection)
 {
     if (QStandardItem *groupedConnectionItem = getItem(connection->id())) {
         QStandardItem *groupedConnectionParentItem =
@@ -186,79 +165,32 @@ void CommonVisualizationModel::updateConnectionItem(ivm::IVConnection *connectio
     }
 }
 
-void CommonVisualizationModel::addItems(const QVector<ivm::IVObject *> &objects)
+IVVisualizationModel::IVVisualizationModel(ivm::IVModel *ivModel, cmd::CommandsStack *commandsStack, QObject *parent)
+    : IVVisualizationModelBase(ivModel, commandsStack, parent)
 {
-    for (auto obj : objects) {
-        addItem(obj);
-    }
+    connect(this, &QStandardItemModel::dataChanged, this, &IVVisualizationModel::onDataChanged);
 }
 
-void CommonVisualizationModel::removeItem(ivm::IVObject *obj)
+void IVVisualizationModel::updateItemData(QStandardItem *item, shared::VEObject *object)
 {
-    const QStandardItem *item = m_itemCache.take(obj->id());
-    obj->disconnect(this);
-    if (!item) {
-        return;
-    } else {
-        QStandardItem *parentItem = item->parent() ? item->parent() : invisibleRootItem();
-        if (parentItem) {
-            parentItem->removeRow(item->row());
+    if (ivm::IVObject *obj = qobject_cast<ivm::IVObject *>(object)) {
+        IVVisualizationModelBase::updateItemData(item, obj);
+        if ((item->checkState() == Qt::Checked) != obj->isVisible()) {
+            item->setData(obj->isVisible() ? Qt::Checked : Qt::Unchecked, Qt::CheckStateRole);
         }
     }
 }
 
-void CommonVisualizationModel::updateItem()
+QStandardItem *IVVisualizationModel::createItem(shared::VEObject *obj)
 {
-    if (auto obj = qobject_cast<ivm::IVObject *>(sender())) {
-        if (auto item = getItem(obj->id())) {
-            updateItemData(item, obj);
-        }
-    }
-}
-
-QStandardItem *CommonVisualizationModel::getParentItem(ivm::IVObject *obj)
-{
-    if (!obj) {
-        return nullptr;
-    }
-
-    return obj->parentObject() ? getItem(obj->parentObject()) : invisibleRootItem();
-}
-
-QStandardItem *CommonVisualizationModel::getItem(ivm::IVObject *obj)
-{
-    return obj ? getItem(obj->id()) : nullptr;
-}
-
-QStandardItem *CommonVisualizationModel::getItem(const shared::Id id)
-{
-    return id.isNull() ? nullptr : m_itemCache.value(id);
-}
-
-VisualizationModel::VisualizationModel(ivm::IVModel *ivModel, cmd::CommandsStack *commandsStack, QObject *parent)
-    : CommonVisualizationModel(ivModel, commandsStack, parent)
-{
-    connect(this, &QStandardItemModel::dataChanged, this, &VisualizationModel::onDataChanged);
-}
-
-void VisualizationModel::updateItemData(QStandardItem *item, ivm::IVObject *obj)
-{
-    CommonVisualizationModel::updateItemData(item, obj);
-    if ((item->checkState() == Qt::Checked) != obj->isVisible()) {
-        item->setData(obj->isVisible() ? Qt::Checked : Qt::Unchecked, Qt::CheckStateRole);
-    }
-}
-
-QStandardItem *VisualizationModel::createItem(ivm::IVObject *obj)
-{
-    auto item = CommonVisualizationModel::createItem(obj);
+    auto item = IVVisualizationModelBase::createItem(obj);
     item->setEditable(true);
     item->setCheckable(true);
     item->setDragEnabled(false);
     return item;
 }
 
-void VisualizationModel::onDataChanged(
+void IVVisualizationModel::onDataChanged(
         const QModelIndex &topLeft, const QModelIndex &bottomRight, const QVector<int> &roles)
 {
     if (!m_commandsStack) {
@@ -274,7 +206,7 @@ void VisualizationModel::onDataChanged(
         if (auto item = parent->child(row)) {
             if (roles.contains(Qt::CheckStateRole) || roles.contains(Qt::DisplayRole) || roles.isEmpty()) {
                 const shared::Id id = item->data(IdRole).toUuid();
-                if (auto obj = m_ivModel->getObject(id)) {
+                if (auto obj = m_veModel->getObject(id)->as<ivm::IVObject *>()) {
                     if (item->isCheckable() && roles.contains(Qt::CheckStateRole)) {
                         obj->setVisible(item->checkState() == Qt::Checked);
                     }

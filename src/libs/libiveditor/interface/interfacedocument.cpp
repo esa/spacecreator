@@ -25,7 +25,6 @@
 #include "commands/cmdentitiesimport.h"
 #include "commands/cmdentitiesinstantiate.h"
 #include "commandsstack.h"
-#include "commonvisualizationmodel.h"
 #include "context/action/actionsmanager.h"
 #include "context/action/editor/dynactioneditor.h"
 #include "creatortool.h"
@@ -44,6 +43,7 @@
 #include "ivfunctiongraphicsitem.h"
 #include "ivitemmodel.h"
 #include "ivmodel.h"
+#include "ivvisualizationmodelbase.h"
 #include "ivxmlreader.h"
 #include "propertytemplateconfig.h"
 
@@ -79,7 +79,7 @@ struct InterfaceDocument::InterfaceDocumentPrivate {
     ivm::PropertyTemplateConfig *dynPropConfig { nullptr };
     QTreeView *objectsView { nullptr };
     IVItemModel *itemsModel { nullptr };
-    CommonVisualizationModel *objectsVisualizationModel { nullptr };
+    IVVisualizationModelBase *objectsVisualizationModel { nullptr };
     QItemSelectionModel *objectsSelectionModel { nullptr };
     ivm::IVModel *objectsModel { nullptr };
     ObjectsTreeView *importView { nullptr };
@@ -314,7 +314,7 @@ QList<ivm::IVObject *> InterfaceDocument::prepareSelectedObjectsForExport(QStrin
     QList<ivm::IVObject *> objects;
     QStringList exportNames;
     for (const auto id : d->objectsSelectionModel->selection().indexes()) {
-        const int role = static_cast<int>(ive::CommonVisualizationModel::IdRole);
+        const int role = static_cast<int>(ive::IVVisualizationModelBase::IdRole);
         if (ivm::IVObject *object = d->objectsModel->getObject(id.data(role).toUuid())) {
             if (object->isFunction() && object->parentObject() == nullptr) {
                 exportNames.append(object->entityAttributeValue<QString>(QLatin1String("name")));
@@ -354,7 +354,7 @@ bool InterfaceDocument::exportSelectedType()
     if (indexes.isEmpty()) {
         return false;
     }
-    static const int role = static_cast<int>(ive::CommonVisualizationModel::IdRole);
+    static const int role = static_cast<int>(ive::IVVisualizationModelBase::IdRole);
     ivm::IVObject *rootType = nullptr;
     for (const auto index : indexes) {
         if (ivm::IVObject *object = d->objectsModel->getObject(index.data(role).toUuid())) {
@@ -522,9 +522,14 @@ QList<QAction *> InterfaceDocument::customActions() const
     return actions;
 }
 
-const QHash<shared::Id, ivm::IVObject *> &InterfaceDocument::objects() const
+QHash<shared::Id, ivm::IVObject *> InterfaceDocument::objects() const
 {
-    return d->objectsModel->objects();
+    QHash<shared::Id, ivm::IVObject *> result;
+    for (auto obj : d->objectsModel->objects()) {
+        result[obj->id()] = obj->as<ivm::IVObject *>();
+    }
+
+    return result;
 }
 
 ivm::IVModel *InterfaceDocument::objectsModel() const
@@ -852,7 +857,7 @@ void InterfaceDocument::showContextMenuForIVModel(const QPoint &pos)
     }
 
     const auto obj =
-            d->objectsModel->getObject(idx.data(static_cast<int>(ive::CommonVisualizationModel::IdRole)).toUuid());
+            d->objectsModel->getObject(idx.data(static_cast<int>(ive::IVVisualizationModelBase::IdRole)).toUuid());
     if (!obj) {
         return;
     }
@@ -1092,7 +1097,7 @@ QVector<QAction *> InterfaceDocument::initActions()
                 d->actRemove->setEnabled(!selected.isEmpty());
                 const QModelIndexList idxs = selected.indexes();
                 auto it = std::find_if(idxs.cbegin(), idxs.cend(), [](const QModelIndex &index) {
-                    return index.data(static_cast<int>(ive::CommonVisualizationModel::TypeRole)).toInt()
+                    return index.data(static_cast<int>(ive::IVVisualizationModelBase::TypeRole)).toInt()
                             == static_cast<int>(ivm::IVObject::Type::Connection);
                 });
                 d->actCreateConnectionGroup->setEnabled(it != std::cend(idxs));
@@ -1136,7 +1141,7 @@ QTreeView *InterfaceDocument::createModelView()
     connect(d->objectsView, &QTreeView::customContextMenuRequested, this,
             &InterfaceDocument::showContextMenuForIVModel);
 
-    d->objectsVisualizationModel = new VisualizationModel(d->objectsModel, d->commandsStack, d->objectsView);
+    d->objectsVisualizationModel = new IVVisualizationModel(d->objectsModel, d->commandsStack, d->objectsView);
     auto headerItem = new QStandardItem(tr("IV Structure"));
     headerItem->setTextAlignment(Qt::AlignCenter);
     d->objectsVisualizationModel->setHorizontalHeaderItem(0, headerItem);
@@ -1159,7 +1164,7 @@ QTreeView *InterfaceDocument::createImportView()
     d->importView->setObjectName(QLatin1String("ImportView"));
     d->importView->setSelectionBehavior(QAbstractItemView::SelectionBehavior::SelectItems);
     d->importView->setSelectionMode(QAbstractItemView::SelectionMode::SingleSelection);
-    auto sourceModel = new CommonVisualizationModel(d->importModel, d->commandsStack, d->importView);
+    auto sourceModel = new IVVisualizationModelBase(d->importModel, d->commandsStack, d->importView);
     auto headerItem = new QStandardItem(tr("Import Component"));
     headerItem->setTextAlignment(Qt::AlignCenter);
     sourceModel->setHorizontalHeaderItem(0, headerItem);
@@ -1177,7 +1182,7 @@ QTreeView *InterfaceDocument::createSharedView()
     d->sharedView->setObjectName(QLatin1String("SharedView"));
     d->sharedView->setSelectionBehavior(QAbstractItemView::SelectionBehavior::SelectItems);
     d->sharedView->setSelectionMode(QAbstractItemView::SelectionMode::SingleSelection);
-    auto sourceModel = new CommonVisualizationModel(d->sharedModel, d->commandsStack, d->sharedView);
+    auto sourceModel = new IVVisualizationModelBase(d->sharedModel, d->commandsStack, d->sharedView);
     auto headerItem = new QStandardItem(tr("Shared Types"));
     headerItem->setTextAlignment(Qt::AlignCenter);
     sourceModel->setHorizontalHeaderItem(0, headerItem);
@@ -1219,7 +1224,7 @@ void InterfaceDocument::onViewSelectionChanged(const QItemSelection &selected, c
 {
     auto updateSelection = [this](const QItemSelection &selection, bool value) {
         for (const QModelIndex &idx : selection.indexes()) {
-            if (auto graphicsItem = d->itemsModel->getItem(idx.data(CommonVisualizationModel::IdRole).toUuid())) {
+            if (auto graphicsItem = d->itemsModel->getItem(idx.data(IVVisualizationModelBase::IdRole).toUuid())) {
                 graphicsItem->setSelected(value);
             }
         }

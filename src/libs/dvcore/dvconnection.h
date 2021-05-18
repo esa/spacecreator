@@ -26,6 +26,8 @@ class DVConnection : public DVObject
     Q_OBJECT
 public:
     explicit DVConnection(DVObject *parent = nullptr);
+
+    QString titleUI() const override;
 };
 
 } // namespace deploy

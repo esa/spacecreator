@@ -1,0 +1,16 @@
+<DeploymentView>
+   <Node name="pb1">
+      <Partition ada_runtime="" coverage="FALSE" cpu="p1" cpu_classifier="ocarina_processors_x86::x86.linux" cpu_platform="PLATFORM_NATIVE" name="pinger" package="ocarina_processors_x86" vp_classifier="" vp_name="" vp_platform="PLATFORM_NONE">
+         <function>a</function>
+      </Partition>
+      <Device asn1file="/home/taste/tool-inst/include/ocarina/runtime/polyorb-hi-c/src/drivers/configuration/ip.asn" asn1module="POHICDRIVER-IP" asn1type="IP-Conf-T" bus="eth0" classifier="deploymentview::dv::pb1::ethernet1.others" config="{devname &quot;eth0&quot;, address &quot;127.0.0.1&quot;, version ipv4, port 5115 }" name="ethernet1.others" pkg="deploymentview::dv::pb1" port="link" proc="p1"/>
+   </Node>
+   <Node name="pb2">
+      <Partition ada_runtime="" coverage="FALSE" cpu="p2" cpu_classifier="ocarina_processors_x86::x86.linux" cpu_platform="PLATFORM_NATIVE" name="pingee" package="ocarina_processors_x86" vp_classifier="" vp_name="" vp_platform="PLATFORM_NONE">
+         <function>b</function>
+      </Partition>
+      <Device asn1file="/home/taste/tool-inst/include/ocarina/runtime/polyorb-hi-c/src/drivers/configuration/ip.asn" asn1module="POHICDRIVER-IP" asn1type="IP-Conf-T" bus="eth0" classifier="deploymentview::dv::pb2::ethernet2.others" config="{devname &quot;eth0&quot;, address &quot;127.0.0.1&quot;, version ipv4, port 5116 }" name="ethernet2.others" pkg="deploymentview::dv::pb2" port="link" proc="p2"/>
+   </Node>
+   <Connection from_node="B" from_port="pong" to_bus="eth0" to_node="A" to_port="ping"/>
+   <Connection from_node="A" from_port="pong" to_bus="eth0" to_node="B" to_port="ping"/>
+</DeploymentView>

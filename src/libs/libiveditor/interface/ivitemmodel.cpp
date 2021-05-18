@@ -160,11 +160,14 @@ void IVItemModel::onIVObjectAdded(ivm::IVObject *object)
     updateItem(item);
 }
 
-void IVItemModel::onObjectsAdded(const QVector<ivm::IVObject *> &objects)
+void IVItemModel::onObjectsAdded(const QVector<shared::Id> &objectsIds)
 {
-    QList<ivm::IVObject *> objectsToAdd(objects.toList());
+    QList<ivm::IVObject *> objectsToAdd;
+    for (auto id : objectsIds) {
+        objectsToAdd.append(m_model->getObject(id));
+    }
     ivm::IVObject::sortObjectList(objectsToAdd);
-    for (auto object : objectsToAdd) {
+    for (auto object : qAsConst(objectsToAdd)) {
         onIVObjectAdded(object);
     }
 
@@ -175,16 +178,21 @@ void IVItemModel::onRootObjectChanged(shared::Id rootId)
 {
     Q_UNUSED(rootId)
     clearScene();
-    onObjectsAdded(m_model->visibleObjects().toVector());
+
+    QVector<shared::Id> objectsToAdd;
+    for (auto obj : m_model->visibleObjects()) {
+        objectsToAdd.append(obj->id());
+    }
+    onObjectsAdded(objectsToAdd);
 }
 
-void IVItemModel::onObjectRemoved(ivm::IVObject *object)
+void IVItemModel::onObjectRemoved(shared::Id objectId)
 {
     if (!m_graphicsScene) {
         return;
     }
 
-    m_rmQueu.enqueue(object);
+    m_rmQueu.enqueue(objectId);
 
     while (!m_rmQueu.isEmpty()) {
         if (m_mutex->tryLock()) {
@@ -227,9 +235,9 @@ void IVItemModel::onConnectionAddedToGroup(ivm::IVConnection *connection)
     handleIface(connection, connectionGroupObject->sourceInterfaceGroup());
     handleIface(connection, connectionGroupObject->targetInterfaceGroup());
 
-    onObjectRemoved(connection);
-    onObjectRemoved(connection->sourceInterface());
-    onObjectRemoved(connection->targetInterface());
+    onObjectRemoved(connection->id());
+    onObjectRemoved(connection->sourceInterface()->id());
+    onObjectRemoved(connection->targetInterface()->id());
 }
 
 void IVItemModel::onConnectionRemovedFromGroup(ivm::IVConnection *connection)
@@ -325,9 +333,9 @@ void IVItemModel::updateItem(QGraphicsItem *item)
     }
 }
 
-void IVItemModel::removeItemForObject(ivm::IVObject *object)
+void IVItemModel::removeItemForObject(shared::Id objectId)
 {
-    if (auto item = m_items.take(object->id())) {
+    if (auto item = m_items.take(objectId)) {
         m_graphicsScene->removeItem(item);
         delete item;
         updateSceneRect();

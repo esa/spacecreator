@@ -19,13 +19,28 @@
 
 #include "dvobject.h"
 
+#include <memory>
+
 namespace dvm {
+struct DVNodePrivate;
+class DVProcessor;
+class DVDevice;
 
 class DVNode : public DVObject
 {
     Q_OBJECT
 public:
     explicit DVNode(DVObject *parent = nullptr);
+    ~DVNode() override;
+
+    void setProcessor(DVProcessor *cpu);
+    DVProcessor *processor() const;
+
+    void setDevice(DVDevice *device);
+    DVDevice *device() const;
+
+private:
+    std::unique_ptr<DVNodePrivate> d;
 };
 
 } // namespace deploy

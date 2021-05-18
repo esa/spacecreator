@@ -34,8 +34,6 @@ struct IVModelPrivate {
     PropertyTemplateConfig *m_dynPropConfig { nullptr };
     IVModel *m_sharedTypesModel { nullptr };
     shared::Id m_rootObjectId;
-    QList<shared::Id> m_objectsOrder;
-    QHash<shared::Id, IVObject *> m_objects;
     QList<IVObject *> m_visibleObjects;
     QVector<QString> m_headerTitles;
 };
@@ -54,113 +52,45 @@ void IVModel::setSharedTypesModel(IVModel *sharedTypesModel)
     d->m_sharedTypesModel = sharedTypesModel;
 }
 
-void IVModel::initFromObjects(const QVector<IVObject *> &objects)
+bool IVModel::addObjectImpl(shared::VEObject *obj)
 {
-    clear();
-    addObjects(objects);
-}
+    if (ivm::IVObject *ivObj = obj->as<ivm::IVObject *>()) {
+        if (shared::VEModel::addObjectImpl(obj)) {
+            d->m_visibleObjects.append(ivObj);
 
-void IVModel::addObjects(const QVector<IVObject *> &objects)
-{
-    QVector<IVObject *> addedObjects;
-    for (auto obj : objects) {
-        if (addObjectImpl(obj)) {
-            addedObjects.append(obj);
-        }
-    }
-
-    for (auto it = addedObjects.begin(); it != addedObjects.end(); ++it) {
-        if (IVObject *obj = *it) {
-            if (!obj->postInit()) {
-                if (IVFunctionType *parentFn = qobject_cast<IVFunction *>(obj->parentObject())) {
-                    parentFn->removeChild(obj);
-                }
-                if (removeObject(obj)) {
-                    it = addedObjects.erase(it);
-                }
-            }
-        }
-    }
-
-    if (!addedObjects.isEmpty()) {
-        Q_EMIT objectsAdded(addedObjects);
-    }
-}
-
-bool IVModel::addObjectImpl(IVObject *obj)
-{
-    if (!obj)
-        return false;
-
-    const shared::Id &id = obj->id();
-    if (getObject(id)) {
-        return false;
-    }
-
-    if (!obj->parent()) {
-        obj->setParent(this);
-    }
-
-    obj->setModel(this);
-
-    d->m_objects.insert(id, obj);
-    d->m_objectsOrder.append(id);
-    d->m_visibleObjects.append(obj);
-
-    for (const auto attr : d->m_dynPropConfig->propertyTemplatesForObject(obj)) {
-        if (attr->validate(obj)) {
-            const QVariant &currentValue = obj->entityAttributeValue(attr->name());
-            if (currentValue.isNull()) {
-                const QVariant &defaultValue = attr->defaultValue();
-                if (!defaultValue.isNull()) {
-                    if (attr->info() == ivm::PropertyTemplate::Info::Attribute) {
-                        obj->setEntityAttribute(attr->name(), defaultValue);
-                    } else if (attr->info() == ivm::PropertyTemplate::Info::Property) {
-                        obj->setEntityProperty(attr->name(), defaultValue);
-                    } else {
-                        qWarning() << "Unknown dynamic property info:" << attr->info();
+            for (const auto attr : d->m_dynPropConfig->propertyTemplatesForObject(ivObj)) {
+                if (attr->validate(ivObj)) {
+                    const QVariant &currentValue = obj->entityAttributeValue(attr->name());
+                    if (currentValue.isNull()) {
+                        const QVariant &defaultValue = attr->defaultValue();
+                        if (!defaultValue.isNull()) {
+                            if (attr->info() == ivm::PropertyTemplate::Info::Attribute) {
+                                obj->setEntityAttribute(attr->name(), defaultValue);
+                            } else if (attr->info() == ivm::PropertyTemplate::Info::Property) {
+                                obj->setEntityProperty(attr->name(), defaultValue);
+                            } else {
+                                qWarning() << "Unknown dynamic property info:" << attr->info();
+                            }
+                        }
                     }
                 }
             }
-        }
-    }
-
-    return true;
-}
-
-bool IVModel::addObject(IVObject *obj)
-{
-    if (addObjectImpl(obj)) {
-        if (!obj->postInit()) {
-            removeObject(obj);
-            if (auto parentObj = qobject_cast<ivm::IVFunctionType *>(obj->parentObject())) {
-                parentObj->removeChild(obj);
-            }
-        } else {
-            Q_EMIT objectsAdded({ obj });
             return true;
         }
     }
+
     return false;
 }
 
-bool IVModel::removeObject(IVObject *obj)
+bool IVModel::removeObject(shared::VEObject *obj)
 {
-    if (!obj)
-        return false;
-
-    const shared::Id &id = obj->id();
-    if (!getObject(id))
-        return false;
-
-    obj->aboutToBeRemoved();
-
-    d->m_objects.remove(id);
-    d->m_objectsOrder.removeAll(id);
-    d->m_visibleObjects.removeAll(obj);
-
-    Q_EMIT objectRemoved(obj);
-    return true;
+    if (shared::VEModel::removeObject(obj)) {
+        if (auto parentObj = qobject_cast<ivm::IVFunctionType *>(obj->parentObject())) {
+            parentObj->removeChild(obj->as<ivm::IVObject *>());
+        }
+        return true;
+    }
+    return false;
 }
 
 void IVModel::setRootObject(shared::Id rootId)
@@ -187,11 +117,7 @@ shared::Id IVModel::rootObjectId() const
 
 IVObject *IVModel::getObject(const shared::Id &id) const
 {
-    if (id.isNull()) {
-        return nullptr;
-    }
-
-    return d->m_objects.value(id, nullptr);
+    return qobject_cast<IVObject *>(shared::VEModel::getObject(id));
 }
 
 IVObject *IVModel::getObjectByName(const QString &name, IVObject::Type type, Qt::CaseSensitivity caseSensitivity) const
@@ -199,10 +125,13 @@ IVObject *IVModel::getObjectByName(const QString &name, IVObject::Type type, Qt:
     if (name.isEmpty())
         return nullptr;
 
-    for (auto obj : d->m_objects)
-        if ((type == IVObject::Type::Unknown || type == obj->type())
-                && obj->title().compare(name, caseSensitivity) == 0)
-            return obj;
+    for (auto object : objects()) {
+        if (auto obj = qobject_cast<ivm::IVObject *>(object)) {
+            if ((type == IVObject::Type::Unknown || type == obj->type())
+                    && obj->title().compare(name, caseSensitivity) == 0)
+                return obj;
+        }
+    }
     return nullptr;
 }
 
@@ -216,8 +145,8 @@ IVInterface *IVModel::getIfaceByName(const QString &name, IVInterface::Interface
         return nullptr;
     }
 
-    for (auto obj : qAsConst(d->m_objects)) {
-        if (obj->isInterface() && obj->title().compare(name, caseSensitivity) == 0) {
+    for (auto obj : objects()) {
+        if (obj->title().compare(name, caseSensitivity) == 0) {
             if (IVInterface *iface = obj->as<IVInterface *>()) {
                 if (iface->direction() == dir && (!parent || iface->parentObject() == parent)) {
                     return iface;
@@ -239,8 +168,8 @@ QList<IVInterface *> IVModel::getIfacesByName(const QString &name, Qt::CaseSensi
         return result;
     }
 
-    for (auto obj : qAsConst(d->m_objects)) {
-        if (obj->isInterface() && obj->title().compare(name, caseSensitivity) == 0) {
+    for (auto obj : objects()) {
+        if (obj->title().compare(name, caseSensitivity) == 0) {
             if (IVInterface *iface = obj->as<IVInterface *>()) {
                 result << iface;
             }
@@ -295,19 +224,17 @@ QHash<QString, IVFunctionType *> IVModel::getAvailableFunctionTypes(const IVFunc
         return false;
     };
 
-    for (IVObject *obj : d->m_objects) {
-        if (obj->isFunctionType()) {
-            if (IVFunctionType *objFnType = qobject_cast<IVFunctionType *>(obj)) {
-                if (isValid(objFnType, fnObj)) {
-                    result.insert(objFnType->title(), objFnType);
-                }
+    for (auto obj : objects()) {
+        if (IVFunctionType *objFnType = qobject_cast<IVFunctionType *>(obj)) {
+            if (isValid(objFnType, fnObj)) {
+                result.insert(objFnType->title(), objFnType);
             }
         }
     }
 
     const auto sharedObjects = d->m_sharedTypesModel->objects();
     for (auto sharedObject : sharedObjects) {
-        if (sharedObject->isFunctionType() && sharedObject->parentObject() == nullptr) {
+        if (sharedObject->parentObject() == nullptr) {
             if (auto fnType = sharedObject->as<IVFunctionType *>()) {
                 result[fnType->title()] = fnType;
             }
@@ -344,8 +271,8 @@ IVComment *IVModel::getCommentById(const shared::Id &id) const
 
 IVConnection *IVModel::getConnectionForIface(const shared::Id &id) const
 {
-    for (auto it = d->m_objects.constBegin(); it != d->m_objects.constEnd(); ++it) {
-        if (auto connection = qobject_cast<IVConnection *>(it.value())) {
+    for (auto obj : objects()) {
+        if (auto connection = qobject_cast<IVConnection *>(obj)) {
             Q_ASSERT(connection->sourceInterface() != nullptr);
             Q_ASSERT(connection->targetInterface() != nullptr);
             if (connection->sourceInterface()->id() == id || connection->targetInterface()->id() == id)
@@ -355,22 +282,18 @@ IVConnection *IVModel::getConnectionForIface(const shared::Id &id) const
     return nullptr;
 }
 
-const QHash<shared::Id, IVObject *> &IVModel::objects() const
-{
-    return d->m_objects;
-}
-
 QVector<IVConnection *> IVModel::getConnectionsForIface(const shared::Id &id) const
 {
     QVector<IVConnection *> result;
 
-    for (auto it = d->m_objects.cbegin(); it != d->m_objects.cend(); ++it)
-        if (it.value()->type() == IVObject::Type::Connection)
-            if (auto connection = qobject_cast<IVConnection *>(it.value()))
-                if ((connection->sourceInterface() && connection->sourceInterface()->id() == id)
-                        || (connection->targetInterface() && connection->targetInterface()->id() == id))
-                    result.append(connection);
-
+    for (auto obj : objects()) {
+        if (auto connection = qobject_cast<IVConnection *>(obj)) {
+            if ((connection->sourceInterface() && connection->sourceInterface()->id() == id)
+                    || (connection->targetInterface() && connection->targetInterface()->id() == id)) {
+                result.append(connection);
+            }
+        }
+    }
     return result;
 }
 
@@ -383,8 +306,8 @@ QList<IVObject *> IVModel::visibleObjects() const
 QList<IVObject *> IVModel::visibleObjects(shared::Id rootId) const
 {
     QList<IVObject *> visibleObjects;
-    IVObject *rootObj = d->m_objects.value(rootId);
-    for (const auto &id : d->m_objectsOrder) {
+    IVObject *rootObj = getObject(rootId);
+    for (const auto &id : objectsOrder()) {
         if (auto obj = getObject(id)) {
             if (rootId.isNull()) {
                 visibleObjects.append(obj);
@@ -410,15 +333,10 @@ QList<IVObject *> IVModel::visibleObjects(shared::Id rootId) const
 
 void IVModel::clear()
 {
-    for (auto object : d->m_objects.values())
-        object->deleteLater();
-
-    d->m_objects.clear();
-    d->m_objectsOrder.clear();
     d->m_visibleObjects.clear();
 
     d->m_rootObjectId = shared::InvalidId;
-    Q_EMIT modelReset();
+    shared::VEModel::clear();
 }
 
 /*!
@@ -428,14 +346,12 @@ void IVModel::clear()
 IVConnection *IVModel::getConnection(const QString &interfaceName, const QString &source, const QString &target,
         Qt::CaseSensitivity caseSensitivity) const
 {
-    for (IVObject *obj : d->m_objects) {
-        if (obj->isConnection()) {
-            if (IVConnection *connection = qobject_cast<IVConnection *>(obj)) {
-                if (connection->targetInterfaceName().compare(interfaceName, caseSensitivity) == 0
-                        && connection->sourceName().compare(source, caseSensitivity) == 0
-                        && connection->targetName().compare(target, caseSensitivity) == 0) {
-                    return connection;
-                }
+    for (shared::VEObject *obj : objects()) {
+        if (IVConnection *connection = qobject_cast<IVConnection *>(obj)) {
+            if (connection->targetInterfaceName().compare(interfaceName, caseSensitivity) == 0
+                    && connection->sourceName().compare(source, caseSensitivity) == 0
+                    && connection->targetName().compare(target, caseSensitivity) == 0) {
+                return connection;
             }
         }
     }
@@ -462,9 +378,11 @@ QSet<QString> IVModel::nestedFunctionNames(const IVFunctionType *fnt) const
 {
     QSet<QString> names;
     if (!fnt) {
-        for (IVObject *obj : d->m_objects) {
-            if (obj->type() == IVObject::Type::Function || obj->type() == IVObject::Type::FunctionType) {
-                names.insert(obj->title());
+        for (shared::VEObject *object : objects()) {
+            if (auto obj = qobject_cast<ivm::IVObject *>(object)) {
+                if (obj->type() == IVObject::Type::Function || obj->type() == IVObject::Type::FunctionType) {
+                    names.insert(obj->title());
+                }
             }
         }
     } else {
@@ -481,9 +399,11 @@ QSet<QStringList> IVModel::nestedFunctionPaths(const IVFunctionType *fnt) const
 {
     QSet<QStringList> paths;
     if (!fnt) {
-        for (IVObject *obj : d->m_objects) {
-            if (obj->type() == IVObject::Type::Function || obj->type() == IVObject::Type::FunctionType) {
-                paths.insert(obj->path());
+        for (shared::VEObject *object : objects()) {
+            if (auto obj = qobject_cast<ivm::IVObject *>(object)) {
+                if (obj->type() == IVObject::Type::Function || obj->type() == IVObject::Type::FunctionType) {
+                    paths.insert(obj->path());
+                }
             }
         }
     } else {

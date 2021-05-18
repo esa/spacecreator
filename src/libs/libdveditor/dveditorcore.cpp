@@ -17,6 +17,7 @@
 
 #include "dveditorcore.h"
 
+#include "abstractvisualizationmodel.h"
 #include "baseitems/graphicsview.h"
 #include "dvappmodel.h"
 #include "dvitemmodel.h"
@@ -24,6 +25,7 @@
 #include "ui/graphicsviewbase.h"
 
 #include <QBoxLayout>
+#include <QHeaderView>
 #include <QSplitter>
 #include <QTreeView>
 #include <QUndoCommand>
@@ -37,6 +39,8 @@ struct DVEditorCore::DeploymentInterfacePrivate {
         : m_scene(new QGraphicsScene)
         , m_appModel(new DVAppModel)
         , m_model(new DVItemModel(m_appModel->objectsModel(), m_appModel->undoStack()))
+        , m_visualizationModel(
+                  new shared::AbstractVisualizationModel(m_appModel->objectsModel(), m_appModel->commandsStack()))
         , m_view(new dve::GraphicsView)
         , m_toolBar(new QToolBar)
     {
@@ -56,6 +60,7 @@ struct DVEditorCore::DeploymentInterfacePrivate {
     QGraphicsScene *m_scene { nullptr };
     std::unique_ptr<dve::DVAppModel> m_appModel;
     std::unique_ptr<dve::DVItemModel> m_model;
+    std::unique_ptr<shared::AbstractVisualizationModel> m_visualizationModel;
     QPointer<dve::GraphicsView> m_view;
     QPointer<QToolBar> m_toolBar;
     QWidget *m_mainWidget { nullptr };
@@ -103,6 +108,8 @@ QWidget *DVEditorCore::mainwidget()
         QSplitter *splitter = new QSplitter(Qt::Horizontal, d->m_mainWidget);
         splitter->setHandleWidth(1);
         auto treeView = new QTreeView(d->m_mainWidget);
+        treeView->setHeaderHidden(true);
+        treeView->setModel(d->m_visualizationModel.get());
         splitter->addWidget(treeView);
         splitter->addWidget(d->m_view);
         splitter->setStretchFactor(0, 0);
@@ -135,6 +142,9 @@ void DVEditorCore::populateCommandLineArguments(shared::CommandLineParser *parse
 
 bool DVEditorCore::renameAsnFile(const QString &oldName, const QString &newName)
 {
+    Q_UNUSED(oldName)
+    Q_UNUSED(newName)
+
     return false;
 }
 

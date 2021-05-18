@@ -27,6 +27,7 @@ class QXmlStreamReader;
 
 namespace dvm {
 class DVObject;
+class DVProcessor;
 struct DVXMLReaderPrivate;
 
 class DVXMLReader : public shared::XmlReader
@@ -45,6 +46,8 @@ protected:
 
 private:
     const std::unique_ptr<DVXMLReaderPrivate> d;
+
+    DVProcessor *createProcessor(const QString &name);
 };
 
 } // namespace dvm

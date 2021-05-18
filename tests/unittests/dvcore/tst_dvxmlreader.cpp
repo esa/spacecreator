@@ -71,19 +71,19 @@ void DVXMLReaderTest::tst_singleItems()
 {
     runReader(helpers::singleNode(), 1);
     runReader(helpers::nonValidDoc(), -1, false);
-    runReader(helpers::singlePartitionWithNode(), 2);
-    runReader(helpers::singlePartitionOnly(), 1);
-    runReader(helpers::singlePartitionWithFunctions(), 1);
-    runReader(helpers::singleDeviceWithNode(), 2);
-    runReader(helpers::singleDeviceOnly(), 1);
-    runReader(helpers::singleNodeWithPartitionAndDevice(), 3);
+    runReader(helpers::singlePartitionWithNode(), 3);
+    runReader(helpers::singlePartitionOnly(), 0);
+    runReader(helpers::singlePartitionWithFunctions(), 0);
+    runReader(helpers::singleDeviceWithNode(), 4);
+    runReader(helpers::singleDeviceOnly(), 0);
+    runReader(helpers::singleNodeWithPartitionAndDevice(), 6);
     runReader(helpers::unknownProperty(), 0);
     runReader(helpers::openCloseTagMismatched(), -1, false);
     runReader(helpers::malformedXml(), -1, false);
-    runReader(helpers::twoConnections(), 2);
-    runReader(helpers::twoConnectionsAndNode(), 3);
-    runReader(helpers::twoConnectionsAndNodeWithPartitionAndDevice(), 5);
-    runReader(helpers::twoConnectionsAndNodeWithDeviceAndPartitionWithFunctions(), 5);
+    runReader(helpers::twoConnections(), 3);
+    runReader(helpers::twoConnectionsAndNode(), 4);
+    runReader(helpers::twoConnectionsAndNodeWithPartitionAndDevice(), 8);
+    runReader(helpers::twoConnectionsAndNodeWithDeviceAndPartitionWithFunctions(), 18);
 }
 
 void DVXMLReaderTest::tst_functions()
@@ -110,16 +110,14 @@ void DVXMLReaderTest::tst_functions()
     QVERIFY(partition->functions().isEmpty());
 
     objects.clear();
-    runReader(helpers::singlePartitionOnly(), -1, true, &objects);
+    runReader(helpers::singlePartitionOnly(), 0, true, &objects);
     partition = findPartition(objects);
-    Q_ASSERT(partition);
-    QVERIFY(partition->functions().isEmpty());
+    Q_ASSERT(!partition);
 
     objects.clear();
-    runReader(helpers::singlePartitionWithFunctions(), -1, true, &objects);
+    runReader(helpers::singlePartitionWithFunctions(), 0, true, &objects);
     partition = findPartition(objects);
-    Q_ASSERT(partition);
-    QCOMPARE(partition->functions().size(), 10);
+    Q_ASSERT(!partition);
 
     objects.clear();
     runReader(helpers::twoConnectionsAndNodeWithDeviceAndPartitionWithFunctions(), -1, true, &objects);

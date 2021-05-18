@@ -17,12 +17,14 @@
 
 #include "dvpartition.h"
 
+#include "dvfunction.h"
+
 #include <QStringList>
 
 namespace dvm {
 
 struct DVPartitionPrivate {
-    QStringList functions;
+    QList<QPointer<DVFunction>> functions;
 };
 
 DVPartition::DVPartition(DVObject *parent)
@@ -33,14 +35,23 @@ DVPartition::DVPartition(DVObject *parent)
 
 DVPartition::~DVPartition() { }
 
-void DVPartition::addFunction(const QString &function)
+void DVPartition::addFunction(DVFunction *function)
 {
     d->functions.append(function);
 }
 
-QStringList DVPartition::functions() const
+QList<QPointer<DVFunction>> DVPartition::functions() const
 {
     return d->functions;
+}
+
+QStringList DVPartition::functionsNames() const
+{
+    QStringList names;
+    for (DVFunction *fn : qAsConst(d->functions)) {
+        names.append(fn->title());
+    }
+    return names;
 }
 
 } // namespace deploy

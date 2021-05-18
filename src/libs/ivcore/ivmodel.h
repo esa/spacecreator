@@ -41,16 +41,14 @@ public:
     explicit IVModel(PropertyTemplateConfig *dynPropConfig, QObject *parent = nullptr);
     ~IVModel() override;
 
+    bool removeObject(shared::VEObject *obj) override;
     void setSharedTypesModel(IVModel *sharedTypesModel);
-
-    bool addObject(IVObject *obj);
-    bool removeObject(IVObject *obj);
 
     void setRootObject(shared::Id rootId);
     IVObject *rootObject() const;
     shared::Id rootObjectId() const;
 
-    IVObject *getObject(const shared::Id &id) const;
+    IVObject *getObject(const shared::Id &id) const override;
     IVObject *getObjectByName(const QString &name, IVObject::Type type = IVObject::Type::Unknown,
             Qt::CaseSensitivity caseSensitivity = Qt::CaseInsensitive) const;
     IVInterface *getIfaceByName(const QString &name, IVInterface::InterfaceType dir,
@@ -76,12 +74,10 @@ public:
     IVConnection *getConnectionForIface(const shared::Id &id) const;
     QVector<IVConnection *> getConnectionsForIface(const shared::Id &id) const;
 
-    const QHash<shared::Id, IVObject *> &objects() const;
-
     QList<IVObject *> visibleObjects() const;
     QList<IVObject *> visibleObjects(shared::Id rootId) const;
 
-    void clear();
+    void clear() override;
 
     /*!
       Returns all objects of the given type
@@ -90,7 +86,7 @@ public:
     QVector<T *> allObjectsByType() const
     {
         QVector<T *> result;
-        const QHash<shared::Id, ivm::IVObject *> &ivObjects = objects();
+        const QHash<shared::Id, shared::VEObject *> &ivObjects = objects();
         for (auto obj : ivObjects) {
             if (auto func = dynamic_cast<T *>(obj)) {
                 result.append(func);
@@ -99,18 +95,11 @@ public:
         return result;
     }
 
-public Q_SLOTS:
-    void initFromObjects(const QVector<ivm::IVObject *> &objects);
-    void addObjects(const QVector<ivm::IVObject *> &objects);
-
 Q_SIGNALS:
-    void objectsAdded(const QVector<ivm::IVObject *> &object);
-    void objectRemoved(ivm::IVObject *object);
     void rootObjectChanged(shared::Id rootId);
-    void modelReset();
 
-private:
-    bool addObjectImpl(IVObject *obj);
+protected:
+    bool addObjectImpl(shared::VEObject *obj) override;
 
 private:
     const std::unique_ptr<IVModelPrivate> d;

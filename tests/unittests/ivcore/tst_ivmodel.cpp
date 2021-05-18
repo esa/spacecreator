@@ -311,7 +311,7 @@ void tst_IVModel::testConnectionQuery()
     auto fn1 = new ivm::IVFunction("Fn1");
     auto fn2 = new ivm::IVFunction("Fn2");
     ivm::IVConnection *connect1 = ivm::testutils::createConnection(fn1, fn2, "cnt1");
-    m_model->addObjects({ fn1, fn2, connect1 });
+    m_model->addObjects<ivm::IVObject *>({ fn1, fn2, connect1 });
 
     const Qt::CaseSensitivity m_caseCheck = Qt::CaseInsensitive;
     QCOMPARE(m_model->getConnection("Dummy", "Fn1", "Fn2", m_caseCheck), nullptr);

@@ -27,6 +27,8 @@ target_sources(${LIB_NAME} PRIVATE
     dvcommonprops.h
     dvinterface.cpp
     dvinterface.h
+    dvfunction.cpp
+    dvfunction.h
 )
 
 target_include_directories(${LIB_NAME} PUBLIC .)

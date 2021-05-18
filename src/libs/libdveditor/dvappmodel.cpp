@@ -75,7 +75,6 @@ bool DVAppModel::load(const QString &path)
     }
 
     d->objectsModel->initFromObjects(reader.parsedObjects());
-    d->objectsModel->setRootObject({});
 
     return true;
 }

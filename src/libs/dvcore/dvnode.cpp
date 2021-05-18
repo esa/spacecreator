@@ -17,11 +17,44 @@
 
 #include "dvnode.h"
 
+#include "dvdevice.h"
+#include "dvprocessor.h"
+
+#include <QPointer>
+
 namespace dvm {
+
+struct DVNodePrivate {
+    QPointer<DVProcessor> cpu;
+    QPointer<DVDevice> device;
+};
 
 DVNode::DVNode(DVObject *parent)
     : DVObject(DVObject::Type::Node, {}, parent)
+    , d(std::make_unique<DVNodePrivate>())
 {
+}
+
+DVNode::~DVNode() { }
+
+void DVNode::setProcessor(DVProcessor *cpu)
+{
+    d->cpu = cpu;
+}
+
+DVProcessor *DVNode::processor() const
+{
+    return d->cpu;
+}
+
+void DVNode::setDevice(DVDevice *device)
+{
+    d->device = device;
+}
+
+DVDevice *DVNode::device() const
+{
+    return d->device;
 }
 
 } // namespace deploy

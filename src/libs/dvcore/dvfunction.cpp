@@ -15,28 +15,13 @@
    along with this program. If not, see <https://www.gnu.org/licenses/lgpl-2.1.html>.
 */
 
-#pragma once
-
-#include "dvobject.h"
-
-#include <QPointer>
-#include <memory>
+#include "dvfunction.h"
 
 namespace dvm {
-class DVPartition;
-struct DVProcessorPrivate;
-class DVProcessor : public DVObject
+
+DVFunction::DVFunction(DVObject *parent)
+    : DVObject(DVObject::Type::Function, {}, parent)
 {
-    Q_OBJECT
-public:
-    explicit DVProcessor(DVObject *parent = nullptr);
-    ~DVProcessor() override;
+}
 
-    void addPartition(DVPartition *partition);
-    QList<QPointer<DVPartition>> partitions() const;
-
-private:
-    std::unique_ptr<DVProcessorPrivate> d;
-};
-
-} // namespace deploy
+} // namespace dvm

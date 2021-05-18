@@ -18,7 +18,7 @@
 #include "objectstreeview.h"
 
 #include "ivmodel.h"
-#include "commonvisualizationmodel.h"
+#include "ivvisualizationmodelbase.h"
 
 #include <QApplication>
 #include <QDrag>
@@ -55,7 +55,7 @@ void ObjectsTreeView::mouseMoveEvent(QMouseEvent *event)
 
             QDrag *drag = new QDrag(this);
             QMimeData *mimeData = new QMimeData;
-            const shared::Id id = index.data(CommonVisualizationModel::IdRole).toUuid();
+            const shared::Id id = index.data(IVVisualizationModelBase::IdRole).toUuid();
             mimeData->setText(id.toString());
             drag->setMimeData(mimeData);
             QPixmap pix;

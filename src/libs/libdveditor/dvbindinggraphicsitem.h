@@ -31,6 +31,7 @@ class DVBindingGraphicsItem : public shared::ui::VEInteractiveObject
     Q_OBJECT
 public:
     explicit DVBindingGraphicsItem(dvm::DVBinding *binding, QGraphicsItem *parent = nullptr);
+    ~DVBindingGraphicsItem() override;
     enum
     {
         Type = UserType + static_cast<int>(dvm::DVObject::Type::Binding)

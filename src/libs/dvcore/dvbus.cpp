@@ -17,11 +17,32 @@
 
 #include "dvbus.h"
 
+#include "dvconnection.h"
+
+#include <QPointer>
+
 namespace dvm {
+
+struct DVBusPrivate {
+    QList<QPointer<DVConnection>> connections;
+};
 
 DVBus::DVBus(DVObject *parent)
     : DVObject(DVObject::Type::Bus, {}, parent)
+    , d(std::make_unique<DVBusPrivate>())
 {
+}
+
+DVBus::~DVBus() { }
+
+void DVBus::addConnection(DVConnection *connection)
+{
+    d->connections.append(connection);
+}
+
+QList<QPointer<DVConnection>> DVBus::connections() const
+{
+    return d->connections;
 }
 
 } // namespace deploy

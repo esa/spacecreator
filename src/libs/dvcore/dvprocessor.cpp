@@ -17,11 +17,30 @@
 
 #include "dvprocessor.h"
 
+#include "dvpartition.h"
+
 namespace dvm {
+
+struct DVProcessorPrivate {
+    QList<QPointer<DVPartition>> partitions;
+};
 
 DVProcessor::DVProcessor(DVObject *parent)
     : DVObject(DVObject::Type::Processor, {}, parent)
+    , d(std::make_unique<DVProcessorPrivate>())
 {
+}
+
+DVProcessor::~DVProcessor() { }
+
+void DVProcessor::addPartition(DVPartition *partition)
+{
+    d->partitions.append(partition);
+}
+
+QList<QPointer<DVPartition>> DVProcessor::partitions() const
+{
+    return d->partitions;
 }
 
 } // namespace deploy

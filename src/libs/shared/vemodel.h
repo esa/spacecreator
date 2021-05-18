@@ -17,15 +17,77 @@
 
 #pragma once
 
+#include "common.h"
+
 #include <QObject>
+#include <QVector>
+#include <memory>
 
 namespace shared {
+class VEObject;
+struct VEModelPrivate;
 
 class VEModel : public QObject
 {
     Q_OBJECT
 public:
     explicit VEModel(QObject *parent = nullptr);
+    ~VEModel() override;
+
+    virtual bool addObject(VEObject *obj);
+    virtual bool removeObject(VEObject *obj);
+    virtual VEObject *getObject(const shared::Id &id) const;
+    virtual void clear();
+
+    QList<shared::Id> objectsOrder() const;
+    QHash<shared::Id, VEObject *> objects() const;
+
+public:
+    template<typename T>
+    void initFromObjects(const QVector<T> &objects)
+    {
+        clear();
+        addObjects(objects);
+    }
+
+    template<typename T>
+    void addObjects(const QVector<T> &objects)
+    {
+        QVector<T> addedObjects;
+        for (auto obj : objects) {
+            if (addObjectImpl(obj)) {
+                addedObjects.append(obj);
+            }
+        }
+
+        QVector<shared::Id> ids;
+        for (auto it = addedObjects.begin(); it != addedObjects.end(); ++it) {
+            if (T obj = *it) {
+                if (!obj->postInit()) {
+                    if (removeObject(obj)) {
+                        it = addedObjects.erase(it);
+                    }
+                } else {
+                    ids.append(obj->id());
+                }
+            }
+        }
+
+        if (!addedObjects.isEmpty()) {
+            Q_EMIT objectsAdded(ids);
+        }
+    }
+
+Q_SIGNALS:
+    void objectsAdded(const QVector<shared::Id> &objectsIds);
+    void objectRemoved(shared::Id objectId);
+    void modelReset();
+
+protected:
+    virtual bool addObjectImpl(VEObject *obj);
+
+private:
+    const std::unique_ptr<VEModelPrivate> d;
 };
 
 } // namespace shared

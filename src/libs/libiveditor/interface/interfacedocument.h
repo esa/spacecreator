@@ -35,6 +35,10 @@ namespace Asn1Acn {
 class Asn1ModelStorage;
 }
 
+namespace shared {
+class VEObject;
+}
+
 namespace ivm {
 class IVObject;
 class IVInterface;
@@ -101,7 +105,7 @@ public:
 
     QList<QAction *> customActions() const;
 
-    const QHash<shared::Id, ivm::IVObject *> &objects() const;
+    QHash<shared::Id, ivm::IVObject *> objects() const;
     ivm::IVModel *objectsModel() const;
     ivm::IVModel *importModel() const;
     IVItemModel *itemsModel() const;

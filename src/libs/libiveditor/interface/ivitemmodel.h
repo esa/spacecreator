@@ -87,8 +87,8 @@ public Q_SLOTS:
 
 private Q_SLOTS:
     void onIVObjectAdded(ivm::IVObject *object);
-    void onObjectsAdded(const QVector<ivm::IVObject *> &objects);
-    void onObjectRemoved(ivm::IVObject *object);
+    void onObjectsAdded(const QVector<shared::Id> &objectsIds);
+    void onObjectRemoved(shared::Id objectId);
     void onRootObjectChanged(shared::Id rootId);
     void onConnectionAddedToGroup(ivm::IVConnection *connection);
     void onConnectionRemovedFromGroup(ivm::IVConnection *connection);
@@ -103,7 +103,7 @@ private:
     void initItem(ivm::IVObject *object, QGraphicsItem *item);
     IVFunctionGraphicsItem *rootItem() const;
     void updateItem(QGraphicsItem *item);
-    void removeItemForObject(ivm::IVObject *object);
+    void removeItemForObject(shared::Id objectId);
     void setupInnerGeometry(ivm::IVObject *obj) const;
 
     template<typename T>
@@ -114,7 +114,7 @@ private:
     InterfaceTabGraphicsScene *m_graphicsScene { nullptr };
     QHash<shared::Id, QGraphicsItem *> m_items;
     QMutex *m_mutex { nullptr };
-    QQueue<ivm::IVObject *> m_rmQueu;
+    QQueue<shared::Id> m_rmQueu;
     QRectF m_desktopGeometry;
     QRectF m_prevItemsRect;
     shared::DelayedSignal *m_textUpdate = nullptr;

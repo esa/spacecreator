@@ -19,9 +19,11 @@
 
 #include "dvobject.h"
 
+#include <QPointer>
 #include <memory>
 
 namespace dvm {
+class DVFunction;
 struct DVPartitionPrivate;
 
 class DVPartition : public DVObject
@@ -31,8 +33,9 @@ public:
     explicit DVPartition(DVObject *parent = nullptr);
     ~DVPartition() override;
 
-    void addFunction(const QString &function);
-    QStringList functions() const;
+    void addFunction(DVFunction *function);
+    QList<QPointer<DVFunction>> functions() const;
+    QStringList functionsNames() const;
 
 private:
     std::unique_ptr<DVPartitionPrivate> d;

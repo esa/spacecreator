@@ -140,7 +140,7 @@ void tst_IVObject::test_coordinatesType()
     ivm::IVFunction fn3("Fn3", &fn2);
 
     QSignalSpy spy(&model, &ivm::IVModel::objectsAdded);
-    model.addObjects({ &fn1, &fn2, &fn3 });
+    model.addObjects<ivm::IVObject *>({ &fn1, &fn2, &fn3 });
     QVERIFY(spy.count() == 1);
     QVERIFY(model.objects().size() == 3);
 

@@ -17,6 +17,7 @@
 
 #include "ivnamevalidator.h"
 
+#include "ivcomment.h"
 #include "ivconnection.h"
 #include "ivconnectiongroup.h"
 #include "ivfunction.h"
@@ -361,7 +362,7 @@ QString IVNameValidator::nameFunctionType(const IVObject *functionType) const
     int counter = 0;
     if (functionType && functionType->model()) {
         for (const auto fn : functionType->model()->objects()) {
-            if (fn->isFunctionType()) {
+            if (qobject_cast<ivm::IVFunctionType *>(fn)) {
                 ++counter;
             }
         }
@@ -380,7 +381,7 @@ QString IVNameValidator::nameFunction(const IVObject *function) const
     int counter = 0;
     if (function && function->model()) {
         for (const auto fn : function->model()->objects()) {
-            if (fn->isFunction()) {
+            if (qobject_cast<ivm::IVFunction *>(fn)) {
                 ++counter;
             }
         }
@@ -425,7 +426,7 @@ QString IVNameValidator::nameComment(const IVObject *comment) const
     int counter = 0;
     if (comment && comment->model()) {
         for (const auto fn : comment->model()->objects())
-            if (fn->isComment())
+            if (qobject_cast<ivm::IVComment *>(fn))
                 ++counter;
     } else
         counter = 0;

@@ -25,8 +25,8 @@
 
 namespace ivm {
 
-IVConnectionGroup::IVConnectionGroup(const QString &name, IVInterfaceGroup *ifaceSource,
-        IVInterfaceGroup *ifaceTarget, const QList<QPointer<IVConnection>> &connections, QObject *parent)
+IVConnectionGroup::IVConnectionGroup(const QString &name, IVInterfaceGroup *ifaceSource, IVInterfaceGroup *ifaceTarget,
+        const QList<QPointer<IVConnection>> &connections, QObject *parent)
     : IVConnection(IVObject::Type::ConnectionGroup, ifaceSource, ifaceTarget, parent)
 {
     setTitle(name);
@@ -65,7 +65,7 @@ bool IVConnectionGroup::aboutToBeRemoved()
         removeConnection(connection);
         m_initConnections.append(connection->id());
     }
-    return true;
+    return IVObject::aboutToBeRemoved();
 }
 
 QList<QPointer<IVConnection>> IVConnectionGroup::groupedConnections() const
@@ -158,8 +158,8 @@ void IVConnectionGroup::removeConnection(const QPointer<IVConnection> &connectio
     bool removeSourceIface = true;
     bool removeTargetIface = true;
 
-    std::for_each(m_connections.constBegin(), m_connections.constEnd(),
-            [&](const QPointer<IVConnection> &connectionObj) {
+    std::for_each(
+            m_connections.constBegin(), m_connections.constEnd(), [&](const QPointer<IVConnection> &connectionObj) {
                 if (connectionObj.isNull()) {
                     return;
                 }
