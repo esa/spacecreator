@@ -184,9 +184,11 @@ void IVVisualizationModel::updateItemData(QStandardItem *item, shared::VEObject 
 QStandardItem *IVVisualizationModel::createItem(shared::VEObject *obj)
 {
     auto item = IVVisualizationModelBase::createItem(obj);
-    item->setEditable(true);
-    item->setCheckable(true);
-    item->setDragEnabled(false);
+    if (item) {
+        item->setEditable(true);
+        item->setCheckable(true);
+        item->setDragEnabled(false);
+    }
     return item;
 }
 
