@@ -67,4 +67,12 @@ QVariantMap ExportableIVConnectionGroup::targetInterfaces() const
     return interfaceNames;
 }
 
+QVariantList ExportableIVConnectionGroup::connections() const
+{
+    QVariantList connections;
+    for (const QPointer<ivm::IVConnection> &connection : exportedObject<ivm::IVConnectionGroup>()->groupedConnections())
+        connections << createFrom(connection.data());
+    return connections;
+}
+
 } // namespace ive

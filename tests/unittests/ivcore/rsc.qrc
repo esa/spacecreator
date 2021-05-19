@@ -2,5 +2,6 @@
     <qresource prefix="/data">
         <file>allitems.xml</file>
         <file>ifaceparams.xml</file>
+        <file>connection_group.xml</file>
     </qresource>
 </RCC>

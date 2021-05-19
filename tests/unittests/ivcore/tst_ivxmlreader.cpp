@@ -15,6 +15,7 @@
   along with this program. If not, see <https://www.gnu.org/licenses/lgpl-2.1.html>.
 */
 
+#include "ivconnectiongroup.h"
 #include "ivfunction.h"
 #include "ivobject.h"
 #include "ivxmlreader.h"
@@ -37,6 +38,7 @@ private Q_SLOTS:
     void test_allItems();
     void test_readMetaData();
     void test_readFunction();
+    void test_connectionGroup();
 };
 
 void IVXMLReader::runReader(const XmlFileMock &xml)
@@ -128,6 +130,24 @@ void IVXMLReader::test_readFunction()
     ivm::ContextParameter param2 = function->contextParam("trigger");
     QVERIFY(!param2.isNull());
     QCOMPARE(param2.paramType(), ivm::BasicParameter::Type::Timer);
+}
+
+void IVXMLReader::test_connectionGroup()
+{
+    ivm::IVXMLReader reader;
+    reader.readFile(":/data/connection_group.xml");
+    const QVector<ivm::IVObject *> objectsList = reader.parsedObjects();
+    ivm::IVConnectionGroup *cgroup = nullptr;
+    for (ivm::IVObject *object : objectsList) {
+        if (object->type() == ivm::IVObject::Type::ConnectionGroup) {
+            cgroup = static_cast<ivm::IVConnectionGroup *>(object);
+            break;
+        }
+    }
+    QVERIFY(cgroup != nullptr);
+
+    QList<QPointer<ivm::IVConnection>> groupedConnection = cgroup->groupedConnections();
+    QCOMPARE(groupedConnection.size(), 2);
 }
 
 QTEST_APPLESS_MAIN(IVXMLReader)

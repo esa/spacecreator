@@ -373,8 +373,12 @@ IVComment *IVXMLReader::addComment(const QString &text)
 IVConnection *IVXMLReader::addConnection()
 {
     IVConnection *connection = new IVConnection(nullptr, nullptr, d->m_currentObject.get());
-    if (d->m_currentObject.function())
+    if (d->m_currentObject.function()) {
         d->m_currentObject.function()->addChild(connection);
+    }
+    if (d->m_currentObject.connectionGroup()) {
+        d->m_currentObject.connectionGroup()->addgroupedConnection(connection);
+    }
 
     return connection;
 }

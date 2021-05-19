@@ -27,9 +27,8 @@ class IVConnectionGroup : public IVConnection
 {
     Q_OBJECT
 public:
-    explicit IVConnectionGroup(const QString &name, IVInterfaceGroup *ifaceSource,
-            IVInterfaceGroup *ifaceTarget, const QList<QPointer<IVConnection>> &connections = {},
-            QObject *parent = nullptr);
+    explicit IVConnectionGroup(const QString &name, IVInterfaceGroup *ifaceSource, IVInterfaceGroup *ifaceTarget,
+            const QList<QPointer<IVConnection>> &connections = {}, QObject *parent = nullptr);
 
     struct CreationInfo {
         QPointer<IVModel> model;
@@ -61,6 +60,8 @@ public:
 
     IVInterfaceGroup *sourceInterfaceGroup() const;
     IVInterfaceGroup *targetInterfaceGroup() const;
+
+    void addgroupedConnection(const QPointer<IVConnection> &connection);
 
 Q_SIGNALS:
     void connectionAdded(IVConnection *connection);

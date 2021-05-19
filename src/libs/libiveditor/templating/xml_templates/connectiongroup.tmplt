@@ -11,9 +11,13 @@ conngroups.properties   :   |_ List of all available properties of connection gr
 prop                    :      |_ Instance of property
 prop.name               :          |_ Name of property
 prop.value              :          |_ Value of property
+conngroups.connections  :   |_ List of all nested connections of connection group
 {% endcomment %}
 <ConnectionGroup{% for attr in conngroups.attributes %} {{ attr.name }}="{{ attr.value }}"{% endfor %}>
     {% for prop in conngroups.properties %}
     <Property name="{{ prop.name }}" value="{{ prop.value }}"/>
+    {% endfor %}
+    {% for conn in conngroups.connections %}
+        {% include "connection.tmplt" %}
     {% endfor %}
 </ConnectionGroup>

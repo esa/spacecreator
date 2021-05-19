@@ -1,0 +1,62 @@
+<InterfaceView>
+<Function name="Function_1" is_type="NO" instance_of="" language="SDL">
+    <Property name="Taste::coordinates" value="15400 18900 46800 48200"/>
+<Required_Interface name="PI_1" kind="Sporadic" group_name="CGroup">
+    <Property name="Taste::coordinates" value="46800 22500"/>
+    <Property name="Taste::InheritPI" value="true"/>
+    <Property name="Taste::Autonamed" value="true"/>
+</Required_Interface>
+
+<Required_Interface name="PI_2" kind="Sporadic" group_name="CGroup">
+    <Property name="Taste::coordinates" value="46800 29100"/>
+    <Property name="Taste::InheritPI" value="true"/>
+    <Property name="Taste::Autonamed" value="true"/>
+</Required_Interface>
+
+<Required_Interface name="PI_3" kind="Sporadic">
+    <Property name="Taste::coordinates" value="46800 37400"/>
+    <Property name="Taste::InheritPI" value="true"/>
+    <Property name="Taste::Autonamed" value="true"/>
+</Required_Interface>
+
+</Function>
+
+<Function name="Function_2" is_type="NO" instance_of="" language="SDL">
+    <Property name="Taste::coordinates" value="74500 20100 101200 49200"/>
+<Provided_Interface name="PI_1" kind="Sporadic" group_name="CGroup">
+    <Property name="Taste::coordinates" value="74500 23100"/>
+</Provided_Interface>
+
+<Provided_Interface name="PI_2" kind="Sporadic" group_name="CGroup">
+    <Property name="Taste::coordinates" value="74500 30500"/>
+</Provided_Interface>
+
+<Provided_Interface name="PI_3" kind="Sporadic">
+    <Property name="Taste::coordinates" value="74500 36800"/>
+</Provided_Interface>
+
+</Function>
+
+<Connection >
+    <Source func_name="Function_1" ri_name="PI_3"/>
+    <Target func_name="Function_2" pi_name="PI_3"/>
+    <Property name="Taste::coordinates" value="47400 37400 60800 37400 74200 36800"/>
+</Connection>
+
+<ConnectionGroup name="CGroup">
+    <Property name="Taste::coordinates" value="47400 33700 60700 33700 60700 26900 73900 26900"/>
+<Connection  group_name="CGroup">
+    <Source func_name="Function_1" ri_name="PI_2"/>
+    <Target func_name="Function_2" pi_name="PI_2"/>
+    <Property name="Taste::coordinates" value="47400 29100 60800 29100 60800 30500 74200 30500"/>
+</Connection>
+
+<Connection  group_name="CGroup">
+    <Source func_name="Function_1" ri_name="PI_1"/>
+    <Target func_name="Function_2" pi_name="PI_1"/>
+    <Property name="Taste::coordinates" value="47400 22500 60800 22500 74200 23100"/>
+</Connection>
+
+</ConnectionGroup>
+
+</InterfaceView>

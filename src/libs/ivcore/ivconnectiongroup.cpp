@@ -115,6 +115,18 @@ IVInterfaceGroup *IVConnectionGroup::targetInterfaceGroup() const
     return qobject_cast<IVInterfaceGroup *>(targetInterface());
 }
 
+/*!
+   Adds a connection whithout removing it from a function.
+   Is used for example when loading connections of a group
+ */
+void IVConnectionGroup::addgroupedConnection(const QPointer<IVConnection> &connection)
+{
+    connection->setParent(this);
+    m_connections.append(connection);
+
+    Q_EMIT connectionAdded(connection);
+}
+
 void IVConnectionGroup::addConnection(const QPointer<IVConnection> &connection)
 {
     if (connection.isNull() || !connection->sourceInterface() || !connection->targetInterface()
@@ -140,10 +152,7 @@ void IVConnectionGroup::addConnection(const QPointer<IVConnection> &connection)
         return;
     }
 
-    connection->setParent(this);
-    m_connections.append(connection);
-
-    Q_EMIT connectionAdded(connection);
+    addgroupedConnection(connection);
 }
 
 void IVConnectionGroup::removeConnection(const QPointer<IVConnection> &connection)

@@ -36,6 +36,7 @@ class ExportableIVConnectionGroup : public ExportableIVObject
     Q_PROPERTY(QString target READ targetName)
     Q_PROPERTY(QVariantMap sifaces READ sourceInterfaces)
     Q_PROPERTY(QVariantMap tifaces READ targetInterfaces)
+    Q_PROPERTY(QVariantList connections READ connections)
 
 public:
     ExportableIVConnectionGroup(const ivm::IVConnectionGroup *connection = nullptr);
@@ -45,6 +46,7 @@ public:
     QString targetName() const;
     QVariantMap sourceInterfaces() const;
     QVariantMap targetInterfaces() const;
+    QVariantList connections() const;
 };
 
 } // namespace ive
