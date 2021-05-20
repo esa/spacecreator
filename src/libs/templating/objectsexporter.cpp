@@ -100,16 +100,11 @@ bool ObjectsExporter::exportData(const QHash<QString, QVariant> &data, const QSt
 
     QString savePath(outPath);
     if (savePath.isEmpty()) {
-        if (interaction == InteractionPolicy::Interactive) {
-            QFileDialog dialog(root, QObject::tr("Export Interface to an XML file"));
-            dialog.setAcceptMode(QFileDialog::AcceptSave);
-            dialog.setDefaultSuffix(".xml");
-            if (dialog.exec() == QDialog::Accepted) {
-                savePath = dialog.selectedUrls().value(0).toLocalFile();
-            }
-        }
-        if (savePath.isEmpty()) {
-            return false;
+        QFileDialog dialog(root, QObject::tr("Export Interface to an XML file"));
+        dialog.setAcceptMode(QFileDialog::AcceptSave);
+        dialog.setDefaultSuffix(".xml");
+        if (dialog.exec() == QDialog::Accepted) {
+            savePath = dialog.selectedUrls().value(0).toLocalFile();
         }
     }
 
