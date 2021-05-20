@@ -64,7 +64,7 @@ QString IVObject::titleUI() const
     return IVNameValidator::decodeName(type(), title());
 }
 
-bool IVObject::postInit()
+bool IVObject::postInit(QString* warning)
 {
     return true;
 }

@@ -248,12 +248,12 @@ bool InterfaceDocument::create(const QString &path)
     return created;
 }
 
-bool InterfaceDocument::load(const QString &path)
+bool InterfaceDocument::load(const QString &path, QStringList *warnings)
 {
     const QString oldPath = d->filePath = path;
     setPath(path);
 
-    const bool loaded = loadImpl(path);
+    const bool loaded = loadImpl(path, warnings);
 
     if (loaded) {
         d->commandsStack->clear();
@@ -645,9 +645,9 @@ void InterfaceDocument::onSavedExternally(const QString &filePath, bool saved)
 /*!
    \brief InterfaceDocument::setObjects
  */
-void InterfaceDocument::setObjects(const QVector<ivm::IVObject *> &objects)
+void InterfaceDocument::setObjects(const QVector<ivm::IVObject *> &objects, QStringList *warnings)
 {
-    d->objectsModel->initFromObjects(objects);
+    d->objectsModel->initFromObjects(objects, warnings);
     d->objectsModel->setRootObject({});
 }
 
@@ -935,7 +935,7 @@ bool InterfaceDocument::exportImpl(const QString &targetDir, const QList<ivm::IV
     return true;
 }
 
-bool InterfaceDocument::loadImpl(const QString &path)
+bool InterfaceDocument::loadImpl(const QString &path, QStringList *warnings)
 {
     if (path.isEmpty() || !QFileInfo::exists(path)) {
         qWarning() << Q_FUNC_INFO << "Invalid path";
@@ -948,7 +948,7 @@ bool InterfaceDocument::loadImpl(const QString &path)
         return false;
     }
 
-    setObjects(parser.parsedObjects());
+    setObjects(parser.parsedObjects(), warnings);
     const QVariantMap metadata = parser.metaData();
     setAsn1FileName(metadata["asn1file"].toString());
     setMscFileName(metadata["mscfile"].toString());

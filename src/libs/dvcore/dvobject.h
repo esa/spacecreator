@@ -66,7 +66,7 @@ public:
 
     DVModel *model() const;
 
-    bool postInit() override;
+    bool postInit(QString *warning = nullptr) override;
     bool aboutToBeRemoved() override;
 
 Q_SIGNALS:

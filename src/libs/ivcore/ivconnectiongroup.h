@@ -43,7 +43,7 @@ public:
         QVariantList toVarList() const;
     };
 
-    bool postInit() override;
+    bool postInit(QString *warning = nullptr) override;
     bool aboutToBeRemoved() override;
 
     void addConnection(const QPointer<IVConnection> &connection);

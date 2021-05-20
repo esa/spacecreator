@@ -29,6 +29,7 @@
 #include "mscsystemchecks.h"
 
 #include <QDebug>
+#include <QMessageBox>
 
 namespace scs {
 
@@ -71,7 +72,11 @@ QSharedPointer<ive::IVEditorCore> SpaceCreatorProject::ivData(const QString &fil
         data->document()->customActions(); // There some further actions are registered
         data->document()->setAsn1ModelStorage(m_asn1Storage.get());
 
-        data->document()->load(fileName);
+        QStringList warnings;
+        data->document()->load(fileName, &warnings);
+        if (!warnings.isEmpty()) {
+            QMessageBox::warning(nullptr, tr("File load warnings"), warnings.join("\n"));
+        }
         const_cast<SpaceCreatorProject *>(this)->setIvData(fileName, data);
         return data;
     }

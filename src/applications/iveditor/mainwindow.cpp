@@ -147,7 +147,11 @@ void MainWindow::onOpenFileRequested()
     const QString &fileName = QFileDialog::getOpenFileName(
             this, tr("Open file"), prevPath, m_core->document()->supportedFileExtensions());
     if (!fileName.isEmpty() && closeFile()) {
-        m_core->document()->load(fileName);
+        QStringList warnings;
+        m_core->document()->load(fileName, &warnings);
+        if (!warnings.isEmpty()) {
+            QMessageBox::warning(this, tr("File load warnings"), warnings.join("\n"));
+        }
     }
     updateActions();
 }
@@ -258,7 +262,12 @@ bool MainWindow::processCommandLineArg(shared::CommandLineParser::Positional arg
     }
     case shared::CommandLineParser::Positional::OpenIVFile: {
         if (!value.isEmpty() && m_core->document() != nullptr) {
-            return m_core->document()->load(value);
+            QStringList warnings;
+            bool ok = m_core->document()->load(value, &warnings);
+            if (!warnings.isEmpty()) {
+                QMessageBox::warning(this, tr("File load warnings"), warnings.join("\n"));
+            }
+            return ok;
         };
 
         return false;

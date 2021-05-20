@@ -42,8 +42,9 @@ IVFunction::IVFunction(const QString &title, QObject *parent, const shared::Id &
 
 IVFunction::~IVFunction() { }
 
-bool IVFunction::postInit()
+bool IVFunction::postInit(QString *warning)
 {
+    Q_UNUSED(warning);
     return true;
 }
 

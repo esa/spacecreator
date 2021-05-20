@@ -17,8 +17,8 @@
 
 #pragma once
 
-#include "ivobject.h"
 #include "ivinterface.h"
+#include "ivobject.h"
 
 #include <QObject>
 #include <memory>
@@ -67,7 +67,7 @@ public:
         return selectIface<T>(sourceInterface(), targetInterface());
     }
 
-    bool postInit() override;
+    bool postInit(QString *warning = nullptr) override;
 
     struct EndPointInfo {
         QString m_functionName;
@@ -95,10 +95,10 @@ public:
     QVector<InterfaceParameter> params() const;
 
 protected:
-    explicit IVConnection(const IVObject::Type t, IVInterface *ifaceSource, IVInterface *ifaceTarget,
-            QObject *parent = nullptr);
-    bool lookupEndpointsPostponed();
-    bool needPostponedInit() const;
+    explicit IVConnection(
+            const IVObject::Type t, IVInterface *ifaceSource, IVInterface *ifaceTarget, QObject *parent = nullptr);
+    bool lookupEndpointsPostponed(QString *warning = nullptr);
+    bool needPostponedInit(QString *warning = nullptr) const;
 
 private:
     const std::unique_ptr<IVConnectionPrivate> d;

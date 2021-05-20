@@ -17,14 +17,15 @@
 
 #include "ivconnection.h"
 
+#include "connectioncreationvalidator.h"
 #include "ivfunction.h"
 #include "ivfunctiontype.h"
 #include "ivinterface.h"
 #include "ivmodel.h"
 #include "ivnamevalidator.h"
-#include "connectioncreationvalidator.h"
 
 #include <QDebug>
+#include <QMetaEnum>
 #include <QPointer>
 
 namespace ivm {
@@ -35,7 +36,7 @@ struct ConnectionHolder {
 };
 
 struct IVConnectionPrivate {
-    IVConnectionPrivate() {}
+    IVConnectionPrivate() { }
     IVConnectionPrivate(IVInterface *ifaceSource, IVInterface *ifaceTarget) { setData(ifaceSource, ifaceTarget); }
 
     void setData(IVInterface *ifaceSource, IVInterface *ifaceTarget)
@@ -81,8 +82,7 @@ IVConnection::IVConnection(IVInterface *ifaceSource, IVInterface *ifaceTarget, Q
 {
 }
 
-IVConnection::IVConnection(
-        const IVObject::Type t, IVInterface *ifaceSource, IVInterface *ifaceTarget, QObject *parent)
+IVConnection::IVConnection(const IVObject::Type t, IVInterface *ifaceSource, IVInterface *ifaceTarget, QObject *parent)
     : IVObject(t, QString(), parent)
     , d(new IVConnectionPrivate { ifaceSource, ifaceTarget })
 {
@@ -214,14 +214,20 @@ void IVConnection::setDelayedEnd(IVConnection::EndPointInfo *end)
     d->m_delayedInit.m_to = end;
 }
 
-bool IVConnection::lookupEndpointsPostponed()
+bool IVConnection::lookupEndpointsPostponed(QString *warning)
 {
     if (!d->m_delayedInit.m_from) {
         qWarning() << "Can't connect, as the source is missing";
+        if (warning) {
+            *warning = tr("Connection removed - Target source");
+        }
         return false;
     }
     if (!d->m_delayedInit.m_to) {
         qWarning() << "Can't connect, as the target is missing";
+        if (warning) {
+            *warning = tr("Connection removed - Target missing");
+        }
         return false;
     }
 
@@ -240,6 +246,9 @@ bool IVConnection::lookupEndpointsPostponed()
             if (!ivFunction) {
                 QString warningMessage = QStringLiteral("Unable to find Fn/FnType %1").arg(info->m_functionName);
                 qWarning() << qPrintable(warningMessage);
+                if (warning) {
+                    *warning = tr("Connection removed - Unable to find Fn/FnType %1").arg(info->m_functionName);
+                }
             }
         }
         return ivFunction;
@@ -260,6 +269,9 @@ bool IVConnection::lookupEndpointsPostponed()
             if (!ivIface) {
                 QString warningMessage = QStringLiteral("Unable to find Interface %1").arg(info->m_interfaceName);
                 qWarning() << qPrintable(warningMessage);
+                if (warning) {
+                    *warning = tr("Connection removed - Unable to find interface %1").arg(info->m_interfaceName);
+                }
             }
         }
         return ivIface;
@@ -286,6 +298,12 @@ bool IVConnection::lookupEndpointsPostponed()
         qWarning() << ifaceFrom << ifaceFrom->parentObject();
         qWarning() << objTo;
         qWarning() << ifaceTo << ifaceTo->parentObject();
+        if (warning) {
+            QMetaEnum metaEnum = QMetaEnum::fromType<ivm::ConnectionCreationValidator::FailReason>();
+            *warning = tr("Connection '%1'.'%2' <-> '%3'.'%4' removed - Reason: %5")
+                               .arg(objFrom->title(), ifaceFrom->titleUI(), objTo->title(), ifaceTo->titleUI())
+                               .arg(metaEnum.valueToKey(int(status)));
+        }
 
         return false;
     }
@@ -296,9 +314,13 @@ bool IVConnection::lookupEndpointsPostponed()
     return true;
 }
 
-bool IVConnection::needPostponedInit() const
+bool IVConnection::needPostponedInit(QString *warning) const
 {
-    return !(d->sourceIface() && d->targetIface());
+    bool ok = !(d->sourceIface() && d->targetIface());
+    if (warning) {
+        *warning = tr("Connection '%1' removed - misses an interface").arg(titleUI());
+    }
+    return ok;
 }
 
 void IVConnection::clearPostponedEndpoints()
@@ -310,9 +332,9 @@ void IVConnection::clearPostponedEndpoints()
     d->m_delayedInit.m_to = nullptr;
 }
 
-bool IVConnection::postInit()
+bool IVConnection::postInit(QString *warning)
 {
-    if (needPostponedInit() && !lookupEndpointsPostponed()) {
+    if (needPostponedInit(warning) && !lookupEndpointsPostponed(warning)) {
         qWarning() << "Postponed Connection initialization failed";
         return false;
     }

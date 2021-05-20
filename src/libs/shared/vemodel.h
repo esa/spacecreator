@@ -44,14 +44,14 @@ public:
 
 public:
     template<typename T>
-    void initFromObjects(const QVector<T> &objects)
+    void initFromObjects(const QVector<T> &objects, QStringList *warnings = nullptr)
     {
         clear();
-        addObjects(objects);
+        addObjects(objects, warnings);
     }
 
     template<typename T>
-    void addObjects(const QVector<T> &objects)
+    void addObjects(const QVector<T> &objects, QStringList *warnings = nullptr)
     {
         QVector<T> addedObjects;
         for (auto obj : objects) {
@@ -61,16 +61,25 @@ public:
         }
 
         QVector<shared::Id> ids;
-        for (auto it = addedObjects.begin(); it != addedObjects.end(); ++it) {
+        auto it = addedObjects.begin();
+        while (it != addedObjects.end()) {
             if (T obj = *it) {
-                if (!obj->postInit()) {
+                QString warning;
+                if (!obj->postInit(&warning)) {
+                    if (warnings) {
+                        warnings->append(warning);
+                    }
                     if (removeObject(obj)) {
                         it = addedObjects.erase(it);
+                        delete (obj);
+                        continue;
+                        ;
                     }
                 } else {
                     ids.append(obj->id());
                 }
             }
+            ++it;
         }
 
         if (!addedObjects.isEmpty()) {

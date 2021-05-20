@@ -72,7 +72,7 @@ public:
 
     virtual VEObject *parentObject() const;
     VEModel *model() const;
-    virtual bool postInit() = 0;
+    virtual bool postInit(QString *warning = nullptr) = 0;
     virtual bool aboutToBeRemoved() = 0;
 
     template<class T>
