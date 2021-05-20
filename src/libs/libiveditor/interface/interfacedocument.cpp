@@ -250,7 +250,7 @@ bool InterfaceDocument::create(const QString &path)
 
 bool InterfaceDocument::load(const QString &path, QStringList *warnings)
 {
-    const QString oldPath = d->filePath = path;
+    const QString oldPath = d->filePath;
     setPath(path);
 
     const bool loaded = loadImpl(path, warnings);
