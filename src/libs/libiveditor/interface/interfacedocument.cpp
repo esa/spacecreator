@@ -1164,6 +1164,7 @@ QTreeView *InterfaceDocument::createImportView()
     d->importView->setObjectName(QLatin1String("ImportView"));
     d->importView->setSelectionBehavior(QAbstractItemView::SelectionBehavior::SelectItems);
     d->importView->setSelectionMode(QAbstractItemView::SelectionMode::SingleSelection);
+    d->importView->setEditTriggers(QAbstractItemView::EditTrigger::NoEditTriggers);
     auto sourceModel = new IVVisualizationModelBase(d->importModel, d->commandsStack, d->importView);
     auto headerItem = new QStandardItem(tr("Import Component"));
     headerItem->setTextAlignment(Qt::AlignCenter);
@@ -1182,6 +1183,7 @@ QTreeView *InterfaceDocument::createSharedView()
     d->sharedView->setObjectName(QLatin1String("SharedView"));
     d->sharedView->setSelectionBehavior(QAbstractItemView::SelectionBehavior::SelectItems);
     d->sharedView->setSelectionMode(QAbstractItemView::SelectionMode::SingleSelection);
+    d->sharedView->setEditTriggers(QAbstractItemView::EditTrigger::NoEditTriggers);
     auto sourceModel = new IVVisualizationModelBase(d->sharedModel, d->commandsStack, d->sharedView);
     auto headerItem = new QStandardItem(tr("Shared Types"));
     headerItem->setTextAlignment(Qt::AlignCenter);
