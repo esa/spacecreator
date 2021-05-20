@@ -39,6 +39,7 @@ private Q_SLOTS:
     void testManageIfaces();
     void testManageMixed();
     void testConnectionQuery();
+    void testAvailableFunctionTypes();
 
 private:
     ivm::PropertyTemplateConfig *m_dynPropConfig;
@@ -318,6 +319,52 @@ void tst_IVModel::testConnectionQuery()
     QCOMPARE(m_model->getConnection("cnt1", "Dummy", "Fn2", m_caseCheck), nullptr);
     QCOMPARE(m_model->getConnection("cnt1", "Fn1", "Dummy", m_caseCheck), nullptr);
     QCOMPARE(m_model->getConnection("cnt1", "Fn1", "Fn2", m_caseCheck), connect1);
+}
+
+void tst_IVModel::testAvailableFunctionTypes()
+{
+    ivm::IVModel model(m_dynPropConfig);
+
+    ivm::IVFunction container1("Container1");
+    ivm::IVFunction container2("Container2", &container1);
+    ivm::IVFunction container3("Container3", &container2);
+    ivm::IVFunction fn1("Fn1");
+    ivm::IVFunction fn2("Fn2", &model);
+    ivm::IVFunction fn3("Fn3", &model);
+    const int functionsCount = 6;
+
+    ivm::IVFunctionType fnt1("FnT1");
+    ivm::IVFunctionType fnt2("FnT2", &model);
+    ivm::IVFunctionType fnt3("FnT3", &model);
+    const int functionTypesCount = 3;
+
+    const QVector<ivm::IVObject *> objects { &container1, &container2, &container3, &fn1, &fn2, &fn3, &fnt1, &fnt2,
+        &fnt3 };
+
+    model.addObjects(objects);
+    QCOMPARE(model.objects().size(), functionsCount + functionTypesCount);
+
+    ivm::IVModel sharedModel(m_dynPropConfig);
+    ivm::IVFunctionType sfnt1("sFnT1");
+    ivm::IVFunctionType sfnt2("sFnT2", &sharedModel);
+    ivm::IVFunctionType sfnt3("sFnT3", &sharedModel);
+    const int sharedFunctionTypesCount = 3;
+
+    const QVector<ivm::IVObject *> sharedObjects { &sfnt1, &sfnt2, &sfnt3 };
+    sharedModel.addObjects(sharedObjects);
+    QCOMPARE(sharedModel.objects().size(), sharedFunctionTypesCount);
+
+    model.setSharedTypesModel(&sharedModel);
+
+    const auto availableTypes = model.getAvailableFunctionTypes(&container1);
+    QCOMPARE(availableTypes.size(), functionTypesCount + sharedFunctionTypesCount);
+
+    for (auto object : objects) {
+        QCOMPARE(object->isFunctionType(), availableTypes.contains(object->title()));
+    }
+    for (auto object : sharedObjects) {
+        QVERIFY(availableTypes.contains(object->title()));
+    }
 }
 
 QTEST_APPLESS_MAIN(tst_IVModel)
