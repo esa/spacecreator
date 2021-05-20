@@ -73,7 +73,6 @@ public:
                         it = addedObjects.erase(it);
                         delete (obj);
                         continue;
-                        ;
                     }
                 } else {
                     ids.append(obj->id());
