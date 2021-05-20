@@ -226,7 +226,7 @@ QHash<QString, IVFunctionType *> IVModel::getAvailableFunctionTypes(const IVFunc
 
     for (auto obj : objects()) {
         if (IVFunctionType *objFnType = qobject_cast<IVFunctionType *>(obj)) {
-            if (isValid(objFnType, fnObj)) {
+            if (objFnType->isFunctionType() && isValid(objFnType, fnObj)) {
                 result.insert(objFnType->title(), objFnType);
             }
         }
@@ -236,7 +236,9 @@ QHash<QString, IVFunctionType *> IVModel::getAvailableFunctionTypes(const IVFunc
     for (auto sharedObject : sharedObjects) {
         if (sharedObject->parentObject() == nullptr) {
             if (auto fnType = sharedObject->as<IVFunctionType *>()) {
-                result[fnType->title()] = fnType;
+                if (fnType->isFunctionType()) {
+                    result[fnType->title()] = fnType;
+                }
             }
         }
     }
