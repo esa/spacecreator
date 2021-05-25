@@ -71,13 +71,18 @@ bool VEModel::removeObject(VEObject *obj)
  */
 void VEModel::clear()
 {
-    for (auto obj : qAsConst(d->m_objects)) {
-        obj->deleteLater();
+    const QList<shared::Id> order = objectsOrder();
+    for (auto it = order.rbegin(); it != order.rend(); ++it) {
+        if (auto obj = d->m_objects.value(*it)) {
+            removeObject(obj);
+            if (!obj->parent() || obj->parent() == this) {
+                delete obj;
+            }
+        }
     }
     d->m_objects.clear();
-    d->m_objects.clear();
-
     d->m_objectsOrder.clear();
+
     Q_EMIT modelReset();
 }
 
