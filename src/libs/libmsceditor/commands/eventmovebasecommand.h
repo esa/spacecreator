@@ -1,5 +1,5 @@
 /*
-   Copyright (C) 2018-2019 European Space Agency - <maxime.perrotin@esa.int>
+   Copyright (C) 2021 European Space Agency - <maxime.perrotin@esa.int>
 
    This library is free software; you can redistribute it and/or
    modify it under the terms of the GNU Library General Public
@@ -17,34 +17,32 @@
 
 #pragma once
 
-#include "chartindex.h"
-#include "eventmovebasecommand.h"
+#include "chartbasecommand.h"
 
+#include <QHash>
 #include <QPointer>
 
 namespace msc {
-
-class MscChart;
-class MscCondition;
-class MscInstance;
+class MscEntity;
+class MscInstanceEvent;
 
 namespace cmd {
 
-class CmdConditionItemMove : public EventMoveBaseCommand
+class EventMoveBaseCommand : public ChartBaseCommand
 {
 public:
-    CmdConditionItemMove(MscCondition *condition, const ChartIndex &newChartIndex, ChartLayoutManager *layoutManager);
+    EventMoveBaseCommand(MscInstanceEvent *event, ChartLayoutManager *layoutManager, QUndoCommand *parent = nullptr);
 
-    void redo() override;
-    void undo() override;
-    bool mergeWith(const QUndoCommand *command) override;
-    int id() const override;
+protected:
+    void storeGeometries();
+    void restoreGeometries();
+    void applyNewPos();
+    void restoreCif(msc::MscEntity *entity, const QString &cifText) const;
 
-private:
-    QPointer<msc::MscCondition> m_condition;
-    ChartIndex m_newIndex;
-    ChartIndex m_oldIndex;
+    QPointer<MscInstanceEvent> m_event;
+    QHash<MscEntity *, QString> m_eventGeometries;
+    QString m_newCif;
 };
 
-} // ns cmd
-} // ns msc
+} // namespace cmd
+} // namespace msc

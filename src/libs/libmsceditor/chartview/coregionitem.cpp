@@ -139,7 +139,6 @@ void CoregionItem::onManualResizeFinish(shared::ui::GripPoint *gp, const QPointF
     m_bottomMove = QPointF();
 
     instantLayoutUpdate();
-    updateCif();
     Q_EMIT moved(this);
 }
 

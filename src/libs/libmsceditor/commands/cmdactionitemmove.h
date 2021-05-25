@@ -17,8 +17,8 @@
 
 #pragma once
 
-#include "chartbasecommand.h"
 #include "chartindex.h"
+#include "eventmovebasecommand.h"
 
 #include <QPair>
 #include <QPointer>
@@ -29,11 +29,10 @@ class ChartLayoutManager;
 class MscAction;
 class MscChart;
 class MscInstance;
-class MscInstanceEvent;
 
 namespace cmd {
 
-class CmdActionItemMove : public ChartBaseCommand
+class CmdActionItemMove : public EventMoveBaseCommand
 {
 public:
     CmdActionItemMove(msc::MscAction *action, const ChartIndex &newChartIndex, ChartLayoutManager *layoutManager);

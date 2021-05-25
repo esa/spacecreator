@@ -243,7 +243,6 @@ void ConditionItem::onManualMoveProgress(shared::ui::GripPoint *, const QPointF 
 
 void ConditionItem::onManualMoveFinish(shared::ui::GripPoint *, const QPointF &, const QPointF &)
 {
-    updateCif();
     Q_EMIT moved(this);
 }
 

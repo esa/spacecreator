@@ -18,6 +18,7 @@
 
 #include "cmdactionitemmove.h"
 
+#include "actionitem.h"
 #include "commandids.h"
 #include "mscaction.h"
 #include "mscchart.h"
@@ -28,7 +29,7 @@ namespace cmd {
 
 CmdActionItemMove::CmdActionItemMove(
         MscAction *action, const ChartIndex &newChartIndex, ChartLayoutManager *layoutManager)
-    : ChartBaseCommand(action, layoutManager)
+    : EventMoveBaseCommand(action, layoutManager)
     , m_action(action)
     , m_newIndex(newChartIndex)
 {
@@ -42,6 +43,8 @@ CmdActionItemMove::CmdActionItemMove(
 void CmdActionItemMove::redo()
 {
     if (m_action && m_chart && m_newIndex.isValid()) {
+        storeGeometries();
+        applyNewPos();
         m_chart->updateActionPos(m_action, m_newIndex);
     }
 }
@@ -50,6 +53,7 @@ void CmdActionItemMove::undo()
 {
     if (m_action && m_chart && m_oldIndex.isValid()) {
         m_chart->updateActionPos(m_action, m_oldIndex);
+        restoreGeometries();
     }
 }
 

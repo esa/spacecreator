@@ -213,7 +213,6 @@ void TimerItem::onManualMoveProgress(shared::ui::GripPoint *, const QPointF &fro
 
 void TimerItem::onManualMoveFinish(shared::ui::GripPoint *, const QPointF &, const QPointF &)
 {
-    updateCif();
     Q_EMIT moved(this);
 }
 

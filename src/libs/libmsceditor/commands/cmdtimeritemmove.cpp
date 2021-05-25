@@ -28,7 +28,7 @@ namespace cmd {
 
 CmdTimerItemMove::CmdTimerItemMove(
         msc::MscTimer *timer, const ChartIndex &newChartIndex, ChartLayoutManager *layoutManager)
-    : ChartBaseCommand(timer, layoutManager)
+    : EventMoveBaseCommand(timer, layoutManager)
     , m_timer(timer)
     , m_newIndex(newChartIndex)
 {
@@ -42,6 +42,8 @@ CmdTimerItemMove::CmdTimerItemMove(
 void CmdTimerItemMove::redo()
 {
     if (m_timer && m_chart && m_newIndex.isValid()) {
+        storeGeometries();
+        applyNewPos();
         m_chart->updateTimerPos(m_timer, m_newIndex);
     }
 }
@@ -50,6 +52,7 @@ void CmdTimerItemMove::undo()
 {
     if (m_timer && m_chart && m_oldIndex.isValid()) {
         m_chart->updateTimerPos(m_timer, m_oldIndex);
+        restoreGeometries();
     }
 }
 

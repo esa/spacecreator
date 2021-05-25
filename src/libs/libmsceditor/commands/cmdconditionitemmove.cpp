@@ -29,7 +29,7 @@ namespace cmd {
 
 CmdConditionItemMove::CmdConditionItemMove(
         MscCondition *condition, const ChartIndex &newChartIndex, ChartLayoutManager *layoutManager)
-    : ChartBaseCommand(condition, layoutManager)
+    : EventMoveBaseCommand(condition, layoutManager)
     , m_condition(condition)
     , m_newIndex(newChartIndex)
 {
@@ -43,6 +43,8 @@ CmdConditionItemMove::CmdConditionItemMove(
 void CmdConditionItemMove::redo()
 {
     if (m_condition && m_chart && m_newIndex.isValid()) {
+        storeGeometries();
+        applyNewPos();
         m_chart->updateConditionPos(m_condition, m_newIndex);
     }
 }
@@ -51,6 +53,7 @@ void CmdConditionItemMove::undo()
 {
     if (m_condition && m_chart && m_oldIndex.isValid()) {
         m_chart->updateConditionPos(m_condition, m_oldIndex);
+        restoreGeometries();
     }
 }
 

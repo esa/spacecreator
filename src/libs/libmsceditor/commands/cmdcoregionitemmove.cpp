@@ -17,7 +17,6 @@
 
 #include "cmdcoregionitemmove.h"
 
-#include "chartlayoutmanager.h"
 #include "commandids.h"
 #include "mscchart.h"
 #include "msccoregion.h"
@@ -28,7 +27,7 @@ namespace cmd {
 
 CmdCoRegionItemMove::CmdCoRegionItemMove(MscCoregion *coregionBegin, MscCoregion *coregionEnd, int newBeginPos,
         int newEndPos, MscInstance *newInsance, ChartLayoutManager *layoutManager)
-    : ChartBaseCommand(coregionBegin, layoutManager)
+    : EventMoveBaseCommand(coregionBegin, layoutManager)
     , m_coregionBegin(coregionBegin)
     , m_coregionEnd(coregionEnd)
     , m_oldBeginIndex(m_chart->indexofEventAtInstance(coregionBegin, coregionBegin->instance()))
@@ -44,6 +43,8 @@ CmdCoRegionItemMove::CmdCoRegionItemMove(MscCoregion *coregionBegin, MscCoregion
 void CmdCoRegionItemMove::redo()
 {
     if (m_coregionBegin && m_coregionEnd && m_chart && m_newInstance) {
+        storeGeometries();
+        applyNewPos();
         m_chart->updateCoregionPos(
                 m_coregionBegin.data(), m_coregionEnd.data(), m_newInstance, m_newBeginIndex, m_newEndIndex);
     }
@@ -54,6 +55,7 @@ void CmdCoRegionItemMove::undo()
     if (m_coregionBegin && m_coregionEnd && m_chart && m_oldInstance) {
         m_chart->updateCoregionPos(
                 m_coregionBegin.data(), m_coregionEnd.data(), m_oldInstance, m_oldBeginIndex, m_oldEndIndex);
+        restoreGeometries();
     }
 }
 

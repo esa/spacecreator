@@ -17,8 +17,8 @@
 
 #pragma once
 
-#include "chartbasecommand.h"
 #include "chartindex.h"
+#include "eventmovebasecommand.h"
 
 #include <QPointer>
 
@@ -30,7 +30,7 @@ class MscInstance;
 
 namespace cmd {
 
-class CmdTimerItemMove : public ChartBaseCommand
+class CmdTimerItemMove : public EventMoveBaseCommand
 {
 public:
     CmdTimerItemMove(msc::MscTimer *timer, const ChartIndex &newChartIndex, ChartLayoutManager *layoutManager);

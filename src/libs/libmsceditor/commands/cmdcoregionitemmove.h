@@ -17,7 +17,7 @@
 
 #pragma once
 
-#include "chartbasecommand.h"
+#include "eventmovebasecommand.h"
 
 #include <QPointer>
 
@@ -29,7 +29,7 @@ class MscInstance;
 
 namespace cmd {
 
-class CmdCoRegionItemMove : public ChartBaseCommand
+class CmdCoRegionItemMove : public EventMoveBaseCommand
 {
     Q_OBJECT
 public:

@@ -114,6 +114,8 @@ target_sources(${LIB_NAME} PRIVATE
     commands/cmdtimeritemmove.cpp
     commands/cmdtimeritemmove.h
     commands/commandids.h
+    commands/eventmovebasecommand.cpp
+    commands/eventmovebasecommand.h
     documenttree/documentitemmodel.cpp
     documenttree/documentitemmodel.h
     documenttree/documenttreeview.cpp

@@ -17,8 +17,8 @@
 
 #pragma once
 
-#include "chartbasecommand.h"
 #include "chartindex.h"
+#include "eventmovebasecommand.h"
 
 #include <QHash>
 #include <QPoint>
@@ -33,7 +33,7 @@ class MscMessage;
 
 namespace cmd {
 
-class CmdMessagePointsEdit : public ChartBaseCommand
+class CmdMessagePointsEdit : public EventMoveBaseCommand
 {
 public:
     CmdMessagePointsEdit(MscMessage *message, const QVector<QPoint> &cifPointsOld, const QVector<QPoint> &cifPointsNew,
