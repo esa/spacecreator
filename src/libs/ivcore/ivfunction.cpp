@@ -36,8 +36,6 @@ IVFunction::IVFunction(const QString &title, QObject *parent, const shared::Id &
     : IVFunctionType(IVObject::Type::Function, title, parent, id)
     , d(new IVFunctionPrivate)
 {
-    setEntityAttribute(meta::Props::token(meta::Props::Token::is_type), QStringLiteral("NO"));
-    setEntityAttribute(meta::Props::token(meta::Props::Token::instance_of), QVariant());
 }
 
 IVFunction::~IVFunction() { }
@@ -45,7 +43,21 @@ IVFunction::~IVFunction() { }
 bool IVFunction::postInit(QString *warning)
 {
     Q_UNUSED(warning);
-    return true;
+
+    if (auto objModel = model()) {
+        const QString typeName =
+                entityAttributeValue(meta::Props::token(meta::Props::Token::instance_of)).value<QString>();
+        if (!typeName.isEmpty()) {
+            const QHash<QString, IVFunctionType *> types = objModel->getAvailableFunctionTypes(this);
+            if (auto typeObj = types.value(typeName)) {
+                setInstanceOf(typeObj);
+            } else {
+                return false;
+            }
+        }
+    }
+
+    return IVObject::postInit(warning);
 }
 
 void IVFunction::setInstanceOf(IVFunctionType *fnType)

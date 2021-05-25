@@ -59,6 +59,8 @@ public:
     IVFunction *getFunction(const QString &name, Qt::CaseSensitivity caseSensitivity) const;
     IVFunctionType *getFunctionType(const QString &name, Qt::CaseSensitivity caseSensitivity) const;
     IVFunctionType *getFunctionType(const shared::Id &id) const;
+    IVFunctionType *getSharedFunctionType(const QString &name, Qt::CaseSensitivity caseSensitivity) const;
+    IVFunctionType *getSharedFunctionType(const shared::Id &id) const;
     QHash<QString, IVFunctionType *> getAvailableFunctionTypes(const IVFunction *fnObj) const;
     IVInterface *getInterface(const shared::Id &id) const;
     IVInterfaceRequired *getRequiredInterface(const shared::Id &id) const;

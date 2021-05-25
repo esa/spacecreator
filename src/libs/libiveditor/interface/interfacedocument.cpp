@@ -268,18 +268,18 @@ bool InterfaceDocument::loadAvailableComponents()
 {
     bool result = true;
 
-    d->importModel->clear();
-    QDirIterator importableIt(ive::componentsLibraryPath(), QDir::Dirs | QDir::NoDotAndDotDot);
-    while (importableIt.hasNext()) {
-        result |= loadComponentModel(
-                d->importModel, importableIt.next() + QDir::separator() + kDefaultInterfaceViewFileName);
-    }
-
     d->sharedModel->clear();
     QDirIterator instantiatableIt(ive::sharedTypesPath(), QDir::Dirs | QDir::NoDotAndDotDot);
     while (instantiatableIt.hasNext()) {
         result |= loadComponentModel(
                 d->sharedModel, instantiatableIt.next() + QDir::separator() + kDefaultInterfaceViewFileName);
+    }
+
+    d->importModel->clear();
+    QDirIterator importableIt(ive::componentsLibraryPath(), QDir::Dirs | QDir::NoDotAndDotDot);
+    while (importableIt.hasNext()) {
+        result |= loadComponentModel(
+                d->importModel, importableIt.next() + QDir::separator() + kDefaultInterfaceViewFileName);
     }
 
     return result;

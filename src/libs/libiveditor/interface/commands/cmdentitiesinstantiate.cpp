@@ -19,6 +19,7 @@
 
 #include "baseitems/common/ivutils.h"
 #include "cmdentityattributechange.h"
+#include "cmdinterfaceitemcreate.h"
 #include "commandids.h"
 #include "graphicsviewutils.h"
 #include "ivfunction.h"
@@ -57,18 +58,29 @@ CmdEntitiesInstantiate::CmdEntitiesInstantiate(
             new ivm::IVFunction({}, m_parent ? qobject_cast<QObject *>(m_parent) : qobject_cast<QObject *>(m_model));
     m_instantiatedEntity->setTitle(
             ivm::IVNameValidator::nameForInstance(m_instantiatedEntity, entity->title() + QLatin1String("_Instance_")));
-    m_instantiatedEntity->setCoordinates(entity->coordinates());
 
-    const QRectF typeGeometry = shared::graphicsviewutils::rect(entity->coordinates());
-    m_offset = pos - typeGeometry.topLeft();
+    QRectF typeGeometry = shared::graphicsviewutils::rect(entity->coordinates());
+    typeGeometry.moveTo(pos);
+    m_instantiatedEntity->setCoordinates(shared::graphicsviewutils::coordinates(typeGeometry));
+
+    m_subCmds.append(new CmdEntityAttributeChange(m_instantiatedEntity,
+            { { ivm::meta::Props::token(ivm::meta::Props::Token::is_type), QLatin1String("NO") } }));
+
+    for (auto iface : entity->interfaces()) {
+        const ivm::IVInterface::CreationInfo clone =
+                ivm::IVInterface::CreationInfo::cloneIface(iface, m_instantiatedEntity);
+        auto cmdRm = new CmdInterfaceItemCreate(clone);
+        m_subCmds.append(cmdRm);
+    }
+
     const QString nameKey = ivm::meta::Props::token(ivm::meta::Props::Token::instance_of);
-    m_subCmd = new CmdEntityAttributeChange(m_instantiatedEntity, { { nameKey, entity->title() } });
+    m_subCmds.append(new CmdEntityAttributeChange(m_instantiatedEntity, { { nameKey, entity->title() } }));
 }
 
 CmdEntitiesInstantiate::~CmdEntitiesInstantiate()
 {
-    delete m_subCmd;
-    m_subCmd = nullptr;
+    qDeleteAll(m_subCmds);
+    m_subCmds.clear();
 
     if (m_instantiatedEntity && !m_instantiatedEntity->parent())
         delete m_instantiatedEntity;
@@ -81,16 +93,18 @@ void CmdEntitiesInstantiate::redo()
             m_parent->addChild(m_instantiatedEntity);
         }
         m_model->addObject(m_instantiatedEntity);
-        m_subCmd->redo();
-        shiftObjects({ m_instantiatedEntity }, m_offset);
+        for (QUndoCommand *cmd : qAsConst(m_subCmds)) {
+            cmd->redo();
+        }
     }
 }
 
 void CmdEntitiesInstantiate::undo()
 {
     if (!m_instantiatedEntity.isNull()) {
-        shiftObjects({ m_instantiatedEntity }, -m_offset);
-        m_subCmd->undo();
+        for (QUndoCommand *cmd : qAsConst(m_subCmds)) {
+            cmd->undo();
+        }
         m_model->removeObject(m_instantiatedEntity);
         if (m_parent) {
             m_parent->removeChild(m_instantiatedEntity);

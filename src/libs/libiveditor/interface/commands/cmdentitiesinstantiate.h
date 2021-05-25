@@ -36,8 +36,8 @@ class CmdEntityAttributeChange;
 class CmdEntitiesInstantiate : public QUndoCommand
 {
 public:
-    explicit CmdEntitiesInstantiate(ivm::IVFunctionType *entity, ivm::IVFunctionType *parent,
-            ivm::IVModel *model, const QPointF &pos);
+    explicit CmdEntitiesInstantiate(
+            ivm::IVFunctionType *entity, ivm::IVFunctionType *parent, ivm::IVModel *model, const QPointF &pos);
     ~CmdEntitiesInstantiate() override;
 
     void redo() override;
@@ -49,8 +49,7 @@ private:
     QPointer<ivm::IVFunctionType> m_parent;
     QPointer<ivm::IVModel> m_model;
     QPointer<ivm::IVFunction> m_instantiatedEntity;
-    QPointF m_offset;
-    CmdEntityAttributeChange *m_subCmd { nullptr };
+    QList<QUndoCommand *> m_subCmds;
 };
 
 } // namespace ive

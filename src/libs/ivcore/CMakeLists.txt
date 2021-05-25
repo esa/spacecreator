@@ -43,6 +43,8 @@ target_sources(${LIB_NAME} PRIVATE
     propertytemplateconfig.h
     ivlibrary.cpp
     ivlibrary.h
+    ivcoreutils.cpp
+    ivcoreutils.h
     ivresources.qrc
 )
 

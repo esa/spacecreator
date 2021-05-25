@@ -53,7 +53,6 @@ IVFunctionType::IVFunctionType(const IVObject::Type t, const QString &title, QOb
     : IVObject(t, title, parent, id)
     , d(new IVFunctionTypePrivate)
 {
-    setEntityAttribute(meta::Props::token(meta::Props::Token::is_type), QStringLiteral("YES"));
 }
 
 IVFunctionType::~IVFunctionType() { }
@@ -168,6 +167,12 @@ bool IVFunctionType::removeChild(IVObject *child)
     }
 
     return false;
+}
+
+bool IVFunctionType::postInit(QString *warning)
+{
+    setEntityAttribute(meta::Props::token(meta::Props::Token::is_type), QStringLiteral("YES"));
+    return IVObject::postInit(warning);
 }
 
 QVector<IVFunctionType *> IVFunctionType::functionTypes() const

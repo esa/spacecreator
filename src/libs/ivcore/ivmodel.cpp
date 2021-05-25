@@ -203,6 +203,18 @@ IVFunctionType *IVModel::getFunctionType(const shared::Id &id) const
     return qobject_cast<IVFunction *>(getObject(id));
 }
 
+IVFunctionType *IVModel::getSharedFunctionType(const QString &name, Qt::CaseSensitivity caseSensitivity) const
+{
+    return d->m_sharedTypesModel ? qobject_cast<IVFunction *>(
+                   d->m_sharedTypesModel->getObjectByName(name, IVObject::Type::FunctionType, caseSensitivity))
+                                 : nullptr;
+}
+
+IVFunctionType *IVModel::getSharedFunctionType(const shared::Id &id) const
+{
+    return d->m_sharedTypesModel ? qobject_cast<IVFunction *>(d->m_sharedTypesModel->getObject(id)) : nullptr;
+}
+
 QHash<QString, IVFunctionType *> IVModel::getAvailableFunctionTypes(const IVFunction *fnObj) const
 {
     QHash<QString, IVFunctionType *> result;

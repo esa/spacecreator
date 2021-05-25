@@ -23,6 +23,7 @@
 #include "commandids.h"
 
 #include <QDebug>
+#include <ivcoreutils.h>
 #include <ivfunction.h>
 #include <ivmodel.h>
 
@@ -220,26 +221,10 @@ void CmdEntityAttributeChange::prepareSetFunctionTypeCommands(const ivm::IVFunct
     if (useOppositeCommands(m_cmdSet, m_cmdUnset, fnTypeId))
         return;
 
-    // Detect an iface which has been just created instead of being properly cloned (the XML file loading).
-    // For now it's only a name- and direction-based check. In case there are two or more ifaces with the same name,
-    // the first one found in IVFunctionType::interfaces is used.
-    auto findExistingClone = [this](ivm::IVInterface *protoIface) -> ivm::IVInterface * {
-        auto mayBeClone = [protoIface](const ivm::IVInterface *iface) {
-            return iface->direction() == protoIface->direction() && iface->title() == protoIface->title();
-        };
-
-        if (protoIface)
-            for (auto iface : m_function->interfaces())
-                if (mayBeClone(iface))
-                    return iface;
-
-        return nullptr;
-    };
-
     Commands &cmdStorage = m_cmdSet[fnTypeId];
     const QVector<ivm::IVInterface *> &fnTypeIfaces = fnType->interfaces();
     for (auto fnTypeIface : fnTypeIfaces) {
-        if (ivm::IVInterface *existingIface = findExistingClone(fnTypeIface)) {
+        if (ivm::IVInterface *existingIface = ivm::utils::findExistingClone(m_function, fnTypeIface)) {
             existingIface->setCloneOrigin(fnTypeIface);
         } else {
             const ivm::IVInterface::CreationInfo clone =

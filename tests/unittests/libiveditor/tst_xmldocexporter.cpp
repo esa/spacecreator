@@ -161,6 +161,7 @@ void tst_XmlDocExporter::testExportFunctions()
 {
     auto testfunc1 = new ivm::IVFunction("TestFunc1", m_doc.get());
     testfunc1->setEntityAttribute(QLatin1String("foo"), QVariant::fromValue(11));
+    testfunc1->setEntityAttribute(QLatin1String("instance_of"), QString());
     testfunc1->setEntityProperty(QLatin1String("bar"), QVariant::fromValue(22));
     testfunc1->addContextParam(
             ivm::ContextParameter("Mo", ivm::BasicParameter::Type::Other, "MyInt", QVariant::fromValue(33)));
@@ -201,6 +202,7 @@ void tst_XmlDocExporter::testExportComment()
 void tst_XmlDocExporter::testExportNestedComment()
 {
     auto testfunc1 = new ivm::IVFunction("TestFunc1", m_doc.get());
+    testfunc1->setEntityAttribute(QLatin1String("instance_of"), QString());
     auto testcomment1 = new ivm::IVComment("TestComment1", testfunc1);
     testfunc1->addChild(testcomment1);
 

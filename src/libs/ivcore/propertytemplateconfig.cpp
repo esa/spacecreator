@@ -17,8 +17,8 @@
 
 #include "propertytemplateconfig.h"
 
-#include "ivobject.h"
 #include "common.h"
+#include "ivobject.h"
 #include "propertytemplate.h"
 
 #include <QDebug>
