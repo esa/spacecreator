@@ -52,39 +52,51 @@ static inline void dumpItem(QObject *obj, bool strict = false)
     if (!item)
         return;
 
-    qDebug() << item->metaObject()->className() << "\n" << item->entity()->props() << "\n" << item->entity()->attrs();
+    qInfo() << item->metaObject()->className() << ":\n";
+
+    if (auto fn = qobject_cast<ive::IVFunctionGraphicsItem *>(obj)) {
+        const bool isInheritFnT = fn->entity()->inheritsFunctionType();
+        qDebug() << isInheritFnT;
+    }
+
+    for (auto attr : item->entity()->entityAttributes()) {
+        qInfo() << attr.name() << ":\t" << attr.value() << "\n";
+    }
 
     if (auto iface = qobject_cast<ive::IVInterfaceGraphicsItem *>(item)) {
-        qDebug() << "\nGraphics Iface geometry:\n" << iface->scenePos() << "\n" << iface->sceneBoundingRect() << "\n";
-        qDebug() << "\nInternal Iface data:\n"
-                 << iface->entity()->title() << "\n"
-                 << ive::pos(iface->entity()->coordinates()) << "\n";
-        qDebug() << "\n####:\n" << iface->connectionItems();
-        Q_ASSERT(!strict || iface->scenePos().toPoint() == ive::pos(iface->entity()->coordinates()));
+        qInfo() << "\nGraphics Iface geometry:\n" << iface->scenePos() << "\n" << iface->sceneBoundingRect() << "\n";
+        qInfo() << "\nInternal Iface data:\n"
+                << iface->entity()->title() << "\n"
+                << shared::graphicsviewutils::pos(iface->entity()->coordinates()) << "\n";
+        qInfo() << "\n####:\n" << iface->connectionItems();
+        Q_ASSERT(!strict
+                || iface->scenePos().toPoint() == shared::graphicsviewutils::pos(iface->entity()->coordinates()));
     } else if (auto connection = qobject_cast<ive::IVConnectionGraphicsItem *>(item)) {
-        qDebug() << "\nGraphics Connection geometry:\n"
-                 << connection->points() << "\n"
-                 << connection->graphicsPoints() << "\n";
-        qDebug() << "\nInternal Connection data:\n"
-                 << (connection->entity()->title().isEmpty() ? QStringLiteral("Connection: %1 <=> %2")
-                                                                       .arg(connection->startItem()->entity()->title(),
-                                                                               connection->endItem()->entity()->title())
-                                                             : connection->entity()->title())
-                 << "\n"
-                 << ive::polygon(connection->entity()->coordinates()) << "\n";
+        qInfo() << "\nGraphics Connection geometry:\n"
+                << connection->points() << "\n"
+                << connection->graphicsPoints() << "\n";
+        qInfo() << "\nInternal Connection data:\n"
+                << (connection->entity()->title().isEmpty() ? QStringLiteral("Connection: %1 <=> %2")
+                                                                      .arg(connection->startItem()->entity()->title(),
+                                                                              connection->endItem()->entity()->title())
+                                                            : connection->entity()->title())
+                << "\n"
+                << shared::graphicsviewutils::polygon(connection->entity()->coordinates()) << "\n";
         Q_ASSERT(!strict
-                || ive::comparePolygones(
-                        connection->graphicsPoints(), ive::polygon(connection->entity()->coordinates())));
+                || shared::graphicsviewutils::comparePolygones(connection->graphicsPoints(),
+                        shared::graphicsviewutils::polygon(connection->entity()->coordinates())));
         Q_ASSERT(!strict
-                || ive::comparePolygones(connection->points(), ive::polygon(connection->entity()->coordinates())));
+                || shared::graphicsviewutils::comparePolygones(
+                        connection->points(), shared::graphicsviewutils::polygon(connection->entity()->coordinates())));
     } else if (auto rectItem = qobject_cast<shared::ui::VERectGraphicsItem *>(item)) {
-        qDebug() << "\nGraphics" << rectItem->metaObject()->className() << "geometry:\n"
-                 << rectItem->sceneBoundingRect() << "\n";
-        qDebug() << "\nInternal Function data:\n"
-                 << rectItem->entity()->title() << "\n"
-                 << ive::rect(rectItem->entity()->coordinates()) << "\n";
+        qInfo() << "\nGraphics" << rectItem->metaObject()->className() << "geometry:\n"
+                << rectItem->sceneBoundingRect() << "\n";
+        qInfo() << "\nInternal Function data:\n"
+                << rectItem->entity()->title() << "\n"
+                << shared::graphicsviewutils::rect(rectItem->entity()->coordinates()) << "\n";
         Q_ASSERT(!strict
-                || rectItem->sceneBoundingRect().toRect() == ive::rect(rectItem->entity()->coordinates()).toRect());
+                || rectItem->sceneBoundingRect().toRect()
+                        == shared::graphicsviewutils::rect(rectItem->entity()->coordinates()).toRect());
     } else {
         qFatal("Not implemented trace");
     }

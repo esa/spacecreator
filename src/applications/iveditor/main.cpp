@@ -15,10 +15,10 @@
   along with this program. If not, see <https://www.gnu.org/licenses/lgpl-2.1.html>.
 */
 
-#include "ivlibrary.h"
 #include "commandlineparser.h"
 #include "iveditor.h"
 #include "iveditorcore.h"
+#include "ivlibrary.h"
 #include "mainwindow.h"
 #include "sharedlibrary.h"
 
@@ -29,6 +29,7 @@
 int main(int argc, char *argv[])
 {
     Q_INIT_RESOURCE(asn1_resources);
+
     shared::initSharedLibrary();
     ive::initIVEditor();
     ivm::initIVLibrary();

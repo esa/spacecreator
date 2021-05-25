@@ -188,6 +188,7 @@ void IVFunctionGraphicsItem::onManualResizeFinish(
 
     if (shared::graphicsviewutils::isBounded(this, sceneBoundingRect())
             && !shared::graphicsviewutils::isCollided(this, sceneBoundingRect())) {
+        layoutInterfaces();
         layoutConnectionsOnResize(IVConnectionGraphicsItem::CollisionsPolicy::PartialRebuild);
         updateEntity();
     } else { // Fallback to previous geometry in case colliding with items at the same level
@@ -272,7 +273,7 @@ void IVFunctionGraphicsItem::drawNestedView(QPainter *painter)
         shared::Id innerFunctionId;
     };
     QList<ConnectionData> parentConnections;
-    for (const ivm::IVObject *child : childEntities) {
+    for (const ivm::IVObject *child : qAsConst(childEntities)) {
         const QString strCoordinates = child->entityAttributeValue<QString>(ivm::meta::Props::token(token));
         if (child->type() == ivm::IVObject::Type::Function || child->type() == ivm::IVObject::Type::FunctionType
                 || child->type() == ivm::IVObject::Type::Comment) {
@@ -290,6 +291,8 @@ void IVFunctionGraphicsItem::drawNestedView(QPainter *painter)
                         shared::graphicsviewutils::polygon(ivm::IVObject::coordinatesFromString(strCoordinates));
                 if (!itemScenePoints.isEmpty()) {
                     existingPolygons.insert(child->id(), itemScenePoints);
+                } else {
+                    /// TODO:
                 }
             } else {
                 ivm::IVObject *outerIface = connection->source()->id() == entity()->id() ? connection->sourceInterface()

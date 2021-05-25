@@ -205,10 +205,21 @@ void IVFunctionTypeGraphicsItem::updateText()
     }
 }
 
+void IVFunctionTypeGraphicsItem::layoutInterfaces()
+{
+    for (auto child : childItems()) {
+        if (child->type() == IVInterfaceGraphicsItem::Type) {
+            if (auto iObj = qgraphicsitem_cast<IVInterfaceGraphicsItem *>(child)) {
+                iObj->adjustItem();
+            }
+        }
+    }
+}
+
 void IVFunctionTypeGraphicsItem::onManualResizeProgress(
         shared::ui::GripPoint *grip, const QPointF &from, const QPointF &to)
 {
-    const QRectF rect = sceneBoundingRect();
+    const QRectF rect = shared::graphicsviewutils::rect(entity()->coordinates());
 
     shared::ui::VERectGraphicsItem::onManualResizeProgress(grip, from, to);
     const QPointF delta = to - from;
@@ -235,6 +246,13 @@ void IVFunctionTypeGraphicsItem::onManualResizeProgress(
             iface->setPos(iface->parentItem()->mapFromScene(pos));
         }
     }
+}
+
+void IVFunctionTypeGraphicsItem::onManualResizeFinish(
+        shared::ui::GripPoint *grip, const QPointF &from, const QPointF &to)
+{
+    layoutInterfaces();
+    shared::ui::VERectGraphicsItem::onManualResizeFinish(grip, from, to);
 }
 
 QString IVFunctionTypeGraphicsItem::prepareTooltip() const

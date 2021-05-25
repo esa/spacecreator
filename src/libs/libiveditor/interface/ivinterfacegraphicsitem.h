@@ -72,6 +72,7 @@ public:
 
 public Q_SLOTS:
     void updateLabel();
+    void adjustItem();
 
 protected:
     void rebuildLayout() override;
@@ -82,7 +83,6 @@ protected:
 
     void updateInternalItems(Qt::Alignment alignment);
     virtual shared::ColorManager::HandledColors handledColorType() const override;
-    void adjustItem();
     qreal typeIconHeight() const;
     qreal baseLength() const;
 
