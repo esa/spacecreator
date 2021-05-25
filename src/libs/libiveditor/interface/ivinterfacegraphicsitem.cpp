@@ -251,11 +251,14 @@ void IVInterfaceGraphicsItem::rebuildLayout()
     const QRectF parentRect = targetItem()->boundingRect();
     QPointF ifacePos = pos();
     Qt::Alignment side = Qt::AlignCenter;
+    bool updateGeometry = false;
     if (entity() && shared::graphicsviewutils::pos(entity()->coordinates()).isNull()) {
         if (auto origin = entity()->cloneOf()) {
             ifacePos = mapPositionFromOrigin(origin, ivm::meta::Props::Token::coordinates, parentRect, &side);
+            updateGeometry = true;
         } else {
             layout();
+            mergeGeometry();
             return;
         }
     } else {
@@ -264,6 +267,8 @@ void IVInterfaceGraphicsItem::rebuildLayout()
     const QPointF stickyPos = shared::graphicsviewutils::getSidePosition(parentRect, ifacePos, side);
     setPos(stickyPos);
     updateInternalItems(side);
+    if (updateGeometry)
+        mergeGeometry();
 }
 
 QPainterPath IVInterfaceGraphicsItem::shape() const
@@ -398,11 +403,12 @@ void IVInterfaceGraphicsItem::onManualMoveProgress(shared::ui::GripPoint *, cons
     if (shift.isNull())
         return;
 
-    const QPointF newPos = scenePos() + shift;
+    const QPointF newScenePos = scenePos() + shift;
+    const QPointF mappedPos = mapToParent(mapFromScene(newScenePos));
     const QRectF parentRect = targetItem()->boundingRect();
-    const Qt::Alignment alignment = shared::graphicsviewutils::getNearestSide(parentRect, newPos);
+    const Qt::Alignment alignment = shared::graphicsviewutils::getNearestSide(parentRect, mappedPos);
     updateInternalItems(alignment);
-    setPos(mapToParent(mapFromScene(newPos)));
+    setPos(mappedPos);
     updateGripPoints();
 
     Q_EMIT needUpdateLayout();
