@@ -18,14 +18,14 @@
 #include "cmdentitiesremove.h"
 
 #include "commandids.h"
+#include "ivconnection.h"
+#include "ivconnectiongroup.h"
+#include "ivfunction.h"
+#include "ivfunctiontype.h"
+#include "ivinterface.h"
+#include "ivmodel.h"
+#include "ivobject.h"
 
-#include <ivconnection.h>
-#include <ivconnectiongroup.h>
-#include <ivfunction.h>
-#include <ivfunctiontype.h>
-#include <ivinterface.h>
-#include <ivmodel.h>
-#include <ivobject.h>
 namespace ive {
 namespace cmd {
 
@@ -41,13 +41,7 @@ CmdEntitiesRemove::CmdEntitiesRemove(const QList<QPointer<ivm::IVObject>> &entit
     }
 }
 
-CmdEntitiesRemove::~CmdEntitiesRemove()
-{
-    const QVector<QPointer<ivm::IVObject>> objects = m_relatedIfaces + m_relatedConnections + m_relatedEntities;
-    for (ivm::IVObject *obj : objects)
-        if (obj && !obj->parent())
-            delete obj;
-}
+CmdEntitiesRemove::~CmdEntitiesRemove() { }
 
 ivm::IVFunctionType *CmdEntitiesRemove::putParentFunctionFor(const ivm::IVObject *obj)
 {
@@ -77,6 +71,8 @@ void CmdEntitiesRemove::advancedRemove(ivm::IVObject *obj)
 
     if (fn)
         fn->removeChild(obj);
+
+    obj->setParent(this);
 }
 
 void CmdEntitiesRemove::advancedRestore(ivm::IVObject *obj)
@@ -98,7 +94,7 @@ void CmdEntitiesRemove::redo()
 
     auto removeIVObjects = [this](const QVector<QPointer<ivm::IVObject>> &collection) {
         for (auto it = collection.cbegin(); it != collection.cend(); ++it) {
-            if ((*it)->type() == ivm::IVObject::Type::Connection) {
+            if (!it->isNull() && (*it)->type() == ivm::IVObject::Type::Connection) {
                 if (auto *connection = qobject_cast<ivm::IVConnection *>(*it)) {
                     connection->unsetInheritPI();
                 }
@@ -121,7 +117,7 @@ void CmdEntitiesRemove::undo()
 
     auto restoreIVObjects = [this](const QVector<QPointer<ivm::IVObject>> &collection) {
         for (auto it = collection.crbegin(); it != collection.crend(); ++it) {
-            if ((*it)->type() == ivm::IVObject::Type::Connection) {
+            if (!it->isNull() && (*it)->type() == ivm::IVObject::Type::Connection) {
                 if (auto *connection = qobject_cast<ivm::IVConnection *>(*it)) {
                     connection->setInheritPI();
                 }

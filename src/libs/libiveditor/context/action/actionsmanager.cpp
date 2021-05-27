@@ -314,6 +314,12 @@ QMap<QString, ActionsManager::ScriptableActionHandler> ActionsManager::scriptabl
     return instance()->m_qactions;
 }
 
+void ActionsManager::clearActions()
+{
+    m_actions.clear();
+    m_qactions.clear();
+}
+
 QStringList ActionsManager::scriptableActionNames()
 {
     return scriptableActions().keys();

@@ -59,6 +59,8 @@ public:
 
     static QMap<QString, ActionsManager::ScriptableActionHandler> scriptableActions();
 
+    void clearActions();
+
 private:
     static ActionsManager *m_instance;
 

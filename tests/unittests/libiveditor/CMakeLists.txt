@@ -1,4 +1,5 @@
 addQtTest(tst_ivconnectiongraphicsitem libiveditor)
+addQtTest(tst_cmdentitiesremove libiveditor)
 addQtTest(tst_ivinterfacegraphicsitem libiveditor)
 addQtTest(tst_attributesconfigure libiveditor "default_attributes.xml;rsc.qrc")
 addQtTest(tst_connectionutils libiveditor)
