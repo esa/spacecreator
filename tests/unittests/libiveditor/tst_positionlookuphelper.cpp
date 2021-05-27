@@ -58,10 +58,10 @@ void tst_PositionLookupHelper::testOnSide(
 {
     QList<QRectF> siblingsRects;
     for (int idx = 0; idx < itemRects.size(); ++idx) {
-        ive::PositionLookupHelper clockwiseHelper(
-                sidePaths, parentBoundingRect, siblingsRects, itemRects.value(idx), initialOffset, true);
-        ive::PositionLookupHelper counterClockwiseHelper(
-                sidePaths, parentBoundingRect, siblingsRects, itemRects.value(idx), initialOffset, false);
+        ive::PositionLookupHelper clockwiseHelper(sidePaths, parentBoundingRect, siblingsRects, itemRects.value(idx),
+                initialOffset, shared::graphicsviewutils::LookupDirection::Clockwise);
+        ive::PositionLookupHelper counterClockwiseHelper(sidePaths, parentBoundingRect, siblingsRects,
+                itemRects.value(idx), initialOffset, shared::graphicsviewutils::LookupDirection::CounterClockwise);
         while (clockwiseHelper.hasNext() || counterClockwiseHelper.hasNext()) {
             if (clockwiseHelper.lookup()) {
                 if (clockwiseHelper.isSideChanged())

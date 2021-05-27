@@ -521,9 +521,10 @@ QRectF alignRectToSide(
  * Moves \a itemRect on the \a side from \a intersectedItemRect
  */
 
-QRectF adjustedRect(
-        const QRectF &itemRect, const QRectF &intersectedItemRect, const Qt::Alignment side, const bool clockwise)
+QRectF adjustedRect(const QRectF &itemRect, const QRectF &intersectedItemRect, const Qt::Alignment side,
+        const LookupDirection direction)
 {
+    const bool clockwise = direction == LookupDirection::Clockwise;
     QRectF resultRect { itemRect };
     switch (side) {
     case Qt::AlignLeft:

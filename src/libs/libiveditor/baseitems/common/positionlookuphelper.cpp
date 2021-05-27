@@ -17,8 +17,6 @@
 
 #include "positionlookuphelper.h"
 
-#include "graphicsviewutils.h"
-
 #include <QTransform>
 #include <QtDebug>
 #include <QtMath>
@@ -27,7 +25,7 @@ namespace ive {
 
 PositionLookupHelper::PositionLookupHelper(const QHash<Qt::Alignment, QPainterPath> &sidePaths,
         const QRectF &parentRect, const QList<QRectF> &siblingsRects, const QRectF &itemRect,
-        const QPointF &originPoint, const bool clockwise)
+        const QPointF &originPoint, const shared::graphicsviewutils::LookupDirection direction)
     : m_sidePaths(sidePaths)
     , m_siblingsRects(siblingsRects)
     , m_parentRect(parentRect)
@@ -36,8 +34,8 @@ PositionLookupHelper::PositionLookupHelper(const QHash<Qt::Alignment, QPainterPa
     , m_intersectedRect()
     , m_itemRect(itemRect)
     , m_offset(originPoint)
+    , m_direction(direction)
     , m_sideIdx(m_initialSideIdx)
-    , m_clockwise(clockwise)
 {
     shared::graphicsviewutils::isCollided(m_siblingsRects, m_itemRect, &m_intersectedRect);
 }
@@ -69,7 +67,7 @@ bool PositionLookupHelper::nextRect()
 {
     if (shared::graphicsviewutils::isCollided(m_siblingsRects, m_itemRect, &m_intersectedRect)) {
         m_itemRect = shared::graphicsviewutils::adjustedRect(
-                m_itemRect, m_intersectedRect, shared::graphicsviewutils::sideFromIndex(m_sideIdx), m_clockwise);
+                m_itemRect, m_intersectedRect, shared::graphicsviewutils::sideFromIndex(m_sideIdx), m_direction);
         return true;
     }
     return false;
@@ -77,7 +75,7 @@ bool PositionLookupHelper::nextRect()
 
 void PositionLookupHelper::nextSide()
 {
-    if (m_clockwise)
+    if (m_direction == shared::graphicsviewutils::LookupDirection::Clockwise)
         ++m_sideIdx;
     else
         --m_sideIdx;

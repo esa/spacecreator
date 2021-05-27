@@ -36,6 +36,12 @@ enum class IntersectionType
     Multiple,
 };
 
+enum class LookupDirection
+{
+    CounterClockwise,
+    Clockwise,
+};
+
 QPainterPath lineShape(const QLineF &line, qreal span);
 QPainterPath edgeCuttedRectShape(const QRectF &rect, qreal cut);
 
@@ -62,8 +68,8 @@ bool alignedLine(QLineF &line, int angleTolerance = 10);
 QRectF alignRectToSide(
         const QRectF &boundingRect, const QRectF &itemRect, Qt::Alignment side, const QPointF &originPointOffset);
 
-QRectF adjustedRect(
-        const QRectF &itemRect, const QRectF &intersectedItemRect, const Qt::Alignment side, const bool clockwise);
+QRectF adjustedRect(const QRectF &itemRect, const QRectF &intersectedItemRect, const Qt::Alignment side,
+        const LookupDirection direction);
 
 Qt::Alignment sideFromIndex(const int idx);
 int indexFromSide(Qt::Alignment side);

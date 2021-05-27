@@ -25,12 +25,15 @@ class QSvgRenderer;
 
 namespace ive {
 class IVInterfaceGraphicsItem;
+class MiniViewRenderer;
 
 class IVFunctionGraphicsItem : public IVFunctionTypeGraphicsItem
 {
     Q_OBJECT
 public:
     explicit IVFunctionGraphicsItem(ivm::IVFunction *entity, QGraphicsItem *parent = nullptr);
+    ~IVFunctionGraphicsItem() override;
+
     enum
     {
         Type = UserType + static_cast<int>(ivm::IVObject::Type::Function)
@@ -66,10 +69,8 @@ private:
     void layoutConnectionsOnMove(IVConnectionGraphicsItem::CollisionsPolicy collisionsPolicy);
     void layoutConnectionsOnResize(IVConnectionGraphicsItem::CollisionsPolicy collisionsPolicy);
 
-    void drawNestedView(QPainter *painter);
-
 private:
     static QPointer<QSvgRenderer> m_svgRenderer;
+    std::unique_ptr<MiniViewRenderer> m_miniViewDrawer;
 };
-
 }

@@ -17,6 +17,8 @@
 
 #pragma once
 
+#include "graphicsviewutils.h"
+
 #include <QHash>
 #include <QPainterPath>
 #include <qnamespace.h>
@@ -43,9 +45,9 @@ namespace ive {
 class PositionLookupHelper
 {
 public:
-    PositionLookupHelper(const QHash<Qt::Alignment, QPainterPath> &sidePaths, const QRectF &parentRect,
+    explicit PositionLookupHelper(const QHash<Qt::Alignment, QPainterPath> &sidePaths, const QRectF &parentRect,
             const QList<QRectF> &siblingsRects, const QRectF &itemRect, const QPointF &originPoint,
-            const bool clockwise);
+            const shared::graphicsviewutils::LookupDirection direction);
 
     /*!
      * Performs next lookup iteration
@@ -99,8 +101,8 @@ private:
     QRectF m_intersectedRect;
     QRectF m_itemRect;
     QPointF m_offset;
+    shared::graphicsviewutils::LookupDirection m_direction;
     int m_sideIdx;
-    bool m_clockwise;
 };
 
 } // namespace ive

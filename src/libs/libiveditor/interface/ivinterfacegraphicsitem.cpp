@@ -467,8 +467,10 @@ void IVInterfaceGraphicsItem::adjustItem()
             { Qt::AlignRight, itemPath(Qt::AlignRight) },
             { Qt::AlignBottom, itemPath(Qt::AlignBottom) },
         };
-        PositionLookupHelper cwHelper(kSidePaths, parentRect, siblingsRects, itemRect, initialOffset, true);
-        PositionLookupHelper ccwHelper(kSidePaths, parentRect, siblingsRects, itemRect, initialOffset, false);
+        PositionLookupHelper cwHelper(kSidePaths, parentRect, siblingsRects, itemRect, initialOffset,
+                shared::graphicsviewutils::LookupDirection::Clockwise);
+        PositionLookupHelper ccwHelper(kSidePaths, parentRect, siblingsRects, itemRect, initialOffset,
+                shared::graphicsviewutils::LookupDirection::CounterClockwise);
         while (cwHelper.hasNext() || ccwHelper.hasNext()) {
             if (cwHelper.lookup()) {
                 if (cwHelper.isSideChanged())

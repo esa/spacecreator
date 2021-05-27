@@ -184,6 +184,8 @@ target_sources(${LIB_NAME} PRIVATE
     zoomcontroller.h
     interface/ivvisualizationmodelbase.cpp
     interface/ivvisualizationmodelbase.h
+    interface/miniviewrenderer.cpp
+    interface/miniviewrenderer.h
 )
 
 target_link_libraries(${LIB_NAME}

@@ -28,6 +28,7 @@
 #include "ivfunctionnamegraphicsitem.h"
 #include "ivinterfacegraphicsitem.h"
 #include "ivmodel.h"
+#include "miniviewrenderer.h"
 
 #include <QApplication>
 #include <QGraphicsScene>
@@ -91,6 +92,7 @@ QPointer<QSvgRenderer> IVFunctionGraphicsItem::m_svgRenderer = {};
 
 IVFunctionGraphicsItem::IVFunctionGraphicsItem(ivm::IVFunction *entity, QGraphicsItem *parent)
     : IVFunctionTypeGraphicsItem(entity, parent)
+    , m_miniViewDrawer(std::make_unique<MiniViewRenderer>(this))
 {
     m_textItem->setVisible(!isRootItem());
     m_textItem->setTextAlignment(Qt::AlignCenter);
@@ -98,6 +100,8 @@ IVFunctionGraphicsItem::IVFunctionGraphicsItem(ivm::IVFunction *entity, QGraphic
     if (!m_svgRenderer) // TODO: change icon
         m_svgRenderer = new QSvgRenderer(QLatin1String(":/tab_interface/toolbar/icns/change_root.svg"));
 }
+
+IVFunctionGraphicsItem::~IVFunctionGraphicsItem() { }
 
 void IVFunctionGraphicsItem::init()
 {
@@ -142,8 +146,7 @@ void IVFunctionGraphicsItem::paint(QPainter *painter, const QStyleOptionGraphics
         QRectF iconRect { QPointF(0, 0), m_svgRenderer->defaultSize() };
         iconRect.moveTopRight(br.adjusted(kRadius, kRadius, -kRadius, -kRadius).topRight());
         m_svgRenderer->render(painter, iconRect);
-
-        drawNestedView(painter);
+        m_miniViewDrawer->render(painter);
     }
 
     painter->restore();
@@ -215,197 +218,6 @@ void IVFunctionGraphicsItem::onManualMoveFinish(
     } else { // Fallback to previous geometry in case colliding with items at the same level
         updateFromEntity();
         layoutConnectionsOnMove(IVConnectionGraphicsItem::CollisionsPolicy::Ignore);
-    }
-}
-
-static inline void drawItems(
-        const QRectF &boundingRect, const QList<QRectF> &existingRects, int count, const qreal sf, QPainter *painter)
-{
-    QRectF childRect { QPointF(), shared::graphicsviewutils::kDefaultGraphicsItemSize * sf };
-    const qreal yOffset = sf
-            * (shared::graphicsviewutils::kContentMargins.top() + shared::graphicsviewutils::kContentMargins.bottom());
-    const qreal xOffset = sf
-            * (shared::graphicsviewutils::kContentMargins.left() + shared::graphicsviewutils::kContentMargins.right());
-    const int column = boundingRect.width() / (childRect.width() + xOffset);
-    const int row = boundingRect.height() / (childRect.height() + yOffset);
-    if (!count || !column || !row) {
-        return;
-    }
-    for (int idx = 0; idx < count && idx < column * row;) {
-        const int currentRow = idx / column;
-        const int currentColumn = idx % column;
-        childRect.moveTopLeft(boundingRect.topLeft()
-                + QPointF((childRect.width() + xOffset) * currentColumn, (childRect.height() + yOffset) * currentRow));
-        auto it = std::find_if(existingRects.cbegin(), existingRects.cend(),
-                [childRect](const QRectF &r) { return r.intersects(childRect); });
-        if (it == existingRects.cend()) {
-            painter->drawRect(childRect);
-            ++idx;
-        }
-    }
-};
-
-void IVFunctionGraphicsItem::drawNestedView(QPainter *painter)
-{
-    if (!entity()->hasNestedChildren()) {
-        return;
-    }
-
-    painter->save();
-    auto cleanup = qScopeGuard([painter] { painter->restore(); });
-
-    const QRectF br = boundingRect();
-
-    const shared::ColorHandler ch =
-            shared::ColorManager::instance()->colorsForItem(shared::ColorManager::FunctionScale);
-    painter->setBrush(ch.brush());
-    painter->setPen(QPen(ch.penColor(), ch.penWidth()));
-
-    QRectF nestedRect;
-    const QVector<ivm::IVObject *> childEntities = entity()->children();
-    static const ivm::meta::Props::Token token = ivm::meta::Props::Token::InnerCoordinates;
-    QList<shared::Id> itemsCountWithoutGeometry;
-    QHash<shared::Id, QRectF> existingRects;
-    QHash<shared::Id, QPolygonF> existingPolygons;
-    struct ConnectionData {
-        QPointF outerMappedScenePos;
-        QPointF innerScenePos;
-        shared::Id innerFunctionId;
-    };
-    QList<ConnectionData> parentConnections;
-    for (const ivm::IVObject *child : qAsConst(childEntities)) {
-        const QString strCoordinates = child->entityAttributeValue<QString>(ivm::meta::Props::token(token));
-        if (child->type() == ivm::IVObject::Type::Function || child->type() == ivm::IVObject::Type::FunctionType
-                || child->type() == ivm::IVObject::Type::Comment) {
-            const QRectF itemSceneRect =
-                    shared::graphicsviewutils::rect(ivm::IVObject::coordinatesFromString(strCoordinates));
-            if (itemSceneRect.isValid()) {
-                nestedRect |= itemSceneRect;
-                existingRects.insert(child->id(), itemSceneRect);
-            } else {
-                itemsCountWithoutGeometry.append(child->id());
-            }
-        } else if (auto connection = qobject_cast<const ivm::IVConnection *>(child)) {
-            if (connection->source()->id() != entity()->id() && connection->target()->id() != entity()->id()) {
-                const QPolygonF itemScenePoints =
-                        shared::graphicsviewutils::polygon(ivm::IVObject::coordinatesFromString(strCoordinates));
-                if (!itemScenePoints.isEmpty()) {
-                    existingPolygons.insert(child->id(), itemScenePoints);
-                } else {
-                    /// TODO:
-                }
-            } else {
-                ivm::IVObject *outerIface = connection->source()->id() == entity()->id() ? connection->sourceInterface()
-                        : connection->target()->id() == entity()->id()                   ? connection->targetInterface()
-                                                                                         : nullptr;
-
-                ivm::IVObject *innerIface = connection->source()->id() == entity()->id() ? connection->targetInterface()
-                        : connection->target()->id() == entity()->id()                   ? connection->sourceInterface()
-                                                                                         : nullptr;
-
-                if (!outerIface || !innerIface) {
-                    continue;
-                }
-
-                const auto items = childItems();
-                auto it = std::find_if(
-                        items.cbegin(), items.cend(), [ifaceId = outerIface->id()](const QGraphicsItem *item) {
-                            if (item->type() != IVInterfaceGraphicsItem::Type) {
-                                return false;
-                            } else if (auto iface = qgraphicsitem_cast<const IVInterfaceGraphicsItem *>(item)) {
-                                return iface->entity()->id() == ifaceId;
-                            } else {
-                                return false;
-                            }
-                        });
-                if (it == items.cend()) {
-                    continue;
-                }
-
-                QPointF innerIfacePos;
-                if (innerIface->hasEntityAttribute(ivm::meta::Props::token(token))) {
-                    const QString ifaceStrCoordinates =
-                            innerIface->entityAttributeValue<QString>(ivm::meta::Props::token(token));
-                    innerIfacePos =
-                            shared::graphicsviewutils::pos(ivm::IVObject::coordinatesFromString(ifaceStrCoordinates));
-                }
-                ConnectionData cd { (*it)->scenePos(), innerIfacePos, innerIface->parentObject()->id() };
-                /// TODO: generate path between outer and inner ifaces
-                /// templorary using straight line to present it
-                parentConnections << cd;
-            }
-        }
-    }
-    while (!itemsCountWithoutGeometry.isEmpty()) {
-        const shared::Id id = itemsCountWithoutGeometry.takeLast();
-        QRectF itemRect { QPointF(), shared::graphicsviewutils::kDefaultGraphicsItemSize };
-        shared::graphicsviewutils::findGeometryForRect(itemRect, nestedRect, existingRects.values());
-        existingRects.insert(id, itemRect);
-    }
-
-    if (!nestedRect.isValid()) {
-        auto view = scene()->views().value(0);
-        if (!view)
-            return;
-
-        const int count = std::count_if(childEntities.cbegin(), childEntities.cend(), [](const ivm::IVObject *child) {
-            return child->type() == ivm::IVObject::Type::Function || child->type() == ivm::IVObject::Type::FunctionType
-                    || child->type() == ivm::IVObject::Type::Comment;
-        });
-
-        const QRect viewportGeometry =
-                view->viewport()->geometry().marginsRemoved(shared::graphicsviewutils::kContentMargins.toMargins());
-        const QRectF mappedViewportGeometry =
-                QRectF(view->mapToScene(viewportGeometry.topLeft()), view->mapToScene(viewportGeometry.bottomRight()));
-
-        const qreal sf =
-                qMin(br.width() / mappedViewportGeometry.width(), br.height() / mappedViewportGeometry.height());
-        drawItems(br, {}, count, sf, painter);
-    } else {
-        const QRectF contentRect { nestedRect.marginsAdded(shared::graphicsviewutils::kRootMargins) };
-        const qreal sf = qMin(br.width() / contentRect.width(), br.height() / contentRect.height());
-        const QTransform transform = QTransform::fromScale(sf, sf).translate(-contentRect.x(), -contentRect.y());
-
-        QList<QRectF> mappedRects;
-        QFont painterFont = painter->font();
-        painterFont.setItalic(true);
-        painterFont.setPointSize(painterFont.pointSize() - 1);
-        const QFontMetricsF fm(painterFont);
-        for (auto it = existingRects.cbegin(); it != existingRects.cend(); ++it) {
-            const QRectF r = it.value();
-            const QRectF mappedRect = transform.mapRect(r);
-            mappedRects << mappedRect;
-            painter->drawRect(mappedRect);
-
-            const QString text = entity()->model()->getObject(it.key())->titleUI();
-            const QRectF textRect = fm.boundingRect(
-                    mappedRect.adjusted(4, 4, -4, -4), Qt::AlignTop | Qt::AlignLeft | Qt::TextDontClip, text);
-            if (mappedRect.contains(textRect)) {
-                painter->setFont(painterFont);
-                painter->drawText(textRect, Qt::AlignTop | Qt::AlignLeft, text);
-            }
-        }
-        for (const QPolygonF &p : qAsConst(existingPolygons)) {
-            painter->drawPolyline(transform.map(p));
-        }
-        for (const ConnectionData &connectionData : qAsConst(parentConnections)) {
-            const QRectF innerRect = transform.mapRect(existingRects.value(connectionData.innerFunctionId));
-            const QRectF outerRect = mapRectFromScene(sceneBoundingRect());
-            const QPointF outerPos = mapFromScene(connectionData.outerMappedScenePos);
-            QPointF innerPos;
-            if (connectionData.innerScenePos.isNull()) {
-                const QPointF ratio { (outerRect.right() - outerPos.x()) / outerRect.width(),
-                    (outerRect.bottom() - outerPos.y()) / outerRect.height() };
-                const qreal x = innerRect.left() + innerRect.width() * ratio.x();
-                const qreal y = innerRect.top() + innerRect.height() * ratio.y();
-                const Qt::Alignment side = shared::graphicsviewutils::getNearestSide(outerRect, outerPos);
-                innerPos = shared::graphicsviewutils::getSidePosition(innerRect, QPointF(x, y), side);
-            } else {
-                innerPos = transform.map(connectionData.innerScenePos);
-            }
-            painter->drawPolyline(shared::graphicsviewutils::createConnectionPath(
-                    mappedRects, outerPos, outerRect, innerPos, innerRect));
-        }
     }
 }
 
