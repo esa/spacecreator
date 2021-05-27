@@ -293,9 +293,6 @@ bool CreatorTool::eventFilter(QObject *watched, QEvent *event)
         if (event->type() == QEvent::KeyPress) {
             QKeyEvent *keyEvent = static_cast<QKeyEvent *>(event);
             switch (keyEvent->key()) {
-            case Qt::Key_Delete: {
-                removeSelectedItems();
-            } break;
             case Qt::Key_Escape: {
                 if (toolType() == ToolType::Pointer) {
                     if (auto scene = d->view->scene())
