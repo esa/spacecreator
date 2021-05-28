@@ -160,8 +160,11 @@ void IVVisualizationModelBase::updateConnectionItem(ivm::IVConnection *connectio
     if (QStandardItem *groupedConnectionItem = getItem(connection->id())) {
         QStandardItem *groupedConnectionParentItem =
                 groupedConnectionItem->parent() ? groupedConnectionItem->parent() : invisibleRootItem();
-        getParentItem(connection)->appendRow(groupedConnectionParentItem->takeRow(groupedConnectionItem->row()));
-        updateItemData(groupedConnectionItem, connection);
+        QStandardItem *parentItem = getParentItem(connection) ? getParentItem(connection) : invisibleRootItem();
+        if (parentItem && groupedConnectionItem && groupedConnectionItem) {
+            parentItem->appendRow(groupedConnectionParentItem->takeRow(groupedConnectionItem->row()));
+            updateItemData(groupedConnectionItem, connection);
+        }
     }
 }
 

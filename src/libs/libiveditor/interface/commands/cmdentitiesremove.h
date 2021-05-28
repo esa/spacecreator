@@ -55,6 +55,7 @@ private:
     QVector<QPointer<ivm::IVObject>> m_relatedConnections;
     QVector<QPointer<ivm::IVObject>> m_relatedIfaces;
     QHash<shared::Id, QPointer<ivm::IVFunctionType>> m_parentFunctions;
+    QList<QUndoCommand *> m_subCommands;
 
     void collectRelatedItems(ivm::IVObject *toBeRemoved);
     void storeLinkedEntity(ivm::IVObject *linkedEntity);

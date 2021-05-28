@@ -120,7 +120,7 @@ IVInterfaceGroup *IVConnectionGroup::targetInterfaceGroup() const
    Adds a connection whithout removing it from a function.
    Is used for example when loading connections of a group
  */
-void IVConnectionGroup::addgroupedConnection(const QPointer<IVConnection> &connection)
+void IVConnectionGroup::addGroupedConnection(const QPointer<IVConnection> &connection)
 {
     connection->setParent(this);
     m_connections.append(connection);
@@ -153,7 +153,7 @@ void IVConnectionGroup::addConnection(const QPointer<IVConnection> &connection)
         return;
     }
 
-    addgroupedConnection(connection);
+    addGroupedConnection(connection);
 }
 
 void IVConnectionGroup::removeConnection(const QPointer<IVConnection> &connection)

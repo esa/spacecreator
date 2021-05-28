@@ -17,6 +17,7 @@
 
 #include "cmdentitiesremove.h"
 
+#include "cmdconnectiongroupitemchange.h"
 #include "commandids.h"
 #include "ivconnection.h"
 #include "ivconnectiongroup.h"
@@ -41,7 +42,11 @@ CmdEntitiesRemove::CmdEntitiesRemove(const QList<QPointer<ivm::IVObject>> &entit
     }
 }
 
-CmdEntitiesRemove::~CmdEntitiesRemove() { }
+CmdEntitiesRemove::~CmdEntitiesRemove()
+{
+    qDeleteAll(m_subCommands);
+    m_subCommands.clear();
+}
 
 ivm::IVFunctionType *CmdEntitiesRemove::putParentFunctionFor(const ivm::IVObject *obj)
 {
@@ -80,8 +85,11 @@ void CmdEntitiesRemove::advancedRestore(ivm::IVObject *obj)
     if (!obj)
         return;
 
-    if (auto *fn = popParentFunctionFor(obj))
+    if (auto *fn = popParentFunctionFor(obj)) {
         fn->addChild(obj);
+    } else {
+        obj->setParentObject(nullptr);
+    }
 
     if (m_model)
         m_model->addObject(obj);
@@ -102,6 +110,10 @@ void CmdEntitiesRemove::redo()
             advancedRemove(*it);
         }
     };
+
+    for (auto it = m_subCommands.begin(); it != m_subCommands.end(); ++it) {
+        (*it)->redo();
+    }
 
     removeIVObjects(m_relatedConnections);
     removeIVObjects(m_relatedIfaces);
@@ -129,6 +141,10 @@ void CmdEntitiesRemove::undo()
     restoreIVObjects(m_relatedEntities);
     restoreIVObjects(m_relatedIfaces);
     restoreIVObjects(m_relatedConnections);
+
+    for (auto it = m_subCommands.rbegin(); it != m_subCommands.rend(); ++it) {
+        (*it)->undo();
+    }
 }
 
 bool CmdEntitiesRemove::mergeWith(const QUndoCommand *command)
@@ -158,17 +174,24 @@ void CmdEntitiesRemove::collectRelatedItems(ivm::IVObject *toBeRemoved)
     case ivm::IVObject::Type::RequiredInterface:
     case ivm::IVObject::Type::ProvidedInterface: {
         if (auto *iface = qobject_cast<ivm::IVInterface *>(toBeRemoved)) {
-            for (const auto &clone : iface->clones())
+            for (const auto &clone : iface->clones()) {
                 collectRelatedItems(clone);
-            for (const auto &connection : m_model->getConnectionsForIface(iface->id()))
-                storeLinkedEntity(connection);
+            }
+            for (const auto &connection : m_model->getConnectionsForIface(iface->id())) {
+                if (connection->type() == ivm::IVObject::Type::ConnectionGroup) {
+                    collectRelatedItems(connection);
+
+                } else {
+                    storeLinkedEntity(connection);
+                }
+            }
         }
         break;
     }
     case ivm::IVObject::Type::Function:
     case ivm::IVObject::Type::FunctionType: {
         if (auto *fnType = qobject_cast<ivm::IVFunctionType *>(toBeRemoved)) {
-            for (auto iface : fnType->interfaces())
+            for (auto iface : fnType->allInterfaces())
                 collectRelatedItems(iface);
 
             for (auto child : toBeRemoved->findChildren<ivm::IVFunction *>(QString(), Qt::FindDirectChildrenOnly))
@@ -195,7 +218,18 @@ void CmdEntitiesRemove::storeLinkedEntity(ivm::IVObject *linkedEntity)
 
     QVector<QPointer<ivm::IVObject>> *pCollection { nullptr };
     switch (linkedEntity->type()) {
-    case ivm::IVObject::Type::ConnectionGroup:
+    case ivm::IVObject::Type::ConnectionGroup: {
+        if (linkedEntity->type() == ivm::IVObject::Type::ConnectionGroup) {
+            auto group = qobject_cast<ivm::IVConnectionGroup *>(linkedEntity);
+            for (auto conn : group->groupedConnections()) {
+                if (conn) {
+                    m_subCommands.append(new CmdConnectionGroupItemChange(group, conn, false));
+                }
+            }
+        }
+        pCollection = &m_relatedConnections;
+        break;
+    }
     case ivm::IVObject::Type::Connection:
         pCollection = &m_relatedConnections;
         break;

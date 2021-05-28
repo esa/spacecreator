@@ -706,8 +706,13 @@ QVariant IVInterfaceGraphicsItem::itemChange(GraphicsItemChange change, const QV
 {
     switch (change) {
     case QGraphicsItem::ItemVisibleHasChanged: {
-        for (IVConnectionGraphicsItem *connection : qAsConst(m_connections))
-            connection->setVisible(connection->startItem()->isVisible() && connection->endItem()->isVisible());
+        for (IVConnectionGraphicsItem *connection : qAsConst(m_connections)) {
+            if (connection->startItem() && connection->endItem()) {
+                connection->setVisible(connection->startItem()->isVisible() && connection->endItem()->isVisible());
+            } else {
+                connection->setVisible(false);
+            }
+        }
         break;
     }
     default:

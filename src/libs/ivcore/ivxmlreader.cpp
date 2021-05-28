@@ -377,7 +377,7 @@ IVConnection *IVXMLReader::addConnection()
         d->m_currentObject.function()->addChild(connection);
     }
     if (d->m_currentObject.connectionGroup()) {
-        d->m_currentObject.connectionGroup()->addgroupedConnection(connection);
+        d->m_currentObject.connectionGroup()->addGroupedConnection(connection);
     }
 
     return connection;
@@ -393,7 +393,12 @@ IVConnectionGroup *IVXMLReader::addConnectionGroup(const QString &groupName)
             it.value()->addEntity(iface);
         } else {
             auto ifaceGroup = new IVInterfaceGroup({});
-            ifaceGroup->setParentObject(iface->parentObject());
+            if (iface->parentObject()->type() == IVObject::Type::Function) {
+                auto fn = qobject_cast<IVFunction *>(iface->parentObject());
+                fn->addChild(ifaceGroup);
+            } else {
+                ifaceGroup->setParentObject(iface->parentObject());
+            }
             ifaceGroup->setGroupName(groupName);
             ifaceGroup->addEntity(iface);
             mappings.insert(iface->parentObject()->id(), ifaceGroup);

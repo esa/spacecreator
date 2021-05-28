@@ -61,7 +61,7 @@ public:
     IVInterfaceGroup *sourceInterfaceGroup() const;
     IVInterfaceGroup *targetInterfaceGroup() const;
 
-    void addgroupedConnection(const QPointer<IVConnection> &connection);
+    void addGroupedConnection(const QPointer<IVConnection> &connection);
 
 Q_SIGNALS:
     void connectionAdded(IVConnection *connection);
