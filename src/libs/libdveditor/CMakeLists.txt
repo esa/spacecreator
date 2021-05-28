@@ -7,6 +7,8 @@ target_sources(${LIB_NAME} PRIVATE
     baseitems/graphicsview.h
     dvappmodel.cpp
     dvappmodel.h
+    dvappwidget.cpp
+    dvappwidget.h
     dveditor.cpp
     dveditor.h
     dveditorcore.cpp

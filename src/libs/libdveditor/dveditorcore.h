@@ -62,8 +62,8 @@ public:
     bool save() override;
 
 private:
-    struct DeploymentInterfacePrivate;
-    std::unique_ptr<DeploymentInterfacePrivate> d;
+    struct DVEditorCorePrivate;
+    std::unique_ptr<DVEditorCorePrivate> d;
 };
 
 } // namespace dve
