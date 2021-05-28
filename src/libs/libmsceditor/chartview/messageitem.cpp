@@ -456,7 +456,7 @@ void MessageItem::setHead(const QPointF &head, ObjectAnchor::Snap snap)
    Sets the position of the head/tip to the given scene position \p head.
    The tail is moved as well, if the message is horizontal, or if the tail would be after/below the head.
  */
-void MessageItem::setHeadPosition(const QPointF &head)
+void MessageItem::setHeadPosition(const QPointF &head, bool ignoreHorizontal)
 {
     if (head == this->head()) {
         return;
@@ -469,7 +469,7 @@ void MessageItem::setHeadPosition(const QPointF &head)
 
     points.last() = head;
 
-    if (points.first().y() > head.y()) {
+    if (points.first().y() > head.y() || (isHorizontal() && !ignoreHorizontal)) {
         points.first().setY(head.y());
     }
 
@@ -497,7 +497,7 @@ void MessageItem::setTail(const QPointF &tail, ObjectAnchor::Snap snap)
    Sets the position of the tail to the given scene position \p tail.
    The head is moved as well, if the message is horizontal, or if the head would be before/above the tail.
  */
-void MessageItem::setTailPosition(const QPointF &tail)
+void MessageItem::setTailPosition(const QPointF &tail, bool ignoreHorizontal)
 {
     if (tail == this->tail()) {
         return;
@@ -510,7 +510,7 @@ void MessageItem::setTailPosition(const QPointF &tail)
 
     points.first() = tail;
 
-    if (points.last().y() < tail.y()) {
+    if (points.last().y() < tail.y() || (isHorizontal() && !ignoreHorizontal)) {
         points.last().setY(tail.y());
     }
 

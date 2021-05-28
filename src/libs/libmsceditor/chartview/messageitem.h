@@ -67,10 +67,10 @@ public:
 
     QPointF head() const;
     void setHead(const QPointF &head, ObjectAnchor::Snap snap);
-    void setHeadPosition(const QPointF &head);
+    void setHeadPosition(const QPointF &head, bool ignoreHorizontal = false);
     QPointF tail() const;
     void setTail(const QPointF &tail, ObjectAnchor::Snap snap);
-    void setTailPosition(const QPointF &tail);
+    void setTailPosition(const QPointF &tail, bool ignoreHorizontal = false);
     void moveToYPosition(qreal yPos);
 
     bool isHorizontal() const;

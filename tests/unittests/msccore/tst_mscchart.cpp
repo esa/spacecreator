@@ -64,6 +64,7 @@ private Q_SLOTS:
     void testCreateMessage();
     void testAddCreateAfterMessage();
     void testIndicesOfEvent();
+    void testIsCrossingMessage();
 
 private:
     MscChart *m_chart = nullptr;
@@ -771,6 +772,37 @@ void tst_MscChart::testIndicesOfEvent()
     m_chart->addInstanceEvent(message2, { { instance1, -1 }, { instance2, -1 } });
     indices = { { instance1, 1 }, { instance2, 0 } };
     QCOMPARE(m_chart->indicesOfEvent(message2), indices);
+}
+
+void tst_MscChart::testIsCrossingMessage()
+{
+    auto instance1 = new MscInstance("Inst1", m_chart);
+    m_chart->addInstance(instance1);
+    auto instance2 = new MscInstance("Inst2", m_chart);
+    m_chart->addInstance(instance2);
+
+    auto message1 = new MscMessage("Msg1", m_chart);
+    message1->setTargetInstance(instance1);
+    m_chart->addInstanceEvent(message1, { { instance1, -1 } });
+
+    QCOMPARE(m_chart->isCrossingMessage(message1), false);
+
+    auto message2 = new MscMessage("Msg2", m_chart);
+    message2->setSourceInstance(instance1);
+    message2->setTargetInstance(instance2);
+    m_chart->addInstanceEvent(message2, { { instance1, -1 }, { instance2, -1 } });
+
+    QCOMPARE(m_chart->isCrossingMessage(message1), false);
+    QCOMPARE(m_chart->isCrossingMessage(message2), false);
+
+    auto message3 = new MscMessage("Msg3", m_chart);
+    message3->setSourceInstance(instance2);
+    message3->setTargetInstance(instance1);
+    m_chart->addInstanceEvent(message3, { { instance1, 1 }, { instance2, -1 } });
+
+    QCOMPARE(m_chart->isCrossingMessage(message1), false);
+    QCOMPARE(m_chart->isCrossingMessage(message2), true);
+    QCOMPARE(m_chart->isCrossingMessage(message3), true);
 }
 
 QTEST_APPLESS_MAIN(tst_MscChart)

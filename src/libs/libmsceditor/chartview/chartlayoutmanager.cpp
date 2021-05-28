@@ -903,16 +903,22 @@ void ChartLayoutManager::checkVerticalConstraints()
                     const int messageMinY = minY + offset;
                     if (messageItem->modelItem()->sourceInstance() == instance) {
                         if (messageItem->tail().y() < messageMinY) {
+                            const bool ignoreHorizontal =
+                                    d->m_currentChart->isCrossingMessage(messageItem->modelItem());
                             messageItem->setTailPosition(
-                                    QPointF(messageItem->tail().x(), messageMinY + d->interMessageSpan()));
+                                    QPointF(messageItem->tail().x(), messageMinY + d->interMessageSpan()),
+                                    ignoreHorizontal);
                             itemMoved = true;
                         }
                         minY = messageItem->tail().y() + minSpace + offset;
                     }
                     if (messageItem->modelItem()->targetInstance() == instance) {
                         if (messageItem->head().y() < messageMinY) {
+                            const bool ignoreHorizontal =
+                                    d->m_currentChart->isCrossingMessage(messageItem->modelItem());
                             messageItem->setHeadPosition(
-                                    QPointF(messageItem->head().x(), messageMinY + d->interMessageSpan()));
+                                    QPointF(messageItem->head().x(), messageMinY + d->interMessageSpan()),
+                                    ignoreHorizontal);
                             itemMoved = true;
                         }
                         minY = messageItem->head().y() + minSpace + offset;

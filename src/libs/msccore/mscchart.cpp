@@ -496,11 +496,61 @@ QVector<MscMessage *> MscChart::messages() const
 }
 
 /*!
+   Returns all messages that connect from the instance \p source to instance \p target
+ */
+QVector<MscMessage *> MscChart::messages(MscInstance *source, MscInstance *target) const
+{
+    QVector<MscMessage *> result;
+
+    if (!m_events.contains(source) || !m_events.contains(target)) {
+        return result;
+    }
+
+    for (MscInstanceEvent *event : m_events.value(source)) {
+        if (event->entityType() == MscEntity::EntityType::Message) {
+            auto message = static_cast<MscMessage *>(event);
+            if (message->targetInstance() == target) {
+                result.append(message);
+            }
+        }
+    }
+
+    return result;
+}
+
+/*!
    Returns all co-regions of this chart
  */
 QVector<MscCoregion *> MscChart::coregions() const
 {
     return allEventsOfType<msc::MscCoregion>();
+}
+
+/*!
+   Returns true if the given message crosses (overtakes or is overtaken) by at least one other message.
+ */
+bool MscChart::isCrossingMessage(MscMessage *message) const
+{
+    if (message->isGlobal()) {
+        return false;
+    }
+
+    QVector<MscMessage *> otherMessages = messages(message->targetInstance(), message->sourceInstance());
+    otherMessages += messages(message->sourceInstance(), message->targetInstance());
+    otherMessages.removeAll(message);
+
+    const int sourceIdx = indexofEventAtInstance(message, message->sourceInstance());
+    const int targetIdx = indexofEventAtInstance(message, message->targetInstance());
+
+    for (MscMessage *msg : otherMessages) {
+        const int sIdx = indexofEventAtInstance(msg, message->sourceInstance());
+        const int tIdx = indexofEventAtInstance(msg, message->targetInstance());
+        if ((sIdx < sourceIdx && tIdx > targetIdx) || (sIdx > sourceIdx && tIdx < targetIdx)) {
+            return true;
+        }
+    }
+
+    return false;
 }
 
 const QVector<MscGate *> &MscChart::gates() const

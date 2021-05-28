@@ -72,7 +72,10 @@ public:
     QVector<MscInstance *> relatedInstances(MscInstanceEvent *event) const;
 
     QVector<MscMessage *> messages() const;
+    QVector<MscMessage *> messages(MscInstance *source, MscInstance *target) const;
     QVector<MscCoregion *> coregions() const;
+
+    bool isCrossingMessage(MscMessage *message) const;
 
     const QVector<MscGate *> &gates() const;
     void addGate(MscGate *gate);

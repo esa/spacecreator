@@ -285,8 +285,6 @@ void tst_ChartLayoutManager::testAddTwoMessages()
     InstanceHeadItem *headItem = instanceItemA->headerItem();
     const QRectF headRect = headItem->sceneBoundingRect();
     const QRectF message1Rect = msgItem1->sceneBoundingRect();
-    qDebug() << headRect;
-    qDebug() << message1Rect;
     QVERIFY2(headRect.bottom() <= message1Rect.top(), "The message top is not below the instance head");
 
     auto message2 = new msc::MscMessage("Msg2");
