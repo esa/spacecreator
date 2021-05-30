@@ -18,6 +18,7 @@
 #include "interface/interfacedocument.h"
 #include "iveditor.h"
 #include "iveditorcore.h"
+#include "ivlibrary.h"
 #include "ivsystemchecks.h"
 #include "msceditorcore.h"
 #include "mscsystemchecks.h"
@@ -52,6 +53,7 @@ private:
 void tst_SpaceCreatorProject::initTestCase()
 {
     QStandardPaths::setTestModeEnabled(true);
+    ivm::initIVLibrary();
     ive::initIVEditor();
     shared::initSharedLibrary();
 }

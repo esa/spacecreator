@@ -106,84 +106,42 @@ static inline void dumpItem(QObject *obj, bool strict = false)
 namespace ive {
 
 IVItemModel::IVItemModel(ivm::IVModel *model, cmd::CommandsStack *commandsStack, QObject *parent)
-    : QObject(parent)
-    , m_model(model)
-    , m_graphicsScene(new InterfaceTabGraphicsScene(this))
-    , m_mutex(new QMutex(QMutex::NonRecursive))
+    : shared::ui::VEItemModel(model, commandsStack, parent)
     , m_textUpdate(new shared::DelayedSignal(this))
-    , m_commandsStack(commandsStack)
 {
-    Q_ASSERT(!m_commandsStack.isNull());
-
-    if (QGuiApplication::primaryScreen()) {
-        m_desktopGeometry = QGuiApplication::primaryScreen()->availableGeometry();
-    }
-
-    connect(m_model, &ivm::IVModel::modelReset, this, &IVItemModel::clearScene);
-    connect(m_model, &ivm::IVModel::rootObjectChanged, this, &IVItemModel::onRootObjectChanged);
-    connect(m_model, &ivm::IVModel::objectsAdded, this, &IVItemModel::onObjectsAdded);
-    connect(m_model, &ivm::IVModel::objectRemoved, this, &IVItemModel::onObjectRemoved);
-
-    connect(m_graphicsScene, &QGraphicsScene::selectionChanged, this, &IVItemModel::onSceneSelectionChanged);
-
     m_textUpdate->setInterval(10);
     connect(m_textUpdate, &shared::DelayedSignal::triggered, this, &IVItemModel::updateInterfaceTexts);
+    connect(model, &ivm::IVModel::rootObjectChanged, this, &IVItemModel::onRootObjectChanged);
 }
 
-IVItemModel::~IVItemModel()
-{
-    delete m_mutex;
-}
+IVItemModel::~IVItemModel() { }
 
-QGraphicsScene *IVItemModel::scene() const
+void IVItemModel::onObjectAdded(shared::Id objectId)
 {
-    return m_graphicsScene;
-}
+    if (!m_graphicsScene || objectId.isNull()) {
+        return;
+    }
 
-void IVItemModel::onIVObjectAdded(ivm::IVObject *object)
-{
-    if (!m_graphicsScene || !object) {
+    auto object = objectsModel()->getObject(objectId);
+    if (!object) {
         return;
     }
 
     setupInnerGeometry(object);
-
     if (object->type() == ivm::IVObject::Type::InterfaceGroup) {
         return;
     }
 
-    const int lowestLevel = gi::nestingLevel(m_model->rootObject()) + 1;
+    const int lowestLevel = gi::nestingLevel(objectsModel()->rootObject()) + 1;
     const int objectLevel = gi::nestingLevel(object);
-    const bool isRootOrRootChild = object->id() == m_model->rootObjectId()
-            || (m_model->rootObject() && object->parentObject() == m_model->rootObject());
+    const bool isRootOrRootChild = objectId == objectsModel()->rootObjectId()
+            || (objectsModel()->rootObject() && object->parentObject() == objectsModel()->rootObject());
     if ((objectLevel < lowestLevel || objectLevel > (lowestLevel + gi::kNestingVisibilityLevel))
             && !isRootOrRootChild) {
         return;
     }
 
-    auto item = m_items.value(object->id());
-    if (!item) {
-        item = createItemForObject(object);
-        if (!item) {
-            return;
-        }
-        initItem(object, item);
-    }
-    updateItem(item);
-}
-
-void IVItemModel::onObjectsAdded(const QVector<shared::Id> &objectsIds)
-{
-    QList<ivm::IVObject *> objectsToAdd;
-    for (auto id : objectsIds) {
-        objectsToAdd.append(m_model->getObject(id));
-    }
-    ivm::IVObject::sortObjectList(objectsToAdd);
-    for (auto object : qAsConst(objectsToAdd)) {
-        onIVObjectAdded(object);
-    }
-
-    updateSceneRect();
+    shared::ui::VEItemModel::onObjectAdded(objectId);
 }
 
 void IVItemModel::onRootObjectChanged(shared::Id rootId)
@@ -191,28 +149,14 @@ void IVItemModel::onRootObjectChanged(shared::Id rootId)
     Q_UNUSED(rootId)
     clearScene();
 
-    QVector<shared::Id> objectsToAdd;
-    for (auto obj : m_model->visibleObjects()) {
-        objectsToAdd.append(obj->id());
+    for (auto obj : objectsModel()->visibleObjects()) {
+        onObjectAdded(obj->id());
     }
-    onObjectsAdded(objectsToAdd);
 }
 
 void IVItemModel::onObjectRemoved(shared::Id objectId)
 {
-    if (!m_graphicsScene) {
-        return;
-    }
-
-    m_rmQueu.enqueue(objectId);
-
-    while (!m_rmQueu.isEmpty()) {
-        if (m_mutex->tryLock()) {
-            removeItemForObject(m_rmQueu.dequeue());
-            m_mutex->unlock();
-        }
-    }
-
+    shared::ui::VEItemModel::onObjectRemoved(objectId);
     scheduleInterfaceTextUpdate();
 }
 
@@ -221,7 +165,7 @@ void IVItemModel::onConnectionAddedToGroup(ivm::IVConnection *connection)
     auto connectionGroupObject = qobject_cast<ivm::IVConnectionGroup *>(sender());
     if (!connectionGroupObject) {
         connectionGroupObject =
-                qobject_cast<ivm::IVConnectionGroup *>(m_model->getObjectByName(connection->groupName()));
+                qobject_cast<ivm::IVConnectionGroup *>(objectsModel()->getObjectByName(connection->groupName()));
         if (!connectionGroupObject) {
             return;
         }
@@ -254,18 +198,24 @@ void IVItemModel::onConnectionAddedToGroup(ivm::IVConnection *connection)
 
 void IVItemModel::onConnectionRemovedFromGroup(ivm::IVConnection *connection)
 {
+    if (!connection) {
+        return;
+    }
+
     auto connectionGroupObject = qobject_cast<ivm::IVConnectionGroup *>(sender());
     if (!connectionGroupObject) {
         connectionGroupObject =
-                qobject_cast<ivm::IVConnectionGroup *>(m_model->getObjectByName(connection->groupName()));
+                qobject_cast<ivm::IVConnectionGroup *>(objectsModel()->getObjectByName(connection->groupName()));
         if (!connectionGroupObject) {
             return;
         }
     }
 
-    onIVObjectAdded(connection->targetInterface());
-    onIVObjectAdded(connection->sourceInterface());
-    onIVObjectAdded(connection);
+    if (connection->targetInterface())
+        onObjectAdded(connection->targetInterface()->id());
+    if (connection->sourceInterface())
+        onObjectAdded(connection->sourceInterface()->id());
+    onObjectAdded(connection->id());
 
     auto handleIface = [this](ivm::IVConnection *connection, ivm::IVInterfaceGroup *connectionGroupEndPoint) {
         auto ifaceObject = connectionGroupEndPoint->function()->id() == connection->source()->id()
@@ -294,17 +244,6 @@ void IVItemModel::onConnectionRemovedFromGroup(ivm::IVConnection *connection)
     handleIface(connection, connectionGroupObject->targetInterfaceGroup());
 }
 
-void IVItemModel::onSceneSelectionChanged()
-{
-    QList<shared::Id> ids;
-    for (auto item : m_graphicsScene->selectedItems()) {
-        if (auto iObj = qobject_cast<shared::ui::VEInteractiveObject *>(item->toGraphicsObject())) {
-            ids.append(iObj->entity()->id());
-        }
-    }
-    Q_EMIT itemsSelected(ids);
-}
-
 /*!
    Schedules an update for all interface texts (geometry constraints)
  */
@@ -327,31 +266,7 @@ void IVItemModel::updateInterfaceTexts()
 
 IVFunctionGraphicsItem *IVItemModel::rootItem() const
 {
-    return qgraphicsitem_cast<IVFunctionGraphicsItem *>(m_items.value(m_model->rootObjectId()));
-}
-
-void IVItemModel::updateItem(QGraphicsItem *item)
-{
-    Q_ASSERT(item);
-    if (!item)
-        return;
-
-    if (auto iObj = qobject_cast<shared::ui::VEInteractiveObject *>(item->toGraphicsObject())) {
-        iObj->updateFromEntity();
-    }
-    if (m_mutex->tryLock()) {
-        updateSceneRect();
-        m_mutex->unlock();
-    }
-}
-
-void IVItemModel::removeItemForObject(shared::Id objectId)
-{
-    if (auto item = m_items.take(objectId)) {
-        m_graphicsScene->removeItem(item);
-        delete item;
-        updateSceneRect();
-    }
+    return getItem<IVFunctionGraphicsItem *>(objectsModel()->rootObjectId());
 }
 
 void IVItemModel::setupInnerGeometry(ivm::IVObject *obj) const
@@ -417,18 +332,9 @@ void IVItemModel::setupInnerGeometry(ivm::IVObject *obj) const
     obj->setEntityProperty(ivm::meta::Props::token(ivm::meta::Props::Token::InnerCoordinates), strCoord);
 }
 
-void IVItemModel::clearScene()
-{
-    if (m_graphicsScene) {
-        m_graphicsScene->clear();
-    }
-    m_items.clear();
-    updateSceneRect();
-}
-
 void IVItemModel::changeRootItem(shared::Id id)
 {
-    if (m_model->rootObjectId() == id) {
+    if (objectsModel()->rootObjectId() == id) {
         return;
     }
     if (!m_commandsStack) {
@@ -436,120 +342,59 @@ void IVItemModel::changeRootItem(shared::Id id)
         return;
     }
 
-    const auto geometryCmd = new cmd::CmdRootEntityChange(m_model, id);
+    const auto geometryCmd = new cmd::CmdRootEntityChange(objectsModel(), id);
     m_commandsStack->push(geometryCmd);
-}
-
-void IVItemModel::zoomChanged()
-{
-    for (auto item : m_graphicsScene->selectedItems()) {
-        if (auto iObj = qobject_cast<shared::ui::VEInteractiveObject *>(item->toGraphicsObject())) {
-            iObj->updateGripPoints();
-        }
-    }
-}
-
-QGraphicsItem *IVItemModel::getItem(const shared::Id id) const
-{
-    if (id.isNull()) {
-        return nullptr;
-    }
-
-    return m_items.value(id);
-}
-
-template<typename T>
-T IVItemModel::getItem(const shared::Id id) const
-{
-    if (id.isNull()) {
-        return nullptr;
-    }
-
-    return qgraphicsitem_cast<T>(m_items.value(id));
 }
 
 ivm::IVModel *IVItemModel::objectsModel() const
 {
-    return m_model;
+    return qobject_cast<ivm::IVModel *>(m_model);
 }
 
-void IVItemModel::updateSceneRect()
+shared::ui::VEInteractiveObject *IVItemModel::createItem(shared::Id objectId)
 {
-    if (!m_graphicsScene) {
-        return;
-    }
-
-    const QRectF itemsRect = m_graphicsScene->itemsBoundingRect();
-    if (itemsRect.isEmpty()) {
-        m_prevItemsRect = {};
-        m_graphicsScene->setSceneRect(m_desktopGeometry);
-        return;
-    }
-
-    if (itemsRect != m_prevItemsRect) {
-        const QRectF sceneRect = m_graphicsScene->sceneRect().marginsRemoved(shared::graphicsviewutils::kRootMargins);
-        const QRectF updated = sceneRect.united(itemsRect);
-
-        if (sceneRect != updated) {
-            m_graphicsScene->setSceneRect(updated.marginsAdded(shared::graphicsviewutils::kRootMargins));
-            m_prevItemsRect = itemsRect;
-        }
-    }
-}
-
-QGraphicsItem *IVItemModel::createItemForObject(ivm::IVObject *obj)
-{
+    auto obj = objectsModel()->getObject(objectId);
     Q_ASSERT(obj);
     if (!obj) {
         return nullptr;
     }
 
     QGraphicsItem *parentItem = obj->parentObject() ? m_items.value(obj->parentObject()->id()) : nullptr;
-    auto nestedGeomtryConnect = [this](QGraphicsItem *parentItem, shared::ui::VEInteractiveObject *child) {
-        if (parentItem) {
-            if (auto iObjParent = qobject_cast<shared::ui::VEInteractiveObject *>(parentItem->toGraphicsObject()))
-                this->connect(child, &shared::ui::VEInteractiveObject::boundingBoxChanged, iObjParent,
-                        &shared::ui::VEInteractiveObject::scheduleLayoutUpdate, Qt::QueuedConnection);
-        }
-    };
 
-    shared::ui::VEInteractiveObject *iObj = nullptr;
     switch (obj->type()) {
     case ivm::IVObject::Type::Comment: {
         auto comment = new IVCommentGraphicsItem(qobject_cast<ivm::IVComment *>(obj), parentItem);
         connect(comment, &shared::ui::InteractiveObjectBase::boundingBoxChanged, this,
                 &IVItemModel::scheduleInterfaceTextUpdate);
-        nestedGeomtryConnect(parentItem, comment);
-        iObj = comment;
+        return comment;
     } break;
     case ivm::IVObject::Type::InterfaceGroup:
-        iObj = new IVInterfaceGroupGraphicsItem(qobject_cast<ivm::IVInterfaceGroup *>(obj), parentItem);
-        break;
+        return new IVInterfaceGroupGraphicsItem(qobject_cast<ivm::IVInterfaceGroup *>(obj), parentItem);
     case ivm::IVObject::Type::RequiredInterface:
     case ivm::IVObject::Type::ProvidedInterface: {
         auto ifItem = new IVInterfaceGraphicsItem(qobject_cast<ivm::IVInterface *>(obj), parentItem);
         connect(ifItem, &shared::ui::InteractiveObjectBase::boundingBoxChanged, this,
                 &IVItemModel::scheduleInterfaceTextUpdate);
-        iObj = ifItem;
-        break;
-    }
+        return ifItem;
+    } break;
     case ivm::IVObject::Type::ConnectionGroup:
         if (auto connection = qobject_cast<ivm::IVConnectionGroup *>(obj)) {
-            auto ifaceGroupItem = [this](ivm::IVObject *group) -> ive::IVInterfaceGroupGraphicsItem * {
-                const auto it = m_items.constFind(group->id());
+            auto ifaceGroupItem = [this](const shared::Id &id) -> ive::IVInterfaceGroupGraphicsItem * {
+                const auto it = m_items.constFind(id);
                 if (it != m_items.constEnd()) {
                     return qgraphicsitem_cast<ive::IVInterfaceGroupGraphicsItem *>(*it);
                 }
-                if (auto item = createItemForObject(group)) {
-                    initItem(group, item);
-                    updateItem(item);
-                    return qgraphicsitem_cast<ive::IVInterfaceGroupGraphicsItem *>(item);
-                }
-                return nullptr;
+                onObjectAdded(id);
+                return getItem<ive::IVInterfaceGroupGraphicsItem *>(id);
             };
-            IVInterfaceGroupGraphicsItem *startItem = ifaceGroupItem(connection->sourceInterface());
-            IVInterfaceGroupGraphicsItem *endItem = ifaceGroupItem(connection->targetInterface());
-            iObj = new IVConnectionGroupGraphicsItem(connection, startItem, endItem, parentItem);
+
+            IVInterfaceGroupGraphicsItem *startItem =
+                    connection->sourceInterface() ? ifaceGroupItem(connection->sourceInterface()->id()) : nullptr;
+
+            IVInterfaceGroupGraphicsItem *endItem =
+                    connection->targetInterface() ? ifaceGroupItem(connection->targetInterface()->id()) : nullptr;
+
+            return new IVConnectionGroupGraphicsItem(connection, startItem, endItem, parentItem);
         }
         break;
     case ivm::IVObject::Type::Connection:
@@ -562,22 +407,20 @@ QGraphicsItem *IVItemModel::createItemForObject(ivm::IVObject *obj)
             auto endItem =
                     qgraphicsitem_cast<IVInterfaceGraphicsItem *>(ifaceEnd ? m_items.value(ifaceEnd->id()) : nullptr);
 
-            iObj = new IVConnectionGraphicsItem(connection, startItem, endItem, parentItem);
+            return new IVConnectionGraphicsItem(connection, startItem, endItem, parentItem);
         }
         break;
     case ivm::IVObject::Type::Function: {
         auto function = new IVFunctionGraphicsItem(qobject_cast<ivm::IVFunction *>(obj), parentItem);
         connect(function, &shared::ui::InteractiveObjectBase::boundingBoxChanged, this,
                 &IVItemModel::scheduleInterfaceTextUpdate);
-        nestedGeomtryConnect(parentItem, function);
-        iObj = function;
+        return function;
     } break;
     case ivm::IVObject::Type::FunctionType: {
         auto functionType = new IVFunctionTypeGraphicsItem(qobject_cast<ivm::IVFunctionType *>(obj), parentItem);
         connect(functionType, &shared::ui::InteractiveObjectBase::boundingBoxChanged, this,
                 &IVItemModel::scheduleInterfaceTextUpdate);
-        nestedGeomtryConnect(parentItem, functionType);
-        iObj = functionType;
+        return functionType;
     } break;
     default: {
         qCritical() << "Unknown object type:" << obj->type();
@@ -585,24 +428,18 @@ QGraphicsItem *IVItemModel::createItemForObject(ivm::IVObject *obj)
     }
     }
 
-    if (iObj) {
-        iObj->setCommandsStack(m_commandsStack);
-        iObj->init();
-    }
-
-    return iObj;
+    return {};
 }
 
-void IVItemModel::initItem(ivm::IVObject *object, QGraphicsItem *item)
+void IVItemModel::initItem(shared::ui::VEInteractiveObject *item)
 {
-    auto propertyChanged = [this]() {
-        if (auto senderObject = qobject_cast<ivm::IVObject *>(sender())) {
-            if (auto item = m_items.value(senderObject->id())) {
-                updateItem(item);
-            }
-            scheduleInterfaceTextUpdate();
-        }
-    };
+    shared::ui::VEItemModel::initItem(item);
+    shared::VEObject *object = item->entity();
+    if (!object) {
+        return;
+    }
+
+    connect(object, &shared::VEObject::attributeChanged, this, &IVItemModel::scheduleInterfaceTextUpdate);
 
     if (const auto connectionGroupObject = qobject_cast<ivm::IVConnectionGroup *>(object)) {
         connect(connectionGroupObject, &ivm::IVConnectionGroup::connectionAdded, this,
@@ -614,45 +451,17 @@ void IVItemModel::initItem(ivm::IVObject *object, QGraphicsItem *item)
             onConnectionAddedToGroup(groupedConnectionObject);
         }
     }
-    connect(object, &ivm::IVObject::visibilityChanged, this, [this, id = object->id()](bool) {
-        if (auto item = dynamic_cast<shared::ui::VEInteractiveObject *>(m_items.value(id))) {
-            item->scheduleLayoutUpdate();
-            scheduleInterfaceTextUpdate();
-        }
-    });
-    connect(object, &ivm::IVObject::coordinatesChanged, this, propertyChanged);
-    if (auto clickable = qobject_cast<shared::ui::VEInteractiveObject *>(item->toGraphicsObject())) {
-        connect(
-                clickable, &shared::ui::VEInteractiveObject::clicked, this,
-                [this, clickable]() {
+    if (auto ivObject = object->as<ivm::IVObject *>()) {
+        connect(ivObject, &ivm::IVObject::visibilityChanged, this, [this, id = ivObject->id()](bool) {
+            if (auto item = getItem<shared::ui::VEInteractiveObject *>(id)) {
+                item->scheduleLayoutUpdate();
+                scheduleInterfaceTextUpdate();
+            }
+        });
+
 #ifdef IV_ITEM_DUMP
-                    dumpItem(sender());
+        connect(item, &shared::ui::VEInteractiveObject::clicked, this, [this, item]() { dumpItem(sender()); });
 #endif
-                    if (auto entity = clickable->entity()) {
-                        Q_EMIT itemClicked(entity->id());
-                    }
-                },
-                Qt::QueuedConnection);
-        connect(
-                clickable, &shared::ui::VEInteractiveObject::doubleClicked, this,
-                [this, clickable]() {
-                    if (auto entity = clickable->entity()) {
-                        if (auto function = qobject_cast<ivm::IVFunction *>(entity)) {
-                            if (function->hasNestedChildren() && !function->isRootObject()) {
-                                changeRootItem(function->id());
-                                return;
-                            }
-                        }
-
-                        Q_EMIT itemDoubleClicked(entity->id());
-                    }
-                },
-                Qt::QueuedConnection);
-    }
-
-    m_items.insert(object->id(), item);
-    if (m_graphicsScene != item->scene()) {
-        m_graphicsScene->addItem(item);
     }
 }
 

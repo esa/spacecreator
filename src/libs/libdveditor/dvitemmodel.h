@@ -17,24 +17,37 @@
 
 #pragma once
 
-#include <QPointer>
+#include "common.h"
+#include "dvmodel.h"
+#include "interface/veitemmodel.h"
 
-class QUndoStack;
-namespace dvm {
-class DVModel;
+namespace shared {
+namespace ui {
+class VEInteractiveObject;
+}
+namespace cmd {
+class CommandsStackBase;
+}
 }
 
 namespace dve {
 
-class DVItemModel : public QObject
+class DVItemModel : public shared::ui::VEItemModel
 {
     Q_OBJECT
 public:
-    explicit DVItemModel(dvm::DVModel *model, QUndoStack *undoStack, QObject *parent = nullptr);
+    enum class Roles
+    {
+        IdRole = Qt::UserRole,
+    };
+    Q_ENUM(Roles);
 
-private:
-    QPointer<dvm::DVModel> m_model;
-    QPointer<QUndoStack> m_undoStack;
+    explicit DVItemModel(dvm::DVModel *model, shared::cmd::CommandsStackBase *commandsStack, QObject *parent = nullptr);
+    ~DVItemModel() override;
+
+    dvm::DVModel *objectsModel() const override;
+
+    shared::ui::VEInteractiveObject *createItem(shared::Id objectId) override;
 };
 
 } // namespace dve

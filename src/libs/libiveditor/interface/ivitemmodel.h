@@ -17,16 +17,8 @@
 
 #pragma once
 
+#include "interface/veitemmodel.h"
 #include "ivmodel.h"
-
-#include <QObject>
-#include <QPointer>
-#include <QQueue>
-#include <QRectF>
-
-class QMutex;
-class QGraphicsItem;
-class QGraphicsScene;
 
 namespace ivm {
 class IVObject;
@@ -41,19 +33,14 @@ namespace cmd {
 class CommandsStack;
 }
 
-class InterfaceTabGraphicsScene;
-class IVCommentGraphicsItem;
-class IVInterfaceGraphicsItem;
 class IVFunctionGraphicsItem;
-class IVFunctionTypeGraphicsItem;
-class IVConnectionGraphicsItem;
 
 /*!
    \class IVItemModel is the model represents the scene graph of the currently selected/visible
    IV model. It handles all changes with existing entities and reflects them on graphic scene.
  */
 
-class IVItemModel : public QObject
+class IVItemModel : public shared::ui::VEItemModel
 {
     Q_OBJECT
 public:
@@ -67,58 +54,29 @@ public:
     explicit IVItemModel(ivm::IVModel *model, cmd::CommandsStack *commandsStack, QObject *parent = nullptr);
     ~IVItemModel() override;
 
-    QGraphicsScene *scene() const;
-
     void changeRootItem(shared::Id id);
-    void zoomChanged();
-
-    QGraphicsItem *getItem(const shared::Id id) const;
-
-    ivm::IVModel *objectsModel() const;
-
-Q_SIGNALS:
-    void itemClicked(shared::Id id);
-    void itemDoubleClicked(shared::Id id);
-    void itemsSelected(const QList<shared::Id> &ids);
-
-public Q_SLOTS:
-    void updateSceneRect();
-    void clearScene();
+    ivm::IVModel *objectsModel() const override;
 
 private Q_SLOTS:
-    void onIVObjectAdded(ivm::IVObject *object);
-    void onObjectsAdded(const QVector<shared::Id> &objectsIds);
-    void onObjectRemoved(shared::Id objectId);
+    void onObjectRemoved(shared::Id objectId) override;
+    void onObjectAdded(shared::Id objectId) override;
+
     void onRootObjectChanged(shared::Id rootId);
     void onConnectionAddedToGroup(ivm::IVConnection *connection);
     void onConnectionRemovedFromGroup(ivm::IVConnection *connection);
-
-    void onSceneSelectionChanged();
 
     void scheduleInterfaceTextUpdate();
     void updateInterfaceTexts();
 
 private:
-    QGraphicsItem *createItemForObject(ivm::IVObject *obj);
-    void initItem(ivm::IVObject *object, QGraphicsItem *item);
+    shared::ui::VEInteractiveObject *createItem(shared::Id objectId) override;
+    void initItem(shared::ui::VEInteractiveObject *item) override;
+
     IVFunctionGraphicsItem *rootItem() const;
-    void updateItem(QGraphicsItem *item);
-    void removeItemForObject(shared::Id objectId);
     void setupInnerGeometry(ivm::IVObject *obj) const;
 
-    template<typename T>
-    T getItem(const shared::Id id) const;
-
 private:
-    ivm::IVModel *m_model { nullptr };
-    InterfaceTabGraphicsScene *m_graphicsScene { nullptr };
-    QHash<shared::Id, QGraphicsItem *> m_items;
-    QMutex *m_mutex { nullptr };
-    QQueue<shared::Id> m_rmQueu;
-    QRectF m_desktopGeometry;
-    QRectF m_prevItemsRect;
     shared::DelayedSignal *m_textUpdate = nullptr;
-    QPointer<cmd::CommandsStack> m_commandsStack;
 };
 
 } // namespace ive

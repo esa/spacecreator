@@ -17,17 +17,22 @@
 
 #include "dvitemmodel.h"
 
-#include "dvmodel.h"
-
-#include <QUndoStack>
+#include "interface/veitemmodel.h"
 
 namespace dve {
 
-DVItemModel::DVItemModel(dvm::DVModel *model, QUndoStack *undoStack, QObject *parent)
-    : QObject(parent)
-    , m_model(model)
-    , m_undoStack(undoStack)
+DVItemModel::DVItemModel(dvm::DVModel *model, shared::cmd::CommandsStackBase *commandsStack, QObject *parent)
+    : shared::ui::VEItemModel(model, commandsStack, parent)
 {
 }
+
+DVItemModel::~DVItemModel() { }
+
+dvm::DVModel *DVItemModel::objectsModel() const
+{
+    return qobject_cast<dvm::DVModel *>(m_model);
+}
+
+shared::ui::VEInteractiveObject *DVItemModel::createItem(shared::Id objectId) { }
 
 } // namespace dve

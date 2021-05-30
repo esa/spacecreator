@@ -39,7 +39,7 @@ struct DVEditorCore::DVEditorCorePrivate {
     DVEditorCorePrivate()
         : m_scene(new QGraphicsScene)
         , m_appModel(new DVAppModel)
-        , m_model(new DVItemModel(m_appModel->objectsModel(), m_appModel->undoStack()))
+        , m_model(new DVItemModel(m_appModel->objectsModel(), m_appModel->commandsStack()))
         , m_visualizationModel(
                   new shared::AbstractVisualizationModel(m_appModel->objectsModel(), m_appModel->commandsStack()))
         , m_toolBar(new QToolBar)

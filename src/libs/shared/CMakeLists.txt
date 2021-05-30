@@ -85,6 +85,8 @@ target_sources(${LIB_NAME} PRIVATE
     ui/verectgraphicsitem.h
     abstractvisualizationmodel.cpp
     abstractvisualizationmodel.h
+    interface/veitemmodel.cpp
+    interface/veitemmodel.h
 )
 
 target_include_directories(${LIB_NAME} PUBLIC .)

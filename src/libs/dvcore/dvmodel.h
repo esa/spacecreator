@@ -23,6 +23,8 @@
 #include <QVector>
 #include <memory>
 
+#pragma once
+
 namespace dvm {
 struct DVModelPrivate;
 
