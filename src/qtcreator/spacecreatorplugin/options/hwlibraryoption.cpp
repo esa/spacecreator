@@ -15,35 +15,39 @@
    along with this program. If not, see <https://www.gnu.org/licenses/lgpl-2.1.html>.
 */
 
-#pragma once
+#include "hwlibraryoption.h"
 
-#include <QWidget>
+#include "config/dvhwlibrarywidget.h"
+#include "spacecreatorpluginconstants.h"
 
-class QAbstractItemModel;
-class QGraphicsScene;
+namespace spctr {
 
-namespace Ui {
-class DVAppWidget;
+HwLibraryOption::HwLibraryOption()
+{
+    setId(Constants::SETTINGS_DV_HW_LIBRARY_ID);
+    setDisplayName(tr("Deployment HW Library"));
+    setCategory(Constants::SETTINGS_CATEGORY);
+
+    setDisplayCategory(tr(Constants::SETTINGS_CATEGORY_DISPLAY));
 }
 
-namespace dve {
-class GraphicsView;
-
-class DVAppWidget : public QWidget
+QWidget *HwLibraryOption::widget()
 {
-    Q_OBJECT
-public:
-    explicit DVAppWidget(QWidget *parent = nullptr);
-    ~DVAppWidget();
+    if (!m_widget) {
+        m_widget = new dve::DVHWLibraryWidget;
+    }
+    return m_widget;
+}
 
-    dve::GraphicsView *graphicsView() const;
+void HwLibraryOption::apply()
+{
+    m_widget->save();
+    /// @todo trigger reload
+}
 
-    void setGraphicsScene(QGraphicsScene *scene);
-    void setAadlModel(QAbstractItemModel *model);
-    void setHWModel(QAbstractItemModel *model);
+void HwLibraryOption::finish()
+{
+    delete m_widget;
+}
 
-private:
-    Ui::DVAppWidget *ui = nullptr;
-};
-
-} // namespace dve
+}

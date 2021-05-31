@@ -5,10 +5,17 @@ add_library(${LIB_NAME} STATIC)
 target_sources(${LIB_NAME} PRIVATE
     baseitems/graphicsview.cpp
     baseitems/graphicsview.h
+    config/dvhwlibrarydialog.cpp
+    config/dvhwlibrarydialog.h
+    config/dvhwlibrarydialog.ui
+    config/dvhwlibrarywidget.cpp
+    config/dvhwlibrarywidget.h
+    config/dvhwlibrarywidget.ui
     dvappmodel.cpp
     dvappmodel.h
     dvappwidget.cpp
     dvappwidget.h
+    dvappwidget.ui
     dveditor.cpp
     dveditor.h
     dveditorcore.cpp

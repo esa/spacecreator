@@ -52,6 +52,12 @@ public:
     };
     Q_ENUM(IVE)
 
+    enum class DVE
+    {
+        HwLibraryFile,
+    };
+    Q_ENUM(DVE)
+
     enum class BugReport
     {
         Host,

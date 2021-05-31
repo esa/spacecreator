@@ -31,6 +31,9 @@ namespace ui {
 class GraphicsViewBase;
 }
 }
+namespace dvm {
+class DVBoardsModel;
+}
 
 namespace dve {
 class DVAppModel;
@@ -60,6 +63,9 @@ public:
 
     QString filePath() const override;
     bool save() override;
+
+    void loadHWLibrary(const QString &fileName);
+    dvm::DVBoardsModel *hwModel() const;
 
 private:
     struct DVEditorCorePrivate;

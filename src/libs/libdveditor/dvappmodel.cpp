@@ -17,6 +17,7 @@
 
 #include "dvappmodel.h"
 
+#include "abstractvisualizationmodel.h"
 #include "commandsstackbase.h"
 #include "dvmodel.h"
 #include "dvxmlreader.h"
@@ -27,20 +28,23 @@
 namespace dve {
 
 struct DVAppModel::DVAppModelPrivate {
-    shared::cmd::CommandsStackBase *commandsStack { nullptr };
+    DVAppModelPrivate()
+        : commandsStack(new shared::cmd::CommandsStackBase)
+        , objectsModel(new dvm::DVModel)
+    {
+    }
+
+    std::unique_ptr<shared::cmd::CommandsStackBase> commandsStack;
     QString filePath;
-    dvm::DVModel *objectsModel = nullptr;
+    std::unique_ptr<dvm::DVModel> objectsModel;
 };
 
 DVAppModel::DVAppModel(QObject *parent)
     : QObject(parent)
     , d(new DVAppModelPrivate)
 {
-    d->commandsStack = new shared::cmd::CommandsStackBase(this);
-    connect(d->commandsStack, &shared::cmd::CommandsStackBase::cleanChanged, this,
+    connect(d->commandsStack.get(), &shared::cmd::CommandsStackBase::cleanChanged, this,
             [this](bool clean) { Q_EMIT dirtyChanged(!clean); });
-
-    d->objectsModel = new dvm::DVModel(this);
 }
 
 QUndoStack *DVAppModel::undoStack() const
@@ -51,7 +55,7 @@ QUndoStack *DVAppModel::undoStack() const
 
 shared::cmd::CommandsStackBase *DVAppModel::commandsStack() const
 {
-    return d->commandsStack;
+    return d->commandsStack.get();
 }
 
 /*!
@@ -104,7 +108,7 @@ void DVAppModel::setPath(const QString &path)
  */
 dvm::DVModel *DVAppModel::objectsModel() const
 {
-    return d->objectsModel;
+    return d->objectsModel.get();
 }
 
 bool DVAppModel::isDirty() const

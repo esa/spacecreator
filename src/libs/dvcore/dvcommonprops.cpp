@@ -40,6 +40,10 @@ const QHash<QString, Props::Token> Props::TokensByName = {
 
     // TASTE props:
     { "Taste::coordinates", Token::coordinates },
+
+    // Boards listing
+    { "Boards", Token::Boards },
+    { "Board", Token::Board },
 };
 
 Props::Token Props::token(const QString &fromString)

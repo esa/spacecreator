@@ -43,6 +43,8 @@ set(SC_PLUGIN_SOURCES
     options/coloroption.h
     options/dynamicactionoption.cpp
     options/dynamicactionoption.h
+    options/hwlibraryoption.cpp
+    options/hwlibraryoption.h
     options/propertyoptions.cpp
     options/propertyoptions.h
     spacecreatorplugin.cpp

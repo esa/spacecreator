@@ -17,47 +17,38 @@
 
 #pragma once
 
-#include "commandlineparser.h"
-#include "common.h"
+#include "dvobject.h"
 
-#include <QMainWindow>
+#include <memory>
+#include <qobjectlistmodelt.h>
 
-namespace Ui {
-class MainWindow;
-}
+namespace dvm {
+struct DVBoardPrivate;
+class DVDevice;
 
-namespace dve {
-
-class DVEditorCore;
-
-class MainWindow : public QMainWindow
+class DVBoard : public DVObject
 {
     Q_OBJECT
-
 public:
-    explicit MainWindow(dve::DVEditorCore *core, QWidget *parent = nullptr);
-    ~MainWindow() override;
+    explicit DVBoard(DVObject *parent = nullptr);
+    ~DVBoard() override;
 
-public Q_SLOTS:
-    void onOpenFileRequested();
-    void showColorScheme();
-    void editHwLibrary();
-
-protected:
-    void closeEvent(QCloseEvent *e) override;
+    QList<DVDevice *> devices() const;
 
 private:
-    void initActions();
-    void initMenus();
-    void initSettings();
-    bool closeFile();
-    bool prepareQuit();
-    void updateWindowTitle();
-    void onDocDirtyChanged(bool dirty);
-    void onQuitRequested();
-
-    Ui::MainWindow *ui { nullptr };
-    dve::DVEditorCore *m_core { nullptr };
+    std::unique_ptr<DVBoardPrivate> d;
 };
 
-} // namespace dve
+/*!
+   Collections of boads (library of boards)
+ */
+class DVBoardsModel : public QObjectListModelT<DVBoard *>
+{
+    Q_OBJECT
+public:
+    explicit DVBoardsModel(QObject *parent = nullptr);
+
+    QVariant data(const QModelIndex &index, int role) const override;
+};
+
+} // namespace dvm

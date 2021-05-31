@@ -20,6 +20,7 @@
 #include "options/asn1sccoption.h"
 #include "options/coloroption.h"
 #include "options/dynamicactionoption.h"
+#include "options/hwlibraryoption.h"
 #include "options/propertyoptions.h"
 #include "spacecreatorplugin_global.h"
 
@@ -97,6 +98,7 @@ private:
     ColorOption m_ivColorOptions;
     DynamicActionOption m_ivDynActionOptions;
     PropertyOptions m_propertyOptions;
+    HwLibraryOption m_hwLibraryOptions;
 };
 
 }

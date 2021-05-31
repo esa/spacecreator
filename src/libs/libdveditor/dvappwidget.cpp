@@ -18,64 +18,43 @@
 #include "dvappwidget.h"
 
 #include "baseitems/graphicsview.h"
+#include "ui_dvappwidget.h"
 
-#include <QBoxLayout>
 #include <QSplitter>
 #include <QTreeView>
 
 namespace dve {
 
-struct DVAppWidget::DVAppWidgetPrivate {
-    DVAppWidgetPrivate(const DVAppWidgetPrivate &) = delete;
-    DVAppWidgetPrivate &operator=(const DVAppWidgetPrivate &) = delete;
-    DVAppWidgetPrivate() { }
-
-    dve::GraphicsView *m_view = nullptr;
-    QTreeView *m_treeView = nullptr;
-};
-
 DVAppWidget::DVAppWidget(QWidget *parent)
     : QWidget(parent)
-    , d(new DVAppWidgetPrivate)
+    , ui(new Ui::DVAppWidget)
 {
-    setupUi();
+    ui->setupUi(this);
+    ui->mainSplitter->setStretchFactor(1, 1);
+    ui->leftSplitter->setStretchFactor(0, 1);
 }
 
 DVAppWidget::~DVAppWidget() { }
 
 GraphicsView *DVAppWidget::graphicsView() const
 {
-    return d->m_view;
+    return ui->view;
 }
 
 void DVAppWidget::setGraphicsScene(QGraphicsScene *scene)
 {
-    d->m_view->setScene(scene);
+    ui->view->setScene(scene);
 }
 
-void DVAppWidget::setTreeViewModel(QAbstractItemModel *model)
+void DVAppWidget::setAadlModel(QAbstractItemModel *model)
 {
-    d->m_treeView->setModel(model);
+    ui->treeView->setModel(model);
+    ui->treeView->setHeaderHidden(true);
 }
 
-void DVAppWidget::setupUi()
+void DVAppWidget::setHWModel(QAbstractItemModel *model)
 {
-    auto rootLayout = new QVBoxLayout(this);
-    rootLayout->setMargin(0);
-    setLayout(rootLayout);
-
-    QSplitter *splitter = new QSplitter(Qt::Horizontal, this);
-    splitter->setHandleWidth(1);
-    rootLayout->addWidget(splitter);
-
-    d->m_treeView = new QTreeView(this);
-    d->m_treeView->setHeaderHidden(true);
-    splitter->addWidget(d->m_treeView);
-    splitter->setStretchFactor(0, 0);
-
-    d->m_view = new dve::GraphicsView(this);
-    splitter->addWidget(d->m_view);
-    splitter->setStretchFactor(1, 1);
+    ui->hwLibraryView->setModel(model);
 }
 
 } // namespace dve

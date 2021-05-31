@@ -19,6 +19,7 @@
 
 #include "baseitems/graphicsview.h"
 #include "colors/colormanagerdialog.h"
+#include "config/dvhwlibrarydialog.h"
 #include "dvappmodel.h"
 #include "dveditorcore.h"
 #include "settingsmanager.h"
@@ -27,6 +28,7 @@
 #include <QCloseEvent>
 #include <QFileDialog>
 #include <QMessageBox>
+#include <QStandardPaths>
 
 namespace dve {
 
@@ -45,6 +47,9 @@ MainWindow::MainWindow(dve::DVEditorCore *core, QWidget *parent)
     addToolBar(core->toolBar());
 
     connect(m_core->actionOpenFile(), &QAction::triggered, this, &MainWindow::onOpenFileRequested);
+
+    QString hwFile = shared::SettingsManager::load<QString>(shared::SettingsManager::DVE::HwLibraryFile, "");
+    m_core->loadHWLibrary(hwFile);
 }
 
 /*!
@@ -72,6 +77,14 @@ void MainWindow::showColorScheme()
     dialog->setFilterGroup("DVE");
     dialog->setAttribute(Qt::WA_DeleteOnClose);
     dialog->open();
+}
+
+void MainWindow::editHwLibrary()
+{
+    DVHWLibraryDialog dialog;
+    dialog.exec();
+    QString hwFile = shared::SettingsManager::load<QString>(shared::SettingsManager::DVE::HwLibraryFile, "");
+    m_core->loadHWLibrary(hwFile);
 }
 
 /*!
@@ -111,6 +124,8 @@ void MainWindow::initMenus()
     menu->addSeparator();
     QAction *colorAction = menu->addAction(tr("Color Scheme..."));
     connect(colorAction, &QAction::triggered, this, &MainWindow::showColorScheme);
+    QAction *hwAction = menu->addAction(tr("Hardware Library..."));
+    connect(hwAction, &QAction::triggered, this, &MainWindow::editHwLibrary);
 
     // Initialize the help menu
     menu = menuBar()->addMenu(tr("&Help"));

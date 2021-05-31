@@ -21,11 +21,14 @@
 #include "baseitems/graphicsview.h"
 #include "dvappmodel.h"
 #include "dvappwidget.h"
+#include "dvboard.h"
+#include "dvboardreader.h"
 #include "dvitemmodel.h"
 #include "dvmodel.h"
 #include "ui/graphicsviewbase.h"
 
 #include <QBoxLayout>
+#include <QDebug>
 #include <QHeaderView>
 #include <QSplitter>
 #include <QTreeView>
@@ -42,6 +45,7 @@ struct DVEditorCore::DVEditorCorePrivate {
         , m_model(new DVItemModel(m_appModel->objectsModel(), m_appModel->commandsStack()))
         , m_visualizationModel(
                   new shared::AbstractVisualizationModel(m_appModel->objectsModel(), m_appModel->commandsStack()))
+        , m_hwModel(new dvm::DVBoardsModel)
         , m_toolBar(new QToolBar)
     {
         m_toolBar->setObjectName("Document ToolBar");
@@ -55,6 +59,7 @@ struct DVEditorCore::DVEditorCorePrivate {
     std::unique_ptr<dve::DVAppModel> m_appModel;
     std::unique_ptr<dve::DVItemModel> m_model;
     std::unique_ptr<shared::AbstractVisualizationModel> m_visualizationModel;
+    std::unique_ptr<dvm::DVBoardsModel> m_hwModel;
     QPointer<QToolBar> m_toolBar;
     DVAppWidget *m_mainWidget { nullptr };
 };
@@ -95,7 +100,8 @@ QWidget *DVEditorCore::mainwidget()
     if (!d->m_mainWidget) {
         d->m_mainWidget = new DVAppWidget;
         d->m_mainWidget->setGraphicsScene(d->m_scene);
-        d->m_mainWidget->setTreeViewModel(d->m_visualizationModel.get());
+        d->m_mainWidget->setAadlModel(d->m_visualizationModel.get());
+        d->m_mainWidget->setHWModel(d->m_hwModel.get());
     }
     return d->m_mainWidget;
 }
@@ -137,6 +143,25 @@ QString DVEditorCore::filePath() const
 bool DVEditorCore::save()
 {
     return false;
+}
+
+/*!
+   Load the HW library from file in the given \p directory
+ */
+void DVEditorCore::loadHWLibrary(const QString &fileName)
+{
+    dvm::DVBoardReader reader;
+    bool ok = reader.readFile(fileName);
+    if (ok) {
+        d->m_hwModel->setObjectList(reader.parsedBoards());
+    } else {
+        qWarning() << "Can't read HW library from " << fileName;
+    }
+}
+
+dvm::DVBoardsModel *DVEditorCore::hwModel() const
+{
+    return d->m_hwModel.get();
 }
 
 }

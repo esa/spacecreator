@@ -17,47 +17,27 @@
 
 #pragma once
 
-#include "commandlineparser.h"
-#include "common.h"
-
-#include <QMainWindow>
+#include <QWidget>
 
 namespace Ui {
-class MainWindow;
+class DVHWLibraryWidget;
 }
 
 namespace dve {
 
-class DVEditorCore;
-
-class MainWindow : public QMainWindow
+class DVHWLibraryWidget : public QWidget
 {
     Q_OBJECT
 
 public:
-    explicit MainWindow(dve::DVEditorCore *core, QWidget *parent = nullptr);
-    ~MainWindow() override;
+    explicit DVHWLibraryWidget(QWidget *parent = nullptr);
+    ~DVHWLibraryWidget();
 
-public Q_SLOTS:
-    void onOpenFileRequested();
-    void showColorScheme();
-    void editHwLibrary();
-
-protected:
-    void closeEvent(QCloseEvent *e) override;
+    QString path() const;
+    void save();
 
 private:
-    void initActions();
-    void initMenus();
-    void initSettings();
-    bool closeFile();
-    bool prepareQuit();
-    void updateWindowTitle();
-    void onDocDirtyChanged(bool dirty);
-    void onQuitRequested();
-
-    Ui::MainWindow *ui { nullptr };
-    dve::DVEditorCore *m_core { nullptr };
+    Ui::DVHWLibraryWidget *ui;
 };
 
 } // namespace dve

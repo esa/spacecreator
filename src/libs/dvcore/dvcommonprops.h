@@ -39,6 +39,9 @@ public:
         Connection,
         Function,
 
+        Boards,
+        Board,
+
         // attrs:
         name,
         from_node,

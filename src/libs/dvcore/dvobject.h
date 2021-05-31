@@ -47,6 +47,7 @@ public:
         Bus,
         Connection,
         Interface,
+        Board
     };
     Q_ENUM(Type)
 
