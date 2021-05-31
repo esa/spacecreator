@@ -132,10 +132,12 @@ QSizeF IVFunctionTypeGraphicsItem::minimalSize() const
 
 void IVFunctionTypeGraphicsItem::updateTextPosition()
 {
-    m_textItem->adjustSize();
+    const QRectF targetTextRect = boundingRect().marginsRemoved(shared::graphicsviewutils::kTextMargins);
+
+    m_textItem->setTextWidth(-1);
+    m_textItem->setTextWidth(qMin(targetTextRect.width(), m_textItem->idealWidth()));
 
     QRectF textRect = m_textItem->boundingRect();
-    const QRectF targetTextRect = boundingRect().marginsRemoved(shared::graphicsviewutils::kTextMargins);
 
     const QSizeF maxTxtSize = targetTextRect.size();
     const QSizeF txtSize = textRect.size();
