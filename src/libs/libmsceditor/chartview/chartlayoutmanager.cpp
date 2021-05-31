@@ -840,6 +840,7 @@ void ChartLayoutManager::checkHorizontalConstraints()
         const qreal offset = leftXLimit - rect.x();
         if (offset > 0.0) {
             instanceItem->moveBy(offset, 0.0);
+            instanceItem->updateCif();
             rect.translate(offset, 0.0);
             syncItemsPosToInstance(instanceItem);
         }
