@@ -163,6 +163,9 @@ VEInteractiveObject *VEItemModel::createItemForObject(shared::Id objectId)
     }
 
     if (VEInteractiveObject *iObj = createItem(objectId)) {
+        if (!iObj) {
+            return nullptr;
+        }
         if (const QGraphicsItem *parentItem = iObj->parentItem()) {
             if (auto iObjParent = qobject_cast<const VEInteractiveObject *>(parentItem->toGraphicsObject())) {
                 connect(iObj, &VEInteractiveObject::boundingBoxChanged, iObjParent,

@@ -33,6 +33,9 @@ dvm::DVModel *DVItemModel::objectsModel() const
     return qobject_cast<dvm::DVModel *>(m_model);
 }
 
-shared::ui::VEInteractiveObject *DVItemModel::createItem(shared::Id objectId) { }
+shared::ui::VEInteractiveObject *DVItemModel::createItem(shared::Id objectId)
+{
+    return nullptr;
+}
 
 } // namespace dve
