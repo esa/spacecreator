@@ -122,18 +122,12 @@ QString ColorManager::handledColorTypeName(HandledColors t)
 
     case Node:
         return tr("Node");
-    case Processor:
-        return tr("Processor");
     case Partition:
         return tr("Partition");
-    case Bus:
-        return tr("Bus");
     case BusConnection:
         return tr("Connection");
     case Device:
         return tr("Device");
-    case Binding:
-        return tr("Binding");
 
     default:
         return tr("Unknown");

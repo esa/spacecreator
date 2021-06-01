@@ -46,15 +46,22 @@ void DVNodeGraphicsItem::paint(QPainter *painter, const QStyleOptionGraphicsItem
     painter->setPen(pen());
     painter->setBrush(brush());
     const QRectF br = boundingRect();
-    painter->drawRect(br);
+    painter->drawRoundedRect(br, 5, 5);
+    painter->drawRoundedRect(br.adjusted(2, 2, -2, -2), 4, 4);
     painter->setFont(font());
-    painter->drawText(br, Qt::AlignCenter, entity()->titleUI());
+    painter->setPen(QPen(Qt::black));
+    painter->drawText(br.adjusted(20, 20, -20, -20), Qt::AlignLeft | Qt::AlignTop, entity()->titleUI());
     painter->restore();
 }
 
 QSizeF DVNodeGraphicsItem::minimalSize() const
 {
-    return shared::graphicsviewutils::kDefaultGraphicsItemSize;
+    return QSizeF(160, 160);
+}
+
+int DVNodeGraphicsItem::itemLevel(bool isSelected) const
+{
+    return isSelected ? 1 : 0;
 }
 
 shared::ColorManager::HandledColors DVNodeGraphicsItem::handledColorType() const

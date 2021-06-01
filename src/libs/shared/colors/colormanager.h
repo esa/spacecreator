@@ -61,12 +61,9 @@ public:
 
         // DVE
         Node = 10001,
-        Processor,
         Partition,
-        Bus,
         BusConnection,
         Device,
-        Binding,
     };
     Q_ENUM(HandledColors)
 

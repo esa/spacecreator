@@ -246,11 +246,12 @@ void VEItemModel::updateSceneRect()
     }
 
     if (itemsRect != m_prevItemsRect) {
-        const QRectF sceneRect = m_graphicsScene->sceneRect().marginsRemoved(shared::graphicsviewutils::kRootMargins);
+        const QRectF sceneRect =
+                m_graphicsScene->sceneRect().marginsRemoved(shared::graphicsviewutils::kContentMargins);
         const QRectF updated = sceneRect.united(itemsRect);
 
         if (sceneRect != updated) {
-            m_graphicsScene->setSceneRect(updated.marginsAdded(shared::graphicsviewutils::kRootMargins));
+            m_graphicsScene->setSceneRect(updated.marginsAdded(shared::graphicsviewutils::kContentMargins));
             m_prevItemsRect = itemsRect;
         }
     }

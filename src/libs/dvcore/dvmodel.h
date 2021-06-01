@@ -34,6 +34,9 @@ class DVModel : public shared::VEModel
 public:
     explicit DVModel(QObject *parent = nullptr);
     ~DVModel() override;
+
+    DVObject *getObject(const shared::Id &id) const override;
+    DVObject *getObjectByName(const QString &name, DVObject::Type type, Qt::CaseSensitivity caseSensitivity) const;
 };
 
 } // namespace deploy

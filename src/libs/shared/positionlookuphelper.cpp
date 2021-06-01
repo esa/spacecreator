@@ -21,7 +21,7 @@
 #include <QtDebug>
 #include <QtMath>
 
-namespace ive {
+namespace shared {
 
 PositionLookupHelper::PositionLookupHelper(const QHash<Qt::Alignment, QPainterPath> &sidePaths,
         const QRectF &parentRect, const QList<QRectF> &siblingsRects, const QRectF &itemRect,
@@ -29,15 +29,15 @@ PositionLookupHelper::PositionLookupHelper(const QHash<Qt::Alignment, QPainterPa
     : m_sidePaths(sidePaths)
     , m_siblingsRects(siblingsRects)
     , m_parentRect(parentRect)
-    , m_initialSideIdx(shared::graphicsviewutils::kRectSides.indexOf(
-              shared::graphicsviewutils::getNearestSide(parentRect, itemRect.topLeft() - originPoint)))
+    , m_initialSideIdx(graphicsviewutils::kRectSides.indexOf(
+              graphicsviewutils::getNearestSide(parentRect, itemRect.topLeft() - originPoint)))
     , m_intersectedRect()
     , m_itemRect(itemRect)
     , m_offset(originPoint)
     , m_direction(direction)
     , m_sideIdx(m_initialSideIdx)
 {
-    shared::graphicsviewutils::isCollided(m_siblingsRects, m_itemRect, &m_intersectedRect);
+    graphicsviewutils::isCollided(m_siblingsRects, m_itemRect, &m_intersectedRect);
 }
 
 bool PositionLookupHelper::lookup()
@@ -55,19 +55,19 @@ bool PositionLookupHelper::lookup()
 
 bool PositionLookupHelper::isReady() const
 {
-    return isBounded() && !shared::graphicsviewutils::isCollided(m_siblingsRects, m_itemRect);
+    return isBounded() && !graphicsviewutils::isCollided(m_siblingsRects, m_itemRect);
 }
 
 bool PositionLookupHelper::hasNext() const
 {
-    return qAbs(m_sideIdx - m_initialSideIdx) < shared::graphicsviewutils::kRectSides.size();
+    return qAbs(m_sideIdx - m_initialSideIdx) < graphicsviewutils::kRectSides.size();
 }
 
 bool PositionLookupHelper::nextRect()
 {
-    if (shared::graphicsviewutils::isCollided(m_siblingsRects, m_itemRect, &m_intersectedRect)) {
-        m_itemRect = shared::graphicsviewutils::adjustedRect(
-                m_itemRect, m_intersectedRect, shared::graphicsviewutils::sideFromIndex(m_sideIdx), m_direction);
+    if (graphicsviewutils::isCollided(m_siblingsRects, m_itemRect, &m_intersectedRect)) {
+        m_itemRect = graphicsviewutils::adjustedRect(
+                m_itemRect, m_intersectedRect, graphicsviewutils::sideFromIndex(m_sideIdx), m_direction);
         return true;
     }
     return false;
@@ -86,8 +86,8 @@ void PositionLookupHelper::nextSide()
 
     // resetting transposed rect to keep origin point on another edge of function
     sideShape.translate(m_itemRect.topLeft() - m_offset);
-    m_itemRect = shared::graphicsviewutils::alignRectToSide(
-            m_parentRect, sideShape.boundingRect(), shared::graphicsviewutils::sideFromIndex(m_sideIdx), m_offset);
+    m_itemRect = graphicsviewutils::alignRectToSide(
+            m_parentRect, sideShape.boundingRect(), graphicsviewutils::sideFromIndex(m_sideIdx), m_offset);
 }
 
 bool PositionLookupHelper::isBounded() const
@@ -107,7 +107,7 @@ QPointF PositionLookupHelper::mappedOriginPoint() const
 
 Qt::Alignment PositionLookupHelper::side() const
 {
-    return shared::graphicsviewutils::sideFromIndex(m_sideIdx);
+    return graphicsviewutils::sideFromIndex(m_sideIdx);
 }
 
-} // namespace ive
+} // namespace shared

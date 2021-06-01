@@ -283,7 +283,7 @@ void VERectGraphicsItem::layout()
         const auto parentFunction = qobject_cast<VERectGraphicsItem *>(parentObject());
         QRectF boundedRect =
                 QRectF(parentFunction ? parentFunction->sceneBoundingRect() : scene()->itemsBoundingRect());
-        QRectF itemRect = QRectF(QPointF(0, 0), graphicsviewutils::kDefaultGraphicsItemSize);
+        QRectF itemRect = QRectF(QPointF(0, 0), minimalSize());
         itemRect.moveTopLeft(boundedRect.topLeft());
         graphicsviewutils::findGeometryForRect(
                 itemRect, boundedRect, graphicsviewutils::siblingItemsRects(this), graphicsviewutils::kContentMargins);

@@ -17,20 +17,69 @@
 
 #include "dvconnectiongraphicsitem.h"
 
+#include "dvdevicegraphicsitem.h"
+#include "dvnodegraphicsitem.h"
 #include "graphicsviewutils.h"
 
 #include <QPainter>
 
 namespace dve {
 
-DVConnectionGraphicsItem::DVConnectionGraphicsItem(dvm::DVConnection *connection, QGraphicsItem *parent)
-    : shared::ui::VERectGraphicsItem(connection, parent)
+DVConnectionGraphicsItem::DVConnectionGraphicsItem(dvm::DVConnection *connection, DVDeviceGraphicsItem *startItem,
+        DVDeviceGraphicsItem *endItem, QGraphicsItem *parent)
+    : shared::ui::VEInteractiveObject(connection, parent)
+    , m_startItem(startItem)
+    , m_endItem(endItem)
 {
+}
+
+DVConnectionGraphicsItem::~DVConnectionGraphicsItem()
+{
+    for (DVDeviceGraphicsItem *item : { startItem(), endItem() }) {
+        if (item) {
+            item->removeConnection(this);
+        }
+    }
 }
 
 dvm::DVConnection *dve::DVConnectionGraphicsItem::entity() const
 {
     return m_dataObject.isNull() ? nullptr : m_dataObject->as<dvm::DVConnection *>();
+}
+
+void DVConnectionGraphicsItem::init()
+{
+    for (DVDeviceGraphicsItem *item : { startItem(), endItem() }) {
+        if (item) {
+            item->addConnection(this);
+        }
+    }
+}
+
+DVDeviceGraphicsItem *DVConnectionGraphicsItem::startItem() const
+{
+    return m_startItem;
+}
+
+DVDeviceGraphicsItem *DVConnectionGraphicsItem::endItem() const
+{
+    return m_endItem;
+}
+
+void DVConnectionGraphicsItem::setPoints(const QVector<QPointF> &points)
+{
+    if (points.isEmpty()) {
+        if (m_startItem && m_endItem)
+            instantLayoutUpdate();
+        else
+            m_points.clear();
+        return;
+    }
+
+    if (!shared::graphicsviewutils::comparePolygones(m_points, points)) {
+        m_points = points;
+        instantLayoutUpdate();
+    }
 }
 
 void DVConnectionGraphicsItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget)
@@ -44,22 +93,42 @@ void DVConnectionGraphicsItem::paint(QPainter *painter, const QStyleOptionGraphi
     painter->save();
     painter->setRenderHint(QPainter::Antialiasing);
     painter->setPen(pen());
-    painter->setBrush(brush());
-    const QRectF br = boundingRect();
-    painter->drawRect(br);
-    painter->setFont(font());
-    painter->drawText(br, Qt::AlignCenter, entity()->titleUI());
+    painter->drawPolyline(m_points);
     painter->restore();
 }
 
-QSizeF DVConnectionGraphicsItem::minimalSize() const
+int DVConnectionGraphicsItem::itemLevel(bool isSelected) const
 {
-    return shared::graphicsviewutils::kDefaultGraphicsItemSize;
+    return isSelected ? 1 : 0;
+}
+
+void DVConnectionGraphicsItem::updateFromEntity()
+{
+    m_points = mapFromScene(shared::graphicsviewutils::polygon(entity()->coordinates()));
+    if (m_points.isEmpty()) {
+        layout();
+        updateEntity();
+    }
+    rebuildLayout();
 }
 
 shared::ColorManager::HandledColors DVConnectionGraphicsItem::handledColorType() const
 {
     return shared::ColorManager::HandledColors::BusConnection;
+}
+
+void DVConnectionGraphicsItem::layout()
+{
+    if (!startItem() || !endItem())
+        return;
+
+    Q_ASSERT(startItem()->scene() == endItem()->scene() && scene());
+
+    m_points = shared::graphicsviewutils::createConnectionPath(shared::graphicsviewutils::siblingItemsRects(this),
+            startItem()->sceneBoundingRect().center(), startItem()->targetItem()->sceneBoundingRect(),
+            endItem()->sceneBoundingRect().center(), endItem()->targetItem()->sceneBoundingRect());
+
+    setBoundingRect(m_points.boundingRect());
 }
 
 void DVConnectionGraphicsItem::applyColorScheme()

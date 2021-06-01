@@ -3,14 +3,10 @@ set(LIB_NAME dvcore)
 add_library(${LIB_NAME} STATIC)
 
 target_sources(${LIB_NAME} PRIVATE
-    dvbinding.cpp
-    dvbinding.h
     dvboard.cpp
     dvboard.h
     dvboardreader.cpp
     dvboardreader.h
-    dvbus.cpp
-    dvbus.h
     dvcommonprops.cpp
     dvcommonprops.h
     dvconnection.cpp
@@ -19,8 +15,6 @@ target_sources(${LIB_NAME} PRIVATE
     dvdevice.h
     dvfunction.cpp
     dvfunction.h
-    dvinterface.cpp
-    dvinterface.h
     dvmodel.cpp
     dvmodel.h
     dvnode.cpp
@@ -29,8 +23,6 @@ target_sources(${LIB_NAME} PRIVATE
     dvobject.h
     dvpartition.cpp
     dvpartition.h
-    dvprocessor.cpp
-    dvprocessor.h
     dvxmlreader.cpp
     dvxmlreader.h
 )

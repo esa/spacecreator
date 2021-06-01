@@ -39,14 +39,10 @@ public:
         Unknown = 0,
 
         Node,
-        Processor,
         Partition,
         Function,
-        Binding,
         Device,
-        Bus,
         Connection,
-        Interface,
         Board
     };
     Q_ENUM(Type)

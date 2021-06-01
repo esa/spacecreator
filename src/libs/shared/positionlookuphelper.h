@@ -23,10 +23,10 @@
 #include <QPainterPath>
 #include <qnamespace.h>
 
-namespace ive {
+namespace shared {
 
 /*!
-   \class ive::PositionLookupHelper
+   \class shared::PositionLookupHelper
    \brief Class to find free place
 
     Class is used to find the place for \a itemRect
@@ -105,4 +105,4 @@ private:
     int m_sideIdx;
 };
 
-} // namespace ive
+} // namespace shared

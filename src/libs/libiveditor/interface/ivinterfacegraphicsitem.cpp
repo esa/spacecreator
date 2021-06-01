@@ -19,7 +19,6 @@
 #include "ivinterfacegraphicsitem.h"
 
 #include "baseitems/common/ivutils.h"
-#include "baseitems/common/positionlookuphelper.h"
 #include "colors/colormanager.h"
 #include "graphicsitemhelpers.h"
 #include "graphicsviewutils.h"
@@ -31,6 +30,7 @@
 #include "ivfunctiontypegraphicsitem.h"
 #include "ivinterface.h"
 #include "ivnamevalidator.h"
+#include "positionlookuphelper.h"
 
 #include <QGraphicsScene>
 #include <QPainter>
@@ -467,9 +467,9 @@ void IVInterfaceGraphicsItem::adjustItem()
             { Qt::AlignRight, itemPath(Qt::AlignRight) },
             { Qt::AlignBottom, itemPath(Qt::AlignBottom) },
         };
-        PositionLookupHelper cwHelper(kSidePaths, parentRect, siblingsRects, itemRect, initialOffset,
+        shared::PositionLookupHelper cwHelper(kSidePaths, parentRect, siblingsRects, itemRect, initialOffset,
                 shared::graphicsviewutils::LookupDirection::Clockwise);
-        PositionLookupHelper ccwHelper(kSidePaths, parentRect, siblingsRects, itemRect, initialOffset,
+        shared::PositionLookupHelper ccwHelper(kSidePaths, parentRect, siblingsRects, itemRect, initialOffset,
                 shared::graphicsviewutils::LookupDirection::CounterClockwise);
         while (cwHelper.hasNext() || ccwHelper.hasNext()) {
             if (cwHelper.lookup()) {

@@ -17,21 +17,15 @@
 
 #include "exportabledvobject.h"
 
-#include "dvbinding.h"
-#include "dvbus.h"
 #include "dvconnection.h"
 #include "dvdevice.h"
 #include "dvnode.h"
 #include "dvobject.h"
 #include "dvpartition.h"
-#include "dvprocessor.h"
-#include "exportabledvbinding.h"
-#include "exportabledvbus.h"
 #include "exportabledvconnection.h"
 #include "exportabledvdevice.h"
 #include "exportabledvnode.h"
 #include "exportabledvpartition.h"
-#include "exportabledvprocessor.h"
 #include "exportableproperty.h"
 
 namespace dve {
@@ -71,16 +65,10 @@ QVariant ExportableDVObject::createFrom(const dvm::DVObject *dvObject)
         break;
     case dvm::DVObject::Type::Node:
         return QVariant::fromValue(ExportableDVNode(static_cast<const dvm::DVNode *>(dvObject)));
-    case dvm::DVObject::Type::Processor:
-        return QVariant::fromValue(ExportableDVProcessor(static_cast<const dvm::DVProcessor *>(dvObject)));
     case dvm::DVObject::Type::Partition:
         return QVariant::fromValue(ExportableDVPartition(static_cast<const dvm::DVPartition *>(dvObject)));
-    case dvm::DVObject::Type::Binding:
-        return QVariant::fromValue(ExportableDVBinding(static_cast<const dvm::DVBinding *>(dvObject)));
     case dvm::DVObject::Type::Device:
         return QVariant::fromValue(ExportableDVDevice(static_cast<const dvm::DVDevice *>(dvObject)));
-    case dvm::DVObject::Type::Bus:
-        return QVariant::fromValue(ExportableDVBus(static_cast<const dvm::DVBus *>(dvObject)));
     case dvm::DVObject::Type::Connection:
         return QVariant::fromValue(ExportableDVConnection(static_cast<const dvm::DVConnection *>(dvObject)));
     default:

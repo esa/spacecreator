@@ -17,7 +17,18 @@
 
 #include "dvitemmodel.h"
 
+#include "dvconnection.h"
+#include "dvconnectiongraphicsitem.h"
+#include "dvdevice.h"
+#include "dvdevicegraphicsitem.h"
+#include "dvnode.h"
+#include "dvnodegraphicsitem.h"
+#include "dvpartition.h"
+#include "dvpartitiongraphicsitem.h"
 #include "interface/veitemmodel.h"
+#include "ui/veinteractiveobject.h"
+
+#include <QtDebug>
 
 namespace dve {
 
@@ -35,7 +46,38 @@ dvm::DVModel *DVItemModel::objectsModel() const
 
 shared::ui::VEInteractiveObject *DVItemModel::createItem(shared::Id objectId)
 {
-    return nullptr;
+    auto obj = objectsModel()->getObject(objectId);
+    Q_ASSERT(obj);
+    if (!obj) {
+        return nullptr;
+    }
+
+    QGraphicsItem *parentItem = obj->parentObject() ? m_items.value(obj->parentObject()->id()) : nullptr;
+
+    switch (obj->type()) {
+    case dvm::DVObject::Type::Node: {
+        return new DVNodeGraphicsItem(obj->as<dvm::DVNode *>(), parentItem);
+    } break;
+    case dvm::DVObject::Type::Partition: {
+        return new DVPartitionGraphicsItem(obj->as<dvm::DVPartition *>(), parentItem);
+    } break;
+    case dvm::DVObject::Type::Device: {
+        return new DVDeviceGraphicsItem(obj->as<dvm::DVDevice *>(), parentItem);
+    } break;
+    case dvm::DVObject::Type::Connection: {
+        if (auto connectionEntity = obj->as<dvm::DVConnection *>()) {
+            DVDeviceGraphicsItem *startItem = getItem<DVDeviceGraphicsItem *>(connectionEntity->sourceDevice()->id());
+            DVDeviceGraphicsItem *endItem = getItem<DVDeviceGraphicsItem *>(connectionEntity->targetDevice()->id());
+            return new DVConnectionGraphicsItem(connectionEntity, startItem, endItem, parentItem);
+        }
+    } break;
+    default: {
+        qCritical() << "Unknown object type:" << obj->type();
+        break;
+    }
+    }
+
+    return {};
 }
 
 } // namespace dve

@@ -18,14 +18,12 @@
 #include "dvboardreader.h"
 
 #include "dvboard.h"
-#include "dvbus.h"
 #include "dvcommonprops.h"
 #include "dvconnection.h"
 #include "dvdevice.h"
 #include "dvfunction.h"
 #include "dvobject.h"
 #include "dvpartition.h"
-#include "dvprocessor.h"
 
 #include <QDebug>
 #include <QFile>

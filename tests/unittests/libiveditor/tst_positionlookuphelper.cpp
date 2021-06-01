@@ -16,12 +16,12 @@
 */
 
 #include "baseitems/common/ivutils.h"
-#include "baseitems/common/positionlookuphelper.h"
 #include "graphicsviewutils.h"
 #include "interface/ivfunctiongraphicsitem.h"
 #include "interface/ivinterfacegraphicsitem.h"
 #include "ivfunction.h"
 #include "ivinterface.h"
+#include "positionlookuphelper.h"
 #include "sharedlibrary.h"
 
 #include <QGraphicsScene>
@@ -58,9 +58,9 @@ void tst_PositionLookupHelper::testOnSide(
 {
     QList<QRectF> siblingsRects;
     for (int idx = 0; idx < itemRects.size(); ++idx) {
-        ive::PositionLookupHelper clockwiseHelper(sidePaths, parentBoundingRect, siblingsRects, itemRects.value(idx),
+        shared::PositionLookupHelper clockwiseHelper(sidePaths, parentBoundingRect, siblingsRects, itemRects.value(idx),
                 initialOffset, shared::graphicsviewutils::LookupDirection::Clockwise);
-        ive::PositionLookupHelper counterClockwiseHelper(sidePaths, parentBoundingRect, siblingsRects,
+        shared::PositionLookupHelper counterClockwiseHelper(sidePaths, parentBoundingRect, siblingsRects,
                 itemRects.value(idx), initialOffset, shared::graphicsviewutils::LookupDirection::CounterClockwise);
         while (clockwiseHelper.hasNext() || counterClockwiseHelper.hasNext()) {
             if (clockwiseHelper.lookup()) {
@@ -177,7 +177,6 @@ void tst_PositionLookupHelper::testLookupOnBottom()
 
 void tst_PositionLookupHelper::testLookupAllSides()
 {
-    QList<QRectF> siblingsRects;
     const QRectF parentBoundingRect = functionItem->boundingRect();
     QRectF itemRect = ifaceItem->itemPath(Qt::AlignTop).boundingRect();
     QPointF initialOffset = itemRect.topLeft();

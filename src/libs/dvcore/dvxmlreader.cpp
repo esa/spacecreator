@@ -17,7 +17,6 @@
 
 #include "dvxmlreader.h"
 
-#include "dvbus.h"
 #include "dvcommonprops.h"
 #include "dvconnection.h"
 #include "dvdevice.h"
@@ -25,7 +24,6 @@
 #include "dvnode.h"
 #include "dvobject.h"
 #include "dvpartition.h"
-#include "dvprocessor.h"
 
 #include <QDebug>
 #include <QFile>
@@ -41,19 +39,10 @@ namespace dvm {
 struct DVXMLReaderPrivate {
     QVector<DVObject *> m_allObjects {};
     DVObject *m_currentObject { nullptr };
-    QHash<QString, DVProcessor *> m_processors;
-    QHash<QString, DVBus *> m_buses;
     void addObject(DVObject *obj)
     {
         if (obj && !m_allObjects.contains(obj)) {
             m_allObjects.append(obj);
-            if (obj->type() == DVObject::Type::Processor) {
-                Q_ASSERT(!m_processors.contains(obj->title()));
-                m_processors.insert(obj->title(), obj->as<DVProcessor *>());
-            } else if (obj->type() == DVObject::Type::Bus) {
-                Q_ASSERT(!m_buses.contains(obj->title()));
-                m_buses.insert(obj->title(), obj->as<DVBus *>());
-            }
         }
     }
 };
@@ -80,14 +69,9 @@ void DVXMLReader::processTagOpen(QXmlStreamReader &xml)
     const meta::Props::Token t = meta::Props::token(tagName);
     switch (t) {
     case meta::Props::Token::Partition: {
-        const QString cpuName = attrs.value(QLatin1String("cpu")).toString();
-        auto cpu = d->m_processors.value(cpuName);
-        if (!cpu) {
-            cpu = createProcessor(cpuName);
-        }
-        if (cpu) {
-            auto partition = new dvm::DVPartition(cpu);
-            cpu->addPartition(partition);
+        if (auto node = qobject_cast<dvm::DVNode *>(d->m_currentObject)) {
+            auto partition = new dvm::DVPartition(node);
+            node->addPartition(partition);
             obj = partition;
         }
     } break;
@@ -96,19 +80,6 @@ void DVXMLReader::processTagOpen(QXmlStreamReader &xml)
     } break;
     case meta::Props::Token::Device: {
         if (auto node = qobject_cast<DVNode *>(d->m_currentObject)) {
-            const QString cpuName = attrs.value(QLatin1String("proc")).toString();
-            auto cpu = d->m_processors.value(cpuName);
-            if (!cpu) {
-                cpu = createProcessor(cpuName);
-            }
-            const QString busName = attrs.value(QLatin1String("bus")).toString();
-            dvm::DVBus *bus = d->m_buses.value(busName);
-            if (!bus) {
-                bus = new dvm::DVBus;
-                bus->setTitle(busName);
-                d->addObject(bus);
-            }
-
             auto dev = new dvm::DVDevice(d->m_currentObject);
             node->setDevice(dev);
             obj = dev;
@@ -123,16 +94,7 @@ void DVXMLReader::processTagOpen(QXmlStreamReader &xml)
         }
     } break;
     case meta::Props::Token::Connection: {
-        const QString busName = attrs.value(QLatin1String("to_bus")).toString();
-        dvm::DVBus *bus = d->m_buses.value(busName);
-        if (!bus) {
-            bus = new dvm::DVBus;
-            bus->setTitle(busName);
-            d->addObject(bus);
-        }
-        auto connection = new dvm::DVConnection(bus);
-        bus->addConnection(connection);
-        obj = connection;
+        obj = new dvm::DVConnection(d->m_currentObject);
     } break;
 
     default:
@@ -159,14 +121,6 @@ void DVXMLReader::processTagClose(QXmlStreamReader &xml)
     const QString &tagName = xml.name().toString();
     switch (meta::Props::token(tagName)) {
     case meta::Props::Token::Partition:
-        if (d->m_currentObject) {
-            if (auto cpu = d->m_currentObject->parentObject()) {
-                d->m_currentObject = cpu->parentObject();
-                break;
-            }
-        }
-        d->m_currentObject = nullptr;
-        break;
     case meta::Props::Token::Function:
     case meta::Props::Token::Node:
     case meta::Props::Token::Device:
@@ -182,22 +136,6 @@ void DVXMLReader::processTagClose(QXmlStreamReader &xml)
 QString DVXMLReader::rootElementName() const
 {
     return meta::Props::token(meta::Props::Token::DeploymentView);
-}
-
-DVProcessor *DVXMLReader::createProcessor(const QString &name)
-{
-    if (auto node = qobject_cast<DVNode *>(d->m_currentObject)) {
-        DVProcessor *cpu = d->m_processors.value(name);
-        if (!cpu) {
-            cpu = new DVProcessor(node);
-            cpu->setTitle(name);
-            node->setProcessor(cpu);
-            d->addObject(cpu);
-            d->m_processors.insert(name, cpu);
-        }
-        return cpu;
-    }
-    return nullptr;
 }
 
 } // namespace dvm

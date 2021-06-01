@@ -842,7 +842,7 @@ void InterfaceDocument::pasteItems()
     if (graphicsView()
                     ->viewport()
                     ->rect()
-                    .marginsRemoved(shared::graphicsviewutils::kRootMargins.toMargins())
+                    .marginsRemoved(shared::graphicsviewutils::kContentMargins.toMargins())
                     .contains(viewportCursorPos)) {
         sceneDropPoint = graphicsView()->mapToScene(viewportCursorPos);
     }

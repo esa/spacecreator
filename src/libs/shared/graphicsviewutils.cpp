@@ -1077,11 +1077,11 @@ bool isBounded(const QGraphicsItem *upcomingItem, const QRectF &upcomingItemRect
 
     if (auto rectItem = qobject_cast<const ui::VERectGraphicsItem *>(upcomingItem->toGraphicsObject())) {
         if (auto parentObj = rectItem->parentItem()) {
-            const QRectF outerRect = parentObj->sceneBoundingRect().marginsRemoved(kRootMargins);
+            const QRectF outerRect = parentObj->sceneBoundingRect().marginsRemoved(kContentMargins);
             return isRectBounded(outerRect, upcomingItemRect);
         } else {
             return isRectBounded(
-                    upcomingItemRect.marginsRemoved(kRootMargins), rectItem->nestedItemsSceneBoundingRect());
+                    upcomingItemRect.marginsRemoved(kContentMargins), rectItem->nestedItemsSceneBoundingRect());
         }
     }
     return true;

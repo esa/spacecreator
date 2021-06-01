@@ -32,4 +32,24 @@ DVModel::DVModel(QObject *parent)
 
 DVModel::~DVModel() { }
 
+DVObject *DVModel::getObjectByName(const QString &name, DVObject::Type type, Qt::CaseSensitivity caseSensitivity) const
+{
+    if (name.isEmpty())
+        return nullptr;
+
+    for (auto object : objects()) {
+        if (auto obj = qobject_cast<dvm::DVObject *>(object)) {
+            if ((type == DVObject::Type::Unknown || type == obj->type())
+                    && obj->title().compare(name, caseSensitivity) == 0)
+                return obj;
+        }
+    }
+    return nullptr;
+}
+
+DVObject *DVModel::getObject(const shared::Id &id) const
+{
+    return qobject_cast<DVObject *>(shared::VEModel::getObject(id));
+}
+
 } // namespace deploy

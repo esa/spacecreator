@@ -24,21 +24,32 @@
 class QGraphicsItem;
 
 namespace dve {
+class DVDeviceGraphicsItem;
 
-class DVConnectionGraphicsItem : public shared::ui::VERectGraphicsItem
+class DVConnectionGraphicsItem : public shared::ui::VEInteractiveObject
 {
     Q_OBJECT
 public:
-    explicit DVConnectionGraphicsItem(dvm::DVConnection *connection, QGraphicsItem *parent = nullptr);
+    explicit DVConnectionGraphicsItem(dvm::DVConnection *connection, DVDeviceGraphicsItem *startItem,
+            DVDeviceGraphicsItem *endItem, QGraphicsItem *parent = nullptr);
+    ~DVConnectionGraphicsItem() override;
     enum
     {
         Type = UserType + static_cast<int>(dvm::DVObject::Type::Connection)
     };
 
     dvm::DVConnection *entity() const override;
-    QSizeF minimalSize() const override;
+    void init() override;
+
+    DVDeviceGraphicsItem *startItem() const;
+    DVDeviceGraphicsItem *endItem() const;
+
+    void setPoints(const QVector<QPointF> &points);
 
     int type() const override { return Type; }
+    int itemLevel(bool isSelected) const override;
+    void updateFromEntity() override;
+    void layout();
 
 protected Q_SLOTS:
     void applyColorScheme() override;
@@ -46,6 +57,11 @@ protected Q_SLOTS:
 protected:
     void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget) override;
     shared::ColorManager::HandledColors handledColorType() const override;
+
+private:
+    DVDeviceGraphicsItem *m_startItem { nullptr };
+    DVDeviceGraphicsItem *m_endItem { nullptr };
+    QPolygonF m_points;
 };
 
 } // namespace dve

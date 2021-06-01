@@ -71,19 +71,19 @@ void DVXMLReaderTest::tst_singleItems()
 {
     runReader(helpers::singleNode(), 1);
     runReader(helpers::nonValidDoc(), -1, false);
-    runReader(helpers::singlePartitionWithNode(), 3);
+    runReader(helpers::singlePartitionWithNode(), 2);
     runReader(helpers::singlePartitionOnly(), 0);
     runReader(helpers::singlePartitionWithFunctions(), 0);
-    runReader(helpers::singleDeviceWithNode(), 4);
+    runReader(helpers::singleDeviceWithNode(), 2);
     runReader(helpers::singleDeviceOnly(), 0);
-    runReader(helpers::singleNodeWithPartitionAndDevice(), 6);
+    runReader(helpers::singleNodeWithPartitionAndDevice(), 3);
     runReader(helpers::unknownProperty(), 0);
     runReader(helpers::openCloseTagMismatched(), -1, false);
     runReader(helpers::malformedXml(), -1, false);
-    runReader(helpers::twoConnections(), 3);
-    runReader(helpers::twoConnectionsAndNode(), 4);
-    runReader(helpers::twoConnectionsAndNodeWithPartitionAndDevice(), 8);
-    runReader(helpers::twoConnectionsAndNodeWithDeviceAndPartitionWithFunctions(), 18);
+    runReader(helpers::twoConnections(), 2);
+    runReader(helpers::twoConnectionsAndNode(), 3);
+    runReader(helpers::twoConnectionsAndNodeWithPartitionAndDevice(), 5);
+    runReader(helpers::twoConnectionsAndNodeWithDeviceAndPartitionWithFunctions(), 15);
 }
 
 void DVXMLReaderTest::tst_functions()

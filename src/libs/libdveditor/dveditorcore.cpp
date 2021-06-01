@@ -40,8 +40,7 @@ struct DVEditorCore::DVEditorCorePrivate {
     DVEditorCorePrivate(const DVEditorCorePrivate &) = delete;
     DVEditorCorePrivate &operator=(const DVEditorCorePrivate &) = delete;
     DVEditorCorePrivate()
-        : m_scene(new QGraphicsScene)
-        , m_appModel(new DVAppModel)
+        : m_appModel(new DVAppModel)
         , m_model(new DVItemModel(m_appModel->objectsModel(), m_appModel->commandsStack()))
         , m_visualizationModel(
                   new shared::AbstractVisualizationModel(m_appModel->objectsModel(), m_appModel->commandsStack()))
@@ -55,7 +54,6 @@ struct DVEditorCore::DVEditorCorePrivate {
 
     ~DVEditorCorePrivate() { delete m_toolBar; }
 
-    QGraphicsScene *m_scene { nullptr };
     std::unique_ptr<dve::DVAppModel> m_appModel;
     std::unique_ptr<dve::DVItemModel> m_model;
     std::unique_ptr<shared::AbstractVisualizationModel> m_visualizationModel;
@@ -99,7 +97,7 @@ QWidget *DVEditorCore::mainwidget()
 {
     if (!d->m_mainWidget) {
         d->m_mainWidget = new DVAppWidget;
-        d->m_mainWidget->setGraphicsScene(d->m_scene);
+        d->m_mainWidget->setGraphicsScene(d->m_model->scene());
         d->m_mainWidget->setAadlModel(d->m_visualizationModel.get());
         d->m_mainWidget->setHWModel(d->m_hwModel.get());
     }

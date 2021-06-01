@@ -19,26 +19,40 @@
 
 #include "colors/colormanager.h"
 #include "dvdevice.h"
-#include "ui/verectgraphicsitem.h"
+#include "ui/veinteractiveobject.h"
+
+#include <QPointer>
 
 class QGraphicsItem;
 
 namespace dve {
+class DVNodeGraphicsItem;
+class DVConnectionGraphicsItem;
 
-class DVDeviceGraphicsItem : public shared::ui::VERectGraphicsItem
+class DVDeviceGraphicsItem : public shared::ui::VEInteractiveObject
 {
     Q_OBJECT
 public:
     explicit DVDeviceGraphicsItem(dvm::DVDevice *device, QGraphicsItem *parent = nullptr);
+    ~DVDeviceGraphicsItem() override;
     enum
     {
         Type = UserType + static_cast<int>(dvm::DVObject::Type::Device)
     };
 
     dvm::DVDevice *entity() const override;
-    QSizeF minimalSize() const override;
 
     int type() const override { return Type; }
+    int itemLevel(bool isSelected) const override;
+
+    DVNodeGraphicsItem *targetItem() const;
+    void setTargetItem(DVNodeGraphicsItem *item, const QPointF &globalPos);
+
+    void addConnection(DVConnectionGraphicsItem *item);
+    void removeConnection(DVConnectionGraphicsItem *item);
+    QList<QPointer<DVConnectionGraphicsItem>> connectionItems() const;
+
+    void updateFromEntity() override;
 
 protected Q_SLOTS:
     void applyColorScheme() override;
@@ -46,6 +60,11 @@ protected Q_SLOTS:
 protected:
     void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget) override;
     shared::ColorManager::HandledColors handledColorType() const override;
+    void adjustItem();
+
+private:
+    DVNodeGraphicsItem *m_node { nullptr };
+    QList<QPointer<DVConnectionGraphicsItem>> m_connections;
 };
 
 } // namespace dve

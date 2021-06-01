@@ -18,14 +18,13 @@
 #include "dvnode.h"
 
 #include "dvdevice.h"
-#include "dvprocessor.h"
 
 #include <QPointer>
 
 namespace dvm {
 
 struct DVNodePrivate {
-    QPointer<DVProcessor> cpu;
+    QList<DVPartition *> partitions;
     QPointer<DVDevice> device;
 };
 
@@ -37,14 +36,17 @@ DVNode::DVNode(DVObject *parent)
 
 DVNode::~DVNode() { }
 
-void DVNode::setProcessor(DVProcessor *cpu)
+void DVNode::addPartition(DVPartition *partition)
 {
-    d->cpu = cpu;
+    if (!d->partitions.contains(partition)) {
+        d->partitions.append(partition);
+    }
 }
 
-DVProcessor *DVNode::processor() const
+QList<DVPartition *> DVNode::partitions() const
 {
-    return d->cpu;
+    return d->partitions;
+    ;
 }
 
 void DVNode::setDevice(DVDevice *device)

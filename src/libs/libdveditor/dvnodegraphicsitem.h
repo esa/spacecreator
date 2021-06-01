@@ -26,7 +26,7 @@ class QGraphicsItem;
 
 namespace dve {
 
-class DVNodeGraphicsItem : shared::ui::VERectGraphicsItem
+class DVNodeGraphicsItem : public shared::ui::VERectGraphicsItem
 {
     Q_OBJECT
 public:
@@ -40,6 +40,7 @@ public:
     QSizeF minimalSize() const override;
 
     int type() const override { return Type; }
+    int itemLevel(bool isSelected) const override;
 
 protected Q_SLOTS:
     void applyColorScheme() override;

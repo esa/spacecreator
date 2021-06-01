@@ -27,14 +27,8 @@ target_sources(${LIB_NAME} PRIVATE
     templating/exportabledvobject.h
     templating/exportabledvnode.cpp
     templating/exportabledvnode.h
-    templating/exportabledvprocessor.cpp
-    templating/exportabledvprocessor.h
     templating/exportabledvpartition.cpp
     templating/exportabledvpartition.h
-    templating/exportabledvbinding.cpp
-    templating/exportabledvbinding.h
-    templating/exportabledvbus.cpp
-    templating/exportabledvbus.h
     templating/exportabledvconnection.cpp
     templating/exportabledvconnection.h
     templating/exportabledvdevice.cpp
@@ -43,20 +37,12 @@ target_sources(${LIB_NAME} PRIVATE
     dvexporter.h
     dvnodegraphicsitem.cpp
     dvnodegraphicsitem.h
-    dvprocessorgraphicsitem.cpp
-    dvprocessorgraphicsitem.h
     dvpartitiongraphicsitem.cpp
     dvpartitiongraphicsitem.h
     dvdevicegraphicsitem.cpp
     dvdevicegraphicsitem.h
-    dvbusgraphicsitem.cpp
-    dvbusgraphicsitem.h
     dvconnectiongraphicsitem.cpp
     dvconnectiongraphicsitem.h
-    dvbindinggraphicsitem.cpp
-    dvbindinggraphicsitem.h
-    dvinterfacegraphicsitem.cpp
-    dvinterfacegraphicsitem.h
 )
 
 target_link_libraries(${LIB_NAME}

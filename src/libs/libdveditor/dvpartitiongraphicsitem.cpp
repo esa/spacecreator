@@ -35,7 +35,12 @@ dvm::DVPartition *DVPartitionGraphicsItem::entity() const
 
 QSizeF DVPartitionGraphicsItem::minimalSize() const
 {
-    return shared::graphicsviewutils::kDefaultGraphicsItemSize;
+    return QSizeF(80, 80);
+}
+
+int DVPartitionGraphicsItem::itemLevel(bool isSelected) const
+{
+    return isSelected ? 1 : 0;
 }
 
 void DVPartitionGraphicsItem::applyColorScheme()
@@ -61,10 +66,20 @@ void DVPartitionGraphicsItem::paint(QPainter *painter, const QStyleOptionGraphic
     painter->setRenderHint(QPainter::Antialiasing);
     painter->setPen(pen());
     painter->setBrush(brush());
-    const QRectF br = boundingRect();
+    QRectF br = boundingRect();
     painter->drawRect(br);
     painter->setFont(font());
-    painter->drawText(br, Qt::AlignCenter, entity()->titleUI());
+    painter->setPen(QPen(Qt::black));
+    QRectF titleRect;
+    painter->drawText(br, Qt::AlignHCenter | Qt::AlignTop, entity()->titleUI(), &titleRect);
+
+    const QString functions = entity()->functionsNames().join(QLatin1Char('\n'));
+    br.setTop(titleRect.bottom());
+    painter->setPen(QPen(Qt::gray));
+    QFont f(font());
+    f.setItalic(true);
+    painter->drawText(br, Qt::AlignCenter, functions);
+
     painter->restore();
 }
 

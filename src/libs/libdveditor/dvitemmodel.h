@@ -47,6 +47,7 @@ public:
 
     dvm::DVModel *objectsModel() const override;
 
+protected:
     shared::ui::VEInteractiveObject *createItem(shared::Id objectId) override;
 };
 

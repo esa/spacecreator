@@ -19,15 +19,27 @@
 
 #include "dvobject.h"
 
+#include <memory>
+
 namespace dvm {
+class DVDevice;
+struct DVConnectionPrivate;
 
 class DVConnection : public DVObject
 {
     Q_OBJECT
 public:
     explicit DVConnection(DVObject *parent = nullptr);
+    ~DVConnection() override;
 
+    bool postInit(QString *warning = nullptr) override;
     QString titleUI() const override;
+
+    DVDevice *sourceDevice() const;
+    DVDevice *targetDevice() const;
+
+private:
+    std::unique_ptr<DVConnectionPrivate> d;
 };
 
 } // namespace deploy

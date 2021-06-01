@@ -17,22 +17,16 @@
 
 #include "dvexporter.h"
 
-#include "dvbinding.h"
-#include "dvbus.h"
 #include "dvconnection.h"
 #include "dvdevice.h"
 #include "dvnode.h"
 #include "dvobject.h"
 #include "dvpartition.h"
-#include "dvprocessor.h"
-#include "templating/exportabledvbinding.h"
-#include "templating/exportabledvbus.h"
 #include "templating/exportabledvconnection.h"
 #include "templating/exportabledvdevice.h"
 #include "templating/exportabledvnode.h"
 #include "templating/exportabledvobject.h"
 #include "templating/exportabledvpartition.h"
-#include "templating/exportabledvprocessor.h"
 
 namespace dve {
 
@@ -57,14 +51,8 @@ QString DVExporter::groupName(const shared::VEObject *object) const
         switch (dvObject->type()) {
         case dvm::DVObject::Type::Node:
             return QStringLiteral("Nodes");
-        case dvm::DVObject::Type::Processor:
-            return QStringLiteral("Processors");
         case dvm::DVObject::Type::Partition:
             return QStringLiteral("Partitions");
-        case dvm::DVObject::Type::Binding:
-            return QStringLiteral("Bindings");
-        case dvm::DVObject::Type::Bus:
-            return QStringLiteral("Buses");
         case dvm::DVObject::Type::Connection:
             return QStringLiteral("Connections");
         case dvm::DVObject::Type::Device:

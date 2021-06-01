@@ -23,7 +23,7 @@
 
 namespace dvm {
 struct DVNodePrivate;
-class DVProcessor;
+class DVPartition;
 class DVDevice;
 
 class DVNode : public DVObject
@@ -33,8 +33,8 @@ public:
     explicit DVNode(DVObject *parent = nullptr);
     ~DVNode() override;
 
-    void setProcessor(DVProcessor *cpu);
-    DVProcessor *processor() const;
+    void addPartition(DVPartition *partition);
+    QList<DVPartition *> partitions() const;
 
     void setDevice(DVDevice *device);
     DVDevice *device() const;

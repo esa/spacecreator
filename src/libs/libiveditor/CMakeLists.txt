@@ -8,8 +8,6 @@ target_sources(${LIB_NAME} PRIVATE
     asn1dialog.ui
     baseitems/common/ivutils.cpp
     baseitems/common/ivutils.h
-    baseitems/common/positionlookuphelper.cpp
-    baseitems/common/positionlookuphelper.h
     baseitems/graphicsview.cpp
     baseitems/graphicsview.h
     commandsstack.cpp
