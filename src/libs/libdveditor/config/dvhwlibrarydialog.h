@@ -33,6 +33,9 @@ public:
     explicit DVHWLibraryDialog(QWidget *parent = nullptr);
     ~DVHWLibraryDialog();
 
+public Q_SLOTS:
+    void accept() override;
+
 private:
     Ui::DVHWLibraryDialog *ui;
 };

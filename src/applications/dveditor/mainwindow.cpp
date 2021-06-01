@@ -82,9 +82,11 @@ void MainWindow::showColorScheme()
 void MainWindow::editHwLibrary()
 {
     DVHWLibraryDialog dialog;
-    dialog.exec();
-    QString hwFile = shared::SettingsManager::load<QString>(shared::SettingsManager::DVE::HwLibraryFile, "");
-    m_core->loadHWLibrary(hwFile);
+    int ret = dialog.exec();
+    if (ret == QDialog::Accepted) {
+        QString hwFile = shared::SettingsManager::load<QString>(shared::SettingsManager::DVE::HwLibraryFile, "");
+        m_core->loadHWLibrary(hwFile);
+    }
 }
 
 /*!

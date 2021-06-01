@@ -33,4 +33,10 @@ DVHWLibraryDialog::~DVHWLibraryDialog()
     delete ui;
 }
 
+void DVHWLibraryDialog::accept()
+{
+    ui->widget->save();
+    QDialog::accept();
+}
+
 } // namespace dve
