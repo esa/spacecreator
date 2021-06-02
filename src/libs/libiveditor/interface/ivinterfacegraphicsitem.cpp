@@ -411,12 +411,8 @@ void IVInterfaceGraphicsItem::onManualMoveProgress(shared::ui::GripPoint *, cons
     setPos(mappedPos);
     updateGripPoints();
 
-    Q_EMIT needUpdateLayout();
-
     IVConnectionGraphicsItem::layoutInterfaceConnections(this, IVConnectionGraphicsItem::LayoutPolicy::LastSegment,
             IVConnectionGraphicsItem::CollisionsPolicy::Ignore, true);
-
-    Q_EMIT boundingBoxChanged();
 }
 
 void IVInterfaceGraphicsItem::onManualMoveFinish(shared::ui::GripPoint *, const QPointF &from, const QPointF &to)

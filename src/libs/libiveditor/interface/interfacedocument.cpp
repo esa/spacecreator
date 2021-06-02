@@ -662,7 +662,17 @@ void InterfaceDocument::onItemDoubleClicked(const shared::Id &id)
         return;
     }
 
-    showPropertyEditor(id);
+    if (auto entity = d->objectsModel->getObject(id)) {
+        if (entity->isFunction()) {
+            if (auto fn = entity->as<ivm::IVFunction *>()) {
+                if (fn->hasNestedChildren()) {
+                    d->objectsModel->setRootObject(id);
+                    return;
+                }
+            }
+        }
+        showPropertyEditor(id);
+    }
 }
 
 void InterfaceDocument::onItemCreated(const shared::Id &id)

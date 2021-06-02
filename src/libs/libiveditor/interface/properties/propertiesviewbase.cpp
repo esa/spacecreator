@@ -17,10 +17,10 @@
 
 #include "propertiesviewbase.h"
 
-#include "ivfunction.h"
-#include "ivinterface.h"
 #include "contextparametersmodel.h"
 #include "ifaceparametersmodel.h"
+#include "ivfunction.h"
+#include "ivinterface.h"
 #include "propertieslistmodel.h"
 #include "ui_propertiesviewbase.h"
 
@@ -185,6 +185,8 @@ AttributesView::AttributesView(QWidget *widget)
     : PropertiesViewBase(widget)
 {
     m_delegatesColumns = { PropertiesListModel::Column::Value };
+    ui->btnAdd->hide();
+    ui->btnDel->hide();
 }
 
 } // namespace ive

@@ -56,7 +56,7 @@ protected:
     bool setButtonsDisabled();
     void rowsInserted(const QModelIndex &parent, int first, int last);
 
-private:
+protected:
     Ui::PropertiesViewBase *ui { nullptr };
 };
 
