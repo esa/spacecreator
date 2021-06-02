@@ -1,8 +1,8 @@
-**File IO**
+# File IO
 
-1. Steps:
+**1. Steps:**
 
-	- Open file `examples/interfaceview/allitems.xml`
+* Open file `examples/interfaceview/allitems.xml`
 
 Expected results:
 
@@ -10,38 +10,39 @@ Expected results:
 * Function and FunctionType items should not cover other items and should be bound within parent function geometry
 
 
-2. Steps:
+**2. Steps:**
 
-    * Export file using interfaceviews.tmplt and save exported content
-    * Open previously saved file
+* Export file using interfaceviews.tmplt and save exported content
+* Open previously saved file
 
 Expected results:
 
 * all items should have the same position/geometry as in previous check step
 
 
-**Layout**
+# Layout
 
-3. Steps:
+**3. Steps:**
 
-    * Move or resize any item (Function, FunctionType, Comment) and release when it overlaps another item
+* Move or resize any item (Function, FunctionType, Comment) and release when it overlaps another item
 
 Expected results:
 
 * Item should restore it previous position/geometry
 
 
-4. Steps:
+**4. Steps:**
 
-    * Move and resize any Function item and release when doesn't overlap another item
+* Move and resize any Function item and release when doesn't overlap another item
 
 Expected results:
+
 * Interfaces should be placed on the edges of changed item, without overlapping each other, connections (if any) should update layout without overlapping another items
 
 
-5. Steps:
+**5. Steps:**
 
-    * Create Function-like item within any Function item, move or resize it
+* Create Function-like item within any Function item
 
 Expected results:
 
@@ -49,19 +50,20 @@ Expected results:
 
 
 
-**UndoStack**
+# UndoStack
 
-6. Steps:
+**6. Steps:**
 
-    * Perform Undo action
+* Perform Undo action
 
 Expected results:
 
 * Affected Item, its interfaces with linked connections should restore theirs previous geometry
 
 
-7. Steps:
-    * Perform Redo action
+**7. Steps:**
+
+* Perform Redo action
 
 Expected results:
 
