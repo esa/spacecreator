@@ -6,7 +6,17 @@
 
 ![Basic setup](architecture01.png)
 
-Space Creator consits of 3 major parts. The 3 editors are for different file formats: aadl, asn.1 and msc.
+SpaceCreator is implemented via plugins for the [QtCreator](https://www.qt.io/product/development-tools) application. One plugin is for editing ASN.1/ACN files in a text editor.
+
+The SpaceCreator plugin for QtCreator contains 3 graphical editors:
+
+* Deployment view editor (DV)
+* Interface view editor (IV)
+* MSC editor
+
+In addition to the editor in the plugin, dedicated stand alone applications for each editor exists. Mainly for easier development.
+
+
 Each of the editor is implemented in a separate library (or set of libraries). Common code that is used by
 more than one editor is in the libraries:
 
@@ -16,14 +26,9 @@ more than one editor is in the libraries:
 
 * **templates** Common code to save data via grantlee.
 
-* **asn1editor** Is a UI editor to edit ASN.1 values
+* **asn1library** Has the basic ASN.1 data and loading of .asn files.
 
-
-## IV editor
-
-* **ivcore** Contains the data structures for InterfaceView.
-
-* **libivedtor** Contains the application, including: UI, graphics elments, file handling
+* **asn1editor** Is a UI editor to edit ASN.1 values.
 
 
 ## ASN.1 editor
@@ -33,9 +38,23 @@ more than one editor is in the libraries:
 * **asn1plugin** The actual editor as a pure QtCtreator plugin
 
 
+## DV editor
+
+* **dvcore** Contains the data structures for deployment view. The data is stored in a custom XML format.
+
+* **libdvedtor** Contains the application, including: UI, graphics elments, file handling
+
+
+## IV editor
+
+* **ivcore** Contains the data structures for interface view. The data is stored in a custom XML format.
+
+* **libivedtor** Contains the application, including: UI, graphics elments, file handling
+
+
 ## MSC editor
 
-The MSC editor code is separated in 3 different libraries:
+The MSC editor code is separated in 2 different libraries:
 
 * **msccore** Handling the .msc file and data structure. For parsing .msc files [ANTLR4](https://www.antlr.org) is used. For writing .msc files, [Grantlee](https://github.com/steveire/grantlee) is used.
 This includes handling of CIF information for types and geometry, which is stored as comments of the msc elements.
@@ -60,7 +79,7 @@ For laoding and saving .msc files the classes [msc::MscReader](@ref msc::MscRead
 
 SpaceCreator is combining everything (except the asn.1 plugin) in one plugin for QtCreator.
 
-* **spacecreatorsystem** Is one library to mainly do checks, suggestions, etc. based on the other parts of the system. 
+* **spacecreatorsystem** Is one library to do checks, suggestions, set constraints, etc. based on the other parts of the system.
 And put all files/data of one project in one common place.
 
-* **spacecreatorplugin** Is the actual plugin. mainly a rather thin wrapper around the existing parts.
+* **spacecreatorplugin** Is the actual QtCreator plugin. Mainly a rather thin wrapper around the existing parts.
