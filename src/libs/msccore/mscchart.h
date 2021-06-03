@@ -57,6 +57,7 @@ public:
     MscInstance *instanceByName(const QString &name) const;
 
     QVector<MscInstanceEvent *> instanceEvents() const;
+    QVector<MscInstanceEvent *> chronologicalEvents() const;
     QVector<MscInstanceEvent *> eventsForInstance(MscInstance *instance) const;
     void addInstanceEvent(MscInstanceEvent *event, ChartIndexList instanceIndexes);
     void setInstanceEvents(
@@ -172,6 +173,7 @@ private:
 
     QVector<MscInstance *> m_instances;
     QHash<MscInstance *, QVector<MscInstanceEvent *>> m_events;
+    QVector<MscInstanceEvent *> m_chronologicalEvents;
     QVector<MscInstanceEvent *> m_orphanEvents;
     QVector<MscGate *> m_gates;
 };

@@ -427,7 +427,7 @@ void ChartLayoutManager::addInstanceItems()
 
         if (isStreamingModeEnabled() && instance->explicitStop()) {
             const QVector<MscInstanceEvent *> instanceEvents = d->m_currentChart->eventsForInstance(instance);
-            const QVector<MscInstanceEvent *> chartEvents = d->m_currentChart->instanceEvents();
+            const QVector<MscInstanceEvent *> chartEvents = d->m_currentChart->chronologicalEvents();
             auto chartEvItEnd = chartEvents.crbegin();
             std::advance(chartEvItEnd, qMin(d->m_visibleItemLimit, chartEvents.size()));
             auto instEvItEnd = instanceEvents.crbegin();
@@ -478,7 +478,8 @@ void ChartLayoutManager::addInstanceEventItems()
     }
 
     InteractiveObject *instanceEventItem(nullptr);
-    const QVector<MscInstanceEvent *> chartEvents = d->m_currentChart->instanceEvents();
+    const QVector<MscInstanceEvent *> chartEvents =
+            isStreamingModeEnabled() ? d->m_currentChart->chronologicalEvents() : d->m_currentChart->instanceEvents();
     auto it = chartEvents.begin();
     if (isStreamingModeEnabled()) {
         for (; it != chartEvents.end(); ++it) {
@@ -2031,7 +2032,7 @@ QVector<MscInstanceEvent *> ChartLayoutManager::visibleEvents() const
         return {};
     }
 
-    const QVector<MscInstanceEvent *> allEvents = d->m_currentChart->instanceEvents();
+    const QVector<MscInstanceEvent *> allEvents = d->m_currentChart->chronologicalEvents();
 
     if (d->m_visibleItemLimit <= 0 || allEvents.size() <= d->m_visibleItemLimit) {
         return allEvents;

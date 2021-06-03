@@ -121,6 +121,7 @@ void MscChart::addInstance(MscInstance *instance, int index)
                 qFatal("Instance add failed - event already there!");
             }
             m_events[instance].append(ev);
+            m_chronologicalEvents.append(ev);
         }
     }
 
@@ -169,6 +170,14 @@ MscInstance *MscChart::instanceByName(const QString &name) const
 QVector<MscInstanceEvent *> MscChart::instanceEvents() const
 {
     return allEvents();
+}
+
+/*!
+   Returns all events sorted by the time they got added. The oldest being first
+ */
+QVector<MscInstanceEvent *> MscChart::chronologicalEvents() const
+{
+    return m_chronologicalEvents;
 }
 
 QVector<MscInstanceEvent *> MscChart::eventsForInstance(MscInstance *instance) const
@@ -236,6 +245,7 @@ void MscChart::addInstanceEvent(MscInstanceEvent *event, ChartIndexList instance
     if (instanceIndexes.isEmpty()) {
         m_orphanEvents.append(event);
     }
+    m_chronologicalEvents.append(event);
 
     event->setParent(this);
 
@@ -279,8 +289,10 @@ void MscChart::setInstanceEvents(
         }
     }
     m_events.clear();
+    m_chronologicalEvents.clear();
 
     m_events = events;
+    m_chronologicalEvents = allEvents();
     m_orphanEvents = orphanEvents;
 
     for (auto it = m_events.begin(); it != m_events.end(); ++it) {
@@ -323,6 +335,7 @@ void MscChart::removeInstanceEvent(MscInstanceEvent *instanceEvent)
         removed += events.removeAll(instanceEvent);
     }
     removed += m_orphanEvents.removeAll(instanceEvent);
+    m_chronologicalEvents.removeAll(instanceEvent);
 
     if (instanceEvent->entityType() == msc::MscEntity::EntityType::Create) {
         if (MscMessage *message = static_cast<MscMessage *>(instanceEvent)) {
