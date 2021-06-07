@@ -19,6 +19,7 @@
 
 #include "asn1editor.h"
 #include "file.h"
+#include "interface/properties/propertieslistmodel.h"
 
 #include <QLabel>
 #include <QVariant>
@@ -41,7 +42,8 @@ QWidget *Asn1ValueDelegate::createEditor(
     dialog->setProperty(MODEL_INDEX_PROPERTY, QVariant(index));
     dialog->setModal(true);
     QModelIndex typeIndex = index.siblingAtColumn(index.column() - 1);
-    dialog->showAsn1Type(typeIndex.data().toString());
+    QString typeName = typeIndex.data(PropertiesListModel::DataRole).toString();
+    dialog->showAsn1Type(typeName);
 
     connect(dialog, &asn1::Asn1Editor::accepted, this, &ive::Asn1ValueDelegate::onDialogAccepted);
 
@@ -53,13 +55,14 @@ QWidget *Asn1ValueDelegate::createEditor(
 
 void Asn1ValueDelegate::setEditorData(QWidget *editor, const QModelIndex &index) const
 {
+    const QString dataText = index.data().toString();
     auto *proxy = qobject_cast<QLabel *>(editor);
     Q_ASSERT(proxy);
-    proxy->setText(index.data().toString());
+    proxy->setText(dataText);
 
     auto dialog = proxy->property(DIALOG_PROPERTY).value<asn1::Asn1Editor *>();
     Q_ASSERT(dialog);
-    dialog->setValue(index.data().toString());
+    dialog->setValue(dataText);
     dialog->show();
 }
 

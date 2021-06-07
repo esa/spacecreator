@@ -60,6 +60,7 @@ void ContextParametersModel::createNewRow(const ivm::ContextParameter &param, in
     setItem(row, Column::Type, typeItem);
 
     QStandardItem *valueItem = new QStandardItem(row, Column::Value);
+    valueItem->setData(param.defaultValue(), Qt::DisplayRole);
     valueItem->setData(param.defaultValue(), DataRole);
     setItem(row, Column::Value, valueItem);
 }
@@ -107,19 +108,28 @@ bool ContextParametersModel::setData(const QModelIndex &index, const QVariant &v
         return false;
     }
 
+    QStandardItem *item = itemFromIndex(index);
+    if (!item) {
+        return false;
+    }
+    const QString stringValue = value.toString();
+
     if (role == DataRole || role == Qt::EditRole) {
-        auto paramOld = m_params.at(index.row());
+        const ivm::ContextParameter &paramOld = m_params.at(index.row());
         ivm::ContextParameter paramNew(paramOld);
 
         switch (index.column()) {
         case Column::Name: {
-            if (!paramNew.setName(ivm::IVNameValidator::encodeName(m_dataObject->type(), value.toString())))
+            if (!paramNew.setName(ivm::IVNameValidator::encodeName(m_dataObject->type(), stringValue)))
                 return false;
+            item->setData(stringValue, Qt::DisplayRole);
+            item->setData(stringValue, DataRole);
             break;
         }
         case Column::Type: {
-            if (!paramNew.setParamTypeName(value.toString()))
+            if (!paramNew.setParamTypeName(stringValue))
                 return false;
+            item->setData(stringValue, DataRole);
             break;
         }
         case Column::Value: {
@@ -130,6 +140,8 @@ bool ContextParametersModel::setData(const QModelIndex &index, const QVariant &v
             if (!paramNew.setDefaultValue(basicDataType, value)) {
                 return false;
             }
+            item->setData(value, Qt::DisplayRole);
+            item->setData(value, DataRole);
             break;
         }
         default:

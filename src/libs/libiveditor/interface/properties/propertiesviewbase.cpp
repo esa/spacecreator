@@ -63,16 +63,16 @@ void PropertiesViewBase::setModel(PropertiesModelBase *model)
     tableView()->setModel(m_model);
     connect(m_model, &QStandardItemModel::rowsInserted, this, &PropertiesViewBase::rowsInserted, Qt::QueuedConnection);
 
-    if (m_model->rowCount()) {
-        tableView()->resizeColumnsToContents();
-    }
-
     if (tableView()->selectionModel()) {
         connect(tableView()->selectionModel(), &QItemSelectionModel::currentRowChanged, this,
                 &PropertiesViewBase::onCurrentRowChanged);
     }
     setButtonsDisabled();
     rowsInserted(QModelIndex(), 0, m_model->rowCount() - 1);
+
+    if (m_model->rowCount()) {
+        tableView()->resizeColumnsToContents();
+    }
 }
 
 QTableView *PropertiesViewBase::tableView() const
@@ -104,7 +104,8 @@ void PropertiesViewBase::on_btnAdd_clicked()
         if (m_model->createProperty(generatePropertyName(m_model))) {
             const QModelIndex &added = m_model->index(m_model->rowCount() - 1, 0);
             ui->tableView->scrollToBottom();
-            ui->tableView->edit(added);
+            // Delay the editing, after the value editor is created, so this name text is on top of the value editor
+            QMetaObject::invokeMethod(ui->tableView, "edit", Qt::QueuedConnection, Q_ARG(const QModelIndex &, added));
         }
     }
 }

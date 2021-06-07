@@ -17,8 +17,8 @@
 
 #pragma once
 
-#include "parameter.h"
 #include "commandsstack.h"
+#include "parameter.h"
 #include "propertiesmodelbase.h"
 
 #include <QPointer>
