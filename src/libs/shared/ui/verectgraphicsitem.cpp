@@ -285,8 +285,8 @@ void VERectGraphicsItem::layout()
                 QRectF(parentFunction ? parentFunction->sceneBoundingRect() : scene()->itemsBoundingRect());
         QRectF itemRect = QRectF(QPointF(0, 0), minimalSize());
         itemRect.moveTopLeft(boundedRect.topLeft());
-        graphicsviewutils::findGeometryForRect(
-                itemRect, boundedRect, graphicsviewutils::siblingItemsRects(this), graphicsviewutils::kContentMargins);
+        graphicsviewutils::findGeometryForRect(itemRect, boundedRect, graphicsviewutils::siblingItemsRects(this),
+                parentFunction == nullptr ? graphicsviewutils::kRootMargins : graphicsviewutils::kContentMargins);
         setRect(itemRect);
         mergeGeometry();
     }

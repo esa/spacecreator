@@ -132,6 +132,7 @@ bool VEObject::setParentObject(VEObject *parentObject)
 void VEObject::setAttributeImpl(const QString &name, const QVariant &value, EntityAttribute::Type type)
 {
     d->m_attrs[name] = EntityAttribute { name, value, type };
+    Q_EMIT attributeChanged(name);
 }
 
 void VEObject::clearAttributes()

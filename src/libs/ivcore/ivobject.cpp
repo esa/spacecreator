@@ -290,7 +290,6 @@ void IVObject::setAttributeImpl(const QString &attributeName, const QVariant &va
             VEObject::setAttributeImpl(attr.name(), attr.value(), attr.type());
             break;
         }
-        Q_EMIT attributeChanged(attributeName);
     }
 }
 
