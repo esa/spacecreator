@@ -27,7 +27,7 @@
 namespace dve {
 
 DVDeviceGraphicsItem::DVDeviceGraphicsItem(dvm::DVDevice *device, QGraphicsItem *parent)
-    : shared::ui::VEInteractiveObject(device, parent)
+    : shared::ui::VEConnectionEndPointGraphicsItem(device, parent)
 {
     setBoundingRect({ -10, -10, 20, 20 });
 }
@@ -44,55 +44,51 @@ int DVDeviceGraphicsItem::itemLevel(bool isSelected) const
     return isSelected ? 1 : 0;
 }
 
-DVNodeGraphicsItem *DVDeviceGraphicsItem::targetItem() const
+QPointF DVDeviceGraphicsItem::connectionEndPoint(const bool nestedConnection) const
 {
-    return m_node;
+    const QRectF deviceRect = sceneBoundingRect();
+    if (auto parentGraphicsItem = parentItem()) {
+        const QRectF parentRect = parentGraphicsItem->boundingRect();
+        const Qt::Alignment alignment = shared::graphicsviewutils::getNearestSide(parentRect, pos());
+        switch (alignment) {
+        case Qt::AlignLeft:
+            if (nestedConnection) {
+                return { deviceRect.right(), QLineF(deviceRect.topRight(), deviceRect.bottomRight()).center().y() };
+            } else {
+                return { deviceRect.left(), QLineF(deviceRect.topLeft(), deviceRect.bottomLeft()).center().y() };
+            }
+        case Qt::AlignTop:
+            if (nestedConnection) {
+                return { QLineF(deviceRect.bottomLeft(), deviceRect.bottomRight()).center().x(), deviceRect.bottom() };
+            } else {
+                return { QLineF(deviceRect.topLeft(), deviceRect.topRight()).center().x(), deviceRect.top() };
+            }
+        case Qt::AlignRight:
+            if (nestedConnection) {
+                return { deviceRect.left(), QLineF(deviceRect.topLeft(), deviceRect.bottomLeft()).center().y() };
+            } else {
+                return { deviceRect.right(), QLineF(deviceRect.topRight(), deviceRect.bottomRight()).center().y() };
+            }
+        case Qt::AlignBottom:
+            if (nestedConnection) {
+                return { QLineF(deviceRect.topLeft(), deviceRect.topRight()).center().x(), deviceRect.top() };
+            } else {
+                return { QLineF(deviceRect.bottomLeft(), deviceRect.bottomRight()).center().x(), deviceRect.bottom() };
+            }
+        default:
+            break;
+        }
+    }
+    return deviceRect.center();
 }
 
-void DVDeviceGraphicsItem::setTargetItem(DVNodeGraphicsItem *item, const QPointF &globalPos)
+QPointF DVDeviceGraphicsItem::connectionEndPoint(shared::ui::VEConnectionGraphicsItem *connection) const
 {
-    if (!item)
-        return;
-
-    setParentItem(item);
-    setPos(parentItem()->mapFromScene(globalPos));
-    instantLayoutUpdate();
-}
-
-void DVDeviceGraphicsItem::addConnection(DVConnectionGraphicsItem *item)
-{
-    if (!item || m_connections.contains(item))
-        return;
-
-    m_connections.append(item);
-}
-
-void DVDeviceGraphicsItem::removeConnection(DVConnectionGraphicsItem *item)
-{
-    if (!item)
-        return;
-
-    m_connections.removeAll(item);
-}
-
-QList<QPointer<DVConnectionGraphicsItem>> DVDeviceGraphicsItem::connectionItems() const
-{
-    return m_connections;
-}
-
-void DVDeviceGraphicsItem::updateFromEntity()
-{
-    const dvm::DVDevice *obj = entity();
-    Q_ASSERT(obj);
-    if (!obj)
-        return;
-
-    const QPointF coordinates = shared::graphicsviewutils::pos(obj->coordinates());
-    if (coordinates.isNull())
-        instantLayoutUpdate();
-    else
-        setTargetItem(qgraphicsitem_cast<DVNodeGraphicsItem *>(parentItem()), coordinates);
-    adjustItem();
+    if (connection) {
+        const bool innerConnection = connection->entity()->parentObject() == entity()->parentObject();
+        return connectionEndPoint(innerConnection);
+    }
+    return sceneBoundingRect().center();
 }
 
 void DVDeviceGraphicsItem::applyColorScheme()
@@ -104,6 +100,29 @@ void DVDeviceGraphicsItem::applyColorScheme()
     setPen(pen);
     setBrush(h.brush());
     update();
+}
+
+void DVDeviceGraphicsItem::rebuildLayout()
+{
+    shared::ui::VEInteractiveObject::rebuildLayout();
+
+    if (!targetItem()) {
+        prepareGeometryChange();
+        setBoundingRect(QRectF());
+        return;
+    }
+
+    if (entity() && shared::graphicsviewutils::pos(entity()->coordinates()).isNull()) {
+        layout();
+        mergeGeometry();
+        return;
+    }
+    const QRectF parentRect = targetItem()->boundingRect();
+    const QPointF ifacePos = pos();
+    const Qt::Alignment side = shared::graphicsviewutils::getNearestSide(parentRect, ifacePos);
+    const QPointF stickyPos = shared::graphicsviewutils::getSidePosition(parentRect, ifacePos, side);
+    setPos(stickyPos);
+    updateInternalItems(side);
 }
 
 void DVDeviceGraphicsItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget)
@@ -126,66 +145,6 @@ void DVDeviceGraphicsItem::paint(QPainter *painter, const QStyleOptionGraphicsIt
 shared::ColorManager::HandledColors DVDeviceGraphicsItem::handledColorType() const
 {
     return shared::ColorManager::HandledColors::Device;
-}
-
-void DVDeviceGraphicsItem::adjustItem()
-{
-    static qreal kSiblingMinDistance = 10.0;
-
-    if (!parentItem()) {
-        return;
-    }
-
-    QList<QRectF> siblingsRects;
-    const QList<QGraphicsItem *> siblingItems = parentItem()->childItems();
-    std::for_each(siblingItems.cbegin(), siblingItems.cend(), [this, &siblingsRects](const QGraphicsItem *sibling) {
-        if (sibling->type() == DVDeviceGraphicsItem::Type && sibling != this) {
-            QRectF itemRect = sibling->boundingRect();
-            itemRect.setWidth(kSiblingMinDistance - itemRect.x());
-            itemRect = sibling->mapRectToParent(itemRect);
-            siblingsRects.append(itemRect);
-        }
-    });
-
-    const QPointF initialOffset = boundingRect().topLeft();
-    QRectF itemRect = boundingRect();
-    itemRect.setWidth(kSiblingMinDistance - itemRect.x());
-    itemRect = mapRectToParent(itemRect);
-    const QRectF parentRect = parentItem()->boundingRect();
-
-    auto itemPath = [this](Qt::Alignment) {
-        QPainterPath pp;
-        pp.addRect(boundingRect());
-        return pp;
-    };
-
-    QRectF intersectedRect;
-    if (shared::graphicsviewutils::isCollided(siblingsRects, itemRect, &intersectedRect) && parentRect.isValid()) {
-        const QHash<Qt::Alignment, QPainterPath> kSidePaths {
-            { Qt::AlignLeft, itemPath(Qt::AlignLeft) },
-            { Qt::AlignTop, itemPath(Qt::AlignTop) },
-            { Qt::AlignRight, itemPath(Qt::AlignRight) },
-            { Qt::AlignBottom, itemPath(Qt::AlignBottom) },
-        };
-        shared::PositionLookupHelper cwHelper(kSidePaths, parentRect, siblingsRects, itemRect, initialOffset,
-                shared::graphicsviewutils::LookupDirection::Clockwise);
-        shared::PositionLookupHelper ccwHelper(kSidePaths, parentRect, siblingsRects, itemRect, initialOffset,
-                shared::graphicsviewutils::LookupDirection::CounterClockwise);
-        while (cwHelper.hasNext() || ccwHelper.hasNext()) {
-            if (cwHelper.lookup()) {
-                setPos(cwHelper.mappedOriginPoint());
-                break;
-            } else if (ccwHelper.lookup()) {
-                setPos(ccwHelper.mappedOriginPoint());
-                break;
-            }
-        }
-        for (DVConnectionGraphicsItem *connection : qAsConst(m_connections)) {
-            if (connection) {
-                connection->layout();
-            }
-        }
-    }
 }
 
 } // namespace dve

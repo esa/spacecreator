@@ -19,8 +19,10 @@
 
 #include "dvdevice.h"
 #include "dvmodel.h"
+#include "dvnode.h"
 
 #include <QPointer>
+#include <QtDebug>
 
 namespace dvm {
 struct DVConnectionPrivate {
@@ -45,31 +47,51 @@ bool DVConnection::postInit(QString *warning)
         return false;
     }
 
-    const QString sourceDeviceName = entityAttributeValue(meta::Props::token(meta::Props::Token::from_port)).toString();
-    if (sourceDeviceName.isEmpty()) {
-        if (warning) {
-            *warning = tr("Malformed data, empty source port");
+    auto getDevice = [this, warning](
+                             const QString &nodeName, const QString &portName, const QString &busName) -> DVDevice * {
+        if (nodeName.isEmpty()) {
+            if (warning) {
+                *warning = tr("Malformed data, empty source port");
+            }
+            return nullptr;
         }
-        return false;
-    }
-    d->sourceDevice = qobject_cast<DVDevice *>(
-            model()->getObjectByName(sourceDeviceName, DVObject::Type::Device, Qt::CaseInsensitive));
-    if (!d->sourceDevice && warning) {
-        *warning = tr("Can't find device with name %1\n").arg(sourceDeviceName);
-    }
+        if (portName.isEmpty()) {
+            if (warning) {
+                *warning = tr("Malformed data, empty source port");
+            }
+            return nullptr;
+        }
 
-    const QString targetDeviceName = entityAttributeValue(meta::Props::token(meta::Props::Token::to_port)).toString();
-    if (targetDeviceName.isEmpty()) {
-        if (warning) {
-            *warning = tr("Malformed data, empty target port");
+        auto node =
+                qobject_cast<DVNode *>(model()->getObjectByName(nodeName, DVObject::Type::Node, Qt::CaseInsensitive));
+        if (!node) {
+            if (warning) {
+                *warning = tr("Can't find node with name %1\n").arg(nodeName);
+            }
+            return nullptr;
         }
-        return false;
-    }
-    d->targetDevice = qobject_cast<DVDevice *>(
-            model()->getObjectByName(targetDeviceName, DVObject::Type::Device, Qt::CaseInsensitive));
-    if (!d->targetDevice && warning) {
-        *warning = tr("Can't find device with name %1\n").arg(targetDeviceName);
-    }
+        const QList<QPointer<DVDevice>> nodeDevices = node->devices();
+        auto it = std::find_if(nodeDevices.cbegin(), nodeDevices.cend(), [portName, busName](DVDevice *dev) {
+            return dev->portName() == portName && dev->busName() == busName;
+        });
+        if (it == nodeDevices.cend()) {
+            if (warning) {
+                *warning = tr("Can't find device with name %1\n").arg(portName);
+            }
+            return nullptr;
+        }
+        return *it;
+    };
+
+    const QString busName = entityAttributeValue(meta::Props::token(meta::Props::Token::to_bus)).toString();
+
+    const QString sourceNodeName = entityAttributeValue(meta::Props::token(meta::Props::Token::from_node)).toString();
+    const QString sourcePortName = entityAttributeValue(meta::Props::token(meta::Props::Token::from_port)).toString();
+    d->sourceDevice = getDevice(sourceNodeName, sourcePortName, busName);
+
+    const QString targetNodeName = entityAttributeValue(meta::Props::token(meta::Props::Token::to_node)).toString();
+    const QString targetPortName = entityAttributeValue(meta::Props::token(meta::Props::Token::to_port)).toString();
+    d->targetDevice = getDevice(targetNodeName, targetPortName, busName);
 
     return d->sourceDevice && d->targetDevice;
 }

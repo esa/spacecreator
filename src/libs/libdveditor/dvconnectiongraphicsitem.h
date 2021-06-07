@@ -19,14 +19,14 @@
 
 #include "colors/colormanager.h"
 #include "dvconnection.h"
-#include "ui/verectgraphicsitem.h"
+#include "ui/veconnectiongraphicsitem.h"
 
 class QGraphicsItem;
 
 namespace dve {
 class DVDeviceGraphicsItem;
 
-class DVConnectionGraphicsItem : public shared::ui::VEInteractiveObject
+class DVConnectionGraphicsItem : public shared::ui::VEConnectionGraphicsItem
 {
     Q_OBJECT
 public:
@@ -39,29 +39,15 @@ public:
     };
 
     dvm::DVConnection *entity() const override;
-    void init() override;
-
-    DVDeviceGraphicsItem *startItem() const;
-    DVDeviceGraphicsItem *endItem() const;
-
-    void setPoints(const QVector<QPointF> &points);
 
     int type() const override { return Type; }
     int itemLevel(bool isSelected) const override;
-    void updateFromEntity() override;
-    void layout();
 
 protected Q_SLOTS:
     void applyColorScheme() override;
 
 protected:
-    void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget) override;
     shared::ColorManager::HandledColors handledColorType() const override;
-
-private:
-    DVDeviceGraphicsItem *m_startItem { nullptr };
-    DVDeviceGraphicsItem *m_endItem { nullptr };
-    QPolygonF m_points;
 };
 
 } // namespace dve

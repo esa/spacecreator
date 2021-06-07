@@ -25,7 +25,7 @@ namespace dvm {
 
 struct DVNodePrivate {
     QList<DVPartition *> partitions;
-    QPointer<DVDevice> device;
+    QList<QPointer<DVDevice>> devices;
 };
 
 DVNode::DVNode(DVObject *parent)
@@ -46,17 +46,18 @@ void DVNode::addPartition(DVPartition *partition)
 QList<DVPartition *> DVNode::partitions() const
 {
     return d->partitions;
-    ;
 }
 
-void DVNode::setDevice(DVDevice *device)
+void DVNode::addDevice(DVDevice *device)
 {
-    d->device = device;
+    if (!d->devices.contains(device)) {
+        d->devices.append(device);
+    }
 }
 
-DVDevice *DVNode::device() const
+QList<QPointer<dvm::DVDevice>> DVNode::devices() const
 {
-    return d->device;
+    return d->devices;
 }
 
 } // namespace deploy

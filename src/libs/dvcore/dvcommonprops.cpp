@@ -32,6 +32,8 @@ const QHash<QString, Props::Token> Props::TokensByName = {
 
     // attrs:
     { "name", Token::name },
+    { "port", Token::port },
+    { "bus", Token::bus },
     { "from_node", Token::from_node },
     { "from_port", Token::from_port },
     { "to_bus", Token::to_bus },

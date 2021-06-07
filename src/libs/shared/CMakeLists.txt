@@ -89,6 +89,10 @@ target_sources(${LIB_NAME} PRIVATE
     interface/veitemmodel.h
     positionlookuphelper.cpp
     positionlookuphelper.h
+    ui/veconnectiongraphicsitem.cpp
+    ui/veconnectiongraphicsitem.h
+    ui/veconnectionendpointgraphicsitem.cpp
+    ui/veconnectionendpointgraphicsitem.h
 )
 
 target_include_directories(${LIB_NAME} PUBLIC .)

@@ -37,6 +37,7 @@
 #include "ivfunction.h"
 #include "ivinterface.h"
 #include "ivinterfacegroup.h"
+#include "ui/veconnectiongraphicsitem.h"
 
 #include <QGraphicsView>
 #include <QGuiApplication>
@@ -218,19 +219,22 @@ void IVItemModel::onConnectionRemovedFromGroup(ivm::IVConnection *connection)
     onObjectAdded(connection->id());
 
     auto handleIface = [this](ivm::IVConnection *connection, ivm::IVInterfaceGroup *connectionGroupEndPoint) {
-        auto ifaceObject = connectionGroupEndPoint->function()->id() == connection->source()->id()
+        ivm::IVInterface *ifaceObject = connectionGroupEndPoint->function()->id() == connection->source()->id()
                 ? connection->sourceInterface()
                 : connectionGroupEndPoint->function()->id() == connection->target()->id()
                 ? connection->targetInterface()
                 : nullptr;
+        if (!ifaceObject) {
+            return;
+        }
         if (auto ifaceItem = getItem<IVInterfaceGraphicsItem *>(connectionGroupEndPoint->id())) {
             for (auto ifaceConnection : ifaceItem->connectionItems()) {
                 const bool currentHandledConnection = ifaceConnection->entity()->id() == connection->id();
                 const bool isLinkedIface =
-                        ifaceConnection->entity()->sourceInterface()->id() == connection->sourceInterface()->id()
-                        || ifaceConnection->entity()->sourceInterface()->id() == connection->targetInterface()->id()
-                        || ifaceConnection->entity()->targetInterface()->id() == connection->sourceInterface()->id()
-                        || ifaceConnection->entity()->targetInterface()->id() == connection->targetInterface()->id();
+                        ifaceConnection->sourceItem()->entity()->id() == connection->sourceInterface()->id()
+                        || ifaceConnection->sourceItem()->entity()->id() == connection->targetInterface()->id()
+                        || ifaceConnection->targetItem()->entity()->id() == connection->sourceInterface()->id()
+                        || ifaceConnection->targetItem()->entity()->id() == connection->targetInterface()->id();
                 if (currentHandledConnection || !isLinkedIface) {
                     continue;
                 }

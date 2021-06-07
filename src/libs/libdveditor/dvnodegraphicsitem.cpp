@@ -17,6 +17,8 @@
 
 #include "dvnodegraphicsitem.h"
 
+#include "dvconnectiongraphicsitem.h"
+#include "dvdevicegraphicsitem.h"
 #include "graphicsviewutils.h"
 
 #include <QPainter>
@@ -78,6 +80,107 @@ void DVNodeGraphicsItem::applyColorScheme()
     setPen(pen);
     setBrush(h.brush());
     update();
+}
+
+void DVNodeGraphicsItem::onManualResizeProgress(
+        shared::ui::GripPoint *grip, const QPointF &pressedAt, const QPointF &releasedAt)
+{
+    if (pressedAt == releasedAt)
+        return;
+
+    const QRectF rect = transformedRect(grip, pressedAt, releasedAt);
+    if (shared::graphicsviewutils::isBounded(this, rect)) {
+        shared::ui::VERectGraphicsItem::onManualResizeProgress(grip, pressedAt, releasedAt);
+        layoutConnectionsOnResize(shared::ui::VEConnectionGraphicsItem::CollisionsPolicy::Ignore);
+    }
+}
+
+void DVNodeGraphicsItem::onManualMoveProgress(
+        shared::ui::GripPoint *grip, const QPointF &pressedAt, const QPointF &releasedAt)
+{
+    if (pressedAt == releasedAt)
+        return;
+
+    const QRectF rect = transformedRect(grip, pressedAt, releasedAt);
+    if (shared::graphicsviewutils::isBounded(this, rect)) {
+        shared::ui::VERectGraphicsItem::onManualMoveProgress(grip, pressedAt, releasedAt);
+        layoutConnectionsOnMove(shared::ui::VEConnectionGraphicsItem::CollisionsPolicy::Ignore);
+    }
+}
+
+void DVNodeGraphicsItem::onManualResizeFinish(
+        shared::ui::GripPoint *grip, const QPointF &pressedAt, const QPointF &releasedAt)
+{
+    Q_UNUSED(grip)
+
+    if (pressedAt == releasedAt)
+        return;
+
+    if (shared::graphicsviewutils::isBounded(this, sceneBoundingRect())
+            && !shared::graphicsviewutils::isCollided(this, sceneBoundingRect())) {
+        layoutInterfaces();
+        layoutConnectionsOnResize(shared::ui::VEConnectionGraphicsItem::CollisionsPolicy::PartialRebuild);
+        updateEntity();
+    } else { // Fallback to previous geometry in case colliding with items at the same level
+        updateFromEntity();
+        layoutConnectionsOnResize(shared::ui::VEConnectionGraphicsItem::CollisionsPolicy::Ignore);
+    }
+}
+
+void DVNodeGraphicsItem::onManualMoveFinish(
+        shared::ui::GripPoint *grip, const QPointF &pressedAt, const QPointF &releasedAt)
+{
+    Q_UNUSED(grip)
+
+    if (pressedAt == releasedAt)
+        return;
+
+    if (shared::graphicsviewutils::isBounded(this, sceneBoundingRect())
+            && !shared::graphicsviewutils::isCollided(this, sceneBoundingRect())) {
+        layoutConnectionsOnMove(shared::ui::VEConnectionGraphicsItem::CollisionsPolicy::PartialRebuild);
+        updateEntity();
+    } else { // Fallback to previous geometry in case colliding with items at the same level
+        updateFromEntity();
+        layoutConnectionsOnMove(shared::ui::VEConnectionGraphicsItem::CollisionsPolicy::Ignore);
+    }
+}
+
+void DVNodeGraphicsItem::layoutInterfaces()
+{
+    for (auto child : childItems()) {
+        if (child->type() == DVDeviceGraphicsItem::Type) {
+            if (auto iObj = qgraphicsitem_cast<DVDeviceGraphicsItem *>(child)) {
+                iObj->adjustItem();
+            }
+        }
+    }
+}
+
+void DVNodeGraphicsItem::layoutConnectionsOnResize(
+        shared::ui::VEConnectionGraphicsItem::CollisionsPolicy collisionsPolicy)
+{
+    /// Changing inner and outer connections bound to current item
+    for (const auto item : childItems()) {
+        if (auto iface = qgraphicsitem_cast<DVDeviceGraphicsItem *>(item)) {
+            shared::ui::VEConnectionGraphicsItem::layoutInterfaceConnections(
+                    iface, shared::ui::VEConnectionGraphicsItem::LayoutPolicy::Scaling, collisionsPolicy, true);
+        } else if (auto connection = qgraphicsitem_cast<DVConnectionGraphicsItem *>(item)) {
+            if (connection->sourceItem() != this && connection->targetItem() != this)
+                connection->layout();
+        }
+    }
+}
+
+void DVNodeGraphicsItem::layoutConnectionsOnMove(
+        shared::ui::VEConnectionGraphicsItem::CollisionsPolicy collisionsPolicy)
+{
+    /// Changing outer connections only cause inner stay unchanged as children of current item
+    for (const auto item : childItems()) {
+        if (auto iface = qgraphicsitem_cast<DVDeviceGraphicsItem *>(item)) {
+            shared::ui::VEConnectionGraphicsItem::layoutInterfaceConnections(
+                    iface, shared::ui::VEConnectionGraphicsItem::LayoutPolicy::Scaling, collisionsPolicy, false);
+        }
+    }
 }
 
 } // namespace dve

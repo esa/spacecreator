@@ -19,7 +19,7 @@
 
 #include "colors/colormanager.h"
 #include "dvdevice.h"
-#include "ui/veinteractiveobject.h"
+#include "ui/veconnectionendpointgraphicsitem.h"
 
 #include <QPointer>
 
@@ -29,7 +29,7 @@ namespace dve {
 class DVNodeGraphicsItem;
 class DVConnectionGraphicsItem;
 
-class DVDeviceGraphicsItem : public shared::ui::VEInteractiveObject
+class DVDeviceGraphicsItem : public shared::ui::VEConnectionEndPointGraphicsItem
 {
     Q_OBJECT
 public:
@@ -45,26 +45,16 @@ public:
     int type() const override { return Type; }
     int itemLevel(bool isSelected) const override;
 
-    DVNodeGraphicsItem *targetItem() const;
-    void setTargetItem(DVNodeGraphicsItem *item, const QPointF &globalPos);
-
-    void addConnection(DVConnectionGraphicsItem *item);
-    void removeConnection(DVConnectionGraphicsItem *item);
-    QList<QPointer<DVConnectionGraphicsItem>> connectionItems() const;
-
-    void updateFromEntity() override;
+    QPointF connectionEndPoint(const bool nestedConnection) const override;
+    QPointF connectionEndPoint(shared::ui::VEConnectionGraphicsItem *connection = nullptr) const override;
 
 protected Q_SLOTS:
     void applyColorScheme() override;
 
 protected:
+    void rebuildLayout() override;
     void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget) override;
     shared::ColorManager::HandledColors handledColorType() const override;
-    void adjustItem();
-
-private:
-    DVNodeGraphicsItem *m_node { nullptr };
-    QList<QPointer<DVConnectionGraphicsItem>> m_connections;
 };
 
 } // namespace dve

@@ -24,4 +24,14 @@ DVDevice::DVDevice(DVObject *parent)
 {
 }
 
+QString DVDevice::portName() const
+{
+    return entityAttributeValue(meta::Props::token(meta::Props::Token::port)).toString();
+}
+
+QString DVDevice::busName() const
+{
+    return entityAttributeValue(meta::Props::token(meta::Props::Token::bus)).toString();
+}
+
 } // namespace deploy

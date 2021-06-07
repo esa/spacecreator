@@ -19,6 +19,7 @@
 
 #include "dvobject.h"
 
+#include <QPointer>
 #include <memory>
 
 namespace dvm {
@@ -36,8 +37,8 @@ public:
     void addPartition(DVPartition *partition);
     QList<DVPartition *> partitions() const;
 
-    void setDevice(DVDevice *device);
-    DVDevice *device() const;
+    void addDevice(DVDevice *device);
+    QList<QPointer<DVDevice>> devices() const;
 
 private:
     std::unique_ptr<DVNodePrivate> d;

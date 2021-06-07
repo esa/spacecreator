@@ -31,6 +31,7 @@
 #include "ivinterface.h"
 #include "ivnamevalidator.h"
 #include "positionlookuphelper.h"
+#include "ui/veconnectiongraphicsitem.h"
 
 #include <QGraphicsScene>
 #include <QPainter>
@@ -40,13 +41,12 @@ static const qreal kBase = 12;
 static const qreal kHeight = kBase * 4 / 5;
 static const QColor kSelectedBackgroundColor = QColor(Qt::magenta);
 static const QColor kDefaultBackgroundColor = QColor(Qt::blue);
-static const int kInterfaceMinDistance = 20;
 static const int kTextMargin = 2;
 
 namespace ive {
 
 IVInterfaceGraphicsItem::IVInterfaceGraphicsItem(ivm::IVInterface *entity, QGraphicsItem *parent)
-    : shared::ui::VEInteractiveObject(entity, parent)
+    : shared::ui::VEConnectionEndPointGraphicsItem(entity, parent)
     , m_type(new QGraphicsPathItem(this))
     , m_iface(new QGraphicsPathItem(this))
     , m_text(new QGraphicsTextItem(this))
@@ -78,42 +78,6 @@ void IVInterfaceGraphicsItem::init()
     updateIface();
     updateKind();
     setInterfaceName(ifaceLabel());
-}
-
-void IVInterfaceGraphicsItem::addConnection(IVConnectionGraphicsItem *item)
-{
-    if (!item || m_connections.contains(item))
-        return;
-
-    m_connections.append(item);
-}
-
-void IVInterfaceGraphicsItem::removeConnection(IVConnectionGraphicsItem *item)
-{
-    if (!item)
-        return;
-
-    m_connections.removeAll(item);
-}
-
-QList<QPointer<IVConnectionGraphicsItem>> IVInterfaceGraphicsItem::connectionItems() const
-{
-    return m_connections;
-}
-
-IVFunctionTypeGraphicsItem *IVInterfaceGraphicsItem::targetItem() const
-{
-    return parentItem() ? qobject_cast<IVFunctionTypeGraphicsItem *>(parentItem()->toGraphicsObject()) : nullptr;
-}
-
-void IVInterfaceGraphicsItem::setTargetItem(QGraphicsItem *item, const QPointF &scenePos)
-{
-    if (!item)
-        return;
-
-    setParentItem(item);
-    setPos(parentItem()->mapFromScene(scenePos));
-    instantLayoutUpdate();
 }
 
 void IVInterfaceGraphicsItem::setInterfaceName(const QString &name)
@@ -177,7 +141,7 @@ QPointF IVInterfaceGraphicsItem::connectionEndPoint(const bool nestedConnection)
     return {};
 }
 
-QPointF IVInterfaceGraphicsItem::connectionEndPoint(IVConnectionGraphicsItem *connection) const
+QPointF IVInterfaceGraphicsItem::connectionEndPoint(shared::ui::VEConnectionGraphicsItem *connection) const
 {
     if (connection) {
         const bool innerConnection = connection->entity()->parentObject() == entity()->parentObject();
@@ -281,41 +245,14 @@ QPainterPath IVInterfaceGraphicsItem::shape() const
 
 void IVInterfaceGraphicsItem::updateFromEntity()
 {
-    const ivm::IVInterface *obj = entity();
-    Q_ASSERT(obj);
-    if (!obj)
-        return;
-
     setInterfaceName(ifaceLabel());
-    const QPointF coordinates = shared::graphicsviewutils::pos(obj->coordinates());
-    if (coordinates.isNull())
-        instantLayoutUpdate();
-    else
-        setTargetItem(parentItem(), coordinates);
-    adjustItem();
+    shared::ui::VEConnectionEndPointGraphicsItem::updateFromEntity();
 }
 
 void IVInterfaceGraphicsItem::onSelectionChanged(bool isSelected)
 {
     const shared::ColorHandler &h = colorHandler();
     m_iface->setBrush(isSelected ? kSelectedBackgroundColor : h.brush());
-}
-
-QList<QPair<shared::VEObject *, QVector<QPointF>>>
-IVInterfaceGraphicsItem::prepareChangeCoordinatesCommandParams() const
-{
-    QVector<QPointF> pos;
-    pos.append(scenePos());
-    QList<QPair<shared::VEObject *, QVector<QPointF>>> params = { { entity(), pos } };
-    for (const auto &connection : connectionItems()) {
-        if (connection) {
-            params.append({ connection->entity(),
-                    connection->graphicsPoints() }); // connection->prepareChangeCoordinatesCommandParams()
-                                                     // - will be fixed during work on Undo/Redo issues
-        }
-    }
-
-    return params;
 }
 
 void IVInterfaceGraphicsItem::layout()
@@ -394,98 +331,9 @@ qreal IVInterfaceGraphicsItem::maxWidth() const
     return width;
 }
 
-void IVInterfaceGraphicsItem::onManualMoveProgress(shared::ui::GripPoint *, const QPointF &from, const QPointF &to)
-{
-    if (!scene())
-        return;
-
-    const QPointF shift = { to - from };
-    if (shift.isNull())
-        return;
-
-    const QPointF newScenePos = scenePos() + shift;
-    const QPointF mappedPos = mapToParent(mapFromScene(newScenePos));
-    const QRectF parentRect = targetItem()->boundingRect();
-    const Qt::Alignment alignment = shared::graphicsviewutils::getNearestSide(parentRect, mappedPos);
-    updateInternalItems(alignment);
-    setPos(mappedPos);
-    updateGripPoints();
-
-    IVConnectionGraphicsItem::layoutInterfaceConnections(this, IVConnectionGraphicsItem::LayoutPolicy::LastSegment,
-            IVConnectionGraphicsItem::CollisionsPolicy::Ignore, true);
-}
-
-void IVInterfaceGraphicsItem::onManualMoveFinish(shared::ui::GripPoint *, const QPointF &from, const QPointF &to)
-{
-    const QPointF shift = { to - from };
-    if (shift.isNull())
-        return;
-
-    rebuildLayout();
-    IVConnectionGraphicsItem::layoutInterfaceConnections(this, IVConnectionGraphicsItem::LayoutPolicy::Default,
-            IVConnectionGraphicsItem::CollisionsPolicy::Rebuild, true);
-    updateEntity();
-}
-
 shared::ColorManager::HandledColors IVInterfaceGraphicsItem::handledColorType() const
 {
     return shared::ColorManager::HandledColors::Iface;
-}
-
-void IVInterfaceGraphicsItem::adjustItem()
-{
-    if (!parentItem()) {
-        return;
-    }
-
-    QList<QRectF> siblingsRects;
-    const QList<QGraphicsItem *> siblingItems = parentItem()->childItems();
-    std::for_each(siblingItems.cbegin(), siblingItems.cend(), [this, &siblingsRects](const QGraphicsItem *sibling) {
-        if (sibling->type() == IVInterfaceGraphicsItem::Type && sibling != this) {
-            QRectF itemRect = sibling->boundingRect();
-            itemRect.setWidth(kInterfaceMinDistance - itemRect.x());
-            itemRect = sibling->mapRectToParent(itemRect);
-            siblingsRects.append(itemRect);
-        }
-    });
-
-    const QPointF initialOffset = boundingRect().topLeft();
-    QRectF itemRect = boundingRect();
-    itemRect.setWidth(kInterfaceMinDistance - itemRect.x());
-    itemRect = mapRectToParent(itemRect);
-    const QRectF parentRect = parentItem()->boundingRect();
-
-    QRectF intersectedRect;
-    if (shared::graphicsviewutils::isCollided(siblingsRects, itemRect, &intersectedRect) && parentRect.isValid()) {
-        const QHash<Qt::Alignment, QPainterPath> kSidePaths {
-            { Qt::AlignLeft, itemPath(Qt::AlignLeft) },
-            { Qt::AlignTop, itemPath(Qt::AlignTop) },
-            { Qt::AlignRight, itemPath(Qt::AlignRight) },
-            { Qt::AlignBottom, itemPath(Qt::AlignBottom) },
-        };
-        shared::PositionLookupHelper cwHelper(kSidePaths, parentRect, siblingsRects, itemRect, initialOffset,
-                shared::graphicsviewutils::LookupDirection::Clockwise);
-        shared::PositionLookupHelper ccwHelper(kSidePaths, parentRect, siblingsRects, itemRect, initialOffset,
-                shared::graphicsviewutils::LookupDirection::CounterClockwise);
-        while (cwHelper.hasNext() || ccwHelper.hasNext()) {
-            if (cwHelper.lookup()) {
-                if (cwHelper.isSideChanged())
-                    updateInternalItems(cwHelper.side());
-                setPos(cwHelper.mappedOriginPoint());
-                break;
-            } else if (ccwHelper.lookup()) {
-                if (ccwHelper.isSideChanged())
-                    updateInternalItems(ccwHelper.side());
-                setPos(ccwHelper.mappedOriginPoint());
-                break;
-            }
-        }
-        for (IVConnectionGraphicsItem *connection : qAsConst(m_connections)) {
-            if (connection) {
-                connection->layout();
-            }
-        }
-    }
 }
 
 qreal IVInterfaceGraphicsItem::typeIconHeight() const
@@ -698,25 +546,6 @@ QPainterPath IVInterfaceGraphicsItem::composeShape() const
     path = path.united(strokePath);
 
     return path.simplified();
-}
-
-QVariant IVInterfaceGraphicsItem::itemChange(GraphicsItemChange change, const QVariant &value)
-{
-    switch (change) {
-    case QGraphicsItem::ItemVisibleHasChanged: {
-        for (IVConnectionGraphicsItem *connection : qAsConst(m_connections)) {
-            if (connection->startItem() && connection->endItem()) {
-                connection->setVisible(connection->startItem()->isVisible() && connection->endItem()->isVisible());
-            } else {
-                connection->setVisible(false);
-            }
-        }
-        break;
-    }
-    default:
-        break;
-    }
-    return shared::ui::VEInteractiveObject::itemChange(change, value);
 }
 
 }

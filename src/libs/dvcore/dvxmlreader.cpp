@@ -81,7 +81,7 @@ void DVXMLReader::processTagOpen(QXmlStreamReader &xml)
     case meta::Props::Token::Device: {
         if (auto node = qobject_cast<DVNode *>(d->m_currentObject)) {
             auto dev = new dvm::DVDevice(d->m_currentObject);
-            node->setDevice(dev);
+            node->addDevice(dev);
             obj = dev;
         }
     } break;

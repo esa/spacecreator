@@ -27,74 +27,16 @@ namespace dve {
 
 DVConnectionGraphicsItem::DVConnectionGraphicsItem(dvm::DVConnection *connection, DVDeviceGraphicsItem *startItem,
         DVDeviceGraphicsItem *endItem, QGraphicsItem *parent)
-    : shared::ui::VEInteractiveObject(connection, parent)
-    , m_startItem(startItem)
-    , m_endItem(endItem)
+    : shared::ui::VEConnectionGraphicsItem(connection, startItem, endItem, parent)
 {
+    setFlags(QGraphicsItem::ItemIsSelectable | QGraphicsItem::ItemHasNoContents | QGraphicsItem::ItemClipsToShape);
 }
 
-DVConnectionGraphicsItem::~DVConnectionGraphicsItem()
-{
-    for (DVDeviceGraphicsItem *item : { startItem(), endItem() }) {
-        if (item) {
-            item->removeConnection(this);
-        }
-    }
-}
+DVConnectionGraphicsItem::~DVConnectionGraphicsItem() { }
 
 dvm::DVConnection *dve::DVConnectionGraphicsItem::entity() const
 {
     return m_dataObject.isNull() ? nullptr : m_dataObject->as<dvm::DVConnection *>();
-}
-
-void DVConnectionGraphicsItem::init()
-{
-    for (DVDeviceGraphicsItem *item : { startItem(), endItem() }) {
-        if (item) {
-            item->addConnection(this);
-        }
-    }
-}
-
-DVDeviceGraphicsItem *DVConnectionGraphicsItem::startItem() const
-{
-    return m_startItem;
-}
-
-DVDeviceGraphicsItem *DVConnectionGraphicsItem::endItem() const
-{
-    return m_endItem;
-}
-
-void DVConnectionGraphicsItem::setPoints(const QVector<QPointF> &points)
-{
-    if (points.isEmpty()) {
-        if (m_startItem && m_endItem)
-            instantLayoutUpdate();
-        else
-            m_points.clear();
-        return;
-    }
-
-    if (!shared::graphicsviewutils::comparePolygones(m_points, points)) {
-        m_points = points;
-        instantLayoutUpdate();
-    }
-}
-
-void DVConnectionGraphicsItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget)
-{
-    Q_UNUSED(option)
-    Q_UNUSED(widget)
-
-    if (!entity())
-        return;
-
-    painter->save();
-    painter->setRenderHint(QPainter::Antialiasing);
-    painter->setPen(pen());
-    painter->drawPolyline(m_points);
-    painter->restore();
 }
 
 int DVConnectionGraphicsItem::itemLevel(bool isSelected) const
@@ -102,33 +44,9 @@ int DVConnectionGraphicsItem::itemLevel(bool isSelected) const
     return isSelected ? 1 : 0;
 }
 
-void DVConnectionGraphicsItem::updateFromEntity()
-{
-    m_points = mapFromScene(shared::graphicsviewutils::polygon(entity()->coordinates()));
-    if (m_points.isEmpty()) {
-        layout();
-        updateEntity();
-    }
-    rebuildLayout();
-}
-
 shared::ColorManager::HandledColors DVConnectionGraphicsItem::handledColorType() const
 {
     return shared::ColorManager::HandledColors::BusConnection;
-}
-
-void DVConnectionGraphicsItem::layout()
-{
-    if (!startItem() || !endItem())
-        return;
-
-    Q_ASSERT(startItem()->scene() == endItem()->scene() && scene());
-
-    m_points = shared::graphicsviewutils::createConnectionPath(shared::graphicsviewutils::siblingItemsRects(this),
-            startItem()->sceneBoundingRect().center(), startItem()->targetItem()->sceneBoundingRect(),
-            endItem()->sceneBoundingRect().center(), endItem()->targetItem()->sceneBoundingRect());
-
-    setBoundingRect(m_points.boundingRect());
 }
 
 void DVConnectionGraphicsItem::applyColorScheme()

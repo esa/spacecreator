@@ -26,6 +26,9 @@ class DVDevice : public DVObject
     Q_OBJECT
 public:
     explicit DVDevice(DVObject *parent = nullptr);
+
+    QString portName() const;
+    QString busName() const;
 };
 
 } // namespace deploy

@@ -20,7 +20,7 @@
 
 #include "ivinterface.h"
 #include "ivobject.h"
-#include "ui/veinteractiveobject.h"
+#include "ui/veconnectionendpointgraphicsitem.h"
 
 #include <QPointer>
 
@@ -31,7 +31,7 @@ class IVConnectionGraphicsItem;
 class IVFunctionGraphicsItem;
 class IVFunctionTypeGraphicsItem;
 
-class IVInterfaceGraphicsItem : public shared::ui::VEInteractiveObject
+class IVInterfaceGraphicsItem : public shared::ui::VEConnectionEndPointGraphicsItem
 {
     Q_OBJECT
 public:
@@ -45,48 +45,32 @@ public:
 
     void init() override;
     int type() const override { return Type; }
-    void addConnection(IVConnectionGraphicsItem *item);
-    void removeConnection(IVConnectionGraphicsItem *item);
-    QList<QPointer<IVConnectionGraphicsItem>> connectionItems() const;
-
-    ive::IVFunctionTypeGraphicsItem *targetItem() const;
-    void setTargetItem(QGraphicsItem *item, const QPointF &globalPos);
 
     void setInterfaceName(const QString &name);
 
-    QPointF connectionEndPoint(const bool nestedConnection) const;
-    QPointF connectionEndPoint(IVConnectionGraphicsItem *connection = nullptr) const;
-    QPainterPath ifaceShape() const;
-
+    QPointF connectionEndPoint(const bool nestedConnection) const override;
+    QPointF connectionEndPoint(shared::ui::VEConnectionGraphicsItem *connection = nullptr) const override;
+    QPainterPath ifaceShape() const override;
     QPainterPath shape() const override;
 
     void updateFromEntity() override;
-    QList<QPair<shared::VEObject *, QVector<QPointF>>> prepareChangeCoordinatesCommandParams() const override;
-
+    void layout() override;
+    int itemLevel(bool isSelected) const override;
     QString prepareTooltip() const override;
-    void layout();
 
     qreal maxWidth() const;
 
-    int itemLevel(bool isSelected) const override;
-
 public Q_SLOTS:
     void updateLabel();
-    void adjustItem();
 
 protected:
     void rebuildLayout() override;
     void onSelectionChanged(bool isSelected) override;
-
-    void onManualMoveProgress(shared::ui::GripPoint *grip, const QPointF &from, const QPointF &to) override;
-    void onManualMoveFinish(shared::ui::GripPoint *grip, const QPointF &from, const QPointF &to) override;
-
-    void updateInternalItems(Qt::Alignment alignment);
+    void updateInternalItems(Qt::Alignment alignment) override;
     virtual shared::ColorManager::HandledColors handledColorType() const override;
+
     qreal typeIconHeight() const;
     qreal baseLength() const;
-
-    QVariant itemChange(GraphicsItemChange change, const QVariant &value) override;
 
 protected Q_SLOTS:
     virtual void applyColorScheme() override;
@@ -96,24 +80,21 @@ protected Q_SLOTS:
 
     virtual QPainterPath ifacePath() const;
     virtual QPainterPath typePath() const;
+    QPainterPath itemPath(Qt::Alignment alignment) const override;
 
 private:
     QTransform typeTransform(Qt::Alignment alignment) const;
     QTransform ifaceTransform(Qt::Alignment alignment) const;
-    QPainterPath itemPath(Qt::Alignment alignment) const;
+    QString ifaceLabel() const;
+    QPainterPath composeShape() const;
 
 private:
     friend tst_PositionLookupHelper;
 
+    QPainterPath m_shape;
     QGraphicsPathItem *m_type = nullptr;
     QGraphicsPathItem *m_iface = nullptr;
     QGraphicsTextItem *m_text = nullptr;
-    QList<QPointer<IVConnectionGraphicsItem>> m_connections;
-    QPainterPath m_shape;
-
-    QString ifaceLabel() const;
-
-    QPainterPath composeShape() const;
 };
 
 }
