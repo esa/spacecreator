@@ -29,6 +29,7 @@
 
 #include <QBoxLayout>
 #include <QDebug>
+#include <QDirIterator>
 #include <QHeaderView>
 #include <QSplitter>
 #include <QTreeView>
@@ -146,15 +147,21 @@ bool DVEditorCore::save()
 /*!
    Load the HW library from file in the given \p directory
  */
-void DVEditorCore::loadHWLibrary(const QString &fileName)
+void DVEditorCore::loadHWLibrary(const QString &directory)
 {
-    dvm::DVBoardReader reader;
-    bool ok = reader.readFile(fileName);
-    if (ok) {
-        d->m_hwModel->setObjectList(reader.parsedBoards());
-    } else {
-        qWarning() << "Can't read HW library from " << fileName;
+    d->m_hwModel->clear(true);
+
+    QList<dvm::DVBoard *> boards;
+    QDirIterator it(directory, QStringList() << "*.xml", QDir::Files, QDirIterator::Subdirectories);
+    while (it.hasNext()) {
+        QString fileName = it.next();
+        dvm::DVBoardReader reader;
+        bool ok = reader.readFile(fileName);
+        if (ok) {
+            boards.append(reader.parsedBoards());
+        }
     }
+    d->m_hwModel->setObjectList(boards);
 }
 
 dvm::DVBoardsModel *DVEditorCore::hwModel() const

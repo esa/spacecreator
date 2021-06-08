@@ -64,7 +64,7 @@ public:
     QString filePath() const override;
     bool save() override;
 
-    void loadHWLibrary(const QString &fileName);
+    void loadHWLibrary(const QString &directory);
     dvm::DVBoardsModel *hwModel() const;
 
 private:
