@@ -41,6 +41,7 @@
 #include <QObject>
 #include <QProcess>
 #include <QStandardPaths>
+#include <QUndoStack>
 #include <QVersionNumber>
 
 struct ExternalArgHolder {
@@ -418,6 +419,8 @@ void ActionsManager::triggerActionExternal(const Action &act, const ivm::IVObjec
                     QMessageBox::warning(
                             nullptr, QObject::tr("Save error"), QObject::tr("Unable to save the document.\nAborting"));
                     return;
+                } else {
+                    doc->undoStack()->setClean();
                 }
             } else if (btn == QMessageBox::Cancel) {
                 return;
