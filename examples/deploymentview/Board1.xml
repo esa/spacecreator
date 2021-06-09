@@ -1,8 +1,8 @@
 <Boards>
    <Board name="Linux on x86" type="ocarina_processors_x86::x86.linux">
-      <Device asn1file="/home/taste/tool-inst/include/ocarina/runtime/polyorb-hi-c/src/drivers/configuration/ip.asn" asn1module="POHICDRIVER-IP" asn1type="IP-Conf-T" bus="eth0" requiresBusAccess="ocarina_buses::ip.i"/>
+      <Port name="eth0" asn1file="/home/taste/tool-inst/include/ocarina/runtime/polyorb-hi-c/src/drivers/configuration/ip.asn" asn1module="POHICDRIVER-IP" asn1type="IP-Conf-T" requiresBusAccess="ocarina_buses::ip.i"/>
    </Board>
    <Board name="Linux on ARM" type="ocarina_processors_arm::aarch64.linux">
-      <Device asn1file="/home/taste/tool-inst/include/ocarina/runtime/polyorb-hi-c/src/drivers/configuration/ip.asn" asn1module="POHICDRIVER-IP" asn1type="IP-Conf-T" bus="eth0" requiresBusAccess="ocarina_buses::ip.i"/>
+      <Port name="eth0" asn1file="/home/taste/tool-inst/include/ocarina/runtime/polyorb-hi-c/src/drivers/configuration/ip.asn" asn1module="POHICDRIVER-IP" asn1type="IP-Conf-T" requiresBusAccess="ocarina_buses::ip.i"/>
    </Board>
 </Boards>

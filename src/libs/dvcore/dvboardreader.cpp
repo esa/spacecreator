@@ -82,7 +82,7 @@ void DVBoardReader::processTagOpen(QXmlStreamReader &xml)
     case meta::Props::Token::Board: {
         obj = new dvm::DVBoard();
     } break;
-    case meta::Props::Token::Device: {
+    case meta::Props::Token::Port: {
         if (auto node = qobject_cast<DVBoard *>(d->m_currentObject)) {
             auto dev = new dvm::DVDevice(d->m_currentObject);
             obj = dev;

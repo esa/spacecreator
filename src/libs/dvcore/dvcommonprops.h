@@ -41,6 +41,7 @@ public:
 
         Boards,
         Board,
+        Port,
 
         // attrs:
         name,

@@ -46,6 +46,7 @@ const QHash<QString, Props::Token> Props::TokensByName = {
     // Boards listing
     { "Boards", Token::Boards },
     { "Board", Token::Board },
+    { "Port", Token::Port },
 };
 
 Props::Token Props::token(const QString &fromString)

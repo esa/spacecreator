@@ -65,11 +65,11 @@ static inline QByteArray singleBoardWithPort()
     return QByteArray(
             "<Boards>"
             "    <Board name=\"Linux on x86\" type=\"ocarina_processors_x86::x86.linux\">"
-            "        <Device "
+            "        <Port "
             "         asn1file=\"/home/taste/tool-inst/include/ocarina/runtime/polyorb-hi-c/src/drivers/configuration/"
             "         ip.asn\" asn1module=\"POHICDRIVER-IP\" asn1type=\"IP-Conf-T\" bus=\"eth0\" "
             "         requiresBusAccess=\"ocarina_buses::ip.i\">"
-            "        </Device>"
+            "        </Port>"
             "    </Board>"
             "</Boards>");
 }
@@ -79,18 +79,19 @@ static inline QByteArray multiBoardsWithPort()
     return QByteArray(
             "<Boards>"
             "    <Board name=\"Linux on Risc-V 32\" type=\"ocarina_processors_riscv32::riscv32.linux\">"
-            "        <Device "
+            "        <Port "
             "         asn1file=\"/home/taste/tool-inst/include/ocarina/runtime/polyorb-hi-c/src/drivers/configuration/"
             "         ip.asn\" asn1module=\"POHICDRIVER-IP\" asn1type=\"IP-Conf-T\" bus=\"eth0\" "
             "         requiresBusAccess=\"ocarina_buses::ip.i\">"
-            "        </Device>"
+            "        </Port>"
             "    </Board>"
             "    <Board name=\"Linux on x86\" type=\"ocarina_processors_x86::x86.linux\">"
-            "        <Device "
+            "        <Port "
+            "         name=\"eth0\""
             "         asn1file=\"/home/taste/tool-inst/include/ocarina/runtime/polyorb-hi-c/src/drivers/configuration/"
-            "         ip.asn\" asn1module=\"POHICDRIVER-IP\" asn1type=\"IP-Conf-T\" bus=\"eth0\" "
+            "         ip.asn\" asn1module=\"POHICDRIVER-IP\" asn1type=\"IP-Conf-T\""
             "         requiresBusAccess=\"ocarina_buses::ip.i\">"
-            "        </Device>"
+            "        </Port>"
             "    </Board>"
             "</Boards>");
 }
