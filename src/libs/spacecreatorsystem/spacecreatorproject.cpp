@@ -52,7 +52,6 @@ QSharedPointer<dve::DVEditorCore> SpaceCreatorProject::dvData(const QString &fil
 {
     if (!m_dvStore.contains(fileName)) {
         QSharedPointer<dve::DVEditorCore> data(new dve::DVEditorCore());
-        data->registerBasicActions();
         QString hwFile = shared::SettingsManager::load<QString>(shared::SettingsManager::DVE::HwLibraryFile, "");
         data->loadHWLibrary(hwFile);
         data->appModel()->load(fileName);

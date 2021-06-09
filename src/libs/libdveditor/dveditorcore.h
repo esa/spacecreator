@@ -53,8 +53,6 @@ public:
     QToolBar *toolBar();
     QWidget *mainwidget();
 
-    void registerBasicActions();
-
     QUndoStack *undoStack() const override;
     shared::cmd::CommandsStackBase *commandsStack() const;
 

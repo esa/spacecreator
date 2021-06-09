@@ -60,7 +60,7 @@ struct DVEditorCore::DVEditorCorePrivate {
     std::unique_ptr<shared::AbstractVisualizationModel> m_visualizationModel;
     std::unique_ptr<dvm::DVBoardsModel> m_hwModel;
     QPointer<QToolBar> m_toolBar;
-    DVAppWidget *m_mainWidget { nullptr };
+    QPointer<DVAppWidget> m_mainWidget;
 };
 
 DVEditorCore::DVEditorCore(QObject *parent)
@@ -103,12 +103,6 @@ QWidget *DVEditorCore::mainwidget()
         d->m_mainWidget->setHWModel(d->m_hwModel.get());
     }
     return d->m_mainWidget;
-}
-
-void DVEditorCore::registerBasicActions()
-{
-    // @todo
-    // register undo/redo/...
 }
 
 QUndoStack *DVEditorCore::undoStack() const
