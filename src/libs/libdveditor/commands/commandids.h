@@ -1,5 +1,5 @@
 /*
-  Copyright (C) 2020 European Space Agency - <maxime.perrotin@esa.int>
+  Copyright (C) 2021 European Space Agency - <maxime.perrotin@esa.int>
 
   This library is free software; you can redistribute it and/or
   modify it under the terms of the GNU Library General Public
@@ -15,29 +15,19 @@
   along with this program. If not, see <https://www.gnu.org/licenses/lgpl-2.1.html>.
 */
 
-#include "undocommand.h"
+#pragma once
 
-namespace shared {
+namespace dve {
+namespace cmd {
 
-UndoCommand::UndoCommand(QObject *parent)
-    : QObject(parent)
+enum Id
 {
-}
+    CreateBoardEntity,
+    CreatePartitionEntity,
+    CreateConnectionEntity,
+    CreateDeviceEntity,
+    LastId
+};
 
-UndoCommand::UndoCommand(const QString &text, QObject *parent)
-    : QObject(parent)
-    , QUndoCommand(text)
-{
 }
-
-UndoCommand::UndoCommand(QUndoCommand *parent)
-    : QUndoCommand(parent)
-{
-}
-
-bool UndoCommand::isFirstChange() const
-{
-    return m_firstRedo;
-}
-
 }

@@ -19,15 +19,15 @@
 
 #include "commandids.h"
 #include "commandsstackbase.h"
-#include "veobject.h"
 #include "graphicsviewutils.h"
+#include "veobject.h"
 
 namespace shared {
 namespace cmd {
 
 CmdEntityGeometryChange::CmdEntityGeometryChange(
         const QList<QPair<shared::VEObject *, QVector<QPointF>>> &objectsData, const QString &title)
-    : QUndoCommand(title.isEmpty() ? QObject::tr("Change item(s) geometry/position") : title)
+    : UndoCommand(title.isEmpty() ? QObject::tr("Change item(s) geometry/position") : title)
     , m_internalData(objectsData)
     , m_data(convertData(m_internalData))
 {
@@ -82,7 +82,8 @@ QList<CmdEntityGeometryChange::ObjectData> CmdEntityGeometryChange::convertData(
 {
     QList<ObjectData> result;
     for (const auto &objectData : objectsData)
-        result.append({ objectData.first, objectData.first->coordinates(), shared::graphicsviewutils::coordinates(objectData.second) });
+        result.append({ objectData.first, objectData.first->coordinates(),
+                shared::graphicsviewutils::coordinates(objectData.second) });
 
     //    std::stable_sort(result.begin(), result.end(), [](const ObjectData &data1, const ObjectData &data2) {
     //        if (data1.entity->type() == data2.entity->type())

@@ -30,6 +30,7 @@ class DVConnection : public DVObject
     Q_OBJECT
 public:
     explicit DVConnection(DVObject *parent = nullptr);
+    explicit DVConnection(DVDevice *sourceDev, DVDevice *targetDev, DVObject *parent = nullptr);
     ~DVConnection() override;
 
     bool postInit(QString *warning = nullptr) override;

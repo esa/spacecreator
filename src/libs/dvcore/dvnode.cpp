@@ -43,6 +43,11 @@ void DVNode::addPartition(DVPartition *partition)
     }
 }
 
+void DVNode::removePartition(DVPartition *partition)
+{
+    d->partitions.removeAll(partition);
+}
+
 QList<DVPartition *> DVNode::partitions() const
 {
     return d->partitions;
@@ -53,6 +58,11 @@ void DVNode::addDevice(DVDevice *device)
     if (!d->devices.contains(device)) {
         d->devices.append(device);
     }
+}
+
+void DVNode::removeDevice(DVDevice *device)
+{
+    d->devices.removeAll(device);
 }
 
 QList<QPointer<dvm::DVDevice>> DVNode::devices() const

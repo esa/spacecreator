@@ -17,9 +17,10 @@
 
 #pragma once
 
+#include "undocommand.h"
+
 #include <QPointF>
 #include <QPointer>
-#include <QUndoCommand>
 #include <QVector>
 
 namespace shared {
@@ -29,7 +30,7 @@ class VEObject;
 namespace shared {
 namespace cmd {
 
-class CmdEntityGeometryChange : public QUndoCommand
+class CmdEntityGeometryChange : public UndoCommand
 {
 
 public:

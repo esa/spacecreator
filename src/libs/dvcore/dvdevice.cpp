@@ -17,11 +17,18 @@
 
 #include "dvdevice.h"
 
+#include "dvnode.h"
+
 namespace dvm {
 
 DVDevice::DVDevice(DVObject *parent)
     : DVObject(DVObject::Type::Device, {}, parent)
 {
+}
+
+DVNode *DVDevice::node() const
+{
+    return qobject_cast<DVNode *>(parent());
 }
 
 QString DVDevice::portName() const

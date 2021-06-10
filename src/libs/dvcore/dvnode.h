@@ -35,9 +35,11 @@ public:
     ~DVNode() override;
 
     void addPartition(DVPartition *partition);
+    void removePartition(DVPartition *partition);
     QList<DVPartition *> partitions() const;
 
     void addDevice(DVDevice *device);
+    void removeDevice(DVDevice *device);
     QList<QPointer<DVDevice>> devices() const;
 
 private:

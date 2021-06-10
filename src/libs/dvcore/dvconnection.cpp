@@ -30,6 +30,22 @@ struct DVConnectionPrivate {
     QPointer<DVDevice> targetDevice;
 };
 
+DVConnection::DVConnection(DVDevice *sourceDev, DVDevice *targetDev, DVObject *parent)
+    : DVConnection(parent)
+{
+    if (sourceDev && sourceDev->node()) {
+        setEntityAttribute(meta::Props::token(meta::Props::Token::from_node), sourceDev->node()->title());
+        setEntityAttribute(meta::Props::token(meta::Props::Token::from_port), sourceDev->portName());
+    }
+    if (targetDev && targetDev->node()) {
+        setEntityAttribute(meta::Props::token(meta::Props::Token::to_node), targetDev->node()->title());
+        setEntityAttribute(meta::Props::token(meta::Props::Token::to_port), targetDev->portName());
+    }
+    if (sourceDev && targetDev && sourceDev->busName() == targetDev->busName()) {
+        setEntityAttribute(meta::Props::token(meta::Props::Token::to_bus), targetDev->busName());
+    }
+}
+
 DVConnection::DVConnection(DVObject *parent)
     : DVObject(DVObject::Type::Connection, {}, parent)
     , d(std::make_unique<DVConnectionPrivate>())
@@ -51,7 +67,7 @@ bool DVConnection::postInit(QString *warning)
                              const QString &nodeName, const QString &portName, const QString &busName) -> DVDevice * {
         if (nodeName.isEmpty()) {
             if (warning) {
-                *warning = tr("Malformed data, empty source port");
+                *warning = tr("Malformed data, empty source node");
             }
             return nullptr;
         }

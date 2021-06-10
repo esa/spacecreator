@@ -43,6 +43,14 @@ target_sources(${LIB_NAME} PRIVATE
     dvdevicegraphicsitem.h
     dvconnectiongraphicsitem.cpp
     dvconnectiongraphicsitem.h
+    commands/cmdboardentitycreate.cpp
+    commands/cmdboardentitycreate.h
+    commands/cmdpartitionentitycreate.cpp
+    commands/cmdpartitionentitycreate.h
+    commands/cmdconnectionentitycreate.cpp
+    commands/cmdconnectionentitycreate.h
+    commands/cmddeviceentitycreate.cpp
+    commands/cmddeviceentitycreate.h
 )
 
 target_link_libraries(${LIB_NAME}

@@ -20,12 +20,15 @@
 #include "dvobject.h"
 
 namespace dvm {
+class DVNode;
 
 class DVDevice : public DVObject
 {
     Q_OBJECT
 public:
     explicit DVDevice(DVObject *parent = nullptr);
+
+    DVNode *node() const;
 
     QString portName() const;
     QString busName() const;

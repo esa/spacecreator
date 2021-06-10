@@ -1,5 +1,5 @@
 /*
-  Copyright (C) 2020 European Space Agency - <maxime.perrotin@esa.int>
+  Copyright (C) 2021 European Space Agency - <maxime.perrotin@esa.int>
 
   This library is free software; you can redistribute it and/or
   modify it under the terms of the GNU Library General Public
@@ -17,26 +17,34 @@
 
 #pragma once
 
-#include <QObject>
-#include <QUndoCommand>
+#include "commands/cmdentitygeometrychange.h"
+#include "common.h"
 
-namespace shared {
+#include <QPointer>
 
-class UndoCommand : public QObject, public QUndoCommand
+namespace dvm {
+class DVModel;
+class DVBoard;
+} // namespace dvm
+
+namespace dve {
+namespace cmd {
+
+class CmdBoardEntityCreate : public shared::cmd::CmdEntityGeometryChange
 {
-    Q_OBJECT
 public:
-    explicit UndoCommand(QObject *parent = nullptr);
-    explicit UndoCommand(const QString &text, QObject *parent = nullptr);
-    explicit UndoCommand(QUndoCommand *parent);
-    explicit UndoCommand(const UndoCommand &other) { }
+    explicit CmdBoardEntityCreate(
+            dvm::DVModel *model, const QRectF &geometry, const shared::Id &id = shared::InvalidId);
+    ~CmdBoardEntityCreate() override;
 
-    bool isFirstChange() const;
+    void redo() override;
+    void undo() override;
+    int id() const override;
 
-protected:
-    bool m_firstRedo = true;
+private:
+    QPointer<dvm::DVModel> m_model;
+    QPointer<dvm::DVBoard> m_entity;
 };
 
-}
-
-Q_DECLARE_METATYPE(shared::UndoCommand)
+} // namespace cmd
+} // namespace dve
