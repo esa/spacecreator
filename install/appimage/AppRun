@@ -1,4 +1,5 @@
 #!/bin/sh
+
 SELF=$(readlink -f "$0")
 HERE=${SELF%/*}
 export PATH="${HERE}/usr/bin/:${HERE}/usr/sbin/:${HERE}/usr/games/:${HERE}/bin/:${HERE}/sbin/${PATH:+:$PATH}"
@@ -9,4 +10,56 @@ export PERLLIB="${HERE}/usr/share/perl5/:${HERE}/usr/lib/perl5/${PERLLIB:+:$PERL
 export GSETTINGS_SCHEMA_DIR="${HERE}/usr/share/glib-2.0/schemas/${GSETTINGS_SCHEMA_DIR:+:$GSETTINGS_SCHEMA_DIR}"
 export QT_PLUGIN_PATH="${HERE}/usr/lib/qt4/plugins/:${HERE}/usr/lib/i386-linux-gnu/qt4/plugins/:${HERE}/usr/lib/x86_64-linux-gnu/qt4/plugins/:${HERE}/usr/lib32/qt4/plugins/:${HERE}/usr/lib64/qt4/plugins/:${HERE}/usr/lib/qt5/plugins/:${HERE}/usr/lib/i386-linux-gnu/qt5/plugins/:${HERE}/usr/lib/x86_64-linux-gnu/qt5/plugins/:${HERE}/usr/lib32/qt5/plugins/:${HERE}/usr/lib64/qt5/plugins/${QT_PLUGIN_PATH:+:$QT_PLUGIN_PATH}"
 EXEC=$(grep -e '^Exec=.*' "${HERE}"/*.desktop | head -n 1 | cut -d "=" -f 2 | cut -d " " -f 1)
-exec "${EXEC}" "$@"
+#exec "${EXEC}" "$@"
+
+usage()
+{
+   cat <<EOF
+Usage: ocarina-config [OPTIONS]
+Options:
+        No option:
+            Start space creator
+        [--aadlconverter [--help]]
+            Run the aadlconverter
+        [--mscconverter [--help]]
+            Run the mscconverter
+        [--mscstreaming [--help]]
+            Run the mscstreaming
+        [--DVeditor [--help]]
+            Run the DVeditor
+        [--IVeditor [--help]]
+            Run the IVeditor
+        [--MSCeditor [--help]]
+            Run the MSC editor
+        [--help]
+            Output this message
+EOF
+}
+
+case $1 in
+--help|-h)
+    usage 1>&2
+    exit 1
+    ;;
+--aadlconverter)
+    exec "aadlconverter" "$2" "$3" "$4" "$5" "$6" "$7"
+    ;;
+--mscconverter)
+    exec "mscconverter" "$2" "$3" "$4" "$5" "$6" "$7"
+    ;;
+--mscstreaming)
+    exec "mscstreaming" "$2" "$3" "$4" "$5" "$6" "$7"
+    ;;
+--DVeditor)
+    exec "DVeditor" "$2" "$3" "$4" "$5" "$6" "$7"
+    ;;
+--IVeditor)
+    exec "IVeditor" "$2" "$3" "$4" "$5" "$6" "$7"
+    ;;
+--MSCeditor)
+    exec "msceditor" "$2" "$3" "$4" "$5" "$6" "$7"
+    ;;
+*)
+    exec "${EXEC}" "$@"
+    ;;
+esac
