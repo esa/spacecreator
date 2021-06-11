@@ -1,4 +1,5 @@
 #!/bin/sh
+set -e
 
 if [ ! $1 ] ; then
     echo "Usage: './run_tests.sh <directory of the binary build>'"

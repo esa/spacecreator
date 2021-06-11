@@ -6,18 +6,32 @@ space-creator:
   stage: build-test-and-bundle
   image: taste-buster:latest
   script:
+    - export PROJECT_ROOT=$(pwd)
+    - export ENV_QTC_VERSION_SHORT=4.8
+    - export ENV_QTC_VERSION=4.8.2
+    - export ENV_QT_VERSION=5.12.1
+    - export DOWNLOAD_DIR=/opt/qt-creator-dev
+    - export BUILD_DIR=${PROJECT_ROOT}/build
+    - export PACKAGE_DIR=${PROJECT_ROOT}/package
+    - export CMAKE_BUILD=-DCMAKE_BUILD_TYPE=Release
+    - export ENV_QT_BASE_DIR=${DOWNLOAD_DIR}/Qt/${ENV_QT_VERSION}/gcc_64
+    - mkdir -p ${DOWNLOAD_DIR}
+    - mkdir -p ${BUILD_DIR}
+    - mkdir -p ${PACKAGE_DIR}
     # dependencies
-    - apt install -y -y build-essential git g++ clang cmake cmake-data ninja-build make qtbase5-dev-tools qtbase5-dev qtdeclarative5-dev qtlocation5-dev qtpositioning5-dev libqt5svg5-dev libqt5websockets5-dev qt5-default qbs qtwebengine5-dev clang-format clang-tidy clazy cppcheck gcovr lcov ccache cccc doxygen graphviz zip p7zip curl wget default-jre uuid-dev pkg-config qtcreator
-    - curl -L https://github.com/steveire/grantlee/archive/v5.2.0.tar.gz | tar xz ; cd grantlee-*; patch -p1 < ../patches/grantlee_fix_escape.diff; mkdir build; cd build; cmake -DCMAKE_INSTALL_PREFIX=$(qmake -query QT_INSTALL_PREFIX) ..; cmake --build .; cmake --build . --target install; cd ../..
-    - wget -q -O - https://github.com/ttsiodras/asn1scc/releases/download/4.2.4.4f/asn1scc-bin-4.2.4.4f.tar.bz2 | tar jxvf -
-    - export PATH=$PATH:$(pwd)/asn1scc
+    - apt install -y -y build-essential git g++ cmake cmake-data ninja-build make qtbase5-dev-tools qtbase5-dev qtdeclarative5-dev qtlocation5-dev qtpositioning5-dev libqt5svg5-dev libqt5websockets5-dev qt5-default qbs qtwebengine5-dev gcovr lcov ccache cccc doxygen graphviz zip p7zip curl wget default-jre uuid-dev pkg-config qtcreator fuse python3-pip
+    - ./scripts/build_grantlee.sh
     # build space creator
-    - mkdir -p build; cd build
-    - cmake -GNinja ..
-    - ninja
-    - cd ..
+    - cd ${BUILD_DIR}
+    - cmake -GNinja -S ${PROJECT_ROOT} -B ${BUILD_DIR} ${CMAKE_BUILD}
+    - cmake --build . --target all
+    - cd ${PROJECT_ROOT}
     # unit tests
-    - ./scripts/run_tests.sh build
+    - cd ${DOWNLOAD_DIR}
+    - wget -q -O - https://github.com/ttsiodras/asn1scc/releases/download/4.2.4.4f/asn1scc-bin-4.2.4.4f.tar.bz2 | tar jxvf -
+    - export PATH=$PATH:${DOWNLOAD_DIR}/asn1scc
+    - cd ${PROJECT_ROOT}
+    - ./scripts/run_tests.sh ${BUILD_DIR}
     ## coverage
     #- export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/usr/lib/x86_64-linux-gnu/qtcreator:/usr/lib/x86_64-linux-gnu/qtcreator/plugins
     #- export QT_QPA_PLATFORM=offscreen
@@ -29,24 +43,18 @@ space-creator:
     - ./scripts/generate_documentation.sh
     # debian package
     # install qtcreator sources
-    - export PWD=$(pwd)
-    - export ENV_QTC_VERSION_SHORT=4.8
-    - export ENV_QTC_VERSION=4.8.2
-    - export DOWNLOAD_DIR=/opt/qt-creator-dev
-    - export QTC_BUILD_DIR=${DOWNLOAD_DIR}/build-debug
-    - mkdir -p "${DOWNLOAD_DIR}"
-    - cd "${DOWNLOAD_DIR}"
-    - export QTC_SOURCE_FILE=qt-creator-opensource-src-${ENV_QTC_VERSION}.tar.gz
-    - curl -L "http://download.qt-project.org/official_releases/qtcreator/${ENV_QTC_VERSION_SHORT}/${ENV_QTC_VERSION}/qt-creator-opensource-src-${ENV_QTC_VERSION}.tar.gz" -o ${QTC_SOURCE_FILE} -s
-    - tar xzf qt-creator-opensource-src-${ENV_QTC_VERSION}.tar.gz || exit 1
-    - mv qt-creator-opensource-src-${ENV_QTC_VERSION} qt-creator
+    - ./scripts/download_qtcreator.sh
     - cd -
     # build the plugin
-    - cd build
-    - cmake -GNinja .. -DBUILD_PATCH_NUMBER=$CI_BUILD_ID -DENABLE_TESTS=OFF
+    - cd ${BUILD_DIR}
+    - cmake -GNinja -S ${PROJECT_ROOT} -B ${BUILD_DIR} ${CMAKE_BUILD} -DBUILD_PATCH_NUMBER=$CI_BUILD_ID -DENABLE_TESTS=OFF
     - cmake --build . --target all
+    # Create .deb package
     - cpack
-    - cd ..; mkdir -p package; cp build/*.deb package
+    - mkdir -p ${PACKAGE_DIR}
+    - cp ${BUILD_DIR}/*.deb ${PACKAGE_DIR}
+    # Create AppImage
+    - ${PROJECT_ROOT}/scripts/create_appimage.sh
   cache:
     key: asn1scc
     paths:
@@ -57,4 +65,4 @@ space-creator:
     paths:
       - doc/doxygen/html
       - package
-    expire_in: 4 weeks
+    expire_in: 3 weeks
