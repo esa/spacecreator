@@ -60,6 +60,7 @@ public:
             }
         }
 
+        bool added = false;
         QVector<shared::Id> ids;
         auto it = addedObjects.begin();
         while (it != addedObjects.end()) {
@@ -71,17 +72,27 @@ public:
                     }
                     if (removeObject(obj)) {
                         it = addedObjects.erase(it);
-                        delete (obj);
+                        for (VEObject *descant : obj->descendants()) {
+                            if (T descantT = dynamic_cast<T>(descant)) {
+                                removeObject(descantT);
+                                int idx = addedObjects.indexOf(descantT);
+                                if (idx >= 0) {
+                                    addedObjects[idx] = nullptr;
+                                }
+                            }
+                        }
+                        delete (obj); // deletes all descants as well
                         continue;
                     }
                 } else {
                     ids.append(obj->id());
+                    added = true;
                 }
             }
             ++it;
         }
 
-        if (!addedObjects.isEmpty()) {
+        if (added) {
             Q_EMIT objectsAdded(ids);
         }
     }

@@ -167,6 +167,21 @@ VEObject *VEObject::parentObject() const
     return qobject_cast<VEObject *>(parent());
 }
 
+/*!
+   Returns all children/grandchildren/etc.
+ */
+QVector<VEObject *> VEObject::descendants() const
+{
+    QVector<VEObject *> result;
+    for (QObject *child : children()) {
+        if (VEObject *veChild = qobject_cast<VEObject *>(child)) {
+            result.append(veChild->descendants());
+            result.append(veChild);
+        }
+    }
+    return result;
+}
+
 void VEObject::setModel(VEModel *model)
 {
     d->m_model = model;

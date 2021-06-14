@@ -37,6 +37,7 @@ private Q_SLOTS:
     void init();
 
     void test_checkAllInterfacesForAsn1Compliance();
+    void test_loadFailingFunctionInit();
 
 private:
     std::unique_ptr<ive::InterfaceDocument> ivDoc;
@@ -78,6 +79,11 @@ void tst_InterfaceDocument::test_checkAllInterfacesForAsn1Compliance()
     if3->addParam(ivm::InterfaceParameter("IfaceParam", ivm::BasicParameter::Type::Other, "InvalidType"));
     ok = ivDoc->checkAllInterfacesForAsn1Compliance();
     QCOMPARE(ok, false);
+}
+
+void tst_InterfaceDocument::test_loadFailingFunctionInit()
+{
+    ivDoc->load(QFINDTESTDATA("interfaceview_function_fail.xml"));
 }
 
 QTEST_MAIN(tst_InterfaceDocument)

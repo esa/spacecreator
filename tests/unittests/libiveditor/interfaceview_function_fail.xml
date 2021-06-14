@@ -1,0 +1,18 @@
+<InterfaceView>
+<Function name="Battery_1" url="https://taste.tools" is_type="NO" instance_of="battery_see_name" language="SDL">
+    <Property name="Taste::coordinates" value="124900 42600 157300 64700"/>
+    <ContextParameter name="p1" type="MyInteger" value="5"/>
+<Provided_Interface name="do_step" kind="Cyclic" period="1000">
+    <Property name="Taste::coordinates" value="142400 42600"/>
+</Provided_Interface>
+</Function>
+
+<Function name="battery_name_missmatch" url="https://taste.tools" is_type="YES" language="SDL">
+    <Property name="Taste::coordinates" value="38100 27100 64400 62700"/>
+    <ContextParameter name="p1" type="MyInteger" value="5"/>
+<Provided_Interface name="do_step" kind="Cyclic" period="1000">
+    <Property name="Taste::coordinates" value="52300 27100"/>
+</Provided_Interface>
+</Function>
+
+</InterfaceView>
