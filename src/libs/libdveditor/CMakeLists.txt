@@ -51,6 +51,12 @@ target_sources(${LIB_NAME} PRIVATE
     commands/cmdconnectionentitycreate.h
     commands/cmddeviceentitycreate.cpp
     commands/cmddeviceentitycreate.h
+    commands/cmdentitiesremove.cpp
+    commands/cmdentitiesremove.h
+    dvcreatortool.cpp
+    dvcreatortool.h
+    graphicsitemhelpers.cpp
+    graphicsitemhelpers.h
 )
 
 target_link_libraries(${LIB_NAME}

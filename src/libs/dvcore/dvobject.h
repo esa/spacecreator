@@ -38,12 +38,12 @@ public:
     {
         Unknown = 0,
 
+        Board,
         Node,
         Partition,
         Function,
         Device,
         Connection,
-        Board
     };
     Q_ENUM(Type)
 

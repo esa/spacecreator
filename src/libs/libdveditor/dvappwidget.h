@@ -21,6 +21,7 @@
 
 class QAbstractItemModel;
 class QGraphicsScene;
+class QItemSelectionModel;
 
 namespace Ui {
 class DVAppWidget;
@@ -37,6 +38,7 @@ public:
     ~DVAppWidget();
 
     dve::GraphicsView *graphicsView() const;
+    QItemSelectionModel *selectionModel() const;
 
     void setGraphicsScene(QGraphicsScene *scene);
     void setAadlModel(QAbstractItemModel *model);
@@ -44,6 +46,7 @@ public:
 
 private:
     Ui::DVAppWidget *ui = nullptr;
+    QItemSelectionModel *m_selectionModel = nullptr;
 };
 
 } // namespace dve

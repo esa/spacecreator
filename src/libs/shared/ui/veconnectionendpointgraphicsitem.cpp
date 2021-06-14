@@ -193,7 +193,7 @@ void VEConnectionEndPointGraphicsItem::layout()
 
 QPainterPath VEConnectionEndPointGraphicsItem::ifaceShape() const
 {
-    return shape();
+    return mapToScene(shape());
 }
 
 QVariant VEConnectionEndPointGraphicsItem::itemChange(GraphicsItemChange change, const QVariant &value)

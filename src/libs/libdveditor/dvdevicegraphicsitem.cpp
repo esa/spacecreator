@@ -91,6 +91,11 @@ QPointF DVDeviceGraphicsItem::connectionEndPoint(shared::ui::VEConnectionGraphic
     return sceneBoundingRect().center();
 }
 
+DVNodeGraphicsItem *DVDeviceGraphicsItem::nodeItem() const
+{
+    return qgraphicsitem_cast<DVNodeGraphicsItem *>(targetItem());
+}
+
 void DVDeviceGraphicsItem::applyColorScheme()
 {
     const shared::ColorHandler &h = colorHandler();

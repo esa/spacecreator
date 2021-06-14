@@ -25,6 +25,8 @@ target_sources(${LIB_NAME} PRIVATE
     dvpartition.h
     dvxmlreader.cpp
     dvxmlreader.h
+    connectioncreationvalidator.cpp
+    connectioncreationvalidator.h
 )
 
 target_include_directories(${LIB_NAME} PUBLIC .)

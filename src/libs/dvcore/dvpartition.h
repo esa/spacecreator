@@ -34,6 +34,7 @@ public:
     ~DVPartition() override;
 
     void addFunction(DVFunction *function);
+    void removeFunction(DVFunction *function);
     QList<QPointer<DVFunction>> functions() const;
     QStringList functionsNames() const;
 

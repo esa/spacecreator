@@ -48,6 +48,8 @@ public:
     QPointF connectionEndPoint(const bool nestedConnection) const override;
     QPointF connectionEndPoint(shared::ui::VEConnectionGraphicsItem *connection = nullptr) const override;
 
+    DVNodeGraphicsItem *nodeItem() const;
+
 protected Q_SLOTS:
     void applyColorScheme() override;
 

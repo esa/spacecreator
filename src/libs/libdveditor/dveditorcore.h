@@ -17,10 +17,12 @@
 
 #pragma once
 
+#include "common.h"
 #include "editorcore.h"
 
 class QUndoStack;
 class QToolBar;
+class QItemSelection;
 
 namespace shared {
 class CommandLineParser;
@@ -64,6 +66,18 @@ public:
 
     void loadHWLibrary(const QString &directory);
     dvm::DVBoardsModel *hwModel() const;
+
+private Q_SLOTS:
+    void showPropertyEditor();
+    void showInfoMessage(const QString &title, const QString &message);
+
+    void copyItems();
+    void cutItems();
+    void pasteItems();
+    void pasteItems(const QPointF &sceneDropPoint);
+
+    void onSceneSelectionChanged(const QList<shared::Id> &selectedObjects);
+    void onViewSelectionChanged(const QItemSelection &selected, const QItemSelection &deselected);
 
 private:
     struct DVEditorCorePrivate;

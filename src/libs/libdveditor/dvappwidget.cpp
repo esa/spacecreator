@@ -20,6 +20,7 @@
 #include "baseitems/graphicsview.h"
 #include "ui_dvappwidget.h"
 
+#include <QItemSelectionModel>
 #include <QSplitter>
 #include <QTreeView>
 
@@ -28,6 +29,7 @@ namespace dve {
 DVAppWidget::DVAppWidget(QWidget *parent)
     : QWidget(parent)
     , ui(new Ui::DVAppWidget)
+    , m_selectionModel(new QItemSelectionModel(nullptr, this))
 {
     ui->setupUi(this);
     ui->mainSplitter->setStretchFactor(1, 1);
@@ -41,6 +43,11 @@ GraphicsView *DVAppWidget::graphicsView() const
     return ui->view;
 }
 
+QItemSelectionModel *DVAppWidget::selectionModel() const
+{
+    return m_selectionModel;
+}
+
 void DVAppWidget::setGraphicsScene(QGraphicsScene *scene)
 {
     ui->view->setScene(scene);
@@ -48,8 +55,10 @@ void DVAppWidget::setGraphicsScene(QGraphicsScene *scene)
 
 void DVAppWidget::setAadlModel(QAbstractItemModel *model)
 {
+    m_selectionModel->setModel(model);
     ui->treeView->setModel(model);
     ui->treeView->setHeaderHidden(true);
+    ui->treeView->setSelectionModel(m_selectionModel);
 }
 
 void DVAppWidget::setHWModel(QAbstractItemModel *model)

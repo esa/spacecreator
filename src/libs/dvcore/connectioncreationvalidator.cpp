@@ -15,20 +15,15 @@
   along with this program. If not, see <https://www.gnu.org/licenses/lgpl-2.1.html>.
 */
 
-#pragma once
+#include "connectioncreationvalidator.h"
 
-namespace dve {
-namespace cmd {
+namespace dvm {
 
-enum Id
+ConnectionCreationValidator::FailReason ConnectionCreationValidator::canConnect(
+        DVNode *sourceNode, DVNode *targetNode, DVDevice *sourceDevice, DVDevice *targetDevice)
 {
-    CreateBoardEntity,
-    CreatePartitionEntity,
-    CreateConnectionEntity,
-    CreateDeviceEntity,
-    RemoveEntity,
-    LastId
-};
-
+    /// TODO:
+    return ConnectionCreationValidator::FailReason::NotFail;
 }
+
 }

@@ -15,20 +15,29 @@
   along with this program. If not, see <https://www.gnu.org/licenses/lgpl-2.1.html>.
 */
 
+#include <QVector>
+
 #pragma once
 
+class QGraphicsScene;
+class QPointF;
+
+namespace dvm {
+struct ValidationResult;
+}
+
 namespace dve {
-namespace cmd {
+namespace gi {
 
-enum Id
-{
-    CreateBoardEntity,
-    CreatePartitionEntity,
-    CreateConnectionEntity,
-    CreateDeviceEntity,
-    RemoveEntity,
-    LastId
-};
+/*!
+ * \brief Performs the validation to detect if it's possible to connect the \a scene's items located in \a startPos and
+ * \a endPos.
+ *
+ * Returns the status of such validation as instance of ConnectionCreationValidator::ValidationResult.
+ * Anything except the FailReason::NotFail in ConnectionCreationValidator::ValidationResult::status
+ * means that the connection creation is prohibited.
+ */
+dvm::ValidationResult validateConnectionCreate(QGraphicsScene *scene, const QVector<QPointF> &points);
 
-}
-}
+} // namespace gi
+} // namespace dve

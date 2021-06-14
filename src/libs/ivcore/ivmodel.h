@@ -81,22 +81,6 @@ public:
 
     void clear() override;
 
-    /*!
-      Returns all objects of the given type
-    */
-    template<typename T>
-    QVector<T *> allObjectsByType() const
-    {
-        QVector<T *> result;
-        const QHash<shared::Id, shared::VEObject *> &ivObjects = objects();
-        for (auto obj : ivObjects) {
-            if (auto func = dynamic_cast<T *>(obj)) {
-                result.append(func);
-            }
-        }
-        return result;
-    }
-
 Q_SIGNALS:
     void rootObjectChanged(shared::Id rootId);
 

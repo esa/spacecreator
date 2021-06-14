@@ -15,7 +15,7 @@
   along with this program. If not, see <https://www.gnu.org/licenses/lgpl-2.1.html>.
 */
 
-#include "creatortool.h"
+#include "ivcreatortool.h"
 
 #include "baseitems/common/ivutils.h"
 #include "commands/cmdcommentitemcreate.h"
@@ -70,101 +70,23 @@ static const qreal kPreviewItemPenWidth = 2.;
 
 namespace ive {
 
-struct CreatorTool::CreatorToolPrivate {
-    CreatorToolPrivate(CreatorTool *tool, InterfaceDocument *doc)
-        : thisTool(tool)
-        , doc(doc)
-        , view(doc->graphicsView())
-        , model(doc->itemsModel())
-    {
-    }
-
-    bool showContextMenu(const QPoint &globalPos);
-    void populateContextMenu_commonCreate(QMenu *menu, const QPointF &scenePos);
-    void populateContextMenu_commonEdit(QMenu *menu, const QPointF &scenePos);
-    void populateContextMenu_propertiesDialog(QMenu *menu);
-    void populateContextMenu_user(QMenu *menu, const QPointF &scenePos);
-
-    void handleToolType(CreatorTool::ToolType type, const QPointF &pos);
-    void handleComment(QGraphicsScene *scene, const QPointF &pos);
-    void handleFunctionType(QGraphicsScene *scene, const QPointF &pos);
-    void handleFunction(QGraphicsScene *scene, const QPointF &pos);
-    void handleInterface(QGraphicsScene *scene, ivm::IVInterface::InterfaceType type, const QPointF &pos);
-    bool handleConnectionCreate(const QPointF &pos);
-    void handleDirectConnection(const QPointF &pos);
-    void handleConnectionReCreate(const QVector<QPointF> &graphicPoints);
-    void handleConnection(const QVector<QPointF> &graphicPoints) const;
-
-    bool warnConnectionPreview(const QPointF &pos);
-
-    QUndoCommand *createInterfaceCommand(const ivm::IVInterface::CreationInfo &info) const;
-
-    void clearPreviewItem();
-
-    CreatorTool *thisTool;
-
-    QPointF cursorInScene() const;
-    QPointF cursorInScene(const QPoint &screenPos) const;
-
-    QPointer<InterfaceDocument> doc;
-    QPointer<QGraphicsView> view;
-    QPointer<IVItemModel> model;
-    QGraphicsRectItem *previewItem = nullptr;
-    QGraphicsPathItem *previewConnectionItem = nullptr;
-    QVector<QPointF> connectionPoints;
-    QPointF clickScenePos;
-    QCursor cursor;
-    CreatorTool::ToolType toolType = ToolType::Pointer;
-    QSet<shared::ui::VEInteractiveObject *> collidedItems;
-};
-
-CreatorTool::CreatorTool(InterfaceDocument *doc)
-    : QObject(doc)
-    , d(new CreatorToolPrivate(this, doc))
+IVCreatorTool::IVCreatorTool(InterfaceDocument *doc)
+    : shared::ui::CreatorTool(doc->graphicsView(), doc->itemsModel(), doc)
+    , m_doc(doc)
 {
-    Q_ASSERT(doc != nullptr);
-    Q_ASSERT(d->view != nullptr);
-    Q_ASSERT(d->model != nullptr);
-
-    if (d->view && d->view->viewport()) {
-        d->view->installEventFilter(this);
-        d->view->viewport()->installEventFilter(this);
-    }
 }
 
-CreatorTool::~CreatorTool()
-{
-    delete d;
-    d = nullptr;
-}
+IVCreatorTool::~IVCreatorTool() { }
 
-CreatorTool::ToolType CreatorTool::toolType() const
+void IVCreatorTool::removeSelectedItems()
 {
-    return d->toolType;
-}
-
-void CreatorTool::setCurrentToolType(CreatorTool::ToolType type)
-{
-    if (d->toolType == type)
+    if (!m_view)
         return;
 
-    d->toolType = type;
-
-    d->clearPreviewItem();
-
-    if (d->view)
-        d->view->setFocus();
-}
-
-void CreatorTool::removeSelectedItems()
-{
-    if (!d->view)
-        return;
-
-    if (auto scene = d->view->scene()) {
+    if (auto scene = m_view->scene()) {
         QStringList clonedIfaces;
         QList<QPointer<ivm::IVObject>> entities;
-        d->clearPreviewItem();
+        clearPreviewItem();
         while (!scene->selectedItems().isEmpty()) {
             QGraphicsItem *item = scene->selectedItems().first();
             item->setSelected(false);
@@ -188,9 +110,9 @@ void CreatorTool::removeSelectedItems()
                 }
             }
         }
-        auto cmdRm = new cmd::CmdEntitiesRemove(entities, d->model->objectsModel());
+        auto cmdRm = new cmd::CmdEntitiesRemove(entities, model()->objectsModel());
         cmdRm->setText(tr("Remove selected item(s)"));
-        d->doc->commandsStack()->push(cmdRm);
+        m_doc->commandsStack()->push(cmdRm);
 
         if (!clonedIfaces.isEmpty()) {
             const QString names = clonedIfaces.join(QStringLiteral("<br>"));
@@ -203,7 +125,7 @@ void CreatorTool::removeSelectedItems()
     }
 }
 
-void CreatorTool::groupSelectedItems()
+void IVCreatorTool::groupSelectedItems()
 {
     QList<ivm::IVConnectionGroup::CreationInfo> groupCreationDataList;
 
@@ -223,8 +145,8 @@ void CreatorTool::groupSelectedItems()
         } else {
             QVector<QPointF> points = shared::graphicsviewutils::polygon(connection->coordinates());
             if (points.isEmpty()) {
-                const QGraphicsItem *sourceItem = d->model->getItem(connection->source()->id());
-                const QGraphicsItem *targetItem = d->model->getItem(connection->target()->id());
+                const QGraphicsItem *sourceItem = m_model->getItem(connection->source()->id());
+                const QGraphicsItem *targetItem = m_model->getItem(connection->target()->id());
                 if (!sourceItem || !targetItem) {
                     return;
                 }
@@ -240,12 +162,12 @@ void CreatorTool::groupSelectedItems()
                 }
                 points << startPoint << endPoint;
             }
-            groupCreationDataList.append({ d->model->objectsModel(), connection->parentObject(), connection->source(),
+            groupCreationDataList.append({ model()->objectsModel(), connection->parentObject(), connection->source(),
                     connection->target(), {}, { connection }, points });
         }
     };
 
-    for (const auto item : d->view->scene()->selectedItems()) {
+    for (const auto item : m_view->scene()->selectedItems()) {
         if (item->type() == IVConnectionGraphicsItem::Type) {
             if (auto connectionItem = qgraphicsitem_cast<IVConnectionGraphicsItem *>(item)) {
                 if (ivm::IVConnection *connectionObj = connectionItem->entity()) {
@@ -255,78 +177,34 @@ void CreatorTool::groupSelectedItems()
         }
     }
 
-    CreateConnectionGroupDialog *dialog = new CreateConnectionGroupDialog(groupCreationDataList, d->view->window());
+    CreateConnectionGroupDialog *dialog = new CreateConnectionGroupDialog(groupCreationDataList, m_view->window());
     if (dialog->exec() == QDialog::Accepted) {
         for (const ivm::IVConnectionGroup::CreationInfo &data : dialog->info()) {
             auto cmd = new cmd::CmdConnectionGroupItemCreate(data);
-            d->doc->commandsStack()->push(cmd);
+            m_doc->commandsStack()->push(cmd);
         }
     }
     dialog->deleteLater();
 }
 
-bool CreatorTool::eventFilter(QObject *watched, QEvent *event)
-{
-    if (d->view && watched == d->view->viewport()) {
-        switch (event->type()) {
-        case QEvent::MouseButtonPress:
-            return onMousePress(static_cast<QMouseEvent *>(event));
-        case QEvent::MouseButtonRelease:
-            return onMouseRelease(static_cast<QMouseEvent *>(event));
-        case QEvent::MouseMove:
-            return onMouseMove(static_cast<QMouseEvent *>(event));
-        case QEvent::MouseButtonDblClick: {
-            QMouseEvent *e = static_cast<QMouseEvent *>(event);
-            if (e->button() & Qt::RightButton) // block double click for right click and handle it
-                return onMousePress(e);
-            return false;
-        }
-        default:
-            break;
-        }
-    }
-
-    if (d->view == watched) {
-        if (event->type() == QEvent::ContextMenu)
-            return onContextMenu(static_cast<QContextMenuEvent *>(event));
-
-        if (event->type() == QEvent::KeyPress) {
-            QKeyEvent *keyEvent = static_cast<QKeyEvent *>(event);
-            switch (keyEvent->key()) {
-            case Qt::Key_Escape: {
-                if (toolType() == ToolType::Pointer) {
-                    if (auto scene = d->view->scene())
-                        scene->clearSelection();
-                } else {
-                    d->clearPreviewItem();
-                    Q_EMIT created();
-                }
-            } break;
-            }
-        }
-    }
-
-    return false;
-}
-
 // Right mouse (ctrl or not) = get the context menu with the creation choices
 // Left mouse + ctrl = shortcut to creating a connection + the PI and RI between two boxes
 // Left mouse without ctrl: If a tool is selected, perform the tool. Otherwise, select the items
-bool CreatorTool::onMousePress(QMouseEvent *e)
+bool IVCreatorTool::onMousePress(QMouseEvent *e)
 {
-    if (d->view.isNull()) {
+    if (m_view.isNull()) {
         return false;
     }
 
-    auto scene = d->view->scene();
+    auto scene = m_view->scene();
     if (scene == nullptr) {
         return false;
     }
 
-    const QPointF scenePos = d->cursorInScene(e->globalPos());
-    if ((d->toolType == ToolType::ReCreateConnection || e->modifiers() & Qt::ShiftModifier)
+    const QPointF scenePos = cursorInScene(e->globalPos());
+    if ((m_toolType == ToolType::ReCreateConnection || e->modifiers() & Qt::ShiftModifier)
             && e->button() != Qt::RightButton) {
-        if (!d->previewConnectionItem) {
+        if (!m_previewConnectionItem) {
             QGraphicsItem *item = shared::graphicsviewutils::nearestItem(
                     scene, scenePos, shared::graphicsviewutils::kInterfaceTolerance, { IVInterfaceGraphicsItem::Type });
             if (!item || item->type() != IVInterfaceGraphicsItem::Type)
@@ -345,79 +223,79 @@ bool CreatorTool::onMousePress(QMouseEvent *e)
             auto reqIface = connectionItem->startItem();
             Q_ASSERT(reqIface);
 
-            d->toolType = ToolType::ReCreateConnection;
-            d->previewConnectionItem = new QGraphicsPathItem;
-            d->previewConnectionItem->setPen(QPen(Qt::black, 2, Qt::DotLine));
-            d->previewConnectionItem->setZValue(ZOrder.Preview);
-            d->previewConnectionItem->setData(Qt::UserRole, connectionItem->entity()->id());
-            scene->addItem(d->previewConnectionItem);
-            d->connectionPoints.append(reqIface->connectionEndPoint(connectionItem));
+            m_toolType = ToolType::ReCreateConnection;
+            m_previewConnectionItem = new QGraphicsPathItem;
+            m_previewConnectionItem->setPen(QPen(Qt::black, 2, Qt::DotLine));
+            m_previewConnectionItem->setZValue(ZOrder.Preview);
+            m_previewConnectionItem->setData(Qt::UserRole, connectionItem->entity()->id());
+            scene->addItem(m_previewConnectionItem);
+            m_connectionPoints.append(reqIface->connectionEndPoint(connectionItem));
             connectionItem->setVisible(false);
         }
         return true;
     } else if (e->modifiers() & Qt::ControlModifier) {
-        auto itemAtCursor = d->view->itemAt(e->pos());
+        auto itemAtCursor = m_view->itemAt(e->pos());
         if ((e->button() & Qt::MouseButton::LeftButton)
                 && (!itemAtCursor || itemAtCursor->type() != shared::ui::GripPoint::Type))
-            d->toolType = ToolType::DirectConnection;
+            m_toolType = ToolType::DirectConnection;
         else
             return false;
-    } else if (!(e->button() & Qt::RightButton) && d->toolType == ToolType::Pointer) {
+    } else if (!(e->button() & Qt::RightButton) && m_toolType == ToolType::Pointer) {
         return false;
     }
 
-    if (d->toolType == ToolType::DirectConnection && e->button() != Qt::RightButton) {
+    if (m_toolType == ToolType::DirectConnection && e->button() != Qt::RightButton) {
         if (!shared::graphicsviewutils::nearestItem(scene, scenePos, QList<int> { IVFunctionGraphicsItem::Type })) {
             if (!shared::graphicsviewutils::nearestItem(scene, scenePos, shared::graphicsviewutils::kInterfaceTolerance,
                         { IVInterfaceGraphicsItem::Type }))
                 return false;
         }
 
-        if (d->previewConnectionItem) {
-            d->connectionPoints.clear();
+        if (m_previewConnectionItem) {
+            m_connectionPoints.clear();
         } else {
-            d->previewConnectionItem = new QGraphicsPathItem;
-            d->previewConnectionItem->setPen(QPen(Qt::black, 2, Qt::DotLine));
-            d->previewConnectionItem->setZValue(ZOrder.Preview);
-            scene->addItem(d->previewConnectionItem);
+            m_previewConnectionItem = new QGraphicsPathItem;
+            m_previewConnectionItem->setPen(QPen(Qt::black, 2, Qt::DotLine));
+            m_previewConnectionItem->setZValue(ZOrder.Preview);
+            scene->addItem(m_previewConnectionItem);
         }
-        d->connectionPoints.append(scenePos);
+        m_connectionPoints.append(scenePos);
         return true;
-    } else if (d->toolType == ToolType::MultiPointConnection && e->button() != Qt::RightButton) {
-        if (!d->previewConnectionItem) {
+    } else if (m_toolType == ToolType::MultiPointConnection && e->button() != Qt::RightButton) {
+        if (!m_previewConnectionItem) {
             QGraphicsItem *item = shared::graphicsviewutils::nearestItem(
                     scene, scenePos, shared::graphicsviewutils::kInterfaceTolerance, { IVInterfaceGraphicsItem::Type });
             if (!item)
                 return false;
 
             const QPointF startPoint = item->mapToScene(QPointF(0, 0));
-            d->previewConnectionItem = new QGraphicsPathItem;
-            d->previewConnectionItem->setPen(QPen(Qt::black, 2, Qt::DotLine));
-            d->previewConnectionItem->setZValue(ZOrder.Preview);
-            scene->addItem(d->previewConnectionItem);
-            d->connectionPoints.append(startPoint);
+            m_previewConnectionItem = new QGraphicsPathItem;
+            m_previewConnectionItem->setPen(QPen(Qt::black, 2, Qt::DotLine));
+            m_previewConnectionItem->setZValue(ZOrder.Preview);
+            scene->addItem(m_previewConnectionItem);
+            m_connectionPoints.append(startPoint);
             return true;
         }
-        return !d->connectionPoints.contains(scenePos);
+        return !m_connectionPoints.contains(scenePos);
     } else if (e->button() == Qt::RightButton
-            || (d->toolType != ToolType::RequiredInterface && d->toolType != ToolType::ProvidedInterface)) {
-        if (!d->previewItem) {
-            QGraphicsItem *parentItem = d->view->itemAt(e->pos());
+            || (m_toolType != ToolType::RequiredInterface && m_toolType != ToolType::ProvidedInterface)) {
+        if (!m_previewItem) {
+            QGraphicsItem *parentItem = m_view->itemAt(e->pos());
             while (parentItem != nullptr && parentItem->type() != IVFunctionGraphicsItem::Type
                     && parentItem->type() != IVFunctionTypeGraphicsItem::Type) {
                 parentItem = parentItem->parentItem();
             }
-            d->previewItem = new QGraphicsRectItem(parentItem);
-            d->previewItem->setPen(QPen(Qt::blue, kPreviewItemPenWidth, Qt::SolidLine));
-            d->previewItem->setBrush(QBrush(QColor(30, 144, 255, 90)));
-            d->previewItem->setZValue(ZOrder.Preview);
-            d->clickScenePos = scenePos;
+            m_previewItem = new QGraphicsRectItem(parentItem);
+            m_previewItem->setPen(QPen(Qt::blue, kPreviewItemPenWidth, Qt::SolidLine));
+            m_previewItem->setBrush(QBrush(QColor(30, 144, 255, 90)));
+            m_previewItem->setZValue(ZOrder.Preview);
+            m_clickScenePos = scenePos;
 
             if (!parentItem)
-                scene->addItem(d->previewItem);
+                scene->addItem(m_previewItem);
 
             if (!e->buttons().testFlag(Qt::MaxMouseButton)) {
-                auto items = d->view->items(e->pos());
+                auto items = m_view->items(e->pos());
                 for (auto item : items) {
                     if (item->type() > QGraphicsItem::UserType) {
                         if (!item->isSelected()) {
@@ -429,132 +307,87 @@ bool CreatorTool::onMousePress(QMouseEvent *e)
                 }
             }
         }
-        const QPointF mappedScenePos = d->previewItem->mapFromScene(scenePos);
-        d->previewItem->setRect({ mappedScenePos, mappedScenePos });
+        const QPointF mappedScenePos = m_previewItem->mapFromScene(scenePos);
+        m_previewItem->setRect({ mappedScenePos, mappedScenePos });
         return true;
     }
 
     return true;
 }
 
-bool CreatorTool::onMouseRelease(QMouseEvent *e)
+bool IVCreatorTool::onMouseRelease(QMouseEvent *e)
 {
-    if (!d->view)
+    if (!m_view)
         return false;
 
-    if ((e->button() & Qt::RightButton) && d->previewItem) {
-        return d->showContextMenu(e->globalPos());
-    } else if (d->toolType != ToolType::Pointer) {
-        const bool hasPreview = d->previewItem || d->previewConnectionItem;
-        const bool isIface = d->toolType == ToolType::ProvidedInterface || d->toolType == ToolType::RequiredInterface;
+    if ((e->button() & Qt::RightButton) && m_previewItem) {
+        return showContextMenu(e->globalPos());
+    } else if (m_toolType != ToolType::Pointer) {
+        const bool hasPreview = m_previewItem || m_previewConnectionItem;
+        const bool isIface = m_toolType == ToolType::ProvidedInterface || m_toolType == ToolType::RequiredInterface;
         if (hasPreview || isIface) {
-            const QPointF &scenePos = d->cursorInScene(e->globalPos());
-            d->handleToolType(d->toolType, scenePos);
-            return true;
+            const QPointF &scenePos = cursorInScene(e->globalPos());
+            return handleToolType(m_toolType, scenePos);
         }
     }
     return false;
 }
 
-bool CreatorTool::onMouseMove(QMouseEvent *e)
+bool IVCreatorTool::onMouseMove(QMouseEvent *e)
 {
-    if (!d->view || !d->view->scene())
+    if (!m_view || !m_view->scene())
         return false;
 
-    const QPointF &scenePos = d->cursorInScene(e->globalPos());
-    if (d->previewItem && d->previewItem->isVisible()) {
-        const QRectF newGeometry = QRectF(d->clickScenePos, scenePos).normalized();
+    const QPointF &scenePos = cursorInScene(e->globalPos());
+    if (m_previewItem && m_previewItem->isVisible()) {
+        const QRectF newGeometry = QRectF(m_clickScenePos, scenePos).normalized();
         if (!newGeometry.isValid())
             return true;
 
         QSet<shared::ui::VEInteractiveObject *> items;
         const QRectF expandedGeometry { newGeometry.marginsAdded(shared::graphicsviewutils::kContentMargins) };
-        QList<QGraphicsItem *> newCollidedItems = d->view->scene()->items(expandedGeometry);
+        QList<QGraphicsItem *> newCollidedItems = m_view->scene()->items(expandedGeometry);
         std::for_each(newCollidedItems.begin(), newCollidedItems.end(),
                 [this, &items, expandedGeometry](QGraphicsItem *item) {
-                    if (item->type() == IVInterfaceGraphicsItem::Type || item->type() == d->previewItem->type())
+                    if (item->type() == IVInterfaceGraphicsItem::Type || item->type() == m_previewItem->type())
                         return;
 
                     auto iObjItem = qobject_cast<shared::ui::VEInteractiveObject *>(item->toGraphicsObject());
                     if (!iObjItem)
                         return;
 
-                    if (item->parentItem() == d->previewItem->parentItem()
-                            || (d->previewItem->parentItem() == item
+                    if (item->parentItem() == m_previewItem->parentItem()
+                            || (m_previewItem->parentItem() == item
                                     && !item->sceneBoundingRect().contains(expandedGeometry))) {
                         items.insert(iObjItem);
                     }
                 });
         QSet<shared::ui::VEInteractiveObject *> newItems(items);
-        newItems.subtract(d->collidedItems);
+        newItems.subtract(m_collidedItems);
         for (auto item : newItems)
             item->doHighlighting(Qt::red, true);
 
-        QSet<shared::ui::VEInteractiveObject *> oldItems(d->collidedItems);
+        QSet<shared::ui::VEInteractiveObject *> oldItems(m_collidedItems);
         oldItems.subtract(items);
 
         for (auto item : oldItems)
             item->doHighlighting(Qt::green, false);
 
-        d->collidedItems = items;
-        d->previewItem->setRect(d->previewItem->mapRectFromScene(newGeometry));
+        m_collidedItems = items;
+        m_previewItem->setRect(m_previewItem->mapRectFromScene(newGeometry));
         return true;
-    } else if (d->previewConnectionItem && d->previewConnectionItem->isVisible() && !d->connectionPoints.isEmpty()) {
-        if (d->view->scene()) {
+    } else if (m_previewConnectionItem && m_previewConnectionItem->isVisible() && !m_connectionPoints.isEmpty()) {
+        if (m_view->scene()) {
             QPainterPath pp;
-            pp.addPolygon(d->connectionPoints);
+            pp.addPolygon(m_connectionPoints);
             pp.lineTo(scenePos);
-            d->previewConnectionItem->setPath(pp);
-            d->warnConnectionPreview(scenePos);
+            m_previewConnectionItem->setPath(pp);
+            warnConnectionPreview(scenePos);
             return true;
         }
     }
 
     return false;
-}
-
-bool CreatorTool::onContextMenu(QContextMenuEvent *e)
-{
-    if (!d->view || e->reason() == QContextMenuEvent::Mouse)
-        return false;
-
-    QGraphicsScene *scene = d->view->scene();
-    if (!scene)
-        return false;
-
-    QPoint viewPos, globalPos;
-    if (!scene->selectedItems().isEmpty()) {
-        QGraphicsItem *selectedItem = scene->selectedItems().first();
-        const QPointF &scenePos = selectedItem->mapToScene(selectedItem->boundingRect().bottomRight());
-        viewPos = d->view->mapFromScene(scenePos);
-        globalPos = d->view->mapToGlobal(viewPos);
-    } else {
-        globalPos = QCursor::pos();
-        viewPos = d->view->mapFromGlobal(globalPos);
-    }
-
-    // onMousePress is needed to set an appropriate d->previewItem
-    QMouseEvent mouseEvent(QEvent::MouseButtonPress, viewPos, Qt::RightButton, Qt::RightButton | Qt::MaxMouseButton,
-            nullptr); // Qt::MaxMouseButton is a fake button
-                      // to distinguish this mouse event
-                      // and thus avoid selecting of another object
-    onMousePress(&mouseEvent);
-
-    return d->showContextMenu(globalPos);
-}
-
-template<typename ItemType>
-ItemType *itemAt(const QGraphicsScene *scene, const QPointF &point)
-{
-    QList<QGraphicsItem *> items = scene->items(point);
-    if (items.isEmpty())
-        return nullptr;
-    auto it = std::find_if(items.constBegin(), items.constEnd(),
-            [](const QGraphicsItem *item) { return item->type() == ItemType::Type; });
-    if (it == items.constEnd())
-        return nullptr;
-
-    return qgraphicsitem_cast<ItemType *>(*it);
 }
 
 static inline QRectF adjustToSize(const QRectF &rect, const QSizeF &minSize)
@@ -567,130 +400,42 @@ static inline QRectF adjustToSize(const QRectF &rect, const QSizeF &minSize)
     return itemRect;
 };
 
-bool CreatorTool::CreatorToolPrivate::showContextMenu(const QPoint &globalPos)
+void IVCreatorTool::populateContextMenu_commonCreate(QMenu *menu, const QPointF &scenePos)
 {
-    QMenu *menu = new QMenu(view);
-    menu->setAttribute(Qt::WA_DeleteOnClose);
-
-    auto scenePos = cursorInScene(globalPos);
-    populateContextMenu_commonCreate(menu, scenePos);
-    populateContextMenu_commonEdit(menu, scenePos);
-    populateContextMenu_propertiesDialog(menu);
-    populateContextMenu_user(menu, scenePos);
-
-    if (menu->isEmpty()) {
-        delete menu;
-        menu = nullptr;
-        return false;
-    }
-
-    connect(menu, &QMenu::aboutToHide, [this]() {
-        if (previewItem) {
-            previewItem->setVisible(false);
-        }
-    });
-    menu->exec(globalPos);
-    clearPreviewItem();
-    return true;
-}
-
-void CreatorTool::CreatorToolPrivate::populateContextMenu_commonCreate(QMenu *menu, const QPointF &scenePos)
-{
-    if (this->previewItem) {
+    if (m_previewItem) {
         static const QSizeF emptyPreviewItemSize = QSizeF(kPreviewItemPenWidth, kPreviewItemPenWidth);
-        const bool isRect = this->previewItem->boundingRect().size() != emptyPreviewItemSize;
+        const bool isRect = m_previewItem->boundingRect().size() != emptyPreviewItemSize;
         // TODO: use a Fn/FnType/Comment's min size to disable related actions if the creation is impossible?
 
         auto action = menu->addAction(QIcon(QLatin1String(":/tab_interface/toolbar/icns/function_type.svg")),
-                thisTool->tr("Function Type"), thisTool,
-                [this, scenePos]() { handleToolType(ToolType::FunctionType, scenePos); });
+                tr("Function Type"), this, [this, scenePos]() { handleToolType(ToolType::FunctionType, scenePos); });
 
-        action = menu->addAction(QIcon(QLatin1String(":/tab_interface/toolbar/icns/function.svg")),
-                thisTool->tr("Function"), thisTool,
-                [this, scenePos]() { handleToolType(ToolType::Function, scenePos); });
+        action = menu->addAction(QIcon(QLatin1String(":/tab_interface/toolbar/icns/function.svg")), tr("Function"),
+                this, [this, scenePos]() { handleToolType(ToolType::Function, scenePos); });
 
-        action = menu->addAction(QIcon(QLatin1String(":/tab_interface/toolbar/icns/comment.svg")),
-                thisTool->tr("Comment"), thisTool, [this, scenePos]() { handleToolType(ToolType::Comment, scenePos); });
+        action = menu->addAction(QIcon(QLatin1String(":/tab_interface/toolbar/icns/comment.svg")), tr("Comment"), this,
+                [this, scenePos]() { handleToolType(ToolType::Comment, scenePos); });
 
-        action = menu->addAction(QIcon(QLatin1String(":/tab_interface/toolbar/icns/ri.svg")),
-                thisTool->tr("Required Interface"), thisTool,
-                [this, scenePos]() { handleToolType(ToolType::RequiredInterface, scenePos); });
-        action->setEnabled(!isRect && this->previewItem->parentItem());
+        action = menu->addAction(QIcon(QLatin1String(":/tab_interface/toolbar/icns/ri.svg")), tr("Required Interface"),
+                this, [this, scenePos]() { handleToolType(ToolType::RequiredInterface, scenePos); });
+        action->setEnabled(!isRect && m_previewItem->parentItem());
 
-        action = menu->addAction(QIcon(QLatin1String(":/tab_interface/toolbar/icns/pi.svg")),
-                thisTool->tr("Provided Interface"), thisTool,
-                [this, scenePos]() { handleToolType(ToolType::ProvidedInterface, scenePos); });
-        action->setEnabled(!isRect && this->previewItem->parentItem());
+        action = menu->addAction(QIcon(QLatin1String(":/tab_interface/toolbar/icns/pi.svg")), tr("Provided Interface"),
+                this, [this, scenePos]() { handleToolType(ToolType::ProvidedInterface, scenePos); });
+        action->setEnabled(!isRect && m_previewItem->parentItem());
 
         action = menu->addAction(QIcon(QLatin1String(":/tab_interface/toolbar/icns/connection_group.svg")),
-                thisTool->tr("Connection group"), thisTool, [this]() { thisTool->groupSelectedItems(); });
-        const auto selectedItems = previewItem->scene()->selectedItems();
+                tr("Connection group"), this, [this]() { groupSelectedItems(); });
+        const auto selectedItems = m_previewItem->scene()->selectedItems();
         const auto it = std::find_if(selectedItems.cbegin(), selectedItems.cend(),
                 [](const QGraphicsItem *item) { return item->type() == IVConnectionGraphicsItem::Type; });
         action->setEnabled(it != selectedItems.cend());
     }
 }
 
-void CreatorTool::CreatorToolPrivate::populateContextMenu_commonEdit(QMenu *menu, const QPointF &scenePos)
+void IVCreatorTool::populateContextMenu_user(QMenu *menu, const QPointF &scenePos)
 {
-    const QList<QGraphicsItem *> selectedItems = view->scene()->selectedItems();
-    static const QList<int> kNestedTypes { ive::IVFunctionGraphicsItem::Type, ive::IVFunctionTypeGraphicsItem::Type,
-        ive::IVCommentGraphicsItem::Type };
-    const bool copyable = std::any_of(selectedItems.cbegin(), selectedItems.cend(),
-            [](const QGraphicsItem *item) { return kNestedTypes.contains(item->type()); });
-    auto action = menu->addAction(
-            QIcon(QLatin1String(":/tab_interface/toolbar/icns/copy.svg")), thisTool->tr("Copy"), thisTool,
-            [this]() { Q_EMIT thisTool->copyActionTriggered(); }, QKeySequence::Copy);
-    action->setEnabled(copyable);
-
-    action = menu->addAction(
-            QIcon(QLatin1String(":/tab_interface/toolbar/icns/cut.svg")), thisTool->tr("Cut"), thisTool,
-            [this]() { Q_EMIT thisTool->cutActionTriggered(); }, QKeySequence::Cut);
-    action->setEnabled(copyable);
-
-    action = menu->addAction(
-            QIcon(QLatin1String(":/tab_interface/toolbar/icns/paste.svg")), thisTool->tr("Paste"), thisTool,
-            [this, scenePos]() { Q_EMIT thisTool->pasteActionTriggered(scenePos); }, QKeySequence::Paste);
-    action->setEnabled(!QApplication::clipboard()->text().isEmpty());
-}
-
-void CreatorTool::CreatorToolPrivate::populateContextMenu_propertiesDialog(QMenu *menu)
-{
-    QGraphicsScene *scene = view->scene();
-    if (!scene) {
-        return;
-    }
-
-    QGraphicsItem *gi = scene->selectedItems().isEmpty() ? nullptr : scene->selectedItems().first();
-    if (ivm::IVObject *ivObj = gi::object(gi)) {
-        if (ivObj->type() != ivm::IVObject::Type::Connection) {
-            menu->addSeparator();
-            QAction *action = menu->addAction(tr("Properties"));
-            action->setEnabled(ivObj);
-
-            connect(action, &QAction::triggered,
-                    [this, ivObj]() { Q_EMIT thisTool->propertyEditorRequest(ivObj->id()); });
-            ActionsManager::registerAction(Q_FUNC_INFO, action, "Properties", "Show IV object properties editor");
-        } else {
-            menu->addSeparator();
-            QAction *action = menu->addAction(tr("Re-create path"));
-            action->setEnabled(ivObj);
-
-            connect(action, &QAction::triggered, [gi]() {
-                if (auto connectionItem = qgraphicsitem_cast<IVConnectionGraphicsItem *>(gi)) {
-                    connectionItem->layout();
-                    connectionItem->updateEntity();
-                }
-            });
-            ActionsManager::registerAction(Q_FUNC_INFO, action, "Connection re-creation",
-                    "Create a generic connection path instead of existing one");
-        }
-    }
-}
-
-void CreatorTool::CreatorToolPrivate::populateContextMenu_user(QMenu *menu, const QPointF &scenePos)
-{
-    QGraphicsScene *scene = view->scene();
+    QGraphicsScene *scene = m_view->scene();
     if (!scene)
         return;
 
@@ -728,15 +473,15 @@ void CreatorTool::CreatorToolPrivate::populateContextMenu_user(QMenu *menu, cons
         }
     }
 
-    ActionsManager::populateMenu(menu, ivObj, doc);
+    ActionsManager::populateMenu(menu, ivObj, m_doc);
 }
 
-void CreatorTool::CreatorToolPrivate::handleToolType(CreatorTool::ToolType type, const QPointF &pos)
+bool IVCreatorTool::handleToolType(int type, const QPointF &pos)
 {
-    if (!view)
-        return;
+    if (!m_view)
+        return false;
 
-    if (auto scene = view->scene()) {
+    if (auto scene = m_view->scene()) {
         switch (type) {
         case ToolType::Comment:
             handleComment(scene, pos);
@@ -755,16 +500,16 @@ void CreatorTool::CreatorToolPrivate::handleToolType(CreatorTool::ToolType type,
             break;
         case ToolType::MultiPointConnection:
             if (!handleConnectionCreate(pos))
-                return;
-            handleConnection(connectionPoints);
+                return false;
+            handleConnection(m_connectionPoints);
             break;
         case ToolType::DirectConnection:
             handleDirectConnection(pos);
             break;
         case ToolType::ReCreateConnection:
             if (!handleConnectionCreate(pos))
-                return;
-            handleConnectionReCreate(connectionPoints);
+                return false;
+            handleConnectionReCreate(m_connectionPoints);
             break;
         default:
             break;
@@ -772,46 +517,52 @@ void CreatorTool::CreatorToolPrivate::handleToolType(CreatorTool::ToolType type,
         clearPreviewItem();
     }
 
-    Q_EMIT thisTool->created();
+    Q_EMIT created();
+    return true;
 }
 
-void CreatorTool::CreatorToolPrivate::handleComment(QGraphicsScene *scene, const QPointF &pos)
+IVItemModel *IVCreatorTool::model() const
+{
+    return qobject_cast<IVItemModel *>(m_model);
+}
+
+void IVCreatorTool::handleComment(QGraphicsScene *scene, const QPointF &pos)
 {
     Q_UNUSED(scene)
     Q_UNUSED(pos)
 
-    if (this->previewItem) {
-        ivm::IVFunctionType *parentObject = gi::functionObject(this->previewItem->parentItem());
+    if (m_previewItem) {
+        ivm::IVFunctionType *parentObject = gi::functionObject(m_previewItem->parentItem());
         if (!parentObject)
-            parentObject = gi::functionTypeObject(this->previewItem->parentItem());
+            parentObject = gi::functionTypeObject(m_previewItem->parentItem());
 
-        QRectF itemSceneRect = adjustToSize(this->previewItem->mapRectToScene(this->previewItem->rect()),
+        QRectF itemSceneRect = adjustToSize(m_previewItem->mapRectToScene(m_previewItem->rect()),
                 shared::graphicsviewutils::kDefaultGraphicsItemSize);
-        if (auto parentItem = previewItem->parentItem()) {
+        if (auto parentItem = m_previewItem->parentItem()) {
             if (!parentItem->sceneBoundingRect()
                             .marginsRemoved(shared::graphicsviewutils::kRootMargins)
                             .contains(itemSceneRect)) {
                 itemSceneRect = QRectF();
             }
         }
-        auto cmd = new cmd::CmdCommentItemCreate(model->objectsModel(), parentObject, itemSceneRect);
-        doc->commandsStack()->push(cmd);
+        auto cmd = new cmd::CmdCommentItemCreate(model()->objectsModel(), parentObject, itemSceneRect);
+        m_doc->commandsStack()->push(cmd);
     }
 }
 
-void CreatorTool::CreatorToolPrivate::handleFunctionType(QGraphicsScene *scene, const QPointF &pos)
+void IVCreatorTool::handleFunctionType(QGraphicsScene *scene, const QPointF &pos)
 {
     Q_UNUSED(scene)
     Q_UNUSED(pos)
 
-    if (this->previewItem) {
-        QRectF itemSceneRect = adjustToSize(this->previewItem->mapRectToScene(this->previewItem->rect()),
+    if (m_previewItem) {
+        QRectF itemSceneRect = adjustToSize(m_previewItem->mapRectToScene(m_previewItem->rect()),
                 shared::graphicsviewutils::kDefaultGraphicsItemSize);
 
-        if (!shared::graphicsviewutils::isBounded(this->previewItem, itemSceneRect))
+        if (!shared::graphicsviewutils::isBounded(m_previewItem, itemSceneRect))
             return;
 
-        if (auto parentItem = previewItem->parentItem()) {
+        if (auto parentItem = m_previewItem->parentItem()) {
             if (!parentItem->sceneBoundingRect()
                             .marginsRemoved(shared::graphicsviewutils::kRootMargins)
                             .contains(itemSceneRect)) {
@@ -819,28 +570,28 @@ void CreatorTool::CreatorToolPrivate::handleFunctionType(QGraphicsScene *scene, 
             }
         }
 
-        ivm::IVFunction *parentObject = gi::functionObject(this->previewItem->parentItem());
+        ivm::IVFunction *parentObject = gi::functionObject(m_previewItem->parentItem());
         const shared::Id id = shared::createId();
-        auto cmd = new cmd::CmdFunctionTypeItemCreate(model->objectsModel(), parentObject, itemSceneRect, id);
-        if (doc->commandsStack()->push(cmd)) {
-            Q_EMIT thisTool->functionCreated(id);
+        auto cmd = new cmd::CmdFunctionTypeItemCreate(model()->objectsModel(), parentObject, itemSceneRect, id);
+        if (m_doc->commandsStack()->push(cmd)) {
+            Q_EMIT functionCreated(id);
         }
     }
 }
 
-void CreatorTool::CreatorToolPrivate::handleFunction(QGraphicsScene *scene, const QPointF &pos)
+void IVCreatorTool::handleFunction(QGraphicsScene *scene, const QPointF &pos)
 {
     Q_UNUSED(scene)
     Q_UNUSED(pos)
 
-    if (previewItem) {
-        QRectF itemSceneRect = adjustToSize(
-                previewItem->mapRectToScene(previewItem->rect()), shared::graphicsviewutils::kDefaultGraphicsItemSize);
+    if (m_previewItem) {
+        QRectF itemSceneRect = adjustToSize(m_previewItem->mapRectToScene(m_previewItem->rect()),
+                shared::graphicsviewutils::kDefaultGraphicsItemSize);
 
-        if (!shared::graphicsviewutils::isBounded(previewItem, itemSceneRect))
+        if (!shared::graphicsviewutils::isBounded(m_previewItem, itemSceneRect))
             return;
 
-        if (auto parentItem = previewItem->parentItem()) {
+        if (auto parentItem = m_previewItem->parentItem()) {
             if (!parentItem->sceneBoundingRect()
                             .marginsRemoved(shared::graphicsviewutils::kRootMargins)
                             .contains(itemSceneRect)) {
@@ -848,70 +599,69 @@ void CreatorTool::CreatorToolPrivate::handleFunction(QGraphicsScene *scene, cons
             }
         }
 
-        ivm::IVFunction *parentObject = gi::functionObject(previewItem->parentItem());
+        ivm::IVFunction *parentObject = gi::functionObject(m_previewItem->parentItem());
         const shared::Id id = shared::createId();
-        auto cmd = new cmd::CmdFunctionItemCreate(model->objectsModel(), parentObject, itemSceneRect, QString(), id);
-        if (doc->commandsStack()->push(cmd)) {
-            Q_EMIT thisTool->functionCreated(id);
+        auto cmd = new cmd::CmdFunctionItemCreate(model()->objectsModel(), parentObject, itemSceneRect, QString(), id);
+        if (m_doc->commandsStack()->push(cmd)) {
+            Q_EMIT functionCreated(id);
         }
     }
 }
 
-void CreatorTool::CreatorToolPrivate::handleInterface(
-        QGraphicsScene *scene, ivm::IVInterface::InterfaceType type, const QPointF &pos)
+void IVCreatorTool::handleInterface(QGraphicsScene *scene, ivm::IVInterface::InterfaceType type, const QPointF &pos)
 {
     if (auto parentItem = shared::graphicsviewutils::nearestItem(scene,
                 shared::graphicsviewutils::adjustFromPoint(pos, shared::graphicsviewutils::kInterfaceTolerance),
                 kFunctionTypes)) {
         ivm::IVFunctionType *parentObject = gi::functionTypeObject(parentItem);
-        ivm::IVInterface::CreationInfo ifaceDescr(model->objectsModel(), parentObject, pos, type, shared::createId());
+        ivm::IVInterface::CreationInfo ifaceDescr(model()->objectsModel(), parentObject, pos, type, shared::createId());
         ifaceDescr.resetKind();
 
         if (auto cmd = createInterfaceCommand(ifaceDescr))
-            doc->commandsStack()->push(cmd);
+            m_doc->commandsStack()->push(cmd);
     }
 }
 
-bool CreatorTool::CreatorToolPrivate::handleConnectionCreate(const QPointF &pos)
+bool IVCreatorTool::handleConnectionCreate(const QPointF &pos)
 {
-    QGraphicsScene *scene = this->view ? this->view->scene() : nullptr;
+    QGraphicsScene *scene = m_view ? m_view->scene() : nullptr;
     if (!scene)
         return false;
 
-    if (!this->previewConnectionItem)
+    if (!m_previewConnectionItem)
         return false;
 
     if (auto itemUnderCursor = qgraphicsitem_cast<IVInterfaceGraphicsItem *>(shared::graphicsviewutils::nearestItem(
                 scene, pos, shared::graphicsviewutils::kInterfaceTolerance, { IVInterfaceGraphicsItem::Type }))) {
         const QPointF finishPoint = itemUnderCursor->connectionEndPoint();
-        if (!itemUnderCursor->ifaceShape().boundingRect().contains(this->connectionPoints.front())) {
-            this->connectionPoints.append(finishPoint);
+        if (!itemUnderCursor->ifaceShape().boundingRect().contains(m_connectionPoints.front())) {
+            m_connectionPoints.append(finishPoint);
             return true;
         }
     } else {
-        this->connectionPoints.append(pos);
+        m_connectionPoints.append(pos);
     }
 
     QPainterPath pp;
-    pp.addPolygon(this->connectionPoints);
+    pp.addPolygon(m_connectionPoints);
     pp.lineTo(pos);
-    this->previewConnectionItem->setPath(pp);
+    m_previewConnectionItem->setPath(pp);
     return false;
 }
 
-void CreatorTool::CreatorToolPrivate::handleDirectConnection(const QPointF &pos)
+void IVCreatorTool::handleDirectConnection(const QPointF &pos)
 {
-    if (this->connectionPoints.size() < 1)
+    if (m_connectionPoints.size() < 1)
         return;
 
-    this->connectionPoints.append(pos);
+    m_connectionPoints.append(pos);
 
-    handleConnection(this->connectionPoints);
+    handleConnection(m_connectionPoints);
 }
 
-void CreatorTool::CreatorToolPrivate::handleConnection(const QVector<QPointF> &graphicPoints) const
+void IVCreatorTool::handleConnection(const QVector<QPointF> &graphicPoints) const
 {
-    const auto info = ive::gi::validateConnectionCreate(this->view ? this->view->scene() : nullptr, graphicPoints);
+    const auto info = ive::gi::validateConnectionCreate(m_view ? m_view->scene() : nullptr, graphicPoints);
     if (info.failed())
         return;
 
@@ -919,7 +669,7 @@ void CreatorTool::CreatorToolPrivate::handleConnection(const QVector<QPointF> &g
     QPointF startInterfacePoint { info.startPointAdjusted };
     QPointF endInterfacePoint { info.endPointAdjusted };
     ivm::IVInterface::CreationInfo ifaceCommons;
-    cmd::CommandsStack::Macro cmdMacro(doc->undoStack(), tr("Create connection"));
+    cmd::CommandsStack::Macro cmdMacro(m_doc->undoStack(), tr("Create connection"));
 
     if (info.startIface && !info.endIface) {
         ifaceCommons = ivm::IVInterface::CreationInfo::fromIface(info.startIface);
@@ -944,7 +694,7 @@ void CreatorTool::CreatorToolPrivate::handleConnection(const QVector<QPointF> &g
         if (!cmdMacro.push(createInterfaceCommand(ifaceCommons)))
             return;
     } else if (!info.startIface && !info.endIface) {
-        ifaceCommons.model = model->objectsModel();
+        ifaceCommons.model = model()->objectsModel();
 
         ifaceCommons.function = info.startObject;
         ifaceCommons.position = info.startPointAdjusted;
@@ -1018,7 +768,7 @@ void CreatorTool::CreatorToolPrivate::handleConnection(const QVector<QPointF> &g
         }
 
         auto cmd = new cmd::CmdConnectionItemCreate(
-                model->objectsModel(), item->entity(), prevStartIfaceId, ifaceCommons.id, points);
+                model()->objectsModel(), item->entity(), prevStartIfaceId, ifaceCommons.id, points);
         if (!cmdMacro.push(cmd))
             return;
 
@@ -1069,7 +819,7 @@ void CreatorTool::CreatorToolPrivate::handleConnection(const QVector<QPointF> &g
         }
 
         auto cmd = new cmd::CmdConnectionItemCreate(
-                model->objectsModel(), item->entity(), prevEndIfaceId, ifaceCommons.id, points);
+                model()->objectsModel(), item->entity(), prevEndIfaceId, ifaceCommons.id, points);
         if (!cmdMacro.push(cmd))
             return;
 
@@ -1089,7 +839,7 @@ void CreatorTool::CreatorToolPrivate::handleConnection(const QVector<QPointF> &g
     resultPoints.append(endInterfacePoint);
     Q_ASSERT(resultPoints.size() >= 2);
     if (resultPoints.first() != resultPoints.last()) {
-        auto cmd = new cmd::CmdConnectionItemCreate(model->objectsModel(),
+        auto cmd = new cmd::CmdConnectionItemCreate(model()->objectsModel(),
                 parentForConnection ? parentForConnection->entity() : nullptr, prevStartIfaceId, prevEndIfaceId,
                 resultPoints);
         if (!cmdMacro.push(cmd))
@@ -1099,20 +849,20 @@ void CreatorTool::CreatorToolPrivate::handleConnection(const QVector<QPointF> &g
     cmdMacro.setComplete(true);
 }
 
-void CreatorTool::CreatorToolPrivate::handleConnectionReCreate(const QVector<QPointF> &graphicPoints)
+void IVCreatorTool::handleConnectionReCreate(const QVector<QPointF> &graphicPoints)
 {
-    toolType = ToolType::Pointer;
-    const auto info = ive::gi::validateConnectionCreate(view ? view->scene() : nullptr, graphicPoints);
+    m_toolType = ToolType::Pointer;
+    const auto info = ive::gi::validateConnectionCreate(m_view ? m_view->scene() : nullptr, graphicPoints);
     if (info.status != ivm::ConnectionCreationValidator::FailReason::MulticastDisabled
             && info.status != ivm::ConnectionCreationValidator::FailReason::NotFail) {
         return;
     }
-    const shared::Id id = previewConnectionItem->data(Qt::UserRole).toUuid();
+    const shared::Id id = m_previewConnectionItem->data(Qt::UserRole).toUuid();
     if (id.isNull()) {
         return;
     }
 
-    if (auto item = model->getItem(id)) {
+    if (auto item = m_model->getItem(id)) {
         if (auto connection = qgraphicsitem_cast<IVConnectionGraphicsItem *>(item)) {
             if (connection->startItem()->entity()->id() != info.startIfaceId
                     || connection->endItem()->entity()->id() != info.endIfaceId) {
@@ -1122,29 +872,29 @@ void CreatorTool::CreatorToolPrivate::handleConnectionReCreate(const QVector<QPo
             QList<QPair<shared::VEObject *, QVector<QPointF>>> paramsList { { connection->entity(),
                     info.connectionPoints } };
             auto cmd = new shared::cmd::CmdEntityGeometryChange(paramsList);
-            doc->commandsStack()->push(cmd);
+            m_doc->commandsStack()->push(cmd);
         }
     }
 }
 
-bool CreatorTool::CreatorToolPrivate::warnConnectionPreview(const QPointF &pos)
+bool IVCreatorTool::warnConnectionPreview(const QPointF &pos)
 {
-    QVector<QPointF> connectionPoints = this->connectionPoints;
+    QVector<QPointF> connectionPoints = m_connectionPoints;
     if (connectionPoints.size() > 1)
         connectionPoints.replace(connectionPoints.size() - 1, pos);
     else
         connectionPoints.append(pos);
 
-    auto info = ive::gi::validateConnectionCreate(this->view ? this->view->scene() : nullptr, connectionPoints);
+    auto info = ive::gi::validateConnectionCreate(m_view ? m_view->scene() : nullptr, connectionPoints);
     bool warn = true;
-    if (toolType == ToolType::ReCreateConnection) {
+    if (m_toolType == ToolType::ReCreateConnection) {
         if ((info.status != ivm::ConnectionCreationValidator::FailReason::MulticastDisabled
                     && info.status != ivm::ConnectionCreationValidator::FailReason::NotFail)
                 || !info.endIface || !info.startIface) {
             warn = true;
         } else {
-            auto startItem = qgraphicsitem_cast<IVInterfaceGraphicsItem *>(model->getItem(info.startIfaceId));
-            auto endItem = qgraphicsitem_cast<IVInterfaceGraphicsItem *>(model->getItem(info.endIfaceId));
+            auto startItem = qgraphicsitem_cast<IVInterfaceGraphicsItem *>(m_model->getItem(info.startIfaceId));
+            auto endItem = qgraphicsitem_cast<IVInterfaceGraphicsItem *>(m_model->getItem(info.endIfaceId));
             if (!startItem || !endItem) {
                 warn = true;
             } else {
@@ -1155,16 +905,16 @@ bool CreatorTool::CreatorToolPrivate::warnConnectionPreview(const QPointF &pos)
     } else {
         warn = info.failed();
     }
-    if (this->previewConnectionItem) {
-        QPen p = this->previewConnectionItem->pen();
+    if (m_previewConnectionItem) {
+        QPen p = m_previewConnectionItem->pen();
         p.setColor(warn ? Qt::red : Qt::black);
-        this->previewConnectionItem->setPen(p);
+        m_previewConnectionItem->setPen(p);
     }
 
     return warn;
 }
 
-QUndoCommand *CreatorTool::CreatorToolPrivate::createInterfaceCommand(const ivm::IVInterface::CreationInfo &info) const
+QUndoCommand *IVCreatorTool::createInterfaceCommand(const ivm::IVInterface::CreationInfo &info) const
 {
     if (!info.function)
         return nullptr;
@@ -1172,63 +922,19 @@ QUndoCommand *CreatorTool::CreatorToolPrivate::createInterfaceCommand(const ivm:
     if (info.function->isFunction()) {
         if (auto fn = info.function->as<const ivm::IVFunction *>()) {
             if (const ivm::IVFunctionType *fnType = fn->instanceOf()) {
-                const QString message = thisTool->tr("Can't add interface directly in <b>%1</b>.<br>"
-                                                     "Please edit the related <b>%2</b> instead.")
+                const QString message = tr("Can't add interface directly in <b>%1</b>.<br>"
+                                           "Please edit the related <b>%2</b> instead.")
                                                 .arg(fn->titleUI(), fnType->titleUI());
-                Q_EMIT thisTool->informUser(thisTool->tr("Interface adding"), message);
+                Q_EMIT informUser(tr("Interface adding"), message);
                 return nullptr;
             }
         }
     }
     if (info.type == ivm::IVInterface::InterfaceType::Provided) {
-        Q_EMIT thisTool->propertyEditorRequest(info.id);
+        Q_EMIT propertyEditorRequest(info.id);
     }
 
     return new cmd::CmdInterfaceItemCreate(info);
 }
 
-void CreatorTool::CreatorToolPrivate::clearPreviewItem()
-{
-    for (auto iObj : this->collidedItems) {
-        iObj->highlightConnected();
-    }
-    this->collidedItems.clear();
-
-    this->clickScenePos = QPointF();
-
-    this->connectionPoints.clear();
-    if (this->previewConnectionItem) {
-        const auto id = previewConnectionItem->data(Qt::UserRole).toUuid();
-        if (!id.isNull()) {
-            if (auto item = model->getItem(id)) {
-                item->setVisible(true);
-            }
-        }
-
-        this->previewConnectionItem->scene()->removeItem(this->previewConnectionItem);
-        delete this->previewConnectionItem;
-        this->previewConnectionItem = nullptr;
-    }
-
-    if (this->previewItem) {
-        this->previewItem->scene()->removeItem(this->previewItem);
-        delete this->previewItem;
-        this->previewItem = nullptr;
-    }
-}
-
-QPointF CreatorTool::CreatorToolPrivate::cursorInScene() const
-{
-    return cursorInScene(QCursor::pos()); // TODO: add current screen detection
-}
-
-QPointF CreatorTool::CreatorToolPrivate::cursorInScene(const QPoint &globalPos) const
-{
-    QPointF sceneCoordinates;
-    if (this->view) {
-        const QPoint viewCoordinates = this->view->viewport()->mapFromGlobal(globalPos);
-        sceneCoordinates = this->view->mapToScene(viewCoordinates);
-    }
-    return sceneCoordinates;
-}
 }

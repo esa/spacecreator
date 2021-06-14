@@ -93,6 +93,8 @@ target_sources(${LIB_NAME} PRIVATE
     ui/veconnectiongraphicsitem.h
     ui/veconnectionendpointgraphicsitem.cpp
     ui/veconnectionendpointgraphicsitem.h
+    interface/creatortool.cpp
+    interface/creatortool.h
 )
 
 target_include_directories(${LIB_NAME} PUBLIC .)

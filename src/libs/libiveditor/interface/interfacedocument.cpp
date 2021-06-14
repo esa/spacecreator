@@ -27,7 +27,7 @@
 #include "commandsstack.h"
 #include "context/action/actionsmanager.h"
 #include "context/action/editor/dynactioneditor.h"
-#include "creatortool.h"
+#include "ivcreatortool.h"
 #include "file.h"
 #include "graphicsitemhelpers.h"
 #include "graphicsviewutils.h"
@@ -96,7 +96,7 @@ struct InterfaceDocument::InterfaceDocumentPrivate {
     QAction *actExitToParent { nullptr };
     QVector<QAction *> m_toolbarActions;
 
-    CreatorTool *tool { nullptr };
+    IVCreatorTool *tool { nullptr };
 
     Asn1Acn::Asn1ModelStorage *asnModelStorage { nullptr };
     QString mscFileName;
@@ -974,20 +974,20 @@ QVector<QAction *> InterfaceDocument::initActions()
     auto actionGroup = new QActionGroup(this);
     actionGroup->setExclusive(true);
 
-    d->tool = new CreatorTool(this);
-    connect(d->tool, &CreatorTool::created, this, [this, actionGroup]() {
+    d->tool = new IVCreatorTool(this);
+    connect(d->tool, &IVCreatorTool::created, this, [this, actionGroup]() {
         if (QAction *currentAction = actionGroup->checkedAction())
             currentAction->setChecked(false);
-        d->tool->setCurrentToolType(CreatorTool::ToolType::Pointer);
+        d->tool->setCurrentToolType(IVCreatorTool::ToolType::Pointer);
     });
-    connect(d->tool, &CreatorTool::functionCreated, this, &InterfaceDocument::prepareEntityNameForEditing,
+    connect(d->tool, &IVCreatorTool::functionCreated, this, &InterfaceDocument::prepareEntityNameForEditing,
             Qt::QueuedConnection);
-    connect(d->tool, &CreatorTool::propertyEditorRequest, this, &InterfaceDocument::showPropertyEditor,
+    connect(d->tool, &IVCreatorTool::propertyEditorRequest, this, &InterfaceDocument::showPropertyEditor,
             Qt::QueuedConnection);
-    connect(d->tool, &CreatorTool::informUser, this, &InterfaceDocument::showInfoMessage);
-    connect(d->tool, &CreatorTool::copyActionTriggered, this, &InterfaceDocument::copyItems);
-    connect(d->tool, &CreatorTool::cutActionTriggered, this, &InterfaceDocument::cutItems);
-    connect(d->tool, &CreatorTool::pasteActionTriggered, this,
+    connect(d->tool, &IVCreatorTool::informUser, this, &InterfaceDocument::showInfoMessage);
+    connect(d->tool, &IVCreatorTool::copyActionTriggered, this, &InterfaceDocument::copyItems);
+    connect(d->tool, &IVCreatorTool::cutActionTriggered, this, &InterfaceDocument::cutItems);
+    connect(d->tool, &IVCreatorTool::pasteActionTriggered, this,
             qOverload<const QPointF &>(&InterfaceDocument::pasteItems));
 
     auto actCreateFunctionType = new QAction(tr("Function Type"));
@@ -995,7 +995,7 @@ QVector<QAction *> InterfaceDocument::initActions()
     actCreateFunctionType->setCheckable(true);
     actCreateFunctionType->setActionGroup(actionGroup);
     connect(actCreateFunctionType, &QAction::triggered, this, [this]() {
-        d->tool->setCurrentToolType(CreatorTool::ToolType::FunctionType);
+        d->tool->setCurrentToolType(IVCreatorTool::ToolType::FunctionType);
         qWarning() << Q_FUNC_INFO << "Not implemented yet.";
     });
     actCreateFunctionType->setIcon(QIcon(":/tab_interface/toolbar/icns/function_type.svg"));
@@ -1005,7 +1005,7 @@ QVector<QAction *> InterfaceDocument::initActions()
     actCreateFunction->setCheckable(true);
     actCreateFunction->setActionGroup(actionGroup);
     connect(actCreateFunction, &QAction::triggered, this,
-            [this]() { d->tool->setCurrentToolType(CreatorTool::ToolType::Function); });
+            [this]() { d->tool->setCurrentToolType(IVCreatorTool::ToolType::Function); });
     actCreateFunction->setIcon(QIcon(":/tab_interface/toolbar/icns/function.svg"));
 
     auto actCreateProvidedInterface = new QAction(tr("Provided Interface"));
@@ -1014,7 +1014,7 @@ QVector<QAction *> InterfaceDocument::initActions()
     actCreateProvidedInterface->setCheckable(true);
     actCreateProvidedInterface->setActionGroup(actionGroup);
     connect(actCreateProvidedInterface, &QAction::triggered, this,
-            [this]() { d->tool->setCurrentToolType(CreatorTool::ToolType::ProvidedInterface); });
+            [this]() { d->tool->setCurrentToolType(IVCreatorTool::ToolType::ProvidedInterface); });
     actCreateProvidedInterface->setIcon(QIcon(":/tab_interface/toolbar/icns/pi.svg"));
 
     auto actCreateRequiredInterface = new QAction(tr("Required Interface"));
@@ -1023,7 +1023,7 @@ QVector<QAction *> InterfaceDocument::initActions()
     actCreateRequiredInterface->setCheckable(true);
     actCreateRequiredInterface->setActionGroup(actionGroup);
     connect(actCreateRequiredInterface, &QAction::triggered, this,
-            [this]() { d->tool->setCurrentToolType(CreatorTool::ToolType::RequiredInterface); });
+            [this]() { d->tool->setCurrentToolType(IVCreatorTool::ToolType::RequiredInterface); });
     actCreateRequiredInterface->setIcon(QIcon(":/tab_interface/toolbar/icns/ri.svg"));
 
     auto actCreateComment = new QAction(tr("Comment"));
@@ -1031,7 +1031,7 @@ QVector<QAction *> InterfaceDocument::initActions()
     actCreateComment->setCheckable(true);
     actCreateComment->setActionGroup(actionGroup);
     connect(actCreateComment, &QAction::triggered, this,
-            [this]() { d->tool->setCurrentToolType(CreatorTool::ToolType::Comment); });
+            [this]() { d->tool->setCurrentToolType(IVCreatorTool::ToolType::Comment); });
     actCreateComment->setIcon(QIcon(":/tab_interface/toolbar/icns/comment.svg"));
 
     auto actCreateConnection = new QAction(tr("Connection"));
@@ -1039,7 +1039,7 @@ QVector<QAction *> InterfaceDocument::initActions()
     actCreateConnection->setCheckable(true);
     actCreateConnection->setActionGroup(actionGroup);
     connect(actCreateConnection, &QAction::triggered, this,
-            [this]() { d->tool->setCurrentToolType(CreatorTool::ToolType::MultiPointConnection); });
+            [this]() { d->tool->setCurrentToolType(IVCreatorTool::ToolType::MultiPointConnection); });
     actCreateConnection->setIcon(QIcon(":/tab_interface/toolbar/icns/connection.svg"));
 
     d->actCreateConnectionGroup = new QAction(tr("Create Connection Group"));

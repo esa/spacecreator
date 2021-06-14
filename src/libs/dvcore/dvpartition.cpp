@@ -40,6 +40,11 @@ void DVPartition::addFunction(DVFunction *function)
     d->functions.append(function);
 }
 
+void DVPartition::removeFunction(DVFunction *function)
+{
+    d->functions.removeAll(function);
+}
+
 QList<QPointer<DVFunction>> DVPartition::functions() const
 {
     return d->functions;

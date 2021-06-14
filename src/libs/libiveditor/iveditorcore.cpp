@@ -29,7 +29,7 @@
 #include "interface/commands/cmdfunctionitemcreate.h"
 #include "interface/commands/cmdifaceattrchange.h"
 #include "interface/commands/cmdinterfaceitemcreate.h"
-#include "interface/creatortool.h"
+#include "interface/ivcreatortool.h"
 #include "interface/interfacedocument.h"
 #include "ivconnection.h"
 #include "ivexporter.h"

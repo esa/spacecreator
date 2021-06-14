@@ -161,5 +161,19 @@ QVector<ItemType *> itemByPos(QGraphicsScene *scene, const TargetPositioning &sc
     return items;
 }
 
+template<typename ItemType>
+ItemType *itemAt(const QGraphicsScene *scene, const QPointF &point)
+{
+    QList<QGraphicsItem *> items = scene->items(point);
+    if (items.isEmpty())
+        return nullptr;
+    auto it = std::find_if(items.constBegin(), items.constEnd(),
+            [](const QGraphicsItem *item) { return item->type() == ItemType::Type; });
+    if (it == items.constEnd())
+        return nullptr;
+
+    return qgraphicsitem_cast<ItemType *>(*it);
+}
+
 }
 }

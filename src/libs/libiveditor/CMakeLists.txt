@@ -125,8 +125,8 @@ target_sources(${LIB_NAME} PRIVATE
     interface/commands/commandids.h
     interface/createconnectiongroupdialog.cpp
     interface/createconnectiongroupdialog.h
-    interface/creatortool.cpp
-    interface/creatortool.h
+    interface/ivcreatortool.cpp
+    interface/ivcreatortool.h
     interface/graphicsitemhelpers.cpp
     interface/graphicsitemhelpers.h
     interface/interfacedocument.cpp
