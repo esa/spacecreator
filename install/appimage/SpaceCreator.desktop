@@ -1,6 +1,6 @@
 [Desktop Entry]
 Name=SpaceCreator
-Exec=qtcreator.sh
+Exec=qtcreator
 Icon=/share/icons/hicolor/64x64/apps/QtProject-qtcreator
 Type=Application
 Categories=Development;
