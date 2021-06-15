@@ -38,8 +38,6 @@ public:
 
     Core::IEditor *createEditor() override;
 
-    DVEditorData *editorData() const;
-
 private:
     std::unique_ptr<DVEditorData> m_editorData;
 };

@@ -40,12 +40,7 @@ DVEditorFactory::DVEditorFactory(
 
 Core::IEditor *spctr::DVEditorFactory::createEditor()
 {
-    return editorData()->createEditor();
-}
-
-DVEditorData *DVEditorFactory::editorData() const
-{
-    return m_editorData.get();
+    return m_editorData->createEditor();
 }
 
 } // namespace spctr

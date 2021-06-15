@@ -61,3 +61,7 @@ MSC editor can be used to convert msc files. Fro more information see [MSC Conve
 # Internal Architecture
 
 Details on the architecture of is described in [Architecture documentation](@ref ArchitecturePage)
+
+# Plugin development
+
+Hints for writing a new SpaceCreator plugin [SpaceCreator plugin](@ref SpaceCreatorPluginPage)
