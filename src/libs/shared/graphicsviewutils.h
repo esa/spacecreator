@@ -15,6 +15,7 @@ static const QMarginsF kContentMargins = { 22, 22, 22, 22 };
 static const QList<Qt::Alignment> kRectSides = { Qt::AlignLeft, Qt::AlignTop, Qt::AlignRight, Qt::AlignBottom };
 
 static const QSizeF kDefaultGraphicsItemSize = { 200, 80 };
+static const QSizeF kDefaultNodeGraphicsItemSize = { 160, 160 };
 
 static const qreal kInterfaceLayoutOffset = 12.0;
 

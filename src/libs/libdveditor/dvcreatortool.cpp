@@ -162,7 +162,7 @@ bool DVCreatorTool::onMousePress(QMouseEvent *e)
     const QPointF scenePos = cursorInScene(e->globalPos());
     if ((m_toolType == ToolType::ReCreateConnection || e->modifiers() & Qt::ShiftModifier)
             && e->button() != Qt::RightButton) {
-        return prepareReCreateConnectionPrewiew(e);
+        return prepareReCreateConnectionPreview(e);
     } else if (e->modifiers() & Qt::ControlModifier) {
         auto itemAtCursor = m_view->itemAt(e->pos());
         if ((e->button() & Qt::MouseButton::LeftButton)
@@ -175,11 +175,11 @@ bool DVCreatorTool::onMousePress(QMouseEvent *e)
     }
 
     if (m_toolType == ToolType::DirectConnection && e->button() != Qt::RightButton) {
-        return prepareDirectConnection(e);
+        return prepareDirectConnectionPreview(e);
     } else if (m_toolType == ToolType::MultiPointConnection && e->button() != Qt::RightButton) {
         return prepareMultiPointConnectionPreview(e);
     } else if (e->button() == Qt::RightButton || (m_toolType == ToolType::Partition)) {
-        return prepareRectPrewview(e);
+        return prepareRectPreview(e);
     }
 
     return true;
@@ -415,7 +415,7 @@ bool DVCreatorTool::prepareMultiPointConnectionPreview(QMouseEvent *e)
     return !m_connectionPoints.contains(scenePos);
 }
 
-bool DVCreatorTool::prepareReCreateConnectionPrewiew(QMouseEvent *e)
+bool DVCreatorTool::prepareReCreateConnectionPreview(QMouseEvent *e)
 {
     QGraphicsScene *scene = m_view->scene();
     const QPointF scenePos = cursorInScene(e->globalPos());
@@ -451,7 +451,7 @@ bool DVCreatorTool::prepareReCreateConnectionPrewiew(QMouseEvent *e)
     return true;
 }
 
-bool DVCreatorTool::prepareRectPrewview(QMouseEvent *e)
+bool DVCreatorTool::prepareRectPreview(QMouseEvent *e)
 {
     QGraphicsScene *scene = m_view->scene();
     const QPointF scenePos = cursorInScene(e->globalPos());
@@ -487,7 +487,7 @@ bool DVCreatorTool::prepareRectPrewview(QMouseEvent *e)
     return true;
 }
 
-bool DVCreatorTool::prepareDirectConnection(QMouseEvent *e)
+bool DVCreatorTool::prepareDirectConnectionPreview(QMouseEvent *e)
 {
     QGraphicsScene *scene = m_view->scene();
     const QPointF scenePos = cursorInScene(e->globalPos());

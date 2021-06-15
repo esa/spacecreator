@@ -63,6 +63,19 @@ void VEObject::setEntityAttribute(const EntityAttribute &attribute)
     setAttributeImpl(attribute.name(), attribute.value(), attribute.type());
 }
 
+void VEObject::setEntityAttributes(const EntityAttributes &attributes)
+{
+    if (attributes == entityAttributes()) {
+        return;
+    }
+
+    clearAttributes();
+    const QList<EntityAttribute> sortedAttrs = sortedAttributesValues(attributes);
+    for (const EntityAttribute &attribute : qAsConst(sortedAttrs)) {
+        setEntityAttribute(attribute);
+    }
+}
+
 void VEObject::setEntityProperty(const QString &name, const QVariant &value)
 {
     setAttributeImpl(name, value, EntityAttribute::Type::Property);
@@ -127,6 +140,11 @@ bool VEObject::setParentObject(VEObject *parentObject)
 
     setParent(parentObject);
     return true;
+}
+
+QList<EntityAttribute> VEObject::sortedAttributesValues(const EntityAttributes &attrs)
+{
+    return attrs.values();
 }
 
 void VEObject::setAttributeImpl(const QString &name, const QVariant &value, EntityAttribute::Type type)

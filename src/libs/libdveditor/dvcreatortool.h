@@ -70,9 +70,9 @@ private:
     void handleConnectionReCreate(const QVector<QPointF> &graphicPoints);
 
     bool prepareMultiPointConnectionPreview(QMouseEvent *e);
-    bool prepareReCreateConnectionPrewiew(QMouseEvent *e);
-    bool prepareRectPrewview(QMouseEvent *e);
-    bool prepareDirectConnection(QMouseEvent *e);
+    bool prepareReCreateConnectionPreview(QMouseEvent *e);
+    bool prepareRectPreview(QMouseEvent *e);
+    bool prepareDirectConnectionPreview(QMouseEvent *e);
 
 private:
     shared::cmd::CommandsStackBase *m_commandsStack { nullptr };

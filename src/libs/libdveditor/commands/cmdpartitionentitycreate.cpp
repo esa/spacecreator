@@ -34,6 +34,7 @@ CmdPartitionEntityCreate::CmdPartitionEntityCreate(
     , m_parent(parent)
     , m_entity(new dvm::DVPartition(m_parent))
 {
+    m_entity->setTitle(tr("Partition_%1").arg(parent->partitions().size() + 1));
     prepareData({ qMakePair(m_entity, QVector<QPointF> { geometry.topLeft(), geometry.bottomRight() }) });
 }
 

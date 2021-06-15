@@ -239,23 +239,6 @@ void IVObject::setGroupName(const QString &groupName)
     }
 }
 
-void IVObject::setEntityAttributes(const EntityAttributes &attributes)
-{
-    if (attributes == entityAttributes()) {
-        return;
-    }
-
-    clearAttributes();
-    QList<EntityAttribute> attrs = attributes.values();
-    std::sort(attrs.begin(), attrs.end(), [](const EntityAttribute &a1, const EntityAttribute &a2) {
-        return meta::Props::token(a1.name()) > meta::Props::token(a2.name());
-    });
-
-    for (const EntityAttribute &attribute : qAsConst(attrs)) {
-        setEntityAttribute(attribute);
-    }
-}
-
 void IVObject::setAttributeImpl(const QString &attributeName, const QVariant &value, EntityAttribute::Type type)
 {
     if (!attributeName.isEmpty()) {
@@ -291,6 +274,15 @@ void IVObject::setAttributeImpl(const QString &attributeName, const QVariant &va
             break;
         }
     }
+}
+
+QList<EntityAttribute> IVObject::sortedAttributesValues(const EntityAttributes &attributes)
+{
+    QList<EntityAttribute> attrs = attributes.values();
+    std::sort(attrs.begin(), attrs.end(), [](const EntityAttribute &a1, const EntityAttribute &a2) {
+        return meta::Props::token(a1.name()) > meta::Props::token(a2.name());
+    });
+    return attrs;
 }
 
 IVModel *IVObject::model() const

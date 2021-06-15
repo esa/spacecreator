@@ -43,8 +43,8 @@ target_sources(${LIB_NAME} PRIVATE
     dvdevicegraphicsitem.h
     dvconnectiongraphicsitem.cpp
     dvconnectiongraphicsitem.h
-    commands/cmdboardentitycreate.cpp
-    commands/cmdboardentitycreate.h
+    commands/cmdnodeentitycreate.cpp
+    commands/cmdnodeentitycreate.h
     commands/cmdpartitionentitycreate.cpp
     commands/cmdpartitionentitycreate.h
     commands/cmdconnectionentitycreate.cpp

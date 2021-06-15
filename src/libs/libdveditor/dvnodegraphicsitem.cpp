@@ -58,7 +58,7 @@ void DVNodeGraphicsItem::paint(QPainter *painter, const QStyleOptionGraphicsItem
 
 QSizeF DVNodeGraphicsItem::minimalSize() const
 {
-    return QSizeF(160, 160);
+    return shared::graphicsviewutils::kDefaultNodeGraphicsItemSize;
 }
 
 int DVNodeGraphicsItem::itemLevel(bool isSelected) const

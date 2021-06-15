@@ -17,25 +17,29 @@
 
 #pragma once
 
-#include "commands/cmdentitygeometrychange.h"
 #include "common.h"
+#include "undocommand.h"
 
+#include <QPointF>
 #include <QPointer>
 
 namespace dvm {
 class DVModel;
 class DVBoard;
+class DVNode;
+class DVPartition;
+class DVDevice;
 } // namespace dvm
 
 namespace dve {
 namespace cmd {
 
-class CmdBoardEntityCreate : public shared::cmd::CmdEntityGeometryChange
+class CmdNodeEntityCreate : public shared::UndoCommand
 {
+    Q_OBJECT
 public:
-    explicit CmdBoardEntityCreate(
-            dvm::DVModel *model, const QRectF &geometry, const shared::Id &id = shared::InvalidId);
-    ~CmdBoardEntityCreate() override;
+    explicit CmdNodeEntityCreate(dvm::DVModel *model, const dvm::DVBoard *board, const QPointF &pos);
+    ~CmdNodeEntityCreate() override;
 
     void redo() override;
     void undo() override;
@@ -43,7 +47,12 @@ public:
 
 private:
     QPointer<dvm::DVModel> m_model;
-    QPointer<dvm::DVBoard> m_entity;
+    QPointer<const dvm::DVBoard> m_board;
+    QPointF m_pos;
+
+    QPointer<dvm::DVNode> m_node;
+    QPointer<dvm::DVPartition> m_partition;
+    QList<QPointer<dvm::DVDevice>> m_devices;
 };
 
 } // namespace cmd

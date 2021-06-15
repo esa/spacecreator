@@ -84,8 +84,6 @@ public:
     QString groupName() const;
     void setGroupName(const QString &groupName);
 
-    void setEntityAttributes(const EntityAttributes &attributes);
-
     IVModel *model() const;
 
     bool isRootObject() const;
@@ -111,6 +109,7 @@ public Q_SLOTS:
 
 protected:
     void setAttributeImpl(const QString &name, const QVariant &value, EntityAttribute::Type type) override;
+    QList<EntityAttribute> sortedAttributesValues(const EntityAttributes &attributes) override;
 
 private:
     const std::unique_ptr<IVObjectPrivate> d;

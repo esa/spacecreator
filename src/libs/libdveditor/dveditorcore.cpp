@@ -19,6 +19,7 @@
 
 #include "abstractvisualizationmodel.h"
 #include "baseitems/graphicsview.h"
+#include "commands/cmdnodeentitycreate.h"
 #include "commandsstackbase.h"
 #include "dvappmodel.h"
 #include "dvappwidget.h"
@@ -311,25 +312,16 @@ void DVEditorCore::onViewSelectionChanged(const QItemSelection &selected, const 
 
 void DVEditorCore::importEntity(const shared::Id &id, const QPointF &sceneDropPoint)
 {
-    const auto obj = d->m_hwModel->getObject(id);
+    const dvm::DVObject *obj = d->m_hwModel->getObject(id);
     if (!obj) {
         return;
     }
-    QBuffer buffer;
-    if (!buffer.open(QIODevice::WriteOnly)) {
-        qWarning() << "Can't open buffer for exporting:" << buffer.errorString();
-        return;
+    if (obj->type() == dvm::DVObject::Type::Board) {
+        if (auto board = qobject_cast<const dvm::DVBoard *>(obj)) {
+            auto cmd = new cmd::CmdNodeEntityCreate(d->m_appModel->objectsModel(), board, sceneDropPoint);
+            d->m_appModel->commandsStack()->push(cmd);
+        }
     }
-
-    if (!d->m_exporter->exportObjects({ obj }, &buffer)) {
-        qWarning() << "Error during component export";
-        return;
-    }
-    buffer.close();
-
-    QUndoCommand *cmd = nullptr;
-    /// TODO:
-    d->m_appModel->commandsStack()->push(cmd);
 }
 
 }

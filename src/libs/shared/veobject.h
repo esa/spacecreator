@@ -98,6 +98,7 @@ public Q_SLOTS:
     bool setParentObject(VEObject *parentObject);
 
 protected:
+    virtual QList<EntityAttribute> sortedAttributesValues(const EntityAttributes &attrs);
     virtual void setAttributeImpl(const QString &name, const QVariant &value, EntityAttribute::Type type);
     void clearAttributes();
 
