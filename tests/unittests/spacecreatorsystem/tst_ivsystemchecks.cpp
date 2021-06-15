@@ -325,10 +325,8 @@ void tst_IvSystemChecks::testCheckMessage()
     message1->setTargetInstance(instance1);
     chart->addInstanceEvent(message1, { { instance1, -1 } });
     QCOMPARE(m_checker->checkMessage(message1), false);
-    // Default interface is not ok
     ivm::IVInterface *if1 = ivm::testutils::createIface(sourceFunc, ivm::IVInterface::InterfaceType::Provided, "Env1");
-    QCOMPARE(m_checker->checkMessage(message1), false);
-    // interface type has to be "cyclic"
+    QCOMPARE(m_checker->checkMessage(message1), true);
     if1->setKind(ivm::IVInterface::OperationKind::Cyclic);
     QCOMPARE(m_checker->checkMessage(message1), true);
 }

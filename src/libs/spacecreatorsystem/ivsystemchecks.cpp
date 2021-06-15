@@ -202,9 +202,7 @@ bool IvSystemChecks::checkMessage(const msc::MscMessage *message) const
         for (ivm::IVInterface *interface : qAsConst(interfaces)) {
             if (auto func = qobject_cast<ivm::IVFunction *>(interface->parent())) {
                 if (targetName.compare(func->title(), m_caseCheck) == 0) {
-                    if (interface->kind() == ivm::IVInterface::OperationKind::Cyclic) {
-                        return true;
-                    }
+                    return true;
                 }
             }
         }
@@ -214,9 +212,7 @@ bool IvSystemChecks::checkMessage(const msc::MscMessage *message) const
         for (ivm::IVInterface *interface : qAsConst(interfaces)) {
             if (auto func = qobject_cast<ivm::IVFunction *>(interface->parent())) {
                 if (sourceName.compare(func->title(), m_caseCheck) == 0) {
-                    if (interface->kind() == ivm::IVInterface::OperationKind::Cyclic) {
-                        return true;
-                    }
+                    return true;
                 }
             }
         }
@@ -255,6 +251,27 @@ QStringList IvSystemChecks::connectionNamesFromTo(const QString &sourceName, con
         const QStringList names = chain->connectionNames(sourceName, targetName);
         connectionNames += names;
     }
+
+    const QVector<ivm::IVFunction *> functions = m_ivCore->allIVFunctions();
+    if (sourceName.isEmpty()) {
+        for (ivm::IVFunction *func : functions) {
+            if (func->title() == targetName) {
+                for (ivm::IVInterface *iface : func->pis()) {
+                    connectionNames += iface->title();
+                }
+            }
+        }
+    }
+    if (targetName.isEmpty()) {
+        for (ivm::IVFunction *func : functions) {
+            if (func->title() == sourceName) {
+                for (ivm::IVInterface *iface : func->ris()) {
+                    connectionNames += iface->title();
+                }
+            }
+        }
+    }
+
     connectionNames.removeDuplicates();
     return connectionNames;
 }

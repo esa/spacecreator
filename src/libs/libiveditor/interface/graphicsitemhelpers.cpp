@@ -344,6 +344,9 @@ int nestingLevel(ivm::IVObject *object)
         object = object->parentObject();
     }
 
+    if (!object)
+        return -1;
+
     int level = 0;
     while (auto parentObject = object->parentObject()) {
         if ((parentObject->type() == ivm::IVObject::Type::Function
