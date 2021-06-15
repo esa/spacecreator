@@ -54,6 +54,7 @@ public:
     shared::ui::GraphicsViewBase *chartView() override;
     QToolBar *toolBar();
     QWidget *mainwidget();
+    QVector<QAction *> initActions();
 
     QUndoStack *undoStack() const override;
     shared::cmd::CommandsStackBase *commandsStack() const;

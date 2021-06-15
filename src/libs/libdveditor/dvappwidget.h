@@ -43,6 +43,7 @@ public:
     void setGraphicsScene(QGraphicsScene *scene);
     void setAadlModel(QAbstractItemModel *model);
     void setHWModel(QAbstractItemModel *model);
+    void setActions(const QVector<QAction *> &actions);
 
 private:
     Ui::DVAppWidget *ui = nullptr;

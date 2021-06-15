@@ -105,7 +105,16 @@
        </layout>
       </widget>
      </widget>
-     <widget class="dve::GraphicsView" name="view"/>
+     <widget class="QWidget" name="layoutWidget">
+      <layout class="QHBoxLayout" name="horizontalLayout">
+       <item>
+        <widget class="shared::ActionsBar" name="toolBar" native="true"/>
+       </item>
+       <item>
+        <widget class="dve::GraphicsView" name="view"/>
+       </item>
+      </layout>
+     </widget>
     </widget>
    </item>
   </layout>
@@ -120,6 +129,12 @@
    <class>shared::ui::ObjectsTreeView</class>
    <extends>QTreeView</extends>
    <header>interface/objectstreeview.h</header>
+  </customwidget>
+  <customwidget>
+   <class>shared::ActionsBar</class>
+   <extends>QWidget</extends>
+   <header>actionsbar.h</header>
+   <container>1</container>
   </customwidget>
  </customwidgets>
  <resources/>

@@ -501,8 +501,6 @@ QList<QAction *> InterfaceDocument::customActions() const
     QAction *actCommonProps = new QAction(tr("Common Properties..."));
     actions.append(actCommonProps);
     connect(actCommonProps, &QAction::triggered, this, &InterfaceDocument::onAttributesManagerRequested);
-    //    QAction *actDataTypes = root->addAction(tr("Data types"));
-    //    connect(actDataTypes, &QAction::triggered, this, &InterfaceDocument::onDataTypesMenuInvoked);
     QAction *actColorScheme = new QAction(tr("Color Scheme..."));
     actions.append(actColorScheme);
     connect(actColorScheme, &QAction::triggered, this, &InterfaceDocument::onColorSchemeMenuInvoked);
@@ -511,8 +509,6 @@ QList<QAction *> InterfaceDocument::customActions() const
     connect(actDynContext, &QAction::triggered, this, &InterfaceDocument::onDynContextEditorMenuInvoked);
 
     ActionsManager::registerAction(Q_FUNC_INFO, actCommonProps, "Edit Properties", "Show editor for common Properties");
-    //    ActionsManager::registerAction(Q_FUNC_INFO, actDataTypes, "Edit Datatypes", "Show editor for common
-    //    Datatypes");
     ActionsManager::registerAction(
             Q_FUNC_INFO, actColorScheme, "Edit Color scheme", "Show editor for common Color schemes");
     ActionsManager::registerAction(

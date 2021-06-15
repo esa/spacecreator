@@ -66,4 +66,11 @@ void DVAppWidget::setHWModel(QAbstractItemModel *model)
     ui->hwLibraryView->setModel(model);
 }
 
+void DVAppWidget::setActions(const QVector<QAction *> &actions)
+{
+    for (QAction *action : actions) {
+        ui->toolBar->addAction(action);
+    }
+}
+
 } // namespace dve

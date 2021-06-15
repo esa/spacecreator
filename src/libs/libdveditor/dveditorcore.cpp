@@ -73,6 +73,7 @@ struct DVEditorCore::DVEditorCorePrivate {
     std::unique_ptr<dve::DVCreatorTool> m_creatorTool;
     std::unique_ptr<dve::DVExporter> m_exporter;
     QPointer<QToolBar> m_toolBar;
+    QVector<QAction *> m_actions;
     QPointer<DVAppWidget> m_mainWidget;
 };
 
@@ -111,75 +112,9 @@ QToolBar *DVEditorCore::toolBar()
         d->m_toolBar->setObjectName("DeploymentToolBar");
         d->m_toolBar->setAllowedAreas(Qt::AllToolBarAreas);
         d->m_toolBar->setMovable(true);
-
-        d->m_creatorTool.reset(
-                new DVCreatorTool(d->m_mainWidget->graphicsView(), d->m_model.get(), d->m_appModel->commandsStack()));
-
-        auto actionGroup = new QActionGroup(this);
-        actionGroup->setExclusive(true);
-
-        connect(d->m_creatorTool.get(), &DVCreatorTool::created, this, [this, actionGroup]() {
-            if (QAction *currentAction = actionGroup->checkedAction())
-                currentAction->setChecked(false);
-            d->m_creatorTool->setCurrentToolType(DVCreatorTool::ToolType::Pointer);
-        });
-        connect(d->m_creatorTool.get(), &DVCreatorTool::propertyEditorRequest, this, &DVEditorCore::showPropertyEditor,
-                Qt::QueuedConnection);
-        connect(d->m_creatorTool.get(), &DVCreatorTool::informUser, this, &DVEditorCore::showInfoMessage);
-        connect(d->m_creatorTool.get(), &DVCreatorTool::copyActionTriggered, this, &DVEditorCore::copyItems);
-        connect(d->m_creatorTool.get(), &DVCreatorTool::cutActionTriggered, this, &DVEditorCore::cutItems);
-        connect(d->m_creatorTool.get(), &DVCreatorTool::pasteActionTriggered, this,
-                qOverload<const QPointF &>(&DVEditorCore::pasteItems));
-
-        auto actCreatePartition = new QAction(tr("Partition"));
-        actCreatePartition->setIcon(QIcon(":/tab_deployment/toolbar/icns/partition.svg"));
-        actCreatePartition->setCheckable(true);
-        actCreatePartition->setActionGroup(actionGroup);
-        connect(actCreatePartition, &QAction::triggered, this,
-                [this]() { d->m_creatorTool->setCurrentToolType(DVCreatorTool::ToolType::Partition); });
-        d->m_toolBar->addAction(actCreatePartition);
-
-        auto actCreateConnection = new QAction(tr("Connection"));
-        actCreateConnection->setIcon(QIcon(":/tab_deployment/toolbar/icns/connection.svg"));
-        actCreateConnection->setCheckable(true);
-        actCreateConnection->setActionGroup(actionGroup);
-        connect(actCreateConnection, &QAction::triggered, this,
-                [this]() { d->m_creatorTool->setCurrentToolType(DVCreatorTool::ToolType::MultiPointConnection); });
-        d->m_toolBar->addAction(actCreateConnection);
-
-        d->m_toolBar->addSeparator();
-
-        auto actRemove = new QAction(tr("Remove"));
-        actRemove->setIcon(QIcon(QLatin1String(":/tab_deployment/toolbar/icns/delete.svg")));
-        actRemove->setEnabled(false);
-        actRemove->setShortcut(QKeySequence::Delete);
-        connect(actRemove, &QAction::triggered, this, [this]() { d->m_creatorTool->removeSelectedItems(); });
-        d->m_toolBar->addAction(actRemove);
-
-        d->m_toolBar->addSeparator();
-
-        auto actZoomIn = new QAction(tr("Zoom In"));
-        actZoomIn->setIcon(QIcon(QLatin1String(":/tab_deployment/toolbar/icns/zoom_in.svg")));
-        actZoomIn->setShortcut(QKeySequence::ZoomIn);
-        connect(actZoomIn, &QAction::triggered, this, [this]() {
-            d->m_mainWidget->graphicsView()->setZoom(
-                    d->m_mainWidget->graphicsView()->zoom() + d->m_mainWidget->graphicsView()->zoomStepPercent());
-        });
-        d->m_toolBar->addAction(actZoomIn);
-
-        auto actZoomOut = new QAction(tr("Zoom Out"));
-        actZoomOut->setIcon(QIcon(QLatin1String(":/tab_deployment/toolbar/icns/zoom_out.svg")));
-        actZoomOut->setShortcut(QKeySequence::ZoomOut);
-        connect(actZoomOut, &QAction::triggered, this, [this]() {
-            d->m_mainWidget->graphicsView()->setZoom(
-                    d->m_mainWidget->graphicsView()->zoom() - d->m_mainWidget->graphicsView()->zoomStepPercent());
-        });
-        d->m_toolBar->addAction(actZoomOut);
-
-        connect(d->m_mainWidget->selectionModel(), &QItemSelectionModel::selectionChanged, this,
-                [this, actRemove](const QItemSelection &selected, const QItemSelection & /*deselected*/) {
-                    actRemove->setEnabled(!selected.isEmpty());
-                });
+        for (QAction *action : initActions()) {
+            d->m_toolBar->addAction(action);
+        }
     }
     return d->m_toolBar;
 }
@@ -191,12 +126,85 @@ QWidget *DVEditorCore::mainwidget()
         d->m_mainWidget->setGraphicsScene(d->m_model->scene());
         d->m_mainWidget->setAadlModel(d->m_visualizationModel.get());
         d->m_mainWidget->setHWModel(d->m_hwVisualizationModel.get());
+        d->m_mainWidget->setActions(initActions());
+        connect(d->m_mainWidget->graphicsView(), &GraphicsView::importEntity, this, &DVEditorCore::importEntity);
         connect(d->m_mainWidget->selectionModel(), &QItemSelectionModel::selectionChanged, this,
                 &DVEditorCore::onViewSelectionChanged);
-
-        connect(d->m_mainWidget->graphicsView(), &GraphicsView::importEntity, this, &DVEditorCore::importEntity);
     }
     return d->m_mainWidget;
+}
+
+QVector<QAction *> DVEditorCore::initActions()
+{
+    if (d->m_creatorTool) {
+        return d->m_actions;
+    }
+
+    auto actionGroup = new QActionGroup(this);
+    actionGroup->setExclusive(true);
+    d->m_creatorTool.reset(
+            new DVCreatorTool(d->m_mainWidget->graphicsView(), d->m_model.get(), d->m_appModel->commandsStack()));
+
+    connect(d->m_creatorTool.get(), &DVCreatorTool::created, this, [this, actionGroup]() {
+        if (QAction *currentAction = actionGroup->checkedAction())
+            currentAction->setChecked(false);
+        d->m_creatorTool->setCurrentToolType(DVCreatorTool::ToolType::Pointer);
+    });
+    connect(d->m_creatorTool.get(), &DVCreatorTool::propertyEditorRequest, this, &DVEditorCore::showPropertyEditor,
+            Qt::QueuedConnection);
+    connect(d->m_creatorTool.get(), &DVCreatorTool::informUser, this, &DVEditorCore::showInfoMessage);
+    connect(d->m_creatorTool.get(), &DVCreatorTool::copyActionTriggered, this, &DVEditorCore::copyItems);
+    connect(d->m_creatorTool.get(), &DVCreatorTool::cutActionTriggered, this, &DVEditorCore::cutItems);
+    connect(d->m_creatorTool.get(), &DVCreatorTool::pasteActionTriggered, this,
+            qOverload<const QPointF &>(&DVEditorCore::pasteItems));
+
+    auto actCreatePartition = new QAction(tr("Partition"));
+    actCreatePartition->setIcon(QIcon(":/tab_deployment/toolbar/icns/partition.svg"));
+    actCreatePartition->setCheckable(true);
+    actCreatePartition->setActionGroup(actionGroup);
+    connect(actCreatePartition, &QAction::triggered, this,
+            [this]() { d->m_creatorTool->setCurrentToolType(DVCreatorTool::ToolType::Partition); });
+    d->m_actions.append(actCreatePartition);
+
+    auto actCreateConnection = new QAction(tr("Connection"));
+    actCreateConnection->setIcon(QIcon(":/tab_deployment/toolbar/icns/connection.svg"));
+    actCreateConnection->setCheckable(true);
+    actCreateConnection->setActionGroup(actionGroup);
+    connect(actCreateConnection, &QAction::triggered, this,
+            [this]() { d->m_creatorTool->setCurrentToolType(DVCreatorTool::ToolType::MultiPointConnection); });
+    d->m_actions.append(actCreateConnection);
+
+    auto actRemove = new QAction(tr("Remove"));
+    actRemove->setIcon(QIcon(QLatin1String(":/tab_deployment/toolbar/icns/delete.svg")));
+    actRemove->setEnabled(false);
+    actRemove->setShortcut(QKeySequence::Delete);
+    connect(actRemove, &QAction::triggered, this, [this]() { d->m_creatorTool->removeSelectedItems(); });
+    d->m_actions.append(actRemove);
+
+    auto actZoomIn = new QAction(tr("Zoom In"));
+    actZoomIn->setIcon(QIcon(QLatin1String(":/tab_deployment/toolbar/icns/zoom_in.svg")));
+    actZoomIn->setShortcut(QKeySequence::ZoomIn);
+    connect(actZoomIn, &QAction::triggered, this, [this]() {
+        d->m_mainWidget->graphicsView()->setZoom(
+                d->m_mainWidget->graphicsView()->zoom() + d->m_mainWidget->graphicsView()->zoomStepPercent());
+    });
+    d->m_actions.append(actZoomIn);
+
+    auto actZoomOut = new QAction(tr("Zoom Out"));
+    actZoomOut->setIcon(QIcon(QLatin1String(":/tab_deployment/toolbar/icns/zoom_out.svg")));
+    actZoomOut->setShortcut(QKeySequence::ZoomOut);
+    connect(actZoomOut, &QAction::triggered, this, [this]() {
+        d->m_mainWidget->graphicsView()->setZoom(
+                d->m_mainWidget->graphicsView()->zoom() - d->m_mainWidget->graphicsView()->zoomStepPercent());
+    });
+    d->m_actions.append(actZoomOut);
+
+    connect(d->m_mainWidget->selectionModel(), &QItemSelectionModel::selectionChanged, this,
+            [this, actRemove](const QItemSelection &selected, const QItemSelection & /*deselected*/) {
+                actRemove->setEnabled(!selected.isEmpty());
+            });
+
+    return d->m_actions;
 }
 
 QUndoStack *DVEditorCore::undoStack() const
