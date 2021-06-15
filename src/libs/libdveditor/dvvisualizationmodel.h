@@ -1,5 +1,5 @@
 /*
-  Copyright (C) 2020 European Space Agency - <maxime.perrotin@esa.int>
+  Copyright (C) 2021 European Space Agency - <maxime.perrotin@esa.int>
 
   This library is free software; you can redistribute it and/or
   modify it under the terms of the GNU Library General Public
@@ -15,26 +15,30 @@
   along with this program. If not, see <https://www.gnu.org/licenses/lgpl-2.1.html>.
 */
 
-#pragma once
+#include "abstractvisualizationmodel.h"
 
-#include "common.h"
+namespace shared {
+namespace cmd {
+class CommandsStackBase;
+} // namespace cmd
+} // namespace shared
 
-#include <QTreeView>
+namespace dvm {
+class DVModel;
+} // namespace dvm
 
-namespace ive {
+namespace dve {
 
-class ObjectsTreeView : public QTreeView
+class DVVisualizationModel : public shared::AbstractVisualizationModel
 {
     Q_OBJECT
 public:
-    explicit ObjectsTreeView(shared::DropType componentType, QWidget *parent = nullptr);
+    explicit DVVisualizationModel(
+            dvm::DVModel *dvModel, shared::cmd::CommandsStackBase *commandsStack, QObject *parent = nullptr);
 
-    void mousePressEvent(QMouseEvent *event) override;
-    void mouseMoveEvent(QMouseEvent *event) override;
-
-private:
-    const shared::DropType m_componentType;
-    QPoint m_dragStartPosition;
+protected:
+    void updateItemData(QStandardItem *item, shared::VEObject *obj) override;
+    QStandardItem *createItem(shared::VEObject *obj) override;
 };
 
-} // namespace ive
+} // namespace dve

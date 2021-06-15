@@ -93,7 +93,14 @@
          </widget>
         </item>
         <item row="2" column="0">
-         <widget class="QListView" name="hwLibraryView"/>
+         <widget class="shared::ui::ObjectsTreeView" name="hwLibraryView">
+          <property name="dragDropMode">
+           <enum>QAbstractItemView::DragOnly</enum>
+          </property>
+          <attribute name="headerVisible">
+           <bool>false</bool>
+          </attribute>
+         </widget>
         </item>
        </layout>
       </widget>
@@ -108,6 +115,11 @@
    <class>dve::GraphicsView</class>
    <extends>QGraphicsView</extends>
    <header>baseitems/graphicsview.h</header>
+  </customwidget>
+  <customwidget>
+   <class>shared::ui::ObjectsTreeView</class>
+   <extends>QTreeView</extends>
+   <header>interface/objectstreeview.h</header>
   </customwidget>
  </customwidgets>
  <resources/>

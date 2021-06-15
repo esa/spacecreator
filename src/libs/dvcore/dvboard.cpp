@@ -39,20 +39,4 @@ QList<DVDevice *> DVBoard::devices() const
     return findChildren<DVDevice *>(QString(), Qt::FindDirectChildrenOnly);
 }
 
-DVBoardsModel::DVBoardsModel(QObject *parent)
-    : QObjectListModelT<DVBoard *>(parent)
-{
-}
-
-QVariant DVBoardsModel::data(const QModelIndex &index, int role) const
-{
-    if (role == Qt::DisplayRole) {
-        if (index.row() < rowCount()) {
-            return get(index.row())->titleUI();
-        }
-    }
-
-    return QObjectListModel::data(index, role);
-}
-
 } // namespace dvm

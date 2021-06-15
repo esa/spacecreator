@@ -57,6 +57,8 @@ target_sources(${LIB_NAME} PRIVATE
     dvcreatortool.h
     graphicsitemhelpers.cpp
     graphicsitemhelpers.h
+    dvvisualizationmodel.cpp
+    dvvisualizationmodel.h
 )
 
 target_link_libraries(${LIB_NAME}

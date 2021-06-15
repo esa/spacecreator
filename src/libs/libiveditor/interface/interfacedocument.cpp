@@ -27,7 +27,6 @@
 #include "commandsstack.h"
 #include "context/action/actionsmanager.h"
 #include "context/action/editor/dynactioneditor.h"
-#include "ivcreatortool.h"
 #include "file.h"
 #include "graphicsitemhelpers.h"
 #include "graphicsviewutils.h"
@@ -38,6 +37,7 @@
 #include "ivcomment.h"
 #include "ivconnection.h"
 #include "ivconnectiongroup.h"
+#include "ivcreatortool.h"
 #include "ivexporter.h"
 #include "ivfunction.h"
 #include "ivfunctiongraphicsitem.h"
@@ -82,9 +82,9 @@ struct InterfaceDocument::InterfaceDocumentPrivate {
     IVVisualizationModelBase *objectsVisualizationModel { nullptr };
     QItemSelectionModel *objectsSelectionModel { nullptr };
     ivm::IVModel *objectsModel { nullptr };
-    ObjectsTreeView *importView { nullptr };
+    shared::ui::ObjectsTreeView *importView { nullptr };
     ivm::IVModel *importModel { nullptr };
-    ObjectsTreeView *sharedView { nullptr };
+    shared::ui::ObjectsTreeView *sharedView { nullptr };
     ivm::IVModel *sharedModel { nullptr };
     IVExporter *exporter { nullptr };
 
@@ -123,10 +123,9 @@ InterfaceDocument::InterfaceDocument(QObject *parent)
     d->dynPropConfig = ivm::PropertyTemplateConfig::instance();
     d->dynPropConfig->init(ive::dynamicPropertiesFilePath());
 
-    d->importModel = new ivm::IVModel(d->dynPropConfig, this);
-    d->sharedModel = new ivm::IVModel(d->dynPropConfig, this);
-    d->objectsModel = new ivm::IVModel(d->dynPropConfig, this);
-    d->objectsModel->setSharedTypesModel(d->sharedModel);
+    d->importModel = new ivm::IVModel(d->dynPropConfig, nullptr, this);
+    d->sharedModel = new ivm::IVModel(d->dynPropConfig, nullptr, this);
+    d->objectsModel = new ivm::IVModel(d->dynPropConfig, d->sharedModel, this);
 }
 
 InterfaceDocument::~InterfaceDocument()
@@ -1170,12 +1169,13 @@ QTreeView *InterfaceDocument::createImportView()
     if (d->importView)
         return d->importView;
 
-    d->importView = new ObjectsTreeView(shared::DropType::ImportableType);
+    d->importView = new shared::ui::ObjectsTreeView;
     d->importView->setObjectName(QLatin1String("ImportView"));
     d->importView->setSelectionBehavior(QAbstractItemView::SelectionBehavior::SelectItems);
     d->importView->setSelectionMode(QAbstractItemView::SelectionMode::SingleSelection);
     d->importView->setEditTriggers(QAbstractItemView::EditTrigger::NoEditTriggers);
-    auto sourceModel = new IVVisualizationModelBase(d->importModel, d->commandsStack, d->importView);
+    auto sourceModel = new IVVisualizationModelBase(
+            d->importModel, d->commandsStack, shared::DropData::Type::ImportableType, d->importView);
     auto headerItem = new QStandardItem(tr("Import Component"));
     headerItem->setTextAlignment(Qt::AlignCenter);
     sourceModel->setHorizontalHeaderItem(0, headerItem);
@@ -1189,12 +1189,13 @@ QTreeView *InterfaceDocument::createSharedView()
     if (d->sharedView)
         return d->sharedView;
 
-    d->sharedView = new ObjectsTreeView(shared::DropType::InstantiatableType);
+    d->sharedView = new shared::ui::ObjectsTreeView;
     d->sharedView->setObjectName(QLatin1String("SharedView"));
     d->sharedView->setSelectionBehavior(QAbstractItemView::SelectionBehavior::SelectItems);
     d->sharedView->setSelectionMode(QAbstractItemView::SelectionMode::SingleSelection);
     d->sharedView->setEditTriggers(QAbstractItemView::EditTrigger::NoEditTriggers);
-    auto sourceModel = new IVVisualizationModelBase(d->sharedModel, d->commandsStack, d->sharedView);
+    auto sourceModel = new IVVisualizationModelBase(
+            d->sharedModel, d->commandsStack, shared::DropData::Type::InstantiatableType, d->sharedView);
     auto headerItem = new QStandardItem(tr("Shared Types"));
     headerItem->setTextAlignment(Qt::AlignCenter);
     sourceModel->setHorizontalHeaderItem(0, headerItem);

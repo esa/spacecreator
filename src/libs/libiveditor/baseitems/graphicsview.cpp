@@ -31,10 +31,6 @@ namespace ive {
 GraphicsView::GraphicsView(QWidget *parent)
     : shared::ui::GraphicsViewBase(parent)
 {
-    setTransformationAnchor(QGraphicsView::AnchorUnderMouse);
-    setResizeAnchor(QGraphicsView::AnchorUnderMouse);
-
-    setAcceptDrops(true);
 }
 
 QList<QPair<QPointF, QString>> GraphicsView::mouseMoveCoordinates(
@@ -42,38 +38,13 @@ QList<QPair<QPointF, QString>> GraphicsView::mouseMoveCoordinates(
 {
     QList<QPair<QPointF, QString>> coords;
     QList<QGraphicsItem *> itemsUnderCursor = items(screenPos);
-    for (QGraphicsItem *item : itemsUnderCursor) {
+    for (QGraphicsItem *item : qAsConst(itemsUnderCursor)) {
         if (auto iObj = qobject_cast<shared::ui::VEInteractiveObject *>(item->toGraphicsObject())) {
             coords.push_back({ item->mapFromScene(scenePos),
                     iObj->entity() ? iObj->entity()->objectName() : QLatin1String("None") });
         }
     }
     return coords;
-}
-
-void GraphicsView::dragEnterEvent(QDragEnterEvent *event)
-{
-    event->acceptProposedAction();
-}
-
-void GraphicsView::dragMoveEvent(QDragMoveEvent *event)
-{
-    event->acceptProposedAction();
-}
-
-void GraphicsView::dropEvent(QDropEvent *event)
-{
-    auto mimeData = event->mimeData();
-    const shared::Id id = QUuid::fromString(mimeData->text());
-    if (event->dropAction() == Qt::DropAction::CopyAction) {
-        Q_EMIT importEntity(id, mapToScene(event->pos()));
-        event->accept();
-    } else if (event->dropAction() == Qt::DropAction::LinkAction) {
-        Q_EMIT instantiateEntity(id, mapToScene(event->pos()));
-        event->accept();
-    } else {
-        event->ignore();
-    }
 }
 
 }

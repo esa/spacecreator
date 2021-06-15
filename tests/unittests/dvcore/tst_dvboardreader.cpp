@@ -16,7 +16,7 @@
 */
 
 #include "dvboard.h"
-#include "dvboardreader.h"
+#include "dvhwlibraryreader.h"
 #include "dvboardreaderhelpers.h"
 
 #include <QtTest>
@@ -43,7 +43,7 @@ void DVBoardReaderTest::runReader(const QByteArray &content, const int expectedO
         return;
     }
 
-    dvm::DVBoardReader reader;
+    dvm::DVHWLibraryReader reader;
     const bool ok = reader.read(&buffer);
     QCOMPARE(ok, canBeParsed);
     if (ok) {

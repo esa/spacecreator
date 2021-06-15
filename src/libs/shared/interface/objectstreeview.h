@@ -1,5 +1,5 @@
 /*
-  Copyright (C) 2019 European Space Agency - <maxime.perrotin@esa.int>
+  Copyright (C) 2020 European Space Agency - <maxime.perrotin@esa.int>
 
   This library is free software; you can redistribute it and/or
   modify it under the terms of the GNU Library General Public
@@ -17,35 +17,25 @@
 
 #pragma once
 
-#include "xmlreader.h"
+#include "common.h"
 
-#include <QVector>
-#include <memory>
+#include <QTreeView>
 
-class QXmlStreamReader;
+namespace shared {
+namespace ui {
 
-namespace dvm {
-class DVBoard;
-class DVObject;
-struct DVBoardReaderPrivate;
-
-class DVBoardReader : public shared::XmlReader
+class ObjectsTreeView : public QTreeView
 {
     Q_OBJECT
 public:
-    explicit DVBoardReader(QObject *parent = nullptr);
-    ~DVBoardReader() override;
+    explicit ObjectsTreeView(QWidget *parent = nullptr);
 
-    QVector<DVObject *> parsedObjects() const;
-    QList<DVBoard *> parsedBoards() const;
-
-protected:
-    void processTagOpen(QXmlStreamReader &xml) override;
-    void processTagClose(QXmlStreamReader &xml) override;
-    QString rootElementName() const override;
+    void mousePressEvent(QMouseEvent *event) override;
+    void mouseMoveEvent(QMouseEvent *event) override;
 
 private:
-    const std::unique_ptr<DVBoardReaderPrivate> d;
+    QPoint m_dragStartPosition;
 };
 
-} // namespace dvm
+} // namespace ui
+} // namespace ive

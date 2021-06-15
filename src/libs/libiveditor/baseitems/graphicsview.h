@@ -36,17 +36,9 @@ class GraphicsView : public shared::ui::GraphicsViewBase
 public:
     explicit GraphicsView(QWidget *parent = nullptr);
 
-Q_SIGNALS:
-    void importEntity(const shared::Id &id, const QPointF &scenePos);
-    void instantiateEntity(const shared::Id &id, const QPointF &scenePos);
-
 protected:
     QList<QPair<QPointF, QString>> mouseMoveCoordinates(
             QGraphicsScene *scene, const QPoint &screenPos, const QPointF &scenePos) const override;
-
-    void dragEnterEvent(QDragEnterEvent *event) override;
-    void dragMoveEvent(QDragMoveEvent *event) override;
-    void dropEvent(QDropEvent *event) override;
 };
 
 }

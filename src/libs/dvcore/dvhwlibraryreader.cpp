@@ -15,7 +15,7 @@
   along with this program. If not, see <https://www.gnu.org/licenses/lgpl-2.1.html>.
 */
 
-#include "dvboardreader.h"
+#include "dvhwlibraryreader.h"
 
 #include "dvboard.h"
 #include "dvcommonprops.h"
@@ -47,31 +47,20 @@ struct DVBoardReaderPrivate {
     }
 };
 
-DVBoardReader::DVBoardReader(QObject *parent)
+DVHWLibraryReader::DVHWLibraryReader(QObject *parent)
     : shared::XmlReader(parent)
     , d(new DVBoardReaderPrivate)
 {
 }
 
-DVBoardReader::~DVBoardReader() { }
+DVHWLibraryReader::~DVHWLibraryReader() { }
 
-QVector<DVObject *> DVBoardReader::parsedObjects() const
+QVector<DVObject *> DVHWLibraryReader::parsedObjects() const
 {
     return d->m_allObjects;
 }
 
-QList<DVBoard *> DVBoardReader::parsedBoards() const
-{
-    QList<DVBoard *> boards;
-    for (DVObject *obj : d->m_allObjects) {
-        if (auto board = qobject_cast<DVBoard *>(obj)) {
-            boards.append(board);
-        }
-    }
-    return boards;
-}
-
-void DVBoardReader::processTagOpen(QXmlStreamReader &xml)
+void DVHWLibraryReader::processTagOpen(QXmlStreamReader &xml)
 {
     const QString &tagName = xml.name().toString();
     const QXmlStreamAttributes attrs = xml.attributes();
@@ -107,7 +96,7 @@ void DVBoardReader::processTagOpen(QXmlStreamReader &xml)
     }
 }
 
-void DVBoardReader::processTagClose(QXmlStreamReader &xml)
+void DVHWLibraryReader::processTagClose(QXmlStreamReader &xml)
 {
     const QString &tagName = xml.name().toString();
     if (meta::Props::token(tagName) == meta::Props::Token::Device) {
@@ -117,7 +106,7 @@ void DVBoardReader::processTagClose(QXmlStreamReader &xml)
     }
 }
 
-QString DVBoardReader::rootElementName() const
+QString DVHWLibraryReader::rootElementName() const
 {
     return meta::Props::token(meta::Props::Token::Boards);
 }

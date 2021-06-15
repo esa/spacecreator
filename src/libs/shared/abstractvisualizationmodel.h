@@ -40,7 +40,9 @@ public:
     enum ItemRole
     {
         IdRole = Qt::UserRole + 1,
-        TypeRole
+        TypeRole,
+        CursorPixmapRole,
+        DropRole,
     };
 
     QStandardItem *getItem(const shared::Id id);

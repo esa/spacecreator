@@ -17,6 +17,8 @@
 
 #pragma once
 
+#include "common.h"
+
 #include <QGraphicsView>
 
 namespace shared {
@@ -51,6 +53,9 @@ Q_SIGNALS:
     void copyItems();
     void pasteItems();
 
+    void importEntity(const shared::Id &id, const QPointF &scenePos);
+    void instantiateEntity(const shared::Id &id, const QPointF &scenePos);
+
 public Q_SLOTS:
     void setZoom(double percent);
     void setMinZoomPercent(qreal percent);
@@ -69,6 +74,10 @@ protected:
     void wheelEvent(QWheelEvent *event) override;
     void keyPressEvent(QKeyEvent *event) override;
     void drawBackground(QPainter *painter, const QRectF &rect) override;
+
+    void dragEnterEvent(QDragEnterEvent *event) override;
+    void dragMoveEvent(QDragMoveEvent *event) override;
+    void dropEvent(QDropEvent *event) override;
 
 private:
     struct GraphicsViewBasePrivate;

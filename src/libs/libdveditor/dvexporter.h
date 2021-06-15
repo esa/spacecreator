@@ -19,6 +19,8 @@
 
 #include "objectsexporter.h"
 
+class QBuffer;
+
 namespace dvm {
 class DVObject;
 }
@@ -31,6 +33,9 @@ class DVExporter : public templating::ObjectsExporter
 public:
     explicit DVExporter(QObject *parent = nullptr);
     QString defaultTemplatePath() const override;
+
+    bool exportObjects(
+            const QList<dvm::DVObject *> &objects, QBuffer *outBuffer, const QString &templatePath = QString());
 
 private:
     /**

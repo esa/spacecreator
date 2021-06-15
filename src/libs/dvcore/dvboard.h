@@ -39,16 +39,4 @@ private:
     std::unique_ptr<DVBoardPrivate> d;
 };
 
-/*!
-   Collections of boads (library of boards)
- */
-class DVBoardsModel : public QObjectListModelT<DVBoard *>
-{
-    Q_OBJECT
-public:
-    explicit DVBoardsModel(QObject *parent = nullptr);
-
-    QVariant data(const QModelIndex &index, int role) const override;
-};
-
 } // namespace dvm

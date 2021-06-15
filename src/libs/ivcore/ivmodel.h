@@ -38,11 +38,10 @@ class IVModel : public shared::VEModel
 {
     Q_OBJECT
 public:
-    explicit IVModel(PropertyTemplateConfig *dynPropConfig, QObject *parent = nullptr);
+    explicit IVModel(PropertyTemplateConfig *dynPropConfig, IVModel *sharedModel = nullptr, QObject *parent = nullptr);
     ~IVModel() override;
 
     bool removeObject(shared::VEObject *obj) override;
-    void setSharedTypesModel(IVModel *sharedTypesModel);
 
     void setRootObject(shared::Id rootId);
     IVObject *rootObject() const;

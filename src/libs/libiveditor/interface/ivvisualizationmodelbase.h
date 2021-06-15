@@ -38,13 +38,8 @@ class IVVisualizationModelBase : public shared::AbstractVisualizationModel
 {
     Q_OBJECT
 public:
-    explicit IVVisualizationModelBase(
-            ivm::IVModel *ivModel, cmd::CommandsStack *commandsStack, QObject *parent = nullptr);
-    enum ItemRole
-    {
-        IdRole = Qt::UserRole + 1,
-        TypeRole
-    };
+    explicit IVVisualizationModelBase(ivm::IVModel *ivModel, cmd::CommandsStack *commandsStack,
+            shared::DropData::Type dropType, QObject *parent = nullptr);
 
 protected:
     void updateItemData(QStandardItem *item, shared::VEObject *obj) override;
@@ -52,6 +47,9 @@ protected:
 
 private Q_SLOTS:
     void updateConnectionItem(ivm::IVConnection *connection);
+
+private:
+    shared::DropData::Type m_dropType;
 };
 
 class IVVisualizationModel : public IVVisualizationModelBase

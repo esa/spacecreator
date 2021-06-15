@@ -42,6 +42,11 @@ GraphicsViewBase::GraphicsViewBase(QGraphicsScene *scene, QWidget *parent)
     setRenderHints(QPainter::Antialiasing | QPainter::TextAntialiasing | QPainter::SmoothPixmapTransform);
     setDragMode(QGraphicsView::DragMode::RubberBandDrag);
     setRubberBandSelectionMode(Qt::IntersectsItemShape);
+
+    setTransformationAnchor(QGraphicsView::AnchorUnderMouse);
+    setResizeAnchor(QGraphicsView::AnchorUnderMouse);
+
+    setAcceptDrops(true);
 }
 
 GraphicsViewBase::GraphicsViewBase(QWidget *parent)
@@ -225,6 +230,31 @@ void GraphicsViewBase::drawBackground(QPainter *painter, const QRectF &rect)
     }
 
     painter->restore();
+}
+
+void GraphicsViewBase::dragEnterEvent(QDragEnterEvent *event)
+{
+    event->acceptProposedAction();
+}
+
+void GraphicsViewBase::dragMoveEvent(QDragMoveEvent *event)
+{
+    event->acceptProposedAction();
+}
+
+void GraphicsViewBase::dropEvent(QDropEvent *event)
+{
+    if (auto mimeData = qobject_cast<const DropData *>(event->mimeData())) {
+        if (mimeData->dropType == DropData::Type::ImportableType) {
+            Q_EMIT importEntity(mimeData->entityId, mapToScene(event->pos()));
+            event->accept();
+        } else if (mimeData->dropType == DropData::Type::InstantiatableType) {
+            Q_EMIT instantiateEntity(mimeData->entityId, mapToScene(event->pos()));
+            event->accept();
+        } else {
+            event->ignore();
+        }
+    }
 }
 
 }

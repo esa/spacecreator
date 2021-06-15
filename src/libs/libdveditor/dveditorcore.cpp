@@ -19,16 +19,20 @@
 
 #include "abstractvisualizationmodel.h"
 #include "baseitems/graphicsview.h"
+#include "commandsstackbase.h"
 #include "dvappmodel.h"
 #include "dvappwidget.h"
 #include "dvboard.h"
-#include "dvboardreader.h"
 #include "dvcreatortool.h"
+#include "dvexporter.h"
+#include "dvhwlibraryreader.h"
 #include "dvitemmodel.h"
 #include "dvmodel.h"
+#include "dvvisualizationmodel.h"
 #include "ui/graphicsviewbase.h"
 
 #include <QBoxLayout>
+#include <QBuffer>
 #include <QDebug>
 #include <QDirIterator>
 #include <QHeaderView>
@@ -48,7 +52,9 @@ struct DVEditorCore::DVEditorCorePrivate {
         , m_model(new DVItemModel(m_appModel->objectsModel(), m_appModel->commandsStack()))
         , m_visualizationModel(
                   new shared::AbstractVisualizationModel(m_appModel->objectsModel(), m_appModel->commandsStack()))
-        , m_hwModel(new dvm::DVBoardsModel)
+        , m_hwModel(new dvm::DVModel)
+        , m_hwVisualizationModel(new DVVisualizationModel(m_hwModel.get(), m_appModel->commandsStack()))
+        , m_exporter(new DVExporter)
     {
     }
 
@@ -61,8 +67,10 @@ struct DVEditorCore::DVEditorCorePrivate {
     std::unique_ptr<dve::DVAppModel> m_appModel;
     std::unique_ptr<dve::DVItemModel> m_model;
     std::unique_ptr<shared::AbstractVisualizationModel> m_visualizationModel;
-    std::unique_ptr<dvm::DVBoardsModel> m_hwModel;
+    std::unique_ptr<dvm::DVModel> m_hwModel;
+    std::unique_ptr<shared::AbstractVisualizationModel> m_hwVisualizationModel;
     std::unique_ptr<dve::DVCreatorTool> m_creatorTool;
+    std::unique_ptr<dve::DVExporter> m_exporter;
     QPointer<QToolBar> m_toolBar;
     QPointer<DVAppWidget> m_mainWidget;
 };
@@ -181,9 +189,11 @@ QWidget *DVEditorCore::mainwidget()
         d->m_mainWidget = new DVAppWidget;
         d->m_mainWidget->setGraphicsScene(d->m_model->scene());
         d->m_mainWidget->setAadlModel(d->m_visualizationModel.get());
-        d->m_mainWidget->setHWModel(d->m_hwModel.get());
+        d->m_mainWidget->setHWModel(d->m_hwVisualizationModel.get());
         connect(d->m_mainWidget->selectionModel(), &QItemSelectionModel::selectionChanged, this,
                 &DVEditorCore::onViewSelectionChanged);
+
+        connect(d->m_mainWidget->graphicsView(), &GraphicsView::importEntity, this, &DVEditorCore::importEntity);
     }
     return d->m_mainWidget;
 }
@@ -226,24 +236,17 @@ bool DVEditorCore::save()
  */
 void DVEditorCore::loadHWLibrary(const QString &directory)
 {
-    d->m_hwModel->clear(true);
-
-    QList<dvm::DVBoard *> boards;
+    QVector<dvm::DVObject *> objects;
     QDirIterator it(directory, QStringList() << "*.xml", QDir::Files, QDirIterator::Subdirectories);
     while (it.hasNext()) {
         QString fileName = it.next();
-        dvm::DVBoardReader reader;
+        dvm::DVHWLibraryReader reader;
         bool ok = reader.readFile(fileName);
         if (ok) {
-            boards.append(reader.parsedBoards());
+            objects << reader.parsedObjects();
         }
     }
-    d->m_hwModel->setObjectList(boards);
-}
-
-dvm::DVBoardsModel *DVEditorCore::hwModel() const
-{
-    return d->m_hwModel.get();
+    d->m_hwModel->initFromObjects(objects);
 }
 
 void DVEditorCore::showPropertyEditor()
@@ -304,6 +307,29 @@ void DVEditorCore::onViewSelectionChanged(const QItemSelection &selected, const 
 
     updateSelection(deselected, false);
     updateSelection(selected, true);
+}
+
+void DVEditorCore::importEntity(const shared::Id &id, const QPointF &sceneDropPoint)
+{
+    const auto obj = d->m_hwModel->getObject(id);
+    if (!obj) {
+        return;
+    }
+    QBuffer buffer;
+    if (!buffer.open(QIODevice::WriteOnly)) {
+        qWarning() << "Can't open buffer for exporting:" << buffer.errorString();
+        return;
+    }
+
+    if (!d->m_exporter->exportObjects({ obj }, &buffer)) {
+        qWarning() << "Error during component export";
+        return;
+    }
+    buffer.close();
+
+    QUndoCommand *cmd = nullptr;
+    /// TODO:
+    d->m_appModel->commandsStack()->push(cmd);
 }
 
 }

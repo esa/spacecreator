@@ -32,8 +32,9 @@
 namespace ive {
 
 IVVisualizationModelBase::IVVisualizationModelBase(
-        ivm::IVModel *ivModel, cmd::CommandsStack *commandsStack, QObject *parent)
+        ivm::IVModel *ivModel, cmd::CommandsStack *commandsStack, shared::DropData::Type dropType, QObject *parent)
     : shared::AbstractVisualizationModel(ivModel, commandsStack, parent)
+    , m_dropType(dropType)
 {
 }
 
@@ -49,7 +50,7 @@ void IVVisualizationModelBase::updateItemData(QStandardItem *item, shared::VEObj
     QString title = obj->titleUI();
     QPixmap pix;
     QFont font;
-
+    QPixmap dragPix;
     switch (obj->type()) {
     case ivm::IVObject::Type::Unknown:
         return;
@@ -82,10 +83,18 @@ void IVVisualizationModelBase::updateItemData(QStandardItem *item, shared::VEObj
         }
     } break;
     case ivm::IVObject::Type::Function: {
+        static const QPixmap dragIcon =
+                QIcon(QLatin1String(":/tab_interface/toolbar/icns/function.svg")).pixmap(128, 128);
+        dragPix = dragIcon;
+
         static const QPixmap icon = QIcon(QLatin1String(":/tab_interface/toolbar/icns/function.svg")).pixmap(16, 16);
         pix = icon;
     } break;
     case ivm::IVObject::Type::FunctionType: {
+        static const QPixmap dragIcon =
+                QIcon(QLatin1String(":/tab_interface/toolbar/icns/function_type.svg")).pixmap(128, 128);
+        dragPix = dragIcon;
+
         static const QPixmap icon =
                 QIcon(QLatin1String(":/tab_interface/toolbar/icns/function_type.svg")).pixmap(16, 16);
         pix = icon;
@@ -115,6 +124,8 @@ void IVVisualizationModelBase::updateItemData(QStandardItem *item, shared::VEObj
     } else {
         color = QColor(Qt::black);
     }
+    item->setData(static_cast<int>(m_dropType), DropRole);
+    item->setData(dragPix, CursorPixmapRole);
     item->setData(color, Qt::ForegroundRole);
     item->setData(font, Qt::FontRole);
     item->setData(title, Qt::DisplayRole);
@@ -169,7 +180,7 @@ void IVVisualizationModelBase::updateConnectionItem(ivm::IVConnection *connectio
 }
 
 IVVisualizationModel::IVVisualizationModel(ivm::IVModel *ivModel, cmd::CommandsStack *commandsStack, QObject *parent)
-    : IVVisualizationModelBase(ivModel, commandsStack, parent)
+    : IVVisualizationModelBase(ivModel, commandsStack, shared::DropData::Type::None, parent)
 {
     connect(this, &QStandardItemModel::dataChanged, this, &IVVisualizationModel::onDataChanged);
 }

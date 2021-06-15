@@ -95,6 +95,8 @@ target_sources(${LIB_NAME} PRIVATE
     ui/veconnectionendpointgraphicsitem.h
     interface/creatortool.cpp
     interface/creatortool.h
+    interface/objectstreeview.cpp
+    interface/objectstreeview.h
 )
 
 target_include_directories(${LIB_NAME} PUBLIC .)

@@ -28,11 +28,19 @@
 #include "templating/exportabledvobject.h"
 #include "templating/exportabledvpartition.h"
 
+#include <QBuffer>
+
 namespace dve {
 
 QString DVExporter::defaultTemplatePath() const
 {
     return QString("%1/aadl_xml/deploymentview.%2").arg(templatesPath(), templateFileExtension());
+}
+
+bool DVExporter::exportObjects(const QList<dvm::DVObject *> &objects, QBuffer *outBuffer, const QString &templatePath)
+{
+    const QHash<QString, QVariant> dvObjects = collectObjects(objects);
+    return exportData(dvObjects, templatePath, outBuffer);
 }
 
 DVExporter::DVExporter(QObject *parent)

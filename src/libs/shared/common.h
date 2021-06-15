@@ -19,16 +19,11 @@
 
 #include <QMetaEnum>
 #include <QMetaType>
+#include <QMimeData>
 #include <QObject>
 #include <QUuid>
 
 namespace shared {
-
-enum class DropType
-{
-    InstantiatableType,
-    ImportableType
-};
 
 typedef QUuid Id;
 
@@ -37,6 +32,22 @@ static const Id InvalidId = Id();
 static const QString kStringDelemiter = QStringLiteral("::");
 
 Id createId();
+
+class DropData : public QMimeData
+{
+    Q_OBJECT
+public:
+    enum class Type
+    {
+        None,
+        ImportableType,
+        InstantiatableType,
+    };
+    Q_ENUM(Type);
+
+    Type dropType = { Type::ImportableType };
+    shared::Id entityId;
+};
 
 enum FileCopyingMode
 {

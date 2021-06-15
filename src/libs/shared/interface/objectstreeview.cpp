@@ -17,8 +17,7 @@
 
 #include "objectstreeview.h"
 
-#include "ivmodel.h"
-#include "ivvisualizationmodelbase.h"
+#include "abstractvisualizationmodel.h"
 
 #include <QApplication>
 #include <QDrag>
@@ -26,11 +25,11 @@
 #include <QModelIndex>
 #include <QMouseEvent>
 
-namespace ive {
+namespace shared {
+namespace ui {
 
-ObjectsTreeView::ObjectsTreeView(shared::DropType componentType, QWidget *parent)
+ObjectsTreeView::ObjectsTreeView(QWidget *parent)
     : QTreeView(parent)
-    , m_componentType(componentType)
 {
     setDragEnabled(true);
     setDragDropMode(QAbstractItemView::DragOnly);
@@ -54,29 +53,20 @@ void ObjectsTreeView::mouseMoveEvent(QMouseEvent *event)
             }
 
             QDrag *drag = new QDrag(this);
-            QMimeData *mimeData = new QMimeData;
-            const shared::Id id = index.data(IVVisualizationModelBase::IdRole).toUuid();
-            mimeData->setText(id.toString());
+            DropData *mimeData = new DropData;
+            const Id id = index.data(AbstractVisualizationModel::IdRole).toUuid();
+            mimeData->entityId = id.toString();
+            const int dropType = index.data(AbstractVisualizationModel::DropRole).toInt();
+            mimeData->dropType = static_cast<DropData::Type>(dropType);
             drag->setMimeData(mimeData);
-            QPixmap pix;
-            Qt::DropAction dropAction;
-            if (m_componentType == shared::DropType::ImportableType) {
-                static QPixmap icon =
-                        QIcon(QLatin1String(":/tab_interface/toolbar/icns/function.svg")).pixmap(128, 128);
-                pix = icon;
-                dropAction = Qt::CopyAction;
-            } else if (m_componentType == shared::DropType::InstantiatableType) {
-                static QPixmap icon =
-                        QIcon(QLatin1String(":/tab_interface/toolbar/icns/function_type.svg")).pixmap(128, 128);
-                pix = icon;
-                dropAction = Qt::LinkAction;
-            }
-            drag->setPixmap(pix);
-            drag->exec(dropAction);
+            const QPixmap pix = index.data(AbstractVisualizationModel::CursorPixmapRole).value<QPixmap>();
+            drag->setDragCursor(pix, Qt::DropAction::CopyAction);
+            drag->exec(Qt::DropAction::CopyAction);
             return;
         }
     }
     QTreeView::mouseMoveEvent(event);
 }
 
+} // namespace ui
 } // namespace ive

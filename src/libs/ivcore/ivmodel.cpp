@@ -38,19 +38,15 @@ struct IVModelPrivate {
     QVector<QString> m_headerTitles;
 };
 
-IVModel::IVModel(PropertyTemplateConfig *dynPropConfig, QObject *parent)
+IVModel::IVModel(PropertyTemplateConfig *dynPropConfig, IVModel *sharedModel, QObject *parent)
     : shared::VEModel(parent)
     , d(new IVModelPrivate)
 {
     d->m_dynPropConfig = dynPropConfig;
+    d->m_sharedTypesModel = sharedModel;
 }
 
 IVModel::~IVModel() { }
-
-void IVModel::setSharedTypesModel(IVModel *sharedTypesModel)
-{
-    d->m_sharedTypesModel = sharedTypesModel;
-}
 
 bool IVModel::addObjectImpl(shared::VEObject *obj)
 {

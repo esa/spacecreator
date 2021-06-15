@@ -65,7 +65,6 @@ public:
     bool save() override;
 
     void loadHWLibrary(const QString &directory);
-    dvm::DVBoardsModel *hwModel() const;
 
 private Q_SLOTS:
     void showPropertyEditor();
@@ -78,6 +77,7 @@ private Q_SLOTS:
 
     void onSceneSelectionChanged(const QList<shared::Id> &selectedObjects);
     void onViewSelectionChanged(const QItemSelection &selected, const QItemSelection &deselected);
+    void importEntity(const shared::Id &id, const QPointF &sceneDropPoint);
 
 private:
     struct DVEditorCorePrivate;

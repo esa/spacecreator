@@ -66,8 +66,6 @@ target_sources(${LIB_NAME} PRIVATE
     interface/ivinterfacegroupgraphicsitem.h
     interface/ivitemmodel.cpp
     interface/ivitemmodel.h
-    interface/objectstreeview.cpp
-    interface/objectstreeview.h
     interface/commands/cmdchangeasn1file.cpp
     interface/commands/cmdchangeasn1file.h
     interface/commands/cmdcommentitemcreate.cpp

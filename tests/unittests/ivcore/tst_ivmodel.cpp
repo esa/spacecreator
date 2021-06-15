@@ -323,7 +323,17 @@ void tst_IVModel::testConnectionQuery()
 
 void tst_IVModel::testAvailableFunctionTypes()
 {
-    ivm::IVModel model(m_dynPropConfig);
+    ivm::IVModel sharedModel(m_dynPropConfig);
+    ivm::IVFunctionType sfnt1("sFnT1");
+    ivm::IVFunctionType sfnt2("sFnT2", &sharedModel);
+    ivm::IVFunctionType sfnt3("sFnT3", &sharedModel);
+    const int sharedFunctionTypesCount = 3;
+
+    const QVector<ivm::IVObject *> sharedObjects { &sfnt1, &sfnt2, &sfnt3 };
+    sharedModel.addObjects(sharedObjects);
+    QCOMPARE(sharedModel.objects().size(), sharedFunctionTypesCount);
+
+    ivm::IVModel model(m_dynPropConfig, &sharedModel);
 
     ivm::IVFunction container1("Container1");
     ivm::IVFunction container2("Container2", &container1);
@@ -343,18 +353,6 @@ void tst_IVModel::testAvailableFunctionTypes()
 
     model.addObjects(objects);
     QCOMPARE(model.objects().size(), functionsCount + functionTypesCount);
-
-    ivm::IVModel sharedModel(m_dynPropConfig);
-    ivm::IVFunctionType sfnt1("sFnT1");
-    ivm::IVFunctionType sfnt2("sFnT2", &sharedModel);
-    ivm::IVFunctionType sfnt3("sFnT3", &sharedModel);
-    const int sharedFunctionTypesCount = 3;
-
-    const QVector<ivm::IVObject *> sharedObjects { &sfnt1, &sfnt2, &sfnt3 };
-    sharedModel.addObjects(sharedObjects);
-    QCOMPARE(sharedModel.objects().size(), sharedFunctionTypesCount);
-
-    model.setSharedTypesModel(&sharedModel);
 
     const auto availableTypes = model.getAvailableFunctionTypes(&container1);
     QCOMPARE(availableTypes.size(), functionTypesCount + sharedFunctionTypesCount);

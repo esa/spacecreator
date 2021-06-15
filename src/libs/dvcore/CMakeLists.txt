@@ -5,8 +5,8 @@ add_library(${LIB_NAME} STATIC)
 target_sources(${LIB_NAME} PRIVATE
     dvboard.cpp
     dvboard.h
-    dvboardreader.cpp
-    dvboardreader.h
+    dvhwlibraryreader.cpp
+    dvhwlibraryreader.h
     dvcommonprops.cpp
     dvcommonprops.h
     dvconnection.cpp
