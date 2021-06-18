@@ -15,35 +15,13 @@
    along with this program. If not, see <https://www.gnu.org/licenses/lgpl-2.1.html>.
 */
 
-#pragma once
+#include "abstractsystemchecks.h"
 
-#include "dvobject.h"
+namespace dve {
 
-#include <QPointer>
-#include <memory>
-
-namespace dvm {
-class DVFunction;
-struct DVPartitionPrivate;
-
-class DVPartition : public DVObject
+AbstractSystemChecks::AbstractSystemChecks(QObject *parent)
+    : QObject(parent)
 {
-    Q_OBJECT
-public:
-    explicit DVPartition(DVObject *parent = nullptr);
-    ~DVPartition() override;
+}
 
-    void addFunction(DVFunction *function);
-    void removeFunction(DVFunction *function);
-    QList<QPointer<DVFunction>> functions() const;
-    QStringList functionsNames() const;
-
-Q_SIGNALS:
-    void functionAdded(shared::Id id);
-    void functionRemoved(shared::Id id);
-
-private:
-    std::unique_ptr<DVPartitionPrivate> d;
-};
-
-} // namespace deploy
+} // namespace dve

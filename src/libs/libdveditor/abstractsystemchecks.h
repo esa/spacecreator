@@ -17,33 +17,21 @@
 
 #pragma once
 
-#include "dvobject.h"
+#include <QObject>
 
-#include <QPointer>
-#include <memory>
+namespace dve {
 
-namespace dvm {
-class DVFunction;
-struct DVPartitionPrivate;
-
-class DVPartition : public DVObject
+class AbstractSystemChecks : public QObject
 {
     Q_OBJECT
 public:
-    explicit DVPartition(DVObject *parent = nullptr);
-    ~DVPartition() override;
+    explicit AbstractSystemChecks(QObject *parent = nullptr);
 
-    void addFunction(DVFunction *function);
-    void removeFunction(DVFunction *function);
-    QList<QPointer<DVFunction>> functions() const;
-    QStringList functionsNames() const;
+    virtual ~AbstractSystemChecks() override = default;
+    virtual QStringList functionsNames() const = 0;
 
 Q_SIGNALS:
-    void functionAdded(shared::Id id);
-    void functionRemoved(shared::Id id);
-
-private:
-    std::unique_ptr<DVPartitionPrivate> d;
+    void ivDataReset();
 };
 
-} // namespace deploy
+} // namespace dve

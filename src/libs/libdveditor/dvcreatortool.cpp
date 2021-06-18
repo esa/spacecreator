@@ -17,15 +17,20 @@
 
 #include "dvcreatortool.h"
 
+#include "abstractsystemchecks.h"
 #include "commands/cmdconnectionentitycreate.h"
 #include "commands/cmdentitiesremove.h"
 #include "commands/cmdentitygeometrychange.h"
+#include "commands/cmdfunctionbind.h"
+#include "commands/cmdfunctionunbind.h"
 #include "commands/cmdpartitionentitycreate.h"
 #include "commandsstackbase.h"
 #include "connectioncreationvalidator.h"
 #include "dvconnectiongraphicsitem.h"
 #include "dvdevicegraphicsitem.h"
+#include "dvfunction.h"
 #include "dvnodegraphicsitem.h"
+#include "dvpartitiongraphicsitem.h"
 #include "graphicsitemhelpers.h"
 #include "graphicsviewutils.h"
 #include "ui/veconnectiongraphicsitem.h"
@@ -56,6 +61,11 @@ DVCreatorTool::DVCreatorTool(
 }
 
 DVCreatorTool::~DVCreatorTool() { }
+
+void DVCreatorTool::setSystemChecker(AbstractSystemChecks *checker)
+{
+    m_sysChecker = checker;
+}
 
 void DVCreatorTool::removeSelectedItems()
 {
@@ -316,6 +326,88 @@ void DVCreatorTool::populateContextMenu_commonCreate(QMenu *menu, const QPointF 
 void DVCreatorTool::populateContextMenu_user(QMenu *menu, const QPointF &scenePos)
 {
     /// TODO:
+}
+
+void DVCreatorTool::populateContextMenu_commonEdit(QMenu *menu, const QPointF &scenePos)
+{
+    CreatorTool::populateContextMenu_commonEdit(menu, scenePos);
+    if (!m_sysChecker) {
+        return;
+    }
+    QGraphicsItem *item = m_view->scene()->itemAt(scenePos, m_view->transform());
+    if (!item || item->type() != DVPartitionGraphicsItem::Type) {
+        return;
+    }
+    auto partitionItem = qgraphicsitem_cast<DVPartitionGraphicsItem *>(item);
+    if (!partitionItem) {
+        return;
+    }
+    dvm::DVPartition *partition = partitionItem->entity();
+    if (!partition) {
+        return;
+    }
+
+    QMenu *bindingMenu = menu->addMenu(tr("Bindings"));
+
+    const QStringList allFunctions = m_sysChecker->functionsNames();
+    const QVector<dvm::DVFunction *> allBoundFunctionsEntities =
+            model()->objectsModel()->allObjectsByType<dvm::DVFunction>();
+    QStringList nonboundFunctions;
+    for (const QString &fnName : qAsConst(allFunctions)) {
+        auto it = std::find_if(allBoundFunctionsEntities.cbegin(), allBoundFunctionsEntities.cend(),
+                [fnName](const dvm::DVFunction *fn) { return fn->title() == fnName; });
+        if (it == allBoundFunctionsEntities.cend()) {
+            nonboundFunctions.append(fnName);
+        }
+    }
+    QAction *action = bindingMenu->addAction(tr("Bind All"));
+    QMenu *bindMenu = bindingMenu->addMenu(tr("Bind"));
+    if (nonboundFunctions.isEmpty()) {
+        action->setEnabled(false);
+        bindMenu->setEnabled(false);
+    } else {
+        connect(action, &QAction::triggered, this, [this, partition, nonboundFunctions, cmdTitle = action->text()]() {
+            m_commandsStack->undoStack()->beginMacro(cmdTitle);
+            for (const QString &fn : qAsConst(nonboundFunctions)) {
+                auto cmd = new cmd::CmdFunctionBind(partition, fn);
+                m_commandsStack->push(cmd);
+            }
+            m_commandsStack->undoStack()->endMacro();
+        });
+        for (const QString &functionName : qAsConst(nonboundFunctions)) {
+            QAction *functionAction = bindMenu->addAction(functionName);
+            connect(functionAction, &QAction::triggered, this, [this, partition, functionName]() {
+                auto cmd = new cmd::CmdFunctionBind(partition, functionName);
+                m_commandsStack->push(cmd);
+            });
+        }
+    }
+
+    const QList<QPointer<dvm::DVFunction>> boundFunctionsEntities = partition->functions();
+    action = bindingMenu->addAction(tr("Unbind All"));
+    QMenu *unbindMenu = bindingMenu->addMenu(tr("Unbind"));
+    if (boundFunctionsEntities.isEmpty()) {
+        action->setEnabled(false);
+        unbindMenu->setEnabled(false);
+    } else {
+        connect(action, &QAction::triggered, this,
+                [this, boundFunctionsEntities, partition, cmdTitle = action->text()]() {
+                    m_commandsStack->undoStack()->beginMacro(cmdTitle);
+                    for (auto fn : boundFunctionsEntities) {
+                        auto cmd = new cmd::CmdFunctionUnbind(partition, fn);
+                        m_commandsStack->push(cmd);
+                    }
+                    m_commandsStack->undoStack()->endMacro();
+                });
+
+        for (dvm::DVFunction *function : qAsConst(boundFunctionsEntities)) {
+            QAction *functionAction = unbindMenu->addAction(function->title());
+            connect(functionAction, &QAction::triggered, this, [this, partition, function]() {
+                auto cmd = new cmd::CmdFunctionUnbind(partition, function);
+                m_commandsStack->push(cmd);
+            });
+        }
+    }
 }
 
 bool DVCreatorTool::handleConnectionCreate(const QPointF &pos)

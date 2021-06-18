@@ -37,12 +37,17 @@ DVPartition::~DVPartition() { }
 
 void DVPartition::addFunction(DVFunction *function)
 {
-    d->functions.append(function);
+    if (!d->functions.contains(function)) {
+        d->functions.append(function);
+        Q_EMIT functionAdded(function->id());
+    }
 }
 
 void DVPartition::removeFunction(DVFunction *function)
 {
-    d->functions.removeAll(function);
+    if (d->functions.removeAll(function)) {
+        Q_EMIT functionRemoved(function->id());
+    }
 }
 
 QList<QPointer<DVFunction>> DVPartition::functions() const

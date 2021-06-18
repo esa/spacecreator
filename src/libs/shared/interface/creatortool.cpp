@@ -263,8 +263,6 @@ void CreatorTool::populateContextMenu_propertiesDialog(QMenu *menu)
             connectionItem->layout();
             connectionItem->updateEntity();
         });
-        //        ActionsManager::registerAction(Q_FUNC_INFO, action, "Connection re-creation",
-        //                "Create a generic connection path instead of existing one");
     } else {
         menu->addSeparator();
         QAction *action = menu->addAction(tr("Properties"));
@@ -272,7 +270,6 @@ void CreatorTool::populateContextMenu_propertiesDialog(QMenu *menu)
 
         connect(action, &QAction::triggered,
                 [this, veIObj]() { Q_EMIT propertyEditorRequest(veIObj->entity()->id()); });
-        //        ActionsManager::registerAction(Q_FUNC_INFO, action, "Attributes", "Show attributes editor");
     }
 }
 

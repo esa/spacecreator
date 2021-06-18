@@ -21,6 +21,7 @@
 #include "baseitems/common/ivutils.h"
 #include "dvappmodel.h"
 #include "dveditorcore.h"
+#include "dvsystemchecks.h"
 #include "interface/interfacedocument.h"
 #include "iveditorcore.h"
 #include "ivsystemchecks.h"
@@ -240,6 +241,17 @@ QVector<IvSystemChecks *> SpaceCreatorProject::ivChecks() const
     return checks;
 }
 
+QVector<DvSystemChecks *> SpaceCreatorProject::dvChecks() const
+{
+    QVector<DvSystemChecks *> checks;
+    for (const QSharedPointer<dve::DVEditorCore> &core : m_dvStore) {
+        if (auto dvChecker = qobject_cast<scs::DvSystemChecks *>(core->systemChecker())) {
+            checks.append(dvChecker);
+        }
+    }
+    return checks;
+}
+
 /*!
    Removes all data that is stored here, but is not part of the project
  */
@@ -283,6 +295,10 @@ void SpaceCreatorProject::setDvData(const QString &fileName, QSharedPointer<dve:
 
     m_dvStore[fileName] = dvData;
     connect(dvData.data(), &shared::EditorCore::editedExternally, this, &scs::SpaceCreatorProject::editedExternally);
+    auto checker = new scs::DvSystemChecks(dvData.data());
+    checker->setDVCore(dvData.data());
+    checker->setIVCore(ivCore());
+    dvData->setSystemChecker(checker);
     Q_EMIT dvCoreAdded(dvData);
 }
 

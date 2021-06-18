@@ -37,8 +37,13 @@ namespace dvm {
 class DVBoardsModel;
 }
 
+namespace scs {
+class DVSystemChecks;
+}
+
 namespace dve {
 class DVAppModel;
+class AbstractSystemChecks;
 
 class DVEditorCore : public shared::EditorCore
 {
@@ -48,6 +53,9 @@ public:
     ~DVEditorCore() override;
 
     dve::DVAppModel *appModel() const;
+
+    void setSystemChecker(AbstractSystemChecks *checker);
+    AbstractSystemChecks *systemChecker() const;
 
     void addToolBars(QMainWindow *window) override;
 

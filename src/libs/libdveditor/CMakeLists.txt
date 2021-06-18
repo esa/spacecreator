@@ -59,6 +59,12 @@ target_sources(${LIB_NAME} PRIVATE
     graphicsitemhelpers.h
     dvvisualizationmodel.cpp
     dvvisualizationmodel.h
+    commands/cmdfunctionbind.cpp
+    commands/cmdfunctionbind.h
+    abstractsystemchecks.cpp
+    abstractsystemchecks.h
+    commands/cmdfunctionunbind.cpp
+    commands/cmdfunctionunbind.h
 )
 
 target_link_libraries(${LIB_NAME}

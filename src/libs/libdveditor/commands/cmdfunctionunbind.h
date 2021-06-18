@@ -17,20 +17,31 @@
 
 #pragma once
 
+#include "undocommand.h"
+
+#include <QPointer>
+
+namespace dvm {
+class DVPartition;
+class DVFunction;
+} // namespace dvm
+
 namespace dve {
 namespace cmd {
 
-enum Id
+class CmdFunctionUnbind : public shared::UndoCommand
 {
-    CreateBoardEntity,
-    CreatePartitionEntity,
-    CreateConnectionEntity,
-    CreateDeviceEntity,
-    BindFunctionEntity,
-    UnbindFunctionEntity,
-    RemoveEntity,
-    LastId
+    Q_OBJECT
+public:
+    explicit CmdFunctionUnbind(dvm::DVPartition *partition, dvm::DVFunction *function);
+    void redo() override;
+    void undo() override;
+    int id() const override;
+
+private:
+    QPointer<dvm::DVPartition> m_partition;
+    QPointer<dvm::DVFunction> m_function;
 };
 
-}
-}
+} // namespace cmd
+} // namespace dve

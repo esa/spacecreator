@@ -17,33 +17,48 @@
 
 #pragma once
 
-#include "dvobject.h"
+#include "abstractsystemchecks.h"
 
 #include <QPointer>
-#include <memory>
+#include <QSharedPointer>
 
-namespace dvm {
-class DVFunction;
-struct DVPartitionPrivate;
+namespace dve {
+class DVEditorCore;
+}
 
-class DVPartition : public DVObject
+namespace ive {
+class IVEditorCore;
+}
+
+namespace ivm {
+class IVModel;
+}
+
+namespace scs {
+
+class DvSystemChecks : public dve::AbstractSystemChecks
 {
     Q_OBJECT
 public:
-    explicit DVPartition(DVObject *parent = nullptr);
-    ~DVPartition() override;
+    explicit DvSystemChecks(QObject *parent = nullptr);
+    ~DvSystemChecks() override = default;
 
-    void addFunction(DVFunction *function);
-    void removeFunction(DVFunction *function);
-    QList<QPointer<DVFunction>> functions() const;
-    QStringList functionsNames() const;
+    void setIVCore(QSharedPointer<ive::IVEditorCore> ivCore);
+    QSharedPointer<ive::IVEditorCore> ivCore() const;
+
+    void setDVCore(dve::DVEditorCore *dvCore);
+    dve::DVEditorCore *dvCore() const;
+
+    QStringList functionsNames() const override;
+
+    ivm::IVModel *ivModel() const;
 
 Q_SIGNALS:
-    void functionAdded(shared::Id id);
-    void functionRemoved(shared::Id id);
+    void ivDataReset();
 
 private:
-    std::unique_ptr<DVPartitionPrivate> d;
+    QSharedPointer<ive::IVEditorCore> m_ivCore;
+    QPointer<dve::DVEditorCore> m_dvCore;
 };
 
-} // namespace deploy
+} // namespace scs

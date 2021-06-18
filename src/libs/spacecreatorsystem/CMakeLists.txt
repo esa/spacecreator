@@ -9,6 +9,8 @@ target_sources(${LIB_NAME} PRIVATE
     mscsystemchecks.h
     spacecreatorproject.cpp
     spacecreatorproject.h
+    dvsystemchecks.cpp
+    dvsystemchecks.h
 )
 
 target_include_directories(${LIB_NAME}

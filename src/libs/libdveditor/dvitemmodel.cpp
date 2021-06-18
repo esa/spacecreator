@@ -55,6 +55,13 @@ shared::ui::VEInteractiveObject *DVItemModel::createItem(shared::Id objectId)
     QGraphicsItem *parentItem = obj->parentObject() ? m_items.value(obj->parentObject()->id()) : nullptr;
 
     switch (obj->type()) {
+    case dvm::DVObject::Type::Function: {
+        if (dvm::DVObject *parent = obj->parentObject()) {
+            if (QGraphicsItem *gi = getItem(parent->id())) {
+                gi->update();
+            }
+        }
+    } break;
     case dvm::DVObject::Type::Node: {
         return new DVNodeGraphicsItem(obj->as<dvm::DVNode *>(), parentItem);
     } break;

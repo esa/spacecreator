@@ -17,6 +17,7 @@
 
 #include "dveditorcore.h"
 
+#include "abstractsystemchecks.h"
 #include "abstractvisualizationmodel.h"
 #include "baseitems/graphicsview.h"
 #include "commands/cmdnodeentitycreate.h"
@@ -72,6 +73,9 @@ struct DVEditorCore::DVEditorCorePrivate {
     std::unique_ptr<shared::AbstractVisualizationModel> m_hwVisualizationModel;
     std::unique_ptr<dve::DVCreatorTool> m_creatorTool;
     std::unique_ptr<dve::DVExporter> m_exporter;
+
+    dve::AbstractSystemChecks *m_systemChecks = nullptr;
+
     QPointer<QToolBar> m_toolBar;
     QVector<QAction *> m_actions;
     QPointer<DVAppWidget> m_mainWidget;
@@ -92,6 +96,26 @@ DVEditorCore::~DVEditorCore() { }
 DVAppModel *DVEditorCore::appModel() const
 {
     return d->m_appModel.get();
+}
+
+void DVEditorCore::setSystemChecker(AbstractSystemChecks *checker)
+{
+    if (d->m_systemChecks == checker) {
+        return;
+    }
+
+    if (d->m_systemChecks && d->m_systemChecks->parent() == this) {
+        delete d->m_systemChecks;
+    }
+    d->m_systemChecks = checker;
+    if (d->m_creatorTool) {
+        d->m_creatorTool->setSystemChecker(checker);
+    }
+}
+
+AbstractSystemChecks *DVEditorCore::systemChecker() const
+{
+    return d->m_systemChecks;
 }
 
 void DVEditorCore::addToolBars(QMainWindow *window)
@@ -144,6 +168,7 @@ QVector<QAction *> DVEditorCore::initActions()
     actionGroup->setExclusive(true);
     d->m_creatorTool.reset(
             new DVCreatorTool(d->m_mainWidget->graphicsView(), d->m_model.get(), d->m_appModel->commandsStack()));
+    d->m_creatorTool->setSystemChecker(d->m_systemChecks);
 
     connect(d->m_creatorTool.get(), &DVCreatorTool::created, this, [this, actionGroup]() {
         if (QAction *currentAction = actionGroup->checkedAction())

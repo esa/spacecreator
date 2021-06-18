@@ -28,6 +28,12 @@ DVPartitionGraphicsItem::DVPartitionGraphicsItem(dvm::DVPartition *partition, QG
 {
 }
 
+void DVPartitionGraphicsItem::init()
+{
+    connect(entity(), &dvm::DVPartition::functionAdded, this, [this]() { update(); });
+    connect(entity(), &dvm::DVPartition::functionRemoved, this, [this]() { update(); });
+}
+
 dvm::DVPartition *DVPartitionGraphicsItem::entity() const
 {
     return m_dataObject.isNull() ? nullptr : m_dataObject->as<dvm::DVPartition *>();

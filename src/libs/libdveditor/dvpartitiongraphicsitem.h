@@ -35,6 +35,8 @@ public:
         Type = UserType + static_cast<int>(dvm::DVObject::Type::Partition)
     };
 
+    void init() override;
+
     dvm::DVPartition *entity() const override;
     QSizeF minimalSize() const override;
 
