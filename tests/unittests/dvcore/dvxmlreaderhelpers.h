@@ -21,6 +21,15 @@ static inline QByteArray singleNode()
                       "</DeploymentView>");
 }
 
+static inline QByteArray singleNodeWithProperty()
+{
+    return QByteArray("<DeploymentView>"
+                      "    <Node name=\"node_linux\">"
+                      "         <Property name=\"Taste::coordinates\" value=\" 54900 69600 62900 77600 \"/>"
+                      "    </Node>"
+                      "</DeploymentView>");
+}
+
 static inline QByteArray unknownProperty()
 {
     return QByteArray("<DeploymentView>"

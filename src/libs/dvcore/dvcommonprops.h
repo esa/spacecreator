@@ -33,6 +33,8 @@ public:
         DeploymentView,
 
         // tags:
+        Property,
+
         Node,
         Partition,
         Device,
@@ -45,6 +47,8 @@ public:
 
         // attrs:
         name,
+        value,
+
         from_node,
         from_port,
         to_bus,

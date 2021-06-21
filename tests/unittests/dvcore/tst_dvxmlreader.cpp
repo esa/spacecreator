@@ -15,10 +15,12 @@
   along with this program. If not, see <https://www.gnu.org/licenses/lgpl-2.1.html>.
 */
 
+#include "dvcommonprops.h"
 #include "dvobject.h"
 #include "dvpartition.h"
 #include "dvxmlreader.h"
 #include "dvxmlreaderhelpers.h"
+#include "entityattribute.h"
 
 #include <QtTest>
 
@@ -34,6 +36,7 @@ private Q_SLOTS:
     void tst_emptyDeploymentViewDoc();
     void tst_singleItems();
     void tst_functions();
+    void tst_property();
 };
 
 void DVXMLReaderTest::runReader(const QByteArray &content, const int expectedObjectCount, const bool canBeParsed,
@@ -124,6 +127,30 @@ void DVXMLReaderTest::tst_functions()
     partition = findPartition(objects);
     Q_ASSERT(partition);
     QCOMPARE(partition->functions().size(), 10);
+}
+
+void DVXMLReaderTest::tst_property()
+{
+    QBuffer buffer;
+    buffer.setData(helpers::singleNodeWithProperty());
+    if (!buffer.open(QIODevice::ReadOnly | QIODevice::Text)) {
+        return;
+    }
+
+    dvm::DVXMLReader reader;
+    const bool ok = reader.read(&buffer);
+    QVERIFY(ok);
+    if (ok) {
+        const QVector<dvm::DVObject *> objectsList = reader.parsedObjects();
+        QCOMPARE(objectsList.size(), 1);
+        const EntityAttribute attr =
+                objectsList.front()->entityAttribute(dvm::meta::Props::token(dvm::meta::Props::Token::coordinates));
+        QVERIFY(attr.isValid());
+        QVERIFY(attr.value().toString().split(QLatin1Char(' '), QString::SkipEmptyParts).size()
+                == 4); // rectangular geometry of Node
+    } else {
+        qWarning() << reader.errorString();
+    }
 }
 
 QTEST_APPLESS_MAIN(DVXMLReaderTest)

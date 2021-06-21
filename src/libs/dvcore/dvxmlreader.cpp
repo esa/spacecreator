@@ -96,7 +96,13 @@ void DVXMLReader::processTagOpen(QXmlStreamReader &xml)
     case meta::Props::Token::Connection: {
         obj = new dvm::DVConnection(d->m_currentObject);
     } break;
-
+    case meta::Props::Token::Property: {
+        if (d->m_currentObject) {
+            d->m_currentObject->setEntityProperty(attrs.value(meta::Props::token(meta::Props::Token::name)).toString(),
+                    attrs.value(meta::Props::token(meta::Props::Token::value)).toString());
+        }
+        break;
+    }
     default:
         static const QString msg("The '%1' is unknown/unexpected here: %2@%3 %4");
         qWarning() << msg.arg(

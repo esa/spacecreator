@@ -24,6 +24,8 @@ const QHash<QString, Props::Token> Props::TokensByName = {
     { "DeploymentView", Token::DeploymentView },
 
     // tags:
+    { "Property", Token::Property },
+
     { "Node", Token::Node },
     { "Partition", Token::Partition },
     { "Device", Token::Device },
@@ -32,6 +34,7 @@ const QHash<QString, Props::Token> Props::TokensByName = {
 
     // attrs:
     { "name", Token::name },
+    { "value", Token::value },
     { "port", Token::port },
     { "bus", Token::bus },
     { "from_node", Token::from_node },
