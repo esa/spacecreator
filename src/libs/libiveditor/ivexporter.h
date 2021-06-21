@@ -39,7 +39,7 @@ public:
     QString defaultTemplatePath() const override;
 
     bool exportObjects(
-            const QList<ivm::IVObject *> &objects, QBuffer *outBuffer, const QString &templatePath = QString());
+            const QList<shared::VEObject *> &objects, QBuffer *outBuffer, const QString &templatePath = QString());
 
     bool exportDocSilently(
             InterfaceDocument *doc, const QString &outPath = QString(), const QString &templatePath = QString());

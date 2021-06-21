@@ -46,8 +46,6 @@ MainWindow::MainWindow(dve::DVEditorCore *core, QWidget *parent)
     setCentralWidget(core->mainwidget());
     addToolBar(core->toolBar());
 
-    connect(m_core->actionOpenFile(), &QAction::triggered, this, &MainWindow::onOpenFileRequested);
-
     QString hwFile = shared::SettingsManager::load<QString>(shared::SettingsManager::DVE::HwLibraryFile, "");
     m_core->loadHWLibrary(hwFile);
 }
@@ -58,6 +56,16 @@ MainWindow::MainWindow(dve::DVEditorCore *core, QWidget *parent)
 MainWindow::~MainWindow()
 {
     delete ui;
+}
+
+void MainWindow::onSaveFileRequested()
+{
+    m_core->save();
+}
+
+void MainWindow::onSaveFileAsRequested()
+{
+    m_core->saveAs();
 }
 
 void MainWindow::onOpenFileRequested()
@@ -104,6 +112,11 @@ void MainWindow::closeEvent(QCloseEvent *e)
 void MainWindow::initActions()
 {
     // Connect the core actions
+    connect(m_core->actionOpenFile(), &QAction::triggered, this, &MainWindow::onOpenFileRequested);
+
+    connect(m_core->actionSaveFile(), &QAction::triggered, this, &MainWindow::onSaveFileRequested);
+    connect(m_core->actionSaveFileAs(), &QAction::triggered, this, &MainWindow::onSaveFileAsRequested);
+
     connect(m_core->actionQuit(), &QAction::triggered, this, &MainWindow::onQuitRequested);
 }
 
@@ -112,6 +125,8 @@ void MainWindow::initMenus()
     // Initialize the file menu
     auto menu = menuBar()->addMenu(tr("File"));
     menu->addAction(m_core->actionOpenFile());
+    menu->addAction(m_core->actionSaveFile());
+    menu->addAction(m_core->actionSaveFileAs());
     menu->addSeparator();
     menu->addAction(m_core->actionQuit());
 

@@ -61,7 +61,8 @@ QString IVExporter::defaultTemplatePath() const
    @param templatePath the grantlee template to use for the export. If empty, the default one is used
    @return true when the export was successful.
  */
-bool IVExporter::exportObjects(const QList<ivm::IVObject *> &objects, QBuffer *outBuffer, const QString &templatePath)
+bool IVExporter::exportObjects(
+        const QList<shared::VEObject *> &objects, QBuffer *outBuffer, const QString &templatePath)
 {
     const QHash<QString, QVariant> ivObjects = collectObjects(objects);
     return exportData(ivObjects, templatePath, outBuffer);

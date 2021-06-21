@@ -39,6 +39,8 @@ public:
     ~MainWindow() override;
 
 public Q_SLOTS:
+    void onSaveFileRequested();
+    void onSaveFileAsRequested();
     void onOpenFileRequested();
     void showColorScheme();
     void editHwLibrary();

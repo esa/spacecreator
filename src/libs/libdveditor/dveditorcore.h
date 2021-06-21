@@ -72,6 +72,7 @@ public:
 
     QString filePath() const override;
     bool save() override;
+    bool saveAs();
 
     void loadHWLibrary(const QString &directory);
 

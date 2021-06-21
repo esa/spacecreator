@@ -33,3 +33,6 @@ public:
 };
 
 } // namespace dve
+
+Q_DECLARE_METATYPE(dve::ExportableDVDevice)
+Q_DECLARE_TYPEINFO(dve::ExportableDVDevice, Q_MOVABLE_TYPE);

@@ -105,7 +105,7 @@ public:
 
     QList<QAction *> customActions() const;
 
-    QHash<shared::Id, ivm::IVObject *> objects() const;
+    QHash<shared::Id, shared::VEObject *> objects() const;
     ivm::IVModel *objectsModel() const;
     ivm::IVModel *importModel() const;
     IVItemModel *itemsModel() const;
@@ -154,10 +154,10 @@ private Q_SLOTS:
     void showContextMenuForIVModel(const QPoint &pos);
 
 private:
-    bool exportImpl(const QString &path, const QList<ivm::IVObject *> &objects);
+    bool exportImpl(const QString &path, const QList<shared::VEObject *> &objects);
     bool loadImpl(const QString &path, QStringList *warnings = nullptr);
     QString getComponentName(const QStringList &exportNames);
-    QList<ivm::IVObject *> prepareSelectedObjectsForExport(QString &name, bool silent = false);
+    QList<shared::VEObject *> prepareSelectedObjectsForExport(QString &name, bool silent = false);
     bool loadComponentModel(ivm::IVModel *model, const QString &path);
 
     QWidget *createGraphicsView();

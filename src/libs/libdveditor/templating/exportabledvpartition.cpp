@@ -17,11 +17,23 @@
 
 #include "exportabledvpartition.h"
 
+#include "dvfunction.h"
+#include "dvpartition.h"
+
 namespace dve {
 
 ExportableDVPartition::ExportableDVPartition(const dvm::DVObject *dvObject)
     : ExportableDVObject(dvObject)
 {
+}
+
+QVariantList ExportableDVPartition::functions() const
+{
+    QVariantList functions;
+    const dvm::DVPartition *o = exportedObject<dvm::DVPartition>();
+    for (const dvm::DVFunction *function : o->functions())
+        functions << function->title();
+    return functions;
 }
 
 } // namespace dve

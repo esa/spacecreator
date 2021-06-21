@@ -1,0 +1,1 @@
+addQtTest(tst_dvxmlexporter libdveditor)

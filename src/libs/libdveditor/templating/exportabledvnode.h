@@ -28,8 +28,17 @@ namespace dve {
 class ExportableDVNode : public ExportableDVObject
 {
     Q_GADGET
+    Q_PROPERTY(QVariantList partitions READ partitions)
+    Q_PROPERTY(QVariantList devices READ devices)
+
 public:
     explicit ExportableDVNode(const dvm::DVObject *dvObject = nullptr);
+
+    QVariantList partitions() const;
+    QVariantList devices() const;
 };
 
 } // namespace dve
+
+Q_DECLARE_METATYPE(dve::ExportableDVNode)
+Q_DECLARE_TYPEINFO(dve::ExportableDVNode, Q_MOVABLE_TYPE);

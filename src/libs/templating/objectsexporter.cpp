@@ -89,7 +89,7 @@ bool ObjectsExporter::exportData(const QHash<QString, QVariant> &data, const QSt
     QString usedTemplate(templatePath);
     if (usedTemplate.isEmpty()) {
         if (interaction == InteractionPolicy::Interactive) {
-            usedTemplate = QFileDialog::getOpenFileName(root, QObject::tr("Select a template for Interface doc"),
+            usedTemplate = QFileDialog::getOpenFileName(root, QObject::tr("Select a template"),
                     QFileInfo(defaultTemplatePath()).path(), QString("*.%1").arg(templateFileExtension()));
             if (usedTemplate.isEmpty())
                 return false;
@@ -100,7 +100,7 @@ bool ObjectsExporter::exportData(const QHash<QString, QVariant> &data, const QSt
 
     QString savePath(outPath);
     if (savePath.isEmpty()) {
-        QFileDialog dialog(root, QObject::tr("Export Interface to an XML file"));
+        QFileDialog dialog(root, QObject::tr("Export data to an XML file"));
         dialog.setAcceptMode(QFileDialog::AcceptSave);
         dialog.setDefaultSuffix(".xml");
         if (dialog.exec() == QDialog::Accepted) {

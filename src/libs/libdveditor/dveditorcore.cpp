@@ -262,7 +262,12 @@ QString DVEditorCore::filePath() const
 
 bool DVEditorCore::save()
 {
-    return false;
+    return d->m_exporter->exportObjectsSilently(d->m_appModel->objectsModel()->objects().values(), filePath());
+}
+
+bool DVEditorCore::saveAs()
+{
+    return d->m_exporter->exportObjectsInteractively(d->m_appModel->objectsModel()->objects().values(), filePath());
 }
 
 /*!

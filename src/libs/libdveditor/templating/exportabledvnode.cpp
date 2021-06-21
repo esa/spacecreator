@@ -17,11 +17,31 @@
 
 #include "exportabledvnode.h"
 
+#include "dvdevice.h"
+#include "dvnode.h"
+#include "dvpartition.h"
+
 namespace dve {
 
 ExportableDVNode::ExportableDVNode(const dvm::DVObject *dvObject)
     : ExportableDVObject(dvObject)
 {
+}
+
+QVariantList ExportableDVNode::partitions() const
+{
+    QVariantList partitions;
+    for (const dvm::DVPartition *partition : exportedObject<dvm::DVNode>()->partitions())
+        partitions << createFrom(partition);
+    return partitions;
+}
+
+QVariantList ExportableDVNode::devices() const
+{
+    QVariantList devices;
+    for (const dvm::DVDevice *device : exportedObject<dvm::DVNode>()->devices())
+        devices << createFrom(device);
+    return devices;
 }
 
 } // namespace dve

@@ -33,3 +33,6 @@ public:
 };
 
 } // namespace dve
+
+Q_DECLARE_METATYPE(dve::ExportableDVConnection)
+Q_DECLARE_TYPEINFO(dve::ExportableDVConnection, Q_MOVABLE_TYPE);

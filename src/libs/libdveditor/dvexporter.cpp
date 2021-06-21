@@ -37,15 +37,31 @@ QString DVExporter::defaultTemplatePath() const
     return QString("%1/aadl_xml/deploymentview.%2").arg(templatesPath(), templateFileExtension());
 }
 
-bool DVExporter::exportObjects(const QList<dvm::DVObject *> &objects, QBuffer *outBuffer, const QString &templatePath)
+bool DVExporter::exportObjects(
+        const QList<shared::VEObject *> &objects, QBuffer *outBuffer, const QString &templatePath)
 {
     const QHash<QString, QVariant> dvObjects = collectObjects(objects);
     return exportData(dvObjects, templatePath, outBuffer);
 }
 
+bool DVExporter::exportObjectsInteractively(
+        const QList<shared::VEObject *> &objects, const QString &outPath, const QString &templatePath, QWidget *root)
+{
+    const QHash<QString, QVariant> dvObjects = collectObjects(objects);
+    return exportData(dvObjects, outPath, templatePath, InteractionPolicy::Interactive, root);
+}
+
+bool DVExporter::exportObjectsSilently(
+        const QList<shared::VEObject *> &objects, const QString &outPath, const QString &templatePath)
+{
+    const QHash<QString, QVariant> dvObjects = collectObjects(objects);
+    return exportData(dvObjects, outPath, templatePath, InteractionPolicy::Silently);
+}
+
 DVExporter::DVExporter(QObject *parent)
     : templating::ObjectsExporter(parent)
 {
+    ensureDefaultTemplatesDeployed(QLatin1String(":/defaults/templating/xml_templates"));
 }
 
 QVariant DVExporter::createFrom(const shared::VEObject *object) const
@@ -59,12 +75,8 @@ QString DVExporter::groupName(const shared::VEObject *object) const
         switch (dvObject->type()) {
         case dvm::DVObject::Type::Node:
             return QStringLiteral("Nodes");
-        case dvm::DVObject::Type::Partition:
-            return QStringLiteral("Partitions");
         case dvm::DVObject::Type::Connection:
             return QStringLiteral("Connections");
-        case dvm::DVObject::Type::Device:
-            return QStringLiteral("Devices");
         default:
             return {};
         }

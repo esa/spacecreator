@@ -308,9 +308,9 @@ QString InterfaceDocument::getComponentName(const QStringList &exportNames)
     return name;
 }
 
-QList<ivm::IVObject *> InterfaceDocument::prepareSelectedObjectsForExport(QString &name, bool silent)
+QList<shared::VEObject *> InterfaceDocument::prepareSelectedObjectsForExport(QString &name, bool silent)
 {
-    QList<ivm::IVObject *> objects;
+    QList<shared::VEObject *> objects;
     QStringList exportNames;
     for (const auto id : d->objectsSelectionModel->selection().indexes()) {
         const int role = static_cast<int>(ive::IVVisualizationModelBase::IdRole);
@@ -327,7 +327,7 @@ QList<ivm::IVObject *> InterfaceDocument::prepareSelectedObjectsForExport(QStrin
         ivm::IVFunction *dummyFunction = new ivm::IVFunction(name);
         for (auto object : objects) {
             if (!object->parentObject()) {
-                dummyFunction->addChild(object);
+                dummyFunction->addChild(object->as<ivm::IVObject *>());
             }
         }
         objects.prepend(dummyFunction);
@@ -338,7 +338,7 @@ QList<ivm::IVObject *> InterfaceDocument::prepareSelectedObjectsForExport(QStrin
 bool InterfaceDocument::exportSelectedFunctions()
 {
     QString name;
-    const QList<ivm::IVObject *> objects = prepareSelectedObjectsForExport(name);
+    const QList<shared::VEObject *> objects = prepareSelectedObjectsForExport(name);
     d->objectsSelectionModel->clearSelection();
     const QString path = componentsLibraryPath() + name;
     if (exportImpl(path, objects)) {
@@ -517,14 +517,9 @@ QList<QAction *> InterfaceDocument::customActions() const
     return actions;
 }
 
-QHash<shared::Id, ivm::IVObject *> InterfaceDocument::objects() const
+QHash<shared::Id, shared::VEObject *> InterfaceDocument::objects() const
 {
-    QHash<shared::Id, ivm::IVObject *> result;
-    for (auto obj : d->objectsModel->objects()) {
-        result[obj->id()] = obj->as<ivm::IVObject *>();
-    }
-
-    return result;
+    return d->objectsModel->objects();
 }
 
 ivm::IVModel *InterfaceDocument::objectsModel() const
@@ -808,7 +803,7 @@ void InterfaceDocument::copyItems()
     }
 
     QString name;
-    const QList<ivm::IVObject *> objects = prepareSelectedObjectsForExport(name, true);
+    const QList<shared::VEObject *> objects = prepareSelectedObjectsForExport(name, true);
     if (!d->exporter->exportObjects(objects, &buffer)) {
         qWarning() << "Error during component export";
         return;
@@ -889,7 +884,7 @@ void InterfaceDocument::showContextMenuForIVModel(const QPoint &pos)
     menu->exec(d->objectsView->mapToGlobal(pos));
 }
 
-bool InterfaceDocument::exportImpl(const QString &targetDir, const QList<ivm::IVObject *> &objects)
+bool InterfaceDocument::exportImpl(const QString &targetDir, const QList<shared::VEObject *> &objects)
 {
     const bool ok = shared::ensureDirExists(targetDir);
     if (!ok) {
@@ -928,8 +923,8 @@ bool InterfaceDocument::exportImpl(const QString &targetDir, const QList<ivm::IV
     }
 
     const QFileInfo ivPath(path());
-    for (ivm::IVObject *object : objects) {
-        if (object->type() == ivm::IVObject::Type::Function) {
+    for (shared::VEObject *object : objects) {
+        if (auto fn = object->as<ivm::IVFunction *>()) {
             const QString subPath = QStringLiteral("work/%1").arg(object->title()).toLower();
             const QString targetExportDir { componentsLibraryPath() + QDir::separator() + subPath };
             const QString sourceExportDir { ivPath.absolutePath() + QDir::separator() + subPath };

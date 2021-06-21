@@ -1,5 +1,28 @@
 {% comment %}
-Template for generation of XML scheme of the whole deployment view.
+    Template for generation of XML scheme of the whole deployment view.
 {% endcomment %}
 <DeploymentView>
+{% for node in Nodes %}
+    <Node{% for attr in node.attributes %} {{ attr.name }}="{{ attr.value }}"{% endfor %}>
+    {% for prop in node.properties %}
+        <Property name="{{ prop.name }}" value="{{ prop.value }}"/>
+    {% endfor %}
+    {% for partition in node.partitions %}
+        <Partition{% for attr in partition.attributes %} {{ attr.name }}="{{ attr.value }}"{% endfor %}>
+        {% for prop in partition.properties %}
+            <Property name="{{ prop.name }}" value="{{ prop.value }}"/>
+        {% endfor %}
+        {% for function in partition.functions %}
+            <function>{{ function }}</function>
+        {% endfor %}
+        </Partition>
+    {% endfor %}
+    {% for device in node.devices %}
+        <Device{% for attr in device.attributes %} {{ attr.name }}="{{ attr.value }}"{% endfor %}/>
+    {% endfor %}
+    </Node>
+{% endfor %}
+{% for connection in Connections %}
+    <Connection {% for attr in connection.attributes %} {{ attr.name }}="{{ attr.value }}"{% endfor %}/>
+{% endfor %}
 </DeploymentView>

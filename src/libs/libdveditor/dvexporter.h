@@ -35,7 +35,13 @@ public:
     QString defaultTemplatePath() const override;
 
     bool exportObjects(
-            const QList<dvm::DVObject *> &objects, QBuffer *outBuffer, const QString &templatePath = QString());
+            const QList<shared::VEObject *> &objects, QBuffer *outBuffer, const QString &templatePath = QString());
+
+    bool exportObjectsInteractively(const QList<shared::VEObject *> &objects, const QString &outPath = QString(),
+            const QString &templatePath = QString(), QWidget *root = nullptr);
+
+    bool exportObjectsSilently(const QList<shared::VEObject *> &objects, const QString &outPath = QString(),
+            const QString &templatePath = QString());
 
 private:
     /**

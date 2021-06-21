@@ -28,8 +28,15 @@ namespace dve {
 class ExportableDVPartition : public ExportableDVObject
 {
     Q_GADGET
+    Q_PROPERTY(QVariantList functions READ functions)
+
 public:
     explicit ExportableDVPartition(const dvm::DVObject *dvObject = nullptr);
+
+    QVariantList functions() const;
 };
 
 } // namespace dve
+
+Q_DECLARE_METATYPE(dve::ExportableDVPartition)
+Q_DECLARE_TYPEINFO(dve::ExportableDVPartition, Q_MOVABLE_TYPE);
