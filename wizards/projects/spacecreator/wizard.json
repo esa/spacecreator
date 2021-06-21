@@ -16,6 +16,7 @@
         { "key": "CMakeFile", "value": "%{ProjectDirectory}/CMakeLists.txt" },
         { "key": "AsnFile", "value": "%{ProjectName}.asn" },
         { "key": "MSCFile", "value": "%{ProjectName}.msc" },
+        { "key": "DVFile", "value": "deploymentview.dv.xml" },
         { "key": "IVFile", "value": "interfaceview.xml" },
         { "key": "MSCAsnFile", "value": "    language ASN.1;\n    data %{AsnFile};" },
         { "key": "IVAsnFile", "value": " asn1file=\"%{AsnFile}\"" }
@@ -127,6 +128,11 @@
                 {
                     "source": "empty.msc",
                     "target": "%{MSCFile}",
+                    "openInEditor": false
+                },
+                {
+                    "source": "deploymentview.dv.xml",
+                    "target": "%{DVFile}",
                     "openInEditor": false
                 },
                 {
