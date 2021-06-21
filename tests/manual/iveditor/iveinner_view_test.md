@@ -6,7 +6,7 @@
 
 Expected results:
 
-* Diagram shouldn't reflect items geometry from Inner View
+* Diagram should reflect items geometry from Inner View
 
 
 **2. Steps:**
