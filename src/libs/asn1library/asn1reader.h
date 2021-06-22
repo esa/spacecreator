@@ -66,8 +66,6 @@ private:
     QByteArray fileHash(const QString &fileName) const;
     bool convertToXML(const QString &asn1FileName, const QString &xmlFilename, QStringList *errorMessages) const;
 
-    static QString m_mono;
-
     static QCache<QString, QString> m_cache;
 };
 

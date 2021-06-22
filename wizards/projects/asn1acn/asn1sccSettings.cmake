@@ -27,7 +27,7 @@ option(ASN1SCC_GENERATE_ADA "Generate Ada code from ASN.1" OFF)
 if(NOT ASN1SCC)
   set(ASN1SCC $ENV{ASN1SCC})
   if(NOT ASN1SCC)
-    set(ASN1SCC asn1.exe)
+    set(ASN1SCC asn1scc)
   endif()
 endif()
 

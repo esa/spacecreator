@@ -32,7 +32,7 @@
 namespace Asn1Acn {
 
 /*!
-   Parses error output of asn1.exe commands
+   Parses error output of asn1scc commands
  */
 class ErrorMessageParser
 {

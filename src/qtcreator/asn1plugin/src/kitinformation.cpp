@@ -26,6 +26,7 @@
 
 #include "asn1reader.h"
 #include <QFileInfo>
+#include <QStandardPaths>
 
 #include <coreplugin/icore.h>
 #include <projectexplorer/projectexplorerconstants.h>
@@ -76,9 +77,13 @@ QVariant KitInformation::defaultValue(const Kit *k) const
     QString path = reader.checkforCompiler();
 
     if (path.isEmpty()) {
-        path = Core::ICore::libexecPath() + QLatin1String("/asn1scc/asn1.exe");
+        path = QStandardPaths::writableLocation(QStandardPaths::HomeLocation)
+               + QLatin1String("/tool-inst/share/asn1scc/asn1scc");
         if (!QFileInfo::exists(path)) {
-            path.clear();
+            path = Core::ICore::libexecPath() + QLatin1String("/asn1scc/asn1scc");
+            if (!QFileInfo::exists(path)) {
+                path.clear();
+            }
         }
     }
     return path;

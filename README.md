@@ -8,7 +8,6 @@ This repository depends on these parts:
 * Java SE 8
 * On Windows: Visual Studio 2017 or 2019
 * CMake
-* On Linux: Mono (On debian, install package mono-complete)
 * ASN1 compiler (binary build from https://github.com/ttsiodras/asn1scc/releases)
 
 Custom Qt Creator build (for plugins) also needs:

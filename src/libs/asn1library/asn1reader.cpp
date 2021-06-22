@@ -33,7 +33,6 @@
 
 namespace Asn1Acn {
 
-QString Asn1Reader::m_mono;
 QCache<QString, QString> Asn1Reader::m_cache {};
 
 #ifdef Q_OS_WIN
@@ -240,8 +239,8 @@ QString Asn1Reader::asn1AsHtml(const QString &filename) const
 #ifdef Q_OS_WIN
         QString cmd = QString("asn1 -customStg \"%1::%2 %3\"").arg(prettyPrintFileName, asn1HtmlFileName, filename);
 #else
-        QString cmd = QString("%1 %2 -customIcdUper %3::%4 %5")
-                              .arg(m_mono, asn1Compiler, prettyPrintFileName, asn1HtmlFileName, filename);
+        QString cmd = QString("%1 -customIcdUper %2::%3 %4")
+                              .arg(asn1Compiler, prettyPrintFileName, asn1HtmlFileName, filename);
 #endif
         QProcess process;
         process.setProcessEnvironment(QProcessEnvironment::systemEnvironment());
@@ -268,8 +267,8 @@ QString Asn1Reader::asn1AsHtml(const QString &filename) const
 }
 
 /*!
-   Does search in the system path for asn1.exe and returns the full file path.
-   An empty string is retunred if asn1.exe was not found.
+   Does search in the system path for asn1scc and returns the full file path.
+   An empty string is retunred if asn1scc was not found.
  */
 QString Asn1Reader::checkforCompiler() const
 {
@@ -279,7 +278,7 @@ QString Asn1Reader::checkforCompiler() const
     process.waitForFinished();
     QString asn1Exec = process.readAll();
     asn1Exec.remove("\r\n");
-    asn1Exec.remove("asn1.exe");
+    asn1Exec.remove("asn1scc.exe");
     if (asn1Exec.isEmpty()) {
         qWarning() << tr("Unable to find the asn1scc compiler");
         return {};
@@ -287,24 +286,18 @@ QString Asn1Reader::checkforCompiler() const
     return asn1Exec;
 #else
     QProcess process;
-    process.start(QString("which asn1.exe"));
+    process.start(QString("which asn1scc"));
     process.waitForFinished();
     QString asn1Exec = process.readAll();
     asn1Exec.remove('\n');
     if (asn1Exec.isEmpty()) {
-        qWarning() << tr("Unable to find the asn1scc compiler");
-        return {};
+        asn1Exec = QStandardPaths::writableLocation(QStandardPaths::HomeLocation)
+                + QLatin1String("/tool-inst/share/asn1scc/asn1scc");
+        if (!QFileInfo::exists(asn1Exec)) {
+            qWarning() << tr("Unable to find the asn1scc compiler");
+            return {};
+        }
     }
-
-    process.start(QString("which mono"));
-    process.waitForFinished();
-    m_mono = process.readAll();
-    m_mono.remove('\n');
-    if (m_mono.isEmpty()) {
-        qWarning() << tr("Unable to find the mono framework to run the asn1scc compiler");
-        return {};
-    }
-
     return asn1Exec;
 #endif
 }
@@ -331,11 +324,7 @@ QString Asn1Reader::asn1CompilerCommand() const
     if (!asn1Compiler.isEmpty()) {
         QFileInfo asnFile(asn1Compiler);
         const QString param = parameter.contains("%1") ? parameter.arg(asnFile.path()) : parameter;
-        if (m_mono.isEmpty()) {
-            return QString("%1 %2").arg(asn1Compiler, param);
-        } else {
-            return QString("%1 %2 %3").arg(m_mono, asn1Compiler, param);
-        }
+        return QString("%1 %2").arg(asn1Compiler, param);
     } else {
         qWarning() << "No asn1scc compiler found";
         return {};
