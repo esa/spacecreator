@@ -93,7 +93,7 @@ public:
     void setVisible(bool isVisible);
     bool isVisible() const;
 
-    bool postInit(QString *warning = nullptr) override;
+    bool postInit() override;
     bool aboutToBeRemoved() override;
 
     static void sortObjectList(QList<ivm::IVObject *> &objects);

@@ -67,7 +67,7 @@ public:
         return selectIface<T>(sourceInterface(), targetInterface());
     }
 
-    bool postInit(QString *warning = nullptr) override;
+    bool postInit() override;
 
     struct EndPointInfo {
         QString m_functionName;
@@ -97,8 +97,8 @@ public:
 protected:
     explicit IVConnection(
             const IVObject::Type t, IVInterface *ifaceSource, IVInterface *ifaceTarget, QObject *parent = nullptr);
-    bool lookupEndpointsPostponed(QString *warning = nullptr);
-    bool needPostponedInit(QString *warning = nullptr) const;
+    bool lookupEndpointsPostponed();
+    bool needPostponedInit() const;
 
 private:
     const std::unique_ptr<IVConnectionPrivate> d;

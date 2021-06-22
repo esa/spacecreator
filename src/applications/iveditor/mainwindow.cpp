@@ -23,6 +23,7 @@
 #include "common.h"
 #include "context/action/actionsmanager.h"
 #include "endtoend/endtoendview.h"
+#include "errorhub.h"
 #include "interface/commands/cmdchangeasn1file.h"
 #include "interface/interfacedocument.h"
 #include "iveditorcore.h"
@@ -147,10 +148,10 @@ void MainWindow::onOpenFileRequested()
     const QString &fileName = QFileDialog::getOpenFileName(
             this, tr("Open file"), prevPath, m_core->document()->supportedFileExtensions());
     if (!fileName.isEmpty() && closeFile()) {
-        QStringList warnings;
-        m_core->document()->load(fileName, &warnings);
-        if (!warnings.isEmpty()) {
-            QMessageBox::warning(this, tr("File load warnings"), warnings.join("\n"));
+        shared::ErrorHub::clearErrors();
+        m_core->document()->load(fileName);
+        if (shared::ErrorHub::hasErrors()) {
+            QMessageBox::warning(this, tr("File load warnings"), shared::ErrorHub::errorDescriptions().join("\n"));
         }
     }
     updateActions();
@@ -262,10 +263,10 @@ bool MainWindow::processCommandLineArg(shared::CommandLineParser::Positional arg
     }
     case shared::CommandLineParser::Positional::OpenIVFile: {
         if (!value.isEmpty() && m_core->document() != nullptr) {
-            QStringList warnings;
-            bool ok = m_core->document()->load(value, &warnings);
-            if (!warnings.isEmpty()) {
-                QMessageBox::warning(this, tr("File load warnings"), warnings.join("\n"));
+            shared::ErrorHub::clearErrors();
+            bool ok = m_core->document()->load(value);
+            if (shared::ErrorHub::hasErrors()) {
+                QMessageBox::warning(this, tr("File load warnings"), shared::ErrorHub::errorDescriptions().join("\n"));
             }
             return ok;
         };

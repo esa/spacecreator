@@ -17,6 +17,7 @@
 
 #include "iveditordocument.h"
 
+#include "errorhub.h"
 #include "interface/interfacedocument.h"
 #include "iveditorcore.h"
 #include "ivexporter.h"
@@ -84,6 +85,8 @@ bool IVEditorDocument::save(QString *errorString, const QString &name, bool auto
         return false;
     }
     bool dirty = isModified();
+
+    shared::ErrorHub::clearFileErrors(actualName.toString());
 
     ive::InterfaceDocument *ivDocument = m_plugin->document();
     ivDocument->setPath(actualName.toString());

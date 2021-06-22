@@ -48,7 +48,7 @@ public:
     bool addChild(IVObject *child);
     bool removeChild(IVObject *child);
 
-    bool postInit(QString *warning = nullptr) override;
+    bool postInit() override;
 
     QVector<IVFunctionType *> functionTypes() const;
     QVector<IVFunction *> functions() const;

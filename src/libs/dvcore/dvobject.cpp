@@ -101,9 +101,8 @@ DVModel *DVObject::model() const
     return qobject_cast<DVModel *>(VEObject::model());
 }
 
-bool DVObject::postInit(QString *warning)
+bool DVObject::postInit()
 {
-    Q_UNUSED(warning)
     return true;
 }
 

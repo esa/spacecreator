@@ -44,14 +44,14 @@ public:
 
 public:
     template<typename T>
-    void initFromObjects(const QVector<T> &objects, QStringList *warnings = nullptr)
+    void initFromObjects(const QVector<T> &objects)
     {
         clear();
-        addObjects(objects, warnings);
+        addObjects(objects);
     }
 
     template<typename T>
-    void addObjects(const QVector<T> &objects, QStringList *warnings = nullptr)
+    void addObjects(const QVector<T> &objects)
     {
         QVector<T> addedObjects;
         for (auto obj : objects) {
@@ -65,11 +65,7 @@ public:
         auto it = addedObjects.begin();
         while (it != addedObjects.end()) {
             if (T obj = *it) {
-                QString warning;
-                if (!obj->postInit(&warning)) {
-                    if (warnings) {
-                        warnings->append(warning);
-                    }
+                if (!obj->postInit()) {
                     if (removeObject(obj)) {
                         it = addedObjects.erase(it);
                         for (VEObject *descant : obj->descendants()) {

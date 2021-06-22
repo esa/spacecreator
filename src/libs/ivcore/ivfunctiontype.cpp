@@ -169,10 +169,10 @@ bool IVFunctionType::removeChild(IVObject *child)
     return false;
 }
 
-bool IVFunctionType::postInit(QString *warning)
+bool IVFunctionType::postInit()
 {
     setEntityAttribute(meta::Props::token(meta::Props::Token::is_type), QStringLiteral("YES"));
-    return IVObject::postInit(warning);
+    return IVObject::postInit();
 }
 
 QVector<IVFunctionType *> IVFunctionType::functionTypes() const

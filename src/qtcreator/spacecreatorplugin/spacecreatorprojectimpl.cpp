@@ -19,6 +19,7 @@
 
 #include "asn1modelstorage.h"
 #include "editorcore.h"
+#include "errorhub.h"
 #include "errormessageparser.h"
 #include "iveditorcore.h"
 #include "msceditorcore.h"
@@ -33,6 +34,7 @@
 namespace spctr {
 
 const char TASK_CATEGORY_ASN_COMPILE[] = "Task.Category.ASNCompile";
+const char TASK_CATEGORY_SPACE_CREATOR[] = "Task.Category.SpaceCreator";
 
 SpaceCreatorProjectImpl::SpaceCreatorProjectImpl(ProjectExplorer::Project *project, QObject *parent)
     : scs::SpaceCreatorProject(parent)
@@ -56,8 +58,14 @@ SpaceCreatorProjectImpl::SpaceCreatorProjectImpl(ProjectExplorer::Project *proje
     static bool hubInitialized = false;
     if (!hubInitialized) {
         ProjectExplorer::TaskHub::instance()->addCategory(TASK_CATEGORY_ASN_COMPILE, tr("ASN error"));
+        ProjectExplorer::TaskHub::instance()->addCategory(TASK_CATEGORY_SPACE_CREATOR, tr("ASN error"));
         hubInitialized = true;
     }
+
+    connect(shared::ErrorHub::instance(), &shared::ErrorHub::errorAdded, this, &SpaceCreatorProjectImpl::reportError);
+    connect(shared::ErrorHub::instance(), &shared::ErrorHub::cleared, this, &SpaceCreatorProjectImpl::clearAllErrors);
+    connect(shared::ErrorHub::instance(), &shared::ErrorHub::clearedFile, this,
+            &SpaceCreatorProjectImpl::clearTasksForFile);
 }
 
 SpaceCreatorProjectImpl::~SpaceCreatorProjectImpl() { }
@@ -137,6 +145,23 @@ void SpaceCreatorProjectImpl::reportAsn1Error(const QString &fileName, const QSt
     }
 
     ProjectExplorer::TaskHub::requestPopup();
+}
+
+void SpaceCreatorProjectImpl::reportError(const shared::ErrorItem &error)
+{
+    ProjectExplorer::Task::TaskType type =
+            error.m_type == shared::ErrorItem::Warning ? ProjectExplorer::Task::Warning : ProjectExplorer::Task::Error;
+    ProjectExplorer::Task task(type, error.m_description, Utils::FileName::fromString(error.m_fileName), error.m_line,
+            TASK_CATEGORY_SPACE_CREATOR);
+    m_errors.append(task);
+    ProjectExplorer::TaskHub::instance()->addTask(task);
+    ProjectExplorer::TaskHub::requestPopup();
+}
+
+void SpaceCreatorProjectImpl::clearAllErrors()
+{
+    ProjectExplorer::TaskHub::instance()->clearTasks(TASK_CATEGORY_ASN_COMPILE);
+    ProjectExplorer::TaskHub::instance()->clearTasks(TASK_CATEGORY_SPACE_CREATOR);
 }
 
 void SpaceCreatorProjectImpl::clearTasksForFile(const QString &fileName)

@@ -51,6 +51,8 @@ target_sources(${LIB_NAME} PRIVATE
     delayedsignal.h
     editorcore.cpp
     editorcore.h
+    errorhub.cpp
+    errorhub.h
     geometry.cpp
     geometry.h
     graphicsviewutils.cpp

@@ -103,10 +103,9 @@ struct IVInterfacePrivate {
 
 IVInterface::IVInterface(IVObject::Type ifaceType, const CreationInfo &ci)
     : IVObject(ifaceType, ci.name, ci.function, ci.toBeCloned ? shared::createId() : ci.id)
-    , d(new IVInterfacePrivate(Type::InterfaceGroup == ifaceType
-                      ? ci.type
-                      : Type::RequiredInterface == ifaceType ? IVInterface::InterfaceType::Required
-                                                             : IVInterface::InterfaceType::Provided))
+    , d(new IVInterfacePrivate(Type::InterfaceGroup == ifaceType ? ci.type
+                      : Type::RequiredInterface == ifaceType     ? IVInterface::InterfaceType::Required
+                                                                 : IVInterface::InterfaceType::Provided))
 {
     setKind(ci.kind);
     setParams(ci.parameters);
@@ -126,24 +125,24 @@ IVInterface::InterfaceType IVInterface::direction() const
     return d->m_direction;
 }
 
-bool IVInterface::postInit(QString *warning)
+bool IVInterface::postInit()
 {
     if (!model() || !function()) {
         return false;
     }
     if (!function()->isFunction()) {
-        return IVObject::postInit(warning);
+        return IVObject::postInit();
     }
 
     IVFunction *fn = function()->as<IVFunction *>();
     if (!fn) {
-        return IVObject::postInit(warning);
+        return IVObject::postInit();
     }
 
     const QString prototypeName =
             fn->entityAttributeValue(meta::Props::token(meta::Props::Token::instance_of)).toString();
     if (prototypeName.isEmpty()) {
-        return IVObject::postInit(warning);
+        return IVObject::postInit();
     }
 
     IVFunctionType *prototype = model()->getFunctionType(prototypeName, Qt::CaseInsensitive);
@@ -159,7 +158,7 @@ bool IVInterface::postInit(QString *warning)
             existingIface->setCloneOrigin(fnTypeIface);
         }
     }
-    return IVObject::postInit(warning);
+    return IVObject::postInit();
 }
 
 bool IVInterface::isProvided() const

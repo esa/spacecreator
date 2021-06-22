@@ -38,9 +38,8 @@ IVConnectionGroup::IVConnectionGroup(const QString &name, IVInterfaceGroup *ifac
     }
 }
 
-bool IVConnectionGroup::postInit(QString *warning)
+bool IVConnectionGroup::postInit()
 {
-    Q_UNUSED(warning);
     if (m_initConnections.isEmpty()) {
         return true;
     }

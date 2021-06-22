@@ -33,7 +33,7 @@ public:
     explicit DVConnection(DVDevice *sourceDev, DVDevice *targetDev, DVObject *parent = nullptr);
     ~DVConnection() override;
 
-    bool postInit(QString *warning = nullptr) override;
+    bool postInit() override;
     QString titleUI() const override;
 
     DVDevice *sourceDevice() const;

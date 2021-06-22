@@ -27,6 +27,7 @@
 #include "commandsstack.h"
 #include "context/action/actionsmanager.h"
 #include "context/action/editor/dynactioneditor.h"
+#include "errorhub.h"
 #include "file.h"
 #include "graphicsitemhelpers.h"
 #include "graphicsviewutils.h"
@@ -247,12 +248,12 @@ bool InterfaceDocument::create(const QString &path)
     return created;
 }
 
-bool InterfaceDocument::load(const QString &path, QStringList *warnings)
+bool InterfaceDocument::load(const QString &path)
 {
     const QString oldPath = d->filePath;
     setPath(path);
 
-    const bool loaded = loadImpl(path, warnings);
+    const bool loaded = loadImpl(path);
 
     if (loaded) {
         d->commandsStack->clear();
@@ -635,9 +636,9 @@ void InterfaceDocument::onSavedExternally(const QString &filePath, bool saved)
 /*!
    \brief InterfaceDocument::setObjects
  */
-void InterfaceDocument::setObjects(const QVector<ivm::IVObject *> &objects, QStringList *warnings)
+void InterfaceDocument::setObjects(const QVector<ivm::IVObject *> &objects)
 {
-    d->objectsModel->initFromObjects(objects, warnings);
+    d->objectsModel->initFromObjects(objects);
     d->objectsModel->setRootObject({});
 }
 
@@ -935,23 +936,28 @@ bool InterfaceDocument::exportImpl(const QString &targetDir, const QList<shared:
     return true;
 }
 
-bool InterfaceDocument::loadImpl(const QString &path, QStringList *warnings)
+bool InterfaceDocument::loadImpl(const QString &path)
 {
     if (path.isEmpty() || !QFileInfo::exists(path)) {
+        shared::ErrorHub::addError(shared::ErrorItem::Error, tr("Invalid path"), path);
         qWarning() << Q_FUNC_INFO << "Invalid path";
         return false;
     }
 
+    shared::ErrorHub::setCurrentFile(path);
     ivm::IVXMLReader parser;
     if (!parser.readFile(path)) {
+        shared::ErrorHub::addError(shared::ErrorItem::Error, parser.errorString(), path);
         qWarning() << parser.errorString();
+        shared::ErrorHub::clearCurrentFile();
         return false;
     }
 
-    setObjects(parser.parsedObjects(), warnings);
+    setObjects(parser.parsedObjects());
     const QVariantMap metadata = parser.metaData();
     setAsn1FileName(metadata["asn1file"].toString());
     setMscFileName(metadata["mscfile"].toString());
+    shared::ErrorHub::clearCurrentFile();
     return true;
 }
 

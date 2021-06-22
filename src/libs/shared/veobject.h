@@ -73,7 +73,7 @@ public:
     virtual VEObject *parentObject() const;
     QVector<VEObject *> descendants() const;
     VEModel *model() const;
-    virtual bool postInit(QString *warning = nullptr) = 0;
+    virtual bool postInit() = 0;
     virtual bool aboutToBeRemoved() = 0;
 
     template<class T>

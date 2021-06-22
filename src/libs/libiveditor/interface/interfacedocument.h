@@ -83,7 +83,7 @@ public:
     cmd::CommandsStack *commandsStack() const;
 
     bool create(const QString &path = QString());
-    bool load(const QString &path, QStringList *warnings = nullptr);
+    bool load(const QString &path);
     bool loadAvailableComponents();
     bool exportSelectedFunctions();
     bool exportSelectedType();
@@ -129,7 +129,7 @@ Q_SIGNALS:
 
 public Q_SLOTS:
     void onSavedExternally(const QString &filePath, bool saved);
-    void setObjects(const QVector<ivm::IVObject *> &objects, QStringList *warnings = nullptr);
+    void setObjects(const QVector<ivm::IVObject *> &objects);
     void onAttributesManagerRequested();
     void onColorSchemeMenuInvoked();
     void onDynContextEditorMenuInvoked();
@@ -155,7 +155,7 @@ private Q_SLOTS:
 
 private:
     bool exportImpl(const QString &path, const QList<shared::VEObject *> &objects);
-    bool loadImpl(const QString &path, QStringList *warnings = nullptr);
+    bool loadImpl(const QString &path);
     QString getComponentName(const QStringList &exportNames);
     QList<shared::VEObject *> prepareSelectedObjectsForExport(QString &name, bool silent = false);
     bool loadComponentModel(ivm::IVModel *model, const QString &path);

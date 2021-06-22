@@ -34,7 +34,7 @@ public:
             const QString &title = QString(), QObject *parent = nullptr, const shared::Id &id = shared::InvalidId);
     ~IVFunction() override;
 
-    bool postInit(QString *warning = nullptr) override;
+    bool postInit() override;
 
     void setInstanceOf(IVFunctionType *fnType);
     const IVFunctionType *instanceOf() const;

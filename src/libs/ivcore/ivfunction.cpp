@@ -17,6 +17,7 @@
 
 #include "ivfunction.h"
 
+#include "errorhub.h"
 #include "ivcommonprops.h"
 #include "ivinterface.h"
 #include "ivmodel.h"
@@ -40,10 +41,8 @@ IVFunction::IVFunction(const QString &title, QObject *parent, const shared::Id &
 
 IVFunction::~IVFunction() { }
 
-bool IVFunction::postInit(QString *warning)
+bool IVFunction::postInit()
 {
-    Q_UNUSED(warning);
-
     if (auto objModel = model()) {
         const QString typeName =
                 entityAttributeValue(meta::Props::token(meta::Props::Token::instance_of)).value<QString>();
@@ -52,12 +51,14 @@ bool IVFunction::postInit(QString *warning)
             if (auto typeObj = types.value(typeName)) {
                 setInstanceOf(typeObj);
             } else {
+                shared::ErrorHub::addError(
+                        shared::ErrorItem::Warning, tr("Function type '%1' error").arg(typeName), "");
                 return false;
             }
         }
     }
 
-    return IVObject::postInit(warning);
+    return IVObject::postInit();
 }
 
 void IVFunction::setInstanceOf(IVFunctionType *fnType)

@@ -100,7 +100,7 @@ public:
 
     IVInterface::InterfaceType direction() const;
 
-    bool postInit(QString *warning = nullptr) override;
+    bool postInit() override;
 
     bool isProvided() const;
     bool isRequired() const;

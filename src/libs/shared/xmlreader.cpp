@@ -59,12 +59,14 @@ bool XmlReader::read(QIODevice *openForRead)
         return readXml(openForRead);
     }
 
+    setErrorString(tr("Can't read device"));
     return false;
 }
 
 bool XmlReader::read(const QByteArray &data)
 {
     if (data.isEmpty()) {
+        setErrorString(tr("Can't read data"));
         return false;
     }
 
@@ -76,6 +78,7 @@ bool XmlReader::read(const QByteArray &data)
             }
         }
     }
+    setErrorString(tr("Malformed XML"));
     return false;
 }
 
@@ -91,8 +94,10 @@ QVariantMap XmlReader::metaData() const
 
 bool XmlReader::readXml(QIODevice *in)
 {
-    if (!in)
+    if (!in) {
+        setErrorString(tr("Can't read device"));
         return false;
+    }
 
     QXmlStreamReader xml(in);
     if (xml.readNext() == QXmlStreamReader::StartDocument)
@@ -100,6 +105,7 @@ bool XmlReader::readXml(QIODevice *in)
             if (xml.name().toString() == rootElementName())
                 return readView(xml);
 
+    setErrorString(tr("Error parsing XML"));
     return false;
 }
 
@@ -116,6 +122,7 @@ bool XmlReader::readView(QXmlStreamReader &xml)
     while (!xml.atEnd()) {
         if (xml.hasError()) {
             setErrorString(xml.errorString());
+            qDebug() << Q_FUNC_INFO << 1 << xml.errorString();
             return false;
         }
 
@@ -133,6 +140,7 @@ bool XmlReader::readView(QXmlStreamReader &xml)
 
     if (xml.hasError()) {
         setErrorString(xml.errorString());
+        qDebug() << Q_FUNC_INFO << 2 << xml.errorString();
         return false;
     }
 

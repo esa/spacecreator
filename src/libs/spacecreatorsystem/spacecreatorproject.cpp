@@ -22,6 +22,7 @@
 #include "dvappmodel.h"
 #include "dveditorcore.h"
 #include "dvsystemchecks.h"
+#include "errorhub.h"
 #include "interface/interfacedocument.h"
 #include "iveditorcore.h"
 #include "ivsystemchecks.h"
@@ -75,11 +76,8 @@ QSharedPointer<ive::IVEditorCore> SpaceCreatorProject::ivData(const QString &fil
         data->document()->customActions(); // There some further actions are registered
         data->document()->setAsn1ModelStorage(m_asn1Storage.get());
 
-        QStringList warnings;
-        data->document()->load(fileName, &warnings);
-        if (!warnings.isEmpty()) {
-            QMessageBox::warning(nullptr, tr("File load warnings"), warnings.join("\n"));
-        }
+        shared::ErrorHub::clearFileErrors(fileName);
+        data->document()->load(fileName);
         const_cast<SpaceCreatorProject *>(this)->setIvData(fileName, data);
         return data;
     }

@@ -21,6 +21,7 @@
 #include "commandsstackbase.h"
 #include "dvmodel.h"
 #include "dvxmlreader.h"
+#include "errorhub.h"
 
 #include <QDebug>
 #include <QFileInfo>
@@ -74,6 +75,7 @@ bool DVAppModel::load(const QString &path)
     dvm::DVXMLReader reader;
     if (!reader.readFile(path)) {
         qWarning() << reader.errorString();
+        shared::ErrorHub::addError(shared::ErrorItem::Error, reader.errorString(), path);
         setPath(oldPath);
         return false;
     }
