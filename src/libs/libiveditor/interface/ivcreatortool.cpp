@@ -672,8 +672,7 @@ void IVCreatorTool::handleConnection(const QVector<QPointF> &graphicPoints) cons
     cmd::CommandsStack::Macro cmdMacro(m_doc->undoStack(), tr("Create connection"));
 
     if (info.startIface && !info.endIface) {
-        ifaceCommons = ivm::IVInterface::CreationInfo::fromIface(info.startIface);
-        ifaceCommons.function = info.endObject;
+        ifaceCommons = ivm::IVInterface::CreationInfo::fromIface(info.startIface, info.endObject);
         ifaceCommons.position = info.endPointAdjusted;
         ifaceCommons.type =
                 info.isToOrFromNested ? info.startIface->direction() : ivm::IVInterface::InterfaceType::Provided;
@@ -683,8 +682,7 @@ void IVCreatorTool::handleConnection(const QVector<QPointF> &graphicPoints) cons
         if (!cmdMacro.push(createInterfaceCommand(ifaceCommons)))
             return;
     } else if (info.endIface && !info.startIface) {
-        ifaceCommons = ivm::IVInterface::CreationInfo::fromIface(info.endIface);
-        ifaceCommons.function = info.startObject;
+        ifaceCommons = ivm::IVInterface::CreationInfo::fromIface(info.endIface, info.startObject);
         ifaceCommons.position = info.startPointAdjusted;
         ifaceCommons.type =
                 info.isToOrFromNested ? info.endIface->direction() : ivm::IVInterface::InterfaceType::Required;

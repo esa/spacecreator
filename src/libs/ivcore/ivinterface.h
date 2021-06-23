@@ -85,8 +85,8 @@ public:
 
         QVariantList toVarList() const;
         static CreationInfo initFromIface(IVInterface *iface, const CreationInfo::Policy policy);
-        static CreationInfo fromIface(IVInterface *iface);
-        static CreationInfo cloneIface(IVInterface *iface, IVFunction *fn);
+        static CreationInfo fromIface(IVInterface *iface, IVFunctionType *fn = nullptr);
+        static CreationInfo cloneIface(IVInterface *iface, IVFunctionType *fn);
 
         void resetKind();
     };
