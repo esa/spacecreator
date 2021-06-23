@@ -1,6 +1,8 @@
 #include "ivtestutils.h"
 
+#include "ivcomment.h"
 #include "ivconnection.h"
+#include "ivfunction.h"
 #include "ivfunctiontype.h"
 #include "ivmodel.h"
 
@@ -67,6 +69,27 @@ IVInterfaceRequired *createRequiredIface(IVFunctionType *fn, const QString &name
 IVInterfaceProvided *createProvidedIface(IVFunctionType *fn, const QString &name)
 {
     return createIface(fn, ivm::IVInterface::InterfaceType::Provided, name)->as<IVInterfaceProvided *>();
+}
+
+IVFunction *createFunction(const QString &name, QObject *parent)
+{
+    auto fn = new IVFunction(parent);
+    fn->setTitle(name);
+    return fn;
+}
+
+IVFunctionType *createFunctionType(const QString &name, QObject *parent)
+{
+    auto fnt = new IVFunctionType(parent);
+    fnt->setTitle(name);
+    return fnt;
+}
+
+IVComment *createComment(const QString &name, QObject *parent)
+{
+    auto comment = new IVComment(parent);
+    comment->setTitle(name);
+    return comment;
 }
 
 }

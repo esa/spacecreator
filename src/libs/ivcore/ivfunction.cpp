@@ -33,8 +33,8 @@ struct IVFunctionPrivate {
     QPointer<IVFunctionType> m_fnType;
 };
 
-IVFunction::IVFunction(const QString &title, QObject *parent, const shared::Id &id)
-    : IVFunctionType(IVObject::Type::Function, title, parent, id)
+IVFunction::IVFunction(QObject *parent, const shared::Id &id)
+    : IVFunctionType(IVObject::Type::Function, parent, id)
     , d(new IVFunctionPrivate)
 {
 }

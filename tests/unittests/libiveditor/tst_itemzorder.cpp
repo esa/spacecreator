@@ -31,6 +31,7 @@
 #include "ivinterface.h"
 #include "ivinterfacegroup.h"
 #include "ivobject.h"
+#include "ivtestutils.h"
 #include "sharedlibrary.h"
 #include "ui/veinteractiveobject.h"
 
@@ -106,115 +107,124 @@ void tst_ItemZOrder::checkItem(shared::ui::VEInteractiveObject *item, const qrea
 
 void tst_ItemZOrder::testItem_FunctionType()
 {
-    ivm::IVFunctionType ivObject(QStringLiteral("TestFunctionType"));
-    ive::IVFunctionTypeGraphicsItem item(&ivObject);
+    ivm::IVFunctionType *ivObject = ivm::testutils::createFunctionType(QStringLiteral("TestFunctionType"));
+    ive::IVFunctionTypeGraphicsItem item(ivObject);
 
     checkItem(&item, ive::ZOrder.Function);
+    delete ivObject;
 }
 
 void tst_ItemZOrder::testItem_Function()
 {
-    ivm::IVFunction ivObject(QStringLiteral("TestFunction"));
-    ive::IVFunctionGraphicsItem item(&ivObject);
+    ivm::IVFunction *ivObject = ivm::testutils::createFunction(QStringLiteral("TestFunction"));
+    ive::IVFunctionGraphicsItem item(ivObject);
 
     checkItem(&item, ive::ZOrder.Function);
+    delete ivObject;
 }
 
 void tst_ItemZOrder::testItem_Comment()
 {
-    ivm::IVComment ivObject(QStringLiteral("TestComment"));
-    ive::IVCommentGraphicsItem item(&ivObject);
+    ivm::IVComment *ivObject = ivm::testutils::createComment(QStringLiteral("TestComment"));
+    ive::IVCommentGraphicsItem item(ivObject);
 
     checkItem(&item, ive::ZOrder.Comment);
+    delete ivObject;
 }
 
 void tst_ItemZOrder::testItem_InterfaceGroup()
 {
-    ivm::IVFunction ivFunction(QStringLiteral("TestFunction"));
+    ivm::IVFunction *ivFunction = ivm::testutils::createFunction(QStringLiteral("TestFunction"));
     ivm::IVInterface::CreationInfo ci;
-    ci.function = &ivFunction;
+    ci.function = ivFunction;
     ci.type = ivm::IVInterface::InterfaceType::Grouped;
-    std::unique_ptr<ivm::IVInterfaceGroup> pIface =
-            std::unique_ptr<ivm::IVInterfaceGroup>(new ivm::IVInterfaceGroup(ci));
-    ive::IVInterfaceGroupGraphicsItem item(pIface.get());
+    auto pIface = new ivm::IVInterfaceGroup(ci);
+    ive::IVInterfaceGroupGraphicsItem item(pIface);
 
     checkItem(&item, ive::ZOrder.Interface);
+    delete ivFunction;
 }
 
 void tst_ItemZOrder::testItem_RequiredInterface()
 {
-    ivm::IVFunction ivFunction(QStringLiteral("TestFunction"));
+    ivm::IVFunction *ivFunction = ivm::testutils::createFunction(QStringLiteral("TestFunction"));
     ivm::IVInterface::CreationInfo ci;
-    ci.function = &ivFunction;
+    ci.function = ivFunction;
     ci.type = ivm::IVInterface::InterfaceType::Required;
-    std::unique_ptr<ivm::IVInterface> pIface = std::unique_ptr<ivm::IVInterface>(ivm::IVInterface::createIface(ci));
-    ive::IVInterfaceGraphicsItem item(pIface.get());
+    auto pIface = ivm::IVInterface::createIface(ci);
+    ive::IVInterfaceGraphicsItem item(pIface);
 
     checkItem(&item, ive::ZOrder.Interface);
+    delete ivFunction;
 }
 
 void tst_ItemZOrder::testItem_ProvidedInterface()
 {
-    ivm::IVFunction ivFunction(QStringLiteral("TestFunction"));
+    ivm::IVFunction *ivFunction = ivm::testutils::createFunction(QStringLiteral("TestFunction"));
     ivm::IVInterface::CreationInfo ci;
-    ci.function = &ivFunction;
+    ci.function = ivFunction;
     ci.type = ivm::IVInterface::InterfaceType::Provided;
-    std::unique_ptr<ivm::IVInterface> pIface = std::unique_ptr<ivm::IVInterface>(ivm::IVInterface::createIface(ci));
-    ive::IVInterfaceGraphicsItem item(pIface.get());
+    auto pIface = ivm::IVInterface::createIface(ci);
+    ive::IVInterfaceGraphicsItem item(pIface);
 
     checkItem(&item, ive::ZOrder.Interface);
+    delete ivFunction;
 }
 
 void tst_ItemZOrder::testItem_Connection()
 {
-    ivm::IVFunction ivFunctionA(QStringLiteral("TestFunctionA"));
-    ivm::IVFunction ivFunctionB(QStringLiteral("TestFunctionB"));
+    ivm::IVFunction *ivFunctionA = ivm::testutils::createFunction(QStringLiteral("TestFunctionA"));
+    ivm::IVFunction *ivFunctionB = ivm::testutils::createFunction(QStringLiteral("TestFunctionB"));
 
     ivm::IVInterface::CreationInfo ciA;
-    ciA.function = &ivFunctionA;
+    ciA.function = ivFunctionA;
     ciA.type = ivm::IVInterface::InterfaceType::Provided;
-    std::unique_ptr<ivm::IVInterface> pIfaceA = std::unique_ptr<ivm::IVInterface>(ivm::IVInterface::createIface(ciA));
-    ive::IVInterfaceGraphicsItem itemA(pIfaceA.get());
+    auto pIfaceA = ivm::IVInterface::createIface(ciA);
+    ive::IVInterfaceGraphicsItem itemA(pIfaceA);
 
     ivm::IVInterface::CreationInfo ciB;
-    ciB.function = &ivFunctionA;
+    ciB.function = ivFunctionA;
     ciB.type = ivm::IVInterface::InterfaceType::Provided;
-    std::unique_ptr<ivm::IVInterface> pIfaceB = std::unique_ptr<ivm::IVInterface>(ivm::IVInterface::createIface(ciB));
-    ive::IVInterfaceGraphicsItem itemB(pIfaceB.get());
+    auto pIfaceB = ivm::IVInterface::createIface(ciB);
+    ive::IVInterfaceGraphicsItem itemB(pIfaceB);
 
-    ivm::IVConnection ivConnection(pIfaceA.get(), pIfaceB.get());
+    ivm::IVConnection ivConnection(pIfaceA, pIfaceB);
     ive::IVConnectionGraphicsItem connectionItem(&ivConnection, &itemA, &itemB);
 
     checkItem(&connectionItem, ive::ZOrder.Connection);
+    delete ivFunctionA;
+    delete ivFunctionB;
 }
 
 void tst_ItemZOrder::testItem_ConnectionGroup()
 {
-    ivm::IVFunction ivFunctionA(QStringLiteral("TestFunctionA"));
-    ivm::IVFunction ivFunctionB(QStringLiteral("TestFunctionB"));
+    ivm::IVFunction *ivFunctionA = ivm::testutils::createFunction(QStringLiteral("TestFunctionA"));
+    ivm::IVFunction *ivFunctionB = ivm::testutils::createFunction(QStringLiteral("TestFunctionB"));
 
     ivm::IVInterface::CreationInfo ciA;
-    ciA.function = &ivFunctionA;
+    ciA.function = ivFunctionA;
     ciA.type = ivm::IVInterface::InterfaceType::Provided;
-    std::unique_ptr<ivm::IVInterfaceGroup> pIfaceA = std::make_unique<ivm::IVInterfaceGroup>(ciA);
-    ive::IVInterfaceGroupGraphicsItem itemA(pIfaceA.get());
+    auto pIfaceA = new ivm::IVInterfaceGroup(ciA);
+    ive::IVInterfaceGroupGraphicsItem itemA(pIfaceA);
 
     ivm::IVInterface::CreationInfo ciB;
-    ciB.function = &ivFunctionA;
+    ciB.function = ivFunctionA;
     ciB.type = ivm::IVInterface::InterfaceType::Provided;
-    std::unique_ptr<ivm::IVInterfaceGroup> pIfaceB = std::make_unique<ivm::IVInterfaceGroup>(ciB);
-    ive::IVInterfaceGroupGraphicsItem itemB(pIfaceB.get());
+    auto pIfaceB = new ivm::IVInterfaceGroup(ciB);
+    ive::IVInterfaceGroupGraphicsItem itemB(pIfaceB);
 
-    std::unique_ptr<ivm::IVConnection> ivConnection { new ivm::IVConnection(pIfaceA.get(), pIfaceB.get()) };
+    std::unique_ptr<ivm::IVConnection> ivConnection { new ivm::IVConnection(pIfaceA, pIfaceB) };
 
     ivm::IVConnectionGroup ivConnectionGroup(
-            QStringLiteral("TestConnectionGroup"), pIfaceA.get(), pIfaceB.get(), { ivConnection.get() });
+            QStringLiteral("TestConnectionGroup"), pIfaceA, pIfaceB, { ivConnection.get() });
 
     ive::IVConnectionGroupGraphicsItem connectionItem(&ivConnectionGroup, &itemA, &itemB);
 
     checkItem(&connectionItem, ive::ZOrder.Connection);
     ivConnectionGroup.removeConnection(ivConnection.get());
     QVERIFY(ivConnectionGroup.groupedConnections().isEmpty());
+    delete ivFunctionA;
+    delete ivFunctionB;
 }
 
 void tst_ItemZOrder::testItem_CheckCoverage()

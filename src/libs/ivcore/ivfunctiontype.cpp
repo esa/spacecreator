@@ -44,13 +44,13 @@ struct IVFunctionTypePrivate {
     QVector<IVConnectionGroup *> m_connectionGroups;
 };
 
-IVFunctionType::IVFunctionType(const QString &title, QObject *parent, const shared::Id &id)
-    : IVFunctionType(IVObject::Type::FunctionType, title, parent, id)
+IVFunctionType::IVFunctionType(QObject *parent, const shared::Id &id)
+    : IVFunctionType(IVObject::Type::FunctionType, parent, id)
 {
 }
 
-IVFunctionType::IVFunctionType(const IVObject::Type t, const QString &title, QObject *parent, const shared::Id &id)
-    : IVObject(t, title, parent, id)
+IVFunctionType::IVFunctionType(const IVObject::Type t, QObject *parent, const shared::Id &id)
+    : IVObject(t, parent, id)
     , d(new IVFunctionTypePrivate)
 {
 }

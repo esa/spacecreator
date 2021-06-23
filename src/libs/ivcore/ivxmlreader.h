@@ -53,9 +53,9 @@ protected:
 private:
     const std::unique_ptr<IVXMLReaderPrivate> d;
 
-    IVFunctionType *addFunction(const QString &name, IVObject::Type fnType);
-    IVInterface *addIface(const QString &name, bool isRI);
-    IVComment *addComment(const QString &text);
+    IVFunctionType *addFunction(IVObject::Type fnType);
+    IVInterface *addIface(bool isRI);
+    IVComment *addComment();
     IVConnection *addConnection();
     IVConnectionGroup *addConnectionGroup(const QString &groupName);
 };

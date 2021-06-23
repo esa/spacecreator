@@ -24,6 +24,7 @@
 #include "interface/ivinterfacegraphicsitem.h"
 #include "ivfunction.h"
 #include "ivinterface.h"
+#include "ivtestutils.h"
 #include "sharedlibrary.h"
 
 #include <QObject>
@@ -119,22 +120,22 @@ void tst_ConnectionUtils::initTestCase()
 {
     shared::initSharedLibrary();
 
-    auto entity1 = new ivm::IVFunction("F1");
+    auto entity1 = ivm::testutils::createFunction("F1");
     f1 = new ive::IVFunctionGraphicsItem(entity1);
     m_scene.addItem(f1);
     f1->setRect(QRectF(100, 100, 300, 300));
 
-    auto nestedEntity1 = new ivm::IVFunction("Nested_F1");
+    auto nestedEntity1 = ivm::testutils::createFunction("Nested_F1");
     entity1->addChild(nestedEntity1);
     nf1 = new ive::IVFunctionGraphicsItem(nestedEntity1, f1);
     nf1->setRect(QRectF(150, 150, 100, 100));
 
-    auto entity2 = new ivm::IVFunction("F2");
+    auto entity2 = ivm::testutils::createFunction("F2");
     f2 = new ive::IVFunctionGraphicsItem(entity2);
     m_scene.addItem(f2);
     f2->setRect(QRectF(600, 100, 300, 300));
 
-    auto nestedEntity2 = new ivm::IVFunction("Nested_F2");
+    auto nestedEntity2 = ivm::testutils::createFunction("Nested_F2");
     entity2->addChild(nestedEntity2);
     nf2 = new ive::IVFunctionGraphicsItem(nestedEntity2, f2);
     nf2->setRect(QRectF(650, 150, 100, 100));

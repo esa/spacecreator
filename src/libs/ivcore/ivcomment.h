@@ -25,7 +25,7 @@ class IVComment : public IVObject
 {
     Q_OBJECT
 public:
-    explicit IVComment(const QString &comment = QString(), QObject *parent = nullptr);
+    explicit IVComment(QObject *parent = nullptr);
     ~IVComment() override;
 };
 

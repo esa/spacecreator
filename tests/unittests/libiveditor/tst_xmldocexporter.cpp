@@ -23,6 +23,7 @@
 #include "ivexporter.h"
 #include "ivfunction.h"
 #include "ivlibrary.h"
+#include "ivtestutils.h"
 #include "parameter.h"
 
 #include <QObject>
@@ -93,7 +94,7 @@ void tst_XmlDocExporter::testExportEmptyDoc()
 
 void tst_XmlDocExporter::testExportFunctions()
 {
-    auto testfunc1 = new ivm::IVFunction("TestFunc1", m_doc.get());
+    auto testfunc1 = ivm::testutils::createFunction("TestFunc1", m_doc.get());
     testfunc1->setEntityAttribute(QLatin1String("foo"), QVariant::fromValue(11));
     testfunc1->setEntityAttribute(QLatin1String("instance_of"), QString());
     testfunc1->setEntityProperty(QLatin1String("bar"), QVariant::fromValue(22));
@@ -118,7 +119,7 @@ void tst_XmlDocExporter::testExportFunctions()
 
 void tst_XmlDocExporter::testExportComment()
 {
-    auto testcomment1 = new ivm::IVComment("TestComment1", m_doc.get());
+    auto testcomment1 = ivm::testutils::createComment("TestComment1", m_doc.get());
     testcomment1->setEntityAttribute(QLatin1String("foo"), QVariant::fromValue(11));
 
     QVector<ivm::IVObject *> objects;
@@ -135,9 +136,9 @@ void tst_XmlDocExporter::testExportComment()
 
 void tst_XmlDocExporter::testExportNestedComment()
 {
-    auto testfunc1 = new ivm::IVFunction("TestFunc1", m_doc.get());
+    auto testfunc1 = ivm::testutils::createFunction("TestFunc1", m_doc.get());
     testfunc1->setEntityAttribute(QLatin1String("instance_of"), QString());
-    auto testcomment1 = new ivm::IVComment("TestComment1", testfunc1);
+    auto testcomment1 = ivm::testutils::createComment("TestComment1", testfunc1);
     testfunc1->addChild(testcomment1);
 
     QVector<ivm::IVObject *> objects;

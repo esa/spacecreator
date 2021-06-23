@@ -78,13 +78,12 @@ private:
 };
 
 IVConnection::IVConnection(IVInterface *ifaceSource, IVInterface *ifaceTarget, QObject *parent)
-    : IVObject(IVObject::Type::Connection, QString(), parent)
-    , d(new IVConnectionPrivate { ifaceSource, ifaceTarget })
+    : IVConnection(IVObject::Type::Connection, ifaceSource, ifaceTarget, parent)
 {
 }
 
 IVConnection::IVConnection(const IVObject::Type t, IVInterface *ifaceSource, IVInterface *ifaceTarget, QObject *parent)
-    : IVObject(t, QString(), parent)
+    : IVObject(t, parent)
     , d(new IVConnectionPrivate { ifaceSource, ifaceTarget })
 {
 }

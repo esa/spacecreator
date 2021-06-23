@@ -33,7 +33,7 @@ IVConnectionGroup::IVConnectionGroup(const QString &name, IVInterfaceGroup *ifac
     ifaceSource->setGroupName(name);
     ifaceTarget->setGroupName(name);
 
-    for (auto connection : connections) {
+    for (auto connection : qAsConst(connections)) {
         m_initConnections.append(connection->id());
     }
 }

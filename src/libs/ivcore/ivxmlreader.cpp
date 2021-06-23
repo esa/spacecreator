@@ -17,6 +17,7 @@
 
 #include "ivxmlreader.h"
 
+#include "entityattribute.h"
 #include "ivcomment.h"
 #include "ivcommonprops.h"
 #include "ivconnection.h"
@@ -40,30 +41,27 @@ namespace ivm {
 
 using namespace ivm::meta;
 
-struct XmlAttribute {
-    XmlAttribute(const QString &name = QString(), const QString &value = QString())
-        : m_name(name)
-        , m_token(meta::Props::token(m_name))
-        , m_value(value)
-    {
+static inline EntityAttributes attributes(const QXmlStreamAttributes &xmlAttrs)
+{
+    EntityAttributes attrs;
+    for (const QXmlStreamAttribute &xmlAttr : xmlAttrs) {
+        const QString &name = xmlAttr.name().toString();
+        attrs.insert(name, EntityAttribute(name, xmlAttr.value().toString(), EntityAttribute::Type::Attribute));
     }
+    return std::move(attrs);
+}
 
-    QString m_name;
-    meta::Props::Token m_token;
-    QString m_value;
-    static QHash<QString, XmlAttribute> wrapp(const QXmlStreamAttributes &attrs)
-    {
-        QHash<QString, XmlAttribute> result;
+static inline QString attrValue(const EntityAttributes &attrs, const QString &name, const QString &defaultValue = {})
+{
+    const EntityAttribute &attr = attrs.value(name);
+    return attr.isValid() ? attr.value<QString>() : defaultValue;
+}
 
-        for (const QXmlStreamAttribute &attr : attrs) {
-            const QString &name = attr.name().toString();
-            result.insert(name, XmlAttribute(name, attr.value().toString()));
-        }
-
-        return result;
-    }
-};
-typedef QHash<QString, XmlAttribute> XmlAttributes;
+static inline QString attrValue(
+        const EntityAttributes &attrs, meta::Props::Token token, const QString &defaultValue = {})
+{
+    return attrValue(attrs, meta::Props::token(token), defaultValue);
+}
 
 struct CurrentObjectHolder {
     void set(IVObject *object)
@@ -156,43 +154,42 @@ QVector<IVObject *> IVXMLReader::parsedObjects() const
     return d->m_allObjects;
 }
 
-InterfaceParameter addIfaceParameter(
-        const QString &name, const XmlAttributes &otherAttrs, InterfaceParameter::Direction direction)
+InterfaceParameter addIfaceParameter(const EntityAttributes &otherAttrs, InterfaceParameter::Direction direction)
 {
     InterfaceParameter param;
 
-    for (const XmlAttribute &attr : otherAttrs) {
-        switch (attr.m_token) {
+    for (const EntityAttribute &attr : otherAttrs) {
+        switch (meta::Props::token(attr.name())) {
+        case Props::Token::name: {
+            param.setName(attr.value<QString>());
+            break;
+        }
         case Props::Token::type: {
-            param.setParamTypeName(attr.m_value);
+            param.setParamTypeName(attr.value<QString>());
             break;
         }
         case Props::Token::encoding: {
-            param.setEncoding(attr.m_value);
+            param.setEncoding(attr.value<QString>());
             break;
         }
         default: {
-            qWarning() << QStringLiteral("Interface Parameter - unknown attribute: %1").arg(attr.m_name);
+            qWarning() << QStringLiteral("Interface Parameter - unknown attribute: %1").arg(attr.name());
             break;
         }
         }
     }
 
-    param.setName(name);
     param.setDirection(direction);
-
     return param;
 }
 
-IVConnection::EndPointInfo *addConnectionPart(const XmlAttributes &otherAttrs)
+IVConnection::EndPointInfo *addConnectionPart(const EntityAttributes &otherAttrs)
 {
-    const QString attrRiName = Props::token(Props::Token::ri_name);
-    const bool isRI = otherAttrs.contains(attrRiName);
+    const bool isRI = otherAttrs.contains(Props::token(Props::Token::ri_name));
 
     IVConnection::EndPointInfo *info = new IVConnection::EndPointInfo();
-    info->m_functionName = otherAttrs.value(Props::token(Props::Token::func_name)).m_value;
-    info->m_interfaceName =
-            isRI ? otherAttrs.value(attrRiName).m_value : otherAttrs.value(Props::token(Props::Token::pi_name)).m_value;
+    info->m_functionName = attrValue(otherAttrs, Props::Token::func_name);
+    info->m_interfaceName = attrValue(otherAttrs, isRI ? Props::Token::ri_name : Props::Token::pi_name);
     info->m_ifaceDirection = isRI ? IVInterface::InterfaceType::Required : IVInterface::InterfaceType::Provided;
 
     Q_ASSERT(info->isReady());
@@ -203,26 +200,25 @@ void IVXMLReader::processTagOpen(QXmlStreamReader &xml)
 {
     const QString &tagName = xml.name().toString();
     const QString &attrName = Props::token(Props::Token::name);
-    XmlAttributes attrs = XmlAttribute::wrapp(xml.attributes());
-    const XmlAttribute &nameAttr = attrs.take(attrName);
+    const EntityAttributes attrs = attributes(xml.attributes());
+    //    const XmlAttribute &nameAttr = attrs.take(attrName);
 
     IVObject *obj { nullptr };
     const Props::Token t = Props::token(tagName);
     switch (t) {
     case Props::Token::Function: {
         const bool isFunctionType =
-                attrs.value(Props::token(Props::Token::is_type), QStringLiteral("no")).m_value.toLower()
-                == QStringLiteral("yes");
+                attrValue(attrs, Props::Token::is_type, QStringLiteral("no")).toLower() == QStringLiteral("yes");
 
-        obj = addFunction(nameAttr.m_value, isFunctionType ? IVObject::Type::FunctionType : IVObject::Type::Function);
+        obj = addFunction(isFunctionType ? IVObject::Type::FunctionType : IVObject::Type::Function);
         break;
     }
     case Props::Token::Provided_Interface:
     case Props::Token::Required_Interface: {
         Q_ASSERT(d->m_currentObject.function() != nullptr);
 
-        const auto iface = addIface(nameAttr.m_value, Props::Token::Required_Interface == t);
-        const QString groupName = attrs.value(Props::token(Props::Token::group_name)).m_value;
+        const auto iface = addIface(Props::Token::Required_Interface == t);
+        const QString groupName = attrValue(attrs, Props::Token::group_name);
         if (!groupName.isEmpty())
             d->m_connectionGroups[groupName].m_interfaces.append(iface);
         obj = iface;
@@ -232,19 +228,19 @@ void IVXMLReader::processTagOpen(QXmlStreamReader &xml)
     case Props::Token::Input_Parameter: {
         Q_ASSERT(d->m_currentObject.iface() != nullptr);
 
-        const InterfaceParameter param = addIfaceParameter(nameAttr.m_value, attrs,
+        const InterfaceParameter param = addIfaceParameter(attrs,
                 t == Props::Token::Input_Parameter ? InterfaceParameter::Direction::IN
                                                    : InterfaceParameter::Direction::OUT);
         d->m_currentObject.iface()->addParam(param);
         break;
     }
     case Props::Token::ConnectionGroup: {
-        obj = addConnectionGroup(nameAttr.m_value);
+        obj = addConnectionGroup(attrValue(attrs, Props::Token::name));
         break;
     }
     case Props::Token::Connection: {
         obj = addConnection();
-        const QString groupName = attrs.value(Props::token(Props::Token::group_name)).m_value;
+        const QString groupName = attrValue(attrs, Props::Token::group_name);
         if (!groupName.isEmpty())
             d->m_connectionGroups[groupName].m_connectionIds.append(obj->id());
         break;
@@ -265,26 +261,26 @@ void IVXMLReader::processTagOpen(QXmlStreamReader &xml)
         break;
     }
     case Props::Token::Comment: {
-        obj = addComment(nameAttr.m_value);
+        obj = addComment();
         break;
     }
     case Props::Token::Property: {
         if (d->m_currentObject.isValid()) {
             d->m_currentObject.get()->setEntityProperty(
-                    nameAttr.m_value, attrs.value(Props::token(Props::Token::value)).m_value);
+                    attrValue(attrs, Props::Token::name), attrValue(attrs, Props::Token::value));
         }
         break;
     }
     case Props::Token::ContextParameter: {
         auto function = qobject_cast<ivm::IVFunctionType *>(d->m_currentObject.get());
         if (function) {
-            const QString typeString = attrs.value(Props::token(Props::Token::type)).m_value;
+            const QString typeString = attrValue(attrs, Props::Token::type);
             ivm::BasicParameter::Type paramType = typeString == "Timer"
                     ? ivm::BasicParameter::Type::Timer
                     : (typeString == "Directive" ? ivm::BasicParameter::Type::Directive
                                                  : ivm::BasicParameter::Type::Other);
             ContextParameter param(
-                    nameAttr.m_value, paramType, typeString, attrs.value(Props::token(Props::Token::value)).m_value);
+                    attrValue(attrs, Props::Token::name), paramType, typeString, attrValue(attrs, Props::Token::value));
             function->addContextParam(param);
         }
         break;
@@ -297,9 +293,7 @@ void IVXMLReader::processTagOpen(QXmlStreamReader &xml)
     }
 
     if (obj) {
-        for (const XmlAttribute &xmlAttr : attrs) {
-            obj->setEntityAttribute(xmlAttr.m_name, xmlAttr.m_value);
-        }
+        obj->setEntityAttributes(attrs);
         d->setCurrentObject(obj);
     }
 }
@@ -327,12 +321,12 @@ QString IVXMLReader::rootElementName() const
     return Props::token(Props::Token::InterfaceView);
 }
 
-IVFunctionType *IVXMLReader::addFunction(const QString &name, IVObject::Type fnType)
+IVFunctionType *IVXMLReader::addFunction(IVObject::Type fnType)
 {
     const bool isFunctionType = fnType == IVObject::Type::FunctionType;
 
-    IVFunctionType *fn = isFunctionType ? new IVFunctionType(name, d->m_currentObject.get())
-                                        : new IVFunction(name, d->m_currentObject.get());
+    IVFunctionType *fn =
+            isFunctionType ? new IVFunctionType(d->m_currentObject.get()) : new IVFunction(d->m_currentObject.get());
 
     if (d->m_currentObject.function())
         d->m_currentObject.function()->addChild(fn);
@@ -340,30 +334,24 @@ IVFunctionType *IVXMLReader::addFunction(const QString &name, IVObject::Type fnT
     return fn;
 }
 
-IVInterface *IVXMLReader::addIface(const QString &name, bool isRI)
+IVInterface *IVXMLReader::addIface(bool isRI)
 {
     Q_ASSERT(d->m_currentObject.function() != nullptr);
 
     IVInterface *iface { nullptr };
     if (d->m_currentObject.function()) {
-
         IVInterface::CreationInfo ci;
         ci.function = d->m_currentObject.function();
-        ci.name = name;
-
-        if (isRI)
-            iface = new IVInterfaceRequired(ci);
-        else
-            iface = new IVInterfaceProvided(ci);
-
+        ci.type = isRI ? IVInterface::InterfaceType::Required : IVInterface::InterfaceType::Provided;
+        iface = IVInterface::createIface(ci);
         d->m_currentObject.function()->addChild(iface);
     }
     return iface;
 }
 
-IVComment *IVXMLReader::addComment(const QString &text)
+IVComment *IVXMLReader::addComment()
 {
-    IVComment *comment = new IVComment(text, d->m_currentObject.get());
+    IVComment *comment = new IVComment(d->m_currentObject.get());
     if (d->m_currentObject.function())
         d->m_currentObject.function()->addChild(comment);
 
@@ -421,4 +409,5 @@ IVConnectionGroup *IVXMLReader::addConnectionGroup(const QString &groupName)
 
     return connection;
 }
+
 }

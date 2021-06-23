@@ -33,9 +33,9 @@ CmdFunctionItemCreate::CmdFunctionItemCreate(ivm::IVModel *model, ivm::IVFunctio
     : shared::cmd::CmdEntityGeometryChange({}, QObject::tr("Create Function"))
     , m_model(model)
     , m_parent(parent)
-    , m_entity(new ivm::IVFunction(
-              title, m_parent ? qobject_cast<QObject *>(m_parent) : qobject_cast<QObject *>(m_model), id))
+    , m_entity(new ivm::IVFunction(m_parent ? qobject_cast<QObject *>(m_parent) : qobject_cast<QObject *>(m_model), id))
 {
+    m_entity->setTitle(title);
     prepareData({ qMakePair(m_entity, QVector<QPointF> { geometry.topLeft(), geometry.bottomRight() }) });
 }
 

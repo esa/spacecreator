@@ -21,8 +21,8 @@
 
 namespace ivm {
 
-IVComment::IVComment(const QString &title, QObject *parent)
-    : IVObject(IVObject::Type::Comment, title, parent)
+IVComment::IVComment(QObject *parent)
+    : IVObject(IVObject::Type::Comment, parent)
 {
     if (IVFunctionType *root = qobject_cast<IVFunctionType *>(parent))
         root->addChild(this);

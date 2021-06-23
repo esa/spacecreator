@@ -41,12 +41,12 @@ void tst_IVConnection::testPostInitEmptyConnection()
 
 void tst_IVConnection::testCorrectConnectionSourceTarget()
 {
-    ivm::IVFunction fn1("Fn1");
-    ivm::IVInterface *rifn1 = ivm::testutils::createIface(&fn1, ivm::IVInterface::InterfaceType::Required, "RI1");
-    ivm::IVInterface *pifn1 = ivm::testutils::createIface(&fn1, ivm::IVInterface::InterfaceType::Provided, "PI1");
-    ivm::IVFunction fn2("Fn2");
-    ivm::IVInterface *rifn2 = ivm::testutils::createIface(&fn2, ivm::IVInterface::InterfaceType::Required, "RI1");
-    ivm::IVInterface *pifn2 = ivm::testutils::createIface(&fn2, ivm::IVInterface::InterfaceType::Provided, "PI1");
+    ivm::IVFunction *fn1 = ivm::testutils::createFunction("Fn1");
+    ivm::IVInterface *rifn1 = ivm::testutils::createIface(fn1, ivm::IVInterface::InterfaceType::Required, "RI1");
+    ivm::IVInterface *pifn1 = ivm::testutils::createIface(fn1, ivm::IVInterface::InterfaceType::Provided, "PI1");
+    ivm::IVFunction *fn2 = ivm::testutils::createFunction("Fn2");
+    ivm::IVInterface *rifn2 = ivm::testutils::createIface(fn2, ivm::IVInterface::InterfaceType::Required, "RI1");
+    ivm::IVInterface *pifn2 = ivm::testutils::createIface(fn2, ivm::IVInterface::InterfaceType::Provided, "PI1");
 
     // Correct as is (PI/RI)
     ivm::IVConnection c1(rifn1, pifn2);
@@ -64,9 +64,11 @@ void tst_IVConnection::testCorrectConnectionSourceTarget()
     QCOMPARE(c4.targetInterface(), pifn1);
 
     // Parent child relations
-    ivm::IVFunction childFn1("ChildFn1", &fn1);
-    ivm::IVInterface *childFnRI = ivm::testutils::createIface(&childFn1, ivm::IVInterface::InterfaceType::Required, "RI1");
-    ivm::IVInterface *childFnPI = ivm::testutils::createIface(&childFn1, ivm::IVInterface::InterfaceType::Provided, "PI1");
+    ivm::IVFunction *childFn1 = ivm::testutils::createFunction("ChildFn1", fn1);
+    ivm::IVInterface *childFnRI =
+            ivm::testutils::createIface(childFn1, ivm::IVInterface::InterfaceType::Required, "RI1");
+    ivm::IVInterface *childFnPI =
+            ivm::testutils::createIface(childFn1, ivm::IVInterface::InterfaceType::Provided, "PI1");
     // Correct as is (RI/PI connections)
     ivm::IVConnection c5(childFnRI, pifn1);
     QCOMPARE(c5.sourceInterface(), childFnRI);
@@ -97,6 +99,9 @@ void tst_IVConnection::testCorrectConnectionSourceTarget()
     ivm::IVConnection c12(childFnRI, rifn1);
     QCOMPARE(c12.sourceInterface(), childFnRI);
     QCOMPARE(c12.targetInterface(), rifn1);
+
+    delete fn1;
+    delete fn2;
 }
 
 QTEST_APPLESS_MAIN(tst_IVConnection)

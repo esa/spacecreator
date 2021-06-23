@@ -51,8 +51,7 @@ public:
     };
     Q_ENUM(Type)
 
-    explicit IVObject(const IVObject::Type t, const QString &title = QString(), QObject *parent = nullptr,
-            const shared::Id &id = shared::InvalidId);
+    explicit IVObject(const IVObject::Type t, QObject *parent = nullptr, const shared::Id &id = shared::InvalidId);
     virtual ~IVObject() override;
 
     QString title() const override;
@@ -95,6 +94,8 @@ public:
 
     bool postInit() override;
     bool aboutToBeRemoved() override;
+
+    void resetTitle();
 
     static void sortObjectList(QList<ivm::IVObject *> &objects);
 

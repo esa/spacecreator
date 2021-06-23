@@ -84,7 +84,8 @@ void tst_MSCEditorCore::testCorrespondingInstances()
 
     auto instance = new msc::MscInstance("dummy", m_chart);
     m_chart->addInstance(instance);
-    ivm::IVFunction fnct("foo");
+    ivm::IVFunction fnct;
+    fnct.setTitle("foo");
     QCOMPARE(m_mscCore->correspondingInstances(&fnct).size(), 0);
 
     fnct.setTitle("dummy");
@@ -102,13 +103,16 @@ void tst_MSCEditorCore::testCorrespondingMessages()
     auto message = new msc::MscMessage("ping", instance1, instance2, m_chart);
     m_chart->addInstanceEvent(message, { { instance1, -1 }, { instance2, -1 } });
 
-    ivm::IVFunction f1("K1");
-    ivm::IVFunction f2("K2");
-    std::unique_ptr<ivm::IVConnection> connection(ivm::testutils::createConnection(&f1, &f2, "call"));
+    ivm::IVFunction *f1 = ivm::testutils::createFunction("K1");
+    ivm::IVFunction *f2 = ivm::testutils::createFunction("K2");
+    std::unique_ptr<ivm::IVConnection> connection(ivm::testutils::createConnection(f1, f2, "call"));
     QCOMPARE(m_mscCore->correspondingMessages(connection.get()).size(), 0);
 
     connection->targetInterface()->setTitle("ping");
     QCOMPARE(m_mscCore->correspondingMessages(connection.get()).size(), 1);
+
+    delete f1;
+    delete f2;
 }
 
 QTEST_MAIN(tst_MSCEditorCore)

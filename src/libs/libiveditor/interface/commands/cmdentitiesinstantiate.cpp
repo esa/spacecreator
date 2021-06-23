@@ -55,7 +55,7 @@ CmdEntitiesInstantiate::CmdEntitiesInstantiate(
 {
     Q_ASSERT(entity);
     m_instantiatedEntity =
-            new ivm::IVFunction({}, m_parent ? qobject_cast<QObject *>(m_parent) : qobject_cast<QObject *>(m_model));
+            new ivm::IVFunction(m_parent ? qobject_cast<QObject *>(m_parent) : qobject_cast<QObject *>(m_model));
     m_instantiatedEntity->setTitle(
             ivm::IVNameValidator::nameForInstance(m_instantiatedEntity, entity->title() + QLatin1String("_Instance_")));
 

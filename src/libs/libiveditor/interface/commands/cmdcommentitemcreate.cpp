@@ -32,8 +32,7 @@ CmdCommentItemCreate::CmdCommentItemCreate(ivm::IVModel *model, ivm::IVFunctionT
     : shared::cmd::CmdEntityGeometryChange({}, QObject::tr("Create Comment"))
     , m_model(model)
     , m_parent(parent)
-    , m_entity(new ivm::IVComment(
-              QString(), m_parent ? qobject_cast<QObject *>(m_parent) : qobject_cast<QObject *>(m_model)))
+    , m_entity(new ivm::IVComment(m_parent ? qobject_cast<QObject *>(m_parent) : qobject_cast<QObject *>(m_model)))
 {
     prepareData({ qMakePair(m_entity, QVector<QPointF> { geometry.topLeft(), geometry.bottomRight() }) });
 }

@@ -60,13 +60,13 @@ void tst_IVModel::testManageContainers()
 
     QCOMPARE(model.objects().size(), 0);
 
-    ivm::IVFunction container1("Container1");
-    ivm::IVFunction container2("Container2");
-    container1.addChild(&container2);
-    ivm::IVFunction container3("Container3");
-    container2.addChild(&container3);
+    ivm::IVFunction *container1 = ivm::testutils::createFunction("Container1");
+    ivm::IVFunction *container2 = ivm::testutils::createFunction("Container2");
+    container1->addChild(container2);
+    ivm::IVFunction *container3 = ivm::testutils::createFunction("Container3");
+    container2->addChild(container3);
 
-    const QVector<ivm::IVFunction *> containers { &container1, &container2, &container3 };
+    const QVector<ivm::IVFunction *> containers { container1, container2, container3 };
     for (int i = 0; i < containers.size(); ++i) {
         auto container = containers.at(i);
         QSignalSpy spyCommon(&model, &ivm::IVModel::objectsAdded);
@@ -129,11 +129,11 @@ void tst_IVModel::testManageFunctions()
 
     QCOMPARE(model.objects().size(), 0);
 
-    ivm::IVFunction fn1("Fn1");
-    ivm::IVFunction fn2("Fn2", &model);
-    ivm::IVFunction fn3("Fn3", &model);
+    ivm::IVFunction *fn1 = ivm::testutils::createFunction("Fn1");
+    ivm::IVFunction *fn2 = ivm::testutils::createFunction("Fn2", &model);
+    ivm::IVFunction *fn3 = ivm::testutils::createFunction("Fn3", &model);
 
-    const QVector<ivm::IVFunction *> functions { &fn1, &fn2, &fn3 };
+    const QVector<ivm::IVFunction *> functions { fn1, fn2, fn3 };
     for (int i = 0; i < functions.size(); ++i) {
         auto function = functions.at(i);
         QSignalSpy spyCommon(&model, &ivm::IVModel::objectsAdded);
@@ -194,13 +194,13 @@ void tst_IVModel::testManageIfaces()
 
     QCOMPARE(model.objects().size(), 0);
 
-    ivm::IVFunction fn("fn");
-    QVERIFY(model.addObject(&fn));
-    ivm::IVInterface::CreationInfo ci1 = ivm::testutils::init(ivm::IVInterface::InterfaceType::Provided, &fn);
+    ivm::IVFunction *fn = ivm::testutils::createFunction("fn");
+    QVERIFY(model.addObject(fn));
+    ivm::IVInterface::CreationInfo ci1 = ivm::testutils::init(ivm::IVInterface::InterfaceType::Provided, fn);
     ci1.name = "eth0";
-    ivm::IVInterface::CreationInfo ci2 = ivm::testutils::init(ivm::IVInterface::InterfaceType::Required, &fn);
+    ivm::IVInterface::CreationInfo ci2 = ivm::testutils::init(ivm::IVInterface::InterfaceType::Required, fn);
     ci2.name = "wlan0";
-    ivm::IVInterface::CreationInfo ci3 = ivm::testutils::init(ivm::IVInterface::InterfaceType::Provided, &fn);
+    ivm::IVInterface::CreationInfo ci3 = ivm::testutils::init(ivm::IVInterface::InterfaceType::Provided, fn);
     ci3.name = "ppp0";
 
     QVector<ivm::IVInterface *> createdIfaces;
@@ -276,25 +276,25 @@ void tst_IVModel::testManageMixed()
 
     QCOMPARE(model.objects().size(), 0);
 
-    ivm::IVFunction container1("Container1");
-    ivm::IVFunction container2("Container2", &container1);
-    ivm::IVFunction container3("Container3", &container2);
-    ivm::IVFunction fn1("Fn1");
-    ivm::IVFunction fn2("Fn2", &model);
-    ivm::IVFunction fn3("Fn3", &model);
+    ivm::IVFunction *container1 = ivm::testutils::createFunction("Container1");
+    ivm::IVFunction *container2 = ivm::testutils::createFunction("Container2", container1);
+    ivm::IVFunction *container3 = ivm::testutils::createFunction("Container3", container2);
+    ivm::IVFunction *fn1 = ivm::testutils::createFunction("Fn1");
+    ivm::IVFunction *fn2 = ivm::testutils::createFunction("Fn2", &model);
+    ivm::IVFunction *fn3 = ivm::testutils::createFunction("Fn3", &model);
     const int functionsCount = 6;
 
-    ivm::IVInterface::CreationInfo ci1 = ivm::testutils::init(ivm::IVInterface::InterfaceType::Provided, &fn1);
+    ivm::IVInterface::CreationInfo ci1 = ivm::testutils::init(ivm::IVInterface::InterfaceType::Provided, fn1);
     ci1.name = "eth0";
     ivm::IVInterface *iface1 = ivm::IVInterface::createIface(ci1);
-    ivm::IVInterface::CreationInfo ci2 = ivm::testutils::init(ivm::IVInterface::InterfaceType::Required, &fn2);
+    ivm::IVInterface::CreationInfo ci2 = ivm::testutils::init(ivm::IVInterface::InterfaceType::Required, fn2);
     ci2.name = "wlan0";
     ivm::IVInterface *iface2 = ivm::IVInterface::createIface(ci2);
-    ivm::IVInterface::CreationInfo ci3 = ivm::testutils::init(ivm::IVInterface::InterfaceType::Provided, &fn3);
+    ivm::IVInterface::CreationInfo ci3 = ivm::testutils::init(ivm::IVInterface::InterfaceType::Provided, fn3);
     ci3.name = "ppp0";
     ivm::IVInterface *iface3 = ivm::IVInterface::createIface(ci3);
 
-    const QVector<ivm::IVObject *> objects { &container1, &fn1, iface1, &container2, &fn2, iface2, &container3, &fn3,
+    const QVector<ivm::IVObject *> objects { container1, fn1, iface1, container2, fn2, iface2, container3, fn3,
         iface3 };
 
     model.addObjects(objects);
@@ -309,8 +309,8 @@ void tst_IVModel::testManageMixed()
 
 void tst_IVModel::testConnectionQuery()
 {
-    auto fn1 = new ivm::IVFunction("Fn1");
-    auto fn2 = new ivm::IVFunction("Fn2");
+    auto fn1 = ivm::testutils::createFunction("Fn1");
+    auto fn2 = ivm::testutils::createFunction("Fn2");
     ivm::IVConnection *connect1 = ivm::testutils::createConnection(fn1, fn2, "cnt1");
     m_model->addObjects<ivm::IVObject *>({ fn1, fn2, connect1 });
 
@@ -324,37 +324,36 @@ void tst_IVModel::testConnectionQuery()
 void tst_IVModel::testAvailableFunctionTypes()
 {
     ivm::IVModel sharedModel(m_dynPropConfig);
-    ivm::IVFunctionType sfnt1("sFnT1");
-    ivm::IVFunctionType sfnt2("sFnT2", &sharedModel);
-    ivm::IVFunctionType sfnt3("sFnT3", &sharedModel);
+    ivm::IVFunctionType *sfnt1 = ivm::testutils::createFunctionType("sFnT1");
+    ivm::IVFunctionType *sfnt2 = ivm::testutils::createFunctionType("sFnT2", &sharedModel);
+    ivm::IVFunctionType *sfnt3 = ivm::testutils::createFunctionType("sFnT3", &sharedModel);
     const int sharedFunctionTypesCount = 3;
 
-    const QVector<ivm::IVObject *> sharedObjects { &sfnt1, &sfnt2, &sfnt3 };
+    const QVector<ivm::IVObject *> sharedObjects { sfnt1, sfnt2, sfnt3 };
     sharedModel.addObjects(sharedObjects);
     QCOMPARE(sharedModel.objects().size(), sharedFunctionTypesCount);
 
     ivm::IVModel model(m_dynPropConfig, &sharedModel);
 
-    ivm::IVFunction container1("Container1");
-    ivm::IVFunction container2("Container2", &container1);
-    ivm::IVFunction container3("Container3", &container2);
-    ivm::IVFunction fn1("Fn1");
-    ivm::IVFunction fn2("Fn2", &model);
-    ivm::IVFunction fn3("Fn3", &model);
+    ivm::IVFunction *container1 = ivm::testutils::createFunction("Container1");
+    ivm::IVFunction *container2 = ivm::testutils::createFunction("Container2", container1);
+    ivm::IVFunction *container3 = ivm::testutils::createFunction("Container3", container2);
+    ivm::IVFunction *fn1 = ivm::testutils::createFunction("Fn1");
+    ivm::IVFunction *fn2 = ivm::testutils::createFunction("Fn2", &model);
+    ivm::IVFunction *fn3 = ivm::testutils::createFunction("Fn3", &model);
     const int functionsCount = 6;
 
-    ivm::IVFunctionType fnt1("FnT1");
-    ivm::IVFunctionType fnt2("FnT2", &model);
-    ivm::IVFunctionType fnt3("FnT3", &model);
+    ivm::IVFunctionType *fnt1 = ivm::testutils::createFunctionType("FnT1");
+    ivm::IVFunctionType *fnt2 = ivm::testutils::createFunctionType("FnT2", &model);
+    ivm::IVFunctionType *fnt3 = ivm::testutils::createFunctionType("FnT3", &model);
     const int functionTypesCount = 3;
 
-    const QVector<ivm::IVObject *> objects { &container1, &container2, &container3, &fn1, &fn2, &fn3, &fnt1, &fnt2,
-        &fnt3 };
+    const QVector<ivm::IVObject *> objects { container1, container2, container3, fn1, fn2, fn3, fnt1, fnt2, fnt3 };
 
     model.addObjects(objects);
     QCOMPARE(model.objects().size(), functionsCount + functionTypesCount);
 
-    const auto availableTypes = model.getAvailableFunctionTypes(&container1);
+    const auto availableTypes = model.getAvailableFunctionTypes(container1);
     QCOMPARE(availableTypes.size(), functionTypesCount + sharedFunctionTypesCount);
 
     for (auto object : objects) {

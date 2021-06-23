@@ -40,7 +40,7 @@ struct IVObjectPrivate {
     const IVObject::Type m_type;
 };
 
-IVObject::IVObject(const IVObject::Type t, const QString &title, QObject *parent, const shared::Id &id)
+IVObject::IVObject(const IVObject::Type t, QObject *parent, const shared::Id &id)
     : shared::VEObject(id, parent)
     , d(new IVObjectPrivate(t))
 {
@@ -48,8 +48,6 @@ IVObject::IVObject(const IVObject::Type t, const QString &title, QObject *parent
         setModel(parentObject->model());
     else if (IVModel *model = qobject_cast<IVModel *>(parent))
         setModel(model);
-
-    setEntityAttribute(meta::Props::token(meta::Props::Token::name), title);
 }
 
 IVObject::~IVObject() { }
@@ -66,12 +64,20 @@ QString IVObject::titleUI() const
 
 bool IVObject::postInit()
 {
+    if (title().isEmpty()) {
+        resetTitle();
+    }
     return true;
 }
 
 bool IVObject::aboutToBeRemoved()
 {
     return true;
+}
+
+void IVObject::resetTitle()
+{
+    setEntityAttribute(meta::Props::token(meta::Props::Token::name), {});
 }
 
 //! This sorts the objects on type.

@@ -21,6 +21,7 @@
 #include "interface/ivinterfacegraphicsitem.h"
 #include "ivfunction.h"
 #include "ivinterface.h"
+#include "ivtestutils.h"
 #include "positionlookuphelper.h"
 #include "sharedlibrary.h"
 
@@ -89,7 +90,7 @@ void tst_PositionLookupHelper::initTestCase()
 {
     shared::initSharedLibrary();
     scene = new QGraphicsScene;
-    function = new ivm::IVFunction("Function");
+    function = ivm::testutils::createFunction("Function");
     functionItem = new ive::IVFunctionGraphicsItem(function);
     scene->addItem(functionItem);
     functionItem->setBoundingRect(QRectF(0, 0, 500, 500));

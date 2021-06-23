@@ -20,6 +20,7 @@
 #include "ivlibrary.h"
 #include "ivmodel.h"
 #include "ivobject.h"
+#include "ivtestutils.h"
 #include "propertytemplateconfig.h"
 
 #include <QSignalSpy>
@@ -30,8 +31,8 @@ class IVObjectImp : public ivm::IVObject
 {
     Q_OBJECT
 public:
-    explicit IVObjectImp(const QString &title = QString(), QObject *parent = nullptr)
-        : IVObject(IVObject::Type::Function, title, parent)
+    explicit IVObjectImp(QObject *parent = nullptr)
+        : IVObject(IVObject::Type::Function, parent)
     {
     }
 };
@@ -59,6 +60,7 @@ void tst_IVObject::initTestCase()
 void tst_IVObject::test_defaultConstructor()
 {
     IVObjectImp obj;
+    obj.postInit();
 
     QCOMPARE(obj.parent(), nullptr);
     QCOMPARE(obj.title(), QString("Function_1"));
@@ -70,7 +72,9 @@ void tst_IVObject::test_paramConstructor()
 {
     auto nameToken = ivm::meta::Props::token(ivm::meta::Props::Token::name);
 
-    auto obj = new IVObjectImp("Some_name", this);
+    auto obj = new IVObjectImp(this);
+    obj->setTitle("Some_name");
+
     QCOMPARE(obj->parent(), this);
     QCOMPARE(obj->entityAttributes().value(nameToken).value<QString>(),
             QString("Some_name")); // This is the stored value
@@ -78,7 +82,8 @@ void tst_IVObject::test_paramConstructor()
     QCOMPARE(obj->titleUI(), "Some name"); // This is what the user sees
     QVERIFY(!obj->id().toString().isEmpty());
 
-    obj = new IVObjectImp("Another_name", this);
+    obj = new IVObjectImp(this);
+    obj->setTitle("Another_name");
     QCOMPARE(obj->parent(), this);
     QCOMPARE(obj->entityAttributes().value(nameToken).value<QString>(),
             QString("Another_name")); // This is the stored value
@@ -135,28 +140,28 @@ void tst_IVObject::test_coordinatesType()
     dynPropConfig->init(QLatin1String("default_attributes.xml"));
     ivm::IVModel model(dynPropConfig);
 
-    ivm::IVFunction fn1("Fn1");
-    ivm::IVFunction fn2("Fn2", &fn1);
-    ivm::IVFunction fn3("Fn3", &fn2);
+    ivm::IVFunction *fn1 = ivm::testutils::createFunction("Fn1");
+    ivm::IVFunction *fn2 = ivm::testutils::createFunction("Fn2", fn1);
+    ivm::IVFunction *fn3 = ivm::testutils::createFunction("Fn3", fn2);
 
     QSignalSpy spy(&model, &ivm::IVModel::objectsAdded);
-    model.addObjects<ivm::IVObject *>({ &fn1, &fn2, &fn3 });
+    model.addObjects<ivm::IVObject *>({ fn1, fn2, fn3 });
     QVERIFY(spy.count() == 1);
     QVERIFY(model.objects().size() == 3);
 
-    QCOMPARE(fn1.coordinatesType(), ivm::meta::Props::Token::coordinates);
-    QCOMPARE(fn2.coordinatesType(), ivm::meta::Props::Token::coordinates);
-    QCOMPARE(fn3.coordinatesType(), ivm::meta::Props::Token::coordinates);
+    QCOMPARE(fn1->coordinatesType(), ivm::meta::Props::Token::coordinates);
+    QCOMPARE(fn2->coordinatesType(), ivm::meta::Props::Token::coordinates);
+    QCOMPARE(fn3->coordinatesType(), ivm::meta::Props::Token::coordinates);
 
-    model.setRootObject(fn1.id());
-    QCOMPARE(fn1.coordinatesType(), ivm::meta::Props::Token::RootCoordinates);
-    QCOMPARE(fn2.coordinatesType(), ivm::meta::Props::Token::InnerCoordinates);
-    QCOMPARE(fn3.coordinatesType(), ivm::meta::Props::Token::coordinates);
+    model.setRootObject(fn1->id());
+    QCOMPARE(fn1->coordinatesType(), ivm::meta::Props::Token::RootCoordinates);
+    QCOMPARE(fn2->coordinatesType(), ivm::meta::Props::Token::InnerCoordinates);
+    QCOMPARE(fn3->coordinatesType(), ivm::meta::Props::Token::coordinates);
 
-    model.setRootObject(fn2.id());
-    QCOMPARE(fn1.coordinatesType(), ivm::meta::Props::Token::coordinates);
-    QCOMPARE(fn2.coordinatesType(), ivm::meta::Props::Token::RootCoordinates);
-    QCOMPARE(fn3.coordinatesType(), ivm::meta::Props::Token::InnerCoordinates);
+    model.setRootObject(fn2->id());
+    QCOMPARE(fn1->coordinatesType(), ivm::meta::Props::Token::coordinates);
+    QCOMPARE(fn2->coordinatesType(), ivm::meta::Props::Token::RootCoordinates);
+    QCOMPARE(fn3->coordinatesType(), ivm::meta::Props::Token::InnerCoordinates);
 }
 
 void tst_IVObject::test_hasAttributes()

@@ -18,6 +18,7 @@
 #include "ivfunction.h"
 #include "ivinterface.h"
 #include "ivlibrary.h"
+#include "ivtestutils.h"
 
 #include <QCryptographicHash>
 #include <QDirIterator>
@@ -123,34 +124,26 @@ void tst_IVUtils::tst_ensureFileExists()
 
 void tst_IVUtils::tst_isAncestorOf()
 {
-    ivm::IVFunction fn(QLatin1String("fn"));
-    ivm::IVFunction sibling(QLatin1String("sibling"));
-    QVERIFY(!shared::isAncestorOf(&fn, &sibling));
-    QVERIFY(!shared::isAncestorOf(&sibling, &fn));
+    ivm::IVFunction *fn = ivm::testutils::createFunction(QLatin1String("fn"));
+    ivm::IVFunction *sibling = ivm::testutils::createFunction(QLatin1String("sibling"));
+    QVERIFY(!shared::isAncestorOf(fn, sibling));
+    QVERIFY(!shared::isAncestorOf(sibling, fn));
 
-    ivm::IVFunction nestedFn(QLatin1String("nestedFn"), &fn);
-    QVERIFY(shared::isAncestorOf(&fn, &nestedFn));
-    QVERIFY(!shared::isAncestorOf(&nestedFn, &fn));
+    ivm::IVFunction *nestedFn = ivm::testutils::createFunction(QLatin1String("nestedFn"), fn);
+    QVERIFY(shared::isAncestorOf(fn, nestedFn));
+    QVERIFY(!shared::isAncestorOf(nestedFn, fn));
 
-    ivm::IVInterface::CreationInfo ci;
+    ivm::IVInterfaceRequired *reqIface = ivm::testutils::createRequiredIface(nestedFn, QLatin1String("reqIface"));
+    QVERIFY(shared::isAncestorOf<ivm::IVObject>(fn, reqIface));
+    QVERIFY(shared::isAncestorOf<ivm::IVObject>(nestedFn, reqIface));
+    QVERIFY(!shared::isAncestorOf<ivm::IVObject>(reqIface, fn));
+    QVERIFY(!shared::isAncestorOf<ivm::IVObject>(reqIface, nestedFn));
 
-    ci.type = ivm::IVInterface::InterfaceType::Required;
-    ci.name = QLatin1String("reqIface");
-    ci.function = &nestedFn;
-    ivm::IVInterfaceRequired reqIface(ci);
-    QVERIFY(shared::isAncestorOf<ivm::IVObject>(&fn, &reqIface));
-    QVERIFY(shared::isAncestorOf<ivm::IVObject>(&nestedFn, &reqIface));
-    QVERIFY(!shared::isAncestorOf<ivm::IVObject>(&reqIface, &fn));
-    QVERIFY(!shared::isAncestorOf<ivm::IVObject>(&reqIface, &nestedFn));
-
-    ci.type = ivm::IVInterface::InterfaceType::Provided;
-    ci.name = QLatin1String("provIface");
-    ci.function = &nestedFn;
-    ivm::IVInterfaceProvided provIface(ci);
-    QVERIFY(shared::isAncestorOf<ivm::IVObject>(&fn, &provIface));
-    QVERIFY(shared::isAncestorOf<ivm::IVObject>(&nestedFn, &provIface));
-    QVERIFY(!shared::isAncestorOf<ivm::IVObject>(&provIface, &fn));
-    QVERIFY(!shared::isAncestorOf<ivm::IVObject>(&provIface, &nestedFn));
+    ivm::IVInterfaceProvided *provIface = ivm::testutils::createProvidedIface(nestedFn, QLatin1String("provIface"));
+    QVERIFY(shared::isAncestorOf<ivm::IVObject>(fn, provIface));
+    QVERIFY(shared::isAncestorOf<ivm::IVObject>(nestedFn, provIface));
+    QVERIFY(!shared::isAncestorOf<ivm::IVObject>(provIface, fn));
+    QVERIFY(!shared::isAncestorOf<ivm::IVObject>(provIface, nestedFn));
 }
 
 QTEST_APPLESS_MAIN(tst_IVUtils)

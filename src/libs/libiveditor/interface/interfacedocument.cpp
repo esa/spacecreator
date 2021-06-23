@@ -328,7 +328,8 @@ QList<shared::VEObject *> InterfaceDocument::prepareSelectedObjectsForExport(QSt
 
     name = silent ? exportNames.join(QLatin1Char('_')) : getComponentName(exportNames);
     if (exportNames.size() > 1) {
-        ivm::IVFunction *dummyFunction = new ivm::IVFunction(name);
+        ivm::IVFunction *dummyFunction = new ivm::IVFunction;
+        dummyFunction->setTitle(name);
         for (auto object : objects) {
             if (!object->parentObject()) {
                 dummyFunction->addChild(object->as<ivm::IVObject *>());
