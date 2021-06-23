@@ -17,6 +17,8 @@
 
 #include "mscerrorlistener.h"
 
+#include "errorhub.h"
+
 #include <Lexer.h>
 #include <Parser.h>
 #include <Token.h>
@@ -33,6 +35,7 @@ void MscErrorListener::syntaxError(antlr4::Recognizer *recognizer, antlr4::Token
     antlr4::Lexer *lexer = dynamic_cast<antlr4::Lexer *>(recognizer);
     if (lexer) {
         m_errorMessages.append(QString("line %1:%2: <b>%3</b><br>").arg(lineOfError, positionInLine, errorMessage));
+        shared::ErrorHub::addError(shared::ErrorItem::Error, errorMessage, "", line);
         return;
     }
 
@@ -54,6 +57,8 @@ void MscErrorListener::syntaxError(antlr4::Recognizer *recognizer, antlr4::Token
         m_errorMessages.append(QString("@%1:%2: <b>%3</b>; Rules stack:<br>[%4]<br>")
                                        .arg(lineOfError, positionInLine, errorMessage, stack));
     }
+
+    shared::ErrorHub::addError(shared::ErrorItem::Error, errorMessage, "", line);
 }
 
 QStringList MscErrorListener::getErrorMessages() const

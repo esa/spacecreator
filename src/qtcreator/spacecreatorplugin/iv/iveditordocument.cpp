@@ -137,9 +137,9 @@ bool IVEditorDocument::reload(QString *errorString, ReloadFlag flag, ChangeType 
     } else {
         Q_EMIT aboutToReload();
         Q_EMIT reloadRequested(errorString, filePath().toString());
-        bool success = true;
-        if (errorString != nullptr) {
-            success = errorString->isEmpty();
+        bool success = false;
+        if (m_plugin) {
+            success = m_plugin->document()->load(filePath().toString());
         }
         Q_EMIT reloadFinished(success);
         return success;

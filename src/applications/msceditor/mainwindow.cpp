@@ -24,6 +24,7 @@
 #include "commandlineparser.h"
 #include "commands/cmdsetasn1file.h"
 #include "documentitemmodel.h"
+#include "errorhub.h"
 #include "geometry.h"
 #include "graphicsview.h"
 #include "interface/interfacedocument.h"

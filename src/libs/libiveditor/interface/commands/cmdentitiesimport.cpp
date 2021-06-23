@@ -19,12 +19,13 @@
 
 #include "baseitems/common/ivutils.h"
 #include "commandids.h"
+#include "errorhub.h"
 #include "graphicsviewutils.h"
+#include "ivexporter.h"
 #include "ivfunctiontype.h"
 #include "ivmodel.h"
 #include "ivnamevalidator.h"
 #include "ivxmlreader.h"
-#include "ivexporter.h"
 
 #include <QBuffer>
 #include <QDir>
@@ -81,6 +82,7 @@ CmdEntitiesImport::CmdEntitiesImport(const QByteArray &data, ivm::IVFunctionType
         }
     } else {
         qWarning() << parser.errorString();
+        shared::ErrorHub::addError(shared::ErrorItem::Error, parser.errorString(), "");
     }
 }
 

@@ -23,7 +23,6 @@
 #include "ivconnectiongroup.h"
 #include "ivmodel.h"
 #include "ivnamevalidator.h"
-#include "ivxmlreader.h"
 
 #include <QDebug>
 #include <QDirIterator>

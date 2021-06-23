@@ -136,9 +136,9 @@ bool MscEditorDocument::reload(QString *errorString, ReloadFlag flag, ChangeType
     } else {
         Q_EMIT aboutToReload();
         Q_EMIT reloadRequested(errorString, filePath().toString());
-        bool success = true;
-        if (errorString != nullptr) {
-            success = errorString->isEmpty();
+        bool success = false;
+        if (m_plugin) {
+            success = m_plugin->mainModel()->loadFile(filePath().toString());
         }
         Q_EMIT reloadFinished(success);
         return success;

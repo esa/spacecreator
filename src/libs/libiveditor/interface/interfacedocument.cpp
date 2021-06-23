@@ -250,6 +250,9 @@ bool InterfaceDocument::create(const QString &path)
 
 bool InterfaceDocument::load(const QString &path)
 {
+    if (!d->filePath.isEmpty()) {
+        shared::ErrorHub::clearFileErrors(d->filePath);
+    }
     const QString oldPath = d->filePath;
     setPath(path);
 
@@ -380,17 +383,21 @@ bool InterfaceDocument::exportSelectedType()
 bool InterfaceDocument::loadComponentModel(ivm::IVModel *model, const QString &path)
 {
     if (path.isEmpty() || !QFileInfo::exists(path)) {
+        shared::ErrorHub::addError(shared::ErrorItem::Error, tr("Invalid path"), path);
         qWarning() << Q_FUNC_INFO << "Invalid path";
         return false;
     }
 
+    shared::ErrorHub::setCurrentFile(path);
     ivm::IVXMLReader parser;
     if (!parser.readFile(path)) {
         qWarning() << parser.errorString();
+        shared::ErrorHub::clearCurrentFile();
         return false;
     }
 
     model->addObjects(parser.parsedObjects());
+    shared::ErrorHub::clearCurrentFile();
     return true;
 }
 

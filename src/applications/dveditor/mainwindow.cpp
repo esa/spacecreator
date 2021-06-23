@@ -22,6 +22,7 @@
 #include "config/dvhwlibrarydialog.h"
 #include "dvappmodel.h"
 #include "dveditorcore.h"
+#include "errorhub.h"
 #include "settingsmanager.h"
 #include "ui_mainwindow.h"
 
@@ -74,7 +75,11 @@ void MainWindow::onOpenFileRequested()
     const QString &fileName = QFileDialog::getOpenFileName(
             this, tr("Open file"), prevPath, m_core->appModel()->supportedFileExtensions());
     if (!fileName.isEmpty() && closeFile()) {
+        shared::ErrorHub::clearErrors();
         m_core->appModel()->load(fileName);
+        if (shared::ErrorHub::hasErrors()) {
+            QMessageBox::warning(this, tr("File load warnings"), shared::ErrorHub::errorDescriptions().join("\n"));
+        }
     }
     m_core->actionSaveFile()->setEnabled(m_core->appModel()->isDirty());
 }

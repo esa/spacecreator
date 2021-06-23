@@ -23,6 +23,7 @@
 #include "chartlayoutmanager.h"
 #include "commands/cmdpastechart.h"
 #include "documentitemmodel.h"
+#include "errorhub.h"
 #include "exceptions.h"
 #include "hierarchyviewmodel.h"
 #include "instanceitem.h"
@@ -304,22 +305,31 @@ void MainModel::showFirstChart()
  */
 bool MainModel::loadFile(const QString &filename)
 {
+    if (!d->m_currentFilePath.isEmpty()) {
+        shared::ErrorHub::clearFileErrors(d->m_currentFilePath);
+    }
     msc::MscReader reader;
     msc::MscModel *model = nullptr;
 
+    shared::ErrorHub::setCurrentFile(filename);
     try {
         d->m_mscErrorMessages.clear();
         model = reader.parseFile(filename, &d->m_mscErrorMessages);
     } catch (const msc::ParserException &e) {
         d->m_mscErrorMessages.append(e.errorMessage());
+        shared::ErrorHub::addError(shared::ErrorItem::Error, e.errorMessage(), filename);
         for (const QString &error : d->m_mscErrorMessages) {
             qWarning() << error;
         }
+        shared::ErrorHub::clearCurrentFile();
         return false;
     } catch (...) {
         // print error message
+        shared::ErrorHub::addError(shared::ErrorItem::Error, "", "");
+        shared::ErrorHub::clearCurrentFile();
         return false;
     }
+    shared::ErrorHub::clearCurrentFile();
 
     setCurrentFilePath(filename);
     setNewModel(model);

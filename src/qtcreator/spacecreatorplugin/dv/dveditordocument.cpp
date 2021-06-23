@@ -17,6 +17,7 @@
 
 #include "dveditordocument.h"
 
+#include "dvappmodel.h"
 #include "dveditorcore.h"
 #include "dvmainwidget.h"
 #include "spacecreatorpluginconstants.h"
@@ -91,6 +92,22 @@ bool DVEditorDocument::isModified() const
 
 bool DVEditorDocument::reload(QString *errorString, ReloadFlag flag, ChangeType type)
 {
+    if (flag == FlagIgnore) {
+        return true;
+    }
+    if (type == TypePermissions) {
+        Q_EMIT changed();
+    } else {
+        Q_EMIT aboutToReload();
+        Q_EMIT reloadRequested(errorString, filePath().toString());
+        bool success = false;
+        if (m_plugin) {
+            success = m_plugin->appModel()->load(filePath().toString());
+        }
+        Q_EMIT reloadFinished(success);
+        return success;
+    }
+
     return true;
 }
 

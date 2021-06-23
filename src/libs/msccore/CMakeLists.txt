@@ -111,6 +111,7 @@ target_link_libraries(${LIB_NAME}
     asn1editor
     asn1library
     qobjectlistmodel
+    shared
     templating
     ${QT_CORE}
     ${QT_GUI}

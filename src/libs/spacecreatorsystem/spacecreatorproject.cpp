@@ -76,7 +76,6 @@ QSharedPointer<ive::IVEditorCore> SpaceCreatorProject::ivData(const QString &fil
         data->document()->customActions(); // There some further actions are registered
         data->document()->setAsn1ModelStorage(m_asn1Storage.get());
 
-        shared::ErrorHub::clearFileErrors(fileName);
         data->document()->load(fileName);
         const_cast<SpaceCreatorProject *>(this)->setIvData(fileName, data);
         return data;

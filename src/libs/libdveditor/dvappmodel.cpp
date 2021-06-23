@@ -65,23 +65,30 @@ shared::cmd::CommandsStackBase *DVAppModel::commandsStack() const
 bool DVAppModel::load(const QString &path)
 {
     if (path.isEmpty() || !QFileInfo::exists(path)) {
+        shared::ErrorHub::addError(shared::ErrorItem::Error, tr("Invalid path"), path);
         qWarning() << Q_FUNC_INFO << "Invalid path";
         return false;
     }
 
+    if (!d->filePath.isEmpty()) {
+        shared::ErrorHub::clearFileErrors(d->filePath);
+    }
     const QString oldPath = d->filePath = path;
     setPath(path);
 
+    shared::ErrorHub::setCurrentFile(path);
     dvm::DVXMLReader reader;
     if (!reader.readFile(path)) {
         qWarning() << reader.errorString();
         shared::ErrorHub::addError(shared::ErrorItem::Error, reader.errorString(), path);
         setPath(oldPath);
+        shared::ErrorHub::clearCurrentFile();
         return false;
     }
 
     d->objectsModel->initFromObjects(reader.parsedObjects());
 
+    shared::ErrorHub::clearCurrentFile();
     return true;
 }
 

@@ -31,6 +31,7 @@
 #include "dvitemmodel.h"
 #include "dvmodel.h"
 #include "dvvisualizationmodel.h"
+#include "errorhub.h"
 #include "ui/graphicsviewbase.h"
 
 #include <QBoxLayout>
@@ -279,12 +280,14 @@ void DVEditorCore::loadHWLibrary(const QString &directory)
     QDirIterator it(directory, QStringList() << "*.xml", QDir::Files, QDirIterator::Subdirectories);
     while (it.hasNext()) {
         QString fileName = it.next();
+        shared::ErrorHub::setCurrentFile(fileName);
         dvm::DVHWLibraryReader reader;
         bool ok = reader.readFile(fileName);
         if (ok) {
             objects << reader.parsedObjects();
         }
     }
+    shared::ErrorHub::clearCurrentFile();
     d->m_hwModel->initFromObjects(objects);
 }
 
