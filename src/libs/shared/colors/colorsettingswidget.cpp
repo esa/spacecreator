@@ -18,6 +18,7 @@
 #include "colorsettingswidget.h"
 
 #include "common.h"
+#include "errorhub.h"
 #include "ui_colorsettingswidget.h"
 
 #include <QDebug>
@@ -68,8 +69,10 @@ void ColorSettingsWidget::saveSettings()
 
 bool ColorSettingsWidget::loadFile(const QString &path)
 {
+    shared::ErrorHub::clearFileErrors(path);
     if (!QFile::exists(path)) {
         qWarning() << "File not exists" << path;
+        shared::ErrorHub::addError(shared::ErrorItem::Error, "File not exists", path);
         return false;
     }
 
@@ -130,8 +133,7 @@ void ColorSettingsWidget::on_btnCreateNew_clicked()
     dialog.setDefaultSuffix(".json");
     if (dialog.exec() == QDialog::Accepted) {
         const QString file = dialog.selectedUrls().value(0).toLocalFile();
-        if (shared::copyFile(
-                    ColorManager::defaultColorsResourceFile(), file, shared::FileCopyingMode::Overwrite)) {
+        if (shared::copyFile(ColorManager::defaultColorsResourceFile(), file, shared::FileCopyingMode::Overwrite)) {
             openFile(file);
         }
     }

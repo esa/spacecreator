@@ -18,6 +18,7 @@
 #include "actionsmanager.h"
 
 #include "common.h"
+#include "errorhub.h"
 #include "extprocmonitor.h"
 #include "interface/interfacedocument.h"
 #include "ivexporter.h"
@@ -203,12 +204,14 @@ void ActionsManager::loadActions(const QString &fromFile)
 
 QVector<Action> ActionsManager::parseFile(const QString &filePath, QString *errorHandler)
 {
+    shared::ErrorHub::clearFileErrors(filePath);
     QVector<Action> res;
 
     QFile f(filePath);
     if (!f.open(QIODevice::ReadOnly | QIODevice::Text)) {
         const QString &msg = QString("Can't open file %1 - %2").arg(filePath, f.errorString());
         qWarning() << msg;
+        shared::ErrorHub::addError(shared::ErrorItem::Error, f.errorString(), filePath);
         if (errorHandler)
             *errorHandler = msg;
         return res;
@@ -218,6 +221,8 @@ QVector<Action> ActionsManager::parseFile(const QString &filePath, QString *erro
     if (err.error != QJsonParseError::NoError) {
         const QString &msg = QString("JSON parsing %1 failed: %2").arg(err.errorString(), filePath);
         qWarning() << msg;
+        shared::ErrorHub::addError(
+                shared::ErrorItem::Error, QString("JSON parsing %1 failed: %2").arg(err.errorString()), filePath);
         if (errorHandler)
             *errorHandler = msg;
         return res;
@@ -233,6 +238,7 @@ QVector<Action> ActionsManager::parseFile(const QString &filePath, QString *erro
             QJsonObject jObj = doc.object();
             if (!jObj.contains("version")) {
                 qWarning() << "JSON content does not have a version";
+                shared::ErrorHub::addError(shared::ErrorItem::Error, "JSON content does not have a version", filePath);
                 return {};
             }
             if (jObj.contains("actions")) {
@@ -242,6 +248,7 @@ QVector<Action> ActionsManager::parseFile(const QString &filePath, QString *erro
             jArr = jObj["actions"].toArray();
         } else {
             qWarning() << "JSON content does not match";
+            shared::ErrorHub::addError(shared::ErrorItem::Error, "JSON content does not match", filePath);
             return {};
         }
     }
