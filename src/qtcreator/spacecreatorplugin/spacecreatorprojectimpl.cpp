@@ -33,7 +33,6 @@
 
 namespace spctr {
 
-const char TASK_CATEGORY_ASN_COMPILE[] = "Task.Category.ASNCompile";
 const char TASK_CATEGORY_SPACE_CREATOR[] = "Task.Category.SpaceCreator";
 
 SpaceCreatorProjectImpl::SpaceCreatorProjectImpl(ProjectExplorer::Project *project, QObject *parent)
@@ -51,13 +50,8 @@ SpaceCreatorProjectImpl::SpaceCreatorProjectImpl(ProjectExplorer::Project *proje
     connect(m_project, &ProjectExplorer::Project::fileListChanged, this,
             &spctr::SpaceCreatorProjectImpl::checkAsnFileRename);
 
-    connect(m_asn1Storage.get(), &Asn1Acn::Asn1ModelStorage::error, this, &SpaceCreatorProjectImpl::reportAsn1Error);
-    connect(m_asn1Storage.get(), &Asn1Acn::Asn1ModelStorage::success, this,
-            &SpaceCreatorProjectImpl::clearTasksForFile);
-
     static bool hubInitialized = false;
     if (!hubInitialized) {
-        ProjectExplorer::TaskHub::instance()->addCategory(TASK_CATEGORY_ASN_COMPILE, tr("ASN error"));
         ProjectExplorer::TaskHub::instance()->addCategory(TASK_CATEGORY_SPACE_CREATOR, tr("ASN error"));
         hubInitialized = true;
     }
@@ -125,28 +119,6 @@ void SpaceCreatorProjectImpl::saveIfNotOpen(shared::EditorCore *core)
     }
 }
 
-void SpaceCreatorProjectImpl::reportAsn1Error(const QString &fileName, const QStringList &errors)
-{
-    if (errors.isEmpty()) {
-        return;
-    }
-
-    clearTasksForFile(fileName);
-
-    Asn1Acn::ErrorMessageParser parser;
-    for (const QString &message : errors) {
-        const Asn1Acn::ErrorMessage error = parser.parse(message);
-        if (error.isValid()) {
-            ProjectExplorer::Task task(ProjectExplorer::Task::Error, error.message(),
-                    Utils::FileName::fromString(fileName), error.location().line(), TASK_CATEGORY_ASN_COMPILE);
-            m_errors.append(task);
-            ProjectExplorer::TaskHub::instance()->addTask(task);
-        }
-    }
-
-    ProjectExplorer::TaskHub::requestPopup();
-}
-
 void SpaceCreatorProjectImpl::reportError(const shared::ErrorItem &error)
 {
     ProjectExplorer::Task::TaskType type =
@@ -160,7 +132,6 @@ void SpaceCreatorProjectImpl::reportError(const shared::ErrorItem &error)
 
 void SpaceCreatorProjectImpl::clearAllErrors()
 {
-    ProjectExplorer::TaskHub::instance()->clearTasks(TASK_CATEGORY_ASN_COMPILE);
     ProjectExplorer::TaskHub::instance()->clearTasks(TASK_CATEGORY_SPACE_CREATOR);
 }
 

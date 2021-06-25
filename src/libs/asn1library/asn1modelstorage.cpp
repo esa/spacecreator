@@ -119,7 +119,7 @@ QSharedPointer<File> Asn1ModelStorage::loadData(const QString &fileName)
     QStringList errorMessages;
     Asn1Acn::Asn1Reader parser;
     std::unique_ptr<Asn1Acn::File> asn1Data = parser.parseAsn1File(QFileInfo(fileName), &errorMessages);
-    if (!errorMessages.isEmpty()) {
+    if (!asn1Data) {
         qWarning() << "Can't read file" << fileName << ":" << errorMessages.join(", ");
         Q_EMIT error(fileName, errorMessages);
         return {};

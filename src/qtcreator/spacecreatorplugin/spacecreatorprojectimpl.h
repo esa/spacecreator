@@ -49,7 +49,6 @@ public:
 private Q_SLOTS:
     void checkAsnFileRename();
     void saveIfNotOpen(shared::EditorCore *core);
-    void reportAsn1Error(const QString &fileName, const QStringList &errors);
     void reportError(const shared::ErrorItem &error);
     void clearAllErrors();
     void clearTasksForFile(const QString &fileName);

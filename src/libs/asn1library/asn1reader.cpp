@@ -19,6 +19,7 @@
 
 #include "asn1const.h"
 #include "astxmlparser.h"
+#include "errorhub.h"
 #include "file.h"
 
 #include <QCryptographicHash>
@@ -69,8 +70,13 @@ std::unique_ptr<Asn1Acn::File> Asn1Reader::parseAsn1File(
         const QString &filePath, const QString &fileName, QStringList *errorMessages)
 {
     const QFileInfo asn1File(QDir(filePath), fileName);
+    shared::ErrorHub::clearFileErrors(asn1File.absoluteFilePath());
+
     if (!asn1File.exists()) {
-        errorMessages->append(tr("ASN.1 file %1 does not exist").arg(asn1File.absoluteFilePath()));
+        QString msg = tr("ASN.1 file %1 does not exist").arg(asn1File.absoluteFilePath());
+        errorMessages->append(msg);
+        shared::ErrorHub::addError(shared::ErrorItem::Error, msg, asn1File.absoluteFilePath());
+
         return {};
     }
 
@@ -81,7 +87,9 @@ std::unique_ptr<Asn1Acn::File> Asn1Reader::parseAsn1File(
             QStandardPaths::writableLocation(QStandardPaths::CacheLocation) + "/asn/" + asn1FileHash + ".xml";
 
     if (!QFile::exists(asnCacheFile)) {
-        convertToXML(fullFilePath, asnCacheFile, errorMessages);
+        if (!convertToXML(fullFilePath, asnCacheFile, errorMessages)) {
+            return {};
+        }
     }
 
     std::unique_ptr<Asn1Acn::File> asn1TypesData = parseAsn1XmlFile(asnCacheFile);
@@ -352,9 +360,10 @@ bool Asn1Reader::convertToXML(const QString &asn1FileName, const QString &xmlFil
 {
     QString cmd = asn1CompilerCommand();
     if (cmd.isEmpty()) {
+        QString msg = tr("ASN1 parse error: Unable to run the asn1scc compiler. https://github.com/ttsiodras/asn1scc");
         if (errorMessages)
-            errorMessages->append(
-                    tr("ASN1 parse error: Unable to run the asn1scc compiler. https://github.com/ttsiodras/asn1scc"));
+            errorMessages->append(msg);
+        shared::ErrorHub::addError(shared::ErrorItem::Error, msg, asn1FileName);
         return false;
     }
     QString asn1Command = cmd + "%1 %2";
@@ -375,6 +384,7 @@ bool Asn1Reader::convertToXML(const QString &asn1FileName, const QString &xmlFil
 
     connect(&asn1Process, &QProcess::errorOccurred, [&](QProcess::ProcessError) {
         qWarning() << asn1Process.errorString();
+        shared::ErrorHub::addError(shared::ErrorItem::Error, asn1Process.errorString(), asn1FileName);
         if (errorMessages)
             errorMessages->append(asn1Process.errorString());
     });
@@ -390,6 +400,7 @@ bool Asn1Reader::convertToXML(const QString &asn1FileName, const QString &xmlFil
             errorMessages->append(error);
         }
         QFile::remove(asn1XMLFileName);
+        shared::ErrorHub::addError(shared::ErrorItem::Error, error, asn1FileName);
         return false;
     }
 
