@@ -67,6 +67,13 @@ void CommentCreatorTool::createPreviewItem()
 
 void CommentCreatorTool::commitPreviewItem()
 {
+    if (m_targetEntity && m_model) {
+        InteractiveObject *item = m_model->itemForEntity(m_targetEntity);
+        if (item) {
+            item->enableHighlight();
+        }
+    }
+
     if (!m_previewItem || !m_activeChart)
         return;
 
@@ -97,8 +104,8 @@ void CommentCreatorTool::commitPreviewItem()
             undoStack->endMacro();
         }
     } else {
-        auto previewEntity = m_model->nearestEntity(m_previewItem->sceneBoundingRect().center());
-        m_model->undoStack()->push(new cmd::CmdEntityCommentChange(previewEntity, itemComment, m_model));
+        MscEntity *targetEntity = m_model->nearestEntity(m_previewItem->sceneBoundingRect().center());
+        m_model->undoStack()->push(new cmd::CmdEntityCommentChange(targetEntity, itemComment, m_model));
     }
 
     m_model->updateLayout();
@@ -106,6 +113,32 @@ void CommentCreatorTool::commitPreviewItem()
     removePreviewItem();
 
     Q_EMIT created();
+}
+
+bool CommentCreatorTool::onMouseMove(QMouseEvent *e)
+{
+    if (m_isGlobalComment || !m_model) {
+        return BaseTool::onMouseMove(e);
+    }
+
+    // handle hightlight
+    MscEntity *targetEntity = m_model->nearestEntity(m_previewItem->sceneBoundingRect().center());
+    if (targetEntity != m_targetEntity) {
+        if (m_targetEntity) {
+            InteractiveObject *item = m_model->itemForEntity(m_targetEntity);
+            if (item) {
+                item->disableHighlight();
+            }
+        }
+
+        m_targetEntity = targetEntity;
+        InteractiveObject *item = m_model->itemForEntity(m_targetEntity);
+        if (item) {
+            item->enableHighlight();
+        }
+    }
+
+    return BaseTool::onMouseMove(e);
 }
 
 } // namespace msc

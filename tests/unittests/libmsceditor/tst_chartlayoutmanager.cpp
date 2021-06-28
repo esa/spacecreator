@@ -81,6 +81,8 @@ private Q_SLOTS:
     void testEventIndex();
     void testInstanceEventIndex();
 
+    void testNerestEntity();
+
 protected:
     void parseMsc(const QString &mscDoc) override;
 
@@ -701,6 +703,28 @@ void tst_ChartLayoutManager::testInstanceEventIndex()
 
     pt.setY(coregionItem->sceneBoundingRect().bottom() + 2);
     QCOMPARE(m_chartModel->eventInstanceIndex(pt, instance), 4);
+}
+
+void tst_ChartLayoutManager::testNerestEntity()
+{
+    const QString msc("mscdocument Untitled_Leaf;\
+            msc Untitled_MSC;\
+                instance Instance_1;\
+                    action 'Woohooo';\
+                    concurrent;\
+                endinstance;\
+            endmsc;\
+        endmscdocument;");
+    parseMsc(msc);
+
+    msc::MscInstance *instance = m_chart->instances().at(0);
+    msc::InstanceItem *instaceItem = m_chartModel->itemForInstance(instance);
+
+    auto action = qobject_cast<msc::MscAction *>(m_chart->eventsForInstance(instance).at(0));
+    msc::ActionItem *action1Item = m_chartModel->itemForAction(action);
+
+    QCOMPARE(m_chartModel->nearestEntity(instaceItem->headerItem()->sceneBoundingRect().center()), instance);
+    QCOMPARE(m_chartModel->nearestEntity(action1Item->sceneBoundingRect().center()), action);
 }
 
 QTEST_MAIN(tst_ChartLayoutManager)

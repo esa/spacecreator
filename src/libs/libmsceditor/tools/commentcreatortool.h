@@ -25,15 +25,18 @@ class CommentCreatorTool : public BaseCreatorTool
 {
     Q_OBJECT
 public:
-    explicit CommentCreatorTool(bool isGlobal, ChartLayoutManager *model, QGraphicsView *view, QObject *parent = nullptr);
+    explicit CommentCreatorTool(
+            bool isGlobal, ChartLayoutManager *model, QGraphicsView *view, QObject *parent = nullptr);
 
     BaseTool::ToolType toolType() const override;
 
 private:
     void createPreviewItem() override;
     void commitPreviewItem() override;
+    bool onMouseMove(QMouseEvent *e) override;
 
     const bool m_isGlobalComment;
+    MscEntity *m_targetEntity = nullptr;
 };
 
 } // namespace msc

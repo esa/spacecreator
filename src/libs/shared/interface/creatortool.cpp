@@ -199,7 +199,7 @@ VEItemModel *CreatorTool::model() const
 void CreatorTool::clearPreviewItem()
 {
     for (VEInteractiveObject *iObj : qAsConst(m_collidedItems)) {
-        iObj->highlightConnected();
+        iObj->enableHighlight();
     }
     m_collidedItems.clear();
 

@@ -109,12 +109,12 @@ bool InteractiveObjectBase::isHovered() const
     return d->gripPointsHandler && d->gripPointsHandler->isVisible();
 }
 
-void InteractiveObjectBase::highlightConnected()
+void InteractiveObjectBase::enableHighlight()
 {
-    doHighlighting(Qt::green, false);
+    doHighlighting(Qt::green, false, 1000);
 }
 
-void InteractiveObjectBase::highlightDisconnected()
+void InteractiveObjectBase::disableHighlight()
 {
     doHighlighting(Qt::red, false);
 }
@@ -123,8 +123,9 @@ void InteractiveObjectBase::highlightDisconnected()
    \brief InteractiveObjectBase::doHighlighting
    \param color
    \param permanent if false, the highlight is shown as animation and fades out within a short time
+   \param duration The time the highlight is visible
  */
-void InteractiveObjectBase::doHighlighting(const QColor &color, bool permanent)
+void InteractiveObjectBase::doHighlighting(const QColor &color, bool permanent, int duration)
 {
     if (!d->highlightable) {
         return;
@@ -142,7 +143,7 @@ void InteractiveObjectBase::doHighlighting(const QColor &color, bool permanent)
         highlighter->setBrush(targetColor);
 
         if (!permanent)
-            highlighter->highlight();
+            highlighter->highlight(duration);
     }
 }
 

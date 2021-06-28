@@ -46,7 +46,7 @@ public:
     void setPen(const QPen &pen);
     void setBrush(const QBrush &brush);
 
-    void highlight();
+    void highlight(int duration = 250);
 
 Q_SIGNALS:
     void highlighted();

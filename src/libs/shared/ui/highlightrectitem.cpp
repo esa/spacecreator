@@ -65,11 +65,10 @@ void HighlightRectItem::setBrush(const QBrush &brush)
     m_pathItem->setBrush(brush);
 }
 
-void HighlightRectItem::highlight()
+void HighlightRectItem::highlight(int duration)
 {
     const qreal from = 1.;
     const qreal to = 0.;
-    const int duration = 250;
 
     show();
 

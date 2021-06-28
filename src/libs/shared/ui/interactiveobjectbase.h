@@ -53,9 +53,9 @@ public:
 
     bool isHovered() const;
 
-    void highlightConnected();
-    void highlightDisconnected();
-    void doHighlighting(const QColor &color, bool permanent);
+    void enableHighlight();
+    void disableHighlight();
+    void doHighlighting(const QColor &color, bool permanent, int duration = 250);
     void clearHighlight();
     bool isHighlighting() const;
 

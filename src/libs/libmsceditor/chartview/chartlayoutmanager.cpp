@@ -416,8 +416,6 @@ void ChartLayoutManager::addInstanceItems()
             }
         }
 
-        item->setHighlightable(false);
-
         const bool geomByCif = item->geometryManagedByCif();
         if (geomByCif) {
             item->applyCif();
@@ -1132,9 +1130,14 @@ MscEntity *ChartLayoutManager::nearestEntity(const QPointF &pos)
     };
 
     MscEntity *entity = nullptr;
-    for (auto item : d->allItems())
+    for (msc::InteractiveObject *item : d->m_instanceEventItemsSorted) {
         if ((entity = getNearest(distance, item, pos)))
             return entity;
+    }
+    for (msc::InteractiveObject *item : d->m_instanceItemsSorted) {
+        if ((entity = getNearest(distance, item, pos)))
+            return entity;
+    }
 
     return nullptr;
 }

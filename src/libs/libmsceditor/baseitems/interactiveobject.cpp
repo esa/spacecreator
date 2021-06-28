@@ -38,6 +38,8 @@ InteractiveObject::InteractiveObject(
     , m_entity(entity)
     , m_chartLayoutManager(chartLayoutManager)
 {
+    setHighlightable(true);
+
     setAcceptHoverEvents(true);
 
     setFlags(QGraphicsItem::ItemSendsGeometryChanges | QGraphicsItem::ItemSendsScenePositionChanges);

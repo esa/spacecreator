@@ -49,7 +49,7 @@ ObjectAnchor::ObjectAnchor(const ObjectAnchor &other)
     , m_storedFlags(other.m_storedFlags)
 {
     if (m_anchorObject) {
-        m_anchorObject->highlightConnected();
+        m_anchorObject->enableHighlight();
     }
 }
 
@@ -139,14 +139,14 @@ void ObjectAnchor::connectObject()
         m_storedFlags = m_anchorObject->flags();
         m_anchorObject->setFlags(
                 m_storedFlags | QGraphicsItem::ItemSendsGeometryChanges | QGraphicsItem::ItemSendsScenePositionChanges);
-        m_anchorObject->highlightConnected();
+        m_anchorObject->enableHighlight();
     }
 }
 
 void ObjectAnchor::disconnectObject()
 {
     if (m_anchorObject) {
-        m_anchorObject->highlightDisconnected();
+        m_anchorObject->disableHighlight();
         m_anchorObject->setFlags(m_storedFlags);
         m_anchorObject = nullptr;
     }
