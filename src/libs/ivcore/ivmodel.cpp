@@ -240,12 +240,14 @@ QHash<QString, IVFunctionType *> IVModel::getAvailableFunctionTypes(const IVFunc
         }
     }
 
-    const auto sharedObjects = d->m_sharedTypesModel->objects();
-    for (auto sharedObject : sharedObjects) {
-        if (sharedObject->parentObject() == nullptr) {
-            if (auto fnType = sharedObject->as<IVFunctionType *>()) {
-                if (fnType->isFunctionType()) {
-                    result[fnType->title()] = fnType;
+    if (d->m_sharedTypesModel) {
+        const auto sharedObjects = d->m_sharedTypesModel->objects();
+        for (auto sharedObject : sharedObjects) {
+            if (sharedObject->parentObject() == nullptr) {
+                if (auto fnType = sharedObject->as<IVFunctionType *>()) {
+                    if (fnType->isFunctionType()) {
+                        result[fnType->title()] = fnType;
+                    }
                 }
             }
         }
