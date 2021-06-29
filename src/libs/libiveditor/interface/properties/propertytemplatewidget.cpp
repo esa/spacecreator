@@ -18,8 +18,8 @@
 #include "propertytemplatewidget.h"
 
 #include "addpropertytemplatedialog.h"
-#include "propertytemplate.h"
-#include "propertytemplateconfig.h"
+#include "ivpropertytemplate.h"
+#include "ivpropertytemplateconfig.h"
 #include "ui_propertytemplatewidget.h"
 
 #include <QDebug>
@@ -35,7 +35,7 @@ namespace ive {
 PropertyTemplateWidget::PropertyTemplateWidget(QWidget *parent)
     : QWidget(parent)
     , ui(new Ui::PropertyTemplateWidget)
-    , m_dynPropConfig(ivm::PropertyTemplateConfig::instance())
+    , m_dynPropConfig(ivm::IVPropertyTemplateConfig::instance())
 {
     ui->setupUi(this);
 
@@ -108,14 +108,14 @@ void PropertyTemplateWidget::updateErrorInfo()
     int errorColumn = -1;
 
     if (!xmlData.isEmpty()) {
-        const QList<ivm::PropertyTemplate *> &attrs =
+        const QList<shared::PropertyTemplate *> &attrs =
                 m_dynPropConfig->parseAttributesList(xmlData, &errorMsg, &errorLine, &errorColumn);
 
         if (!errorMsg.isEmpty()) {
             qWarning() << errorMsg << errorLine << errorColumn;
             textColor = Qt::red;
         } else {
-            for (ivm::PropertyTemplate *attr : attrs) {
+            for (shared::PropertyTemplate *attr : attrs) {
                 if (m_usedNames.contains(attr->name())) {
                     errorMsg = tr("Duplicate names found: %1").arg(attr->name());
                     break;
@@ -137,7 +137,7 @@ void PropertyTemplateWidget::on_btnNewProp_clicked()
 {
     AddPropertyTemplateDialog *dlg = new AddPropertyTemplateDialog(m_usedNames, this);
     if (dlg->exec() == QDialog::Accepted) {
-        if (ivm::PropertyTemplate *attr = dlg->attribute()) {
+        if (ivm::IVPropertyTemplate *attr = dlg->attribute()) {
             const QString &xmlData = ui->plainTextEdit->toPlainText();
             QDomDocument doc;
             if (doc.setContent(xmlData)) {

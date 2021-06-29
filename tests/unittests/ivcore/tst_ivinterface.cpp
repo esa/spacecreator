@@ -21,8 +21,8 @@
 #include "ivlibrary.h"
 #include "ivmodel.h"
 #include "ivnamevalidator.h"
+#include "ivpropertytemplateconfig.h"
 #include "ivtestutils.h"
-#include "propertytemplateconfig.h"
 
 #include <QTest>
 
@@ -31,7 +31,7 @@ class tst_IVInterface : public QObject
     Q_OBJECT
 
 private:
-    ivm::PropertyTemplateConfig *cfg { nullptr };
+    ivm::IVPropertyTemplateConfig *cfg { nullptr };
 
 private Q_SLOTS:
     void initTestCase();
@@ -42,7 +42,7 @@ private Q_SLOTS:
 void tst_IVInterface::initTestCase()
 {
     ivm::initIVLibrary();
-    cfg = ivm::PropertyTemplateConfig::instance();
+    cfg = ivm::IVPropertyTemplateConfig::instance();
     cfg->init(QLatin1String("default_attributes.xml"));
 }
 

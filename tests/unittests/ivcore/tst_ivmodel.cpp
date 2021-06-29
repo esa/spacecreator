@@ -22,8 +22,8 @@
 #include "ivlibrary.h"
 #include "ivmodel.h"
 #include "ivobject.h"
+#include "ivpropertytemplateconfig.h"
 #include "ivtestutils.h"
-#include "propertytemplateconfig.h"
 
 #include <QScopedPointer>
 #include <QtTest>
@@ -42,14 +42,14 @@ private Q_SLOTS:
     void testAvailableFunctionTypes();
 
 private:
-    ivm::PropertyTemplateConfig *m_dynPropConfig;
+    ivm::IVPropertyTemplateConfig *m_dynPropConfig;
     QScopedPointer<ivm::IVModel> m_model;
 };
 
 void tst_IVModel::initTestCase()
 {
     ivm::initIVLibrary();
-    m_dynPropConfig = ivm::PropertyTemplateConfig::instance();
+    m_dynPropConfig = ivm::IVPropertyTemplateConfig::instance();
     m_dynPropConfig->init(QLatin1String("default_attributes.xml"));
     m_model.reset(new ivm::IVModel(m_dynPropConfig));
 }

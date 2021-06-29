@@ -17,26 +17,25 @@
 
 #include "propertytemplate.h"
 
-#include "ivobject.h"
+#include "veobject.h"
 
-#include <QDomElement>
-#include <QMetaEnum>
 #include <QRegularExpressionMatch>
 
-namespace ivm {
+namespace shared {
 
-const QString kTagName = QLatin1String("Attr");
+const QString PropertyTemplate::kAttributeTagName = QLatin1String("Attr");
+const QString PropertyTemplate::kScopesTagName = QLatin1String("Scopes");
 
 struct PropertyTemplate::PropertyTemplatePrivate {
     QString m_name;
     QString m_label;
     PropertyTemplate::Info m_info;
     PropertyTemplate::Type m_type;
-    PropertyTemplate::Scopes m_scope;
     QVariant m_value;
     QVariant m_defaultValue;
     QString m_rxValueValidatorPattern;
-    QMap<PropertyTemplate::Scope, QPair<QString, QString>> m_rxAttrValidatorPattern;
+    QMap<int, QPair<QString, QString>> m_rxAttrValidatorPattern;
+    int m_scopes = 0;
     bool m_isVisible = true;
     bool m_isSystem = false;
 };
@@ -98,14 +97,14 @@ void PropertyTemplate::setType(PropertyTemplate::Type t)
     d->m_type = t;
 }
 
-PropertyTemplate::Scopes PropertyTemplate::scope() const
+int PropertyTemplate::scopes() const
 {
-    return d->m_scope;
+    return d->m_scopes;
 }
 
-void PropertyTemplate::setScope(const PropertyTemplate::Scopes &s)
+void PropertyTemplate::setScopes(int s)
 {
-    d->m_scope = s;
+    d->m_scopes = s;
 }
 
 bool PropertyTemplate::isVisible() const
@@ -148,19 +147,19 @@ void PropertyTemplate::setValueValidatorPattern(const QString &pattern)
     d->m_rxValueValidatorPattern = pattern;
 }
 
-QMap<PropertyTemplate::Scope, QPair<QString, QString>> PropertyTemplate::attrValidatorPatterns() const
+QMap<int, QPair<QString, QString>> PropertyTemplate::attrValidatorPatterns() const
 {
     return d->m_rxAttrValidatorPattern;
 }
 
-void PropertyTemplate::setAttrValidatorPattern(const QMap<Scope, QPair<QString, QString>> &pattern)
+void PropertyTemplate::setAttrValidatorPattern(const QMap<int, QPair<QString, QString>> &pattern)
 {
     d->m_rxAttrValidatorPattern = pattern;
 }
 
 QDomElement PropertyTemplate::toXml(QDomDocument *doc) const
 {
-    QDomElement attrElement = doc->createElement(kTagName);
+    QDomElement attrElement = doc->createElement(kAttributeTagName);
     attrElement.setAttribute(QLatin1String("name"), d->m_name);
     if (!d->m_label.isEmpty()) {
         attrElement.setAttribute(QLatin1String("label"), d->m_label);
@@ -191,27 +190,18 @@ QDomElement PropertyTemplate::toXml(QDomDocument *doc) const
     typeElement.appendChild(typeSubElement);
     attrElement.appendChild(typeElement);
 
-#if (QT_VERSION >= QT_VERSION_CHECK(5, 12, 0))
-    static const QMetaEnum &scopeMeta = QMetaEnum::fromType<PropertyTemplate::Scopes>();
-    static const QString scopesElementTag = scopeMeta.name();
-#else
-    static const QMetaEnum &scopeMeta = QMetaEnum::fromType<PropertyTemplate::Scope>();
-    static const QString scopesElementTag = QLatin1String("Scopes");
-#endif
-    QDomElement scopeElement = doc->createElement(scopesElementTag);
-    auto scopesToString = [](const PropertyTemplate::Scopes s) -> QStringList {
+    QDomElement scopeElement = doc->createElement(kScopesTagName);
+    auto scopesToStrings = [scopeMeta = scopeMetaEnum()](int s) -> QStringList {
         QStringList result;
         for (int idx = 0; idx < scopeMeta.keyCount(); ++idx) {
-            if (s.testFlag(static_cast<PropertyTemplate::Scope>(scopeMeta.value(idx)))) {
+            if (s == 0 || s & scopeMeta.value(idx)) {
                 result.append(QString::fromLatin1(scopeMeta.key(idx)));
             }
         }
-        if (result.isEmpty()) {
-            return { scopeMeta.valueToKeys(static_cast<int>(PropertyTemplate::Scope::None)) };
-        }
         return result;
     };
-    for (const QString &scope : scopesToString(d->m_scope)) {
+
+    for (const QString &scope : scopesToStrings(d->m_scopes)) {
         QDomElement scopeSubElement = doc->createElement(scope);
         for (auto it = d->m_rxAttrValidatorPattern.constBegin(); it != d->m_rxAttrValidatorPattern.constEnd(); ++it) {
             QDomElement attrValidatorElement = doc->createElement(QLatin1String("AttrValidator"));
@@ -226,17 +216,12 @@ QDomElement PropertyTemplate::toXml(QDomDocument *doc) const
     return attrElement;
 }
 
-PropertyTemplate *PropertyTemplate::fromXml(const QDomElement &element)
+void PropertyTemplate::initFromXml(const QDomElement &element)
 {
-    if (element.isNull() || element.tagName() != kTagName || !element.hasAttribute(QLatin1String("name"))
-            || !element.hasChildNodes()) {
-        return nullptr;
-    }
     bool ok;
 
     const QString attrName = element.attribute(QLatin1String("name"));
     const QString attrLabel = element.attribute(QLatin1String("label"));
-
     const QString attrType = element.attribute(QLatin1String("type"), QLatin1String("Attribute"));
     const bool isVisible =
             QString::compare(element.attribute(QLatin1String("visible")), QLatin1String("false"), Qt::CaseInsensitive)
@@ -277,19 +262,11 @@ PropertyTemplate *PropertyTemplate::fromXml(const QDomElement &element)
         }
     }
 
-#if (QT_VERSION >= QT_VERSION_CHECK(5, 12, 0))
-    static const QMetaEnum &scopeMeta = QMetaEnum::fromType<PropertyTemplate::Scopes>();
-    static const QString scopesElementTag = scopeMeta.name();
-#else
-    static const QMetaEnum &scopeMeta = QMetaEnum::fromType<PropertyTemplate::Scope>();
-    static const QString scopesElementTag = QLatin1String("Scopes");
-#endif
-    const QDomElement scopeElement = element.firstChildElement(scopesElementTag);
-    PropertyTemplate::Scopes s = PropertyTemplate::Scope::None;
-    QMap<PropertyTemplate::Scope, QPair<QString, QString>> attrValidators;
-    if (scopeElement.isNull() || !scopeElement.hasChildNodes()) {
-        s = PropertyTemplate::Scope::All;
-    } else {
+    const QDomElement scopeElement = element.firstChildElement(kScopesTagName);
+    const QMetaEnum scopeMeta = scopeMetaEnum();
+    int s = 0;
+    QMap<int, QPair<QString, QString>> attrValidators;
+    if (!scopeElement.isNull() && scopeElement.hasChildNodes()) {
         QDomElement scopeSubElement = scopeElement.firstChildElement();
         while (!scopeSubElement.isNull()) {
             const QString scopeName = scopeSubElement.tagName();
@@ -297,14 +274,14 @@ PropertyTemplate *PropertyTemplate::fromXml(const QDomElement &element)
             if (!ok || scopeInt == -1) {
                 continue;
             }
-            const PropertyTemplate::Scope scope = static_cast<PropertyTemplate::Scope>(scopeInt);
-            s.setFlag(scope);
+
+            s |= scopeInt;
             QDomElement attrValidatorElement = scopeSubElement.firstChildElement(QLatin1String("AttrValidator"));
             while (!attrValidatorElement.isNull()) {
                 const QString attrValidatorName = attrValidatorElement.attribute(QLatin1String("name"));
                 const QString attrValidatorPattern = attrValidatorElement.attribute(QLatin1String("value"));
                 if (!attrValidatorName.isEmpty() && !attrValidatorPattern.isNull()) {
-                    attrValidators.insert(scope, qMakePair(attrValidatorName, attrValidatorPattern));
+                    attrValidators.insert(scopeInt, qMakePair(attrValidatorName, attrValidatorPattern));
                 }
                 attrValidatorElement = attrValidatorElement.nextSiblingElement(attrValidatorElement.tagName());
             }
@@ -312,23 +289,16 @@ PropertyTemplate *PropertyTemplate::fromXml(const QDomElement &element)
         }
     }
 
-    auto propertyTemplate = new PropertyTemplate;
-    propertyTemplate->setName(attrName);
-    propertyTemplate->setLabel(attrLabel);
-    propertyTemplate->setInfo(i);
-    propertyTemplate->setType(t);
-    propertyTemplate->setScope(s);
-    propertyTemplate->setValue(value);
-    propertyTemplate->setDefaultValue(defaultValue);
-    propertyTemplate->setAttrValidatorPattern(attrValidators);
-    propertyTemplate->setValueValidatorPattern(typeValidator);
-    propertyTemplate->setVisible(isVisible);
-    return propertyTemplate;
-}
-
-QString PropertyTemplate::tagName()
-{
-    return kTagName;
+    setName(attrName);
+    setLabel(attrLabel);
+    setInfo(i);
+    setType(t);
+    setScopes(s);
+    setValue(value);
+    setDefaultValue(defaultValue);
+    setAttrValidatorPattern(attrValidators);
+    setValueValidatorPattern(typeValidator);
+    setVisible(isVisible);
 }
 
 QVariant PropertyTemplate::convertData(const QVariant &value, PropertyTemplate::Type type)
@@ -381,41 +351,15 @@ QVariant PropertyTemplate::convertData(const QVariant &value, PropertyTemplate::
     return typedValue;
 }
 
-static inline PropertyTemplate::Scope typeToScope(const IVObject::Type &type)
-{
-    auto scope = PropertyTemplate::Scope::None;
-    switch (type) {
-    case ivm::IVObject::Type::Connection:
-        scope = PropertyTemplate::Scope::Connection;
-        break;
-    case ivm::IVObject::Type::Comment:
-        scope = PropertyTemplate::Scope::Comment;
-        break;
-    case ivm::IVObject::Type::FunctionType:
-    case ivm::IVObject::Type::Function:
-        scope = PropertyTemplate::Scope::Function;
-        break;
-    case ivm::IVObject::Type::RequiredInterface:
-        scope = PropertyTemplate::Scope::Required_Interface;
-        break;
-    case ivm::IVObject::Type::ProvidedInterface:
-        scope = PropertyTemplate::Scope::Provided_Interface;
-        break;
-    default:
-        break;
-    }
-    return scope;
-}
-
 /*!
  * \brief PropertyTemplate::validate
  * \param object which attributes to be checked
  * \return
  */
-bool PropertyTemplate::validate(const IVObject *object) const
+bool PropertyTemplate::validate(const VEObject *object) const
 {
-    const PropertyTemplate::Scope objectScope = typeToScope(object->type());
-    if (!d->m_scope.testFlag(objectScope)) {
+    const int objScope = objectScope(object);
+    if (d->m_scopes != 0 && !(d->m_scopes & objScope)) {
         return false;
     }
 
@@ -423,7 +367,7 @@ bool PropertyTemplate::validate(const IVObject *object) const
         return true;
     }
 
-    const auto it = d->m_rxAttrValidatorPattern.constFind(objectScope);
+    const auto it = d->m_rxAttrValidatorPattern.constFind(objScope);
     if (it != d->m_rxAttrValidatorPattern.constEnd()) {
         auto checkPattern = [](const EntityAttributes &data, const QString &name, const QString &pattern) {
             auto objAttrIter = data.constFind(name);
@@ -440,4 +384,4 @@ bool PropertyTemplate::validate(const IVObject *object) const
     return false;
 }
 
-} // namespace ivm
+} // namespace shared

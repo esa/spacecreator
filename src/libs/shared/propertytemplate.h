@@ -1,5 +1,7 @@
 #pragma once
 
+#include <QDomElement>
+#include <QMetaEnum>
 #include <QObject>
 #include <QVariant>
 #include <QVector>
@@ -7,15 +9,17 @@
 
 class QValidator;
 class QDomDocument;
-class QDomElement;
 
-namespace ivm {
-class IVObject;
+namespace shared {
+class VEObject;
 
 class PropertyTemplate
 {
     Q_GADGET
 public:
+    static const QString kAttributeTagName;
+    static const QString kScopesTagName;
+
     enum class Info
     {
         Property,
@@ -34,27 +38,8 @@ public:
     };
     Q_ENUM(Type)
 
-    enum class Scope
-    {
-        None = 0x0,
-        Function = 0x1,
-        Required_Interface = 0x2,
-        Provided_Interface = 0x4,
-        Comment = 0x8,
-        Connection = 0x10,
-        All = Function | Required_Interface | Provided_Interface | Comment | Connection
-    };
-
-    Q_ENUM(Scope)
-#if (QT_VERSION >= QT_VERSION_CHECK(5, 12, 0))
-    Q_DECLARE_FLAGS(Scopes, Scope)
-#else
-    Q_DECLARE_FLAGS(Scopes, ivm::PropertyTemplate::Scope)
-#endif
-    Q_FLAG(Scopes)
-
     PropertyTemplate();
-    ~PropertyTemplate();
+    virtual ~PropertyTemplate();
 
     QString name() const;
     void setName(const QString &name);
@@ -71,8 +56,8 @@ public:
     bool isSystem() const;
     void setSystem(bool value);
 
-    Scopes scope() const;
-    void setScope(const Scopes &s);
+    int scopes() const;
+    void setScopes(int s);
 
     bool isVisible() const;
     void setVisible(bool value);
@@ -86,23 +71,37 @@ public:
     QString valueValidatorPattern() const;
     void setValueValidatorPattern(const QString &pattern);
 
-    QMap<PropertyTemplate::Scope, QPair<QString, QString>> attrValidatorPatterns() const;
-    void setAttrValidatorPattern(const QMap<PropertyTemplate::Scope, QPair<QString, QString>> &pattern);
+    QMap<int, QPair<QString, QString>> attrValidatorPatterns() const;
+    void setAttrValidatorPattern(const QMap<int, QPair<QString, QString>> &pattern);
 
     QDomElement toXml(QDomDocument *domDoc) const;
-    static PropertyTemplate *fromXml(const QDomElement &element);
-    static QString tagName();
+
+    bool validate(const VEObject *object) const;
+
     static QVariant convertData(const QVariant &value, PropertyTemplate::Type type);
 
-    bool validate(const IVObject *object) const;
+    virtual QMetaEnum scopeMetaEnum() const = 0;
+    virtual int objectScope(const VEObject *obj) const = 0;
+
+    template<typename T, typename = typename std::enable_if<std::is_base_of<PropertyTemplate, T>::value, T>::type>
+    static PropertyTemplate *createFromXml(const QDomElement &element)
+    {
+        if (element.isNull() || element.tagName() != T::kAttributeTagName
+                || !element.hasAttribute(QLatin1String("name")) || !element.hasChildNodes()) {
+            return nullptr;
+        }
+
+        PropertyTemplate *t = new T;
+        t->initFromXml(element);
+        return t;
+    }
+
+protected:
+    void initFromXml(const QDomElement &element);
 
 private:
     struct PropertyTemplatePrivate;
     const std::unique_ptr<PropertyTemplatePrivate> d;
 };
 
-} // namespace ivm
-
-Q_DECLARE_OPERATORS_FOR_FLAGS(ivm::PropertyTemplate::Scopes)
-Q_DECLARE_METATYPE(ivm::PropertyTemplate::Type)
-Q_DECLARE_METATYPE(ivm::PropertyTemplate::Scopes)
+} // namespace shared

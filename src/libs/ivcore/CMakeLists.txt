@@ -37,14 +37,14 @@ target_sources(${LIB_NAME} PRIVATE
     ivxmlreader.h
     connectioncreationvalidator.cpp
     connectioncreationvalidator.h
-    propertytemplate.cpp
-    propertytemplate.h
-    propertytemplateconfig.cpp
-    propertytemplateconfig.h
+    ivpropertytemplate.cpp
+    ivpropertytemplate.h
     ivlibrary.cpp
     ivlibrary.h
     ivcoreutils.cpp
     ivcoreutils.h
+    ivpropertytemplateconfig.cpp
+    ivpropertytemplateconfig.h
     ivresources.qrc
 )
 

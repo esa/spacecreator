@@ -17,43 +17,20 @@
 
 #pragma once
 
-#include <QWidget>
+#include "propertytemplateconfig.h"
 
 namespace ivm {
-class IVPropertyTemplateConfig;
-}
-namespace Ui {
-class PropertyTemplateWidget;
-}
 
-namespace ive {
-
-class PropertyTemplateWidget : public QWidget
+class IVPropertyTemplateConfig : public shared::PropertyTemplateConfig
 {
-    Q_OBJECT
-
 public:
-    explicit PropertyTemplateWidget(QWidget *parent = nullptr);
-    ~PropertyTemplateWidget();
+    static IVPropertyTemplateConfig *instance();
 
-    void save();
-    bool readConfig(const QString &from);
-    void setTextColor(const QColor &color);
-
-    bool hasError() const;
-
-Q_SIGNALS:
-    void hasErrorChanged();
-
-private Q_SLOTS:
-    void updateErrorInfo();
-    void on_btnNewProp_clicked();
+protected:
+    shared::PropertyTemplate *createPropertyTemplate(const QDomElement &element) const override;
 
 private:
-    Ui::PropertyTemplateWidget *ui;
-    ivm::IVPropertyTemplateConfig *m_dynPropConfig { nullptr };
-    QStringList m_usedNames;
-    bool m_error = false;
+    static IVPropertyTemplateConfig *m_instance;
 };
 
-}
+} // namespace ivm

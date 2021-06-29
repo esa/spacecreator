@@ -1,5 +1,5 @@
 /*
-  Copyright (C) 2019 European Space Agency - <maxime.perrotin@esa.int>
+  Copyright (C) 2019-2021 European Space Agency - <maxime.perrotin@esa.int>
 
   This library is free software; you can redistribute it and/or
   modify it under the terms of the GNU Library General Public
@@ -17,23 +17,15 @@
 
 #pragma once
 
-#include "commandsstack.h"
-
-#include <QDialog>
-#include <QPointer>
-#include <QSharedPointer>
-
-namespace Ui {
-class PropertiesDialog;
-}
+#include "ivobject.h"
+#include "propertiesdialog.h"
 
 namespace Asn1Acn {
 class File;
 }
 
 namespace ivm {
-class IVObject;
-class PropertyTemplateConfig;
+class IVPropertyTemplateConfig;
 }
 
 namespace ive {
@@ -41,22 +33,22 @@ namespace cmd {
 class CommandsStack;
 }
 
-class PropertiesDialog : public QDialog
+class IVPropertiesDialog : public shared::PropertiesDialog
 {
     Q_OBJECT
 
 public:
-    explicit PropertiesDialog(ivm::PropertyTemplateConfig *dynPropConfig, ivm::IVObject *obj,
+    explicit IVPropertiesDialog(ivm::IVPropertyTemplateConfig *dynPropConfig, ivm::IVObject *obj,
             const QSharedPointer<Asn1Acn::File> &dataTypes, cmd::CommandsStack *commandsStack,
             QWidget *parent = nullptr);
-    ~PropertiesDialog() override;
+    ~IVPropertiesDialog() override;
+    void init() override;
 
-public Q_SLOTS:
-    void done(int r) override;
+protected:
+    QString objectTypeName() const override;
+    ivm::IVObject *dataObject() const override;
 
 private:
-    QString objectTypeName() const;
-    void initTabs();
     void initConnectionGroup();
     void initAttributesView();
     void initContextParams();
@@ -64,12 +56,7 @@ private:
     void initCommentView();
 
 private:
-    Ui::PropertiesDialog *ui;
-    ivm::IVObject *m_dataObject { nullptr };
-    ivm::PropertyTemplateConfig *m_dynPropConfig { nullptr };
-    cmd::CommandsStack::Macro *m_cmdMacro { nullptr };
     QSharedPointer<Asn1Acn::File> m_dataTypes;
-    QPointer<cmd::CommandsStack> m_commandsStack;
 };
 
-}
+} // namespace ive

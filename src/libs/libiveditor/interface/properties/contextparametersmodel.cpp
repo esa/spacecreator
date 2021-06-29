@@ -27,7 +27,7 @@
 #include "ivfunction.h"
 #include "ivnamevalidator.h"
 #include "ivobject.h"
-#include "propertytemplate.h"
+#include "ivpropertytemplate.h"
 #include "propertytemplateconfig.h"
 
 #include <algorithm>

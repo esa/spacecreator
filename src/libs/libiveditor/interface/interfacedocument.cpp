@@ -32,7 +32,7 @@
 #include "graphicsitemhelpers.h"
 #include "graphicsviewutils.h"
 #include "interface/objectstreeview.h"
-#include "interface/properties/propertiesdialog.h"
+#include "interface/properties/ivpropertiesdialog.h"
 #include "interface/properties/propertytemplatemanager.h"
 #include "interface/properties/propertytemplatewidget.h"
 #include "ivcomment.h"
@@ -44,9 +44,9 @@
 #include "ivfunctiongraphicsitem.h"
 #include "ivitemmodel.h"
 #include "ivmodel.h"
+#include "ivpropertytemplateconfig.h"
 #include "ivvisualizationmodelbase.h"
 #include "ivxmlreader.h"
-#include "propertytemplateconfig.h"
 
 #include <QAction>
 #include <QApplication>
@@ -77,7 +77,7 @@ struct InterfaceDocument::InterfaceDocumentPrivate {
 
     QPointer<QWidget> view;
     ive::GraphicsView *graphicsView { nullptr };
-    ivm::PropertyTemplateConfig *dynPropConfig { nullptr };
+    ivm::IVPropertyTemplateConfig *dynPropConfig { nullptr };
     QTreeView *objectsView { nullptr };
     IVItemModel *itemsModel { nullptr };
     IVVisualizationModelBase *objectsVisualizationModel { nullptr };
@@ -121,7 +121,7 @@ InterfaceDocument::InterfaceDocument(QObject *parent)
     connect(d->commandsStack, &cmd::CommandsStack::cleanChanged, this,
             [this](bool clean) { Q_EMIT dirtyChanged(!clean); });
 
-    d->dynPropConfig = ivm::PropertyTemplateConfig::instance();
+    d->dynPropConfig = ivm::IVPropertyTemplateConfig::instance();
     d->dynPropConfig->init(ive::dynamicPropertiesFilePath());
 
     d->importModel = new ivm::IVModel(d->dynPropConfig, nullptr, this);
@@ -738,8 +738,9 @@ void InterfaceDocument::showPropertyEditor(const shared::Id &id)
         return;
     }
 
-    ive::PropertiesDialog dialog(d->dynPropConfig, obj, d->asnModelStorage->asn1DataTypes(asn1FilePath()),
+    ive::IVPropertiesDialog dialog(d->dynPropConfig, obj, d->asnModelStorage->asn1DataTypes(asn1FilePath()),
             d->commandsStack, d->graphicsView);
+    dialog.init();
     dialog.exec();
 }
 

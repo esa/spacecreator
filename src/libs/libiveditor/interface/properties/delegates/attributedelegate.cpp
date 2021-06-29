@@ -22,7 +22,7 @@
 #include "ivnamevalidator.h"
 #include "ivobject.h"
 #include "interface/properties/propertieslistmodel.h"
-#include "propertytemplate.h"
+#include "ivpropertytemplate.h"
 #include "propertytemplateconfig.h"
 
 #include <QCheckBox>

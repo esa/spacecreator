@@ -18,7 +18,7 @@
 #include "baseitems/common/ivutils.h"
 #include "interface/properties/propertieslistmodel.h"
 #include "ivfunction.h"
-#include "propertytemplateconfig.h"
+#include "ivpropertytemplateconfig.h"
 
 #include <QObject>
 #include <QtTest>
@@ -32,13 +32,13 @@ private Q_SLOTS:
 
 private:
     ive::cmd::CommandsStack::Macro *m_macro { nullptr };
-    ivm::PropertyTemplateConfig *m_config { nullptr };
+    ivm::IVPropertyTemplateConfig *m_config { nullptr };
 };
 
 void tst_PropertiesListModel::initTestCase()
 {
     m_macro = new ive::cmd::CommandsStack::Macro(new QUndoStack);
-    m_config = ivm::PropertyTemplateConfig::instance();
+    m_config = ivm::IVPropertyTemplateConfig::instance();
     m_config->init(ive::dynamicPropertiesFilePath());
 }
 

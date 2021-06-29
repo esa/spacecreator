@@ -148,9 +148,8 @@ target_sources(${LIB_NAME} PRIVATE
     interface/properties/propertytemplatewidget.ui
     interface/properties/ifaceparametersmodel.cpp
     interface/properties/ifaceparametersmodel.h
-    interface/properties/propertiesdialog.cpp
-    interface/properties/propertiesdialog.h
-    interface/properties/propertiesdialog.ui
+    interface/properties/ivpropertiesdialog.cpp
+    interface/properties/ivpropertiesdialog.h
     interface/properties/propertieslistmodel.cpp
     interface/properties/propertieslistmodel.h
     interface/properties/propertiesmodelbase.cpp

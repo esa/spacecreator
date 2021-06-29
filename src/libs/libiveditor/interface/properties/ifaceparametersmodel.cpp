@@ -23,7 +23,7 @@
 #include "interface/commands/cmdifaceparamremove.h"
 #include "ivinterface.h"
 #include "ivobject.h"
-#include "propertytemplate.h"
+#include "ivpropertytemplate.h"
 #include "propertytemplateconfig.h"
 
 #include <QDebug>

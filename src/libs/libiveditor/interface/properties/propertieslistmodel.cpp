@@ -29,7 +29,7 @@
 #include "ivmodel.h"
 #include "ivnamevalidator.h"
 #include "ivobject.h"
-#include "propertytemplateconfig.h"
+#include "ivpropertytemplateconfig.h"
 
 #include <QApplication>
 #include <QDebug>
@@ -61,7 +61,7 @@ ivm::meta::Props::Token PropertiesListModel::tokenFromIndex(const QModelIndex &i
 }
 
 PropertiesListModel::PropertiesListModel(
-        cmd::CommandsStack::Macro *macro, ivm::PropertyTemplateConfig *dynPropConfig, QObject *parent)
+        cmd::CommandsStack::Macro *macro, shared::PropertyTemplateConfig *dynPropConfig, QObject *parent)
     : PropertiesModelBase(parent)
     , m_cmdMacro(macro)
     , m_propTemplatesConfig(dynPropConfig)
@@ -88,7 +88,7 @@ void PropertiesListModel::updateRow(const RowData &data)
 
     QFont font = qApp->font();
     font.setBold(true);
-    font.setItalic(data.info == ivm::PropertyTemplate::Info::Property);
+    font.setItalic(data.info == ivm::IVPropertyTemplate::Info::Property);
     titleItem->setData(font, Qt::FontRole);
 
     QStandardItem *valueItem = item(row, Column::Value);
@@ -102,10 +102,10 @@ void PropertiesListModel::updateRow(const RowData &data)
     valueItem->setData(static_cast<int>(data.info), InfoRole);
 }
 
-QStringList PropertiesListModel::sortedKeys(const QList<ivm::PropertyTemplate *> &templates) const
+QStringList PropertiesListModel::sortedKeys(const QList<shared::PropertyTemplate *> &templates) const
 {
     QStringList templateKeys;
-    for (ivm::PropertyTemplate *propTemplate : templates) {
+    for (shared::PropertyTemplate *propTemplate : templates) {
         templateKeys.append(propTemplate->name());
     }
     QStringList keys { m_dataObject->entityAttributes().keys() };
@@ -141,25 +141,26 @@ void PropertiesListModel::invalidateAttributes(const QString &propName)
     setDataObject(m_dataObject);
 }
 
-void PropertiesListModel::updateRows(const QList<ivm::PropertyTemplate *> &templates)
+void PropertiesListModel::updateRows(const QList<shared::PropertyTemplate *> &templates)
 {
     auto init = [this](const QStringList &keys) {
         int row = -1;
         for (const QString &key : keys) {
-            ivm::PropertyTemplate *propTemplate = m_propTemplatesConfig->propertyTemplateForObject(m_dataObject, key);
+            shared::PropertyTemplate *propTemplate =
+                    m_propTemplatesConfig->propertyTemplateForObject(m_dataObject, key);
             if (propTemplate && (!propTemplate->isVisible() || !propTemplate->validate(m_dataObject)))
                 continue;
 
             RowData rd;
             rd.row = ++row;
             rd.name = key;
-            const ivm::PropertyTemplate::Type type =
-                    propTemplate ? propTemplate->type() : ivm::PropertyTemplate::Type::String;
+            const ivm::IVPropertyTemplate::Type type =
+                    propTemplate ? propTemplate->type() : ivm::IVPropertyTemplate::Type::String;
             const QString decodedKey = ivm::IVNameValidator::decodeName(m_dataObject->type(), key);
             if (propTemplate) {
                 rd.rxValidator = propTemplate->valueValidatorPattern();
                 rd.label = propTemplate->label().isEmpty() ? decodedKey : propTemplate->label();
-                rd.editValue = ivm::PropertyTemplate::convertData(propTemplate->value(), type);
+                rd.editValue = ivm::IVPropertyTemplate::convertData(propTemplate->value(), type);
             } else {
                 rd.label = decodedKey;
                 rd.editValue = QVariant(QVariant::String);
@@ -170,8 +171,8 @@ void PropertiesListModel::updateRows(const QList<ivm::PropertyTemplate *> &templ
                 rd.info = propTemplate->info();
             } else {
                 rd.value = attr.value();
-                rd.info = attr.isProperty() ? ivm::PropertyTemplate::Info::Property
-                                            : ivm::PropertyTemplate::Info::Attribute;
+                rd.info = attr.isProperty() ? ivm::IVPropertyTemplate::Info::Property
+                                            : ivm::IVPropertyTemplate::Info::Attribute;
             }
 
             updateRow(rd);
@@ -244,7 +245,7 @@ bool PropertiesListModel::setData(const QModelIndex &index, const QVariant &valu
     if (role == DataRole || role == Qt::EditRole) {
         const QString &name = tokenNameFromIndex(index);
         auto isValueValid = [this](const QString &name, const QString &value) {
-            if (ivm::PropertyTemplate *propTemplate =
+            if (shared::PropertyTemplate *propTemplate =
                             m_propTemplatesConfig->propertyTemplateForObject(m_dataObject, name)) {
                 const QString valuePattern = propTemplate->valueValidatorPattern();
                 if (!valuePattern.isEmpty()) {
@@ -358,12 +359,12 @@ bool PropertiesListModel::removeProperty(const QModelIndex &index)
 
 bool PropertiesListModel::isAttr(const QModelIndex &id) const
 {
-    return id.isValid() && static_cast<int>(ivm::PropertyTemplate::Info::Attribute) == id.data(InfoRole).toInt();
+    return id.isValid() && static_cast<int>(ivm::IVPropertyTemplate::Info::Attribute) == id.data(InfoRole).toInt();
 }
 
 bool PropertiesListModel::isProp(const QModelIndex &id) const
 {
-    return id.isValid() && static_cast<int>(ivm::PropertyTemplate::Info::Property) == id.data(InfoRole).toInt();
+    return id.isValid() && static_cast<int>(ivm::IVPropertyTemplate::Info::Property) == id.data(InfoRole).toInt();
 }
 
 bool PropertiesListModel::isEditable(const QModelIndex &idx) const
@@ -404,7 +405,7 @@ Qt::ItemFlags PropertiesListModel::flags(const QModelIndex &index) const
 }
 
 FunctionPropertiesListModel::FunctionPropertiesListModel(
-        cmd::CommandsStack::Macro *macro, ivm::PropertyTemplateConfig *dynPropConfig, QObject *parent)
+        cmd::CommandsStack::Macro *macro, shared::PropertyTemplateConfig *dynPropConfig, QObject *parent)
     : PropertiesListModel(macro, dynPropConfig, parent)
 {
 }
@@ -458,7 +459,7 @@ bool FunctionPropertiesListModel::isEditable(const QModelIndex &index) const
 }
 
 InterfacePropertiesListModel::InterfacePropertiesListModel(
-        cmd::CommandsStack::Macro *macro, ivm::PropertyTemplateConfig *dynPropConfig, QObject *parent)
+        cmd::CommandsStack::Macro *macro, shared::PropertyTemplateConfig *dynPropConfig, QObject *parent)
     : PropertiesListModel(macro, dynPropConfig, parent)
 {
 }

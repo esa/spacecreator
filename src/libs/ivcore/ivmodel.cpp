@@ -23,7 +23,7 @@
 #include "ivfunction.h"
 #include "ivfunctiontype.h"
 #include "ivnamevalidator.h"
-#include "propertytemplate.h"
+#include "ivpropertytemplate.h"
 #include "propertytemplateconfig.h"
 
 #include <QtDebug>
@@ -31,14 +31,14 @@
 namespace ivm {
 
 struct IVModelPrivate {
-    PropertyTemplateConfig *m_dynPropConfig { nullptr };
+    shared::PropertyTemplateConfig *m_dynPropConfig { nullptr };
     IVModel *m_sharedTypesModel { nullptr };
     shared::Id m_rootObjectId;
     QList<IVObject *> m_visibleObjects;
     QVector<QString> m_headerTitles;
 };
 
-IVModel::IVModel(PropertyTemplateConfig *dynPropConfig, IVModel *sharedModel, QObject *parent)
+IVModel::IVModel(shared::PropertyTemplateConfig *dynPropConfig, IVModel *sharedModel, QObject *parent)
     : shared::VEModel(parent)
     , d(new IVModelPrivate)
 {
@@ -60,9 +60,9 @@ bool IVModel::addObjectImpl(shared::VEObject *obj)
                     if (currentValue.isNull()) {
                         const QVariant &defaultValue = attr->defaultValue();
                         if (!defaultValue.isNull()) {
-                            if (attr->info() == ivm::PropertyTemplate::Info::Attribute) {
+                            if (attr->info() == ivm::IVPropertyTemplate::Info::Attribute) {
                                 obj->setEntityAttribute(attr->name(), defaultValue);
-                            } else if (attr->info() == ivm::PropertyTemplate::Info::Property) {
+                            } else if (attr->info() == ivm::IVPropertyTemplate::Info::Property) {
                                 obj->setEntityProperty(attr->name(), defaultValue);
                             } else {
                                 qWarning() << "Unknown dynamic property info:" << attr->info();

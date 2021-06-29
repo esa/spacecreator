@@ -25,20 +25,23 @@
 #include <QVector>
 #include <memory>
 
+namespace shared {
+class PropertyTemplateConfig;
+}
 namespace ivm {
 
 class IVComment;
 class IVConnection;
 class IVFunction;
 class IVFunctionType;
-class PropertyTemplateConfig;
 
 struct IVModelPrivate;
 class IVModel : public shared::VEModel
 {
     Q_OBJECT
 public:
-    explicit IVModel(PropertyTemplateConfig *dynPropConfig, IVModel *sharedModel = nullptr, QObject *parent = nullptr);
+    explicit IVModel(
+            shared::PropertyTemplateConfig *dynPropConfig, IVModel *sharedModel = nullptr, QObject *parent = nullptr);
     ~IVModel() override;
 
     bool removeObject(shared::VEObject *obj) override;

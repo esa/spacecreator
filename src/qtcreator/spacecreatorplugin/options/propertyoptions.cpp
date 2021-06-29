@@ -19,7 +19,7 @@
 
 #include "baseitems/common/ivutils.h"
 #include "interface/properties/propertytemplatewidget.h"
-#include "propertytemplateconfig.h"
+#include "ivpropertytemplateconfig.h"
 #include "spacecreatorpluginconstants.h"
 
 namespace spctr {
@@ -36,7 +36,7 @@ PropertyOptions::PropertyOptions()
 QWidget *PropertyOptions::widget()
 {
     if (!m_widget) {
-        auto config = ivm::PropertyTemplateConfig::instance();
+        auto config = ivm::IVPropertyTemplateConfig::instance();
         config->init(ive::dynamicPropertiesFilePath());
         m_widget = new ive::PropertyTemplateWidget;
     }
@@ -46,7 +46,7 @@ QWidget *PropertyOptions::widget()
 void PropertyOptions::apply()
 {
     m_widget->save();
-    auto config = ivm::PropertyTemplateConfig::instance();
+    auto config = ivm::IVPropertyTemplateConfig::instance();
     config->init(ive::dynamicPropertiesFilePath());
 }
 

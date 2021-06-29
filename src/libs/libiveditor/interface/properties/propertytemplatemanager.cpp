@@ -18,7 +18,7 @@
 #include "propertytemplatemanager.h"
 
 #include "baseitems/common/ivutils.h"
-#include "propertytemplateconfig.h"
+#include "ivpropertytemplateconfig.h"
 #include "ui_propertytemplatemanager.h"
 
 #include <QDialogButtonBox>
@@ -44,7 +44,7 @@ PropertyTemplateManager::~PropertyTemplateManager()
 void PropertyTemplateManager::accept()
 {
     ui->widget->save();
-    auto config = ivm::PropertyTemplateConfig::instance();
+    auto config = ivm::IVPropertyTemplateConfig::instance();
     config->init(ive::dynamicPropertiesFilePath());
 
     QDialog::accept();

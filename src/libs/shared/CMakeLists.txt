@@ -99,6 +99,13 @@ target_sources(${LIB_NAME} PRIVATE
     interface/creatortool.h
     interface/objectstreeview.cpp
     interface/objectstreeview.h
+    propertytemplate.cpp
+    propertytemplate.h
+    propertytemplateconfig.cpp
+    propertytemplateconfig.h
+    propertiesdialog.cpp
+    propertiesdialog.h
+    propertiesdialog.ui
 )
 
 target_include_directories(${LIB_NAME} PUBLIC .)
@@ -106,6 +113,7 @@ target_include_directories(${LIB_NAME} PUBLIC .)
 target_link_libraries(${LIB_NAME}
     ${QT_CORE}
     ${QT_GUI}
+    ${QT_XML}
     ${QT_WIDGETS}
     ${QT_NETWORK}
     ${QT_CONCURRENT}

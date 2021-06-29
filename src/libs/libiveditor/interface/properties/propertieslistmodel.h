@@ -17,16 +17,19 @@
 
 #pragma once
 
-#include "ivcommonprops.h"
 #include "commandsstack.h"
+#include "ivcommonprops.h"
+#include "ivpropertytemplate.h"
 #include "propertiesmodelbase.h"
-#include "propertytemplate.h"
 
 #include <QVector>
 
+namespace shared {
+class PropertyTemplateConfig;
+}
+
 namespace ivm {
 class IVObject;
-class PropertyTemplateConfig;
 }
 
 namespace ive {
@@ -43,7 +46,7 @@ public:
     };
 
     explicit PropertiesListModel(
-            cmd::CommandsStack::Macro *macro, ivm::PropertyTemplateConfig *dynPropConfig, QObject *parent = nullptr);
+            cmd::CommandsStack::Macro *macro, shared::PropertyTemplateConfig *dynPropConfig, QObject *parent = nullptr);
     ~PropertiesListModel() override;
 
     int rowCount(const QModelIndex &parent = QModelIndex()) const override;
@@ -69,19 +72,19 @@ public:
 
 protected:
     cmd::CommandsStack::Macro *m_cmdMacro { nullptr };
-    ivm::PropertyTemplateConfig *m_propTemplatesConfig { nullptr };
+    shared::PropertyTemplateConfig *m_propTemplatesConfig { nullptr };
     QVector<QString> m_names;
 
     virtual bool isEditable(const QModelIndex &idx) const;
     void createNewRow(int row, const QString &name);
-    void updateRows(const QList<ivm::PropertyTemplate *> &templates);
+    void updateRows(const QList<shared::PropertyTemplate *> &templates);
 
     void invalidateAttributes(const QString &attrName);
 
 private:
     struct RowData {
         int row { -1 };
-        ivm::PropertyTemplate::Info info;
+        ivm::IVPropertyTemplate::Info info;
         QString label;
         QString name;
         QVariant value;
@@ -91,14 +94,14 @@ private:
 
 private:
     void updateRow(const RowData &data);
-    QStringList sortedKeys(const QList<ivm::PropertyTemplate *> &templates) const;
+    QStringList sortedKeys(const QList<shared::PropertyTemplate *> &templates) const;
 };
 
 class FunctionPropertiesListModel : public PropertiesListModel
 {
 public:
     explicit FunctionPropertiesListModel(
-            cmd::CommandsStack::Macro *macro, ivm::PropertyTemplateConfig *dynPropConfig, QObject *parent = nullptr);
+            cmd::CommandsStack::Macro *macro, shared::PropertyTemplateConfig *dynPropConfig, QObject *parent = nullptr);
 
     QVariant data(const QModelIndex &index, int role) const override;
 
@@ -110,7 +113,7 @@ class InterfacePropertiesListModel : public PropertiesListModel
 {
 public:
     explicit InterfacePropertiesListModel(
-            cmd::CommandsStack::Macro *macro, ivm::PropertyTemplateConfig *dynPropConfig, QObject *parent = nullptr);
+            cmd::CommandsStack::Macro *macro, shared::PropertyTemplateConfig *dynPropConfig, QObject *parent = nullptr);
 
     QVariant data(const QModelIndex &index, int role) const override;
 

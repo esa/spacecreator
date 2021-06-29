@@ -20,8 +20,8 @@
 #include "ivlibrary.h"
 #include "ivmodel.h"
 #include "ivobject.h"
+#include "ivpropertytemplateconfig.h"
 #include "ivtestutils.h"
-#include "propertytemplateconfig.h"
 
 #include <QSignalSpy>
 #include <QTest>
@@ -136,7 +136,7 @@ void tst_IVObject::test_coordinatesConverting()
 
 void tst_IVObject::test_coordinatesType()
 {
-    ivm::PropertyTemplateConfig *dynPropConfig = ivm::PropertyTemplateConfig::instance();
+    ivm::IVPropertyTemplateConfig *dynPropConfig = ivm::IVPropertyTemplateConfig::instance();
     dynPropConfig->init(QLatin1String("default_attributes.xml"));
     ivm::IVModel model(dynPropConfig);
 

@@ -1,5 +1,5 @@
 /*
-  Copyright (C) 2019 European Space Agency - <maxime.perrotin@esa.int>
+  Copyright (C) 2019-2021 European Space Agency - <maxime.perrotin@esa.int>
 
   This library is free software; you can redistribute it and/or
   modify it under the terms of the GNU Library General Public
@@ -18,8 +18,8 @@
 #include "propertytemplateconfig.h"
 
 #include "common.h"
-#include "ivobject.h"
 #include "propertytemplate.h"
+#include "veobject.h"
 
 #include <QDebug>
 #include <QDir>
@@ -33,60 +33,20 @@
 #include <QRegularExpression>
 #include <QStandardPaths>
 
-namespace ivm {
-
-PropertyTemplateConfig *PropertyTemplateConfig::m_instance = nullptr;
+namespace shared {
 
 const static QString kSysAttrsConfigFilePath = QLatin1String(":/defaults/resources/system_attributes.xml");
-
 const static QString kUserAttrsResourceConfigPath = QLatin1String(":/defaults/resources/default_attributes.xml");
 
-/*!
-   Adds all attributes from \p attrs that are not already in \a storage to that data
- */
-void collectUniqeAttributes(const QList<PropertyTemplate *> &attrs, QList<PropertyTemplate *> &storage)
-{
-    for (auto attr : attrs) {
-        auto it = std::find_if(storage.constBegin(), storage.constEnd(),
-                [name = attr->name()](PropertyTemplate *propTemplate) { return propTemplate->name() == name; });
-        if (storage.constEnd() == it) {
-            storage.append(attr);
-        }
-    }
-};
-
 struct PropertyTemplateConfig::PropertyTemplateConfigPrivate {
-    void init(const QList<PropertyTemplate *> &attrs)
+    void init(const QList<shared::PropertyTemplate *> &attrs)
     {
-        QList<PropertyTemplate *> uniqeAttrs;
-        collectUniqeAttributes(m_function, uniqeAttrs);
-        collectUniqeAttributes(m_reqIface, uniqeAttrs);
-        collectUniqeAttributes(m_provIface, uniqeAttrs);
-
-        qDeleteAll(uniqeAttrs);
-        m_function.clear();
-        m_reqIface.clear();
-        m_provIface.clear();
-
-        for (PropertyTemplate *attr : attrs) {
-            if (attr->scope() == PropertyTemplate::Scopes(PropertyTemplate::Scope::None))
-                continue;
-
-            if (attr->scope().testFlag(PropertyTemplate::Scope::Function))
-                m_function.append(attr);
-
-            if (attr->scope().testFlag(PropertyTemplate::Scope::Required_Interface))
-                m_reqIface.append(attr);
-
-            if (attr->scope().testFlag(PropertyTemplate::Scope::Provided_Interface))
-                m_provIface.append(attr);
-        }
+        qDeleteAll(m_attrTemplates);
+        m_attrTemplates = attrs;
     }
 
     QString m_configPath;
-    QList<PropertyTemplate *> m_function;
-    QList<PropertyTemplate *> m_reqIface;
-    QList<PropertyTemplate *> m_provIface;
+    QList<shared::PropertyTemplate *> m_attrTemplates;
 };
 
 PropertyTemplateConfig::PropertyTemplateConfig()
@@ -94,7 +54,7 @@ PropertyTemplateConfig::PropertyTemplateConfig()
 {
 }
 
-QList<PropertyTemplate *> PropertyTemplateConfig::systemAttributes()
+QList<shared::PropertyTemplate *> PropertyTemplateConfig::systemAttributes() const
 {
     QFile f(kSysAttrsConfigFilePath);
     if (!f.open(QIODevice::ReadOnly | QIODevice::Text)) {
@@ -105,7 +65,7 @@ QList<PropertyTemplate *> PropertyTemplateConfig::systemAttributes()
     int errorLine = -1;
     int errorColumn = -1;
 
-    QList<PropertyTemplate *> sysAttrs =
+    QList<shared::PropertyTemplate *> sysAttrs =
             parseAttributesList(QString::fromUtf8(f.readAll()), &errorMsg, &errorLine, &errorColumn);
     if (sysAttrs.isEmpty()) {
         qCritical() << "Can't load system attributes:"
@@ -116,14 +76,6 @@ QList<PropertyTemplate *> PropertyTemplateConfig::systemAttributes()
         attr->setSystem(true);
     }
     return sysAttrs;
-}
-
-PropertyTemplateConfig *PropertyTemplateConfig::instance()
-{
-    if (m_instance == nullptr) {
-        m_instance = new PropertyTemplateConfig;
-    }
-    return m_instance;
 }
 
 PropertyTemplateConfig::~PropertyTemplateConfig() { }
@@ -163,23 +115,21 @@ void PropertyTemplateConfig::init(const QString &configPath)
     d->init(attributes);
 }
 
-bool PropertyTemplateConfig::hasPropertyTemplateForObject(const IVObject *obj, const QString &name) const
+bool PropertyTemplateConfig::hasPropertyTemplateForObject(const VEObject *obj, const QString &name) const
 {
     return propertyTemplateForObject(obj, name) != nullptr;
 }
 
-PropertyTemplate *PropertyTemplateConfig::propertyTemplateForObject(const IVObject *obj, const QString &name) const
+PropertyTemplate *PropertyTemplateConfig::propertyTemplateForObject(const VEObject *obj, const QString &name) const
 {
     const QList<PropertyTemplate *> templates = propertyTemplatesForObject(obj);
-    auto it = std::find_if(templates.constBegin(), templates.constEnd(), [name](PropertyTemplate *propTemplate) {
-        return propTemplate->name() == name;
-        ;
-    });
+    auto it = std::find_if(templates.constBegin(), templates.constEnd(),
+            [name](PropertyTemplate *propTemplate) { return propTemplate->name() == name; });
     return it == templates.constEnd() ? nullptr : *it;
 }
 
 QList<PropertyTemplate *> PropertyTemplateConfig::parseAttributesList(
-        const QString &fromData, QString *errorMsg, int *errorLine, int *errorColumn)
+        const QString &fromData, QString *errorMsg, int *errorLine, int *errorColumn) const
 {
     QList<PropertyTemplate *> attrs;
     QDomDocument doc;
@@ -188,45 +138,23 @@ QList<PropertyTemplate *> PropertyTemplateConfig::parseAttributesList(
         if (docElem.isNull())
             return {};
 
-        QDomElement attributeElement = docElem.firstChildElement(PropertyTemplate::tagName());
+        QDomElement attributeElement = docElem.firstChildElement(PropertyTemplate::kAttributeTagName);
         while (!attributeElement.isNull()) {
-            if (auto PropertyTemplate = PropertyTemplate::fromXml(attributeElement)) {
-                attrs.append(PropertyTemplate);
+            if (PropertyTemplate *propTemplate = createPropertyTemplate(attributeElement)) {
+                attrs.append(propTemplate);
             }
-            attributeElement = attributeElement.nextSiblingElement(PropertyTemplate::tagName());
+            attributeElement = attributeElement.nextSiblingElement(PropertyTemplate::kAttributeTagName);
         }
     }
     return attrs;
 }
 
-QList<PropertyTemplate *> PropertyTemplateConfig::propertyTemplatesForObject(const ivm::IVObject *obj) const
+QList<PropertyTemplate *> PropertyTemplateConfig::propertyTemplatesForObject(const VEObject *obj) const
 {
-    switch (obj->type()) {
-    case ivm::IVObject::Type::FunctionType:
-    case ivm::IVObject::Type::Function:
-        return d->m_function;
-    case ivm::IVObject::Type::RequiredInterface:
-        return d->m_reqIface;
-    case ivm::IVObject::Type::ProvidedInterface:
-        return d->m_provIface;
-    default:
-        return {};
-    }
-}
-
-QList<PropertyTemplate *> PropertyTemplateConfig::attributesForFunction() const
-{
-    return d->m_function;
-}
-
-QList<PropertyTemplate *> PropertyTemplateConfig::attributesForRequiredInterface() const
-{
-    return d->m_reqIface;
-}
-
-QList<PropertyTemplate *> PropertyTemplateConfig::attributesForProvidedInterface() const
-{
-    return d->m_provIface;
+    QList<PropertyTemplate *> attrs;
+    std::copy_if(d->m_attrTemplates.cbegin(), d->m_attrTemplates.cend(), std::back_inserter(attrs),
+            [obj](PropertyTemplate *attrTemplate) { return attrTemplate->scopes() & attrTemplate->objectScope(obj); });
+    return attrs;
 }
 
 QString PropertyTemplateConfig::configPath() const
@@ -234,4 +162,4 @@ QString PropertyTemplateConfig::configPath() const
     return d->m_configPath;
 }
 
-} // namespace ivm
+} // namespace shared

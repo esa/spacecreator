@@ -1,5 +1,5 @@
 /*
-  Copyright (C) 2019 European Space Agency - <maxime.perrotin@esa.int>
+  Copyright (C) 2019-2021 European Space Agency - <maxime.perrotin@esa.int>
 
   This library is free software; you can redistribute it and/or
   modify it under the terms of the GNU Library General Public
@@ -20,39 +20,37 @@
 #include <QVector>
 #include <memory>
 
-namespace ivm {
-class IVObject;
+class QDomElement;
+
+namespace shared {
+class VEObject;
 class PropertyTemplate;
 
 class PropertyTemplateConfig
 {
 public:
-    static PropertyTemplateConfig *instance();
-    ~PropertyTemplateConfig();
+    virtual ~PropertyTemplateConfig();
 
     void init(const QString &configPath);
 
-    bool hasPropertyTemplateForObject(const ivm::IVObject *obj, const QString &name) const;
-    PropertyTemplate *propertyTemplateForObject(const ivm::IVObject *obj, const QString &name) const;
-    QList<PropertyTemplate *> propertyTemplatesForObject(const ivm::IVObject *obj) const;
-    QList<PropertyTemplate *> attributesForFunction() const;
-    QList<PropertyTemplate *> attributesForRequiredInterface() const;
-    QList<PropertyTemplate *> attributesForProvidedInterface() const;
+    bool hasPropertyTemplateForObject(const VEObject *obj, const QString &name) const;
+    PropertyTemplate *propertyTemplateForObject(const VEObject *obj, const QString &name) const;
+    QList<PropertyTemplate *> propertyTemplatesForObject(const VEObject *obj) const;
 
     QString configPath() const;
 
-    static QList<PropertyTemplate *> parseAttributesList(
-            const QString &fromData, QString *errorMsg = nullptr, int *errorLine = nullptr, int *errorColumn = nullptr);
+    QList<PropertyTemplate *> parseAttributesList(const QString &fromData, QString *errorMsg = nullptr,
+            int *errorLine = nullptr, int *errorColumn = nullptr) const;
+    QList<shared::PropertyTemplate *> systemAttributes() const;
 
-    static QList<PropertyTemplate *> systemAttributes();
-
-private:
+protected:
     PropertyTemplateConfig();
 
-    static PropertyTemplateConfig *m_instance;
+    virtual shared::PropertyTemplate *createPropertyTemplate(const QDomElement &element) const = 0;
 
+private:
     struct PropertyTemplateConfigPrivate;
     std::unique_ptr<PropertyTemplateConfigPrivate> d;
 };
 
-} // namespace ivm
+} // namespace shared

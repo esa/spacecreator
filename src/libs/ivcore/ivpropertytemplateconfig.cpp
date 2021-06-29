@@ -15,45 +15,25 @@
   along with this program. If not, see <https://www.gnu.org/licenses/lgpl-2.1.html>.
 */
 
-#pragma once
+#include "ivpropertytemplateconfig.h"
 
-#include <QWidget>
+#include "ivpropertytemplate.h"
 
 namespace ivm {
-class IVPropertyTemplateConfig;
-}
-namespace Ui {
-class PropertyTemplateWidget;
-}
 
-namespace ive {
+IVPropertyTemplateConfig *IVPropertyTemplateConfig::m_instance = nullptr;
 
-class PropertyTemplateWidget : public QWidget
+IVPropertyTemplateConfig *IVPropertyTemplateConfig::instance()
 {
-    Q_OBJECT
-
-public:
-    explicit PropertyTemplateWidget(QWidget *parent = nullptr);
-    ~PropertyTemplateWidget();
-
-    void save();
-    bool readConfig(const QString &from);
-    void setTextColor(const QColor &color);
-
-    bool hasError() const;
-
-Q_SIGNALS:
-    void hasErrorChanged();
-
-private Q_SLOTS:
-    void updateErrorInfo();
-    void on_btnNewProp_clicked();
-
-private:
-    Ui::PropertyTemplateWidget *ui;
-    ivm::IVPropertyTemplateConfig *m_dynPropConfig { nullptr };
-    QStringList m_usedNames;
-    bool m_error = false;
-};
-
+    if (m_instance == nullptr) {
+        m_instance = new IVPropertyTemplateConfig;
+    }
+    return m_instance;
 }
+
+shared::PropertyTemplate *IVPropertyTemplateConfig::createPropertyTemplate(const QDomElement &element) const
+{
+    return shared::PropertyTemplate::createFromXml<IVPropertyTemplate>(element);
+}
+
+} // namespace ivm

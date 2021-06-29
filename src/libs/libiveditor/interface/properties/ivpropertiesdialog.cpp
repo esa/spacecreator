@@ -15,7 +15,7 @@
   along with this program. If not, see <https://www.gnu.org/licenses/lgpl-2.1.html>.
 */
 
-#include "propertiesdialog.h"
+#include "ivpropertiesdialog.h"
 
 #include "asn1/file.h"
 #include "asn1/types/builtintypes.h"
@@ -32,9 +32,9 @@
 #include "ivinterface.h"
 #include "ivnamevalidator.h"
 #include "ivobject.h"
+#include "ivpropertytemplateconfig.h"
 #include "propertieslistmodel.h"
 #include "propertiesviewbase.h"
-#include "ui_propertiesdialog.h"
 
 #include <QDebug>
 #include <QHeaderView>
@@ -46,38 +46,22 @@
 
 namespace ive {
 
-PropertiesDialog::PropertiesDialog(ivm::PropertyTemplateConfig *dynPropConfig, ivm::IVObject *obj,
+IVPropertiesDialog::IVPropertiesDialog(ivm::IVPropertyTemplateConfig *dynPropConfig, ivm::IVObject *obj,
         const QSharedPointer<Asn1Acn::File> &dataTypes, cmd::CommandsStack *commandsStack, QWidget *parent)
-    : QDialog(parent)
-    , ui(new Ui::PropertiesDialog)
-    , m_dataObject(obj)
-    , m_dynPropConfig(dynPropConfig)
-    , m_cmdMacro(new cmd::CommandsStack::Macro(commandsStack->undoStack(),
-              tr("Edit %1 - %2")
-                      .arg(ivm::IVNameValidator::nameOfType(m_dataObject->type()).trimmed(), m_dataObject->titleUI())))
+    : shared::PropertiesDialog(dynPropConfig, obj, commandsStack, parent)
     , m_dataTypes(dataTypes)
-    , m_commandsStack(commandsStack)
 {
-    ui->setupUi(this);
-
-    connect(ui->buttonBox, &QDialogButtonBox::accepted, this, &QDialog::accept);
-    connect(ui->buttonBox, &QDialogButtonBox::rejected, this, &QDialog::reject);
-
-    initTabs();
 }
 
-PropertiesDialog::~PropertiesDialog()
-{
-    delete m_cmdMacro;
-    delete ui;
-}
+IVPropertiesDialog::~IVPropertiesDialog() { }
 
-QString PropertiesDialog::objectTypeName() const
+QString IVPropertiesDialog::objectTypeName() const
 {
-    if (!m_dataObject)
+    const ivm::IVObject *obi = dataObject();
+    if (!obi)
         return QString();
 
-    switch (m_dataObject->type()) {
+    switch (obi->type()) {
     case ivm::IVObject::Type::FunctionType:
         return tr("Function Type");
     case ivm::IVObject::Type::Function:
@@ -97,18 +81,12 @@ QString PropertiesDialog::objectTypeName() const
     }
 }
 
-void PropertiesDialog::done(int r)
+void IVPropertiesDialog::init()
 {
-    m_cmdMacro->setComplete(r == QDialog::Accepted);
-    QDialog::done(r);
-}
-
-void PropertiesDialog::initTabs()
-{
-    if (!m_dataObject)
+    if (!dataObject())
         return;
 
-    switch (m_dataObject->type()) {
+    switch (dataObject()->type()) {
     case ivm::IVObject::Type::FunctionType:
     case ivm::IVObject::Type::Function: {
         initContextParams();
@@ -134,44 +112,48 @@ void PropertiesDialog::initTabs()
         break;
     }
 
-    setWindowTitle(tr("Edit %1").arg(objectTypeName()));
-    ui->tabWidget->setCurrentIndex(0);
+    shared::PropertiesDialog::init();
 }
 
-void PropertiesDialog::initConnectionGroup()
+ivm::IVObject *IVPropertiesDialog::dataObject() const
 {
-    auto model = new IVConnectionGroupModel(qobject_cast<ivm::IVConnectionGroup *>(m_dataObject), m_cmdMacro, this);
+    return qobject_cast<ivm::IVObject *>(shared::PropertiesDialog::dataObject());
+}
+
+void IVPropertiesDialog::initConnectionGroup()
+{
+    auto model = new IVConnectionGroupModel(qobject_cast<ivm::IVConnectionGroup *>(dataObject()), commandMacro(), this);
     auto connectionsView = new QListView;
     connectionsView->setModel(model);
-    ui->tabWidget->insertTab(0, connectionsView, tr("Connections"));
+    insertTab(connectionsView, tr("Connections"));
 }
 
-void PropertiesDialog::initAttributesView()
+void IVPropertiesDialog::initAttributesView()
 {
     auto viewAttrs = new AttributesView(this);
     PropertiesListModel *modelAttrs { nullptr };
     QStyledItemDelegate *attrDelegate = new AttributeDelegate(viewAttrs->tableView());
 
-    switch (m_dataObject->type()) {
+    switch (dataObject()->type()) {
     case ivm::IVObject::Type::Function: {
-        modelAttrs = new FunctionPropertiesListModel(m_cmdMacro, m_dynPropConfig, this);
+        modelAttrs = new FunctionPropertiesListModel(commandMacro(), propertiesConfig(), this);
         break;
     }
     default:
-        modelAttrs = new InterfacePropertiesListModel(m_cmdMacro, m_dynPropConfig, this);
+        modelAttrs = new InterfacePropertiesListModel(commandMacro(), propertiesConfig(), this);
         break;
     }
 
-    modelAttrs->setDataObject(m_dataObject);
+    modelAttrs->setDataObject(dataObject());
     viewAttrs->tableView()->setItemDelegateForColumn(PropertiesListModel::Column::Value, attrDelegate);
     viewAttrs->setModel(modelAttrs);
 
-    ui->tabWidget->insertTab(0, viewAttrs, tr("Attributes"));
+    insertTab(viewAttrs, tr("Attributes"));
 
     QTimer::singleShot(0, viewAttrs, [this, viewAttrs, modelAttrs]() {
-        const int nameColumn = m_dataObject->isFunction() ? FunctionPropertiesListModel::Column::Name
+        const int nameColumn = dataObject()->isFunction() ? FunctionPropertiesListModel::Column::Name
                                                           : InterfacePropertiesListModel::Column::Name;
-        const int valueColumn = m_dataObject->isFunction() ? FunctionPropertiesListModel::Column::Value
+        const int valueColumn = dataObject()->isFunction() ? FunctionPropertiesListModel::Column::Value
                                                            : InterfacePropertiesListModel::Column::Value;
 
         const QModelIndexList indexes = modelAttrs->match(modelAttrs->index(0, nameColumn),
@@ -182,11 +164,11 @@ void PropertiesDialog::initAttributesView()
     });
 }
 
-void PropertiesDialog::initContextParams()
+void IVPropertiesDialog::initContextParams()
 {
-    ContextParametersModel *modelCtxParams = new ContextParametersModel(m_cmdMacro, this);
+    ContextParametersModel *modelCtxParams = new ContextParametersModel(commandMacro(), this);
     modelCtxParams->setDataTypes(m_dataTypes);
-    modelCtxParams->setDataObject(m_dataObject);
+    modelCtxParams->setDataObject(dataObject());
 
     PropertiesViewBase *viewAttrs = new ContextParametersView(this);
     viewAttrs->tableView()->setItemDelegateForColumn(
@@ -195,13 +177,14 @@ void PropertiesDialog::initContextParams()
             ContextParametersModel::Column::Value, new Asn1ValueDelegate(m_dataTypes, viewAttrs->tableView()));
     viewAttrs->tableView()->horizontalHeader()->show();
     viewAttrs->setModel(modelCtxParams);
-    ui->tabWidget->insertTab(0, viewAttrs, tr("Context Parameters"));
+    insertTab(viewAttrs, tr("Context Parameters"));
 }
 
-void PropertiesDialog::initIfaceParams()
+void IVPropertiesDialog::initIfaceParams()
 {
-    IfaceParametersModel *modelIfaceParams = new IfaceParametersModel(m_cmdMacro, asn1Names(m_dataTypes.get()), this);
-    modelIfaceParams->setDataObject(m_dataObject);
+    IfaceParametersModel *modelIfaceParams =
+            new IfaceParametersModel(commandMacro(), asn1Names(m_dataTypes.get()), this);
+    modelIfaceParams->setDataObject(dataObject());
 
     PropertiesViewBase *viewAttrs = new IfaceParametersView(this);
     viewAttrs->tableView()->setItemDelegateForColumn(
@@ -212,15 +195,15 @@ void PropertiesDialog::initIfaceParams()
             IfaceParametersModel::Column::Direction, new AttributeDelegate(viewAttrs->tableView()));
     viewAttrs->tableView()->horizontalHeader()->show();
     viewAttrs->setModel(modelIfaceParams);
-    ui->tabWidget->insertTab(0, viewAttrs, tr("Parameters"));
+    insertTab(viewAttrs, tr("Parameters"));
 }
 
-void PropertiesDialog::initCommentView()
+void IVPropertiesDialog::initCommentView()
 {
-    if (auto comment = qobject_cast<ivm::IVComment *>(m_dataObject)) {
+    if (auto comment = qobject_cast<ivm::IVComment *>(dataObject())) {
         auto commentEdit = new QPlainTextEdit(this);
         commentEdit->setPlainText(comment->titleUI());
-        ui->tabWidget->insertTab(0, commentEdit, tr("Comment content"));
+        insertTab(commentEdit, tr("Comment content"));
         connect(this, &QDialog::accepted, this, [comment, commentEdit, this]() {
             const QString text = commentEdit->toPlainText();
             if (comment->titleUI() == text)
@@ -230,7 +213,7 @@ void PropertiesDialog::initCommentView()
             const QVariantHash textArg { { ivm::meta::Props::token(ivm::meta::Props::Token::name), encodedText } };
             auto commentTextCmd = new cmd::CmdEntityAttributeChange(comment, textArg);
             commentTextCmd->setText(tr("Edit Comment"));
-            m_commandsStack->push(commentTextCmd);
+            commandStack()->push(commentTextCmd);
         });
     }
 }

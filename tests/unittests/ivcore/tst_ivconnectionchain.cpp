@@ -19,8 +19,8 @@
 #include "ivconnectionchain.h"
 #include "ivlibrary.h"
 #include "ivmodel.h"
+#include "ivpropertytemplateconfig.h"
 #include "ivxmlreader.h"
-#include "propertytemplateconfig.h"
 
 #include <QtTest>
 
@@ -43,7 +43,7 @@ private:
     bool checkChain(ivm::IVConnectionChain *chain, const QStringList &functionNames) const;
 
 private:
-    ivm::PropertyTemplateConfig *conf { nullptr };
+    ivm::IVPropertyTemplateConfig *conf { nullptr };
 };
 
 ivm::IVConnection *tst_IVConnectionChain::selectConnection(
@@ -92,7 +92,7 @@ bool tst_IVConnectionChain::checkChain(ivm::IVConnectionChain *chain, const QStr
 void tst_IVConnectionChain::initTestCase()
 {
     ivm::initIVLibrary();
-    conf = ivm::PropertyTemplateConfig::instance();
+    conf = ivm::IVPropertyTemplateConfig::instance();
     conf->init(QLatin1String("default_attrinbutes.xml"));
 }
 
