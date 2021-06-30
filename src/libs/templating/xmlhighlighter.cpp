@@ -88,7 +88,6 @@ void XMLHighlighter::highlightBlock(const QString &text)
         QRegularExpression expression(rule.pattern);
         if (!expression.isValid()) {
             qWarning() << Q_FUNC_INFO << expression.errorString() << expression.pattern();
-            ;
             continue;
         }
         QRegularExpressionMatchIterator it = expression.globalMatch(text);

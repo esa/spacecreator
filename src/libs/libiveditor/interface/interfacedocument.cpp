@@ -27,6 +27,7 @@
 #include "commandsstack.h"
 #include "context/action/actionsmanager.h"
 #include "context/action/editor/dynactioneditor.h"
+#include "error.h"
 #include "errorhub.h"
 #include "file.h"
 #include "graphicsitemhelpers.h"
@@ -385,14 +386,13 @@ bool InterfaceDocument::loadComponentModel(ivm::IVModel *model, const QString &p
 {
     if (path.isEmpty() || !QFileInfo::exists(path)) {
         shared::ErrorHub::addError(shared::ErrorItem::Error, tr("Invalid path"), path);
-        qWarning() << Q_FUNC_INFO << "Invalid path";
         return false;
     }
 
     shared::ErrorHub::setCurrentFile(path);
     ivm::IVXMLReader parser;
     if (!parser.readFile(path)) {
-        qWarning() << parser.errorString();
+        shared::ErrorHub::addError(shared::ErrorItem::Error, parser.errorString(), path);
         shared::ErrorHub::clearCurrentFile();
         return false;
     }
@@ -638,6 +638,8 @@ void InterfaceDocument::onSavedExternally(const QString &filePath, bool saved)
     if (saved) {
         setPath(filePath);
         d->commandsStack->setClean();
+    } else {
+        shared::ErrorHub::addError(shared::ErrorItem::Error, tr("Export failed"), filePath);
     }
 }
 
@@ -759,10 +761,9 @@ void InterfaceDocument::importEntity(const shared::Id &id, const QPointF &sceneD
     const auto intersectedNames = d->importModel->nestedFunctionNames(obj->as<const ivm::IVFunctionType *>())
                                           .intersect(existingFunctionNames);
     if (!intersectedNames.isEmpty()) {
-        QMessageBox::critical(view()->window(), tr("Entity importing"),
-                tr("Chosen entity [%1] couldn't be imported because of Function names conflict(s): %2")
-                        .arg(obj->titleUI())
-                        .arg(intersectedNames.toList().join(QLatin1Char('\n'))));
+        QString msg = tr("Chosen entity [%1] couldn't be imported because of Function names conflict(s): %2")
+                              .arg(obj->titleUI(), intersectedNames.toList().join(QLatin1Char('\n')));
+        shared::ErrorHub::addError(shared::ErrorItem::Error, msg);
         return;
     }
     QGraphicsItem *itemAtScenePos = scene()->itemAt(sceneDropPoint, graphicsView()->transform());
@@ -772,12 +773,13 @@ void InterfaceDocument::importEntity(const shared::Id &id, const QPointF &sceneD
 
     QBuffer buffer;
     if (!buffer.open(QIODevice::WriteOnly)) {
-        qWarning() << "Can't open buffer for exporting:" << buffer.errorString();
+        shared::ErrorHub::addError(
+                shared::ErrorItem::Error, tr("Can't open buffer for exporting: %1").arg(buffer.errorString()));
         return;
     }
 
     if (!d->exporter->exportObjects({ obj }, &buffer)) {
-        qWarning() << "Error during component export";
+        shared::ErrorHub::addError(shared::ErrorItem::Error, tr("Error during component export"));
         return;
     }
     buffer.close();
@@ -808,14 +810,15 @@ void InterfaceDocument::copyItems()
 {
     QBuffer buffer;
     if (!buffer.open(QIODevice::WriteOnly)) {
-        qWarning() << "Can't open buffer for exporting:" << buffer.errorString();
+        shared::ErrorHub::addError(
+                shared::ErrorItem::Error, tr("Can't open buffer for exporting: %1").arg(buffer.errorString()), "");
         return;
     }
 
     QString name;
     const QList<shared::VEObject *> objects = prepareSelectedObjectsForExport(name, true);
     if (!d->exporter->exportObjects(objects, &buffer)) {
-        qWarning() << "Error during component export";
+        shared::ErrorHub::addError(shared::ErrorItem::Error, tr("Error during component export"));
         return;
     }
     buffer.close();
@@ -898,7 +901,7 @@ bool InterfaceDocument::exportImpl(const QString &targetDir, const QList<shared:
 {
     const bool ok = shared::ensureDirExists(targetDir);
     if (!ok) {
-        qWarning() << "Unable to create directory" << targetDir;
+        shared::ErrorHub::addError(shared::ErrorItem::Error, tr("Unable to create directory %1").arg(targetDir));
         return {};
     }
 
@@ -906,30 +909,33 @@ bool InterfaceDocument::exportImpl(const QString &targetDir, const QList<shared:
 
     const QFileInfo exportFileInfo(exportFilePath);
     if (exportFileInfo.exists()) {
-        qWarning() << "Current object already exported: " << exportFilePath;
+        shared::ErrorHub::addError(
+                shared::ErrorItem::Error, tr("Current object already exported:  %1").arg(exportFilePath));
         return false;
     }
 
     QBuffer buffer;
     if (!buffer.open(QIODevice::WriteOnly)) {
-        qWarning() << "Can't open buffer for exporting:" << buffer.errorString();
+        shared::ErrorHub::addError(
+                shared::ErrorItem::Error, tr("Can't open buffer for exporting: %1").arg(buffer.errorString()));
         return false;
     }
     if (!d->exporter->exportObjects(objects, &buffer)) {
-        qWarning() << "Error during component export";
+        shared::ErrorHub::addError(shared::ErrorItem::Error, tr("Error during component export"));
         return false;
     }
     buffer.close();
 
     QFile file(exportFileInfo.absoluteFilePath());
     if (!file.open(QIODevice::WriteOnly)) {
-        qWarning() << "Can't export file: " << file.errorString();
+        shared::ErrorHub::addError(shared::ErrorItem::Error, tr("Can't export file: ").arg(file.errorString()));
         return false;
     }
     file.write(buffer.buffer());
     file.close();
     if (QFile::copy(asn1FilePath(), targetDir + QDir::separator() + asn1FileName())) {
-        qWarning() << "Error during ASN.1 file copying:" << asn1FilePath();
+        shared::ErrorHub::addError(
+                shared::ErrorItem::Error, tr("Error during ASN.1 file copying: %1").arg(asn1FilePath()));
     }
 
     const QFileInfo ivPath(path());
@@ -949,7 +955,6 @@ bool InterfaceDocument::loadImpl(const QString &path)
 {
     if (path.isEmpty() || !QFileInfo::exists(path)) {
         shared::ErrorHub::addError(shared::ErrorItem::Error, tr("Invalid path"), path);
-        qWarning() << Q_FUNC_INFO << "Invalid path";
         return false;
     }
 
@@ -957,7 +962,6 @@ bool InterfaceDocument::loadImpl(const QString &path)
     ivm::IVXMLReader parser;
     if (!parser.readFile(path)) {
         shared::ErrorHub::addError(shared::ErrorItem::Error, parser.errorString(), path);
-        qWarning() << parser.errorString();
         shared::ErrorHub::clearCurrentFile();
         return false;
     }

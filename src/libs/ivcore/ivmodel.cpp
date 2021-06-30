@@ -18,6 +18,7 @@
 #include "ivmodel.h"
 
 #include "common.h"
+#include "errorhub.h"
 #include "ivcomment.h"
 #include "ivconnection.h"
 #include "ivfunction.h"
@@ -65,7 +66,10 @@ bool IVModel::addObjectImpl(shared::VEObject *obj)
                             } else if (attr->info() == ivm::IVPropertyTemplate::Info::Property) {
                                 obj->setEntityProperty(attr->name(), defaultValue);
                             } else {
-                                qWarning() << "Unknown dynamic property info:" << attr->info();
+                                QMetaEnum metaEnum = QMetaEnum::fromType<shared::PropertyTemplate::Info>();
+                                shared::ErrorHub::addError(shared::ErrorItem::Warning,
+                                        tr("Unknown dynamic property info: %1")
+                                                .arg(metaEnum.valueToKey(int(attr->info()))));
                             }
                         }
                     }

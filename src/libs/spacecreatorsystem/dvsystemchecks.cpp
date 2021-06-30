@@ -18,6 +18,7 @@
 #include "dvsystemchecks.h"
 
 #include "dveditorcore.h"
+#include "errorhub.h"
 #include "interface/interfacedocument.h"
 #include "iveditorcore.h"
 #include "ivmodel.h"
@@ -79,7 +80,7 @@ ivm::IVModel *DvSystemChecks::ivModel() const
     }
 
     if (!m_ivCore->document() || !m_ivCore->document()->objectsModel()) {
-        qWarning() << "No IVModel";
+        shared::ErrorHub::addError(shared::ErrorItem::Warning, tr("No IV model"));
         return {};
     }
 

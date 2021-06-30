@@ -81,7 +81,6 @@ CmdEntitiesImport::CmdEntitiesImport(const QByteArray &data, ivm::IVFunctionType
             m_importedEntities.append(obj);
         }
     } else {
-        qWarning() << parser.errorString();
         shared::ErrorHub::addError(shared::ErrorItem::Error, parser.errorString(), "");
     }
 }

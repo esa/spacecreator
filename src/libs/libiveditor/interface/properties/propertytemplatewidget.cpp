@@ -18,6 +18,7 @@
 #include "propertytemplatewidget.h"
 
 #include "addpropertytemplatedialog.h"
+#include "errorhub.h"
 #include "ivpropertytemplate.h"
 #include "ivpropertytemplateconfig.h"
 #include "ui_propertytemplatewidget.h"
@@ -76,7 +77,8 @@ bool PropertyTemplateWidget::readConfig(const QString &from)
 
     QFile configFile(from);
     if (!configFile.open(QIODevice::ReadOnly | QIODevice::Text)) {
-        qWarning() << "File opening failed:" << from << configFile.errorString();
+        shared::ErrorHub::addError(
+                shared::ErrorItem::Error, tr("File opening failed: %1").arg(configFile.errorString()), from);
         return false;
     }
 

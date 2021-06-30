@@ -17,6 +17,7 @@
 
 #include "templateeditor.h"
 
+#include "errorhub.h"
 #include "stringtemplate.h"
 #include "templatehighlighter.h"
 #include "templatesyntaxhelpdialog.h"
@@ -153,7 +154,8 @@ bool TemplateEditor::saveResultToFile(const QString &fileName)
         m_outFileName = fileName;
         saved = true;
     } else {
-        qWarning() << "Can't open file for writing:" << fileName << outputFile.errorString();
+        shared::ErrorHub::addError(shared::ErrorItem::Error,
+                tr("Can't open file for writing: %1").arg(outputFile.errorString()), fileName);
     }
 
     Q_EMIT fileSaved(fileName, saved);
@@ -265,7 +267,7 @@ void TemplateEditor::onSaveResult()
  */
 void TemplateEditor::onErrorOccurred(const QString &errorString)
 {
-    QMessageBox::warning(this, tr("Error occurred"), errorString);
+    shared::ErrorHub::addError(shared::ErrorItem::Error, errorString);
 }
 
 /**

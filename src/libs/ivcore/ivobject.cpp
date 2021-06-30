@@ -88,6 +88,12 @@ void IVObject::sortObjectList(QList<IVObject *> &objects)
             [](ivm::IVObject *obj1, ivm::IVObject *obj2) { return obj1->type() < obj2->type(); });
 }
 
+QString IVObject::typeToString(Type t)
+{
+    QMetaEnum metaEnum = QMetaEnum::fromType<Type>();
+    return metaEnum.valueToKey(int(t));
+}
+
 IVObject::Type IVObject::type() const
 {
     return d->m_type;

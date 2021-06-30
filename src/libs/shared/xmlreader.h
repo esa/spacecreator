@@ -39,6 +39,8 @@ public:
     QString errorString() const;
     QVariantMap metaData() const;
 
+    const QString &file() const;
+
 private:
     bool readView(QXmlStreamReader &xml);
     bool readXml(QIODevice *in);

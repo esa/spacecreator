@@ -98,6 +98,7 @@ public:
     void resetTitle();
 
     static void sortObjectList(QList<ivm::IVObject *> &objects);
+    static QString typeToString(Type t);
 
 Q_SIGNALS:
     void titleChanged(const QString &title);

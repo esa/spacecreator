@@ -18,6 +18,7 @@
 #include "ivxmlreader.h"
 
 #include "entityattribute.h"
+#include "errorhub.h"
 #include "ivcomment.h"
 #include "ivcommonprops.h"
 #include "ivconnection.h"
@@ -173,7 +174,8 @@ InterfaceParameter addIfaceParameter(const EntityAttributes &otherAttrs, Interfa
             break;
         }
         default: {
-            qWarning() << QStringLiteral("Interface Parameter - unknown attribute: %1").arg(attr.name());
+            shared::ErrorHub::addError(shared::ErrorItem::Warning,
+                    QObject::tr("Interface Parameter - unknown attribute: %1").arg(attr.name()));
             break;
         }
         }
@@ -287,8 +289,9 @@ void IVXMLReader::processTagOpen(QXmlStreamReader &xml)
     }
     default:
         static const QString msg("The '%1' is unknown/unexpected here: %2@%3 %4");
-        qWarning() << msg.arg(
-                tagName, QString::number(xml.lineNumber()), QString::number(xml.columnNumber()), xml.tokenString());
+        shared::ErrorHub::addError(shared::ErrorItem::Warning,
+                msg.arg(tagName, QString::number(xml.lineNumber()), QString::number(xml.columnNumber()),
+                        xml.tokenString()));
         break;
     }
 

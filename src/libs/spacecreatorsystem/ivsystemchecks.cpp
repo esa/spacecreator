@@ -17,6 +17,7 @@
 
 #include "ivsystemchecks.h"
 
+#include "errorhub.h"
 #include "interface/interfacedocument.h"
 #include "ivconnection.h"
 #include "ivconnectionchain.h"
@@ -286,7 +287,7 @@ ivm::IVModel *IvSystemChecks::ivModel() const
     }
 
     if (!m_ivCore->document() || !m_ivCore->document()->objectsModel()) {
-        qWarning() << "No IVModel";
+        shared::ErrorHub::addError(shared::ErrorItem::Warning, tr("No IV model"));
         return {};
     }
 

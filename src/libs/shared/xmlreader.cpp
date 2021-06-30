@@ -26,6 +26,7 @@ namespace shared {
 struct XMLReaderPrivate {
     QVariantMap m_metaData;
     QString m_errorString;
+    QString m_file;
 };
 
 XmlReader::XmlReader(QObject *parent)
@@ -45,6 +46,7 @@ void XmlReader::setMetaData(const QXmlStreamAttributes &attributes)
 
 bool XmlReader::readFile(const QString &file)
 {
+    d->m_file = file;
     QFile in(file);
     if (in.exists(file) && in.open(QFile::ReadOnly | QFile::Text))
         return read(&in);
@@ -90,6 +92,14 @@ QString XmlReader::errorString() const
 QVariantMap XmlReader::metaData() const
 {
     return d->m_metaData;
+}
+
+/*!
+   Returns the file path of the file being parsed
+ */
+const QString &XmlReader::file() const
+{
+    return d->m_file;
 }
 
 bool XmlReader::readXml(QIODevice *in)

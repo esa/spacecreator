@@ -210,7 +210,6 @@ QVector<Action> ActionsManager::parseFile(const QString &filePath, QString *erro
     QFile f(filePath);
     if (!f.open(QIODevice::ReadOnly | QIODevice::Text)) {
         const QString &msg = QString("Can't open file %1 - %2").arg(filePath, f.errorString());
-        qWarning() << msg;
         shared::ErrorHub::addError(shared::ErrorItem::Error, f.errorString(), filePath);
         if (errorHandler)
             *errorHandler = msg;
@@ -220,7 +219,6 @@ QVector<Action> ActionsManager::parseFile(const QString &filePath, QString *erro
     const QJsonDocument doc = QJsonDocument::fromJson(f.readAll(), &err);
     if (err.error != QJsonParseError::NoError) {
         const QString &msg = QString("JSON parsing %1 failed: %2").arg(err.errorString(), filePath);
-        qWarning() << msg;
         shared::ErrorHub::addError(
                 shared::ErrorItem::Error, QString("JSON parsing %1 failed: %2").arg(err.errorString()), filePath);
         if (errorHandler)
@@ -237,7 +235,6 @@ QVector<Action> ActionsManager::parseFile(const QString &filePath, QString *erro
         if (doc.isObject()) {
             QJsonObject jObj = doc.object();
             if (!jObj.contains("version")) {
-                qWarning() << "JSON content does not have a version";
                 shared::ErrorHub::addError(shared::ErrorItem::Error, "JSON content does not have a version", filePath);
                 return {};
             }
@@ -247,7 +244,6 @@ QVector<Action> ActionsManager::parseFile(const QString &filePath, QString *erro
             version = QVersionNumber::fromString(jObj["version"].toString());
             jArr = jObj["actions"].toArray();
         } else {
-            qWarning() << "JSON content does not match";
             shared::ErrorHub::addError(shared::ErrorItem::Error, "JSON content does not match", filePath);
             return {};
         }

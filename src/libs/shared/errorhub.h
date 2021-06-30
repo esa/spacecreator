@@ -33,7 +33,7 @@ public:
     };
 
     ErrorItem();
-    ErrorItem(TaskType type, const QString &description, const QString &fileName, int line = -1);
+    ErrorItem(TaskType type, const QString &description, const QString &fileName = QString(), int line = -1);
 
     TaskType m_type = Error;
     QString m_description;
@@ -49,7 +49,8 @@ public:
 
     static ErrorHub *instance();
 
-    static void addError(ErrorItem::TaskType type, const QString &description, const QString &fileName, int line = -1);
+    static void addError(
+            ErrorItem::TaskType type, const QString &description, const QString &fileName = QString(), int line = -1);
     static void clearErrors();
     static void clearFileErrors(const QString &fileName);
     static const QVector<ErrorItem> &errors();

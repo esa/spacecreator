@@ -17,6 +17,8 @@
 
 #include "templatesyntaxhelpdialog.h"
 
+#include "errorhub.h"
+
 #include <QBoxLayout>
 #include <QDebug>
 #include <QDialogButtonBox>
@@ -42,7 +44,7 @@ TemplateSyntaxHelpDialog::TemplateSyntaxHelpDialog(QWidget *parent)
         QTextStream stream(&helpFile);
         browser->setText(stream.readAll());
     } else {
-        qWarning() << "Unable to open" << helpFile.fileName();
+        shared::ErrorHub::addError(shared::ErrorItem::Warning, tr("Unable to open file"), helpFile.fileName());
     }
 
     QDialogButtonBox *closeButtonBox = new QDialogButtonBox(this);

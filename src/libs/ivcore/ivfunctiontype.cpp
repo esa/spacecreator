@@ -17,6 +17,7 @@
 
 #include "ivfunctiontype.h"
 
+#include "errorhub.h"
 #include "ivcomment.h"
 #include "ivcommonprops.h"
 #include "ivconnection.h"
@@ -103,7 +104,8 @@ bool IVFunctionType::addChild(IVObject *child)
             break;
         }
         default: {
-            qWarning() << "attempt to reg unsupported Function child:" << t;
+            shared::ErrorHub::addError(shared::ErrorItem::Warning,
+                    tr("attempt to reg unsupported Function child: %1").arg(IVObject::typeToString(t)));
             return false;
         }
         }
@@ -157,7 +159,8 @@ bool IVFunctionType::removeChild(IVObject *child)
             break;
         }
         default: {
-            qWarning() << "attempt to unreg unsupported Function child:" << t;
+            shared::ErrorHub::addError(shared::ErrorItem::Warning,
+                    tr("attempt to unreg unsupported Function child: %1").arg(IVObject::typeToString(t)));
             return false;
         }
         }

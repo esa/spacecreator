@@ -66,7 +66,6 @@ bool DVAppModel::load(const QString &path)
 {
     if (path.isEmpty() || !QFileInfo::exists(path)) {
         shared::ErrorHub::addError(shared::ErrorItem::Error, tr("Invalid path"), path);
-        qWarning() << Q_FUNC_INFO << "Invalid path";
         return false;
     }
 
@@ -79,7 +78,6 @@ bool DVAppModel::load(const QString &path)
     shared::ErrorHub::setCurrentFile(path);
     dvm::DVXMLReader reader;
     if (!reader.readFile(path)) {
-        qWarning() << reader.errorString();
         shared::ErrorHub::addError(shared::ErrorItem::Error, reader.errorString(), path);
         setPath(oldPath);
         shared::ErrorHub::clearCurrentFile();

@@ -218,12 +218,10 @@ bool IVConnection::lookupEndpointsPostponed()
 {
     if (!d->m_delayedInit.m_from) {
         shared::ErrorHub::addError(shared::ErrorItem::Warning, tr("Connection removed - Target source"), "");
-        qWarning() << "Can't connect, as the source is missing";
         return false;
     }
     if (!d->m_delayedInit.m_to) {
         shared::ErrorHub::addError(shared::ErrorItem::Warning, tr("Connection removed - Target missing"), "");
-        qWarning() << "Can't connect, as the target is missing";
         return false;
     }
 
@@ -241,7 +239,6 @@ bool IVConnection::lookupEndpointsPostponed()
                     IVNameValidator::encodeName(IVObject::Type::Function, info->m_functionName));
             if (!ivFunction) {
                 QString warningMessage = QStringLiteral("Unable to find Fn/FnType %1").arg(info->m_functionName);
-                qWarning() << qPrintable(warningMessage);
                 shared::ErrorHub::addError(shared::ErrorItem::Warning,
                         tr("Connection removed - Unable to find Fn/FnType %1").arg(info->m_functionName), "");
             }
@@ -265,7 +262,6 @@ bool IVConnection::lookupEndpointsPostponed()
                 QString warningMessage = QStringLiteral("Unable to find Interface %1").arg(info->m_interfaceName);
                 shared::ErrorHub::addError(shared::ErrorItem::Warning,
                         tr("Connection removed - Unable to find interface %1").arg(info->m_interfaceName), "");
-                qWarning() << qPrintable(warningMessage);
             }
         }
         return ivIface;
@@ -330,7 +326,6 @@ bool IVConnection::postInit()
 {
     if (needPostponedInit() && !lookupEndpointsPostponed()) {
         shared::ErrorHub::addError(shared::ErrorItem::Warning, tr("Postponed Connection initialization failed"), "");
-        qWarning() << "Postponed Connection initialization failed";
         return false;
     }
 

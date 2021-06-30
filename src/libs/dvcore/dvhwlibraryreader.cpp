@@ -24,6 +24,7 @@
 #include "dvfunction.h"
 #include "dvobject.h"
 #include "dvpartition.h"
+#include "errorhub.h"
 
 #include <QDebug>
 #include <QFile>
@@ -78,9 +79,11 @@ void DVHWLibraryReader::processTagOpen(QXmlStreamReader &xml)
         }
     } break;
     default:
-        static const QString msg("The '%1' is unknown/unexpected here: %2@%3 %4");
-        qWarning() << msg.arg(
-                tagName, QString::number(xml.lineNumber()), QString::number(xml.columnNumber()), xml.tokenString());
+        static const QString msg = tr("The '%1' is unknown/unexpected here: %2@%3 %4");
+        shared::ErrorHub::addError(shared::ErrorItem::Warning,
+                msg.arg(tagName, QString::number(xml.lineNumber()), QString::number(xml.columnNumber()),
+                        xml.tokenString()),
+                file(), xml.lineNumber());
         break;
     }
 

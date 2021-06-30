@@ -134,8 +134,9 @@ void IVFunction::reflectAttr(const QString &attrName)
 {
     if (!d->m_fnType) {
         if (const IVFunctionType *fnType = dynamic_cast<const IVFunctionType *>(sender()))
-            qWarning() << QString("The Function type \"%1\" (%2) has not been disconnected, it seems")
-                                  .arg(fnType->title(), fnType->id().toString());
+            shared::ErrorHub::addError(shared::ErrorItem::Warning,
+                    tr("The Function type \"%1\" (%2) has not been disconnected, it seems")
+                            .arg(fnType->title(), fnType->id().toString()));
         return;
     }
     const meta::Props::Token attr = meta::Props::token(attrName);
@@ -163,8 +164,9 @@ void IVFunction::reflectContextParam()
 {
     if (!d->m_fnType) {
         if (const IVFunctionType *fnType = dynamic_cast<const IVFunctionType *>(sender()))
-            qWarning() << QString("The Function type \"%1\" (%2) has not been disconnected, it seems")
-                                  .arg(fnType->title(), fnType->id().toString());
+            shared::ErrorHub::addError(shared::ErrorItem::Warning,
+                    tr("The Function type \"%1\" (%2) has not been disconnected, it seems")
+                            .arg(fnType->title(), fnType->id().toString()));
         return;
     }
 

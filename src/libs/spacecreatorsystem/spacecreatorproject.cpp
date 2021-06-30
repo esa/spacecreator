@@ -109,7 +109,7 @@ QSharedPointer<ive::IVEditorCore> SpaceCreatorProject::ivCore() const
 {
     const QStringList ivFiles = allIVFiles();
     if (ivFiles.empty()) {
-        qWarning() << "No IV file in the project";
+        shared::ErrorHub::addError(shared::ErrorItem::Warning, tr("No IV file in the project"));
         return {};
     }
 
