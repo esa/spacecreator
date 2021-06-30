@@ -1,5 +1,5 @@
 /*
-  Copyright (C) 2019 European Space Agency - <maxime.perrotin@esa.int>
+  Copyright (C) 2019-2021 European Space Agency - <maxime.perrotin@esa.int>
 
   This library is free software; you can redistribute it and/or
   modify it under the terms of the GNU Library General Public
@@ -17,26 +17,21 @@
 
 #include "propertieslistmodel.h"
 
-#include "commandsstack.h"
-#include "interface/commands/cmdentityattributechange.h"
-#include "interface/commands/cmdentitypropertychange.h"
-#include "interface/commands/cmdentitypropertycreate.h"
-#include "interface/commands/cmdentitypropertyremove.h"
-#include "interface/commands/cmdentitypropertyrename.h"
-#include "ivcommonprops.h"
-#include "ivfunction.h"
-#include "ivinterface.h"
-#include "ivmodel.h"
-#include "ivnamevalidator.h"
-#include "ivobject.h"
-#include "ivpropertytemplateconfig.h"
+#include "commands/cmdentityattributechange.h"
+#include "commands/cmdentitypropertychange.h"
+#include "commands/cmdentitypropertycreate.h"
+#include "commands/cmdentitypropertyremove.h"
+#include "commands/cmdentitypropertyrename.h"
+#include "commandsstackbase.h"
+#include "propertytemplateconfig.h"
+#include "vemodel.h"
+#include "veobject.h"
 
 #include <QApplication>
 #include <QDebug>
 #include <QRegularExpression>
-#include <algorithm>
 
-namespace ive {
+namespace shared {
 
 QString PropertiesListModel::tokenNameFromIndex(const QModelIndex &index)
 {
@@ -52,16 +47,8 @@ QString PropertiesListModel::tokenNameFromIndex(const QModelIndex &index)
     return name;
 }
 
-ivm::meta::Props::Token PropertiesListModel::tokenFromIndex(const QModelIndex &index)
-{
-    if (!index.isValid())
-        return ivm::meta::Props::Token::Unknown;
-
-    return ivm::meta::Props::token(tokenNameFromIndex(index));
-}
-
 PropertiesListModel::PropertiesListModel(
-        cmd::CommandsStack::Macro *macro, shared::PropertyTemplateConfig *dynPropConfig, QObject *parent)
+        cmd::CommandsStackBase::Macro *macro, shared::PropertyTemplateConfig *dynPropConfig, QObject *parent)
     : PropertiesModelBase(parent)
     , m_cmdMacro(macro)
     , m_propTemplatesConfig(dynPropConfig)
@@ -88,7 +75,7 @@ void PropertiesListModel::updateRow(const RowData &data)
 
     QFont font = qApp->font();
     font.setBold(true);
-    font.setItalic(data.info == ivm::IVPropertyTemplate::Info::Property);
+    font.setItalic(data.info == shared::PropertyTemplate::Info::Property);
     titleItem->setData(font, Qt::FontRole);
 
     QStandardItem *valueItem = item(row, Column::Value);
@@ -154,25 +141,24 @@ void PropertiesListModel::updateRows(const QList<shared::PropertyTemplate *> &te
             RowData rd;
             rd.row = ++row;
             rd.name = key;
-            const ivm::IVPropertyTemplate::Type type =
-                    propTemplate ? propTemplate->type() : ivm::IVPropertyTemplate::Type::String;
-            const QString decodedKey = ivm::IVNameValidator::decodeName(m_dataObject->type(), key);
+            const shared::PropertyTemplate::Type type =
+                    propTemplate ? propTemplate->type() : shared::PropertyTemplate::Type::String;
             if (propTemplate) {
                 rd.rxValidator = propTemplate->valueValidatorPattern();
-                rd.label = propTemplate->label().isEmpty() ? decodedKey : propTemplate->label();
-                rd.editValue = ivm::IVPropertyTemplate::convertData(propTemplate->value(), type);
+                rd.label = propTemplate->label().isEmpty() ? key : propTemplate->label();
+                rd.editValue = shared::PropertyTemplate::convertData(propTemplate->value(), type);
             } else {
-                rd.label = decodedKey;
+                rd.label = key;
                 rd.editValue = QVariant(QVariant::String);
             }
 
             const EntityAttribute attr = m_dataObject->entityAttribute(key);
-            if (!attr.isValid()) {
+            if (!attr.isValid() && propTemplate) {
                 rd.info = propTemplate->info();
             } else {
                 rd.value = attr.value();
-                rd.info = attr.isProperty() ? ivm::IVPropertyTemplate::Info::Property
-                                            : ivm::IVPropertyTemplate::Info::Attribute;
+                rd.info = attr.isProperty() ? shared::PropertyTemplate::Info::Property
+                                            : shared::PropertyTemplate::Info::Attribute;
             }
 
             updateRow(rd);
@@ -182,13 +168,13 @@ void PropertiesListModel::updateRows(const QList<shared::PropertyTemplate *> &te
     init(sortedKeys(templates));
 }
 
-void PropertiesListModel::setDataObject(ivm::IVObject *obj)
+void PropertiesListModel::setDataObject(VEObject *obj)
 {
     clear();
     m_names.clear();
 
     if (m_dataObject) {
-        disconnect(m_dataObject, &ivm::IVObject::attributeChanged, this, &PropertiesListModel::invalidateAttributes);
+        disconnect(m_dataObject, &shared::VEObject::attributeChanged, this, &PropertiesListModel::invalidateAttributes);
     }
 
     m_dataObject = obj;
@@ -196,7 +182,7 @@ void PropertiesListModel::setDataObject(ivm::IVObject *obj)
     if (!m_dataObject)
         return;
 
-    connect(m_dataObject, &ivm::IVObject::attributeChanged, this, &PropertiesListModel::invalidateAttributes,
+    connect(m_dataObject, &shared::VEObject::attributeChanged, this, &PropertiesListModel::invalidateAttributes,
             Qt::UniqueConnection);
 
     updateRows(m_propTemplatesConfig->propertyTemplatesForObject(m_dataObject));
@@ -258,30 +244,16 @@ bool PropertiesListModel::setData(const QModelIndex &index, const QVariant &valu
         };
 
         if (isAttr(index) && index.column() == Column::Value) {
-            QVariant attributeValue = value;
-            switch (tokenFromIndex(index)) {
-            case ivm::meta::Props::Token::name: {
-                const QString newName = ivm::IVNameValidator::encodeName(m_dataObject->type(), value.toString());
-                if (!ivm::IVNameValidator::isAcceptableName(m_dataObject, newName)) {
-                    return false;
-                }
-                attributeValue = newName;
-                break;
-            }
-            default:
-                break;
-            }
-
-            if (m_dataObject->entityAttributeValue(name) == attributeValue) {
+            if (m_dataObject->entityAttributeValue(name) == value) {
                 return false;
             }
 
-            if (!isValueValid(name, attributeValue.toString())) {
+            if (!isValueValid(name, value.toString())) {
                 return false;
             }
 
-            const QVariantHash attributes = { { name, attributeValue } };
-            auto attributesCmd = new cmd::CmdEntityAttributeChange(m_dataObject, attributes);
+            const QVariantHash attributes = { { name, value } };
+            auto attributesCmd = new shared::cmd::CmdEntityAttributeChange(m_dataObject, attributes);
             m_cmdMacro->push(attributesCmd);
             return true;
         } else if (isProp(index)) {
@@ -296,7 +268,7 @@ bool PropertiesListModel::setData(const QModelIndex &index, const QVariant &valu
                 }
 
                 const QVariantHash props = { { name, value } };
-                auto propsCmd = new cmd::CmdEntityPropertyChange(m_dataObject, props);
+                auto propsCmd = new shared::cmd::CmdEntityPropertyChange(m_dataObject, props);
                 m_cmdMacro->push(propsCmd);
                 return true;
             }
@@ -305,7 +277,7 @@ bool PropertiesListModel::setData(const QModelIndex &index, const QVariant &valu
                 if (newName.isEmpty() || m_names.contains(newName))
                     return false;
                 const QHash<QString, QString> props = { { name, newName } };
-                auto propsCmd = new cmd::CmdEntityPropertyRename(m_dataObject, props);
+                auto propsCmd = new shared::cmd::CmdEntityPropertyRename(m_dataObject, props);
                 m_cmdMacro->push(propsCmd);
                 const int idx = m_names.indexOf(name);
                 if (idx >= 0) {
@@ -332,7 +304,7 @@ bool PropertiesListModel::createProperty(const QString &propName)
     }
 
     const QVariantHash props = { { propName, QString() } };
-    auto propsCmd = new cmd::CmdEntityPropertyCreate(m_dataObject, props);
+    auto propsCmd = new shared::cmd::CmdEntityPropertyCreate(m_dataObject, props);
     return m_cmdMacro->push(propsCmd);
 }
 
@@ -349,7 +321,7 @@ bool PropertiesListModel::removeProperty(const QModelIndex &index)
 
     const QString &propName = propId.data().toString();
     const QStringList props { propName };
-    auto propsCmd = new cmd::CmdEntityPropertyRemove(m_dataObject, props);
+    auto propsCmd = new shared::cmd::CmdEntityPropertyRemove(m_dataObject, props);
     removeRow(row);
     m_names.removeAt(row);
     m_cmdMacro->push(propsCmd);
@@ -359,12 +331,12 @@ bool PropertiesListModel::removeProperty(const QModelIndex &index)
 
 bool PropertiesListModel::isAttr(const QModelIndex &id) const
 {
-    return id.isValid() && static_cast<int>(ivm::IVPropertyTemplate::Info::Attribute) == id.data(InfoRole).toInt();
+    return id.isValid() && static_cast<int>(shared::PropertyTemplate::Info::Attribute) == id.data(InfoRole).toInt();
 }
 
 bool PropertiesListModel::isProp(const QModelIndex &id) const
 {
-    return id.isValid() && static_cast<int>(ivm::IVPropertyTemplate::Info::Property) == id.data(InfoRole).toInt();
+    return id.isValid() && static_cast<int>(shared::PropertyTemplate::Info::Property) == id.data(InfoRole).toInt();
 }
 
 bool PropertiesListModel::isEditable(const QModelIndex &idx) const
@@ -382,20 +354,7 @@ bool PropertiesListModel::isEditable(const QModelIndex &idx) const
 
 Qt::ItemFlags PropertiesListModel::flags(const QModelIndex &index) const
 {
-    bool editable = isEditable(index);
-    if (editable) {
-        switch (tokenFromIndex(index)) {
-        case ivm::meta::Props::Token::RootCoordinates:
-        case ivm::meta::Props::Token::InnerCoordinates:
-        case ivm::meta::Props::Token::coordinates: {
-            editable = false;
-            break;
-        }
-        default:
-            break;
-        }
-    }
-
+    const bool editable = isEditable(index);
     Qt::ItemFlags flags = QStandardItemModel::flags(index);
     for (Qt::ItemFlag f : { Qt::ItemIsEditable, Qt::ItemIsEnabled })
         if (flags.testFlag(f) != editable)
@@ -404,100 +363,4 @@ Qt::ItemFlags PropertiesListModel::flags(const QModelIndex &index) const
     return flags;
 }
 
-FunctionPropertiesListModel::FunctionPropertiesListModel(
-        cmd::CommandsStack::Macro *macro, shared::PropertyTemplateConfig *dynPropConfig, QObject *parent)
-    : PropertiesListModel(macro, dynPropConfig, parent)
-{
-}
-
-QVariant FunctionPropertiesListModel::data(const QModelIndex &index, int role) const
-{
-    if (index.column() == Column::Value && role == EditRole
-            && tokenFromIndex(index) == ivm::meta::Props::Token::instance_of) {
-        QStringList availableFnTypes { QString() };
-        if (auto fn = m_dataObject->as<const ivm::IVFunction *>()) {
-            availableFnTypes << fn->model()->getAvailableFunctionTypes(fn).keys();
-        }
-        return availableFnTypes;
-    }
-
-    return PropertiesListModel::data(index, role);
-}
-
-bool FunctionPropertiesListModel::isEditable(const QModelIndex &index) const
-{
-    if (!entity() || !index.isValid() || !PropertiesListModel::isEditable(index))
-        return false;
-
-    bool editable = true;
-    switch (tokenFromIndex(index)) {
-    case ivm::meta::Props::Token::is_type: {
-        editable = false;
-        break;
-    }
-    case ivm::meta::Props::Token::name: {
-        editable = true;
-        break;
-    }
-    case ivm::meta::Props::Token::instance_of: {
-        if (entity()->isFunctionType() || index.column() == Column::Name)
-            editable = false;
-        else {
-            if (auto fn = entity()->as<const ivm::IVFunction *>()) {
-                editable = fn->instanceOf() || fn->interfaces().isEmpty();
-            }
-        }
-        break;
-    }
-    default:
-        if (auto fn = entity()->as<const ivm::IVFunction *>())
-            editable = !fn->inheritsFunctionType();
-        break;
-    }
-
-    return editable;
-}
-
-InterfacePropertiesListModel::InterfacePropertiesListModel(
-        cmd::CommandsStack::Macro *macro, shared::PropertyTemplateConfig *dynPropConfig, QObject *parent)
-    : PropertiesListModel(macro, dynPropConfig, parent)
-{
-}
-
-QVariant InterfacePropertiesListModel::data(const QModelIndex &index, int role) const
-{
-    if ((role == PropertiesListModel::DataRole || role == PropertiesListModel::EditRole)
-            && index.column() == Column::Value) {
-        if (m_dataObject->type() == ivm::IVObject::Type::RequiredInterface
-                && tokenFromIndex(index) == ivm::meta::Props::Token::name) {
-            return m_dataObject->as<ivm::IVInterfaceRequired *>()->ifaceLabel();
-        }
-    }
-    return PropertiesListModel::data(index, role);
-}
-
-bool InterfacePropertiesListModel::isEditable(const QModelIndex &index) const
-{
-    if (!entity() || !index.isValid() || !PropertiesListModel::isEditable(index))
-        return false;
-
-    if (auto iface = m_dataObject->as<const ivm::IVInterface *>()) {
-        const bool isClone = iface->isClone();
-        switch (tokenFromIndex(index)) {
-        case ivm::meta::Props::Token::name:
-        case ivm::meta::Props::Token::InheritPI:
-            return !isClone;
-        default:
-            if (iface->isRequired()) {
-                if (auto ri = iface->as<const ivm::IVInterfaceRequired *>()) {
-                    return !isClone && !ri->hasPrototypePi();
-                }
-            }
-            return !isClone;
-        }
-    }
-
-    return true;
-}
-
-}
+} // namespace shared

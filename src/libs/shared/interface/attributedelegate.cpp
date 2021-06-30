@@ -1,5 +1,5 @@
 /*
-  Copyright (C) 2020 European Space Agency - <maxime.perrotin@esa.int>
+  Copyright (C) 2020-2021 European Space Agency - <maxime.perrotin@esa.int>
 
   This library is free software; you can redistribute it and/or
   modify it under the terms of the GNU Library General Public
@@ -17,13 +17,7 @@
 
 #include "attributedelegate.h"
 
-#include "ivcommonprops.h"
-#include "ivmodel.h"
-#include "ivnamevalidator.h"
-#include "ivobject.h"
-#include "interface/properties/propertieslistmodel.h"
-#include "ivpropertytemplate.h"
-#include "propertytemplateconfig.h"
+#include "propertieslistmodel.h"
 
 #include <QCheckBox>
 #include <QComboBox>
@@ -33,7 +27,7 @@
 #include <QRegularExpressionValidator>
 #include <QSpinBox>
 
-namespace ive {
+namespace shared {
 
 AttributeDelegate::AttributeDelegate(QObject *parent)
     : QStyledItemDelegate(parent)
@@ -98,9 +92,7 @@ static QWidget *createConfiguredEditor(
     case QVariant::String: {
         auto lineEdit = new QLineEdit(parent);
         QRegularExpression re;
-        if (attribute == ivm::meta::Props::token(ivm::meta::Props::Token::name)) {
-            re.setPattern(ivm::IVNameValidator::namePatternUI());
-        } else if (!validator.isNull() && validator.canConvert<QString>()) {
+        if (!validator.isNull() && validator.canConvert<QString>()) {
             re.setPattern(validator.toString());
         }
         lineEdit->setValidator(new QRegularExpressionValidator(re, lineEdit));
@@ -207,4 +199,4 @@ void AttributeDelegate::setModelData(QWidget *editor, QAbstractItemModel *model,
     }
 }
 
-} // namespace ive
+} // namespace shared

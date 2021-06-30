@@ -18,6 +18,7 @@
 #pragma once
 
 #include "commandsstack.h"
+#include "ivobject.h"
 #include "parameter.h"
 #include "propertiesmodelbase.h"
 
@@ -29,13 +30,12 @@ class File;
 }
 
 namespace ivm {
-class IVObject;
 class ContextParameter;
 }
 
 namespace ive {
 
-class ContextParametersModel : public PropertiesModelBase
+class ContextParametersModel : public shared::PropertiesModelBase
 {
     Q_OBJECT
 
@@ -56,7 +56,7 @@ public:
     // Editable:
     bool setData(const QModelIndex &index, const QVariant &value, int role = Qt::EditRole) override;
 
-    void setDataObject(ivm::IVObject *obj) override;
+    void setDataObject(shared::VEObject *obj) override;
     void setDataTypes(const QSharedPointer<Asn1Acn::File> &dataTypes);
 
     bool createProperty(const QString &propName) override;
@@ -69,9 +69,10 @@ public:
 
     QVariant headerData(int section, Qt::Orientation orientation, int role) const override;
 
+    ivm::IVObject *entity() const override;
+
 private:
     cmd::CommandsStack::Macro *m_cmdMacro { nullptr };
-    ivm::IVObject *m_dataObject { nullptr };
     QVector<ivm::ContextParameter> m_params;
     QSharedPointer<Asn1Acn::File> m_dataTypes;
     QStringList m_asn1Names;

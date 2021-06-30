@@ -72,7 +72,7 @@ QList<shared::PropertyTemplate *> PropertyTemplateConfig::systemAttributes() con
                     << QStringLiteral("%1:%2 => %3").arg(errorLine).arg(errorColumn).arg(errorMsg);
         return {};
     }
-    for (auto attr : sysAttrs) {
+    for (auto attr : qAsConst(sysAttrs)) {
         attr->setSystem(true);
     }
     return sysAttrs;

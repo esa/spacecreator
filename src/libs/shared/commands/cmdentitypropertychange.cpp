@@ -16,16 +16,15 @@
   <https://www.gnu.org/licenses/lgpl-2.1.html>.
 */
 
-#include "cmdentitypropertycreate.h"
+#include "cmdentitypropertychange.h"
 
 #include "commandids.h"
+#include "veobject.h"
 
-#include <ivmodel.h>
-
-namespace ive {
+namespace shared {
 namespace cmd {
 
-static inline QVariantHash getCurrentProperties(ivm::IVObject *entity, const QVariantHash &props)
+static inline QVariantHash getCurrentProperties(VEObject *entity, const QVariantHash &props)
 {
     QVariantHash result;
     for (auto it = props.constBegin(); it != props.constEnd(); ++it)
@@ -33,45 +32,31 @@ static inline QVariantHash getCurrentProperties(ivm::IVObject *entity, const QVa
     return result;
 }
 
-CmdEntityPropertyCreate::CmdEntityPropertyCreate(ivm::IVObject *entity, const QVariantHash &props)
+CmdEntityPropertyChange::CmdEntityPropertyChange(VEObject *entity, const QVariantHash &props)
     : QUndoCommand()
     , m_entity(entity)
     , m_newProps(props)
     , m_oldProps(getCurrentProperties(entity, props))
 {
-    setText(QObject::tr("Create Property"));
+    setText(QObject::tr("Change Property"));
 }
 
-void CmdEntityPropertyCreate::redo()
+void CmdEntityPropertyChange::redo()
 {
     for (auto it = m_newProps.constBegin(); it != m_newProps.constEnd(); ++it)
         m_entity->setEntityProperty(it.key(), it.value());
 }
 
-void CmdEntityPropertyCreate::undo()
+void CmdEntityPropertyChange::undo()
 {
     for (auto it = m_oldProps.constBegin(); it != m_oldProps.constEnd(); ++it)
-        m_entity->removeEntityAttribute(it.key());
+        m_entity->setEntityProperty(it.key(), it.value());
 }
 
-bool CmdEntityPropertyCreate::mergeWith(const QUndoCommand *command)
+int CmdEntityPropertyChange::id() const
 {
-    if (command->id() == id()) {
-        const QVariantHash &update = static_cast<const CmdEntityPropertyCreate *>(command)->m_newProps;
-        QVariantHash::const_iterator i = update.constBegin();
-        while (i != update.constEnd()) {
-            m_newProps[i.key()] = i.value();
-            ++i;
-        }
-        return true;
-    }
-    return false;
+    return ChangeEntityProperty;
 }
 
-int CmdEntityPropertyCreate::id() const
-{
-    return CreateEntityProperty;
-}
-
-}
-}
+} // namespace cmd
+} // namespace shared

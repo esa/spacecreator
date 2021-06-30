@@ -106,6 +106,25 @@ target_sources(${LIB_NAME} PRIVATE
     propertiesdialog.cpp
     propertiesdialog.h
     propertiesdialog.ui
+    propertiesviewbase.cpp
+    propertiesviewbase.h
+    propertiesviewbase.ui
+    propertiesmodelbase.cpp
+    propertiesmodelbase.h
+    propertieslistmodel.cpp
+    propertieslistmodel.h
+    commands/cmdentitypropertycreate.cpp
+    commands/cmdentitypropertycreate.h
+    commands/cmdentitypropertychange.cpp
+    commands/cmdentitypropertychange.h
+    commands/cmdentitypropertyremove.cpp
+    commands/cmdentitypropertyremove.h
+    commands/cmdentitypropertyrename.cpp
+    commands/cmdentitypropertyrename.h
+    commands/cmdentityattributechange.cpp
+    commands/cmdentityattributechange.h
+    interface/attributedelegate.cpp
+    interface/attributedelegate.h
 )
 
 target_include_directories(${LIB_NAME} PUBLIC .)

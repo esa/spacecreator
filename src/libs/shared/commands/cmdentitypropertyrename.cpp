@@ -1,5 +1,5 @@
 /*
-  Copyright (C) 2018-2019 European Space Agency - <maxime.perrotin@esa.int>
+  Copyright (C) 2018-2021 European Space Agency - <maxime.perrotin@esa.int>
 
   This library is free software; you can redistribute it and/or
   modify it under the terms of the GNU Library General Public
@@ -19,13 +19,12 @@
 #include "cmdentitypropertyrename.h"
 
 #include "commandids.h"
+#include "veobject.h"
 
-#include <ivmodel.h>
-
-namespace ive {
+namespace shared {
 namespace cmd {
 
-CmdEntityPropertyRename::CmdEntityPropertyRename(ivm::IVObject *entity, const QHash<QString, QString> &props)
+CmdEntityPropertyRename::CmdEntityPropertyRename(VEObject *entity, const QHash<QString, QString> &props)
     : QUndoCommand()
     , m_entity(entity)
     , m_newProps(props)
@@ -57,15 +56,10 @@ void CmdEntityPropertyRename::undo()
     m_entity->setEntityAttributes(props);
 }
 
-bool CmdEntityPropertyRename::mergeWith(const QUndoCommand *)
-{
-    return false;
-}
-
 int CmdEntityPropertyRename::id() const
 {
     return RenameEntityProperty;
 }
 
-}
-}
+} // namespace cmd
+} // namespace shared

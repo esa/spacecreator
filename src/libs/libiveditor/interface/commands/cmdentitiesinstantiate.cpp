@@ -18,9 +18,9 @@
 #include "cmdentitiesinstantiate.h"
 
 #include "baseitems/common/ivutils.h"
-#include "cmdentityattributechange.h"
 #include "cmdinterfaceitemcreate.h"
 #include "commandids.h"
+#include "commands/cmdentityattributechange.h"
 #include "graphicsviewutils.h"
 #include "ivfunction.h"
 #include "ivfunctiontype.h"
@@ -63,7 +63,7 @@ CmdEntitiesInstantiate::CmdEntitiesInstantiate(
     typeGeometry.moveTo(pos);
     m_instantiatedEntity->setCoordinates(shared::graphicsviewutils::coordinates(typeGeometry));
 
-    m_subCmds.append(new CmdEntityAttributeChange(m_instantiatedEntity,
+    m_subCmds.append(new shared::cmd::CmdEntityAttributeChange(m_instantiatedEntity,
             { { ivm::meta::Props::token(ivm::meta::Props::Token::is_type), QLatin1String("NO") } }));
 
     for (auto iface : entity->interfaces()) {
@@ -74,7 +74,7 @@ CmdEntitiesInstantiate::CmdEntitiesInstantiate(
     }
 
     const QString nameKey = ivm::meta::Props::token(ivm::meta::Props::Token::instance_of);
-    m_subCmds.append(new CmdEntityAttributeChange(m_instantiatedEntity, { { nameKey, entity->title() } }));
+    m_subCmds.append(new shared::cmd::CmdEntityAttributeChange(m_instantiatedEntity, { { nameKey, entity->title() } }));
 }
 
 CmdEntitiesInstantiate::~CmdEntitiesInstantiate()

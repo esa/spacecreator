@@ -30,6 +30,8 @@
 #include "dvhwlibraryreader.h"
 #include "dvitemmodel.h"
 #include "dvmodel.h"
+#include "dvpropertiesdialog.h"
+#include "dvpropertytemplateconfig.h"
 #include "dvvisualizationmodel.h"
 #include "errorhub.h"
 #include "ui/graphicsviewbase.h"
@@ -58,6 +60,7 @@ struct DVEditorCore::DVEditorCorePrivate {
         , m_hwModel(new dvm::DVModel)
         , m_hwVisualizationModel(new DVVisualizationModel(m_hwModel.get(), m_appModel->commandsStack()))
         , m_exporter(new DVExporter)
+        , m_dynPropConfig(new dvm::DVPropertyTemplateConfig())
     {
     }
 
@@ -74,6 +77,7 @@ struct DVEditorCore::DVEditorCorePrivate {
     std::unique_ptr<shared::AbstractVisualizationModel> m_hwVisualizationModel;
     std::unique_ptr<dve::DVCreatorTool> m_creatorTool;
     std::unique_ptr<dve::DVExporter> m_exporter;
+    shared::PropertyTemplateConfig *m_dynPropConfig { nullptr };
 
     dve::AbstractSystemChecks *m_systemChecks = nullptr;
 
@@ -87,6 +91,7 @@ DVEditorCore::DVEditorCore(QObject *parent)
     , d(new DVEditorCorePrivate)
 {
     connect(d->m_model.get(), &dve::DVItemModel::itemsSelected, this, &DVEditorCore::onSceneSelectionChanged);
+    connect(d->m_model.get(), &dve::DVItemModel::itemDoubleClicked, this, &DVEditorCore::showPropertyEditor);
 }
 
 DVEditorCore::~DVEditorCore() { }
@@ -291,9 +296,14 @@ void DVEditorCore::loadHWLibrary(const QString &directory)
     d->m_hwModel->initFromObjects(objects);
 }
 
-void DVEditorCore::showPropertyEditor()
+void DVEditorCore::showPropertyEditor(const shared::Id &id)
 {
-    /// TODO:
+    if (auto obj = d->m_appModel->objectsModel()->getObject(id)) {
+        dve::DVPropertiesDialog dialog(
+                d->m_dynPropConfig, obj, d->m_appModel->commandsStack(), d->m_mainWidget->window());
+        dialog.init();
+        dialog.exec();
+    }
 }
 
 void DVEditorCore::showInfoMessage(const QString &title, const QString &message)

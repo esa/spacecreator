@@ -1,5 +1,5 @@
 /*
-  Copyright (C) 2019 European Space Agency - <maxime.perrotin@esa.int>
+  Copyright (C) 2019-2021 European Space Agency - <maxime.perrotin@esa.int>
 
   This library is free software; you can redistribute it and/or
   modify it under the terms of the GNU Library General Public
@@ -17,27 +17,18 @@
 
 #pragma once
 
-#include "commandsstack.h"
-#include "ivcommonprops.h"
-#include "ivpropertytemplate.h"
+#include "commandsstackbase.h"
 #include "propertiesmodelbase.h"
-
-#include <QVector>
+#include "propertytemplate.h"
 
 namespace shared {
+
+class PropertyTemplate;
 class PropertyTemplateConfig;
-}
-
-namespace ivm {
-class IVObject;
-}
-
-namespace ive {
 
 class PropertiesListModel : public PropertiesModelBase
 {
     Q_OBJECT
-
 public:
     enum Column
     {
@@ -45,8 +36,8 @@ public:
         Value
     };
 
-    explicit PropertiesListModel(
-            cmd::CommandsStack::Macro *macro, shared::PropertyTemplateConfig *dynPropConfig, QObject *parent = nullptr);
+    explicit PropertiesListModel(cmd::CommandsStackBase::Macro *macro, shared::PropertyTemplateConfig *dynPropConfig,
+            QObject *parent = nullptr);
     ~PropertiesListModel() override;
 
     int rowCount(const QModelIndex &parent = QModelIndex()) const override;
@@ -55,7 +46,7 @@ public:
     // Editable:
     bool setData(const QModelIndex &index, const QVariant &value, int role = DataRole) override;
 
-    void setDataObject(ivm::IVObject *obj) override;
+    void setDataObject(VEObject *obj) override;
 
     Qt::ItemFlags flags(const QModelIndex &index) const override;
 
@@ -68,12 +59,11 @@ public:
     QVariant headerData(int section, Qt::Orientation orientation, int role) const override;
 
     static QString tokenNameFromIndex(const QModelIndex &index);
-    static ivm::meta::Props::Token tokenFromIndex(const QModelIndex &index);
 
 protected:
-    cmd::CommandsStack::Macro *m_cmdMacro { nullptr };
+    cmd::CommandsStackBase::Macro *m_cmdMacro { nullptr };
     shared::PropertyTemplateConfig *m_propTemplatesConfig { nullptr };
-    QVector<QString> m_names;
+    QStringList m_names;
 
     virtual bool isEditable(const QModelIndex &idx) const;
     void createNewRow(int row, const QString &name);
@@ -84,7 +74,7 @@ protected:
 private:
     struct RowData {
         int row { -1 };
-        ivm::IVPropertyTemplate::Info info;
+        shared::PropertyTemplate::Info info;
         QString label;
         QString name;
         QVariant value;
@@ -97,28 +87,4 @@ private:
     QStringList sortedKeys(const QList<shared::PropertyTemplate *> &templates) const;
 };
 
-class FunctionPropertiesListModel : public PropertiesListModel
-{
-public:
-    explicit FunctionPropertiesListModel(
-            cmd::CommandsStack::Macro *macro, shared::PropertyTemplateConfig *dynPropConfig, QObject *parent = nullptr);
-
-    QVariant data(const QModelIndex &index, int role) const override;
-
-protected:
-    bool isEditable(const QModelIndex &index) const override;
-};
-
-class InterfacePropertiesListModel : public PropertiesListModel
-{
-public:
-    explicit InterfacePropertiesListModel(
-            cmd::CommandsStack::Macro *macro, shared::PropertyTemplateConfig *dynPropConfig, QObject *parent = nullptr);
-
-    QVariant data(const QModelIndex &index, int role) const override;
-
-protected:
-    bool isEditable(const QModelIndex &index) const override;
-};
-
-}
+} // namespace shared

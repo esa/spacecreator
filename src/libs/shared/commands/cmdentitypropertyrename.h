@@ -1,5 +1,5 @@
 /*
-  Copyright (C) 2019 European Space Agency - <maxime.perrotin@esa.int>
+  Copyright (C) 2019-2021 European Space Agency - <maxime.perrotin@esa.int>
 
   This library is free software; you can redistribute it and/or
   modify it under the terms of the GNU Library General Public
@@ -15,18 +15,28 @@
   along with this program. If not, see <https://www.gnu.org/licenses/lgpl-2.1.html>.
 */
 
-#include "propertiesmodelbase.h"
+#pragma once
 
-namespace ive {
+#include <QPointer>
+#include <QUndoCommand>
 
-PropertiesModelBase::PropertiesModelBase(QObject *parent)
-    : QStandardItemModel(parent)
+namespace shared {
+class VEObject;
+namespace cmd {
+
+class CmdEntityPropertyRename : public QUndoCommand
 {
-}
+public:
+    explicit CmdEntityPropertyRename(VEObject *entity, const QHash<QString, QString> &props);
 
-const ivm::IVObject *PropertiesModelBase::entity() const
-{
-    return m_dataObject;
-}
+    void redo() override;
+    void undo() override;
+    int id() const override;
 
-}
+private:
+    QPointer<VEObject> m_entity;
+    QHash<QString, QString> m_newProps;
+};
+
+} // namespace cmd
+} // namespace shared

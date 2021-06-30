@@ -65,6 +65,8 @@ target_sources(${LIB_NAME} PRIVATE
     abstractsystemchecks.h
     commands/cmdfunctionunbind.cpp
     commands/cmdfunctionunbind.h
+    dvpropertiesdialog.cpp
+    dvpropertiesdialog.h
 )
 
 target_link_libraries(${LIB_NAME}

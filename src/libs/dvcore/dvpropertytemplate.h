@@ -19,40 +19,39 @@
 
 #include "propertytemplate.h"
 
-namespace ivm {
+namespace dvm {
 
-class IVPropertyTemplate : public shared::PropertyTemplate
+class DVPropertyTemplate : public shared::PropertyTemplate
 {
     Q_GADGET
 public:
     enum class Scope
     {
         None = 0x0,
-        Function = 0x1,
-        Required_Interface = 0x2,
-        Provided_Interface = 0x4,
-        Comment = 0x8,
-        Connection = 0x10,
+        Node = 0x1,
+        Partition = 0x2,
+        Device = 0x4,
+        Connection = 0x8,
     };
 
     Q_ENUM(Scope)
 #if (QT_VERSION >= QT_VERSION_CHECK(5, 12, 0))
     Q_DECLARE_FLAGS(Scopes, Scope)
 #else
-    Q_DECLARE_FLAGS(Scopes, ivm::IVPropertyTemplate::Scope)
+    Q_DECLARE_FLAGS(Scopes, dvm::DVPropertyTemplate::Scope)
 #endif
     Q_FLAG(Scopes)
 
-    IVPropertyTemplate();
-    ~IVPropertyTemplate() override {};
+    DVPropertyTemplate();
+    ~DVPropertyTemplate() override {};
 
 protected:
     QMetaEnum scopeMetaEnum() const override;
     int objectScope(const shared::VEObject *obj) const override;
 };
 
-} // namespace ivm
+} // namespace dvm
 
-Q_DECLARE_OPERATORS_FOR_FLAGS(ivm::IVPropertyTemplate::Scopes)
-Q_DECLARE_METATYPE(ivm::IVPropertyTemplate::Type)
-Q_DECLARE_METATYPE(ivm::IVPropertyTemplate::Scopes)
+Q_DECLARE_OPERATORS_FOR_FLAGS(dvm::DVPropertyTemplate::Scopes)
+Q_DECLARE_METATYPE(dvm::DVPropertyTemplate::Type)
+Q_DECLARE_METATYPE(dvm::DVPropertyTemplate::Scopes)

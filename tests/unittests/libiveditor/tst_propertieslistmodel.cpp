@@ -16,7 +16,8 @@
 */
 
 #include "baseitems/common/ivutils.h"
-#include "interface/properties/propertieslistmodel.h"
+#include "commandsstack.h"
+#include "interface/properties/ivpropertieslistmodel.h"
 #include "ivfunction.h"
 #include "ivpropertytemplateconfig.h"
 
@@ -65,7 +66,7 @@ void tst_PropertiesListModel::tst_object()
     ivm::IVFunction fn;
     fn.setEntityAttributes(attrs);
 
-    ive::PropertiesListModel plmodel(m_macro, m_config);
+    ive::IVPropertiesListModel plmodel(m_macro, m_config);
     plmodel.setDataObject(&fn);
 
     QVERIFY(!plmodel.createProperty(QLatin1String("Attr1")));

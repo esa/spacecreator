@@ -186,7 +186,7 @@ void IVFunctionTypeGraphicsItem::updateNameFromUi(const QString &name)
     }
 
     const QVariantHash attributess = { { ivm::meta::Props::token(ivm::meta::Props::Token::name), newName } };
-    const auto attributesCmd = new cmd::CmdEntityAttributeChange(entity(), attributess);
+    const auto attributesCmd = new shared::cmd::CmdEntityAttributeChange(entity(), attributess);
     m_commandsStack->push(attributesCmd);
 }
 

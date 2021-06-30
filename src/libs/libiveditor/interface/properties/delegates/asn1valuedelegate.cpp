@@ -19,7 +19,7 @@
 
 #include "asn1editor.h"
 #include "file.h"
-#include "interface/properties/propertieslistmodel.h"
+#include "propertieslistmodel.h"
 
 #include <QLabel>
 #include <QVariant>
@@ -42,7 +42,7 @@ QWidget *Asn1ValueDelegate::createEditor(
     dialog->setProperty(MODEL_INDEX_PROPERTY, QVariant(index));
     dialog->setModal(true);
     QModelIndex typeIndex = index.siblingAtColumn(index.column() - 1);
-    QString typeName = typeIndex.data(PropertiesListModel::DataRole).toString();
+    QString typeName = typeIndex.data(shared::PropertiesListModel::DataRole).toString();
     dialog->showAsn1Type(typeName);
 
     connect(dialog, &asn1::Asn1Editor::accepted, this, &ive::Asn1ValueDelegate::onDialogAccepted);

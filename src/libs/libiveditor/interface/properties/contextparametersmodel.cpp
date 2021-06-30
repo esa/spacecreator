@@ -35,7 +35,7 @@
 namespace ive {
 
 ContextParametersModel::ContextParametersModel(cmd::CommandsStack::Macro *macro, QObject *parent)
-    : PropertiesModelBase(parent)
+    : shared::PropertiesModelBase(parent)
     , m_cmdMacro(macro)
 {
 }
@@ -46,7 +46,7 @@ void ContextParametersModel::createNewRow(const ivm::ContextParameter &param, in
 {
     m_params.insert(row, param);
 
-    const QString name = ivm::IVNameValidator::decodeName(m_dataObject->type(), param.name());
+    const QString name = ivm::IVNameValidator::decodeName(entity()->type(), param.name());
     QStandardItem *titleItem = new QStandardItem(row, Column::Name);
     titleItem->setData(name, Qt::DisplayRole);
     titleItem->setData(name, DataRole);
@@ -65,7 +65,7 @@ void ContextParametersModel::createNewRow(const ivm::ContextParameter &param, in
     setItem(row, Column::Value, valueItem);
 }
 
-void ContextParametersModel::setDataObject(ivm::IVObject *obj)
+void ContextParametersModel::setDataObject(shared::VEObject *obj)
 {
     clear();
     m_params.clear();
@@ -104,7 +104,7 @@ int ContextParametersModel::columnCount(const QModelIndex &) const
 bool ContextParametersModel::setData(const QModelIndex &index, const QVariant &value, int role)
 {
     if (!index.isValid() || data(index, role) == value || !m_dataObject
-            || !(m_dataObject->isFunction() || m_dataObject->isFunctionType())) {
+            || !(entity()->isFunction() || entity()->isFunctionType())) {
         return false;
     }
 
@@ -120,7 +120,7 @@ bool ContextParametersModel::setData(const QModelIndex &index, const QVariant &v
 
         switch (index.column()) {
         case Column::Name: {
-            if (!paramNew.setName(ivm::IVNameValidator::encodeName(m_dataObject->type(), stringValue)))
+            if (!paramNew.setName(ivm::IVNameValidator::encodeName(entity()->type(), stringValue)))
                 return false;
             item->setData(stringValue, Qt::DisplayRole);
             item->setData(stringValue, DataRole);
@@ -215,7 +215,7 @@ Qt::ItemFlags ContextParametersModel::flags(const QModelIndex &index) const
         return flags;
 
     if (flags.testFlag(Qt::ItemIsEditable) || flags.testFlag(Qt::ItemIsEnabled)) {
-        switch (m_dataObject->type()) {
+        switch (entity()->type()) {
         case ivm::IVObject::Type::Function: {
             if (auto fn = m_dataObject->as<const ivm::IVFunction *>())
                 if (fn->inheritsFunctionType())
@@ -244,5 +244,10 @@ QVariant ContextParametersModel::headerData(int section, Qt::Orientation orienta
         }
     }
     return QVariant();
+}
+
+ivm::IVObject *ContextParametersModel::entity() const
+{
+    return qobject_cast<ivm::IVObject *>(PropertiesModelBase::entity());
 }
 }

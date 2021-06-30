@@ -1,5 +1,5 @@
 /*
-  Copyright (C) 2018-2019 European Space Agency - <maxime.perrotin@esa.int>
+  Copyright (C) 2018-2021 European Space Agency - <maxime.perrotin@esa.int>
 
   This library is free software; you can redistribute it and/or
   modify it under the terms of the GNU Library General Public
@@ -19,13 +19,12 @@
 #include "cmdentitypropertyremove.h"
 
 #include "commandids.h"
+#include "veobject.h"
 
-#include <ivmodel.h>
-
-namespace ive {
+namespace shared {
 namespace cmd {
 
-static inline QVariantHash getCurrentProperties(ivm::IVObject *entity, const QStringList &props)
+static inline QVariantHash getCurrentProperties(VEObject *entity, const QStringList &props)
 {
     QVariantHash result;
     for (const QString &prop : props)
@@ -33,7 +32,7 @@ static inline QVariantHash getCurrentProperties(ivm::IVObject *entity, const QSt
     return result;
 }
 
-CmdEntityPropertyRemove::CmdEntityPropertyRemove(ivm::IVObject *entity, const QStringList &props)
+CmdEntityPropertyRemove::CmdEntityPropertyRemove(VEObject *entity, const QStringList &props)
     : QUndoCommand()
     , m_entity(entity)
     , m_names(props)
@@ -58,15 +57,10 @@ void CmdEntityPropertyRemove::undo()
     m_entity->setEntityAttributes(props);
 }
 
-bool CmdEntityPropertyRemove::mergeWith(const QUndoCommand *)
-{
-    return false;
-}
-
 int CmdEntityPropertyRemove::id() const
 {
     return RemoveEntityProperty;
 }
 
-}
-}
+} // namespace cmd
+} // namespace shared

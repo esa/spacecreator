@@ -17,20 +17,20 @@
 
 #pragma once
 
-#include "parameter.h"
 #include "commandsstack.h"
+#include "ivobject.h"
+#include "parameter.h"
 #include "propertiesmodelbase.h"
 
 #include <QVector>
 
 namespace ivm {
-class IVObject;
 class InterfaceParameter;
 }
 
 namespace ive {
 
-class IfaceParametersModel : public PropertiesModelBase
+class IfaceParametersModel : public shared::PropertiesModelBase
 {
     Q_OBJECT
 public:
@@ -48,7 +48,7 @@ public:
     ~IfaceParametersModel() override;
 
     bool setData(const QModelIndex &index, const QVariant &value, int role = Qt::EditRole) override;
-    void setDataObject(ivm::IVObject *obj) override;
+    void setDataObject(shared::VEObject *obj) override;
 
     int columnCount(const QModelIndex &) const override;
 
@@ -62,6 +62,8 @@ public:
 
     Qt::ItemFlags flags(const QModelIndex &index) const override;
 
+    ivm::IVObject *entity() const override;
+
 private:
     void createNewRow(const ivm::InterfaceParameter &param, int row);
 
@@ -69,7 +71,6 @@ private:
     const QStringList m_asn1Names;
     QVector<ivm::InterfaceParameter> m_params;
     cmd::CommandsStack::Macro *m_cmdMacro { nullptr };
-    ivm::IVObject *m_dataObject { nullptr };
 };
 
 }

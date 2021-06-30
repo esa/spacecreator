@@ -1,5 +1,5 @@
 /*
-  Copyright (C) 2019 European Space Agency - <maxime.perrotin@esa.int>
+  Copyright (C) 2019-2021 European Space Agency - <maxime.perrotin@esa.int>
 
   This library is free software; you can redistribute it and/or
   modify it under the terms of the GNU Library General Public
@@ -20,28 +20,24 @@
 #include <QPointer>
 #include <QUndoCommand>
 
-namespace ivm {
-class IVObject;
-}
-
-namespace ive {
+namespace shared {
+class VEObject;
 namespace cmd {
 
 class CmdEntityPropertyRemove : public QUndoCommand
 {
 public:
-    explicit CmdEntityPropertyRemove(ivm::IVObject *entity, const QStringList &props);
+    explicit CmdEntityPropertyRemove(VEObject *entity, const QStringList &props);
 
     void redo() override;
     void undo() override;
-    bool mergeWith(const QUndoCommand *command) override;
     int id() const override;
 
 private:
-    QPointer<ivm::IVObject> m_entity;
+    QPointer<VEObject> m_entity;
     QStringList m_names;
     QVariantHash m_props;
 };
 
-}
-}
+} // namespace cmd
+} // namespace shared

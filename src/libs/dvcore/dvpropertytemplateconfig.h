@@ -1,5 +1,5 @@
 /*
-  Copyright (C) 2018-2019 European Space Agency - <maxime.perrotin@esa.int>
+  Copyright (C) 2021 European Space Agency - <maxime.perrotin@esa.int>
 
   This library is free software; you can redistribute it and/or
   modify it under the terms of the GNU Library General Public
@@ -17,40 +17,20 @@
 
 #pragma once
 
-namespace ive {
-namespace cmd {
+#include "propertytemplateconfig.h"
 
-enum Id
+namespace dvm {
+
+class DVPropertyTemplateConfig : public shared::PropertyTemplateConfig
 {
-    CreateFunctionTypeEntity = 0,
-    CreateCommentEntity,
-    CreateFunctionEntity,
-    CreateInterfaceEntity,
-    CreateConnectionEntity,
-    CreateConnectionGroupEntity,
-    ChangeConnectionGroupEntity,
-    RemoveEntity,
-    ChangeRootEntity,
+public:
+    static DVPropertyTemplateConfig *instance();
 
-    CreateContextParameter,
-    ChangeContextParameter,
-    RemoveContextParameter,
+protected:
+    shared::PropertyTemplate *createPropertyTemplate(const QDomElement &element) const override;
 
-    CreateIfaceParam,
-    RemoveIfaceParam,
-    ChangeIfaceParam,
-
-    ChangeFunctionAttribute,
-
-    ChangeRequiredIfaceProperty,
-    ChangeIfaceAttribute,
-
-    ChangeAsn1File,
-    ImportEntities,
-    InstantiateEntities,
-
-    LastId
+private:
+    static DVPropertyTemplateConfig *m_instance;
 };
 
-}
-}
+} // namespace dvm

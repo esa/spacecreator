@@ -1,5 +1,5 @@
 /*
-  Copyright (C) 2018-2019 European Space Agency - <maxime.perrotin@esa.int>
+  Copyright (C) 2018-2021 European Space Agency - <maxime.perrotin@esa.int>
 
   This library is free software; you can redistribute it and/or
   modify it under the terms of the GNU Library General Public
@@ -16,16 +16,15 @@
   <https://www.gnu.org/licenses/lgpl-2.1.html>.
 */
 
-#include "cmdentitypropertychange.h"
+#include "cmdentitypropertycreate.h"
 
 #include "commandids.h"
+#include "veobject.h"
 
-#include <ivmodel.h>
-
-namespace ive {
+namespace shared {
 namespace cmd {
 
-static inline QVariantHash getCurrentProperties(ivm::IVObject *entity, const QVariantHash &props)
+static inline QVariantHash getCurrentProperties(VEObject *entity, const QVariantHash &props)
 {
     QVariantHash result;
     for (auto it = props.constBegin(); it != props.constEnd(); ++it)
@@ -33,37 +32,45 @@ static inline QVariantHash getCurrentProperties(ivm::IVObject *entity, const QVa
     return result;
 }
 
-CmdEntityPropertyChange::CmdEntityPropertyChange(ivm::IVObject *entity, const QVariantHash &props)
+CmdEntityPropertyCreate::CmdEntityPropertyCreate(VEObject *entity, const QVariantHash &props)
     : QUndoCommand()
     , m_entity(entity)
     , m_newProps(props)
     , m_oldProps(getCurrentProperties(entity, props))
 {
-    setText(QObject::tr("Change Property"));
+    setText(QObject::tr("Create Property"));
 }
 
-void CmdEntityPropertyChange::redo()
+void CmdEntityPropertyCreate::redo()
 {
     for (auto it = m_newProps.constBegin(); it != m_newProps.constEnd(); ++it)
         m_entity->setEntityProperty(it.key(), it.value());
 }
 
-void CmdEntityPropertyChange::undo()
+void CmdEntityPropertyCreate::undo()
 {
     for (auto it = m_oldProps.constBegin(); it != m_oldProps.constEnd(); ++it)
-        m_entity->setEntityProperty(it.key(), it.value());
+        m_entity->removeEntityAttribute(it.key());
 }
 
-bool CmdEntityPropertyChange::mergeWith(const QUndoCommand *command)
+bool CmdEntityPropertyCreate::mergeWith(const QUndoCommand *command)
 {
-    Q_UNUSED(command)
+    if (command->id() == id()) {
+        const QVariantHash &update = static_cast<const CmdEntityPropertyCreate *>(command)->m_newProps;
+        QVariantHash::const_iterator i = update.constBegin();
+        while (i != update.constEnd()) {
+            m_newProps[i.key()] = i.value();
+            ++i;
+        }
+        return true;
+    }
     return false;
 }
 
-int CmdEntityPropertyChange::id() const
+int CmdEntityPropertyCreate::id() const
 {
-    return ChangeEntityProperty;
+    return CreateEntityProperty;
 }
 
-}
-}
+} // namespace cmd
+} // namespace shared

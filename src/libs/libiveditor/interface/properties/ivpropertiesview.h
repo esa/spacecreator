@@ -1,5 +1,5 @@
 /*
-  Copyright (C) 2020 European Space Agency - <maxime.perrotin@esa.int>
+  Copyright (C) 2019 European Space Agency - <maxime.perrotin@esa.int>
 
   This library is free software; you can redistribute it and/or
   modify it under the terms of the GNU Library General Public
@@ -17,19 +17,32 @@
 
 #pragma once
 
-#include <QStyledItemDelegate>
+#include "propertiesviewbase.h"
+
+#include <QWidget>
 
 namespace ive {
 
-class AttributeDelegate : public QStyledItemDelegate
+class ContextParametersView : public shared::PropertiesViewBase
 {
     Q_OBJECT
-public:
-    explicit AttributeDelegate(QObject *parent = nullptr);
 
-    QWidget *createEditor(QWidget *parent, const QStyleOptionViewItem &option, const QModelIndex &index) const override;
-    void setEditorData(QWidget *editor, const QModelIndex &index) const override;
-    void setModelData(QWidget *editor, QAbstractItemModel *model, const QModelIndex &index) const override;
+public:
+    explicit ContextParametersView(QWidget *widget = nullptr);
+    ~ContextParametersView() override = default;
+
+    bool setButtonsDisabled() override;
+};
+
+class IfaceParametersView : public shared::PropertiesViewBase
+{
+    Q_OBJECT
+
+public:
+    explicit IfaceParametersView(QWidget *widget = nullptr);
+    ~IfaceParametersView() override = default;
+
+    bool setButtonsDisabled() override;
 };
 
 } // namespace ive

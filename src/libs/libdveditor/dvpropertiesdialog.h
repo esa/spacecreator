@@ -1,5 +1,5 @@
 /*
-  Copyright (C) 2018-2019 European Space Agency - <maxime.perrotin@esa.int>
+  Copyright (C) 2021 European Space Agency - <maxime.perrotin@esa.int>
 
   This library is free software; you can redistribute it and/or
   modify it under the terms of the GNU Library General Public
@@ -16,41 +16,32 @@
 */
 
 #pragma once
+#include "dvobject.h"
+#include "propertiesdialog.h"
 
-namespace ive {
+namespace shared {
 namespace cmd {
+class CommandsStackBase;
+class PropertyTemplateConfig;
+} // namespace cmd
+} // namespace shared
 
-enum Id
+namespace dve {
+
+class DVPropertiesDialog : public shared::PropertiesDialog
 {
-    CreateFunctionTypeEntity = 0,
-    CreateCommentEntity,
-    CreateFunctionEntity,
-    CreateInterfaceEntity,
-    CreateConnectionEntity,
-    CreateConnectionGroupEntity,
-    ChangeConnectionGroupEntity,
-    RemoveEntity,
-    ChangeRootEntity,
+public:
+    DVPropertiesDialog(shared::PropertyTemplateConfig *dynPropConfig, dvm::DVObject *obj,
+            shared::cmd::CommandsStackBase *commandsStack, QWidget *parent = nullptr);
 
-    CreateContextParameter,
-    ChangeContextParameter,
-    RemoveContextParameter,
+    void init() override;
 
-    CreateIfaceParam,
-    RemoveIfaceParam,
-    ChangeIfaceParam,
+private:
+    void initAttributesView();
 
-    ChangeFunctionAttribute,
-
-    ChangeRequiredIfaceProperty,
-    ChangeIfaceAttribute,
-
-    ChangeAsn1File,
-    ImportEntities,
-    InstantiateEntities,
-
-    LastId
+protected:
+    QString objectTypeName() const override;
+    dvm::DVObject *dataObject() const override;
 };
 
-}
-}
+} // namespace dve

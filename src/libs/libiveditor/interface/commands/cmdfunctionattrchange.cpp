@@ -1,5 +1,5 @@
 /*
-  Copyright (C) 2018-2019 European Space Agency - <maxime.perrotin@esa.int>
+  Copyright (C) 2018-2021 European Space Agency - <maxime.perrotin@esa.int>
 
   This library is free software; you can redistribute it and/or
   modify it under the terms of the GNU Library General Public
@@ -16,7 +16,7 @@
   <https://www.gnu.org/licenses/lgpl-2.1.html>.
 */
 
-#include "cmdentityattributechange.h"
+#include "cmdfunctionattrchange.h"
 
 #include "cmdentitiesremove.h"
 #include "cmdinterfaceitemcreate.h"
@@ -41,7 +41,7 @@ static inline QVariantHash getCurrentAttributes(ivm::IVObject *entity, const QVa
     return result;
 }
 
-CmdEntityAttributeChange::CmdEntityAttributeChange(ivm::IVObject *entity, const QVariantHash &attrs)
+CmdFunctionAttrChange::CmdFunctionAttrChange(ivm::IVObject *entity, const QVariantHash &attrs)
     : shared::UndoCommand()
     , m_entity(entity)
     , m_function(m_entity ? m_entity->as<ivm::IVFunction *>() : nullptr)
@@ -51,7 +51,7 @@ CmdEntityAttributeChange::CmdEntityAttributeChange(ivm::IVObject *entity, const 
     setText(QObject::tr("Change Attribute"));
 }
 
-CmdEntityAttributeChange::~CmdEntityAttributeChange()
+CmdFunctionAttrChange::~CmdFunctionAttrChange()
 {
     for (const shared::Id &key : m_cmdSet.keys()) {
         m_cmdUnset.remove(key);
@@ -62,7 +62,7 @@ CmdEntityAttributeChange::~CmdEntityAttributeChange()
         qDeleteAll(cmds);
 }
 
-void CmdEntityAttributeChange::redo()
+void CmdFunctionAttrChange::redo()
 {
     setAttrs(m_newAttrs, true);
 
@@ -75,7 +75,7 @@ void CmdEntityAttributeChange::redo()
     m_firstRedo = false;
 }
 
-void CmdEntityAttributeChange::undo()
+void CmdFunctionAttrChange::undo()
 {
     setAttrs(m_oldAttrs, false);
 
@@ -86,12 +86,12 @@ void CmdEntityAttributeChange::undo()
     }
 }
 
-int CmdEntityAttributeChange::id() const
+int CmdFunctionAttrChange::id() const
 {
-    return ChangeEntityAttributes;
+    return ChangeFunctionAttribute;
 }
 
-void CmdEntityAttributeChange::setAttrs(const QVariantHash &attrs, bool isRedo)
+void CmdFunctionAttrChange::setAttrs(const QVariantHash &attrs, bool isRedo)
 {
     if (!m_entity)
         return;
@@ -115,7 +115,7 @@ void CmdEntityAttributeChange::setAttrs(const QVariantHash &attrs, bool isRedo)
     }
 }
 
-ivm::IVFunctionType *CmdEntityAttributeChange::functionTypeByName(const QString &name) const
+ivm::IVFunctionType *CmdFunctionAttrChange::functionTypeByName(const QString &name) const
 {
     if (name.isEmpty() || !m_function || !m_function->model())
         return nullptr;
@@ -123,7 +123,7 @@ ivm::IVFunctionType *CmdEntityAttributeChange::functionTypeByName(const QString 
     return m_function->model()->getAvailableFunctionTypes(m_function).value(name, nullptr);
 }
 
-void CmdEntityAttributeChange::handleFunctionInstanceOf(const QVariant &attr, bool isRedo)
+void CmdFunctionAttrChange::handleFunctionInstanceOf(const QVariant &attr, bool isRedo)
 {
     const ivm::IVFunctionType *oldInstanceOf = m_function->instanceOf();
     ivm::IVFunctionType *newInstanceOf = functionTypeByName(attr.toString());
@@ -150,8 +150,7 @@ void CmdEntityAttributeChange::handleFunctionInstanceOf(const QVariant &attr, bo
 }
 
 Commands getCommands(const ivm::IVFunctionType *fnType, const CommandsStorage &cmdStorage,
-        CmdEntityAttributeChange *caller,
-        void (CmdEntityAttributeChange::*prepareMethod)(const ivm::IVFunctionType *fn))
+        CmdFunctionAttrChange *caller, void (CmdFunctionAttrChange::*prepareMethod)(const ivm::IVFunctionType *fn))
 {
     if (!fnType || !caller || !prepareMethod)
         return {};
@@ -163,14 +162,14 @@ Commands getCommands(const ivm::IVFunctionType *fnType, const CommandsStorage &c
     return cmdStorage.value(fnTypeId, {});
 }
 
-Commands CmdEntityAttributeChange::commandsUnsetPrevFunctionType(const ivm::IVFunctionType *fnType)
+Commands CmdFunctionAttrChange::commandsUnsetPrevFunctionType(const ivm::IVFunctionType *fnType)
 {
-    return getCommands(fnType, m_cmdUnset, this, &CmdEntityAttributeChange::prepareUnsetFunctionTypeCommands);
+    return getCommands(fnType, m_cmdUnset, this, &CmdFunctionAttrChange::prepareUnsetFunctionTypeCommands);
 }
 
-Commands CmdEntityAttributeChange::commandsSetNewFunctionType(const ivm::IVFunctionType *fnType)
+Commands CmdFunctionAttrChange::commandsSetNewFunctionType(const ivm::IVFunctionType *fnType)
 {
-    return getCommands(fnType, m_cmdSet, this, &CmdEntityAttributeChange::prepareSetFunctionTypeCommands);
+    return getCommands(fnType, m_cmdSet, this, &CmdFunctionAttrChange::prepareSetFunctionTypeCommands);
 }
 
 bool useOppositeCommands(CommandsStorage &commands, const CommandsStorage &oppositeCommands, const shared::Id &fnTypeId)
@@ -183,7 +182,7 @@ bool useOppositeCommands(CommandsStorage &commands, const CommandsStorage &oppos
     return false;
 }
 
-void CmdEntityAttributeChange::prepareUnsetFunctionTypeCommands(const ivm::IVFunctionType *fnType)
+void CmdFunctionAttrChange::prepareUnsetFunctionTypeCommands(const ivm::IVFunctionType *fnType)
 {
     if (!fnType)
         return;
@@ -212,7 +211,7 @@ void CmdEntityAttributeChange::prepareUnsetFunctionTypeCommands(const ivm::IVFun
     }
 }
 
-void CmdEntityAttributeChange::prepareSetFunctionTypeCommands(const ivm::IVFunctionType *fnType)
+void CmdFunctionAttrChange::prepareSetFunctionTypeCommands(const ivm::IVFunctionType *fnType)
 {
     if (!fnType)
         return;
@@ -235,5 +234,5 @@ void CmdEntityAttributeChange::prepareSetFunctionTypeCommands(const ivm::IVFunct
     }
 }
 
-}
-}
+} // namespace cmd
+} // namespace ive

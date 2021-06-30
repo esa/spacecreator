@@ -86,16 +86,6 @@ target_sources(${LIB_NAME} PRIVATE
     interface/commands/cmdentitiesimport.h
     interface/commands/cmdentitiesinstantiate.cpp
     interface/commands/cmdentitiesinstantiate.h
-    interface/commands/cmdentityattributechange.cpp
-    interface/commands/cmdentityattributechange.h
-    interface/commands/cmdentitypropertychange.cpp
-    interface/commands/cmdentitypropertychange.h
-    interface/commands/cmdentitypropertycreate.cpp
-    interface/commands/cmdentitypropertycreate.h
-    interface/commands/cmdentitypropertyremove.cpp
-    interface/commands/cmdentitypropertyremove.h
-    interface/commands/cmdentitypropertyrename.cpp
-    interface/commands/cmdentitypropertyrename.h
     interface/commands/cmdentitiesremove.cpp
     interface/commands/cmdentitiesremove.h
     interface/commands/cmdfunctionitemcreate.cpp
@@ -138,8 +128,6 @@ target_sources(${LIB_NAME} PRIVATE
     interface/properties/contextparametersmodel.h
     interface/properties/delegates/asn1valuedelegate.cpp
     interface/properties/delegates/asn1valuedelegate.h
-    interface/properties/delegates/attributedelegate.cpp
-    interface/properties/delegates/attributedelegate.h
     interface/properties/propertytemplatemanager.cpp
     interface/properties/propertytemplatemanager.h
     interface/properties/propertytemplatemanager.ui
@@ -150,13 +138,10 @@ target_sources(${LIB_NAME} PRIVATE
     interface/properties/ifaceparametersmodel.h
     interface/properties/ivpropertiesdialog.cpp
     interface/properties/ivpropertiesdialog.h
-    interface/properties/propertieslistmodel.cpp
-    interface/properties/propertieslistmodel.h
-    interface/properties/propertiesmodelbase.cpp
-    interface/properties/propertiesmodelbase.h
-    interface/properties/propertiesviewbase.cpp
-    interface/properties/propertiesviewbase.h
-    interface/properties/propertiesviewbase.ui
+    interface/properties/ivpropertieslistmodel.cpp
+    interface/properties/ivpropertieslistmodel.h
+    interface/properties/ivpropertiesview.cpp
+    interface/properties/ivpropertiesview.h
     interface/tab_interface_resources.qrc
     iveditor.cpp
     iveditor.h
@@ -181,6 +166,8 @@ target_sources(${LIB_NAME} PRIVATE
     interface/ivvisualizationmodelbase.h
     interface/miniviewrenderer.cpp
     interface/miniviewrenderer.h
+    interface/commands/cmdfunctionattrchange.cpp
+    interface/commands/cmdfunctionattrchange.h
 )
 
 target_link_libraries(${LIB_NAME}

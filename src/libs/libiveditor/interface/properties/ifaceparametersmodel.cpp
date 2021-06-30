@@ -33,7 +33,7 @@ namespace ive {
 
 IfaceParametersModel::IfaceParametersModel(
         cmd::CommandsStack::Macro *macro, const QStringList &asn1Names, QObject *parent)
-    : PropertiesModelBase(parent)
+    : shared::PropertiesModelBase(parent)
     , m_cmdMacro(macro)
     , m_asn1Names(asn1Names)
 {
@@ -68,7 +68,7 @@ void IfaceParametersModel::createNewRow(const ivm::InterfaceParameter &param, in
     setItem(row, Column::Direction, directionItem);
 }
 
-void IfaceParametersModel::setDataObject(ivm::IVObject *obj)
+void IfaceParametersModel::setDataObject(shared::VEObject *obj)
 {
     clear();
     m_params.clear();
@@ -128,7 +128,7 @@ bool IfaceParametersModel::setData(const QModelIndex &index, const QVariant &val
             return false;
         }
 
-        auto attributesCmd = new cmd::CmdIfaceParamChange(m_dataObject, paramOld, paramNew);
+        auto attributesCmd = new cmd::CmdIfaceParamChange(entity(), paramOld, paramNew);
         m_cmdMacro->push(attributesCmd);
         m_params.replace(index.row(), paramNew);
     }
@@ -143,7 +143,7 @@ bool IfaceParametersModel::createProperty(const QString &propName)
         param.setParamTypeName(m_asn1Names.front());
     }
 
-    auto propsCmd = new cmd::CmdIfaceParamCreate(m_dataObject, param);
+    auto propsCmd = new cmd::CmdIfaceParamCreate(entity(), param);
     const int rows = rowCount();
 
     createNewRow(param, rows);
@@ -159,7 +159,7 @@ bool IfaceParametersModel::removeProperty(const QModelIndex &index)
     }
 
     const int row(index.row());
-    auto propsCmd = new cmd::CmdIfaceParamRemove(m_dataObject, m_params.value(row));
+    auto propsCmd = new cmd::CmdIfaceParamRemove(entity(), m_params.value(row));
     removeRow(row);
     m_params.removeAt(row);
     m_cmdMacro->push(propsCmd);
@@ -207,6 +207,11 @@ Qt::ItemFlags IfaceParametersModel::flags(const QModelIndex &index) const
             }
         }
     return flags;
+}
+
+ivm::IVObject *IfaceParametersModel::entity() const
+{
+    return qobject_cast<ivm::IVObject *>(PropertiesModelBase::entity());
 }
 
 }

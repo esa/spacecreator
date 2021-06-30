@@ -1,5 +1,5 @@
 /*
-  Copyright (C) 2019 European Space Agency - <maxime.perrotin@esa.int>
+  Copyright (C) 2019-2021 European Space Agency - <maxime.perrotin@esa.int>
 
   This library is free software; you can redistribute it and/or
   modify it under the terms of the GNU Library General Public
@@ -20,18 +20,20 @@
 #include "asn1/file.h"
 #include "asn1/types/builtintypes.h"
 #include "baseitems/common/ivutils.h"
+#include "commands/cmdentityattributechange.h"
 #include "commandsstack.h"
 #include "contextparametersmodel.h"
 #include "delegates/asn1valuedelegate.h"
-#include "delegates/attributedelegate.h"
 #include "ifaceparametersmodel.h"
-#include "interface/commands/cmdentityattributechange.h"
+#include "interface/attributedelegate.h"
 #include "interface/ivconnectiongroupmodel.h"
 #include "ivcomment.h"
 #include "ivconnectiongroup.h"
 #include "ivinterface.h"
 #include "ivnamevalidator.h"
 #include "ivobject.h"
+#include "ivpropertieslistmodel.h"
+#include "ivpropertiesview.h"
 #include "ivpropertytemplateconfig.h"
 #include "propertieslistmodel.h"
 #include "propertiesviewbase.h"
@@ -130,9 +132,9 @@ void IVPropertiesDialog::initConnectionGroup()
 
 void IVPropertiesDialog::initAttributesView()
 {
-    auto viewAttrs = new AttributesView(this);
-    PropertiesListModel *modelAttrs { nullptr };
-    QStyledItemDelegate *attrDelegate = new AttributeDelegate(viewAttrs->tableView());
+    auto viewAttrs = new shared::AttributesView(this);
+    shared::PropertiesListModel *modelAttrs { nullptr };
+    QStyledItemDelegate *attrDelegate = new shared::AttributeDelegate(viewAttrs->tableView());
 
     switch (dataObject()->type()) {
     case ivm::IVObject::Type::Function: {
@@ -145,7 +147,7 @@ void IVPropertiesDialog::initAttributesView()
     }
 
     modelAttrs->setDataObject(dataObject());
-    viewAttrs->tableView()->setItemDelegateForColumn(PropertiesListModel::Column::Value, attrDelegate);
+    viewAttrs->tableView()->setItemDelegateForColumn(shared::PropertiesListModel::Column::Value, attrDelegate);
     viewAttrs->setModel(modelAttrs);
 
     insertTab(viewAttrs, tr("Attributes"));
@@ -170,9 +172,9 @@ void IVPropertiesDialog::initContextParams()
     modelCtxParams->setDataTypes(m_dataTypes);
     modelCtxParams->setDataObject(dataObject());
 
-    PropertiesViewBase *viewAttrs = new ContextParametersView(this);
+    shared::PropertiesViewBase *viewAttrs = new ContextParametersView(this);
     viewAttrs->tableView()->setItemDelegateForColumn(
-            ContextParametersModel::Column::Type, new AttributeDelegate(viewAttrs->tableView()));
+            ContextParametersModel::Column::Type, new shared::AttributeDelegate(viewAttrs->tableView()));
     viewAttrs->tableView()->setItemDelegateForColumn(
             ContextParametersModel::Column::Value, new Asn1ValueDelegate(m_dataTypes, viewAttrs->tableView()));
     viewAttrs->tableView()->horizontalHeader()->show();
@@ -186,13 +188,13 @@ void IVPropertiesDialog::initIfaceParams()
             new IfaceParametersModel(commandMacro(), asn1Names(m_dataTypes.get()), this);
     modelIfaceParams->setDataObject(dataObject());
 
-    PropertiesViewBase *viewAttrs = new IfaceParametersView(this);
+    shared::PropertiesViewBase *viewAttrs = new IfaceParametersView(this);
     viewAttrs->tableView()->setItemDelegateForColumn(
-            IfaceParametersModel::Column::Type, new AttributeDelegate(viewAttrs->tableView()));
+            IfaceParametersModel::Column::Type, new shared::AttributeDelegate(viewAttrs->tableView()));
     viewAttrs->tableView()->setItemDelegateForColumn(
-            IfaceParametersModel::Column::Encoding, new AttributeDelegate(viewAttrs->tableView()));
+            IfaceParametersModel::Column::Encoding, new shared::AttributeDelegate(viewAttrs->tableView()));
     viewAttrs->tableView()->setItemDelegateForColumn(
-            IfaceParametersModel::Column::Direction, new AttributeDelegate(viewAttrs->tableView()));
+            IfaceParametersModel::Column::Direction, new shared::AttributeDelegate(viewAttrs->tableView()));
     viewAttrs->tableView()->horizontalHeader()->show();
     viewAttrs->setModel(modelIfaceParams);
     insertTab(viewAttrs, tr("Parameters"));
@@ -211,7 +213,7 @@ void IVPropertiesDialog::initCommentView()
 
             const QString encodedText = ivm::IVNameValidator::encodeName(comment->type(), text);
             const QVariantHash textArg { { ivm::meta::Props::token(ivm::meta::Props::Token::name), encodedText } };
-            auto commentTextCmd = new cmd::CmdEntityAttributeChange(comment, textArg);
+            auto commentTextCmd = new shared::cmd::CmdEntityAttributeChange(comment, textArg);
             commentTextCmd->setText(tr("Edit Comment"));
             commandStack()->push(commentTextCmd);
         });

@@ -17,10 +17,10 @@
 
 #include "commandsstack.h"
 
-#include "ivobject.h"
 #include "interface/commands/cmdentitiesremove.h"
-#include "interface/commands/cmdentityattributechange.h"
+#include "interface/commands/cmdfunctionattrchange.h"
 #include "interface/commands/cmdifaceattrchange.h"
+#include "ivobject.h"
 #include "undocommand.h"
 
 #include <QUndoStack>
@@ -39,8 +39,8 @@ bool CommandsStack::push(QUndoCommand *command)
         return false;
     }
 
-    if (auto nameCommand = dynamic_cast<CmdEntityAttributeChange *>(command)) {
-        connect(nameCommand, &CmdEntityAttributeChange::nameChanged, this, &CommandsStack::nameChanged,
+    if (auto nameCommand = dynamic_cast<CmdFunctionAttrChange *>(command)) {
+        connect(nameCommand, &CmdFunctionAttrChange::nameChanged, this, &CommandsStack::nameChanged,
                 Qt::UniqueConnection);
     }
     if (auto nameCommand = dynamic_cast<CmdIfaceAttrChange *>(command)) {

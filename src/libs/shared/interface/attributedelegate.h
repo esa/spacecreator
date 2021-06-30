@@ -1,5 +1,5 @@
 /*
-  Copyright (C) 2019 European Space Agency - <maxime.perrotin@esa.int>
+  Copyright (C) 2020-2021 European Space Agency - <maxime.perrotin@esa.int>
 
   This library is free software; you can redistribute it and/or
   modify it under the terms of the GNU Library General Public
@@ -17,31 +17,19 @@
 
 #pragma once
 
-#include <QHash>
-#include <QPointer>
-#include <QUndoCommand>
+#include <QStyledItemDelegate>
 
-namespace ivm {
-class IVObject;
-}
+namespace shared {
 
-namespace ive {
-namespace cmd {
-
-class CmdEntityPropertyRename : public QUndoCommand
+class AttributeDelegate : public QStyledItemDelegate
 {
+    Q_OBJECT
 public:
-    explicit CmdEntityPropertyRename(ivm::IVObject *entity, const QHash<QString, QString> &props);
+    explicit AttributeDelegate(QObject *parent = nullptr);
 
-    void redo() override;
-    void undo() override;
-    bool mergeWith(const QUndoCommand *command) override;
-    int id() const override;
-
-private:
-    QPointer<ivm::IVObject> m_entity;
-    QHash<QString, QString> m_newProps;
+    QWidget *createEditor(QWidget *parent, const QStyleOptionViewItem &option, const QModelIndex &index) const override;
+    void setEditorData(QWidget *editor, const QModelIndex &index) const override;
+    void setModelData(QWidget *editor, QAbstractItemModel *model, const QModelIndex &index) const override;
 };
 
-}
-}
+} // namespace shared

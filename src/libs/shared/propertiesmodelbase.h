@@ -1,5 +1,5 @@
 /*
-  Copyright (C) 2019 European Space Agency - <maxime.perrotin@esa.int>
+  Copyright (C) 2019-2021 European Space Agency - <maxime.perrotin@esa.int>
 
   This library is free software; you can redistribute it and/or
   modify it under the terms of the GNU Library General Public
@@ -19,14 +19,12 @@
 
 #include <QStandardItemModel>
 
-namespace ivm {
-class IVObject;
-}
-
-namespace ive {
+namespace shared {
+class VEObject;
 
 class PropertiesModelBase : public QStandardItemModel
 {
+    Q_OBJECT
 public:
     enum Roles
     {
@@ -39,7 +37,7 @@ public:
     explicit PropertiesModelBase(QObject *parent = nullptr);
     ~PropertiesModelBase() override = default;
 
-    virtual void setDataObject(ivm::IVObject *obj) = 0;
+    virtual void setDataObject(VEObject *obj) = 0;
 
     virtual bool createProperty(const QString &propName) = 0;
     virtual bool removeProperty(const QModelIndex &index) = 0;
@@ -47,10 +45,10 @@ public:
     virtual bool isAttr(const QModelIndex &id) const = 0;
     virtual bool isProp(const QModelIndex &id) const = 0;
 
-    const ivm::IVObject *entity() const;
+    virtual VEObject *entity() const;
 
 protected:
-    ivm::IVObject *m_dataObject { nullptr };
+    VEObject *m_dataObject { nullptr };
 };
 
-}
+} // namespace shared

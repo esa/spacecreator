@@ -17,8 +17,8 @@
 
 #include "ivvisualizationmodelbase.h"
 
+#include "commands/cmdentityattributechange.h"
 #include "commandsstack.h"
-#include "interface/commands/cmdentityattributechange.h"
 #include "ivconnection.h"
 #include "ivconnectiongroup.h"
 #include "ivmodel.h"
@@ -232,7 +232,7 @@ void IVVisualizationModel::onDataChanged(
                                 const QVariantHash attributes = {
                                     { ivm::meta::Props::token(ivm::meta::Props::Token::name), name }
                                 };
-                                auto attributesCmd = new cmd::CmdEntityAttributeChange(obj, attributes);
+                                auto attributesCmd = new shared::cmd::CmdEntityAttributeChange(obj, attributes);
                                 m_commandsStack->push(attributesCmd);
                             } else {
                                 item->setData(obj->titleUI(), Qt::DisplayRole);

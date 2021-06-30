@@ -1,5 +1,5 @@
 /*
- Copyright (C) 2018-2019 European Space Agency - <maxime.perrotin@esa.int>
+ Copyright (C) 2018-2021 European Space Agency - <maxime.perrotin@esa.int>
 
  This library is free software; you can redistribute it and/or
  modify it under the terms of the GNU Library General Public
@@ -18,8 +18,8 @@
 
 #pragma once
 
-#include "common.h"
 #include "undocommand.h"
+#include "common.h"
 
 #include <QPointer>
 
@@ -32,13 +32,12 @@ class IVFunctionType;
 namespace ive {
 namespace cmd {
 
-class CmdEntityAttributeChange : public shared::UndoCommand
+class CmdFunctionAttrChange : public shared::UndoCommand
 {
     Q_OBJECT
-
 public:
-    explicit CmdEntityAttributeChange(ivm::IVObject *entity, const QVariantHash &attrs);
-    ~CmdEntityAttributeChange() override;
+    explicit CmdFunctionAttrChange(ivm::IVObject *entity, const QVariantHash &attrs);
+    ~CmdFunctionAttrChange() override;
 
     void redo() override;
     void undo() override;
@@ -68,5 +67,5 @@ private:
     void prepareSetFunctionTypeCommands(const ivm::IVFunctionType *fnType);
 };
 
-}
-}
+} // namespace cmd
+} // namespace ive

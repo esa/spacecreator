@@ -77,7 +77,7 @@ public:
     void loadHWLibrary(const QString &directory);
 
 private Q_SLOTS:
-    void showPropertyEditor();
+    void showPropertyEditor(const shared::Id &id);
     void showInfoMessage(const QString &title, const QString &message);
 
     void copyItems();

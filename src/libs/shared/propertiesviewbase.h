@@ -1,5 +1,5 @@
 /*
-  Copyright (C) 2019 European Space Agency - <maxime.perrotin@esa.int>
+  Copyright (C) 2019-2021 European Space Agency - <maxime.perrotin@esa.int>
 
   This library is free software; you can redistribute it and/or
   modify it under the terms of the GNU Library General Public
@@ -17,26 +17,23 @@
 
 #pragma once
 
-#include "propertieslistmodel.h"
-
 #include <QWidget>
+
+class QTableView;
 
 namespace Ui {
 class PropertiesViewBase;
 }
 
-class QTableView;
-class QAbstractItemModel;
-
-namespace ive {
-
+namespace shared {
 class PropertiesModelBase;
+
 class PropertiesViewBase : public QWidget
 {
     Q_OBJECT
 
 public:
-    explicit PropertiesViewBase(QWidget *parent = nullptr);
+    explicit PropertiesViewBase(const QList<int> delegatesColumns, QWidget *parent = nullptr);
     ~PropertiesViewBase();
 
     virtual void setModel(PropertiesModelBase *model);
@@ -49,11 +46,12 @@ protected Q_SLOTS:
 
 protected:
     PropertiesModelBase *m_model { nullptr };
-    QList<int> m_delegatesColumns;
+    const QList<int> m_delegatesColumns;
     bool m_buttonsVisible { true };
 
 protected:
-    bool setButtonsDisabled();
+    void setButtonsDisabled(bool state);
+    virtual bool setButtonsDisabled() = 0;
     void rowsInserted(const QModelIndex &parent, int first, int last);
 
 protected:
@@ -67,24 +65,8 @@ class AttributesView : public PropertiesViewBase
 public:
     explicit AttributesView(QWidget *widget = nullptr);
     ~AttributesView() override = default;
+
+    bool setButtonsDisabled() override;
 };
 
-class ContextParametersView : public PropertiesViewBase
-{
-    Q_OBJECT
-
-public:
-    explicit ContextParametersView(QWidget *widget = nullptr);
-    ~ContextParametersView() override = default;
-};
-
-class IfaceParametersView : public PropertiesViewBase
-{
-    Q_OBJECT
-
-public:
-    explicit IfaceParametersView(QWidget *widget = nullptr);
-    ~IfaceParametersView() override = default;
-};
-
-}
+} // namespace shared

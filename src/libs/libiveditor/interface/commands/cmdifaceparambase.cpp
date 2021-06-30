@@ -17,9 +17,9 @@
 
 #include "cmdifaceparambase.h"
 
+#include "cmdentitiesremove.h"
 #include "ivconnection.h"
 #include "ivmodel.h"
-#include "cmdentitiesremove.h"
 
 namespace ive {
 namespace cmd {
@@ -65,7 +65,7 @@ void CmdIfaceParamBase::prepareRmCommands()
 {
     QList<QPointer<ivm::IVObject>> entities;
     if (auto model = m_iface->model()) {
-        for (auto connection : m_connections) {
+        for (auto connection : qAsConst(m_connections)) {
             if (connection->sourceInterface() && connection->targetInterface()) {
                 if (connection->sourceInterface()->params() != connection->targetInterface()->params()) {
                     entities.append(connection);
@@ -86,13 +86,13 @@ void CmdIfaceParamBase::redo()
     if (!m_rmCommandsPrepared)
         prepareRmCommands();
 
-    for (QUndoCommand *rmCmd : m_cmdRmConnections)
+    for (QUndoCommand *rmCmd : qAsConst(m_cmdRmConnections))
         rmCmd->redo();
 }
 
 void CmdIfaceParamBase::undo()
 {
-    for (QUndoCommand *rmCmd : m_cmdRmConnections)
+    for (QUndoCommand *rmCmd : qAsConst(m_cmdRmConnections))
         rmCmd->undo();
 }
 

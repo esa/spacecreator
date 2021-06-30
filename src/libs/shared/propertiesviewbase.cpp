@@ -1,5 +1,5 @@
 /*
-  Copyright (C) 2019 European Space Agency - <maxime.perrotin@esa.int>
+  Copyright (C) 2019-2021 European Space Agency - <maxime.perrotin@esa.int>
 
   This library is free software; you can redistribute it and/or
   modify it under the terms of the GNU Library General Public
@@ -17,28 +17,23 @@
 
 #include "propertiesviewbase.h"
 
-#include "contextparametersmodel.h"
-#include "ifaceparametersmodel.h"
-#include "ivfunction.h"
-#include "ivinterface.h"
 #include "propertieslistmodel.h"
+#include "propertiesmodelbase.h"
 #include "ui_propertiesviewbase.h"
 
-#include <QDebug>
 #include <QHeaderView>
-#include <QSortFilterProxyModel>
+#include <QStandardItemModel>
 
-namespace ive {
+namespace shared {
 
-PropertiesViewBase::PropertiesViewBase(QWidget *parent)
+PropertiesViewBase::PropertiesViewBase(const QList<int> delegatesColumns, QWidget *parent)
     : QWidget(parent)
     , ui(new Ui::PropertiesViewBase)
+    , m_delegatesColumns(delegatesColumns)
 {
     ui->setupUi(this);
     ui->tableView->horizontalHeader()->setSectionResizeMode(QHeaderView::Interactive);
     ui->tableView->horizontalHeader()->setMinimumSectionSize(120);
-
-    setButtonsDisabled();
 }
 
 PropertiesViewBase::~PropertiesViewBase()
@@ -118,10 +113,16 @@ void PropertiesViewBase::on_btnDel_clicked()
     }
 }
 
+void PropertiesViewBase::setButtonsDisabled(bool state)
+{
+    ui->btnAdd->setDisabled(state);
+    ui->btnDel->setDisabled(state);
+}
+
 void PropertiesViewBase::rowsInserted(const QModelIndex &parent, int first, int last)
 {
     for (int idx = first; idx <= last; ++idx) {
-        for (const int column : m_delegatesColumns) {
+        for (const int column : qAsConst(m_delegatesColumns)) {
             const QModelIndex index = m_model->index(idx, column, parent);
             if (index.isValid()) {
                 tableView()->openPersistentEditor(index);
@@ -130,64 +131,17 @@ void PropertiesViewBase::rowsInserted(const QModelIndex &parent, int first, int 
     }
 }
 
-bool PropertiesViewBase::setButtonsDisabled()
-{
-    if (!m_model)
-        return false;
-
-    bool disabled = false;
-
-    if (auto dataObject = m_model->entity()) {
-        switch (dataObject->type()) {
-        case ivm::IVObject::Type::Function: {
-            if (auto fn = dataObject->as<const ivm::IVFunction *>())
-                disabled = fn->inheritsFunctionType();
-            break;
-        }
-        case ivm::IVObject::Type::RequiredInterface:
-        case ivm::IVObject::Type::ProvidedInterface: {
-            if (auto iface = dataObject->as<const ivm::IVInterface *>()) {
-                disabled = iface->isClone();
-                if (!disabled && iface->isRequired()) {
-                    if (auto ri = iface->as<const ivm::IVInterfaceRequired *>())
-                        disabled = ri->hasPrototypePi();
-                }
-            }
-
-            break;
-        }
-        default:
-            break;
-        }
-    }
-
-    if (disabled) {
-        ui->btnAdd->setDisabled(disabled);
-        ui->btnDel->setDisabled(disabled);
-    }
-
-    return disabled;
-}
-
-ContextParametersView::ContextParametersView(QWidget *widget)
-    : PropertiesViewBase(widget)
-{
-    m_delegatesColumns = { ContextParametersModel::Column::Type };
-}
-
-IfaceParametersView::IfaceParametersView(QWidget *widget)
-    : PropertiesViewBase(widget)
-{
-    m_delegatesColumns = { IfaceParametersModel::Column::Type, IfaceParametersModel::Column::Encoding,
-        IfaceParametersModel::Column::Direction };
-}
-
 AttributesView::AttributesView(QWidget *widget)
-    : PropertiesViewBase(widget)
+    : PropertiesViewBase({ PropertiesListModel::Column::Value }, widget)
 {
-    m_delegatesColumns = { PropertiesListModel::Column::Value };
     ui->btnAdd->hide();
     ui->btnDel->hide();
 }
 
-} // namespace ive
+bool AttributesView::setButtonsDisabled()
+{
+    PropertiesViewBase::setButtonsDisabled(true);
+    return true;
+}
+
+} // namespace shared

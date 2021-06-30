@@ -19,18 +19,18 @@
 
 #include "baseitems/common/ivutils.h"
 #include "commandlineparser.h"
+#include "commands/cmdentityattributechange.h"
 #include "commandsstack.h"
 #include "connectioncreationvalidator.h"
 #include "context/action/actionsmanager.h"
 #include "graphicsviewutils.h"
 #include "interface/commands/cmdchangeasn1file.h"
 #include "interface/commands/cmdconnectionitemcreate.h"
-#include "interface/commands/cmdentityattributechange.h"
 #include "interface/commands/cmdfunctionitemcreate.h"
 #include "interface/commands/cmdifaceattrchange.h"
 #include "interface/commands/cmdinterfaceitemcreate.h"
-#include "interface/ivcreatortool.h"
 #include "interface/interfacedocument.h"
+#include "interface/ivcreatortool.h"
 #include "ivconnection.h"
 #include "ivexporter.h"
 #include "ivfunction.h"
@@ -293,7 +293,7 @@ bool IVEditorCore::renameIVFunction(const QString &oldName, const QString &newNa
     }
 
     const QVariantHash attributess = { { ivm::meta::Props::token(ivm::meta::Props::Token::name), newName } };
-    auto cmd = new cmd::CmdEntityAttributeChange(ivFunc, attributess);
+    auto cmd = new shared::cmd::CmdEntityAttributeChange(ivFunc, attributess);
     commandsStack()->push(cmd);
 
     Q_EMIT editedExternally(this);

@@ -15,23 +15,25 @@
   along with this program. If not, see <https://www.gnu.org/licenses/lgpl-2.1.html>.
 */
 
-#pragma once
+#include "dvpropertytemplateconfig.h"
 
-namespace shared {
-namespace cmd {
+#include "dvpropertytemplate.h"
 
-enum Id
+namespace dvm {
+
+DVPropertyTemplateConfig *DVPropertyTemplateConfig::m_instance = nullptr;
+
+DVPropertyTemplateConfig *DVPropertyTemplateConfig::instance()
 {
-    AutoLayoutEntity,
-    ChangeEntityGeometry,
-    CreateEntityProperty,
-    ChangeEntityAttribute,
-    ChangeEntityProperty,
-    RemoveEntityProperty,
-    RenameEntityProperty,
-
-    LastId
-};
-
+    if (m_instance == nullptr) {
+        m_instance = new DVPropertyTemplateConfig;
+    }
+    return m_instance;
 }
+
+shared::PropertyTemplate *DVPropertyTemplateConfig::createPropertyTemplate(const QDomElement &element) const
+{
+    return shared::PropertyTemplate::createFromXml<DVPropertyTemplate>(element);
 }
+
+} // namespace dvm

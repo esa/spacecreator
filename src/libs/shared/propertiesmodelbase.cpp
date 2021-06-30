@@ -1,5 +1,5 @@
 /*
-  Copyright (C) 2021 European Space Agency - <maxime.perrotin@esa.int>
+  Copyright (C) 2019-2021 European Space Agency - <maxime.perrotin@esa.int>
 
   This library is free software; you can redistribute it and/or
   modify it under the terms of the GNU Library General Public
@@ -15,23 +15,18 @@
   along with this program. If not, see <https://www.gnu.org/licenses/lgpl-2.1.html>.
 */
 
-#pragma once
+#include "propertiesmodelbase.h"
 
 namespace shared {
-namespace cmd {
 
-enum Id
+PropertiesModelBase::PropertiesModelBase(QObject *parent)
+    : QStandardItemModel(parent)
 {
-    AutoLayoutEntity,
-    ChangeEntityGeometry,
-    CreateEntityProperty,
-    ChangeEntityAttribute,
-    ChangeEntityProperty,
-    RemoveEntityProperty,
-    RenameEntityProperty,
-
-    LastId
-};
-
 }
+
+VEObject *PropertiesModelBase::entity() const
+{
+    return m_dataObject;
 }
+
+} // namespace shared
