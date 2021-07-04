@@ -1,5 +1,5 @@
 <RCC>
-    <qresource prefix="/tab_interface/toolbar">
+    <qresource prefix="/toolbar">
         <file>icns/asn1.png</file>
         <file>icns/change_root.svg</file>
         <file>icns/comment.svg</file>

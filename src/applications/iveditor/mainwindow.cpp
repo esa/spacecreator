@@ -354,8 +354,8 @@ void MainWindow::initMenus()
     menu->addAction(m_core->actionExportFunctions());
     menu->addAction(m_core->actionExportType());
     menu->addSeparator();
-    m_actionSaveSceneRender = menu->addAction(QIcon(QLatin1String(":/tab_interface/toolbar/icns/render.svg")),
-            tr("Render Scene..."), m_core, &IVEditorCore::onSaveRenderRequested);
+    m_actionSaveSceneRender = menu->addAction(QIcon(QLatin1String(":/toolbar/icns/render.svg")), tr("Render Scene..."),
+            m_core, &IVEditorCore::onSaveRenderRequested);
     ActionsManager::registerAction(
             Q_FUNC_INFO, m_actionSaveSceneRender, "Render", "Save current scene complete render.");
     m_actionShowAsnDialog = menu->addAction(tr("ASN1 dialog..."), this, &MainWindow::openAsn1Dialog);

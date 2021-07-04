@@ -407,25 +407,25 @@ void IVCreatorTool::populateContextMenu_commonCreate(QMenu *menu, const QPointF 
         const bool isRect = m_previewItem->boundingRect().size() != emptyPreviewItemSize;
         // TODO: use a Fn/FnType/Comment's min size to disable related actions if the creation is impossible?
 
-        auto action = menu->addAction(QIcon(QLatin1String(":/tab_interface/toolbar/icns/function_type.svg")),
-                tr("Function Type"), this, [this, scenePos]() { handleToolType(ToolType::FunctionType, scenePos); });
+        auto action = menu->addAction(QIcon(QLatin1String(":/toolbar/icns/function_type.svg")), tr("Function Type"),
+                this, [this, scenePos]() { handleToolType(ToolType::FunctionType, scenePos); });
 
-        action = menu->addAction(QIcon(QLatin1String(":/tab_interface/toolbar/icns/function.svg")), tr("Function"),
-                this, [this, scenePos]() { handleToolType(ToolType::Function, scenePos); });
+        action = menu->addAction(QIcon(QLatin1String(":/toolbar/icns/function.svg")), tr("Function"), this,
+                [this, scenePos]() { handleToolType(ToolType::Function, scenePos); });
 
-        action = menu->addAction(QIcon(QLatin1String(":/tab_interface/toolbar/icns/comment.svg")), tr("Comment"), this,
+        action = menu->addAction(QIcon(QLatin1String(":/toolbar/icns/comment.svg")), tr("Comment"), this,
                 [this, scenePos]() { handleToolType(ToolType::Comment, scenePos); });
 
-        action = menu->addAction(QIcon(QLatin1String(":/tab_interface/toolbar/icns/ri.svg")), tr("Required Interface"),
-                this, [this, scenePos]() { handleToolType(ToolType::RequiredInterface, scenePos); });
+        action = menu->addAction(QIcon(QLatin1String(":/toolbar/icns/ri.svg")), tr("Required Interface"), this,
+                [this, scenePos]() { handleToolType(ToolType::RequiredInterface, scenePos); });
         action->setEnabled(!isRect && m_previewItem->parentItem());
 
-        action = menu->addAction(QIcon(QLatin1String(":/tab_interface/toolbar/icns/pi.svg")), tr("Provided Interface"),
-                this, [this, scenePos]() { handleToolType(ToolType::ProvidedInterface, scenePos); });
+        action = menu->addAction(QIcon(QLatin1String(":/toolbar/icns/pi.svg")), tr("Provided Interface"), this,
+                [this, scenePos]() { handleToolType(ToolType::ProvidedInterface, scenePos); });
         action->setEnabled(!isRect && m_previewItem->parentItem());
 
-        action = menu->addAction(QIcon(QLatin1String(":/tab_interface/toolbar/icns/connection_group.svg")),
-                tr("Connection group"), this, [this]() { groupSelectedItems(); });
+        action = menu->addAction(QIcon(QLatin1String(":/toolbar/icns/connection_group.svg")), tr("Connection group"),
+                this, [this]() { groupSelectedItems(); });
         const auto selectedItems = m_previewItem->scene()->selectedItems();
         const auto it = std::find_if(selectedItems.cbegin(), selectedItems.cend(),
                 [](const QGraphicsItem *item) { return item->type() == IVConnectionGraphicsItem::Type; });

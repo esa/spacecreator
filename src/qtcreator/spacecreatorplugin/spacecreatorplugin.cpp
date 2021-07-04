@@ -114,7 +114,7 @@ bool SpaceCreatorPlugin::initialize(const QStringList &arguments, QString *error
     connect(m_showMinimapAction, &QAction::triggered, this, &SpaceCreatorPlugin::setMinimapVisible);
 
     m_showE2EDataflow = new QAction(
-            QIcon(QLatin1String(":/tab_interface/toolbar/icns/end_to_end.png")), tr("Show end to end dataflow"), this);
+            QIcon(QLatin1String(":/toolbar/icns/end_to_end.png")), tr("Show end to end dataflow"), this);
     Core::Command *showE2ECmd = Core::ActionManager::registerAction(
             m_showE2EDataflow, Constants::SHOW_E2E_ID, Core::Context(Core::Constants::C_EDIT_MODE));
     connect(m_showE2EDataflow, &QAction::triggered, this, &SpaceCreatorPlugin::showE2EDataflow);
@@ -131,14 +131,14 @@ bool SpaceCreatorPlugin::initialize(const QStringList &arguments, QString *error
 
     // IV
     m_asn1DialogAction = new QAction(
-            QIcon(QLatin1String(":/tab_interface/toolbar/icns/asn1.png")), tr("Show ASN1 dialog ..."), this);
+            QIcon(QLatin1String(":/toolbar/icns/asn1.png")), tr("Show ASN1 dialog ..."), this);
     Core::Command *showAsn1Cmd = Core::ActionManager::registerAction(m_asn1DialogAction, Constants::IV_SHOW_ASN1_ID);
     ive::ActionsManager::registerAction(Q_FUNC_INFO, m_asn1DialogAction, "Asn1", "Edit the ASN1 file");
     connect(m_asn1DialogAction, &QAction::triggered, this, &SpaceCreatorPlugin::showAsn1Dialog);
     m_asn1DialogAction->setEnabled(false);
 
     m_actionSaveSceneRender =
-            new QAction(QIcon(QLatin1String(":/tab_interface/toolbar/icns/render.svg")), tr("Render Scene..."), this);
+            new QAction(QIcon(QLatin1String(":/toolbar/icns/render.svg")), tr("Render Scene..."), this);
     Core::Command *renderCmd = Core::ActionManager::registerAction(m_actionSaveSceneRender, Constants::IV_RENDER_ID);
     ive::ActionsManager::registerAction(
             Q_FUNC_INFO, m_actionSaveSceneRender, "Render", "Save current scene complete render.");
@@ -148,13 +148,13 @@ bool SpaceCreatorPlugin::initialize(const QStringList &arguments, QString *error
         }
     });
 
-    m_exportSelectedIV = new QAction(QIcon(QLatin1String(":/tab_interface/toolbar/icns/export_selected.svg")),
+    m_exportSelectedIV = new QAction(QIcon(QLatin1String(":/toolbar/icns/export_selected.svg")),
             tr("Export selected entity"), this);
     Core::Command *exportElectedCmd = Core::ActionManager::registerAction(
             m_exportSelectedIV, Constants::IV_EXPORT_SELECTED_ID, Core::Context(Core::Constants::C_EDIT_MODE));
     connect(m_exportSelectedIV, &QAction::triggered, this, &SpaceCreatorPlugin::exportSelectedIV);
 
-    m_exportIVType = new QAction(QIcon(QLatin1String(":/tab_interface/toolbar/icns/export_component_type.svg")),
+    m_exportIVType = new QAction(QIcon(QLatin1String(":/toolbar/icns/export_component_type.svg")),
             tr("Export component type"), this);
     Core::Command *exporttypeCmd = Core::ActionManager::registerAction(
             m_exportIVType, Constants::IV_EXPORT_IV_TYPE_ID, Core::Context(Core::Constants::C_EDIT_MODE));

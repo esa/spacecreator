@@ -54,18 +54,18 @@ void IVVisualizationModelBase::updateItemData(QStandardItem *item, shared::VEObj
     case ivm::IVObject::Type::Unknown:
         return;
     case ivm::IVObject::Type::RequiredInterface: {
-        static const QPixmap icon = QIcon(QLatin1String(":/tab_interface/toolbar/icns/ri.svg")).pixmap(16, 16);
+        static const QPixmap icon = QIcon(QLatin1String(":/toolbar/icns/ri.svg")).pixmap(16, 16);
         pix = icon;
     } break;
 
     case ivm::IVObject::Type::ProvidedInterface: {
-        static const QPixmap icon = QIcon(QLatin1String(":/tab_interface/toolbar/icns/pi.svg")).pixmap(16, 16);
+        static const QPixmap icon = QIcon(QLatin1String(":/toolbar/icns/pi.svg")).pixmap(16, 16);
         pix = icon;
     } break;
     case ivm::IVObject::Type::Connection: {
         static const QPixmap iconHidden =
-                QIcon(QLatin1String(":/tab_interface/toolbar/icns/connection.svg")).pixmap(16, 16, QIcon::Disabled);
-        static const QPixmap icon = QIcon(QLatin1String(":/tab_interface/toolbar/icns/connection.svg")).pixmap(16, 16);
+                QIcon(QLatin1String(":/toolbar/icns/connection.svg")).pixmap(16, 16, QIcon::Disabled);
+        static const QPixmap icon = QIcon(QLatin1String(":/toolbar/icns/connection.svg")).pixmap(16, 16);
         pix = obj->isGrouped() ? iconHidden : icon;
 
         if (auto connectionPtr = qobject_cast<ivm::IVConnection *>(obj)) {
@@ -83,28 +83,28 @@ void IVVisualizationModelBase::updateItemData(QStandardItem *item, shared::VEObj
     } break;
     case ivm::IVObject::Type::Function: {
         static const QPixmap dragIcon =
-                QIcon(QLatin1String(":/tab_interface/toolbar/icns/function.svg")).pixmap(128, 128);
+                QIcon(QLatin1String(":/toolbar/icns/function.svg")).pixmap(128, 128);
         dragPix = dragIcon;
 
-        static const QPixmap icon = QIcon(QLatin1String(":/tab_interface/toolbar/icns/function.svg")).pixmap(16, 16);
+        static const QPixmap icon = QIcon(QLatin1String(":/toolbar/icns/function.svg")).pixmap(16, 16);
         pix = icon;
     } break;
     case ivm::IVObject::Type::FunctionType: {
         static const QPixmap dragIcon =
-                QIcon(QLatin1String(":/tab_interface/toolbar/icns/function_type.svg")).pixmap(128, 128);
+                QIcon(QLatin1String(":/toolbar/icns/function_type.svg")).pixmap(128, 128);
         dragPix = dragIcon;
 
         static const QPixmap icon =
-                QIcon(QLatin1String(":/tab_interface/toolbar/icns/function_type.svg")).pixmap(16, 16);
+                QIcon(QLatin1String(":/toolbar/icns/function_type.svg")).pixmap(16, 16);
         pix = icon;
     } break;
     case ivm::IVObject::Type::Comment: {
-        static const QPixmap icon = QIcon(QLatin1String(":/tab_interface/toolbar/icns/comment.svg")).pixmap(16, 16);
+        static const QPixmap icon = QIcon(QLatin1String(":/toolbar/icns/comment.svg")).pixmap(16, 16);
         pix = icon;
     } break;
     case ivm::IVObject::Type::ConnectionGroup: {
         static const QPixmap icon =
-                QIcon(QLatin1String(":/tab_interface/toolbar/icns/connection_group.svg")).pixmap(16, 16);
+                QIcon(QLatin1String(":/toolbar/icns/connection_group.svg")).pixmap(16, 16);
         pix = icon;
     } break;
 

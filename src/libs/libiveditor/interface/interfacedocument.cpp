@@ -27,7 +27,6 @@
 #include "commandsstack.h"
 #include "context/action/actionsmanager.h"
 #include "context/action/editor/dynactioneditor.h"
-#include "error.h"
 #include "errorhub.h"
 #include "file.h"
 #include "graphicsitemhelpers.h"
@@ -1007,7 +1006,7 @@ QVector<QAction *> InterfaceDocument::initActions()
         d->tool->setCurrentToolType(IVCreatorTool::ToolType::FunctionType);
         qWarning() << Q_FUNC_INFO << "Not implemented yet.";
     });
-    actCreateFunctionType->setIcon(QIcon(":/tab_interface/toolbar/icns/function_type.svg"));
+    actCreateFunctionType->setIcon(QIcon(":/toolbar/icns/function_type.svg"));
 
     auto actCreateFunction = new QAction(tr("Function"));
     ActionsManager::registerAction(Q_FUNC_INFO, actCreateFunction, "Function", "Create Function object");
@@ -1015,7 +1014,7 @@ QVector<QAction *> InterfaceDocument::initActions()
     actCreateFunction->setActionGroup(actionGroup);
     connect(actCreateFunction, &QAction::triggered, this,
             [this]() { d->tool->setCurrentToolType(IVCreatorTool::ToolType::Function); });
-    actCreateFunction->setIcon(QIcon(":/tab_interface/toolbar/icns/function.svg"));
+    actCreateFunction->setIcon(QIcon(":/toolbar/icns/function.svg"));
 
     auto actCreateProvidedInterface = new QAction(tr("Provided Interface"));
     ActionsManager::registerAction(
@@ -1024,7 +1023,7 @@ QVector<QAction *> InterfaceDocument::initActions()
     actCreateProvidedInterface->setActionGroup(actionGroup);
     connect(actCreateProvidedInterface, &QAction::triggered, this,
             [this]() { d->tool->setCurrentToolType(IVCreatorTool::ToolType::ProvidedInterface); });
-    actCreateProvidedInterface->setIcon(QIcon(":/tab_interface/toolbar/icns/pi.svg"));
+    actCreateProvidedInterface->setIcon(QIcon(":/toolbar/icns/pi.svg"));
 
     auto actCreateRequiredInterface = new QAction(tr("Required Interface"));
     ActionsManager::registerAction(
@@ -1033,7 +1032,7 @@ QVector<QAction *> InterfaceDocument::initActions()
     actCreateRequiredInterface->setActionGroup(actionGroup);
     connect(actCreateRequiredInterface, &QAction::triggered, this,
             [this]() { d->tool->setCurrentToolType(IVCreatorTool::ToolType::RequiredInterface); });
-    actCreateRequiredInterface->setIcon(QIcon(":/tab_interface/toolbar/icns/ri.svg"));
+    actCreateRequiredInterface->setIcon(QIcon(":/toolbar/icns/ri.svg"));
 
     auto actCreateComment = new QAction(tr("Comment"));
     ActionsManager::registerAction(Q_FUNC_INFO, actCreateComment, "Comment", "Create Comment object");
@@ -1041,7 +1040,7 @@ QVector<QAction *> InterfaceDocument::initActions()
     actCreateComment->setActionGroup(actionGroup);
     connect(actCreateComment, &QAction::triggered, this,
             [this]() { d->tool->setCurrentToolType(IVCreatorTool::ToolType::Comment); });
-    actCreateComment->setIcon(QIcon(":/tab_interface/toolbar/icns/comment.svg"));
+    actCreateComment->setIcon(QIcon(":/toolbar/icns/comment.svg"));
 
     auto actCreateConnection = new QAction(tr("Connection"));
     ActionsManager::registerAction(Q_FUNC_INFO, actCreateConnection, "Connection", "Create Connection object");
@@ -1049,32 +1048,32 @@ QVector<QAction *> InterfaceDocument::initActions()
     actCreateConnection->setActionGroup(actionGroup);
     connect(actCreateConnection, &QAction::triggered, this,
             [this]() { d->tool->setCurrentToolType(IVCreatorTool::ToolType::MultiPointConnection); });
-    actCreateConnection->setIcon(QIcon(":/tab_interface/toolbar/icns/connection.svg"));
+    actCreateConnection->setIcon(QIcon(":/toolbar/icns/connection.svg"));
 
     d->actCreateConnectionGroup = new QAction(tr("Create Connection Group"));
     ActionsManager::registerAction(
             Q_FUNC_INFO, d->actCreateConnectionGroup, "Connection Group", "Create Connection group");
     d->actCreateConnectionGroup->setActionGroup(actionGroup);
     connect(d->actCreateConnectionGroup, &QAction::triggered, this, [this]() { d->tool->groupSelectedItems(); });
-    d->actCreateConnectionGroup->setIcon(QIcon(":/tab_interface/toolbar/icns/connection_group.svg"));
+    d->actCreateConnectionGroup->setIcon(QIcon(":/toolbar/icns/connection_group.svg"));
 
     d->actRemove = new QAction(tr("Remove"));
     ActionsManager::registerAction(Q_FUNC_INFO, d->actRemove, "Remove", "Remove selected object");
-    d->actRemove->setIcon(QIcon(QLatin1String(":/tab_interface/toolbar/icns/delete.svg")));
+    d->actRemove->setIcon(QIcon(QLatin1String(":/toolbar/icns/delete.svg")));
     d->actRemove->setEnabled(false);
     d->actRemove->setShortcut(QKeySequence::Delete);
     connect(d->actRemove, &QAction::triggered, this, [this]() { d->tool->removeSelectedItems(); });
 
     d->actZoomIn = new QAction(tr("Zoom In"));
     ActionsManager::registerAction(Q_FUNC_INFO, d->actZoomIn, "Zoom In", "Scale up the current scene");
-    d->actZoomIn->setIcon(QIcon(QLatin1String(":/tab_interface/toolbar/icns/zoom_in.svg")));
+    d->actZoomIn->setIcon(QIcon(QLatin1String(":/toolbar/icns/zoom_in.svg")));
     d->actZoomIn->setShortcut(QKeySequence::ZoomIn);
     connect(d->actZoomIn, &QAction::triggered, this,
             [this]() { d->graphicsView->setZoom(d->graphicsView->zoom() + d->graphicsView->zoomStepPercent()); });
 
     d->actZoomOut = new QAction(tr("Zoom Out"));
     ActionsManager::registerAction(Q_FUNC_INFO, d->actZoomOut, "Zoom Out", "Scale down the current scene");
-    d->actZoomOut->setIcon(QIcon(QLatin1String(":/tab_interface/toolbar/icns/zoom_out.svg")));
+    d->actZoomOut->setIcon(QIcon(QLatin1String(":/toolbar/icns/zoom_out.svg")));
     d->actZoomOut->setShortcut(QKeySequence::ZoomOut);
     connect(d->actZoomOut, &QAction::triggered, this,
             [this]() { d->graphicsView->setZoom(d->graphicsView->zoom() - d->graphicsView->zoomStepPercent()); });
@@ -1083,7 +1082,7 @@ QVector<QAction *> InterfaceDocument::initActions()
     d->actExitToRoot->setActionGroup(actionGroup);
     d->actExitToRoot->setEnabled(false);
     connect(d->actExitToRoot, &QAction::triggered, this, [this]() { d->itemsModel->changeRootItem({}); });
-    d->actExitToRoot->setIcon(QIcon(":/tab_interface/toolbar/icns/exit.svg"));
+    d->actExitToRoot->setIcon(QIcon(":/toolbar/icns/exit.svg"));
 
     d->actExitToParent = new QAction(tr("Exit to parent function"));
     d->actExitToParent->setActionGroup(actionGroup);
@@ -1093,7 +1092,7 @@ QVector<QAction *> InterfaceDocument::initActions()
                 d->objectsModel->rootObject() ? d->objectsModel->rootObject()->parentObject() : nullptr;
         d->itemsModel->changeRootItem(parentObject ? parentObject->id() : shared::InvalidId);
     });
-    d->actExitToParent->setIcon(QIcon(":/tab_interface/toolbar/icns/exit_parent.svg"));
+    d->actExitToParent->setIcon(QIcon(":/toolbar/icns/exit_parent.svg"));
 
     d->m_toolbarActions = { actCreateFunctionType, actCreateFunction, actCreateProvidedInterface,
         actCreateRequiredInterface, actCreateComment, actCreateConnection, d->actCreateConnectionGroup, d->actRemove,

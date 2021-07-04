@@ -230,17 +230,17 @@ void CreatorTool::populateContextMenu_commonEdit(QMenu *menu, const QPointF &sce
 {
     const QList<QGraphicsItem *> selectedItems = m_view->scene()->selectedItems();
     auto action = menu->addAction(
-            QIcon(QLatin1String(":/tab_interface/toolbar/icns/copy.svg")), tr("Copy"), this,
+            QIcon(QLatin1String(":/toolbar/icns/copy.svg")), tr("Copy"), this,
             [this]() { Q_EMIT copyActionTriggered(); }, QKeySequence::Copy);
     action->setEnabled(!selectedItems.isEmpty());
 
     action = menu->addAction(
-            QIcon(QLatin1String(":/tab_interface/toolbar/icns/cut.svg")), tr("Cut"), this,
-            [this]() { Q_EMIT cutActionTriggered(); }, QKeySequence::Cut);
+            QIcon(QLatin1String(":/toolbar/icns/cut.svg")), tr("Cut"), this, [this]() { Q_EMIT cutActionTriggered(); },
+            QKeySequence::Cut);
     action->setEnabled(!selectedItems.isEmpty());
 
     action = menu->addAction(
-            QIcon(QLatin1String(":/tab_interface/toolbar/icns/paste.svg")), tr("Paste"), this,
+            QIcon(QLatin1String(":/toolbar/icns/paste.svg")), tr("Paste"), this,
             [this, scenePos]() { Q_EMIT pasteActionTriggered(scenePos); }, QKeySequence::Paste);
     action->setEnabled(!QApplication::clipboard()->text().isEmpty());
 }

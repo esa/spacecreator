@@ -2,7 +2,7 @@
     <qresource prefix="/defaults">
         <file>templating/xml_templates/deploymentview.tmplt</file>
     </qresource>
-    <qresource prefix="/tab_deployment/toolbar">
+    <qresource prefix="/toolbar">
         <file>icns/asn1.png</file>
         <file>icns/comment.svg</file>
         <file>icns/connection_group.svg</file>

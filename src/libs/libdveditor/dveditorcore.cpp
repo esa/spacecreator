@@ -190,7 +190,7 @@ QVector<QAction *> DVEditorCore::initActions()
             qOverload<const QPointF &>(&DVEditorCore::pasteItems));
 
     auto actCreatePartition = new QAction(tr("Partition"));
-    actCreatePartition->setIcon(QIcon(":/tab_deployment/toolbar/icns/partition.svg"));
+    actCreatePartition->setIcon(QIcon(":/toolbar/icns/partition.svg"));
     actCreatePartition->setCheckable(true);
     actCreatePartition->setActionGroup(actionGroup);
     connect(actCreatePartition, &QAction::triggered, this,
@@ -198,7 +198,7 @@ QVector<QAction *> DVEditorCore::initActions()
     d->m_actions.append(actCreatePartition);
 
     auto actCreateConnection = new QAction(tr("Connection"));
-    actCreateConnection->setIcon(QIcon(":/tab_deployment/toolbar/icns/connection.svg"));
+    actCreateConnection->setIcon(QIcon(":/toolbar/icns/connection.svg"));
     actCreateConnection->setCheckable(true);
     actCreateConnection->setActionGroup(actionGroup);
     connect(actCreateConnection, &QAction::triggered, this,
@@ -206,14 +206,14 @@ QVector<QAction *> DVEditorCore::initActions()
     d->m_actions.append(actCreateConnection);
 
     auto actRemove = new QAction(tr("Remove"));
-    actRemove->setIcon(QIcon(QLatin1String(":/tab_deployment/toolbar/icns/delete.svg")));
+    actRemove->setIcon(QIcon(QLatin1String(":/toolbar/icns/delete.svg")));
     actRemove->setEnabled(false);
     actRemove->setShortcut(QKeySequence::Delete);
     connect(actRemove, &QAction::triggered, this, [this]() { d->m_creatorTool->removeSelectedItems(); });
     d->m_actions.append(actRemove);
 
     auto actZoomIn = new QAction(tr("Zoom In"));
-    actZoomIn->setIcon(QIcon(QLatin1String(":/tab_deployment/toolbar/icns/zoom_in.svg")));
+    actZoomIn->setIcon(QIcon(QLatin1String(":/toolbar/icns/zoom_in.svg")));
     actZoomIn->setShortcut(QKeySequence::ZoomIn);
     connect(actZoomIn, &QAction::triggered, this, [this]() {
         d->m_mainWidget->graphicsView()->setZoom(
@@ -222,7 +222,7 @@ QVector<QAction *> DVEditorCore::initActions()
     d->m_actions.append(actZoomIn);
 
     auto actZoomOut = new QAction(tr("Zoom Out"));
-    actZoomOut->setIcon(QIcon(QLatin1String(":/tab_deployment/toolbar/icns/zoom_out.svg")));
+    actZoomOut->setIcon(QIcon(QLatin1String(":/toolbar/icns/zoom_out.svg")));
     actZoomOut->setShortcut(QKeySequence::ZoomOut);
     connect(actZoomOut, &QAction::triggered, this, [this]() {
         d->m_mainWidget->graphicsView()->setZoom(

@@ -56,7 +56,7 @@ IVFunctionGraphicsItem::IVFunctionGraphicsItem(ivm::IVFunction *entity, QGraphic
     m_textItem->setTextAlignment(Qt::AlignCenter);
 
     if (!m_svgRenderer) // TODO: change icon
-        m_svgRenderer = new QSvgRenderer(QLatin1String(":/tab_interface/toolbar/icns/change_root.svg"));
+        m_svgRenderer = new QSvgRenderer(QLatin1String(":/toolbar/icns/change_root.svg"));
 }
 
 IVFunctionGraphicsItem::~IVFunctionGraphicsItem() { }

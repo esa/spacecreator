@@ -309,15 +309,17 @@ void DVCreatorTool::populateContextMenu_commonCreate(QMenu *menu, const QPointF 
 {
     if (m_previewItem) {
         static const QSizeF emptyPreviewItemSize = QSizeF(kPreviewItemPenWidth, kPreviewItemPenWidth);
-        auto action = menu->addAction(QIcon(QLatin1String(":/tab_interface/toolbar/icns/partition.svg")),
-                tr("Partition"), this, [this, scenePos]() { handleToolType(ToolType::Partition, scenePos); });
-
-        action = menu->addAction(QIcon(QLatin1String(":/tab_interface/toolbar/icns/connection.svg")),
-                tr("Re-create Connection"), this,
-                [this, scenePos]() { handleToolType(ToolType::ReCreateConnection, scenePos); });
-
         const auto selectedItems = m_previewItem->scene()->selectedItems();
-        const auto it = std::find_if(selectedItems.cbegin(), selectedItems.cend(),
+        auto action = menu->addAction(QIcon(QLatin1String(":/toolbar/icns/partition.svg")), tr("Partition"), this,
+                [this, scenePos]() { handleToolType(ToolType::Partition, scenePos); });
+        auto it = std::find_if(selectedItems.cbegin(), selectedItems.cend(),
+                [](const QGraphicsItem *item) { return item->type() == DVNodeGraphicsItem::Type; });
+        action->setEnabled(it != selectedItems.cend());
+
+        action = menu->addAction(QIcon(QLatin1String(":/toolbar/icns/connection.svg")), tr("Re-create Connection"),
+                this, [this, scenePos]() { handleToolType(ToolType::ReCreateConnection, scenePos); });
+
+        it = std::find_if(selectedItems.cbegin(), selectedItems.cend(),
                 [](const QGraphicsItem *item) { return item->type() == DVConnectionGraphicsItem::Type; });
         action->setEnabled(it != selectedItems.cend());
     }
@@ -548,7 +550,9 @@ bool DVCreatorTool::prepareRectPreview(QMouseEvent *e)
     QGraphicsScene *scene = m_view->scene();
     const QPointF scenePos = cursorInScene(e->globalPos());
     QGraphicsItem *parentItem = m_view->itemAt(e->pos());
-
+    if (!parentItem) {
+        return false;
+    }
     if (!m_previewItem) {
         while (parentItem != nullptr && parentItem->type() != DVNodeGraphicsItem::Type) {
             parentItem = parentItem->parentItem();
