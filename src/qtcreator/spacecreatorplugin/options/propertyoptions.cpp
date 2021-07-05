@@ -18,8 +18,10 @@
 #include "propertyoptions.h"
 
 #include "baseitems/common/ivutils.h"
-#include "interface/properties/propertytemplatewidget.h"
+#include "common.h"
+#include "dvpropertytemplateconfig.h"
 #include "ivpropertytemplateconfig.h"
+#include "propertytemplatewidget.h"
 #include "spacecreatorpluginconstants.h"
 
 namespace spctr {
@@ -36,9 +38,14 @@ PropertyOptions::PropertyOptions()
 QWidget *PropertyOptions::widget()
 {
     if (!m_widget) {
-        auto config = ivm::IVPropertyTemplateConfig::instance();
-        config->init(ive::dynamicPropertiesFilePath());
-        m_widget = new ive::PropertyTemplateWidget;
+        shared::PropertyTemplateConfig *ivConfig = ivm::IVPropertyTemplateConfig::instance();
+        ivConfig->init(shared::interfaceCustomAttributesFilePath());
+
+        shared::PropertyTemplateConfig *dvConfig = dvm::DVPropertyTemplateConfig::instance();
+        dvConfig->init(shared::deploymentCustomAttributesFilePath());
+
+        m_widget = new shared::PropertyTemplateWidget;
+        m_widget->setPropertyTemplateConfigs({ ivConfig, dvConfig });
     }
     return m_widget;
 }
@@ -46,8 +53,6 @@ QWidget *PropertyOptions::widget()
 void PropertyOptions::apply()
 {
     m_widget->save();
-    auto config = ivm::IVPropertyTemplateConfig::instance();
-    config->init(ive::dynamicPropertiesFilePath());
 }
 
 void PropertyOptions::finish()

@@ -23,6 +23,10 @@
 #include <QObject>
 #include <QUuid>
 
+namespace Asn1Acn {
+class File;
+}
+
 namespace shared {
 
 typedef QUuid Id;
@@ -98,6 +102,35 @@ E typeFromName(const QString &name)
     static const QMetaEnum &me = QMetaEnum::fromType<E>();
     return static_cast<E>(me.keyToValue(name.toLatin1()));
 }
+
+//! Default filename for Interface View diagram
+static const QString kDefaultInterfaceViewFileName { QLatin1String("interfaceview.xml") };
+
+/*!
+ * Returns path to exported components library set in TASTE_COMPONENTS_LIBRARY
+ * environment variable otherwise points to default, for ex. ~/.local/share/ESA/IV Editor/components_library
+ */
+QString componentsLibraryPath();
+
+/*!
+ * Returns path to shared function types set in TASTE_SHARED_TYPES
+ * environment variable otherwise points to default, for ex. ~/.local/share/ESA/IV Editor/shared_types
+ */
+QString sharedTypesPath();
+
+/*!
+ * Returns path to user defined attributes set in TASTE_DEFAULT_ATTRIBUTES_PATH
+ * environment variable otherwise points to default, for ex. ~/.local/share/ESA/IV Editor/default_attributes.xml
+ */
+QString interfaceCustomAttributesFilePath();
+
+/*!
+ * Returns path to user defined attributes set in TASTE_DEPLOYMENT_ATTRIBUTES_PATH
+ * environment variable otherwise points to default, for ex. ~/.local/share/ESA/DV Editor/default_attributes.xml
+ */
+QString deploymentCustomAttributesFilePath();
+
+QStringList asn1Names(const Asn1Acn::File *dataTypes);
 
 }
 

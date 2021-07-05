@@ -21,6 +21,9 @@
 
 namespace dvm {
 
+const static QString kSysAttrsConfigFilePath = QLatin1String(":/defaults/resources/dv_system_attributes.xml");
+const static QString kUserAttrsResourceConfigPath = QLatin1String(":/defaults/resources/dv_custom_attributes.xml");
+
 DVPropertyTemplateConfig *DVPropertyTemplateConfig::m_instance = nullptr;
 
 DVPropertyTemplateConfig *DVPropertyTemplateConfig::instance()
@@ -31,9 +34,29 @@ DVPropertyTemplateConfig *DVPropertyTemplateConfig::instance()
     return m_instance;
 }
 
+QString DVPropertyTemplateConfig::title() const
+{
+    return QObject::tr("DeploymentView");
+}
+
+shared::PropertyTemplate *DVPropertyTemplateConfig::createPropertyTemplate() const
+{
+    return new DVPropertyTemplate;
+}
+
+DVPropertyTemplateConfig::DVPropertyTemplateConfig()
+    : shared::PropertyTemplateConfig(kSysAttrsConfigFilePath)
+{
+}
+
 shared::PropertyTemplate *DVPropertyTemplateConfig::createPropertyTemplate(const QDomElement &element) const
 {
     return shared::PropertyTemplate::createFromXml<DVPropertyTemplate>(element);
+}
+
+QString DVPropertyTemplateConfig::userAttrsResourceConfigPath() const
+{
+    return kUserAttrsResourceConfigPath;
 }
 
 } // namespace dvm

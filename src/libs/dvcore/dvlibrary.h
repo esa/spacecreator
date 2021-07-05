@@ -17,26 +17,8 @@
 
 #pragma once
 
-#include <QPointer>
-#include <coreplugin/dialogs/ioptionspage.h>
+namespace dvm {
 
-namespace shared {
-class PropertyTemplateWidget;
-}
-
-namespace spctr {
-
-class PropertyOptions : public Core::IOptionsPage
-{
-public:
-    PropertyOptions();
-
-    QWidget *widget() override;
-    void apply() override;
-    void finish() override;
-
-private:
-    QPointer<shared::PropertyTemplateWidget> m_widget;
-};
+void initDVLibrary();
 
 }

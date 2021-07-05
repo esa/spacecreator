@@ -60,7 +60,7 @@ struct DVEditorCore::DVEditorCorePrivate {
         , m_hwModel(new dvm::DVModel)
         , m_hwVisualizationModel(new DVVisualizationModel(m_hwModel.get(), m_appModel->commandsStack()))
         , m_exporter(new DVExporter)
-        , m_dynPropConfig(new dvm::DVPropertyTemplateConfig())
+        , m_dynPropConfig(dvm::DVPropertyTemplateConfig::instance())
     {
     }
 

@@ -1,5 +1,5 @@
 /*
-   Copyright (C) 2021 European Space Agency - <maxime.perrotin@esa.int>
+   Copyright (C) 2018-2019 European Space Agency - <maxime.perrotin@esa.int>
 
    This library is free software; you can redistribute it and/or
    modify it under the terms of the GNU Library General Public
@@ -17,26 +17,30 @@
 
 #pragma once
 
-#include <QPointer>
-#include <coreplugin/dialogs/ioptionspage.h>
+#include <QRegularExpression>
+#include <QSyntaxHighlighter>
 
 namespace shared {
-class PropertyTemplateWidget;
-}
 
-namespace spctr {
-
-class PropertyOptions : public Core::IOptionsPage
+/**
+ * @brief The XMLHighlighter class makes highlighting of XML document
+ */
+class XMLHighlighter : public QSyntaxHighlighter
 {
+    Q_OBJECT
 public:
-    PropertyOptions();
+    XMLHighlighter(QTextDocument *parent);
 
-    QWidget *widget() override;
-    void apply() override;
-    void finish() override;
+    // QSyntaxHighlighter interface
+protected:
+    void highlightBlock(const QString &text) override;
 
 private:
-    QPointer<shared::PropertyTemplateWidget> m_widget;
+    struct HighlightingRule {
+        QRegularExpression pattern;
+        QTextCharFormat format;
+    };
+    QVector<HighlightingRule> m_highlightingRules;
 };
 
-}
+} // namespace shared

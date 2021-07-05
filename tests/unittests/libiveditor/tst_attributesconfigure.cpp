@@ -53,7 +53,7 @@ void tst_AttributesConfigure::initTestCase()
     ive::initIVEditor();
     QStandardPaths::setTestModeEnabled(true);
     m_dynPropConfig = ivm::IVPropertyTemplateConfig::instance();
-    m_dynPropConfig->init(ive::dynamicPropertiesFilePath());
+    m_dynPropConfig->init(shared::interfaceCustomAttributesFilePath());
 }
 
 void tst_AttributesConfigure::tst_attributesLoad()

@@ -31,6 +31,9 @@ target_sources(${LIB_NAME} PRIVATE
     dvpropertytemplateconfig.h
     dvpropertytemplate.cpp
     dvpropertytemplate.h
+    dvlibrary.cpp
+    dvlibrary.h
+    dvresources.qrc
 )
 
 target_include_directories(${LIB_NAME} PUBLIC .)

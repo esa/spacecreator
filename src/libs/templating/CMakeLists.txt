@@ -13,8 +13,6 @@ target_sources(${LIB_NAME} PRIVATE
     templatehighlighter.h
     templatesyntaxhelpdialog.cpp
     templatesyntaxhelpdialog.h
-    xmlhighlighter.cpp
-    xmlhighlighter.h
     objectsexporter.cpp
     objectsexporter.h
     template_syntax_help.qrc

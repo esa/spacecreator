@@ -19,7 +19,7 @@
 
 #include <QDebug>
 
-namespace templating {
+namespace shared {
 
 /**
  * @brief XMLHighlighter::XMLHighlighter ctor
@@ -101,4 +101,4 @@ void XMLHighlighter::highlightBlock(const QString &text)
     }
 }
 
-}
+} // namespace shared

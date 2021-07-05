@@ -91,7 +91,7 @@ void ContextParametersModel::setDataTypes(const QSharedPointer<Asn1Acn::File> &d
 
     m_dataTypes = dataTypes;
     if (m_dataTypes) {
-        m_asn1Names = asn1Names(m_dataTypes.get());
+        m_asn1Names = shared::asn1Names(m_dataTypes.get());
     }
 }
 

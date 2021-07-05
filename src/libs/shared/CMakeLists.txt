@@ -125,11 +125,22 @@ target_sources(${LIB_NAME} PRIVATE
     commands/cmdentityattributechange.h
     interface/attributedelegate.cpp
     interface/attributedelegate.h
+    addpropertytemplatedialog.cpp
+    addpropertytemplatedialog.h
+    addpropertytemplatedialog.ui
+    propertytemplatemanager.cpp
+    propertytemplatemanager.h
+    propertytemplatemanager.ui
+    propertytemplatewidget.cpp
+    propertytemplatewidget.h
+    xmlhighlighter.cpp
+    xmlhighlighter.h
 )
 
 target_include_directories(${LIB_NAME} PUBLIC .)
 
 target_link_libraries(${LIB_NAME}
+    asn1library
     ${QT_CORE}
     ${QT_GUI}
     ${QT_XML}

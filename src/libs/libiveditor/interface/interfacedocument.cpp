@@ -33,8 +33,6 @@
 #include "graphicsviewutils.h"
 #include "interface/objectstreeview.h"
 #include "interface/properties/ivpropertiesdialog.h"
-#include "interface/properties/propertytemplatemanager.h"
-#include "interface/properties/propertytemplatewidget.h"
 #include "ivcomment.h"
 #include "ivconnection.h"
 #include "ivconnectiongroup.h"
@@ -47,6 +45,8 @@
 #include "ivpropertytemplateconfig.h"
 #include "ivvisualizationmodelbase.h"
 #include "ivxmlreader.h"
+#include "propertytemplatemanager.h"
+#include "propertytemplatewidget.h"
 
 #include <QAction>
 #include <QApplication>
@@ -122,7 +122,7 @@ InterfaceDocument::InterfaceDocument(QObject *parent)
             [this](bool clean) { Q_EMIT dirtyChanged(!clean); });
 
     d->dynPropConfig = ivm::IVPropertyTemplateConfig::instance();
-    d->dynPropConfig->init(ive::dynamicPropertiesFilePath());
+    d->dynPropConfig->init(shared::interfaceCustomAttributesFilePath());
 
     d->importModel = new ivm::IVModel(d->dynPropConfig, nullptr, this);
     d->sharedModel = new ivm::IVModel(d->dynPropConfig, nullptr, this);
@@ -272,17 +272,17 @@ bool InterfaceDocument::loadAvailableComponents()
     bool result = true;
 
     d->sharedModel->clear();
-    QDirIterator instantiatableIt(ive::sharedTypesPath(), QDir::Dirs | QDir::NoDotAndDotDot);
+    QDirIterator instantiatableIt(shared::sharedTypesPath(), QDir::Dirs | QDir::NoDotAndDotDot);
     while (instantiatableIt.hasNext()) {
         result |= loadComponentModel(
-                d->sharedModel, instantiatableIt.next() + QDir::separator() + kDefaultInterfaceViewFileName);
+                d->sharedModel, instantiatableIt.next() + QDir::separator() + shared::kDefaultInterfaceViewFileName);
     }
 
     d->importModel->clear();
-    QDirIterator importableIt(ive::componentsLibraryPath(), QDir::Dirs | QDir::NoDotAndDotDot);
+    QDirIterator importableIt(shared::componentsLibraryPath(), QDir::Dirs | QDir::NoDotAndDotDot);
     while (importableIt.hasNext()) {
         result |= loadComponentModel(
-                d->importModel, importableIt.next() + QDir::separator() + kDefaultInterfaceViewFileName);
+                d->importModel, importableIt.next() + QDir::separator() + shared::kDefaultInterfaceViewFileName);
     }
 
     return result;
@@ -345,9 +345,9 @@ bool InterfaceDocument::exportSelectedFunctions()
     QString name;
     const QList<shared::VEObject *> objects = prepareSelectedObjectsForExport(name);
     d->objectsSelectionModel->clearSelection();
-    const QString path = componentsLibraryPath() + name;
+    const QString path = shared::componentsLibraryPath() + name;
     if (exportImpl(path, objects)) {
-        return loadComponentModel(d->importModel, path + QDir::separator() + kDefaultInterfaceViewFileName);
+        return loadComponentModel(d->importModel, path + QDir::separator() + shared::kDefaultInterfaceViewFileName);
     }
     return false;
 }
@@ -374,9 +374,9 @@ bool InterfaceDocument::exportSelectedType()
         return false;
     }
     d->objectsSelectionModel->clearSelection();
-    const QString path = sharedTypesPath() + QDir::separator() + rootType->title();
+    const QString path = shared::sharedTypesPath() + QDir::separator() + rootType->title();
     if (exportImpl(path, { rootType })) {
-        return loadComponentModel(d->sharedModel, path + QDir::separator() + kDefaultInterfaceViewFileName);
+        return loadComponentModel(d->sharedModel, path + QDir::separator() + shared::kDefaultInterfaceViewFileName);
     }
     return false;
 }
@@ -686,7 +686,7 @@ void InterfaceDocument::onItemCreated(const shared::Id &id)
 
 void InterfaceDocument::onAttributesManagerRequested()
 {
-    auto dialog = new ive::PropertyTemplateManager(window());
+    auto dialog = new shared::PropertyTemplateManager({ d->dynPropConfig }, window());
     dialog->setAttribute(Qt::WA_DeleteOnClose);
     dialog->open();
 }
@@ -904,7 +904,7 @@ bool InterfaceDocument::exportImpl(const QString &targetDir, const QList<shared:
         return {};
     }
 
-    const QString exportFilePath = QString("%1/%2").arg(targetDir, kDefaultInterfaceViewFileName);
+    const QString exportFilePath = QString("%1/%2").arg(targetDir, shared::kDefaultInterfaceViewFileName);
 
     const QFileInfo exportFileInfo(exportFilePath);
     if (exportFileInfo.exists()) {
@@ -941,7 +941,7 @@ bool InterfaceDocument::exportImpl(const QString &targetDir, const QList<shared:
     for (shared::VEObject *object : objects) {
         if (auto fn = object->as<ivm::IVFunction *>()) {
             const QString subPath = QStringLiteral("work/%1").arg(object->title()).toLower();
-            const QString targetExportDir { componentsLibraryPath() + QDir::separator() + subPath };
+            const QString targetExportDir { shared::componentsLibraryPath() + QDir::separator() + subPath };
             const QString sourceExportDir { ivPath.absolutePath() + QDir::separator() + subPath };
             shared::copyDir(sourceExportDir, targetExportDir);
         }

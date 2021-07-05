@@ -92,26 +92,6 @@
             </Provided_Interface>
         </Scopes>
     </Attr>
-    <Attr name="Taste::coordinates" type="property" visible="false">
-        <Type>
-            <String validator="[0-9 ]+"/>
-        </Type>
-        <Scopes/>
-    </Attr>
-    <Attr name="Taste::InnerCoordinates" type="property" visible="false">
-        <Type>
-            <String validator="[0-9 ]+"/>
-        </Type>
-        <Scopes/>
-    </Attr>
-    <Attr name="Taste::RootCoordinates" type="property" visible="false">
-        <Type>
-            <String validator="[0-9 ]+"/>
-        </Type>
-        <Scopes>
-            <Function/>
-        </Scopes>
-    </Attr>
     <Attr name="Taste::InheritPI" type="property">
         <Type>
             <Boolean/>

@@ -20,6 +20,7 @@
 #include "context/action/actionsmanager.h"
 #include "dv/dveditorfactory.h"
 #include "dveditor.h"
+#include "dvlibrary.h"
 #include "interface/interfacedocument.h"
 #include "iv/iveditordata.h"
 #include "iv/iveditorfactory.h"
@@ -57,6 +58,7 @@ void initSpaceCreatorResources()
     ive::initIVEditor();
     ivm::initIVLibrary();
     dve::initDvEditor();
+    dvm::initDVLibrary();
 }
 
 using namespace Core;

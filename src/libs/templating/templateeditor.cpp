@@ -66,7 +66,7 @@ TemplateEditor::TemplateEditor(const QString &saveHere, QWidget *parent)
     QFont textFont(QStringLiteral("Courier"));
     m_resultTextEdit->setFont(textFont);
     m_resultTextEdit->setWordWrapMode(QTextOption::NoWrap);
-    new XMLHighlighter(m_resultTextEdit->document());
+    new shared::XMLHighlighter(m_resultTextEdit->document());
 
     m_templatesTabWidget->setTabPosition(QTabWidget::South);
     addTemplateEditor();

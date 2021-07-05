@@ -19,14 +19,13 @@
 
 #include <QWidget>
 
-namespace ivm {
-class IVPropertyTemplateConfig;
-}
-namespace Ui {
-class PropertyTemplateWidget;
-}
+class QPlainTextEdit;
+class QPushButton;
+class QLabel;
+class QComboBox;
 
-namespace ive {
+namespace shared {
+class PropertyTemplateConfig;
 
 class PropertyTemplateWidget : public QWidget
 {
@@ -34,26 +33,33 @@ class PropertyTemplateWidget : public QWidget
 
 public:
     explicit PropertyTemplateWidget(QWidget *parent = nullptr);
-    ~PropertyTemplateWidget();
+    ~PropertyTemplateWidget() override = default;
 
     void save();
     bool readConfig(const QString &from);
     void setTextColor(const QColor &color);
-
     bool hasError() const;
+    void setPropertyTemplateConfigs(const QList<PropertyTemplateConfig *> &propTemplateConfigs);
 
 Q_SIGNALS:
-    void hasErrorChanged();
+    void hasErrorChanged(bool hasError);
+    void currentTemplateConfigChanged(const QString &title);
 
 private Q_SLOTS:
     void updateErrorInfo();
-    void on_btnNewProp_clicked();
+    void createProperty();
 
 private:
-    Ui::PropertyTemplateWidget *ui;
-    ivm::IVPropertyTemplateConfig *m_dynPropConfig { nullptr };
+    PropertyTemplateConfig *currentTemplateConfig() const;
+
+private:
+    QList<PropertyTemplateConfig *> m_propTemplateConfigs;
+    QPlainTextEdit *m_plainTextEdit { nullptr };
+    QPushButton *m_btnNewProp { nullptr };
+    QComboBox *m_templateConfigTypes { nullptr };
+    QLabel *m_errorDisplay { nullptr };
     QStringList m_usedNames;
     bool m_error = false;
 };
 
-}
+} // namespace shared

@@ -184,7 +184,7 @@ QStringList SpaceCreatorProject::allDVFiles() const
  */
 QStringList SpaceCreatorProject::allIVFiles() const
 {
-    return projectFiles(ive::kDefaultInterfaceViewFileName);
+    return projectFiles(shared::kDefaultInterfaceViewFileName);
 }
 
 /*!

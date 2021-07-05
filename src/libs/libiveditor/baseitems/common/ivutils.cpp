@@ -17,49 +17,9 @@
 
 #include "ivutils.h"
 
-#include "asn1/definitions.h"
-#include "asn1/file.h"
-
 #include <QDir>
 #include <QStandardPaths>
 
 namespace ive {
-
-QString dynamicPropertiesFilePath()
-{
-    static const QString kDefaultPath = QStandardPaths::writableLocation(QStandardPaths::AppLocalDataLocation)
-            + QDir::separator() + QLatin1String("default_attributes.xml");
-
-    return qEnvironmentVariable("TASTE_DEFAULT_ATTRIBUTES_PATH", kDefaultPath);
-}
-
-QString componentsLibraryPath()
-{
-    static const QString kDefaultPath = QStandardPaths::writableLocation(QStandardPaths::AppLocalDataLocation)
-            + QDir::separator() + QLatin1String("components_library") + QDir::separator();
-
-    return qEnvironmentVariable("TASTE_COMPONENTS_LIBRARY", kDefaultPath);
-}
-
-QString sharedTypesPath()
-{
-    static const QString kDefaultPath = QStandardPaths::writableLocation(QStandardPaths::AppLocalDataLocation)
-            + QDir::separator() + QLatin1String("shared_types") + QDir::separator();
-
-    return qEnvironmentVariable("TASTE_SHARED_TYPES", kDefaultPath);
-}
-
-QStringList asn1Names(const Asn1Acn::File *dataTypes)
-{
-    QStringList names;
-    if (dataTypes) {
-        for (const std::unique_ptr<Asn1Acn::Definitions> &definitions : dataTypes->definitionsList()) {
-            for (const std::unique_ptr<Asn1Acn::TypeAssignment> &assignment : definitions->types()) {
-                names.append(assignment->name());
-            }
-        }
-    }
-    return names;
-}
 
 } // namespace ive

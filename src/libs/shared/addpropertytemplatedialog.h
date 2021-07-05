@@ -18,40 +18,47 @@
 #pragma once
 
 #include <QDialog>
+#include <memory>
+
+class QCheckBox;
 
 namespace Ui {
 class AddPropertyTemplateDialog;
 }
 
-namespace ivm {
-class IVPropertyTemplate;
-} // namespace ivm
-
-namespace ive {
+namespace shared {
+class PropertyTemplate;
+class PropertyTemplateConfig;
 
 class AddPropertyTemplateDialog : public QDialog
 {
     Q_OBJECT
 
 public:
-    explicit AddPropertyTemplateDialog(const QStringList &prohibitedNames, QWidget *parent = nullptr);
+    explicit AddPropertyTemplateDialog(
+            PropertyTemplateConfig *config, const QStringList &prohibitedNames, QWidget *parent = nullptr);
     ~AddPropertyTemplateDialog() override;
 
-    ivm::IVPropertyTemplate *attribute() const;
+    PropertyTemplate *attribute() const;
+
 public Q_SLOTS:
     void accept() override;
 
 private:
-    Ui::AddPropertyTemplateDialog *ui;
-    QStringList m_prohibitedNames;
-    QColor m_nameColorDefault;
-    ivm::IVPropertyTemplate *m_attr;
     bool validateName(bool showWarn);
     bool validateType();
     bool validateValuesList();
     bool validateScope();
 
     QStringList listValues() const;
+
+private:
+    Ui::AddPropertyTemplateDialog *ui;
+    PropertyTemplateConfig *m_config;
+    QStringList m_prohibitedNames;
+    QColor m_nameColorDefault;
+    std::unique_ptr<shared::PropertyTemplate> m_attr;
+    QList<QPair<QCheckBox *, int>> m_scopeMappings;
 };
 
-} // namespace ive
+} // namespace shared

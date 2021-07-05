@@ -121,19 +121,10 @@ target_sources(${LIB_NAME} PRIVATE
     interface/interfacedocument.h
     interface/interfacetabgraphicsscene.cpp
     interface/interfacetabgraphicsscene.h
-    interface/properties/addpropertytemplatedialog.h
-    interface/properties/addpropertytemplatedialog.ui
-    interface/properties/addpropertytemplatedialog.cpp
     interface/properties/contextparametersmodel.cpp
     interface/properties/contextparametersmodel.h
     interface/properties/delegates/asn1valuedelegate.cpp
     interface/properties/delegates/asn1valuedelegate.h
-    interface/properties/propertytemplatemanager.cpp
-    interface/properties/propertytemplatemanager.h
-    interface/properties/propertytemplatemanager.ui
-    interface/properties/propertytemplatewidget.cpp
-    interface/properties/propertytemplatewidget.h
-    interface/properties/propertytemplatewidget.ui
     interface/properties/ifaceparametersmodel.cpp
     interface/properties/ifaceparametersmodel.h
     interface/properties/ivpropertiesdialog.cpp

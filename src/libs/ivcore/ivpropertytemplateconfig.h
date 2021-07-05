@@ -25,9 +25,13 @@ class IVPropertyTemplateConfig : public shared::PropertyTemplateConfig
 {
 public:
     static IVPropertyTemplateConfig *instance();
+    QString title() const override;
+    shared::PropertyTemplate *createPropertyTemplate() const override;
 
 protected:
+    IVPropertyTemplateConfig();
     shared::PropertyTemplate *createPropertyTemplate(const QDomElement &element) const override;
+    QString userAttrsResourceConfigPath() const override;
 
 private:
     static IVPropertyTemplateConfig *m_instance;

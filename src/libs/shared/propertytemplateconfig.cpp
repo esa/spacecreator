@@ -18,6 +18,7 @@
 #include "propertytemplateconfig.h"
 
 #include "common.h"
+#include "errorhub.h"
 #include "propertytemplate.h"
 #include "veobject.h"
 
@@ -35,41 +36,38 @@
 
 namespace shared {
 
-const static QString kSysAttrsConfigFilePath = QLatin1String(":/defaults/resources/system_attributes.xml");
-const static QString kUserAttrsResourceConfigPath = QLatin1String(":/defaults/resources/default_attributes.xml");
-
 struct PropertyTemplateConfig::PropertyTemplateConfigPrivate {
-    void init(const QList<shared::PropertyTemplate *> &attrs)
-    {
-        qDeleteAll(m_attrTemplates);
-        m_attrTemplates = attrs;
-    }
-
     QString m_configPath;
-    QList<shared::PropertyTemplate *> m_attrTemplates;
+    QString m_sysConfigPath;
+    QList<PropertyTemplate *> m_attrTemplates;
 };
 
-PropertyTemplateConfig::PropertyTemplateConfig()
+PropertyTemplateConfig::PropertyTemplateConfig(const QString &sysConfigPath)
     : d(new PropertyTemplateConfigPrivate())
 {
+    d->m_sysConfigPath = sysConfigPath;
 }
 
-QList<shared::PropertyTemplate *> PropertyTemplateConfig::systemAttributes() const
+QList<PropertyTemplate *> PropertyTemplateConfig::systemAttributes() const
 {
-    QFile f(kSysAttrsConfigFilePath);
+    QFile f(d->m_sysConfigPath);
     if (!f.open(QIODevice::ReadOnly | QIODevice::Text)) {
-        qWarning() << "Can't open file:" << kSysAttrsConfigFilePath << f.errorString();
+        ErrorHub::addError(ErrorItem::Warning,
+                QStringLiteral("Can't open file: %1 - %2").arg(d->m_sysConfigPath, f.errorString()));
         return {};
     }
     QString errorMsg;
     int errorLine = -1;
     int errorColumn = -1;
 
-    QList<shared::PropertyTemplate *> sysAttrs =
+    QList<PropertyTemplate *> sysAttrs =
             parseAttributesList(QString::fromUtf8(f.readAll()), &errorMsg, &errorLine, &errorColumn);
     if (sysAttrs.isEmpty()) {
-        qCritical() << "Can't load system attributes:"
-                    << QStringLiteral("%1:%2 => %3").arg(errorLine).arg(errorColumn).arg(errorMsg);
+        ErrorHub::addError(ErrorItem::Error,
+                QStringLiteral("Can't load system attributes: %1:%2 => %3")
+                        .arg(errorLine)
+                        .arg(errorColumn)
+                        .arg(errorMsg));
         return {};
     }
     for (auto attr : qAsConst(sysAttrs)) {
@@ -85,11 +83,12 @@ void PropertyTemplateConfig::init(const QString &configPath)
     QList<PropertyTemplate *> attributes = systemAttributes();
 
     QList<PropertyTemplate *> userAttributes;
-    if (shared::ensureFileExists(configPath, kUserAttrsResourceConfigPath)) {
+    if (ensureFileExists(configPath, userAttrsResourceConfigPath())) {
         d->m_configPath = configPath;
         QFile f(configPath);
         if (!f.open(QIODevice::ReadOnly | QIODevice::Text)) {
-            qWarning() << "Can't open file:" << configPath << f.errorString();
+            ErrorHub::addError(
+                    ErrorItem::Warning, QStringLiteral("Can't open file: %1 - %2").arg(configPath, f.errorString()));
             return;
         }
         userAttributes = parseAttributesList(QString::fromUtf8(f.readAll()));
@@ -112,7 +111,8 @@ void PropertyTemplateConfig::init(const QString &configPath)
     }
     qDeleteAll(userAttributes);
 
-    d->init(attributes);
+    qDeleteAll(d->m_attrTemplates);
+    d->m_attrTemplates = attributes;
 }
 
 bool PropertyTemplateConfig::hasPropertyTemplateForObject(const VEObject *obj, const QString &name) const
@@ -153,7 +153,9 @@ QList<PropertyTemplate *> PropertyTemplateConfig::propertyTemplatesForObject(con
 {
     QList<PropertyTemplate *> attrs;
     std::copy_if(d->m_attrTemplates.cbegin(), d->m_attrTemplates.cend(), std::back_inserter(attrs),
-            [obj](PropertyTemplate *attrTemplate) { return attrTemplate->scopes() & attrTemplate->objectScope(obj); });
+            [obj](PropertyTemplate *attrTemplate) {
+                return !attrTemplate->scopes() || (attrTemplate->scopes() & attrTemplate->objectScope(obj));
+            });
     return attrs;
 }
 

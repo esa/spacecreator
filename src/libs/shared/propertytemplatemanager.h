@@ -19,25 +19,15 @@
 
 #include <QDialog>
 
-namespace Ui {
-class PropertyTemplateManager;
-}
-
-namespace ive {
-
+namespace shared {
+class PropertyTemplateConfig;
 class PropertyTemplateManager : public QDialog
 {
     Q_OBJECT
 
 public:
-    explicit PropertyTemplateManager(QWidget *parent = nullptr);
-    ~PropertyTemplateManager() override;
-
-public Q_SLOTS:
-    void accept() override;
-
-private:
-    Ui::PropertyTemplateManager *ui { nullptr };
+    explicit PropertyTemplateManager(const QList<PropertyTemplateConfig *> &configs, QWidget *parent = nullptr);
+    ~PropertyTemplateManager() override = default;
 };
 
-}
+} // namespace shared

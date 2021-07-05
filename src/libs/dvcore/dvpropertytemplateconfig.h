@@ -25,9 +25,13 @@ class DVPropertyTemplateConfig : public shared::PropertyTemplateConfig
 {
 public:
     static DVPropertyTemplateConfig *instance();
+    QString title() const override;
+    shared::PropertyTemplate *createPropertyTemplate() const override;
 
 protected:
+    DVPropertyTemplateConfig();
     shared::PropertyTemplate *createPropertyTemplate(const QDomElement &element) const override;
+    QString userAttrsResourceConfigPath() const override;
 
 private:
     static DVPropertyTemplateConfig *m_instance;

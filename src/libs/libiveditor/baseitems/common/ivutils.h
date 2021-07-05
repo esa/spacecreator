@@ -69,27 +69,4 @@ static const struct {
     const qreal GripPoint = Selected;
 } ZOrder {};
 
-//! Default filename for Interface View diagram
-static const QString kDefaultInterfaceViewFileName { QLatin1String("interfaceview.xml") };
-
-/*!
- * Returns path to exported components library set in TASTE_COMPONENTS_LIBRARY
- * environment variable otherwise points to default, for ex. ~/.local/share/ESA/IV Editor/components_library
- */
-QString componentsLibraryPath();
-
-/*!
- * Returns path to shared function types set in TASTE_SHARED_TYPES
- * environment variable otherwise points to default, for ex. ~/.local/share/ESA/IV Editor/shared_types
- */
-QString sharedTypesPath();
-
-/*!
- * Returns path to user defined attributes set in TASTE_DEFAULT_ATTRIBUTES_PATH
- * environment variable otherwise points to default, for ex. ~/.local/share/ESA/IV Editor/default_attributes.xml
- */
-QString dynamicPropertiesFilePath();
-
-QStringList asn1Names(const Asn1Acn::File *dataTypes);
-
 } // namespace ive

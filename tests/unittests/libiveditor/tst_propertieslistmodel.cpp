@@ -40,7 +40,7 @@ void tst_PropertiesListModel::initTestCase()
 {
     m_macro = new ive::cmd::CommandsStack::Macro(new QUndoStack);
     m_config = ivm::IVPropertyTemplateConfig::instance();
-    m_config->init(ive::dynamicPropertiesFilePath());
+    m_config->init(shared::interfaceCustomAttributesFilePath());
 }
 
 void tst_PropertiesListModel::tst_object()

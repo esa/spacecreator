@@ -156,7 +156,7 @@ void CmdEntitiesImport::redoSourceCloning(const ivm::IVObject *object)
     }
 
     const QString subPath = relativePathForObject(object);
-    const QString sourcePrefix = m_tempDir.isNull() ? componentsLibraryPath() : m_tempDir->path();
+    const QString sourcePrefix = m_tempDir.isNull() ? shared::componentsLibraryPath() : m_tempDir->path();
     const QString sourcePath { sourcePrefix + QDir::separator() + subPath };
     const QString destPath { m_destPath + QDir::separator() + subPath };
     shared::copyDir(sourcePath, destPath);

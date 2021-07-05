@@ -21,6 +21,9 @@
 
 namespace ivm {
 
+const static QString kSysAttrsConfigFilePath = QLatin1String(":/defaults/resources/iv_system_attributes.xml");
+const static QString kUserAttrsResourceConfigPath = QLatin1String(":/defaults/resources/iv_custom_attributes.xml");
+
 IVPropertyTemplateConfig *IVPropertyTemplateConfig::m_instance = nullptr;
 
 IVPropertyTemplateConfig *IVPropertyTemplateConfig::instance()
@@ -31,9 +34,29 @@ IVPropertyTemplateConfig *IVPropertyTemplateConfig::instance()
     return m_instance;
 }
 
+QString IVPropertyTemplateConfig::title() const
+{
+    return QObject::tr("InterfaceView");
+}
+
+shared::PropertyTemplate *IVPropertyTemplateConfig::createPropertyTemplate() const
+{
+    return new IVPropertyTemplate();
+}
+
+IVPropertyTemplateConfig::IVPropertyTemplateConfig()
+    : shared::PropertyTemplateConfig(kSysAttrsConfigFilePath)
+{
+}
+
 shared::PropertyTemplate *IVPropertyTemplateConfig::createPropertyTemplate(const QDomElement &element) const
 {
     return shared::PropertyTemplate::createFromXml<IVPropertyTemplate>(element);
+}
+
+QString IVPropertyTemplateConfig::userAttrsResourceConfigPath() const
+{
+    return kUserAttrsResourceConfigPath;
 }
 
 } // namespace ivm

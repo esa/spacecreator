@@ -31,8 +31,6 @@ class PropertyTemplateConfig
 public:
     virtual ~PropertyTemplateConfig();
 
-    void init(const QString &configPath);
-
     bool hasPropertyTemplateForObject(const VEObject *obj, const QString &name) const;
     PropertyTemplate *propertyTemplateForObject(const VEObject *obj, const QString &name) const;
     QList<PropertyTemplate *> propertyTemplatesForObject(const VEObject *obj) const;
@@ -41,12 +39,16 @@ public:
 
     QList<PropertyTemplate *> parseAttributesList(const QString &fromData, QString *errorMsg = nullptr,
             int *errorLine = nullptr, int *errorColumn = nullptr) const;
-    QList<shared::PropertyTemplate *> systemAttributes() const;
+    QList<PropertyTemplate *> systemAttributes() const;
+    void init(const QString &configPath);
+
+    virtual QString title() const = 0;
+    virtual PropertyTemplate *createPropertyTemplate() const = 0;
 
 protected:
-    PropertyTemplateConfig();
-
-    virtual shared::PropertyTemplate *createPropertyTemplate(const QDomElement &element) const = 0;
+    PropertyTemplateConfig(const QString &sysConfigPath);
+    virtual PropertyTemplate *createPropertyTemplate(const QDomElement &element) const = 0;
+    virtual QString userAttrsResourceConfigPath() const = 0;
 
 private:
     struct PropertyTemplateConfigPrivate;

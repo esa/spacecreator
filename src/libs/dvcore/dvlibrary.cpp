@@ -1,5 +1,5 @@
 /*
-   Copyright (C) 2018-2019 European Space Agency - <maxime.perrotin@esa.int>
+   Copyright (C) 2021 European Space Agency - <maxime.perrotin@esa.int>
 
    This library is free software; you can redistribute it and/or
    modify it under the terms of the GNU Library General Public
@@ -15,32 +15,23 @@
    along with this program. If not, see <https://www.gnu.org/licenses/lgpl-2.1.html>.
 */
 
-#pragma once
+#include "dvlibrary.h"
 
-#include <QRegularExpression>
-#include <QSyntaxHighlighter>
+#include <qglobal.h>
 
-namespace templating {
+static void init_dv_library()
+{
+    Q_INIT_RESOURCE(dvresources);
+}
+
+namespace dvm {
 
 /**
- * @brief The XMLHighlighter class makes highlighting of XML document
+   Initializes the library resources and Qt meta types.
  */
-class XMLHighlighter : public QSyntaxHighlighter
+void initDVLibrary()
 {
-    Q_OBJECT
-public:
-    XMLHighlighter(QTextDocument *parent);
-
-    // QSyntaxHighlighter interface
-protected:
-    void highlightBlock(const QString &text) override;
-
-private:
-    struct HighlightingRule {
-        QRegularExpression pattern;
-        QTextCharFormat format;
-    };
-    QVector<HighlightingRule> m_highlightingRules;
-};
-
+    init_dv_library();
 }
+
+} // namespace dvm
