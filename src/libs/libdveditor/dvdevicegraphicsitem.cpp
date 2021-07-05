@@ -21,18 +21,33 @@
 #include "dvnodegraphicsitem.h"
 #include "graphicsviewutils.h"
 #include "positionlookuphelper.h"
+#include "ui/textitem.h"
 
 #include <QPainter>
+
+static const QRectF kBoundingRect = { -10, -10, 20, 20 };
 
 namespace dve {
 
 DVDeviceGraphicsItem::DVDeviceGraphicsItem(dvm::DVDevice *device, QGraphicsItem *parent)
     : shared::ui::VEConnectionEndPointGraphicsItem(device, parent)
+    , m_textItem(new shared::ui::TextItem(this))
 {
-    setBoundingRect({ -10, -10, 20, 20 });
+    setBoundingRect(kBoundingRect);
+    m_textItem->setPos(QPointF(5, -5));
+    m_textItem->setFramed(false);
+    m_textItem->setBackground(Qt::transparent);
+    m_textItem->setEditable(true);
 }
 
 DVDeviceGraphicsItem::~DVDeviceGraphicsItem() { }
+
+void DVDeviceGraphicsItem::init()
+{
+    shared::ui::VEConnectionEndPointGraphicsItem::init();
+    m_textItem->setPlainText(entity()->titleUI());
+    connect(entity(), &dvm::DVObject::titleChanged, m_textItem, &shared::ui::TextItem::setPlainText);
+}
 
 dvm::DVDevice *DVDeviceGraphicsItem::entity() const
 {
@@ -117,10 +132,12 @@ void DVDeviceGraphicsItem::rebuildLayout()
         return;
     }
 
-    if (entity() && shared::graphicsviewutils::pos(entity()->coordinates()).isNull()) {
-        layout();
-        mergeGeometry();
-        return;
+    if (entity()) {
+        if (shared::graphicsviewutils::pos(entity()->coordinates()).isNull()) {
+            layout();
+            mergeGeometry();
+            return;
+        }
     }
     const QRectF parentRect = targetItem()->boundingRect();
     const QPointF ifacePos = pos();
@@ -150,6 +167,32 @@ void DVDeviceGraphicsItem::paint(QPainter *painter, const QStyleOptionGraphicsIt
 shared::ColorManager::HandledColors DVDeviceGraphicsItem::handledColorType() const
 {
     return shared::ColorManager::HandledColors::Device;
+}
+
+void DVDeviceGraphicsItem::updateInternalItems(Qt::Alignment alignment)
+{
+    QRectF textRect = m_textItem->boundingRect();
+    switch (alignment) {
+    case Qt::AlignLeft:
+        textRect.moveCenter(kBoundingRect.center());
+        textRect.moveRight(kBoundingRect.left());
+        break;
+    case Qt::AlignRight:
+        textRect.moveCenter(kBoundingRect.center());
+        textRect.moveLeft(kBoundingRect.right());
+        break;
+    case Qt::AlignTop:
+        textRect.moveCenter(kBoundingRect.topRight());
+        textRect.moveLeft(kBoundingRect.right());
+        break;
+    case Qt::AlignBottom:
+        textRect.moveCenter(kBoundingRect.bottomRight());
+        textRect.moveLeft(kBoundingRect.right());
+        break;
+    default:
+        return;
+    }
+    m_textItem->setPos(textRect.topLeft());
 }
 
 } // namespace dve

@@ -1,7 +1,6 @@
 <DeploymentView>
-   
    <Node name="node_linux">
-      <Partition name="demo" coverage="FALSE" package="ocarina_processors_x86" cpu="x86_linux" cpu_platform="PLATFORM_NATIVE" cpu_classifier="ocarina_processors_x86::x86.linux" vp_name="" vp_platform="PLATFORM_NONE" vp_classifier="" ada_runtime="">
+      <Partition ada_runtime="" coverage="FALSE" cpu="x86_linux" cpu_classifier="ocarina_processors_x86::x86.linux" cpu_platform="PLATFORM_NATIVE" name="demo" package="ocarina_processors_x86" vp_classifier="" vp_name="" vp_platform="PLATFORM_NONE">
          <function>asw_gnc_con</function>
          <function>asw_gnc_gui</function>
          <function>asw_gnc_nav</function>
@@ -13,8 +12,5 @@
          <function>sl_dev_external</function>
          <function>sl_svc_datapool</function>
       </Partition>
-      
    </Node>
-   
-   
 </DeploymentView>

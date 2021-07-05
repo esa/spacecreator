@@ -25,6 +25,12 @@
 
 class QGraphicsItem;
 
+namespace shared {
+namespace ui {
+class TextItem;
+}
+}
+
 namespace dve {
 class DVNodeGraphicsItem;
 class DVConnectionGraphicsItem;
@@ -40,6 +46,7 @@ public:
         Type = UserType + static_cast<int>(dvm::DVObject::Type::Device)
     };
 
+    void init() override;
     dvm::DVDevice *entity() const override;
 
     int type() const override { return Type; }
@@ -57,6 +64,10 @@ protected:
     void rebuildLayout() override;
     void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget) override;
     shared::ColorManager::HandledColors handledColorType() const override;
+    void updateInternalItems(Qt::Alignment alignment) override;
+
+private:
+    shared::ui::TextItem *m_textItem { nullptr };
 };
 
 } // namespace dve
