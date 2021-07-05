@@ -62,7 +62,6 @@ void ObjectsTreeView::mouseMoveEvent(QMouseEvent *event)
             const QPixmap pix = index.data(AbstractVisualizationModel::CursorPixmapRole).value<QPixmap>();
             drag->setDragCursor(pix, Qt::DropAction::CopyAction);
             drag->exec(Qt::DropAction::CopyAction);
-            return;
         }
     }
     QTreeView::mouseMoveEvent(event);
