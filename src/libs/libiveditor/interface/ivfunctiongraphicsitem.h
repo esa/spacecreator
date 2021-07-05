@@ -52,9 +52,6 @@ public:
 protected:
     void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget) override;
 
-    void onManualResizeProgress(shared::ui::GripPoint *grip, const QPointF &from, const QPointF &to) override;
-    void onManualResizeFinish(
-            shared::ui::GripPoint *grip, const QPointF &pressedAt, const QPointF &releasedAt) override;
     void onManualMoveProgress(shared::ui::GripPoint *grip, const QPointF &from, const QPointF &to) override;
     void onManualMoveFinish(shared::ui::GripPoint *grip, const QPointF &pressedAt, const QPointF &releasedAt) override;
 
@@ -64,10 +61,6 @@ protected:
 
 protected Q_SLOTS:
     void applyColorScheme() override;
-
-private:
-    void layoutConnectionsOnMove(IVConnectionGraphicsItem::CollisionsPolicy collisionsPolicy);
-    void layoutConnectionsOnResize(IVConnectionGraphicsItem::CollisionsPolicy collisionsPolicy);
 
 private:
     static QPointer<QSvgRenderer> m_svgRenderer;

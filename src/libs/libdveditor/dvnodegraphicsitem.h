@@ -49,17 +49,6 @@ protected Q_SLOTS:
 protected:
     void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget) override;
     shared::ColorManager::HandledColors handledColorType() const override;
-    void onManualResizeProgress(
-            shared::ui::GripPoint *grip, const QPointF &pressedAt, const QPointF &releasedAt) override;
-    void onManualMoveProgress(
-            shared::ui::GripPoint *grip, const QPointF &pressedAt, const QPointF &releasedAt) override;
-    void onManualResizeFinish(
-            shared::ui::GripPoint *grip, const QPointF &pressedAt, const QPointF &releasedAt) override;
-    void onManualMoveFinish(shared::ui::GripPoint *grip, const QPointF &pressedAt, const QPointF &releasedAt) override;
-
-    void layoutConnectionsOnResize(shared::ui::VEConnectionGraphicsItem::CollisionsPolicy collisionsPolicy);
-    void layoutConnectionsOnMove(shared::ui::VEConnectionGraphicsItem::CollisionsPolicy collisionsPolicy);
-    void layoutInterfaces();
 };
 
 } // namespace dve

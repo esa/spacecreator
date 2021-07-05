@@ -20,6 +20,7 @@
 #include "commandsstackbase.h"
 #include "graphicsviewutils.h"
 #include "ui/grippointshandler.h"
+#include "veconnectionendpointgraphicsitem.h"
 #include "veobject.h"
 
 #include <QGraphicsScene>
@@ -28,7 +29,7 @@
 namespace shared {
 namespace ui {
 
-VERectGraphicsItem::VERectGraphicsItem(shared::VEObject *entity, QGraphicsItem *parentGraphicsItem)
+VERectGraphicsItem::VERectGraphicsItem(VEObject *entity, QGraphicsItem *parentGraphicsItem)
     : VEInteractiveObject(entity, parentGraphicsItem)
 {
     connect(this, &VEInteractiveObject::relocated, this, &VERectGraphicsItem::onGeometryChanged);
@@ -90,10 +91,9 @@ void VERectGraphicsItem::setRect(const QRectF &geometry)
 void VERectGraphicsItem::initGripPoints()
 {
     VEInteractiveObject::initGripPoints();
-    gripPointsHandler()->setUsedPoints({ ui::GripPoint::Location::Top, ui::GripPoint::Location::Left,
-            ui::GripPoint::Location::Bottom, ui::GripPoint::Location::Right, ui::GripPoint::Location::TopLeft,
-            ui::GripPoint::Location::BottomLeft, ui::GripPoint::Location::TopRight,
-            ui::GripPoint::Location::BottomRight });
+    gripPointsHandler()->setUsedPoints({ GripPoint::Location::Top, GripPoint::Location::Left,
+            GripPoint::Location::Bottom, GripPoint::Location::Right, GripPoint::Location::TopLeft,
+            GripPoint::Location::BottomLeft, GripPoint::Location::TopRight, GripPoint::Location::BottomRight });
 }
 
 void VERectGraphicsItem::updateFromEntity()
@@ -115,7 +115,7 @@ void VERectGraphicsItem::updateFromEntity()
 
 QList<QPair<shared::VEObject *, QVector<QPointF>>> VERectGraphicsItem::prepareChangeCoordinatesCommandParams() const
 {
-    QList<QPair<shared::VEObject *, QVector<QPointF>>> params;
+    QList<QPair<VEObject *, QVector<QPointF>>> params;
     const QVector<QPointF> sceneGeometry { sceneBoundingRect().topLeft(), sceneBoundingRect().bottomRight() };
     params.append({ entity(), sceneGeometry });
     params.append(VEInteractiveObject::prepareChangeCoordinatesCommandParams());
@@ -130,31 +130,97 @@ void VERectGraphicsItem::rebuildLayout()
     applyColorScheme();
 }
 
-void VERectGraphicsItem::onManualMoveProgress(
-        shared::ui::GripPoint *grip, const QPointF &pressedAt, const QPointF &releasedAt)
+void VERectGraphicsItem::onManualMoveProgress(GripPoint *grip, const QPointF &pressedAt, const QPointF &releasedAt)
 {
-    handleGeometryChanging(grip, pressedAt, releasedAt);
+    if (pressedAt == releasedAt)
+        return;
+
+    const QRectF rect = transformedRect(grip, pressedAt, releasedAt);
+    if (shared::graphicsviewutils::isBounded(this, rect)) {
+        handleGeometryChanging(grip, pressedAt, releasedAt);
+        layoutConnectionsOnMove(shared::ui::VEConnectionGraphicsItem::CollisionsPolicy::Ignore);
+    }
 }
 
-void VERectGraphicsItem::onManualResizeProgress(
-        shared::ui::GripPoint *grip, const QPointF &pressedAt, const QPointF &releasedAt)
+void VERectGraphicsItem::onManualResizeProgress(GripPoint *grip, const QPointF &pressedAt, const QPointF &releasedAt)
 {
-    handleGeometryChanging(grip, pressedAt, releasedAt);
+    if (pressedAt == releasedAt)
+        return;
+
+    const QRectF rect = transformedRect(grip, pressedAt, releasedAt);
+    if (shared::graphicsviewutils::isBounded(this, rect)) {
+        const QRectF entityRect = graphicsviewutils::rect(entity()->coordinates());
+        handleGeometryChanging(grip, pressedAt, releasedAt);
+        const QPointF delta = releasedAt - pressedAt;
+        for (auto child : childItems()) {
+            if (auto iface = qobject_cast<VEConnectionEndPointGraphicsItem *>(child->toGraphicsObject())) {
+                const VEObject *obj = iface->entity();
+                Q_ASSERT(obj);
+                if (!obj) {
+                    return;
+                }
+
+                const QPointF storedPos = graphicsviewutils::pos(obj->coordinates());
+                if (storedPos.isNull() || !grip) {
+                    iface->instantLayoutUpdate();
+                    continue;
+                }
+
+                const Qt::Alignment side = graphicsviewutils::getNearestSide(entityRect, storedPos);
+                const QRectF sceneRect = sceneBoundingRect();
+                const QPointF pos = graphicsviewutils::getSidePosition(sceneRect, storedPos, side);
+                iface->setPos(iface->parentItem()->mapFromScene(pos));
+            }
+        }
+        layoutConnectionsOnResize(shared::ui::VEConnectionGraphicsItem::CollisionsPolicy::Ignore);
+    }
 }
 
-void VERectGraphicsItem::onManualResizeFinish(
-        shared::ui::GripPoint *grip, const QPointF &pressedAt, const QPointF &releasedAt)
+void VERectGraphicsItem::layoutInterfaces()
 {
+    for (auto child : childItems()) {
+        if (auto endPoint = qobject_cast<VEConnectionEndPointGraphicsItem *>(child->toGraphicsObject())) {
+            endPoint->adjustItem();
+        }
+    }
+}
+
+void VERectGraphicsItem::onManualResizeFinish(GripPoint *grip, const QPointF &pressedAt, const QPointF &releasedAt)
+{
+    if (pressedAt == releasedAt)
+        return;
+
     handleGeometryChanged(grip, pressedAt, releasedAt);
+
+    if (shared::graphicsviewutils::isBounded(this, sceneBoundingRect())
+            && !shared::graphicsviewutils::isCollided(this, sceneBoundingRect())) {
+        layoutInterfaces();
+        layoutConnectionsOnResize(shared::ui::VEConnectionGraphicsItem::CollisionsPolicy::PartialRebuild);
+        updateEntity();
+    } else { // Fallback to previous geometry in case colliding with items at the same level
+        updateFromEntity();
+        layoutConnectionsOnResize(shared::ui::VEConnectionGraphicsItem::CollisionsPolicy::Ignore);
+    }
 }
 
-void VERectGraphicsItem::onManualMoveFinish(
-        shared::ui::GripPoint *grip, const QPointF &pressedAt, const QPointF &releasedAt)
+void VERectGraphicsItem::onManualMoveFinish(GripPoint *grip, const QPointF &pressedAt, const QPointF &releasedAt)
 {
+    if (pressedAt == releasedAt)
+        return;
+
     handleGeometryChanged(grip, pressedAt, releasedAt);
+
+    if (shared::graphicsviewutils::isBounded(this, sceneBoundingRect())
+            && !shared::graphicsviewutils::isCollided(this, sceneBoundingRect())) {
+        layoutConnectionsOnMove(shared::ui::VEConnectionGraphicsItem::CollisionsPolicy::PartialRebuild);
+        updateEntity();
+    } else { // Fallback to previous geometry in case colliding with items at the same level
+        updateFromEntity();
+        layoutConnectionsOnMove(shared::ui::VEConnectionGraphicsItem::CollisionsPolicy::Ignore);
+    }
 }
 
-QRectF VERectGraphicsItem::transformedRect(shared::ui::GripPoint *grip, const QPointF &from, const QPointF &to)
+QRectF VERectGraphicsItem::transformedRect(GripPoint *grip, const QPointF &from, const QPointF &to)
 {
     const QPointF shift = QPointF(to - from);
     QRectF rect = sceneBoundingRect();
@@ -166,39 +232,39 @@ QRectF VERectGraphicsItem::transformedRect(shared::ui::GripPoint *grip, const QP
     }
 
     switch (grip->location()) {
-    case shared::ui::GripPoint::Left: {
+    case GripPoint::Left: {
         const qreal left = rect.left() + shift.x();
         rect.setLeft(left);
     } break;
-    case shared::ui::GripPoint::Top: {
+    case GripPoint::Top: {
         const qreal top = rect.top() + shift.y();
         rect.setTop(top);
     } break;
-    case shared::ui::GripPoint::Right: {
+    case GripPoint::Right: {
         const qreal right = rect.right() + shift.x();
         rect.setRight(right);
     } break;
-    case shared::ui::GripPoint::Bottom: {
+    case GripPoint::Bottom: {
         const qreal bottom = rect.bottom() + shift.y();
         rect.setBottom(bottom);
     } break;
-    case shared::ui::GripPoint::TopLeft: {
+    case GripPoint::TopLeft: {
         const QPointF topLeft = rect.topLeft() + shift;
         rect.setTopLeft(topLeft);
     } break;
-    case shared::ui::GripPoint::TopRight: {
+    case GripPoint::TopRight: {
         const QPointF topRight = rect.topRight() + shift;
         rect.setTopRight(topRight);
     } break;
-    case shared::ui::GripPoint::BottomLeft: {
+    case GripPoint::BottomLeft: {
         const QPointF bottomLeft = rect.bottomLeft() + shift;
         rect.setBottomLeft(bottomLeft);
     } break;
-    case shared::ui::GripPoint::BottomRight: {
+    case GripPoint::BottomRight: {
         const QPointF bottomRight = rect.bottomRight() + shift;
         rect.setBottomRight(bottomRight);
     } break;
-    case shared::ui::GripPoint::Center: {
+    case GripPoint::Center: {
         rect.translate(shift);
     } break;
     default:
@@ -209,8 +275,7 @@ QRectF VERectGraphicsItem::transformedRect(shared::ui::GripPoint *grip, const QP
     return rect.normalized();
 }
 
-void VERectGraphicsItem::handleGeometryChanged(
-        shared::ui::GripPoint *grip, const QPointF &pressedAt, const QPointF &releasedAt)
+void VERectGraphicsItem::handleGeometryChanged(GripPoint *grip, const QPointF &pressedAt, const QPointF &releasedAt)
 {
     Q_UNUSED(grip)
 
@@ -224,8 +289,7 @@ void VERectGraphicsItem::handleGeometryChanged(
         updateFromEntity();
 }
 
-void VERectGraphicsItem::handleGeometryChanging(
-        shared::ui::GripPoint *grip, const QPointF &pressedAt, const QPointF &releasedAt)
+void VERectGraphicsItem::handleGeometryChanging(GripPoint *grip, const QPointF &pressedAt, const QPointF &releasedAt)
 {
     if (pressedAt == releasedAt)
         return;
@@ -301,5 +365,29 @@ bool VERectGraphicsItem::itemNeedsToBeRelayout() const
     return graphicsviewutils::isCollided(this, currentRect) || !graphicsviewutils::isBounded(this, currentRect);
 }
 
+void VERectGraphicsItem::layoutConnectionsOnResize(VEConnectionGraphicsItem::CollisionsPolicy collisionsPolicy)
+{
+    /// Changing inner and outer connections bound to current item
+    for (const auto item : childItems()) {
+        if (auto iface = qobject_cast<VEConnectionEndPointGraphicsItem *>(item->toGraphicsObject())) {
+            VEConnectionGraphicsItem::layoutInterfaceConnections(
+                    iface, VEConnectionGraphicsItem::LayoutPolicy::Scaling, collisionsPolicy, true);
+        } else if (auto connection = qobject_cast<VEConnectionGraphicsItem *>(item->toGraphicsObject())) {
+            if (connection->sourceItem() != this && connection->targetItem() != this)
+                connection->layout();
+        }
+    }
+}
+
+void VERectGraphicsItem::layoutConnectionsOnMove(VEConnectionGraphicsItem::CollisionsPolicy collisionsPolicy)
+{
+    /// Changing outer connections only cause inner stay unchanged as children of current item
+    for (const auto item : childItems()) {
+        if (auto iface = qobject_cast<VEConnectionEndPointGraphicsItem *>(item->toGraphicsObject())) {
+            VEConnectionGraphicsItem::layoutInterfaceConnections(
+                    iface, VEConnectionGraphicsItem::LayoutPolicy::Scaling, collisionsPolicy, false);
+        }
+    }
+}
 }
 }

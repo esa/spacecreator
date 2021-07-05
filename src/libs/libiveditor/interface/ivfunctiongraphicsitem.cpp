@@ -110,98 +110,22 @@ void IVFunctionGraphicsItem::paint(QPainter *painter, const QStyleOptionGraphics
     painter->restore();
 }
 
-void IVFunctionGraphicsItem::onManualResizeProgress(
-        shared::ui::GripPoint *grip, const QPointF &pressedAt, const QPointF &releasedAt)
-{
-    if (pressedAt == releasedAt)
-        return;
-
-    const QRectF rect = transformedRect(grip, pressedAt, releasedAt);
-    if (shared::graphicsviewutils::isBounded(this, rect)) {
-        IVFunctionTypeGraphicsItem::onManualResizeProgress(grip, pressedAt, releasedAt);
-        layoutConnectionsOnResize(IVConnectionGraphicsItem::CollisionsPolicy::Ignore);
-    }
-}
-
 void IVFunctionGraphicsItem::onManualMoveProgress(
         shared::ui::GripPoint *grip, const QPointF &pressedAt, const QPointF &releasedAt)
 {
     if (isRootItem())
         return;
 
-    if (pressedAt == releasedAt)
-        return;
-
-    const QRectF rect = transformedRect(grip, pressedAt, releasedAt);
-    if (shared::graphicsviewutils::isBounded(this, rect)) {
-        IVFunctionTypeGraphicsItem::onManualMoveProgress(grip, pressedAt, releasedAt);
-        layoutConnectionsOnMove(IVConnectionGraphicsItem::CollisionsPolicy::Ignore);
-    }
-}
-
-void IVFunctionGraphicsItem::onManualResizeFinish(
-        shared::ui::GripPoint *grip, const QPointF &pressedAt, const QPointF &releasedAt)
-{
-    Q_UNUSED(grip)
-
-    if (pressedAt == releasedAt)
-        return;
-
-    if (shared::graphicsviewutils::isBounded(this, sceneBoundingRect())
-            && !shared::graphicsviewutils::isCollided(this, sceneBoundingRect())) {
-        layoutInterfaces();
-        layoutConnectionsOnResize(IVConnectionGraphicsItem::CollisionsPolicy::PartialRebuild);
-        updateEntity();
-    } else { // Fallback to previous geometry in case colliding with items at the same level
-        updateFromEntity();
-        layoutConnectionsOnResize(IVConnectionGraphicsItem::CollisionsPolicy::Ignore);
-    }
+    IVFunctionTypeGraphicsItem::onManualMoveProgress(grip, pressedAt, releasedAt);
 }
 
 void IVFunctionGraphicsItem::onManualMoveFinish(
         shared::ui::GripPoint *grip, const QPointF &pressedAt, const QPointF &releasedAt)
 {
-    Q_UNUSED(grip)
-
     if (isRootItem())
         return;
 
-    if (pressedAt == releasedAt)
-        return;
-
-    if (shared::graphicsviewutils::isBounded(this, sceneBoundingRect())
-            && !shared::graphicsviewutils::isCollided(this, sceneBoundingRect())) {
-        layoutConnectionsOnMove(IVConnectionGraphicsItem::CollisionsPolicy::PartialRebuild);
-        updateEntity();
-    } else { // Fallback to previous geometry in case colliding with items at the same level
-        updateFromEntity();
-        layoutConnectionsOnMove(IVConnectionGraphicsItem::CollisionsPolicy::Ignore);
-    }
-}
-
-void IVFunctionGraphicsItem::layoutConnectionsOnResize(IVConnectionGraphicsItem::CollisionsPolicy collisionsPolicy)
-{
-    /// Changing inner and outer connections bound to current function item
-    for (const auto item : childItems()) {
-        if (auto iface = qgraphicsitem_cast<IVInterfaceGraphicsItem *>(item)) {
-            IVConnectionGraphicsItem::layoutInterfaceConnections(
-                    iface, IVConnectionGraphicsItem::LayoutPolicy::Scaling, collisionsPolicy, true);
-        } else if (auto connection = qgraphicsitem_cast<IVConnectionGraphicsItem *>(item)) {
-            if (connection->sourceItem() != this && connection->targetItem() != this)
-                connection->layout();
-        }
-    }
-}
-
-void IVFunctionGraphicsItem::layoutConnectionsOnMove(IVConnectionGraphicsItem::CollisionsPolicy collisionsPolicy)
-{
-    /// Changing outer connections only cause inner stay unchanged as children of current item
-    for (const auto item : childItems()) {
-        if (auto iface = qgraphicsitem_cast<IVInterfaceGraphicsItem *>(item)) {
-            IVConnectionGraphicsItem::layoutInterfaceConnections(
-                    iface, IVConnectionGraphicsItem::LayoutPolicy::Scaling, collisionsPolicy, false);
-        }
-    }
+    IVFunctionTypeGraphicsItem::onManualMoveFinish(grip, pressedAt, releasedAt);
 }
 
 void IVFunctionGraphicsItem::prepareTextRect(QRectF &textRect, const QRectF &targetTextRect) const

@@ -17,6 +17,7 @@
 
 #pragma once
 
+#include "veconnectiongraphicsitem.h"
 #include "veinteractiveobject.h"
 
 #include <QPointer>
@@ -31,13 +32,13 @@ class VERectGraphicsItem : public VEInteractiveObject
 {
     Q_OBJECT
 public:
-    explicit VERectGraphicsItem(shared::VEObject *entity, QGraphicsItem *parentGraphicsItem = nullptr);
+    explicit VERectGraphicsItem(VEObject *entity, QGraphicsItem *parentGraphicsItem = nullptr);
     virtual QSizeF minimalSize() const;
 
     void setRect(const QRectF &geometry);
 
     void updateFromEntity() override;
-    QList<QPair<shared::VEObject *, QVector<QPointF>>> prepareChangeCoordinatesCommandParams() const override;
+    QList<QPair<VEObject *, QVector<QPointF>>> prepareChangeCoordinatesCommandParams() const override;
 
     /// PUBLIC FOR TESTING PURPOSE, MOVE TO PRIVATE
     QRectF nestedItemsSceneBoundingRect() const;
@@ -47,18 +48,21 @@ public:
 protected:
     void rebuildLayout() override;
     void initGripPoints() override;
-    void onManualMoveProgress(shared::ui::GripPoint *grip, const QPointF &from, const QPointF &to) override;
-    void onManualResizeProgress(shared::ui::GripPoint *grip, const QPointF &from, const QPointF &to) override;
-    void onManualResizeFinish(
-            shared::ui::GripPoint *grip, const QPointF &pressedAt, const QPointF &releasedAt) override;
-    void onManualMoveFinish(shared::ui::GripPoint *grip, const QPointF &pressedAt, const QPointF &releasedAt) override;
+    void onManualMoveProgress(GripPoint *grip, const QPointF &from, const QPointF &to) override;
+    void onManualResizeProgress(GripPoint *grip, const QPointF &from, const QPointF &to) override;
+    void onManualResizeFinish(GripPoint *grip, const QPointF &pressedAt, const QPointF &releasedAt) override;
+    void onManualMoveFinish(GripPoint *grip, const QPointF &pressedAt, const QPointF &releasedAt) override;
 
-    QRectF transformedRect(shared::ui::GripPoint *grip, const QPointF &from, const QPointF &to);
+    QRectF transformedRect(GripPoint *grip, const QPointF &from, const QPointF &to);
 
     bool setGeometry(const QRectF &sceneGeometry);
+    void layoutInterfaces();
 
-    void handleGeometryChanged(shared::ui::GripPoint *grip, const QPointF &from, const QPointF &releasedAt);
-    void handleGeometryChanging(shared::ui::GripPoint *grip, const QPointF &from, const QPointF &releasedAt);
+    void handleGeometryChanged(GripPoint *grip, const QPointF &from, const QPointF &releasedAt);
+    void handleGeometryChanging(GripPoint *grip, const QPointF &from, const QPointF &releasedAt);
+
+    void layoutConnectionsOnResize(VEConnectionGraphicsItem::CollisionsPolicy collisionsPolicy);
+    void layoutConnectionsOnMove(VEConnectionGraphicsItem::CollisionsPolicy collisionsPolicy);
 
 private Q_SLOTS:
     void onGeometryChanged();
@@ -67,6 +71,6 @@ private:
     QSet<VEInteractiveObject *> m_collidedItems;
 };
 
-}
+} // namespace ui
 
-}
+} // namespace shared

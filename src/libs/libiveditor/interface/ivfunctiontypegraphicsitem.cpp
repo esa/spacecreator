@@ -207,56 +207,6 @@ void IVFunctionTypeGraphicsItem::updateText()
     }
 }
 
-void IVFunctionTypeGraphicsItem::layoutInterfaces()
-{
-    for (auto child : childItems()) {
-        if (child->type() == IVInterfaceGraphicsItem::Type) {
-            if (auto iObj = qgraphicsitem_cast<IVInterfaceGraphicsItem *>(child)) {
-                iObj->adjustItem();
-            }
-        }
-    }
-}
-
-void IVFunctionTypeGraphicsItem::onManualResizeProgress(
-        shared::ui::GripPoint *grip, const QPointF &from, const QPointF &to)
-{
-    const QRectF rect = shared::graphicsviewutils::rect(entity()->coordinates());
-
-    shared::ui::VERectGraphicsItem::onManualResizeProgress(grip, from, to);
-    const QPointF delta = to - from;
-    if (delta.isNull()) {
-        return;
-    }
-    for (auto child : childItems()) {
-        if (auto iface = qgraphicsitem_cast<IVInterfaceGraphicsItem *>(child)) {
-            const ivm::IVInterface *obj = iface->entity();
-            Q_ASSERT(obj);
-            if (!obj) {
-                return;
-            }
-
-            const QPointF storedPos = shared::graphicsviewutils::pos(obj->coordinates());
-            if (storedPos.isNull() || !grip) {
-                iface->instantLayoutUpdate();
-                continue;
-            }
-
-            const Qt::Alignment side = shared::graphicsviewutils::getNearestSide(rect, storedPos);
-            const QRectF sceneRect = sceneBoundingRect();
-            const QPointF pos = shared::graphicsviewutils::getSidePosition(sceneRect, storedPos, side);
-            iface->setPos(iface->parentItem()->mapFromScene(pos));
-        }
-    }
-}
-
-void IVFunctionTypeGraphicsItem::onManualResizeFinish(
-        shared::ui::GripPoint *grip, const QPointF &from, const QPointF &to)
-{
-    layoutInterfaces();
-    shared::ui::VERectGraphicsItem::onManualResizeFinish(grip, from, to);
-}
-
 QString IVFunctionTypeGraphicsItem::prepareTooltip() const
 {
     const QString title = uniteNames<ivm::IVFunctionType *>({ entity() }, QString());
