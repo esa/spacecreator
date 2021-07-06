@@ -137,7 +137,7 @@ void VERectGraphicsItem::onManualMoveProgress(GripPoint *grip, const QPointF &pr
 
     const QRectF rect = transformedRect(grip, pressedAt, releasedAt);
     if (shared::graphicsviewutils::isBounded(this, rect)) {
-        handleGeometryChanging(grip, pressedAt, releasedAt);
+        setRect(rect);
         layoutConnectionsOnMove(shared::ui::VEConnectionGraphicsItem::CollisionsPolicy::Ignore);
     }
 }
@@ -149,8 +149,8 @@ void VERectGraphicsItem::onManualResizeProgress(GripPoint *grip, const QPointF &
 
     const QRectF rect = transformedRect(grip, pressedAt, releasedAt);
     if (shared::graphicsviewutils::isBounded(this, rect)) {
+        setRect(rect);
         const QRectF entityRect = graphicsviewutils::rect(entity()->coordinates());
-        handleGeometryChanging(grip, pressedAt, releasedAt);
         const QPointF delta = releasedAt - pressedAt;
         for (auto child : childItems()) {
             if (auto iface = qobject_cast<VEConnectionEndPointGraphicsItem *>(child->toGraphicsObject())) {
@@ -190,8 +190,6 @@ void VERectGraphicsItem::onManualResizeFinish(GripPoint *grip, const QPointF &pr
     if (pressedAt == releasedAt)
         return;
 
-    handleGeometryChanged(grip, pressedAt, releasedAt);
-
     if (shared::graphicsviewutils::isBounded(this, sceneBoundingRect())
             && !shared::graphicsviewutils::isCollided(this, sceneBoundingRect())) {
         layoutInterfaces();
@@ -199,6 +197,11 @@ void VERectGraphicsItem::onManualResizeFinish(GripPoint *grip, const QPointF &pr
         updateEntity();
     } else { // Fallback to previous geometry in case colliding with items at the same level
         updateFromEntity();
+        for (auto child : childItems()) {
+            if (auto iface = qobject_cast<VEConnectionEndPointGraphicsItem *>(child->toGraphicsObject())) {
+                iface->updateFromEntity();
+            }
+        }
         layoutConnectionsOnResize(shared::ui::VEConnectionGraphicsItem::CollisionsPolicy::Ignore);
     }
 }
@@ -207,8 +210,6 @@ void VERectGraphicsItem::onManualMoveFinish(GripPoint *grip, const QPointF &pres
 {
     if (pressedAt == releasedAt)
         return;
-
-    handleGeometryChanged(grip, pressedAt, releasedAt);
 
     if (shared::graphicsviewutils::isBounded(this, sceneBoundingRect())
             && !shared::graphicsviewutils::isCollided(this, sceneBoundingRect())) {
@@ -273,32 +274,6 @@ QRectF VERectGraphicsItem::transformedRect(GripPoint *grip, const QPointF &from,
     }
 
     return rect.normalized();
-}
-
-void VERectGraphicsItem::handleGeometryChanged(GripPoint *grip, const QPointF &pressedAt, const QPointF &releasedAt)
-{
-    Q_UNUSED(grip)
-
-    if (pressedAt == releasedAt)
-        return;
-
-    if (graphicsviewutils::isBounded(this, sceneBoundingRect())
-            && !graphicsviewutils::isCollided(this, sceneBoundingRect()))
-        updateEntity();
-    else // Fallback to previous geometry in case colliding with items at the same level
-        updateFromEntity();
-}
-
-void VERectGraphicsItem::handleGeometryChanging(GripPoint *grip, const QPointF &pressedAt, const QPointF &releasedAt)
-{
-    if (pressedAt == releasedAt)
-        return;
-
-    const QRectF rect = transformedRect(grip, pressedAt, releasedAt);
-    if (rect.width() >= minimalSize().width() && rect.height() >= minimalSize().height()
-            && graphicsviewutils::isBounded(this, rect)) {
-        setRect(rect);
-    }
 }
 
 QRectF VERectGraphicsItem::nestedItemsSceneBoundingRect() const

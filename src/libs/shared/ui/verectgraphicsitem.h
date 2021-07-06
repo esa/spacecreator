@@ -58,9 +58,6 @@ protected:
     bool setGeometry(const QRectF &sceneGeometry);
     void layoutInterfaces();
 
-    void handleGeometryChanged(GripPoint *grip, const QPointF &from, const QPointF &releasedAt);
-    void handleGeometryChanging(GripPoint *grip, const QPointF &from, const QPointF &releasedAt);
-
     void layoutConnectionsOnResize(VEConnectionGraphicsItem::CollisionsPolicy collisionsPolicy);
     void layoutConnectionsOnMove(VEConnectionGraphicsItem::CollisionsPolicy collisionsPolicy);
 
