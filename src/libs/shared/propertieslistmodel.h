@@ -70,6 +70,7 @@ protected:
     void updateRows(const QList<shared::PropertyTemplate *> &templates);
 
     void invalidateAttributes(const QString &attrName);
+    bool isValueValid(const QString &name, const QString &value) const;
 
 private:
     struct RowData {

@@ -144,10 +144,12 @@ void IVFunction::reflectAttr(const QString &attrName)
     switch (attr) {
     case meta::Props::Token::is_type:
     case meta::Props::Token::instance_of:
-    case meta::Props::Token::name:
     case meta::Props::Token::RootCoordinates:
     case meta::Props::Token::InnerCoordinates:
     case meta::Props::Token::coordinates:
+        break;
+    case meta::Props::Token::name:
+        setEntityAttribute(meta::Props::token(meta::Props::Token::instance_of), d->m_fnType->title());
         break;
     case meta::Props::Token::Unknown: {
         reflectAttrs(d->m_fnType->entityAttributes());

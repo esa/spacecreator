@@ -18,8 +18,8 @@
 
 #pragma once
 
-#include "undocommand.h"
 #include "common.h"
+#include "undocommand.h"
 
 #include <QPointer>
 
@@ -36,7 +36,7 @@ class CmdFunctionAttrChange : public shared::UndoCommand
 {
     Q_OBJECT
 public:
-    explicit CmdFunctionAttrChange(ivm::IVObject *entity, const QVariantHash &attrs);
+    explicit CmdFunctionAttrChange(ivm::IVFunction *entity, const QVariantHash &attrs);
     ~CmdFunctionAttrChange() override;
 
     void redo() override;
@@ -47,8 +47,7 @@ Q_SIGNALS:
     void nameChanged(ivm::IVObject *entity, const QString &oldName, shared::UndoCommand *command);
 
 private:
-    QPointer<ivm::IVObject> m_entity;
-    ivm::IVFunction *m_function { nullptr };
+    QPointer<ivm::IVFunction> m_entity;
 
     const QVariantHash m_newAttrs;
     const QVariantHash m_oldAttrs;

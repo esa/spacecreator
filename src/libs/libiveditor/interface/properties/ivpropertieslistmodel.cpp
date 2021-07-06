@@ -17,6 +17,8 @@
 
 #include "ivpropertieslistmodel.h"
 
+#include "interface/commands/cmdfunctionattrchange.h"
+#include "interface/commands/cmdifaceattrchange.h"
 #include "ivcommonprops.h"
 #include "ivfunction.h"
 #include "ivinterface.h"
@@ -35,6 +37,34 @@ ivm::meta::Props::Token IVPropertiesListModel::tokenFromIndex(const QModelIndex 
         return ivm::meta::Props::Token::Unknown;
 
     return ivm::meta::Props::token(tokenNameFromIndex(index));
+}
+
+QPair<QString, QVariant> IVPropertiesListModel::prepareDataForUpdate(
+        const QModelIndex &index, const QVariant &value, int role) const
+{
+    if (!index.isValid())
+        return {};
+
+    const QVariant currentValue = data(index, role);
+    if (currentValue == value) {
+        if (role != DataRole || !currentValue.isNull()) {
+            return {};
+        }
+    }
+
+    if ((role == DataRole || role == Qt::EditRole) && index.column() == Column::Value) {
+        const QString &name = tokenNameFromIndex(index);
+        if (m_dataObject->entityAttributeValue(name) == value) {
+            return {};
+        }
+
+        if (!isValueValid(name, value.toString())) {
+            return {};
+        }
+
+        return { name, value };
+    }
+    return {};
 }
 
 IVPropertiesListModel::IVPropertiesListModel(
@@ -101,6 +131,20 @@ QVariant FunctionPropertiesListModel::data(const QModelIndex &index, int role) c
     return PropertiesListModel::data(index, role);
 }
 
+bool FunctionPropertiesListModel::setData(const QModelIndex &index, const QVariant &value, int role)
+{
+    const QPair<QString, QVariant> data = prepareDataForUpdate(index, value, role);
+    if (!data.first.isEmpty()) {
+        return m_cmdMacro->push(new cmd::CmdFunctionAttrChange(entity(), { { data.first, data.second } }));
+    }
+    return false;
+}
+
+ivm::IVFunction *FunctionPropertiesListModel::entity() const
+{
+    return qobject_cast<ivm::IVFunction *>(m_dataObject);
+}
+
 bool FunctionPropertiesListModel::isEditable(const QModelIndex &index) const
 {
     if (!entity() || !index.isValid() || !PropertiesListModel::isEditable(index))
@@ -151,6 +195,20 @@ QVariant InterfacePropertiesListModel::data(const QModelIndex &index, int role) 
         }
     }
     return PropertiesListModel::data(index, role);
+}
+
+bool InterfacePropertiesListModel::setData(const QModelIndex &index, const QVariant &value, int role)
+{
+    const QPair<QString, QVariant> data = prepareDataForUpdate(index, value, role);
+    if (!data.first.isEmpty()) {
+        return m_cmdMacro->push(new cmd::CmdIfaceAttrChange(entity(), data.first, data.second));
+    }
+    return false;
+}
+
+ivm::IVInterface *InterfacePropertiesListModel::entity() const
+{
+    return qobject_cast<ivm::IVInterface *>(m_dataObject);
 }
 
 bool InterfacePropertiesListModel::isEditable(const QModelIndex &index) const

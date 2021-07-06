@@ -128,6 +128,19 @@ void PropertiesListModel::invalidateAttributes(const QString &propName)
     setDataObject(m_dataObject);
 }
 
+bool PropertiesListModel::isValueValid(const QString &name, const QString &value) const
+{
+    if (shared::PropertyTemplate *propTemplate = m_propTemplatesConfig->propertyTemplateForObject(m_dataObject, name)) {
+        const QString valuePattern = propTemplate->valueValidatorPattern();
+        if (!valuePattern.isEmpty()) {
+            const QRegularExpression rx(valuePattern);
+            const QRegularExpressionMatch match = rx.match(value);
+            return match.capturedLength() == value.length();
+        }
+    }
+    return true;
+}
+
 void PropertiesListModel::updateRows(const QList<shared::PropertyTemplate *> &templates)
 {
     auto init = [this](const QStringList &keys) {
@@ -230,19 +243,6 @@ bool PropertiesListModel::setData(const QModelIndex &index, const QVariant &valu
 
     if (role == DataRole || role == Qt::EditRole) {
         const QString &name = tokenNameFromIndex(index);
-        auto isValueValid = [this](const QString &name, const QString &value) {
-            if (shared::PropertyTemplate *propTemplate =
-                            m_propTemplatesConfig->propertyTemplateForObject(m_dataObject, name)) {
-                const QString valuePattern = propTemplate->valueValidatorPattern();
-                if (!valuePattern.isEmpty()) {
-                    const QRegularExpression rx(valuePattern);
-                    const QRegularExpressionMatch match = rx.match(value);
-                    return match.capturedLength() == value.length();
-                }
-            }
-            return true;
-        };
-
         if (isAttr(index) && index.column() == Column::Value) {
             if (m_dataObject->entityAttributeValue(name) == value) {
                 return false;

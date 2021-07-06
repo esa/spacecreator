@@ -18,6 +18,8 @@
 #pragma once
 
 #include "commandsstack.h"
+#include "ivfunction.h"
+#include "ivinterface.h"
 #include "ivobject.h"
 #include "propertieslistmodel.h"
 
@@ -41,6 +43,9 @@ public:
 
     ivm::IVObject *entity() const override;
     static ivm::meta::Props::Token tokenFromIndex(const QModelIndex &index);
+
+protected:
+    QPair<QString, QVariant> prepareDataForUpdate(const QModelIndex &index, const QVariant &value, int role) const;
 };
 
 class FunctionPropertiesListModel : public IVPropertiesListModel
@@ -50,6 +55,8 @@ public:
             cmd::CommandsStack::Macro *macro, shared::PropertyTemplateConfig *dynPropConfig, QObject *parent = nullptr);
 
     QVariant data(const QModelIndex &index, int role) const override;
+    bool setData(const QModelIndex &index, const QVariant &value, int role = DataRole) override;
+    ivm::IVFunction *entity() const override;
 
 protected:
     bool isEditable(const QModelIndex &index) const override;
@@ -62,6 +69,8 @@ public:
             cmd::CommandsStack::Macro *macro, shared::PropertyTemplateConfig *dynPropConfig, QObject *parent = nullptr);
 
     QVariant data(const QModelIndex &index, int role) const override;
+    bool setData(const QModelIndex &index, const QVariant &value, int role = DataRole) override;
+    ivm::IVInterface *entity() const override;
 
 protected:
     bool isEditable(const QModelIndex &index) const override;

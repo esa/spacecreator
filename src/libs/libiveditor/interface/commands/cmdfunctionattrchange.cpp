@@ -41,10 +41,9 @@ static inline QVariantHash getCurrentAttributes(ivm::IVObject *entity, const QVa
     return result;
 }
 
-CmdFunctionAttrChange::CmdFunctionAttrChange(ivm::IVObject *entity, const QVariantHash &attrs)
+CmdFunctionAttrChange::CmdFunctionAttrChange(ivm::IVFunction *entity, const QVariantHash &attrs)
     : shared::UndoCommand()
     , m_entity(entity)
-    , m_function(m_entity ? m_entity->as<ivm::IVFunction *>() : nullptr)
     , m_newAttrs(attrs)
     , m_oldAttrs(getCurrentAttributes(entity, attrs))
 {
@@ -101,10 +100,7 @@ void CmdFunctionAttrChange::setAttrs(const QVariantHash &attrs, bool isRedo)
         const QVariant val = it.value();
         switch (ivm::meta::Props::token(name)) {
         case ivm::meta::Props::Token::instance_of: {
-            if (m_function)
-                handleFunctionInstanceOf(val, isRedo);
-            else
-                m_entity->setEntityAttribute(name, val);
+            handleFunctionInstanceOf(val, isRedo);
             break;
         }
         default: {
@@ -117,15 +113,15 @@ void CmdFunctionAttrChange::setAttrs(const QVariantHash &attrs, bool isRedo)
 
 ivm::IVFunctionType *CmdFunctionAttrChange::functionTypeByName(const QString &name) const
 {
-    if (name.isEmpty() || !m_function || !m_function->model())
+    if (name.isEmpty() || !m_entity || !m_entity->model())
         return nullptr;
 
-    return m_function->model()->getAvailableFunctionTypes(m_function).value(name, nullptr);
+    return m_entity->model()->getAvailableFunctionTypes(m_entity).value(name, nullptr);
 }
 
 void CmdFunctionAttrChange::handleFunctionInstanceOf(const QVariant &attr, bool isRedo)
 {
-    const ivm::IVFunctionType *oldInstanceOf = m_function->instanceOf();
+    const ivm::IVFunctionType *oldInstanceOf = m_entity->instanceOf();
     ivm::IVFunctionType *newInstanceOf = functionTypeByName(attr.toString());
     if (oldInstanceOf == newInstanceOf)
         return;
@@ -145,8 +141,8 @@ void CmdFunctionAttrChange::handleFunctionInstanceOf(const QVariant &attr, bool 
     if (newInstanceOf)
         performCommands(commandsSetNewFunctionType(newInstanceOf));
 
-    m_function->setInstanceOf(newInstanceOf);
-    m_function->setEntityAttribute(ivm::meta::Props::token(ivm::meta::Props::Token::instance_of), attr);
+    m_entity->setInstanceOf(newInstanceOf);
+    m_entity->setEntityAttribute(ivm::meta::Props::token(ivm::meta::Props::Token::instance_of), attr);
 }
 
 Commands getCommands(const ivm::IVFunctionType *fnType, const CommandsStorage &cmdStorage,
@@ -192,7 +188,7 @@ void CmdFunctionAttrChange::prepareUnsetFunctionTypeCommands(const ivm::IVFuncti
         return;
 
     Commands &cmdStorage = m_cmdUnset[fnTypeId];
-    const QVector<ivm::IVInterface *> &fnIfaces = m_function->interfaces();
+    const QVector<ivm::IVInterface *> &fnIfaces = m_entity->interfaces();
     const QVector<ivm::IVInterface *> &fnTypeIfaces = fnType->interfaces();
     QList<QPointer<ivm::IVObject>> entities;
     for (auto fnTypeIface : fnTypeIfaces) {
@@ -206,7 +202,7 @@ void CmdFunctionAttrChange::prepareUnsetFunctionTypeCommands(const ivm::IVFuncti
         }
     }
     if (!entities.isEmpty()) {
-        auto cmdRm = new cmd::CmdEntitiesRemove(entities, m_function->model());
+        auto cmdRm = new cmd::CmdEntitiesRemove(entities, m_entity->model());
         cmdStorage.append(cmdRm);
     }
 }
@@ -223,11 +219,11 @@ void CmdFunctionAttrChange::prepareSetFunctionTypeCommands(const ivm::IVFunction
     Commands &cmdStorage = m_cmdSet[fnTypeId];
     const QVector<ivm::IVInterface *> &fnTypeIfaces = fnType->interfaces();
     for (auto fnTypeIface : fnTypeIfaces) {
-        if (ivm::IVInterface *existingIface = ivm::utils::findExistingClone(m_function, fnTypeIface)) {
+        if (ivm::IVInterface *existingIface = ivm::utils::findExistingClone(m_entity, fnTypeIface)) {
             existingIface->setCloneOrigin(fnTypeIface);
         } else {
             const ivm::IVInterface::CreationInfo clone =
-                    ivm::IVInterface::CreationInfo::cloneIface(fnTypeIface, m_function);
+                    ivm::IVInterface::CreationInfo::cloneIface(fnTypeIface, m_entity);
             auto cmdRm = new cmd::CmdInterfaceItemCreate(clone);
             cmdStorage.append(cmdRm);
         }

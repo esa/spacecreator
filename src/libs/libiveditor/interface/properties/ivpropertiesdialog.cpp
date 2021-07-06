@@ -88,6 +88,8 @@ void IVPropertiesDialog::init()
     if (!dataObject())
         return;
 
+    shared::PropertiesDialog::init();
+
     switch (dataObject()->type()) {
     case ivm::IVObject::Type::FunctionType:
     case ivm::IVObject::Type::Function: {
@@ -113,8 +115,6 @@ void IVPropertiesDialog::init()
     default:
         break;
     }
-
-    shared::PropertiesDialog::init();
 }
 
 ivm::IVObject *IVPropertiesDialog::dataObject() const
