@@ -8,6 +8,8 @@ target_sources(${APP_NAME} PRIVATE
     mainwindow.cpp
     mainwindow.h
     mainwindow.ui
+    mscproject.cpp
+    mscproject.h
 )
 
 target_link_libraries(${APP_NAME} PUBLIC

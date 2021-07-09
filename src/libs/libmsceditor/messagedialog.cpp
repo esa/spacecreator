@@ -18,13 +18,13 @@
 #include "messagedialog.h"
 
 #include "asn1editor.h"
+#include "asn1systemchecks.h"
 #include "asn1valueparser.h"
 #include "chartlayoutmanager.h"
 #include "commands/cmdentitynamechange.h"
 #include "commands/cmdsetasn1file.h"
 #include "commands/cmdsetmessagedeclarations.h"
 #include "commands/cmdsetparameterlist.h"
-#include "file.h"
 #include "messagedeclarationsdialog.h"
 #include "mscchart.h"
 #include "msccommandsstack.h"
@@ -282,8 +282,9 @@ void MessageDialog::editItem(QTableWidgetItem *item)
     if (!m_selectedDeclaration)
         return;
 
-    const QSharedPointer<Asn1Acn::File> &types = mscModel()->asn1Types();
-    asn1::Asn1Editor editor(types, this);
+    msc::MscModel *model = mscModel();
+    Asn1Acn::Asn1SystemChecks *checks = model ? model->asn1Checks() : nullptr;
+    asn1::Asn1Editor editor(checks, this);
     const QString type = ui->parameterTable->verticalHeaderItem(item->row())->text();
     editor.showAsn1Type(type);
     editor.setValue(item->text());
@@ -344,8 +345,8 @@ void MessageDialog::checkTextValidity()
 
     if (m_selectedDeclaration) {
         Asn1Acn::Asn1ValueParser parser;
-        const QSharedPointer<Asn1Acn::File> &asn1Data = mscModel()->asn1Types();
-        if (!asn1Data.isNull()) {
+        Asn1Acn::Asn1SystemChecks *asn1Data = mscModel()->asn1Checks();
+        if (asn1Data) {
             for (int i = 0; i < ui->parameterTable->rowCount(); ++i) {
                 QTableWidgetItem *item = ui->parameterTable->item(i, 0);
                 if (item) {

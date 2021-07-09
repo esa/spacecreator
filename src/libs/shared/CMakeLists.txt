@@ -39,6 +39,8 @@ target_sources(${LIB_NAME} PRIVATE
     ui/interactiveobjectbase.h
     ui/textitem.cpp
     ui/textitem.h
+    abstractproject.cpp
+    abstractproject.h
     actionsbar.cpp
     actionsbar.h
     animation.cpp

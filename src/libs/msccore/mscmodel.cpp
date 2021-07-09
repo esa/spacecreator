@@ -17,8 +17,8 @@
 
 #include "mscmodel.h"
 
+#include "asn1systemchecks.h"
 #include "asn1valueparser.h"
-#include "file.h"
 #include "mscchart.h"
 #include "mscdocument.h"
 #include "mscmessagedeclaration.h"
@@ -165,17 +165,12 @@ void MscModel::setDataDefinitionString(const QString &dataString)
 
     Q_EMIT dataDefinitionStringChanged(m_dataDefinitionString);
     Q_EMIT dataChanged();
+
+    checkAllMessages();
 }
 
-void MscModel::setAsn1TypesData(QSharedPointer<Asn1Acn::File> data)
+void msc::MscModel::checkAllMessages()
 {
-    if (data == m_asn1Data) {
-        return;
-    }
-
-    m_asn1Data.swap(data);
-    Q_EMIT asn1DataChanged();
-
     QStringList faultyMessages;
     const bool ok = checkAllMessagesForAsn1Compliance(&faultyMessages);
     if (!ok) {
@@ -183,9 +178,14 @@ void MscModel::setAsn1TypesData(QSharedPointer<Asn1Acn::File> data)
     }
 }
 
-const QSharedPointer<Asn1Acn::File> &MscModel::asn1Types() const
+void MscModel::setAsn1Checks(Asn1Acn::Asn1SystemChecks *checks)
 {
-    return m_asn1Data;
+    m_asnChecks = checks;
+}
+
+Asn1Acn::Asn1SystemChecks *MscModel::asn1Checks() const
+{
+    return m_asnChecks;
 }
 
 void MscModel::clear()
@@ -259,7 +259,7 @@ bool MscModel::checkMessageAsn1Compliance(const msc::MscMessage &message) const
         for (int i = 0; i < message.parameters().size(); ++i) {
             const QString &parameter = message.parameters().at(i).parameter();
             const QString &type = usedDeclaration->typeRefList().at(i);
-            if (m_asn1Data && !m_asn1Data->checkAsn1Compliance(parameter, type)) {
+            if (m_asnChecks && !m_asnChecks->checkAsn1Compliance(parameter, type)) {
                 return false;
             }
         }

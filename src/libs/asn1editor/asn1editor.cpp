@@ -17,13 +17,12 @@
 
 #include "asn1editor.h"
 
+#include "asn1systemchecks.h"
 #include "asn1treeview.h"
 #include "asn1valueparser.h"
-#include "file.h"
 #include "ui_asn1editor.h"
 
 #include <QDebug>
-#include <QFileDialog>
 #include <QMessageBox>
 
 namespace asn1 {
@@ -38,10 +37,10 @@ namespace asn1 {
  * \brief Asn1Editor::Asn1Editor Constructor
  * \param parent Dialog parent
  */
-Asn1Editor::Asn1Editor(const QSharedPointer<Asn1Acn::File> &asn1Types, QWidget *parent)
+Asn1Editor::Asn1Editor(Asn1Acn::Asn1SystemChecks *asn1Checks, QWidget *parent)
     : QDialog(parent)
     , ui(new Ui::Asn1Editor)
-    , m_asn1Types(asn1Types)
+    , m_asn1Checks(asn1Checks)
 {
     ui->setupUi(this);
 
@@ -71,14 +70,14 @@ Asn1Editor::~Asn1Editor()
 void Asn1Editor::setValue(const QString &value)
 {
     const QString &currentType { ui->typesCB->currentText() };
-    if (value.isEmpty() || currentType.isEmpty() || !m_asn1Types) {
+    if (value.isEmpty() || currentType.isEmpty() || !m_asn1Checks) {
         return;
     }
 
     Asn1Acn::Asn1ValueParser valueParser;
     connect(&valueParser, &Asn1Acn::Asn1ValueParser::parseError, this, &Asn1Editor::showParseError);
 
-    const std::unique_ptr<Asn1Acn::TypeAssignment> &asn1Item = m_asn1Types->typeAssignment(currentType);
+    const std::unique_ptr<Asn1Acn::TypeAssignment> &asn1Item = m_asn1Checks->typeAssignment(currentType);
     if (asn1Item) {
         const QVariantMap valueData = valueParser.parseAsn1Value(asn1Item.get(), value);
         m_asn1TreeView->setAsn1Value(valueData);
@@ -119,8 +118,8 @@ void Asn1Editor::showParseError(const QString &error)
  */
 void Asn1Editor::showAsn1Type(const QString &text)
 {
-    if (!m_asn1Types.isNull()) {
-        const std::unique_ptr<Asn1Acn::TypeAssignment> &asn1Item = m_asn1Types->typeAssignment(text);
+    if (!m_asn1Checks.isNull()) {
+        const std::unique_ptr<Asn1Acn::TypeAssignment> &asn1Item = m_asn1Checks->typeAssignment(text);
         if (asn1Item) {
             m_asn1TreeView->setAsn1Model(asn1Item);
         }
@@ -150,12 +149,12 @@ void Asn1Editor::getAsn1Value()
 void Asn1Editor::addAsn1TypeItems()
 {
     ui->typesCB->clear();
-    if (!m_asn1Types) {
+    if (!m_asn1Checks) {
         return;
     }
 
     QStringList typeNames;
-    for (const std::unique_ptr<Asn1Acn::Definitions> &definitions : m_asn1Types->definitionsList()) {
+    for (const Asn1Acn::Definitions *definitions : m_asn1Checks->definitionsList()) {
         for (const std::unique_ptr<Asn1Acn::TypeAssignment> &type : definitions->types()) {
             typeNames << type->name();
         }

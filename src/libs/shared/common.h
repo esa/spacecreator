@@ -130,8 +130,6 @@ QString interfaceCustomAttributesFilePath();
  */
 QString deploymentCustomAttributesFilePath();
 
-QStringList asn1Names(const Asn1Acn::File *dataTypes);
-
 }
 
 Q_DECLARE_METATYPE(shared::Id)

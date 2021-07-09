@@ -4,6 +4,8 @@ project(${APP_NAME})
 add_executable(${APP_NAME})
 
 target_sources(${APP_NAME} PRIVATE
+    ivproject.cpp
+    ivproject.h
     main.cpp
     mainwindow.cpp
     mainwindow.h

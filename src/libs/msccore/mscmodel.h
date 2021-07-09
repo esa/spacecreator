@@ -18,13 +18,13 @@
 #pragma once
 
 #include <QObject>
-#include <QSharedPointer>
+#include <QPointer>
 #include <QStringList>
 #include <QVector>
 #include <memory>
 
 namespace Asn1Acn {
-class File;
+class Asn1SystemChecks;
 }
 
 namespace msc {
@@ -61,13 +61,14 @@ public:
     const QString &dataDefinitionString() const;
     void setDataDefinitionString(const QString &dataString);
 
-    void setAsn1TypesData(QSharedPointer<Asn1Acn::File> data);
-    const QSharedPointer<Asn1Acn::File> &asn1Types() const;
+    void setAsn1Checks(Asn1Acn::Asn1SystemChecks *checks);
+    Asn1Acn::Asn1SystemChecks *asn1Checks() const;
 
     void clear();
 
     void checkInstanceNames();
 
+    Q_SLOT void checkAllMessages();
     bool checkMessageAsn1Compliance(const msc::MscMessage &message) const;
     bool checkAllMessagesForAsn1Compliance(QStringList *faultyMessages = nullptr) const;
 
@@ -91,7 +92,7 @@ private:
     QVector<MscChart *> m_charts;
     QString m_dataLanguage;
     QString m_dataDefinitionString;
-    QSharedPointer<Asn1Acn::File> m_asn1Data;
+    QPointer<Asn1Acn::Asn1SystemChecks> m_asnChecks;
 };
 
 }

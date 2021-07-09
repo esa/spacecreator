@@ -20,8 +20,10 @@
 #include "ivobject.h"
 #include "propertiesdialog.h"
 
+#include <QPointer>
+
 namespace Asn1Acn {
-class File;
+class Asn1SystemChecks;
 }
 
 namespace ivm {
@@ -39,8 +41,7 @@ class IVPropertiesDialog : public shared::PropertiesDialog
 
 public:
     explicit IVPropertiesDialog(ivm::IVPropertyTemplateConfig *dynPropConfig, ivm::IVObject *obj,
-            const QSharedPointer<Asn1Acn::File> &dataTypes, cmd::CommandsStack *commandsStack,
-            QWidget *parent = nullptr);
+            Asn1Acn::Asn1SystemChecks *asn1Checks, cmd::CommandsStack *commandsStack, QWidget *parent = nullptr);
     ~IVPropertiesDialog() override;
     void init() override;
 
@@ -56,7 +57,7 @@ private:
     void initCommentView();
 
 private:
-    QSharedPointer<Asn1Acn::File> m_dataTypes;
+    QPointer<Asn1Acn::Asn1SystemChecks> m_asn1Checks;
 };
 
 } // namespace ive

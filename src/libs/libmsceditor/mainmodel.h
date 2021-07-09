@@ -30,6 +30,7 @@ class QUndoStack;
 
 namespace Asn1Acn {
 class Asn1ModelStorage;
+class Asn1SystemChecks;
 }
 namespace msc {
 class ChartLayoutManager;
@@ -83,8 +84,7 @@ public:
     bool needSave() const;
 
     QFileInfo asn1File() const;
-    Asn1Acn::Asn1ModelStorage *asn1ModelStorage() const;
-    void setAsn1ModelStorage(Asn1Acn::Asn1ModelStorage *asn1Storage);
+    void setAsn1Check(Asn1Acn::Asn1SystemChecks *check);
 
 Q_SIGNALS:
     void showChartVew();

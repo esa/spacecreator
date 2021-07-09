@@ -19,6 +19,7 @@
 
 #include "asn1modelstorage.h"
 #include "asn1reader.h"
+#include "asn1systemchecks.h"
 #include "astxmlparser.h"
 #include "chartlayoutmanager.h"
 #include "commands/cmdpastechart.h"
@@ -46,6 +47,7 @@
 #include <QImage>
 #include <QMimeData>
 #include <QPainter>
+#include <QPointer>
 #include <QUndoStack>
 
 namespace msc {
@@ -80,7 +82,7 @@ struct MainModelPrivate {
     DocumentItemModel *m_documentItemModel = nullptr; /// model of the document tree
     QPointer<msc::MscDocument> m_selectedDocument;
     QString m_currentFilePath;
-    Asn1Acn::Asn1ModelStorage *m_asnDataStore = nullptr;
+    QPointer<Asn1Acn::Asn1SystemChecks> asnCheck;
 };
 
 /*!
@@ -97,8 +99,6 @@ MainModel::MainModel(QObject *parent)
     : QObject(parent)
     , d(new MainModelPrivate(this))
 {
-    setAsn1ModelStorage(new Asn1Acn::Asn1ModelStorage(this));
-
     connect(&d->m_hierarchyModel, &HierarchyViewModel::documentDoubleClicked, this, &MainModel::showChartFromDocument);
     connect(&d->m_hierarchyModel, &HierarchyViewModel::selectedDocumentChanged, this, &MainModel::setSelectedDocument);
 
@@ -507,11 +507,8 @@ void MainModel::setNewModel(MscModel *model)
     showFirstChart();
     d->m_hierarchyModel.setModel(d->m_mscModel);
 
-    d->m_mscModel->setAsn1TypesData(d->m_asnDataStore->asn1DataTypes(asn1File().absoluteFilePath()));
-    connect(d->m_mscModel, &msc::MscModel::dataDefinitionStringChanged, this, [this](const QString &) {
-        d->m_mscModel->setAsn1TypesData(d->m_asnDataStore->asn1DataTypes(asn1File().absoluteFilePath()));
-    });
     connect(d->m_mscModel, &msc::MscModel::dataDefinitionStringChanged, this, &msc::MainModel::asn1FileNameChanged);
+    d->m_mscModel->setAsn1Checks(d->asnCheck);
 
     Q_EMIT modelUpdated(d->m_mscModel);
     Q_EMIT asn1FileNameChanged(d->m_mscModel->dataDefinitionString());
@@ -526,30 +523,10 @@ QFileInfo MainModel::asn1File() const
     return QFileInfo(QFileInfo(d->m_currentFilePath).absolutePath() + "/" + d->m_mscModel->dataDefinitionString());
 }
 
-Asn1Acn::Asn1ModelStorage *MainModel::asn1ModelStorage() const
+void MainModel::setAsn1Check(Asn1Acn::Asn1SystemChecks *check)
 {
-    return d->m_asnDataStore;
-}
-
-void MainModel::setAsn1ModelStorage(Asn1Acn::Asn1ModelStorage *asn1Storage)
-{
-    if (!asn1Storage) {
-        return;
-    }
-
-    if (d->m_asnDataStore) {
-        disconnect(d->m_asnDataStore, nullptr, this, nullptr);
-        if (d->m_asnDataStore->parent() == this) {
-            d->m_asnDataStore->deleteLater();
-        }
-    }
-
-    d->m_asnDataStore = asn1Storage;
-    connect(d->m_asnDataStore, &Asn1Acn::Asn1ModelStorage::dataTypesChanged, this, [&](const QString &fileName) {
-        if (fileName == asn1File().absoluteFilePath()) {
-            d->m_mscModel->setAsn1TypesData(d->m_asnDataStore->asn1DataTypes(fileName));
-        }
-    });
+    d->asnCheck = check;
+    d->m_mscModel->setAsn1Checks(d->asnCheck);
 }
 
 }

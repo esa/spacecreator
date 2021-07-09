@@ -2,5 +2,8 @@ DV DEFINITIONS ::=
 BEGIN
 MyInt ::= INTEGER (0..255)
 
-MyChoice ::= CHOICE { a MyInt, b BOOLEAN }
+MySignedInt ::= INTEGER (-32768..32767)
+MyUnSignedInt ::= INTEGER (0..65535)
+
+SimpleChoice ::= CHOICE { a MyInt, b BOOLEAN }
 END

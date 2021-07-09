@@ -17,9 +17,6 @@
 
 #include "parameter.h"
 
-#include "asn1/definitions.h"
-#include "asn1/file.h"
-#include "asn1/typeassignment.h"
 #include "asn1/types/type.h"
 #include "asn1valueparser.h"
 

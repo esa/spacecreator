@@ -17,8 +17,8 @@
 
 #include "ivpropertiesdialog.h"
 
-#include "asn1/file.h"
 #include "asn1/types/builtintypes.h"
+#include "asn1systemchecks.h"
 #include "baseitems/common/ivutils.h"
 #include "commands/cmdentityattributechange.h"
 #include "commandsstack.h"
@@ -49,9 +49,9 @@
 namespace ive {
 
 IVPropertiesDialog::IVPropertiesDialog(ivm::IVPropertyTemplateConfig *dynPropConfig, ivm::IVObject *obj,
-        const QSharedPointer<Asn1Acn::File> &dataTypes, cmd::CommandsStack *commandsStack, QWidget *parent)
+        Asn1Acn::Asn1SystemChecks *asn1Checks, cmd::CommandsStack *commandsStack, QWidget *parent)
     : shared::PropertiesDialog(dynPropConfig, obj, commandsStack, parent)
-    , m_dataTypes(dataTypes)
+    , m_asn1Checks(asn1Checks)
 {
 }
 
@@ -169,14 +169,14 @@ void IVPropertiesDialog::initAttributesView()
 void IVPropertiesDialog::initContextParams()
 {
     ContextParametersModel *modelCtxParams = new ContextParametersModel(commandMacro(), this);
-    modelCtxParams->setDataTypes(m_dataTypes);
+    modelCtxParams->setAsn1Check(m_asn1Checks);
     modelCtxParams->setDataObject(dataObject());
 
     shared::PropertiesViewBase *viewAttrs = new ContextParametersView(this);
     viewAttrs->tableView()->setItemDelegateForColumn(
             ContextParametersModel::Column::Type, new shared::AttributeDelegate(viewAttrs->tableView()));
     viewAttrs->tableView()->setItemDelegateForColumn(
-            ContextParametersModel::Column::Value, new Asn1ValueDelegate(m_dataTypes, viewAttrs->tableView()));
+            ContextParametersModel::Column::Value, new Asn1ValueDelegate(m_asn1Checks, viewAttrs->tableView()));
     viewAttrs->tableView()->horizontalHeader()->show();
     viewAttrs->setModel(modelCtxParams);
     insertTab(viewAttrs, tr("Context Parameters"));
@@ -185,7 +185,7 @@ void IVPropertiesDialog::initContextParams()
 void IVPropertiesDialog::initIfaceParams()
 {
     IfaceParametersModel *modelIfaceParams =
-            new IfaceParametersModel(commandMacro(), shared::asn1Names(m_dataTypes.get()), this);
+            new IfaceParametersModel(commandMacro(), m_asn1Checks->allTypeNames(), this);
     modelIfaceParams->setDataObject(dataObject());
 
     shared::PropertiesViewBase *viewAttrs = new IfaceParametersView(this);

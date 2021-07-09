@@ -71,7 +71,6 @@ void tst_XmlDocExporter::initTestCase()
 void tst_XmlDocExporter::init()
 {
     m_doc = std::make_unique<ive::InterfaceDocument>(this);
-    m_doc->asn1ModelStorage()->clear();
     if (QFile::exists(testFilePath)) {
         QFile::remove(testFilePath);
     }

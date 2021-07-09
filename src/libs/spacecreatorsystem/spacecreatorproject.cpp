@@ -18,6 +18,7 @@
 #include "spacecreatorproject.h"
 
 #include "asn1modelstorage.h"
+#include "asn1systemchecks.h"
 #include "baseitems/common/ivutils.h"
 #include "dvappmodel.h"
 #include "dveditorcore.h"
@@ -37,11 +38,15 @@
 namespace scs {
 
 SpaceCreatorProject::SpaceCreatorProject(QObject *parent)
-    : QObject(parent)
+    : AbstractProject(parent)
     , m_mscChecks(new MscSystemChecks)
     , m_asn1Storage(new Asn1Acn::Asn1ModelStorage)
+    , m_asnChecks(new Asn1Acn::Asn1SystemChecks)
 {
     m_mscChecks->setStorage(this);
+
+    m_asnChecks->setAsn1Storage(m_asn1Storage.get());
+    m_asnChecks->setProject(this);
 }
 
 SpaceCreatorProject::~SpaceCreatorProject() { }
@@ -74,7 +79,7 @@ QSharedPointer<ive::IVEditorCore> SpaceCreatorProject::ivData(const QString &fil
         QSharedPointer<ive::IVEditorCore> data(new ive::IVEditorCore());
         data->registerBasicActions();
         data->document()->customActions(); // There some further actions are registered
-        data->document()->setAsn1ModelStorage(m_asn1Storage.get());
+        data->document()->setAsn1Check(m_asnChecks.get());
 
         data->document()->load(fileName);
         const_cast<SpaceCreatorProject *>(this)->setIvData(fileName, data);
@@ -93,7 +98,7 @@ QSharedPointer<msc::MSCEditorCore> SpaceCreatorProject::mscData(const QString &f
     if (!m_mscStore.contains(fileName)) {
         QSharedPointer<msc::MSCEditorCore> data(new msc::MSCEditorCore());
         data->showToolbars(false);
-        data->mainModel()->setAsn1ModelStorage(m_asn1Storage.get());
+        data->mainModel()->setAsn1Check(m_asnChecks.get());
         data->mainModel()->loadFile(fileName);
         const_cast<SpaceCreatorProject *>(this)->setMscData(fileName, data);
         return data;
@@ -222,6 +227,14 @@ QStringList SpaceCreatorProject::projectFiles(const QString &suffix) const
         }
     }
     return files;
+}
+
+/*!
+   Returns the Asn1SystemChecks object to access project wide asn1 data
+ */
+Asn1Acn::Asn1SystemChecks *SpaceCreatorProject::asn1Checks() const
+{
+    return m_asnChecks.get();
 }
 
 /*!

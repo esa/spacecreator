@@ -15,10 +15,14 @@
   along with this program. If not, see <https://www.gnu.org/licenses/lgpl-2.1.html>.
 */
 
+#include "asn1modelstorage.h"
+#include "asn1systemchecks.h"
 #include "commandlineparser.h"
+#include "interface/interfacedocument.h"
 #include "iveditor.h"
 #include "iveditorcore.h"
 #include "ivlibrary.h"
+#include "ivproject.h"
 #include "mainwindow.h"
 #include "sharedlibrary.h"
 
@@ -45,12 +49,20 @@ int main(int argc, char *argv[])
         QFontDatabase::addApplicationFont(dirIt.next());
     a.setFont(QFont(QLatin1String("Ubuntu"), 8));
 
-    ive::IVEditorCore plugin;
+    ive::IVEditorCore editorCore;
+    ive::IvProject project;
+    project.setModel(editorCore.document());
+    Asn1Acn::Asn1ModelStorage asnStorage;
+    Asn1Acn::Asn1SystemChecks asnCheck;
+    asnCheck.setAsn1Storage(&asnStorage);
+    asnCheck.setProject(&project);
 
-    ive::MainWindow w(&plugin);
+    editorCore.document()->setAsn1Check(&asnCheck);
+
+    ive::MainWindow w(&editorCore);
 
     shared::CommandLineParser cmdParser;
-    plugin.populateCommandLineArguments(&cmdParser);
+    editorCore.populateCommandLineArguments(&cmdParser);
     cmdParser.process(a.arguments());
 
     const auto args = cmdParser.positionalsSet();

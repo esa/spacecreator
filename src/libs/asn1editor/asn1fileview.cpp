@@ -18,7 +18,6 @@
 #include "asn1fileview.h"
 
 #include "asn1reader.h"
-#include "file.h"
 #include "ui_asn1fileview.h"
 
 #include <QDebug>

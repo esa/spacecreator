@@ -15,14 +15,18 @@
    along with this program. If not, see <https://www.gnu.org/licenses/lgpl-2.1.html>.
 */
 
-#include "ivlibrary.h"
+#include "asn1modelstorage.h"
+#include "asn1systemchecks.h"
 #include "commandlineparser.h"
 #include "iveditor.h"
+#include "ivlibrary.h"
 #include "ivsystemchecks.h"
+#include "mainmodel.h"
 #include "mainwindow.h"
 #include "msceditor.h"
 #include "msceditorcore.h"
 #include "msclibrary.h"
+#include "mscproject.h"
 #include "mscwriter.h"
 #include "sharedlibrary.h"
 
@@ -52,6 +56,15 @@ int main(int argc, char *argv[])
 
     msc::MSCEditorCore editorCore;
     editorCore.setSystemChecker(new scs::IvSystemChecks(&editorCore));
+
+    msc::MscProject project;
+    project.setModel(editorCore.mainModel());
+    Asn1Acn::Asn1ModelStorage asnStorage;
+    Asn1Acn::Asn1SystemChecks asnCheck;
+    asnCheck.setAsn1Storage(&asnStorage);
+    asnCheck.setProject(&project);
+
+    editorCore.mainModel()->setAsn1Check(&asnCheck);
 
     shared::CommandLineParser cmdParser;
     editorCore.populateCommandLineArguments(&cmdParser);

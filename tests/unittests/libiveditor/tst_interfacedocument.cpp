@@ -15,7 +15,9 @@
    along with this program. If not, see <https://www.gnu.org/licenses/lgpl-2.1.html>.
 */
 
+#include "abstractproject.h"
 #include "asn1modelstorage.h"
+#include "asn1systemchecks.h"
 #include "interface/interfacedocument.h"
 #include "iveditor.h"
 #include "ivfunction.h"
@@ -27,6 +29,20 @@
 #include <QObject>
 #include <QtTest>
 #include <memory>
+
+class IvProjectMoc : public shared::AbstractProject
+{
+public:
+    explicit IvProjectMoc(QObject *parent = nullptr)
+        : shared::AbstractProject(parent)
+    {
+    }
+
+    QStringList allDVFiles() const override { return {}; }
+    QStringList allIVFiles() const override { return {}; }
+    QStringList allMscFiles() const override { return {}; }
+    QStringList allAsn1Files() const override { return { { QString(EXAMPLES_DIR) + "asn1/dataview-uniq.asn" } }; }
+};
 
 class tst_InterfaceDocument : public QObject
 {
@@ -40,7 +56,10 @@ private Q_SLOTS:
     void test_loadFailingFunctionInit();
 
 private:
-    std::unique_ptr<ive::InterfaceDocument> ivDoc;
+    std::unique_ptr<ive::InterfaceDocument> m_ivDoc;
+    std::unique_ptr<IvProjectMoc> m_project;
+    std::unique_ptr<Asn1Acn::Asn1ModelStorage> m_asnStorage;
+    std::unique_ptr<Asn1Acn::Asn1SystemChecks> m_asnCheck;
 };
 
 void tst_InterfaceDocument::initTestCase()
@@ -52,38 +71,45 @@ void tst_InterfaceDocument::initTestCase()
 
 void tst_InterfaceDocument::init()
 {
-    ivDoc = std::make_unique<ive::InterfaceDocument>();
+    m_asnStorage = std::make_unique<Asn1Acn::Asn1ModelStorage>();
+    m_project = std::make_unique<IvProjectMoc>();
+    m_asnCheck = std::make_unique<Asn1Acn::Asn1SystemChecks>();
+    m_asnCheck->setAsn1Storage(m_asnStorage.get());
+    m_asnCheck->setProject(m_project.get());
+
+    m_ivDoc = std::make_unique<ive::InterfaceDocument>();
+    m_ivDoc->setAsn1Check(m_asnCheck.get());
 }
 
 void tst_InterfaceDocument::test_checkAllInterfacesForAsn1Compliance()
 {
-    ivDoc->setPath(QString(EXAMPLES_DIR).append("asn1/interfaceview.xml"));
-    ivDoc->setAsn1FileName("dataview-uniq.asn");
+    m_ivDoc->setPath(QString(EXAMPLES_DIR).append("asn1/interfaceview.xml"));
+    m_ivDoc->setAsn1FileName("dataview-uniq.asn");
 
     auto fn1 = ivm::testutils::createFunction("Fn1");
-    ivDoc->objectsModel()->addObject(fn1);
+    m_ivDoc->objectsModel()->addObject(fn1);
 
     // Empty parameters results to true
     auto if1 = ivm::testutils::createIface(fn1, ivm::IVInterface::InterfaceType::Provided, "If1");
-    bool ok = ivDoc->checkAllInterfacesForAsn1Compliance();
+    bool ok = m_ivDoc->checkAllInterfacesForAsn1Compliance();
     QCOMPARE(ok, true);
 
     // Used type is defined in ASN1
     auto if2 = ivm::testutils::createIface(fn1, ivm::IVInterface::InterfaceType::Provided, "If2");
     if2->addParam(ivm::InterfaceParameter("IfaceParam", ivm::BasicParameter::Type::Other, "T-UInt32"));
-    ok = ivDoc->checkAllInterfacesForAsn1Compliance();
+    ok = m_ivDoc->checkAllInterfacesForAsn1Compliance();
     QCOMPARE(ok, true);
 
     // Unknown type
     auto if3 = ivm::testutils::createIface(fn1, ivm::IVInterface::InterfaceType::Provided, "If3");
     if3->addParam(ivm::InterfaceParameter("IfaceParam", ivm::BasicParameter::Type::Other, "InvalidType"));
-    ok = ivDoc->checkAllInterfacesForAsn1Compliance();
+    ok = m_ivDoc->checkAllInterfacesForAsn1Compliance();
     QCOMPARE(ok, false);
 }
 
 void tst_InterfaceDocument::test_loadFailingFunctionInit()
 {
-    ivDoc->load(QFINDTESTDATA("interfaceview_function_fail.xml"));
+    m_ivDoc->load(QFINDTESTDATA("interfaceview_function_fail.xml"));
 }
 
 QTEST_MAIN(tst_InterfaceDocument)

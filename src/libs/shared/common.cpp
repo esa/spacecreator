@@ -202,19 +202,6 @@ QString sharedTypesPath()
     return qEnvironmentVariable("TASTE_SHARED_TYPES", kDefaultPath);
 }
 
-QStringList asn1Names(const Asn1Acn::File *dataTypes)
-{
-    QStringList names;
-    if (dataTypes) {
-        for (const std::unique_ptr<Asn1Acn::Definitions> &definitions : dataTypes->definitionsList()) {
-            for (const std::unique_ptr<Asn1Acn::TypeAssignment> &assignment : definitions->types()) {
-                names.append(assignment->name());
-            }
-        }
-    }
-    return names;
-}
-
 QString deploymentCustomAttributesFilePath()
 {
     static const QString kDefaultPath = QStandardPaths::writableLocation(QStandardPaths::AppLocalDataLocation)

@@ -17,6 +17,8 @@
 
 #pragma once
 
+#include "abstractproject.h"
+
 #include <QHash>
 #include <QObject>
 #include <QSharedPointer>
@@ -25,6 +27,7 @@
 
 namespace Asn1Acn {
 class Asn1ModelStorage;
+class Asn1SystemChecks;
 }
 namespace dve {
 class DVEditorCore;
@@ -50,7 +53,7 @@ class DvSystemChecks;
    - Has functions to query for all space creator related data and files.
    - Contains checks for the system
  */
-class SpaceCreatorProject : public QObject
+class SpaceCreatorProject : public shared::AbstractProject
 {
     Q_OBJECT
 public:
@@ -69,13 +72,14 @@ public:
 
     bool contains(QSharedPointer<shared::EditorCore> core) const;
 
-    virtual QStringList allDVFiles() const;
-    virtual QStringList allIVFiles() const;
-    virtual QStringList allMscFiles() const;
-    virtual QStringList allAsn1Files() const;
+    QStringList allDVFiles() const override;
+    QStringList allIVFiles() const override;
+    QStringList allMscFiles() const override;
+    QStringList allAsn1Files() const override;
     virtual QStringList projectFiles(const QString &suffix) const;
 
     // System checks
+    Asn1Acn::Asn1SystemChecks *asn1Checks() const;
     /*!
        Access to the msc checks done from iv
        */
@@ -102,6 +106,7 @@ protected:
     QHash<QString, QSharedPointer<msc::MSCEditorCore>> m_mscStore;
     std::unique_ptr<scs::MscSystemChecks> m_mscChecks;
     std::unique_ptr<Asn1Acn::Asn1ModelStorage> m_asn1Storage;
+    std::unique_ptr<Asn1Acn::Asn1SystemChecks> m_asnChecks;
 };
 
 } // namespace scs

@@ -1,5 +1,5 @@
 /*
-  Copyright (C) 2020 European Space Agency - <maxime.perrotin@esa.int>
+  Copyright (C) 2021 European Space Agency - <maxime.perrotin@esa.int>
 
   This library is free software; you can redistribute it and/or
   modify it under the terms of the GNU Library General Public
@@ -17,32 +17,20 @@
 
 #pragma once
 
-#include <QPointer>
-#include <QStyledItemDelegate>
+#include <QObject>
 
-namespace Asn1Acn {
-class Asn1SystemChecks;
-}
-namespace asn1 {
-class Asn1Editor;
-}
+namespace shared {
 
-namespace ive {
-
-class Asn1ValueDelegate : public QStyledItemDelegate
+class AbstractProject : public QObject
 {
     Q_OBJECT
 public:
-    Asn1ValueDelegate(Asn1Acn::Asn1SystemChecks *asn1Checks, QObject *parent = nullptr);
+    explicit AbstractProject(QObject *parent = nullptr);
 
-    QWidget *createEditor(QWidget *parent, const QStyleOptionViewItem &option, const QModelIndex &index) const override;
-    void setEditorData(QWidget *editor, const QModelIndex &index) const override;
-
-protected Q_SLOTS:
-    void onDialogAccepted();
-
-private:
-    QPointer<Asn1Acn::Asn1SystemChecks> m_asn1Checks;
+    virtual QStringList allDVFiles() const = 0;
+    virtual QStringList allIVFiles() const = 0;
+    virtual QStringList allMscFiles() const = 0;
+    virtual QStringList allAsn1Files() const = 0;
 };
 
-}
+} // namespace shared

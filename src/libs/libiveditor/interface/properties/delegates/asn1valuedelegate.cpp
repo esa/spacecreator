@@ -18,7 +18,7 @@
 #include "asn1valuedelegate.h"
 
 #include "asn1editor.h"
-#include "file.h"
+#include "asn1systemchecks.h"
 #include "propertieslistmodel.h"
 
 #include <QLabel>
@@ -29,16 +29,16 @@ namespace ive {
 static const char *MODEL_INDEX_PROPERTY = "modelIndex";
 static const char *DIALOG_PROPERTY = "dialog";
 
-Asn1ValueDelegate::Asn1ValueDelegate(const QSharedPointer<Asn1Acn::File> &asn1Types, QObject *parent)
+Asn1ValueDelegate::Asn1ValueDelegate(Asn1Acn::Asn1SystemChecks *asn1Checks, QObject *parent)
     : QStyledItemDelegate(parent)
-    , m_asn1Types(asn1Types)
+    , m_asn1Checks(asn1Checks)
 {
 }
 
 QWidget *Asn1ValueDelegate::createEditor(
         QWidget *parent, const QStyleOptionViewItem & /*option*/, const QModelIndex &index) const
 {
-    auto dialog = new asn1::Asn1Editor(m_asn1Types, parent);
+    auto dialog = new asn1::Asn1Editor(m_asn1Checks, parent);
     dialog->setProperty(MODEL_INDEX_PROPERTY, QVariant(index));
     dialog->setModal(true);
     QModelIndex typeIndex = index.siblingAtColumn(index.column() - 1);

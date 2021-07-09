@@ -19,6 +19,7 @@
 
 #include "actionsbar.h"
 #include "asn1modelstorage.h"
+#include "asn1systemchecks.h"
 #include "baseitems/common/ivutils.h"
 #include "baseitems/graphicsview.h"
 #include "colors/colormanagerdialog.h"
@@ -28,7 +29,6 @@
 #include "context/action/actionsmanager.h"
 #include "context/action/editor/dynactioneditor.h"
 #include "errorhub.h"
-#include "file.h"
 #include "graphicsitemhelpers.h"
 #include "graphicsviewutils.h"
 #include "interface/objectstreeview.h"
@@ -99,7 +99,7 @@ struct InterfaceDocument::InterfaceDocumentPrivate {
 
     IVCreatorTool *tool { nullptr };
 
-    Asn1Acn::Asn1ModelStorage *asnModelStorage { nullptr };
+    Asn1Acn::Asn1SystemChecks *asnCheck { nullptr };
     QString mscFileName;
     QString asnFileName;
 };
@@ -114,8 +114,6 @@ InterfaceDocument::InterfaceDocument(QObject *parent)
     , d(new InterfaceDocumentPrivate)
 {
     d->exporter = new IVExporter(this);
-
-    setAsn1ModelStorage(new Asn1Acn::Asn1ModelStorage(this));
 
     d->commandsStack = new cmd::CommandsStack(this);
     connect(d->commandsStack, &cmd::CommandsStack::cleanChanged, this,
@@ -434,12 +432,12 @@ void InterfaceDocument::setAsn1FileName(const QString &asnfile)
     d->asnFileName = asnfile;
     Q_EMIT asn1FileNameChanged(d->asnFileName);
 
-    if (d->asnModelStorage) {
-        if (d->asnModelStorage->contains(asn1FilePath())) {
+    if (d->asnCheck && d->asnCheck->asn1Storage()) {
+        if (d->asnCheck->asn1Storage()->contains(asn1FilePath())) {
             checkAllInterfacesForAsn1Compliance();
         } else {
             // does load the data
-            d->asnModelStorage->asn1DataTypes(asn1FilePath());
+            d->asnCheck->asn1Storage()->asn1DataTypes(asn1FilePath());
         }
     }
 }
@@ -487,6 +485,17 @@ void InterfaceDocument::setMscFileName(const QString &mscFile)
 const QString &InterfaceDocument::mscFileName() const
 {
     return d->mscFileName;
+}
+
+QString InterfaceDocument::mscFilePath() const
+{
+    if (path().isEmpty()) {
+        return {};
+    }
+
+    QFileInfo fi(path());
+    fi.setFile(fi.absolutePath() + QDir::separator() + d->mscFileName);
+    return fi.absoluteFilePath();
 }
 
 bool InterfaceDocument::isDirty() const
@@ -545,30 +554,16 @@ IVItemModel *InterfaceDocument::itemsModel() const
     return d->itemsModel;
 }
 
-Asn1Acn::Asn1ModelStorage *InterfaceDocument::asn1ModelStorage() const
+void InterfaceDocument::setAsn1Check(Asn1Acn::Asn1SystemChecks *check)
 {
-    return d->asnModelStorage;
-}
-
-void InterfaceDocument::setAsn1ModelStorage(Asn1Acn::Asn1ModelStorage *asn1Storage)
-{
-    if (!asn1Storage) {
-        return;
+    if (d->asnCheck && d->asnCheck->asn1Storage()) {
+        disconnect(d->asnCheck->asn1Storage(), nullptr, this, nullptr);
     }
 
-    if (d->asnModelStorage) {
-        disconnect(d->asnModelStorage, nullptr, this, nullptr);
-        if (d->asnModelStorage->parent() == this) {
-            d->asnModelStorage->deleteLater();
-        }
-    }
+    d->asnCheck = check;
 
-    d->asnModelStorage = asn1Storage;
-    connect(d->asnModelStorage, &Asn1Acn::Asn1ModelStorage::dataTypesChanged, this, [&](const QString &fileName) {
-        if (fileName == asn1FilePath()) {
-            checkAllInterfacesForAsn1Compliance();
-        }
-    });
+    connect(d->asnCheck->asn1Storage(), &Asn1Acn::Asn1ModelStorage::dataTypesChanged, this,
+            &ive::InterfaceDocument::checkAllInterfacesForAsn1Compliance);
 }
 
 QString InterfaceDocument::supportedFileExtensions() const
@@ -583,20 +578,16 @@ QString InterfaceDocument::supportedFileExtensions() const
  */
 bool InterfaceDocument::checkInterfaceAsn1Compliance(const ivm::IVInterface *interface) const
 {
-    if (!d->asnModelStorage) {
+    if (!d->asnCheck) {
         return true;
     }
-    const QSharedPointer<Asn1Acn::File> dataTypes = d->asnModelStorage->asn1DataTypes(asn1FilePath());
-    if (dataTypes.isNull()) {
-        return true;
-    }
-
     const QVector<ivm::InterfaceParameter> &params = interface->params();
     if (params.isEmpty()) {
         return true;
     }
+
     return std::any_of(params.cbegin(), params.cend(),
-            [dataTypes](const ivm::InterfaceParameter &param) { return dataTypes->hasType(param.paramTypeName()); });
+            [&](const ivm::InterfaceParameter &param) { return d->asnCheck->hasType(param.paramTypeName()); });
 }
 
 /*!
@@ -727,7 +718,7 @@ void InterfaceDocument::onDynContextEditorMenuInvoked()
 
 void InterfaceDocument::showPropertyEditor(const shared::Id &id)
 {
-    Q_ASSERT(d->asnModelStorage);
+    Q_ASSERT(d->asnCheck);
     Q_ASSERT(d->commandsStack);
     Q_ASSERT(d->graphicsView);
     if (id.isNull()) {
@@ -739,8 +730,7 @@ void InterfaceDocument::showPropertyEditor(const shared::Id &id)
         return;
     }
 
-    ive::IVPropertiesDialog dialog(d->dynPropConfig, obj, d->asnModelStorage->asn1DataTypes(asn1FilePath()),
-            d->commandsStack, d->graphicsView);
+    ive::IVPropertiesDialog dialog(d->dynPropConfig, obj, d->asnCheck, d->commandsStack, d->graphicsView);
     dialog.init();
     dialog.exec();
 }

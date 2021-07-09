@@ -23,10 +23,9 @@
 #include "propertiesmodelbase.h"
 
 #include <QPointer>
-#include <QSharedPointer>
 
 namespace Asn1Acn {
-class File;
+class Asn1SystemChecks;
 }
 
 namespace ivm {
@@ -57,7 +56,7 @@ public:
     bool setData(const QModelIndex &index, const QVariant &value, int role = Qt::EditRole) override;
 
     void setDataObject(shared::VEObject *obj) override;
-    void setDataTypes(const QSharedPointer<Asn1Acn::File> &dataTypes);
+    void setAsn1Check(Asn1Acn::Asn1SystemChecks *asn1Checks);
 
     bool createProperty(const QString &propName) override;
     bool removeProperty(const QModelIndex &index) override;
@@ -74,7 +73,7 @@ public:
 private:
     cmd::CommandsStack::Macro *m_cmdMacro { nullptr };
     QVector<ivm::ContextParameter> m_params;
-    QSharedPointer<Asn1Acn::File> m_dataTypes;
+    QPointer<Asn1Acn::Asn1SystemChecks> m_asn1Checks;
     QStringList m_asn1Names;
 
     void createNewRow(const ivm::ContextParameter &param, int row);

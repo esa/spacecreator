@@ -17,27 +17,28 @@
 
 #pragma once
 
-#include <QObject>
+#include "abstractproject.h"
 
-namespace shared {
-class AbstractProject;
-}
+#include <QPointer>
 
-namespace dve {
+namespace msc {
 
-class AbstractSystemChecks : public QObject
+class MainModel;
+
+class MscProject : public shared::AbstractProject
 {
-    Q_OBJECT
 public:
-    explicit AbstractSystemChecks(QObject *parent = nullptr);
+    explicit MscProject(QObject *parent = nullptr);
 
-    virtual ~AbstractSystemChecks() override = default;
-    virtual QStringList functionsNames() const = 0;
+    void setModel(MainModel *model);
 
-Q_SIGNALS:
-    void ivDataReset();
+    QStringList allDVFiles() const override;
+    QStringList allIVFiles() const override;
+    QStringList allMscFiles() const override;
+    QStringList allAsn1Files() const override;
 
 private:
+    QPointer<MainModel> m_model;
 };
 
-} // namespace dve
+} // namespace msc

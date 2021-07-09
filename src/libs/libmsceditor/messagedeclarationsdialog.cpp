@@ -18,9 +18,9 @@
 #include "messagedeclarationsdialog.h"
 
 #include "asn1reader.h"
+#include "asn1systemchecks.h"
 #include "commands/cmdsetasn1file.h"
 #include "definitions.h"
-#include "file.h"
 #include "msccommandsstack.h"
 #include "mscdocument.h"
 #include "mscmessagedeclarationlist.h"
@@ -275,7 +275,6 @@ void MessageDeclarationsDialog::selectAsn1File()
             updateAsn1TypesView();
             m_fileName = fileInfo.fileName();
             m_undoStack->push(new msc::cmd::CmdSetAsn1File(m_mscModel, m_fileName, "ASN.1"));
-            m_mscModel->setAsn1TypesData(sharedTypes);
         } else {
             qWarning() << "File" << fileName << "is no valid ASN.1 file:" << errors;
         }
@@ -320,11 +319,11 @@ void MessageDeclarationsDialog::importFromIV()
 void MessageDeclarationsDialog::updateAsn1TypesView()
 {
     ui->availableListView->clear();
-    if (!m_mscModel || !m_mscModel->asn1Types()) {
+    if (!m_mscModel || !m_mscModel->asn1Checks()) {
         return;
     }
 
-    for (const std::unique_ptr<Asn1Acn::Definitions> &definitions : m_mscModel->asn1Types()->definitionsList()) {
+    for (Asn1Acn::Definitions *definitions : m_mscModel->asn1Checks()->definitionsList()) {
         for (const QString &name : definitions->typeAssignmentNames()) {
             ui->availableListView->addItem(name);
         }

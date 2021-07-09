@@ -33,6 +33,7 @@ class QItemSelection;
 
 namespace Asn1Acn {
 class Asn1ModelStorage;
+class Asn1SystemChecks;
 }
 
 namespace shared {
@@ -98,6 +99,7 @@ public:
 
     void setMscFileName(const QString &mscFile);
     const QString &mscFileName() const;
+    QString mscFilePath() const;
 
     bool isDirty() const;
 
@@ -110,8 +112,7 @@ public:
     ivm::IVModel *importModel() const;
     IVItemModel *itemsModel() const;
 
-    Asn1Acn::Asn1ModelStorage *asn1ModelStorage() const;
-    void setAsn1ModelStorage(Asn1Acn::Asn1ModelStorage *asn1Storage);
+    void setAsn1Check(Asn1Acn::Asn1SystemChecks *check);
 
     QString supportedFileExtensions() const;
 

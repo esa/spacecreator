@@ -15,6 +15,7 @@
    along with this program. If not, see <https://www.gnu.org/licenses/lgpl-2.1.html>.
 */
 
+#include "asn1systemchecks.h"
 #include "definitions.h"
 #include "exceptions.h"
 #include "file.h"
@@ -31,6 +32,28 @@
 #include <QtTest>
 
 using namespace msc;
+
+class Asn1SystemChecksMoc : public Asn1Acn::Asn1SystemChecks
+{
+public:
+    Asn1SystemChecksMoc(QObject *parent = nullptr)
+        : Asn1Acn::Asn1SystemChecks(parent)
+    {
+    }
+
+    void setAsnFile(QSharedPointer<Asn1Acn::File> asnFile) { m_asnFile = asnFile; }
+
+    bool checkAsn1Compliance(const QString &parameter, const QString &typeName) const override
+    {
+        if (!m_asnFile) {
+            return false;
+        }
+        return m_asnFile->checkAsn1Compliance(parameter, typeName);
+    }
+
+private:
+    QSharedPointer<Asn1Acn::File> m_asnFile;
+};
 
 class tst_MscModel : public QObject
 {
@@ -53,17 +76,22 @@ private Q_SLOTS:
 private:
     void addAsn1Types();
     MscModel *m_model = nullptr;
+    Asn1SystemChecksMoc *m_asnChecks = nullptr;
 };
 
 void tst_MscModel::init()
 {
     m_model = new MscModel;
+    m_asnChecks = new Asn1SystemChecksMoc;
 }
 
 void tst_MscModel::cleanup()
 {
     delete m_model;
     m_model = nullptr;
+
+    delete m_asnChecks;
+    m_asnChecks = nullptr;
 }
 
 void tst_MscModel::testAddDocument()
@@ -255,7 +283,9 @@ void tst_MscModel::addAsn1Types()
     asn1Definitions->addType(std::move(assignment));
     auto asn1Data = QSharedPointer<Asn1Acn::File>().create("/dumm/path");
     asn1Data->add(std::move(asn1Definitions));
-    m_model->setAsn1TypesData(asn1Data);
+
+    m_asnChecks->setAsnFile(asn1Data);
+    m_model->setAsn1Checks(m_asnChecks);
 }
 
 QTEST_APPLESS_MAIN(tst_MscModel)

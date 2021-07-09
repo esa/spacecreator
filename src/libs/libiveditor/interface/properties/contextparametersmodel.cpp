@@ -17,7 +17,7 @@
 
 #include "contextparametersmodel.h"
 
-#include "asn1/file.h"
+#include "asn1systemchecks.h"
 #include "baseitems/common/ivutils.h"
 #include "commandsstack.h"
 #include "interface/commands/cmdcontextparameterchange.h"
@@ -84,14 +84,15 @@ void ContextParametersModel::setDataObject(shared::VEObject *obj)
     }
 }
 
-void ContextParametersModel::setDataTypes(const QSharedPointer<Asn1Acn::File> &dataTypes)
+void ContextParametersModel::setAsn1Check(Asn1Acn::Asn1SystemChecks *asn1Checks)
 {
-    if (m_dataTypes == dataTypes)
+    if (m_asn1Checks == asn1Checks) {
         return;
+    }
 
-    m_dataTypes = dataTypes;
-    if (m_dataTypes) {
-        m_asn1Names = shared::asn1Names(m_dataTypes.get());
+    m_asn1Checks = asn1Checks;
+    if (m_asn1Checks) {
+        m_asn1Names = asn1Checks->allTypeNames();
     }
 }
 
@@ -133,10 +134,10 @@ bool ContextParametersModel::setData(const QModelIndex &index, const QVariant &v
             break;
         }
         case Column::Value: {
-            if (!m_dataTypes) {
+            if (!m_asn1Checks) {
                 return false;
             }
-            const Asn1Acn::Types::Type *basicDataType = m_dataTypes->typeFromName(paramNew.paramTypeName());
+            const Asn1Acn::Types::Type *basicDataType = m_asn1Checks->typeFromName(paramNew.paramTypeName());
             if (!paramNew.setDefaultValue(basicDataType, value)) {
                 return false;
             }
