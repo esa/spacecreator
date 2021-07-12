@@ -132,8 +132,8 @@ void VEConnectionEndPointGraphicsItem::adjustItem()
         }
     });
 
-    const QPointF initialOffset = boundingRect().topLeft();
     QRectF itemRect = boundingRect();
+    const QPointF initialOffset = itemRect.topLeft();
     itemRect.setWidth(kSiblingMinDistance - itemRect.x());
     itemRect = mapRectToParent(itemRect);
     const QRectF parentRect = parentItem()->boundingRect();

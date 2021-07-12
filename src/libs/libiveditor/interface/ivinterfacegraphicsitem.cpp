@@ -270,6 +270,8 @@ void IVInterfaceGraphicsItem::layout()
         ++idx;
     }
     if (pos.isNull()) {
+        const Qt::Alignment side = shared::graphicsviewutils::getNearestSide(targetItem()->boundingRect(), pos);
+        updateInternalItems(side);
         adjustItem();
         /// NOTE: iface items without connections are put close to top left corner
         /// because of null pos
