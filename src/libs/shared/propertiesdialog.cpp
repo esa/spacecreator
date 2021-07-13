@@ -34,8 +34,8 @@ namespace shared {
 struct PropertiesDialog::PropertiesDialogPrivate {
     PropertiesDialogPrivate(VEObject *obj, PropertyTemplateConfig *dynPropConfig, cmd::CommandsStackBase *commandsStack)
         : dataObject(obj)
-        , dynPropConfig(dynPropConfig)
         , commandsStack(commandsStack)
+        , dynPropConfig(dynPropConfig)
         , ui(new Ui::PropertiesDialog)
     {
     }

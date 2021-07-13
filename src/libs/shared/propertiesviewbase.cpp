@@ -28,8 +28,8 @@ namespace shared {
 
 PropertiesViewBase::PropertiesViewBase(const QList<int> delegatesColumns, QWidget *parent)
     : QWidget(parent)
-    , ui(new Ui::PropertiesViewBase)
     , m_delegatesColumns(delegatesColumns)
+    , ui(new Ui::PropertiesViewBase)
 {
     ui->setupUi(this);
     ui->tableView->horizontalHeader()->setSectionResizeMode(QHeaderView::Interactive);
@@ -67,6 +67,7 @@ void PropertiesViewBase::setModel(PropertiesModelBase *model)
 
     if (m_model->rowCount()) {
         tableView()->resizeColumnsToContents();
+        ui->tableView->horizontalHeader()->setStretchLastSection(true);
     }
 }
 
@@ -98,6 +99,10 @@ void PropertiesViewBase::on_btnAdd_clicked()
     if (m_model) {
         if (m_model->createProperty(generatePropertyName(m_model))) {
             const QModelIndex &added = m_model->index(m_model->rowCount() - 1, 0);
+            if (m_model->rowCount() == 1) {
+                ui->tableView->resizeColumnsToContents();
+                ui->tableView->horizontalHeader()->setStretchLastSection(true);
+            }
             ui->tableView->scrollToBottom();
             // Delay the editing, after the value editor is created, so this name text is on top of the value editor
             QMetaObject::invokeMethod(ui->tableView, "edit", Qt::QueuedConnection, Q_ARG(const QModelIndex &, added));
@@ -127,6 +132,7 @@ void PropertiesViewBase::rowsInserted(const QModelIndex &parent, int first, int 
             if (index.isValid()) {
                 tableView()->openPersistentEditor(index);
             }
+            ui->tableView->resizeColumnToContents(column);
         }
     }
 }
