@@ -19,8 +19,10 @@
 
 #include "commandids.h"
 #include "dvboard.h"
+#include "dvcommonprops.h"
 #include "dvdevice.h"
 #include "dvmodel.h"
+#include "dvnamevalidator.h"
 #include "dvnode.h"
 #include "dvpartition.h"
 #include "graphicsviewutils.h"
@@ -31,21 +33,20 @@ namespace dve {
 namespace cmd {
 
 CmdNodeEntityCreate::CmdNodeEntityCreate(dvm::DVModel *model, const dvm::DVBoard *board, const QPointF &pos)
-    : shared::UndoCommand(QObject::tr("Create Board"))
+    : shared::UndoCommand(tr("Create Board"))
     , m_model(model)
     , m_board(board)
     , m_pos(pos)
-    , m_node(new dvm::DVNode)
+    , m_node(new dvm::DVNode(*board))
     , m_partition(new dvm::DVPartition(m_node))
 {
-    m_node->setEntityAttributes(m_board->entityAttributes());
+    m_node->setTitle(dvm::DVNameValidator::nameForObject(m_node, m_model, m_board->title()));
     m_node->setCoordinates(shared::graphicsviewutils::coordinates(
             QRectF(pos, shared::graphicsviewutils::kDefaultNodeGraphicsItemSize)));
-    m_partition->setTitle(tr("Partition_%1").arg(m_node->partitions().size() + 1));
+    m_partition->setTitle(dvm::DVNameValidator::nameForObject(m_partition, m_model));
     m_node->addPartition(m_partition);
-    for (const dvm::DVDevice *dev : m_board->devices()) {
-        auto nodeDevice = new dvm::DVDevice(m_node);
-        nodeDevice->setEntityAttributes(dev->entityAttributes());
+    for (const dvm::DVPort *port : m_board->ports()) {
+        auto nodeDevice = new dvm::DVDevice(*port, m_node);
         m_node->addDevice(nodeDevice);
         m_devices.append(nodeDevice);
     }

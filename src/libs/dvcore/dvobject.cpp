@@ -111,4 +111,4 @@ bool DVObject::aboutToBeRemoved()
     return true;
 }
 
-} // namespace deploy
+} // namespace dvm

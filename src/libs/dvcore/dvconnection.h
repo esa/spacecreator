@@ -43,4 +43,4 @@ private:
     std::unique_ptr<DVConnectionPrivate> d;
 };
 
-} // namespace deploy
+} // namespace dvm

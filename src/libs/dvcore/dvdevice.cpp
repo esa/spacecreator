@@ -17,9 +17,26 @@
 
 #include "dvdevice.h"
 
+#include "dvcommonprops.h"
 #include "dvnode.h"
+#include "dvport.h"
 
 namespace dvm {
+
+DVDevice::DVDevice(const DVPort &port, DVObject *parent)
+    : DVDevice(parent)
+{
+    EntityAttributes attrs = port.entityAttributes();
+    EntityAttribute entityAttr = attrs.take(meta::Props::token(meta::Props::Token::name));
+    QString attrName = dvm::meta::Props::token(meta::Props::Token::port);
+    attrs[attrName] = EntityAttribute { attrName, entityAttr.value(), entityAttr.type() };
+
+    entityAttr = attrs.take(meta::Props::token(meta::Props::Token::requiresBusAccess));
+    attrName = dvm::meta::Props::token(meta::Props::Token::requires_bus_access);
+    attrs[attrName] = EntityAttribute { attrName, entityAttr.value(), entityAttr.type() };
+
+    setEntityAttributes(attrs);
+}
 
 DVDevice::DVDevice(DVObject *parent)
     : DVObject(DVObject::Type::Device, {}, parent)
@@ -38,7 +55,7 @@ QString DVDevice::portName() const
 
 QString DVDevice::busName() const
 {
-    return entityAttributeValue(meta::Props::token(meta::Props::Token::bus)).toString();
+    return entityAttributeValue(meta::Props::token(meta::Props::Token::requires_bus_access)).toString();
 }
 
-} // namespace deploy
+} // namespace dvm

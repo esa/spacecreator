@@ -18,9 +18,11 @@
 #include "dvboard.h"
 
 #include "dvdevice.h"
+
 namespace dvm {
 
 struct DVBoardPrivate {
+    QList<DVPort *> ports;
 };
 
 DVBoard::DVBoard(DVObject *parent)
@@ -31,12 +33,20 @@ DVBoard::DVBoard(DVObject *parent)
 
 DVBoard::~DVBoard() { }
 
+void DVBoard::addPort(DVPort *port)
+{
+    if (d->ports.contains(port))
+        return;
+
+    d->ports.append(port);
+}
+
 /*!
    Returns all devices/ports of this device
  */
-QList<DVDevice *> DVBoard::devices() const
+QList<DVPort *> DVBoard::ports() const
 {
-    return findChildren<DVDevice *>(QString(), Qt::FindDirectChildrenOnly);
+    return d->ports;
 }
 
 } // namespace dvm

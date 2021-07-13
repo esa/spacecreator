@@ -54,6 +54,9 @@ public:
         to_bus,
         to_node,
         to_port,
+        requires_bus_access,
+
+        requiresBusAccess,
 
         coverage,
         package,

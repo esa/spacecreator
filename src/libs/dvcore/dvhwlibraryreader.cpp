@@ -24,6 +24,7 @@
 #include "dvfunction.h"
 #include "dvobject.h"
 #include "dvpartition.h"
+#include "dvport.h"
 #include "errorhub.h"
 
 #include <QDebug>
@@ -73,9 +74,10 @@ void DVHWLibraryReader::processTagOpen(QXmlStreamReader &xml)
         obj = new dvm::DVBoard();
     } break;
     case meta::Props::Token::Port: {
-        if (auto node = qobject_cast<DVBoard *>(d->m_currentObject)) {
-            auto dev = new dvm::DVDevice(d->m_currentObject);
-            obj = dev;
+        if (auto board = qobject_cast<DVBoard *>(d->m_currentObject)) {
+            auto port = new dvm::DVPort(d->m_currentObject);
+            board->addPort(port);
+            obj = port;
         }
     } break;
     default:

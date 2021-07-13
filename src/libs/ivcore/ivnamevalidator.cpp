@@ -33,7 +33,6 @@
 namespace ivm {
 
 IVNameValidator *IVNameValidator::m_instance = nullptr;
-static const QString namePatternUI("^[a-zA-Z][\\w ]*(?(?<=_)[a-zA-Z0-9])$");
 
 IVNameValidator::IVNameValidator()
     : m_typePrefixes {
@@ -165,17 +164,9 @@ bool IVNameValidator::isValidName(const QString &name)
         return false;
     }
 
-    static QRegularExpression re(ivm::namePatternUI);
+    static QRegularExpression re(shared::namePatternUI);
     QRegularExpressionMatch match = re.match(name);
     return match.hasMatch();
-}
-
-/*!
-   The regular expression pattern for iv names, used for the UI (encoded name)
- */
-const QString &IVNameValidator::namePatternUI()
-{
-    return ivm::namePatternUI;
 }
 
 /*!

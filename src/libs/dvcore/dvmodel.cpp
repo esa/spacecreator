@@ -52,4 +52,4 @@ DVObject *DVModel::getObject(const shared::Id &id) const
     return qobject_cast<DVObject *>(shared::VEModel::getObject(id));
 }
 
-} // namespace deploy
+} // namespace dvm

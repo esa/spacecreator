@@ -26,11 +26,13 @@ namespace dvm {
 struct DVNodePrivate;
 class DVPartition;
 class DVDevice;
+class DVBoard;
 
 class DVNode : public DVObject
 {
     Q_OBJECT
 public:
+    explicit DVNode(const DVBoard &board, DVObject *parent = nullptr);
     explicit DVNode(DVObject *parent = nullptr);
     ~DVNode() override;
 
@@ -46,4 +48,4 @@ private:
     std::unique_ptr<DVNodePrivate> d;
 };
 
-} // namespace deploy
+} // namespace dvm

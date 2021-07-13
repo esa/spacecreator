@@ -46,4 +46,4 @@ private:
     std::unique_ptr<DVPartitionPrivate> d;
 };
 
-} // namespace deploy
+} // namespace dvm

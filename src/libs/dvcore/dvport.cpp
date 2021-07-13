@@ -15,30 +15,31 @@
    along with this program. If not, see <https://www.gnu.org/licenses/lgpl-2.1.html>.
 */
 
-#pragma once
+#include "dvport.h"
 
-#include "dvobject.h"
-
-#include <memory>
-#include <qobjectlistmodelt.h>
+#include "dvboard.h"
+#include "dvcommonprops.h"
 
 namespace dvm {
-struct DVBoardPrivate;
-class DVPort;
 
-class DVBoard : public DVObject
+DVPort::DVPort(QObject *parent)
+    : DVObject(DVObject::Type::Port, {}, parent)
 {
-    Q_OBJECT
-public:
-    explicit DVBoard(DVObject *parent = nullptr);
-    ~DVBoard() override;
+}
 
-    void addPort(DVPort *port);
+DVBoard *DVPort::board() const
+{
+    return qobject_cast<DVBoard *>(parent());
+}
 
-    QList<DVPort *> ports() const;
+QString DVPort::title() const
+{
+    return entityAttributeValue(meta::Props::token(meta::Props::Token::name)).toString();
+}
 
-private:
-    std::unique_ptr<DVBoardPrivate> d;
-};
+QString DVPort::busName() const
+{
+    return entityAttributeValue(meta::Props::token(meta::Props::Token::requiresBusAccess)).toString();
+}
 
 } // namespace dvm

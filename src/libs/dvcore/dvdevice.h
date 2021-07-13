@@ -21,11 +21,13 @@
 
 namespace dvm {
 class DVNode;
+class DVPort;
 
 class DVDevice : public DVObject
 {
     Q_OBJECT
 public:
+    explicit DVDevice(const DVPort &port, DVObject *parent = nullptr);
     explicit DVDevice(DVObject *parent = nullptr);
 
     DVNode *node() const;
@@ -34,4 +36,4 @@ public:
     QString busName() const;
 };
 
-} // namespace deploy
+} // namespace dvm

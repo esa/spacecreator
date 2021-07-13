@@ -19,26 +19,18 @@
 
 #include "dvobject.h"
 
-#include <memory>
-#include <qobjectlistmodelt.h>
-
 namespace dvm {
-struct DVBoardPrivate;
-class DVPort;
+class DVBoard;
 
-class DVBoard : public DVObject
+class DVPort : public DVObject
 {
     Q_OBJECT
 public:
-    explicit DVBoard(DVObject *parent = nullptr);
-    ~DVBoard() override;
+    explicit DVPort(QObject *parent = nullptr);
 
-    void addPort(DVPort *port);
-
-    QList<DVPort *> ports() const;
-
-private:
-    std::unique_ptr<DVBoardPrivate> d;
+    QString title() const override;
+    DVBoard *board() const;
+    QString busName() const;
 };
 
 } // namespace dvm

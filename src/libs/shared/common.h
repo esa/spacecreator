@@ -35,6 +35,8 @@ static const Id InvalidId = Id();
 
 static const QString kStringDelemiter = QStringLiteral("::");
 
+static const QString namePatternUI("^[a-zA-Z][\\w ]*(?(?<=_)[a-zA-Z0-9])$");
+
 Id createId();
 
 class DropData : public QMimeData

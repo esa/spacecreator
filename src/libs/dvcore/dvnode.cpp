@@ -17,6 +17,7 @@
 
 #include "dvnode.h"
 
+#include "dvboard.h"
 #include "dvdevice.h"
 
 #include <QPointer>
@@ -27,6 +28,12 @@ struct DVNodePrivate {
     QList<DVPartition *> partitions;
     QList<QPointer<DVDevice>> devices;
 };
+
+DVNode::DVNode(const DVBoard &board, DVObject *parent)
+    : DVNode(parent)
+{
+    setEntityAttributes(board.entityAttributes());
+}
 
 DVNode::DVNode(DVObject *parent)
     : DVObject(DVObject::Type::Node, {}, parent)
@@ -70,4 +77,4 @@ QList<QPointer<dvm::DVDevice>> DVNode::devices() const
     return d->devices;
 }
 
-} // namespace deploy
+} // namespace dvm

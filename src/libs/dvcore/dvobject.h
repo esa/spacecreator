@@ -39,6 +39,8 @@ public:
         Unknown = 0,
 
         Board,
+        Port,
+
         Node,
         Partition,
         Function,
@@ -83,4 +85,4 @@ inline uint qHash(const DVObject::Type &key, uint seed)
     return ::qHash(static_cast<uint>(key), seed);
 }
 
-} // namespace deploy
+} // namespace dvm

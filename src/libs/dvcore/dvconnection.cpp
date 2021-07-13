@@ -58,25 +58,24 @@ DVConnection::~DVConnection() { }
 bool DVConnection::postInit()
 {
     if (!model()) {
-        shared::ErrorHub::addError(shared::ErrorItem::Error, tr("Connection can't init without model set"), "");
+        shared::ErrorHub::addError(shared::ErrorItem::Error, tr("Connection can't init without model set"));
         return false;
     }
 
     auto getDevice = [this](const QString &nodeName, const QString &portName, const QString &busName) -> DVDevice * {
         if (nodeName.isEmpty()) {
-            shared::ErrorHub::addError(shared::ErrorItem::Error, tr("Malformed data, empty source node"), "");
+            shared::ErrorHub::addError(shared::ErrorItem::Error, tr("Malformed data, empty source node"));
             return nullptr;
         }
         if (portName.isEmpty()) {
-            shared::ErrorHub::addError(shared::ErrorItem::Error, tr("Malformed data, empty source port"), "");
+            shared::ErrorHub::addError(shared::ErrorItem::Error, tr("Malformed data, empty source port"));
             return nullptr;
         }
 
         auto node =
                 qobject_cast<DVNode *>(model()->getObjectByName(nodeName, DVObject::Type::Node, Qt::CaseInsensitive));
         if (!node) {
-            shared::ErrorHub::addError(
-                    shared::ErrorItem::Error, tr("Can't find node with name %1\n").arg(nodeName), "");
+            shared::ErrorHub::addError(shared::ErrorItem::Error, tr("Can't find node with name %1\n").arg(nodeName));
             return nullptr;
         }
         const QList<QPointer<DVDevice>> nodeDevices = node->devices();
@@ -84,8 +83,7 @@ bool DVConnection::postInit()
             return dev->portName() == portName && dev->busName() == busName;
         });
         if (it == nodeDevices.cend()) {
-            shared::ErrorHub::addError(
-                    shared::ErrorItem::Error, tr("Can't find device with name %1\n").arg(portName), "");
+            shared::ErrorHub::addError(shared::ErrorItem::Error, tr("Can't find device with name %1\n").arg(portName));
             return nullptr;
         }
         return *it;
@@ -125,4 +123,4 @@ DVDevice *DVConnection::targetDevice() const
     return d->targetDevice;
 }
 
-} // namespace deploy
+} // namespace dvm

@@ -64,4 +64,4 @@ QStringList DVPartition::functionsNames() const
     return names;
 }
 
-} // namespace deploy
+} // namespace dvm

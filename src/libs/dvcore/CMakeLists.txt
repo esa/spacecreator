@@ -33,6 +33,10 @@ target_sources(${LIB_NAME} PRIVATE
     dvpropertytemplate.h
     dvlibrary.cpp
     dvlibrary.h
+    dvport.cpp
+    dvport.h
+    dvnamevalidator.cpp
+    dvnamevalidator.h
     dvresources.qrc
 )
 

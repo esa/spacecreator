@@ -39,4 +39,4 @@ public:
     DVObject *getObjectByName(const QString &name, DVObject::Type type, Qt::CaseSensitivity caseSensitivity) const;
 };
 
-} // namespace deploy
+} // namespace dvm
