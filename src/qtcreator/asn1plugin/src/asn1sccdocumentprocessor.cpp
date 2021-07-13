@@ -54,6 +54,11 @@ Asn1SccDocumentProcessor::Asn1SccDocumentProcessor(const QString &projectName,
 
 void Asn1SccDocumentProcessor::addToRun(const QString &filePath, const QString &docContent)
 {
+    // skip acn files
+    if (filePath.endsWith("acn", Qt::CaseInsensitive)) {
+        return;
+    }
+
     m_documents.insert(filePath, docContent);
 }
 
