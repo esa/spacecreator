@@ -49,6 +49,9 @@ SpaceCreatorProjectImpl::SpaceCreatorProjectImpl(ProjectExplorer::Project *proje
     m_asnFiles = allAsn1Files();
     connect(m_project, &ProjectExplorer::Project::fileListChanged, this,
             &spctr::SpaceCreatorProjectImpl::checkAsnFileRename);
+    for (const QString &file : qAsConst(m_asnFiles)) {
+        m_asn1Storage->watchFile(file);
+    }
 
     static bool hubInitialized = false;
     if (!hubInitialized) {
@@ -85,6 +88,10 @@ QStringList SpaceCreatorProjectImpl::projectFiles(const QString &suffix) const
 void SpaceCreatorProjectImpl::checkAsnFileRename()
 {
     QStringList asnFiles = allAsn1Files();
+
+    for (const QString &file : qAsConst(asnFiles)) {
+        m_asn1Storage->watchFile(file);
+    }
 
     QStringList newAsnFiles;
     for (const QString &file : qAsConst(asnFiles)) {

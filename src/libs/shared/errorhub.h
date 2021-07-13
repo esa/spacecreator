@@ -45,8 +45,6 @@ class ErrorHub : public QObject
 {
     Q_OBJECT
 public:
-    explicit ErrorHub(QObject *parent = nullptr);
-
     static ErrorHub *instance();
 
     static void addError(
@@ -67,6 +65,8 @@ Q_SIGNALS:
     void clearedFile(const QString &fileName);
 
 private:
+    explicit ErrorHub();
+
     static ErrorHub *m_instance;
 
     QVector<ErrorItem> m_errors;

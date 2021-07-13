@@ -33,9 +33,8 @@ ErrorItem::ErrorItem(TaskType type, const QString &description, const QString &f
 {
 }
 
-ErrorHub::ErrorHub(QObject *parent)
-
-    : QObject(parent)
+ErrorHub::ErrorHub()
+    : QObject()
 {
 }
 

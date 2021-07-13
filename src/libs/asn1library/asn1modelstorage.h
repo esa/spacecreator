@@ -52,6 +52,8 @@ public:
 
     void clear();
 
+    void watchFile(const QString &fileName);
+
 Q_SIGNALS:
     void dataTypesChanged(const QString &fileName);
     void success(const QString &fileName);

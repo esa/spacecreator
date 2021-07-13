@@ -94,15 +94,10 @@ void Asn1ModelStorage::clear()
 }
 
 /*!
-   Load the data types stored the file \sa fileName
+   Ensures that the file is watched. So if the file on disk changes, it is reloaded.
  */
-bool Asn1ModelStorage::loadFile(const QString &fileName)
+void Asn1ModelStorage::watchFile(const QString &fileName)
 {
-    QSharedPointer<Asn1Acn::File> asn1Data = loadData(fileName);
-
-    m_store[fileName] = asn1Data;
-    Q_EMIT dataTypesChanged(fileName);
-
     if (QFileInfo::exists(fileName) && !m_asn1Watcher->files().contains(fileName)) {
         m_asn1Watcher->addPath(fileName);
         connect(m_asn1Watcher, &QFileSystemWatcher::fileChanged, this, [this](const QString &path) {
@@ -111,6 +106,18 @@ bool Asn1ModelStorage::loadFile(const QString &fileName)
             m_filesToReload.insert(path);
         });
     }
+}
+
+/*!
+   Load the data types stored the file \sa fileName
+ */
+bool Asn1ModelStorage::loadFile(const QString &fileName)
+{
+    QSharedPointer<Asn1Acn::File> asn1Data = loadData(fileName);
+
+    m_store[fileName] = asn1Data;
+    Q_EMIT dataTypesChanged(fileName);
+    watchFile(fileName);
     return !asn1Data.isNull();
 }
 
