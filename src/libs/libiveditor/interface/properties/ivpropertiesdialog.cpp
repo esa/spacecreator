@@ -137,6 +137,7 @@ void IVPropertiesDialog::initAttributesView()
     QStyledItemDelegate *attrDelegate = new shared::AttributeDelegate(viewAttrs->tableView());
 
     switch (dataObject()->type()) {
+    case ivm::IVObject::Type::FunctionType:
     case ivm::IVObject::Type::Function: {
         modelAttrs = new FunctionPropertiesListModel(commandMacro(), propertiesConfig(), this);
         break;
