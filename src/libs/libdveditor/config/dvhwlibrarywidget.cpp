@@ -36,7 +36,7 @@ DVHWLibraryWidget::DVHWLibraryWidget(QWidget *parent)
 
     connect(ui->pathButton, &QPushButton::clicked, this, [this]() {
         QFileInfo fi(path());
-        QString exec = QFileDialog::getOpenFileName(this, tr("Select HW Library"), fi.absolutePath());
+        QString exec = QFileDialog::getExistingDirectory(this, tr("Select HW Library"), fi.absolutePath());
         if (!exec.isEmpty()) {
             ui->pathEdit->setText(exec);
         }

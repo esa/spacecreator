@@ -24,7 +24,11 @@
       </widget>
      </item>
      <item>
-      <widget class="QLineEdit" name="pathEdit"/>
+      <widget class="QLineEdit" name="pathEdit">
+       <property name="toolTip">
+        <string>Select the directory of the HW library (boards collection)</string>
+       </property>
+      </widget>
      </item>
      <item>
       <widget class="QPushButton" name="pathButton">
