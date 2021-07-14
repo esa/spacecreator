@@ -132,6 +132,12 @@ QString interfaceCustomAttributesFilePath();
  */
 QString deploymentCustomAttributesFilePath();
 
+/*!
+ * Returns path to the HW library directory (containing the boards) set in TASTE_DEPLOYMENT_HW_PATH
+ * environment variable otherwise points to default, for ex. ~/.local/share/ESA/DV Editor/HWlibrary
+ */
+QString hwLibraryPath();
+
 }
 
 Q_DECLARE_METATYPE(shared::Id)

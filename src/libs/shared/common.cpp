@@ -17,6 +17,8 @@
 
 #include "common.h"
 
+#include "settingsmanager.h"
+
 #include <QDebug>
 #include <QDir>
 #include <QDirIterator>
@@ -25,8 +27,6 @@
 #include <QPalette>
 #include <QStandardPaths>
 #include <QWidget>
-#include <asn1/definitions.h>
-#include <asn1/file.h>
 
 #ifdef Q_OS_WIN
 extern Q_CORE_EXPORT int qt_ntfs_permission_lookup;
@@ -208,6 +208,15 @@ QString deploymentCustomAttributesFilePath()
             + QDir::separator() + QLatin1String("deployment_attributes.xml");
 
     return qEnvironmentVariable("TASTE_DEPLOYMENT_ATTRIBUTES_PATH", kDefaultPath);
+}
+
+QString hwLibraryPath()
+{
+    static const QString kDefaultPath = QStandardPaths::writableLocation(QStandardPaths::AppLocalDataLocation)
+            + QDir::separator() + QLatin1String("HWlibrary");
+    QString hwFile = shared::SettingsManager::load<QString>(shared::SettingsManager::DVE::HwLibraryFile, kDefaultPath);
+
+    return qEnvironmentVariable("TASTE_DEPLOYMENT_HW_PATH", hwFile);
 }
 
 }

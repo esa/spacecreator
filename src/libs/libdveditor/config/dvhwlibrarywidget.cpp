@@ -17,6 +17,7 @@
 
 #include "dvhwlibrarywidget.h"
 
+#include "common.h"
 #include "settingsmanager.h"
 #include "ui_dvhwlibrarywidget.h"
 
@@ -31,8 +32,7 @@ DVHWLibraryWidget::DVHWLibraryWidget(QWidget *parent)
 {
     ui->setupUi(this);
 
-    QString hwFile = shared::SettingsManager::load<QString>(shared::SettingsManager::DVE::HwLibraryFile, "");
-    ui->pathEdit->setText(hwFile);
+    ui->pathEdit->setText(shared::hwLibraryPath());
 
     connect(ui->pathButton, &QPushButton::clicked, this, [this]() {
         QFileInfo fi(path());
@@ -55,7 +55,9 @@ QString DVHWLibraryWidget::path() const
 
 void DVHWLibraryWidget::save()
 {
-    shared::SettingsManager::store<QString>(shared::SettingsManager::DVE::HwLibraryFile, path());
+    if (path() != shared::hwLibraryPath()) {
+        shared::SettingsManager::store<QString>(shared::SettingsManager::DVE::HwLibraryFile, path());
+    }
 }
 
 } // namespace dve

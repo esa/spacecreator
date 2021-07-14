@@ -20,6 +20,7 @@
 #include "asn1modelstorage.h"
 #include "asn1systemchecks.h"
 #include "baseitems/common/ivutils.h"
+#include "common.h"
 #include "dvappmodel.h"
 #include "dveditorcore.h"
 #include "dvsystemchecks.h"
@@ -30,7 +31,6 @@
 #include "mainmodel.h"
 #include "msceditorcore.h"
 #include "mscsystemchecks.h"
-#include "settingsmanager.h"
 
 #include <QDebug>
 #include <QMessageBox>
@@ -59,8 +59,7 @@ QSharedPointer<dve::DVEditorCore> SpaceCreatorProject::dvData(const QString &fil
 {
     if (!m_dvStore.contains(fileName)) {
         QSharedPointer<dve::DVEditorCore> data(new dve::DVEditorCore());
-        QString hwFile = shared::SettingsManager::load<QString>(shared::SettingsManager::DVE::HwLibraryFile, "");
-        data->loadHWLibrary(hwFile);
+        data->loadHWLibrary(shared::hwLibraryPath());
         data->appModel()->load(fileName);
         const_cast<SpaceCreatorProject *>(this)->setDvData(fileName, data);
         return data;
