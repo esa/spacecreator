@@ -30,12 +30,15 @@
 #include "ivsystemchecks.h"
 #include "mainmodel.h"
 #include "msceditorcore.h"
+#include "mscmodel.h"
 #include "mscsystemchecks.h"
 
 #include <QDebug>
 #include <QMessageBox>
 
 namespace scs {
+
+static const QString GLOBAL_ASN_FILE = { "dataview-uniq.asn" };
 
 SpaceCreatorProject::SpaceCreatorProject(QObject *parent)
     : AbstractProject(parent)
@@ -81,6 +84,9 @@ QSharedPointer<ive::IVEditorCore> SpaceCreatorProject::ivData(const QString &fil
         data->document()->setAsn1Check(m_asnChecks.get());
 
         data->document()->load(fileName);
+        if (data->document()->asn1FileName().isEmpty()) {
+            data->document()->setAsn1FileName(GLOBAL_ASN_FILE);
+        }
         const_cast<SpaceCreatorProject *>(this)->setIvData(fileName, data);
         return data;
     }
@@ -99,6 +105,12 @@ QSharedPointer<msc::MSCEditorCore> SpaceCreatorProject::mscData(const QString &f
         data->showToolbars(false);
         data->mainModel()->setAsn1Check(m_asnChecks.get());
         data->mainModel()->loadFile(fileName);
+        if (data->mainModel()->mscModel() && data->mainModel()->mscModel()->dataLanguage().isEmpty()) {
+            data->mainModel()->mscModel()->setDataLanguage("ASN.1");
+        }
+        if (data->mainModel()->mscModel() && data->mainModel()->mscModel()->dataDefinitionString().isEmpty()) {
+            data->mainModel()->mscModel()->setDataDefinitionString(GLOBAL_ASN_FILE);
+        }
         const_cast<SpaceCreatorProject *>(this)->setMscData(fileName, data);
         return data;
     }

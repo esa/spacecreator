@@ -18,8 +18,8 @@
         { "key": "MSCFile", "value": "%{ProjectName}.msc" },
         { "key": "DVFile", "value": "deploymentview.dv.xml" },
         { "key": "IVFile", "value": "interfaceview.xml" },
-        { "key": "MSCAsnFile", "value": "    language ASN.1;\n    data %{AsnFile};" },
-        { "key": "IVAsnFile", "value": " asn1file=\"%{AsnFile}\"" }
+        { "key": "MSCAsnFile", "value": "    language ASN.1;\n    data dataview-uniq.asn;" },
+        { "key": "IVAsnFile", "value": " asn1file=\"dataview-uniq.asn\"" }
     ],
 
     "pages":
