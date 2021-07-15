@@ -264,7 +264,7 @@ void MessageDeclarationsDialog::updateParameterButtons()
 
 void MessageDeclarationsDialog::selectAsn1File()
 {
-    QString fileName = QFileDialog::getOpenFileName(this, "ASN.1 file", QString(), "ASN.1 files (*.asn)");
+    QString fileName = QFileDialog::getOpenFileName(this, "ASN.1 file", QString(), "ASN.1 files (*.asn *.asn1)");
     if (!fileName.isEmpty()) {
         QFileInfo fileInfo(fileName);
         QStringList errors;

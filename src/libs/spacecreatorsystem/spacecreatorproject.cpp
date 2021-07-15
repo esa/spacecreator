@@ -216,7 +216,7 @@ QStringList SpaceCreatorProject::allMscFiles() const
  */
 QStringList SpaceCreatorProject::allAsn1Files() const
 {
-    return projectFiles(".asn");
+    return projectFiles(".asn") + projectFiles(".asn1");
 }
 
 /*!

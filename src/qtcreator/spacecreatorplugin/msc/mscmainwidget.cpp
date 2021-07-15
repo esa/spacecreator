@@ -181,7 +181,7 @@ void MscMainWidget::onViewModeChanged()
 void MscMainWidget::openAsn1Dialog()
 {
     QString dir = QFileInfo(m_plugin->mainModel()->currentFilePath()).absolutePath();
-    QString asn1File = QFileDialog::getOpenFileName(this, tr("Select a asn.1 file"), dir, "*.asn");
+    QString asn1File = QFileDialog::getOpenFileName(this, tr("Select a asn.1 file"), dir, "ASN.1 files (*.asn *.asn1)");
     if (!asn1File.isEmpty()) {
         QFileInfo fi(asn1File);
         msc::MscModel *model = m_plugin->mainModel()->mscModel();

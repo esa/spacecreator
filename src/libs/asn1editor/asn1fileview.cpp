@@ -130,8 +130,8 @@ void ASN1FileView::setFile(const QFileInfo &file)
  */
 void ASN1FileView::selectFile()
 {
-    QString file =
-            QFileDialog::getOpenFileName(this, tr("ASN.1 file"), QString(), QStringLiteral("ASN1 files (*.asn *.ASN)"));
+    QString file = QFileDialog::getOpenFileName(
+            this, tr("ASN.1 file"), QString(), QStringLiteral("ASN1 files (*.asn *.asn1)"));
     if (!file.isEmpty()) {
         QFileInfo fi(file);
         if (ui->filenameLabel->text() != fi.fileName()) {
