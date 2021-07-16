@@ -342,7 +342,7 @@ qreal IVInterfaceGraphicsItem::typeIconHeight() const
 {
     return kHeight;
 }
-qreal IVInterfaceGraphicsItem::baseLength() const
+qreal IVInterfaceGraphicsItem::baseLength()
 {
     return kBase;
 }

@@ -59,6 +59,7 @@ public:
     QString prepareTooltip() const override;
 
     qreal maxWidth() const;
+    static qreal baseLength();
 
 public Q_SLOTS:
     void updateLabel();
@@ -70,7 +71,6 @@ protected:
     virtual shared::ColorManager::HandledColors handledColorType() const override;
 
     qreal typeIconHeight() const;
-    qreal baseLength() const;
 
 protected Q_SLOTS:
     virtual void applyColorScheme() override;

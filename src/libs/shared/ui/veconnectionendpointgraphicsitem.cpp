@@ -171,7 +171,7 @@ void VEConnectionEndPointGraphicsItem::adjustItem()
     }
 }
 
-qreal VEConnectionEndPointGraphicsItem::minSiblingDistance() const
+qreal VEConnectionEndPointGraphicsItem::minSiblingDistance()
 {
     return kSiblingMinDistance;
 }

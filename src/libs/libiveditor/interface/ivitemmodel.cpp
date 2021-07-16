@@ -37,6 +37,7 @@
 #include "ivfunction.h"
 #include "ivinterface.h"
 #include "ivinterfacegroup.h"
+#include "positionlookuphelper.h"
 #include "ui/veconnectiongraphicsitem.h"
 
 #include <QGraphicsView>
@@ -275,10 +276,7 @@ IVFunctionGraphicsItem *IVItemModel::rootItem() const
 
 void IVItemModel::setupInnerGeometry(ivm::IVObject *obj) const
 {
-    static const QSet<ivm::IVObject::Type> kTypes { ivm::IVObject::Type::FunctionType, ivm::IVObject::Type::Function,
-        ivm::IVObject::Type::Comment };
-
-    if (!obj || !kTypes.contains(obj->type())) {
+    if (!obj) {
         return;
     }
 
@@ -290,50 +288,113 @@ void IVItemModel::setupInnerGeometry(ivm::IVObject *obj) const
     if (!parentObj) {
         return;
     }
-    QRectF rootGeometry;
-    const QVariant rootCoord =
-            parentObj->entityAttributeValue(ivm::meta::Props::token(ivm::meta::Props::Token::RootCoordinates));
-    if (rootCoord.isValid()) {
-        rootGeometry = shared::graphicsviewutils::rect(ivm::IVObject::coordinatesFromString(rootCoord.toString()));
-    }
-    QList<QRectF> existingRects;
-    QRectF innerItemsGeometry;
-    for (const ivm::IVObject *child : parentObj->children()) {
-        if (kTypes.contains(child->type())) {
-            innerCoord =
-                    child->entityAttributeValue(ivm::meta::Props::token(ivm::meta::Props::Token::InnerCoordinates));
-            if (!innerCoord.isValid()) {
-                continue;
+
+    static const QSet<ivm::IVObject::Type> kRectangularTypes { ivm::IVObject::Type::FunctionType,
+        ivm::IVObject::Type::Function, ivm::IVObject::Type::Comment };
+
+    static const QSet<ivm::IVObject::Type> kInterfaceTypes { ivm::IVObject::Type::RequiredInterface,
+        ivm::IVObject::Type::ProvidedInterface, ivm::IVObject::Type::InterfaceGroup };
+
+    if (kRectangularTypes.contains(obj->type())) {
+        QRectF rootGeometry;
+        const QVariant rootCoord =
+                parentObj->entityAttributeValue(ivm::meta::Props::token(ivm::meta::Props::Token::RootCoordinates));
+        if (rootCoord.isValid()) {
+            rootGeometry = shared::graphicsviewutils::rect(ivm::IVObject::coordinatesFromString(rootCoord.toString()));
+        }
+        QList<QRectF> existingRects;
+        QRectF innerItemsGeometry;
+        for (const ivm::IVObject *child : parentObj->children()) {
+            if (kRectangularTypes.contains(child->type())) {
+                innerCoord =
+                        child->entityAttributeValue(ivm::meta::Props::token(ivm::meta::Props::Token::InnerCoordinates));
+                if (!innerCoord.isValid()) {
+                    continue;
+                }
+                const QRectF innerRect =
+                        shared::graphicsviewutils::rect(ivm::IVObject::coordinatesFromString(innerCoord.toString()));
+                innerItemsGeometry |= innerRect;
+                existingRects.append(innerRect);
             }
-            const QRectF innerRect =
-                    shared::graphicsviewutils::rect(ivm::IVObject::coordinatesFromString(innerCoord.toString()));
-            innerItemsGeometry |= innerRect;
-            existingRects.append(innerRect);
         }
-    }
-    QRectF innerGeometry;
-    QRectF newRootGeometry { rootGeometry };
-    shared::graphicsviewutils::findGeometryForRect(innerGeometry, newRootGeometry, existingRects);
-    if (!rootCoord.isValid()) {
-        QRectF mappedViewportGeometry;
-        if (const QGraphicsView *view = m_graphicsScene->views().value(0)) {
-            const QRect viewportGeometry =
-                    view->viewport()->geometry().marginsRemoved(shared::graphicsviewutils::kContentMargins.toMargins());
-            mappedViewportGeometry = QRectF(view->mapToScene(QPoint(0, 0)),
-                    view->mapToScene(QPoint(viewportGeometry.width(), viewportGeometry.height())));
+        QRectF innerGeometry;
+        QRectF newRootGeometry { rootGeometry };
+        shared::graphicsviewutils::findGeometryForRect(innerGeometry, newRootGeometry, existingRects);
+        if (!rootCoord.isValid()) {
+            QRectF mappedViewportGeometry;
+            if (const QGraphicsView *view = m_graphicsScene->views().value(0)) {
+                const QRect viewportGeometry = view->viewport()->geometry().marginsRemoved(
+                        shared::graphicsviewutils::kContentMargins.toMargins());
+                mappedViewportGeometry = QRectF(view->mapToScene(QPoint(0, 0)),
+                        view->mapToScene(QPoint(viewportGeometry.width(), viewportGeometry.height())));
+            }
+            mappedViewportGeometry.moveCenter(rootGeometry.center());
+            rootGeometry |= mappedViewportGeometry;
+        } else {
+            rootGeometry |= newRootGeometry;
         }
-        mappedViewportGeometry.moveCenter(rootGeometry.center());
-        rootGeometry |= mappedViewportGeometry;
-    } else {
-        rootGeometry |= newRootGeometry;
+
+        const QString strRootCoord =
+                ivm::IVObject::coordinatesToString(shared::graphicsviewutils::coordinates(rootGeometry));
+        parentObj->setEntityProperty(ivm::meta::Props::token(ivm::meta::Props::Token::RootCoordinates), strRootCoord);
+
+        const QString strCoord =
+                ivm::IVObject::coordinatesToString(shared::graphicsviewutils::coordinates(innerGeometry));
+        obj->setEntityProperty(ivm::meta::Props::token(ivm::meta::Props::Token::InnerCoordinates), strCoord);
+    } else if (kInterfaceTypes.contains(obj->type())) {
+        const QString parentStrCoord = parentObj->entityAttributeValue<QString>(
+                ivm::meta::Props::token(ivm::meta::Props::Token::InnerCoordinates));
+        const QRectF parentRect =
+                shared::graphicsviewutils::rect(shared::VEObject::coordinatesFromString(parentStrCoord));
+        QList<QRectF> siblingsRects;
+        const qreal side = IVInterfaceGraphicsItem::baseLength();
+        const QRectF kBaseRect { -side / 2, -side / 2, side, side };
+        QRectF itemRect { kBaseRect };
+        const QPointF initialOffset = itemRect.topLeft();
+        itemRect.setWidth(IVInterfaceGraphicsItem::minSiblingDistance() - itemRect.x());
+        for (const ivm::IVInterface *iface : parentObj->allInterfaces()) {
+            const QString ifaceStrCoord = iface->entityAttributeValue<QString>(
+                    ivm::meta::Props::token(ivm::meta::Props::Token::InnerCoordinates));
+            if (ifaceStrCoord.isEmpty())
+                continue;
+
+            const QPointF ifacePoint =
+                    shared::graphicsviewutils::pos(shared::VEObject::coordinatesFromString(ifaceStrCoord));
+            itemRect.moveCenter(ifacePoint);
+            siblingsRects.append(itemRect);
+        }
+
+        itemRect.translate(parentRect.topLeft());
+        QPointF innerGeometry;
+        QRectF intersectedRect;
+        if (shared::graphicsviewutils::isCollided(siblingsRects, itemRect, &intersectedRect) && parentRect.isValid()) {
+            QPainterPath pp;
+            pp.addRect(kBaseRect);
+            const QHash<Qt::Alignment, QPainterPath> kSidePaths {
+                { Qt::AlignLeft, pp },
+                { Qt::AlignTop, pp },
+                { Qt::AlignRight, pp },
+                { Qt::AlignBottom, pp },
+            };
+            shared::PositionLookupHelper cwHelper(kSidePaths, parentRect, siblingsRects, itemRect, initialOffset,
+                    shared::graphicsviewutils::LookupDirection::Clockwise);
+            shared::PositionLookupHelper ccwHelper(kSidePaths, parentRect, siblingsRects, itemRect, initialOffset,
+                    shared::graphicsviewutils::LookupDirection::CounterClockwise);
+            while (cwHelper.hasNext() || ccwHelper.hasNext()) {
+                if (cwHelper.lookup()) {
+                    innerGeometry = cwHelper.mappedOriginPoint();
+                    break;
+                } else if (ccwHelper.lookup()) {
+                    innerGeometry = ccwHelper.mappedOriginPoint();
+                    break;
+                }
+            }
+        }
+
+        const QString strCoord =
+                ivm::IVObject::coordinatesToString(shared::graphicsviewutils::coordinates(innerGeometry));
+        obj->setEntityProperty(ivm::meta::Props::token(ivm::meta::Props::Token::InnerCoordinates), strCoord);
     }
-
-    const QString strRootCoord =
-            ivm::IVObject::coordinatesToString(shared::graphicsviewutils::coordinates(rootGeometry));
-    parentObj->setEntityProperty(ivm::meta::Props::token(ivm::meta::Props::Token::RootCoordinates), strRootCoord);
-
-    const QString strCoord = ivm::IVObject::coordinatesToString(shared::graphicsviewutils::coordinates(innerGeometry));
-    obj->setEntityProperty(ivm::meta::Props::token(ivm::meta::Props::Token::InnerCoordinates), strCoord);
 }
 
 void IVItemModel::changeRootItem(shared::Id id)

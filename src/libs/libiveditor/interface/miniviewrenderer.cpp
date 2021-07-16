@@ -200,8 +200,9 @@ void MiniViewRenderer::updateData()
                 if (innerIface->hasEntityAttribute(ivm::meta::Props::token(innerCoordToken))) {
                     const QString ifaceStrCoordinates =
                             innerIface->entityAttributeValue<QString>(ivm::meta::Props::token(innerCoordToken));
-                    innerIfacePos =
-                            shared::graphicsviewutils::pos(ivm::IVObject::coordinatesFromString(ifaceStrCoordinates));
+                    innerIfacePos = ifaceStrCoordinates.isEmpty()
+                            ? QPointF(-1, -1)
+                            : shared::graphicsviewutils::pos(ivm::IVObject::coordinatesFromString(ifaceStrCoordinates));
                     const ConnectionData cd { outerIfaceItem->scenePos(), innerIfacePos,
                         innerIface->parentObject()->id() };
                     d->parentChildConnections << cd;
@@ -295,7 +296,7 @@ void MiniViewRenderer::drawData(QPainter *painter)
         const QRectF outerRect = d->item->mapRectFromScene(d->item->sceneBoundingRect());
         const QPointF outerPos = d->item->mapFromScene(connectionData.outerMappedScenePos);
         QPointF innerPos;
-        if (connectionData.innerScenePos.isNull()) {
+        if (connectionData.innerScenePos == QPointF(-1, -1)) {
             const QPointF ratio { (outerRect.right() - outerPos.x()) / outerRect.width(),
                 (outerRect.bottom() - outerPos.y()) / outerRect.height() };
             const qreal x = innerRect.left() + innerRect.width() * ratio.x();

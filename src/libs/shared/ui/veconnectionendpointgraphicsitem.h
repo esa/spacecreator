@@ -50,7 +50,7 @@ public:
 
     void adjustItem();
 
-    qreal minSiblingDistance() const;
+    static qreal minSiblingDistance();
     virtual void layout();
     virtual QPainterPath ifaceShape() const;
 
