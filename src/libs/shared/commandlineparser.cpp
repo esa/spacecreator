@@ -37,14 +37,14 @@ namespace shared {
            Used for debug/test purpose only
     \var shared::CommandLineParser::StartRemoteControl
            Run the MSC editor in streaming mode
-    \var shared::CommandLineParser::OpenIVFile
+    \var shared::CommandLineParser::OpenXMLFile
            Automatically load the speceficied file on startup.
     \var shared::CommandLineParser::ListScriptableActions
            List all the actions available for scripting and exit.
     \var shared::CommandLineParser::OpenStringTemplateFile
            Load the specified template file.
     \var shared::CommandLineParser::ExportToFile
-           Save the file opened by OpenIVFile using the template passed with OpenStringTemplateFile.
+           Save the file opened by OpenXMLFile using the template passed with OpenStringTemplateFile.
     \var shared::CommandLineParser::DropUnsavedChangesSilently
            Do not warn about unsaved changes on the document closing.
 */
@@ -143,10 +143,10 @@ QCommandLineOption CommandLineParser::positionalArg(CommandLineParser::Positiona
         description = QCoreApplication::translate(
                 "CommandLineParser", "Do not propose to save changes when closing a document");
         break;
-    case CommandLineParser::Positional::OpenIVFile:
+    case CommandLineParser::Positional::OpenXMLFile:
         names << "o"
-              << "open-iv-xml";
-        description = QCoreApplication::translate("CommandLineParser", "The iv-xml document to load document");
+              << "open-xml";
+        description = QCoreApplication::translate("CommandLineParser", "The xml document to load document");
         valueName = QCoreApplication::translate("CommandLineParser", "file");
         break;
     case CommandLineParser::Positional::OpenStringTemplateFile:

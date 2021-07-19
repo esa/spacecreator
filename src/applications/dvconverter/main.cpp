@@ -16,26 +16,26 @@
 */
 
 #include "commandlineparser.h"
-#include "interface/interfacedocument.h"
-#include "iveditor.h"
-#include "ivexporter.h"
-#include "ivlibrary.h"
+#include "dvappmodel.h"
+#include "dveditor.h"
+#include "dveditorcore.h"
+#include "dvexporter.h"
+#include "dvmodel.h"
 #include "sharedlibrary.h"
 
-#include <QCoreApplication>
+#include <QApplication>
 #include <QDebug>
 
 int main(int argc, char *argv[])
 {
-    ivm::initIVLibrary();
-    ive::initIVEditor();
     shared::initSharedLibrary();
+    dve::initDvEditor();
 
-    QCoreApplication a(argc, argv);
+    QApplication a(argc, argv);
     a.setOrganizationName(SC_ORGANISATION);
     a.setOrganizationDomain(SC_ORGANISATION_DOMAIN);
     a.setApplicationVersion(SC_VERSION);
-    a.setApplicationName(QObject::tr("IV converter"));
+    a.setApplicationName(QObject::tr("DV converter"));
 
     shared::CommandLineParser cmdParser;
     cmdParser.handlePositional(shared::CommandLineParser::Positional::OpenXMLFile);
@@ -51,13 +51,15 @@ int main(int argc, char *argv[])
         const QString templateFile = cmdParser.value(shared::CommandLineParser::Positional::OpenStringTemplateFile);
         const QString outputFile = cmdParser.value(shared::CommandLineParser::Positional::ExportToFile);
 
-        ive::InterfaceDocument doc;
-        const bool loadOk = doc.load(inputFile);
+        dve::DVEditorCore core;
+        dve::DVAppModel *appModel = core.appModel();
+        const bool loadOk = appModel->load(inputFile);
         if (!loadOk) {
             qCritical() << "Unable to load file" << inputFile;
             return -1;
         }
-        const bool convertOk = doc.exporter()->exportDocSilently(&doc, outputFile, templateFile);
+        const bool convertOk = core.exporter()->exportObjectsSilently(
+                appModel->objectsModel()->objects().values(), outputFile, templateFile);
         if (!convertOk) {
             qCritical() << "Error converting " << inputFile << "to" << outputFile;
             return -1;

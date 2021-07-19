@@ -276,6 +276,11 @@ bool DVEditorCore::saveAs()
     return d->m_exporter->exportObjectsInteractively(d->m_appModel->objectsModel()->objects().values(), filePath());
 }
 
+DVExporter *DVEditorCore::exporter() const
+{
+    return d->m_exporter.get();
+}
+
 /*!
    Load the HW library from file in the given \p directory
  */

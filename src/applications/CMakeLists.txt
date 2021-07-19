@@ -1,4 +1,5 @@
 add_subdirectory(aadlconverter)
+add_subdirectory(dvconverter)
 add_subdirectory(dveditor)
 add_subdirectory(iveditor)
 add_subdirectory(mscconverter)

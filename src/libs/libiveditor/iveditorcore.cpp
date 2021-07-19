@@ -108,7 +108,7 @@ void IVEditorCore::registerBasicActions()
 
 void IVEditorCore::populateCommandLineArguments(shared::CommandLineParser *parser) const
 {
-    parser->handlePositional(shared::CommandLineParser::Positional::OpenIVFile);
+    parser->handlePositional(shared::CommandLineParser::Positional::OpenXMLFile);
     parser->handlePositional(shared::CommandLineParser::Positional::OpenStringTemplateFile);
     parser->handlePositional(shared::CommandLineParser::Positional::ExportToFile);
     parser->handlePositional(shared::CommandLineParser::Positional::ListScriptableActions);

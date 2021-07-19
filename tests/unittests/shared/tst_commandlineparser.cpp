@@ -113,7 +113,7 @@ void tst_CommandLineParser::testCmdArgumentRemoteControl()
 void tst_CommandLineParser::testCmdArgumentOpenIVFile()
 {
     const QCommandLineOption cmdOpenIV =
-            CommandLineParser::positionalArg(CommandLineParser::Positional::OpenIVFile);
+            CommandLineParser::positionalArg(CommandLineParser::Positional::OpenXMLFile);
     const QString fileName(QString(EXAMPLES_DIR).append("msc/sample.xml"));
     const QString noFileName("./no-such-file.xml");
 
@@ -124,15 +124,15 @@ void tst_CommandLineParser::testCmdArgumentOpenIVFile()
     parser.process(args);
 
     QVERIFY(!parser.isSet(CommandLineParser::Positional::Unknown));
-    QVERIFY(parser.isSet(CommandLineParser::Positional::OpenIVFile));
+    QVERIFY(parser.isSet(CommandLineParser::Positional::OpenXMLFile));
 
-    const QString argFromParser1(parser.value(CommandLineParser::Positional::OpenIVFile));
+    const QString argFromParser1(parser.value(CommandLineParser::Positional::OpenXMLFile));
     QCOMPARE(argFromParser1, fileName);
 
     parser.process({ QApplication::instance()->applicationFilePath(),
             QString("-%1=%2").arg(cmdOpenIV.names().first(), noFileName) });
-    QVERIFY(parser.isSet(CommandLineParser::Positional::OpenIVFile));
-    const QString argFromParser2(parser.value(CommandLineParser::Positional::OpenIVFile));
+    QVERIFY(parser.isSet(CommandLineParser::Positional::OpenXMLFile));
+    const QString argFromParser2(parser.value(CommandLineParser::Positional::OpenXMLFile));
     QCOMPARE(argFromParser2, noFileName);
 }
 

@@ -44,6 +44,7 @@ class DVSystemChecks;
 namespace dve {
 class DVAppModel;
 class AbstractSystemChecks;
+class DVExporter;
 
 class DVEditorCore : public shared::EditorCore
 {
@@ -73,6 +74,7 @@ public:
     QString filePath() const override;
     bool save() override;
     bool saveAs();
+    dve::DVExporter* exporter() const;
 
     void loadHWLibrary(const QString &directory);
 

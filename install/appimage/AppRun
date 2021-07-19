@@ -19,6 +19,8 @@ Options:
             Start space creator
         [--aadlconverter [--help]]
             Run the aadlconverter
+        [--dvconverter [--help]]
+            Run the dvconverter
         [--mscconverter [--help]]
             Run the mscconverter
         [--mscstreaming [--help]]
@@ -55,6 +57,9 @@ case $1 in
     ;;
 --aadlconverter)
     exec "aadlconverter" "$2" "$3" "$4" "$5" "$6" "$7"
+    ;;
+--dvconverter)
+    exec "dvconverter" "$2" "$3" "$4" "$5" "$6" "$7"
     ;;
 --mscconverter)
     exec "mscconverter" "$2" "$3" "$4" "$5" "$6" "$7"

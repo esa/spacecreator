@@ -41,7 +41,7 @@ public:
         StartRemoteControl,
 
         // IV editor
-        OpenIVFile,
+        OpenXMLFile,
         ListScriptableActions,
 
         // Both

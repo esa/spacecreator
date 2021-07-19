@@ -261,7 +261,7 @@ bool MainWindow::processCommandLineArg(shared::CommandLineParser::Positional arg
         m_dropUnsavedChangesSilently = true;
         return true;
     }
-    case shared::CommandLineParser::Positional::OpenIVFile: {
+    case shared::CommandLineParser::Positional::OpenXMLFile: {
         if (!value.isEmpty() && m_core->document() != nullptr) {
             shared::ErrorHub::clearErrors();
             bool ok = m_core->document()->load(value);
