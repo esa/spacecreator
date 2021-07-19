@@ -115,6 +115,7 @@ void IVPropertiesDialog::init()
     default:
         break;
     }
+    setCurrentTabIndex(0);
 }
 
 ivm::IVObject *IVPropertiesDialog::dataObject() const

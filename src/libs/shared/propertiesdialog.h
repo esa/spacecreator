@@ -40,6 +40,7 @@ public Q_SLOTS:
 
 protected:
     void insertTab(QWidget *widget, const QString &tabName);
+    void setCurrentTabIndex(int idx);
 
     virtual QString objectTypeName() const = 0;
     virtual void init();

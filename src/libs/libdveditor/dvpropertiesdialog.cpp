@@ -64,6 +64,8 @@ void DVPropertiesDialog::init()
 
     shared::PropertiesDialog::init();
     initAttributesView();
+
+    setCurrentTabIndex(0);
 }
 
 void DVPropertiesDialog::initAttributesView()

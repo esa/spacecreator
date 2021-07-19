@@ -65,6 +65,11 @@ void PropertiesDialog::insertTab(QWidget *widget, const QString &tabName)
     d->ui->tabWidget->insertTab(0, widget, tabName);
 }
 
+void PropertiesDialog::setCurrentTabIndex(int idx)
+{
+    d->ui->tabWidget->setCurrentIndex(idx);
+}
+
 void PropertiesDialog::done(int r)
 {
     if (!d->cmdMacro) {
