@@ -32,6 +32,7 @@
 #include "dvmodel.h"
 #include "dvpropertiesdialog.h"
 #include "dvpropertytemplateconfig.h"
+#include "dvtreeviewmodel.h"
 #include "dvvisualizationmodel.h"
 #include "errorhub.h"
 #include "ui/graphicsviewbase.h"
@@ -55,8 +56,7 @@ struct DVEditorCore::DVEditorCorePrivate {
     DVEditorCorePrivate()
         : m_appModel(new DVAppModel)
         , m_model(new DVItemModel(m_appModel->objectsModel(), m_appModel->commandsStack()))
-        , m_visualizationModel(
-                  new shared::AbstractVisualizationModel(m_appModel->objectsModel(), m_appModel->commandsStack()))
+        , m_visualizationModel(new DVTreeViewModel(m_appModel->objectsModel(), m_appModel->commandsStack()))
         , m_hwModel(new dvm::DVModel)
         , m_hwVisualizationModel(new DVVisualizationModel(m_hwModel.get(), m_appModel->commandsStack()))
         , m_exporter(new DVExporter)

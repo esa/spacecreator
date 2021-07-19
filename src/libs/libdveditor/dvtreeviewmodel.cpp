@@ -15,39 +15,45 @@
   along with this program. If not, see <https://www.gnu.org/licenses/lgpl-2.1.html>.
 */
 
-#include "dvvisualizationmodel.h"
+#include "dvtreeviewmodel.h"
 
 #include "dvmodel.h"
 
 namespace dve {
 
-DVVisualizationModel::DVVisualizationModel(
-        dvm::DVModel *dvModel, shared::cmd::CommandsStackBase *commandsStack, QObject *parent)
+DVTreeViewModel::DVTreeViewModel(dvm::DVModel *dvModel, shared::cmd::CommandsStackBase *commandsStack, QObject *parent)
     : shared::AbstractVisualizationModel(dvModel, commandsStack, parent)
 {
 }
 
-Qt::ItemFlags DVVisualizationModel::flags(const QModelIndex &index) const
+void DVTreeViewModel::updateItemData(QStandardItem *item, shared::VEObject *object)
 {
-    return shared::AbstractVisualizationModel::flags(index) & ~Qt::ItemIsEditable;
-}
+    shared::AbstractVisualizationModel::updateItemData(item, object);
 
-void DVVisualizationModel::updateItemData(QStandardItem *item, shared::VEObject *obj)
-{
-    item->setData(static_cast<int>(shared::DropData::Type::ImportableType), DropRole);
-
-    dvm::DVObject *object = qobject_cast<dvm::DVObject *>(obj);
-    if (!object) {
+    dvm::DVObject *obj = qobject_cast<dvm::DVObject *>(object);
+    if (!obj) {
         return;
     }
     QPixmap pix;
-    switch (object->type()) {
-    case dvm::DVObject::Type::Board: {
-        static const QPixmap icon = QIcon(QLatin1String(":/toolbar/icns/board.svg")).pixmap(16, 16);
+    switch (obj->type()) {
+    case dvm::DVObject::Type::Connection: {
+        static const QPixmap icon = QIcon(QLatin1String(":/toolbar/icns/connection.svg")).pixmap(16, 16);
         pix = icon;
     } break;
-    case dvm::DVObject::Type::Port: {
+    case dvm::DVObject::Type::Device: {
         static const QPixmap icon = QIcon(QLatin1String(":/toolbar/icns/port.svg")).pixmap(16, 16);
+        pix = icon;
+    } break;
+    case dvm::DVObject::Type::Function: {
+        static const QPixmap icon = QIcon(QLatin1String(":/toolbar/icns/function.svg")).pixmap(16, 16);
+        pix = icon;
+    } break;
+    case dvm::DVObject::Type::Node: {
+        static const QPixmap icon = QIcon(QLatin1String(":/toolbar/icns/node.svg")).pixmap(16, 16);
+        pix = icon;
+    } break;
+    case dvm::DVObject::Type::Partition: {
+        static const QPixmap icon = QIcon(QLatin1String(":/toolbar/icns/partition.svg")).pixmap(16, 16);
         pix = icon;
     } break;
     default:
@@ -56,7 +62,7 @@ void DVVisualizationModel::updateItemData(QStandardItem *item, shared::VEObject 
     item->setData(pix, Qt::DecorationRole);
 }
 
-QStandardItem *DVVisualizationModel::createItem(shared::VEObject *obj)
+QStandardItem *DVTreeViewModel::createItem(shared::VEObject *obj)
 {
     QStandardItem *item = shared::AbstractVisualizationModel::createItem(obj);
     updateItemData(item, obj);

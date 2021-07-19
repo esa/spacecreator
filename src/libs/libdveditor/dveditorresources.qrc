@@ -4,14 +4,18 @@
     </qresource>
     <qresource prefix="/toolbar">
         <file>icns/asn1.png</file>
+        <file>icns/board.svg</file>
         <file>icns/comment.svg</file>
         <file>icns/connection_group.svg</file>
         <file>icns/connection.svg</file>
         <file>icns/copy.svg</file>
         <file>icns/cut.svg</file>
         <file>icns/delete.svg</file>
+        <file>icns/function.svg</file>
+        <file>icns/node.svg</file>
         <file>icns/partition.svg</file>
         <file>icns/paste.svg</file>
+        <file>icns/port.svg</file>
         <file>icns/render.svg</file>
         <file>icns/zoom_in.svg</file>
         <file>icns/zoom_out.svg</file>
