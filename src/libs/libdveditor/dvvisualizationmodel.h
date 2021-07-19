@@ -36,6 +36,8 @@ public:
     explicit DVVisualizationModel(
             dvm::DVModel *dvModel, shared::cmd::CommandsStackBase *commandsStack, QObject *parent = nullptr);
 
+    Qt::ItemFlags flags(const QModelIndex &index) const override;
+
 protected:
     void updateItemData(QStandardItem *item, shared::VEObject *obj) override;
     QStandardItem *createItem(shared::VEObject *obj) override;

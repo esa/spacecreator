@@ -27,6 +27,11 @@ DVVisualizationModel::DVVisualizationModel(
 {
 }
 
+Qt::ItemFlags DVVisualizationModel::flags(const QModelIndex &index) const
+{
+    return shared::AbstractVisualizationModel::flags(index) & ~Qt::ItemIsEditable;
+}
+
 void DVVisualizationModel::updateItemData(QStandardItem *item, shared::VEObject *obj)
 {
     item->setData(static_cast<int>(shared::DropData::Type::ImportableType), DropRole);
