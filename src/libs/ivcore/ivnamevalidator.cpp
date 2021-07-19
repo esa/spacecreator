@@ -347,81 +347,96 @@ QString IVNameValidator::makeCountedName(const IVObject *object, const QString &
 
 QString IVNameValidator::nameFunctionType(const IVObject *functionType) const
 {
+    Q_ASSERT(functionType);
     const QString nameTemplate =
             functionType->title().isEmpty() ? m_typePrefixes[functionType->type()] : functionType->title();
 
-    int counter = 0;
-    if (functionType && functionType->model()) {
+    int counter = 1;
+    if (functionType->model()) {
         for (const auto fn : functionType->model()->objects()) {
-            if (qobject_cast<ivm::IVFunctionType *>(fn)) {
-                ++counter;
+            if (auto obj = qobject_cast<ivm::IVObject *>(fn)) {
+                if (obj->type() == IVObject::Type::FunctionType && fn != functionType) {
+                    ++counter;
+                }
             }
         }
-    } else {
-        counter = 0;
     }
-    ++counter;
 
     return makeCountedName(functionType, nameTemplate, counter);
 }
 
 QString IVNameValidator::nameFunction(const IVObject *function) const
 {
+    Q_ASSERT(function);
     const QString nameTemplate = function->title().isEmpty() ? m_typePrefixes[function->type()] : function->title();
 
-    int counter = 0;
-    if (function && function->model()) {
+    int counter = 1;
+    if (function->model()) {
         for (const auto fn : function->model()->objects()) {
-            if (qobject_cast<ivm::IVFunction *>(fn)) {
-                ++counter;
+            if (auto obj = qobject_cast<ivm::IVObject *>(fn)) {
+                if (obj->type() == IVObject::Type::Function && fn != function) {
+                    ++counter;
+                }
             }
         }
-    } else {
-        counter = 0;
     }
-    ++counter;
 
     return makeCountedName(function, nameTemplate, counter);
 }
 
 QString IVNameValidator::nameRequiredInterface(const IVObject *iface) const
 {
-    Q_ASSERT(iface);
+    auto interface = qobject_cast<const ivm::IVInterface *>(iface);
+    Q_ASSERT(interface);
 
     const QString nameTemplate = m_typePrefixes[iface->type()];
 
-    const auto parent = iface->parentObject()->as<const IVFunctionType *>();
-    int counter = parent ? parent->ris().size() : 0;
-    ++counter;
+    const auto parent = interface->parentObject()->as<const IVFunctionType *>();
+    int counter = 1;
+    if (parent) {
+        counter = parent->ris().size();
+        if (!parent->ris().contains(const_cast<ivm::IVInterface *>(interface))) {
+            ++counter;
+        }
+    }
 
     return makeCountedName(iface, nameTemplate, counter);
 }
 
 QString IVNameValidator::nameProvidedInterface(const IVObject *iface) const
 {
-    Q_ASSERT(iface);
+    auto interface = qobject_cast<const ivm::IVInterface *>(iface);
+    Q_ASSERT(interface);
 
     const QString nameTemplate = m_typePrefixes[iface->type()];
 
-    const auto parent = iface->parentObject()->as<const IVFunctionType *>();
-    int counter = parent ? parent->pis().size() : 0;
-    ++counter;
+    const auto parent = interface->parentObject()->as<const IVFunctionType *>();
+    int counter = 1;
+    if (parent) {
+        counter = parent->pis().size();
+        if (!parent->pis().contains(const_cast<ivm::IVInterface *>(interface))) {
+            ++counter;
+        }
+    }
 
     return makeCountedName(iface, nameTemplate, counter);
 }
 
 QString IVNameValidator::nameComment(const IVObject *comment) const
 {
+    Q_ASSERT(comment);
     const QString nameTemplate = m_typePrefixes[comment->type()];
 
-    int counter = 0;
-    if (comment && comment->model()) {
-        for (const auto fn : comment->model()->objects())
-            if (qobject_cast<ivm::IVComment *>(fn))
-                ++counter;
-    } else
-        counter = 0;
-    ++counter;
+    int counter = 1;
+    if (comment->model()) {
+        for (const auto fn : comment->model()->objects()) {
+            if (auto obj = qobject_cast<ivm::IVComment *>(fn)) {
+                if (obj->type() == IVObject::Type::Comment && fn != comment) {
+                    ++counter;
+                }
+            }
+        }
+    }
 
     return makeCountedName(comment, nameTemplate, counter);
 }
