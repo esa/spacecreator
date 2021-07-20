@@ -444,7 +444,7 @@ QString IVNameValidator::nameComment(const IVObject *comment) const
 QString IVNameValidator::nameConnection(const IVObject *connection) const
 {
     if (auto connectionPtr = qobject_cast<const IVConnection *>(connection)) {
-        return QString("%1.%2 <-> %3.%4")
+        return QString("%1.%2 -> %3.%4")
                 .arg(connectionPtr->sourceName(), connectionPtr->sourceInterfaceName(), connectionPtr->targetName(),
                         connectionPtr->targetInterfaceName());
     } else if (auto connectionPtr = qobject_cast<const IVConnectionGroup *>(connection)) {
@@ -455,7 +455,7 @@ QString IVNameValidator::nameConnection(const IVObject *connection) const
         for (const auto &targetIface : connectionPtr->groupedTargetInterfaces()) {
             targetNames.append(targetIface->title());
         }
-        return QString("%1.{%2} <-> %3.{%4}")
+        return QString("%1.{%2} -> %3.{%4}")
                 .arg(connectionPtr->sourceName(), sourceNames.join(QLatin1Char('|')), connectionPtr->targetName(),
                         targetNames.join(QLatin1Char('|')));
     }

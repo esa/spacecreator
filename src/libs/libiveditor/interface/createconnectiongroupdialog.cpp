@@ -51,7 +51,7 @@ CreateConnectionGroupDialog::CreateConnectionGroupDialog(
                         ivm::IVNameValidator::decodeName(ivm::IVObject::Type::Function, connection->targetName());
                 const QString targetInterfaceName = ivm::IVNameValidator::decodeName(
                         ivm::IVObject::Type::ProvidedInterface, connection->targetInterfaceName());
-                result.append(QStringLiteral("%1.%2 <-> %3.%4")
+                result.append(QStringLiteral("%1.%2 -> %3.%4")
                                       .arg(sourceName, sourceInterfaceName, targetName, targetInterfaceName));
             }
         }

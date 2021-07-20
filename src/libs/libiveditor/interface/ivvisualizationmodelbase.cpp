@@ -77,25 +77,22 @@ void IVVisualizationModelBase::updateItemData(QStandardItem *item, shared::VEObj
                     ivm::IVNameValidator::decodeName(ivm::IVObject::Type::Function, connectionPtr->targetName());
             const QString targetInterfaceName = ivm::IVNameValidator::decodeName(
                     ivm::IVObject::Type::ProvidedInterface, connectionPtr->targetInterfaceName());
-            title = QStringLiteral("%1.%2 <-> %3.%4")
+            title = QStringLiteral("%1.%2 -> %3.%4")
                             .arg(sourceName, sourceInterfaceName, targetName, targetInterfaceName);
         }
     } break;
     case ivm::IVObject::Type::Function: {
-        static const QPixmap dragIcon =
-                QIcon(QLatin1String(":/toolbar/icns/function.svg")).pixmap(128, 128);
+        static const QPixmap dragIcon = QIcon(QLatin1String(":/toolbar/icns/function.svg")).pixmap(128, 128);
         dragPix = dragIcon;
 
         static const QPixmap icon = QIcon(QLatin1String(":/toolbar/icns/function.svg")).pixmap(16, 16);
         pix = icon;
     } break;
     case ivm::IVObject::Type::FunctionType: {
-        static const QPixmap dragIcon =
-                QIcon(QLatin1String(":/toolbar/icns/function_type.svg")).pixmap(128, 128);
+        static const QPixmap dragIcon = QIcon(QLatin1String(":/toolbar/icns/function_type.svg")).pixmap(128, 128);
         dragPix = dragIcon;
 
-        static const QPixmap icon =
-                QIcon(QLatin1String(":/toolbar/icns/function_type.svg")).pixmap(16, 16);
+        static const QPixmap icon = QIcon(QLatin1String(":/toolbar/icns/function_type.svg")).pixmap(16, 16);
         pix = icon;
     } break;
     case ivm::IVObject::Type::Comment: {
@@ -103,8 +100,7 @@ void IVVisualizationModelBase::updateItemData(QStandardItem *item, shared::VEObj
         pix = icon;
     } break;
     case ivm::IVObject::Type::ConnectionGroup: {
-        static const QPixmap icon =
-                QIcon(QLatin1String(":/toolbar/icns/connection_group.svg")).pixmap(16, 16);
+        static const QPixmap icon = QIcon(QLatin1String(":/toolbar/icns/connection_group.svg")).pixmap(16, 16);
         pix = icon;
     } break;
 

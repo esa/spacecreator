@@ -289,7 +289,7 @@ bool IVConnection::lookupEndpointsPostponed()
         qWarning() << objTo;
         qWarning() << ifaceTo << ifaceTo->parentObject();
         QMetaEnum metaEnum = QMetaEnum::fromType<ivm::ConnectionCreationValidator::FailReason>();
-        QString warning = tr("Connection '%1'.'%2' <-> '%3'.'%4' removed - Reason: %5")
+        QString warning = tr("Connection '%1'.'%2' -> '%3'.'%4' removed - Reason: %5")
                                   .arg(objFrom->title(), ifaceFrom->titleUI(), objTo->title(), ifaceTo->titleUI())
                                   .arg(metaEnum.valueToKey(int(status)));
         shared::ErrorHub::addError(shared::ErrorItem::Warning, warning, "");
@@ -378,7 +378,7 @@ QVector<InterfaceParameter> IVConnection::params() const
 QDebug operator<<(QDebug debug, const ivm::IVConnection &c)
 {
     QDebugStateSaver saver(debug);
-    debug.nospace() << QString("%1.%2<->%3.%4")
+    debug.nospace() << QString("%1.%2->%3.%4")
                                .arg(c.sourceName(), c.sourceInterfaceName(), c.targetName(), c.targetInterfaceName());
     return debug;
 }
