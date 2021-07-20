@@ -103,12 +103,8 @@ void DVHWLibraryReader::processTagOpen(QXmlStreamReader &xml)
 
 void DVHWLibraryReader::processTagClose(QXmlStreamReader &xml)
 {
-    const QString &tagName = xml.name().toString();
-    if (meta::Props::token(tagName) == meta::Props::Token::Device) {
-        d->m_currentObject = d->m_currentObject ? d->m_currentObject->parentObject() : nullptr;
-    } else {
-        d->m_currentObject = nullptr;
-    }
+    Q_UNUSED(xml)
+    d->m_currentObject = d->m_currentObject ? d->m_currentObject->parentObject() : nullptr;
 }
 
 QString DVHWLibraryReader::rootElementName() const

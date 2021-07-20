@@ -16,8 +16,8 @@
 */
 
 #include "dvboard.h"
-#include "dvhwlibraryreader.h"
 #include "dvboardreaderhelpers.h"
+#include "dvhwlibraryreader.h"
 
 #include <QtTest>
 
@@ -68,6 +68,7 @@ void DVBoardReaderTest::tst_singleItems()
     runReader(helpers::singleBoard(), 1);
     runReader(helpers::nonValidDoc(), -1, false);
     runReader(helpers::singleBoardWithPort(), 2);
+    runReader(helpers::singleBoardWithPorts(), 4);
     runReader(helpers::multiBoardsWithPort(), 4);
     runReader(helpers::unknownProperty(), 0);
     runReader(helpers::openCloseTagMismatched(), -1, false);
