@@ -37,6 +37,7 @@ struct PropertyTemplate::PropertyTemplatePrivate {
     QMap<int, QPair<QString, QString>> m_rxAttrValidatorPattern;
     int m_scopes = 0;
     bool m_isVisible = true;
+    bool m_isEditable = true;
     bool m_isSystem = false;
 };
 
@@ -115,6 +116,16 @@ bool PropertyTemplate::isVisible() const
 void PropertyTemplate::setVisible(bool value)
 {
     d->m_isVisible = value;
+}
+
+bool PropertyTemplate::isEditable() const
+{
+    return d->m_isEditable;
+}
+
+void PropertyTemplate::setEditable(bool value)
+{
+    d->m_isEditable = value;
 }
 
 QVariant PropertyTemplate::value() const
@@ -223,6 +234,9 @@ void PropertyTemplate::initFromXml(const QDomElement &element)
     const QString attrName = element.attribute(QLatin1String("name"));
     const QString attrLabel = element.attribute(QLatin1String("label"));
     const QString attrType = element.attribute(QLatin1String("type"), QLatin1String("Attribute"));
+    const bool isEditable =
+            QString::compare(element.attribute(QLatin1String("editable")), QLatin1String("false"), Qt::CaseInsensitive)
+            != 0;
     const bool isVisible =
             QString::compare(element.attribute(QLatin1String("visible")), QLatin1String("false"), Qt::CaseInsensitive)
             != 0;
@@ -299,6 +313,7 @@ void PropertyTemplate::initFromXml(const QDomElement &element)
     setAttrValidatorPattern(attrValidators);
     setValueValidatorPattern(typeValidator);
     setVisible(isVisible);
+    setEditable(isEditable);
 }
 
 QVariant PropertyTemplate::convertData(const QVariant &value, PropertyTemplate::Type type)

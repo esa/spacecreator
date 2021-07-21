@@ -341,12 +341,18 @@ bool PropertiesListModel::isProp(const QModelIndex &id) const
 
 bool PropertiesListModel::isEditable(const QModelIndex &idx) const
 {
+    const QString propName = m_names.value(idx.row());
     if (idx.column() == Column::Name) {
-        const QString propName = m_names.value(idx.row());
         if (m_propTemplatesConfig->hasPropertyTemplateForObject(m_dataObject, propName)) {
             return false;
         }
         return index(idx.row(), Column::Value).data().isNull();
+    } else if (idx.column() == Column::Value) {
+        if (const PropertyTemplate *propTemplate =
+                        m_propTemplatesConfig->propertyTemplateForObject(m_dataObject, propName)) {
+            return propTemplate->isEditable();
+        }
+        return false;
     }
 
     return true;

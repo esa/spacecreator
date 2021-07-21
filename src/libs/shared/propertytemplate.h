@@ -79,6 +79,9 @@ public:
     bool isVisible() const;
     void setVisible(bool value);
 
+    bool isEditable() const;
+    void setEditable(bool value);
+
     QVariant value() const;
     void setValue(const QVariant &value);
 
