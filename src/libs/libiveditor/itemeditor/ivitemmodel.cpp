@@ -21,7 +21,7 @@
 #include "delayedsignal.h"
 #include "graphicsitemhelpers.h"
 #include "graphicsviewutils.h"
-#include "interface/commands/cmdrootentitychange.h"
+#include "commands/cmdrootentitychange.h"
 #include "interfacetabgraphicsscene.h"
 #include "itemeditor/common/ivutils.h"
 #include "ivcomment.h"

@@ -20,7 +20,7 @@
 #include "chartlayoutmanager.h"
 #include "commands/cmdentityattributechange.h"
 #include "commandsstack.h"
-#include "interface/commands/cmdifaceattrchange.h"
+#include "commands/cmdifaceattrchange.h"
 #include "interface/interfacedocument.h"
 #include "ivconnection.h"
 #include "ivconnectionchain.h"

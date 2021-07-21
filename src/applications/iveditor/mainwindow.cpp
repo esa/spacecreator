@@ -23,7 +23,7 @@
 #include "context/action/actionsmanager.h"
 #include "endtoend/endtoendview.h"
 #include "errorhub.h"
-#include "interface/commands/cmdchangeasn1file.h"
+#include "commands/cmdchangeasn1file.h"
 #include "interface/interfacedocument.h"
 #include "itemeditor/common/ivutils.h"
 #include "iveditorcore.h"

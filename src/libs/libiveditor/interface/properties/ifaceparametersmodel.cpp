@@ -18,9 +18,9 @@
 #include "ifaceparametersmodel.h"
 
 #include "commandsstack.h"
-#include "interface/commands/cmdifaceparamchange.h"
-#include "interface/commands/cmdifaceparamcreate.h"
-#include "interface/commands/cmdifaceparamremove.h"
+#include "commands/cmdifaceparamchange.h"
+#include "commands/cmdifaceparamcreate.h"
+#include "commands/cmdifaceparamremove.h"
 #include "ivinterface.h"
 #include "ivobject.h"
 #include "ivpropertytemplate.h"

@@ -23,7 +23,7 @@
 #include "ivmodel.h"
 #include "ivnamevalidator.h"
 #include "commandsstack.h"
-#include "interface/commands/cmdconnectiongroupitemchange.h"
+#include "commands/cmdconnectiongroupitemchange.h"
 
 #include <QSet>
 

@@ -6,6 +6,53 @@ target_sources(${LIB_NAME} PRIVATE
     asn1dialog.cpp
     asn1dialog.h
     asn1dialog.ui
+    commands/cmdchangeasn1file.cpp
+    commands/cmdchangeasn1file.h
+    commands/cmdcommentitemcreate.cpp
+    commands/cmdcommentitemcreate.h
+    commands/cmdconnectiongroupitemchange.cpp
+    commands/cmdconnectiongroupitemchange.h
+    commands/cmdconnectiongroupitemcreate.cpp
+    commands/cmdconnectiongroupitemcreate.h
+    commands/cmdconnectionitemcreate.cpp
+    commands/cmdconnectionitemcreate.h
+    commands/cmdcontextparameterchange.cpp
+    commands/cmdcontextparameterchange.h
+    commands/cmdcontextparametercreate.cpp
+    commands/cmdcontextparametercreate.h
+    commands/cmdcontextparameterremove.cpp
+    commands/cmdcontextparameterremove.h
+    commands/cmdentitiesimport.cpp
+    commands/cmdentitiesimport.h
+    commands/cmdentitiesinstantiate.cpp
+    commands/cmdentitiesinstantiate.h
+    commands/cmdentitiesremove.cpp
+    commands/cmdentitiesremove.h
+    commands/cmdfunctionattrchange.cpp
+    commands/cmdfunctionattrchange.h
+    commands/cmdfunctionitemcreate.cpp
+    commands/cmdfunctionitemcreate.h
+    commands/cmdfunctiontypeitemcreate.cpp
+    commands/cmdfunctiontypeitemcreate.h
+    commands/cmdifaceattrchange.cpp
+    commands/cmdifaceattrchange.h
+    commands/cmdifacedatachangebase.cpp
+    commands/cmdifacedatachangebase.h
+    commands/cmdifaceparambase.cpp
+    commands/cmdifaceparambase.h
+    commands/cmdifaceparamchange.cpp
+    commands/cmdifaceparamchange.h
+    commands/cmdifaceparamcreate.cpp
+    commands/cmdifaceparamcreate.h
+    commands/cmdifaceparamremove.cpp
+    commands/cmdifaceparamremove.h
+    commands/cmdinterfaceitemcreate.cpp
+    commands/cmdinterfaceitemcreate.h
+    commands/cmdrequiredifacepropertychange.cpp
+    commands/cmdrequiredifacepropertychange.h
+    commands/cmdrootentitychange.cpp
+    commands/cmdrootentitychange.h
+    commands/commandids.h
     commandsstack.cpp
     commandsstack.h
     context/action/action.cpp
@@ -40,53 +87,6 @@ target_sources(${LIB_NAME} PRIVATE
     endtoend/endtoendview.ui
     endtoend/leafdocumentsmodel.cpp
     endtoend/leafdocumentsmodel.h
-    interface/commands/cmdchangeasn1file.cpp
-    interface/commands/cmdchangeasn1file.h
-    interface/commands/cmdcommentitemcreate.cpp
-    interface/commands/cmdcommentitemcreate.h
-    interface/commands/cmdconnectiongroupitemchange.cpp
-    interface/commands/cmdconnectiongroupitemchange.h
-    interface/commands/cmdconnectiongroupitemcreate.cpp
-    interface/commands/cmdconnectiongroupitemcreate.h
-    interface/commands/cmdconnectionitemcreate.cpp
-    interface/commands/cmdconnectionitemcreate.h
-    interface/commands/cmdcontextparameterchange.cpp
-    interface/commands/cmdcontextparameterchange.h
-    interface/commands/cmdcontextparametercreate.cpp
-    interface/commands/cmdcontextparametercreate.h
-    interface/commands/cmdcontextparameterremove.cpp
-    interface/commands/cmdcontextparameterremove.h
-    interface/commands/cmdentitiesimport.cpp
-    interface/commands/cmdentitiesimport.h
-    interface/commands/cmdentitiesinstantiate.cpp
-    interface/commands/cmdentitiesinstantiate.h
-    interface/commands/cmdentitiesremove.cpp
-    interface/commands/cmdentitiesremove.h
-    interface/commands/cmdfunctionattrchange.cpp
-    interface/commands/cmdfunctionattrchange.h
-    interface/commands/cmdfunctionitemcreate.cpp
-    interface/commands/cmdfunctionitemcreate.h
-    interface/commands/cmdfunctiontypeitemcreate.cpp
-    interface/commands/cmdfunctiontypeitemcreate.h
-    interface/commands/cmdifaceattrchange.cpp
-    interface/commands/cmdifaceattrchange.h
-    interface/commands/cmdifacedatachangebase.cpp
-    interface/commands/cmdifacedatachangebase.h
-    interface/commands/cmdifaceparambase.cpp
-    interface/commands/cmdifaceparambase.h
-    interface/commands/cmdifaceparamchange.cpp
-    interface/commands/cmdifaceparamchange.h
-    interface/commands/cmdifaceparamcreate.cpp
-    interface/commands/cmdifaceparamcreate.h
-    interface/commands/cmdifaceparamremove.cpp
-    interface/commands/cmdifaceparamremove.h
-    interface/commands/cmdinterfaceitemcreate.cpp
-    interface/commands/cmdinterfaceitemcreate.h
-    interface/commands/cmdrequiredifacepropertychange.cpp
-    interface/commands/cmdrequiredifacepropertychange.h
-    interface/commands/cmdrootentitychange.cpp
-    interface/commands/cmdrootentitychange.h
-    interface/commands/commandids.h
     interface/createconnectiongroupdialog.cpp
     interface/createconnectiongroupdialog.h
     interface/interfacedocument.cpp

@@ -19,9 +19,9 @@
 
 #include "asn1systemchecks.h"
 #include "commandsstack.h"
-#include "interface/commands/cmdcontextparameterchange.h"
-#include "interface/commands/cmdcontextparametercreate.h"
-#include "interface/commands/cmdcontextparameterremove.h"
+#include "commands/cmdcontextparameterchange.h"
+#include "commands/cmdcontextparametercreate.h"
+#include "commands/cmdcontextparameterremove.h"
 #include "itemeditor/common/ivutils.h"
 #include "ivcommonprops.h"
 #include "ivfunction.h"

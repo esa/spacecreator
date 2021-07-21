@@ -17,9 +17,9 @@
 
 #include "commandsstack.h"
 
-#include "interface/commands/cmdentitiesremove.h"
-#include "interface/commands/cmdfunctionattrchange.h"
-#include "interface/commands/cmdifaceattrchange.h"
+#include "commands/cmdentitiesremove.h"
+#include "commands/cmdfunctionattrchange.h"
+#include "commands/cmdifaceattrchange.h"
 #include "ivobject.h"
 #include "undocommand.h"
 

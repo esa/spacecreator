@@ -17,8 +17,8 @@
 
 #include "ivpropertieslistmodel.h"
 
-#include "interface/commands/cmdfunctionattrchange.h"
-#include "interface/commands/cmdifaceattrchange.h"
+#include "commands/cmdfunctionattrchange.h"
+#include "commands/cmdifaceattrchange.h"
 #include "ivcommonprops.h"
 #include "ivfunction.h"
 #include "ivinterface.h"

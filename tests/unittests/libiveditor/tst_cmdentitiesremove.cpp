@@ -17,7 +17,7 @@
 
 #include "commandsstack.h"
 #include "context/action/actionsmanager.h"
-#include "interface/commands/cmdentitiesremove.h"
+#include "commands/cmdentitiesremove.h"
 #include "interface/interfacedocument.h"
 #include "iveditor.h"
 #include "iveditorcore.h"
