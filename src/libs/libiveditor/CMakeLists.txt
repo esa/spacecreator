@@ -99,18 +99,6 @@ target_sources(${LIB_NAME} PRIVATE
     interface/ivvisualizationmodelbase.h
     interface/miniviewrenderer.cpp
     interface/miniviewrenderer.h
-    interface/properties/contextparametersmodel.cpp
-    interface/properties/contextparametersmodel.h
-    interface/properties/delegates/asn1valuedelegate.cpp
-    interface/properties/delegates/asn1valuedelegate.h
-    interface/properties/ifaceparametersmodel.cpp
-    interface/properties/ifaceparametersmodel.h
-    interface/properties/ivpropertiesdialog.cpp
-    interface/properties/ivpropertiesdialog.h
-    interface/properties/ivpropertieslistmodel.cpp
-    interface/properties/ivpropertieslistmodel.h
-    interface/properties/ivpropertiesview.cpp
-    interface/properties/ivpropertiesview.h
     itemeditor/common/ivutils.cpp
     itemeditor/common/ivutils.h
     itemeditor/graphicsitemhelpers.cpp
@@ -146,6 +134,18 @@ target_sources(${LIB_NAME} PRIVATE
     iveditorresources.qrc
     ivexporter.cpp
     ivexporter.h
+    properties/contextparametersmodel.cpp
+    properties/contextparametersmodel.h
+    properties/delegates/asn1valuedelegate.cpp
+    properties/delegates/asn1valuedelegate.h
+    properties/ifaceparametersmodel.cpp
+    properties/ifaceparametersmodel.h
+    properties/ivpropertiesdialog.cpp
+    properties/ivpropertiesdialog.h
+    properties/ivpropertieslistmodel.cpp
+    properties/ivpropertieslistmodel.h
+    properties/ivpropertiesview.cpp
+    properties/ivpropertiesview.h
     templating/exportableivconnection.cpp
     templating/exportableivconnection.h
     templating/exportableivconnectiongroup.cpp

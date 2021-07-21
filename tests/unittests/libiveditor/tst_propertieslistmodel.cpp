@@ -16,10 +16,10 @@
 */
 
 #include "commandsstack.h"
-#include "interface/properties/ivpropertieslistmodel.h"
 #include "itemeditor/common/ivutils.h"
 #include "ivfunction.h"
 #include "ivpropertytemplateconfig.h"
+#include "properties/ivpropertieslistmodel.h"
 
 #include <QObject>
 #include <QtTest>

@@ -29,7 +29,6 @@
 #include "errorhub.h"
 #include "graphicsviewutils.h"
 #include "interface/objectstreeview.h"
-#include "interface/properties/ivpropertiesdialog.h"
 #include "itemeditor/common/ivutils.h"
 #include "itemeditor/graphicsitemhelpers.h"
 #include "itemeditor/graphicsview.h"
@@ -45,6 +44,7 @@
 #include "ivpropertytemplateconfig.h"
 #include "ivvisualizationmodelbase.h"
 #include "ivxmlreader.h"
+#include "properties/ivpropertiesdialog.h"
 #include "propertytemplatemanager.h"
 #include "propertytemplatewidget.h"
 
