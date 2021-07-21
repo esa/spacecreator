@@ -46,6 +46,7 @@ public:
         Function,
         Device,
         Connection,
+        Message,
     };
     Q_ENUM(Type)
 

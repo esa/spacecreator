@@ -15,6 +15,8 @@ target_sources(${LIB_NAME} PRIVATE
     dvdevice.h
     dvfunction.cpp
     dvfunction.h
+    dvmessage.cpp
+    dvmessage.h
     dvmodel.cpp
     dvmodel.h
     dvnode.cpp

@@ -48,6 +48,10 @@ void DVTreeViewModel::updateItemData(QStandardItem *item, shared::VEObject *obje
         static const QPixmap icon = QIcon(QLatin1String(":/toolbar/icns/function.svg")).pixmap(16, 16);
         pix = icon;
     } break;
+    case dvm::DVObject::Type::Message: {
+        static const QPixmap icon = QIcon(QLatin1String(":/toolbar/icns/message.svg")).pixmap(16, 16);
+        pix = icon;
+    } break;
     case dvm::DVObject::Type::Node: {
         static const QPixmap icon = QIcon(QLatin1String(":/toolbar/icns/node.svg")).pixmap(16, 16);
         pix = icon;

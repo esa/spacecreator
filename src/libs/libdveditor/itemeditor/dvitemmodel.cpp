@@ -78,6 +78,9 @@ shared::ui::VEInteractiveObject *DVItemModel::createItem(shared::Id objectId)
             return new DVConnectionGraphicsItem(connectionEntity, startItem, endItem, parentItem);
         }
     } break;
+    case dvm::DVObject::Type::Message: {
+        qWarning() << "No DV item to show for type" << obj->type();
+    }
     default: {
         qCritical() << "Unknown object type:" << obj->type();
         break;
