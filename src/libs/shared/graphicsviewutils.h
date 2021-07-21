@@ -41,6 +41,7 @@ enum class LookupDirection
 {
     CounterClockwise,
     Clockwise,
+    Both,
 };
 
 QPainterPath lineShape(const QLineF &line, qreal span);

@@ -17,7 +17,6 @@
 
 #include "veconnectionendpointgraphicsitem.h"
 
-#include "graphicsviewutils.h"
 #include "positionlookuphelper.h"
 #include "veconnectiongraphicsitem.h"
 #include "veobject.h"
@@ -151,18 +150,19 @@ void VEConnectionEndPointGraphicsItem::adjustItem()
         PositionLookupHelper ccwHelper(kSidePaths, parentRect, siblingsRects, itemRect, initialOffset,
                 graphicsviewutils::LookupDirection::CounterClockwise);
         while (cwHelper.hasNext() || ccwHelper.hasNext()) {
-            if (cwHelper.lookup()) {
+            if (cwHelper.lookup() && m_adjustDirection != graphicsviewutils::LookupDirection::CounterClockwise) {
                 if (cwHelper.isSideChanged())
                     updateInternalItems(cwHelper.side());
                 setPos(cwHelper.mappedOriginPoint());
                 break;
-            } else if (ccwHelper.lookup()) {
+            } else if (ccwHelper.lookup() && m_adjustDirection != graphicsviewutils::LookupDirection::Clockwise) {
                 if (ccwHelper.isSideChanged())
                     updateInternalItems(ccwHelper.side());
                 setPos(ccwHelper.mappedOriginPoint());
                 break;
             }
         }
+
         for (VEConnectionGraphicsItem *connection : qAsConst(m_connections)) {
             if (connection) {
                 connection->layout();
@@ -188,7 +188,7 @@ void VEConnectionEndPointGraphicsItem::layout()
     const Qt::Alignment side = shared::graphicsviewutils::getNearestSide(parentRect, pos);
     const QPointF stickyPos = shared::graphicsviewutils::getSidePosition(parentRect, pos, side);
     updateInternalItems(side);
-    setPos(targetItem()->mapFromScene(pos));
+    setPos(targetItem()->mapFromScene(stickyPos));
 }
 
 QPainterPath VEConnectionEndPointGraphicsItem::ifaceShape() const

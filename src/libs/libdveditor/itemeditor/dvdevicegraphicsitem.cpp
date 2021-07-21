@@ -33,6 +33,9 @@ DVDeviceGraphicsItem::DVDeviceGraphicsItem(dvm::DVDevice *device, QGraphicsItem 
     : shared::ui::VEConnectionEndPointGraphicsItem(device, parent)
     , m_textItem(new shared::ui::TextItem(this))
 {
+    m_adjustDirection = shared::graphicsviewutils::LookupDirection::CounterClockwise;
+
+    setPos(0, 20);
     setBoundingRect(kBoundingRect);
     m_textItem->setPos(QPointF(5, -5));
     m_textItem->setFramed(false);

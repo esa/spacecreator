@@ -17,6 +17,7 @@
 
 #pragma once
 
+#include "graphicsviewutils.h"
 #include "veinteractiveobject.h"
 
 #include <QPointer>
@@ -62,6 +63,7 @@ protected:
 
 protected:
     QList<QPointer<VEConnectionGraphicsItem>> m_connections;
+    shared::graphicsviewutils::LookupDirection m_adjustDirection = graphicsviewutils::LookupDirection::Both;
 };
 
 } // namespace ui
