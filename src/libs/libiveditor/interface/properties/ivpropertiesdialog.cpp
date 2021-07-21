@@ -19,7 +19,6 @@
 
 #include "asn1/types/builtintypes.h"
 #include "asn1systemchecks.h"
-#include "baseitems/common/ivutils.h"
 #include "commands/cmdentityattributechange.h"
 #include "commandsstack.h"
 #include "contextparametersmodel.h"
@@ -27,6 +26,7 @@
 #include "ifaceparametersmodel.h"
 #include "interface/attributedelegate.h"
 #include "interface/ivconnectiongroupmodel.h"
+#include "itemeditor/common/ivutils.h"
 #include "ivcomment.h"
 #include "ivconnectiongroup.h"
 #include "ivinterface.h"

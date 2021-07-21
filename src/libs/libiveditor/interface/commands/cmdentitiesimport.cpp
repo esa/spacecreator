@@ -17,10 +17,10 @@
 
 #include "cmdentitiesimport.h"
 
-#include "baseitems/common/ivutils.h"
 #include "commandids.h"
 #include "errorhub.h"
 #include "graphicsviewutils.h"
+#include "itemeditor/common/ivutils.h"
 #include "ivexporter.h"
 #include "ivfunctiontype.h"
 #include "ivmodel.h"

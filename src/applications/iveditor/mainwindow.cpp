@@ -18,7 +18,6 @@
 #include "mainwindow.h"
 
 #include "asn1dialog.h"
-#include "baseitems/common/ivutils.h"
 #include "commandsstack.h"
 #include "common.h"
 #include "context/action/actionsmanager.h"
@@ -26,6 +25,7 @@
 #include "errorhub.h"
 #include "interface/commands/cmdchangeasn1file.h"
 #include "interface/interfacedocument.h"
+#include "itemeditor/common/ivutils.h"
 #include "iveditorcore.h"
 #include "ivexporter.h"
 #include "ivfunctiontype.h"

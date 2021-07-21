@@ -15,7 +15,7 @@
    along with this program. If not, see <https://www.gnu.org/licenses/lgpl-2.1.html>.
 */
 
-#include "baseitems/common/ivutils.h"
+#include "itemeditor/common/ivutils.h"
 #include "ivcomment.h"
 #include "ivcommonprops.h"
 #include "ivconnection.h"

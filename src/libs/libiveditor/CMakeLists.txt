@@ -6,10 +6,6 @@ target_sources(${LIB_NAME} PRIVATE
     asn1dialog.cpp
     asn1dialog.h
     asn1dialog.ui
-    baseitems/common/ivutils.cpp
-    baseitems/common/ivutils.h
-    baseitems/graphicsview.cpp
-    baseitems/graphicsview.h
     commandsstack.cpp
     commandsstack.h
     context/action/action.cpp
@@ -44,28 +40,6 @@ target_sources(${LIB_NAME} PRIVATE
     endtoend/endtoendview.ui
     endtoend/leafdocumentsmodel.cpp
     endtoend/leafdocumentsmodel.h
-    interface/ivcommentgraphicsitem.cpp
-    interface/ivcommentgraphicsitem.h
-    interface/ivconnectiongraphicsitem.cpp
-    interface/ivconnectiongraphicsitem.h
-    interface/ivconnectiongroupgraphicsitem.cpp
-    interface/ivconnectiongroupgraphicsitem.h
-    interface/ivconnectiongroupmodel.cpp
-    interface/ivconnectiongroupmodel.h
-    interface/ivflowconnectiongraphicsitem.cpp
-    interface/ivflowconnectiongraphicsitem.h
-    interface/ivfunctiongraphicsitem.cpp
-    interface/ivfunctiongraphicsitem.h
-    interface/ivfunctionnamegraphicsitem.cpp
-    interface/ivfunctionnamegraphicsitem.h
-    interface/ivfunctiontypegraphicsitem.cpp
-    interface/ivfunctiontypegraphicsitem.h
-    interface/ivinterfacegraphicsitem.cpp
-    interface/ivinterfacegraphicsitem.h
-    interface/ivinterfacegroupgraphicsitem.cpp
-    interface/ivinterfacegroupgraphicsitem.h
-    interface/ivitemmodel.cpp
-    interface/ivitemmodel.h
     interface/commands/cmdchangeasn1file.cpp
     interface/commands/cmdchangeasn1file.h
     interface/commands/cmdcommentitemcreate.cpp
@@ -88,6 +62,8 @@ target_sources(${LIB_NAME} PRIVATE
     interface/commands/cmdentitiesinstantiate.h
     interface/commands/cmdentitiesremove.cpp
     interface/commands/cmdentitiesremove.h
+    interface/commands/cmdfunctionattrchange.cpp
+    interface/commands/cmdfunctionattrchange.h
     interface/commands/cmdfunctionitemcreate.cpp
     interface/commands/cmdfunctionitemcreate.h
     interface/commands/cmdfunctiontypeitemcreate.cpp
@@ -113,14 +89,16 @@ target_sources(${LIB_NAME} PRIVATE
     interface/commands/commandids.h
     interface/createconnectiongroupdialog.cpp
     interface/createconnectiongroupdialog.h
-    interface/ivcreatortool.cpp
-    interface/ivcreatortool.h
-    interface/graphicsitemhelpers.cpp
-    interface/graphicsitemhelpers.h
     interface/interfacedocument.cpp
     interface/interfacedocument.h
-    interface/interfacetabgraphicsscene.cpp
-    interface/interfacetabgraphicsscene.h
+    interface/ivconnectiongroupmodel.cpp
+    interface/ivconnectiongroupmodel.h
+    interface/ivcreatortool.cpp
+    interface/ivcreatortool.h
+    interface/ivvisualizationmodelbase.cpp
+    interface/ivvisualizationmodelbase.h
+    interface/miniviewrenderer.cpp
+    interface/miniviewrenderer.h
     interface/properties/contextparametersmodel.cpp
     interface/properties/contextparametersmodel.h
     interface/properties/delegates/asn1valuedelegate.cpp
@@ -134,11 +112,41 @@ target_sources(${LIB_NAME} PRIVATE
     interface/properties/ivpropertiesview.cpp
     interface/properties/ivpropertiesview.h
     interface/tab_interface_resources.qrc
+    itemeditor/common/ivutils.cpp
+    itemeditor/common/ivutils.h
+    itemeditor/graphicsitemhelpers.cpp
+    itemeditor/graphicsitemhelpers.h
+    itemeditor/graphicsview.cpp
+    itemeditor/graphicsview.h
+    itemeditor/interfacetabgraphicsscene.cpp
+    itemeditor/interfacetabgraphicsscene.h
+    itemeditor/ivcommentgraphicsitem.cpp
+    itemeditor/ivcommentgraphicsitem.h
+    itemeditor/ivconnectiongraphicsitem.cpp
+    itemeditor/ivconnectiongraphicsitem.h
+    itemeditor/ivconnectiongroupgraphicsitem.cpp
+    itemeditor/ivconnectiongroupgraphicsitem.h
+    itemeditor/ivflowconnectiongraphicsitem.cpp
+    itemeditor/ivflowconnectiongraphicsitem.h
+    itemeditor/ivfunctiongraphicsitem.cpp
+    itemeditor/ivfunctiongraphicsitem.h
+    itemeditor/ivfunctionnamegraphicsitem.cpp
+    itemeditor/ivfunctionnamegraphicsitem.h
+    itemeditor/ivfunctiontypegraphicsitem.cpp
+    itemeditor/ivfunctiontypegraphicsitem.h
+    itemeditor/ivinterfacegraphicsitem.cpp
+    itemeditor/ivinterfacegraphicsitem.h
+    itemeditor/ivinterfacegroupgraphicsitem.cpp
+    itemeditor/ivinterfacegroupgraphicsitem.h
+    itemeditor/ivitemmodel.cpp
+    itemeditor/ivitemmodel.h
     iveditor.cpp
     iveditor.h
     iveditorcore.cpp
     iveditorcore.h
     iveditorresources.qrc
+    ivexporter.cpp
+    ivexporter.h
     templating/exportableivconnection.cpp
     templating/exportableivconnection.h
     templating/exportableivconnectiongroup.cpp
@@ -149,16 +157,8 @@ target_sources(${LIB_NAME} PRIVATE
     templating/exportableivinterface.h
     templating/exportableivobject.cpp
     templating/exportableivobject.h
-    ivexporter.cpp
-    ivexporter.h
     zoomcontroller.cpp
     zoomcontroller.h
-    interface/ivvisualizationmodelbase.cpp
-    interface/ivvisualizationmodelbase.h
-    interface/miniviewrenderer.cpp
-    interface/miniviewrenderer.h
-    interface/commands/cmdfunctionattrchange.cpp
-    interface/commands/cmdfunctionattrchange.h
 )
 
 target_link_libraries(${LIB_NAME}

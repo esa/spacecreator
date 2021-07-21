@@ -17,8 +17,8 @@
 
 #include "cmdcommentitemcreate.h"
 
-#include "baseitems/common/ivutils.h"
 #include "commandids.h"
+#include "itemeditor/common/ivutils.h"
 #include "ivcomment.h"
 #include "ivfunctiontype.h"
 #include "ivmodel.h"

@@ -17,8 +17,8 @@
 
 #include "cmdconnectionitemcreate.h"
 
-#include "baseitems/common/ivutils.h"
 #include "commandids.h"
+#include "itemeditor/common/ivutils.h"
 #include "ivconnection.h"
 #include "ivfunction.h"
 #include "ivfunctiontype.h"

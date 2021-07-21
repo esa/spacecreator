@@ -18,11 +18,11 @@
 #include "contextparametersmodel.h"
 
 #include "asn1systemchecks.h"
-#include "baseitems/common/ivutils.h"
 #include "commandsstack.h"
 #include "interface/commands/cmdcontextparameterchange.h"
 #include "interface/commands/cmdcontextparametercreate.h"
 #include "interface/commands/cmdcontextparameterremove.h"
+#include "itemeditor/common/ivutils.h"
 #include "ivcommonprops.h"
 #include "ivfunction.h"
 #include "ivnamevalidator.h"

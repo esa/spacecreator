@@ -17,8 +17,8 @@
 
 #pragma once
 
-#include "baseitems/graphicsview.h"
 #include "common.h"
+#include "itemeditor/graphicsview.h"
 
 #include <QPointer>
 #include <QQueue>

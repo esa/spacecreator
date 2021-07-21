@@ -17,7 +17,6 @@
 
 #include "iveditorcore.h"
 
-#include "baseitems/common/ivutils.h"
 #include "commandlineparser.h"
 #include "commands/cmdentityattributechange.h"
 #include "commandsstack.h"
@@ -31,6 +30,7 @@
 #include "interface/commands/cmdinterfaceitemcreate.h"
 #include "interface/interfacedocument.h"
 #include "interface/ivcreatortool.h"
+#include "itemeditor/common/ivutils.h"
 #include "ivconnection.h"
 #include "ivexporter.h"
 #include "ivfunction.h"

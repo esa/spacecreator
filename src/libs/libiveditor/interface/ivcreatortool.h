@@ -19,8 +19,8 @@
 
 #include "common.h"
 #include "interface/creatortool.h"
+#include "itemeditor/ivitemmodel.h"
 #include "ivinterface.h"
-#include "ivitemmodel.h"
 
 #include <QObject>
 #include <memory>

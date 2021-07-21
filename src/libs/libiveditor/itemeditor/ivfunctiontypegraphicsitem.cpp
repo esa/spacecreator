@@ -17,12 +17,12 @@
 
 #include "ivfunctiontypegraphicsitem.h"
 
-#include "baseitems/common/ivutils.h"
 #include "colors/colormanager.h"
 #include "commands/cmdentityattributechange.h"
 #include "commandsstack.h"
 #include "graphicsitemhelpers.h"
 #include "graphicsviewutils.h"
+#include "itemeditor/common/ivutils.h"
 #include "ivcommonprops.h"
 #include "ivconnection.h"
 #include "ivconnectiongraphicsitem.h"

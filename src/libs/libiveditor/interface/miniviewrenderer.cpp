@@ -18,8 +18,8 @@
 #include "miniviewrenderer.h"
 
 #include "graphicsviewutils.h"
-#include "ivfunctiongraphicsitem.h"
-#include "ivinterfacegraphicsitem.h"
+#include "itemeditor/ivfunctiongraphicsitem.h"
+#include "itemeditor/ivinterfacegraphicsitem.h"
 #include "ivmodel.h"
 
 #include <QGraphicsView>

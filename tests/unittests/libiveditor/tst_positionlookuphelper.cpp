@@ -15,10 +15,10 @@
    along with this program. If not, see <https://www.gnu.org/licenses/lgpl-2.1.html>.
 */
 
-#include "baseitems/common/ivutils.h"
 #include "graphicsviewutils.h"
-#include "interface/ivfunctiongraphicsitem.h"
-#include "interface/ivinterfacegraphicsitem.h"
+#include "itemeditor/common/ivutils.h"
+#include "itemeditor/ivfunctiongraphicsitem.h"
+#include "itemeditor/ivinterfacegraphicsitem.h"
 #include "ivfunction.h"
 #include "ivinterface.h"
 #include "ivtestutils.h"

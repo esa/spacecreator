@@ -17,7 +17,7 @@
 
 #include "graphicsview.h"
 
-#include "baseitems/common/ivutils.h"
+#include "itemeditor/common/ivutils.h"
 #include "ivobject.h"
 #include "ui/veinteractiveobject.h"
 

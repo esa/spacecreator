@@ -17,9 +17,9 @@
 
 #include "propertyoptions.h"
 
-#include "baseitems/common/ivutils.h"
 #include "common.h"
 #include "dvpropertytemplateconfig.h"
+#include "itemeditor/common/ivutils.h"
 #include "ivpropertytemplateconfig.h"
 #include "propertytemplatewidget.h"
 #include "spacecreatorpluginconstants.h"

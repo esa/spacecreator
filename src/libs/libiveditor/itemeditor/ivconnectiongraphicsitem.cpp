@@ -17,10 +17,10 @@
 
 #include "ivconnectiongraphicsitem.h"
 
-#include "baseitems/common/ivutils.h"
 #include "colors/colormanager.h"
 #include "graphicsviewutils.h"
-#include "interface/graphicsitemhelpers.h"
+#include "itemeditor/common/ivutils.h"
+#include "itemeditor/graphicsitemhelpers.h"
 #include "ivcommentgraphicsitem.h"
 #include "ivconnection.h"
 #include "ivfunction.h"

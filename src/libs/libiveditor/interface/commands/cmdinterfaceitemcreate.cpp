@@ -17,9 +17,8 @@
 
 #include "cmdinterfaceitemcreate.h"
 
-#include "baseitems/common/ivutils.h"
-#include "cmdinterfaceitemcreate.h"
 #include "commandids.h"
+#include "itemeditor/common/ivutils.h"
 #include "ivfunction.h"
 #include "ivmodel.h"
 

@@ -15,9 +15,9 @@
    along with this program. If not, see <https://www.gnu.org/licenses/lgpl-2.1.html>.
 */
 
-#include "baseitems/common/ivutils.h"
 #include "commandsstack.h"
 #include "interface/properties/ivpropertieslistmodel.h"
+#include "itemeditor/common/ivutils.h"
 #include "ivfunction.h"
 #include "ivpropertytemplateconfig.h"
 

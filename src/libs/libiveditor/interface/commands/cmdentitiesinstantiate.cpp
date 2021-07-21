@@ -17,11 +17,11 @@
 
 #include "cmdentitiesinstantiate.h"
 
-#include "baseitems/common/ivutils.h"
 #include "cmdinterfaceitemcreate.h"
 #include "commandids.h"
 #include "commands/cmdentityattributechange.h"
 #include "graphicsviewutils.h"
+#include "itemeditor/common/ivutils.h"
 #include "ivfunction.h"
 #include "ivfunctiontype.h"
 #include "ivmodel.h"

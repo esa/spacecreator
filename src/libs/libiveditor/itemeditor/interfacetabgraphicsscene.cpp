@@ -17,9 +17,9 @@
 
 #include "interfacetabgraphicsscene.h"
 
-#include "baseitems/common/ivutils.h"
 #include "graphicsviewutils.h"
-#include "interface/graphicsitemhelpers.h"
+#include "itemeditor/common/ivutils.h"
+#include "itemeditor/graphicsitemhelpers.h"
 #include "ui/veinteractiveobject.h"
 
 #include <QGraphicsSceneHelpEvent>
