@@ -19,7 +19,6 @@
 
 #include "abstractsystemchecks.h"
 #include "abstractvisualizationmodel.h"
-#include "baseitems/graphicsview.h"
 #include "commands/cmdnodeentitycreate.h"
 #include "commandsstackbase.h"
 #include "dvappmodel.h"
@@ -28,13 +27,14 @@
 #include "dvcreatortool.h"
 #include "dvexporter.h"
 #include "dvhwlibraryreader.h"
-#include "dvitemmodel.h"
 #include "dvmodel.h"
 #include "dvpropertiesdialog.h"
 #include "dvpropertytemplateconfig.h"
 #include "dvtreeviewmodel.h"
 #include "dvvisualizationmodel.h"
 #include "errorhub.h"
+#include "itemeditor/dvitemmodel.h"
+#include "itemeditor/graphicsview.h"
 #include "ui/graphicsviewbase.h"
 
 #include <QBoxLayout>

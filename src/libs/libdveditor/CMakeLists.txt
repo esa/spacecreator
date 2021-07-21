@@ -5,8 +5,6 @@ add_library(${LIB_NAME} STATIC)
 target_sources(${LIB_NAME} PRIVATE
     abstractsystemchecks.cpp
     abstractsystemchecks.h
-    baseitems/graphicsview.cpp
-    baseitems/graphicsview.h
     commands/cmdconnectionentitycreate.cpp
     commands/cmdconnectionentitycreate.h
     commands/cmddeviceentitycreate.cpp
@@ -32,12 +30,8 @@ target_sources(${LIB_NAME} PRIVATE
     dvappwidget.cpp
     dvappwidget.h
     dvappwidget.ui
-    dvconnectiongraphicsitem.cpp
-    dvconnectiongraphicsitem.h
     dvcreatortool.cpp
     dvcreatortool.h
-    dvdevicegraphicsitem.cpp
-    dvdevicegraphicsitem.h
     dveditor.cpp
     dveditor.h
     dveditorcore.cpp
@@ -45,20 +39,26 @@ target_sources(${LIB_NAME} PRIVATE
     dveditorresources.qrc
     dvexporter.cpp
     dvexporter.h
-    dvitemmodel.cpp
-    dvitemmodel.h
-    dvnodegraphicsitem.cpp
-    dvnodegraphicsitem.h
-    dvpartitiongraphicsitem.cpp
-    dvpartitiongraphicsitem.h
     dvpropertiesdialog.cpp
     dvpropertiesdialog.h
     dvtreeviewmodel.cpp
     dvtreeviewmodel.h
     dvvisualizationmodel.cpp
     dvvisualizationmodel.h
-    graphicsitemhelpers.cpp
-    graphicsitemhelpers.h
+    itemeditor/dvconnectiongraphicsitem.cpp
+    itemeditor/dvconnectiongraphicsitem.h
+    itemeditor/dvdevicegraphicsitem.cpp
+    itemeditor/dvdevicegraphicsitem.h
+    itemeditor/dvitemmodel.cpp
+    itemeditor/dvitemmodel.h
+    itemeditor/dvnodegraphicsitem.cpp
+    itemeditor/dvnodegraphicsitem.h
+    itemeditor/dvpartitiongraphicsitem.cpp
+    itemeditor/dvpartitiongraphicsitem.h
+    itemeditor/graphicsitemhelpers.cpp
+    itemeditor/graphicsitemhelpers.h
+    itemeditor/graphicsview.cpp
+    itemeditor/graphicsview.h
     templating/exportabledvconnection.cpp
     templating/exportabledvconnection.h
     templating/exportabledvdevice.cpp

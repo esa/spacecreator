@@ -17,7 +17,7 @@
 
 #include "dvappwidget.h"
 
-#include "baseitems/graphicsview.h"
+#include "itemeditor/graphicsview.h"
 #include "ui_dvappwidget.h"
 
 #include <QItemSelectionModel>

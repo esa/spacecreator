@@ -17,12 +17,12 @@
 
 #include "mainwindow.h"
 
-#include "baseitems/graphicsview.h"
 #include "colors/colormanagerdialog.h"
 #include "config/dvhwlibrarydialog.h"
 #include "dvappmodel.h"
 #include "dveditorcore.h"
 #include "errorhub.h"
+#include "itemeditor/graphicsview.h"
 #include "settingsmanager.h"
 #include "ui_mainwindow.h"
 

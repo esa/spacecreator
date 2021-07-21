@@ -123,7 +123,7 @@
   <customwidget>
    <class>dve::GraphicsView</class>
    <extends>QGraphicsView</extends>
-   <header>baseitems/graphicsview.h</header>
+   <header>itemeditor/graphicsview.h</header>
   </customwidget>
   <customwidget>
    <class>shared::ui::ObjectsTreeView</class>

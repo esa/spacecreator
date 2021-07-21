@@ -18,8 +18,8 @@
 #pragma once
 
 #include "common.h"
-#include "dvitemmodel.h"
 #include "interface/creatortool.h"
+#include "itemeditor/dvitemmodel.h"
 
 namespace shared {
 namespace cmd {
