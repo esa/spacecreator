@@ -16,8 +16,6 @@
 */
 #include "arrowsign.h"
 
-#include <QTransform>
-
 namespace msc {
 
 /*!

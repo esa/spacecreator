@@ -32,6 +32,7 @@ public:
 
     DVNode *node() const;
 
+    QString title() const override;
     QString portName() const;
     QString busName() const;
 };

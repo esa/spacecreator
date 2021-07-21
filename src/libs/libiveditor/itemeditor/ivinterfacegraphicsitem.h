@@ -85,6 +85,7 @@ protected Q_SLOTS:
 private:
     QTransform typeTransform(Qt::Alignment alignment) const;
     QTransform ifaceTransform(Qt::Alignment alignment) const;
+    QTransform textTransform(Qt::Alignment alignment) const;
     QString ifaceLabel() const;
     QPainterPath composeShape() const;
 

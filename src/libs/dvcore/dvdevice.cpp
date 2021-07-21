@@ -48,6 +48,11 @@ DVNode *DVDevice::node() const
     return qobject_cast<DVNode *>(parent());
 }
 
+QString DVDevice::title() const
+{
+    return portName();
+}
+
 QString DVDevice::portName() const
 {
     return entityAttributeValue(meta::Props::token(meta::Props::Token::port)).toString();

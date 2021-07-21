@@ -17,8 +17,6 @@
 
 #include "positionlookuphelper.h"
 
-#include <QTransform>
-#include <QtDebug>
 #include <QtMath>
 
 namespace shared {

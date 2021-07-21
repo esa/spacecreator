@@ -74,9 +74,9 @@ void IVInterfaceGraphicsItem::init()
         }
     });
 
-    updateLabel();
     updateIface();
     updateKind();
+    updateLabel();
     setInterfaceName(ifaceLabel());
 }
 
@@ -161,6 +161,8 @@ void IVInterfaceGraphicsItem::updateInternalItems(Qt::Alignment alignment)
 {
     m_iface->setTransform(ifaceTransform(alignment));
     m_type->setTransform(typeTransform(alignment));
+    m_text->setTransform(textTransform(alignment));
+
     m_shape = composeShape();
     setBoundingRect(shape().boundingRect());
 }
@@ -361,6 +363,7 @@ void IVInterfaceGraphicsItem::applyColorScheme()
 void IVInterfaceGraphicsItem::updateLabel()
 {
     setInterfaceName(ifaceLabel());
+    m_shape = composeShape();
 }
 
 void IVInterfaceGraphicsItem::updateKind()
@@ -465,6 +468,34 @@ QTransform IVInterfaceGraphicsItem::ifaceTransform(Qt::Alignment alignment) cons
     return QTransform().rotate(rotationDegree);
 }
 
+QTransform IVInterfaceGraphicsItem::textTransform(Qt::Alignment alignment) const
+{
+    QRectF textRect = mapRectFromItem(m_text, m_text->boundingRect());
+    const qreal leading = QFontMetricsF(m_text->font()).leading();
+    const QRectF ifaceRect = mapRectFromItem(m_iface, m_iface->boundingRect());
+    const QPointF leadingOffset = QPointF(0, 4 * leading);
+    switch (alignment) {
+    case Qt::AlignLeft:
+        textRect.moveBottomRight(ifaceRect.center() + leadingOffset);
+        break;
+    case Qt::AlignRight:
+        textRect.moveBottomLeft(ifaceRect.center() + leadingOffset);
+        break;
+    case Qt::AlignTop:
+        textRect.moveCenter(ifaceRect.topRight() + leadingOffset);
+        textRect.moveLeft(ifaceRect.right());
+        break;
+    case Qt::AlignBottom:
+        textRect.moveCenter(ifaceRect.bottomRight() - leadingOffset);
+        textRect.moveLeft(ifaceRect.right());
+        break;
+    default:
+        return {};
+    }
+    const QPointF offset = textRect.topLeft() - m_text->pos();
+    return QTransform().translate(offset.x(), offset.y());
+}
+
 QPainterPath IVInterfaceGraphicsItem::ifacePath() const
 {
     QPainterPath path;
@@ -522,7 +553,7 @@ QPainterPath IVInterfaceGraphicsItem::typePath() const
 
 QPainterPath IVInterfaceGraphicsItem::itemPath(Qt::Alignment alignment) const
 {
-    QPainterPath path = m_text->shape();
+    QPainterPath path = textTransform(alignment).map(m_text->shape());
     path = path.united(typeTransform(alignment).map(m_type->path()));
     path = path.united(ifaceTransform(alignment).map(m_iface->path()));
     return path;
@@ -530,7 +561,7 @@ QPainterPath IVInterfaceGraphicsItem::itemPath(Qt::Alignment alignment) const
 
 QPainterPath IVInterfaceGraphicsItem::composeShape() const
 {
-    QPainterPath path = m_text->shape();
+    QPainterPath path = m_text->transform().map(m_text->shape());
     for (auto sub : { m_type, m_iface }) {
         QPainterPath subPath = sub->transform().map(sub->path());
         subPath.translate(sub->pos());
