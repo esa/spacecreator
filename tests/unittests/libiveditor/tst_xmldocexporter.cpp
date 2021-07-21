@@ -17,7 +17,7 @@
 
 #include "../common/xmldatahelper.h"
 #include "asn1modelstorage.h"
-#include "interface/interfacedocument.h"
+#include "interfacedocument.h"
 #include "ivcomment.h"
 #include "iveditor.h"
 #include "ivexporter.h"

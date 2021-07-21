@@ -18,7 +18,7 @@
 #include "ivsystemchecks.h"
 
 #include "errorhub.h"
-#include "interface/interfacedocument.h"
+#include "interfacedocument.h"
 #include "ivconnection.h"
 #include "ivconnectionchain.h"
 #include "iveditorcore.h"

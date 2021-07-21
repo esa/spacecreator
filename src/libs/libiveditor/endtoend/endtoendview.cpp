@@ -18,7 +18,7 @@
 #include "endtoendview.h"
 
 #include "endtoendconnections.h"
-#include "interface/interfacedocument.h"
+#include "interfacedocument.h"
 #include "itemeditor/common/ivutils.h"
 #include "itemeditor/graphicsitemhelpers.h"
 #include "itemeditor/ivconnectiongraphicsitem.h"

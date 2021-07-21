@@ -18,7 +18,7 @@
 #include "iveditordocument.h"
 
 #include "errorhub.h"
-#include "interface/interfacedocument.h"
+#include "interfacedocument.h"
 #include "iveditorcore.h"
 #include "ivexporter.h"
 #include "ivmainwidget.h"

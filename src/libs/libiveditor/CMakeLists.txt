@@ -80,6 +80,8 @@ target_sources(${LIB_NAME} PRIVATE
     context/action/editor/dynactioneditorwidget.ui
     context/action/extprocmonitor.cpp
     context/action/extprocmonitor.h
+    createconnectiongroupdialog.cpp
+    createconnectiongroupdialog.h
     endtoend/endtoendconnections.cpp
     endtoend/endtoendconnections.h
     endtoend/endtoendview.cpp
@@ -87,18 +89,8 @@ target_sources(${LIB_NAME} PRIVATE
     endtoend/endtoendview.ui
     endtoend/leafdocumentsmodel.cpp
     endtoend/leafdocumentsmodel.h
-    interface/createconnectiongroupdialog.cpp
-    interface/createconnectiongroupdialog.h
-    interface/interfacedocument.cpp
-    interface/interfacedocument.h
-    interface/ivconnectiongroupmodel.cpp
-    interface/ivconnectiongroupmodel.h
-    interface/ivcreatortool.cpp
-    interface/ivcreatortool.h
-    interface/ivvisualizationmodelbase.cpp
-    interface/ivvisualizationmodelbase.h
-    interface/miniviewrenderer.cpp
-    interface/miniviewrenderer.h
+    interfacedocument.cpp
+    interfacedocument.h
     itemeditor/common/ivutils.cpp
     itemeditor/common/ivutils.h
     itemeditor/graphicsitemhelpers.cpp
@@ -127,6 +119,10 @@ target_sources(${LIB_NAME} PRIVATE
     itemeditor/ivinterfacegroupgraphicsitem.h
     itemeditor/ivitemmodel.cpp
     itemeditor/ivitemmodel.h
+    ivconnectiongroupmodel.cpp
+    ivconnectiongroupmodel.h
+    ivcreatortool.cpp
+    ivcreatortool.h
     iveditor.cpp
     iveditor.h
     iveditorcore.cpp
@@ -134,6 +130,10 @@ target_sources(${LIB_NAME} PRIVATE
     iveditorresources.qrc
     ivexporter.cpp
     ivexporter.h
+    ivvisualizationmodelbase.cpp
+    ivvisualizationmodelbase.h
+    miniviewrenderer.cpp
+    miniviewrenderer.h
     properties/contextparametersmodel.cpp
     properties/contextparametersmodel.h
     properties/delegates/asn1valuedelegate.cpp

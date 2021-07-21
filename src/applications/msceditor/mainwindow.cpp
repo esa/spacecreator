@@ -27,7 +27,7 @@
 #include "errorhub.h"
 #include "geometry.h"
 #include "graphicsview.h"
-#include "interface/interfacedocument.h"
+#include "interfacedocument.h"
 #include "iveditorcore.h"
 #include "ivsystemchecks.h"
 #include "mainmodel.h"

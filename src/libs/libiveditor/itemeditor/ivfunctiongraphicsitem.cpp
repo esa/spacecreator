@@ -20,7 +20,6 @@
 #include "colors/colormanager.h"
 #include "graphicsitemhelpers.h"
 #include "graphicsviewutils.h"
-#include "interface/miniviewrenderer.h"
 #include "itemeditor/common/ivutils.h"
 #include "ivcommentgraphicsitem.h"
 #include "ivconnection.h"
@@ -29,6 +28,7 @@
 #include "ivfunctionnamegraphicsitem.h"
 #include "ivinterfacegraphicsitem.h"
 #include "ivmodel.h"
+#include "miniviewrenderer.h"
 
 #include <QApplication>
 #include <QGraphicsScene>

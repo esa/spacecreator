@@ -19,9 +19,9 @@
 
 #include "chartlayoutmanager.h"
 #include "commands/cmdentityattributechange.h"
-#include "commandsstack.h"
 #include "commands/cmdifaceattrchange.h"
-#include "interface/interfacedocument.h"
+#include "commandsstack.h"
+#include "interfacedocument.h"
 #include "ivconnection.h"
 #include "ivconnectionchain.h"
 #include "iveditorcore.h"

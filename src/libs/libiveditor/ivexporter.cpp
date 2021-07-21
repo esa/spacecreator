@@ -18,7 +18,7 @@
 #include "ivexporter.h"
 
 #include "common.h"
-#include "interface/interfacedocument.h"
+#include "interfacedocument.h"
 #include "ivcomment.h"
 #include "ivconnection.h"
 #include "ivconnectiongroup.h"

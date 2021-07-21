@@ -15,10 +15,10 @@
    along with this program. If not, see <https://www.gnu.org/licenses/lgpl-2.1.html>.
 */
 
+#include "commands/cmdentitiesremove.h"
 #include "commandsstack.h"
 #include "context/action/actionsmanager.h"
-#include "commands/cmdentitiesremove.h"
-#include "interface/interfacedocument.h"
+#include "interfacedocument.h"
 #include "iveditor.h"
 #include "iveditorcore.h"
 #include "ivfunction.h"

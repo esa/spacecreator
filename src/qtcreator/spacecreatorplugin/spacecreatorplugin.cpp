@@ -21,7 +21,7 @@
 #include "dv/dveditorfactory.h"
 #include "dveditor.h"
 #include "dvlibrary.h"
-#include "interface/interfacedocument.h"
+#include "interfacedocument.h"
 #include "iv/iveditordata.h"
 #include "iv/iveditorfactory.h"
 #include "iv/ivqtceditor.h"
@@ -115,8 +115,8 @@ bool SpaceCreatorPlugin::initialize(const QStringList &arguments, QString *error
             m_showMinimapAction, Constants::SHOW_MINIMAP_ID, Core::Context(Core::Constants::C_EDIT_MODE));
     connect(m_showMinimapAction, &QAction::triggered, this, &SpaceCreatorPlugin::setMinimapVisible);
 
-    m_showE2EDataflow = new QAction(
-            QIcon(QLatin1String(":/toolbar/icns/end_to_end.png")), tr("Show end to end dataflow"), this);
+    m_showE2EDataflow =
+            new QAction(QIcon(QLatin1String(":/toolbar/icns/end_to_end.png")), tr("Show end to end dataflow"), this);
     Core::Command *showE2ECmd = Core::ActionManager::registerAction(
             m_showE2EDataflow, Constants::SHOW_E2E_ID, Core::Context(Core::Constants::C_EDIT_MODE));
     connect(m_showE2EDataflow, &QAction::triggered, this, &SpaceCreatorPlugin::showE2EDataflow);
@@ -132,8 +132,7 @@ bool SpaceCreatorPlugin::initialize(const QStringList &arguments, QString *error
     Core::ActionManager::actionContainer(Core::Constants::M_TOOLS)->addMenu(menu);
 
     // IV
-    m_asn1DialogAction = new QAction(
-            QIcon(QLatin1String(":/toolbar/icns/asn1.png")), tr("Show ASN1 dialog ..."), this);
+    m_asn1DialogAction = new QAction(QIcon(QLatin1String(":/toolbar/icns/asn1.png")), tr("Show ASN1 dialog ..."), this);
     Core::Command *showAsn1Cmd = Core::ActionManager::registerAction(m_asn1DialogAction, Constants::IV_SHOW_ASN1_ID);
     ive::ActionsManager::registerAction(Q_FUNC_INFO, m_asn1DialogAction, "Asn1", "Edit the ASN1 file");
     connect(m_asn1DialogAction, &QAction::triggered, this, &SpaceCreatorPlugin::showAsn1Dialog);
@@ -150,14 +149,14 @@ bool SpaceCreatorPlugin::initialize(const QStringList &arguments, QString *error
         }
     });
 
-    m_exportSelectedIV = new QAction(QIcon(QLatin1String(":/toolbar/icns/export_selected.svg")),
-            tr("Export selected entity"), this);
+    m_exportSelectedIV =
+            new QAction(QIcon(QLatin1String(":/toolbar/icns/export_selected.svg")), tr("Export selected entity"), this);
     Core::Command *exportElectedCmd = Core::ActionManager::registerAction(
             m_exportSelectedIV, Constants::IV_EXPORT_SELECTED_ID, Core::Context(Core::Constants::C_EDIT_MODE));
     connect(m_exportSelectedIV, &QAction::triggered, this, &SpaceCreatorPlugin::exportSelectedIV);
 
-    m_exportIVType = new QAction(QIcon(QLatin1String(":/toolbar/icns/export_component_type.svg")),
-            tr("Export component type"), this);
+    m_exportIVType = new QAction(
+            QIcon(QLatin1String(":/toolbar/icns/export_component_type.svg")), tr("Export component type"), this);
     Core::Command *exporttypeCmd = Core::ActionManager::registerAction(
             m_exportIVType, Constants::IV_EXPORT_IV_TYPE_ID, Core::Context(Core::Constants::C_EDIT_MODE));
     connect(m_exportIVType, &QAction::triggered, this, &SpaceCreatorPlugin::exportComponentType);

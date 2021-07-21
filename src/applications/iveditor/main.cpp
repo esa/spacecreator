@@ -18,7 +18,7 @@
 #include "asn1modelstorage.h"
 #include "asn1systemchecks.h"
 #include "commandlineparser.h"
-#include "interface/interfacedocument.h"
+#include "interfacedocument.h"
 #include "iveditor.h"
 #include "iveditorcore.h"
 #include "ivlibrary.h"

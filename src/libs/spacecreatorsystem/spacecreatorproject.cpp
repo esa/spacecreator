@@ -24,7 +24,7 @@
 #include "dveditorcore.h"
 #include "dvsystemchecks.h"
 #include "errorhub.h"
-#include "interface/interfacedocument.h"
+#include "interfacedocument.h"
 #include "itemeditor/common/ivutils.h"
 #include "iveditorcore.h"
 #include "ivsystemchecks.h"

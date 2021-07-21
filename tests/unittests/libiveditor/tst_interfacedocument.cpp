@@ -18,7 +18,7 @@
 #include "abstractproject.h"
 #include "asn1modelstorage.h"
 #include "asn1systemchecks.h"
-#include "interface/interfacedocument.h"
+#include "interfacedocument.h"
 #include "iveditor.h"
 #include "ivfunction.h"
 #include "ivinterface.h"

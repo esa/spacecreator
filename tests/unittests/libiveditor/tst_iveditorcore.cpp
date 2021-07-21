@@ -15,14 +15,14 @@
    along with this program. If not, see <https://www.gnu.org/licenses/lgpl-2.1.html>.
 */
 
+#include "interfacedocument.h"
 #include "ivconnection.h"
+#include "iveditor.h"
+#include "iveditorcore.h"
 #include "ivfunction.h"
 #include "ivinterface.h"
 #include "ivmodel.h"
 #include "ivtestutils.h"
-#include "interface/interfacedocument.h"
-#include "iveditor.h"
-#include "iveditorcore.h"
 #include "sharedlibrary.h"
 
 #include <QObject>

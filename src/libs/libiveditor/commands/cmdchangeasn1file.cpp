@@ -18,7 +18,7 @@
 #include "cmdchangeasn1file.h"
 
 #include "commandids.h"
-#include "interface/interfacedocument.h"
+#include "interfacedocument.h"
 
 #include <QDir>
 

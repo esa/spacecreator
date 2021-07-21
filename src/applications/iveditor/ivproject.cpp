@@ -17,7 +17,7 @@
 
 #include "ivproject.h"
 
-#include "interface/interfacedocument.h"
+#include "interfacedocument.h"
 
 #include <QDebug>
 #include <QFileInfo>

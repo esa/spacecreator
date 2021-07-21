@@ -19,7 +19,7 @@
 
 #include "actionsbar.h"
 #include "commandsstack.h"
-#include "interface/interfacedocument.h"
+#include "interfacedocument.h"
 #include "iveditorcore.h"
 
 #include <QHBoxLayout>

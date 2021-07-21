@@ -15,7 +15,7 @@
    along with this program. If not, see <https://www.gnu.org/licenses/lgpl-2.1.html>.
 */
 
-#include "interface/interfacedocument.h"
+#include "interfacedocument.h"
 #include "iveditor.h"
 #include "iveditorcore.h"
 #include "ivlibrary.h"

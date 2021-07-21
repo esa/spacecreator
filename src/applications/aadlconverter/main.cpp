@@ -16,7 +16,7 @@
 */
 
 #include "commandlineparser.h"
-#include "interface/interfacedocument.h"
+#include "interfacedocument.h"
 #include "iveditor.h"
 #include "ivexporter.h"
 #include "ivlibrary.h"

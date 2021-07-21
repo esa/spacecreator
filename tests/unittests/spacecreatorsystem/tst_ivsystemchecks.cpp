@@ -18,7 +18,7 @@
 #include "baseitems/common/coordinatesconverter.h"
 #include "chartitem.h"
 #include "commandsstack.h"
-#include "interface/interfacedocument.h"
+#include "interfacedocument.h"
 #include "ivconnection.h"
 #include "iveditor.h"
 #include "iveditorcore.h"

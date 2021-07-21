@@ -20,7 +20,7 @@
 #include "common.h"
 #include "errorhub.h"
 #include "extprocmonitor.h"
-#include "interface/interfacedocument.h"
+#include "interfacedocument.h"
 #include "ivexporter.h"
 #include "ivfunction.h"
 #include "ivinterface.h"

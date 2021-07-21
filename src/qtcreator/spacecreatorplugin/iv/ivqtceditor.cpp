@@ -18,10 +18,10 @@
 #include "ivqtceditor.h"
 
 #include "asn1dialog.h"
+#include "commands/cmdchangeasn1file.h"
 #include "commandsstack.h"
 #include "endtoend/endtoendview.h"
-#include "commands/cmdchangeasn1file.h"
-#include "interface/interfacedocument.h"
+#include "interfacedocument.h"
 #include "iveditorcore.h"
 #include "iveditordocument.h"
 #include "ivmainwidget.h"
