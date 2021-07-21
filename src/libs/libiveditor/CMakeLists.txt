@@ -111,7 +111,6 @@ target_sources(${LIB_NAME} PRIVATE
     interface/properties/ivpropertieslistmodel.h
     interface/properties/ivpropertiesview.cpp
     interface/properties/ivpropertiesview.h
-    interface/tab_interface_resources.qrc
     itemeditor/common/ivutils.cpp
     itemeditor/common/ivutils.h
     itemeditor/graphicsitemhelpers.cpp
