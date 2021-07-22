@@ -18,6 +18,10 @@
 #include "dvpropertiesdialog.h"
 
 #include "commandsstackbase.h"
+#include "dvconnection.h"
+#include "dvdevice.h"
+#include "dvmessagebindingswidget.h"
+#include "dvmodel.h"
 #include "interface/attributedelegate.h"
 #include "propertieslistmodel.h"
 #include "propertiesviewbase.h"
@@ -64,6 +68,31 @@ void DVPropertiesDialog::init()
 
     shared::PropertiesDialog::init();
     initAttributesView();
+
+    switch (dataObject()->type()) {
+    case dvm::DVObject::Type::Connection: {
+        auto mBindings = new DVMessageBindingsWidget(this);
+        mBindings->initModel(qobject_cast<dvm::DVConnection *>(dataObject()));
+        insertTab(mBindings, tr("Message Bindings"), -1);
+        break;
+    }
+    case dvm::DVObject::Type::Device: {
+        auto device = qobject_cast<dvm::DVDevice *>(dataObject());
+        dvm::DVModel *model = device->model();
+        Q_ASSERT(model);
+        for (dvm::DVConnection *connection : model->connections(device)) {
+            auto mBindings = new DVMessageBindingsWidget(this);
+            mBindings->initModel(connection);
+            QString title = QString("%1 -> %2")
+                                    .arg(connection->sourceDevice() ? connection->sourceDevice()->titleUI() : "",
+                                            connection->targetDevice() ? connection->targetDevice()->titleUI() : "");
+            insertTab(mBindings, title, -1);
+        }
+        break;
+    }
+    default:
+        break;
+    }
 
     setCurrentTabIndex(0);
 }

@@ -39,8 +39,8 @@ public:
     virtual VEObject *getObject(const shared::Id &id) const;
     virtual void clear();
 
-    QList<shared::Id> objectsOrder() const;
-    QHash<shared::Id, VEObject *> objects() const;
+    const QList<shared::Id> &objectsOrder() const;
+    const QHash<shared::Id, VEObject *> &objects() const;
 
 public:
     template<typename T>

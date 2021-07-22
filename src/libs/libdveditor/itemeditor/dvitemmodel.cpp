@@ -79,7 +79,7 @@ shared::ui::VEInteractiveObject *DVItemModel::createItem(shared::Id objectId)
         }
     } break;
     case dvm::DVObject::Type::Message: {
-        qWarning() << "No DV item to show for type" << obj->type();
+        break;
     }
     default: {
         qCritical() << "Unknown object type:" << obj->type();

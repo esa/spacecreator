@@ -18,6 +18,8 @@
 #include "dvmodel.h"
 
 #include "common.h"
+#include "dvconnection.h"
+#include "dvdevice.h"
 #include "dvobject.h"
 
 #include <QDebug>
@@ -45,6 +47,23 @@ DVObject *DVModel::getObjectByName(const QString &name, DVObject::Type type, Qt:
         }
     }
     return nullptr;
+}
+
+/*!
+   Returns all connections that are connected to teh given \p device
+ */
+QList<DVConnection *> DVModel::connections(DVDevice *device) const
+{
+    QList<DVConnection *> c;
+    const QHash<shared::Id, shared::VEObject *> &allObjects = objects();
+    for (auto it = allObjects.begin(); it != allObjects.end(); ++it) {
+        if (auto connection = qobject_cast<DVConnection *>(it.value())) {
+            if (connection->sourceDevice() == device || connection->targetDevice() == device) {
+                c.append(connection);
+            }
+        }
+    }
+    return c;
 }
 
 DVObject *DVModel::getObject(const shared::Id &id) const

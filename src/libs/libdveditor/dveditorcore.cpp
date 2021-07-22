@@ -28,13 +28,13 @@
 #include "dvexporter.h"
 #include "dvhwlibraryreader.h"
 #include "dvmodel.h"
-#include "dvpropertiesdialog.h"
 #include "dvpropertytemplateconfig.h"
 #include "dvtreeviewmodel.h"
 #include "dvvisualizationmodel.h"
 #include "errorhub.h"
 #include "itemeditor/dvitemmodel.h"
 #include "itemeditor/graphicsview.h"
+#include "properties/dvpropertiesdialog.h"
 #include "ui/graphicsviewbase.h"
 
 #include <QBoxLayout>

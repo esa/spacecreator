@@ -39,7 +39,7 @@ public Q_SLOTS:
     void done(int r) override;
 
 protected:
-    void insertTab(QWidget *widget, const QString &tabName);
+    void insertTab(QWidget *widget, const QString &tabName, int idx = 0);
     void setCurrentTabIndex(int idx);
 
     virtual QString objectTypeName() const = 0;

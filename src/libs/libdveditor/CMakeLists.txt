@@ -39,8 +39,6 @@ target_sources(${LIB_NAME} PRIVATE
     dveditorresources.qrc
     dvexporter.cpp
     dvexporter.h
-    dvpropertiesdialog.cpp
-    dvpropertiesdialog.h
     dvtreeviewmodel.cpp
     dvtreeviewmodel.h
     dvvisualizationmodel.cpp
@@ -59,6 +57,12 @@ target_sources(${LIB_NAME} PRIVATE
     itemeditor/graphicsitemhelpers.h
     itemeditor/graphicsview.cpp
     itemeditor/graphicsview.h
+    properties/dvmessagebindingsmodel.cpp
+    properties/dvmessagebindingsmodel.h
+    properties/dvmessagebindingswidget.cpp
+    properties/dvmessagebindingswidget.h
+    properties/dvpropertiesdialog.cpp
+    properties/dvpropertiesdialog.h
     templating/exportabledvconnection.cpp
     templating/exportabledvconnection.h
     templating/exportabledvdevice.cpp

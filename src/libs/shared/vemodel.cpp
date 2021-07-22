@@ -86,12 +86,12 @@ void VEModel::clear()
     Q_EMIT modelReset();
 }
 
-QList<Id> VEModel::objectsOrder() const
+const QList<Id> &VEModel::objectsOrder() const
 {
     return d->m_objectsOrder;
 }
 
-QHash<Id, VEObject *> VEModel::objects() const
+const QHash<Id, VEObject *> &VEModel::objects() const
 {
     return d->m_objects;
 }

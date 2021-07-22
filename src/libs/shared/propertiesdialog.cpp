@@ -60,9 +60,9 @@ PropertiesDialog::PropertiesDialog(
 
 PropertiesDialog::~PropertiesDialog() { }
 
-void PropertiesDialog::insertTab(QWidget *widget, const QString &tabName)
+void PropertiesDialog::insertTab(QWidget *widget, const QString &tabName, int idx)
 {
-    d->ui->tabWidget->insertTab(0, widget, tabName);
+    d->ui->tabWidget->insertTab(idx, widget, tabName);
 }
 
 void PropertiesDialog::setCurrentTabIndex(int idx)

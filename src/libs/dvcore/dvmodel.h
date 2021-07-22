@@ -26,6 +26,8 @@
 #pragma once
 
 namespace dvm {
+class DVConnection;
+class DVDevice;
 struct DVModelPrivate;
 
 class DVModel : public shared::VEModel
@@ -37,6 +39,8 @@ public:
 
     DVObject *getObject(const shared::Id &id) const override;
     DVObject *getObjectByName(const QString &name, DVObject::Type type, Qt::CaseSensitivity caseSensitivity) const;
+
+    QList<DVConnection *> connections(DVDevice *device) const;
 };
 
 } // namespace dvm
