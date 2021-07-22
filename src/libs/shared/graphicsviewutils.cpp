@@ -1079,10 +1079,9 @@ bool isBounded(const QGraphicsItem *upcomingItem, const QRectF &upcomingItemRect
         if (auto parentObj = rectItem->parentItem()) {
             const QRectF outerRect = parentObj->sceneBoundingRect().marginsRemoved(kContentMargins);
             return isRectBounded(outerRect, upcomingItemRect);
-        } else {
-            return isRectBounded(
-                    upcomingItemRect.marginsRemoved(kContentMargins), rectItem->nestedItemsSceneBoundingRect());
         }
+        return isRectBounded(
+                upcomingItemRect.marginsRemoved(kContentMargins), rectItem->nestedItemsSceneBoundingRect());
     }
     return true;
 }

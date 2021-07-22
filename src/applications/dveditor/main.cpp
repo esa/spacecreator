@@ -40,7 +40,7 @@ int main(int argc, char *argv[])
     QDirIterator dirIt(":/fonts");
     while (dirIt.hasNext())
         QFontDatabase::addApplicationFont(dirIt.next());
-    a.setFont(QFont(QLatin1String("Ubuntu"), 8));
+    a.setFont(QFont(QLatin1String("Ubuntu"), 12));
 
     dve::DVEditorCore plugin;
     dve::MainWindow w(&plugin);

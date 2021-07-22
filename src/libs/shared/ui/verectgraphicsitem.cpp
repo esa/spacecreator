@@ -136,10 +136,14 @@ void VERectGraphicsItem::onManualMoveProgress(GripPoint *grip, const QPointF &pr
         return;
 
     const QRectF rect = transformedRect(grip, pressedAt, releasedAt);
-    if (shared::graphicsviewutils::isBounded(this, rect)) {
-        setRect(rect);
-        layoutConnectionsOnMove(shared::ui::VEConnectionGraphicsItem::CollisionsPolicy::Ignore);
+    if (QGraphicsItem *parentObj = parentItem()) {
+        const QRectF parentRect = parentObj->sceneBoundingRect().marginsRemoved(shared::graphicsviewutils::kContentMargins);
+        if (!shared::graphicsviewutils::isRectBounded(parentRect, rect)) {
+            return;
+        }
     }
+    setRect(rect);
+    layoutConnectionsOnMove(shared::ui::VEConnectionGraphicsItem::CollisionsPolicy::Ignore);
 }
 
 void VERectGraphicsItem::onManualResizeProgress(GripPoint *grip, const QPointF &pressedAt, const QPointF &releasedAt)
