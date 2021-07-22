@@ -63,6 +63,8 @@ target_sources(${LIB_NAME} PRIVATE
     templating/exportabledvconnection.h
     templating/exportabledvdevice.cpp
     templating/exportabledvdevice.h
+    templating/exportabledvmessage.cpp
+    templating/exportabledvmessage.h
     templating/exportabledvnode.cpp
     templating/exportabledvnode.h
     templating/exportabledvobject.cpp

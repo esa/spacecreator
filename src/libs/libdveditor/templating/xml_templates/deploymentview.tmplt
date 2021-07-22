@@ -23,6 +23,10 @@
     </Node>
 {% endfor %}
 {% for connection in Connections %}
-    <Connection {% for attr in connection.attributes %} {{ attr.name }}="{{ attr.value }}"{% endfor %}/>
+    <Connection{% for attr in connection.attributes %} {{ attr.name }}="{{ attr.value }}"{% endfor %}>
+        {% for message in connection.messages %}
+            <Message{% for attr in message.attributes %} {{ attr.name }}="{{ attr.value }}"{% endfor %}/>
+        {% endfor %}
+    </Connection>
 {% endfor %}
 </DeploymentView>

@@ -19,11 +19,13 @@
 
 #include "dvconnection.h"
 #include "dvdevice.h"
+#include "dvmessage.h"
 #include "dvnode.h"
 #include "dvobject.h"
 #include "dvpartition.h"
 #include "exportabledvconnection.h"
 #include "exportabledvdevice.h"
+#include "exportabledvmessage.h"
 #include "exportabledvnode.h"
 #include "exportabledvpartition.h"
 #include "exportableproperty.h"
@@ -71,6 +73,8 @@ QVariant ExportableDVObject::createFrom(const dvm::DVObject *dvObject)
         return QVariant::fromValue(ExportableDVDevice(static_cast<const dvm::DVDevice *>(dvObject)));
     case dvm::DVObject::Type::Connection:
         return QVariant::fromValue(ExportableDVConnection(static_cast<const dvm::DVConnection *>(dvObject)));
+    case dvm::DVObject::Type::Message:
+        return QVariant::fromValue(ExportableDVMessage(static_cast<const dvm::DVMessage *>(dvObject)));
     default:
         break;
     }

@@ -1,3 +1,4 @@
+#include <QDebug>
 #include <QFile>
 #include <QVariant>
 #include <QXmlStreamReader>
@@ -13,7 +14,18 @@ public:
 
         bool operator==(const Node &n)
         {
-            return n.type == type && n.data == data && n.attrs == attrs && n.children == children;
+            const bool ok = n.type == type && n.data == data && n.attrs == attrs && n.children == children;
+            if (!ok) {
+                if (n.type != type)
+                    qDebug() << n.type << "!=" << type;
+                if (n.data != data)
+                    qDebug() << n.data << "!=" << data;
+                if (n.attrs != attrs)
+                    qDebug() << n.attrs << "!=" << attrs;
+                if (n.children != children)
+                    qDebug() << "children of type '" << type << "' differ";
+            }
+            return ok;
         }
     };
 

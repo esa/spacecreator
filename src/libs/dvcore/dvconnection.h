@@ -19,11 +19,14 @@
 
 #include "dvobject.h"
 
+#include <QList>
+#include <QPointer>
 #include <memory>
 
 namespace dvm {
 class DVDevice;
 struct DVConnectionPrivate;
+class DVMessage;
 
 class DVConnection : public DVObject
 {
@@ -38,6 +41,8 @@ public:
 
     DVDevice *sourceDevice() const;
     DVDevice *targetDevice() const;
+
+    QList<DVMessage *> messages() const;
 
 private:
     std::unique_ptr<DVConnectionPrivate> d;

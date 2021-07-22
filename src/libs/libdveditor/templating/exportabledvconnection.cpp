@@ -17,11 +17,24 @@
 
 #include "exportabledvconnection.h"
 
+#include "dvconnection.h"
+#include "dvmessage.h"
+
 namespace dve {
 
 ExportableDVConnection::ExportableDVConnection(const dvm::DVObject *dvObject)
     : ExportableDVObject(dvObject)
 {
+}
+
+QVariantList ExportableDVConnection::messages() const
+{
+    QVariantList messages;
+    const dvm::DVConnection *connection = exportedObject<dvm::DVConnection>();
+    for (const dvm::DVMessage *message : connection->messages()) {
+        messages << createFrom(message);
+    }
+    return messages;
 }
 
 } // namespace dve

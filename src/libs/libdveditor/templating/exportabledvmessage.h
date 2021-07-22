@@ -19,24 +19,16 @@
 
 #include "exportabledvobject.h"
 
-namespace dvm {
-class DVObject;
-}
-
 namespace dve {
 
-class ExportableDVConnection : public ExportableDVObject
+class ExportableDVMessage : public ExportableDVObject
 {
     Q_GADGET
-    Q_PROPERTY(QVariantList messages READ messages)
-
 public:
-    explicit ExportableDVConnection(const dvm::DVObject *dvObject = nullptr);
-
-    QVariantList messages() const;
+    ExportableDVMessage(const dvm::DVObject *dvObject = nullptr);
 };
 
 } // namespace dve
 
-Q_DECLARE_METATYPE(dve::ExportableDVConnection)
-Q_DECLARE_TYPEINFO(dve::ExportableDVConnection, Q_MOVABLE_TYPE);
+Q_DECLARE_METATYPE(dve::ExportableDVMessage)
+Q_DECLARE_TYPEINFO(dve::ExportableDVMessage, Q_MOVABLE_TYPE);

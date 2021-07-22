@@ -209,4 +209,35 @@ static inline QByteArray twoConnectionsAndNodeWithDeviceAndPartitionWithFunction
             "</DeploymentView>");
 }
 
+static inline QByteArray singleMessage()
+{
+    return QByteArray(
+            "<DeploymentView>"
+            "    <Node name=\"node_linux\">"
+            "        <Partition ada_runtime=\"\""
+            "             coverage=\"FALSE\" cpu=\"x86_linux\" cpu_classifier=\"ocarina_processors_x86::x86.linux\""
+            "             cpu_platform=\"PLATFORM_NATIVE\" name=\"demo\" package=\"ocarina_processors_x86\""
+            "             vp_classifier=\"\" vp_name=\"\" vp_platform=\"PLATFORM_NONE\">"
+            "                 <function>gnc_fm</function>"
+            "        </Partition>"
+            "        <Device requires_bus_access=\"ocarina_buses::ip.i\" port=\"eth0\" "
+            "             asn1file=\"/opt/ip.asn\" asn1type=\"IP-Conf-T\" asn1module=\"POHICDRIVER-IP\" />"
+            "    </Node>"
+            "    <Node name=\"node_bsd\">"
+            "        <Partition ada_runtime=\"\""
+            "             coverage=\"FALSE\" cpu=\"x86_linux\" cpu_classifier=\"ocarina_processors_x86::x86.linux\""
+            "             cpu_platform=\"PLATFORM_NATIVE\" name=\"demo\" package=\"ocarina_processors_x86\""
+            "             vp_classifier=\"\" vp_name=\"\" vp_platform=\"PLATFORM_NONE\">"
+            "                 <function>gnc_gui</function>"
+            "        </Partition>"
+            "        <Device requires_bus_access=\"ocarina_buses::ip.i\" port=\"eth0\" "
+            "             asn1file=\"/opt/ip.asn\" asn1type=\"IP-Conf-T\" asn1module=\"POHICDRIVER-IP\" />"
+            "    </Node>"
+            "    <Connection name=\"\" from_node=\"node_linux\" from_port=\"eth0\" to_bus=\"ocarina_buses::ip.i\""
+            "         to_node=\"node_bsd\" to_port=\"eth0\">"
+            "        <Message name=\"init\" from_function=\"gnc_fm\" to_function=\"gnc_gui\" />"
+            "    </Connection>"
+            "</DeploymentView>");
+}
+
 } // namespace helpers

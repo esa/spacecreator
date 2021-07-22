@@ -18,6 +18,7 @@
 #include "dvconnection.h"
 
 #include "dvdevice.h"
+#include "dvmessage.h"
 #include "dvmodel.h"
 #include "dvnode.h"
 #include "errorhub.h"
@@ -121,6 +122,11 @@ DVDevice *DVConnection::sourceDevice() const
 DVDevice *DVConnection::targetDevice() const
 {
     return d->targetDevice;
+}
+
+QList<dvm::DVMessage *> DVConnection::messages() const
+{
+    return findChildren<dvm::DVMessage *>();
 }
 
 } // namespace dvm

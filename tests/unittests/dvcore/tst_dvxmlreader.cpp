@@ -87,6 +87,7 @@ void DVXMLReaderTest::tst_singleItems()
     runReader(helpers::twoConnectionsAndNode(), 3);
     runReader(helpers::twoConnectionsAndNodeWithPartitionAndDevice(), 5);
     runReader(helpers::twoConnectionsAndNodeWithDeviceAndPartitionWithFunctions(), 15);
+    runReader(helpers::singleMessage(), 10);
 }
 
 void DVXMLReaderTest::tst_functions()

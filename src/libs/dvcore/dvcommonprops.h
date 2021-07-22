@@ -40,6 +40,7 @@ public:
         Device,
         Connection,
         Function,
+        Message,
 
         Boards,
         Board,
@@ -77,6 +78,9 @@ public:
         asn1file,
         asn1type,
         asn1module,
+
+        from_function,
+        to_function,
 
         // TASTE props:
         coordinates,

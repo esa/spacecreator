@@ -24,6 +24,7 @@
 #include "dvfunction.h"
 #include "dvnode.h"
 #include "dvpartition.h"
+#include "dvxmlreader.h"
 
 #include <QFile>
 #include <QObject>
@@ -51,6 +52,7 @@ private Q_SLOTS:
     void testExportConnection();
     void testExportPartitionAndDevice();
     void testExportFunctionsAndDevice();
+    void testExportMessage();
     void testAll();
     void testExportToBuffer();
 
@@ -351,6 +353,54 @@ void tst_DVXmlExporter::testExportFunctionsAndDevice()
                                 "</DeploymentView>";
 
     QVERIFY(XmlData(expected) == XmlData(text));
+}
+
+void tst_DVXmlExporter::testExportMessage()
+{
+    const QByteArray source =
+            "<DeploymentView>"
+            "    <Node name=\"node_linux\">"
+            "        <Partition ada_runtime=\"\""
+            "             coverage=\"FALSE\" cpu=\"x86_linux\" cpu_classifier=\"ocarina_processors_x86::x86.linux\""
+            "             cpu_platform=\"PLATFORM_NATIVE\" name=\"demo\" package=\"ocarina_processors_x86\""
+            "             vp_classifier=\"\" vp_name=\"\" vp_platform=\"PLATFORM_NONE\">"
+            "                 <function>gnc_fm</function>"
+            "        </Partition>"
+            "        <Device name=\"\" requires_bus_access=\"ocarina_buses::ip.i\" port=\"eth0\" "
+            "             asn1file=\"/opt/ip.asn\" asn1type=\"IP-Conf-T\" asn1module=\"POHICDRIVER-IP\" />"
+            "    </Node>"
+            "    <Node name=\"node_bsd\">"
+            "        <Partition ada_runtime=\"\""
+            "             coverage=\"FALSE\" cpu=\"x86_linux\" cpu_classifier=\"ocarina_processors_x86::x86.linux\""
+            "             cpu_platform=\"PLATFORM_NATIVE\" name=\"demo\" package=\"ocarina_processors_x86\""
+            "             vp_classifier=\"\" vp_name=\"\" vp_platform=\"PLATFORM_NONE\">"
+            "                 <function>gnc_gui</function>"
+            "        </Partition>"
+            "        <Device name=\"\" requires_bus_access=\"ocarina_buses::ip.i\" port=\"eth0\" "
+            "             asn1file=\"/opt/ip.asn\" asn1type=\"IP-Conf-T\" asn1module=\"POHICDRIVER-IP\" />"
+            "    </Node>"
+            "    <Connection name=\"\" from_node=\"node_linux\" from_port=\"eth0\" to_bus=\"ocarina_buses::ip.i\""
+            "         to_node=\"node_bsd\" to_port=\"eth0\">"
+            "        <Message name=\"init\" from_function=\"gnc_fm\" to_function=\"gnc_gui\" />"
+            "    </Connection>"
+            "</DeploymentView>";
+
+    QBuffer buffer;
+    buffer.setData(source);
+    if (!buffer.open(QIODevice::ReadOnly | QIODevice::Text)) {
+        return;
+    }
+
+    dvm::DVXMLReader reader;
+    reader.read(&buffer);
+
+    QList<shared::VEObject *> objects;
+    for (dvm::DVObject *obj : reader.parsedObjects()) {
+        objects.append(obj);
+    }
+    QVERIFY(m_exporter->exportObjectsSilently(objects, testFilePath));
+    const QByteArray text = testFileContent();
+    QVERIFY(XmlData(source) == XmlData(text));
 }
 
 void tst_DVXmlExporter::testAll()

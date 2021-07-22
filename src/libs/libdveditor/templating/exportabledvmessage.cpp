@@ -15,28 +15,13 @@
    along with this program. If not, see <https://www.gnu.org/licenses/lgpl-2.1.html>.
 */
 
-#pragma once
-
-#include "exportabledvobject.h"
-
-namespace dvm {
-class DVObject;
-}
+#include "exportabledvmessage.h"
 
 namespace dve {
 
-class ExportableDVConnection : public ExportableDVObject
+ExportableDVMessage::ExportableDVMessage(const dvm::DVObject *dvObject)
+    : ExportableDVObject(dvObject)
 {
-    Q_GADGET
-    Q_PROPERTY(QVariantList messages READ messages)
-
-public:
-    explicit ExportableDVConnection(const dvm::DVObject *dvObject = nullptr);
-
-    QVariantList messages() const;
-};
+}
 
 } // namespace dve
-
-Q_DECLARE_METATYPE(dve::ExportableDVConnection)
-Q_DECLARE_TYPEINFO(dve::ExportableDVConnection, Q_MOVABLE_TYPE);

@@ -21,6 +21,7 @@
 #include "dvconnection.h"
 #include "dvdevice.h"
 #include "dvfunction.h"
+#include "dvmessage.h"
 #include "dvnode.h"
 #include "dvobject.h"
 #include "dvpartition.h"
@@ -97,6 +98,9 @@ void DVXMLReader::processTagOpen(QXmlStreamReader &xml)
     case meta::Props::Token::Connection: {
         obj = new dvm::DVConnection(d->m_currentObject);
     } break;
+    case meta::Props::Token::Message: {
+        obj = new dvm::DVMessage(d->m_currentObject);
+    } break;
     case meta::Props::Token::Property: {
         if (d->m_currentObject) {
             d->m_currentObject->setEntityProperty(attrs.value(meta::Props::token(meta::Props::Token::name)).toString(),
@@ -133,7 +137,8 @@ void DVXMLReader::processTagClose(QXmlStreamReader &xml)
     case meta::Props::Token::Function:
     case meta::Props::Token::Node:
     case meta::Props::Token::Device:
-    case meta::Props::Token::Connection: {
+    case meta::Props::Token::Connection:
+    case meta::Props::Token::Message: {
         d->m_currentObject = d->m_currentObject ? d->m_currentObject->parentObject() : nullptr;
         break;
     }
