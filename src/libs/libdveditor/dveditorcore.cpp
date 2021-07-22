@@ -62,6 +62,7 @@ struct DVEditorCore::DVEditorCorePrivate {
         , m_exporter(new DVExporter)
         , m_dynPropConfig(dvm::DVPropertyTemplateConfig::instance())
     {
+        m_dynPropConfig->init(shared::deploymentCustomAttributesFilePath());
     }
 
     ~DVEditorCorePrivate()

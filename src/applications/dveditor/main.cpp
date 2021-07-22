@@ -17,6 +17,7 @@
 
 #include "dveditor.h"
 #include "dveditorcore.h"
+#include "dvlibrary.h"
 #include "mainwindow.h"
 #include "sharedlibrary.h"
 
@@ -28,6 +29,7 @@ int main(int argc, char *argv[])
 {
     shared::initSharedLibrary();
     dve::initDvEditor();
+    dvm::initDVLibrary();
 
     QApplication a(argc, argv);
     a.setOrganizationName(SC_ORGANISATION);

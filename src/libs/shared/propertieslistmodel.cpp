@@ -346,13 +346,12 @@ bool PropertiesListModel::isEditable(const QModelIndex &idx) const
         if (m_propTemplatesConfig->hasPropertyTemplateForObject(m_dataObject, propName)) {
             return false;
         }
-        return index(idx.row(), Column::Value).data().isNull();
+        return index(idx.row(), Column::Value).data(DataRole).isNull();
     } else if (idx.column() == Column::Value) {
         if (const PropertyTemplate *propTemplate =
                         m_propTemplatesConfig->propertyTemplateForObject(m_dataObject, propName)) {
             return propTemplate->isEditable();
         }
-        return false;
     }
 
     return true;
