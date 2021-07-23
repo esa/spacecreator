@@ -39,8 +39,6 @@ public:
         Type = UserType + static_cast<int>(ivm::IVObject::Type::Function)
     };
 
-    void init() override;
-
     ivm::IVFunction *entity() const override;
 
     int type() const override { return Type; }
@@ -51,6 +49,7 @@ public:
 
 protected:
     void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget) override;
+    QVariant itemChange(GraphicsItemChange change, const QVariant &value) override;
 
     void onManualMoveProgress(shared::ui::GripPoint *grip, const QPointF &from, const QPointF &to) override;
     void onManualMoveFinish(shared::ui::GripPoint *grip, const QPointF &pressedAt, const QPointF &releasedAt) override;

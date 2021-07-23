@@ -61,13 +61,6 @@ IVFunctionGraphicsItem::IVFunctionGraphicsItem(ivm::IVFunction *entity, QGraphic
 
 IVFunctionGraphicsItem::~IVFunctionGraphicsItem() { }
 
-void IVFunctionGraphicsItem::init()
-{
-    IVFunctionTypeGraphicsItem::init();
-    connect(entity(), &ivm::IVFunction::childAdded, this, [this]() { update(); });
-    connect(entity(), &ivm::IVFunction::childRemoved, this, [this]() { update(); });
-}
-
 ivm::IVFunction *IVFunctionGraphicsItem::entity() const
 {
     return qobject_cast<ivm::IVFunction *>(m_dataObject);
@@ -108,6 +101,22 @@ void IVFunctionGraphicsItem::paint(QPainter *painter, const QStyleOptionGraphics
     }
 
     painter->restore();
+}
+
+QVariant IVFunctionGraphicsItem::itemChange(GraphicsItemChange change, const QVariant &value)
+{
+    if (change == ItemChildAddedChange) {
+        QTimer::singleShot(0, this, [this, item = value.value<QGraphicsItem *>()]() {
+            if (auto iface = qgraphicsitem_cast<IVInterfaceGraphicsItem *>(item)) {
+                connect(iface, &IVInterfaceGraphicsItem::relocated, this, [this]() { update(); });
+            }
+        });
+    } else if (change == ItemChildRemovedChange) {
+        if (auto iface = qgraphicsitem_cast<IVInterfaceGraphicsItem *>(value.value<QGraphicsItem *>())) {
+            disconnect(iface, &IVInterfaceGraphicsItem::relocated, this, nullptr);
+        }
+    }
+    return IVFunctionTypeGraphicsItem::itemChange(change, value);
 }
 
 void IVFunctionGraphicsItem::onManualMoveProgress(
