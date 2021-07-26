@@ -28,7 +28,9 @@
 namespace dvm {
 class DVConnection;
 class DVDevice;
+class DVFunction;
 struct DVModelPrivate;
+class DVNode;
 
 class DVModel : public shared::VEModel
 {
@@ -41,6 +43,7 @@ public:
     DVObject *getObjectByName(const QString &name, DVObject::Type type, Qt::CaseSensitivity caseSensitivity) const;
 
     QList<DVConnection *> connections(DVDevice *device) const;
+    QList<DVFunction *> functions(DVNode *node) const;
 };
 
 } // namespace dvm

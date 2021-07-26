@@ -33,6 +33,7 @@ public:
 
     virtual ~AbstractSystemChecks() override = default;
     virtual QStringList functionsNames() const = 0;
+    virtual QStringList messages(const QString &sourceFunction, const QString &targetFunction) const = 0;
 
 Q_SIGNALS:
     void ivDataReset();

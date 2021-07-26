@@ -124,6 +124,16 @@ DVDevice *DVConnection::targetDevice() const
     return d->targetDevice;
 }
 
+DVNode *DVConnection::sourceNode() const
+{
+    return d->sourceDevice ? qobject_cast<DVNode *>(d->sourceDevice->parent()) : nullptr;
+}
+
+DVNode *DVConnection::targetNode() const
+{
+    return d->targetDevice ? qobject_cast<DVNode *>(d->targetDevice->parent()) : nullptr;
+}
+
 QList<dvm::DVMessage *> DVConnection::messages() const
 {
     return findChildren<dvm::DVMessage *>();

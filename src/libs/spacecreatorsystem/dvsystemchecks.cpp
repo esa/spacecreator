@@ -20,6 +20,7 @@
 #include "dveditorcore.h"
 #include "errorhub.h"
 #include "interfacedocument.h"
+#include "ivconnectionchain.h"
 #include "iveditorcore.h"
 #include "ivmodel.h"
 
@@ -68,6 +69,25 @@ QStringList DvSystemChecks::functionsNames() const
     }
 
     return m_ivCore->ivFunctionsNames();
+}
+
+/*!
+   Returns all messages/connections from function \p sourceFunction to \p targetFunction
+ */
+QStringList DvSystemChecks::messages(const QString &sourceFunction, const QString &targetFunction) const
+{
+    if (!m_ivCore) {
+        return {};
+    }
+
+    QStringList connectionNames;
+    QList<ivm::IVConnectionChain *> chains = ivm::IVConnectionChain::build(*ivModel());
+    for (const ivm::IVConnectionChain *chain : qAsConst(chains)) {
+        const QStringList names = chain->connectionNames(sourceFunction, targetFunction);
+        connectionNames += names;
+    }
+    connectionNames.removeDuplicates();
+    return connectionNames;
 }
 
 /*!

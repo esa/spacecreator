@@ -27,6 +27,7 @@ class DVConnection;
 }
 
 namespace dve {
+class AbstractSystemChecks;
 class DVMessageBindingsModel;
 
 class DVMessageBindingsWidget : public QWidget
@@ -35,7 +36,7 @@ class DVMessageBindingsWidget : public QWidget
 public:
     DVMessageBindingsWidget(QWidget *parent = nullptr);
 
-    void initModel(dvm::DVConnection *connection);
+    void initModel(dvm::DVConnection *connection, AbstractSystemChecks *systemChecker);
 
 private:
     QTreeView *m_treeView = nullptr;

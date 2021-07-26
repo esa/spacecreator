@@ -17,7 +17,13 @@
 
 #include "dvmessagebindingsmodel.h"
 
+#include "abstractsystemchecks.h"
 #include "dvconnection.h"
+#include "dvdevice.h"
+#include "dvfunction.h"
+#include "dvmodel.h"
+#include "dvnode.h"
+#include "dvpartition.h"
 
 #include <QDebug>
 
@@ -28,27 +34,75 @@ DVMessageBindingsModel::DVMessageBindingsModel(QObject *parent)
 {
 }
 
-void DVMessageBindingsModel::initModel(dvm::DVConnection *connection)
+void DVMessageBindingsModel::initModel(dvm::DVConnection *connection, AbstractSystemChecks *systemChecker)
 {
+    Q_ASSERT(connection);
+    Q_ASSERT(connection->model());
+    dvm::DVModel *model = connection->model();
+
+    dvm::DVNode *sourceNode = connection->sourceNode();
+    dvm::DVNode *targetNode = connection->targetNode();
+
     beginResetModel();
+    m_messages.clear();
     m_connection = connection;
-    /// @todo fetch data from interface view
+
+    if (!systemChecker || !sourceNode || !targetNode) {
+        endResetModel();
+        return;
+    }
+
+    QList<dvm::DVFunction *> sourceFunctions = model->functions(sourceNode);
+    QStringList sourceFunctionNames;
+    for (dvm::DVFunction *fn : qAsConst(sourceFunctions)) {
+        if (fn) {
+            sourceFunctionNames.append(fn->title());
+        }
+    }
+    QList<dvm::DVFunction *> targetFunctions = model->functions(targetNode);
+    QStringList targetFunctionNames;
+    for (dvm::DVFunction *fn : qAsConst(targetFunctions)) {
+        if (fn) {
+            targetFunctionNames.append(fn->title());
+        }
+    }
+
+    for (const QString &sourceName : sourceFunctionNames) {
+        for (const QString &targetName : targetFunctionNames) {
+            if (sourceName == targetName) {
+                continue;
+            }
+            QStringList names = systemChecker->messages(sourceName, targetName);
+            for (const QString &name : qAsConst(names)) {
+                m_messages.append({ name, sourceName, targetName, false });
+            }
+            names = systemChecker->messages(targetName, sourceName);
+            for (const QString &name : qAsConst(names)) {
+                m_messages.append({ name, targetName, sourceName, false });
+            }
+        }
+    }
+
     endResetModel();
 }
 
 int DVMessageBindingsModel::rowCount(const QModelIndex &parent) const
 {
     Q_UNUSED(parent)
-    /// @todo use data from interface view
-    return 1;
+    return m_messages.size();
 }
 
 QVariant DVMessageBindingsModel::data(const QModelIndex &index, int role) const
 {
-    /// @todo use data from interface view and messages from the connection
+    if (index.row() >= m_messages.size()) {
+        return {};
+    }
+
     switch (role) {
-    case Qt::DisplayRole:
-        return QVariant("Example F1.m -> F2.m");
+    case Qt::DisplayRole: {
+        const DataItem &item = m_messages.at(index.row());
+        return QVariant(QString("%1.%2 -> %3.%2").arg(item.m_from, item.m_name, item.m_to));
+    }
     case Qt::CheckStateRole:
         return QVariant(true);
     }

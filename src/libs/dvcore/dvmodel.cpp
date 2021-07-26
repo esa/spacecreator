@@ -20,7 +20,10 @@
 #include "common.h"
 #include "dvconnection.h"
 #include "dvdevice.h"
+#include "dvfunction.h"
+#include "dvnode.h"
 #include "dvobject.h"
+#include "dvpartition.h"
 
 #include <QDebug>
 #include <QHash>
@@ -64,6 +67,21 @@ QList<DVConnection *> DVModel::connections(DVDevice *device) const
         }
     }
     return c;
+}
+
+QList<DVFunction *> DVModel::functions(DVNode *node) const
+{
+    if (!node) {
+        return {};
+    }
+
+    QList<DVFunction *> result;
+    for (DVPartition *partition : node->partitions()) {
+        for (DVFunction *fn : partition->functions()) {
+            result.append(fn);
+        }
+    }
+    return result;
 }
 
 DVObject *DVModel::getObject(const shared::Id &id) const

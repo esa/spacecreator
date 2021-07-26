@@ -27,6 +27,7 @@ namespace dvm {
 class DVDevice;
 struct DVConnectionPrivate;
 class DVMessage;
+class DVNode;
 
 class DVConnection : public DVObject
 {
@@ -41,6 +42,9 @@ public:
 
     DVDevice *sourceDevice() const;
     DVDevice *targetDevice() const;
+
+    DVNode *sourceNode() const;
+    DVNode *targetNode() const;
 
     QList<DVMessage *> messages() const;
 

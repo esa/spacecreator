@@ -306,7 +306,7 @@ void DVEditorCore::showPropertyEditor(const shared::Id &id)
 {
     if (auto obj = d->m_appModel->objectsModel()->getObject(id)) {
         dve::DVPropertiesDialog dialog(
-                d->m_dynPropConfig, obj, d->m_appModel->commandsStack(), d->m_mainWidget->window());
+                d->m_dynPropConfig, obj, d->m_systemChecks, d->m_appModel->commandsStack(), d->m_mainWidget->window());
         dialog.init();
         dialog.exec();
     }

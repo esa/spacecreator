@@ -25,6 +25,7 @@ class DVConnection;
 }
 
 namespace dve {
+class AbstractSystemChecks;
 class DVMessageBindingsModel;
 
 class DVMessageBindingsModel : public QAbstractListModel
@@ -32,7 +33,7 @@ class DVMessageBindingsModel : public QAbstractListModel
 public:
     explicit DVMessageBindingsModel(QObject *parent = nullptr);
 
-    void initModel(dvm::DVConnection *connection);
+    void initModel(dvm::DVConnection *connection, AbstractSystemChecks *systemChecker);
 
     // QAbstractItemModel interface
     int rowCount(const QModelIndex &parent) const override;
@@ -41,7 +42,15 @@ public:
     Qt::ItemFlags flags(const QModelIndex &index) const override;
 
 private:
+    struct DataItem {
+        QString m_name;
+        QString m_from;
+        QString m_to;
+        bool m_bound = false;
+    };
+
     QPointer<dvm::DVConnection> m_connection;
+    QList<DataItem> m_messages;
 };
 
 } // namespace dve

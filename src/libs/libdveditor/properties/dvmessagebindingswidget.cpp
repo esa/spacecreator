@@ -36,7 +36,7 @@ DVMessageBindingsWidget::DVMessageBindingsWidget(QWidget *parent)
     layout->addWidget(m_treeView);
 }
 
-void DVMessageBindingsWidget::initModel(dvm::DVConnection *connection)
+void DVMessageBindingsWidget::initModel(dvm::DVConnection *connection, AbstractSystemChecks *systemChecker)
 {
     // set up model
     if (!m_model) {
@@ -44,7 +44,7 @@ void DVMessageBindingsWidget::initModel(dvm::DVConnection *connection)
         m_treeView->setModel(m_model);
     }
     m_connection = connection;
-    m_model->initModel(m_connection);
+    m_model->initModel(m_connection, systemChecker);
 }
 
 } // namespace dve

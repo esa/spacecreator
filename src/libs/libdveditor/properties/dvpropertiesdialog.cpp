@@ -17,6 +17,7 @@
 
 #include "dvpropertiesdialog.h"
 
+#include "abstractsystemchecks.h"
 #include "commandsstackbase.h"
 #include "dvconnection.h"
 #include "dvdevice.h"
@@ -33,8 +34,9 @@
 namespace dve {
 
 DVPropertiesDialog::DVPropertiesDialog(shared::PropertyTemplateConfig *dynPropConfig, dvm::DVObject *obj,
-        shared::cmd::CommandsStackBase *commandsStack, QWidget *parent)
+        AbstractSystemChecks *systemChecker, shared::cmd::CommandsStackBase *commandsStack, QWidget *parent)
     : shared::PropertiesDialog(dynPropConfig, obj, commandsStack, parent)
+    , m_systemChecker(systemChecker)
 {
 }
 
@@ -72,7 +74,7 @@ void DVPropertiesDialog::init()
     switch (dataObject()->type()) {
     case dvm::DVObject::Type::Connection: {
         auto mBindings = new DVMessageBindingsWidget(this);
-        mBindings->initModel(qobject_cast<dvm::DVConnection *>(dataObject()));
+        mBindings->initModel(qobject_cast<dvm::DVConnection *>(dataObject()), m_systemChecker);
         insertTab(mBindings, tr("Message Bindings"), -1);
         break;
     }
@@ -82,7 +84,7 @@ void DVPropertiesDialog::init()
         Q_ASSERT(model);
         for (dvm::DVConnection *connection : model->connections(device)) {
             auto mBindings = new DVMessageBindingsWidget(this);
-            mBindings->initModel(connection);
+            mBindings->initModel(connection, m_systemChecker);
             QString title = QString("%1 -> %2")
                                     .arg(connection->sourceDevice() ? connection->sourceDevice()->titleUI() : "",
                                             connection->targetDevice() ? connection->targetDevice()->titleUI() : "");

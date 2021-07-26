@@ -27,21 +27,25 @@ class PropertyTemplateConfig;
 } // namespace shared
 
 namespace dve {
+class AbstractSystemChecks;
 
 class DVPropertiesDialog : public shared::PropertiesDialog
 {
 public:
     DVPropertiesDialog(shared::PropertyTemplateConfig *dynPropConfig, dvm::DVObject *obj,
-            shared::cmd::CommandsStackBase *commandsStack, QWidget *parent = nullptr);
+            AbstractSystemChecks *systemChecker, shared::cmd::CommandsStackBase *commandsStack,
+            QWidget *parent = nullptr);
 
     void init() override;
-
-private:
-    void initAttributesView();
 
 protected:
     QString objectTypeName() const override;
     dvm::DVObject *dataObject() const override;
+
+private:
+    void initAttributesView();
+
+    AbstractSystemChecks *m_systemChecker = nullptr;
 };
 
 } // namespace dve
