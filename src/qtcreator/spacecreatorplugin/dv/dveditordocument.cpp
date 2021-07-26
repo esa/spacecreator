@@ -20,6 +20,8 @@
 #include "dvappmodel.h"
 #include "dveditorcore.h"
 #include "dvmainwidget.h"
+#include "dvmodel.h"
+#include "errorhub.h"
 #include "spacecreatorpluginconstants.h"
 #include "spacecreatorproject.h"
 #include "spacecreatorprojectimpl.h"
@@ -72,6 +74,40 @@ Core::IDocument::OpenResult DVEditorDocument::open(
 
 bool DVEditorDocument::save(QString *errorString, const QString &name, bool autoSave)
 {
+    Q_UNUSED(errorString)
+    if (m_plugin.isNull()) {
+        return false;
+    }
+
+    const FileName oldFileName = filePath();
+    const FileName actualName = name.isEmpty() ? oldFileName : FileName::fromString(name);
+    if (actualName.isEmpty()) {
+        return false;
+    }
+    bool dirty = isModified();
+
+    shared::ErrorHub::clearFileErrors(actualName.toString());
+
+    dve::DVAppModel *model = m_plugin->appModel();
+    model->setPath(actualName.toString());
+    if (!m_plugin->save()) {
+        model->setPath(oldFileName.toString());
+        return false;
+    }
+
+    if (autoSave) {
+        model->setPath(oldFileName.toString());
+        return true;
+    } else {
+        m_plugin->undoStack()->setClean();
+    }
+
+    setFilePath(actualName);
+
+    if (dirty != isModified()) {
+        Q_EMIT changed();
+    }
+
     return true;
 }
 
@@ -87,7 +123,7 @@ bool DVEditorDocument::isSaveAsAllowed() const
 
 bool DVEditorDocument::isModified() const
 {
-    return false;
+    return m_plugin && !m_plugin->undoStack()->isClean();
 }
 
 bool DVEditorDocument::reload(QString *errorString, ReloadFlag flag, ChangeType type)

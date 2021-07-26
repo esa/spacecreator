@@ -97,7 +97,6 @@ bool IVEditorDocument::save(QString *errorString, const QString &name, bool auto
 
     if (autoSave) {
         ivDocument->setPath(oldFileName.toString());
-        ivDocument->exporter()->exportDocSilently(m_plugin->document(), actualName.toString());
         return true;
     } else {
         ivDocument->undoStack()->setClean();
