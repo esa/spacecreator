@@ -73,7 +73,7 @@ void DVPropertiesDialog::init()
 
     switch (dataObject()->type()) {
     case dvm::DVObject::Type::Connection: {
-        auto mBindings = new DVMessageBindingsWidget(this);
+        auto mBindings = new DVMessageBindingsWidget(commandMacro(), this);
         mBindings->initModel(qobject_cast<dvm::DVConnection *>(dataObject()), m_systemChecker);
         insertTab(mBindings, tr("Message Bindings"), -1);
         break;
@@ -83,9 +83,9 @@ void DVPropertiesDialog::init()
         dvm::DVModel *model = device->model();
         Q_ASSERT(model);
         for (dvm::DVConnection *connection : model->connections(device)) {
-            auto mBindings = new DVMessageBindingsWidget(this);
+            auto mBindings = new DVMessageBindingsWidget(commandMacro(), this);
             mBindings->initModel(connection, m_systemChecker);
-            QString title = QString("%1 -> %2")
+            QString title = QString("%1 <-> %2")
                                     .arg(connection->sourceDevice() ? connection->sourceDevice()->titleUI() : "",
                                             connection->targetDevice() ? connection->targetDevice()->titleUI() : "");
             insertTab(mBindings, title, -1);

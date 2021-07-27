@@ -48,6 +48,9 @@ public:
 
     QList<DVMessage *> messages() const;
 
+    bool hasMessage(const QString &name, const QString &from, const QString &to) const;
+    DVMessage *message(const QString &name, const QString &from, const QString &to) const;
+
 private:
     std::unique_ptr<DVConnectionPrivate> d;
 };

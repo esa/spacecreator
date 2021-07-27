@@ -15,6 +15,8 @@ target_sources(${LIB_NAME} PRIVATE
     commands/cmdfunctionbind.h
     commands/cmdfunctionunbind.cpp
     commands/cmdfunctionunbind.h
+    commands/cmdmessagenetitycreate.cpp
+    commands/cmdmessagenetitycreate.h
     commands/cmdnodeentitycreate.cpp
     commands/cmdnodeentitycreate.h
     commands/cmdpartitionentitycreate.cpp

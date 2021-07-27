@@ -139,4 +139,19 @@ QList<dvm::DVMessage *> DVConnection::messages() const
     return findChildren<dvm::DVMessage *>();
 }
 
+bool DVConnection::hasMessage(const QString &name, const QString &from, const QString &to) const
+{
+    return message(name, from, to) != nullptr;
+}
+
+DVMessage *DVConnection::message(const QString &name, const QString &from, const QString &to) const
+{
+    for (dvm::DVMessage *message : messages()) {
+        if (message->name() == name && message->fromFunction() == from && message->toFunction() == to) {
+            return message;
+        }
+    }
+    return {};
+}
+
 } // namespace dvm

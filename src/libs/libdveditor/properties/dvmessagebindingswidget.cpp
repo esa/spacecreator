@@ -25,8 +25,9 @@
 
 namespace dve {
 
-DVMessageBindingsWidget::DVMessageBindingsWidget(QWidget *parent)
+DVMessageBindingsWidget::DVMessageBindingsWidget(shared::cmd::CommandsStackBase::Macro *macro, QWidget *parent)
     : QWidget(parent)
+    , m_cmdMacro(macro)
 {
     auto layout = new QVBoxLayout(this);
     setLayout(layout);
@@ -40,7 +41,7 @@ void DVMessageBindingsWidget::initModel(dvm::DVConnection *connection, AbstractS
 {
     // set up model
     if (!m_model) {
-        m_model = new dve::DVMessageBindingsModel(this);
+        m_model = new dve::DVMessageBindingsModel(m_cmdMacro, this);
         m_treeView->setModel(m_model);
     }
     m_connection = connection;

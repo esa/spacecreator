@@ -26,6 +26,7 @@ enum Id
     CreatePartitionEntity,
     CreateConnectionEntity,
     CreateDeviceEntity,
+    CreateMessageEntity,
     BindFunctionEntity,
     UnbindFunctionEntity,
     RemoveEntity,

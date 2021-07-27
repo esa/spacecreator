@@ -17,6 +17,8 @@
 
 #pragma once
 
+#include "commandsstackbase.h"
+
 #include <QPointer>
 #include <QWidget>
 
@@ -34,7 +36,7 @@ class DVMessageBindingsWidget : public QWidget
 {
     Q_OBJECT
 public:
-    DVMessageBindingsWidget(QWidget *parent = nullptr);
+    DVMessageBindingsWidget(shared::cmd::CommandsStackBase::Macro *macro, QWidget *parent = nullptr);
 
     void initModel(dvm::DVConnection *connection, AbstractSystemChecks *systemChecker);
 
@@ -42,6 +44,7 @@ private:
     QTreeView *m_treeView = nullptr;
     DVMessageBindingsModel *m_model = nullptr;
     QPointer<dvm::DVConnection> m_connection;
+    shared::cmd::CommandsStackBase::Macro *m_cmdMacro { nullptr };
 };
 
 } // namespace dve

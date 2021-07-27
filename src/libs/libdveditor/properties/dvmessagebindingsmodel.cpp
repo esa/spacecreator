@@ -18,9 +18,12 @@
 #include "dvmessagebindingsmodel.h"
 
 #include "abstractsystemchecks.h"
+#include "commands/cmdentitiesremove.h"
+#include "commands/cmdmessagenetitycreate.h"
 #include "dvconnection.h"
 #include "dvdevice.h"
 #include "dvfunction.h"
+#include "dvmessage.h"
 #include "dvmodel.h"
 #include "dvnode.h"
 #include "dvpartition.h"
@@ -29,8 +32,9 @@
 
 namespace dve {
 
-DVMessageBindingsModel::DVMessageBindingsModel(QObject *parent)
+DVMessageBindingsModel::DVMessageBindingsModel(shared::cmd::CommandsStackBase::Macro *macro, QObject *parent)
     : QAbstractListModel(parent)
+    , m_cmdMacro(macro)
 {
 }
 
@@ -74,11 +78,11 @@ void DVMessageBindingsModel::initModel(dvm::DVConnection *connection, AbstractSy
             }
             QStringList names = systemChecker->messages(sourceName, targetName);
             for (const QString &name : qAsConst(names)) {
-                m_messages.append({ name, sourceName, targetName, false });
+                m_messages.append({ name, sourceName, targetName });
             }
             names = systemChecker->messages(targetName, sourceName);
             for (const QString &name : qAsConst(names)) {
-                m_messages.append({ name, targetName, sourceName, false });
+                m_messages.append({ name, targetName, sourceName });
             }
         }
     }
@@ -98,21 +102,36 @@ QVariant DVMessageBindingsModel::data(const QModelIndex &index, int role) const
         return {};
     }
 
+    const DataItem &item = m_messages.at(index.row());
     switch (role) {
     case Qt::DisplayRole: {
-        const DataItem &item = m_messages.at(index.row());
         return QVariant(QString("%1.%2 -> %3.%2").arg(item.m_from, item.m_name, item.m_to));
     }
     case Qt::CheckStateRole:
-        return QVariant(true);
+        return m_connection->hasMessage(item.m_name, item.m_from, item.m_to) ? QVariant(Qt::Checked)
+                                                                             : QVariant(Qt::Unchecked);
     }
     return {};
 }
 
 bool DVMessageBindingsModel::setData(const QModelIndex &index, const QVariant &value, int role)
 {
+    if (index.row() >= m_messages.size()) {
+        return {};
+    }
+
     if (role == Qt::CheckStateRole) {
-        /// @todo run command to add/remove the message
+        DataItem &item = m_messages[index.row()];
+        if ((Qt::CheckState)value.toInt() == Qt::Checked) {
+            auto cmd = new cmd::CmdMessageEntityCreate(m_connection, item.m_name, item.m_from, item.m_to);
+            m_cmdMacro->push(cmd);
+        } else {
+            dvm::DVMessage *message = m_connection->message(item.m_name, item.m_from, item.m_to);
+            if (message) {
+                auto cmd = new cmd::CmdEntitiesRemove({ message }, message->model());
+                m_cmdMacro->push(cmd);
+            }
+        }
         return true;
     }
     return false;

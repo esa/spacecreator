@@ -17,42 +17,33 @@
 
 #pragma once
 
-#include "commandsstackbase.h"
+#include "undocommand.h"
 
-#include <QAbstractListModel>
 #include <QPointer>
 
 namespace dvm {
 class DVConnection;
-}
+class DVMessage;
+} // namespace dvm
 
 namespace dve {
-class AbstractSystemChecks;
-class DVMessageBindingsModel;
+namespace cmd {
 
-class DVMessageBindingsModel : public QAbstractListModel
+class CmdMessageEntityCreate : public shared::UndoCommand
 {
+    Q_OBJECT
 public:
-    explicit DVMessageBindingsModel(shared::cmd::CommandsStackBase::Macro *macro, QObject *parent = nullptr);
+    explicit CmdMessageEntityCreate(
+            dvm::DVConnection *connection, const QString &messageName, const QString &from, const QString &to);
 
-    void initModel(dvm::DVConnection *connection, AbstractSystemChecks *systemChecker);
-
-    // QAbstractItemModel interface
-    int rowCount(const QModelIndex &parent) const override;
-    QVariant data(const QModelIndex &index, int role) const override;
-    bool setData(const QModelIndex &index, const QVariant &value, int role) override;
-    Qt::ItemFlags flags(const QModelIndex &index) const override;
+    void redo() override;
+    void undo() override;
+    int id() const override;
 
 private:
-    struct DataItem {
-        QString m_name;
-        QString m_from;
-        QString m_to;
-    };
-
     QPointer<dvm::DVConnection> m_connection;
-    QList<DataItem> m_messages;
-    shared::cmd::CommandsStackBase::Macro *m_cmdMacro { nullptr };
+    QPointer<dvm::DVMessage> m_message;
 };
 
+} // namespace cmd
 } // namespace dve
