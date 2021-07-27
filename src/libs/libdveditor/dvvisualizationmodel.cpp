@@ -19,6 +19,8 @@
 
 #include "dvmodel.h"
 
+#include <QFile>
+
 namespace dve {
 
 DVVisualizationModel::DVVisualizationModel(
@@ -54,6 +56,14 @@ void DVVisualizationModel::updateItemData(QStandardItem *item, shared::VEObject 
         break;
     }
     item->setData(pix, Qt::DecorationRole);
+    if (obj->hasEntityAttribute(dvm::meta::Props::token(dvm::meta::Props::Token::asn1file))) {
+        const QString asn1file =
+                obj->entityAttributeValue<QString>(dvm::meta::Props::token(dvm::meta::Props::Token::asn1file));
+        if (!QFile::exists(asn1file)) {
+            item->setData(QColor(Qt::red), Qt::ForegroundRole);
+            item->setData(tr("ASN1File doesn't exists: %1").arg(asn1file), Qt::ToolTipRole);
+        }
+    }
 }
 
 QStandardItem *DVVisualizationModel::createItem(shared::VEObject *obj)

@@ -44,6 +44,8 @@ public:
 
     QList<DVConnection *> connections(DVDevice *device) const;
     QList<DVFunction *> functions(DVNode *node) const;
+
+    bool addObjectImpl(shared::VEObject *obj) override;
 };
 
 } // namespace dvm
