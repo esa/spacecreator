@@ -171,17 +171,17 @@ QVector<QSharedPointer<msc::MSCEditorCore>> SpaceCreatorProject::allMscCores() c
  */
 bool SpaceCreatorProject::contains(QSharedPointer<shared::EditorCore> core) const
 {
-    for (QSharedPointer<dve::DVEditorCore> dvCore : m_dvStore) {
+    for (const QSharedPointer<dve::DVEditorCore> &dvCore : m_dvStore) {
         if (core == dvCore) {
             return true;
         }
     }
-    for (QSharedPointer<ive::IVEditorCore> ivCore : m_ivStore) {
+    for (const QSharedPointer<ive::IVEditorCore> &ivCore : m_ivStore) {
         if (core == ivCore) {
             return true;
         }
     }
-    for (QSharedPointer<msc::MSCEditorCore> mscCore : m_mscStore) {
+    for (const QSharedPointer<msc::MSCEditorCore> &mscCore : m_mscStore) {
         if (core == mscCore) {
             return true;
         }

@@ -81,9 +81,10 @@ public:
     QString filePath() const override;
     bool save() override;
     bool saveAs();
-    dve::DVExporter* exporter() const;
+    dve::DVExporter *exporter() const;
 
     void loadHWLibrary(const QString &directory);
+    void reloadHWLibrary();
 
 private Q_SLOTS:
     void showPropertyEditor(const shared::Id &id);

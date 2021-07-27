@@ -42,7 +42,6 @@ QWidget *HwLibraryOption::widget()
 void HwLibraryOption::apply()
 {
     m_widget->save();
-    /// @todo trigger reload
 }
 
 void HwLibraryOption::finish()

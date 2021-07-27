@@ -81,11 +81,20 @@ public:
     template<typename V, typename T, typename std::enable_if<std::is_enum<T>::value, void *>::type = nullptr>
     static void store(const T &type, const V &value)
     {
+        QString key = keyString<T>(type);
+        QVariant v = QVariant::fromValue<V>(value);
+        instance()->storage()->setValue(key, v);
+        instance()->storage()->sync();
+        Q_EMIT instance()->settingChanged(key, v);
+    }
+
+    template<typename T>
+    static QString keyString(const T &type)
+    {
         const QMetaEnum typeMetaEnum = QMetaEnum::fromType<T>();
         const QString key = QString::fromLatin1(typeMetaEnum.name()) + QLatin1Char('/')
                 + QString::fromLatin1(typeMetaEnum.valueToKey(static_cast<int>(type)));
-        instance()->storage()->setValue(key, QVariant::fromValue<V>(value));
-        instance()->storage()->sync();
+        return key;
     }
 
     /*!
@@ -106,6 +115,9 @@ public:
         const QVariant value = instance()->storage()->value(key);
         return value.isValid() ? value.value<V>() : defaultValue;
     }
+
+Q_SIGNALS:
+    void settingChanged(const QString &key, const QVariant &value);
 
 private:
     QSettings *m_settings = nullptr;

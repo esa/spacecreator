@@ -35,6 +35,7 @@
 #include "itemeditor/dvitemmodel.h"
 #include "itemeditor/graphicsview.h"
 #include "properties/dvpropertiesdialog.h"
+#include "settingsmanager.h"
 #include "ui/graphicsviewbase.h"
 #include "asn1systemchecks.h"
 
@@ -42,10 +43,12 @@
 #include <QBuffer>
 #include <QDebug>
 #include <QDirIterator>
+#include <QFileSystemWatcher>
 #include <QHeaderView>
 #include <QMainWindow>
 #include <QMessageBox>
 #include <QSplitter>
+#include <QTimer>
 #include <QTreeView>
 #include <QUndoCommand>
 
@@ -64,6 +67,7 @@ struct DVEditorCore::DVEditorCorePrivate {
         , m_dynPropConfig(dvm::DVPropertyTemplateConfig::instance())
     {
         m_dynPropConfig->init(shared::deploymentCustomAttributesFilePath());
+        m_hwReload.setInterval(10);
     }
 
     ~DVEditorCorePrivate()
@@ -88,6 +92,8 @@ struct DVEditorCore::DVEditorCorePrivate {
     QPointer<QToolBar> m_toolBar;
     QVector<QAction *> m_actions;
     QPointer<DVAppWidget> m_mainWidget;
+    QFileSystemWatcher m_hwLibraryWatcher;
+    QTimer m_hwReload;
 };
 
 DVEditorCore::DVEditorCore(QObject *parent)
@@ -96,6 +102,17 @@ DVEditorCore::DVEditorCore(QObject *parent)
 {
     connect(d->m_model.get(), &dve::DVItemModel::itemsSelected, this, &DVEditorCore::onSceneSelectionChanged);
     connect(d->m_model.get(), &dve::DVItemModel::itemDoubleClicked, this, &DVEditorCore::showPropertyEditor);
+
+    connect(shared::SettingsManager::instance(), &shared::SettingsManager::settingChanged, this,
+            [this](const QString &key, const QVariant &) {
+                const QString hwKey = shared::SettingsManager::keyString(shared::SettingsManager::DVE::HwLibraryFile);
+                if (key == hwKey) {
+                    this->reloadHWLibrary();
+                }
+            });
+    connect(&d->m_hwReload, &QTimer::timeout, this, &DVEditorCore::reloadHWLibrary);
+    connect(&d->m_hwLibraryWatcher, &QFileSystemWatcher::directoryChanged, &d->m_hwReload, qOverload<>(&QTimer::start));
+    connect(&d->m_hwLibraryWatcher, &QFileSystemWatcher::fileChanged, &d->m_hwReload, qOverload<>(&QTimer::start));
 }
 
 DVEditorCore::~DVEditorCore() { }
@@ -300,6 +317,11 @@ DVExporter *DVEditorCore::exporter() const
  */
 void DVEditorCore::loadHWLibrary(const QString &directory)
 {
+    d->m_hwModel->clear();
+    d->m_hwLibraryWatcher.removePaths(d->m_hwLibraryWatcher.files());
+    d->m_hwLibraryWatcher.removePaths(d->m_hwLibraryWatcher.directories());
+    d->m_hwLibraryWatcher.addPath(directory);
+
     QVector<dvm::DVObject *> objects;
     QDirIterator it(directory, QStringList() << "*.xml", QDir::Files, QDirIterator::Subdirectories);
     while (it.hasNext()) {
@@ -309,10 +331,19 @@ void DVEditorCore::loadHWLibrary(const QString &directory)
         bool ok = reader.readFile(fileName);
         if (ok) {
             objects << reader.parsedObjects();
+            d->m_hwLibraryWatcher.addPath(fileName);
+            QFileInfo fi(fileName);
+            d->m_hwLibraryWatcher.addPath(fi.absolutePath());
         }
     }
+
     shared::ErrorHub::clearCurrentFile();
     d->m_hwModel->initFromObjects(objects);
+}
+
+void DVEditorCore::reloadHWLibrary()
+{
+    loadHWLibrary(shared::hwLibraryPath());
 }
 
 void DVEditorCore::showPropertyEditor(const shared::Id &id)
