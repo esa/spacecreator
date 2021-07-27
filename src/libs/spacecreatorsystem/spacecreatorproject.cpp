@@ -62,8 +62,10 @@ QSharedPointer<dve::DVEditorCore> SpaceCreatorProject::dvData(const QString &fil
 {
     if (!m_dvStore.contains(fileName)) {
         QSharedPointer<dve::DVEditorCore> data(new dve::DVEditorCore());
+        data->setAsn1Check(m_asnChecks.get());
         data->loadHWLibrary(shared::hwLibraryPath());
         data->appModel()->load(fileName);
+
         const_cast<SpaceCreatorProject *>(this)->setDvData(fileName, data);
         return data;
     }

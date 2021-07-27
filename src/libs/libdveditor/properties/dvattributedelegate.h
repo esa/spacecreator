@@ -16,42 +16,31 @@
 */
 
 #pragma once
-#include "dvobject.h"
-#include "propertiesdialog.h"
+
+#include "interface/attributedelegate.h"
 
 #include <QPointer>
-
-namespace shared {
-namespace cmd {
-class CommandsStackBase;
-class PropertyTemplateConfig;
-} // namespace cmd
-} // namespace shared
 
 namespace Asn1Acn {
 class Asn1SystemChecks;
 }
 
 namespace dve {
-class AbstractSystemChecks;
 
-class DVPropertiesDialog : public shared::PropertiesDialog
+class DVAttributeDelegate : public shared::AttributeDelegate
 {
+    Q_OBJECT
 public:
-    DVPropertiesDialog(shared::PropertyTemplateConfig *dynPropConfig, dvm::DVObject *obj,
-            AbstractSystemChecks *systemChecker, Asn1Acn::Asn1SystemChecks *asn1Checks,
-            shared::cmd::CommandsStackBase *commandsStack, QWidget *parent = nullptr);
+    explicit DVAttributeDelegate(Asn1Acn::Asn1SystemChecks *asn1Checks, QObject *parent = nullptr);
 
-    void init() override;
+    QWidget *createEditor(QWidget *parent, const QStyleOptionViewItem &option, const QModelIndex &index) const override;
+    void setEditorData(QWidget *editor, const QModelIndex &index) const override;
 
 protected:
-    QString objectTypeName() const override;
-    dvm::DVObject *dataObject() const override;
+    bool eventFilter(QObject *object, QEvent *event) override;
 
 private:
-    void initAttributesView();
-
-    AbstractSystemChecks *m_systemChecker = nullptr;
+    QPointer<Asn1Acn::Asn1SystemChecks> m_asn1Checks;
 };
 
 } // namespace dve

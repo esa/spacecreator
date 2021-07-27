@@ -27,15 +27,18 @@
 #include "propertieslistmodel.h"
 #include "propertiesviewbase.h"
 #include "propertytemplateconfig.h"
+#include "dvattributedelegate.h"
+#include "asn1systemchecks.h"
 
 #include <QStyledItemDelegate>
 #include <QTableView>
 
 namespace dve {
 
-DVPropertiesDialog::DVPropertiesDialog(shared::PropertyTemplateConfig *dynPropConfig, dvm::DVObject *obj,
-        AbstractSystemChecks *systemChecker, shared::cmd::CommandsStackBase *commandsStack, QWidget *parent)
-    : shared::PropertiesDialog(dynPropConfig, obj, commandsStack, parent)
+DVPropertiesDialog::DVPropertiesDialog(shared::PropertyTemplateConfig *dynPropConfig,
+        dvm::DVObject *obj, AbstractSystemChecks *systemChecker, Asn1Acn::Asn1SystemChecks *asn1Checks,
+        shared::cmd::CommandsStackBase *commandsStack, QWidget *parent)
+    : shared::PropertiesDialog(dynPropConfig, obj, asn1Checks, commandsStack, parent)
     , m_systemChecker(systemChecker)
 {
 }
@@ -105,7 +108,7 @@ void DVPropertiesDialog::initAttributesView()
     modelAttrs->setDataObject(dataObject());
 
     shared::AttributesView *viewAttrs = new shared::AttributesView(this);
-    QStyledItemDelegate *attrDelegate = new shared::AttributeDelegate(viewAttrs->tableView());
+    QStyledItemDelegate *attrDelegate = new DVAttributeDelegate(asn1Checks(), viewAttrs->tableView());
 
     viewAttrs->tableView()->setItemDelegateForColumn(shared::PropertiesListModel::Column::Value, attrDelegate);
     viewAttrs->setModel(modelAttrs);

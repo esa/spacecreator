@@ -77,10 +77,13 @@ target_sources(${LIB_NAME} PRIVATE
     templating/exportabledvobject.h
     templating/exportabledvpartition.cpp
     templating/exportabledvpartition.h
+    properties/dvattributedelegate.cpp
+    properties/dvattributedelegate.h
 )
 
 target_link_libraries(${LIB_NAME}
     dvcore
+    asn1editor
     templating
     shared
     ${QT_SVG}

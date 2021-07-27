@@ -45,6 +45,7 @@ const QHash<QString, Props::Token> Props::TokensByName = {
     { "to_port", Token::to_port },
     { "requires_bus_access", Token::requires_bus_access },
     { "requiresBusAccess", Token::requiresBusAccess },
+    { "config", Token::config },
     { "from_function", Token::from_function },
     { "to_function", Token::to_function },
 

@@ -19,6 +19,7 @@
 
 #include "ui_propertiesdialog.h"
 #include "veobject.h"
+#include "asn1systemchecks.h"
 
 #include <QDebug>
 #include <QHeaderView>
@@ -32,8 +33,9 @@
 namespace shared {
 
 struct PropertiesDialog::PropertiesDialogPrivate {
-    PropertiesDialogPrivate(VEObject *obj, PropertyTemplateConfig *dynPropConfig, cmd::CommandsStackBase *commandsStack)
+    PropertiesDialogPrivate(VEObject *obj, PropertyTemplateConfig *dynPropConfig, Asn1Acn::Asn1SystemChecks *asn1Checks, cmd::CommandsStackBase *commandsStack)
         : dataObject(obj)
+        , asn1Checks(asn1Checks)
         , commandsStack(commandsStack)
         , dynPropConfig(dynPropConfig)
         , ui(new Ui::PropertiesDialog)
@@ -41,6 +43,7 @@ struct PropertiesDialog::PropertiesDialogPrivate {
     }
 
     QPointer<VEObject> dataObject;
+    QPointer<Asn1Acn::Asn1SystemChecks> asn1Checks;
     QPointer<cmd::CommandsStackBase> commandsStack;
     PropertyTemplateConfig *dynPropConfig;
     std::unique_ptr<Ui::PropertiesDialog> ui;
@@ -48,9 +51,11 @@ struct PropertiesDialog::PropertiesDialogPrivate {
 };
 
 PropertiesDialog::PropertiesDialog(
-        PropertyTemplateConfig *dynPropConfig, VEObject *obj, cmd::CommandsStackBase *commandsStack, QWidget *parent)
+        PropertyTemplateConfig *dynPropConfig, VEObject *obj,
+        Asn1Acn::Asn1SystemChecks *asn1Checks, cmd::CommandsStackBase *commandsStack,
+        QWidget *parent)
     : QDialog(parent)
-    , d(std::make_unique<PropertiesDialogPrivate>(obj, dynPropConfig, commandsStack))
+    , d(std::make_unique<PropertiesDialogPrivate>(obj, dynPropConfig, asn1Checks, commandsStack))
 {
     d->ui->setupUi(this);
 
@@ -113,6 +118,11 @@ cmd::CommandsStackBase *PropertiesDialog::commandStack() const
 PropertyTemplateConfig *PropertiesDialog::propertiesConfig() const
 {
     return d->dynPropConfig;
+}
+
+Asn1Acn::Asn1SystemChecks *PropertiesDialog::asn1Checks() const
+{
+    return d->asn1Checks;
 }
 
 } // namespace ive

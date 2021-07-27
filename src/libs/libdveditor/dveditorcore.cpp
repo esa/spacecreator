@@ -36,6 +36,7 @@
 #include "itemeditor/graphicsview.h"
 #include "properties/dvpropertiesdialog.h"
 #include "ui/graphicsviewbase.h"
+#include "asn1systemchecks.h"
 
 #include <QBoxLayout>
 #include <QBuffer>
@@ -82,6 +83,8 @@ struct DVEditorCore::DVEditorCorePrivate {
 
     dve::AbstractSystemChecks *m_systemChecks = nullptr;
 
+    QPointer<Asn1Acn::Asn1SystemChecks> m_asn1SystemChecks;
+
     QPointer<QToolBar> m_toolBar;
     QVector<QAction *> m_actions;
     QPointer<DVAppWidget> m_mainWidget;
@@ -118,6 +121,16 @@ void DVEditorCore::setSystemChecker(AbstractSystemChecks *checker)
     if (d->m_creatorTool) {
         d->m_creatorTool->setSystemChecker(checker);
     }
+}
+
+void DVEditorCore::setAsn1Check(Asn1Acn::Asn1SystemChecks *check)
+{
+    d->m_asn1SystemChecks = check;
+}
+
+Asn1Acn::Asn1SystemChecks *DVEditorCore::asn1Checker() const
+{
+    return d->m_asn1SystemChecks;
 }
 
 AbstractSystemChecks *DVEditorCore::systemChecker() const
@@ -305,8 +318,8 @@ void DVEditorCore::loadHWLibrary(const QString &directory)
 void DVEditorCore::showPropertyEditor(const shared::Id &id)
 {
     if (auto obj = d->m_appModel->objectsModel()->getObject(id)) {
-        dve::DVPropertiesDialog dialog(
-                d->m_dynPropConfig, obj, d->m_systemChecks, d->m_appModel->commandsStack(), d->m_mainWidget->window());
+        dve::DVPropertiesDialog dialog(d->m_dynPropConfig, obj, d->m_systemChecks,
+                d->m_asn1SystemChecks, d->m_appModel->commandsStack(), d->m_mainWidget->window());
         dialog.init();
         dialog.exec();
     }

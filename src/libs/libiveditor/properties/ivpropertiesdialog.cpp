@@ -50,8 +50,7 @@ namespace ive {
 
 IVPropertiesDialog::IVPropertiesDialog(ivm::IVPropertyTemplateConfig *dynPropConfig, ivm::IVObject *obj,
         Asn1Acn::Asn1SystemChecks *asn1Checks, cmd::CommandsStack *commandsStack, QWidget *parent)
-    : shared::PropertiesDialog(dynPropConfig, obj, commandsStack, parent)
-    , m_asn1Checks(asn1Checks)
+    : shared::PropertiesDialog(dynPropConfig, obj, asn1Checks, commandsStack, parent)
 {
 }
 
@@ -171,14 +170,14 @@ void IVPropertiesDialog::initAttributesView()
 void IVPropertiesDialog::initContextParams()
 {
     ContextParametersModel *modelCtxParams = new ContextParametersModel(commandMacro(), this);
-    modelCtxParams->setAsn1Check(m_asn1Checks);
+    modelCtxParams->setAsn1Check(asn1Checks());
     modelCtxParams->setDataObject(dataObject());
 
     shared::PropertiesViewBase *viewAttrs = new ContextParametersView(this);
     viewAttrs->tableView()->setItemDelegateForColumn(
             ContextParametersModel::Column::Type, new shared::AttributeDelegate(viewAttrs->tableView()));
     viewAttrs->tableView()->setItemDelegateForColumn(
-            ContextParametersModel::Column::Value, new Asn1ValueDelegate(m_asn1Checks, viewAttrs->tableView()));
+            ContextParametersModel::Column::Value, new Asn1ValueDelegate(asn1Checks(), viewAttrs->tableView()));
     viewAttrs->tableView()->horizontalHeader()->show();
     viewAttrs->setModel(modelCtxParams);
     insertTab(viewAttrs, tr("Context Parameters"));
@@ -187,7 +186,7 @@ void IVPropertiesDialog::initContextParams()
 void IVPropertiesDialog::initIfaceParams()
 {
     IfaceParametersModel *modelIfaceParams =
-            new IfaceParametersModel(commandMacro(), m_asn1Checks->allTypeNames(), this);
+            new IfaceParametersModel(commandMacro(), asn1Checks()->allTypeNames(), this);
     modelIfaceParams->setDataObject(dataObject());
 
     shared::PropertiesViewBase *viewAttrs = new IfaceParametersView(this);

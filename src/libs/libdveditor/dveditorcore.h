@@ -40,6 +40,10 @@ class DVBoardsModel;
 namespace scs {
 class DVSystemChecks;
 }
+namespace Asn1Acn {
+class Asn1SystemChecks;
+}
+
 
 namespace dve {
 class DVAppModel;
@@ -54,6 +58,9 @@ public:
     ~DVEditorCore() override;
 
     dve::DVAppModel *appModel() const;
+
+    void setAsn1Check(Asn1Acn::Asn1SystemChecks *check);
+    Asn1Acn::Asn1SystemChecks *asn1Checker() const;
 
     void setSystemChecker(AbstractSystemChecks *checker);
     AbstractSystemChecks *systemChecker() const;

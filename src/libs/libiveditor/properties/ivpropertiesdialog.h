@@ -55,9 +55,6 @@ private:
     void initContextParams();
     void initIfaceParams();
     void initCommentView();
-
-private:
-    QPointer<Asn1Acn::Asn1SystemChecks> m_asn1Checks;
 };
 
 } // namespace ive
