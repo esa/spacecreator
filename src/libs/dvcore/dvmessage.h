@@ -27,13 +27,17 @@ class DVMessage : public DVObject
 public:
     explicit DVMessage(QObject *parent = nullptr);
 
-    QString name() const;
-
     QString fromFunction() const;
     void setFromFunction(const QString &from);
 
+    QString fromInterface() const;
+    void setFromInterface(const QString &from);
+
     QString toFunction() const;
     void setToFunction(const QString &to);
+
+    QString toInterface() const;
+    void setToInterface(const QString &to);
 };
 
 } // namespace dvm

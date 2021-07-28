@@ -271,6 +271,49 @@ QStringList IVConnectionChain::connectionNames(const QString &sourceName, const 
 }
 
 /*!
+   \brief IVConnectionChain::connectionNames
+   \param sourceFunction
+   \param targetFunction
+   \return
+ */
+QList<QPair<QString, QString>> IVConnectionChain::connectionIfNames(
+        const QString &sourceFunction, const QString &targetFunction) const
+{
+    if (sourceFunction.isEmpty() && targetFunction.isEmpty()) {
+        return {};
+    }
+
+    const QString sName = sourceFunction.trimmed().toLower();
+    const QString tName = targetFunction.trimmed().toLower();
+
+    auto it = m_chain.begin();
+    if (!sName.isEmpty()) {
+        while (it != m_chain.end() && (*it)->sourceName().trimmed().toLower() != sName) {
+            ++it;
+        }
+    }
+
+    if (!tName.isEmpty()) {
+        while (it != m_chain.end() && (*it)->targetName().trimmed().toLower() != tName) {
+            ++it;
+        }
+        if (it != m_chain.end()) {
+            return { { (*it)->sourceInterfaceName(), (*it)->targetInterfaceName() } };
+        }
+    } else {
+        QList<QPair<QString, QString>> result;
+        while (it != m_chain.end()) {
+            QPair<QString, QString> data { (*it)->sourceInterfaceName(), (*it)->targetInterfaceName() };
+            result << data;
+            ++it;
+        }
+        return result;
+    }
+
+    return {};
+}
+
+/*!
    Returns if two chains are equal
  */
 bool IVConnectionChain::operator==(const IVConnectionChain &other) const

@@ -17,7 +17,9 @@
 
 #pragma once
 
+#include <QList>
 #include <QObject>
+#include <QPair>
 
 namespace shared {
 class AbstractProject;
@@ -33,7 +35,8 @@ public:
 
     virtual ~AbstractSystemChecks() override = default;
     virtual QStringList functionsNames() const = 0;
-    virtual QStringList messages(const QString &sourceFunction, const QString &targetFunction) const = 0;
+    virtual QList<QPair<QString, QString>> messages(
+            const QString &sourceFunction, const QString &targetFunction) const = 0;
 
 Q_SIGNALS:
     void ivDataReset();

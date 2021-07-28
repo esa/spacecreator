@@ -33,8 +33,8 @@ class CmdMessageEntityCreate : public shared::UndoCommand
 {
     Q_OBJECT
 public:
-    explicit CmdMessageEntityCreate(
-            dvm::DVConnection *connection, const QString &messageName, const QString &from, const QString &to);
+    explicit CmdMessageEntityCreate(dvm::DVConnection *connection, const QString &fromFunction,
+            const QString &fromInterface, const QString &toFunction, const QString &toInterface);
 
     void redo() override;
     void undo() override;

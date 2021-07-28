@@ -45,9 +45,10 @@ public:
 
 private:
     struct DataItem {
-        QString m_name;
-        QString m_from;
-        QString m_to;
+        QString m_fromFunction;
+        QString m_fromInterface;
+        QString m_toFunction;
+        QString m_toInterface;
     };
 
     QPointer<dvm::DVConnection> m_connection;

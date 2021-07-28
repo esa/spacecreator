@@ -235,7 +235,8 @@ static inline QByteArray singleMessage()
             "    </Node>"
             "    <Connection name=\"\" from_node=\"node_linux\" from_port=\"eth0\" to_bus=\"ocarina_buses::ip.i\""
             "         to_node=\"node_bsd\" to_port=\"eth0\">"
-            "        <Message name=\"init\" from_function=\"gnc_fm\" to_function=\"gnc_gui\" />"
+            "        <Message from_interface=\"init\" from_function=\"gnc_fm\" to_function=\"gnc_gui\" "
+            "            to_interface=\"init\" />"
             "    </Connection>"
             "</DeploymentView>");
 }

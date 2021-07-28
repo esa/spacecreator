@@ -73,20 +73,26 @@ QStringList DvSystemChecks::functionsNames() const
 
 /*!
    Returns all messages/connections from function \p sourceFunction to \p targetFunction
+   Result is a list of pairs. The first of the pais is the name of the source, the second, the name of the target
+   interface
  */
-QStringList DvSystemChecks::messages(const QString &sourceFunction, const QString &targetFunction) const
+QList<QPair<QString, QString>> DvSystemChecks::messages(
+        const QString &sourceFunction, const QString &targetFunction) const
 {
     if (!m_ivCore) {
         return {};
     }
 
-    QStringList connectionNames;
+    QList<QPair<QString, QString>> connectionNames;
     QList<ivm::IVConnectionChain *> chains = ivm::IVConnectionChain::build(*ivModel());
     for (const ivm::IVConnectionChain *chain : qAsConst(chains)) {
-        const QStringList names = chain->connectionNames(sourceFunction, targetFunction);
-        connectionNames += names;
+        QList<QPair<QString, QString>> names = chain->connectionIfNames(sourceFunction, targetFunction);
+        for (const QPair<QString, QString> &name : names) {
+            if (!connectionNames.contains(name)) {
+                connectionNames.append(name);
+            }
+        }
     }
-    connectionNames.removeDuplicates();
     return connectionNames;
 }
 

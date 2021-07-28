@@ -80,7 +80,9 @@ public:
         asn1module,
 
         from_function,
+        from_interface,
         to_function,
+        to_interface,
 
         // TASTE props:
         coordinates,

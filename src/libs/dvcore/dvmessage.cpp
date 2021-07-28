@@ -24,11 +24,6 @@ DVMessage::DVMessage(QObject *parent)
 {
 }
 
-QString DVMessage::name() const
-{
-    return title();
-}
-
 QString DVMessage::fromFunction() const
 {
     return entityAttributeValue(meta::Props::token(meta::Props::Token::from_function)).toString();
@@ -39,6 +34,16 @@ void DVMessage::setFromFunction(const QString &from)
     setEntityAttribute(meta::Props::token(meta::Props::Token::from_function), from);
 }
 
+QString DVMessage::fromInterface() const
+{
+    return entityAttributeValue(meta::Props::token(meta::Props::Token::from_interface)).toString();
+}
+
+void DVMessage::setFromInterface(const QString &from)
+{
+    setEntityAttribute(meta::Props::token(meta::Props::Token::from_interface), from);
+}
+
 QString DVMessage::toFunction() const
 {
     return entityAttributeValue(meta::Props::token(meta::Props::Token::to_function)).toString();
@@ -47,6 +52,16 @@ QString DVMessage::toFunction() const
 void DVMessage::setToFunction(const QString &to)
 {
     setEntityAttribute(meta::Props::token(meta::Props::Token::to_function), to);
+}
+
+QString DVMessage::toInterface() const
+{
+    return entityAttributeValue(meta::Props::token(meta::Props::Token::to_interface)).toString();
+}
+
+void DVMessage::setToInterface(const QString &to)
+{
+    setEntityAttribute(meta::Props::token(meta::Props::Token::to_interface), to);
 }
 
 } // namespace dvm

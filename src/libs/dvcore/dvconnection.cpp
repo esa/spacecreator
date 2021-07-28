@@ -23,8 +23,8 @@
 #include "dvnode.h"
 #include "errorhub.h"
 
+#include <QDebug>
 #include <QPointer>
-#include <QtDebug>
 
 namespace dvm {
 struct DVConnectionPrivate {
@@ -139,15 +139,18 @@ QList<dvm::DVMessage *> DVConnection::messages() const
     return findChildren<dvm::DVMessage *>();
 }
 
-bool DVConnection::hasMessage(const QString &name, const QString &from, const QString &to) const
+bool DVConnection::hasMessage(const QString &fromFunction, const QString &fromInterface, const QString &toFunction,
+        const QString &toInterface) const
 {
-    return message(name, from, to) != nullptr;
+    return message(fromFunction, fromInterface, toFunction, toInterface) != nullptr;
 }
 
-DVMessage *DVConnection::message(const QString &name, const QString &from, const QString &to) const
+DVMessage *DVConnection::message(const QString &fromFunction, const QString &fromInterface, const QString &toFunction,
+        const QString &toInterface) const
 {
     for (dvm::DVMessage *message : messages()) {
-        if (message->name() == name && message->fromFunction() == from && message->toFunction() == to) {
+        if (message->fromFunction() == fromFunction && message->fromInterface() == fromInterface
+                && message->toFunction() == toFunction && message->toInterface() == toInterface) {
             return message;
         }
     }

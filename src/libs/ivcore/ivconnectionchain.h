@@ -18,6 +18,7 @@
 #pragma once
 
 #include <QList>
+#include <QPair>
 
 namespace ivm {
 class IVConnection;
@@ -33,8 +34,7 @@ public:
     IVConnectionChain();
 
     static QList<IVConnectionChain *> build(const ivm::IVModel &model);
-    static QList<IVConnectionChain *> build(
-            IVConnection *connection, const QList<IVConnection *> &allConnections);
+    static QList<IVConnectionChain *> build(IVConnection *connection, const QList<IVConnection *> &allConnections);
 
     const QList<IVConnection *> &connections() const;
 
@@ -46,14 +46,15 @@ public:
     bool contains(const QString &connectionName, const QString &sourceName, const QString &targetName) const;
 
     QStringList connectionNames(const QString &sourceName, const QString &targetName) const;
+    QList<QPair<QString, QString>> connectionIfNames(
+            const QString &sourceFunction, const QString &targetFunction) const;
 
     bool operator==(const IVConnectionChain &other) const;
 
 private:
     static QList<IVConnectionChain *> findPrevious(
             IVConnection *connection, const QList<IVConnection *> &allConnections);
-    static QList<IVConnectionChain *> findNext(
-            IVConnection *connection, const QList<IVConnection *> &allConnections);
+    static QList<IVConnectionChain *> findNext(IVConnection *connection, const QList<IVConnection *> &allConnections);
 
     QList<IVConnection *> m_chain;
 };

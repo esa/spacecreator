@@ -25,15 +25,16 @@
 namespace dve {
 namespace cmd {
 
-CmdMessageEntityCreate::CmdMessageEntityCreate(
-        dvm::DVConnection *connection, const QString &messageName, const QString &from, const QString &to)
+CmdMessageEntityCreate::CmdMessageEntityCreate(dvm::DVConnection *connection, const QString &fromFunction,
+        const QString &fromInterface, const QString &toFunction, const QString &toInterface)
     : shared::UndoCommand()
     , m_connection(connection)
     , m_message(new dvm::DVMessage(connection))
 {
-    m_message->setTitle(messageName);
-    m_message->setFromFunction(from);
-    m_message->setToFunction(to);
+    m_message->setFromFunction(fromFunction);
+    m_message->setFromInterface(fromInterface);
+    m_message->setToFunction(toFunction);
+    m_message->setToInterface(toInterface);
 }
 
 void CmdMessageEntityCreate::redo()

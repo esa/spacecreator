@@ -51,7 +51,7 @@ public:
 
     QStringList functionsNames() const override;
 
-    QStringList messages(const QString &sourceFunction, const QString &targetFunction) const override;
+    QList<QPair<QString, QString> > messages(const QString &sourceFunction, const QString &targetFunction) const override;
 
     ivm::IVModel *ivModel() const;
 

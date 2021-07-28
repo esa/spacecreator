@@ -51,7 +51,9 @@ const QHash<QString, Props::Token> Props::TokensByName = {
     { "requiresBusAccess", Token::requiresBusAccess },
     { "config", Token::config },
     { "from_function", Token::from_function },
+    { "from_interface", Token::from_interface },
     { "to_function", Token::to_function },
+    { "to_interface", Token::to_interface },
 
     // TASTE props:
     { "Taste::coordinates", Token::coordinates },
