@@ -65,4 +65,4 @@ space-creator:
     paths:
       - doc/doxygen/html
       - package
-    expire_in: 3 weeks
+    expire_in: 2 days
