@@ -24,6 +24,11 @@ DVMessage::DVMessage(QObject *parent)
 {
 }
 
+QString DVMessage::titleUI() const
+{
+    return QString("%1.%2 -> %3.%4").arg(fromFunction(), fromInterface(), toFunction(), toInterface());
+}
+
 QString DVMessage::fromFunction() const
 {
     return entityAttributeValue(meta::Props::token(meta::Props::Token::from_function)).toString();

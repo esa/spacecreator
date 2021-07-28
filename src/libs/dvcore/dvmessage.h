@@ -27,6 +27,8 @@ class DVMessage : public DVObject
 public:
     explicit DVMessage(QObject *parent = nullptr);
 
+    QString titleUI() const override;
+
     QString fromFunction() const;
     void setFromFunction(const QString &from);
 
