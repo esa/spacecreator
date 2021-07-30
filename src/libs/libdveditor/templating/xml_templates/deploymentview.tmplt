@@ -18,12 +18,19 @@
         </Partition>
     {% endfor %}
     {% for device in node.devices %}
-        <Device{% for attr in device.attributes %} {{ attr.name }}="{{ attr.value }}"{% endfor %}/>
+        <Device{% for attr in device.attributes %} {{ attr.name }}="{{ attr.value }}"{% endfor %}>
+        {% for prop in device.properties %}
+            <Property name="{{ prop.name }}" value="{{ prop.value }}"/>
+        {% endfor %}
+        </Device>
     {% endfor %}
     </Node>
 {% endfor %}
 {% for connection in Connections %}
     <Connection{% for attr in connection.attributes %} {{ attr.name }}="{{ attr.value }}"{% endfor %}>
+        {% for prop in connection.properties %}
+            <Property name="{{ prop.name }}" value="{{ prop.value }}"/>
+        {% endfor %}
         {% for message in connection.messages %}
             <Message{% for attr in message.attributes %} {{ attr.name }}="{{ attr.value }}"{% endfor %}/>
         {% endfor %}
