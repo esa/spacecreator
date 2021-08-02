@@ -177,20 +177,16 @@ void DVDeviceGraphicsItem::updateInternalItems(Qt::Alignment alignment)
     QRectF textRect = m_textItem->boundingRect();
     switch (alignment) {
     case Qt::AlignLeft:
-        textRect.moveCenter(kBoundingRect.center());
-        textRect.moveRight(kBoundingRect.left());
+        textRect.moveBottomRight(kBoundingRect.topLeft());
         break;
     case Qt::AlignRight:
-        textRect.moveCenter(kBoundingRect.center());
-        textRect.moveLeft(kBoundingRect.right());
+        textRect.moveBottomLeft(kBoundingRect.topRight());
         break;
     case Qt::AlignTop:
-        textRect.moveCenter(kBoundingRect.topRight());
-        textRect.moveLeft(kBoundingRect.right());
+        textRect.moveBottomLeft(kBoundingRect.topRight());
         break;
     case Qt::AlignBottom:
-        textRect.moveCenter(kBoundingRect.bottomRight());
-        textRect.moveLeft(kBoundingRect.right());
+        textRect.moveTopLeft(kBoundingRect.bottomRight());
         break;
     default:
         return;
