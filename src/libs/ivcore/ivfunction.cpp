@@ -53,7 +53,6 @@ bool IVFunction::postInit()
             } else {
                 shared::ErrorHub::addError(
                         shared::ErrorItem::Warning, tr("Function type '%1' error").arg(typeName), "");
-                return false;
             }
         }
     }

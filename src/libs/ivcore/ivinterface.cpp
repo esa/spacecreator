@@ -159,13 +159,12 @@ bool IVInterface::postInit()
     if (!prototype) {
         prototype = model()->getSharedFunctionType(prototypeName, Qt::CaseInsensitive);
     }
-    if (!prototype) {
-        return false;
-    }
-    const QVector<ivm::IVInterface *> &fnTypeIfaces = prototype->interfaces();
-    for (auto fnTypeIface : fnTypeIfaces) {
-        if (ivm::IVInterface *existingIface = utils::findExistingClone(fn, fnTypeIface)) {
-            existingIface->setCloneOrigin(fnTypeIface);
+    if (prototype) {
+        const QVector<ivm::IVInterface *> &fnTypeIfaces = prototype->interfaces();
+        for (auto fnTypeIface : fnTypeIfaces) {
+            if (ivm::IVInterface *existingIface = utils::findExistingClone(fn, fnTypeIface)) {
+                existingIface->setCloneOrigin(fnTypeIface);
+            }
         }
     }
     return IVObject::postInit();
