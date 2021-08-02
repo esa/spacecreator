@@ -24,6 +24,7 @@ set(CMAKE_CXX_EXTENSIONS OFF)
 include(GitHash)
 include(CCache)
 include(GoldLinker)
+include(ClangFormat)
 
 set(CMAKE_POSITION_INDEPENDENT_CODE ON)
 

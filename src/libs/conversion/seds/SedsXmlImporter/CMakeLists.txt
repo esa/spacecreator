@@ -1,0 +1,25 @@
+project(SedsXmlImporter VERSION 1.0.0 LANGUAGES CXX)
+
+set(SOURCES importer.cpp)
+
+set(INCLUDES importer.h)
+
+add_library(SedsXmlImporter STATIC)
+target_sources(SedsXmlImporter
+    PRIVATE     "${SOURCES}"
+                "${INCLUDES}")
+target_include_directories(SedsXmlImporter
+    PUBLIC      .
+    PRIVATE     ${CMAKE_SOURCE_DIR}/src/libs/conversion)
+target_link_libraries(SedsXmlImporter
+    PRIVATE     Conversion::Converter
+                SEDS::Parser
+                SEDS::SymbolDefinitionReader
+                SEDS::XmlPreprocessor
+                SEDS::XmlValidator
+                Qt5::Xml
+    PUBLIC      Qt5::Core)
+
+# add_format_target(SedsXmlImporter)
+
+add_library(SEDS::XmlImporter ALIAS SedsXmlImporter)
