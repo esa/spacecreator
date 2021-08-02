@@ -24,21 +24,33 @@
 ****************************************************************************/
 #include "root.h"
 
+#include <QFileInfo>
+
+#include "mutatingvisitor.h"
 #include "project.h"
 #include "visitor.h"
-
-#include <QFileInfo>
 
 using namespace Asn1Acn;
 
 Root::Root()
     : Node("ROOT", {})
+{}
+
+Root::Root(const Root &other)
+    : Root()
 {
+    for (const auto &p : other.projects())
+        add(std::make_unique<Project>(*p));
 }
 
 Root::~Root() { }
 
 void Root::accept(Visitor &visitor) const
+{
+    visitor.visit(*this);
+}
+
+void Root::accept(MutatingVisitor &visitor)
 {
     visitor.visit(*this);
 }

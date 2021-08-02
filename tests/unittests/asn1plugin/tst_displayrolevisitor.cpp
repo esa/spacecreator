@@ -29,7 +29,7 @@
 #include <file.h>
 #include <typeassignment.h>
 #include <typereference.h>
-#include <types/builtintypes.h>
+#include <types/typefactory.h>
 #include <types/userdefinedtype.h>
 
 using namespace Asn1Acn::Internal::TreeViews::Tests;
@@ -59,7 +59,7 @@ void DisplayRoleVisitorTests::test_typeAssignmentBuiltIn()
     QFETCH(QString, typeName);
     QFETCH(QString, typeDisplayName);
 
-    TypeAssignment typeAssignment("TypeName", {}, Asn1Acn::Types::BuiltinType::createBuiltinType(typeName));
+    TypeAssignment typeAssignment("TypeName", "TypeName", {}, Asn1Acn::Types::TypeFactory::createBuiltinType(typeName));
 
     QCOMPARE(typeAssignment.valueFor<DisplayRoleVisitor>(), QString("TypeName: " + typeDisplayName));
 }
@@ -88,7 +88,7 @@ void DisplayRoleVisitorTests::test_typeAssignmentBuiltIn_data()
 void DisplayRoleVisitorTests::test_typeAssignmentUserDefined()
 {
     TypeAssignment typeAssignment(
-            "TypeName", {}, std::make_unique<Asn1Acn::Types::UserdefinedType>("type", "module", nullptr));
+            "TypeName", "TypeName", {}, std::make_unique<Asn1Acn::Types::UserdefinedType>("type", "module", nullptr));
     QCOMPARE(typeAssignment.valueFor<DisplayRoleVisitor>(), QString("TypeName: module.type"));
 }
 

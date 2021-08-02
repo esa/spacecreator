@@ -33,7 +33,7 @@
 #include <asn1/project.h>
 #include <asn1/root.h>
 #include <asn1/typeassignment.h>
-#include <asn1/types/builtintypes.h>
+#include <asn1/types/integer.h>
 
 using namespace Asn1Acn::Internal;
 using namespace Asn1Acn::Internal::TreeViews;
@@ -58,17 +58,17 @@ void TypesTreeModelTests::test_modelWithDummyPopulation()
         auto definitions1 =
                 std::make_unique<Asn1Acn::Definitions>("Module1", Asn1Acn::SourceLocation { "file1.asn1", 0, 0 });
         definitions1->addType(std::make_unique<Asn1Acn::TypeAssignment>(
-                "Num1", Asn1Acn::SourceLocation { "file1.asn1", 2, 3 }, std::make_unique<Asn1Acn::Types::Integer>()));
+                "Num1", "Num1", Asn1Acn::SourceLocation { "file1.asn1", 2, 3 }, std::make_unique<Asn1Acn::Types::Integer>()));
         definitions1->addType(std::make_unique<Asn1Acn::TypeAssignment>(
-                "Num2", Asn1Acn::SourceLocation { "file1.asn1", 3, 3 }, std::make_unique<Asn1Acn::Types::Integer>()));
+                "Num2", "Num2", Asn1Acn::SourceLocation { "file1.asn1", 3, 3 }, std::make_unique<Asn1Acn::Types::Integer>()));
         file1->add(std::move(definitions1));
 
         auto definitions2 =
                 std::make_unique<Asn1Acn::Definitions>("Module2", Asn1Acn::SourceLocation { "file1.asn1", 5, 0 });
         definitions2->addType(std::make_unique<Asn1Acn::TypeAssignment>(
-                "Num3", Asn1Acn::SourceLocation { "file1.asn1", 6, 3 }, std::make_unique<Asn1Acn::Types::Integer>()));
+                "Num3", "Num3", Asn1Acn::SourceLocation { "file1.asn1", 6, 3 }, std::make_unique<Asn1Acn::Types::Integer>()));
         definitions2->addType(std::make_unique<Asn1Acn::TypeAssignment>(
-                "Num4", Asn1Acn::SourceLocation { "file1.asn1", 7, 3 }, std::make_unique<Asn1Acn::Types::Integer>()));
+                "Num4", "Num3", Asn1Acn::SourceLocation { "file1.asn1", 7, 3 }, std::make_unique<Asn1Acn::Types::Integer>()));
         file1->add(std::move(definitions2));
     }
 
@@ -77,7 +77,7 @@ void TypesTreeModelTests::test_modelWithDummyPopulation()
         auto definitions1 =
                 std::make_unique<Asn1Acn::Definitions>("Module10", Asn1Acn::SourceLocation { "file2.asn1", 0, 0 });
         definitions1->addType(std::make_unique<Asn1Acn::TypeAssignment>(
-                "Num10", Asn1Acn::SourceLocation { "file2.asn1", 2, 3 }, std::make_unique<Asn1Acn::Types::Integer>()));
+                "Num10", "Num10", Asn1Acn::SourceLocation { "file2.asn1", 2, 3 }, std::make_unique<Asn1Acn::Types::Integer>()));
         file2->add(std::move(definitions1));
     }
 
@@ -90,7 +90,7 @@ void TypesTreeModelTests::test_modelWithDummyPopulation()
         auto definitions1 =
                 std::make_unique<Asn1Acn::Definitions>("Module20", Asn1Acn::SourceLocation { "file3.asn1", 0, 0 });
         definitions1->addType(std::make_unique<Asn1Acn::TypeAssignment>(
-                "Num20", Asn1Acn::SourceLocation { "file3.asn1", 2, 3 }, std::make_unique<Asn1Acn::Types::Integer>()));
+                "Num20", "Num20", Asn1Acn::SourceLocation { "file3.asn1", 2, 3 }, std::make_unique<Asn1Acn::Types::Integer>()));
         file3->add(std::move(definitions1));
     }
 

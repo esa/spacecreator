@@ -38,10 +38,12 @@ class Project;
 class Root : public Node
 {
 public:
-    Root();
+    explicit Root();
+    Root(const Root &other);
     ~Root() override;
 
     void accept(Visitor &visitor) const override;
+    void accept(MutatingVisitor &visitor) override;
 
     void add(std::unique_ptr<Project> project);
     void remove(const QString &name);

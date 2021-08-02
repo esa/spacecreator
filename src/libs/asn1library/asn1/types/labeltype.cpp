@@ -25,6 +25,9 @@
 
 #include "labeltype.h"
 
+#include "typemutatingvisitor.h"
+#include "typereadingvisitor.h"
+
 using namespace Asn1Acn::Types;
 
 LabelType::LabelType(const QString &name)
@@ -45,6 +48,21 @@ QString LabelType::label() const
 Type::ASN1Type LabelType::typeEnum() const
 {
     return LABELTYPE;
+}
+
+void LabelType::accept(TypeMutatingVisitor &visitor)
+{
+    visitor.visit(*this);
+}
+
+void LabelType::accept(TypeReadingVisitor &visitor) const
+{
+    visitor.visit(*this);
+}
+
+std::unique_ptr<Type> LabelType::clone() const
+{
+    return std::make_unique<LabelType>(*this);
 }
 
 QString LabelType::baseIconFile() const

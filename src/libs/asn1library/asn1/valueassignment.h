@@ -27,6 +27,7 @@
 #include "node.h"
 #include "sourcelocation.h"
 #include "types/type.h"
+#include "value.h"
 
 #include <QString>
 #include <memory>
@@ -36,15 +37,22 @@ namespace Asn1Acn {
 class ValueAssignment : public Node
 {
 public:
-    ValueAssignment(const QString &name, const SourceLocation &location, std::unique_ptr<Types::Type> type);
+    ValueAssignment(const QString &name,
+                    const SourceLocation &location,
+                    std::unique_ptr<Types::Type> type,
+                    ValuePtr value);
+    ValueAssignment(const ValueAssignment &other);
     ~ValueAssignment() override;
 
     void accept(Visitor &visitor) const override;
+    void accept(MutatingVisitor &visitor) override;
 
-    const Types::Type *type() const { return m_type.get(); }
+    const Types::Type *type() const;
+    const ValuePtr &value() const;
 
 private:
     std::unique_ptr<Types::Type> m_type;
+    ValuePtr m_value;
 };
 
 }

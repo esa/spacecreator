@@ -24,18 +24,36 @@
 ****************************************************************************/
 #include "definitions.h"
 
+#include "mutatingvisitor.h"
 #include "visitor.h"
 
 using namespace Asn1Acn;
 
 Definitions::Definitions(const QString &name, const SourceLocation &location)
     : Node(name, location)
+{}
+
+Definitions::Definitions(const Definitions &other)
+    : Definitions(other.name(), other.location())
 {
+    for (const auto &type : other.types())
+        addType(std::make_unique<TypeAssignment>(*type));
+    for (const auto &value : other.values())
+        addValue(std::make_unique<ValueAssignment>(*value));
+    for (const auto &importedType : other.importedTypes())
+        addImportedType(importedType);
+    for (const auto &importedValue : other.importedValues())
+        addImportedValue(importedValue);
 }
 
 Definitions::~Definitions() { }
 
 void Definitions::accept(Visitor &visitor) const
+{
+    visitor.visit(*this);
+}
+
+void Definitions::accept(MutatingVisitor &visitor)
 {
     visitor.visit(*this);
 }

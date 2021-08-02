@@ -27,7 +27,7 @@
 #include "mscmessagedeclarationlist.h"
 #include "mscmodel.h"
 #include "typeassignment.h"
-#include "types/builtintypes.h"
+#include "types/integer.h"
 
 #include <QtTest>
 
@@ -277,7 +277,7 @@ void tst_MscModel::addAsn1Types()
     Asn1Acn::SourceLocation location;
     auto type = std::make_unique<Asn1Acn::Types::Integer>();
     type->setParameters({ { "min", 0 }, { "max", 255 } });
-    auto assignment = std::make_unique<Asn1Acn::TypeAssignment>("MyInt", location, std::move(type));
+    auto assignment = std::make_unique<Asn1Acn::TypeAssignment>("MyInt", "MyInt", location, std::move(type));
 
     auto asn1Definitions = std::make_unique<Asn1Acn::Definitions>("TestDef", location);
     asn1Definitions->addType(std::move(assignment));

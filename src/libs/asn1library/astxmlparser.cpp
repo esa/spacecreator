@@ -25,8 +25,12 @@
 #include "astxmlparser.h"
 
 #include "asn1const.h"
-#include "types/builtintypes.h"
+#include "types/typefactory.h"
 #include "types/userdefinedtype.h"
+
+#include "types/choice.h"
+#include "types/sequence.h"
+#include "types/sequenceof.h"
 
 #include <QDebug>
 #include <QMap>
@@ -168,7 +172,7 @@ void AstXmlParser::readTypeAssignment()
     type->setIdentifier(name);
     m_xmlReader.skipCurrentElement();
 
-    m_currentDefinitions->addType(std::make_unique<TypeAssignment>(name, location, std::move(type)));
+    m_currentDefinitions->addType(std::make_unique<TypeAssignment>(name, name, location, std::move(type)));
     m_data[m_currentFile]->addTypeReference(
             std::make_unique<TypeReference>(name, m_currentDefinitions->name(), location));
 }
@@ -182,7 +186,7 @@ void AstXmlParser::readValueAssignment()
     type->setIdentifier(name);
     m_xmlReader.skipCurrentElement();
 
-    m_currentDefinitions->addValue(std::make_unique<ValueAssignment>(name, location, std::move(type)));
+    m_currentDefinitions->addValue(std::make_unique<ValueAssignment>(name, location, std::move(type), nullptr));
 }
 
 QString AstXmlParser::readTypeAssignmentAttribute()
@@ -396,7 +400,7 @@ std::unique_ptr<Types::Type> AstXmlParser::buildTypeFromName(const SourceLocatio
     if (name == QStringLiteral("REFERENCE_TYPE") || name == QStringLiteral("ReferenceType")) {
         return readReferenceType(location);
     }
-    return Types::BuiltinType::createBuiltinType(name.toString());
+    return Types::TypeFactory::createBuiltinType(name.toString());
 }
 
 std::unique_ptr<Types::Type> AstXmlParser::readReferenceType(const SourceLocation &location)

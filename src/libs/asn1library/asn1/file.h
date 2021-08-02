@@ -41,10 +41,12 @@ class TypeAssignment;
 class File : public Node
 {
 public:
-    File(const QString &path);
+    explicit File(const QString &path);
+    File(const File &other);
     ~File() override;
 
     void accept(Visitor &visitor) const override;
+    void accept(MutatingVisitor &visitor) override;
 
     void add(std::unique_ptr<Definitions> defs);
     void addTypeReference(std::unique_ptr<TypeReference> ref);

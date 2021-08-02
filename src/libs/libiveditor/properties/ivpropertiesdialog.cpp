@@ -17,7 +17,6 @@
 
 #include "ivpropertiesdialog.h"
 
-#include "asn1/types/builtintypes.h"
 #include "asn1systemchecks.h"
 #include "commands/cmdentityattributechange.h"
 #include "commandsstack.h"

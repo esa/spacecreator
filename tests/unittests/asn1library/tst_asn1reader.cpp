@@ -20,7 +20,9 @@
 #include "definitions.h"
 #include "file.h"
 #include "typeassignment.h"
-#include "types/builtintypes.h"
+
+#include "types/choice.h"
+#include "types/sequence.h"
 
 #include <QSignalSpy>
 #include <QtTest>

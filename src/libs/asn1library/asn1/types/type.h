@@ -29,12 +29,19 @@
 #include <memory>
 #include <vector>
 
+#include "typereadingvisitor.h"
+
 namespace Asn1Acn {
 
 class AstXmlParser;
 class TypeAssignment;
 
 namespace Types {
+
+class TypeMutatingVisitor;
+
+enum class AlignToNext { byte, word, dword, unspecified };
+enum class Endianness { big, little, unspecified };
 
 class Type
 {
@@ -59,7 +66,7 @@ public:
     };
 
     Type(const QString &identifier = QString());
-    Type(const Type &) = delete;
+    Type(const Type &);
     virtual ~Type() = default;
 
     Type &operator=(const Type &) = delete;
@@ -68,9 +75,13 @@ public:
        Type as string
      */
     virtual QString typeName() const = 0;
+    virtual QString label() const;
     virtual ASN1Type typeEnum() const = 0;
 
-    virtual QString label() const = 0;
+    virtual void accept(TypeMutatingVisitor &visitor) = 0;
+    virtual void accept(TypeReadingVisitor &visitor) const = 0;
+
+    virtual std::unique_ptr<Type> clone() const = 0;
 
     const QString &identifier() const;
 
@@ -82,12 +93,26 @@ public:
     const std::vector<std::unique_ptr<Type>> &children() const;
     void addChild(std::unique_ptr<Type> child);
 
+    void setAlignToNext(const AlignToNext alignToNext) { m_alignment = alignToNext; }
+    AlignToNext alignToNext() const { return m_alignment; }
+
+    static AlignToNext mapAlignToNext(QStringRef in);
+    static AlignToNext mapAlignToNext(const QString &in) { return mapAlignToNext(&in); }
+
+    static Endianness mapEndianess(QStringRef in);
+    static Endianness mapEndianess(const QString &in) { return mapEndianess(&in); }
+
+    static QString alignToNextToString(AlignToNext param);
+    static QString endiannessToString(Endianness param);
+
 protected:
     void setIdentifier(const QString &name);
 
     QString m_identifier;
     QVariantMap m_parameters;
     std::vector<std::unique_ptr<Type>> m_children;
+
+    AlignToNext m_alignment;
 
     friend class Asn1Acn::AstXmlParser;
     friend class Asn1Acn::TypeAssignment;

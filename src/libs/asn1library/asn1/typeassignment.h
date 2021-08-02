@@ -36,16 +36,25 @@ namespace Asn1Acn {
 class TypeAssignment : public Node
 {
 public:
-    TypeAssignment(const QString &name, const SourceLocation &location, std::unique_ptr<Types::Type> type);
+    TypeAssignment(const QString &name,
+                   const QString &cName,
+                   const SourceLocation &location,
+                   std::unique_ptr<Types::Type> type);
+    TypeAssignment(const TypeAssignment &other);
     ~TypeAssignment() override;
 
-    void accept(Visitor &visitor) const override;
+    const QString &cName() const;
 
-    Types::Type *type() const;
+    void accept(Visitor &visitor) const override;
+    void accept(MutatingVisitor &visitor) override;
+
+    Types::Type *type();
+    const Types::Type *type() const;
 
     Types::Type::ASN1Type typeEnum() const;
 
 private:
+    QString m_cName;
     std::unique_ptr<Types::Type> m_type;
 };
 

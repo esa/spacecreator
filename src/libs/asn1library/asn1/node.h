@@ -31,6 +31,7 @@
 namespace Asn1Acn {
 
 class Visitor;
+class MutatingVisitor;
 
 class Node
 {
@@ -39,13 +40,15 @@ protected:
         : m_name(name)
         , m_location(location)
         , m_parent(nullptr)
-    {
-    }
+    {}
+
+    Node(const Node &other) = delete;
 
 public:
     virtual ~Node();
 
     virtual void accept(Visitor &visitor) const = 0;
+    virtual void accept(MutatingVisitor &visitor) = 0;
 
     template<typename VisitorType, typename... Args>
     typename VisitorType::ValueType valueFor(Args... args) const

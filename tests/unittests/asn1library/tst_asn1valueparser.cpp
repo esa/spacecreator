@@ -19,9 +19,16 @@
 #include "asn1valueparser.h"
 #include "sourcelocation.h"
 #include "typeassignment.h"
-#include "types/builtintypes.h"
 #include "types/type.h"
 #include "types/userdefinedtype.h"
+
+#include "types/boolean.h"
+#include "types/choice.h"
+#include "types/enumerated.h"
+#include "types/integer.h"
+#include "types/real.h"
+#include "types/sequence.h"
+#include "types/sequenceof.h"
 
 #include <QSignalSpy>
 #include <QtTest>
@@ -75,7 +82,7 @@ void tst_Asn1ValueParser::testIntValues()
 {
     Asn1Acn::SourceLocation location;
     auto type = std::make_unique<Asn1Acn::Types::Integer>();
-    auto assignment = std::make_unique<Asn1Acn::TypeAssignment>("MyInt", location, std::move(type));
+    auto assignment = std::make_unique<Asn1Acn::TypeAssignment>("MyInt", "MyInt", location, std::move(type));
 
     auto valueMap = valueParser->parseAsn1Value(assignment.get(), "3107");
     QCOMPARE(valueMap.size(), 2);
@@ -88,7 +95,7 @@ void tst_Asn1ValueParser::testRealValues()
 {
     Asn1Acn::SourceLocation location;
     auto type = std::make_unique<Asn1Acn::Types::Real>();
-    auto assignment = std::make_unique<Asn1Acn::TypeAssignment>("MyDouble", location, std::move(type));
+    auto assignment = std::make_unique<Asn1Acn::TypeAssignment>("MyDouble", "MyDouble", location, std::move(type));
 
     auto valueMap = valueParser->parseAsn1Value(assignment.get(), "31.07");
     QCOMPARE(valueMap.size(), 2);
@@ -103,7 +110,7 @@ void tst_Asn1ValueParser::testIntValuesFormatError()
 
     Asn1Acn::SourceLocation location;
     auto type = std::make_unique<Asn1Acn::Types::Integer>();
-    auto assignment = std::make_unique<Asn1Acn::TypeAssignment>("MyInt", location, std::move(type));
+    auto assignment = std::make_unique<Asn1Acn::TypeAssignment>("MyInt", "MyInt", location, std::move(type));
     auto valueMap = valueParser->parseAsn1Value(assignment.get(), "31o7");
     QCOMPARE(valueMap.size(), 0);
     QCOMPARE(spy.count(), 1);
@@ -118,7 +125,7 @@ void tst_Asn1ValueParser::testRealValuesFormatError()
 
     Asn1Acn::SourceLocation location;
     auto type = std::make_unique<Asn1Acn::Types::Real>();
-    auto assignment = std::make_unique<Asn1Acn::TypeAssignment>("MyDouble", location, std::move(type));
+    auto assignment = std::make_unique<Asn1Acn::TypeAssignment>("MyDouble", "MyDouble", location, std::move(type));
     auto valueMap = valueParser->parseAsn1Value(assignment.get(), "31.o7");
     QCOMPARE(valueMap.size(), 0);
     QCOMPARE(spy.count(), 1);
@@ -132,7 +139,7 @@ void tst_Asn1ValueParser::testIntValuesWithRange()
     Asn1Acn::SourceLocation location;
     auto type = std::make_unique<Asn1Acn::Types::Integer>();
     type->setParameters({ { "min", 5 }, { "max", 15 } });
-    auto assignment = std::make_unique<Asn1Acn::TypeAssignment>("MyInt", location, std::move(type));
+    auto assignment = std::make_unique<Asn1Acn::TypeAssignment>("MyInt", "MyInt", location, std::move(type));
     auto valueMap = valueParser->parseAsn1Value(assignment.get(), "13");
     QCOMPARE(valueMap.size(), 2);
 
@@ -145,7 +152,7 @@ void tst_Asn1ValueParser::testRealValuesWithRange()
     Asn1Acn::SourceLocation location;
     auto type = std::make_unique<Asn1Acn::Types::Real>();
     type->setParameters({ { "min", 10.0 }, { "max", 50.0 } });
-    auto assignment = std::make_unique<Asn1Acn::TypeAssignment>("MyDouble", location, std::move(type));
+    auto assignment = std::make_unique<Asn1Acn::TypeAssignment>("MyDouble", "MyDouble", location, std::move(type));
     auto valueMap = valueParser->parseAsn1Value(assignment.get(), "31.07");
     QCOMPARE(valueMap.size(), 2);
 
@@ -160,7 +167,7 @@ void tst_Asn1ValueParser::testIntValuesWithRangeError()
     Asn1Acn::SourceLocation location;
     auto type = std::make_unique<Asn1Acn::Types::Integer>();
     type->setParameters({ { "min", 1 }, { "max", 10 } });
-    auto assignment = std::make_unique<Asn1Acn::TypeAssignment>("MyInt", location, std::move(type));
+    auto assignment = std::make_unique<Asn1Acn::TypeAssignment>("MyInt", "MyInt", location, std::move(type));
     auto valueMap = valueParser->parseAsn1Value(assignment.get(), "13");
     QCOMPARE(valueMap.size(), 0);
     QCOMPARE(spy.count(), 1);
@@ -176,7 +183,7 @@ void tst_Asn1ValueParser::testRealValuesWithRangeError()
     Asn1Acn::SourceLocation location;
     auto type = std::make_unique<Asn1Acn::Types::Real>();
     type->setParameters({ { "min", 10.0 }, { "max", 30.0 } });
-    auto assignment = std::make_unique<Asn1Acn::TypeAssignment>("MyDouble", location, std::move(type));
+    auto assignment = std::make_unique<Asn1Acn::TypeAssignment>("MyDouble", "MyDouble", location, std::move(type));
     auto valueMap = valueParser->parseAsn1Value(assignment.get(), "31.07");
     QCOMPARE(valueMap.size(), 0);
     QCOMPARE(spy.count(), 1);
@@ -189,7 +196,7 @@ void tst_Asn1ValueParser::testBoolValues()
 {
     Asn1Acn::SourceLocation location;
     auto type = std::make_unique<Asn1Acn::Types::Boolean>();
-    auto assignment = std::make_unique<Asn1Acn::TypeAssignment>("MyBool", location, std::move(type));
+    auto assignment = std::make_unique<Asn1Acn::TypeAssignment>("MyBool", "MyBool", location, std::move(type));
     auto valueMap = valueParser->parseAsn1Value(assignment.get(), "TRUE");
     QCOMPARE(valueMap.size(), 2);
 
@@ -205,7 +212,7 @@ void tst_Asn1ValueParser::testEnumValues()
     QVariantMap params;
     params["values"] = enumValues;
     type->setParameters(params);
-    auto assignment = std::make_unique<Asn1Acn::TypeAssignment>("MyEnum", location, std::move(type));
+    auto assignment = std::make_unique<Asn1Acn::TypeAssignment>("MyEnum", "MyEnum", location, std::move(type));
     auto valueMap = valueParser->parseAsn1Value(assignment.get(), "enum2");
 
     QCOMPARE(valueMap.size(), 2);
@@ -220,7 +227,7 @@ void tst_Asn1ValueParser::testBoolValuesError()
 
     Asn1Acn::SourceLocation location;
     auto type = std::make_unique<Asn1Acn::Types::Boolean>();
-    auto assignment = std::make_unique<Asn1Acn::TypeAssignment>("MyBool", location, std::move(type));
+    auto assignment = std::make_unique<Asn1Acn::TypeAssignment>("MyBool", "MyBool", location, std::move(type));
     auto valueMap = valueParser->parseAsn1Value(assignment.get(), "true");
     QCOMPARE(valueMap.size(), 0);
     QCOMPARE(spy.count(), 1);
@@ -239,7 +246,7 @@ void tst_Asn1ValueParser::testEnumValuesError()
     QVariantMap params;
     params["values"] = enumValues;
     type->setParameters(params);
-    auto assignment = std::make_unique<Asn1Acn::TypeAssignment>("MyEnum", location, std::move(type));
+    auto assignment = std::make_unique<Asn1Acn::TypeAssignment>("MyEnum", "MyEnum", location, std::move(type));
     auto valueMap = valueParser->parseAsn1Value(assignment.get(), "enum");
 
     QCOMPARE(valueMap.size(), 0);
@@ -257,7 +264,7 @@ void tst_Asn1ValueParser::testChoiceValue()
     type->addChild(std::move(choice1));
     auto choice2 = std::make_unique<Asn1Acn::Types::Real>("choiceReal");
     type->addChild(std::move(choice2));
-    auto assignment = std::make_unique<Asn1Acn::TypeAssignment>("MyChoice", location, std::move(type));
+    auto assignment = std::make_unique<Asn1Acn::TypeAssignment>("MyChoice", "MyChoice", location, std::move(type));
     auto valueMap = valueParser->parseAsn1Value(assignment.get(), "choiceReal : 31.07");
     QCOMPARE(valueMap.size(), 2);
     QCOMPARE(valueMap["name"].toString(), QString("MyChoice"));
@@ -279,7 +286,7 @@ void tst_Asn1ValueParser::testChoiceValueError()
     type->addChild(std::move(choice1));
     auto choice2 = std::make_unique<Asn1Acn::Types::Real>("choiceReal");
     type->addChild(std::move(choice2));
-    auto assignment = std::make_unique<Asn1Acn::TypeAssignment>("MyChoice", location, std::move(type));
+    auto assignment = std::make_unique<Asn1Acn::TypeAssignment>("MyChoice", "MyChoice", location, std::move(type));
     auto valueMap = valueParser->parseAsn1Value(assignment.get(), "choice : TRUE");
     QCOMPARE(valueMap.size(), 0);
     QCOMPARE(spy.count(), 1);
@@ -304,7 +311,7 @@ void tst_Asn1ValueParser::testSequenceValue()
     auto choice2 = std::make_unique<Asn1Acn::Types::Integer>("choice2");
     sequence4->addChild(std::move(choice2));
     type->addChild(std::move(sequence4));
-    auto assignment = std::make_unique<Asn1Acn::TypeAssignment>("MySequence", location, std::move(type));
+    auto assignment = std::make_unique<Asn1Acn::TypeAssignment>("MySequence", "MySequence", location, std::move(type));
     auto valueMap = valueParser->parseAsn1Value(
             assignment.get(), "{ intVal 3107, realVal 31.07, boolVal TRUE, choiceVal choice1 : FALSE }");
 
@@ -350,7 +357,7 @@ void tst_Asn1ValueParser::testSequenceValueError()
     type->addChild(std::move(sequence2));
     auto sequence3 = std::make_unique<Asn1Acn::Types::Boolean>("boolVal");
     type->addChild(std::move(sequence3));
-    auto assignment = std::make_unique<Asn1Acn::TypeAssignment>("MySequence", location, std::move(type));
+    auto assignment = std::make_unique<Asn1Acn::TypeAssignment>("MySequence", "MySequence", location, std::move(type));
     auto valueMap = valueParser->parseAsn1Value(assignment.get(), "{ intVal 31o7, realVal 31.07 }");
 
     QCOMPARE(valueMap.size(), 0);
@@ -377,7 +384,7 @@ void tst_Asn1ValueParser::testSequenceOfValue()
     auto type = std::make_unique<Asn1Acn::Types::SequenceOf>();
     type->addChild(std::move(ofType));
 
-    auto assignment = std::make_unique<Asn1Acn::TypeAssignment>("MySequenceOf", location, std::move(type));
+    auto assignment = std::make_unique<Asn1Acn::TypeAssignment>("MySequenceOf", "MySequenceOf", location, std::move(type));
 
     auto valueMap = valueParser->parseAsn1Value(assignment.get(), "{ blue, green }");
 
@@ -405,7 +412,7 @@ void tst_Asn1ValueParser::testUserType()
     QVariantMap emunPparams;
     emunPparams["values"] = enumValues;
     colorType->setParameters(emunPparams);
-    auto colorAssignment = std::make_unique<Asn1Acn::TypeAssignment>("Color", location, std::move(colorType));
+    auto colorAssignment = std::make_unique<Asn1Acn::TypeAssignment>("Color", "Color", location, std::move(colorType));
 
     auto userType = std::make_unique<Asn1Acn::Types::UserdefinedType>("Color", "", colorAssignment.get());
     QVariantMap userParams;
@@ -415,7 +422,7 @@ void tst_Asn1ValueParser::testUserType()
 
     auto type = std::make_unique<Asn1Acn::Types::SequenceOf>();
     type->addChild(std::move(userType));
-    auto assignment = std::make_unique<Asn1Acn::TypeAssignment>("MySequenceOf", location, std::move(type));
+    auto assignment = std::make_unique<Asn1Acn::TypeAssignment>("MySequenceOf", "MySequenceOf", location, std::move(type));
 
     auto valueMap = valueParser->parseAsn1Value(assignment.get(), "{ blue, green }");
 

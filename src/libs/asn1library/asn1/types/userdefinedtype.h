@@ -26,6 +26,9 @@
 #pragma once
 
 #include "type.h"
+#include "../acnargument.h"
+
+#include <vector>
 
 #include <QString>
 
@@ -36,20 +39,36 @@ class UserdefinedType : public Type
 {
 public:
     UserdefinedType(const QString &typeName, const QString &module, const TypeAssignment *referencedType);
+    UserdefinedType(const UserdefinedType &other);
 
     QString typeName() const override;
     QString label() const override;
-
     ASN1Type typeEnum() const override;
+    const QString &module() const;
+
+    void accept(TypeMutatingVisitor &visitor) override;
+    void accept(TypeReadingVisitor &visitor) const override;
+
+    std::unique_ptr<Type> clone() const override;
 
     QString baseIconFile() const override;
 
     const TypeAssignment *referencedType() const;
 
+    const Type &type() const { return *m_type; }
+    Type &type() { return *m_type; }
+    void setType(std::unique_ptr<Type> type);
+
+    const AcnArgumentPtrs &acnArguments() const { return m_arguments; }
+    void addArgument(AcnArgumentPtr argument);
+
 private:
     QString m_name;
     QString m_module;
     const TypeAssignment *m_referencedType = nullptr;
+
+    std::unique_ptr<Type> m_type;
+    AcnArgumentPtrs m_arguments;
 };
 
 }

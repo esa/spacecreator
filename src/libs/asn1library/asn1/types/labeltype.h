@@ -36,11 +36,16 @@ class LabelType : public Type
 {
 public:
     LabelType(const QString &label);
+    LabelType(const LabelType &other) = default;
 
     QString typeName() const override;
     QString label() const override;
-
     ASN1Type typeEnum() const override;
+
+    void accept(TypeMutatingVisitor &visitor) override;
+    void accept(TypeReadingVisitor &visitor) const override;
+
+    std::unique_ptr<Type> clone() const override;
 
     QString baseIconFile() const override;
 

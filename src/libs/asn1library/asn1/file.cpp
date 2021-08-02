@@ -25,6 +25,7 @@
 #include "file.h"
 
 #include "asn1valueparser.h"
+#include "mutatingvisitor.h"
 #include "visitor.h"
 
 using namespace Asn1Acn;
@@ -32,12 +33,29 @@ using namespace Asn1Acn;
 File::File(const QString &path)
     : Node(path, { path, 0, 0 })
     , m_polluted(false)
+{}
+
+File::File(const File &other)
+    : File(other.location().path())
 {
+    for (const auto &def : other.definitionsList())
+        add(std::make_unique<Definitions>(*def));
+    for (const auto &ref : other.references())
+        addTypeReference(std::make_unique<TypeReference>(*ref));
+    for (const auto &err : other.errors())
+        addErrorMessage(err);
+    if (other.isPolluted())
+        setPolluted();
 }
 
-File::~File() { }
+File::~File() {}
 
 void File::accept(Visitor &visitor) const
+{
+    visitor.visit(*this);
+}
+
+void File::accept(MutatingVisitor &visitor)
 {
     visitor.visit(*this);
 }

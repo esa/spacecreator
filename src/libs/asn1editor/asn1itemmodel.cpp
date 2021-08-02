@@ -20,7 +20,6 @@
 #include "asn1const.h"
 #include "asn1editorconst.h"
 #include "typeassignment.h"
-#include "types/builtintypes.h"
 #include "types/userdefinedtype.h"
 
 #include <QStandardItem>

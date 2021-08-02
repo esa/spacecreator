@@ -31,7 +31,7 @@
 #include <definitions.h>
 #include <file.h>
 #include <typeassignment.h>
-#include <types/builtintypes.h>
+#include <types/integer.h>
 
 using namespace Asn1Acn::Internal;
 using namespace Asn1Acn::Internal::TreeViews;
@@ -57,17 +57,17 @@ void OutlineModelTests::test_modelWithDummyPopulation()
     auto definitions1 =
             std::make_unique<Asn1Acn::Definitions>("Module1", Asn1Acn::SourceLocation { "file1.asn1", 0, 0 });
     definitions1->addType(std::make_unique<Asn1Acn::TypeAssignment>(
-            "Num1", Asn1Acn::SourceLocation { "file1.asn1", 2, 3 }, std::make_unique<Asn1Acn::Types::Integer>()));
+            "Num1", "Num1", Asn1Acn::SourceLocation { "file1.asn1", 2, 3 }, std::make_unique<Asn1Acn::Types::Integer>()));
     definitions1->addType(std::make_unique<Asn1Acn::TypeAssignment>(
-            "Num2", Asn1Acn::SourceLocation { "file1.asn1", 3, 3 }, std::make_unique<Asn1Acn::Types::Integer>()));
+            "Num2", "Num2", Asn1Acn::SourceLocation { "file1.asn1", 3, 3 }, std::make_unique<Asn1Acn::Types::Integer>()));
     root->add(std::move(definitions1));
 
     auto definitions2 =
             std::make_unique<Asn1Acn::Definitions>("Module2", Asn1Acn::SourceLocation { "file1.asn1", 5, 0 });
     definitions2->addType(std::make_unique<Asn1Acn::TypeAssignment>(
-            "Num3", Asn1Acn::SourceLocation { "file1.asn1", 6, 3 }, std::make_unique<Asn1Acn::Types::Integer>()));
+            "Num3", "Num3", Asn1Acn::SourceLocation { "file1.asn1", 6, 3 }, std::make_unique<Asn1Acn::Types::Integer>()));
     definitions2->addType(std::make_unique<Asn1Acn::TypeAssignment>(
-            "Num4", Asn1Acn::SourceLocation { "file1.asn1", 7, 3 }, std::make_unique<Asn1Acn::Types::Integer>()));
+            "Num4", "Num4", Asn1Acn::SourceLocation { "file1.asn1", 7, 3 }, std::make_unique<Asn1Acn::Types::Integer>()));
     root->add(std::move(definitions2));
 
     auto model = new OutlineModel(Utils::FileName::fromString(filePath), this);

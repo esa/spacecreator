@@ -42,9 +42,11 @@ class Definitions : public Node
 {
 public:
     Definitions(const QString &name, const SourceLocation &location);
+    Definitions(const Definitions &other);
     ~Definitions() override;
 
     void accept(Visitor &visitor) const override;
+    void accept(MutatingVisitor &visitor) override;
 
     void addType(std::unique_ptr<TypeAssignment> type);
     void addValue(std::unique_ptr<ValueAssignment> value);

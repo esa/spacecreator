@@ -29,7 +29,22 @@ using namespace Asn1Acn::Types;
 
 Type::Type(const QString &identifier)
     : m_identifier(identifier)
+    , m_alignment(AlignToNext::unspecified)
 {
+}
+
+Type::Type(const Type& other)
+    : m_identifier(other.m_identifier)
+    , m_parameters(other.m_parameters)
+    , m_alignment(other.m_alignment)
+{
+    for (const auto &child : other.m_children)
+        addChild(child->clone());
+}
+
+QString Type::label() const
+{
+    return QLatin1String(": ") + typeName();
 }
 
 /*!
@@ -78,4 +93,53 @@ const std::vector<std::unique_ptr<Type>> &Type::children() const
 void Type::addChild(std::unique_ptr<Type> child)
 {
     m_children.push_back(std::move(child));
+}
+
+AlignToNext Type::mapAlignToNext(QStringRef in)
+{
+    if (in == "byte")
+        return AlignToNext::byte;
+    if (in == "word")
+        return AlignToNext::word;
+    if (in == "dword")
+        return AlignToNext::dword;
+    return AlignToNext::unspecified;
+}
+
+Endianness Type::mapEndianess(QStringRef in)
+{
+    if (in == "big")
+        return Endianness::big;
+    if (in == "little")
+        return Endianness::little;
+    return Endianness::unspecified;
+}
+
+QString Type::alignToNextToString(AlignToNext param)
+{
+    switch (param) {
+    case AlignToNext::byte:
+        return QStringLiteral("byte");
+    case AlignToNext::word:
+        return QStringLiteral("word");
+    case AlignToNext::dword:
+        return QStringLiteral("dword");
+    case AlignToNext::unspecified:
+        return {};
+    }
+
+    return {};
+}
+QString Type::endiannessToString(Endianness param)
+{
+    switch (param) {
+    case Endianness::big:
+        return QStringLiteral("big");
+    case Endianness::little:
+        return QStringLiteral("little");
+    case Endianness::unspecified:
+        return {};
+    }
+
+    return {};
 }

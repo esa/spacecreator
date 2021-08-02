@@ -38,7 +38,7 @@ public:
     {
         QFile file(path);
         if (!file.open(QIODevice::ReadOnly)) {
-            qFatal(qUtf8Printable(file.errorString()));
+            qFatal("%s", qUtf8Printable(file.errorString()));
             return;
         }
 

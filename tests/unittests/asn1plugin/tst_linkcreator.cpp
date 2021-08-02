@@ -34,7 +34,7 @@
 #include <pluginmanager.h>
 #include <texteditor/textdocument.h>
 #include <typereference.h>
-#include <types/builtintypes.h>
+#include <types/integer.h>
 #include <utils/fileutils.h>
 
 using namespace Asn1Acn::Internal;
@@ -137,7 +137,7 @@ void LinkCreatorTests::test_createTarget()
     file->addTypeReference(std::move(ref));
 
     auto typeAssignment = std::make_unique<Asn1Acn::TypeAssignment>(
-            "TypeName", Asn1Acn::SourceLocation(m_path, 1, 15), std::make_unique<Asn1Acn::Types::Integer>());
+            "TypeName", "TypeName", Asn1Acn::SourceLocation(m_path, 1, 15), std::make_unique<Asn1Acn::Types::Integer>());
     auto defs = std::make_unique<Asn1Acn::Definitions>("ModuleName", Asn1Acn::SourceLocation(m_path, 0, 0));
 
     defs->addType(std::move(typeAssignment));

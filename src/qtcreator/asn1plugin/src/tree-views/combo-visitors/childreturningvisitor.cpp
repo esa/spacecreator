@@ -39,9 +39,11 @@ Asn1Acn::Node *ChildReturningVisitor::valueFor(const Asn1Acn::File &file) const
 {
     // items are static to satisfy unit testing routines
     static TypeAssignment selectSymbol("<Select Symbol>",
+                                       "<Select Symbol>",
                                        {},
                                        std::make_unique<Types::LabelType>("<Select Symbol>"));
     static TypeAssignment noSymbols("<No Symbols>",
+                                    "<No Symbols>",
                                     {},
                                     std::make_unique<Types::LabelType>("<No Symbols>"));
 

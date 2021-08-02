@@ -24,26 +24,50 @@
 ****************************************************************************/
 #include "typeassignment.h"
 
+#include "mutatingvisitor.h"
 #include "visitor.h"
 
 using namespace Asn1Acn;
 
-TypeAssignment::TypeAssignment(const QString &name, const SourceLocation &location, std::unique_ptr<Types::Type> type)
+TypeAssignment::TypeAssignment(const QString &name,
+                               const QString &cName,
+                               const SourceLocation &location,
+                               std::unique_ptr<Types::Type> type)
     : Node(name, location)
+    , m_cName(cName)
     , m_type(std::move(type))
 {
     Q_ASSERT(m_type);
     m_type->setIdentifier(name);
 }
 
-TypeAssignment::~TypeAssignment() { }
+TypeAssignment::TypeAssignment(const TypeAssignment &other)
+    : TypeAssignment(other.name(), other.cName(), other.location(), other.type()->clone())
+{}
+
+TypeAssignment::~TypeAssignment() {}
+
+const QString &TypeAssignment::cName() const
+{
+    return m_cName;
+}
 
 void TypeAssignment::accept(Visitor &visitor) const
 {
     visitor.visit(*this);
 }
 
-Types::Type *TypeAssignment::type() const
+void TypeAssignment::accept(MutatingVisitor &visitor)
+{
+    visitor.visit(*this);
+}
+
+Types::Type *TypeAssignment::type()
+{
+    return m_type.get();
+}
+
+const Types::Type *TypeAssignment::type() const
 {
     return m_type.get();
 }

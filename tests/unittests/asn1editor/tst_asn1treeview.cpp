@@ -21,7 +21,6 @@
 #include "definitions.h"
 #include "file.h"
 #include "typeassignment.h"
-#include "types/builtintypes.h"
 
 #include <QtTest>
 

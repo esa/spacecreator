@@ -23,6 +23,8 @@
 **
 ****************************************************************************/
 
+#include "typemutatingvisitor.h"
+#include "typereadingvisitor.h"
 #include "userdefinedtype.h"
 
 using namespace Asn1Acn::Types;
@@ -31,7 +33,20 @@ UserdefinedType::UserdefinedType(const QString &name, const QString &module, con
     : m_name(name)
     , m_module(module)
     , m_referencedType(referencedType)
+    , m_type(nullptr)
 {
+}
+
+UserdefinedType::UserdefinedType(const UserdefinedType &other)
+    : Type(other)
+    , m_name(other.m_name)
+    , m_module(other.m_module)
+    , m_referencedType(other.m_referencedType)
+{
+    m_type = (other.m_type != nullptr) ? other.m_type->clone() : nullptr;
+
+    for (const auto &item : other.m_arguments)
+        addArgument(std::make_unique<AcnArgument>(*item));
 }
 
 QString UserdefinedType::typeName() const
@@ -49,6 +64,26 @@ Type::ASN1Type UserdefinedType::typeEnum() const
     return USERDEFINED;
 }
 
+const QString &UserdefinedType::module() const
+{
+    return m_module;
+}
+
+void UserdefinedType::accept(TypeMutatingVisitor &visitor)
+{
+    visitor.visit(*this);
+}
+
+void UserdefinedType::accept(TypeReadingVisitor &visitor) const
+{
+    visitor.visit(*this);
+}
+
+std::unique_ptr<Type> UserdefinedType::clone() const
+{
+    return std::make_unique<UserdefinedType>(*this);
+}
+
 QString UserdefinedType::baseIconFile() const
 {
     return QStringLiteral(":/asn1acn/images/outline/userdefined.png");
@@ -60,4 +95,14 @@ QString UserdefinedType::baseIconFile() const
 const Asn1Acn::TypeAssignment *UserdefinedType::referencedType() const
 {
     return m_referencedType;
+}
+
+void UserdefinedType::setType(std::unique_ptr<Type> type)
+{
+    m_type = std::move(type);
+}
+
+void UserdefinedType::addArgument(AcnArgumentPtr argument)
+{
+    m_arguments.push_back(std::move(argument));
 }

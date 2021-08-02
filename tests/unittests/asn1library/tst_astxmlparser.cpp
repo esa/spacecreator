@@ -24,7 +24,13 @@
 ****************************************************************************/
 #include "tst_astxmlparser.h"
 
-#include "types/builtintypes.h"
+#include "types/boolean.h"
+#include "types/choice.h"
+#include "types/enumerated.h"
+#include "types/integer.h"
+#include "types/real.h"
+#include "types/sequence.h"
+#include "types/sequenceof.h"
 #include "types/userdefinedtype.h"
 
 #include <QtTest>

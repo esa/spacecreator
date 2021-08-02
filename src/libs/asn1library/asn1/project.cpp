@@ -24,6 +24,7 @@
 ****************************************************************************/
 #include "project.h"
 
+#include "mutatingvisitor.h"
 #include "visitor.h"
 
 using namespace Asn1Acn;
@@ -31,12 +32,23 @@ using namespace Asn1Acn;
 Project::Project(const QString &projectName)
     : Node(projectName, {})
     , m_buildersCount(0)
+{}
+
+Project::Project(const Project &other)
+    : Project(other.name())
 {
+    for (const auto &file : other.files())
+        add(std::make_unique<File>(*file));
 }
 
 Project::~Project() { }
 
 void Project::accept(Visitor &visitor) const
+{
+    visitor.visit(*this);
+}
+
+void Project::accept(MutatingVisitor &visitor)
 {
     visitor.visit(*this);
 }

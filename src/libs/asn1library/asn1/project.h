@@ -26,7 +26,6 @@
 
 #include "file.h"
 #include "node.h"
-
 #include <map>
 #include <memory>
 #include <vector>
@@ -36,10 +35,12 @@ namespace Asn1Acn {
 class Project : public Node
 {
 public:
-    Project(const QString &projectName);
+    explicit Project(const QString &projectName);
+    Project(const Project &other);
     ~Project() override;
 
     void accept(Visitor &visitor) const override;
+    void accept(MutatingVisitor &visitor) override;
 
     void add(std::unique_ptr<File> file);
     void remove(const QString &path);

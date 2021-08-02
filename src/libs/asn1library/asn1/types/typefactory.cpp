@@ -1,19 +1,20 @@
 /****************************************************************************
 **
-** Copyright (C) 2017-2019 N7 Space sp. z o. o.
+** Copyright (C) 2018-2019 N7 Space sp. z o. o.
 ** Contact: http://n7space.com
 **
-** This file is part of ASN.1/ACN Plugin for QtCreator.
+** This file is part of ASN.1/ACN Fuzzer - Tool for generating test cases
+** based on ASN.1/ACN models and simulating malformed or malicious data.
 **
-** Plugin was developed under a program and funded by
+** Tool was developed under a programme and funded by
 ** European Space Agency.
 **
-** This Plugin is free software: you can redistribute it and/or modify
+** This Tool is free software: you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
 ** the Free Software Foundation, either version 3 of the License, or
 ** (at your option) any later version.
 **
-** This Plugin is distributed in the hope that it will be useful,
+** This Tool is distributed in the hope that it will be useful,
 ** but WITHOUT ANY WARRANTY; without even the implied warranty of
 ** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 ** GNU General Public License for more details.
@@ -22,23 +23,35 @@
 ** along with this program.  If not, see <http://www.gnu.org/licenses/>.
 **
 ****************************************************************************/
+#include "typefactory.h"
 
-#include "builtintypes.h"
+#include "bitstring.h"
+#include "boolean.h"
+#include "choice.h"
+#include "enumerated.h"
+#include "ia5string.h"
+#include "integer.h"
+#include "null.h"
+#include "numericstring.h"
+#include "octetstring.h"
+#include "real.h"
+#include "sequence.h"
+#include "sequenceof.h"
 
 using namespace Asn1Acn::Types;
 
-std::unique_ptr<Type> BuiltinType::createBuiltinType(const QString &name)
+std::unique_ptr<Type> TypeFactory::createBuiltinType(const QString &name)
 {
-    if (name.startsWith(QStringLiteral("boolean"), Qt::CaseInsensitive))
+    if (name == QStringLiteral("BOOLEAN") || name.startsWith(QStringLiteral("boolean"), Qt::CaseInsensitive))
         return std::make_unique<Boolean>();
 
     if (name == QStringLiteral("NULL") || name == QStringLiteral("NullType"))
         return std::make_unique<Null>();
 
-    if (name.startsWith(QStringLiteral("Integer"), Qt::CaseInsensitive))
+    if (name == QStringLiteral("INTEGER") || name.startsWith(QStringLiteral("Integer"), Qt::CaseInsensitive))
         return std::make_unique<Integer>();
 
-    if (name.startsWith(QStringLiteral("real"), Qt::CaseInsensitive))
+    if (name == QStringLiteral("REAL") || name.startsWith(QStringLiteral("Real"), Qt::CaseInsensitive))
         return std::make_unique<Real>();
 
     if (name == QStringLiteral("BIT_STRING") || name == QStringLiteral("BitStringType"))
@@ -53,10 +66,10 @@ std::unique_ptr<Type> BuiltinType::createBuiltinType(const QString &name)
     if (name.startsWith(QStringLiteral("NumericString"), Qt::CaseInsensitive))
         return std::make_unique<NumericString>();
 
-    if (name.startsWith(QStringLiteral("enumerated"), Qt::CaseInsensitive))
+    if (name == QStringLiteral("ENUMERATED") || name.startsWith(QStringLiteral("Enumerated"), Qt::CaseInsensitive))
         return std::make_unique<Enumerated>();
 
-    if (name.startsWith(QStringLiteral("choice"), Qt::CaseInsensitive))
+    if (name == QStringLiteral("CHOICE") || name.startsWith(QStringLiteral("Choice"), Qt::CaseInsensitive))
         return std::make_unique<Choice>();
 
     if (name == QStringLiteral("SEQUENCE") || name == QStringLiteral("SequenceType"))

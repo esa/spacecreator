@@ -107,7 +107,8 @@ QVariantMap Asn1ValueParser::parseAsn1Value(
     case Asn1Acn::Types::Type::ENUMERATED: {
         QVariantList values = asn1Values["values"].toList();
         // check enumerated value
-        if (ok = values.contains(value)) {
+        ok = values.contains(value);
+        if (ok) {
             valueMap["value"] = value;
         }
         break;
