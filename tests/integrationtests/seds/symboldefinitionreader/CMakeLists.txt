@@ -13,4 +13,4 @@ target_link_libraries(${TEST_NAME}
 configure_file(resources/Valid.toml Valid.toml COPYONLY)
 configure_file(resources/Invalid.toml Invalid.toml COPYONLY)
 
-# add_format_target(${TEST_NAME})
+add_format_target(${TEST_NAME})

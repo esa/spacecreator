@@ -1,21 +1,21 @@
 /** @file
-  * This file is part of the SpaceCreator.
-  *
-  * @copyright (C) 2021 N7 Space Sp. z o.o.
-  *
-  * This library is free software; you can redistribute it and/or
-  * modify it under the terms of the GNU Library General Public
-  * License as published by the Free Software Foundation; either
-  * version 2 of the License, or (at your option) any later version.
-  *
-  * This library is distributed in the hope that it will be useful,
-  * but WITHOUT ANY WARRANTY; without even the implied warranty of
-  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-  * Library General Public License for more details.
-  *
-  * You should have received a copy of the GNU Library General Public License
-  * along with this program. If not, see <https://www.gnu.org/licenses/lgpl-2.1.html>.
-  */
+ * This file is part of the SpaceCreator.
+ *
+ * @copyright (C) 2021 N7 Space Sp. z o.o.
+ *
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Library General Public
+ * License as published by the Free Software Foundation; either
+ * version 2 of the License, or (at your option) any later version.
+ *
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Library General Public License for more details.
+ *
+ * You should have received a copy of the GNU Library General Public License
+ * along with this program. If not, see <https://www.gnu.org/licenses/lgpl-2.1.html>.
+ */
 
 #pragma once
 
@@ -40,12 +40,12 @@ namespace seds::parser {
  */
 class CoreParser final
 {
-  public:
+public:
     /**
      * @brief   Reads current element as a long description
      * @return  Long description
      */
-    static auto readLongDescription(QXmlStreamReader& xmlReader) -> common::String;
+    static auto readLongDescription(QXmlStreamReader &xmlReader) -> common::String;
 
     /**
      * @brief   Parses given string as a boolean
@@ -104,7 +104,7 @@ class CoreParser final
      * @param   attribute       Attribute to check
      * @return  True if attribute was used, false otherwise
      */
-    static auto processForDescription(model::Description* object, const QXmlStreamAttribute& attribute) -> bool;
+    static auto processForDescription(model::Description *object, const QXmlStreamAttribute &attribute) -> bool;
     /**
      * @brief   Processes element for Description
      *
@@ -112,7 +112,7 @@ class CoreParser final
      * @param   xmlReader       XML reader
      * @return  True if element was used, false otherwise
      */
-    static auto processForDescription(model::Description* object, QXmlStreamReader& xmlReader) -> bool;
+    static auto processForDescription(model::Description *object, QXmlStreamReader &xmlReader) -> bool;
     /**
      * @brief   Processes attribute for NamedEntity
      *
@@ -120,7 +120,7 @@ class CoreParser final
      * @param   attribute       Attribute to check
      * @return  True if attribute was used, false otherwise
      */
-    static auto processForNamedEntity(model::NamedEntity* object, const QXmlStreamAttribute& attribute) -> bool;
+    static auto processForNamedEntity(model::NamedEntity *object, const QXmlStreamAttribute &attribute) -> bool;
     /**
      * @brief   Processes element for NamedEntity
      *
@@ -128,7 +128,7 @@ class CoreParser final
      * @param   xmlReader       XML reader
      * @return  True if element was used, false otherwise
      */
-    static auto processForNamedEntity(model::NamedEntity* object, QXmlStreamReader& xmlReader) -> bool;
+    static auto processForNamedEntity(model::NamedEntity *object, QXmlStreamReader &xmlReader) -> bool;
 };
 
 } // namespace seds::parser

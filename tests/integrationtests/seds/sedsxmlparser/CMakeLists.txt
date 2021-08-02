@@ -8,7 +8,7 @@ target_sources(${TEST_NAME}
     PRIVATE     ${TEST_NAME}.cpp)
 target_link_libraries(${TEST_NAME}
     PRIVATE     SEDS::TestBase
-                SEDS::Parser
+                SEDS::XmlParser
                 Qt5::Xml)
 
 configure_file(resources/Arrays.xml Arrays.xml COPYONLY)
@@ -18,4 +18,4 @@ configure_file(resources/Device.xml Device.xml COPYONLY)
 configure_file(resources/Interfaces.xml Interfaces.xml COPYONLY)
 configure_file(resources/SimpleDataTypes.xml SimpleDataTypes.xml COPYONLY)
 
-# add_format_target(${TEST_NAME})
+add_format_target(${TEST_NAME})

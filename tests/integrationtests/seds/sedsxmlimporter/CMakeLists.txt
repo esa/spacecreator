@@ -18,4 +18,4 @@ configure_file(resources/seds-core-semantics.xsd seds-core-semantics.xsd COPYONL
 configure_file(resources/seds-extension-semantics.xsd seds-extension-semantics.xsd COPYONLY)
 configure_file(resources/seds.xsd seds.xsd COPYONLY)
 
-# add_format_target(${TEST_NAME})
+add_format_target(${TEST_NAME})

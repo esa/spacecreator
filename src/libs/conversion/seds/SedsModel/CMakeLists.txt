@@ -253,6 +253,6 @@ target_link_libraries(SedsModel
     PRIVATE     Conversion::Converter
     PUBLIC      Qt5::Core)
 
-# add_format_target(SedsModel)
+add_format_target(SedsModel)
 
 add_library(SEDS::Model ALIAS SedsModel)

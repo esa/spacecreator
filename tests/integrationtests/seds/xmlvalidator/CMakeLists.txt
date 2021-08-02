@@ -18,4 +18,4 @@ configure_file(resources/seds.xsd seds.xsd COPYONLY)
 configure_file(resources/SomeInvalidData.xml SomeInvalidData.xml COPYONLY)
 configure_file(resources/Valid.xml Valid.xml COPYONLY)
 
-# add_format_target(${TEST_NAME})
+add_format_target(${TEST_NAME})

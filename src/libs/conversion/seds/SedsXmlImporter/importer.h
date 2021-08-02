@@ -1,31 +1,29 @@
 /** @file
-  * This file is part of the SpaceCreator.
-  *
-  * @copyright (C) 2021 N7 Space Sp. z o.o.
-  *
-  * This library is free software; you can redistribute it and/or
-  * modify it under the terms of the GNU Library General Public
-  * License as published by the Free Software Foundation; either
-  * version 2 of the License, or (at your option) any later version.
-  *
-  * This library is distributed in the hope that it will be useful,
-  * but WITHOUT ANY WARRANTY; without even the implied warranty of
-  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-  * Library General Public License for more details.
-  *
-  * You should have received a copy of the GNU Library General Public License
-  * along with this program. If not, see <https://www.gnu.org/licenses/lgpl-2.1.html>.
-  */
+ * This file is part of the SpaceCreator.
+ *
+ * @copyright (C) 2021 N7 Space Sp. z o.o.
+ *
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Library General Public
+ * License as published by the Free Software Foundation; either
+ * version 2 of the License, or (at your option) any later version.
+ *
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Library General Public License for more details.
+ *
+ * You should have received a copy of the GNU Library General Public License
+ * along with this program. If not, see <https://www.gnu.org/licenses/lgpl-2.1.html>.
+ */
 
 #pragma once
 
+#include <QString>
+#include <converter/import/options.h>
+#include <converter/model.h>
 #include <memory>
 #include <optional>
-
-#include <QString>
-
-#include <converter/model.h>
-#include <converter/import/options.h>
 #include <seds/SymbolDefinitionReader/symboldefinitionreader.h>
 
 namespace seds::importer {
@@ -35,7 +33,7 @@ namespace seds::importer {
  */
 class SedsXmlImporter final
 {
-  public:
+public:
     /**
      * @brief   Read given SEDS file and produce SEDS model
      *
@@ -49,9 +47,9 @@ class SedsXmlImporter final
      *
      * @return  Imported SEDS model
      */
-    static auto import(const converter::import::Options& options) -> std::unique_ptr<converter::Model>;
+    static auto import(const converter::import::Options &options) -> std::unique_ptr<converter::Model>;
 
-  private:
+private:
     /**
      * @brief   Create external references map
      *
@@ -66,7 +64,7 @@ class SedsXmlImporter final
      *
      * @returns Map with external references
      */
-    static auto readExternalReferences(const converter::import::Options& options)
+    static auto readExternalReferences(const converter::import::Options &options)
             -> symbolreader::SymbolDefinitionReader::ExternalReferencesMap;
     /**
      * @brief   Preprocess given input SEDS file
@@ -85,8 +83,8 @@ class SedsXmlImporter final
      *
      * @returns Preprocessed filename
      */
-    static auto preprocess(const symbolreader::SymbolDefinitionReader::ExternalReferencesMap& externalReferences,
-                           const converter::import::Options& options) -> QString;
+    static auto preprocess(const symbolreader::SymbolDefinitionReader::ExternalReferencesMap &externalReferences,
+            const converter::import::Options &options) -> QString;
     /**
      * @brief   Validate given preprocessed SEDS file
      *
@@ -98,7 +96,7 @@ class SedsXmlImporter final
      * @throws  converter::import::FileNotFound
      * @throws  seds::validator::ValidatorException
      */
-    static auto validate(const QString& preprocessedFilename, const converter::import::Options& options) -> void;
+    static auto validate(const QString &preprocessedFilename, const converter::import::Options &options) -> void;
 
     /**
      * @brief   Get schema filename from imported file
@@ -109,9 +107,9 @@ class SedsXmlImporter final
      *
      * @returns Schema filename
      */
-    static auto getSchemaFilename(const QString& filename) -> QString;
+    static auto getSchemaFilename(const QString &filename) -> QString;
 
-  private:
+private:
     static const QString preprocessedFilenameTemplate;
 };
 

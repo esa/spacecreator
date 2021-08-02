@@ -1,4 +1,4 @@
-project(SedsParser VERSION 1.0.0 LANGUAGES CXX)
+project(SedsXmlParser VERSION 1.0.0 LANGUAGES CXX)
 
 set(SOURCES exceptions.cpp
             parser.cpp
@@ -23,17 +23,17 @@ set(INCLUDES exceptions.h
              specialized/interfacesparser.h
              specialized/genericsparser.h)
 
-add_library(SedsParser STATIC)
-target_sources(SedsParser
+add_library(SedsXmlParser STATIC)
+target_sources(SedsXmlParser
     PRIVATE     "${SOURCES}"
                 "${INCLUDES}")
-target_include_directories(SedsParser
+target_include_directories(SedsXmlParser
     PUBLIC      .
     PRIVATE     ${CMAKE_SOURCE_DIR}/src/libs/conversion)
-target_link_libraries(SedsParser
+target_link_libraries(SedsXmlParser
     PUBLIC      SEDS::Model
                 Qt5::Core)
 
-# add_format_target(SedsParser)
+add_format_target(SedsXmlParser)
 
-add_library(SEDS::Parser ALIAS SedsParser)
+add_library(SEDS::XmlParser ALIAS SedsXmlParser)

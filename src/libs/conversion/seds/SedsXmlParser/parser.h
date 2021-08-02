@@ -1,28 +1,27 @@
 /** @file
-  * This file is part of the SpaceCreator.
-  *
-  * @copyright (C) 2021 N7 Space Sp. z o.o.
-  *
-  * This library is free software; you can redistribute it and/or
-  * modify it under the terms of the GNU Library General Public
-  * License as published by the Free Software Foundation; either
-  * version 2 of the License, or (at your option) any later version.
-  *
-  * This library is distributed in the hope that it will be useful,
-  * but WITHOUT ANY WARRANTY; without even the implied warranty of
-  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-  * Library General Public License for more details.
-  *
-  * You should have received a copy of the GNU Library General Public License
-  * along with this program. If not, see <https://www.gnu.org/licenses/lgpl-2.1.html>.
-  */
+ * This file is part of the SpaceCreator.
+ *
+ * @copyright (C) 2021 N7 Space Sp. z o.o.
+ *
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Library General Public
+ * License as published by the Free Software Foundation; either
+ * version 2 of the License, or (at your option) any later version.
+ *
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Library General Public License for more details.
+ *
+ * You should have received a copy of the GNU Library General Public License
+ * along with this program. If not, see <https://www.gnu.org/licenses/lgpl-2.1.html>.
+ */
 
 #pragma once
 
 #include <memory>
-#include <variant>
-
 #include <seds/SedsCommon/basetypesmappings.h>
+#include <variant>
 
 class QXmlStreamReader;
 
@@ -51,7 +50,7 @@ namespace seds::parser {
  */
 class Parser final
 {
-  public:
+public:
     /**
      * @brief   Parse given file
      *
@@ -61,9 +60,9 @@ class Parser final
      *
      * @returns SEDS Model
      */
-    static auto parse(const QString& filename) -> std::unique_ptr<converter::Model>;
+    static auto parse(const QString &filename) -> std::unique_ptr<converter::Model>;
 
-  private:
+private:
     /**
      * @brief   Constructs PackageFile object
      *
@@ -71,7 +70,7 @@ class Parser final
      *
      * @returns PackageFile
      */
-    static auto readPackageFile(QXmlStreamReader& xmlReader) -> model::PackageFile;
+    static auto readPackageFile(QXmlStreamReader &xmlReader) -> model::PackageFile;
     /**
      * @brief   Constructs DataSheet object
      *
@@ -79,7 +78,7 @@ class Parser final
      *
      * @returns  Package
      */
-    static auto readDataSheet(QXmlStreamReader& xmlReader) -> model::DataSheet;
+    static auto readDataSheet(QXmlStreamReader &xmlReader) -> model::DataSheet;
 
     /**
      * @brief   Constructs Package object
@@ -88,7 +87,7 @@ class Parser final
      *
      * @returns Package
      */
-    static auto readPackage(QXmlStreamReader& xmlReader) -> model::Package;
+    static auto readPackage(QXmlStreamReader &xmlReader) -> model::Package;
 };
 
 } // namespace seds::parser

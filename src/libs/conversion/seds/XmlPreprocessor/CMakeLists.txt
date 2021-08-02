@@ -18,6 +18,6 @@ target_link_libraries(XmlPreprocessor
                 Qt5::Xml
     PUBLIC      Qt5::Core)
 
-# add_format_target(XmlPreprocessor)
+add_format_target(XmlPreprocessor)
 
 add_library(SEDS::XmlPreprocessor ALIAS XmlPreprocessor)

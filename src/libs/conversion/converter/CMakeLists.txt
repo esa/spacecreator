@@ -17,6 +17,6 @@ target_include_directories(ConversionConverter
 target_link_libraries(ConversionConverter
     PUBLIC      Qt5::Core)
 
-# add_format_target(ConversionConverter)
+add_format_target(ConversionConverter)
 
 add_library(Conversion::Converter ALIAS ConversionConverter)

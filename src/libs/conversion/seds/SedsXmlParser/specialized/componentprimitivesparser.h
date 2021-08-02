@@ -1,21 +1,21 @@
 /** @file
-  * This file is part of the SpaceCreator.
-  *
-  * @copyright (C) 2021 N7 Space Sp. z o.o.
-  *
-  * This library is free software; you can redistribute it and/or
-  * modify it under the terms of the GNU Library General Public
-  * License as published by the Free Software Foundation; either
-  * version 2 of the License, or (at your option) any later version.
-  *
-  * This library is distributed in the hope that it will be useful,
-  * but WITHOUT ANY WARRANTY; without even the implied warranty of
-  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-  * Library General Public License for more details.
-  *
-  * You should have received a copy of the GNU Library General Public License
-  * along with this program. If not, see <https://www.gnu.org/licenses/lgpl-2.1.html>.
-  */
+ * This file is part of the SpaceCreator.
+ *
+ * @copyright (C) 2021 N7 Space Sp. z o.o.
+ *
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Library General Public
+ * License as published by the Free Software Foundation; either
+ * version 2 of the License, or (at your option) any later version.
+ *
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Library General Public License for more details.
+ *
+ * You should have received a copy of the GNU Library General Public License
+ * along with this program. If not, see <https://www.gnu.org/licenses/lgpl-2.1.html>.
+ */
 
 #pragma once
 
@@ -47,39 +47,39 @@ namespace seds::parser {
  */
 class ComponentPrimitivesParser final
 {
-  public:
+public:
     /**
      * @brief   Constructs NamedArgumentValue object
      * @return  NamedArgumentValue
      */
-    static auto readNamedArgumentValue(QXmlStreamReader& xmlReader) -> model::NamedArgumentValue;
+    static auto readNamedArgumentValue(QXmlStreamReader &xmlReader) -> model::NamedArgumentValue;
 
     /**
      * @brief   Constructs SendCommandPrimitive object
      * @return  SendCommandPrimitive
      */
-    static auto readSendCommandPrimitive(QXmlStreamReader& xmlReader) -> model::SendCommandPrimitive;
+    static auto readSendCommandPrimitive(QXmlStreamReader &xmlReader) -> model::SendCommandPrimitive;
     /**
      * @brief   Constructs SendParameterPrimitive object
      * @return  SendParameterPrimitive
      */
-    static auto readSendParameterPrimitive(QXmlStreamReader& xmlReader) -> model::SendParameterPrimitive;
+    static auto readSendParameterPrimitive(QXmlStreamReader &xmlReader) -> model::SendParameterPrimitive;
 
     /**
      * @brief   Constructs OnCommandPrimitive object
      * @return  OnCommandPrimitive
      */
-    static auto readOnCommandPrimitive(QXmlStreamReader& xmlReader) -> model::OnCommandPrimitive;
+    static auto readOnCommandPrimitive(QXmlStreamReader &xmlReader) -> model::OnCommandPrimitive;
     /**
      * @brief   Constructs OnParameterPrimitive object
      * @return  OnParameterPrimitive
      */
-    static auto readOnParameterPrimitive(QXmlStreamReader& xmlReader) -> model::OnParameterPrimitive;
+    static auto readOnParameterPrimitive(QXmlStreamReader &xmlReader) -> model::OnParameterPrimitive;
     /**
      * @brief   Constructs TimerSink object
      * @return  TimerSink
      */
-    static auto readTimerSink(QXmlStreamReader& xmlReader) -> model::TimerSink;
+    static auto readTimerSink(QXmlStreamReader &xmlReader) -> model::TimerSink;
 
     /**
      * @brief   Processes attribute for ParameterRefAttributes
@@ -88,8 +88,8 @@ class ComponentPrimitivesParser final
      * @param   attribute       Attribute to check
      * @return  True if attribute was used, false otherwise
      */
-    static auto processForParameterRefAttributes(model::ParameterRefAttributes* object,
-                                                 const QXmlStreamAttribute& attribute) -> bool;
+    static auto processForParameterRefAttributes(
+            model::ParameterRefAttributes *object, const QXmlStreamAttribute &attribute) -> bool;
     /**
      * @brief   Processes element for ParameterRefAttributes
      *
@@ -97,15 +97,15 @@ class ComponentPrimitivesParser final
      * @param   xmlReader       XML reader
      * @return  True if element was used, false otherwise
      */
-    static auto processForParameterRefAttributes(model::ParameterRefAttributes* object, QXmlStreamReader& xmlReader)
+    static auto processForParameterRefAttributes(model::ParameterRefAttributes *object, QXmlStreamReader &xmlReader)
             -> bool;
 
-  private:
+private:
     /**
      * @brief   Constructs SinkArgumentValue object
      * @return  SinkArgumentValue
      */
-    static auto readSinkArgumentValue(QXmlStreamReader& xmlReader) -> model::SinkArgumentValue;
+    static auto readSinkArgumentValue(QXmlStreamReader &xmlReader) -> model::SinkArgumentValue;
 
     /**
      * @brief   Parses given string as a parameter operation
@@ -122,8 +122,8 @@ class ComponentPrimitivesParser final
      * @param   attribute       Attribute to check
      * @return  True if attribute was used, false otherwise
      */
-    static auto processForCommandRefAttributes(model::CommandRefAttributes* object,
-                                               const QXmlStreamAttribute& attribute) -> bool;
+    static auto processForCommandRefAttributes(
+            model::CommandRefAttributes *object, const QXmlStreamAttribute &attribute) -> bool;
     /**
      * @brief   Processes element for CommandRefAttributes
      *
@@ -131,7 +131,7 @@ class ComponentPrimitivesParser final
      * @param   xmlReader       XML reader
      * @return  True if element was used, false otherwise
      */
-    static auto processForCommandRefAttributes(model::CommandRefAttributes* object, QXmlStreamReader& xmlReader)
+    static auto processForCommandRefAttributes(model::CommandRefAttributes *object, QXmlStreamReader &xmlReader)
             -> bool;
     /**
      * @brief   Processes attribute for PrimitiveSink
@@ -140,7 +140,7 @@ class ComponentPrimitivesParser final
      * @param   attribute       Attribute to check
      * @return  True if attribute was used, false otherwise
      */
-    static auto processForPrimitiveSink(model::PrimitiveSink* object, const QXmlStreamAttribute& attribute) -> bool;
+    static auto processForPrimitiveSink(model::PrimitiveSink *object, const QXmlStreamAttribute &attribute) -> bool;
     /**
      * @brief   Processes element for PrimitiveSink
      *
@@ -148,7 +148,7 @@ class ComponentPrimitivesParser final
      * @param   xmlReader       XML reader
      * @return  True if element was used, false otherwise
      */
-    static auto processForPrimitiveSink(model::PrimitiveSink* object, QXmlStreamReader& xmlReader) -> bool;
+    static auto processForPrimitiveSink(model::PrimitiveSink *object, QXmlStreamReader &xmlReader) -> bool;
     /**
      * @brief   Processes attribute for PrimitiveSource
      *
@@ -156,7 +156,7 @@ class ComponentPrimitivesParser final
      * @param   attribute       Attribute to check
      * @return  True if attribute was used, false otherwise
      */
-    static auto processForPrimitiveSource(model::PrimitiveSource* object, const QXmlStreamAttribute& attribute) -> bool;
+    static auto processForPrimitiveSource(model::PrimitiveSource *object, const QXmlStreamAttribute &attribute) -> bool;
     /**
      * @brief   Processes element for PrimitiveSource
      *
@@ -164,7 +164,7 @@ class ComponentPrimitivesParser final
      * @param   xmlReader       XML reader
      * @return  True if element was used, false otherwise
      */
-    static auto processForPrimitiveSource(model::PrimitiveSource* object, QXmlStreamReader& xmlReader) -> bool;
+    static auto processForPrimitiveSource(model::PrimitiveSource *object, QXmlStreamReader &xmlReader) -> bool;
 };
 
 } // namespace seds::parser

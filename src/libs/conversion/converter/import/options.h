@@ -1,29 +1,28 @@
 /** @file
-  * This file is part of the SpaceCreator.
-  *
-  * @copyright (C) 2021 N7 Space Sp. z o.o.
-  *
-  * This library is free software; you can redistribute it and/or
-  * modify it under the terms of the GNU Library General Public
-  * License as published by the Free Software Foundation; either
-  * version 2 of the License, or (at your option) any later version.
-  *
-  * This library is distributed in the hope that it will be useful,
-  * but WITHOUT ANY WARRANTY; without even the implied warranty of
-  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-  * Library General Public License for more details.
-  *
-  * You should have received a copy of the GNU Library General Public License
-  * along with this program. If not, see <https://www.gnu.org/licenses/lgpl-2.1.html>.
-  */
+ * This file is part of the SpaceCreator.
+ *
+ * @copyright (C) 2021 N7 Space Sp. z o.o.
+ *
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Library General Public
+ * License as published by the Free Software Foundation; either
+ * version 2 of the License, or (at your option) any later version.
+ *
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Library General Public License for more details.
+ *
+ * You should have received a copy of the GNU Library General Public License
+ * along with this program. If not, see <https://www.gnu.org/licenses/lgpl-2.1.html>.
+ */
 
 #pragma once
 
+#include <QString>
 #include <optional>
 #include <unordered_map>
 #include <vector>
-
-#include <QString>
 
 namespace converter::import {
 
@@ -32,22 +31,22 @@ namespace converter::import {
  */
 class Options final
 {
-  public:
+public:
     /**
      * @brief   Possible options for importers
      */
     enum class Key
     {
-        InputFile,             ///< File to import
-        PreprocessedFile,      ///< Intermediate file that will be created during preprocessing
-        SchemaFile,            ///< Schema file that will be used during validation
-        ExternalRef,           ///< Declaration of an external reference
-        ExternalRefFile,       ///< File with external references declarations
-        SkipSedsValidation,    ///< Skip SEDS validation
+        InputFile, ///< File to import
+        PreprocessedFile, ///< Intermediate file that will be created during preprocessing
+        SchemaFile, ///< Schema file that will be used during validation
+        ExternalRef, ///< Declaration of an external reference
+        ExternalRefFile, ///< File with external references declarations
+        SkipSedsValidation, ///< Skip SEDS validation
         KeepIntermediateFiles, ///< Don't remove intermediate files after import
     };
 
-  public:
+public:
     /**
      * @brief   Adds new option without value
      *
@@ -91,7 +90,7 @@ class Options final
      */
     auto values(Options::Key key) const -> std::vector<QString>;
 
-  private:
+private:
     /** @brief  Options map type */
     std::unordered_multimap<Options::Key, std::optional<QString>> m_options;
 };

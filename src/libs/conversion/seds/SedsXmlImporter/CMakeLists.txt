@@ -13,13 +13,13 @@ target_include_directories(SedsXmlImporter
     PRIVATE     ${CMAKE_SOURCE_DIR}/src/libs/conversion)
 target_link_libraries(SedsXmlImporter
     PRIVATE     Conversion::Converter
-                SEDS::Parser
                 SEDS::SymbolDefinitionReader
+                SEDS::XmlParser
                 SEDS::XmlPreprocessor
                 SEDS::XmlValidator
                 Qt5::Xml
     PUBLIC      Qt5::Core)
 
-# add_format_target(SedsXmlImporter)
+add_format_target(SedsXmlImporter)
 
 add_library(SEDS::XmlImporter ALIAS SedsXmlImporter)

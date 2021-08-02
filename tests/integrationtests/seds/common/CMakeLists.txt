@@ -12,6 +12,6 @@ target_link_libraries(SedsTestBase
                 Qt5::Core
                 Qt5::Test)
 
-# add_format_target(SedsTestBase)
+add_format_target(SedsTestBase)
 
 add_library(SEDS::TestBase ALIAS SedsTestBase)

@@ -1,30 +1,29 @@
 /** @file
-  * This file is part of the SpaceCreator.
-  *
-  * @copyright (C) 2021 N7 Space Sp. z o.o.
-  *
-  * This library is free software; you can redistribute it and/or
-  * modify it under the terms of the GNU Library General Public
-  * License as published by the Free Software Foundation; either
-  * version 2 of the License, or (at your option) any later version.
-  *
-  * This library is distributed in the hope that it will be useful,
-  * but WITHOUT ANY WARRANTY; without even the implied warranty of
-  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-  * Library General Public License for more details.
-  *
-  * You should have received a copy of the GNU Library General Public License
-  * along with this program. If not, see <https://www.gnu.org/licenses/lgpl-2.1.html>.
-  */
+ * This file is part of the SpaceCreator.
+ *
+ * @copyright (C) 2021 N7 Space Sp. z o.o.
+ *
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Library General Public
+ * License as published by the Free Software Foundation; either
+ * version 2 of the License, or (at your option) any later version.
+ *
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Library General Public License for more details.
+ *
+ * You should have received a copy of the GNU Library General Public License
+ * along with this program. If not, see <https://www.gnu.org/licenses/lgpl-2.1.html>.
+ */
+
+#include "sedstestbase.h"
 
 #include <QDir>
 #include <QDomDocument>
 #include <QDomElement>
 #include <QObject>
 #include <QtTest>
-
-#include "sedstestbase.h"
-
 #include <converter/import/exceptions.h>
 #include <seds/SymbolDefinitionReader/symboldefinitionreader.h>
 #include <seds/XmlPreprocessor/exceptions.h>
@@ -42,17 +41,16 @@ class tsti_XmlPreprocessor : public SedsTestBase
 {
     Q_OBJECT
 
-  public:
+public:
     virtual ~tsti_XmlPreprocessor() = default;
 
-  private Q_SLOTS:
+private Q_SLOTS:
     void testValid();
     void testUndefinedExternalReference();
     void testXIncludedNonexisting();
 };
 
-void
-tsti_XmlPreprocessor::testValid()
+void tsti_XmlPreprocessor::testValid()
 {
     SymbolDefinitionReader::ExternalReferencesMap externalReferences;
     externalReferences.insert({ "long_description", "This is a long description" });
@@ -60,17 +58,17 @@ tsti_XmlPreprocessor::testValid()
 
     try {
         XmlPreprocessor::preprocess("IncludesValid.xml", "IncludesValidPreprocessed.xml", externalReferences);
-    } catch(const std::exception& ex) {
+    } catch (const std::exception &ex) {
         QFAIL(ex.what());
     }
 
     QFile file("IncludesValidPreprocessed.xml");
-    if(!file.open(QIODevice::ReadOnly)) {
+    if (!file.open(QIODevice::ReadOnly)) {
         QFAIL("Unable to open file");
     }
 
     QDomDocument xmlDoc;
-    if(!xmlDoc.setContent(&file)) {
+    if (!xmlDoc.setContent(&file)) {
         QFAIL("Unable to load DOM");
     }
 
@@ -81,28 +79,24 @@ tsti_XmlPreprocessor::testValid()
     QCOMPARE(longDescriptionElement.nodeValue(), "This is a long description");
 }
 
-void
-tsti_XmlPreprocessor::testUndefinedExternalReference()
+void tsti_XmlPreprocessor::testUndefinedExternalReference()
 {
     SymbolDefinitionReader::ExternalReferencesMap externalReferences;
 
     QVERIFY_EXCEPTION_THROWN(XmlPreprocessor::preprocess("UndefinedExternalReference.xml",
-                                                         "UnfedinedExternalReference.xml",
-                                                         externalReferences),
-                             UndefinedExternalReference);
+                                     "UnfedinedExternalReference.xml", externalReferences),
+            UndefinedExternalReference);
 }
 
-void
-tsti_XmlPreprocessor ::testXIncludedNonexisting()
+void tsti_XmlPreprocessor ::testXIncludedNonexisting()
 {
     SymbolDefinitionReader::ExternalReferencesMap externalReferences;
     externalReferences.insert({ "long_description", "This is a long description" });
     externalReferences.insert({ "integer.name", "DataItem" });
 
     QVERIFY_EXCEPTION_THROWN(XmlPreprocessor::preprocess("IncludesNonexisting.xml",
-                                                         "IncludesNonexistingPreprocessed.xml",
-                                                         externalReferences),
-                             FileNotFound);
+                                     "IncludesNonexistingPreprocessed.xml", externalReferences),
+            FileNotFound);
 }
 
 } // namespace seds::test

@@ -15,4 +15,4 @@ configure_file(resources/Valid.xml Valid.xml COPYONLY)
 configure_file(resources/IncludesValid.xml IncludesValid.xml COPYONLY)
 configure_file(resources/UndefinedExternalReference.xml UndefinedExternalReference.xml COPYONLY)
 
-# add_format_target(${TEST_NAME})
+add_format_target(${TEST_NAME})

@@ -1,21 +1,21 @@
 /** @file
-  * This file is part of the SpaceCreator.
-  *
-  * @copyright (C) 2021 N7 Space Sp. z o.o.
-  *
-  * This library is free software; you can redistribute it and/or
-  * modify it under the terms of the GNU Library General Public
-  * License as published by the Free Software Foundation; either
-  * version 2 of the License, or (at your option) any later version.
-  *
-  * This library is distributed in the hope that it will be useful,
-  * but WITHOUT ANY WARRANTY; without even the implied warranty of
-  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-  * Library General Public License for more details.
-  *
-  * You should have received a copy of the GNU Library General Public License
-  * along with this program. If not, see <https://www.gnu.org/licenses/lgpl-2.1.html>.
-  */
+ * This file is part of the SpaceCreator.
+ *
+ * @copyright (C) 2021 N7 Space Sp. z o.o.
+ *
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Library General Public
+ * License as published by the Free Software Foundation; either
+ * version 2 of the License, or (at your option) any later version.
+ *
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Library General Public License for more details.
+ *
+ * You should have received a copy of the GNU Library General Public License
+ * along with this program. If not, see <https://www.gnu.org/licenses/lgpl-2.1.html>.
+ */
 
 #include "components/activities/splinecalibrator.h"
 
@@ -26,26 +26,22 @@ SplineCalibrator::SplineCalibrator() noexcept
 {
 }
 
-const std::vector<SplinePoint>&
-SplineCalibrator::splinePoints() const
+const std::vector<SplinePoint> &SplineCalibrator::splinePoints() const
 {
     return m_splinePoints;
 }
 
-void
-SplineCalibrator::addSplinePoint(SplinePoint splinePoint)
+void SplineCalibrator::addSplinePoint(SplinePoint splinePoint)
 {
     m_splinePoints.push_back(std::move(splinePoint));
 }
 
-bool
-SplineCalibrator::isExtrapolate() const
+bool SplineCalibrator::isExtrapolate() const
 {
     return m_extrapolate;
 }
 
-void
-SplineCalibrator::setExtrapolate(bool extrapolate)
+void SplineCalibrator::setExtrapolate(bool extrapolate)
 {
     m_extrapolate = extrapolate;
 }

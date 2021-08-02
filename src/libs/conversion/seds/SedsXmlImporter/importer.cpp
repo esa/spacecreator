@@ -1,31 +1,29 @@
 /** @file
-  * This file is part of the SpaceCreator.
-  *
-  * @copyright (C) 2021 N7 Space Sp. z o.o.
-  *
-  * This library is free software; you can redistribute it and/or
-  * modify it under the terms of the GNU Library General Public
-  * License as published by the Free Software Foundation; either
-  * version 2 of the License, or (at your option) any later version.
-  *
-  * This library is distributed in the hope that it will be useful,
-  * but WITHOUT ANY WARRANTY; without even the implied warranty of
-  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-  * Library General Public License for more details.
-  *
-  * You should have received a copy of the GNU Library General Public License
-  * along with this program. If not, see <https://www.gnu.org/licenses/lgpl-2.1.html>.
-  */
+ * This file is part of the SpaceCreator.
+ *
+ * @copyright (C) 2021 N7 Space Sp. z o.o.
+ *
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Library General Public
+ * License as published by the Free Software Foundation; either
+ * version 2 of the License, or (at your option) any later version.
+ *
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Library General Public License for more details.
+ *
+ * You should have received a copy of the GNU Library General Public License
+ * along with this program. If not, see <https://www.gnu.org/licenses/lgpl-2.1.html>.
+ */
 
 #include "importer.h"
-
-#include <algorithm>
 
 #include <QDebug>
 #include <QFileInfo>
 #include <QString>
 #include <QXmlStreamReader>
-
+#include <algorithm>
 #include <converter/import/exceptions.h>
 #include <seds/SedsXmlParser/parser.h>
 #include <seds/XmlPreprocessor/preprocessor.h>
@@ -44,21 +42,20 @@ using validator::XmlValidator;
 
 const QString SedsXmlImporter::preprocessedFilenameTemplate = "preprocessed_%1";
 
-std::unique_ptr<converter::Model>
-SedsXmlImporter::import(const Options& options)
+std::unique_ptr<converter::Model> SedsXmlImporter::import(const Options &options)
 {
     const auto externalReferences = readExternalReferences(options);
     const auto preprocessedFilename = preprocess(externalReferences, options);
 
     // Validation can be disabled by the user
-    if(!options.isSet(Options::Key::SkipSedsValidation)) {
+    if (!options.isSet(Options::Key::SkipSedsValidation)) {
         validate(preprocessedFilename, options);
     }
 
     auto model = Parser::parse(preprocessedFilename);
 
     // Cleanup working directory after importing
-    if(!options.isSet(Options::Key::KeepIntermediateFiles)) {
+    if (!options.isSet(Options::Key::KeepIntermediateFiles)) {
         QFile preprocessedFile(preprocessedFilename);
         preprocessedFile.remove();
     }
@@ -66,18 +63,17 @@ SedsXmlImporter::import(const Options& options)
     return model;
 }
 
-SymbolDefinitionReader::ExternalReferencesMap
-SedsXmlImporter::readExternalReferences(const Options& options)
+SymbolDefinitionReader::ExternalReferencesMap SedsXmlImporter::readExternalReferences(const Options &options)
 {
     SymbolDefinitionReader::ExternalReferencesMap externalReferences;
 
     // First check if external references should be read from a file
-    if(const auto externalRefFile = options.value(Options::Key::ExternalRefFile); externalRefFile) {
+    if (const auto externalRefFile = options.value(Options::Key::ExternalRefFile); externalRefFile) {
         externalReferences = SymbolDefinitionReader::readSymbols(*externalRefFile);
     }
 
     // External references can be also be declared via options
-    for(const auto& externalReferenceDeclaration : options.values(Options::Key::ExternalRef)) {
+    for (const auto &externalReferenceDeclaration : options.values(Options::Key::ExternalRef)) {
         const auto externalReference = externalReferenceDeclaration.split(':', QString::SkipEmptyParts);
         externalReferences.insert({ externalReference[0], externalReference[1] });
     }
@@ -85,17 +81,16 @@ SedsXmlImporter::readExternalReferences(const Options& options)
     return externalReferences;
 }
 
-QString
-SedsXmlImporter::preprocess(const SymbolDefinitionReader::ExternalReferencesMap& externalReferences,
-                            const Options& options)
+QString SedsXmlImporter::preprocess(
+        const SymbolDefinitionReader::ExternalReferencesMap &externalReferences, const Options &options)
 {
     const auto inputFilename = options.value(Options::Key::InputFile);
-    if(!inputFilename) {
+    if (!inputFilename) {
         throw ImportException("File to import wasn't specified");
     }
 
     const QFileInfo inputFileInfo(*inputFilename);
-    if(!inputFileInfo.exists()) {
+    if (!inputFileInfo.exists()) {
         throw FileNotFound(*inputFilename, "while importing");
     }
 
@@ -103,7 +98,7 @@ SedsXmlImporter::preprocess(const SymbolDefinitionReader::ExternalReferencesMap&
     // Either use name provided in the options or use default `preprocessed_%input%`
     const auto preprocessedFilename = [&]() {
         const auto value = options.value(Options::Key::PreprocessedFile);
-        if(value) {
+        if (value) {
             return *value;
         } else {
             return preprocessedFilenameTemplate.arg(*inputFilename);
@@ -115,12 +110,11 @@ SedsXmlImporter::preprocess(const SymbolDefinitionReader::ExternalReferencesMap&
     return preprocessedFilename;
 }
 
-void
-SedsXmlImporter::validate(const QString& preprocessedFilename, const Options& options)
+void SedsXmlImporter::validate(const QString &preprocessedFilename, const Options &options)
 {
     const auto schemaFilename = [&]() {
         const auto value = options.value(Options::Key::SchemaFile);
-        if(value) {
+        if (value) {
             return *value;
         } else {
             return getSchemaFilename(preprocessedFilename);
@@ -130,11 +124,10 @@ SedsXmlImporter::validate(const QString& preprocessedFilename, const Options& op
     XmlValidator::validate(preprocessedFilename, schemaFilename);
 }
 
-QString
-SedsXmlImporter::getSchemaFilename(const QString& filename)
+QString SedsXmlImporter::getSchemaFilename(const QString &filename)
 {
     QFile file(filename);
-    if(!file.open(QIODevice::ReadWrite)) {
+    if (!file.open(QIODevice::ReadWrite)) {
         throw ImportException(file.errorString());
     }
 
@@ -143,15 +136,14 @@ SedsXmlImporter::getSchemaFilename(const QString& filename)
     xmlReader.readNextStartElement();
 
     const auto attributes = xmlReader.attributes();
-    const auto found = std::find_if(std::begin(attributes), std::end(attributes), [](auto&& attribute) {
-        return attribute.name() == QStringLiteral("schemaLocation");
-    });
+    const auto found = std::find_if(std::begin(attributes), std::end(attributes),
+            [](auto &&attribute) { return attribute.name() == QStringLiteral("schemaLocation"); });
 
-    if(found != std::end(attributes)) {
+    if (found != std::end(attributes)) {
         // xmi:schemaLocation contains url and schema filename separated by space
         const auto schemaLocation = found->value().split(" ", QString::SkipEmptyParts);
 
-        if(schemaLocation.size() != 2) {
+        if (schemaLocation.size() != 2) {
             throw ImportException("xmi:schemaLocation in the validated file is incorrect");
         }
 

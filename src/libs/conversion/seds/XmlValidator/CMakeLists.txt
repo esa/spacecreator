@@ -17,6 +17,6 @@ target_link_libraries(XmlValidator
                 LibXml2::LibXml2
     PUBLIC      Qt5::Core)
 
-# add_format_target(XmlValidator)
+add_format_target(XmlValidator)
 
 add_library(SEDS::XmlValidator ALIAS XmlValidator)

@@ -16,6 +16,6 @@ target_link_libraries(SymbolDefinitionReader
     PRIVATE     Conversion::Converter
     PUBLIC      Qt5::Core)
 
-# add_format_target(SymbolDefinitionReader)
+add_format_target(SymbolDefinitionReader)
 
 add_library(SEDS::SymbolDefinitionReader ALIAS SymbolDefinitionReader)
