@@ -1,0 +1,107 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<PackageFile xmlns="http://www.ccsds.org/schema/sois/seds" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.ccsds.org/schema/sois/seds seds.xsd">
+  <Package name="Interfaces">
+    <DataTypeSet>
+      <IntegerDataType name="DataItem">
+        <LongDescription>A sample data item</LongDescription>
+        <IntegerDataEncoding encoding="unsigned" sizeInBits="8" />
+        <Range>
+          <MinMaxRange rangeType="inclusiveMinInclusiveMax" min="0" max="255" />
+        </Range>
+      </IntegerDataType>
+      <ContainerDataType name="ParentType" abstract="true">
+        <LongDescription>An abstract type to be used as a base type for other types</LongDescription>
+      </ContainerDataType>
+    </DataTypeSet>
+    <DeclaredInterfaceSet>
+      <Interface name="InterfaceWithSynchronousCommands">
+        <LongDescription>Interface with synchronous commands</LongDescription>
+        <CommandSet>
+          <Command name="ExecuteSynchronousAction" mode="sync">
+            <LongDescription>Execute a synchronous action with arguments</LongDescription>
+            <Argument name="InputArg" type="DataItem" mode="in" defaultValue="15" />
+            <Argument name="OutputArg" type="DataItem" mode="out" defaultValue="20" />
+          </Command>
+          <Command name="ExecuteSynchronousActionWithNotification" mode="sync">
+            <LongDescription>Execute a synchronous action with in, out and notify arguments</LongDescription>
+            <Argument name="InputArg" type="DataItem" mode="in" />
+            <Argument name="OutputArg" type="DataItem" mode="out" />
+            <Argument name="NotifyArg" type="DataItem" mode="notify" />
+          </Command>
+          <Command name="ExecuteSynchronousActionWithInOutArg" mode="sync">
+            <LongDescription>Execute a synchronous action with an in/out argument</LongDescription>
+            <Argument name="InOutArg" type="DataItem" mode="inout" />
+          </Command>
+        </CommandSet>
+      </Interface>
+      <Interface name="InterfaceWithAsynchronousCommands">
+        <LongDescription>Interface with asynchronous commands</LongDescription>
+        <CommandSet>
+          <Command name="ExecuteAsynchronousAction" mode="async">
+            <LongDescription>Execute an asynchronous action with input arguments</LongDescription>
+            <Argument name="ArgA" type="DataItem" mode="in" />
+            <Argument name="ArgB" type="DataItem" mode="in" />
+          </Command>
+          <Command name="ExecuteAsynchronousActionWithOutArgs" mode="async">
+            <LongDescription>Execute an asynchronous action with output arguments</LongDescription>
+            <Argument name="ArgA" type="DataItem" mode="out" />
+            <Argument name="ArgB" type="DataItem" mode="out" />
+          </Command>
+          <Command name="ExecuteAsynchronousActionWithNotification" mode="async">
+            <LongDescription>Execute an asynchronous action with output arguments</LongDescription>
+            <Argument name="InputArg" type="DataItem" mode="in" />
+            <Argument name="NotifyArg" type="DataItem" mode="notify" />
+          </Command>
+        </CommandSet>
+      </Interface>
+      <Interface name="InterfaceWithParameters">
+        <LongDescription>Interface with parameters</LongDescription>
+        <ParameterSet>
+          <Parameter name="SynchronousParameter" type="DataItem" mode="sync">
+            <LongDescription>Synchronous parameter</LongDescription>
+          </Parameter>
+          <Parameter name="SynchronousReadOnlyParameter" type="DataItem" mode="sync" readOnly="true">
+            <LongDescription>Synchronous read-only parameter</LongDescription>
+          </Parameter>
+          <Parameter name="AsynchronousParameter" type="DataItem" mode="async">
+            <LongDescription>Asynchronous parameter</LongDescription>
+          </Parameter>
+          <Parameter name="AsynchronousReadOnlyParameter" type="DataItem" mode="async" readOnly="true">
+            <LongDescription>Asynchronous read-only parameter</LongDescription>
+          </Parameter>
+        </ParameterSet>
+      </Interface>
+      <Interface name="DerivedInterface">
+        <LongDescription>An interface which combines (inherits from) multiple base interfaces</LongDescription>
+        <BaseInterfaceSet>
+          <Interface type="InterfaceWithSynchronousCommands" />
+          <Interface type="InterfaceWithAsynchronousCommands" />
+        </BaseInterfaceSet>
+        <CommandSet>
+          <Command name="AdditionalCommand" mode="sync">
+            <LongDescription>An additional command to be included in the derived interface</LongDescription>
+            <Argument name="DummyArg" type="DataItem" mode="inout" />
+          </Command>
+        </CommandSet>
+      </Interface>
+      <Interface name="InterfaceWithGenericTypeSet">
+        <LongDescription>An interface with a GenericTypeSet</LongDescription>
+        <GenericTypeSet>
+          <GenericType name="PurelyAbstractType" />
+          <GenericType name="AbstractTypeWithABaseType" baseType="ParentType" />
+        </GenericTypeSet>
+        <ParameterSet>
+          <Parameter name="ParameterOfAnAbstractType" type="PurelyAbstractType" mode="sync">
+            <LongDescription>Parameter of an abstract type</LongDescription>
+          </Parameter>
+        </ParameterSet>
+        <CommandSet>
+          <Command name="CommandWithAnAbstractType" mode="async">
+            <LongDescription>Command with an argument of an abstract type</LongDescription>
+            <Argument name="ArgumentWithAnAbstractType" type="AbstractTypeWithABaseType" mode="in" />
+          </Command>
+        </CommandSet>
+      </Interface>
+    </DeclaredInterfaceSet>
+  </Package>
+</PackageFile>

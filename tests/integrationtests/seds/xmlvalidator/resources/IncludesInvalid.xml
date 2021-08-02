@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<DataSheet xmlns="http://www.ccsds.org/schema/sois/seds" xmlns:xi="http://www.w3.org/2001/XInclude" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.ccsds.org/schema/sois/seds seds.xsd">
+ <Device name="ExampleDevice"/>
+ <xi:include href="SomeInvalidData.xml" xpointer="element(/1/1)"/>
+</DataSheet>

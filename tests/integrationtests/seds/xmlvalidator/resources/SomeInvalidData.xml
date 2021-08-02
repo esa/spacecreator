@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<PackageFile xmlns="http://www.ccsds.org/schema/sois/seds"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.ccsds.org/schema/sois/seds ../schema/seds.xsd">
+    <GuruMeditation name="SomePackage">
+        <DataTypeSet>
+            <IntegerDataType name="Octet">
+                <IntegerDataEncoding encoding="unsigned" sizeInBits="8"/>
+                <Range>
+                    <MinMaxRange min="0" max="255" rangeType="inclusiveMinInclusiveMax" />
+                </Range>
+            </IntegerDataType>
+        </DataTypeSet>
+    </GuruMeditation>
+</PackageFile>

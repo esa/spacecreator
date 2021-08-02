@@ -1,0 +1,288 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<PackageFile xmlns="http://www.ccsds.org/schema/sois/seds" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.ccsds.org/schema/sois/seds seds.xsd">
+  <Package name="Components">
+    <LongDescription>Package containing a set of example components</LongDescription>
+    <ComponentSet>
+      <Component name="SampleComponent">
+        <LongDescription>Sample component</LongDescription>
+        <ProvidedInterfaceSet>
+          <Interface name="OutputInterface" type="DataInterface">
+            <LongDescription>An output, provided interface, with AlternateSet.</LongDescription>
+            <GenericTypeMapSet>
+              <AlternateSet>
+                <Alternate>
+                  <GenericTypeMap fixedValue="1" name="Id" type="Id" />
+                  <GenericTypeMap name="AbstractType" type="DataItem" />
+                </Alternate>
+                <Alternate>
+                  <GenericTypeMap fixedValue="2" name="Id" type="Id" />
+                  <GenericTypeMap name="AbstractType" type="StringDataItem" />
+                </Alternate>
+              </AlternateSet>
+            </GenericTypeMapSet>
+          </Interface>
+        </ProvidedInterfaceSet>
+        <RequiredInterfaceSet>
+          <Interface name="InputInterface" type="DataInterface">
+            <LongDescription>An input, required interface, with GenericTypeMap.</LongDescription>
+            <GenericTypeMapSet>
+              <GenericTypeMap name="AbstractType" type="DataItem" />
+            </GenericTypeMapSet>
+          </Interface>
+        </RequiredInterfaceSet>
+        <DataTypeSet>
+          <IntegerDataType name="DataItem">
+            <LongDescription>Example data item</LongDescription>
+            <IntegerDataEncoding sizeInBits="8" encoding="unsigned" />
+            <Range>
+              <MinMaxRange rangeType="inclusiveMinInclusiveMax" min="0" max="255" />
+            </Range>
+          </IntegerDataType>
+          <IntegerDataType name="Id">
+            <LongDescription>Example id</LongDescription>
+            <IntegerDataEncoding encoding="unsigned" sizeInBits="4" />
+            <Range>
+              <MinMaxRange rangeType="greaterThan" min="0" />
+            </Range>
+          </IntegerDataType>
+          <StringDataType name="StringDataItem" length="16">
+            <LongDescription>Example string data item</LongDescription>
+            <StringDataEncoding encoding="ASCII" />
+          </StringDataType>
+        </DataTypeSet>
+        <DeclaredInterfaceSet>
+          <Interface name="DataInterface">
+            <GenericTypeSet>
+              <GenericType name="AbstractType" />
+            </GenericTypeSet>
+            <ParameterSet>
+              <Parameter name="SyncInterfaceParameter" type="DataItem" mode="sync" />
+              <Parameter name="AsyncInterfaceParameter" type="DataItem" mode="async" />
+              <Parameter name="MappableInterfaceParameterA" type="DataItem" mode="async" />
+            </ParameterSet>
+            <CommandSet>
+              <Command name="SampleCommand">
+                <Argument name="Id" mode="in" type="Id" />
+                <Argument name="InputArgument" mode="in" type="AbstractType" />
+                <Argument name="OutputArgument" mode="out" type="AbstractType" />
+              </Command>
+            </CommandSet>
+          </Interface>
+        </DeclaredInterfaceSet>
+        <Implementation>
+          <VariableSet>
+            <Variable name="VariableA" type="DataItem">
+              <LongDescription>Simple variable</LongDescription>
+            </Variable>
+            <Variable name="VariableB" type="DataItem">
+              <LongDescription>Variable with additional range override</LongDescription>
+              <ValidRange>
+                <MinMaxRange rangeType="lessThan" max="32" />
+              </ValidRange>
+            </Variable>
+            <Variable name="ArrayA" type="DataItem">
+              <LongDescription>An array variable</LongDescription>
+              <ArrayDimensions>
+                <Dimension size="32" />
+              </ArrayDimensions>
+            </Variable>
+            <Variable name="Iterator" type="DataItem">
+              <LongDescription>Variable used as an iterator in activities</LongDescription>
+            </Variable>
+            <Variable name="Tmp1" type="DataItem" />
+            <Variable name="Tmp2" type="DataItem" />
+            <Variable name="Tmp3" type="DataItem" />
+          </VariableSet>
+          <ParameterMapSet>
+            <ParameterMap interface="OutputInterface" parameter="SyncInterfaceParameter" variableRef="VariableA" />
+            <ParameterMap interface="OutputInterface" parameter="AsyncInterfaceParameter" variableRef="VariableA" />
+          </ParameterMapSet>
+          <ParameterActivityMapSet>
+            <ParameterActivityMap>
+              <Provided name="MapDataOutput" interface="OutputInterface" parameter="MappableInterfaceParameterA"></Provided>
+              <Required name="MapDataInput" interface="InputInterface" parameter="MappableInterfaceParameterA" />
+              <GetActivity>
+                <Calibration inputVariableRef="MapDataInput" outputVariableRef="MapDataOutput">
+                  <LongDescription>Translation between input and output parameter data</LongDescription>
+                  <PolynomialCalibrator>
+                    <Term coefficient="2" exponent="0" />
+                    <Term coefficient="4" exponent="1" />
+                  </PolynomialCalibrator>
+                </Calibration>
+              </GetActivity>
+            </ParameterActivityMap>
+          </ParameterActivityMapSet>
+          <ActivitySet>
+            <Activity name="AssignVariableA">
+              <Argument name="x" type="DataItem" />
+              <Body>
+                <Assignment outputVariableRef="VariableA">
+                  <VariableRef variableRef="x" />
+                </Assignment>
+              </Body>
+            </Activity>
+            <Activity name="SendSampleCommand">
+              <Body>
+                <SendCommandPrimitive interface="InputInterface" command="SampleCommand">
+                  <ArgumentValue name="Id">
+                    <Value value="1" />
+                  </ArgumentValue>
+                  <ArgumentValue name="InputArgument">
+                    <Value value="64"></Value>
+                  </ArgumentValue>
+                  <ArgumentValue name="OutputArgument">
+                    <VariableRef variableRef="VariableA" />
+                  </ArgumentValue>
+                </SendCommandPrimitive>
+              </Body>
+            </Activity>
+            <Activity name="GetParameterValueAndSaveInVariableA">
+              <Body>
+                <SendParameterPrimitive interface="InputInterface" parameter="AsyncInterfaceParameter" operation="get">
+                  <ArgumentValue>
+                    <VariableRef variableRef="VariableA" />
+                  </ArgumentValue>
+                </SendParameterPrimitive>
+              </Body>
+            </Activity>
+            <Activity name="SetParameterValue">
+              <Body>
+                <SendParameterPrimitive interface="InputInterface" parameter="AsyncInterfaceParameter" operation="set">
+                  <ArgumentValue>
+                    <Value value="7" />
+                  </ArgumentValue>
+                </SendParameterPrimitive>
+              </Body>
+            </Activity>
+            <Activity name="DoMathAndSaveInVariableA">
+              <Argument name="x" type="DataItem" />
+              <Argument name="y" type="DataItem" />
+              <Body>
+                <Iteration iteratorVariableRef="Iterator">
+                  <StartAt>
+                    <Value value="0"></Value>
+                  </StartAt>
+                  <Step>
+                    <Value value="2"></Value>
+                  </Step>
+                  <EndAt>
+                    <VariableRef variableRef="y"></VariableRef>
+                  </EndAt>
+                  <Do>
+                    <Calibration inputVariableRef="x" outputVariableRef="x">
+                      <SplineCalibrator>
+                        <SplinePoint raw="10" calibrated="12" />
+                        <SplinePoint raw="20" calibrated="15" />
+                        <SplinePoint raw="50" calibrated="64" />
+                      </SplineCalibrator>
+                    </Calibration>
+                  </Do>
+                </Iteration>
+                <MathOperation outputVariableRef="VariableA">
+                  <Operator operator="cos" />
+                  <VariableRef variableRef="x" />
+                </MathOperation>
+              </Body>
+            </Activity>
+            <Activity name="DoOperationConditionally">
+              <Argument name="DecisionParameter" type="DataItem" />
+              <Body>
+                <Conditional>
+                  <Condition>
+                    <ORedConditions>
+                      <Condition>
+                        <FirstOperand variableRef="DecisionParameter" />
+                        <ComparisonOperator>equals</ComparisonOperator>
+                        <Value value="1" />
+                      </Condition>
+                      <ANDedConditions>
+                          <Condition>
+                            <FirstOperand variableRef="DecisionParameter" />
+                            <ComparisonOperator>equals</ComparisonOperator>
+                            <Value value="2" />
+                          </Condition>
+                          <TypeCondition>
+                            <FirstOperand variableRef="DecisionParameter"/>
+                            <TypeOperand>DataItem</TypeOperand>
+                          </TypeCondition>
+                      </ANDedConditions>
+                    </ORedConditions>
+                  </Condition>
+                  <OnConditionTrue>
+                    <Call activity="AssignVariableA">
+                      <ArgumentValue name="x">
+                        <Value value="12" />
+                      </ArgumentValue>
+                    </Call>
+                  </OnConditionTrue>
+                  <OnConditionFalse>
+                    <Iteration iteratorVariableRef="Iterator">
+                      <OverArray>ArrayA</OverArray>
+                      <Do>
+                        <Call activity="SendSampleCommand">
+                          <ArgumentValue name="Id">
+                            <Value value="12" />
+                          </ArgumentValue>
+                          <ArgumentValue name="InputArgument">
+                            <VariableRef variableRef="Iterator" />
+                          </ArgumentValue>
+                          <ArgumentValue name="OutputArgument">
+                            <VariableRef variableRef="VariableA" />
+                          </ArgumentValue>
+                        </Call>
+                      </Do>
+                    </Iteration>
+                  </OnConditionFalse>
+                </Conditional>
+              </Body>
+            </Activity>
+          </ActivitySet>
+          <StateMachineSet>
+            <StateMachine name="SampleStateMachine">
+              <EntryState name="Entry" />
+              <ExitState name="Exit" />
+              <State name="Other">
+                <OnEntry activity="AssignVariableA">
+                  <ArgumentValue name="x">
+                    <Value value="10" />
+                  </ArgumentValue>
+                </OnEntry>
+                <OnExit activity="AssignVariableA">
+                  <ArgumentValue name="x">
+                    <VariableRef variableRef="VariableB" />
+                  </ArgumentValue>
+                </OnExit>
+              </State>
+              <Transition fromState="Entry" toState="Other" name="Transition1">
+                <OnTimer nanosecondsAfterEntry="1000000" />
+              </Transition>
+              <Transition fromState="Other" toState="Exit" name="Transition2">
+                <OnCommandPrimitive interface="OutputInterface" command="SampleCommand">
+                  <ArgumentValue name="Id" outputVariableRef="Tmp1" />
+                  <ArgumentValue name="InputArgument" outputVariableRef="Tmp2" />
+                  <ArgumentValue name="OutputArgument" outputVariableRef="Tmp3" />
+                </OnCommandPrimitive>
+                <Guard>
+                  <Condition>
+                    <FirstOperand variableRef="VariableA" />
+                    <ComparisonOperator>greaterThanEquals</ComparisonOperator>
+                    <SecondOperand variableRef="VariableB" />
+                  </Condition>
+                </Guard>
+                <Do activity="DoOperationConditionally">
+                  <ArgumentValue name="DecisionParameter">
+                    <VariableRef variableRef="Tmp1" />
+                  </ArgumentValue>
+                </Do>
+              </Transition>
+              <Transition name="Transition3" fromState="Other" toState="Other">
+                <OnParameterPrimitive interface="OutputInterface" parameter="AsyncInterfaceParameter" operation="set" />
+                <Do activity="SetParameterValue" />
+              </Transition>
+            </StateMachine>
+          </StateMachineSet>
+        </Implementation>
+      </Component>
+    </ComponentSet>
+  </Package>
+</PackageFile>

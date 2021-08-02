@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PackageFile xmlns="http://www.ccsds.org/schema/sois/seds" xmlns:xi="http://www.w3.org/2001/XInclude" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.ccsds.org/schema/sois/seds seds.xsd">
+  <Package name="ExamplePackage">
+    <DataTypeSet>
+      <IntegerDataType name="${integer.name}">
+        <LongDescription>${long_description}</LongDescription>
+        <IntegerDataEncoding encoding="unsigned" sizeInBits="8" />
+        <Range>
+          <MinMaxRange rangeType="inclusiveMinInclusiveMax" min="0" max="255" />
+        </Range>
+      </IntegerDataType>
+    </DataTypeSet>
+  </Package>
+</PackageFile>

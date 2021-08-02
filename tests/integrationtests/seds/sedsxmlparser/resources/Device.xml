@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<DataSheet xmlns="http://www.ccsds.org/schema/sois/seds" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.ccsds.org/schema/sois/seds seds.xsd">
+    <Device name="ExampleDevice">
+        <Metadata>
+            <MetadataValueSet>
+                <DateValue name="DateValue" value="2021-06-07"/>
+                <FloatValue name="FloatValue" value="3.14"/>
+                <IntegerValue name="IntegerValue" value="42"/>
+                <StringValue name="StringValue" value="Important String"/>
+            </MetadataValueSet>
+            <Category name="RootCategory">
+                <MetadataValueSet>
+                    <IntegerValue name="RootCategoryValue1" value="1"/>
+                    <IntegerValue name="RootCategoryValue2" value="2"/>
+                 </MetadataValueSet>
+                 <Category name="SubCategory">
+                     <MetadataValueSet>
+                         <FloatValue name="SubCategoryValue1" value="1.1"/>
+                         <FloatValue name="SubCategoryValue2" value="2.2"/>
+                      </MetadataValueSet>
+                 </Category>
+            </Category>
+            <Category name="OtherCategory">
+                <MetadataValueSet>
+                    <IntegerValue name="OtherCategoryValue1" value="3"/>
+                    <IntegerValue name="OtherCategoryValue2" value="4"/>
+                </MetadataValueSet>
+            </Category>
+        </Metadata>
+    </Device>
+    <Package name="ExamplePackage">
+    </Package>
+</DataSheet>
