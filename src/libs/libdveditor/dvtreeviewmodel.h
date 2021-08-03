@@ -41,6 +41,9 @@ public:
 protected:
     void updateItemData(QStandardItem *item, shared::VEObject *object) override;
     QStandardItem *createItem(shared::VEObject *obj) override;
+
+private Q_SLOTS:
+    void onDataChanged(const QModelIndex &topLeft, const QModelIndex &bottomRight, const QVector<int> &roles);
 };
 
 } // namespace dve

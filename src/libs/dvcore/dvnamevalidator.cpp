@@ -39,4 +39,33 @@ QString DVNameValidator::nameForObject(const DVObject *object, DVModel *model, c
     return name;
 }
 
+QString DVNameValidator::encodeName(const DVObject::Type t, const QString &name)
+{
+    Q_UNUSED(t)
+
+    QString result;
+    std::transform(name.cbegin(), name.cend(), std::back_inserter(result),
+            [](const QChar &ch) { return ch.isLetterOrNumber() ? ch : QLatin1Char('_'); });
+    return result;
+}
+
+QString DVNameValidator::decodeName(const DVObject::Type t, const QString &name)
+{
+    Q_UNUSED(t)
+
+    QString result;
+    std::transform(name.cbegin(), name.cend(), std::back_inserter(result),
+            [](const QChar &ch) { return ch.isLetterOrNumber() ? ch : QLatin1Char(' '); });
+    return result;
+}
+
+bool DVNameValidator::isAcceptableName(const DVObject *object, const QString &name, DVModel *model)
+{
+    DVModel *dvModel = model ? model : object->model();
+    if (!dvModel) {
+        return shared::isValidName(name);
+    }
+    return dvModel->getObjectByName(name, object->type(), Qt::CaseInsensitive) == nullptr;
+}
+
 } // namespace dvm

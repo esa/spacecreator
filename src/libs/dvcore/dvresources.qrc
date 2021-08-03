@@ -1,6 +1,5 @@
 <RCC>
     <qresource prefix="/defaults">
-        <file>resources/forbidden_names.txt</file>
         <file>resources/dv_system_attributes.xml</file>
         <file>resources/dv_custom_attributes.xml</file>
     </qresource>

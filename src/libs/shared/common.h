@@ -138,6 +138,16 @@ QString deploymentCustomAttributesFilePath();
  */
 QString hwLibraryPath();
 
+/*!
+    Returns ths set of words couldn't be used as entity name
+ */
+QSet<QString> forbiddenNamesSet();
+
+/*!
+   Returns is the given \p name is usable as name in general.
+ */
+bool isValidName(const QString &name);
+
 }
 
 Q_DECLARE_METATYPE(shared::Id)

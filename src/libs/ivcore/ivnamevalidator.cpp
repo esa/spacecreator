@@ -126,56 +126,12 @@ QString IVNameValidator::decodeName(const IVObject::Type t, const QString &name)
 }
 
 /*!
-    Returns ths set of words couldn't be used as entity name
- */
-static inline QSet<QString> forbiddenNamesSet()
-{
-    static const QString kFilePath = QStandardPaths::writableLocation(QStandardPaths::AppLocalDataLocation)
-            + QDir::separator() + QLatin1String("forbidden_names.txt");
-    static const QString kDefaultPath = QLatin1String(":/defaults/resources/forbidden_names.txt");
-    if (shared::ensureFileExists(kFilePath, kDefaultPath)) {
-        QFile f(kFilePath);
-        if (!f.open(QIODevice::ReadOnly | QIODevice::Text)) {
-            qWarning() << "Can't open file:" << kFilePath << f.errorString();
-            return {};
-        }
-        QSet<QString> names;
-        QTextStream stream(&f);
-        QString line;
-        while (stream.readLineInto(&line)) {
-            names << line.trimmed();
-        }
-        return names;
-    }
-    return {};
-}
-
-/*!
-   Returns is the given \p name is usable as name in general.
- */
-bool IVNameValidator::isValidName(const QString &name)
-{
-    if (name.isEmpty()) {
-        return false;
-    }
-
-    static const QSet<QString> reservedWords = forbiddenNamesSet();
-    if (reservedWords.contains(name.trimmed())) {
-        return false;
-    }
-
-    static QRegularExpression re(shared::namePatternUI);
-    QRegularExpressionMatch match = re.match(name);
-    return match.hasMatch();
-}
-
-/*!
    Check if the name can be used for that object.
    It checks if the name is usable at all, and if the names is used already by another relevant object
  */
 bool IVNameValidator::isAcceptableName(const IVObject *object, const QString &name)
 {
-    if (!object || !isValidName(name)) {
+    if (!object || !shared::isValidName(name)) {
         return false;
     }
 

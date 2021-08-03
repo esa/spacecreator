@@ -25,6 +25,7 @@
 #include <QFile>
 #include <QFileInfo>
 #include <QPalette>
+#include <QRegularExpressionMatch>
 #include <QStandardPaths>
 #include <QWidget>
 
@@ -217,6 +218,44 @@ QString hwLibraryPath()
     QString hwFile = shared::SettingsManager::load<QString>(shared::SettingsManager::DVE::HwLibraryFile, kDefaultPath);
 
     return qEnvironmentVariable("TASTE_DEPLOYMENT_HW_PATH", hwFile);
+}
+
+QSet<QString> forbiddenNamesSet()
+{
+    static const QString kFilePath = QStandardPaths::writableLocation(QStandardPaths::AppLocalDataLocation)
+            + QDir::separator() + QLatin1String("forbidden_names.txt");
+    static const QString kDefaultPath = QLatin1String(":/defaults/forbidden_names.txt");
+    if (shared::ensureFileExists(kFilePath, kDefaultPath)) {
+        QFile f(kFilePath);
+        if (!f.open(QIODevice::ReadOnly | QIODevice::Text)) {
+            qWarning() << "Can't open file:" << kFilePath << f.errorString();
+            return {};
+        }
+        QSet<QString> names;
+        QTextStream stream(&f);
+        QString line;
+        while (stream.readLineInto(&line)) {
+            names << line.trimmed();
+        }
+        return names;
+    }
+    return {};
+}
+
+bool isValidName(const QString &name)
+{
+    if (name.isEmpty()) {
+        return false;
+    }
+
+    static const QSet<QString> reservedWords = shared::forbiddenNamesSet();
+    if (reservedWords.contains(name.trimmed())) {
+        return false;
+    }
+
+    static QRegularExpression re(shared::namePatternUI);
+    QRegularExpressionMatch match = re.match(name);
+    return match.hasMatch();
 }
 
 }

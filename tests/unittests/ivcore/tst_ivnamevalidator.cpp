@@ -18,6 +18,7 @@
 #include "ivfunction.h"
 #include "ivlibrary.h"
 #include "ivnamevalidator.h"
+#include "sharedlibrary.h"
 
 #include <QStandardPaths>
 #include <QTest>
@@ -35,6 +36,7 @@ private Q_SLOTS:
 void tst_IVNameValidator::initTestCase()
 {
     QStandardPaths::setTestModeEnabled(true);
+    shared::initSharedLibrary();
     ivm::initIVLibrary();
 }
 
@@ -63,7 +65,7 @@ void tst_IVNameValidator::test_functionName()
     QFETCH(QString, name);
     QFETCH(bool, expectedResult);
 
-    const bool ok = ivm::IVNameValidator::isValidName(name);
+    const bool ok = shared::isValidName(name);
     QCOMPARE(ok, expectedResult);
 }
 

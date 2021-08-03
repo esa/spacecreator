@@ -18,12 +18,16 @@
 #include "dvtreeviewmodel.h"
 
 #include "dvmodel.h"
+#include "commands/cmdentityattributechange.h"
+#include "commandsstackbase.h"
+#include "dvnamevalidator.h"
 
 namespace dve {
 
 DVTreeViewModel::DVTreeViewModel(dvm::DVModel *dvModel, shared::cmd::CommandsStackBase *commandsStack, QObject *parent)
     : shared::AbstractVisualizationModel(dvModel, commandsStack, parent)
 {
+    connect(this, &QStandardItemModel::dataChanged, this, &DVTreeViewModel::onDataChanged);
 }
 
 void DVTreeViewModel::updateItemData(QStandardItem *item, shared::VEObject *object)
@@ -69,8 +73,47 @@ void DVTreeViewModel::updateItemData(QStandardItem *item, shared::VEObject *obje
 QStandardItem *DVTreeViewModel::createItem(shared::VEObject *obj)
 {
     QStandardItem *item = shared::AbstractVisualizationModel::createItem(obj);
+    connect(obj, &shared::VEObject::attributeChanged, this, [this](const QString &attrName){
+        if (attrName == dvm::meta::Props::token(dvm::meta::Props::Token::name)) {
+            updateItem();
+        }
+    });
     updateItemData(item, obj);
     return item;
 }
+
+void DVTreeViewModel::onDataChanged(const QModelIndex &topLeft, const QModelIndex &bottomRight, const QVector<int> &roles)
+{
+    if (!m_commandsStack) {
+        return;
+    }
+
+    const QStandardItem *firstItem = itemFromIndex(topLeft);
+    const QStandardItem *lastItem = itemFromIndex(bottomRight);
+    Q_ASSERT(firstItem->parent() == lastItem->parent());
+    for (int row = firstItem->row(); row <= lastItem->row(); ++row) {
+        const QStandardItem *parent = firstItem->parent() ? firstItem->parent() : invisibleRootItem();
+        if (auto item = parent->child(row)) {
+            if (roles.contains(Qt::DisplayRole) || roles.isEmpty()) {
+                const shared::Id id = item->data(IdRole).toUuid();
+                if (auto obj = m_veModel->getObject(id)->as<dvm::DVObject *>()) {
+                    const QString name = dvm::DVNameValidator::encodeName(obj->type(), item->text());
+                    if (name != obj->title()) {
+                        if (dvm::DVNameValidator::isAcceptableName(obj, name)) {
+                            const QVariantHash attributes = {
+                                { dvm::meta::Props::token(dvm::meta::Props::Token::name), name }
+                            };
+                            auto attributesCmd = new shared::cmd::CmdEntityAttributeChange(obj, attributes);
+                            m_commandsStack->push(attributesCmd);
+                        } else {
+                            item->setData(obj->titleUI(), Qt::DisplayRole);
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
+
 
 } // namespace dve

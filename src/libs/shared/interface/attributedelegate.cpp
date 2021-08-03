@@ -71,7 +71,28 @@ static void setConfiguredEditorData(QWidget *editor, const QVariant &displayValu
     }
 }
 
-static QWidget *createConfiguredEditor(
+template <typename T>
+inline void connectCommitData(T *editor, QAbstractItemDelegate *context) {
+    QObject::connect(editor, &T::editingFinished, context, [context, editor](){
+        context->commitData(editor);
+    });
+}
+
+template <>
+inline void connectCommitData(QCheckBox *editor, QAbstractItemDelegate *context) {
+    QObject::connect(editor, &QCheckBox::stateChanged, context, [context, editor](){
+        context->commitData(editor);
+    });
+}
+
+template <>
+inline void connectCommitData(QComboBox *editor, QAbstractItemDelegate *context) {
+    QObject::connect(editor, &QComboBox::currentTextChanged, context, [context, editor](){
+        context->commitData(editor);
+    });
+}
+
+static QWidget *createConfiguredEditor(QAbstractItemDelegate *context,
         const QString &attribute, const QVariant &editValue, const QVariant &validator, QWidget *parent)
 {
     if (!editValue.isValid())
@@ -81,6 +102,7 @@ static QWidget *createConfiguredEditor(
     switch (editValue.type()) {
     case QVariant::Int: {
         auto spinBox = new QSpinBox(parent);
+        connectCommitData(spinBox, context);
         if (!validator.isNull() && validator.canConvert<QPair<int, int>>()) {
             const auto limits = validator.value<QPair<int, int>>();
             spinBox->setMinimum(limits.first);
@@ -91,6 +113,7 @@ static QWidget *createConfiguredEditor(
     }
     case QVariant::String: {
         auto lineEdit = new QLineEdit(parent);
+        connectCommitData(lineEdit, context);
         QRegularExpression re;
         if (!validator.isNull() && validator.canConvert<QString>()) {
             re.setPattern(validator.toString());
@@ -101,6 +124,7 @@ static QWidget *createConfiguredEditor(
     }
     case QVariant::Double: {
         auto doubleSpinBox = new QDoubleSpinBox(parent);
+        connectCommitData(doubleSpinBox, context);
         if (!validator.isNull() && validator.canConvert<QPair<qreal, qreal>>()) {
             const auto limits = validator.value<QPair<qreal, qreal>>();
             doubleSpinBox->setMinimum(limits.first);
@@ -110,11 +134,14 @@ static QWidget *createConfiguredEditor(
         break;
     }
     case QVariant::Bool: {
-        editor = new QCheckBox(parent);
+        auto checkbox = new QCheckBox(parent);
+        connectCommitData(checkbox, context);
+        editor = checkbox;
         break;
     }
     case QVariant::StringList: {
         auto comboBox = new QComboBox(parent);
+        connectCommitData(comboBox, context);
         comboBox->addItems(editValue.toStringList());
         editor = comboBox;
         break;
@@ -133,7 +160,7 @@ QWidget *AttributeDelegate::createEditor(
         QWidget *parent, const QStyleOptionViewItem &option, const QModelIndex &index) const
 {
     if (index.isValid()) {
-        QWidget *editor = createConfiguredEditor(PropertiesListModel::tokenNameFromIndex(index),
+        QWidget *editor = createConfiguredEditor(const_cast<AttributeDelegate *>(this), PropertiesListModel::tokenNameFromIndex(index),
                 index.data(PropertiesListModel::EditRole), index.data(PropertiesListModel::ValidatorRole), parent);
         if (editor) {
             editor->setEnabled(index.flags().testFlag(Qt::ItemIsEnabled));
