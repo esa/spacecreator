@@ -1,19 +1,19 @@
 /****************************************************************************
 **
-** Copyright (C) 2017-2019 N7 Space sp. z o. o.
+** Copyright (C) 2017-2021 N7 Space sp. z o. o.
 ** Contact: http://n7space.com
 **
-** This file is part of ASN.1/ACN Plugin for QtCreator.
+** This file is part of ASN.1/ACN Library.
 **
-** Plugin was developed under a program and funded by
+** Library was developed under a programme and funded by
 ** European Space Agency.
 **
-** This Plugin is free software: you can redistribute it and/or modify
+** This Library is free software: you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
 ** the Free Software Foundation, either version 3 of the License, or
 ** (at your option) any later version.
 **
-** This Plugin is distributed in the hope that it will be useful,
+** This Library is distributed in the hope that it will be useful,
 ** but WITHOUT ANY WARRANTY; without even the implied warranty of
 ** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 ** GNU General Public License for more details.
@@ -22,20 +22,24 @@
 ** along with this program.  If not, see <http://www.gnu.org/licenses/>.
 **
 ****************************************************************************/
-#include "typereference.h"
 
-#include "visitor.h"
+#include "singlevalue.h"
 
 using namespace Asn1Acn;
 
-TypeReference::TypeReference(const SourceLocation &location)
-    : m_location(location)
+SingleValue::SingleValue(const QString &value, std::function<QString(const QString &)> printer)
+    : m_value(value)
+    , m_printer(printer)
+{}
+
+QString SingleValue::asString() const
 {
+    if (m_printer)
+        return m_printer(m_value);
+    return m_value;
 }
 
-TypeReference::TypeReference(const QString &name, const QString &module, const SourceLocation &location)
-    : TypeReference(location)
+ValuePtr SingleValue::clone() const
 {
-    m_name = name;
-    m_module = module;
+    return std::make_unique<SingleValue>(*this);
 }

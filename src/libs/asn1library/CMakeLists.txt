@@ -16,6 +16,12 @@ target_sources(${LIB_NAME} PRIVATE
     astxmlparser.h
     asn1/acnargument.h
     asn1/acnparameter.h
+    asn1/acnsequencecomponent.cpp
+    asn1/acnsequencecomponent.h
+    asn1/asnsequencecomponent.cpp
+    asn1/asnsequencecomponent.h
+    asn1/choicevalue.cpp
+    asn1/choicevalue.h
     asn1/definitions.cpp
     asn1/definitions.h
     asn1/errormessage.h
@@ -23,21 +29,27 @@ target_sources(${LIB_NAME} PRIVATE
     asn1/file.h
     asn1/importedtype.h
     asn1/importedvalue.h
+    asn1/multiplevalue.cpp
+    asn1/multiplevalue.h
     asn1/mutatingvisitor.h
     asn1/mutatingvisitor.cpp
+    asn1/namedvalue.cpp
+    asn1/namedvalue.h
     asn1/node.cpp
     asn1/node.h
     asn1/project.cpp
     asn1/project.h
     asn1/range.h
+    asn1/rangelist.h
     asn1/root.cpp
     asn1/root.h
     asn1/sequencecomponent.h
+    asn1/singlevalue.cpp
+    asn1/singlevalue.h
     asn1/sourcelocation.cpp
     asn1/sourcelocation.h
     asn1/typeassignment.cpp
     asn1/typeassignment.h
-    asn1/typereference.cpp
     asn1/typereference.h
     asn1/constraints/constraint.h
     asn1/constraints/constraintlist.h
@@ -88,6 +100,7 @@ target_sources(${LIB_NAME} PRIVATE
     asn1/types/typemutatingvisitor.cpp
     asn1/types/typemutatingvisitor.h
     asn1/types/typereadingvisitor.h
+    asn1/types/typevisitorwithvalue.h
     asn1/types/userdefinedtype.cpp
     asn1/types/userdefinedtype.h
     asn1/value.h
