@@ -128,16 +128,21 @@ bool DVMessageBindingsModel::setData(const QModelIndex &index, const QVariant &v
         if ((Qt::CheckState)value.toInt() == Qt::Checked) {
             auto cmd = new cmd::CmdMessageEntityCreate(
                     m_connection, item.m_fromFunction, item.m_fromInterface, item.m_toFunction, item.m_toInterface);
-            m_cmdMacro->push(cmd);
+            if (m_cmdMacro->push(cmd)) {
+                Q_EMIT dataChanged(index, index, { Qt::CheckStateRole });
+                return true;
+            }
         } else {
             dvm::DVMessage *message = m_connection->message(
                     item.m_fromFunction, item.m_fromInterface, item.m_toFunction, item.m_toInterface);
             if (message) {
                 auto cmd = new cmd::CmdEntitiesRemove({ message }, message->model());
-                m_cmdMacro->push(cmd);
+                if (m_cmdMacro->push(cmd)) {
+                    Q_EMIT dataChanged(index, index, { Qt::CheckStateRole });
+                    return true;
+                }
             }
         }
-        return true;
     }
     return false;
 }

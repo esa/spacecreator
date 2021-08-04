@@ -20,6 +20,7 @@
 #include "dvconnection.h"
 #include "dvmessagebindingsmodel.h"
 
+#include <QPushButton>
 #include <QTreeView>
 #include <QVBoxLayout>
 
@@ -35,6 +36,18 @@ DVMessageBindingsWidget::DVMessageBindingsWidget(shared::cmd::CommandsStackBase:
     m_treeView = new QTreeView(this);
     m_treeView->setHeaderHidden(true);
     layout->addWidget(m_treeView);
+
+    auto btnsLayout = new QHBoxLayout;
+    btnsLayout->addSpacerItem(new QSpacerItem(10, 10, QSizePolicy::Expanding, QSizePolicy::Fixed));
+
+    auto button = new QPushButton(tr("Bind all"));
+    connect(button, &QPushButton::pressed, this, &DVMessageBindingsWidget::bindAll);
+    btnsLayout->addWidget(button);
+
+    button = new QPushButton(tr("Unbind all"));
+    connect(button, &QPushButton::pressed, this, &DVMessageBindingsWidget::unbindAll);
+    btnsLayout->addWidget(button);
+    layout->addLayout(btnsLayout);
 }
 
 void DVMessageBindingsWidget::initModel(dvm::DVConnection *connection, AbstractSystemChecks *systemChecker)
@@ -46,6 +59,24 @@ void DVMessageBindingsWidget::initModel(dvm::DVConnection *connection, AbstractS
     }
     m_connection = connection;
     m_model->initModel(m_connection, systemChecker);
+}
+
+void DVMessageBindingsWidget::bindAll()
+{
+    setMessagesChecked(true);
+}
+
+void DVMessageBindingsWidget::unbindAll()
+{
+    setMessagesChecked(false);
+}
+
+void DVMessageBindingsWidget::setMessagesChecked(bool value)
+{
+    for (int idx = 0; idx < m_model->rowCount(QModelIndex()); ++idx) {
+        m_model->setData(
+                m_model->index(idx), value ? Qt::CheckState::Checked : Qt::CheckState::Unchecked, Qt::CheckStateRole);
+    }
 }
 
 } // namespace dve

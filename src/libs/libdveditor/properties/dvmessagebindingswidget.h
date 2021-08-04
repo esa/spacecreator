@@ -40,6 +40,13 @@ public:
 
     void initModel(dvm::DVConnection *connection, AbstractSystemChecks *systemChecker);
 
+private Q_SLOTS:
+    void bindAll();
+    void unbindAll();
+
+private:
+    void setMessagesChecked(bool value);
+
 private:
     QTreeView *m_treeView = nullptr;
     DVMessageBindingsModel *m_model = nullptr;
