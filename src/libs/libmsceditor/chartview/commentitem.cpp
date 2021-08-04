@@ -62,6 +62,7 @@ CommentItem::CommentItem(MscChart *chart, ChartLayoutManager *chartLayoutManager
     m_textItem->setBackground(Qt::transparent);
     m_textItem->setTextAlignment(Qt::AlignCenter);
     m_textItem->setTextWrapMode(QTextOption::WrapAtWordBoundaryOrAnywhere);
+    m_textItem->setMultilineEnabled(true);
     connect(m_textItem, &TextItem::edited, this, &CommentItem::textEdited);
     connect(m_textItem, &TextItem::textChanged, this, [this]() {
         prepareGeometryChange();

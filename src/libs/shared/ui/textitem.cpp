@@ -227,11 +227,13 @@ void TextItem::keyPressEvent(QKeyEvent *event)
             break;
         }
         case Qt::Key_Return: {
-            accepted = event->modifiers() == Qt::NoModifier;
+            if (!m_multiline)
+                accepted = event->modifiers() == Qt::NoModifier;
             break;
         }
         case Qt::Key_Enter: {
-            accepted = event->modifiers() == Qt::KeypadModifier;
+            if (!m_multiline)
+                accepted = event->modifiers() == Qt::KeypadModifier;
             break;
         }
         default: {
@@ -536,6 +538,16 @@ void TextItem::removeCompleter()
         m_completer->deleteLater();
         m_completer = nullptr;
     }
+}
+
+void TextItem::setMultilineEnabled(bool value)
+{
+    m_multiline = value;
+}
+
+bool TextItem::isMultilineEnabled() const
+{
+    return m_multiline;
 }
 
 void TextItem::checkTextValidity()

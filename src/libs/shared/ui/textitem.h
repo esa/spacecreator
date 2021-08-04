@@ -83,6 +83,9 @@ public:
     void updateCompleter(const QStringList &completionList);
     void removeCompleter();
 
+    void setMultilineEnabled(bool value);
+    bool isMultilineEnabled() const;
+
 Q_SIGNALS:
     void edited(const QString &newText);
     void textChanged();
@@ -127,6 +130,7 @@ protected:
     bool m_filterInvalidText = true;
     QString m_mscValidationTest;
     QCompleter *m_completer = nullptr;
+    bool m_multiline = false;
 };
 
 class NameItem : public TextItem
