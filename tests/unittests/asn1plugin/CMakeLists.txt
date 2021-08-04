@@ -36,7 +36,7 @@ function(addAsn1PluginTest TEST_NAME)
     add_test(NAME ${TEST_NAME} COMMAND ${TEST_NAME} -xunitxml -o ${CMAKE_BINARY_DIR}/${TEST_NAME}.xml)
 
     set_tests_properties(${TEST_NAME} PROPERTIES
-        ENVIRONMENT "LD_LIBRARY_PATH=$LD_LIBRARY_PATH:${QTC_LIB_DIR}:${QTC_PLUGINS_DIR}"
+        ENVIRONMENT "LD_LIBRARY_PATH=$<TARGET_FILE_DIR:Asn1Acn>:${QTC_LIB_DIR}:${QTC_PLUGINS_DIR}:$LD_LIBRARY_PATH"
     )
 endfunction()
 
