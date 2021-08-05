@@ -17,3 +17,6 @@ examples/*.local.msc
 
 # Generated API documentation
 doc/doxygen
+
+# VS Code directory
+.vscode

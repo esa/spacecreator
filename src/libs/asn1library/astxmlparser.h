@@ -1,19 +1,20 @@
 /****************************************************************************
 **
-** Copyright (C) 2017-2019 N7 Space sp. z o. o.
+** Copyright (C) 2018-2019 N7 Space sp. z o. o.
 ** Contact: http://n7space.com
 **
-** This file is part of ASN.1/ACN Plugin for QtCreator.
+** This file is part of ASN.1/ACN Fuzzer - Tool for generating test cases
+** based on ASN.1/ACN models and simulating malformed or malicious data.
 **
-** Plugin was developed under a program and funded by
+** Tool was developed under a programme and funded by
 ** European Space Agency.
 **
-** This Plugin is free software: you can redistribute it and/or modify
+** This Tool is free software: you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
 ** the Free Software Foundation, either version 3 of the License, or
 ** (at your option) any later version.
 **
-** This Plugin is distributed in the hope that it will be useful,
+** This Tool is distributed in the hope that it will be useful,
 ** but WITHOUT ANY WARRANTY; without even the implied warranty of
 ** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 ** GNU General Public License for more details.
@@ -24,12 +25,20 @@
 ****************************************************************************/
 #pragma once
 
-#include "file.h"
+#include <memory>
 
 #include <QString>
-#include <QStringList>
+
 #include <QXmlStreamReader>
-#include <memory>
+
+#include "asn1/acnargument.h"
+#include "asn1/acnparameter.h"
+#include "asn1/acnsequencecomponent.h"
+#include "asn1/definitions.h"
+#include "asn1/file.h"
+#include "asn1/namedvalue.h"
+#include "asn1/value.h"
+#include "asn1/types/type.h"
 
 namespace Asn1Acn {
 
@@ -58,9 +67,11 @@ private:
 
     void updateCurrentFile();
     void createNewModule();
-    QString readIdAttribute();
+    QString readIdAttribute(const QString &id);
     QString readNameAttribute();
-    QString readVarNameAttribute() const;
+    QString readCNameAttribute();
+    QString readVarNameAttribute();
+    QString readTypeAttribute();
     int readLineAttribute();
     int readCharPossitionInLineAttribute();
     bool isParametrizedTypeInstance() const;
@@ -72,25 +83,66 @@ private:
     void readImportedType(const QString &moduleName);
 
     SourceLocation readLocationFromAttributes();
+    QString readIsAlignedToNext();
 
+    ValuePtr findAndReadValueAssignmentValue();
+    ValuePtr readValueAssignmentValue();
+
+    ValuePtr readSimpleValue(const QStringRef &name);
+    ValuePtr readMultipleValue();
+    ValuePtr readSequenceValues();
+    std::pair<QString, ValuePtr> readNamedValue();
+    ValuePtr readChoiceValue();
+
+    std::unique_ptr<Types::Type> findAndReadType();
     std::unique_ptr<Types::Type> readType();
-    std::unique_ptr<Types::Type> readTypeDetails(const SourceLocation &location);
-    std::unique_ptr<Types::Type> readReferenceType(const SourceLocation &location);
-    std::unique_ptr<Types::Type> buildTypeFromName(const SourceLocation &location, const QStringRef &name);
+    std::unique_ptr<Types::Type> readTypeDetails(const QString &name,
+                                                       const SourceLocation &location,
+                                                       const bool isParametrized,
+                                                       const QString &typeAlignment);
+    std::unique_ptr<Types::Type> buildTypeFromName(const QString &name,
+                                                         const SourceLocation &location,
+                                                         bool isParametrized);
 
-    void readTypeContents(const QString &name, Types::Type *type);
-    void readSequence();
-    void readSequenceAsn(Types::Type *type);
-    void readSequenceOf(Types::Type *type);
-    void readChoice();
-    void readChoiceAsn(Types::Type *type);
+    std::unique_ptr<Types::Type> createReferenceType(const SourceLocation &location);
+    void readReferredTypeDetails(Types::Type &type);
+    void readAcnArguments(Types::Type &type);
+
+    AcnParameterPtrs readAcnParameters();
+    AcnParameterPtr readAcnParameter();
+
+    void readTypeContents(const QString &name, Types::Type &type);
+    void readTypeAttributes(Types::Type &type);
+
+    void readSequence(Types::Type &type);
+    void readSequenceComponent(Types::Type &type);
+    void readAcnComponent(Types::Type &type);
+    void readSequenceAsn(Types::Type &type);
+
+    void readSequenceOf(Types::Type &type);
+
+    void readChoice(Types::Type &type);
+    void readChoiceAsn(Types::Type &type);
+
+    void readReferenceType(Types::Type &type);
+
+    void readInteger(Types::Type &type);
+    void readReal(Types::Type &type);
+
+    void readEnumerated(Types::Type &type);
+    void readEnumeratedItem(Types::Type &type);
+    void readEnumValues(Types::Type &type);
+
+    void readOctetString(Types::Type &type);
+    void readIA5String(Types::Type &type);
+    void readNumericString(Types::Type &type);
+    void readBitString(Types::Type &type);
+
+    void findAndReadConstraints(Types::Type &type);
+    void readConstraints(Types::Type &type);
 
     QString readTypeAssignmentAttribute();
     QString readModuleAttribute();
-
-    template<typename T>
-    void parseRange(Types::Type &type);
-    void parseEnumeration(Types::Type &type);
 
     bool nextRequiredElementIs(const QString &name);
     bool nextRequiredElementIs(const QStringList &names);
@@ -99,11 +151,16 @@ private:
     bool skipToChildElement(const QString &name);
     bool skipToChildElement(const QStringList &names);
 
+    template<typename T>
+    void parseRange(Types::Type &type);
+
     QXmlStreamReader &m_xmlReader;
     std::map<QString, std::unique_ptr<File>> m_data;
     QString m_currentFile;
     QString m_currentModule;
+
     Definitions *m_currentDefinitions;
+    bool m_inParametrizedBranch;
 };
 
 }

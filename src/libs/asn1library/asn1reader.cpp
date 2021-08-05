@@ -177,7 +177,7 @@ std::unique_ptr<Asn1Acn::File> Asn1Reader::parseAsn1XmlFile(const QString &fileN
         Q_EMIT parseError(tr("File not found"));
     }
 
-    return {};
+    return nullptr;
 }
 
 /*!

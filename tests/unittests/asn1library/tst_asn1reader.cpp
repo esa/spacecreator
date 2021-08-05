@@ -15,6 +15,8 @@
    along with this program. If not, see <https://www.gnu.org/licenses/lgpl-2.1.html>.
 */
 
+#include <iostream>
+
 #include "asn1const.h"
 #include "asn1reader.h"
 #include "definitions.h"
@@ -58,6 +60,7 @@ private:
 void tst_Asn1Reader::init()
 {
     xmlParser = new Asn1Reader;
+    connect(xmlParser, &Asn1Reader::parseError, [](const QString& msg){std::cerr << "!!!! " << msg.toStdString() << std::endl;});
 }
 
 void tst_Asn1Reader::cleanup()
@@ -147,7 +150,7 @@ void tst_Asn1Reader::testBoolEnumTypes()
     QCOMPARE(typeAssign2->type()->typeName(), QString("ENUMERATED"));
     const QVariantMap &data2 = typeAssign2->type()->parameters();
     QCOMPARE(data2.size(), 1);
-    QVariantList enumValues = data2[ASN1_VALUES].toList();
+QVariantList enumValues = data2[ASN1_VALUES].toList();
     QCOMPARE(enumValues.count(), 3);
     QCOMPARE(enumValues.at(0).toString(), QString("red"));
     QCOMPARE(enumValues.at(1).toString(), QString("green"));
@@ -228,7 +231,7 @@ void tst_Asn1Reader::testMixedTypes()
 {
     std::unique_ptr<Asn1Acn::File> asn1Types = xmlParser->parseAsn1XmlFile(QFINDTESTDATA("mixed_types01.xml"));
     const Asn1Acn::Definitions *definitions = asn1Types->definitions("TASTE-BasicTypes");
-    //    QCOMPARE(definitions->types().size(), 10);
+    QCOMPARE(definitions->types().size(), 10);
 
     const std::unique_ptr<Asn1Acn::TypeAssignment> &typeAssign1 = definitions->types().at(0);
     QCOMPARE(typeAssign1->name(), QString("T-UInt32"));

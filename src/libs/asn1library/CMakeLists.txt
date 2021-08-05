@@ -12,6 +12,7 @@ target_sources(${LIB_NAME} PRIVATE
     asn1reader.h
     asn1systemchecks.cpp
     asn1systemchecks.h
+    astxmlconstraintparser.h
     astxmlparser.cpp
     astxmlparser.h
     asn1/acnargument.h

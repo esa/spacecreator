@@ -119,6 +119,7 @@ void tst_Asn1TreeView::testSetSequenceInSequenceValue()
     m_types = m_parser.parseAsn1XmlFile(QFINDTESTDATA("tetris_dataview.xml"));
     m_definitions = m_types->definitions("TETRIS-DATAVIEW");
     QVERIFY(m_definitions != nullptr);
+    QCOMPARE(m_definitions->types().size(), 10);
     const std::unique_ptr<Asn1Acn::TypeAssignment> &assignment = m_definitions->types().at(4);
     m_treeView->setAsn1Model(assignment);
     const QString value = "{ origin  { x  4, y  5 }, shape  { { blue, blue, blue, blue }, { green, green, green, empty "

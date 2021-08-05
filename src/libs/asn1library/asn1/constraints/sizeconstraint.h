@@ -29,8 +29,7 @@
 
 #include <QString>
 
-#include <data/values.h>
-
+#include "../values.h"
 #include "constraint.h"
 #include "constraintvisitor.h"
 
@@ -41,18 +40,18 @@ template<typename ValueType>
 class SizeConstraint : public Constraint<ValueType>
 {
 public:
-    SizeConstraint(std::unique_ptr<Constraint<Data::IntegerValue>> innerConstraints)
+    SizeConstraint(std::unique_ptr<Constraint<IntegerValue>> innerConstraints)
         : m_innerContraints(std::move(innerConstraints))
     {}
 
-    const Constraint<Data::IntegerValue> &innerConstraints() const { return *m_innerContraints; }
+    const Constraint<IntegerValue> &innerConstraints() const { return *m_innerContraints; }
 
     void accept(ConstraintVisitor<ValueType> &visitor) const override { visitor.visit(*this); }
 
     std::unique_ptr<Constraint<ValueType>> clone() const override;
 
 private:
-    std::unique_ptr<Constraint<Data::IntegerValue>> m_innerContraints;
+    std::unique_ptr<Constraint<IntegerValue>> m_innerContraints;
 };
 
 template<typename ValueType>
