@@ -181,7 +181,8 @@ QDomElement PropertyTemplate::toXml(QDomDocument *doc) const
 
     static const QMetaEnum &infoMeta = QMetaEnum::fromType<PropertyTemplate::Info>();
     if (d->m_info == PropertyTemplate::Info::Property) {
-        attrElement.setAttribute(QLatin1String("type"), infoMeta.valueToKey(static_cast<int>(d->m_info)));
+        const QString infoStr = QString::fromLatin1(infoMeta.valueToKey(static_cast<int>(d->m_info)));
+        attrElement.setAttribute(QLatin1String("type"), infoStr.toLower());
     }
 
     static const QMetaEnum &typeMeta = QMetaEnum::fromType<PropertyTemplate::Type>();

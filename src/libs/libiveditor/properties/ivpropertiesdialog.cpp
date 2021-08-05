@@ -138,12 +138,18 @@ void IVPropertiesDialog::initAttributesView()
 
     switch (dataObject()->type()) {
     case ivm::IVObject::Type::FunctionType:
-    case ivm::IVObject::Type::Function: {
+        modelAttrs = new IVPropertiesListModel(commandMacro(), propertiesConfig(), this);
+        break;
+    case ivm::IVObject::Type::Function:
         modelAttrs = new FunctionPropertiesListModel(commandMacro(), propertiesConfig(), this);
         break;
-    }
-    default:
+    case ivm::IVObject::Type::InterfaceGroup:
+    case ivm::IVObject::Type::ProvidedInterface:
+    case ivm::IVObject::Type::RequiredInterface:
         modelAttrs = new InterfacePropertiesListModel(commandMacro(), propertiesConfig(), this);
+        break;
+    default:
+        modelAttrs = new shared::PropertiesListModel(commandMacro(), propertiesConfig(), this);
         break;
     }
 

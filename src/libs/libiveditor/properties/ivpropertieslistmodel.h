@@ -46,6 +46,7 @@ public:
 
 protected:
     QPair<QString, QVariant> prepareDataForUpdate(const QModelIndex &index, const QVariant &value, int role) const;
+    bool isEditable(const QModelIndex &index) const override;
 };
 
 class FunctionPropertiesListModel : public IVPropertiesListModel

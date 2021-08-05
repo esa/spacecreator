@@ -17,6 +17,7 @@
 
 #include "ivpropertieslistmodel.h"
 
+#include "commands/cmdentitypropertychange.h"
 #include "commands/cmdfunctionattrchange.h"
 #include "commands/cmdifaceattrchange.h"
 #include "ivcommonprops.h"
@@ -65,6 +66,22 @@ QPair<QString, QVariant> IVPropertiesListModel::prepareDataForUpdate(
         return { name, value };
     }
     return {};
+}
+
+bool IVPropertiesListModel::isEditable(const QModelIndex &index) const
+{
+    if (!entity() || !index.isValid() || !PropertiesListModel::isEditable(index))
+        return false;
+
+    bool editable = true;
+    switch (tokenFromIndex(index)) {
+    case ivm::meta::Props::Token::is_type:
+        editable = false;
+        break;
+    default:
+        break;
+    }
+    return editable;
 }
 
 IVPropertiesListModel::IVPropertiesListModel(
@@ -135,7 +152,9 @@ bool FunctionPropertiesListModel::setData(const QModelIndex &index, const QVaria
 {
     const QPair<QString, QVariant> data = prepareDataForUpdate(index, value, role);
     if (!data.first.isEmpty()) {
-        return m_cmdMacro->push(new cmd::CmdFunctionAttrChange(entity(), { { data.first, data.second } }));
+        if (isAttr(index))
+            return m_cmdMacro->push(new cmd::CmdFunctionAttrChange(entity(), { { data.first, data.second } }));
+        return m_cmdMacro->push(new shared::cmd::CmdEntityPropertyChange(entity(), { { data.first, data.second } }));
     }
     return false;
 }
@@ -147,7 +166,7 @@ ivm::IVFunction *FunctionPropertiesListModel::entity() const
 
 bool FunctionPropertiesListModel::isEditable(const QModelIndex &index) const
 {
-    if (!entity() || !index.isValid() || !PropertiesListModel::isEditable(index))
+    if (!entity() || !index.isValid() || !IVPropertiesListModel::isEditable(index))
         return false;
 
     bool editable = true;
