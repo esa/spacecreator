@@ -93,6 +93,7 @@ private Q_SLOTS:
     void testDifferentParameter();
     void testMultiMessageOccurrence();
     void testNonStandardVia();
+    void testMessageParameterExpressionWithAsn();
 
 private:
     msc::MscReader *m_reader = nullptr;

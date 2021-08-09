@@ -486,6 +486,7 @@ expressionString
     | LEFTCURLYBRACKET name COLON NAME (COMMA name COLON NAME)* RIGHTCURLYBRACKET // TODO not correct ?
     | name COLON CHARACTERSTRING // extending the spec here ?
     | name COLON LEFTCURLYBRACKET NAME asnSequence RIGHTCURLYBRACKET // extending the spec here
+    | name COLON asnSequence // extending the spec here
     ;
 
 variableValue

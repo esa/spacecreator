@@ -894,3 +894,23 @@ void tst_MscReader::testNonStandardVia()
     QCOMPARE(chart->instances().size(), 1);
     QCOMPARE(chart->totalEventNumber(), 2);
 }
+
+void tst_MscReader::testMessageParameterExpressionWithAsn()
+{
+    QString msc = "MSC msc1; \
+                   INSTANCE sender; \
+                      out telecommand,597(automode:{level e1}) to agent;\
+                  ENDINSTANCE; \
+                  INSTANCE agent; \
+                     in telecommand,597(automode:{level e1}) from sender;\
+                  ENDINSTANCE; \
+               ENDMSC;";
+
+    QScopedPointer<MscModel> model(m_reader->parseText(msc));
+
+    QCOMPARE(model->charts().size(), 1);
+    MscChart *chart = model->charts().at(0);
+
+    QCOMPARE(chart->instances().size(), 2);
+    QCOMPARE(chart->totalEventNumber(), 1);
+}
