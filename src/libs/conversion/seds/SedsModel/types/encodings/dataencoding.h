@@ -19,13 +19,9 @@
 
 #pragma once
 
-namespace seds::model {
+#include "types/encodings/byteorder.h"
 
-enum class ByteOrder
-{
-    BIGENDIAN,
-    LITTLEENDIAN
-};
+namespace seds::model {
 
 class DataEncoding
 {

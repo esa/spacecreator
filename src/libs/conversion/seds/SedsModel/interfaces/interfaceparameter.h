@@ -19,15 +19,10 @@
 
 #pragma once
 
+#include "interfaces/interfaceparametermode.h"
 #include "types/externalfield.h"
 
 namespace seds::model {
-
-enum class InterfaceParameterMode
-{
-    SYNC,
-    ASYNC
-};
 
 class InterfaceParameter final : public ExternalField
 {

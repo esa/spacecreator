@@ -20,18 +20,13 @@
 #pragma once
 
 #include "base/positivelong.h"
+#include "types/encodings/corestringencoding.h"
 #include "types/encodings/dataencoding.h"
 
 #include <optional>
 #include <variant>
 
 namespace seds::model {
-
-enum class CoreStringEncoding
-{
-    ASCII,
-    UTF8
-};
 
 class StringDataEncoding final : public DataEncoding
 {

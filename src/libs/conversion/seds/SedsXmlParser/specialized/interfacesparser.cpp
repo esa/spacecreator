@@ -27,13 +27,15 @@
 
 #include <QXmlStreamReader>
 #include <seds/SedsModel/interfaces/commandargument.h>
+#include <seds/SedsModel/interfaces/commandargumentmode.h>
 #include <seds/SedsModel/interfaces/interfacecommand.h>
+#include <seds/SedsModel/interfaces/interfacecommandmode.h>
 #include <seds/SedsModel/interfaces/interfacedeclaration.h>
 #include <seds/SedsModel/interfaces/interfacedeclarationref.h>
 #include <seds/SedsModel/interfaces/interfaceparameter.h>
+#include <seds/SedsModel/interfaces/interfaceparametermode.h>
 #include <seds/SedsModel/interfaces/interfaceref.h>
 #include <seds/SedsModel/package/package.h>
-#include <seds/ThirdParty/magicenum.h>
 
 namespace seds::parser {
 
@@ -238,45 +240,35 @@ model::InterfaceParameter InterfacesParser::readInterfaceParameter(QXmlStreamRea
 
 model::InterfaceCommandMode InterfacesParser::parseInterfaceCommandMode(QStringRef commandModeStr)
 {
-    auto commandModeStdStr = commandModeStr.toString().toStdString();
-    std::transform(commandModeStdStr.begin(), commandModeStdStr.end(), commandModeStdStr.begin(), ::toupper);
-
-    auto commandMode = magic_enum::enum_cast<model::InterfaceCommandMode>(commandModeStdStr);
+    auto commandMode = model::enumFromString<model::InterfaceCommandMode>(commandModeStr);
 
     if (commandMode) {
         return *commandMode;
+    } else {
+        throw ParserException(QString("Unable to parse InterfaceCommandMode '%1'").arg(commandModeStr));
     }
-
-    throw ParserException(QString("Unable to parse InterfaceCommandMode '%1'").arg(commandModeStr));
 }
 
 model::CommandArgumentMode InterfacesParser::parseCommandArgumentMode(QStringRef commandArgumentModeStr)
 {
-    auto commandArgumentModeStdStr = commandArgumentModeStr.toString().toStdString();
-    std::transform(commandArgumentModeStdStr.begin(), commandArgumentModeStdStr.end(),
-            commandArgumentModeStdStr.begin(), ::toupper);
-
-    auto commandArgumentMode = magic_enum::enum_cast<model::CommandArgumentMode>(commandArgumentModeStdStr);
+    auto commandArgumentMode = model::enumFromString<model::CommandArgumentMode>(commandArgumentModeStr);
 
     if (commandArgumentMode) {
         return *commandArgumentMode;
+    } else {
+        throw ParserException(QString("Unable to parse CommandArgumentMode '%1'").arg(commandArgumentModeStr));
     }
-
-    throw ParserException(QString("Unable to parse CommandArgumentMode '%1'").arg(commandArgumentModeStr));
 }
 
 model::InterfaceParameterMode InterfacesParser::parseInterfaceParameterMode(QStringRef parameterModeStr)
 {
-    auto parameterModeStdStr = parameterModeStr.toString().toStdString();
-    std::transform(parameterModeStdStr.begin(), parameterModeStdStr.end(), parameterModeStdStr.begin(), ::toupper);
-
-    auto parameterMode = magic_enum::enum_cast<model::InterfaceParameterMode>(parameterModeStdStr);
+    auto parameterMode = model::enumFromString<model::InterfaceParameterMode>(parameterModeStr);
 
     if (parameterMode) {
         return *parameterMode;
+    } else {
+        throw ParserException(QString("Unable to parse InterfaceParameterMode '%1'").arg(parameterModeStr));
     }
-
-    throw ParserException(QString("Unable to parse InterfaceParameterMode '%1'").arg(parameterModeStr));
 }
 
 } // namespace seds::parser

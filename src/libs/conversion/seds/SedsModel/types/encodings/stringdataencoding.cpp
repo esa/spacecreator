@@ -22,7 +22,7 @@
 namespace seds::model {
 
 StringDataEncoding::StringDataEncoding() noexcept
-    : m_encoding(CoreStringEncoding::ASCII)
+    : m_encoding(CoreStringEncoding::Ascii)
 {
 }
 

@@ -17,37 +17,20 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/lgpl-2.1.html>.
  */
 
-#pragma once
-
-#include "base/positivelong.h"
-#include "types/encodings/coreencodingandprecision.h"
-#include "types/encodings/dataencoding.h"
-
-#include <cstdint>
-#include <variant>
+#include "interfaces/interfaceparametermode.h"
 
 namespace seds::model {
 
-class FloatDataEncoding final : public DataEncoding
+template<>
+auto enumFromString(const QStringRef enumStr) -> std::optional<InterfaceParameterMode>
 {
-public:
-    using Encoding = std::variant<CoreEncodingAndPrecision>;
-
-public:
-    FloatDataEncoding() = default;
-    FloatDataEncoding(FloatDataEncoding &&) = default;
-    FloatDataEncoding &operator=(FloatDataEncoding &&) = default;
-
-public:
-    auto encoding() const -> const Encoding &;
-    auto setEncoding(Encoding encoding) -> void;
-
-    auto bits() const -> PositiveLong::Value;
-    auto setBits(PositiveLong::Value bits) -> void;
-
-private:
-    Encoding m_encoding;
-    PositiveLong m_bits;
-};
+    if (enumStr.compare(QStringLiteral("sync"), Qt::CaseInsensitive) == 0) {
+        return InterfaceParameterMode::Sync;
+    } else if (enumStr.compare(QStringLiteral("async"), Qt::CaseInsensitive) == 0) {
+        return InterfaceParameterMode::Async;
+    } else {
+        return std::nullopt;
+    }
+}
 
 } // namespace seds::model

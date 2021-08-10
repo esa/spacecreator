@@ -19,17 +19,10 @@
 
 #pragma once
 
+#include "types/entries/coreerrorcontrol.h"
 #include "types/entries/entry.h"
 
 namespace seds::model {
-
-enum class CoreErrorControl
-{
-    CRC16CCITT,
-    CRC8,
-    CHECKSUM,
-    CHECKSUMLONGITUNDINAL
-};
 
 class ErrorControlEntry final : public Entry
 {

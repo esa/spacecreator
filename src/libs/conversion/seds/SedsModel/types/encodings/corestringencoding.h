@@ -19,35 +19,17 @@
 
 #pragma once
 
-#include "base/positivelong.h"
-#include "types/encodings/coreencodingandprecision.h"
-#include "types/encodings/dataencoding.h"
-
-#include <cstdint>
-#include <variant>
+#include <seds/SedsCommon/enumconversion.h>
 
 namespace seds::model {
 
-class FloatDataEncoding final : public DataEncoding
+enum class CoreStringEncoding
 {
-public:
-    using Encoding = std::variant<CoreEncodingAndPrecision>;
-
-public:
-    FloatDataEncoding() = default;
-    FloatDataEncoding(FloatDataEncoding &&) = default;
-    FloatDataEncoding &operator=(FloatDataEncoding &&) = default;
-
-public:
-    auto encoding() const -> const Encoding &;
-    auto setEncoding(Encoding encoding) -> void;
-
-    auto bits() const -> PositiveLong::Value;
-    auto setBits(PositiveLong::Value bits) -> void;
-
-private:
-    Encoding m_encoding;
-    PositiveLong m_bits;
+    Ascii,
+    Utf8
 };
+
+template<>
+auto enumFromString(const QStringRef enumStr) -> std::optional<CoreStringEncoding>;
 
 } // namespace seds::model

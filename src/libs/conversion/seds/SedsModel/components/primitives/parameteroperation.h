@@ -19,12 +19,17 @@
 
 #pragma once
 
+#include <seds/SedsCommon/enumconversion.h>
+
 namespace seds::model {
 
 enum class ParameterOperation
 {
-    SET,
-    GET
+    Set,
+    Get
 };
+
+template<>
+auto enumFromString(const QStringRef enumStr) -> std::optional<ParameterOperation>;
 
 } // namespace seds::model

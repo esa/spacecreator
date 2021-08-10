@@ -30,7 +30,9 @@ set(SOURCES
     components/activities/booleanexpression.cpp
     components/activities/calibration.cpp
     components/activities/comparison.cpp
+    components/activities/comparisonoperator.cpp
     components/activities/conditional.cpp
+    components/activities/coremathoperator.cpp
     components/activities/iteration.cpp
     components/activities/mathoperation.cpp
     components/activities/operand.cpp
@@ -48,6 +50,7 @@ set(SOURCES
     components/primitives/namedargumentvalue.cpp
     components/primitives/oncommandprimitive.cpp
     components/primitives/onparameterprimitive.cpp
+    components/primitives/parameteroperation.cpp
     components/primitives/parameterrefattributes.cpp
     components/primitives/primitivesink.cpp
     components/primitives/primitivesource.cpp
@@ -74,10 +77,13 @@ set(SOURCES
     generics/generictypemap.cpp
     generics/generictypemapset.cpp
     interfaces/commandargument.cpp
+    interfaces/commandargumentmode.cpp
     interfaces/interfacecommand.cpp
+    interfaces/interfacecommandmode.cpp
     interfaces/interfacedeclaration.cpp
     interfaces/interfacedeclarationref.cpp
     interfaces/interfaceparameter.cpp
+    interfaces/interfaceparametermode.cpp
     interfaces/interfaceref.cpp
     package/package.cpp
     types/arraydatatype.cpp
@@ -103,17 +109,24 @@ set(SOURCES
     types/constraints/containertypeconstraint.cpp
     types/constraints/containervalueconstraint.cpp
     types/encodings/booleandataencoding.cpp
+    types/encodings/byteorder.cpp
+    types/encodings/coreencodingandprecision.cpp
+    types/encodings/coreintegerencoding.cpp
+    types/encodings/corestringencoding.cpp
     types/encodings/dataencoding.cpp
+    types/encodings/falsevalue.cpp
     types/encodings/floatdataencoding.cpp
     types/encodings/integerdataencoding.cpp
     types/encodings/stringdataencoding.cpp
+    types/entries/coreerrorcontrol.cpp
     types/entries/errorcontrolentry.cpp
     types/entries/fixedvalueentry.cpp
     types/entries/listentry.cpp
     types/entries/paddingentry.cpp
     types/ranges/enumerateddatatyperange.cpp
     types/ranges/floatprecisionrange.cpp
-    types/ranges/minmaxrange.cpp)
+    types/ranges/minmaxrange.cpp
+    types/ranges/rangetype.cpp)
 set(INCLUDES
     sedsmodel.h
     datasheet.h
@@ -196,10 +209,13 @@ set(INCLUDES
     generics/generictypemap.h
     generics/generictypemapset.h
     interfaces/commandargument.h
+    interfaces/commandargumentmode.h
     interfaces/interfacecommand.h
+    interfaces/interfacecommandmode.h
     interfaces/interfacedeclaration.h
     interfaces/interfacedeclarationref.h
     interfaces/interfaceparameter.h
+    interfaces/interfaceparametermode.h
     interfaces/interfaceref.h
     package/package.h
     types/arraydatatype.h
@@ -226,10 +242,16 @@ set(INCLUDES
     types/constraints/containertypeconstraint.h
     types/constraints/containervalueconstraint.h
     types/encodings/booleandataencoding.h
+    types/encodings/byteorder.h
+    types/encodings/coreencodingandprecision.h
+    types/encodings/coreintegerencoding.h
+    types/encodings/corestringencoding.h
     types/encodings/dataencoding.h
+    types/encodings/falsevalue.h
     types/encodings/floatdataencoding.h
     types/encodings/integerdataencoding.h
     types/encodings/stringdataencoding.h
+    types/entries/coreerrorcontrol.h
     types/entries/entry.h
     types/entries/errorcontrolentry.h
     types/entries/fixedvalueentry.h

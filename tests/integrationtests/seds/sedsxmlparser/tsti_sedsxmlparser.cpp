@@ -168,7 +168,7 @@ void tsti_SedsXmlParser::testInterfacesParsing()
 
         const auto &command = commands.at(0);
         QCOMPARE(command.name().value(), "ExecuteSynchronousAction");
-        QCOMPARE(command.mode(), model::InterfaceCommandMode::SYNC);
+        QCOMPARE(command.mode(), model::InterfaceCommandMode::Sync);
         QCOMPARE(command.arguments().size(), 2);
 
         const auto &interfaceWithParameters = declaredInterfaces.at(2);
@@ -180,7 +180,7 @@ void tsti_SedsXmlParser::testInterfacesParsing()
         const auto &parameter = parameters.at(0);
         QCOMPARE(parameter.name().value(), "SynchronousParameter");
         QCOMPARE(parameter.type().value().name().value(), "DataItem");
-        QCOMPARE(parameter.mode(), model::InterfaceParameterMode::SYNC);
+        QCOMPARE(parameter.mode(), model::InterfaceParameterMode::Sync);
     } catch (const std::exception &ex) {
         QFAIL(ex.what());
     }

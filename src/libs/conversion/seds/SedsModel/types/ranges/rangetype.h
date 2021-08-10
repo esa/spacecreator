@@ -19,18 +19,23 @@
 
 #pragma once
 
+#include <seds/SedsCommon/enumconversion.h>
+
 namespace seds::model {
 
 enum class RangeType
 {
-    EXCLUSIVEMINEXCLUSIVEMAX,
-    INCLUSIVEMININCLUSIVEMAX,
-    INCLUSIVEMINEXCLUSIVEMAX,
-    EXCLUSIVEMININCLUSIVEMAX,
-    GREATERTHAN,
-    LESSTHAN,
-    ATLEAST,
-    ATMOST,
+    ExclusiveMinExclusiveMax,
+    InclusiveMinInclusiveMax,
+    InclusiveMinExclusiveMax,
+    ExclusiveMinInclusiveMax,
+    GreaterThan,
+    LessThan,
+    AtLeast,
+    AtMost,
 };
+
+template<>
+auto enumFromString(const QStringRef enumStr) -> std::optional<RangeType>;
 
 } // namespace seds::model

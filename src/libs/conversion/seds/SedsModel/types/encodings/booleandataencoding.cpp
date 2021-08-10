@@ -24,7 +24,7 @@
 namespace seds::model {
 
 BooleanDataEncoding::BooleanDataEncoding() noexcept
-    : m_falseValue(FalseValue::ZEROISFALSE)
+    : m_falseValue(FalseValue::ZeroIsFalse)
 {
 }
 

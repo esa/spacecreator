@@ -21,14 +21,9 @@
 
 #include "base/namedentity.h"
 #include "interfaces/commandargument.h"
+#include "interfaces/interfacecommandmode.h"
 
 namespace seds::model {
-
-enum class InterfaceCommandMode
-{
-    SYNC,
-    ASYNC
-};
 
 class InterfaceCommand final : public NamedEntity
 {

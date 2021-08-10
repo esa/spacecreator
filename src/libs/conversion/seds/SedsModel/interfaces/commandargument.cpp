@@ -22,7 +22,7 @@
 namespace seds::model {
 
 CommandArgument::CommandArgument() noexcept
-    : m_mode(CommandArgumentMode::IN)
+    : m_mode(CommandArgumentMode::In)
     , m_dataUnit(false)
 {
 }

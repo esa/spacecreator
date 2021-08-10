@@ -37,7 +37,6 @@
 #include <seds/SedsModel/components/primitives/sendparameterprimitive.h>
 #include <seds/SedsModel/components/primitives/sinkargumentvalue.h>
 #include <seds/SedsModel/components/primitives/timersink.h>
-#include <seds/ThirdParty/magicenum.h>
 
 namespace seds::parser {
 
@@ -251,17 +250,12 @@ model::SinkArgumentValue ComponentPrimitivesParser::readSinkArgumentValue(QXmlSt
 
 model::ParameterOperation ComponentPrimitivesParser::parseParameterOperation(QStringRef valueStr)
 {
-    auto parameterOperationStdStr = valueStr.toString().toStdString();
-    std::transform(parameterOperationStdStr.begin(), parameterOperationStdStr.end(), parameterOperationStdStr.begin(),
-            ::toupper);
-
-    auto parameterOperation = magic_enum::enum_cast<model::ParameterOperation>(parameterOperationStdStr);
-
+    auto parameterOperation = model::enumFromString<model::ParameterOperation>(valueStr);
     if (parameterOperation) {
         return *parameterOperation;
+    } else {
+        throw ParserException(QString("Unable to parse parameter operation '%1'").arg(valueStr));
     }
-
-    throw ParserException(QString("Unable to parse parameter operation '%1'").arg(valueStr));
 }
 
 bool ComponentPrimitivesParser::processForCommandRefAttributes(

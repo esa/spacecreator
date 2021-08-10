@@ -17,37 +17,24 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/lgpl-2.1.html>.
  */
 
-#pragma once
-
-#include "base/positivelong.h"
-#include "types/encodings/coreencodingandprecision.h"
-#include "types/encodings/dataencoding.h"
-
-#include <cstdint>
-#include <variant>
+#include "types/entries/coreerrorcontrol.h"
 
 namespace seds::model {
 
-class FloatDataEncoding final : public DataEncoding
+template<>
+auto enumFromString(const QStringRef enumStr) -> std::optional<CoreErrorControl>
 {
-public:
-    using Encoding = std::variant<CoreEncodingAndPrecision>;
-
-public:
-    FloatDataEncoding() = default;
-    FloatDataEncoding(FloatDataEncoding &&) = default;
-    FloatDataEncoding &operator=(FloatDataEncoding &&) = default;
-
-public:
-    auto encoding() const -> const Encoding &;
-    auto setEncoding(Encoding encoding) -> void;
-
-    auto bits() const -> PositiveLong::Value;
-    auto setBits(PositiveLong::Value bits) -> void;
-
-private:
-    Encoding m_encoding;
-    PositiveLong m_bits;
-};
+    if (enumStr.compare(QStringLiteral("crc16_ccitt"), Qt::CaseInsensitive) == 0) {
+        return CoreErrorControl::Crc16;
+    } else if (enumStr.compare(QStringLiteral("crc8"), Qt::CaseInsensitive) == 0) {
+        return CoreErrorControl::Crc8;
+    } else if (enumStr.compare(QStringLiteral("checksum"), Qt::CaseInsensitive) == 0) {
+        return CoreErrorControl::Checksum;
+    } else if (enumStr.compare(QStringLiteral("checksum_longitudinal"), Qt::CaseInsensitive) == 0) {
+        return CoreErrorControl::ChecksumLongitundinal;
+    } else {
+        return std::nullopt;
+    }
+}
 
 } // namespace seds::model

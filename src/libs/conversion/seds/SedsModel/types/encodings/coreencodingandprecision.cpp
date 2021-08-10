@@ -17,19 +17,23 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/lgpl-2.1.html>.
  */
 
-#include "types/ranges/floatprecisionrange.h"
+#include "types/encodings/coreencodingandprecision.h"
 
 namespace seds::model {
 
 template<>
-auto enumFromString(const QStringRef enumStr) -> std::optional<FloatPrecisionRange>
+auto enumFromString(const QStringRef enumStr) -> std::optional<CoreEncodingAndPrecision>
 {
-    if (enumStr.compare(QStringLiteral("single"), Qt::CaseInsensitive) == 0) {
-        return FloatPrecisionRange::Single;
-    } else if (enumStr.compare(QStringLiteral("double"), Qt::CaseInsensitive) == 0) {
-        return FloatPrecisionRange::Double;
-    } else if (enumStr.compare(QStringLiteral("quad"), Qt::CaseInsensitive) == 0) {
-        return FloatPrecisionRange::Quad;
+    if (enumStr.compare(QStringLiteral("ieee754_2008_single"), Qt::CaseInsensitive) == 0) {
+        return CoreEncodingAndPrecision::IeeeSingle;
+    } else if (enumStr.compare(QStringLiteral("ieee754_2008_double"), Qt::CaseInsensitive) == 0) {
+        return CoreEncodingAndPrecision::IeeeDouble;
+    } else if (enumStr.compare(QStringLiteral("ieee754_2008_quad"), Qt::CaseInsensitive) == 0) {
+        return CoreEncodingAndPrecision::IeeeQuad;
+    } else if (enumStr.compare(QStringLiteral("milstd_1750a_simple"), Qt::CaseInsensitive) == 0) {
+        return CoreEncodingAndPrecision::MilstdSimple;
+    } else if (enumStr.compare(QStringLiteral("milstd_1750a_extended"), Qt::CaseInsensitive) == 0) {
+        return CoreEncodingAndPrecision::MilstdExtended;
     } else {
         return std::nullopt;
     }

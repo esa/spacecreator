@@ -19,16 +19,21 @@
 
 #pragma once
 
+#include <seds/SedsCommon/enumconversion.h>
+
 namespace seds::model {
 
 enum class ComparisonOperator
 {
-    EQUALS,
-    NOTEQUALS,
-    LESSTHAN,
-    LESSTHANEQUALS,
-    GREATERTHAN,
-    GREATERTHANEQUALS,
+    Equals,
+    NotEquals,
+    LessThan,
+    LessThanEquals,
+    GreaterThan,
+    GreaterThanEquals,
 };
+
+template<>
+auto enumFromString(const QStringRef enumStr) -> std::optional<ComparisonOperator>;
 
 } // namespace seds::model

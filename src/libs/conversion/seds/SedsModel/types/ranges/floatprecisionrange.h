@@ -19,18 +19,18 @@
 
 #pragma once
 
-#include "base/literalvalue.h"
-#include "types/ranges/rangetype.h"
-
-#include <optional>
+#include <seds/SedsCommon/enumconversion.h>
 
 namespace seds::model {
 
 enum class FloatPrecisionRange
 {
-    SINGLE,
-    DOUBLE,
-    QUAD
+    Single,
+    Double,
+    Quad
 };
+
+template<>
+auto enumFromString(const QStringRef enumStr) -> std::optional<FloatPrecisionRange>;
 
 } // namespace seds::model

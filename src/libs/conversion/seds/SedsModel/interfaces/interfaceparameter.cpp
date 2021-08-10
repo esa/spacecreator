@@ -22,7 +22,7 @@
 namespace seds::model {
 
 InterfaceParameter::InterfaceParameter() noexcept
-    : m_mode(InterfaceParameterMode::SYNC)
+    : m_mode(InterfaceParameterMode::Sync)
     , m_readOnly(false)
 {
 }

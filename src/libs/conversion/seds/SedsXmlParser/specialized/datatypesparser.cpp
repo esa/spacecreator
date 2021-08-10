@@ -45,7 +45,6 @@
 #include <seds/SedsModel/types/stringdatatype.h>
 #include <seds/SedsModel/types/subrangedatatype.h>
 #include <seds/SedsModel/types/valueenumeration.h>
-#include <seds/ThirdParty/magicenum.h>
 
 using std::placeholders::_1;
 
@@ -926,117 +925,91 @@ model::ContainerValueConstraint DataTypesParser::readValueConstraint(QXmlStreamR
 
 model::FloatDataEncoding::Encoding DataTypesParser::parseFloatEncoding(QStringRef encodingStr)
 {
-    auto encodingStdStr = encodingStr.toString().toStdString();
-    std::transform(encodingStdStr.begin(), encodingStdStr.end(), encodingStdStr.begin(), ::toupper);
-
-    auto coreFloatEncoding = magic_enum::enum_cast<model::CoreEncodingAndPrecision>(encodingStdStr);
+    auto coreFloatEncoding = model::enumFromString<model::CoreEncodingAndPrecision>(encodingStr);
 
     if (coreFloatEncoding) {
         return *coreFloatEncoding;
+    } else {
+        throw ParserException(QString("Unable to parse float encoding '%1'").arg(encodingStr));
     }
-
-    throw ParserException(QString("Unable to parse float encoding '%1'").arg(encodingStr));
 }
 
 model::IntegerDataEncoding::Encoding DataTypesParser::parseIntegerEncoding(QStringRef encodingStr)
 {
-    auto encodingStdStr = encodingStr.toString().toStdString();
-    std::transform(encodingStdStr.begin(), encodingStdStr.end(), encodingStdStr.begin(), ::toupper);
-
-    auto coreIntegerEncoding = magic_enum::enum_cast<model::CoreIntegerEncoding>(encodingStdStr);
+    auto coreIntegerEncoding = model::enumFromString<model::CoreIntegerEncoding>(encodingStr);
 
     if (coreIntegerEncoding) {
         return *coreIntegerEncoding;
+    } else {
+        throw ParserException(QString("Unable to parse integer encoding '%1'").arg(encodingStr));
     }
-
-    throw ParserException(QString("Unable to parse integer encoding '%1'").arg(encodingStr));
 }
 
 model::StringDataEncoding::Encoding DataTypesParser::parseStringEncoding(QStringRef encodingStr)
 {
-    auto encodingStdStr = encodingStr.toString().toStdString();
-    std::transform(encodingStdStr.begin(), encodingStdStr.end(), encodingStdStr.begin(), ::toupper);
-    encodingStdStr.erase(std::remove(encodingStdStr.begin(), encodingStdStr.end(), '-'), encodingStdStr.end());
-
-    auto coreStringEncoding = magic_enum::enum_cast<model::CoreStringEncoding>(encodingStdStr);
+    auto coreStringEncoding = model::enumFromString<model::CoreStringEncoding>(encodingStr);
 
     if (coreStringEncoding) {
         return *coreStringEncoding;
+    } else {
+        throw ParserException(QString("Unable to parse string encoding '%1'").arg(encodingStr));
     }
-
-    throw ParserException(QString("Unable to parse string encoding '%1'").arg(encodingStr));
 }
 
 model::FloatPrecisionRange DataTypesParser::parseFloatPrecisionRange(QXmlStreamReader &xmlReader)
 {
     auto rangeStr = xmlReader.readElementText();
-
-    auto rangeStdStr = rangeStr.toStdString();
-    std::transform(rangeStdStr.begin(), rangeStdStr.end(), rangeStdStr.begin(), ::toupper);
-
-    auto range = magic_enum::enum_cast<model::FloatPrecisionRange>(rangeStdStr);
+    auto range = model::enumFromString<model::FloatPrecisionRange>(QStringRef(&rangeStr));
 
     if (range) {
         return *range;
+    } else {
+        throw ParserException(QString("Unable to parse float precision range '%1'").arg(rangeStr));
     }
-
-    throw ParserException(QString("Unable to parse float precision range '%1'").arg(rangeStr));
 }
 
 model::ByteOrder DataTypesParser::parseByteOrder(QStringRef byteOrderStr)
 {
-    auto byteOrderStdStr = byteOrderStr.toString().toStdString();
-    std::transform(byteOrderStdStr.begin(), byteOrderStdStr.end(), byteOrderStdStr.begin(), ::toupper);
-
-    auto byteOrder = magic_enum::enum_cast<model::ByteOrder>(byteOrderStdStr);
+    auto byteOrder = model::enumFromString<model::ByteOrder>(byteOrderStr);
 
     if (byteOrder) {
         return *byteOrder;
+    } else {
+        throw ParserException(QString("Unable to parse byte order '%1'").arg(byteOrderStr));
     }
-
-    throw ParserException(QString("Unable to parse byte order '%1'").arg(byteOrderStr));
 }
 
 model::ErrorControlEntry::ErrorControl DataTypesParser::parseErrorControl(QStringRef errorControlStr)
 {
-    auto errorControlStdStr = errorControlStr.toString().toStdString();
-    std::transform(errorControlStdStr.begin(), errorControlStdStr.end(), errorControlStdStr.begin(), ::toupper);
-
-    auto coreErrorControl = magic_enum::enum_cast<model::CoreErrorControl>(errorControlStdStr);
+    auto coreErrorControl = model::enumFromString<model::CoreErrorControl>(errorControlStr);
 
     if (coreErrorControl) {
         return *coreErrorControl;
+    } else {
+        throw ParserException(QString("Unable to parse error control '%1'").arg(errorControlStr));
     }
-
-    throw ParserException(QString("Unable to parse error control '%1'").arg(errorControlStr));
 }
 
 model::FalseValue DataTypesParser::parseFalseValue(QStringRef falseValueStr)
 {
-    auto falseValueStdStr = falseValueStr.toString().toStdString();
-    std::transform(falseValueStdStr.begin(), falseValueStdStr.end(), falseValueStdStr.begin(), ::toupper);
-
-    auto falseValue = magic_enum::enum_cast<model::FalseValue>(falseValueStdStr);
+    auto falseValue = model::enumFromString<model::FalseValue>(falseValueStr);
 
     if (falseValue) {
         return *falseValue;
+    } else {
+        throw ParserException(QString("Unable to parse false value '%1'").arg(falseValueStr));
     }
-
-    throw ParserException(QString("Unable to parse false value '%1'").arg(falseValueStr));
 }
 
 model::RangeType DataTypesParser::parseRangeType(QStringRef rangeTypeStr)
 {
-    auto rangeTypeStdStr = rangeTypeStr.toString().toStdString();
-    std::transform(rangeTypeStdStr.begin(), rangeTypeStdStr.end(), rangeTypeStdStr.begin(), ::toupper);
-
-    auto rangeType = magic_enum::enum_cast<model::RangeType>(rangeTypeStdStr);
+    auto rangeType = model::enumFromString<model::RangeType>(rangeTypeStr);
 
     if (rangeType) {
         return *rangeType;
+    } else {
+        throw ParserException(QString("Unable to parse range type '%1'").arg(rangeTypeStr));
     }
-
-    throw ParserException(QString("Unable to parse range type '%1'").arg(rangeTypeStr));
 }
 
 bool DataTypesParser::processForContainerConstraint(

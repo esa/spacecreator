@@ -38,7 +38,6 @@
 #include <seds/SedsModel/components/variable.h>
 #include <seds/SedsModel/components/variableref.h>
 #include <seds/SedsModel/package/package.h>
-#include <seds/ThirdParty/magicenum.h>
 
 using std::placeholders::_1;
 

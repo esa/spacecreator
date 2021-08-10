@@ -19,19 +19,12 @@
 
 #pragma once
 
+#include "interfaces/commandargumentmode.h"
 #include "types/externalfield.h"
 
 #include <optional>
 
 namespace seds::model {
-
-enum class CommandArgumentMode
-{
-    IN,
-    OUT,
-    INOUT,
-    NOTIFY
-};
 
 class CommandArgument final : public ExternalField
 {

@@ -19,41 +19,46 @@
 
 #pragma once
 
+#include <seds/SedsCommon/enumconversion.h>
+
 namespace seds::model {
 
 enum class CoreMathOperator
 {
-    ABS,
-    ACOS,
-    ACOSH,
-    ADD,
-    ASIN,
-    ASINH,
-    ATAN,
-    ATAN2,
-    ATANH,
-    CEIL,
-    COS,
-    COSH,
-    DIVIDE,
-    EXP,
-    FLOOR,
-    INVERSE,
-    LN,
-    LOG,
-    MAX,
-    MIN,
-    MODULUS,
-    MULTIPLY,
-    POW,
-    ROUND,
-    SIN,
-    SINH,
-    SQRT,
-    SUBTRACT,
-    SWAP,
-    TAN,
-    TANH
+    Abs,
+    Acos,
+    Acosh,
+    Add,
+    Asin,
+    Asinh,
+    Atan,
+    Atan2,
+    Atanh,
+    Ceil,
+    Cos,
+    Cosh,
+    Divide,
+    Exp,
+    Floor,
+    Inverse,
+    Ln,
+    Log,
+    Max,
+    Min,
+    Modulus,
+    Multiply,
+    Pow,
+    Round,
+    Sin,
+    Sinh,
+    Sqrt,
+    Subtract,
+    Swap,
+    Tan,
+    Tanh
 };
+
+template<>
+auto enumFromString(const QStringRef enumStr) -> std::optional<CoreMathOperator>;
 
 } // namespace seds::model

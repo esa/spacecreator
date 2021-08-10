@@ -50,7 +50,6 @@
 #include <seds/SedsModel/components/activities/valueoperand.h>
 #include <seds/SedsModel/components/activities/variablerefoperand.h>
 #include <seds/SedsModel/components/componentimplementation.h>
-#include <seds/ThirdParty/magicenum.h>
 
 namespace seds::parser {
 
@@ -661,31 +660,24 @@ model::TypeCheck ComponentActivitiesParser::readTypeCheck(QXmlStreamReader &xmlR
 
 model::ComparisonOperator ComponentActivitiesParser::parseComparisonOperator(QString comparisonOperatorStr)
 {
-    auto comparisonOperatorStdStr = comparisonOperatorStr.toStdString();
-    std::transform(comparisonOperatorStdStr.begin(), comparisonOperatorStdStr.end(), comparisonOperatorStdStr.begin(),
-            ::toupper);
-
-    auto coreComparisonOperator = magic_enum::enum_cast<model::ComparisonOperator>(comparisonOperatorStdStr);
+    auto coreComparisonOperator = model::enumFromString<model::ComparisonOperator>(QStringRef(&comparisonOperatorStr));
 
     if (coreComparisonOperator) {
         return *coreComparisonOperator;
+    } else {
+        throw ParserException(QString("Unable to parse comparison operator '%1'").arg(comparisonOperatorStr));
     }
-
-    throw ParserException(QString("Unable to parse comparison operator '%1'").arg(comparisonOperatorStr));
 }
 
 model::MathOperator ComponentActivitiesParser::parseMathOperator(QStringRef mathOperatorStr)
 {
-    auto mathOperatorStdStr = mathOperatorStr.toString().toStdString();
-    std::transform(mathOperatorStdStr.begin(), mathOperatorStdStr.end(), mathOperatorStdStr.begin(), ::toupper);
-
-    auto coreMathOperator = magic_enum::enum_cast<model::CoreMathOperator>(mathOperatorStdStr);
+    auto coreMathOperator = model::enumFromString<model::CoreMathOperator>(mathOperatorStr);
 
     if (coreMathOperator) {
         return *coreMathOperator;
+    } else {
+        throw ParserException(QString("Unable to parse math operator '%1'").arg(mathOperatorStr));
     }
-
-    throw ParserException(QString("Unable to parse math operator '%1'").arg(mathOperatorStr));
 }
 
 } // namespace seds::parser

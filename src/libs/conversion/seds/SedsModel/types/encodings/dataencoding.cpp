@@ -24,7 +24,7 @@ namespace seds::model {
 DataEncoding::~DataEncoding() = default;
 
 DataEncoding::DataEncoding() noexcept
-    : m_byteOrder(ByteOrder::BIGENDIAN)
+    : m_byteOrder(ByteOrder::BigEndian)
 {
 }
 

@@ -20,21 +20,12 @@
 #pragma once
 
 #include "base/positivelong.h"
+#include "types/encodings/coreintegerencoding.h"
 #include "types/encodings/dataencoding.h"
 
 #include <variant>
 
 namespace seds::model {
-
-enum class CoreIntegerEncoding
-{
-    UNSIGNED,
-    SIGNMAGNITUDE,
-    TWOSCOMPLEMENT,
-    ONESCOMPLEMENT,
-    BCD,
-    PACKEDBCD
-};
 
 class IntegerDataEncoding final : public DataEncoding
 {

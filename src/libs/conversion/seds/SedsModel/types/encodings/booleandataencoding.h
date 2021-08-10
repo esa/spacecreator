@@ -21,16 +21,11 @@
 
 #include "base/positivelong.h"
 #include "types/encodings/dataencoding.h"
+#include "types/encodings/falsevalue.h"
 
 #include <cstdint>
 
 namespace seds::model {
-
-enum class FalseValue
-{
-    ZEROISFALSE,
-    NONZEROISFALSE
-};
 
 class BooleanDataEncoding final : public DataEncoding
 {

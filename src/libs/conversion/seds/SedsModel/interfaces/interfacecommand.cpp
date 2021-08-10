@@ -22,7 +22,7 @@
 namespace seds::model {
 
 InterfaceCommand::InterfaceCommand() noexcept
-    : m_mode(InterfaceCommandMode::SYNC)
+    : m_mode(InterfaceCommandMode::Sync)
 {
 }
 
