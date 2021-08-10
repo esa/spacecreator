@@ -214,4 +214,16 @@ ivm::IVObject *IfaceParametersModel::entity() const
     return qobject_cast<ivm::IVObject *>(PropertiesModelBase::entity());
 }
 
+bool IfaceParametersModel::moveRows(const QModelIndex &sourceParent, int sourceRow,
+        int count, const QModelIndex &destinationParent, int destinationChild)
+{
+    if (PropertiesModelBase::moveRows(sourceParent, sourceRow, count, destinationParent, destinationChild)) {
+        for (int idx = 0; idx < count; ++idx)
+            std::swap(m_params[sourceRow + idx], m_params[destinationChild + idx]);
+        return true;
+    }
+    return false;
+}
+
+
 }

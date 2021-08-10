@@ -70,6 +70,8 @@ public:
 
     ivm::IVObject *entity() const override;
 
+    bool moveRows(const QModelIndex &sourceParent, int sourceRow, int count,
+            const QModelIndex &destinationParent, int destinationChild) override;
 private:
     cmd::CommandsStack::Macro *m_cmdMacro { nullptr };
     QVector<ivm::ContextParameter> m_params;

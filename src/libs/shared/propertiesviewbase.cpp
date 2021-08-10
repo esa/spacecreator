@@ -21,6 +21,7 @@
 #include "propertiesmodelbase.h"
 #include "ui_propertiesviewbase.h"
 
+#include <QtDebug>
 #include <QHeaderView>
 #include <QStandardItemModel>
 
@@ -34,6 +35,9 @@ PropertiesViewBase::PropertiesViewBase(const QList<int> delegatesColumns, QWidge
     ui->setupUi(this);
     ui->tableView->horizontalHeader()->setSectionResizeMode(QHeaderView::Interactive);
     ui->tableView->horizontalHeader()->setMinimumSectionSize(120);
+
+    connect(ui->btnUp, &QPushButton::clicked, this, &PropertiesViewBase::moveCurrentRowUp);
+    connect(ui->btnDown, &QPushButton::clicked, this, &PropertiesViewBase::moveCurrentRowDown);
 }
 
 PropertiesViewBase::~PropertiesViewBase()
@@ -47,8 +51,8 @@ void PropertiesViewBase::setModel(PropertiesModelBase *model)
         return;
 
     if (tableView()->selectionModel()) {
-        disconnect(tableView()->selectionModel(), &QItemSelectionModel::currentRowChanged, this,
-                &PropertiesViewBase::onCurrentRowChanged);
+        disconnect(tableView()->selectionModel(), &QItemSelectionModel::selectionChanged, this,
+                &PropertiesViewBase::onSelectionChanged);
     }
     if (m_model) {
         disconnect(m_model, &QStandardItemModel::rowsInserted, this, &PropertiesViewBase::rowsInserted);
@@ -56,11 +60,12 @@ void PropertiesViewBase::setModel(PropertiesModelBase *model)
 
     m_model = model;
     tableView()->setModel(m_model);
-    connect(m_model, &QStandardItemModel::rowsInserted, this, &PropertiesViewBase::rowsInserted, Qt::QueuedConnection);
+    connect(m_model, &QStandardItemModel::rowsInserted,
+        this, &PropertiesViewBase::rowsInserted, Qt::QueuedConnection);
 
     if (tableView()->selectionModel()) {
-        connect(tableView()->selectionModel(), &QItemSelectionModel::currentRowChanged, this,
-                &PropertiesViewBase::onCurrentRowChanged);
+        connect(tableView()->selectionModel(), &QItemSelectionModel::selectionChanged, this,
+                &PropertiesViewBase::onSelectionChanged);
     }
     setButtonsDisabled();
     rowsInserted(QModelIndex(), 0, m_model->rowCount() - 1);
@@ -76,10 +81,24 @@ QTableView *PropertiesViewBase::tableView() const
     return ui->tableView;
 }
 
-void PropertiesViewBase::onCurrentRowChanged(const QModelIndex &current, const QModelIndex &)
+void PropertiesViewBase::onSelectionChanged(const QItemSelection &selected, const QItemSelection &deselected)
 {
     if (m_model && !setButtonsDisabled()) {
-        ui->btnDel->setEnabled(current.isValid());
+        ui->btnDel->setEnabled(!selected.isEmpty());
+    }
+
+    if (selected.isEmpty()) {
+        ui->btnUp->setEnabled(false);
+        ui->btnDown->setEnabled(false);
+    } else {
+        const QModelIndexList indexes = selected.indexes();
+        bool hasFirst{false}, hasLast{false};
+        auto it = std::for_each(indexes.cbegin(), indexes.cend(), [&hasFirst, &hasLast](const QModelIndex &index){
+            hasFirst |= index.row() == 0;
+            hasLast |= index.row() == index.model()->rowCount(index.parent()) - 1;
+        });
+        ui->btnUp->setEnabled(!hasFirst);
+        ui->btnDown->setEnabled(!hasLast);
     }
 }
 
@@ -118,6 +137,52 @@ void PropertiesViewBase::on_btnDel_clicked()
     }
 }
 
+void PropertiesViewBase::moveCurrentRowUp()
+{
+    if (m_model) {
+        QModelIndexList idxs = ui->tableView->selectionModel()->selectedRows();
+        QList<int> rows;
+        for (const QModelIndex &idx: qAsConst(idxs))
+            rows.append(idx.row() - 1);
+
+        std::sort(idxs.begin(), idxs.end(), [](const QModelIndex &idx1, const QModelIndex &idx2){
+            return idx1.row() < idx2.row();
+        });
+        for (int idx = 0; idx < idxs.size(); ++idx) {
+            m_model->moveRow(QModelIndex(), idxs.value(idx).row(), QModelIndex(), idxs.value(idx).row() - 1);
+        }
+
+        ui->tableView->selectionModel()->clearSelection();
+        for (int row: qAsConst(rows)) {
+            const QItemSelection selection(m_model->index(row, 0), m_model->index(row, m_model->columnCount() - 1));
+            ui->tableView->selectionModel()->select(selection, QItemSelectionModel::SelectCurrent | QItemSelectionModel::Rows);
+        }
+    }
+}
+
+void PropertiesViewBase::moveCurrentRowDown()
+{
+    if (m_model) {
+        QModelIndexList idxs = ui->tableView->selectionModel()->selectedRows();
+        QList<int> rows;
+        for (auto idx: idxs)
+            rows.append(idx.row() + 1);
+
+        std::sort(idxs.begin(), idxs.end(), [](const QModelIndex &idx1, const QModelIndex &idx2){
+            return idx1.row() > idx2.row();
+        });
+        for (int idx = 0; idx < idxs.size(); ++idx) {
+            m_model->moveRow(QModelIndex(), idxs.value(idx).row(), QModelIndex(), idxs.value(idx).row() + 1);
+        }
+
+        ui->tableView->selectionModel()->clearSelection();
+        for (int row: rows) {
+            const QItemSelection selection(m_model->index(row, 0), m_model->index(row, m_model->columnCount() - 1));
+            ui->tableView->selectionModel()->select(selection, QItemSelectionModel::SelectCurrent | QItemSelectionModel::Rows);
+        }
+    }
+}
+
 void PropertiesViewBase::setButtonsDisabled(bool state)
 {
     ui->btnAdd->setDisabled(state);
@@ -142,6 +207,8 @@ AttributesView::AttributesView(QWidget *widget)
 {
     ui->btnAdd->hide();
     ui->btnDel->hide();
+    ui->btnDown->hide();
+    ui->btnUp->hide();
 }
 
 bool AttributesView::setButtonsDisabled()

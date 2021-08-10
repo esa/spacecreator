@@ -29,4 +29,14 @@ VEObject *PropertiesModelBase::entity() const
     return m_dataObject;
 }
 
+bool PropertiesModelBase::moveRows(const QModelIndex &sourceParent, int sourceRow,
+        int count, const QModelIndex &destinationParent, int destinationChild)
+{
+    for (int idx = sourceRow; idx < sourceRow + count; ++idx) {
+        auto items = takeRow(idx);
+        insertRow(destinationChild + idx - sourceRow, items);
+    }
+    return true;
+}
+
 } // namespace shared

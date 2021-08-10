@@ -47,6 +47,17 @@ QString PropertiesListModel::tokenNameFromIndex(const QModelIndex &index)
     return name;
 }
 
+bool PropertiesListModel::moveRows(const QModelIndex &sourceParent, int sourceRow,
+        int count, const QModelIndex &destinationParent, int destinationChild)
+{
+    if (PropertiesModelBase::moveRows(sourceParent, sourceRow, count, destinationParent, destinationChild)) {
+        for (int idx = 0; idx < count; ++idx)
+            std::swap(m_names[sourceRow + idx], m_names[destinationChild + idx]);
+        return true;
+    }
+    return false;
+}
+
 PropertiesListModel::PropertiesListModel(
         cmd::CommandsStackBase::Macro *macro, shared::PropertyTemplateConfig *dynPropConfig, QObject *parent)
     : PropertiesModelBase(parent)

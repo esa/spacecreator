@@ -108,7 +108,7 @@ void ActionsManager::populateMenu(QMenu *menu, ivm::IVObject *currObj, Interface
 
     menu->addSeparator();
 
-    for (const Action &actHandler : instance()->m_actions) {
+    for (const Action &actHandler : qAsConst(instance()->m_actions)) {
         QAction *act = new QAction(actHandler.m_title, menu);
         act->setData(QVariant::fromValue(currObj));
         const bool enabled(actHandler.isAcceptable(currObj));

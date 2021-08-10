@@ -64,6 +64,8 @@ public:
 
     ivm::IVObject *entity() const override;
 
+    bool moveRows(const QModelIndex &sourceParent, int sourceRow, int count,
+            const QModelIndex &destinationParent, int destinationChild) override;
 private:
     void createNewRow(const ivm::InterfaceParameter &param, int row);
 

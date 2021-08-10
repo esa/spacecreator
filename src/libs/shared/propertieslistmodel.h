@@ -60,6 +60,9 @@ public:
 
     static QString tokenNameFromIndex(const QModelIndex &index);
 
+    bool moveRows(const QModelIndex &sourceParent, int sourceRow,
+            int count, const QModelIndex &destinationParent, int destinationChild) override;
+
 protected:
     cmd::CommandsStackBase::Macro *m_cmdMacro { nullptr };
     shared::PropertyTemplateConfig *m_propTemplatesConfig { nullptr };

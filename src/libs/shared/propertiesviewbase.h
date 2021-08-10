@@ -20,6 +20,7 @@
 #include <QWidget>
 
 class QTableView;
+class QItemSelection;
 
 namespace Ui {
 class PropertiesViewBase;
@@ -40,14 +41,15 @@ public:
     QTableView *tableView() const;
 
 protected Q_SLOTS:
-    virtual void onCurrentRowChanged(const QModelIndex &current, const QModelIndex &previous);
-    virtual void on_btnAdd_clicked();
-    virtual void on_btnDel_clicked();
+    void on_btnAdd_clicked();
+    void on_btnDel_clicked();
+    void onSelectionChanged(const QItemSelection &selected, const QItemSelection &deselected);
+    void moveCurrentRowUp();
+    void moveCurrentRowDown();
 
 protected:
     PropertiesModelBase *m_model { nullptr };
     const QList<int> m_delegatesColumns;
-    bool m_buttonsVisible { true };
 
 protected:
     void setButtonsDisabled(bool state);
