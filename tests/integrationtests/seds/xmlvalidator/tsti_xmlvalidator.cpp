@@ -21,7 +21,7 @@
 
 #include <QObject>
 #include <QtTest>
-#include <converter/import/exceptions.h>
+#include <conversion/converter/import/exceptions.h>
 #include <seds/XmlValidator/exceptions.h>
 #include <seds/XmlValidator/validator.h>
 

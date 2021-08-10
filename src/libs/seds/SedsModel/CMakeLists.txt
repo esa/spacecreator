@@ -270,7 +270,7 @@ target_sources(SedsModel
                 "${INCLUDES}")
 target_include_directories(SedsModel
     PUBLIC      .
-    PRIVATE     ${CMAKE_SOURCE_DIR}/src/libs/conversion)
+    PRIVATE     ${CMAKE_SOURCE_DIR}/src/libs)
 target_link_libraries(SedsModel
     PRIVATE     Conversion::Converter
     PUBLIC      Qt5::Core)

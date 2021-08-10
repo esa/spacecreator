@@ -11,7 +11,7 @@ target_sources(SymbolDefinitionReader
                 "${INCLUDES}")
 target_include_directories(SymbolDefinitionReader
     PUBLIC      .
-    PRIVATE     ${CMAKE_SOURCE_DIR}/src/libs/conversion)
+    PRIVATE     ${CMAKE_SOURCE_DIR}/src/libs)
 target_link_libraries(SymbolDefinitionReader
     PRIVATE     Conversion::Converter
     PUBLIC      Qt5::Core)

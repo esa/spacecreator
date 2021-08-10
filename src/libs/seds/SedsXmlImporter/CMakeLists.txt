@@ -10,7 +10,7 @@ target_sources(SedsXmlImporter
                 "${INCLUDES}")
 target_include_directories(SedsXmlImporter
     PUBLIC      .
-    PRIVATE     ${CMAKE_SOURCE_DIR}/src/libs/conversion)
+    PRIVATE     ${CMAKE_SOURCE_DIR}/src/libs)
 target_link_libraries(SedsXmlImporter
     PRIVATE     Conversion::Converter
                 SEDS::SymbolDefinitionReader

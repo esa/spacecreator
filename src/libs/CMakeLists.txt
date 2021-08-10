@@ -18,8 +18,9 @@ add_subdirectory(msccore)
 add_subdirectory(dvcore)
 add_subdirectory(libdveditor)
 
-# seds conversion
+# conversion
 add_subdirectory(conversion)
+add_subdirectory(seds)
 
 # Total SpaceCreator system
 add_subdirectory(spacecreatorsystem)

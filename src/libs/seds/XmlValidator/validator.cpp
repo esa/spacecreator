@@ -22,7 +22,7 @@
 #include "exceptions.h"
 
 #include <QFileInfo>
-#include <converter/import/exceptions.h>
+#include <conversion/converter/import/exceptions.h>
 #include <libxml/xinclude.h>
 #include <libxml/xmlschemastypes.h>
 

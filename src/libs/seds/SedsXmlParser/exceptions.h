@@ -20,7 +20,7 @@
 #pragma once
 
 #include <QString>
-#include <converter/import/exceptions.h>
+#include <conversion/converter/import/exceptions.h>
 
 namespace seds::parser {
 

@@ -13,7 +13,7 @@ target_sources(ConversionConverter
                 "${INCLUDES}")
 target_include_directories(ConversionConverter
     PUBLIC      .
-    PRIVATE     ${CMAKE_SOURCE_DIR}/src/libs/conversion)
+    PRIVATE     ${CMAKE_SOURCE_DIR}/src/libs)
 target_link_libraries(ConversionConverter
     PUBLIC      Qt5::Core)
 

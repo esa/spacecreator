@@ -20,31 +20,38 @@
 #pragma once
 
 #include <QString>
-#include <converter/import/exceptions.h>
-#include <string_view>
+#include <conversion/converter/import/exceptions.h>
 
-namespace seds::symbolreader {
+namespace seds::preprocessor {
 
 /**
- * @brief   Exception thrown when an error was encountered during reading symbol definitions
+ * @brief   Exception thrown when an error was encountered during preprocessing
  */
-class SymbolDefinitionReaderException : public converter::import::ImportException
+class XmlPreprocessorException : public converter::import::ImportException
 {
 public:
-    /*
+    /**
      * @brief   Constructor
      *
-     * @param   filename    File that is being read
+     * @param   filename    File that is being preprocessed
      * @param   message     Error message
      */
-    SymbolDefinitionReaderException(QString filename, QString message);
-    /*
-     * @brief   Constructor
-     *
-     * @param   filename    File that is being read
-     * @param   message     Error message
-     */
-    SymbolDefinitionReaderException(QString filename, std::string_view message);
+    XmlPreprocessorException(QString filename, QString message);
 };
 
-} // namespace seds::symbolreader
+/**
+ * @brief   Exception thrown when preprocessed file contains undefined external reference
+ */
+class UndefinedExternalReference : public XmlPreprocessorException
+{
+public:
+    /**
+     * @brief   Constructor
+     *
+     * @param   filename            File that is being preprocessed
+     * @param   externalReference   Reference that wasn't defined
+     */
+    UndefinedExternalReference(QString filename, QString externalReference);
+};
+
+} // namespace seds::preprocessor

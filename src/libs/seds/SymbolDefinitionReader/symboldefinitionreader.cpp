@@ -21,7 +21,7 @@
 
 #include <QFileInfo>
 #include <QVariant>
-#include <converter/import/exceptions.h>
+#include <conversion/converter/import/exceptions.h>
 #define TOML_EXCEPTIONS 0
 #include "exceptions.h"
 

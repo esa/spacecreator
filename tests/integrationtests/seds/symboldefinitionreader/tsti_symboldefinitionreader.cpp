@@ -22,7 +22,7 @@
 #include <QDir>
 #include <QObject>
 #include <QtTest>
-#include <converter/import/exceptions.h>
+#include <conversion/converter/import/exceptions.h>
 #include <seds/SymbolDefinitionReader/exceptions.h>
 #include <seds/SymbolDefinitionReader/symboldefinitionreader.h>
 

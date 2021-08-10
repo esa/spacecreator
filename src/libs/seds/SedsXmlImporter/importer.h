@@ -20,8 +20,8 @@
 #pragma once
 
 #include <QString>
-#include <converter/import/options.h>
-#include <converter/model.h>
+#include <conversion/converter/import/options.h>
+#include <conversion/converter/model.h>
 #include <memory>
 #include <optional>
 #include <seds/SymbolDefinitionReader/symboldefinitionreader.h>

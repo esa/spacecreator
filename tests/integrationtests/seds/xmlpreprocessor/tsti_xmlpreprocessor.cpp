@@ -24,7 +24,7 @@
 #include <QDomElement>
 #include <QObject>
 #include <QtTest>
-#include <converter/import/exceptions.h>
+#include <conversion/converter/import/exceptions.h>
 #include <seds/SymbolDefinitionReader/symboldefinitionreader.h>
 #include <seds/XmlPreprocessor/exceptions.h>
 #include <seds/XmlPreprocessor/preprocessor.h>

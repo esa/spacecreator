@@ -6,7 +6,7 @@ target_sources(SedsTestBase
                 sedstestbase.cpp)
 target_include_directories(SedsTestBase
     PUBLIC      .
-                ${CMAKE_SOURCE_DIR}/src/libs/conversion)
+                ${CMAKE_SOURCE_DIR}/src/libs)
 target_link_libraries(SedsTestBase
     PUBLIC      Conversion::Converter
                 Qt5::Core

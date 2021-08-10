@@ -28,7 +28,7 @@
 #include <QDomText>
 #include <QFileInfo>
 #include <QTextStream>
-#include <converter/import/exceptions.h>
+#include <conversion/converter/import/exceptions.h>
 #include <libxml/xinclude.h>
 
 using converter::import::FileNotFound;

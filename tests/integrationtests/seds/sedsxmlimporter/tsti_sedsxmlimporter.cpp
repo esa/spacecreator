@@ -22,8 +22,8 @@
 #include <QFileInfo>
 #include <QObject>
 #include <QtTest>
-#include <converter/import/exceptions.h>
-#include <converter/import/options.h>
+#include <conversion/converter/import/exceptions.h>
+#include <conversion/converter/import/options.h>
 #include <seds/SedsModel/sedsmodel.h>
 #include <seds/SedsXmlImporter/importer.h>
 

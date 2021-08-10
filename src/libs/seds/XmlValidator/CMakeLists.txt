@@ -11,7 +11,7 @@ target_sources(XmlValidator
                 "${INCLUDES}")
 target_include_directories(XmlValidator
     PUBLIC      .
-    PRIVATE     ${CMAKE_SOURCE_DIR}/src/libs/conversion)
+    PRIVATE     ${CMAKE_SOURCE_DIR}/src/libs)
 target_link_libraries(XmlValidator
     PRIVATE     Conversion::Converter
                 LibXml2::LibXml2

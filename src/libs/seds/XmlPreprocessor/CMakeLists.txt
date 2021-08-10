@@ -11,7 +11,7 @@ target_sources(XmlPreprocessor
                 "${INCLUDES}")
 target_include_directories(XmlPreprocessor
     PUBLIC      .
-    PRIVATE     ${CMAKE_SOURCE_DIR}/src/libs/conversion)
+    PRIVATE     ${CMAKE_SOURCE_DIR}/src/libs)
 target_link_libraries(XmlPreprocessor
     PRIVATE     Conversion::Converter
                 LibXml2::LibXml2

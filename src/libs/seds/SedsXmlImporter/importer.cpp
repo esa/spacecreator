@@ -24,7 +24,7 @@
 #include <QString>
 #include <QXmlStreamReader>
 #include <algorithm>
-#include <converter/import/exceptions.h>
+#include <conversion/converter/import/exceptions.h>
 #include <seds/SedsXmlParser/parser.h>
 #include <seds/XmlPreprocessor/preprocessor.h>
 #include <seds/XmlValidator/validator.h>

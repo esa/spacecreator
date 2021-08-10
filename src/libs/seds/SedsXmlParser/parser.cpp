@@ -29,8 +29,8 @@
 #include <QFile>
 #include <QFileInfo>
 #include <QXmlStreamReader>
-#include <converter/import/exceptions.h>
-#include <converter/model.h>
+#include <conversion/converter/import/exceptions.h>
+#include <conversion/converter/model.h>
 #include <seds/SedsModel/datasheet.h>
 #include <seds/SedsModel/package/package.h>
 #include <seds/SedsModel/packagefile.h>
