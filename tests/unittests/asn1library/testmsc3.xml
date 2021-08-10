@@ -119,7 +119,6 @@
                                         </SequenceType>
                                     </Type>
                                 </ReferenceType>
-
                             </Type>
                         </SequenceOrSetChild>
                         <SequenceOrSetChild VarName="shape" CName="shape" AdaName="shape" Optional="False" Line="27" CharPositionInLine="5" bAlwaysPresent = "True" bAlwaysAbsent="False">

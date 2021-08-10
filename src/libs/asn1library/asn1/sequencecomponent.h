@@ -58,8 +58,8 @@ public:
     const QString &name() const { return m_name; }
     const QString &cName() const { return m_cName; }
 
-    const Types::Type &type() const { return *m_type; }
-    Types::Type &type() { return *m_type; }
+    const Types::Type *type() const { return m_type.get(); }
+    Types::Type *type() { return m_type.get(); }
 
 private:
     QString m_name;

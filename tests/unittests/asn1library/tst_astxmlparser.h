@@ -53,7 +53,8 @@ private Q_SLOTS:
     void test_multipleImportedType();
     void test_assignmentsAreTypeReferences();
     void test_sequenceTypeAssingment();
-    void test_sequenceOfTypeAssingment();
+    void test_sequenceOfTypeAssingmentOfReferencedType();
+    void test_sequenceOfTypeAssingmentOfBuiltinType();
     void test_choiceTypeAssignment();
     void test_valueAssignment();
     void test_importedValues();
@@ -64,7 +65,75 @@ private Q_SLOTS:
     void test_asn1AstParsing();
     void test_asn1AstReferenceParsing();
 
+    void test_enumeratedItems();
+    void test_enumeratedConstraints();
+    void test_enumeratedWithAcnParams();
+    void test_enumeratedValueAssignment();
+
+    void test_singleIntegerTypeAssignmentWithSimpleConstraint();
+    void test_singleIntegerTypeAssignmentWithRangedConstraints();
+    void test_singleIntegerTypeAssignmentWithAcnParams();
+    void test_singleIntegerValueAssignment();
+
+    void test_singleRealTypeAssignmentWithSimpleConstraint();
+    void test_singleRealTypeAssignmentWithRangedConstraints();
+    void test_singleRealTypeAssignmentWithAcnParams();
+    void test_singleRealValueAssignment();
+
+    void test_sequenceOfAssignmentWithSimpleConstraint();
+    void test_sequenceOfAssignmentWithMultipleRangeConstraints();
+    void test_sequenceOfAssignmentWithRangeConstraintInsideSizeConstraint();
+    void test_sequenceOfAssignmentWithAcnParams();
+    void test_sequenceOfValueAssignment();
+
+    void test_choiceWithAcnParams();
+    void test_choiceAlternatives();
+    void test_choiceAlternativesWithAcnParams();
+    void test_choiceValueAssignment();
+
+    void test_booleanWithAcnParams();
+    void test_booleanValueAssignment();
+
+    void test_nullWithAcnParams();
+    void test_nullValueAssignment();
+
+    void test_sequnceWithAcnParams();
+    void test_sequenceComponents();
+    void test_sequenceComponentsWithAcnParams();
+    void test_sequenceAcnComponents();
+    void test_sequenceValueAssignment();
+
+    void test_octetStringWithSizeConstraint();
+    void test_octetStringWithRangedSizeConstraint();
+    void test_octetStringWithValueDefined();
+    void test_octetStringAcnParams();
+    void test_octetStringValueAssignment();
+
+    void test_iA5StringWithSizeConstraint();
+    void test_iA5StringWithValueConstraint();
+    void test_iA5StringWithValueDefined();
+    void test_iA5StringAcnParams();
+    void test_iA5StringValueAssignment();
+
+    void test_numericStringWithSizeConstraint();
+    void test_numericStringWithValueConstraint();
+    void test_numericStringWithValueDefined();
+    void test_numericStringAcnParams();
+
+    void test_bitStringWithSizeConstraint();
+    void test_bitStringWithRangedSizeConstraint();
+    void test_bitStringWithValueDefined();
+    void test_bitStringAcnParams();
+    void test_bitStringValueAssignment();
+
+    void test_notRelatedConstraintsInNumericString();
+    void test_nestedValueAssignments();
+    void test_parametrizedInstances();
+
 private:
+    template<typename Collection>
+    auto itemFromCollection(const Collection &col, const QString &id);
+
     void setXmlData(const QString &str);
     void parsingFails(const QString &xmlData);
     void parse(const QString &xmlData);

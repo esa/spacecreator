@@ -46,7 +46,7 @@ std::unique_ptr<SequenceComponent> AcnSequenceComponent::clone() const
 
 QString AcnSequenceComponent::definitionAsString() const
 {
-    return name() + QChar(' ') + type().typeName();
+    return name() + QChar(' ') + (type() ? type()->typeName() : QChar(' '));
 }
 
 QString AcnSequenceComponent::presentWhen() const

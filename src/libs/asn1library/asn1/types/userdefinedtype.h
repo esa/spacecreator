@@ -55,8 +55,8 @@ public:
 
     const TypeAssignment *referencedType() const;
 
-    const Type &type() const { return *m_type; }
-    Type &type() { return *m_type; }
+    const Type *type() const { return m_type.get(); }
+    Type *type() { return m_type.get(); }
     void setType(std::unique_ptr<Type> type);
 
     const AcnArgumentPtrs &acnArguments() const { return m_arguments; }

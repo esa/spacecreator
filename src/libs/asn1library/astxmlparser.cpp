@@ -762,29 +762,33 @@ static bool isTypeName(const QString &name)
 {
     // clang-format off
     return name == QStringLiteral("BIT_STRING")
+           || name == QStringLiteral("BIT STRING")
+           || name == QStringLiteral("BitStringType")
            || name == QStringLiteral("BOOLEAN")
+           || name.startsWith(QStringLiteral("Boolean"), Qt::CaseInsensitive)
            || name == QStringLiteral("CHOICE")
+           || name.startsWith(QStringLiteral("Choice"), Qt::CaseInsensitive)
            || name == QStringLiteral("ENUMERATED")
+           || name.startsWith(QStringLiteral("Enumerated"), Qt::CaseInsensitive)
            || name == QStringLiteral("NumericString")
            || name == QStringLiteral("IA5String")
            || name == QStringLiteral("INTEGER")
+           || name.startsWith(QStringLiteral("Integer"), Qt::CaseInsensitive)
            || name == QStringLiteral("NULL")
+           || name == QStringLiteral("NullType")
            || name == QStringLiteral("NumericString")
            || name == QStringLiteral("OCTET_STRING")
-           || name == QStringLiteral("REAL")
-           || name == QStringLiteral("SEQUENCE")
-           || name == QStringLiteral("SEQUENCE_OF")
-           || name == QStringLiteral("REFERENCE_TYPE")
-           || name.startsWith(QStringLiteral("boolean"), Qt::CaseInsensitive)
-           || name == QStringLiteral("NullType")
-           || name.startsWith(QStringLiteral("Integer"), Qt::CaseInsensitive)
-           || name.startsWith(QStringLiteral("Real"), Qt::CaseInsensitive)
-           || name == QStringLiteral("BitStringType")
+           || name == QStringLiteral("OCTET STRING")
            || name == QStringLiteral("OctetStringType")
-           || name.startsWith(QStringLiteral("Enumerated"), Qt::CaseInsensitive)
-           || name.startsWith(QStringLiteral("Choice"), Qt::CaseInsensitive)
+           || name == QStringLiteral("REAL")
+           || name.startsWith(QStringLiteral("Real"), Qt::CaseInsensitive)
+           || name == QStringLiteral("SEQUENCE")
            || name == QStringLiteral("SequenceType")
+           || name == QStringLiteral("SEQUENCE_OF")
+           || name == QStringLiteral("SEQUENCE OF")
            || name == QStringLiteral("SequenceOfType")
+           || name == QStringLiteral("REFERENCE_TYPE")
+           || name == QStringLiteral("REFERENCE TYPE")
            || name == QStringLiteral("ReferenceType");
     // clang-format on
 }
@@ -863,7 +867,7 @@ std::unique_ptr<Types::Type> AstXmlParser::buildTypeFromName(
         m_inParametrizedBranch = true;
 
     readTypeAttributes(*type);
-    readTypeContents(type->typeName(), *type);
+    readTypeContents(name, *type);
 
     return type;
 }
@@ -912,51 +916,34 @@ void AstXmlParser::readAcnArguments(Types::Type &type)
 
 void AstXmlParser::readTypeContents(const QString &name, Types::Type &type)
 {
-    if (name == QStringLiteral("SEQUENCE")) {
-        if (m_xmlReader.name() == QStringLiteral("SequenceType")) {
-            readSequenceAsn(type);
-        } else {
-            readSequence(type);
-        }
-    } else if (name == QStringLiteral("SEQUENCE_OF") || name == QStringLiteral("SEQUENCE OF")) {
+    if (name == QStringLiteral("SequenceType")) {
+        readSequenceAsn(type);
+    } else if (name == QStringLiteral("SEQUENCE")) {
+        readSequence(type);
+    } else if (name == QStringLiteral("SEQUENCE_OF") || name == QStringLiteral("SEQUENCE OF") || name == QStringLiteral("SequenceOfType")) {
         readSequenceOf(type);
+    } else if (m_xmlReader.name() == "ChoiceType") {
+        readChoiceAsn(type);
     } else if (name == QStringLiteral("CHOICE")) {
-        if (m_xmlReader.name() == "ChoiceType") {
-            readChoiceAsn(type);
-        } else {
-            readChoice(type);
-        }
-    } else if (name == QStringLiteral("REFERENCE_TYPE")) {
+        readChoice(type);
+    } else if (name == QStringLiteral("REFERENCE_TYPE") || name == QStringLiteral("REFERENCE TYPE") || name == QStringLiteral("ReferenceType")) {
         readReferenceType(type);
-    } else if (name == QStringLiteral("INTEGER")) {
+    } else if (name == QStringLiteral("INTEGER") || name.startsWith(QStringLiteral("Integer"), Qt::CaseInsensitive)) {
         readInteger(type);
-    } else if (name == QStringLiteral("REAL")) {
+    } else if (name == QStringLiteral("REAL") || name.startsWith(QStringLiteral("Real"), Qt::CaseInsensitive)) {
         readReal(type);
-    } else if (name == QStringLiteral("ENUMERATED")) {
+    } else if (name == QStringLiteral("ENUMERATED") || name.startsWith(QStringLiteral("Enumerated"), Qt::CaseInsensitive)) {
         readEnumerated(type);
-    } else if (name == QStringLiteral("OCTET_STRING")) {
+    } else if (name == QStringLiteral("OCTET_STRING") || name == QStringLiteral("OCTET STRING") || name == QStringLiteral("OctetStringType")) {
         readOctetString(type);
-    } else if (name == QStringLiteral("IA5String")) {
+    } else if (name == QStringLiteral("IA5String") || name == QStringLiteral("IA5String")) {
         readIA5String(type);
     } else if (name == QStringLiteral("NumericString")) {
         readNumericString(type);
-    } else if (name == QStringLiteral("BIT_STRING")) {
+    } else if (name == QStringLiteral("BIT_STRING") || name == QStringLiteral("BIT STRING") || name == QStringLiteral("BitStringType")) {
         readBitString(type);
     } else {
-        const TypeAssignment *assignment = m_currentDefinitions->type(name);
-        if (assignment) {
-            std::unique_ptr<Types::Type> subType = findAndReadType();
-            if (subType) {
-                type.addChild(std::move(subType));
-                m_xmlReader.skipCurrentElement();
-            } else {
-                if (type.parameters().isEmpty()) {
-                    type.setParameters(assignment->type()->parameters());
-                }
-            }
-        } else {
-            m_xmlReader.skipCurrentElement();
-        }
+        m_xmlReader.skipCurrentElement();
     }
 }
 
@@ -1146,10 +1133,17 @@ void AstXmlParser::readEnumValues(Types::Type &type)
 
 void AstXmlParser::readReferenceType(Types::Type &type)
 {
+    const TypeAssignment *assignment = m_currentDefinitions->type(type.typeName());
+    if (assignment) {
+        if (type.parameters().isEmpty()) {
+            type.setParameters(assignment->type()->parameters());
+        }
+    } 
+
     while (m_xmlReader.readNextStartElement()) {
         if (m_xmlReader.name() == QStringLiteral("AcnArguments"))
             readAcnArguments(type);
-        else if (m_xmlReader.name() == QStringLiteral("Asn1Type"))
+        else if (m_xmlReader.name() == QStringLiteral("Asn1Type") || m_xmlReader.name() == QStringLiteral("Type"))
             readReferredTypeDetails(type);
         else
             m_xmlReader.skipCurrentElement();

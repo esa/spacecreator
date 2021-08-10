@@ -101,7 +101,7 @@ template<typename ValueType>
 void PrintingVisitor<ValueType>::visit(const FromConstraint<ValueType> &constraint)
 {
     m_stream << "FROM(";
-    PrintingVisitor<Data::StringValue> v(m_stream);
+    PrintingVisitor<StringValue> v(m_stream);
     constraint.innerConstraints().accept(v);
     m_stream << ")";
 }
@@ -110,7 +110,7 @@ template<typename ValueType>
 void PrintingVisitor<ValueType>::visit(const SizeConstraint<ValueType> &constraint)
 {
     m_stream << "SIZE(";
-    PrintingVisitor<Data::IntegerValue> v(m_stream);
+    PrintingVisitor<IntegerValue> v(m_stream);
     constraint.innerConstraints().accept(v);
     m_stream << ")";
 }

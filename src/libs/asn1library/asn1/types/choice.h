@@ -58,8 +58,8 @@ public:
     const QString &presentWhen() const { return m_presentWhen; }
     const SourceLocation &location() const { return m_location; }
 
-    const Type &type() const { return *m_type; }
-    Type &type() { return *m_type; }
+    const Type *type() const { return m_type.get(); }
+    Type *type() { return m_type.get(); }
 
 private:
     QString m_name;
