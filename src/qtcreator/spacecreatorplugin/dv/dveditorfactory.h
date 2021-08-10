@@ -36,7 +36,9 @@ public:
     DVEditorFactory(
             SpaceCreatorProjectManager *projectManager, const QList<QAction *> &dvActions, QObject *parent = nullptr);
 
+#if QTC_VERSION == 48
     Core::IEditor *createEditor() override;
+#endif
 
 private:
     std::unique_ptr<DVEditorData> m_editorData;

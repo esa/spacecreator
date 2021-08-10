@@ -37,7 +37,9 @@ public:
     explicit IVEditorFactory(
             SpaceCreatorProjectManager *projectManager, const QList<QAction *> &ivActions, QObject *parent);
 
+#if QTC_VERSION == 48
     Core::IEditor *createEditor() override;
+#endif
 
     IVEditorData *editorData() const;
 

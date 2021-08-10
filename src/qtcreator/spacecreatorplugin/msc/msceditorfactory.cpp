@@ -29,20 +29,26 @@ namespace spctr {
 
 MscEditorFactory::MscEditorFactory(
         SpaceCreatorProjectManager *projectManager, const QList<QAction *> &mscActions, QObject *parent)
-    : IEditorFactory(parent)
+    : IEditorFactory()
     , m_editorData(new MscEditorData(projectManager, mscActions))
 {
     setId(Constants::K_MSC_EDITOR_ID);
     setDisplayName(QCoreApplication::translate("MscEditor", Constants::C_MSCEDITOR_DISPLAY_NAME));
     addMimeType(spctr::Constants::MSC_MIMETYPE);
 
+#if QTC_VERSION == 582
+    setEditorCreator(std::bind(&MscEditorFactory::createEditor, this));
+#endif
+
     Core::FileIconProvider::registerIconOverlayForSuffix(":/projectexplorer/images/fileoverlay_scxml.png", "msc");
 }
 
+#if QTC_VERSION == 48
 Core::IEditor *MscEditorFactory::createEditor()
 {
     return m_editorData->createEditor();
 }
+#endif
 
 MscEditorData *MscEditorFactory::editorData() const
 {

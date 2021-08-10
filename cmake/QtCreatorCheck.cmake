@@ -60,7 +60,12 @@ if (EXISTS ${QTC_SOURCE_DIR} AND EXISTS ${QTC_LIB_DIR})
     message(STATUS "QtCreator sources in ${QTC_SOURCE_DIR}")
     message(STATUS "QtCreator libraries in ${QTC_LIB_DIR}")
 
-    set(priFile "${QTC_SOURCE_DIR}/qtcreator.pri")
+    if (EXISTS "${QTC_SOURCE_DIR}/qtcreator_ide_branding.pri")
+        set(priFile "${QTC_SOURCE_DIR}/qtcreator_ide_branding.pri")
+    else ()
+        set(priFile "${QTC_SOURCE_DIR}/qtcreator.pri")
+    endif ()
+
     if (EXISTS ${priFile})
         file(READ ${priFile} FILE_CONTENT)
         set(_regex "QTCREATOR_COMPAT_VERSION = ([0-9.]+)")

@@ -9,6 +9,6 @@ add_subdirectory(msccore)
 add_subdirectory(shared)
 add_subdirectory(spacecreatorsystem)
 
-if (${QTC_FOUND})
+if (${QTC_FOUND} AND QTC_VERSION EQUAL 48)
     add_subdirectory(asn1plugin)
 endif()

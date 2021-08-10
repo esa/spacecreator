@@ -24,7 +24,7 @@
 ****************************************************************************/
 #pragma once
 
-#include <coreplugin/id.h>
+#include <id.h>
 
 #include "completionassist.h"
 

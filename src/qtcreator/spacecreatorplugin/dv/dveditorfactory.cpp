@@ -28,19 +28,23 @@ namespace spctr {
 
 DVEditorFactory::DVEditorFactory(
         SpaceCreatorProjectManager *projectManager, const QList<QAction *> &dvActions, QObject *parent)
-    : IEditorFactory(parent)
+    : IEditorFactory()
     , m_editorData(new DVEditorData(projectManager, dvActions))
 {
     setId(spctr::Constants::K_DV_EDITOR_ID);
     setDisplayName(QCoreApplication::translate("DV Editor", spctr::Constants::C_DVEDITOR_DISPLAY_NAME));
     addMimeType(spctr::Constants::DV_MIMETYPE);
-
+#if QTC_VERSION == 582
+    setEditorCreator(std::bind(&DVEditorFactory::createEditor, this));
+#endif
     Core::FileIconProvider::registerIconOverlayForSuffix(":/projectexplorer/images/fileoverlay_scxml.png", "xml");
 }
 
+#if QTC_VERSION == 48
 Core::IEditor *spctr::DVEditorFactory::createEditor()
 {
     return m_editorData->createEditor();
 }
+#endif
 
 } // namespace spctr

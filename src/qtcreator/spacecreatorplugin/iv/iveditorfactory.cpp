@@ -29,24 +29,28 @@ namespace spctr {
 
 IVEditorFactory::IVEditorFactory(
         SpaceCreatorProjectManager *projectManager, const QList<QAction *> &ivActions, QObject *parent)
-    : IEditorFactory(parent)
+    : IEditorFactory()
     , m_editorData(new IVEditorData(projectManager, ivActions))
 {
     setId(spctr::Constants::K_IV_EDITOR_ID);
     setDisplayName(QCoreApplication::translate("IV Editor", spctr::Constants::C_IVEDITOR_DISPLAY_NAME));
     addMimeType(spctr::Constants::IV_MIMETYPE);
 
+#if QTC_VERSION == 582
+    setEditorCreator(std::bind(&IVEditorFactory::createEditor, this));
+#endif
     Core::FileIconProvider::registerIconOverlayForSuffix(":/projectexplorer/images/fileoverlay_scxml.png", "xml");
 }
 
+#if QTC_VERSION == 48
 Core::IEditor *IVEditorFactory::createEditor()
 {
     return m_editorData->createEditor();
 }
+#endif
 
 IVEditorData *IVEditorFactory::editorData() const
 {
     return m_editorData.get();
 }
-
 }

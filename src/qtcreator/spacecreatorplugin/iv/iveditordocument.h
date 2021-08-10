@@ -36,8 +36,18 @@ public:
     explicit IVEditorDocument(SpaceCreatorProjectManager *projectManager, QObject *parent = nullptr);
 
     // IDocument
+#if QTC_VERSION == 582
+    OpenResult open(
+            QString *errorString, const Utils::FilePath &fileName, const Utils::FilePath &realFileName) override;
+    bool save(QString *errorString, const Utils::FilePath &fileName, bool autoSave) override;
+    void setFilePath(const Utils::FilePath &) override;
+#elif QTC_VERSION == 48
     OpenResult open(QString *errorString, const QString &fileName, const QString &realFileName) override;
     bool save(QString *errorString, const QString &fileName, bool autoSave) override;
+    void setFilePath(const Utils::FileName &) override;
+#else
+#warning(Unsupported QtC version)
+#endif
     bool shouldAutoSave() const override;
     bool isSaveAsAllowed() const override;
     bool isModified() const override;
@@ -45,7 +55,6 @@ public:
 
     // Internal
     QSharedPointer<ive::IVEditorCore> ivEditorCore() const;
-    void setFilePath(const Utils::FileName &) override;
 
 Q_SIGNALS:
     void reloadRequested(QString *errorString, const QString &);

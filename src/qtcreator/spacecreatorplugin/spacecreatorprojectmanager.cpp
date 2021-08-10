@@ -85,9 +85,15 @@ QSharedPointer<msc::MSCEditorCore> SpaceCreatorProjectManager::mscData(const QSt
 SpaceCreatorProjectImpl *SpaceCreatorProjectManager::project(const QString &fileName) const
 {
     for (SpaceCreatorProjectImpl *project : m_projects) {
+#if QTC_VERSION == 582
+        if (project->project()->isKnownFile(Utils::FilePath::fromString(fileName))) {
+            return project;
+        }
+#elif QTC_VERSION == 48
         if (project->project()->isKnownFile(Utils::FileName::fromString(fileName))) {
             return project;
         }
+#endif
     }
 
     // Fallback needed during project startup, when the files are not all populated in the project

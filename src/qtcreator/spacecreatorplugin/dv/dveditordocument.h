@@ -25,6 +25,10 @@ namespace dve {
 class DVEditorCore;
 }
 
+// namespace Utils {
+// using FilePath = FileName;
+//}
+
 namespace spctr {
 class SpaceCreatorProjectManager;
 
@@ -36,16 +40,26 @@ public:
     explicit DVEditorDocument(SpaceCreatorProjectManager *projectManager, QObject *parent = nullptr);
 
     // IDocument
+#if QTC_VERSION == 48
     OpenResult open(QString *errorString, const QString &fileName, const QString &realFileName) override;
     bool save(QString *errorString, const QString &fileName, bool autoSave) override;
+    void setFilePath(const Utils::FileName &) override;
+#elif QTC_VERSION == 582
+    OpenResult open(
+            QString *errorString, const Utils::FilePath &fileName, const Utils::FilePath &realFileName) override;
+    bool save(QString *errorString, const Utils::FilePath &fileName, bool autoSave) override;
+    void setFilePath(const Utils::FilePath &) override;
+#else
+#warning(Unsupported QtC version)
+#endif
     bool shouldAutoSave() const override;
+
     bool isSaveAsAllowed() const override;
     bool isModified() const override;
     bool reload(QString *errorString, ReloadFlag flag, ChangeType type) override;
 
     // Internal
     QSharedPointer<dve::DVEditorCore> dvEditorCore() const;
-    void setFilePath(const Utils::FileName &) override;
 
 Q_SIGNALS:
     void reloadRequested(QString *errorString, const QString &);
