@@ -2,7 +2,7 @@ cmake_minimum_required(VERSION 3.8)
 
 set(SC_NAME SpaceCreator)
 set(SC_VERSION_MAJOR "0")
-set(SC_VERSION_MINOR "1")
+set(SC_VERSION_MINOR "8")
 set(ORGANISATION ESA)
 set(ORGANISATION_DOMAIN https://taste.tools)
 
@@ -97,6 +97,7 @@ if(DOXYGEN_FOUND)
     )
 endif()
 add_custom_target(DocuFiles SOURCES
+    changelog.txt
     README.md
     doc/architecture.md
     doc/mainpage.md

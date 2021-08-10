@@ -1,0 +1,18 @@
+
+========================================================
+Release: DVE_08
+* [fb3bc888] [2021-07-28] Reduce artifact expire in CI
+* [c87e00b0] [2021-07-28] 612 For DV message binding use RI and PI names
+* [77bd2f07] [2021-07-28] 612 Show messages in treeview properly
+* [92717caf] [2021-07-30] DVE: Store and load device/connection coordinates
+* [49784bea] [2021-08-02] IVE: interface text not always fully outside the function
+* [d30fc845] [2021-08-02] IVE: Keep functions even if the function type is missing
+* [16b49037] [2021-08-02] DVE: Device text gets overdrawn by connection
+* [c42d68ac] [2021-08-03] DVE: Edit entity names from AADL tree
+* [d4e98262] [2021-08-05] DVE: Properties configuring fixes
+* [8050b284] [2021-08-04] MSC: Multiline comment
+* [da027f9e] [2021-08-04] DVE: Add button to bind/unbind all messages
+* [7de49535] [2021-08-09] 620 Fix msc parsing for expressions with asn statement
+* [7fd2bfab] [2021-08-10] DVE: Script to generate changelog.txt
+* [d2a8997d] [2021-08-10] QtC: Support QtCreator 4.15
+* [f61b786f] [2021-08-10] IVE: It should be possible to modify the order of the parameters in the list
