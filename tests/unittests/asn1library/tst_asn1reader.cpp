@@ -150,7 +150,7 @@ void tst_Asn1Reader::testBoolEnumTypes()
     QCOMPARE(typeAssign2->type()->typeName(), QString("ENUMERATED"));
     const QVariantMap &data2 = typeAssign2->type()->parameters();
     QCOMPARE(data2.size(), 1);
-QVariantList enumValues = data2[ASN1_VALUES].toList();
+    QVariantList enumValues = data2[ASN1_VALUES].toList();
     QCOMPARE(enumValues.count(), 3);
     QCOMPARE(enumValues.at(0).toString(), QString("red"));
     QCOMPARE(enumValues.at(1).toString(), QString("green"));

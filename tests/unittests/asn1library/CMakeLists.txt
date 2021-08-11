@@ -1,5 +1,6 @@
 addQtTest(tst_asn1reader ivcore "boolenum_type.xml;choice_type.xml;empty.xml;invalid_format.xml;mixed_types01.xml;number_type.xml;sequence_custom_type.xml;sequence_type.xml")
 addQtTest(tst_asn1valueparser ivcore)
 addQtTest(tst_astxmlparser ivcore "testmsc3.asn;testmsc3.xml")
+addQtTest(tst_astxmlconstraintparser ivcore)
 addQtTest(tst_errormessageparser ivcore "tst_errormessageparser.h")
 addQtTest(tst_file ivcore)
