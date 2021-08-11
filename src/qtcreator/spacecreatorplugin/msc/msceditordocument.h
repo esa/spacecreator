@@ -36,14 +36,11 @@ public:
     explicit MscEditorDocument(SpaceCreatorProjectManager *projectManager, QObject *parent = nullptr);
 
     // IDocument
-#if QTC_VERSION == 582
-    OpenResult open(
-            QString *errorString, const Utils::FilePath &fileName, const Utils::FilePath &realFileName) override;
-    bool save(QString *errorString, const Utils::FilePath &fileName, bool autoSave) override;
-    void setFilePath(const Utils::FilePath &) override;
-#elif QTC_VERSION == 48
     OpenResult open(QString *errorString, const QString &fileName, const QString &realFileName) override;
     bool save(QString *errorString, const QString &fileName, bool autoSave) override;
+#if QTC_VERSION == 415
+    void setFilePath(const Utils::FilePath &) override;
+#elif QTC_VERSION == 48
     void setFilePath(const Utils::FileName &) override;
 #else
 #warning(Unsupported QtC version)

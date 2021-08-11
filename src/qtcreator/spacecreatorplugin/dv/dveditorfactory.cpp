@@ -34,7 +34,7 @@ DVEditorFactory::DVEditorFactory(
     setId(spctr::Constants::K_DV_EDITOR_ID);
     setDisplayName(QCoreApplication::translate("DV Editor", spctr::Constants::C_DVEDITOR_DISPLAY_NAME));
     addMimeType(spctr::Constants::DV_MIMETYPE);
-#if QTC_VERSION == 582
+#if QTC_VERSION == 415
     setEditorCreator(std::bind(&DVEditorFactory::createEditor, this));
 #endif
     Core::FileIconProvider::registerIconOverlayForSuffix(":/projectexplorer/images/fileoverlay_scxml.png", "xml");

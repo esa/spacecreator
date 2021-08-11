@@ -45,79 +45,6 @@ IVEditorDocument::IVEditorDocument(SpaceCreatorProjectManager *projectManager, Q
     setId(Id(spctr::Constants::K_IV_EDITOR_ID));
 }
 
-#if QTC_VERSION == 582
-Core::IDocument::OpenResult IVEditorDocument::open(
-        QString *errorString, const Utils::FilePath &fileName, const Utils::FilePath &realFileName)
-{
-    Q_UNUSED(errorString)
-    Q_UNUSED(realFileName)
-
-    if (fileName.isEmpty() || !m_projectManager) {
-        return OpenResult::ReadError;
-    }
-
-    const QFileInfo fi(fileName.toFileInfo());
-    const QString absfileName = fi.absoluteFilePath();
-
-    SpaceCreatorProjectImpl *project = m_projectManager->project(absfileName);
-    scs::SpaceCreatorProject *storage = project ? project : m_projectManager->orphanStorage();
-    m_plugin = storage->ivData(absfileName);
-    if (m_plugin.isNull()) {
-        return OpenResult::ReadError;
-    }
-
-    setFilePath(Utils::FilePath::fromString(absfileName));
-
-    connect(m_plugin->undoStack(), &QUndoStack::cleanChanged, this, [this](bool) { Q_EMIT changed(); });
-    Q_EMIT ivDataLoaded(absfileName, m_plugin);
-
-    return OpenResult::Success;
-}
-
-bool IVEditorDocument::save(QString *errorString, const Utils::FilePath &name, bool autoSave)
-{
-    Q_UNUSED(errorString)
-    if (m_plugin.isNull()) {
-        return false;
-    }
-
-    const FilePath oldFileName = filePath();
-    const FilePath actualName = name.isEmpty() ? oldFileName : name;
-    if (actualName.isEmpty()) {
-        return false;
-    }
-    bool dirty = isModified();
-
-    shared::ErrorHub::clearFileErrors(actualName.toString());
-
-    ive::InterfaceDocument *ivDocument = m_plugin->document();
-    ivDocument->setPath(actualName.toString());
-    if (!ivDocument->exporter()->exportDocSilently(m_plugin->document(), actualName.toString())) {
-        ivDocument->setPath(oldFileName.toString());
-        return false;
-    }
-
-    if (autoSave) {
-        ivDocument->setPath(oldFileName.toString());
-        return true;
-    } else {
-        ivDocument->undoStack()->setClean();
-    }
-
-    setFilePath(actualName);
-
-    if (dirty != isModified()) {
-        Q_EMIT changed();
-    }
-
-    return true;
-}
-
-void IVEditorDocument::setFilePath(const FilePath &newName)
-{
-    IDocument::setFilePath(newName);
-}
-#elif QTC_VERSION == 48
 Core::IDocument::OpenResult IVEditorDocument::open(
         QString *errorString, const QString &fileName, const QString &realFileName)
 {
@@ -138,7 +65,11 @@ Core::IDocument::OpenResult IVEditorDocument::open(
         return OpenResult::ReadError;
     }
 
+#if QTC_VERSION == 48
     setFilePath(Utils::FileName::fromString(absfileName));
+#elif QTC_VERSION == 415
+    setFilePath(Utils::FilePath::fromString(absfileName));
+#endif
 
     connect(m_plugin->undoStack(), &QUndoStack::cleanChanged, this, [this](bool) { Q_EMIT changed(); });
     Q_EMIT ivDataLoaded(absfileName, m_plugin);
@@ -153,8 +84,14 @@ bool IVEditorDocument::save(QString *errorString, const QString &name, bool auto
         return false;
     }
 
-    const FileName oldFileName = filePath();
-    const FileName actualName = name.isEmpty() ? oldFileName : FileName::fromString(name);
+#if QTC_VERSION == 48
+    const FileName newName = Utils::FileName::fromString(name);
+#elif QTC_VERSION == 415
+    const FilePath newName = Utils::FilePath::fromString(name);
+#endif
+
+    const auto oldFileName = filePath();
+    const auto actualName = name.isEmpty() ? oldFileName : newName;
     if (actualName.isEmpty()) {
         return false;
     }
@@ -185,6 +122,12 @@ bool IVEditorDocument::save(QString *errorString, const QString &name, bool auto
     return true;
 }
 
+#if QTC_VERSION == 415
+void IVEditorDocument::setFilePath(const FilePath &newName)
+{
+    IDocument::setFilePath(newName);
+}
+#elif QTC_VERSION == 48
 void IVEditorDocument::setFilePath(const FileName &newName)
 {
     IDocument::setFilePath(newName);

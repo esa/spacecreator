@@ -44,85 +44,6 @@ MscEditorDocument::MscEditorDocument(SpaceCreatorProjectManager *projectManager,
     setId(Id(spctr::Constants::K_MSC_EDITOR_ID));
 }
 
-#if QTC_VERSION == 582
-Core::IDocument::OpenResult MscEditorDocument::open(
-        QString *errorString, const Utils::FilePath &fileName, const Utils::FilePath &realFileName)
-{
-    Q_UNUSED(realFileName)
-
-    if (fileName.isEmpty() || !m_projectManager) {
-        return OpenResult::ReadError;
-    }
-
-    const QFileInfo fi(fileName.toFileInfo());
-    const QString absfileName = fi.absoluteFilePath();
-
-    SpaceCreatorProjectImpl *project = m_projectManager->project(absfileName);
-    scs::SpaceCreatorProject *storage = project ? project : m_projectManager->orphanStorage();
-    m_plugin = storage->mscData(absfileName);
-    if (m_plugin.isNull()) {
-        return OpenResult::ReadError;
-    }
-    if (errorString) {
-        *errorString = m_plugin->mainModel()->mscErrorMessages().join("\n");
-    }
-
-    setFilePath(Utils::FilePath::fromString(absfileName));
-
-    connect(m_plugin->undoStack(), &QUndoStack::cleanChanged, this, [this](bool) { Q_EMIT changed(); });
-    Q_EMIT mscDataLoaded(absfileName, m_plugin);
-
-    return OpenResult::Success;
-}
-
-bool MscEditorDocument::save(QString *errorString, const FilePath &name, bool autoSave)
-{
-    if (m_plugin.isNull()) {
-        return false;
-    }
-
-    const FilePath oldFileName = filePath();
-    const FilePath actualName = name.isEmpty() ? oldFileName : name;
-    if (actualName.isEmpty()) {
-        return false;
-    }
-    bool dirty = isModified();
-
-    msc::MainModel *mainModel = m_plugin->mainModel();
-    mainModel->setCurrentFilePath(actualName.toString());
-    if (!mainModel->saveMsc(mainModel->currentFilePath())) {
-        if (errorString != nullptr) {
-            *errorString = mainModel->mscErrorMessages().join("\n");
-        }
-        mainModel->setCurrentFilePath(oldFileName.toString());
-        return false;
-    }
-
-    if (autoSave) {
-        mainModel->setCurrentFilePath(oldFileName.toString());
-        mainModel->saveMsc(mainModel->currentFilePath());
-        return true;
-    }
-
-    setFilePath(actualName);
-
-    if (dirty != isModified()) {
-        Q_EMIT changed();
-    }
-
-    return true;
-}
-
-void MscEditorDocument::setFilePath(const FilePath &newName)
-{
-    if (!m_plugin.isNull()) {
-        m_plugin->mainModel()->setCurrentFilePath(newName.toString());
-    }
-    IDocument::setFilePath(newName);
-}
-
-#elif QTC_VERSION == 48
-
 Core::IDocument::OpenResult MscEditorDocument::open(
         QString *errorString, const QString &fileName, const QString &realFileName)
 {
@@ -145,7 +66,11 @@ Core::IDocument::OpenResult MscEditorDocument::open(
         *errorString = m_plugin->mainModel()->mscErrorMessages().join("\n");
     }
 
+#if QTC_VERSION == 48
     setFilePath(Utils::FileName::fromString(absfileName));
+#elif QTC_VERSION == 415
+    setFilePath(Utils::FilePath::fromString(absfileName));
+#endif
 
     connect(m_plugin->undoStack(), &QUndoStack::cleanChanged, this, [this](bool) { Q_EMIT changed(); });
     Q_EMIT mscDataLoaded(absfileName, m_plugin);
@@ -159,8 +84,14 @@ bool MscEditorDocument::save(QString *errorString, const QString &name, bool aut
         return false;
     }
 
-    const FileName oldFileName = filePath();
-    const FileName actualName = name.isEmpty() ? oldFileName : FileName::fromString(name);
+#if QTC_VERSION == 48
+    const FileName newName = Utils::FileName::fromString(name);
+#elif QTC_VERSION == 415
+    const FilePath newName = Utils::FilePath::fromString(name);
+#endif
+
+    const auto oldFileName = filePath();
+    const auto actualName = name.isEmpty() ? oldFileName : newName;
     if (actualName.isEmpty()) {
         return false;
     }
@@ -191,6 +122,16 @@ bool MscEditorDocument::save(QString *errorString, const QString &name, bool aut
     return true;
 }
 
+#if QTC_VERSION == 415
+void MscEditorDocument::setFilePath(const FilePath &newName)
+{
+    if (!m_plugin.isNull()) {
+        m_plugin->mainModel()->setCurrentFilePath(newName.toString());
+    }
+    IDocument::setFilePath(newName);
+}
+
+#elif QTC_VERSION == 48
 void MscEditorDocument::setFilePath(const FileName &newName)
 {
     if (!m_plugin.isNull()) {

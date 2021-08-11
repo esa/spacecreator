@@ -36,7 +36,7 @@ MscEditorFactory::MscEditorFactory(
     setDisplayName(QCoreApplication::translate("MscEditor", Constants::C_MSCEDITOR_DISPLAY_NAME));
     addMimeType(spctr::Constants::MSC_MIMETYPE);
 
-#if QTC_VERSION == 582
+#if QTC_VERSION == 415
     setEditorCreator(std::bind(&MscEditorFactory::createEditor, this));
 #endif
 

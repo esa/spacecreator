@@ -73,7 +73,7 @@ SpaceCreatorProjectImpl::~SpaceCreatorProjectImpl() { }
 QStringList SpaceCreatorProjectImpl::projectFiles(const QString &suffix) const
 {
     QStringList result;
-#if QTC_VERSION == 582
+#if QTC_VERSION == 415
     for (const Utils::FilePath &fileName : m_project->files(ProjectExplorer::Project::AllFiles)) {
         if (fileName.toString().endsWith(suffix, Qt::CaseInsensitive)) {
             result.append(fileName.toString());
@@ -137,7 +137,7 @@ void SpaceCreatorProjectImpl::reportError(const shared::ErrorItem &error)
 {
     ProjectExplorer::Task::TaskType type =
             error.m_type == shared::ErrorItem::Warning ? ProjectExplorer::Task::Warning : ProjectExplorer::Task::Error;
-#if QTC_VERSION == 582
+#if QTC_VERSION == 415
     ProjectExplorer::Task task(type, error.m_description, Utils::FilePath::fromString(error.m_fileName), error.m_line,
             TASK_CATEGORY_SPACE_CREATOR);
 #elif QTC_VERSION == 48
