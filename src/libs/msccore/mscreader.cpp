@@ -119,7 +119,6 @@ MscModel *MscReader::parse(ANTLRInputStream &input, QStringList *errorMessages)
             checkDocumentHierarchy(doc);
         }
     }
-
     return model;
 }
 

@@ -73,6 +73,7 @@ private Q_SLOTS:
     void testNoHorizontalShiftOnEventAdd();
 
     void testShiftVerticalIfNeeded();
+    void testShiftOverlappingMessagesVertical();
 
     void testMessageWithCifInformation();
 
@@ -578,6 +579,41 @@ void tst_ChartLayoutManager::testShiftVerticalIfNeeded()
     // the message has to be after/below the create
     QVERIFY(createItem->head().y() <= messageItem->head().y());
     QVERIFY(instanceItem2->headerItem()->sceneBoundingRect().bottom() <= messageItem->head().y());
+}
+
+void tst_ChartLayoutManager::testShiftOverlappingMessagesVertical()
+{
+    QString mscText = "mscdocument Untitled_Document /* MSC AND */;\
+                      mscdocument Untitled_Leaf /* MSC LEAF */;\
+                          msc Untitled_MSC;\
+                              instance Instance_1;\
+                                  out msg1 to Instance_3;\
+                              endinstance;\
+                              instance Instance_2;\
+                                  in msg2 from Instance_4;\
+                              endinstance;\
+                              instance Instance_3;\
+                                  in msg1 from Instance_1;\
+                              endinstance;\
+                              instance Instance_4;\
+                                 out msg2 to Instance_2;\
+                              endinstance;\
+                          endmsc;\
+                      endmscdocument;\
+                  endmscdocument;";
+    parseMsc(mscText);
+
+    waitForLayoutUpdate();
+
+    MscInstance *instance1 = m_chart->instances().at(0);
+    auto message1 = qobject_cast<msc::MscMessage *>(m_chart->eventsForInstance(instance1).at(0));
+    msc::MessageItem *message1Item = m_chartModel->itemForMessage(message1);
+
+    MscInstance *instance2 = m_chart->instances().at(1);
+    auto message2 = qobject_cast<msc::MscMessage *>(m_chart->eventsForInstance(instance2).at(0));
+    msc::MessageItem *message2Item = m_chartModel->itemForMessage(message2);
+
+    QVERIFY(!message1Item->sceneBoundingRect().intersects(message2Item->sceneBoundingRect()));
 }
 
 void tst_ChartLayoutManager::testMessageWithCifInformation()

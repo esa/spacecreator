@@ -40,6 +40,9 @@ public:
     virtual qreal instanceTopArea(MscInstance *instance) const;
     virtual qreal instanceBottomArea(MscInstance *instance) const;
 
+    virtual qreal instancesTopArea(const QVector<MscInstance *> &instances) const;
+    virtual qreal instancesBottomArea(const QVector<MscInstance *> &instances) const;
+
     msc::MscInstanceEvent *eventEntity() const;
 
     virtual QHash<msc::MscInstance *, int> visualIndices() const;

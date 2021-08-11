@@ -23,6 +23,7 @@
 #include "baseitems/instanceenditem.h"
 #include "baseitems/instanceheaditem.h"
 #include "chartitem.h"
+#include "chartverticalcheck.h"
 #include "commands/cmdactionitemmove.h"
 #include "commands/cmdconditionitemmove.h"
 #include "commands/cmdcoregionitemmove.h"
@@ -51,6 +52,7 @@
 #include <QPointer>
 #include <QTimer>
 #include <QVector>
+#include <algorithm>
 #include <cmath>
 #include <limits>
 
@@ -131,6 +133,7 @@ struct ChartLayoutManagerPrivate {
     QTimer m_layoutUpdateTimer;
 
     ChartViewLayoutInfo m_layoutInfo;
+    ChartVerticalCheck m_verticalCheck;
 
     qreal calcInstanceAxisHeight() const
     {
@@ -848,115 +851,14 @@ void ChartLayoutManager::checkHorizontalConstraints()
     }
 }
 
-/*!
-   Checks that events do not overlap vertically, so the sorting of MSC is not violated visually
- */
 void ChartLayoutManager::checkVerticalConstraints()
 {
     if (!d->m_currentChart) {
         return;
     }
 
-    static qreal minSpace = 3.;
-    bool itemMoved = true;
-    int loopCount = 0;
-
-    while (itemMoved && loopCount < 99) {
-        itemMoved = false;
-
-        for (MscInstance *instance : d->m_currentChart->instances()) {
-            InstanceItem *instanceItem = itemForInstance(instance);
-            Q_ASSERT(instanceItem);
-            qreal minY = instanceItem->headerItem()->sceneBoundingRect().bottom() + minSpace;
-
-            CoregionItem *activeCoregionItem = nullptr;
-
-            for (MscInstanceEvent *event : d->m_currentChart->eventsForInstance(instance)) {
-                auto eventItem = qobject_cast<msc::EventItem *>(d->m_instanceEventItems.value(event->internalId()));
-                if (!eventItem) {
-                    // Check if this is the end of a coregion
-                    if (activeCoregionItem != nullptr && activeCoregionItem->end() == event) {
-                        eventItem = activeCoregionItem;
-                    } else {
-                        continue;
-                    }
-                }
-
-                if (eventItem->geometryManagedByCif()) {
-                    eventItem->applyCif();
-                }
-
-                switch (event->entityType()) {
-                case MscEntity::EntityType::Action:
-                case MscEntity::EntityType::Condition:
-                case MscEntity::EntityType::Timer:
-                    if (eventItem->instanceTopArea(instance) < minY) {
-                        eventItem->setY(minY + d->interMessageSpan());
-                        itemMoved = true;
-                    }
-                    minY = eventItem->instanceBottomArea(instance) + minSpace;
-                    break;
-                case MscEntity::EntityType::Create:
-                case MscEntity::EntityType::Message: {
-                    auto messageItem = static_cast<MessageItem *>(eventItem);
-                    static const int offset = 8;
-                    const int messageMinY = minY + offset;
-                    if (messageItem->modelItem()->sourceInstance() == instance) {
-                        if (messageItem->tail().y() < messageMinY) {
-                            const bool ignoreHorizontal =
-                                    d->m_currentChart->isCrossingMessage(messageItem->modelItem());
-                            messageItem->setTailPosition(
-                                    QPointF(messageItem->tail().x(), messageMinY + d->interMessageSpan()),
-                                    ignoreHorizontal);
-                            itemMoved = true;
-                        }
-                        minY = messageItem->tail().y() + minSpace + offset;
-                    }
-                    if (messageItem->modelItem()->targetInstance() == instance) {
-                        if (messageItem->head().y() < messageMinY) {
-                            const bool ignoreHorizontal =
-                                    d->m_currentChart->isCrossingMessage(messageItem->modelItem());
-                            messageItem->setHeadPosition(
-                                    QPointF(messageItem->head().x(), messageMinY + d->interMessageSpan()),
-                                    ignoreHorizontal);
-                            itemMoved = true;
-                        }
-                        minY = messageItem->head().y() + minSpace + offset;
-                    }
-                    break;
-                }
-                case MscEntity::EntityType::Coregion: {
-                    auto coregion = static_cast<MscCoregion *>(event);
-                    if (coregion->type() == MscCoregion::Type::Begin) {
-                        Q_ASSERT(activeCoregionItem == nullptr);
-                        activeCoregionItem = static_cast<CoregionItem *>(eventItem);
-                        if (eventItem->instanceTopArea(instance) < minY) {
-                            eventItem->setY(minY + d->interMessageSpan());
-                            itemMoved = true;
-                        }
-                        minY = eventItem->instanceTopArea(instance) + minSpace;
-                    } else {
-                        Q_ASSERT(activeCoregionItem != nullptr);
-                        // check if end is below last included item
-                        if (activeCoregionItem->instanceBottomArea(instance) < minY) {
-                            QRectF bbox = activeCoregionItem->boundingRect();
-                            bbox.setHeight((minY + d->interMessageSpan()) - activeCoregionItem->y());
-                            activeCoregionItem->setBoundingRect(bbox);
-                            itemMoved = true;
-                        }
-                        minY = activeCoregionItem->instanceBottomArea(instance) + minSpace;
-                        activeCoregionItem = nullptr;
-                    }
-                    break;
-                }
-                default:
-                    qDebug() << "Type" << event->entityType() << "unhandled yet" << Q_FUNC_INFO;
-                    break;
-                }
-            }
-        }
-        ++loopCount;
-    }
+    d->m_verticalCheck.reset(this, d->m_currentChart);
+    d->m_verticalCheck.checkVerticalConstraints();
 }
 
 /*!
@@ -2013,6 +1915,16 @@ bool ChartLayoutManager::layoutUpdatePending() const
 MscCommandsStack *ChartLayoutManager::undoStack() const
 {
     return d->m_undoStack;
+}
+
+qreal ChartLayoutManager::interMessageSpan() const
+{
+    return d->interMessageSpan();
+}
+
+InteractiveObject *ChartLayoutManager::eventItem(const QUuid &id)
+{
+    return d->m_instanceEventItems.value(id);
 }
 
 void ChartLayoutManager::setInstancesRect(const QRectF &rect)

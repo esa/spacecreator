@@ -77,6 +77,7 @@ public:
     QVector<MscCoregion *> coregions() const;
 
     bool isCrossingMessage(MscMessage *message) const;
+    QVector<MscMessage *> crossingMessages(MscMessage *message) const;
 
     const QVector<MscGate *> &gates() const;
     void addGate(MscGate *gate);

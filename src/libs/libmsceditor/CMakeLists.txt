@@ -38,6 +38,8 @@ target_sources(${LIB_NAME} PRIVATE
     chartview/chartitem.h
     chartview/chartlayoutmanager.cpp
     chartview/chartlayoutmanager.h
+    chartview/chartverticalcheck.cpp
+    chartview/chartverticalcheck.h
     chartview/commentitem.cpp
     chartview/commentitem.h
     chartview/conditionitem.cpp

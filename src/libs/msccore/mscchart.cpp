@@ -544,9 +544,19 @@ QVector<MscCoregion *> MscChart::coregions() const
  */
 bool MscChart::isCrossingMessage(MscMessage *message) const
 {
-    if (message->isGlobal()) {
-        return false;
+    return !crossingMessages(message).isEmpty();
+}
+
+/*!
+   Returns all messages that cross or overtake this message
+ */
+QVector<MscMessage *> MscChart::crossingMessages(MscMessage *message) const
+{
+    if (!message || message->isGlobal()) {
+        return {};
     }
+
+    QVector<MscMessage *> crosses;
 
     QVector<MscMessage *> otherMessages = messages(message->targetInstance(), message->sourceInstance());
     otherMessages += messages(message->sourceInstance(), message->targetInstance());
@@ -555,15 +565,15 @@ bool MscChart::isCrossingMessage(MscMessage *message) const
     const int sourceIdx = indexofEventAtInstance(message, message->sourceInstance());
     const int targetIdx = indexofEventAtInstance(message, message->targetInstance());
 
-    for (MscMessage *msg : otherMessages) {
+    for (MscMessage *msg : qAsConst(otherMessages)) {
         const int sIdx = indexofEventAtInstance(msg, message->sourceInstance());
         const int tIdx = indexofEventAtInstance(msg, message->targetInstance());
         if ((sIdx < sourceIdx && tIdx > targetIdx) || (sIdx > sourceIdx && tIdx < targetIdx)) {
-            return true;
+            crosses.append(msg);
         }
     }
 
-    return false;
+    return crosses;
 }
 
 const QVector<MscGate *> &MscChart::gates() const

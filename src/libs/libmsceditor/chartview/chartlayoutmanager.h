@@ -124,6 +124,9 @@ public:
 
     MscCommandsStack *undoStack() const;
 
+    qreal interMessageSpan() const;
+    msc::InteractiveObject *eventItem(const QUuid &id);
+
 public Q_SLOTS:
     void updateLayout();
     void doLayout();

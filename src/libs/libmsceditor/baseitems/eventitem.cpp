@@ -22,6 +22,8 @@
 #include "mscinstance.h"
 #include "mscinstanceevent.h"
 
+#include <algorithm>
+
 namespace msc {
 
 EventItem::EventItem(msc::MscInstanceEvent *entity, msc::ChartLayoutManager *chartLayoutManager, QGraphicsItem *parent)
@@ -66,6 +68,24 @@ qreal EventItem::instanceBottomArea(MscInstance *instance) const
 {
     Q_UNUSED(instance)
     return sceneBoundingRect().bottom();
+}
+
+qreal EventItem::instancesTopArea(const QVector<MscInstance *> &instances) const
+{
+    qreal top = 0.0;
+    for (MscInstance *instance : instances) {
+        top = std::max(top, instanceTopArea(instance));
+    }
+    return top;
+}
+
+qreal EventItem::instancesBottomArea(const QVector<MscInstance *> &instances) const
+{
+    qreal bottom = 0.0;
+    for (MscInstance *instance : instances) {
+        bottom = std::max(bottom, instanceBottomArea(instance));
+    }
+    return bottom;
 }
 
 /*!
