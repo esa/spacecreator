@@ -273,6 +273,7 @@ MessageItem *ChartLayoutManager::fillMessageItem(
     MessageItem *item = itemForMessage(message);
     if (!item) {
         item = new MessageItem(message, this, sourceItem, targetItem);
+        item->setChartItem(d->m_layoutInfo.m_chartItem);
         connect(item, &MessageItem::retargeted, this, &ChartLayoutManager::onMessageRetargeted, Qt::UniqueConnection);
         connect(d->m_layoutInfo.m_chartItem, &msc::ChartItem::contentRectChanged, item,
                 &msc::MessageItem::onChartBoxChanged);

@@ -26,6 +26,7 @@
 
 namespace msc {
 
+class ChartItem;
 class ChartLayoutManager;
 class MscEntity;
 
@@ -49,6 +50,8 @@ public:
 
     virtual void moveSilentlyBy(const QPointF &shift);
 
+    void setChartItem(msc::ChartItem *item);
+
 Q_SIGNALS:
     void cifChanged();
 
@@ -66,6 +69,7 @@ protected:
 
     QPointer<msc::MscEntity> m_entity;
     QPointer<ChartLayoutManager> m_chartLayoutManager;
+    mutable QPointer<msc::ChartItem> m_chartItem;
 
     bool m_hovered = false;
     qreal m_storedZ = 0.;

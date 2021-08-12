@@ -151,6 +151,11 @@ void InteractiveObject::moveSilentlyBy(const QPointF &shift)
     moveBy(shift.x(), shift.y());
 }
 
+void InteractiveObject::setChartItem(ChartItem* item)
+{
+    m_chartItem = item;
+}
+
 void InteractiveObject::hoverEnterEvent(QGraphicsSceneHoverEvent *event)
 {
     m_hovered = true;
@@ -177,11 +182,16 @@ void InteractiveObject::hoverLeaveEvent(QGraphicsSceneHoverEvent *event)
  */
 QRectF InteractiveObject::getChartContentBox() const
 {
+    if (m_chartItem) {
+        return m_chartItem->contentRect();
+    }
+
     // The chart item should be the first one, when AscendingOrder is used
     for (QGraphicsItem *item : scene()->items(Qt::AscendingOrder)) {
         auto chartItem = dynamic_cast<msc::ChartItem *>(item);
         if (chartItem) {
-            return chartItem->contentRect();
+            m_chartItem = chartItem;
+            return m_chartItem->contentRect();
         }
     }
     return QRectF();
@@ -192,11 +202,16 @@ QRectF InteractiveObject::getChartContentBox() const
  */
 QRectF InteractiveObject::getChartBox() const
 {
+    if (m_chartItem) {
+        return m_chartItem->boundingRect();
+    }
+
     // The chart item should be the first one, when AscendingOrder is used
     for (QGraphicsItem *item : scene()->items(Qt::AscendingOrder)) {
         auto chartItem = dynamic_cast<msc::ChartItem *>(item);
         if (chartItem) {
-            return chartItem->boundingRect();
+            m_chartItem = chartItem;
+            return m_chartItem->boundingRect();
         }
     }
     return QRectF();
