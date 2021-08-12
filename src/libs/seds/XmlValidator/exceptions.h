@@ -36,7 +36,7 @@ public:
      * @param   filename    File that is being validated
      * @param   message     Error message
      */
-    XmlValidatorException(QString filename, QString message);
+    XmlValidatorException(const QString &filename, const QString &message);
 };
 
 } // namespace seds::validator

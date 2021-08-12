@@ -28,7 +28,7 @@ const std::optional<PositiveLong> &DimensionSize::size() const
 
 void DimensionSize::setSize(PositiveLong::Value size)
 {
-    m_size = std::move(size);
+    m_size = size;
 }
 
 const std::optional<DataTypeRef> &DimensionSize::indexTypeRef() const

@@ -24,7 +24,7 @@
 namespace seds::model {
 
 template <typename EnumType>
-auto enumFromString(const QStringRef enumStr) -> std::optional<EnumType>
+auto enumFromString(const QStringRef &enumStr) -> std::optional<EnumType>
 {
     return std::nullopt;
 }

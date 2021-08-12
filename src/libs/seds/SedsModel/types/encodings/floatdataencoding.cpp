@@ -28,7 +28,7 @@ const FloatDataEncoding::Encoding &FloatDataEncoding::encoding() const
 
 void FloatDataEncoding::setEncoding(Encoding encoding)
 {
-    m_encoding = std::move(encoding);
+    m_encoding = encoding;
 }
 
 PositiveLong::Value FloatDataEncoding::bits() const
@@ -36,9 +36,9 @@ PositiveLong::Value FloatDataEncoding::bits() const
     return m_bits.value();
 }
 
-void FloatDataEncoding::setBits(PositiveLong::Value value)
+void FloatDataEncoding::setBits(PositiveLong::Value bits)
 {
-    m_bits = std::move(value);
+    m_bits = bits;
 }
 
 } // namespace seds::model

@@ -59,6 +59,6 @@ enum class CoreMathOperator
 };
 
 template<>
-auto enumFromString(const QStringRef enumStr) -> std::optional<CoreMathOperator>;
+auto enumFromString(const QStringRef &enumStr) -> std::optional<CoreMathOperator>;
 
 } // namespace seds::model

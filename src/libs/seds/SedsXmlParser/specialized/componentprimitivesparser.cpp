@@ -248,7 +248,7 @@ model::SinkArgumentValue ComponentPrimitivesParser::readSinkArgumentValue(QXmlSt
     return value;
 }
 
-model::ParameterOperation ComponentPrimitivesParser::parseParameterOperation(QStringRef valueStr)
+model::ParameterOperation ComponentPrimitivesParser::parseParameterOperation(const QStringRef &valueStr)
 {
     auto parameterOperation = model::enumFromString<model::ParameterOperation>(valueStr);
     if (parameterOperation) {
@@ -321,11 +321,7 @@ bool ComponentPrimitivesParser::processForPrimitiveSource(
 
 bool ComponentPrimitivesParser::processForPrimitiveSource(model::PrimitiveSource *object, QXmlStreamReader &xmlReader)
 {
-    if (ComponentActivitiesParser::processForStatement(object, xmlReader)) {
-        return true;
-    } else {
-        return false;
-    }
+    return ComponentActivitiesParser::processForStatement(object, xmlReader);
 }
 
 } // namespace seds::parser

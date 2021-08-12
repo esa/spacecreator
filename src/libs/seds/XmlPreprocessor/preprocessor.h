@@ -42,6 +42,12 @@ private:
 
 public:
     /**
+     * @brief   Deleted constructor
+     */
+    XmlPreprocessor() = delete;
+
+public:
+    /**
      * @brief   Preprocesses given file
      *
      * Preprocessing has two stages:

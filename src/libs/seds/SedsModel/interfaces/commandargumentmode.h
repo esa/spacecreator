@@ -32,6 +32,6 @@ enum class CommandArgumentMode
 };
 
 template<>
-auto enumFromString(const QStringRef enumStr) -> std::optional<CommandArgumentMode>;
+auto enumFromString(const QStringRef &enumStr) -> std::optional<CommandArgumentMode>;
 
 } // namespace seds::model {

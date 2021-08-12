@@ -30,6 +30,6 @@ enum class FalseValue
 };
 
 template<>
-auto enumFromString(const QStringRef enumStr) -> std::optional<FalseValue>;
+auto enumFromString(const QStringRef &enumStr) -> std::optional<FalseValue>;
 
 } // namespace seds::model

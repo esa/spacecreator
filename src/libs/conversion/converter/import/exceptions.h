@@ -74,7 +74,7 @@ public:
      * @param   filename    File that is missing
      * @param   message     Additional error message
      */
-    FileNotFound(QString filename, QString message);
+    FileNotFound(const QString &filename, const QString &message);
 };
 
 } // namespace converter::import

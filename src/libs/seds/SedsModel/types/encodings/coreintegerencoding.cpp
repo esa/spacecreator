@@ -22,7 +22,7 @@
 namespace seds::model {
 
 template<>
-auto enumFromString(const QStringRef enumStr) -> std::optional<CoreIntegerEncoding>
+auto enumFromString(const QStringRef &enumStr) -> std::optional<CoreIntegerEncoding>
 {
     if (enumStr.compare(QStringLiteral("unsigned"), Qt::CaseInsensitive) == 0) {
         return CoreIntegerEncoding::Unsigned;

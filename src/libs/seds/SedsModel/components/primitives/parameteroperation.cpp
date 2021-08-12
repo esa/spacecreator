@@ -22,7 +22,7 @@
 namespace seds::model {
 
 template<>
-auto enumFromString(const QStringRef enumStr) -> std::optional<ParameterOperation>
+auto enumFromString(const QStringRef &enumStr) -> std::optional<ParameterOperation>
 {
     if (enumStr.compare(QStringLiteral("set"), Qt::CaseInsensitive) == 0) {
         return ParameterOperation::Set;

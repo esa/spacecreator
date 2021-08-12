@@ -28,7 +28,7 @@ RangeType MinMaxRange::type() const
 
 void MinMaxRange::setType(RangeType type)
 {
-    m_type = std::move(type);
+    m_type = type;
 }
 
 const std::optional<LiteralValue> &MinMaxRange::min() const

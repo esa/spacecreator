@@ -21,7 +21,7 @@
 
 namespace seds::validator {
 
-XmlValidatorException::XmlValidatorException(QString filename, QString message)
+XmlValidatorException::XmlValidatorException(const QString &filename, const QString &message)
     : ImportException(QString("Validation error in file '%1': '%2'").arg(filename).arg(message))
 {
 }

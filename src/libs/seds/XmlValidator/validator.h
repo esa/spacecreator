@@ -33,6 +33,12 @@ class XmlValidator final
 {
 public:
     /**
+     * @brief   Deleted constructor
+     */
+    XmlValidator() = delete;
+
+public:
+    /**
      * @brief   Validate given file
      *
      * @param   inputFilename       Input XML filename

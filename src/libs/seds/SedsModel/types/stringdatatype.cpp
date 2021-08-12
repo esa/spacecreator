@@ -33,7 +33,7 @@ PositiveLong::Value StringDataType::length() const
 
 void StringDataType::setLength(PositiveLong::Value length)
 {
-    m_length = std::move(length);
+    m_length = length;
 }
 
 bool StringDataType::hasFixedLength() const

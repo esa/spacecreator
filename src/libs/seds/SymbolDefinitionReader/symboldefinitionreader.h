@@ -40,6 +40,12 @@ public:
 
 public:
     /**
+     * @brief   Deleted constructor
+     */
+    SymbolDefinitionReader() = delete;
+
+public:
+    /**
      * @brief   Reads symbols from given file
      *
      * @param   filename    File to read

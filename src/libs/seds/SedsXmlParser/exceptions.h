@@ -50,7 +50,7 @@ public:
      * @param   encounteredType     Type of the encountered element
      * @param   elementType         Type of the element in which unhandled element was encountered in
      */
-    UnhandledElement(QStringRef encounteredType, const QString &elementType);
+    UnhandledElement(const QStringRef &encounteredType, const QString &elementType);
 };
 
 /**
@@ -65,7 +65,7 @@ public:
      * @param   attributeName   Encountered attribute
      * @param   elementType     Type of the element in which unhandled attribute was encountered in
      */
-    UnhandledAttribute(QStringRef attributeName, QStringRef elementType);
+    UnhandledAttribute(const QStringRef &attributeName, const QStringRef &elementType);
 };
 
 /**
@@ -79,7 +79,7 @@ public:
      *
      * @param   elementType     Type of the element in which EOF was encountered in
      */
-    UnexpectedEOF(QStringRef elementType);
+    UnexpectedEOF(const QStringRef &elementType);
 };
 
 } // namespace seds::parser

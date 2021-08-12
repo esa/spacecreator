@@ -22,7 +22,7 @@
 namespace seds::model {
 
 template<>
-auto enumFromString(const QStringRef enumStr) -> std::optional<ComparisonOperator>
+auto enumFromString(const QStringRef &enumStr) -> std::optional<ComparisonOperator>
 {
     if (enumStr.compare(QStringLiteral("equals"), Qt::CaseInsensitive) == 0) {
         return ComparisonOperator::Equals;

@@ -79,7 +79,7 @@ public:
      * @brief   Adds all data types to given package
      * @param   package     Package to which constructed DataTypes will be added
      */
-    static auto readDataTypeSet(DataTypeAddingFunction addDataType, QXmlStreamReader &xmlReader) -> void;
+    static auto readDataTypeSet(const DataTypeAddingFunction &addDataType, QXmlStreamReader &xmlReader) -> void;
 
     /**
      * @brief   Processes attribute for ExternalField
@@ -88,7 +88,7 @@ public:
      * @param   attribute       Attribute to check
      * @return  True if attribute was used, false otherwise
      */
-    static auto processForExternalField(model::ExternalField *object, const QXmlStreamAttribute &xmlReader) -> bool;
+    static auto processForExternalField(model::ExternalField *object, const QXmlStreamAttribute &attribute) -> bool;
     /**
      * @brief   Processes element for ExternalField
      *
@@ -104,7 +104,7 @@ public:
      * @param   attribute       Attribute to check
      * @return  True if attribute was used, false otherwise
      */
-    static auto processForField(model::Field *object, const QXmlStreamAttribute &xmlReader) -> bool;
+    static auto processForField(model::Field *object, const QXmlStreamAttribute &attribute) -> bool;
     /**
      * @brief   Processes element for Field
      *
@@ -213,7 +213,7 @@ private:
      * @brief   Adds all entries to given container data type
      * @param   containerDataType       EnumeratedDataType to which constructed entries will be added
      */
-    static auto readEntryList(EntryAddingFunction addEntry, QXmlStreamReader &xmlReader) -> void;
+    static auto readEntryList(const EntryAddingFunction &addEntry, QXmlStreamReader &xmlReader) -> void;
     /**
      * @brief   Constructs Entry object
      * @return  Entry
@@ -260,7 +260,7 @@ private:
      * @brief   Adds all dimensions to given array data type
      * @param   dataType    ArrayDataType to which constructed Dimensions will be added
      */
-    static auto readDimensionList(DimensionAddingFunction dataType, QXmlStreamReader &xmlReader) -> void;
+    static auto readDimensionList(const DimensionAddingFunction &addDimension, QXmlStreamReader &xmlReader) -> void;
     /**
      * @brief   Constructs DimensionSize object
      * @return  DimensionSize
@@ -293,19 +293,19 @@ private:
      * @param   encodingStr     String to parse
      * @return  Float encoding
      */
-    static auto parseFloatEncoding(QStringRef encodingStr) -> model::FloatDataEncoding::Encoding;
+    static auto parseFloatEncoding(const QStringRef &encodingStr) -> model::FloatDataEncoding::Encoding;
     /**
      * @brief   Parses given string as a integer encoding
      * @param   encodingStr     String to parse
      * @return  Integer encoding
      */
-    static auto parseIntegerEncoding(QStringRef encodingStr) -> model::IntegerDataEncoding::Encoding;
+    static auto parseIntegerEncoding(const QStringRef &encodingStr) -> model::IntegerDataEncoding::Encoding;
     /**
      * @brief   Parses given string as a string encoding
      * @param   encodingStr     String to parse
      * @return  String encoding
      */
-    static auto parseStringEncoding(QStringRef encodingStr) -> model::StringDataEncoding::Encoding;
+    static auto parseStringEncoding(const QStringRef &encodingStr) -> model::StringDataEncoding::Encoding;
 
     /**
      * @brief   Parses current element as a float precision range
@@ -319,25 +319,25 @@ private:
      * @param   rangeTypeStr    String to parse
      * @return  Byte order
      */
-    static auto parseByteOrder(QStringRef byteOrderStr) -> model::ByteOrder;
+    static auto parseByteOrder(const QStringRef &byteOrderStr) -> model::ByteOrder;
     /**
      * @brief   Parses given string as a error control
      * @param   errorControlStr     String to parse
      * @return  Error control value
      */
-    static auto parseErrorControl(QStringRef errorControlStr) -> model::ErrorControlEntry::ErrorControl;
+    static auto parseErrorControl(const QStringRef &errorControlStr) -> model::ErrorControlEntry::ErrorControl;
     /**
      * @brief   Parses given string as a false value
      * @param   falseValueStr   String to parse
      * @return  False value
      */
-    static auto parseFalseValue(QStringRef falseValueStr) -> model::FalseValue;
+    static auto parseFalseValue(const QStringRef &falseValueStr) -> model::FalseValue;
     /**
      * @brief   Parses given string as a range type
      * @param   rangeTypeStr    String to parse
      * @return  Range type
      */
-    static auto parseRangeType(QStringRef rangeTypeStr) -> model::RangeType;
+    static auto parseRangeType(const QStringRef &rangeTypeStr) -> model::RangeType;
 
     /**
      * @brief   Processes attribute for ContainerConstraint

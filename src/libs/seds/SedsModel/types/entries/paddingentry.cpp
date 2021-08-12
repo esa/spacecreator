@@ -28,7 +28,7 @@ PositiveLong::Value PaddingEntry::getSizeInBits() const
 
 void PaddingEntry::setSizeInBits(PositiveLong::Value sizeInBits)
 {
-    m_sizeInBits = std::move(sizeInBits);
+    m_sizeInBits = sizeInBits;
 }
 
 } // namespace seds::model

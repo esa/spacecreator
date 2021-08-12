@@ -22,7 +22,7 @@
 namespace seds::model {
 
 template<>
-auto enumFromString(const QStringRef enumStr) -> std::optional<CoreEncodingAndPrecision>
+auto enumFromString(const QStringRef &enumStr) -> std::optional<CoreEncodingAndPrecision>
 {
     if (enumStr.compare(QStringLiteral("ieee754_2008_single"), Qt::CaseInsensitive) == 0) {
         return CoreEncodingAndPrecision::IeeeSingle;

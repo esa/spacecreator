@@ -22,7 +22,7 @@
 namespace seds::model {
 
 template<>
-auto enumFromString(const QStringRef enumStr) -> std::optional<FalseValue>
+auto enumFromString(const QStringRef &enumStr) -> std::optional<FalseValue>
 {
     if (enumStr.compare(QStringLiteral("zeroisfalse"), Qt::CaseInsensitive) == 0) {
         return FalseValue::ZeroIsFalse;

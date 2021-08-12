@@ -235,7 +235,7 @@ private:
      * @return  Corresponding value
      * @throws  ParserException
      */
-    static auto parseMathOperator(QStringRef mathOperatorStr) -> model::MathOperator;
+    static auto parseMathOperator(const QStringRef &mathOperatorStr) -> model::MathOperator;
 };
 
 } // namespace seds::parser

@@ -21,13 +21,13 @@
 
 namespace seds::preprocessor {
 
-XmlPreprocessorException::XmlPreprocessorException(QString filename, QString message)
+XmlPreprocessorException::XmlPreprocessorException(const QString &filename, const QString &message)
     : ImportException(QString("Preprocessing error in file '%1': '%2'").arg(filename).arg(message))
 {
 }
 
-UndefinedExternalReference::UndefinedExternalReference(QString filename, QString unknownReference)
-    : XmlPreprocessorException(filename, QString("Undefined external reference '%1'").arg(unknownReference))
+UndefinedExternalReference::UndefinedExternalReference(const QString &filename, const QString &undefinedReference)
+    : XmlPreprocessorException(filename, QString("Undefined external reference '%1'").arg(undefinedReference))
 {
 }
 

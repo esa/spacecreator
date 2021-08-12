@@ -25,6 +25,7 @@ include(GitHash)
 include(CCache)
 include(GoldLinker)
 include(ClangFormat)
+include(ClangTidy)
 
 set(CMAKE_POSITION_INDEPENDENT_CODE ON)
 

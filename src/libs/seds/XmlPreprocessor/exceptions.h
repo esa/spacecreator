@@ -36,7 +36,7 @@ public:
      * @param   filename    File that is being preprocessed
      * @param   message     Error message
      */
-    XmlPreprocessorException(QString filename, QString message);
+    XmlPreprocessorException(const QString &filename, const QString &message);
 };
 
 /**
@@ -51,7 +51,7 @@ public:
      * @param   filename            File that is being preprocessed
      * @param   externalReference   Reference that wasn't defined
      */
-    UndefinedExternalReference(QString filename, QString externalReference);
+    UndefinedExternalReference(const QString &filename, const QString &undefinedReference);
 };
 
 } // namespace seds::preprocessor

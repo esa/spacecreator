@@ -28,17 +28,17 @@ ParserException::ParserException(QString message)
 {
 }
 
-UnhandledElement::UnhandledElement(QStringRef encounteredType, const QString &elementType)
+UnhandledElement::UnhandledElement(const QStringRef &encounteredType, const QString &elementType)
     : ParserException(QString("Unhandled element <%1> in <%2>").arg(encounteredType).arg(elementType))
 {
 }
 
-UnhandledAttribute::UnhandledAttribute(QStringRef attributeName, QStringRef elementType)
+UnhandledAttribute::UnhandledAttribute(const QStringRef &attributeName, const QStringRef &elementType)
     : ParserException(QString("Unhandled attribute [%1] in element <%2>").arg(attributeName).arg(elementType))
 {
 }
 
-UnexpectedEOF::UnexpectedEOF(QStringRef elementType)
+UnexpectedEOF::UnexpectedEOF(const QStringRef &elementType)
     : ParserException(QString("Unexpected EOF in <%1>").arg(elementType))
 {
 }

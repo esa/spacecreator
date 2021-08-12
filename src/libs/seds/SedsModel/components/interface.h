@@ -37,7 +37,7 @@ public:
     auto setGenericTypeMapSet(GenericTypeMapSet genericTypeMapSet) -> void;
 
     auto type() const -> const InterfaceDeclarationRef &;
-    auto setType(InterfaceDeclarationRef interfaceDeclarationRef) -> void;
+    auto setType(InterfaceDeclarationRef type) -> void;
 
 private:
     GenericTypeMapSet m_genericTypeMapSet;

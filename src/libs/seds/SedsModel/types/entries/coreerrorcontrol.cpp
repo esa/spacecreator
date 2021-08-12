@@ -22,7 +22,7 @@
 namespace seds::model {
 
 template<>
-auto enumFromString(const QStringRef enumStr) -> std::optional<CoreErrorControl>
+auto enumFromString(const QStringRef &enumStr) -> std::optional<CoreErrorControl>
 {
     if (enumStr.compare(QStringLiteral("crc16_ccitt"), Qt::CaseInsensitive) == 0) {
         return CoreErrorControl::Crc16;

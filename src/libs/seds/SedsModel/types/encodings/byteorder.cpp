@@ -22,7 +22,7 @@
 namespace seds::model {
 
 template<>
-auto enumFromString(const QStringRef enumStr) -> std::optional<ByteOrder>
+auto enumFromString(const QStringRef &enumStr) -> std::optional<ByteOrder>
 {
     if (enumStr.compare(QStringLiteral("bigendian"), Qt::CaseInsensitive) == 0) {
         return ByteOrder::BigEndian;

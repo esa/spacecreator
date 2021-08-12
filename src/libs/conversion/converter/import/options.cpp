@@ -34,11 +34,7 @@ void Options::add(Options::Key key, QString value)
 bool Options::isSet(Options::Key key) const
 {
     const auto found = m_options.find(key);
-    if (found != std::end(m_options)) {
-        return true;
-    } else {
-        return false;
-    }
+    return found != std::end(m_options);
 }
 
 std::optional<QString> Options::value(Options::Key key) const

@@ -28,7 +28,7 @@ const MathOperator &Operator::mathOperator() const
 
 void Operator::setMathOperator(MathOperator mathOperator)
 {
-    m_mathOperator = std::move(mathOperator);
+    m_mathOperator = mathOperator;
 }
 
 } // namespace seds::model

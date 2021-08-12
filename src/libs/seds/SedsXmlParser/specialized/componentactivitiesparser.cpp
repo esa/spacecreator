@@ -669,7 +669,7 @@ model::ComparisonOperator ComponentActivitiesParser::parseComparisonOperator(QSt
     }
 }
 
-model::MathOperator ComponentActivitiesParser::parseMathOperator(QStringRef mathOperatorStr)
+model::MathOperator ComponentActivitiesParser::parseMathOperator(const QStringRef &mathOperatorStr)
 {
     auto coreMathOperator = model::enumFromString<model::CoreMathOperator>(mathOperatorStr);
 

@@ -33,7 +33,7 @@ PositiveLong::Value BinaryDataType::bits() const
 
 void BinaryDataType::setBits(PositiveLong::Value bits)
 {
-    m_bits = std::move(bits);
+    m_bits = bits;
 }
 
 bool BinaryDataType::hasFixedSize() const

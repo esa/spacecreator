@@ -35,7 +35,7 @@ PositiveLong::Value BooleanDataEncoding::bits() const
 
 void BooleanDataEncoding::setBits(PositiveLong::Value bits)
 {
-    m_bits = std::move(bits);
+    m_bits = bits;
 }
 
 FalseValue BooleanDataEncoding::falseValue() const

@@ -52,6 +52,12 @@ class Parser final
 {
 public:
     /**
+     * @brief   Deleted constructor
+     */
+    Parser() = delete;
+
+public:
+    /**
      * @brief   Parse given file
      *
      * @param   filename   Input SEDS filename

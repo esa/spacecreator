@@ -22,7 +22,7 @@
 namespace converter::import {
 
 ImportException::ImportException(QString message)
-    : m_message(message)
+    : m_message(std::move(message))
 {
 }
 
@@ -36,9 +36,9 @@ const QString &ImportException::errorMessage() const noexcept
     return m_message;
 }
 
-FileNotFound::FileNotFound(QString filename, QString message)
+FileNotFound::FileNotFound(const QString &filename, const QString &message)
+    : ImportException(QString("File '%1' not found: '%2'").arg(filename).arg(message))
 {
-    m_message = QString("File '%1' not found: '%2'").arg(filename).arg(message);
 }
 
 } // namespace converter::import

@@ -22,7 +22,7 @@
 namespace seds::model {
 
 template<>
-auto enumFromString(const QStringRef enumStr) -> std::optional<CoreMathOperator>
+auto enumFromString(const QStringRef &enumStr) -> std::optional<CoreMathOperator>
 {
     if (enumStr.compare(QStringLiteral("abs"), Qt::CaseInsensitive) == 0) {
         return CoreMathOperator::Abs;

@@ -22,7 +22,7 @@
 namespace seds::model {
 
 template<>
-auto enumFromString(const QStringRef enumStr) -> std::optional<RangeType>
+auto enumFromString(const QStringRef &enumStr) -> std::optional<RangeType>
 {
     if (enumStr.compare(QStringLiteral("exclusiveminexclusivemax"), Qt::CaseInsensitive) == 0) {
         return RangeType::ExclusiveMinExclusiveMax;

@@ -28,7 +28,7 @@ const std::vector<PolynomialTerm> &Polynomial::terms() const
 
 void Polynomial::addTerm(PolynomialTerm term)
 {
-    m_terms.push_back(std::move(term));
+    m_terms.push_back(term);
 }
 
 } // namespace seds::model

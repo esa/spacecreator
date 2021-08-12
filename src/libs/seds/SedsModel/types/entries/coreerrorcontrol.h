@@ -32,6 +32,6 @@ enum class CoreErrorControl
 };
 
 template<>
-auto enumFromString(const QStringRef enumStr) -> std::optional<CoreErrorControl>;
+auto enumFromString(const QStringRef &enumStr) -> std::optional<CoreErrorControl>;
 
 } // namespace seds::model

@@ -22,7 +22,7 @@
 namespace seds::model {
 
 template<>
-auto enumFromString(const QStringRef enumStr) -> std::optional<FloatPrecisionRange>
+auto enumFromString(const QStringRef &enumStr) -> std::optional<FloatPrecisionRange>
 {
     if (enumStr.compare(QStringLiteral("single"), Qt::CaseInsensitive) == 0) {
         return FloatPrecisionRange::Single;

@@ -38,7 +38,7 @@ const ComparisonOperator &Comparison::comparisonOperator() const
 
 void Comparison::setComparisonOperator(const ComparisonOperator &comparisonOperator)
 {
-    m_comparisonOperator = std::move(comparisonOperator);
+    m_comparisonOperator = comparisonOperator;
 }
 
 const Comparison::SecondOperand &Comparison::secondOperand() const

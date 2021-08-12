@@ -38,7 +38,7 @@ public:
     auto setProvided(ParameterMapData provided) -> void;
 
     auto required() const -> const ParameterMapData &;
-    auto setRequired(ParameterMapData provided) -> void;
+    auto setRequired(ParameterMapData required) -> void;
 
     auto getActivity() const -> Body *;
     auto setGetActivity(std::unique_ptr<Body> getActivity) -> void;

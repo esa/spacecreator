@@ -53,49 +53,49 @@ public:
      * @return  Corresponding value
      * @throws  ParserException
      */
-    static auto parseBool(QStringRef valueStr) -> bool;
+    static auto parseBool(const QStringRef &valueStr) -> bool;
     /**
      * @brief   Parses given string as a 8-bit unsigned integer
      * @param   valueStr        String to parse
      * @return  Corresponding value
      * @throws  ParserException
      */
-    static auto parseUInt8(QStringRef valueStr) -> uint8_t;
+    static auto parseUInt8(const QStringRef &valueStr) -> uint8_t;
     /**
      * @brief   Parses given string as a 32-bit integer
      * @param   valueStr        String to parse
      * @return  Corresponding value
      * @throws  ParserException
      */
-    static auto parseInt32(QStringRef valueStr) -> int32_t;
+    static auto parseInt32(const QStringRef &valueStr) -> int32_t;
     /**
      * @brief   Parses given string as a 64-bit integer
      * @param   valueStr        String to parse
      * @return  Corresponding value
      * @throws  ParserException
      */
-    static auto parseInt64(QStringRef valueStr) -> int64_t;
+    static auto parseInt64(const QStringRef &valueStr) -> int64_t;
     /**
      * @brief   Parses given string as a 64-bit unsigned integer
      * @param   valueStr        String to parse
      * @return  Corresponding value
      * @throws  ParserException
      */
-    static auto parseUInt64(QStringRef valueStr) -> uint64_t;
+    static auto parseUInt64(const QStringRef &valueStr) -> uint64_t;
     /**
      * @brief   Parses given string as a 64-bit floating point
      * @param   valueStr        String to parse
      * @return  Corresponding value
      * @throws  ParserException
      */
-    static auto parseDouble(QStringRef valueStr) -> double;
+    static auto parseDouble(const QStringRef &valueStr) -> double;
     /**
      * @brief   Parses given string as a PositiveLong
      * @param   valueStr        String to parse
      * @return  Corresponding value
      * @throws  ParserException
      */
-    static auto parsePositiveLong(QStringRef valueStr) -> model::PositiveLong::Value;
+    static auto parsePositiveLong(const QStringRef &valueStr) -> model::PositiveLong::Value;
 
     /**
      * @brief   Processes attribute for Description

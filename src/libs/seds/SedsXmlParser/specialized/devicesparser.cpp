@@ -83,7 +83,7 @@ model::Metadata DevicesParser::readMetadata(QXmlStreamReader &xmlReader)
 }
 
 void DevicesParser::readMetadataValueSet(
-        DevicesParser::MetadataValueAddingFunction addValue, QXmlStreamReader &xmlReader)
+        const DevicesParser::MetadataValueAddingFunction &addValue, QXmlStreamReader &xmlReader)
 {
     for (const auto &attribute : xmlReader.attributes()) {
         throw UnhandledAttribute(attribute.name(), xmlReader.name());

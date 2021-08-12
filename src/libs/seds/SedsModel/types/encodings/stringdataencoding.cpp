@@ -33,7 +33,7 @@ const std::optional<StringDataEncoding::Encoding> &StringDataEncoding::encoding(
 
 void StringDataEncoding::setEncoding(Encoding encoding)
 {
-    m_encoding = std::move(encoding);
+    m_encoding = encoding;
 }
 
 const std::optional<uint8_t> &StringDataEncoding::terminationByte() const

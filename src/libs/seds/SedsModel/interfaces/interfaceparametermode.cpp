@@ -22,7 +22,7 @@
 namespace seds::model {
 
 template<>
-auto enumFromString(const QStringRef enumStr) -> std::optional<InterfaceParameterMode>
+auto enumFromString(const QStringRef &enumStr) -> std::optional<InterfaceParameterMode>
 {
     if (enumStr.compare(QStringLiteral("sync"), Qt::CaseInsensitive) == 0) {
         return InterfaceParameterMode::Sync;

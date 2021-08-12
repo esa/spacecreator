@@ -40,7 +40,7 @@
 namespace seds::parser {
 
 void InterfacesParser::readDeclaredInterfaceSet(
-        InterfacesParser::DeclaredInterfaceAddingFunction addInterfaceDeclaration, QXmlStreamReader &xmlReader)
+        const InterfacesParser::DeclaredInterfaceAddingFunction &addInterfaceDeclaration, QXmlStreamReader &xmlReader)
 {
     for (const auto &attribute : xmlReader.attributes()) {
         throw UnhandledAttribute(attribute.name(), xmlReader.name());
@@ -238,7 +238,7 @@ model::InterfaceParameter InterfacesParser::readInterfaceParameter(QXmlStreamRea
     return parameter;
 }
 
-model::InterfaceCommandMode InterfacesParser::parseInterfaceCommandMode(QStringRef commandModeStr)
+model::InterfaceCommandMode InterfacesParser::parseInterfaceCommandMode(const QStringRef &commandModeStr)
 {
     auto commandMode = model::enumFromString<model::InterfaceCommandMode>(commandModeStr);
 
@@ -249,7 +249,7 @@ model::InterfaceCommandMode InterfacesParser::parseInterfaceCommandMode(QStringR
     }
 }
 
-model::CommandArgumentMode InterfacesParser::parseCommandArgumentMode(QStringRef commandArgumentModeStr)
+model::CommandArgumentMode InterfacesParser::parseCommandArgumentMode(const QStringRef &commandArgumentModeStr)
 {
     auto commandArgumentMode = model::enumFromString<model::CommandArgumentMode>(commandArgumentModeStr);
 
@@ -260,7 +260,7 @@ model::CommandArgumentMode InterfacesParser::parseCommandArgumentMode(QStringRef
     }
 }
 
-model::InterfaceParameterMode InterfacesParser::parseInterfaceParameterMode(QStringRef parameterModeStr)
+model::InterfaceParameterMode InterfacesParser::parseInterfaceParameterMode(const QStringRef &parameterModeStr)
 {
     auto parameterMode = model::enumFromString<model::InterfaceParameterMode>(parameterModeStr);
 

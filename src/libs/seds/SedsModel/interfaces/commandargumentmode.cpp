@@ -22,7 +22,7 @@
 namespace seds::model {
 
 template<>
-auto enumFromString(const QStringRef enumStr) -> std::optional<CommandArgumentMode>
+auto enumFromString(const QStringRef &enumStr) -> std::optional<CommandArgumentMode>
 {
     if (enumStr.compare(QStringLiteral("in"), Qt::CaseInsensitive) == 0) {
         return CommandArgumentMode::In;

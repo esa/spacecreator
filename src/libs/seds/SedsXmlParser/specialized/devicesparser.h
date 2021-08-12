@@ -67,7 +67,7 @@ private:
      * @brief   Adds all metadata values to given metadata
      * @param   metadata    Metadata declaration to which constructed MetadataValues will be added
      */
-    static auto readMetadataValueSet(MetadataValueAddingFunction addValue, QXmlStreamReader &xmlReader) -> void;
+    static auto readMetadataValueSet(const MetadataValueAddingFunction &addValue, QXmlStreamReader &xmlReader) -> void;
     /**
      * @brief   Constructs DateMetadataValue object
      * @param   xmlReader   XML reader

@@ -21,12 +21,12 @@
 
 namespace seds::symbolreader {
 
-SymbolDefinitionReaderException::SymbolDefinitionReaderException(QString filename, QString message)
+SymbolDefinitionReaderException::SymbolDefinitionReaderException(const QString &filename, const QString &message)
     : ImportException(QString("Error while reading '%1': '%2'").arg(filename).arg(message))
 {
 }
 
-SymbolDefinitionReaderException::SymbolDefinitionReaderException(QString filename, std::string_view message)
+SymbolDefinitionReaderException::SymbolDefinitionReaderException(const QString &filename, std::string_view message)
     : ImportException(
             QString("Error while reading '%1': '%2'").arg(filename).arg(QString::fromStdString(std::string(message))))
 {

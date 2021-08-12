@@ -28,7 +28,7 @@ const IntegerDataEncoding::Encoding &IntegerDataEncoding::encoding() const
 
 void IntegerDataEncoding::setEncoding(Encoding encoding)
 {
-    m_encoding = std::move(encoding);
+    m_encoding = encoding;
 }
 
 PositiveLong::Value IntegerDataEncoding::bits() const
@@ -38,7 +38,7 @@ PositiveLong::Value IntegerDataEncoding::bits() const
 
 void IntegerDataEncoding::setBits(PositiveLong::Value bits)
 {
-    m_bits = std::move(bits);
+    m_bits = bits;
 }
 
 } // namespace seds::model

@@ -30,6 +30,6 @@ enum class ParameterOperation
 };
 
 template<>
-auto enumFromString(const QStringRef enumStr) -> std::optional<ParameterOperation>;
+auto enumFromString(const QStringRef &enumStr) -> std::optional<ParameterOperation>;
 
 } // namespace seds::model

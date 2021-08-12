@@ -34,6 +34,6 @@ enum class ComparisonOperator
 };
 
 template<>
-auto enumFromString(const QStringRef enumStr) -> std::optional<ComparisonOperator>;
+auto enumFromString(const QStringRef &enumStr) -> std::optional<ComparisonOperator>;
 
 } // namespace seds::model
