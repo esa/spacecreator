@@ -5,6 +5,7 @@ set(SOURCES model.cpp
             import/options.cpp)
 set(INCLUDES model.h
              import/exceptions.h
+             import/modelimporter.h
              import/options.h)
 
 add_library(ConversionConverter STATIC)

@@ -51,8 +51,10 @@ void tsti_SedsXmlImporter::testValid()
     options.add(Options::Key::ExternalRefFile, "external_references.toml");
     options.add(Options::Key::ExternalRef, "integer.name:UnsignedInteger8");
 
+    SedsXmlImporter sedsImporter;
+
     try {
-        const auto model = SedsXmlImporter::import(options);
+        const auto model = sedsImporter.import(options);
         const auto sedsModel = dynamic_cast<seds::model::SedsModel *>(model.get());
         const auto &packageFile = std::get<seds::model::PackageFile>(sedsModel->data());
         const auto &dataTypeSet = packageFile.package().dataTypes();

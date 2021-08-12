@@ -20,6 +20,7 @@
 #pragma once
 
 #include <QString>
+#include <conversion/converter/import/modelimporter.h>
 #include <conversion/converter/import/options.h>
 #include <conversion/converter/model.h>
 #include <memory>
@@ -31,7 +32,7 @@ namespace seds::importer {
 /**
  * @brief   Importer that reads SEDS files
  */
-class SedsXmlImporter final
+class SedsXmlImporter final : public converter::import::ModelImporter
 {
 public:
     /**
@@ -47,7 +48,7 @@ public:
      *
      * @return  Imported SEDS model
      */
-    static auto import(const converter::import::Options &options) -> std::unique_ptr<converter::Model>;
+    virtual auto import(const converter::import::Options &options) -> std::unique_ptr<converter::Model> override;
 
 private:
     /**
@@ -64,7 +65,7 @@ private:
      *
      * @returns Map with external references
      */
-    static auto readExternalReferences(const converter::import::Options &options)
+    auto readExternalReferences(const converter::import::Options &options)
             -> symbolreader::SymbolDefinitionReader::ExternalReferencesMap;
     /**
      * @brief   Preprocess given input SEDS file
@@ -83,7 +84,7 @@ private:
      *
      * @returns Preprocessed filename
      */
-    static auto preprocess(const symbolreader::SymbolDefinitionReader::ExternalReferencesMap &externalReferences,
+    auto preprocess(const symbolreader::SymbolDefinitionReader::ExternalReferencesMap &externalReferences,
             const converter::import::Options &options) -> QString;
     /**
      * @brief   Validate given preprocessed SEDS file
@@ -96,7 +97,7 @@ private:
      * @throws  converter::import::FileNotFound
      * @throws  seds::validator::ValidatorException
      */
-    static auto validate(const QString &preprocessedFilename, const converter::import::Options &options) -> void;
+    auto validate(const QString &preprocessedFilename, const converter::import::Options &options) -> void;
 
     /**
      * @brief   Get schema filename from imported file
@@ -107,7 +108,7 @@ private:
      *
      * @returns Schema filename
      */
-    static auto getSchemaFilename(const QString &filename) -> QString;
+    auto getSchemaFilename(const QString &filename) -> QString;
 
 private:
     static const QString preprocessedFilenameTemplate;
