@@ -19,6 +19,7 @@
 
 #pragma once
 
+#include <conversion/common/qstringhash.h>
 #include <seds/SedsCommon/basetypesmappings.h>
 #include <unordered_map>
 
@@ -51,7 +52,7 @@ public:
      * @param   filename    File to read
      *
      * @throws  SymbolDefinitionReaderException
-     * @throws  converter::import::FileNotFound
+     * @throws  conversion::importer::FileNotFound
      *
      * @returns Map with read external references
      */

@@ -19,32 +19,38 @@
 
 #pragma once
 
-#include <QString>
-#include <conversion/common/import/exceptions.h>
-#include <string_view>
+class QString;
 
-namespace seds::symbolreader {
+#include <set>
+
+namespace conversion {
 
 /**
- * @brief   Exception thrown when an error was encountered during reading symbol definitions
+ * @brief   All model types supported in conversion
  */
-class SymbolDefinitionReaderException : public conversion::importer::ImportException
+enum class ModelType
 {
-public:
-    /*
-     * @brief   Constructor
-     *
-     * @param   filename    File that is being read
-     * @param   message     Error message
-     */
-    SymbolDefinitionReaderException(const QString &filename, const QString &message);
-    /*
-     * @brief   Constructor
-     *
-     * @param   filename    File that is being read
-     * @param   message     Error message
-     */
-    SymbolDefinitionReaderException(const QString &filename, std::string_view message);
+    Asn1,
+    Aadl,
+    Sdl,
+    Seds
 };
 
-} // namespace seds::symbolreader
+/**
+ * @brief   Converts given model type to string
+ *
+ * @param   modelType   Model type to convert
+ *
+ * @param   String with model type name
+ */
+auto modelTypeToString(ModelType modelType) -> QString;
+/**
+ * @brief   Converts given set of model types to string
+ *
+ * @param   sourceModelsTypes       Set of model types
+ *
+ * @return  String with model types names separated with comma
+ */
+auto modelTypesToString(const std::set<ModelType> &modelsTypes) -> QString;
+
+} // namespace conversion

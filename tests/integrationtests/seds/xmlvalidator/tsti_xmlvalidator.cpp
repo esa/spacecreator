@@ -21,11 +21,9 @@
 
 #include <QObject>
 #include <QtTest>
-#include <conversion/converter/import/exceptions.h>
 #include <seds/XmlValidator/exceptions.h>
 #include <seds/XmlValidator/validator.h>
 
-using converter::import::FileNotFound;
 using seds::validator::XmlValidator;
 using seds::validator::XmlValidatorException;
 

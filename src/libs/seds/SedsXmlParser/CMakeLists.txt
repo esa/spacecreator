@@ -31,8 +31,8 @@ target_include_directories(SedsXmlParser
     PUBLIC      .
     PRIVATE     ${CMAKE_SOURCE_DIR}/src/libs)
 target_link_libraries(SedsXmlParser
-    PUBLIC      SEDS::Model
-                Qt5::Core)
+    PUBLIC      Conversion::Common
+                SEDS::Model)
 
 add_format_target(SedsXmlParser)
 

@@ -19,32 +19,28 @@
 
 #pragma once
 
-#include <QString>
-#include <conversion/common/import/exceptions.h>
-#include <string_view>
+#include <conversion/registry/registry.h>
 
-namespace seds::symbolreader {
+namespace conversion {
 
 /**
- * @brief   Exception thrown when an error was encountered during reading symbol definitions
+ * @brief   Interface for conversion registrars
  */
-class SymbolDefinitionReaderException : public conversion::importer::ImportException
+class Registrar
 {
 public:
-    /*
-     * @brief   Constructor
-     *
-     * @param   filename    File that is being read
-     * @param   message     Error message
+    /**
+     * @brief   Default destructor
      */
-    SymbolDefinitionReaderException(const QString &filename, const QString &message);
-    /*
-     * @brief   Constructor
+    virtual ~Registrar() = default;
+
+public:
+    /**
+     * @brief   Register conversion capabilties
      *
-     * @param   filename    File that is being read
-     * @param   message     Error message
+     * @param   registry    Registry to use
      */
-    SymbolDefinitionReaderException(const QString &filename, std::string_view message);
+    virtual auto registerCapabilities(Registry &registry) -> bool = 0;
 };
 
-} // namespace seds::symbolreader
+} // namespace conversion

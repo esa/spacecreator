@@ -17,26 +17,33 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/lgpl-2.1.html>.
  */
 
-#pragma once
+#include "modeltype.h"
 
 #include <QString>
-#include <conversion/common/import/exceptions.h>
+#include <numeric>
 
-namespace seds::validator {
+namespace conversion {
 
-/**
- * @brief   Exception thrown when error was encountered during validation
- */
-class XmlValidatorException : public conversion::importer::ImportException
+QString modelTypeToString(ModelType modelType)
 {
-public:
-    /**
-     * @brief   Constructor
-     *
-     * @param   filename    File that is being validated
-     * @param   message     Error message
-     */
-    XmlValidatorException(const QString &filename, const QString &message);
-};
+    switch (modelType) {
+    case ModelType::Asn1:
+        return "ASN.1";
+    case ModelType::Aadl:
+        return "AADL";
+    case ModelType::Sdl:
+        return "SDL";
+    case ModelType::Seds:
+        return "SEDS";
+    default:
+        return "unhandled model type";
+    }
+}
 
-} // namespace seds::validator
+QString modelTypesToString(const std::set<ModelType> &modelTypes)
+{
+    return std::accumulate(std::next(modelTypes.begin()), modelTypes.end(), modelTypeToString(*modelTypes.begin()),
+            [](QString acc, ModelType modelType) { return std::move(acc) + ", " + modelTypeToString(modelType); });
+}
+
+} // namespace conversion

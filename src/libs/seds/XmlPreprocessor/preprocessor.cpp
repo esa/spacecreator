@@ -28,10 +28,10 @@
 #include <QDomText>
 #include <QFileInfo>
 #include <QTextStream>
-#include <conversion/converter/import/exceptions.h>
+#include <conversion/common/exceptions.h>
 #include <libxml/xinclude.h>
 
-using converter::import::FileNotFound;
+using conversion::FileNotFoundException;
 
 namespace seds::preprocessor {
 
@@ -42,7 +42,7 @@ void XmlPreprocessor::preprocess(
 {
     const QFileInfo inputFileInfo(inputFilename);
     if (!inputFileInfo.exists()) {
-        throw FileNotFound(inputFilename, "while preprocessing");
+        throw FileNotFoundException(inputFilename, "while preprocessing");
     }
 
     processXInclude(inputFilename, outputFilename);
@@ -74,7 +74,7 @@ void XmlPreprocessor::processExternalReferences(
 {
     const QFileInfo fileInfo(filename);
     if (!fileInfo.exists()) {
-        throw FileNotFound(filename, "while processing external references");
+        throw FileNotFoundException(filename, "while processing external references");
     }
 
     QFile file(filename);

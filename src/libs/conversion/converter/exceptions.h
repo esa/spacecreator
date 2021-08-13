@@ -19,39 +19,22 @@
 
 #pragma once
 
-#include <QString>
-#include <conversion/common/import/exceptions.h>
+#include <conversion/common/exceptions.h>
 
-namespace seds::preprocessor {
+namespace conversion {
 
 /**
- * @brief   Exception thrown when an error was encountered during preprocessing
+ * @brief   Exception that is thrown when Converter encounters an error
  */
-class XmlPreprocessorException : public conversion::importer::ImportException
+class ConverterException : public ConversionException
 {
 public:
     /**
      * @brief   Constructor
      *
-     * @param   filename    File that is being preprocessed
      * @param   message     Error message
      */
-    XmlPreprocessorException(const QString &filename, const QString &message);
+    explicit ConverterException(QString message);
 };
 
-/**
- * @brief   Exception thrown when preprocessed file contains undefined external reference
- */
-class UndefinedExternalReference : public XmlPreprocessorException
-{
-public:
-    /**
-     * @brief   Constructor
-     *
-     * @param   filename            File that is being preprocessed
-     * @param   externalReference   Reference that wasn't defined
-     */
-    UndefinedExternalReference(const QString &filename, const QString &undefinedReference);
-};
-
-} // namespace seds::preprocessor
+} // namespace conversion::importer

@@ -29,23 +29,23 @@
 #include <QFile>
 #include <QFileInfo>
 #include <QXmlStreamReader>
-#include <conversion/converter/import/exceptions.h>
-#include <conversion/converter/model.h>
+#include <conversion/common/exceptions.h>
+#include <conversion/common/model.h>
 #include <seds/SedsModel/datasheet.h>
 #include <seds/SedsModel/package/package.h>
 #include <seds/SedsModel/packagefile.h>
 #include <seds/SedsModel/sedsmodel.h>
 
-using converter::import::FileNotFound;
+using conversion::FileNotFoundException;
 using std::placeholders::_1;
 
 namespace seds::parser {
 
-std::unique_ptr<converter::Model> Parser::parse(const QString &inputSedsFilename)
+std::unique_ptr<conversion::Model> Parser::parse(const QString &inputSedsFilename)
 {
     const QFileInfo inputSedsFileInfo(inputSedsFilename);
     if (!inputSedsFileInfo.exists()) {
-        throw FileNotFound(inputSedsFilename, "File doesn't exist");
+        throw FileNotFoundException(inputSedsFilename, "File doesn't exist");
     }
 
     QFile inputSedsFile(inputSedsFilename);

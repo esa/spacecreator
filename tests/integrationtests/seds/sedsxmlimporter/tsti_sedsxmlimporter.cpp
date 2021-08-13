@@ -22,12 +22,14 @@
 #include <QFileInfo>
 #include <QObject>
 #include <QtTest>
-#include <conversion/converter/import/exceptions.h>
-#include <conversion/converter/import/options.h>
+#include <conversion/common/import/exceptions.h>
+#include <conversion/common/options.h>
+#include <conversion/seds/SedsOptions/options.h>
 #include <seds/SedsModel/sedsmodel.h>
 #include <seds/SedsXmlImporter/importer.h>
 
-using converter::import::Options;
+using conversion::Options;
+using conversion::seds::SedsOptions;
 using seds::importer::SedsXmlImporter;
 
 namespace seds::test {
@@ -46,15 +48,15 @@ private Q_SLOTS:
 void tsti_SedsXmlImporter::testValid()
 {
     Options options;
-    options.add(Options::Key::InputFile, "seds.xml");
-    options.add(Options::Key::PreprocessedFile, "preprocessed.xml");
-    options.add(Options::Key::ExternalRefFile, "external_references.toml");
-    options.add(Options::Key::ExternalRef, "integer.name:UnsignedInteger8");
+    options.add(SedsOptions::inputFile, "seds.xml");
+    options.add(SedsOptions::preprocessedFile, "preprocessed.xml");
+    options.add(SedsOptions::externalRefFile, "external_references.toml");
+    options.add(SedsOptions::externalRef, "integer.name:UnsignedInteger8");
 
     SedsXmlImporter sedsImporter;
 
     try {
-        const auto model = sedsImporter.import(options);
+        const auto model = sedsImporter.importModel(options);
         const auto sedsModel = dynamic_cast<seds::model::SedsModel *>(model.get());
         const auto &packageFile = std::get<seds::model::PackageFile>(sedsModel->data());
         const auto &dataTypeSet = packageFile.package().dataTypes();

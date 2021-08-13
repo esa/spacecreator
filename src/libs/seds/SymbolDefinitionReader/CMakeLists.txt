@@ -13,8 +13,7 @@ target_include_directories(SymbolDefinitionReader
     PUBLIC      .
     PRIVATE     ${CMAKE_SOURCE_DIR}/src/libs)
 target_link_libraries(SymbolDefinitionReader
-    PRIVATE     Conversion::Converter
-    PUBLIC      Qt5::Core)
+    PUBLIC     Conversion::Common)
 
 add_format_target(SymbolDefinitionReader)
 

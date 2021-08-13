@@ -22,11 +22,11 @@
 #include "exceptions.h"
 
 #include <QFileInfo>
-#include <conversion/converter/import/exceptions.h>
+#include <conversion/common/exceptions.h>
 #include <libxml/xinclude.h>
 #include <libxml/xmlschemastypes.h>
 
-using converter::import::FileNotFound;
+using conversion::FileNotFoundException;
 
 namespace seds::validator {
 
@@ -34,12 +34,12 @@ void XmlValidator::validate(const QString &inputFilename, const QString &schemaF
 {
     const QFileInfo schemaFileInfo(schemaFilename);
     if (!schemaFileInfo.exists()) {
-        throw FileNotFound(schemaFilename, "while validating");
+        throw FileNotFoundException(schemaFilename, "while validating");
     }
 
     const QFileInfo inputXmlFileInfo(inputFilename);
     if (!inputXmlFileInfo.exists()) {
-        throw FileNotFound(inputFilename, "while validating");
+        throw FileNotFoundException(inputFilename, "while validating");
     }
 
     // Create context for schema

@@ -19,47 +19,53 @@
 
 #pragma once
 
-#include "import/options.h"
 #include "model.h"
+#include "options.h"
 
 #include <memory>
 
-namespace converter::import {
+namespace conversion::exporter {
 
 /**
- * @brief   Interface for converter model importers
+ * @brief   Interface for converter model exporters
  */
-class ModelImporter
+class ModelExporter
 {
 public:
     /**
      * @brief   Default constructor
      */
-    ModelImporter() = default;
+    ModelExporter() = default;
     /**
      * @brief   Default destructor
      */
-    virtual ~ModelImporter() = default;
+    virtual ~ModelExporter() = default;
     /**
      * @brief   Deleted copy constructor
      */
-    ModelImporter(const ModelImporter &) = delete;
+    ModelExporter(const ModelExporter &) = delete;
     /**
      * @brief   Default move constructor
      */
-    ModelImporter(ModelImporter &&) = default;
+    ModelExporter(ModelExporter &&) = default;
 
     /**
      * @brief   Deleted copy assignment operator
      */
-    ModelImporter &operator=(const ModelImporter &) = delete;
+    ModelExporter &operator=(const ModelExporter &) = delete;
     /**
      * @brief   Default move assignment operator
      */
-    ModelImporter &operator=(ModelImporter &&) = default;
+    ModelExporter &operator=(ModelExporter &&) = default;
 
 public:
-    virtual auto import(const Options &options) -> std::unique_ptr<Model> = 0;
+    /**
+     * @brief   Exports model
+     *
+     * @param   model       Model to export
+     * @param   options     Options for export configuration
+     */
+    virtual auto exportModel(const Model* model, const Options &options) const -> void = 0;
 };
 
-} // namespace converter::import
+} // namespace conversion::exporter

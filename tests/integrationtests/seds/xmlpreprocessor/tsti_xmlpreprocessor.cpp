@@ -24,12 +24,12 @@
 #include <QDomElement>
 #include <QObject>
 #include <QtTest>
-#include <conversion/converter/import/exceptions.h>
+#include <conversion/common/exceptions.h>
 #include <seds/SymbolDefinitionReader/symboldefinitionreader.h>
 #include <seds/XmlPreprocessor/exceptions.h>
 #include <seds/XmlPreprocessor/preprocessor.h>
 
-using converter::import::FileNotFound;
+using conversion::FileNotFoundException;
 using seds::preprocessor::UndefinedExternalReference;
 using seds::preprocessor::XmlPreprocessor;
 using seds::preprocessor::XmlPreprocessorException;
@@ -96,7 +96,7 @@ void tsti_XmlPreprocessor ::testXIncludedNonexisting()
 
     QVERIFY_EXCEPTION_THROWN(XmlPreprocessor::preprocess("IncludesNonexisting.xml",
                                      "IncludesNonexistingPreprocessed.xml", externalReferences),
-            FileNotFound);
+            FileNotFoundException);
 }
 
 } // namespace seds::test

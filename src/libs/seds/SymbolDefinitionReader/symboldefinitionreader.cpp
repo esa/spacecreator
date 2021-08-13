@@ -21,13 +21,13 @@
 
 #include <QFileInfo>
 #include <QVariant>
-#include <conversion/converter/import/exceptions.h>
+#include <conversion/common/exceptions.h>
 #define TOML_EXCEPTIONS 0
 #include "exceptions.h"
 
 #include <seds/ThirdParty/toml.h>
 
-using converter::import::FileNotFound;
+using conversion::FileNotFoundException;
 
 namespace seds::symbolreader {
 
@@ -35,7 +35,7 @@ SymbolDefinitionReader::ExternalReferencesMap SymbolDefinitionReader::readSymbol
 {
     const QFileInfo fileInfo(filename);
     if (!fileInfo.exists()) {
-        throw FileNotFound(filename, "while reading symbol definitions");
+        throw FileNotFoundException(filename, "while reading symbol definitions");
     }
 
     const auto result = toml::parse_file(filename.toStdString());

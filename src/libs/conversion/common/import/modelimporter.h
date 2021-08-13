@@ -19,55 +19,54 @@
 
 #pragma once
 
-#include <conversion/common/model.h>
-#include <seds/SedsModel/datasheet.h>
-#include <seds/SedsModel/packagefile.h>
-#include <variant>
+#include "model.h"
+#include "options.h"
 
-namespace seds::model {
+#include <memory>
 
-class SedsModel final : public conversion::Model
+namespace conversion::importer {
+
+/**
+ * @brief   Interface for converter model importers
+ */
+class ModelImporter
 {
 public:
-    /** @brief  Possible underlaying values */
-    using Data = std::variant<model::PackageFile, model::DataSheet>;
-
-public:
     /**
-     * @brief   Constructor
-     *
-     * @param   data    Model data
+     * @brief   Default constructor
      */
-    explicit SedsModel(Data data);
+    ModelImporter() = default;
     /**
-     * @brief   Deleted copy constructor/
+     * @brief   Default destructor
      */
-    SedsModel(const SedsModel &) = delete;
+    virtual ~ModelImporter() = default;
+    /**
+     * @brief   Deleted copy constructor
+     */
+    ModelImporter(const ModelImporter &) = delete;
     /**
      * @brief   Default move constructor
      */
-    SedsModel(SedsModel &&) = default;
+    ModelImporter(ModelImporter &&) = default;
 
     /**
      * @brief   Deleted copy assignment operator
      */
-    SedsModel &operator=(const SedsModel &) = delete;
+    ModelImporter &operator=(const ModelImporter &) = delete;
     /**
      * @brief   Default move assignment operator
      */
-    SedsModel &operator=(SedsModel &&) = default;
+    ModelImporter &operator=(ModelImporter &&) = default;
 
 public:
     /**
-     * @brief   Getter for model data
+     * @brief   Imports model
      *
-     * @returns Model data
+     * @param   options     Options for import configuration
+     *
+     * @return  Imported model
      */
-    auto data() const -> const Data &;
-
-private:
-    /** @brief  Model data */
-    Data m_data;
+    virtual auto importModel(const Options &options) const -> std::unique_ptr<Model> = 0;
 };
 
-} // namespace seds::model
+} // namespace conversion::importer

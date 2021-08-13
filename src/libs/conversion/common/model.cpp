@@ -17,20 +17,10 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/lgpl-2.1.html>.
  */
 
-#pragma once
+#include "model.h"
 
-namespace converter {
+namespace conversion {
 
-/**
- * @brief   Interface for models supported in the conversion
- */
-class Model
-{
-public:
-    /**
-     * @brief   Destructor
-     */
-    virtual ~Model() = 0;
-};
+Model::~Model() = default;
 
-} // namespace converter
+} // namespace conversion

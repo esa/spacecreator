@@ -19,32 +19,25 @@
 
 #pragma once
 
+#include "qstringhash.h"
+
 #include <QString>
 #include <optional>
 #include <unordered_map>
 #include <vector>
 
-namespace converter::import {
+namespace conversion {
 
 /**
  * @brief  Stores a map of importer options
+ *
+ * QString is used as a key, but it's recommended to use predeclared strings
+ * that can be found in respective namespaces.
  */
 class Options final
 {
 public:
-    /**
-     * @brief   Possible options for importers
-     */
-    enum class Key
-    {
-        InputFile, ///< File to import
-        PreprocessedFile, ///< Intermediate file that will be created during preprocessing
-        SchemaFile, ///< Schema file that will be used during validation
-        ExternalRef, ///< Declaration of an external reference
-        ExternalRefFile, ///< File with external references declarations
-        SkipSedsValidation, ///< Skip SEDS validation
-        KeepIntermediateFiles, ///< Don't remove intermediate files after import
-    };
+    using Key = QString;
 
 public:
     /**
@@ -52,14 +45,14 @@ public:
      *
      * @param   key     Option key
      */
-    auto add(Options::Key key) -> void;
+    auto add(Key key) -> void;
     /**
      * @brief   Adds new option with a value
      *
      * @param   key     Option key
      * @param   value   Option value
      */
-    auto add(Options::Key key, QString value) -> void;
+    auto add(Key key, QString value) -> void;
 
     /**
      * @brief   Checks whether given option is set
@@ -68,7 +61,7 @@ public:
      *
      * @returns True of option was set, false otherwise
      */
-    auto isSet(Options::Key key) const -> bool;
+    auto isSet(const Key &key) const -> bool;
     /**
      * @brief   Returns value for first found key
      *
@@ -78,7 +71,7 @@ public:
      *
      * @returns Optional option value
      */
-    auto value(Options::Key key) const -> std::optional<QString>;
+    auto value(const Key &key) const -> std::optional<QString>;
     /**
      * @brief   Returns vector of values for given key
      *
@@ -88,11 +81,11 @@ public:
      *
      * @returns Vector of option values
      */
-    auto values(Options::Key key) const -> std::vector<QString>;
+    auto values(const Key &key) const -> std::vector<QString>;
 
 private:
     /** @brief  Options map type */
-    std::unordered_multimap<Options::Key, std::optional<QString>> m_options;
+    std::unordered_multimap<Key, std::optional<QString>> m_options;
 };
 
-} // namespace converter::import
+} // namespace conversion

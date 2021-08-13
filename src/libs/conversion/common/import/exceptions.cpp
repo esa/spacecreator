@@ -17,26 +17,13 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/lgpl-2.1.html>.
  */
 
-#pragma once
+#include "import/exceptions.h"
 
-#include <QString>
-#include <conversion/common/import/exceptions.h>
+namespace conversion::importer {
 
-namespace seds::validator {
-
-/**
- * @brief   Exception thrown when error was encountered during validation
- */
-class XmlValidatorException : public conversion::importer::ImportException
+ImportException::ImportException(QString message)
+    : ConversionException(std::move(message))
 {
-public:
-    /**
-     * @brief   Constructor
-     *
-     * @param   filename    File that is being validated
-     * @param   message     Error message
-     */
-    XmlValidatorException(const QString &filename, const QString &message);
-};
+}
 
-} // namespace seds::validator
+} // namespace conversion::importer

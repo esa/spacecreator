@@ -1,12 +1,9 @@
 project(ConversionConverter VERSION 1.0.0 LANGUAGES CXX)
 
-set(SOURCES model.cpp
-            import/exceptions.cpp
-            import/options.cpp)
-set(INCLUDES model.h
-             import/exceptions.h
-             import/modelimporter.h
-             import/options.h)
+set(SOURCES converter.cpp
+            exceptions.cpp)
+set(INCLUDES converter.h
+             exceptions.h)
 
 add_library(ConversionConverter STATIC)
 target_sources(ConversionConverter
@@ -16,7 +13,8 @@ target_include_directories(ConversionConverter
     PUBLIC      .
     PRIVATE     ${CMAKE_SOURCE_DIR}/src/libs)
 target_link_libraries(ConversionConverter
-    PUBLIC      Qt5::Core)
+    PUBLIC      Conversion::Common
+                Conversion::Registry)
 
 add_format_target(ConversionConverter)
 

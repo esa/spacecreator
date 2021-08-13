@@ -25,9 +25,9 @@
 
 class QXmlStreamReader;
 
-namespace converter {
+namespace conversion {
 class Model;
-} // namespace converter
+} // namespace conversion
 
 namespace seds::model {
 class DataSheet;
@@ -66,7 +66,7 @@ public:
      *
      * @returns SEDS Model
      */
-    static auto parse(const QString &filename) -> std::unique_ptr<converter::Model>;
+    static auto parse(const QString &filename) -> std::unique_ptr<conversion::Model>;
 
 private:
     /**

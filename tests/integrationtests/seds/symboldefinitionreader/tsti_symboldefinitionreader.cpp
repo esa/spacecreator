@@ -22,11 +22,11 @@
 #include <QDir>
 #include <QObject>
 #include <QtTest>
-#include <conversion/converter/import/exceptions.h>
+#include <conversion/common/exceptions.h>
 #include <seds/SymbolDefinitionReader/exceptions.h>
 #include <seds/SymbolDefinitionReader/symboldefinitionreader.h>
 
-using converter::import::FileNotFound;
+using conversion::FileNotFoundException;
 using seds::symbolreader::SymbolDefinitionReader;
 using seds::symbolreader::SymbolDefinitionReaderException;
 
@@ -61,7 +61,7 @@ void tsti_SymbolDefinitionReader::readValidFile()
 
 void tsti_SymbolDefinitionReader::readNonexistingFile()
 {
-    QVERIFY_EXCEPTION_THROWN(SymbolDefinitionReader::readSymbols("Nonexisting.toml"), FileNotFound);
+    QVERIFY_EXCEPTION_THROWN(SymbolDefinitionReader::readSymbols("Nonexisting.toml"), FileNotFoundException);
 }
 
 void tsti_SymbolDefinitionReader::readInvalidFile()

@@ -17,28 +17,10 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/lgpl-2.1.html>.
  */
 
-#include "import/exceptions.h"
+#include "sedsconverter.h"
 
-namespace converter::import {
-
-ImportException::ImportException(QString message)
-    : m_message(std::move(message))
+int main(int argc, char **argv)
 {
+    sedsconverter::SedsConverter sedsConverter;
+    sedsConverter.convert(conversion::ModelType::Asn1);
 }
-
-const char *ImportException::what() const noexcept
-{
-    return m_message.toUtf8().constData();
-}
-
-const QString &ImportException::errorMessage() const noexcept
-{
-    return m_message;
-}
-
-FileNotFound::FileNotFound(const QString &filename, const QString &message)
-    : ImportException(QString("File '%1' not found: '%2'").arg(filename).arg(message))
-{
-}
-
-} // namespace converter::import

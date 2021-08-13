@@ -17,27 +17,27 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/lgpl-2.1.html>.
  */
 
-#include "import/options.h"
+#include "options.h"
 
-namespace converter::import {
+namespace conversion {
 
 void Options::add(Options::Key key)
 {
-    m_options.insert({ key, std::nullopt });
+    m_options.insert({ std::move(key), std::nullopt });
 }
 
 void Options::add(Options::Key key, QString value)
 {
-    m_options.insert({ key, std::move(value) });
+    m_options.insert({ std::move(key), std::move(value) });
 }
 
-bool Options::isSet(Options::Key key) const
+bool Options::isSet(const Options::Key &key) const
 {
     const auto found = m_options.find(key);
     return found != std::end(m_options);
 }
 
-std::optional<QString> Options::value(Options::Key key) const
+std::optional<QString> Options::value(const Options::Key &key) const
 {
     const auto found = m_options.find(key);
     if (found != std::end(m_options)) {
@@ -47,7 +47,7 @@ std::optional<QString> Options::value(Options::Key key) const
     }
 }
 
-std::vector<QString> Options::values(Options::Key key) const
+std::vector<QString> Options::values(const Options::Key &key) const
 {
     std::vector<QString> values;
 
@@ -61,4 +61,4 @@ std::vector<QString> Options::values(Options::Key key) const
     return values;
 }
 
-} // namespace converter::import
+} // namespace conversion

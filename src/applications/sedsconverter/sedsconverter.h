@@ -19,55 +19,56 @@
 
 #pragma once
 
-#include <conversion/common/model.h>
-#include <seds/SedsModel/datasheet.h>
-#include <seds/SedsModel/packagefile.h>
-#include <variant>
+#include <conversion/common/modeltype.h>
+#include <conversion/registry/registry.h>
 
-namespace seds::model {
+namespace sedsconverter {
 
-class SedsModel final : public conversion::Model
+/**
+ * @brief   Console application for SEDS conversion
+ */
+class SedsConverter final
 {
-public:
-    /** @brief  Possible underlaying values */
-    using Data = std::variant<model::PackageFile, model::DataSheet>;
-
 public:
     /**
      * @brief   Constructor
-     *
-     * @param   data    Model data
      */
-    explicit SedsModel(Data data);
+    SedsConverter();
     /**
-     * @brief   Deleted copy constructor/
+     * @brief   Deleted copy constructor
      */
-    SedsModel(const SedsModel &) = delete;
+    SedsConverter(const SedsConverter &) = delete;
     /**
-     * @brief   Default move constructor
+     * @brief   Deleted move constructor
      */
-    SedsModel(SedsModel &&) = default;
+    SedsConverter(SedsConverter &&) = delete;
 
     /**
      * @brief   Deleted copy assignment operator
      */
-    SedsModel &operator=(const SedsModel &) = delete;
+    SedsConverter &operator=(const SedsConverter &) = delete;
     /**
-     * @brief   Default move assignment operator
+     * @brief   Deleted move assignmnet operator
      */
-    SedsModel &operator=(SedsModel &&) = default;
+    SedsConverter &operator=(SedsConverter &&) = delete;
 
 public:
     /**
-     * @brief   Getter for model data
+     * @brief   Convert SEDS to target model
      *
-     * @returns Model data
+     * @param   targetModelType     Target model type
      */
-    auto data() const -> const Data &;
+    auto convert(conversion::ModelType targetModelType) const -> void;
 
 private:
-    /** @brief  Model data */
-    Data m_data;
+    /**
+     * @brief   Register all required conversion components in the internal registry
+     */
+    auto initializeRegistry() -> void;
+
+private:
+    /** @brief  Internal registry */
+    conversion::Registry m_registry;
 };
 
-} // namespace seds::model
+} // namespace sedsconverter

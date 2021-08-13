@@ -17,10 +17,25 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/lgpl-2.1.html>.
  */
 
-#include "model.h"
+#include "registrar.h"
 
-namespace converter {
+#include <conversion/common/modeltype.h>
+#include <memory>
+#include <seds/SedsXmlImporter/importer.h>
 
-Model::~Model() = default;
+using seds::importer::SedsXmlImporter;
 
-} // namespace converter
+namespace conversion::seds {
+
+bool SedsRegistrar::registerCapabilities(conversion::Registry &registry)
+{
+    auto sedsImporter = std::make_unique<SedsXmlImporter>();
+    auto result = registry.registerImporter(ModelType::Seds, std::move(sedsImporter));
+    if (!result) {
+        return false;
+    }
+
+    return true;
+}
+
+} // namespace conversion::seds

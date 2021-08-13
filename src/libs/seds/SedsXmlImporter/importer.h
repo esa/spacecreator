@@ -20,9 +20,9 @@
 #pragma once
 
 #include <QString>
-#include <conversion/converter/import/modelimporter.h>
-#include <conversion/converter/import/options.h>
-#include <conversion/converter/model.h>
+#include <conversion/common/import/modelimporter.h>
+#include <conversion/common/model.h>
+#include <conversion/common/options.h>
 #include <memory>
 #include <optional>
 #include <seds/SymbolDefinitionReader/symboldefinitionreader.h>
@@ -32,7 +32,7 @@ namespace seds::importer {
 /**
  * @brief   Importer that reads SEDS files
  */
-class SedsXmlImporter final : public converter::import::ModelImporter
+class SedsXmlImporter final : public conversion::importer::ModelImporter
 {
 public:
     /**
@@ -40,7 +40,7 @@ public:
      *
      * @param   options     List of options
      *
-     * @throws  converter::import::FileNotFound
+     * @throws  conversion::importer::FileNotFound
      * @throws  seds::symbolreader::SymbolDefinitionReaderException
      * @throws  seds::preprocessor::XmlPreprocessorException
      * @throws  seds::preprocessor::UndefinedExternalReference
@@ -48,7 +48,7 @@ public:
      *
      * @return  Imported SEDS model
      */
-    virtual auto import(const converter::import::Options &options) -> std::unique_ptr<converter::Model> override;
+    virtual auto importModel(const conversion::Options &options) const -> std::unique_ptr<conversion::Model> override;
 
 private:
     /**
@@ -60,12 +60,12 @@ private:
      *
      * @param   options     Importer options
      *
-     * @throws  converter::import::FileNotFound
+     * @throws  conversion::importer::FileNotFound
      * @throws  seds::symbolreader::SymbolDefinitionReaderException
      *
      * @returns Map with external references
      */
-    auto readExternalReferences(const converter::import::Options &options)
+    auto readExternalReferences(const conversion::Options &options) const
             -> symbolreader::SymbolDefinitionReader::ExternalReferencesMap;
     /**
      * @brief   Preprocess given input SEDS file
@@ -78,14 +78,14 @@ private:
      * @param   externalReferences      External references map to use
      * @param   options                 Importer options
      *
-     * @throws  converter::import::FileNotFound
+     * @throws  conversion::importer::FileNotFound
      * @throws  seds::preprocessor::XmlPreprocessorException
      * @throws  seds::preprocessor::UndefinedExternalReference
      *
      * @returns Preprocessed filename
      */
     auto preprocess(const symbolreader::SymbolDefinitionReader::ExternalReferencesMap &externalReferences,
-            const converter::import::Options &options) -> QString;
+            const conversion::Options &options) const -> QString;
     /**
      * @brief   Validate given preprocessed SEDS file
      *
@@ -94,10 +94,10 @@ private:
      * @param   preprocessedFilename    File to validate
      * @param   options                 Importer options
      *
-     * @throws  converter::import::FileNotFound
+     * @throws  conversion::importer::FileNotFound
      * @throws  seds::validator::ValidatorException
      */
-    auto validate(const QString &preprocessedFilename, const converter::import::Options &options) -> void;
+    auto validate(const QString &preprocessedFilename, const conversion::Options &options) const -> void;
 
     /**
      * @brief   Get schema filename from imported file
@@ -108,7 +108,7 @@ private:
      *
      * @returns Schema filename
      */
-    auto getSchemaFilename(const QString &filename) -> QString;
+    auto getSchemaFilename(const QString &filename) const -> QString;
 
 private:
     static const QString preprocessedFilenameTemplate;

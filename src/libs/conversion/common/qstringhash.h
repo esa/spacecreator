@@ -19,32 +19,17 @@
 
 #pragma once
 
+#include <QHash>
 #include <QString>
-#include <conversion/common/import/exceptions.h>
-#include <string_view>
+#include <functional>
 
-namespace seds::symbolreader {
+namespace std {
 
-/**
- * @brief   Exception thrown when an error was encountered during reading symbol definitions
- */
-class SymbolDefinitionReaderException : public conversion::importer::ImportException
-{
-public:
-    /*
-     * @brief   Constructor
-     *
-     * @param   filename    File that is being read
-     * @param   message     Error message
-     */
-    SymbolDefinitionReaderException(const QString &filename, const QString &message);
-    /*
-     * @brief   Constructor
-     *
-     * @param   filename    File that is being read
-     * @param   message     Error message
-     */
-    SymbolDefinitionReaderException(const QString &filename, std::string_view message);
+template<>
+struct hash<QString> {
+    std::size_t operator()(const QString& s) const noexcept {
+      return (size_t) qHash(s);
+    }
 };
 
-} // namespace seds::symbolreader
+}

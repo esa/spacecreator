@@ -19,17 +19,7 @@
 
 #pragma once
 
-#include <functional>
-
-#include <QHash>
 #include <QString>
-
-namespace std {
-template<>
-struct hash<QString> {
-    std::size_t operator()(const QString& s) const noexcept { return static_cast<std::size_t>(qHash(s)); }
-};
-} // namespace std
 
 namespace seds::common {
 

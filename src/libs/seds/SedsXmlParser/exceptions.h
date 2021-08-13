@@ -20,14 +20,14 @@
 #pragma once
 
 #include <QString>
-#include <conversion/converter/import/exceptions.h>
+#include <conversion/common/import/exceptions.h>
 
 namespace seds::parser {
 
 /**
  * @brief   Exception thrown when an error was encountered during parsing
  */
-class ParserException : public converter::import::ImportException
+class ParserException : public conversion::importer::ImportException
 {
 public:
     /**
