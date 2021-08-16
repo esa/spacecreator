@@ -17,22 +17,19 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/lgpl-2.1.html>.
  */
 
-#include "registrar.h"
+#include "translation/exceptions.h"
 
-#include <conversion/asn1/SedsToAsn1Translator/translator.h>
-#include <conversion/common/modeltype.h>
-#include <memory>
+namespace conversion::translator {
 
-namespace conversion::asn1 {
-
-bool Asn1Registrar::registerCapabilities(conversion::Registry &registry)
+TranslationException::TranslationException(QString message)
+    : ConversionException(std::move(message))
 {
-    bool result = true;
-
-    auto sedsToAsn1Translator = std::make_unique<SedsToAsn1Translator>();
-    result &= registry.registerTranslator({ ModelType::Seds }, ModelType::Asn1, std::move(sedsToAsn1Translator));
-
-    return result;
 }
 
-} // namespace conversion::asn1
+IncorrectSourceModelException::IncorrectSourceModelException(ModelType expectedModelType)
+    : ConversionException(
+              QString("Source model not supported, expected %1 model").arg(modelTypeToString(expectedModelType)))
+{
+}
+
+} // namespace conversion::translator

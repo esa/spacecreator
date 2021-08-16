@@ -11,7 +11,8 @@ target_include_directories(Asn1Registrar
     PUBLIC      .
     PRIVATE     ${CMAKE_SOURCE_DIR}/src/libs)
 target_link_libraries(Asn1Registrar
-    PUBLIC      Conversion::Common)
+    PUBLIC      Conversion::Common
+                Conversion::SedsToAsn1Translator)
 
 add_format_target(Asn1Registrar)
 

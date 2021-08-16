@@ -17,22 +17,39 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/lgpl-2.1.html>.
  */
 
-#include "registrar.h"
+#pragma once
 
-#include <conversion/asn1/SedsToAsn1Translator/translator.h>
-#include <conversion/common/modeltype.h>
-#include <memory>
+#include "../exceptions.h"
+#include "modeltype.h"
 
-namespace conversion::asn1 {
+namespace conversion::translator {
 
-bool Asn1Registrar::registerCapabilities(conversion::Registry &registry)
+/**
+ * @brief   Base class for all exceptions that occur while importing
+ */
+class TranslationException : public ConversionException
 {
-    bool result = true;
+public:
+    /**
+     * @brief   Constructor
+     *
+     * @param   message     Error message
+     */
+    explicit TranslationException(QString message);
+};
 
-    auto sedsToAsn1Translator = std::make_unique<SedsToAsn1Translator>();
-    result &= registry.registerTranslator({ ModelType::Seds }, ModelType::Asn1, std::move(sedsToAsn1Translator));
+/**
+ * @brief   Exception thrown when translator gets unsupported model
+ */
+class IncorrectSourceModelException : public ConversionException
+{
+public:
+    /**
+     * @brief   Constructor
+     *
+     * @param   expectedModelType   Expected model type
+     */
+    explicit IncorrectSourceModelException(ModelType expectedModelType);
+};
 
-    return result;
-}
-
-} // namespace conversion::asn1
+} // namespace conversion::translator
