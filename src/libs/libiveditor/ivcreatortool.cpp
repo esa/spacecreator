@@ -669,7 +669,7 @@ void IVCreatorTool::handleConnection(const QVector<QPointF> &graphicPoints) cons
     QPointF startInterfacePoint { info.startPointAdjusted };
     QPointF endInterfacePoint { info.endPointAdjusted };
     ivm::IVInterface::CreationInfo ifaceCommons;
-    cmd::CommandsStack::Macro cmdMacro(m_doc->undoStack(), tr("Create connection"));
+    cmd::CommandsStack::Macro cmdMacro(m_doc->commandsStack(), tr("Create connection"));
 
     if (info.startIface && !info.endIface) {
         ifaceCommons = ivm::IVInterface::CreationInfo::fromIface(info.startIface, info.endObject);

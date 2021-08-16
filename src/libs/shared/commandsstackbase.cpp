@@ -37,7 +37,7 @@ namespace cmd {
  * \sa CreatorTool::handleConnection(), PropertiesDialog
 
  */
-CommandsStackBase::Macro::Macro(QUndoStack *undoStack, const QString &title)
+CommandsStackBase::Macro::Macro(CommandsStackBase *undoStack, const QString &title)
     : m_undoStack(undoStack)
 {
     m_undoStack->beginMacro(title);

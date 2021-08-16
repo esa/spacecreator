@@ -19,6 +19,7 @@
 
 #include "chartlayoutmanager.h"
 #include "commands/cmdentityattributechange.h"
+#include "commands/cmdfunctionattrchange.h"
 #include "commands/cmdifaceattrchange.h"
 #include "commandsstack.h"
 #include "interfacedocument.h"
@@ -259,7 +260,7 @@ void MscSystemChecks::onEntityNameChanged(ivm::IVObject *entity, const QString &
         return;
     }
 
-    auto cmdAttribChange = dynamic_cast<shared::cmd::CmdEntityAttributeChange *>(command);
+    auto cmdAttribChange = dynamic_cast<ive::cmd::CmdFunctionAttrChange *>(command);
     if (cmdAttribChange) {
         if (mscInstancesExist(oldName)) {
             if (command->isFirstChange()) {

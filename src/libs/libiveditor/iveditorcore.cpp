@@ -192,7 +192,7 @@ bool IVEditorCore::addConnection(QString name, const QString &fromInstanceName, 
     ivm::IVInterface *toInterface = getInterface(name, ivm::IVInterface::InterfaceType::Provided, toFunc);
 
     if (fromInterface && toInterface) {
-        cmd::CommandsStack::Macro cmdMacro(undoStack(), tr("Create connection"));
+        cmd::CommandsStack::Macro cmdMacro(commandsStack(), tr("Create connection"));
 
         auto createConnection = [ivModel, this](
                                         ivm::IVFunction *parent, ivm::IVInterface *inIf, ivm::IVInterface *outIf) {

@@ -19,6 +19,7 @@
 
 #include "colors/colormanager.h"
 #include "commands/cmdentityattributechange.h"
+#include "commands/cmdfunctionattrchange.h"
 #include "commandsstack.h"
 #include "graphicsitemhelpers.h"
 #include "graphicsviewutils.h"
@@ -186,7 +187,12 @@ void IVFunctionTypeGraphicsItem::updateNameFromUi(const QString &name)
     }
 
     const QVariantHash attributess = { { ivm::meta::Props::token(ivm::meta::Props::Token::name), newName } };
-    const auto attributesCmd = new shared::cmd::CmdEntityAttributeChange(entity(), attributess);
+    QUndoCommand *attributesCmd = nullptr;
+    if (entity()->type() == ivm::IVObject::Type::Function) {
+        attributesCmd = new ive::cmd::CmdFunctionAttrChange(static_cast<ivm::IVFunction *>(entity()), attributess);
+    } else {
+        attributesCmd = new shared::cmd::CmdEntityAttributeChange(entity(), attributess);
+    }
     m_commandsStack->push(attributesCmd);
 }
 

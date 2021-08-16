@@ -17,9 +17,9 @@
 
 #include "propertiesdialog.h"
 
+#include "asn1systemchecks.h"
 #include "ui_propertiesdialog.h"
 #include "veobject.h"
-#include "asn1systemchecks.h"
 
 #include <QDebug>
 #include <QHeaderView>
@@ -33,7 +33,8 @@
 namespace shared {
 
 struct PropertiesDialog::PropertiesDialogPrivate {
-    PropertiesDialogPrivate(VEObject *obj, PropertyTemplateConfig *dynPropConfig, Asn1Acn::Asn1SystemChecks *asn1Checks, cmd::CommandsStackBase *commandsStack)
+    PropertiesDialogPrivate(VEObject *obj, PropertyTemplateConfig *dynPropConfig, Asn1Acn::Asn1SystemChecks *asn1Checks,
+            cmd::CommandsStackBase *commandsStack)
         : dataObject(obj)
         , asn1Checks(asn1Checks)
         , commandsStack(commandsStack)
@@ -50,10 +51,8 @@ struct PropertiesDialog::PropertiesDialogPrivate {
     std::unique_ptr<cmd::CommandsStackBase::Macro> cmdMacro;
 };
 
-PropertiesDialog::PropertiesDialog(
-        PropertyTemplateConfig *dynPropConfig, VEObject *obj,
-        Asn1Acn::Asn1SystemChecks *asn1Checks, cmd::CommandsStackBase *commandsStack,
-        QWidget *parent)
+PropertiesDialog::PropertiesDialog(PropertyTemplateConfig *dynPropConfig, VEObject *obj,
+        Asn1Acn::Asn1SystemChecks *asn1Checks, cmd::CommandsStackBase *commandsStack, QWidget *parent)
     : QDialog(parent)
     , d(std::make_unique<PropertiesDialogPrivate>(obj, dynPropConfig, asn1Checks, commandsStack))
 {
@@ -96,7 +95,7 @@ void PropertiesDialog::init()
 
     if (!d->cmdMacro) {
         d->cmdMacro = std::make_unique<cmd::CommandsStackBase::Macro>(
-                d->commandsStack->undoStack(), tr("Edit %1 - %2").arg(objectTypeName(), d->dataObject->titleUI()));
+                d->commandsStack.data(), tr("Edit %1 - %2").arg(objectTypeName(), d->dataObject->titleUI()));
     }
 }
 

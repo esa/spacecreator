@@ -43,7 +43,7 @@ class CommandsStackBase : public QObject
 
 public:
     struct Macro {
-        explicit Macro(QUndoStack *undoStack, const QString &title = QString());
+        explicit Macro(CommandsStackBase *undoStack, const QString &title = QString());
         ~Macro();
 
         bool push(QUndoCommand *cmd) const;
@@ -53,7 +53,7 @@ public:
 
     private:
         bool m_keepMacro { false };
-        QUndoStack *m_undoStack = nullptr;
+        CommandsStackBase *m_undoStack = nullptr;
     };
 
     explicit CommandsStackBase(QObject *parent = nullptr);
