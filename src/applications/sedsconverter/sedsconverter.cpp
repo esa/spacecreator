@@ -19,6 +19,7 @@
 
 #include "sedsconverter.h"
 
+#include <conversion/asn1/Asn1Registrar/registrar.h>
 #include <conversion/common/exceptions.h>
 #include <conversion/common/modeltype.h>
 #include <conversion/common/options.h>
@@ -31,6 +32,7 @@ using conversion::ModelType;
 using conversion::Options;
 using conversion::RegistrationFailedException;
 using conversion::Registry;
+using conversion::asn1::Asn1Registrar;
 using conversion::seds::SedsOptions;
 using conversion::seds::SedsRegistrar;
 
@@ -57,9 +59,14 @@ void SedsConverter::initializeRegistry()
 {
     SedsRegistrar sedsRegistrar;
     auto result = sedsRegistrar.registerCapabilities(m_registry);
-
     if (!result) {
         throw RegistrationFailedException(ModelType::Seds);
+    }
+
+    Asn1Registrar asn1Registrar;
+    result = asn1Registrar.registerCapabilities(m_registry);
+    if (!result) {
+        throw RegistrationFailedException(ModelType::Asn1);
     }
 }
 

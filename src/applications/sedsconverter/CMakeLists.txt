@@ -14,6 +14,7 @@ target_include_directories(SedsConverter
 target_link_libraries(SedsConverter
     PRIVATE     Conversion::Converter
                 Conversion::Registry
+                Conversion::Asn1Registrar
                 Conversion::SedsRegistrar)
 
 add_format_target(SedsConverter)
