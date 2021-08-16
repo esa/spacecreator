@@ -17,26 +17,13 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/lgpl-2.1.html>.
  */
 
-#include "registrar.h"
+#include "export/exceptions.h"
 
-#include <QDebug>
-#include <conversion/common/modeltype.h>
-#include <memory>
-#include <seds/SedsXmlImporter/importer.h>
+namespace conversion::exporter {
 
-using seds::importer::SedsXmlImporter;
-
-namespace conversion::seds {
-
-bool SedsRegistrar::registerCapabilities(conversion::Registry &registry)
+ExportException::ExportException(QString message)
+    : ConversionException(std::move(message))
 {
-    auto sedsImporter = std::make_unique<SedsXmlImporter>();
-    auto result = registry.registerImporter(ModelType::Seds, std::move(sedsImporter));
-    if (!result) {
-        return false;
-    }
-
-    return true;
 }
 
-} // namespace conversion::seds
+} // namespace conversion::exporter

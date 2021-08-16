@@ -56,7 +56,7 @@ void XmlValidator::validate(const QString &inputFilename, const QString &schemaF
     xmlSchemaFreeParserCtxt(parserCtx);
 
     if (!errorStr.isEmpty()) {
-        throw XmlValidatorException(schemaFilename, errorStr);
+        throw XmlValidatorException(schemaFilename, errorStr.trimmed());
     }
 
     // Load XML file
@@ -86,7 +86,7 @@ void XmlValidator::validate(const QString &inputFilename, const QString &schemaF
     if (validationResult == 0) {
         return;
     } else if (validationResult > 0) {
-        throw XmlValidatorException(inputFilename, errorStr);
+        throw XmlValidatorException(inputFilename, errorStr.trimmed());
     } else {
         throw XmlValidatorException(inputFilename, "libxml2: Internal error");
     }

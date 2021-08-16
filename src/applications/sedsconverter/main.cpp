@@ -19,8 +19,28 @@
 
 #include "sedsconverter.h"
 
+#include <conversion/common/export/exceptions.h>
+#include <conversion/common/import/exceptions.h>
+#include <conversion/common/translation/exceptions.h>
+
+using conversion::exporter::ExportException;
+using conversion::importer::ImportException;
+using conversion::translator::TranslationException;
+
 int main(int argc, char **argv)
 {
     sedsconverter::SedsConverter sedsConverter;
-    sedsConverter.convert(conversion::ModelType::Asn1);
+
+    try {
+        sedsConverter.convert(conversion::ModelType::Asn1);
+    } catch (const ImportException &ex) {
+        const auto errorMessage = QString("Import failure: %1").arg(ex.errorMessage());
+        qFatal("%s", errorMessage.toLatin1().constData());
+    } catch (const TranslationException &ex) {
+        const auto errorMessage = QString("Translation failure: %1").arg(ex.errorMessage());
+        qFatal("%s", errorMessage.toLatin1().constData());
+    } catch (const ExportException &ex) {
+        const auto errorMessage = QString("Export failure: %1").arg(ex.errorMessage());
+        qFatal("%s", errorMessage.toLatin1().constData());
+    }
 }

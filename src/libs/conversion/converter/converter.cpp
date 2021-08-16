@@ -25,6 +25,7 @@
 #include <conversion/common/export/modelexporter.h>
 #include <conversion/common/import/exceptions.h>
 #include <conversion/common/import/modelimporter.h>
+#include <conversion/common/model.h>
 #include <conversion/common/translation/translator.h>
 #include <conversion/seds/SedsRegistrar/registrar.h>
 

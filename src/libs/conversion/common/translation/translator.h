@@ -62,12 +62,12 @@ public:
 
 public:
     /**
-     * @brief   Translate given source models into a target model
+     * @brief   Translate given source model into a target model
      *
      * @param   sources     Vector of source models
      * @param   options     Options for export configuration
      *
-     * @return  Target model translated from source models
+     * @return  Target model translated from the source model
      */
     virtual auto translateModels(std::vector<const Model *> sources, const Options &options) const
             -> std::unique_ptr<Model> = 0;

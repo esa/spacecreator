@@ -19,6 +19,7 @@
 
 #include "sedsconverter.h"
 
+#include <QDebug>
 #include <conversion/asn1/Asn1Registrar/registrar.h>
 #include <conversion/common/exceptions.h>
 #include <conversion/common/modeltype.h>

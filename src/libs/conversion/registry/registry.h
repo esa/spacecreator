@@ -87,7 +87,7 @@ public:
      *
      * @return  Importer if found, nullptr otherwise
      */
-    auto findImporter(ModelType modelType) const -> importer::ModelImporter *;
+    auto findImporter(ModelType modelType) const -> const importer::ModelImporter *;
     /**
      * @brief   Finds translator for given model type
      *
@@ -105,7 +105,7 @@ public:
      *
      * @return  Exporter if found, nullptr otherwise
      */
-    auto findExporter(ModelType modelType) const -> exporter::ModelExporter *;
+    auto findExporter(ModelType modelType) const -> const exporter::ModelExporter *;
 
 private:
     /** @brief  Map of registered importers */

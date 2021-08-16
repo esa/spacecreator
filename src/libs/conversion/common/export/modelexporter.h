@@ -65,7 +65,7 @@ public:
      * @param   model       Model to export
      * @param   options     Options for export configuration
      */
-    virtual auto exportModel(const Model* model, const Options &options) const -> void = 0;
+    virtual auto exportModel(const Model *model, const Options &options) const -> void = 0;
 };
 
 } // namespace conversion::exporter

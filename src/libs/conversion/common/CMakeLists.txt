@@ -4,6 +4,7 @@ set(SOURCES exceptions.cpp
             model.cpp
             modeltype.cpp
             options.cpp
+            export/exceptions.cpp
             import/exceptions.cpp
             translation/exceptions.cpp)
 set(INCLUDES exceptions.h
@@ -11,6 +12,8 @@ set(INCLUDES exceptions.h
              modeltype.h
              options.h
              registrar.h
+             export/exceptions.h
+             export/modelexporter.h
              import/exceptions.h
              import/modelimporter.h
              translation/exceptions.h

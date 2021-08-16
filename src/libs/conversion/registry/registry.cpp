@@ -72,7 +72,7 @@ bool Registry::registerExporter(ModelType modelType, std::unique_ptr<exporter::M
     return result.second;
 }
 
-importer::ModelImporter *Registry::findImporter(ModelType modelType) const
+const importer::ModelImporter *Registry::findImporter(ModelType modelType) const
 {
     const auto found = m_importers.find(modelType);
 
@@ -95,7 +95,7 @@ translator::Translator *Registry::findTranslator(std::set<ModelType> sourceModel
     }
 }
 
-exporter::ModelExporter *Registry::findExporter(ModelType modelType) const
+const exporter::ModelExporter *Registry::findExporter(ModelType modelType) const
 {
     const auto found = m_exporters.find(modelType);
 
