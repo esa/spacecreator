@@ -106,37 +106,7 @@ void IVCommentGraphicsItem::paint(QPainter *painter, const QStyleOptionGraphicsI
     };
     painter->drawPolyline(preparePolyline(br));
 
-    qreal y = kMargins;
-    const qreal lineWidth = boundingRect().width() - 2 * kMargins;
-    const qreal maxY = boundingRect().height() - kMargins;
-    const QFontMetricsF fm(font());
-    bool complete = false;
-    for (auto line : m_text.split(QLatin1Char('\n'))) {
-        QTextLayout textLayout(line);
-        textLayout.setFont(font());
-        textLayout.beginLayout();
-        while (true) {
-            QTextLine textLine = textLayout.createLine();
-            if (!textLine.isValid()) {
-                break;
-            }
-
-            textLine.setLineWidth(lineWidth);
-            if (maxY < y + textLine.height()) {
-                const QString lastLine = line.mid(textLine.textStart());
-                const QString elidedLastLine = fm.elidedText(lastLine, Qt::ElideRight, lineWidth);
-                painter->drawText(QPointF(kMargins, y + fm.ascent()), elidedLastLine);
-                complete = true;
-                break;
-            }
-
-            textLine.draw(painter, QPointF(kMargins, y));
-            y += textLine.height();
-        }
-        textLayout.endLayout();
-        if (complete)
-            break;
-    }
+    shared::graphicsviewutils::drawText(painter, br, m_text, kMargins);
 
     painter->restore();
     shared::ui::VERectGraphicsItem::paint(painter, option, widget);

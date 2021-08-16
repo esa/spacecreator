@@ -4,7 +4,10 @@
 #include "ui/verectgraphicsitem.h"
 #include "veobject.h"
 
+#include <QFontMetricsF>
+#include <QPainter>
 #include <QPainterPath>
+#include <QTextLayout>
 #include <QtDebug>
 #include <QtMath>
 
@@ -1084,6 +1087,41 @@ bool isBounded(const QGraphicsItem *upcomingItem, const QRectF &upcomingItemRect
                 upcomingItemRect.marginsRemoved(kContentMargins), rectItem->nestedItemsSceneBoundingRect());
     }
     return true;
+}
+
+void drawText(QPainter *painter, const QRectF &rect, const QString &text, qreal margin)
+{
+    qreal y = margin;
+    const qreal lineWidth = rect.width() - 2 * margin;
+    const qreal maxY = rect.height() - margin;
+    const QFontMetricsF fm(painter->font());
+    bool complete = false;
+    for (auto line : text.split(QLatin1Char('\n'))) {
+        QTextLayout textLayout(line);
+        textLayout.setFont(painter->font());
+        textLayout.beginLayout();
+        while (true) {
+            QTextLine textLine = textLayout.createLine();
+            if (!textLine.isValid()) {
+                break;
+            }
+
+            textLine.setLineWidth(lineWidth);
+            if (maxY < y + textLine.height()) {
+                const QString lastLine = line.mid(textLine.textStart());
+                const QString elidedLastLine = fm.elidedText(lastLine, Qt::ElideRight, lineWidth);
+                painter->drawText(QPointF(margin, y + fm.ascent()) + rect.topLeft(), elidedLastLine);
+                complete = true;
+                break;
+            }
+
+            textLine.draw(painter, QPointF(margin, y) + rect.topLeft());
+            y += textLine.height();
+        }
+        textLayout.endLayout();
+        if (complete)
+            break;
+    }
 }
 
 }

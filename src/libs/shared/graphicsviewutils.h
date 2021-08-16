@@ -177,5 +177,7 @@ ItemType *itemAt(const QGraphicsScene *scene, const QPointF &point)
     return qgraphicsitem_cast<ItemType *>(*it);
 }
 
-}
-}
+void drawText(QPainter *painter, const QRectF &rect, const QString &text, qreal margin);
+
+} // namespace graphicsviewutils
+} // namespace shared

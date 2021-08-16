@@ -239,12 +239,9 @@ void MiniViewRenderer::drawData(QPainter *painter)
         painter->drawRect(mappedRect);
 
         const QString text = d->item->entity()->model()->getObject(it.key())->titleUI();
-        const QRectF textRect = fm.boundingRect(
-                mappedRect.adjusted(4, 4, -4, -4), Qt::AlignTop | Qt::AlignLeft | Qt::TextDontClip, text);
-        if (mappedRect.contains(textRect)) {
-            painter->setFont(painterFont);
-            painter->drawText(textRect, Qt::AlignTop | Qt::AlignLeft, text);
-        }
+        const qreal margin = 8;
+        painter->setFont(painterFont);
+        shared::graphicsviewutils::drawText(painter, mappedRect.adjusted(margin, margin, -margin, -margin), text, margin);
     }
     for (const QPolygonF &p : qAsConst(d->childrenConnections)) {
         painter->drawPolyline(transform.map(p));
