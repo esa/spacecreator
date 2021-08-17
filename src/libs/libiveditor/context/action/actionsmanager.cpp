@@ -53,6 +53,7 @@ struct ExternalArgHolder {
         Prop,
         Param,
         ProjectPath,
+        FilePath,
     };
 
     QString key;
@@ -64,6 +65,7 @@ static QVector<ExternalArgHolder> externalArgs(bool namedKey)
 {
     const QString name = namedKey ? QLatin1String("name") : QString();
     QVector<ExternalArgHolder> args;
+    args.append({ "$FILE", QObject::tr("Path to the file should be processed"), ExternalArgHolder::Type::FilePath });
     args.append({ "$TASTE3", QObject::tr("Path to the Taste binary"), ExternalArgHolder::Type::CWD });
     args.append(
             { "$PRJ_FOLDER", QObject::tr("Path to the Taste current project"), ExternalArgHolder::Type::ProjectPath });
@@ -101,6 +103,11 @@ QString ActionsManager::storagePath()
  * Adds the appropriate actions into \a menu, managing its enablement based on action conditions and the \a currObj.
  * Initiates connection from QAction to the related handler slot.
  */
+void ActionsManager::registerDeploymentFilesCallback(std::function<QStringList()> cb)
+{
+    instance()->m_deploymentFilesCallBack = cb;
+}
+
 void ActionsManager::populateMenu(QMenu *menu, ivm::IVObject *currObj, InterfaceDocument *doc)
 {
     if (!menu)
@@ -108,20 +115,25 @@ void ActionsManager::populateMenu(QMenu *menu, ivm::IVObject *currObj, Interface
 
     menu->addSeparator();
 
+    static const QString kBuildAction = QLatin1String("Build");
     for (const Action &actHandler : qAsConst(instance()->m_actions)) {
+        if (actHandler.m_title == kBuildAction)
+            continue;
+
         QAction *act = new QAction(actHandler.m_title, menu);
         act->setData(QVariant::fromValue(currObj));
         const bool enabled(actHandler.isAcceptable(currObj));
         act->setEnabled(enabled);
         if (enabled) {
-            QObject::connect(act, &QAction::triggered, [actHandler, act, doc]() {
+            QObject::connect(act, &QAction::triggered, doc, [actHandler, act, doc]() {
                 if (triggerActionHidden(actHandler)) {
                     return;
                 }
                 if (!actHandler.m_internalActName.isEmpty())
                     triggerActionInternal(actHandler);
                 else if (!actHandler.m_externalApp.isEmpty()) {
-                    triggerActionExternal(actHandler, act ? act->data().value<ivm::IVObject *>() : nullptr, doc);
+                    triggerActionExternal(
+                            actHandler, act ? act->data().value<ivm::IVObject *>() : nullptr, doc, doc->path());
                 } else {
                     QMessageBox::warning(nullptr, QObject::tr("Custom action"),
                             QObject::tr("No internal or external action provided by %1").arg(actHandler.m_title));
@@ -129,6 +141,33 @@ void ActionsManager::populateMenu(QMenu *menu, ivm::IVObject *currObj, Interface
             });
         }
         menu->addAction(act);
+    }
+
+    auto it = instance()->m_actions.cend();
+    if (instance()->m_deploymentFilesCallBack) {
+        it = std::find_if(m_instance->m_actions.cbegin(), m_instance->m_actions.cend(),
+                [](const Action &action) { return kBuildAction == action.m_title; });
+    }
+
+    if (it != instance()->m_actions.cend()) {
+        QMenu *buildMenu = new QMenu(QObject::tr("Build"), menu);
+        for (const QString &dvFilePath : instance()->m_deploymentFilesCallBack()) {
+            QAction *act = new QAction(QFileInfo(dvFilePath).fileName(), menu);
+            act->setData(QVariant::fromValue(currObj));
+            QObject::connect(act, &QAction::triggered, doc, [actHandler = *it, act, doc, dvFilePath]() {
+                if (triggerActionHidden(actHandler)) {
+                    return;
+                }
+                if (!actHandler.m_internalActName.isEmpty())
+                    triggerActionInternal(actHandler);
+                else if (!actHandler.m_externalApp.isEmpty()) {
+                    triggerActionExternal(
+                            actHandler, act ? act->data().value<ivm::IVObject *>() : nullptr, doc, dvFilePath);
+                }
+            });
+            buildMenu->addAction(act);
+        }
+        menu->addMenu(buildMenu);
     }
 }
 
@@ -344,7 +383,8 @@ void ActionsManager::triggerActionInternal(const Action &act)
     }
 }
 
-QString ActionsManager::replaceKeyHolder(const QString &text, const ivm::IVObject *ivObj, const QString &projectDir)
+QString ActionsManager::replaceKeyHolder(
+        const QString &text, const ivm::IVObject *ivObj, const QString &projectDir, const QString &filepath)
 {
     if (text.isEmpty() || text[0] != '$') {
         return text;
@@ -353,6 +393,10 @@ QString ActionsManager::replaceKeyHolder(const QString &text, const ivm::IVObjec
     for (const ExternalArgHolder &holder : externalArgs(false)) {
         const QString name = text.mid(holder.key.size());
         switch (holder.target) {
+        case ExternalArgHolder::FilePath:
+            if (text == holder.key)
+                return QFileInfo(filepath).absoluteFilePath();
+            break;
         case ExternalArgHolder::ProjectPath:
             if (text == holder.key)
                 return QFileInfo(projectDir).absolutePath();
@@ -408,7 +452,8 @@ QString ActionsManager::replaceKeyHolder(const QString &text, const ivm::IVObjec
  * Replaces the keyholders by actual values of \a ivObj's attributes or parameters.
  * Creates and shows an instance of ExtProcMonitor.
  */
-void ActionsManager::triggerActionExternal(const Action &act, const ivm::IVObject *ivObj, InterfaceDocument *doc)
+void ActionsManager::triggerActionExternal(
+        const Action &act, const ivm::IVObject *ivObj, InterfaceDocument *doc, const QString &filepath)
 {
     if (!act.m_externalApp.isEmpty()) {
         if (doc->isDirty()) {
@@ -433,10 +478,10 @@ void ActionsManager::triggerActionExternal(const Action &act, const ivm::IVObjec
         QStringList params;
         for (const QString &param : act.m_externalAppParams) {
             if (!param.isEmpty()) {
-                params.append(replaceKeyHolder(param, ivObj, doc->path()));
+                params.append(replaceKeyHolder(param, ivObj, doc->path(), filepath));
             }
         }
-        const QString cwd = replaceKeyHolder(act.m_externalAppCwd, ivObj, doc->path());
+        const QString cwd = replaceKeyHolder(act.m_externalAppCwd, ivObj, doc->path(), filepath);
 
         QWidget *mainWindow(nullptr);
         for (auto w : qApp->topLevelWidgets())
@@ -502,5 +547,4 @@ void ActionsManager::registerAction(
         qWarning() << caller << "The registration of action failed; probably the duplicate key used:\n";
     }
 }
-
 }

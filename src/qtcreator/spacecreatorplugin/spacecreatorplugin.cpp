@@ -173,6 +173,17 @@ bool SpaceCreatorPlugin::initialize(const QStringList &arguments, QString *error
     menu->menu()->setEnabled(true);
     Core::ActionManager::actionContainer(Core::Constants::M_TOOLS)->addMenu(menu);
 
+    std::function<QStringList()> deploymentFilesCallback = [this]() {
+        if (auto ivEditor = qobject_cast<spctr::IVQtCEditor *>(Core::EditorManager::currentEditor())) {
+            SpaceCreatorProjectImpl *project = m_projectsManager->project(ivEditor->ivPlugin());
+            if (project) {
+                return project->allDVFiles();
+            }
+        }
+        return QStringList();
+    };
+    ive::ActionsManager::registerDeploymentFilesCallback(deploymentFilesCallback);
+
     QList<QAction *> mscActions;
     mscActions << m_showMinimapAction << m_checkInstancesAction << m_checkMessagesAction;
     m_mscFactory = new MscEditorFactory(m_projectsManager, mscActions, this);

@@ -263,7 +263,7 @@ void CreatorTool::populateContextMenu_propertiesDialog(QMenu *menu)
             connectionItem->layout();
             connectionItem->updateEntity();
         });
-    } else {
+    } else if (veIObj) {
         menu->addSeparator();
         QAction *action = menu->addAction(tr("Properties"));
         action->setEnabled(true);

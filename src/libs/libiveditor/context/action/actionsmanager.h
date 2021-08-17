@@ -36,6 +36,7 @@ class InterfaceDocument;
 class ActionsManager
 {
 public:
+    static void registerDeploymentFilesCallback(std::function<QStringList()> cb);
     static void populateMenu(QMenu *menu, ivm::IVObject *currObj, InterfaceDocument *doc);
     static bool registerScriptableAction(QAction *action, const QString &key, const QString &description);
     static QString listRegisteredActions();
@@ -72,13 +73,16 @@ private:
     void loadActions(const QString &fromFile);
 
     static void triggerActionInternal(const Action &act);
-    static void triggerActionExternal(const Action &act, const ivm::IVObject *ivObj, InterfaceDocument *doc);
+    static void triggerActionExternal(
+            const Action &act, const ivm::IVObject *ivObj, InterfaceDocument *doc, const QString &filepath);
     static bool triggerActionHidden(const Action &act);
 
-    static QString replaceKeyHolder(const QString &text, const ivm::IVObject *ivObj, const QString &projectDir);
+    static QString replaceKeyHolder(
+            const QString &text, const ivm::IVObject *ivObj, const QString &projectDir, const QString &filepath);
 
     QVector<Action> m_actions;
     QMap<QString, ScriptableActionHandler> m_qactions;
+    std::function<QStringList()> m_deploymentFilesCallBack;
 };
 
 }
