@@ -57,7 +57,7 @@ void CmdEntitiesRemove::advancedRemove(dvm::DVObject *obj)
         m_model->removeObject(obj);
 
     if (parent) {
-        switch (parent->type()) {
+        switch (obj->type()) {
         case dvm::DVObject::Type::Device:
             if (auto node = parent->as<dvm::DVNode *>()) {
                 node->removeDevice(obj->as<dvm::DVDevice *>());

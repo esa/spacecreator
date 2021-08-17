@@ -512,9 +512,9 @@ void MscSystemChecks::onEntitiesRemoved(const QList<QPointer<ivm::IVObject>> &en
 
     bool doRemove = true;
     if (command->isFirstChange()) {
-        const int result = QMessageBox::question(nullptr, tr("Remove MSC entities"),
+        const int result = QMessageBox::question(nullptr, tr("Remove MSC/DV entities"),
                 tr("The IV entity(ies) %1 was(were) removed."
-                   "\nDo you want to remove the correlating MSC entities?")
+                   "\nDo you want to remove the correlating MSC/DV entities?")
                         .arg(removedNames.join(QLatin1String(", "))));
         if (result != QMessageBox::Yes) {
             doRemove = false;
@@ -523,6 +523,7 @@ void MscSystemChecks::onEntitiesRemoved(const QList<QPointer<ivm::IVObject>> &en
     if (doRemove) {
         for (auto ivFunction : qAsConst(removedFunctions)) {
             removeMscInstances(ivFunction);
+            removeDvFunctionBinding(ivFunction);
         }
         for (auto ivConnection : qAsConst(removedConnections)) {
             removeMscMessages(ivConnection);

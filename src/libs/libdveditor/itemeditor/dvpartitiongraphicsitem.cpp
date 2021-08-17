@@ -19,6 +19,7 @@
 
 #include "graphicsviewutils.h"
 
+#include <QDebug>
 #include <QPainter>
 
 namespace dve {
@@ -84,6 +85,7 @@ void DVPartitionGraphicsItem::paint(QPainter *painter, const QStyleOptionGraphic
     QRectF titleRect;
     painter->drawText(br, Qt::AlignHCenter | Qt::AlignTop, entity()->titleUI(), &titleRect);
 
+    qDebug() << Q_FUNC_INFO << entity()->functionsNames().join("--");
     const QString functions = entity()->functionsNames().join(QLatin1Char('\n'));
     br.setTop(titleRect.bottom());
     painter->setPen(QPen(Qt::gray));
