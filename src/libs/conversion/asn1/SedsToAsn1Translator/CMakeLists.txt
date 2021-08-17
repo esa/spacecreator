@@ -12,6 +12,7 @@ target_include_directories(SedsToAsn1Translator
     PRIVATE     ${CMAKE_SOURCE_DIR}/src/libs)
 target_link_libraries(SedsToAsn1Translator
     PUBLIC      Conversion::Common
+                asn1library
                 SEDS::Model)
 
 add_format_target(SedsToAsn1Translator)

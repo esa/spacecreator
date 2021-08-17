@@ -21,9 +21,13 @@
 
 #include <conversion/common/translation/translator.h>
 
+namespace Asn1Acn {
+class Asn1Model;
+} // namespace Asn1Acn
+
 namespace seds::model {
 class SedsModel;
-};
+} // namespace seds::model
 
 namespace conversion::asn1 {
 
@@ -47,7 +51,7 @@ public:
     virtual auto getDependencies() const -> std::set<ModelType> override;
 
 private:
-    auto translateSedsModel(const seds::model::SedsModel *sedsModel) const -> void;
+    auto translateSedsModel(const seds::model::SedsModel *sedsModel) const -> Asn1Acn::Asn1Model;
 };
 
 } // namespace conversion::asn1

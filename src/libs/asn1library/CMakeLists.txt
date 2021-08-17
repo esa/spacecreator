@@ -19,6 +19,8 @@ target_sources(${LIB_NAME} PRIVATE
     asn1/acnparameter.h
     asn1/acnsequencecomponent.cpp
     asn1/acnsequencecomponent.h
+    asn1/asn1model.h
+    asn1/asn1model.cpp
     asn1/asnsequencecomponent.cpp
     asn1/asnsequencecomponent.h
     asn1/choicevalue.cpp
@@ -118,6 +120,7 @@ target_sources(${LIB_NAME} PRIVATE
 target_include_directories(${LIB_NAME}
     PUBLIC .
     PUBLIC asn1
+    PRIVATE ${CMAKE_SOURCE_DIR}/src/libs
 )
 
 target_link_libraries(${LIB_NAME}

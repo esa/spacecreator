@@ -20,22 +20,20 @@
 #pragma once
 
 #include <conversion/common/model.h>
-#include <seds/SedsModel/datasheet.h>
-#include <seds/SedsModel/packagefile.h>
-#include <variant>
+#include <memory>
 
-namespace seds::model {
+#include "file.h"
+
+namespace Asn1Acn {
 
 /**
- * @brief   Represents a SEDS data model
- *
- * Stores either a PackageFile or a DataSheet.
+ * @brief   Represents an ASN.1 data model
  */
-class SedsModel final : public conversion::Model
+class Asn1Model final : public conversion::Model
 {
 public:
     /** @brief  Model data type */
-    using Data = std::variant<model::PackageFile, model::DataSheet>;
+    using Data = std::vector<File>;
 
 public:
     /**
@@ -43,24 +41,24 @@ public:
      *
      * @param   data    Model data
      */
-    explicit SedsModel(Data data);
+    explicit Asn1Model(Data data);
     /**
      * @brief   Deleted copy constructor/
      */
-    SedsModel(const SedsModel &) = delete;
+    Asn1Model(const Asn1Model &) = delete;
     /**
      * @brief   Default move constructor
      */
-    SedsModel(SedsModel &&) = default;
+    Asn1Model(Asn1Model &&) = default;
 
     /**
      * @brief   Deleted copy assignment operator
      */
-    SedsModel &operator=(const SedsModel &) = delete;
+    Asn1Model &operator=(const Asn1Model &) = delete;
     /**
      * @brief   Default move assignment operator
      */
-    SedsModel &operator=(SedsModel &&) = default;
+    Asn1Model &operator=(Asn1Model &&) = default;
 
 public:
     /**
@@ -68,11 +66,11 @@ public:
      *
      * @returns Model data
      */
-    auto data() const -> const Data &;
+    auto data() const -> const Data&;
 
 private:
     /** @brief  Model data */
     Data m_data;
 };
 
-} // namespace seds::model
+} // namespace Asn1Acn

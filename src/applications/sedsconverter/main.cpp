@@ -19,10 +19,12 @@
 
 #include "sedsconverter.h"
 
+#include <conversion/common/exceptions.h>
 #include <conversion/common/export/exceptions.h>
 #include <conversion/common/import/exceptions.h>
 #include <conversion/common/translation/exceptions.h>
 
+using conversion::ConversionException;
 using conversion::exporter::ExportException;
 using conversion::importer::ImportException;
 using conversion::translator::TranslationException;
@@ -41,6 +43,9 @@ int main(int argc, char **argv)
         qFatal("%s", errorMessage.toLatin1().constData());
     } catch (const ExportException &ex) {
         const auto errorMessage = QString("Export failure: %1").arg(ex.errorMessage());
+        qFatal("%s", errorMessage.toLatin1().constData());
+    } catch (const ConversionException &ex) {
+        const auto errorMessage = QString("Conversion failure: %1").arg(ex.errorMessage());
         qFatal("%s", errorMessage.toLatin1().constData());
     }
 }
