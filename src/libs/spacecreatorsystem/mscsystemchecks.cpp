@@ -22,6 +22,10 @@
 #include "commands/cmdfunctionattrchange.h"
 #include "commands/cmdifaceattrchange.h"
 #include "commandsstack.h"
+#include "dvappmodel.h"
+#include "dveditorcore.h"
+#include "dvfunction.h"
+#include "dvmodel.h"
 #include "interfacedocument.h"
 #include "ivconnection.h"
 #include "ivconnectionchain.h"
@@ -68,9 +72,10 @@ void MscSystemChecks::setStorage(SpaceCreatorProject *storage)
 }
 
 /*!
-   Returns if at least one instance in one of the .msc files has the name \p name
+   Returns if at least one instance in one of the .msc files, or if any function in any dv.xml files  has the name \p
+   name
  */
-bool MscSystemChecks::mscInstancesExist(const QString &name)
+bool MscSystemChecks::ivFunctionUsed(const QString &name)
 {
     for (QSharedPointer<msc::MSCEditorCore> &mscCore : m_storage->allMscCores()) {
         for (msc::MscChart *chart : mscCore->mainModel()->mscModel()->allCharts()) {
@@ -81,6 +86,16 @@ bool MscSystemChecks::mscInstancesExist(const QString &name)
             }
         }
     }
+
+    for (QSharedPointer<dve::DVEditorCore> &dvCore : m_storage->allDVCores()) {
+        dvm::DVModel *model = dvCore->appModel()->objectsModel();
+        for (dvm::DVFunction *fn : model->allObjectsByType<dvm::DVFunction>()) {
+            if (fn->title() == name) {
+                return true;
+            }
+        }
+    }
+
     return false;
 }
 
@@ -95,7 +110,7 @@ void MscSystemChecks::changeMscInstanceName(const QString &oldName, const QStrin
 }
 
 /*!
-   Removes all instance that are corresponding to the function \p aaldFunction
+   Removes all instance that are corresponding to the function \p ivFunction
  */
 void MscSystemChecks::removeMscInstances(ivm::IVFunction *ivFunction)
 {
@@ -254,6 +269,26 @@ void MscSystemChecks::checkMessages()
     }
 }
 
+/*!
+   Changes all function bindings that have the name \p oldName to have the new name \p name
+ */
+void MscSystemChecks::changeDvFunctionBindingName(const QString &oldName, const QString &name)
+{
+    for (QSharedPointer<dve::DVEditorCore> &dvCore : m_storage->allDVCores()) {
+        dvCore->changeDvFunctionBindingName(oldName, name);
+    }
+}
+
+/*!
+   Removes all function bindings that are corresponding to the function \p ivFunction
+ */
+void MscSystemChecks::removeDvFunctionBinding(ivm::IVFunction *ivFunction)
+{
+    for (QSharedPointer<dve::DVEditorCore> &dvCore : m_storage->allDVCores()) {
+        dvCore->removeDvFunctionBinding(ivFunction->title());
+    }
+}
+
 void MscSystemChecks::onEntityNameChanged(ivm::IVObject *entity, const QString &oldName, shared::UndoCommand *command)
 {
     if (m_nameUpdateRunning) {
@@ -262,17 +297,19 @@ void MscSystemChecks::onEntityNameChanged(ivm::IVObject *entity, const QString &
 
     auto cmdAttribChange = dynamic_cast<ive::cmd::CmdFunctionAttrChange *>(command);
     if (cmdAttribChange) {
-        if (mscInstancesExist(oldName)) {
+        if (ivFunctionUsed(oldName)) {
             if (command->isFirstChange()) {
                 const int result = QMessageBox::question(
-                        nullptr, tr("Update instances"), tr("Do you want to update MSC instances?"));
+                        nullptr, tr("Update instances"), tr("Do you want to update MSC instances / DV bindings?"));
                 if (result == QMessageBox::Yes) {
                     m_nameUpdateRunning = true;
                     changeMscInstanceName(oldName, entity->title());
+                    changeDvFunctionBindingName(oldName, entity->title());
                     m_nameUpdateRunning = false;
                 }
             } else {
                 changeMscInstanceName(oldName, entity->title());
+                changeDvFunctionBindingName(oldName, entity->title());
             }
         }
     }
@@ -351,7 +388,7 @@ void MscSystemChecks::onMscEntityNameChanged(QObject *entity, const QString &old
             if (command && command->isFirstChange()) {
                 QMessageBox box;
                 box.setWindowTitle(tr("Update IV function"));
-                box.setText(tr("The IV function should be updated."
+                box.setText(tr("The IV/DV function should be updated."
                                "\nDo you want to update it?"
                                "\nDo you want to add it to the IV model?"));
                 QPushButton *updateButton = box.addButton(tr("Update"), QMessageBox::AcceptRole);
@@ -363,6 +400,7 @@ void MscSystemChecks::onMscEntityNameChanged(QObject *entity, const QString &old
                     m_nameUpdateRunning = true;
                     ivCore->renameIVFunction(oldName, instance->name());
                     changeMscInstanceName(oldName, instance->name());
+                    changeDvFunctionBindingName(oldName, instance->name());
                     m_nameUpdateRunning = false;
                 }
                 if (box.clickedButton() == addButton) {
@@ -372,6 +410,8 @@ void MscSystemChecks::onMscEntityNameChanged(QObject *entity, const QString &old
                 m_nameUpdateRunning = true;
                 ivCore->renameIVFunction(oldName, instance->name());
                 changeMscInstanceName(oldName, instance->name());
+                changeDvFunctionBindingName(oldName, instance->name());
+
                 m_nameUpdateRunning = false;
             }
         }

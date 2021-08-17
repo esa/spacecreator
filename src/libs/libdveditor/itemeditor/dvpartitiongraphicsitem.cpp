@@ -32,6 +32,7 @@ void DVPartitionGraphicsItem::init()
 {
     connect(entity(), &dvm::DVPartition::functionAdded, this, [this]() { update(); });
     connect(entity(), &dvm::DVPartition::functionRemoved, this, [this]() { update(); });
+    connect(entity(), &dvm::DVPartition::functionChanged, this, [this]() { update(); });
     connect(entity(), &dvm::DVPartition::attributeChanged, this, [this](const QString &attrName) {
         if (attrName == dvm::meta::Props::token(dvm::meta::Props::Token::name))
             update();

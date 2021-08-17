@@ -39,6 +39,12 @@ void DVPartition::addFunction(DVFunction *function)
 {
     if (!d->functions.contains(function)) {
         d->functions.append(function);
+        connect(function, &DVFunction::attributeChanged, this, [this](const QString &) {
+            auto fn = qobject_cast<DVFunction *>(sender());
+            if (fn) {
+                Q_EMIT functionChanged(fn->id());
+            }
+        });
         Q_EMIT functionAdded(function->id());
     }
 }
@@ -46,6 +52,7 @@ void DVPartition::addFunction(DVFunction *function)
 void DVPartition::removeFunction(DVFunction *function)
 {
     if (d->functions.removeAll(function)) {
+        disconnect(function, nullptr, this, nullptr);
         Q_EMIT functionRemoved(function->id());
     }
 }

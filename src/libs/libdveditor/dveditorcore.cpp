@@ -19,6 +19,9 @@
 
 #include "abstractsystemchecks.h"
 #include "abstractvisualizationmodel.h"
+#include "asn1systemchecks.h"
+#include "commands/cmdentitiesremove.h"
+#include "commands/cmdentityattributechange.h"
 #include "commands/cmdnodeentitycreate.h"
 #include "commandsstackbase.h"
 #include "dvappmodel.h"
@@ -37,7 +40,6 @@
 #include "properties/dvpropertiesdialog.h"
 #include "settingsmanager.h"
 #include "ui/graphicsviewbase.h"
-#include "asn1systemchecks.h"
 
 #include <QBoxLayout>
 #include <QBuffer>
@@ -51,6 +53,7 @@
 #include <QTimer>
 #include <QTreeView>
 #include <QUndoCommand>
+#include <dvfunction.h>
 
 namespace dve {
 
@@ -346,11 +349,55 @@ void DVEditorCore::reloadHWLibrary()
     loadHWLibrary(shared::hwLibraryPath());
 }
 
+/*!
+   \brief DVEditorCore::changeDvFunctionBindingName
+   \param oldName
+   \param name
+ */
+void DVEditorCore::changeDvFunctionBindingName(const QString &oldName, const QString &name)
+{
+    bool updated = false;
+    dvm::DVModel *model = d->m_appModel->objectsModel();
+    for (dvm::DVFunction *fn : model->allObjectsByType<dvm::DVFunction>()) {
+        if (fn->title() == oldName) {
+            const QVariantHash attributes = { { dvm::meta::Props::token(dvm::meta::Props::Token::name), name } };
+            auto cmd = new shared::cmd::CmdEntityAttributeChange(fn, attributes);
+            commandsStack()->push(cmd);
+            updated = true;
+        }
+    }
+    if (updated) {
+        Q_EMIT editedExternally(this);
+    }
+}
+
+/*!
+   \brief DVEditorCore::removeDvFunctionBinding
+   \param ivFunction
+ */
+void DVEditorCore::removeDvFunctionBinding(const QString &functionName)
+{
+    dvm::DVModel *model = d->m_appModel->objectsModel();
+    QList<QPointer<dvm::DVObject>> toDelete;
+    for (dvm::DVFunction *fn : model->allObjectsByType<dvm::DVFunction>()) {
+        if (fn->title() == functionName) {
+            toDelete.append(fn);
+        }
+    }
+
+    if (!toDelete.isEmpty()) {
+        auto cmd = new cmd::CmdEntitiesRemove(toDelete, model);
+        commandsStack()->push(cmd);
+
+        Q_EMIT editedExternally(this);
+    }
+}
+
 void DVEditorCore::showPropertyEditor(const shared::Id &id)
 {
     if (auto obj = d->m_appModel->objectsModel()->getObject(id)) {
-        dve::DVPropertiesDialog dialog(d->m_dynPropConfig, obj, d->m_systemChecks,
-                d->m_asn1SystemChecks, d->m_appModel->commandsStack(), d->m_mainWidget->window());
+        dve::DVPropertiesDialog dialog(d->m_dynPropConfig, obj, d->m_systemChecks, d->m_asn1SystemChecks,
+                d->m_appModel->commandsStack(), d->m_mainWidget->window());
         dialog.init();
         dialog.exec();
     }

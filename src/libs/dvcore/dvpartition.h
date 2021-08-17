@@ -41,6 +41,7 @@ public:
 Q_SIGNALS:
     void functionAdded(shared::Id id);
     void functionRemoved(shared::Id id);
+    void functionChanged(shared::Id id);
 
 private:
     std::unique_ptr<DVPartitionPrivate> d;

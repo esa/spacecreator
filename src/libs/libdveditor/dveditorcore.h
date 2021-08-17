@@ -24,6 +24,10 @@ class QUndoStack;
 class QToolBar;
 class QItemSelection;
 
+namespace ivm {
+class IVFunction;
+}
+
 namespace shared {
 class CommandLineParser;
 namespace cmd {
@@ -43,7 +47,6 @@ class DVSystemChecks;
 namespace Asn1Acn {
 class Asn1SystemChecks;
 }
-
 
 namespace dve {
 class DVAppModel;
@@ -85,6 +88,10 @@ public:
 
     void loadHWLibrary(const QString &directory);
     void reloadHWLibrary();
+
+    //
+    void changeDvFunctionBindingName(const QString &oldName, const QString &name);
+    void removeDvFunctionBinding(const QString &functionName);
 
 private Q_SLOTS:
     void showPropertyEditor(const shared::Id &id);

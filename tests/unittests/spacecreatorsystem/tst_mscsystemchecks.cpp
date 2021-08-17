@@ -64,8 +64,8 @@ void tst_MscSystemChecks::testInstanceExists()
     const QString mscFileName = QFINDTESTDATA("/Taste07.msc");
     m_project->mscData(mscFileName);
 
-    QCOMPARE(m_checker->mscInstancesExist("foo"), false);
-    QCOMPARE(m_checker->mscInstancesExist("Function_1"), true);
+    QCOMPARE(m_checker->ivFunctionUsed("foo"), false);
+    QCOMPARE(m_checker->ivFunctionUsed("Function_1"), true);
 }
 
 void tst_MscSystemChecks::testMessagesExists()

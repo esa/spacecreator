@@ -55,8 +55,8 @@ public:
     // Setup functions
     void setStorage(scs::SpaceCreatorProject *storage);
 
-    // Check functions
-    bool mscInstancesExist(const QString &name);
+    // MSC functions
+    bool ivFunctionUsed(const QString &name);
     void changeMscInstanceName(const QString &oldName, const QString &name);
     void removeMscInstances(ivm::IVFunction *ivFunction);
     bool hasCorrespondingInstances(ivm::IVFunction *ivFunction) const;
@@ -69,6 +69,10 @@ public:
 
     void checkInstances();
     void checkMessages();
+
+    // DV functions
+    void changeDvFunctionBindingName(const QString &oldName, const QString &name);
+    void removeDvFunctionBinding(ivm::IVFunction *ivFunction);
 
 public Q_SLOTS:
     void onEntityNameChanged(ivm::IVObject *entity, const QString &oldName, shared::UndoCommand *command);
