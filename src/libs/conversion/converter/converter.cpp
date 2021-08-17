@@ -26,6 +26,7 @@
 #include <conversion/common/import/exceptions.h>
 #include <conversion/common/import/modelimporter.h>
 #include <conversion/common/model.h>
+#include <conversion/common/translation/exceptions.h>
 #include <conversion/common/translation/translator.h>
 #include <conversion/seds/SedsRegistrar/registrar.h>
 
@@ -34,6 +35,7 @@ namespace conversion {
 using exporter::ModelExporter;
 using importer::ImportException;
 using importer::ModelImporter;
+using translator::TranslationException;
 using translator::Translator;
 
 Converter::Converter(const Registry &registry, Options options)
