@@ -23,7 +23,7 @@ space-creator:
     - ./scripts/build_grantlee.sh
     # build space creator
     - cd ${BUILD_DIR}
-    - cmake -GNinja -S ${PROJECT_ROOT} -B ${BUILD_DIR} ${CMAKE_BUILD}
+    - cmake -GNinja -S ${PROJECT_ROOT} -B ${BUILD_DIR} ${CMAKE_BUILD} -DBUILD_PATCH_NUMBER=$CI_BUILD_ID
     - cmake --build . --target all
     - cd ${PROJECT_ROOT}
     # unit tests

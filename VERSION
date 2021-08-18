@@ -1,0 +1,20 @@
+# To change the version of the project, edit the lines setting
+# SC_MAJOR_VERSION and SC_MINOR_VERSION
+# This file is parsed by cmake
+# And used via "source VERSION" to set the AppImage filename
+
+
+# This sets the major version
+export SC_MAJOR_VERSION=0
+
+# This sets the minor version
+export SC_MINOR_VERSION=8
+
+# The patch version is set automaticly
+if [ ! -z "${CI_BUILD_ID}" ]; then
+  export SC_PATCH_VERSION=${CI_BUILD_ID}
+else
+  export SC_PATCH_VERSION=0
+fi
+
+export SC_VERSION="${SC_MAJOR_VERSION}.${SC_MINOR_VERSION}.${SC_PATCH_VERSION}"

@@ -14,10 +14,9 @@ if [ -z "${BUILD_DIR}" ]; then
     echo "BUILD_DIR not defined"
     exit 1
 fi
-if [ -z "${CI_BUILD_ID}" ]; then
-    echo "CI_BUILD_ID not defined"
-    CI_BUILD_ID=1234
-fi
+
+# Grab version number(s)
+source ../VERSION
 
 # Detect system architecture to know which binaries of AppImage tools
 # should be downloaded and used.
@@ -73,4 +72,4 @@ cp ${ENV_QT_BASE_DIR}/lib/libQt5WebSockets* ${APP_DIR}/lib/Qt/lib -r
 
 # Generate AppImage
 echo "Generating the app image"
-${APPIMAGE_TOOL} ${APP_DIR} ${PACKAGE_DIR}/spacecreator-x86_64-${CI_BUILD_ID}.AppImage
+${APPIMAGE_TOOL} ${APP_DIR} ${PACKAGE_DIR}/spacecreator-x86_64-${SC_VERSION}.AppImage
