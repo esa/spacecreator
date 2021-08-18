@@ -48,6 +48,33 @@ qtlibdir=$libdir/Qt/lib
 if test -d "$qtlibdir"; then
     qtlibpath=:$qtlibdir
 fi
+
+# get the version number from the Qt library in the given directory
+qtVersion() {
+    local QTL=`ls ${1}/libQt5Core.so.5*`
+    set -- $QTL
+    RESULT=`echo $3 | awk -FlibQt5Core.so. '{print $2}'`
+}
+# Create version number out of string
+version() {
+    echo "$@" | awk -F. '{ printf("%d%03d%03d%03d\n", $1,$2,$3,$4); }';
+}
+# check for existing newer Qt version
+if [ -f /usr/lib/x86_64-linux-gnu/libQt5Core.prl ]; then
+    qtVersion /usr/lib/x86_64-linux-gnu
+    SYSTEM_QT=$RESULT
+    qtVersion $qtlibdir
+    LOCAL_QT=$RESULT
+    if [ $(version $SYSTEM_QT) -ge $(version $LOCAL_QT) ]; then
+        # Put system Qt in front of AppImage provided one
+        echo "Putting system Qt in front"
+         LD_LIBRARY_PATH=/usr/lib/x86_64-linux-gnu:$LD_LIBRARY_PATH
+         export LD_LIBRARY_PATH
+         QT_PLUGIN_PATH=/usr/lib/x86_64-linux-gnu/qt5/plugins:$QT_PLUGIN_PATH
+         export QT_PLUGIN_PATH
+    fi
+fi
+
 # Add Qt Creator library path
 LD_LIBRARY_PATH=$libdir:$libdir/qtcreator$qtlibpath${LD_LIBRARY_PATH:+:$LD_LIBRARY_PATH}
 export LD_LIBRARY_PATH
