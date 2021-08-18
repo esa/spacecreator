@@ -25,7 +25,6 @@
 #include <seds/SedsModel/sedsmodel.h>
 
 using Asn1Acn::Asn1Model;
-using Asn1Acn::File;
 using conversion::translator::IncorrectSourceModelException;
 using conversion::translator::TranslationException;
 using seds::model::SedsModel;
@@ -63,9 +62,29 @@ std::set<ModelType> SedsToAsn1Translator::getDependencies() const
 
 Asn1Model SedsToAsn1Translator::translateSedsModel(const SedsModel *sedsModel) const
 {
-    std::vector<File> asn1Files;
+    std::vector<Asn1Acn::File> asn1Files;
+
+    const auto &sedsModelData = sedsModel->data();
+    if (std::holds_alternative<seds::model::PackageFile>(sedsModelData)) {
+        const auto &package = std::get<seds::model::PackageFile>(sedsModelData).package();
+        asn1Files.push_back(translatePackage(package));
+    } else if (std::holds_alternative<seds::model::DataSheet>(sedsModelData)) {
+        const auto &packages = std::get<seds::model::DataSheet>(sedsModelData).packages();
+        for (const auto &package : packages) {
+            asn1Files.push_back(translatePackage(package));
+        }
+    } else {
+        throw TranslationException("Unhandled SEDS model data");
+    }
 
     return Asn1Model(std::move(asn1Files));
+}
+
+Asn1Acn::File SedsToAsn1Translator::translatePackage(const seds::model::Package &package) const
+{
+    Asn1Acn::File asn1File(package.qualifiedName().name().value());
+
+    return asn1File;
 }
 
 } // namespace conversion::asn1

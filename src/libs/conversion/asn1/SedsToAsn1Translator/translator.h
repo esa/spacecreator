@@ -23,10 +23,12 @@
 
 namespace Asn1Acn {
 class Asn1Model;
+class File;
 } // namespace Asn1Acn
 
 namespace seds::model {
 class SedsModel;
+class Package;
 } // namespace seds::model
 
 namespace conversion::asn1 {
@@ -52,6 +54,9 @@ public:
 
 private:
     auto translateSedsModel(const seds::model::SedsModel *sedsModel) const -> Asn1Acn::Asn1Model;
+
+private:
+    auto translatePackage(const seds::model::Package &package) const -> Asn1Acn::File;
 };
 
 } // namespace conversion::asn1
