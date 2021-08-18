@@ -60,7 +60,7 @@ version() {
     echo "$@" | awk -F. '{ printf("%d%03d%03d%03d\n", $1,$2,$3,$4); }';
 }
 # check for existing newer Qt version
-if [ -f /usr/lib/x86_64-linux-gnu/libQt5Core.prl ]; then
+if [ -f /usr/lib/x86_64-linux-gnu/libQt5Core.so.5 ]; then
     qtVersion /usr/lib/x86_64-linux-gnu
     SYSTEM_QT=$RESULT
     qtVersion $qtlibdir
