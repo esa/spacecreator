@@ -19,10 +19,9 @@
 
 #pragma once
 
-#include <variant>
+#include <asn1library/asn1/definitions.h>
 
 namespace seds::model {
-
 class ArrayDataType;
 class BinaryDataType;
 class BooleanDataType;
@@ -30,11 +29,24 @@ class ContainerDataType;
 class EnumeratedDataType;
 class FloatDataType;
 class IntegerDataType;
-class RootDataType;
 class StringDataType;
 class SubRangeDataType;
-
-using DataType = std::variant<ArrayDataType, BinaryDataType, BooleanDataType, ContainerDataType, EnumeratedDataType,
-        FloatDataType, IntegerDataType, StringDataType, SubRangeDataType>;
-
 } // namespace seds::model
+
+namespace conversion::asn1::translator {
+
+struct DataTypeTranslatorVisitor final {
+    Asn1Acn::Definitions *m_definitions;
+
+    void operator()(const seds::model::ArrayDataType &dataType);
+    void operator()(const seds::model::BinaryDataType &dataType);
+    void operator()(const seds::model::BooleanDataType &dataType);
+    void operator()(const seds::model::ContainerDataType &dataType);
+    void operator()(const seds::model::EnumeratedDataType &dataType);
+    void operator()(const seds::model::FloatDataType &dataType);
+    void operator()(const seds::model::IntegerDataType &dataType);
+    void operator()(const seds::model::StringDataType &dataType);
+    void operator()(const seds::model::SubRangeDataType &dataType);
+};
+
+} // namespace conversion::asn1::translator

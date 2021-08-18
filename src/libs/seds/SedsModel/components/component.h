@@ -23,7 +23,17 @@
 #include "components/componentimplementation.h"
 #include "components/interface.h"
 #include "interfaces/interfacedeclaration.h"
+#include "types/arraydatatype.h"
+#include "types/binarydatatype.h"
+#include "types/booleandatatype.h"
+#include "types/containerdatatype.h"
 #include "types/datatype.h"
+#include "types/enumerateddatatype.h"
+#include "types/floatdatatype.h"
+#include "types/integerdatatype.h"
+#include "types/rootdatatype.h"
+#include "types/stringdatatype.h"
+#include "types/subrangedatatype.h"
 
 #include <memory>
 

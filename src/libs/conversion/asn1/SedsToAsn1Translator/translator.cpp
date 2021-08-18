@@ -19,8 +19,12 @@
 
 #include "translator.h"
 
+#include "visitors/datatypetranslatorvisitor.h"
+
 #include <asn1library/asn1/asn1model.h>
+#include <asn1library/asn1/definitions.h>
 #include <asn1library/asn1/file.h>
+#include <asn1library/asn1/sourcelocation.h>
 #include <conversion/common/translation/exceptions.h>
 #include <seds/SedsModel/sedsmodel.h>
 
@@ -29,7 +33,7 @@ using conversion::translator::IncorrectSourceModelException;
 using conversion::translator::TranslationException;
 using seds::model::SedsModel;
 
-namespace conversion::asn1 {
+namespace conversion::asn1::translator {
 
 std::unique_ptr<Model> SedsToAsn1Translator::translateModels(
         std::vector<const Model *> sourceModels, const Options &options) const
@@ -57,7 +61,7 @@ std::unique_ptr<Model> SedsToAsn1Translator::translateModels(
 
 std::set<ModelType> SedsToAsn1Translator::getDependencies() const
 {
-    return std::set<ModelType> { ModelType::Seds, ModelType::Asn1 };
+    return std::set<ModelType> { ModelType::Seds };
 }
 
 Asn1Model SedsToAsn1Translator::translateSedsModel(const SedsModel *sedsModel) const
@@ -82,9 +86,22 @@ Asn1Model SedsToAsn1Translator::translateSedsModel(const SedsModel *sedsModel) c
 
 Asn1Acn::File SedsToAsn1Translator::translatePackage(const seds::model::Package &package) const
 {
-    Asn1Acn::File asn1File(package.qualifiedName().name().value());
+    Asn1Acn::File asn1File("");
+
+    auto definitions =
+            std::make_unique<Asn1Acn::Definitions>(package.qualifiedName().name().value(), Asn1Acn::SourceLocation());
+    translateDataTypes(definitions.get(), package.dataTypes());
+    asn1File.add(std::move(definitions));
 
     return asn1File;
 }
 
-} // namespace conversion::asn1
+void SedsToAsn1Translator::translateDataTypes(
+        Asn1Acn::Definitions *definitions, const std::vector<seds::model::DataType> &dataTypes) const
+{
+    for (const auto &dataType : dataTypes) {
+        std::visit(DataTypeTranslatorVisitor { definitions }, dataType);
+    }
+}
+
+} // namespace conversion::asn1::translator

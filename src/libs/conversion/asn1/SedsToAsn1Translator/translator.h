@@ -20,9 +20,12 @@
 #pragma once
 
 #include <conversion/common/translation/translator.h>
+#include <seds/SedsModel/types/datatype.h>
+#include <vector>
 
 namespace Asn1Acn {
 class Asn1Model;
+class Definitions;
 class File;
 } // namespace Asn1Acn
 
@@ -31,9 +34,9 @@ class SedsModel;
 class Package;
 } // namespace seds::model
 
-namespace conversion::asn1 {
+namespace conversion::asn1::translator {
 
-class SedsToAsn1Translator final : public translator::Translator
+class SedsToAsn1Translator final : public ::conversion::translator::Translator
 {
 public:
     /**
@@ -57,6 +60,9 @@ private:
 
 private:
     auto translatePackage(const seds::model::Package &package) const -> Asn1Acn::File;
+
+    auto translateDataTypes(
+            Asn1Acn::Definitions *definitions, const std::vector<seds::model::DataType> &dataTypes) const -> void;
 };
 
-} // namespace conversion::asn1
+} // namespace conversion::asn1::translator

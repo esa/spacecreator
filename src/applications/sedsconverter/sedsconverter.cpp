@@ -50,6 +50,7 @@ void SedsConverter::convert(ModelType targetModelType) const
     options.add(SedsOptions::inputFilename, "input.xml");
     options.add(SedsOptions::schemaFilename, "seds.xsd");
     options.add(SedsOptions::externalRefFilename, "config.toml");
+    options.add(SedsOptions::skipValidation);
     options.add(SedsOptions::keepIntermediateFiles);
 
     Converter converter(m_registry, std::move(options));

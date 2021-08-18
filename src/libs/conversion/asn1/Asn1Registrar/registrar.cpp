@@ -29,7 +29,7 @@ bool Asn1Registrar::registerCapabilities(conversion::Registry &registry)
 {
     bool result = true;
 
-    auto sedsToAsn1Translator = std::make_unique<SedsToAsn1Translator>();
+    auto sedsToAsn1Translator = std::make_unique<translator::SedsToAsn1Translator>();
     result &= registry.registerTranslator({ ModelType::Seds }, ModelType::Asn1, std::move(sedsToAsn1Translator));
 
     return result;

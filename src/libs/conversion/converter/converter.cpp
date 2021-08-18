@@ -52,6 +52,9 @@ void Converter::convert(std::set<ModelType> sourceModelsTypes, ModelType targetM
     }
 
     const auto *exporter = m_registry.findExporter(targetModelType);
+    if (!exporter) {
+        /* throw ExporterNotRegisteredException(targetModelType); */
+    }
 
     for (const auto &sourceModelType : sourceModelsTypes) {
         if (!isModelImported(sourceModelType)) {
@@ -61,7 +64,7 @@ void Converter::convert(std::set<ModelType> sourceModelsTypes, ModelType targetM
 
     // TODO: Check and resolve translator dependencies
     translateModels(translator, targetModelType);
-    exportModel(exporter, targetModelType);
+    /* exportModel(exporter, targetModelType); */
 }
 
 void Converter::importModel(ModelType modelType)
