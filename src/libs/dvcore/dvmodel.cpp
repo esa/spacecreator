@@ -71,6 +71,20 @@ QList<DVConnection *> DVModel::connections(DVDevice *device) const
     return c;
 }
 
+QList<DVConnection *> DVModel::connections(DVNode *node) const
+{
+    QList<DVConnection *> c;
+    const QHash<shared::Id, shared::VEObject *> &allObjects = objects();
+    for (auto it = allObjects.begin(); it != allObjects.end(); ++it) {
+        if (auto connection = qobject_cast<DVConnection *>(it.value())) {
+            if (connection->sourceNode() == node || connection->targetNode() == node) {
+                c.append(connection);
+            }
+        }
+    }
+    return c;
+}
+
 QList<DVFunction *> DVModel::functions(DVNode *node) const
 {
     if (!node) {

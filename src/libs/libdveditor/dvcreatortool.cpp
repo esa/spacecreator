@@ -403,7 +403,7 @@ void DVCreatorTool::populateContextMenu_commonEdit(QMenu *menu, const QPointF &s
         connect(action, &QAction::triggered, this,
                 [this, boundFunctionsEntities, partition, cmdTitle = action->text()]() {
                     m_commandsStack->undoStack()->beginMacro(cmdTitle);
-                    for (auto fn : boundFunctionsEntities) {
+                    for (dvm::DVFunction *fn : qAsConst(boundFunctionsEntities)) {
                         auto cmd = new cmd::CmdFunctionUnbind(partition, fn);
                         m_commandsStack->push(cmd);
                     }

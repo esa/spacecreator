@@ -43,6 +43,7 @@ public:
     DVObject *getObjectByName(const QString &name, DVObject::Type type, Qt::CaseSensitivity caseSensitivity) const;
 
     QList<DVConnection *> connections(DVDevice *device) const;
+    QList<DVConnection *> connections(DVNode *node) const;
     QList<DVFunction *> functions(DVNode *node) const;
 
     bool addObjectImpl(shared::VEObject *obj) override;

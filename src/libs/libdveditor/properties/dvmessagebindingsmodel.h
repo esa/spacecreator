@@ -44,6 +44,9 @@ public:
     Qt::ItemFlags flags(const QModelIndex &index) const override;
 
 private:
+    bool isEditable(const QModelIndex &index) const;
+
+private:
     struct DataItem {
         QString m_fromFunction;
         QString m_fromInterface;

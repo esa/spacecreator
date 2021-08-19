@@ -28,6 +28,7 @@
 #include "dvnode.h"
 #include "dvpartition.h"
 
+#include <QColor>
 #include <QDebug>
 
 namespace dve {
@@ -108,6 +109,8 @@ QVariant DVMessageBindingsModel::data(const QModelIndex &index, int role) const
         return QVariant(QString("%1.%2 -> %3.%4")
                                 .arg(item.m_fromFunction, item.m_fromInterface, item.m_toFunction, item.m_toInterface));
     }
+    case Qt::ForegroundRole:
+        return isEditable(index) ? QVariant::fromValue(QColor(Qt::gray)) : QVariant();
     case Qt::CheckStateRole:
         return m_connection->hasMessage(
                        item.m_fromFunction, item.m_fromInterface, item.m_toFunction, item.m_toInterface)
@@ -123,7 +126,7 @@ bool DVMessageBindingsModel::setData(const QModelIndex &index, const QVariant &v
         return {};
     }
 
-    if (role == Qt::CheckStateRole) {
+    if (role == Qt::CheckStateRole && index.flags().testFlag(Qt::ItemIsUserCheckable)) {
         DataItem &item = m_messages[index.row()];
         if ((Qt::CheckState)value.toInt() == Qt::Checked) {
             auto cmd = new cmd::CmdMessageEntityCreate(
@@ -149,7 +152,32 @@ bool DVMessageBindingsModel::setData(const QModelIndex &index, const QVariant &v
 
 Qt::ItemFlags DVMessageBindingsModel::flags(const QModelIndex &index) const
 {
-    return QAbstractListModel::flags(index) | Qt::ItemIsUserCheckable;
+    Qt::ItemFlags itemFlags = QAbstractListModel::flags(index);
+    if (isEditable(index)) {
+        itemFlags |= Qt::ItemIsUserCheckable;
+    }
+
+    return itemFlags;
+}
+
+bool DVMessageBindingsModel::isEditable(const QModelIndex &index) const
+{
+    if (!index.isValid())
+        return false;
+
+    const DataItem &item = m_messages.at(index.row());
+    auto isBound = [](const QList<dvm::DVConnection *> &connections, dvm::DVConnection *connection,
+                           const DataItem &item) {
+        auto it = std::find_if(connections.cbegin(), connections.cend(), [connection, item](dvm::DVConnection *c) {
+            return connection != c && c->sourceNode() == connection->sourceNode()
+                    && c->targetNode() == connection->targetNode()
+                    && c->hasMessage(item.m_fromFunction, item.m_fromInterface, item.m_toFunction, item.m_toInterface);
+        });
+        return it != connections.cend();
+    };
+
+    return !(isBound(m_connection->model()->connections(m_connection->sourceNode()), m_connection, item)
+            || isBound(m_connection->model()->connections(m_connection->targetNode()), m_connection, item));
 }
 
 } // namespace dve
