@@ -36,7 +36,6 @@ class tst_Utils : public QObject
 private Q_SLOTS:
     void initTestCase();
     void testCheckCollision();
-    void testSides();
     void testAdjustedRect();
     void testAlignRectToSide();
     void testCollidingRect();
@@ -67,28 +66,6 @@ void tst_Utils::testCheckCollision()
     QVERIFY(intersected == rects.at(3));
     QVERIFY(shared::graphicsviewutils::isCollided(rects, rectNotCollided, &notIntersected) == false);
     QVERIFY(!notIntersected.isValid());
-}
-
-void tst_Utils::testSides()
-{
-    const QMetaEnum me = QMetaEnum::fromType<Qt::Alignment>();
-    for (int idx = 0; idx < me.keyCount(); ++idx) {
-        const auto align = static_cast<Qt::Alignment>(me.value(idx));
-        const int sideIdx = shared::graphicsviewutils::indexFromSide(align);
-        if (shared::graphicsviewutils::kRectSides.contains(align)) {
-            QVERIFY(align == shared::graphicsviewutils::sideFromIndex(sideIdx));
-        } else {
-            QCOMPARE(sideIdx, -1);
-        }
-    }
-    QCOMPARE(shared::graphicsviewutils::sideFromIndex(-1),
-            shared::graphicsviewutils::sideFromIndex(shared::graphicsviewutils::kRectSides.size() - 1));
-    QCOMPARE(shared::graphicsviewutils::sideFromIndex(-2),
-            shared::graphicsviewutils::sideFromIndex(shared::graphicsviewutils::kRectSides.size() - 2));
-    QCOMPARE(shared::graphicsviewutils::sideFromIndex(-3),
-            shared::graphicsviewutils::sideFromIndex(shared::graphicsviewutils::kRectSides.size() - 3));
-    QCOMPARE(shared::graphicsviewutils::sideFromIndex(-4),
-            shared::graphicsviewutils::sideFromIndex(shared::graphicsviewutils::kRectSides.size() - 4));
 }
 
 void tst_Utils::testAdjustedRect()

@@ -66,6 +66,9 @@ protected:
     shared::ColorManager::HandledColors handledColorType() const override;
     void updateInternalItems(Qt::Alignment alignment) override;
 
+    QList<QPair<Qt::Alignment, QPainterPath> > sidePaths() const override;
+    shared::graphicsviewutils::LookupDirection lookupType() const override;
+
 private:
     shared::ui::TextItem *m_textItem { nullptr };
 };

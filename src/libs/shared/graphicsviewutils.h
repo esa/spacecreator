@@ -39,9 +39,10 @@ enum class IntersectionType
 
 enum class LookupDirection
 {
-    CounterClockwise,
-    Clockwise,
-    Both,
+    CounterClockwise = 0x1,
+    Clockwise = 0x2,
+    Bidirectional = CounterClockwise | Clockwise,
+    Mixed,
 };
 
 QPainterPath lineShape(const QLineF &line, qreal span);
@@ -67,14 +68,11 @@ QGraphicsItem *nearestItem(const QGraphicsScene *scene, const QPointF &center, q
 
 bool alignedLine(QLineF &line, int angleTolerance = 10);
 
-QRectF alignRectToSide(
-        const QRectF &boundingRect, const QRectF &itemRect, Qt::Alignment side, const QPointF &originPointOffset);
+QRectF alignRectToSide(const QRectF &boundingRect, const QRectF &itemRect, Qt::Alignment side,
+        const QPointF &originPointOffset, const QMarginsF &margins = QMarginsF());
 
 QRectF adjustedRect(const QRectF &itemRect, const QRectF &intersectedItemRect, const Qt::Alignment side,
         const LookupDirection direction);
-
-Qt::Alignment sideFromIndex(const int idx);
-int indexFromSide(Qt::Alignment side);
 
 bool isCollided(const QList<QRectF> &itemRects, const QRectF &itemRect, QRectF *collidingRect = nullptr);
 

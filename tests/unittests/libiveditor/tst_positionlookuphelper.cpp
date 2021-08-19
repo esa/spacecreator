@@ -46,7 +46,7 @@ private Q_SLOTS:
     void testLookupAllSides();
 
 private:
-    QHash<Qt::Alignment, QPainterPath> sidePaths;
+    QList<QPair<Qt::Alignment, QPainterPath>> sidePaths;
     QGraphicsScene *scene = nullptr;
     ivm::IVFunction *function = nullptr;
     ivm::IVInterfaceProvided *iface = nullptr;
@@ -59,28 +59,16 @@ void tst_PositionLookupHelper::testOnSide(
 {
     QList<QRectF> siblingsRects;
     for (int idx = 0; idx < itemRects.size(); ++idx) {
-        shared::PositionLookupHelper clockwiseHelper(sidePaths, parentBoundingRect, siblingsRects, itemRects.value(idx),
-                initialOffset, shared::graphicsviewutils::LookupDirection::Clockwise);
-        shared::PositionLookupHelper counterClockwiseHelper(sidePaths, parentBoundingRect, siblingsRects,
-                itemRects.value(idx), initialOffset, shared::graphicsviewutils::LookupDirection::CounterClockwise);
-        while (clockwiseHelper.hasNext() || counterClockwiseHelper.hasNext()) {
-            if (clockwiseHelper.lookup()) {
-                if (clockwiseHelper.isSideChanged())
-                    ifaceItem->updateInternalItems(clockwiseHelper.side());
-                ifaceItem->setPos(clockwiseHelper.mappedOriginPoint());
-                iface->setCoordinates(shared::graphicsviewutils::coordinates(clockwiseHelper.mappedOriginPoint()));
-                ifaceItem->rebuildLayout();
-                break;
-            } else if (counterClockwiseHelper.lookup()) {
-                if (counterClockwiseHelper.isSideChanged())
-                    ifaceItem->updateInternalItems(counterClockwiseHelper.side());
-                ifaceItem->setPos(counterClockwiseHelper.mappedOriginPoint());
-                iface->setCoordinates(
-                        shared::graphicsviewutils::coordinates(counterClockwiseHelper.mappedOriginPoint()));
-                ifaceItem->rebuildLayout();
-                break;
+        shared::PositionLookupHelper helper(sidePaths, parentBoundingRect, siblingsRects, itemRects.value(idx), initialOffset);
+        if (helper.lookup()) {
+            if (helper.isSideChanged()) {
+                ifaceItem->updateInternalItems(helper.side());
             }
+            ifaceItem->setPos(helper.mappedOriginPoint());
+            iface->setCoordinates(shared::graphicsviewutils::coordinates(helper.mappedOriginPoint()));
+            ifaceItem->rebuildLayout();
         }
+
         QVERIFY(ifaceItem->parentItem()->boundingRect().contains(ifaceItem->pos()));
         siblingsRects.append(ifaceItem->mapRectToParent(ifaceItem->boundingRect()));
     }

@@ -60,10 +60,12 @@ protected:
     void onManualMoveFinish(GripPoint *grip, const QPointF &from, const QPointF &to) override;
     virtual void updateInternalItems(Qt::Alignment alignment);
     virtual QPainterPath itemPath(Qt::Alignment alignment) const;
+    virtual QList<QPair<Qt::Alignment, QPainterPath>> sidePaths() const;
+    virtual shared::graphicsviewutils::LookupDirection lookupType() const;
 
 protected:
     QList<QPointer<VEConnectionGraphicsItem>> m_connections;
-    shared::graphicsviewutils::LookupDirection m_adjustDirection = graphicsviewutils::LookupDirection::Both;
+    shared::graphicsviewutils::LookupDirection m_adjustDirection = graphicsviewutils::LookupDirection::Bidirectional;
 };
 
 } // namespace ui

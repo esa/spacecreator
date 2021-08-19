@@ -125,7 +125,7 @@ void VEConnectionEndPointGraphicsItem::adjustItem()
         if (qobject_cast<const VEConnectionEndPointGraphicsItem *>(sibling->toGraphicsObject()) != nullptr
                 && sibling != this) {
             QRectF itemRect = sibling->boundingRect();
-            itemRect.setWidth(kSiblingMinDistance - itemRect.x());
+            itemRect.adjust(-kSiblingMinDistance/2, -kSiblingMinDistance/2, kSiblingMinDistance/2, kSiblingMinDistance/2);
             itemRect = sibling->mapRectToParent(itemRect);
             siblingsRects.append(itemRect);
         }
@@ -133,39 +133,20 @@ void VEConnectionEndPointGraphicsItem::adjustItem()
 
     QRectF itemRect = boundingRect();
     const QPointF initialOffset = itemRect.topLeft();
-    itemRect.setWidth(kSiblingMinDistance - itemRect.x());
     itemRect = mapRectToParent(itemRect);
     const QRectF parentRect = parentItem()->boundingRect();
 
-    QRectF intersectedRect;
-    if (shared::graphicsviewutils::isCollided(siblingsRects, itemRect, &intersectedRect) && parentRect.isValid()) {
-        const QHash<Qt::Alignment, QPainterPath> kSidePaths {
-            { Qt::AlignLeft, itemPath(Qt::AlignLeft) },
-            { Qt::AlignTop, itemPath(Qt::AlignTop) },
-            { Qt::AlignRight, itemPath(Qt::AlignRight) },
-            { Qt::AlignBottom, itemPath(Qt::AlignBottom) },
-        };
-        PositionLookupHelper cwHelper(kSidePaths, parentRect, siblingsRects, itemRect, initialOffset,
-                graphicsviewutils::LookupDirection::Clockwise);
-        PositionLookupHelper ccwHelper(kSidePaths, parentRect, siblingsRects, itemRect, initialOffset,
-                graphicsviewutils::LookupDirection::CounterClockwise);
-        while (cwHelper.hasNext() || ccwHelper.hasNext()) {
-            if (cwHelper.lookup() && m_adjustDirection != graphicsviewutils::LookupDirection::CounterClockwise) {
-                if (cwHelper.isSideChanged())
-                    updateInternalItems(cwHelper.side());
-                setPos(cwHelper.mappedOriginPoint());
-                break;
-            } else if (ccwHelper.lookup() && m_adjustDirection != graphicsviewutils::LookupDirection::Clockwise) {
-                if (ccwHelper.isSideChanged())
-                    updateInternalItems(ccwHelper.side());
-                setPos(ccwHelper.mappedOriginPoint());
-                break;
+    if ((pos().isNull() || shared::graphicsviewutils::isCollided(siblingsRects, itemRect)) && parentRect.isValid()) {
+        PositionLookupHelper helper(sidePaths(), parentRect, siblingsRects, itemRect, initialOffset, lookupType());
+        if (helper.lookup()) {
+            if (helper.isSideChanged()) {
+                updateInternalItems(helper.side());
             }
-        }
-
-        for (VEConnectionGraphicsItem *connection : qAsConst(m_connections)) {
-            if (connection) {
-                connection->layout();
+            setPos(helper.mappedOriginPoint());
+            for (VEConnectionGraphicsItem *connection : qAsConst(m_connections)) {
+                if (connection) {
+                    connection->layout();
+                }
             }
         }
     }
@@ -258,6 +239,21 @@ QPainterPath VEConnectionEndPointGraphicsItem::itemPath(Qt::Alignment alignment)
     Q_UNUSED(alignment)
 
     return shape();
+}
+
+QList<QPair<Qt::Alignment, QPainterPath> > VEConnectionEndPointGraphicsItem::sidePaths() const
+{
+    return {
+        { Qt::AlignLeft, itemPath(Qt::AlignLeft) },
+        { Qt::AlignTop, itemPath(Qt::AlignTop) },
+        { Qt::AlignRight, itemPath(Qt::AlignRight) },
+        { Qt::AlignBottom, itemPath(Qt::AlignBottom) },
+    };
+}
+
+graphicsviewutils::LookupDirection VEConnectionEndPointGraphicsItem::lookupType() const
+{
+    return graphicsviewutils::LookupDirection::Bidirectional;
 }
 
 } // namespace ui

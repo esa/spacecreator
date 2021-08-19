@@ -22,6 +22,7 @@
 #include <QHash>
 #include <QPainterPath>
 #include <qnamespace.h>
+#include <memory>
 
 namespace shared {
 
@@ -45,36 +46,16 @@ namespace shared {
 class PositionLookupHelper
 {
 public:
-    explicit PositionLookupHelper(const QHash<Qt::Alignment, QPainterPath> &sidePaths, const QRectF &parentRect,
+    explicit PositionLookupHelper(const QList<QPair<Qt::Alignment, QPainterPath>> &sidePaths, const QRectF &parentRect,
             const QList<QRectF> &siblingsRects, const QRectF &itemRect, const QPointF &originPoint,
-            const shared::graphicsviewutils::LookupDirection direction);
+            const shared::graphicsviewutils::LookupDirection direction = shared::graphicsviewutils::LookupDirection::Bidirectional);
+
+    ~PositionLookupHelper();
 
     /*!
-     * Performs next lookup iteration
+     * Performs search for free space for itemRect
      */
     bool lookup();
-
-    bool hasNext() const;
-
-    /*!
-     * Checks if place was found
-     */
-    bool isReady() const;
-
-    /*!
-     * Performs next search on current side
-     */
-    bool nextRect();
-
-    /*!
-     * Moves to another side according to \a clockwise set
-     */
-    void nextSide();
-
-    /*!
-     * Checks if origin point \a m_offset placed within \a parentRect
-     */
-    bool isBounded() const;
 
     /*!
      * Checks if side was changed during previous searches
@@ -88,21 +69,13 @@ public:
     QPointF mappedOriginPoint() const;
 
     /*!
-     * Current side of parent rect there \a itemRect is placed
+     * Current side of parent rect where \a itemRect is placed
      */
     Qt::Alignment side() const;
 
 private:
-    const QHash<Qt::Alignment, QPainterPath> m_sidePaths;
-    const QList<QRectF> m_siblingsRects;
-    const QRectF m_parentRect;
-    const int m_initialSideIdx;
-
-    QRectF m_intersectedRect;
-    QRectF m_itemRect;
-    QPointF m_offset;
-    shared::graphicsviewutils::LookupDirection m_direction;
-    int m_sideIdx;
+    struct PositionLookupPrivate;
+    std::unique_ptr<PositionLookupPrivate> d;
 };
 
 } // namespace shared

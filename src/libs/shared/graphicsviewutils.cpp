@@ -481,20 +481,19 @@ QRectF adjustFromPoint(const QPointF &pos, const qreal &adjustment)
  * Returns a \a itemRect aligned inside of \a boundingRect but keeping the offset of \a originPointOffset
  */
 
-QRectF alignRectToSide(
-        const QRectF &boundingRect, const QRectF &itemRect, Qt::Alignment side, const QPointF &originPointOffset)
+QRectF alignRectToSide(const QRectF &boundingRect, const QRectF &itemRect, Qt::Alignment side, const QPointF &originPointOffset, const QMarginsF &margins)
 {
     if (!boundingRect.isValid() || !itemRect.isValid())
         return {};
 
     QRectF rect { itemRect };
     auto adjustVertically = [=](QRectF &rect) {
-        rect.moveTop(qBound(
-                boundingRect.top() + originPointOffset.y(), rect.top(), boundingRect.bottom() + originPointOffset.y()));
+        rect.moveTop(qBound(boundingRect.top() + originPointOffset.y() + margins.top(), rect.top(),
+                boundingRect.bottom() + originPointOffset.y() - margins.bottom()));
     };
     auto adjustHorizontally = [=](QRectF &rect) {
-        rect.moveLeft(qBound(boundingRect.left() + originPointOffset.x(), rect.left(),
-                boundingRect.right() + originPointOffset.x()));
+        rect.moveLeft(qBound(boundingRect.left() + originPointOffset.x() + margins.left(), rect.left(),
+                boundingRect.right() + originPointOffset.x() - margins.right()));
     };
 
     switch (side) {
@@ -559,19 +558,6 @@ QRectF adjustedRect(const QRectF &itemRect, const QRectF &intersectedItemRect, c
         return {};
     }
     return resultRect;
-}
-
-Qt::Alignment sideFromIndex(const int idx)
-{
-    if (idx >= 0)
-        return kRectSides.value(idx % kRectSides.size());
-
-    return kRectSides.value((kRectSides.size() - qAbs(idx)) % kRectSides.size());
-}
-
-int indexFromSide(Qt::Alignment side)
-{
-    return kRectSides.indexOf(side);
 }
 
 /*!

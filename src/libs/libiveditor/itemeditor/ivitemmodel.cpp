@@ -370,24 +370,15 @@ void IVItemModel::setupInnerGeometry(ivm::IVObject *obj) const
         if (shared::graphicsviewutils::isCollided(siblingsRects, itemRect, &intersectedRect) && parentRect.isValid()) {
             QPainterPath pp;
             pp.addRect(kBaseRect);
-            const QHash<Qt::Alignment, QPainterPath> kSidePaths {
+            const QList<QPair<Qt::Alignment, QPainterPath>> sidePaths {
                 { Qt::AlignLeft, pp },
                 { Qt::AlignTop, pp },
                 { Qt::AlignRight, pp },
                 { Qt::AlignBottom, pp },
             };
-            shared::PositionLookupHelper cwHelper(kSidePaths, parentRect, siblingsRects, itemRect, initialOffset,
-                    shared::graphicsviewutils::LookupDirection::Clockwise);
-            shared::PositionLookupHelper ccwHelper(kSidePaths, parentRect, siblingsRects, itemRect, initialOffset,
-                    shared::graphicsviewutils::LookupDirection::CounterClockwise);
-            while (cwHelper.hasNext() || ccwHelper.hasNext()) {
-                if (cwHelper.lookup()) {
-                    innerGeometry = cwHelper.mappedOriginPoint();
-                    break;
-                } else if (ccwHelper.lookup()) {
-                    innerGeometry = ccwHelper.mappedOriginPoint();
-                    break;
-                }
+            shared::PositionLookupHelper helper(sidePaths, parentRect, siblingsRects, itemRect, initialOffset);
+            if (helper.lookup()) {
+                innerGeometry = helper.mappedOriginPoint();
             }
         }
 

@@ -35,7 +35,6 @@ DVDeviceGraphicsItem::DVDeviceGraphicsItem(dvm::DVDevice *device, QGraphicsItem 
 {
     m_adjustDirection = shared::graphicsviewutils::LookupDirection::CounterClockwise;
 
-    setPos(0, 20);
     setBoundingRect(kBoundingRect);
     m_textItem->setPos(QPointF(5, -5));
     m_textItem->setFramed(false);
@@ -192,6 +191,21 @@ void DVDeviceGraphicsItem::updateInternalItems(Qt::Alignment alignment)
         return;
     }
     m_textItem->setPos(textRect.topLeft());
+}
+
+QList<QPair<Qt::Alignment, QPainterPath> > DVDeviceGraphicsItem::sidePaths() const
+{
+    return {
+        { Qt::AlignLeft, itemPath(Qt::AlignLeft) },
+        { Qt::AlignRight, itemPath(Qt::AlignRight) },
+        { Qt::AlignTop, itemPath(Qt::AlignTop) },
+        { Qt::AlignBottom, itemPath(Qt::AlignBottom) },
+    };
+}
+
+shared::graphicsviewutils::LookupDirection DVDeviceGraphicsItem::lookupType() const
+{
+    return shared::graphicsviewutils::LookupDirection::Mixed;
 }
 
 } // namespace dve
