@@ -113,8 +113,8 @@ add_custom_target(BuildFiles SOURCES
     .gitattributes
     .gitignore
     .gitlab-ci.yml
-    _clang-format
-    _clang-tidy
+    .clang-format
+    .clang-tidy
     lgpl.lic.qtc
 )
 
