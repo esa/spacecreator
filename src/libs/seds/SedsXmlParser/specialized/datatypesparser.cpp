@@ -40,6 +40,7 @@
 #include <seds/SedsModel/types/enumerateddatatype.h>
 #include <seds/SedsModel/types/externalfield.h>
 #include <seds/SedsModel/types/field.h>
+#include <seds/SedsModel/types/integerdatatype.h>
 #include <seds/SedsModel/types/ranges/minmaxrange.h>
 #include <seds/SedsModel/types/rootdatatype.h>
 #include <seds/SedsModel/types/stringdatatype.h>
@@ -504,7 +505,7 @@ model::FloatDataType::Range DataTypesParser::readFloatDataRange(QXmlStreamReader
     }
 }
 
-model::IntegerDataType::Range DataTypesParser::readIntegerDataRange(QXmlStreamReader &xmlReader)
+model::MinMaxRange DataTypesParser::readIntegerDataRange(QXmlStreamReader &xmlReader)
 {
     xmlReader.readNextStartElement();
 

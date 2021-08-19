@@ -56,7 +56,7 @@ public:
     virtual auto getDependencies() const -> std::set<ModelType> override;
 
 private:
-    auto translateSedsModel(const seds::model::SedsModel *sedsModel) const -> Asn1Acn::Asn1Model;
+    auto translateSedsModel(const seds::model::SedsModel *sedsModel) const -> std::unique_ptr<Asn1Acn::Asn1Model>;
 
 private:
     auto translatePackage(const seds::model::Package &package) const -> Asn1Acn::File;

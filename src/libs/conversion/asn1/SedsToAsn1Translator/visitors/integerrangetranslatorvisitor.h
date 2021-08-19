@@ -19,36 +19,19 @@
 
 #pragma once
 
-#include "seds/SedsCommon/basetypesmappings.h"
-#include "types/encodings/integerdataencoding.h"
-#include "types/numericdatatype.h"
-#include "types/ranges/minmaxrange.h"
-
-#include <optional>
-#include <variant>
+#include <asn1library/asn1/constraints/constraintlist.h>
+#include <asn1library/asn1/values.h>
 
 namespace seds::model {
+class MinMaxRange;
+}
 
-class IntegerDataType final : public NumericDataType
-{
-public:
-    using Range = std::variant<MinMaxRange>;
+namespace conversion::asn1::translator {
 
-public:
-    IntegerDataType() = default;
-    IntegerDataType(IntegerDataType &&) = default;
-    IntegerDataType &operator=(IntegerDataType &&) = default;
+struct IntegerRangeTranslatorVisitor final {
+    Asn1Acn::Constraints::ConstraintList<Asn1Acn::IntegerValue> &m_constraints;
 
-public:
-    auto range() const -> const Range &;
-    auto setRange(Range minMaxRange) -> void;
-
-    auto encoding() const -> const std::optional<IntegerDataEncoding> &;
-    auto setEncoding(IntegerDataEncoding encoding) -> void;
-
-private:
-    std::optional<IntegerDataEncoding> m_encoding;
-    Range m_range;
+    auto operator()(const seds::model::MinMaxRange &range) -> void;
 };
 
-} // namespace seds::model
+} // namespace conversion::asn1::translator

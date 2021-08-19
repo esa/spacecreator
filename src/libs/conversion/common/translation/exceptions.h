@@ -52,4 +52,32 @@ public:
     explicit IncorrectSourceModelException(ModelType expectedModelType);
 };
 
+/**
+ * @brief   Exception thrown when translator encounters unhandled value in source model
+ */
+class UnhandledValueException : public TranslationException
+{
+public:
+    /**
+     * @brief   Constructor
+     *
+     * @param   valueTypeName   Name of the unhandled value type
+     */
+    explicit UnhandledValueException(QString valueTypeName);
+};
+
+/**
+ * @brief   Exception thrown when translator encounters unsupported value in source model
+ */
+class UnsupportedValueException : public TranslationException
+{
+public:
+    /**
+     * @brief   Constructor
+     *
+     * @param   valueTypeName   Name of the unsupported value type
+     */
+    explicit UnsupportedValueException(QString valueTypeName);
+};
+
 } // namespace conversion::translator

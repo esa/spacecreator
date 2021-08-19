@@ -32,7 +32,6 @@ public:
     DataEncoding &operator=(DataEncoding &&) = default;
 
 public:
-public:
     auto byteOrder() const -> ByteOrder;
     auto setByteOrder(ByteOrder byteOrder) -> void;
 

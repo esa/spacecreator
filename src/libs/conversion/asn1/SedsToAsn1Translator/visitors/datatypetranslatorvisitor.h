@@ -21,6 +21,10 @@
 
 #include <asn1library/asn1/definitions.h>
 
+namespace Asn1Acn::Types {
+class Integer;
+} // namespace Asn1Acn::Types
+
 namespace seds::model {
 class ArrayDataType;
 class BinaryDataType;
@@ -29,6 +33,7 @@ class ContainerDataType;
 class EnumeratedDataType;
 class FloatDataType;
 class IntegerDataType;
+class Name;
 class StringDataType;
 class SubRangeDataType;
 } // namespace seds::model
@@ -38,15 +43,19 @@ namespace conversion::asn1::translator {
 struct DataTypeTranslatorVisitor final {
     Asn1Acn::Definitions *m_definitions;
 
-    void operator()(const seds::model::ArrayDataType &dataType);
-    void operator()(const seds::model::BinaryDataType &dataType);
-    void operator()(const seds::model::BooleanDataType &dataType);
-    void operator()(const seds::model::ContainerDataType &dataType);
-    void operator()(const seds::model::EnumeratedDataType &dataType);
-    void operator()(const seds::model::FloatDataType &dataType);
-    void operator()(const seds::model::IntegerDataType &dataType);
-    void operator()(const seds::model::StringDataType &dataType);
-    void operator()(const seds::model::SubRangeDataType &dataType);
+    auto operator()(const seds::model::ArrayDataType &sedsType) -> void;
+    auto operator()(const seds::model::BinaryDataType &sedsType) -> void;
+    auto operator()(const seds::model::BooleanDataType &sedsType) -> void;
+    auto operator()(const seds::model::ContainerDataType &sedsType) -> void;
+    auto operator()(const seds::model::EnumeratedDataType &sedsType) -> void;
+    auto operator()(const seds::model::FloatDataType &sedsType) -> void;
+    auto operator()(const seds::model::IntegerDataType &sedsType) -> void;
+    auto operator()(const seds::model::StringDataType &sedsType) -> void;
+    auto operator()(const seds::model::SubRangeDataType &sedsType) -> void;
+
+private:
+    auto translateIntegerEncoding(Asn1Acn::Types::Integer *asn1Type, const seds::model::IntegerDataType &sedsType)
+            -> void;
 };
 
 } // namespace conversion::asn1::translator

@@ -28,7 +28,6 @@
 #include <seds/SedsModel/types/encodings/stringdataencoding.h>
 #include <seds/SedsModel/types/entries/errorcontrolentry.h>
 #include <seds/SedsModel/types/floatdatatype.h>
-#include <seds/SedsModel/types/integerdatatype.h>
 #include <seds/SedsModel/types/ranges/derivedtyperange.h>
 
 class QXmlStreamAttribute;
@@ -46,6 +45,7 @@ class EnumeratedDataTypeRange;
 class ExternalField;
 class Field;
 class FixedValueEntry;
+class IntegerDataType;
 class LengthEntry;
 class ListEntry;
 class MinMaxRange;
@@ -191,7 +191,7 @@ private:
      * @brief   Constructs IntegerDataRange object
      * @return  IntegerDataRange
      */
-    static auto readIntegerDataRange(QXmlStreamReader &xmlReader) -> model::IntegerDataType::Range;
+    static auto readIntegerDataRange(QXmlStreamReader &xmlReader) -> model::MinMaxRange;
 
     /**
      * @brief   Constructs DerivedTypeRange object

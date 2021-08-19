@@ -32,4 +32,14 @@ IncorrectSourceModelException::IncorrectSourceModelException(ModelType expectedM
 {
 }
 
+UnhandledValueException::UnhandledValueException(QString valueTypeName)
+    : TranslationException(QString("Translator encountered unhandled value for %1").arg(valueTypeName))
+{
+}
+
+UnsupportedValueException::UnsupportedValueException(QString valueTypeName)
+    : TranslationException(QString("Translator encountered unsupported value for %1").arg(valueTypeName))
+{
+}
+
 } // namespace conversion::translator
