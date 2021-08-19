@@ -93,11 +93,9 @@ void ChartVerticalCheck::checkEvent(MscInstanceEvent *event)
         }
         // Check for overlaps (crossing messages)
         if (!m_overlapEvents.contains(eventItem)) {
-            QRectF eventBox = eventItem->sceneBoundingRect();
             for (const msc::EventItem *ev : m_overlapEvents) {
-                if (eventBox.intersects(ev->sceneBoundingRect())) {
+                if (eventItem->sceneBoundingRect().intersects(ev->sceneBoundingRect())) {
                     eventItem->setY(ev->sceneBoundingRect().bottom() + 2);
-                    eventBox = eventItem->sceneBoundingRect();
                 }
             }
             m_overlapEvents.append(eventItem);
@@ -124,11 +122,9 @@ void ChartVerticalCheck::checkEvent(MscInstanceEvent *event)
         // Only check horizontal messages for overlaps
         if (!m_overlapEvents.contains(messageItem) && messageItem->isHorizontal() && !isCrossing) {
             if (event->entityType() == MscEntity::EntityType::Message) {
-                QRectF messageBox = messageItem->sceneBoundingRect();
                 for (const msc::EventItem *ev : m_overlapEvents) {
-                    if (messageBox.intersects(ev->sceneBoundingRect())) {
+                    if (messageItem->sceneBoundingRect().intersects(ev->sceneBoundingRect())) {
                         messageItem->moveToYPosition(ev->sceneBoundingRect().bottom() + m_messageOffset);
-                        messageBox = messageItem->sceneBoundingRect();
                     }
                 }
             }

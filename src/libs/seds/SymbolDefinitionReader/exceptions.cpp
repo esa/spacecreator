@@ -28,7 +28,7 @@ SymbolDefinitionReaderException::SymbolDefinitionReaderException(QString filenam
 
 SymbolDefinitionReaderException::SymbolDefinitionReaderException(QString filename, std::string_view message)
     : ImportException(
-              QString("Error while reading '%1': '%2'").arg(filename).arg(QString::fromStdString(std::string(message))))
+            QString("Error while reading '%1': '%2'").arg(filename).arg(QString::fromStdString(std::string(message))))
 {
 }
 
