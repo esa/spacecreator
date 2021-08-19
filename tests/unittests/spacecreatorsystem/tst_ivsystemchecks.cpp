@@ -80,7 +80,7 @@ void tst_IvSystemChecks::initTestCase()
 
 void tst_IvSystemChecks::init()
 {
-    m_checker = std::make_unique<scs::IvSystemChecks>();
+    m_checker = std::make_unique<scs::IvSystemChecks>(nullptr);
     m_mscCore = std::make_unique<msc::MSCEditorCore>();
     m_mscCore->mainModel()->initialModel();
     m_checker->setMscCore(m_mscCore.get());

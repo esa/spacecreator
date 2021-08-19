@@ -22,10 +22,6 @@
 #include <QPointer>
 #include <QSharedPointer>
 
-namespace dve {
-class DVEditorCore;
-}
-
 namespace ive {
 class IVEditorCore;
 }
@@ -35,23 +31,25 @@ class IVModel;
 }
 
 namespace scs {
+class SpaceCreatorProject;
 
-class DvSystemChecks : public dve::AbstractSystemChecks
+/*!
+   Queries for the IV system only
+ */
+class IvSystemQueries : public dve::AbstractSystemChecks
 {
     Q_OBJECT
 public:
-    explicit DvSystemChecks(QObject *parent = nullptr);
-    ~DvSystemChecks() override = default;
+    explicit IvSystemQueries(SpaceCreatorProject *project, QObject *parent = nullptr);
+    ~IvSystemQueries() override = default;
 
     void setIVCore(QSharedPointer<ive::IVEditorCore> ivCore);
     QSharedPointer<ive::IVEditorCore> ivCore() const;
 
-    void setDVCore(dve::DVEditorCore *dvCore);
-    dve::DVEditorCore *dvCore() const;
-
     QStringList functionsNames() const override;
 
-    QList<QPair<QString, QString> > messages(const QString &sourceFunction, const QString &targetFunction) const override;
+    QList<QPair<QString, QString>> messages(
+            const QString &sourceFunction, const QString &targetFunction) const override;
 
     ivm::IVModel *ivModel() const;
 
@@ -60,7 +58,7 @@ Q_SIGNALS:
 
 private:
     QSharedPointer<ive::IVEditorCore> m_ivCore;
-    QPointer<dve::DVEditorCore> m_dvCore;
+    QPointer<scs::SpaceCreatorProject> m_project;
 };
 
 } // namespace scs

@@ -55,7 +55,7 @@ int main(int argc, char *argv[])
     a.setFont(QFont(QLatin1String("Ubuntu"), 10));
 
     msc::MSCEditorCore editorCore;
-    editorCore.setSystemChecker(new scs::IvSystemChecks(&editorCore));
+    editorCore.setSystemChecker(new scs::IvSystemChecks(nullptr, &editorCore));
 
     msc::MscProject project;
     project.setModel(editorCore.mainModel());

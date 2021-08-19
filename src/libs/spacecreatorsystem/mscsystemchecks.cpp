@@ -419,7 +419,7 @@ void MscSystemChecks::onMscEntityNameChanged(QObject *entity, const QString &old
 
     auto message = dynamic_cast<msc::MscMessage *>(entity);
     if (message && ivCore && ivCore->document() && ivCore->document()->objectsModel()) {
-        scs::IvSystemChecks ivChecker;
+        scs::IvSystemChecks ivChecker(nullptr);
         ivChecker.setIvCore(ivCore);
         // Check if source/target are in IV model
         if (message->sourceInstance() && !ivChecker.checkInstance(message->sourceInstance())) {

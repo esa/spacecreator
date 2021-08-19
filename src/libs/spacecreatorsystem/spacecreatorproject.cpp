@@ -22,12 +22,12 @@
 #include "common.h"
 #include "dvappmodel.h"
 #include "dveditorcore.h"
-#include "dvsystemchecks.h"
 #include "errorhub.h"
 #include "interfacedocument.h"
 #include "itemeditor/common/ivutils.h"
 #include "iveditorcore.h"
 #include "ivsystemchecks.h"
+#include "ivsystemqueries.h"
 #include "mainmodel.h"
 #include "msceditorcore.h"
 #include "mscmodel.h"
@@ -264,11 +264,11 @@ QVector<IvSystemChecks *> SpaceCreatorProject::ivChecks() const
     return checks;
 }
 
-QVector<DvSystemChecks *> SpaceCreatorProject::dvChecks() const
+QVector<IvSystemQueries *> SpaceCreatorProject::dvChecks() const
 {
-    QVector<DvSystemChecks *> checks;
+    QVector<IvSystemQueries *> checks;
     for (const QSharedPointer<dve::DVEditorCore> &core : m_dvStore) {
-        if (auto dvChecker = qobject_cast<scs::DvSystemChecks *>(core->systemChecker())) {
+        if (auto dvChecker = qobject_cast<scs::IvSystemQueries *>(core->systemChecker())) {
             checks.append(dvChecker);
         }
     }
@@ -318,9 +318,7 @@ void SpaceCreatorProject::setDvData(const QString &fileName, QSharedPointer<dve:
 
     m_dvStore[fileName] = dvData;
     connect(dvData.data(), &shared::EditorCore::editedExternally, this, &scs::SpaceCreatorProject::editedExternally);
-    auto checker = new scs::DvSystemChecks(dvData.data());
-    checker->setDVCore(dvData.data());
-    checker->setIVCore(ivCore());
+    auto checker = new scs::IvSystemQueries(this, dvData.data());
     dvData->setSystemChecker(checker);
     Q_EMIT dvCoreAdded(dvData);
 }
@@ -362,9 +360,8 @@ void SpaceCreatorProject::setMscData(const QString &fileName, QSharedPointer<msc
 
     m_mscStore[fileName] = mscData;
     connect(mscData.data(), &shared::EditorCore::editedExternally, this, &scs::SpaceCreatorProject::editedExternally);
-    auto checker = new scs::IvSystemChecks(mscData.data());
+    auto checker = new scs::IvSystemChecks(this, mscData.data());
     checker->setMscCore(mscData.data());
-    checker->setIvCore(ivCore());
     mscData->setSystemChecker(checker);
     Q_EMIT mscCoreAdded(mscData);
 }

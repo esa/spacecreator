@@ -24,6 +24,7 @@
 #include "iveditorcore.h"
 #include "ivfunction.h"
 #include "ivmodel.h"
+#include "ivsystemqueries.h"
 #include "mainmodel.h"
 #include "mscchart.h"
 #include "msceditorcore.h"
@@ -31,15 +32,19 @@
 #include "mscmessage.h"
 #include "mscmessagedeclaration.h"
 #include "mscmodel.h"
+#include "spacecreatorproject.h"
 
 #include <QDebug>
 #include <algorithm>
 
 namespace scs {
 
-IvSystemChecks::IvSystemChecks(QObject *parent)
+IvSystemChecks::IvSystemChecks(SpaceCreatorProject *project, QObject *parent)
     : msc::SystemChecks(parent)
+    , m_ivQueries(new IvSystemQueries(project, this))
+    , m_project(project)
 {
+    connect(m_ivQueries, &scs::IvSystemQueries::ivDataReset, this, &scs::IvSystemChecks::ivDataReset);
 }
 
 IvSystemChecks::~IvSystemChecks() { }
@@ -51,24 +56,15 @@ void IvSystemChecks::setMscCore(msc::MSCEditorCore *mscCore)
 
 void IvSystemChecks::setIvCore(QSharedPointer<ive::IVEditorCore> ivCore)
 {
-    if (ivCore == m_ivCore) {
-        return;
-    }
-
-    if (ivm::IVModel *model = ivModel()) {
-        disconnect(model, nullptr, this, nullptr);
-    }
-
-    m_ivCore = ivCore;
-    Q_EMIT ivDataReset();
+    m_ivQueries->setIVCore(ivCore);
 }
 
 /*!
    Returns a pointer to the IV editor model
  */
-const QSharedPointer<ive::IVEditorCore> &IvSystemChecks::ivCore() const
+QSharedPointer<ive::IVEditorCore> IvSystemChecks::ivCore() const
 {
-    return m_ivCore;
+    return m_ivQueries->ivCore();
 }
 
 /*!
@@ -77,7 +73,7 @@ const QSharedPointer<ive::IVEditorCore> &IvSystemChecks::ivCore() const
 QVector<QPair<msc::MscChart *, msc::MscInstance *>> IvSystemChecks::checkInstanceNames() const
 {
     QVector<QPair<msc::MscChart *, msc::MscInstance *>> result;
-    if (!m_ivCore || !m_mscCore) {
+    if (!ivCore() || !m_mscCore) {
         return result;
     }
 
@@ -100,7 +96,7 @@ QVector<QPair<msc::MscChart *, msc::MscInstance *>> IvSystemChecks::checkInstanc
 QVector<QPair<msc::MscChart *, msc::MscInstance *>> IvSystemChecks::checkInstanceRelations() const
 {
     QVector<QPair<msc::MscChart *, msc::MscInstance *>> result;
-    if (!m_ivCore || !m_mscCore) {
+    if (!ivCore() || !m_mscCore) {
         return result;
     }
 
@@ -133,7 +129,7 @@ QVector<QPair<msc::MscChart *, msc::MscInstance *>> IvSystemChecks::checkInstanc
  */
 bool IvSystemChecks::checkInstance(const msc::MscInstance *instance) const
 {
-    if (!m_ivCore) {
+    if (!ivCore()) {
         return true;
     }
 
@@ -146,11 +142,7 @@ bool IvSystemChecks::checkInstance(const msc::MscInstance *instance) const
  */
 QStringList IvSystemChecks::functionsNames() const
 {
-    if (!m_ivCore) {
-        return {};
-    }
-
-    return m_ivCore->ivFunctionsNames();
+    return m_ivQueries->functionsNames();
 }
 
 /*!
@@ -160,7 +152,7 @@ QStringList IvSystemChecks::functionsNames() const
 QVector<QPair<msc::MscChart *, msc::MscMessage *>> IvSystemChecks::checkMessages() const
 {
     QVector<QPair<msc::MscChart *, msc::MscMessage *>> result;
-    if (!m_ivCore || !m_mscCore) {
+    if (!ivCore() || !m_mscCore) {
         return result;
     }
 
@@ -182,7 +174,7 @@ QVector<QPair<msc::MscChart *, msc::MscMessage *>> IvSystemChecks::checkMessages
  */
 bool IvSystemChecks::checkMessage(const msc::MscMessage *message) const
 {
-    if (!m_ivCore || !message) {
+    if (!ivCore() || !message) {
         return true;
     }
 
@@ -228,11 +220,11 @@ bool IvSystemChecks::checkMessage(const msc::MscMessage *message) const
  */
 QStringList IvSystemChecks::connectionNames() const
 {
-    if (!m_ivCore) {
+    if (!ivCore()) {
         return {};
     }
 
-    return m_ivCore->ivConnectionNames();
+    return ivCore()->ivConnectionNames();
 }
 
 /*!
@@ -242,7 +234,7 @@ QStringList IvSystemChecks::connectionNames() const
  */
 QStringList IvSystemChecks::connectionNamesFromTo(const QString &sourceName, const QString &targetName) const
 {
-    if (!m_ivCore) {
+    if (!ivCore()) {
         return {};
     }
 
@@ -253,7 +245,7 @@ QStringList IvSystemChecks::connectionNamesFromTo(const QString &sourceName, con
         connectionNames += names;
     }
 
-    const QVector<ivm::IVFunction *> functions = m_ivCore->allIVFunctions();
+    const QVector<ivm::IVFunction *> functions = ivCore()->allIVFunctions();
     if (sourceName.isEmpty()) {
         for (ivm::IVFunction *func : functions) {
             if (func->title() == targetName) {
@@ -282,16 +274,7 @@ QStringList IvSystemChecks::connectionNamesFromTo(const QString &sourceName, con
  */
 ivm::IVModel *IvSystemChecks::ivModel() const
 {
-    if (!m_ivCore) {
-        return {};
-    }
-
-    if (!m_ivCore->document() || !m_ivCore->document()->objectsModel()) {
-        shared::ErrorHub::addError(shared::ErrorItem::Warning, tr("No IV model"));
-        return {};
-    }
-
-    return m_ivCore->document()->objectsModel();
+    return m_ivQueries->ivModel();
 }
 
 /*!
@@ -303,7 +286,7 @@ ivm::IVFunction *IvSystemChecks::correspondingFunction(const msc::MscInstance *i
         return nullptr;
     }
 
-    const QVector<ivm::IVFunction *> functions = m_ivCore->allIVFunctions();
+    const QVector<ivm::IVFunction *> functions = ivCore()->allIVFunctions();
     auto it = std::find_if(functions.cbegin(), functions.cend(),
             [this, &instance](ivm::IVFunction *func) { return correspond(func, instance); });
 
@@ -418,7 +401,7 @@ QVector<msc::MscMessageDeclaration *> IvSystemChecks::allConnectionsAsDeclaratio
 {
     QVector<msc::MscMessageDeclaration *> result;
 
-    for (ivm::IVConnection *connection : m_ivCore->allIVConnections()) {
+    for (ivm::IVConnection *connection : ivCore()->allIVConnections()) {
         auto declaration = new msc::MscMessageDeclaration();
         declaration->setNames({ connection->name() });
         QStringList params;
@@ -445,7 +428,7 @@ Qt::CaseSensitivity IvSystemChecks::stringSensitivity() const
  */
 bool IvSystemChecks::hasValidSystem() const
 {
-    return !m_ivCore.isNull();
+    return !ivCore().isNull();
 }
 
 }

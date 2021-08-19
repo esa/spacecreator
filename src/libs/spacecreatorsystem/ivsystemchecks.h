@@ -48,6 +48,8 @@ class MscModel;
 }
 
 namespace scs {
+class IvSystemQueries;
+class SpaceCreatorProject;
 
 /*!
    \brief The IvSystemChecks class is used to check consistency of a msc model with one iv model
@@ -56,12 +58,12 @@ class IvSystemChecks : public msc::SystemChecks
 {
     Q_OBJECT
 public:
-    explicit IvSystemChecks(QObject *parent = nullptr);
+    explicit IvSystemChecks(SpaceCreatorProject *project, QObject *parent = nullptr);
     ~IvSystemChecks();
 
     void setMscCore(msc::MSCEditorCore *mscCore);
     void setIvCore(QSharedPointer<ive::IVEditorCore> ivCore);
-    const QSharedPointer<ive::IVEditorCore> &ivCore() const;
+    QSharedPointer<ive::IVEditorCore> ivCore() const;
 
     QVector<QPair<msc::MscChart *, msc::MscInstance *>> checkInstanceNames() const override;
     QVector<QPair<msc::MscChart *, msc::MscInstance *>> checkInstanceRelations() const override;
@@ -94,7 +96,8 @@ private:
     bool isAncestor(ivm::IVFunction *func, ivm::IVFunction *otherFunc) const;
 
     QPointer<msc::MSCEditorCore> m_mscCore;
-    QSharedPointer<ive::IVEditorCore> m_ivCore;
+    IvSystemQueries *m_ivQueries;
+    QPointer<scs::SpaceCreatorProject> m_project;
     Qt::CaseSensitivity m_caseCheck = Qt::CaseInsensitive;
 };
 

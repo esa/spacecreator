@@ -15,7 +15,7 @@
    along with this program. If not, see <https://www.gnu.org/licenses/lgpl-2.1.html>.
 */
 
-#include "dvsystemchecks.h"
+#include "ivsystemqueries.h"
 
 #include "dveditorcore.h"
 #include "errorhub.h"
@@ -23,52 +23,48 @@
 #include "ivconnectionchain.h"
 #include "iveditorcore.h"
 #include "ivmodel.h"
+#include "spacecreatorproject.h"
 
 #include <QtDebug>
 
 namespace scs {
 
-DvSystemChecks::DvSystemChecks(QObject *parent)
+IvSystemQueries::IvSystemQueries(SpaceCreatorProject *project, QObject *parent)
     : dve::AbstractSystemChecks(parent)
+    , m_project(project)
 {
 }
 
-void DvSystemChecks::setIVCore(QSharedPointer<ive::IVEditorCore> ivCore)
+void IvSystemQueries::setIVCore(QSharedPointer<ive::IVEditorCore> ivCore)
 {
     if (ivCore == m_ivCore) {
         return;
     }
 
+    m_ivCore = ivCore;
     if (ivm::IVModel *model = ivModel()) {
         disconnect(model, nullptr, this, nullptr);
     }
 
-    m_ivCore = ivCore;
     Q_EMIT ivDataReset();
 }
 
-QSharedPointer<ive::IVEditorCore> DvSystemChecks::ivCore() const
+QSharedPointer<ive::IVEditorCore> IvSystemQueries::ivCore() const
 {
+    if (!m_ivCore && m_project) {
+        IvSystemQueries *me = const_cast<IvSystemQueries *>(this);
+        me->setIVCore(m_project->ivCore());
+    }
     return m_ivCore;
 }
 
-void DvSystemChecks::setDVCore(dve::DVEditorCore *dvCore)
+QStringList IvSystemQueries::functionsNames() const
 {
-    m_dvCore = dvCore;
-}
-
-dve::DVEditorCore *DvSystemChecks::dvCore() const
-{
-    return m_dvCore;
-}
-
-QStringList DvSystemChecks::functionsNames() const
-{
-    if (!m_ivCore) {
+    if (!ivCore()) {
         return {};
     }
 
-    return m_ivCore->ivFunctionsNames();
+    return ivCore()->ivFunctionsNames();
 }
 
 /*!
@@ -76,10 +72,10 @@ QStringList DvSystemChecks::functionsNames() const
    Result is a list of pairs. The first of the pais is the name of the source, the second, the name of the target
    interface
  */
-QList<QPair<QString, QString>> DvSystemChecks::messages(
+QList<QPair<QString, QString>> IvSystemQueries::messages(
         const QString &sourceFunction, const QString &targetFunction) const
 {
-    if (!m_ivCore) {
+    if (!ivCore()) {
         return {};
     }
 
@@ -99,18 +95,18 @@ QList<QPair<QString, QString>> DvSystemChecks::messages(
 /*!
    Returns a pointer to the IV model of the in-core
  */
-ivm::IVModel *DvSystemChecks::ivModel() const
+ivm::IVModel *IvSystemQueries::ivModel() const
 {
-    if (!m_ivCore) {
+    if (!ivCore()) {
         return {};
     }
 
-    if (!m_ivCore->document() || !m_ivCore->document()->objectsModel()) {
+    if (!ivCore()->document() || !ivCore()->document()->objectsModel()) {
         shared::ErrorHub::addError(shared::ErrorItem::Warning, tr("No IV model"));
         return {};
     }
 
-    return m_ivCore->document()->objectsModel();
+    return ivCore()->document()->objectsModel();
 }
 
 } // namespace scs

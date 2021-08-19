@@ -45,7 +45,7 @@ class EditorCore;
 namespace scs {
 class IvSystemChecks;
 class MscSystemChecks;
-class DvSystemChecks;
+class IvSystemQueries;
 
 /*!
    \brief Contains all data of project (of all files).
@@ -85,7 +85,7 @@ public:
        */
     scs::MscSystemChecks *mscChecks() const { return m_mscChecks.get(); }
     QVector<scs::IvSystemChecks *> ivChecks() const;
-    QVector<scs::DvSystemChecks *> dvChecks() const;
+    QVector<scs::IvSystemQueries *> dvChecks() const;
 
 Q_SIGNALS:
     void editedExternally(shared::EditorCore *);
