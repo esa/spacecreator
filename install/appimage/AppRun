@@ -6,9 +6,9 @@ SELF=$(readlink -f "$0")
 HERE=${SELF%/*}
 export PATH="${HERE}/usr/bin/:${HERE}/usr/sbin/:${HERE}/usr/games/:${HERE}/bin/:${HERE}/sbin/${PATH:+:$PATH}"
 export LD_LIBRARY_PATH="${HERE}/usr/lib/:${HERE}/usr/lib/i386-linux-gnu/:${HERE}/usr/lib/x86_64-linux-gnu/:${HERE}/usr/lib32/:${HERE}/usr/lib64/:${HERE}/lib/:${HERE}/lib/i386-linux-gnu/:${HERE}/lib/x86_64-linux-gnu/:${HERE}/lib32/:${HERE}/lib64/${LD_LIBRARY_PATH:+:$LD_LIBRARY_PATH}"
-export PYTHONPATH="${HERE}/usr/share/pyshared/${PYTHONPATH:+:$PYTHONPATH}"
+#export PYTHONPATH="${HERE}/usr/share/pyshared/${PYTHONPATH:+:$PYTHONPATH}"
 export XDG_DATA_DIRS="${HERE}/usr/share/${XDG_DATA_DIRS:+:$XDG_DATA_DIRS}"
-export PERLLIB="${HERE}/usr/share/perl5/:${HERE}/usr/lib/perl5/${PERLLIB:+:$PERLLIB}"
+#export PERLLIB="${HERE}/usr/share/perl5/:${HERE}/usr/lib/perl5/${PERLLIB:+:$PERLLIB}"
 export GSETTINGS_SCHEMA_DIR="${HERE}/usr/share/glib-2.0/schemas/${GSETTINGS_SCHEMA_DIR:+:$GSETTINGS_SCHEMA_DIR}"
 #export QT_PLUGIN_PATH="${HERE}/usr/lib/qt5/plugins/:${HERE}/usr/lib/i386-linux-gnu/qt5/plugins/:${HERE}/usr/lib/x86_64-linux-gnu/qt5/plugins/:${HERE}/usr/lib32/qt5/plugins/:${HERE}/usr/lib64/qt5/plugins/${QT_PLUGIN_PATH:+:$QT_PLUGIN_PATH}"
 
@@ -48,33 +48,6 @@ qtlibdir=$libdir/Qt/lib
 if test -d "$qtlibdir"; then
     qtlibpath=:$qtlibdir
 fi
-
-# get the version number from the Qt library in the given directory
-qtVersion() {
-    local QTL=`ls ${1}/libQt5Core.so.5*`
-    set -- $QTL
-    RESULT=`echo $3 | awk -FlibQt5Core.so. '{print $2}'`
-}
-# Create version number out of string
-version() {
-    echo "$@" | awk -F. '{ printf("%d%03d%03d%03d\n", $1,$2,$3,$4); }';
-}
-# check for existing newer Qt version
-if [ -f /usr/lib/x86_64-linux-gnu/libQt5Core.so.5 ]; then
-    qtVersion /usr/lib/x86_64-linux-gnu
-    SYSTEM_QT=$RESULT
-    qtVersion $qtlibdir
-    LOCAL_QT=$RESULT
-    if [ $(version $SYSTEM_QT) -ge $(version $LOCAL_QT) ]; then
-        # Put system Qt in front of AppImage provided one
-        echo "Putting system Qt in front"
-         LD_LIBRARY_PATH=/usr/lib/x86_64-linux-gnu:$LD_LIBRARY_PATH
-         export LD_LIBRARY_PATH
-         QT_PLUGIN_PATH=/usr/lib/x86_64-linux-gnu/qt5/plugins:$QT_PLUGIN_PATH
-         export QT_PLUGIN_PATH
-    fi
-fi
-
 # Add Qt Creator library path
 LD_LIBRARY_PATH=$libdir:$libdir/qtcreator$qtlibpath${LD_LIBRARY_PATH:+:$LD_LIBRARY_PATH}
 export LD_LIBRARY_PATH
@@ -106,7 +79,6 @@ case $1 in
 --MSCeditor)
     exec "$bindir/msceditor" "$2" "$3" "$4" "$5" "$6" "$7"
     ;;
---version|-version)
     "$bindir/qtcreator" -user-library-path "$_ORIGINAL_LD_LIBRARY_PATH" "-version"
     exec $bindir/IVeditor "--version"
     ;;
