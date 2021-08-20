@@ -17,8 +17,6 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/lgpl-2.1.html>.
  */
 
-#include "sedstestbase.h"
-
 #include <QObject>
 #include <QtTest>
 #include <seds/XmlValidator/exceptions.h>
@@ -29,12 +27,12 @@ using seds::validator::XmlValidatorException;
 
 namespace seds::test {
 
-class tsti_XmlValidator : public SedsTestBase
+class tst_XmlValidator : public QObject
 {
     Q_OBJECT
 
 public:
-    virtual ~tsti_XmlValidator() = default;
+    virtual ~tst_XmlValidator() = default;
 
 private Q_SLOTS:
     void testValid();
@@ -42,7 +40,7 @@ private Q_SLOTS:
     void testIncludesInvalid();
 };
 
-void tsti_XmlValidator::testValid()
+void tst_XmlValidator::testValid()
 {
     try {
         XmlValidator::validate("Valid.xml", "seds.xsd");
@@ -51,18 +49,18 @@ void tsti_XmlValidator::testValid()
     }
 }
 
-void tsti_XmlValidator::testInvalid()
+void tst_XmlValidator::testInvalid()
 {
     QVERIFY_EXCEPTION_THROWN(XmlValidator::validate("seds.xsd", "Invalid.xml"), XmlValidatorException);
 }
 
-void tsti_XmlValidator::testIncludesInvalid()
+void tst_XmlValidator::testIncludesInvalid()
 {
     QVERIFY_EXCEPTION_THROWN(XmlValidator::validate("seds.xsd", "IncludesInvalid.xml"), XmlValidatorException);
 }
 
 } // namespace seds::test
 
-QTEST_MAIN(seds::test::tsti_XmlValidator)
+QTEST_MAIN(seds::test::tst_XmlValidator)
 
-#include "tsti_xmlvalidator.moc"
+#include "tst_xmlvalidator.moc"

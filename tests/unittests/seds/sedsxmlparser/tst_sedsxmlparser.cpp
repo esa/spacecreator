@@ -17,8 +17,6 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/lgpl-2.1.html>.
  */
 
-#include "sedstestbase.h"
-
 #include <QDir>
 #include <QObject>
 #include <QtTest>
@@ -31,12 +29,12 @@ using seds::parser::ParserException;
 
 namespace seds::test {
 
-class tsti_SedsXmlParser : public SedsTestBase
+class tst_SedsXmlParser : public QObject
 {
     Q_OBJECT
 
 public:
-    virtual ~tsti_SedsXmlParser() = default;
+    virtual ~tst_SedsXmlParser() = default;
 
 private Q_SLOTS:
     void testComponentsParsing();
@@ -46,7 +44,7 @@ private Q_SLOTS:
     void testSimpleDataTypesParsing();
 };
 
-void tsti_SedsXmlParser::testComponentsParsing()
+void tst_SedsXmlParser::testComponentsParsing()
 {
     try {
         const auto model = Parser::parse("Components.xml");
@@ -92,7 +90,7 @@ void tsti_SedsXmlParser::testComponentsParsing()
     }
 }
 
-void tsti_SedsXmlParser::testContainerDataTypesParsing()
+void tst_SedsXmlParser::testContainerDataTypesParsing()
 {
     try {
         const auto model = Parser::parse("Containers.xml");
@@ -121,7 +119,7 @@ void tsti_SedsXmlParser::testContainerDataTypesParsing()
     }
 }
 
-void tsti_SedsXmlParser::testDeviceParsing()
+void tst_SedsXmlParser::testDeviceParsing()
 {
     try {
         const auto model = Parser::parse("Device.xml");
@@ -151,7 +149,7 @@ void tsti_SedsXmlParser::testDeviceParsing()
     }
 }
 
-void tsti_SedsXmlParser::testInterfacesParsing()
+void tst_SedsXmlParser::testInterfacesParsing()
 {
     try {
         const auto model = Parser::parse("Interfaces.xml");
@@ -186,7 +184,7 @@ void tsti_SedsXmlParser::testInterfacesParsing()
     }
 }
 
-void tsti_SedsXmlParser::testSimpleDataTypesParsing()
+void tst_SedsXmlParser::testSimpleDataTypesParsing()
 {
     try {
         const auto model = Parser::parse("SimpleDataTypes.xml");
@@ -213,6 +211,6 @@ void tsti_SedsXmlParser::testSimpleDataTypesParsing()
 
 } // namespace seds::test
 
-QTEST_MAIN(seds::test::tsti_SedsXmlParser)
+QTEST_MAIN(seds::test::tst_SedsXmlParser)
 
-#include "tsti_sedsxmlparser.moc"
+#include "tst_sedsxmlparser.moc"

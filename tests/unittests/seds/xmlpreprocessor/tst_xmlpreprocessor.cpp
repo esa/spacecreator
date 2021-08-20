@@ -17,8 +17,6 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/lgpl-2.1.html>.
  */
 
-#include "sedstestbase.h"
-
 #include <QDir>
 #include <QDomDocument>
 #include <QDomElement>
@@ -37,12 +35,12 @@ using seds::symbolreader::SymbolDefinitionReader;
 
 namespace seds::test {
 
-class tsti_XmlPreprocessor : public SedsTestBase
+class tst_XmlPreprocessor : public QObject
 {
     Q_OBJECT
 
 public:
-    virtual ~tsti_XmlPreprocessor() = default;
+    virtual ~tst_XmlPreprocessor() = default;
 
 private Q_SLOTS:
     void testValid();
@@ -50,7 +48,7 @@ private Q_SLOTS:
     void testXIncludedNonexisting();
 };
 
-void tsti_XmlPreprocessor::testValid()
+void tst_XmlPreprocessor::testValid()
 {
     SymbolDefinitionReader::ExternalReferencesMap externalReferences;
     externalReferences.insert({ "long_description", "This is a long description" });
@@ -79,7 +77,7 @@ void tsti_XmlPreprocessor::testValid()
     QCOMPARE(longDescriptionElement.nodeValue(), "This is a long description");
 }
 
-void tsti_XmlPreprocessor::testUndefinedExternalReference()
+void tst_XmlPreprocessor::testUndefinedExternalReference()
 {
     SymbolDefinitionReader::ExternalReferencesMap externalReferences;
 
@@ -88,7 +86,7 @@ void tsti_XmlPreprocessor::testUndefinedExternalReference()
             UndefinedExternalReference);
 }
 
-void tsti_XmlPreprocessor ::testXIncludedNonexisting()
+void tst_XmlPreprocessor ::testXIncludedNonexisting()
 {
     SymbolDefinitionReader::ExternalReferencesMap externalReferences;
     externalReferences.insert({ "long_description", "This is a long description" });
@@ -101,6 +99,6 @@ void tsti_XmlPreprocessor ::testXIncludedNonexisting()
 
 } // namespace seds::test
 
-QTEST_MAIN(seds::test::tsti_XmlPreprocessor)
+QTEST_MAIN(seds::test::tst_XmlPreprocessor)
 
-#include "tsti_xmlpreprocessor.moc"
+#include "tst_xmlpreprocessor.moc"

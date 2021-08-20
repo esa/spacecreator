@@ -17,8 +17,6 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/lgpl-2.1.html>.
  */
 
-#include "sedstestbase.h"
-
 #include <QDir>
 #include <QObject>
 #include <QtTest>
@@ -32,12 +30,12 @@ using seds::symbolreader::SymbolDefinitionReaderException;
 
 namespace seds::test {
 
-class tsti_SymbolDefinitionReader : public SedsTestBase
+class tst_SymbolDefinitionReader : public QObject
 {
     Q_OBJECT
 
 public:
-    virtual ~tsti_SymbolDefinitionReader() = default;
+    virtual ~tst_SymbolDefinitionReader() = default;
 
 private Q_SLOTS:
     void readValidFile();
@@ -45,7 +43,7 @@ private Q_SLOTS:
     void readInvalidFile();
 };
 
-void tsti_SymbolDefinitionReader::readValidFile()
+void tst_SymbolDefinitionReader::readValidFile()
 {
     SymbolDefinitionReader::ExternalReferencesMap externalReferences;
 
@@ -59,18 +57,18 @@ void tsti_SymbolDefinitionReader::readValidFile()
     QCOMPARE(externalReferences.at("integer.name"), "DataItem");
 }
 
-void tsti_SymbolDefinitionReader::readNonexistingFile()
+void tst_SymbolDefinitionReader::readNonexistingFile()
 {
     QVERIFY_EXCEPTION_THROWN(SymbolDefinitionReader::readSymbols("Nonexisting.toml"), FileNotFoundException);
 }
 
-void tsti_SymbolDefinitionReader::readInvalidFile()
+void tst_SymbolDefinitionReader::readInvalidFile()
 {
     QVERIFY_EXCEPTION_THROWN(SymbolDefinitionReader::readSymbols("Invalid.toml"), SymbolDefinitionReaderException);
 }
 
 } // namespace seds::test
 
-QTEST_MAIN(seds::test::tsti_SymbolDefinitionReader)
+QTEST_MAIN(seds::test::tst_SymbolDefinitionReader)
 
-#include "tsti_symboldefinitionreader.moc"
+#include "tst_symboldefinitionreader.moc"

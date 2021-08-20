@@ -1,4 +1,4 @@
-set(TEST_NAME tsti_xmlvalidator)
+set(TEST_NAME tst_xmlvalidator)
 project(${TEST_NAME})
 
 add_executable(${TEST_NAME})
@@ -6,9 +6,13 @@ add_test(NAME ${TEST_NAME} COMMAND ${TEST_NAME})
 
 target_sources(${TEST_NAME}
     PRIVATE     ${TEST_NAME}.cpp)
+target_include_directories(${TEST_NAME}
+    PRIVATE     ${CMAKE_SOURCE_DIR}/src/libs)
 target_link_libraries(${TEST_NAME}
-    PRIVATE     SEDS::TestBase
-                SEDS::XmlValidator)
+    PRIVATE     Conversion::Common
+                SEDS::XmlValidator
+                Qt5::Core
+                Qt5::Test)
 
 configure_file(resources/IncludesInvalid.xml IncludesInvalid.xml COPYONLY)
 configure_file(resources/Invalid.xml Invalid.xml COPYONLY)

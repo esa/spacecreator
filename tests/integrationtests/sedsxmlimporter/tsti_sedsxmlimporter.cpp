@@ -17,8 +17,6 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/lgpl-2.1.html>.
  */
 
-#include "sedstestbase.h"
-
 #include <QFileInfo>
 #include <QObject>
 #include <QtTest>
@@ -34,7 +32,7 @@ using seds::importer::SedsXmlImporter;
 
 namespace seds::test {
 
-class tsti_SedsXmlImporter : public SedsTestBase
+class tsti_SedsXmlImporter : public QObject
 {
     Q_OBJECT
 
