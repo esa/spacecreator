@@ -29,7 +29,9 @@
 #include "dvboard.h"
 #include "dvcreatortool.h"
 #include "dvexporter.h"
+#include "dvfunction.h"
 #include "dvhwlibraryreader.h"
+#include "dvmessage.h"
 #include "dvmodel.h"
 #include "dvpropertytemplateconfig.h"
 #include "dvtreeviewmodel.h"
@@ -53,7 +55,6 @@
 #include <QTimer>
 #include <QTreeView>
 #include <QUndoCommand>
-#include <dvfunction.h>
 
 namespace dve {
 
@@ -350,9 +351,7 @@ void DVEditorCore::reloadHWLibrary()
 }
 
 /*!
-   \brief DVEditorCore::changeDvFunctionBindingName
-   \param oldName
-   \param name
+   Update all function bindings in all partitions from \p oldName to \p name
  */
 void DVEditorCore::changeDvFunctionBindingName(const QString &oldName, const QString &name)
 {
@@ -372,8 +371,7 @@ void DVEditorCore::changeDvFunctionBindingName(const QString &oldName, const QSt
 }
 
 /*!
-   \brief DVEditorCore::removeDvFunctionBinding
-   \param ivFunction
+   Remove all function bindings in all partitions that have the name \p functionName
  */
 void DVEditorCore::removeDvFunctionBinding(const QString &functionName)
 {
@@ -382,6 +380,61 @@ void DVEditorCore::removeDvFunctionBinding(const QString &functionName)
     for (dvm::DVFunction *fn : model->allObjectsByType<dvm::DVFunction>()) {
         if (fn->title() == functionName) {
             toDelete.append(fn);
+        }
+    }
+
+    if (!toDelete.isEmpty()) {
+        auto cmd = new cmd::CmdEntitiesRemove(toDelete, model);
+        commandsStack()->push(cmd);
+
+        Q_EMIT editedExternally(this);
+    }
+}
+
+/*!
+   Update all message binding interface names from \p oldName to \p name. If source and target functions as well as
+   message end doe match
+ */
+void DVEditorCore::changeDvMessageBinding(const QString &oldName, const QString &name, const QString &sourceName,
+        const QString &targetName, shared::MessageEnd msgSide)
+{
+    bool updated = false;
+    dvm::DVModel *model = d->m_appModel->objectsModel();
+    for (dvm::DVMessage *msg : model->allObjectsByType<dvm::DVMessage>()) {
+        if (msg->fromFunction() == sourceName && msg->toFunction() == targetName) {
+            dvm::meta::Props::Token tocken;
+            if (msgSide == shared::SOURCE && msg->fromInterface() == oldName) {
+                tocken = dvm::meta::Props::Token::from_interface;
+                const QVariantHash attributes = { { dvm::meta::Props::token(tocken), name } };
+                auto cmd = new shared::cmd::CmdEntityAttributeChange(msg, attributes);
+                commandsStack()->push(cmd);
+            }
+            if (msgSide == shared::TARGET && msg->toInterface() == oldName) {
+                tocken = dvm::meta::Props::Token::to_interface;
+                const QVariantHash attributes = { { dvm::meta::Props::token(tocken), name } };
+                auto cmd = new shared::cmd::CmdEntityAttributeChange(msg, attributes);
+                commandsStack()->push(cmd);
+            }
+            updated = true;
+        }
+    }
+    if (updated) {
+        Q_EMIT editedExternally(this);
+    }
+}
+
+/*!
+   Remove all message binding that match the source and taget function and interface names
+ */
+void DVEditorCore::removeDvMessageBinding(const QString &sourceFunction, const QString &sourceInterface,
+        const QString &targetFunction, const QString &targetInterface)
+{
+    dvm::DVModel *model = d->m_appModel->objectsModel();
+    QList<QPointer<dvm::DVObject>> toDelete;
+    for (dvm::DVMessage *msg : model->allObjectsByType<dvm::DVMessage>()) {
+        if (msg->fromFunction() == sourceFunction && msg->fromInterface() == sourceInterface
+                && msg->toFunction() == targetFunction && msg->toInterface() == targetInterface) {
+            toDelete.append(msg);
         }
     }
 

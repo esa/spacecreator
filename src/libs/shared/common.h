@@ -23,10 +23,6 @@
 #include <QObject>
 #include <QUuid>
 
-namespace Asn1Acn {
-class File;
-}
-
 namespace shared {
 
 typedef QUuid Id;
@@ -55,6 +51,19 @@ public:
     shared::Id entityId;
 };
 
+/*!
+   Enum describing the two ends of connections/messages
+ */
+enum MessageEnd
+{
+    SOURCE = 1, /// Same as "required" or "from"
+    TARGET = 2, /// Same as "provided" or "to"
+    BOTH = 3, /// Used to handle both ends
+};
+
+/*!
+   \brief The FileCopyingMode enum
+ */
 enum FileCopyingMode
 {
     Keep,

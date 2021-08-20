@@ -25,6 +25,7 @@
 #include "dvappmodel.h"
 #include "dveditorcore.h"
 #include "dvfunction.h"
+#include "dvmessage.h"
 #include "dvmodel.h"
 #include "interfacedocument.h"
 #include "ivconnection.h"
@@ -270,6 +271,29 @@ void MscSystemChecks::checkMessages()
 }
 
 /*!
+   Returns if any message binding exists, that has the given source function, target function, and name for the
+   side/end of the message
+ */
+bool MscSystemChecks::dvMessagesExist(
+        const QString &messageName, const QString &sourceName, const QString &targetName, shared::MessageEnd msgSide)
+{
+    for (QSharedPointer<dve::DVEditorCore> &dvCore : m_storage->allDVCores()) {
+        dvm::DVModel *model = dvCore->appModel()->objectsModel();
+        for (const dvm::DVMessage *msg : model->allObjectsByType<dvm::DVMessage>()) {
+            if (msg->fromFunction() == sourceName && msg->toFunction() == targetName) {
+                if ((msgSide == shared::SOURCE || msgSide == shared::BOTH) && msg->fromInterface() == messageName) {
+                    return true;
+                }
+                if ((msgSide == shared::TARGET || msgSide == shared::BOTH) && msg->toInterface() == messageName) {
+                    return true;
+                }
+            }
+        }
+    }
+    return false;
+}
+
+/*!
    Changes all function bindings that have the name \p oldName to have the new name \p name
  */
 void MscSystemChecks::changeDvFunctionBindingName(const QString &oldName, const QString &name)
@@ -286,6 +310,28 @@ void MscSystemChecks::removeDvFunctionBinding(ivm::IVFunction *ivFunction)
 {
     for (QSharedPointer<dve::DVEditorCore> &dvCore : m_storage->allDVCores()) {
         dvCore->removeDvFunctionBinding(ivFunction->title());
+    }
+}
+
+/*!
+   Update all DV message bindings interface name, that match the name, source/target function and message side/end
+ */
+void MscSystemChecks::changeDvMessageBindingName(const QString &oldName, const QString &name, const QString &sourceName,
+        const QString &targetName, shared::MessageEnd msgSide)
+{
+    for (QSharedPointer<dve::DVEditorCore> &dvCore : m_storage->allDVCores()) {
+        dvCore->changeDvMessageBinding(oldName, name, sourceName, targetName, msgSide);
+    }
+}
+
+/*!
+   Removes all message bindings that are corresponding to the function \p ivFunction
+ */
+void MscSystemChecks::removeDvMessageBinding(ivm::IVConnection *ivConnection)
+{
+    for (QSharedPointer<dve::DVEditorCore> &dvCore : m_storage->allDVCores()) {
+        dvCore->removeDvMessageBinding(ivConnection->sourceName(), ivConnection->sourceInterfaceName(),
+                ivConnection->targetName(), ivConnection->targetInterfaceName());
     }
 }
 
@@ -318,11 +364,13 @@ void MscSystemChecks::onEntityNameChanged(ivm::IVObject *entity, const QString &
     if (cmdIfaceAttribChange) {
         ivm::IVInterface *interface = cmdIfaceAttribChange->interface();
         QList<QStringList> messagesData;
+        shared::MessageEnd msgEnd = shared::TARGET;
         if (interface->direction() == ivm::IVInterface::InterfaceType::Provided) {
             // Update from connections
             QVector<ivm::IVConnection *> connections = cmdIfaceAttribChange->getRelatedConnections();
             for (const ivm::IVConnection *connection : qAsConst(connections)) {
-                if (mscMessagesExist(oldName, connection->sourceName(), connection->targetName())) {
+                if (mscMessagesExist(oldName, connection->sourceName(), connection->targetName())
+                        || dvMessagesExist(oldName, connection->sourceName(), connection->targetName(), msgEnd)) {
                     messagesData << QStringList({ connection->sourceName(), connection->targetName() });
                 }
             }
@@ -336,20 +384,30 @@ void MscSystemChecks::onEntityNameChanged(ivm::IVObject *entity, const QString &
                     messagesData << QStringList({ "", func->title() });
                 }
             }
+        } else {
+            msgEnd = shared::SOURCE;
+            QVector<ivm::IVConnection *> connections = cmdIfaceAttribChange->getRelatedConnections();
+            for (const ivm::IVConnection *connection : qAsConst(connections)) {
+                if (dvMessagesExist(oldName, connection->sourceName(), connection->targetName(), msgEnd)) {
+                    messagesData << QStringList({ connection->sourceName(), connection->targetName() });
+                }
+            }
         }
 
         if (!messagesData.isEmpty()) {
             if (command->isFirstChange()) {
                 const int result = QMessageBox::question(
-                        nullptr, tr("Update messages"), tr("Do you want to update MSC messages?"));
+                        nullptr, tr("Update messages"), tr("Do you want to update MSC messages / DV bindings?"));
                 if (result == QMessageBox::Yes) {
                     for (const QStringList &data : qAsConst(messagesData)) {
                         changeMscMessageName(oldName, entity->title(), data[0], data[1]);
+                        changeDvMessageBindingName(oldName, entity->title(), data[0], data[1], msgEnd);
                     }
                 }
             } else {
                 for (const QStringList &data : qAsConst(messagesData)) {
                     changeMscMessageName(oldName, entity->title(), data[0], data[1]);
+                    changeDvMessageBindingName(oldName, entity->title(), data[0], data[1], msgEnd);
                 }
             }
         }
@@ -465,6 +523,7 @@ void MscSystemChecks::onMscEntityNameChanged(QObject *entity, const QString &old
                     m_nameUpdateRunning = true;
                     ivCore->renameIVConnection(oldName, message->name(), fromName, toName);
                     changeMscMessageName(oldName, message->name(), fromName, toName);
+                    changeDvMessageBindingName(oldName, message->name(), fromName, toName, shared::TARGET);
                     m_nameUpdateRunning = false;
                 }
                 if (box.clickedButton() == addButton) {
@@ -474,6 +533,7 @@ void MscSystemChecks::onMscEntityNameChanged(QObject *entity, const QString &old
                 m_nameUpdateRunning = true;
                 ivCore->renameIVConnection(oldName, message->name(), fromName, toName);
                 changeMscMessageName(oldName, message->name(), fromName, toName);
+                changeDvMessageBindingName(oldName, message->name(), fromName, toName, shared::TARGET);
                 m_nameUpdateRunning = false;
             }
         }
@@ -527,6 +587,7 @@ void MscSystemChecks::onEntitiesRemoved(const QList<QPointer<ivm::IVObject>> &en
         }
         for (auto ivConnection : qAsConst(removedConnections)) {
             removeMscMessages(ivConnection);
+            removeDvMessageBinding(ivConnection);
         }
     }
 }

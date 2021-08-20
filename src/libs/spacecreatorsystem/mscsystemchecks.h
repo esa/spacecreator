@@ -17,6 +17,8 @@
 
 #pragma once
 
+#include "common.h"
+
 #include <QPointer>
 #include <QSharedPointer>
 #include <QVector>
@@ -71,8 +73,13 @@ public:
     void checkMessages();
 
     // DV functions
+    bool dvMessagesExist(const QString &messageName, const QString &sourceName, const QString &targetName,
+            shared::MessageEnd msgSide);
     void changeDvFunctionBindingName(const QString &oldName, const QString &name);
     void removeDvFunctionBinding(ivm::IVFunction *ivFunction);
+    void changeDvMessageBindingName(const QString &oldName, const QString &name, const QString &sourceName,
+            const QString &targetName, shared::MessageEnd msgSide);
+    void removeDvMessageBinding(ivm::IVConnection *ivConnection);
 
 public Q_SLOTS:
     void onEntityNameChanged(ivm::IVObject *entity, const QString &oldName, shared::UndoCommand *command);
