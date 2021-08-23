@@ -17,12 +17,37 @@
 
 #include "connectioncreationvalidator.h"
 
+#include "dvconnection.h"
+#include "dvmodel.h"
+#include "dvnode.h"
+
 namespace dvm {
 
 ConnectionCreationValidator::FailReason ConnectionCreationValidator::canConnect(
         DVNode *sourceNode, DVNode *targetNode, DVDevice *sourceDevice, DVDevice *targetDevice)
 {
-    /// TODO:
+    if (!sourceDevice)
+        return ConnectionCreationValidator::FailReason::NoStartDevice;
+    if (!targetDevice)
+        return ConnectionCreationValidator::FailReason::NoEndDevice;
+    if (!sourceNode)
+        return ConnectionCreationValidator::FailReason::NoStartNode;
+    if (!targetNode)
+        return ConnectionCreationValidator::FailReason::NoEndNode;
+    if (sourceDevice == targetDevice)
+        return ConnectionCreationValidator::FailReason::SameDevice;
+    if (sourceNode == targetNode)
+        return ConnectionCreationValidator::FailReason::SameParent;
+    if (!sourceNode->model() || !targetNode->model() || !sourceDevice || !targetDevice)
+        return ConnectionCreationValidator::FailReason::NoScene;
+
+    for (DVConnection *connection : sourceNode->model()->connections(sourceDevice)) {
+        if ((connection->sourceDevice() == sourceDevice || connection->targetDevice() == sourceDevice)
+                && (connection->sourceDevice() == targetDevice || connection->targetDevice() == targetDevice)) {
+            return ConnectionCreationValidator::FailReason::AlreadyExists;
+        }
+    }
+
     return ConnectionCreationValidator::FailReason::NotFail;
 }
 

@@ -46,6 +46,7 @@ public:
         NoEndNode,
         NoStartDevice,
         NoEndDevice,
+        AlreadyExists,
     };
     Q_ENUM(FailReason)
 
