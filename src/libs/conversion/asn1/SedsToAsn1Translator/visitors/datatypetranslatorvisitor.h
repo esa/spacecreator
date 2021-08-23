@@ -24,6 +24,7 @@
 namespace Asn1Acn::Types {
 class Integer;
 class Real;
+class IA5String;
 } // namespace Asn1Acn::Types
 
 namespace seds::model {
@@ -34,6 +35,7 @@ enum class ByteOrder;
 class ContainerDataType;
 enum class CoreEncodingAndPrecision;
 enum class CoreIntegerEncoding;
+enum class CoreStringEncoding;
 class EnumeratedDataType;
 enum class FalseValue;
 class FloatDataType;
@@ -59,19 +61,25 @@ struct DataTypeTranslatorVisitor final {
     auto operator()(const seds::model::SubRangeDataType &sedsType) -> void;
 
 private:
-    auto translateIntegerEncoding(Asn1Acn::Types::Integer *asn1Type, const seds::model::IntegerDataType &sedsType) const
+    auto translateIntegerEncoding(const seds::model::IntegerDataType &sedsType, Asn1Acn::Types::Integer *asn1Type) const
             -> void;
-    auto translateFloatEncoding(Asn1Acn::Types::Real *asn1Type, const seds::model::FloatDataType &sedsType) const
+    auto translateFloatEncoding(const seds::model::FloatDataType &sedsType, Asn1Acn::Types::Real *asn1Type) const
             -> void;
-    auto translateBooleanEncoding(Asn1Acn::Types::Boolean *asn1Type, const seds::model::BooleanDataType &sedsType) const
+    auto translateBooleanEncoding(const seds::model::BooleanDataType &sedsType, Asn1Acn::Types::Boolean *asn1Type) const
+            -> void;
+    auto translateStringEncoding(const seds::model::StringDataType &sedsType, Asn1Acn::Types::IA5String *asn1Type) const
             -> void;
 
-private:
+    auto translateStringLength(const seds::model::StringDataType &sedsType, Asn1Acn::Types::IA5String *asn1Type) const
+            -> void;
     auto translateCoreIntegerEncoding(
-            Asn1Acn::Types::Integer *asn1Type, seds::model::CoreIntegerEncoding coreEncoding) const -> void;
+            seds::model::CoreIntegerEncoding coreEncoding, Asn1Acn::Types::Integer *asn1Type) const -> void;
     auto translateCoreEncodingAndPrecision(
-            Asn1Acn::Types::Real *asn1Type, seds::model::CoreEncodingAndPrecision coreEncoding) const -> void;
-    auto translateFalseValue(Asn1Acn::Types::Boolean *asn1Type, seds::model::FalseValue falseValue) const -> void;
+            seds::model::CoreEncodingAndPrecision coreEncoding, Asn1Acn::Types::Real *asn1Type) const -> void;
+    auto translateCoreStringEncoding(
+            seds::model::CoreStringEncoding coreEncoding, Asn1Acn::Types::IA5String *asn1Type) const -> void;
+    auto translateFalseValue(seds::model::FalseValue falseValue, Asn1Acn::Types::Boolean *asn1Type) const -> void;
+
     auto convertByteOrder(seds::model::ByteOrder sedsByteOrder) const -> Asn1Acn::Types::Endianness;
 };
 

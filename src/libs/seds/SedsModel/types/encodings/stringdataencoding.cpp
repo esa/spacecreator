@@ -26,7 +26,7 @@ StringDataEncoding::StringDataEncoding() noexcept
 {
 }
 
-const std::optional<StringDataEncoding::Encoding> &StringDataEncoding::encoding() const
+const StringDataEncoding::Encoding &StringDataEncoding::encoding() const
 {
     return m_encoding;
 }

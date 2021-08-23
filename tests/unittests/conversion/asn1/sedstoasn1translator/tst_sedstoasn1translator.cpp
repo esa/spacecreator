@@ -21,7 +21,9 @@
 #include <QtTest>
 #include <asn1library/asn1/asn1model.h>
 #include <asn1library/asn1/constraints/rangeconstraint.h>
+#include <asn1library/asn1/constraints/sizeconstraint.h>
 #include <asn1library/asn1/types/boolean.h>
+#include <asn1library/asn1/types/ia5string.h>
 #include <asn1library/asn1/types/integer.h>
 #include <asn1library/asn1/types/real.h>
 #include <asn1library/asn1/types/type.h>
@@ -49,11 +51,13 @@ private Q_SLOTS:
     void testTranslateBooleanDataType();
     void testTranslateIntegerDataType();
     void testTranslateFloatDataType();
+    void testTranslateStringDataType();
 
 private:
     std::unique_ptr<SedsModel> createBoolean();
     std::unique_ptr<SedsModel> createSignedInteger16();
     std::unique_ptr<SedsModel> createFloat64();
+    std::unique_ptr<SedsModel> createString();
 
     const Types::Type *getType(const Asn1Model *asn1Model, std::size_t index);
 };
@@ -159,6 +163,50 @@ void tst_SedsToAsn1Translator::testTranslateFloatDataType()
     QCOMPARE(range.end(), 1.79769e+308);
 }
 
+void tst_SedsToAsn1Translator::testTranslateStringDataType()
+{
+    const auto sedsModel = createString();
+
+    Options options;
+    SedsToAsn1Translator translator;
+
+    const auto resultModel = translator.translateModels({ sedsModel.get() }, options);
+    QVERIFY(resultModel);
+
+    const auto *asn1Model = dynamic_cast<Asn1Model *>(resultModel.get());
+    QVERIFY(asn1Model);
+
+    const auto *type = getType(asn1Model, 0);
+    QVERIFY(type);
+
+    const auto *stringType = dynamic_cast<const Types::IA5String *>(type);
+    QVERIFY(stringType);
+
+    QCOMPARE(stringType->identifier(), "String20");
+    QCOMPARE(stringType->typeName(), "IA5String");
+    QCOMPARE(stringType->encoding(), Types::AsciiStringEncoding::ASCII);
+    QCOMPARE(stringType->terminationPattern(), "X");
+
+    const auto &constraints = stringType->constraints().constraints();
+    QCOMPARE(constraints.size(), 1);
+
+    const auto &constraint = constraints[0];
+    QVERIFY(constraint);
+
+    const auto *sizeConstraint = dynamic_cast<Constraints::SizeConstraint<StringValue> *>(constraint.get());
+    QVERIFY(sizeConstraint);
+
+    const auto *innerConstraints = sizeConstraint->innerConstraints();
+    QVERIFY(innerConstraints);
+
+    const auto *rangeConstraint = dynamic_cast<const Constraints::RangeConstraint<IntegerValue> *>(innerConstraints);
+    QVERIFY(rangeConstraint);
+
+    const auto &range = rangeConstraint->range();
+    QVERIFY(range.isSingleItem());
+    QCOMPARE(range.begin(), 20);
+}
+
 std::unique_ptr<SedsModel> tst_SedsToAsn1Translator::createBoolean()
 {
     BooleanDataEncoding encoding;
@@ -219,6 +267,27 @@ std::unique_ptr<SedsModel> tst_SedsToAsn1Translator::createFloat64()
 
     Package package;
     package.addDataType(std::move(floatDataType));
+
+    PackageFile packageFile;
+    packageFile.setPackage(std::move(package));
+
+    return std::make_unique<SedsModel>(std::move(packageFile));
+}
+
+std::unique_ptr<SedsModel> tst_SedsToAsn1Translator::createString()
+{
+    StringDataEncoding encoding;
+    encoding.setEncoding(CoreStringEncoding::Ascii);
+    encoding.setTerminationByte(88);
+
+    StringDataType stringDataType;
+    stringDataType.setName("String20");
+    stringDataType.setLength(20);
+    stringDataType.setFixedLength(true);
+    stringDataType.setEncoding(std::move(encoding));
+
+    Package package;
+    package.addDataType(std::move(stringDataType));
 
     PackageFile packageFile;
     packageFile.setPackage(std::move(package));

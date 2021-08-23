@@ -40,11 +40,17 @@ template<typename ValueType>
 class SizeConstraint : public Constraint<ValueType>
 {
 public:
+    SizeConstraint() = default;
     SizeConstraint(std::unique_ptr<Constraint<IntegerValue>> innerConstraints)
         : m_innerContraints(std::move(innerConstraints))
     {}
 
-    const Constraint<IntegerValue> &innerConstraints() const { return *m_innerContraints; }
+    void setInnerConstraints(std::unique_ptr<Constraint<IntegerValue>> innerConstraints)
+    {
+        m_innerContraints = std::move(innerConstraints);
+    }
+
+    Constraint<IntegerValue> *innerConstraints() const { return m_innerContraints.get(); }
 
     void accept(ConstraintVisitor<ValueType> &visitor) const override { visitor.visit(*this); }
 

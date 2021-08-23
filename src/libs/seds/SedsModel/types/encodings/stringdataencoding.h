@@ -38,14 +38,14 @@ public:
     StringDataEncoding() noexcept;
 
 public:
-    auto encoding() const -> const std::optional<Encoding> &;
+    auto encoding() const -> const Encoding &;
     auto setEncoding(Encoding encoding) -> void;
 
     auto terminationByte() const -> const std::optional<uint8_t> &;
     auto setTerminationByte(uint8_t terminationByte) -> void;
 
 private:
-    std::optional<Encoding> m_encoding;
+    Encoding m_encoding;
     std::optional<uint8_t> m_terminationByte;
 };
 
