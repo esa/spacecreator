@@ -17,24 +17,28 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/lgpl-2.1.html>.
  */
 
-#include "visitors/integerrangetranslatorvisitor.h"
+#pragma once
 
-#include <asn1library/asn1/constraints/rangeconstraint.h>
-#include <seds/SedsModel/types/ranges/minmaxrange.h>
+#include <asn1library/asn1/constraints/constraintlist.h>
+#include <asn1library/asn1/values.h>
 
-using Asn1Acn::IntegerValue;
+namespace seds::model {
+enum class FloatPrecisionRange;
+class MinMaxRange;
+}
 
 namespace conversion::asn1::translator {
 
-void IntegerRangeTranslatorVisitor::operator()(const seds::model::MinMaxRange &range)
-{
-    const auto min = range.min() ? IntegerValue::fromAstValue(range.min()->value())
-                                 : std::numeric_limits<IntegerValue::Type>::min();
-    const auto max = range.max() ? IntegerValue::fromAstValue(range.max()->value())
-                                 : std::numeric_limits<IntegerValue::Type>::max();
+struct FloatRangeTranslatorVisitor final {
+    Asn1Acn::Constraints::ConstraintList<Asn1Acn::RealValue> &m_constraints;
 
-    auto constraint = Asn1Acn::Constraints::RangeConstraint<IntegerValue>::create({ min, max });
-    m_constraints.append(std::move(constraint));
-}
+    auto operator()(const seds::model::FloatPrecisionRange &range) -> void;
+    auto operator()(const seds::model::MinMaxRange &range) -> void;
+
+    constexpr static double singleRangeMin = 1.17549E-38;
+    constexpr static double singleRangeMax = 3.40282e+38;
+    constexpr static double doubleRangeMin = 2.22507e-308;
+    constexpr static double doubleRangeMax = 1.79769e+308;
+};
 
 } // namespace conversion::asn1::translator

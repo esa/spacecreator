@@ -33,7 +33,7 @@ namespace seds::model {
 class FloatDataType final : public NumericDataType
 {
 public:
-    using Range = std::variant<std::monostate, FloatPrecisionRange, MinMaxRange>;
+    using Range = std::variant<FloatPrecisionRange, MinMaxRange>;
 
 public:
     FloatDataType() = default;

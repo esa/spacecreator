@@ -23,13 +23,17 @@
 
 namespace Asn1Acn::Types {
 class Integer;
+class Real;
 } // namespace Asn1Acn::Types
 
 namespace seds::model {
 class ArrayDataType;
 class BinaryDataType;
 class BooleanDataType;
+enum class ByteOrder;
 class ContainerDataType;
+enum class CoreEncodingAndPrecision;
+enum class CoreIntegerEncoding;
 class EnumeratedDataType;
 class FloatDataType;
 class IntegerDataType;
@@ -54,8 +58,17 @@ struct DataTypeTranslatorVisitor final {
     auto operator()(const seds::model::SubRangeDataType &sedsType) -> void;
 
 private:
-    auto translateIntegerEncoding(Asn1Acn::Types::Integer *asn1Type, const seds::model::IntegerDataType &sedsType)
+    auto translateIntegerEncoding(Asn1Acn::Types::Integer *asn1Type, const seds::model::IntegerDataType &sedsType) const
             -> void;
+    auto translateFloatEncoding(Asn1Acn::Types::Real *asn1Type, const seds::model::FloatDataType &sedsType) const
+            -> void;
+
+private:
+    auto translateCoreIntegerEncoding(
+            Asn1Acn::Types::Integer *asn1Type, seds::model::CoreIntegerEncoding coreEncoding) const -> void;
+    auto translateCoreEncodingAndPrecision(
+            Asn1Acn::Types::Real *asn1Type, seds::model::CoreEncodingAndPrecision coreEncoding) const -> void;
+    auto convertByteOrder(seds::model::ByteOrder sedsByteOrder) const -> Asn1Acn::Types::Endianness;
 };
 
 } // namespace conversion::asn1::translator

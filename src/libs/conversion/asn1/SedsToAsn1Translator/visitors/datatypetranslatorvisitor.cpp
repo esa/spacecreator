@@ -19,11 +19,13 @@
 
 #include "visitors/datatypetranslatorvisitor.h"
 
+#include "visitors/floatrangetranslatorvisitor.h"
 #include "visitors/integerrangetranslatorvisitor.h"
 
 #include <QDebug>
 #include <asn1library/asn1/typeassignment.h>
 #include <asn1library/asn1/types/integer.h>
+#include <asn1library/asn1/types/real.h>
 #include <conversion/common/translation/exceptions.h>
 #include <seds/SedsModel/types/arraydatatype.h>
 #include <seds/SedsModel/types/binarydatatype.h>
@@ -83,7 +85,16 @@ void DataTypeTranslatorVisitor::operator()(const EnumeratedDataType &sedsType)
 
 void DataTypeTranslatorVisitor::operator()(const FloatDataType &sedsType)
 {
-    qDebug() << "float";
+    const auto &typeName = sedsType.name().value();
+
+    auto type = std::make_unique<Asn1Acn::Types::Real>(typeName);
+    std::visit(FloatRangeTranslatorVisitor { type->constraints() }, sedsType.range());
+    translateFloatEncoding(type.get(), sedsType);
+
+    auto typeAssignment =
+            std::make_unique<Asn1Acn::TypeAssignment>(typeName, typeName, Asn1Acn::SourceLocation(), std::move(type));
+
+    m_definitions->addType(std::move(typeAssignment));
 }
 
 void DataTypeTranslatorVisitor::operator()(const IntegerDataType &sedsType)
@@ -111,51 +122,98 @@ void DataTypeTranslatorVisitor::operator()(const SubRangeDataType &sedsType)
 }
 
 void DataTypeTranslatorVisitor::translateIntegerEncoding(
-        Asn1Acn::Types::Integer *asn1Type, const IntegerDataType &sedsType)
+        Asn1Acn::Types::Integer *asn1Type, const IntegerDataType &sedsType) const
 {
     if (const auto &encoding = sedsType.encoding(); encoding) {
-        switch (encoding->byteOrder()) {
-        case seds::model::ByteOrder::BigEndian:
-            asn1Type->setEndianness(Asn1Acn::Types::Endianness::big);
-            break;
-        case seds::model::ByteOrder::LittleEndian:
-            asn1Type->setEndianness(Asn1Acn::Types::Endianness::little);
-            break;
-        default:
-            throw UnhandledValueException("ByteOrder");
-            break;
-        }
-
         // clang-format off
         std::visit(overloaded {
-            [](auto arg) { },
-            [&asn1Type](seds::model::CoreIntegerEncoding coreEncoding) {
-                switch (coreEncoding) {
-                case seds::model::CoreIntegerEncoding::Unsigned:
-                    asn1Type->setEncoding(Asn1Acn::Types::IntegerEncoding::pos_int);
-                    break;
-                case seds::model::CoreIntegerEncoding::TwosComplement:
-                    asn1Type->setEncoding(Asn1Acn::Types::IntegerEncoding::twos_complement);
-                    break;
-                case seds::model::CoreIntegerEncoding::Bcd:
-                    asn1Type->setEncoding(Asn1Acn::Types::IntegerEncoding::BCD);
-                    break;
-                case seds::model::CoreIntegerEncoding::SignMagnitude:
-                case seds::model::CoreIntegerEncoding::OnesComplement:
-                case seds::model::CoreIntegerEncoding::PackedBcd:
-                default:
-                    throw UnsupportedValueException("CoreIntegerEncoding");
-                    break;
-                }
+            [&](seds::model::CoreIntegerEncoding coreEncoding) {
+                translateCoreIntegerEncoding(asn1Type, coreEncoding);
             }
         }, encoding->encoding());
         // clang-format on
 
+        asn1Type->setEndianness(convertByteOrder(encoding->byteOrder()));
         asn1Type->setSize(encoding->bits());
     } else {
-        asn1Type->setEndianness(Asn1Acn::Types::Endianness::unspecified);
         asn1Type->setEncoding(Asn1Acn::Types::IntegerEncoding::unspecified);
+        asn1Type->setEndianness(Asn1Acn::Types::Endianness::unspecified);
         asn1Type->setSize(0);
+    }
+}
+
+void DataTypeTranslatorVisitor::translateFloatEncoding(
+        Asn1Acn::Types::Real *asn1Type, const FloatDataType &sedsType) const
+{
+    if (const auto &encoding = sedsType.encoding(); encoding) {
+        // clang-format off
+        std::visit(overloaded {
+            [&](seds::model::CoreEncodingAndPrecision coreEncoding) {
+                translateCoreEncodingAndPrecision(asn1Type, coreEncoding);
+            }
+        }, encoding->encoding());
+        // clang-format on
+        //
+        asn1Type->setEndianness(convertByteOrder(encoding->byteOrder()));
+    } else {
+        asn1Type->setEndianness(Asn1Acn::Types::Endianness::unspecified);
+        asn1Type->setEncoding(Asn1Acn::Types::RealEncoding::unspecified);
+    }
+}
+
+void DataTypeTranslatorVisitor::translateCoreIntegerEncoding(
+        Asn1Acn::Types::Integer *asn1Type, seds::model::CoreIntegerEncoding coreEncoding) const
+{
+    switch (coreEncoding) {
+    case seds::model::CoreIntegerEncoding::Unsigned:
+        asn1Type->setEncoding(Asn1Acn::Types::IntegerEncoding::pos_int);
+        break;
+    case seds::model::CoreIntegerEncoding::TwosComplement:
+        asn1Type->setEncoding(Asn1Acn::Types::IntegerEncoding::twos_complement);
+        break;
+    case seds::model::CoreIntegerEncoding::Bcd:
+        asn1Type->setEncoding(Asn1Acn::Types::IntegerEncoding::BCD);
+        break;
+    case seds::model::CoreIntegerEncoding::SignMagnitude:
+    case seds::model::CoreIntegerEncoding::OnesComplement:
+    case seds::model::CoreIntegerEncoding::PackedBcd:
+    default:
+        throw UnsupportedValueException("CoreIntegerEncoding");
+        break;
+    }
+}
+
+void DataTypeTranslatorVisitor::translateCoreEncodingAndPrecision(
+        Asn1Acn::Types::Real *asn1Type, seds::model::CoreEncodingAndPrecision coreEncoding) const
+{
+    switch (coreEncoding) {
+    case seds::model::CoreEncodingAndPrecision::IeeeSingle:
+        asn1Type->setEncoding(Asn1Acn::Types::RealEncoding::IEEE754_1985_32);
+        break;
+    case seds::model::CoreEncodingAndPrecision::IeeeDouble:
+        asn1Type->setEncoding(Asn1Acn::Types::RealEncoding::IEEE754_1985_64);
+        break;
+    case seds::model::CoreEncodingAndPrecision::IeeeQuad:
+    case seds::model::CoreEncodingAndPrecision::MilstdSimple:
+    case seds::model::CoreEncodingAndPrecision::MilstdExtended:
+        throw UnsupportedValueException("CoreEncodingAndPrecision");
+        break;
+    default:
+        throw UnhandledValueException("CoreEncodingAndPrecision");
+        break;
+    }
+}
+
+Asn1Acn::Types::Endianness DataTypeTranslatorVisitor::convertByteOrder(seds::model::ByteOrder sedsByteOrder) const
+{
+    switch (sedsByteOrder) {
+    case seds::model::ByteOrder::BigEndian:
+        return Asn1Acn::Types::Endianness::big;
+    case seds::model::ByteOrder::LittleEndian:
+        return Asn1Acn::Types::Endianness::little;
+    default:
+        throw UnhandledValueException("ByteOrder");
+        break;
     }
 }
 
