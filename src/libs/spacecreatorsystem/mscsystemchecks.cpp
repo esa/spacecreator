@@ -320,7 +320,7 @@ void MscSystemChecks::changeDvMessageBindingName(const QString &oldName, const Q
         const QString &targetName, shared::MessageEnd msgSide)
 {
     for (QSharedPointer<dve::DVEditorCore> &dvCore : m_storage->allDVCores()) {
-        dvCore->changeDvMessageBinding(oldName, name, sourceName, targetName, msgSide);
+        dvCore->changeDvMessageBindingIfName(oldName, name, sourceName, targetName, msgSide);
     }
 }
 

@@ -357,6 +357,7 @@ void DVEditorCore::changeDvFunctionBindingName(const QString &oldName, const QSt
 {
     bool updated = false;
     dvm::DVModel *model = d->m_appModel->objectsModel();
+    // Update function bindings
     for (dvm::DVFunction *fn : model->allObjectsByType<dvm::DVFunction>()) {
         if (fn->title() == oldName) {
             const QVariantHash attributes = { { dvm::meta::Props::token(dvm::meta::Props::Token::name), name } };
@@ -365,6 +366,24 @@ void DVEditorCore::changeDvFunctionBindingName(const QString &oldName, const QSt
             updated = true;
         }
     }
+    // Update functions in message bindings
+    for (dvm::DVMessage *msg : model->allObjectsByType<dvm::DVMessage>()) {
+        if (msg->fromFunction() == oldName) {
+            dvm::meta::Props::Token token = dvm::meta::Props::Token::from_function;
+            const QVariantHash attributes = { { dvm::meta::Props::token(token), name } };
+            auto cmd = new shared::cmd::CmdEntityAttributeChange(msg, attributes);
+            commandsStack()->push(cmd);
+            updated = true;
+        }
+        if (msg->toFunction() == oldName) {
+            dvm::meta::Props::Token token = dvm::meta::Props::Token::to_function;
+            const QVariantHash attributes = { { dvm::meta::Props::token(token), name } };
+            auto cmd = new shared::cmd::CmdEntityAttributeChange(msg, attributes);
+            commandsStack()->push(cmd);
+            updated = true;
+        }
+    }
+
     if (updated) {
         Q_EMIT editedExternally(this);
     }
@@ -395,23 +414,23 @@ void DVEditorCore::removeDvFunctionBinding(const QString &functionName)
    Update all message binding interface names from \p oldName to \p name. If source and target functions as well as
    message end doe match
  */
-void DVEditorCore::changeDvMessageBinding(const QString &oldName, const QString &name, const QString &sourceName,
+void DVEditorCore::changeDvMessageBindingIfName(const QString &oldName, const QString &name, const QString &sourceName,
         const QString &targetName, shared::MessageEnd msgSide)
 {
     bool updated = false;
     dvm::DVModel *model = d->m_appModel->objectsModel();
     for (dvm::DVMessage *msg : model->allObjectsByType<dvm::DVMessage>()) {
         if (msg->fromFunction() == sourceName && msg->toFunction() == targetName) {
-            dvm::meta::Props::Token tocken;
+            dvm::meta::Props::Token token;
             if (msgSide == shared::SOURCE && msg->fromInterface() == oldName) {
-                tocken = dvm::meta::Props::Token::from_interface;
-                const QVariantHash attributes = { { dvm::meta::Props::token(tocken), name } };
+                token = dvm::meta::Props::Token::from_interface;
+                const QVariantHash attributes = { { dvm::meta::Props::token(token), name } };
                 auto cmd = new shared::cmd::CmdEntityAttributeChange(msg, attributes);
                 commandsStack()->push(cmd);
             }
             if (msgSide == shared::TARGET && msg->toInterface() == oldName) {
-                tocken = dvm::meta::Props::Token::to_interface;
-                const QVariantHash attributes = { { dvm::meta::Props::token(tocken), name } };
+                token = dvm::meta::Props::Token::to_interface;
+                const QVariantHash attributes = { { dvm::meta::Props::token(token), name } };
                 auto cmd = new shared::cmd::CmdEntityAttributeChange(msg, attributes);
                 commandsStack()->push(cmd);
             }

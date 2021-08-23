@@ -92,7 +92,7 @@ public:
     //
     void changeDvFunctionBindingName(const QString &oldName, const QString &name);
     void removeDvFunctionBinding(const QString &functionName);
-    void changeDvMessageBinding(const QString &oldName, const QString &name, const QString &sourceName,
+    void changeDvMessageBindingIfName(const QString &oldName, const QString &name, const QString &sourceName,
             const QString &targetName, shared::MessageEnd msgSide);
     void removeDvMessageBinding(const QString &sourceFunction, const QString &sourceInterface,
             const QString &targetFunction, const QString &targetInterface);
