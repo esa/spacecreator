@@ -21,6 +21,7 @@
 #include <QtTest>
 #include <asn1library/asn1/asn1model.h>
 #include <asn1library/asn1/constraints/rangeconstraint.h>
+#include <asn1library/asn1/types/boolean.h>
 #include <asn1library/asn1/types/integer.h>
 #include <asn1library/asn1/types/real.h>
 #include <asn1library/asn1/types/type.h>
@@ -45,15 +46,41 @@ public:
     virtual ~tst_SedsToAsn1Translator() = default;
 
 private Q_SLOTS:
+    void testTranslateBooleanDataType();
     void testTranslateIntegerDataType();
     void testTranslateFloatDataType();
 
 private:
+    std::unique_ptr<SedsModel> createBoolean();
     std::unique_ptr<SedsModel> createSignedInteger16();
     std::unique_ptr<SedsModel> createFloat64();
 
     const Types::Type *getType(const Asn1Model *asn1Model, std::size_t index);
 };
+
+void tst_SedsToAsn1Translator::testTranslateBooleanDataType()
+{
+    const auto sedsModel = createBoolean();
+
+    Options options;
+    SedsToAsn1Translator translator;
+
+    const auto resultModel = translator.translateModels({ sedsModel.get() }, options);
+    QVERIFY(resultModel);
+
+    const auto *asn1Model = dynamic_cast<Asn1Model *>(resultModel.get());
+    QVERIFY(asn1Model);
+
+    const auto *type = getType(asn1Model, 0);
+    QVERIFY(type);
+
+    const auto *booleanType = dynamic_cast<const Types::Boolean *>(type);
+    QVERIFY(booleanType);
+
+    QCOMPARE(booleanType->identifier(), "Boolean");
+    QCOMPARE(booleanType->typeName(), "BOOLEAN");
+    QCOMPARE(booleanType->trueValue(), "0");
+}
 
 void tst_SedsToAsn1Translator::testTranslateIntegerDataType()
 {
@@ -130,6 +157,25 @@ void tst_SedsToAsn1Translator::testTranslateFloatDataType()
     const auto &range = rangeConstraint->range();
     QCOMPARE(range.begin(), 2.22507e-308);
     QCOMPARE(range.end(), 1.79769e+308);
+}
+
+std::unique_ptr<SedsModel> tst_SedsToAsn1Translator::createBoolean()
+{
+    BooleanDataEncoding encoding;
+    encoding.setBits(16);
+    encoding.setFalseValue(FalseValue::NonZeroIsFalse);
+
+    BooleanDataType booleanDataType;
+    booleanDataType.setName("Boolean");
+    booleanDataType.setEncoding(std::move(encoding));
+
+    Package package;
+    package.addDataType(std::move(booleanDataType));
+
+    PackageFile packageFile;
+    packageFile.setPackage(std::move(package));
+
+    return std::make_unique<SedsModel>(std::move(packageFile));
 }
 
 std::unique_ptr<SedsModel> tst_SedsToAsn1Translator::createSignedInteger16()

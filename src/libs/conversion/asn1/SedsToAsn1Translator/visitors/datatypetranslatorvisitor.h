@@ -35,6 +35,7 @@ class ContainerDataType;
 enum class CoreEncodingAndPrecision;
 enum class CoreIntegerEncoding;
 class EnumeratedDataType;
+enum class FalseValue;
 class FloatDataType;
 class IntegerDataType;
 class Name;
@@ -62,12 +63,15 @@ private:
             -> void;
     auto translateFloatEncoding(Asn1Acn::Types::Real *asn1Type, const seds::model::FloatDataType &sedsType) const
             -> void;
+    auto translateBooleanEncoding(Asn1Acn::Types::Boolean *asn1Type, const seds::model::BooleanDataType &sedsType) const
+            -> void;
 
 private:
     auto translateCoreIntegerEncoding(
             Asn1Acn::Types::Integer *asn1Type, seds::model::CoreIntegerEncoding coreEncoding) const -> void;
     auto translateCoreEncodingAndPrecision(
             Asn1Acn::Types::Real *asn1Type, seds::model::CoreEncodingAndPrecision coreEncoding) const -> void;
+    auto translateFalseValue(Asn1Acn::Types::Boolean *asn1Type, seds::model::FalseValue falseValue) const -> void;
     auto convertByteOrder(seds::model::ByteOrder sedsByteOrder) const -> Asn1Acn::Types::Endianness;
 };
 

@@ -24,6 +24,7 @@
 
 #include <QDebug>
 #include <asn1library/asn1/typeassignment.h>
+#include <asn1library/asn1/types/boolean.h>
 #include <asn1library/asn1/types/integer.h>
 #include <asn1library/asn1/types/real.h>
 #include <conversion/common/translation/exceptions.h>
@@ -70,7 +71,15 @@ void DataTypeTranslatorVisitor::operator()(const BinaryDataType &sedsType)
 
 void DataTypeTranslatorVisitor::operator()(const BooleanDataType &sedsType)
 {
-    qDebug() << "bool";
+    const auto &typeName = sedsType.name().value();
+
+    auto type = std::make_unique<Asn1Acn::Types::Boolean>(typeName);
+    translateBooleanEncoding(type.get(), sedsType);
+
+    auto typeAssignment =
+            std::make_unique<Asn1Acn::TypeAssignment>(typeName, typeName, Asn1Acn::SourceLocation(), std::move(type));
+
+    m_definitions->addType(std::move(typeAssignment));
 }
 
 void DataTypeTranslatorVisitor::operator()(const ContainerDataType &sedsType)
@@ -132,7 +141,6 @@ void DataTypeTranslatorVisitor::translateIntegerEncoding(
             }
         }, encoding->encoding());
         // clang-format on
-
         asn1Type->setEndianness(convertByteOrder(encoding->byteOrder()));
         asn1Type->setSize(encoding->bits());
     } else {
@@ -161,6 +169,16 @@ void DataTypeTranslatorVisitor::translateFloatEncoding(
     }
 }
 
+void DataTypeTranslatorVisitor::translateBooleanEncoding(
+        Asn1Acn::Types::Boolean *asn1Type, const BooleanDataType &sedsType) const
+{
+    if (const auto &encoding = sedsType.encoding(); encoding) {
+        translateFalseValue(asn1Type, encoding->falseValue());
+    } else {
+        asn1Type->setFalseValue("0");
+    }
+}
+
 void DataTypeTranslatorVisitor::translateCoreIntegerEncoding(
         Asn1Acn::Types::Integer *asn1Type, seds::model::CoreIntegerEncoding coreEncoding) const
 {
@@ -177,8 +195,10 @@ void DataTypeTranslatorVisitor::translateCoreIntegerEncoding(
     case seds::model::CoreIntegerEncoding::SignMagnitude:
     case seds::model::CoreIntegerEncoding::OnesComplement:
     case seds::model::CoreIntegerEncoding::PackedBcd:
-    default:
         throw UnsupportedValueException("CoreIntegerEncoding");
+        break;
+    default:
+        throw UnhandledValueException("CoreIntegerEncoding");
         break;
     }
 }
@@ -200,6 +220,22 @@ void DataTypeTranslatorVisitor::translateCoreEncodingAndPrecision(
         break;
     default:
         throw UnhandledValueException("CoreEncodingAndPrecision");
+        break;
+    }
+}
+
+void DataTypeTranslatorVisitor::translateFalseValue(
+        Asn1Acn::Types::Boolean *asn1Type, seds::model::FalseValue falseValue) const
+{
+    switch (falseValue) {
+    case seds::model::FalseValue::ZeroIsFalse:
+        asn1Type->setFalseValue("0");
+        break;
+    case seds::model::FalseValue::NonZeroIsFalse:
+        asn1Type->setTrueValue("0");
+        break;
+    default:
+        throw UnhandledValueException("FalseValue");
         break;
     }
 }
