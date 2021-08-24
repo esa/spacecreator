@@ -91,7 +91,7 @@ QVariantMap Asn1ValueParser::parseAsn1Value(
     case Asn1Acn::Types::Type::BOOLEAN: {
         ok = (value == "TRUE" || value == "FALSE");
         if (ok) {
-            valueMap["value"] = value == "TRUE" ? true : false;
+            valueMap["value"] = value == "TRUE";
         }
         break;
     }
@@ -259,7 +259,7 @@ bool Asn1ValueParser::parseSequenceOfValue(
         const Asn1Acn::Types::Type *itemType =
                 asn1Type->children().empty() ? asn1Type : asn1Type->children().at(0).get();
         auto itemValue = parseAsn1Value(itemType, item);
-        if (itemValue.size())
+        if (!itemValue.empty())
             seqofValues.append(itemValue);
         else
             return false;

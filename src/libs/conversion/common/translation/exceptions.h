@@ -63,7 +63,7 @@ public:
      *
      * @param   valueTypeName   Name of the unhandled value type
      */
-    explicit UnhandledValueException(QString valueTypeName);
+    explicit UnhandledValueException(const QString &valueTypeName);
 };
 
 /**
@@ -77,7 +77,7 @@ public:
      *
      * @param   valueTypeName   Name of the unsupported value type
      */
-    explicit UnsupportedValueException(QString valueTypeName);
+    explicit UnsupportedValueException(const QString &valueTypeName);
 };
 
 } // namespace conversion::translator

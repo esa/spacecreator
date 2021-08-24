@@ -193,7 +193,7 @@ QDomElement PropertyTemplate::toXml(QDomDocument *doc) const
         typeSubElement.setAttribute(QLatin1String("validator"), d->m_rxValueValidatorPattern);
     }
     if (d->m_type == PropertyTemplate::Type::Enumeration) {
-        for (auto entry : d->m_value.toList()) {
+        for (const auto& entry : d->m_value.toList()) {
             QDomElement entryElement = doc->createElement(QLatin1String("Entry"));
             entryElement.setAttribute(QLatin1String("value"), entry.toString());
             typeSubElement.appendChild(entryElement);

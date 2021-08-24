@@ -27,7 +27,7 @@ class Asn1Registrar final : public Registrar
 {
 public:
     /**
-     * @brief   Register SEDS conversion capabilties
+     * @brief   Register ASN.1 conversion capabilties
      *
      * @param   registry    Registry to use
      */

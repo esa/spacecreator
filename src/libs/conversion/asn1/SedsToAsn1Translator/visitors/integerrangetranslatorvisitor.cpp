@@ -20,6 +20,7 @@
 #include "visitors/integerrangetranslatorvisitor.h"
 
 #include <asn1library/asn1/constraints/rangeconstraint.h>
+#include <limits>
 #include <seds/SedsModel/types/ranges/minmaxrange.h>
 
 using Asn1Acn::IntegerValue;

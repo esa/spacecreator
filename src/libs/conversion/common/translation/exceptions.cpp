@@ -28,16 +28,16 @@ TranslationException::TranslationException(QString message)
 
 IncorrectSourceModelException::IncorrectSourceModelException(ModelType expectedModelType)
     : ConversionException(
-              QString("Source model not supported, expected %1 model").arg(modelTypeToString(expectedModelType)))
+            QString("Source model not supported, expected %1 model").arg(modelTypeToString(expectedModelType)))
 {
 }
 
-UnhandledValueException::UnhandledValueException(QString valueTypeName)
+UnhandledValueException::UnhandledValueException(const QString &valueTypeName)
     : TranslationException(QString("Translator encountered unhandled value for %1").arg(valueTypeName))
 {
 }
 
-UnsupportedValueException::UnsupportedValueException(QString valueTypeName)
+UnsupportedValueException::UnsupportedValueException(const QString &valueTypeName)
     : TranslationException(QString("Translator encountered unsupported value for %1").arg(valueTypeName))
 {
 }

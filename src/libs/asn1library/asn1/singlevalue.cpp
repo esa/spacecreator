@@ -29,7 +29,7 @@ using namespace Asn1Acn;
 
 SingleValue::SingleValue(const QString &value, std::function<QString(const QString &)> printer)
     : m_value(value)
-    , m_printer(printer)
+    , m_printer(std::move(printer))
 {}
 
 QString SingleValue::asString() const

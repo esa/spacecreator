@@ -136,7 +136,7 @@ QSharedPointer<File> Asn1ModelStorage::loadData(const QString &fileName)
 
 void Asn1ModelStorage::loadChangedFiles()
 {
-    for (QString fileName : m_filesToReload) {
+    for (const QString& fileName : m_filesToReload) {
         loadFile(fileName);
     }
     m_filesToReload.clear();

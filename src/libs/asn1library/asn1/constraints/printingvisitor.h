@@ -111,7 +111,7 @@ void PrintingVisitor<ValueType>::visit(const SizeConstraint<ValueType> &constrai
 {
     m_stream << "SIZE(";
     PrintingVisitor<IntegerValue> v(m_stream);
-    constraint.innerConstraints().accept(v);
+    constraint.innerConstraints()->accept(v);
     m_stream << ")";
 }
 

@@ -35,7 +35,7 @@ namespace Types {
 class LabelType : public Type
 {
 public:
-    LabelType(const QString &label);
+    LabelType(const QString &name);
     LabelType(const LabelType &other) = default;
 
     QString typeName() const override;

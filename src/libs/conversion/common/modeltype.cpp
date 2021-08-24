@@ -40,10 +40,10 @@ QString modelTypeToString(ModelType modelType)
     }
 }
 
-QString modelTypesToString(const std::set<ModelType> &modelTypes)
+QString modelTypesToString(const std::set<ModelType> &modelsTypes)
 {
-    return std::accumulate(std::next(modelTypes.begin()), modelTypes.end(), modelTypeToString(*modelTypes.begin()),
-            [](QString acc, ModelType modelType) { return std::move(acc) + ", " + modelTypeToString(modelType); });
+    return std::accumulate(std::next(modelsTypes.begin()), modelsTypes.end(), modelTypeToString(*modelsTypes.begin()),
+            [](QString acc, ModelType modelType) { return acc + ", " + modelTypeToString(modelType); });
 }
 
 } // namespace conversion

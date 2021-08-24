@@ -21,6 +21,7 @@
 
 #include <asn1library/asn1/constraints/rangeconstraint.h>
 #include <conversion/common/translation/exceptions.h>
+#include <limits>
 #include <seds/SedsModel/types/ranges/floatprecisionrange.h>
 #include <seds/SedsModel/types/ranges/minmaxrange.h>
 

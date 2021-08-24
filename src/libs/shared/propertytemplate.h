@@ -62,7 +62,7 @@ public:
     void setName(const QString &name);
 
     QString label() const;
-    void setLabel(const QString &name);
+    void setLabel(const QString &label);
 
     Type type() const;
     void setType(Type t);
