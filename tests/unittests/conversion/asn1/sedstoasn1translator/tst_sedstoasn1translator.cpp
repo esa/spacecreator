@@ -24,6 +24,7 @@
 #include <asn1library/asn1/constraints/sizeconstraint.h>
 #include <asn1library/asn1/types/bitstring.h>
 #include <asn1library/asn1/types/boolean.h>
+#include <asn1library/asn1/types/enumerated.h>
 #include <asn1library/asn1/types/ia5string.h>
 #include <asn1library/asn1/types/integer.h>
 #include <asn1library/asn1/types/real.h>
@@ -51,6 +52,7 @@ public:
 private Q_SLOTS:
     void testTranslateBinaryDataType();
     void testTranslateBooleanDataType();
+    void testTranslateEnumeratedDataType();
     void testTranslateIntegerDataType();
     void testTranslateFloatDataType();
     void testTranslateStringDataType();
@@ -58,7 +60,8 @@ private Q_SLOTS:
 private:
     std::unique_ptr<SedsModel> createBitString();
     std::unique_ptr<SedsModel> createBoolean();
-    std::unique_ptr<SedsModel> createSignedInteger16();
+    std::unique_ptr<SedsModel> createEnumeration();
+    std::unique_ptr<SedsModel> createInteger16();
     std::unique_ptr<SedsModel> createFloat64();
     std::unique_ptr<SedsModel> createString();
 
@@ -132,9 +135,43 @@ void tst_SedsToAsn1Translator::testTranslateBooleanDataType()
     QCOMPARE(booleanType->trueValue(), "0");
 }
 
+void tst_SedsToAsn1Translator::testTranslateEnumeratedDataType()
+{
+    const auto sedsModel = createEnumeration();
+
+    Options options;
+    SedsToAsn1Translator translator;
+
+    const auto resultModel = translator.translateModels({ sedsModel.get() }, options);
+    QVERIFY(resultModel);
+
+    const auto *asn1Model = dynamic_cast<Asn1Model *>(resultModel.get());
+    QVERIFY(asn1Model);
+
+    const auto *type = getType(asn1Model, 0);
+    QVERIFY(type);
+
+    const auto *enumType = dynamic_cast<const Types::Enumerated *>(type);
+    QVERIFY(enumType);
+
+    QCOMPARE(enumType->identifier(), "Enumeration");
+    QCOMPARE(enumType->typeName(), "ENUMERATED");
+    QCOMPARE(enumType->size(), 8);
+    QCOMPARE(enumType->encoding(), Types::IntegerEncoding::twos_complement);
+    QCOMPARE(enumType->endianness(), Types::Endianness::big);
+
+    const auto &items = enumType->items();
+    QCOMPARE(items.size(), 3);
+
+    const auto &item = items["Twenty"];
+    QCOMPARE(item.index(), 1);
+    QCOMPARE(item.name(), "Twenty");
+    QCOMPARE(item.value(), 20);
+}
+
 void tst_SedsToAsn1Translator::testTranslateIntegerDataType()
 {
-    const auto sedsModel = createSignedInteger16();
+    const auto sedsModel = createInteger16();
 
     Options options;
     SedsToAsn1Translator translator;
@@ -288,7 +325,42 @@ std::unique_ptr<SedsModel> tst_SedsToAsn1Translator::createBoolean()
     return std::make_unique<SedsModel>(std::move(packageFile));
 }
 
-std::unique_ptr<SedsModel> tst_SedsToAsn1Translator::createSignedInteger16()
+std::unique_ptr<SedsModel> tst_SedsToAsn1Translator::createEnumeration()
+{
+    IntegerDataEncoding encoding;
+    encoding.setByteOrder(ByteOrder::BigEndian);
+    encoding.setEncoding(CoreIntegerEncoding::TwosComplement);
+    encoding.setBits(8);
+
+    EnumeratedDataType enumeratedDataType;
+    enumeratedDataType.setName("Enumeration");
+    enumeratedDataType.setEncoding(std::move(encoding));
+
+    ValueEnumeration value1;
+    value1.setValue(10);
+    value1.setLabel("Ten");
+    enumeratedDataType.addEnumeration(std::move(value1));
+
+    ValueEnumeration value2;
+    value2.setValue(20);
+    value2.setLabel("Twenty");
+    enumeratedDataType.addEnumeration(std::move(value2));
+
+    ValueEnumeration value3;
+    value3.setValue(30);
+    value3.setLabel("Thirty");
+    enumeratedDataType.addEnumeration(std::move(value3));
+
+    Package package;
+    package.addDataType(std::move(enumeratedDataType));
+
+    PackageFile packageFile;
+    packageFile.setPackage(std::move(package));
+
+    return std::make_unique<SedsModel>(std::move(packageFile));
+}
+
+std::unique_ptr<SedsModel> tst_SedsToAsn1Translator::createInteger16()
 {
     MinMaxRange range;
     range.setMin(QString("-42"));

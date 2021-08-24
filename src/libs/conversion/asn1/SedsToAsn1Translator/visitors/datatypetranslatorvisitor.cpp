@@ -27,6 +27,7 @@
 #include <asn1library/asn1/typeassignment.h>
 #include <asn1library/asn1/types/bitstring.h>
 #include <asn1library/asn1/types/boolean.h>
+#include <asn1library/asn1/types/enumerated.h>
 #include <asn1library/asn1/types/ia5string.h>
 #include <asn1library/asn1/types/integer.h>
 #include <asn1library/asn1/types/real.h>
@@ -87,7 +88,7 @@ void DataTypeTranslatorVisitor::operator()(const BooleanDataType &sedsType)
     const auto &typeName = sedsType.name().value();
 
     auto type = std::make_unique<Asn1Acn::Types::Boolean>(typeName);
-    translateBooleanEncoding(sedsType, type.get());
+    translateBooleanEncoding(sedsType.encoding(), type.get());
 
     auto typeAssignment =
             std::make_unique<Asn1Acn::TypeAssignment>(typeName, typeName, Asn1Acn::SourceLocation(), std::move(type));
@@ -102,7 +103,16 @@ void DataTypeTranslatorVisitor::operator()(const ContainerDataType &sedsType)
 
 void DataTypeTranslatorVisitor::operator()(const EnumeratedDataType &sedsType)
 {
-    qDebug() << "enum";
+    const auto &typeName = sedsType.name().value();
+
+    auto type = std::make_unique<Asn1Acn::Types::Enumerated>(typeName);
+    translateIntegerEncoding(sedsType.encoding(), type.get());
+    translateEnumerationList(sedsType.enumerationList(), type.get());
+
+    auto typeAssignment =
+            std::make_unique<Asn1Acn::TypeAssignment>(typeName, typeName, Asn1Acn::SourceLocation(), std::move(type));
+
+    m_definitions->addType(std::move(typeAssignment));
 }
 
 void DataTypeTranslatorVisitor::operator()(const FloatDataType &sedsType)
@@ -111,7 +121,7 @@ void DataTypeTranslatorVisitor::operator()(const FloatDataType &sedsType)
 
     auto type = std::make_unique<Asn1Acn::Types::Real>(typeName);
     std::visit(FloatRangeTranslatorVisitor { type->constraints() }, sedsType.range());
-    translateFloatEncoding(sedsType, type.get());
+    translateFloatEncoding(sedsType.encoding(), type.get());
 
     auto typeAssignment =
             std::make_unique<Asn1Acn::TypeAssignment>(typeName, typeName, Asn1Acn::SourceLocation(), std::move(type));
@@ -125,7 +135,7 @@ void DataTypeTranslatorVisitor::operator()(const IntegerDataType &sedsType)
 
     auto type = std::make_unique<Asn1Acn::Types::Integer>(typeName);
     std::visit(IntegerRangeTranslatorVisitor { type->constraints() }, sedsType.range());
-    translateIntegerEncoding(sedsType, type.get());
+    translateIntegerEncoding(sedsType.encoding(), type.get());
 
     auto typeAssignment =
             std::make_unique<Asn1Acn::TypeAssignment>(typeName, typeName, Asn1Acn::SourceLocation(), std::move(type));
@@ -139,7 +149,7 @@ void DataTypeTranslatorVisitor::operator()(const StringDataType &sedsType)
 
     auto type = std::make_unique<Asn1Acn::Types::IA5String>(typeName);
     translateStringLength(sedsType, type.get());
-    translateStringEncoding(sedsType, type.get());
+    translateStringEncoding(sedsType.encoding(), type.get());
 
     auto typeAssignment =
             std::make_unique<Asn1Acn::TypeAssignment>(typeName, typeName, Asn1Acn::SourceLocation(), std::move(type));
@@ -153,9 +163,10 @@ void DataTypeTranslatorVisitor::operator()(const seds::model::SubRangeDataType &
 }
 
 void DataTypeTranslatorVisitor::translateIntegerEncoding(
-        const IntegerDataType &sedsType, Asn1Acn::Types::Integer *asn1Type) const
+        const std::optional<seds::model::IntegerDataEncoding> &encoding,
+        Asn1Acn::Types::IntegerAcnParameters *asn1Type) const
 {
-    if (const auto &encoding = sedsType.encoding(); encoding) {
+    if (encoding) {
         // clang-format off
         std::visit(overloaded {
             [&](seds::model::CoreIntegerEncoding coreEncoding) {
@@ -173,9 +184,9 @@ void DataTypeTranslatorVisitor::translateIntegerEncoding(
 }
 
 void DataTypeTranslatorVisitor::translateFloatEncoding(
-        const FloatDataType &sedsType, Asn1Acn::Types::Real *asn1Type) const
+        const std::optional<seds::model::FloatDataEncoding> &encoding, Asn1Acn::Types::Real *asn1Type) const
 {
-    if (const auto &encoding = sedsType.encoding(); encoding) {
+    if (encoding) {
         // clang-format off
         std::visit(overloaded {
             [&](seds::model::CoreEncodingAndPrecision coreEncoding) {
@@ -191,9 +202,9 @@ void DataTypeTranslatorVisitor::translateFloatEncoding(
 }
 
 void DataTypeTranslatorVisitor::translateBooleanEncoding(
-        const BooleanDataType &sedsType, Asn1Acn::Types::Boolean *asn1Type) const
+        const std::optional<seds::model::BooleanDataEncoding> &encoding, Asn1Acn::Types::Boolean *asn1Type) const
 {
-    if (const auto &encoding = sedsType.encoding(); encoding) {
+    if (encoding) {
         translateFalseValue(encoding->falseValue(), asn1Type);
     } else {
         asn1Type->setFalseValue("0");
@@ -201,9 +212,9 @@ void DataTypeTranslatorVisitor::translateBooleanEncoding(
 }
 
 void DataTypeTranslatorVisitor::translateStringEncoding(
-        const StringDataType &sedsType, Asn1Acn::Types::IA5String *asn1Type) const
+        const std::optional<seds::model::StringDataEncoding> &encoding, Asn1Acn::Types::IA5String *asn1Type) const
 {
-    if (const auto &encoding = sedsType.encoding(); encoding) {
+    if (encoding) {
         // clang-format off
         std::visit(overloaded {
             [&](seds::model::CoreStringEncoding coreEncoding) {
@@ -220,52 +231,8 @@ void DataTypeTranslatorVisitor::translateStringEncoding(
     }
 }
 
-void DataTypeTranslatorVisitor::translateBitStringLength(
-        const BinaryDataType &sedsType, Asn1Acn::Types::BitString *asn1Type) const
-{
-    if (sedsType.bits() > std::numeric_limits<Asn1Acn::IntegerValue::Type>::max()) {
-        throw TranslationException("Bit string length size overflows ASN.1 range");
-    }
-
-    auto sizeConstraint = std::make_unique<Asn1Acn::Constraints::SizeConstraint<Asn1Acn::BitStringValue>>();
-
-    if (sedsType.hasFixedSize()) {
-        auto constraint = Asn1Acn::Constraints::RangeConstraint<Asn1Acn::IntegerValue>::create(
-                { static_cast<Asn1Acn::IntegerValue::Type>(sedsType.bits()) });
-        sizeConstraint->setInnerConstraints(std::move(constraint));
-    } else {
-        auto constraint = Asn1Acn::Constraints::RangeConstraint<Asn1Acn::IntegerValue>::create(
-                { 0, static_cast<Asn1Acn::IntegerValue::Type>(sedsType.bits()) });
-        sizeConstraint->setInnerConstraints(std::move(constraint));
-    }
-
-    asn1Type->constraints().append(std::move(sizeConstraint));
-}
-
-void DataTypeTranslatorVisitor::translateStringLength(
-        const StringDataType &sedsType, Asn1Acn::Types::IA5String *asn1Type) const
-{
-    if (sedsType.length() > std::numeric_limits<Asn1Acn::IntegerValue::Type>::max()) {
-        throw TranslationException("String length size overflows ASN.1 range");
-    }
-
-    auto sizeConstraint = std::make_unique<Asn1Acn::Constraints::SizeConstraint<Asn1Acn::StringValue>>();
-
-    if (sedsType.hasFixedLength()) {
-        auto constraint = Asn1Acn::Constraints::RangeConstraint<Asn1Acn::IntegerValue>::create(
-                { static_cast<Asn1Acn::IntegerValue::Type>(sedsType.length()) });
-        sizeConstraint->setInnerConstraints(std::move(constraint));
-    } else {
-        auto constraint = Asn1Acn::Constraints::RangeConstraint<Asn1Acn::IntegerValue>::create(
-                { 0, static_cast<Asn1Acn::IntegerValue::Type>(sedsType.length()) });
-        sizeConstraint->setInnerConstraints(std::move(constraint));
-    }
-
-    asn1Type->constraints().append(std::move(sizeConstraint));
-}
-
 void DataTypeTranslatorVisitor::translateCoreIntegerEncoding(
-        seds::model::CoreIntegerEncoding coreEncoding, Asn1Acn::Types::Integer *asn1Type) const
+        seds::model::CoreIntegerEncoding coreEncoding, Asn1Acn::Types::IntegerAcnParameters *asn1Type) const
 {
     switch (coreEncoding) {
     case seds::model::CoreIntegerEncoding::Unsigned:
@@ -322,6 +289,61 @@ void DataTypeTranslatorVisitor::translateCoreStringEncoding(
     default:
         throw UnhandledValueException("CoreStringEncoding");
         break;
+    }
+}
+
+void DataTypeTranslatorVisitor::translateBitStringLength(
+        const BinaryDataType &sedsType, Asn1Acn::Types::BitString *asn1Type) const
+{
+    if (sedsType.bits() > std::numeric_limits<Asn1Acn::IntegerValue::Type>::max()) {
+        throw TranslationException("Bit string length size overflows ASN.1 range");
+    }
+
+    auto sizeConstraint = std::make_unique<Asn1Acn::Constraints::SizeConstraint<Asn1Acn::BitStringValue>>();
+
+    if (sedsType.hasFixedSize()) {
+        auto constraint = Asn1Acn::Constraints::RangeConstraint<Asn1Acn::IntegerValue>::create(
+                { static_cast<Asn1Acn::IntegerValue::Type>(sedsType.bits()) });
+        sizeConstraint->setInnerConstraints(std::move(constraint));
+    } else {
+        auto constraint = Asn1Acn::Constraints::RangeConstraint<Asn1Acn::IntegerValue>::create(
+                { 0, static_cast<Asn1Acn::IntegerValue::Type>(sedsType.bits()) });
+        sizeConstraint->setInnerConstraints(std::move(constraint));
+    }
+
+    asn1Type->constraints().append(std::move(sizeConstraint));
+}
+
+void DataTypeTranslatorVisitor::translateStringLength(
+        const StringDataType &sedsType, Asn1Acn::Types::IA5String *asn1Type) const
+{
+    if (sedsType.length() > std::numeric_limits<Asn1Acn::IntegerValue::Type>::max()) {
+        throw TranslationException("String length size overflows ASN.1 range");
+    }
+
+    auto sizeConstraint = std::make_unique<Asn1Acn::Constraints::SizeConstraint<Asn1Acn::StringValue>>();
+
+    if (sedsType.hasFixedLength()) {
+        auto constraint = Asn1Acn::Constraints::RangeConstraint<Asn1Acn::IntegerValue>::create(
+                { static_cast<Asn1Acn::IntegerValue::Type>(sedsType.length()) });
+        sizeConstraint->setInnerConstraints(std::move(constraint));
+    } else {
+        auto constraint = Asn1Acn::Constraints::RangeConstraint<Asn1Acn::IntegerValue>::create(
+                { 0, static_cast<Asn1Acn::IntegerValue::Type>(sedsType.length()) });
+        sizeConstraint->setInnerConstraints(std::move(constraint));
+    }
+
+    asn1Type->constraints().append(std::move(sizeConstraint));
+}
+
+void DataTypeTranslatorVisitor::translateEnumerationList(
+        const std::vector<seds::model::ValueEnumeration> &items, Asn1Acn::Types::Enumerated *asn1Type) const
+{
+    for (long index = 0; index < items.size(); ++index) {
+        const auto &item = items[index];
+
+        asn1Type->addItem(
+                Asn1Acn::Types::EnumeratedItem(index, item.label().value(), item.value(), Asn1Acn::SourceLocation()));
     }
 }
 
