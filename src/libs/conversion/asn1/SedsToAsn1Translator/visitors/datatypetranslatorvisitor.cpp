@@ -25,6 +25,7 @@
 #include <QDebug>
 #include <asn1library/asn1/constraints/sizeconstraint.h>
 #include <asn1library/asn1/typeassignment.h>
+#include <asn1library/asn1/types/bitstring.h>
 #include <asn1library/asn1/types/boolean.h>
 #include <asn1library/asn1/types/ia5string.h>
 #include <asn1library/asn1/types/integer.h>
@@ -70,7 +71,15 @@ void DataTypeTranslatorVisitor::operator()(const ArrayDataType &sedsType)
 
 void DataTypeTranslatorVisitor::operator()(const BinaryDataType &sedsType)
 {
-    qDebug() << "binary";
+    const auto &typeName = sedsType.name().value();
+
+    auto type = std::make_unique<Asn1Acn::Types::BitString>(typeName);
+    translateBitStringLength(sedsType, type.get());
+
+    auto typeAssignment =
+            std::make_unique<Asn1Acn::TypeAssignment>(typeName, typeName, Asn1Acn::SourceLocation(), std::move(type));
+
+    m_definitions->addType(std::move(typeAssignment));
 }
 
 void DataTypeTranslatorVisitor::operator()(const BooleanDataType &sedsType)
@@ -209,6 +218,28 @@ void DataTypeTranslatorVisitor::translateStringEncoding(
     } else {
         asn1Type->setEncoding(Asn1Acn::Types::AsciiStringEncoding::unspecified);
     }
+}
+
+void DataTypeTranslatorVisitor::translateBitStringLength(
+        const BinaryDataType &sedsType, Asn1Acn::Types::BitString *asn1Type) const
+{
+    if (sedsType.bits() > std::numeric_limits<Asn1Acn::IntegerValue::Type>::max()) {
+        throw TranslationException("Bit string length size overflows ASN.1 range");
+    }
+
+    auto sizeConstraint = std::make_unique<Asn1Acn::Constraints::SizeConstraint<Asn1Acn::BitStringValue>>();
+
+    if (sedsType.hasFixedSize()) {
+        auto constraint = Asn1Acn::Constraints::RangeConstraint<Asn1Acn::IntegerValue>::create(
+                { static_cast<Asn1Acn::IntegerValue::Type>(sedsType.bits()) });
+        sizeConstraint->setInnerConstraints(std::move(constraint));
+    } else {
+        auto constraint = Asn1Acn::Constraints::RangeConstraint<Asn1Acn::IntegerValue>::create(
+                { 0, static_cast<Asn1Acn::IntegerValue::Type>(sedsType.bits()) });
+        sizeConstraint->setInnerConstraints(std::move(constraint));
+    }
+
+    asn1Type->constraints().append(std::move(sizeConstraint));
 }
 
 void DataTypeTranslatorVisitor::translateStringLength(

@@ -22,6 +22,7 @@
 #include <asn1library/asn1/definitions.h>
 
 namespace Asn1Acn::Types {
+class BitString;
 class Integer;
 class Real;
 class IA5String;
@@ -70,14 +71,16 @@ private:
     auto translateStringEncoding(const seds::model::StringDataType &sedsType, Asn1Acn::Types::IA5String *asn1Type) const
             -> void;
 
-    auto translateStringLength(const seds::model::StringDataType &sedsType, Asn1Acn::Types::IA5String *asn1Type) const
-            -> void;
     auto translateCoreIntegerEncoding(
             seds::model::CoreIntegerEncoding coreEncoding, Asn1Acn::Types::Integer *asn1Type) const -> void;
     auto translateCoreEncodingAndPrecision(
             seds::model::CoreEncodingAndPrecision coreEncoding, Asn1Acn::Types::Real *asn1Type) const -> void;
     auto translateCoreStringEncoding(
             seds::model::CoreStringEncoding coreEncoding, Asn1Acn::Types::IA5String *asn1Type) const -> void;
+    auto translateStringLength(const seds::model::StringDataType &sedsType, Asn1Acn::Types::IA5String *asn1Type) const
+            -> void;
+    auto translateBitStringLength(
+            const seds::model::BinaryDataType &sedsType, Asn1Acn::Types::BitString *asn1Type) const -> void;
     auto translateFalseValue(seds::model::FalseValue falseValue, Asn1Acn::Types::Boolean *asn1Type) const -> void;
 
     auto convertByteOrder(seds::model::ByteOrder sedsByteOrder) const -> Asn1Acn::Types::Endianness;

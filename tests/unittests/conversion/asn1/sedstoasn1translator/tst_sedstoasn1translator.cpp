@@ -22,6 +22,7 @@
 #include <asn1library/asn1/asn1model.h>
 #include <asn1library/asn1/constraints/rangeconstraint.h>
 #include <asn1library/asn1/constraints/sizeconstraint.h>
+#include <asn1library/asn1/types/bitstring.h>
 #include <asn1library/asn1/types/boolean.h>
 #include <asn1library/asn1/types/ia5string.h>
 #include <asn1library/asn1/types/integer.h>
@@ -48,12 +49,14 @@ public:
     virtual ~tst_SedsToAsn1Translator() = default;
 
 private Q_SLOTS:
+    void testTranslateBinaryDataType();
     void testTranslateBooleanDataType();
     void testTranslateIntegerDataType();
     void testTranslateFloatDataType();
     void testTranslateStringDataType();
 
 private:
+    std::unique_ptr<SedsModel> createBitString();
     std::unique_ptr<SedsModel> createBoolean();
     std::unique_ptr<SedsModel> createSignedInteger16();
     std::unique_ptr<SedsModel> createFloat64();
@@ -61,6 +64,49 @@ private:
 
     const Types::Type *getType(const Asn1Model *asn1Model, std::size_t index);
 };
+
+void tst_SedsToAsn1Translator::testTranslateBinaryDataType()
+{
+    const auto sedsModel = createBitString();
+
+    Options options;
+    SedsToAsn1Translator translator;
+
+    const auto resultModel = translator.translateModels({ sedsModel.get() }, options);
+    QVERIFY(resultModel);
+
+    const auto *asn1Model = dynamic_cast<Asn1Model *>(resultModel.get());
+    QVERIFY(asn1Model);
+
+    const auto *type = getType(asn1Model, 0);
+    QVERIFY(type);
+
+    const auto *stringType = dynamic_cast<const Types::BitString *>(type);
+    QVERIFY(stringType);
+
+    QCOMPARE(stringType->identifier(), "Bitstring");
+    QCOMPARE(stringType->typeName(), "BIT STRING");
+
+    const auto &constraints = stringType->constraints().constraints();
+    QCOMPARE(constraints.size(), 1);
+
+    const auto &constraint = constraints[0];
+    QVERIFY(constraint);
+
+    const auto *sizeConstraint = dynamic_cast<Constraints::SizeConstraint<BitStringValue> *>(constraint.get());
+    QVERIFY(sizeConstraint);
+
+    const auto *innerConstraints = sizeConstraint->innerConstraints();
+    QVERIFY(innerConstraints);
+
+    const auto *rangeConstraint = dynamic_cast<const Constraints::RangeConstraint<IntegerValue> *>(innerConstraints);
+    QVERIFY(rangeConstraint);
+
+    const auto &range = rangeConstraint->range();
+    QVERIFY(!range.isSingleItem());
+    QCOMPARE(range.begin(), 0);
+    QCOMPARE(range.end(), 42);
+}
 
 void tst_SedsToAsn1Translator::testTranslateBooleanDataType()
 {
@@ -205,6 +251,22 @@ void tst_SedsToAsn1Translator::testTranslateStringDataType()
     const auto &range = rangeConstraint->range();
     QVERIFY(range.isSingleItem());
     QCOMPARE(range.begin(), 20);
+}
+
+std::unique_ptr<SedsModel> tst_SedsToAsn1Translator::createBitString()
+{
+    BinaryDataType binaryDataType;
+    binaryDataType.setName("Bitstring");
+    binaryDataType.setBits(42);
+    binaryDataType.setFixedSize(false);
+
+    Package package;
+    package.addDataType(std::move(binaryDataType));
+
+    PackageFile packageFile;
+    packageFile.setPackage(std::move(package));
+
+    return std::make_unique<SedsModel>(std::move(packageFile));
 }
 
 std::unique_ptr<SedsModel> tst_SedsToAsn1Translator::createBoolean()
