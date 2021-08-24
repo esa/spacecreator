@@ -18,6 +18,10 @@ if [ -z "${CMAKE_BUILD}" ]; then
     echo "CMAKE_BUILD not defined"
     exit 1
 fi
+if [ -z "${ENV_QT_VERSION}" ]; then
+    echo "ENV_QT_VERSION not defined"
+    exit 1
+fi
 
 mkdir -p ${DOWNLOAD_DIR}
 cd ${DOWNLOAD_DIR}
@@ -34,7 +38,6 @@ mkdir -p build
 cd build
 
 echo "Building Grantlee"
-cmake -DCMAKE_INSTALL_PREFIX=$(qmake -query QT_INSTALL_PREFIX) ${CMAKE_BUILD} ..
+cmake -GNinja -DCMAKE_PREFIX_PATH:STRING=${ENV_QT_BASE_DIR} -DQT_QMAKE_EXECUTABLE:STRING=${ENV_QT_BASE_DIR}/bin/qmake ${CMAKE_BUILD} ..
 cmake --build .
 cmake --build . --target install
-cd ${PROJECT_ROOT}

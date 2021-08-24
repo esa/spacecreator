@@ -14,9 +14,13 @@ if [ -z "${BUILD_DIR}" ]; then
     echo "BUILD_DIR not defined"
     exit 1
 fi
+if [ -z "${PACKAGE_DIR}" ]; then
+    echo "PACKAGE_DIR not defined"
+    exit 1
+fi
 
 # Grab version number(s)
-source ../VERSION
+. ${PROJECT_ROOT}/VERSION
 
 # Detect system architecture to know which binaries of AppImage tools
 # should be downloaded and used.
@@ -60,7 +64,7 @@ fi
 cp ${PROJECT_ROOT}/install/appimage/* ${APP_DIR}
 # Copy space creator
 cp ${BUILD_DIR}/bin/* ${APP_DIR}/bin
-cp ${BUILD_DIR}/lib/x86_64-linux-gnu/qtcreator/plugins/* ${APP_DIR}/lib/qtcreator/plugins
+cp ${BUILD_DIR}/lib/qtcreator/plugins/* ${APP_DIR}/lib/qtcreator/plugins
 cp ${BUILD_DIR}/asn1scc_bin/* ${APP_DIR} -r
 cp ${PROJECT_ROOT}/wizards/files/* ${APP_DIR}/share/qtcreator/templates/wizards/files -r
 cp ${PROJECT_ROOT}/wizards/projects/* ${APP_DIR}/share/qtcreator/templates/wizards/projects -r
@@ -69,6 +73,9 @@ cp ${PROJECT_ROOT}/src/qtcreator/asn1plugin/snippets ${APP_DIR}/share/qtcreator 
 cp ${BUILD_DIR}/grantlee/build/templates/lib/libGrantlee_Templates.* ${APP_DIR}/lib/Qt/lib
 cp ${BUILD_DIR}/grantlee/build/grantlee ${APP_DIR}/lib/Qt/plugins -r
 cp ${ENV_QT_BASE_DIR}/lib/libQt5WebSockets* ${APP_DIR}/lib/Qt/lib -r
+# copy depending library
+cd ${APP_DIR}/lib
+tar xzf ${PROJECT_ROOT}/install/libzxb-util.tar.gz
 
 # Generate AppImage
 echo "Generating the app image"
