@@ -1,3 +1,31 @@
+Release: DVE_09
+========================================================
+* [2c618b0a] [2021-08-11] 621 Fix overlapping messages
+* [7dd3dddf] [2021-08-12] Major msc performance improvement
+* [b028b8d1] [2021-08-16] DVE: Function bindings can be in several partitions, if not in the same node
+* [0c76784f] [2021-08-17] IVE: Long text in nested comments isn't visible in Outer Mini-View
+* [ed943642] [2021-08-17] IVE: Add sub-context menu to build each DV separately
+* [379775ec] [2021-08-16] 562 Fix keeping iv and msc in sync
+* [2cf0db8f] [2021-08-17] 562 Keep IV functions name changes in sync for DV
+* [4dd559e9] [2021-08-17] 562 Keep IV functions deletes in sync for DV
+* [57144b45] [2021-08-17] Resolve "QtC: AppImage can't save files"
+* [73e4eae9] [2021-08-18] 633 Set the version including the patch version number
+* [f6587d77] [2021-08-19] DVE: Default device positions should  be on the left and right only
+* [14c1efad] [2021-08-02] SEDS: Added SedsXmlImporter sources
+* [ed1fff6a] [2021-08-02] SEDS: Added SedsXmlImporter tests
+* [df4f2929] [2021-08-02] SEDS: Formatted sources
+* [7fc889b8] [2021-08-10] SEDS: Removed magic_enum library
+* [fd2b8c6a] [2021-08-10] SEDS: Refactored SEDS directory structure
+* [fbe1efad] [2021-08-19] Fix local test run
+* [5013799a] [2021-08-12] SEDS: Fixed clang-tidy warnings
+* [649681f4] [2021-08-19] Renamed clang-format and clang-tidy files
+* [2bbc2c8c] [2021-08-19] DVE: A message can be bound for one connection only
+* [63195c7c] [2021-08-04] Prepended Asn1Acn plugin path as first to it's test's LD_LIBRARY_PATH
+* [97e5a10c] [2021-08-19] 616 Use lazy loading to enable QtC session usage
+* [0edca334] [2021-08-20] 616 Update DV messages on IV interface changes
+* [92d3db7c] [2021-08-23] DVE: Only one connection can be created between the same devices
+* [3a0a6622] [2021-08-23] 616 Update DV function names in message bindings
+* [e6257789] [2021-08-02] asn1library: Backported ASN.1 model from asn1scc.Fuzzer (part 1)
 
 ========================================================
 Release: DVE_08
