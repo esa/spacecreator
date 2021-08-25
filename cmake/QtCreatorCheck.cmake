@@ -19,10 +19,10 @@ endif()
 
 if(LINUX)
     find_path(QTC_LIB_DIR libExtensionSystem.so
-        "$ENV{QTC_INSTALL}/lib/qtcreator"
         /opt/qt-creator-dev/build-debug/lib/qtcreator
         /usr/lib/x86_64-linux-gnu/qtcreator
-        /usr/lib/aarch64-linux-gnu/qtcreator)
+        /usr/lib/aarch64-linux-gnu/qtcreator
+        "$ENV{QTC_INSTALL}/lib/qtcreator")
 elseif(APPLE)
     find_path(QTC_LIB_DIR libExtensionSystem.dylib
         "$ENV{QTC_INSTALL}/Qt\ Creator.app/Contents/Frameworks")
@@ -33,11 +33,11 @@ endif()
 
 if(LINUX)
     find_path(QTC_PLUGINS_DIR libCore.so
-        "$ENV{QTC_LIB_DIR}/plugins"
-        "$ENV{QTC_INSTALL}/lib/qtcreator/plugins"
         /opt/qt-creator-dev/build-debug/lib/qtcreator/plugins
         /usr/lib/x86_64-linux-gnu/qtcreator/plugins
-        /usr/lib/aarch64-linux-gnu/qtcreator/plugins)
+        /usr/lib/aarch64-linux-gnu/qtcreator/plugins
+        "$ENV{QTC_LIB_DIR}/plugins"
+        "$ENV{QTC_INSTALL}/lib/qtcreator/plugins")
 elseif(APPLE)
     find_path(QTC_PLUGINS_DIR libCore.dylib
         "$ENV{QTC_INSTALL}/Qt\ Creator.app/Contents/PlugIns")
@@ -52,7 +52,7 @@ find_path(QTC_SOURCE_DIR src/libs/extensionsystem/iplugin.h
     "$ENV{QTC_SOURCE}/src/libs/extensionsystem/iplugin.h"
     "${QTC_SOURCE_DIR}/dev"
     /opt/qt-creator-dev/qt-creator
-    "$ENV{HOME}/Qt/qt-creator"
+    "$ENV{QTC_SOURCE}/include/qtcreator"
 )
 
 if (EXISTS ${QTC_SOURCE_DIR} AND EXISTS ${QTC_LIB_DIR})
@@ -79,10 +79,14 @@ if (EXISTS ${QTC_SOURCE_DIR} AND EXISTS ${QTC_LIB_DIR})
     set(appVersionFile "${QTC_SOURCE_DIR}/src/app/app_version.h")
     if (EXISTS ${appVersionFile})
         file(READ ${appVersionFile} FILE_CONTENT)
-        set(_regex "#define IDE_VERSION_DISPLAY_DEF ([0-9.]+)")
+        set(_regex "const char IDE_VERSION_LONG\\[\\] = \"([0-9.]+)\";") # Qt > 4.10
         string(REGEX MATCH "${_regex}" _tmp "${FILE_CONTENT}")
         if (NOT _tmp)
-            message(FATAL_ERROR "Could not detect project version number from ${appVersionFile}")
+            set(_regex "#define IDE_VERSION_DISPLAY_DEF ([0-9.]+)") # QtCreator < 4.11
+            string(REGEX MATCH "${_regex}" _tmp "${FILE_CONTENT}")
+            if (NOT _tmp)
+                message(FATAL_ERROR "Could not detect project version number from ${appVersionFile}")
+            endif()
         endif()
         set(QTC_VERSION_STR "${CMAKE_MATCH_1}")
     endif()
