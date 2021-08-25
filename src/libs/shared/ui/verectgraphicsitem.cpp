@@ -137,7 +137,8 @@ void VERectGraphicsItem::onManualMoveProgress(GripPoint *grip, const QPointF &pr
 
     const QRectF rect = transformedRect(grip, pressedAt, releasedAt);
     if (QGraphicsItem *parentObj = parentItem()) {
-        const QRectF parentRect = parentObj->sceneBoundingRect().marginsRemoved(shared::graphicsviewutils::kContentMargins);
+        const QRectF parentRect =
+                parentObj->sceneBoundingRect().marginsRemoved(shared::graphicsviewutils::kContentMargins);
         if (!shared::graphicsviewutils::isRectBounded(parentRect, rect)) {
             return;
         }
@@ -152,7 +153,8 @@ void VERectGraphicsItem::onManualResizeProgress(GripPoint *grip, const QPointF &
         return;
 
     const QRectF rect = transformedRect(grip, pressedAt, releasedAt);
-    if (shared::graphicsviewutils::isBounded(this, rect)) {
+    if (rect.width() >= minimalSize().width() && rect.height() >= minimalSize().height()
+            && shared::graphicsviewutils::isBounded(this, rect)) {
         setRect(rect);
         const QRectF entityRect = graphicsviewutils::rect(entity()->coordinates());
         const QPointF delta = releasedAt - pressedAt;

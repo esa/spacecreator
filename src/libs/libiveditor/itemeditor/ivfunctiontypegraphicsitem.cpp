@@ -41,6 +41,7 @@
 #include <QGraphicsView>
 #include <QMessageBox>
 #include <QPainter>
+#include <QTextDocument>
 #include <QtDebug>
 
 static const qreal kBorderWidth = 2;
@@ -135,18 +136,16 @@ void IVFunctionTypeGraphicsItem::updateTextPosition()
 {
     const QRectF targetTextRect = boundingRect().marginsRemoved(shared::graphicsviewutils::kTextMargins);
 
+    m_textItem->setExplicitSize(QSizeF());
     m_textItem->setTextWidth(-1);
-    m_textItem->setTextWidth(qMin(targetTextRect.width(), m_textItem->idealWidth()));
-
-    QRectF textRect = m_textItem->boundingRect();
 
     const QSizeF maxTxtSize = targetTextRect.size();
-    const QSizeF txtSize = textRect.size();
+    const QSizeF txtSize = m_textItem->document()->size();
     if (txtSize.width() > maxTxtSize.width() || txtSize.height() > maxTxtSize.height()) {
         m_textItem->setExplicitSize(maxTxtSize);
-        textRect = m_textItem->boundingRect();
     }
 
+    QRectF textRect = m_textItem->boundingRect();
     prepareTextRect(textRect, targetTextRect);
     m_textItem->setPos(textRect.topLeft());
 }
