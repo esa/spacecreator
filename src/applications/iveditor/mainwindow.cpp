@@ -117,6 +117,20 @@ MainWindow::MainWindow(ive::IVEditorCore *core, QWidget *parent)
     connect(core->actionToggleE2EView(), &QAction::toggled, endToEndView, &QWidget::setVisible);
     connect(endToEndView, &EndToEndView::visibleChanged, core->actionToggleE2EView(), &QAction::setChecked);
     endToEndView->setVisible(core->actionToggleE2EView()->isChecked());
+
+    connect(shared::ErrorHub::instance(), &shared::ErrorHub::errorAdded, this, [this](const shared::ErrorItem &error) {
+        switch (error.m_type) {
+        case shared::ErrorItem::TaskType::Error:
+            QMessageBox::critical(this, tr("Error"), shared::ErrorHub::errorDescriptions().join(QLatin1Char('\n')));
+            break;
+        case shared::ErrorItem::TaskType::Warning:
+            QMessageBox::warning(this, tr("Warning"), shared::ErrorHub::errorDescriptions().join(QLatin1Char('\n')));
+            break;
+        default:
+            break;
+        }
+        shared::ErrorHub::clearErrors();
+    });
 }
 
 /*!
@@ -148,11 +162,7 @@ void MainWindow::onOpenFileRequested()
     const QString &fileName = QFileDialog::getOpenFileName(
             this, tr("Open file"), prevPath, m_core->document()->supportedFileExtensions());
     if (!fileName.isEmpty() && closeFile()) {
-        shared::ErrorHub::clearErrors();
         m_core->document()->load(fileName);
-        if (shared::ErrorHub::hasErrors()) {
-            QMessageBox::warning(this, tr("File load warnings"), shared::ErrorHub::errorDescriptions().join("\n"));
-        }
     }
     updateActions();
 }
