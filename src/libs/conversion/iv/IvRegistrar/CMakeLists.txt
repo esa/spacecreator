@@ -11,7 +11,8 @@ target_include_directories(IvRegistrar
     PUBLIC      .
     PRIVATE     ${CMAKE_SOURCE_DIR}/src/libs)
 target_link_libraries(IvRegistrar
-    PUBLIC      Conversion::Common)
+    PUBLIC      Conversion::Common
+                Conversion::IvXmlImporter)
 
 add_format_target(IvRegistrar)
 

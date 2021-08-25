@@ -1,1 +1,2 @@
 add_subdirectory(IvRegistrar)
+add_subdirectory(IvXmlImporter)

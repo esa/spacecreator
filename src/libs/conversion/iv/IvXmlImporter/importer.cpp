@@ -17,25 +17,17 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/lgpl-2.1.html>.
  */
 
-#include "registrar.h"
+#include "importer.h"
 
-#include <conversion/common/modeltype.h>
-#include <conversion/iv/IvXmlImporter/importer.h>
-#include <memory>
+#include <QString>
+#include <conversion/common/exceptions.h>
+#include <conversion/common/import/exceptions.h>
 
-namespace conversion::iv {
+namespace conversion::iv::importer {
 
-using importer::IvXmlImporter;
-
-bool IvRegistrar::registerCapabilities(conversion::Registry &registry)
+std::unique_ptr<conversion::Model> IvXmlImporter::importModel(const Options &options) const
 {
-    auto ivImporter = std::make_unique<IvXmlImporter>();
-    auto result = registry.registerImporter(ModelType::InterfaceView, std::move(ivImporter));
-    if (!result) {
-        return false;
-    }
-
-    return true;
+    return nullptr;
 }
 
-} // namespace conversion::iv
+} // namespace conversion::iv::importer
