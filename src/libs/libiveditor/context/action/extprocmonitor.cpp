@@ -24,6 +24,7 @@
 #include <QDir>
 #include <QLayout>
 #include <QMessageBox>
+#include <QProcessEnvironment>
 #include <QTextBrowser>
 
 namespace ive {
@@ -51,6 +52,19 @@ ExtProcMonitor::ExtProcMonitor(QWidget *parent)
 
     resize(640, 480);
     m_process->setProcessChannelMode(QProcess::MergedChannels);
+
+    QProcessEnvironment env = QProcessEnvironment::systemEnvironment();
+    const QString libPathKey { "LD_LIBRARY_PATH" };
+    const QString userLibPathKey { "_ORIGINAL_LD_LIBRARY_PATH" };
+    if (env.keys().contains(userLibPathKey)) {
+        QString path = env.value(userLibPathKey);
+        if (path.isEmpty()) {
+            env.remove(libPathKey);
+        } else {
+            env.insert(libPathKey, path);
+        }
+        m_process->setProcessEnvironment(env);
+    }
 }
 
 bool ExtProcMonitor::start(const QString &app, const QStringList &args, const QString &workingDir)

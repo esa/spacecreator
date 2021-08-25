@@ -1,5 +1,7 @@
 #!/bin/sh
 
+export _ORIGINAL_LD_LIBRARY_PATH=$LD_LIBRARY_PATH
+
 SELF=$(readlink -f "$0")
 HERE=${SELF%/*}
 export PATH="${HERE}/usr/bin/:${HERE}/usr/sbin/:${HERE}/usr/games/:${HERE}/bin/:${HERE}/sbin/${PATH:+:$PATH}"
@@ -8,7 +10,7 @@ export PYTHONPATH="${HERE}/usr/share/pyshared/${PYTHONPATH:+:$PYTHONPATH}"
 export XDG_DATA_DIRS="${HERE}/usr/share/${XDG_DATA_DIRS:+:$XDG_DATA_DIRS}"
 export PERLLIB="${HERE}/usr/share/perl5/:${HERE}/usr/lib/perl5/${PERLLIB:+:$PERLLIB}"
 export GSETTINGS_SCHEMA_DIR="${HERE}/usr/share/glib-2.0/schemas/${GSETTINGS_SCHEMA_DIR:+:$GSETTINGS_SCHEMA_DIR}"
-export QT_PLUGIN_PATH="${HERE}/usr/lib/qt4/plugins/:${HERE}/usr/lib/i386-linux-gnu/qt4/plugins/:${HERE}/usr/lib/x86_64-linux-gnu/qt4/plugins/:${HERE}/usr/lib32/qt4/plugins/:${HERE}/usr/lib64/qt4/plugins/:${HERE}/usr/lib/qt5/plugins/:${HERE}/usr/lib/i386-linux-gnu/qt5/plugins/:${HERE}/usr/lib/x86_64-linux-gnu/qt5/plugins/:${HERE}/usr/lib32/qt5/plugins/:${HERE}/usr/lib64/qt5/plugins/${QT_PLUGIN_PATH:+:$QT_PLUGIN_PATH}"
+#export QT_PLUGIN_PATH="${HERE}/usr/lib/qt5/plugins/:${HERE}/usr/lib/i386-linux-gnu/qt5/plugins/:${HERE}/usr/lib/x86_64-linux-gnu/qt5/plugins/:${HERE}/usr/lib32/qt5/plugins/:${HERE}/usr/lib64/qt5/plugins/${QT_PLUGIN_PATH:+:$QT_PLUGIN_PATH}"
 
 usage()
 {
@@ -40,14 +42,13 @@ EOF
 
 
 bindir=${HERE}/bin
-libdir=`cd "$bindir/../lib" ; pwd`
+libdir=`cd "${HERE}/lib" ; pwd`
 # Add path to deployed Qt libraries in package
 qtlibdir=$libdir/Qt/lib
 if test -d "$qtlibdir"; then
     qtlibpath=:$qtlibdir
 fi
 # Add Qt Creator library path
-_ORIGINAL_LD_LIBRARY_PATH=$LD_LIBRARY_PATH
 LD_LIBRARY_PATH=$libdir:$libdir/qtcreator$qtlibpath${LD_LIBRARY_PATH:+:$LD_LIBRARY_PATH}
 export LD_LIBRARY_PATH
 
@@ -58,28 +59,28 @@ case $1 in
     exit 1
     ;;
 --aadlconverter)
-    exec "aadlconverter" "$2" "$3" "$4" "$5" "$6" "$7"
+    exec "$bindir/aadlconverter" "$2" "$3" "$4" "$5" "$6" "$7"
     ;;
 --dvconverter)
-    exec "dvconverter" "$2" "$3" "$4" "$5" "$6" "$7"
+    exec "$bindir/dvconverter" "$2" "$3" "$4" "$5" "$6" "$7"
     ;;
 --mscconverter)
-    exec "mscconverter" "$2" "$3" "$4" "$5" "$6" "$7"
+    exec "$bindir/mscconverter" "$2" "$3" "$4" "$5" "$6" "$7"
     ;;
 --mscstreaming)
-    exec "mscstreaming" "$2" "$3" "$4" "$5" "$6" "$7"
+    exec "$bindir/mscstreaming" "$2" "$3" "$4" "$5" "$6" "$7"
     ;;
 --DVeditor)
-    exec "DVeditor" "$2" "$3" "$4" "$5" "$6" "$7"
+    exec "$bindir/DVeditor" "$2" "$3" "$4" "$5" "$6" "$7"
     ;;
 --IVeditor)
-    exec "IVeditor" "$2" "$3" "$4" "$5" "$6" "$7"
+    exec "$bindir/IVeditor" "$2" "$3" "$4" "$5" "$6" "$7"
     ;;
 --MSCeditor)
-    exec "msceditor" "$2" "$3" "$4" "$5" "$6" "$7"
+    exec "$bindir/msceditor" "$2" "$3" "$4" "$5" "$6" "$7"
     ;;
 --version)
-    exec "IVeditor --version"
+    $bindir/IVeditor "--version"
     exec "$bindir/qtcreator" -user-library-path "$_ORIGINAL_LD_LIBRARY_PATH" "--version"
     ;;
 *)
