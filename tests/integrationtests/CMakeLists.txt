@@ -1,2 +1,4 @@
 add_subdirectory(libmsceditor)
-add_subdirectory(seds)
+if (QTC_VERSION EQUAL 48)
+    add_subdirectory(seds)
+endif()

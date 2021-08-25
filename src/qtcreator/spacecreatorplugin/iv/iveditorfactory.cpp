@@ -37,17 +37,15 @@ IVEditorFactory::IVEditorFactory(
     addMimeType(spctr::Constants::IV_MIMETYPE);
 
 #if QTC_VERSION == 415
-    setEditorCreator(std::bind(&IVEditorFactory::createEditor, this));
+    setEditorCreator(std::bind(&IVEditorFactory::createIVEditor, this));
 #endif
     Core::FileIconProvider::registerIconOverlayForSuffix(":/projectexplorer/images/fileoverlay_scxml.png", "xml");
 }
 
-#if QTC_VERSION == 48
-Core::IEditor *IVEditorFactory::createEditor()
+Core::IEditor *IVEditorFactory::createIVEditor()
 {
     return m_editorData->createEditor();
 }
-#endif
 
 IVEditorData *IVEditorFactory::editorData() const
 {

@@ -37,18 +37,16 @@ MscEditorFactory::MscEditorFactory(
     addMimeType(spctr::Constants::MSC_MIMETYPE);
 
 #if QTC_VERSION == 415
-    setEditorCreator(std::bind(&MscEditorFactory::createEditor, this));
+    setEditorCreator(std::bind(&MscEditorFactory::createMSCEditor, this));
 #endif
 
     Core::FileIconProvider::registerIconOverlayForSuffix(":/projectexplorer/images/fileoverlay_scxml.png", "msc");
 }
 
-#if QTC_VERSION == 48
-Core::IEditor *MscEditorFactory::createEditor()
+Core::IEditor *MscEditorFactory::createMSCEditor()
 {
     return m_editorData->createEditor();
 }
-#endif
 
 MscEditorData *MscEditorFactory::editorData() const
 {

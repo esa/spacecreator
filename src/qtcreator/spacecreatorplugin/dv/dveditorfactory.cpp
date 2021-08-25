@@ -35,16 +35,14 @@ DVEditorFactory::DVEditorFactory(
     setDisplayName(QCoreApplication::translate("DV Editor", spctr::Constants::C_DVEDITOR_DISPLAY_NAME));
     addMimeType(spctr::Constants::DV_MIMETYPE);
 #if QTC_VERSION == 415
-    setEditorCreator(std::bind(&DVEditorFactory::createEditor, this));
+    setEditorCreator(std::bind(&DVEditorFactory::createDVEditor, this));
 #endif
     Core::FileIconProvider::registerIconOverlayForSuffix(":/projectexplorer/images/fileoverlay_scxml.png", "xml");
 }
 
-#if QTC_VERSION == 48
-Core::IEditor *spctr::DVEditorFactory::createEditor()
+Core::IEditor *spctr::DVEditorFactory::createDVEditor()
 {
     return m_editorData->createEditor();
 }
-#endif
 
 } // namespace spctr

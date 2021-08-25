@@ -38,8 +38,9 @@ public:
             SpaceCreatorProjectManager *projectManager, const QList<QAction *> &ivActions, QObject *parent);
 
 #if QTC_VERSION == 48
-    Core::IEditor *createEditor() override;
+    Core::IEditor *createEditor() override { return createIVEditor(); };
 #endif
+    Core::IEditor *createIVEditor();
 
     IVEditorData *editorData() const;
 
