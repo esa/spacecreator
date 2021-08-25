@@ -348,43 +348,35 @@ void DVCreatorTool::populateContextMenu_commonEdit(QMenu *menu, const QPointF &s
     if (!partition) {
         return;
     }
-    dvm::DVNode *node = qobject_cast<dvm::DVNode *>(partition->parentObject());
-    if (!node) {
-        return;
-    }
 
     QMenu *bindingMenu = menu->addMenu(tr("Bindings"));
 
-    auto getUnBoundFunctionsEntities = [](dvm::DVNode *node, const QStringList &allFunctions) {
-        QStringList functions;
-        QStringList unBoundFunctions;
-        for (auto partition : node->partitions()) {
-            functions << partition->functionsNames();
+    const QStringList allFunctions = m_sysChecker->functionsNames();
+    const QVector<dvm::DVFunction *> allBoundFunctionsEntities =
+            model()->objectsModel()->allObjectsByType<dvm::DVFunction>();
+    QStringList nonboundFunctions;
+    for (const QString &fnName : qAsConst(allFunctions)) {
+        auto it = std::find_if(allBoundFunctionsEntities.cbegin(), allBoundFunctionsEntities.cend(),
+                [fnName](const dvm::DVFunction *fn) { return fn->title() == fnName; });
+        if (it == allBoundFunctionsEntities.cend()) {
+            nonboundFunctions.append(fnName);
         }
-        for (const QString &fnName : allFunctions) {
-            if (!functions.contains(fnName)) {
-                unBoundFunctions.append(fnName);
-            }
-        }
-        return unBoundFunctions;
-    };
-
-    const QStringList unBoundFunctions = getUnBoundFunctionsEntities(node, m_sysChecker->functionsNames());
+    }
     QAction *action = bindingMenu->addAction(tr("Bind All"));
     QMenu *bindMenu = bindingMenu->addMenu(tr("Bind"));
-    if (unBoundFunctions.isEmpty()) {
+    if (nonboundFunctions.isEmpty()) {
         action->setEnabled(false);
         bindMenu->setEnabled(false);
     } else {
-        connect(action, &QAction::triggered, this, [this, partition, unBoundFunctions, cmdTitle = action->text()]() {
+        connect(action, &QAction::triggered, this, [this, partition, nonboundFunctions, cmdTitle = action->text()]() {
             m_commandsStack->undoStack()->beginMacro(cmdTitle);
-            for (const QString &fn : qAsConst(unBoundFunctions)) {
+            for (const QString &fn : qAsConst(nonboundFunctions)) {
                 auto cmd = new cmd::CmdFunctionBind(partition, fn);
                 m_commandsStack->push(cmd);
             }
             m_commandsStack->undoStack()->endMacro();
         });
-        for (const QString &functionName : qAsConst(unBoundFunctions)) {
+        for (const QString &functionName : qAsConst(nonboundFunctions)) {
             QAction *functionAction = bindMenu->addAction(functionName);
             connect(functionAction, &QAction::triggered, this, [this, partition, functionName]() {
                 auto cmd = new cmd::CmdFunctionBind(partition, functionName);
