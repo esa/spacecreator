@@ -35,6 +35,14 @@ dvm::DVNode *dve::DVNodeGraphicsItem::entity() const
     return m_dataObject.isNull() ? nullptr : m_dataObject->as<dvm::DVNode *>();
 }
 
+void DVNodeGraphicsItem::init()
+{
+    connect(entity(), &dvm::DVNode::attributeChanged, this, [this](const QString &attrName) {
+        if (attrName == dvm::meta::Props::token(dvm::meta::Props::Token::name))
+            update();
+    });
+}
+
 void DVNodeGraphicsItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget)
 {
     Q_UNUSED(option)

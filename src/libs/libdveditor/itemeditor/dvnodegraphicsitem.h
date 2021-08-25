@@ -42,6 +42,7 @@ public:
 
     int type() const override { return Type; }
     int itemLevel(bool isSelected) const override;
+    void init() override;
 
 protected Q_SLOTS:
     void applyColorScheme() override;
