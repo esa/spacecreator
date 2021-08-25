@@ -172,6 +172,53 @@ void ChartVerticalCheck::checkEvent(MscInstanceEvent *event)
     m_processedEvents.insert(event);
 }
 
+/*!
+   Simpler vertical layout of the events in streaming mode
+ */
+void ChartVerticalCheck::checkStreamingVerticalConstraints()
+{
+    if (!m_currentChart || !m_manager) {
+        return;
+    }
+
+    double yPos = 0;
+    for (InstanceItem *item : m_manager->instanceItems()) {
+        if (!item->modelItem()->isCreated()) {
+            yPos = std::max(yPos, item->headerItem()->sceneBoundingRect().bottom() + m_manager->interMessageSpan());
+        }
+    }
+
+    for (MscInstanceEvent *event : m_manager->visibleEvents()) {
+        auto eventItem = qobject_cast<msc::EventItem *>(m_manager->eventItem(event->internalId()));
+        if (!eventItem) {
+            continue;
+        }
+
+        switch (event->entityType()) {
+        case MscEntity::EntityType::Action:
+        case MscEntity::EntityType::Condition:
+        case MscEntity::EntityType::Timer: {
+            eventItem->setY(yPos);
+            yPos = eventItem->sceneBoundingRect().bottom() + m_manager->interMessageSpan();
+            break;
+        }
+        case MscEntity::EntityType::Create:
+        case MscEntity::EntityType::Message: {
+            auto messageItem = static_cast<MessageItem *>(eventItem);
+            messageItem->moveToYPosition(yPos);
+            yPos = eventItem->sceneBoundingRect().bottom() + m_manager->interMessageSpan();
+            break;
+        }
+        case MscEntity::EntityType::Coregion: {
+            // Coregions are not handled in RemoteControlWebServer / RemoteControlHandler
+            break;
+        }
+        default:
+            break;
+        }
+    }
+}
+
 void ChartVerticalCheck::checkMessageHead(MessageItem *messageItem, bool isCrossing)
 {
     if (messageItem->modelItem()->targetInstance()) {

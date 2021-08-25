@@ -113,4 +113,9 @@ bool MscAction::relatesTo(const MscInstance *instance) const
     return m_instance == instance;
 }
 
+QString MscAction::toDbgString() const
+{
+    return QString("%1('%2')").arg(entityTypeName(), m_informalAction);
+}
+
 }

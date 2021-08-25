@@ -102,8 +102,11 @@ void CifBlock::updateHashKey()
         m_linesByType.insert(line->lineType(), line);
     }
 
-    if (!strings.isEmpty())
-        m_hashKey = QCryptographicHash::hash(strings.toUtf8(), QCryptographicHash::Md5);
+    if (!strings.isEmpty()) {
+        m_hashKey = strings.size() < 60
+                ? strings
+                : QCryptographicHash::hash(strings.toUtf8() + "TasteSalt", QCryptographicHash::Md5);
+    }
 }
 
 void CifBlock::addLine(const CifLineShared &line)

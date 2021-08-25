@@ -51,6 +51,8 @@ public:
 
     QString cifText(int tabsSize = 0) const override;
 
+    QString toDbgString() const override;
+
 Q_SIGNALS:
     void textChanged();
     void isGlobalChanged();

@@ -127,6 +127,8 @@ public:
     qreal interMessageSpan() const;
     msc::InteractiveObject *eventItem(const QUuid &id);
 
+    QVector<MscInstanceEvent *> visibleEvents() const;
+
 public Q_SLOTS:
     void updateLayout();
     void doLayout();
@@ -156,7 +158,6 @@ private:
 
     void checkHorizontalConstraints();
     void checkVerticalConstraints();
-    void checkStreamingVerticalConstraints();
     void actualizeInstancesHeights(qreal height) const;
     void updateStoppedInstanceHeight(InstanceItem *instanceItem, qreal totalH) const;
     void updateCreatedInstanceHeight(InstanceItem *instanceItem, qreal totalH) const;
@@ -196,8 +197,6 @@ private:
     void forceCifForAll();
 
     void setInstancesRect(const QRectF &rect);
-
-    QVector<MscInstanceEvent *> visibleEvents() const;
 
     qreal eventsBottom() const;
 };

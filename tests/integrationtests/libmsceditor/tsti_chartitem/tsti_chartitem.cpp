@@ -109,15 +109,19 @@ void tsti_Chartitem::testItemLimit()
     auto instanceB = qobject_cast<msc::MscInstance *>(m_chart->instances().at(1));
     QCOMPARE(m_chart->totalEventNumber(), 3);
     QCOMPARE(m_chartModel->instanceEventItems().size(), 3);
-    InteractiveObject *action0 = m_chartModel->itemForEntity(m_chart->eventsForInstance(instanceA).at(0));
-    QVERIFY(action0 != nullptr);
-    InteractiveObject *action1 = m_chartModel->itemForEntity(m_chart->eventsForInstance(instanceB).at(0));
-    QVERIFY(action1 != nullptr);
-    InteractiveObject *message2 = m_chartModel->itemForEntity(m_chart->eventsForInstance(instanceA).at(1));
-    QVERIFY(message2 != nullptr);
+    InteractiveObject *actionItem0 = m_chartModel->itemForEntity(m_chart->eventsForInstance(instanceA).at(0));
+    QVERIFY(actionItem0 != nullptr);
+    MscEntity *action0 = actionItem0->modelEntity();
+    InteractiveObject *actionItem1 = m_chartModel->itemForEntity(m_chart->eventsForInstance(instanceB).at(0));
+    QVERIFY(actionItem1 != nullptr);
+    MscEntity *action1 = actionItem1->modelEntity();
+    InteractiveObject *messageItem2 = m_chartModel->itemForEntity(m_chart->eventsForInstance(instanceA).at(1));
+    QVERIFY(messageItem2 != nullptr);
+    MscEntity *message2 = messageItem2->modelEntity();
 
     // append one action
-    auto action2 = new msc::MscAction("Action02");
+    auto action2 = new msc::MscAction();
+    action2->setInformalAction("Action03");
     action2->setInstance(instanceA);
     auto addCommand = new cmd::CmdActionItemCreate(action2, instanceA, -1, m_chartModel.data());
     m_undoStack->push(addCommand);
@@ -125,24 +129,27 @@ void tsti_Chartitem::testItemLimit()
     QCOMPARE(m_chart->totalEventNumber(), 4);
     const QVector<InteractiveObject *> &items = m_chartModel->instanceEventItems();
     QCOMPARE(items.size(), 3);
-    QVERIFY(!items.contains(action0)); // action0 is not shown anymore
-    QVERIFY(items.contains(action1));
-    QVERIFY(items.contains(message2));
-    InteractiveObject *action3Item = m_chartModel->itemForEntity(m_chart->eventsForInstance(instanceA).at(1));
-    QVERIFY(action3Item != nullptr);
+    QVERIFY(!m_chartModel->itemForEntity(action0)); // action0 is not shown anymore
+    QVERIFY(m_chartModel->itemForEntity(action1));
+    QVERIFY(m_chartModel->itemForEntity(message2));
+    InteractiveObject *actionItem3 = m_chartModel->itemForEntity(m_chart->eventsForInstance(instanceA).at(1));
+    QVERIFY(actionItem3 != nullptr);
+    MscEntity *action3 = actionItem3->modelEntity();
 
     // append one more action, pushing the message to the top
-    auto action3 = new msc::MscAction("Action03");
-    action3->setInstance(instanceA);
-    addCommand = new cmd::CmdActionItemCreate(action3, instanceA, -1, m_chartModel.data());
+    auto action4 = new msc::MscAction();
+    action4->setInformalAction("Action04");
+    action4->setInstance(instanceA);
+    addCommand = new cmd::CmdActionItemCreate(action4, instanceA, -1, m_chartModel.data());
     m_undoStack->push(addCommand);
     waitForLayoutUpdate();
     QCOMPARE(m_chart->totalEventNumber(), 5);
     QCOMPARE(items.size(), 3);
-    QVERIFY(!items.contains(action0)); // action0 is not shown anymore
-    QVERIFY(!items.contains(action1)); // action1 is not shown anymore
-    QVERIFY(items.contains(message2));
-    QVERIFY(items.contains(action3Item));
+    QVERIFY(!m_chartModel->itemForEntity(action0)); // action0 is not shown anymore
+    QVERIFY(!m_chartModel->itemForEntity(action1)); // action1 is not shown anymore
+    QVERIFY(m_chartModel->itemForEntity(message2));
+    QVERIFY(m_chartModel->itemForEntity(action3));
+    QVERIFY(m_chartModel->itemForEntity(action4));
 }
 
 QTEST_MAIN(tsti_Chartitem)

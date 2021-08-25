@@ -44,6 +44,8 @@ public:
     void checkVerticalConstraints();
     void checkEvent(msc::MscInstanceEvent *event);
 
+    void checkStreamingVerticalConstraints();
+
 private:
     void checkMessageHead(MessageItem *messageItem, bool isCrossing);
     void checkMessageTail(MessageItem *messageItem, bool isCrossing);

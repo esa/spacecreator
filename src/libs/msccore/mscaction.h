@@ -66,6 +66,8 @@ public:
 
     bool relatesTo(const MscInstance *instance) const override;
 
+    QString toDbgString() const override;
+
 Q_SIGNALS:
     void actionTypeChanged();
     void informalActionChanged(const QString &text);

@@ -365,11 +365,7 @@ void ChartLayoutManager::doLayout()
     addInstanceEventItems();
     disconnectItems();
     checkHorizontalConstraints();
-    if (isStreamingModeEnabled()) {
-        checkStreamingVerticalConstraints();
-    } else {
-        checkVerticalConstraints();
-    }
+    checkVerticalConstraints();
 
     qreal lastY = eventsBottom();
     actualizeInstancesHeights(lastY + d->interMessageSpan());
@@ -859,53 +855,10 @@ void ChartLayoutManager::checkVerticalConstraints()
     }
 
     d->m_verticalCheck.reset(this, d->m_currentChart);
-    d->m_verticalCheck.checkVerticalConstraints();
-}
-
-/*!
-   Simpler vertical layout of the events in streaming mode
- */
-void ChartLayoutManager::checkStreamingVerticalConstraints()
-{
-    if (!d->m_currentChart) {
-        return;
-    }
-
-    double yPos = 0;
-    for (InstanceItem *item : d->m_instanceItems) {
-        if (!item->modelItem()->isCreated()) {
-            yPos = std::max(yPos, item->headerItem()->sceneBoundingRect().bottom() + d->interMessageSpan());
-        }
-    }
-
-    for (MscInstanceEvent *event : visibleEvents()) {
-        auto eventItem = qobject_cast<msc::EventItem *>(d->m_instanceEventItems.value(event->internalId()));
-        if (!eventItem) {
-            continue;
-        }
-
-        switch (event->entityType()) {
-        case MscEntity::EntityType::Action:
-        case MscEntity::EntityType::Condition:
-        case MscEntity::EntityType::Timer: {
-            eventItem->setY(yPos);
-            yPos = eventItem->sceneBoundingRect().bottom() + d->interMessageSpan();
-            break;
-        }
-        case MscEntity::EntityType::Create:
-        case MscEntity::EntityType::Message: {
-            auto messageItem = static_cast<MessageItem *>(eventItem);
-            messageItem->moveToYPosition(yPos);
-            yPos = eventItem->sceneBoundingRect().bottom() + d->interMessageSpan();
-            break;
-        }
-        case MscEntity::EntityType::Coregion: {
-            // Coregions are not handled in RemoteControlWebServer / RemoteControlHandler
-            break;
-        }
-        default:
-            break;
-        }
+    if (isStreamingModeEnabled()) {
+        d->m_verticalCheck.checkStreamingVerticalConstraints();
+    } else {
+        d->m_verticalCheck.checkVerticalConstraints();
     }
 }
 

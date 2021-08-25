@@ -119,6 +119,11 @@ QString MscComment::cifText(int tabsSize) const
     return cifTexts.join("\n");
 }
 
+QString MscComment::toDbgString() const
+{
+    return QString("%1('%2')").arg(entityTypeName(), m_text);
+}
+
 void MscComment::updateCifComment()
 {
     cif::CifBlockShared cifBlock = cifBlockByType(mainCifType());
