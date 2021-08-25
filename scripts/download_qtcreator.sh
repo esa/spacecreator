@@ -18,13 +18,24 @@ if [ -z "${ENV_QT_VERSION}" ]; then
     echo "ENV_QT_VERSION not defined"
     exit 1
 fi
+if [ -z "${ENV_QT_BASE_DIR}" ]; then
+    echo "ENV_QT_BASE_DIR not defined"
+    exit 1
+fi
+if [ -z "${QTC_SOURCE}" ]; then
+    echo "QTC_SOURCE not defined"
+    exit 1
+fi
+if [ -z "${QTC_INSTALL}" ]; then
+    echo "QTC_INSTALL not defined"
+    exit 1
+fi
 
 
 mkdir -p "${DOWNLOAD_DIR}"
 cd "${DOWNLOAD_DIR}"
 
 # grab the source
-export QTC_SOURCE=${DOWNLOAD_DIR}/qt-creator
 export QTC_SOURCE_FILE=qt-creator-opensource-src-${ENV_QTC_VERSION}.tar.gz
 if [ ! -f "${QTC_SOURCE_FILE}" ]; then
     echo "Downloading ${QTC_SOURCE_FILE}"
@@ -43,7 +54,6 @@ else
 fi
 
 # gab the binary
-export QTC_INSTALL=${DOWNLOAD_DIR}/spacecreator.AppDir
 export QTC_BINARY_FILE=qtcreator-${ENV_QTC_VERSION}.7z
 if [ ! -f "${QTC_BINARY_FILE}" ]; then
     echo "Downloading ${QTC_BINARY_FILE}"
