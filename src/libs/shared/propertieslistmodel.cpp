@@ -194,7 +194,7 @@ void PropertiesListModel::updateRows(const QList<shared::PropertyTemplate *> &te
 
 void PropertiesListModel::setDataObject(VEObject *obj)
 {
-    clear();
+    removeRows(0, rowCount());
     m_names.clear();
 
     if (m_dataObject) {
