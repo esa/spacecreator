@@ -19,39 +19,19 @@
 
 #pragma once
 
-class QString;
+#include <conversion/common/registrar.h>
 
-#include <set>
+namespace conversion::iv {
 
-namespace conversion {
-
-/**
- * @brief   All model types supported in conversion
- */
-enum class ModelType
+class IvRegistrar final : public Registrar
 {
-    Asn1,
-    Aadl,
-    InterfaceView,
-    Sdl,
-    Seds
+public:
+    /**
+     * @brief   Register InterfaceView conversion capabilties
+     *
+     * @param   registry    Registry to use
+     */
+    [[nodiscard]] virtual auto registerCapabilities(conversion::Registry &registry) -> bool override;
 };
 
-/**
- * @brief   Converts given model type to string
- *
- * @param   modelType   Model type to convert
- *
- * @param   String with model type name
- */
-auto modelTypeToString(ModelType modelType) -> QString;
-/**
- * @brief   Converts given set of model types to string
- *
- * @param   sourceModelsTypes       Set of model types
- *
- * @return  String with model types names separated with comma
- */
-auto modelTypesToString(const std::set<ModelType> &modelsTypes) -> QString;
-
-} // namespace conversion
+} // namespace conversion::iv
