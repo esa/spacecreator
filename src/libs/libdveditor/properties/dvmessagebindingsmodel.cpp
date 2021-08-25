@@ -110,7 +110,7 @@ QVariant DVMessageBindingsModel::data(const QModelIndex &index, int role) const
                                 .arg(item.m_fromFunction, item.m_fromInterface, item.m_toFunction, item.m_toInterface));
     }
     case Qt::ForegroundRole:
-        return isEditable(index) ? QVariant::fromValue(QColor(Qt::gray)) : QVariant();
+        return isEditable(index) ? QVariant() : QVariant::fromValue(QColor(Qt::gray));
     case Qt::CheckStateRole:
         return m_connection->hasMessage(
                        item.m_fromFunction, item.m_fromInterface, item.m_toFunction, item.m_toInterface)
