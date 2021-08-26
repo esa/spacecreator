@@ -17,33 +17,34 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/lgpl-2.1.html>.
  */
 
-#include "registrar.h"
+#pragma once
 
-#include <conversion/common/modeltype.h>
-#include <conversion/iv/IvXmlExporter/exporter.h>
-#include <conversion/iv/IvXmlImporter/importer.h>
+#include <QString>
+#include <conversion/common/export/modelexporter.h>
 #include <memory>
 
-namespace conversion::iv {
+namespace conversion {
+class Model;
+class Options;
+} // namespace conversion
 
-using exporter::IvXmlExporter;
-using importer::IvXmlImporter;
+namespace conversion::iv::exporter {
 
-bool IvRegistrar::registerCapabilities(conversion::Registry &registry)
+/**
+ * @brief   Exporter that outputs IV XML files
+ */
+class IvXmlExporter final : public conversion::exporter::ModelExporter
 {
-    auto ivImporter = std::make_unique<IvXmlImporter>();
-    auto result = registry.registerImporter(ModelType::InterfaceView, std::move(ivImporter));
-    if (!result) {
-        return false;
-    }
+public:
+    /**
+     * @brief   Creates a IV XML file from the passed model
+     *
+     * @param   model       Model to export
+     * @param   options     List of options
+     *
+     * @throws  conversion::exporter::ExportException
+     */
+    virtual auto exportModel(const conversion::Model *model, const conversion::Options &options) const -> void override;
+};
 
-    auto ivExporter = std::make_unique<IvXmlExporter>();
-    result = registry.registerExporter(ModelType::InterfaceView, std::move(ivExporter));
-    if (!result) {
-        return false;
-    }
-
-    return true;
-}
-
-} // namespace conversion::iv
+} // namespace conversion::iv::exporter
