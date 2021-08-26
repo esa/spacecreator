@@ -17,18 +17,18 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/lgpl-2.1.html>.
  */
 
-#include "importer.h"
+#pragma once
 
-#include <QString>
-#include <conversion/common/exceptions.h>
-#include <conversion/common/import/exceptions.h>
-#include <conversion/iv/IvOptions/options.h>
+namespace conversion::iv {
 
-namespace conversion::iv::importer {
-
-std::unique_ptr<conversion::Model> IvXmlImporter::importModel(const Options &options) const
+/**
+ * @brief   Possible options for IV conversion
+ */
+class IvOptions
 {
-    return nullptr;
-}
+public:
+    /** @brief File to import */
+    inline static const QString inputFile = "Iv_Import_InputFile";
+};
 
-} // namespace conversion::iv::importer
+} // namespace conversion::seds
