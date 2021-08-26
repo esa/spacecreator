@@ -1,3 +1,4 @@
+add_subdirectory(ivxmlexporter)
 add_subdirectory(ivxmlimporter)
 add_subdirectory(libmsceditor)
 add_subdirectory(sedsxmlimporter)
