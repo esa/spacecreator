@@ -22,17 +22,46 @@
 #include <QString>
 #include <conversion/common/exceptions.h>
 #include <conversion/common/import/exceptions.h>
+#include <conversion/common/model.h>
+#include <conversion/common/options.h>
 #include <conversion/iv/IvOptions/options.h>
+#include <ivcore/ivlibrary.h>
+#include <ivcore/ivmodel.h>
 #include <ivcore/ivxmlreader.h>
+#include <ivpropertytemplateconfig.h>
 
 using conversion::Options;
 using conversion::importer::ImportException;
 using conversion::iv::IvOptions;
+using ivm::IVModel;
+using ivm::IVPropertyTemplateConfig;
 using ivm::IVXMLReader;
 
 namespace conversion::iv::importer {
 
 std::unique_ptr<conversion::Model> IvXmlImporter::importModel(const Options &options) const
+{
+    ivm::initIVLibrary();
+
+    auto config = initConfig(options);
+
+    return parse(options, config);
+}
+
+IVPropertyTemplateConfig *IvXmlImporter::initConfig(const Options &options) const
+{
+    const auto configFilename = options.value(IvOptions::configFile);
+    if (!configFilename) {
+        throw ImportException("Configuration file wasn't specified");
+    }
+
+    auto conf = IVPropertyTemplateConfig::instance();
+    conf->init(*configFilename);
+
+    return conf;
+}
+
+std::unique_ptr<conversion::Model> IvXmlImporter::parse(const Options &options, IVPropertyTemplateConfig *config) const
 {
     const auto inputFilename = options.value(IvOptions::inputFile);
     if (!inputFilename) {
@@ -46,7 +75,10 @@ std::unique_ptr<conversion::Model> IvXmlImporter::importModel(const Options &opt
         throw ImportException(message);
     }
 
-    return nullptr;
+    auto model = std::make_unique<IVModel>(config);
+    model->initFromObjects(parser.parsedObjects());
+
+    return model;
 }
 
 } // namespace conversion::iv::importer

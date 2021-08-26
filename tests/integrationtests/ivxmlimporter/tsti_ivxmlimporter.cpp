@@ -24,10 +24,12 @@
 #include <conversion/common/options.h>
 #include <conversion/iv/IvOptions/options.h>
 #include <conversion/iv/IvXmlImporter/importer.h>
+#include <ivcore/ivmodel.h>
 
 using conversion::Options;
 using conversion::iv::IvOptions;
 using conversion::iv::importer::IvXmlImporter;
+using ivm::IVModel;
 
 namespace iv::test {
 
@@ -46,11 +48,15 @@ void tsti_IvXmlImporter::testValid()
 {
     Options options;
     options.add(IvOptions::inputFile, "interfaceview.xml");
+    options.add(IvOptions::configFile, "config.xml");
 
     IvXmlImporter ivImporter;
 
     try {
         const auto model = ivImporter.importModel(options);
+        const auto *ivModel = dynamic_cast<IVModel *>(model.get());
+
+        QCOMPARE(ivModel->objects().size(), 8);
     } catch (const std::exception &ex) {
         QFAIL(ex.what());
     }

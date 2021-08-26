@@ -26,6 +26,8 @@
 #include <algorithm>
 #include <conversion/common/exceptions.h>
 #include <conversion/common/import/exceptions.h>
+#include <conversion/common/model.h>
+#include <conversion/common/options.h>
 #include <conversion/seds/SedsOptions/options.h>
 #include <seds/SedsXmlParser/parser.h>
 #include <seds/XmlPreprocessor/preprocessor.h>

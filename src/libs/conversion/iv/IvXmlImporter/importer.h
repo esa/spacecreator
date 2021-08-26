@@ -21,10 +21,16 @@
 
 #include <QString>
 #include <conversion/common/import/modelimporter.h>
-#include <conversion/common/model.h>
-#include <conversion/common/options.h>
 #include <memory>
-#include <optional>
+
+namespace ivm {
+class IVPropertyTemplateConfig;
+} // namespace ivm
+
+namespace conversion {
+class Model;
+class Options;
+} // namespace conversion
 
 namespace conversion::iv::importer {
 
@@ -35,19 +41,35 @@ class IvXmlImporter final : public conversion::importer::ModelImporter
 {
 public:
     /**
-     * @brief   Read given SEDS file and produce SEDS model
+     * @brief   Reads given IV XML file and produces InterfaceView model
      *
      * @param   options     List of options
      *
-     * @throws  conversion::importer::FileNotFound
-     * @throws  seds::symbolreader::SymbolDefinitionReaderException
-     * @throws  seds::preprocessor::XmlPreprocessorException
-     * @throws  seds::preprocessor::UndefinedExternalReference
-     * @throws  seds::validator::ValidatorException
+     * @throws  conversion::importer::ImportException
      *
-     * @return  Imported SEDS model
+     * @return  Imported InterfaceView model
      */
     virtual auto importModel(const conversion::Options &options) const -> std::unique_ptr<conversion::Model> override;
+
+private:
+    /**
+     * @brief   Initiatlizes config for IV parser
+     *
+     * @param   options     List of options
+     *
+     * @return  IV parser config
+     */
+    auto initConfig(const conversion::Options &options) const -> ivm::IVPropertyTemplateConfig *;
+    /**
+     * @brief   Use IV parser to parse input xml file
+     *
+     * @param   options     List of options
+     * @param   config      IV parser config
+     *
+     * @return  IV model
+     */
+    auto parse(const conversion::Options &options, ivm::IVPropertyTemplateConfig *config) const
+            -> std::unique_ptr<conversion::Model>;
 };
 
 } // namespace conversion::iv::importer

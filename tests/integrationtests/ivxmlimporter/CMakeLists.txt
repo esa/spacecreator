@@ -15,6 +15,7 @@ target_link_libraries(${TEST_NAME}
                 Qt5::Core
                 Qt5::Test)
 
+configure_file(resources/config.xml config.xml COPYONLY)
 configure_file(resources/interfaceview.xml interfaceview.xml COPYONLY)
 
 add_format_target(${TEST_NAME})
