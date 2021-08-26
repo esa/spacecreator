@@ -1,0 +1,48 @@
+<InterfaceView asn1file="ivtest.asn">
+<Function name="Pinger" is_type="NO" language="SDL">
+    <Property name="Taste::coordinates" value="15200 21200 35200 29200"/>
+    <ContextParameter name="pinger_val" type="MyInteger" value="314"/>
+<Provided_Interface name="PI_pong" kind="Sporadic">
+    <Property name="Taste::coordinates" value="35200 28400"/>
+    <Property name="Taste::InnerCoordinates" value="0 0"/>
+</Provided_Interface>
+
+<Required_Interface name="PI_ping" kind="Sporadic">
+    <Property name="Taste::coordinates" value="35200 23300"/>
+    <Property name="Taste::InnerCoordinates" value="0 0"/>
+    <Property name="Taste::InheritPI" value="true"/>
+    <Property name="Taste::Autonamed" value="true"/>
+</Required_Interface>
+
+</Function>
+
+<Function name="Ponger" is_type="NO" language="SDL">
+    <Property name="Taste::coordinates" value="53600 18200 75500 31600"/>
+    <ContextParameter name="ponger_val" type="MyInteger" value="42"/>
+<Provided_Interface name="PI_ping" kind="Sporadic">
+    <Property name="Taste::coordinates" value="53600 23300"/>
+    <Property name="Taste::InnerCoordinates" value="0 0"/>
+</Provided_Interface>
+
+<Required_Interface name="PI_pong" kind="Sporadic">
+    <Property name="Taste::coordinates" value="53600 28400"/>
+    <Property name="Taste::InnerCoordinates" value="0 0"/>
+    <Property name="Taste::InheritPI" value="true"/>
+    <Property name="Taste::Autonamed" value="true"/>
+</Required_Interface>
+
+</Function>
+
+<Connection >
+    <Source func_name="Ponger" ri_name="PI_pong"/>
+    <Target func_name="Pinger" pi_name="PI_pong"/>
+    <Property name="Taste::coordinates" value="53000 28400 35500 28400"/>
+</Connection>
+
+<Connection >
+    <Source func_name="Pinger" ri_name="PI_ping"/>
+    <Target func_name="Ponger" pi_name="PI_ping"/>
+    <Property name="Taste::coordinates" value="35800 23300 53300 23300"/>
+</Connection>
+
+</InterfaceView>

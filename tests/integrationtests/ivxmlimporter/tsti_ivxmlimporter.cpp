@@ -17,36 +17,47 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/lgpl-2.1.html>.
  */
 
-#include "importer.h"
-
-#include <QString>
-#include <conversion/common/exceptions.h>
+#include <QFileInfo>
+#include <QObject>
+#include <QtTest>
 #include <conversion/common/import/exceptions.h>
+#include <conversion/common/options.h>
 #include <conversion/iv/IvOptions/options.h>
-#include <ivcore/ivxmlreader.h>
+#include <conversion/iv/IvXmlImporter/importer.h>
 
 using conversion::Options;
-using conversion::importer::ImportException;
 using conversion::iv::IvOptions;
-using ivm::IVXMLReader;
+using conversion::iv::importer::IvXmlImporter;
 
-namespace conversion::iv::importer {
+namespace iv::test {
 
-std::unique_ptr<conversion::Model> IvXmlImporter::importModel(const Options &options) const
+class tsti_IvXmlImporter : public QObject
 {
-    const auto inputFilename = options.value(IvOptions::inputFile);
-    if (!inputFilename) {
-        throw ImportException("File to import wasn't specified");
+    Q_OBJECT
+
+public:
+    virtual ~tsti_IvXmlImporter() = default;
+
+private Q_SLOTS:
+    void testValid();
+};
+
+void tsti_IvXmlImporter::testValid()
+{
+    Options options;
+    options.add(IvOptions::inputFile, "interfaceview.xml");
+
+    IvXmlImporter ivImporter;
+
+    try {
+        const auto model = ivImporter.importModel(options);
+    } catch (const std::exception &ex) {
+        QFAIL(ex.what());
     }
-
-    IVXMLReader parser;
-
-    if (!parser.readFile(*inputFilename)) {
-        const auto message = parser.errorString();
-        throw ImportException(message);
-    }
-
-    return nullptr;
 }
 
-} // namespace conversion::iv::importer
+} // namespace iv::test
+
+QTEST_MAIN(iv::test::tsti_IvXmlImporter)
+
+#include "tsti_ivxmlimporter.moc"
