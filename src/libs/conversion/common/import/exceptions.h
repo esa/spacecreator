@@ -29,6 +29,11 @@ namespace conversion::importer {
 class ImportException : public ConversionException
 {
 public:
+    /**
+     * @brief   Constructor
+     *
+     * @param   message     Error message
+     */
     explicit ImportException(QString message);
 };
 

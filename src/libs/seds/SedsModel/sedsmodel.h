@@ -26,6 +26,11 @@
 
 namespace seds::model {
 
+/**
+ * @brief   Represents a SEDS model.
+ *
+ * Stores either a PackageFile or a DataSheet.
+ */
 class SedsModel final : public conversion::Model
 {
 public:

@@ -23,6 +23,9 @@
 
 namespace conversion::seds {
 
+/**
+ * @brief   Registers conversion capabilities for SEDS model
+ */
 class SedsRegistrar final : public Registrar
 {
 public:
