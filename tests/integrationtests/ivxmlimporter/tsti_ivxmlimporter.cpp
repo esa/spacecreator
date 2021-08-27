@@ -45,8 +45,8 @@ private Q_SLOTS:
 void tsti_IvXmlImporter::testValid()
 {
     Options options;
-    options.add(IvOptions::inputFile, "interfaceview.xml");
-    options.add(IvOptions::configFile, "config.xml");
+    options.add(IvOptions::inputFilename, "interfaceview.xml");
+    options.add(IvOptions::configFilename, "config.xml");
 
     IvXmlImporter ivImporter;
 

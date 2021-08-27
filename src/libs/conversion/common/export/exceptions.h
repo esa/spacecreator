@@ -20,6 +20,7 @@
 #pragma once
 
 #include "../exceptions.h"
+#include "modeltype.h"
 
 namespace conversion::exporter {
 
@@ -29,7 +30,26 @@ namespace conversion::exporter {
 class ExportException : public ConversionException
 {
 public:
+    /**
+     * @brief   Constructor
+     *
+     * @param   message     Error message
+     */
     explicit ExportException(QString message);
+};
+
+/**
+ * @brief   Exception thrown when exporters gets incorrect model
+ */
+class IncorrectModelException : public ExportException
+{
+public:
+    /**
+     * @brief   Constructor
+     *
+     * @param   expectedModelType   Expected model type
+     */
+    explicit IncorrectModelException(ModelType expectedModelType);
 };
 
 } // namespace conversion::exporter

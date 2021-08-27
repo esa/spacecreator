@@ -27,8 +27,8 @@
 #include <conversion/iv/IvOptions/options.h>
 #include <ivcore/ivlibrary.h>
 #include <ivcore/ivmodel.h>
+#include <ivcore/ivpropertytemplateconfig.h>
 #include <ivcore/ivxmlreader.h>
-#include <ivpropertytemplateconfig.h>
 
 using conversion::Options;
 using conversion::importer::ImportException;
@@ -50,7 +50,7 @@ std::unique_ptr<conversion::Model> IvXmlImporter::importModel(const Options &opt
 
 IVPropertyTemplateConfig *IvXmlImporter::initConfig(const Options &options) const
 {
-    const auto configFilename = options.value(IvOptions::configFile);
+    const auto configFilename = options.value(IvOptions::configFilename);
     if (!configFilename) {
         throw ImportException("Configuration file wasn't specified");
     }
@@ -63,7 +63,7 @@ IVPropertyTemplateConfig *IvXmlImporter::initConfig(const Options &options) cons
 
 std::unique_ptr<conversion::Model> IvXmlImporter::parse(const Options &options, IVPropertyTemplateConfig *config) const
 {
-    const auto inputFilename = options.value(IvOptions::inputFile);
+    const auto inputFilename = options.value(IvOptions::inputFilename);
     if (!inputFilename) {
         throw ImportException("File to import wasn't specified");
     }

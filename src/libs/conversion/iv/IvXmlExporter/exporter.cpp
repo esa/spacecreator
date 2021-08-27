@@ -19,16 +19,53 @@
 
 #include "exporter.h"
 
+#include <QBuffer>
+#include <QSaveFile>
 #include <QString>
 #include <conversion/common/export/exceptions.h>
 #include <conversion/common/model.h>
+#include <conversion/common/modeltype.h>
 #include <conversion/common/options.h>
+#include <conversion/iv/IvOptions/options.h>
+#include <ivcore/ivmodel.h>
+#include <libiveditor/ivexporter.h>
 
 using conversion::Options;
 using conversion::exporter::ExportException;
+using conversion::exporter::IncorrectModelException;
+using conversion::iv::IvOptions;
+using ive::IVExporter;
+using ivm::IVModel;
 
 namespace conversion::iv::exporter {
 
-void IvXmlExporter::exportModel(const Model *model, const Options &options) const {}
+void IvXmlExporter::exportModel(const Model *model, const Options &options) const
+{
+    if (model == nullptr) {
+        throw ExportException("Model to export is null");
+    }
+
+    const auto *ivModel = dynamic_cast<const IVModel *>(model);
+    if (ivModel == nullptr) {
+        throw IncorrectModelException(ModelType::InterfaceView);
+    }
+
+    const auto outputFilename = options.value(IvOptions::outputFilename);
+    if (!outputFilename) {
+        throw ExportException("Output filename wasn't specified");
+    }
+
+    QByteArray modelData;
+    QBuffer modelDataBuffer(&modelData);
+    modelDataBuffer.open(QIODevice::WriteOnly);
+
+    IVExporter exporter;
+    exporter.exportObjects(ivModel->objects().values(), &modelDataBuffer);
+
+    QSaveFile outputFile(*outputFilename);
+    outputFile.open(QIODevice::WriteOnly);
+    outputFile.write(modelData);
+    outputFile.commit();
+}
 
 } // namespace conversion::iv::exporter
