@@ -19,10 +19,8 @@ add_subdirectory(dvcore)
 add_subdirectory(libdveditor)
 
 # conversion
-if (QTC_VERSION EQUAL 48)
-    add_subdirectory(conversion)
-    add_subdirectory(seds)
-endif()
+add_subdirectory(conversion)
+add_subdirectory(seds)
 
 # Total SpaceCreator system
 add_subdirectory(spacecreatorsystem)
