@@ -19,16 +19,24 @@
 
 #include <QFileInfo>
 #include <QObject>
+#include <QUuid>
 #include <QtTest>
 #include <conversion/common/export/exceptions.h>
 #include <conversion/common/options.h>
 #include <conversion/iv/IvOptions/options.h>
 #include <conversion/iv/IvXmlExporter/exporter.h>
+#include <ivcore/ivfunction.h>
+#include <ivcore/ivlibrary.h>
 #include <ivcore/ivmodel.h>
+#include <ivcore/ivpropertytemplateconfig.h>
+#include <libiveditor/iveditor.h>
+#include <memory>
 
 using conversion::Options;
+using conversion::iv::IvOptions;
 using conversion::iv::exporter::IvXmlExporter;
 using ivm::IVModel;
+using ivm::IVPropertyTemplateConfig;
 
 namespace iv::test {
 
@@ -40,20 +48,49 @@ public:
     virtual ~tsti_IvXmlExporter() = default;
 
 private Q_SLOTS:
+    void initTestCase();
+    void cleanup();
     void testValid();
+
+private:
+    IVPropertyTemplateConfig *m_config;
 };
+
+void tsti_IvXmlExporter::initTestCase()
+{
+    ivm::initIVLibrary();
+    ive::initIVEditor();
+    m_config = IVPropertyTemplateConfig::instance();
+    m_config->init("config.xml");
+}
+
+void tsti_IvXmlExporter::cleanup()
+{
+    QFile file("output.xml");
+    file.remove();
+}
 
 void tsti_IvXmlExporter::testValid()
 {
+    QFileInfo outputFileInfo("output.xml");
+    QVERIFY(!outputFileInfo.exists());
+
+    auto *function = new ivm::IVFunction(nullptr, QUuid::createUuid());
+    IVModel model(m_config);
+    model.addObject(function);
+
     Options options;
+    options.add(IvOptions::outputFilename, "output.xml");
 
     IvXmlExporter ivExporter;
 
     try {
-        ivExporter.exportModel(nullptr, options);
+        ivExporter.exportModel(&model, options);
     } catch (const std::exception &ex) {
         QFAIL(ex.what());
     }
+
+    QVERIFY(outputFileInfo.exists());
 }
 
 } // namespace iv::test

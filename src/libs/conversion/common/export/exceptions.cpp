@@ -26,4 +26,9 @@ ExportException::ExportException(QString message)
 {
 }
 
+IncorrectModelException::IncorrectModelException(ModelType expectedModelType)
+    : ExportException(QString("Incorrect model passed, expected %1 model").arg(modelTypeToString(expectedModelType)))
+{
+}
+
 } // namespace conversion::exporter

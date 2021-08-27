@@ -28,9 +28,11 @@ class IvOptions
 {
 public:
     /** @brief File to import */
-    inline static const QString inputFile = "Iv_Import_InputFile";
+    inline static const QString inputFilename = "Iv_Import_InputFilename";
     /** @brief IV parser file */
-    inline static const QString configFile = "Iv_Import_ConfigFile";
+    inline static const QString configFilename = "Iv_Import_ConfigFilename";
+    /** @biref Export output file */
+    inline static const QString outputFilename = "Iv_Export_OutputFilename";
 };
 
 } // namespace conversion::seds

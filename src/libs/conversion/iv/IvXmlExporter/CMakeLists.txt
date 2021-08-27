@@ -12,6 +12,7 @@ target_include_directories(IvXmlExporter
     PRIVATE     ${CMAKE_SOURCE_DIR}/src/libs)
 target_link_libraries(IvXmlExporter
     PRIVATE     ivcore
+                libiveditor
     PUBLIC      Conversion::Common)
 
 add_format_target(IvXmlExporter)
