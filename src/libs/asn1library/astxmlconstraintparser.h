@@ -100,7 +100,7 @@ template<typename T>
 bool AstXmlConstraintParser<T>::parse()
 {
     while (m_xmlReader.readNextStartElement()) {
-        if (m_xmlReader.name() == QLatin1Literal("Constraints"))
+        if (m_xmlReader.name() == QStringLiteral("Constraints"))
             return parse();
         AstXmlConstraintNodeParser<T> nodeParser(m_xmlReader);
         if (!nodeParser.parseNextSubNode())
@@ -136,15 +136,15 @@ typename AstXmlConstraintNodeParser<T>::Constraints AstXmlConstraintNodeParser<T
 {
     if (m_xmlReader.name() == T::astNodeName())
         return readValueNode();
-    else if (m_xmlReader.name() == QLatin1Literal("Range"))
+    else if (m_xmlReader.name() == QStringLiteral("Range"))
         return readRange();
-    else if (m_xmlReader.name() == QLatin1Literal("OR"))
+    else if (m_xmlReader.name() == QStringLiteral("OR"))
         return readOr();
-    else if (m_xmlReader.name() == QLatin1Literal("AND"))
+    else if (m_xmlReader.name() == QStringLiteral("AND"))
         return readAnd();
-    else if (m_xmlReader.name() == QLatin1Literal("ALPHA"))
+    else if (m_xmlReader.name() == QStringLiteral("ALPHA"))
         return readAlpha();
-    else if (m_xmlReader.name() == QLatin1Literal("SIZE"))
+    else if (m_xmlReader.name() == QStringLiteral("SIZE"))
         return readSize();
 
     m_xmlReader.raiseError("Unknown node: " + m_xmlReader.name());
@@ -163,9 +163,9 @@ typename AstXmlConstraintNodeParser<T>::Constraints AstXmlConstraintNodeParser<T
     QString min;
     QString max;
     while (m_xmlReader.readNextStartElement())
-        if (m_xmlReader.name() == QLatin1Literal("Min"))
+        if (m_xmlReader.name() == QStringLiteral("Min"))
             min = findValue();
-        else if (m_xmlReader.name() == QLatin1Literal("Max"))
+        else if (m_xmlReader.name() == QStringLiteral("Max"))
             max = findValue();
 
     if (min.isEmpty() || max.isEmpty()) {

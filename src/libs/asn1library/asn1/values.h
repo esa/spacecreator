@@ -33,7 +33,7 @@ namespace Asn1Acn {
 struct IntegerValue
 {
     using Type = std::int64_t;
-    static QLatin1String astNodeName() { return QLatin1Literal("IntegerValue"); }
+    static QString astNodeName() { return QStringLiteral("IntegerValue"); }
     static Type fromAstValue(const QString &value) { return value.toLongLong(); }
     static QString asString(Type t) { return QString::number(t); }
 };
@@ -41,7 +41,7 @@ struct IntegerValue
 struct RealValue
 {
     using Type = double;
-    static QLatin1String astNodeName() { return QLatin1Literal("RealValue"); }
+    static QString astNodeName() { return QStringLiteral("RealValue"); }
     static Type fromAstValue(const QString &value) { return value.toDouble(); }
     static QString asString(Type t) { return QString::number(t); }
 };
@@ -49,7 +49,7 @@ struct RealValue
 struct EnumValue
 {
     using Type = QString;
-    static QLatin1String astNodeName() { return QLatin1Literal("EnumValue"); }
+    static QString astNodeName() { return QStringLiteral("EnumValue"); }
     static Type fromAstValue(const QString &value) { return value; }
     static QString asString(Type t) { return t; }
 };
@@ -57,7 +57,7 @@ struct EnumValue
 struct BooleanValue
 {
     using Type = bool;
-    static QLatin1String astNodeName() { return QLatin1Literal("BooleanValue"); }
+    static QString astNodeName() { return QStringLiteral("BooleanValue"); }
     static Type fromAstValue(const QString &value) { return value.toUpper() == "TRUE"; }
     static QString asString(Type t) { return t ? "TRUE" : "FALSE"; }
     static QString reformatString(const QString &value) { return asString(fromAstValue(value)); }
@@ -66,7 +66,7 @@ struct BooleanValue
 struct StringValue
 {
     using Type = QString;
-    static QLatin1String astNodeName() { return QLatin1Literal("StringValue"); }
+    static QString astNodeName() { return QStringLiteral("StringValue"); }
     static Type fromAstValue(const QString &value) { return value; }
     static QString asString(Type t) { return '"' + t + '"'; }
 };
@@ -74,7 +74,7 @@ struct StringValue
 struct BitStringValue
 {
     using Type = QString;
-    static QLatin1String astNodeName() { return QLatin1Literal("BitStringValue"); }
+    static QString astNodeName() { return QStringLiteral("BitStringValue"); }
     static Type fromAstValue(const QString &value) { return value; }
     static QString asString(Type t) { return "'" + t + "'B"; }
 };
@@ -82,7 +82,7 @@ struct BitStringValue
 struct OctetStringValue
 {
     using Type = QString;
-    static QLatin1String astNodeName() { return QLatin1Literal("OctetStringValue"); }
+    static QString astNodeName() { return QStringLiteral("OctetStringValue"); }
     static Type fromAstValue(const QString &value) { return value; }
     static QString asString(Type t) { return "'" + t + "'H"; }
 };

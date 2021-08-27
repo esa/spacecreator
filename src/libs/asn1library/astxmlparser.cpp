@@ -1214,7 +1214,7 @@ private:
 void AstXmlParser::findAndReadConstraints(Types::Type &type)
 {
     while (m_xmlReader.readNextStartElement()) {
-        if (m_xmlReader.name() == QLatin1Literal("Constraints"))
+        if (m_xmlReader.name() == QStringLiteral("Constraints"))
             readConstraints(type);
         else
             m_xmlReader.skipCurrentElement();

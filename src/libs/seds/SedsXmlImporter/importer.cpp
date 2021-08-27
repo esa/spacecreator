@@ -35,6 +35,12 @@ using conversion::FileNotFoundException;
 using conversion::Options;
 using conversion::importer::ImportException;
 
+#if QT_VERSION < QT_VERSION_CHECK(5, 14, 0)
+#define SEDS_SPLIT_BEHAVIOR QString::SkipEmptyParts
+#else
+#define SEDS_SPLIT_BEHAVIOR Qt::SkipEmptyParts
+#endif
+
 namespace seds::importer {
 
 using conversion::seds::SedsOptions;
@@ -77,7 +83,7 @@ SymbolDefinitionReader::ExternalReferencesMap SedsXmlImporter::readExternalRefer
 
     // External references can be also be declared via options
     for (const auto &externalReferenceDeclaration : options.values(SedsOptions::externalRef)) {
-        const auto externalReference = externalReferenceDeclaration.split(':', QString::SkipEmptyParts);
+        const auto externalReference = externalReferenceDeclaration.split(':', SEDS_SPLIT_BEHAVIOR);
         externalReferences.insert({ externalReference[0], externalReference[1] });
     }
 
@@ -144,7 +150,7 @@ QString SedsXmlImporter::getSchemaFilename(const QString &filename) const
 
     if (found != std::end(attributes)) {
         // xmi:schemaLocation contains url and schema filename separated by space
-        const auto schemaLocation = found->value().split(" ", QString::SkipEmptyParts);
+        const auto schemaLocation = found->value().split(" ", SEDS_SPLIT_BEHAVIOR);
 
         if (schemaLocation.size() != 2) {
             throw ImportException("xmi:schemaLocation in the validated file is incorrect");
@@ -157,3 +163,5 @@ QString SedsXmlImporter::getSchemaFilename(const QString &filename) const
 }
 
 } // namespace seds::importer
+
+#undef SEDS_SPLIT_BEHAVIOR
