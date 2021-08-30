@@ -28,15 +28,15 @@ class SedsOptions
 {
 public:
     /** @brief File to import */
-    inline static const QString inputFile = "Seds_Import_InputFile";
+    inline static const QString inputFilename = "Seds_Import_InputFilename";
     /** @brief Intermediate file that will be created during preprocessing */
-    inline static const QString preprocessedFile = "Seds_Import_PreprocessedFile";
+    inline static const QString preprocessedFilename = "Seds_Import_PreprocessedFilename";
     /** @brief Schema file that will be used during validation */
-    inline static const QString schemaFile = "Seds_Import_SchemaFile";
+    inline static const QString schemaFilename = "Seds_Import_SchemaFilename";
     /** @brief Declaration of an external reference */
     inline static const QString externalRef = "Seds_Import_ExternalRef";
     /** @brief File with external references declarations */
-    inline static const QString externalRefFile = "Seds_Import_ExternalRefFile";
+    inline static const QString externalRefFilename = "Seds_Import_ExternalRefFilename";
     /** @brief Skip SEDS validation */
     inline static const QString skipValidation = "Seds_Import_SkipValidation";
     /** @brief Don't remove intermediate files after import */

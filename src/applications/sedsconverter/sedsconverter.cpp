@@ -44,9 +44,9 @@ SedsConverter::SedsConverter()
 void SedsConverter::convert(ModelType targetModelType) const
 {
     Options options;
-    options.add(SedsOptions::inputFile, "input.xml");
-    options.add(SedsOptions::schemaFile, "seds.xsd");
-    options.add(SedsOptions::externalRefFile, "config.toml");
+    options.add(SedsOptions::inputFilename, "input.xml");
+    options.add(SedsOptions::schemaFilename, "seds.xsd");
+    options.add(SedsOptions::externalRefFilename, "config.toml");
     options.add(SedsOptions::keepIntermediateFiles);
 
     Converter converter(m_registry, std::move(options));

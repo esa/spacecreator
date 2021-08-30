@@ -46,9 +46,9 @@ private Q_SLOTS:
 void tsti_SedsXmlImporter::testValid()
 {
     Options options;
-    options.add(SedsOptions::inputFile, "seds.xml");
-    options.add(SedsOptions::preprocessedFile, "preprocessed.xml");
-    options.add(SedsOptions::externalRefFile, "external_references.toml");
+    options.add(SedsOptions::inputFilename, "seds.xml");
+    options.add(SedsOptions::preprocessedFilename, "preprocessed.xml");
+    options.add(SedsOptions::externalRefFilename, "external_references.toml");
     options.add(SedsOptions::externalRef, "integer.name:UnsignedInteger8");
 
     SedsXmlImporter sedsImporter;
