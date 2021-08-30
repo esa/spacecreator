@@ -1,5 +1,4 @@
 add_subdirectory(aadlconverter)
-add_subdirectory(asn1parser)
 add_subdirectory(dvconverter)
 add_subdirectory(dveditor)
 add_subdirectory(iveditor)
