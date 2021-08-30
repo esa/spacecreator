@@ -27,7 +27,7 @@ TranslationException::TranslationException(QString message)
 }
 
 IncorrectSourceModelException::IncorrectSourceModelException(ModelType expectedModelType)
-    : ConversionException(
+    : TranslationException(
             QString("Source model not supported, expected %1 model").arg(modelTypeToString(expectedModelType)))
 {
 }

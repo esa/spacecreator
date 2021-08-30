@@ -41,7 +41,7 @@ public:
 /**
  * @brief   Exception thrown when translator gets unsupported model
  */
-class IncorrectSourceModelException : public ConversionException
+class IncorrectSourceModelException : public TranslationException
 {
 public:
     /**
