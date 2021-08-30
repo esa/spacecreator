@@ -19,6 +19,7 @@
 
 #include "sedsconverter.h"
 
+#include <QCoreApplication>
 #include <conversion/common/exceptions.h>
 #include <conversion/common/export/exceptions.h>
 #include <conversion/common/import/exceptions.h>
@@ -31,10 +32,11 @@ using conversion::translator::TranslationException;
 
 int main(int argc, char **argv)
 {
+    QCoreApplication a(argc, argv);
     sedsconverter::SedsConverter sedsConverter;
 
     try {
-        sedsConverter.convert(conversion::ModelType::Asn1, {});
+        sedsConverter.convert(conversion::ModelType::InterfaceView, {});
     } catch (const ImportException &ex) {
         const auto errorMessage = QString("Import failure: %1").arg(ex.errorMessage());
         qFatal("%s", errorMessage.toLatin1().constData());

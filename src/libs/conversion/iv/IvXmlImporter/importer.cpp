@@ -25,7 +25,6 @@
 #include <conversion/common/model.h>
 #include <conversion/common/options.h>
 #include <conversion/iv/IvOptions/options.h>
-#include <ivcore/ivlibrary.h>
 #include <ivcore/ivmodel.h>
 #include <ivcore/ivpropertytemplateconfig.h>
 #include <ivcore/ivxmlreader.h>
@@ -41,8 +40,6 @@ namespace conversion::iv::importer {
 
 std::unique_ptr<conversion::Model> IvXmlImporter::importModel(const Options &options) const
 {
-    ivm::initIVLibrary();
-
     auto *config = initConfig(options);
 
     return parse(options, config);

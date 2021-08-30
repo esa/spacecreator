@@ -26,10 +26,8 @@
 #include <conversion/iv/IvOptions/options.h>
 #include <conversion/iv/IvXmlExporter/exporter.h>
 #include <ivcore/ivfunction.h>
-#include <ivcore/ivlibrary.h>
 #include <ivcore/ivmodel.h>
 #include <ivcore/ivpropertytemplateconfig.h>
-#include <libiveditor/iveditor.h>
 #include <memory>
 
 using conversion::Options;

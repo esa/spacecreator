@@ -22,17 +22,30 @@
 #include <conversion/common/modeltype.h>
 #include <conversion/iv/IvXmlExporter/exporter.h>
 #include <conversion/iv/IvXmlImporter/importer.h>
+#include <conversion/iv/SedsToIvTranslator/translator.h>
+#include <ivcore/ivlibrary.h>
+#include <libiveditor/iveditor.h>
 #include <memory>
 
 namespace conversion::iv {
 
 using exporter::IvXmlExporter;
 using importer::IvXmlImporter;
+using translator::SedsToIvTranslator;
 
 bool IvRegistrar::registerCapabilities(conversion::Registry &registry)
 {
+    ivm::initIVLibrary();
+    ive::initIVEditor();
+
     auto ivImporter = std::make_unique<IvXmlImporter>();
     auto result = registry.registerImporter(ModelType::InterfaceView, std::move(ivImporter));
+    if (!result) {
+        return false;
+    }
+
+    auto sedsToIvTranslator = std::make_unique<SedsToIvTranslator>();
+    result = registry.registerTranslator({ ModelType::Seds }, ModelType::InterfaceView, std::move(sedsToIvTranslator));
     if (!result) {
         return false;
     }

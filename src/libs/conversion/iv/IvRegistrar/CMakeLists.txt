@@ -13,7 +13,8 @@ target_include_directories(IvRegistrar
 target_link_libraries(IvRegistrar
     PUBLIC      Conversion::Common
                 Conversion::IvXmlImporter
-                Conversion::IvXmlExporter)
+                Conversion::IvXmlExporter
+                Conversion::SedsToIvTranslator)
 
 add_format_target(IvRegistrar)
 

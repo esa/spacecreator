@@ -1,3 +1,4 @@
 add_subdirectory(IvRegistrar)
 add_subdirectory(IvXmlExporter)
 add_subdirectory(IvXmlImporter)
+add_subdirectory(SedsToIvTranslator)
