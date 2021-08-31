@@ -305,12 +305,7 @@ bool IVConnection::lookupEndpointsPostponed()
 
 bool IVConnection::needPostponedInit() const
 {
-    bool ok = !(d->sourceIface() && d->targetIface());
-    if (!ok) {
-        shared::ErrorHub::addError(
-                shared::ErrorItem::Warning, tr("Connection '%1' removed - misses an interface").arg(titleUI()), "");
-    }
-    return ok;
+    return !(d->sourceIface() && d->targetIface());
 }
 
 void IVConnection::clearPostponedEndpoints()

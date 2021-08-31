@@ -153,33 +153,30 @@ void VERectGraphicsItem::onManualResizeProgress(GripPoint *grip, const QPointF &
         return;
 
     const QRectF rect = transformedRect(grip, pressedAt, releasedAt);
-    if (rect.width() >= minimalSize().width() && rect.height() >= minimalSize().height()
-            && shared::graphicsviewutils::isBounded(this, rect)) {
-        setRect(rect);
-        const QRectF entityRect = graphicsviewutils::rect(entity()->coordinates());
-        const QPointF delta = releasedAt - pressedAt;
-        for (auto child : childItems()) {
-            if (auto iface = qobject_cast<VEConnectionEndPointGraphicsItem *>(child->toGraphicsObject())) {
-                const VEObject *obj = iface->entity();
-                Q_ASSERT(obj);
-                if (!obj) {
-                    return;
-                }
-
-                const QPointF storedPos = graphicsviewutils::pos(obj->coordinates());
-                if (storedPos.isNull() || !grip) {
-                    iface->instantLayoutUpdate();
-                    continue;
-                }
-
-                const Qt::Alignment side = graphicsviewutils::getNearestSide(entityRect, storedPos);
-                const QRectF sceneRect = sceneBoundingRect();
-                const QPointF pos = graphicsviewutils::getSidePosition(sceneRect, storedPos, side);
-                iface->setPos(iface->parentItem()->mapFromScene(pos));
+    setRect(rect);
+    const QRectF entityRect = graphicsviewutils::rect(entity()->coordinates());
+    const QPointF delta = releasedAt - pressedAt;
+    for (auto child : childItems()) {
+        if (auto iface = qobject_cast<VEConnectionEndPointGraphicsItem *>(child->toGraphicsObject())) {
+            const VEObject *obj = iface->entity();
+            Q_ASSERT(obj);
+            if (!obj) {
+                return;
             }
+
+            const QPointF storedPos = graphicsviewutils::pos(obj->coordinates());
+            if (storedPos.isNull() || !grip) {
+                iface->instantLayoutUpdate();
+                continue;
+            }
+
+            const Qt::Alignment side = graphicsviewutils::getNearestSide(entityRect, storedPos);
+            const QRectF sceneRect = sceneBoundingRect();
+            const QPointF pos = graphicsviewutils::getSidePosition(sceneRect, storedPos, side);
+            iface->setPos(iface->parentItem()->mapFromScene(pos));
         }
-        layoutConnectionsOnResize(shared::ui::VEConnectionGraphicsItem::CollisionsPolicy::Ignore);
     }
+    layoutConnectionsOnResize(shared::ui::VEConnectionGraphicsItem::CollisionsPolicy::Ignore);
 }
 
 void VERectGraphicsItem::layoutInterfaces()
@@ -217,7 +214,8 @@ void VERectGraphicsItem::onManualMoveFinish(GripPoint *grip, const QPointF &pres
     if (pressedAt == releasedAt)
         return;
 
-    if (shared::graphicsviewutils::isBounded(this, sceneBoundingRect())
+    if (boundingRect().width() >= minimalSize().width() && boundingRect().height() >= minimalSize().height()
+            && shared::graphicsviewutils::isBounded(this, sceneBoundingRect())
             && !shared::graphicsviewutils::isCollided(this, sceneBoundingRect())) {
         layoutConnectionsOnMove(shared::ui::VEConnectionGraphicsItem::CollisionsPolicy::PartialRebuild);
         updateEntity();

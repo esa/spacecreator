@@ -29,10 +29,11 @@ class VEObject;
 
 namespace shared {
 namespace cmd {
+class CmdEntityAutoLayout;
 
 class CmdEntityGeometryChange : public UndoCommand
 {
-
+    Q_OBJECT
 public:
     explicit CmdEntityGeometryChange(
             const QList<QPair<shared::VEObject *, QVector<QPointF>>> &objectsData, const QString &title = {});
@@ -42,13 +43,15 @@ public:
     void undo() override;
     int id() const override;
 
-    void mergeCommand(QUndoCommand *command);
+    bool mergeGeometryData(const QList<QPair<VEObject *, QVector<QPointF>>> &objectsData);
 
 protected:
     struct ObjectData {
         QPointer<shared::VEObject> entity;
         QVector<qint32> prevCoordinates;
         QVector<qint32> newCoordinates;
+
+        bool operator==(const CmdEntityGeometryChange::ObjectData &data) const;
     };
 
     void prepareData(const QList<QPair<shared::VEObject *, QVector<QPointF>>> &objectsData);
@@ -57,9 +60,7 @@ private:
     static QList<ObjectData> convertData(const QList<QPair<shared::VEObject *, QVector<QPointF>>> &objectsData);
 
 private:
-    QList<QPair<shared::VEObject *, QVector<QPointF>>> m_internalData;
     QList<ObjectData> m_data;
-    QList<QUndoCommand *> m_mergedCmds;
 };
 
 }

@@ -75,21 +75,21 @@ void CmdInterfaceItemCreate::redo()
     if (m_ifaceInfo.model)
         m_ifaceInfo.model->addObject(m_entity);
 
-    for (QUndoCommand *clone : m_cmdClones)
+    for (QUndoCommand *clone : qAsConst(m_cmdClones))
         clone->redo();
 }
 
 void CmdInterfaceItemCreate::undo()
 {
-    shared::cmd::CmdEntityGeometryChange::undo();
-
     if (m_ifaceInfo.function)
         m_ifaceInfo.function->removeChild(m_entity);
     if (m_ifaceInfo.model)
         m_ifaceInfo.model->removeObject(m_entity);
 
-    for (QUndoCommand *clone : m_cmdClones)
+    for (QUndoCommand *clone : qAsConst(m_cmdClones))
         clone->undo();
+
+    shared::cmd::CmdEntityGeometryChange::undo();
 }
 
 int CmdInterfaceItemCreate::id() const

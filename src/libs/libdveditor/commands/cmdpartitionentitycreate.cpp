@@ -58,13 +58,13 @@ void CmdPartitionEntityCreate::redo()
 
 void CmdPartitionEntityCreate::undo()
 {
-    shared::cmd::CmdEntityGeometryChange::undo();
-
     if (m_model)
         m_model->removeObject(m_entity);
     if (m_parent)
         m_parent->removePartition(m_entity);
     m_entity->setParent(this);
+
+    shared::cmd::CmdEntityGeometryChange::undo();
 }
 
 int CmdPartitionEntityCreate::id() const

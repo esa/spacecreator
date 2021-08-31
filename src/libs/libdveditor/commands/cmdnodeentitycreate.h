@@ -17,8 +17,8 @@
 
 #pragma once
 
+#include "commands/cmdentitygeometrychange.h"
 #include "common.h"
-#include "undocommand.h"
 
 #include <QPointF>
 #include <QPointer>
@@ -34,7 +34,7 @@ class DVDevice;
 namespace dve {
 namespace cmd {
 
-class CmdNodeEntityCreate : public shared::UndoCommand
+class CmdNodeEntityCreate : public shared::cmd::CmdEntityGeometryChange
 {
     Q_OBJECT
 public:

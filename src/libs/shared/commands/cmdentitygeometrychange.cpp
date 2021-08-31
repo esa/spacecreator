@@ -17,6 +17,7 @@
 
 #include "cmdentitygeometrychange.h"
 
+#include "cmdentityautolayout.h"
 #include "commandids.h"
 #include "commandsstackbase.h"
 #include "graphicsviewutils.h"
@@ -28,15 +29,11 @@ namespace cmd {
 CmdEntityGeometryChange::CmdEntityGeometryChange(
         const QList<QPair<shared::VEObject *, QVector<QPointF>>> &objectsData, const QString &title)
     : UndoCommand(title.isEmpty() ? QObject::tr("Change item(s) geometry/position") : title)
-    , m_internalData(objectsData)
-    , m_data(convertData(m_internalData))
+    , m_data(convertData(objectsData))
 {
 }
 
-CmdEntityGeometryChange::~CmdEntityGeometryChange()
-{
-    qDeleteAll(m_mergedCmds);
-}
+CmdEntityGeometryChange::~CmdEntityGeometryChange() { }
 
 void CmdEntityGeometryChange::redo()
 {
@@ -46,17 +43,11 @@ void CmdEntityGeometryChange::redo()
 
         it->entity->setCoordinates(it->newCoordinates);
     }
-
-    for (auto it = m_mergedCmds.cbegin(); it != m_mergedCmds.cend(); ++it)
-        (*it)->redo();
 }
 
 void CmdEntityGeometryChange::undo()
 {
-    for (auto it = m_mergedCmds.crbegin(); it != m_mergedCmds.crend(); ++it)
-        (*it)->undo();
-
-    for (auto it = m_data.cbegin(); it != m_data.cend(); ++it) {
+    for (auto it = m_data.crbegin(); it != m_data.crend(); ++it) {
         if (!it->entity)
             continue;
 
@@ -69,12 +60,32 @@ int CmdEntityGeometryChange::id() const
     return ChangeEntityGeometry;
 }
 
-void CmdEntityGeometryChange::mergeCommand(QUndoCommand *command)
+bool CmdEntityGeometryChange::mergeGeometryData(const QList<QPair<shared::VEObject *, QVector<QPointF>>> &objectsData)
 {
-    if (command->id() != AutoLayoutEntity)
-        return;
+    if (objectsData.isEmpty()) {
+        return false;
+    }
 
-    m_mergedCmds.append(command);
+    QList<ObjectData> data = convertData(objectsData);
+    if (data.isEmpty()) {
+        return false;
+    }
+
+    while (!m_data.isEmpty() && !data.isEmpty()) {
+        if (m_data.last() == data.last()) {
+            data.takeLast();
+        } else if (m_data.last().entity == data.last().entity) {
+            m_data.last() = data.takeLast();
+        } else {
+            break;
+        }
+    }
+    for (const ObjectData &objGeometryData : data) {
+        m_data.append(objGeometryData);
+        objGeometryData.entity->setCoordinates(objGeometryData.newCoordinates);
+    }
+
+    return true;
 }
 
 QList<CmdEntityGeometryChange::ObjectData> CmdEntityGeometryChange::convertData(
@@ -85,13 +96,6 @@ QList<CmdEntityGeometryChange::ObjectData> CmdEntityGeometryChange::convertData(
         result.append({ objectData.first, objectData.first->coordinates(),
                 shared::graphicsviewutils::coordinates(objectData.second) });
 
-    //    std::stable_sort(result.begin(), result.end(), [](const ObjectData &data1, const ObjectData &data2) {
-    //        if (data1.entity->type() == data2.entity->type())
-    //            return ive::nestingLevel(data1.entity) < ive::nestingLevel(data2.entity);
-
-    //        return data1.entity->type() < data2.entity->type();
-    //    });
-
     return result;
 }
 
@@ -100,5 +104,9 @@ void CmdEntityGeometryChange::prepareData(const QList<QPair<shared::VEObject *, 
     m_data = convertData(objectsData);
 }
 
+bool CmdEntityGeometryChange::ObjectData::operator==(const ObjectData &data) const
+{
+    return data.entity == entity && data.newCoordinates == newCoordinates && data.prevCoordinates == prevCoordinates;
+}
 }
 }

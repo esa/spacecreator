@@ -108,8 +108,6 @@ void CmdConnectionGroupItemCreate::undo()
         (*it)->undo();
     }
 
-    shared::cmd::CmdEntityGeometryChange::undo();
-
     m_model->removeObject(m_entity);
     m_model->removeObject(m_targetIface);
     m_model->removeObject(m_sourceIface);
@@ -123,6 +121,8 @@ void CmdConnectionGroupItemCreate::undo()
     if (m_sourceIfaceParent) {
         m_sourceIfaceParent->removeChild(m_sourceIface);
     }
+
+    shared::cmd::CmdEntityGeometryChange::undo();
 }
 
 int CmdConnectionGroupItemCreate::id() const

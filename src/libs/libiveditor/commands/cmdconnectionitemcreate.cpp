@@ -65,12 +65,12 @@ void CmdConnectionItemCreate::redo()
 
 void CmdConnectionItemCreate::undo()
 {
-    shared::cmd::CmdEntityGeometryChange::undo();
-
     m_entity->unsetInheritPI();
     m_model->removeObject(m_entity);
     if (m_parent)
         m_parent->removeChild(m_entity);
+
+    shared::cmd::CmdEntityGeometryChange::undo();
 }
 
 int CmdConnectionItemCreate::id() const

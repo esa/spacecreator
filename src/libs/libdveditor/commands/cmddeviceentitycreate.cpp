@@ -55,13 +55,13 @@ void CmdDeviceEntityCreate::redo()
 
 void CmdDeviceEntityCreate::undo()
 {
-    shared::cmd::CmdEntityGeometryChange::undo();
-
     if (m_parent)
         m_parent->removeDevice(m_entity);
     if (m_model)
         m_model->removeObject(m_entity);
     m_entity->setParent(this);
+
+    shared::cmd::CmdEntityGeometryChange::undo();
 }
 
 int CmdDeviceEntityCreate::id() const

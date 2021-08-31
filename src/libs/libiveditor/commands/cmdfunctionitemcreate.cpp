@@ -58,12 +58,12 @@ void CmdFunctionItemCreate::redo()
 
 void CmdFunctionItemCreate::undo()
 {
-    shared::cmd::CmdEntityGeometryChange::undo();
-
     if (m_model)
         m_model->removeObject(m_entity);
     if (m_parent)
         m_parent->removeChild(m_entity);
+
+    shared::cmd::CmdEntityGeometryChange::undo();
 }
 
 int CmdFunctionItemCreate::id() const

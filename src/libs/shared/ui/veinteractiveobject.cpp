@@ -73,15 +73,15 @@ void VEInteractiveObject::mergeGeometry()
                 io->mergeGeometry();
             }
         }
-
-        QUndoCommand *autolayoutCmd = new cmd::CmdEntityAutoLayout(prepareChangeCoordinatesCommandParams());
-        autolayoutCmd->redo();
-
+        const QList<QPair<shared::VEObject *, QVector<QPointF>>> geometryData = prepareChangeCoordinatesCommandParams();
         const QUndoCommand *cmd = m_commandsStack->command(m_commandsStack->index() - 1);
-        if (auto prevGeometryBasedCmd = dynamic_cast<const cmd::CmdEntityGeometryChange *>(cmd))
-            const_cast<cmd::CmdEntityGeometryChange *>(prevGeometryBasedCmd)->mergeCommand(autolayoutCmd);
-        else
-            delete autolayoutCmd;
+        if (auto prevGeometryBasedCmd = dynamic_cast<const cmd::CmdEntityGeometryChange *>(cmd)) {
+            auto mutCmd = const_cast<cmd::CmdEntityGeometryChange *>(prevGeometryBasedCmd);
+            if (mutCmd->mergeGeometryData(geometryData)) {
+                return;
+            }
+        }
+        m_commandsStack->push(new cmd::CmdEntityAutoLayout(geometryData));
     });
 }
 

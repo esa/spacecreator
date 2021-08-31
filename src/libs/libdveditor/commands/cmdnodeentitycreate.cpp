@@ -33,7 +33,7 @@ namespace dve {
 namespace cmd {
 
 CmdNodeEntityCreate::CmdNodeEntityCreate(dvm::DVModel *model, const dvm::DVBoard *board, const QPointF &pos)
-    : shared::UndoCommand(tr("Create Board"))
+    : shared::cmd::CmdEntityGeometryChange({}, tr("Create Board"))
     , m_model(model)
     , m_board(board)
     , m_pos(pos)
@@ -41,8 +41,8 @@ CmdNodeEntityCreate::CmdNodeEntityCreate(dvm::DVModel *model, const dvm::DVBoard
     , m_partition(new dvm::DVPartition(m_node))
 {
     m_node->setTitle(dvm::DVNameValidator::nameForObject(m_node, m_model, m_board->title()));
-    m_node->setCoordinates(shared::graphicsviewutils::coordinates(
-            QRectF(pos, shared::graphicsviewutils::kDefaultNodeGraphicsItemSize)));
+    const QRectF geometry { QRectF(pos, shared::graphicsviewutils::kDefaultNodeGraphicsItemSize) };
+    prepareData({ qMakePair(m_node, QVector<QPointF> { geometry.topLeft(), geometry.bottomRight() }) });
     m_partition->setTitle(dvm::DVNameValidator::nameForObject(m_partition, m_model));
     m_node->addPartition(m_partition);
     for (const dvm::DVPort *port : m_board->ports()) {
@@ -61,6 +61,8 @@ CmdNodeEntityCreate::~CmdNodeEntityCreate()
 
 void CmdNodeEntityCreate::redo()
 {
+    shared::cmd::CmdEntityGeometryChange::redo();
+
     m_node->setParent(m_model);
 
     if (m_model) {
@@ -83,6 +85,8 @@ void CmdNodeEntityCreate::undo()
     }
 
     m_node->setParent(this);
+
+    shared::cmd::CmdEntityGeometryChange::undo();
 }
 
 int CmdNodeEntityCreate::id() const

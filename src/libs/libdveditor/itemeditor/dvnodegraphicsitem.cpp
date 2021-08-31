@@ -79,6 +79,19 @@ shared::ColorManager::HandledColors DVNodeGraphicsItem::handledColorType() const
     return shared::ColorManager::HandledColors::Node;
 }
 
+void DVNodeGraphicsItem::rebuildLayout()
+{
+    shared::ui::VERectGraphicsItem::rebuildLayout();
+    const QRectF nestedContent = nestedItemsSceneBoundingRect();
+    if (nestedContent.isValid()) {
+        const QRectF contentRect = nestedContent.marginsAdded(shared::graphicsviewutils::kContentMargins);
+        if (!sceneBoundingRect().contains(contentRect)) {
+            setRect(sceneBoundingRect() | contentRect);
+            mergeGeometry();
+        }
+    }
+}
+
 void DVNodeGraphicsItem::applyColorScheme()
 {
     const shared::ColorHandler &h = colorHandler();

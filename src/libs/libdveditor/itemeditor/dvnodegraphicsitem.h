@@ -50,6 +50,7 @@ protected Q_SLOTS:
 protected:
     void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget) override;
     shared::ColorManager::HandledColors handledColorType() const override;
+    void rebuildLayout() override;
 };
 
 } // namespace dve
