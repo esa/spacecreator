@@ -79,9 +79,9 @@ case $1 in
 --MSCeditor)
     exec "$bindir/msceditor" "$2" "$3" "$4" "$5" "$6" "$7"
     ;;
---version)
-    $bindir/IVeditor "--version"
-    exec "$bindir/qtcreator" -user-library-path "$_ORIGINAL_LD_LIBRARY_PATH" "--version"
+--version|-version)
+    "$bindir/qtcreator" -user-library-path "$_ORIGINAL_LD_LIBRARY_PATH" "-version"
+    exec $bindir/IVeditor "--version"
     ;;
 *)
     exec "$bindir/qtcreator" -user-library-path "$_ORIGINAL_LD_LIBRARY_PATH" ${1+"$@"}
