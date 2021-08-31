@@ -20,6 +20,7 @@
 #include "iveditor.h"
 #include "ivexporter.h"
 #include "ivlibrary.h"
+#include "scversion.h"
 #include "sharedlibrary.h"
 
 #include <QCoreApplication>
@@ -34,7 +35,7 @@ int main(int argc, char *argv[])
     QCoreApplication a(argc, argv);
     a.setOrganizationName(SC_ORGANISATION);
     a.setOrganizationDomain(SC_ORGANISATION_DOMAIN);
-    a.setApplicationVersion(SC_VERSION);
+    a.setApplicationVersion(spaceCreatorVersion);
     a.setApplicationName(QObject::tr("IV converter"));
 
     shared::CommandLineParser cmdParser;

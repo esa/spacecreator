@@ -17,8 +17,9 @@
 
 #include "commandlineparser.h"
 #include "msceditor.h"
-#include "msclibrary.h"
 #include "msceditorcore.h"
+#include "msclibrary.h"
+#include "scversion.h"
 #include "sharedlibrary.h"
 #include "streamingwindow.h"
 
@@ -36,7 +37,7 @@ int main(int argc, char *argv[])
     QApplication a(argc, argv);
     a.setOrganizationName(SC_ORGANISATION);
     a.setOrganizationDomain(SC_ORGANISATION_DOMAIN);
-    a.setApplicationVersion(SC_VERSION);
+    a.setApplicationVersion(spaceCreatorVersion);
     a.setApplicationName(QObject::tr("MSC Streaming"));
 
     QDirIterator dirIt(":/fonts");

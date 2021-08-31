@@ -17,6 +17,7 @@
 
 #include "editorcore.h"
 
+#include "scversion.h"
 #include "ui/graphicsviewbase.h"
 
 #include <QAction>
@@ -148,12 +149,7 @@ QAction *EditorCore::actionToggleMinimap()
  */
 void EditorCore::showAboutDialog()
 {
-    QString info = QString("%1 %2").arg(qApp->applicationName(), qApp->applicationVersion());
-
-#ifdef VS_BUILD_HASH
-    info += QString(" @%1").arg(VS_BUILD_HASH);
-#endif
-
+    QString info = QString("%1 %2 @%3").arg(qApp->applicationName(), qApp->applicationVersion(), spaceCreatorGitHash);
     QMessageBox::information(QApplication::activeWindow() ? QApplication::activeWindow() : nullptr, tr("About"), info);
 }
 

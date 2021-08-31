@@ -24,6 +24,7 @@
 #include "ivlibrary.h"
 #include "ivproject.h"
 #include "mainwindow.h"
+#include "scversion.h"
 #include "sharedlibrary.h"
 
 #include <QApplication>
@@ -41,7 +42,7 @@ int main(int argc, char *argv[])
     QApplication a(argc, argv);
     a.setOrganizationName(SC_ORGANISATION);
     a.setOrganizationDomain(SC_ORGANISATION_DOMAIN);
-    a.setApplicationVersion(SC_VERSION);
+    a.setApplicationVersion(spaceCreatorVersion);
     a.setApplicationName("IV Editor");
 
     QDirIterator dirIt(":/fonts");

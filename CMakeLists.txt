@@ -6,13 +6,13 @@ set(SC_NAME SpaceCreator)
 set(ORGANISATION ESA)
 set(ORGANISATION_DOMAIN https://taste.tools)
 
+include(GitHash)
 include(FunctionReadVersion)
 read_version("${CMAKE_CURRENT_SOURCE_DIR}/VERSION" SC_VERSION_MAJOR SC_VERSION_MINOR SC_VERSION_PATCH)
-
 project(${SC_NAME} VERSION "${SC_VERSION_MAJOR}.${SC_VERSION_MINOR}.${SC_VERSION_PATCH}" LANGUAGES CXX)
 message(STATUS "SpaceCreator Version: ${CMAKE_PROJECT_VERSION}")
+include(WriteVersionFile)
 
-add_definitions(-DSC_VERSION="${CMAKE_PROJECT_VERSION}")
 add_definitions(-DSC_ORGANISATION="${ORGANISATION}")
 add_definitions(-DSC_ORGANISATION_DOMAIN="${ORGANISATION_DOMAIN}")
 
@@ -21,7 +21,6 @@ set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
 
-include(GitHash)
 include(CCache)
 include(GoldLinker)
 include(ClangFormat)

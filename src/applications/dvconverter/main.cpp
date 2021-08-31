@@ -21,6 +21,7 @@
 #include "dveditorcore.h"
 #include "dvexporter.h"
 #include "dvmodel.h"
+#include "scversion.h"
 #include "sharedlibrary.h"
 
 #include <QApplication>
@@ -34,7 +35,7 @@ int main(int argc, char *argv[])
     QApplication a(argc, argv);
     a.setOrganizationName(SC_ORGANISATION);
     a.setOrganizationDomain(SC_ORGANISATION_DOMAIN);
-    a.setApplicationVersion(SC_VERSION);
+    a.setApplicationVersion(spaceCreatorVersion);
     a.setApplicationName(QObject::tr("DV converter"));
 
     shared::CommandLineParser cmdParser;

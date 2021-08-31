@@ -18,6 +18,7 @@
 #include "commandlineparser.h"
 #include "msclibrary.h"
 #include "mscwriter.h"
+#include "scversion.h"
 #include "sharedlibrary.h"
 
 #include <QCoreApplication>
@@ -30,7 +31,7 @@ int main(int argc, char *argv[])
     QCoreApplication a(argc, argv);
     a.setOrganizationName(SC_ORGANISATION);
     a.setOrganizationDomain(SC_ORGANISATION_DOMAIN);
-    a.setApplicationVersion(SC_VERSION);
+    a.setApplicationVersion(spaceCreatorVersion);
     a.setApplicationName(QObject::tr("MSC Converter"));
 
     shared::CommandLineParser cmdParser;

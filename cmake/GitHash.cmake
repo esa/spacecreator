@@ -12,5 +12,3 @@ if(GIT_FOUND)
 else()
   message(STATUS "GIT not found")
 endif()
-
-add_definitions (-DVS_BUILD_HASH="${SC_GIT_HASH}")
