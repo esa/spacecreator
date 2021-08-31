@@ -17,7 +17,7 @@
 
 #include "graphicsitemhelpers.h"
 
-#include "connectioncreationvalidator.h"
+#include "connectionvalidator.h"
 #include "dvdevicegraphicsitem.h"
 #include "graphicsviewutils.h"
 
@@ -31,22 +31,21 @@ dvm::ValidationResult validateConnectionCreate(QGraphicsScene *scene, const QVec
     result.endPointAdjusted = points.back();
     auto startDeviceItem = shared::graphicsviewutils::itemAt<DVDeviceGraphicsItem>(scene, result.startPointAdjusted);
     if (!startDeviceItem || !startDeviceItem->entity()) {
-        result.status = dvm::ConnectionCreationValidator::FailReason::NoStartDevice;
+        result.status = dvm::ConnectionValidator::FailReason::NoStartDevice;
         return result;
     }
     auto endDeviceItem = shared::graphicsviewutils::itemAt<DVDeviceGraphicsItem>(scene, result.endPointAdjusted);
     if (!endDeviceItem || !endDeviceItem->entity()) {
-        result.status = dvm::ConnectionCreationValidator::FailReason::NoEndDevice;
+        result.status = dvm::ConnectionValidator::FailReason::NoEndDevice;
         return result;
     }
 
     result.startDeviceId = startDeviceItem->entity()->id();
     result.endDeviceId = endDeviceItem->entity()->id();
 
-    result.status = dvm::ConnectionCreationValidator::canConnect(startDeviceItem->entity()->node(),
+    result.status = dvm::ConnectionValidator::canConnect(startDeviceItem->entity()->node(),
             endDeviceItem->entity()->node(), startDeviceItem->entity(), endDeviceItem->entity());
 
-    /// TODO:
     return result;
 }
 

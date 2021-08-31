@@ -15,7 +15,7 @@
    along with this program. If not, see <https://www.gnu.org/licenses/lgpl-2.1.html>.
 */
 
-#include "connectioncreationvalidator.h"
+#include "connectionvalidator.h"
 #include "dvconnection.h"
 #include "dvdevice.h"
 #include "dvmodel.h"
@@ -71,46 +71,55 @@ void tst_DVConnectionUtils::tst_createValidation()
     attrName = dvm::meta::Props::token(dvm::meta::Props::Token::port);
     d2->setEntityAttribute(attrName, QLatin1String("PortName"));
     attrName = dvm::meta::Props::token(dvm::meta::Props::Token::requires_bus_access);
-    d2->setEntityAttribute(attrName, QLatin1String("BusName"));
+    d2->setEntityAttribute(attrName, QLatin1String("OtherBusName"));
 
     n2->addDevice(d2);
 
-    dvm::ConnectionCreationValidator::FailReason reason =
-            dvm::ConnectionCreationValidator::canConnect(nullptr, nullptr, nullptr, nullptr);
-    QVERIFY(reason == dvm::ConnectionCreationValidator::FailReason::NoStartDevice);
+    dvm::ConnectionValidator::FailReason reason =
+            dvm::ConnectionValidator::canConnect(nullptr, nullptr, nullptr, nullptr);
+    QCOMPARE(reason, dvm::ConnectionValidator::FailReason::NoStartDevice);
 
-    reason = dvm::ConnectionCreationValidator::canConnect(nullptr, nullptr, d1, nullptr);
-    QVERIFY(reason == dvm::ConnectionCreationValidator::FailReason::NoEndDevice);
+    reason = dvm::ConnectionValidator::canConnect(nullptr, nullptr, d1, nullptr);
+    QCOMPARE(reason, dvm::ConnectionValidator::FailReason::NoEndDevice);
 
-    reason = dvm::ConnectionCreationValidator::canConnect(nullptr, nullptr, d1, d2);
-    QVERIFY(reason == dvm::ConnectionCreationValidator::FailReason::NoStartNode);
+    reason = dvm::ConnectionValidator::canConnect(nullptr, nullptr, d1, d2);
+    QCOMPARE(reason, dvm::ConnectionValidator::FailReason::NoStartNode);
 
-    reason = dvm::ConnectionCreationValidator::canConnect(n1, nullptr, d1, d2);
-    QVERIFY(reason == dvm::ConnectionCreationValidator::FailReason::NoEndNode);
+    reason = dvm::ConnectionValidator::canConnect(n1, nullptr, d1, d2);
+    QCOMPARE(reason, dvm::ConnectionValidator::FailReason::NoEndNode);
 
-    reason = dvm::ConnectionCreationValidator::canConnect(n1, n1, d1, d2);
-    QVERIFY(reason == dvm::ConnectionCreationValidator::FailReason::SameParent);
+    reason = dvm::ConnectionValidator::canConnect(n1, n1, d1, d2);
+    QCOMPARE(reason, dvm::ConnectionValidator::FailReason::SameParent);
 
-    reason = dvm::ConnectionCreationValidator::canConnect(n1, n2, d1, d1);
-    QVERIFY(reason == dvm::ConnectionCreationValidator::FailReason::SameDevice);
+    reason = dvm::ConnectionValidator::canConnect(n1, n2, d1, d1);
+    QCOMPARE(reason, dvm::ConnectionValidator::FailReason::SameDevice);
 
-    reason = dvm::ConnectionCreationValidator::canConnect(n1, n2, d1, d2);
-    QVERIFY(reason == dvm::ConnectionCreationValidator::FailReason::NoScene);
+    reason = dvm::ConnectionValidator::canConnect(n1, n2, d1, d2);
+    QCOMPARE(reason, dvm::ConnectionValidator::FailReason::NoScene);
 
     model->addObject(n1);
     model->addObject(d1);
     model->addObject(n2);
     model->addObject(d2);
 
-    reason = dvm::ConnectionCreationValidator::canConnect(n1, n2, d1, d2);
-    QVERIFY(reason == dvm::ConnectionCreationValidator::FailReason::NotFail);
+    reason = dvm::ConnectionValidator::canConnect(n1, n2, d1, d2);
+    QCOMPARE(reason, dvm::ConnectionValidator::FailReason::ParamsDiffer);
+
+    d2->setEntityAttribute(attrName, QLatin1String("BusName"));
+    reason = dvm::ConnectionValidator::canConnect(n1, n2, d1, d2);
+    QCOMPARE(reason, dvm::ConnectionValidator::FailReason::NotFail);
 
     auto c = new dvm::DVConnection(d1, d2);
     QVERIFY(c != nullptr);
-    model->addObject(c);
+    bool added = model->addObject(c);
+    QVERIFY(added);
 
-    reason = dvm::ConnectionCreationValidator::canConnect(n1, n2, d1, d2);
-    QVERIFY(reason == dvm::ConnectionCreationValidator::FailReason::AlreadyExists);
+    reason = dvm::ConnectionValidator::canConnect(n1, n2, d1, d2);
+    QCOMPARE(reason, dvm::ConnectionValidator::FailReason::AlreadyExists);
+
+    auto c2 = new dvm::DVConnection(d1, d2);
+    added = model->addObject(c2);
+    QVERIFY(!added);
 }
 
 QTEST_MAIN(tst_DVConnectionUtils)

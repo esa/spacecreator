@@ -17,6 +17,7 @@
 
 #include "dvconnection.h"
 
+#include "connectionvalidator.h"
 #include "dvdevice.h"
 #include "dvmessage.h"
 #include "dvmodel.h"
@@ -84,7 +85,8 @@ bool DVConnection::postInit()
             return dev->portName() == portName && dev->busName() == busName;
         });
         if (it == nodeDevices.cend()) {
-            shared::ErrorHub::addError(shared::ErrorItem::Error, tr("Can't find device with name %1\n").arg(portName));
+            shared::ErrorHub::addError(shared::ErrorItem::Error,
+                    tr("Can't find device with name %1 and bus access %2\n").arg(portName, busName));
             return nullptr;
         }
         return *it;
@@ -100,7 +102,26 @@ bool DVConnection::postInit()
     const QString targetPortName = entityAttributeValue(meta::Props::token(meta::Props::Token::to_port)).toString();
     d->targetDevice = getDevice(targetNodeName, targetPortName, busName);
 
-    return d->sourceDevice && d->targetDevice;
+    if (!d->sourceDevice || !d->targetDevice) {
+        return false;
+    }
+
+    ConnectionValidator::FailReason valid = ConnectionValidator::check(this);
+    if (valid != ConnectionValidator::FailReason::NotFail) {
+        switch (valid) {
+        case ConnectionValidator::FailReason::ParamsDiffer:
+            shared::ErrorHub::addError(shared::ErrorItem::Error,
+                    tr("%1 parameter differ for %2 and %3")
+                            .arg(title(), d->sourceDevice->title(), d->targetDevice->title()));
+            break;
+        default:
+            shared::ErrorHub::addError(shared::ErrorItem::Error, tr("Connection %1 can't init").arg(title()));
+        }
+
+        return false;
+    }
+
+    return true;
 }
 
 QString DVConnection::titleUI() const

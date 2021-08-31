@@ -25,7 +25,7 @@
 #include "commands/cmdfunctionunbind.h"
 #include "commands/cmdpartitionentitycreate.h"
 #include "commandsstackbase.h"
-#include "connectioncreationvalidator.h"
+#include "connectionvalidator.h"
 #include "dvfunction.h"
 #include "graphicsviewutils.h"
 #include "itemeditor/dvconnectiongraphicsitem.h"
@@ -280,7 +280,7 @@ bool DVCreatorTool::warnConnectionPreview(const QPointF &pos)
     auto info = dve::gi::validateConnectionCreate(m_view ? m_view->scene() : nullptr, connectionPoints);
     bool warn = true;
     if (m_toolType == ToolType::ReCreateConnection) {
-        if ((info.status != dvm::ConnectionCreationValidator::FailReason::NotFail) || info.endDeviceId.isNull()
+        if ((info.status != dvm::ConnectionValidator::FailReason::NotFail) || info.endDeviceId.isNull()
                 || info.startDeviceId.isNull()) {
             warn = true;
         } else {
@@ -464,7 +464,7 @@ void DVCreatorTool::handleConnectionReCreate(const QVector<QPointF> &graphicPoin
 {
     m_toolType = ToolType::Pointer;
     const auto info = dve::gi::validateConnectionCreate(m_view ? m_view->scene() : nullptr, graphicPoints);
-    if (info.status != dvm::ConnectionCreationValidator::FailReason::NotFail) {
+    if (info.status != dvm::ConnectionValidator::FailReason::NotFail) {
         return;
     }
     const shared::Id id = m_previewConnectionItem->data(Qt::UserRole).toUuid();

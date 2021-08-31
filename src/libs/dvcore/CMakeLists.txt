@@ -3,10 +3,10 @@ set(LIB_NAME dvcore)
 add_library(${LIB_NAME} STATIC)
 
 target_sources(${LIB_NAME} PRIVATE
+    connectionvalidator.cpp
+    connectionvalidator.h
     dvboard.cpp
     dvboard.h
-    dvhwlibraryreader.cpp
-    dvhwlibraryreader.h
     dvcommonprops.cpp
     dvcommonprops.h
     dvconnection.cpp
@@ -15,31 +15,31 @@ target_sources(${LIB_NAME} PRIVATE
     dvdevice.h
     dvfunction.cpp
     dvfunction.h
+    dvhwlibraryreader.cpp
+    dvhwlibraryreader.h
+    dvlibrary.cpp
+    dvlibrary.h
     dvmessage.cpp
     dvmessage.h
     dvmodel.cpp
     dvmodel.h
+    dvnamevalidator.cpp
+    dvnamevalidator.h
     dvnode.cpp
     dvnode.h
     dvobject.cpp
     dvobject.h
     dvpartition.cpp
     dvpartition.h
-    dvxmlreader.cpp
-    dvxmlreader.h
-    connectioncreationvalidator.cpp
-    connectioncreationvalidator.h
-    dvpropertytemplateconfig.cpp
-    dvpropertytemplateconfig.h
-    dvpropertytemplate.cpp
-    dvpropertytemplate.h
-    dvlibrary.cpp
-    dvlibrary.h
     dvport.cpp
     dvport.h
-    dvnamevalidator.cpp
-    dvnamevalidator.h
+    dvpropertytemplate.cpp
+    dvpropertytemplate.h
+    dvpropertytemplateconfig.cpp
+    dvpropertytemplateconfig.h
     dvresources.qrc
+    dvxmlreader.cpp
+    dvxmlreader.h
 )
 
 target_include_directories(${LIB_NAME} PUBLIC .)

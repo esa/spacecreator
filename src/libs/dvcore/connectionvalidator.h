@@ -27,10 +27,11 @@ class QGraphicsScene;
 class QGraphicsItem;
 
 namespace dvm {
-class DVNode;
+class DVConnection;
 class DVDevice;
+class DVNode;
 
-class ConnectionCreationValidator
+class ConnectionValidator
 {
     Q_GADGET
 
@@ -50,11 +51,12 @@ public:
     };
     Q_ENUM(FailReason)
 
-    static ConnectionCreationValidator::FailReason canConnect(
-            DVNode *sourceNode, DVNode *targetNode, DVDevice *sourceDevice, DVDevice *targetDevice);
+    static ConnectionValidator::FailReason canConnect(DVNode *sourceNode, DVNode *targetNode, DVDevice *sourceDevice,
+            DVDevice *targetDevice, DVConnection *ignoreConnection = nullptr);
+    static ConnectionValidator::FailReason check(DVConnection *connection);
 
 private:
-    ConnectionCreationValidator();
+    ConnectionValidator();
 };
 
 struct ValidationResult {
@@ -66,10 +68,10 @@ struct ValidationResult {
 
     QVector<QPointF> connectionPoints;
 
-    ConnectionCreationValidator::FailReason status { ConnectionCreationValidator::FailReason::NotFail };
+    ConnectionValidator::FailReason status { ConnectionValidator::FailReason::NotFail };
 
-    inline bool failed() const { return status != ConnectionCreationValidator::FailReason::NotFail; }
-    inline bool setFailed(ConnectionCreationValidator::FailReason s)
+    inline bool failed() const { return status != ConnectionValidator::FailReason::NotFail; }
+    inline bool setFailed(ConnectionValidator::FailReason s)
     {
         status = s;
         return failed();
