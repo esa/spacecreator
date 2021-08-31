@@ -1,5 +1,29 @@
 {% comment %}
-    Template for generation of XML scheme of the whole deployment view.
+Template for generation of XML scheme of the whole deployment view.
+==================
+Every instance/object (node, partition, connection, ...) has at least the following properties:
+name            : Name of the object
+attributes      : List of attributes
+attribute.name  :  |_ Name of that attribute
+attribute.value :  |_ Value of that attribute
+properties      : List of properties
+properties.name :  |_ Name of that property
+properties.value:  |_ Value of that property
+==================
+The following tags are available in this template:
+Nodes               : List of all available Nodes (Boards)
+node                :  |_ Instance of node (see "for node in Nodes")
+node.partitions     :  |   |_ List of partitions (binary) in that node
+partition           :  |   |   |_ Instance of partition (see "for partition in node.partitions")
+partitions.functions:  |   |       |_ List of functions in that partition
+function            :  |   |           |_ Instance of function (see "for function in function in partition.functions")
+node.devices        :  |   |_ List of devices (ports) in that node
+device              :  |       |_ Instance of device (see "for device in node.devices")
+Connections         : List of all available Connections between devices
+connection          :  |_ Instance of connection (see "for connection in Connections")
+connection.messages :      |_ List of message binding of that connection
+message             :          |_ Instance of message/binding (see "for message in connection.messages")
+==================
 {% endcomment %}
 <DeploymentView>
 {% for node in Nodes %}
