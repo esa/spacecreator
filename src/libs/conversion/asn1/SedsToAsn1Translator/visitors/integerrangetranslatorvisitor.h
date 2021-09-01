@@ -28,9 +28,20 @@ class MinMaxRange;
 
 namespace conversion::asn1::translator {
 
+/**
+ * @brief   Translator visitor for SEDS integer range
+ *
+ * Translated range will be added to the passed ASN.1 constraint
+ */
 struct IntegerRangeTranslatorVisitor final {
+    /** @brief  Where translated range will be added */
     Asn1Acn::Constraints::ConstraintList<Asn1Acn::IntegerValue> &m_constraints;
 
+    /**
+     * @brief   Translate SEDS min-max range
+     *
+     * @param   range   Range to translate
+     */
     auto operator()(const seds::model::MinMaxRange &range) -> void;
 };
 

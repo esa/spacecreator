@@ -29,15 +29,35 @@ class MinMaxRange;
 
 namespace conversion::asn1::translator {
 
+/**
+ * @brief   Translator visitor for SEDS float range
+ *
+ * Translated range will be added to the passed ASN.1 constraint
+ */
 struct FloatRangeTranslatorVisitor final {
+    /** @brief  Where translated range will be added */
     Asn1Acn::Constraints::ConstraintList<Asn1Acn::RealValue> &m_constraints;
 
+    /**
+     * @brief   Translate SEDS float precision range
+     *
+     * @param   range   Range to translate
+     */
     auto operator()(const seds::model::FloatPrecisionRange &range) -> void;
+    /**
+     * @brief   Translate SEDS min-max range
+     *
+     * @param   range   Range to translate
+     */
     auto operator()(const seds::model::MinMaxRange &range) -> void;
 
+    /** @brief   Smallest range value for single precision */
     constexpr static double singleRangeMin = 1.17549E-38;
+    /** @brief   Greatest range value for single precision */
     constexpr static double singleRangeMax = 3.40282e+38;
+    /** @brief   Smallest range value for double precision */
     constexpr static double doubleRangeMin = 2.22507e-308;
+    /** @brief   Greate range value for double precision */
     constexpr static double doubleRangeMax = 1.79769e+308;
 };
 

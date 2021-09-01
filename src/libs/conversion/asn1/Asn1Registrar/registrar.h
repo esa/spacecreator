@@ -23,6 +23,9 @@
 
 namespace conversion::asn1 {
 
+/**
+ * @brief   Registers conversion capabilities for ASN.1 model
+ */
 class Asn1Registrar final : public Registrar
 {
 public:

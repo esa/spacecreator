@@ -36,6 +36,9 @@ class Package;
 
 namespace conversion::asn1::translator {
 
+/**
+ * @brief   Translator between SEDS model and ASN.1 model
+ */
 class SedsToAsn1Translator final : public ::conversion::translator::Translator
 {
 public:
@@ -56,13 +59,33 @@ public:
     virtual auto getDependencies() const -> std::set<ModelType> override;
 
 private:
+    /**
+     * @brief   Translate SEDS model
+     *
+     * @param   sedsModel   SEDS model to translate
+     *
+     * @return  Result ASN.1 model
+     */
     auto translateSedsModel(const seds::model::SedsModel *sedsModel) const -> std::unique_ptr<Asn1Acn::Asn1Model>;
 
 private:
+    /**
+     * @brief   Translate SEDS package
+     *
+     * @param   package     Package to translate
+     *
+     * @return  Result ASN.1 file
+     */
     auto translatePackage(const seds::model::Package &package) const -> Asn1Acn::File;
 
+    /**
+     * @brief   Translate SEDS data types
+     *
+     * @param   dataTypes       Vector of data types to translate
+     * @param   definitions     Where translated data types should be added
+     */
     auto translateDataTypes(
-            Asn1Acn::Definitions *definitions, const std::vector<seds::model::DataType> &dataTypes) const -> void;
+            const std::vector<seds::model::DataType> &dataTypes, Asn1Acn::Definitions *definitions) const -> void;
 };
 
 } // namespace conversion::asn1::translator

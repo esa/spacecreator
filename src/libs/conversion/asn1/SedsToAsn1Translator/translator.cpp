@@ -88,7 +88,7 @@ Asn1Acn::File SedsToAsn1Translator::translatePackage(const seds::model::Package 
 
     auto definitions =
             std::make_unique<Asn1Acn::Definitions>(package.qualifiedName().name().value(), Asn1Acn::SourceLocation());
-    translateDataTypes(definitions.get(), package.dataTypes());
+    translateDataTypes(package.dataTypes(), definitions.get());
 
     asn1File.add(std::move(definitions));
 
@@ -96,7 +96,7 @@ Asn1Acn::File SedsToAsn1Translator::translatePackage(const seds::model::Package 
 }
 
 void SedsToAsn1Translator::translateDataTypes(
-        Asn1Acn::Definitions *definitions, const std::vector<seds::model::DataType> &dataTypes) const
+        const std::vector<seds::model::DataType> &dataTypes, Asn1Acn::Definitions *definitions) const
 {
     for (const auto &dataType : dataTypes) {
         std::visit(DataTypeTranslatorVisitor { definitions }, dataType);
