@@ -49,10 +49,11 @@ std::vector<std::unique_ptr<Model>> SedsToAsn1Translator::translateModels(
         throw TranslationException("Source model is null");
     }
 
-    const auto *sedsModel = dynamic_cast<const SedsModel *>(sourceModel);
-    if (sedsModel == nullptr) {
-        throw IncorrectSourceModelException(ModelType::Seds);
+    if (sourceModel->modelType() != ModelType::Seds) {
+        throw IncorrectSourceModelException(ModelType::Seds, sourceModel->modelType());
     }
+
+    const auto *sedsModel = dynamic_cast<const SedsModel *>(sourceModel);
 
     return translateSedsModel(sedsModel);
 }

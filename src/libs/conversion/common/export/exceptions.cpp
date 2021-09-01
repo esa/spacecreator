@@ -26,8 +26,10 @@ ExportException::ExportException(QString message)
 {
 }
 
-IncorrectModelException::IncorrectModelException(ModelType expectedModelType)
-    : ExportException(QString("Incorrect model passed, expected %1 model").arg(modelTypeToString(expectedModelType)))
+IncorrectModelException::IncorrectModelException(ModelType expectedModelType, ModelType receivedModelType)
+    : ExportException(QString("Incorrect model passed, expected %1 model, got %2 model")
+                              .arg(modelTypeToString(expectedModelType))
+                              .arg(modelTypeToString(receivedModelType)))
 {
 }
 

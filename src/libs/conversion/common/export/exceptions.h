@@ -48,8 +48,9 @@ public:
      * @brief   Constructor
      *
      * @param   expectedModelType   Expected model type
+     * @param   receivedModelType   Received model type
      */
-    explicit IncorrectModelException(ModelType expectedModelType);
+    explicit IncorrectModelException(ModelType expectedModelType, ModelType receivedModelType);
 };
 
 } // namespace conversion::exporter
