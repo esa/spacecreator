@@ -100,12 +100,16 @@ void Converter::translateModels(const Translator *translator, ModelType targetMo
         sourceModels.push_back(model);
     }
 
-    auto targetModel = translator->translateModels(std::move(sourceModels), m_options);
+    auto targetModels = translator->translateModels(std::move(sourceModels), m_options);
 
-    const auto insertionResult = m_modelCache.insert({ targetModelType, std::move(targetModel) });
-    if (!insertionResult.second) {
-        const auto message = QString("Failed to save translated %1 model").arg(modelTypeToString(targetModelType));
-        throw ConverterException(message);
+    for (auto &targetModel : targetModels) {
+        const auto targetModelType = targetModel->modelType();
+
+        const auto insertionResult = m_modelCache.insert({ targetModelType, std::move(targetModel) });
+        if (!insertionResult.second) {
+            const auto message = QString("Failed to save translated %1 model").arg(modelTypeToString(targetModelType));
+            throw ConverterException(message);
+        }
     }
 }
 
