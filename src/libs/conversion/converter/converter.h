@@ -56,7 +56,7 @@ public:
     /**
      * @brief   Default move constructor
      */
-    Converter(Converter &&) = default;
+    Converter(Converter &&) = delete;
 
     /**
      * @brief   Deleted copy assignment operator
@@ -65,7 +65,7 @@ public:
     /**
      * @brief   Default move assignment operator
      */
-    Converter &operator=(Converter &&) = default;
+    Converter &operator=(Converter &&) = delete;
 
 public:
     /**
