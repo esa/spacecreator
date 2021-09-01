@@ -525,7 +525,6 @@ void MainWindow::initConnections()
             d->m_core->commandsStack()->push(new cmd::CmdSetAsn1File(model, d->ui->asn1Widget->fileName(), "ASN.1"));
         }
     });
-    connect(d->m_core->mainModel(), &MainModel::asn1ParameterErrorDetected, this, &MainWindow::showAsn1Errors);
 }
 
 /*!
@@ -856,12 +855,6 @@ void MainWindow::saveScreenshot()
         const QString fileName = dialog.selectedUrls().value(0).toLocalFile();
         saveSceneRender(fileName);
     }
-}
-
-void MainWindow::showAsn1Errors(const QStringList &faultyMessages)
-{
-    QMessageBox::warning(
-            this, tr("ASN1 error"), tr("Following messages have ASN.1 errors:") + "\n" + faultyMessages.join("\n"));
 }
 
 void MainWindow::editColorScheme()

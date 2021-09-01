@@ -82,7 +82,6 @@ public Q_SLOTS:
     void saveScreenshot();
 
 private Q_SLOTS:
-    void showAsn1Errors(const QStringList &faultyMessages);
     void editColorScheme();
 
 private:

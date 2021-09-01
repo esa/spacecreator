@@ -40,10 +40,14 @@ class MscModel : public QObject
                     dataDefinitionStringChanged)
     Q_PROPERTY(QVector<msc::MscDocument *> documents READ documents NOTIFY dataChanged)
     Q_PROPERTY(QVector<msc::MscChart *> charts READ charts NOTIFY dataChanged)
+    Q_PROPERTY(QString filename READ filename WRITE setFilename NOTIFY filenameChanged)
 
 public:
     explicit MscModel(QObject *parent = nullptr);
     ~MscModel();
+
+    void setFilename(const QString filename);
+    const QString filename() const;
 
     const QVector<MscDocument *> &documents() const;
     bool addDocument(MscDocument *document);
@@ -80,7 +84,7 @@ Q_SIGNALS:
     void dataLanguageChanged(const QString &dataLanguage);
     void dataDefinitionStringChanged(const QString &dataString);
     void asn1DataChanged();
-    void asn1ParameterErrorDetected(const QStringList &faultyMessages);
+    void filenameChanged();
 
     // Emitted whenever a document is removed anywhere in the model
     void documentRemovedFrom(msc::MscDocument *document, QObject *parentObject);
@@ -93,6 +97,7 @@ private:
     QString m_dataLanguage;
     QString m_dataDefinitionString;
     QPointer<Asn1Acn::Asn1SystemChecks> m_asnChecks;
+    QString m_filename;
 };
 
 }

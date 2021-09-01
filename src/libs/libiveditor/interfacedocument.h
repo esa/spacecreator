@@ -126,8 +126,6 @@ Q_SIGNALS:
     void asn1FileNameChanged(const QString &asn1FileName);
     void mscFileNameChanged(const QString &mscFileName);
 
-    void asn1ParameterErrorDetected(const QStringList &faultyInterfaces);
-
 public Q_SLOTS:
     void onSavedExternally(const QString &filePath, bool saved);
     void setObjects(const QVector<ivm::IVObject *> &objects);

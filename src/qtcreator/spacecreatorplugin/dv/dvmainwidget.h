@@ -40,9 +40,6 @@ public:
 
     QSharedPointer<dve::DVEditorCore> dvPlugin() const;
 
-private Q_SLOTS:
-    void showAsn1Errors(const QStringList &faultyInterfaces);
-
 private:
     void init();
 

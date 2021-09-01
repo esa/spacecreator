@@ -563,7 +563,7 @@ void InterfaceDocument::setAsn1Check(Asn1Acn::Asn1SystemChecks *check)
     d->asnCheck = check;
 
     connect(d->asnCheck->asn1Storage(), &Asn1Acn::Asn1ModelStorage::dataTypesChanged, this,
-            &ive::InterfaceDocument::checkAllInterfacesForAsn1Compliance);
+            &ive::InterfaceDocument::checkAllInterfacesForAsn1Compliance, Qt::QueuedConnection);
 }
 
 QString InterfaceDocument::supportedFileExtensions() const
@@ -597,7 +597,8 @@ bool InterfaceDocument::checkInterfaceAsn1Compliance(const ivm::IVInterface *int
  */
 bool InterfaceDocument::checkAllInterfacesForAsn1Compliance()
 {
-    QStringList faultyInterfaces;
+    const QString ivFilenname = d->filePath;
+    shared::ErrorHub::clearFileErrors(ivFilenname);
 
     bool ok = true;
     for (ivm::IVInterface *interface : d->objectsModel->allObjectsByType<ivm::IVInterface>()) {
@@ -612,12 +613,9 @@ bool InterfaceDocument::checkAllInterfacesForAsn1Compliance()
                 }
                 parameters += param.toString();
             }
-            faultyInterfaces << QString("%1(%2)").arg(id, parameters);
+            QString error = tr("Interface ASN.1 error: %1(%2)").arg(id, parameters);
+            shared::ErrorHub::addError(shared::ErrorItem::Error, error, ivFilenname);
         }
-    }
-
-    if (!ok) {
-        Q_EMIT asn1ParameterErrorDetected(faultyInterfaces);
     }
 
     return ok;

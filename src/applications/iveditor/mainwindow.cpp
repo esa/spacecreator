@@ -106,8 +106,6 @@ MainWindow::MainWindow(ive::IVEditorCore *core, QWidget *parent)
 
     m_core->setupMiniMap();
 
-    connect(m_core->document(), &InterfaceDocument::asn1ParameterErrorDetected, this, &MainWindow::showAsn1Errors);
-
     connect(m_core->document()->exporter(), &IVExporter::exported, m_core->document(),
             &InterfaceDocument::onSavedExternally);
 
@@ -343,12 +341,6 @@ void MainWindow::openAsn1Dialog()
             m_core->commandsStack()->push(command);
         }
     }
-}
-
-void MainWindow::showAsn1Errors(const QStringList &faultyInterfaces)
-{
-    QMessageBox::warning(
-            this, tr("ASN1 error"), tr("Following interfaces have ASN.1 errors:") + "\n" + faultyInterfaces.join("\n"));
 }
 
 void MainWindow::initMenus()

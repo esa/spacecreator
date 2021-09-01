@@ -163,12 +163,6 @@ void MscMainWidget::showSelection(const QModelIndex &current, const QModelIndex 
     }
 }
 
-void MscMainWidget::showAsn1Errors(const QStringList &faultyMessages)
-{
-    QMessageBox::warning(
-            this, tr("ASN1 error"), tr("Following messages have ASN.1 errors:") + "\n" + faultyMessages.join("\n"));
-}
-
 /*!
    Thw the chart of document tool bar depending of the view mode
  */
@@ -302,8 +296,6 @@ void MscMainWidget::initConnections()
 
     connect(m_plugin->mainModel()->documentItemModel(), &msc::DocumentItemModel::dataChanged, this,
             &MscMainWidget::showSelection);
-
-    connect(m_plugin->mainModel(), &msc::MainModel::asn1ParameterErrorDetected, this, &MscMainWidget::showAsn1Errors);
 
     connect(m_plugin->mainModel(), &msc::MainModel::asn1FileNameChanged, m_asn1Switch, &QPushButton::setText);
     connect(m_asn1Switch, &QPushButton::clicked, this, [&]() {

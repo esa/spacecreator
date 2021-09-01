@@ -19,6 +19,7 @@
 
 #include "actionsbar.h"
 #include "commandsstack.h"
+#include "errorhub.h"
 #include "interfacedocument.h"
 #include "iveditorcore.h"
 
@@ -74,15 +75,6 @@ void IVMainWidget::init()
     layout->addWidget(m_plugin->document()->view());
 
     m_plugin->setupMiniMap();
-
-    connect(m_plugin->document(), &ive::InterfaceDocument::asn1ParameterErrorDetected, this,
-            &IVMainWidget::showAsn1Errors);
-}
-
-void IVMainWidget::showAsn1Errors(const QStringList &faultyInterfaces)
-{
-    QMessageBox::warning(
-            this, tr("ASN1 error"), tr("Following interfaces have ASN.1 errors:") + "\n" + faultyInterfaces.join("\n"));
 }
 
 }

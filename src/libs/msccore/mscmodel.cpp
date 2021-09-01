@@ -19,6 +19,7 @@
 
 #include "asn1systemchecks.h"
 #include "asn1valueparser.h"
+#include "errorhub.h"
 #include "mscchart.h"
 #include "mscdocument.h"
 #include "mscmessagedeclaration.h"
@@ -36,6 +37,21 @@ MscModel::MscModel(QObject *parent)
 MscModel::~MscModel()
 {
     clear();
+}
+
+void MscModel::setFilename(const QString filename)
+{
+    if (filename == m_filename) {
+        return;
+    }
+
+    m_filename = filename;
+    Q_EMIT filenameChanged();
+}
+
+const QString MscModel::filename() const
+{
+    return m_filename;
 }
 
 const QVector<MscDocument *> &MscModel::documents() const
@@ -171,10 +187,14 @@ void MscModel::setDataDefinitionString(const QString &dataString)
 
 void msc::MscModel::checkAllMessages()
 {
+    shared::ErrorHub::clearFileErrors(m_filename);
+
     QStringList faultyMessages;
     const bool ok = checkAllMessagesForAsn1Compliance(&faultyMessages);
     if (!ok) {
-        Q_EMIT asn1ParameterErrorDetected(faultyMessages);
+        for (const QString &error : faultyMessages) {
+            shared::ErrorHub::addError(shared::ErrorItem::Error, tr("Message ASN.1 error: ").arg(error), m_filename);
+        }
     }
 }
 

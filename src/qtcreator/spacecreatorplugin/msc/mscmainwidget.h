@@ -57,7 +57,6 @@ public:
 private Q_SLOTS:
     void showChart(const QModelIndex &index);
     void showSelection(const QModelIndex &current, const QModelIndex &previous);
-    void showAsn1Errors(const QStringList &faultyMessages);
     void onViewModeChanged();
     void openAsn1Dialog();
 

@@ -59,10 +59,4 @@ void DVMainWidget::init()
     layout->addWidget(m_plugin->mainwidget());
 }
 
-void DVMainWidget::showAsn1Errors(const QStringList &faultyInterfaces)
-{
-    QMessageBox::warning(
-            this, tr("ASN1 error"), tr("Following interfaces have ASN.1 errors:") + "\n" + faultyInterfaces.join("\n"));
-}
-
 }

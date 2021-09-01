@@ -43,9 +43,6 @@ public:
 public Q_SLOTS:
     void setMinimapVisible(bool visible);
 
-private Q_SLOTS:
-    void showAsn1Errors(const QStringList &faultyInterfaces);
-
 private:
     void init();
 
