@@ -84,6 +84,8 @@ public:
 
     void clear() override;
 
+    virtual conversion::ModelType modelType() const override;
+
 Q_SIGNALS:
     void rootObjectChanged(shared::Id rootId);
 

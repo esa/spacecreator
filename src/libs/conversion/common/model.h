@@ -19,6 +19,8 @@
 
 #pragma once
 
+#include "modeltype.h"
+
 namespace conversion {
 
 /**
@@ -30,7 +32,15 @@ public:
     /**
      * @brief   Destructor
      */
-    virtual ~Model() = 0;
+    virtual ~Model() = default;
+
+public:
+    /**
+     * @brief   Get this model type
+     *
+     * @return  Model type
+     */
+    virtual auto modelType() const -> ModelType = 0;
 };
 
 } // namespace conversion
