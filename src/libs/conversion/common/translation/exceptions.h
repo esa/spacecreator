@@ -48,8 +48,9 @@ public:
      * @brief   Constructor
      *
      * @param   expectedModelType   Expected model type
+     * @param   receivedModelType   Received model type
      */
-    explicit IncorrectSourceModelException(ModelType expectedModelType);
+    explicit IncorrectSourceModelException(ModelType expectedModelType, ModelType receivedModelType);
 };
 
 /**

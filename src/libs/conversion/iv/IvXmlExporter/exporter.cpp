@@ -45,10 +45,11 @@ void IvXmlExporter::exportModel(const Model *model, const Options &options) cons
         throw ExportException("Model to export is null");
     }
 
-    const auto *ivModel = dynamic_cast<const IVModel *>(model);
-    if (ivModel == nullptr) {
-        throw IncorrectModelException(ModelType::InterfaceView);
+    if (model->modelType() != ModelType::InterfaceView) {
+        throw IncorrectModelException(ModelType::InterfaceView, model->modelType());
     }
+
+    const auto *ivModel = dynamic_cast<const IVModel *>(model);
 
     const auto outputFilename = options.value(IvOptions::outputFilename);
     if (!outputFilename) {
