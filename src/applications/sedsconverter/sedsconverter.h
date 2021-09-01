@@ -56,9 +56,11 @@ public:
     /**
      * @brief   Convert SEDS to target model
      *
-     * @param   targetModelType     Target model type
+     * @param   targetModelType         Target model type
+     * @param   auxiliaryModelsTypes    List of types that will be additionally exported
      */
-    auto convert(conversion::ModelType targetModelType) const -> void;
+    auto convert(conversion::ModelType targetModelType,
+            const std::set<conversion::ModelType> &auxiliaryModelsTypes) const -> void;
 
 private:
     /**

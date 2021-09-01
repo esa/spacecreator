@@ -44,16 +44,24 @@ Converter::Converter(const Registry &registry, Options options)
 {
 }
 
-void Converter::convert(std::set<ModelType> sourceModelsTypes, ModelType targetModelType)
+void Converter::convert(
+        std::set<ModelType> sourceModelsTypes, ModelType targetModelType, std::set<ModelType> auxiliaryModelsTypes)
 {
-    const auto *translator = m_registry.findTranslator(sourceModelsTypes, targetModelType);
-    if (!translator) {
+    for (const auto sourceModelType : sourceModelsTypes) {
+        if (!m_registry.isImporterRegistered(sourceModelType)) {
+            throw ImporterNotRegisteredException(sourceModelType);
+        }
+    }
+    if (!m_registry.isTranslatorRegistered(sourceModelsTypes, targetModelType)) {
         throw TranslatorNotRegisteredException(sourceModelsTypes, targetModelType);
     }
-
-    const auto *exporter = m_registry.findExporter(targetModelType);
-    if (!exporter) {
+    if (!m_registry.isExporterRegistered(targetModelType)) {
         throw ExporterNotRegisteredException(targetModelType);
+    }
+    for (const auto auxiliaryModelType : auxiliaryModelsTypes) {
+        if (!m_registry.isExporterRegistered(auxiliaryModelType)) {
+            throw ExporterNotRegisteredException(auxiliaryModelType);
+        }
     }
 
     for (const auto &sourceModelType : sourceModelsTypes) {
@@ -63,16 +71,17 @@ void Converter::convert(std::set<ModelType> sourceModelsTypes, ModelType targetM
     }
 
     // TODO: Check and resolve translator dependencies
-    translateModels(translator, targetModelType);
-    exportModel(exporter, targetModelType);
+
+    translateModels(sourceModelsTypes, targetModelType);
+    exportModel(targetModelType);
+    for (const auto &auxiliaryModelType : auxiliaryModelsTypes) {
+        exportModel(auxiliaryModelType);
+    }
 }
 
 void Converter::importModel(ModelType modelType)
 {
     const auto *importer = m_registry.findImporter(modelType);
-    if (importer == nullptr) {
-        throw ImporterNotRegisteredException(modelType);
-    }
 
     auto model = importer->importModel(m_options);
     if (model == nullptr) {
@@ -87,8 +96,10 @@ void Converter::importModel(ModelType modelType)
     }
 }
 
-void Converter::translateModels(const Translator *translator, ModelType targetModelType)
+void Converter::translateModels(const std::set<ModelType> &sourceModelsTypes, ModelType targetModelType)
 {
+    const auto *translator = m_registry.findTranslator(sourceModelsTypes, targetModelType);
+
     std::vector<const Model *> sourceModels;
     for (const auto modelType : translator->getDependencies()) {
         if (!isModelImported(modelType)) {
@@ -113,8 +124,10 @@ void Converter::translateModels(const Translator *translator, ModelType targetMo
     }
 }
 
-void Converter::exportModel(const ModelExporter *exporter, ModelType modelType)
+void Converter::exportModel(ModelType modelType)
 {
+    const auto *exporter = m_registry.findExporter(modelType);
+
     if (!isModelImported(modelType)) {
         const auto message = QString("%1 model was not found").arg(modelTypeToString(modelType));
         throw ConverterException(message);

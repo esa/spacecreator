@@ -46,7 +46,7 @@ SedsConverter::SedsConverter()
     initializeRegistry();
 }
 
-void SedsConverter::convert(ModelType targetModelType) const
+void SedsConverter::convert(ModelType targetModelType, const std::set<ModelType> &auxiliaryModelsTypes) const
 {
     Options options;
     options.add(SedsOptions::inputFilename, "input.xml");
@@ -56,7 +56,7 @@ void SedsConverter::convert(ModelType targetModelType) const
     options.add(SedsOptions::keepIntermediateFiles);
 
     Converter converter(m_registry, std::move(options));
-    converter.convert({ ModelType::Seds }, targetModelType);
+    converter.convert({ ModelType::Seds }, targetModelType, auxiliaryModelsTypes);
 }
 
 void SedsConverter::initializeRegistry()

@@ -81,6 +81,32 @@ public:
     [[nodiscard]] auto registerExporter(ModelType modelType, std::unique_ptr<exporter::ModelExporter> exporter) -> bool;
 
     /**
+     * @brief   Checks if importer for given model type is registered
+     *
+     * @param   modelType   Import model type
+     *
+     * @return  True if registered, false otherwise
+     */
+    auto isImporterRegistered(ModelType modelType) const -> bool;
+    /**
+     * @brief   Checks if translator for given sources and target models types is registered
+     *
+     * @param   sourceModelType     Source model type
+     * @param   targetModelType     Target model type
+     *
+     * @return  True if registered, false otherwise
+     */
+    auto isTranslatorRegistered(std::set<ModelType> sourceModelType, ModelType targetModelType) const -> bool;
+    /**
+     * @brief   Checks if exporter for given model type is registered
+     *
+     * @param   modelType   Export model type
+     *
+     * @return  True if found, false otherwise
+     */
+    auto isExporterRegistered(ModelType modelType) const -> bool;
+
+    /**
      * @brief   Finds importer for given model type
      *
      * @param   modelType   Model type to import
