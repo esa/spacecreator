@@ -26,6 +26,11 @@ SedsModel::SedsModel(Data data)
 {
 }
 
+conversion::ModelType SedsModel::modelType() const
+{
+    return conversion::ModelType::Seds;
+}
+
 const SedsModel::Data &SedsModel::data() const
 {
     return m_data;

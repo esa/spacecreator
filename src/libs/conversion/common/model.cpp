@@ -21,6 +21,4 @@
 
 namespace conversion {
 
-Model::~Model() = default;
-
 } // namespace conversion

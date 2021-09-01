@@ -64,6 +64,14 @@ public:
 
 public:
     /**
+     * @brief   Get this model type
+     *
+     * @return  Model type
+     */
+    virtual auto modelType() const -> conversion::ModelType override;
+
+public:
+    /**
      * @brief   Getter for model data
      *
      * @returns Model data

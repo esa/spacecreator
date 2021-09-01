@@ -355,6 +355,11 @@ void IVModel::clear()
     shared::VEModel::clear();
 }
 
+conversion::ModelType IVModel::modelType() const
+{
+    return conversion::ModelType::InterfaceView;
+}
+
 /*!
    Returns the connection with the given \p interfaceName connection from function \p source to function \p target
    If no such connection is found, a nullptr is returned.

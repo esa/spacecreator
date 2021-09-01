@@ -25,6 +25,11 @@ Asn1Model::Asn1Model(Asn1Model::Data data)
     : m_data(std::move(data))
 { }
 
+conversion::ModelType Asn1Model::modelType() const
+{
+    return conversion::ModelType::Asn1;
+}
+
 const Asn1Model::Data& Asn1Model::data() const
 {
     return m_data;
