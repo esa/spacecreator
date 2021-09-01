@@ -70,7 +70,7 @@ public:
      * @return  Target model translated from the source model
      */
     virtual auto translateModels(std::vector<const Model *> sources, const Options &options) const
-            -> std::unique_ptr<Model> = 0;
+            -> std::vector<std::unique_ptr<Model>> = 0;
 
     /**
      * @brief   Provides a set of all source model types that are required for the translation

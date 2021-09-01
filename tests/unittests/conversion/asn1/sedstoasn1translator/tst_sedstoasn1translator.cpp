@@ -72,8 +72,11 @@ void tst_SedsToAsn1Translator::testTranslateBinaryDataType()
     Options options;
     SedsToAsn1Translator translator;
 
-    const auto resultModel = translator.translateModels({ sedsModel.get() }, options);
-    QVERIFY(resultModel);
+    const auto resultModels = translator.translateModels({ sedsModel.get() }, options);
+    QCOMPARE(resultModels.size(), 1);
+
+    const auto &resultModel = resultModels[0];
+    QCOMPARE(resultModel->modelType(), conversion::ModelType::Asn1);
 
     const auto *asn1Model = dynamic_cast<Asn1Model *>(resultModel.get());
     QVERIFY(asn1Model);
@@ -115,8 +118,11 @@ void tst_SedsToAsn1Translator::testTranslateBooleanDataType()
     Options options;
     SedsToAsn1Translator translator;
 
-    const auto resultModel = translator.translateModels({ sedsModel.get() }, options);
-    QVERIFY(resultModel);
+    const auto resultModels = translator.translateModels({ sedsModel.get() }, options);
+    QCOMPARE(resultModels.size(), 1);
+
+    const auto &resultModel = resultModels[0];
+    QCOMPARE(resultModel->modelType(), conversion::ModelType::Asn1);
 
     const auto *asn1Model = dynamic_cast<Asn1Model *>(resultModel.get());
     QVERIFY(asn1Model);
@@ -139,8 +145,11 @@ void tst_SedsToAsn1Translator::testTranslateEnumeratedDataType()
     Options options;
     SedsToAsn1Translator translator;
 
-    const auto resultModel = translator.translateModels({ sedsModel.get() }, options);
-    QVERIFY(resultModel);
+    const auto resultModels = translator.translateModels({ sedsModel.get() }, options);
+    QCOMPARE(resultModels.size(), 1);
+
+    const auto &resultModel = resultModels[0];
+    QCOMPARE(resultModel->modelType(), conversion::ModelType::Asn1);
 
     const auto *asn1Model = dynamic_cast<Asn1Model *>(resultModel.get());
     QVERIFY(asn1Model);
@@ -173,8 +182,11 @@ void tst_SedsToAsn1Translator::testTranslateIntegerDataType()
     Options options;
     SedsToAsn1Translator translator;
 
-    const auto resultModel = translator.translateModels({ sedsModel.get() }, options);
-    QVERIFY(resultModel);
+    const auto resultModels = translator.translateModels({ sedsModel.get() }, options);
+    QCOMPARE(resultModels.size(), 1);
+
+    const auto &resultModel = resultModels[0];
+    QCOMPARE(resultModel->modelType(), conversion::ModelType::Asn1);
 
     const auto *asn1Model = dynamic_cast<Asn1Model *>(resultModel.get());
     QVERIFY(asn1Model);
@@ -212,8 +224,11 @@ void tst_SedsToAsn1Translator::testTranslateFloatDataType()
     Options options;
     SedsToAsn1Translator translator;
 
-    const auto resultModel = translator.translateModels({ sedsModel.get() }, options);
-    QVERIFY(resultModel);
+    const auto resultModels = translator.translateModels({ sedsModel.get() }, options);
+    QCOMPARE(resultModels.size(), 1);
+
+    const auto &resultModel = resultModels[0];
+    QCOMPARE(resultModel->modelType(), conversion::ModelType::Asn1);
 
     const auto *asn1Model = dynamic_cast<Asn1Model *>(resultModel.get());
     QVERIFY(asn1Model);
@@ -250,10 +265,13 @@ void tst_SedsToAsn1Translator::testTranslateStringDataType()
     Options options;
     SedsToAsn1Translator translator;
 
-    const auto resultModel = translator.translateModels({ sedsModel.get() }, options);
-    QVERIFY(resultModel);
+    const auto resultModels = translator.translateModels({ sedsModel.get() }, options);
+    QCOMPARE(resultModels.size(), 1);
 
-    const auto *asn1Model = dynamic_cast<Asn1Model *>(resultModel.get());
+    const auto &resultModel = resultModels[0];
+    QCOMPARE(resultModel->modelType(), conversion::ModelType::Asn1);
+
+    const auto *asn1Model = dynamic_cast<Asn1Model *>(resultModels[0].get());
     QVERIFY(asn1Model);
 
     const auto *type = getType(asn1Model, 0);

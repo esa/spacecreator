@@ -35,7 +35,7 @@ using seds::model::SedsModel;
 
 namespace conversion::asn1::translator {
 
-std::unique_ptr<Model> SedsToAsn1Translator::translateModels(
+std::vector<std::unique_ptr<Model>> SedsToAsn1Translator::translateModels(
         std::vector<const Model *> sourceModels, const Options &options) const
 {
     if (sourceModels.empty()) {
@@ -62,7 +62,7 @@ std::set<ModelType> SedsToAsn1Translator::getDependencies() const
     return std::set<ModelType> { ModelType::Seds };
 }
 
-std::unique_ptr<Asn1Model> SedsToAsn1Translator::translateSedsModel(const SedsModel *sedsModel) const
+std::vector<std::unique_ptr<Model>> SedsToAsn1Translator::translateSedsModel(const SedsModel *sedsModel) const
 {
     std::vector<Asn1Acn::File> asn1Files;
 
@@ -79,7 +79,12 @@ std::unique_ptr<Asn1Model> SedsToAsn1Translator::translateSedsModel(const SedsMo
         throw TranslationException("Unhandled SEDS model data");
     }
 
-    return std::make_unique<Asn1Model>(std::move(asn1Files));
+    auto asn1Model = std::make_unique<Asn1Model>(std::move(asn1Files));
+
+    std::vector<std::unique_ptr<Model>> result;
+    result.push_back(std::move(asn1Model));
+
+    return result;
 }
 
 Asn1Acn::File SedsToAsn1Translator::translatePackage(const seds::model::Package &package) const
