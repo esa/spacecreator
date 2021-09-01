@@ -68,6 +68,21 @@ public:
 };
 
 /**
+ * @brief   Exception thrown when interface parameter type wasn't mapped for given interface
+ */
+class MissingGenericTypeMappingException : public TranslationException
+{
+public:
+    /**
+     * @brief   Constructor
+     *
+     * @param   genericTypeName   Type that wasn't mapped
+     * @param   argumentName      Name of argument with that type
+     */
+    explicit MissingGenericTypeMappingException(const QString &genericTypeName, const QString &argumentName);
+};
+
+/**
  * @brief   Exception thrown when translator encounters unhandled value in source model
  */
 class UnhandledValueException : public TranslationException

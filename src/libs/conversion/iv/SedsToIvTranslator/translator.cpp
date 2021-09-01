@@ -32,6 +32,7 @@
 
 using conversion::iv::IvOptions;
 using conversion::translator::IncorrectSourceModelException;
+using conversion::translator::MissingGenericTypeMappingException;
 using conversion::translator::TranslationException;
 using conversion::translator::UndeclaredInterfaceException;
 using conversion::translator::UnhandledValueException;
@@ -176,12 +177,13 @@ void SedsToIvTranslator::translateInterface(const seds::model::Interface &interf
     }
 
     for (const auto &command : (*interfaceDeclaration)->commands()) {
-        translateInterfaceCommand(command, interfaceType, ivFunction);
+        translateInterfaceCommand(command, interfaceType, interface.genericTypeMapSet().genericTypeMaps(), ivFunction);
     }
 }
 
 void SedsToIvTranslator::translateInterfaceCommand(const seds::model::InterfaceCommand &command,
-        ivm::IVInterface::InterfaceType interfaceType, ivm::IVFunction *ivFunction) const
+        ivm::IVInterface::InterfaceType interfaceType, const std::vector<seds::model::GenericTypeMap> &typeMaps,
+        ivm::IVFunction *ivFunction) const
 {
     ivm::IVInterface::CreationInfo creationInfo;
     creationInfo.function = ivFunction;
@@ -192,16 +194,28 @@ void SedsToIvTranslator::translateInterfaceCommand(const seds::model::InterfaceC
     auto *interface = ivm::IVInterface::createIface(creationInfo);
 
     for (const auto &argument : command.arguments()) {
-        interface->addParam(translateArgument(argument));
+        interface->addParam(translateArgument(argument, typeMaps));
     }
 
     ivFunction->addChild(interface);
 }
 
-ivm::InterfaceParameter SedsToIvTranslator::translateArgument(const seds::model::CommandArgument &argument) const
+ivm::InterfaceParameter SedsToIvTranslator::translateArgument(
+        const seds::model::CommandArgument &argument, const std::vector<seds::model::GenericTypeMap> &typeMaps) const
 {
-    return ivm::InterfaceParameter(argument.name().value(), ivm::BasicParameter::Type::Other,
-            argument.type().value().name().value(), QStringLiteral("ACN"), convertCommandArgumentMode(argument.mode()));
+    const auto argumentName = argument.name().value();
+    const auto genericTypeName = argument.type().value().name().value();
+    const auto concreteTypeName = std::find_if(
+            typeMaps.begin(), typeMaps.end(), [&genericTypeName](const seds::model::GenericTypeMap &typeMap) {
+                return typeMap.type().value().name().value() == genericTypeName;
+            });
+
+    if (concreteTypeName == typeMaps.end()) {
+        throw MissingGenericTypeMappingException(genericTypeName, argumentName);
+    }
+
+    return ivm::InterfaceParameter(argumentName, ivm::BasicParameter::Type::Other, genericTypeName,
+            QStringLiteral("ACN"), convertCommandArgumentMode(argument.mode()));
 }
 
 ivm::IVInterface::OperationKind SedsToIvTranslator::convertInterfaceCommandMode(

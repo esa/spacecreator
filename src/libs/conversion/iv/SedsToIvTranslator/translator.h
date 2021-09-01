@@ -33,6 +33,7 @@ class InterfaceParameter;
 namespace seds::model {
 class CommandArgument;
 class Component;
+class GenericTypeMap;
 class Interface;
 class InterfaceCommand;
 class InterfaceDeclaration;
@@ -78,8 +79,10 @@ private:
             const std::vector<const seds::model::InterfaceDeclaration *> &interfaceDeclarations,
             ivm::IVInterface::InterfaceType interfaceType, ivm::IVFunction *ivFunction) const -> void;
     auto translateInterfaceCommand(const seds::model::InterfaceCommand &command,
-            ivm::IVInterface::InterfaceType interfaceType, ivm::IVFunction *ivFunction) const -> void;
-    auto translateArgument(const seds::model::CommandArgument &argument) const -> ivm::InterfaceParameter;
+            ivm::IVInterface::InterfaceType interfaceType, const std::vector<seds::model::GenericTypeMap> &typeMaps,
+            ivm::IVFunction *ivFunction) const -> void;
+    auto translateArgument(const seds::model::CommandArgument &argument,
+            const std::vector<seds::model::GenericTypeMap> &typeMaps) const -> ivm::InterfaceParameter;
 
     auto convertInterfaceCommandMode(seds::model::InterfaceCommandMode commandMode) const
             -> ivm::IVInterface::OperationKind;

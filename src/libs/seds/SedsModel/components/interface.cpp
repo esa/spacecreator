@@ -21,7 +21,7 @@
 
 namespace seds::model {
 
-const GenericTypeMapSet &Interface::genericTypeMapSet()
+const GenericTypeMapSet &Interface::genericTypeMapSet() const
 {
     return m_genericTypeMapSet;
 }
