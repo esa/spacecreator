@@ -56,7 +56,7 @@ public:
      * @return  ASN.1 model translated from SEDS models
      */
     virtual auto translateModels(std::vector<const Model *> sourceModels, const Options &options) const
-            -> std::unique_ptr<Model> override;
+            -> std::vector<std::unique_ptr<Model>> override;
     /**
      * @brief   Provides a set of all source model types that are required for the translation
      *
@@ -66,7 +66,7 @@ public:
 
 private:
     auto translateSedsModel(const seds::model::SedsModel *sedsModel, ivm::IVPropertyTemplateConfig *config,
-            const Options &options) const -> std::unique_ptr<ivm::IVModel>;
+            const Options &options) const -> std::vector<std::unique_ptr<Model>>;
 
 private:
     auto translatePackage(const seds::model::Package &package, ivm::IVModel *model, bool generateFunction) const

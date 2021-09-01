@@ -42,7 +42,7 @@ using seds::model::SedsModel;
 
 namespace conversion::iv::translator {
 
-std::unique_ptr<Model> SedsToIvTranslator::translateModels(
+std::vector<std::unique_ptr<Model>> SedsToIvTranslator::translateModels(
         std::vector<const Model *> sourceModels, const Options &options) const
 {
     if (sourceModels.empty()) {
@@ -56,10 +56,11 @@ std::unique_ptr<Model> SedsToIvTranslator::translateModels(
         throw TranslationException("Source model is null");
     }
 
-    const auto *sedsModel = dynamic_cast<const SedsModel *>(sourceModel);
-    if (sedsModel == nullptr) {
-        throw IncorrectSourceModelException(ModelType::Seds);
+    if (sourceModel->modelType() != ModelType::Seds) {
+        throw IncorrectSourceModelException(ModelType::Seds, sourceModel->modelType());
     }
+
+    const auto *sedsModel = dynamic_cast<const SedsModel *>(sourceModel);
 
     const auto configFilename = options.value(IvOptions::configFilename);
     if (!configFilename) {
@@ -77,7 +78,7 @@ std::set<ModelType> SedsToIvTranslator::getDependencies() const
     return std::set<ModelType> { ModelType::Seds };
 }
 
-std::unique_ptr<IVModel> SedsToIvTranslator::translateSedsModel(
+std::vector<std::unique_ptr<Model>> SedsToIvTranslator::translateSedsModel(
         const SedsModel *sedsModel, ivm::IVPropertyTemplateConfig *config, const Options &options) const
 {
     const auto generateFunctionsForPackages = options.isSet(IvOptions::generateFunctionsForPackages);
@@ -97,7 +98,10 @@ std::unique_ptr<IVModel> SedsToIvTranslator::translateSedsModel(
         throw TranslationException("Unhandled SEDS model data type");
     }
 
-    return ivModel;
+    std::vector<std::unique_ptr<Model>> result;
+    result.push_back(std::move(ivModel));
+
+    return result;
 }
 
 void SedsToIvTranslator::translatePackage(
