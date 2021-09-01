@@ -34,7 +34,7 @@ int main(int argc, char **argv)
     sedsconverter::SedsConverter sedsConverter;
 
     try {
-        sedsConverter.convert(conversion::ModelType::Asn1);
+        sedsConverter.convert(conversion::ModelType::Asn1, {});
     } catch (const ImportException &ex) {
         const auto errorMessage = QString("Import failure: %1").arg(ex.errorMessage());
         qFatal("%s", errorMessage.toLatin1().constData());

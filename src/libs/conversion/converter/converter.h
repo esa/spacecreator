@@ -73,8 +73,10 @@ public:
      *
      * @param   sourceModelsTypes       List of types of source models
      * @param   targetModelType         Type of target model
+     * @param   auxiliaryModelsTypes    List of types that will be additionally exported
      */
-    auto convert(std::set<ModelType> sourceModelsTypes, ModelType targetModelType) -> void;
+    auto convert(std::set<ModelType> sourceModelsTypes, ModelType targetModelType,
+            std::set<ModelType> auxiliaryModelsTypes) -> void;
 
 private:
     /**
@@ -86,17 +88,16 @@ private:
     /**
      * @brief   Translates models and saves output in the model cache
      *
-     * @param   translator          Translator to use
+     * @param   sourceModelsTypes   List of types of source models
      * @param   targetModelType     Target model type
      */
-    auto translateModels(const translator::Translator *translator, ModelType targetModelType) -> void;
+    auto translateModels(const std::set<ModelType> &sourceModelsTypes, ModelType targetModelType) -> void;
     /**
      * @brief   Exports a model
      *
-     * @param   exporter        Exporter to use
      * @param   modelType       Type of model to export
      */
-    auto exportModel(const exporter::ModelExporter *exporter, ModelType modelType) -> void;
+    auto exportModel(ModelType modelType) -> void;
 
     /**
      * @brief   Checks if model of given type is already present in the model cache

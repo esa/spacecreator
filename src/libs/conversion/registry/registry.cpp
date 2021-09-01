@@ -72,6 +72,40 @@ bool Registry::registerExporter(ModelType modelType, std::unique_ptr<exporter::M
     return result.second;
 }
 
+bool Registry::isImporterRegistered(ModelType modelType) const
+{
+    const auto found = m_importers.find(modelType);
+
+    if (found != m_importers.end()) {
+        return true;
+    } else {
+        return false;
+    }
+}
+
+bool Registry::isTranslatorRegistered(std::set<ModelType> sourceModelsTypes, ModelType targetModelType) const
+{
+    const Registry::TranslatorsKey key(std::move(sourceModelsTypes), targetModelType);
+    const auto found = m_translators.find(key);
+
+    if (found != m_translators.end()) {
+        return true;
+    } else {
+        return false;
+    }
+}
+
+bool Registry::isExporterRegistered(ModelType modelType) const
+{
+    const auto found = m_exporters.find(modelType);
+
+    if (found != m_exporters.end()) {
+        return true;
+    } else {
+        return false;
+    }
+}
+
 const importer::ModelImporter *Registry::findImporter(ModelType modelType) const
 {
     const auto found = m_importers.find(modelType);
