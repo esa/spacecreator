@@ -65,6 +65,9 @@ public:
     auto components() const -> const ComponentSet &;
     auto addComponent(Component component) -> void;
 
+public:
+    auto nameStr() const -> const QString &;
+
 private:
     QualifiedName m_qualifiedName;
 

@@ -31,4 +31,9 @@ const QualifiedName &InterfaceDeclarationRef::value() const
     return m_value;
 }
 
+const QString &InterfaceDeclarationRef::nameStr() const
+{
+    return m_value.name().value();
+}
+
 } // namespace seds::model

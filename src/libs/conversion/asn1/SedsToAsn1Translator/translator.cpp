@@ -93,7 +93,7 @@ Asn1Acn::File SedsToAsn1Translator::translatePackage(const seds::model::Package 
     Asn1Acn::File asn1File("");
 
     auto definitions =
-            std::make_unique<Asn1Acn::Definitions>(package.qualifiedName().name().value(), Asn1Acn::SourceLocation());
+            std::make_unique<Asn1Acn::Definitions>(package.nameStr()), Asn1Acn::SourceLocation());
     translateDataTypes(package.dataTypes(), definitions.get());
 
     asn1File.add(std::move(definitions));

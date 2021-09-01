@@ -34,6 +34,9 @@ public:
 public:
     auto value() const -> const QualifiedName &;
 
+public:
+    auto nameStr() const -> const QString &;
+
 private:
     QualifiedName m_value;
 };

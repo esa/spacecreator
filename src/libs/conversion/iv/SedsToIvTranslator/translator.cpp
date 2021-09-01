@@ -111,8 +111,7 @@ void SedsToIvTranslator::translatePackage(
 
     if (generateFunction) {
         auto *ivFunction = new ivm::IVFunction();
-        ivFunction->setEntityAttribute(
-                ivm::meta::Props::token(ivm::meta::Props::Token::name), package.qualifiedName().name().value());
+        ivFunction->setEntityAttribute(ivm::meta::Props::token(ivm::meta::Props::Token::name), package.nameStr());
 
         for (auto *component : components) {
             ivFunction->addChild(component);
@@ -128,7 +127,7 @@ ivm::IVFunction *SedsToIvTranslator::translateComponent(const seds::model::Compo
         const std::vector<seds::model::InterfaceDeclaration> &interfaceDeclarations, IVModel *model) const
 {
     auto *ivFunction = new ivm::IVFunction();
-    ivFunction->setEntityAttribute(ivm::meta::Props::token(ivm::meta::Props::Token::name), component.name().value());
+    ivFunction->setEntityAttribute(ivm::meta::Props::token(ivm::meta::Props::Token::name), component.nameStr());
 
     const auto globalInterfaceDeclarationsCount = interfaceDeclarations.size();
 
@@ -166,11 +165,11 @@ void SedsToIvTranslator::translateInterface(const seds::model::Interface &interf
         const std::vector<const seds::model::InterfaceDeclaration *> &interfaceDeclarations,
         ivm::IVInterface::InterfaceType interfaceType, ivm::IVFunction *ivFunction) const
 {
-    const auto &interfaceTypeName = interface.type().value().name().value();
+    const auto &interfaceTypeName = interface.type().nameStr();
 
     const auto interfaceDeclaration = std::find_if(interfaceDeclarations.begin(), interfaceDeclarations.end(),
             [&interfaceTypeName](const seds::model::InterfaceDeclaration *interfaceDeclaration) {
-                return interfaceDeclaration->name().value() == interfaceTypeName;
+                return interfaceDeclaration->nameStr() == interfaceTypeName;
             });
     if (interfaceDeclaration == interfaceDeclarations.end()) {
         throw UndeclaredInterfaceException(interfaceTypeName);
@@ -188,7 +187,7 @@ void SedsToIvTranslator::translateInterfaceCommand(const seds::model::InterfaceC
     ivm::IVInterface::CreationInfo creationInfo;
     creationInfo.function = ivFunction;
     creationInfo.type = interfaceType;
-    creationInfo.name = command.name().value();
+    creationInfo.name = command.nameStr();
     creationInfo.kind = convertInterfaceCommandMode(command.mode());
 
     auto *interface = ivm::IVInterface::createIface(creationInfo);
@@ -203,11 +202,11 @@ void SedsToIvTranslator::translateInterfaceCommand(const seds::model::InterfaceC
 ivm::InterfaceParameter SedsToIvTranslator::translateArgument(
         const seds::model::CommandArgument &argument, const std::vector<seds::model::GenericTypeMap> &typeMaps) const
 {
-    const auto argumentName = argument.name().value();
-    const auto genericTypeName = argument.type().value().name().value();
+    const auto argumentName = argument.nameStr();
+    const auto genericTypeName = argument.type().nameStr();
     const auto concreteTypeName = std::find_if(
             typeMaps.begin(), typeMaps.end(), [&genericTypeName](const seds::model::GenericTypeMap &typeMap) {
-                return typeMap.type().value().name().value() == genericTypeName;
+                return typeMap.type().nameStr() == genericTypeName;
             });
 
     if (concreteTypeName == typeMaps.end()) {

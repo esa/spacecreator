@@ -31,4 +31,9 @@ const QualifiedName &DataTypeRef::value() const
     return m_value;
 }
 
+const QString &DataTypeRef::nameStr() const
+{
+    return m_value.name().value();
+}
+
 } // namespace seds::model

@@ -61,4 +61,9 @@ void Package::addComponent(Component component)
     m_components.push_back(std::move(component));
 }
 
+const QString &Package::nameStr() const
+{
+    return m_qualifiedName.name().value();
+}
+
 } // namespace seds::model

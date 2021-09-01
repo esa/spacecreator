@@ -39,6 +39,9 @@ public:
     auto name() const -> const Name &;
     auto setName(common::String name) -> void;
 
+public:
+    auto nameStr() const -> const QString &;
+
 protected:
     Name m_name;
 };
