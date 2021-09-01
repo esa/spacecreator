@@ -46,9 +46,6 @@ class tst_SedsToAsn1Translator : public QObject
 {
     Q_OBJECT
 
-public:
-    virtual ~tst_SedsToAsn1Translator() = default;
-
 private Q_SLOTS:
     void testTranslateBinaryDataType();
     void testTranslateBooleanDataType();
