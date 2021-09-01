@@ -23,6 +23,9 @@
 
 namespace conversion::iv {
 
+/**
+ * @brief   Registers conversion capabilities for InterfaceView model
+ */
 class IvRegistrar final : public Registrar
 {
 public:
