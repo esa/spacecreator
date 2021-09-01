@@ -77,7 +77,7 @@ std::vector<std::unique_ptr<Model>> SedsToAsn1Translator::translateSedsModel(con
             asn1Files.push_back(translatePackage(package));
         }
     } else {
-        throw TranslationException("Unhandled SEDS model data");
+        throw TranslationException("Unhandled SEDS model data type");
     }
 
     auto asn1Model = std::make_unique<Asn1Model>(std::move(asn1Files));

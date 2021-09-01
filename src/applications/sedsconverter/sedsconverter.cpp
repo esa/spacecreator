@@ -58,6 +58,7 @@ void SedsConverter::convert(ModelType targetModelType, const std::set<ModelType>
     options.add(SedsOptions::keepIntermediateFiles);
     options.add(IvOptions::configFilename, "config.xml");
     options.add(IvOptions::outputFilename, "output.xml");
+    options.add(IvOptions::generateFunctionsForPackages);
 
     Converter converter(m_registry, std::move(options));
     converter.convert({ ModelType::Seds }, targetModelType, auxiliaryModelsTypes);

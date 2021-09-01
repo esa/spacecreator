@@ -21,6 +21,7 @@
 
 #include <conversion/common/translation/translator.h>
 #include <seds/SedsModel/types/datatype.h>
+#include <vector>
 
 namespace Asn1Acn {
 class Asn1Model;

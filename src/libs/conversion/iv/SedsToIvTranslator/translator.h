@@ -20,15 +20,26 @@
 #pragma once
 
 #include <conversion/common/translation/translator.h>
+#include <ivcore/ivinterface.h>
+#include <ivcore/parameter.h>
 
 namespace ivm {
+class IVFunction;
 class IVModel;
 class IVPropertyTemplateConfig;
+class InterfaceParameter;
 } // namespace ivm
 
 namespace seds::model {
-class SedsModel;
+class CommandArgument;
+class Component;
+class Interface;
+class InterfaceCommand;
+class InterfaceDeclaration;
 class Package;
+class SedsModel;
+enum class CommandArgumentMode;
+enum class InterfaceCommandMode;
 } // namespace seds::model
 
 namespace conversion::iv::translator {
@@ -53,8 +64,28 @@ public:
     virtual auto getDependencies() const -> std::set<ModelType> override;
 
 private:
-    auto translateSedsModel(const seds::model::SedsModel *sedsModel, ivm::IVPropertyTemplateConfig *config) const
-            -> std::unique_ptr<ivm::IVModel>;
+    auto translateSedsModel(const seds::model::SedsModel *sedsModel, ivm::IVPropertyTemplateConfig *config,
+            const Options &options) const -> std::unique_ptr<ivm::IVModel>;
+
+private:
+    auto translatePackage(const seds::model::Package &package, ivm::IVModel *model, bool generateFunction) const
+            -> void;
+
+    auto translateComponent(const seds::model::Component &component,
+            const std::vector<seds::model::InterfaceDeclaration> &interfaceDeclarations, ivm::IVModel *model) const
+            -> ivm::IVFunction *;
+    auto translateInterface(const seds::model::Interface &interface,
+            const std::vector<const seds::model::InterfaceDeclaration *> &interfaceDeclarations,
+            ivm::IVInterface::InterfaceType interfaceType, ivm::IVFunction *ivFunction) const -> void;
+    auto translateInterfaceCommand(const seds::model::InterfaceCommand &command,
+            ivm::IVInterface::InterfaceType interfaceType, ivm::IVFunction *ivFunction) const -> void;
+    auto translateArgument(const seds::model::CommandArgument &argument) const -> ivm::InterfaceParameter;
+
+    auto convertInterfaceCommandMode(seds::model::InterfaceCommandMode commandMode) const
+            -> ivm::IVInterface::OperationKind;
+
+    auto convertCommandArgumentMode(seds::model::CommandArgumentMode argumentMode) const
+            -> ivm::InterfaceParameter::Direction;
 };
 
 } // namespace conversion::iv::translator

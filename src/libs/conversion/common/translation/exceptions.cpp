@@ -33,6 +33,11 @@ IncorrectSourceModelException::IncorrectSourceModelException(ModelType expectedM
 {
 }
 
+UndeclaredInterfaceException::UndeclaredInterfaceException(const QString &interfaceTypeName)
+    : TranslationException(QString("Undeclared interface '%1'").arg(interfaceTypeName))
+{
+}
+
 UnhandledValueException::UnhandledValueException(const QString &valueTypeName)
     : TranslationException(QString("Translator encountered unhandled value for %1").arg(valueTypeName))
 {

@@ -54,6 +54,20 @@ public:
 };
 
 /**
+ * @brief   Exception thrown when translator encounters an interface that wasn't declared
+ */
+class UndeclaredInterfaceException : public TranslationException
+{
+public:
+    /**
+     * @brief   Constructor
+     *
+     * @param   interfaceTypeName   Type of the undeclared interface
+     */
+    explicit UndeclaredInterfaceException(const QString &interfaceTypeName);
+};
+
+/**
  * @brief   Exception thrown when translator encounters unhandled value in source model
  */
 class UnhandledValueException : public TranslationException
