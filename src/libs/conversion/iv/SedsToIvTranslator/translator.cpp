@@ -19,24 +19,20 @@
 
 #include "translator.h"
 
-#include <QDebug>
-#include <QVector>
+#include "specialized/componentstranslator.h"
+
+#include <asn1library/asn1/file.h>
 #include <conversion/common/translation/exceptions.h>
 #include <conversion/iv/IvOptions/options.h>
 #include <ivcore/ivcommonprops.h>
 #include <ivcore/ivfunction.h>
 #include <ivcore/ivmodel.h>
 #include <ivcore/ivpropertytemplateconfig.h>
-#include <seds/SedsModel/interfaces/commandargumentmode.h>
 #include <seds/SedsModel/sedsmodel.h>
 
 using conversion::iv::IvOptions;
 using conversion::translator::IncorrectSourceModelException;
-using conversion::translator::MissingGenericTypeMappingException;
 using conversion::translator::TranslationException;
-using conversion::translator::UndeclaredInterfaceException;
-using conversion::translator::UnhandledValueException;
-using conversion::translator::UnsupportedValueException;
 using ivm::IVModel;
 using seds::model::SedsModel;
 
@@ -84,15 +80,16 @@ std::vector<std::unique_ptr<Model>> SedsToIvTranslator::translateSedsModel(
     const auto generateFunctionsForPackages = options.isSet(IvOptions::generateFunctionsForPackages);
 
     auto ivModel = std::make_unique<IVModel>(config);
+    Asn1Acn::File asn1File("interfaceview.asn");
 
     const auto &sedsModelData = sedsModel->data();
     if (std::holds_alternative<seds::model::PackageFile>(sedsModelData)) {
         const auto &package = std::get<seds::model::PackageFile>(sedsModelData).package();
-        translatePackage(package, ivModel.get(), generateFunctionsForPackages);
+        translatePackage(package, ivModel.get(), asn1File, generateFunctionsForPackages);
     } else if (std::holds_alternative<seds::model::DataSheet>(sedsModelData)) {
         const auto &packages = std::get<seds::model::DataSheet>(sedsModelData).packages();
         for (const auto &package : packages) {
-            translatePackage(package, ivModel.get(), generateFunctionsForPackages);
+            translatePackage(package, ivModel.get(), asn1File, generateFunctionsForPackages);
         }
     } else {
         throw TranslationException("Unhandled SEDS model data type");
@@ -105,13 +102,10 @@ std::vector<std::unique_ptr<Model>> SedsToIvTranslator::translateSedsModel(
 }
 
 void SedsToIvTranslator::translatePackage(
-        const seds::model::Package &package, IVModel *model, bool generateFunction) const
+        const seds::model::Package &package, IVModel *model, Asn1Acn::File &asn1File, bool generateFunction) const
 {
-    QVector<ivm::IVFunction *> components;
-
-    for (const auto &component : package.components()) {
-        components.append(translateComponent(component, package.declaredInterfaces(), model));
-    }
+    ComponentsTranslator componentsTranslator(package, asn1File);
+    auto components = componentsTranslator.translateComponents();
 
     if (generateFunction) {
         auto *ivFunction = new ivm::IVFunction();
@@ -124,132 +118,6 @@ void SedsToIvTranslator::translatePackage(
         model->addObject(ivFunction);
     } else {
         model->addObjects(components);
-    }
-}
-
-ivm::IVFunction *SedsToIvTranslator::translateComponent(const seds::model::Component &component,
-        const std::vector<seds::model::InterfaceDeclaration> &interfaceDeclarations, IVModel *model) const
-{
-    auto *ivFunction = new ivm::IVFunction();
-    ivFunction->setEntityAttribute(ivm::meta::Props::token(ivm::meta::Props::Token::name), component.nameStr());
-
-    const auto globalInterfaceDeclarationsCount = interfaceDeclarations.size();
-
-    std::vector<const seds::model::InterfaceDeclaration *> allInterfaceDeclarations;
-    for (const auto &interfaceDeclaration : interfaceDeclarations) {
-        allInterfaceDeclarations.push_back(&interfaceDeclaration);
-    }
-
-    for (const auto &providedInterface : component.providedInterfaces()) {
-        for (const auto &interfaceDeclaration : component.declaredInterfaces()) {
-            allInterfaceDeclarations.push_back(&interfaceDeclaration);
-        }
-
-        translateInterface(
-                providedInterface, allInterfaceDeclarations, ivm::IVInterface::InterfaceType::Provided, ivFunction);
-
-        allInterfaceDeclarations.resize(globalInterfaceDeclarationsCount);
-    }
-
-    for (const auto &requiredInterface : component.requiredInterfaces()) {
-        for (const auto &interfaceDeclaration : component.declaredInterfaces()) {
-            allInterfaceDeclarations.push_back(&interfaceDeclaration);
-        }
-
-        translateInterface(
-                requiredInterface, allInterfaceDeclarations, ivm::IVInterface::InterfaceType::Required, ivFunction);
-
-        allInterfaceDeclarations.resize(globalInterfaceDeclarationsCount);
-    }
-
-    return ivFunction;
-}
-
-void SedsToIvTranslator::translateInterface(const seds::model::Interface &interface,
-        const std::vector<const seds::model::InterfaceDeclaration *> &interfaceDeclarations,
-        ivm::IVInterface::InterfaceType interfaceType, ivm::IVFunction *ivFunction) const
-{
-    const auto &interfaceTypeName = interface.type().nameStr();
-
-    const auto interfaceDeclaration = std::find_if(interfaceDeclarations.begin(), interfaceDeclarations.end(),
-            [&interfaceTypeName](const seds::model::InterfaceDeclaration *interfaceDeclaration) {
-                return interfaceDeclaration->nameStr() == interfaceTypeName;
-            });
-    if (interfaceDeclaration == interfaceDeclarations.end()) {
-        throw UndeclaredInterfaceException(interfaceTypeName);
-    }
-
-    for (const auto &command : (*interfaceDeclaration)->commands()) {
-        translateInterfaceCommand(command, interfaceType, interface.genericTypeMapSet().genericTypeMaps(), ivFunction);
-    }
-}
-
-void SedsToIvTranslator::translateInterfaceCommand(const seds::model::InterfaceCommand &command,
-        ivm::IVInterface::InterfaceType interfaceType, const std::vector<seds::model::GenericTypeMap> &typeMaps,
-        ivm::IVFunction *ivFunction) const
-{
-    ivm::IVInterface::CreationInfo creationInfo;
-    creationInfo.function = ivFunction;
-    creationInfo.type = interfaceType;
-    creationInfo.name = command.nameStr();
-    creationInfo.kind = convertInterfaceCommandMode(command.mode());
-
-    auto *interface = ivm::IVInterface::createIface(creationInfo);
-
-    for (const auto &argument : command.arguments()) {
-        interface->addParam(translateArgument(argument, typeMaps));
-    }
-
-    ivFunction->addChild(interface);
-}
-
-ivm::InterfaceParameter SedsToIvTranslator::translateArgument(
-        const seds::model::CommandArgument &argument, const std::vector<seds::model::GenericTypeMap> &typeMaps) const
-{
-    const auto argumentName = argument.nameStr();
-    const auto genericTypeName = argument.type().nameStr();
-    const auto concreteTypeName = std::find_if(
-            typeMaps.begin(), typeMaps.end(), [&genericTypeName](const seds::model::GenericTypeMap &typeMap) {
-                return typeMap.type().nameStr() == genericTypeName;
-            });
-
-    if (concreteTypeName == typeMaps.end()) {
-        throw MissingGenericTypeMappingException(genericTypeName, argumentName);
-    }
-
-    return ivm::InterfaceParameter(argumentName, ivm::BasicParameter::Type::Other, genericTypeName,
-            QStringLiteral("ACN"), convertCommandArgumentMode(argument.mode()));
-}
-
-ivm::IVInterface::OperationKind SedsToIvTranslator::convertInterfaceCommandMode(
-        seds::model::InterfaceCommandMode commandMode) const
-{
-    switch (commandMode) {
-    case seds::model::InterfaceCommandMode::Sync:
-        return ivm::IVInterface::OperationKind::Protected;
-    case seds::model::InterfaceCommandMode::Async:
-        return ivm::IVInterface::OperationKind::Sporadic;
-    default:
-        throw UnhandledValueException("InterfaceCommandMode");
-        break;
-    }
-}
-
-ivm::InterfaceParameter::Direction SedsToIvTranslator::convertCommandArgumentMode(
-        seds::model::CommandArgumentMode argumentMode) const
-{
-    switch (argumentMode) {
-    case seds::model::CommandArgumentMode::In:
-        return ivm::InterfaceParameter::Direction::IN;
-    case seds::model::CommandArgumentMode::Out:
-        return ivm::InterfaceParameter::Direction::OUT;
-    case seds::model::CommandArgumentMode::InOut:
-    case seds::model::CommandArgumentMode::Notify:
-        throw UnsupportedValueException("InterfaceCommandMode");
-        break;
-    default:
-        throw UnhandledValueException("InterfaceCommandMode");
-        break;
     }
 }
 

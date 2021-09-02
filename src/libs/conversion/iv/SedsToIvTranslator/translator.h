@@ -20,27 +20,19 @@
 #pragma once
 
 #include <conversion/common/translation/translator.h>
-#include <ivcore/ivinterface.h>
-#include <ivcore/parameter.h>
+
+namespace Asn1Acn {
+class File;
+} // namespace Asn1Acn
 
 namespace ivm {
-class IVFunction;
 class IVModel;
 class IVPropertyTemplateConfig;
-class InterfaceParameter;
 } // namespace ivm
 
 namespace seds::model {
-class CommandArgument;
-class Component;
-class GenericTypeMap;
-class Interface;
-class InterfaceCommand;
-class InterfaceDeclaration;
 class Package;
 class SedsModel;
-enum class CommandArgumentMode;
-enum class InterfaceCommandMode;
 } // namespace seds::model
 
 namespace conversion::iv::translator {
@@ -69,26 +61,8 @@ private:
             const Options &options) const -> std::vector<std::unique_ptr<Model>>;
 
 private:
-    auto translatePackage(const seds::model::Package &package, ivm::IVModel *model, bool generateFunction) const
-            -> void;
-
-    auto translateComponent(const seds::model::Component &component,
-            const std::vector<seds::model::InterfaceDeclaration> &interfaceDeclarations, ivm::IVModel *model) const
-            -> ivm::IVFunction *;
-    auto translateInterface(const seds::model::Interface &interface,
-            const std::vector<const seds::model::InterfaceDeclaration *> &interfaceDeclarations,
-            ivm::IVInterface::InterfaceType interfaceType, ivm::IVFunction *ivFunction) const -> void;
-    auto translateInterfaceCommand(const seds::model::InterfaceCommand &command,
-            ivm::IVInterface::InterfaceType interfaceType, const std::vector<seds::model::GenericTypeMap> &typeMaps,
-            ivm::IVFunction *ivFunction) const -> void;
-    auto translateArgument(const seds::model::CommandArgument &argument,
-            const std::vector<seds::model::GenericTypeMap> &typeMaps) const -> ivm::InterfaceParameter;
-
-    auto convertInterfaceCommandMode(seds::model::InterfaceCommandMode commandMode) const
-            -> ivm::IVInterface::OperationKind;
-
-    auto convertCommandArgumentMode(seds::model::CommandArgumentMode argumentMode) const
-            -> ivm::InterfaceParameter::Direction;
+    auto translatePackage(const seds::model::Package &package, ivm::IVModel *model, Asn1Acn::File &asn1File,
+            bool generateFunction) const -> void;
 };
 
 } // namespace conversion::iv::translator

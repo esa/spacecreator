@@ -1,7 +1,9 @@
 project(SedsToIvTranslator VERSION 1.0.0 LANGUAGES CXX)
 
-set(SOURCES translator.cpp)
-set(INCLUDES translator.h)
+set(SOURCES translator.cpp
+            specialized/componentstranslator.cpp)
+set(INCLUDES translator.h
+             specialized/componentstranslator.h)
 
 add_library(SedsToIvTranslator STATIC)
 target_sources(SedsToIvTranslator
@@ -13,6 +15,7 @@ target_include_directories(SedsToIvTranslator
 target_link_libraries(SedsToIvTranslator
     PUBLIC      Conversion::Common
                 ivcore
+                asn1library
                 SEDS::Model)
 
 add_format_target(SedsToIvTranslator)
