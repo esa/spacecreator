@@ -56,6 +56,8 @@ public:
 
     QString defaultParameter() const;
 
+    int lineNumberFromError(const QString &error) const;
+
 Q_SIGNALS:
     void parseError(const QString &error);
 

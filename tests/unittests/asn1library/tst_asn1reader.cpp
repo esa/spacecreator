@@ -15,19 +15,17 @@
    along with this program. If not, see <https://www.gnu.org/licenses/lgpl-2.1.html>.
 */
 
-#include <iostream>
-
 #include "asn1const.h"
 #include "asn1reader.h"
 #include "definitions.h"
 #include "file.h"
 #include "typeassignment.h"
-
 #include "types/choice.h"
 #include "types/sequence.h"
 
 #include <QSignalSpy>
 #include <QtTest>
+#include <iostream>
 
 using namespace Asn1Acn;
 
@@ -48,6 +46,8 @@ private Q_SLOTS:
     void testSequenceCustomType();
     void testMixedTypes();
     void testChoiceReference();
+    void testLineNumber_data();
+    void testLineNumber();
 
 private:
     Asn1Reader *xmlParser = nullptr;
@@ -60,7 +60,8 @@ private:
 void tst_Asn1Reader::init()
 {
     xmlParser = new Asn1Reader;
-    connect(xmlParser, &Asn1Reader::parseError, [](const QString& msg){std::cerr << "!!!! " << msg.toStdString() << std::endl;});
+    connect(xmlParser, &Asn1Reader::parseError,
+            [](const QString &msg) { std::cerr << "!!!! " << msg.toStdString() << std::endl; });
 }
 
 void tst_Asn1Reader::cleanup()
@@ -304,6 +305,24 @@ void tst_Asn1Reader::testChoiceReference()
 
     const std::unique_ptr<Asn1Acn::Types::Type> &choice2 = choice->children().at(1);
     QCOMPARE(choice2->typeName(), QString("BOOLEAN"));
+}
+
+void tst_Asn1Reader::testLineNumber_data()
+{
+    QTest::addColumn<QString>("input");
+    QTest::addColumn<int>("result");
+
+    QTest::newRow("empty") << "" << -1;
+    QTest::newRow("nonsense") << "nonsense" << -1;
+    QTest::newRow("missing line") << "/tmp/Taste07.asn: error: no viable alternative at input 'INTEGER'\n" << -1;
+    QTest::newRow("correct") << "/tmp/Taste07.asn:3:10: error: no viable alternative at input 'INTEGER'\n" << 3;
+}
+
+void tst_Asn1Reader::testLineNumber()
+{
+    QFETCH(QString, input);
+    QFETCH(int, result);
+    QCOMPARE(xmlParser->lineNumberFromError(input), result);
 }
 
 QTEST_APPLESS_MAIN(tst_Asn1Reader)

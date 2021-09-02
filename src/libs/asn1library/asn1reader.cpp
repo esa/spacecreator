@@ -315,6 +315,18 @@ QString Asn1Reader::defaultParameter() const
     return Asn1Acn::defaultParameter;
 }
 
+int Asn1Reader::lineNumberFromError(const QString &error) const
+{
+    QStringList tokens = error.split(':');
+    if (tokens.size() < 4) {
+        return -1;
+    }
+
+    bool ok;
+    int line = tokens[1].toInt(&ok);
+    return ok ? line : -1;
+}
+
 QString Asn1Reader::asn1CompilerCommand() const
 {
     QSettings settings;
@@ -383,10 +395,11 @@ bool Asn1Reader::convertToXML(const QString &asn1FileName, const QString &xmlFil
             });
 
     connect(&asn1Process, &QProcess::errorOccurred, [&](QProcess::ProcessError) {
-        qWarning() << asn1Process.errorString();
-        shared::ErrorHub::addError(shared::ErrorItem::Error, asn1Process.errorString(), asn1FileName);
-        if (errorMessages)
+        shared::ErrorHub::addError(shared::ErrorItem::Error, asn1Process.errorString(), asn1FileName,
+                lineNumberFromError(asn1Process.errorString()));
+        if (errorMessages) {
             errorMessages->append(asn1Process.errorString());
+        }
     });
 
     asn1Process.setProcessEnvironment(QProcessEnvironment::systemEnvironment());
@@ -400,7 +413,7 @@ bool Asn1Reader::convertToXML(const QString &asn1FileName, const QString &xmlFil
             errorMessages->append(error);
         }
         QFile::remove(asn1XMLFileName);
-        shared::ErrorHub::addError(shared::ErrorItem::Error, error, asn1FileName);
+        shared::ErrorHub::addError(shared::ErrorItem::Error, error, asn1FileName, lineNumberFromError(error));
         return false;
     }
 
