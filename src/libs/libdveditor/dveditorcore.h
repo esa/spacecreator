@@ -20,6 +20,8 @@
 #include "common.h"
 #include "editorcore.h"
 
+#include <QSharedPointer>
+
 class QUndoStack;
 class QToolBar;
 class QItemSelection;
@@ -116,3 +118,6 @@ private:
 };
 
 } // namespace dve
+
+typedef QSharedPointer<dve::DVEditorCore> DVEditorCorePtr;
+Q_DECLARE_METATYPE(DVEditorCorePtr)

@@ -22,6 +22,7 @@
 #include "common.h"
 #include "dvappmodel.h"
 #include "dveditorcore.h"
+#include "dvsystemchecks.h"
 #include "errorhub.h"
 #include "interfacedocument.h"
 #include "itemeditor/common/ivutils.h"
@@ -43,10 +44,12 @@ static const QString GLOBAL_ASN_FILE = { "dataview-uniq.asn" };
 SpaceCreatorProject::SpaceCreatorProject(QObject *parent)
     : AbstractProject(parent)
     , m_mscChecks(new MscSystemChecks)
+    , m_dvChecks(new DvSystemChecks)
     , m_asn1Storage(new Asn1Acn::Asn1ModelStorage)
     , m_asnChecks(new Asn1Acn::Asn1SystemChecks)
 {
     m_mscChecks->setStorage(this);
+    m_dvChecks->setStorage(this);
 
     m_asnChecks->setAsn1Storage(m_asn1Storage.get());
     m_asnChecks->setProject(this);
@@ -58,10 +61,10 @@ SpaceCreatorProject::~SpaceCreatorProject() { }
    Returns the DVEditorCore object for the given file
    If the object does not exist yet, one will be created and the data be loaded
  */
-QSharedPointer<dve::DVEditorCore> SpaceCreatorProject::dvData(const QString &fileName) const
+DVEditorCorePtr SpaceCreatorProject::dvData(const QString &fileName) const
 {
     if (!m_dvStore.contains(fileName)) {
-        QSharedPointer<dve::DVEditorCore> data(new dve::DVEditorCore());
+        DVEditorCorePtr data(new dve::DVEditorCore());
         data->setAsn1Check(m_asnChecks.get());
         data->loadHWLibrary(shared::hwLibraryPath());
         data->appModel()->load(fileName);
@@ -137,12 +140,12 @@ QSharedPointer<ive::IVEditorCore> SpaceCreatorProject::ivCore() const
 /*!
    Returns all deployment view objects, that are used in the current project
  */
-QVector<QSharedPointer<dve::DVEditorCore>> SpaceCreatorProject::allDVCores() const
+QVector<DVEditorCorePtr> SpaceCreatorProject::allDVCores() const
 {
     const QStringList dvFiles = allDVFiles();
-    QVector<QSharedPointer<dve::DVEditorCore>> allDvCores;
+    QVector<DVEditorCorePtr> allDvCores;
     for (const QString &dvFile : dvFiles) {
-        QSharedPointer<dve::DVEditorCore> core = dvData(dvFile);
+        DVEditorCorePtr core = dvData(dvFile);
         if (core) {
             allDvCores.append(core);
         }
@@ -171,7 +174,7 @@ QVector<QSharedPointer<msc::MSCEditorCore>> SpaceCreatorProject::allMscCores() c
  */
 bool SpaceCreatorProject::contains(QSharedPointer<shared::EditorCore> core) const
 {
-    for (const QSharedPointer<dve::DVEditorCore> &dvCore : m_dvStore) {
+    for (const DVEditorCorePtr &dvCore : m_dvStore) {
         if (core == dvCore) {
             return true;
         }
@@ -264,15 +267,33 @@ QVector<IvSystemChecks *> SpaceCreatorProject::ivChecks() const
     return checks;
 }
 
-QVector<IvSystemQueries *> SpaceCreatorProject::dvChecks() const
+QVector<IvSystemQueries *> SpaceCreatorProject::ivQueries() const
 {
     QVector<IvSystemQueries *> checks;
-    for (const QSharedPointer<dve::DVEditorCore> &core : m_dvStore) {
+    for (const DVEditorCorePtr &core : m_dvStore) {
         if (auto dvChecker = qobject_cast<scs::IvSystemQueries *>(core->systemChecker())) {
             checks.append(dvChecker);
         }
     }
     return checks;
+}
+
+/*!
+   Returns an instance of the IV queries
+ */
+IvSystemQueries *SpaceCreatorProject::ivQuery() const
+{
+    for (const DVEditorCorePtr &core : m_dvStore) {
+        if (auto dvChecker = qobject_cast<scs::IvSystemQueries *>(core->systemChecker())) {
+            return dvChecker;
+        }
+    }
+    return nullptr;
+}
+
+DvSystemChecks *SpaceCreatorProject::dvChecks() const
+{
+    return m_dvChecks.get();
 }
 
 /*!
@@ -305,14 +326,14 @@ void SpaceCreatorProject::purgeNonProjectData()
    Sets the DVEditorCore object for the given file.
    If the object was already used for another file, that old file/object connection is removed.
  */
-void SpaceCreatorProject::setDvData(const QString &fileName, QSharedPointer<dve::DVEditorCore> dvData)
+void SpaceCreatorProject::setDvData(const QString &fileName, DVEditorCorePtr dvData)
 {
     const QString oldKey = m_dvStore.key(dvData, "");
     if (!oldKey.isEmpty()) {
         if (m_dvStore[fileName] == dvData) {
             return;
         }
-        QSharedPointer<dve::DVEditorCore> oldData = m_dvStore.take(oldKey);
+        DVEditorCorePtr oldData = m_dvStore.take(oldKey);
         disconnect(oldData.data(), nullptr, this, nullptr);
     }
 

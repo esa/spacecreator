@@ -19,7 +19,6 @@
 
 #include "actionsbar.h"
 #include "commandsstack.h"
-#include "dveditorcore.h"
 
 #include <QHBoxLayout>
 #include <QMessageBox>
@@ -33,14 +32,14 @@ DVMainWidget::DVMainWidget(QWidget *parent)
 
 DVMainWidget::~DVMainWidget() { }
 
-bool DVMainWidget::init(QSharedPointer<dve::DVEditorCore> data)
+bool DVMainWidget::init(DVEditorCorePtr data)
 {
     m_plugin = data;
     init();
     return true;
 }
 
-QSharedPointer<dve::DVEditorCore> DVMainWidget::dvPlugin() const
+DVEditorCorePtr DVMainWidget::dvPlugin() const
 {
     return m_plugin;
 }

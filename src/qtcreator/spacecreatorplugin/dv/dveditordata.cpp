@@ -78,9 +78,7 @@ Core::IEditor *DVEditorData::createEditor()
     auto *dvEditor = new DVQtCEditor(m_projectManager, m_dvActions);
 
     connect(dvEditor->dvDocument(), &spctr::DVEditorDocument::dvDataLoaded, this,
-            [this](const QString &fileName, QSharedPointer<dve::DVEditorCore> data) {
-                m_undoGroup->addStack(data->undoStack());
-            });
+            [this](const QString &fileName, DVEditorCorePtr data) { m_undoGroup->addStack(data->undoStack()); });
 
     return dvEditor;
 }

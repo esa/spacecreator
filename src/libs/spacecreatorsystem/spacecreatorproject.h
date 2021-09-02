@@ -18,6 +18,7 @@
 #pragma once
 
 #include "abstractproject.h"
+#include "dveditorcore.h"
 
 #include <QHash>
 #include <QObject>
@@ -28,9 +29,6 @@
 namespace Asn1Acn {
 class Asn1ModelStorage;
 class Asn1SystemChecks;
-}
-namespace dve {
-class DVEditorCore;
 }
 namespace ive {
 class IVEditorCore;
@@ -43,6 +41,7 @@ class EditorCore;
 }
 
 namespace scs {
+class DvSystemChecks;
 class IvSystemChecks;
 class MscSystemChecks;
 class IvSystemQueries;
@@ -61,13 +60,13 @@ public:
     virtual ~SpaceCreatorProject();
 
     // Load / access functions
-    QSharedPointer<dve::DVEditorCore> dvData(const QString &fileName) const;
+    DVEditorCorePtr dvData(const QString &fileName) const;
     QSharedPointer<ive::IVEditorCore> ivData(const QString &fileName) const;
     QSharedPointer<msc::MSCEditorCore> mscData(const QString &fileName) const;
 
     // Query functions
     virtual QSharedPointer<ive::IVEditorCore> ivCore() const;
-    virtual QVector<QSharedPointer<dve::DVEditorCore>> allDVCores() const;
+    virtual QVector<DVEditorCorePtr> allDVCores() const;
     virtual QVector<QSharedPointer<msc::MSCEditorCore>> allMscCores() const;
 
     bool contains(QSharedPointer<shared::EditorCore> core) const;
@@ -85,11 +84,14 @@ public:
        */
     scs::MscSystemChecks *mscChecks() const { return m_mscChecks.get(); }
     QVector<scs::IvSystemChecks *> ivChecks() const;
-    QVector<scs::IvSystemQueries *> dvChecks() const;
+    QVector<scs::IvSystemQueries *> ivQueries() const;
+    scs::IvSystemQueries *ivQuery() const;
+    // Access to check for the DV files
+    scs::DvSystemChecks *dvChecks() const;
 
 Q_SIGNALS:
     void editedExternally(shared::EditorCore *);
-    void dvCoreAdded(QSharedPointer<dve::DVEditorCore> dvCore);
+    void dvCoreAdded(DVEditorCorePtr dvCore);
     void ivCoreAdded(QSharedPointer<ive::IVEditorCore> ivCore);
     void mscCoreAdded(QSharedPointer<msc::MSCEditorCore> mscCore);
 
@@ -97,14 +99,15 @@ protected Q_SLOTS:
     void purgeNonProjectData();
 
 protected:
-    void setDvData(const QString &fileName, QSharedPointer<dve::DVEditorCore> dvData);
+    void setDvData(const QString &fileName, DVEditorCorePtr dvData);
     void setIvData(const QString &fileName, QSharedPointer<ive::IVEditorCore> ivData);
     void setMscData(const QString &fileName, QSharedPointer<msc::MSCEditorCore> mscData);
 
-    QHash<QString, QSharedPointer<dve::DVEditorCore>> m_dvStore;
+    QHash<QString, DVEditorCorePtr> m_dvStore;
     QHash<QString, QSharedPointer<ive::IVEditorCore>> m_ivStore;
     QHash<QString, QSharedPointer<msc::MSCEditorCore>> m_mscStore;
     std::unique_ptr<scs::MscSystemChecks> m_mscChecks;
+    std::unique_ptr<scs::DvSystemChecks> m_dvChecks;
     std::unique_ptr<Asn1Acn::Asn1ModelStorage> m_asn1Storage;
     std::unique_ptr<Asn1Acn::Asn1SystemChecks> m_asnChecks;
 };

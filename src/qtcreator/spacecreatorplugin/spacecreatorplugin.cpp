@@ -19,8 +19,10 @@
 
 #include "context/action/actionsmanager.h"
 #include "dv/dveditorfactory.h"
+#include "dv/dvqtceditor.h"
 #include "dveditor.h"
 #include "dvlibrary.h"
+#include "dvsystemchecks.h"
 #include "interfacedocument.h"
 #include "iv/iveditordata.h"
 #include "iv/iveditorfactory.h"
@@ -108,6 +110,12 @@ bool SpaceCreatorPlugin::initialize(const QStringList &arguments, QString *error
             m_checkMessagesAction, Constants::CHECK_MESSAGES_ID, Core::Context(Core::Constants::C_GLOBAL));
     connect(m_checkMessagesAction, &QAction::triggered, this, &SpaceCreatorPlugin::checkMesagesForCurrentEditor);
 
+    m_checkDvFunctionssAction =
+            new QAction(QIcon(QLatin1String(":/icons/check_yellow.svg")), tr("Check DV functions"), this);
+    Core::Command *checkDVFunctionsCmd = Core::ActionManager::registerAction(
+            m_checkDvFunctionssAction, Constants::CHECK_DV_FUNCTIONS_ID, Core::Context(Core::Constants::C_GLOBAL));
+    connect(m_checkDvFunctionssAction, &QAction::triggered, this, &SpaceCreatorPlugin::checkDVFunctionsValidity);
+
     m_showMinimapAction =
             new QAction(QIcon(QLatin1String(":/sharedresources/icons/minimap.svg")), tr("Show minimap"), this);
     m_showMinimapAction->setCheckable(true);
@@ -129,6 +137,8 @@ bool SpaceCreatorPlugin::initialize(const QStringList &arguments, QString *error
     menu->addAction(messageDeclCmd);
     menu->addAction(checkInstancesCmd);
     menu->addAction(checkMessagesCmd);
+    menu->addSeparator();
+    menu->addAction(checkDVFunctionsCmd);
     Core::ActionManager::actionContainer(Core::Constants::M_TOOLS)->addMenu(menu);
 
     // IV
@@ -192,6 +202,7 @@ bool SpaceCreatorPlugin::initialize(const QStringList &arguments, QString *error
               << m_actionSaveSceneRender;
     m_ivFactory = new IVEditorFactory(m_projectsManager, ivActions, this);
     QList<QAction *> dvActions;
+    dvActions << m_checkDvFunctionssAction;
     m_dvFactory = new DVEditorFactory(m_projectsManager, dvActions, this);
 
     addHelp();
@@ -304,6 +315,22 @@ void SpaceCreatorPlugin::checkMesagesForCurrentEditor()
         SpaceCreatorProjectImpl *project = m_projectsManager->project(mscEditor->mscEditorCore());
         if (project) {
             project->mscChecks()->checkMessages();
+        }
+    }
+}
+
+void SpaceCreatorPlugin::checkDVFunctionsValidity()
+{
+    if (auto dvEditor = qobject_cast<spctr::DVQtCEditor *>(Core::EditorManager::currentEditor())) {
+        SpaceCreatorProjectImpl *project = m_projectsManager->project(dvEditor->dvPlugin());
+        if (project) {
+            bool ok = project->dvChecks()->checkFunctionBindings();
+            if (ok) {
+                QMessageBox::information(nullptr, tr("DV function check"), tr("All deployment view functions are ok."));
+            } else {
+                QMessageBox::warning(nullptr, tr("DV function check"),
+                        tr("Deployment view functions have errors.\nSee the issue panel for more details"));
+            }
         }
     }
 }

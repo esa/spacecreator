@@ -21,6 +21,7 @@
 #include "dveditorcore.h"
 #include "dvmainwidget.h"
 #include "dvmodel.h"
+#include "dvsystemchecks.h"
 #include "errorhub.h"
 #include "spacecreatorpluginconstants.h"
 #include "spacecreatorproject.h"
@@ -72,6 +73,9 @@ Core::IDocument::OpenResult DVEditorDocument::open(
 #endif
     connect(m_plugin->undoStack(), &QUndoStack::cleanChanged, this, [this](bool) { Q_EMIT changed(); });
     Q_EMIT dvDataLoaded(absfileName, m_plugin);
+
+    QMetaObject::invokeMethod(
+            storage->dvChecks(), "checkDVFile", Qt::QueuedConnection, Q_ARG(DVEditorCorePtr, m_plugin));
 
     return OpenResult::Success;
 }
@@ -164,7 +168,7 @@ bool DVEditorDocument::reload(QString *errorString, ReloadFlag flag, ChangeType 
     return success;
 }
 
-QSharedPointer<dve::DVEditorCore> DVEditorDocument::dvEditorCore() const
+DVEditorCorePtr DVEditorDocument::dvEditorCore() const
 {
     return m_plugin;
 }

@@ -19,7 +19,6 @@
 
 #include "asn1dialog.h"
 #include "commandsstack.h"
-#include "dveditorcore.h"
 #include "dveditordocument.h"
 #include "dvmainwidget.h"
 #include "mainmodel.h"
@@ -45,7 +44,7 @@ DVQtCEditor::DVQtCEditor(SpaceCreatorProjectManager *projectManager, const QList
     setWidget(m_editorWidget);
 
     connect(m_document, &spctr::DVEditorDocument::dvDataLoaded, this,
-            [this](const QString &, QSharedPointer<dve::DVEditorCore> data) { m_editorWidget->init(data); });
+            [this](const QString &, DVEditorCorePtr data) { m_editorWidget->init(data); });
 }
 
 DVQtCEditor::~DVQtCEditor()
@@ -63,14 +62,14 @@ DVEditorDocument *DVQtCEditor::dvDocument() const
     return m_document;
 }
 
-QSharedPointer<dve::DVEditorCore> DVQtCEditor::dvPlugin() const
+DVEditorCorePtr DVQtCEditor::dvPlugin() const
 {
     return m_document->dvEditorCore();
 }
 
 QWidget *DVQtCEditor::toolBar()
 {
-    QSharedPointer<dve::DVEditorCore> dvCore = m_document->dvEditorCore();
+    DVEditorCorePtr dvCore = m_document->dvEditorCore();
     if (m_toolbar == nullptr && !dvCore.isNull()) {
         m_toolbar = new QToolBar;
         m_toolbar->addAction(dvCore->actionUndo());

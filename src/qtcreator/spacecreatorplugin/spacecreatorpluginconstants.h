@@ -44,6 +44,7 @@ const char SHOW_E2E_ID[] = "SpaceCreator.E2EDataflow";
 const char MESSAGE_DECLARATIONS_ID[] = "MscEditor.MessageDeclarations";
 const char CHECK_INSTANCES_ID[] = "MscEditor.CheckInstances";
 const char CHECK_MESSAGES_ID[] = "MscEditor.CheckMessages";
+const char CHECK_DV_FUNCTIONS_ID[] = "DvEditor.CheckFunctions";
 const char IV_SHOW_ASN1_ID[] = "IVEditor.ShowAsn1";
 const char IV_RENDER_ID[] = "IVEditor.RenderToFile";
 const char IV_SHOW_COMMON_PROPS_ID[] = "IVEditor.CommonProps";

@@ -17,6 +17,8 @@
 
 #pragma once
 
+#include "dveditorcore.h"
+
 #include <QSharedPointer>
 #include <QVector>
 #include <QWidget>
@@ -36,14 +38,14 @@ public:
     DVMainWidget(QWidget *parent = nullptr);
     ~DVMainWidget();
 
-    bool init(QSharedPointer<dve::DVEditorCore> data);
+    bool init(DVEditorCorePtr data);
 
-    QSharedPointer<dve::DVEditorCore> dvPlugin() const;
+    DVEditorCorePtr dvPlugin() const;
 
 private:
     void init();
 
-    QSharedPointer<dve::DVEditorCore> m_plugin;
+    DVEditorCorePtr m_plugin;
 };
 
 }

@@ -76,6 +76,7 @@ private Q_SLOTS:
     void updateActions();
     void checkInstancesForCurrentEditor();
     void checkMesagesForCurrentEditor();
+    void checkDVFunctionsValidity();
 
 private:
     void addHelp();
@@ -86,6 +87,7 @@ private:
     QAction *m_messageDeclarationAction = nullptr;
     QAction *m_checkInstancesAction = nullptr;
     QAction *m_checkMessagesAction = nullptr;
+    QAction *m_checkDvFunctionssAction = nullptr;
     QAction *m_asn1DialogAction = nullptr;
     QAction *m_actionSaveSceneRender = nullptr;
     QAction *m_showMinimapAction = nullptr;

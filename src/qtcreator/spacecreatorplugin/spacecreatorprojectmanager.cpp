@@ -44,7 +44,7 @@ SpaceCreatorProjectManager::~SpaceCreatorProjectManager()
    Returns tha editor core that represents the file fileName.
    In case the core does not exist yet, it is created in the correct SpaceCreatorProject
  */
-QSharedPointer<dve::DVEditorCore> SpaceCreatorProjectManager::dvData(const QString &fileName) const
+DVEditorCorePtr SpaceCreatorProjectManager::dvData(const QString &fileName) const
 {
     if (SpaceCreatorProjectImpl *data = project(fileName)) {
         return data->dvData(fileName);

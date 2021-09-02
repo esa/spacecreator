@@ -17,13 +17,11 @@
 
 #pragma once
 
+#include "dveditorcore.h"
+
 #include <QPointer>
 #include <QSharedPointer>
 #include <coreplugin/idocument.h>
-
-namespace dve {
-class DVEditorCore;
-}
 
 // namespace Utils {
 // using FilePath = FileName;
@@ -56,15 +54,15 @@ public:
     bool reload(QString *errorString, ReloadFlag flag, ChangeType type) override;
 
     // Internal
-    QSharedPointer<dve::DVEditorCore> dvEditorCore() const;
+    DVEditorCorePtr dvEditorCore() const;
 
 Q_SIGNALS:
     void reloadRequested(QString *errorString, const QString &);
-    void dvDataLoaded(const QString &fileName, QSharedPointer<dve::DVEditorCore> data);
+    void dvDataLoaded(const QString &fileName, DVEditorCorePtr data);
 
 private:
     QPointer<SpaceCreatorProjectManager> m_projectManager;
-    QSharedPointer<dve::DVEditorCore> m_plugin;
+    DVEditorCorePtr m_plugin;
 };
 
 }

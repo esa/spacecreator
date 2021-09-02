@@ -88,7 +88,7 @@ bool MscSystemChecks::ivFunctionUsed(const QString &name)
         }
     }
 
-    for (QSharedPointer<dve::DVEditorCore> &dvCore : m_storage->allDVCores()) {
+    for (const DVEditorCorePtr &dvCore : m_storage->allDVCores()) {
         dvm::DVModel *model = dvCore->appModel()->objectsModel();
         for (dvm::DVFunction *fn : model->allObjectsByType<dvm::DVFunction>()) {
             if (fn->title() == name) {
@@ -277,7 +277,7 @@ void MscSystemChecks::checkMessages()
 bool MscSystemChecks::dvMessagesExist(
         const QString &messageName, const QString &sourceName, const QString &targetName, shared::MessageEnd msgSide)
 {
-    for (QSharedPointer<dve::DVEditorCore> &dvCore : m_storage->allDVCores()) {
+    for (const DVEditorCorePtr &dvCore : m_storage->allDVCores()) {
         dvm::DVModel *model = dvCore->appModel()->objectsModel();
         for (const dvm::DVMessage *msg : model->allObjectsByType<dvm::DVMessage>()) {
             if (msg->fromFunction() == sourceName && msg->toFunction() == targetName) {
@@ -298,7 +298,7 @@ bool MscSystemChecks::dvMessagesExist(
  */
 void MscSystemChecks::changeDvFunctionBindingName(const QString &oldName, const QString &name)
 {
-    for (QSharedPointer<dve::DVEditorCore> &dvCore : m_storage->allDVCores()) {
+    for (const DVEditorCorePtr &dvCore : m_storage->allDVCores()) {
         dvCore->changeDvFunctionBindingName(oldName, name);
     }
 }
@@ -308,7 +308,7 @@ void MscSystemChecks::changeDvFunctionBindingName(const QString &oldName, const 
  */
 void MscSystemChecks::removeDvFunctionBinding(ivm::IVFunction *ivFunction)
 {
-    for (QSharedPointer<dve::DVEditorCore> &dvCore : m_storage->allDVCores()) {
+    for (const DVEditorCorePtr &dvCore : m_storage->allDVCores()) {
         dvCore->removeDvFunctionBinding(ivFunction->title());
     }
 }
@@ -319,7 +319,7 @@ void MscSystemChecks::removeDvFunctionBinding(ivm::IVFunction *ivFunction)
 void MscSystemChecks::changeDvMessageBindingName(const QString &oldName, const QString &name, const QString &sourceName,
         const QString &targetName, shared::MessageEnd msgSide)
 {
-    for (QSharedPointer<dve::DVEditorCore> &dvCore : m_storage->allDVCores()) {
+    for (const DVEditorCorePtr &dvCore : m_storage->allDVCores()) {
         dvCore->changeDvMessageBindingIfName(oldName, name, sourceName, targetName, msgSide);
     }
 }
@@ -329,7 +329,7 @@ void MscSystemChecks::changeDvMessageBindingName(const QString &oldName, const Q
  */
 void MscSystemChecks::removeDvMessageBinding(ivm::IVConnection *ivConnection)
 {
-    for (QSharedPointer<dve::DVEditorCore> &dvCore : m_storage->allDVCores()) {
+    for (const DVEditorCorePtr &dvCore : m_storage->allDVCores()) {
         dvCore->removeDvMessageBinding(ivConnection->sourceName(), ivConnection->sourceInterfaceName(),
                 ivConnection->targetName(), ivConnection->targetInterfaceName());
     }

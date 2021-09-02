@@ -3,6 +3,8 @@ set(LIB_NAME spacecreatorsystem)
 add_library(${LIB_NAME} STATIC)
 
 target_sources(${LIB_NAME} PRIVATE
+    dvsystemchecks.cpp
+    dvsystemchecks.h
     ivsystemchecks.cpp
     ivsystemchecks.h
     ivsystemqueries.cpp

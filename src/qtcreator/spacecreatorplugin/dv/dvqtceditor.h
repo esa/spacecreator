@@ -17,6 +17,8 @@
 
 #pragma once
 
+#include "dveditorcore.h"
+
 #include <QPointer>
 #include <QSharedPointer>
 #include <editormanager/ieditor.h>
@@ -43,7 +45,7 @@ public:
 
     Core::IDocument *document() const override;
     DVEditorDocument *dvDocument() const;
-    QSharedPointer<dve::DVEditorCore> dvPlugin() const;
+    DVEditorCorePtr dvPlugin() const;
 
     QWidget *toolBar() override;
 
