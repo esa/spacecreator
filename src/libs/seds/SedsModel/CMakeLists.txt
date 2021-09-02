@@ -76,6 +76,7 @@ set(SOURCES
     generics/generictype.cpp
     generics/generictypemap.cpp
     generics/generictypemapset.cpp
+    interfaces/argumentscombination.cpp
     interfaces/commandargument.cpp
     interfaces/commandargumentmode.cpp
     interfaces/interfacecommand.cpp
@@ -208,6 +209,7 @@ set(INCLUDES
     generics/generictype.h
     generics/generictypemap.h
     generics/generictypemapset.h
+    interfaces/argumentscombination.h
     interfaces/commandargument.h
     interfaces/commandargumentmode.h
     interfaces/interfacecommand.h

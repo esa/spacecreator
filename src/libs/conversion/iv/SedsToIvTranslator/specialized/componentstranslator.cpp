@@ -50,66 +50,68 @@ ivm::IVFunction *ComponentsTranslator::translateComponent(const seds::model::Com
 }
 
 void ComponentsTranslator::translateInterface(const seds::model::Interface &interface,
-        const seds::model::Component &component, ivm::IVInterface::InterfaceType interfaceType,
+        const seds::model::Component &component, const ivm::IVInterface::InterfaceType interfaceType,
         ivm::IVFunction *ivFunction) const
 {
     const auto &interfaceTypeName = interface.type().nameStr();
     const auto &interfaceDeclaration = findInterfaceDeclaration(interfaceTypeName, component);
 
     for (const auto &command : interfaceDeclaration.commands()) {
-        translateInterfaceCommand(command, interface, interfaceType, ivFunction);
+        switch (command.mode()) {
+        case seds::model::InterfaceCommandMode::Sync:
+            throw TranslationException("Sync commands not implemented");
+            break;
+        case seds::model::InterfaceCommandMode::Async:
+            translateAsyncInterfaceCommand(command, interface, interfaceType, ivFunction);
+            break;
+        default:
+            throw UnhandledValueException("InterfaceCommandMode");
+            break;
+        }
+    }
+}
+
+void ComponentsTranslator::translateAsyncInterfaceCommand(const seds::model::InterfaceCommand &command,
+        const seds::model::Interface &interface, ivm::IVInterface::InterfaceType interfaceType,
+        ivm::IVFunction *ivFunction) const
+{
+    switch (command.argumentsCombination()) {
+    case seds::model::ArgumentsCombination::InOnly:
+        throw TranslationException("Interface command with in arguments only not implemented");
+        break;
+    case seds::model::ArgumentsCombination::OutOnly:
+        throw TranslationException("Interface command with out arguments only not implemented");
+        break;
+    case seds::model::ArgumentsCombination::InAndNotify:
+        throw TranslationException("Interface command with in and notify arguments not implemented");
+        break;
+    case seds::model::ArgumentsCombination::NoArgs:
+    case seds::model::ArgumentsCombination::NotifyOnly:
+    case seds::model::ArgumentsCombination::InAndOut:
+    case seds::model::ArgumentsCombination::OutAndNotify:
+    case seds::model::ArgumentsCombination::All: {
+        const auto message =
+                QString("Interface command arguments combination '%1' is not supported for TASTE InterfaceView")
+                        .arg(argumentsCombinationToString(command.argumentsCombination()));
+        throw TranslationException(message);
+    } break;
+    default:
+        throw UnhandledValueException("ArgumentsCombination");
+        break;
     }
 }
 
 void ComponentsTranslator::translateInterfaceCommand(const seds::model::InterfaceCommand &command,
         const seds::model::Interface &interface, ivm::IVInterface::InterfaceType interfaceType,
-        ivm::IVFunction *ivFunction) const
+        ivm::IVInterface::OperationKind operationKind, ivm::IVFunction *ivFunction) const
 {
     ivm::IVInterface::CreationInfo creationInfo;
     creationInfo.function = ivFunction;
     creationInfo.type = interfaceType;
     creationInfo.name = command.nameStr();
-    creationInfo.kind = convertInterfaceCommandMode(command.mode());
+    creationInfo.kind = operationKind;
 
     auto *ivInterface = ivm::IVInterface::createIface(creationInfo);
-
-    for (const auto &argument : command.arguments()) {
-        qDebug() << argument.nameStr();
-    }
-
-    ivFunction->addChild(ivInterface);
-}
-
-ivm::IVInterface::OperationKind ComponentsTranslator::convertInterfaceCommandMode(
-        seds::model::InterfaceCommandMode commandMode) const
-{
-    switch (commandMode) {
-    case seds::model::InterfaceCommandMode::Sync:
-        return ivm::IVInterface::OperationKind::Protected;
-    case seds::model::InterfaceCommandMode::Async:
-        return ivm::IVInterface::OperationKind::Sporadic;
-    default:
-        throw UnhandledValueException("InterfaceCommandMode");
-        break;
-    }
-}
-
-ivm::InterfaceParameter::Direction ComponentsTranslator::convertCommandArgumentMode(
-        seds::model::CommandArgumentMode argumentMode) const
-{
-    switch (argumentMode) {
-    case seds::model::CommandArgumentMode::In:
-        return ivm::InterfaceParameter::Direction::IN;
-    case seds::model::CommandArgumentMode::Out:
-        return ivm::InterfaceParameter::Direction::OUT;
-    case seds::model::CommandArgumentMode::InOut:
-    case seds::model::CommandArgumentMode::Notify:
-        throw UnsupportedValueException("InterfaceCommandMode");
-        break;
-    default:
-        throw UnhandledValueException("InterfaceCommandMode");
-        break;
-    }
 }
 
 const seds::model::InterfaceDeclaration &ComponentsTranslator::findInterfaceDeclaration(

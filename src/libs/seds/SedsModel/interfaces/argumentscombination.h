@@ -19,19 +19,31 @@
 
 #pragma once
 
-#include <seds/SedsCommon/enumconversion.h>
+#include <cstdint>
+
+class QString;
 
 namespace seds::model {
 
-enum class CommandArgumentMode : uint8_t
+enum class ArgumentsCombination : uint8_t
 {
-    In = 0b001,
-    Out = 0b010,
-    InOut = 0b011,
-    Notify = 0b100,
+    NoArgs = 0b000,
+    InOnly = 0b001,
+    OutOnly = 0b010,
+    NotifyOnly = 0b100,
+    InAndOut = 0b011,
+    InAndNotify = 0b101,
+    OutAndNotify = 0b110,
+    All = 0b111,
 };
 
-template<>
-auto enumFromString(const QStringRef &enumStr) -> std::optional<CommandArgumentMode>;
+/**
+ * @brief   Converts given arguments combination to string
+ *
+ * @param   argumentsCombination   Arguments combination to convert
+ *
+ * @param   String with arguments combination name
+ */
+auto argumentsCombinationToString(ArgumentsCombination argumentsCombination) -> QString;
 
-} // namespace seds::model {
+} // namespace seds::model

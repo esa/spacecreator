@@ -33,7 +33,7 @@ class InterfaceParameter;
 class InterfaceRef;
 class Package;
 
-enum class CommandArgumentMode;
+enum class CommandArgumentMode : uint8_t;
 enum class InterfaceCommandMode;
 enum class InterfaceParameterMode;
 } // namespace seds::model

@@ -20,8 +20,6 @@ class Interface;
 class InterfaceCommand;
 class InterfaceDeclaration;
 class Package;
-enum class CommandArgumentMode;
-enum class InterfaceCommandMode;
 } // namespace seds::model
 
 namespace conversion::iv::translator {
@@ -62,15 +60,13 @@ public:
 private:
     auto translateComponent(const seds::model::Component &component) const -> ivm::IVFunction *;
     auto translateInterface(const seds::model::Interface &interface, const seds::model::Component &component,
-            ivm::IVInterface::InterfaceType interfaceType, ivm::IVFunction *ivFunction) const -> void;
-    auto translateInterfaceCommand(const seds::model::InterfaceCommand &command,
+            const ivm::IVInterface::InterfaceType interfaceType, ivm::IVFunction *ivFunction) const -> void;
+    auto translateAsyncInterfaceCommand(const seds::model::InterfaceCommand &command,
             const seds::model::Interface &interface, ivm::IVInterface::InterfaceType interfaceType,
             ivm::IVFunction *ivFunction) const -> void;
-
-    auto convertInterfaceCommandMode(seds::model::InterfaceCommandMode commandMode) const
-            -> ivm::IVInterface::OperationKind;
-    auto convertCommandArgumentMode(seds::model::CommandArgumentMode argumentMode) const
-            -> ivm::InterfaceParameter::Direction;
+    auto translateInterfaceCommand(const seds::model::InterfaceCommand &command,
+            const seds::model::Interface &interface, ivm::IVInterface::InterfaceType interfaceType,
+            ivm::IVInterface::OperationKind operationKind, ivm::IVFunction *ivFunction) const -> void;
 
 private:
     auto findInterfaceDeclaration(const QString &interfaceTypeName, const seds::model::Component &component) const

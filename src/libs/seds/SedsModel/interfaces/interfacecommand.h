@@ -20,8 +20,11 @@
 #pragma once
 
 #include "base/namedentity.h"
+#include "interfaces/argumentscombination.h"
 #include "interfaces/commandargument.h"
 #include "interfaces/interfacecommandmode.h"
+
+#include <set>
 
 namespace seds::model {
 
@@ -42,9 +45,14 @@ public:
     auto arguments() const -> const CommandArguments &;
     auto addArgument(CommandArgument argument) -> void;
 
+public:
+    auto argumentsCombination() const -> ArgumentsCombination;
+
 private:
     InterfaceCommandMode m_mode;
     CommandArguments m_arguments;
+
+    std::set<CommandArgumentMode> m_argumentsModes;
 };
 
 } // namespace seds::model
