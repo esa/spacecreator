@@ -44,11 +44,15 @@ public Q_SLOTS:
     bool checkFunctionBindings() const;
     bool checkFunctionBindings(DVEditorCorePtr dvCore) const;
 
-Q_SIGNALS:
+    bool checkMessageBindings() const;
+    bool checkMessageBindings(DVEditorCorePtr dvCore) const;
 
 private:
+    bool checkFunctionIvValidity(const DVEditorCorePtr &dvCore) const;
+    bool checkUniqueFunctionBindings(const DVEditorCorePtr &dvCore) const;
+
     bool checkMessageIvValidity(const DVEditorCorePtr &dvCore) const;
-    bool checkUniqueMessageBindings(const DVEditorCorePtr &dvCore) const;
+    bool checkUniqueMessages(const DVEditorCorePtr &dvCore) const;
 
     QPointer<SpaceCreatorProject> m_storage;
     Qt::CaseSensitivity m_caseCheck = Qt::CaseInsensitive;

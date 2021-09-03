@@ -69,6 +69,8 @@ public:
     bool postInit() override;
     bool aboutToBeRemoved() override;
 
+    virtual bool isEqual(DVObject *other) const;
+
 Q_SIGNALS:
     void titleChanged(const QString &title);
     void coordinatesChanged(const QVector<qint32> &coordinates);

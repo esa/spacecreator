@@ -180,6 +180,15 @@ QString VEObject::coordinatesToString(const QVector<qint32> &coordinates)
     return coordString;
 }
 
+/*!
+   Returns if the \p other is equal to this object.
+   Two of these are considered euqal if they have the exact same attributes.
+ */
+bool VEObject::isEqual(const VEObject *other) const
+{
+    return other && d->m_attrs == other->d->m_attrs;
+}
+
 VEObject *VEObject::parentObject() const
 {
     return qobject_cast<VEObject *>(parent());

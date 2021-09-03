@@ -111,4 +111,9 @@ bool DVObject::aboutToBeRemoved()
     return true;
 }
 
+bool DVObject::isEqual(DVObject *other) const
+{
+    return this->type() == other->type() && VEObject::isEqual(other);
+}
+
 } // namespace dvm

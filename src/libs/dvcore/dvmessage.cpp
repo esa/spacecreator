@@ -17,6 +17,9 @@
 
 #include "dvmessage.h"
 
+#include "dvconnection.h"
+#include "dvnode.h"
+
 namespace dvm {
 
 DVMessage::DVMessage(QObject *parent)
@@ -49,6 +52,15 @@ void DVMessage::setFromInterface(const QString &from)
     setEntityAttribute(meta::Props::token(meta::Props::Token::from_interface), from);
 }
 
+DVNode *DVMessage::fromNode() const
+{
+    auto connection = qobject_cast<const DVConnection *>(this);
+    if (!connection) {
+        return nullptr;
+    }
+    return connection->sourceNode();
+}
+
 QString DVMessage::toFunction() const
 {
     return entityAttributeValue(meta::Props::token(meta::Props::Token::to_function)).toString();
@@ -67,6 +79,15 @@ QString DVMessage::toInterface() const
 void DVMessage::setToInterface(const QString &to)
 {
     setEntityAttribute(meta::Props::token(meta::Props::Token::to_interface), to);
+}
+
+DVNode *DVMessage::toNode() const
+{
+    auto connection = qobject_cast<const DVConnection *>(this);
+    if (!connection) {
+        return nullptr;
+    }
+    return connection->targetNode();
 }
 
 } // namespace dvm

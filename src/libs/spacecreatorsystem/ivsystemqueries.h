@@ -48,6 +48,9 @@ public:
     QList<QPair<QString, QString>> messages(
             const QString &sourceFunction, const QString &targetFunction) const override;
 
+    bool connectionExists(const QString &sourceFunction, const QString &sourceInterface, const QString &targetFunction,
+            const QString &targetInterface) const;
+
     ivm::IVModel *ivModel() const;
 
 Q_SIGNALS:

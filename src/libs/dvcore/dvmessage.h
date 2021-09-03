@@ -20,6 +20,7 @@
 #include "dvobject.h"
 
 namespace dvm {
+class DVNode;
 
 class DVMessage : public DVObject
 {
@@ -35,11 +36,15 @@ public:
     QString fromInterface() const;
     void setFromInterface(const QString &from);
 
+    DVNode *fromNode() const;
+
     QString toFunction() const;
     void setToFunction(const QString &to);
 
     QString toInterface() const;
     void setToInterface(const QString &to);
+
+    DVNode *toNode() const;
 };
 
 } // namespace dvm

@@ -92,6 +92,17 @@ QList<QPair<QString, QString>> IvSystemQueries::messages(
 }
 
 /*!
+   Returns if a IV connection with the given parameters esists
+ */
+bool IvSystemQueries::connectionExists(const QString &sourceFunction, const QString &sourceInterface,
+        const QString &targetFunction, const QString &targetInterface) const
+{
+    QList<QPair<QString, QString>> connections = messages(sourceFunction, targetFunction);
+    QPair<QString, QString> msgIf { sourceInterface, targetInterface };
+    return connections.contains(msgIf);
+}
+
+/*!
    Returns a pointer to the IV model of the in-core
  */
 ivm::IVModel *IvSystemQueries::ivModel() const
