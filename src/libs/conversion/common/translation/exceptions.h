@@ -77,9 +77,8 @@ public:
      * @brief   Constructor
      *
      * @param   genericTypeName   Type that wasn't mapped
-     * @param   argumentName      Name of argument with that type
      */
-    explicit MissingGenericTypeMappingException(const QString &genericTypeName, const QString &argumentName);
+    explicit MissingGenericTypeMappingException(const QString &genericTypeName);
 };
 
 /**

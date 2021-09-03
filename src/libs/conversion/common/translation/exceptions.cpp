@@ -38,10 +38,8 @@ UndeclaredInterfaceException::UndeclaredInterfaceException(const QString &interf
 {
 }
 
-MissingGenericTypeMappingException::MissingGenericTypeMappingException(
-        const QString &genericTypeName, const QString &argumentName)
-    : TranslationException(
-            QString("Generic type '%1' for argument %2 wasn't mapped").arg(genericTypeName).arg(argumentName))
+MissingGenericTypeMappingException::MissingGenericTypeMappingException(const QString &genericTypeName)
+    : TranslationException(QString("Generic type '%1' wasn't mapped").arg(genericTypeName))
 {
 }
 

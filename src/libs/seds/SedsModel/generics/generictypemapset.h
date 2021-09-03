@@ -23,6 +23,7 @@
 #include "generics/genericalternateset.h"
 #include "generics/generictypemap.h"
 
+#include <optional>
 #include <vector>
 
 namespace seds::model {

@@ -23,15 +23,20 @@
 #include <conversion/common/translation/exceptions.h>
 #include <ivcore/ivfunction.h>
 #include <ivcore/parameter.h>
+#include <seds/SedsModel/generics/generictypemapset.h>
+#include <seds/SedsModel/interfaces/argumentscombination.h>
 #include <seds/SedsModel/interfaces/interfacecommand.h>
 
+using conversion::translator::MissingGenericTypeMappingException;
 using conversion::translator::TranslationException;
 using conversion::translator::UnhandledValueException;
 
 namespace conversion::iv::translator {
 
-AsyncInterfaceCommandTranslator::AsyncInterfaceCommandTranslator(ivm::IVFunction *ivFunction)
-    : m_ivFunction(ivFunction)
+AsyncInterfaceCommandTranslator::AsyncInterfaceCommandTranslator(
+        const seds::model::GenericTypeMapSet &typeMappings, ivm::IVFunction *ivFunction)
+    : m_typeMappings(typeMappings)
+    , m_ivFunction(ivFunction)
 {
 }
 
@@ -89,8 +94,11 @@ void AsyncInterfaceCommandTranslator::translateArguments(const std::vector<seds:
 void AsyncInterfaceCommandTranslator::translateArgument(
         const seds::model::CommandArgument &argument, ivm::IVInterface *ivInterface) const
 {
+    const auto &genericArgumentTypeName = argument.type().nameStr();
+    const auto concreteArgumentTypeName = findMappedType(genericArgumentTypeName).nameStr();
+
     const auto ivParameter = ivm::InterfaceParameter(argument.nameStr(), ivm::BasicParameter::Type::Other,
-            argument.type().nameStr(), QStringLiteral("ACN"), ivm::InterfaceParameter::Direction::IN);
+            concreteArgumentTypeName, QStringLiteral("ACN"), ivm::InterfaceParameter::Direction::IN);
 
     ivInterface->addParam(ivParameter);
 }
@@ -119,6 +127,21 @@ ivm::IVInterface::InterfaceType AsyncInterfaceCommandTranslator::switchInterface
         throw UnhandledValueException("InterfaceType");
         break;
     }
+}
+
+const seds::model::DataTypeRef &AsyncInterfaceCommandTranslator::findMappedType(const QString &genericTypeName) const
+{
+    const auto &genericTypeMaps = m_typeMappings.genericTypeMaps();
+
+    const auto found = std::find_if(genericTypeMaps.begin(), genericTypeMaps.end(),
+            [&genericTypeName](
+                    const seds::model::GenericTypeMap &typeMap) { return typeMap.nameStr() == genericTypeName; });
+
+    if (found != genericTypeMaps.end()) {
+        return found->type();
+    }
+
+    throw MissingGenericTypeMappingException(genericTypeName);
 }
 
 } // namespace conversion::iv::translator

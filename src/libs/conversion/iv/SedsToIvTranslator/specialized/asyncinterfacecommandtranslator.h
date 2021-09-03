@@ -29,6 +29,8 @@ class IVFunction;
 namespace seds::model {
 class CommandArgument;
 class Component;
+class DataTypeRef;
+class GenericTypeMapSet;
 class InterfaceCommand;
 enum class CommandArgumentMode : uint8_t;
 } // namespace seds::model
@@ -38,7 +40,7 @@ namespace conversion::iv::translator {
 class AsyncInterfaceCommandTranslator final
 {
 public:
-    explicit AsyncInterfaceCommandTranslator(ivm::IVFunction *ivFunction);
+    AsyncInterfaceCommandTranslator(const seds::model::GenericTypeMapSet &typeMappings, ivm::IVFunction *ivFunction);
     AsyncInterfaceCommandTranslator(const AsyncInterfaceCommandTranslator &) = delete;
     AsyncInterfaceCommandTranslator(AsyncInterfaceCommandTranslator &&) = delete;
     AsyncInterfaceCommandTranslator &operator=(const AsyncInterfaceCommandTranslator &) = delete;
@@ -55,8 +57,10 @@ private:
     auto createIvInterface(const QString &name, ivm::IVInterface::InterfaceType interfaceType) const
             -> ivm::IVInterface *;
     auto switchInterfaceType(ivm::IVInterface::InterfaceType interfaceType) const -> ivm::IVInterface::InterfaceType;
+    auto findMappedType(const QString &genericTypeName) const -> const seds::model::DataTypeRef &;
 
 private:
+    const seds::model::GenericTypeMapSet &m_typeMappings;
     ivm::IVFunction *m_ivFunction;
 };
 

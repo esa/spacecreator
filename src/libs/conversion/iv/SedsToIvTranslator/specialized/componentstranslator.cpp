@@ -73,7 +73,7 @@ void ComponentsTranslator::translateInterface(const seds::model::Interface &inte
     const auto &interfaceTypeName = interface.type().nameStr();
     const auto &interfaceDeclaration = findInterfaceDeclaration(interfaceTypeName, component);
 
-    AsyncInterfaceCommandTranslator asyncCommandTranslator(ivFunction);
+    AsyncInterfaceCommandTranslator asyncCommandTranslator(interface.genericTypeMapSet(), ivFunction);
 
     for (const auto &command : interfaceDeclaration.commands()) {
         switch (command.mode()) {
