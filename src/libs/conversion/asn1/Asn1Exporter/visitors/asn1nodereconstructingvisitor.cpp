@@ -19,20 +19,20 @@
 
 #include "asn1nodereconstructingvisitor.h"
 
-#include <QString>
+#include "asn1typecomponentreconstructingvisitor.h"
 
+#include <QString>
 #include <data/definitions.h>
 #include <data/file.h>
 #include <data/project.h>
 #include <data/root.h>
 
-#include "asn1typecomponentreconstructingvisitor.h"
-
 using namespace Asn1Acn;
 
 Asn1NodeReconstructingVisitor::Asn1NodeReconstructingVisitor(QTextStream &outStream)
     : m_outStream(outStream)
-{}
+{
+}
 
 void Asn1NodeReconstructingVisitor::visit(const Data::Definitions &defs)
 {
@@ -65,9 +65,8 @@ void Asn1NodeReconstructingVisitor::visit(const Data::ValueAssignment &assignmen
     if (assignment.value() == nullptr)
         return;
 
-    m_outStream << assignment.name() << QStringLiteral(" ") << assignment.type()->name()
-                << QStringLiteral(" ::= ") << assignment.value()->asString()
-                << QStringLiteral("\n");
+    m_outStream << assignment.name() << QStringLiteral(" ") << assignment.type()->name() << QStringLiteral(" ::= ")
+                << assignment.value()->asString() << QStringLiteral("\n");
 }
 
 void Asn1NodeReconstructingVisitor::visit(const Data::Project &project)
@@ -100,8 +99,7 @@ template<typename T>
 void Asn1NodeReconstructingVisitor::reconstructImportedCollection(const T &types) const
 {
     for (const auto &type : types)
-        m_outStream << type.name() << QStringLiteral(" FROM ") << type.module()
-                    << QStringLiteral("\n");
+        m_outStream << type.name() << QStringLiteral(" FROM ") << type.module() << QStringLiteral("\n");
 }
 
 template<typename T>

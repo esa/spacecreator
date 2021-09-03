@@ -21,7 +21,6 @@
 
 #include <QString>
 #include <QTextStream>
-
 #include <data/visitor.h>
 
 namespace Asn1Acn {

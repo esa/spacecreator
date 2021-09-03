@@ -19,20 +19,20 @@
 
 #include "acnnodereconstructingvisitor.h"
 
-#include <QString>
+#include "acntypecomponentreconstructingvisitor.h"
 
+#include <QString>
 #include <data/definitions.h>
 #include <data/file.h>
 #include <data/project.h>
 #include <data/root.h>
 
-#include "acntypecomponentreconstructingvisitor.h"
-
 using namespace Asn1Acn;
 
 AcnNodeReconstructingVisitor::AcnNodeReconstructingVisitor(QTextStream &outStream)
     : m_outStream(outStream)
-{}
+{
+}
 
 void AcnNodeReconstructingVisitor::visit(const Data::Definitions &defs)
 {

@@ -20,7 +20,6 @@
 #pragma once
 
 #include <QTextStream>
-
 #include <data/types/acnparameterizablecomposite.h>
 #include <data/types/bitstring.h>
 #include <data/types/boolean.h>

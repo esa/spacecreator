@@ -20,7 +20,6 @@
 #pragma once
 
 #include <QTextStream>
-
 #include <data/types/acnparameterizablecomposite.h>
 #include <data/types/bitstring.h>
 #include <data/types/boolean.h>
@@ -43,9 +42,7 @@ namespace Asn1Acn {
 class AcnTypeComponentReconstructingVisitor : public Data::Types::TypeReadingVisitor
 {
 public:
-    AcnTypeComponentReconstructingVisitor(QTextStream &outStream,
-                                          int indent = 0,
-                                          QString presentWhenValue = QString());
+    AcnTypeComponentReconstructingVisitor(QTextStream &outStream, int indent = 0, QString presentWhenValue = QString());
     ~AcnTypeComponentReconstructingVisitor() override = default;
 
     void visit(const Data::Types::Boolean &type) override;
@@ -64,17 +61,14 @@ public:
     void visit(const Data::Types::UserdefinedType &type) override;
 
 private:
-    void tryAppendIntegerAcnParams(const Data::Types::IntegerAcnParameters &type,
-                                   QStringList &params) const;
-    void tryAppendAsciiStringParams(const Data::Types::AsciiStringAcnParameters &type,
-                                    QStringList &params) const;
+    void tryAppendIntegerAcnParams(const Data::Types::IntegerAcnParameters &type, QStringList &params) const;
+    void tryAppendAsciiStringParams(const Data::Types::AsciiStringAcnParameters &type, QStringList &params) const;
 
     void tryAppendAlignToNext(const Data::Types::Type &type, QStringList &params) const;
     void tryAppendTrueValue(const Data::Types::Boolean &type, QStringList &params) const;
     void tryAppendFalseValue(const Data::Types::Boolean &type, QStringList &params) const;
     void tryAppendPattern(const Data::Types::Null &type, QStringList &params) const;
-    void tryAppendTerminationPattern(const Data::Types::AsciiStringAcnParameters &type,
-                                     QStringList &params) const;
+    void tryAppendTerminationPattern(const Data::Types::AsciiStringAcnParameters &type, QStringList &params) const;
 
     void tryAppendPresentWhen(QStringList &params) const;
     void tryAppendSize(const Data::Types::IntegerAcnParameters &type, QStringList &params) const;

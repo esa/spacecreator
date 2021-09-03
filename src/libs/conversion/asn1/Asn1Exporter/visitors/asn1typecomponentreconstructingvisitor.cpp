@@ -1,33 +1,27 @@
-/****************************************************************************
-**
-** Copyright (C) 2017-2021 N7 Space sp. z o. o.
-** Contact: http://n7space.com
-**
-** This file is part of ASN.1/ACN Library.
-**
-** Library was developed under a programme and funded by
-** European Space Agency.
-**
-** This Library is free software: you can redistribute it and/or modify
-** it under the terms of the GNU General Public License as published by
-** the Free Software Foundation, either version 3 of the License, or
-** (at your option) any later version.
-**
-** This Library is distributed in the hope that it will be useful,
-** but WITHOUT ANY WARRANTY; without even the implied warranty of
-** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-** GNU General Public License for more details.
-**
-** You should have received a copy of the GNU General Public License
-** along with this program.  If not, see <http://www.gnu.org/licenses/>.
-**
-****************************************************************************/
+/** @file
+ * This file is part of the SpaceCreator.
+ *
+ * @copyright (C) 2021 N7 Space Sp. z o.o.
+ *
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Library General Public
+ * License as published by the Free Software Foundation; either
+ * version 2 of the License, or (at your option) any later version.
+ *
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Library General Public License for more details.
+ *
+ * You should have received a copy of the GNU Library General Public License
+ * along with this program. If not, see <https://www.gnu.org/licenses/lgpl-2.1.html>.
+ */
 
 #include "asn1typecomponentreconstructingvisitor.h"
 
-#include <data/constraints/printingvisitor.h>
-
 #include "typeconstraintsreconstructingvisitor.h"
+
+#include <data/constraints/printingvisitor.h>
 
 using namespace Asn1Acn;
 
@@ -35,11 +29,11 @@ namespace {
 const int INDENT_SIZE = 4;
 } // namespace
 
-Asn1TypeComponentReconstructingVisitor::Asn1TypeComponentReconstructingVisitor(
-    QTextStream &outStream, int indent)
+Asn1TypeComponentReconstructingVisitor::Asn1TypeComponentReconstructingVisitor(QTextStream &outStream, int indent)
     : m_outStream(outStream)
     , m_indent(indent)
-{}
+{
+}
 
 void Asn1TypeComponentReconstructingVisitor::visit(const Data::Types::Boolean &type)
 {
@@ -74,11 +68,10 @@ namespace {
 QList<Data::Types::EnumeratedItem> itemsSortedByIndex(const Data::Types::Enumerated &type)
 {
     auto items = type.items().values();
-    std::sort(items.begin(),
-              items.end(),
-              [](const Data::Types::EnumeratedItem &a, const Data::Types::EnumeratedItem &b) {
-                  return a.index() < b.index();
-              });
+    std::sort(
+            items.begin(), items.end(), [](const Data::Types::EnumeratedItem &a, const Data::Types::EnumeratedItem &b) {
+                return a.index() < b.index();
+            });
     return items;
 }
 } // namespace
@@ -117,8 +110,7 @@ void Asn1TypeComponentReconstructingVisitor::visit(const Data::Types::Sequence &
 
 void Asn1TypeComponentReconstructingVisitor::visit(const Data::Types::SequenceOf &type)
 {
-    m_outStream << QStringLiteral("SEQUENCE ") << toString(type.constraints())
-                << QStringLiteral(" OF ");
+    m_outStream << QStringLiteral("SEQUENCE ") << toString(type.constraints()) << QStringLiteral(" OF ");
 
     Asn1TypeComponentReconstructingVisitor visitor(m_outStream, m_indent);
     type.itemsType().accept(visitor);
