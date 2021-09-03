@@ -44,7 +44,7 @@
 #include <data/types/typereadingvisitor.h>
 #include <data/types/userdefinedtype.h>
 
-namespace Fuzzer {
+namespace Asn1Acn {
 
 class AcnTypeComponentReconstructingVisitor : public Data::Types::TypeReadingVisitor
 {
@@ -113,4 +113,4 @@ private:
     QString m_presentWhenValue;
 };
 
-} // namespace Fuzzer
+} // namespace Asn1Acn

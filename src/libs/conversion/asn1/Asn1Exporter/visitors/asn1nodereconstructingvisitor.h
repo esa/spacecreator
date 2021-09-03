@@ -30,7 +30,7 @@
 
 #include <data/visitor.h>
 
-namespace Fuzzer {
+namespace Asn1Acn {
 
 class Asn1NodeReconstructingVisitor : public Data::Visitor
 {
@@ -56,4 +56,4 @@ private:
     QTextStream &m_outStream;
 };
 
-} // namespace Fuzzer
+} // namespace Asn1Acn

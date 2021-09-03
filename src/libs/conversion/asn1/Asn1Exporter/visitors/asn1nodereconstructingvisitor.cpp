@@ -34,7 +34,7 @@
 
 #include "asn1typecomponentreconstructingvisitor.h"
 
-using namespace Fuzzer;
+using namespace Asn1Acn;
 
 Asn1NodeReconstructingVisitor::Asn1NodeReconstructingVisitor(QTextStream &outStream)
     : m_outStream(outStream)

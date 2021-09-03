@@ -30,7 +30,7 @@
 
 #include "typeconstraintsreconstructingvisitor.h"
 
-using namespace Fuzzer;
+using namespace Asn1Acn;
 
 namespace {
 const int INDENT_SIZE = 4;

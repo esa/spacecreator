@@ -44,7 +44,7 @@
 #include <data/types/typereadingvisitor.h>
 #include <data/types/userdefinedtype.h>
 
-namespace Fuzzer {
+namespace Asn1Acn {
 
 class Asn1TypeComponentReconstructingVisitor : public Data::Types::TypeReadingVisitor
 {
@@ -82,4 +82,4 @@ private:
     int m_indent;
 };
 
-} // namespace Fuzzer
+} // namespace Asn1Acn
