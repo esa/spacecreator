@@ -1,3 +1,22 @@
+/** @file
+ * This file is part of the SpaceCreator.
+ *
+ * @copyright (C) 2021 N7 Space Sp. z o.o.
+ *
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Library General Public
+ * License as published by the Free Software Foundation; either
+ * version 2 of the License, or (at your option) any later version.
+ *
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Library General Public License for more details.
+ *
+ * You should have received a copy of the GNU Library General Public License
+ * along with this program. If not, see <https://www.gnu.org/licenses/lgpl-2.1.html>.
+ */
+
 #pragma once
 
 #include <QVector>
@@ -9,15 +28,11 @@ class File;
 
 namespace ivm {
 class IVFunction;
-class InterfaceParameter;
 } // namespace ivm
 
 namespace seds::model {
-class CommandArgument;
 class Component;
-class GenericTypeMap;
 class Interface;
-class InterfaceCommand;
 class InterfaceDeclaration;
 class Package;
 } // namespace seds::model
@@ -61,12 +76,6 @@ private:
     auto translateComponent(const seds::model::Component &component) const -> ivm::IVFunction *;
     auto translateInterface(const seds::model::Interface &interface, const seds::model::Component &component,
             const ivm::IVInterface::InterfaceType interfaceType, ivm::IVFunction *ivFunction) const -> void;
-    auto translateAsyncInterfaceCommand(const seds::model::InterfaceCommand &command,
-            const seds::model::Interface &interface, ivm::IVInterface::InterfaceType interfaceType,
-            ivm::IVFunction *ivFunction) const -> void;
-    auto translateInterfaceCommand(const seds::model::InterfaceCommand &command,
-            const seds::model::Interface &interface, ivm::IVInterface::InterfaceType interfaceType,
-            ivm::IVInterface::OperationKind operationKind, ivm::IVFunction *ivFunction) const -> void;
 
 private:
     auto findInterfaceDeclaration(const QString &interfaceTypeName, const seds::model::Component &component) const
