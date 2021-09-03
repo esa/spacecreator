@@ -20,15 +20,17 @@
 #pragma once
 
 #include <ivcore/ivinterface.h>
+#include <vector>
 
 namespace ivm {
-class InterfaceParameter;
 class IVFunction;
 } // namespace ivm
 
 namespace seds::model {
+class CommandArgument;
 class Component;
 class InterfaceCommand;
+enum class CommandArgumentMode : uint8_t;
 } // namespace seds::model
 
 namespace conversion::iv::translator {
@@ -36,20 +38,25 @@ namespace conversion::iv::translator {
 class AsyncInterfaceCommandTranslator final
 {
 public:
-    AsyncInterfaceCommandTranslator(const ivm::IVInterface::InterfaceType interfaceType, ivm::IVFunction *ivFunction);
+    explicit AsyncInterfaceCommandTranslator(ivm::IVFunction *ivFunction);
     AsyncInterfaceCommandTranslator(const AsyncInterfaceCommandTranslator &) = delete;
     AsyncInterfaceCommandTranslator(AsyncInterfaceCommandTranslator &&) = delete;
     AsyncInterfaceCommandTranslator &operator=(const AsyncInterfaceCommandTranslator &) = delete;
     AsyncInterfaceCommandTranslator &operator=(AsyncInterfaceCommandTranslator) = delete;
 
 public:
-    auto translateCommand(const seds::model::InterfaceCommand &command) const -> void;
+    auto translateCommand(
+            const seds::model::InterfaceCommand &command, ivm::IVInterface::InterfaceType interfaceType) const -> void;
+    auto translateArguments(const std::vector<seds::model::CommandArgument> &arguments,
+            seds::model::CommandArgumentMode requestedArgumentMode, ivm::IVInterface *ivInterface) const -> void;
+    auto translateArgument(const seds::model::CommandArgument &argument, ivm::IVInterface *ivInterface) const -> void;
 
 private:
-    auto createIvInterface(const QString &name, ivm::IVInterface::OperationKind operationKind) const -> void;
+    auto createIvInterface(const QString &name, ivm::IVInterface::InterfaceType interfaceType) const
+            -> ivm::IVInterface *;
+    auto switchInterfaceType(ivm::IVInterface::InterfaceType interfaceType) const -> ivm::IVInterface::InterfaceType;
 
 private:
-    const ivm::IVInterface::InterfaceType m_interfaceType;
     ivm::IVFunction *m_ivFunction;
 };
 
