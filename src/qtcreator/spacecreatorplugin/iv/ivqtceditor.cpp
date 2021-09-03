@@ -22,7 +22,6 @@
 #include "commandsstack.h"
 #include "endtoend/endtoendview.h"
 #include "interfacedocument.h"
-#include "iveditorcore.h"
 #include "iveditordocument.h"
 #include "ivmainwidget.h"
 #include "mainmodel.h"
@@ -48,7 +47,7 @@ IVQtCEditor::IVQtCEditor(SpaceCreatorProjectManager *projectManager, const QList
     setWidget(m_editorWidget);
 
     connect(m_document, &spctr::IVEditorDocument::ivDataLoaded, this,
-            [this](const QString &, QSharedPointer<ive::IVEditorCore> data) { m_editorWidget->init(data); });
+            [this](const QString &, IVEditorCorePtr data) { m_editorWidget->init(data); });
 }
 
 IVQtCEditor::~IVQtCEditor()
@@ -66,14 +65,14 @@ IVEditorDocument *IVQtCEditor::ivDocument() const
     return m_document;
 }
 
-QSharedPointer<ive::IVEditorCore> IVQtCEditor::ivPlugin() const
+IVEditorCorePtr IVQtCEditor::ivPlugin() const
 {
     return m_document->ivEditorCore();
 }
 
 QWidget *IVQtCEditor::toolBar()
 {
-    QSharedPointer<ive::IVEditorCore> ivCore = m_document->ivEditorCore();
+    IVEditorCorePtr ivCore = m_document->ivEditorCore();
     if (m_toolbar == nullptr && !ivCore.isNull()) {
         m_toolbar = new QToolBar;
         m_toolbar->addAction(ivCore->actionUndo());
@@ -96,7 +95,7 @@ void IVQtCEditor::showAsn1Dialog()
         return;
     }
 
-    QSharedPointer<ive::IVEditorCore> plugin = ivPlugin();
+    IVEditorCorePtr plugin = ivPlugin();
     ive::Asn1Dialog dialog;
     QFileInfo fi(plugin->document()->asn1FilePath());
     dialog.setFile(fi);
@@ -116,7 +115,7 @@ void IVQtCEditor::showE2EDataflow(const QStringList &mscFiles)
         return;
     }
 
-    QSharedPointer<ive::IVEditorCore> plugin = ivPlugin();
+    IVEditorCorePtr plugin = ivPlugin();
     if (m_endToEndView.isNull()) {
         m_endToEndView = new ive::EndToEndView(plugin->document(), nullptr);
         m_endToEndView->setAttribute(Qt::WA_DeleteOnClose);

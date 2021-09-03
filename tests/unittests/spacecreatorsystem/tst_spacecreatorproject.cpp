@@ -68,7 +68,7 @@ void tst_SpaceCreatorProject::testIvCores()
     QVERIFY(m_project->ivCore().isNull());
 
     const QString ivFileName = QFINDTESTDATA("/interfaceview.xml");
-    QSharedPointer<ive::IVEditorCore> ivData = m_project->ivData(ivFileName);
+    IVEditorCorePtr ivData = m_project->ivData(ivFileName);
 
     QVERIFY(!m_project->ivCore().isNull());
     QCOMPARE(m_project->ivCore(), ivData);

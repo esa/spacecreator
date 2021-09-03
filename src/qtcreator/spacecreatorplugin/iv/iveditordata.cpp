@@ -17,7 +17,6 @@
 
 #include "iveditordata.h"
 
-#include "iveditorcore.h"
 #include "iveditordocument.h"
 #include "ivqtceditor.h"
 #include "msc/msccontext.h"
@@ -77,7 +76,7 @@ Core::IEditor *IVEditorData::createEditor()
     auto *ivEditor = new IVQtCEditor(m_projectManager, m_ivActions);
 
     connect(ivEditor->ivDocument(), &spctr::IVEditorDocument::ivDataLoaded, this,
-            [this](const QString &fileName, QSharedPointer<ive::IVEditorCore> data) {
+            [this](const QString &fileName, IVEditorCorePtr data) {
                 data->minimapView()->setVisible(m_minimapVisible);
                 m_undoGroup->addStack(data->undoStack());
             });

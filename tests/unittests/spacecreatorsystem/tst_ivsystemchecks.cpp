@@ -94,7 +94,7 @@ void tst_IvSystemChecks::testCheckInstanceNames()
     msc::MscChart *chart = m_mscCore->mainModel()->mscModel()->documents().at(0)->documents().at(0)->charts().at(0);
     QVERIFY(chart != nullptr);
 
-    QSharedPointer<ive::IVEditorCore> ivPlugin(new ive::IVEditorCore);
+    IVEditorCorePtr ivPlugin(new ive::IVEditorCore);
     m_checker->setIvCore(ivPlugin);
     result = m_checker->checkInstanceNames();
     QCOMPARE(result.size(), 0);
@@ -137,7 +137,7 @@ void tst_IvSystemChecks::testCheckInstanceRelations()
     msc::MscChart *chart = m_mscCore->mainModel()->mscModel()->documents().at(0)->documents().at(0)->charts().at(0);
     QVERIFY(chart != nullptr);
 
-    QSharedPointer<ive::IVEditorCore> ivPlugin(new ive::IVEditorCore);
+    IVEditorCorePtr ivPlugin(new ive::IVEditorCore);
     m_checker->setIvCore(ivPlugin);
     result = m_checker->checkInstanceRelations();
     QCOMPARE(result.size(), 0);
@@ -179,7 +179,7 @@ void tst_IvSystemChecks::testCheckMessageNames()
     msc::MscChart *chart = m_mscCore->mainModel()->mscModel()->documents().at(0)->documents().at(0)->charts().at(0);
     QVERIFY(chart != nullptr);
 
-    QSharedPointer<ive::IVEditorCore> ivPlugin(new ive::IVEditorCore);
+    IVEditorCorePtr ivPlugin(new ive::IVEditorCore);
     m_checker->setIvCore(ivPlugin);
     QVector<QPair<msc::MscChart *, msc::MscMessage *>> result = m_checker->checkMessages();
     QCOMPARE(result.size(), 0);
@@ -300,7 +300,7 @@ void tst_IvSystemChecks::testCheckMessage()
     QCOMPARE(m_checker->checkMessage(message), true);
 
     // Add IVEditorCore for real checks
-    QSharedPointer<ive::IVEditorCore> ivPlugin(new ive::IVEditorCore);
+    IVEditorCorePtr ivPlugin(new ive::IVEditorCore);
     m_checker->setIvCore(ivPlugin);
     QCOMPARE(m_checker->checkMessage(message), false);
 

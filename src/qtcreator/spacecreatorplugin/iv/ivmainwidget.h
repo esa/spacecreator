@@ -17,15 +17,13 @@
 
 #pragma once
 
+#include "iveditorcore.h"
+
 #include <QSharedPointer>
 #include <QVector>
 #include <QWidget>
 
 class QAction;
-
-namespace ive {
-class IVEditorCore;
-}
 
 namespace spctr {
 
@@ -36,9 +34,9 @@ public:
     IVMainWidget(QWidget *parent = nullptr);
     ~IVMainWidget();
 
-    bool init(QSharedPointer<ive::IVEditorCore> data);
+    bool init(IVEditorCorePtr data);
 
-    QSharedPointer<ive::IVEditorCore> ivPlugin() const;
+    IVEditorCorePtr ivPlugin() const;
 
 public Q_SLOTS:
     void setMinimapVisible(bool visible);
@@ -46,7 +44,7 @@ public Q_SLOTS:
 private:
     void init();
 
-    QSharedPointer<ive::IVEditorCore> m_plugin;
+    IVEditorCorePtr m_plugin;
 };
 
 }

@@ -21,7 +21,6 @@
 #include "commandsstack.h"
 #include "errorhub.h"
 #include "interfacedocument.h"
-#include "iveditorcore.h"
 
 #include <QHBoxLayout>
 #include <QMessageBox>
@@ -40,7 +39,7 @@ IVMainWidget::~IVMainWidget()
     }
 }
 
-bool IVMainWidget::init(QSharedPointer<ive::IVEditorCore> data)
+bool IVMainWidget::init(IVEditorCorePtr data)
 {
     m_plugin = data;
     init();
@@ -55,7 +54,7 @@ void IVMainWidget::setMinimapVisible(bool visible)
     m_plugin->minimapView()->setVisible(visible);
 }
 
-QSharedPointer<ive::IVEditorCore> IVMainWidget::ivPlugin() const
+IVEditorCorePtr IVMainWidget::ivPlugin() const
 {
     return m_plugin;
 }

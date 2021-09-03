@@ -19,6 +19,7 @@
 
 #include "abstractproject.h"
 #include "dveditorcore.h"
+#include "iveditorcore.h"
 
 #include <QHash>
 #include <QObject>
@@ -29,9 +30,6 @@
 namespace Asn1Acn {
 class Asn1ModelStorage;
 class Asn1SystemChecks;
-}
-namespace ive {
-class IVEditorCore;
 }
 namespace msc {
 class MSCEditorCore;
@@ -61,11 +59,11 @@ public:
 
     // Load / access functions
     DVEditorCorePtr dvData(const QString &fileName) const;
-    QSharedPointer<ive::IVEditorCore> ivData(const QString &fileName) const;
+    IVEditorCorePtr ivData(const QString &fileName) const;
     QSharedPointer<msc::MSCEditorCore> mscData(const QString &fileName) const;
 
     // Query functions
-    virtual QSharedPointer<ive::IVEditorCore> ivCore() const;
+    virtual IVEditorCorePtr ivCore() const;
     virtual QVector<DVEditorCorePtr> allDVCores() const;
     virtual QVector<QSharedPointer<msc::MSCEditorCore>> allMscCores() const;
 
@@ -92,7 +90,7 @@ public:
 Q_SIGNALS:
     void editedExternally(shared::EditorCore *);
     void dvCoreAdded(DVEditorCorePtr dvCore);
-    void ivCoreAdded(QSharedPointer<ive::IVEditorCore> ivCore);
+    void ivCoreAdded(IVEditorCorePtr ivCore);
     void mscCoreAdded(QSharedPointer<msc::MSCEditorCore> mscCore);
 
 protected Q_SLOTS:
@@ -100,11 +98,11 @@ protected Q_SLOTS:
 
 protected:
     void setDvData(const QString &fileName, DVEditorCorePtr dvData);
-    void setIvData(const QString &fileName, QSharedPointer<ive::IVEditorCore> ivData);
+    void setIvData(const QString &fileName, IVEditorCorePtr ivData);
     void setMscData(const QString &fileName, QSharedPointer<msc::MSCEditorCore> mscData);
 
     QHash<QString, DVEditorCorePtr> m_dvStore;
-    QHash<QString, QSharedPointer<ive::IVEditorCore>> m_ivStore;
+    QHash<QString, IVEditorCorePtr> m_ivStore;
     QHash<QString, QSharedPointer<msc::MSCEditorCore>> m_mscStore;
     std::unique_ptr<scs::MscSystemChecks> m_mscChecks;
     std::unique_ptr<scs::DvSystemChecks> m_dvChecks;

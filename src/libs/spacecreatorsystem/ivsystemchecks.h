@@ -17,6 +17,7 @@
 
 #pragma once
 
+#include "iveditorcore.h"
 #include "systemchecks.h"
 
 #include <QObject>
@@ -32,10 +33,6 @@ class IVObject;
 class IVConnection;
 class IVFunction;
 class IVModel;
-}
-
-namespace ive {
-class IVEditorCore;
 }
 
 namespace msc {
@@ -62,8 +59,8 @@ public:
     ~IvSystemChecks();
 
     void setMscCore(msc::MSCEditorCore *mscCore);
-    void setIvCore(QSharedPointer<ive::IVEditorCore> ivCore);
-    QSharedPointer<ive::IVEditorCore> ivCore() const;
+    void setIvCore(IVEditorCorePtr ivCore);
+    IVEditorCorePtr ivCore() const;
 
     QVector<QPair<msc::MscChart *, msc::MscInstance *>> checkInstanceNames() const override;
     QVector<QPair<msc::MscChart *, msc::MscInstance *>> checkInstanceRelations() const override;

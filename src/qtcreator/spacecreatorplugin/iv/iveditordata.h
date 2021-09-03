@@ -17,15 +17,13 @@
 
 #pragma once
 
+#include "iveditorcore.h"
+
 #include <QList>
 #include <QPointer>
 
 class QAction;
 class QUndoGroup;
-
-namespace ive {
-class IVEditorCore;
-}
 
 namespace Core {
 class IEditor;
@@ -47,7 +45,7 @@ public:
 
     void showMinimap(bool visible);
 
-    QSharedPointer<ive::IVEditorCore> ivPlugin(const QString &fileName);
+    IVEditorCorePtr ivPlugin(const QString &fileName);
 
 private Q_SLOTS:
     void onCurrentEditorChanged(Core::IEditor *editor);

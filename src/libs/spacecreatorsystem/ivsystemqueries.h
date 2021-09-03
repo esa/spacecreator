@@ -18,13 +18,10 @@
 #pragma once
 
 #include "abstractsystemchecks.h"
+#include "iveditorcore.h"
 
 #include <QPointer>
 #include <QSharedPointer>
-
-namespace ive {
-class IVEditorCore;
-}
 
 namespace ivm {
 class IVModel;
@@ -43,8 +40,8 @@ public:
     explicit IvSystemQueries(SpaceCreatorProject *project, QObject *parent = nullptr);
     ~IvSystemQueries() override = default;
 
-    void setIVCore(QSharedPointer<ive::IVEditorCore> ivCore);
-    QSharedPointer<ive::IVEditorCore> ivCore() const;
+    void setIVCore(IVEditorCorePtr ivCore);
+    IVEditorCorePtr ivCore() const;
 
     QStringList functionsNames() const override;
 
@@ -57,7 +54,7 @@ Q_SIGNALS:
     void ivDataReset();
 
 private:
-    QSharedPointer<ive::IVEditorCore> m_ivCore;
+    IVEditorCorePtr m_ivCore;
     QPointer<scs::SpaceCreatorProject> m_project;
 };
 

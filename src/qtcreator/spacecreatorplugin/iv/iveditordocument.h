@@ -17,13 +17,11 @@
 
 #pragma once
 
+#include "iveditorcore.h"
+
 #include <QPointer>
 #include <QSharedPointer>
 #include <coreplugin/idocument.h>
-
-namespace ive {
-class IVEditorCore;
-}
 
 namespace spctr {
 class SpaceCreatorProjectManager;
@@ -51,15 +49,15 @@ public:
     bool reload(QString *errorString, ReloadFlag flag, ChangeType type) override;
 
     // Internal
-    QSharedPointer<ive::IVEditorCore> ivEditorCore() const;
+    IVEditorCorePtr ivEditorCore() const;
 
 Q_SIGNALS:
     void reloadRequested(QString *errorString, const QString &);
-    void ivDataLoaded(const QString &fileName, QSharedPointer<ive::IVEditorCore> data);
+    void ivDataLoaded(const QString &fileName, IVEditorCorePtr data);
 
 private:
     QPointer<SpaceCreatorProjectManager> m_projectManager;
-    QSharedPointer<ive::IVEditorCore> m_plugin;
+    IVEditorCorePtr m_plugin;
 };
 
 }

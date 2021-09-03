@@ -26,7 +26,6 @@
 #include "errorhub.h"
 #include "interfacedocument.h"
 #include "itemeditor/common/ivutils.h"
-#include "iveditorcore.h"
 #include "ivsystemchecks.h"
 #include "ivsystemqueries.h"
 #include "mainmodel.h"
@@ -80,10 +79,10 @@ DVEditorCorePtr SpaceCreatorProject::dvData(const QString &fileName) const
    Returns the IVEditorCore object for the given file
    If the object does not exist yet, one will be created and the data be loaded
  */
-QSharedPointer<ive::IVEditorCore> SpaceCreatorProject::ivData(const QString &fileName) const
+IVEditorCorePtr SpaceCreatorProject::ivData(const QString &fileName) const
 {
     if (!m_ivStore.contains(fileName)) {
-        QSharedPointer<ive::IVEditorCore> data(new ive::IVEditorCore());
+        IVEditorCorePtr data(new ive::IVEditorCore());
         data->registerBasicActions();
         data->document()->customActions(); // There some further actions are registered
         data->document()->setAsn1Check(m_asnChecks.get());
@@ -126,7 +125,7 @@ QSharedPointer<msc::MSCEditorCore> SpaceCreatorProject::mscData(const QString &f
 /*!
    Returns the iv data of the project
  */
-QSharedPointer<ive::IVEditorCore> SpaceCreatorProject::ivCore() const
+IVEditorCorePtr SpaceCreatorProject::ivCore() const
 {
     const QStringList ivFiles = allIVFiles();
     if (ivFiles.empty()) {
@@ -179,7 +178,7 @@ bool SpaceCreatorProject::contains(QSharedPointer<shared::EditorCore> core) cons
             return true;
         }
     }
-    for (const QSharedPointer<ive::IVEditorCore> &ivCore : m_ivStore) {
+    for (const IVEditorCorePtr &ivCore : m_ivStore) {
         if (core == ivCore) {
             return true;
         }
@@ -232,7 +231,7 @@ QStringList SpaceCreatorProject::allAsn1Files() const
 QStringList SpaceCreatorProject::projectFiles(const QString &suffix) const
 {
     QStringList files;
-    for (QSharedPointer<ive::IVEditorCore> ivCore : m_ivStore) {
+    for (IVEditorCorePtr ivCore : m_ivStore) {
         if (ivCore->filePath().endsWith(suffix)) {
             files.append(ivCore->filePath());
         }
@@ -348,14 +347,14 @@ void SpaceCreatorProject::setDvData(const QString &fileName, DVEditorCorePtr dvD
    Sets the IVEditorCore object for the given file.
    If the object was already used for another file, that old file/object connection is removed.
  */
-void SpaceCreatorProject::setIvData(const QString &fileName, QSharedPointer<ive::IVEditorCore> ivData)
+void SpaceCreatorProject::setIvData(const QString &fileName, IVEditorCorePtr ivData)
 {
     const QString oldKey = m_ivStore.key(ivData, "");
     if (!oldKey.isEmpty()) {
         if (m_ivStore[fileName] == ivData) {
             return;
         }
-        QSharedPointer<ive::IVEditorCore> oldData = m_ivStore.take(oldKey);
+        IVEditorCorePtr oldData = m_ivStore.take(oldKey);
         disconnect(oldData.data(), nullptr, this, nullptr);
     }
 

@@ -17,6 +17,8 @@
 
 #pragma once
 
+#include "iveditorcore.h"
+
 #include <QPointer>
 #include <QSharedPointer>
 #include <editormanager/ieditor.h>
@@ -25,7 +27,6 @@ class QToolBar;
 
 namespace ive {
 class EndToEndView;
-class IVEditorCore;
 }
 
 namespace spctr {
@@ -44,7 +45,7 @@ public:
 
     Core::IDocument *document() const override;
     IVEditorDocument *ivDocument() const;
-    QSharedPointer<ive::IVEditorCore> ivPlugin() const;
+    IVEditorCorePtr ivPlugin() const;
 
     QWidget *toolBar() override;
 

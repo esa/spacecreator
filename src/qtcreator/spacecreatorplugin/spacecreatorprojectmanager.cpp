@@ -57,7 +57,7 @@ DVEditorCorePtr SpaceCreatorProjectManager::dvData(const QString &fileName) cons
    Returns tha editor core that represents the file fileName.
    In case the core does not exist yet, it is created in the correct SpaceCreatorProject
  */
-QSharedPointer<ive::IVEditorCore> SpaceCreatorProjectManager::ivData(const QString &fileName) const
+IVEditorCorePtr SpaceCreatorProjectManager::ivData(const QString &fileName) const
 {
     if (SpaceCreatorProjectImpl *data = project(fileName)) {
         return data->ivData(fileName);

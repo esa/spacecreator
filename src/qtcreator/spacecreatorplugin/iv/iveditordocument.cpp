@@ -19,7 +19,6 @@
 
 #include "errorhub.h"
 #include "interfacedocument.h"
-#include "iveditorcore.h"
 #include "ivexporter.h"
 #include "ivmainwidget.h"
 #include "spacecreatorpluginconstants.h"
@@ -165,7 +164,7 @@ bool IVEditorDocument::reload(QString *errorString, ReloadFlag flag, ChangeType 
     return success;
 }
 
-QSharedPointer<ive::IVEditorCore> IVEditorDocument::ivEditorCore() const
+IVEditorCorePtr IVEditorDocument::ivEditorCore() const
 {
     return m_plugin;
 }

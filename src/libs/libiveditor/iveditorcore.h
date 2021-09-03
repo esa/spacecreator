@@ -17,10 +17,11 @@
 
 #pragma once
 
-#include "ivinterface.h"
 #include "editorcore.h"
+#include "ivinterface.h"
 #include "ui/graphicsviewbase.h"
 
+#include <QSharedPointer>
 #include <QVector>
 
 namespace ivm {
@@ -107,3 +108,6 @@ private:
 };
 
 }
+
+typedef QSharedPointer<ive::IVEditorCore> IVEditorCorePtr;
+Q_DECLARE_METATYPE(IVEditorCorePtr)

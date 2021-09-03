@@ -64,7 +64,7 @@ void MscSystemChecks::setStorage(SpaceCreatorProject *storage)
         connect(core.data(), &msc::MSCEditorCore::nameChanged, this, &scs::MscSystemChecks::onMscEntityNameChanged);
     });
 
-    connect(m_storage, &scs::SpaceCreatorProject::ivCoreAdded, this, [this](QSharedPointer<ive::IVEditorCore> ivCore) {
+    connect(m_storage, &scs::SpaceCreatorProject::ivCoreAdded, this, [this](IVEditorCorePtr ivCore) {
         connect(ivCore->commandsStack(), &ive::cmd::CommandsStack::nameChanged, this,
                 &scs::MscSystemChecks::onEntityNameChanged);
         connect(ivCore->commandsStack(), &ive::cmd::CommandsStack::entitiesRemoved, this,
@@ -422,7 +422,7 @@ void MscSystemChecks::onMscEntityNameChanged(QObject *entity, const QString &old
     if (m_nameUpdateRunning) {
         return;
     }
-    QSharedPointer<ive::IVEditorCore> ivCore = m_storage->ivCore();
+    IVEditorCorePtr ivCore = m_storage->ivCore();
     if (!ivCore) {
         return;
     }

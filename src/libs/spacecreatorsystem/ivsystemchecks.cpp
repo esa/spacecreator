@@ -21,7 +21,6 @@
 #include "interfacedocument.h"
 #include "ivconnection.h"
 #include "ivconnectionchain.h"
-#include "iveditorcore.h"
 #include "ivfunction.h"
 #include "ivmodel.h"
 #include "ivsystemqueries.h"
@@ -54,7 +53,7 @@ void IvSystemChecks::setMscCore(msc::MSCEditorCore *mscCore)
     m_mscCore = mscCore;
 }
 
-void IvSystemChecks::setIvCore(QSharedPointer<ive::IVEditorCore> ivCore)
+void IvSystemChecks::setIvCore(IVEditorCorePtr ivCore)
 {
     m_ivQueries->setIVCore(ivCore);
 }
@@ -62,7 +61,7 @@ void IvSystemChecks::setIvCore(QSharedPointer<ive::IVEditorCore> ivCore)
 /*!
    Returns a pointer to the IV editor model
  */
-QSharedPointer<ive::IVEditorCore> IvSystemChecks::ivCore() const
+IVEditorCorePtr IvSystemChecks::ivCore() const
 {
     return m_ivQueries->ivCore();
 }

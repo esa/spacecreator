@@ -21,7 +21,6 @@
 #include "errorhub.h"
 #include "interfacedocument.h"
 #include "ivconnectionchain.h"
-#include "iveditorcore.h"
 #include "ivmodel.h"
 #include "spacecreatorproject.h"
 
@@ -35,7 +34,7 @@ IvSystemQueries::IvSystemQueries(SpaceCreatorProject *project, QObject *parent)
 {
 }
 
-void IvSystemQueries::setIVCore(QSharedPointer<ive::IVEditorCore> ivCore)
+void IvSystemQueries::setIVCore(IVEditorCorePtr ivCore)
 {
     if (ivCore == m_ivCore) {
         return;
@@ -49,7 +48,7 @@ void IvSystemQueries::setIVCore(QSharedPointer<ive::IVEditorCore> ivCore)
     Q_EMIT ivDataReset();
 }
 
-QSharedPointer<ive::IVEditorCore> IvSystemQueries::ivCore() const
+IVEditorCorePtr IvSystemQueries::ivCore() const
 {
     if (!m_ivCore && m_project) {
         IvSystemQueries *me = const_cast<IvSystemQueries *>(this);

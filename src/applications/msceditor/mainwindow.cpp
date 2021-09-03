@@ -72,7 +72,7 @@ struct MainWindow::MainWindowPrivate {
 
     ~MainWindowPrivate() { delete ui; }
 
-    QSharedPointer<ive::IVEditorCore> m_ivCore { new ive::IVEditorCore() };
+    IVEditorCorePtr m_ivCore { new ive::IVEditorCore() };
 
     Ui::MainWindow *ui = nullptr;
 
