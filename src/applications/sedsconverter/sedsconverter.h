@@ -59,8 +59,8 @@ public:
      * @param   targetModelType         Target model type
      * @param   auxiliaryModelsTypes    List of types that will be additionally exported
      */
-    auto convert(conversion::ModelType targetModelType,
-            const std::set<conversion::ModelType> &auxiliaryModelsTypes) const -> void;
+    auto convert(conversion::ModelType targetModelType, const std::set<conversion::ModelType> &auxiliaryModelsTypes,
+            conversion::Options options) const -> void;
 
 private:
     /**

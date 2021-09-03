@@ -25,9 +25,7 @@
 #include <conversion/common/modeltype.h>
 #include <conversion/common/options.h>
 #include <conversion/converter/converter.h>
-#include <conversion/iv/IvOptions/options.h>
 #include <conversion/iv/IvRegistrar/registrar.h>
-#include <conversion/seds/SedsOptions/options.h>
 #include <conversion/seds/SedsRegistrar/registrar.h>
 
 using conversion::Converter;
@@ -36,9 +34,7 @@ using conversion::Options;
 using conversion::RegistrationFailedException;
 using conversion::Registry;
 using conversion::asn1::Asn1Registrar;
-using conversion::iv::IvOptions;
 using conversion::iv::IvRegistrar;
-using conversion::seds::SedsOptions;
 using conversion::seds::SedsRegistrar;
 
 namespace sedsconverter {
@@ -48,18 +44,9 @@ SedsConverter::SedsConverter()
     initializeRegistry();
 }
 
-void SedsConverter::convert(ModelType targetModelType, const std::set<ModelType> &auxiliaryModelsTypes) const
+void SedsConverter::convert(
+        ModelType targetModelType, const std::set<ModelType> &auxiliaryModelsTypes, Options options) const
 {
-    Options options;
-    options.add(SedsOptions::inputFilename, "input.xml");
-    options.add(SedsOptions::schemaFilename, "seds.xsd");
-    options.add(SedsOptions::externalRefFilename, "config.toml");
-    options.add(SedsOptions::skipValidation);
-    options.add(SedsOptions::keepIntermediateFiles);
-    options.add(IvOptions::configFilename, "config.xml");
-    options.add(IvOptions::outputFilename, "output.xml");
-    options.add(IvOptions::generateFunctionsForPackages);
-
     Converter converter(m_registry, std::move(options));
     converter.convert({ ModelType::Seds }, targetModelType, auxiliaryModelsTypes);
 }
