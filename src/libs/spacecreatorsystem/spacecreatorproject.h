@@ -20,6 +20,7 @@
 #include "abstractproject.h"
 #include "dveditorcore.h"
 #include "iveditorcore.h"
+#include "msceditorcore.h"
 
 #include <QHash>
 #include <QObject>
@@ -30,9 +31,6 @@
 namespace Asn1Acn {
 class Asn1ModelStorage;
 class Asn1SystemChecks;
-}
-namespace msc {
-class MSCEditorCore;
 }
 namespace shared {
 class EditorCore;
@@ -60,12 +58,12 @@ public:
     // Load / access functions
     DVEditorCorePtr dvData(const QString &fileName) const;
     IVEditorCorePtr ivData(const QString &fileName) const;
-    QSharedPointer<msc::MSCEditorCore> mscData(const QString &fileName) const;
+    MSCEditorCorePtr mscData(const QString &fileName) const;
 
     // Query functions
     virtual IVEditorCorePtr ivCore() const;
     virtual QVector<DVEditorCorePtr> allDVCores() const;
-    virtual QVector<QSharedPointer<msc::MSCEditorCore>> allMscCores() const;
+    virtual QVector<MSCEditorCorePtr> allMscCores() const;
 
     bool contains(QSharedPointer<shared::EditorCore> core) const;
 
@@ -91,7 +89,7 @@ Q_SIGNALS:
     void editedExternally(shared::EditorCore *);
     void dvCoreAdded(DVEditorCorePtr dvCore);
     void ivCoreAdded(IVEditorCorePtr ivCore);
-    void mscCoreAdded(QSharedPointer<msc::MSCEditorCore> mscCore);
+    void mscCoreAdded(MSCEditorCorePtr mscCore);
 
 protected Q_SLOTS:
     void purgeNonProjectData();
@@ -99,11 +97,11 @@ protected Q_SLOTS:
 protected:
     void setDvData(const QString &fileName, DVEditorCorePtr dvData);
     void setIvData(const QString &fileName, IVEditorCorePtr ivData);
-    void setMscData(const QString &fileName, QSharedPointer<msc::MSCEditorCore> mscData);
+    void setMscData(const QString &fileName, MSCEditorCorePtr mscData);
 
     QHash<QString, DVEditorCorePtr> m_dvStore;
     QHash<QString, IVEditorCorePtr> m_ivStore;
-    QHash<QString, QSharedPointer<msc::MSCEditorCore>> m_mscStore;
+    QHash<QString, MSCEditorCorePtr> m_mscStore;
     std::unique_ptr<scs::MscSystemChecks> m_mscChecks;
     std::unique_ptr<scs::DvSystemChecks> m_dvChecks;
     std::unique_ptr<Asn1Acn::Asn1ModelStorage> m_asn1Storage;

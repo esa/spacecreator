@@ -17,13 +17,11 @@
 
 #pragma once
 
+#include "msceditorcore.h"
+
 #include <QPointer>
 #include <QSharedPointer>
 #include <coreplugin/idocument.h>
-
-namespace msc {
-class MSCEditorCore;
-}
 
 namespace spctr {
 class SpaceCreatorProjectManager;
@@ -51,15 +49,15 @@ public:
     bool reload(QString *errorString, ReloadFlag flag, ChangeType type) override;
 
     // Internal
-    QSharedPointer<msc::MSCEditorCore> mscEditorCore() const;
+    MSCEditorCorePtr mscEditorCore() const;
 
 Q_SIGNALS:
     void reloadRequested(QString *errorString, const QString &);
-    void mscDataLoaded(const QString &fileName, QSharedPointer<msc::MSCEditorCore> data);
+    void mscDataLoaded(const QString &fileName, MSCEditorCorePtr data);
 
 private:
     QPointer<SpaceCreatorProjectManager> m_projectManager;
-    QSharedPointer<msc::MSCEditorCore> m_plugin;
+    MSCEditorCorePtr m_plugin;
 };
 
 }

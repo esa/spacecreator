@@ -77,7 +77,7 @@ Core::IEditor *MscEditorData::createEditor()
     auto *mscEditor = new MscQtCEditor(m_projectManager, m_mscActions);
 
     connect(mscEditor->mscDocument(), &spctr::MscEditorDocument::mscDataLoaded, this,
-            [this](const QString &fileName, QSharedPointer<msc::MSCEditorCore> data) {
+            [this](const QString &fileName, MSCEditorCorePtr data) {
                 data->minimapView()->setVisible(m_minimapVisible);
                 m_undoGroup->addStack(data->undoStack());
             });

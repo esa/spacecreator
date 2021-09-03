@@ -79,7 +79,7 @@ void tst_SpaceCreatorProject::testMscCores()
     QVERIFY(m_project->allMscCores().isEmpty());
 
     const QString mscFileName = QFINDTESTDATA("/Taste07.msc");
-    QSharedPointer<msc::MSCEditorCore> mscData = m_project->mscData(mscFileName);
+    MSCEditorCorePtr mscData = m_project->mscData(mscFileName);
 
     QCOMPARE(m_project->allMscCores().size(), 1);
 }

@@ -17,6 +17,8 @@
 
 #pragma once
 
+#include "msceditorcore.h"
+
 #include <QPointer>
 #include <QSharedPointer>
 #include <QStackedWidget>
@@ -33,7 +35,6 @@ class QVBoxLayout;
 namespace msc {
 class DocumentTreeView;
 class GraphicsView;
-class MSCEditorCore;
 }
 
 namespace shared {
@@ -50,9 +51,9 @@ public:
     MscMainWidget(QWidget *parent = nullptr);
     ~MscMainWidget();
 
-    bool init(QSharedPointer<msc::MSCEditorCore> plugin, SpaceCreatorProjectImpl *project);
+    bool init(MSCEditorCorePtr plugin, SpaceCreatorProjectImpl *project);
 
-    QSharedPointer<msc::MSCEditorCore> mscCore() const;
+    MSCEditorCorePtr mscCore() const;
 
 private Q_SLOTS:
     void showChart(const QModelIndex &index);
@@ -72,7 +73,7 @@ private:
     QPushButton *m_asn1Switch = nullptr;
     QPushButton *m_asn1Select = nullptr;
 
-    QSharedPointer<msc::MSCEditorCore> m_plugin;
+    MSCEditorCorePtr m_plugin;
     QPointer<SpaceCreatorProjectImpl> m_project;
 };
 

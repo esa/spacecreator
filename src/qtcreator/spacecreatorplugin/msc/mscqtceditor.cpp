@@ -17,7 +17,6 @@
 
 #include "mscqtceditor.h"
 
-#include "msceditorcore.h"
 #include "msceditordocument.h"
 #include "mscmainwidget.h"
 #include "spacecreatorpluginconstants.h"
@@ -39,7 +38,7 @@ MscQtCEditor::MscQtCEditor(SpaceCreatorProjectManager *projectManager, const QLi
     setWidget(m_editorWidget);
 
     connect(m_document, &spctr::MscEditorDocument::mscDataLoaded, this,
-            [this, projectManager](const QString &fileName, QSharedPointer<msc::MSCEditorCore> data) {
+            [this, projectManager](const QString &fileName, MSCEditorCorePtr data) {
                 m_editorWidget->init(data, projectManager->project(fileName));
             });
 }
@@ -59,14 +58,14 @@ MscEditorDocument *MscQtCEditor::mscDocument() const
     return m_document;
 }
 
-QSharedPointer<msc::MSCEditorCore> MscQtCEditor::mscEditorCore() const
+MSCEditorCorePtr MscQtCEditor::mscEditorCore() const
 {
     return m_document->mscEditorCore();
 }
 
 QWidget *MscQtCEditor::toolBar()
 {
-    QSharedPointer<msc::MSCEditorCore> mscCore = m_document->mscEditorCore();
+    MSCEditorCorePtr mscCore = m_document->mscEditorCore();
     if (m_toolbar == nullptr && !mscCore.isNull()) {
         m_toolbar = new QToolBar;
         m_toolbar->addAction(mscCore->actionUndo());

@@ -70,7 +70,7 @@ IVEditorCorePtr SpaceCreatorProjectManager::ivData(const QString &fileName) cons
    Returns tha editor core that represents the file fileName.
    In case the core does not exist yet, it is created in the correct SpaceCreatorProject
  */
-QSharedPointer<msc::MSCEditorCore> SpaceCreatorProjectManager::mscData(const QString &fileName) const
+MSCEditorCorePtr SpaceCreatorProjectManager::mscData(const QString &fileName) const
 {
     if (SpaceCreatorProjectImpl *data = project(fileName)) {
         return data->mscData(fileName);

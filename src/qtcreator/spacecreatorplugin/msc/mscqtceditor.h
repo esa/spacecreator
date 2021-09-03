@@ -17,16 +17,14 @@
 
 #pragma once
 
+#include "msceditorcore.h"
+
 #include <QPointer>
 #include <QSharedPointer>
 #include <editormanager/ieditor.h>
 
 class QAction;
 class QToolBar;
-
-namespace msc {
-class MSCEditorCore;
-}
 
 namespace spctr {
 
@@ -44,7 +42,7 @@ public:
 
     Core::IDocument *document() const override;
     MscEditorDocument *mscDocument() const;
-    QSharedPointer<msc::MSCEditorCore> mscEditorCore() const;
+    MSCEditorCorePtr mscEditorCore() const;
 
     QWidget *toolBar() override;
 

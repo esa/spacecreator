@@ -19,6 +19,7 @@
 
 #include "dveditorcore.h"
 #include "iveditorcore.h"
+#include "msceditorcore.h"
 
 #include <QList>
 #include <QObject>
@@ -29,9 +30,6 @@ namespace ProjectExplorer {
 class Project;
 }
 
-namespace msc {
-class MSCEditorCore;
-}
 namespace shared {
 class EditorCore;
 }
@@ -55,7 +53,7 @@ public:
 
     DVEditorCorePtr dvData(const QString &fileName) const;
     IVEditorCorePtr ivData(const QString &fileName) const;
-    QSharedPointer<msc::MSCEditorCore> mscData(const QString &fileName) const;
+    MSCEditorCorePtr mscData(const QString &fileName) const;
 
     SpaceCreatorProjectImpl *project(const QString &fileName) const;
     SpaceCreatorProjectImpl *project(const QSharedPointer<shared::EditorCore> &core) const;

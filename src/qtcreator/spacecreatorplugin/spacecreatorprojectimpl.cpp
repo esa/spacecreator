@@ -114,7 +114,7 @@ void SpaceCreatorProjectImpl::checkAsnFileRename()
     }
 
     if (newAsnFiles.size() == 1 && lostAsnFiles.size() == 1) {
-        for (QSharedPointer<msc::MSCEditorCore> &mscCore : allMscCores()) {
+        for (MSCEditorCorePtr &mscCore : allMscCores()) {
             mscCore->renameAsnFile(lostAsnFiles[0], newAsnFiles[0]);
         }
         ivCore()->renameAsnFile(lostAsnFiles[0], newAsnFiles[0]);

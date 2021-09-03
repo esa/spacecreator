@@ -27,7 +27,6 @@
 #include "mainmodel.h"
 #include "mscchart.h"
 #include "mscdocument.h"
-#include "msceditorcore.h"
 #include "mscmodel.h"
 #include "spacecreatorprojectimpl.h"
 
@@ -71,7 +70,7 @@ MscMainWidget::~MscMainWidget()
     }
 }
 
-bool MscMainWidget::init(QSharedPointer<msc::MSCEditorCore> plugin, SpaceCreatorProjectImpl *project)
+bool MscMainWidget::init(MSCEditorCorePtr plugin, SpaceCreatorProjectImpl *project)
 {
     m_project = project;
     m_plugin = plugin;
@@ -92,7 +91,7 @@ bool MscMainWidget::init(QSharedPointer<msc::MSCEditorCore> plugin, SpaceCreator
     return true;
 }
 
-QSharedPointer<msc::MSCEditorCore> MscMainWidget::mscCore() const
+MSCEditorCorePtr MscMainWidget::mscCore() const
 {
     Q_ASSERT(!m_plugin.isNull());
     return m_plugin;

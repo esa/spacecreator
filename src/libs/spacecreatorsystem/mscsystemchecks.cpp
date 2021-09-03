@@ -60,7 +60,7 @@ void MscSystemChecks::setStorage(SpaceCreatorProject *storage)
 {
     m_storage = storage;
 
-    connect(m_storage, &scs::SpaceCreatorProject::mscCoreAdded, this, [=](QSharedPointer<msc::MSCEditorCore> core) {
+    connect(m_storage, &scs::SpaceCreatorProject::mscCoreAdded, this, [=](MSCEditorCorePtr core) {
         connect(core.data(), &msc::MSCEditorCore::nameChanged, this, &scs::MscSystemChecks::onMscEntityNameChanged);
     });
 
@@ -78,7 +78,7 @@ void MscSystemChecks::setStorage(SpaceCreatorProject *storage)
  */
 bool MscSystemChecks::ivFunctionUsed(const QString &name)
 {
-    for (QSharedPointer<msc::MSCEditorCore> &mscCore : m_storage->allMscCores()) {
+    for (MSCEditorCorePtr &mscCore : m_storage->allMscCores()) {
         for (msc::MscChart *chart : mscCore->mainModel()->mscModel()->allCharts()) {
             for (msc::MscInstance *instance : chart->instances()) {
                 if (instance->name() == name) {
@@ -105,7 +105,7 @@ bool MscSystemChecks::ivFunctionUsed(const QString &name)
  */
 void MscSystemChecks::changeMscInstanceName(const QString &oldName, const QString &name)
 {
-    for (QSharedPointer<msc::MSCEditorCore> &mscCore : m_storage->allMscCores()) {
+    for (MSCEditorCorePtr &mscCore : m_storage->allMscCores()) {
         mscCore->changeMscInstanceName(oldName, name);
     }
 }
@@ -115,7 +115,7 @@ void MscSystemChecks::changeMscInstanceName(const QString &oldName, const QStrin
  */
 void MscSystemChecks::removeMscInstances(ivm::IVFunction *ivFunction)
 {
-    for (QSharedPointer<msc::MSCEditorCore> &mscCore : m_storage->allMscCores()) {
+    for (MSCEditorCorePtr &mscCore : m_storage->allMscCores()) {
         mscCore->removeMscInstances(ivFunction);
     }
 }
@@ -125,7 +125,7 @@ void MscSystemChecks::removeMscInstances(ivm::IVFunction *ivFunction)
  */
 bool MscSystemChecks::hasCorrespondingInstances(ivm::IVFunction *ivFunction) const
 {
-    for (QSharedPointer<msc::MSCEditorCore> &mscCore : m_storage->allMscCores()) {
+    for (MSCEditorCorePtr &mscCore : m_storage->allMscCores()) {
         if (!mscCore->correspondingInstances(ivFunction).isEmpty()) {
             return true;
         }
@@ -138,7 +138,7 @@ bool MscSystemChecks::hasCorrespondingInstances(ivm::IVFunction *ivFunction) con
  */
 bool MscSystemChecks::mscMessagesExist(const QString &messageName, const QString &sourceName, const QString &targetName)
 {
-    for (QSharedPointer<msc::MSCEditorCore> &mscCore : m_storage->allMscCores()) {
+    for (MSCEditorCorePtr &mscCore : m_storage->allMscCores()) {
         for (msc::MscChart *chart : mscCore->mainModel()->mscModel()->allCharts()) {
             for (msc::MscMessage *message : chart->messages()) {
                 if (message->name() == messageName) {
@@ -161,7 +161,7 @@ bool MscSystemChecks::mscMessagesExist(const QString &messageName, const QString
 void MscSystemChecks::changeMscMessageName(
         const QString &oldName, const QString &newName, const QString &sourceName, const QString &targetName)
 {
-    for (QSharedPointer<msc::MSCEditorCore> &mscCore : m_storage->allMscCores()) {
+    for (MSCEditorCorePtr &mscCore : m_storage->allMscCores()) {
         mscCore->changeMscMessageName(oldName, newName, sourceName, targetName);
     }
 }
@@ -171,7 +171,7 @@ void MscSystemChecks::changeMscMessageName(
  */
 void MscSystemChecks::removeMscMessages(ivm::IVConnection *ivConnection)
 {
-    for (QSharedPointer<msc::MSCEditorCore> &mscCore : m_storage->allMscCores()) {
+    for (MSCEditorCorePtr &mscCore : m_storage->allMscCores()) {
         mscCore->removeMscMessages(ivConnection);
     }
 }
@@ -181,7 +181,7 @@ void MscSystemChecks::removeMscMessages(ivm::IVConnection *ivConnection)
  */
 bool MscSystemChecks::hasCorrespondingMessages(ivm::IVConnection *ivConnection) const
 {
-    for (QSharedPointer<msc::MSCEditorCore> &mscCore : m_storage->allMscCores()) {
+    for (MSCEditorCorePtr &mscCore : m_storage->allMscCores()) {
         if (!mscCore->correspondingMessages(ivConnection).isEmpty()) {
             return true;
         }
@@ -195,17 +195,17 @@ bool MscSystemChecks::hasCorrespondingMessages(ivm::IVConnection *ivConnection) 
  */
 void MscSystemChecks::checkInstances()
 {
-    QVector<QSharedPointer<msc::MSCEditorCore>> mscCores = m_storage->allMscCores();
+    QVector<MSCEditorCorePtr> mscCores = m_storage->allMscCores();
 
     // Check for names
     QVector<QPair<msc::MscChart *, msc::MscInstance *>> resultNames;
-    for (QSharedPointer<msc::MSCEditorCore> &mplugin : mscCores) {
+    for (MSCEditorCorePtr &mplugin : mscCores) {
         resultNames += mplugin->systemChecker()->checkInstanceNames();
     }
 
     // Check for nested functions usage
     QVector<QPair<msc::MscChart *, msc::MscInstance *>> resultRelations;
-    for (QSharedPointer<msc::MSCEditorCore> &mplugin : mscCores) {
+    for (MSCEditorCorePtr &mplugin : mscCores) {
         resultRelations += mplugin->systemChecker()->checkInstanceRelations();
     }
 
@@ -245,11 +245,11 @@ void MscSystemChecks::checkInstances()
  */
 void MscSystemChecks::checkMessages()
 {
-    QVector<QSharedPointer<msc::MSCEditorCore>> mscCores = m_storage->allMscCores();
+    QVector<MSCEditorCorePtr> mscCores = m_storage->allMscCores();
 
     // check messages
     QVector<QPair<msc::MscChart *, msc::MscMessage *>> resultNames;
-    for (const QSharedPointer<msc::MSCEditorCore> &mplugin : mscCores) {
+    for (const MSCEditorCorePtr &mplugin : mscCores) {
         resultNames += mplugin->systemChecker()->checkMessages();
     }
 

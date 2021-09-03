@@ -121,7 +121,7 @@ void IVQtCEditor::showE2EDataflow(const QStringList &mscFiles)
         m_endToEndView->setAttribute(Qt::WA_DeleteOnClose);
         std::function<msc::MscModel *(QString fileName)> fetcher = [this](QString fileName) -> msc::MscModel * {
             if (m_projectManager) {
-                QSharedPointer<msc::MSCEditorCore> core = m_projectManager->mscData(fileName);
+                MSCEditorCorePtr core = m_projectManager->mscData(fileName);
                 if (core) {
                     return core->mainModel()->mscModel();
                 }

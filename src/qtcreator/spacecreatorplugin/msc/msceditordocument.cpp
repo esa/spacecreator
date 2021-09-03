@@ -18,7 +18,6 @@
 #include "msceditordocument.h"
 
 #include "mainmodel.h"
-#include "msceditorcore.h"
 #include "mscmodel.h"
 #include "spacecreatorpluginconstants.h"
 #include "spacecreatorproject.h"
@@ -173,7 +172,7 @@ bool MscEditorDocument::reload(QString *errorString, ReloadFlag flag, ChangeType
     return success;
 }
 
-QSharedPointer<msc::MSCEditorCore> MscEditorDocument::mscEditorCore() const
+MSCEditorCorePtr MscEditorDocument::mscEditorCore() const
 {
     return m_plugin;
 }

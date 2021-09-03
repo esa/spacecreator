@@ -29,7 +29,6 @@
 #include "ivsystemchecks.h"
 #include "ivsystemqueries.h"
 #include "mainmodel.h"
-#include "msceditorcore.h"
 #include "mscmodel.h"
 #include "mscsystemchecks.h"
 
@@ -102,10 +101,10 @@ IVEditorCorePtr SpaceCreatorProject::ivData(const QString &fileName) const
    Returns the MSCEditorCore object for the given file
    If the object does not exist yet, one will be created and the data be loaded
  */
-QSharedPointer<msc::MSCEditorCore> SpaceCreatorProject::mscData(const QString &fileName) const
+MSCEditorCorePtr SpaceCreatorProject::mscData(const QString &fileName) const
 {
     if (!m_mscStore.contains(fileName)) {
-        QSharedPointer<msc::MSCEditorCore> data(new msc::MSCEditorCore());
+        MSCEditorCorePtr data(new msc::MSCEditorCore());
         data->showToolbars(false);
         data->mainModel()->setAsn1Check(m_asnChecks.get());
         data->mainModel()->loadFile(fileName);
@@ -155,12 +154,12 @@ QVector<DVEditorCorePtr> SpaceCreatorProject::allDVCores() const
 /*!
    Returns all MSCEditorCore objects, that are used in the current project
  */
-QVector<QSharedPointer<msc::MSCEditorCore>> SpaceCreatorProject::allMscCores() const
+QVector<MSCEditorCorePtr> SpaceCreatorProject::allMscCores() const
 {
     const QStringList mscFiles = allMscFiles();
-    QVector<QSharedPointer<msc::MSCEditorCore>> allMscCores;
+    QVector<MSCEditorCorePtr> allMscCores;
     for (const QString &mscFile : mscFiles) {
-        QSharedPointer<msc::MSCEditorCore> core = mscData(mscFile);
+        MSCEditorCorePtr core = mscData(mscFile);
         if (core) {
             allMscCores.append(core);
         }
@@ -183,7 +182,7 @@ bool SpaceCreatorProject::contains(QSharedPointer<shared::EditorCore> core) cons
             return true;
         }
     }
-    for (const QSharedPointer<msc::MSCEditorCore> &mscCore : m_mscStore) {
+    for (const MSCEditorCorePtr &mscCore : m_mscStore) {
         if (core == mscCore) {
             return true;
         }
@@ -236,7 +235,7 @@ QStringList SpaceCreatorProject::projectFiles(const QString &suffix) const
             files.append(ivCore->filePath());
         }
     }
-    for (const QSharedPointer<msc::MSCEditorCore> &mscCore : m_mscStore) {
+    for (const MSCEditorCorePtr &mscCore : m_mscStore) {
         if (mscCore->filePath().endsWith(suffix)) {
             files.append(mscCore->filePath());
         }
@@ -258,7 +257,7 @@ Asn1Acn::Asn1SystemChecks *SpaceCreatorProject::asn1Checks() const
 QVector<IvSystemChecks *> SpaceCreatorProject::ivChecks() const
 {
     QVector<IvSystemChecks *> checks;
-    for (const QSharedPointer<msc::MSCEditorCore> &core : m_mscStore) {
+    for (const MSCEditorCorePtr &core : m_mscStore) {
         if (auto ivChecker = qobject_cast<scs::IvSystemChecks *>(core->systemChecker())) {
             checks.append(ivChecker);
         }
@@ -367,14 +366,14 @@ void SpaceCreatorProject::setIvData(const QString &fileName, IVEditorCorePtr ivD
    Sets the MSCEditorCore object for the given file.
    If the object was already used for another file, that old file/object connection is removed.
  */
-void SpaceCreatorProject::setMscData(const QString &fileName, QSharedPointer<msc::MSCEditorCore> mscData)
+void SpaceCreatorProject::setMscData(const QString &fileName, MSCEditorCorePtr mscData)
 {
     const QString oldKey = m_mscStore.key(mscData, "");
     if (!oldKey.isEmpty()) {
         if (m_mscStore[fileName] == mscData) {
             return;
         }
-        QSharedPointer<msc::MSCEditorCore> oldData = m_mscStore.take(oldKey);
+        MSCEditorCorePtr oldData = m_mscStore.take(oldKey);
         disconnect(oldData.data(), nullptr, this, nullptr);
     }
 

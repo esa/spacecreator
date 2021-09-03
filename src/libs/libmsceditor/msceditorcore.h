@@ -22,6 +22,7 @@
 #include "mscdocument.h"
 
 #include <QList>
+#include <QSharedPointer>
 #include <QStackedWidget>
 #include <QVector>
 #include <memory>
@@ -187,3 +188,6 @@ private:
 };
 
 }
+
+typedef QSharedPointer<msc::MSCEditorCore> MSCEditorCorePtr;
+Q_DECLARE_METATYPE(MSCEditorCorePtr)
