@@ -76,7 +76,7 @@ QList<Types::EnumeratedItem> itemsSortedByIndex(const Types::Enumerated &type)
 
 void Asn1TypeComponentReconstructingVisitor::visit(const Types::Enumerated &type)
 {
-    m_outStream << type.name() << QStringLiteral("\n");
+    m_outStream << type.typeName() << QStringLiteral("\n");
     m_outStream << QString(m_indent, QChar(' ')) << QStringLiteral("{") << QStringLiteral("\n");
 
     const auto items = itemsSortedByIndex(type);
@@ -139,13 +139,13 @@ void Asn1TypeComponentReconstructingVisitor::valueForStraightType(const Types::T
     TypeConstraintsReconstructingVisitor visitor;
     type.accept(visitor);
 
-    m_outStream << type.name() << visitor.value();
+    m_outStream << type.typeName() << visitor.value();
 }
 
 template<typename T>
 void Asn1TypeComponentReconstructingVisitor::valueForComplexType(const T &type, const int indent)
 {
-    addLine(type.name());
+    addLine(type.typeName());
     addLine(QStringLiteral("{"), indent);
 
     const auto &components = type.components();
@@ -154,7 +154,7 @@ void Asn1TypeComponentReconstructingVisitor::valueForComplexType(const T &type, 
         addWord((*it)->name());
 
         Asn1TypeComponentReconstructingVisitor visitor(m_outStream, indent + INDENT_SIZE);
-        (*it)->type().accept(visitor);
+        (*it)->type()->accept(visitor);
 
         if (std::next(it) != components.end())
             addWord(QStringLiteral(","));
