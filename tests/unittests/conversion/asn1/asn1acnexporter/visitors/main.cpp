@@ -4,7 +4,7 @@
 ** Contact: http://n7space.com
 **
 ** This file is part of ASN.1/ACN Fuzzer - Tool for generating test cases
-** based on ASN.1/ACN models and simulating malformed or malicious data.
+** based on ASN.1/ACN models and simulating malformed or malicious asn1library/asn1.
 **
 ** Tool was developed under a programme and funded by
 ** European Space Agency.
@@ -24,24 +24,23 @@
 **
 ****************************************************************************/
 
-#include <QObject>
-#include <QTest>
-
 #include "acnnodereconstructingvisitor_tests.h"
-#include "asn1nodereconstructingvisitor_tests.h"
 #include "astxmlconstraintparser_tests.h"
 #include "astxmlparser_tests.h"
-#include "reconstructor_tests.h"
-
-#include "data/constraints/printingvisitor_tests.h"
-
-#include "data/range_tests.h"
-#include "data/rangelist_tests.h"
-
 #include "cases/enumeratedincorrectitems_tests.h"
 #include "cases/integerincorrectvalues_tests.h"
 #include "cases/integerranges_tests.h"
 #include "cases/testcaseprinter_tests.h"
+#include "reconstructor_tests.h"
+
+#include <QObject>
+#include <QTest>
+#include <QtTest/qtestcase.h>
+#include <asn1library/asn1/constraints/printingvisitor_tests.h>
+#include <asn1library/asn1/definitions.h>
+#include <asn1library/asn1/range_tests.h>
+#include <asn1library/asn1/rangelist_tests.h>
+#include <asn1nodereconstructingvisitor_tests.h>
 
 int main(int argc, char *argv[])
 {
@@ -51,18 +50,8 @@ int main(int argc, char *argv[])
         delete obj;
     };
 
-    runTest(new Fuzzer::Tests::AstXmlParserTests);
-    runTest(new Fuzzer::Tests::Asn1NodeReconstructingVisitorTests);
-    runTest(new Fuzzer::Tests::AcnNodeReconstructingVisitorTests);
-    runTest(new Fuzzer::Tests::ReconstructorTests);
-    runTest(new Fuzzer::Tests::AstXmlConstraintParserTests);
-    runTest(new Fuzzer::Data::Tests::RangeTests);
-    runTest(new Fuzzer::Data::Tests::RangeListTests);
-    runTest(new Fuzzer::Data::Constraints::Tests::PrintingVisitorTests);
-    runTest(new Fuzzer::Cases::Tests::IntegerIncorrectValuesTests);
-    runTest(new Fuzzer::Cases::Tests::EnumeratedIncorrectItemsTests);
-    runTest(new Fuzzer::Cases::Tests::IntegerRangesTests);
-    runTest(new Fuzzer::Cases::Tests::TestCasePrinterTests);
+    runTest(new Asn1Acn::Tests::Asn1NodeReconstructingVisitorTests);
+    runTest(new Asn1Acn::Tests::AcnNodeReconstructingVisitorTests);
 
     return ret;
 }

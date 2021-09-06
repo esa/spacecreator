@@ -3,8 +3,8 @@
 ** Copyright (C) 2018-2019 N7 Space sp. z o. o.
 ** Contact: http://n7space.com
 **
-** This file is part of ASN.1/ACN Fuzzer - Tool for generating test cases
-** based on ASN.1/ACN models and simulating malformed or malicious data.
+** This file is part of ASN.1/ACN Asn1Acn - Tool for generating test cases
+** based on ASN.1/ACN models and simulating malformed or malicious asn1library/asn1.
 **
 ** Tool was developed under a programme and funded by
 ** European Space Agency.
@@ -25,18 +25,16 @@
 ****************************************************************************/
 #pragma once
 
+#include <QObject>
+#include <asn1library/asn1/constraints/constraint.h>
+#include <asn1library/asn1/definitions.h>
+#include <asn1library/asn1/file.h>
+#include <asn1library/asn1/project.h>
+#include <asn1library/asn1/valueassignment.h>
 #include <functional>
 #include <memory>
 
-#include <QObject>
-
-#include <data/constraints/constraint.h>
-#include <data/definitions.h>
-#include <data/file.h>
-#include <data/project.h>
-#include <data/valueassignment.h>
-
-namespace Fuzzer {
+namespace Asn1Acn {
 namespace Tests {
 
 class Asn1NodeReconstructingVisitorTests : public QObject
@@ -100,28 +98,25 @@ private slots:
 private:
     std::unique_ptr<Definitions> createDefinitions(const QString &name) const;
 
-    QString createSingleValueValueAssignmentValue(
-        const QString &typeName,
-        const QString &typeValue,
-        std::function<QString(const QString &)> printer = {}) const;
+    QString createSingleValueValueAssignmentValue(const QString &typeName, const QString &typeValue,
+            std::function<QString(const QString &)> printer = {}) const;
 
     void testSimpleTypeAssignment(const QString &astValue, const QString &asn1Value) const;
 
-    std::unique_ptr<Data::TypeAssignment> createSimpleTypeAssignment(
-        const QString &astTypeName) const;
+    std::unique_ptr<TypeAssignment> createSimpleTypeAssignment(const QString &astTypeName) const;
 
     template<typename T>
-    std::unique_ptr<Data::TypeAssignment> createTypeAssignmentWithConstraint(
-        const QString &astTypeName, Data::Constraints::Constraint<T> *contraint) const;
+    std::unique_ptr<TypeAssignment> createTypeAssignmentWithConstraint(
+            const QString &astTypeName, Constraints::Constraint<T> *contraint) const;
 
     QString createMultipleValueValueAssignmentValue() const;
     QString createNamedValueAssignmentValue() const;
-    QString createComponentialTypeAssignmentValue(std::unique_ptr<Data::Types::Type> type) const;
+    QString createComponentialTypeAssignmentValue(std::unique_ptr<Types::Type> type) const;
 
     QString createChoiceValueAssignmentValue() const;
 
-    QString restoreNode(const Data::Node &assignment) const;
+    QString restoreNode(const Node &assignment) const;
 };
 
 } // namespace Tests
-} // namespace Fuzzer
+} // namespace Asn1Acn

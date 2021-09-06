@@ -4,7 +4,7 @@
 ** Contact: http://n7space.com
 **
 ** This file is part of ASN.1/ACN Asn1Acn - Tool for generating test cases
-** based on ASN.1/ACN models and simulating malformed or malicious data.
+** based on ASN.1/ACN models and simulating malformed or malicious asn1library/asn1.
 **
 ** Tool was developed under a programme and funded by
 ** European Space Agency.
@@ -27,24 +27,24 @@
 #include "asn1nodereconstructingvisitor_tests.h"
 
 #include <QtTest>
-#include <asn1nodereconstructingvisitor.h>
-#include <data/acnsequencecomponent.h>
-#include <data/asnsequencecomponent.h>
-#include <data/choicevalue.h>
-#include <data/constraints/constraintlist.h>
-#include <data/constraints/rangeconstraint.h>
-#include <data/constraints/sizeconstraint.h>
-#include <data/multiplevalue.h>
-#include <data/namedvalue.h>
-#include <data/singlevalue.h>
-#include <data/sourcelocation.h>
-#include <data/types/choice.h>
-#include <data/types/enumerated.h>
-#include <data/types/integer.h>
-#include <data/types/sequence.h>
-#include <data/types/sequenceof.h>
-#include <data/types/typefactory.h>
-#include <data/types/userdefinedtype.h>
+#include <asn1library/asn1/acnsequencecomponent.h>
+#include <asn1library/asn1/asnsequencecomponent.h>
+#include <asn1library/asn1/choicevalue.h>
+#include <asn1library/asn1/constraints/constraintlist.h>
+#include <asn1library/asn1/constraints/rangeconstraint.h>
+#include <asn1library/asn1/constraints/sizeconstraint.h>
+#include <asn1library/asn1/multiplevalue.h>
+#include <asn1library/asn1/namedvalue.h>
+#include <asn1library/asn1/singlevalue.h>
+#include <asn1library/asn1/sourcelocation.h>
+#include <asn1library/asn1/types/choice.h>
+#include <asn1library/asn1/types/enumerated.h>
+#include <asn1library/asn1/types/integer.h>
+#include <asn1library/asn1/types/sequence.h>
+#include <asn1library/asn1/types/sequenceof.h>
+#include <asn1library/asn1/types/typefactory.h>
+#include <asn1library/asn1/types/userdefinedtype.h>
+#include <conversion/asn1/Asn1AcnExporter/visitors/asn1nodereconstructingvisitor.h>
 // #include <reconstructor.h>
 
 using namespace Asn1Acn;
@@ -481,7 +481,8 @@ void Asn1NodeReconstructingVisitorTests::test_typeAssignmentIntegerWithValue()
 
 void Asn1NodeReconstructingVisitorTests::test_typeAssignmentUserDefined()
 {
-    auto type = std::make_unique<Types::UserdefinedType>(QStringLiteral("ReferencedType"), QStringLiteral("MyModule"));
+    auto type = std::make_unique<Types::UserdefinedType>(
+            QStringLiteral("ReferencedType"), QStringLiteral("MyModule"), nullptr);
     type->setType(Types::TypeFactory::createBuiltinType(QStringLiteral("INTEGER")));
 
     auto assignment = std::make_unique<TypeAssignment>(
@@ -498,7 +499,8 @@ void Asn1NodeReconstructingVisitorTests::test_typeAssignmentUserDefinedWithValue
     auto &constrainedType = dynamic_cast<Constraints::WithConstraints<IntegerValue> &>(*referedType);
     constrainedType.constraints().append({ 1, 2 });
 
-    auto type = std::make_unique<Types::UserdefinedType>(QStringLiteral("ReferencedType"), QStringLiteral("MyModule"));
+    auto type = std::make_unique<Types::UserdefinedType>(
+            QStringLiteral("ReferencedType"), QStringLiteral("MyModule"), nullptr);
     type->setType(std::move(referedType));
     auto assignment = std::make_unique<TypeAssignment>(
             QStringLiteral("MyType"), QStringLiteral("MyTypeT"), SourceLocation(), std::move(type));
