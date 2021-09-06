@@ -2,7 +2,7 @@
 #
 
 # Create one test that is called "TEST_NAME" and has a test source TEST_NAME.cpp
-# LIBRARY is the LIBRARY (a list is possible as well)the test depends on
+# LIBRARY is the LIBRARY (a list is possible as well) the test depends on
 # Optionally you can add a list of aditional source files
 #
 # Example: addQtTest(tst_ivobject ivcore "extra01.xml;extra02.xml;extra03.xml")
