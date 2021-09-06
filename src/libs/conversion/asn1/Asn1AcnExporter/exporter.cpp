@@ -20,4 +20,6 @@
 #include "exporter.h"
 
 #include "visitors/acnnodereconstructingvisitor.h"
-// #include "visitors/asn1
+#include "visitors/acntypecomponentreconstructingvisitor.h"
+#include "visitors/asn1nodereconstructingvisitor.h"
+#include "visitors/asn1typecomponentreconstructingvisitor.h"
