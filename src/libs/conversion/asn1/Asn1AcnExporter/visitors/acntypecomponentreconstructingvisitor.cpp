@@ -285,7 +285,7 @@ void AcnTypeComponentReconstructingVisitor::reconstructComplexTypeComponents(con
         m_outStream << addIndent(indent + INDENT_SIZE) << (*it)->definitionAsString() << QStringLiteral(" ");
 
         AcnTypeComponentReconstructingVisitor visitor(m_outStream, indent + INDENT_SIZE, (*it)->presentWhen());
-        (*it)->type().accept(visitor);
+        (*it)->type()->accept(visitor);
 
         if (std::next(it, 1) != components.end())
             m_outStream << QStringLiteral(",");
