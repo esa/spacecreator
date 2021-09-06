@@ -21,22 +21,22 @@
 
 #include <QString>
 #include <QTextStream>
-#include <data/visitor.h>
+#include <asn1library/asn1/visitor.h>
 
 namespace Asn1Acn {
 
-class Asn1NodeReconstructingVisitor : public Data::Visitor
+class Asn1NodeReconstructingVisitor : public Visitor
 {
 public:
     Asn1NodeReconstructingVisitor(QTextStream &outStream);
     ~Asn1NodeReconstructingVisitor() override = default;
 
-    void visit(const Data::Definitions &defs) override;
-    void visit(const Data::File &file) override;
-    void visit(const Data::TypeAssignment &type) override;
-    void visit(const Data::ValueAssignment &value) override;
-    void visit(const Data::Project &project) override;
-    void visit(const Data::Root &root) override;
+    void visit(const Definitions &defs) override;
+    void visit(const File &file) override;
+    void visit(const TypeAssignment &type) override;
+    void visit(const ValueAssignment &value) override;
+    void visit(const Project &project) override;
+    void visit(const Root &root) override;
 
 private:
     template<typename T>
@@ -44,7 +44,7 @@ private:
     template<typename T>
     void reconstructCollection(const T &collection) const;
 
-    void reconstructImports(const Data::Definitions &defs) const;
+    void reconstructImports(const Definitions &defs) const;
 
     QTextStream &m_outStream;
 };

@@ -20,51 +20,51 @@
 #pragma once
 
 #include <QTextStream>
-#include <data/types/acnparameterizablecomposite.h>
-#include <data/types/bitstring.h>
-#include <data/types/boolean.h>
-#include <data/types/choice.h>
-#include <data/types/enumerated.h>
-#include <data/types/ia5string.h>
-#include <data/types/integer.h>
-#include <data/types/integeracnparams.h>
-#include <data/types/null.h>
-#include <data/types/numericstring.h>
-#include <data/types/octetstring.h>
-#include <data/types/real.h>
-#include <data/types/sequence.h>
-#include <data/types/sequenceof.h>
-#include <data/types/typereadingvisitor.h>
-#include <data/types/userdefinedtype.h>
+#include <asn1library/asn1/types/acnparameterizablecomposite.h>
+#include <asn1library/asn1/types/bitstring.h>
+#include <asn1library/asn1/types/boolean.h>
+#include <asn1library/asn1/types/choice.h>
+#include <asn1library/asn1/types/enumerated.h>
+#include <asn1library/asn1/types/ia5string.h>
+#include <asn1library/asn1/types/integer.h>
+#include <asn1library/asn1/types/integeracnparams.h>
+#include <asn1library/asn1/types/null.h>
+#include <asn1library/asn1/types/numericstring.h>
+#include <asn1library/asn1/types/octetstring.h>
+#include <asn1library/asn1/types/real.h>
+#include <asn1library/asn1/types/sequence.h>
+#include <asn1library/asn1/types/sequenceof.h>
+#include <asn1library/asn1/types/typereadingvisitor.h>
+#include <asn1library/asn1/types/userdefinedtype.h>
 
 namespace Asn1Acn {
 
-class Asn1TypeComponentReconstructingVisitor : public Data::Types::TypeReadingVisitor
+class Asn1TypeComponentReconstructingVisitor : public Types::TypeReadingVisitor
 {
 public:
     Asn1TypeComponentReconstructingVisitor(QTextStream &outStream, int indent = 0);
     ~Asn1TypeComponentReconstructingVisitor() override = default;
 
-    void visit(const Data::Types::Boolean &type) override;
-    void visit(const Data::Types::Null &type) override;
-    void visit(const Data::Types::BitString &type) override;
-    void visit(const Data::Types::OctetString &type) override;
-    void visit(const Data::Types::IA5String &type) override;
-    void visit(const Data::Types::NumericString &type) override;
-    void visit(const Data::Types::Enumerated &type) override;
-    void visit(const Data::Types::Choice &type) override;
-    void visit(const Data::Types::Sequence &type) override;
-    void visit(const Data::Types::SequenceOf &type) override;
-    void visit(const Data::Types::Real &type) override;
-    void visit(const Data::Types::LabelType &type) override;
-    void visit(const Data::Types::Integer &type) override;
-    void visit(const Data::Types::UserdefinedType &type) override;
+    void visit(const Types::Boolean &type) override;
+    void visit(const Types::Null &type) override;
+    void visit(const Types::BitString &type) override;
+    void visit(const Types::OctetString &type) override;
+    void visit(const Types::IA5String &type) override;
+    void visit(const Types::NumericString &type) override;
+    void visit(const Types::Enumerated &type) override;
+    void visit(const Types::Choice &type) override;
+    void visit(const Types::Sequence &type) override;
+    void visit(const Types::SequenceOf &type) override;
+    void visit(const Types::Real &type) override;
+    void visit(const Types::LabelType &type) override;
+    void visit(const Types::Integer &type) override;
+    void visit(const Types::UserdefinedType &type) override;
 
 private:
-    void valueForStraightType(const Data::Types::Type &type);
+    void valueForStraightType(const Types::Type &type);
 
     template<typename T>
-    void valueForComplexType(const T &type, const int indent);
+    void valueForComplexType(const T &type, int indent);
 
     void addIndent(int indent);
     void addWord(const QString &word);

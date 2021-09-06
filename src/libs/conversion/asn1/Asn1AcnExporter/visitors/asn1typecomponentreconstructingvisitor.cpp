@@ -21,7 +21,7 @@
 
 #include "typeconstraintsreconstructingvisitor.h"
 
-#include <data/constraints/printingvisitor.h>
+#include <asn1library/asn1/constraints/printingvisitor.h>
 
 using namespace Asn1Acn;
 
@@ -35,48 +35,46 @@ Asn1TypeComponentReconstructingVisitor::Asn1TypeComponentReconstructingVisitor(Q
 {
 }
 
-void Asn1TypeComponentReconstructingVisitor::visit(const Data::Types::Boolean &type)
+void Asn1TypeComponentReconstructingVisitor::visit(const Types::Boolean &type)
 {
     valueForStraightType(type);
 }
-void Asn1TypeComponentReconstructingVisitor::visit(const Data::Types::Null &type)
-{
-    valueForStraightType(type);
-}
-
-void Asn1TypeComponentReconstructingVisitor::visit(const Data::Types::BitString &type)
+void Asn1TypeComponentReconstructingVisitor::visit(const Types::Null &type)
 {
     valueForStraightType(type);
 }
 
-void Asn1TypeComponentReconstructingVisitor::visit(const Data::Types::OctetString &type)
+void Asn1TypeComponentReconstructingVisitor::visit(const Types::BitString &type)
 {
     valueForStraightType(type);
 }
 
-void Asn1TypeComponentReconstructingVisitor::visit(const Data::Types::IA5String &type)
+void Asn1TypeComponentReconstructingVisitor::visit(const Types::OctetString &type)
 {
     valueForStraightType(type);
 }
 
-void Asn1TypeComponentReconstructingVisitor::visit(const Data::Types::NumericString &type)
+void Asn1TypeComponentReconstructingVisitor::visit(const Types::IA5String &type)
+{
+    valueForStraightType(type);
+}
+
+void Asn1TypeComponentReconstructingVisitor::visit(const Types::NumericString &type)
 {
     valueForStraightType(type);
 }
 
 namespace {
-QList<Data::Types::EnumeratedItem> itemsSortedByIndex(const Data::Types::Enumerated &type)
+QList<Types::EnumeratedItem> itemsSortedByIndex(const Types::Enumerated &type)
 {
     auto items = type.items().values();
-    std::sort(
-            items.begin(), items.end(), [](const Data::Types::EnumeratedItem &a, const Data::Types::EnumeratedItem &b) {
-                return a.index() < b.index();
-            });
+    std::sort(items.begin(), items.end(),
+            [](const Types::EnumeratedItem &a, const Types::EnumeratedItem &b) { return a.index() < b.index(); });
     return items;
 }
 } // namespace
 
-void Asn1TypeComponentReconstructingVisitor::visit(const Data::Types::Enumerated &type)
+void Asn1TypeComponentReconstructingVisitor::visit(const Types::Enumerated &type)
 {
     m_outStream << type.name() << QStringLiteral("\n");
     m_outStream << QString(m_indent, QChar(' ')) << QStringLiteral("{") << QStringLiteral("\n");
@@ -98,17 +96,17 @@ void Asn1TypeComponentReconstructingVisitor::visit(const Data::Types::Enumerated
     m_outStream << QString(m_indent, QChar(' ')) << QStringLiteral("}");
 }
 
-void Asn1TypeComponentReconstructingVisitor::visit(const Data::Types::Choice &type)
+void Asn1TypeComponentReconstructingVisitor::visit(const Types::Choice &type)
 {
-    valueForComplexType<Data::Types::Choice>(type, m_indent);
+    valueForComplexType<Types::Choice>(type, m_indent);
 }
 
-void Asn1TypeComponentReconstructingVisitor::visit(const Data::Types::Sequence &type)
+void Asn1TypeComponentReconstructingVisitor::visit(const Types::Sequence &type)
 {
-    valueForComplexType<Data::Types::Sequence>(type, m_indent);
+    valueForComplexType<Types::Sequence>(type, m_indent);
 }
 
-void Asn1TypeComponentReconstructingVisitor::visit(const Data::Types::SequenceOf &type)
+void Asn1TypeComponentReconstructingVisitor::visit(const Types::SequenceOf &type)
 {
     m_outStream << QStringLiteral("SEQUENCE ") << toString(type.constraints()) << QStringLiteral(" OF ");
 
@@ -116,27 +114,27 @@ void Asn1TypeComponentReconstructingVisitor::visit(const Data::Types::SequenceOf
     type.itemsType().accept(visitor);
 }
 
-void Asn1TypeComponentReconstructingVisitor::visit(const Data::Types::Real &type)
+void Asn1TypeComponentReconstructingVisitor::visit(const Types::Real &type)
 {
     valueForStraightType(type);
 }
 
-void Asn1TypeComponentReconstructingVisitor::visit(const Data::Types::LabelType &type)
+void Asn1TypeComponentReconstructingVisitor::visit(const Types::LabelType &type)
 {
     Q_UNUSED(type);
 }
 
-void Asn1TypeComponentReconstructingVisitor::visit(const Data::Types::Integer &type)
+void Asn1TypeComponentReconstructingVisitor::visit(const Types::Integer &type)
 {
     valueForStraightType(type);
 }
 
-void Asn1TypeComponentReconstructingVisitor::visit(const Data::Types::UserdefinedType &type)
+void Asn1TypeComponentReconstructingVisitor::visit(const Types::UserdefinedType &type)
 {
     valueForStraightType(type);
 }
 
-void Asn1TypeComponentReconstructingVisitor::valueForStraightType(const Data::Types::Type &type)
+void Asn1TypeComponentReconstructingVisitor::valueForStraightType(const Types::Type &type)
 {
     TypeConstraintsReconstructingVisitor visitor;
     type.accept(visitor);

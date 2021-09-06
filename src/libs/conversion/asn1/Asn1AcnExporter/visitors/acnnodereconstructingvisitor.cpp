@@ -22,10 +22,10 @@
 #include "acntypecomponentreconstructingvisitor.h"
 
 #include <QString>
-#include <data/definitions.h>
-#include <data/file.h>
-#include <data/project.h>
-#include <data/root.h>
+#include <asn1library/asn1/definitions.h>
+#include <asn1library/asn1/file.h>
+#include <asn1library/asn1/project.h>
+#include <asn1library/asn1/root.h>
 
 using namespace Asn1Acn;
 
@@ -34,19 +34,19 @@ AcnNodeReconstructingVisitor::AcnNodeReconstructingVisitor(QTextStream &outStrea
 {
 }
 
-void AcnNodeReconstructingVisitor::visit(const Data::Definitions &defs)
+void AcnNodeReconstructingVisitor::visit(const Definitions &defs)
 {
     m_outStream << defs.name() << QStringLiteral(" DEFINITIONS ::= BEGIN") << QStringLiteral("\n");
     reconstructCollection(defs.types());
     m_outStream << QStringLiteral("END\n\n");
 }
 
-void AcnNodeReconstructingVisitor::visit(const Data::File &file)
+void AcnNodeReconstructingVisitor::visit(const File &file)
 {
-    reconstructCollection<Data::File::DefinitionsList>(file.definitionsList());
+    reconstructCollection<File::DefinitionsList>(file.definitionsList());
 }
 
-void AcnNodeReconstructingVisitor::visit(const Data::TypeAssignment &type)
+void AcnNodeReconstructingVisitor::visit(const TypeAssignment &type)
 {
     m_outStream << type.name() << QStringLiteral(" ");
 
@@ -56,17 +56,17 @@ void AcnNodeReconstructingVisitor::visit(const Data::TypeAssignment &type)
     m_outStream << QStringLiteral("\n");
 }
 
-void AcnNodeReconstructingVisitor::visit(const Data::ValueAssignment &assignment)
+void AcnNodeReconstructingVisitor::visit(const ValueAssignment &assignment)
 {
     Q_UNUSED(assignment);
 }
 
-void AcnNodeReconstructingVisitor::visit(const Data::Project &project)
+void AcnNodeReconstructingVisitor::visit(const Project &project)
 {
     Q_UNUSED(project);
 }
 
-void AcnNodeReconstructingVisitor::visit(const Data::Root &root)
+void AcnNodeReconstructingVisitor::visit(const Root &root)
 {
     Q_UNUSED(root);
 }

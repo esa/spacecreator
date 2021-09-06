@@ -22,10 +22,10 @@
 #include "asn1typecomponentreconstructingvisitor.h"
 
 #include <QString>
-#include <data/definitions.h>
-#include <data/file.h>
-#include <data/project.h>
-#include <data/root.h>
+#include <asn1library/asn1/definitions.h>
+#include <asn1library/asn1/file.h>
+#include <asn1library/asn1/project.h>
+#include <asn1library/asn1/root.h>
 
 using namespace Asn1Acn;
 
@@ -34,23 +34,23 @@ Asn1NodeReconstructingVisitor::Asn1NodeReconstructingVisitor(QTextStream &outStr
 {
 }
 
-void Asn1NodeReconstructingVisitor::visit(const Data::Definitions &defs)
+void Asn1NodeReconstructingVisitor::visit(const Definitions &defs)
 {
     m_outStream << defs.name() << QStringLiteral(" DEFINITIONS ::= BEGIN") << QStringLiteral("\n");
 
     reconstructImports(defs);
-    reconstructCollection<Data::Definitions::Values>(defs.values());
-    reconstructCollection<Data::Definitions::Types>(defs.types());
+    reconstructCollection<Definitions::Values>(defs.values());
+    reconstructCollection<Definitions::Types>(defs.types());
 
     m_outStream << QStringLiteral("END\n\n");
 }
 
-void Asn1NodeReconstructingVisitor::visit(const Data::File &file)
+void Asn1NodeReconstructingVisitor::visit(const File &file)
 {
-    reconstructCollection<Data::File::DefinitionsList>(file.definitionsList());
+    reconstructCollection<File::DefinitionsList>(file.definitionsList());
 }
 
-void Asn1NodeReconstructingVisitor::visit(const Data::TypeAssignment &type)
+void Asn1NodeReconstructingVisitor::visit(const TypeAssignment &type)
 {
     m_outStream << type.name() << QStringLiteral(" ::= ");
 
@@ -60,7 +60,7 @@ void Asn1NodeReconstructingVisitor::visit(const Data::TypeAssignment &type)
     m_outStream << QStringLiteral("\n");
 }
 
-void Asn1NodeReconstructingVisitor::visit(const Data::ValueAssignment &assignment)
+void Asn1NodeReconstructingVisitor::visit(const ValueAssignment &assignment)
 {
     if (assignment.value() == nullptr)
         return;
@@ -69,17 +69,17 @@ void Asn1NodeReconstructingVisitor::visit(const Data::ValueAssignment &assignmen
                 << assignment.value()->asString() << QStringLiteral("\n");
 }
 
-void Asn1NodeReconstructingVisitor::visit(const Data::Project &project)
+void Asn1NodeReconstructingVisitor::visit(const Project &project)
 {
     Q_UNUSED(project);
 }
 
-void Asn1NodeReconstructingVisitor::visit(const Data::Root &root)
+void Asn1NodeReconstructingVisitor::visit(const Root &root)
 {
     Q_UNUSED(root);
 }
 
-void Asn1NodeReconstructingVisitor::reconstructImports(const Data::Definitions &defs) const
+void Asn1NodeReconstructingVisitor::reconstructImports(const Definitions &defs) const
 {
     const auto &values = defs.importedValues();
     const auto &types = defs.importedTypes();
@@ -89,8 +89,8 @@ void Asn1NodeReconstructingVisitor::reconstructImports(const Data::Definitions &
 
     m_outStream << QStringLiteral("IMPORTS\n");
 
-    reconstructImportedCollection<Data::Definitions::ImportedValues>(values);
-    reconstructImportedCollection<Data::Definitions::ImportedTypes>(types);
+    reconstructImportedCollection<Definitions::ImportedValues>(values);
+    reconstructImportedCollection<Definitions::ImportedTypes>(types);
 
     m_outStream << QStringLiteral(";\n");
 }
