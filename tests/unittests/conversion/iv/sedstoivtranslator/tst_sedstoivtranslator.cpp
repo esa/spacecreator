@@ -79,6 +79,14 @@ void tst_SedsToIvTranslator::testTranslateComponentWithProvidedInterface()
     QVERIFY(interface);
     QVERIFY(interface->isProvided());
     QCOMPARE(interface->title(), "ICommand");
+
+    const auto params = interface->params();
+    QCOMPARE(params.size(), 1);
+
+    const auto param = params[0];
+    QCOMPARE(param.name(), "Interface_Interface_Parameter");
+    QCOMPARE(param.paramTypeName(), "Interface_Interface_TypeGroup");
+    QCOMPARE(param.direction(), ivm::InterfaceParameter::Direction::IN);
 }
 
 void tst_SedsToIvTranslator::testTranslateComponentWithRequiredInterface()
@@ -109,6 +117,14 @@ void tst_SedsToIvTranslator::testTranslateComponentWithRequiredInterface()
     QVERIFY(interface);
     QVERIFY(interface->isRequired());
     QCOMPARE(interface->title(), "ICommand");
+
+    const auto params = interface->params();
+    QCOMPARE(params.size(), 1);
+
+    const auto param = params[0];
+    QCOMPARE(param.name(), "Interface_Interface_Parameter");
+    QCOMPARE(param.paramTypeName(), "Interface_Interface_TypeGroup");
+    QCOMPARE(param.direction(), ivm::InterfaceParameter::Direction::IN);
 }
 
 std::unique_ptr<SedsModel> tst_SedsToIvTranslator::createComponentWithProvidedInterface()
