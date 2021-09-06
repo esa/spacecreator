@@ -103,8 +103,14 @@ Asn1Acn::File SedsToAsn1Translator::translatePackage(const seds::model::Package 
 void SedsToAsn1Translator::translateDataTypes(
         const std::vector<seds::model::DataType> &dataTypes, Asn1Acn::Definitions *definitions) const
 {
+    std::unique_ptr<Asn1Acn::Types::Type> type;
+
     for (const auto &dataType : dataTypes) {
-        std::visit(DataTypeTranslatorVisitor { definitions }, dataType);
+        std::visit(DataTypeTranslatorVisitor { type }, dataType);
+
+        auto typeAssignment = std::make_unique<Asn1Acn::TypeAssignment>(
+                type->identifier(), type->identifier(), Asn1Acn::SourceLocation(), std::move(type));
+        definitions->addType(std::move(typeAssignment));
     }
 }
 

@@ -27,7 +27,9 @@
 #include <conversion/common/modeltype.h>
 #include <conversion/common/options.h>
 #include <conversion/iv/IvOptions/options.h>
+#include <ivcore/ivlibrary.h>
 #include <ivcore/ivmodel.h>
+#include <libiveditor/iveditor.h>
 #include <libiveditor/ivexporter.h>
 
 using conversion::Options;

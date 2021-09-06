@@ -92,6 +92,7 @@ set(SOURCES
     types/booleandatatype.cpp
     types/compositedatatype.cpp
     types/containerdatatype.cpp
+    types/datatype.cpp
     types/datatyperef.cpp
     types/dimensionsize.cpp
     types/enumerateddatatype.cpp

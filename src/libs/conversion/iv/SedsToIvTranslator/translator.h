@@ -22,6 +22,7 @@
 #include <conversion/common/translation/translator.h>
 
 namespace Asn1Acn {
+class Definitions;
 class File;
 } // namespace Asn1Acn
 
@@ -61,7 +62,7 @@ private:
             const Options &options) const -> std::vector<std::unique_ptr<Model>>;
 
 private:
-    auto translatePackage(const seds::model::Package &package, ivm::IVModel *model, Asn1Acn::File &asn1File,
+    auto translatePackage(const seds::model::Package &package, ivm::IVModel *model, Asn1Acn::Definitions *definitions,
             bool generateFunction) const -> void;
 };
 

@@ -33,13 +33,20 @@ IncorrectSourceModelException::IncorrectSourceModelException(ModelType expectedM
 {
 }
 
+UndeclaredDataTypeException::UndeclaredDataTypeException(const QString &dataTypeName)
+    : TranslationException(QString("Undeclared data type '%1'").arg(dataTypeName))
+{
+}
+
 UndeclaredInterfaceException::UndeclaredInterfaceException(const QString &interfaceTypeName)
     : TranslationException(QString("Undeclared interface '%1'").arg(interfaceTypeName))
 {
 }
 
-MissingGenericTypeMappingException::MissingGenericTypeMappingException(const QString &genericTypeName)
-    : TranslationException(QString("Generic type '%1' wasn't mapped").arg(genericTypeName))
+MissingGenericTypeMappingException::MissingGenericTypeMappingException(
+        const QString &genericTypeName, const QString &interfaceName)
+    : TranslationException(
+            QString("Generic type '%1' wasn't mapped in the '%2' interface").arg(genericTypeName).arg(interfaceName))
 {
 }
 

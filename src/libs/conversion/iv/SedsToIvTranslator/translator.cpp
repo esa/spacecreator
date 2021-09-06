@@ -21,6 +21,8 @@
 
 #include "specialized/componentstranslator.h"
 
+#include <asn1library/asn1/asn1model.h>
+#include <asn1library/asn1/definitions.h>
 #include <asn1library/asn1/file.h>
 #include <conversion/common/translation/exceptions.h>
 #include <conversion/iv/IvOptions/options.h>
@@ -80,31 +82,40 @@ std::vector<std::unique_ptr<Model>> SedsToIvTranslator::translateSedsModel(
     const auto generateFunctionsForPackages = options.isSet(IvOptions::generateFunctionsForPackages);
 
     auto ivModel = std::make_unique<IVModel>(config);
+
+    std::vector<Asn1Acn::File> asn1Files;
     Asn1Acn::File asn1File("interfaceview.asn");
+    auto asn1Definitions =
+            std::make_unique<Asn1Acn::Definitions>(QStringLiteral("interfaceview"), Asn1Acn::SourceLocation());
 
     const auto &sedsModelData = sedsModel->data();
     if (std::holds_alternative<seds::model::PackageFile>(sedsModelData)) {
         const auto &package = std::get<seds::model::PackageFile>(sedsModelData).package();
-        translatePackage(package, ivModel.get(), asn1File, generateFunctionsForPackages);
+        translatePackage(package, ivModel.get(), asn1Definitions.get(), generateFunctionsForPackages);
     } else if (std::holds_alternative<seds::model::DataSheet>(sedsModelData)) {
         const auto &packages = std::get<seds::model::DataSheet>(sedsModelData).packages();
         for (const auto &package : packages) {
-            translatePackage(package, ivModel.get(), asn1File, generateFunctionsForPackages);
+            translatePackage(package, ivModel.get(), asn1Definitions.get(), generateFunctionsForPackages);
         }
     } else {
         throw TranslationException("Unhandled SEDS model data type");
     }
 
+    asn1File.add(std::move(asn1Definitions));
+    asn1Files.push_back(std::move(asn1File));
+    auto asn1Model = std::make_unique<Asn1Acn::Asn1Model>(std::move(asn1Files));
+
     std::vector<std::unique_ptr<Model>> result;
     result.push_back(std::move(ivModel));
+    result.push_back(std::move(asn1Model));
 
     return result;
 }
 
-void SedsToIvTranslator::translatePackage(
-        const seds::model::Package &package, IVModel *model, Asn1Acn::File &asn1File, bool generateFunction) const
+void SedsToIvTranslator::translatePackage(const seds::model::Package &package, IVModel *model,
+        Asn1Acn::Definitions *asn1Definitions, bool generateFunction) const
 {
-    ComponentsTranslator componentsTranslator(package, asn1File);
+    ComponentsTranslator componentsTranslator(package, asn1Definitions);
     auto components = componentsTranslator.translateComponents();
 
     if (generateFunction) {

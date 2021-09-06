@@ -18,7 +18,8 @@ target_link_libraries(SedsToIvTranslator
     PUBLIC      Conversion::Common
                 ivcore
                 asn1library
-                SEDS::Model)
+                SEDS::Model
+                Conversion::SedsToAsn1Translator)
 
 add_format_target(SedsToIvTranslator)
 

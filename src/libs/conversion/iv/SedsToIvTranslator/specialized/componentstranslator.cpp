@@ -32,9 +32,9 @@ using conversion::translator::UnhandledValueException;
 
 namespace conversion::iv::translator {
 
-ComponentsTranslator::ComponentsTranslator(const seds::model::Package &package, Asn1Acn::File &asn1File)
+ComponentsTranslator::ComponentsTranslator(const seds::model::Package &package, Asn1Acn::Definitions *asn1Definitions)
     : m_package(package)
-    , m_asn1File(asn1File)
+    , m_asn1Definitions(asn1Definitions)
 {
 }
 
@@ -73,7 +73,8 @@ void ComponentsTranslator::translateInterface(const seds::model::Interface &inte
     const auto &interfaceTypeName = interface.type().nameStr();
     const auto &interfaceDeclaration = findInterfaceDeclaration(interfaceTypeName, component);
 
-    AsyncInterfaceCommandTranslator asyncCommandTranslator(interface.genericTypeMapSet(), ivFunction);
+    AsyncInterfaceCommandTranslator asyncCommandTranslator(
+            m_package, component, interface, ivFunction, m_asn1Definitions);
 
     for (const auto &command : interfaceDeclaration.commands()) {
         switch (command.mode()) {

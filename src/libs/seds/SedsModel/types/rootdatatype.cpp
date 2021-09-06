@@ -23,4 +23,9 @@ namespace seds::model {
 
 RootDataType::~RootDataType() = default;
 
+const QString &RootDataType::nameStr() const
+{
+    return name().value();
+}
+
 } // namespace seds::model

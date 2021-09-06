@@ -23,7 +23,7 @@
 #include <ivcore/ivinterface.h>
 
 namespace Asn1Acn {
-class File;
+class Definitions;
 } // namespace Asn1Acn
 
 namespace ivm {
@@ -48,10 +48,10 @@ public:
     /**
      * @brief   Constructor
      *
-     * @param   package     Package with components to translate
-     * @param   asn1File    ASN.1 file where types of the packed argument will be saved
+     * @param   package             Package with components to translate
+     * @param   asn1Definitions     ASN.1 file where types of the packed argument will be saved
      */
-    ComponentsTranslator(const seds::model::Package &package, Asn1Acn::File &asn1File);
+    ComponentsTranslator(const seds::model::Package &package, Asn1Acn::Definitions *asn1Definitions);
     /**
      * @brief   Deleted copy constructor
      */
@@ -83,7 +83,7 @@ private:
 
 private:
     const seds::model::Package &m_package;
-    Asn1Acn::File &m_asn1File;
+    Asn1Acn::Definitions *m_asn1Definitions;
 };
 
 } // namespace conversion::iv::translator
