@@ -60,8 +60,11 @@ void tst_SedsToIvTranslator::testTranslateComponentWithProvidedInterface()
 
     SedsToIvTranslator translator;
 
-    const auto resultModel = translator.translateModels({ sedsModel.get() }, options);
-    QVERIFY(resultModel);
+    const auto resultModels = translator.translateModels({ sedsModel.get() }, options);
+    QCOMPARE(resultModels.size(), 2);
+
+    const auto &resultModel = resultModels[0];
+    QCOMPARE(resultModel->modelType(), conversion::ModelType::InterfaceView);
 
     const auto *ivModel = dynamic_cast<IVModel *>(resultModel.get());
     QVERIFY(ivModel);
@@ -76,13 +79,6 @@ void tst_SedsToIvTranslator::testTranslateComponentWithProvidedInterface()
     QVERIFY(interface);
     QVERIFY(interface->isProvided());
     QCOMPARE(interface->title(), "ICommand");
-
-    const auto params = interface->params();
-    QCOMPARE(params.size(), 1);
-
-    const auto &param = params[0];
-    QVERIFY(param.isInDirection());
-    QCOMPARE(param.name(), "CmdArg");
 }
 
 void tst_SedsToIvTranslator::testTranslateComponentWithRequiredInterface()
@@ -94,8 +90,11 @@ void tst_SedsToIvTranslator::testTranslateComponentWithRequiredInterface()
 
     SedsToIvTranslator translator;
 
-    const auto resultModel = translator.translateModels({ sedsModel.get() }, options);
-    QVERIFY(resultModel);
+    const auto resultModels = translator.translateModels({ sedsModel.get() }, options);
+    QCOMPARE(resultModels.size(), 2);
+
+    const auto &resultModel = resultModels[0];
+    QCOMPARE(resultModel->modelType(), conversion::ModelType::InterfaceView);
 
     const auto *ivModel = dynamic_cast<IVModel *>(resultModel.get());
     QVERIFY(ivModel);
@@ -110,19 +109,13 @@ void tst_SedsToIvTranslator::testTranslateComponentWithRequiredInterface()
     QVERIFY(interface);
     QVERIFY(interface->isRequired());
     QCOMPARE(interface->title(), "ICommand");
-
-    const auto params = interface->params();
-    QCOMPARE(params.size(), 1);
-
-    const auto &param = params[0];
-    QVERIFY(param.isInDirection());
-    QCOMPARE(param.name(), "CmdArg");
 }
 
 std::unique_ptr<SedsModel> tst_SedsToIvTranslator::createComponentWithProvidedInterface()
 {
     CommandArgument argument;
     argument.setName(QStringLiteral("CmdArg"));
+    argument.setType(QStringLiteral("GenericType"));
     argument.setMode(CommandArgumentMode::In);
 
     InterfaceCommand command;
@@ -134,18 +127,30 @@ std::unique_ptr<SedsModel> tst_SedsToIvTranslator::createComponentWithProvidedIn
     interfaceDeclaration.setName(QStringLiteral("ProvidedInterface"));
     interfaceDeclaration.addCommand(std::move(command));
 
+    GenericTypeMap genericTypeMap;
+    genericTypeMap.setName(QStringLiteral("GenericType"));
+    genericTypeMap.setType(QStringLiteral("MyInteger"));
+
+    GenericTypeMapSet genericTypeMapSet;
+    genericTypeMapSet.addGenericTypeMap(std::move(genericTypeMap));
+
     Interface interface;
     interface.setName(QStringLiteral("Interface"));
     interface.setType(QStringLiteral("ProvidedInterface"));
+    interface.setGenericTypeMapSet(std::move(genericTypeMapSet));
 
     Component component;
     component.setName(QStringLiteral("Component"));
     component.addInterfaceDeclaration(std::move(interfaceDeclaration));
     component.addProvidedInterface(std::move(interface));
 
+    IntegerDataType integerDataType;
+    integerDataType.setName(QStringLiteral("MyInteger"));
+
     Package package;
     package.setName(QStringLiteral("Package"));
     package.addComponent(std::move(component));
+    package.addDataType(std::move(integerDataType));
 
     PackageFile packageFile;
     packageFile.setPackage(std::move(package));
@@ -157,6 +162,7 @@ std::unique_ptr<SedsModel> tst_SedsToIvTranslator::createComponentWithRequiredIn
 {
     CommandArgument argument;
     argument.setName(QStringLiteral("CmdArg"));
+    argument.setType(QStringLiteral("GenericType"));
     argument.setMode(CommandArgumentMode::In);
 
     InterfaceCommand command;
@@ -168,18 +174,30 @@ std::unique_ptr<SedsModel> tst_SedsToIvTranslator::createComponentWithRequiredIn
     interfaceDeclaration.setName(QStringLiteral("RequiredInterface"));
     interfaceDeclaration.addCommand(std::move(command));
 
+    GenericTypeMap genericTypeMap;
+    genericTypeMap.setName(QStringLiteral("GenericType"));
+    genericTypeMap.setType(QStringLiteral("MyInteger"));
+
+    GenericTypeMapSet genericTypeMapSet;
+    genericTypeMapSet.addGenericTypeMap(std::move(genericTypeMap));
+
     Interface interface;
     interface.setName(QStringLiteral("Interface"));
     interface.setType(QStringLiteral("RequiredInterface"));
+    interface.setGenericTypeMapSet(std::move(genericTypeMapSet));
 
     Component component;
     component.setName(QStringLiteral("Component"));
     component.addInterfaceDeclaration(std::move(interfaceDeclaration));
     component.addRequiredInterface(std::move(interface));
 
+    IntegerDataType integerDataType;
+    integerDataType.setName(QStringLiteral("MyInteger"));
+
     Package package;
     package.setName(QStringLiteral("Package"));
     package.addComponent(std::move(component));
+    package.addDataType(std::move(integerDataType));
 
     PackageFile packageFile;
     packageFile.setPackage(std::move(package));
