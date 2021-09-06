@@ -49,6 +49,7 @@ public:
         // attrs:
         name,
         value,
+        url,
 
         from_node,
         from_port,

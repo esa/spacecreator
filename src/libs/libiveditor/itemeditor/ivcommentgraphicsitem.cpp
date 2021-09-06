@@ -18,11 +18,14 @@
 #include "ivcommentgraphicsitem.h"
 
 #include "colors/colormanager.h"
+#include "commands/cmdentityattributechange.h"
+#include "commandsstackbase.h"
 #include "graphicsitemhelpers.h"
 #include "graphicsviewutils.h"
 #include "itemeditor/common/ivutils.h"
 #include "ivcomment.h"
 #include "ivfunctiongraphicsitem.h"
+#include "ivnamevalidator.h"
 #include "ui/textitem.h"
 
 #include <QApplication>
@@ -48,33 +51,11 @@ IVCommentGraphicsItem::IVCommentGraphicsItem(ivm::IVComment *comment, QGraphicsI
 void IVCommentGraphicsItem::init()
 {
     shared::ui::VERectGraphicsItem::init();
-    connect(entity(), &ivm::IVObject::titleChanged, this, &shared::ui::VEInteractiveObject::updateGraphicsItem);
-}
-
-void IVCommentGraphicsItem::updateFromEntity()
-{
-    shared::ui::VERectGraphicsItem::updateFromEntity();
-    setText(entity()->titleUI());
 }
 
 int IVCommentGraphicsItem::itemLevel(bool isSelected) const
 {
     return gi::itemLevel(entity(), isSelected);
-}
-
-void IVCommentGraphicsItem::setText(const QString &text)
-{
-    if (m_text == text)
-        return;
-
-    m_text = text;
-
-    instantLayoutUpdate();
-}
-
-QString IVCommentGraphicsItem::text() const
-{
-    return m_text;
 }
 
 ivm::IVComment *IVCommentGraphicsItem::entity() const
@@ -91,7 +72,6 @@ void IVCommentGraphicsItem::paint(QPainter *painter, const QStyleOptionGraphicsI
     painter->setRenderHint(QPainter::Antialiasing);
     painter->setPen(pen());
     painter->setBrush(brush());
-    painter->setFont(font());
 
     const QRectF br = boundingRect();
     auto preparePolygon = [](const QRectF &rect) {
@@ -105,9 +85,6 @@ void IVCommentGraphicsItem::paint(QPainter *painter, const QStyleOptionGraphicsI
             rect.topRight() - QPointF(kMargins, -kMargins), rect.topRight() - QPointF(kMargins, 0) };
     };
     painter->drawPolyline(preparePolyline(br));
-
-    shared::graphicsviewutils::drawText(painter, br, m_text, kMargins);
-
     painter->restore();
     shared::ui::VERectGraphicsItem::paint(painter, option, widget);
 }
@@ -130,6 +107,23 @@ shared::ColorManager::HandledColors IVCommentGraphicsItem::handledColorType() co
     return shared::ColorManager::HandledColors::Comment;
 }
 
+shared::ui::TextItem *IVCommentGraphicsItem::initTextItem()
+{
+    auto textItem = new shared::ui::TextItem(this);
+    connect(entity(), &ivm::IVObject::titleChanged, this, &IVCommentGraphicsItem::updateText);
+    connect(textItem, &shared::ui::TextItem::edited, this, &IVCommentGraphicsItem::updateEntityTitle);
+    textItem->setTextMargin(kMargins);
+    textItem->setTextAlignment(Qt::AlignTop | Qt::AlignLeft);
+    textItem->setFont(font());
+    textItem->setTextWrapMode(QTextOption::WordWrap);
+    textItem->setFlags(QGraphicsItem::ItemClipsToShape);
+    textItem->setTextInteractionFlags(Qt::NoTextInteraction);
+    textItem->setBackground(Qt::transparent);
+    textItem->setOpenExternalLinks(true);
+    textItem->setHtml(entity()->titleUI());
+    return textItem;
+}
+
 void IVCommentGraphicsItem::applyColorScheme()
 {
     const shared::ColorHandler &h = colorHandler();
@@ -139,6 +133,26 @@ void IVCommentGraphicsItem::applyColorScheme()
     setPen(pen);
     setBrush(h.brush());
     update();
+}
+
+void IVCommentGraphicsItem::updateEntityTitle(const QString &text)
+{
+    if (text == entity()->title()) {
+        return;
+    }
+
+    Q_ASSERT(!m_commandsStack.isNull());
+    if (m_commandsStack.isNull()) {
+        qWarning() << "Command stack not set for IVCommentGraphicsItem";
+        return;
+    }
+
+    const QString newName = ivm::IVNameValidator::encodeName(entity()->type(), text);
+    if (!ivm::IVNameValidator::isAcceptableName(entity(), newName)) {
+        return;
+    }
+    const QVariantHash attributes = { { ivm::meta::Props::token(ivm::meta::Props::Token::name), newName } };
+    m_commandsStack->push(new shared::cmd::CmdEntityAttributeChange(entity(), attributes));
 }
 
 }

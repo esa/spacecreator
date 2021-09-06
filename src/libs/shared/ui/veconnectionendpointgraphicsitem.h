@@ -62,6 +62,7 @@ protected:
     virtual QPainterPath itemPath(Qt::Alignment alignment) const;
     virtual QList<QPair<Qt::Alignment, QPainterPath>> sidePaths() const;
     virtual shared::graphicsviewutils::LookupDirection lookupType() const;
+    void updateTextPosition() override;
 
 protected:
     QList<QPointer<VEConnectionGraphicsItem>> m_connections;

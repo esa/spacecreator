@@ -18,6 +18,7 @@
 #include "dvobject.h"
 
 #include "dvmodel.h"
+#include "dvnamevalidator.h"
 
 #include <QVector>
 
@@ -37,11 +38,6 @@ DVObject::DVObject(const DVObject::Type t, const QString &title, QObject *parent
     , d(new DVObjectPrivate(t))
 {
     setEntityAttribute(meta::Props::token(meta::Props::Token::name), title);
-    connect(this, &shared::VEObject::attributeChanged, this, [this](const QString &name) {
-        if (name == meta::Props::token(meta::Props::Token::name)) {
-            Q_EMIT titleChanged(this->title());
-        }
-    });
 }
 
 DVObject::~DVObject() { }
@@ -53,7 +49,13 @@ QString DVObject::title() const
 
 QString DVObject::titleUI() const
 {
-    return title();
+    QString text = DVNameValidator::decodeName(type(), title());
+    static const QString urlAttrName { dvm::meta::Props::token(dvm::meta::Props::Token::url) };
+    if (hasEntityAttribute(urlAttrName)) {
+        const QString url = entityAttributeValue<QString>(urlAttrName);
+        text = QStringLiteral("<a href=\"%1\">%2</a>").arg(url, text);
+    }
+    return text;
 }
 
 DVObject::Type DVObject::type() const
@@ -79,6 +81,37 @@ bool DVObject::setParentObject(DVObject *parentObject)
     return true;
 }
 
+void DVObject::setAttributeImpl(const QString &name, const QVariant &value, EntityAttribute::Type type)
+{
+    EntityAttribute attr = entityAttribute(name);
+    if (attr.isValid() && attr.value() == value) {
+        return;
+    }
+    const meta::Props::Token token = meta::Props::token(name);
+    switch (token) {
+        case meta::Props::Token::name: {
+            attr = EntityAttribute { name, value, type };
+            QString usedName = value.value<QString>();
+            if (usedName.isEmpty()) {
+                usedName = DVNameValidator::nameForObject(this);
+                attr.setValue(usedName);
+            }
+            VEObject::setAttributeImpl(attr.name(), attr.value(), attr.type());
+            Q_EMIT titleChanged(usedName);
+            break;
+        }
+        default: {
+            VEObject::setAttributeImpl(name, value, type);
+            if (meta::Props::Token::coordinates == token) {
+                Q_EMIT coordinatesChanged(value.value<QVector<qint32>>());
+            } else if (meta::Props::Token::url == token) {
+                Q_EMIT urlChanged(value.toString());
+            }
+            break;
+        }
+    }
+}
+
 QVector<qint32> DVObject::coordinates() const
 {
     const meta::Props::Token token = meta::Props::Token::coordinates;
@@ -93,7 +126,6 @@ void DVObject::setCoordinates(const QVector<qint32> &coordinates)
 
     const meta::Props::Token token = meta::Props::Token::coordinates;
     setEntityProperty(meta::Props::token(token), coordinatesToString(coordinates));
-    Q_EMIT coordinatesChanged(coordinates);
 }
 
 DVObject *DVObject::parentObject() const

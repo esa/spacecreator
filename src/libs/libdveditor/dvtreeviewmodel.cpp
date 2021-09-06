@@ -32,12 +32,13 @@ DVTreeViewModel::DVTreeViewModel(dvm::DVModel *dvModel, shared::cmd::CommandsSta
 
 void DVTreeViewModel::updateItemData(QStandardItem *item, shared::VEObject *object)
 {
-    shared::AbstractVisualizationModel::updateItemData(item, object);
 
     dvm::DVObject *obj = qobject_cast<dvm::DVObject *>(object);
     if (!obj) {
         return;
     }
+    item->setData(dvm::DVNameValidator::decodeName(obj->type(), obj->title()), Qt::DisplayRole);
+
     QPixmap pix;
     switch (obj->type()) {
     case dvm::DVObject::Type::Connection: {
@@ -106,7 +107,7 @@ void DVTreeViewModel::onDataChanged(const QModelIndex &topLeft, const QModelInde
                             auto attributesCmd = new shared::cmd::CmdEntityAttributeChange(obj, attributes);
                             m_commandsStack->push(attributesCmd);
                         } else {
-                            item->setData(obj->titleUI(), Qt::DisplayRole);
+                            updateItemData(item, obj);
                         }
                     }
                 }

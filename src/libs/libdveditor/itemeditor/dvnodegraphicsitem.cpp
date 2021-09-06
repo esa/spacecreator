@@ -17,11 +17,17 @@
 
 #include "dvnodegraphicsitem.h"
 
+#include "commands/cmdentityattributechange.h"
+#include "commandsstackbase.h"
 #include "dvconnectiongraphicsitem.h"
 #include "dvdevicegraphicsitem.h"
+#include "dvnamevalidator.h"
 #include "graphicsviewutils.h"
+#include "ui/textitem.h"
 
 #include <QPainter>
+#include <QTextDocument>
+#include <QtDebug>
 
 namespace dve {
 
@@ -33,14 +39,6 @@ DVNodeGraphicsItem::DVNodeGraphicsItem(dvm::DVNode *entity, QGraphicsItem *paren
 dvm::DVNode *dve::DVNodeGraphicsItem::entity() const
 {
     return m_dataObject.isNull() ? nullptr : m_dataObject->as<dvm::DVNode *>();
-}
-
-void DVNodeGraphicsItem::init()
-{
-    connect(entity(), &dvm::DVNode::attributeChanged, this, [this](const QString &attrName) {
-        if (attrName == dvm::meta::Props::token(dvm::meta::Props::Token::name))
-            update();
-    });
 }
 
 void DVNodeGraphicsItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget)
@@ -58,9 +56,6 @@ void DVNodeGraphicsItem::paint(QPainter *painter, const QStyleOptionGraphicsItem
     const QRectF br = boundingRect();
     painter->drawRoundedRect(br, 5, 5);
     painter->drawRoundedRect(br.adjusted(2, 2, -2, -2), 4, 4);
-    painter->setFont(font());
-    painter->setPen(QPen(Qt::black));
-    painter->drawText(br.adjusted(20, 20, -20, -20), Qt::AlignLeft | Qt::AlignTop, entity()->titleUI());
     painter->restore();
 }
 
@@ -101,6 +96,36 @@ void DVNodeGraphicsItem::applyColorScheme()
     setPen(pen);
     setBrush(h.brush());
     update();
+}
+
+shared::ui::TextItem *DVNodeGraphicsItem::initTextItem()
+{
+    auto textItem = shared::ui::VERectGraphicsItem::initTextItem();
+    connect(entity(), &dvm::DVObject::titleChanged, this, &DVNodeGraphicsItem::updateText);
+    connect(entity(), &dvm::DVObject::urlChanged, this, &DVNodeGraphicsItem::updateText);
+    connect(textItem, &shared::ui::TextItem::edited, this, &DVNodeGraphicsItem::updateEntityTitle);
+    textItem->setHtml(entity()->titleUI());
+    return textItem;
+}
+
+void DVNodeGraphicsItem::updateEntityTitle(const QString &text)
+{
+    const QString newName = dvm::DVNameValidator::encodeName(entity()->type(), text);
+    if (newName == entity()->title()) {
+        return;
+    }
+
+    Q_ASSERT(!m_commandsStack.isNull());
+    if (m_commandsStack.isNull()) {
+        qWarning() << "Command stack not set for DVNodeGraphicsItem";
+        return;
+    }
+
+    if (!dvm::DVNameValidator::isAcceptableName(entity(), newName)) {
+        return;
+    }
+    const QVariantHash attributes = { { dvm::meta::Props::token(dvm::meta::Props::Token::name), newName } };
+    m_commandsStack->push(new shared::cmd::CmdEntityAttributeChange(entity(), attributes));
 }
 
 } // namespace dve

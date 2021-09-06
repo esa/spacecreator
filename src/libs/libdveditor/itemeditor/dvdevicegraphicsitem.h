@@ -46,7 +46,6 @@ public:
         Type = UserType + static_cast<int>(dvm::DVObject::Type::Device)
     };
 
-    void init() override;
     dvm::DVDevice *entity() const override;
 
     int type() const override { return Type; }
@@ -65,12 +64,12 @@ protected:
     void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget) override;
     shared::ColorManager::HandledColors handledColorType() const override;
     void updateInternalItems(Qt::Alignment alignment) override;
+    void updateTextPosition() override;
 
-    QList<QPair<Qt::Alignment, QPainterPath> > sidePaths() const override;
+    QList<QPair<Qt::Alignment, QPainterPath>> sidePaths() const override;
     shared::graphicsviewutils::LookupDirection lookupType() const override;
-
-private:
-    shared::ui::TextItem *m_textItem { nullptr };
+    shared::ui::TextItem *initTextItem() override;
+    void updateEntityTitle(const QString &text);
 };
 
 } // namespace dve

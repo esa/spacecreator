@@ -23,6 +23,12 @@
 
 class QSvgRenderer;
 
+namespace shared {
+namespace ui {
+class TextItem;
+}
+}
+
 namespace ive {
 class IVInterfaceGraphicsItem;
 class MiniViewRenderer;
@@ -57,6 +63,7 @@ protected:
     void prepareTextRect(QRectF &textRect, const QRectF &targetTextRect) const override;
 
     virtual shared::ColorManager::HandledColors handledColorType() const override;
+    shared::ui::TextItem *initTextItem() override;
 
 protected Q_SLOTS:
     void applyColorScheme() override;

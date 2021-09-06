@@ -24,6 +24,8 @@
 #include "itemeditor/ivinterfacegraphicsitem.h"
 #include "iveditor.h"
 #include "sharedlibrary.h"
+#include "ivpropertytemplateconfig.h"
+#include "ivmodel.h"
 
 #include <QDebug>
 #include <QGraphicsScene>
@@ -51,22 +53,37 @@ void tst_IVConnectionGraphicsItem::initTestCase()
 
 void tst_IVConnectionGraphicsItem::tst_Overlapping()
 {
+    auto cfg = ivm::IVPropertyTemplateConfig::instance();
+    cfg->init(QLatin1String("default_attributes.xml"));
+    ivm::IVModel model(cfg);
+
+    ivm::IVInterface::CreationInfo ifc;
+    ifc.model = &model;
+
     QGraphicsScene scene;
-    auto parentFunc1 = new ive::IVFunctionGraphicsItem(nullptr);
+    auto parentFunc1 = new ive::IVFunctionGraphicsItem(new ivm::IVFunction);
     scene.addItem(parentFunc1);
     parentFunc1->setBoundingRect(QRectF(0., 0., 200., 200.));
-    auto ifaceItem1 = new ive::IVInterfaceGraphicsItem(nullptr, parentFunc1);
+
+    ifc.function = parentFunc1->entity();
+    ifc.type = ivm::IVInterface::InterfaceType::Provided;
+    auto ifaceItem1 = new ive::IVInterfaceGraphicsItem(ivm::IVInterface::createIface(ifc), parentFunc1);
+    ifaceItem1->init();
     ifaceItem1->setBoundingRect(QRectF(0, 0, 10, 10));
     ifaceItem1->setPos(parentFunc1->mapFromScene(QPointF(100, 0)));
 
-    auto parentFunc2 = new ive::IVFunctionGraphicsItem(nullptr);
+    auto parentFunc2 = new ive::IVFunctionGraphicsItem(new ivm::IVFunction);
     scene.addItem(parentFunc2);
+
+    ifc.function = parentFunc1->entity();
+    ifc.type = ivm::IVInterface::InterfaceType::Required;
     parentFunc2->setBoundingRect(QRectF(400., 0., 200., 200.));
-    auto ifaceItem2 = new ive::IVInterfaceGraphicsItem(nullptr, parentFunc2);
+    auto ifaceItem2 = new ive::IVInterfaceGraphicsItem(ivm::IVInterface::createIface(ifc), parentFunc2);
+    ifaceItem2->init();
     ifaceItem2->setBoundingRect(QRectF(0, 0, 10, 10));
     ifaceItem2->setPos(parentFunc2->mapFromScene(QPointF(500, 0)));
 
-    auto connection = new ive::IVConnectionGraphicsItem(nullptr, ifaceItem1, ifaceItem2);
+    auto connection = new ive::IVConnectionGraphicsItem(new ivm::IVConnection(ifaceItem1->entity(), ifaceItem2->entity()), ifaceItem1, ifaceItem2);
     scene.addItem(connection);
     connection->init();
     ifaceItem1->addConnection(connection);

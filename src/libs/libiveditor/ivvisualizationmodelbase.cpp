@@ -46,7 +46,7 @@ void IVVisualizationModelBase::updateItemData(QStandardItem *item, shared::VEObj
         return;
     }
 
-    QString title = obj->titleUI();
+    QString title = ivm::IVNameValidator::decodeName(obj->type(), obj->title());
     QPixmap pix;
     QFont font;
     QPixmap dragPix;
@@ -231,7 +231,7 @@ void IVVisualizationModel::onDataChanged(
                                 auto attributesCmd = new shared::cmd::CmdEntityAttributeChange(obj, attributes);
                                 m_commandsStack->push(attributesCmd);
                             } else {
-                                item->setData(obj->titleUI(), Qt::DisplayRole);
+                                updateItemData(item, obj);
                             }
                         }
                     }

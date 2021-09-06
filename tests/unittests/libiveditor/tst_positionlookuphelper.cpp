@@ -80,6 +80,7 @@ void tst_PositionLookupHelper::initTestCase()
     scene = new QGraphicsScene;
     function = ivm::testutils::createFunction("Function");
     functionItem = new ive::IVFunctionGraphicsItem(function);
+    functionItem->init();
     scene->addItem(functionItem);
     functionItem->setBoundingRect(QRectF(0, 0, 500, 500));
     ivm::IVInterface::CreationInfo ci;
@@ -87,6 +88,7 @@ void tst_PositionLookupHelper::initTestCase()
     ci.function = function;
     iface = new ivm::IVInterfaceProvided(ci);
     ifaceItem = new ive::IVInterfaceGraphicsItem(iface, functionItem);
+    ifaceItem->init();
     ifaceItem->updateLabel();
 
     sidePaths = {

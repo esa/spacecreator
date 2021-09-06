@@ -20,10 +20,15 @@
 #include "colors/colormanager.h"
 #include "dvnode.h"
 #include "dvobject.h"
-#include "ui/veconnectiongraphicsitem.h"
 #include "ui/verectgraphicsitem.h"
 
 class QGraphicsItem;
+
+namespace shared {
+namespace ui {
+class TextItem;
+}
+}
 
 namespace dve {
 
@@ -42,7 +47,6 @@ public:
 
     int type() const override { return Type; }
     int itemLevel(bool isSelected) const override;
-    void init() override;
 
 protected Q_SLOTS:
     void applyColorScheme() override;
@@ -51,6 +55,8 @@ protected:
     void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget) override;
     shared::ColorManager::HandledColors handledColorType() const override;
     void rebuildLayout() override;
+    shared::ui::TextItem *initTextItem() override;
+    void updateEntityTitle(const QString &text);
 };
 
 } // namespace dve

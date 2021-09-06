@@ -17,7 +17,11 @@
 
 #include "dvpartitiongraphicsitem.h"
 
+#include "commands/cmdentityattributechange.h"
+#include "commandsstackbase.h"
+#include "dvnamevalidator.h"
 #include "graphicsviewutils.h"
+#include "ui/textitem.h"
 
 #include <QDebug>
 #include <QPainter>
@@ -31,13 +35,10 @@ DVPartitionGraphicsItem::DVPartitionGraphicsItem(dvm::DVPartition *partition, QG
 
 void DVPartitionGraphicsItem::init()
 {
+    shared::ui::VERectGraphicsItem::init();
     connect(entity(), &dvm::DVPartition::functionAdded, this, [this]() { update(); });
     connect(entity(), &dvm::DVPartition::functionRemoved, this, [this]() { update(); });
     connect(entity(), &dvm::DVPartition::functionChanged, this, [this]() { update(); });
-    connect(entity(), &dvm::DVPartition::attributeChanged, this, [this](const QString &attrName) {
-        if (attrName == dvm::meta::Props::token(dvm::meta::Props::Token::name))
-            update();
-    });
 }
 
 dvm::DVPartition *DVPartitionGraphicsItem::entity() const
@@ -81,15 +82,14 @@ void DVPartitionGraphicsItem::paint(QPainter *painter, const QStyleOptionGraphic
     QRectF br = boundingRect();
     painter->drawRect(br);
     painter->setFont(font());
-    painter->setPen(QPen(Qt::black));
-    QRectF titleRect;
-    painter->drawText(br, Qt::AlignHCenter | Qt::AlignTop, entity()->titleUI(), &titleRect);
 
     const QString functions = entity()->functionsNames().join(QLatin1Char('\n'));
-    br.setTop(titleRect.bottom());
     painter->setPen(QPen(Qt::gray));
     QFont f(font());
     f.setItalic(true);
+    if (m_textItem) {
+        br.setTop(mapFromItem(m_textItem, m_textItem->boundingRect().bottomLeft()).y());
+    }
     painter->drawText(br, Qt::AlignCenter, functions);
 
     painter->restore();
@@ -98,6 +98,36 @@ void DVPartitionGraphicsItem::paint(QPainter *painter, const QStyleOptionGraphic
 shared::ColorManager::HandledColors DVPartitionGraphicsItem::handledColorType() const
 {
     return shared::ColorManager::HandledColors::Partition;
+}
+
+shared::ui::TextItem *DVPartitionGraphicsItem::initTextItem()
+{
+    auto textItem = shared::ui::VERectGraphicsItem::initTextItem();
+    connect(entity(), &dvm::DVObject::titleChanged, this, &DVPartitionGraphicsItem::updateText);
+    connect(entity(), &dvm::DVObject::urlChanged, this, &DVPartitionGraphicsItem::updateText);
+    connect(textItem, &shared::ui::TextItem::edited, this, &DVPartitionGraphicsItem::updateEntityTitle);
+    textItem->setHtml(entity()->titleUI());
+    return textItem;
+}
+
+void DVPartitionGraphicsItem::updateEntityTitle(const QString &text)
+{
+    const QString newName = dvm::DVNameValidator::encodeName(entity()->type(), text);
+    if (newName == entity()->title()) {
+        return;
+    }
+
+    Q_ASSERT(!m_commandsStack.isNull());
+    if (m_commandsStack.isNull()) {
+        qWarning() << "Command stack not set for DVPartitionGraphicsItem";
+        return;
+    }
+
+    if (!dvm::DVNameValidator::isAcceptableName(entity(), newName)) {
+        return;
+    }
+    const QVariantHash attributes = { { dvm::meta::Props::token(dvm::meta::Props::Token::name), newName } };
+    m_commandsStack->push(new shared::cmd::CmdEntityAttributeChange(entity(), attributes));
 }
 
 } // namespace dve

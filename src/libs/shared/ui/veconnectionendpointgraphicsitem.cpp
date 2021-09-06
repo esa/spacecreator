@@ -18,6 +18,7 @@
 #include "veconnectionendpointgraphicsitem.h"
 
 #include "positionlookuphelper.h"
+#include "textitem.h"
 #include "veconnectiongraphicsitem.h"
 #include "veobject.h"
 #include "verectgraphicsitem.h"
@@ -125,7 +126,8 @@ void VEConnectionEndPointGraphicsItem::adjustItem()
         if (qobject_cast<const VEConnectionEndPointGraphicsItem *>(sibling->toGraphicsObject()) != nullptr
                 && sibling != this) {
             QRectF itemRect = sibling->boundingRect();
-            itemRect.adjust(-kSiblingMinDistance/2, -kSiblingMinDistance/2, kSiblingMinDistance/2, kSiblingMinDistance/2);
+            itemRect.adjust(-kSiblingMinDistance / 2, -kSiblingMinDistance / 2, kSiblingMinDistance / 2,
+                    kSiblingMinDistance / 2);
             itemRect = sibling->mapRectToParent(itemRect);
             siblingsRects.append(itemRect);
         }
@@ -241,7 +243,7 @@ QPainterPath VEConnectionEndPointGraphicsItem::itemPath(Qt::Alignment alignment)
     return shape();
 }
 
-QList<QPair<Qt::Alignment, QPainterPath> > VEConnectionEndPointGraphicsItem::sidePaths() const
+QList<QPair<Qt::Alignment, QPainterPath>> VEConnectionEndPointGraphicsItem::sidePaths() const
 {
     return {
         { Qt::AlignLeft, itemPath(Qt::AlignLeft) },
@@ -254,6 +256,13 @@ QList<QPair<Qt::Alignment, QPainterPath> > VEConnectionEndPointGraphicsItem::sid
 graphicsviewutils::LookupDirection VEConnectionEndPointGraphicsItem::lookupType() const
 {
     return graphicsviewutils::LookupDirection::Bidirectional;
+}
+
+void VEConnectionEndPointGraphicsItem::updateTextPosition()
+{
+    if (m_textItem) {
+        m_textItem->setPos(QPointF(0, 0));
+    }
 }
 
 } // namespace ui

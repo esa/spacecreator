@@ -31,6 +31,7 @@ class CommandsStackBase;
 }
 class VEObject;
 namespace ui {
+class TextItem;
 
 class VEInteractiveObject : public ui::InteractiveObjectBase
 {
@@ -65,7 +66,6 @@ Q_SIGNALS:
 
 public Q_SLOTS:
     virtual void applyColorScheme() = 0;
-    virtual void updateGraphicsItem();
 
 protected:
     void mouseMoveEvent(QGraphicsSceneMouseEvent *event) override;
@@ -80,9 +80,14 @@ protected:
     virtual ColorManager::HandledColors handledColorType() const = 0;
     virtual ColorHandler colorHandler() const;
 
+    virtual TextItem *initTextItem();
+    virtual void updateTextPosition();
+    void updateText();
+
 protected:
     const QPointer<VEObject> m_dataObject;
     QPointer<cmd::CommandsStackBase> m_commandsStack;
+    TextItem *m_textItem;
 
     QBrush m_brush;
     QPen m_pen;

@@ -38,8 +38,6 @@ public:
 
     ivm::IVFunctionType *entity() const override;
 
-    void init() override;
-
     void enableEditMode() override;
 
     QSizeF minimalSize() const override;
@@ -49,6 +47,8 @@ public:
     bool isRootItem() const;
 
     int itemLevel(bool isSelected) const override;
+
+    void init() override;
 
 protected Q_SLOTS:
     void applyColorScheme() override;
@@ -60,7 +60,7 @@ protected:
     void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget) override;
     shared::ColorManager::HandledColors handledColorType() const override;
 
-    virtual void updateTextPosition();
+    void updateTextPosition() override;
 
     template<class Type>
     static QString uniteNames(const QVector<Type> &collection, const QString &prefix)
@@ -81,8 +81,7 @@ protected:
 
     virtual void prepareTextRect(QRectF &textRect, const QRectF &targetTextRect) const;
 
-protected:
-    IVFunctionNameGraphicsItem *m_textItem = nullptr;
+    shared::ui::TextItem *initTextItem() override;
 };
 
 }

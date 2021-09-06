@@ -23,6 +23,12 @@
 
 class QGraphicsItem;
 
+namespace shared {
+namespace ui {
+class TextItem;
+}
+}
+
 namespace dve {
 
 class DVPartitionGraphicsItem : public shared::ui::VERectGraphicsItem
@@ -49,6 +55,8 @@ protected Q_SLOTS:
 protected:
     void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget) override;
     shared::ColorManager::HandledColors handledColorType() const override;
+    shared::ui::TextItem *initTextItem() override;
+    void updateEntityTitle(const QString &text);
 };
 
 } // namespace dve

@@ -21,6 +21,7 @@
 #include "commands/cmdentityautolayout.h"
 #include "commands/cmdentitygeometrychange.h"
 #include "commandsstackbase.h"
+#include "textitem.h"
 #include "veobject.h"
 
 #include <QDebug>
@@ -33,6 +34,7 @@ namespace ui {
 VEInteractiveObject::VEInteractiveObject(VEObject *entity, QGraphicsItem *parent)
     : ui::InteractiveObjectBase(parent)
     , m_dataObject(entity)
+    , m_textItem(nullptr)
 {
     setAcceptHoverEvents(true);
     setFlags(QGraphicsItem::ItemSendsGeometryChanges | QGraphicsItem::ItemSendsScenePositionChanges
@@ -42,6 +44,8 @@ VEInteractiveObject::VEInteractiveObject(VEObject *entity, QGraphicsItem *parent
 
     connect(shared::ColorManager::instance(), &shared::ColorManager::colorsUpdated, this,
             &VEInteractiveObject::applyColorScheme);
+
+    connect(this, &VEInteractiveObject::boundingBoxChanged, this, &VEInteractiveObject::updateTextPosition);
 }
 
 shared::VEObject *VEInteractiveObject::entity() const
@@ -97,6 +101,7 @@ void VEInteractiveObject::setFont(const QFont &font)
 
 void VEInteractiveObject::init()
 {
+    m_textItem = initTextItem();
     applyColorScheme();
 }
 
@@ -146,12 +151,6 @@ void VEInteractiveObject::setPen(const QPen &pen)
     m_pen = pen;
 }
 
-void VEInteractiveObject::updateGraphicsItem()
-{
-    updateFromEntity();
-    update();
-}
-
 void VEInteractiveObject::mouseMoveEvent(QGraphicsSceneMouseEvent *event)
 {
     QGraphicsObject::mouseMoveEvent(event);
@@ -191,6 +190,25 @@ shared::ColorHandler VEInteractiveObject::colorHandler() const
     return h;
 }
 
+TextItem *VEInteractiveObject::initTextItem()
+{
+    auto textItem = new TextItem(this);
+    textItem->setEditable(true);
+    textItem->setFont(font());
+    textItem->setBackground(Qt::transparent);
+    textItem->setTextWrapMode(QTextOption::WrapAnywhere);
+    textItem->setTextInteractionFlags(Qt::TextBrowserInteraction);
+    textItem->setOpenExternalLinks(true);
+    return textItem;
+}
+
+void VEInteractiveObject::updateTextPosition()
+{
+    if (m_textItem) {
+        m_textItem->setExplicitSize(boundingRect().size());
+    }
+}
+
 void VEInteractiveObject::setCommandsStack(cmd::CommandsStackBase *commandsStack)
 {
     m_commandsStack = commandsStack;
@@ -199,6 +217,12 @@ void VEInteractiveObject::setCommandsStack(cmd::CommandsStackBase *commandsStack
 QString VEInteractiveObject::prepareTooltip() const
 {
     return entity() ? entity()->titleUI() : QString();
+}
+
+void VEInteractiveObject::updateText()
+{
+    m_textItem->setHtml(entity()->titleUI());
+    updateTextPosition();
 }
 
 }

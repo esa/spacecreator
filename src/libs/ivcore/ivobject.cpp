@@ -59,7 +59,13 @@ QString IVObject::title() const
 
 QString IVObject::titleUI() const
 {
-    return IVNameValidator::decodeName(type(), title());
+    QString text = IVNameValidator::decodeName(type(), title());
+    static const QString urlAttrName { ivm::meta::Props::token(ivm::meta::Props::Token::url) };
+    if (hasEntityAttribute(urlAttrName)) {
+        const QString url = entityAttributeValue<QString>(urlAttrName);
+        text = QStringLiteral("<a href=\"%1\">%2</a>").arg(url, text);
+    }
+    return text;
 }
 
 bool IVObject::postInit()
@@ -122,7 +128,6 @@ void IVObject::setCoordinates(const QVector<qint32> &coordinates)
 
     const meta::Props::Token token = coordinatesType();
     setEntityProperty(meta::Props::token(token), coordinatesToString(coordinates));
-    Q_EMIT coordinatesChanged(coordinates);
 }
 
 meta::Props::Token IVObject::coordinatesType() const
@@ -266,9 +271,21 @@ void IVObject::setAttributeImpl(const QString &attributeName, const QVariant &va
             Q_EMIT visibilityChanged(value.value<bool>());
             break;
         }
+        case meta::Props::Token::url: {
+            VEObject::setAttributeImpl(attr.name(), attr.value(), attr.type());
+            Q_EMIT urlChanged(value.value<QString>());
+            break;
+        }
         case meta::Props::Token::group_name: {
             VEObject::setAttributeImpl(attr.name(), attr.value(), attr.type());
             Q_EMIT groupChanged(value.value<QString>());
+            break;
+        }
+        case meta::Props::Token::RootCoordinates:
+        case meta::Props::Token::InnerCoordinates:
+        case meta::Props::Token::coordinates: {
+            VEObject::setAttributeImpl(attr.name(), attr.value(), attr.type());
+            Q_EMIT coordinatesChanged(value.value<QVector<qint32>>());
             break;
         }
         case meta::Props::Token::name: {
