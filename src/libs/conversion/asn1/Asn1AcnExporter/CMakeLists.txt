@@ -4,12 +4,14 @@ set(SOURCES exporter.cpp
             visitors/acnnodereconstructingvisitor.cpp
             visitors/acntypecomponentreconstructingvisitor.cpp
             visitors/asn1nodereconstructingvisitor.cpp
-            visitors/asn1typecomponentreconstructingvisitor.cpp)
+            visitors/asn1typecomponentreconstructingvisitor.cpp
+            visitors/typeconstraintsreconstructingvisitor.cpp)
 set(INCLUDES exporter.h
              visitors/acnnodereconstructingvisitor.h
              visitors/acntypecomponentreconstructingvisitor.h
              visitors/asn1nodereconstructingvisitor.h
-             visitors/asn1typecomponentreconstructingvisitor.h)
+             visitors/asn1typecomponentreconstructingvisitor.h
+             visitors/typeconstraintsreconstructingvisitor.h)
 
 add_library(Asn1Exporter STATIC)
 target_sources(Asn1Exporter
