@@ -98,7 +98,7 @@ private slots:
     void test_typeAssignmentBooleanAcnParams();
 
 private:
-    std::unique_ptr<Data::Definitions> createDefinitions(const QString &name) const;
+    std::unique_ptr<Definitions> createDefinitions(const QString &name) const;
 
     QString createSingleValueValueAssignmentValue(
         const QString &typeName,
