@@ -15,32 +15,28 @@
    along with this program. If not, see <https://www.gnu.org/licenses/lgpl-2.1.html>.
 */
 
-#pragma once
-
-#include "exportabledvobject.h"
-
-namespace dvm {
-class DVObject;
-}
+#include "exportablebusaccess.h"
 
 namespace dve {
 
-class ExportableDVNode : public ExportableDVObject
+const QString &ExportableBusAccess::name() const
 {
-    Q_GADGET
-    Q_PROPERTY(QVariantList partitions READ partitions)
-    Q_PROPERTY(QVariantList devices READ devices)
-    Q_PROPERTY(QVariantList requiredBusAccesses READ requiredBusAccesses)
+    return m_name;
+}
 
-public:
-    explicit ExportableDVNode(const dvm::DVObject *dvObject = nullptr);
+void ExportableBusAccess::setName(const QString &name)
+{
+    m_name = name;
+}
 
-    QVariantList partitions() const;
-    QVariantList devices() const;
-    QVariantList requiredBusAccesses() const;
-};
+const QString &ExportableBusAccess::busName() const
+{
+    return m_busName;
+}
+
+void ExportableBusAccess::setBusName(const QString &name)
+{
+    m_busName = name;
+}
 
 } // namespace dve
-
-Q_DECLARE_METATYPE(dve::ExportableDVNode)
-Q_DECLARE_TYPEINFO(dve::ExportableDVNode, Q_MOVABLE_TYPE);

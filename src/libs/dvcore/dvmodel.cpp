@@ -85,6 +85,25 @@ QList<DVConnection *> DVModel::connections(DVNode *node) const
     return c;
 }
 
+/*!
+   Returns if the given \p device is used. Meaning has a connection bound to it.
+ */
+bool DVModel::isUsed(const DVDevice *device) const
+{
+    if (!device) {
+        return false;
+    }
+    const QHash<shared::Id, shared::VEObject *> &allObjects = objects();
+    for (auto it = allObjects.begin(); it != allObjects.end(); ++it) {
+        if (auto connection = qobject_cast<DVConnection *>(it.value())) {
+            if (connection->sourceDevice() == device || connection->targetDevice() == device) {
+                return true;
+            }
+        }
+    }
+    return false;
+}
+
 QList<DVFunction *> DVModel::functions(DVNode *node) const
 {
     if (!node) {

@@ -37,6 +37,11 @@ DVObject::DVObject(const DVObject::Type t, const QString &title, QObject *parent
     , d(new DVObjectPrivate(t))
 {
     setEntityAttribute(meta::Props::token(meta::Props::Token::name), title);
+    connect(this, &shared::VEObject::attributeChanged, this, [this](const QString &name) {
+        if (name == meta::Props::token(meta::Props::Token::name)) {
+            Q_EMIT titleChanged(this->title());
+        }
+    });
 }
 
 DVObject::~DVObject() { }

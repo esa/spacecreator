@@ -17,30 +17,30 @@
 
 #pragma once
 
-#include "exportabledvobject.h"
-
-namespace dvm {
-class DVObject;
-}
+#include <QObject>
+#include <QString>
 
 namespace dve {
 
-class ExportableDVNode : public ExportableDVObject
+class ExportableBusAccess
 {
     Q_GADGET
-    Q_PROPERTY(QVariantList partitions READ partitions)
-    Q_PROPERTY(QVariantList devices READ devices)
-    Q_PROPERTY(QVariantList requiredBusAccesses READ requiredBusAccesses)
+    Q_PROPERTY(QString name READ name)
+    Q_PROPERTY(QString busName READ busName)
 
 public:
-    explicit ExportableDVNode(const dvm::DVObject *dvObject = nullptr);
+    const QString &name() const;
+    void setName(const QString &name);
 
-    QVariantList partitions() const;
-    QVariantList devices() const;
-    QVariantList requiredBusAccesses() const;
+    const QString &busName() const;
+    void setBusName(const QString &name);
+
+private:
+    QString m_name;
+    QString m_busName;
 };
 
 } // namespace dve
 
-Q_DECLARE_METATYPE(dve::ExportableDVNode)
-Q_DECLARE_TYPEINFO(dve::ExportableDVNode, Q_MOVABLE_TYPE);
+Q_DECLARE_METATYPE(dve::ExportableBusAccess)
+Q_DECLARE_TYPEINFO(dve::ExportableBusAccess, Q_MOVABLE_TYPE);

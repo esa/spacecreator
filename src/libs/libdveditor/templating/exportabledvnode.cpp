@@ -17,9 +17,12 @@
 
 #include "exportabledvnode.h"
 
+#include "dvcommonprops.h"
 #include "dvdevice.h"
+#include "dvmodel.h"
 #include "dvnode.h"
 #include "dvpartition.h"
+#include "exportablebusaccess.h"
 
 namespace dve {
 
@@ -42,6 +45,31 @@ QVariantList ExportableDVNode::devices() const
     for (const dvm::DVDevice *device : exportedObject<dvm::DVNode>()->devices())
         devices << createFrom(device);
     return devices;
+}
+
+QVariantList ExportableDVNode::requiredBusAccesses() const
+{
+    QVariantList accesses;
+    auto node = exportedObject<dvm::DVNode>();
+    if (!node) {
+        return accesses;
+    }
+    dvm::DVModel *model = node->model();
+    if (!model) {
+        return accesses;
+    }
+
+    for (const dvm::DVDevice *device : node->devices()) {
+        if (model->isUsed(device)) {
+            ExportableBusAccess access;
+            access.setName(device->title() + "_" + device->portName());
+            access.setBusName(device->entityAttributeValue<QString>(
+                    dvm::meta::Props::token(dvm::meta::Props::Token::requires_bus_access)));
+            accesses.append(QVariant::fromValue(access));
+        }
+    }
+
+    return accesses;
 }
 
 } // namespace dve

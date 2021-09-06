@@ -32,9 +32,11 @@ public:
 
     DVNode *node() const;
 
-    QString title() const override;
     QString portName() const;
     QString busName() const;
+
+Q_SIGNALS:
+    void portChanged(const QString &port);
 };
 
 } // namespace dvm
