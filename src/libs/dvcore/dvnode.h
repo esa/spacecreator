@@ -39,6 +39,9 @@ public:
     void addPartition(DVPartition *partition);
     void removePartition(DVPartition *partition);
     QList<DVPartition *> partitions() const;
+    DVPartition *partitionByName(const QString &name) const;
+
+    QString newPartitionName() const;
 
     void addDevice(DVDevice *device);
     void removeDevice(DVDevice *device);

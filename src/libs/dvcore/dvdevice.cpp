@@ -61,9 +61,19 @@ QString DVDevice::portName() const
     return entityAttributeValue(meta::Props::token(meta::Props::Token::port)).toString();
 }
 
+void DVDevice::setPortName(const QString &name)
+{
+    setEntityAttribute(meta::Props::token(meta::Props::Token::port), name);
+}
+
 QString DVDevice::busName() const
 {
     return entityAttributeValue(meta::Props::token(meta::Props::Token::requires_bus_access)).toString();
+}
+
+void DVDevice::setBusName(const QString &name)
+{
+    setEntityAttribute(meta::Props::token(meta::Props::Token::requires_bus_access), name);
 }
 
 } // namespace dvm

@@ -26,6 +26,7 @@ class DVPort;
 class DVDevice : public DVObject
 {
     Q_OBJECT
+    Q_PROPERTY(QString portName READ portName WRITE setPortName NOTIFY portChanged)
 public:
     explicit DVDevice(const DVPort &port, DVObject *parent = nullptr);
     explicit DVDevice(DVObject *parent = nullptr);
@@ -33,7 +34,10 @@ public:
     DVNode *node() const;
 
     QString portName() const;
+    void setPortName(const QString &name);
+
     QString busName() const;
+    void setBusName(const QString &name);
 
 Q_SIGNALS:
     void portChanged(const QString &port);

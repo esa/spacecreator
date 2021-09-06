@@ -86,6 +86,36 @@ QList<DVConnection *> DVModel::connections(DVNode *node) const
 }
 
 /*!
+   Returns the connection with the given \p name.
+   Return nullptr if no such connection is found.
+ */
+DVConnection *DVModel::connectionByName(const QString &name) const
+{
+    QVector<DVConnection *> connections = allObjectsByType<DVConnection>();
+    for (DVConnection *connection : connections) {
+        if (connection && connection->title() == name) {
+            return connection;
+        }
+    }
+    return nullptr;
+}
+
+/*!
+   Returns a unique connection name not yet used in the model
+ */
+QString DVModel::newConnectionName() const
+{
+    QVector<DVConnection *> connections = allObjectsByType<DVConnection>();
+    int i = connections.size() + 1;
+    QString name = tr("Connection_%1").arg(i);
+    while (connectionByName(name) != nullptr) {
+        ++i;
+        name = tr("Connection_%1").arg(i);
+    }
+    return name;
+}
+
+/*!
    Returns if the given \p device is used. Meaning has a connection bound to it.
  */
 bool DVModel::isUsed(const DVDevice *device) const
