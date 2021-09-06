@@ -19,14 +19,29 @@
 
 namespace dve {
 
-const QString &ExportableBusAccess::name() const
+QString ExportableBusAccess::name() const
 {
-    return m_name;
+    return m_deviceName + "_" + m_portName;
 }
 
-void ExportableBusAccess::setName(const QString &name)
+const QString &ExportableBusAccess::deviceName() const
 {
-    m_name = name;
+    return m_deviceName;
+}
+
+void ExportableBusAccess::setDeviceName(const QString &name)
+{
+    m_deviceName = name;
+}
+
+const QString &ExportableBusAccess::portName() const
+{
+    return m_portName;
+}
+
+void ExportableBusAccess::setPortName(const QString &name)
+{
+    m_portName = name;
 }
 
 const QString &ExportableBusAccess::busName() const

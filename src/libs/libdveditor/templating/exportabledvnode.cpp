@@ -62,7 +62,8 @@ QVariantList ExportableDVNode::requiredBusAccesses() const
     for (const dvm::DVDevice *device : node->devices()) {
         if (model->isUsed(device)) {
             ExportableBusAccess access;
-            access.setName(device->title() + "_" + device->portName());
+            access.setDeviceName(device->title());
+            access.setPortName(device->portName());
             access.setBusName(device->entityAttributeValue<QString>(
                     dvm::meta::Props::token(dvm::meta::Props::Token::requires_bus_access)));
             accesses.append(QVariant::fromValue(access));

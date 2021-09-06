@@ -26,17 +26,25 @@ class ExportableBusAccess
 {
     Q_GADGET
     Q_PROPERTY(QString name READ name)
+    Q_PROPERTY(QString deviceName READ deviceName)
+    Q_PROPERTY(QString portName READ portName)
     Q_PROPERTY(QString busName READ busName)
 
 public:
-    const QString &name() const;
-    void setName(const QString &name);
+    QString name() const;
+
+    const QString &deviceName() const;
+    void setDeviceName(const QString &name);
+
+    const QString &portName() const;
+    void setPortName(const QString &name);
 
     const QString &busName() const;
     void setBusName(const QString &name);
 
 private:
-    QString m_name;
+    QString m_deviceName;
+    QString m_portName;
     QString m_busName;
 };
 
