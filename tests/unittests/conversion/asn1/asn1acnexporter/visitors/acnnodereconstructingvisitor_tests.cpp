@@ -339,7 +339,7 @@ void AcnNodeReconstructingVisitorTests::test_acnParameter()
 
 void AcnNodeReconstructingVisitorTests::test_acnArgument()
 {
-    auto type = std::make_unique<Types::UserdefinedType>(QStringLiteral("MyType"), QStringLiteral("MyModule"));
+    auto type = std::make_unique<Types::UserdefinedType>(QStringLiteral("MyType"), QStringLiteral("MyModule"), nullptr);
     type->addArgument(std::make_unique<AcnArgument>(QStringLiteral("ArgumentName")));
 
     auto expectedResult = QStringLiteral("MySequence <ArgumentName> []\n");

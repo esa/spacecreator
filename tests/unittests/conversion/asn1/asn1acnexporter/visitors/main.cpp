@@ -25,22 +25,12 @@
 ****************************************************************************/
 
 #include "acnnodereconstructingvisitor_tests.h"
-#include "astxmlconstraintparser_tests.h"
-#include "astxmlparser_tests.h"
-#include "cases/enumeratedincorrectitems_tests.h"
-#include "cases/integerincorrectvalues_tests.h"
-#include "cases/integerranges_tests.h"
-#include "cases/testcaseprinter_tests.h"
-#include "reconstructor_tests.h"
+#include "asn1nodereconstructingvisitor_tests.h"
 
 #include <QObject>
 #include <QTest>
 #include <QtTest/qtestcase.h>
-#include <asn1library/asn1/constraints/printingvisitor_tests.h>
 #include <asn1library/asn1/definitions.h>
-#include <asn1library/asn1/range_tests.h>
-#include <asn1library/asn1/rangelist_tests.h>
-#include <asn1nodereconstructingvisitor_tests.h>
 
 int main(int argc, char *argv[])
 {
