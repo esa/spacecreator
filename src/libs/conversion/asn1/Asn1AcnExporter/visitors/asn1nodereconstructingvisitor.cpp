@@ -65,7 +65,7 @@ void Asn1NodeReconstructingVisitor::visit(const ValueAssignment &assignment)
     if (assignment.value() == nullptr)
         return;
 
-    m_outStream << assignment.name() << QStringLiteral(" ") << assignment.type()->name() << QStringLiteral(" ::= ")
+    m_outStream << assignment.name() << QStringLiteral(" ") << assignment.type()->typeName() << QStringLiteral(" ::= ")
                 << assignment.value()->asString() << QStringLiteral("\n");
 }
 
