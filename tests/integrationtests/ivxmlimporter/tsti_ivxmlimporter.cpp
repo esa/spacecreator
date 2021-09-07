@@ -24,6 +24,7 @@
 #include <conversion/common/options.h>
 #include <conversion/iv/IvOptions/options.h>
 #include <conversion/iv/IvXmlImporter/importer.h>
+#include <ivcore/ivfunction.h>
 #include <ivcore/ivmodel.h>
 
 using conversion::Options;
@@ -54,6 +55,16 @@ void tsti_IvXmlImporter::testValid()
         const auto *ivModel = dynamic_cast<IVModel *>(model.get());
 
         QCOMPARE(ivModel->objects().size(), 8);
+
+        auto *pingerFunction = ivModel->getFunction("Pinger", Qt::CaseSensitive);
+        QVERIFY(pingerFunction);
+        QCOMPARE(pingerFunction->ris().size(), 1);
+        QCOMPARE(pingerFunction->pis().size(), 1);
+
+        auto *pongerFunction = ivModel->getFunction("Ponger", Qt::CaseSensitive);
+        QVERIFY(pongerFunction);
+        QCOMPARE(pongerFunction->ris().size(), 1);
+        QCOMPARE(pongerFunction->pis().size(), 1);
     } catch (const std::exception &ex) {
         QFAIL(ex.what());
     }
