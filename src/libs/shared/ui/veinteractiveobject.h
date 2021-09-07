@@ -94,6 +94,5 @@ protected:
     QFont m_font;
 };
 
-}
-
-}
+} // namespace ui
+} // namespace shared

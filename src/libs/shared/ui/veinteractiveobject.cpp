@@ -26,6 +26,7 @@
 
 #include <QDebug>
 #include <QGraphicsSceneMouseEvent>
+#include <QTextDocument>
 #include <QTimer>
 
 namespace shared {
@@ -221,10 +222,14 @@ QString VEInteractiveObject::prepareTooltip() const
 
 void VEInteractiveObject::updateText()
 {
-    m_textItem->setHtml(entity()->titleUI());
+    const QString text = entity()->titleUI();
+    if (Qt::mightBeRichText(text)) {
+        m_textItem->setHtml(text);
+    } else {
+        m_textItem->setPlainText(text);
+    }
     updateTextPosition();
 }
 
-}
-
-}
+} // namespace ui
+} // namespace shared
