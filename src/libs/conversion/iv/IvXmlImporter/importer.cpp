@@ -43,7 +43,7 @@ std::unique_ptr<conversion::Model> IvXmlImporter::importModel(const Options &opt
 {
     ivm::initIVLibrary();
 
-    auto config = initConfig(options);
+    auto *config = initConfig(options);
 
     return parse(options, config);
 }
@@ -55,10 +55,10 @@ IVPropertyTemplateConfig *IvXmlImporter::initConfig(const Options &options) cons
         throw ImportException("Configuration file wasn't specified");
     }
 
-    auto conf = IVPropertyTemplateConfig::instance();
-    conf->init(*configFilename);
+    auto *config = IVPropertyTemplateConfig::instance();
+    config->init(*configFilename);
 
-    return conf;
+    return config;
 }
 
 std::unique_ptr<conversion::Model> IvXmlImporter::parse(const Options &options, IVPropertyTemplateConfig *config) const
