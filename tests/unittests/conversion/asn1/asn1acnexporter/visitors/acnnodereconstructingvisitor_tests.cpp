@@ -42,7 +42,6 @@
 #include <asn1library/asn1/types/typefactory.h>
 #include <asn1library/asn1/types/userdefinedtype.h>
 #include <conversion/asn1/Asn1AcnExporter/visitors/acnnodereconstructingvisitor.h>
-// #include <reconstructor.h>
 
 using namespace Asn1Acn;
 using namespace Asn1Acn::Tests;
