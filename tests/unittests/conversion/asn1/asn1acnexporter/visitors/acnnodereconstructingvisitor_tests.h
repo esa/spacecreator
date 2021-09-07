@@ -17,15 +17,15 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/lgpl-2.1.html>.
  */
 
-#include <functional>
-#include <memory>
+#pragma once
 
 #include <QObject>
-
 #include <asn1library/asn1/definitions.h>
 #include <asn1library/asn1/file.h>
 #include <asn1library/asn1/project.h>
 #include <asn1library/asn1/valueassignment.h>
+#include <functional>
+#include <memory>
 
 namespace Asn1Acn {
 namespace Tests {
@@ -64,9 +64,7 @@ private slots:
     void test_asciiStringEncodingToString();
 
 private:
-    void performTest(const QString &name,
-                     const QString &expectedResult,
-                     std::unique_ptr<Types::Type> type) const;
+    void performTest(const QString &name, const QString &expectedResult, std::unique_ptr<Types::Type> type) const;
     QString restoreNode(const Node &node) const;
 };
 
