@@ -28,8 +28,16 @@ namespace dve {
 class ExportableDVDevice : public ExportableDVObject
 {
     Q_GADGET
+    Q_PROPERTY(QString longName READ longName)
+    Q_PROPERTY(QString portName READ portName)
+    Q_PROPERTY(QString busName READ busName)
+
 public:
     explicit ExportableDVDevice(const dvm::DVObject *dvObject = nullptr);
+
+    QString longName() const;
+    QString portName() const;
+    QString busName() const;
 };
 
 } // namespace dve

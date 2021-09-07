@@ -19,11 +19,11 @@ partitions.functions     :  |   |       |_ List of functions in that partition
 function                 :  |   |           |_ Instance of function (see "for function in function in partition.functions")
 node.devices             :  |   |_ List of devices (ports) in that node
 device                   :  |       |_ Instance of device (see "for device in node.devices")
-node.requiredBusAccesses :  |   |_ List of bus acesses in the node
+node.requiredBusAccesses :  |   |_ List of devices in the node that are actually used by at least one connection
 device                   :  |       |_ Instance of bus access
-device.name              :  |       |_ Name of the access being device and port name
-device.deviceName        :  |       |_ Name of the access device
-device.portN             :  |       |_ Name of the access port
+device.totalName         :  |       |_ Name of the access being device and port name
+device.name              :  |       |_ Name of the access device
+device.port              :  |       |_ Name of the access port
 device.busName           :  |       |_ bus access name (has to match for both connected devices)
 Connections              : List of all available Connections between devices
 connection               :  |_ Instance of connection (see "for connection in Connections")

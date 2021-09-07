@@ -17,11 +17,29 @@
 
 #include "exportabledvdevice.h"
 
+#include "dvdevice.h"
+
 namespace dve {
 
 ExportableDVDevice::ExportableDVDevice(const dvm::DVObject *dvObject)
     : ExportableDVObject(dvObject)
 {
+}
+
+QString ExportableDVDevice::longName() const
+{
+    return name() + "_" + portName();
+}
+
+QString ExportableDVDevice::portName() const
+{
+    return exportedObject<dvm::DVDevice>()->portName();
+}
+
+QString ExportableDVDevice::busName() const
+{
+    return exportedObject<dvm::DVDevice>()->entityAttributeValue<QString>(
+            dvm::meta::Props::token(dvm::meta::Props::Token::requires_bus_access));
 }
 
 } // namespace dve

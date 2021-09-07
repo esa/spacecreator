@@ -22,7 +22,6 @@
 #include "dvmodel.h"
 #include "dvnode.h"
 #include "dvpartition.h"
-#include "exportablebusaccess.h"
 
 namespace dve {
 
@@ -49,28 +48,23 @@ QVariantList ExportableDVNode::devices() const
 
 QVariantList ExportableDVNode::requiredBusAccesses() const
 {
-    QVariantList accesses;
+    QVariantList devices;
     auto node = exportedObject<dvm::DVNode>();
     if (!node) {
-        return accesses;
+        return devices;
     }
     dvm::DVModel *model = node->model();
     if (!model) {
-        return accesses;
+        return devices;
     }
 
     for (const dvm::DVDevice *device : node->devices()) {
         if (model->isUsed(device)) {
-            ExportableBusAccess access;
-            access.setDeviceName(device->title());
-            access.setPortName(device->portName());
-            access.setBusName(device->entityAttributeValue<QString>(
-                    dvm::meta::Props::token(dvm::meta::Props::Token::requires_bus_access)));
-            accesses.append(QVariant::fromValue(access));
+            devices << createFrom(device);
         }
     }
 
-    return accesses;
+    return devices;
 }
 
 } // namespace dve
