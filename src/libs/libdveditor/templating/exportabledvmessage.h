@@ -24,8 +24,18 @@ namespace dve {
 class ExportableDVMessage : public ExportableDVObject
 {
     Q_GADGET
+    Q_PROPERTY(QString fromFunction READ fromFunction)
+    Q_PROPERTY(QString fromInterface READ fromInterface)
+    Q_PROPERTY(QString toFunction READ toFunction)
+    Q_PROPERTY(QString toInterface READ toInterface)
 public:
     ExportableDVMessage(const dvm::DVObject *dvObject = nullptr);
+
+    QString fromFunction() const;
+    QString fromInterface() const;
+
+    QString toFunction() const;
+    QString toInterface() const;
 };
 
 } // namespace dve
