@@ -56,6 +56,7 @@ protected:
     void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget) override;
     shared::ColorManager::HandledColors handledColorType() const override;
     shared::ui::TextItem *initTextItem() override;
+    void updateTextPosition() override;
     void updateEntityTitle(const QString &text);
 };
 

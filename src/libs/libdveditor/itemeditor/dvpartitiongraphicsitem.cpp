@@ -110,6 +110,15 @@ shared::ui::TextItem *DVPartitionGraphicsItem::initTextItem()
     return textItem;
 }
 
+void DVPartitionGraphicsItem::updateTextPosition()
+{
+    if (m_textItem) {
+        const QRectF targetTextRect = boundingRect();
+        m_textItem->setTextWidth(targetTextRect.width());
+        m_textItem->setPos(targetTextRect.topLeft());
+    }
+}
+
 void DVPartitionGraphicsItem::updateEntityTitle(const QString &text)
 {
     const QString newName = dvm::DVNameValidator::encodeName(entity()->type(), text);
