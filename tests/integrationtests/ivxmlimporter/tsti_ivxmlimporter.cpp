@@ -37,9 +37,6 @@ class tsti_IvXmlImporter : public QObject
 {
     Q_OBJECT
 
-public:
-    virtual ~tsti_IvXmlImporter() = default;
-
 private Q_SLOTS:
     void testValid();
 };
