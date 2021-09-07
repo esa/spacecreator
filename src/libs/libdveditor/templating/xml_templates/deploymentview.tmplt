@@ -22,7 +22,7 @@ device                   :  |   |   |_ Instance of device (see "for device in no
 device.fullName          :  |   |   |_ Name of the access being device and port name
 device.name              :  |   |   |_ Name of the access device
 device.portName          :  |   |   |_ Name of the access port
-device.busName           :  |   |   |_ bus access name (has to match for both connected devices)
+device.qualifier         :  |   |   |_ Qualifier of the bus (see bus.qualifier)
 node.requiredBusAccesses :  |   |_ List of devices in the node that are actually used by at least one connection
 device                   :  |       |_ Instance of bus access (same properties as in node.devices)
 Connections              : List of all available Connections between devices
@@ -42,7 +42,7 @@ message.toFunction       :  |           |_ Name of the connected target function
 message.toInterface      :  |           |_ Name of the connected target interface
 Buses                    : List of all used Buses
 bus                      :  |_ Instance of one bus
-bus.qualifier            :      |_ Quaifier of the bus (see device/connection busName)
+bus.qualifier            :      |_ Qualifier of the bus (see device.qualifier)
 ==================
 {% endcomment %}
 <DeploymentView>

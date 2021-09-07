@@ -36,7 +36,7 @@ QString ExportableDVDevice::portName() const
     return exportedObject<dvm::DVDevice>()->portName();
 }
 
-QString ExportableDVDevice::busName() const
+QString ExportableDVDevice::qualifier() const
 {
     return exportedObject<dvm::DVDevice>()->entityAttributeValue<QString>(
             dvm::meta::Props::token(dvm::meta::Props::Token::requires_bus_access));
