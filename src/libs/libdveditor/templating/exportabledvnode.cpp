@@ -17,7 +17,9 @@
 
 #include "exportabledvnode.h"
 
+#include "dvcommonprops.h"
 #include "dvdevice.h"
+#include "dvmodel.h"
 #include "dvnode.h"
 #include "dvpartition.h"
 
@@ -41,6 +43,27 @@ QVariantList ExportableDVNode::devices() const
     QVariantList devices;
     for (const dvm::DVDevice *device : exportedObject<dvm::DVNode>()->devices())
         devices << createFrom(device);
+    return devices;
+}
+
+QVariantList ExportableDVNode::requiredBusAccesses() const
+{
+    QVariantList devices;
+    auto node = exportedObject<dvm::DVNode>();
+    if (!node) {
+        return devices;
+    }
+    dvm::DVModel *model = node->model();
+    if (!model) {
+        return devices;
+    }
+
+    for (const dvm::DVDevice *device : node->devices()) {
+        if (model->isUsed(device)) {
+            devices << createFrom(device);
+        }
+    }
+
     return devices;
 }
 

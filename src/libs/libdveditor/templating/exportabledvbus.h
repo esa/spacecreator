@@ -17,38 +17,29 @@
 
 #pragma once
 
-#include "dvobject.h"
+#include <QObject>
 
-#include <QPointer>
-#include <memory>
+namespace dve {
 
-namespace dvm {
-struct DVNodePrivate;
-class DVPartition;
-class DVDevice;
-class DVBoard;
-
-class DVNode : public DVObject
+class ExportableDVBus
 {
-    Q_OBJECT
+    Q_GADGET
+    Q_PROPERTY(QString name READ name)
+    Q_PROPERTY(QString qualifier READ qualifier)
+
 public:
-    explicit DVNode(const DVBoard &board, DVObject *parent = nullptr);
-    explicit DVNode(DVObject *parent = nullptr);
-    ~DVNode() override;
+    QString name() const;
+    void setName(const QString &name);
 
-    void addPartition(DVPartition *partition);
-    void removePartition(DVPartition *partition);
-    QList<DVPartition *> partitions() const;
-    DVPartition *partitionByName(const QString &name) const;
-
-    QString newPartitionName() const;
-
-    void addDevice(DVDevice *device);
-    void removeDevice(DVDevice *device);
-    QList<QPointer<DVDevice>> devices() const;
+    QString qualifier() const;
+    void setQualifier(const QString &name);
 
 private:
-    std::unique_ptr<DVNodePrivate> d;
+    QString m_name;
+    QString m_qualifier;
 };
 
-} // namespace dvm
+} // namespace dve
+
+Q_DECLARE_METATYPE(dve::ExportableDVBus)
+Q_DECLARE_TYPEINFO(dve::ExportableDVBus, Q_MOVABLE_TYPE);

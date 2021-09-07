@@ -52,9 +52,6 @@ IVFunctionGraphicsItem::IVFunctionGraphicsItem(ivm::IVFunction *entity, QGraphic
     : IVFunctionTypeGraphicsItem(entity, parent)
     , m_miniViewDrawer(std::make_unique<MiniViewRenderer>(this))
 {
-    m_textItem->setVisible(!isRootItem());
-    m_textItem->setTextAlignment(Qt::AlignCenter);
-
     if (!m_svgRenderer) // TODO: change icon
         m_svgRenderer = new QSvgRenderer(QLatin1String(":/toolbar/icns/change_root.svg"));
 }
@@ -153,6 +150,14 @@ shared::ColorManager::HandledColors IVFunctionGraphicsItem::handledColorType() c
         return shared::ColorManager::HandledColors::FunctionPartial;
 
     return shared::ColorManager::HandledColors::FunctionRegular;
+}
+
+shared::ui::TextItem *IVFunctionGraphicsItem::initTextItem()
+{
+    auto textItem = IVFunctionTypeGraphicsItem::initTextItem();
+    textItem->setVisible(!isRootItem());
+    textItem->setTextAlignment(Qt::AlignCenter);
+    return textItem;
 }
 
 void IVFunctionGraphicsItem::applyColorScheme()

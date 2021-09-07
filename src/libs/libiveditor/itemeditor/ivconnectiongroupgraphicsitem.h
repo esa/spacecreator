@@ -45,9 +45,6 @@ private Q_SLOTS:
 
 private:
     void updateTitleItemPosition();
-
-private:
-    QGraphicsTextItem *m_textItem = nullptr;
 };
 
 } // namespace ive

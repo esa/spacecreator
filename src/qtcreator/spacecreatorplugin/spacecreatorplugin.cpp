@@ -110,11 +110,17 @@ bool SpaceCreatorPlugin::initialize(const QStringList &arguments, QString *error
             m_checkMessagesAction, Constants::CHECK_MESSAGES_ID, Core::Context(Core::Constants::C_GLOBAL));
     connect(m_checkMessagesAction, &QAction::triggered, this, &SpaceCreatorPlugin::checkMesagesForCurrentEditor);
 
-    m_checkDvFunctionssAction =
+    m_checkDvFunctionsAction =
             new QAction(QIcon(QLatin1String(":/icons/check_yellow.svg")), tr("Check DV functions"), this);
     Core::Command *checkDVFunctionsCmd = Core::ActionManager::registerAction(
-            m_checkDvFunctionssAction, Constants::CHECK_DV_FUNCTIONS_ID, Core::Context(Core::Constants::C_GLOBAL));
-    connect(m_checkDvFunctionssAction, &QAction::triggered, this, &SpaceCreatorPlugin::checkDVFunctionsValidity);
+            m_checkDvFunctionsAction, Constants::CHECK_DV_FUNCTIONS_ID, Core::Context(Core::Constants::C_GLOBAL));
+    connect(m_checkDvFunctionsAction, &QAction::triggered, this, &SpaceCreatorPlugin::checkDVFunctionsValidity);
+
+    m_checkDvMessagesAction =
+            new QAction(QIcon(QLatin1String(":/icons/check_blue.svg")), tr("Check DV messages"), this);
+    Core::Command *checkDVMessagesCmd = Core::ActionManager::registerAction(
+            m_checkDvMessagesAction, Constants::CHECK_DV_MESSAGES_ID, Core::Context(Core::Constants::C_GLOBAL));
+    connect(m_checkDvMessagesAction, &QAction::triggered, this, &SpaceCreatorPlugin::checkDVMessagesValidity);
 
     m_showMinimapAction =
             new QAction(QIcon(QLatin1String(":/sharedresources/icons/minimap.svg")), tr("Show minimap"), this);
@@ -139,6 +145,7 @@ bool SpaceCreatorPlugin::initialize(const QStringList &arguments, QString *error
     menu->addAction(checkMessagesCmd);
     menu->addSeparator();
     menu->addAction(checkDVFunctionsCmd);
+    menu->addAction(checkDVMessagesCmd);
     Core::ActionManager::actionContainer(Core::Constants::M_TOOLS)->addMenu(menu);
 
     // IV
@@ -202,7 +209,7 @@ bool SpaceCreatorPlugin::initialize(const QStringList &arguments, QString *error
               << m_actionSaveSceneRender;
     m_ivFactory = new IVEditorFactory(m_projectsManager, ivActions, this);
     QList<QAction *> dvActions;
-    dvActions << m_checkDvFunctionssAction;
+    dvActions << m_checkDvFunctionsAction << m_checkDvMessagesAction;
     m_dvFactory = new DVEditorFactory(m_projectsManager, dvActions, this);
 
     addHelp();
@@ -330,6 +337,22 @@ void SpaceCreatorPlugin::checkDVFunctionsValidity()
             } else {
                 QMessageBox::warning(nullptr, tr("DV function check"),
                         tr("Deployment view functions have errors.\nSee the issue panel for more details"));
+            }
+        }
+    }
+}
+
+void SpaceCreatorPlugin::checkDVMessagesValidity()
+{
+    if (auto dvEditor = qobject_cast<spctr::DVQtCEditor *>(Core::EditorManager::currentEditor())) {
+        SpaceCreatorProjectImpl *project = m_projectsManager->project(dvEditor->dvPlugin());
+        if (project) {
+            bool ok = project->dvChecks()->checkMessageBindings();
+            if (ok) {
+                QMessageBox::information(nullptr, tr("DV messages check"), tr("All deployment view messages are ok."));
+            } else {
+                QMessageBox::warning(nullptr, tr("DV messages check"),
+                        tr("Deployment view messages have errors.\nSee the issue panel for more details"));
             }
         }
     }

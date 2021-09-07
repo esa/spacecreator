@@ -101,6 +101,7 @@ public:
     static QString typeToString(Type t);
 
 Q_SIGNALS:
+    void urlChanged(const QString &url);
     void titleChanged(const QString &title);
     void coordinatesChanged(const QVector<qint32> &coordinates);
     void visibilityChanged(bool visible);

@@ -33,6 +33,7 @@ CmdConnectionEntityCreate::CmdConnectionEntityCreate(dvm::DVModel *model, const 
     auto sourceDevice = qobject_cast<dvm::DVDevice *>(m_model->getObject(sourceDeviceId));
     auto targetDevice = qobject_cast<dvm::DVDevice *>(m_model->getObject(targetDeviceId));
     m_entity = new dvm::DVConnection(sourceDevice, targetDevice);
+    m_entity->setTitle(model->newConnectionName());
     prepareData({ qMakePair(m_entity, points) });
 }
 

@@ -15,32 +15,28 @@
    along with this program. If not, see <https://www.gnu.org/licenses/lgpl-2.1.html>.
 */
 
-#pragma once
-
-#include "exportabledvobject.h"
-
-namespace dvm {
-class DVObject;
-}
+#include "exportabledvbus.h"
 
 namespace dve {
 
-class ExportableDVDevice : public ExportableDVObject
+QString ExportableDVBus::name() const
 {
-    Q_GADGET
-    Q_PROPERTY(QString fullName READ fullName)
-    Q_PROPERTY(QString portName READ portName)
-    Q_PROPERTY(QString busName READ busName)
+    return m_name;
+}
 
-public:
-    explicit ExportableDVDevice(const dvm::DVObject *dvObject = nullptr);
+void ExportableDVBus::setName(const QString &name)
+{
+    m_name = name;
+}
 
-    QString fullName() const;
-    QString portName() const;
-    QString busName() const;
-};
+QString ExportableDVBus::qualifier() const
+{
+    return m_qualifier;
+}
+
+void ExportableDVBus::setQualifier(const QString &name)
+{
+    m_qualifier = name;
+}
 
 } // namespace dve
-
-Q_DECLARE_METATYPE(dve::ExportableDVDevice)
-Q_DECLARE_TYPEINFO(dve::ExportableDVDevice, Q_MOVABLE_TYPE);

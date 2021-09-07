@@ -21,6 +21,8 @@
 #include "itemeditor/ivinterfacegraphicsitem.h"
 #include "iveditor.h"
 #include "sharedlibrary.h"
+#include "ivpropertytemplateconfig.h"
+#include "ivmodel.h"
 
 #include <QDebug>
 #include <QGraphicsScene>
@@ -45,17 +47,31 @@ void tst_IVInterfaceGraphicsItem::initTestCase()
 void tst_IVInterfaceGraphicsItem::testMaxWidth()
 {
     QGraphicsScene scene;
-    auto parentFunc = new ive::IVFunctionGraphicsItem(nullptr);
+    auto parentFunc = new ive::IVFunctionGraphicsItem(new ivm::IVFunction);
+    parentFunc->init();
     scene.addItem(parentFunc);
     parentFunc->setBoundingRect(QRectF(0., 0., 200., 200.));
-    auto item = new ive::IVInterfaceGraphicsItem(nullptr, parentFunc);
+
+    auto cfg = ivm::IVPropertyTemplateConfig::instance();
+    cfg->init(QLatin1String("default_attributes.xml"));
+    ivm::IVModel model(cfg);
+
+    ivm::IVInterface::CreationInfo ifc;
+    ifc.model = &model;
+
+    ifc.function = parentFunc->entity();
+    ifc.type = ivm::IVInterface::InterfaceType::Provided;
+
+    auto item = new ive::IVInterfaceGraphicsItem(ivm::IVInterface::createIface(ifc), parentFunc);
     item->setBoundingRect(QRectF(200., 10., 50., 30.));
+    item->init();
 
     QCOMPARE(item->maxWidth(), -1.);
 
-    auto funcItem = new ive::IVFunctionGraphicsItem(nullptr);
+    auto funcItem = new ive::IVFunctionGraphicsItem(new ivm::IVFunction);
     scene.addItem(funcItem);
     funcItem->setBoundingRect(QRectF(400., 400., 300., 300.));
+    funcItem->init();
     QCOMPARE(item->maxWidth(), -1.);
 
     // Function moved right of the interface
@@ -65,10 +81,14 @@ void tst_IVInterfaceGraphicsItem::testMaxWidth()
     funcItem->setVisible(false);
     QCOMPARE(item->maxWidth(), -1.);
 
+    ifc.function = funcItem->entity();
+    ifc.type = ivm::IVInterface::InterfaceType::Required;
+
     // Another interface on the right
     item->setBoundingRect(QRectF(20., 0., 50., 30.));
-    auto item2 = new ive::IVInterfaceGraphicsItem(nullptr, parentFunc);
+    auto item2 = new ive::IVInterfaceGraphicsItem(ivm::IVInterface::createIface(ifc), parentFunc);
     item2->setBoundingRect(QRectF(130., 0., 50., 30.));
+    item2->init();
     QCOMPARE(item->maxWidth(), 110.);
     // Invisible items don't limit the width
     item2->setVisible(false);
@@ -81,15 +101,17 @@ void tst_IVInterfaceGraphicsItem::testMaxWidth()
     QCOMPARE(item->maxWidth(), -1.);
 
     // Function type
-    auto typeItem = new ive::IVFunctionTypeGraphicsItem(nullptr);
+    auto typeItem = new ive::IVFunctionTypeGraphicsItem(new ivm::IVFunctionType());
     scene.addItem(typeItem);
     typeItem->setBoundingRect(QRectF(600., 0., 300., 300.));
+    typeItem->init();
     QCOMPARE(item->maxWidth(), 580.);
 
     // Comment
-    auto commentItem = new ive::IVCommentGraphicsItem(nullptr);
+    auto commentItem = new ive::IVCommentGraphicsItem(new ivm::IVComment);
     scene.addItem(commentItem);
     commentItem->setBoundingRect(QRectF(450., 0., 300., 300.));
+    commentItem->init();
     QCOMPARE(item->maxWidth(), 430.);
 }
 

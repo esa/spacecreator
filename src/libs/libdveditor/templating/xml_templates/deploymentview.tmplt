@@ -1,7 +1,7 @@
 {% comment %}
 Template for generation of XML scheme of the whole deployment view.
 ==================
-Every instance/object (node, partition, connection, ...) has at least the following properties:
+Every instance/object (node, partition, connection, ... - except access) has at least the following properties:
 name            : Name of the object
 attributes      : List of attributes
 attribute.name  :  |_ Name of that attribute
@@ -11,18 +11,34 @@ properties.name :  |_ Name of that property
 properties.value:  |_ Value of that property
 ==================
 The following tags are available in this template:
-Nodes               : List of all available Nodes (Boards)
-node                :  |_ Instance of node (see "for node in Nodes")
-node.partitions     :  |   |_ List of partitions (binary) in that node
-partition           :  |   |   |_ Instance of partition (see "for partition in node.partitions")
-partitions.functions:  |   |       |_ List of functions in that partition
-function            :  |   |           |_ Instance of function (see "for function in function in partition.functions")
-node.devices        :  |   |_ List of devices (ports) in that node
-device              :  |       |_ Instance of device (see "for device in node.devices")
-Connections         : List of all available Connections between devices
-connection          :  |_ Instance of connection (see "for connection in Connections")
-connection.messages :      |_ List of message binding of that connection
-message             :          |_ Instance of message/binding (see "for message in connection.messages")
+Nodes                    : List of all available Nodes (Boards)
+node                     :  |_ Instance of node (see "for node in Nodes")
+node.partitions          :  |   |_ List of partitions (binary) in that node
+partition                :  |   |   |_ Instance of partition (see "for partition in node.partitions")
+partitions.functions     :  |   |       |_ List of functions in that partition
+function                 :  |   |           |_ Instance of function (see "for function in function in partition.functions")
+node.devices             :  |   |_ List of devices (ports) in that node
+device                   :  |   |   |_ Instance of device (see "for device in node.devices")
+node.requiredBusAccesses :  |   |_ List of devices in the node that are actually used by at least one connection
+device                   :  |       |_ Instance of bus access
+device.fullName          :  |       |_ Name of the access being device and port name
+device.name              :  |       |_ Name of the access device
+device.portName          :  |       |_ Name of the access port
+device.busName           :  |       |_ bus access name (has to match for both connected devices)
+Connections              : List of all available Connections between devices
+connection               :  |_ Instance of connection (see "for connection in Connections")
+connection.fromNode      :      |_ The source node of this connection
+connection.fromDevice    :      |_ The source device of this connection
+connection.fromPort      :      |_ The source port of this connection
+connection.toNode        :      |_ The target node of this connection
+connection.toDevice      :      |_ The target device of this connection
+connection.toPort        :      |_ The target port of this connection
+connection.busName       :      |_ Name of the bus used by this connection
+connection.messages      :      |_ List of message binding of that connection
+message                  :          |_ Instance of message/binding (see "for message in connection.messages")
+Buses                    : List of all used Buses
+bus                      :  |_ Instance of one bus
+bus.qualifier            :      |_ Quaifier of the bus (see device/connection busName)
 ==================
 {% endcomment %}
 <DeploymentView>

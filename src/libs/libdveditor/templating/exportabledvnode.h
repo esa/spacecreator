@@ -30,12 +30,14 @@ class ExportableDVNode : public ExportableDVObject
     Q_GADGET
     Q_PROPERTY(QVariantList partitions READ partitions)
     Q_PROPERTY(QVariantList devices READ devices)
+    Q_PROPERTY(QVariantList requiredBusAccesses READ requiredBusAccesses)
 
 public:
     explicit ExportableDVNode(const dvm::DVObject *dvObject = nullptr);
 
     QVariantList partitions() const;
     QVariantList devices() const;
+    QVariantList requiredBusAccesses() const;
 };
 
 } // namespace dve

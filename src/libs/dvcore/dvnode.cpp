@@ -19,6 +19,7 @@
 
 #include "dvboard.h"
 #include "dvdevice.h"
+#include "dvpartition.h"
 
 #include <QPointer>
 
@@ -58,6 +59,30 @@ void DVNode::removePartition(DVPartition *partition)
 QList<DVPartition *> DVNode::partitions() const
 {
     return d->partitions;
+}
+
+DVPartition *DVNode::partitionByName(const QString &name) const
+{
+    for (DVPartition *partition : d->partitions) {
+        if (partition && partition->title() == name) {
+            return partition;
+        }
+    }
+    return nullptr;
+}
+
+/*!
+   Returns a unique partition name not yet used in the node
+ */
+QString DVNode::newPartitionName() const
+{
+    int i = d->partitions.size() + 1;
+    QString name = tr("Partition_%1").arg(i);
+    while (partitionByName(name) != nullptr) {
+        ++i;
+        name = tr("Partition_%1").arg(i);
+    }
+    return name;
 }
 
 void DVNode::addDevice(DVDevice *device)

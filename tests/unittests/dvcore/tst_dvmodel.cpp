@@ -15,6 +15,8 @@
    along with this program. If not, see <https://www.gnu.org/licenses/lgpl-2.1.html>.
 */
 
+#include "dvconnection.h"
+#include "dvdevice.h"
 #include "dvmodel.h"
 #include "dvnode.h"
 
@@ -32,6 +34,7 @@ private Q_SLOTS:
     void testRemoveObject();
     void testClear();
     void testInitFromObjects();
+    void testConnectionName();
 
 private:
     QScopedPointer<dvm::DVModel> m_model;
@@ -99,6 +102,42 @@ void tst_DVModel::testInitFromObjects()
 
     m_model->initFromObjects<dvm::DVObject *>({ new dvm::DVNode(), new dvm::DVNode() });
     QCOMPARE(m_model->objects().size(), 2);
+}
+
+void tst_DVModel::testConnectionName()
+{
+    auto node1 = new dvm::DVNode();
+    node1->setTitle("Node_A");
+    m_model->addObject(node1);
+    auto device1 = new dvm::DVDevice(node1);
+    device1->setTitle("Device_A");
+    device1->setPortName("Port_A");
+    device1->setBusName("ipv6");
+    node1->addDevice(device1);
+    m_model->addObject(device1);
+
+    auto node2 = new dvm::DVNode();
+    node2->setTitle("Node_B");
+    m_model->addObject(node2);
+    auto device2 = new dvm::DVDevice(node2);
+    device2->setTitle("Device_B");
+    device2->setPortName("Port_B");
+    device2->setBusName("ipv6");
+    node2->addDevice(device2);
+    m_model->addObject(device2);
+
+    auto connection = new dvm::DVConnection(device1, device2);
+
+    QCOMPARE(m_model->newConnectionName(), "Connection_1");
+
+    m_model->addObject(connection);
+    QCOMPARE(m_model->newConnectionName(), "Connection_2");
+
+    connection->setTitle("Connection_2");
+    QCOMPARE(m_model->newConnectionName(), "Connection_3");
+
+    connection->setTitle("New_name");
+    QCOMPARE(m_model->newConnectionName(), "Connection_2");
 }
 
 QTEST_APPLESS_MAIN(tst_DVModel)

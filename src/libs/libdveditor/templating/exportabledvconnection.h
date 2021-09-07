@@ -29,11 +29,28 @@ class ExportableDVConnection : public ExportableDVObject
 {
     Q_GADGET
     Q_PROPERTY(QVariantList messages READ messages)
+    Q_PROPERTY(QString fromNode READ fromNode)
+    Q_PROPERTY(QString fromDevice READ fromDevice)
+    Q_PROPERTY(QString fromPort READ fromPort)
+    Q_PROPERTY(QString toNode READ toNode)
+    Q_PROPERTY(QString toDevice READ toDevice)
+    Q_PROPERTY(QString toPort READ toPort)
+    Q_PROPERTY(QString busName READ busName)
 
 public:
     explicit ExportableDVConnection(const dvm::DVObject *dvObject = nullptr);
 
     QVariantList messages() const;
+
+    QString fromNode() const;
+    QString fromDevice() const;
+    QString fromPort() const;
+
+    QString toNode() const;
+    QString toDevice() const;
+    QString toPort() const;
+
+    QString busName() const;
 };
 
 } // namespace dve

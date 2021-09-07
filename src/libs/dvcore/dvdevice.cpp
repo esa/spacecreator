@@ -36,11 +36,19 @@ DVDevice::DVDevice(const DVPort &port, DVObject *parent)
     attrs[attrName] = EntityAttribute { attrName, entityAttr.value(), entityAttr.type() };
 
     setEntityAttributes(attrs);
+    if (title().isEmpty()) {
+        setTitle(portName());
+    }
 }
 
 DVDevice::DVDevice(DVObject *parent)
     : DVObject(DVObject::Type::Device, {}, parent)
 {
+    connect(this, &shared::VEObject::attributeChanged, this, [this](const QString &name) {
+        if (name == meta::Props::token(meta::Props::Token::port)) {
+            Q_EMIT portChanged(this->portName());
+        }
+    });
 }
 
 DVNode *DVDevice::node() const
@@ -48,19 +56,24 @@ DVNode *DVDevice::node() const
     return qobject_cast<DVNode *>(parent());
 }
 
-QString DVDevice::title() const
-{
-    return portName();
-}
-
 QString DVDevice::portName() const
 {
     return entityAttributeValue(meta::Props::token(meta::Props::Token::port)).toString();
 }
 
+void DVDevice::setPortName(const QString &name)
+{
+    setEntityAttribute(meta::Props::token(meta::Props::Token::port), name);
+}
+
 QString DVDevice::busName() const
 {
     return entityAttributeValue(meta::Props::token(meta::Props::Token::requires_bus_access)).toString();
+}
+
+void DVDevice::setBusName(const QString &name)
+{
+    setEntityAttribute(meta::Props::token(meta::Props::Token::requires_bus_access), name);
 }
 
 } // namespace dvm

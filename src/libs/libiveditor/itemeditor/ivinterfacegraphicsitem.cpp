@@ -19,6 +19,8 @@
 #include "ivinterfacegraphicsitem.h"
 
 #include "colors/colormanager.h"
+#include "commands/cmdentityattributechange.h"
+#include "commandsstackbase.h"
 #include "graphicsitemhelpers.h"
 #include "graphicsviewutils.h"
 #include "itemeditor/common/ivutils.h"
@@ -31,6 +33,7 @@
 #include "ivinterface.h"
 #include "ivnamevalidator.h"
 #include "positionlookuphelper.h"
+#include "ui/textitem.h"
 #include "ui/veconnectiongraphicsitem.h"
 
 #include <QGraphicsScene>
@@ -49,7 +52,6 @@ IVInterfaceGraphicsItem::IVInterfaceGraphicsItem(ivm::IVInterface *entity, QGrap
     : shared::ui::VEConnectionEndPointGraphicsItem(entity, parent)
     , m_type(new QGraphicsPathItem(this))
     , m_iface(new QGraphicsPathItem(this))
-    , m_text(new QGraphicsTextItem(this))
 {
     setFlag(QGraphicsItem::ItemHasNoContents);
     setFlag(QGraphicsItem::ItemIsSelectable);
@@ -64,8 +66,8 @@ ivm::IVInterface *IVInterfaceGraphicsItem::entity() const
 void IVInterfaceGraphicsItem::init()
 {
     shared::ui::VEInteractiveObject::init();
+
     connect(entity(), &ivm::IVObject::attributeChanged, this, &IVInterfaceGraphicsItem::onAttrOrPropChanged);
-    connect(entity(), &ivm::IVInterface::titleChanged, this, &IVInterfaceGraphicsItem::updateLabel);
     if (auto ri = qobject_cast<ivm::IVInterfaceRequired *>(entity()))
         connect(ri, &ivm::IVInterfaceRequired::inheritedLabelsChanged, this, &IVInterfaceGraphicsItem::updateLabel);
     connect(this, &IVInterfaceGraphicsItem::needUpdateLayout, this, [this]() {
@@ -88,12 +90,12 @@ void IVInterfaceGraphicsItem::setInterfaceName(const QString &name)
     if (maxTextWidth > 0) {
         // text is always at 0, interface item might (probably is) negative
         maxTextWidth = maxTextWidth + (boundingRect().x() - kTextMargin);
-        const QFontMetrics fm(m_text->font());
+        const QFontMetrics fm(m_textItem->font());
         text = fm.elidedText(text, Qt::ElideRight, maxTextWidth);
     }
 
-    if (text != m_text->toPlainText()) {
-        m_text->setPlainText(text);
+    if (text != m_textItem->toPlainText()) {
+        m_textItem->setPlainText(text);
         instantLayoutUpdate();
     }
 }
@@ -161,7 +163,7 @@ void IVInterfaceGraphicsItem::updateInternalItems(Qt::Alignment alignment)
 {
     m_iface->setTransform(ifaceTransform(alignment));
     m_type->setTransform(typeTransform(alignment));
-    m_text->setTransform(textTransform(alignment));
+    m_textItem->setTransform(textTransform(alignment));
 
     m_shape = composeShape();
     setBoundingRect(shape().boundingRect());
@@ -340,6 +342,22 @@ shared::ColorManager::HandledColors IVInterfaceGraphicsItem::handledColorType() 
     return shared::ColorManager::HandledColors::Iface;
 }
 
+shared::ui::TextItem *IVInterfaceGraphicsItem::initTextItem()
+{
+    auto textItem = new shared::ui::TextItem(this);
+    connect(entity(), &ivm::IVInterface::titleChanged, this, &IVInterfaceGraphicsItem::updateLabel);
+    connect(textItem, &shared::ui::TextItem::edited, this, &IVInterfaceGraphicsItem::updateEntityTitle);
+    textItem->setEditable(false);
+    textItem->setFont(font());
+    textItem->setBackground(Qt::transparent);
+    textItem->setTextWrapMode(QTextOption::NoWrap);
+    textItem->setTextInteractionFlags(Qt::NoTextInteraction);
+    textItem->setTextAlignment(Qt::AlignTop | Qt::AlignLeft);
+    textItem->setPos(QPointF(5, -5));
+    textItem->setHtml(entity()->titleUI());
+    return textItem;
+}
+
 qreal IVInterfaceGraphicsItem::typeIconHeight() const
 {
     return kHeight;
@@ -470,10 +488,10 @@ QTransform IVInterfaceGraphicsItem::ifaceTransform(Qt::Alignment alignment) cons
 
 QTransform IVInterfaceGraphicsItem::textTransform(Qt::Alignment alignment) const
 {
-    const qreal leading = QFontMetricsF(m_text->font()).leading();
+    const qreal leading = QFontMetricsF(m_textItem->font()).leading();
     const QPointF leadingOffset = QPointF(0, 4 * leading);
 
-    QRectF textRect = mapRectFromItem(m_text, m_text->boundingRect());
+    QRectF textRect = mapRectFromItem(m_textItem, m_textItem->boundingRect());
     const QRectF ifaceRect = mapRectFromItem(m_iface, m_iface->boundingRect());
     switch (alignment) {
     case Qt::AlignLeft:
@@ -491,7 +509,7 @@ QTransform IVInterfaceGraphicsItem::textTransform(Qt::Alignment alignment) const
     default:
         return {};
     }
-    const QPointF offset = textRect.topLeft() - m_text->pos();
+    const QPointF offset = textRect.topLeft() - m_textItem->pos();
     return QTransform().translate(offset.x(), offset.y());
 }
 
@@ -552,7 +570,7 @@ QPainterPath IVInterfaceGraphicsItem::typePath() const
 
 QPainterPath IVInterfaceGraphicsItem::itemPath(Qt::Alignment alignment) const
 {
-    QPainterPath path = textTransform(alignment).map(m_text->shape());
+    QPainterPath path = textTransform(alignment).map(m_textItem->shape());
     path = path.united(typeTransform(alignment).map(m_type->path()));
     path = path.united(ifaceTransform(alignment).map(m_iface->path()));
     return path;
@@ -560,7 +578,7 @@ QPainterPath IVInterfaceGraphicsItem::itemPath(Qt::Alignment alignment) const
 
 QPainterPath IVInterfaceGraphicsItem::composeShape() const
 {
-    QPainterPath path = m_text->transform().map(m_text->shape());
+    QPainterPath path = m_textItem->transform().map(m_textItem->shape());
     for (auto sub : { m_type, m_iface }) {
         QPainterPath subPath = sub->transform().map(sub->path());
         subPath.translate(sub->pos());
@@ -578,6 +596,26 @@ QPainterPath IVInterfaceGraphicsItem::composeShape() const
     path = path.united(strokePath);
 
     return path.simplified();
+}
+
+void IVInterfaceGraphicsItem::updateEntityTitle(const QString &text)
+{
+    const QString newName = ivm::IVNameValidator::encodeName(entity()->type(), text);
+    if (newName == entity()->title()) {
+        return;
+    }
+
+    Q_ASSERT(!m_commandsStack.isNull());
+    if (m_commandsStack.isNull()) {
+        qWarning() << "Command stack not set for IVInterfaceGraphicsItem";
+        return;
+    }
+
+    if (!ivm::IVNameValidator::isAcceptableName(entity(), newName)) {
+        return;
+    }
+    const QVariantHash attributes = { { ivm::meta::Props::token(ivm::meta::Props::Token::name), newName } };
+    m_commandsStack->push(new shared::cmd::CmdEntityAttributeChange(entity(), attributes));
 }
 
 }

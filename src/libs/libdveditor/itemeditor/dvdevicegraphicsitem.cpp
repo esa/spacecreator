@@ -17,13 +17,17 @@
 
 #include "dvdevicegraphicsitem.h"
 
+#include "commands/cmdentityattributechange.h"
+#include "commandsstackbase.h"
 #include "dvconnectiongraphicsitem.h"
+#include "dvnamevalidator.h"
 #include "dvnodegraphicsitem.h"
 #include "graphicsviewutils.h"
 #include "positionlookuphelper.h"
 #include "ui/textitem.h"
 
 #include <QPainter>
+#include <QtDebug>
 
 static const QRectF kBoundingRect = { -10, -10, 20, 20 };
 
@@ -31,25 +35,13 @@ namespace dve {
 
 DVDeviceGraphicsItem::DVDeviceGraphicsItem(dvm::DVDevice *device, QGraphicsItem *parent)
     : shared::ui::VEConnectionEndPointGraphicsItem(device, parent)
-    , m_textItem(new shared::ui::TextItem(this))
 {
     m_adjustDirection = shared::graphicsviewutils::LookupDirection::CounterClockwise;
 
     setBoundingRect(kBoundingRect);
-    m_textItem->setPos(QPointF(5, -5));
-    m_textItem->setFramed(false);
-    m_textItem->setBackground(Qt::transparent);
-    m_textItem->setEditable(true);
 }
 
 DVDeviceGraphicsItem::~DVDeviceGraphicsItem() { }
-
-void DVDeviceGraphicsItem::init()
-{
-    shared::ui::VEConnectionEndPointGraphicsItem::init();
-    m_textItem->setPlainText(entity()->titleUI());
-    connect(entity(), &dvm::DVObject::titleChanged, m_textItem, &shared::ui::TextItem::setPlainText);
-}
 
 dvm::DVDevice *DVDeviceGraphicsItem::entity() const
 {
@@ -193,7 +185,17 @@ void DVDeviceGraphicsItem::updateInternalItems(Qt::Alignment alignment)
     m_textItem->setPos(textRect.topLeft());
 }
 
-QList<QPair<Qt::Alignment, QPainterPath> > DVDeviceGraphicsItem::sidePaths() const
+void DVDeviceGraphicsItem::updateTextPosition()
+{
+    if (m_textItem) {
+        const QPointF pos = scenePos();
+        const QRectF parentRect = targetItem()->sceneBoundingRect();
+        const Qt::Alignment side = shared::graphicsviewutils::getNearestSide(parentRect, pos);
+        updateInternalItems(side);
+    }
+}
+
+QList<QPair<Qt::Alignment, QPainterPath>> DVDeviceGraphicsItem::sidePaths() const
 {
     return {
         { Qt::AlignLeft, itemPath(Qt::AlignLeft) },
@@ -206,6 +208,37 @@ QList<QPair<Qt::Alignment, QPainterPath> > DVDeviceGraphicsItem::sidePaths() con
 shared::graphicsviewutils::LookupDirection DVDeviceGraphicsItem::lookupType() const
 {
     return shared::graphicsviewutils::LookupDirection::Mixed;
+}
+
+shared::ui::TextItem *DVDeviceGraphicsItem::initTextItem()
+{
+    auto textItem = shared::ui::VEConnectionEndPointGraphicsItem::initTextItem();
+    connect(entity(), &dvm::DVObject::titleChanged, this, &DVDeviceGraphicsItem::updateText);
+    connect(entity(), &dvm::DVObject::urlChanged, this, &DVDeviceGraphicsItem::updateText);
+    connect(textItem, &shared::ui::TextItem::edited, this, &DVDeviceGraphicsItem::updateEntityTitle);
+    textItem->setPos(QPointF(5, -5));
+    textItem->setHtml(entity()->titleUI());
+    return textItem;
+}
+
+void DVDeviceGraphicsItem::updateEntityTitle(const QString &text)
+{
+    const QString newName = dvm::DVNameValidator::encodeName(entity()->type(), text);
+    if (newName == entity()->title()) {
+        return;
+    }
+
+    Q_ASSERT(!m_commandsStack.isNull());
+    if (m_commandsStack.isNull()) {
+        qWarning() << "Command stack not set for DVDeviceGraphicsItem";
+        return;
+    }
+
+    if (!dvm::DVNameValidator::isAcceptableName(entity(), newName)) {
+        return;
+    }
+    const QVariantHash attributes = { { dvm::meta::Props::token(dvm::meta::Props::Token::name), newName } };
+    m_commandsStack->push(new shared::cmd::CmdEntityAttributeChange(entity(), attributes));
 }
 
 } // namespace dve

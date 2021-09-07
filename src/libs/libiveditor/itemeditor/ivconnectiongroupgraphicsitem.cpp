@@ -19,6 +19,7 @@
 
 #include "ivconnectiongroup.h"
 #include "ivinterfacegroupgraphicsitem.h"
+#include "ui/textitem.h"
 
 #include <QFontMetrics>
 
@@ -29,7 +30,6 @@ namespace ive {
 IVConnectionGroupGraphicsItem::IVConnectionGroupGraphicsItem(ivm::IVConnectionGroup *connection,
         IVInterfaceGroupGraphicsItem *ifaceStart, IVInterfaceGroupGraphicsItem *ifaceEnd, QGraphicsItem *parent)
     : IVConnectionGraphicsItem(connection, ifaceStart, ifaceEnd, parent)
-    , m_textItem(new QGraphicsTextItem(this))
 {
     connect(connection, &ivm::IVObject::titleChanged, this, &IVConnectionGroupGraphicsItem::updateLabel);
 }

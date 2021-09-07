@@ -155,6 +155,15 @@ DVNode *DVConnection::targetNode() const
     return d->targetDevice ? qobject_cast<DVNode *>(d->targetDevice->parent()) : nullptr;
 }
 
+/*!
+   Returns true if the given \p other connection shares at least one device with this connection.
+ */
+bool DVConnection::isConnected(DVConnection *other) const
+{
+    return d->sourceDevice == other->sourceDevice() || d->sourceDevice == other->targetDevice()
+            || d->targetDevice == other->sourceDevice() || d->targetDevice == other->targetDevice();
+}
+
 QList<dvm::DVMessage *> DVConnection::messages() const
 {
     return findChildren<dvm::DVMessage *>();

@@ -50,7 +50,6 @@ namespace ive {
 
 IVFunctionTypeGraphicsItem::IVFunctionTypeGraphicsItem(ivm::IVFunctionType *entity, QGraphicsItem *parent)
     : shared::ui::VERectGraphicsItem(entity, parent)
-    , m_textItem(new IVFunctionNameGraphicsItem(this))
 {
     setFlag(QGraphicsItem::ItemIsSelectable);
     setZValue(ZOrder.Function);
@@ -59,24 +58,6 @@ IVFunctionTypeGraphicsItem::IVFunctionTypeGraphicsItem(ivm::IVFunctionType *enti
 ivm::IVFunctionType *IVFunctionTypeGraphicsItem::entity() const
 {
     return qobject_cast<ivm::IVFunctionType *>(m_dataObject);
-}
-
-void IVFunctionTypeGraphicsItem::init()
-{
-    shared::ui::VERectGraphicsItem::init();
-    m_textItem->setTextAlignment(Qt::AlignLeft | Qt::AlignTop);
-    m_textItem->setFont(font());
-    updateText();
-
-    connect(m_textItem, &shared::ui::TextItem::edited, this, &IVFunctionTypeGraphicsItem::updateNameFromUi);
-    connect(entity(), &ivm::IVFunction::attributeChanged, this, [this](const QString &token) {
-        const ivm::meta::Props::Token attr = ivm::meta::Props::token(token);
-        if (attr == ivm::meta::Props::Token::name || attr == ivm::meta::Props::Token::url) {
-            updateText();
-        }
-    });
-    connect(entity(), &ivm::IVFunction::titleChanged, this, &IVFunctionTypeGraphicsItem::updateText);
-    connect(m_textItem, &IVFunctionNameGraphicsItem::textChanged, this, [this]() { updateTextPosition(); });
 }
 
 void IVFunctionTypeGraphicsItem::enableEditMode()
@@ -100,6 +81,12 @@ void IVFunctionTypeGraphicsItem::rebuildLayout()
 int IVFunctionTypeGraphicsItem::itemLevel(bool isSelected) const
 {
     return gi::itemLevel(entity(), isSelected);
+}
+
+void IVFunctionTypeGraphicsItem::init()
+{
+    shared::ui::VERectGraphicsItem::init();
+    updateText();
 }
 
 void IVFunctionTypeGraphicsItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget)
@@ -134,6 +121,10 @@ QSizeF IVFunctionTypeGraphicsItem::minimalSize() const
 
 void IVFunctionTypeGraphicsItem::updateTextPosition()
 {
+    if (!m_textItem) {
+        return;
+    }
+
     const QRectF targetTextRect = boundingRect().marginsRemoved(shared::graphicsviewutils::kTextMargins);
 
     m_textItem->setExplicitSize(QSizeF());
@@ -197,19 +188,19 @@ void IVFunctionTypeGraphicsItem::updateNameFromUi(const QString &name)
 
 void IVFunctionTypeGraphicsItem::updateText()
 {
+    if (!m_textItem) {
+        return;
+    }
+
     const QString text = entity()->titleUI();
-    static const QString urlAttrName { ivm::meta::Props::token(ivm::meta::Props::Token::url) };
-    if (m_dataObject->hasEntityAttribute(urlAttrName)) {
-        const QString url = m_dataObject->entityAttributeValue<QString>(urlAttrName);
-        const QString html = QStringLiteral("<a href=\"%1\">%2</a>").arg(url, text);
-        if (html != m_textItem->toHtml()) {
-            m_textItem->setHtml(html);
-            updateTextPosition();
+    if (Qt::mightBeRichText(text)) {
+        if (text != m_textItem->toHtml()) {
+            m_textItem->setHtml(text);
         }
     } else if (text != m_textItem->toPlainText()) {
         m_textItem->setPlainText(entity()->titleUI());
-        updateTextPosition();
     }
+    updateTextPosition();
 }
 
 QString IVFunctionTypeGraphicsItem::prepareTooltip() const
@@ -230,6 +221,21 @@ bool IVFunctionTypeGraphicsItem::isRootItem() const
 void IVFunctionTypeGraphicsItem::prepareTextRect(QRectF &textRect, const QRectF &targetTextRect) const
 {
     textRect.moveTopLeft(targetTextRect.topLeft());
+}
+
+shared::ui::TextItem *IVFunctionTypeGraphicsItem::initTextItem()
+{
+    shared::ui::TextItem *textItem = new IVFunctionNameGraphicsItem(this);
+    connect(textItem, &shared::ui::TextItem::edited, this, &IVFunctionTypeGraphicsItem::updateNameFromUi);
+    connect(entity(), &ivm::IVFunction::attributeChanged, this, [this](const QString &token) {
+        const ivm::meta::Props::Token attr = ivm::meta::Props::token(token);
+        if (attr == ivm::meta::Props::Token::name || attr == ivm::meta::Props::Token::url) {
+            updateText();
+        }
+    });
+    textItem->setTextAlignment(Qt::AlignLeft | Qt::AlignTop);
+    textItem->setFont(font());
+    return textItem;
 }
 
 }

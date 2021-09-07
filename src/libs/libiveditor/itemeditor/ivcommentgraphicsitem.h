@@ -27,6 +27,12 @@ namespace ivm {
 class IVComment;
 }
 
+namespace shared {
+namespace ui {
+class TextItem;
+}
+}
+
 namespace ive {
 
 class IVCommentGraphicsItem : public shared::ui::VERectGraphicsItem
@@ -42,14 +48,8 @@ public:
     int type() const override { return Type; }
 
     void init() override;
-
-    void setText(const QString &text);
-    QString text() const;
-
     ivm::IVComment *entity() const override;
     QSizeF minimalSize() const override;
-    void updateFromEntity() override;
-
     int itemLevel(bool isSelected) const override;
 
 protected Q_SLOTS:
@@ -59,9 +59,8 @@ protected:
     void rebuildLayout() override;
     void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget) override;
     virtual shared::ColorManager::HandledColors handledColorType() const override;
-
-private:
-    QString m_text;
+    shared::ui::TextItem *initTextItem() override;
+    void updateEntityTitle(const QString &text);
 };
 
 }

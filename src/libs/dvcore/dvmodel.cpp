@@ -85,6 +85,97 @@ QList<DVConnection *> DVModel::connections(DVNode *node) const
     return c;
 }
 
+/*!
+   Returns the connection with the given \p name.
+   Return nullptr if no such connection is found.
+ */
+DVConnection *DVModel::connectionByName(const QString &name) const
+{
+    QVector<DVConnection *> connections = allObjectsByType<DVConnection>();
+    for (DVConnection *connection : connections) {
+        if (connection && connection->title() == name) {
+            return connection;
+        }
+    }
+    return nullptr;
+}
+
+/*!
+   Returns a unique connection name not yet used in the model
+ */
+QString DVModel::newConnectionName() const
+{
+    QVector<DVConnection *> connections = allObjectsByType<DVConnection>();
+    int i = connections.size() + 1;
+    QString name = tr("Connection_%1").arg(i);
+    while (connectionByName(name) != nullptr) {
+        ++i;
+        name = tr("Connection_%1").arg(i);
+    }
+    return name;
+}
+
+/*!
+   A cluster of connections is a group of connections, that a bound together being connected via devices
+ */
+QList<QList<DVConnection *>> DVModel::connectionClusters() const
+{
+    QVector<DVConnection *> connections = allObjectsByType<DVConnection>();
+    QList<QList<DVConnection *>> clusters;
+
+    auto isConnected = [](DVConnection *connection, const QList<DVConnection *> &cluster) {
+        for (DVConnection *c : cluster) {
+            if (connection->isConnected(c)) {
+                return true;
+            }
+        }
+        return false;
+    };
+
+    for (DVConnection *connection : connections) {
+        QList<DVConnection *> cluster1;
+        int idx = 0;
+        for (QList<DVConnection *> &cluster : clusters) {
+            if (isConnected(connection, cluster)) {
+                if (cluster1.isEmpty()) {
+                    cluster.append(connection);
+                    cluster1 = cluster;
+                } else {
+                    cluster1.append(cluster);
+                    clusters.removeAt(idx);
+                    break;
+                }
+            }
+            ++idx;
+        }
+        if (cluster1.isEmpty()) {
+            cluster1.append(connection);
+            clusters.append(cluster1);
+        }
+    }
+
+    return clusters;
+}
+
+/*!
+   Returns if the given \p device is used. Meaning has a connection bound to it.
+ */
+bool DVModel::isUsed(const DVDevice *device) const
+{
+    if (!device) {
+        return false;
+    }
+    const QHash<shared::Id, shared::VEObject *> &allObjects = objects();
+    for (auto it = allObjects.begin(); it != allObjects.end(); ++it) {
+        if (auto connection = qobject_cast<DVConnection *>(it.value())) {
+            if (connection->sourceDevice() == device || connection->targetDevice() == device) {
+                return true;
+            }
+        }
+    }
+    return false;
+}
+
 QList<DVFunction *> DVModel::functions(DVNode *node) const
 {
     if (!node) {

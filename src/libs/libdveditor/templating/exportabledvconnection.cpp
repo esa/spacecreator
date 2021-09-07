@@ -18,7 +18,9 @@
 #include "exportabledvconnection.h"
 
 #include "dvconnection.h"
+#include "dvdevice.h"
 #include "dvmessage.h"
+#include "dvnode.h"
 
 namespace dve {
 
@@ -35,6 +37,48 @@ QVariantList ExportableDVConnection::messages() const
         messages << createFrom(message);
     }
     return messages;
+}
+
+QString ExportableDVConnection::fromNode() const
+{
+    dvm::DVNode *node = exportedObject<dvm::DVConnection>()->sourceNode();
+    return node ? node->title() : "";
+}
+
+QString ExportableDVConnection::fromDevice() const
+{
+    dvm::DVDevice *device = exportedObject<dvm::DVConnection>()->sourceDevice();
+    return device ? device->title() : "";
+}
+
+QString ExportableDVConnection::fromPort() const
+{
+    dvm::DVDevice *device = exportedObject<dvm::DVConnection>()->sourceDevice();
+    return device ? device->portName() : "";
+}
+
+QString ExportableDVConnection::toNode() const
+{
+    dvm::DVNode *node = exportedObject<dvm::DVConnection>()->targetNode();
+    return node ? node->title() : "";
+}
+
+QString ExportableDVConnection::toDevice() const
+{
+    dvm::DVDevice *device = exportedObject<dvm::DVConnection>()->targetDevice();
+    return device ? device->title() : "";
+}
+
+QString ExportableDVConnection::toPort() const
+{
+    dvm::DVDevice *device = exportedObject<dvm::DVConnection>()->targetDevice();
+    return device ? device->portName() : "";
+}
+
+QString ExportableDVConnection::busName() const
+{
+    dvm::DVDevice *device = exportedObject<dvm::DVConnection>()->sourceDevice();
+    return device ? device->busName() : "";
 }
 
 } // namespace dve

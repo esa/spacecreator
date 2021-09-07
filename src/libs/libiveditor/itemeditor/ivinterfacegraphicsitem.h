@@ -69,8 +69,10 @@ protected:
     void onSelectionChanged(bool isSelected) override;
     void updateInternalItems(Qt::Alignment alignment) override;
     virtual shared::ColorManager::HandledColors handledColorType() const override;
+    shared::ui::TextItem *initTextItem() override;
 
     qreal typeIconHeight() const;
+    void updateEntityTitle(const QString &text);
 
 protected Q_SLOTS:
     virtual void applyColorScheme() override;
@@ -95,7 +97,6 @@ private:
     QPainterPath m_shape;
     QGraphicsPathItem *m_type = nullptr;
     QGraphicsPathItem *m_iface = nullptr;
-    QGraphicsTextItem *m_text = nullptr;
 };
 
 }

@@ -69,13 +69,19 @@ public:
     bool postInit() override;
     bool aboutToBeRemoved() override;
 
+    virtual bool isEqual(DVObject *other) const;
+
 Q_SIGNALS:
+    void urlChanged(const QString &title);
     void titleChanged(const QString &title);
     void coordinatesChanged(const QVector<qint32> &coordinates);
 
 public Q_SLOTS:
     bool setTitle(const QString &title);
     bool setParentObject(DVObject *parentObject);
+
+protected:
+    void setAttributeImpl(const QString &name, const QVariant &value, EntityAttribute::Type type) override;
 
 private:
     const std::unique_ptr<DVObjectPrivate> d;

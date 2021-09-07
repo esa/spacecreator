@@ -91,6 +91,8 @@ public:
     static QVector<qint32> coordinatesFromString(const QString &strCoordinates);
     static QString coordinatesToString(const QVector<qint32> &coordinates);
 
+    virtual bool isEqual(const VEObject *other) const;
+
 Q_SIGNALS:
     void attributeChanged(const QString &name);
 

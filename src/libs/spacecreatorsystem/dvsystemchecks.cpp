@@ -20,6 +20,7 @@
 #include "dvappmodel.h"
 #include "dveditorcore.h"
 #include "dvfunction.h"
+#include "dvmessage.h"
 #include "dvmodel.h"
 #include "errorhub.h"
 #include "ivsystemqueries.h"
@@ -44,7 +45,9 @@ void DvSystemChecks::setStorage(SpaceCreatorProject *storage)
  */
 bool DvSystemChecks::checkDVFile(DVEditorCorePtr dvCore) const
 {
-    return checkFunctionBindings(dvCore);
+    bool ok = checkFunctionBindings(dvCore);
+    ok = ok && checkMessageBindings(dvCore);
+    return ok;
 }
 
 /*!
@@ -65,12 +68,29 @@ bool DvSystemChecks::checkFunctionBindings() const
 bool DvSystemChecks::checkFunctionBindings(DVEditorCorePtr dvCore) const
 {
     bool ok = true;
-    ok = ok && checkMessageIvValidity(dvCore);
-    ok = ok && checkUniqueMessageBindings(dvCore);
+    ok = ok && checkFunctionIvValidity(dvCore);
+    ok = ok && checkUniqueFunctionBindings(dvCore);
     return ok;
 }
 
-bool DvSystemChecks::checkMessageIvValidity(const DVEditorCorePtr &dvCore) const
+bool DvSystemChecks::checkMessageBindings() const
+{
+    bool ok = true;
+    for (const DVEditorCorePtr &dvCore : m_storage->allDVCores()) {
+        ok = ok && checkMessageBindings(dvCore);
+    }
+    return ok;
+}
+
+bool DvSystemChecks::checkMessageBindings(DVEditorCorePtr dvCore) const
+{
+    bool ok = true;
+    ok = ok && checkMessageIvValidity(dvCore);
+    ok = ok && checkUniqueMessages(dvCore);
+    return ok;
+}
+
+bool DvSystemChecks::checkFunctionIvValidity(const DVEditorCorePtr &dvCore) const
 {
     if (!m_storage && m_storage->ivQuery()) {
         return true;
@@ -93,7 +113,7 @@ bool DvSystemChecks::checkMessageIvValidity(const DVEditorCorePtr &dvCore) const
     return ok;
 }
 
-bool DvSystemChecks::checkUniqueMessageBindings(const DVEditorCorePtr &dvCore) const
+bool DvSystemChecks::checkUniqueFunctionBindings(const DVEditorCorePtr &dvCore) const
 {
     if (!m_storage) {
         return true;
@@ -105,9 +125,9 @@ bool DvSystemChecks::checkUniqueMessageBindings(const DVEditorCorePtr &dvCore) c
     for (dvm::DVFunction *f : functions) {
         const QString fTitle = f->title();
         // Check is DV functions are bound uniquely
-        int c = std::count_if(functions.begin(), functions.end(),
+        int count = std::count_if(functions.begin(), functions.end(),
                 [f, &fTitle](dvm::DVFunction *cf) { return fTitle == cf->title() && f != cf; });
-        if (c > 0 && !duplicateNames.contains(fTitle)) {
+        if (count > 0 && !duplicateNames.contains(fTitle)) {
             ok = false;
             shared::ErrorHub::addError(shared::ErrorItem::Error,
                     tr("Function binding '%1' is used more than once").arg(fTitle), dvCore->filePath());
@@ -115,6 +135,50 @@ bool DvSystemChecks::checkUniqueMessageBindings(const DVEditorCorePtr &dvCore) c
         }
     }
 
+    return ok;
+}
+
+bool DvSystemChecks::checkMessageIvValidity(const DVEditorCorePtr &dvCore) const
+{
+    if (!m_storage && m_storage->ivQuery()) {
+        return true;
+    }
+
+    IvSystemQueries *ivQuery = m_storage->ivQuery();
+    bool ok = true;
+    dvm::DVModel *model = dvCore->appModel()->objectsModel();
+    QVector<dvm::DVMessage *> messages = model->allObjectsByType<dvm::DVMessage>();
+    for (dvm::DVMessage *msg : messages) {
+        if (!ivQuery->connectionExists(
+                    msg->fromFunction(), msg->fromInterface(), msg->toFunction(), msg->toInterface())) {
+            ok = false;
+            shared::ErrorHub::addError(shared::ErrorItem::Error,
+                    tr("Message binding %1.%2 -> %3.%4 is not available in the interface view")
+                            .arg(msg->fromFunction(), msg->fromInterface(), msg->toFunction(), msg->toInterface()),
+                    dvCore->filePath());
+        }
+    }
+
+    return ok;
+}
+
+bool DvSystemChecks::checkUniqueMessages(const DVEditorCorePtr &dvCore) const
+{
+    bool ok = true;
+    dvm::DVModel *model = dvCore->appModel()->objectsModel();
+    QVector<dvm::DVMessage *> messages = model->allObjectsByType<dvm::DVMessage>();
+    for (dvm::DVMessage *msg : messages) {
+        int count = std::count_if(messages.begin(), messages.end(), [msg](dvm::DVMessage *m) {
+            return m->isEqual(msg) && m->fromNode() == msg->fromNode() && m->toNode() == msg->toNode();
+        });
+        if (count > 1) {
+            ok = false;
+            shared::ErrorHub::addError(shared::ErrorItem::Error,
+                    tr("Message binding %1.%2 -> %3.%4 more than once")
+                            .arg(msg->fromFunction(), msg->fromInterface(), msg->toFunction(), msg->toInterface()),
+                    dvCore->filePath());
+        }
+    }
     return ok;
 }
 
