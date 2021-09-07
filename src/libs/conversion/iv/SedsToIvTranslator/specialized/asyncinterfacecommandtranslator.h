@@ -21,7 +21,6 @@
 
 #include <ivcore/ivinterface.h>
 #include <seds/SedsModel/types/datatype.h>
-#include <vector>
 
 namespace Asn1Acn {
 class Definitions;
@@ -36,7 +35,6 @@ namespace seds::model {
 class CommandArgument;
 class Component;
 class DataTypeRef;
-class GenericTypeMapSet;
 class Interface;
 class InterfaceCommand;
 class Package;
@@ -59,11 +57,11 @@ public:
 public:
     auto translateCommand(const seds::model::InterfaceCommand &command, ivm::IVInterface::InterfaceType interfaceType)
             -> void;
-    auto translateArguments(const std::vector<seds::model::CommandArgument> &arguments,
+    auto translateArguments(const seds::model::InterfaceCommand &command,
             seds::model::CommandArgumentMode requestedArgumentMode, ivm::IVInterface *ivInterface) -> void;
 
 private:
-    auto createIvInterface(const QString &name, ivm::IVInterface::InterfaceType interfaceType) const
+    auto createIvInterface(const seds::model::InterfaceCommand &command, ivm::IVInterface::InterfaceType type) const
             -> ivm::IVInterface *;
     auto createAsn1SequenceComponent(const seds::model::CommandArgument &commandArgument) const
             -> std::unique_ptr<Asn1Acn::AsnSequenceComponent>;
@@ -71,6 +69,7 @@ private:
     auto findMappedType(const QString &genericTypeName) const -> const seds::model::DataTypeRef &;
     auto findDataType(const QString &dataTypeName) const -> const seds::model::DataType &;
 
+    auto interfaceTypeToString(ivm::IVInterface::InterfaceType interfaceType) const -> const QString &;
     auto switchInterfaceType(ivm::IVInterface::InterfaceType interfaceType) const -> ivm::IVInterface::InterfaceType;
 
 private:
@@ -79,6 +78,11 @@ private:
     const seds::model::Interface &m_interface;
     ivm::IVFunction *m_ivFunction;
     Asn1Acn::Definitions *m_asn1Definitions;
+
+    static const QString m_interfaceParameterName;
+    static const QString m_interfaceParameterEncoding;
+    static const QString m_asn1GroupTypeTemplate;
+    static const QString m_ivInterfaceNameTemplate;
 };
 
 } // namespace conversion::iv::translator

@@ -36,6 +36,11 @@ using conversion::translator::UnhandledValueException;
 
 namespace conversion::iv::translator {
 
+const QString AsyncInterfaceCommandTranslator::m_interfaceParameterName = "InputParam";
+const QString AsyncInterfaceCommandTranslator::m_interfaceParameterEncoding = "ACN";
+const QString AsyncInterfaceCommandTranslator::m_asn1GroupTypeTemplate = "%1_%2_Type";
+const QString AsyncInterfaceCommandTranslator::m_ivInterfaceNameTemplate = "%1_%2_%3";
+
 AsyncInterfaceCommandTranslator::AsyncInterfaceCommandTranslator(const seds::model::Package &package,
         const seds::model::Component &component, const seds::model::Interface &interface, ivm::IVFunction *ivFunction,
         Asn1Acn::Definitions *asn1Definitions)
@@ -52,22 +57,22 @@ void AsyncInterfaceCommandTranslator::translateCommand(
 {
     switch (command.argumentsCombination()) {
     case seds::model::ArgumentsCombination::InOnly: {
-        auto *ivInterface = createIvInterface(command.nameStr(), interfaceType);
-        translateArguments(command.arguments(), seds::model::CommandArgumentMode::In, ivInterface);
+        auto *ivInterface = createIvInterface(command, interfaceType);
+        translateArguments(command, seds::model::CommandArgumentMode::In, ivInterface);
         m_ivFunction->addChild(ivInterface);
     } break;
     case seds::model::ArgumentsCombination::OutOnly: {
-        auto *ivInterface = createIvInterface(command.nameStr(), switchInterfaceType(interfaceType));
-        translateArguments(command.arguments(), seds::model::CommandArgumentMode::Out, ivInterface);
+        auto *ivInterface = createIvInterface(command, switchInterfaceType(interfaceType));
+        translateArguments(command, seds::model::CommandArgumentMode::Out, ivInterface);
         m_ivFunction->addChild(ivInterface);
     } break;
     case seds::model::ArgumentsCombination::InAndNotify: {
-        auto *ivInterfaceIn = createIvInterface(command.nameStr() + "_IN", interfaceType);
-        translateArguments(command.arguments(), seds::model::CommandArgumentMode::In, ivInterfaceIn);
+        auto *ivInterfaceIn = createIvInterface(command, interfaceType);
+        translateArguments(command, seds::model::CommandArgumentMode::In, ivInterfaceIn);
         m_ivFunction->addChild(ivInterfaceIn);
 
-        auto *ivInterfaceNotify = createIvInterface(command.nameStr() + "_NOTIFY", switchInterfaceType(interfaceType));
-        translateArguments(command.arguments(), seds::model::CommandArgumentMode::Notify, ivInterfaceNotify);
+        auto *ivInterfaceNotify = createIvInterface(command, switchInterfaceType(interfaceType));
+        translateArguments(command, seds::model::CommandArgumentMode::Notify, ivInterfaceNotify);
         m_ivFunction->addChild(ivInterfaceNotify);
     } break;
     case seds::model::ArgumentsCombination::NoArgs:
@@ -86,13 +91,13 @@ void AsyncInterfaceCommandTranslator::translateCommand(
     }
 }
 
-void AsyncInterfaceCommandTranslator::translateArguments(const std::vector<seds::model::CommandArgument> &arguments,
+void AsyncInterfaceCommandTranslator::translateArguments(const seds::model::InterfaceCommand &command,
         seds::model::CommandArgumentMode requestedArgumentMode, ivm::IVInterface *ivInterface)
 {
-    const auto asn1TypeName = QString("Interface_%1_TypeGroup").arg(m_interface.nameStr());
+    const auto asn1TypeName = m_asn1GroupTypeTemplate.arg(m_interface.nameStr()).arg(command.nameStr());
     auto asn1Type = std::make_unique<Asn1Acn::Types::Sequence>(asn1TypeName);
 
-    for (const auto &argument : arguments) {
+    for (const auto &argument : command.arguments()) {
         asn1Type->addComponent(std::move(createAsn1SequenceComponent(argument)));
     }
 
@@ -100,10 +105,8 @@ void AsyncInterfaceCommandTranslator::translateArguments(const std::vector<seds:
             asn1Type->identifier(), asn1Type->identifier(), Asn1Acn::SourceLocation(), std::move(asn1Type));
     m_asn1Definitions->addType(std::move(asn1TypeAssignment));
 
-    const auto ivParameterName = QString("Interface_%1_Parameter").arg(m_interface.nameStr());
-    auto ivParameter = ivm::InterfaceParameter(ivParameterName, ivm::BasicParameter::Type::Other, asn1TypeName,
-            QStringLiteral("ACN"), ivm::InterfaceParameter::Direction::IN);
-
+    auto ivParameter = ivm::InterfaceParameter(m_interfaceParameterName, ivm::BasicParameter::Type::Other, asn1TypeName,
+            m_interfaceParameterEncoding, ivm::InterfaceParameter::Direction::IN);
     ivInterface->addParam(std::move(ivParameter));
 }
 
@@ -124,12 +127,14 @@ std::unique_ptr<Asn1Acn::AsnSequenceComponent> AsyncInterfaceCommandTranslator::
 }
 
 ivm::IVInterface *AsyncInterfaceCommandTranslator::createIvInterface(
-        const QString &name, ivm::IVInterface::InterfaceType interfaceType) const
+        const seds::model::InterfaceCommand &command, ivm::IVInterface::InterfaceType type) const
 {
     ivm::IVInterface::CreationInfo creationInfo;
     creationInfo.function = m_ivFunction;
-    creationInfo.type = interfaceType;
-    creationInfo.name = name;
+    creationInfo.type = type;
+    creationInfo.name = m_ivInterfaceNameTemplate.arg(m_interface.nameStr())
+                                .arg(command.nameStr())
+                                .arg(interfaceTypeToString(type));
     creationInfo.kind = ivm::IVInterface::OperationKind::Sporadic;
 
     return ivm::IVInterface::createIface(creationInfo);
@@ -170,6 +175,28 @@ const seds::model::DataType &AsyncInterfaceCommandTranslator::findDataType(const
     }
 
     throw UndeclaredDataTypeException(dataTypeName);
+}
+
+const QString &AsyncInterfaceCommandTranslator::interfaceTypeToString(
+        ivm::IVInterface::InterfaceType interfaceType) const
+{
+    switch (interfaceType) {
+    case ivm::IVInterface::InterfaceType::Required: {
+        static QString name = "Ri";
+        return name;
+    }
+    case ivm::IVInterface::InterfaceType::Provided: {
+        static QString name = "Pi";
+        return name;
+    }
+    case ivm::IVInterface::InterfaceType::Grouped: {
+        static QString name = "Grp";
+        return name;
+    }
+    default:
+        throw UnhandledValueException("ivm::InterfaceType");
+        break;
+    }
 }
 
 ivm::IVInterface::InterfaceType AsyncInterfaceCommandTranslator::switchInterfaceType(
