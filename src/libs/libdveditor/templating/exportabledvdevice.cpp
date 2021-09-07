@@ -26,7 +26,7 @@ ExportableDVDevice::ExportableDVDevice(const dvm::DVObject *dvObject)
 {
 }
 
-QString ExportableDVDevice::longName() const
+QString ExportableDVDevice::fullName() const
 {
     return name() + "_" + portName();
 }

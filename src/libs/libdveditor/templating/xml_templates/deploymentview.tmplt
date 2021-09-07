@@ -21,9 +21,9 @@ node.devices             :  |   |_ List of devices (ports) in that node
 device                   :  |   |   |_ Instance of device (see "for device in node.devices")
 node.requiredBusAccesses :  |   |_ List of devices in the node that are actually used by at least one connection
 device                   :  |       |_ Instance of bus access
-device.totalName         :  |       |_ Name of the access being device and port name
+device.fullName          :  |       |_ Name of the access being device and port name
 device.name              :  |       |_ Name of the access device
-device.port              :  |       |_ Name of the access port
+device.portName          :  |       |_ Name of the access port
 device.busName           :  |       |_ bus access name (has to match for both connected devices)
 Connections              : List of all available Connections between devices
 connection               :  |_ Instance of connection (see "for connection in Connections")
@@ -33,8 +33,12 @@ connection.fromPort      :      |_ The source port of this connection
 connection.toNode        :      |_ The target node of this connection
 connection.toDevice      :      |_ The target device of this connection
 connection.toPort        :      |_ The target port of this connection
+connection.busName       :      |_ Name of the bus used by this connection
 connection.messages      :      |_ List of message binding of that connection
 message                  :          |_ Instance of message/binding (see "for message in connection.messages")
+Buses                    : List of all used Buses
+bus                      :  |_ Instance of one bus
+bus.qualifier            :      |_ Quaifier of the bus (see device/connection busName)
 ==================
 {% endcomment %}
 <DeploymentView>

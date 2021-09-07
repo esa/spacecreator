@@ -35,6 +35,7 @@ class ExportableDVConnection : public ExportableDVObject
     Q_PROPERTY(QString toNode READ toNode)
     Q_PROPERTY(QString toDevice READ toDevice)
     Q_PROPERTY(QString toPort READ toPort)
+    Q_PROPERTY(QString busName READ busName)
 
 public:
     explicit ExportableDVConnection(const dvm::DVObject *dvObject = nullptr);
@@ -48,6 +49,8 @@ public:
     QString toNode() const;
     QString toDevice() const;
     QString toPort() const;
+
+    QString busName() const;
 };
 
 } // namespace dve

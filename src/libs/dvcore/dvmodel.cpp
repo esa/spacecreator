@@ -116,6 +116,48 @@ QString DVModel::newConnectionName() const
 }
 
 /*!
+   A cluster of connections is a group of connections, that a bound together being connected via devices
+ */
+QList<QList<DVConnection *>> DVModel::connectionClusters() const
+{
+    QVector<DVConnection *> connections = allObjectsByType<DVConnection>();
+    QList<QList<DVConnection *>> clusters;
+
+    auto isConnected = [](DVConnection *connection, const QList<DVConnection *> &cluster) {
+        for (DVConnection *c : cluster) {
+            if (connection->isConnected(c)) {
+                return true;
+            }
+        }
+        return false;
+    };
+
+    for (DVConnection *connection : connections) {
+        QList<DVConnection *> cluster1;
+        int idx = 0;
+        for (QList<DVConnection *> &cluster : clusters) {
+            if (isConnected(connection, cluster)) {
+                if (cluster1.isEmpty()) {
+                    cluster.append(connection);
+                    cluster1 = cluster;
+                } else {
+                    cluster1.append(cluster);
+                    clusters.removeAt(idx);
+                    break;
+                }
+            }
+            ++idx;
+        }
+        if (cluster1.isEmpty()) {
+            cluster1.append(connection);
+            clusters.append(cluster1);
+        }
+    }
+
+    return clusters;
+}
+
+/*!
    Returns if the given \p device is used. Meaning has a connection bound to it.
  */
 bool DVModel::isUsed(const DVDevice *device) const

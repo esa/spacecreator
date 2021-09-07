@@ -46,6 +46,8 @@ public:
     DVNode *sourceNode() const;
     DVNode *targetNode() const;
 
+    bool isConnected(DVConnection *other) const;
+
     QList<DVMessage *> messages() const;
 
     bool hasMessage(const QString &fromFunction, const QString &fromInterface, const QString &toFunction,

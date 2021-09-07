@@ -17,30 +17,29 @@
 
 #pragma once
 
-#include "exportabledvobject.h"
-
-namespace dvm {
-class DVObject;
-}
+#include <QObject>
 
 namespace dve {
 
-class ExportableDVDevice : public ExportableDVObject
+class ExportableDVBus
 {
     Q_GADGET
-    Q_PROPERTY(QString fullName READ fullName)
-    Q_PROPERTY(QString portName READ portName)
-    Q_PROPERTY(QString busName READ busName)
+    Q_PROPERTY(QString name READ name)
+    Q_PROPERTY(QString qualifier READ qualifier)
 
 public:
-    explicit ExportableDVDevice(const dvm::DVObject *dvObject = nullptr);
+    QString name() const;
+    void setName(const QString &name);
 
-    QString fullName() const;
-    QString portName() const;
-    QString busName() const;
+    QString qualifier() const;
+    void setQualifier(const QString &name);
+
+private:
+    QString m_name;
+    QString m_qualifier;
 };
 
 } // namespace dve
 
-Q_DECLARE_METATYPE(dve::ExportableDVDevice)
-Q_DECLARE_TYPEINFO(dve::ExportableDVDevice, Q_MOVABLE_TYPE);
+Q_DECLARE_METATYPE(dve::ExportableDVBus)
+Q_DECLARE_TYPEINFO(dve::ExportableDVBus, Q_MOVABLE_TYPE);

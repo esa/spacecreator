@@ -46,6 +46,7 @@ public:
     QList<DVConnection *> connections(DVNode *node) const;
     DVConnection *connectionByName(const QString &name) const;
     QString newConnectionName() const;
+    QList<QList<DVConnection *>> connectionClusters() const;
 
     bool isUsed(const DVDevice *device) const;
 

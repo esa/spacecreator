@@ -70,7 +70,7 @@ protected:
     virtual QString groupName(const shared::VEObject *object) const = 0;
 
     template<typename T>
-    QHash<QString, QVariant> collectObjects(const QList<T *> &objects)
+    QHash<QString, QVariant> collectObjects(const QList<T *> &objects) const
     {
         QHash<QString, QVariant> grouppedObjects;
 

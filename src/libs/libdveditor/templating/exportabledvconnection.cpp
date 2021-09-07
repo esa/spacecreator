@@ -75,4 +75,10 @@ QString ExportableDVConnection::toPort() const
     return device ? device->portName() : "";
 }
 
+QString ExportableDVConnection::busName() const
+{
+    dvm::DVDevice *device = exportedObject<dvm::DVConnection>()->sourceDevice();
+    return device ? device->busName() : "";
+}
+
 } // namespace dve

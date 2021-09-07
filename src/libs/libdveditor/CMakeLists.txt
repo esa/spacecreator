@@ -65,6 +65,8 @@ target_sources(${LIB_NAME} PRIVATE
     properties/dvmessagebindingswidget.h
     properties/dvpropertiesdialog.cpp
     properties/dvpropertiesdialog.h
+    templating/exportabledvbus.cpp
+    templating/exportabledvbus.h
     templating/exportabledvconnection.cpp
     templating/exportabledvconnection.h
     templating/exportabledvdevice.cpp
