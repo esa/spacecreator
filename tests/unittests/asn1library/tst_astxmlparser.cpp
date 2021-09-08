@@ -2914,6 +2914,35 @@ void AstXmlParserTests::test_iA5StringValueAssignment()
     QCOMPARE(type->value()->asString(), QStringLiteral("\"value\""));
 }
 
+void AstXmlParserTests::test_iA5StringWithAlternativeXmlTypename()
+{
+    parse(
+        R"(<?xml version="1.0" encoding="utf-8"?>)"
+        R"(<AstRoot>)"
+        R"(  <Asn1File FileName="Test2File.asn">)"
+        R"(    <Modules>)"
+        R"(      <Module Name="TestDefinitions" Line="13" CharPositionInLine="42">)"
+        R"(        <TypeAssignments>)"
+        R"(         <TypeAssignment Name="MyIA5String" Line="7" CharPositionInLine="0">)"
+        R"(           <Asn1Type id="TestDefinitions.MyIA5String" Line="7" CharPositionInLine="24" ParameterizedTypeInstance="false">)"
+        R"(             <IA5StringType>)"
+        R"(             </IA5StringType>)"
+        R"(           </Asn1Type>)"
+        R"(         </TypeAssignment>)"
+        R"(        </TypeAssignments>)"
+        R"(      </Module>)"
+        R"(    </Modules>)"
+        R"(  </Asn1File>)"
+        R"(</AstRoot>)");
+
+    const auto *type
+        = m_parsedData["Test2File.asn"]->definitions("TestDefinitions")->type("MyIA5String");
+    QVERIFY(type);
+    QVERIFY(type->type());
+    const auto *myIA5String = dynamic_cast<const Types::IA5String *>(type->type());
+    QVERIFY(myIA5String);
+}
+
 void AstXmlParserTests::test_numericStringWithSizeConstraint()
 {
     parse(
