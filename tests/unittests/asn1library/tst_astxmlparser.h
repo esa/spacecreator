@@ -114,6 +114,7 @@ private Q_SLOTS:
     void test_iA5StringWithValueDefined();
     void test_iA5StringAcnParams();
     void test_iA5StringValueAssignment();
+    void test_iA5StringWithAlternativeXmlTypename();
 
     void test_numericStringWithSizeConstraint();
     void test_numericStringWithValueConstraint();
