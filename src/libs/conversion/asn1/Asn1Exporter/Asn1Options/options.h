@@ -19,18 +19,18 @@
 
 #pragma once
 
+#include <QString>
+
 namespace conversion::asn1 {
 
 /**
- * @brief   Possible options for IV conversion
+ * @brief   Possible options for ASN.1 conversion
  */
-class IvOptions
+class Asn1Options
 {
 public:
-    /** @brief File to import */
-    inline static const QString inputFile = "Iv_Import_InputFile";
-    /** @brief IV parser file */
-    inline static const QString configFile = "Iv_Import_ConfigFile";
+    /** @brief File to export */
+    inline static const QString outputFilename = "Asn1_Export_OutputFilename";
 };
 
 } // namespace conversion::asn1
