@@ -37,7 +37,7 @@
 #include <asn1library/asn1/types/sequenceof.h>
 #include <asn1library/asn1/types/typefactory.h>
 #include <asn1library/asn1/types/userdefinedtype.h>
-#include <conversion/asn1/Asn1AcnExporter/visitors/asn1nodereconstructingvisitor.h>
+#include <conversion/asn1/Asn1Exporter/visitors/asn1nodereconstructingvisitor.h>
 
 using namespace Asn1Acn;
 using namespace Asn1Acn::Tests;

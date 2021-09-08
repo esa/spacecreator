@@ -11,7 +11,7 @@ target_include_directories(${TEST_NAME}
    PRIVATE     ${CMAKE_SOURCE_DIR}/src/libs)
 target_link_libraries(${TEST_NAME}
    PRIVATE     Conversion::Common
-               Conversion::Asn1AcnExporter
+               Conversion::Asn1Exporter
                asn1library
                Qt5::Core
                Qt5::Test)

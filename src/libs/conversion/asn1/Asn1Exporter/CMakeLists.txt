@@ -1,4 +1,4 @@
-project(Asn1AcnExporter VERSION 1.0.0 LANGUAGES CXX)
+project(Asn1Exporter VERSION 1.0.0 LANGUAGES CXX)
 
 set(SOURCES exporter.cpp
             visitors/acnnodereconstructingvisitor.cpp
@@ -13,17 +13,17 @@ set(INCLUDES exporter.h
              visitors/asn1typecomponentreconstructingvisitor.h
              visitors/typeconstraintsreconstructingvisitor.h)
 
-add_library(Asn1AcnExporter STATIC)
-target_sources(Asn1AcnExporter
+add_library(Asn1Exporter STATIC)
+target_sources(Asn1Exporter
     PRIVATE     "${SOURCES}"
                 "${INCLUDES}")
-target_include_directories(Asn1AcnExporter
+target_include_directories(Asn1Exporter
     PUBLIC      .
     PRIVATE     ${CMAKE_SOURCE_DIR}/src/libs)
-target_link_libraries(Asn1AcnExporter
+target_link_libraries(Asn1Exporter
     PUBLIC      Conversion::Common
                 asn1library)
 
-add_format_target(Asn1AcnExporter)
+add_format_target(Asn1Exporter)
 
-add_library(Conversion::Asn1AcnExporter ALIAS Asn1AcnExporter)
+add_library(Conversion::Asn1Exporter ALIAS Asn1Exporter)

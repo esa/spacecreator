@@ -1,2 +1,2 @@
-add_subdirectory(asn1acnexporter)
+add_subdirectory(asn1exporter)
 add_subdirectory(sedstoasn1translator)
