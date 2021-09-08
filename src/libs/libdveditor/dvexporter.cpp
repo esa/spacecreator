@@ -42,21 +42,21 @@ QString DVExporter::defaultTemplatePath() const
 bool DVExporter::exportObjects(
         const QList<shared::VEObject *> &objects, QBuffer *outBuffer, const QString &templatePath)
 {
-    const QHash<QString, QVariant> dvObjects = exportObjects(objects);
+    const QHash<QString, QVariant> dvObjects = collectObjects(objects);
     return exportData(dvObjects, templatePath, outBuffer);
 }
 
 bool DVExporter::exportObjectsInteractively(
         const QList<shared::VEObject *> &objects, const QString &outPath, const QString &templatePath, QWidget *root)
 {
-    const QHash<QString, QVariant> dvObjects = exportObjects(objects);
+    const QHash<QString, QVariant> dvObjects = collectObjects(objects);
     return exportData(dvObjects, outPath, templatePath, InteractionPolicy::Interactive, root);
 }
 
 bool DVExporter::exportObjectsSilently(
         const QList<shared::VEObject *> &objects, const QString &outPath, const QString &templatePath)
 {
-    const QHash<QString, QVariant> dvObjects = exportObjects(objects);
+    const QHash<QString, QVariant> dvObjects = collectObjects(objects);
     return exportData(dvObjects, outPath, templatePath, InteractionPolicy::Silently);
 }
 
@@ -79,36 +79,13 @@ QString DVExporter::groupName(const shared::VEObject *object) const
             return QStringLiteral("Nodes");
         case dvm::DVObject::Type::Connection:
             return QStringLiteral("Connections");
+        case dvm::DVObject::Type::Bus:
+            return QStringLiteral("Buses");
         default:
             return {};
         }
     }
     return {};
-}
-
-QHash<QString, QVariant> DVExporter::exportObjects(const QList<shared::VEObject *> &objects) const
-{
-    if (objects.isEmpty()) {
-        return {};
-    }
-    QHash<QString, QVariant> exObjects = collectObjects(objects);
-
-    auto model = qobject_cast<dvm::DVModel *>(objects.first()->model());
-    if (model) {
-        QVariantList buses;
-        QList<QList<dvm::DVConnection *>> clusters = model->connectionClusters();
-        for (const QList<dvm::DVConnection *> &cluster : clusters) {
-            if (cluster.isEmpty()) {
-                continue;
-            }
-            ExportableDVBus bus;
-            bus.setName(cluster.first()->sourceNode()->title() + "_" + cluster.first()->sourceDevice()->title());
-            bus.setQualifier(cluster.first()->sourceDevice()->busName());
-            buses.append(QVariant::fromValue(bus));
-        }
-        exObjects["Buses"] = buses;
-    }
-    return exObjects;
 }
 
 } // namespace dve

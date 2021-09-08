@@ -44,8 +44,8 @@ DVConnection::DVConnection(DVDevice *sourceDev, DVDevice *targetDev, DVObject *p
         setEntityAttribute(meta::Props::token(meta::Props::Token::to_node), targetDev->node()->title());
         setEntityAttribute(meta::Props::token(meta::Props::Token::to_port), targetDev->portName());
     }
-    if (sourceDev && targetDev && sourceDev->busName() == targetDev->busName()) {
-        setEntityAttribute(meta::Props::token(meta::Props::Token::to_bus), targetDev->busName());
+    if (sourceDev && targetDev && sourceDev->qualifier() == targetDev->qualifier()) {
+        setEntityAttribute(meta::Props::token(meta::Props::Token::to_bus), targetDev->qualifier());
     }
 }
 
@@ -82,7 +82,7 @@ bool DVConnection::postInit()
         }
         const QList<QPointer<DVDevice>> nodeDevices = node->devices();
         auto it = std::find_if(nodeDevices.cbegin(), nodeDevices.cend(), [portName, busName](DVDevice *dev) {
-            return dev->portName() == portName && dev->busName() == busName;
+            return dev->portName() == portName && dev->qualifier() == busName;
         });
         if (it == nodeDevices.cend()) {
             shared::ErrorHub::addError(shared::ErrorItem::Error,

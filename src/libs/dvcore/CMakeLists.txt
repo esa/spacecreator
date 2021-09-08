@@ -7,6 +7,8 @@ target_sources(${LIB_NAME} PRIVATE
     connectionvalidator.h
     dvboard.cpp
     dvboard.h
+    dvbus.cpp
+    dvbus.h
     dvcommonprops.cpp
     dvcommonprops.h
     dvconnection.cpp

@@ -78,6 +78,7 @@ shared::ui::VEInteractiveObject *DVItemModel::createItem(shared::Id objectId)
             return new DVConnectionGraphicsItem(connectionEntity, startItem, endItem, parentItem);
         }
     } break;
+    case dvm::DVObject::Type::Bus:
     case dvm::DVObject::Type::Message: {
         break;
     }

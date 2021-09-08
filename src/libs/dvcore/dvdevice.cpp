@@ -49,6 +49,11 @@ DVDevice::DVDevice(DVObject *parent)
             Q_EMIT portChanged(this->portName());
         }
     });
+    connect(this, &shared::VEObject::attributeChanged, this, [this](const QString &name) {
+        if (name == meta::Props::token(meta::Props::Token::requires_bus_access)) {
+            Q_EMIT qualifierChanged(this->qualifier());
+        }
+    });
 }
 
 DVNode *DVDevice::node() const
@@ -66,12 +71,12 @@ void DVDevice::setPortName(const QString &name)
     setEntityAttribute(meta::Props::token(meta::Props::Token::port), name);
 }
 
-QString DVDevice::busName() const
+QString DVDevice::qualifier() const
 {
     return entityAttributeValue(meta::Props::token(meta::Props::Token::requires_bus_access)).toString();
 }
 
-void DVDevice::setBusName(const QString &name)
+void DVDevice::setQualifier(const QString &name)
 {
     setEntityAttribute(meta::Props::token(meta::Props::Token::requires_bus_access), name);
 }

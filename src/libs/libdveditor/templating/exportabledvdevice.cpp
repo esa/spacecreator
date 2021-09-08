@@ -18,6 +18,7 @@
 #include "exportabledvdevice.h"
 
 #include "dvdevice.h"
+#include "dvnode.h"
 
 namespace dve {
 
@@ -38,8 +39,13 @@ QString ExportableDVDevice::portName() const
 
 QString ExportableDVDevice::qualifier() const
 {
-    return exportedObject<dvm::DVDevice>()->entityAttributeValue<QString>(
-            dvm::meta::Props::token(dvm::meta::Props::Token::requires_bus_access));
+    return exportedObject<dvm::DVDevice>()->qualifier();
+}
+
+QString ExportableDVDevice::nodeName() const
+{
+    dvm::DVNode *node = exportedObject<dvm::DVDevice>()->node();
+    return node ? node->title() : "";
 }
 
 } // namespace dve

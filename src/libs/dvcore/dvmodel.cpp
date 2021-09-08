@@ -18,6 +18,7 @@
 #include "dvmodel.h"
 
 #include "common.h"
+#include "dvbus.h"
 #include "dvconnection.h"
 #include "dvdevice.h"
 #include "dvfunction.h"
@@ -35,9 +36,16 @@ namespace dvm {
 DVModel::DVModel(QObject *parent)
     : shared::VEModel(parent)
 {
+    connect(this, &DVModel::objectsAdded, this, &DVModel::onObjectsAdded);
+    connect(this, &DVModel::objectRemoved, this, &DVModel::onObjectRemoved);
 }
 
 DVModel::~DVModel() { }
+
+DVObject *DVModel::getObject(const shared::Id &id) const
+{
+    return qobject_cast<DVObject *>(shared::VEModel::getObject(id));
+}
 
 DVObject *DVModel::getObjectByName(const QString &name, DVObject::Type type, Qt::CaseSensitivity caseSensitivity) const
 {
@@ -52,6 +60,14 @@ DVObject *DVModel::getObjectByName(const QString &name, DVObject::Type type, Qt:
         }
     }
     return nullptr;
+}
+
+void DVModel::clear()
+{
+    // Avoid calling resetBuses() again and again
+    disconnect(this, &DVModel::objectRemoved, this, &DVModel::onObjectRemoved);
+    VEModel::clear();
+    connect(this, &DVModel::objectRemoved, this, &DVModel::onObjectRemoved);
 }
 
 /*!
@@ -206,9 +222,41 @@ bool DVModel::addObjectImpl(shared::VEObject *obj)
     return false;
 }
 
-DVObject *DVModel::getObject(const shared::Id &id) const
+void DVModel::resetBuses()
 {
-    return qobject_cast<DVObject *>(shared::VEModel::getObject(id));
+    // Remove old buses
+    disconnect(this, &DVModel::objectRemoved, this, &DVModel::onObjectRemoved);
+    for (DVBus *bus : allObjectsByType<DVBus>()) {
+        removeObject(bus);
+    }
+
+    // Add buses
+    QList<QList<DVConnection *>> clusters = connectionClusters();
+    int idx = 1;
+    for (const QList<DVConnection *> &cluster : clusters) {
+        auto bus = new DVBus();
+        bus->setConnections(cluster);
+        bus->setTitle(QString("bus_%1").arg(idx));
+        addObject(bus);
+        ++idx;
+    }
+    connect(this, &DVModel::objectRemoved, this, &DVModel::onObjectRemoved);
+}
+
+void DVModel::onObjectsAdded(const QVector<shared::Id> &objectsIds)
+{
+    for (const shared::Id &id : objectsIds) {
+        DVObject *obj = getObject(id);
+        if (obj && obj->type() == dvm::DVObject::Type::Connection) {
+            resetBuses();
+            return;
+        }
+    }
+}
+
+void DVModel::onObjectRemoved()
+{
+    resetBuses();
 }
 
 } // namespace dvm

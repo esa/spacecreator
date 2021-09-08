@@ -47,6 +47,7 @@ public:
         Device,
         Connection,
         Message,
+        Bus,
     };
     Q_ENUM(Type)
 

@@ -19,30 +19,25 @@
 
 #include "dvobject.h"
 
-namespace dvm {
-class DVNode;
-class DVPort;
+#include <QPointer>
 
-class DVDevice : public DVObject
+namespace dvm {
+class DVConnection;
+class DVDevice;
+
+class DVBus : public DVObject
 {
     Q_OBJECT
-    Q_PROPERTY(QString portName READ portName WRITE setPortName NOTIFY portChanged)
-    Q_PROPERTY(QString qualifier READ qualifier WRITE setQualifier NOTIFY qualifierChanged)
 public:
-    explicit DVDevice(const DVPort &port, DVObject *parent = nullptr);
-    explicit DVDevice(DVObject *parent = nullptr);
+    explicit DVBus(DVObject *parent = nullptr);
 
-    DVNode *node() const;
+    void setConnections(const QList<DVConnection *> &connections);
 
-    QString portName() const;
-    void setPortName(const QString &name);
-
+    QList<DVDevice *> connectedDevices() const;
     QString qualifier() const;
-    void setQualifier(const QString &name);
 
-Q_SIGNALS:
-    void portChanged(const QString &port);
-    void qualifierChanged(const QString &qualifier);
+private:
+    QList<QPointer<DVDevice>> m_devices;
 };
 
 } // namespace dvm
