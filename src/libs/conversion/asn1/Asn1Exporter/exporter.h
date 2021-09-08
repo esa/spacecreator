@@ -18,3 +18,21 @@
  */
 
 #pragma once
+
+#include "export/modelexporter.h"
+#include "visitors/acnnodereconstructingvisitor.h"
+#include "visitors/asn1nodereconstructingvisitor.h"
+
+namespace conversion::asn1::exporter {
+class Asn1Exporter final : public ::conversion::exporter::ModelExporter
+{
+public:
+    /**
+     * @brief   Exports model
+     *
+     * @param   model       Model to export
+     * @param   options     Options for export configuration
+     */
+    virtual auto exportModel(const Model *model, const Options &options) const -> void override;
+};
+} // namespace conversion::asn1::exporter

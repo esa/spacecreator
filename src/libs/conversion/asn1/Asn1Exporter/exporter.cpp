@@ -19,7 +19,27 @@
 
 #include "exporter.h"
 
-#include "visitors/acnnodereconstructingvisitor.h"
-#include "visitors/acntypecomponentreconstructingvisitor.h"
-#include "visitors/asn1nodereconstructingvisitor.h"
-#include "visitors/asn1typecomponentreconstructingvisitor.h"
+#include "Asn1Options/options.h"
+#include "asn1editor/asn1itemmodel.h"
+#include "export/exceptions.h"
+
+// #include <asn1library/asn1/>
+
+using asn1::Asn1ItemModel;
+using conversion::asn1::Asn1Options;
+using conversion::exporter::ExportException;
+
+namespace conversion::asn1::exporter {
+
+void Asn1Exporter::exportModel(const Model *model, const Options &options) const
+{
+
+    const auto outputFilename = options.value(Asn1Options::outputFilename);
+    if (outputFilename == nullptr) {
+        throw ExportException("Output filename wasn't specified");
+    }
+
+    // TODO
+}
+
+} // namespace conversion::asn1::exporter
