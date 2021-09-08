@@ -42,6 +42,8 @@ public:
     DVObject *getObject(const shared::Id &id) const override;
     DVObject *getObjectByName(const QString &name, DVObject::Type type, Qt::CaseSensitivity caseSensitivity) const;
 
+    void clear() override;
+
     QList<DVConnection *> connections(DVDevice *device) const;
     QList<DVConnection *> connections(DVNode *node) const;
     DVConnection *connectionByName(const QString &name) const;
@@ -53,6 +55,12 @@ public:
     QList<DVFunction *> functions(DVNode *node) const;
 
     bool addObjectImpl(shared::VEObject *obj) override;
+
+    void resetBuses();
+
+protected Q_SLOTS:
+    void onObjectsAdded(const QVector<shared::Id> &objectsIds);
+    void onObjectRemoved();
 };
 
 } // namespace dvm

@@ -17,9 +17,9 @@
 
 #include "dvtreeviewmodel.h"
 
-#include "dvmodel.h"
 #include "commands/cmdentityattributechange.h"
 #include "commandsstackbase.h"
+#include "dvmodel.h"
 #include "dvnamevalidator.h"
 
 namespace dve {
@@ -41,6 +41,10 @@ void DVTreeViewModel::updateItemData(QStandardItem *item, shared::VEObject *obje
 
     QPixmap pix;
     switch (obj->type()) {
+    case dvm::DVObject::Type::Bus: {
+        static const QPixmap icon = QIcon(QLatin1String(":/toolbar/icns/bus.svg")).pixmap(16, 16);
+        pix = icon;
+    } break;
     case dvm::DVObject::Type::Connection: {
         static const QPixmap icon = QIcon(QLatin1String(":/toolbar/icns/connection.svg")).pixmap(16, 16);
         pix = icon;
@@ -74,7 +78,7 @@ void DVTreeViewModel::updateItemData(QStandardItem *item, shared::VEObject *obje
 QStandardItem *DVTreeViewModel::createItem(shared::VEObject *obj)
 {
     QStandardItem *item = shared::AbstractVisualizationModel::createItem(obj);
-    connect(obj, &shared::VEObject::attributeChanged, this, [this](const QString &attrName){
+    connect(obj, &shared::VEObject::attributeChanged, this, [this](const QString &attrName) {
         if (attrName == dvm::meta::Props::token(dvm::meta::Props::Token::name)) {
             updateItem();
         }
@@ -83,7 +87,8 @@ QStandardItem *DVTreeViewModel::createItem(shared::VEObject *obj)
     return item;
 }
 
-void DVTreeViewModel::onDataChanged(const QModelIndex &topLeft, const QModelIndex &bottomRight, const QVector<int> &roles)
+void DVTreeViewModel::onDataChanged(
+        const QModelIndex &topLeft, const QModelIndex &bottomRight, const QVector<int> &roles)
 {
     if (!m_commandsStack) {
         return;
@@ -101,9 +106,8 @@ void DVTreeViewModel::onDataChanged(const QModelIndex &topLeft, const QModelInde
                     const QString name = dvm::DVNameValidator::encodeName(obj->type(), item->text());
                     if (name != obj->title()) {
                         if (dvm::DVNameValidator::isAcceptableName(obj, name)) {
-                            const QVariantHash attributes = {
-                                { dvm::meta::Props::token(dvm::meta::Props::Token::name), name }
-                            };
+                            const QVariantHash attributes = { { dvm::meta::Props::token(dvm::meta::Props::Token::name),
+                                    name } };
                             auto attributesCmd = new shared::cmd::CmdEntityAttributeChange(obj, attributes);
                             m_commandsStack->push(attributesCmd);
                         } else {
@@ -115,6 +119,5 @@ void DVTreeViewModel::onDataChanged(const QModelIndex &topLeft, const QModelInde
         }
     }
 }
-
 
 } // namespace dve

@@ -5,6 +5,7 @@
     <qresource prefix="/toolbar">
         <file>icns/asn1.png</file>
         <file>icns/board.svg</file>
+        <file>icns/bus.svg</file>
         <file>icns/comment.svg</file>
         <file>icns/connection_group.svg</file>
         <file>icns/connection.svg</file>

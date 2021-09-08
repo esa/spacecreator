@@ -80,6 +80,8 @@ QString ExportableDVConnection::toPort() const
 
 QString ExportableDVConnection::busName() const
 {
+    /// @todo get the name of the DVbus instead
+
     dvm::DVConnection *connection = const_cast<dvm::DVConnection *>(exportedObject<dvm::DVConnection>());
     dvm::DVDevice *device = connection->sourceDevice();
     dvm::DVModel *model = device ? device->model() : nullptr;
@@ -88,13 +90,15 @@ QString ExportableDVConnection::busName() const
     }
 
     QList<QList<dvm::DVConnection *>> clusters = model->connectionClusters();
-    auto it = std::find_if(clusters.begin(), clusters.end(),
-            [&connection](QList<dvm::DVConnection *> cluster) { return cluster.contains(connection); });
-    if (it == clusters.end()) {
-        return {};
+    int count = 1;
+    for (const QList<dvm::DVConnection *> &cluster : clusters) {
+        if (cluster.contains(connection)) {
+            break;
+        }
+        ++count;
     }
 
-    return it->first()->sourceNode()->title() + "_" + it->first()->sourceDevice()->title();
+    return QString("bus_%1").arg(count);
 }
 
 } // namespace dve

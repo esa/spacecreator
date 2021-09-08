@@ -51,8 +51,6 @@ private:
      */
     QVariant createFrom(const shared::VEObject *object) const override;
     QString groupName(const shared::VEObject *object) const override;
-
-    QHash<QString, QVariant> exportObjects(const QList<shared::VEObject *> &objects) const;
 };
 
 } // namespace dve

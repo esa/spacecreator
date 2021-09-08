@@ -17,26 +17,26 @@
 
 #pragma once
 
-#include <QObject>
+#include "exportabledvobject.h"
+
+namespace dvm {
+class DVObject;
+}
 
 namespace dve {
 
-class ExportableDVBus
+class ExportableDVBus : public ExportableDVObject
 {
     Q_GADGET
-    Q_PROPERTY(QString name READ name)
     Q_PROPERTY(QString qualifier READ qualifier)
+    Q_PROPERTY(QVariantList devices READ devices)
 
 public:
-    QString name() const;
-    void setName(const QString &name);
+    explicit ExportableDVBus(const dvm::DVObject *dvObject = nullptr);
 
     QString qualifier() const;
-    void setQualifier(const QString &name);
 
-private:
-    QString m_name;
-    QString m_qualifier;
+    QVariantList devices() const;
 };
 
 } // namespace dve

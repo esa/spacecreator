@@ -112,7 +112,7 @@ void tst_DVModel::testConnectionName()
     auto device1 = new dvm::DVDevice(node1);
     device1->setTitle("Device_A");
     device1->setPortName("Port_A");
-    device1->setBusName("ipv6");
+    device1->setQualifier("ipv6");
     node1->addDevice(device1);
     m_model->addObject(device1);
 
@@ -122,7 +122,7 @@ void tst_DVModel::testConnectionName()
     auto device2 = new dvm::DVDevice(node2);
     device2->setTitle("Device_B");
     device2->setPortName("Port_B");
-    device2->setBusName("ipv6");
+    device2->setQualifier("ipv6");
     node2->addDevice(device2);
     m_model->addObject(device2);
 

@@ -17,26 +17,28 @@
 
 #include "exportabledvbus.h"
 
+#include "dvbus.h"
+#include "dvdevice.h"
+
 namespace dve {
 
-QString ExportableDVBus::name() const
+ExportableDVBus::ExportableDVBus(const dvm::DVObject *dvObject)
+    : ExportableDVObject(dvObject)
 {
-    return m_name;
-}
-
-void ExportableDVBus::setName(const QString &name)
-{
-    m_name = name;
 }
 
 QString ExportableDVBus::qualifier() const
 {
-    return m_qualifier;
+    return exportedObject<dvm::DVBus>()->qualifier();
+    ;
 }
 
-void ExportableDVBus::setQualifier(const QString &name)
+QVariantList ExportableDVBus::devices() const
 {
-    m_qualifier = name;
+    QVariantList devices;
+    for (const dvm::DVDevice *device : exportedObject<dvm::DVBus>()->connectedDevices())
+        devices << createFrom(device);
+    return devices;
 }
 
 } // namespace dve
