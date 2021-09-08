@@ -44,9 +44,6 @@ class tsti_IvXmlExporter : public QObject
 {
     Q_OBJECT
 
-public:
-    virtual ~tsti_IvXmlExporter() = default;
-
 private Q_SLOTS:
     void initTestCase();
     void cleanup();
