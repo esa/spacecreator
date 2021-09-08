@@ -33,4 +33,4 @@ public:
     inline static const QString configFile = "Iv_Import_ConfigFile";
 };
 
-} // namespace conversion::seds
+} // namespace conversion::iv
