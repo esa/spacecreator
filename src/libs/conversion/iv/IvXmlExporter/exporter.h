@@ -37,7 +37,7 @@ class IvXmlExporter final : public conversion::exporter::ModelExporter
 {
 public:
     /**
-     * @brief   Creates a IV XML file from the passed model
+     * @brief   Creates an IV XML file from the passed model
      *
      * @param   model       Model to export
      * @param   options     List of options
