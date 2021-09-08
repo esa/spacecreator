@@ -21,6 +21,7 @@
 #include "ivobject.h"
 #include "vemodel.h"
 
+#include <conversion/common/model.h>
 #include <QAbstractItemModel>
 #include <QVector>
 #include <memory>
@@ -36,7 +37,7 @@ class IVFunction;
 class IVFunctionType;
 
 struct IVModelPrivate;
-class IVModel : public shared::VEModel
+class IVModel : public shared::VEModel, public conversion::Model
 {
     Q_OBJECT
 public:

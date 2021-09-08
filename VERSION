@@ -8,7 +8,7 @@
 export SC_MAJOR_VERSION=0
 
 # This sets the minor version
-export SC_MINOR_VERSION=9
+export SC_MINOR_VERSION=10
 
 # The patch version is set automaticly
 if [ ! -z "${CI_BUILD_ID}" ]; then

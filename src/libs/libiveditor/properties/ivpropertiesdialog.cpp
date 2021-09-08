@@ -214,10 +214,10 @@ void IVPropertiesDialog::initCommentView()
         insertTab(commentEdit, tr("Comment content"));
         connect(this, &QDialog::accepted, this, [comment, commentEdit, this]() {
             const QString text = commentEdit->toPlainText();
-            if (comment->titleUI() == text)
+            const QString encodedText = ivm::IVNameValidator::encodeName(comment->type(), text);
+            if (comment->title() == encodedText)
                 return;
 
-            const QString encodedText = ivm::IVNameValidator::encodeName(comment->type(), text);
             const QVariantHash textArg { { ivm::meta::Props::token(ivm::meta::Props::Token::name), encodedText } };
             auto commentTextCmd = new shared::cmd::CmdEntityAttributeChange(comment, textArg);
             commentTextCmd->setText(tr("Edit Comment"));

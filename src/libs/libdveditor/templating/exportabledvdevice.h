@@ -30,14 +30,14 @@ class ExportableDVDevice : public ExportableDVObject
     Q_GADGET
     Q_PROPERTY(QString fullName READ fullName)
     Q_PROPERTY(QString portName READ portName)
-    Q_PROPERTY(QString busName READ busName)
+    Q_PROPERTY(QString qualifier READ qualifier)
 
 public:
     explicit ExportableDVDevice(const dvm::DVObject *dvObject = nullptr);
 
     QString fullName() const;
     QString portName() const;
-    QString busName() const;
+    QString qualifier() const;
 };
 
 } // namespace dve

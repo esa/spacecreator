@@ -1,3 +1,101 @@
+Release: DVE_10
+========================================================
+* [2c618b0a] [2021-08-11] 621 Fix overlapping messages
+* [7dd3dddf] [2021-08-12] Major msc performance improvement
+* [b028b8d1] [2021-08-16] DVE: Function bindings can be in several partitions, if not in the same node
+* [0c76784f] [2021-08-17] IVE: Long text in nested comments isn't visible in Outer Mini-View
+* [ed943642] [2021-08-17] IVE: Add sub-context menu to build each DV separately
+* [379775ec] [2021-08-16] 562 Fix keeping iv and msc in sync
+* [2cf0db8f] [2021-08-17] 562 Keep IV functions name changes in sync for DV
+* [4dd559e9] [2021-08-17] 562 Keep IV functions deletes in sync for DV
+* [57144b45] [2021-08-17] Resolve "QtC: AppImage can't save files"
+* [73e4eae9] [2021-08-18] 633 Set the version including the patch version number
+* [f6587d77] [2021-08-19] DVE: Default device positions should  be on the left and right only
+* [14c1efad] [2021-08-02] SEDS: Added SedsXmlImporter sources
+* [ed1fff6a] [2021-08-02] SEDS: Added SedsXmlImporter tests
+* [df4f2929] [2021-08-02] SEDS: Formatted sources
+* [7fc889b8] [2021-08-10] SEDS: Removed magic_enum library
+* [fd2b8c6a] [2021-08-10] SEDS: Refactored SEDS directory structure
+* [fbe1efad] [2021-08-19] Fix local test run
+* [5013799a] [2021-08-12] SEDS: Fixed clang-tidy warnings
+* [649681f4] [2021-08-19] Renamed clang-format and clang-tidy files
+* [2bbc2c8c] [2021-08-19] DVE: A message can be bound for one connection only
+* [63195c7c] [2021-08-04] Prepended Asn1Acn plugin path as first to it's test's LD_LIBRARY_PATH
+* [97e5a10c] [2021-08-19] 616 Use lazy loading to enable QtC session usage
+* [0edca334] [2021-08-20] 616 Update DV messages on IV interface changes
+* [92d3db7c] [2021-08-23] DVE: Only one connection can be created between the same devices
+* [3a0a6622] [2021-08-23] 616 Update DV function names in message bindings
+* [e6257789] [2021-08-02] asn1library: Backported ASN.1 model from asn1scc.Fuzzer (part 1)
+* [4b9899f3] [2021-08-25] Bump version to 0.9
+* [61fe2db0] [2021-08-25] IVE: Function label disappears
+* [251d6949] [2021-08-04] asn1library: Backported ASN.1 model from asn1scc.Fuzzer (part 2)
+* [37995ab2] [2021-08-05] asn1library: Ported asn1 parser from asn1scc.Fuzzer
+* [0d97a82e] [2021-08-10] asn1library: Ported asn1scc.Fuzzer tests
+* [ed652158] [2021-08-11] asn1library: Ported AstXmlConstraintParser tests from asn1scc.Fuzzer
+* [7535ecfd] [2021-08-25] Resolve "MSC: Comments are off"
+* [6ff5ccfd] [2021-08-25] 636 Call external tools with original environment
+* [ccad950e] [2021-08-25] 636 Improve QtCreator detection
+* [356b0efe] [2021-08-25] 636 QtCreator 4.15 build fixes
+* [8856c027] [2021-08-25] 632 More QtCreator detection improvement
+* [44066402] [2021-08-25] DVE: Node name change does not trigger text update
+* [7ed59225] [2021-08-25] Revert "DVE: Function bindings can be in several partitions, if not in the same"
+* [effb3d77] [2021-08-25] DVE: Message binding color is wrong
+* [63aebafb] [2021-08-25] IVE: There is no error reporting when import of duplicated function is declined
+* [31671f2e] [2021-08-25] IVE: Attributes table column width changes
+* [14ee3e6c] [2021-08-12] Conversion: Created ModelImporter class
+* [68e12f10] [2021-08-13] Conversion: Implemented subsystem architecture
+* [365ad06e] [2021-08-27] Conversion: Added missing documentation
+* [38187001] [2021-08-27] Conversion: Added QT version check around hash implementation for QString
+* [643893d3] [2021-08-20] SEDS: Moved some tests to the unittests directory
+* [85593ba5] [2021-08-27] SEDS: Fixes deprecated Qt constructs
+* [bfa62656] [2021-08-30] SEDS: Renamed some SEDS conversion options
+* [0ef28a90] [2021-08-31] 646 Fix appimage version argument
+* [bb56d343] [2021-08-31] Read version and git information from a generated file
+* [b550c0e9] [2021-08-31] 629 Use device bus access for connection validation
+* [b3774680] [2021-08-31] DVE: Resize/move issues for nodes/partitions
+* [84b64e28] [2021-08-31] 642 Update DV template documentation
+* [8ff36366] [2021-08-31] 643 Left align msc comments
+* [cce67fa8] [2021-08-16] Conversion: Created Asn1Registrar
+* [0e9570f2] [2021-08-16] Conversion: Created SedsToAsn1Translator
+* [9ec18a3c] [2021-08-16] Converter: Importing model
+* [13ff69e9] [2021-08-17] Converter: Translating model
+* [6f6f5a5c] [2021-08-17] Conversion: Created Asn1Model
+* [e8a6c1fe] [2021-08-18] SedsToAsn1Translator: Translating package
+* [40ea28f2] [2021-08-18] SedsToAsn1Translator: Translating data types set
+* [f25f4130] [2021-08-19] SedsToAsn1Translator: Translating IntegerDataType
+* [e65dcd42] [2021-08-20] SedsToAsn1Translator: Translator tests
+* [8479166c] [2021-08-23] SedsToAsn1Translator: Translating RealDataType
+* [81f39a4e] [2021-08-23] SedsToAsn1Translator: Translating BooleanDataType
+* [d275dafc] [2021-08-23] SedsToAsn1Translator: Translating StringDataType
+* [f4016b72] [2021-08-24] SedsToAsn1Translator: Translating BitStringDataType
+* [c2c12198] [2021-08-24] SedsToAsn1Translator: Translating EnumeratedDataType
+* [327b1a36] [2021-08-24] SedsToAsn1Translator: clang-tidy fixes
+* [99c3b8c4] [2021-08-30] SedsToAsn1Trasnslator: Removed helper asn1 parser application
+* [9d2d88e3] [2021-08-30] SedsToAsn1Trasnslator: Cleanup
+* [baa02aa2] [2021-09-01] SedsToAsn1Trasnslator: Added documentation
+* [a32387bd] [2021-09-01] SedsToAsn1Trasnslator: Removed redundant destructor in the test
+* [8325da17] [2021-09-01] Conversion: Explicitly deleted Converter move constructor which was implicitly deleted anyway
+* [3707ad4d] [2021-09-01] 647 Show asn.1 errors using the ErrorHub
+* [de4e93aa] [2021-09-02] 648 Use line numbers in asn error messages
+* [4032813c] [2021-09-02] 641 DV function validity tests
+* [2cad96a2] [2021-09-03] 640 Introduce IVEditorCorePtr typedef
+* [a0378d05] [2021-09-03] 630 Introduce MSCEditorCorePtr typedef
+* [aafd1b2e] [2021-09-03] Use environment variables as highest priority for QtCreator checks
+* [7c6b8bd9] [2021-09-03] 640 DV messages validity tests
+* [ff8867a6] [2021-09-06] 653 Provide requiredBusAccesses in nodes when exporting
+* [43807d6f] [2021-09-06] 653 Use unique names for new connections/partitions
+* [8f9ee7b7] [2021-09-06] 653 Add device and port name to DV template
+* [8be16712] [2021-09-06] DVE: Changing(adding) value for URL Property doesn't have any visual effect
+* [12428b71] [2021-09-07] 653 Simplify exportable used DV devices
+* [18aa1544] [2021-09-07] 654 Make more DV connection properties directyl accessable for the template
+* [6ab76d1a] [2021-09-07] DVE: Bound functions visibility in partition is fixed
+* [4231bb49] [2021-09-07] DVE: Crash connecting devices
+* [77172332] [2021-09-07] 654 DV templates gains access to Buses
+* [bd26941b] [2021-09-07] IVE: Newline in comments are ignored
+* [75254325] [2021-09-07] 654 Connection busName reports the name used by the bus, not the quelifier
+* [78fe23e1] [2021-09-07] 654 Extend the template
+* [99edda0d] [2021-09-07] 654 Template device.busName renamed to device.qualifier
+
 Release: DVE_09
 ========================================================
 * [2c618b0a] [2021-08-11] 621 Fix overlapping messages

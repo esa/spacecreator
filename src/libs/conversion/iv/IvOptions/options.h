@@ -19,39 +19,18 @@
 
 #pragma once
 
-class QString;
-
-#include <set>
-
-namespace conversion {
+namespace conversion::iv {
 
 /**
- * @brief   All model types supported in conversion
+ * @brief   Possible options for IV conversion
  */
-enum class ModelType
+class IvOptions
 {
-    Asn1,
-    Aadl,
-    InterfaceView,
-    Sdl,
-    Seds
+public:
+    /** @brief File to import */
+    inline static const QString inputFile = "Iv_Import_InputFile";
+    /** @brief IV parser file */
+    inline static const QString configFile = "Iv_Import_ConfigFile";
 };
 
-/**
- * @brief   Converts given model type to string
- *
- * @param   modelType   Model type to convert
- *
- * @param   String with model type name
- */
-auto modelTypeToString(ModelType modelType) -> QString;
-/**
- * @brief   Converts given set of model types to string
- *
- * @param   sourceModelsTypes       Set of model types
- *
- * @return  String with model types names separated with comma
- */
-auto modelTypesToString(const std::set<ModelType> &modelsTypes) -> QString;
-
-} // namespace conversion
+} // namespace conversion::seds

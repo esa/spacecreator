@@ -9,7 +9,7 @@
 * Select `MyEnum` from the list of combo box as type
 * Double click the value
 * In the new dialog select `three` as value
-* Press the button "Ok" nad "Ok" to close all dialogs
+* Press the button "Ok" and "Ok" to close all dialogs
 
 Expected results:
 

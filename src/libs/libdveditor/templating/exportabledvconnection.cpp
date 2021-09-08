@@ -20,7 +20,10 @@
 #include "dvconnection.h"
 #include "dvdevice.h"
 #include "dvmessage.h"
+#include "dvmodel.h"
 #include "dvnode.h"
+
+#include <algorithm>
 
 namespace dve {
 
@@ -77,8 +80,21 @@ QString ExportableDVConnection::toPort() const
 
 QString ExportableDVConnection::busName() const
 {
-    dvm::DVDevice *device = exportedObject<dvm::DVConnection>()->sourceDevice();
-    return device ? device->busName() : "";
+    dvm::DVConnection *connection = const_cast<dvm::DVConnection *>(exportedObject<dvm::DVConnection>());
+    dvm::DVDevice *device = connection->sourceDevice();
+    dvm::DVModel *model = device ? device->model() : nullptr;
+    if (!model) {
+        return {};
+    }
+
+    QList<QList<dvm::DVConnection *>> clusters = model->connectionClusters();
+    auto it = std::find_if(clusters.begin(), clusters.end(),
+            [&connection](QList<dvm::DVConnection *> cluster) { return cluster.contains(connection); });
+    if (it == clusters.end()) {
+        return {};
+    }
+
+    return it->first()->sourceNode()->title() + "_" + it->first()->sourceDevice()->title();
 }
 
 } // namespace dve

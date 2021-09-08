@@ -25,6 +25,7 @@
 #include <conversion/common/modeltype.h>
 #include <conversion/common/options.h>
 #include <conversion/converter/converter.h>
+#include <conversion/iv/IvRegistrar/registrar.h>
 #include <conversion/seds/SedsOptions/options.h>
 #include <conversion/seds/SedsRegistrar/registrar.h>
 
@@ -34,6 +35,7 @@ using conversion::Options;
 using conversion::RegistrationFailedException;
 using conversion::Registry;
 using conversion::asn1::Asn1Registrar;
+using conversion::iv::IvRegistrar;
 using conversion::seds::SedsOptions;
 using conversion::seds::SedsRegistrar;
 
@@ -59,16 +61,22 @@ void SedsConverter::convert(ModelType targetModelType) const
 
 void SedsConverter::initializeRegistry()
 {
-    SedsRegistrar sedsRegistrar;
-    auto result = sedsRegistrar.registerCapabilities(m_registry);
-    if (!result) {
-        throw RegistrationFailedException(ModelType::Seds);
-    }
-
     Asn1Registrar asn1Registrar;
-    result = asn1Registrar.registerCapabilities(m_registry);
+    auto result = asn1Registrar.registerCapabilities(m_registry);
     if (!result) {
         throw RegistrationFailedException(ModelType::Asn1);
+    }
+
+    IvRegistrar ivRegistrar;
+    result = ivRegistrar.registerCapabilities(m_registry);
+    if (!result) {
+        throw RegistrationFailedException(ModelType::InterfaceView);
+    }
+
+    SedsRegistrar sedsRegistrar;
+    result = sedsRegistrar.registerCapabilities(m_registry);
+    if (!result) {
+        throw RegistrationFailedException(ModelType::Seds);
     }
 }
 

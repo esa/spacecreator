@@ -51,6 +51,7 @@ IVCommentGraphicsItem::IVCommentGraphicsItem(ivm::IVComment *comment, QGraphicsI
 void IVCommentGraphicsItem::init()
 {
     shared::ui::VERectGraphicsItem::init();
+    updateText();
 }
 
 int IVCommentGraphicsItem::itemLevel(bool isSelected) const
@@ -120,7 +121,6 @@ shared::ui::TextItem *IVCommentGraphicsItem::initTextItem()
     textItem->setTextInteractionFlags(Qt::NoTextInteraction);
     textItem->setBackground(Qt::transparent);
     textItem->setOpenExternalLinks(true);
-    textItem->setHtml(entity()->titleUI());
     return textItem;
 }
 
@@ -137,7 +137,11 @@ void IVCommentGraphicsItem::applyColorScheme()
 
 void IVCommentGraphicsItem::updateEntityTitle(const QString &text)
 {
-    if (text == entity()->title()) {
+    const QString newName = ivm::IVNameValidator::encodeName(entity()->type(), text);
+    if (newName == entity()->title()) {
+        return;
+    }
+    if (!ivm::IVNameValidator::isAcceptableName(entity(), newName)) {
         return;
     }
 
@@ -147,10 +151,6 @@ void IVCommentGraphicsItem::updateEntityTitle(const QString &text)
         return;
     }
 
-    const QString newName = ivm::IVNameValidator::encodeName(entity()->type(), text);
-    if (!ivm::IVNameValidator::isAcceptableName(entity(), newName)) {
-        return;
-    }
     const QVariantHash attributes = { { ivm::meta::Props::token(ivm::meta::Props::Token::name), newName } };
     m_commandsStack->push(new shared::cmd::CmdEntityAttributeChange(entity(), attributes));
 }

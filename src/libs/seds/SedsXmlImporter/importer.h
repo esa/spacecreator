@@ -21,11 +21,13 @@
 
 #include <QString>
 #include <conversion/common/import/modelimporter.h>
-#include <conversion/common/model.h>
-#include <conversion/common/options.h>
 #include <memory>
-#include <optional>
 #include <seds/SymbolDefinitionReader/symboldefinitionreader.h>
+
+namespace conversion {
+class Model;
+class Options;
+} // namespace conversion
 
 namespace seds::importer {
 

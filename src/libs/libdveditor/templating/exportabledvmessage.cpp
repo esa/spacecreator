@@ -17,11 +17,33 @@
 
 #include "exportabledvmessage.h"
 
+#include "dvmessage.h"
+
 namespace dve {
 
 ExportableDVMessage::ExportableDVMessage(const dvm::DVObject *dvObject)
     : ExportableDVObject(dvObject)
 {
+}
+
+QString ExportableDVMessage::fromFunction() const
+{
+    return exportedObject<dvm::DVMessage>()->fromFunction();
+}
+
+QString ExportableDVMessage::fromInterface() const
+{
+    return exportedObject<dvm::DVMessage>()->fromInterface();
+}
+
+QString ExportableDVMessage::toFunction() const
+{
+    return exportedObject<dvm::DVMessage>()->toFunction();
+}
+
+QString ExportableDVMessage::toInterface() const
+{
+    return exportedObject<dvm::DVMessage>()->toInterface();
 }
 
 } // namespace dve
