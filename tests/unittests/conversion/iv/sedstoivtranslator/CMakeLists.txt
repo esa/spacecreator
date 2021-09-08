@@ -9,10 +9,8 @@ target_sources(${TEST_NAME}
 target_include_directories(${TEST_NAME}
     PRIVATE     ${CMAKE_SOURCE_DIR}/src/libs)
 target_link_libraries(${TEST_NAME}
-    PRIVATE     Conversion::Common
-                Conversion::SedsToIvTranslator
-                ivcore
-                SEDS::Model
+    PRIVATE     Conversion::SedsToIvTranslator
+                ConversionTests::SedsModelBuilder
                 Qt5::Core
                 Qt5::Test)
 

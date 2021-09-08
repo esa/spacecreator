@@ -24,16 +24,27 @@
 #include <conversion/iv/SedsToIvTranslator/translator.h>
 #include <ivcore/ivfunction.h>
 #include <ivcore/ivmodel.h>
-#include <seds/SedsModel/sedsmodel.h>
+#include <sedscomponentbuilder.h>
+#include <sedsinterfacebuilder.h>
+#include <sedsinterfacecommandbuilder.h>
+#include <sedsinterfacedeclarationbuilder.h>
+#include <sedsmodelbuilder.h>
 
 using namespace ivm;
 using namespace seds::model;
 
+using conversion::ModelType;
 using conversion::Options;
 using conversion::iv::IvOptions;
 using conversion::iv::translator::SedsToIvTranslator;
 
-namespace seds::test {
+namespace tests::conversion::iv {
+
+using common::SedsComponentBuilder;
+using common::SedsInterfaceBuilder;
+using common::SedsInterfaceCommandBuilder;
+using common::SedsInterfaceDeclarationBuilder;
+using common::SedsModelBuilder;
 
 class tst_SedsToIvTranslator : public QObject
 {
@@ -45,15 +56,24 @@ public:
 private Q_SLOTS:
     void testTranslateComponentWithProvidedInterface();
     void testTranslateComponentWithRequiredInterface();
-
-private:
-    std::unique_ptr<SedsModel> createComponentWithProvidedInterface();
-    std::unique_ptr<SedsModel> createComponentWithRequiredInterface();
 };
 
 void tst_SedsToIvTranslator::testTranslateComponentWithProvidedInterface()
 {
-    const auto sedsModel = createComponentWithProvidedInterface();
+    // clang-format off
+    const std::unique_ptr<seds::model::SedsModel> sedsModel =
+        SedsModelBuilder("Package")
+            .withIntegerDataType("MyInteger")
+            .withComponent(
+                SedsComponentBuilder("Component")
+                    .declaringInterface(
+                        SedsInterfaceDeclarationBuilder("RequiredInterface")
+                            .withCommand(SedsInterfaceCommandBuilder("ICommand", InterfaceCommandMode::Async)
+                                .withArgument("CmdArg", "GenericType", CommandArgumentMode::In)))
+                    .withProvidedInterface(
+                        SedsInterfaceBuilder("Interface", "RequiredInterface")
+                            .withMappings({{"GenericType", "MyInteger"}})));
+    // clang-format on
 
     Options options;
     options.add(IvOptions::configFilename, "config.xml");
@@ -64,7 +84,7 @@ void tst_SedsToIvTranslator::testTranslateComponentWithProvidedInterface()
     QCOMPARE(resultModels.size(), 2);
 
     const auto &resultModel = resultModels[0];
-    QCOMPARE(resultModel->modelType(), conversion::ModelType::InterfaceView);
+    QCOMPARE(resultModel->modelType(), ModelType::InterfaceView);
 
     const auto *ivModel = dynamic_cast<IVModel *>(resultModel.get());
     QVERIFY(ivModel);
@@ -78,20 +98,33 @@ void tst_SedsToIvTranslator::testTranslateComponentWithProvidedInterface()
     const auto *interface = interfaces[0];
     QVERIFY(interface);
     QVERIFY(interface->isProvided());
-    QCOMPARE(interface->title(), "ICommand");
+    QCOMPARE(interface->title(), "Interface_ICommand_Pi");
 
     const auto params = interface->params();
     QCOMPARE(params.size(), 1);
 
     const auto param = params[0];
-    QCOMPARE(param.name(), "Interface_Interface_Parameter");
-    QCOMPARE(param.paramTypeName(), "Interface_Interface_TypeGroup");
+    QCOMPARE(param.name(), "InputParam");
+    QCOMPARE(param.paramTypeName(), "Interface_ICommand_Type");
     QCOMPARE(param.direction(), ivm::InterfaceParameter::Direction::IN);
 }
 
 void tst_SedsToIvTranslator::testTranslateComponentWithRequiredInterface()
 {
-    const auto sedsModel = createComponentWithRequiredInterface();
+    // clang-format off
+    const std::unique_ptr<seds::model::SedsModel> sedsModel =
+        SedsModelBuilder("Package")
+            .withIntegerDataType("MyInteger")
+            .withComponent(
+                SedsComponentBuilder("Component")
+                    .declaringInterface(
+                        SedsInterfaceDeclarationBuilder("RequiredInterface")
+                            .withCommand(SedsInterfaceCommandBuilder("ICommand", InterfaceCommandMode::Async)
+                                .withArgument("CmdArg", "GenericType", CommandArgumentMode::In)))
+                    .withRequiredInterface(
+                        SedsInterfaceBuilder("Interface", "RequiredInterface")
+                            .withMappings({{"GenericType", "MyInteger"}})));
+    // clang-format on
 
     Options options;
     options.add(IvOptions::configFilename, "config.xml");
@@ -102,7 +135,7 @@ void tst_SedsToIvTranslator::testTranslateComponentWithRequiredInterface()
     QCOMPARE(resultModels.size(), 2);
 
     const auto &resultModel = resultModels[0];
-    QCOMPARE(resultModel->modelType(), conversion::ModelType::InterfaceView);
+    QCOMPARE(resultModel->modelType(), ModelType::InterfaceView);
 
     const auto *ivModel = dynamic_cast<IVModel *>(resultModel.get());
     QVERIFY(ivModel);
@@ -116,113 +149,19 @@ void tst_SedsToIvTranslator::testTranslateComponentWithRequiredInterface()
     const auto *interface = interfaces[0];
     QVERIFY(interface);
     QVERIFY(interface->isRequired());
-    QCOMPARE(interface->title(), "ICommand");
+    QCOMPARE(interface->title(), "Interface_ICommand_Ri");
 
     const auto params = interface->params();
     QCOMPARE(params.size(), 1);
 
     const auto param = params[0];
-    QCOMPARE(param.name(), "Interface_Interface_Parameter");
-    QCOMPARE(param.paramTypeName(), "Interface_Interface_TypeGroup");
+    QCOMPARE(param.name(), "InputParam");
+    QCOMPARE(param.paramTypeName(), "Interface_ICommand_Type");
     QCOMPARE(param.direction(), ivm::InterfaceParameter::Direction::IN);
 }
 
-std::unique_ptr<SedsModel> tst_SedsToIvTranslator::createComponentWithProvidedInterface()
-{
-    CommandArgument argument;
-    argument.setName(QStringLiteral("CmdArg"));
-    argument.setType(QStringLiteral("GenericType"));
-    argument.setMode(CommandArgumentMode::In);
+} // namespace tests::conversion::iv
 
-    InterfaceCommand command;
-    command.setName(QStringLiteral("ICommand"));
-    command.setMode(InterfaceCommandMode::Async);
-    command.addArgument(std::move(argument));
-
-    InterfaceDeclaration interfaceDeclaration;
-    interfaceDeclaration.setName(QStringLiteral("ProvidedInterface"));
-    interfaceDeclaration.addCommand(std::move(command));
-
-    GenericTypeMap genericTypeMap;
-    genericTypeMap.setName(QStringLiteral("GenericType"));
-    genericTypeMap.setType(QStringLiteral("MyInteger"));
-
-    GenericTypeMapSet genericTypeMapSet;
-    genericTypeMapSet.addGenericTypeMap(std::move(genericTypeMap));
-
-    Interface interface;
-    interface.setName(QStringLiteral("Interface"));
-    interface.setType(QStringLiteral("ProvidedInterface"));
-    interface.setGenericTypeMapSet(std::move(genericTypeMapSet));
-
-    Component component;
-    component.setName(QStringLiteral("Component"));
-    component.addInterfaceDeclaration(std::move(interfaceDeclaration));
-    component.addProvidedInterface(std::move(interface));
-
-    IntegerDataType integerDataType;
-    integerDataType.setName(QStringLiteral("MyInteger"));
-
-    Package package;
-    package.setName(QStringLiteral("Package"));
-    package.addComponent(std::move(component));
-    package.addDataType(std::move(integerDataType));
-
-    PackageFile packageFile;
-    packageFile.setPackage(std::move(package));
-
-    return std::make_unique<SedsModel>(std::move(packageFile));
-}
-
-std::unique_ptr<SedsModel> tst_SedsToIvTranslator::createComponentWithRequiredInterface()
-{
-    CommandArgument argument;
-    argument.setName(QStringLiteral("CmdArg"));
-    argument.setType(QStringLiteral("GenericType"));
-    argument.setMode(CommandArgumentMode::In);
-
-    InterfaceCommand command;
-    command.setName(QStringLiteral("ICommand"));
-    command.setMode(InterfaceCommandMode::Async);
-    command.addArgument(std::move(argument));
-
-    InterfaceDeclaration interfaceDeclaration;
-    interfaceDeclaration.setName(QStringLiteral("RequiredInterface"));
-    interfaceDeclaration.addCommand(std::move(command));
-
-    GenericTypeMap genericTypeMap;
-    genericTypeMap.setName(QStringLiteral("GenericType"));
-    genericTypeMap.setType(QStringLiteral("MyInteger"));
-
-    GenericTypeMapSet genericTypeMapSet;
-    genericTypeMapSet.addGenericTypeMap(std::move(genericTypeMap));
-
-    Interface interface;
-    interface.setName(QStringLiteral("Interface"));
-    interface.setType(QStringLiteral("RequiredInterface"));
-    interface.setGenericTypeMapSet(std::move(genericTypeMapSet));
-
-    Component component;
-    component.setName(QStringLiteral("Component"));
-    component.addInterfaceDeclaration(std::move(interfaceDeclaration));
-    component.addRequiredInterface(std::move(interface));
-
-    IntegerDataType integerDataType;
-    integerDataType.setName(QStringLiteral("MyInteger"));
-
-    Package package;
-    package.setName(QStringLiteral("Package"));
-    package.addComponent(std::move(component));
-    package.addDataType(std::move(integerDataType));
-
-    PackageFile packageFile;
-    packageFile.setPackage(std::move(package));
-
-    return std::make_unique<SedsModel>(std::move(packageFile));
-}
-
-} // namespace seds::test
-
-QTEST_MAIN(seds::test::tst_SedsToIvTranslator)
+QTEST_MAIN(tests::conversion::iv::tst_SedsToIvTranslator)
 
 #include "tst_sedstoivtranslator.moc"
