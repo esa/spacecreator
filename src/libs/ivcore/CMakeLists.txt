@@ -50,8 +50,7 @@ target_sources(${LIB_NAME} PRIVATE
 
 target_include_directories(${LIB_NAME}
     PUBLIC .
-           ${CMAKE_SOURCE_DIR}/src/libs
-)
+           ${CMAKE_SOURCE_DIR}/src/libs)
 
 target_link_libraries(${LIB_NAME}
     asn1editor
