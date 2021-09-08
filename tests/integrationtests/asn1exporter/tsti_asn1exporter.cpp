@@ -21,13 +21,17 @@
 #include <QObject>
 #include <QUuid>
 #include <QtTest>
+#include <asn1library/asn1/asn1model.h>
 #include <conversion/asn1/Asn1Exporter/Asn1Options/options.h>
 #include <conversion/asn1/Asn1Exporter/exporter.h>
 #include <conversion/common/export/exceptions.h>
 #include <conversion/common/options.h>
 #include <memory>
 
+using Asn1Acn::Asn1Model;
 using conversion::Options;
+using conversion::asn1::Asn1Options;
+using conversion::asn1::exporter::Asn1Exporter;
 
 namespace asn1::test {
 
@@ -63,20 +67,20 @@ void tsti_Asn1Exporter::testValid()
     QFileInfo outputFileInfo("output.asn");
     QVERIFY(!outputFileInfo.exists());
 
-    //     auto *function = new ivm::IVFunction(nullptr, QUuid::createUuid());
-    //     IVModel model(m_config);
-    //     model.addObject(function);
+    auto *function = new ivm::IVFunction(nullptr, QUuid::createUuid());
+    Asn1Model model(m_config);
+    model.addObject(function);
 
-    //     Options options;
-    //     options.add(Asn1Options::outputFilename, "output.asn");
+    Options options;
+    options.add(Asn1Options::outputFilename, "output.asn");
 
-    //     IvXmlExporter ivExporter;
+    Asn1Exporter asn1Exporter;
 
-    //     try {
-    //         ivExporter.exportModel(&model, options);
-    //     } catch (const std::exception &ex) {
-    //         QFAIL(ex.what());
-    //     }
+    try {
+        asn1Exporter.exportModel(&model, options);
+    } catch (const std::exception &ex) {
+        QFAIL(ex.what());
+    }
 
     QVERIFY(outputFileInfo.exists());
 }

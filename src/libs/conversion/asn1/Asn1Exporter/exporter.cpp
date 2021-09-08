@@ -20,12 +20,14 @@
 #include "exporter.h"
 
 #include "Asn1Options/options.h"
-#include "asn1editor/asn1itemmodel.h"
 #include "export/exceptions.h"
 
-// #include <asn1library/asn1/>
+#include <QBuffer>
+#include <QSaveFile>
+#include <QString>
+#include <asn1library/asn1/asn1model.h>
 
-using asn1::Asn1ItemModel;
+using Asn1Acn::Asn1Model;
 using conversion::asn1::Asn1Options;
 using conversion::exporter::ExportException;
 
@@ -37,18 +39,35 @@ void Asn1Exporter::exportModel(const Model *model, const Options &options) const
         throw ExportException("Model to export is null");
     }
 
-    const auto *asn1model = dynamic_cast<const Asn1ItemModel *>(model);
-    if (asn1model == nullptr) {
+    const auto *asn1Model = dynamic_cast<const Asn1Model *>(model);
+    if (asn1Model == nullptr) {
         // throw IncorrectModelException(ModelType::Asn1Model);
         return;
     }
 
-    const auto outputFilename = options.value(Asn1Options::outputFilename);
-    if (outputFilename == nullptr) {
-        throw ExportException("Output filename wasn't specified");
-    }
+    for (const auto &file : asn1Model->data()) {
+        QByteArray modelData;
+        QBuffer modelDataBuffer(&modelData);
+        modelDataBuffer.open(QIODevice::WriteOnly);
 
-    // TODO
+        QTextStream qtas(modelData);
+        Asn1Acn::Asn1NodeReconstructingVisitor asn1nrvis(qtas);
+
+        asn1nrvis.visit(file);
+
+        const auto inputFilename = options.value(Asn1Options::outputFilename);
+        if (inputFilename == nullptr) {
+            throw ExportException("Input filename wasn't specified");
+        }
+        const auto outputFilename =
+                QString(file.name()) + QString::fromStdString(inputFilename->toStdString()) + QString(".asn");
+        QSaveFile outputFile(outputFilename);
+        outputFile.open(QIODevice::WriteOnly);
+        outputFile.write(modelData);
+        outputFile.commit();
+
+        // analogically as ^^ for ACN for a given File
+    }
 }
 
 } // namespace conversion::asn1::exporter
