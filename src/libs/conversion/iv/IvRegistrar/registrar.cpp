@@ -38,12 +38,7 @@ bool IvRegistrar::registerCapabilities(conversion::Registry &registry)
     }
 
     auto ivExporter = std::make_unique<IvXmlExporter>();
-    result = registry.registerExporter(ModelType::InterfaceView, std::move(ivExporter));
-    if (!result) {
-        return false;
-    }
-
-    return true;
+    return registry.registerExporter(ModelType::InterfaceView, std::move(ivExporter));
 }
 
 } // namespace conversion::iv

@@ -19,7 +19,6 @@
 
 #include "registrar.h"
 
-#include <QDebug>
 #include <conversion/common/modeltype.h>
 #include <memory>
 #include <seds/SedsXmlImporter/importer.h>
@@ -31,12 +30,7 @@ namespace conversion::seds {
 bool SedsRegistrar::registerCapabilities(conversion::Registry &registry)
 {
     auto sedsImporter = std::make_unique<SedsXmlImporter>();
-    auto result = registry.registerImporter(ModelType::Seds, std::move(sedsImporter));
-    if (!result) {
-        return false;
-    }
-
-    return true;
+    return registry.registerImporter(ModelType::Seds, std::move(sedsImporter));
 }
 
 } // namespace conversion::seds
