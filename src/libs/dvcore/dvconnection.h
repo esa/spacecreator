@@ -55,6 +55,9 @@ public:
     DVMessage *message(const QString &fromFunction, const QString &fromInterface, const QString &toFunction,
             const QString &toInterface) const;
 
+    DVDevice *getDevice(const QString &nodeName, const QString &portName, const QString &busName);
+    void updateAttributeFromEntity(dvm::DVObject *object, const meta::Props::Token token);
+
 private:
     std::unique_ptr<DVConnectionPrivate> d;
 };
