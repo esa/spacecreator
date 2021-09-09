@@ -14,7 +14,8 @@ target_include_directories(ConversionConverter
     PRIVATE     ${CMAKE_SOURCE_DIR}/src/libs)
 target_link_libraries(ConversionConverter
     PUBLIC      Conversion::Common
-                Conversion::Registry)
+                Conversion::Registry
+    PRIVATE     CommonProjectWarnings)
 
 add_format_target(ConversionConverter)
 

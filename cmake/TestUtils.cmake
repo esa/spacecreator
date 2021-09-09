@@ -22,4 +22,8 @@ function(addQtTest TEST_NAME LIBRARY)
     target_compile_definitions(${TEST_NAME} PUBLIC EXAMPLES_DIR=\"${CMAKE_SOURCE_DIR}/examples/\")
 
     add_test(NAME ${TEST_NAME} COMMAND ${TEST_NAME} -xunitxml -o ${CMAKE_BINARY_DIR}/${TEST_NAME}.xml)
+
+    if(OPTIONS_NO_DEPRECATED)
+        target_compile_options(${TEST_NAME} PRIVATE -Wno-deprecated -Wno-deprecated-declarations)
+    endif()
 endfunction()

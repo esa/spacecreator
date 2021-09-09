@@ -265,7 +265,7 @@ class EnumeratedItemAddingVisitor : public ChildItemAddingVisitor
 public:
     EnumeratedItemAddingVisitor(const QXmlStreamAttributes &attributes,
                                 const QString &currentFile,
-                                int index)
+                                std::size_t index)
         : ChildItemAddingVisitor(attributes, currentFile)
         , m_index(index)
     {}
@@ -281,7 +281,7 @@ public:
     }
 
 private:
-    const int m_index;
+    const std::size_t m_index;
 };
 
 class AcnDefinedItemsAddingVisitor : public Types::TypeMutatingVisitor
@@ -1097,7 +1097,7 @@ void AstXmlParser::readBitString(Types::Type &type)
 
 void AstXmlParser::readEnumeratedItem(Types::Type &type)
 {
-    int index = 0;
+    std::size_t index = 0;
     while (m_xmlReader.readNextStartElement()) {
         if (m_xmlReader.name() == QStringLiteral("Item")) {
             EnumeratedItemAddingVisitor visitor(m_xmlReader.attributes(), m_currentFile, index++);

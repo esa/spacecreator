@@ -38,6 +38,8 @@ namespace conversion::asn1::translator {
 std::vector<std::unique_ptr<Model>> SedsToAsn1Translator::translateModels(
         std::vector<const Model *> sourceModels, const Options &options) const
 {
+    Q_UNUSED(options);
+
     if (sourceModels.empty()) {
         throw TranslationException("No models passed for translation");
     } else if (sourceModels.size() > 1) {

@@ -12,12 +12,13 @@ target_include_directories(SedsXmlImporter
     PUBLIC      .
     PRIVATE     ${CMAKE_SOURCE_DIR}/src/libs)
 target_link_libraries(SedsXmlImporter
+    PUBLIC      Conversion::Common
+                SEDS::SymbolDefinitionReader
     PRIVATE     SEDS::XmlParser
                 SEDS::XmlPreprocessor
                 SEDS::XmlValidator
                 Qt5::Xml
-    PUBLIC      Conversion::Common
-                SEDS::SymbolDefinitionReader)
+                CommonProjectWarnings)
 
 add_format_target(SedsXmlImporter)
 

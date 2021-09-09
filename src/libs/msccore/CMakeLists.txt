@@ -120,5 +120,9 @@ target_link_libraries(${LIB_NAME}
 
 target_compile_definitions(${LIB_NAME} PUBLIC ANTLR4CPP_STATIC)
 
+if(OPTIONS_NO_DEPRECATED)
+    target_compile_options(${LIB_NAME} PRIVATE -Wno-deprecated -Wno-deprecated-declarations)
+endif()
+
 source_group("Designer Files" REGULAR_EXPRESSION ".*.ui$")
 source_group("Resource Files" REGULAR_EXPRESSION ".*.qrc$")

@@ -47,49 +47,49 @@ void AstXmlConstraintParserTests::test_simpleIntegerValue()
 {
     parse<IntegerValue>("<IntegerValue>1410</IntegerValue>");
 
-    QCOMPARE(m_dumpedConstraint, QLatin1Literal("(1410)"));
+    QCOMPARE(m_dumpedConstraint, QStringLiteral("(1410)"));
 }
 
 void AstXmlConstraintParserTests::test_simpleRealValue()
 {
     parse<RealValue>("<RealValue>2.5</RealValue>");
 
-    QCOMPARE(m_dumpedConstraint, QLatin1Literal("(2.5)"));
+    QCOMPARE(m_dumpedConstraint, QStringLiteral("(2.5)"));
 }
 
 void AstXmlConstraintParserTests::test_simpleBooleanValue()
 {
     parse<BooleanValue>("<BooleanValue>true</BooleanValue>");
 
-    QCOMPARE(m_dumpedConstraint, QLatin1Literal("(TRUE)"));
+    QCOMPARE(m_dumpedConstraint, QStringLiteral("(TRUE)"));
 }
 
 void AstXmlConstraintParserTests::test_simpleEnumValue()
 {
     parse<EnumValue>("<EnumValue>x</EnumValue>");
 
-    QCOMPARE(m_dumpedConstraint, QLatin1Literal("(x)"));
+    QCOMPARE(m_dumpedConstraint, QStringLiteral("(x)"));
 }
 
 void AstXmlConstraintParserTests::test_simpleStringValue()
 {
     parse<StringValue>("<StringValue>abc</StringValue>");
 
-    QCOMPARE(m_dumpedConstraint, QLatin1Literal(R"(("abc"))"));
+    QCOMPARE(m_dumpedConstraint, QStringLiteral(R"(("abc"))"));
 }
 
 void AstXmlConstraintParserTests::test_simpleBitStringValue()
 {
     parse<BitStringValue>("<BitStringValue>0101</BitStringValue>");
 
-    QCOMPARE(m_dumpedConstraint, QLatin1Literal("('0101'B)"));
+    QCOMPARE(m_dumpedConstraint, QStringLiteral("('0101'B)"));
 }
 
 void AstXmlConstraintParserTests::test_simpleOctetStringValue()
 {
     parse<OctetStringValue>("<OctetStringValue>10</OctetStringValue>");
 
-    QCOMPARE(m_dumpedConstraint, QLatin1Literal("('10'H)"));
+    QCOMPARE(m_dumpedConstraint, QStringLiteral("('10'H)"));
 }
 
 void AstXmlConstraintParserTests::test_range()
@@ -105,7 +105,7 @@ void AstXmlConstraintParserTests::test_range()
                               </Range>
                               )");
 
-    QCOMPARE(m_dumpedConstraint, QLatin1Literal("(12 .. 34)"));
+    QCOMPARE(m_dumpedConstraint, QStringLiteral("(12 .. 34)"));
 }
 
 void AstXmlConstraintParserTests::test_rangeWithoutMinOrMax()
@@ -136,7 +136,7 @@ void AstXmlConstraintParserTests::test_multipleValues()
                                     <IntegerValue>22</IntegerValue>
                                  </Constraints>)");
 
-    QCOMPARE(m_dumpedConstraint, QLatin1Literal("(12) (22)"));
+    QCOMPARE(m_dumpedConstraint, QStringLiteral("(12) (22)"));
 }
 
 void AstXmlConstraintParserTests::test_or()
@@ -148,7 +148,7 @@ void AstXmlConstraintParserTests::test_or()
                            </OR>
                            )");
 
-    QCOMPARE(m_dumpedConstraint, QLatin1Literal("((a | b))"));
+    QCOMPARE(m_dumpedConstraint, QStringLiteral("((a | b))"));
 }
 
 void AstXmlConstraintParserTests::test_and()
@@ -160,7 +160,7 @@ void AstXmlConstraintParserTests::test_and()
                            </AND>
                            )");
 
-    QCOMPARE(m_dumpedConstraint, QLatin1Literal("((a ^ b))"));
+    QCOMPARE(m_dumpedConstraint, QStringLiteral("((a ^ b))"));
 }
 
 void AstXmlConstraintParserTests::test_nestedLogicalOperators()
@@ -175,7 +175,7 @@ void AstXmlConstraintParserTests::test_nestedLogicalOperators()
                            </AND>
                            )");
 
-    QCOMPARE(m_dumpedConstraint, QLatin1Literal("((a ^ (b | c)))"));
+    QCOMPARE(m_dumpedConstraint, QStringLiteral("((a ^ (b | c)))"));
 }
 
 void AstXmlConstraintParserTests::test_from()
@@ -189,7 +189,7 @@ void AstXmlConstraintParserTests::test_from()
                              </ALPHA>
                            )");
 
-    QCOMPARE(m_dumpedConstraint, QLatin1Literal(R"((FROM("A" .. "Z")))"));
+    QCOMPARE(m_dumpedConstraint, QStringLiteral(R"((FROM("A" .. "Z")))"));
 }
 
 void AstXmlConstraintParserTests::test_size()
@@ -203,7 +203,7 @@ void AstXmlConstraintParserTests::test_size()
                              </SIZE>
                            )");
 
-    QCOMPARE(m_dumpedConstraint, QLatin1Literal("(SIZE(1 .. 5))"));
+    QCOMPARE(m_dumpedConstraint, QStringLiteral("(SIZE(1 .. 5))"));
 }
 
 void AstXmlConstraintParserTests::test_mixed()
@@ -224,7 +224,7 @@ void AstXmlConstraintParserTests::test_mixed()
                              </Constraints>
                            )");
 
-    QCOMPARE(m_dumpedConstraint, QLatin1Literal(R"((FROM("A" .. "Z")) (SIZE(1 .. 5)))"));
+    QCOMPARE(m_dumpedConstraint, QStringLiteral(R"((FROM("A" .. "Z")) (SIZE(1 .. 5)))"));
 }
 
 void AstXmlConstraintParserTests::test_mixedInReverseOrder()
@@ -245,7 +245,7 @@ void AstXmlConstraintParserTests::test_mixedInReverseOrder()
                              </Constraints>
                            )");
 
-    QCOMPARE(m_dumpedConstraint, QLatin1Literal(R"((SIZE(1 .. 5)) (FROM("A" .. "Z")))"));
+    QCOMPARE(m_dumpedConstraint, QStringLiteral(R"((SIZE(1 .. 5)) (FROM("A" .. "Z")))"));
 }
 
 void AstXmlConstraintParserTests::test_complex()
@@ -270,7 +270,7 @@ void AstXmlConstraintParserTests::test_complex()
                              </OR>
                            )");
 
-    QCOMPARE(m_dumpedConstraint, QLatin1Literal(R"((((SIZE(1 .. 5) ^ FROM("A" .. "Z")) | "ZXY")))"));
+    QCOMPARE(m_dumpedConstraint, QStringLiteral(R"((((SIZE(1 .. 5) ^ FROM("A" .. "Z")) | "ZXY")))"));
 }
 
 template<typename T>

@@ -19,7 +19,8 @@ target_include_directories(SedsModelBuilder
     PUBLIC      .
     PRIVATE     ${CMAKE_SOURCE_DIR}/src/libs)
 target_link_libraries(SedsModelBuilder
-    PUBLIC     SEDS::Model)
+    PUBLIC      SEDS::Model
+    PRIVATE     CommonProjectWarnings)
 
 add_format_target(SedsModelBuilder)
 

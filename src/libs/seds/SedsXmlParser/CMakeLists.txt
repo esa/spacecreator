@@ -32,7 +32,8 @@ target_include_directories(SedsXmlParser
     PRIVATE     ${CMAKE_SOURCE_DIR}/src/libs)
 target_link_libraries(SedsXmlParser
     PUBLIC      Conversion::Common
-                SEDS::Model)
+                SEDS::Model
+    PRIVATE     CommonProjectWarnings)
 
 add_format_target(SedsXmlParser)
 

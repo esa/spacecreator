@@ -95,22 +95,21 @@ const seds::model::InterfaceDeclaration &ComponentsTranslator::findInterfaceDecl
         const QString &interfaceTypeName, const seds::model::Component &component) const
 {
     const auto &componentInterfacesDeclarations = component.declaredInterfaces();
-    auto interfaceDeclaration =
-            std::find_if(componentInterfacesDeclarations.begin(), componentInterfacesDeclarations.end(),
-                    [&interfaceTypeName](const seds::model::InterfaceDeclaration &interfaceDeclaration) {
-                        return interfaceDeclaration.nameStr() == interfaceTypeName;
-                    });
-    if (interfaceDeclaration != componentInterfacesDeclarations.end()) {
-        return *interfaceDeclaration;
-    }
-
-    const auto &packageInterfacesDeclarations = m_package.declaredInterfaces();
-    interfaceDeclaration = std::find_if(packageInterfacesDeclarations.begin(), packageInterfacesDeclarations.end(),
+    auto found = std::find_if(componentInterfacesDeclarations.begin(), componentInterfacesDeclarations.end(),
             [&interfaceTypeName](const seds::model::InterfaceDeclaration &interfaceDeclaration) {
                 return interfaceDeclaration.nameStr() == interfaceTypeName;
             });
-    if (interfaceDeclaration != packageInterfacesDeclarations.end()) {
-        return *interfaceDeclaration;
+    if (found != componentInterfacesDeclarations.end()) {
+        return *found;
+    }
+
+    const auto &packageInterfacesDeclarations = m_package.declaredInterfaces();
+    found = std::find_if(packageInterfacesDeclarations.begin(), packageInterfacesDeclarations.end(),
+            [&interfaceTypeName](const seds::model::InterfaceDeclaration &interfaceDeclaration) {
+                return interfaceDeclaration.nameStr() == interfaceTypeName;
+            });
+    if (found != packageInterfacesDeclarations.end()) {
+        return *found;
     }
 
     throw UndeclaredInterfaceException(interfaceTypeName);

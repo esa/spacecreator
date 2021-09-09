@@ -22,7 +22,8 @@ target_include_directories(Asn1AcnExporter
     PRIVATE     ${CMAKE_SOURCE_DIR}/src/libs)
 target_link_libraries(Asn1AcnExporter
     PUBLIC      Conversion::Common
-                asn1library)
+                asn1library
+    PRIVATE     CommonProjectWarnings)
 
 add_format_target(Asn1AcnExporter)
 

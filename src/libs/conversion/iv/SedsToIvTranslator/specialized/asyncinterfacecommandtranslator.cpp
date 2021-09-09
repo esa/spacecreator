@@ -98,7 +98,9 @@ void AsyncInterfaceCommandTranslator::translateArguments(const seds::model::Inte
     auto asn1Type = std::make_unique<Asn1Acn::Types::Sequence>(asn1TypeName);
 
     for (const auto &argument : command.arguments()) {
-        asn1Type->addComponent(std::move(createAsn1SequenceComponent(argument)));
+        if (argument.mode() == requestedArgumentMode) {
+            asn1Type->addComponent(createAsn1SequenceComponent(argument));
+        }
     }
 
     auto asn1TypeAssignment = std::make_unique<Asn1Acn::TypeAssignment>(
@@ -158,20 +160,20 @@ const seds::model::DataTypeRef &AsyncInterfaceCommandTranslator::findMappedType(
 const seds::model::DataType &AsyncInterfaceCommandTranslator::findDataType(const QString &dataTypeName) const
 {
     const auto &componentDataTypes = m_component.dataTypes();
-    auto dataType = std::find_if(componentDataTypes.begin(), componentDataTypes.end(),
+    auto found = std::find_if(componentDataTypes.begin(), componentDataTypes.end(),
             [&dataTypeName](
                     const seds::model::DataType &dataType) { return dataTypeNameStr(dataType) == dataTypeName; });
-    if (dataType != componentDataTypes.end()) {
-        return *dataType;
+    if (found != componentDataTypes.end()) {
+        return *found;
     }
 
     const auto &packageDataTypes = m_package.dataTypes();
-    dataType = std::find_if(
+    found = std::find_if(
             packageDataTypes.begin(), packageDataTypes.end(), [&dataTypeName](const seds::model::DataType &dataType) {
                 return dataTypeNameStr(dataType) == dataTypeName;
             });
-    if (dataType != packageDataTypes.end()) {
-        return *dataType;
+    if (found != packageDataTypes.end()) {
+        return *found;
     }
 
     throw UndeclaredDataTypeException(dataTypeName);

@@ -85,8 +85,10 @@ QWidget *Asn1ItemDelegate::createEditor(QWidget *parent, const QStyleOptionViewI
             spinBox->setDecimals(0);
         }
 
-        spinBox->setMinimum(index.data(MIN_RANGE_ROLE).isValid() ? index.data(MIN_RANGE_ROLE).toDouble() : LONG_MIN);
-        spinBox->setMaximum(index.data(MAX_RANGE_ROLE).isValid() ? index.data(MAX_RANGE_ROLE).toDouble() : LONG_MAX);
+        spinBox->setMinimum(index.data(MIN_RANGE_ROLE).isValid() ? index.data(MIN_RANGE_ROLE).toDouble()
+                                                                 : std::numeric_limits<double>::min());
+        spinBox->setMaximum(index.data(MAX_RANGE_ROLE).isValid() ? index.data(MAX_RANGE_ROLE).toDouble()
+                                                                 : std::numeric_limits<double>::max());
         spinBox->setValue(0);
         editor = spinBox;
         break;

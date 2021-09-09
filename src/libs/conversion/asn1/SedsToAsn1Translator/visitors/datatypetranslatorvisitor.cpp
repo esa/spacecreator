@@ -67,6 +67,7 @@ overloaded(Ts...) -> overloaded<Ts...>;
 
 void DataTypeTranslatorVisitor::operator()(const ArrayDataType &sedsType)
 {
+    Q_UNUSED(sedsType);
     qDebug() << "array";
 }
 
@@ -92,6 +93,7 @@ void DataTypeTranslatorVisitor::operator()(const BooleanDataType &sedsType)
 
 void DataTypeTranslatorVisitor::operator()(const ContainerDataType &sedsType)
 {
+    Q_UNUSED(sedsType);
     qDebug() << "container";
 }
 
@@ -141,6 +143,7 @@ void DataTypeTranslatorVisitor::operator()(const StringDataType &sedsType)
 
 void DataTypeTranslatorVisitor::operator()(const seds::model::SubRangeDataType &sedsType)
 {
+    Q_UNUSED(sedsType);
     qDebug() << "subrange";
 }
 
@@ -321,7 +324,7 @@ void DataTypeTranslatorVisitor::translateStringLength(
 void DataTypeTranslatorVisitor::translateEnumerationList(
         const std::vector<seds::model::ValueEnumeration> &items, Asn1Acn::Types::Enumerated *asn1Type) const
 {
-    for (long index = 0; index < items.size(); ++index) {
+    for (std::size_t index = 0; index < items.size(); ++index) {
         const auto &item = items[index];
 
         asn1Type->addItem(

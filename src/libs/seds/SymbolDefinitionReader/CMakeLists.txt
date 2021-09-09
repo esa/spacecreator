@@ -10,10 +10,12 @@ target_sources(SymbolDefinitionReader
     PRIVATE     "${SOURCES}"
                 "${INCLUDES}")
 target_include_directories(SymbolDefinitionReader
-    PUBLIC      .
+    PUBLIC      .)
+target_include_directories(SymbolDefinitionReader SYSTEM
     PRIVATE     ${CMAKE_SOURCE_DIR}/src/libs)
 target_link_libraries(SymbolDefinitionReader
-    PUBLIC     Conversion::Common)
+    PUBLIC      Conversion::Common
+    PRIVATE     CommonProjectWarnings)
 
 add_format_target(SymbolDefinitionReader)
 

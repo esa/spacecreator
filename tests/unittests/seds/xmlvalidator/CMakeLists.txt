@@ -12,7 +12,8 @@ target_link_libraries(${TEST_NAME}
     PRIVATE     Conversion::Common
                 SEDS::XmlValidator
                 Qt5::Core
-                Qt5::Test)
+                Qt5::Test
+                CommonProjectWarnings)
 
 configure_file(resources/IncludesInvalid.xml IncludesInvalid.xml COPYONLY)
 configure_file(resources/Invalid.xml Invalid.xml COPYONLY)

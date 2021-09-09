@@ -52,3 +52,7 @@ target_link_libraries(${LIB_NAME}
     ${QT_CORE}
     ${QT_XML}
 )
+
+if(OPTIONS_NO_DEPRECATED)
+    target_compile_options(${LIB_NAME} PRIVATE -Wno-deprecated)
+endif()

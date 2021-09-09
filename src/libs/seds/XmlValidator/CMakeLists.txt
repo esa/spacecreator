@@ -13,9 +13,10 @@ target_include_directories(XmlValidator
     PUBLIC      .
     PRIVATE     ${CMAKE_SOURCE_DIR}/src/libs)
 target_link_libraries(XmlValidator
-    PRIVATE     LibXml2::LibXml2
     PUBLIC      Conversion::Converter
-                Qt5::Core)
+                Qt5::Core
+    PRIVATE     LibXml2::LibXml2
+                CommonProjectWarnings)
 
 add_format_target(XmlValidator)
 

@@ -19,7 +19,8 @@ target_include_directories(SedsToAsn1Translator
 target_link_libraries(SedsToAsn1Translator
     PUBLIC      Conversion::Common
                 asn1library
-                SEDS::Model)
+                SEDS::Model
+    PRIVATE     CommonProjectWarnings)
 
 add_format_target(SedsToAsn1Translator)
 

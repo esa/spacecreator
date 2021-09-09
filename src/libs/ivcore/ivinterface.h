@@ -230,5 +230,5 @@ private:
 
 }
 
-Q_DECLARE_METATYPE(ivm::IVInterface::InterfaceType);
-Q_DECLARE_METATYPE(ivm::IVInterface::CreationInfo);
+Q_DECLARE_METATYPE(ivm::IVInterface::InterfaceType)
+Q_DECLARE_METATYPE(ivm::IVInterface::CreationInfo)

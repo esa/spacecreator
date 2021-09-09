@@ -12,7 +12,8 @@ target_link_libraries(${TEST_NAME}
     PRIVATE     Conversion::SedsToIvTranslator
                 ConversionTests::SedsModelBuilder
                 Qt5::Core
-                Qt5::Test)
+                Qt5::Test
+                CommonProjectWarnings)
 
 configure_file(resources/config.xml config.xml COPYONLY)
 
