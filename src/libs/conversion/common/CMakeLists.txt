@@ -1,7 +1,6 @@
 project(ConversionCommon VERSION 1.0.0 LANGUAGES CXX)
 
 set(SOURCES exceptions.cpp
-            model.cpp
             modeltype.cpp
             options.cpp
             export/exceptions.cpp
