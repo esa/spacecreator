@@ -22,6 +22,7 @@
 
 namespace ivm {
 class IVObject;
+class IVInterfaceGroup;
 } // namespace ivm
 
 namespace shared {
@@ -74,6 +75,10 @@ private:
 
     IVFunctionGraphicsItem *rootItem() const;
     void setupInnerGeometry(ivm::IVObject *obj) const;
+
+    void updateInterfaceOnConnectionAdd(ivm::IVConnection *connection, ivm::IVInterfaceGroup *connectionGroupEndPoint);
+    void updateInterfaceOnConnectionRemove(
+            ivm::IVConnection *connection, ivm::IVInterfaceGroup *connectionGroupEndPoint);
 
 private:
     shared::DelayedSignal *m_textUpdate = nullptr;

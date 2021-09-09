@@ -153,7 +153,9 @@ void MiniViewRenderer::updateData()
 
                 const IVInterfaceGraphicsItem *outerIfaceItem =
                         findChildItem<IVInterfaceGraphicsItem>(d->item, outerIface->id());
-
+                if (!outerIfaceItem) {
+                    continue;
+                }
                 QPointF innerIfacePos;
                 if (innerIface->hasEntityAttribute(ivm::meta::Props::token(innerCoordToken))) {
                     const QString ifaceStrCoordinates =
@@ -241,7 +243,8 @@ void MiniViewRenderer::drawData(QPainter *painter)
         const QString text = d->item->entity()->model()->getObject(it.key())->titleUI();
         const qreal margin = 8;
         painter->setFont(painterFont);
-        shared::graphicsviewutils::drawText(painter, mappedRect.adjusted(margin, margin, -margin, -margin), text, margin);
+        shared::graphicsviewutils::drawText(
+                painter, mappedRect.adjusted(margin, margin, -margin, -margin), text, margin);
     }
     for (const QPolygonF &p : qAsConst(d->childrenConnections)) {
         painter->drawPolyline(transform.map(p));

@@ -65,6 +65,7 @@ public Q_SLOTS:
     void updateLabel();
 
 protected:
+    QVariant itemChange(GraphicsItemChange change, const QVariant &value) override;
     void rebuildLayout() override;
     void onSelectionChanged(bool isSelected) override;
     void updateInternalItems(Qt::Alignment alignment) override;

@@ -30,21 +30,18 @@ class IVConnectionGroupGraphicsItem : public IVConnectionGraphicsItem
 {
     Q_OBJECT
 public:
-    explicit IVConnectionGroupGraphicsItem(ivm::IVConnectionGroup *connection,
-            IVInterfaceGroupGraphicsItem *ifaceStart, IVInterfaceGroupGraphicsItem *ifaceEnd,
-            QGraphicsItem *parent = nullptr);
+    explicit IVConnectionGroupGraphicsItem(ivm::IVConnectionGroup *connection, IVInterfaceGroupGraphicsItem *ifaceStart,
+            IVInterfaceGroupGraphicsItem *ifaceEnd, QGraphicsItem *parent = nullptr);
 
     shared::ColorManager::HandledColors handledColorType() const override;
     void init() override;
 
 protected:
     void updateBoundingRect() override;
+    void updateTextPosition() override;
 
 private Q_SLOTS:
     void updateLabel(const QString &text);
-
-private:
-    void updateTitleItemPosition();
 };
 
 } // namespace ive
