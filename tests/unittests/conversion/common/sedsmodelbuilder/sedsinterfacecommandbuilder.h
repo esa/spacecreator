@@ -27,7 +27,7 @@ class SedsInterfaceCommandBuilder final
 {
 public:
     SedsInterfaceCommandBuilder(QString name, seds::model::InterfaceCommandMode mode);
-    operator seds::model::InterfaceCommand();
+    seds::model::InterfaceCommand build();
 
 public:
     auto withArgument(QString name, QString type, seds::model::CommandArgumentMode mode)

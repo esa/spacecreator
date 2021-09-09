@@ -28,7 +28,7 @@ class SedsModelBuilder final
 {
 public:
     SedsModelBuilder(QString name);
-    operator std::unique_ptr<seds::model::SedsModel>();
+    std::unique_ptr<seds::model::SedsModel> build();
 
 public:
     auto withIntegerDataType(QString name) -> SedsModelBuilder &;

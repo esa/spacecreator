@@ -29,7 +29,7 @@ SedsInterfaceBuilder::SedsInterfaceBuilder(QString name, QString type)
     m_interface.setType(std::move(type));
 }
 
-SedsInterfaceBuilder::operator Interface()
+Interface SedsInterfaceBuilder::build()
 {
     return std::move(m_interface);
 }

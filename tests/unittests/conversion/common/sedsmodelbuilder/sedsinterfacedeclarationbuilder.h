@@ -27,7 +27,7 @@ class SedsInterfaceDeclarationBuilder final
 {
 public:
     SedsInterfaceDeclarationBuilder(QString name);
-    operator seds::model::InterfaceDeclaration();
+    seds::model::InterfaceDeclaration build();
 
 public:
     auto withCommand(seds::model::InterfaceCommand command) -> SedsInterfaceDeclarationBuilder &;

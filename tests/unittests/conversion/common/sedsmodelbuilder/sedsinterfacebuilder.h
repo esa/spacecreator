@@ -27,7 +27,7 @@ class SedsInterfaceBuilder final
 {
 public:
     SedsInterfaceBuilder(QString name, QString type);
-    operator seds::model::Interface();
+    seds::model::Interface build();
 
 public:
     auto withMappings(std::vector<std::pair<QString, QString>> mappings) -> SedsInterfaceBuilder &;

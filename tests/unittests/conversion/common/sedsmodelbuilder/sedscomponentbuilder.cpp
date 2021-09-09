@@ -28,7 +28,7 @@ SedsComponentBuilder::SedsComponentBuilder(QString name)
     m_component.setName(std::move(name));
 }
 
-SedsComponentBuilder::operator Component()
+Component SedsComponentBuilder::build()
 {
     return std::move(m_component);
 }

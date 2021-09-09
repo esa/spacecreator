@@ -27,7 +27,7 @@ class SedsComponentBuilder final
 {
 public:
     SedsComponentBuilder(QString name);
-    operator seds::model::Component();
+    seds::model::Component build();
 
 public:
     auto declaringInterface(seds::model::InterfaceDeclaration interfaceDeclaration) -> SedsComponentBuilder &;

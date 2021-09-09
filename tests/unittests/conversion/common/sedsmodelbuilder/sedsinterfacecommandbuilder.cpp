@@ -29,7 +29,7 @@ SedsInterfaceCommandBuilder::SedsInterfaceCommandBuilder(QString name, Interface
     m_command.setMode(mode);
 }
 
-SedsInterfaceCommandBuilder::operator InterfaceCommand()
+InterfaceCommand SedsInterfaceCommandBuilder::build()
 {
     return std::move(m_command);
 }

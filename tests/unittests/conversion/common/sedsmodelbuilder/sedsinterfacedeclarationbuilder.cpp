@@ -28,7 +28,7 @@ SedsInterfaceDeclarationBuilder::SedsInterfaceDeclarationBuilder(QString name)
     m_interfaceDeclaration.setName(std::move(name));
 }
 
-SedsInterfaceDeclarationBuilder::operator InterfaceDeclaration()
+InterfaceDeclaration SedsInterfaceDeclarationBuilder::build()
 {
     return std::move(m_interfaceDeclaration);
 }

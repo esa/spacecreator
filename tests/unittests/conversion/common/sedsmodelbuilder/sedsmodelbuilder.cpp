@@ -28,7 +28,7 @@ SedsModelBuilder::SedsModelBuilder(QString name)
     m_package.setName(std::move(name));
 }
 
-SedsModelBuilder::operator std::unique_ptr<SedsModel>()
+std::unique_ptr<SedsModel> SedsModelBuilder::build()
 {
     PackageFile packageFile;
     packageFile.setPackage(std::move(m_package));

@@ -65,11 +65,17 @@ void tst_SedsToIvTranslator::testTranslateComponentWithProvidedInterface()
                 SedsComponentBuilder("Component")
                     .declaringInterface(
                         SedsInterfaceDeclarationBuilder("RequiredInterface")
-                            .withCommand(SedsInterfaceCommandBuilder("ICommand", InterfaceCommandMode::Async)
-                                .withArgument("CmdArg", "GenericType", CommandArgumentMode::In)))
+                            .withCommand(
+                                SedsInterfaceCommandBuilder("ICommand", InterfaceCommandMode::Async)
+                                    .withArgument("CmdArg", "GenericType", CommandArgumentMode::In)
+                                    .build())
+                        .build())
                     .withProvidedInterface(
                         SedsInterfaceBuilder("Interface", "RequiredInterface")
-                            .withMappings({{"GenericType", "MyInteger"}})));
+                            .withMappings({{"GenericType", "MyInteger"}})
+                            .build())
+                    .build())
+            .build();
     // clang-format on
 
     Options options;
@@ -117,10 +123,15 @@ void tst_SedsToIvTranslator::testTranslateComponentWithRequiredInterface()
                     .declaringInterface(
                         SedsInterfaceDeclarationBuilder("RequiredInterface")
                             .withCommand(SedsInterfaceCommandBuilder("ICommand", InterfaceCommandMode::Async)
-                                .withArgument("CmdArg", "GenericType", CommandArgumentMode::In)))
+                                .withArgument("CmdArg", "GenericType", CommandArgumentMode::In)
+                                .build())
+                            .build())
                     .withRequiredInterface(
                         SedsInterfaceBuilder("Interface", "RequiredInterface")
-                            .withMappings({{"GenericType", "MyInteger"}})));
+                            .withMappings({{"GenericType", "MyInteger"}})
+                            .build())
+                    .build())
+            .build();
     // clang-format on
 
     Options options;
