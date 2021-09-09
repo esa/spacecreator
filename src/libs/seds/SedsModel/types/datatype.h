@@ -37,6 +37,13 @@ class SubRangeDataType;
 using DataType = std::variant<ArrayDataType, BinaryDataType, BooleanDataType, ContainerDataType, EnumeratedDataType,
         FloatDataType, IntegerDataType, StringDataType, SubRangeDataType>;
 
+/**
+ * @brief   Gets name string from data type
+ *
+ * @param   dataType    Data type
+ *
+ * @return  Name string
+ */
 const QString &dataTypeNameStr(const DataType &dataType);
 
 } // namespace seds::model

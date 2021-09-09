@@ -40,6 +40,11 @@ public:
     auto setName(common::String name) -> void;
 
 public:
+    /**
+     * @brief   Get name string
+     *
+     * @return Name string
+     */
     auto nameStr() const -> const QString &;
 
 protected:

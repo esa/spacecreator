@@ -46,6 +46,11 @@ public:
     auto addArgument(CommandArgument argument) -> void;
 
 public:
+    /**
+     * @brief   Getter for argument mode combination in this command
+     *
+     * @return  Arguments mode combination
+     */
     auto argumentsCombination() const -> ArgumentsCombination;
 
 private:

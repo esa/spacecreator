@@ -66,6 +66,11 @@ public:
     auto addComponent(Component component) -> void;
 
 public:
+    /**
+     * @brief   Get name string
+     *
+     * @return Name string
+     */
     auto nameStr() const -> const QString &;
 
 private:

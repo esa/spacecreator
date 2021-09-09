@@ -35,6 +35,11 @@ public:
     auto value() const -> const QualifiedName &;
 
 public:
+    /**
+     * @brief   Get name string
+     *
+     * @return Name string
+     */
     auto nameStr() const -> const QString &;
 
 private:

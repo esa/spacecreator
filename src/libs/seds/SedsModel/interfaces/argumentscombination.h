@@ -25,6 +25,9 @@ class QString;
 
 namespace seds::model {
 
+/**
+ * @brief   Represents all available permutation of interface argument types
+ */
 enum class ArgumentsCombination : uint8_t
 {
     NoArgs = 0b000,
