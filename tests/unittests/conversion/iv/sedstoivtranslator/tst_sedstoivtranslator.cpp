@@ -50,9 +50,6 @@ class tst_SedsToIvTranslator : public QObject
 {
     Q_OBJECT
 
-public:
-    virtual ~tst_SedsToIvTranslator() = default;
-
 private Q_SLOTS:
     void testTranslateComponentWithProvidedInterface();
     void testTranslateComponentWithRequiredInterface();
