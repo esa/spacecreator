@@ -279,5 +279,6 @@ target_link_libraries(SedsModel
     PRIVATE    CommonProjectWarnings)
 
 add_format_target(SedsModel)
+add_tidy_target(SedsModel)
 
 add_library(SEDS::Model ALIAS SedsModel)

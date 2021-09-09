@@ -18,5 +18,6 @@ target_link_libraries(SymbolDefinitionReader
     PRIVATE     CommonProjectWarnings)
 
 add_format_target(SymbolDefinitionReader)
+add_tidy_target(SymbolDefinitionReader)
 
 add_library(SEDS::SymbolDefinitionReader ALIAS SymbolDefinitionReader)

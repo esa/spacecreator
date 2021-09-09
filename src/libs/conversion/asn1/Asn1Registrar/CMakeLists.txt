@@ -16,5 +16,6 @@ target_link_libraries(Asn1Registrar
     PRIVATE     CommonProjectWarnings)
 
 add_format_target(Asn1Registrar)
+add_tidy_target(Asn1Registrar)
 
 add_library(Conversion::Asn1Registrar ALIAS Asn1Registrar)

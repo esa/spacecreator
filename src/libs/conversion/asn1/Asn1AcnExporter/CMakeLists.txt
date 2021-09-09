@@ -26,5 +26,6 @@ target_link_libraries(Asn1AcnExporter
     PRIVATE     CommonProjectWarnings)
 
 add_format_target(Asn1AcnExporter)
+add_tidy_target(Asn1AcnExporter)
 
 add_library(Conversion::Asn1AcnExporter ALIAS Asn1AcnExporter)

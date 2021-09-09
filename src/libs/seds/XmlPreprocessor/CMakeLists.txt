@@ -19,5 +19,6 @@ target_link_libraries(XmlPreprocessor
                 CommonProjectWarnings)
 
 add_format_target(XmlPreprocessor)
+add_tidy_target(XmlPreprocessor)
 
 add_library(SEDS::XmlPreprocessor ALIAS XmlPreprocessor)

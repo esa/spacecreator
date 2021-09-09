@@ -17,5 +17,6 @@ target_link_libraries(IvXmlExporter
                 CommonProjectWarnings)
 
 add_format_target(IvXmlExporter)
+add_tidy_target(IvXmlExporter)
 
 add_library(Conversion::IvXmlExporter ALIAS IvXmlExporter)

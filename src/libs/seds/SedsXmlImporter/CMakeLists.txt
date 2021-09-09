@@ -21,5 +21,6 @@ target_link_libraries(SedsXmlImporter
                 CommonProjectWarnings)
 
 add_format_target(SedsXmlImporter)
+add_tidy_target(SedsXmlImporter)
 
 add_library(SEDS::XmlImporter ALIAS SedsXmlImporter)

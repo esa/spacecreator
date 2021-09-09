@@ -18,5 +18,6 @@ target_link_libraries(ConversionConverter
     PRIVATE     CommonProjectWarnings)
 
 add_format_target(ConversionConverter)
+add_tidy_target(ConversionConverter)
 
 add_library(Conversion::Converter ALIAS ConversionConverter)

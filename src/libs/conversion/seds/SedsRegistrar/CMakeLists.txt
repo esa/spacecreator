@@ -16,5 +16,6 @@ target_link_libraries(SedsRegistrar
                 CommonProjectWarnings)
 
 add_format_target(SedsRegistrar)
+add_tidy_target(SedsRegistrar)
 
 add_library(Conversion::SedsRegistrar ALIAS SedsRegistrar)

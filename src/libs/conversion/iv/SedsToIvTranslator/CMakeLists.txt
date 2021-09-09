@@ -23,5 +23,6 @@ target_link_libraries(SedsToIvTranslator
     PRIVATE     CommonProjectWarnings)
 
 add_format_target(SedsToIvTranslator)
+add_tidy_target(SedsToIvTranslator)
 
 add_library(Conversion::SedsToIvTranslator ALIAS SedsToIvTranslator)

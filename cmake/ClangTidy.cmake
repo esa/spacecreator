@@ -4,7 +4,10 @@ option(ENABLE_CLANG_TIDY
 
 if(ENABLE_CLANG_TIDY)
     find_program(CLANG-TIDY clang-tidy)
-    if(CLANG-TIDY)
-        set(CMAKE_CXX_CLANG_TIDY ${CLANG-TIDY})
-    endif(CLANG-TIDY)
 endif(ENABLE_CLANG_TIDY)
+
+function(add_tidy_target TARGET)
+    if(ENABLE_CLANG_TIDY)
+        set_target_properties(${TARGET} PROPERTIES CXX_CLANG_TIDY ${CLANG-TIDY})
+    endif()
+endfunction()

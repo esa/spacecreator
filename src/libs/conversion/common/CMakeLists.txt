@@ -30,5 +30,6 @@ target_link_libraries(ConversionCommon
     PRIVATE     CommonProjectWarnings)
 
 add_format_target(ConversionCommon)
+add_tidy_target(ConversionCommon)
 
 add_library(Conversion::Common ALIAS ConversionCommon)

@@ -19,5 +19,6 @@ target_link_libraries(XmlValidator
                 CommonProjectWarnings)
 
 add_format_target(XmlValidator)
+add_tidy_target(XmlValidator)
 
 add_library(SEDS::XmlValidator ALIAS XmlValidator)

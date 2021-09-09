@@ -36,5 +36,6 @@ target_link_libraries(SedsXmlParser
     PRIVATE     CommonProjectWarnings)
 
 add_format_target(SedsXmlParser)
+add_tidy_target(SedsXmlParser)
 
 add_library(SEDS::XmlParser ALIAS SedsXmlParser)

@@ -18,5 +18,6 @@ target_link_libraries(IvRegistrar
     PRIVATE     CommonProjectWarnings)
 
 add_format_target(IvRegistrar)
+add_tidy_target(IvRegistrar)
 
 add_library(Conversion::IvRegistrar ALIAS IvRegistrar)

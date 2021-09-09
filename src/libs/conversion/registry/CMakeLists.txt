@@ -15,5 +15,6 @@ target_link_libraries(ConversionRegistry
     PRIVATE     CommonProjectWarnings)
 
 add_format_target(ConversionRegistry)
+add_tidy_target(ConversionRegistry)
 
 add_library(Conversion::Registry ALIAS ConversionRegistry)
