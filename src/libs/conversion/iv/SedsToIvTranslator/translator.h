@@ -38,6 +38,9 @@ class SedsModel;
 
 namespace conversion::iv::translator {
 
+/**
+ * @brief   Translator between SEDS model and InterfaceView model
+ */
 class SedsToIvTranslator final : public ::conversion::translator::Translator
 {
 public:
@@ -58,10 +61,24 @@ public:
     virtual auto getDependencies() const -> std::set<ModelType> override;
 
 private:
+    /**
+     * @brief   Translate SEDS model
+     *
+     * @param   sedsModel   SEDS model to translate
+     * @param   config      IV model config
+     * @param   options     List of options
+     *
+     * @return  Result IV model with auxiliary ASN.1 model
+     */
     auto translateSedsModel(const seds::model::SedsModel *sedsModel, ivm::IVPropertyTemplateConfig *config,
             const Options &options) const -> std::vector<std::unique_ptr<Model>>;
 
 private:
+    /**
+     * @brief   Translate SEDS package
+     *
+     * @param   package     Package to translate
+     */
     auto translatePackage(const seds::model::Package &package, ivm::IVModel *model, Asn1Acn::Definitions *definitions,
             bool generateFunction) const -> void;
 };
