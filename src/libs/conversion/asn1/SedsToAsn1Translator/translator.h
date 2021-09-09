@@ -45,9 +45,10 @@ public:
     /**
      * @brief   Translate given SEDS models into an ASN.1 model
      *
-     * @param   sources     List of SEDS models
+     * @param   sourceModels    List of SEDS models
+     * @param   options         List of options
      *
-     * @return  ASN.1 model translated from SEDS models
+     * @return  ASN.1 model translated from the SEDS models
      */
     virtual auto translateModels(std::vector<const Model *> sourceModels, const Options &options) const
             -> std::vector<std::unique_ptr<Model>> override;
