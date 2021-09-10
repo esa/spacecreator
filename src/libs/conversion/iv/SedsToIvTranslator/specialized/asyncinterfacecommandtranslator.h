@@ -43,6 +43,9 @@ enum class CommandArgumentMode : uint8_t;
 
 namespace conversion::iv::translator {
 
+/**
+ * @brief   Translator from SEDS async interface commadn to InterfaceView interface
+ */
 class AsyncInterfaceCommandTranslator final
 {
 public:
