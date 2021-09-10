@@ -24,13 +24,15 @@
 namespace conversion::asn1 {
 
 /**
- * @brief   Possible options for ASN.1 conversion
+ * @brief   Possible options for ASN.1/ACN conversion
  */
 class Asn1Options
 {
 public:
-    /** @brief File to export */
-    inline static const QString outputFilename = "Asn1_Export_OutputFilename";
+    /** @brief Prefix to add at the beginning of the filename */
+    inline static const QString asn1FilenamePrefix = "Asn1_Export_Prefix";
+    /** @brief Prefix to add at the beginning of the filename */
+    inline static const QString acnFilenamePrefix = "Acn_Export_Prefix";
 };
 
 } // namespace conversion::asn1
