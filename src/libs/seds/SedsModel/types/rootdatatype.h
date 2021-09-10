@@ -34,6 +34,11 @@ public:
     RootDataType &operator=(RootDataType &&) = default;
 
 public:
+    /**
+     * @brief   Get name string
+     *
+     * @return Name string
+     */
     auto nameStr() const -> const QString &;
 };
 

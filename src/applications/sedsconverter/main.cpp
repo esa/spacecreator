@@ -53,7 +53,6 @@ int main(int argc, char **argv)
     options.add(SedsOptions::keepIntermediateFiles);
     options.add(IvOptions::configFilename, "config.xml");
     options.add(IvOptions::outputFilename, "output.xml");
-    /* options.add(IvOptions::generateFunctionsForPackages); */
 
     try {
         sedsConverter.convert(conversion::ModelType::InterfaceView, {}, std::move(options));
