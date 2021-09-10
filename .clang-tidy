@@ -1,5 +1,5 @@
 ---
-Checks:          'clang-diagnostic-*,clang-analyzer-*,-*,performance-*,readability-a*,readability-const-return-type,readability-container-size-empty,readability-d*,readability-f*,readability-id*,readability-inco*,readability-m*,readability-n*,readability-r*,readability-s*,readability-u*'
+Checks:          'clang-diagnostic-*,clang-analyzer-*,-*,performance-*,readability-a*,readability-braces-around-statements,readability-const-return-type,readability-container-size-empty,readability-d*,readability-f*,readability-id*,readability-inco*,readability-m*,readability-n*,readability-r*,readability-s*,readability-u*'
 WarningsAsErrors: ''
 HeaderFilterRegex: ''
 AnalyzeTemporaryDtors: false

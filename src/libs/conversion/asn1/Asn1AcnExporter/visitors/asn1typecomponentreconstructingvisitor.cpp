@@ -87,8 +87,9 @@ void Asn1TypeComponentReconstructingVisitor::visit(const Types::Enumerated &type
         m_outStream << QString::number((*it).value());
         m_outStream << QStringLiteral(")");
 
-        if (std::next(it, 1) != items.end())
+        if (std::next(it, 1) != items.end()) {
             m_outStream << QStringLiteral(",");
+        }
 
         m_outStream << QStringLiteral("\n");
     }
@@ -156,8 +157,9 @@ void Asn1TypeComponentReconstructingVisitor::valueForComplexType(const T &type, 
         Asn1TypeComponentReconstructingVisitor visitor(m_outStream, indent + INDENT_SIZE);
         (*it)->type()->accept(visitor);
 
-        if (std::next(it) != components.end())
+        if (std::next(it) != components.end()) {
             addWord(QStringLiteral(","));
+        }
 
         finishLine();
     }
