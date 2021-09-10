@@ -69,7 +69,7 @@ private:
     void addIndent(int indent);
     void addWord(const QString &word);
     void finishLine();
-    void addLine(QString line, int indent = 0);
+    void addLine(const QString &line, int indent = 0);
 
     QTextStream &m_outStream;
     int m_indent;

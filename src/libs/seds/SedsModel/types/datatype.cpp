@@ -45,13 +45,13 @@ const QString &dataTypeNameStr(const DataType &dataType)
         return std::get<ContainerDataType>(dataType).nameStr();
     case 4:
         return std::get<EnumeratedDataType>(dataType).nameStr();
-    case 5:
+    case 5: // NOLINT(readability-magic-numbers)
         return std::get<FloatDataType>(dataType).nameStr();
-    case 6:
+    case 6: // NOLINT(readability-magic-numbers)
         return std::get<IntegerDataType>(dataType).nameStr();
-    case 7:
+    case 7: // NOLINT(readability-magic-numbers)
         return std::get<StringDataType>(dataType).nameStr();
-    case 8:
+    case 8: // NOLINT(readability-magic-numbers)
         return std::get<SubRangeDataType>(dataType).nameStr();
     default: {
         static QString emptyStr("");

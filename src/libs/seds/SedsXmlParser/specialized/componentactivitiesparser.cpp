@@ -658,7 +658,7 @@ model::TypeCheck ComponentActivitiesParser::readTypeCheck(QXmlStreamReader &xmlR
     return typeCheck;
 }
 
-model::ComparisonOperator ComponentActivitiesParser::parseComparisonOperator(QString comparisonOperatorStr)
+model::ComparisonOperator ComponentActivitiesParser::parseComparisonOperator(const QString &comparisonOperatorStr)
 {
     auto coreComparisonOperator = model::enumFromString<model::ComparisonOperator>(QStringRef(&comparisonOperatorStr));
 

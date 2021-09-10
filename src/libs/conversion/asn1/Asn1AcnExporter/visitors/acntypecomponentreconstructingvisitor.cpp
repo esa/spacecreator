@@ -31,7 +31,7 @@ AcnTypeComponentReconstructingVisitor::AcnTypeComponentReconstructingVisitor(
         QTextStream &outStream, int indent, QString presentWhenValue)
     : m_outStream(outStream)
     , m_indent(indent)
-    , m_presentWhenValue(presentWhenValue)
+    , m_presentWhenValue(std::move(presentWhenValue))
 {
 }
 
@@ -190,21 +190,21 @@ void AcnTypeComponentReconstructingVisitor::tryAppendAlignToNext(const Types::Ty
 
 void AcnTypeComponentReconstructingVisitor::tryAppendTrueValue(const Types::Boolean &type, QStringList &params) const
 {
-    auto trueValue = type.trueValue();
+    const auto &trueValue = type.trueValue();
     if (!trueValue.isEmpty())
         params << QStringLiteral("true-value ") + BitStringValue::asString(trueValue);
 }
 
 void AcnTypeComponentReconstructingVisitor::tryAppendFalseValue(const Types::Boolean &type, QStringList &params) const
 {
-    auto falseValue = type.falseValue();
+    const auto &falseValue = type.falseValue();
     if (!falseValue.isEmpty())
         params << QStringLiteral("false-value ") + BitStringValue::asString(falseValue);
 }
 
 void AcnTypeComponentReconstructingVisitor::tryAppendPattern(const Types::Null &type, QStringList &params) const
 {
-    auto pattern = type.pattern();
+    const auto &pattern = type.pattern();
     if (!pattern.isEmpty())
         params << QStringLiteral("pattern ") + BitStringValue::asString(pattern);
 }
@@ -212,7 +212,7 @@ void AcnTypeComponentReconstructingVisitor::tryAppendPattern(const Types::Null &
 void AcnTypeComponentReconstructingVisitor::tryAppendTerminationPattern(
         const Types::AsciiStringAcnParameters &type, QStringList &params) const
 {
-    auto terminationPattern = type.terminationPattern();
+    const auto &terminationPattern = type.terminationPattern();
     if (!terminationPattern.isEmpty())
         params << QStringLiteral("termination-pattern ") + OctetStringValue::asString(terminationPattern);
 }

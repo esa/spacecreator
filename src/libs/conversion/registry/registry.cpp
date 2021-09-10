@@ -61,7 +61,7 @@ bool Registry::registerImporter(ModelType modelType, std::unique_ptr<importer::M
 bool Registry::registerTranslator(std::set<ModelType> sourceModelsTypes, ModelType targetModelType,
         std::unique_ptr<translator::Translator> translator)
 {
-    const Registry::TranslatorsKey key(std::move(sourceModelsTypes), targetModelType);
+    Registry::TranslatorsKey key(std::move(sourceModelsTypes), targetModelType);
     const auto result = m_translators.insert({ std::move(key), std::move(translator) });
     return result.second;
 }

@@ -60,13 +60,13 @@ void Asn1NodeReconstructingVisitor::visit(const TypeAssignment &type)
     m_outStream << QStringLiteral("\n");
 }
 
-void Asn1NodeReconstructingVisitor::visit(const ValueAssignment &assignment)
+void Asn1NodeReconstructingVisitor::visit(const ValueAssignment &value)
 {
-    if (assignment.value() == nullptr)
+    if (value.value() == nullptr)
         return;
 
-    m_outStream << assignment.name() << QStringLiteral(" ") << assignment.type()->typeName() << QStringLiteral(" ::= ")
-                << assignment.value()->asString() << QStringLiteral("\n");
+    m_outStream << value.name() << QStringLiteral(" ") << value.type()->typeName() << QStringLiteral(" ::= ")
+                << value.value()->asString() << QStringLiteral("\n");
 }
 
 void Asn1NodeReconstructingVisitor::visit(const Project &project)

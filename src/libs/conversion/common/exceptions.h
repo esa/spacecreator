@@ -122,7 +122,7 @@ public:
      * @param   sourceModelsTypes   Set of source models types
      * @param   targetModelType     Target model type
      */
-    TranslatorNotRegisteredException(const std::set<ModelType> &sourceModelTypes, ModelType targetModelType);
+    TranslatorNotRegisteredException(const std::set<ModelType> &sourceModelsTypes, ModelType targetModelType);
 
 private:
     auto sourceModelsTypesToString(const std::set<ModelType> &sourceModelsTypes) -> QString;

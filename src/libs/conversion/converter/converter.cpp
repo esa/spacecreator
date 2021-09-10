@@ -44,8 +44,8 @@ Converter::Converter(const Registry &registry, Options options)
 {
 }
 
-void Converter::convert(
-        std::set<ModelType> sourceModelsTypes, ModelType targetModelType, std::set<ModelType> auxiliaryModelsTypes)
+void Converter::convert(const std::set<ModelType> &sourceModelsTypes, ModelType targetModelType,
+        const std::set<ModelType> &auxiliaryModelsTypes)
 {
     for (const auto sourceModelType : sourceModelsTypes) {
         if (!m_registry.isImporterRegistered(sourceModelType)) {

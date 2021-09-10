@@ -181,7 +181,7 @@ void Asn1TypeComponentReconstructingVisitor::finishLine()
     m_outStream << QStringLiteral("\n");
 }
 
-void Asn1TypeComponentReconstructingVisitor::addLine(QString line, int indent)
+void Asn1TypeComponentReconstructingVisitor::addLine(const QString &line, int indent)
 {
     addIndent(indent);
     addWord(line);

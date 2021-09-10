@@ -109,7 +109,7 @@ void AsyncInterfaceCommandTranslator::translateArguments(const seds::model::Inte
 
     auto ivParameter = ivm::InterfaceParameter(m_interfaceParameterName, ivm::BasicParameter::Type::Other, asn1TypeName,
             m_interfaceParameterEncoding, ivm::InterfaceParameter::Direction::IN);
-    ivInterface->addParam(std::move(ivParameter));
+    ivInterface->addParam(ivParameter);
 }
 
 std::unique_ptr<Asn1Acn::AsnSequenceComponent> AsyncInterfaceCommandTranslator::createAsn1SequenceComponent(
