@@ -21,10 +21,14 @@
 
 #include <ivcore/ivinterface.h>
 #include <seds/SedsModel/types/datatype.h>
+#include <set>
 
 namespace Asn1Acn {
-class Definitions;
 class AsnSequenceComponent;
+class Definitions;
+namespace Types {
+class Sequence;
+} // namespace Types
 } // namespace Asn1Acn
 
 namespace ivm {
@@ -64,12 +68,15 @@ public:
             seds::model::CommandArgumentMode requestedArgumentMode, ivm::IVInterface *ivInterface) -> void;
 
 private:
+    auto buildAsn1SequenceType(const seds::model::InterfaceCommand &command,
+            seds::model::CommandArgumentMode requestedArgumentMode, const QString &asn1TypeName) const -> void;
+
     auto createIvInterface(const seds::model::InterfaceCommand &command, ivm::IVInterface::InterfaceType type) const
             -> ivm::IVInterface *;
-    auto createAsn1SequenceComponent(const seds::model::CommandArgument &commandArgument) const
+    auto createAsn1SequenceComponent(const QString &argumentName, const QString &argumentTypeName) const
             -> std::unique_ptr<Asn1Acn::AsnSequenceComponent>;
 
-    auto findMappedType(const QString &genericTypeName) const -> const seds::model::DataTypeRef &;
+    auto findMappedType(const QString &genericTypeName) const -> const QString &;
     auto findDataType(const QString &dataTypeName) const -> const seds::model::DataType &;
 
     auto interfaceTypeToString(ivm::IVInterface::InterfaceType interfaceType) const -> const QString &;
@@ -81,6 +88,8 @@ private:
     const seds::model::Interface &m_interface;
     ivm::IVFunction *m_ivFunction;
     Asn1Acn::Definitions *m_asn1Definitions;
+
+    static std::set<std::size_t> m_asn1InterfaceArgumentsHashesCache;
 
     static const QString m_interfaceParameterName;
     static const QString m_interfaceParameterEncoding;
