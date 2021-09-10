@@ -41,32 +41,39 @@ void Asn1Exporter::exportModel(const Model *model, const Options &options) const
 
     const auto *asn1Model = dynamic_cast<const Asn1Model *>(model);
     if (asn1Model == nullptr) {
-        // throw IncorrectModelException(ModelType::Asn1Model);
-        return;
+        throw ExportException("Invalid ASN.1 model");
     }
 
     for (const auto &file : asn1Model->data()) {
-        QByteArray modelData;
-        QBuffer modelDataBuffer(&modelData);
-        modelDataBuffer.open(QIODevice::WriteOnly);
+        // export ASN.1 model
+        QString asn1SerializedModelData;
+        QTextStream asn1OoutputTextStream(&asn1SerializedModelData, QIODevice::ReadWrite);
+        Asn1Acn::Asn1NodeReconstructingVisitor asn1NodeReconVis(asn1OoutputTextStream);
 
-        QTextStream qtas(modelData);
-        Asn1Acn::Asn1NodeReconstructingVisitor asn1nrvis(qtas);
+        asn1NodeReconVis.visit(file);
 
-        asn1nrvis.visit(file);
+        const auto asn1FilenamePrefix = options.value(Asn1Options::asn1FilenamePrefix);
+        const auto asn1OutputFilename =
+                QString::fromStdString(asn1FilenamePrefix->toStdString()) + QString(file.name());
+        QSaveFile asn1OutputFile(asn1OutputFilename);
+        assert(asn1OutputFile.open(QIODevice::WriteOnly));
+        assert(asn1OutputFile.write(asn1SerializedModelData.toStdString().c_str()));
+        assert(asn1OutputFile.commit());
 
-        const auto inputFilename = options.value(Asn1Options::outputFilename);
-        if (inputFilename == nullptr) {
-            throw ExportException("Input filename wasn't specified");
-        }
-        const auto outputFilename =
-                QString(file.name()) + QString::fromStdString(inputFilename->toStdString()) + QString(".asn");
-        QSaveFile outputFile(outputFilename);
-        outputFile.open(QIODevice::WriteOnly);
-        outputFile.write(modelData);
-        outputFile.commit();
+        // export ACN model
+        QString acnSerializedModelData;
+        QTextStream acnOutputTextStream(&acnSerializedModelData, QIODevice::ReadWrite);
+        Asn1Acn::AcnNodeReconstructingVisitor acnNodeReconVis(acnOutputTextStream);
 
-        // analogically as ^^ for ACN for a given File
+        acnNodeReconVis.visit(file);
+
+        const auto acnFilenamePrefix = options.value(Asn1Options::acnFilenamePrefix);
+        const auto acnOutputFilename =
+                QString::fromStdString(acnFilenamePrefix->toStdString()) + QString(file.name()) + QString(".acn");
+        QSaveFile acnOutputFile(acnOutputFilename);
+        assert(acnOutputFile.open(QIODevice::WriteOnly));
+        assert(acnOutputFile.write(acnSerializedModelData.toStdString().c_str()));
+        assert(acnOutputFile.commit());
     }
 }
 
