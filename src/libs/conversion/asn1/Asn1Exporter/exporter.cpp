@@ -25,6 +25,7 @@
 #include <QBuffer>
 #include <QString>
 #include <asn1library/asn1/asn1model.h>
+#include <qglobal.h>
 
 using Asn1Acn::Asn1Model;
 using conversion::asn1::Asn1Options;
@@ -84,6 +85,9 @@ void Asn1Exporter::writeAndCommit(QSaveFile &outputFile, const std::string &data
     bool written = outputFile.write(data.c_str());
     bool commited = outputFile.commit();
 
+    Q_UNUSED(opened);
+    Q_UNUSED(written);
+    Q_UNUSED(commited)
     assert(opened);
     assert(written);
     assert(commited);
