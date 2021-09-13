@@ -3,10 +3,12 @@ project(SedsToIvTranslator VERSION 1.0.0 LANGUAGES CXX)
 set(SOURCES translator.cpp
             specialized/asyncinterfacecommandtranslator.cpp
             specialized/interfacecommandtranslator.cpp
+            specialized/syncinterfacecommandtranslator.cpp
             specialized/componentstranslator.cpp)
 set(INCLUDES translator.h
              specialized/asyncinterfacecommandtranslator.h
              specialized/interfacecommandtranslator.h
+             specialized/syncinterfacecommandtranslator.h
              specialized/componentstranslator.h)
 
 add_library(SedsToIvTranslator STATIC)

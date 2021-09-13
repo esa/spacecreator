@@ -20,6 +20,7 @@
 #include "specialized/componentstranslator.h"
 
 #include "specialized/asyncinterfacecommandtranslator.h"
+#include "specialized/syncinterfacecommandtranslator.h"
 
 #include <conversion/common/translation/exceptions.h>
 #include <ivcore/ivcommonprops.h>
@@ -75,6 +76,7 @@ void ComponentsTranslator::translateInterface(const seds::model::Interface &inte
 
     AsyncInterfaceCommandTranslator asyncCommandTranslator(
             m_package, component, interface, ivFunction, m_asn1Definitions);
+    SyncInterfaceCommandTranslator syncCommandTranslator(interface, ivFunction);
 
     for (const auto &command : interfaceDeclaration.commands()) {
         switch (command.mode()) {
