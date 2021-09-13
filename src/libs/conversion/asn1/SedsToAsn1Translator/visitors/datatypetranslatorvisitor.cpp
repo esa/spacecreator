@@ -67,6 +67,7 @@ overloaded(Ts...)->overloaded<Ts...>;
 
 void DataTypeTranslatorVisitor::operator()(const ArrayDataType &sedsType)
 {
+    Q_UNUSED(sedsType);
     qDebug() << "array";
 }
 
@@ -77,10 +78,7 @@ void DataTypeTranslatorVisitor::operator()(const BinaryDataType &sedsType)
     auto type = std::make_unique<Asn1Acn::Types::BitString>(typeName);
     translateBitStringLength(sedsType, type.get());
 
-    auto typeAssignment =
-            std::make_unique<Asn1Acn::TypeAssignment>(typeName, typeName, Asn1Acn::SourceLocation(), std::move(type));
-
-    m_definitions->addType(std::move(typeAssignment));
+    m_asn1Type = std::move(type);
 }
 
 void DataTypeTranslatorVisitor::operator()(const BooleanDataType &sedsType)
@@ -90,14 +88,12 @@ void DataTypeTranslatorVisitor::operator()(const BooleanDataType &sedsType)
     auto type = std::make_unique<Asn1Acn::Types::Boolean>(typeName);
     translateBooleanEncoding(sedsType.encoding(), type.get());
 
-    auto typeAssignment =
-            std::make_unique<Asn1Acn::TypeAssignment>(typeName, typeName, Asn1Acn::SourceLocation(), std::move(type));
-
-    m_definitions->addType(std::move(typeAssignment));
+    m_asn1Type = std::move(type);
 }
 
 void DataTypeTranslatorVisitor::operator()(const ContainerDataType &sedsType)
 {
+    Q_UNUSED(sedsType);
     qDebug() << "container";
 }
 
@@ -109,10 +105,7 @@ void DataTypeTranslatorVisitor::operator()(const EnumeratedDataType &sedsType)
     translateIntegerEncoding(sedsType.encoding(), type.get());
     translateEnumerationList(sedsType.enumerationList(), type.get());
 
-    auto typeAssignment =
-            std::make_unique<Asn1Acn::TypeAssignment>(typeName, typeName, Asn1Acn::SourceLocation(), std::move(type));
-
-    m_definitions->addType(std::move(typeAssignment));
+    m_asn1Type = std::move(type);
 }
 
 void DataTypeTranslatorVisitor::operator()(const FloatDataType &sedsType)
@@ -123,10 +116,7 @@ void DataTypeTranslatorVisitor::operator()(const FloatDataType &sedsType)
     std::visit(FloatRangeTranslatorVisitor { type->constraints() }, sedsType.range());
     translateFloatEncoding(sedsType.encoding(), type.get());
 
-    auto typeAssignment =
-            std::make_unique<Asn1Acn::TypeAssignment>(typeName, typeName, Asn1Acn::SourceLocation(), std::move(type));
-
-    m_definitions->addType(std::move(typeAssignment));
+    m_asn1Type = std::move(type);
 }
 
 void DataTypeTranslatorVisitor::operator()(const IntegerDataType &sedsType)
@@ -137,10 +127,7 @@ void DataTypeTranslatorVisitor::operator()(const IntegerDataType &sedsType)
     std::visit(IntegerRangeTranslatorVisitor { type->constraints() }, sedsType.range());
     translateIntegerEncoding(sedsType.encoding(), type.get());
 
-    auto typeAssignment =
-            std::make_unique<Asn1Acn::TypeAssignment>(typeName, typeName, Asn1Acn::SourceLocation(), std::move(type));
-
-    m_definitions->addType(std::move(typeAssignment));
+    m_asn1Type = std::move(type);
 }
 
 void DataTypeTranslatorVisitor::operator()(const StringDataType &sedsType)
@@ -151,14 +138,12 @@ void DataTypeTranslatorVisitor::operator()(const StringDataType &sedsType)
     translateStringLength(sedsType, type.get());
     translateStringEncoding(sedsType.encoding(), type.get());
 
-    auto typeAssignment =
-            std::make_unique<Asn1Acn::TypeAssignment>(typeName, typeName, Asn1Acn::SourceLocation(), std::move(type));
-
-    m_definitions->addType(std::move(typeAssignment));
+    m_asn1Type = std::move(type);
 }
 
 void DataTypeTranslatorVisitor::operator()(const seds::model::SubRangeDataType &sedsType)
 {
+    Q_UNUSED(sedsType);
     qDebug() << "subrange";
 }
 
@@ -339,7 +324,7 @@ void DataTypeTranslatorVisitor::translateStringLength(
 void DataTypeTranslatorVisitor::translateEnumerationList(
         const std::vector<seds::model::ValueEnumeration> &items, Asn1Acn::Types::Enumerated *asn1Type) const
 {
-    for (long index = 0; index < items.size(); ++index) {
+    for (std::size_t index = 0; index < items.size(); ++index) {
         const auto &item = items[index];
 
         asn1Type->addItem(

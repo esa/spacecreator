@@ -61,6 +61,12 @@ private:
      * @param   format      Format
      */
     static auto libXmlWarningFunc(void *context, const char *format, ...) -> void;
+
+private:
+    /// @brief  Max size of a char buffer in handling XML errors
+    static constexpr std::size_t m_errorBufferSize = 1024;
+    /// @brief  Max size of a char buffer in handling XML warnings
+    static constexpr std::size_t m_warningBufferSize = 1024;
 };
 
 } // namespace seds::validator

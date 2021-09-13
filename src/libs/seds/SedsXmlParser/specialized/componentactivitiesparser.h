@@ -228,7 +228,7 @@ private:
      * @return  Corresponding value
      * @throws  ParserException
      */
-    static auto parseComparisonOperator(common::String comparisonOperatorStr) -> model::ComparisonOperator;
+    static auto parseComparisonOperator(const QString &comparisonOperatorStr) -> model::ComparisonOperator;
     /**
      * @brief   Parses given string as a math operator
      * @param   valueStr        String to parse

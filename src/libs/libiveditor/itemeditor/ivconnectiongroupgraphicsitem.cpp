@@ -48,7 +48,7 @@ void IVConnectionGroupGraphicsItem::init()
 void IVConnectionGroupGraphicsItem::updateBoundingRect()
 {
     IVConnectionGraphicsItem::updateBoundingRect();
-    updateTitleItemPosition();
+    updateTextPosition();
 }
 
 void IVConnectionGroupGraphicsItem::updateLabel(const QString &text)
@@ -60,7 +60,7 @@ void IVConnectionGroupGraphicsItem::updateLabel(const QString &text)
     }
 }
 
-void IVConnectionGroupGraphicsItem::updateTitleItemPosition()
+void IVConnectionGroupGraphicsItem::updateTextPosition()
 {
     const QVector<QPointF> scenePoints = points();
     const QString text = m_textItem->toPlainText().trimmed();

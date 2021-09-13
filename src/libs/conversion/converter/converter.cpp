@@ -44,8 +44,8 @@ Converter::Converter(const Registry &registry, Options options)
 {
 }
 
-void Converter::convert(
-        std::set<ModelType> sourceModelsTypes, ModelType targetModelType, std::set<ModelType> auxiliaryModelsTypes)
+void Converter::convert(const std::set<ModelType> &sourceModelsTypes, ModelType targetModelType,
+        const std::set<ModelType> &auxiliaryModelsTypes)
 {
     for (const auto sourceModelType : sourceModelsTypes) {
         if (!m_registry.isImporterRegistered(sourceModelType)) {
@@ -111,14 +111,14 @@ void Converter::translateModels(const std::set<ModelType> &sourceModelsTypes, Mo
         sourceModels.push_back(model);
     }
 
-    auto targetModels = translator->translateModels(std::move(sourceModels), m_options);
+    auto outputModels = translator->translateModels(std::move(sourceModels), m_options);
 
-    for (auto &targetModel : targetModels) {
-        const auto targetModelType = targetModel->modelType();
+    for (auto &outputModel : outputModels) {
+        const auto outputModelType = outputModel->modelType();
 
-        const auto insertionResult = m_modelCache.insert({ targetModelType, std::move(targetModel) });
+        const auto insertionResult = m_modelCache.insert({ outputModelType, std::move(outputModel) });
         if (!insertionResult.second) {
-            const auto message = QString("Failed to save translated %1 model").arg(modelTypeToString(targetModelType));
+            const auto message = QString("Failed to save translated %1 model").arg(modelTypeToString(outputModelType));
             throw ConverterException(message);
         }
     }

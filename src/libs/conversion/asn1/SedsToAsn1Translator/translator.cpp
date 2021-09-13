@@ -38,6 +38,8 @@ namespace conversion::asn1::translator {
 std::vector<std::unique_ptr<Model>> SedsToAsn1Translator::translateModels(
         std::vector<const Model *> sourceModels, const Options &options) const
 {
+    Q_UNUSED(options);
+
     if (sourceModels.empty()) {
         throw TranslationException("No models passed for translation");
     } else if (sourceModels.size() > 1) {
@@ -77,7 +79,7 @@ std::vector<std::unique_ptr<Model>> SedsToAsn1Translator::translateSedsModel(con
             asn1Files.push_back(translatePackage(package));
         }
     } else {
-        throw TranslationException("Unhandled SEDS model data");
+        throw TranslationException("Unhandled SEDS model data type");
     }
 
     auto asn1Model = std::make_unique<Asn1Model>(std::move(asn1Files));
@@ -92,8 +94,7 @@ Asn1Acn::File SedsToAsn1Translator::translatePackage(const seds::model::Package 
 {
     Asn1Acn::File asn1File("");
 
-    auto definitions =
-            std::make_unique<Asn1Acn::Definitions>(package.qualifiedName().name().value(), Asn1Acn::SourceLocation());
+    auto definitions = std::make_unique<Asn1Acn::Definitions>(package.nameStr(), Asn1Acn::SourceLocation());
     translateDataTypes(package.dataTypes(), definitions.get());
 
     asn1File.add(std::move(definitions));
@@ -104,8 +105,14 @@ Asn1Acn::File SedsToAsn1Translator::translatePackage(const seds::model::Package 
 void SedsToAsn1Translator::translateDataTypes(
         const std::vector<seds::model::DataType> &dataTypes, Asn1Acn::Definitions *definitions) const
 {
+    std::unique_ptr<Asn1Acn::Types::Type> type;
+
     for (const auto &dataType : dataTypes) {
-        std::visit(DataTypeTranslatorVisitor { definitions }, dataType);
+        std::visit(DataTypeTranslatorVisitor { type }, dataType);
+
+        auto typeAssignment = std::make_unique<Asn1Acn::TypeAssignment>(
+                type->identifier(), type->identifier(), Asn1Acn::SourceLocation(), std::move(type));
+        definitions->addType(std::move(typeAssignment));
     }
 }
 

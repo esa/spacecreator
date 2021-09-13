@@ -58,11 +58,11 @@ protected:
 template<typename T>
 inline const T *AcnParameterizableCollection<T>::component(const QString &name) const
 {
-    auto item = find_if(m_components.begin(), m_components.end(), [name](const auto &item) {
+    auto found = find_if(m_components.begin(), m_components.end(), [name](const auto &item) {
         return item->name() == name;
     });
 
-    return item == m_components.end() ? nullptr : (*item).get();
+    return found == m_components.end() ? nullptr : (*found).get();
 }
 
 template<typename T>

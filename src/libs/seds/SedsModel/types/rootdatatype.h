@@ -32,6 +32,14 @@ public:
     virtual ~RootDataType() = 0;
     RootDataType(RootDataType &&) = default;
     RootDataType &operator=(RootDataType &&) = default;
+
+public:
+    /**
+     * @brief   Get name string
+     *
+     * @return Name string
+     */
+    auto nameStr() const -> const QString &;
 };
 
 } // namespace seds::model

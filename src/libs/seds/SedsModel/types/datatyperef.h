@@ -23,7 +23,7 @@
 
 namespace seds::model {
 
-class DataTypeRef final : public QualifiedName
+class DataTypeRef final
 {
 public:
     DataTypeRef() = default;
@@ -33,6 +33,9 @@ public:
 
 public:
     auto value() const -> const QualifiedName &;
+
+public:
+    auto nameStr() const -> const QString &;
 
 private:
     QualifiedName m_value;

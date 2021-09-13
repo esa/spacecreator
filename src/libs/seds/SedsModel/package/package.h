@@ -65,6 +65,14 @@ public:
     auto components() const -> const ComponentSet &;
     auto addComponent(Component component) -> void;
 
+public:
+    /**
+     * @brief   Get name string
+     *
+     * @return Name string
+     */
+    auto nameStr() const -> const QString &;
+
 private:
     QualifiedName m_qualifiedName;
 

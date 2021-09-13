@@ -16,15 +16,18 @@
 */
 
 #include "dvattributedelegate.h"
-#include "propertieslistmodel.h"
-#include "dvcommonprops.h"
 
+#include "asn1/file.h"
 #include "asn1editor.h"
-#include "asn1systemchecks.h"
 #include "asn1modelstorage.h"
+#include "asn1reader.h"
+#include "asn1systemchecks.h"
+#include "dvcommonprops.h"
+#include "propertieslistmodel.h"
 
 #include <QEvent>
 #include <QLabel>
+#include <QtDebug>
 
 static const char *MODEL_INDEX_PROPERTY = "modelIndex";
 
@@ -34,10 +37,10 @@ DVAttributeDelegate::DVAttributeDelegate(Asn1Acn::Asn1SystemChecks *asn1Checks, 
     : shared::AttributeDelegate(parent)
     , m_asn1Checks(asn1Checks)
 {
-
 }
 
-QWidget *DVAttributeDelegate::createEditor(QWidget *parent, const QStyleOptionViewItem &option, const QModelIndex &index) const
+QWidget *DVAttributeDelegate::createEditor(
+        QWidget *parent, const QStyleOptionViewItem &option, const QModelIndex &index) const
 {
     if (index.isValid()) {
         const QString name = shared::PropertiesListModel::tokenNameFromIndex(index);
@@ -75,28 +78,35 @@ bool DVAttributeDelegate::eventFilter(QObject *object, QEvent *event)
                 return shared::AttributeDelegate::eventFilter(object, event);
             }
 
-            auto getAttrValue = [modelIndex](const QString &attrName){
+            auto getAttrValue = [modelIndex](const QString &attrName) {
                 if (auto model = modelIndex.model()) {
                     const QModelIndex startIndex = model->index(0, shared::PropertiesListModel::Column::Name);
-                    const QModelIndexList indexList = model->match(startIndex, shared::PropertiesListModel::DataRole,
-                            attrName);
+                    const QModelIndexList indexList =
+                            model->match(startIndex, shared::PropertiesListModel::DataRole, attrName);
                     if (!indexList.isEmpty()) {
-                        const QModelIndex valueIndex = indexList.first().siblingAtColumn(shared::PropertiesListModel::Column::Value);
+                        const QModelIndex valueIndex =
+                                indexList.first().siblingAtColumn(shared::PropertiesListModel::Column::Value);
                         const QString asn1file = valueIndex.data(shared::PropertiesListModel::DataRole).toString();
                         return asn1file;
                     }
                 }
                 return QString();
             };
-            if (m_asn1Checks && m_asn1Checks->asn1Storage()) {
-                const QString asn1fileAttrName = dvm::meta::Props::token(dvm::meta::Props::Token::asn1file);
-                const QString asn1file = getAttrValue(asn1fileAttrName);
-                if (!asn1file.isEmpty()) {
-                    m_asn1Checks->asn1Storage()->asn1DataTypes(asn1file);
+
+            std::unique_ptr<Asn1Acn::File> asn1Data;
+            const QString asn1fileAttrName = dvm::meta::Props::token(dvm::meta::Props::Token::asn1file);
+            const QString asn1file = getAttrValue(asn1fileAttrName);
+            if (!asn1file.isEmpty()) {
+                QStringList errorMessages;
+                Asn1Acn::Asn1Reader parser;
+                asn1Data = parser.parseAsn1File(QFileInfo(asn1file), &errorMessages);
+                if (!asn1Data) {
+                    qWarning() << "Can't read file" << asn1file << ":" << errorMessages.join(", ");
+                    return {};
                 }
             }
 
-            auto dialog = new asn1::Asn1Editor(m_asn1Checks, label->window());
+            auto dialog = new asn1::Asn1Editor(m_asn1Checks, std::move(asn1Data), label->window());
             dialog->setAttribute(Qt::WA_DeleteOnClose);
             dialog->setModal(true);
 
@@ -106,7 +116,7 @@ bool DVAttributeDelegate::eventFilter(QObject *object, QEvent *event)
                 dialog->showAsn1Type(asn1type);
             }
             dialog->setValue(label->text());
-            connect(dialog, &asn1::Asn1Editor::accepted, this, [this, modelIndex](){
+            connect(dialog, &asn1::Asn1Editor::accepted, this, [this, modelIndex]() {
                 if (auto dialog = qobject_cast<asn1::Asn1Editor *>(sender())) {
                     auto model = const_cast<QAbstractItemModel *>(modelIndex.model());
                     const QString newValue = dialog->value();

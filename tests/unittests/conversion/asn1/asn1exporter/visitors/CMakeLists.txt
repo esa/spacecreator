@@ -14,6 +14,7 @@ target_link_libraries(${TEST_NAME}
                Conversion::Asn1Exporter
                asn1library
                Qt5::Core
-               Qt5::Test)
+               Qt5::Test
+               CommonProjectWarnings)
 
 add_format_target(${TEST_NAME})

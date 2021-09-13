@@ -55,7 +55,6 @@ public:
 
 protected:
     void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget) override;
-    QVariant itemChange(GraphicsItemChange change, const QVariant &value) override;
 
     void onManualMoveProgress(shared::ui::GripPoint *grip, const QPointF &from, const QPointF &to) override;
     void onManualMoveFinish(shared::ui::GripPoint *grip, const QPointF &pressedAt, const QPointF &releasedAt) override;
@@ -71,5 +70,6 @@ protected Q_SLOTS:
 private:
     static QPointer<QSvgRenderer> m_svgRenderer;
     std::unique_ptr<MiniViewRenderer> m_miniViewDrawer;
+    QList<IVInterfaceGraphicsItem *> m_interfaces;
 };
 }

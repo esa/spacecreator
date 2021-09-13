@@ -44,6 +44,18 @@ const InterfaceCommand::CommandArguments &InterfaceCommand::arguments() const
 void InterfaceCommand::addArgument(CommandArgument argument)
 {
     m_arguments.push_back(std::move(argument));
+    m_argumentsModes.insert(argument.mode());
+}
+
+ArgumentsCombination InterfaceCommand::argumentsCombination() const
+{
+    uint8_t result = 0;
+
+    for (const auto mode : m_argumentsModes) {
+        result |= static_cast<uint8_t>(mode);
+    }
+
+    return static_cast<ArgumentsCombination>(result);
 }
 
 } // namespace seds::model

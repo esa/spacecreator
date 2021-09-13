@@ -31,8 +31,10 @@ public:
     inline static const QString inputFilename = "Iv_Import_InputFilename";
     /** @brief IV parser file */
     inline static const QString configFilename = "Iv_Import_ConfigFilename";
+    /** @brief Use functions instead of a flat structure */
+    inline static const QString generateFunctionsForPackages = "Iv_Translation_GenerateFunctionsForPackages";
     /** @biref Export output file */
     inline static const QString outputFilename = "Iv_Export_OutputFilename";
 };
 
-} // namespace conversion::iv
+} // namespace conversion::seds

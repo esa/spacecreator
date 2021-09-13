@@ -100,22 +100,6 @@ void IVFunctionGraphicsItem::paint(QPainter *painter, const QStyleOptionGraphics
     painter->restore();
 }
 
-QVariant IVFunctionGraphicsItem::itemChange(GraphicsItemChange change, const QVariant &value)
-{
-    if (change == ItemChildAddedChange) {
-        QTimer::singleShot(0, this, [this, item = value.value<QGraphicsItem *>()]() {
-            if (auto iface = qgraphicsitem_cast<IVInterfaceGraphicsItem *>(item)) {
-                connect(iface, &IVInterfaceGraphicsItem::relocated, this, [this]() { update(); });
-            }
-        });
-    } else if (change == ItemChildRemovedChange) {
-        if (auto iface = qgraphicsitem_cast<IVInterfaceGraphicsItem *>(value.value<QGraphicsItem *>())) {
-            disconnect(iface, &IVInterfaceGraphicsItem::relocated, this, nullptr);
-        }
-    }
-    return IVFunctionTypeGraphicsItem::itemChange(change, value);
-}
-
 void IVFunctionGraphicsItem::onManualMoveProgress(
         shared::ui::GripPoint *grip, const QPointF &pressedAt, const QPointF &releasedAt)
 {

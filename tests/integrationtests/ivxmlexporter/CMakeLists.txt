@@ -13,7 +13,8 @@ target_link_libraries(${TEST_NAME}
                 Conversion::IvXmlExporter
                 ivcore
                 Qt5::Core
-                Qt5::Test)
+                Qt5::Test
+                CommonProjectWarnings)
 
 configure_file(resources/config.xml config.xml COPYONLY)
 

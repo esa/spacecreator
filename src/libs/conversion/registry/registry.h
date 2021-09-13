@@ -66,11 +66,11 @@ public:
     /**
      * @brief   Registers new translator
      *
-     * @param   sourceModelType     Source model type
+     * @param   sourceModelsTypes   Source models types
      * @param   targetModelType     Target model type
      * @param   translator          Translator to register
      */
-    [[nodiscard]] auto registerTranslator(std::set<ModelType> sourceModelType, ModelType targetModelType,
+    [[nodiscard]] auto registerTranslator(std::set<ModelType> sourceModelsTypes, ModelType targetModelType,
             std::unique_ptr<translator::Translator> translator) -> bool;
     /**
      * @brief   Registers new exporter
@@ -91,12 +91,12 @@ public:
     /**
      * @brief   Checks if translator for given sources and target models types is registered
      *
-     * @param   sourceModelType     Source model type
+     * @param   sourceModelsTypes   Source models types
      * @param   targetModelType     Target model type
      *
      * @return  True if registered, false otherwise
      */
-    auto isTranslatorRegistered(std::set<ModelType> sourceModelType, ModelType targetModelType) const -> bool;
+    auto isTranslatorRegistered(std::set<ModelType> sourceModelsTypes, ModelType targetModelType) const -> bool;
     /**
      * @brief   Checks if exporter for given model type is registered
      *
@@ -117,12 +117,12 @@ public:
     /**
      * @brief   Finds translator for given model type
      *
-     * @param   sourceModelType     Source model type
+     * @param   sourceModelsTypes   Source models types
      * @param   targetModelType     Target model type
      *
      * @return  Translator if found, nullptr otherwise
      */
-    auto findTranslator(std::set<ModelType> sourceModelType, ModelType targetModelType) const
+    auto findTranslator(std::set<ModelType> sourceModelsTypes, ModelType targetModelType) const
             -> translator::Translator *;
     /**
      * @brief   Finds exporter for given model type

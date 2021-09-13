@@ -27,6 +27,7 @@ class Asn1Editor;
 
 namespace Asn1Acn {
 class Asn1SystemChecks;
+class File;
 }
 
 namespace asn1 {
@@ -39,6 +40,8 @@ class Asn1Editor : public QDialog
 
 public:
     Asn1Editor(Asn1Acn::Asn1SystemChecks *asn1Checks, QWidget *parent = nullptr);
+    Asn1Editor(Asn1Acn::Asn1SystemChecks *asn1Checks, std::unique_ptr<Asn1Acn::File> attrAsn1File,
+            QWidget *parent = nullptr);
     ~Asn1Editor();
 
     void setValue(const QString &value);
@@ -63,6 +66,7 @@ private:
     Ui::Asn1Editor *ui;
     Asn1TreeView *m_asn1TreeView;
     QPointer<Asn1Acn::Asn1SystemChecks> m_asn1Checks;
+    std::unique_ptr<Asn1Acn::File> m_attrAsn1File;
     QString m_fileName;
 };
 

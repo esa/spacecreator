@@ -13,8 +13,10 @@ target_include_directories(Asn1Registrar
 target_link_libraries(Asn1Registrar
     PUBLIC      Conversion::Common
                 Conversion::Asn1Exporter
-                Conversion::SedsToAsn1Translator)
+                Conversion::SedsToAsn1Translator
+    PRIVATE     CommonProjectWarnings)
 
 add_format_target(Asn1Registrar)
+add_tidy_target(Asn1Registrar)
 
 add_library(Conversion::Asn1Registrar ALIAS Asn1Registrar)

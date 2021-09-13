@@ -83,9 +83,9 @@ protected:
             if (!grouppedObjects.contains(objectGroupName)) {
                 grouppedObjects[objectGroupName] = QVariant::fromValue(QList<QVariant>());
             }
-            QVariantList objects = grouppedObjects[objectGroupName].toList();
-            objects << exportedObject;
-            grouppedObjects[objectGroupName] = objects;
+            auto groupObjects = grouppedObjects[objectGroupName].toList();
+            groupObjects << exportedObject;
+            grouppedObjects[objectGroupName] = groupObjects;
         }
         return grouppedObjects;
     }

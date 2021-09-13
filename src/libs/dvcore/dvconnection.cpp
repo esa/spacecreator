@@ -63,35 +63,6 @@ bool DVConnection::postInit()
         shared::ErrorHub::addError(shared::ErrorItem::Error, tr("Connection can't init without model set"));
         return false;
     }
-
-    auto getDevice = [this](const QString &nodeName, const QString &portName, const QString &busName) -> DVDevice * {
-        if (nodeName.isEmpty()) {
-            shared::ErrorHub::addError(shared::ErrorItem::Error, tr("Malformed data, empty source node"));
-            return nullptr;
-        }
-        if (portName.isEmpty()) {
-            shared::ErrorHub::addError(shared::ErrorItem::Error, tr("Malformed data, empty source port"));
-            return nullptr;
-        }
-
-        auto node =
-                qobject_cast<DVNode *>(model()->getObjectByName(nodeName, DVObject::Type::Node, Qt::CaseInsensitive));
-        if (!node) {
-            shared::ErrorHub::addError(shared::ErrorItem::Error, tr("Can't find node with name %1\n").arg(nodeName));
-            return nullptr;
-        }
-        const QList<QPointer<DVDevice>> nodeDevices = node->devices();
-        auto it = std::find_if(nodeDevices.cbegin(), nodeDevices.cend(), [portName, busName](DVDevice *dev) {
-            return dev->portName() == portName && dev->qualifier() == busName;
-        });
-        if (it == nodeDevices.cend()) {
-            shared::ErrorHub::addError(shared::ErrorItem::Error,
-                    tr("Can't find device with name %1 and bus access %2\n").arg(portName, busName));
-            return nullptr;
-        }
-        return *it;
-    };
-
     const QString busName = entityAttributeValue(meta::Props::token(meta::Props::Token::to_bus)).toString();
 
     const QString sourceNodeName = entityAttributeValue(meta::Props::token(meta::Props::Token::from_node)).toString();
@@ -106,6 +77,15 @@ bool DVConnection::postInit()
         return false;
     }
 
+    connect(d->sourceDevice->node(), &DVNode::titleChanged, this,
+            [this]() { updateAttributeFromEntity(qobject_cast<DVObject *>(sender()), meta::Props::Token::from_node); });
+    connect(d->sourceDevice, &DVNode::titleChanged, this,
+            [this]() { updateAttributeFromEntity(qobject_cast<DVObject *>(sender()), meta::Props::Token::from_port); });
+    connect(d->targetDevice->node(), &DVNode::titleChanged, this,
+            [this]() { updateAttributeFromEntity(qobject_cast<DVObject *>(sender()), meta::Props::Token::to_node); });
+    connect(d->targetDevice, &DVNode::titleChanged, this,
+            [this]() { updateAttributeFromEntity(qobject_cast<DVObject *>(sender()), meta::Props::Token::to_port); });
+
     ConnectionValidator::FailReason valid = ConnectionValidator::check(this);
     if (valid != ConnectionValidator::FailReason::NotFail) {
         switch (valid) {
@@ -117,10 +97,8 @@ bool DVConnection::postInit()
         default:
             shared::ErrorHub::addError(shared::ErrorItem::Error, tr("Connection %1 can't init").arg(title()));
         }
-
         return false;
     }
-
     return true;
 }
 
@@ -185,6 +163,43 @@ DVMessage *DVConnection::message(const QString &fromFunction, const QString &fro
         }
     }
     return {};
+}
+
+DVDevice *DVConnection::getDevice(const QString &nodeName, const QString &portName, const QString &busName)
+{
+    if (nodeName.isEmpty()) {
+        shared::ErrorHub::addError(shared::ErrorItem::Error, tr("Malformed data, empty source node"));
+        return nullptr;
+    }
+    if (portName.isEmpty()) {
+        shared::ErrorHub::addError(shared::ErrorItem::Error, tr("Malformed data, empty source port"));
+        return nullptr;
+    }
+
+    auto node = qobject_cast<DVNode *>(model()->getObjectByName(nodeName, DVObject::Type::Node, Qt::CaseInsensitive));
+    if (!node) {
+        shared::ErrorHub::addError(shared::ErrorItem::Error, tr("Can't find node with name %1\n").arg(nodeName));
+        return nullptr;
+    }
+    const QList<QPointer<DVDevice>> nodeDevices = node->devices();
+    auto it = std::find_if(nodeDevices.cbegin(), nodeDevices.cend(),
+            [portName, busName](DVDevice *dev) { return dev->portName() == portName && dev->qualifier() == busName; });
+    if (it == nodeDevices.cend()) {
+        shared::ErrorHub::addError(shared::ErrorItem::Error,
+                tr("Can't find device with name %1 and bus access %2\n").arg(portName, busName));
+        return nullptr;
+    }
+    return *it;
+}
+
+void DVConnection::updateAttributeFromEntity(DVObject *object, const meta::Props::Token token)
+{
+    if (!object)
+        return;
+
+    EntityAttribute attr = entityAttribute(meta::Props::token(token));
+    attr.setValue(object->title());
+    setEntityAttribute(attr);
 }
 
 } // namespace dvm

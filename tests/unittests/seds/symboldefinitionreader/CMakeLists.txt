@@ -12,7 +12,8 @@ target_link_libraries(${TEST_NAME}
     PRIVATE     Conversion::Common
                 SEDS::SymbolDefinitionReader
                 Qt5::Core
-                Qt5::Test)
+                Qt5::Test
+                CommonProjectWarnings)
 
 configure_file(resources/Valid.toml Valid.toml COPYONLY)
 configure_file(resources/Invalid.toml Invalid.toml COPYONLY)

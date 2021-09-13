@@ -384,6 +384,21 @@ void IVInterfaceGraphicsItem::updateLabel()
     m_shape = composeShape();
 }
 
+QVariant IVInterfaceGraphicsItem::itemChange(GraphicsItemChange change, const QVariant &value)
+{
+    if (change == QGraphicsItem::ItemParentChange) {
+        if (auto currentParentObj = parentObject()) {
+            disconnect(this, &VEInteractiveObject::relocated, currentParentObj, nullptr);
+        }
+    } else if (change == QGraphicsItem::ItemParentHasChanged) {
+        if (auto currentParentObj = parentObject()) {
+            connect(this, &VEInteractiveObject::relocated, currentParentObj,
+                    [currentParentObj]() { currentParentObj->update(); });
+        }
+    }
+    return shared::ui::VEConnectionEndPointGraphicsItem::itemChange(change, value);
+}
+
 void IVInterfaceGraphicsItem::updateKind()
 {
     m_type->setPath(typePath());

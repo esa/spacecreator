@@ -74,4 +74,4 @@ private:
 
 } // namespace ivm
 
-Q_DECLARE_METATYPE(ivm::IVConnectionGroup::CreationInfo);
+Q_DECLARE_METATYPE(ivm::IVConnectionGroup::CreationInfo)

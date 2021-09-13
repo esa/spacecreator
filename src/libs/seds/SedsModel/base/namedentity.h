@@ -39,6 +39,14 @@ public:
     auto name() const -> const Name &;
     auto setName(common::String name) -> void;
 
+public:
+    /**
+     * @brief   Get name string
+     *
+     * @return Name string
+     */
+    auto nameStr() const -> const QString &;
+
 protected:
     Name m_name;
 };

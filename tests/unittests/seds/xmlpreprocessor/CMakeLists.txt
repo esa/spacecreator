@@ -13,7 +13,8 @@ target_link_libraries(${TEST_NAME}
                 SEDS::XmlPreprocessor
                 Qt5::Core
                 Qt5::Test
-                Qt5::Xml)
+                Qt5::Xml
+                CommonProjectWarnings)
 
 configure_file(resources/Valid.xml Valid.xml COPYONLY)
 configure_file(resources/IncludesValid.xml IncludesValid.xml COPYONLY)

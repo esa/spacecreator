@@ -25,7 +25,7 @@
 
 namespace seds::model {
 
-class QualifiedName
+class QualifiedName final
 {
 public:
     QualifiedName() = default;

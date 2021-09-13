@@ -19,7 +19,7 @@
 
 #pragma once
 
-#include <asn1library/asn1/definitions.h>
+#include <asn1library/asn1/types/type.h>
 #include <optional>
 
 namespace Asn1Acn::Types {
@@ -61,7 +61,7 @@ namespace conversion::asn1::translator {
  */
 struct DataTypeTranslatorVisitor final {
     /** @brief  Where translated data type will be added */
-    Asn1Acn::Definitions *m_definitions;
+    std::unique_ptr<Asn1Acn::Types::Type> &m_asn1Type;
 
     /**
      * @brief   Translates SEDS array data type

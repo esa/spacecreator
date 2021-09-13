@@ -54,6 +54,49 @@ public:
 };
 
 /**
+ * @brief   Exception thrown when translator encounters a data type that wasn't declared
+ */
+class UndeclaredDataTypeException : public TranslationException
+{
+public:
+    /**
+     * @brief   Constructor
+     *
+     * @param   dataTypeName    Name of undeclared the type
+     */
+    explicit UndeclaredDataTypeException(const QString &dataTypeName);
+};
+
+/**
+ * @brief   Exception thrown when translator encounters an interface that wasn't declared
+ */
+class UndeclaredInterfaceException : public TranslationException
+{
+public:
+    /**
+     * @brief   Constructor
+     *
+     * @param   interfaceTypeName   Name of the type of the undeclared interface
+     */
+    explicit UndeclaredInterfaceException(const QString &interfaceTypeName);
+};
+
+/**
+ * @brief   Exception thrown when interface parameter type wasn't mapped for given interface
+ */
+class MissingGenericTypeMappingException : public TranslationException
+{
+public:
+    /**
+     * @brief   Constructor
+     *
+     * @param   genericTypeName     Type that wasn't mapped
+     * @param   interfaceName       Name of interface with the unmapped type
+     */
+    explicit MissingGenericTypeMappingException(const QString &genericTypeName, const QString &interfaceName);
+};
+
+/**
  * @brief   Exception thrown when translator encounters unhandled value in source model
  */
 class UnhandledValueException : public TranslationException

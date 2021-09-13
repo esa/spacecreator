@@ -13,8 +13,10 @@ target_include_directories(IvXmlExporter
 target_link_libraries(IvXmlExporter
     PUBLIC      Conversion::Common
     PRIVATE     ivcore
-                libiveditor)
+                libiveditor
+                CommonProjectWarnings)
 
 add_format_target(IvXmlExporter)
+add_tidy_target(IvXmlExporter)
 
 add_library(Conversion::IvXmlExporter ALIAS IvXmlExporter)

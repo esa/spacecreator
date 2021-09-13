@@ -23,12 +23,12 @@
 
 namespace seds::model {
 
-enum class CommandArgumentMode
+enum class CommandArgumentMode : uint8_t
 {
-    In,
-    Out,
-    InOut,
-    Notify
+    In = 0b001,
+    Out = 0b010,
+    InOut = 0b011,
+    Notify = 0b100,
 };
 
 template<>

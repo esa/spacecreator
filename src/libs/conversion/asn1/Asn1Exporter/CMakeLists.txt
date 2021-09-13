@@ -22,8 +22,10 @@ target_include_directories(Asn1Exporter
     PRIVATE     ${CMAKE_SOURCE_DIR}/src/libs)
 target_link_libraries(Asn1Exporter
     PUBLIC      Conversion::Common
-                asn1library)
+                asn1library
+    PRIVATE     CommonProjectWarnings)
 
 add_format_target(Asn1Exporter)
+add_tidy_target(Asn1Exporter)
 
 add_library(Conversion::Asn1Exporter ALIAS Asn1Exporter)

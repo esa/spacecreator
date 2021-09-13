@@ -28,22 +28,22 @@ QString modelTypeToString(ModelType modelType)
 {
     switch (modelType) {
     case ModelType::Asn1:
-        return "ASN.1";
+        return QStringLiteral("ASN.1");
     case ModelType::Aadl:
-        return "AADL";
+        return QStringLiteral("AADL");
     case ModelType::Sdl:
-        return "SDL";
+        return QStringLiteral("SDL");
     case ModelType::Seds:
-        return "SEDS";
+        return QStringLiteral("SEDS");
     default:
-        return "unhandled model type";
+        return QStringLiteral("unhandled model type");
     }
 }
 
 QString modelTypesToString(const std::set<ModelType> &modelsTypes)
 {
     return std::accumulate(std::next(modelsTypes.begin()), modelsTypes.end(), modelTypeToString(*modelsTypes.begin()),
-            [](QString acc, ModelType modelType) { return acc + ", " + modelTypeToString(modelType); });
+            [](const QString &acc, ModelType modelType) { return acc + ", " + modelTypeToString(modelType); });
 }
 
 } // namespace conversion

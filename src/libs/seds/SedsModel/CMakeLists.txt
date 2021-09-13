@@ -76,6 +76,7 @@ set(SOURCES
     generics/generictype.cpp
     generics/generictypemap.cpp
     generics/generictypemapset.cpp
+    interfaces/argumentscombination.cpp
     interfaces/commandargument.cpp
     interfaces/commandargumentmode.cpp
     interfaces/interfacecommand.cpp
@@ -91,6 +92,7 @@ set(SOURCES
     types/booleandatatype.cpp
     types/compositedatatype.cpp
     types/containerdatatype.cpp
+    types/datatype.cpp
     types/datatyperef.cpp
     types/dimensionsize.cpp
     types/enumerateddatatype.cpp
@@ -208,6 +210,7 @@ set(INCLUDES
     generics/generictype.h
     generics/generictypemap.h
     generics/generictypemapset.h
+    interfaces/argumentscombination.h
     interfaces/commandargument.h
     interfaces/commandargumentmode.h
     interfaces/interfacecommand.h
@@ -272,8 +275,10 @@ target_include_directories(SedsModel
     PUBLIC      .
     PRIVATE     ${CMAKE_SOURCE_DIR}/src/libs)
 target_link_libraries(SedsModel
-    PUBLIC     Conversion::Common)
+    PUBLIC     Conversion::Common
+    PRIVATE    CommonProjectWarnings)
 
 add_format_target(SedsModel)
+add_tidy_target(SedsModel)
 
 add_library(SEDS::Model ALIAS SedsModel)

@@ -60,13 +60,14 @@ void Asn1NodeReconstructingVisitor::visit(const TypeAssignment &type)
     m_outStream << QStringLiteral("\n");
 }
 
-void Asn1NodeReconstructingVisitor::visit(const ValueAssignment &assignment)
+void Asn1NodeReconstructingVisitor::visit(const ValueAssignment &value)
 {
-    if (assignment.value() == nullptr)
+    if (value.value() == nullptr) {
         return;
+    }
 
-    m_outStream << assignment.name() << QStringLiteral(" ") << assignment.type()->typeName() << QStringLiteral(" ::= ")
-                << assignment.value()->asString() << QStringLiteral("\n");
+    m_outStream << value.name() << QStringLiteral(" ") << value.type()->typeName() << QStringLiteral(" ::= ")
+                << value.value()->asString() << QStringLiteral("\n");
 }
 
 void Asn1NodeReconstructingVisitor::visit(const Project &project)
@@ -84,8 +85,9 @@ void Asn1NodeReconstructingVisitor::reconstructImports(const Definitions &defs) 
     const auto &values = defs.importedValues();
     const auto &types = defs.importedTypes();
 
-    if (values.empty() && types.empty())
+    if (values.empty() && types.empty()) {
         return;
+    }
 
     m_outStream << QStringLiteral("IMPORTS\n");
 
@@ -98,8 +100,9 @@ void Asn1NodeReconstructingVisitor::reconstructImports(const Definitions &defs) 
 template<typename T>
 void Asn1NodeReconstructingVisitor::reconstructImportedCollection(const T &types) const
 {
-    for (const auto &type : types)
+    for (const auto &type : types) {
         m_outStream << type.name() << QStringLiteral(" FROM ") << type.module() << QStringLiteral("\n");
+    }
 }
 
 template<typename T>

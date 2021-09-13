@@ -17,11 +17,11 @@
 
 #include "ivitemmodel.h"
 
+#include "commands/cmdrootentitychange.h"
 #include "commandsstack.h"
 #include "delayedsignal.h"
 #include "graphicsitemhelpers.h"
 #include "graphicsviewutils.h"
-#include "commands/cmdrootentitychange.h"
 #include "interfacetabgraphicsscene.h"
 #include "itemeditor/common/ivutils.h"
 #include "ivcomment.h"
@@ -172,26 +172,8 @@ void IVItemModel::onConnectionAddedToGroup(ivm::IVConnection *connection)
             return;
         }
     }
-
-    auto handleIface = [this](ivm::IVConnection *connection, ivm::IVInterfaceGroup *connectionGroupEndPoint) {
-        auto ifaceObject = connectionGroupEndPoint->function()->id() == connection->source()->id()
-                ? connection->sourceInterface()
-                : connectionGroupEndPoint->function()->id() == connection->target()->id()
-                ? connection->targetInterface()
-                : nullptr;
-        if (auto ifaceItem = getItem<IVInterfaceGraphicsItem *>(ifaceObject->id())) {
-            for (auto ifaceConnection : ifaceItem->connectionItems()) {
-                if (ifaceConnection->entity()->id() == connection->id()) {
-                    continue;
-                }
-                ifaceConnection->replaceInterface(
-                        ifaceItem, getItem<IVInterfaceGroupGraphicsItem *>(connectionGroupEndPoint->id()));
-            }
-        }
-    };
-
-    handleIface(connection, connectionGroupObject->sourceInterfaceGroup());
-    handleIface(connection, connectionGroupObject->targetInterfaceGroup());
+    updateInterfaceOnConnectionAdd(connection, connectionGroupObject->sourceInterfaceGroup());
+    updateInterfaceOnConnectionAdd(connection, connectionGroupObject->targetInterfaceGroup());
 
     onObjectRemoved(connection->id());
     onObjectRemoved(connection->sourceInterface()->id());
@@ -219,34 +201,8 @@ void IVItemModel::onConnectionRemovedFromGroup(ivm::IVConnection *connection)
         onObjectAdded(connection->sourceInterface()->id());
     onObjectAdded(connection->id());
 
-    auto handleIface = [this](ivm::IVConnection *connection, ivm::IVInterfaceGroup *connectionGroupEndPoint) {
-        ivm::IVInterface *ifaceObject = connectionGroupEndPoint->function()->id() == connection->source()->id()
-                ? connection->sourceInterface()
-                : connectionGroupEndPoint->function()->id() == connection->target()->id()
-                ? connection->targetInterface()
-                : nullptr;
-        if (!ifaceObject) {
-            return;
-        }
-        if (auto ifaceItem = getItem<IVInterfaceGraphicsItem *>(connectionGroupEndPoint->id())) {
-            for (auto ifaceConnection : ifaceItem->connectionItems()) {
-                const bool currentHandledConnection = ifaceConnection->entity()->id() == connection->id();
-                const bool isLinkedIface =
-                        ifaceConnection->sourceItem()->entity()->id() == connection->sourceInterface()->id()
-                        || ifaceConnection->sourceItem()->entity()->id() == connection->targetInterface()->id()
-                        || ifaceConnection->targetItem()->entity()->id() == connection->sourceInterface()->id()
-                        || ifaceConnection->targetItem()->entity()->id() == connection->targetInterface()->id();
-                if (currentHandledConnection || !isLinkedIface) {
-                    continue;
-                }
-                ifaceConnection->replaceInterface(
-                        ifaceItem, getItem<IVInterfaceGroupGraphicsItem *>(ifaceObject->id()));
-            }
-        }
-    };
-
-    handleIface(connection, connectionGroupObject->sourceInterfaceGroup());
-    handleIface(connection, connectionGroupObject->targetInterfaceGroup());
+    updateInterfaceOnConnectionRemove(connection, connectionGroupObject->sourceInterfaceGroup());
+    updateInterfaceOnConnectionRemove(connection, connectionGroupObject->targetInterfaceGroup());
 }
 
 /*!
@@ -388,6 +344,54 @@ void IVItemModel::setupInnerGeometry(ivm::IVObject *obj) const
     }
 }
 
+void IVItemModel::updateInterfaceOnConnectionAdd(
+        ivm::IVConnection *connection, ivm::IVInterfaceGroup *connectionGroupEndPoint)
+{
+    ivm::IVInterface *ifaceObject = connectionGroupEndPoint->function()->id() == connection->source()->id()
+            ? connection->sourceInterface()
+            : connectionGroupEndPoint->function()->id() == connection->target()->id() ? connection->targetInterface()
+                                                                                      : nullptr;
+    if (!ifaceObject) {
+        return;
+    }
+
+    if (auto ifaceItem = getItem<IVInterfaceGraphicsItem *>(ifaceObject->id())) {
+        for (auto ifaceConnection : ifaceItem->connectionItems()) {
+            if (ifaceConnection->entity()->id() == connection->id()) {
+                continue;
+            }
+            ifaceConnection->replaceInterface(
+                    ifaceItem, getItem<IVInterfaceGroupGraphicsItem *>(connectionGroupEndPoint->id()));
+        }
+    }
+}
+
+void IVItemModel::updateInterfaceOnConnectionRemove(
+        ivm::IVConnection *connection, ivm::IVInterfaceGroup *connectionGroupEndPoint)
+{
+    ivm::IVInterface *ifaceObject = connectionGroupEndPoint->function()->id() == connection->source()->id()
+            ? connection->sourceInterface()
+            : connectionGroupEndPoint->function()->id() == connection->target()->id() ? connection->targetInterface()
+                                                                                      : nullptr;
+    if (!ifaceObject) {
+        return;
+    }
+    if (auto ifaceItem = getItem<IVInterfaceGraphicsItem *>(ifaceObject->id())) {
+        for (auto ifaceConnection : ifaceItem->connectionItems()) {
+            const bool currentHandledConnection = ifaceConnection->entity()->id() == connection->id();
+            const bool isLinkedIface =
+                    ifaceConnection->sourceItem()->entity()->id() == connection->sourceInterface()->id()
+                    || ifaceConnection->sourceItem()->entity()->id() == connection->targetInterface()->id()
+                    || ifaceConnection->targetItem()->entity()->id() == connection->sourceInterface()->id()
+                    || ifaceConnection->targetItem()->entity()->id() == connection->targetInterface()->id();
+            if (currentHandledConnection || !isLinkedIface) {
+                continue;
+            }
+            ifaceConnection->replaceInterface(ifaceItem, getItem<IVInterfaceGroupGraphicsItem *>(ifaceObject->id()));
+        }
+    }
+}
+
 void IVItemModel::changeRootItem(shared::Id id)
 {
     if (objectsModel()->rootObjectId() == id) {
@@ -440,7 +444,7 @@ shared::ui::VEInteractiveObject *IVItemModel::createItem(shared::Id objectId)
                 if (it != m_items.constEnd()) {
                     return qgraphicsitem_cast<ive::IVInterfaceGroupGraphicsItem *>(*it);
                 }
-                onObjectAdded(id);
+                shared::ui::VEItemModel::onObjectAdded(id);
                 return getItem<ive::IVInterfaceGroupGraphicsItem *>(id);
             };
 

@@ -33,7 +33,7 @@ public:
     Interface &operator=(Interface &&) = default;
 
 public:
-    auto genericTypeMapSet() -> const GenericTypeMapSet &;
+    auto genericTypeMapSet() const -> const GenericTypeMapSet &;
     auto setGenericTypeMapSet(GenericTypeMapSet genericTypeMapSet) -> void;
 
     auto type() const -> const InterfaceDeclarationRef &;

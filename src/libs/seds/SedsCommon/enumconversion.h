@@ -26,6 +26,7 @@ namespace seds::model {
 template <typename EnumType>
 auto enumFromString(const QStringRef &enumStr) -> std::optional<EnumType>
 {
+    Q_UNUSED(enumStr);
     return std::nullopt;
 }
 

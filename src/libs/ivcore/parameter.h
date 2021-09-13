@@ -143,6 +143,6 @@ protected:
 
 }
 
-Q_DECLARE_METATYPE(ivm::BasicParameter);
-Q_DECLARE_METATYPE(ivm::ContextParameter);
-Q_DECLARE_METATYPE(ivm::InterfaceParameter);
+Q_DECLARE_METATYPE(ivm::BasicParameter)
+Q_DECLARE_METATYPE(ivm::ContextParameter)
+Q_DECLARE_METATYPE(ivm::InterfaceParameter)

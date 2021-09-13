@@ -26,8 +26,10 @@ target_include_directories(ConversionCommon
     PUBLIC      .
     PRIVATE     ${CMAKE_SOURCE_DIR}/src/libs)
 target_link_libraries(ConversionCommon
-    PUBLIC      Qt5::Core)
+    PUBLIC      Qt5::Core
+    PRIVATE     CommonProjectWarnings)
 
 add_format_target(ConversionCommon)
+add_tidy_target(ConversionCommon)
 
 add_library(Conversion::Common ALIAS ConversionCommon)

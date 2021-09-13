@@ -97,7 +97,7 @@ void XmlValidator::validate(const QString &inputFilename, const QString &schemaF
 
 void XmlValidator::libXmlErrorFunc(void *context, const char *format, ...)
 {
-    char buf[1024];
+    char buf[m_errorBufferSize];
     va_list args;
 
     va_start(args, format);
@@ -113,7 +113,7 @@ void XmlValidator::libXmlErrorFunc(void *context, const char *format, ...)
 
 void XmlValidator::libXmlWarningFunc(void *context, const char *format, ...)
 {
-    char buf[1024];
+    char buf[m_warningBufferSize];
     va_list args;
 
     va_start(args, format);

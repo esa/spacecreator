@@ -13,7 +13,8 @@ target_link_libraries(${TEST_NAME}
                 SEDS::Model
                 SEDS::XmlImporter
                 Qt5::Core
-                Qt5::Test)
+                Qt5::Test
+                CommonProjectWarnings)
 
 configure_file(resources/external_references.toml external_references.toml COPYONLY)
 configure_file(resources/seds.xml seds.xml COPYONLY)

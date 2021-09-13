@@ -33,4 +33,9 @@ void NamedEntity::setName(common::String name)
     m_name = std::move(name);
 }
 
+const QString &NamedEntity::nameStr() const
+{
+    return m_name.value();
+}
+
 } // namespace seds::model

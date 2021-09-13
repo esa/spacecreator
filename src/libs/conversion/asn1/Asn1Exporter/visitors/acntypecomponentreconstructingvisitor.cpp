@@ -31,7 +31,7 @@ AcnTypeComponentReconstructingVisitor::AcnTypeComponentReconstructingVisitor(
         QTextStream &outStream, int indent, QString presentWhenValue)
     : m_outStream(outStream)
     , m_indent(indent)
-    , m_presentWhenValue(presentWhenValue)
+    , m_presentWhenValue(std::move(presentWhenValue))
 {
 }
 
@@ -184,68 +184,77 @@ void AcnTypeComponentReconstructingVisitor::tryAppendAsciiStringParams(
 void AcnTypeComponentReconstructingVisitor::tryAppendAlignToNext(const Types::Type &type, QStringList &params) const
 {
     auto alignToNext = type.alignToNext();
-    if (alignToNext != Types::AlignToNext::unspecified)
+    if (alignToNext != Types::AlignToNext::unspecified) {
         params << QStringLiteral("align-to-next ") + Types::Type::alignToNextToString(alignToNext);
+    }
 }
 
 void AcnTypeComponentReconstructingVisitor::tryAppendTrueValue(const Types::Boolean &type, QStringList &params) const
 {
-    auto trueValue = type.trueValue();
-    if (!trueValue.isEmpty())
+    const auto &trueValue = type.trueValue();
+    if (!trueValue.isEmpty()) {
         params << QStringLiteral("true-value ") + BitStringValue::asString(trueValue);
+    }
 }
 
 void AcnTypeComponentReconstructingVisitor::tryAppendFalseValue(const Types::Boolean &type, QStringList &params) const
 {
-    auto falseValue = type.falseValue();
-    if (!falseValue.isEmpty())
+    const auto &falseValue = type.falseValue();
+    if (!falseValue.isEmpty()) {
         params << QStringLiteral("false-value ") + BitStringValue::asString(falseValue);
+    }
 }
 
 void AcnTypeComponentReconstructingVisitor::tryAppendPattern(const Types::Null &type, QStringList &params) const
 {
-    auto pattern = type.pattern();
-    if (!pattern.isEmpty())
+    const auto &pattern = type.pattern();
+    if (!pattern.isEmpty()) {
         params << QStringLiteral("pattern ") + BitStringValue::asString(pattern);
+    }
 }
 
 void AcnTypeComponentReconstructingVisitor::tryAppendTerminationPattern(
         const Types::AsciiStringAcnParameters &type, QStringList &params) const
 {
-    auto terminationPattern = type.terminationPattern();
-    if (!terminationPattern.isEmpty())
+    const auto &terminationPattern = type.terminationPattern();
+    if (!terminationPattern.isEmpty()) {
         params << QStringLiteral("termination-pattern ") + OctetStringValue::asString(terminationPattern);
+    }
 }
 
 void AcnTypeComponentReconstructingVisitor::tryAppendPresentWhen(QStringList &params) const
 {
     auto val = m_presentWhenValue;
-    if (!val.isEmpty())
+    if (!val.isEmpty()) {
         params << QStringLiteral("present-when ") + val.replace(QStringLiteral(" = "), QStringLiteral(" == "));
+    }
 }
 
 template<typename T>
 void AcnTypeComponentReconstructingVisitor::tryAppendSize(const T &type, QStringList &params) const
 {
     const auto size = type.acnSize();
-    if (!size.isEmpty())
+    if (!size.isEmpty()) {
         params << QStringLiteral("size ") + size;
+    }
 }
 
 void AcnTypeComponentReconstructingVisitor::tryAppendSize(
         const Types::IntegerAcnParameters &type, QStringList &params) const
 {
     const auto size = type.size();
-    if (size != 0)
+    if (size != 0) {
         params << QStringLiteral("size ") + QString::number(size);
+    }
 }
 
 template<typename T>
 void AcnTypeComponentReconstructingVisitor::tryAppendEncoding(const T &type, QStringList &params) const
 {
     const auto encodingString = type.encodingToString(type.encoding());
-    if (encodingString.isEmpty())
+    if (encodingString.isEmpty()) {
         return;
+    }
 
     params << QStringLiteral("encoding ") + encodingString;
 }
@@ -254,8 +263,9 @@ template<typename T>
 void AcnTypeComponentReconstructingVisitor::tryAppendEndianness(const T &type, QStringList &params) const
 {
     auto endianness = type.endianness();
-    if (endianness != Types::Endianness::unspecified)
+    if (endianness != Types::Endianness::unspecified) {
         params.append(QStringLiteral("endianness ") + Types::Type::endiannessToString(endianness));
+    }
 }
 
 template<typename T>
@@ -275,8 +285,9 @@ void AcnTypeComponentReconstructingVisitor::reconstructComplexType(const T &type
 template<typename T>
 void AcnTypeComponentReconstructingVisitor::reconstructComplexTypeComponents(const T &type, const int indent)
 {
-    if (type.components().empty())
+    if (type.components().empty()) {
         return;
+    }
 
     m_outStream << QStringLiteral("\n") << addIndent(indent) << QStringLiteral("{") << QStringLiteral("\n");
 
@@ -287,8 +298,9 @@ void AcnTypeComponentReconstructingVisitor::reconstructComplexTypeComponents(con
         AcnTypeComponentReconstructingVisitor visitor(m_outStream, indent + INDENT_SIZE, (*it)->presentWhen());
         (*it)->type()->accept(visitor);
 
-        if (std::next(it, 1) != components.end())
+        if (std::next(it, 1) != components.end()) {
             m_outStream << QStringLiteral(",");
+        }
         m_outStream << QStringLiteral("\n");
     }
 
@@ -299,15 +311,17 @@ template<typename T>
 void AcnTypeComponentReconstructingVisitor::reconstructComplexTypeParameters(const T &type)
 {
     const auto &acnParameters = type.acnParameters();
-    if (acnParameters.empty())
+    if (acnParameters.empty()) {
         return;
+    }
 
     m_outStream << QStringLiteral("<");
     for (auto it = acnParameters.begin(); it != acnParameters.end(); it++) {
         m_outStream << (*it)->type() << QStringLiteral(":") << (*it)->name();
 
-        if (std::next(it, 1) != acnParameters.end())
+        if (std::next(it, 1) != acnParameters.end()) {
             m_outStream << QStringLiteral(", ");
+        }
     }
     m_outStream << QStringLiteral("> ");
 }
@@ -315,15 +329,17 @@ void AcnTypeComponentReconstructingVisitor::reconstructComplexTypeParameters(con
 void AcnTypeComponentReconstructingVisitor::reconstructComplexTypeArguments(const Types::UserdefinedType &type)
 {
     const auto &acnArguments = type.acnArguments();
-    if (acnArguments.empty())
+    if (acnArguments.empty()) {
         return;
+    }
 
     m_outStream << QStringLiteral("<");
     for (auto it = acnArguments.begin(); it != acnArguments.end(); it++) {
         m_outStream << (*it)->id();
 
-        if (std::next(it, 1) != acnArguments.end())
+        if (std::next(it, 1) != acnArguments.end()) {
             m_outStream << QStringLiteral(", ");
+        }
     }
 
     m_outStream << QStringLiteral("> ");
@@ -339,8 +355,9 @@ void AcnTypeComponentReconstructingVisitor::endParamsList(QStringList &params)
 {
     tryAppendPresentWhen(params);
 
-    if (!params.isEmpty())
+    if (!params.isEmpty()) {
         m_outStream << params.join(QStringLiteral(", "));
+    }
 
     m_outStream << QStringLiteral("]");
 }
