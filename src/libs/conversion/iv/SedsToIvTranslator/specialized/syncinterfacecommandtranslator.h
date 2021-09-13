@@ -17,9 +17,16 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/lgpl-2.1.html>.
  */
 
+#pragma once
+
 #include "specialized/interfacecommandtranslator.h"
 
-#pragma once
+#include <ivcore/parameter.h>
+
+namespace seds::model {
+class CommandArgument;
+enum class ArgumentsCombination : uint8_t;
+} // namespace seds::model
 
 namespace conversion::iv::translator {
 
@@ -54,8 +61,38 @@ public:
     SyncInterfaceCommandTranslator &operator=(SyncInterfaceCommandTranslator &&) = delete;
 
 public:
-    auto translateCommand(const seds::model::InterfaceCommand &command, ivm::IVInterface::InterfaceType interfaceType)
+    /**
+     * @brief   Translates SEDS interface command to interface view interface
+     *
+     * This inserts result IV interface into member IV function
+     *
+     * @param   command         SEDS interface command
+     * @param   interfaceType   Interface type
+     */
+    virtual auto translateCommand(const seds::model::InterfaceCommand &command,
+            ivm::IVInterface::InterfaceType interfaceType) -> void override;
+
+private:
+    /**
+     * @brief   Translates arguments of a SEDS interface command
+     *
+     * @param   arguments       Arguments to translate
+     * @param   ivInterface     Output interface view interface
+     */
+    auto translateArguments(const std::vector<seds::model::CommandArgument> &arguments, ivm::IVInterface *ivInterface)
             -> void;
+
+    /**
+     * @brief   Creates interface view interface parameter
+     *
+     * @param   name        Name of the parameter
+     * @param   typeName    Name of the type
+     * @param   direction   Parameter direction
+     *
+     * @return  Interface view interface parameter
+     */
+    auto createIvInterfaceParameter(const QString &name, const QString &typeName,
+            ivm::InterfaceParameter::Direction direction) -> ivm::InterfaceParameter;
 };
 
 } // namespace conversion::iv::translator

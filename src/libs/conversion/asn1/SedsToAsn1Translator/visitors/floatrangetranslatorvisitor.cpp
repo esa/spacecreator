@@ -58,7 +58,7 @@ void FloatRangeTranslatorVisitor::operator()(const FloatPrecisionRange &range)
         break;
     }
     case FloatPrecisionRange::Quad:
-        throw UnsupportedValueException("FloatPrecisionRange");
+        throw UnsupportedValueException("FloatPrecisionRange", "Quad");
     default:
         throw UnhandledValueException("FloatPrecisionRange");
         break;

@@ -81,7 +81,7 @@ void ComponentsTranslator::translateInterface(const seds::model::Interface &inte
     for (const auto &command : interfaceDeclaration.commands()) {
         switch (command.mode()) {
         case seds::model::InterfaceCommandMode::Sync:
-            throw TranslationException("Sync commands not implemented");
+            syncCommandTranslator.translateCommand(command, interfaceType);
             break;
         case seds::model::InterfaceCommandMode::Async:
             asyncCommandTranslator.translateCommand(command, interfaceType);

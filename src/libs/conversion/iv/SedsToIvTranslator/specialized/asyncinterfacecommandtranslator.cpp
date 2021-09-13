@@ -40,7 +40,6 @@ namespace conversion::iv::translator {
 std::set<std::size_t> AsyncInterfaceCommandTranslator::m_asn1InterfaceArgumentsHashesCache;
 
 const QString AsyncInterfaceCommandTranslator::m_interfaceParameterName = "InputParam";
-const QString AsyncInterfaceCommandTranslator::m_interfaceParameterEncoding = "ACN";
 const QString AsyncInterfaceCommandTranslator::m_asn1BundledTypeTemplate = "%1_%2_Type";
 
 AsyncInterfaceCommandTranslator::AsyncInterfaceCommandTranslator(const seds::model::Package &package,
@@ -58,21 +57,23 @@ void AsyncInterfaceCommandTranslator::translateCommand(
 {
     switch (command.argumentsCombination()) {
     case seds::model::ArgumentsCombination::InOnly: {
-        auto *ivInterface = createIvInterface(command, interfaceType);
+        auto *ivInterface = createIvInterface(command, interfaceType, ivm::IVInterface::OperationKind::Sporadic);
         translateArguments(command, seds::model::CommandArgumentMode::In, ivInterface);
         m_ivFunction->addChild(ivInterface);
     } break;
     case seds::model::ArgumentsCombination::OutOnly: {
-        auto *ivInterface = createIvInterface(command, switchInterfaceType(interfaceType));
+        auto *ivInterface = createIvInterface(
+                command, switchInterfaceType(interfaceType), ivm::IVInterface::OperationKind::Sporadic);
         translateArguments(command, seds::model::CommandArgumentMode::Out, ivInterface);
         m_ivFunction->addChild(ivInterface);
     } break;
     case seds::model::ArgumentsCombination::InAndNotify: {
-        auto *ivInterfaceIn = createIvInterface(command, interfaceType);
+        auto *ivInterfaceIn = createIvInterface(command, interfaceType, ivm::IVInterface::OperationKind::Sporadic);
         translateArguments(command, seds::model::CommandArgumentMode::In, ivInterfaceIn);
         m_ivFunction->addChild(ivInterfaceIn);
 
-        auto *ivInterfaceNotify = createIvInterface(command, switchInterfaceType(interfaceType));
+        auto *ivInterfaceNotify = createIvInterface(
+                command, switchInterfaceType(interfaceType), ivm::IVInterface::OperationKind::Sporadic);
         translateArguments(command, seds::model::CommandArgumentMode::Notify, ivInterfaceNotify);
         m_ivFunction->addChild(ivInterfaceNotify);
     } break;

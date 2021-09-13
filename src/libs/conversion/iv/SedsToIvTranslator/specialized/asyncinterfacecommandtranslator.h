@@ -86,10 +86,12 @@ public:
      * @param   command         SEDS interface command
      * @param   interfaceType   Interface type
      */
-    auto translateCommand(const seds::model::InterfaceCommand &command, ivm::IVInterface::InterfaceType interfaceType)
-            -> void;
+    virtual auto translateCommand(const seds::model::InterfaceCommand &command,
+            ivm::IVInterface::InterfaceType interfaceType) -> void override;
+
+private:
     /**
-     * @brief   Translates arguments of SEDS interface command
+     * @brief   Translates arguments of a SEDS interface command
      *
      * This bundles all arguments into one and creates ASN.1 sequence type for it
      *
@@ -100,7 +102,6 @@ public:
     auto translateArguments(const seds::model::InterfaceCommand &command,
             seds::model::CommandArgumentMode requestedArgumentMode, ivm::IVInterface *ivInterface) -> void;
 
-private:
     /**
      * @brief   Builds ASN.1 sequence type for bundled interface argument
      *
@@ -166,8 +167,6 @@ private:
 
     /// @brief  Interface parameter name
     static const QString m_interfaceParameterName;
-    /// @brief  Interface parameter encoding name
-    static const QString m_interfaceParameterEncoding;
     /// @brief  Template for ASN.1 bundled type name
     static const QString m_asn1BundledTypeTemplate;
 };

@@ -47,6 +47,10 @@ public:
      */
     InterfaceCommandTranslator(const seds::model::Interface &interface, ivm::IVFunction *ivFunction);
     /**
+     * @brief   Default destructor
+     */
+    virtual ~InterfaceCommandTranslator() = default;
+    /**
      * @brief   Deleted copy constructor
      */
     InterfaceCommandTranslator(const InterfaceCommandTranslator &) = delete;
@@ -63,17 +67,30 @@ public:
      */
     InterfaceCommandTranslator &operator=(InterfaceCommandTranslator) = delete;
 
+public:
+    /**
+     * @brief   Translates SEDS interface command to interface view interface
+     *
+     * This inserts result IV interface into member IV function
+     *
+     * @param   command         SEDS interface command
+     * @param   interfaceType   Interface type
+     */
+    virtual auto translateCommand(
+            const seds::model::InterfaceCommand &command, ivm::IVInterface::InterfaceType interfaceType) -> void = 0;
+
 protected:
     /**
      * @brief   Creates new interface view interface
      *
      * @param   command     SEDS interface command
      * @param   type        Type of interface to create
+     * @param   kind        Kind of interface to create
      *
      * @return   Interface view interface
      */
-    auto createIvInterface(const seds::model::InterfaceCommand &command, ivm::IVInterface::InterfaceType type) const
-            -> ivm::IVInterface *;
+    auto createIvInterface(const seds::model::InterfaceCommand &command, ivm::IVInterface::InterfaceType type,
+            ivm::IVInterface::OperationKind kind) const -> ivm::IVInterface *;
 
     /**
      * @brief   Converts interface view interface type to string
@@ -90,6 +107,8 @@ protected:
     /// @brief  Output interface view function
     ivm::IVFunction *m_ivFunction;
 
+    /// @brief  Interface parameter encoding name
+    static const QString m_interfaceParameterEncoding;
     /// @brief  Template for interface view interfaces
     static const QString m_ivInterfaceNameTemplate;
 };

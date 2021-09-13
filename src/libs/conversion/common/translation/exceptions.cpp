@@ -50,13 +50,14 @@ MissingGenericTypeMappingException::MissingGenericTypeMappingException(
 {
 }
 
-UnhandledValueException::UnhandledValueException(const QString &valueTypeName)
-    : TranslationException(QString("Translator encountered unhandled value for %1").arg(valueTypeName))
+UnhandledValueException::UnhandledValueException(const QString &enumName)
+    : TranslationException(QString("Translator encountered unhandled value %1").arg(enumName))
 {
 }
 
-UnsupportedValueException::UnsupportedValueException(const QString &valueTypeName)
-    : TranslationException(QString("Translator encountered unsupported value for %1").arg(valueTypeName))
+UnsupportedValueException::UnsupportedValueException(const QString &enumName, const QString &valueTypeName)
+    : TranslationException(
+            QString("Translator encountered unsupported value %1 in %2").arg(valueTypeName).arg(enumName))
 {
 }
 

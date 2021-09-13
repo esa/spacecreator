@@ -230,9 +230,13 @@ void DataTypeTranslatorVisitor::translateCoreIntegerEncoding(
         asn1Type->setEncoding(Asn1Acn::Types::IntegerEncoding::BCD);
         break;
     case seds::model::CoreIntegerEncoding::SignMagnitude:
+        throw UnsupportedValueException("CoreIntegerEncoding", "SignMagnitude");
+        break;
     case seds::model::CoreIntegerEncoding::OnesComplement:
+        throw UnsupportedValueException("CoreIntegerEncoding", "OnesComplement");
+        break;
     case seds::model::CoreIntegerEncoding::PackedBcd:
-        throw UnsupportedValueException("CoreIntegerEncoding");
+        throw UnsupportedValueException("CoreIntegerEncoding", "PackedBcd");
         break;
     default:
         throw UnhandledValueException("CoreIntegerEncoding");
@@ -251,9 +255,13 @@ void DataTypeTranslatorVisitor::translateCoreEncodingAndPrecision(
         asn1Type->setEncoding(Asn1Acn::Types::RealEncoding::IEEE754_1985_64);
         break;
     case seds::model::CoreEncodingAndPrecision::IeeeQuad:
+        throw UnsupportedValueException("CoreEncodingAndPrecision", "IeeeQuad");
+        break;
     case seds::model::CoreEncodingAndPrecision::MilstdSimple:
+        throw UnsupportedValueException("CoreEncodingAndPrecision", "MilstdSimple");
+        break;
     case seds::model::CoreEncodingAndPrecision::MilstdExtended:
-        throw UnsupportedValueException("CoreEncodingAndPrecision");
+        throw UnsupportedValueException("CoreEncodingAndPrecision", "MilstdExtended");
         break;
     default:
         throw UnhandledValueException("CoreEncodingAndPrecision");
@@ -269,7 +277,7 @@ void DataTypeTranslatorVisitor::translateCoreStringEncoding(
         asn1Type->setEncoding(Asn1Acn::Types::AsciiStringEncoding::ASCII);
         break;
     case seds::model::CoreStringEncoding::Utf8:
-        throw UnsupportedValueException("CoreStringEncoding");
+        throw UnsupportedValueException("CoreStringEncoding", "Utf8");
         break;
     default:
         throw UnhandledValueException("CoreStringEncoding");

@@ -28,6 +28,7 @@ using conversion::translator::UnhandledValueException;
 
 namespace conversion::iv::translator {
 
+const QString InterfaceCommandTranslator::m_interfaceParameterEncoding = "ACN";
 const QString InterfaceCommandTranslator::m_ivInterfaceNameTemplate = "%1_%2_%3";
 
 InterfaceCommandTranslator::InterfaceCommandTranslator(
@@ -37,8 +38,8 @@ InterfaceCommandTranslator::InterfaceCommandTranslator(
 {
 }
 
-ivm::IVInterface *InterfaceCommandTranslator::createIvInterface(
-        const seds::model::InterfaceCommand &command, ivm::IVInterface::InterfaceType type) const
+ivm::IVInterface *InterfaceCommandTranslator::createIvInterface(const seds::model::InterfaceCommand &command,
+        ivm::IVInterface::InterfaceType type, ivm::IVInterface::OperationKind kind) const
 {
     ivm::IVInterface::CreationInfo creationInfo;
     creationInfo.function = m_ivFunction;
@@ -46,7 +47,7 @@ ivm::IVInterface *InterfaceCommandTranslator::createIvInterface(
     creationInfo.name = m_ivInterfaceNameTemplate.arg(m_interface.nameStr())
                                 .arg(command.nameStr())
                                 .arg(interfaceTypeToString(type));
-    creationInfo.kind = ivm::IVInterface::OperationKind::Sporadic;
+    creationInfo.kind = kind;
 
     return ivm::IVInterface::createIface(creationInfo);
 }

@@ -97,7 +97,7 @@ public:
 };
 
 /**
- * @brief   Exception thrown when translator encounters unhandled value in source model
+ * @brief   Exception thrown when translator encounters unhandled value while handling enum values
  */
 class UnhandledValueException : public TranslationException
 {
@@ -105,13 +105,13 @@ public:
     /**
      * @brief   Constructor
      *
-     * @param   valueTypeName   Name of the unhandled value type
+     * @param   enumName        Name of the enum
      */
-    explicit UnhandledValueException(const QString &valueTypeName);
+    explicit UnhandledValueException(const QString &enumName);
 };
 
 /**
- * @brief   Exception thrown when translator encounters unsupported value in source model
+ * @brief   Exception thrown when translator encounters unsupported value while handling enum values
  */
 class UnsupportedValueException : public TranslationException
 {
@@ -119,9 +119,10 @@ public:
     /**
      * @brief   Constructor
      *
+     * @param   enumName        Name of the enum
      * @param   valueTypeName   Name of the unsupported value type
      */
-    explicit UnsupportedValueException(const QString &valueTypeName);
+    explicit UnsupportedValueException(const QString &enumName, const QString &valueTypeName);
 };
 
 } // namespace conversion::translator

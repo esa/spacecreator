@@ -26,6 +26,7 @@
 
 using conversion::translator::TranslationException;
 using conversion::translator::UnhandledValueException;
+using conversion::translator::UnsupportedValueException;
 
 namespace conversion::iv::translator {
 
@@ -39,15 +40,16 @@ void SyncInterfaceCommandTranslator::translateCommand(
         const seds::model::InterfaceCommand &command, ivm::IVInterface::InterfaceType interfaceType)
 {
     switch (command.argumentsCombination()) {
-    case seds::model::ArgumentsCombination::InOnly: {
-        auto *ivInterface = createIvInterface(command, interfaceType);
+    case seds::model::ArgumentsCombination::InOnly:
+    case seds::model::ArgumentsCombination::OutOnly:
+    case seds::model::ArgumentsCombination::InAndOut: {
+        auto *ivInterface = createIvInterface(command, interfaceType, ivm::IVInterface::OperationKind::Protected);
+        translateArguments(command.arguments(), ivInterface);
         m_ivFunction->addChild(ivInterface);
     } break;
-    case seds::model::ArgumentsCombination::OutOnly:
-    case seds::model::ArgumentsCombination::InAndNotify:
     case seds::model::ArgumentsCombination::NoArgs:
     case seds::model::ArgumentsCombination::NotifyOnly:
-    case seds::model::ArgumentsCombination::InAndOut:
+    case seds::model::ArgumentsCombination::InAndNotify:
     case seds::model::ArgumentsCombination::OutAndNotify:
     case seds::model::ArgumentsCombination::All: {
         const auto message = QString(
@@ -59,6 +61,43 @@ void SyncInterfaceCommandTranslator::translateCommand(
         throw UnhandledValueException("ArgumentsCombination");
         break;
     }
+}
+
+void SyncInterfaceCommandTranslator::translateArguments(
+        const std::vector<seds::model::CommandArgument> &arguments, ivm::IVInterface *ivInterface)
+{
+    for (const auto &argument : arguments) {
+        switch (argument.mode()) {
+        case seds::model::CommandArgumentMode::In: {
+            const auto ivParameter = createIvInterfaceParameter(
+                    argument.nameStr(), argument.type().nameStr(), ivm::InterfaceParameter::Direction::IN);
+            ivInterface->addParam(ivParameter);
+        } break;
+        case seds::model::CommandArgumentMode::Out: {
+            const auto ivParameter = createIvInterfaceParameter(
+                    argument.nameStr(), argument.type().nameStr(), ivm::InterfaceParameter::Direction::OUT);
+            ivInterface->addParam(ivParameter);
+        } break;
+        case seds::model::CommandArgumentMode::InOut: {
+            const auto ivParameterIn = createIvInterfaceParameter(QString("%1_In").arg(argument.nameStr()),
+                    argument.type().nameStr(), ivm::InterfaceParameter::Direction::IN);
+            ivInterface->addParam(ivParameterIn);
+            const auto ivParameterOut = createIvInterfaceParameter(QString("%2_Out").arg(argument.nameStr()),
+                    argument.type().nameStr(), ivm::InterfaceParameter::Direction::OUT);
+            ivInterface->addParam(ivParameterOut);
+        } break;
+        case seds::model::CommandArgumentMode::Notify:
+            throw UnsupportedValueException("CommandArgumentMode", "Notify");
+            break;
+        }
+    }
+}
+
+ivm::InterfaceParameter SyncInterfaceCommandTranslator::createIvInterfaceParameter(
+        const QString &name, const QString &typeName, ivm::InterfaceParameter::Direction direction)
+{
+    return ivm::InterfaceParameter(
+            name, ivm::BasicParameter::Type::Other, typeName, m_interfaceParameterEncoding, direction);
 }
 
 } // namespace conversion::iv::translator
