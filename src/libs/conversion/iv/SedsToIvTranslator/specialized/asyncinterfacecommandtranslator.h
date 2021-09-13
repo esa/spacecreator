@@ -53,47 +53,151 @@ namespace conversion::iv::translator {
 class AsyncInterfaceCommandTranslator final
 {
 public:
+    /**
+     * @brief   Constructor
+     *
+     * @param   package             Parent package
+     * @param   component           Parent package
+     * @param   interface           Parent interface
+     * @param   ivFunction          Output interface view function
+     * @param   asn1Definitions     Output ASN.1 type definitions
+     */
     AsyncInterfaceCommandTranslator(const seds::model::Package &package, const seds::model::Component &component,
             const seds::model::Interface &interface, ivm::IVFunction *ivFunction,
             Asn1Acn::Definitions *asn1Definitions);
+    /**
+     * @brief   Deleted copy constructor
+     */
     AsyncInterfaceCommandTranslator(const AsyncInterfaceCommandTranslator &) = delete;
+    /**
+     * @brief   Deleted move constructor
+     */
     AsyncInterfaceCommandTranslator(AsyncInterfaceCommandTranslator &&) = delete;
+    /**
+     * @brief   Deleted copy assignment operator
+     */
     AsyncInterfaceCommandTranslator &operator=(const AsyncInterfaceCommandTranslator &) = delete;
+    /**
+     * @brief   Deleted move assignment operator
+     */
     AsyncInterfaceCommandTranslator &operator=(AsyncInterfaceCommandTranslator) = delete;
 
 public:
+    /**
+     * @brief   Translates SEDS interface command to interface view interface
+     *
+     * This inserts result IV interface into member IV function
+     *
+     * @param   command         SEDS interface command
+     * @param   interfaceType   Interface type
+     */
     auto translateCommand(const seds::model::InterfaceCommand &command, ivm::IVInterface::InterfaceType interfaceType)
             -> void;
+    /**
+     * @brief   Translates arguments of SEDS interface command
+     *
+     * This bundles all arguments into one and creates ASN.1 sequence type for it
+     *
+     * @param   command                 SEDS interface command
+     * @param   requestedArgumentMode   Which arguments should be translated
+     * @param   ivInterface             Output interface view interface
+     */
     auto translateArguments(const seds::model::InterfaceCommand &command,
             seds::model::CommandArgumentMode requestedArgumentMode, ivm::IVInterface *ivInterface) -> void;
 
 private:
+    /**
+     * @brief   Builds ASN.1 sequence type for bundled interface argument
+     *
+     * @param   command                 SEDS interface command
+     * @param   requestedArgumentMode   Which arguments should be used
+     * @param   asn1TypeName            How new ASN.1 type should be named
+     */
     auto buildAsn1SequenceType(const seds::model::InterfaceCommand &command,
             seds::model::CommandArgumentMode requestedArgumentMode, const QString &asn1TypeName) const -> void;
 
+    /**
+     * @brief   Creates new interface view interface
+     *
+     * @param   command     SEDS interface command
+     * @param   type        Type of interface to create
+     *
+     * @return   Interface view interface
+     */
     auto createIvInterface(const seds::model::InterfaceCommand &command, ivm::IVInterface::InterfaceType type) const
             -> ivm::IVInterface *;
+    /**
+     * @brief   Creates ASN.1 sequence component type
+     *
+     * @param   name                Name of the new type
+     * @param   argumentTypeName    Name of the SEDS type from which ASN.1 type should be created
+     *
+     * @return  ASN.1 sequence component
+     */
     auto createAsn1SequenceComponent(const QString &argumentName, const QString &argumentTypeName) const
             -> std::unique_ptr<Asn1Acn::AsnSequenceComponent>;
 
+    /**
+     * @brief   Checks if given type name is mapped in the parent SEDS interface
+     *
+     * @param   genericTypeName     Generic type name
+     *
+     * @return  Mapped type name if given type name was mapped, given type name otherwise
+     */
     auto findMappedType(const QString &genericTypeName) const -> const QString &;
+    /**
+     * @brief   Searches for SEDS type declaration
+     *
+     * First it searches in the parent SEDS component. If not found then it searches
+     * in the package. Throws an exception if not found
+     *
+     * @param   dataTypeName    Type name
+     *
+     * @throws  UndeclaredDataTypeException     If given type wasn't declared
+     *
+     * @return  Found SEDS data type declaration
+     */
     auto findDataType(const QString &dataTypeName) const -> const seds::model::DataType &;
 
+    /**
+     * @brief   Converts interface view interface type to string
+     *
+     * @param   interfaceType   Interface type to convert
+     *
+     * @return   Interface type name
+     */
     auto interfaceTypeToString(ivm::IVInterface::InterfaceType interfaceType) const -> const QString &;
+    /**
+     * @brief   Swaps between provided and required interface types
+     *
+     * @param   interfaceType   Interface type to switch
+     *
+     * @return  Provided type if required was passed, requried otherwise
+     */
     auto switchInterfaceType(ivm::IVInterface::InterfaceType interfaceType) const -> ivm::IVInterface::InterfaceType;
 
 private:
+    /// @brief  Parent SEDS package
     const seds::model::Package &m_package;
+    /// @brief  Parent SEDS component
     const seds::model::Component &m_component;
+    /// @brief  Parent SEDS interface
     const seds::model::Interface &m_interface;
+    /// @brief  Output interface view function
     ivm::IVFunction *m_ivFunction;
+    /// @brief  Output ASN.1 type definitions
     Asn1Acn::Definitions *m_asn1Definitions;
 
+    /// @brief  Cache of hashes of the bundled ASN.1 typenames that was created
     static std::set<std::size_t> m_asn1InterfaceArgumentsHashesCache;
 
+    /// @brief  Interface parameter name
     static const QString m_interfaceParameterName;
+    /// @brief  Interface parameter encoding name
     static const QString m_interfaceParameterEncoding;
-    static const QString m_asn1GroupTypeTemplate;
+    /// @brief  Template for ASN.1 bundled type name
+    static const QString m_asn1BundledTypeTemplate;
+    /// @brief  Template for interface view interfaces
     static const QString m_ivInterfaceNameTemplate;
 };
 

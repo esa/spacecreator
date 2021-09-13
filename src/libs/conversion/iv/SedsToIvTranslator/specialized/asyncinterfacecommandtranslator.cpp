@@ -40,7 +40,7 @@ std::set<std::size_t> AsyncInterfaceCommandTranslator::m_asn1InterfaceArgumentsH
 
 const QString AsyncInterfaceCommandTranslator::m_interfaceParameterName = "InputParam";
 const QString AsyncInterfaceCommandTranslator::m_interfaceParameterEncoding = "ACN";
-const QString AsyncInterfaceCommandTranslator::m_asn1GroupTypeTemplate = "%1_%2_Type";
+const QString AsyncInterfaceCommandTranslator::m_asn1BundledTypeTemplate = "%1_%2_Type";
 const QString AsyncInterfaceCommandTranslator::m_ivInterfaceNameTemplate = "%1_%2_%3";
 
 AsyncInterfaceCommandTranslator::AsyncInterfaceCommandTranslator(const seds::model::Package &package,
@@ -96,7 +96,7 @@ void AsyncInterfaceCommandTranslator::translateCommand(
 void AsyncInterfaceCommandTranslator::translateArguments(const seds::model::InterfaceCommand &command,
         seds::model::CommandArgumentMode requestedArgumentMode, ivm::IVInterface *ivInterface)
 {
-    const auto asn1TypeName = m_asn1GroupTypeTemplate.arg(m_interface.nameStr()).arg(command.nameStr());
+    const auto asn1TypeName = m_asn1BundledTypeTemplate.arg(m_interface.nameStr()).arg(command.nameStr());
 
     buildAsn1SequenceType(command, requestedArgumentMode, asn1TypeName);
 
@@ -145,7 +145,7 @@ void AsyncInterfaceCommandTranslator::buildAsn1SequenceType(const seds::model::I
 }
 
 std::unique_ptr<Asn1Acn::AsnSequenceComponent> AsyncInterfaceCommandTranslator::createAsn1SequenceComponent(
-        const QString &argumentName, const QString &argumentTypeName) const
+        const QString &name, const QString &argumentTypeName) const
 {
     const auto &argumentType = findDataType(argumentTypeName);
 
@@ -153,7 +153,7 @@ std::unique_ptr<Asn1Acn::AsnSequenceComponent> AsyncInterfaceCommandTranslator::
     std::visit(conversion::asn1::translator::DataTypeTranslatorVisitor { asn1Type }, argumentType);
 
     auto sequenceComponent = std::make_unique<Asn1Acn::AsnSequenceComponent>(
-            argumentName, argumentName, false, "", Asn1Acn::SourceLocation(), std::move(asn1Type));
+            name, name, false, "", Asn1Acn::SourceLocation(), std::move(asn1Type));
 
     return sequenceComponent;
 }
