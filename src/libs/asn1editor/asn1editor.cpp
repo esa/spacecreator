@@ -38,9 +38,16 @@ namespace asn1 {
  * \param parent Dialog parent
  */
 Asn1Editor::Asn1Editor(Asn1Acn::Asn1SystemChecks *asn1Checks, QWidget *parent)
+    : Asn1Editor(asn1Checks, {}, parent)
+{
+}
+
+Asn1Editor::Asn1Editor(
+        Asn1Acn::Asn1SystemChecks *asn1Checks, std::unique_ptr<Asn1Acn::File> attrAsn1File, QWidget *parent)
     : QDialog(parent)
     , ui(new Ui::Asn1Editor)
     , m_asn1Checks(asn1Checks)
+    , m_attrAsn1File(std::move(attrAsn1File))
 {
     ui->setupUi(this);
 
@@ -118,7 +125,15 @@ void Asn1Editor::showParseError(const QString &error)
  */
 void Asn1Editor::showAsn1Type(const QString &text)
 {
-    if (!m_asn1Checks.isNull()) {
+    bool filled = false;
+    if (m_attrAsn1File) {
+        const std::unique_ptr<Asn1Acn::TypeAssignment> &asn1Item = m_attrAsn1File->typeAssignment(text);
+        if (asn1Item) {
+            m_asn1TreeView->setAsn1Model(asn1Item);
+            filled = true;
+        }
+    }
+    if (!filled && !m_asn1Checks.isNull()) {
         const std::unique_ptr<Asn1Acn::TypeAssignment> &asn1Item = m_asn1Checks->typeAssignment(text);
         if (asn1Item) {
             m_asn1TreeView->setAsn1Model(asn1Item);
@@ -149,18 +164,26 @@ void Asn1Editor::getAsn1Value()
 void Asn1Editor::addAsn1TypeItems()
 {
     ui->typesCB->clear();
-    if (!m_asn1Checks) {
-        return;
-    }
-
     QStringList typeNames;
-    for (const Asn1Acn::Definitions *definitions : m_asn1Checks->definitionsList()) {
-        for (const std::unique_ptr<Asn1Acn::TypeAssignment> &type : definitions->types()) {
-            typeNames << type->name();
+    if (m_attrAsn1File) {
+        const Asn1Acn::File::DefinitionsList &definitionsList = m_attrAsn1File->definitionsList();
+        for (const std::unique_ptr<Asn1Acn::Definitions> &definitions : definitionsList) {
+            for (const std::unique_ptr<Asn1Acn::TypeAssignment> &type : definitions->types()) {
+                typeNames << type->name();
+            }
+        }
+    }
+    if (m_asn1Checks) {
+        for (const Asn1Acn::Definitions *definitions : m_asn1Checks->definitionsList()) {
+            for (const std::unique_ptr<Asn1Acn::TypeAssignment> &type : definitions->types()) {
+                typeNames << type->name();
+            }
         }
     }
 
-    ui->typesCB->addItems(typeNames);
+    if (!typeNames.isEmpty()) {
+        ui->typesCB->addItems(typeNames);
+    }
 }
 
 void Asn1Editor::accept()
