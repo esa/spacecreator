@@ -23,6 +23,8 @@
 #include "visitors/acnnodereconstructingvisitor.h"
 #include "visitors/asn1nodereconstructingvisitor.h"
 
+#include <QSaveFile>
+
 namespace conversion::asn1::exporter {
 class Asn1Exporter final : public ::conversion::exporter::ModelExporter
 {
@@ -34,5 +36,13 @@ public:
      * @param   options     Options for export configuration
      */
     virtual auto exportModel(const Model *model, const Options &options) const -> void override;
+
+private:
+    static void exportAsn1Model(const Asn1Acn::File &file, const Options &options);
+    static void exportAcnModel(const Asn1Acn::File &file, const Options &options);
+
+    static inline QString makeFilename(
+            const std::optional<QString> &prefix, const QString &name, const QString &extension);
+    static void writeAndCommit(QSaveFile &outputFile, const std::string &data);
 };
 } // namespace conversion::asn1::exporter
