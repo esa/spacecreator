@@ -56,57 +56,56 @@ private Q_SLOTS:
 
 void tsti_Asn1Exporter::initTestCase() {}
 
-void tsti_Asn1Exporter::cleanup()
+void tsti_Asn1Exporter::cleanup() {}
+
+static Asn1Acn::Definitions CreateExampleDefs()
 {
-    QFile file("output.asn");
-    file.remove();
+    Asn1Acn::Definitions defs(QString("example1Definition"), {});
+
+    Asn1Acn::Types::Integer i("integer_id");
+    i.setSize(4);
+    Asn1Acn::TypeAssignment ta(QString("name_of_type_assignment"), QString("cName_of_assignment"), {},
+            std::make_unique<Asn1Acn::Types::Integer>(i));
+
+    Asn1Acn::SingleValue sv(QString("example integer's value"));
+    Asn1Acn::ValueAssignment va(QString("name_of_value_assignment"), {}, std::make_unique<Asn1Acn::Types::Integer>(i),
+            std::make_unique<Asn1Acn::SingleValue>(sv));
+
+    defs.addType(std::make_unique<Asn1Acn::TypeAssignment>(ta));
+    defs.addValue(std::make_unique<Asn1Acn::ValueAssignment>(va));
+
+    return defs;
+}
+
+static Asn1Acn::Definitions CreateAnotherExampleDefs()
+{
+    Asn1Acn::Definitions defs(QString("anotherExampleDefinition"), {});
+
+    Asn1Acn::Types::Integer i("another_integer_id");
+    Asn1Acn::TypeAssignment ta(QString("name_of_another_type_assignment"), QString("cName_of_another_assignment"), {},
+            std::make_unique<Asn1Acn::Types::Integer>(i));
+
+    Asn1Acn::SingleValue sv(QString("another_single_value"));
+    Asn1Acn::ValueAssignment va(QString("name_of_another_value_assignment"), {},
+            std::make_unique<Asn1Acn::Types::Integer>(i), std::make_unique<Asn1Acn::SingleValue>(sv));
+
+    defs.addType(std::make_unique<Asn1Acn::TypeAssignment>(ta));
+    defs.addValue(std::make_unique<Asn1Acn::ValueAssignment>(va));
+
+    return defs;
 }
 
 void tsti_Asn1Exporter::testValid()
 {
-    // first asn.1/acn file
-    QFileInfo outputFileInfo("output.asn");
-    QVERIFY(!outputFileInfo.exists());
+    Asn1Acn::File file1("file1");
+    auto defs1 = CreateExampleDefs();
+    file1.add(std::make_unique<Asn1Acn::Definitions>(defs1));
 
-    Asn1Acn::Types::Integer integer("integer");
-    Asn1Acn::Definitions defs(QString("example1Definition1"), {});
-    Asn1Acn::TypeAssignment assign1(
-            QString("assignment1"), QString("cName_of_assign"), {}, std::make_unique<Asn1Acn::Types::Integer>(integer));
-    Asn1Acn::SingleValue sv(QString("example integer's single value"));
-    Asn1Acn::ValueAssignment va(QString("val_assignment1"), {}, std::make_unique<Asn1Acn::Types::Integer>(integer),
-            std::make_unique<Asn1Acn::SingleValue>(sv));
-
-    integer.setSize(4);
-    defs.addType(std::make_unique<Asn1Acn::TypeAssignment>(assign1));
-    defs.addValue(std::make_unique<Asn1Acn::ValueAssignment>(va));
-
-    Asn1Acn::File file(outputFileInfo.fileName());
-    file.add(std::make_unique<Asn1Acn::Definitions>(defs));
-
-    // second asn.1/acn file
-    QFileInfo outputFile2Info("output2.asn");
-    QVERIFY(!outputFile2Info.exists());
-
-    Asn1Acn::Types::Integer integer2("integer2");
-    Asn1Acn::Definitions defs2(QString("exampleName"), {});
-    Asn1Acn::TypeAssignment assign2(QString("name_of_assign2"), QString("cName_of_assign"), {},
-            std::make_unique<Asn1Acn::Types::Integer>(integer2));
-
-    Asn1Acn::SingleValue sv2(QString("1"));
-    Asn1Acn::ValueAssignment va2(QString("val2_assignment"), {}, std::make_unique<Asn1Acn::Types::Integer>(integer2),
-            std::make_unique<Asn1Acn::SingleValue>(sv2));
-
-    defs2.addType(std::make_unique<Asn1Acn::TypeAssignment>(assign2));
-    defs.addValue(std::make_unique<Asn1Acn::ValueAssignment>(va2));
-
-    Asn1Acn::File file2(outputFile2Info.fileName());
+    Asn1Acn::File file2("file2");
+    auto defs2 = CreateAnotherExampleDefs();
     file2.add(std::make_unique<Asn1Acn::Definitions>(defs2));
 
-    // asn1acn vector of files
-    std::vector<Asn1Acn::File> files;
-    files.push_back(file);
-    files.push_back(file2);
-    Asn1Model model(files);
+    Asn1Model model(std::vector<Asn1Acn::File>({ file1, file2 }));
 
     Options options;
     options.add(Asn1Options::asn1FilenamePrefix, "Asn1Pref_");
@@ -121,7 +120,10 @@ void tsti_Asn1Exporter::testValid()
 
     // TODO: check created files
 
-    // TODO: remove created files
+    // QFile("AcnPref_file1.acn").remove();
+    // QFile("AcnPref_file2.acn").remove();
+    // QFile("Asn1Pref_file1.asn").remove();
+    // QFile("Asn1Pref_file2.asn").remove();
 }
 
 } // namespace asn1::test
