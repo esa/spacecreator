@@ -42,15 +42,13 @@ std::set<std::size_t> AsyncInterfaceCommandTranslator::m_asn1InterfaceArgumentsH
 const QString AsyncInterfaceCommandTranslator::m_interfaceParameterName = "InputParam";
 const QString AsyncInterfaceCommandTranslator::m_interfaceParameterEncoding = "ACN";
 const QString AsyncInterfaceCommandTranslator::m_asn1BundledTypeTemplate = "%1_%2_Type";
-const QString AsyncInterfaceCommandTranslator::m_ivInterfaceNameTemplate = "%1_%2_%3";
 
 AsyncInterfaceCommandTranslator::AsyncInterfaceCommandTranslator(const seds::model::Package &package,
         const seds::model::Component &component, const seds::model::Interface &interface, ivm::IVFunction *ivFunction,
         Asn1Acn::Definitions *asn1Definitions)
-    : m_package(package)
+    : InterfaceCommandTranslator(interface, ivFunction)
+    , m_package(package)
     , m_component(component)
-    , m_interface(interface)
-    , m_ivFunction(ivFunction)
     , m_asn1Definitions(asn1Definitions)
 {
 }
@@ -159,20 +157,6 @@ std::unique_ptr<Asn1Acn::AsnSequenceComponent> AsyncInterfaceCommandTranslator::
     return sequenceComponent;
 }
 
-ivm::IVInterface *AsyncInterfaceCommandTranslator::createIvInterface(
-        const seds::model::InterfaceCommand &command, ivm::IVInterface::InterfaceType type) const
-{
-    ivm::IVInterface::CreationInfo creationInfo;
-    creationInfo.function = m_ivFunction;
-    creationInfo.type = type;
-    creationInfo.name = m_ivInterfaceNameTemplate.arg(m_interface.nameStr())
-                                .arg(command.nameStr())
-                                .arg(interfaceTypeToString(type));
-    creationInfo.kind = ivm::IVInterface::OperationKind::Sporadic;
-
-    return ivm::IVInterface::createIface(creationInfo);
-}
-
 const QString &AsyncInterfaceCommandTranslator::findMappedType(const QString &genericTypeName) const
 {
     const auto &genericTypeMaps = m_interface.genericTypeMapSet().genericTypeMaps();
@@ -208,28 +192,6 @@ const seds::model::DataType &AsyncInterfaceCommandTranslator::findDataType(const
     }
 
     throw UndeclaredDataTypeException(dataTypeName);
-}
-
-const QString &AsyncInterfaceCommandTranslator::interfaceTypeToString(
-        ivm::IVInterface::InterfaceType interfaceType) const
-{
-    switch (interfaceType) {
-    case ivm::IVInterface::InterfaceType::Required: {
-        static QString name = "Ri";
-        return name;
-    }
-    case ivm::IVInterface::InterfaceType::Provided: {
-        static QString name = "Pi";
-        return name;
-    }
-    case ivm::IVInterface::InterfaceType::Grouped: {
-        static QString name = "Grp";
-        return name;
-    }
-    default:
-        throw UnhandledValueException("ivm::InterfaceType");
-        break;
-    }
 }
 
 ivm::IVInterface::InterfaceType AsyncInterfaceCommandTranslator::switchInterfaceType(

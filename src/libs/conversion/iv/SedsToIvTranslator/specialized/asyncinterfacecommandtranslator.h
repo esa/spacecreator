@@ -19,7 +19,8 @@
 
 #pragma once
 
-#include <ivcore/ivinterface.h>
+#include "specialized/interfacecommandtranslator.h"
+
 #include <seds/SedsModel/types/datatype.h>
 #include <set>
 
@@ -31,16 +32,10 @@ class Sequence;
 } // namespace Types
 } // namespace Asn1Acn
 
-namespace ivm {
-class IVFunction;
-} // namespace ivm
-
 namespace seds::model {
 class CommandArgument;
 class Component;
 class DataTypeRef;
-class Interface;
-class InterfaceCommand;
 class Package;
 enum class CommandArgumentMode : uint8_t;
 } // namespace seds::model
@@ -48,9 +43,9 @@ enum class CommandArgumentMode : uint8_t;
 namespace conversion::iv::translator {
 
 /**
- * @brief   Translator from SEDS async interface commadn to InterfaceView interface
+ * @brief   Translator from SEDS async interface command to InterfaceView interface
  */
-class AsyncInterfaceCommandTranslator final
+class AsyncInterfaceCommandTranslator final : public InterfaceCommandTranslator
 {
 public:
     /**
@@ -117,16 +112,6 @@ private:
             seds::model::CommandArgumentMode requestedArgumentMode, const QString &asn1TypeName) const -> void;
 
     /**
-     * @brief   Creates new interface view interface
-     *
-     * @param   command     SEDS interface command
-     * @param   type        Type of interface to create
-     *
-     * @return   Interface view interface
-     */
-    auto createIvInterface(const seds::model::InterfaceCommand &command, ivm::IVInterface::InterfaceType type) const
-            -> ivm::IVInterface *;
-    /**
      * @brief   Creates ASN.1 sequence component type
      *
      * @param   name                Name of the new type
@@ -160,14 +145,6 @@ private:
     auto findDataType(const QString &dataTypeName) const -> const seds::model::DataType &;
 
     /**
-     * @brief   Converts interface view interface type to string
-     *
-     * @param   interfaceType   Interface type to convert
-     *
-     * @return   Interface type name
-     */
-    auto interfaceTypeToString(ivm::IVInterface::InterfaceType interfaceType) const -> const QString &;
-    /**
      * @brief   Swaps between provided and required interface types
      *
      * @param   interfaceType   Interface type to switch
@@ -181,10 +158,6 @@ private:
     const seds::model::Package &m_package;
     /// @brief  Parent SEDS component
     const seds::model::Component &m_component;
-    /// @brief  Parent SEDS interface
-    const seds::model::Interface &m_interface;
-    /// @brief  Output interface view function
-    ivm::IVFunction *m_ivFunction;
     /// @brief  Output ASN.1 type definitions
     Asn1Acn::Definitions *m_asn1Definitions;
 
@@ -197,8 +170,6 @@ private:
     static const QString m_interfaceParameterEncoding;
     /// @brief  Template for ASN.1 bundled type name
     static const QString m_asn1BundledTypeTemplate;
-    /// @brief  Template for interface view interfaces
-    static const QString m_ivInterfaceNameTemplate;
 };
 
 } // namespace conversion::iv::translator
