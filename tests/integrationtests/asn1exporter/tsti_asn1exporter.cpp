@@ -26,6 +26,7 @@
 
 #include <QFileInfo>
 #include <QObject>
+#include <QTextStream>
 #include <QUuid>
 #include <QtTest>
 #include <asn1library/asn1/asn1model.h>
@@ -36,6 +37,7 @@
 #include <conversion/common/export/exceptions.h>
 #include <conversion/common/options.h>
 #include <memory>
+#include <qtestcase.h>
 
 using Asn1Acn::Asn1Model;
 using conversion::Options;
@@ -95,6 +97,22 @@ static Asn1Acn::Definitions CreateAnotherExampleDefs()
     return defs;
 }
 
+std::string getFileContents(const std::string &filename)
+{
+    QFile file(filename.c_str());
+    file.open(QIODevice::ReadOnly);
+    return file.readAll().toStdString();
+}
+
+static void checkAndRemove(const std::string &filename)
+{
+    const std::string expectedFilename = "expect_" + filename;
+
+    QVERIFY(getFileContents(filename) == getFileContents(expectedFilename));
+
+    QFile(QString::fromStdString(filename)).remove();
+}
+
 void tsti_Asn1Exporter::testValid()
 {
     Asn1Acn::File file1("file1");
@@ -108,8 +126,8 @@ void tsti_Asn1Exporter::testValid()
     Asn1Model model(std::vector<Asn1Acn::File>({ file1, file2 }));
 
     Options options;
-    options.add(Asn1Options::asn1FilenamePrefix, "Asn1Pref_");
-    options.add(Asn1Options::acnFilenamePrefix, "AcnPref_");
+    options.add(Asn1Options::asn1FilenamePrefix, "Asn1_");
+    options.add(Asn1Options::acnFilenamePrefix, "Acn_");
 
     Asn1Exporter asn1Exporter;
     try {
@@ -118,12 +136,10 @@ void tsti_Asn1Exporter::testValid()
         QFAIL(ex.what());
     }
 
-    // TODO: check created files
-
-    // QFile("AcnPref_file1.acn").remove();
-    // QFile("AcnPref_file2.acn").remove();
-    // QFile("Asn1Pref_file1.asn").remove();
-    // QFile("Asn1Pref_file2.asn").remove();
+    std::string filenames[] = { "Acn_file1.acn", "Acn_file2.acn", "Asn1_file1.asn", "Asn1_file2.asn" };
+    for (auto filename : filenames) {
+        checkAndRemove(filename);
+    }
 }
 
 } // namespace asn1::test

@@ -1,0 +1,4 @@
+example1Definition DEFINITIONS ::= BEGIN
+name_of_type_assignment [size 4]
+END
+

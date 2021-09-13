@@ -1,0 +1,4 @@
+anotherExampleDefinition DEFINITIONS ::= BEGIN
+name_of_another_type_assignment []
+END
+

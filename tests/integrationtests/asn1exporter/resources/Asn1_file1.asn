@@ -1,0 +1,5 @@
+example1Definition DEFINITIONS ::= BEGIN
+name_of_value_assignment INTEGER ::= example integer's value
+name_of_type_assignment ::= INTEGER
+END
+
