@@ -24,6 +24,7 @@
 #include <asn1library/asn1/definitions.h>
 #include <asn1library/asn1/types/sequence.h>
 #include <conversion/asn1/SedsToAsn1Translator/visitors/datatypetranslatorvisitor.h>
+#include <conversion/common/qstringhash.h>
 #include <conversion/common/translation/exceptions.h>
 #include <ivcore/ivfunction.h>
 #include <ivcore/parameter.h>
