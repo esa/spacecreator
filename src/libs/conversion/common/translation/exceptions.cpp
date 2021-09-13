@@ -46,7 +46,7 @@ UndeclaredInterfaceException::UndeclaredInterfaceException(const QString &interf
 MissingGenericTypeMappingException::MissingGenericTypeMappingException(
         const QString &genericTypeName, const QString &interfaceName)
     : TranslationException(
-            QString("Generic type '%1' wasn't mapped in the '%2' interface").arg(genericTypeName).arg(interfaceName))
+              QString("Generic type '%1' wasn't mapped in the '%2' interface").arg(genericTypeName).arg(interfaceName))
 {
 }
 
