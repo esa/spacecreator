@@ -80,9 +80,13 @@ QString Asn1Exporter::makeFilename(const std::optional<QString> &prefix, const Q
 
 void Asn1Exporter::writeAndCommit(QSaveFile &outputFile, const std::string &data)
 {
-    assert(outputFile.open(QIODevice::WriteOnly));
-    assert(outputFile.write(data.c_str()));
-    assert(outputFile.commit());
+    bool opened = outputFile.open(QIODevice::WriteOnly);
+    bool written = outputFile.write(data.c_str());
+    bool commited = outputFile.commit();
+
+    assert(opened);
+    assert(written);
+    assert(commited);
 }
 
 } // namespace conversion::asn1::exporter
