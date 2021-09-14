@@ -55,12 +55,14 @@ private Q_SLOTS:
     void testValid();
 
 private:
-    std::array<const QString, 4u> filenames { "Acn_file1.acn", "Acn_file2.acn", "Asn1_file1.asn", "Asn1_file2.asn" };
+    static const std::array<const QString, 4u> m_filenames;
 };
+const std::array<const QString, 4u> tsti_Asn1Exporter::m_filenames { "Acn_file1.acn", "Acn_file2.acn", "Asn1_file1.asn",
+    "Asn1_file2.asn" };
 
 void tsti_Asn1Exporter::cleanupTestCase()
 {
-    for (auto filename : filenames) {
+    for (auto filename : m_filenames) {
         QFile(filename).remove();
     }
 }
@@ -132,7 +134,7 @@ void tsti_Asn1Exporter::testValid()
         QFAIL(ex.what());
     }
 
-    for (auto filename : filenames) {
+    for (auto filename : m_filenames) {
         const QString expectedFilename = "expect_" + filename;
         QVERIFY(getFileContents(filename) == getFileContents(expectedFilename));
     }

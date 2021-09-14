@@ -48,9 +48,6 @@ void Asn1Exporter::exportModel(const Model *const model, const Options &options)
     }
 
     const auto *const asn1Model = dynamic_cast<const Asn1Model *>(model);
-    if (asn1Model == nullptr) {
-        throw ExportException("Unhandled exception");
-    }
 
     for (const auto &file : asn1Model->data()) {
         exportAsn1Model(file, options);
@@ -93,13 +90,13 @@ void Asn1Exporter::writeAndCommit(QSaveFile &outputFile, const std::string &data
     bool commited = outputFile.commit();
 
     if (!opened) {
-        throw ExportException("Failed to open a file");
+        throw ExportException(QString("Failed to open a file %1").arg(outputFile.fileName()));
     }
     if (!written) {
-        throw ExportException("Failed to write a file");
+        throw ExportException(QString("Failed to write a file %1").arg(outputFile.fileName()));
     }
     if (!commited) {
-        throw ExportException("Failed to commit a transaction");
+        throw ExportException(QString("Failed to commit a transaction in %1").arg(outputFile.fileName()));
     }
 }
 
