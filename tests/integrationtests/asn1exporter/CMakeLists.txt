@@ -14,9 +14,9 @@ target_link_libraries(${TEST_NAME}
                 Qt5::Core
                 Qt5::Test)
 
-configure_file(resources/Acn_file1.acn expect_Acn_file1.acn COPYONLY)
-configure_file(resources/Acn_file2.acn expect_Acn_file2.acn COPYONLY)
-configure_file(resources/Asn1_file1.asn expect_Asn1_file1.asn COPYONLY)
-configure_file(resources/Asn1_file2.asn expect_Asn1_file2.asn COPYONLY)
+configure_file(resources/expect_Acn_file1.acn expect_Acn_file1.acn COPYONLY)
+configure_file(resources/expect_Acn_file2.acn expect_Acn_file2.acn COPYONLY)
+configure_file(resources/expect_Asn1_file1.asn expect_Asn1_file1.asn COPYONLY)
+configure_file(resources/expect_Asn1_file2.asn expect_Asn1_file2.asn COPYONLY)
 
 add_format_target(${TEST_NAME})

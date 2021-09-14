@@ -39,7 +39,7 @@ public:
 };
 
 /**
- * @brief   Exception thrown when exporters gets incorrect model
+ * @brief   Exception thrown when exporters get incorrect model
  */
 class IncorrectModelException : public ExportException
 {
@@ -51,6 +51,21 @@ public:
      * @param   receivedModelType   Received model type
      */
     explicit IncorrectModelException(ModelType expectedModelType, ModelType receivedModelType);
+};
+
+/**
+ * @brief   Exception thrown when exporters get unsupported source model
+ */
+class IncorrectSourceModelException : public ExportException
+{
+public:
+    /**
+     * @brief   Constructor
+     *
+     * @param   expectedModelType   Expected model type
+     * @param   receivedModelType   Received model type
+     */
+    explicit IncorrectSourceModelException(ModelType expectedModelType, ModelType receivedModelType);
 };
 
 } // namespace conversion::exporter

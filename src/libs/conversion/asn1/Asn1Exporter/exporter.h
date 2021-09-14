@@ -20,17 +20,18 @@
 #pragma once
 
 #include "export/modelexporter.h"
-#include "visitors/acnnodereconstructingvisitor.h"
-#include "visitors/asn1nodereconstructingvisitor.h"
 
-#include <QSaveFile>
+namespace Asn1Acn {
+class File;
+}
+class QSaveFile;
 
 namespace conversion::asn1::exporter {
 class Asn1Exporter final : public ::conversion::exporter::ModelExporter
 {
 public:
     /**
-     * @brief   Exports model
+     * @brief   Exports ASN.1 and ACN models to separate files
      *
      * @param   model       Model to export
      * @param   options     Options for export configuration
@@ -38,11 +39,9 @@ public:
     virtual auto exportModel(const Model *model, const Options &options) const -> void override;
 
 private:
-    static void exportAsn1Model(const Asn1Acn::File &file, const Options &options);
-    static void exportAcnModel(const Asn1Acn::File &file, const Options &options);
+    static auto exportAsn1Model(const Asn1Acn::File &file, const Options &options) -> void;
+    static auto exportAcnModel(const Asn1Acn::File &file, const Options &options) -> void;
 
-    static inline QString makeFilename(
-            const std::optional<QString> &prefix, const QString &name, const QString &extension);
-    static void writeAndCommit(QSaveFile &outputFile, const std::string &data);
+    static auto writeAndCommit(QSaveFile &outputFile, const std::string &data) -> void;
 };
 } // namespace conversion::asn1::exporter

@@ -29,10 +29,10 @@ namespace conversion::asn1 {
 class Asn1Options
 {
 public:
-    /** @brief Prefix to add at the beginning of the filename */
-    inline static const QString asn1FilenamePrefix = "Asn1_Export_Prefix";
-    /** @brief Prefix to add at the beginning of the filename */
-    inline static const QString acnFilenamePrefix = "Acn_Export_Prefix";
+    /** @brief Prefix to add at the beginning of the filepath */
+    inline static const QString asn1FilepathPrefix = "Asn1_Export_Prefix";
+    /** @brief Prefix to add at the beginning of the filepath */
+    inline static const QString acnFilepathPrefix = "Acn_Export_Prefix";
 };
 
 } // namespace conversion::asn1

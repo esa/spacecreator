@@ -51,26 +51,31 @@ class tsti_Asn1Exporter : public QObject
     Q_OBJECT
 
 private Q_SLOTS:
-    void initTestCase();
-    void cleanup();
+    void cleanupTestCase();
     void testValid();
+
+private:
+    std::array<const QString, 4u> filenames { "Acn_file1.acn", "Acn_file2.acn", "Asn1_file1.asn", "Asn1_file2.asn" };
 };
 
-void tsti_Asn1Exporter::initTestCase() {}
-
-void tsti_Asn1Exporter::cleanup() {}
+void tsti_Asn1Exporter::cleanupTestCase()
+{
+    for (auto filename : filenames) {
+        QFile(filename).remove();
+    }
+}
 
 static Asn1Acn::Definitions CreateExampleDefs()
 {
-    Asn1Acn::Definitions defs(QString("example1Definition"), {});
+    Asn1Acn::Definitions defs("example1Definition", {});
 
     Asn1Acn::Types::Integer i("integer_id");
     i.setSize(4);
-    Asn1Acn::TypeAssignment ta(QString("name_of_type_assignment"), QString("cName_of_assignment"), {},
-            std::make_unique<Asn1Acn::Types::Integer>(i));
+    Asn1Acn::TypeAssignment ta(
+            "name_of_type_assignment", "cName_of_assignment", {}, std::make_unique<Asn1Acn::Types::Integer>(i));
 
-    Asn1Acn::SingleValue sv(QString("example integer's value"));
-    Asn1Acn::ValueAssignment va(QString("name_of_value_assignment"), {}, std::make_unique<Asn1Acn::Types::Integer>(i),
+    Asn1Acn::SingleValue sv("example integer's value");
+    Asn1Acn::ValueAssignment va("name_of_value_assignment", {}, std::make_unique<Asn1Acn::Types::Integer>(i),
             std::make_unique<Asn1Acn::SingleValue>(sv));
 
     defs.addType(std::make_unique<Asn1Acn::TypeAssignment>(ta));
@@ -81,15 +86,15 @@ static Asn1Acn::Definitions CreateExampleDefs()
 
 static Asn1Acn::Definitions CreateAnotherExampleDefs()
 {
-    Asn1Acn::Definitions defs(QString("anotherExampleDefinition"), {});
+    Asn1Acn::Definitions defs("anotherExampleDefinition", {});
 
     Asn1Acn::Types::Integer i("another_integer_id");
-    Asn1Acn::TypeAssignment ta(QString("name_of_another_type_assignment"), QString("cName_of_another_assignment"), {},
+    Asn1Acn::TypeAssignment ta("name_of_another_type_assignment", "cName_of_another_assignment", {},
             std::make_unique<Asn1Acn::Types::Integer>(i));
 
-    Asn1Acn::SingleValue sv(QString("another_single_value"));
-    Asn1Acn::ValueAssignment va(QString("name_of_another_value_assignment"), {},
-            std::make_unique<Asn1Acn::Types::Integer>(i), std::make_unique<Asn1Acn::SingleValue>(sv));
+    Asn1Acn::SingleValue sv("another_single_value");
+    Asn1Acn::ValueAssignment va("name_of_another_value_assignment", {}, std::make_unique<Asn1Acn::Types::Integer>(i),
+            std::make_unique<Asn1Acn::SingleValue>(sv));
 
     defs.addType(std::make_unique<Asn1Acn::TypeAssignment>(ta));
     defs.addValue(std::make_unique<Asn1Acn::ValueAssignment>(va));
@@ -97,20 +102,11 @@ static Asn1Acn::Definitions CreateAnotherExampleDefs()
     return defs;
 }
 
-std::string getFileContents(const std::string &filename)
+QString getFileContents(const QString &filename)
 {
-    QFile file(filename.c_str());
+    QFile file(filename);
     file.open(QIODevice::ReadOnly);
-    return file.readAll().toStdString();
-}
-
-static void checkAndRemove(const std::string &filename)
-{
-    const std::string expectedFilename = "expect_" + filename;
-
-    QVERIFY(getFileContents(filename) == getFileContents(expectedFilename));
-
-    QFile(QString::fromStdString(filename)).remove();
+    return file.readAll();
 }
 
 void tsti_Asn1Exporter::testValid()
@@ -126,8 +122,8 @@ void tsti_Asn1Exporter::testValid()
     Asn1Model model(std::vector<Asn1Acn::File>({ file1, file2 }));
 
     Options options;
-    options.add(Asn1Options::asn1FilenamePrefix, "Asn1_");
-    options.add(Asn1Options::acnFilenamePrefix, "Acn_");
+    options.add(Asn1Options::asn1FilepathPrefix, "Asn1_");
+    options.add(Asn1Options::acnFilepathPrefix, "Acn_");
 
     Asn1Exporter asn1Exporter;
     try {
@@ -136,9 +132,9 @@ void tsti_Asn1Exporter::testValid()
         QFAIL(ex.what());
     }
 
-    std::string filenames[] = { "Acn_file1.acn", "Acn_file2.acn", "Asn1_file1.asn", "Asn1_file2.asn" };
     for (auto filename : filenames) {
-        checkAndRemove(filename);
+        const QString expectedFilename = "expect_" + filename;
+        QVERIFY(getFileContents(filename) == getFileContents(expectedFilename));
     }
 }
 
