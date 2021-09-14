@@ -67,11 +67,11 @@ public:
     bool moveRows(const QModelIndex &sourceParent, int sourceRow, int count,
             const QModelIndex &destinationParent, int destinationChild) override;
 private:
-    void createNewRow(const ivm::InterfaceParameter &param, int row);
+    void createNewRow(const shared::InterfaceParameter &param, int row);
 
 private:
     const QStringList m_asn1Names;
-    QVector<ivm::InterfaceParameter> m_params;
+    QVector<shared::InterfaceParameter> m_params;
     cmd::CommandsStack::Macro *m_cmdMacro { nullptr };
 };
 

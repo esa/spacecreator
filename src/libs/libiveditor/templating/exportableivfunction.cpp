@@ -89,7 +89,7 @@ QVariantList ExportableIVFunction::connectedFunctions() const
 QVariantList ExportableIVFunction::contextParameters() const
 {
     QVariantList parameters;
-    for (const ivm::ContextParameter &param : exportedObject<ivm::IVFunctionType>()->contextParams()) {
+    for (const shared::ContextParameter &param : exportedObject<ivm::IVFunctionType>()->contextParams()) {
         parameters << QVariant::fromValue(param);
     }
     return parameters;

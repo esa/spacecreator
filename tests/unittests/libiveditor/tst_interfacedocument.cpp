@@ -96,13 +96,13 @@ void tst_InterfaceDocument::test_checkAllInterfacesForAsn1Compliance()
 
     // Used type is defined in ASN1
     auto if2 = ivm::testutils::createIface(fn1, ivm::IVInterface::InterfaceType::Provided, "If2");
-    if2->addParam(ivm::InterfaceParameter("IfaceParam", ivm::BasicParameter::Type::Other, "T-UInt32"));
+    if2->addParam(shared::InterfaceParameter("IfaceParam", shared::BasicParameter::Type::Other, "T-UInt32"));
     ok = m_ivDoc->checkAllInterfacesForAsn1Compliance();
     QCOMPARE(ok, true);
 
     // Unknown type
     auto if3 = ivm::testutils::createIface(fn1, ivm::IVInterface::InterfaceType::Provided, "If3");
-    if3->addParam(ivm::InterfaceParameter("IfaceParam", ivm::BasicParameter::Type::Other, "InvalidType"));
+    if3->addParam(shared::InterfaceParameter("IfaceParam", shared::BasicParameter::Type::Other, "InvalidType"));
     ok = m_ivDoc->checkAllInterfacesForAsn1Compliance();
     QCOMPARE(ok, false);
 }

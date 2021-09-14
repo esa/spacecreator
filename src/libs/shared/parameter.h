@@ -28,7 +28,7 @@ class Type;
 }
 }
 
-namespace ivm {
+namespace shared {
 
 class BasicParameter
 {
@@ -143,6 +143,6 @@ protected:
 
 }
 
-Q_DECLARE_METATYPE(ivm::BasicParameter)
-Q_DECLARE_METATYPE(ivm::ContextParameter)
-Q_DECLARE_METATYPE(ivm::InterfaceParameter)
+Q_DECLARE_METATYPE(shared::BasicParameter)
+Q_DECLARE_METATYPE(shared::ContextParameter)
+Q_DECLARE_METATYPE(shared::InterfaceParameter)

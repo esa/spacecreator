@@ -92,7 +92,7 @@ public:
     bool isOneDirection() const;
 
     QString name() const;
-    QVector<InterfaceParameter> params() const;
+    QVector<shared::InterfaceParameter> params() const;
 
 protected:
     explicit IVConnection(

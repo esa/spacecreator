@@ -24,7 +24,7 @@
 namespace ivm {
 class IVFunctionType;
 }
-namespace ivm {
+namespace shared {
 class ContextParameter;
 }
 
@@ -43,7 +43,7 @@ public:
 
 private:
     QPointer<ivm::IVFunctionType> m_entity;
-    QHash<int, ivm::ContextParameter> m_params;
+    QHash<int, shared::ContextParameter> m_params;
 };
 
 }

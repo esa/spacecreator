@@ -32,8 +32,8 @@ namespace cmd {
 class CmdContextParameterChange : public QUndoCommand
 {
 public:
-    explicit CmdContextParameterChange(ivm::IVFunctionType *entity, const ivm::ContextParameter &oldParam,
-            const ivm::ContextParameter &newParam);
+    explicit CmdContextParameterChange(ivm::IVFunctionType *entity, const shared::ContextParameter &oldParam,
+            const shared::ContextParameter &newParam);
 
     void redo() override;
     void undo() override;
@@ -42,10 +42,10 @@ public:
 
 private:
     QPointer<ivm::IVFunctionType> m_entity;
-    ivm::ContextParameter m_newParam;
-    const ivm::ContextParameter m_oldParam;
+    shared::ContextParameter m_newParam;
+    const shared::ContextParameter m_oldParam;
 
-    void swapParam(const ivm::ContextParameter &from, const ivm::ContextParameter &to);
+    void swapParam(const shared::ContextParameter &from, const shared::ContextParameter &to);
 };
 
 }

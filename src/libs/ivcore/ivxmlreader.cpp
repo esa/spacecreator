@@ -42,16 +42,6 @@ namespace ivm {
 
 using namespace ivm::meta;
 
-static inline EntityAttributes attributes(const QXmlStreamAttributes &xmlAttrs)
-{
-    EntityAttributes attrs;
-    for (const QXmlStreamAttribute &xmlAttr : xmlAttrs) {
-        const QString &name = xmlAttr.name().toString();
-        attrs.insert(name, EntityAttribute(name, xmlAttr.value().toString(), EntityAttribute::Type::Attribute));
-    }
-    return std::move(attrs);
-}
-
 static inline QString attrValue(const EntityAttributes &attrs, const QString &name, const QString &defaultValue = {})
 {
     const EntityAttribute &attr = attrs.value(name);
@@ -155,36 +145,6 @@ QVector<IVObject *> IVXMLReader::parsedObjects() const
     return d->m_allObjects;
 }
 
-InterfaceParameter addIfaceParameter(const EntityAttributes &otherAttrs, InterfaceParameter::Direction direction)
-{
-    InterfaceParameter param;
-
-    for (const EntityAttribute &attr : otherAttrs) {
-        switch (meta::Props::token(attr.name())) {
-        case Props::Token::name: {
-            param.setName(attr.value<QString>());
-            break;
-        }
-        case Props::Token::type: {
-            param.setParamTypeName(attr.value<QString>());
-            break;
-        }
-        case Props::Token::encoding: {
-            param.setEncoding(attr.value<QString>());
-            break;
-        }
-        default: {
-            shared::ErrorHub::addError(shared::ErrorItem::Warning,
-                    QObject::tr("Interface Parameter - unknown attribute: %1").arg(attr.name()));
-            break;
-        }
-        }
-    }
-
-    param.setDirection(direction);
-    return param;
-}
-
 IVConnection::EndPointInfo *addConnectionPart(const EntityAttributes &otherAttrs)
 {
     const bool isRI = otherAttrs.contains(Props::token(Props::Token::ri_name));
@@ -230,9 +190,9 @@ void IVXMLReader::processTagOpen(QXmlStreamReader &xml)
     case Props::Token::Input_Parameter: {
         Q_ASSERT(d->m_currentObject.iface() != nullptr);
 
-        const InterfaceParameter param = addIfaceParameter(attrs,
-                t == Props::Token::Input_Parameter ? InterfaceParameter::Direction::IN
-                                                   : InterfaceParameter::Direction::OUT);
+        const shared::InterfaceParameter param = addIfaceParameter(attrs,
+                t == Props::Token::Input_Parameter ? shared::InterfaceParameter::Direction::IN
+                                                   : shared::InterfaceParameter::Direction::OUT);
         d->m_currentObject.iface()->addParam(param);
         break;
     }
@@ -277,11 +237,11 @@ void IVXMLReader::processTagOpen(QXmlStreamReader &xml)
         auto function = qobject_cast<ivm::IVFunctionType *>(d->m_currentObject.get());
         if (function) {
             const QString typeString = attrValue(attrs, Props::Token::type);
-            ivm::BasicParameter::Type paramType = typeString == "Timer"
-                    ? ivm::BasicParameter::Type::Timer
-                    : (typeString == "Directive" ? ivm::BasicParameter::Type::Directive
-                                                 : ivm::BasicParameter::Type::Other);
-            ContextParameter param(
+            shared::BasicParameter::Type paramType = typeString == "Timer"
+                    ? shared::BasicParameter::Type::Timer
+                    : (typeString == "Directive" ? shared::BasicParameter::Type::Directive
+                                                 : shared::BasicParameter::Type::Other);
+            shared::ContextParameter param(
                     attrValue(attrs, Props::Token::name), paramType, typeString, attrValue(attrs, Props::Token::value));
             function->addContextParam(param);
         }

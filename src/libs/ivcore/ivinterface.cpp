@@ -30,7 +30,7 @@
 namespace ivm {
 
 IVInterface::CreationInfo::CreationInfo(IVModel *model, IVFunctionType *function, const QPointF &position,
-        IVInterface::InterfaceType type, const shared::Id &id, const QVector<InterfaceParameter> &parameters,
+        IVInterface::InterfaceType type, const shared::Id &id, const QVector<shared::InterfaceParameter> &parameters,
         OperationKind kind, const QString &name, const CreationInfo::Policy policy, IVInterface *source)
     : model(model)
     , function(function)
@@ -106,7 +106,7 @@ struct IVInterfacePrivate {
     {
     }
     IVInterface::InterfaceType m_direction;
-    QVector<InterfaceParameter> m_params = {};
+    QVector<shared::InterfaceParameter> m_params = {};
     QPointer<IVInterface> m_cloneOf { nullptr };
     QVector<QPointer<IVInterface>> m_clones {};
 };
@@ -242,21 +242,21 @@ bool IVInterface::setKind(IVInterface::OperationKind k)
     return false;
 }
 
-QVector<InterfaceParameter> IVInterface::params() const
+QVector<shared::InterfaceParameter> IVInterface::params() const
 {
     return d->m_params;
 }
 
-InterfaceParameter IVInterface::param(const QString &name) const
+shared::InterfaceParameter IVInterface::param(const QString &name) const
 {
     if (!name.isEmpty())
-        for (const InterfaceParameter &param : params())
+        for (const shared::InterfaceParameter &param : params())
             if (param.name() == name)
                 return param;
     return {};
 }
 
-void IVInterface::setParams(const QVector<InterfaceParameter> &params)
+void IVInterface::setParams(const QVector<shared::InterfaceParameter> &params)
 {
     if (d->m_params != params) {
         d->m_params = params;
@@ -264,7 +264,7 @@ void IVInterface::setParams(const QVector<InterfaceParameter> &params)
     }
 }
 
-void IVInterface::addParam(const InterfaceParameter &param)
+void IVInterface::addParam(const shared::InterfaceParameter &param)
 {
     if (!d->m_params.contains(param)) {
         d->m_params.append(param);
@@ -442,7 +442,7 @@ QVariant IVInterface::originalAttributeValue(const QString &name) const
     return m_originalFields.attrs.value(name).value();
 }
 
-QVector<InterfaceParameter> IVInterface::originalParams() const
+QVector<shared::InterfaceParameter> IVInterface::originalParams() const
 {
     return m_originalFields.params;
 }

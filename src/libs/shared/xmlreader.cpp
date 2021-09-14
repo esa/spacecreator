@@ -17,6 +17,9 @@
 
 #include "xmlreader.h"
 
+#include "entityattribute.h"
+#include "errorhub.h"
+
 #include <QFile>
 #include <QXmlStreamAttribute>
 #include <QtDebug>
@@ -42,6 +45,41 @@ void XmlReader::setMetaData(const QXmlStreamAttributes &attributes)
     for (const QXmlStreamAttribute &attribute : attributes) {
         d->m_metaData[attribute.name().toString()] = QVariant::fromValue(attribute.value().toString());
     }
+}
+
+InterfaceParameter XmlReader::addIfaceParameter(
+        const EntityAttributes &otherAttrs, InterfaceParameter::Direction direction)
+{
+    shared::InterfaceParameter param;
+    for (const EntityAttribute &attr : otherAttrs) {
+        if (attr.name() == "name") {
+            param.setName(attr.value<QString>());
+            break;
+        } else if (attr.name() == "type") {
+            param.setParamTypeName(attr.value<QString>());
+            break;
+        } else if (attr.name() == "encoding") {
+            param.setEncoding(attr.value<QString>());
+            break;
+        } else {
+            shared::ErrorHub::addError(shared::ErrorItem::Warning,
+                    QObject::tr("Interface Parameter - unknown attribute: %1").arg(attr.name()));
+            break;
+        }
+    }
+
+    param.setDirection(direction);
+    return param;
+}
+
+EntityAttributes XmlReader::attributes(const QXmlStreamAttributes &xmlAttrs)
+{
+    EntityAttributes attrs;
+    for (const QXmlStreamAttribute &xmlAttr : xmlAttrs) {
+        const QString &name = xmlAttr.name().toString();
+        attrs.insert(name, EntityAttribute(name, xmlAttr.value().toString(), EntityAttribute::Type::Attribute));
+    }
+    return attrs;
 }
 
 bool XmlReader::readFile(const QString &file)

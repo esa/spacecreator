@@ -17,6 +17,7 @@
 
 #pragma once
 
+#include "parameter.h"
 #include "veobject.h"
 
 #include <QObject>
@@ -52,6 +53,10 @@ protected:
     virtual void processTagOpen(QXmlStreamReader &xml) = 0;
     virtual void processTagClose(QXmlStreamReader &xml) = 0;
     virtual QString rootElementName() const = 0;
+
+    InterfaceParameter addIfaceParameter(
+            const EntityAttributes &otherAttrs, shared::InterfaceParameter::Direction direction);
+    EntityAttributes attributes(const QXmlStreamAttributes &xmlAttrs);
 
 private:
     const std::unique_ptr<XMLReaderPrivate> d;

@@ -39,6 +39,10 @@ target_sources(${LIB_NAME} PRIVATE
     dvpropertytemplate.h
     dvpropertytemplateconfig.cpp
     dvpropertytemplateconfig.h
+    dvpseudofunction.cpp
+    dvpseudofunction.h
+    dvpseudointerface.cpp
+    dvpseudointerface.h
     dvresources.qrc
     dvxmlreader.cpp
     dvxmlreader.h

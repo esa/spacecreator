@@ -42,7 +42,7 @@ ContextParametersModel::ContextParametersModel(cmd::CommandsStack::Macro *macro,
 
 ContextParametersModel::~ContextParametersModel() { }
 
-void ContextParametersModel::createNewRow(const ivm::ContextParameter &param, int row)
+void ContextParametersModel::createNewRow(const shared::ContextParameter &param, int row)
 {
     m_params.insert(row, param);
 
@@ -55,7 +55,7 @@ void ContextParametersModel::createNewRow(const ivm::ContextParameter &param, in
     QStandardItem *typeItem = new QStandardItem(row, Column::Type);
     typeItem->setData(param.paramTypeName(), DataRole);
     QStringList typesList = { m_asn1Names };
-    typesList.append(shared::typeName(ivm::BasicParameter::Type::Timer));
+    typesList.append(shared::typeName(shared::BasicParameter::Type::Timer));
     typeItem->setData(typesList, EditRole);
     setItem(row, Column::Type, typeItem);
 
@@ -116,8 +116,8 @@ bool ContextParametersModel::setData(const QModelIndex &index, const QVariant &v
     const QString stringValue = value.toString();
 
     if (role == DataRole || role == Qt::EditRole) {
-        const ivm::ContextParameter &paramOld = m_params.at(index.row());
-        ivm::ContextParameter paramNew(paramOld);
+        const shared::ContextParameter &paramOld = m_params.at(index.row());
+        shared::ContextParameter paramNew(paramOld);
 
         switch (index.column()) {
         case Column::Name: {
@@ -162,8 +162,8 @@ bool ContextParametersModel::createProperty(const QString &propName)
 {
     bool res(false);
 
-    ivm::ContextParameter param(propName);
-    param.setParamType(ivm::BasicParameter::Type::Timer);
+    shared::ContextParameter param(propName);
+    param.setParamType(shared::BasicParameter::Type::Timer);
 
     if (auto entity = qobject_cast<ivm::IVFunctionType *>(m_dataObject)) {
         auto propsCmd = new cmd::CmdContextParameterCreate(entity, param);
@@ -209,7 +209,7 @@ bool ContextParametersModel::isProp(const QModelIndex & /*id*/) const
 Qt::ItemFlags ContextParametersModel::flags(const QModelIndex &index) const
 {
     Qt::ItemFlags flags = QStandardItemModel::flags(index);
-    if (index.column() == Column::Value && m_params.at(index.row()).paramType() != ivm::BasicParameter::Type::Other)
+    if (index.column() == Column::Value && m_params.at(index.row()).paramType() != shared::BasicParameter::Type::Other)
         flags = flags & ~Qt::ItemIsEditable & ~Qt::ItemIsEnabled;
 
     if (!m_dataObject)

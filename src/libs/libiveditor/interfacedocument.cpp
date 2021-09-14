@@ -581,13 +581,13 @@ bool InterfaceDocument::checkInterfaceAsn1Compliance(const ivm::IVInterface *int
     if (!d->asnCheck) {
         return true;
     }
-    const QVector<ivm::InterfaceParameter> &params = interface->params();
+    const QVector<shared::InterfaceParameter> &params = interface->params();
     if (params.isEmpty()) {
         return true;
     }
 
     return std::any_of(params.cbegin(), params.cend(),
-            [&](const ivm::InterfaceParameter &param) { return d->asnCheck->hasType(param.paramTypeName()); });
+            [&](const shared::InterfaceParameter &param) { return d->asnCheck->hasType(param.paramTypeName()); });
 }
 
 /*!
@@ -607,7 +607,7 @@ bool InterfaceDocument::checkAllInterfacesForAsn1Compliance()
             const QString id = QString("%1.%2").arg(
                     interface->function() ? interface->function()->title() : "", interface->title());
             QString parameters;
-            for (const ivm::InterfaceParameter &param : interface->params()) {
+            for (const shared::InterfaceParameter &param : interface->params()) {
                 if (!parameters.isEmpty()) {
                     parameters += ", ";
                 }

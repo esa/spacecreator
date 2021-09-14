@@ -25,10 +25,10 @@
 namespace ive {
 namespace cmd {
 
-CmdIfaceParamCreate::CmdIfaceParamCreate(ivm::IVObject *entity, const ivm::InterfaceParameter &param)
+CmdIfaceParamCreate::CmdIfaceParamCreate(ivm::IVObject *entity, const shared::InterfaceParameter &param)
     : CmdIfaceParamBase(entity ? entity->as<ivm::IVInterface *>() : nullptr)
     , m_targetParams({ param })
-    , m_sourceParams(m_iface ? m_iface->params() : QVector<ivm::InterfaceParameter>())
+    , m_sourceParams(m_iface ? m_iface->params() : QVector<shared::InterfaceParameter>())
 {
     setText(QObject::tr("Create Iface Parameter"));
 }
@@ -38,7 +38,7 @@ void CmdIfaceParamCreate::redo()
     if (!m_iface)
         return;
 
-    QVector<ivm::InterfaceParameter> currParams = m_iface->params();
+    QVector<shared::InterfaceParameter> currParams = m_iface->params();
     currParams.append(m_targetParams);
     m_iface->setParams(currParams);
 

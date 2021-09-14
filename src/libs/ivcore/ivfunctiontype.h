@@ -62,12 +62,12 @@ public:
     bool hasNestedChildren() const;
     bool hasInterface(const QString &name, Qt::CaseSensitivity caseSensitivity = Qt::CaseInsensitive) const;
 
-    QVector<ContextParameter> contextParams() const;
-    ContextParameter contextParam(const QString &name) const;
-    void addContextParam(const ContextParameter &param);
-    bool removeContextParam(const ContextParameter &param);
+    QVector<shared::ContextParameter> contextParams() const;
+    shared::ContextParameter contextParam(const QString &name) const;
+    void addContextParam(const shared::ContextParameter &param);
+    bool removeContextParam(const shared::ContextParameter &param);
     void clearContextParams();
-    void setContextParams(const QVector<ContextParameter> &params);
+    void setContextParams(const QVector<shared::ContextParameter> &params);
 
     QVector<QPointer<IVFunction>> instances() const;
     void rememberInstance(IVFunction *function);

@@ -121,15 +121,15 @@ void IVXMLReader::test_readFunction()
     QVERIFY(function != nullptr);
     QCOMPARE(function->contextParams().size(), 2);
 
-    ivm::ContextParameter param1 = function->contextParam("duration");
+    shared::ContextParameter param1 = function->contextParam("duration");
     QVERIFY(!param1.isNull());
-    QCOMPARE(param1.paramType(), ivm::BasicParameter::Type::Other);
+    QCOMPARE(param1.paramType(), shared::BasicParameter::Type::Other);
     QCOMPARE(param1.paramTypeName(), QString("MyInt"));
     QCOMPARE(param1.defaultValue(), QVariant::fromValue(60));
 
-    ivm::ContextParameter param2 = function->contextParam("trigger");
+    shared::ContextParameter param2 = function->contextParam("trigger");
     QVERIFY(!param2.isNull());
-    QCOMPARE(param2.paramType(), ivm::BasicParameter::Type::Timer);
+    QCOMPARE(param2.paramType(), shared::BasicParameter::Type::Timer);
 }
 
 void IVXMLReader::test_connectionGroup()

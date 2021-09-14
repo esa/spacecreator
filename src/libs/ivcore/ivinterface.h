@@ -69,7 +69,7 @@ public:
         };
         CreationInfo(IVModel *model = nullptr, IVFunctionType *function = nullptr, const QPointF &position = QPointF(),
                 IVInterface::InterfaceType type = DefaultDirection, const shared::Id &id = shared::createId(),
-                const QVector<InterfaceParameter> &parameters = QVector<InterfaceParameter>(),
+                const QVector<shared::InterfaceParameter> &parameters = QVector<shared::InterfaceParameter>(),
                 OperationKind kind = OperationKind::Sporadic, const QString &name = QString(),
                 const CreationInfo::Policy policy = CreationInfo::Policy::Init, IVInterface *toBeCloned = nullptr);
         IVModel *model { nullptr };
@@ -77,7 +77,7 @@ public:
         QPointF position = {};
         IVInterface::InterfaceType type { DefaultDirection };
         shared::Id id = {};
-        QVector<InterfaceParameter> parameters = {};
+        QVector<shared::InterfaceParameter> parameters = {};
         OperationKind kind = { OperationKind::Sporadic };
         QString name {};
         CreationInfo::Policy policy { CreationInfo::Policy::Init };
@@ -108,10 +108,10 @@ public:
     OperationKind kind() const;
     bool setKind(OperationKind k);
 
-    QVector<InterfaceParameter> params() const;
-    InterfaceParameter param(const QString &name) const;
-    void setParams(const QVector<InterfaceParameter> &params);
-    void addParam(const InterfaceParameter &param);
+    QVector<shared::InterfaceParameter> params() const;
+    shared::InterfaceParameter param(const QString &name) const;
+    void setParams(const QVector<shared::InterfaceParameter> &params);
+    void addParam(const shared::InterfaceParameter &param);
 
     IVFunctionType *function() const;
 
@@ -125,7 +125,7 @@ public:
     static IVInterface *createIface(const CreationInfo &descr);
 
     QVariant originalAttributeValue(const QString &name) const;
-    QVector<InterfaceParameter> originalParams() const;
+    QVector<shared::InterfaceParameter> originalParams() const;
 
     void setCloneOrigin(IVInterface *source);
 
@@ -157,7 +157,7 @@ protected:
     struct OriginalPropsHolder {
         // TODO: unite with IVFunction::OriginalPropsHolder
         EntityAttributes attrs;
-        QVector<InterfaceParameter> params;
+        QVector<shared::InterfaceParameter> params;
 
         inline QString name() const
         {

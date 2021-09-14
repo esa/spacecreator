@@ -28,7 +28,7 @@ namespace ive {
 namespace cmd {
 
 CmdContextParameterCreate::CmdContextParameterCreate(
-        ivm::IVFunctionType *entity, const ivm::ContextParameter &prop)
+        ivm::IVFunctionType *entity, const shared::ContextParameter &prop)
     : QUndoCommand()
     , m_entity(entity)
     , m_newProps({ prop })
@@ -42,8 +42,8 @@ void CmdContextParameterCreate::redo()
     if (!m_entity)
         return;
 
-    QVector<ivm::ContextParameter> params = m_oldProps;
-    for (const ivm::ContextParameter &param : m_newProps)
+    QVector<shared::ContextParameter> params = m_oldProps;
+    for (const shared::ContextParameter &param : m_newProps)
         params.append(param);
     m_entity->setContextParams(params);
 }

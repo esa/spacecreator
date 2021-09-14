@@ -49,7 +49,7 @@ private:
     struct OriginalPropsHolder {
         // TODO: unite with IVInterface::OriginalPropsHolder
         EntityAttributes attrs;
-        QVector<ContextParameter> params;
+        QVector<shared::ContextParameter> params;
 
         QString name() const
         {
@@ -76,7 +76,7 @@ private:
     void restoreInternals();
 
     void reflectAttrs(const EntityAttributes &attrs);
-    void reflectContextParams(const QVector<ContextParameter> &params);
+    void reflectContextParams(const QVector<shared::ContextParameter> &params);
 };
 
 }

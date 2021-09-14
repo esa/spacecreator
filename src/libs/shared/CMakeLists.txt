@@ -3,6 +3,17 @@ set(LIB_NAME shared)
 add_library(${LIB_NAME} STATIC)
 
 target_sources(${LIB_NAME} PRIVATE
+    abstractproject.cpp
+    abstractproject.h
+    abstractvisualizationmodel.cpp
+    abstractvisualizationmodel.h
+    actionsbar.cpp
+    actionsbar.h
+    addpropertytemplatedialog.cpp
+    addpropertytemplatedialog.h
+    addpropertytemplatedialog.ui
+    animation.cpp
+    animation.h
     colors/colorhandler.cpp
     colors/colorhandler.h
     colors/colorhandlereditor.cpp
@@ -18,11 +29,82 @@ target_sources(${LIB_NAME} PRIVATE
     colors/colorsettingswidget.cpp
     colors/colorsettingswidget.h
     colors/colorsettingswidget.ui
+    commandlineparser.cpp
+    commandlineparser.h
+    commands/cmdentityattributechange.cpp
+    commands/cmdentityattributechange.h
+    commands/cmdentityautolayout.cpp
+    commands/cmdentityautolayout.h
+    commands/cmdentitygeometrychange.cpp
+    commands/cmdentitygeometrychange.h
+    commands/cmdentitypropertychange.cpp
+    commands/cmdentitypropertychange.h
+    commands/cmdentitypropertycreate.cpp
+    commands/cmdentitypropertycreate.h
+    commands/cmdentitypropertyremove.cpp
+    commands/cmdentitypropertyremove.h
+    commands/cmdentitypropertyrename.cpp
+    commands/cmdentitypropertyrename.h
+    commandsstackbase.cpp
+    commandsstackbase.h
+    common.cpp
+    common.h
+    delayedsignal.cpp
+    delayedsignal.h
+    editorcore.cpp
+    editorcore.h
+    entityattribute.cpp
+    entityattribute.h
+    errorhub.cpp
+    errorhub.h
+    geometry.cpp
+    geometry.h
+    graphicsviewutils.cpp
+    graphicsviewutils.h
+    interface/attributedelegate.cpp
+    interface/attributedelegate.h
+    interface/creatortool.cpp
+    interface/creatortool.h
+    interface/objectstreeview.cpp
+    interface/objectstreeview.h
+    interface/veitemmodel.cpp
+    interface/veitemmodel.h
+    minimap.cpp
+    minimap.h
+    parameter.cpp
+    parameter.h
+    positionlookuphelper.cpp
+    positionlookuphelper.h
+    propertiesdialog.cpp
+    propertiesdialog.h
+    propertiesdialog.ui
+    propertieslistmodel.cpp
+    propertieslistmodel.h
+    propertiesmodelbase.cpp
+    propertiesmodelbase.h
+    propertiesviewbase.cpp
+    propertiesviewbase.h
+    propertiesviewbase.ui
+    propertytemplate.cpp
+    propertytemplate.h
+    propertytemplateconfig.cpp
+    propertytemplateconfig.h
+    propertytemplatemanager.cpp
+    propertytemplatemanager.h
+    propertytemplatemanager.ui
+    propertytemplatewidget.cpp
+    propertytemplatewidget.h
     reports/bugreportdialog.cpp
     reports/bugreportdialog.h
     reports/bugreportdialog.ui
     reports/bugreporthandler.cpp
     reports/bugreporthandler.h
+    settingsmanager.cpp
+    settingsmanager.h
+    sharedlibrary.cpp
+    sharedlibrary.h
+    sharedresources/colors/default_colors.json
+    sharedresources/sharedresources.qrc
     ui/drawrectinfo.cpp
     ui/drawrectinfo.h
     ui/graphicsscenebase.cpp
@@ -39,104 +121,24 @@ target_sources(${LIB_NAME} PRIVATE
     ui/interactiveobjectbase.h
     ui/textitem.cpp
     ui/textitem.h
-    abstractproject.cpp
-    abstractproject.h
-    actionsbar.cpp
-    actionsbar.h
-    animation.cpp
-    animation.h
-    commandlineparser.cpp
-    commandlineparser.h
-    common.cpp
-    common.h
-    delayedsignal.cpp
-    delayedsignal.h
-    editorcore.cpp
-    editorcore.h
-    errorhub.cpp
-    errorhub.h
-    geometry.cpp
-    geometry.h
-    graphicsviewutils.cpp
-    graphicsviewutils.h
-    minimap.h
-    minimap.cpp
-    settingsmanager.cpp
-    settingsmanager.h
-    sharedlibrary.cpp
-    sharedlibrary.h
-    sharedresources/colors/default_colors.json
-    sharedresources/sharedresources.qrc
-    undocommand.cpp
-    undocommand.h
-    commandsstackbase.cpp
-    commandsstackbase.h
-    veobject.cpp
-    veobject.h
-    vemodel.cpp
-    vemodel.h
-    entityattribute.cpp
-    entityattribute.h
-    xmlreader.cpp
-    xmlreader.h
-    commands/cmdentitygeometrychange.cpp
-    commands/cmdentitygeometrychange.h
-    commands/cmdentityautolayout.cpp
-    commands/cmdentityautolayout.h
+    ui/veconnectionendpointgraphicsitem.cpp
+    ui/veconnectionendpointgraphicsitem.h
+    ui/veconnectiongraphicsitem.cpp
+    ui/veconnectiongraphicsitem.h
     ui/veinteractiveobject.cpp
     ui/veinteractiveobject.h
     ui/verectgraphicsitem.cpp
     ui/verectgraphicsitem.h
-    abstractvisualizationmodel.cpp
-    abstractvisualizationmodel.h
-    interface/veitemmodel.cpp
-    interface/veitemmodel.h
-    positionlookuphelper.cpp
-    positionlookuphelper.h
-    ui/veconnectiongraphicsitem.cpp
-    ui/veconnectiongraphicsitem.h
-    ui/veconnectionendpointgraphicsitem.cpp
-    ui/veconnectionendpointgraphicsitem.h
-    interface/creatortool.cpp
-    interface/creatortool.h
-    interface/objectstreeview.cpp
-    interface/objectstreeview.h
-    propertytemplate.cpp
-    propertytemplate.h
-    propertytemplateconfig.cpp
-    propertytemplateconfig.h
-    propertiesdialog.cpp
-    propertiesdialog.h
-    propertiesdialog.ui
-    propertiesviewbase.cpp
-    propertiesviewbase.h
-    propertiesviewbase.ui
-    propertiesmodelbase.cpp
-    propertiesmodelbase.h
-    propertieslistmodel.cpp
-    propertieslistmodel.h
-    commands/cmdentitypropertycreate.cpp
-    commands/cmdentitypropertycreate.h
-    commands/cmdentitypropertychange.cpp
-    commands/cmdentitypropertychange.h
-    commands/cmdentitypropertyremove.cpp
-    commands/cmdentitypropertyremove.h
-    commands/cmdentitypropertyrename.cpp
-    commands/cmdentitypropertyrename.h
-    commands/cmdentityattributechange.cpp
-    commands/cmdentityattributechange.h
-    interface/attributedelegate.cpp
-    interface/attributedelegate.h
-    addpropertytemplatedialog.cpp
-    addpropertytemplatedialog.h
-    addpropertytemplatedialog.ui
-    propertytemplatemanager.cpp
-    propertytemplatemanager.h
-    propertytemplatemanager.ui
-    propertytemplatewidget.cpp
-    propertytemplatewidget.h
+    undocommand.cpp
+    undocommand.h
+    vemodel.cpp
+    vemodel.h
+    veobject.cpp
+    veobject.h
     xmlhighlighter.cpp
     xmlhighlighter.h
+    xmlreader.cpp
+    xmlreader.h
 )
 
 target_include_directories(${LIB_NAME} PUBLIC .)

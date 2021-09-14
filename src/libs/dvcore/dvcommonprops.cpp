@@ -37,6 +37,8 @@ const QHash<QString, Props::Token> Props::TokensByName = {
     { "name", Token::name },
     { "value", Token::value },
     { "url", Token::url },
+    { "type", Token::type },
+    { "encoding", Token::encoding },
 
     { "port", Token::port },
     { "bus", Token::bus },
@@ -64,6 +66,11 @@ const QHash<QString, Props::Token> Props::TokensByName = {
     { "Boards", Token::Boards },
     { "Board", Token::Board },
     { "Port", Token::Port },
+    { "Pseudo_Function", Token::Pseudo_Function },
+    { "Provided_Interface", Token::Provided_Interface },
+    { "Required_Interface", Token::Required_Interface },
+    { "Input_Parameter", Token::Input_Parameter },
+    { "Output_Parameter", Token::Output_Parameter },
 };
 
 Props::Token Props::token(const QString &fromString)

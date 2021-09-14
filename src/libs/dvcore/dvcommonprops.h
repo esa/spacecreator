@@ -42,14 +42,22 @@ public:
         Function,
         Message,
 
+        // HW Library
         Boards,
         Board,
         Port,
+        Pseudo_Function,
+        Provided_Interface,
+        Required_Interface,
+        Input_Parameter,
+        Output_Parameter,
 
         // attrs:
         name,
         value,
         url,
+        type,
+        encoding,
 
         from_node,
         from_port,

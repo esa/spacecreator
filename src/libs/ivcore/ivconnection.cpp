@@ -357,7 +357,7 @@ QString IVConnection::name() const
 /*!
    Returns the parameters. Usually that's the parameters  of the provider interface
  */
-QVector<InterfaceParameter> IVConnection::params() const
+QVector<shared::InterfaceParameter> IVConnection::params() const
 {
     if (d->targetIface()) {
         return d->targetIface()->params();

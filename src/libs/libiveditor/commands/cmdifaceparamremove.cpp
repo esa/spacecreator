@@ -26,7 +26,7 @@
 namespace ive {
 namespace cmd {
 
-CmdIfaceParamRemove::CmdIfaceParamRemove(ivm::IVObject *entity, const ivm::InterfaceParameter &param)
+CmdIfaceParamRemove::CmdIfaceParamRemove(ivm::IVObject *entity, const shared::InterfaceParameter &param)
     : CmdIfaceParamCreate(entity, param)
 {
     setText(QObject::tr("Remove Iface Parameter"));
@@ -37,8 +37,8 @@ void CmdIfaceParamRemove::redo()
     if (!m_iface)
         return;
 
-    QVector<ivm::InterfaceParameter> currParams = m_iface->params();
-    for (const ivm::InterfaceParameter &param : m_targetParams)
+    QVector<shared::InterfaceParameter> currParams = m_iface->params();
+    for (const shared::InterfaceParameter &param : m_targetParams)
         currParams.removeAll(param);
     m_iface->setParams(currParams);
 

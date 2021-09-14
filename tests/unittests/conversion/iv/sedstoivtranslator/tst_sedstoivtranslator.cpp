@@ -109,7 +109,7 @@ void tst_SedsToIvTranslator::testTranslateComponentWithProvidedInterface()
     const auto param = params[0];
     QCOMPARE(param.name(), "InputParam");
     QCOMPARE(param.paramTypeName(), "Interface_ICommand_Type");
-    QCOMPARE(param.direction(), ivm::InterfaceParameter::Direction::IN);
+    QCOMPARE(param.direction(), shared::InterfaceParameter::Direction::IN);
 }
 
 void tst_SedsToIvTranslator::testTranslateComponentWithRequiredInterface()
@@ -165,7 +165,7 @@ void tst_SedsToIvTranslator::testTranslateComponentWithRequiredInterface()
     const auto param = params[0];
     QCOMPARE(param.name(), "InputParam");
     QCOMPARE(param.paramTypeName(), "Interface_ICommand_Type");
-    QCOMPARE(param.direction(), ivm::InterfaceParameter::Direction::IN);
+    QCOMPARE(param.direction(), shared::InterfaceParameter::Direction::IN);
 }
 
 } // namespace tests::conversion::iv

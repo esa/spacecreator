@@ -25,6 +25,8 @@
 #include "dvobject.h"
 #include "dvpartition.h"
 #include "dvport.h"
+#include "dvpseudofunction.h"
+#include "dvpseudointerface.h"
 #include "errorhub.h"
 
 #include <QDebug>
@@ -80,6 +82,36 @@ void DVHWLibraryReader::processTagOpen(QXmlStreamReader &xml)
             obj = port;
         }
     } break;
+    case meta::Props::Token::Pseudo_Function: {
+        Q_ASSERT(d->m_currentObject != nullptr);
+        if (auto board = qobject_cast<DVBoard *>(d->m_currentObject)) {
+            obj = new dvm::DVPseudoFunction(d->m_currentObject);
+        }
+    } break;
+    case meta::Props::Token::Provided_Interface:
+    case meta::Props::Token::Required_Interface: {
+        Q_ASSERT(d->m_currentObject != nullptr);
+        if (auto board = qobject_cast<DVPseudoFunction *>(d->m_currentObject)) {
+            auto interface = new dvm::DVPseudoInterface(d->m_currentObject);
+            obj = interface;
+            interface->setInterfaceType(t == meta::Props::Token::Provided_Interface
+                            ? dvm::DVPseudoInterface::InterfaceType::Provided
+                            : dvm::DVPseudoInterface::InterfaceType::Required);
+            break;
+        }
+        break;
+    }
+    case meta::Props::Token::Output_Parameter:
+    case meta::Props::Token::Input_Parameter: {
+        auto iface = qobject_cast<DVPseudoInterface *>(d->m_currentObject);
+        Q_ASSERT(iface != nullptr);
+        const EntityAttributes attrs = attributes(xml.attributes());
+        const shared::InterfaceParameter param = addIfaceParameter(attrs,
+                t == meta::Props::Token::Input_Parameter ? shared::InterfaceParameter::Direction::IN
+                                                         : shared::InterfaceParameter::Direction::OUT);
+        iface->addParam(param);
+        break;
+    }
     default:
         static const QString msg = tr("The '%1' is unknown/unexpected here: %2@%3 %4");
         shared::ErrorHub::addError(shared::ErrorItem::Warning,

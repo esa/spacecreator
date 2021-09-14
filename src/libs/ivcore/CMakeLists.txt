@@ -29,8 +29,6 @@ target_sources(${LIB_NAME} PRIVATE
     ivinterfacegroup.h
     ivmodel.cpp
     ivmodel.h
-    parameter.cpp
-    parameter.h
     ivtestutils.cpp
     ivtestutils.h
     ivxmlreader.cpp

@@ -44,7 +44,7 @@ void CmdContextParameterRemove::redo()
     if (!m_entity)
         return;
 
-    for (const ivm::ContextParameter &param : m_params)
+    for (const shared::ContextParameter &param : m_params)
         m_entity->removeContextParam(param);
 }
 
@@ -53,12 +53,12 @@ void CmdContextParameterRemove::undo()
     if (!m_entity)
         return;
 
-    QVector<ivm::ContextParameter> params = m_entity->contextParams();
+    QVector<shared::ContextParameter> params = m_entity->contextParams();
 
     QList<int> ids = m_params.keys();
     std::sort(ids.begin(), ids.end());
     for (int i : ids) {
-        const ivm::ContextParameter &param = m_params.value(i);
+        const shared::ContextParameter &param = m_params.value(i);
         params.insert(i, param);
     }
     m_entity->setContextParams(params);

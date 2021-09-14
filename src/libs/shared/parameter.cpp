@@ -22,7 +22,7 @@
 
 #include <QMetaEnum>
 
-namespace ivm {
+namespace shared {
 
 BasicParameter::BasicParameter(const QString &name, Type t, const QString &paramTypeName)
     : m_paramName(name)

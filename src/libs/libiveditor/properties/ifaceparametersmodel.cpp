@@ -41,7 +41,7 @@ IfaceParametersModel::IfaceParametersModel(
 
 IfaceParametersModel::~IfaceParametersModel() { }
 
-void IfaceParametersModel::createNewRow(const ivm::InterfaceParameter &param, int row)
+void IfaceParametersModel::createNewRow(const shared::InterfaceParameter &param, int row)
 {
     m_params.insert(row, param);
 
@@ -62,8 +62,8 @@ void IfaceParametersModel::createNewRow(const ivm::InterfaceParameter &param, in
 
     QStandardItem *directionItem = new QStandardItem(row, Column::Direction);
     directionItem->setData(shared::typeName(param.direction()), DataRole);
-    directionItem->setData(QStringList { shared::typeName(ivm::InterfaceParameter::Direction::IN),
-                                   shared::typeName(ivm::InterfaceParameter::Direction::OUT) },
+    directionItem->setData(QStringList { shared::typeName(shared::InterfaceParameter::Direction::IN),
+                                   shared::typeName(shared::InterfaceParameter::Direction::OUT) },
             EditRole);
     setItem(row, Column::Direction, directionItem);
 }
@@ -78,11 +78,11 @@ void IfaceParametersModel::setDataObject(shared::VEObject *obj)
         return;
 
     if (auto iface = qobject_cast<ivm::IVInterface *>(m_dataObject)) {
-        const QVector<ivm::InterfaceParameter> &params(iface->params());
+        const QVector<shared::InterfaceParameter> &params(iface->params());
         const int paramsCount = params.size();
 
         for (int i = 0; i < paramsCount; ++i) {
-            const ivm::InterfaceParameter &param = params.at(i);
+            const shared::InterfaceParameter &param = params.at(i);
             createNewRow(param, i);
         }
     }
@@ -100,8 +100,8 @@ bool IfaceParametersModel::setData(const QModelIndex &index, const QVariant &val
         return false;
 
     if (role == DataRole || role == Qt::EditRole) {
-        const ivm::InterfaceParameter &paramOld = m_params.value(index.row());
-        ivm::InterfaceParameter paramNew(paramOld);
+        const shared::InterfaceParameter &paramOld = m_params.value(index.row());
+        shared::InterfaceParameter paramNew(paramOld);
 
         switch (index.column()) {
         case Column::Name: {
@@ -120,7 +120,7 @@ bool IfaceParametersModel::setData(const QModelIndex &index, const QVariant &val
             break;
         }
         case Column::Direction: {
-            if (!paramNew.setDirection(shared::typeFromName<ivm::InterfaceParameter::Direction>(value.toString())))
+            if (!paramNew.setDirection(shared::typeFromName<shared::InterfaceParameter::Direction>(value.toString())))
                 return false;
             break;
         }
@@ -138,7 +138,7 @@ bool IfaceParametersModel::setData(const QModelIndex &index, const QVariant &val
 
 bool IfaceParametersModel::createProperty(const QString &propName)
 {
-    ivm::InterfaceParameter param(propName);
+    shared::InterfaceParameter param(propName);
     if (!m_asn1Names.isEmpty()) {
         param.setParamTypeName(m_asn1Names.front());
     }

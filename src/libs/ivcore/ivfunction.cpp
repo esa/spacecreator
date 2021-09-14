@@ -174,7 +174,7 @@ void IVFunction::reflectContextParam()
     reflectContextParams(d->m_fnType->contextParams());
 }
 
-void IVFunction::reflectContextParams(const QVector<ContextParameter> &params)
+void IVFunction::reflectContextParams(const QVector<shared::ContextParameter> &params)
 {
     setContextParams(params);
 }

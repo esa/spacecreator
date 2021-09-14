@@ -26,7 +26,7 @@ namespace ive {
 namespace cmd {
 
 CmdIfaceParamChange::CmdIfaceParamChange(
-        ivm::IVObject *entity, const ivm::InterfaceParameter &from, const ivm::InterfaceParameter &to)
+        ivm::IVObject *entity, const shared::InterfaceParameter &from, const shared::InterfaceParameter &to)
     : CmdIfaceParamBase(entity ? entity->as<ivm::IVInterface *>() : nullptr)
     , m_newParam(to)
     , m_oldParam(from)
@@ -34,7 +34,7 @@ CmdIfaceParamChange::CmdIfaceParamChange(
     setText(QObject::tr("Change Iface Parameter"));
 }
 
-void CmdIfaceParamChange::swapParam(const ivm::InterfaceParameter &from, const ivm::InterfaceParameter &to)
+void CmdIfaceParamChange::swapParam(const shared::InterfaceParameter &from, const shared::InterfaceParameter &to)
 {
     if (!m_iface)
         return;

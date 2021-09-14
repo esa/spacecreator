@@ -27,8 +27,8 @@
 #include <conversion/common/qstringhash.h>
 #include <conversion/common/translation/exceptions.h>
 #include <ivcore/ivfunction.h>
-#include <ivcore/parameter.h>
 #include <seds/SedsModel/package/package.h>
+#include <shared/parameter.h>
 
 using conversion::translator::MissingGenericTypeMappingException;
 using conversion::translator::TranslationException;
@@ -101,8 +101,8 @@ void AsyncInterfaceCommandTranslator::translateArguments(const seds::model::Inte
 
     buildAsn1SequenceType(command, requestedArgumentMode, asn1TypeName);
 
-    auto ivParameter = ivm::InterfaceParameter(m_interfaceParameterName, ivm::BasicParameter::Type::Other, asn1TypeName,
-            m_interfaceParameterEncoding, ivm::InterfaceParameter::Direction::IN);
+    auto ivParameter = shared::InterfaceParameter(m_interfaceParameterName, shared::BasicParameter::Type::Other,
+            asn1TypeName, m_interfaceParameterEncoding, shared::InterfaceParameter::Direction::IN);
     ivInterface->addParam(ivParameter);
 }
 

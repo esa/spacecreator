@@ -32,17 +32,17 @@ class CmdIfaceParamChange : public CmdIfaceParamBase
 {
 public:
     explicit CmdIfaceParamChange(
-            ivm::IVObject *entity, const ivm::InterfaceParameter &from, const ivm::InterfaceParameter &to);
+            ivm::IVObject *entity, const shared::InterfaceParameter &from, const shared::InterfaceParameter &to);
 
     void redo() override;
     void undo() override;
     int id() const override;
 
 protected:
-    ivm::InterfaceParameter m_newParam;
-    ivm::InterfaceParameter m_oldParam;
+    shared::InterfaceParameter m_newParam;
+    shared::InterfaceParameter m_oldParam;
 
-    void swapParam(const ivm::InterfaceParameter &from, const ivm::InterfaceParameter &to);
+    void swapParam(const shared::InterfaceParameter &from, const shared::InterfaceParameter &to);
 };
 
 }

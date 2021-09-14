@@ -98,7 +98,7 @@ void tst_XmlDocExporter::testExportFunctions()
     testfunc1->setEntityAttribute(QLatin1String("instance_of"), QString());
     testfunc1->setEntityProperty(QLatin1String("bar"), QVariant::fromValue(22));
     testfunc1->addContextParam(
-            ivm::ContextParameter("Mo", ivm::BasicParameter::Type::Other, "MyInt", QVariant::fromValue(33)));
+            shared::ContextParameter("Mo", shared::BasicParameter::Type::Other, "MyInt", QVariant::fromValue(33)));
 
     QVector<ivm::IVObject *> objects;
     objects.append(testfunc1);

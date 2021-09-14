@@ -23,6 +23,8 @@
 
 namespace ivm {
 class IVObject;
+}
+namespace shared {
 class InterfaceParameter;
 }
 
@@ -32,15 +34,15 @@ namespace cmd {
 class CmdIfaceParamCreate : public CmdIfaceParamBase
 {
 public:
-    explicit CmdIfaceParamCreate(ivm::IVObject *entity, const ivm::InterfaceParameter &param);
+    explicit CmdIfaceParamCreate(ivm::IVObject *entity, const shared::InterfaceParameter &param);
 
     void redo() override;
     void undo() override;
     int id() const override;
 
 protected:
-    QVector<ivm::InterfaceParameter> m_targetParams;
-    const QVector<ivm::InterfaceParameter> m_sourceParams;
+    QVector<shared::InterfaceParameter> m_targetParams;
+    const QVector<shared::InterfaceParameter> m_sourceParams;
 };
 
 }

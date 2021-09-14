@@ -74,11 +74,11 @@ public:
             const QModelIndex &destinationParent, int destinationChild) override;
 private:
     cmd::CommandsStack::Macro *m_cmdMacro { nullptr };
-    QVector<ivm::ContextParameter> m_params;
+    QVector<shared::ContextParameter> m_params;
     QPointer<Asn1Acn::Asn1SystemChecks> m_asn1Checks;
     QStringList m_asn1Names;
 
-    void createNewRow(const ivm::ContextParameter &param, int row);
+    void createNewRow(const shared::ContextParameter &param, int row);
 };
 
 }

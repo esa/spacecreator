@@ -404,7 +404,7 @@ QVector<msc::MscMessageDeclaration *> IvSystemChecks::allConnectionsAsDeclaratio
         auto declaration = new msc::MscMessageDeclaration();
         declaration->setNames({ connection->name() });
         QStringList params;
-        for (ivm::InterfaceParameter p : connection->params()) {
+        for (shared::InterfaceParameter p : connection->params()) {
             params.append(p.paramTypeName());
         }
         declaration->setTypeRefList(params);

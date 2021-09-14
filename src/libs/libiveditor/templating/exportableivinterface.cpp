@@ -40,7 +40,7 @@ bool ExportableIVInterface::isRequired() const
 QVariantList ExportableIVInterface::paramList() const
 {
     QVariantList list;
-    for (const ivm::InterfaceParameter &param : exportedObject<ivm::IVInterface>()->params())
+    for (const shared::InterfaceParameter &param : exportedObject<ivm::IVInterface>()->params())
         list << QVariant::fromValue(param);
     return list;
 }

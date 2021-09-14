@@ -32,7 +32,7 @@ namespace ivm {
 
 struct IVFunctionTypePrivate {
     QVector<IVObject *> m_children {};
-    QVector<ContextParameter> m_contextParams {};
+    QVector<shared::ContextParameter> m_contextParams {};
     QVector<QPointer<IVFunction>> m_instances {};
 
     QVector<IVFunctionType *> m_functionTypes;
@@ -272,21 +272,21 @@ bool IVFunctionType::hasInterface(const QString &name, Qt::CaseSensitivity caseS
     return false;
 }
 
-QVector<ContextParameter> IVFunctionType::contextParams() const
+QVector<shared::ContextParameter> IVFunctionType::contextParams() const
 {
     return d->m_contextParams;
 }
 
-ContextParameter IVFunctionType::contextParam(const QString &name) const
+shared::ContextParameter IVFunctionType::contextParam(const QString &name) const
 {
     if (!name.isEmpty())
-        for (const ContextParameter &param : contextParams())
+        for (const shared::ContextParameter &param : contextParams())
             if (param.name() == name)
                 return param;
     return {};
 }
 
-void IVFunctionType::addContextParam(const ContextParameter &param)
+void IVFunctionType::addContextParam(const shared::ContextParameter &param)
 {
     if (!d->m_contextParams.contains(param)) {
         d->m_contextParams.append(param);
@@ -294,7 +294,7 @@ void IVFunctionType::addContextParam(const ContextParameter &param)
     }
 }
 
-bool IVFunctionType::removeContextParam(const ContextParameter &param)
+bool IVFunctionType::removeContextParam(const shared::ContextParameter &param)
 {
     const bool removed = d->m_contextParams.removeOne(param);
     if (removed)
@@ -312,7 +312,7 @@ void IVFunctionType::clearContextParams()
         Q_EMIT contextParamsChanged();
 }
 
-void IVFunctionType::setContextParams(const QVector<ContextParameter> &params)
+void IVFunctionType::setContextParams(const QVector<shared::ContextParameter> &params)
 {
     if (d->m_contextParams != params) {
         d->m_contextParams = params;

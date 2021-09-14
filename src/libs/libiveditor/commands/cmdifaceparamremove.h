@@ -30,7 +30,7 @@ namespace cmd {
 class CmdIfaceParamRemove : public CmdIfaceParamCreate
 {
 public:
-    explicit CmdIfaceParamRemove(ivm::IVObject *entity, const ivm::InterfaceParameter &param);
+    explicit CmdIfaceParamRemove(ivm::IVObject *entity, const shared::InterfaceParameter &param);
 
     void redo() override;
     void undo() override;

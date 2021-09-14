@@ -421,7 +421,7 @@ QString ActionsManager::replaceKeyHolder(
                 case ivm::IVObject::Type::RequiredInterface:
                 case ivm::IVObject::Type::ProvidedInterface:
                     if (const ivm::IVInterface *iface = ivObj->as<const ivm::IVInterface *>()) {
-                        const ivm::InterfaceParameter &ifaceParam = iface->param(name);
+                        const shared::InterfaceParameter &ifaceParam = iface->param(name);
                         if (!ifaceParam.isNull())
                             return ifaceParam.toString();
                     }
@@ -429,7 +429,7 @@ QString ActionsManager::replaceKeyHolder(
                 case ivm::IVObject::Type::Function:
                 case ivm::IVObject::Type::FunctionType:
                     if (const ivm::IVFunctionType *fn = ivObj->as<const ivm::IVFunctionType *>()) {
-                        const ivm::ContextParameter &ctxParam = fn->contextParam(name);
+                        const shared::ContextParameter &ctxParam = fn->contextParam(name);
                         if (!ctxParam.isNull())
                             return ctxParam.toString();
                     }
