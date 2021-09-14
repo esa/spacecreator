@@ -15,6 +15,7 @@
                 <Entry value="Simulink"/>
                 <Entry value="Blackbox_Device"/>
                 <Entry value="VHDL"/>
+                <Entry value="Pseudo function"/>
             </Enumeration>
         </Type>
     </Attr>
