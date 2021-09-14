@@ -42,10 +42,6 @@ static inline QList<QGraphicsItem *> intersectedItems(VEConnectionGraphicsItem *
                     return true;
                 }
 
-                if (item->parentItem() != connection->parentItem()) {
-                    return true;
-                }
-
                 const auto intersectionPoints =
                         graphicsviewutils::intersectionPoints(item->sceneBoundingRect(), points);
                 return intersectionPoints.size() <= 1;
@@ -482,12 +478,7 @@ void VEConnectionGraphicsItem::onManualMoveFinish(GripPoint *gp, const QPointF &
     auto updateEndPointItem = [](VEConnectionEndPointGraphicsItem *endPointItem) {
         if (endPointItem) {
             endPointItem->instantLayoutUpdate();
-            //            if (endPointItem->entity()->isRequired()) {
             layoutInterfaceConnections(endPointItem, LayoutPolicy::Default, CollisionsPolicy::Rebuild, true);
-            //            } else {
-            //                layoutInterfaceConnections(endPointItem, LayoutPolicy::LastSegment,
-            //                CollisionsPolicy::Rebuild, true);
-            //            }
         }
     };
 
