@@ -58,6 +58,7 @@ public:
 
     auto dataTypes() const -> const DataTypeSet &;
     auto addDataType(DataType dataType) -> void;
+    auto findDataType(const QString &dataTypeName) const -> const DataType *;
 
     auto declaredInterfaces() const -> const DeclaredInterfaceSet &;
     auto addInterfaceDeclaration(InterfaceDeclaration interfaceDeclaration) -> void;

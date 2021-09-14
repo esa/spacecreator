@@ -57,7 +57,6 @@ int main(int argc, char **argv)
     options.add(SedsOptions::schemaFilename, "seds.xsd");
     options.add(SedsOptions::externalRefFilename, "config.toml");
     options.add(SedsOptions::skipValidation);
-    options.add(SedsOptions::keepIntermediateFiles);
     options.add(IvOptions::configFilename, "config.xml");
     options.add(IvOptions::outputFilename, QString("%1.iv").arg(argv[1]));
 

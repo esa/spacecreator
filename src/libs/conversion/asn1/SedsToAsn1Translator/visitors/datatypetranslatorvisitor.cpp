@@ -23,7 +23,9 @@
 #include "visitors/integerrangetranslatorvisitor.h"
 
 #include <QDebug>
+#include <asn1library/asn1/constraints/rangeconstraint.h>
 #include <asn1library/asn1/constraints/sizeconstraint.h>
+#include <asn1library/asn1/definitions.h>
 #include <asn1library/asn1/typeassignment.h>
 #include <asn1library/asn1/types/bitstring.h>
 #include <asn1library/asn1/types/boolean.h>
@@ -31,17 +33,11 @@
 #include <asn1library/asn1/types/ia5string.h>
 #include <asn1library/asn1/types/integer.h>
 #include <asn1library/asn1/types/real.h>
+#include <asn1library/asn1/types/sequenceof.h>
+#include <asn1library/asn1/types/userdefinedtype.h>
 #include <asn1library/asn1/values.h>
 #include <conversion/common/translation/exceptions.h>
-#include <seds/SedsModel/types/arraydatatype.h>
-#include <seds/SedsModel/types/binarydatatype.h>
-#include <seds/SedsModel/types/booleandatatype.h>
-#include <seds/SedsModel/types/containerdatatype.h>
-#include <seds/SedsModel/types/enumerateddatatype.h>
-#include <seds/SedsModel/types/floatdatatype.h>
-#include <seds/SedsModel/types/integerdatatype.h>
-#include <seds/SedsModel/types/stringdatatype.h>
-#include <seds/SedsModel/types/subrangedatatype.h>
+#include <seds/SedsModel/package/package.h>
 
 using conversion::translator::TranslationException;
 using conversion::translator::UnhandledValueException;
@@ -67,15 +63,42 @@ overloaded(Ts...)->overloaded<Ts...>;
 
 void DataTypeTranslatorVisitor::operator()(const ArrayDataType &sedsType)
 {
-    Q_UNUSED(sedsType);
-    throw TranslationException("ArrayDataType translation not implemented");
+    const auto &dimensions = sedsType.dimensions();
+    if (dimensions.empty()) {
+        throw TranslationException("Encountered ArrayDataType without dimensions");
+    }
+
+    if (dimensions.size() == 1) { // Sequence of type with one dimension
+        auto type = std::make_unique<Asn1Acn::Types::SequenceOf>(sedsType.nameStr());
+        translateArrayType(sedsType.type().nameStr(), type.get());
+        translateArrayDimension(dimensions[0], type.get());
+
+        m_asn1Type = std::move(type);
+    } else { // Sequence of with many dimensions
+        // The outermost 'sequence of' element
+        auto rootType = std::make_unique<Asn1Acn::Types::SequenceOf>(sedsType.nameStr());
+        translateArrayDimension(dimensions[0], rootType.get());
+
+        // Create 'sequence of' chain
+        auto *lastType = rootType.get();
+        std::for_each(std::next(dimensions.begin()), dimensions.end(), [&](const auto &dimension) {
+            auto subType = std::make_unique<Asn1Acn::Types::SequenceOf>();
+            translateArrayDimension(dimension, subType.get());
+            lastType->setItemsType(std::move(subType));
+
+            lastType = dynamic_cast<Asn1Acn::Types::SequenceOf *>(lastType->itemsType());
+        });
+
+        // Add item type to the last element
+        translateArrayType(sedsType.type().nameStr(), lastType);
+
+        m_asn1Type = std::move(rootType);
+    }
 }
 
 void DataTypeTranslatorVisitor::operator()(const BinaryDataType &sedsType)
 {
-    const auto &typeName = sedsType.name().value();
-
-    auto type = std::make_unique<Asn1Acn::Types::BitString>(typeName);
+    auto type = std::make_unique<Asn1Acn::Types::BitString>(sedsType.nameStr());
     translateBitStringLength(sedsType, type.get());
 
     m_asn1Type = std::move(type);
@@ -83,9 +106,7 @@ void DataTypeTranslatorVisitor::operator()(const BinaryDataType &sedsType)
 
 void DataTypeTranslatorVisitor::operator()(const BooleanDataType &sedsType)
 {
-    const auto &typeName = sedsType.name().value();
-
-    auto type = std::make_unique<Asn1Acn::Types::Boolean>(typeName);
+    auto type = std::make_unique<Asn1Acn::Types::Boolean>(sedsType.nameStr());
     translateBooleanEncoding(sedsType.encoding(), type.get());
 
     m_asn1Type = std::move(type);
@@ -99,9 +120,7 @@ void DataTypeTranslatorVisitor::operator()(const ContainerDataType &sedsType)
 
 void DataTypeTranslatorVisitor::operator()(const EnumeratedDataType &sedsType)
 {
-    const auto &typeName = sedsType.name().value();
-
-    auto type = std::make_unique<Asn1Acn::Types::Enumerated>(typeName);
+    auto type = std::make_unique<Asn1Acn::Types::Enumerated>(sedsType.nameStr());
     translateIntegerEncoding(sedsType.encoding(), type.get());
     translateEnumerationList(sedsType.enumerationList(), type.get());
 
@@ -110,9 +129,7 @@ void DataTypeTranslatorVisitor::operator()(const EnumeratedDataType &sedsType)
 
 void DataTypeTranslatorVisitor::operator()(const FloatDataType &sedsType)
 {
-    const auto &typeName = sedsType.name().value();
-
-    auto type = std::make_unique<Asn1Acn::Types::Real>(typeName);
+    auto type = std::make_unique<Asn1Acn::Types::Real>(sedsType.nameStr());
     std::visit(FloatRangeTranslatorVisitor { type->constraints() }, sedsType.range());
     translateFloatEncoding(sedsType.encoding(), type.get());
 
@@ -121,9 +138,7 @@ void DataTypeTranslatorVisitor::operator()(const FloatDataType &sedsType)
 
 void DataTypeTranslatorVisitor::operator()(const IntegerDataType &sedsType)
 {
-    const auto &typeName = sedsType.name().value();
-
-    auto type = std::make_unique<Asn1Acn::Types::Integer>(typeName);
+    auto type = std::make_unique<Asn1Acn::Types::Integer>(sedsType.nameStr());
     std::visit(IntegerRangeTranslatorVisitor { type->constraints() }, sedsType.range());
     translateIntegerEncoding(sedsType.encoding(), type.get());
 
@@ -132,9 +147,7 @@ void DataTypeTranslatorVisitor::operator()(const IntegerDataType &sedsType)
 
 void DataTypeTranslatorVisitor::operator()(const StringDataType &sedsType)
 {
-    const auto &typeName = sedsType.name().value();
-
-    auto type = std::make_unique<Asn1Acn::Types::IA5String>(typeName);
+    auto type = std::make_unique<Asn1Acn::Types::IA5String>(sedsType.nameStr());
     translateStringLength(sedsType, type.get());
     translateStringEncoding(sedsType.encoding(), type.get());
 
@@ -327,6 +340,41 @@ void DataTypeTranslatorVisitor::translateStringLength(
     }
 
     asn1Type->constraints().append(std::move(sizeConstraint));
+}
+
+void DataTypeTranslatorVisitor::translateArrayType(
+        const QString &sedsTypeName, Asn1Acn::Types::SequenceOf *asn1Type) const
+{
+    const auto *asn1ReferencedType = m_asn1Definitions->type(sedsTypeName)->type();
+    auto asn1ItemType = std::make_unique<Asn1Acn::Types::UserdefinedType>(
+            asn1ReferencedType->identifier(), m_asn1Definitions->name());
+    asn1ItemType->setType(asn1ReferencedType->clone());
+
+    asn1Type->setItemsType(std::move(asn1ItemType));
+}
+
+void DataTypeTranslatorVisitor::translateArrayDimension(
+        const seds::model::DimensionSize &dimension, Asn1Acn::Types::SequenceOf *asn1Type) const
+{
+    if (dimension.size()) {
+        const auto dimensionSize = dimension.size()->value();
+
+        if (dimensionSize > std::numeric_limits<Asn1Acn::IntegerValue::Type>::max()) {
+            const auto message = QString("Dimension size (%1) overflows ASN.1 range").arg(dimensionSize);
+            throw TranslationException(message);
+        }
+
+        auto rangeConstraint = Asn1Acn::Constraints::RangeConstraint<Asn1Acn::IntegerValue>::create(
+                { static_cast<Asn1Acn::IntegerValue::Type>(dimensionSize) });
+
+        auto sizeConstraint = std::make_unique<Asn1Acn::Constraints::SizeConstraint<Asn1Acn::IntegerValue>>();
+        sizeConstraint->setInnerConstraints(std::move(rangeConstraint));
+        asn1Type->constraints().append(std::move(sizeConstraint));
+    } else if (dimension.indexTypeRef()) {
+        throw TranslationException("Array dimension with index type not yet implemented");
+    } else {
+        throw TranslationException("Array dimension without size nor index type");
+    }
 }
 
 void DataTypeTranslatorVisitor::translateEnumerationList(
