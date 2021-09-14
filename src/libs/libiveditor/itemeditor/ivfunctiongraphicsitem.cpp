@@ -58,6 +58,15 @@ IVFunctionGraphicsItem::IVFunctionGraphicsItem(ivm::IVFunction *entity, QGraphic
 
 IVFunctionGraphicsItem::~IVFunctionGraphicsItem() { }
 
+void IVFunctionGraphicsItem::init()
+{
+    IVFunctionTypeGraphicsItem::init();
+    if (auto dataObj = entity()) {
+        connect(dataObj, &ivm::IVFunction::childAdded, this, [this](){ update(); });
+        connect(dataObj, &ivm::IVFunction::childRemoved, this, [this](){ update(); });
+    }
+}
+
 ivm::IVFunction *IVFunctionGraphicsItem::entity() const
 {
     return qobject_cast<ivm::IVFunction *>(m_dataObject);

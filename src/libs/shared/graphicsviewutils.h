@@ -17,7 +17,7 @@ static const QList<Qt::Alignment> kRectSides = { Qt::AlignLeft, Qt::AlignTop, Qt
 static const QSizeF kDefaultGraphicsItemSize = { 200, 80 };
 static const QSizeF kDefaultNodeGraphicsItemSize = { 160, 160 };
 
-static const qreal kInterfaceLayoutOffset = 12.0;
+static const qreal kInterfaceLayoutOffset = 17.0;
 
 /*!
  * \brief The tolerance used to find an IVInterfaceGraphicsItem on scene (the size of a square used as a search area)

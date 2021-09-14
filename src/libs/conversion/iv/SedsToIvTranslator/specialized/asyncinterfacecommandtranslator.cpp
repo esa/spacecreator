@@ -24,6 +24,7 @@
 #include <asn1library/asn1/definitions.h>
 #include <asn1library/asn1/types/sequence.h>
 #include <conversion/asn1/SedsToAsn1Translator/visitors/datatypetranslatorvisitor.h>
+#include <conversion/common/qstringhash.h>
 #include <conversion/common/translation/exceptions.h>
 #include <ivcore/ivfunction.h>
 #include <ivcore/parameter.h>
@@ -36,9 +37,11 @@ using conversion::translator::UnhandledValueException;
 
 namespace conversion::iv::translator {
 
+std::set<std::size_t> AsyncInterfaceCommandTranslator::m_asn1InterfaceArgumentsHashesCache;
+
 const QString AsyncInterfaceCommandTranslator::m_interfaceParameterName = "InputParam";
 const QString AsyncInterfaceCommandTranslator::m_interfaceParameterEncoding = "ACN";
-const QString AsyncInterfaceCommandTranslator::m_asn1GroupTypeTemplate = "%1_%2_Type";
+const QString AsyncInterfaceCommandTranslator::m_asn1BundledTypeTemplate = "%1_%2_Type";
 const QString AsyncInterfaceCommandTranslator::m_ivInterfaceNameTemplate = "%1_%2_%3";
 
 AsyncInterfaceCommandTranslator::AsyncInterfaceCommandTranslator(const seds::model::Package &package,
@@ -94,36 +97,64 @@ void AsyncInterfaceCommandTranslator::translateCommand(
 void AsyncInterfaceCommandTranslator::translateArguments(const seds::model::InterfaceCommand &command,
         seds::model::CommandArgumentMode requestedArgumentMode, ivm::IVInterface *ivInterface)
 {
-    const auto asn1TypeName = m_asn1GroupTypeTemplate.arg(m_interface.nameStr()).arg(command.nameStr());
-    auto asn1Type = std::make_unique<Asn1Acn::Types::Sequence>(asn1TypeName);
+    const auto asn1TypeName = m_asn1BundledTypeTemplate.arg(m_interface.nameStr()).arg(command.nameStr());
 
-    for (const auto &argument : command.arguments()) {
-        if (argument.mode() == requestedArgumentMode) {
-            asn1Type->addComponent(createAsn1SequenceComponent(argument));
-        }
-    }
-
-    auto asn1TypeAssignment = std::make_unique<Asn1Acn::TypeAssignment>(
-            asn1Type->identifier(), asn1Type->identifier(), Asn1Acn::SourceLocation(), std::move(asn1Type));
-    m_asn1Definitions->addType(std::move(asn1TypeAssignment));
+    buildAsn1SequenceType(command, requestedArgumentMode, asn1TypeName);
 
     auto ivParameter = ivm::InterfaceParameter(m_interfaceParameterName, ivm::BasicParameter::Type::Other, asn1TypeName,
             m_interfaceParameterEncoding, ivm::InterfaceParameter::Direction::IN);
     ivInterface->addParam(ivParameter);
 }
 
-std::unique_ptr<Asn1Acn::AsnSequenceComponent> AsyncInterfaceCommandTranslator::createAsn1SequenceComponent(
-        const seds::model::CommandArgument &commandArgument) const
+void AsyncInterfaceCommandTranslator::buildAsn1SequenceType(const seds::model::InterfaceCommand &command,
+        seds::model::CommandArgumentMode requestedArgumentMode, const QString &asn1TypeName) const
 {
-    const auto &genericArgumentTypeName = commandArgument.type().nameStr();
-    const auto &concreteArgumentTypeName = findMappedType(genericArgumentTypeName).nameStr();
-    const auto &concreteArgumentType = findDataType(concreteArgumentTypeName);
+    std::unordered_map<QString, QString> arguments;
+    for (const auto &argument : command.arguments()) {
+        if (argument.mode() == requestedArgumentMode) {
+            const auto &genericTypeName = argument.type().nameStr();
+            const auto &concreteTypeName = findMappedType(genericTypeName);
+
+            arguments.insert({ argument.nameStr(), concreteTypeName });
+        }
+    }
+
+    std::size_t asn1TypeHash = 0;
+    for (const auto &[name, typeName] : arguments) {
+        const auto typeNameHash = std::hash<QString> {}(typeName);
+
+        if (asn1TypeHash == 0) {
+            asn1TypeHash = typeNameHash;
+        } else {
+            asn1TypeHash ^= (typeNameHash << 1);
+        }
+    }
+
+    if (m_asn1InterfaceArgumentsHashesCache.count(asn1TypeHash) == 0) {
+        auto asn1Type = std::make_unique<Asn1Acn::Types::Sequence>(asn1TypeName);
+
+        for (const auto &[name, typeName] : arguments) {
+            asn1Type->addComponent(createAsn1SequenceComponent(name, typeName));
+        }
+
+        auto asn1TypeAssignment = std::make_unique<Asn1Acn::TypeAssignment>(
+                asn1Type->identifier(), asn1Type->identifier(), Asn1Acn::SourceLocation(), std::move(asn1Type));
+        m_asn1Definitions->addType(std::move(asn1TypeAssignment));
+
+        m_asn1InterfaceArgumentsHashesCache.insert(asn1TypeHash);
+    }
+}
+
+std::unique_ptr<Asn1Acn::AsnSequenceComponent> AsyncInterfaceCommandTranslator::createAsn1SequenceComponent(
+        const QString &name, const QString &argumentTypeName) const
+{
+    const auto &argumentType = findDataType(argumentTypeName);
 
     std::unique_ptr<Asn1Acn::Types::Type> asn1Type;
-    std::visit(conversion::asn1::translator::DataTypeTranslatorVisitor { asn1Type }, concreteArgumentType);
+    std::visit(conversion::asn1::translator::DataTypeTranslatorVisitor { asn1Type }, argumentType);
 
-    auto sequenceComponent = std::make_unique<Asn1Acn::AsnSequenceComponent>(commandArgument.nameStr(),
-            commandArgument.nameStr(), false, "", Asn1Acn::SourceLocation(), std::move(asn1Type));
+    auto sequenceComponent = std::make_unique<Asn1Acn::AsnSequenceComponent>(
+            name, name, false, "", Asn1Acn::SourceLocation(), std::move(asn1Type));
 
     return sequenceComponent;
 }
@@ -142,7 +173,7 @@ ivm::IVInterface *AsyncInterfaceCommandTranslator::createIvInterface(
     return ivm::IVInterface::createIface(creationInfo);
 }
 
-const seds::model::DataTypeRef &AsyncInterfaceCommandTranslator::findMappedType(const QString &genericTypeName) const
+const QString &AsyncInterfaceCommandTranslator::findMappedType(const QString &genericTypeName) const
 {
     const auto &genericTypeMaps = m_interface.genericTypeMapSet().genericTypeMaps();
 
@@ -151,10 +182,10 @@ const seds::model::DataTypeRef &AsyncInterfaceCommandTranslator::findMappedType(
                     const seds::model::GenericTypeMap &typeMap) { return typeMap.nameStr() == genericTypeName; });
 
     if (found != genericTypeMaps.end()) {
-        return found->type();
+        return found->type().nameStr();
+    } else {
+        return genericTypeName;
     }
-
-    throw MissingGenericTypeMappingException(genericTypeName, m_interface.nameStr());
 }
 
 const seds::model::DataType &AsyncInterfaceCommandTranslator::findDataType(const QString &dataTypeName) const
