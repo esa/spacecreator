@@ -69,12 +69,12 @@ std::vector<std::unique_ptr<Model>> SedsToAsn1Translator::translateSedsModel(con
 
     const auto &sedsModelData = sedsModel->data();
     if (std::holds_alternative<seds::model::PackageFile>(sedsModelData)) {
-        const auto &package = std::get<seds::model::PackageFile>(sedsModelData).package();
-        asn1Files.push_back(translatePackage(package));
+        const auto &sedsPackage = std::get<seds::model::PackageFile>(sedsModelData).package();
+        asn1Files.push_back(translatePackage(sedsPackage));
     } else if (std::holds_alternative<seds::model::DataSheet>(sedsModelData)) {
-        const auto &packages = std::get<seds::model::DataSheet>(sedsModelData).packages();
-        for (const auto &package : packages) {
-            asn1Files.push_back(translatePackage(package));
+        const auto &sedsPackages = std::get<seds::model::DataSheet>(sedsModelData).packages();
+        for (const auto &sedsPackage : sedsPackages) {
+            asn1Files.push_back(translatePackage(sedsPackage));
         }
     } else {
         throw TranslationException("Unhandled SEDS model data type");
@@ -88,49 +88,53 @@ std::vector<std::unique_ptr<Model>> SedsToAsn1Translator::translateSedsModel(con
     return result;
 }
 
-std::unique_ptr<Asn1Acn::File> SedsToAsn1Translator::translatePackage(const seds::model::Package &package) const
+std::unique_ptr<Asn1Acn::File> SedsToAsn1Translator::translatePackage(const seds::model::Package &sedsPackage) const
 {
-    std::vector<const seds::model::DataType *> dataTypes = collectDataTypes(package);
+    std::vector<const seds::model::DataType *> sedsDataTypes = collectDataTypes(sedsPackage);
 
-    auto definitions = std::make_unique<Asn1Acn::Definitions>(package.asn1NameStr(), Asn1Acn::SourceLocation());
-    translateDataTypes(dataTypes, definitions.get());
+    auto asn1Definitions = std::make_unique<Asn1Acn::Definitions>(sedsPackage.asn1NameStr(), Asn1Acn::SourceLocation());
+    translateDataTypes(sedsDataTypes, asn1Definitions.get());
 
-    auto asn1File = std::make_unique<Asn1Acn::File>(package.nameStr());
-    asn1File->add(std::move(definitions));
+    auto asn1File = std::make_unique<Asn1Acn::File>(sedsPackage.nameStr());
+    asn1File->add(std::move(asn1Definitions));
 
     return asn1File;
 }
 
 void SedsToAsn1Translator::translateDataTypes(
-        const std::vector<const seds::model::DataType *> &dataTypes, Asn1Acn::Definitions *definitions) const
+        const std::vector<const seds::model::DataType *> &sedsDataTypes, Asn1Acn::Definitions *asn1Definitions) const
 {
-    std::unique_ptr<Asn1Acn::Types::Type> type;
-
     DataTypesDependencyResolver dependencyResolver;
-    const auto resolvedDataTypes = dependencyResolver.resolve(&dataTypes);
+    const auto resolvedSedsDataTypes = dependencyResolver.resolve(&sedsDataTypes);
 
-    for (const auto *dataType : resolvedDataTypes) {
-        std::visit(DataTypeTranslatorVisitor { type }, *dataType);
+    std::unique_ptr<Asn1Acn::Types::Type> asn1Type;
+    DataTypeTranslatorVisitor dataTypeVisitor { asn1Definitions, asn1Type };
 
-        auto typeAssignment = std::make_unique<Asn1Acn::TypeAssignment>(
-                type->identifier(), type->identifier(), Asn1Acn::SourceLocation(), std::move(type));
-        definitions->addType(std::move(typeAssignment));
+    for (const auto *sedsDataType : resolvedSedsDataTypes) {
+        std::visit(dataTypeVisitor, *sedsDataType);
+
+        const auto &asn1TypeIdentifier = asn1Type->identifier();
+        auto asn1TypeAssignment = std::make_unique<Asn1Acn::TypeAssignment>(
+                asn1TypeIdentifier, asn1TypeIdentifier, Asn1Acn::SourceLocation(), std::move(asn1Type));
+        asn1Definitions->addType(std::move(asn1TypeAssignment));
     }
 }
 
 std::vector<const seds::model::DataType *> SedsToAsn1Translator::collectDataTypes(
-        const seds::model::Package &package) const
+        const seds::model::Package &sedsPackage) const
 {
     const auto func = [](const auto &dataType) { return &dataType; };
 
-    std::vector<const seds::model::DataType *> dataTypes;
+    std::vector<const seds::model::DataType *> sedsDataTypes;
 
-    std::transform(package.dataTypes().begin(), package.dataTypes().end(), std::back_inserter(dataTypes), func);
-    for (const auto &component : package.components()) {
-        std::transform(component.dataTypes().begin(), component.dataTypes().end(), std::back_inserter(dataTypes), func);
+    std::transform(
+            sedsPackage.dataTypes().begin(), sedsPackage.dataTypes().end(), std::back_inserter(sedsDataTypes), func);
+    for (const auto &sedsComponent : sedsPackage.components()) {
+        std::transform(sedsComponent.dataTypes().begin(), sedsComponent.dataTypes().end(),
+                std::back_inserter(sedsDataTypes), func);
     }
 
-    return dataTypes;
+    return sedsDataTypes;
 }
 
 } // namespace conversion::asn1::translator

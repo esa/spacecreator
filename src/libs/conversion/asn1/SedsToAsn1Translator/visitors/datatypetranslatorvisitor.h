@@ -21,35 +21,43 @@
 
 #include <asn1library/asn1/types/type.h>
 #include <optional>
+#include <seds/SedsModel/types/datatype.h>
 
-namespace Asn1Acn::Types {
+namespace Asn1Acn {
+class Definitions;
+namespace Types {
 class BitString;
 class IntegerAcnParameters;
 class Real;
 class IA5String;
-} // namespace Asn1Acn::Types
+} // namespace Types
+} // namespace Asn1Acn
 
 namespace seds::model {
 class ArrayDataType;
 class BinaryDataType;
 class BooleanDataEncoding;
 class BooleanDataType;
-enum class ByteOrder;
+class Component;
 class ContainerDataType;
-enum class CoreEncodingAndPrecision;
-enum class CoreIntegerEncoding;
-enum class CoreStringEncoding;
+class DataTypeRef;
+class DimensionSize;
 class EnumeratedDataType;
-enum class FalseValue;
 class FloatDataEncoding;
 class FloatDataType;
 class IntegerDataEncoding;
 class IntegerDataType;
 class Name;
+class Package;
 class StringDataEncoding;
 class StringDataType;
 class SubRangeDataType;
 class ValueEnumeration;
+enum class ByteOrder;
+enum class CoreEncodingAndPrecision;
+enum class CoreIntegerEncoding;
+enum class CoreStringEncoding;
+enum class FalseValue;
 } // namespace seds::model
 
 namespace conversion::asn1::translator {
@@ -60,7 +68,9 @@ namespace conversion::asn1::translator {
  * Translated data type will be added to the passed ASN.1 Definitions
  */
 struct DataTypeTranslatorVisitor final {
-    /** @brief  Where translated data type will be added */
+    /// @brief  Parent definitions
+    Asn1Acn::Definitions *m_asn1Definitions;
+    /// @brief  Where translated data type will be saved
     std::unique_ptr<Asn1Acn::Types::Type> &m_asn1Type;
 
     /**
@@ -192,6 +202,23 @@ private:
      */
     auto translateBitStringLength(
             const seds::model::BinaryDataType &sedsType, Asn1Acn::Types::BitString *asn1Type) const -> void;
+    /**
+     * @brief   Translate SEDS array type
+     *
+     * @param   sedsTypeName    SEDS array element type name
+     * @param   asn1Type        ASN.1 type that will be updated
+     */
+    auto translateArrayType(const QString &sedsTypeName, Asn1Acn::Types::SequenceOf *asn1Type) const -> void;
+    /**
+     * @brief   Translate SEDS array dimension
+     *
+     * This is translated as ASN.1 range constraint
+     *
+     * @param   dimension   SEDS array dimension
+     * @param   asn1Type    ASN.1 type that will be updated
+     */
+    auto translateArrayDimension(
+            const seds::model::DimensionSize &dimension, Asn1Acn::Types::SequenceOf *asn1Type) const -> void;
     /**
      * @brief   Translate SEDS enumeration list
      *

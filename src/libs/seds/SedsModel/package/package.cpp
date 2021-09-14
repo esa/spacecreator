@@ -41,6 +41,17 @@ void Package::addDataType(DataType dataType)
     m_dataTypes.push_back(std::move(dataType));
 }
 
+const DataType *Package::findDataType(const QString &dataTypeName) const
+{
+    auto found = std::find_if(m_dataTypes.begin(), m_dataTypes.end(),
+            [&dataTypeName](const DataType &dataType) { return dataTypeNameStr(dataType) == dataTypeName; });
+    if (found != m_dataTypes.end()) {
+        return &(*found);
+    } else {
+        return nullptr;
+    }
+}
+
 const Package::DeclaredInterfaceSet &Package::declaredInterfaces() const
 {
     return m_declaredInterfaces;
