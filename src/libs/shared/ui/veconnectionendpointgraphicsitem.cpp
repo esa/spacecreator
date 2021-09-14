@@ -23,7 +23,7 @@
 #include "veobject.h"
 #include "verectgraphicsitem.h"
 
-static const int kSiblingMinDistance = 20;
+static const int kSiblingMinDistance = 8;
 
 namespace shared {
 namespace ui {
