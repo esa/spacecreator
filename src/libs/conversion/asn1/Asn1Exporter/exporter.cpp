@@ -43,11 +43,10 @@ void Asn1Exporter::exportModel(const Model *const model, const Options &options)
         throw ExportException("Model to export is null");
     }
 
-    if (model->modelType() != ModelType::Asn1) {
+    const auto *const asn1Model = dynamic_cast<const Asn1Model *>(model);
+    if (asn1Model == nullptr) {
         throw IncorrectSourceModelException(ModelType::Asn1, model->modelType());
     }
-
-    const auto *const asn1Model = dynamic_cast<const Asn1Model *>(model);
 
     for (const auto &file : asn1Model->data()) {
         exportAsn1Model(file, options);
