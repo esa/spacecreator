@@ -207,8 +207,7 @@ void VEConnectionEndPointGraphicsItem::onManualMoveProgress(GripPoint *grip, con
     if (shift.isNull())
         return;
 
-    const QPointF newScenePos = scenePos() + shift;
-    const QPointF mappedPos = mapToParent(mapFromScene(newScenePos));
+    const QPointF mappedPos = mapToParent(mapFromScene(to));
     const QRectF parentRect = targetItem()->boundingRect();
     const Qt::Alignment alignment = graphicsviewutils::getNearestSide(parentRect, mappedPos);
     updateInternalItems(alignment);
