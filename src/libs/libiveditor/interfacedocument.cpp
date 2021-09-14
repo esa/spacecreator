@@ -655,7 +655,7 @@ void InterfaceDocument::onItemDoubleClicked(const shared::Id &id)
         if (entity->isFunction()) {
             if (auto fn = entity->as<ivm::IVFunction *>()) {
                 if (fn->hasNestedChildren()) {
-                    d->objectsModel->setRootObject(id);
+                    d->itemsModel->changeRootItem(id);
                     return;
                 }
             }

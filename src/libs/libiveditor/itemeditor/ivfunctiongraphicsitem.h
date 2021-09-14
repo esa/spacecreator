@@ -45,6 +45,8 @@ public:
         Type = UserType + static_cast<int>(ivm::IVObject::Type::Function)
     };
 
+    void init() override;
+
     ivm::IVFunction *entity() const override;
 
     int type() const override { return Type; }
