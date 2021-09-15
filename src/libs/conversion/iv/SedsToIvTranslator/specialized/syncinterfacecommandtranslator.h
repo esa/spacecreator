@@ -21,7 +21,7 @@
 
 #include "specialized/interfacecommandtranslator.h"
 
-#include <ivcore/parameter.h>
+#include <shared/parameter.h>
 
 namespace seds::model {
 class CommandArgument;
@@ -92,7 +92,7 @@ private:
      * @return  Interface view interface parameter
      */
     auto createIvInterfaceParameter(const QString &name, const QString &typeName,
-            ivm::InterfaceParameter::Direction direction) -> ivm::InterfaceParameter;
+            shared::InterfaceParameter::Direction direction) -> shared::InterfaceParameter;
 };
 
 } // namespace conversion::iv::translator

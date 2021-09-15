@@ -70,20 +70,20 @@ void SyncInterfaceCommandTranslator::translateArguments(
         switch (argument.mode()) {
         case seds::model::CommandArgumentMode::In: {
             const auto ivParameter = createIvInterfaceParameter(
-                    argument.nameStr(), argument.type().nameStr(), ivm::InterfaceParameter::Direction::IN);
+                    argument.nameStr(), argument.type().nameStr(), shared::InterfaceParameter::Direction::IN);
             ivInterface->addParam(ivParameter);
         } break;
         case seds::model::CommandArgumentMode::Out: {
             const auto ivParameter = createIvInterfaceParameter(
-                    argument.nameStr(), argument.type().nameStr(), ivm::InterfaceParameter::Direction::OUT);
+                    argument.nameStr(), argument.type().nameStr(), shared::InterfaceParameter::Direction::OUT);
             ivInterface->addParam(ivParameter);
         } break;
         case seds::model::CommandArgumentMode::InOut: {
             const auto ivParameterIn = createIvInterfaceParameter(QString("%1_In").arg(argument.nameStr()),
-                    argument.type().nameStr(), ivm::InterfaceParameter::Direction::IN);
+                    argument.type().nameStr(), shared::InterfaceParameter::Direction::IN);
             ivInterface->addParam(ivParameterIn);
             const auto ivParameterOut = createIvInterfaceParameter(QString("%2_Out").arg(argument.nameStr()),
-                    argument.type().nameStr(), ivm::InterfaceParameter::Direction::OUT);
+                    argument.type().nameStr(), shared::InterfaceParameter::Direction::OUT);
             ivInterface->addParam(ivParameterOut);
         } break;
         case seds::model::CommandArgumentMode::Notify:
@@ -93,11 +93,11 @@ void SyncInterfaceCommandTranslator::translateArguments(
     }
 }
 
-ivm::InterfaceParameter SyncInterfaceCommandTranslator::createIvInterfaceParameter(
-        const QString &name, const QString &typeName, ivm::InterfaceParameter::Direction direction)
+shared::InterfaceParameter SyncInterfaceCommandTranslator::createIvInterfaceParameter(
+        const QString &name, const QString &typeName, shared::InterfaceParameter::Direction direction)
 {
-    return ivm::InterfaceParameter(
-            name, ivm::BasicParameter::Type::Other, typeName, m_interfaceParameterEncoding, direction);
+    return shared::InterfaceParameter(
+            name, shared::BasicParameter::Type::Other, typeName, m_interfaceParameterEncoding, direction);
 }
 
 } // namespace conversion::iv::translator
