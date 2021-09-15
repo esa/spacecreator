@@ -46,7 +46,7 @@ public:
         Boards,
         Board,
         Port,
-        Pseudo_Function,
+        System_Function,
         Provided_Interface,
         Required_Interface,
         Input_Parameter,

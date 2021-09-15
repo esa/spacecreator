@@ -71,7 +71,7 @@ void DVBoardReaderTest::tst_singleItems()
     runReader(helpers::singleBoardWithPorts(), 4);
     runReader(helpers::multiBoardsWithPort(), 4);
     runReader(helpers::unknownProperty(), 0);
-    runReader(helpers::boardWithPseudoFunction(), 5);
+    runReader(helpers::boardWithSystemFunction(), 5);
     runReader(helpers::openCloseTagMismatched(), -1, false);
     runReader(helpers::malformedXml(), -1, false);
 }

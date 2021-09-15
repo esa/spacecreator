@@ -110,7 +110,7 @@ static inline QByteArray multiBoardsWithPort()
             "</Boards>");
 }
 
-static inline QByteArray boardWithPseudoFunction()
+static inline QByteArray boardWithSystemFunction()
 {
     return QByteArray(
             "<Boards>"
@@ -118,13 +118,13 @@ static inline QByteArray boardWithPseudoFunction()
             "       <Port "
             "        asn1file=\"/opt/asn/ip.asn\" asn1module=\"POHICDRIVER-IP\" asn1type=\"IP-Conf-T\" bus=\"eth0\" "
             "        requiresBusAccess=\"ocarina_buses::ip.i\" />"
-            "      <Pseudo_Function name=\"PrecisionTimer\">"
+            "      <System_Function name=\"PrecisionTimer\">"
             "        <Provided_Interface name=\"getTime\">"
             "        </Provided_Interface>"
             "        <Required_Interface name=\"init\">"
             "          <Input_Parameter name=\"seed\" type=\"MyInt\" encoding=\"NATIVE\"/>"
             "        </Required_Interface>"
-            "      </Pseudo_Function>"
+            "      </System_Function>"
             "    </Board>"
             "</Boards>");
 }

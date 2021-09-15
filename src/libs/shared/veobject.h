@@ -72,6 +72,20 @@ public:
 
     virtual VEObject *parentObject() const;
     QVector<VEObject *> descendants() const;
+
+    /// Return all children of type T
+    template<typename T>
+    QList<T *> typedChildren() const
+    {
+        QList<T *> typedChildren;
+        for (QObject *obj : children()) {
+            if (auto child = qobject_cast<T *>(obj)) {
+                typedChildren.append(child);
+            }
+        }
+        return typedChildren;
+    }
+
     VEModel *model() const;
     virtual bool postInit() = 0;
     virtual bool aboutToBeRemoved() = 0;

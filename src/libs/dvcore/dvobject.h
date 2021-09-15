@@ -40,8 +40,8 @@ public:
 
         Board,
         Port,
-        PseudoFunction,
-        PseudoInterface,
+        SystemFunction,
+        SystemInterface,
 
         Node,
         Partition,

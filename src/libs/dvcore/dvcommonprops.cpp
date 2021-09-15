@@ -66,7 +66,7 @@ const QHash<QString, Props::Token> Props::TokensByName = {
     { "Boards", Token::Boards },
     { "Board", Token::Board },
     { "Port", Token::Port },
-    { "Pseudo_Function", Token::Pseudo_Function },
+    { "System_Function", Token::System_Function },
     { "Provided_Interface", Token::Provided_Interface },
     { "Required_Interface", Token::Required_Interface },
     { "Input_Parameter", Token::Input_Parameter },

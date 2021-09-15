@@ -19,13 +19,20 @@
 
 #include "dvobject.h"
 
-namespace dvm {
+#include <QList>
 
-class DVPseudoFunction : public DVObject
+namespace dvm {
+class DVSystemInterface;
+
+class DVSystemFunction : public DVObject
 {
     Q_OBJECT
+    Q_PROPERTY(QList<dvm::DVSystemInterface *> interfaces READ interfaces)
+
 public:
-    explicit DVPseudoFunction(DVObject *parent = nullptr);
+    explicit DVSystemFunction(DVObject *parent = nullptr);
+
+    QList<DVSystemInterface *> interfaces() const;
 };
 
 } // namespace dvm

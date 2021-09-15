@@ -15,13 +15,20 @@
    along with this program. If not, see <https://www.gnu.org/licenses/lgpl-2.1.html>.
 */
 
-#include "dvpseudofunction.h"
+#include "dvsystemfunction.h"
+
+#include "dvsysteminterface.h"
 
 namespace dvm {
 
-DVPseudoFunction::DVPseudoFunction(DVObject *parent)
-    : DVObject(DVObject::Type::PseudoFunction, {}, parent)
+DVSystemFunction::DVSystemFunction(DVObject *parent)
+    : DVObject(DVObject::Type::SystemFunction, {}, parent)
 {
+}
+
+QList<DVSystemInterface *> DVSystemFunction::interfaces() const
+{
+    return typedChildren<DVSystemInterface>();
 }
 
 } // namespace dvm

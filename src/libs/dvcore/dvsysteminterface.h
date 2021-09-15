@@ -24,9 +24,13 @@
 
 namespace dvm {
 
-class DVPseudoInterface : public DVObject
+class DVSystemInterface : public DVObject
 {
     Q_OBJECT
+    Q_PROPERTY(bool isProvided READ isProvided)
+    Q_PROPERTY(bool isRequired READ isRequired)
+    Q_PROPERTY(QVector<shared::InterfaceParameter> params READ params)
+
 public:
     enum class InterfaceType
     {
@@ -35,10 +39,12 @@ public:
     };
     Q_ENUM(InterfaceType)
 
-    explicit DVPseudoInterface(DVObject *parent = nullptr);
+    explicit DVSystemInterface(DVObject *parent = nullptr);
 
     void setInterfaceType(InterfaceType type);
     InterfaceType interfaceType() const;
+    bool isProvided() const;
+    bool isRequired() const;
 
     QVector<shared::InterfaceParameter> params() const;
     shared::InterfaceParameter param(const QString &name) const;

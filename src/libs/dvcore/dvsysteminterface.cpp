@@ -15,31 +15,41 @@
    along with this program. If not, see <https://www.gnu.org/licenses/lgpl-2.1.html>.
 */
 
-#include "dvpseudointerface.h"
+#include "dvsysteminterface.h"
 
 namespace dvm {
 
-DVPseudoInterface::DVPseudoInterface(DVObject *parent)
-    : DVObject(DVObject::Type::PseudoInterface, {}, parent)
+DVSystemInterface::DVSystemInterface(DVObject *parent)
+    : DVObject(DVObject::Type::SystemInterface, {}, parent)
 {
 }
 
-void DVPseudoInterface::setInterfaceType(InterfaceType type)
+void DVSystemInterface::setInterfaceType(InterfaceType type)
 {
     m_interfaceType = type;
 }
 
-DVPseudoInterface::InterfaceType DVPseudoInterface::interfaceType() const
+DVSystemInterface::InterfaceType DVSystemInterface::interfaceType() const
 {
     return m_interfaceType;
 }
 
-QVector<shared::InterfaceParameter> DVPseudoInterface::params() const
+bool DVSystemInterface::isProvided() const
+{
+    return m_interfaceType == InterfaceType::Provided;
+}
+
+bool DVSystemInterface::isRequired() const
+{
+    return m_interfaceType == InterfaceType::Required;
+}
+
+QVector<shared::InterfaceParameter> DVSystemInterface::params() const
 {
     return m_parameters;
 }
 
-shared::InterfaceParameter DVPseudoInterface::param(const QString &name) const
+shared::InterfaceParameter DVSystemInterface::param(const QString &name) const
 {
     if (!name.isEmpty()) {
         for (const shared::InterfaceParameter &param : m_parameters) {
@@ -51,7 +61,7 @@ shared::InterfaceParameter DVPseudoInterface::param(const QString &name) const
     return {};
 }
 
-void DVPseudoInterface::setParams(const QVector<shared::InterfaceParameter> &params)
+void DVSystemInterface::setParams(const QVector<shared::InterfaceParameter> &params)
 {
     if (m_parameters != params) {
         m_parameters = params;
@@ -59,7 +69,7 @@ void DVPseudoInterface::setParams(const QVector<shared::InterfaceParameter> &par
     }
 }
 
-void DVPseudoInterface::addParam(const shared::InterfaceParameter &param)
+void DVSystemInterface::addParam(const shared::InterfaceParameter &param)
 {
     if (!m_parameters.contains(param)) {
         m_parameters.append(param);

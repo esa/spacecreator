@@ -11,12 +11,12 @@
       <Port name="eth5" asn1file="/home/taste/tool-inst/include/ocarina/runtime/polyorb-hi-c/src/drivers/configuration/ip.asn" asn1module="POHICDRIVER-IP" asn1type="IP-Conf-T" requiresBusAccess="ocarina_buses::ip.i"/>
       <Port name="eth6" asn1file="/home/taste/tool-inst/include/ocarina/runtime/polyorb-hi-c/src/drivers/configuration/ip.asn" asn1module="POHICDRIVER-IP" asn1type="IP-Conf-T" requiresBusAccess="ocarina_buses::ip.i"/>
       <Port name="eth7" asn1file="/home/taste/tool-inst/include/ocarina/runtime/polyorb-hi-c/src/drivers/configuration/ip.asn" asn1module="POHICDRIVER-IP" asn1type="IP-Conf-T" requiresBusAccess="ocarina_buses::ip.i"/>
-       <Pseudo_Function name="PrecisionTimer">
+       <System_Function name="PrecisionTimer">
           <Provided_Interface name="getTime">
           </Provided_Interface>"
           <Required_Interface name="init">
               <Input_Parameter name="seed" type="MyInt" encoding="NATIVE"/>
           </Required_Interface>"
-       </Pseudo_Function>
+       </System_Function>
    </Board>
 </Boards>
