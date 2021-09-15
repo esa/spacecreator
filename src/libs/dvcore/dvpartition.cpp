@@ -24,7 +24,7 @@
 namespace dvm {
 
 struct DVPartitionPrivate {
-    QList<QPointer<DVFunction>> functions;
+    QList<DVFunction *> functions;
 };
 
 DVPartition::DVPartition(DVObject *parent)
@@ -57,7 +57,7 @@ void DVPartition::removeFunction(DVFunction *function)
     }
 }
 
-QList<QPointer<DVFunction>> DVPartition::functions() const
+QList<DVFunction *> DVPartition::functions() const
 {
     return d->functions;
 }

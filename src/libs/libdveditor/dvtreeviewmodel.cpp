@@ -30,9 +30,21 @@ DVTreeViewModel::DVTreeViewModel(dvm::DVModel *dvModel, shared::cmd::CommandsSta
     connect(this, &QStandardItemModel::dataChanged, this, &DVTreeViewModel::onDataChanged);
 }
 
+Qt::ItemFlags DVTreeViewModel::flags(const QModelIndex &index) const
+{
+    Qt::ItemFlags itemFlags = shared::AbstractVisualizationModel::flags(index);
+    const shared::Id id = index.data(IdRole).toUuid();
+    if (auto obj = m_veModel->getObject(id)->as<dvm::DVObject *>()) {
+        if (obj->type() == dvm::DVObject::Type::SystemFunction || obj->type() == dvm::DVObject::Type::SystemInterface) {
+            // disable edit
+            itemFlags &= ~Qt::ItemIsEditable;
+        }
+    }
+    return itemFlags;
+}
+
 void DVTreeViewModel::updateItemData(QStandardItem *item, shared::VEObject *object)
 {
-
     dvm::DVObject *obj = qobject_cast<dvm::DVObject *>(object);
     if (!obj) {
         return;

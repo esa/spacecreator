@@ -29,6 +29,8 @@ class DVPort;
 class DVBoard : public DVObject
 {
     Q_OBJECT
+    Q_PROPERTY(QList<dvm::DVPort *> ports READ ports)
+
 public:
     explicit DVBoard(DVObject *parent = nullptr);
     ~DVBoard() override;
@@ -42,3 +44,5 @@ private:
 };
 
 } // namespace dvm
+
+Q_DECLARE_METATYPE(dvm::DVBoard *)

@@ -72,7 +72,7 @@ QVariant ExportableIVObject::createFrom(const ivm::IVObject *ivObject)
  */
 QVariantList ExportableIVObject::attributes() const
 {
-    return generateProperties(exportedObject<ivm::IVObject>()->entityAttributes(), false);
+    return exportedObject<ivm::IVObject>()->generateProperties(false);
 }
 
 /**
@@ -81,43 +81,12 @@ QVariantList ExportableIVObject::attributes() const
  */
 QVariantList ExportableIVObject::properties() const
 {
-    return generateProperties(exportedObject<ivm::IVObject>()->entityAttributes(), true);
+    return exportedObject<ivm::IVObject>()->generateProperties(true);
 }
 
 QStringList ExportableIVObject::path() const
 {
     return exportedObject<ivm::IVObject>()->path();
-}
-
-/**
- * @brief ExportableIVObject::generateProperties generates a variant list sorted by meta::Props::Token.
- * @param props can be hash of attributes or properties of IVObject.
- * @return sorted QVariantList which can be used in string templates
- */
-QVariantList ExportableIVObject::generateProperties(const EntityAttributes &attributes, bool isProperty)
-{
-    QVariantList result;
-    for (auto it = attributes.cbegin(); it != attributes.cend(); ++it) {
-        if (it.value().isProperty() == isProperty) {
-            result << QVariant::fromValue(templating::ExportableProperty(it.key(), it.value().value()));
-        }
-    }
-
-    std::sort(result.begin(), result.end(), [](const QVariant &left_val, const QVariant &right_val) {
-        const auto &r = right_val.value<templating::ExportableProperty>();
-        const ivm::meta::Props::Token right_token = ivm::meta::Props::token(r.name());
-        if (right_token == ivm::meta::Props::Token::Unknown)
-            return true;
-
-        const auto &l = left_val.value<templating::ExportableProperty>();
-        const ivm::meta::Props::Token left_token = ivm::meta::Props::token(l.name());
-        if (left_token == ivm::meta::Props::Token::Unknown)
-            return false;
-
-        return left_token < right_token;
-    });
-
-    return result;
 }
 
 }

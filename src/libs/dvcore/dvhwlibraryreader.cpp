@@ -84,14 +84,14 @@ void DVHWLibraryReader::processTagOpen(QXmlStreamReader &xml)
     } break;
     case meta::Props::Token::System_Function: {
         Q_ASSERT(d->m_currentObject != nullptr);
-        if (auto board = qobject_cast<DVBoard *>(d->m_currentObject)) {
+        if (qobject_cast<DVBoard *>(d->m_currentObject)) {
             obj = new dvm::DVSystemFunction(d->m_currentObject);
         }
     } break;
     case meta::Props::Token::Provided_Interface:
     case meta::Props::Token::Required_Interface: {
         Q_ASSERT(d->m_currentObject != nullptr);
-        if (auto board = qobject_cast<DVSystemFunction *>(d->m_currentObject)) {
+        if (qobject_cast<DVSystemFunction *>(d->m_currentObject)) {
             auto interface = new dvm::DVSystemInterface(d->m_currentObject);
             obj = interface;
             interface->setInterfaceType(t == meta::Props::Token::Provided_Interface

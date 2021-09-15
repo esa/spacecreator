@@ -79,7 +79,9 @@ shared::ui::VEInteractiveObject *DVItemModel::createItem(shared::Id objectId)
         }
     } break;
     case dvm::DVObject::Type::Bus:
-    case dvm::DVObject::Type::Message: {
+    case dvm::DVObject::Type::Message:
+    case dvm::DVObject::Type::SystemFunction:
+    case dvm::DVObject::Type::SystemInterface: {
         break;
     }
     default: {

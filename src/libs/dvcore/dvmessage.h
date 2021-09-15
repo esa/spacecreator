@@ -25,6 +25,14 @@ class DVNode;
 class DVMessage : public DVObject
 {
     Q_OBJECT
+    Q_PROPERTY(QString titleUI READ titleUI)
+    Q_PROPERTY(QString fromFunction READ fromFunction WRITE setFromFunction)
+    Q_PROPERTY(QString fromInterface READ fromInterface WRITE setFromInterface)
+    Q_PROPERTY(dvm::DVNode *fromNode READ fromNode)
+    Q_PROPERTY(QString toFunction READ toFunction WRITE setToFunction)
+    Q_PROPERTY(QString toInterface READ toInterface WRITE setToInterface)
+    Q_PROPERTY(dvm::DVNode *toNode READ toNode)
+
 public:
     explicit DVMessage(QObject *parent = nullptr);
 
@@ -48,3 +56,5 @@ public:
 };
 
 } // namespace dvm
+
+Q_DECLARE_METATYPE(dvm::DVMessage *)

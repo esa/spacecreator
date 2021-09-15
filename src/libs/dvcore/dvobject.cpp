@@ -19,6 +19,7 @@
 
 #include "dvmodel.h"
 #include "dvnamevalidator.h"
+#include "exportableproperty.h"
 
 #include <QVector>
 
@@ -89,26 +90,26 @@ void DVObject::setAttributeImpl(const QString &name, const QVariant &value, Enti
     }
     const meta::Props::Token token = meta::Props::token(name);
     switch (token) {
-        case meta::Props::Token::name: {
-            attr = EntityAttribute { name, value, type };
-            QString usedName = value.value<QString>();
-            if (usedName.isEmpty()) {
-                usedName = DVNameValidator::nameForObject(this);
-                attr.setValue(usedName);
-            }
-            VEObject::setAttributeImpl(attr.name(), attr.value(), attr.type());
-            Q_EMIT titleChanged(usedName);
-            break;
+    case meta::Props::Token::name: {
+        attr = EntityAttribute { name, value, type };
+        QString usedName = value.value<QString>();
+        if (usedName.isEmpty()) {
+            usedName = DVNameValidator::nameForObject(this);
+            attr.setValue(usedName);
         }
-        default: {
-            VEObject::setAttributeImpl(name, value, type);
-            if (meta::Props::Token::coordinates == token) {
-                Q_EMIT coordinatesChanged(value.value<QVector<qint32>>());
-            } else if (meta::Props::Token::url == token) {
-                Q_EMIT urlChanged(value.toString());
-            }
-            break;
+        VEObject::setAttributeImpl(attr.name(), attr.value(), attr.type());
+        Q_EMIT titleChanged(usedName);
+        break;
+    }
+    default: {
+        VEObject::setAttributeImpl(name, value, type);
+        if (meta::Props::Token::coordinates == token) {
+            Q_EMIT coordinatesChanged(value.value<QVector<qint32>>());
+        } else if (meta::Props::Token::url == token) {
+            Q_EMIT urlChanged(value.toString());
         }
+        break;
+    }
     }
 }
 
@@ -151,6 +152,56 @@ bool DVObject::aboutToBeRemoved()
 bool DVObject::isEqual(DVObject *other) const
 {
     return this->type() == other->type() && VEObject::isEqual(other);
+}
+
+/**
+ * @brief Returns list of attributes for using in string templates.
+ * @return list of attributes.
+ */
+QVariantList DVObject::attributes() const
+{
+    return generateProperties(false);
+}
+
+/**
+ * @brief Returns list of properties for using in string templates.
+ * @return list of properties.
+ */
+QVariantList DVObject::properties() const
+{
+    return generateProperties(true);
+}
+
+/**
+ * @brief generateProperties generates a variant list sorted by meta::Props::Token.
+ * @param props can be hash of attributes or properties of DVObject.
+ * @return sorted QVariantList which can be used in string templates
+ */
+QVariantList DVObject::generateProperties(bool isProperty) const
+{
+    QVariantList result;
+    EntityAttributes attributes = entityAttributes();
+    for (auto it = attributes.cbegin(); it != attributes.cend(); ++it) {
+        if (it.value().isProperty() == isProperty) {
+            result << QVariant::fromValue(shared::ExportableProperty(it.key(), it.value().value()));
+        }
+    }
+
+    std::sort(result.begin(), result.end(), [](const QVariant &left_val, const QVariant &right_val) {
+        const auto &r = right_val.value<shared::ExportableProperty>();
+        const dvm::meta::Props::Token right_token = dvm::meta::Props::token(r.name());
+        if (right_token == dvm::meta::Props::Token::Unknown)
+            return true;
+
+        const auto &l = left_val.value<shared::ExportableProperty>();
+        const dvm::meta::Props::Token left_token = dvm::meta::Props::token(l.name());
+        if (left_token == dvm::meta::Props::Token::Unknown)
+            return false;
+
+        return left_token < right_token;
+    });
+
+    return result;
 }
 
 } // namespace dvm

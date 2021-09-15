@@ -385,7 +385,7 @@ void DVCreatorTool::populateContextMenu_commonEdit(QMenu *menu, const QPointF &s
         }
     }
 
-    const QList<QPointer<dvm::DVFunction>> boundFunctionsEntities = partition->functions();
+    const QList<dvm::DVFunction *> boundFunctionsEntities = partition->functions();
     action = bindingMenu->addAction(tr("Unbind All"));
     QMenu *unbindMenu = bindingMenu->addMenu(tr("Unbind"));
     if (boundFunctionsEntities.isEmpty()) {

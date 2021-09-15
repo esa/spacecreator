@@ -4,7 +4,6 @@ add_library(${LIB_NAME} STATIC)
 
 target_sources(${LIB_NAME} PRIVATE
     abstractexportableobject.h
-    exportableproperty.h
     stringtemplate.cpp
     stringtemplate.h
     templateeditor.cpp

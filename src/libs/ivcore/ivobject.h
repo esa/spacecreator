@@ -34,6 +34,8 @@ class IVObject : public shared::VEObject
 {
     Q_OBJECT
     Q_PROPERTY(QString title READ title WRITE setTitle NOTIFY titleChanged)
+    Q_PROPERTY(QVariantList attributes READ attributes)
+    Q_PROPERTY(QVariantList properties READ properties)
 
 public:
     enum class Type
@@ -99,6 +101,11 @@ public:
 
     static void sortObjectList(QList<ivm::IVObject *> &objects);
     static QString typeToString(Type t);
+
+    QVariantList attributes() const;
+    QVariantList properties() const;
+
+    QVariantList generateProperties(bool isProperty) const override;
 
 Q_SIGNALS:
     void urlChanged(const QString &url);

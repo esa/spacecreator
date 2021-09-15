@@ -32,6 +32,12 @@ class DVNode;
 class DVConnection : public DVObject
 {
     Q_OBJECT
+    Q_PROPERTY(dvm::DVDevice *sourceDevice READ sourceDevice)
+    Q_PROPERTY(dvm::DVDevice *targetDevice READ targetDevice)
+    Q_PROPERTY(dvm::DVNode *sourceNode READ sourceNode)
+    Q_PROPERTY(dvm::DVNode *targetNode READ targetNode)
+    Q_PROPERTY(QList<dvm::DVMessage *> messages READ messages)
+
 public:
     explicit DVConnection(DVObject *parent = nullptr);
     explicit DVConnection(DVDevice *sourceDev, DVDevice *targetDev, DVObject *parent = nullptr);
@@ -63,3 +69,5 @@ private:
 };
 
 } // namespace dvm
+
+Q_DECLARE_METATYPE(dvm::DVConnection *)

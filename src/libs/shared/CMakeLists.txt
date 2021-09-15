@@ -57,6 +57,7 @@ target_sources(${LIB_NAME} PRIVATE
     entityattribute.h
     errorhub.cpp
     errorhub.h
+    exportableproperty.h
     geometry.cpp
     geometry.h
     graphicsviewutils.cpp

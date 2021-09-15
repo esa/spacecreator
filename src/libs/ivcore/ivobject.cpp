@@ -17,6 +17,7 @@
 
 #include "ivobject.h"
 
+#include "exportableproperty.h"
 #include "ivmodel.h"
 #include "ivnamevalidator.h"
 
@@ -98,6 +99,56 @@ QString IVObject::typeToString(Type t)
 {
     QMetaEnum metaEnum = QMetaEnum::fromType<Type>();
     return metaEnum.valueToKey(int(t));
+}
+
+/**
+ * @brief Returns list of attributes for using in string templates.
+ * @return list of attributes.
+ */
+QVariantList IVObject::attributes() const
+{
+    return generateProperties(false);
+}
+
+/**
+ * @brief Returns list of properties for using in string templates.
+ * @return list of properties.
+ */
+QVariantList IVObject::properties() const
+{
+    return generateProperties(true);
+}
+
+/**
+ * @brief generateProperties generates a variant list sorted by meta::Props::Token.
+ * @param props can be hash of attributes or properties of IVObject.
+ * @return sorted QVariantList which can be used in string templates
+ */
+QVariantList IVObject::generateProperties(bool isProperty) const
+{
+    QVariantList result;
+    EntityAttributes attributes = entityAttributes();
+    for (auto it = attributes.cbegin(); it != attributes.cend(); ++it) {
+        if (it.value().isProperty() == isProperty) {
+            result << QVariant::fromValue(shared::ExportableProperty(it.key(), it.value().value()));
+        }
+    }
+
+    std::sort(result.begin(), result.end(), [](const QVariant &left_val, const QVariant &right_val) {
+        const auto &r = right_val.value<shared::ExportableProperty>();
+        const ivm::meta::Props::Token right_token = ivm::meta::Props::token(r.name());
+        if (right_token == ivm::meta::Props::Token::Unknown)
+            return true;
+
+        const auto &l = left_val.value<shared::ExportableProperty>();
+        const ivm::meta::Props::Token left_token = ivm::meta::Props::token(l.name());
+        if (left_token == ivm::meta::Props::Token::Unknown)
+            return false;
+
+        return left_token < right_token;
+    });
+
+    return result;
 }
 
 IVObject::Type IVObject::type() const

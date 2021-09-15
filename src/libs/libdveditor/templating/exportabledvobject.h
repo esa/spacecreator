@@ -47,9 +47,6 @@ public:
     QVariantList properties() const;
 
     static QVariant createFrom(const dvm::DVObject *dvObject);
-
-protected:
-    static QVariantList generateProperties(const EntityAttributes &attributes, bool isProperty);
 };
 
 }

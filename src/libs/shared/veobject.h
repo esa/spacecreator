@@ -31,6 +31,7 @@ class VEObject : public QObject
 {
     Q_OBJECT
     Q_PROPERTY(shared::Id id READ id CONSTANT)
+    Q_PROPERTY(QString name READ title)
 
 public:
     explicit VEObject(const shared::Id &id = shared::InvalidId, QObject *parent = nullptr);
@@ -107,6 +108,8 @@ public:
 
     virtual bool isEqual(const VEObject *other) const;
 
+    virtual QVariantList generateProperties(bool isProperty) const = 0;
+
 Q_SIGNALS:
     void attributeChanged(const QString &name);
 
@@ -123,3 +126,5 @@ private:
 };
 
 }
+
+Q_DECLARE_METATYPE(shared::VEObject *)

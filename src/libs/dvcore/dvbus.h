@@ -28,6 +28,9 @@ class DVDevice;
 class DVBus : public DVObject
 {
     Q_OBJECT
+    Q_PROPERTY(QList<dvm::DVDevice *> connectedDevices READ connectedDevices)
+    Q_PROPERTY(QString qualifier READ qualifier)
+
 public:
     explicit DVBus(DVObject *parent = nullptr);
 
@@ -41,3 +44,5 @@ private:
 };
 
 } // namespace dvm
+
+Q_DECLARE_METATYPE(dvm::DVBus *)

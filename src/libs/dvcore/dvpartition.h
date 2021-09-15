@@ -29,13 +29,16 @@ struct DVPartitionPrivate;
 class DVPartition : public DVObject
 {
     Q_OBJECT
+    Q_PROPERTY(QList<dvm::DVFunction *> functions READ functions)
+    Q_PROPERTY(QStringList functionsNames READ functionsNames)
+
 public:
     explicit DVPartition(DVObject *parent = nullptr);
     ~DVPartition() override;
 
     void addFunction(DVFunction *function);
     void removeFunction(DVFunction *function);
-    QList<QPointer<DVFunction>> functions() const;
+    QList<DVFunction *> functions() const;
     QStringList functionsNames() const;
 
 Q_SIGNALS:
@@ -48,3 +51,5 @@ private:
 };
 
 } // namespace dvm
+
+Q_DECLARE_METATYPE(dvm::DVPartition *)

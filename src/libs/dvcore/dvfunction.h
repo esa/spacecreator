@@ -29,3 +29,5 @@ public:
 };
 
 } // namespace dvm
+
+Q_DECLARE_METATYPE(dvm::DVFunction *)

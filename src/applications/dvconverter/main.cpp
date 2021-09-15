@@ -20,6 +20,7 @@
 #include "dveditor.h"
 #include "dveditorcore.h"
 #include "dvexporter.h"
+#include "dvlibrary.h"
 #include "dvmodel.h"
 #include "scversion.h"
 #include "sharedlibrary.h"
@@ -30,6 +31,7 @@
 int main(int argc, char *argv[])
 {
     shared::initSharedLibrary();
+    dvm::initDVLibrary();
     dve::initDvEditor();
 
     QApplication a(argc, argv);

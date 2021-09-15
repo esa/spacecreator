@@ -19,18 +19,22 @@
 
 #include "dvobject.h"
 
-#include <QPointer>
 #include <memory>
 
 namespace dvm {
 struct DVNodePrivate;
-class DVPartition;
-class DVDevice;
 class DVBoard;
+class DVDevice;
+class DVPartition;
+class DVSystemFunction;
 
 class DVNode : public DVObject
 {
     Q_OBJECT
+    Q_PROPERTY(QList<dvm::DVPartition *> partitions READ partitions)
+    Q_PROPERTY(QList<dvm::DVDevice *> devices READ devices)
+    Q_PROPERTY(QList<dvm::DVSystemFunction *> systemFunctions READ systemFunctions)
+
 public:
     explicit DVNode(const DVBoard &board, DVObject *parent = nullptr);
     explicit DVNode(DVObject *parent = nullptr);
@@ -45,10 +49,14 @@ public:
 
     void addDevice(DVDevice *device);
     void removeDevice(DVDevice *device);
-    QList<QPointer<DVDevice>> devices() const;
+    QList<DVDevice *> devices() const;
+
+    QList<DVSystemFunction *> systemFunctions() const;
 
 private:
     std::unique_ptr<DVNodePrivate> d;
 };
 
 } // namespace dvm
+
+Q_DECLARE_METATYPE(dvm::DVNode *)

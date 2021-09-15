@@ -22,6 +22,7 @@
 #include "dvmodel.h"
 #include "dvnode.h"
 #include "dvpartition.h"
+#include "dvsystemfunction.h"
 
 namespace dve {
 
@@ -65,6 +66,15 @@ QVariantList ExportableDVNode::requiredBusAccesses() const
     }
 
     return devices;
+}
+
+QVariantList ExportableDVNode::systemFunctions() const
+{
+    QVariantList functions;
+    for (dvm::DVSystemFunction *function : exportedObject<dvm::DVNode>()->systemFunctions()) {
+        functions << createFrom(function);
+    }
+    return functions;
 }
 
 } // namespace dve

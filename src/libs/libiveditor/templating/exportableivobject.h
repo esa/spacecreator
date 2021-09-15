@@ -49,9 +49,6 @@ public:
     QVariantList attributes() const;
     QVariantList properties() const;
     QStringList path() const;
-
-protected:
-    static QVariantList generateProperties(const EntityAttributes &attributes, bool isProperty);
 };
 
 }

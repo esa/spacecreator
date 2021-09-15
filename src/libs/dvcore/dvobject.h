@@ -32,6 +32,8 @@ class DVObject : public shared::VEObject
 {
     Q_OBJECT
     Q_PROPERTY(QString title READ title WRITE setTitle NOTIFY titleChanged)
+    Q_PROPERTY(QVariantList attributes READ attributes)
+    Q_PROPERTY(QVariantList properties READ properties)
 
 public:
     enum class Type
@@ -74,6 +76,11 @@ public:
 
     virtual bool isEqual(DVObject *other) const;
 
+    QVariantList attributes() const;
+    QVariantList properties() const;
+
+    QVariantList generateProperties(bool isProperty) const override;
+
 Q_SIGNALS:
     void urlChanged(const QString &title);
     void titleChanged(const QString &title);
@@ -96,3 +103,5 @@ inline uint qHash(const DVObject::Type &key, uint seed)
 }
 
 } // namespace dvm
+
+Q_DECLARE_METATYPE(dvm::DVObject *)

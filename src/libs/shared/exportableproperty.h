@@ -17,11 +17,9 @@
 
 #pragma once
 
-#include "abstractexportableobject.h"
-
 #include <QVariant>
 
-namespace templating {
+namespace shared {
 
 /**
  * @brief The ExportableProperty class is needed for string templates only.
@@ -63,5 +61,5 @@ private:
 
 }
 
-Q_DECLARE_METATYPE(templating::ExportableProperty)
-Q_DECLARE_TYPEINFO(templating::ExportableProperty, Q_MOVABLE_TYPE);
+Q_DECLARE_METATYPE(shared::ExportableProperty)
+Q_DECLARE_TYPEINFO(shared::ExportableProperty, Q_MOVABLE_TYPE);

@@ -20,6 +20,7 @@
 #include "dvboard.h"
 #include "dvdevice.h"
 #include "dvpartition.h"
+#include "dvsystemfunction.h"
 
 #include <QPointer>
 
@@ -27,7 +28,7 @@ namespace dvm {
 
 struct DVNodePrivate {
     QList<DVPartition *> partitions;
-    QList<QPointer<DVDevice>> devices;
+    QList<DVDevice *> devices;
 };
 
 DVNode::DVNode(const DVBoard &board, DVObject *parent)
@@ -97,9 +98,14 @@ void DVNode::removeDevice(DVDevice *device)
     d->devices.removeAll(device);
 }
 
-QList<QPointer<dvm::DVDevice>> DVNode::devices() const
+QList<dvm::DVDevice *> DVNode::devices() const
 {
     return d->devices;
+}
+
+QList<DVSystemFunction *> DVNode::systemFunctions() const
+{
+    return typedChildren<DVSystemFunction>();
 }
 
 } // namespace dvm

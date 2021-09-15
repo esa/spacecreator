@@ -241,4 +241,19 @@ static inline QByteArray singleMessage()
             "</DeploymentView>");
 }
 
+static inline QByteArray singleDeviceWithSystemFunction()
+{
+    return QByteArray("<DeploymentView>"
+                      "    <Node name=\"node_linux\">"
+                      "        <System_Function name=\"PrecisionTimer\">"
+                      "          <Provided_Interface name=\"getTime\">"
+                      "          </Provided_Interface>"
+                      "          <Required_Interface name=\"init\">"
+                      "              <Input_Parameter name=\"seed\" type=\"MyInt\" encoding=\"NATIVE\" />"
+                      "          </Required_Interface>"
+                      "        </System_Function>"
+                      "    </Node>"
+                      "</DeploymentView>");
+}
+
 } // namespace helpers

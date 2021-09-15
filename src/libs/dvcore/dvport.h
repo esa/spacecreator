@@ -25,6 +25,9 @@ class DVBoard;
 class DVPort : public DVObject
 {
     Q_OBJECT
+    Q_PROPERTY(dvm::DVBoard *board READ board)
+    Q_PROPERTY(QString busName READ busName)
+
 public:
     explicit DVPort(QObject *parent = nullptr);
 
@@ -34,3 +37,5 @@ public:
 };
 
 } // namespace dvm
+
+Q_DECLARE_METATYPE(dvm::DVPort *)

@@ -24,6 +24,8 @@
 #include "dvnode.h"
 #include "dvobject.h"
 #include "dvpartition.h"
+#include "dvsystemfunction.h"
+#include "dvsysteminterface.h"
 #include "exportabledvbus.h"
 #include "exportabledvconnection.h"
 #include "exportabledvdevice.h"
@@ -50,7 +52,7 @@ QString ExportableDVObject::name() const
  */
 QVariantList ExportableDVObject::attributes() const
 {
-    return generateProperties(exportedObject<dvm::DVObject>()->entityAttributes(), false);
+    return exportedObject<dvm::DVObject>()->generateProperties(false);
 }
 
 /**
@@ -59,7 +61,7 @@ QVariantList ExportableDVObject::attributes() const
  */
 QVariantList ExportableDVObject::properties() const
 {
-    return generateProperties(exportedObject<dvm::DVObject>()->entityAttributes(), true);
+    return exportedObject<dvm::DVObject>()->generateProperties(true);
 }
 
 QVariant ExportableDVObject::createFrom(const dvm::DVObject *dvObject)
@@ -79,41 +81,16 @@ QVariant ExportableDVObject::createFrom(const dvm::DVObject *dvObject)
         return QVariant::fromValue(ExportableDVMessage(static_cast<const dvm::DVMessage *>(dvObject)));
     case dvm::DVObject::Type::Bus:
         return QVariant::fromValue(ExportableDVBus(static_cast<const dvm::DVBus *>(dvObject)));
+    case dvm::DVObject::Type::SystemFunction:
+        return QVariant::fromValue(
+                const_cast<dvm::DVSystemFunction *>(static_cast<const dvm::DVSystemFunction *>(dvObject)));
+    case dvm::DVObject::Type::SystemInterface:
+        return QVariant::fromValue(
+                const_cast<dvm::DVSystemInterface *>(static_cast<const dvm::DVSystemInterface *>(dvObject)));
     default:
         break;
     }
     return QVariant();
-}
-
-/**
- * @brief ExportableDVObject::generateProperties generates a variant list sorted by meta::Props::Token.
- * @param props can be hash of attributes or properties of DVObject.
- * @return sorted QVariantList which can be used in string templates
- */
-QVariantList ExportableDVObject::generateProperties(const EntityAttributes &attributes, bool isProperty)
-{
-    QVariantList result;
-    for (auto it = attributes.cbegin(); it != attributes.cend(); ++it) {
-        if (it.value().isProperty() == isProperty) {
-            result << QVariant::fromValue(templating::ExportableProperty(it.key(), it.value().value()));
-        }
-    }
-
-    std::sort(result.begin(), result.end(), [](const QVariant &left_val, const QVariant &right_val) {
-        const auto &r = right_val.value<templating::ExportableProperty>();
-        const dvm::meta::Props::Token right_token = dvm::meta::Props::token(r.name());
-        if (right_token == dvm::meta::Props::Token::Unknown)
-            return true;
-
-        const auto &l = left_val.value<templating::ExportableProperty>();
-        const dvm::meta::Props::Token left_token = dvm::meta::Props::token(l.name());
-        if (left_token == dvm::meta::Props::Token::Unknown)
-            return false;
-
-        return left_token < right_token;
-    });
-
-    return result;
 }
 
 }

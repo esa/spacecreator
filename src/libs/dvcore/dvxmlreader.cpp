@@ -25,6 +25,8 @@
 #include "dvnode.h"
 #include "dvobject.h"
 #include "dvpartition.h"
+#include "dvsystemfunction.h"
+#include "dvsysteminterface.h"
 #include "errorhub.h"
 
 #include <QDebug>
@@ -108,6 +110,36 @@ void DVXMLReader::processTagOpen(QXmlStreamReader &xml)
         }
         break;
     }
+    case meta::Props::Token::System_Function: {
+        Q_ASSERT(d->m_currentObject != nullptr);
+        if (qobject_cast<DVNode *>(d->m_currentObject)) {
+            obj = new dvm::DVSystemFunction(d->m_currentObject);
+        }
+    } break;
+    case meta::Props::Token::Provided_Interface:
+    case meta::Props::Token::Required_Interface: {
+        Q_ASSERT(d->m_currentObject != nullptr);
+        if (qobject_cast<DVSystemFunction *>(d->m_currentObject)) {
+            auto interface = new dvm::DVSystemInterface(d->m_currentObject);
+            obj = interface;
+            interface->setInterfaceType(t == meta::Props::Token::Provided_Interface
+                            ? dvm::DVSystemInterface::InterfaceType::Provided
+                            : dvm::DVSystemInterface::InterfaceType::Required);
+            break;
+        }
+        break;
+    }
+    case meta::Props::Token::Output_Parameter:
+    case meta::Props::Token::Input_Parameter: {
+        auto iface = qobject_cast<DVSystemInterface *>(d->m_currentObject);
+        Q_ASSERT(iface != nullptr);
+        const EntityAttributes attrs = attributes(xml.attributes());
+        const shared::InterfaceParameter param = addIfaceParameter(attrs,
+                t == meta::Props::Token::Input_Parameter ? shared::InterfaceParameter::Direction::IN
+                                                         : shared::InterfaceParameter::Direction::OUT);
+        iface->addParam(param);
+        break;
+    }
     default:
         static const QString msg = tr("The '%1' is unknown/unexpected here: %2@%3 %4");
         shared::ErrorHub::addError(shared::ErrorItem::Warning,
@@ -138,7 +170,10 @@ void DVXMLReader::processTagClose(QXmlStreamReader &xml)
     case meta::Props::Token::Node:
     case meta::Props::Token::Device:
     case meta::Props::Token::Connection:
-    case meta::Props::Token::Message: {
+    case meta::Props::Token::Message:
+    case meta::Props::Token::System_Function:
+    case meta::Props::Token::Provided_Interface:
+    case meta::Props::Token::Required_Interface: {
         d->m_currentObject = d->m_currentObject ? d->m_currentObject->parentObject() : nullptr;
         break;
     }

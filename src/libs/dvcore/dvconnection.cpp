@@ -181,7 +181,7 @@ DVDevice *DVConnection::getDevice(const QString &nodeName, const QString &portNa
         shared::ErrorHub::addError(shared::ErrorItem::Error, tr("Can't find node with name %1\n").arg(nodeName));
         return nullptr;
     }
-    const QList<QPointer<DVDevice>> nodeDevices = node->devices();
+    const QList<DVDevice *> nodeDevices = node->devices();
     auto it = std::find_if(nodeDevices.cbegin(), nodeDevices.cend(),
             [portName, busName](DVDevice *dev) { return dev->portName() == portName && dev->qualifier() == busName; });
     if (it == nodeDevices.cend()) {

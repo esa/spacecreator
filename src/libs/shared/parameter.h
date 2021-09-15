@@ -21,6 +21,7 @@
 
 #include <QString>
 #include <QVariant>
+#include <QVector>
 
 namespace Asn1Acn {
 namespace Types {
@@ -145,4 +146,6 @@ protected:
 
 Q_DECLARE_METATYPE(shared::BasicParameter)
 Q_DECLARE_METATYPE(shared::ContextParameter)
+Q_DECLARE_METATYPE(QVector<shared::ContextParameter>)
 Q_DECLARE_METATYPE(shared::InterfaceParameter)
+Q_DECLARE_METATYPE(QVector<shared::InterfaceParameter>)
