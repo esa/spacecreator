@@ -65,7 +65,7 @@ public:
     /**
      * @brief   Deleted move assignment operator
      */
-    InterfaceCommandTranslator &operator=(InterfaceCommandTranslator) = delete;
+    InterfaceCommandTranslator &operator=(InterfaceCommandTranslator &&) = delete;
 
 public:
     /**
