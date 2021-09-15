@@ -24,16 +24,15 @@
 #include "visitors/acnnodereconstructingvisitor.h"
 #include "visitors/asn1nodereconstructingvisitor.h"
 
-#include <QBuffer>
 #include <QSaveFile>
 #include <QString>
 #include <asn1library/asn1/asn1model.h>
-#include <qglobal.h>
 
 using Asn1Acn::Asn1Model;
 using conversion::asn1::Asn1Options;
 using conversion::exporter::ExportException;
-using conversion::exporter::IncorrectSourceModelException;
+using conversion::exporter::IncorrectModelException;
+using conversion::exporter::MissingOutputFilenameException;
 
 namespace conversion::asn1::exporter {
 
@@ -45,7 +44,7 @@ void Asn1Exporter::exportModel(const Model *const model, const Options &options)
 
     const auto *const asn1Model = dynamic_cast<const Asn1Model *>(model);
     if (asn1Model == nullptr) {
-        throw IncorrectSourceModelException(ModelType::Asn1, model->modelType());
+        throw IncorrectModelException(ModelType::Asn1, model->modelType());
     }
 
     for (const auto &file : asn1Model->data()) {
@@ -54,7 +53,7 @@ void Asn1Exporter::exportModel(const Model *const model, const Options &options)
     }
 }
 
-void Asn1Exporter::exportAsn1Model(const Asn1Acn::File &file, const Options &options)
+void Asn1Exporter::exportAsn1Model(const Asn1Acn::File &file, const Options &options) const
 {
     QString serializedModelData;
     QTextStream outputTextStream(&serializedModelData, QIODevice::WriteOnly);
@@ -62,13 +61,12 @@ void Asn1Exporter::exportAsn1Model(const Asn1Acn::File &file, const Options &opt
     Asn1Acn::Asn1NodeReconstructingVisitor asn1NodeReconVis(outputTextStream);
     asn1NodeReconVis.visit(file);
 
-    const QString pathPrefix = (options.value(Asn1Options::asn1FilepathPrefix)).value_or("");
-    const auto filePath = QString("%1%2%3").arg(pathPrefix, file.name(), ".asn");
+    const auto filePath = buildFilePath(file.name(), "asn", options);
     QSaveFile outputFile(filePath);
     writeAndCommit(outputFile, serializedModelData.toStdString());
 }
 
-void Asn1Exporter::exportAcnModel(const Asn1Acn::File &file, const Options &options)
+void Asn1Exporter::exportAcnModel(const Asn1Acn::File &file, const Options &options) const
 {
     QString serializedModelData;
     QTextStream outputTextStream(&serializedModelData, QIODevice::WriteOnly);
@@ -76,13 +74,12 @@ void Asn1Exporter::exportAcnModel(const Asn1Acn::File &file, const Options &opti
     Asn1Acn::AcnNodeReconstructingVisitor acnNodeReconVis(outputTextStream);
     acnNodeReconVis.visit(file);
 
-    const QString pathPrefix = (options.value(Asn1Options::acnFilepathPrefix)).value_or("");
-    const auto filePath = QString("%1%2%3").arg(pathPrefix, file.name(), ".acn");
+    const auto filePath = buildFilePath(file.name(), "acn", options);
     QSaveFile outputFile(filePath);
     writeAndCommit(outputFile, serializedModelData.toStdString());
 }
 
-void Asn1Exporter::writeAndCommit(QSaveFile &outputFile, const std::string &data)
+void Asn1Exporter::writeAndCommit(QSaveFile &outputFile, const std::string &data) const
 {
     bool opened = outputFile.open(QIODevice::WriteOnly);
     bool written = outputFile.write(data.c_str());
@@ -97,6 +94,16 @@ void Asn1Exporter::writeAndCommit(QSaveFile &outputFile, const std::string &data
     if (!commited) {
         throw ExportException(QString("Failed to commit a transaction in %1").arg(outputFile.fileName()));
     }
+}
+
+QString Asn1Exporter::buildFilePath(const QString &fileName, const QString &extension, const Options &options) const
+{
+    if (fileName.isEmpty()) {
+        throw MissingOutputFilenameException(ModelType::Asn1);
+    }
+
+    const auto pathPrefix = options.value(Asn1Options::acnFilepathPrefix).value_or("");
+    return QString("%1%2.%3").arg(pathPrefix, fileName, extension);
 }
 
 } // namespace conversion::asn1::exporter

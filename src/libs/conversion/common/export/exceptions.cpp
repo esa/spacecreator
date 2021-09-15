@@ -33,10 +33,9 @@ IncorrectModelException::IncorrectModelException(ModelType expectedModelType, Mo
 {
 }
 
-IncorrectSourceModelException::IncorrectSourceModelException(ModelType expectedModelType, ModelType receivedModelType)
-    : ExportException(QString("Source model not supported, expected %1 model, got %2 model")
-                              .arg(modelTypeToString(expectedModelType))
-                              .arg(modelTypeToString(receivedModelType)))
+MissingOutputFilenameException::MissingOutputFilenameException(ModelType modelType)
+    : ExportException(
+            QString("Missing name of the output filename while exporting %1 model").arg(modelTypeToString(modelType)))
 {
 }
 

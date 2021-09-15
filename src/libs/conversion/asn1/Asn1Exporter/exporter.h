@@ -39,9 +39,11 @@ public:
     virtual auto exportModel(const Model *model, const Options &options) const -> void override;
 
 private:
-    static auto exportAsn1Model(const Asn1Acn::File &file, const Options &options) -> void;
-    static auto exportAcnModel(const Asn1Acn::File &file, const Options &options) -> void;
+    auto exportAsn1Model(const Asn1Acn::File &file, const Options &options) const -> void;
+    auto exportAcnModel(const Asn1Acn::File &file, const Options &options) const -> void;
 
-    static auto writeAndCommit(QSaveFile &outputFile, const std::string &data) -> void;
+    auto writeAndCommit(QSaveFile &outputFile, const std::string &data) const -> void;
+
+    auto buildFilePath(const QString &fileName, const QString &extension, const Options &Options) const -> QString;
 };
 } // namespace conversion::asn1::exporter

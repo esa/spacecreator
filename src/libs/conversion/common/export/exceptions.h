@@ -54,18 +54,17 @@ public:
 };
 
 /**
- * @brief   Exception thrown when exporters get unsupported source model
+ * @brief   Exception thrown when output file name is missing
  */
-class IncorrectSourceModelException : public ExportException
+class MissingOutputFilenameException : public ExportException
 {
 public:
     /**
      * @brief   Constructor
      *
-     * @param   expectedModelType   Expected model type
-     * @param   receivedModelType   Received model type
+     * @param   message     Model type
      */
-    explicit IncorrectSourceModelException(ModelType expectedModelType, ModelType receivedModelType);
+    explicit MissingOutputFilenameException(ModelType modelType);
 };
 
 } // namespace conversion::exporter

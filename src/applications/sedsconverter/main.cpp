@@ -55,7 +55,7 @@ int main(int argc, char **argv)
     options.add(IvOptions::outputFilename, "output.xml");
 
     try {
-        sedsConverter.convert(conversion::ModelType::InterfaceView, {}, std::move(options));
+        sedsConverter.convert(conversion::ModelType::Asn1, {}, std::move(options));
     } catch (const ImportException &ex) {
         const auto errorMessage = QString("Import failure: %1").arg(ex.errorMessage());
         qFatal("%s", errorMessage.toLatin1().constData());
