@@ -77,17 +77,28 @@ Asn1Editor::~Asn1Editor()
 void Asn1Editor::setValue(const QString &value)
 {
     const QString &currentType { ui->typesCB->currentText() };
-    if (value.isEmpty() || currentType.isEmpty() || !m_asn1Checks) {
+    if (value.isEmpty() || currentType.isEmpty()) {
         return;
     }
 
     Asn1Acn::Asn1ValueParser valueParser;
     connect(&valueParser, &Asn1Acn::Asn1ValueParser::parseError, this, &Asn1Editor::showParseError);
 
-    const std::unique_ptr<Asn1Acn::TypeAssignment> &asn1Item = m_asn1Checks->typeAssignment(currentType);
-    if (asn1Item) {
-        const QVariantMap valueData = valueParser.parseAsn1Value(asn1Item.get(), value);
-        m_asn1TreeView->setAsn1Value(valueData);
+    if (m_attrAsn1File) {
+        const std::unique_ptr<Asn1Acn::TypeAssignment> &asn1Item = m_attrAsn1File->typeAssignment(currentType);
+        if (asn1Item) {
+            const QVariantMap valueData = valueParser.parseAsn1Value(asn1Item.get(), value);
+            m_asn1TreeView->setAsn1Value(valueData);
+            return;
+        }
+    }
+
+    if (m_asn1Checks) {
+        const std::unique_ptr<Asn1Acn::TypeAssignment> &asn1Item = m_asn1Checks->typeAssignment(currentType);
+        if (asn1Item) {
+            const QVariantMap valueData = valueParser.parseAsn1Value(asn1Item.get(), value);
+            m_asn1TreeView->setAsn1Value(valueData);
+        }
     }
 }
 
