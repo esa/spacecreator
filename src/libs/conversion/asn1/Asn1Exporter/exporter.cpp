@@ -61,7 +61,7 @@ void Asn1Exporter::exportAsn1Model(const Asn1Acn::File &file, const Options &opt
     Asn1Acn::Asn1NodeReconstructingVisitor asn1NodeReconVis(outputTextStream);
     asn1NodeReconVis.visit(file);
 
-    const auto filePath = buildFilePath(file.name(), "asn", options);
+    const auto filePath = makeFilePath(file.name(), "asn", options);
     QSaveFile outputFile(filePath);
     writeAndCommit(outputFile, serializedModelData.toStdString());
 }
@@ -74,7 +74,7 @@ void Asn1Exporter::exportAcnModel(const Asn1Acn::File &file, const Options &opti
     Asn1Acn::AcnNodeReconstructingVisitor acnNodeReconVis(outputTextStream);
     acnNodeReconVis.visit(file);
 
-    const auto filePath = buildFilePath(file.name(), "acn", options);
+    const auto filePath = makeFilePath(file.name(), "acn", options);
     QSaveFile outputFile(filePath);
     writeAndCommit(outputFile, serializedModelData.toStdString());
 }
@@ -96,7 +96,7 @@ void Asn1Exporter::writeAndCommit(QSaveFile &outputFile, const std::string &data
     }
 }
 
-QString Asn1Exporter::buildFilePath(const QString &fileName, const QString &extension, const Options &options) const
+QString Asn1Exporter::makeFilePath(const QString &fileName, const QString &extension, const Options &options) const
 {
     if (fileName.isEmpty()) {
         throw MissingOutputFilenameException(ModelType::Asn1);

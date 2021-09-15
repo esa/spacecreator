@@ -44,6 +44,6 @@ private:
 
     auto writeAndCommit(QSaveFile &outputFile, const std::string &data) const -> void;
 
-    auto buildFilePath(const QString &fileName, const QString &extension, const Options &Options) const -> QString;
+    auto makeFilePath(const QString &fileName, const QString &extension, const Options &Options) const -> QString;
 };
 } // namespace conversion::asn1::exporter
