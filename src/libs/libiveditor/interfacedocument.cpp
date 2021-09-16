@@ -56,6 +56,7 @@
 #include <QDialogButtonBox>
 #include <QDir>
 #include <QDirIterator>
+#include <QInputDialog>
 #include <QLabel>
 #include <QLineEdit>
 #include <QMenu>
@@ -342,9 +343,9 @@ bool InterfaceDocument::exportSelectedFunctions()
 {
     QString name;
     const QList<shared::VEObject *> objects = prepareSelectedObjectsForExport(name);
-    d->objectsSelectionModel->clearSelection();
-    const QString path = shared::componentsLibraryPath() + name;
+    QString path = shared::componentsLibraryPath() + name;
     if (exportImpl(path, objects)) {
+        d->objectsSelectionModel->clearSelection();
         return loadComponentModel(d->importModel, path + QDir::separator() + shared::kDefaultInterfaceViewFileName);
     }
     return false;
@@ -371,9 +372,9 @@ bool InterfaceDocument::exportSelectedType()
     if (!rootType) {
         return false;
     }
-    d->objectsSelectionModel->clearSelection();
-    const QString path = shared::sharedTypesPath() + QDir::separator() + rootType->title();
+    QString path = shared::sharedTypesPath() + QDir::separator() + rootType->title();
     if (exportImpl(path, { rootType })) {
+        d->objectsSelectionModel->clearSelection();
         return loadComponentModel(d->sharedModel, path + QDir::separator() + shared::kDefaultInterfaceViewFileName);
     }
     return false;
@@ -748,8 +749,8 @@ void InterfaceDocument::importEntity(const shared::Id &id, const QPointF &sceneD
     const auto intersectedNames = d->importModel->nestedFunctionNames(obj->as<const ivm::IVFunctionType *>())
                                           .intersect(existingFunctionNames);
     if (!intersectedNames.isEmpty()) {
-        QString msg = tr("Chosen entity [%1] couldn't be imported because of Function names conflict(s): %2")
-                              .arg(obj->titleUI(), intersectedNames.toList().join(QLatin1Char('\n')));
+        const QString msg = tr("Chosen entity [%1] couldn't be imported because of Function names conflict(s): %2")
+                                    .arg(obj->titleUI(), intersectedNames.toList().join(QLatin1Char('\n')));
         shared::ErrorHub::addError(shared::ErrorItem::Error, msg);
         return;
     }
@@ -884,43 +885,113 @@ void InterfaceDocument::showContextMenuForIVModel(const QPoint &pos)
     menu->exec(d->objectsView->mapToGlobal(pos));
 }
 
-bool InterfaceDocument::exportImpl(const QString &targetDir, const QList<shared::VEObject *> &objects)
+static inline bool exportObjects(
+        IVExporter *exporter, const QList<shared::VEObject *> &objects, const QString &filePath)
 {
-    const bool ok = shared::ensureDirExists(targetDir);
-    if (!ok) {
-        shared::ErrorHub::addError(shared::ErrorItem::Error, tr("Unable to create directory %1").arg(targetDir));
-        return {};
-    }
-
-    const QString exportFilePath = QString("%1/%2").arg(targetDir, shared::kDefaultInterfaceViewFileName);
-
-    const QFileInfo exportFileInfo(exportFilePath);
-    if (exportFileInfo.exists()) {
-        shared::ErrorHub::addError(
-                shared::ErrorItem::Error, tr("Current object already exported:  %1").arg(exportFilePath));
-        return false;
-    }
-
     QBuffer buffer;
     if (!buffer.open(QIODevice::WriteOnly)) {
         shared::ErrorHub::addError(
-                shared::ErrorItem::Error, tr("Can't open buffer for exporting: %1").arg(buffer.errorString()));
+                shared::ErrorItem::Error, QObject::tr("Can't open buffer for exporting: %1").arg(buffer.errorString()));
         return false;
     }
-    if (!d->exporter->exportObjects(objects, &buffer)) {
-        shared::ErrorHub::addError(shared::ErrorItem::Error, tr("Error during component export"));
+    if (!exporter->exportObjects(objects, &buffer)) {
+        shared::ErrorHub::addError(shared::ErrorItem::Error, QObject::tr("Error during component export"));
         return false;
     }
     buffer.close();
 
-    QFile file(exportFileInfo.absoluteFilePath());
+    QFile file(filePath);
     if (!file.open(QIODevice::WriteOnly)) {
-        shared::ErrorHub::addError(shared::ErrorItem::Error, tr("Can't export file: ").arg(file.errorString()));
+        shared::ErrorHub::addError(
+                shared::ErrorItem::Error, QObject::tr("Can't export file: ").arg(file.errorString()));
         return false;
     }
-    file.write(buffer.buffer());
+    const qint64 bytesWritten = file.write(buffer.buffer());
     file.close();
-    if (QFile::copy(asn1FilePath(), targetDir + QDir::separator() + asn1FileName())) {
+    return bytesWritten == buffer.size();
+}
+
+static inline bool resolveNameConflict(QString &targetPath, QWidget *window)
+{
+    QMessageBox msgBox(QMessageBox::Question, QObject::tr("Exporting objects"),
+            QObject::tr("Current object already exported: %1\nDo you want to proceed?").arg(targetPath),
+            QMessageBox::StandardButton::NoButton, window);
+    msgBox.addButton(QMessageBox::Cancel);
+    msgBox.addButton(QObject::tr("Overwrite"), QMessageBox::ButtonRole::AcceptRole);
+    msgBox.addButton(QObject::tr("Rename"), QMessageBox::ButtonRole::ResetRole);
+    msgBox.exec();
+
+    const QMessageBox::ButtonRole role = msgBox.buttonRole(msgBox.clickedButton());
+    switch (role) {
+    case QMessageBox::ButtonRole::AcceptRole:
+        if (!QDir(targetPath).removeRecursively()) {
+            shared::ErrorHub::addError(
+                    shared::ErrorItem::Error, QObject::tr("Unable to cleanup directory %1").arg(targetPath));
+            return false;
+        }
+        break;
+    case QMessageBox::ButtonRole::ResetRole: {
+        const QFileInfo fi(targetPath);
+        bool ok = true;
+        QString text;
+        while (ok) {
+            text = QInputDialog::getText(window, QObject::tr("Exporting objects"),
+                    QObject::tr("Set another name for exporting object"), QLineEdit::Normal, QString(), &ok);
+            if (!ok) {
+                return false;
+            } else if (text.isEmpty()) {
+                shared::ErrorHub::addError(shared::ErrorItem::Error, QObject::tr("Component name can't be empty"));
+            } else if (QFile::exists(fi.absoluteDir().filePath(text))) {
+                shared::ErrorHub::addError(shared::ErrorItem::Error,
+                        QObject::tr("Exported component with such name already exists, choose another one"));
+            } else {
+                break;
+            }
+        }
+        targetPath = fi.absoluteDir().filePath(text);
+        break;
+    }
+    case QMessageBox::ButtonRole::RejectRole:
+    default:
+        return false;
+    }
+
+    if (!shared::ensureDirExists(targetPath)) {
+        shared::ErrorHub::addError(
+                shared::ErrorItem::Error, QObject::tr("Unable to create directory %1").arg(targetPath));
+        return false;
+    }
+    return true;
+}
+
+bool InterfaceDocument::exportImpl(QString &targetPath, const QList<shared::VEObject *> &objects)
+{
+    const bool ok = shared::ensureDirExists(targetPath);
+    if (!ok) {
+        shared::ErrorHub::addError(shared::ErrorItem::Error, tr("Unable to create directory %1").arg(targetPath));
+        return false;
+    }
+
+    QDir targetDir(targetPath);
+    if (QFile::exists(targetDir.filePath(shared::kDefaultInterfaceViewFileName))) {
+        if (!resolveNameConflict(targetPath, window())) {
+            return false;
+        } else {
+            targetDir.setPath(targetPath);
+        }
+    }
+
+    auto it = std::find_if(
+            objects.begin(), objects.end(), [](shared::VEObject *obj) { return obj->parentObject() == nullptr; });
+    if (it != objects.end()) {
+        (*it)->setEntityAttribute(ivm::meta::Props::token(ivm::meta::Props::Token::name), targetDir.dirName());
+    }
+
+    if (!exportObjects(d->exporter, objects, targetDir.filePath(shared::kDefaultInterfaceViewFileName))) {
+        return false;
+    }
+
+    if (!QFile::copy(asn1FilePath(), targetDir.filePath(asn1FileName()))) {
         shared::ErrorHub::addError(
                 shared::ErrorItem::Error, tr("Error during ASN.1 file copying: %1").arg(asn1FilePath()));
     }

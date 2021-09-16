@@ -153,7 +153,7 @@ private Q_SLOTS:
     void showContextMenuForIVModel(const QPoint &pos);
 
 private:
-    bool exportImpl(const QString &path, const QList<shared::VEObject *> &objects);
+    bool exportImpl(QString &targetPath, const QList<shared::VEObject *> &objects);
     bool loadImpl(const QString &path);
     QString getComponentName(const QStringList &exportNames);
     QList<shared::VEObject *> prepareSelectedObjectsForExport(QString &name, bool silent = false);
