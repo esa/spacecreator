@@ -25,6 +25,7 @@
 namespace dvm {
 struct DVBoardPrivate;
 class DVPort;
+class DVSystemFunction;
 
 class DVBoard : public DVObject
 {
@@ -38,6 +39,8 @@ public:
     void addPort(DVPort *port);
 
     QList<DVPort *> ports() const;
+
+    QList<DVSystemFunction *> systemFunctions() const;
 
 private:
     std::unique_ptr<DVBoardPrivate> d;

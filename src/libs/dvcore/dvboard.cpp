@@ -18,6 +18,7 @@
 #include "dvboard.h"
 
 #include "dvdevice.h"
+#include "dvsystemfunction.h"
 
 namespace dvm {
 
@@ -47,6 +48,11 @@ void DVBoard::addPort(DVPort *port)
 QList<DVPort *> DVBoard::ports() const
 {
     return d->ports;
+}
+
+QList<DVSystemFunction *> DVBoard::systemFunctions() const
+{
+    return typedChildren<DVSystemFunction>();
 }
 
 } // namespace dvm

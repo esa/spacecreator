@@ -39,6 +39,7 @@ public:
     };
     Q_ENUM(InterfaceType)
 
+    explicit DVSystemInterface(const DVSystemInterface &copy, DVObject *parent = nullptr);
     explicit DVSystemInterface(DVObject *parent = nullptr);
 
     void setInterfaceType(InterfaceType type);

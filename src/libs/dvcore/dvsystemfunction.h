@@ -30,6 +30,7 @@ class DVSystemFunction : public DVObject
     Q_PROPERTY(QList<dvm::DVSystemInterface *> interfaces READ interfaces)
 
 public:
+    explicit DVSystemFunction(const DVSystemFunction &copy, DVObject *parent = nullptr);
     explicit DVSystemFunction(DVObject *parent = nullptr);
 
     QList<DVSystemInterface *> interfaces() const;

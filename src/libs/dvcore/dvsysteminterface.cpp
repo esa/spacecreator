@@ -19,6 +19,16 @@
 
 namespace dvm {
 
+/**
+   Constructore that copies all attributes and parameters from \p copy
+ */
+DVSystemInterface::DVSystemInterface(const DVSystemInterface &copy, DVObject *parent)
+    : DVSystemInterface(parent)
+{
+    setEntityAttributes(copy.entityAttributes());
+    setParams(copy.params());
+}
+
 DVSystemInterface::DVSystemInterface(DVObject *parent)
     : DVObject(DVObject::Type::SystemInterface, {}, parent)
 {

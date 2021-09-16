@@ -25,6 +25,8 @@
 #include "dvnamevalidator.h"
 #include "dvnode.h"
 #include "dvpartition.h"
+#include "dvsystemfunction.h"
+#include "dvsysteminterface.h"
 #include "graphicsviewutils.h"
 
 #include <QRectF>
@@ -43,12 +45,20 @@ CmdNodeEntityCreate::CmdNodeEntityCreate(dvm::DVModel *model, const dvm::DVBoard
     m_node->setTitle(dvm::DVNameValidator::nameForObject(m_node, m_model, m_board->title()));
     const QRectF geometry { QRectF(pos, shared::graphicsviewutils::kDefaultNodeGraphicsItemSize) };
     prepareData({ qMakePair(m_node, QVector<QPointF> { geometry.topLeft(), geometry.bottomRight() }) });
+
     m_partition->setTitle(dvm::DVNameValidator::nameForObject(m_partition, m_model));
     m_node->addPartition(m_partition);
+
     for (const dvm::DVPort *port : m_board->ports()) {
         auto nodeDevice = new dvm::DVDevice(*port, m_node);
         m_node->addDevice(nodeDevice);
         m_devices.append(nodeDevice);
+    }
+    for (const dvm::DVSystemFunction *sfunc : m_board->systemFunctions()) {
+        auto newFunc = new dvm::DVSystemFunction(*sfunc, m_node);
+        for (const dvm::DVSystemInterface *sface : sfunc->interfaces()) {
+            new dvm::DVSystemInterface(*sface, newFunc);
+        }
     }
 }
 
@@ -71,12 +81,24 @@ void CmdNodeEntityCreate::redo()
         for (dvm::DVDevice *dev : qAsConst(m_devices)) {
             m_model->addObject(dev);
         }
+        for (dvm::DVSystemFunction *sfunc : m_node->systemFunctions()) {
+            m_model->addObject(sfunc);
+            for (dvm::DVSystemInterface *sface : sfunc->interfaces()) {
+                m_model->addObject(sface);
+            }
+        }
     }
 }
 
 void CmdNodeEntityCreate::undo()
 {
     if (m_model) {
+        for (dvm::DVSystemFunction *sfunc : m_node->systemFunctions()) {
+            for (dvm::DVSystemInterface *sface : sfunc->interfaces()) {
+                m_model->removeObject(sface);
+            }
+            m_model->removeObject(sfunc);
+        }
         for (dvm::DVDevice *dev : qAsConst(m_devices)) {
             m_model->removeObject(dev);
         }
