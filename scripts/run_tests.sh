@@ -16,7 +16,7 @@ cd $BUILD_DIR
 BASE_DIR=`pwd`
 
 EXIT_CODE=0
-TESTS=`find . -name "tst_*" -type f -executable`
+TESTS=`find . -name "tst*_*" -type f -executable`
 for TEST in $TESTS
 do
     echo $TEST
