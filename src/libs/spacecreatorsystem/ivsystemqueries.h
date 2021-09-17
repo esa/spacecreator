@@ -24,6 +24,7 @@
 #include <QSharedPointer>
 
 namespace ivm {
+class IVFunction;
 class IVModel;
 }
 
@@ -45,6 +46,7 @@ public:
 
     QStringList functionsNames() const override;
     QStringList pseudoFunctionsNames() const override;
+    QList<ivm::IVFunction *> connectedPseudoFunctions(const QString &functionName) const;
 
     QList<QPair<QString, QString>> messages(
             const QString &sourceFunction, const QString &targetFunction) const override;
@@ -60,6 +62,7 @@ Q_SIGNALS:
 private:
     IVEditorCorePtr m_ivCore;
     QPointer<scs::SpaceCreatorProject> m_project;
+    Qt::CaseSensitivity m_caseCheck = Qt::CaseInsensitive;
 };
 
 } // namespace scs

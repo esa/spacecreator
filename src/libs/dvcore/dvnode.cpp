@@ -108,4 +108,19 @@ QList<DVSystemFunction *> DVNode::systemFunctions() const
     return typedChildren<DVSystemFunction>();
 }
 
+DVSystemFunction *DVNode::systemFunction(const QString &name) const
+{
+    for (DVSystemFunction *func : systemFunctions()) {
+        if (func->title() == name) {
+            return func;
+        }
+    }
+    return nullptr;
+}
+
+bool DVNode::hasSystemFunction(const QString &name) const
+{
+    return systemFunction(name) != nullptr;
+}
+
 } // namespace dvm

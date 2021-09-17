@@ -22,7 +22,13 @@
 #include "dvfunction.h"
 #include "dvmessage.h"
 #include "dvmodel.h"
+#include "dvnode.h"
+#include "dvpartition.h"
+#include "dvsystemfunction.h"
+#include "dvsysteminterface.h"
 #include "errorhub.h"
+#include "ivfunction.h"
+#include "ivinterface.h"
 #include "ivsystemqueries.h"
 #include "spacecreatorproject.h"
 
@@ -70,6 +76,7 @@ bool DvSystemChecks::checkFunctionBindings(DVEditorCorePtr dvCore) const
     bool ok = true;
     ok = ok && checkFunctionIvValidity(dvCore);
     ok = ok && checkUniqueFunctionBindings(dvCore);
+    ok = ok && checkSystemFunctionsAvailable(dvCore);
     return ok;
 }
 
@@ -97,16 +104,22 @@ bool DvSystemChecks::checkFunctionIvValidity(const DVEditorCorePtr &dvCore) cons
     }
     scs::IvSystemQueries *ivQuery = m_storage->ivQuery();
     QStringList ivFunctionNames = ivQuery->functionsNames();
+    QStringList systemFunctionNames = ivQuery->pseudoFunctionsNames();
 
     bool ok = true;
     dvm::DVModel *model = dvCore->appModel()->objectsModel();
     QVector<dvm::DVFunction *> functions = model->allObjectsByType<dvm::DVFunction>();
     for (dvm::DVFunction *f : functions) {
-        if (!ivFunctionNames.contains(f->title(), m_caseCheck)) {
+        const QString fname = f->title();
+        if (!ivFunctionNames.contains(fname, m_caseCheck)) {
             ok = false;
             shared::ErrorHub::addError(shared::ErrorItem::Error,
-                    tr("Function binding '%1' is not available in the interface view").arg(f->title()),
-                    dvCore->filePath());
+                    tr("Function binding '%1' is not available in the interface view").arg(fname), dvCore->filePath());
+        }
+        if (systemFunctionNames.contains(fname, m_caseCheck)) {
+            ok = false;
+            shared::ErrorHub::addError(shared::ErrorItem::Error,
+                    tr("Function binding '%1' is a pseudo/system function").arg(fname), dvCore->filePath());
         }
     }
 
@@ -115,9 +128,6 @@ bool DvSystemChecks::checkFunctionIvValidity(const DVEditorCorePtr &dvCore) cons
 
 bool DvSystemChecks::checkUniqueFunctionBindings(const DVEditorCorePtr &dvCore) const
 {
-    if (!m_storage) {
-        return true;
-    }
     bool ok = true;
     dvm::DVModel *model = dvCore->appModel()->objectsModel();
     QVector<dvm::DVFunction *> functions = model->allObjectsByType<dvm::DVFunction>();
@@ -132,6 +142,80 @@ bool DvSystemChecks::checkUniqueFunctionBindings(const DVEditorCorePtr &dvCore) 
             shared::ErrorHub::addError(shared::ErrorItem::Error,
                     tr("Function binding '%1' is used more than once").arg(fTitle), dvCore->filePath());
             duplicateNames.append(f->title());
+        }
+    }
+
+    return ok;
+}
+
+bool DvSystemChecks::checkSystemFunctionsAvailable(const DVEditorCorePtr &dvCore) const
+{
+    dvm::DVModel *model = dvCore->appModel()->objectsModel();
+    QVector<dvm::DVNode *> nodes = model->allObjectsByType<dvm::DVNode>();
+    bool ok = true;
+    for (dvm::DVNode *node : nodes) {
+        ok &= checkSystemFunctionsAvailable(node, dvCore);
+    }
+
+    return ok;
+}
+
+/*!
+   Checks for all bound functions, that are connected to a pseudo function (in IV), if a matching system function is
+   available in this node
+ */
+bool DvSystemChecks::checkSystemFunctionsAvailable(const dvm::DVNode *node, const DVEditorCorePtr &dvCore) const
+{
+    if (!m_storage && m_storage->ivQuery()) {
+        return true;
+    }
+
+    IvSystemQueries *ivQuery = m_storage->ivQuery();
+    bool ok = true;
+    QStringList boundFunctions;
+    for (dvm::DVPartition *partition : node->partitions()) {
+        boundFunctions += partition->functionsNames();
+    }
+
+    QList<ivm::IVFunction *> boundSystemFunctions;
+    for (const QString &func : boundFunctions) {
+        boundSystemFunctions += ivQuery->connectedPseudoFunctions(func);
+    }
+
+    // check if functions exist
+    for (ivm::IVFunction *func : boundSystemFunctions) {
+        dvm::DVSystemFunction *sysFunc = node->systemFunction(func->title());
+        if (!sysFunc) {
+            ok = false;
+            shared::ErrorHub::addError(shared::ErrorItem::Error,
+                    tr("Node '%1' misses a pseudo function '%2'").arg(node->title(), func->title()),
+                    dvCore->filePath());
+            continue;
+        }
+        // Check if interfaces match
+        for (ivm::IVInterface *iface : func->allInterfaces()) {
+            bool foundMatch = false;
+            for (dvm::DVSystemInterface *sysFace : sysFunc->interfaces()) {
+                if (sysFace->title().compare(iface->title()) == 0) {
+                    // check parameters
+                    if (sysFace->params() != iface->params()) {
+                        ok = false;
+                        shared::ErrorHub::addError(shared::ErrorItem::Error,
+                                tr("Parameters of interface '%1'.'%2'.'%3' does not match")
+                                        .arg(node->title(), func->title(), sysFace->title()),
+                                dvCore->filePath());
+                    }
+                    foundMatch = true;
+                    break;
+                }
+            }
+            if (!foundMatch) {
+                ok = false;
+                shared::ErrorHub::addError(shared::ErrorItem::Error,
+                        tr("Node '%1' misses interface '%2' in pseudo function '%3'")
+                                .arg(node->title(), iface->title(), func->title()),
+                        dvCore->filePath());
+            }
         }
     }
 

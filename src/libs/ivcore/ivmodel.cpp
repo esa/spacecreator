@@ -313,6 +313,21 @@ QVector<IVConnection *> IVModel::getConnectionsForIface(const shared::Id &id) co
     return result;
 }
 
+QVector<IVConnection *> IVModel::getConnectionsForFunction(const shared::Id &id) const
+{
+    QVector<IVConnection *> result;
+
+    for (auto obj : objects()) {
+        if (auto connection = qobject_cast<IVConnection *>(obj)) {
+            if ((connection->source() && connection->source()->id() == id)
+                    || (connection->target() && connection->target()->id() == id)) {
+                result.append(connection);
+            }
+        }
+    }
+    return result;
+}
+
 QList<IVObject *> IVModel::visibleObjects() const
 {
     return d->m_visibleObjects;

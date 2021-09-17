@@ -23,7 +23,11 @@
 #include <QPointer>
 
 namespace dvm {
-class DVFunction;
+class DVNode;
+class DVSystemFunction;
+}
+namespace ivm {
+class IVInterface;
 }
 
 namespace scs {
@@ -50,6 +54,8 @@ public Q_SLOTS:
 private:
     bool checkFunctionIvValidity(const DVEditorCorePtr &dvCore) const;
     bool checkUniqueFunctionBindings(const DVEditorCorePtr &dvCore) const;
+    bool checkSystemFunctionsAvailable(const DVEditorCorePtr &dvCore) const;
+    bool checkSystemFunctionsAvailable(const dvm::DVNode *node, const DVEditorCorePtr &dvCore) const;
 
     bool checkMessageIvValidity(const DVEditorCorePtr &dvCore) const;
     bool checkUniqueMessages(const DVEditorCorePtr &dvCore) const;

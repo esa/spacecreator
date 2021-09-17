@@ -20,6 +20,7 @@
 #include "dveditorcore.h"
 #include "errorhub.h"
 #include "interfacedocument.h"
+#include "ivconnection.h"
 #include "ivconnectionchain.h"
 #include "ivfunction.h"
 #include "ivmodel.h"
@@ -83,6 +84,38 @@ QStringList IvSystemQueries::pseudoFunctionsNames() const
         }
     }
     return functionNames;
+}
+
+/*!
+   Returns all pseudo/system functions that are connected to the \p function
+ */
+QList<ivm::IVFunction *> IvSystemQueries::connectedPseudoFunctions(const QString &functionName) const
+{
+    if (!ivModel()) {
+        return {};
+    }
+
+    ivm::IVModel *model = ivModel();
+    ivm::IVFunction *ivFunction = model->getFunction(functionName, m_caseCheck);
+    if (!ivFunction) {
+        return {};
+    }
+    QVector<ivm::IVConnection *> connections = model->getConnectionsForFunction(ivFunction->id());
+
+    QList<ivm::IVFunction *> functions;
+    auto addFunction = [&](ivm::IVObject *obj) {
+        ivm::IVFunction *f = qobject_cast<ivm::IVFunction *>(obj);
+        if (f && f != ivFunction && f->isPseudoFunction() && !functions.contains(f)) {
+            functions.append(f);
+        }
+    };
+
+    for (ivm::IVConnection *connection : connections) {
+        addFunction(connection->source());
+        addFunction(connection->target());
+    }
+
+    return functions;
 }
 
 /*!

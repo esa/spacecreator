@@ -52,6 +52,8 @@ public:
     QList<DVDevice *> devices() const;
 
     QList<DVSystemFunction *> systemFunctions() const;
+    DVSystemFunction *systemFunction(const QString &name) const;
+    bool hasSystemFunction(const QString &name) const;
 
 private:
     std::unique_ptr<DVNodePrivate> d;

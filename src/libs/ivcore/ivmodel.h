@@ -21,9 +21,9 @@
 #include "ivobject.h"
 #include "vemodel.h"
 
-#include <conversion/common/model.h>
 #include <QAbstractItemModel>
 #include <QVector>
+#include <conversion/common/model.h>
 #include <memory>
 
 namespace shared {
@@ -78,6 +78,8 @@ public:
 
     IVConnection *getConnectionForIface(const shared::Id &id) const;
     QVector<IVConnection *> getConnectionsForIface(const shared::Id &id) const;
+
+    QVector<IVConnection *> getConnectionsForFunction(const shared::Id &id) const;
 
     QList<IVObject *> visibleObjects() const;
     QList<IVObject *> visibleObjects(shared::Id rootId) const;
