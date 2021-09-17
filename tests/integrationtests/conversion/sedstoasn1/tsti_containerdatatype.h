@@ -17,20 +17,18 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/lgpl-2.1.html>.
  */
 
-#include "tsti_arraydatatype.h"
-#include "tsti_containerdatatype.h"
+#pragma once
 
-#include <QTest>
+#include "testbase.h"
 
-using namespace conversion::asn1::test;
+namespace conversion::asn1::test {
 
-int main()
+class tsti_ContainerDataType : public TestBase
 {
-    tsti_ArrayDataType arrayDataType;
-    tsti_ContainerDataType containerDataType;
+    Q_OBJECT
 
-    QTest::qExec(&arrayDataType);
-    QTest::qExec(&containerDataType);
+private Q_SLOTS:
+    void testSimpleContainer();
+};
 
-    return EXIT_SUCCESS;
-}
+} // namespace conversion::asn1::test

@@ -1,0 +1,59 @@
+/** @file
+ * This file is part of the SpaceCreator.
+ *
+ * @copyright (C) 2021 N7 Space Sp. z o.o.
+ *
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Library General Public
+ * License as published by the Free Software Foundation; either
+ * version 2 of the License, or (at your option) any later version.
+ *
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Library General Public License for more details.
+ *
+ * You should have received a copy of the GNU Library General Public License
+ * along with this program. If not, see <https://www.gnu.org/licenses/lgpl-2.1.html>.
+ */
+
+#pragma once
+
+#include <asn1library/asn1/asnsequencecomponent.h>
+#include <seds/SedsModel/types/datatype.h>
+
+namespace Asn1Acn {
+class Definitions;
+} // namespace Asn1Acn
+
+namespace seds::model {
+class Component;
+class Entry;
+class ErrorControlEntry;
+class FixedValueEntry;
+class LengthEntry;
+class ListEntry;
+class Package;
+class PaddingEntry;
+} // namespace seds::model
+
+namespace conversion::asn1::translator {
+
+struct EntryTranslatorVisitor final {
+    /// @brief  Parent definitions
+    Asn1Acn::Definitions *m_asn1Definitions;
+    /// @brief  Where translated entry will be saved
+    std::unique_ptr<Asn1Acn::AsnSequenceComponent> &m_asn1SequenceComponent;
+
+    auto operator()(const seds::model::Entry &sedsEntry) -> void;
+    auto operator()(const seds::model::ErrorControlEntry &sedsEntry) -> void;
+    auto operator()(const seds::model::FixedValueEntry &sedsEntry) -> void;
+    auto operator()(const seds::model::LengthEntry &sedsEntry) -> void;
+    auto operator()(const seds::model::ListEntry &sedsEntry) -> void;
+    auto operator()(const seds::model::PaddingEntry &sedsEntry) -> void;
+
+private:
+    auto translateEntryType(const QString &sedsTypeName) const -> std::unique_ptr<Asn1Acn::Types::UserdefinedType>;
+};
+
+} // namespace conversion::asn1::translator
