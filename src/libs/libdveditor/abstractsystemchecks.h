@@ -35,6 +35,7 @@ public:
 
     virtual ~AbstractSystemChecks() override = default;
     virtual QStringList functionsNames() const = 0;
+    virtual QStringList pseudoFunctionsNames() const = 0;
     virtual QList<QPair<QString, QString>> messages(
             const QString &sourceFunction, const QString &targetFunction) const = 0;
 

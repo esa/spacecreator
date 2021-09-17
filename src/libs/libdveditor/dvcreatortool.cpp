@@ -352,13 +352,14 @@ void DVCreatorTool::populateContextMenu_commonEdit(QMenu *menu, const QPointF &s
     QMenu *bindingMenu = menu->addMenu(tr("Bindings"));
 
     const QStringList allFunctions = m_sysChecker->functionsNames();
+    const QStringList systemFunctions = m_sysChecker->pseudoFunctionsNames();
     const QVector<dvm::DVFunction *> allBoundFunctionsEntities =
             model()->objectsModel()->allObjectsByType<dvm::DVFunction>();
     QStringList nonboundFunctions;
     for (const QString &fnName : qAsConst(allFunctions)) {
         auto it = std::find_if(allBoundFunctionsEntities.cbegin(), allBoundFunctionsEntities.cend(),
                 [fnName](const dvm::DVFunction *fn) { return fn->title() == fnName; });
-        if (it == allBoundFunctionsEntities.cend()) {
+        if (it == allBoundFunctionsEntities.cend() && !systemFunctions.contains(fnName)) {
             nonboundFunctions.append(fnName);
         }
     }

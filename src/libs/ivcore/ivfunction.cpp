@@ -114,6 +114,11 @@ bool IVFunction::inheritsFunctionType() const
     return instanceOf();
 }
 
+bool IVFunction::isPseudoFunction() const
+{
+    return entityAttributeValue("language").toString() == "Pseudo function";
+}
+
 void IVFunction::reflectAttrs(const EntityAttributes &attributes)
 {
     EntityAttributes prepared { attributes };

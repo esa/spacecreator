@@ -39,6 +39,8 @@ public:
     const IVFunctionType *instanceOf() const;
     bool inheritsFunctionType() const;
 
+    bool isPseudoFunction() const;
+
 protected Q_SLOTS:
     void reflectAttr(const QString &attrName);
     void reflectContextParam();

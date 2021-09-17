@@ -21,6 +21,7 @@
 #include "errorhub.h"
 #include "interfacedocument.h"
 #include "ivconnectionchain.h"
+#include "ivfunction.h"
 #include "ivmodel.h"
 #include "spacecreatorproject.h"
 
@@ -64,6 +65,24 @@ QStringList IvSystemQueries::functionsNames() const
     }
 
     return ivCore()->ivFunctionsNames();
+}
+
+/*!
+   Returns the names of all functions names using "pseudo function" as implementation
+ */
+QStringList IvSystemQueries::pseudoFunctionsNames() const
+{
+    if (!ivCore()) {
+        return {};
+    }
+
+    QStringList functionNames;
+    for (const ivm::IVFunction *ivFunction : ivCore()->allIVFunctions()) {
+        if (ivFunction && !ivFunction->title().isEmpty() && ivFunction->isPseudoFunction()) {
+            functionNames << ivFunction->title();
+        }
+    }
+    return functionNames;
 }
 
 /*!

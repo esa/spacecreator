@@ -44,6 +44,7 @@ public:
     IVEditorCorePtr ivCore() const;
 
     QStringList functionsNames() const override;
+    QStringList pseudoFunctionsNames() const override;
 
     QList<QPair<QString, QString>> messages(
             const QString &sourceFunction, const QString &targetFunction) const override;
