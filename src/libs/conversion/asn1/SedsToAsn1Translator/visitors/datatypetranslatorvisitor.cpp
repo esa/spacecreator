@@ -19,6 +19,7 @@
 
 #include "visitors/datatypetranslatorvisitor.h"
 
+#include "visitors/entrytranslatorvisitor.h"
 #include "visitors/floatrangetranslatorvisitor.h"
 #include "visitors/integerrangetranslatorvisitor.h"
 
@@ -33,6 +34,7 @@
 #include <asn1library/asn1/types/ia5string.h>
 #include <asn1library/asn1/types/integer.h>
 #include <asn1library/asn1/types/real.h>
+#include <asn1library/asn1/types/sequence.h>
 #include <asn1library/asn1/types/sequenceof.h>
 #include <asn1library/asn1/types/userdefinedtype.h>
 #include <asn1library/asn1/values.h>
@@ -114,8 +116,18 @@ void DataTypeTranslatorVisitor::operator()(const BooleanDataType &sedsType)
 
 void DataTypeTranslatorVisitor::operator()(const ContainerDataType &sedsType)
 {
-    Q_UNUSED(sedsType);
-    throw TranslationException("ContainerDataType translation not implemented");
+    auto type = std::make_unique<Asn1Acn::Types::Sequence>(sedsType.nameStr());
+
+    std::unique_ptr<Asn1Acn::AsnSequenceComponent> asn1SequenceComponent;
+    EntryTranslatorVisitor visitor { m_asn1Definitions, asn1SequenceComponent };
+
+    for (const auto &entry : sedsType.entries()) {
+        std::visit(visitor, entry);
+
+        type->addComponent(std::move(asn1SequenceComponent));
+    }
+
+    m_asn1Type = std::move(type);
 }
 
 void DataTypeTranslatorVisitor::operator()(const EnumeratedDataType &sedsType)
