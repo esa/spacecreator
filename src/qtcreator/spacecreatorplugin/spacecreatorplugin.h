@@ -21,6 +21,7 @@
 #include "options/coloroption.h"
 #include "options/dynamicactionoption.h"
 #include "options/hwlibraryoption.h"
+#include "options/ivlibraryoption.h"
 #include "options/propertyoptions.h"
 #include "spacecreatorplugin_global.h"
 
@@ -103,6 +104,7 @@ private:
     DynamicActionOption m_ivDynActionOptions;
     PropertyOptions m_propertyOptions;
     HwLibraryOption m_hwLibraryOptions;
+    IVLibraryOption m_ivLibraryOptions;
 };
 
 }

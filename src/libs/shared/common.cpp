@@ -34,6 +34,13 @@ extern Q_CORE_EXPORT int qt_ntfs_permission_lookup;
 #endif
 
 namespace shared {
+namespace env {
+const char *kSharedTypesLibrary = "TASTE_SHARED_TYPES";
+const char *kComponentsLibrary = "TASTE_COMPONENTS_LIBRARY";
+const char *kInterfaceAttrs = "TASTE_DEPLOYMENT_ATTRIBUTES_PATH";
+const char *kDeploymentAttrs = "TASTE_DEFAULT_ATTRIBUTES_PATH";
+const char *kDeploymentLibrary = "TASTE_DEPLOYMENT_HW_PATH";
+} // namespace env
 
 /*!
   \namespace shared
@@ -184,23 +191,27 @@ QString interfaceCustomAttributesFilePath()
     static const QString kDefaultPath = QStandardPaths::writableLocation(QStandardPaths::AppLocalDataLocation)
             + QDir::separator() + QLatin1String("default_attributes.xml");
 
-    return qEnvironmentVariable("TASTE_DEFAULT_ATTRIBUTES_PATH", kDefaultPath);
+    return qEnvironmentVariable(env::kInterfaceAttrs, kDefaultPath);
 }
 
 QString componentsLibraryPath()
 {
     static const QString kDefaultPath = QStandardPaths::writableLocation(QStandardPaths::AppLocalDataLocation)
             + QDir::separator() + QLatin1String("components_library") + QDir::separator();
+    const QString componentsFile =
+            shared::SettingsManager::load<QString>(shared::SettingsManager::IVE::ComponentsPath, kDefaultPath);
 
-    return qEnvironmentVariable("TASTE_COMPONENTS_LIBRARY", kDefaultPath);
+    return qEnvironmentVariable(env::kComponentsLibrary, componentsFile);
 }
 
 QString sharedTypesPath()
 {
     static const QString kDefaultPath = QStandardPaths::writableLocation(QStandardPaths::AppLocalDataLocation)
             + QDir::separator() + QLatin1String("shared_types") + QDir::separator();
+    const QString sharedTypesFile =
+            shared::SettingsManager::load<QString>(shared::SettingsManager::IVE::SharedTypesPath, kDefaultPath);
 
-    return qEnvironmentVariable("TASTE_SHARED_TYPES", kDefaultPath);
+    return qEnvironmentVariable(env::kSharedTypesLibrary, sharedTypesFile);
 }
 
 QString deploymentCustomAttributesFilePath()
@@ -208,7 +219,7 @@ QString deploymentCustomAttributesFilePath()
     static const QString kDefaultPath = QStandardPaths::writableLocation(QStandardPaths::AppLocalDataLocation)
             + QDir::separator() + QLatin1String("deployment_attributes.xml");
 
-    return qEnvironmentVariable("TASTE_DEPLOYMENT_ATTRIBUTES_PATH", kDefaultPath);
+    return qEnvironmentVariable(env::kDeploymentAttrs, kDefaultPath);
 }
 
 QString hwLibraryPath()
@@ -217,7 +228,7 @@ QString hwLibraryPath()
             + QDir::separator() + QLatin1String("HWlibrary");
     QString hwFile = shared::SettingsManager::load<QString>(shared::SettingsManager::DVE::HwLibraryFile, kDefaultPath);
 
-    return qEnvironmentVariable("TASTE_DEPLOYMENT_HW_PATH", hwFile);
+    return qEnvironmentVariable(env::kDeploymentLibrary, hwFile);
 }
 
 QSet<QString> forbiddenNamesSet()

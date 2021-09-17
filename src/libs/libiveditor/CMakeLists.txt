@@ -158,6 +158,10 @@ target_sources(${LIB_NAME} PRIVATE
     templating/exportableivobject.h
     zoomcontroller.cpp
     zoomcontroller.h
+    config/ivlibrarywidget.cpp
+    config/ivlibrarywidget.h
+    config/ivlibrarydialog.cpp
+    config/ivlibrarydialog.h
 )
 
 target_link_libraries(${LIB_NAME}

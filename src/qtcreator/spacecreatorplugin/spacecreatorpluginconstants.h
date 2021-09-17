@@ -63,6 +63,7 @@ const char SETTINGS_IV_COLOR_ID[] = "B.SpaceCreator.IVColor";
 const char SETTINGS_IV_ACTIONS_ID[] = "C.SpaceCreator.IVActions";
 const char SETTINGS_IV_PROPERTIES_ID[] = "D.SpaceCreator.IVProperties";
 const char SETTINGS_DV_HW_LIBRARY_ID[] = "E.SpaceCreator.HWLibrary";
+const char SETTINGS_IV_LIBRARY_ID[] = "F.SpaceCreator.IVLibrary";
 const char SETTINGS_CATEGORY[] = "K.SpaceCreator";
 const QString SETTINGS_ASN_COMPILER_KEY = { "SpaceCreator/asn1compiler" };
 const QString SETTINGS_ASN_COMPILER_PARAMETER_KEY = { "SpaceCreator/asn1compilerparameter" };

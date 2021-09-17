@@ -21,6 +21,7 @@
 #include "commands/cmdchangeasn1file.h"
 #include "commandsstack.h"
 #include "common.h"
+#include "config/ivlibrarydialog.h"
 #include "context/action/actionsmanager.h"
 #include "endtoend/endtoendview.h"
 #include "errorhub.h"
@@ -343,6 +344,12 @@ void MainWindow::openAsn1Dialog()
     }
 }
 
+void MainWindow::editIVLibrary()
+{
+    IVLibraryDialog dialog;
+    dialog.exec();
+}
+
 void MainWindow::initMenus()
 {
     // Initialize the file menu
@@ -362,6 +369,7 @@ void MainWindow::initMenus()
             Q_FUNC_INFO, m_actionSaveSceneRender, "Render", "Save current scene complete render.");
     m_actionShowAsnDialog = menu->addAction(tr("ASN1 dialog..."), this, &MainWindow::openAsn1Dialog);
     ActionsManager::registerAction(Q_FUNC_INFO, m_actionShowAsnDialog, "Asn1", "Edit the ASN1 file");
+
     menu->addSeparator();
     menu->addAction(m_core->actionQuit());
 
@@ -375,6 +383,9 @@ void MainWindow::initMenus()
     menu->addAction(redoAction);
     QMenu *root = new QMenu(tr("Common Settings"));
     root->addActions(m_core->document()->customActions());
+    auto action = root->addAction(tr("IV Library settings"), this, &MainWindow::editIVLibrary);
+    ActionsManager::registerAction(Q_FUNC_INFO, action, "IV Library", "Edit IV Library pathes");
+
     menu->addMenu(root);
 
     // Initialize the view menu

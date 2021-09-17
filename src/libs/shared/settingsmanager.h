@@ -49,6 +49,8 @@ public:
     enum class IVE
     {
         RecentFiles,
+        ComponentsPath,
+        SharedTypesPath,
     };
     Q_ENUM(IVE)
 

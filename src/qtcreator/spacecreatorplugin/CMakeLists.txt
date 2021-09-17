@@ -47,6 +47,8 @@ set(SC_PLUGIN_SOURCES
     options/hwlibraryoption.h
     options/propertyoptions.cpp
     options/propertyoptions.h
+    options/ivlibraryoption.cpp
+    options/ivlibraryoption.h
     spacecreatorplugin.cpp
     spacecreatorplugin.h
     spacecreatorplugin_global.h

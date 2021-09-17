@@ -67,6 +67,7 @@ public Q_SLOTS:
     void onGraphicsViewInfo(const QString &info);
     void updateWindowTitle();
     void openAsn1Dialog();
+    void editIVLibrary();
 
 private:
     void initMenus();

@@ -35,6 +35,14 @@ static const QString namePatternUI("^[a-zA-Z][\\w ]*(?(?<=_)[a-zA-Z0-9])$");
 
 Id createId();
 
+namespace env {
+extern const char *kSharedTypesLibrary;
+extern const char *kComponentsLibrary;
+extern const char *kInterfaceAttrs;
+extern const char *kDeploymentAttrs;
+extern const char *kDeploymentLibrary;
+}
+
 class DropData : public QMimeData
 {
     Q_OBJECT
