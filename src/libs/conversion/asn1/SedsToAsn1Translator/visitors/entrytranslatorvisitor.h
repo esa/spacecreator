@@ -19,12 +19,15 @@
 
 #pragma once
 
-#include <asn1library/asn1/asnsequencecomponent.h>
 #include <asn1library/asn1/constraints/rangeconstraint.h>
+#include <asn1library/asn1/types/sequence.h>
 #include <seds/SedsModel/types/datatype.h>
 
 namespace Asn1Acn {
 class Definitions;
+namespace Types {
+class Null;
+} // namespace Types
 } // namespace Asn1Acn
 
 namespace seds::model {
@@ -36,6 +39,7 @@ class LengthEntry;
 class ListEntry;
 class Package;
 class PaddingEntry;
+enum class CoreErrorControl;
 } // namespace seds::model
 
 namespace conversion::asn1::translator {
@@ -44,7 +48,7 @@ struct EntryTranslatorVisitor final {
     /// @brief  Parent definitions
     Asn1Acn::Definitions *m_asn1Definitions;
     /// @brief  Where translated entry will be saved
-    std::unique_ptr<Asn1Acn::AsnSequenceComponent> &m_asn1SequenceComponent;
+    std::unique_ptr<Asn1Acn::Types::Sequence> &m_asn1Sequence;
 
     auto operator()(const seds::model::Entry &sedsEntry) -> void;
     auto operator()(const seds::model::ErrorControlEntry &sedsEntry) -> void;
@@ -57,6 +61,11 @@ private:
     auto translateEntryType(const QString &sedsTypeName) const -> std::unique_ptr<Asn1Acn::Types::UserdefinedType>;
     auto translateFixedValue(
             const seds::model::FixedValueEntry &sedsEntry, Asn1Acn::Types::UserdefinedType *asn1Type) const -> void;
+    auto translateErrorControl(const seds::model::ErrorControlEntry &sedsEntry) const
+            -> std::unique_ptr<Asn1Acn::Types::Null>;
+
+    auto translateCoreErrorControl(seds::model::CoreErrorControl coreErrorControl, Asn1Acn::Types::Null *asn1Type) const
+            -> void;
 
     template<typename Type, typename ValueType>
     auto createValueConstraint(const QString &value, Asn1Acn::Types::Type *asn1Type) const -> void;

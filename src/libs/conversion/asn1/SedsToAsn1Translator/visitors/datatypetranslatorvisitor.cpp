@@ -118,13 +118,9 @@ void DataTypeTranslatorVisitor::operator()(const ContainerDataType &sedsType)
 {
     auto type = std::make_unique<Asn1Acn::Types::Sequence>(sedsType.nameStr());
 
-    std::unique_ptr<Asn1Acn::AsnSequenceComponent> asn1SequenceComponent;
-    EntryTranslatorVisitor visitor { m_asn1Definitions, asn1SequenceComponent };
-
+    EntryTranslatorVisitor visitor { m_asn1Definitions, type };
     for (const auto &entry : sedsType.entries()) {
         std::visit(visitor, entry);
-
-        type->addComponent(std::move(asn1SequenceComponent));
     }
 
     m_asn1Type = std::move(type);

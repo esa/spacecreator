@@ -21,12 +21,15 @@
 
 #include "visitors/datatypetranslatorvisitor.h"
 
+#include <asn1library/asn1/acnsequencecomponent.h>
+#include <asn1library/asn1/asnsequencecomponent.h>
 #include <asn1library/asn1/definitions.h>
 #include <asn1library/asn1/types/bitstring.h>
 #include <asn1library/asn1/types/boolean.h>
 #include <asn1library/asn1/types/enumerated.h>
 #include <asn1library/asn1/types/ia5string.h>
 #include <asn1library/asn1/types/integer.h>
+#include <asn1library/asn1/types/null.h>
 #include <asn1library/asn1/types/numericstring.h>
 #include <asn1library/asn1/types/octetstring.h>
 #include <asn1library/asn1/types/real.h>
@@ -42,18 +45,29 @@ using conversion::translator::UnsupportedValueException;
 
 namespace conversion::asn1::translator {
 
+template<class... Ts>
+struct overloaded : Ts... {
+    using Ts::operator()...;
+};
+template<class... Ts>
+overloaded(Ts...)->overloaded<Ts...>;
+
 void EntryTranslatorVisitor::operator()(const seds::model::Entry &sedsEntry)
 {
     auto asn1EntryType = translateEntryType(sedsEntry.type().nameStr());
 
-    m_asn1SequenceComponent = std::make_unique<Asn1Acn::AsnSequenceComponent>(
+    auto sequenceComponent = std::make_unique<Asn1Acn::AsnSequenceComponent>(
             sedsEntry.nameStr(), sedsEntry.nameStr(), false, "", Asn1Acn::SourceLocation(), std::move(asn1EntryType));
+    m_asn1Sequence->addComponent(std::move(sequenceComponent));
 }
 
 void EntryTranslatorVisitor::operator()(const seds::model::ErrorControlEntry &sedsEntry)
 {
-    Q_UNUSED(sedsEntry);
-    throw TranslationException("ErrorControlEntry translation not implemented");
+    auto asn1EntryType = translateErrorControl(sedsEntry);
+
+    auto sequenceComponent = std::make_unique<Asn1Acn::AcnSequenceComponent>(
+            sedsEntry.nameStr(), sedsEntry.nameStr(), std::move(asn1EntryType));
+    m_asn1Sequence->addComponent(std::move(sequenceComponent));
 }
 
 void EntryTranslatorVisitor::operator()(const seds::model::FixedValueEntry &sedsEntry)
@@ -61,8 +75,9 @@ void EntryTranslatorVisitor::operator()(const seds::model::FixedValueEntry &seds
     auto asn1EntryType = translateEntryType(sedsEntry.type().nameStr());
     translateFixedValue(sedsEntry, asn1EntryType.get());
 
-    m_asn1SequenceComponent = std::make_unique<Asn1Acn::AsnSequenceComponent>(
+    auto sequenceComponent = std::make_unique<Asn1Acn::AsnSequenceComponent>(
             sedsEntry.nameStr(), sedsEntry.nameStr(), false, "", Asn1Acn::SourceLocation(), std::move(asn1EntryType));
+    m_asn1Sequence->addComponent(std::move(sequenceComponent));
 }
 
 void EntryTranslatorVisitor::operator()(const seds::model::LengthEntry &sedsEntry)
@@ -159,6 +174,43 @@ void EntryTranslatorVisitor::translateFixedValue(
         break;
     default:
         throw UnhandledValueException("ASN1Type/FixedValueEntry");
+        break;
+    }
+}
+
+std::unique_ptr<Asn1Acn::Types::Null> EntryTranslatorVisitor::translateErrorControl(
+        const seds::model::ErrorControlEntry &sedsEntry) const
+{
+    auto nullType = std::make_unique<Asn1Acn::Types::Null>(sedsEntry.nameStr());
+    nullType->setAlignToNext(Asn1Acn::Types::AlignToNext::byte);
+
+    // clang-format off
+    std::visit(overloaded {
+        [&](seds::model::CoreErrorControl coreErrorControl) {
+            translateCoreErrorControl(coreErrorControl, nullType.get());
+        }
+    }, sedsEntry.errorControl());
+    // clang-format on
+
+    return nullType;
+}
+
+void EntryTranslatorVisitor::translateCoreErrorControl(
+        seds::model::CoreErrorControl coreErrorControl, Asn1Acn::Types::Null *asn1Type) const
+{
+    switch (coreErrorControl) {
+    case seds::model::CoreErrorControl::Crc8:
+        asn1Type->setPattern(QString(8, '0'));
+        break;
+    case seds::model::CoreErrorControl::Crc16:
+        asn1Type->setPattern(QString(16, '0'));
+        break;
+    case seds::model::CoreErrorControl::Checksum:
+    case seds::model::CoreErrorControl::ChecksumLongitundinal:
+        asn1Type->setPattern(QString(32, '0'));
+        break;
+    default:
+        throw UnhandledValueException("CoreErrorControl");
         break;
     }
 }
