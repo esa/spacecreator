@@ -45,6 +45,9 @@ enum class LookupDirection
     Mixed,
 };
 
+QVector<QPointF> round(const QVector<QPointF> &points);
+QList<QPointF> round(const QList<QPointF> &points);
+
 QPainterPath lineShape(const QLineF &line, qreal span);
 QPainterPath edgeCuttedRectShape(const QRectF &rect, qreal cut);
 
