@@ -54,17 +54,13 @@ InterfaceParameter XmlReader::addIfaceParameter(
     for (const EntityAttribute &attr : otherAttrs) {
         if (attr.name() == "name") {
             param.setName(attr.value<QString>());
-            break;
         } else if (attr.name() == "type") {
             param.setParamTypeName(attr.value<QString>());
-            break;
         } else if (attr.name() == "encoding") {
             param.setEncoding(attr.value<QString>());
-            break;
         } else {
             shared::ErrorHub::addError(shared::ErrorItem::Warning,
                     QObject::tr("Interface Parameter - unknown attribute: %1").arg(attr.name()));
-            break;
         }
     }
 
