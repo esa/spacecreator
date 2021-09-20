@@ -181,7 +181,7 @@ void VEConnectionGraphicsItem::setPoints(const QVector<QPointF> &points)
     }
 
     if (!graphicsviewutils::comparePolygones(m_points, points)) {
-        m_points = points;
+        m_points = shared::graphicsviewutils::round(points);
         instantLayoutUpdate();
     }
 }
@@ -300,15 +300,21 @@ QList<QPair<VEObject *, QVector<QPointF>>> VEConnectionGraphicsItem::prepareChan
     return params;
 }
 
-void VEConnectionGraphicsItem::layout()
+/*!
+   Re-generates the connection path
+   Returns true, if the points did change
+ */
+bool VEConnectionGraphicsItem::layout()
 {
     if (!m_startItem || !m_startItem->isVisible() || !m_endItem || !m_endItem->isVisible()) {
         setVisible(false);
-        return;
+        return false;
     }
 
+    const QVector<QPointF> oldPoints = m_points;
     m_points = generateConnectionPath(this);
     updateBoundingRect();
+    return oldPoints != m_points;
 }
 
 bool VEConnectionGraphicsItem::replaceInterface(
@@ -524,8 +530,10 @@ void VEConnectionGraphicsItem::rebuildLayout()
     }
 
     if (pathObsolete) {
-        layout();
-        mergeGeometry();
+        const bool changed = layout();
+        if (changed) {
+            mergeGeometry();
+        }
         return;
     }
 

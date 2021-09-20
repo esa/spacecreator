@@ -330,8 +330,10 @@ void VERectGraphicsItem::layout()
         itemRect.moveTopLeft(boundedRect.topLeft());
         graphicsviewutils::findGeometryForRect(itemRect, boundedRect, graphicsviewutils::siblingItemsRects(this),
                 parentFunction == nullptr ? graphicsviewutils::kRootMargins : graphicsviewutils::kContentMargins);
-        setRect(itemRect);
-        mergeGeometry();
+        if (itemRect != sceneBoundingRect()) {
+            setRect(itemRect);
+            mergeGeometry();
+        }
     }
 }
 
