@@ -20,6 +20,7 @@
 #pragma once
 
 #include <asn1library/asn1/asnsequencecomponent.h>
+#include <asn1library/asn1/constraints/rangeconstraint.h>
 #include <seds/SedsModel/types/datatype.h>
 
 namespace Asn1Acn {
@@ -54,6 +55,19 @@ struct EntryTranslatorVisitor final {
 
 private:
     auto translateEntryType(const QString &sedsTypeName) const -> std::unique_ptr<Asn1Acn::Types::UserdefinedType>;
+    auto translateFixedValue(
+            const seds::model::FixedValueEntry &sedsEntry, Asn1Acn::Types::UserdefinedType *asn1Type) const -> void;
+
+    template<typename Type, typename ValueType>
+    auto createValueConstraint(const QString &value, Asn1Acn::Types::Type *asn1Type) const -> void;
 };
+
+template<typename Type, typename ValueType>
+void EntryTranslatorVisitor::createValueConstraint(const QString &value, Asn1Acn::Types::Type *asn1Type) const
+{
+    auto *referencedType = dynamic_cast<Type *>(asn1Type);
+    auto constraint = Asn1Acn::Constraints::RangeConstraint<ValueType>::create({ ValueType::fromAstValue(value) });
+    referencedType->constraints().append(std::move(constraint));
+}
 
 } // namespace conversion::asn1::translator

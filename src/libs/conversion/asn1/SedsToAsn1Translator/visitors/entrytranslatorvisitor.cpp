@@ -22,12 +22,23 @@
 #include "visitors/datatypetranslatorvisitor.h"
 
 #include <asn1library/asn1/definitions.h>
+#include <asn1library/asn1/types/bitstring.h>
+#include <asn1library/asn1/types/boolean.h>
+#include <asn1library/asn1/types/enumerated.h>
+#include <asn1library/asn1/types/ia5string.h>
+#include <asn1library/asn1/types/integer.h>
+#include <asn1library/asn1/types/numericstring.h>
+#include <asn1library/asn1/types/octetstring.h>
+#include <asn1library/asn1/types/real.h>
 #include <asn1library/asn1/types/userdefinedtype.h>
+#include <asn1library/asn1/values.h>
 #include <conversion/common/translation/exceptions.h>
 #include <seds/SedsModel/package/package.h>
 
 using conversion::translator::TranslationException;
 using conversion::translator::UndeclaredDataTypeException;
+using conversion::translator::UnhandledValueException;
+using conversion::translator::UnsupportedValueException;
 
 namespace conversion::asn1::translator {
 
@@ -42,31 +53,34 @@ void EntryTranslatorVisitor::operator()(const seds::model::Entry &sedsEntry)
 void EntryTranslatorVisitor::operator()(const seds::model::ErrorControlEntry &sedsEntry)
 {
     Q_UNUSED(sedsEntry);
-    throw TranslationException("ErrorControlEntry translation no implemented");
+    throw TranslationException("ErrorControlEntry translation not implemented");
 }
 
 void EntryTranslatorVisitor::operator()(const seds::model::FixedValueEntry &sedsEntry)
 {
-    Q_UNUSED(sedsEntry);
-    throw TranslationException("FixedValueEntry translation no implemented");
+    auto asn1EntryType = translateEntryType(sedsEntry.type().nameStr());
+    translateFixedValue(sedsEntry, asn1EntryType.get());
+
+    m_asn1SequenceComponent = std::make_unique<Asn1Acn::AsnSequenceComponent>(
+            sedsEntry.nameStr(), sedsEntry.nameStr(), false, "", Asn1Acn::SourceLocation(), std::move(asn1EntryType));
 }
 
 void EntryTranslatorVisitor::operator()(const seds::model::LengthEntry &sedsEntry)
 {
     Q_UNUSED(sedsEntry);
-    throw TranslationException("LengthEntry translation no implemented");
+    throw TranslationException("LengthEntry translation not implemented");
 }
 
 void EntryTranslatorVisitor::operator()(const seds::model::ListEntry &sedsEntry)
 {
     Q_UNUSED(sedsEntry);
-    throw TranslationException("ListEntry translation no implemented");
+    throw TranslationException("ListEntry translation not implemented");
 }
 
 void EntryTranslatorVisitor::operator()(const seds::model::PaddingEntry &sedsEntry)
 {
     Q_UNUSED(sedsEntry);
-    throw TranslationException("PaddingEntry translation no implemented");
+    throw TranslationException("PaddingEntry translation not implemented");
 }
 
 std::unique_ptr<Asn1Acn::Types::UserdefinedType> EntryTranslatorVisitor::translateEntryType(
@@ -80,6 +94,73 @@ std::unique_ptr<Asn1Acn::Types::UserdefinedType> EntryTranslatorVisitor::transla
     asn1EntryType->setType(asn1ReferencedType->clone());
 
     return asn1EntryType;
+}
+
+void EntryTranslatorVisitor::translateFixedValue(
+        const seds::model::FixedValueEntry &sedsEntry, Asn1Acn::Types::UserdefinedType *asn1Type) const
+{
+    if (!sedsEntry.fixedValue()) {
+        return;
+    }
+
+    switch (asn1Type->type()->typeEnum()) {
+    case Asn1Acn::Types::Type::ASN1Type::INTEGER:
+        createValueConstraint<Asn1Acn::Types::Integer, Asn1Acn::IntegerValue>(
+                sedsEntry.fixedValue()->value(), asn1Type->type());
+        break;
+    case Asn1Acn::Types::Type::ASN1Type::REAL:
+        createValueConstraint<Asn1Acn::Types::Real, Asn1Acn::RealValue>(
+                sedsEntry.fixedValue()->value(), asn1Type->type());
+        break;
+    case Asn1Acn::Types::Type::ASN1Type::BOOLEAN:
+        createValueConstraint<Asn1Acn::Types::Boolean, Asn1Acn::BooleanValue>(
+                sedsEntry.fixedValue()->value(), asn1Type->type());
+        break;
+    case Asn1Acn::Types::Type::ASN1Type::SEQUENCE:
+        throw UnsupportedValueException("ASN1Type/FixedValueEntry", "SEQUENCE");
+        break;
+    case Asn1Acn::Types::Type::ASN1Type::SEQUENCEOF:
+        throw UnsupportedValueException("ASN1Type/FixedValueEntry", "SEQUENCEOF");
+        break;
+    case Asn1Acn::Types::Type::ASN1Type::ENUMERATED:
+        createValueConstraint<Asn1Acn::Types::Enumerated, Asn1Acn::EnumValue>(
+                sedsEntry.fixedValue()->value(), asn1Type->type());
+        break;
+    case Asn1Acn::Types::Type::ASN1Type::CHOICE:
+        throw UnsupportedValueException("ASN1Type/FixedValueEntry", "CHOICE");
+        break;
+    case Asn1Acn::Types::Type::ASN1Type::STRING:
+        throw UnsupportedValueException("ASN1Type/FixedValueEntry", "STRING");
+        break;
+    case Asn1Acn::Types::Type::ASN1Type::IA5STRING:
+        createValueConstraint<Asn1Acn::Types::IA5String, Asn1Acn::StringValue>(
+                sedsEntry.fixedValue()->value(), asn1Type->type());
+        break;
+    case Asn1Acn::Types::Type::ASN1Type::NUMERICSTRING:
+        createValueConstraint<Asn1Acn::Types::NumericString, Asn1Acn::StringValue>(
+                sedsEntry.fixedValue()->value(), asn1Type->type());
+        break;
+    case Asn1Acn::Types::Type::ASN1Type::NULLTYPE:
+        throw UnsupportedValueException("ASN1Type/FixedValueEntry", "NULLTYPE");
+        break;
+    case Asn1Acn::Types::Type::ASN1Type::BITSTRING:
+        createValueConstraint<Asn1Acn::Types::BitString, Asn1Acn::BitStringValue>(
+                sedsEntry.fixedValue()->value(), asn1Type->type());
+        break;
+    case Asn1Acn::Types::Type::ASN1Type::OCTETSTRING:
+        createValueConstraint<Asn1Acn::Types::OctetString, Asn1Acn::OctetStringValue>(
+                sedsEntry.fixedValue()->value(), asn1Type->type());
+        break;
+    case Asn1Acn::Types::Type::ASN1Type::LABELTYPE:
+        throw UnsupportedValueException("ASN1Type/FixedValueEntry", "LABELTYPE");
+        break;
+    case Asn1Acn::Types::Type::ASN1Type::USERDEFINED:
+        throw UnsupportedValueException("ASN1Type/FixedValueEntry", "USERDEFINED");
+        break;
+    default:
+        throw UnhandledValueException("ASN1Type/FixedValueEntry");
+        break;
+    }
 }
 
 } // namespace conversion::asn1::translator
