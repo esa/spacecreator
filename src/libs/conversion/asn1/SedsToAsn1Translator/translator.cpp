@@ -36,14 +36,14 @@ using seds::model::SedsModel;
 namespace conversion::asn1::translator {
 
 std::vector<std::unique_ptr<Model>> SedsToAsn1Translator::translateModels(
-        std::vector<const Model *> sourceModels, const Options &options) const
+        std::vector<Model *> sourceModels, const Options &options) const
 {
     Q_UNUSED(options);
 
     if (sourceModels.empty()) {
         throw TranslationException("No models passed for translation");
-    } else if (sourceModels.size() > 1) {
-        throw TranslationException("Only one model is allowed for translation");
+    } else if (sourceModels.size() != 1) {
+        throw TranslationException("Too many models passed for SEDS to InterfaceView translation");
     }
 
     const auto *sourceModel = sourceModels[0];
@@ -52,7 +52,7 @@ std::vector<std::unique_ptr<Model>> SedsToAsn1Translator::translateModels(
     }
 
     if (sourceModel->modelType() != ModelType::Seds) {
-        throw IncorrectSourceModelException(ModelType::Seds, sourceModel->modelType());
+        throw IncorrectSourceModelException({ ModelType::Seds }, sourceModel->modelType());
     }
 
     const auto *sedsModel = dynamic_cast<const SedsModel *>(sourceModel);
@@ -92,9 +92,9 @@ std::vector<std::unique_ptr<Model>> SedsToAsn1Translator::translateSedsModel(con
 
 std::unique_ptr<Asn1Acn::File> SedsToAsn1Translator::translatePackage(const seds::model::Package &package) const
 {
-    auto asn1File = std::make_unique<Asn1Acn::File>("");
+    auto asn1File = std::make_unique<Asn1Acn::File>(package.nameStr());
 
-    auto definitions = std::make_unique<Asn1Acn::Definitions>(package.nameStr(), Asn1Acn::SourceLocation());
+    auto definitions = std::make_unique<Asn1Acn::Definitions>(package.asn1NameStr(), Asn1Acn::SourceLocation());
     translateDataTypes(package.dataTypes(), definitions.get());
 
     asn1File->add(std::move(definitions));

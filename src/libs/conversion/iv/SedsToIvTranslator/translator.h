@@ -22,8 +22,8 @@
 #include <conversion/common/translation/translator.h>
 
 namespace Asn1Acn {
+class Asn1Model;
 class Definitions;
-class File;
 } // namespace Asn1Acn
 
 namespace ivm {
@@ -51,7 +51,7 @@ public:
      *
      * @return  ASN.1 model translated from SEDS models
      */
-    virtual auto translateModels(std::vector<const Model *> sourceModels, const Options &options) const
+    virtual auto translateModels(std::vector<Model *> sourceModels, const Options &options) const
             -> std::vector<std::unique_ptr<Model>> override;
     /**
      * @brief   Provides a set of all source model types that are required for the translation
@@ -70,8 +70,8 @@ private:
      *
      * @return  Result IV model with auxiliary ASN.1 model
      */
-    auto translateSedsModel(const seds::model::SedsModel *sedsModel, ivm::IVPropertyTemplateConfig *config,
-            const Options &options) const -> std::vector<std::unique_ptr<Model>>;
+    auto translateSedsModel(const seds::model::SedsModel *sedsModel, Asn1Acn::Asn1Model *asn1Model,
+            ivm::IVPropertyTemplateConfig *config, const Options &options) const -> std::vector<std::unique_ptr<Model>>;
 
 private:
     /**
@@ -79,7 +79,7 @@ private:
      *
      * @param   package     Package to translate
      */
-    auto translatePackage(const seds::model::Package &package, ivm::IVModel *model, Asn1Acn::Definitions *definitions,
+    auto translatePackage(const seds::model::Package &package, Asn1Acn::Asn1Model *asn1Model, ivm::IVModel *model,
             bool generateFunction) const -> void;
 };
 

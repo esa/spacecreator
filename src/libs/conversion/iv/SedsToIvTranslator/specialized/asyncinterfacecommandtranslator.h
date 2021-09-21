@@ -21,15 +21,13 @@
 
 #include "specialized/interfacecommandtranslator.h"
 
+#include <map>
 #include <seds/SedsModel/types/datatype.h>
-#include <set>
 
 namespace Asn1Acn {
 class AsnSequenceComponent;
 class Definitions;
-namespace Types {
-class Sequence;
-} // namespace Types
+class SequenceComponent;
 } // namespace Asn1Acn
 
 namespace seds::model {
@@ -47,6 +45,9 @@ namespace conversion::iv::translator {
  */
 class AsyncInterfaceCommandTranslator final : public InterfaceCommandTranslator
 {
+private:
+    using InterfaceCommandArgumentsCache = std::multimap<QString, std::pair<std::size_t, QString>>;
+
 public:
     /**
      * @brief   Constructor
@@ -110,18 +111,27 @@ private:
      * @param   asn1TypeName            How new ASN.1 type should be named
      */
     auto buildAsn1SequenceType(const seds::model::InterfaceCommand &command,
-            seds::model::CommandArgumentMode requestedArgumentMode, const QString &asn1TypeName) const -> void;
+            seds::model::CommandArgumentMode requestedArgumentMode) const -> QString;
 
+    /**
+     * @brief   Creates ASN.1 sequence type
+     *
+     * @param   name        Name of the new type
+     * @param   arguments   Command arguments
+     *
+     * @return  ASN.1 sequence
+     */
+    auto createAsn1Sequence(const QString &name, const std::unordered_map<QString, QString> &arguments) const -> void;
     /**
      * @brief   Creates ASN.1 sequence component type
      *
-     * @param   name                Name of the new type
-     * @param   argumentTypeName    Name of the SEDS type from which ASN.1 type should be created
+     * @param   name        Name of the new type
+     * @param   typeName    Name of the SEDS type from which ASN.1 type should be created
      *
      * @return  ASN.1 sequence component
      */
-    auto createAsn1SequenceComponent(const QString &argumentName, const QString &argumentTypeName) const
-            -> std::unique_ptr<Asn1Acn::AsnSequenceComponent>;
+    auto createAsn1SequenceComponent(const QString &name, const QString typeName) const
+            -> std::unique_ptr<Asn1Acn::SequenceComponent>;
 
     /**
      * @brief   Checks if given type name is mapped in the parent SEDS interface
@@ -162,8 +172,8 @@ private:
     /// @brief  Output ASN.1 type definitions
     Asn1Acn::Definitions *m_asn1Definitions;
 
-    /// @brief  Cache of hashes of the bundled ASN.1 typenames that was created
-    static std::set<std::size_t> m_asn1InterfaceArgumentsHashesCache;
+    /// @brief  Cache of the bundled ASN.1 types that was created for given command
+    static InterfaceCommandArgumentsCache m_asn1CommandArgumentsCache;
 
     /// @brief  Interface parameter name
     static const QString m_interfaceParameterName;

@@ -22,6 +22,8 @@
 #include "../exceptions.h"
 #include "modeltype.h"
 
+#include <set>
+
 namespace conversion::translator {
 
 /**
@@ -47,10 +49,10 @@ public:
     /**
      * @brief   Constructor
      *
-     * @param   expectedModelType   Expected model type
-     * @param   receivedModelType   Received model type
+     * @param   expectedModelsTypes     Expected models types
+     * @param   receivedModelType       Received model type
      */
-    explicit IncorrectSourceModelException(ModelType expectedModelType, ModelType receivedModelType);
+    explicit IncorrectSourceModelException(std::set<ModelType> expectedModelsTypes, ModelType receivedModelType);
 };
 
 /**

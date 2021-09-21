@@ -75,6 +75,12 @@ public:
      * @returns Model data
      */
     auto data() const -> const Data&;
+    /**
+     * @brief   Getter for model data
+     *
+     * @returns Model data
+     */
+    auto data() -> Data&;
 
 private:
     /** @brief  Model data */

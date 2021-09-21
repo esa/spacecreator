@@ -58,9 +58,11 @@ int main(int argc, char **argv)
     options.add(SedsOptions::externalRefFilename, "config.toml");
     options.add(SedsOptions::skipValidation);
     options.add(SedsOptions::keepIntermediateFiles);
+    options.add(IvOptions::configFilename, "config.xml");
+    options.add(IvOptions::outputFilename, QString("%1.iv").arg(argv[1]));
 
     try {
-        sedsConverter.convert({ ModelType::Asn1 }, ModelType::Asn1, {}, std::move(options));
+        sedsConverter.convert(ModelType::InterfaceView, { ModelType::Asn1 }, std::move(options));
     } catch (const ImportException &ex) {
         const auto errorMessage = QString("Import failure: %1").arg(ex.errorMessage());
         qFatal("%s", errorMessage.toLatin1().constData());

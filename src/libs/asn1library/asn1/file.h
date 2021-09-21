@@ -59,6 +59,7 @@ public:
 
     const DefinitionsList &definitionsList() const { return m_definitionsList; }
     const Definitions *definitions(const QString &name) const;
+    Definitions *definitions(const QString &name);
 
     const ReferencesMap &referencesMap() const { return m_referencesMap; }
     const References &references() const { return m_references; }

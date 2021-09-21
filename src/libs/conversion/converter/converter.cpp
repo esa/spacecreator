@@ -70,8 +70,6 @@ void Converter::convert(const std::set<ModelType> &sourceModelsTypes, ModelType 
         }
     }
 
-    // TODO: Check and resolve translator dependencies
-
     translateModels(sourceModelsTypes, targetModelType);
     exportModel(targetModelType);
     for (const auto &auxiliaryModelType : auxiliaryModelsTypes) {
@@ -100,15 +98,19 @@ void Converter::translateModels(const std::set<ModelType> &sourceModelsTypes, Mo
 {
     const auto *translator = m_registry.findTranslator(sourceModelsTypes, targetModelType);
 
-    std::vector<const Model *> sourceModels;
-    for (const auto modelType : translator->getDependencies()) {
-        if (!isModelImported(modelType)) {
-            const auto message = QString("Required %1 model is missing").arg(modelTypeToString(modelType));
+    std::vector<Model *> sourceModels;
+    for (const auto dependencyModelType : translator->getDependencies()) {
+        if (isModelImported(dependencyModelType)) {
+            auto *model = m_modelCache[dependencyModelType].get();
+            sourceModels.push_back(model);
+        } else if (m_registry.isTranslatorRegistered(sourceModelsTypes, dependencyModelType)) {
+            translateModels(sourceModelsTypes, dependencyModelType);
+            auto *model = m_modelCache[dependencyModelType].get();
+            sourceModels.push_back(model);
+        } else {
+            const auto message = QString("Required %1 model is missing").arg(modelTypeToString(dependencyModelType));
             throw ConverterException(message);
         }
-
-        const auto *model = m_modelCache[modelType].get();
-        sourceModels.push_back(model);
     }
 
     auto outputModels = translator->translateModels(std::move(sourceModels), m_options);

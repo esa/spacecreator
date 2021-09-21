@@ -35,4 +35,9 @@ const Asn1Model::Data& Asn1Model::data() const
     return m_data;
 }
 
+Asn1Model::Data& Asn1Model::data()
+{
+    return m_data;
+}
+
 } // namespace Asn1Acn

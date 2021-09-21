@@ -26,9 +26,10 @@ TranslationException::TranslationException(QString message)
 {
 }
 
-IncorrectSourceModelException::IncorrectSourceModelException(ModelType expectedModelType, ModelType receivedModelType)
-    : TranslationException(QString("Source model not supported, expected %1 model, got %2 model")
-                                   .arg(modelTypeToString(expectedModelType))
+IncorrectSourceModelException::IncorrectSourceModelException(
+        std::set<ModelType> expectedModelsTypes, ModelType receivedModelType)
+    : TranslationException(QString("Source model not supported, expected one of { %1 } models, got %2 model")
+                                   .arg(modelTypesToString(expectedModelsTypes))
                                    .arg(modelTypeToString(receivedModelType)))
 {
 }

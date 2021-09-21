@@ -66,6 +66,12 @@ const Definitions *File::definitions(const QString &name) const
     return it != m_definitionsByNameMap.end() ? it->second : nullptr;
 }
 
+Definitions *File::definitions(const QString &name)
+{
+    auto it = m_definitionsByNameMap.find(name);
+    return it != m_definitionsByNameMap.end() ? it->second : nullptr;
+}
+
 void File::add(std::unique_ptr<Definitions> defs)
 {
     defs->setParent(this);

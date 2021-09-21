@@ -69,7 +69,7 @@ public:
      *
      * @return  Target model translated from the source model
      */
-    virtual auto translateModels(std::vector<const Model *> sources, const Options &options) const
+    virtual auto translateModels(std::vector<Model *> sources, const Options &options) const
             -> std::vector<std::unique_ptr<Model>> = 0;
 
     /**

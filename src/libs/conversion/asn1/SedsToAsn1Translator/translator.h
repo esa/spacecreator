@@ -50,7 +50,7 @@ public:
      *
      * @return  ASN.1 model translated from the SEDS models
      */
-    virtual auto translateModels(std::vector<const Model *> sourceModels, const Options &options) const
+    virtual auto translateModels(std::vector<Model *> sourceModels, const Options &options) const
             -> std::vector<std::unique_ptr<Model>> override;
     /**
      * @brief   Provides a set of all source model types that are required for the translation
