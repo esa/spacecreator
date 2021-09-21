@@ -19,16 +19,16 @@
 #include "asn1valueparser.h"
 #include "sourcelocation.h"
 #include "typeassignment.h"
-#include "types/type.h"
-#include "types/userdefinedtype.h"
-
 #include "types/boolean.h"
 #include "types/choice.h"
 #include "types/enumerated.h"
+#include "types/ia5string.h"
 #include "types/integer.h"
 #include "types/real.h"
 #include "types/sequence.h"
 #include "types/sequenceof.h"
+#include "types/type.h"
+#include "types/userdefinedtype.h"
 
 #include <QSignalSpy>
 #include <QtTest>
@@ -46,6 +46,7 @@ private Q_SLOTS:
 
     void testIntValues();
     void testRealValues();
+    void testStringValues();
     void testIntValuesFormatError();
     void testRealValuesFormatError();
     void testIntValuesWithRange();
@@ -89,6 +90,19 @@ void tst_Asn1ValueParser::testIntValues()
 
     QCOMPARE(valueMap["name"].toString(), QString("MyInt"));
     QCOMPARE(valueMap["value"].toInt(), 3107);
+}
+
+void tst_Asn1ValueParser::testStringValues()
+{
+    Asn1Acn::SourceLocation location;
+    auto type = std::make_unique<Asn1Acn::Types::IA5String>();
+    auto assignment = std::make_unique<Asn1Acn::TypeAssignment>("MyString", "MyString", location, std::move(type));
+
+    auto valueMap = valueParser->parseAsn1Value(assignment.get(), "teststringforcheck");
+    QCOMPARE(valueMap.size(), 2);
+
+    QCOMPARE(valueMap["name"].toString(), QString::fromLatin1("MyString"));
+    QCOMPARE(valueMap["value"].toString(), QString::fromLatin1("teststringforcheck"));
 }
 
 void tst_Asn1ValueParser::testRealValues()
@@ -384,7 +398,8 @@ void tst_Asn1ValueParser::testSequenceOfValue()
     auto type = std::make_unique<Asn1Acn::Types::SequenceOf>();
     type->addChild(std::move(ofType));
 
-    auto assignment = std::make_unique<Asn1Acn::TypeAssignment>("MySequenceOf", "MySequenceOf", location, std::move(type));
+    auto assignment =
+            std::make_unique<Asn1Acn::TypeAssignment>("MySequenceOf", "MySequenceOf", location, std::move(type));
 
     auto valueMap = valueParser->parseAsn1Value(assignment.get(), "{ blue, green }");
 
@@ -422,7 +437,8 @@ void tst_Asn1ValueParser::testUserType()
 
     auto type = std::make_unique<Asn1Acn::Types::SequenceOf>();
     type->addChild(std::move(userType));
-    auto assignment = std::make_unique<Asn1Acn::TypeAssignment>("MySequenceOf", "MySequenceOf", location, std::move(type));
+    auto assignment =
+            std::make_unique<Asn1Acn::TypeAssignment>("MySequenceOf", "MySequenceOf", location, std::move(type));
 
     auto valueMap = valueParser->parseAsn1Value(assignment.get(), "{ blue, green }");
 

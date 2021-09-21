@@ -172,35 +172,25 @@ void Asn1TreeView::setChildRowValue(const QStandardItem *rootItem, int childInde
     const QString asnType = childItem ? rootItem->child(childIndex, MODEL_TYPE_INDEX)->text() : "";
     auto *child = rootItem->child(childIndex, MODEL_VALUE_INDEX);
 
-    if (asn1Value.type() == QVariant::List && asn1Value.toList().count() <= childIndex) {
-        return;
-    }
-
-    QVariant value = (asn1Value.type() == QVariant::List) ? asn1Value.toList()[childIndex] : asn1Value;
-
     if (asnType.startsWith("integer", Qt::CaseInsensitive) || asnType.startsWith("double", Qt::CaseInsensitive)
             || asnType.startsWith("real", Qt::CaseInsensitive) || asnType.startsWith("string", Qt::CaseInsensitive)
             || asnType.startsWith("enumerated", Qt::CaseInsensitive) || asnType == "BIT STRING"
             || asnType == "OCTET STRING" || asnType == "IA5String" || asnType == "NumericString")
-        child->setText(value.toMap()["value"].toString());
+        child->setText(asn1Value.toMap()["value"].toString());
     else if (asnType.startsWith("bool", Qt::CaseInsensitive))
-        child->setText(value.toMap()["value"].toString().toLower());
+        child->setText(asn1Value.toMap()["value"].toString().toLower());
     else if (asnType.startsWith("sequenceOf", Qt::CaseInsensitive)
             || asnType.startsWith("sequence of", Qt::CaseInsensitive)) {
-        int seqOfSize = value.toMap()["seqofvalue"].toList().count();
+        int seqOfSize = asn1Value.toMap()["seqofvalue"].toList().count();
         child->setText(QString::number(seqOfSize));
-        setChildValue(rootItem->child(childIndex), value.toMap()["seqofvalue"], seqOfSize);
+        setChildValue(rootItem->child(childIndex), asn1Value.toMap()["seqofvalue"], seqOfSize);
     } else if (asnType.startsWith("sequence", Qt::CaseInsensitive)) {
-        if (value.toMap().contains("children")) {
-            value = value.toMap()["children"];
-        }
-        setChildValue(rootItem->child(childIndex), value);
+        setChildValue(rootItem->child(childIndex), asn1Value.toMap()["children"]);
     } else if (asnType.startsWith("choice", Qt::CaseInsensitive)) {
-        value = value.toMap()["choice"];
-        QString choiceValue = value.toMap()["name"].toString();
-
+        const QString choiceValue = asn1Value.toMap()["choice"].toMap()["name"].toString();
         child->setText(choiceValue);
-        setChildRowValue(rootItem->child(childIndex), itemChoiceIndex(rootItem->child(childIndex), choiceValue), value);
+        setChildRowValue(rootItem->child(childIndex), itemChoiceIndex(rootItem->child(childIndex), choiceValue),
+                asn1Value.toMap()["choice"]);
     }
 }
 
@@ -220,17 +210,26 @@ void Asn1TreeView::setChildValue(const QStandardItem *rootItem, const QVariant &
         // asn1Value = map
         setChildRowValue(rootItem, choiceRow, asn1Value);
     } else if (rootItem->hasChildren()) {
-        int rowCount = seqOfSize != -1 ? seqOfSize : rootItem->rowCount();
+        auto getItemIndex = [](const QStandardItem *rootItem, const QString &name) {
+            for (int idx = 0; idx < rootItem->rowCount(); ++idx) {
+                if (rootItem->child(idx, MODEL_NAME_INDEX)->text() == name) {
+                    return idx;
+                }
+            }
+            return -1;
+        };
+        int idx = -1;
+        for (const QVariant &value : asn1Value.toList()) {
+            const QString name = value.toMap()["name"].toString();
+            const int row = name.isEmpty() ? ++idx : getItemIndex(rootItem, name);
+            setChildRowValue(rootItem, row, value);
 
-        for (int x = 0; x < rowCount; ++x) {
-            setChildRowValue(rootItem, x, asn1Value);
-
-            bool isOptional = rootItem->child(x, MODEL_IS_OPTIONAL_INDEX)->data(OPTIONAL_ROLE).toBool();
+            bool isOptional = rootItem->child(row, MODEL_IS_OPTIONAL_INDEX)->data(OPTIONAL_ROLE).toBool();
             if (isOptional) {
                 // asn1Value = list of map
                 const auto &valueMap =
-                        findValue(rootItem->child(x, MODEL_NAME_INDEX)->text(), asn1Value.toList()[x].toMap());
-                rootItem->child(x, MODEL_IS_OPTIONAL_INDEX)
+                        findValue(rootItem->child(row, MODEL_NAME_INDEX)->text(), asn1Value.toList()[row].toMap());
+                rootItem->child(row, MODEL_IS_OPTIONAL_INDEX)
                         ->setCheckState(valueMap.size() ? Qt::Checked : Qt::Unchecked);
             }
         }
@@ -336,7 +335,8 @@ QString Asn1TreeView::getItemValue(const QStandardItem *item, const QString &sep
             }
         }
         itemValue += " }";
-    } else if (asnType.startsWith("string", Qt::CaseInsensitive)) {
+    } else if (asnType.startsWith("string", Qt::CaseInsensitive) || asnType == "BIT STRING" || asnType == "OCTET STRING"
+            || asnType == "IA5String" || asnType == "NumericString") {
         itemValue += "\"" + asnValue + "\"";
     } else if (item->child(0, 0)) {
         itemValue += getItemValue(item->child(0, 0), " :");

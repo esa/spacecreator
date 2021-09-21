@@ -48,6 +48,7 @@ private Q_SLOTS:
     void testChoiceReference();
     void testLineNumber_data();
     void testLineNumber();
+    void testOptional();
 
 private:
     Asn1Reader *xmlParser = nullptr;
@@ -323,6 +324,49 @@ void tst_Asn1Reader::testLineNumber()
     QFETCH(QString, input);
     QFETCH(int, result);
     QCOMPARE(xmlParser->lineNumberFromError(input), result);
+}
+
+void tst_Asn1Reader::testOptional()
+{
+    QStringList errorsList;
+    std::unique_ptr<Asn1Acn::File> asn1Types =
+            xmlParser->parseAsn1File(QFileInfo(QFINDTESTDATA("ip.asn")), &errorsList);
+    const Asn1Acn::Definitions *definitions = asn1Types->definitions("POHICDRIVER-IP");
+    QCOMPARE(definitions->types().size(), 3);
+
+    const std::unique_ptr<Asn1Acn::TypeAssignment> &typeAssign1 = definitions->types().back();
+    QCOMPARE(typeAssign1->typeEnum(), Asn1Acn::Types::Type::SEQUENCE);
+
+    auto sequence = dynamic_cast<const Asn1Acn::Types::Sequence *>(typeAssign1->type());
+    QCOMPARE(sequence->children().size(), 8);
+
+    const std::unique_ptr<Asn1Acn::Types::Type> &sequence1 = sequence->children().at(0);
+    QCOMPARE(sequence1->identifier(), QString("devname"));
+    QCOMPARE(sequence1->typeName(), QString("IA5String"));
+
+    const QVariantMap &data1 = sequence1->parameters();
+    QCOMPARE(data1[ASN1_IS_OPTIONAL].toBool(), false);
+
+    const std::unique_ptr<Asn1Acn::Types::Type> &sequence2 = sequence->children().at(1);
+    QCOMPARE(sequence2->identifier(), QString("address"));
+    QCOMPARE(sequence2->typeName(), QString("IA5String"));
+
+    const QVariantMap &data2 = sequence2->parameters();
+    QCOMPARE(data2[ASN1_IS_OPTIONAL].toBool(), false);
+
+    const std::unique_ptr<Asn1Acn::Types::Type> &sequence3 = sequence->children().at(2);
+    QCOMPARE(sequence3->identifier(), QString("broadcast"));
+    QCOMPARE(sequence3->typeName(), QString("IA5String"));
+
+    const QVariantMap &data3 = sequence3->parameters();
+    //    QCOMPARE(data3[ASN1_IS_OPTIONAL].toBool(), true);
+
+    const std::unique_ptr<Asn1Acn::Types::Type> &sequence4 = sequence->children().at(7);
+    QCOMPARE(sequence4->identifier(), QString("port"));
+    QCOMPARE(sequence4->typeName(), QString("Port-T"));
+
+    const QVariantMap &data4 = sequence3->parameters();
+    QCOMPARE(data4[ASN1_IS_OPTIONAL].toBool(), false);
 }
 
 QTEST_APPLESS_MAIN(tst_Asn1Reader)

@@ -64,7 +64,9 @@ QVariantMap Asn1ValueParser::parseAsn1Value(
     if (type->typeEnum() == Asn1Acn::Types::Type::USERDEFINED) {
         auto userType = dynamic_cast<const Asn1Acn::Types::UserdefinedType *>(type);
         if (userType && userType->referencedType()) {
-            return parseAsn1Value(userType->referencedType()->type(), asn1Value, valueOk);
+            valueMap = parseAsn1Value(userType->referencedType(), asn1Value, valueOk);
+            valueMap["name"] = type->identifier();
+            return valueMap;
         }
     }
 
@@ -120,10 +122,8 @@ QVariantMap Asn1ValueParser::parseAsn1Value(
     case Asn1Acn::Types::Type::BITSTRING:
     case Asn1Acn::Types::Type::IA5STRING:
     case Asn1Acn::Types::Type::NUMERICSTRING:
-    case Asn1Acn::Types::Type::OCTETSTRING: {
-        valueMap["value"] = value;
-        break;
-    }
+    case Asn1Acn::Types::Type::OCTETSTRING:
+    case Asn1Acn::Types::Type::STRING:
     default: {
         // take string between " "
         if (value.startsWith("\"")) {
