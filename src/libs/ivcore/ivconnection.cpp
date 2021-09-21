@@ -149,6 +149,20 @@ void IVConnection::unsetInheritPI()
     handleInheritPIChange(IVConnection::InheritPIChange::NotInherit);
 }
 
+/*!
+   Returns true if the interface(s) are of kind protected. \see IVInterface::OperationKind::Protected
+ */
+bool IVConnection::isProtected() const
+{
+    if (d->sourceIface() && d->sourceIface()->kind() == IVInterface::OperationKind::Protected) {
+        return true;
+    }
+    if (d->targetIface() && d->targetIface()->kind() == IVInterface::OperationKind::Protected) {
+        return true;
+    }
+    return false;
+}
+
 void IVConnection::handleInheritPIChange(IVConnection::InheritPIChange inheritance)
 {
     if (isOneDirection())

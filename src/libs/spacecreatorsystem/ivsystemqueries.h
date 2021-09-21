@@ -47,6 +47,8 @@ public:
     QStringList functionsNames() const override;
     QStringList pseudoFunctionsNames() const override;
     QList<ivm::IVFunction *> connectedPseudoFunctions(const QString &functionName) const;
+    ivm::IVFunction *functionByName(const QString &functionName) const;
+    QList<ivm::IVFunction *> connectedProtectedFunctions(const QString &functionName) const;
 
     QList<QPair<QString, QString>> messages(
             const QString &sourceFunction, const QString &targetFunction) const override;

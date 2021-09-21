@@ -32,6 +32,7 @@
 #include "ivsystemqueries.h"
 #include "spacecreatorproject.h"
 
+#include <QDebug>
 #include <algorithm>
 
 namespace scs {
@@ -77,6 +78,7 @@ bool DvSystemChecks::checkFunctionBindings(DVEditorCorePtr dvCore) const
     ok = ok && checkFunctionIvValidity(dvCore);
     ok = ok && checkUniqueFunctionBindings(dvCore);
     ok = ok && checkSystemFunctionsAvailable(dvCore);
+    ok = ok && checkProtectedFunctions(dvCore);
     return ok;
 }
 
@@ -95,6 +97,32 @@ bool DvSystemChecks::checkMessageBindings(DVEditorCorePtr dvCore) const
     ok = ok && checkMessageIvValidity(dvCore);
     ok = ok && checkUniqueMessages(dvCore);
     return ok;
+}
+
+/*!
+   Returns the corresponding IV function for \p dvFunc
+   If none is found, nullptr is returned
+ */
+ivm::IVFunction *DvSystemChecks::correspondingFunction(dvm::DVFunction *dvFunc) const
+{
+    if (!m_storage && m_storage->ivQuery()) {
+        return nullptr;
+    }
+
+    return m_storage->ivQuery()->functionByName(dvFunc->title());
+
+    return nullptr;
+}
+
+/*!
+   Returns the corresponding DV function for \p ivFunc in the DV editor \p dvCore
+   If none is found, nullptr is returned
+ */
+dvm::DVFunction *DvSystemChecks::correspondingFunction(ivm::IVFunction *ivFunc, const DVEditorCorePtr &dvCore) const
+{
+    dvm::DVModel *model = dvCore->appModel()->objectsModel();
+    dvm::DVObject *dvf = model->getObjectByName(ivFunc->title(), dvm::DVObject::Type::Function);
+    return qobject_cast<dvm::DVFunction *>(dvf);
 }
 
 bool DvSystemChecks::checkFunctionIvValidity(const DVEditorCorePtr &dvCore) const
@@ -215,6 +243,58 @@ bool DvSystemChecks::checkSystemFunctionsAvailable(const dvm::DVNode *node, cons
                         tr("Node '%1' misses interface '%2' in pseudo function '%3'")
                                 .arg(node->title(), iface->title(), func->title()),
                         dvCore->filePath());
+            }
+        }
+    }
+
+    return ok;
+}
+
+/*!
+   Checks that functions that are bound in one partition, that have other functions connected protected interfaces have
+   to be in the same partition
+ */
+bool DvSystemChecks::checkProtectedFunctions(const DVEditorCorePtr &dvCore) const
+{
+    if (!m_storage && m_storage->ivQuery()) {
+        return true;
+    }
+    IvSystemQueries *ivQuery = m_storage->ivQuery();
+
+    bool ok = true;
+    dvm::DVModel *model = dvCore->appModel()->objectsModel();
+    QVector<dvm::DVFunction *> functions = model->allObjectsByType<dvm::DVFunction>();
+    for (dvm::DVFunction *dvf : functions) {
+        dvm::DVPartition *partition = dvf->partition();
+        if (!partition) {
+            continue;
+        }
+        // Get all connected "protected" functions
+        QList<ivm::IVFunction *> protectedFunctions = ivQuery->connectedProtectedFunctions(dvf->title());
+        QList<dvm::DVFunction *> boundFunctions;
+        for (ivm::IVFunction *ivf : protectedFunctions) {
+            dvm::DVFunction *f = correspondingFunction(ivf, dvCore);
+            if (f) {
+                boundFunctions.append(f);
+            } else {
+                dvm::DVNode *node = partition->node();
+                if (!node || !node->hasSystemFunction(ivf->title())) {
+                    shared::ErrorHub::addError(shared::ErrorItem::Error,
+                            tr("Bound protected function '%1' misses '%2'").arg(dvf->title(), ivf->title()),
+                            dvCore->filePath());
+                    ok = false;
+                }
+            }
+        }
+
+        // check if the functions are in the same partition
+        for (dvm::DVFunction *f : boundFunctions) {
+            if (f->partition() != partition) {
+                shared::ErrorHub::addError(shared::ErrorItem::Error,
+                        tr("Bound protected function '%1' is not in partition '%2' like '%3'")
+                                .arg(f->title(), partition->title(), dvf->title()),
+                        dvCore->filePath());
+                ok = false;
             }
         }
     }

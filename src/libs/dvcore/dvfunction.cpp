@@ -17,11 +17,18 @@
 
 #include "dvfunction.h"
 
+#include "dvpartition.h"
+
 namespace dvm {
 
 DVFunction::DVFunction(DVObject *parent)
     : DVObject(DVObject::Type::Function, {}, parent)
 {
+}
+
+DVPartition *DVFunction::partition() const
+{
+    return qobject_cast<DVPartition *>(parent());
 }
 
 } // namespace dvm

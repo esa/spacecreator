@@ -20,12 +20,14 @@
 #include "dvobject.h"
 
 namespace dvm {
+class DVPartition;
 
 class DVFunction : public DVObject
 {
     Q_OBJECT
 public:
     explicit DVFunction(DVObject *parent = nullptr);
+    DVPartition *partition() const;
 };
 
 } // namespace dvm

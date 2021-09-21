@@ -22,6 +22,7 @@
 
 #include <QScopedPointer>
 #include <QtTest>
+#include <dvpartition.h>
 
 class tst_DVModel : public QObject
 {
@@ -35,6 +36,7 @@ private Q_SLOTS:
     void testClear();
     void testInitFromObjects();
     void testConnectionName();
+    void testGetObjectByName();
 
 private:
     QScopedPointer<dvm::DVModel> m_model;
@@ -138,6 +140,21 @@ void tst_DVModel::testConnectionName()
 
     connection->setTitle("New_name");
     QCOMPARE(m_model->newConnectionName(), "Connection_2");
+}
+
+void tst_DVModel::testGetObjectByName()
+{
+    auto node1 = new dvm::DVNode();
+    node1->setTitle("Node_A");
+    m_model->addObject(node1);
+    auto partition1 = new dvm::DVPartition(node1);
+    partition1->setTitle("Partition_A");
+    node1->addPartition(partition1);
+    m_model->addObject(partition1);
+
+    QCOMPARE(m_model->getObjectByName("partition_a", dvm::DVObject::Type::Partition), partition1);
+    QCOMPARE(m_model->getObjectByName("partition_a", dvm::DVObject::Type::Partition, Qt::CaseSensitive), nullptr);
+    QCOMPARE(m_model->getObjectByName("partition_a", dvm::DVObject::Type::Node), nullptr);
 }
 
 QTEST_APPLESS_MAIN(tst_DVModel)

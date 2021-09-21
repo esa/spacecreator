@@ -29,6 +29,7 @@ class tst_IVConnection : public QObject
 private Q_SLOTS:
     void testPostInitEmptyConnection();
     void testCorrectConnectionSourceTarget();
+    void testIsProtected();
 };
 
 void tst_IVConnection::testPostInitEmptyConnection()
@@ -102,6 +103,22 @@ void tst_IVConnection::testCorrectConnectionSourceTarget()
 
     delete fn1;
     delete fn2;
+}
+
+void tst_IVConnection::testIsProtected()
+{
+    ivm::IVFunction *fn1 = ivm::testutils::createFunction("Fn1");
+    ivm::IVFunction *fn2 = ivm::testutils::createFunction("Fn2");
+    ivm::IVConnection *c1 = ivm::testutils::createConnection(fn1, fn2, "Cnt1");
+
+    QCOMPARE(c1->sourceInterface()->kind(), ivm::IVInterface::OperationKind::Protected);
+    QCOMPARE(c1->targetInterface()->kind(), ivm::IVInterface::OperationKind::Protected);
+    QCOMPARE(c1->isProtected(), true);
+
+    c1->sourceInterface()->setKind(ivm::IVInterface::OperationKind::Sporadic);
+    QCOMPARE(c1->isProtected(), true);
+    c1->targetInterface()->setKind(ivm::IVInterface::OperationKind::Sporadic);
+    QCOMPARE(c1->isProtected(), false);
 }
 
 QTEST_APPLESS_MAIN(tst_IVConnection)

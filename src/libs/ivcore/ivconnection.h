@@ -49,6 +49,8 @@ public:
     void setInheritPI();
     void unsetInheritPI();
 
+    bool isProtected() const;
+
     template<class T>
     static inline T selectIface(IVInterface *a, IVInterface *b)
     {

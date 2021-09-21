@@ -1,0 +1,79 @@
+<InterfaceView asn1file="Taste07.asn">
+<Function name="Function_33" language="" is_type="NO" instance_of="">
+    <Property name="Taste::coordinates" value="53200 69500 104800 102700"/>
+<Provided_Interface name="init" kind="Protected" period="" wcet="" queue_size="">
+    <Input_Parameter name="bar" type="MyInt" encoding="NATIVE"/>
+    <Property name="Taste::coordinates" value="53200 86100"/>
+</Provided_Interface>
+
+<Provided_Interface name="aaaa" kind="Cyclic" period="" wcet="" queue_size="">
+    <Property name="Taste::coordinates" value="0 0"/>
+</Provided_Interface>
+
+<Required_Interface name="done" kind="Protected" period="" wcet="" queue_size="">
+    <Property name="Taste::coordinates" value="104800 86100"/>
+    <Property name="Taste::InheritPI" value="true"/>
+</Required_Interface>
+
+</Function>
+
+<Function name="Function_HH" language="" is_type="NO" instance_of="">
+    <Property name="Taste::coordinates" value="1000 1000 21000 9000"/>
+</Function>
+
+<Function name="Function_1" language="" is_type="NO" instance_of="">
+    <Property name="Taste::coordinates" value="12600 15600 48500 41700"/>
+    <ContextParameter name="Foo" type="Timer" value=""/>
+    <ContextParameter name="Bar" type="MyChoice" value="b : FALSE"/>
+<Provided_Interface name="done" kind="Protected" period="" wcet="" queue_size="">
+    <Property name="Taste::coordinates" value="12600 28700"/>
+</Provided_Interface>
+
+<Provided_Interface name="Msg1ABC" kind="Cyclic" period="" wcet="" queue_size="">
+    <Property name="Taste::coordinates" value="24000 16100"/>
+</Provided_Interface>
+
+<Required_Interface name="notch" kind="SPORADIC_OPERATION" period="" wcet="" queue_size="">
+    <Property name="Taste::coordinates" value="48500 28700"/>
+    <Property name="Taste::InheritPI" value="true"/>
+</Required_Interface>
+
+</Function>
+
+<Function name="Function_B" language="" is_type="NO" instance_of="">
+    <Property name="Taste::coordinates" value="117700 19200 158600 48200"/>
+<Provided_Interface name="notch" kind="SPORADIC_OPERATION" period="" wcet="" queue_size="">
+    <Property name="Taste::coordinates" value="117700 33700"/>
+</Provided_Interface>
+
+<Required_Interface name="init" kind="Protected" period="" wcet="" queue_size="">
+    <Input_Parameter name="bar" type="MyInt" encoding="NATIVE"/>
+    <Property name="Taste::coordinates" value="158600 33700"/>
+    <Property name="Taste::InheritPI" value="true"/>
+</Required_Interface>
+
+</Function>
+
+<Function name="Function_G" language="" is_type="NO" instance_of="">
+    <Property name="Taste::coordinates" value="23400 5400 43400 13400"/>
+</Function>
+
+<Connection >
+    <Source func_name="Function_B" ri_name="init"/>
+    <Target func_name="Function_33" pi_name="init"/>
+    <Property name="Taste::coordinates" value="159200 33700 161200 33700 161200 50200 51100 50200 51100 86100 52900 86100"/>
+</Connection>
+
+<Connection >
+    <Source func_name="Function_1" ri_name="notch"/>
+    <Target func_name="Function_B" pi_name="notch"/>
+    <Property name="Taste::coordinates" value="49100 28700 83200 28700 83200 33700 117400 33700"/>
+</Connection>
+
+<Connection >
+    <Source func_name="Function_33" ri_name="done"/>
+    <Target func_name="Function_1" pi_name="done"/>
+    <Property name="Taste::coordinates" value="105400 86100 107300 86100 107300 43700 5700 43700 10500 28700 12300 28700"/>
+</Connection>
+
+</InterfaceView>

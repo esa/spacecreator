@@ -24,6 +24,7 @@
 
 namespace dvm {
 class DVFunction;
+class DVNode;
 struct DVPartitionPrivate;
 
 class DVPartition : public DVObject
@@ -31,6 +32,7 @@ class DVPartition : public DVObject
     Q_OBJECT
     Q_PROPERTY(QList<dvm::DVFunction *> functions READ functions)
     Q_PROPERTY(QStringList functionsNames READ functionsNames)
+    Q_PROPERTY(dvm::DVNode *node READ node)
 
 public:
     explicit DVPartition(DVObject *parent = nullptr);
@@ -40,6 +42,8 @@ public:
     void removeFunction(DVFunction *function);
     QList<DVFunction *> functions() const;
     QStringList functionsNames() const;
+
+    DVNode *node() const;
 
 Q_SIGNALS:
     void functionAdded(shared::Id id);

@@ -18,6 +18,7 @@
 #include "dvpartition.h"
 
 #include "dvfunction.h"
+#include "dvnode.h"
 
 #include <QStringList>
 
@@ -69,6 +70,11 @@ QStringList DVPartition::functionsNames() const
         names.append(fn->title());
     }
     return names;
+}
+
+DVNode *DVPartition::node() const
+{
+    return qobject_cast<DVNode *>(parent());
 }
 
 } // namespace dvm

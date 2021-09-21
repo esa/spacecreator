@@ -95,11 +95,12 @@ QList<ivm::IVFunction *> IvSystemQueries::connectedPseudoFunctions(const QString
         return {};
     }
 
-    ivm::IVModel *model = ivModel();
-    ivm::IVFunction *ivFunction = model->getFunction(functionName, m_caseCheck);
+    ivm::IVFunction *ivFunction = functionByName(functionName);
     if (!ivFunction) {
         return {};
     }
+
+    ivm::IVModel *model = ivModel();
     QVector<ivm::IVConnection *> connections = model->getConnectionsForFunction(ivFunction->id());
 
     QList<ivm::IVFunction *> functions;
@@ -113,6 +114,54 @@ QList<ivm::IVFunction *> IvSystemQueries::connectedPseudoFunctions(const QString
     for (ivm::IVConnection *connection : connections) {
         addFunction(connection->source());
         addFunction(connection->target());
+    }
+
+    return functions;
+}
+
+/*!
+   Returns the function with the name \p functionName
+ */
+ivm::IVFunction *IvSystemQueries::functionByName(const QString &functionName) const
+{
+    if (!ivModel()) {
+        return nullptr;
+    }
+
+    ivm::IVModel *model = ivModel();
+    return model->getFunction(functionName, m_caseCheck);
+}
+
+/*!
+   Return all functions that are connected with \p functionName via a proteced connection/interface
+ */
+QList<ivm::IVFunction *> IvSystemQueries::connectedProtectedFunctions(const QString &functionName) const
+{
+    if (!ivModel()) {
+        return {};
+    }
+
+    ivm::IVFunction *ivFunction = functionByName(functionName);
+    if (!ivFunction) {
+        return {};
+    }
+
+    ivm::IVModel *model = ivModel();
+    QVector<ivm::IVConnection *> connections = model->getConnectionsForFunction(ivFunction->id());
+
+    QList<ivm::IVFunction *> functions;
+    auto addFunction = [&](ivm::IVObject *obj) {
+        ivm::IVFunction *f = qobject_cast<ivm::IVFunction *>(obj);
+        if (f && f != ivFunction && !functions.contains(f)) {
+            functions.append(f);
+        }
+    };
+
+    for (ivm::IVConnection *connection : connections) {
+        if (connection->isProtected()) {
+            addFunction(connection->source());
+            addFunction(connection->target());
+        }
     }
 
     return functions;

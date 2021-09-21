@@ -40,7 +40,8 @@ public:
     ~DVModel() override;
 
     DVObject *getObject(const shared::Id &id) const override;
-    DVObject *getObjectByName(const QString &name, DVObject::Type type, Qt::CaseSensitivity caseSensitivity) const;
+    DVObject *getObjectByName(
+            const QString &name, DVObject::Type type, Qt::CaseSensitivity caseSensitivity = Qt::CaseInsensitive) const;
 
     void clear() override;
 
