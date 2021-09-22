@@ -1,3 +1,157 @@
+Release: DVE_11
+========================================================
+Known issues in layouting and undo/redo in interface view
+
+* [658de322] [2021-09-03] Asn1AcnExporter: ASN.1/ACN visitors added to Asn1AcnExporter/visitors
+* [801cfd0e] [2021-09-03] Asn1AcnExporter: changed namespace from Fuzzer to Asn1Acn
+* [319b3cfc] [2021-09-03] Asn1AcnExporter: updated the license text in backported code
+* [22dbb377] [2021-09-03] Asn1AcnExporter: applied clang-format to backported code
+* [0464503f] [2021-09-03] Asn1AcnExporter: visitors moved to Asn1AcnExporter dir
+* [1624937b] [2021-09-03] Asn1AcnExporter: added reconstructorvisitors source, header and CMakeLists.txt
+* [e07db378] [2021-09-06] Asn1AcnExporter: copied test sources from Fuzzer/src/tests
+* [39681b6f] [2021-09-06] Asn1AcnExporter: changed includes from data/ to asn1library/asn1, removed Data:: references
+* [450a2f7f] [2021-09-06] Asn1AcnExporter: added Asn1AcnExporter subdirectory to CMakeLists.txt in conversion/asn1 dir
+* [a6fdf104] [2021-09-06] Asn1AcnExporter: added missing typeconstraintsreconstructingvisitor.cpp
+* [2cdb1ca7] [2021-09-06] Asn1AcnExporter: added compiling of asn1typecomponentreconstructingvisitor and typeconstraintsreconstructingvisitor to CMakeLists.txt
+* [f46d4b97] [2021-09-06] Asn1AcnExporter: fixed bug in acntypereconstructingvisitor
+* [065f8f45] [2021-09-06] Asn1AcnExporter: changed type()->name() to type()->typeName()
+* [7de931aa] [2021-09-06] Asn1AcnExporter: applied fixes in asn1typecomponentreconstructor
+* [72fcc915] [2021-09-06] Asn1AcnExporter: added includes to exporter.cpp
+* [b9d1ccc2] [2021-09-06] Asn1AcnExporter: changed includes, removed Data:: references and clang-format applied in visitor tests
+* [a53455f7] [2021-09-06] Asn1AcnExporter: added asn1nodereconstructingvisitor_tests
+* [5d17d585] [2021-09-06] Asn1AcnExporter: removed reconstructor_tests
+* [c949a6bb] [2021-09-06] Asn1AcnExporter: added asn1nodereconstructionvisitor tests
+* [f8b8d931] [2021-09-06] fixed typo in cmake/TestUtils.cmake
+* [908dee5c] [2021-09-07] Asn1AcnExporter: updated license in tests
+* [a81bca19] [2021-09-07] Asn1AcnExporter: clang-formatted the test code
+* [f93882ad] [2021-09-07] Asn1AcnExporter: removed dead line from tests
+* [129a41aa] [2021-09-07] Asn1AcnExporter: removed commented-out line from visitor tests src
+* [fd6f4003] [2021-09-07] Merge branch 'master' into n7s-etb#52-asn1acn-exporter
+* [8eb974cf] [2021-09-08] Typo fixes for manual tests
+* [b6ea2c28] [2021-09-08] Merge branch 'master' into n7s-etb#52-asn1acn-exporter
+* [73747216] [2021-09-08] Asn1AcnExporter: renamed to Asn1Exporter
+* [c7b03e65] [2021-09-08] asn1library: Fixed parsing IA5String type
+* [d8b20ce4] [2021-09-08] asn1library: Added regression test for ASN.1 IA5String parsing
+* [cfe781c3] [2021-09-08] Asn1Exporter: fixed Asn1Options/options.h file
+* [4bb65c79] [2021-09-08] Asn1Exporter: added exportModel override stub
+* [a2d61618] [2021-09-08] fixed typo in IvOptions/options.h
+* [bed0b4d7] [2021-09-08] Asn1Exporter: added checks to exportModelStub
+* [90ba4fa4] [2021-09-08] Asn1Exporter: added to Asn1Registrar
+* [9b7657f7] [2021-09-08] Asn1Exporter: added stub of integration tests
+* [913a4b83] [2021-08-26] Conversion: Created IvXmlExporter
+* [12a30826] [2021-08-26] Conversion: IvXmlExporter tests
+* [e2741a61] [2021-08-27] Conversion: Implemented IvXmlExporter
+* [5d803afc] [2021-09-08] IvXmlExporter: Pre-MR cleanup
+* [47df27f5] [2021-09-08] IvXmlExporter: Removed unnecessary destructor
+* [71fb6bac] [2021-09-09] Conversion: Cleaned up registrars code
+* [cbca2815] [2021-09-08] 663 Add DVBus entity
+* [9009667f] [2021-09-01] Conversion: Model has now 'modelType'function
+* [e27c948e] [2021-09-01] Conversion: Translator can now return more than one model
+* [ad60078f] [2021-09-01] Conversion: Using 'modelType' instead of dynamic_casts for checking whether correct model was passed
+* [f304ea6f] [2021-09-01] Conversion: Converter now accepts list of auxiliary models to export
+* [371fdc1d] [2021-09-09] Conversion: Documentation polish
+* [e5454666] [2021-09-09] Conversion: Removed no longer necessary model.cpp
+* [f2f20dc9] [2021-09-09] Conversion: Removed unnecessary ifs
+* [f59a9d2e] [2021-09-09] DVE: Update connection attributes when linked entities are changed
+* [d874ca0e] [2021-09-09] IVE: ConnectionGroup graphic items are invisible in the scene
+* [cb89eef3] [2021-08-30] SedsToIvTranslator: Created translator
+* [68c84091] [2021-09-01] SedsToIvTranslator: Implementation
+* [e3fa1541] [2021-09-01] SedsToIvTranslator: Tests
+* [8bfb647e] [2021-09-01] SedsToIvTranslator: Translating GenericTypeMapSet
+* [4f2360d9] [2021-09-01] SEDS Model: Added some helper methods for names
+* [c5371e79] [2021-09-01] SedsToIvTranslator: Fixed translator interface
+* [8ab8068d] [2021-09-02] SedsToIvTranslator: Created ComponentsTranslator
+* [831714aa] [2021-09-02] SedsToIvTranslator: Added checking for interface command arguments combination
+* [bb42f3cf] [2021-09-03] SedsToIvTranslator: Created AsyncInterfaceCommandTranslator
+* [9a447f1c] [2021-09-03] SedsConverter: Passing input filename via arguments
+* [9c1a9b92] [2021-09-03] SedsToIvTranslator: Added dumb parameter translation
+* [4182dd75] [2021-09-03] SedsToIvTranslator: Mapping abstract to concrete type in paramters
+* [e85a5318] [2021-09-06] SedsToIvTranslator: Tests fixes
+* [5f28e80f] [2021-09-06] SedsToIvTranslator: Creating ASN.1 type group for interface parameters
+* [9d90d917] [2021-09-06] SedsToIvTranslator: Added params to tests
+* [03f76f7b] [2021-09-07] SedsToIvTranslator: Changed generated names
+* [4066c18f] [2021-09-08] SedsToIvTranslator: SedsModelBuilder
+* [eb6533fc] [2021-09-09] SedsToIvTranslator: Added documentation
+* [8f0bde8e] [2021-09-09] SedsToIvTranslator: Added documentation
+* [9aa81fc8] [2021-09-09] SedsToIvTranslator: Removed unneccessary destructor
+* [87fdca01] [2021-09-09] SedsModelBuilder: Changed conversion operator to 'build' function
+* [b86167fe] [2021-09-10] SedsToIvTranslator: Review fixes
+* [29866c16] [2021-09-10] SedsToIvTranslator: Added missing documentation
+* [559305f8] [2021-09-09] Build system: Enable warnings in conversion targets
+* [c92a8272] [2021-09-09] Build system: Clang-tidy is now enabled per target
+* [5277c11d] [2021-09-10] Build system: Fixed clang-tidy warnings
+* [66bae1ff] [2021-09-10] Build system: Enabled readability-braces-around-statements in clang-tidy
+* [288154ad] [2021-09-13] DVE: ASN1 data edit fix for Device entity
+* [bfacab78] [2021-09-08] Asn1Exporter: added stub of integration tests
+* [5dfd42a6] [2021-09-08] asn1library: Fixed parsing IA5String type
+* [4a1ebef4] [2021-09-08] asn1library: Added regression test for ASN.1 IA5String parsing
+* [6e226523] [2021-08-26] Conversion: Created IvXmlExporter
+* [7c5fa073] [2021-08-26] Conversion: IvXmlExporter tests
+* [a0711abe] [2021-08-27] Conversion: Implemented IvXmlExporter
+* [adbb6d54] [2021-09-08] IvXmlExporter: Pre-MR cleanup
+* [5ac99a42] [2021-09-08] IvXmlExporter: Removed unnecessary destructor
+* [bb40df2d] [2021-09-09] Conversion: Cleaned up registrars code
+* [2fa333d2] [2021-09-08] 663 Add DVBus entity
+* [4b876acf] [2021-09-01] Conversion: Model has now 'modelType'function
+* [37473b1c] [2021-09-01] Conversion: Translator can now return more than one model
+* [f0213023] [2021-09-01] Conversion: Using 'modelType' instead of dynamic_casts for checking whether correct model was passed
+* [294771cf] [2021-09-01] Conversion: Converter now accepts list of auxiliary models to export
+* [48db014f] [2021-09-09] Conversion: Documentation polish
+* [c96f0381] [2021-09-09] Conversion: Removed no longer necessary model.cpp
+* [848b6306] [2021-09-09] Conversion: Removed unnecessary ifs
+* [0c13a820] [2021-09-09] clang-format applied to stray files
+* [74897fec] [2021-09-10] Asn1Exporter: updated the options
+* [e0e78848] [2021-09-10] Asn1Exporter: added ACN exporting
+* [76cec697] [2021-09-10] Asn1Exporter: tests: added Asn1Model and exporting the files
+* [1008bfba] [2021-09-13] Asn1Exporter: refactored
+* [80baecdd] [2021-09-13] Asn1Exporter: tests: refactor
+* [2a4d0c64] [2021-09-13] Asn1Exporter: tests: additional checks
+* [254d894c] [2021-09-13] Merge branch 'master' into n7s-etb#52-asn1exporter-wrapper
+* [ce7b4fa0] [2021-09-13] Asn1Exporter: functional code extracted from asssertions
+* [8926067d] [2021-09-13] clang-format applied to stray file
+* [8e415950] [2021-09-13] Asn1Exporter: Q_UNUSED added to unused (in release) variables
+* [3291d54c] [2021-09-10] SedsToIvTranslator: Optimized generating ASN.1 types for groupped command argument
+* [9a98bdc7] [2021-09-13] SedsToIvTranslator: Documentation
+* [15b17cc0] [2021-09-13] SedsToIvTranslator: Build fix
+* [44ccf3b6] [2021-09-14] IVE: Interface position mismatch with cursor during the move
+* [ba409190] [2021-09-14] IVE: Undo actions performed after entering/leaving nested view mess up the scene
+* [d1fddb63] [2021-09-14] DVE: Adjust default position of Device graphic item
+* [b71a186c] [2021-09-14] Asn1Exporter: review fixes
+* [a217b804] [2021-09-14] Apply 1 suggestion(s) to 1 file(s)
+* [7b48cab4] [2021-09-14] Asn1Exporter: review fixes, part 2
+* [dd4c7545] [2021-09-14] IVE: Nested Connections outside Function item
+* [8b6e551b] [2021-09-14] Apply 1 suggestion(s) to 1 file(s)
+* [3e5854e2] [2021-09-14] Merge branch 'master' into n7s-etb#52-asn1exporter-wrapper
+* [ebc93b03] [2021-09-14] Asn1Exporter: moved the check for dynamic_cast
+* [281cdc9b] [2021-09-15] DVE: Fill ASN1 Editor with existing data during attribute setup
+* [6ccb2e3e] [2021-09-15] Merge branch 'master' into n7s-etb#52-asn1exporter-wrapper
+* [ecc9f866] [2021-09-14] 662 Add Preudo function to IV
+* [cadd6fd9] [2021-09-14] 662 Add pseudo function for HW boards
+* [ab2e7d03] [2021-09-15] 626 Rename pseudo function/interface to system
+* [995b590b] [2021-09-15] Asn1Exporter: Added handling missing output filename
+* [c232dd97] [2021-09-15] Asn1Exporter: Renamed buildFilePath to makeFilePath
+* [15b1587d] [2021-09-13] SedsToIvTranslator: Extracted common InterfaceCommandTranslator class
+* [85d553b4] [2021-09-13] SedsToIvTranslator: Created SyncInterfaceCommandTranslator class
+* [211312d6] [2021-09-13] SedsToIvTranslator: Implemented translating sync interface commands
+* [b52ea899] [2021-09-15] SedsToIvTranslator: Build fix
+* [13e689fd] [2021-09-15] SedsToIvTranslator: Build fix
+* [91252bea] [2021-09-15] 662 Add system function/interface to DV model
+* [bb01be2f] [2021-09-16] 662 Copy all system entities from boards to nodes
+* [8fbf5a07] [2021-09-17] IVE: Exporting a component should raise a question
+* [fac7f096] [2021-09-17] IVE: Configuration for the export folder
+* [ca45ad25] [2021-09-17] Asn1Exporter: Fixed getting prefix for the asn1/acn filenames
+* [0b6d8339] [2021-09-16] Run all tests in the CI
+* [006ff0d9] [2021-09-17] 662 Exclude system functions from list of bindable functions
+* [c08e2488] [2021-09-17] 662 Check is DV system function s do match IV pseudo functions
+* [9fe25ff1] [2021-09-20] 674 Fix parsing interface parameters
+* [0fd9d649] [2021-09-20] 673 Round positions of items
+* [a3acfe86] [2021-09-20] 673 Avoid unnecessary geometry command
+* [92e4ccb1] [2021-09-20] 352 Initial DV manual tests
+* [a725484b] [2021-09-21] 352 First simple manual test
+* [40e234f4] [2021-09-21] Update default editor colors
+* [3e4d8195] [2021-09-21] Resolve "ASN: editor for IP4 is behaving wrong"
+* [c24d9dbc] [2021-09-21] 639 Check for protected functions during DV load
+
 Release: DVE_10
 ========================================================
 * [2c618b0a] [2021-08-11] 621 Fix overlapping messages
