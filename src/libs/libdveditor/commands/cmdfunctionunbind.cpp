@@ -17,37 +17,61 @@
 
 #include "cmdfunctionunbind.h"
 
+#include "abstractsystemchecks.h"
 #include "commandids.h"
+#include "dveditorcore.h"
 #include "dvfunction.h"
 #include "dvmodel.h"
+#include "dvnode.h"
 #include "dvpartition.h"
+#include "errorhub.h"
 
 namespace dve {
 namespace cmd {
 
-CmdFunctionUnbind::CmdFunctionUnbind(dvm::DVPartition *partition, dvm::DVFunction *function)
+CmdFunctionUnbind::CmdFunctionUnbind(dvm::DVPartition *partition, dvm::DVFunction *function, DVEditorCore *dvCore)
     : shared::UndoCommand()
     , m_partition(partition)
-    , m_function(function)
 {
+    m_functions.append(function);
+
+    // find/add connected protedted functions
+    if (dvCore && dvCore->systemChecker()) {
+        QStringList functionNames = dvCore->systemChecker()->connectedProtectedFunctionNames(function->title());
+        for (dvm::DVFunction *func : m_partition->functions()) {
+            if (func->title() != function->title() && functionNames.contains(func->title(), Qt::CaseInsensitive)) {
+                m_functions.append(func);
+            }
+        }
+    }
 }
 
 void CmdFunctionUnbind::redo()
 {
-    m_partition->removeFunction(m_function);
-    if (auto model = m_partition->model()) {
-        model->removeObject(m_function);
+    dvm::DVModel *model = m_partition->model();
+    for (dvm::DVFunction *function : m_functions) {
+        if (function) {
+            m_partition->removeFunction(function);
+            if (model) {
+                model->removeObject(function);
+            }
+            function->setParent(this);
+        }
     }
-    m_function->setParent(this);
 }
 
 void CmdFunctionUnbind::undo()
 {
-    m_function->setParent(m_partition);
-    if (auto model = m_partition->model()) {
-        model->addObject(m_function);
+    dvm::DVModel *model = m_partition->model();
+    for (dvm::DVFunction *function : m_functions) {
+        if (function) {
+            function->setParent(m_partition);
+            if (model) {
+                model->addObject(function);
+            }
+            m_partition->addFunction(function);
+        }
     }
-    m_partition->addFunction(m_function);
 }
 
 int CmdFunctionUnbind::id() const

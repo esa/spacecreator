@@ -19,6 +19,7 @@
 
 #include "undocommand.h"
 
+#include <QList>
 #include <QPointer>
 
 namespace dvm {
@@ -27,20 +28,21 @@ class DVFunction;
 } // namespace dvm
 
 namespace dve {
+class DVEditorCore;
 namespace cmd {
 
 class CmdFunctionUnbind : public shared::UndoCommand
 {
     Q_OBJECT
 public:
-    explicit CmdFunctionUnbind(dvm::DVPartition *partition, dvm::DVFunction *function);
+    explicit CmdFunctionUnbind(dvm::DVPartition *partition, dvm::DVFunction *function, dve::DVEditorCore *dvCore);
     void redo() override;
     void undo() override;
     int id() const override;
 
 private:
     QPointer<dvm::DVPartition> m_partition;
-    QPointer<dvm::DVFunction> m_function;
+    QList<QPointer<dvm::DVFunction>> m_functions;
 };
 
 } // namespace cmd

@@ -19,6 +19,7 @@
 
 #include "undocommand.h"
 
+#include <QList>
 #include <QPointer>
 
 namespace dvm {

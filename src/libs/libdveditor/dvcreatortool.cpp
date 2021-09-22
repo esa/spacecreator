@@ -392,7 +392,7 @@ void DVCreatorTool::populateContextMenu_commonEdit(QMenu *menu, const QPointF &s
                 [this, boundFunctionsEntities, partition, cmdTitle = action->text()]() {
                     m_dvCore->commandsStack()->undoStack()->beginMacro(cmdTitle);
                     for (dvm::DVFunction *fn : qAsConst(boundFunctionsEntities)) {
-                        auto cmd = new cmd::CmdFunctionUnbind(partition, fn);
+                        auto cmd = new cmd::CmdFunctionUnbind(partition, fn, nullptr);
                         m_dvCore->commandsStack()->push(cmd);
                     }
                     m_dvCore->commandsStack()->undoStack()->endMacro();
@@ -401,7 +401,7 @@ void DVCreatorTool::populateContextMenu_commonEdit(QMenu *menu, const QPointF &s
         for (dvm::DVFunction *function : qAsConst(boundFunctionsEntities)) {
             QAction *functionAction = unbindMenu->addAction(function->title());
             connect(functionAction, &QAction::triggered, this, [this, partition, function]() {
-                auto cmd = new cmd::CmdFunctionUnbind(partition, function);
+                auto cmd = new cmd::CmdFunctionUnbind(partition, function, m_dvCore);
                 m_dvCore->commandsStack()->push(cmd);
             });
         }
