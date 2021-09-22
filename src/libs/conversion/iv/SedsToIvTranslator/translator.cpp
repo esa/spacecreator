@@ -44,7 +44,9 @@ std::vector<std::unique_ptr<Model>> SedsToIvTranslator::translateModels(
 {
     if (sourceModels.empty()) {
         throw TranslationException("No models passed for translation");
-    } else if (sourceModels.size() != 2) {
+    } else if (sourceModels.size() < 2) {
+        throw TranslationException("Not enough models passed for SEDS to InterfaceView translation");
+    } else if (sourceModels.size() > 2) {
         throw TranslationException("Too many models passed for SEDS to InterfaceView translation");
     }
 

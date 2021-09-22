@@ -19,16 +19,17 @@
 
 #include <QObject>
 #include <QtTest>
+#include <asn1modelbuilder/asn1modelbuilder.h>
 #include <conversion/common/options.h>
 #include <conversion/iv/IvOptions/options.h>
 #include <conversion/iv/SedsToIvTranslator/translator.h>
 #include <ivcore/ivfunction.h>
 #include <ivcore/ivmodel.h>
-#include <sedscomponentbuilder.h>
-#include <sedsinterfacebuilder.h>
-#include <sedsinterfacecommandbuilder.h>
-#include <sedsinterfacedeclarationbuilder.h>
-#include <sedsmodelbuilder.h>
+#include <sedsmodelbuilder/sedscomponentbuilder.h>
+#include <sedsmodelbuilder/sedsinterfacebuilder.h>
+#include <sedsmodelbuilder/sedsinterfacecommandbuilder.h>
+#include <sedsmodelbuilder/sedsinterfacedeclarationbuilder.h>
+#include <sedsmodelbuilder/sedsmodelbuilder.h>
 
 using namespace ivm;
 using namespace seds::model;
@@ -40,6 +41,7 @@ using conversion::iv::translator::SedsToIvTranslator;
 
 namespace tests::conversion::iv {
 
+using common::Asn1ModelBuilder;
 using common::SedsComponentBuilder;
 using common::SedsInterfaceBuilder;
 using common::SedsInterfaceCommandBuilder;
@@ -78,13 +80,20 @@ void tst_SedsToIvTranslator::testTranslateComponentWithProvidedInterface()
             .build();
     // clang-format on
 
+    // clang-format off
+    const std::unique_ptr<Asn1Acn::Asn1Model> asn1Model =
+        Asn1ModelBuilder("Package")
+            .withIntegerDataType("MyInteger")
+        .build();
+    // clang-format on
+
     Options options;
     options.add(IvOptions::configFilename, "config.xml");
 
     SedsToIvTranslator translator;
 
-    const auto resultModels = translator.translateModels({ sedsModel.get() }, options);
-    QCOMPARE(resultModels.size(), 2);
+    const auto resultModels = translator.translateModels({ sedsModel.get(), asn1Model.get() }, options);
+    QCOMPARE(resultModels.size(), 1);
 
     const auto &resultModel = resultModels[0];
     QCOMPARE(resultModel->modelType(), ModelType::InterfaceView);
@@ -108,7 +117,7 @@ void tst_SedsToIvTranslator::testTranslateComponentWithProvidedInterface()
 
     const auto param = params[0];
     QCOMPARE(param.name(), "InputParam");
-    QCOMPARE(param.paramTypeName(), "Interface_ICommand_Type");
+    QCOMPARE(param.paramTypeName(), "ICommand_Type");
     QCOMPARE(param.direction(), shared::InterfaceParameter::Direction::IN);
 }
 
@@ -134,13 +143,20 @@ void tst_SedsToIvTranslator::testTranslateComponentWithRequiredInterface()
             .build();
     // clang-format on
 
+    // clang-format off
+    const std::unique_ptr<Asn1Acn::Asn1Model> asn1Model =
+        Asn1ModelBuilder("Package")
+            .withIntegerDataType("MyInteger")
+        .build();
+    // clang-format on
+
     Options options;
     options.add(IvOptions::configFilename, "config.xml");
 
     SedsToIvTranslator translator;
 
-    const auto resultModels = translator.translateModels({ sedsModel.get() }, options);
-    QCOMPARE(resultModels.size(), 2);
+    const auto resultModels = translator.translateModels({ sedsModel.get(), asn1Model.get() }, options);
+    QCOMPARE(resultModels.size(), 1);
 
     const auto &resultModel = resultModels[0];
     QCOMPARE(resultModel->modelType(), ModelType::InterfaceView);
@@ -164,7 +180,7 @@ void tst_SedsToIvTranslator::testTranslateComponentWithRequiredInterface()
 
     const auto param = params[0];
     QCOMPARE(param.name(), "InputParam");
-    QCOMPARE(param.paramTypeName(), "Interface_ICommand_Type");
+    QCOMPARE(param.paramTypeName(), "ICommand_Type");
     QCOMPARE(param.direction(), shared::InterfaceParameter::Direction::IN);
 }
 
