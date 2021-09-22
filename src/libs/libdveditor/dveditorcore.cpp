@@ -139,9 +139,6 @@ void DVEditorCore::setSystemChecker(AbstractSystemChecks *checker)
         delete d->m_systemChecks;
     }
     d->m_systemChecks = checker;
-    if (d->m_creatorTool) {
-        d->m_creatorTool->setSystemChecker(checker);
-    }
 }
 
 void DVEditorCore::setAsn1Check(Asn1Acn::Asn1SystemChecks *check)
@@ -207,9 +204,7 @@ QVector<QAction *> DVEditorCore::initActions()
 
     auto actionGroup = new QActionGroup(this);
     actionGroup->setExclusive(true);
-    d->m_creatorTool.reset(
-            new DVCreatorTool(d->m_mainWidget->graphicsView(), d->m_model.get(), d->m_appModel->commandsStack()));
-    d->m_creatorTool->setSystemChecker(d->m_systemChecks);
+    d->m_creatorTool.reset(new DVCreatorTool(d->m_mainWidget->graphicsView(), d->m_model.get(), this));
 
     connect(d->m_creatorTool.get(), &DVCreatorTool::created, this, [this, actionGroup]() {
         if (QAction *currentAction = actionGroup->checkedAction())

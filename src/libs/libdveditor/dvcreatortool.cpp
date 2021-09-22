@@ -26,6 +26,7 @@
 #include "commands/cmdpartitionentitycreate.h"
 #include "commandsstackbase.h"
 #include "connectionvalidator.h"
+#include "dveditorcore.h"
 #include "dvfunction.h"
 #include "graphicsviewutils.h"
 #include "itemeditor/dvconnectiongraphicsitem.h"
@@ -53,19 +54,13 @@ static const qreal kPreviewItemPenWidth = 2.;
 
 namespace dve {
 
-DVCreatorTool::DVCreatorTool(
-        QGraphicsView *view, DVItemModel *model, shared::cmd::CommandsStackBase *commandsStack, QObject *parent)
+DVCreatorTool::DVCreatorTool(QGraphicsView *view, DVItemModel *model, DVEditorCore *dvCore, QObject *parent)
     : shared::ui::CreatorTool(view, model, parent)
-    , m_commandsStack(commandsStack)
+    , m_dvCore(dvCore)
 {
 }
 
 DVCreatorTool::~DVCreatorTool() { }
-
-void DVCreatorTool::setSystemChecker(AbstractSystemChecks *checker)
-{
-    m_sysChecker = checker;
-}
 
 void DVCreatorTool::removeSelectedItems()
 {
@@ -87,7 +82,7 @@ void DVCreatorTool::removeSelectedItems()
         }
         auto cmdRm = new cmd::CmdEntitiesRemove(entities, model()->objectsModel());
         cmdRm->setText(tr("Remove selected item(s)"));
-        m_commandsStack->push(cmdRm);
+        m_dvCore->commandsStack()->push(cmdRm);
     }
 }
 
@@ -149,7 +144,7 @@ void DVCreatorTool::handlePartition(const QPointF &pos)
 
         dvm::DVNode *node = nodeItem->entity();
         auto cmd = new cmd::CmdPartitionEntityCreate(model()->objectsModel(), node, itemSceneRect);
-        m_commandsStack->push(cmd);
+        m_dvCore->commandsStack()->push(cmd);
     }
 }
 
@@ -333,7 +328,7 @@ void DVCreatorTool::populateContextMenu_user(QMenu *menu, const QPointF &scenePo
 void DVCreatorTool::populateContextMenu_commonEdit(QMenu *menu, const QPointF &scenePos)
 {
     CreatorTool::populateContextMenu_commonEdit(menu, scenePos);
-    if (!m_sysChecker) {
+    if (!m_dvCore->commandsStack()) {
         return;
     }
     QGraphicsItem *item = m_view->scene()->itemAt(scenePos, m_view->transform());
@@ -351,8 +346,8 @@ void DVCreatorTool::populateContextMenu_commonEdit(QMenu *menu, const QPointF &s
 
     QMenu *bindingMenu = menu->addMenu(tr("Bindings"));
 
-    const QStringList allFunctions = m_sysChecker->functionsNames();
-    const QStringList systemFunctions = m_sysChecker->pseudoFunctionsNames();
+    const QStringList allFunctions = m_dvCore->systemChecker()->functionsNames();
+    const QStringList systemFunctions = m_dvCore->systemChecker()->pseudoFunctionsNames();
     const QVector<dvm::DVFunction *> allBoundFunctionsEntities =
             model()->objectsModel()->allObjectsByType<dvm::DVFunction>();
     QStringList nonboundFunctions;
@@ -370,18 +365,18 @@ void DVCreatorTool::populateContextMenu_commonEdit(QMenu *menu, const QPointF &s
         bindMenu->setEnabled(false);
     } else {
         connect(action, &QAction::triggered, this, [this, partition, nonboundFunctions, cmdTitle = action->text()]() {
-            m_commandsStack->undoStack()->beginMacro(cmdTitle);
+            m_dvCore->commandsStack()->undoStack()->beginMacro(cmdTitle);
             for (const QString &fn : qAsConst(nonboundFunctions)) {
-                auto cmd = new cmd::CmdFunctionBind(partition, fn);
-                m_commandsStack->push(cmd);
+                auto cmd = new cmd::CmdFunctionBind(partition, fn, nullptr);
+                m_dvCore->commandsStack()->push(cmd);
             }
-            m_commandsStack->undoStack()->endMacro();
+            m_dvCore->commandsStack()->undoStack()->endMacro();
         });
         for (const QString &functionName : qAsConst(nonboundFunctions)) {
             QAction *functionAction = bindMenu->addAction(functionName);
             connect(functionAction, &QAction::triggered, this, [this, partition, functionName]() {
-                auto cmd = new cmd::CmdFunctionBind(partition, functionName);
-                m_commandsStack->push(cmd);
+                auto cmd = new cmd::CmdFunctionBind(partition, functionName, m_dvCore);
+                m_dvCore->commandsStack()->push(cmd);
             });
         }
     }
@@ -395,19 +390,19 @@ void DVCreatorTool::populateContextMenu_commonEdit(QMenu *menu, const QPointF &s
     } else {
         connect(action, &QAction::triggered, this,
                 [this, boundFunctionsEntities, partition, cmdTitle = action->text()]() {
-                    m_commandsStack->undoStack()->beginMacro(cmdTitle);
+                    m_dvCore->commandsStack()->undoStack()->beginMacro(cmdTitle);
                     for (dvm::DVFunction *fn : qAsConst(boundFunctionsEntities)) {
                         auto cmd = new cmd::CmdFunctionUnbind(partition, fn);
-                        m_commandsStack->push(cmd);
+                        m_dvCore->commandsStack()->push(cmd);
                     }
-                    m_commandsStack->undoStack()->endMacro();
+                    m_dvCore->commandsStack()->undoStack()->endMacro();
                 });
 
         for (dvm::DVFunction *function : qAsConst(boundFunctionsEntities)) {
             QAction *functionAction = unbindMenu->addAction(function->title());
             connect(functionAction, &QAction::triggered, this, [this, partition, function]() {
                 auto cmd = new cmd::CmdFunctionUnbind(partition, function);
-                m_commandsStack->push(cmd);
+                m_dvCore->commandsStack()->push(cmd);
             });
         }
     }
@@ -458,7 +453,7 @@ void DVCreatorTool::handleConnection(const QVector<QPointF> &graphicPoints) cons
 
     auto cmd = new dve::cmd::CmdConnectionEntityCreate(
             model()->objectsModel(), graphicPoints, info.startDeviceId, info.endDeviceId);
-    m_commandsStack->push(cmd);
+    m_dvCore->commandsStack()->push(cmd);
 }
 
 void DVCreatorTool::handleConnectionReCreate(const QVector<QPointF> &graphicPoints)
@@ -483,7 +478,7 @@ void DVCreatorTool::handleConnectionReCreate(const QVector<QPointF> &graphicPoin
             QList<QPair<shared::VEObject *, QVector<QPointF>>> paramsList { { connection->entity(),
                     info.connectionPoints } };
             auto cmd = new shared::cmd::CmdEntityGeometryChange(paramsList);
-            m_commandsStack->push(cmd);
+            m_dvCore->commandsStack()->push(cmd);
         }
     }
 }

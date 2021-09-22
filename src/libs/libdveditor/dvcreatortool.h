@@ -28,7 +28,7 @@ class CommandsStackBase;
 } // namespace shared
 
 namespace dve {
-class AbstractSystemChecks;
+class DVEditorCore;
 
 class DVCreatorTool : public shared::ui::CreatorTool
 {
@@ -44,11 +44,8 @@ public:
         ReCreateConnection,
     };
 
-    DVCreatorTool(QGraphicsView *view, DVItemModel *model, shared::cmd::CommandsStackBase *commandsStack,
-            QObject *parent = nullptr);
+    DVCreatorTool(QGraphicsView *view, DVItemModel *model, DVEditorCore *dvCore, QObject *parent = nullptr);
     ~DVCreatorTool() override;
-
-    void setSystemChecker(AbstractSystemChecks *checker);
 
     void removeSelectedItems() override;
 
@@ -79,8 +76,7 @@ private:
     bool prepareDirectConnectionPreview(QMouseEvent *e);
 
 private:
-    shared::cmd::CommandsStackBase *m_commandsStack { nullptr };
-    AbstractSystemChecks *m_sysChecker { nullptr };
+    DVEditorCore *m_dvCore { nullptr };
 };
 
 } // namespace dve

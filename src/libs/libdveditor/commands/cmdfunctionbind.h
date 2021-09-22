@@ -27,13 +27,14 @@ class DVFunction;
 } // namespace dvm
 
 namespace dve {
+class DVEditorCore;
 namespace cmd {
 
 class CmdFunctionBind : public shared::UndoCommand
 {
     Q_OBJECT
 public:
-    explicit CmdFunctionBind(dvm::DVPartition *partition, const QString &functionName);
+    explicit CmdFunctionBind(dvm::DVPartition *partition, const QString &functionName, dve::DVEditorCore *dvCore);
 
     void redo() override;
     void undo() override;
@@ -41,7 +42,7 @@ public:
 
 private:
     QPointer<dvm::DVPartition> m_partition;
-    QPointer<dvm::DVFunction> m_function;
+    QList<QPointer<dvm::DVFunction>> m_functions;
 };
 
 } // namespace cmd

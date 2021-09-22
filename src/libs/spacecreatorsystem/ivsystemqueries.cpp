@@ -168,6 +168,19 @@ QList<ivm::IVFunction *> IvSystemQueries::connectedProtectedFunctions(const QStr
 }
 
 /*!
+   Returns the names of all functions that are connected with \p functionName via a proteced connection/interface
+ */
+QStringList IvSystemQueries::connectedProtectedFunctionNames(const QString &functionName) const
+{
+    QList<ivm::IVFunction *> functions = connectedProtectedFunctions(functionName);
+    QStringList names;
+    for (ivm::IVFunction *function : functions) {
+        names.append(function->title());
+    }
+    return names;
+}
+
+/*!
    Returns all messages/connections from function \p sourceFunction to \p targetFunction
    Result is a list of pairs. The first of the pais is the name of the source, the second, the name of the target
    interface

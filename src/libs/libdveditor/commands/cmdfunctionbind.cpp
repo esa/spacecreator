@@ -17,38 +17,78 @@
 
 #include "cmdfunctionbind.h"
 
+#include "abstractsystemchecks.h"
 #include "commandids.h"
+#include "dveditorcore.h"
 #include "dvfunction.h"
 #include "dvmodel.h"
+#include "dvnode.h"
 #include "dvpartition.h"
+#include "errorhub.h"
 
 namespace dve {
 namespace cmd {
 
-CmdFunctionBind::CmdFunctionBind(dvm::DVPartition *partition, const QString &functionName)
+CmdFunctionBind::CmdFunctionBind(dvm::DVPartition *partition, const QString &functionName, dve::DVEditorCore *dvCore)
     : shared::UndoCommand()
     , m_partition(partition)
-    , m_function(new dvm::DVFunction)
 {
-    m_function->setTitle(functionName);
+    auto function = new dvm::DVFunction;
+    function->setTitle(functionName);
+    m_functions.append(function);
+
+    // find/add connected protedted functions
+    if (dvCore && dvCore->systemChecker()) {
+        dvm::DVNode *node = partition->node();
+        dvm::DVModel *model = m_partition->model();
+        QStringList functionNames = dvCore->systemChecker()->connectedProtectedFunctionNames(functionName);
+        for (const QString &name : functionNames) {
+            if (node && !node->hasSystemFunction(name)) {
+                if (model->getObjectByName(name, dvm::DVObject::Type::Function) != nullptr) {
+                    shared::ErrorHub::addError(shared::ErrorItem::Error,
+                            tr("Protected function '%1' already used without '%2'").arg(name, functionName),
+                            dvCore->filePath());
+
+                } else {
+                    function = new dvm::DVFunction;
+                    function->setTitle(name);
+                    m_functions.append(function);
+                }
+            }
+        }
+    }
 }
 
 void CmdFunctionBind::redo()
 {
-    m_function->setParent(m_partition);
-    if (auto model = m_partition->model()) {
-        model->addObject(m_function);
+    if (!m_partition) {
+        return;
     }
-    m_partition->addFunction(m_function);
+
+    dvm::DVModel *model = m_partition->model();
+    for (dvm::DVFunction *function : m_functions) {
+        if (function) {
+            function->setParent(m_partition);
+            if (model) {
+                model->addObject(function);
+            }
+            m_partition->addFunction(function);
+        }
+    }
 }
 
 void CmdFunctionBind::undo()
 {
-    m_partition->removeFunction(m_function);
-    if (auto model = m_partition->model()) {
-        model->removeObject(m_function);
+    dvm::DVModel *model = m_partition->model();
+    for (dvm::DVFunction *function : m_functions) {
+        if (function) {
+            m_partition->removeFunction(function);
+            if (model) {
+                model->removeObject(function);
+            }
+            function->setParent(this);
+        }
     }
-    m_function->setParent(this);
 }
 
 int CmdFunctionBind::id() const
