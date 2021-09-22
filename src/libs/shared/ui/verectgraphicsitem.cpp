@@ -193,8 +193,9 @@ void VERectGraphicsItem::onManualResizeFinish(GripPoint *grip, const QPointF &pr
     if (pressedAt == releasedAt)
         return;
 
-    if (shared::graphicsviewutils::isBounded(this, sceneBoundingRect())
-            && !shared::graphicsviewutils::isCollided(this, sceneBoundingRect())) {
+    const QRectF rect = sceneBoundingRect();
+    if (rect.width() >= minimalSize().width() && rect.height() >= minimalSize().height()
+            && shared::graphicsviewutils::isBounded(this, rect) && !shared::graphicsviewutils::isCollided(this, rect)) {
         layoutInterfaces();
         layoutConnectionsOnResize(shared::ui::VEConnectionGraphicsItem::CollisionsPolicy::PartialRebuild);
         updateEntity();
