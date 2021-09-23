@@ -108,32 +108,14 @@ void AsyncInterfaceCommandTranslator::translateArguments(const seds::model::Inte
 QString AsyncInterfaceCommandTranslator::buildAsn1SequenceType(
         const seds::model::InterfaceCommand &sedsCommand, seds::model::CommandArgumentMode requestedArgumentMode) const
 {
-    std::unordered_map<QString, QString> arguments;
-    for (const auto &sedsArgument : sedsCommand.arguments()) {
-        if (sedsArgument.mode() == requestedArgumentMode) {
-            const auto &genericTypeName = sedsArgument.type().nameStr();
-            const auto &concreteTypeName = findMappedType(genericTypeName);
-
-            arguments.insert({ sedsArgument.nameStr(), concreteTypeName });
-        }
-    }
-
-    std::size_t bundledTypeHash = 0;
-    for (const auto &[name, typeName] : arguments) {
-        const auto typeNameHash = std::hash<QString> {}(typeName);
-
-        if (bundledTypeHash == 0) {
-            bundledTypeHash = typeNameHash;
-        } else {
-            bundledTypeHash ^= (bundledTypeHash << 1);
-        }
-    }
+    const auto arguments = processArgumentsTypes(sedsCommand.arguments(), requestedArgumentMode);
+    const auto bundledTypeHash = calculateArgumentsHash(arguments);
 
     const auto &sedsCommandName = sedsCommand.nameStr();
     const auto cachedTypesCount = m_asn1CommandArgumentsCache.count(sedsCommandName);
 
     if (cachedTypesCount == 0) {
-        const auto bundledTypeName = m_bundledTypeNameTemplate.arg(sedsCommandName, "");
+        const auto bundledTypeName = createBundledTypeName(sedsCommandName);
         createAsn1Sequence(bundledTypeName, arguments);
 
         m_asn1CommandArgumentsCache.insert({ sedsCommandName, { bundledTypeHash, bundledTypeName } });
@@ -147,7 +129,7 @@ QString AsyncInterfaceCommandTranslator::buildAsn1SequenceType(
         if (foundType != typesForCommand.second) {
             return foundType->second.second;
         } else {
-            const auto bundledTypeName = m_bundledTypeNameTemplate.arg(sedsCommandName).arg(cachedTypesCount);
+            const auto bundledTypeName = createBundledTypeName(sedsCommandName, cachedTypesCount);
             createAsn1Sequence(bundledTypeName, arguments);
 
             m_asn1CommandArgumentsCache.insert({ sedsCommandName, { bundledTypeHash, bundledTypeName } });
@@ -183,6 +165,51 @@ std::unique_ptr<Asn1Acn::SequenceComponent> AsyncInterfaceCommandTranslator::cre
 
     return std::make_unique<Asn1Acn::AsnSequenceComponent>(
             name, name, false, "", Asn1Acn::SourceLocation(), std::move(sequenceComponentType));
+}
+
+QString AsyncInterfaceCommandTranslator::createBundledTypeName(const QString sedsCommandName, std::size_t counter) const
+{
+    if (counter == 0) {
+        return m_bundledTypeNameTemplate.arg(sedsCommandName, "");
+    } else {
+        return m_bundledTypeNameTemplate.arg(sedsCommandName, counter);
+    }
+}
+
+std::unordered_map<QString, QString> AsyncInterfaceCommandTranslator::processArgumentsTypes(
+        const std::vector<seds::model::CommandArgument> &sedsArguments,
+        seds::model::CommandArgumentMode requestedArgumentMode) const
+{
+    std::unordered_map<QString, QString> arguments;
+
+    for (const auto &sedsArgument : sedsArguments) {
+        if (sedsArgument.mode() == requestedArgumentMode) {
+            const auto &genericTypeName = sedsArgument.type().nameStr();
+            const auto &concreteTypeName = findMappedType(genericTypeName);
+
+            arguments.insert({ sedsArgument.nameStr(), concreteTypeName });
+        }
+    }
+
+    return arguments;
+}
+
+std::size_t AsyncInterfaceCommandTranslator::calculateArgumentsHash(
+        const std::unordered_map<QString, QString> &arguments) const
+{
+    std::size_t typeHash = 0;
+
+    for (const auto &[name, typeName] : arguments) {
+        const auto typeNameHash = std::hash<QString> {}(typeName);
+
+        if (typeHash == 0) {
+            typeHash = typeNameHash;
+        } else {
+            typeHash ^= (typeNameHash << 1);
+        }
+    }
+
+    return typeHash;
 }
 
 const QString &AsyncInterfaceCommandTranslator::findMappedType(const QString &genericTypeName) const

@@ -133,6 +133,36 @@ private:
      */
     auto createAsn1SequenceComponent(const QString &name, const QString typeName) const
             -> std::unique_ptr<Asn1Acn::SequenceComponent>;
+    /**
+     *  Create a name for the bundled argument type
+     *
+     *  @param  sedsCommandName     SEDS command name
+     *  @param  counter             Additional counter
+     *
+     *  @return Type name
+     */
+    auto createBundledTypeName(const QString sedsCommandName, std::size_t counter = 0) const -> QString;
+
+    /**
+     * @brief   Process SEDS command arguments types
+     *
+     * Maps generic types of the arguments to a concrete type
+     *
+     * @param   sedsArguments   Arguments to process
+     * @param   requestedArgumentMode   Which arguments should be used
+     *
+     * @return  Processed arguments
+     */
+    auto processArgumentsTypes(const std::vector<seds::model::CommandArgument> &sedsArguments,
+            seds::model::CommandArgumentMode requestedArgumentMode) const -> std::unordered_map<QString, QString>;
+    /**
+     * @brief   Calculates hash from arguments types
+     *
+     * @param   arguments   Arguments to process
+     *
+     * @return  Calculated hash
+     */
+    auto calculateArgumentsHash(const std::unordered_map<QString, QString> &arguments) const -> std::size_t;
 
     /**
      * @brief   Checks if given type name is mapped in the parent SEDS interface
@@ -142,19 +172,6 @@ private:
      * @return  Mapped type name if given type name was mapped, given type name otherwise
      */
     auto findMappedType(const QString &genericTypeName) const -> const QString &;
-    /**
-     * @brief   Searches for SEDS type declaration
-     *
-     * First it searches in the parent SEDS component. If not found then it searches
-     * in the package. Throws an exception if not found
-     *
-     * @param   dataTypeName    Type name
-     *
-     * @throws  UndeclaredDataTypeException     If given type wasn't declared
-     *
-     * @return  Found SEDS data type declaration
-     */
-    auto findDataType(const QString &dataTypeName) const -> const seds::model::DataType &;
 
     /**
      * @brief   Swaps between provided and required interface types
