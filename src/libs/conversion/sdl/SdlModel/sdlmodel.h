@@ -19,10 +19,9 @@
 
 #pragma once
 
-#include "sdlmodel/ast.h"
-
 #include <conversion/common/model.h>
 
+namespace conversion {
 namespace Sdl {
 
 /**
@@ -34,7 +33,7 @@ class SdlModel final : public conversion::Model
 {
 public:
     /** @brief Model data type **/
-    using Data = AST;
+    using Data = void *; // TODO: this should be a Process type
 
 public:
     /**
@@ -77,9 +76,12 @@ public:
      */
     auto data() const -> const Data &;
 
+    auto name() const -> const QString &;
+
 private:
     /** @brief  Model data */
     Data m_data;
 };
 
 } // namespace Sdl
+} // namespace conversion
