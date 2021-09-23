@@ -74,15 +74,15 @@ std::vector<std::unique_ptr<Model>> SedsToIvTranslator::translateModels(
         throw TranslationException("Source ASN.1 model is null");
     }
 
-    const auto configFilename = options.value(IvOptions::configFilename);
-    if (!configFilename) {
+    const auto ivConfigFilename = options.value(IvOptions::configFilename);
+    if (!ivConfigFilename) {
         throw TranslationException("InterfaceView configuration file wasn't specified");
     }
 
-    ivm::IVPropertyTemplateConfig *config = ivm::IVPropertyTemplateConfig::instance();
-    config->init(*configFilename);
+    ivm::IVPropertyTemplateConfig *ivConfig = ivm::IVPropertyTemplateConfig::instance();
+    ivConfig->init(*ivConfigFilename);
 
-    return translateSedsModel(sedsModel, asn1Model, config, options);
+    return translateSedsModel(sedsModel, asn1Model, ivConfig, options);
 }
 
 std::set<ModelType> SedsToIvTranslator::getDependencies() const
@@ -91,66 +91,67 @@ std::set<ModelType> SedsToIvTranslator::getDependencies() const
 }
 
 std::vector<std::unique_ptr<Model>> SedsToIvTranslator::translateSedsModel(const SedsModel *sedsModel,
-        Asn1Model *asn1Model, ivm::IVPropertyTemplateConfig *config, const Options &options) const
+        Asn1Model *asn1Model, ivm::IVPropertyTemplateConfig *ivConfig, const Options &options) const
 {
     const auto generateFunctionsForPackages = options.isSet(IvOptions::generateFunctionsForPackages);
 
-    auto ivModel = std::make_unique<IVModel>(config);
+    auto ivModel = std::make_unique<IVModel>(ivConfig);
 
     const auto &sedsModelData = sedsModel->data();
     if (std::holds_alternative<seds::model::PackageFile>(sedsModelData)) {
-        const auto &package = std::get<seds::model::PackageFile>(sedsModelData).package();
-        translatePackage(package, asn1Model, ivModel.get(), generateFunctionsForPackages);
+        const auto &sedsPackage = std::get<seds::model::PackageFile>(sedsModelData).package();
+        translatePackage(sedsPackage, asn1Model, ivModel.get(), generateFunctionsForPackages);
     } else if (std::holds_alternative<seds::model::DataSheet>(sedsModelData)) {
-        const auto &packages = std::get<seds::model::DataSheet>(sedsModelData).packages();
-        for (const auto &package : packages) {
-            translatePackage(package, asn1Model, ivModel.get(), generateFunctionsForPackages);
+        const auto &sedsPackages = std::get<seds::model::DataSheet>(sedsModelData).packages();
+        for (const auto &sedsPackage : sedsPackages) {
+            translatePackage(sedsPackage, asn1Model, ivModel.get(), generateFunctionsForPackages);
         }
     } else {
         throw TranslationException("Unhandled SEDS model data type");
     }
 
-    std::vector<std::unique_ptr<Model>> result;
-    result.push_back(std::move(ivModel));
+    std::vector<std::unique_ptr<Model>> resultModels;
+    resultModels.push_back(std::move(ivModel));
 
-    return result;
+    return resultModels;
 }
 
 void SedsToIvTranslator::translatePackage(
-        const seds::model::Package &package, Asn1Model *asn1Model, IVModel *ivModel, bool generateFunction) const
+        const seds::model::Package &sedsPackage, Asn1Model *asn1Model, IVModel *ivModel, bool generateFunction) const
 {
-    const auto packageName = package.nameStr();
-
+    const auto &asn1FileName = sedsPackage.nameStr();
     auto &asn1Files = asn1Model->data();
     auto asn1File = std::find_if(std::begin(asn1Files), std::end(asn1Files),
-            [&packageName](const auto &file) { return file->name() == packageName; });
+            [&packageName](const auto &file) { return file->name() == asn1FileName; });
     if (asn1File == asn1Files.end()) {
-        const auto message = QString("Unable to find file %1 in the ASN.1 model").arg(packageName);
+        const auto message = QString("Unable to find file %1 in the ASN.1 model").arg(asn1FileName);
         throw TranslationException(std::move(message));
     }
 
     const auto &asn1DefinitionsName = package.asn1NameStr();
-    auto *asn1Definitions = (*asn1File)->definitions(asn1DefinitionsName);
+    auto *asn1Definitions = (*asn1File)->definitions(sedsPackage.asn1NameStr());
     if (!asn1Definitions) {
         const auto message =
-                QString("ASN.1 file %1 doesn't have definitions named %2").arg(packageName).arg(asn1DefinitionsName);
+                QString("ASN.1 file %1 doesn't have definitions named %2").arg(asn1FileName).arg(asn1DefinitionsName);
         throw TranslationException(std::move(message));
     }
 
-    ComponentsTranslator componentsTranslator(package, asn1Definitions);
-    auto components = componentsTranslator.translateComponents();
+    ComponentsTranslator componentsTranslator(sedsPackage, asn1Definitions);
+    auto ivFunctions = componentsTranslator.translateComponents();
 
     if (generateFunction) {
-        auto *ivFunction = new ivm::IVFunction();
-        ivFunction->setEntityAttribute(ivm::meta::Props::token(ivm::meta::Props::Token::name), packageName);
+        const auto &parentIvFunctionName = sedsPackage.nameStr();
+        auto *parentIvFunction = new ivm::IVFunction();
+        parentIvFunction->setEntityAttribute(
+                ivm::meta::Props::token(ivm::meta::Props::Token::name), parentIvFunctionName);
 
-        for (auto *component : components) {
-            ivFunction->addChild(component);
+        for (auto *ivFunction : ivFunctions) {
+            parentIvFunction->addChild(ivFunction);
         }
 
-        ivModel->addObject(ivFunction);
+        ivModel->addObject(parentIvFunction);
     } else {
-        ivModel->addObjects(components);
+        ivModel->addObjects(ivFunctions);
     }
 }
 

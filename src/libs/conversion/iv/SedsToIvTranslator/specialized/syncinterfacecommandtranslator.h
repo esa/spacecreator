@@ -39,10 +39,10 @@ public:
     /**
      * @brief   Constructor
      *
+     * @param   sedsInterface   Parent interface
      * @param   ivFunction      Output interface view function
-     * @param   interface       Parent interface
      */
-    SyncInterfaceCommandTranslator(const seds::model::Interface &interface, ivm::IVFunction *ivFunction);
+    SyncInterfaceCommandTranslator(const seds::model::Interface &sedsInterface, ivm::IVFunction *ivFunction);
     /**
      * @brief   Deleted copy constructor
      */
@@ -66,21 +66,21 @@ public:
      *
      * This inserts result IV interface into member IV function
      *
-     * @param   command         SEDS interface command
+     * @param   sedsCommand     SEDS interface command
      * @param   interfaceType   Interface type
      */
-    virtual auto translateCommand(const seds::model::InterfaceCommand &command,
+    virtual auto translateCommand(const seds::model::InterfaceCommand &sedsCommand,
             ivm::IVInterface::InterfaceType interfaceType) -> void override;
 
 private:
     /**
      * @brief   Translates arguments of a SEDS interface command
      *
-     * @param   arguments       Arguments to translate
+     * @param   sedsArguments   Arguments to translate
      * @param   ivInterface     Output interface view interface
      */
-    auto translateArguments(const std::vector<seds::model::CommandArgument> &arguments, ivm::IVInterface *ivInterface)
-            -> void;
+    auto translateArguments(
+            const std::vector<seds::model::CommandArgument> &sedsArguments, ivm::IVInterface *ivInterface) -> void;
 
     /**
      * @brief   Creates interface view interface parameter

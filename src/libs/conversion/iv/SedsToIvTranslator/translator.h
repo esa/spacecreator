@@ -66,13 +66,14 @@ private:
      *
      * @param   sedsModel   SEDS model to translate
      * @param   asn1Model   ASN.1 Model with types defined in this package
-     * @param   config      IV model config
+     * @param   ivConfig    IV model config
      * @param   options     List of options
      *
      * @return  Result IV model with auxiliary ASN.1 model
      */
     auto translateSedsModel(const seds::model::SedsModel *sedsModel, Asn1Acn::Asn1Model *asn1Model,
-            ivm::IVPropertyTemplateConfig *config, const Options &options) const -> std::vector<std::unique_ptr<Model>>;
+            ivm::IVPropertyTemplateConfig *ivConfig, const Options &options) const
+            -> std::vector<std::unique_ptr<Model>>;
 
 private:
     /**
@@ -83,7 +84,7 @@ private:
      * @param   model               InterfaceView model to which should translated IV functions will be added
      * @param   generateFunction    Generate parent function for the translated components
      */
-    auto translatePackage(const seds::model::Package &package, Asn1Acn::Asn1Model *asn1Model, ivm::IVModel *model,
+    auto translatePackage(const seds::model::Package &sedsPackage, Asn1Acn::Asn1Model *asn1Model, ivm::IVModel *ivModel,
             bool generateFunction) const -> void;
 };
 

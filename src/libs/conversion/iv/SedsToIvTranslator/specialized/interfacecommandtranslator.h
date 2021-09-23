@@ -42,10 +42,10 @@ public:
     /**
      * @brief   Constructor
      *
+     * @param   sedsInterface   Parent interface
      * @param   ivFunction      Output interface view function
-     * @param   interface       Parent interface
      */
-    InterfaceCommandTranslator(const seds::model::Interface &interface, ivm::IVFunction *ivFunction);
+    InterfaceCommandTranslator(const seds::model::Interface &sedsInterface, ivm::IVFunction *ivFunction);
     /**
      * @brief   Default destructor
      */
@@ -73,7 +73,7 @@ public:
      *
      * This inserts result IV interface into member IV function
      *
-     * @param   command         SEDS interface command
+     * @param   sedsCommand     SEDS interface command
      * @param   interfaceType   Interface type
      */
     virtual auto translateCommand(
@@ -83,13 +83,13 @@ protected:
     /**
      * @brief   Creates new interface view interface
      *
-     * @param   command     SEDS interface command
-     * @param   type        Type of interface to create
-     * @param   kind        Kind of interface to create
+     * @param   sedsCommand     SEDS interface command
+     * @param   type            Type of interface to create
+     * @param   kind            Kind of interface to create
      *
-     * @return   Interface view interface
+     * @return  Interface view interface
      */
-    auto createIvInterface(const seds::model::InterfaceCommand &command, ivm::IVInterface::InterfaceType type,
+    auto createIvInterface(const seds::model::InterfaceCommand &sedsCommand, ivm::IVInterface::InterfaceType type,
             ivm::IVInterface::OperationKind kind) const -> ivm::IVInterface *;
 
     /**
@@ -99,11 +99,11 @@ protected:
      *
      * @return   Interface type name
      */
-    auto interfaceTypeToString(ivm::IVInterface::InterfaceType interfaceType) const -> const QString &;
+    auto interfaceTypeToString(ivm::IVInterface::InterfaceType type) const -> const QString &;
 
 protected:
     /// @brief  Parent SEDS interface
-    const seds::model::Interface &m_interface;
+    const seds::model::Interface &m_sedsInterface;
     /// @brief  Output interface view function
     ivm::IVFunction *m_ivFunction;
 

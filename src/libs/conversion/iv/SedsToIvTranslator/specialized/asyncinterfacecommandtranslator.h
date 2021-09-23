@@ -52,15 +52,15 @@ public:
     /**
      * @brief   Constructor
      *
-     * @param   package             Parent package
-     * @param   component           Parent package
-     * @param   interface           Parent interface
+     * @param   sedsPackage         Parent SEDS package
+     * @param   sedsComponent       Parent SEDS component
+     * @param   sedsInterface       Parent SEDS interface
+     * @param   asn1Definitions     ASN.1 type definitions for parent package
      * @param   ivFunction          Output interface view function
-     * @param   asn1Definitions     Output ASN.1 type definitions
      */
-    AsyncInterfaceCommandTranslator(const seds::model::Package &package, const seds::model::Component &component,
-            const seds::model::Interface &interface, ivm::IVFunction *ivFunction,
-            Asn1Acn::Definitions *asn1Definitions);
+    AsyncInterfaceCommandTranslator(const seds::model::Package &sedsPackage,
+            const seds::model::Component &sedsComponent, const seds::model::Interface &sedsInterface,
+            Asn1Acn::Definitions *asn1Definitions, ivm::IVFunction *ivFunction);
     /**
      * @brief   Deleted copy constructor
      */
@@ -84,10 +84,10 @@ public:
      *
      * This inserts result IV interface into member IV function
      *
-     * @param   command         SEDS interface command
-     * @param   interfaceType   Interface type
+     * @param   sedsCommand     SEDS interface command
+     * @param   interfaceType   Interface type that will be created
      */
-    virtual auto translateCommand(const seds::model::InterfaceCommand &command,
+    virtual auto translateCommand(const seds::model::InterfaceCommand &sedsCommand,
             ivm::IVInterface::InterfaceType interfaceType) -> void override;
 
 private:
@@ -96,27 +96,29 @@ private:
      *
      * This bundles all arguments into one and creates ASN.1 sequence type for it
      *
-     * @param   command                 SEDS interface command
+     * @param   sedsCommand             SEDS interface command
      * @param   requestedArgumentMode   Which arguments should be translated
      * @param   ivInterface             Output interface view interface
      */
-    auto translateArguments(const seds::model::InterfaceCommand &command,
+    auto translateArguments(const seds::model::InterfaceCommand &sedsCommand,
             seds::model::CommandArgumentMode requestedArgumentMode, ivm::IVInterface *ivInterface) -> void;
 
     /**
      * @brief   Builds ASN.1 sequence type for bundled interface argument
      *
-     * @param   command                 SEDS interface command
+     * @param   sedsCommand             SEDS interface command
      * @param   requestedArgumentMode   Which arguments should be used
+     *
+     * @return  Name of the created type
      */
-    auto buildAsn1SequenceType(const seds::model::InterfaceCommand &command,
+    auto buildAsn1SequenceType(const seds::model::InterfaceCommand &sedsCommand,
             seds::model::CommandArgumentMode requestedArgumentMode) const -> QString;
 
     /**
      * @brief   Creates ASN.1 sequence type
      *
-     * @param   name        Name of the new type
-     * @param   arguments   Command arguments
+     * @param   name        Name of the sequence
+     * @param   arguments   SEDS command arguments
      *
      * @return  ASN.1 sequence
      */
@@ -124,8 +126,8 @@ private:
     /**
      * @brief   Creates ASN.1 sequence component type
      *
-     * @param   name        Name of the new type
-     * @param   typeName    Name of the SEDS type from which ASN.1 type should be created
+     * @param   name        Name of the component
+     * @param   typeName    Name of the component type
      *
      * @return  ASN.1 sequence component
      */
@@ -165,19 +167,19 @@ private:
 
 private:
     /// @brief  Parent SEDS package
-    const seds::model::Package &m_package;
+    const seds::model::Package &m_sedsPackage;
     /// @brief  Parent SEDS component
-    const seds::model::Component &m_component;
+    const seds::model::Component &m_sedsComponent;
     /// @brief  Output ASN.1 type definitions
     Asn1Acn::Definitions *m_asn1Definitions;
 
     /// @brief  Cache of the bundled ASN.1 types that was created for given command
     static InterfaceCommandArgumentsCache m_asn1CommandArgumentsCache;
 
-    /// @brief  Interface parameter name
-    static const QString m_interfaceParameterName;
+    /// @brief  Name for the argument in the IV interface
+    static const QString m_ivInterfaceParameterName;
     /// @brief  Template for ASN.1 bundled type name
-    static const QString m_asn1BundledTypeTemplate;
+    static const QString m_bundledTypeNameTemplate;
 };
 
 } // namespace conversion::iv::translator

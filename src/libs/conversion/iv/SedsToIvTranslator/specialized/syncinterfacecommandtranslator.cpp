@@ -31,20 +31,20 @@ using conversion::translator::UnsupportedValueException;
 namespace conversion::iv::translator {
 
 SyncInterfaceCommandTranslator::SyncInterfaceCommandTranslator(
-        const seds::model::Interface &interface, ivm::IVFunction *ivFunction)
-    : InterfaceCommandTranslator(interface, ivFunction)
+        const seds::model::Interface &sedsInterface, ivm::IVFunction *ivFunction)
+    : InterfaceCommandTranslator(sedsInterface, ivFunction)
 {
 }
 
 void SyncInterfaceCommandTranslator::translateCommand(
-        const seds::model::InterfaceCommand &command, ivm::IVInterface::InterfaceType interfaceType)
+        const seds::model::InterfaceCommand &sedsCommand, ivm::IVInterface::InterfaceType interfaceType)
 {
-    switch (command.argumentsCombination()) {
+    switch (sedsCommand.argumentsCombination()) {
     case seds::model::ArgumentsCombination::InOnly:
     case seds::model::ArgumentsCombination::OutOnly:
     case seds::model::ArgumentsCombination::InAndOut: {
-        auto *ivInterface = createIvInterface(command, interfaceType, ivm::IVInterface::OperationKind::Protected);
-        translateArguments(command.arguments(), ivInterface);
+        auto *ivInterface = createIvInterface(sedsCommand, interfaceType, ivm::IVInterface::OperationKind::Protected);
+        translateArguments(sedsCommand.arguments(), ivInterface);
         m_ivFunction->addChild(ivInterface);
     } break;
     case seds::model::ArgumentsCombination::NoArgs:
@@ -54,7 +54,7 @@ void SyncInterfaceCommandTranslator::translateCommand(
     case seds::model::ArgumentsCombination::All: {
         const auto message = QString(
                 "Interface command arguments combination '%1' is not supported for TASTE InterfaceView async interface")
-                                     .arg(argumentsCombinationToString(command.argumentsCombination()));
+                                     .arg(argumentsCombinationToString(sedsCommand.argumentsCombination()));
         throw TranslationException(message);
     } break;
     default:
@@ -64,26 +64,26 @@ void SyncInterfaceCommandTranslator::translateCommand(
 }
 
 void SyncInterfaceCommandTranslator::translateArguments(
-        const std::vector<seds::model::CommandArgument> &arguments, ivm::IVInterface *ivInterface)
+        const std::vector<seds::model::CommandArgument> &sedsArguments, ivm::IVInterface *ivInterface)
 {
-    for (const auto &argument : arguments) {
-        switch (argument.mode()) {
+    for (const auto &sedsArgument : sedsArguments) {
+        switch (sedsArgument.mode()) {
         case seds::model::CommandArgumentMode::In: {
             const auto ivParameter = createIvInterfaceParameter(
-                    argument.nameStr(), argument.type().nameStr(), shared::InterfaceParameter::Direction::IN);
+                    sedsArgument.nameStr(), sedsArgument.type().nameStr(), shared::InterfaceParameter::Direction::IN);
             ivInterface->addParam(ivParameter);
         } break;
         case seds::model::CommandArgumentMode::Out: {
             const auto ivParameter = createIvInterfaceParameter(
-                    argument.nameStr(), argument.type().nameStr(), shared::InterfaceParameter::Direction::OUT);
+                    sedsArgument.nameStr(), sedsArgument.type().nameStr(), shared::InterfaceParameter::Direction::OUT);
             ivInterface->addParam(ivParameter);
         } break;
         case seds::model::CommandArgumentMode::InOut: {
-            const auto ivParameterIn = createIvInterfaceParameter(QString("%1_In").arg(argument.nameStr()),
-                    argument.type().nameStr(), shared::InterfaceParameter::Direction::IN);
+            const auto ivParameterIn = createIvInterfaceParameter(QString("%1_In").arg(sedsArgument.nameStr()),
+                    sedsArgument.type().nameStr(), shared::InterfaceParameter::Direction::IN);
             ivInterface->addParam(ivParameterIn);
-            const auto ivParameterOut = createIvInterfaceParameter(QString("%2_Out").arg(argument.nameStr()),
-                    argument.type().nameStr(), shared::InterfaceParameter::Direction::OUT);
+            const auto ivParameterOut = createIvInterfaceParameter(QString("%2_Out").arg(sedsArgument.nameStr()),
+                    sedsArgument.type().nameStr(), shared::InterfaceParameter::Direction::OUT);
             ivInterface->addParam(ivParameterOut);
         } break;
         case seds::model::CommandArgumentMode::Notify:
