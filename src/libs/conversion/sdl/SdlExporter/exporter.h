@@ -19,9 +19,8 @@
 
 #pragma once
 
-#include "../SdlModel/sdlmodel.h"
-
 #include <conversion/common/export/modelexporter.h>
+#include <sdl/SdlModel/sdlmodel.h>
 
 class QSaveFile;
 

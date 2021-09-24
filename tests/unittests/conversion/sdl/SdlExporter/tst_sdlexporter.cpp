@@ -22,8 +22,8 @@
 #include <conversion/common/options.h>
 #include <conversion/sdl/SdlExporter/SdlOptions/options.h>
 #include <conversion/sdl/SdlExporter/exporter.h>
-#include <conversion/sdl/SdlModel/process.h>
-#include <conversion/sdl/SdlModel/sdlmodel.h>
+#include <sdl/SdlModel/process.h>
+#include <sdl/SdlModel/sdlmodel.h>
 
 using conversion::ModelType;
 using conversion::Options;

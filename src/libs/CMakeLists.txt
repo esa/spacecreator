@@ -18,6 +18,9 @@ add_subdirectory(msccore)
 add_subdirectory(dvcore)
 add_subdirectory(libdveditor)
 
+# SDL metamodel
+add_subdirectory(sdl)
+
 # conversion
 add_subdirectory(conversion)
 add_subdirectory(seds)
