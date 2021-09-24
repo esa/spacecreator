@@ -17,23 +17,44 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/lgpl-2.1.html>.
  */
 
-#include "sdlmodel.h"
+#include "process.h"
+
+#include <memory>
 
 namespace conversion::Sdl {
 
-SdlModel::SdlModel(const QString &nameOfProcess)
-    : m_data(Process(nameOfProcess))
+Process::Process(const QString &name)
+    : m_name(name)
 {
 }
 
-conversion::ModelType SdlModel::modelType() const
+Process::Process(const QString &name, std::unique_ptr<StateMachine> &stateMachine,
+        const std::vector<VariableDeclaration> &variables, const std::vector<Procedure> &procedures)
+    : m_name(name)
+    , m_variables(variables)
+    , m_procedures(procedures)
 {
-    return conversion::ModelType::Sdl;
+    m_stateMachine = std::move(stateMachine);
 }
 
-const SdlModel::Data &SdlModel::data() const
+auto Process::name() const -> QString
 {
-    return m_data;
+    return m_name;
+}
+
+auto Process::stateMachine() const -> const std::unique_ptr<StateMachine> &
+{
+    return m_stateMachine;
+}
+
+auto Process::variables() const -> const std::vector<VariableDeclaration> &
+{
+    return m_variables;
+}
+
+auto Process::procedure() const -> const std::vector<Procedure> &
+{
+    return m_procedures;
 }
 
 } // namespace conversion::Sdl

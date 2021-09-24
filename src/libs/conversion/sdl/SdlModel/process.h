@@ -17,23 +17,42 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/lgpl-2.1.html>.
  */
 
-#include "sdlmodel.h"
+#pragma once
+
+#include <QString>
+#include <memory>
+#include <vector>
 
 namespace conversion::Sdl {
 
-SdlModel::SdlModel(const QString &nameOfProcess)
-    : m_data(Process(nameOfProcess))
+class StateMachine
 {
-}
+};
 
-conversion::ModelType SdlModel::modelType() const
+class VariableDeclaration
 {
-    return conversion::ModelType::Sdl;
-}
+};
 
-const SdlModel::Data &SdlModel::data() const
+class Procedure
 {
-    return m_data;
-}
+};
 
+class Process
+{
+public:
+    Process(const QString &name = "defaultProcessName");
+    Process(const QString &name, std::unique_ptr<StateMachine> &stateMachine,
+            const std::vector<VariableDeclaration> &variables, const std::vector<Procedure> &procedures);
+
+    auto name() const -> QString;
+    auto stateMachine() const -> const std::unique_ptr<StateMachine> &;
+    auto variables() const -> const std::vector<VariableDeclaration> &;
+    auto procedure() const -> const std::vector<Procedure> &;
+
+private:
+    QString m_name = "";
+    std::unique_ptr<StateMachine> m_stateMachine;
+    std::vector<VariableDeclaration> m_variables;
+    std::vector<Procedure> m_procedures;
+};
 } // namespace conversion::Sdl

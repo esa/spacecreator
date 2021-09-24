@@ -19,6 +19,8 @@
 
 #pragma once
 
+#include "process.h"
+
 #include <conversion/common/model.h>
 
 namespace conversion::Sdl {
@@ -26,13 +28,13 @@ namespace conversion::Sdl {
 /**
  * @brief   Represents an SDL data model.
  *
- * Stores AST.
+ * Stores a Process.
  */
 class SdlModel final : public conversion::Model
 {
 public:
     /** @brief Model data type **/
-    using Data = void *; // TODO: this should be a Process type
+    using Data = Process;
 
 public:
     /**
@@ -40,7 +42,7 @@ public:
      *
      * @param   data    Model data
      */
-    explicit SdlModel();
+    explicit SdlModel(const QString &name = "defaultProcessName");
     /**
      * @brief   Deleted copy constructor/
      */
