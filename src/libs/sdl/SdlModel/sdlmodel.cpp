@@ -21,8 +21,8 @@
 
 namespace sdl {
 
-SdlModel::SdlModel()
-    : m_data(Process())
+SdlModel::SdlModel(const Data &data)
+    : m_data(data)
 {
 }
 

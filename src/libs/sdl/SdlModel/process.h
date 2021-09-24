@@ -40,7 +40,7 @@ class Procedure
 class Process
 {
 public:
-    Process(const QString &name = "defaultProcessName");
+    Process(const Process &process);
     Process(const QString &name, const StateMachine &stateMachine, const std::vector<VariableDeclaration> &variables,
             const std::vector<Procedure> &procedures);
 

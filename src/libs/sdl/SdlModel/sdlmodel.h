@@ -40,8 +40,9 @@ public:
     /**
      * @brief   Constructor
      *
+     * data     model data (Process)
      */
-    explicit SdlModel();
+    explicit SdlModel(const Data &data);
     /**
      * @brief   Deleted copy constructor/
      */
