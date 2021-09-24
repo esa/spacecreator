@@ -21,10 +21,12 @@
 #include <QtTest>
 #include <conversion/common/options.h>
 #include <conversion/sdl/SdlExporter/exporter.h>
+#include <conversion/sdl/SdlModel/process.h>
 #include <conversion/sdl/SdlModel/sdlmodel.h>
 
 using conversion::ModelType;
 using conversion::Options;
+using conversion::Sdl::Process;
 using conversion::Sdl::SdlModel;
 
 namespace tests::conversion::Sdl {
@@ -34,15 +36,20 @@ class tst_sdlmodel : public QObject
     Q_OBJECT
 
 private Q_SLOTS:
-    void testDefaultValues();
+    void testDefaultValuesInModel();
+    void testGenerateProcess();
 };
 
-void tst_sdlmodel::testDefaultValues()
+void tst_sdlmodel::testDefaultValuesInModel()
 {
     SdlModel exampleModel;
 
     QVERIFY(exampleModel.modelType() == ModelType::Sdl);
+    const auto *const process = &exampleModel.data();
+    QVERIFY("defaultProcessName" == process->name());
 }
+
+void tst_sdlmodel::testGenerateProcess() {}
 
 } // namespace tests::conversion::sdl
 
