@@ -19,12 +19,17 @@
 
 #pragma once
 
+#include "options.h"
+
 #include <conversion/common/export/modelexporter.h>
 #include <sdl/SdlModel/sdlmodel.h>
 
 class QSaveFile;
 
-namespace conversion::Sdl::exporter {
+using conversion::Model;
+using conversion::Options;
+
+namespace sdl::exporter {
 class SdlExporter final : public ::conversion::exporter::ModelExporter
 {
 public:
@@ -43,4 +48,4 @@ private:
 
     auto makeFilePath(const QString &pathPrefix, const QString &fileName, const QString &extension) const -> QString;
 };
-} // namespace conversion::Sdl::exporter
+} // namespace sdl::exporter

@@ -23,7 +23,7 @@
 #include <memory>
 #include <vector>
 
-namespace conversion::Sdl {
+namespace sdl {
 
 class StateMachine
 {
@@ -55,4 +55,4 @@ private:
     std::vector<VariableDeclaration> m_variables;
     std::vector<Procedure> m_procedures;
 };
-} // namespace conversion::Sdl
+} // namespace sdl

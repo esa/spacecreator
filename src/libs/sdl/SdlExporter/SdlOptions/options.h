@@ -17,20 +17,20 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/lgpl-2.1.html>.
  */
 
-#include <sdl/SdlModel/sdlmodel.h>
+#pragma once
 
-class QTextStream;
+#include <QString>
 
-namespace conversion::Sdl {
+namespace sdl::exporter {
 
-class SdlVisitor
+/**
+ * @brief   Possible options for SDL export
+ */
+class SdlOptions
 {
 public:
-    SdlVisitor(const QTextStream &stream);
-    void *visit(const SdlModel *model);
-
-private:
-    // TODO
+    /** @brief Prefix to add at the beginning of the filepath */
+    inline static const QString sdlFilepathPrefix = "Sdl_Export_FilepathPrefix";
 };
 
-} // namespace conversion::Sdl
+} // namespace sdl::exporter

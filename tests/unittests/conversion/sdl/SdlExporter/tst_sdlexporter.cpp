@@ -20,17 +20,17 @@
 #include <QObject>
 #include <QtTest>
 #include <conversion/common/options.h>
-#include <conversion/sdl/SdlExporter/SdlOptions/options.h>
-#include <conversion/sdl/SdlExporter/exporter.h>
+#include <sdl/SdlExporter/SdlOptions/options.h>
+#include <sdl/SdlExporter/exporter.h>
 #include <sdl/SdlModel/process.h>
 #include <sdl/SdlModel/sdlmodel.h>
 
 using conversion::ModelType;
 using conversion::Options;
-using conversion::Sdl::Process;
-using conversion::Sdl::SdlModel;
-using conversion::Sdl::SdlOptions;
-using conversion::Sdl::exporter::SdlExporter;
+using sdl::Process;
+using sdl::SdlModel;
+using sdl::exporter::SdlExporter;
+using sdl::exporter::SdlOptions;
 
 namespace tests::conversion::Sdl {
 

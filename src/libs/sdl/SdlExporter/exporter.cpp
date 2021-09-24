@@ -21,18 +21,20 @@
 
 #include "SdlOptions/options.h"
 #include "export/exceptions.h"
+#include "modeltype.h"
 #include "visitors/sdlvisitor.h"
 
 #include <QSaveFile>
 #include <QString>
 #include <QTextStream>
 
+using conversion::ModelType;
 using conversion::exporter::ExportException;
 using conversion::exporter::IncorrectModelException;
 using conversion::exporter::MissingOutputFilenameException;
-using conversion::Sdl::SdlModel;
+using sdl::SdlModel;
 
-namespace conversion::Sdl::exporter {
+namespace sdl::exporter {
 
 void SdlExporter::exportModel(const Model *const model, const Options &options) const
 {
@@ -53,7 +55,7 @@ void SdlExporter::exportSdlModel(const SdlModel *const model, const Options &opt
     QString serializedModelData;
     QTextStream outputTextStream(&serializedModelData, QIODevice::WriteOnly);
 
-    Sdl::SdlVisitor sdlvis(outputTextStream);
+    sdl::SdlVisitor sdlvis(outputTextStream);
     sdlvis.visit(model);
 
     const auto pathPrefix = options.value(SdlOptions::sdlFilepathPrefix).value_or("");

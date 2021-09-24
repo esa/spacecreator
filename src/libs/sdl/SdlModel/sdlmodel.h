@@ -23,7 +23,7 @@
 
 #include <conversion/common/model.h>
 
-namespace conversion::Sdl {
+namespace sdl {
 
 /**
  * @brief   Represents an SDL data model.
@@ -83,4 +83,4 @@ private:
     Data m_data;
 };
 
-} // namespace conversion::Sdl
+} // namespace sdl

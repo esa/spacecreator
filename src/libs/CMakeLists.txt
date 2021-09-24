@@ -18,7 +18,7 @@ add_subdirectory(msccore)
 add_subdirectory(dvcore)
 add_subdirectory(libdveditor)
 
-# SDL metamodel
+# SDL metamodel and exporter
 add_subdirectory(sdl)
 
 # conversion

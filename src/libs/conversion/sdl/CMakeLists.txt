@@ -1,2 +1,1 @@
-add_subdirectory(SdlExporter)
 add_subdirectory(SdlRegistrar)

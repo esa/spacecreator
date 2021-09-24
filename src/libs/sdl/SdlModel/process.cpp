@@ -21,7 +21,7 @@
 
 #include <memory>
 
-namespace conversion::Sdl {
+namespace sdl {
 
 Process::Process(const QString &name)
     : m_name(name)
@@ -57,4 +57,4 @@ auto Process::procedures() const -> const std::vector<Procedure> &
     return m_procedures;
 }
 
-} // namespace conversion::Sdl
+} // namespace sdl
