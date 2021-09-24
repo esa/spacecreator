@@ -19,40 +19,18 @@
 
 #pragma once
 
-class QString;
+#include <QString>
 
-#include <set>
-
-namespace conversion {
+namespace conversion::tmc {
 
 /**
- * @brief   All model types supported in conversion
+ * @brief   Possible options for Promela conversion
  */
-enum class ModelType
+class PromelaOptions
 {
-    Unspecified,
-    Asn1,
-    InterfaceView,
-    Sdl,
-    Seds,
-    Promela
+public:
+    /** @brief  Filepath of output file  */
+    inline static const QString promelaOutputFile = "Promela_Export_Filepath";
 };
 
-/**
- * @brief   Converts given model type to string
- *
- * @param   modelType   Model type to convert
- *
- * @param   String with model type name
- */
-auto modelTypeToString(ModelType modelType) -> QString;
-/**
- * @brief   Converts given set of model types to string
- *
- * @param   sourceModelsTypes       Set of model types
- *
- * @return  String with model types names separated with comma
- */
-auto modelTypesToString(const std::set<ModelType> &modelsTypes) -> QString;
-
-} // namespace conversion
+}

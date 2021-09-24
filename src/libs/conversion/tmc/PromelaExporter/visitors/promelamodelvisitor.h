@@ -19,40 +19,31 @@
 
 #pragma once
 
-class QString;
+#include "tmc/PromelaModel/namedmtype.h"
+#include "tmc/PromelaModel/promelamodel.h"
+#include "tmc/PromelaModel/utype.h"
 
-#include <set>
+#include <QTextStream>
 
-namespace conversion {
+namespace conversion::tmc::exporter {
+using ::tmc::promelamodel::NamedMtype;
+using ::tmc::promelamodel::PromelaModel;
+using ::tmc::promelamodel::Utype;
 
-/**
- * @brief   All model types supported in conversion
- */
-enum class ModelType
+class PromelaModelVisitor
 {
-    Unspecified,
-    Asn1,
-    InterfaceView,
-    Sdl,
-    Seds,
-    Promela
+public:
+    PromelaModelVisitor(QTextStream &stream);
+
+    void visit(const PromelaModel &promelaModel);
+
+private:
+    void generateMtypes(const QSet<QString> &values);
+    void generateNamedMtypes(const std::map<QString, NamedMtype> &values);
+    void generateMtypeNames(QVector<QString> &names);
+    void generateUtypes(const QList<Utype> &utypes);
+
+private:
+    QTextStream &m_stream;
 };
-
-/**
- * @brief   Converts given model type to string
- *
- * @param   modelType   Model type to convert
- *
- * @param   String with model type name
- */
-auto modelTypeToString(ModelType modelType) -> QString;
-/**
- * @brief   Converts given set of model types to string
- *
- * @param   sourceModelsTypes       Set of model types
- *
- * @return  String with model types names separated with comma
- */
-auto modelTypesToString(const std::set<ModelType> &modelsTypes) -> QString;
-
-} // namespace conversion
+}

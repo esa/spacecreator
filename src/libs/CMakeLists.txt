@@ -24,6 +24,7 @@ add_subdirectory(sdl)
 # conversion
 add_subdirectory(conversion)
 add_subdirectory(seds)
+add_subdirectory(tmc)
 
 # Total SpaceCreator system
 add_subdirectory(spacecreatorsystem)

@@ -19,40 +19,24 @@
 
 #pragma once
 
-class QString;
+#include "declaration.h"
 
-#include <set>
+#include <QList>
+#include <QString>
 
-namespace conversion {
-
-/**
- * @brief   All model types supported in conversion
- */
-enum class ModelType
+namespace tmc::promelamodel {
+class Utype final
 {
-    Unspecified,
-    Asn1,
-    InterfaceView,
-    Sdl,
-    Seds,
-    Promela
+public:
+    Utype(QString name);
+
+    const QString &getName() const;
+
+    void addField(const Declaration &field);
+    const QList<Declaration> &getFields() const;
+
+private:
+    QString m_name;
+    QList<Declaration> m_fields;
 };
-
-/**
- * @brief   Converts given model type to string
- *
- * @param   modelType   Model type to convert
- *
- * @param   String with model type name
- */
-auto modelTypeToString(ModelType modelType) -> QString;
-/**
- * @brief   Converts given set of model types to string
- *
- * @param   sourceModelsTypes       Set of model types
- *
- * @return  String with model types names separated with comma
- */
-auto modelTypesToString(const std::set<ModelType> &modelsTypes) -> QString;
-
-} // namespace conversion
+}

@@ -19,40 +19,39 @@
 
 #pragma once
 
-class QString;
+#include "arraytype.h"
+#include "basictypes.h"
+#include "unsigneddatatype.h"
+#include "utyperef.h"
 
-#include <set>
+#include <QString>
+#include <variant>
 
-namespace conversion {
-
-/**
- * @brief   All model types supported in conversion
- */
-enum class ModelType
+namespace tmc::promelamodel {
+class DataType final
 {
-    Unspecified,
-    Asn1,
-    InterfaceView,
-    Sdl,
-    Seds,
-    Promela
+public:
+    using Value = std::variant<UnsignedDataType, UtypeRef, BasicType, ArrayType>;
+
+    DataType(Value value);
+    DataType(UnsignedDataType value);
+    DataType(UtypeRef value);
+    DataType(BasicType value);
+    DataType(ArrayType value);
+
+    const Value &getValue() const;
+
+    bool isUnsigned() const;
+    bool isReference() const;
+    bool isBasicType() const;
+    bool isArrayType() const;
+
+    const UnsignedDataType &getUnsigned() const;
+    const UtypeRef &getReference() const;
+    const BasicType &getBasicType() const;
+    const ArrayType &getArrayType() const;
+
+private:
+    Value m_value;
 };
-
-/**
- * @brief   Converts given model type to string
- *
- * @param   modelType   Model type to convert
- *
- * @param   String with model type name
- */
-auto modelTypeToString(ModelType modelType) -> QString;
-/**
- * @brief   Converts given set of model types to string
- *
- * @param   sourceModelsTypes       Set of model types
- *
- * @return  String with model types names separated with comma
- */
-auto modelTypesToString(const std::set<ModelType> &modelsTypes) -> QString;
-
-} // namespace conversion
+}

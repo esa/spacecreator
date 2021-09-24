@@ -19,40 +19,15 @@
 
 #pragma once
 
-class QString;
-
-#include <set>
-
-namespace conversion {
-
-/**
- * @brief   All model types supported in conversion
- */
-enum class ModelType
+namespace tmc::promelamodel {
+enum class BasicType
 {
-    Unspecified,
-    Asn1,
-    InterfaceView,
-    Sdl,
-    Seds,
-    Promela
+    BIT,
+    BOOLEAN,
+    BYTE,
+    PID,
+    SHORT,
+    INT,
+    CHAN
 };
-
-/**
- * @brief   Converts given model type to string
- *
- * @param   modelType   Model type to convert
- *
- * @param   String with model type name
- */
-auto modelTypeToString(ModelType modelType) -> QString;
-/**
- * @brief   Converts given set of model types to string
- *
- * @param   sourceModelsTypes       Set of model types
- *
- * @return  String with model types names separated with comma
- */
-auto modelTypesToString(const std::set<ModelType> &modelsTypes) -> QString;
-
-} // namespace conversion
+}

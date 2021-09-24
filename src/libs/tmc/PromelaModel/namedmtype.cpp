@@ -17,42 +17,46 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/lgpl-2.1.html>.
  */
 
-#pragma once
+#include "namedmtype.h"
 
-class QString;
-
-#include <set>
-
-namespace conversion {
-
-/**
- * @brief   All model types supported in conversion
- */
-enum class ModelType
+namespace tmc::promelamodel {
+NamedMtype::NamedMtype(QString name)
+    : m_name(std::move(name))
 {
-    Unspecified,
-    Asn1,
-    InterfaceView,
-    Sdl,
-    Seds,
-    Promela
-};
+}
 
-/**
- * @brief   Converts given model type to string
- *
- * @param   modelType   Model type to convert
- *
- * @param   String with model type name
- */
-auto modelTypeToString(ModelType modelType) -> QString;
-/**
- * @brief   Converts given set of model types to string
- *
- * @param   sourceModelsTypes       Set of model types
- *
- * @return  String with model types names separated with comma
- */
-auto modelTypesToString(const std::set<ModelType> &modelsTypes) -> QString;
+const QString &NamedMtype::getName() const
+{
+    return m_name;
+}
 
-} // namespace conversion
+void NamedMtype::addValue(const QString &value)
+{
+    m_values.insert(value);
+}
+
+void NamedMtype::removeValue(const QString &value)
+{
+    m_values.remove(value);
+}
+
+bool NamedMtype::hasValue(const QString &value)
+{
+    return m_values.contains(value);
+}
+
+const QSet<QString> &NamedMtype::values() const
+{
+    return m_values;
+}
+
+QSet<QString>::const_iterator NamedMtype::values_begin() const
+{
+    return m_values.begin();
+}
+
+QSet<QString>::const_iterator NamedMtype::values_end() const
+{
+    return m_values.end();
+}
+}

@@ -17,42 +17,24 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/lgpl-2.1.html>.
  */
 
-#pragma once
+#include "visitors/utypevisitor.h"
 
-class QString;
+#include "visitors/declarationvisitor.h"
 
-#include <set>
-
-namespace conversion {
-
-/**
- * @brief   All model types supported in conversion
- */
-enum class ModelType
+namespace conversion::tmc::exporter {
+using ::tmc::promelamodel::Declaration;
+UtypeVisitor::UtypeVisitor(QTextStream &stream)
+    : m_stream(stream)
 {
-    Unspecified,
-    Asn1,
-    InterfaceView,
-    Sdl,
-    Seds,
-    Promela
-};
+}
 
-/**
- * @brief   Converts given model type to string
- *
- * @param   modelType   Model type to convert
- *
- * @param   String with model type name
- */
-auto modelTypeToString(ModelType modelType) -> QString;
-/**
- * @brief   Converts given set of model types to string
- *
- * @param   sourceModelsTypes       Set of model types
- *
- * @return  String with model types names separated with comma
- */
-auto modelTypesToString(const std::set<ModelType> &modelsTypes) -> QString;
-
-} // namespace conversion
+void UtypeVisitor::visit(const Utype &utype)
+{
+    m_stream << "typedef " << utype.getName() << " {\n";
+    for (const Declaration &declaration : utype.getFields()) {
+        DeclarationVisitor visitor(m_stream, "    ");
+        visitor.visit(declaration);
+    }
+    m_stream << "}\n\n";
+}
+}

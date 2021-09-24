@@ -17,42 +17,30 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/lgpl-2.1.html>.
  */
 
-#pragma once
+#include "visitors/declarationvisitor.h"
 
-class QString;
+#include "visitors/datatypeprefixvisitor.h"
+#include "visitors/datatypesuffixvisitor.h"
 
-#include <set>
+namespace conversion::tmc::exporter {
+using ::tmc::promelamodel::ArrayType;
+using ::tmc::promelamodel::UnsignedDataType;
+using ::tmc::promelamodel::UtypeRef;
 
-namespace conversion {
-
-/**
- * @brief   All model types supported in conversion
- */
-enum class ModelType
+DeclarationVisitor::DeclarationVisitor(QTextStream &stream, QString prefix)
+    : m_stream(stream)
+    , m_prefix(std::move(prefix))
 {
-    Unspecified,
-    Asn1,
-    InterfaceView,
-    Sdl,
-    Seds,
-    Promela
-};
+}
 
-/**
- * @brief   Converts given model type to string
- *
- * @param   modelType   Model type to convert
- *
- * @param   String with model type name
- */
-auto modelTypeToString(ModelType modelType) -> QString;
-/**
- * @brief   Converts given set of model types to string
- *
- * @param   sourceModelsTypes       Set of model types
- *
- * @return  String with model types names separated with comma
- */
-auto modelTypesToString(const std::set<ModelType> &modelsTypes) -> QString;
-
-} // namespace conversion
+void DeclarationVisitor::visit(const Declaration &declaration)
+{
+    m_stream << m_prefix;
+    DataTypePrefixVisitor prefixVisitor(m_stream);
+    prefixVisitor.visit(declaration.getType());
+    m_stream << " " << declaration.getName();
+    DataTypeSuffixVisitor suffixVisitor(m_stream);
+    suffixVisitor.visit(declaration.getType());
+    m_stream << ";\n";
+}
+}

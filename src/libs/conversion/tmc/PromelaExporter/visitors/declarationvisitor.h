@@ -19,40 +19,24 @@
 
 #pragma once
 
-class QString;
+#include "tmc/PromelaModel/declaration.h"
 
-#include <set>
+#include <QTextStream>
 
-namespace conversion {
-
-/**
- * @brief   All model types supported in conversion
- */
-enum class ModelType
+namespace conversion::tmc::exporter {
+using ::tmc::promelamodel::BasicType;
+using ::tmc::promelamodel::DataType;
+using ::tmc::promelamodel::Declaration;
+class DeclarationVisitor
 {
-    Unspecified,
-    Asn1,
-    InterfaceView,
-    Sdl,
-    Seds,
-    Promela
+public:
+    DeclarationVisitor(QTextStream &stream, QString prefix);
+
+    void visit(const Declaration &declaration);
+
+private:
+private:
+    QTextStream &m_stream;
+    QString m_prefix;
 };
-
-/**
- * @brief   Converts given model type to string
- *
- * @param   modelType   Model type to convert
- *
- * @param   String with model type name
- */
-auto modelTypeToString(ModelType modelType) -> QString;
-/**
- * @brief   Converts given set of model types to string
- *
- * @param   sourceModelsTypes       Set of model types
- *
- * @return  String with model types names separated with comma
- */
-auto modelTypesToString(const std::set<ModelType> &modelsTypes) -> QString;
-
-} // namespace conversion
+}

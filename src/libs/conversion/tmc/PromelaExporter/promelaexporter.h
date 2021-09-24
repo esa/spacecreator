@@ -19,40 +19,20 @@
 
 #pragma once
 
-class QString;
+#include "export/modelexporter.h"
 
-#include <set>
-
-namespace conversion {
-
-/**
- * @brief   All model types supported in conversion
- */
-enum class ModelType
+namespace conversion::tmc::exporter {
+class PromelaExporter final : public ::conversion::exporter::ModelExporter
 {
-    Unspecified,
-    Asn1,
-    InterfaceView,
-    Sdl,
-    Seds,
-    Promela
+public:
+    /**
+     * @brief   Exports Promela model to file
+     *
+     * @param   model       Model to export
+     * @param   options     Options for export configuration
+     */
+    virtual auto exportModel(const Model *model, const Options &options) const -> void override;
+
+private:
 };
-
-/**
- * @brief   Converts given model type to string
- *
- * @param   modelType   Model type to convert
- *
- * @param   String with model type name
- */
-auto modelTypeToString(ModelType modelType) -> QString;
-/**
- * @brief   Converts given set of model types to string
- *
- * @param   sourceModelsTypes       Set of model types
- *
- * @return  String with model types names separated with comma
- */
-auto modelTypesToString(const std::set<ModelType> &modelsTypes) -> QString;
-
-} // namespace conversion
+}

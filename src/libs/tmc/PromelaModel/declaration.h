@@ -19,40 +19,22 @@
 
 #pragma once
 
-class QString;
+#include "datatype.h"
 
-#include <set>
+#include <QString>
+#include <optional>
 
-namespace conversion {
-
-/**
- * @brief   All model types supported in conversion
- */
-enum class ModelType
+namespace tmc::promelamodel {
+class Declaration final
 {
-    Unspecified,
-    Asn1,
-    InterfaceView,
-    Sdl,
-    Seds,
-    Promela
+public:
+    Declaration(DataType type, QString name);
+    const DataType &getType() const;
+    const QString &getName() const;
+
+private:
+    DataType m_type;
+    QString m_name;
+    // std::optional<Expr> init
 };
-
-/**
- * @brief   Converts given model type to string
- *
- * @param   modelType   Model type to convert
- *
- * @param   String with model type name
- */
-auto modelTypeToString(ModelType modelType) -> QString;
-/**
- * @brief   Converts given set of model types to string
- *
- * @param   sourceModelsTypes       Set of model types
- *
- * @return  String with model types names separated with comma
- */
-auto modelTypesToString(const std::set<ModelType> &modelsTypes) -> QString;
-
-} // namespace conversion
+}

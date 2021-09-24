@@ -17,42 +17,25 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/lgpl-2.1.html>.
  */
 
-#pragma once
+#include "utype.h"
 
-class QString;
-
-#include <set>
-
-namespace conversion {
-
-/**
- * @brief   All model types supported in conversion
- */
-enum class ModelType
+namespace tmc::promelamodel {
+Utype::Utype(QString name)
+    : m_name(std::move(name))
 {
-    Unspecified,
-    Asn1,
-    InterfaceView,
-    Sdl,
-    Seds,
-    Promela
-};
+}
+const QString &Utype::getName() const
+{
+    return m_name;
+}
 
-/**
- * @brief   Converts given model type to string
- *
- * @param   modelType   Model type to convert
- *
- * @param   String with model type name
- */
-auto modelTypeToString(ModelType modelType) -> QString;
-/**
- * @brief   Converts given set of model types to string
- *
- * @param   sourceModelsTypes       Set of model types
- *
- * @return  String with model types names separated with comma
- */
-auto modelTypesToString(const std::set<ModelType> &modelsTypes) -> QString;
+void Utype::addField(const Declaration &field)
+{
+    m_fields.append(field);
+}
+const QList<Declaration> &Utype::getFields() const
+{
+    return m_fields;
+}
 
-} // namespace conversion
+}
