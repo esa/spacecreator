@@ -20,9 +20,10 @@
 #include "declaration.h"
 
 namespace tmc::promelamodel {
-Declaration::Declaration(DataType type, QString name)
+Declaration::Declaration(DataType type, QString name, Visibility visibility)
     : m_type(std::move(type))
     , m_name(std::move(name))
+    , m_visibility(visibility)
 {
 }
 
@@ -34,5 +35,10 @@ const DataType &Declaration::getType() const
 const QString &Declaration::getName() const
 {
     return m_name;
+}
+
+Declaration::Visibility Declaration::getVisibility() const
+{
+    return m_visibility;
 }
 }

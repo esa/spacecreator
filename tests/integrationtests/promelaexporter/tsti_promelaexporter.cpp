@@ -48,6 +48,7 @@ private Q_SLOTS:
     void testMtype();
     void testNamedMtype();
     void testUtype();
+    void testUtypeVisibility();
 
 private:
     QString getFileContents(const QString &filename);
@@ -152,6 +153,28 @@ void tst_PromelaExporter::testUtype()
         QFAIL(ex.what());
     }
     QString out2 = getFileContents("expect_promela_file3.pml");
+    showInfo(out, out2);
+    QCOMPARE(out, out2);
+}
+
+void tst_PromelaExporter::testUtypeVisibility()
+{
+    PromelaModel model;
+
+    Utype basic_types("test_visibility");
+
+    basic_types.addField(Declaration(DataType(BasicType::INT), "field_one", Declaration::Visibility::HIDDEN));
+    basic_types.addField(Declaration(DataType(BasicType::INT), "field_two", Declaration::Visibility::SHOW));
+    basic_types.addField(Declaration(DataType(BasicType::INT), "field_three", Declaration::Visibility::NORMAL));
+
+    model.addUtype(basic_types);
+    QString out;
+    try {
+        out = generatePromelaFromModel(model);
+    } catch (const std::exception &ex) {
+        QFAIL(ex.what());
+    }
+    QString out2 = getFileContents("expect_promela_file4.pml");
     showInfo(out, out2);
     QCOMPARE(out, out2);
 }

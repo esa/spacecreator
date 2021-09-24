@@ -35,6 +35,8 @@ public:
     void visit(const Declaration &declaration);
 
 private:
+    QString getVisitilityString(const Declaration &declaration);
+
 private:
     QTextStream &m_stream;
     QString m_prefix;

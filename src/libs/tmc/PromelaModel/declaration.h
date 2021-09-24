@@ -28,13 +28,23 @@ namespace tmc::promelamodel {
 class Declaration final
 {
 public:
-    Declaration(DataType type, QString name);
+    enum Visibility
+    {
+        NORMAL,
+        SHOW,
+        HIDDEN
+    };
+
+public:
+    Declaration(DataType type, QString name, Visibility visibility = Visibility::NORMAL);
     const DataType &getType() const;
     const QString &getName() const;
+    Visibility getVisibility() const;
 
 private:
     DataType m_type;
     QString m_name;
+    Visibility m_visibility;
     // std::optional<Expr> init
 };
 }

@@ -36,6 +36,7 @@ DeclarationVisitor::DeclarationVisitor(QTextStream &stream, QString prefix)
 void DeclarationVisitor::visit(const Declaration &declaration)
 {
     m_stream << m_prefix;
+    m_stream << getVisitilityString(declaration);
     DataTypePrefixVisitor prefixVisitor(m_stream);
     prefixVisitor.visit(declaration.getType());
     m_stream << " " << declaration.getName();
@@ -43,4 +44,19 @@ void DeclarationVisitor::visit(const Declaration &declaration)
     suffixVisitor.visit(declaration.getType());
     m_stream << ";\n";
 }
+
+QString DeclarationVisitor::getVisitilityString(const Declaration &declaration)
+{
+    switch (declaration.getVisibility()) {
+    case Declaration::NORMAL:
+        return "";
+    case Declaration::HIDDEN:
+        return "hidden ";
+    case Declaration::SHOW:
+        return "show ";
+    }
+
+    return "";
+}
+
 }
