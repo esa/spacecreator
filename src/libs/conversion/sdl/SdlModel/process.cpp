@@ -28,13 +28,13 @@ Process::Process(const QString &name)
 {
 }
 
-Process::Process(const QString &name, std::unique_ptr<StateMachine> &stateMachine,
+Process::Process(const QString &name, const StateMachine &stateMachine,
         const std::vector<VariableDeclaration> &variables, const std::vector<Procedure> &procedures)
     : m_name(name)
     , m_variables(variables)
     , m_procedures(procedures)
 {
-    m_stateMachine = std::move(stateMachine);
+    m_stateMachine = stateMachine;
 }
 
 auto Process::name() const -> QString
@@ -42,7 +42,7 @@ auto Process::name() const -> QString
     return m_name;
 }
 
-auto Process::stateMachine() const -> const std::unique_ptr<StateMachine> &
+auto Process::stateMachine() const -> const StateMachine &
 {
     return m_stateMachine;
 }
@@ -52,7 +52,7 @@ auto Process::variables() const -> const std::vector<VariableDeclaration> &
     return m_variables;
 }
 
-auto Process::procedure() const -> const std::vector<Procedure> &
+auto Process::procedures() const -> const std::vector<Procedure> &
 {
     return m_procedures;
 }

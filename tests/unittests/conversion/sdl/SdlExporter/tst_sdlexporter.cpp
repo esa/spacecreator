@@ -20,6 +20,7 @@
 #include <QObject>
 #include <QtTest>
 #include <conversion/common/options.h>
+#include <conversion/sdl/SdlExporter/SdlOptions/options.h>
 #include <conversion/sdl/SdlExporter/exporter.h>
 #include <conversion/sdl/SdlModel/process.h>
 #include <conversion/sdl/SdlModel/sdlmodel.h>
@@ -28,6 +29,8 @@ using conversion::ModelType;
 using conversion::Options;
 using conversion::Sdl::Process;
 using conversion::Sdl::SdlModel;
+using conversion::Sdl::SdlOptions;
+using conversion::Sdl::exporter::SdlExporter;
 
 namespace tests::conversion::Sdl {
 
@@ -49,7 +52,16 @@ void tst_sdlmodel::testDefaultValuesInModel()
     QVERIFY("defaultProcessName" == process->name());
 }
 
-void tst_sdlmodel::testGenerateProcess() {}
+void tst_sdlmodel::testGenerateProcess()
+{
+    SdlModel exampleModel;
+
+    Options options;
+    options.add(SdlOptions::sdlFilepathPrefix, "Sdl_");
+
+    // SdlExporter
+    (void)exampleModel;
+}
 
 } // namespace tests::conversion::sdl
 

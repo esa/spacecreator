@@ -41,17 +41,17 @@ class Process
 {
 public:
     Process(const QString &name = "defaultProcessName");
-    Process(const QString &name, std::unique_ptr<StateMachine> &stateMachine,
-            const std::vector<VariableDeclaration> &variables, const std::vector<Procedure> &procedures);
+    Process(const QString &name, const StateMachine &stateMachine, const std::vector<VariableDeclaration> &variables,
+            const std::vector<Procedure> &procedures);
 
     auto name() const -> QString;
-    auto stateMachine() const -> const std::unique_ptr<StateMachine> &;
+    auto stateMachine() const -> const StateMachine &;
     auto variables() const -> const std::vector<VariableDeclaration> &;
-    auto procedure() const -> const std::vector<Procedure> &;
+    auto procedures() const -> const std::vector<Procedure> &;
 
 private:
     QString m_name = "";
-    std::unique_ptr<StateMachine> m_stateMachine;
+    StateMachine m_stateMachine;
     std::vector<VariableDeclaration> m_variables;
     std::vector<Procedure> m_procedures;
 };

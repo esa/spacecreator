@@ -40,9 +40,8 @@ public:
     /**
      * @brief   Constructor
      *
-     * @param   data    Model data
      */
-    explicit SdlModel(const QString &name = "defaultProcessName");
+    explicit SdlModel();
     /**
      * @brief   Deleted copy constructor/
      */

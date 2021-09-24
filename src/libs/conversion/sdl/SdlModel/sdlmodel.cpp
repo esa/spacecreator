@@ -21,8 +21,8 @@
 
 namespace conversion::Sdl {
 
-SdlModel::SdlModel(const QString &nameOfProcess)
-    : m_data(Process(nameOfProcess))
+SdlModel::SdlModel()
+    : m_data(Process())
 {
 }
 
