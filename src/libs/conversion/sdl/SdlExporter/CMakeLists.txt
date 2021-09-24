@@ -14,7 +14,7 @@ target_include_directories(SdlExporter
     PRIVATE     ${CMAKE_SOURCE_DIR}/src/libs)
 target_link_libraries(SdlExporter
     PUBLIC      Conversion::Common
-                asn1library
+                SdlModel
     PRIVATE     CommonProjectWarnings)
 
 add_format_target(SdlExporter)

@@ -9,7 +9,8 @@ target_sources(${TEST_NAME}
 target_include_directories(${TEST_NAME}
     PRIVATE     ${CMAKE_SOURCE_DIR}/src/libs)
 target_link_libraries(${TEST_NAME}
-    PRIVATE     SdlModel
+    PRIVATE     SdlExporter
+                SdlModel
                 Qt5::Core
                 Qt5::Test
                 CommonProjectWarnings)

@@ -1,21 +1,20 @@
-project(SedsRegistrar VERSION 1.0.0 LANGUAGES CXX)
+project(SdlRegistrar VERSION 1.0.0 LANGUAGES CXX)
 
 set(SOURCES registrar.cpp)
 set(INCLUDES registrar.h)
 
-add_library(SedsRegistrar STATIC)
-target_sources(SedsRegistrar
+add_library(SdlRegistrar STATIC)
+target_sources(SdlRegistrar
     PRIVATE     "${SOURCES}"
                 "${INCLUDES}")
-target_include_directories(SedsRegistrar
+target_include_directories(SdlRegistrar
     PUBLIC      .
     PRIVATE     ${CMAKE_SOURCE_DIR}/src/libs)
-target_link_libraries(SedsRegistrar
-    PRIVATE     SEDS::XmlImporter
+target_link_libraries(SdlRegistrar
     PUBLIC      Conversion::Common
                 CommonProjectWarnings)
 
-add_format_target(SedsRegistrar)
-add_tidy_target(SedsRegistrar)
+add_format_target(SdlRegistrar)
+add_tidy_target(SdlRegistrar)
 
-add_library(Conversion::SedsRegistrar ALIAS SedsRegistrar)
+add_library(Conversion::SdlRegistrar ALIAS SdlRegistrar)

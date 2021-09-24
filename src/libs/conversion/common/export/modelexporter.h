@@ -19,8 +19,8 @@
 
 #pragma once
 
-#include "model.h"
-#include "options.h"
+#include "../model.h"
+#include "../options.h"
 
 #include <memory>
 

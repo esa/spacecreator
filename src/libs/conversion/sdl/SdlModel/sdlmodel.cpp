@@ -19,7 +19,7 @@
 
 #include "sdlmodel.h"
 
-namespace Sdl {
+namespace conversion::Sdl {
 
 SdlModel::SdlModel() {}
 
@@ -33,4 +33,4 @@ const SdlModel::Data &SdlModel::data() const
     return m_data;
 }
 
-} // namespace Sdl
+} // namespace conversion::Sdl

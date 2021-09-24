@@ -20,7 +20,8 @@
 #pragma once
 
 #include "../SdlModel/sdlmodel.h"
-#include "export/modelexporter.h"
+
+#include <conversion/common/export/modelexporter.h>
 
 class QSaveFile;
 

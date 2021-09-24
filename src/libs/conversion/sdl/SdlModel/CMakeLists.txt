@@ -3,9 +3,7 @@ project(SdlModel VERSION 1.0.0 LANGUAGES CXX)
 
 add_library(SdlModel STATIC)
 
-set(SOURCES sdlmodel.cpp
-            sdlmodel/ast.cpp
-            sdlmodel/system.cpp)
+set(SOURCES sdlmodel.cpp)
 set(INCLUDES sdlmodel.h)
 
 target_sources(SdlModel
