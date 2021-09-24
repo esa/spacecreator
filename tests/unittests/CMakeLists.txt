@@ -8,6 +8,7 @@ add_subdirectory(libiveditor)
 add_subdirectory(libmsceditor)
 add_subdirectory(msccore)
 add_subdirectory(seds)
+add_subdirectory(sdl)
 add_subdirectory(shared)
 add_subdirectory(spacecreatorsystem)
 
