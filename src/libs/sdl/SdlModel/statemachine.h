@@ -19,15 +19,13 @@
 
 #pragma once
 
+#include "state.h"
+
 #include <QString>
 #include <vector>
 
 namespace sdl {
 
-class State
-{
-    // TODO
-};
 class Transition
 {
     // TODO
