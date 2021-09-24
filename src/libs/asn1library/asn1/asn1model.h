@@ -33,7 +33,7 @@ class Asn1Model final : public conversion::Model
 {
 public:
     /** @brief  Model data type */
-    using Data = std::vector<File>;
+    using Data = std::vector<std::unique_ptr<File>>;
 
 public:
     /**

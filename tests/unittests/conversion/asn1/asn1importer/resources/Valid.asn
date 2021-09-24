@@ -1,0 +1,39 @@
+MyShopPurchaseOrders DEFINITIONS AUTOMATIC TAGS ::= BEGIN
+
+PurchaseOrder ::= SEQUENCE {
+    customer    CustomerInfo,
+    items       ListOfItems
+}
+
+CustomerInfo ::= SEQUENCE {
+    companyName     IA5String (SIZE (3..50)),
+    billingAddress  Address,
+    contactPhone    NumericString (SIZE (7..12))
+}
+
+Address::= SEQUENCE {
+    street  IA5String (SIZE (5 .. 50)) OPTIONAL,
+    city    IA5String (SIZE (2..30)),
+    state   IA5String (SIZE(2) ^ FROM ("A".."Z")),
+    zipCode NumericString (SIZE(5 | 9))
+}
+
+ListOfItems ::= SEQUENCE (SIZE (1..100)) OF Item
+
+ItemColor ::= ENUMERATED {
+    black,
+    blue,
+    brown
+}
+
+Item ::= SEQUENCE {
+    itemCode        INTEGER (1..99999),
+    color           ItemColor,
+    power           INTEGER (110 | 220),
+    deliveryTime    INTEGER (8..12 | 14..19),
+    quantity        INTEGER (1..1000),
+    unitPrice       REAL (1.00 .. 9999.00),
+    isTaxable       BOOLEAN
+}
+
+END

@@ -77,7 +77,7 @@ private:
      *
      * @return  Result ASN.1 file
      */
-    auto translatePackage(const seds::model::Package &package) const -> Asn1Acn::File;
+    auto translatePackage(const seds::model::Package &package) const -> std::unique_ptr<Asn1Acn::File>;
 
     /**
      * @brief   Translate SEDS data types

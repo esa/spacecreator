@@ -20,19 +20,32 @@
 #pragma once
 
 #include <QString>
+#include <conversion/common/import/modelimporter.h>
+#include <memory>
 
-namespace conversion::asn1 {
+namespace conversion {
+class Model;
+class Options;
+} // namespace conversion
+
+namespace conversion::asn1::importer {
 
 /**
- * @brief   Possible options for ASN.1/ACN conversion
+ * @brief   Importer that reads ASN.1 files
  */
-class Asn1Options
+class Asn1Importer final : public conversion::importer::ModelImporter
 {
 public:
-    /** @brief Prefix to add at the beginning of the filepath */
-    inline static const QString asn1FilepathPrefix = "Asn1_Export_FilepathPrefix";
-    /** @brief Prefix to add at the beginning of the filepath */
-    inline static const QString acnFilepathPrefix = "Acn_Export_FilepathPrefix";
+    /**
+     * @brief   Reads given ASN.1 file and produces ASN.1 model
+     *
+     * @param   options     List of options
+     *
+     * @throws  conversion::importer::ImportException
+     *
+     * @return  Imported ASN.1 model
+     */
+    virtual auto importModel(const conversion::Options &options) const -> std::unique_ptr<conversion::Model> override;
 };
 
-} // namespace conversion::asn1
+} // namespace conversion::asn1::importer

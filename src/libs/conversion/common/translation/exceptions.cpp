@@ -46,7 +46,7 @@ UndeclaredInterfaceException::UndeclaredInterfaceException(const QString &interf
 MissingGenericTypeMappingException::MissingGenericTypeMappingException(
         const QString &genericTypeName, const QString &interfaceName)
     : TranslationException(
-              QString("Generic type '%1' wasn't mapped in the '%2' interface").arg(genericTypeName).arg(interfaceName))
+            QString("Generic type '%1' wasn't mapped in the '%2' interface").arg(genericTypeName).arg(interfaceName))
 {
 }
 
@@ -57,7 +57,7 @@ UnhandledValueException::UnhandledValueException(const QString &enumName)
 
 UnsupportedValueException::UnsupportedValueException(const QString &enumName, const QString &valueTypeName)
     : TranslationException(
-              QString("Translator encountered unsupported value %1 in %2").arg(valueTypeName).arg(enumName))
+            QString("Translator encountered unsupported value %1 in %2").arg(valueTypeName).arg(enumName))
 {
 }
 

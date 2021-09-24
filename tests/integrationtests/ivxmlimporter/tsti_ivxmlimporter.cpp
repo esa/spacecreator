@@ -52,7 +52,9 @@ void tsti_IvXmlImporter::testValid()
 
     try {
         const auto model = ivImporter.importModel(options);
+        QVERIFY(model);
         const auto *ivModel = dynamic_cast<IVModel *>(model.get());
+        QVERIFY(ivModel);
 
         QCOMPARE(ivModel->objects().size(), 8);
 

@@ -447,7 +447,7 @@ std::unique_ptr<SedsModel> tst_SedsToAsn1Translator::createString()
 const Types::Type *tst_SedsToAsn1Translator::getType(const Asn1Model *asn1Model, std::size_t index)
 {
     const auto &asn1Files = asn1Model->data();
-    const auto &definitions = asn1Files.at(0).definitionsList();
+    const auto &definitions = asn1Files.at(0)->definitionsList();
     const auto &typeAssignments = definitions.at(0)->types();
     const auto *type = typeAssignments.at(index)->type();
 

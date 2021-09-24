@@ -21,6 +21,7 @@
 
 #include <conversion/common/modeltype.h>
 #include <conversion/registry/registry.h>
+#include <set>
 
 namespace sedsconverter {
 
@@ -59,8 +60,8 @@ public:
      * @param   targetModelType         Target model type
      * @param   auxiliaryModelsTypes    List of types that will be additionally exported
      */
-    auto convert(conversion::ModelType targetModelType, const std::set<conversion::ModelType> &auxiliaryModelsTypes,
-            conversion::Options options) const -> void;
+    auto convert(std::set<conversion::ModelType> sourceModelTypes, conversion::ModelType targetModelType,
+            const std::set<conversion::ModelType> &auxiliaryModelsTypes, conversion::Options options) const -> void;
 
 private:
     /**

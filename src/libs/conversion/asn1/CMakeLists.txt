@@ -1,3 +1,4 @@
 add_subdirectory(Asn1Exporter)
+add_subdirectory(Asn1Importer)
 add_subdirectory(Asn1Registrar)
 add_subdirectory(SedsToAsn1Translator)

@@ -32,8 +32,8 @@
 #include <asn1library/asn1/asn1model.h>
 #include <asn1library/asn1/file.h>
 #include <asn1library/asn1/singlevalue.h>
-#include <conversion/asn1/Asn1Exporter/Asn1Options/options.h>
 #include <conversion/asn1/Asn1Exporter/exporter.h>
+#include <conversion/asn1/Asn1Options/options.h>
 #include <conversion/common/export/exceptions.h>
 #include <conversion/common/options.h>
 #include <memory>
@@ -113,15 +113,19 @@ QString getFileContents(const QString &filename)
 
 void tsti_Asn1Exporter::testValid()
 {
-    Asn1Acn::File file1("file1");
+    auto file1 = std::make_unique<Asn1Acn::File>("file1");
     auto defs1 = CreateExampleDefs();
-    file1.add(std::make_unique<Asn1Acn::Definitions>(defs1));
+    file1->add(std::make_unique<Asn1Acn::Definitions>(defs1));
 
-    Asn1Acn::File file2("file2");
+    auto file2 = std::make_unique<Asn1Acn::File>("file2");
     auto defs2 = CreateAnotherExampleDefs();
-    file2.add(std::make_unique<Asn1Acn::Definitions>(defs2));
+    file2->add(std::make_unique<Asn1Acn::Definitions>(defs2));
 
-    Asn1Model model(std::vector<Asn1Acn::File>({ file1, file2 }));
+    std::vector<std::unique_ptr<Asn1Acn::File>> files;
+    files.push_back(std::move(file1));
+    files.push_back(std::move(file2));
+
+    Asn1Model model(std::move(files));
 
     Options options;
     options.add(Asn1Options::asn1FilepathPrefix, "Asn1_");

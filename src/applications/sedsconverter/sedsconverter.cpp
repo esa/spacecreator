@@ -44,11 +44,11 @@ SedsConverter::SedsConverter()
     initializeRegistry();
 }
 
-void SedsConverter::convert(
-        ModelType targetModelType, const std::set<ModelType> &auxiliaryModelsTypes, Options options) const
+void SedsConverter::convert(std::set<conversion::ModelType> sourceModelTypes, ModelType targetModelType,
+        const std::set<ModelType> &auxiliaryModelsTypes, Options options) const
 {
     Converter converter(m_registry, std::move(options));
-    converter.convert({ ModelType::Seds }, targetModelType, auxiliaryModelsTypes);
+    converter.convert(sourceModelTypes, targetModelType, auxiliaryModelsTypes);
 }
 
 void SedsConverter::initializeRegistry()

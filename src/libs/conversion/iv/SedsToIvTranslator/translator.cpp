@@ -83,8 +83,8 @@ std::vector<std::unique_ptr<Model>> SedsToIvTranslator::translateSedsModel(
 
     auto ivModel = std::make_unique<IVModel>(config);
 
-    std::vector<Asn1Acn::File> asn1Files;
-    Asn1Acn::File asn1File("interfaceview.asn");
+    std::vector<std::unique_ptr<Asn1Acn::File>> asn1Files;
+    auto asn1File = std::make_unique<Asn1Acn::File>("interfaceview.asn");
     auto asn1Definitions =
             std::make_unique<Asn1Acn::Definitions>(QStringLiteral("interfaceview"), Asn1Acn::SourceLocation());
 
@@ -101,7 +101,7 @@ std::vector<std::unique_ptr<Model>> SedsToIvTranslator::translateSedsModel(
         throw TranslationException("Unhandled SEDS model data type");
     }
 
-    asn1File.add(std::move(asn1Definitions));
+    asn1File->add(std::move(asn1Definitions));
     asn1Files.push_back(std::move(asn1File));
     auto asn1Model = std::make_unique<Asn1Acn::Asn1Model>(std::move(asn1Files));
 

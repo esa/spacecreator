@@ -20,6 +20,7 @@
 #include "registrar.h"
 
 #include <conversion/asn1/Asn1Exporter/exporter.h>
+#include <conversion/asn1/Asn1Importer/importer.h>
 #include <conversion/asn1/SedsToAsn1Translator/translator.h>
 #include <conversion/common/modeltype.h>
 #include <memory>
@@ -28,8 +29,14 @@ namespace conversion::asn1 {
 
 bool Asn1Registrar::registerCapabilities(conversion::Registry &registry)
 {
+    auto asn1Importer = std::make_unique<importer::Asn1Importer>();
+    auto result = registry.registerImporter(ModelType::Asn1, std::move(asn1Importer));
+    if (!result) {
+        return false;
+    }
+
     auto sedsToAsn1Translator = std::make_unique<translator::SedsToAsn1Translator>();
-    auto result = registry.registerTranslator({ ModelType::Seds }, ModelType::Asn1, std::move(sedsToAsn1Translator));
+    result = registry.registerTranslator({ ModelType::Seds }, ModelType::Asn1, std::move(sedsToAsn1Translator));
     if (!result) {
         return false;
     }
