@@ -4,6 +4,7 @@ project(SdlModel VERSION 1.0.0 LANGUAGES CXX)
 add_library(SdlModel STATIC)
 
 set(SOURCES sdlmodel.cpp
+            statemachine.cpp
             process.cpp)
 set(INCLUDES sdlmodel.h)
 

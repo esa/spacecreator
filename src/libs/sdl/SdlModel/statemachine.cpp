@@ -17,43 +17,24 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/lgpl-2.1.html>.
  */
 
-#pragma once
-
 #include "statemachine.h"
-
-#include <QString>
-#include <memory>
-#include <vector>
 
 namespace sdl {
 
+StateMachine::StateMachine(const std::vector<State> &states, const std::vector<Transition> &transitions)
+    : m_states(states)
+    , m_transitions(transitions)
 {
-};
+}
 
-class VariableDeclaration
+auto StateMachine::states() const -> const std::vector<State> &
 {
-};
+    return m_states;
+}
 
-class Procedure
+auto StateMachine::transitions() const -> const std::vector<Transition> &
 {
-};
+    return m_transitions;
+}
 
-class Process
-{
-public:
-    Process(const Process &process);
-    Process(const QString &name, const StateMachine &stateMachine, const std::vector<VariableDeclaration> &variables,
-            const std::vector<Procedure> &procedures);
-
-    auto name() const -> QString;
-    auto stateMachine() const -> const StateMachine &;
-    auto variables() const -> const std::vector<VariableDeclaration> &;
-    auto procedures() const -> const std::vector<Procedure> &;
-
-private:
-    QString m_name = "";
-    StateMachine m_stateMachine;
-    std::vector<VariableDeclaration> m_variables;
-    std::vector<Procedure> m_procedures;
-};
 } // namespace sdl
