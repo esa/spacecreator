@@ -35,7 +35,7 @@ IncorrectModelException::IncorrectModelException(ModelType expectedModelType, Mo
 
 MissingOutputFilenameException::MissingOutputFilenameException(ModelType modelType)
     : ExportException(
-            QString("Missing name of the output filename while exporting %1 model").arg(modelTypeToString(modelType)))
+              QString("Missing name of the output filename while exporting %1 model").arg(modelTypeToString(modelType)))
 {
 }
 
