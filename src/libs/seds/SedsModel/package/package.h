@@ -77,7 +77,7 @@ public:
      *
      * @return  ASN.1 name string
      */
-    auto asn1NameStr() const -> const QString &;
+    auto asn1NameStr() const -> QString;
 
 private:
     QualifiedName m_qualifiedName;

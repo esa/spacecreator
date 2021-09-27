@@ -66,17 +66,11 @@ const QString &Package::nameStr() const
     return m_qualifiedName.name().value();
 }
 
-const QString &Package::asn1NameStr() const
+QString Package::asn1NameStr() const
 {
-    static QString mangledName;
-
-    if (mangledName.isEmpty()) {
-        mangledName = m_qualifiedName.name().value();
-        mangledName.remove('_');
-        mangledName = mangledName.toUpper();
-    }
-
-    return mangledName;
+    auto mangledName = m_qualifiedName.name().value();
+    mangledName.remove('_');
+    return mangledName.toUpper();
 }
 
 } // namespace seds::model
