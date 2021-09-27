@@ -59,7 +59,7 @@ void SdlExporter::exportSdlModel(const SdlModel *const model, const Options &opt
     sdlvis.visit(model);
 
     const auto pathPrefix = options.value(SdlOptions::sdlFilepathPrefix).value_or("");
-    const auto filePath = makeFilePath(pathPrefix, model->name(), "sdl");
+    const auto filePath = makeFilePath(pathPrefix, model->name(), "pr");
 
     QSaveFile outputFile(filePath);
     writeAndCommit(outputFile, serializedModelData.toStdString());
