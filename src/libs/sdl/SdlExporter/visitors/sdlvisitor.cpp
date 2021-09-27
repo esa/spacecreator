@@ -38,11 +38,18 @@ void SdlVisitor::visit(const SdlModel *model)
     m_stream << "/* CIF PROCESS (" << 250 << ", " << 150 << "), (" << 150 << ", " << 75 << ") */\n";
     m_stream << "process " << process.name() << "\n";
 
-    // loop over process variables and export them
+    // TODO: loop over process variables and export them
 
-    // loop over procedures and export them
+    // TODO: loop over procedures and export them
 
-    // loop over provess states and export them
+    // TODO: loop over process states and export them
+    for (const auto &state : process.stateMachine().states()) {
+        // write some dummy CIF
+        m_stream << "    /* CIF state (" << 250 << ", " << 150 << "), (" << 150 << ", " << 75 << ") */\n";
+        m_stream << "    state " << state.name() << ";\n";
+        // TODO: loop over inputs and export them
+        m_stream << "    endstate;\n";
+    }
 
     m_stream << "endprocess " << process.name() << ";";
 }
