@@ -108,7 +108,6 @@ private:
      *
      * @param   command                 SEDS interface command
      * @param   requestedArgumentMode   Which arguments should be used
-     * @param   asn1TypeName            How new ASN.1 type should be named
      */
     auto buildAsn1SequenceType(const seds::model::InterfaceCommand &command,
             seds::model::CommandArgumentMode requestedArgumentMode) const -> QString;
