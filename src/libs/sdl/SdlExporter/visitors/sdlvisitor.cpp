@@ -50,7 +50,7 @@ void SdlVisitor::visit(const SdlModel *model)
         // TODO: loop over inputs and export them
         for (const auto &input : state.inputs()) {
             m_stream << "        /* CIF input (" << 250 << "," << 150 << "), (" << 150 << ", " << 75 << ") */\n";
-            m_stream << "        input " << input.name() << "(" /* parametres of the input */ << ")\n";
+            m_stream << "        input " << input.name() << "(" /* parametres of the input */ << ");\n";
         }
         m_stream << "    endstate;\n";
     }
