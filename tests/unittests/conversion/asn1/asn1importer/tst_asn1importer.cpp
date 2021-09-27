@@ -20,6 +20,8 @@
 #include <QObject>
 #include <QtTest>
 #include <asn1library/asn1/asn1model.h>
+#include <asn1library/asn1/types/enumerated.h>
+#include <asn1library/asn1/types/sequence.h>
 #include <conversion/asn1/Asn1Importer/importer.h>
 #include <conversion/asn1/Asn1Options/options.h>
 #include <conversion/common/import/exceptions.h>
@@ -58,6 +60,25 @@ void tst_Asn1Importer::testValid()
 
         const auto &files = asn1Model->data();
         QCOMPARE(files.size(), 1);
+
+        const auto &definitionsList = files.at(0)->definitionsList();
+        QCOMPARE(definitionsList.size(), 1);
+
+        const auto &definitions = definitionsList.at(0);
+        const auto &types = definitions->types();
+        QCOMPARE(types.size(), 2);
+
+        const auto &sequenceTypeAssignment = types.at(0);
+        QVERIFY(sequenceTypeAssignment);
+        const auto *sequenceType = sequenceTypeAssignment->type();
+        QVERIFY(sequenceType);
+        QVERIFY(dynamic_cast<const Asn1Acn::Types::Sequence *>(sequenceType));
+
+        const auto &enumTypeAssignment = types.at(1);
+        QVERIFY(enumTypeAssignment);
+        const auto *enumType = enumTypeAssignment->type();
+        QVERIFY(enumType);
+        QVERIFY(dynamic_cast<const Asn1Acn::Types::Enumerated *>(enumType));
     } catch (const std::exception &ex) {
         QFAIL(ex.what());
     }

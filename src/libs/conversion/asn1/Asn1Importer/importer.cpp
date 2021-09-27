@@ -47,7 +47,8 @@ std::unique_ptr<conversion::Model> Asn1Importer::importModel(const Options &opti
     Asn1Reader asn1Reader;
 
     QStringList errorMessages;
-    QObject::connect(&asn1Reader, &Asn1Reader::parseError, [&errorMessages](const QString &error) { errorMessages << error; });
+    QObject::connect(
+            &asn1Reader, &Asn1Reader::parseError, [&errorMessages](const QString &error) { errorMessages << error; });
 
     std::unique_ptr<Asn1Acn::File> result;
 
