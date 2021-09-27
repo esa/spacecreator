@@ -9,6 +9,7 @@ set(SOURCES sdlmodel.cpp
             signal.cpp
             input.cpp
             variabledeclaration.cpp
+            variablereference.cpp
             process.cpp)
 set(INCLUDES sdlmodel.h)
 
