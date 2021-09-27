@@ -17,25 +17,13 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/lgpl-2.1.html>.
  */
 
-#pragma once
-
 #include "input.h"
-
-#include <QString>
-#include <vector>
 
 namespace sdl {
 
-class State
+Input::Input(const QString &name)
+    : Signal(name)
 {
-public:
-    State(const QString &name, const std::vector<Input> &inputs = std::vector<Input>());
-    auto name() const -> const QString &;
-    auto inputs() const -> const std::vector<Input> &;
-
-private:
-    QString m_name = "";
-    std::vector<Input> m_inputs;
-};
+}
 
 } // namespace sdl

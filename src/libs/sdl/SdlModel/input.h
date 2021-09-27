@@ -19,23 +19,18 @@
 
 #pragma once
 
-#include "input.h"
+#include "signal.h"
 
 #include <QString>
 #include <vector>
 
 namespace sdl {
 
-class State
+class Input : public Signal
 {
 public:
-    State(const QString &name, const std::vector<Input> &inputs = std::vector<Input>());
-    auto name() const -> const QString &;
-    auto inputs() const -> const std::vector<Input> &;
+    Input(const QString &name);
 
-private:
-    QString m_name = "";
-    std::vector<Input> m_inputs;
+    // TODO: list of input parameters (variable declarations)
 };
-
 } // namespace sdl
