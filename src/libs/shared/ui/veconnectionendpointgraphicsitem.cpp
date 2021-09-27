@@ -96,7 +96,11 @@ void VEConnectionEndPointGraphicsItem::updateFromEntity()
         instantLayoutUpdate();
     else
         setTargetItem(qobject_cast<VERectGraphicsItem *>(parentObject()), coordinates);
+
     adjustItem();
+    if (coordinates != scenePos()) {
+        mergeGeometry();
+    }
 }
 
 QList<QPair<VEObject *, QVector<QPointF>>>
@@ -123,17 +127,21 @@ void VEConnectionEndPointGraphicsItem::adjustItem()
     QList<QRectF> siblingsRects;
     const QList<QGraphicsItem *> siblingItems = parentItem()->childItems();
     std::for_each(siblingItems.cbegin(), siblingItems.cend(), [this, &siblingsRects](const QGraphicsItem *sibling) {
-        if (qobject_cast<const VEConnectionEndPointGraphicsItem *>(sibling->toGraphicsObject()) != nullptr
-                && sibling != this) {
-            QRectF itemRect = sibling->boundingRect();
+        if (sibling == this) {
+            return;
+        }
+        if (auto endPointObj = qobject_cast<const VEConnectionEndPointGraphicsItem *>(sibling->toGraphicsObject())) {
+            QRectF itemRect = endPointObj->ifaceShape().boundingRect();
             itemRect.adjust(-kSiblingMinDistance / 2, -kSiblingMinDistance / 2, kSiblingMinDistance / 2,
                     kSiblingMinDistance / 2);
-            itemRect = sibling->mapRectToParent(itemRect);
+            itemRect = parentItem()->mapRectFromScene(itemRect);
             siblingsRects.append(itemRect);
         }
     });
 
-    QRectF itemRect = boundingRect();
+    QRectF itemRect = mapRectFromScene(ifaceShape().boundingRect());
+    itemRect.adjust(
+            -kSiblingMinDistance / 2, -kSiblingMinDistance / 2, kSiblingMinDistance / 2, kSiblingMinDistance / 2);
     const QPointF initialOffset = itemRect.topLeft();
     itemRect = mapRectToParent(itemRect);
     const QRectF parentRect = parentItem()->boundingRect();
@@ -159,12 +167,12 @@ qreal VEConnectionEndPointGraphicsItem::minSiblingDistance()
     return kSiblingMinDistance;
 }
 
-void VEConnectionEndPointGraphicsItem::layout()
+bool VEConnectionEndPointGraphicsItem::layout()
 {
     const QPointF pos = shared::graphicsviewutils::pos(entity()->coordinates());
     if (pos.isNull()) {
         adjustItem();
-        return;
+        return true;
     }
 
     const QRectF parentRect = targetItem()->sceneBoundingRect();
@@ -172,6 +180,7 @@ void VEConnectionEndPointGraphicsItem::layout()
     const QPointF stickyPos = shared::graphicsviewutils::getSidePosition(parentRect, pos, side);
     updateInternalItems(side);
     setPos(targetItem()->mapFromScene(stickyPos));
+    return pos != stickyPos;
 }
 
 QPainterPath VEConnectionEndPointGraphicsItem::ifaceShape() const

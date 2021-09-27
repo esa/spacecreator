@@ -99,7 +99,7 @@ void IVConnectionGroupGraphicsItem::updateTextPosition()
     normal.setLength(height / 2);
     textRect.moveCenter(normal.p2());
 
-    const QPointF topLeft = mapFromScene(textRect.topLeft()).toPoint();
+    const QPointF topLeft = mapFromScene(textRect.topLeft());
     m_textItem->setPos(topLeft);
 }
 

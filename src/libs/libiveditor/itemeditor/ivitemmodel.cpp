@@ -47,6 +47,8 @@
 #include <QUndoStack>
 #include <QtDebug>
 
+#define IV_ITEM_DUMP
+
 #ifdef IV_ITEM_DUMP
 static inline void dumpItem(QObject *obj, bool strict = false)
 {

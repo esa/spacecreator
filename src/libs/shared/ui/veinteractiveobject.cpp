@@ -67,27 +67,25 @@ void VEInteractiveObject::onSelectionChanged(bool isSelected)
 
 void VEInteractiveObject::mergeGeometry()
 {
-    QTimer::singleShot(0, this, [this]() {
-        if (!m_commandsStack) {
-            qWarning() << Q_FUNC_INFO << "No command stack set in shared::ui::VEInteractiveObject";
+    if (!m_commandsStack) {
+        qWarning() << Q_FUNC_INFO << "No command stack set in shared::ui::VEInteractiveObject";
+        return;
+    }
+
+    for (auto child : childItems()) {
+        if (auto io = qobject_cast<VEInteractiveObject *>(child->toGraphicsObject())) {
+            io->mergeGeometry();
+        }
+    }
+    const QList<QPair<shared::VEObject *, QVector<QPointF>>> geometryData = prepareChangeCoordinatesCommandParams();
+    const QUndoCommand *cmd = m_commandsStack->command(m_commandsStack->index() - 1);
+    if (auto prevGeometryBasedCmd = dynamic_cast<const cmd::CmdEntityGeometryChange *>(cmd)) {
+        auto mutCmd = const_cast<cmd::CmdEntityGeometryChange *>(prevGeometryBasedCmd);
+        if (mutCmd->mergeGeometryData(geometryData)) {
             return;
         }
-
-        for (auto child : childItems()) {
-            if (auto io = qobject_cast<VEInteractiveObject *>(child->toGraphicsObject())) {
-                io->mergeGeometry();
-            }
-        }
-        const QList<QPair<shared::VEObject *, QVector<QPointF>>> geometryData = prepareChangeCoordinatesCommandParams();
-        const QUndoCommand *cmd = m_commandsStack->command(m_commandsStack->index() - 1);
-        if (auto prevGeometryBasedCmd = dynamic_cast<const cmd::CmdEntityGeometryChange *>(cmd)) {
-            auto mutCmd = const_cast<cmd::CmdEntityGeometryChange *>(prevGeometryBasedCmd);
-            if (mutCmd->mergeGeometryData(geometryData)) {
-                return;
-            }
-        }
-        m_commandsStack->push(new cmd::CmdEntityAutoLayout(geometryData));
-    });
+    }
+    m_commandsStack->push(new cmd::CmdEntityAutoLayout(geometryData));
 }
 
 QFont VEInteractiveObject::font() const

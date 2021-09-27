@@ -127,8 +127,8 @@ void DVDeviceGraphicsItem::rebuildLayout()
     }
 
     if (entity()) {
-        if (shared::graphicsviewutils::pos(entity()->coordinates()).isNull()) {
-            layout();
+        const QPointF entityPos = shared::graphicsviewutils::pos(entity()->coordinates());
+        if (entityPos.isNull() && layout()) {
             mergeGeometry();
             return;
         }

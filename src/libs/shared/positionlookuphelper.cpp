@@ -16,20 +16,22 @@
 */
 
 #include "positionlookuphelper.h"
+
 #include "graphicsviewutils.h"
+
 #include <QtMath>
 
 namespace gu = shared::graphicsviewutils;
 
-static const QMarginsF kMargins { gu::kInterfaceLayoutOffset, gu::kInterfaceLayoutOffset,
-    gu::kInterfaceLayoutOffset, gu::kInterfaceLayoutOffset };
+static const QMarginsF kMargins { gu::kInterfaceLayoutOffset, gu::kInterfaceLayoutOffset, gu::kInterfaceLayoutOffset,
+    gu::kInterfaceLayoutOffset };
 
 namespace shared {
 
 struct PositionLookupHelper::PositionLookupPrivate {
-    PositionLookupPrivate(const QList<QPair<Qt::Alignment, QPainterPath> > &sidePaths,
-            const QRectF &parentRect, const QList<QRectF> &siblingsRects, const QRectF &itemRect,
-            const QPointF &originPoint, const gu::LookupDirection direction)
+    PositionLookupPrivate(const QList<QPair<Qt::Alignment, QPainterPath>> &sidePaths, const QRectF &parentRect,
+            const QList<QRectF> &siblingsRects, const QRectF &itemRect, const QPointF &originPoint,
+            const gu::LookupDirection direction)
         : m_sidePaths(sidePaths)
         , m_siblingsRects(siblingsRects)
         , m_parentRect(parentRect)
@@ -38,7 +40,8 @@ struct PositionLookupHelper::PositionLookupPrivate {
         , m_cw({ this, itemRect, m_initialSideIdx, gu::LookupDirection::Clockwise })
         , m_ccw({ this, itemRect, m_initialSideIdx, gu::LookupDirection::CounterClockwise })
         , m_mixed({ this, itemRect, m_initialSideIdx, gu::LookupDirection::Mixed })
-    {}
+    {
+    }
     const QList<QPair<Qt::Alignment, QPainterPath>> m_sidePaths;
     const QList<QRectF> m_siblingsRects;
     const QRectF m_parentRect;
@@ -56,24 +59,25 @@ struct PositionLookupHelper::PositionLookupPrivate {
     int indexFromSide(Qt::Alignment side)
     {
         const auto it = std::find_if(m_sidePaths.cbegin(), m_sidePaths.cend(),
-                [side](const QPair<Qt::Alignment, QPainterPath> &p){
-                    return p.first == side;
-                });
+                [side](const QPair<Qt::Alignment, QPainterPath> &p) { return p.first == side; });
         return it == m_sidePaths.cend() ? -1 : std::distance(m_sidePaths.cbegin(), it);
     }
 
     struct DirectionHelper {
-        DirectionHelper(PositionLookupHelper::PositionLookupPrivate *q, const QRectF &itemRect,
-                        int sideIdx, gu::LookupDirection direction)
-            : q(q), itemRect(itemRect), sideIdx(sideIdx), direction(direction)
+        DirectionHelper(PositionLookupHelper::PositionLookupPrivate *q, const QRectF &itemRect, int sideIdx,
+                gu::LookupDirection direction)
+            : q(q)
+            , itemRect(itemRect)
+            , sideIdx(sideIdx)
+            , direction(direction)
         {
             originPoint = shapeForSide().boundingRect().topLeft();
-            if (!gu::isCollided(q->m_siblingsRects, itemRect, &m_intersectedRect) && mappedOriginPoint().isNull()) {
+            if (!gu::isCollided(q->m_siblingsRects, itemRect, &intersectedRect) && mappedOriginPoint().isNull()) {
                 this->itemRect = gu::alignRectToSide(q->m_parentRect, itemRect, side(), originPoint, kMargins);
             }
         }
         PositionLookupHelper::PositionLookupPrivate *q;
-        QRectF m_intersectedRect;
+        QRectF intersectedRect;
         QRectF itemRect;
         QPointF originPoint;
         int sideIdx;
@@ -92,29 +96,20 @@ struct PositionLookupHelper::PositionLookupPrivate {
             return false;
         }
 
-        Qt::Alignment side() const
-        {
-            return q->sideFromIndex(sideIdx);
-        }
+        Qt::Alignment side() const { return q->sideFromIndex(sideIdx); }
 
-        QPointF mappedOriginPoint() const
-        {
-            return itemRect.topLeft() - originPoint;
-        }
+        QPointF mappedOriginPoint() const { return itemRect.topLeft() - originPoint; }
 
         QPainterPath shapeForSide() const
         {
             auto it = std::find_if(q->m_sidePaths.cbegin(), q->m_sidePaths.cend(),
-                    [s = side()](const QPair<Qt::Alignment, QPainterPath> &p){
-                        return p.first == s;
-                    });
+                    [s = side()](const QPair<Qt::Alignment, QPainterPath> &p) { return p.first == s; });
             return it == q->m_sidePaths.cend() ? QPainterPath() : it->second;
         }
 
         void nextSide()
         {
-            if (direction == gu::LookupDirection::Clockwise
-                    || direction == gu::LookupDirection::Mixed) {
+            if (direction == gu::LookupDirection::Clockwise || direction == gu::LookupDirection::Mixed) {
                 ++sideIdx;
             } else if (direction == gu::LookupDirection::CounterClockwise) {
                 --sideIdx;
@@ -141,15 +136,9 @@ struct PositionLookupHelper::PositionLookupPrivate {
             itemRect = gu::alignRectToSide(q->m_parentRect, itemRect, side(), originPoint, kMargins);
         }
 
-        bool isBounded() const
-        {
-            return q->m_parentRect.contains(mappedOriginPoint());
-        }
+        bool isBounded() const { return q->m_parentRect.contains(mappedOriginPoint()); }
 
-        bool isReady() const
-        {
-            return isBounded() && !gu::isCollided(q->m_siblingsRects, itemRect);
-        }
+        bool isReady() const { return isBounded() && !gu::isCollided(q->m_siblingsRects, itemRect); }
 
         bool hasNext() const
         {
@@ -161,12 +150,13 @@ struct PositionLookupHelper::PositionLookupPrivate {
 
         bool nextRect()
         {
-            if (gu::isCollided(q->m_siblingsRects, itemRect, &m_intersectedRect)) {
+            if (gu::isCollided(q->m_siblingsRects, itemRect, &intersectedRect)) {
                 auto dir = direction == gu::LookupDirection::Mixed
-                        ? ((side() == Qt::AlignLeft || side() == Qt::AlignBottom) ? gu::LookupDirection::CounterClockwise
-                                                                                  : gu::LookupDirection::Clockwise)
+                        ? ((side() == Qt::AlignLeft || side() == Qt::AlignBottom)
+                                        ? gu::LookupDirection::CounterClockwise
+                                        : gu::LookupDirection::Clockwise)
                         : direction;
-                itemRect = gu::adjustedRect(itemRect, m_intersectedRect, side(), dir);
+                itemRect = gu::adjustedRect(itemRect, intersectedRect, side(), dir);
                 return true;
             }
             return false;
@@ -180,33 +170,30 @@ struct PositionLookupHelper::PositionLookupPrivate {
     DirectionHelper *m_cache { nullptr };
 };
 
-
-
-PositionLookupHelper::PositionLookupHelper(const QList<QPair<Qt::Alignment, QPainterPath> > &sidePaths,
+PositionLookupHelper::PositionLookupHelper(const QList<QPair<Qt::Alignment, QPainterPath>> &sidePaths,
         const QRectF &parentRect, const QList<QRectF> &siblingsRects, const QRectF &itemRect,
         const QPointF &originPoint, const gu::LookupDirection direction)
     : d(new PositionLookupPrivate(sidePaths, parentRect, siblingsRects, itemRect, originPoint, direction))
 {
 }
 
-PositionLookupHelper::~PositionLookupHelper()
-{
-
-}
+PositionLookupHelper::~PositionLookupHelper() { }
 
 bool PositionLookupHelper::lookup()
 {
-    auto isValid = [this](PositionLookupPrivate::DirectionHelper *helper){
-        return (d->m_direction == helper->direction || (d->m_direction == gu::LookupDirection::Bidirectional
-                        && (helper->direction == gu::LookupDirection::Clockwise
-                            || helper->direction == gu::LookupDirection::CounterClockwise))) && helper->hasNext();
+    auto isValid = [this](PositionLookupPrivate::DirectionHelper *helper) {
+        return (d->m_direction == helper->direction
+                       || (d->m_direction == gu::LookupDirection::Bidirectional
+                               && (helper->direction == gu::LookupDirection::Clockwise
+                                       || helper->direction == gu::LookupDirection::CounterClockwise)))
+                && helper->hasNext();
     };
 
     const QVector<PositionLookupPrivate::DirectionHelper *> helpers { &d->m_cw, &d->m_ccw, &d->m_mixed };
     int count = helpers.size();
     while (count) {
         count = 0;
-        for (PositionLookupPrivate::DirectionHelper *helper: { &d->m_cw, &d->m_ccw, &d->m_mixed }) {
+        for (PositionLookupPrivate::DirectionHelper *helper : { &d->m_cw, &d->m_ccw, &d->m_mixed }) {
             if (isValid(helper)) {
                 count += 1;
                 if (helper->lookup()) {

@@ -181,7 +181,7 @@ void VEConnectionGraphicsItem::setPoints(const QVector<QPointF> &points)
     }
 
     if (!graphicsviewutils::comparePolygones(m_points, points)) {
-        m_points = shared::graphicsviewutils::round(points);
+        m_points = points;
         instantLayoutUpdate();
     }
 }
@@ -314,7 +314,7 @@ bool VEConnectionGraphicsItem::layout()
     const QVector<QPointF> oldPoints = m_points;
     m_points = generateConnectionPath(this);
     updateBoundingRect();
-    return oldPoints != m_points;
+    return !shared::graphicsviewutils::comparePolygones(oldPoints, m_points);
 }
 
 bool VEConnectionGraphicsItem::replaceInterface(

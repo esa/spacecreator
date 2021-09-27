@@ -54,7 +54,7 @@ public:
     QPainterPath shape() const override;
 
     void updateFromEntity() override;
-    void layout() override;
+    bool layout() override;
     int itemLevel(bool isSelected) const override;
     QString prepareTooltip() const override;
 

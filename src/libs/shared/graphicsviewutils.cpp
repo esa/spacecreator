@@ -393,7 +393,7 @@ QList<QPointF> sortedCorners(const QRectF &area, const QPointF &point1, const QP
     std::sort(rectPoints.begin(), rectPoints.end(), [=](const QPointF &p1, const QPointF &p2) {
         return distancePolygon({ point1, p1, point2 }) < distancePolygon({ point1, p2, point2 });
     });
-    return round(rectPoints);
+    return rectPoints;
 }
 
 /*!
@@ -474,20 +474,19 @@ QVector<qint32> coordinates(const QVector<QPointF> &points)
 QRectF adjustFromPoint(const QPointF &pos, const qreal &adjustment)
 {
     const QPointF adjustmentPoint { adjustment / 2, adjustment / 2 };
-    return QRectF { (pos - adjustmentPoint).toPoint(), (pos + adjustmentPoint).toPoint() };
+    return QRectF { pos - adjustmentPoint, pos + adjustmentPoint };
 }
 
 /*!
  * Returns a \a itemRect aligned inside of \a boundingRect but keeping the offset of \a originPointOffset
  */
 
-QRectF alignRectToSide(const QRectF &boundingRect, const QRectF &itemRect, Qt::Alignment side,
-        const QPointF &originPointOffset, const QMarginsF &margins)
+QRectF alignRectToSide(const QRectF &boundingRect, const QRectF &itemRect, Qt::Alignment side, const QPointF &originPointOffset, const QMarginsF &margins)
 {
     if (!boundingRect.isValid() || !itemRect.isValid())
         return {};
 
-    QRectF rect { itemRect.toRect() };
+    QRectF rect { itemRect };
     auto adjustVertically = [=](QRectF &rect) {
         rect.moveTop(qBound(boundingRect.top() + originPointOffset.y() + margins.top(), rect.top(),
                 boundingRect.bottom() + originPointOffset.y() - margins.bottom()));
@@ -517,7 +516,7 @@ QRectF alignRectToSide(const QRectF &boundingRect, const QRectF &itemRect, Qt::A
     default:
         return {};
     }
-    return rect.toRect();
+    return rect;
 }
 
 /*!
@@ -528,7 +527,7 @@ QRectF adjustedRect(const QRectF &itemRect, const QRectF &intersectedItemRect, c
         const LookupDirection direction)
 {
     const bool clockwise = direction == LookupDirection::Clockwise;
-    QRectF resultRect { itemRect.toRect() };
+    QRectF resultRect { itemRect };
     switch (side) {
     case Qt::AlignLeft:
         if (clockwise)
@@ -558,7 +557,7 @@ QRectF adjustedRect(const QRectF &itemRect, const QRectF &intersectedItemRect, c
         qWarning() << "Unhandled side:" << side;
         return {};
     }
-    return resultRect.toRect();
+    return resultRect;
 }
 
 /*!
@@ -586,16 +585,14 @@ bool isCollided(const QList<QRectF> &itemRects, const QRectF &itemRect, QRectF *
  */
 QList<QVector<QPointF>> generateSegments(const QPointF &startPoint, const QPointF &endPoint)
 {
-    QPointF startPt = startPoint.toPoint();
-    QPointF endPt = endPoint.toPoint();
-    if (startPt == endPt) {
+    if (startPoint == endPoint)
         return {};
-    }
 
-    if (qFuzzyCompare(startPt.x(), endPt.x()) || qFuzzyCompare(startPt.y(), endPt.y()))
-        return { { startPt, endPt } };
+    if (qFuzzyCompare(startPoint.x(), endPoint.x()) || qFuzzyCompare(startPoint.y(), endPoint.y()))
+        return { { startPoint, endPoint } };
 
-    return { { startPt, { startPt.x(), endPt.y() }, endPt }, { startPt, { endPt.x(), startPt.y() }, endPt } };
+    return { { startPoint, { startPoint.x(), endPoint.y() }, endPoint },
+        { startPoint, { endPoint.x(), startPoint.y() }, endPoint } };
 }
 
 /*!
@@ -641,7 +638,7 @@ QVector<QPointF> generateSegments(const QLineF &startDirection, const QLineF &en
 #endif
         connectionPoints.insert(connectionPoints.size() - 1, mid);
     }
-    return round(connectionPoints);
+    return connectionPoints;
 }
 
 static inline QLineF getDirection(const QRectF &sceneRect, const QPointF &point)
@@ -680,7 +677,7 @@ QLineF ifaceSegment(const QRectF &sceneRect, const QPointF &firstEndPoint, const
     if (sceneRect.contains(lastEndPoint))
         vector.setAngle(180 + vector.angle());
 
-    return vector.toLine();
+    return vector;
 }
 
 /*!
@@ -694,9 +691,8 @@ QVector<QPointF> path(const QList<QRectF> &existingRects, const QPointF &startPo
 {
     const QVector<QPointF> points { startPoint, endPoint };
     auto item = getNearestIntersectedRect(existingRects, points, IntersectionType::Multiple);
-    if (!item.isValid()) {
-        return round(points);
-    }
+    if (!item.isValid())
+        return points;
 
     const QList<QVector<QPointF>> possiblePaths = findSubPath(item, { startPoint }, { endPoint }, false);
     if (possiblePaths.isEmpty()) {
@@ -739,7 +735,7 @@ QVector<QPointF> path(const QList<QRectF> &existingRects, const QPointF &startPo
     if (shortestPath.isEmpty())
         return {};
 
-    return round(shortestPath);
+    return shortestPath;
 }
 
 /*!
@@ -783,7 +779,7 @@ QList<QVector<QPointF>> findSubPath(
                 QVector<QPointF> previousPoints(prevPoints);
                 previousPoints.removeLast();
                 previousPoints << polygon;
-                allPaths << round(previousPoints);
+                allPaths << previousPoints;
             }
         }
     }
@@ -863,13 +859,13 @@ QVector<QPointF> path(const QList<QRectF> &existingRects, const QLineF &startDir
                 return v1.size() < v2.size();
             });
 
-            return round(results.first());
+            return results.first();
         }
 
         if (paths.size() != deeper.size() || !std::equal(paths.constBegin(), paths.constEnd(), deeper.constBegin()))
             paths = deeper;
         else if (!deeper.isEmpty())
-            return round(deeper.front());
+            return deeper.front();
         else
             break;
     }
@@ -894,7 +890,7 @@ QVector<QPointF> createConnectionPath(const QList<QRectF> &existingRects, const 
 QVector<QPointF> simplifyPoints(const QVector<QPointF> &points)
 {
     if (points.size() <= 2)
-        return round(points);
+        return points;
 
     auto checkLines = [](const QLineF &line1, const QLineF &line2) -> bool {
         if (line1.length() < kMinSegmentLength) {
@@ -917,7 +913,7 @@ QVector<QPointF> simplifyPoints(const QVector<QPointF> &points)
         }
         ++idx;
     }
-    return round(simplifiedPoints);
+    return simplifiedPoints;
 }
 
 bool comparePolygones(const QVector<QPointF> &v1, const QVector<QPointF> &v2)
@@ -1112,32 +1108,6 @@ void drawText(QPainter *painter, const QRectF &rect, const QString &text, qreal 
         if (complete)
             break;
     }
-}
-
-/*!
-   Round all coordinates
- */
-QVector<QPointF> round(const QVector<QPointF> &points)
-{
-    QVector<QPointF> result;
-    result.reserve(points.size());
-    for (const QPointF &pt : points) {
-        result.push_back(QPointF(qRound(pt.x()), qRound(pt.y())));
-    }
-    return result;
-}
-
-/*!
-   Round all coordinates
- */
-QList<QPointF> round(const QList<QPointF> &points)
-{
-    QList<QPointF> result;
-    result.reserve(points.size());
-    for (const QPointF &pt : points) {
-        result.push_back(QPointF(qRound(pt.x()), qRound(pt.y())));
-    }
-    return result;
 }
 
 }

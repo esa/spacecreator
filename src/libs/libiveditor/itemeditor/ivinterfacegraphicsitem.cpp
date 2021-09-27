@@ -223,9 +223,7 @@ void IVInterfaceGraphicsItem::rebuildLayout()
     if (entity() && shared::graphicsviewutils::pos(entity()->coordinates()).isNull()) {
         if (auto origin = entity()->cloneOf()) {
             ifacePos = mapPositionFromOrigin(origin, ivm::meta::Props::Token::coordinates, parentRect, &side);
-            updateGeometry = true;
-        } else {
-            layout();
+        } else if (layout()) {
             mergeGeometry();
             return;
         }
@@ -233,10 +231,11 @@ void IVInterfaceGraphicsItem::rebuildLayout()
         side = shared::graphicsviewutils::getNearestSide(parentRect, ifacePos);
     }
     const QPointF stickyPos = shared::graphicsviewutils::getSidePosition(parentRect, ifacePos, side);
-    setPos(stickyPos);
     updateInternalItems(side);
-    if (updateGeometry)
+    if (stickyPos != ifacePos) {
+        setPos(stickyPos);
         mergeGeometry();
+    }
 }
 
 QPainterPath IVInterfaceGraphicsItem::shape() const
@@ -259,7 +258,7 @@ void IVInterfaceGraphicsItem::onSelectionChanged(bool isSelected)
     m_iface->setBrush(isSelected ? kSelectedBackgroundColor : h.brush());
 }
 
-void IVInterfaceGraphicsItem::layout()
+bool IVInterfaceGraphicsItem::layout()
 {
     static const QList<ivm::meta::Props::Token> types { ivm::meta::Props::Token::coordinates,
         ivm::meta::Props::Token::InnerCoordinates, ivm::meta::Props::Token::RootCoordinates };
@@ -279,14 +278,15 @@ void IVInterfaceGraphicsItem::layout()
         adjustItem();
         /// NOTE: iface items without connections are put close to top left corner
         /// because of null pos
-        return;
+        return true;
     }
 
     Qt::Alignment side = Qt::AlignCenter;
     const QRectF sceneParentFnRect = targetItem()->sceneBoundingRect();
-    pos = mapPositionFromOrigin(entity(), token, sceneParentFnRect, &side);
+    const QPointF mappedPos = mapPositionFromOrigin(entity(), token, sceneParentFnRect, &side);
     updateInternalItems(side);
-    setPos(targetItem()->mapFromScene(pos));
+    setPos(targetItem()->mapFromScene(mappedPos));
+    return mappedPos != pos;
 }
 
 /*!

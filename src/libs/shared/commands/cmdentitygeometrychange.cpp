@@ -75,6 +75,7 @@ bool CmdEntityGeometryChange::mergeGeometryData(const QList<QPair<shared::VEObje
         if (m_data.last() == data.last()) {
             data.takeLast();
         } else if (m_data.last().entity == data.last().entity) {
+            data.last().entity->setCoordinates(data.last().newCoordinates);
             m_data.last() = data.takeLast();
         } else {
             break;
