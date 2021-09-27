@@ -65,13 +65,20 @@ void tst_sdlmodel::testGenerateProcess()
     QString processName = "name_of_the_process";
     Process process(processName, StateMachine(std::vector<State>(), std::vector<Transition>()),
             std::vector<VariableDeclaration>(), std::vector<Procedure>());
-    SdlModel exampleModel(process);
+    SdlModel exampleModel(process, "Example");
 
     Options options;
     options.add(SdlOptions::sdlFilepathPrefix, "Sdl_");
 
     // SdlExporter
     (void)exampleModel;
+
+    SdlExporter exporter;
+    try {
+        exporter.exportModel(&exampleModel, options);
+    } catch (const std::exception &ex) {
+        QFAIL(ex.what());
+    }
 }
 
 } // namespace tests::conversion::sdl

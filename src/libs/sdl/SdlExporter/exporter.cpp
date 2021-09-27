@@ -85,7 +85,7 @@ void SdlExporter::writeAndCommit(QSaveFile &outputFile, const std::string &data)
 QString SdlExporter::makeFilePath(const QString &pathPrefix, const QString &fileName, const QString &extension) const
 {
     if (fileName.isEmpty()) {
-        throw MissingOutputFilenameException(ModelType::Asn1);
+        throw MissingOutputFilenameException(ModelType::Sdl);
     }
 
     return QString("%1%2.%3").arg(pathPrefix, fileName, extension);

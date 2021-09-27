@@ -21,8 +21,9 @@
 
 namespace sdl {
 
-SdlModel::SdlModel(const Data &data)
+SdlModel::SdlModel(const Data &data, const QString &name)
     : m_data(data)
+    , m_name(name)
 {
 }
 
@@ -34,6 +35,11 @@ conversion::ModelType SdlModel::modelType() const
 const SdlModel::Data &SdlModel::data() const
 {
     return m_data;
+}
+
+auto SdlModel::name() const -> const QString &
+{
+    return m_name;
 }
 
 } // namespace sdl
