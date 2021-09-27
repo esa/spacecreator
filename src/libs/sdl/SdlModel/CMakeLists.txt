@@ -8,6 +8,7 @@ set(SOURCES sdlmodel.cpp
             state.cpp
             signal.cpp
             input.cpp
+            literal.cpp
             variabledeclaration.cpp
             variablereference.cpp
             process.cpp)
