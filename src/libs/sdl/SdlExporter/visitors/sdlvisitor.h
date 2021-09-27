@@ -17,20 +17,20 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/lgpl-2.1.html>.
  */
 
+#include <QTextStream>
 #include <sdl/SdlModel/sdlmodel.h>
-
-class QTextStream;
 
 namespace sdl {
 
 class SdlVisitor
 {
 public:
-    SdlVisitor(const QTextStream &stream);
-    void *visit(const SdlModel *model);
+    SdlVisitor(QTextStream &stream);
+    SdlVisitor(const QTextStream &&) = delete;
+    void visit(const SdlModel *model);
 
 private:
-    // TODO
+    QTextStream &m_stream;
 };
 
 } // namespace conversion::Sdl

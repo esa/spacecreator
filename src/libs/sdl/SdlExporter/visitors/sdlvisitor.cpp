@@ -21,16 +21,19 @@
 
 namespace sdl {
 
-SdlVisitor::SdlVisitor(const QTextStream &stream)
+SdlVisitor::SdlVisitor(QTextStream &stream)
+    : m_stream(stream)
 {
-    (void)stream;
 }
 
-void *SdlVisitor::visit(const SdlModel *model)
+void SdlVisitor::visit(const SdlModel *model)
 {
     (void)model;
     // TODO
-    return nullptr;
+
+    // get Process -
+
+    m_stream << "begin";
 }
 
 } // namespace sdl
