@@ -30,6 +30,7 @@ class Signal : public Node
 {
 public:
     Signal(const QString &name = "");
+    ~Signal();
     auto name() const -> QString;
     virtual auto accept(Visitor &visitor) const -> void override;
 

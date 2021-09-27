@@ -46,6 +46,7 @@ public:
     Process(const QString &name, const StateMachine &stateMachine = StateMachine(),
             const std::vector<VariableDeclaration> &variables = std::vector<VariableDeclaration>(),
             const std::vector<Procedure> &procedures = std::vector<Procedure>());
+    virtual ~Process();
 
     auto name() const -> QString;
     auto stateMachine() const -> const StateMachine &;

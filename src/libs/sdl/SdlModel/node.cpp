@@ -24,6 +24,8 @@
 ****************************************************************************/
 #include "node.h"
 
-using namespace sdl;
+namespace sdl {
 
 Node::~Node() {}
+
+} // sdl

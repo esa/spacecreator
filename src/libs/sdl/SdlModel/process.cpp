@@ -42,6 +42,8 @@ Process::Process(const QString &name, const StateMachine &stateMachine,
 {
 }
 
+Process::~Process() {}
+
 auto Process::name() const -> QString
 {
     return m_name;

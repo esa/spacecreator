@@ -38,6 +38,8 @@ State::State(const State &state)
 {
 }
 
+State::~State() {}
+
 auto State::name() const -> const QString &
 {
     return m_name;

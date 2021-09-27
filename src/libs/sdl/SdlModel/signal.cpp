@@ -27,6 +27,8 @@ Signal::Signal(const QString &name)
 {
 }
 
+Signal::~Signal() {}
+
 auto Signal::name() const -> QString
 {
     return m_name;
