@@ -19,6 +19,8 @@
 
 #include "sdlvisitor.h"
 
+#include <iostream>
+
 namespace sdl {
 
 SdlVisitor::SdlVisitor(QTextStream &stream)
@@ -31,9 +33,18 @@ void SdlVisitor::visit(const SdlModel *model)
     (void)model;
     // TODO
 
-    // get Process -
+    Process process = model->data();
+    // write some dummy CIF
+    m_stream << "/* CIF PROCESS (" << 250 << ", " << 150 << "), (" << 150 << ", " << 75 << ") */\n";
+    m_stream << "process " << process.name() << "\n";
 
-    m_stream << "begin";
+    // loop over process variables and export them
+
+    // loop over procedures and export them
+
+    // loop over provess states and export them
+
+    m_stream << "endprocess " << process.name() << ";";
 }
 
 } // namespace sdl
