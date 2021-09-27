@@ -28,12 +28,13 @@ SdlVisitor::SdlVisitor(QTextStream &stream)
 {
 }
 
-void SdlVisitor::visit(const SdlModel *model)
+void SdlVisitor::visit(const SdlModel *model) const
 {
-    (void)model;
-    // TODO
+    visit(model->data());
+}
 
-    Process process = model->data();
+void SdlVisitor::visit(const Process &process) const
+{
     // write some dummy CIF
     m_stream << "/* CIF PROCESS (" << 250 << ", " << 150 << "), (" << 150 << ", " << 75 << ") */\n";
     m_stream << "process " << process.name() << "\n";
@@ -42,20 +43,39 @@ void SdlVisitor::visit(const SdlModel *model)
 
     // TODO: loop over procedures and export them
 
-    // TODO: loop over process states and export them
     for (const auto &state : process.stateMachine().states()) {
-        // write some dummy CIF
-        m_stream << "    /* CIF state (" << 250 << ", " << 150 << "), (" << 150 << ", " << 75 << ") */\n";
-        m_stream << "    state " << state.name() << ";\n";
-        // TODO: loop over inputs and export them
-        for (const auto &input : state.inputs()) {
-            m_stream << "        /* CIF input (" << 250 << "," << 150 << "), (" << 150 << ", " << 75 << ") */\n";
-            m_stream << "        input " << input.name() << "(" /* parametres of the input */ << ");\n";
-        }
-        m_stream << "    endstate;\n";
+        visit(state);
     }
+    //     exportCollection<State>(process.stateMachine().states());
 
-    m_stream << "endprocess " << process.name() << ";";
+    m_stream << "endprocess " << process.name() << ";\n";
+}
+
+void SdlVisitor::visit(const State &state) const
+{
+    // write some dummy CIF
+    m_stream << "    /* CIF state (" << 250 << ", " << 150 << "), (" << 150 << ", " << 75 << ") */\n";
+    m_stream << "    state " << state.name() << ";\n";
+    for (const auto &input : state.inputs()) {
+        visit(input);
+    }
+    m_stream << "    endstate;\n";
+}
+
+void SdlVisitor::visit(const Input &input) const
+{
+    // write some dummy CIF
+    m_stream << "        /* CIF input (" << 250 << "," << 150 << "), (" << 150 << ", " << 75 << ") */\n";
+    m_stream << "        input " << input.name() << "(" /* parametres of the input */ << ");\n";
+}
+
+template<typename T>
+void SdlVisitor::exportCollection(const T &collection) const
+{
+    for (const auto &item : collection) {
+        SdlVisitor visitor(m_stream);
+        collection->accept(visitor);
+    }
 }
 
 } // namespace sdl

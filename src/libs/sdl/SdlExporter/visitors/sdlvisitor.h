@@ -27,9 +27,16 @@ class SdlVisitor
 public:
     SdlVisitor(QTextStream &stream);
     SdlVisitor(const QTextStream &&) = delete;
-    void visit(const SdlModel *model);
+    auto visit(const SdlModel *model) const -> void;
 
 private:
+    auto visit(const Process &process) const -> void;
+    auto visit(const State &state) const -> void;
+    auto visit(const Input &input) const -> void;
+
+    template<typename T>
+    auto exportCollection(const T &collection) const -> void;
+
     QTextStream &m_stream;
 };
 
