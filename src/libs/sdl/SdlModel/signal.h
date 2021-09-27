@@ -19,15 +19,19 @@
 
 #pragma once
 
+#include "../SdlExporter/visitors/visitor.h"
+#include "node.h"
+
 #include <QString>
 
 namespace sdl {
 
-class Signal
+class Signal : public Node
 {
 public:
     Signal(const QString &name);
     auto name() const -> QString;
+    auto accept(Visitor &visitor) const -> void override;
 
 private:
     QString m_name = "";

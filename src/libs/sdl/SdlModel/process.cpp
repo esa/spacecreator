@@ -60,4 +60,9 @@ auto Process::procedures() const -> const std::vector<Procedure> &
     return m_procedures;
 }
 
+auto Process::accept(Visitor &visitor) const -> void
+{
+    visitor.visit(*this);
+}
+
 } // namespace sdl

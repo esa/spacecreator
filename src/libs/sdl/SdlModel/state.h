@@ -19,19 +19,22 @@
 
 #pragma once
 
+#include "../SdlExporter/visitors/visitor.h"
 #include "input.h"
+#include "node.h"
 
 #include <QString>
 #include <vector>
 
 namespace sdl {
 
-class State
+class State : public Node
 {
 public:
     State(const QString &name, const std::vector<Input> &inputs = std::vector<Input>());
     auto name() const -> const QString &;
     auto inputs() const -> const std::vector<Input> &;
+    auto accept(Visitor &visitor) const -> void override;
 
 private:
     QString m_name = "";

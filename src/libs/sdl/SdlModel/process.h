@@ -19,6 +19,8 @@
 
 #pragma once
 
+#include "../SdlExporter/visitors/visitor.h"
+#include "node.h"
 #include "statemachine.h"
 
 #include <QString>
@@ -37,7 +39,7 @@ class Procedure
     // TODO
 };
 
-class Process
+class Process : public Node
 {
 public:
     Process(const Process &process);
@@ -49,6 +51,7 @@ public:
     auto stateMachine() const -> const StateMachine &;
     auto variables() const -> const std::vector<VariableDeclaration> &;
     auto procedures() const -> const std::vector<Procedure> &;
+    auto accept(Visitor &visitor) const -> void override;
 
 private:
     QString m_name = "";

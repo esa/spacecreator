@@ -31,4 +31,9 @@ auto Signal::name() const -> QString
     return m_name;
 }
 
+auto Process::accept(Visitor &visitor) const -> void
+{
+    visitor.visit(*this);
+}
+
 } // namespace sdl

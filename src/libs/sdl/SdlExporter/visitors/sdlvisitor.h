@@ -17,22 +17,30 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/lgpl-2.1.html>.
  */
 
+#include "visitor.h"
+
 #include <QTextStream>
 #include <sdl/SdlModel/sdlmodel.h>
 
 namespace sdl {
 
-class SdlVisitor
+class SdlVisitor : public Visitor
 {
 public:
     SdlVisitor(QTextStream &stream);
     SdlVisitor(const QTextStream &&) = delete;
-    auto visit(const SdlModel *model) const -> void;
+    auto visit(const SdlModel *model) const -> void override;
+    auto visit(const Process &process) const -> void override;
+    auto visit(const State &state) const -> void override;
+    auto visit(const Input &input) const -> void override;
 
 private:
     auto visit(const Process &process) const -> void;
     auto visit(const State &state) const -> void;
     auto visit(const Input &input) const -> void;
+
+    template<typename T>
+    auto exportCollection(const T &collection) const -> void;
 
     QTextStream &m_stream;
 };

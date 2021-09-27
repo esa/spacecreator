@@ -11,6 +11,7 @@ set(SOURCES sdlmodel.cpp
             literal.cpp
             variabledeclaration.cpp
             variablereference.cpp
+            node.cpp
             process.cpp)
 set(INCLUDES sdlmodel.h)
 
