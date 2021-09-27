@@ -119,24 +119,9 @@ std::vector<std::unique_ptr<Model>> SedsToIvTranslator::translateSedsModel(const
 void SedsToIvTranslator::translatePackage(
         const seds::model::Package &sedsPackage, Asn1Model *asn1Model, IVModel *ivModel, bool generateFunction) const
 {
-    const auto &asn1FileName = sedsPackage.nameStr();
-    auto &asn1Files = asn1Model->data();
-    auto asn1File = std::find_if(std::begin(asn1Files), std::end(asn1Files),
-            [&packageName](const auto &file) { return file->name() == asn1FileName; });
-    if (asn1File == asn1Files.end()) {
-        const auto message = QString("Unable to find file %1 in the ASN.1 model").arg(asn1FileName);
-        throw TranslationException(std::move(message));
-    }
+    auto asn1Definitions = getAsn1Definitions(sedsPackage, asn1Model);
 
-    const auto &asn1DefinitionsName = package.asn1NameStr();
-    auto *asn1Definitions = (*asn1File)->definitions(sedsPackage.asn1NameStr());
-    if (!asn1Definitions) {
-        const auto message =
-                QString("ASN.1 file %1 doesn't have definitions named %2").arg(asn1FileName).arg(asn1DefinitionsName);
-        throw TranslationException(std::move(message));
-    }
-
-    ComponentsTranslator componentsTranslator(sedsPackage, asn1Definitions);
+    const ComponentsTranslator componentsTranslator(sedsPackage, asn1Definitions);
     auto ivFunctions = componentsTranslator.translateComponents();
 
     if (generateFunction) {
@@ -153,6 +138,29 @@ void SedsToIvTranslator::translatePackage(
     } else {
         ivModel->addObjects(ivFunctions);
     }
+}
+
+Asn1Acn::Definitions *SedsToIvTranslator::getAsn1Definitions(
+        const seds::model::Package &sedsPackage, Asn1Model *asn1Model) const
+{
+    const auto &asn1FileName = sedsPackage.nameStr();
+    auto &asn1Files = asn1Model->data();
+    auto asn1File = std::find_if(
+            std::begin(asn1Files), std::end(asn1Files), [&](const auto &file) { return file->name() == asn1FileName; });
+    if (asn1File == asn1Files.end()) {
+        const auto message = QString("Unable to find file %1 in the ASN.1 model").arg(asn1FileName);
+        throw TranslationException(std::move(message));
+    }
+
+    const auto &asn1DefinitionsName = sedsPackage.asn1NameStr();
+    auto *asn1Definitions = asn1File->definitions(asn1DefinitionsName);
+    if (!asn1Definitions) {
+        const auto message =
+                QString("ASN.1 file %1 doesn't have definitions named %2").arg(asn1FileName).arg(asn1DefinitionsName);
+        throw TranslationException(std::move(message));
+    }
+
+    return asn1Definitions;
 }
 
 } // namespace conversion::iv::translator

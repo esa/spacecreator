@@ -44,12 +44,9 @@ AsyncInterfaceCommandTranslator::InterfaceCommandArgumentsCache
 const QString AsyncInterfaceCommandTranslator::m_ivInterfaceParameterName = "InputParam";
 const QString AsyncInterfaceCommandTranslator::m_bundledTypeNameTemplate = "%1_Type%2";
 
-AsyncInterfaceCommandTranslator::AsyncInterfaceCommandTranslator(const seds::model::Package &sedsPackage,
-        const seds::model::Component &sedsComponent, const seds::model::Interface &sedsInterface,
-        Asn1Acn::Definitions *asn1Definitions, ivm::IVFunction *ivFunction)
+AsyncInterfaceCommandTranslator::AsyncInterfaceCommandTranslator(
+        const seds::model::Interface &sedsInterface, Asn1Acn::Definitions *asn1Definitions, ivm::IVFunction *ivFunction)
     : InterfaceCommandTranslator(sedsInterface, ivFunction)
-    , m_sedsPackage(sedsPackage)
-    , m_sedsComponent(sedsComponent)
     , m_asn1Definitions(asn1Definitions)
 {
 }

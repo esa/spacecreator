@@ -86,6 +86,17 @@ private:
      */
     auto translatePackage(const seds::model::Package &sedsPackage, Asn1Acn::Asn1Model *asn1Model, ivm::IVModel *ivModel,
             bool generateFunction) const -> void;
+
+    /**
+     * @brief   Gets ASN.1 definitions for given SEDS package from given ASN.1 model
+     *
+     * @param   sedsPackage     SEDS package
+     * @param   asn1Model       ASN.1 model
+     *
+     * @return  Asn1 definitions
+     */
+    auto getAsn1Definitions(const seds::model::Package &sedsPackage, Asn1Acn::Asn1Model *asn1Model) const
+            -> Asn1Acn::Definitions *;
 };
 
 } // namespace conversion::iv::translator

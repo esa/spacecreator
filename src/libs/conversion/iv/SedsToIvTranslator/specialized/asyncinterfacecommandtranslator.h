@@ -58,9 +58,8 @@ public:
      * @param   asn1Definitions     ASN.1 type definitions for parent package
      * @param   ivFunction          Output interface view function
      */
-    AsyncInterfaceCommandTranslator(const seds::model::Package &sedsPackage,
-            const seds::model::Component &sedsComponent, const seds::model::Interface &sedsInterface,
-            Asn1Acn::Definitions *asn1Definitions, ivm::IVFunction *ivFunction);
+    AsyncInterfaceCommandTranslator(const seds::model::Interface &sedsInterface, Asn1Acn::Definitions *asn1Definitions,
+            ivm::IVFunction *ivFunction);
     /**
      * @brief   Deleted copy constructor
      */
@@ -183,10 +182,6 @@ private:
     auto switchInterfaceType(ivm::IVInterface::InterfaceType interfaceType) const -> ivm::IVInterface::InterfaceType;
 
 private:
-    /// @brief  Parent SEDS package
-    const seds::model::Package &m_sedsPackage;
-    /// @brief  Parent SEDS component
-    const seds::model::Component &m_sedsComponent;
     /// @brief  Output ASN.1 type definitions
     Asn1Acn::Definitions *m_asn1Definitions;
 
