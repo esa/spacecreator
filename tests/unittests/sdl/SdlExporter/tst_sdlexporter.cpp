@@ -52,8 +52,7 @@ private Q_SLOTS:
 void tst_sdlmodel::testDefaultValuesInModel()
 {
     QString processName = "name_of_the_process";
-    Process process(processName, StateMachine(std::vector<State>(), std::vector<Transition>()),
-            std::vector<VariableDeclaration>(), std::vector<Procedure>());
+    Process process(processName);
     SdlModel exampleModel(process);
 
     QVERIFY(exampleModel.modelType() == ModelType::Sdl);
@@ -72,9 +71,6 @@ void tst_sdlmodel::testGenerateProcess()
     Options options;
     options.add(SdlOptions::sdlFilepathPrefix, "Sdl_");
 
-    // SdlExporter
-    (void)exampleModel;
-
     SdlExporter exporter;
     try {
         exporter.exportModel(&exampleModel, options);
@@ -83,7 +79,7 @@ void tst_sdlmodel::testGenerateProcess()
     }
 }
 
-} // namespace tests::conversion::sdl
+} // namespace tests::sdl
 
 QTEST_MAIN(tests::conversion::Sdl::tst_sdlmodel)
 

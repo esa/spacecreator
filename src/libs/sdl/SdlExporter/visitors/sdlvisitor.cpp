@@ -69,13 +69,4 @@ void SdlVisitor::visit(const Input &input) const
     m_stream << "        input " << input.name() << "(" /* parametres of the input */ << ");\n";
 }
 
-template<typename T>
-void SdlVisitor::exportCollection(const T &collection) const
-{
-    for (const auto &item : collection) {
-        SdlVisitor visitor(m_stream);
-        collection->accept(visitor);
-    }
-}
-
 } // namespace sdl

@@ -34,9 +34,6 @@ private:
     auto visit(const State &state) const -> void;
     auto visit(const Input &input) const -> void;
 
-    template<typename T>
-    auto exportCollection(const T &collection) const -> void;
-
     QTextStream &m_stream;
 };
 
