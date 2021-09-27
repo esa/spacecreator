@@ -46,9 +46,8 @@ std::unique_ptr<conversion::Model> Asn1Importer::importModel(const Options &opti
 
     Asn1Reader asn1Reader;
 
-    QString error;
     QStringList errorMessages;
-    QObject::connect(&asn1Reader, &Asn1Reader::parseError, [&error](const QString &msg) { error = msg; });
+    QObject::connect(&asn1Reader, &Asn1Reader::parseError, [&errorMessages](const QString &error) { errorMessages << error; });
 
     std::unique_ptr<Asn1Acn::File> result;
 
@@ -63,9 +62,6 @@ std::unique_ptr<conversion::Model> Asn1Importer::importModel(const Options &opti
     if (!errorMessages.isEmpty()) {
         const auto message = errorMessages.join("\n");
         throw ImportException(std::move(message));
-    }
-    if (!error.isEmpty()) {
-        throw ImportException(std::move(error));
     }
 
     std::vector<std::unique_ptr<Asn1Acn::File>> files;
