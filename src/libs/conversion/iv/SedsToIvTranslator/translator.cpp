@@ -121,7 +121,7 @@ void SedsToIvTranslator::translatePackage(
 {
     auto asn1Definitions = getAsn1Definitions(sedsPackage, asn1Model);
 
-    const ComponentsTranslator componentsTranslator(sedsPackage, asn1Definitions);
+    ComponentsTranslator componentsTranslator(sedsPackage, asn1Definitions);
     auto ivFunctions = componentsTranslator.translateComponents();
 
     if (generateFunction) {

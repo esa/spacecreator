@@ -38,8 +38,8 @@ using conversion::translator::UnhandledValueException;
 
 namespace conversion::iv::translator {
 
-AsyncInterfaceCommandTranslator::InterfaceCommandArgumentsCache
-        AsyncInterfaceCommandTranslator::m_asn1CommandArgumentsCache;
+std::multimap<QString, AsyncInterfaceCommandTranslator::ArgumentsCacheEntry>
+        AsyncInterfaceCommandTranslator::m_commandArgumentsCache;
 
 const QString AsyncInterfaceCommandTranslator::m_ivInterfaceParameterName = "InputParam";
 const QString AsyncInterfaceCommandTranslator::m_bundledTypeNameTemplate = "%1_Type%2";
@@ -103,41 +103,34 @@ void AsyncInterfaceCommandTranslator::translateArguments(const seds::model::Inte
 }
 
 QString AsyncInterfaceCommandTranslator::buildAsn1SequenceType(
-        const seds::model::InterfaceCommand &sedsCommand, seds::model::CommandArgumentMode requestedArgumentMode) const
+        const seds::model::InterfaceCommand &sedsCommand, seds::model::CommandArgumentMode requestedArgumentMode)
 {
-    const auto arguments = processArgumentsTypes(sedsCommand.arguments(), requestedArgumentMode);
+    auto arguments = processArgumentsTypes(sedsCommand.arguments(), requestedArgumentMode);
     const auto bundledTypeHash = calculateArgumentsHash(arguments);
 
     const auto &sedsCommandName = sedsCommand.nameStr();
-    const auto cachedTypesCount = m_asn1CommandArgumentsCache.count(sedsCommandName);
 
-    if (cachedTypesCount == 0) {
-        const auto bundledTypeName = createBundledTypeName(sedsCommandName);
+    const auto typesForCommand = m_commandArgumentsCache.equal_range(sedsCommandName);
+    const auto foundType = std::find_if(
+            typesForCommand.first, typesForCommand.second, [&bundledTypeHash, &arguments](const auto &typePair) {
+                return typePair.second.typeHash == bundledTypeHash && typePair.second.compareArguments(arguments);
+            });
+
+    if (foundType != typesForCommand.second) {
+        return foundType->second.asn1TypeName;
+    } else {
+        const auto cachedTypesCount = m_commandArgumentsCache.count(sedsCommandName);
+        const auto bundledTypeName = createBundledTypeName(sedsCommandName, cachedTypesCount);
         createAsn1Sequence(bundledTypeName, arguments);
 
-        m_asn1CommandArgumentsCache.insert({ sedsCommandName, { bundledTypeHash, bundledTypeName } });
+        m_commandArgumentsCache.insert({ sedsCommandName, { bundledTypeName, bundledTypeHash, std::move(arguments) } });
 
         return bundledTypeName;
-    } else {
-        const auto typesForCommand = m_asn1CommandArgumentsCache.equal_range(sedsCommandName);
-        const auto foundType = std::find_if(typesForCommand.first, typesForCommand.second,
-                [&bundledTypeHash](const auto &typePair) { return typePair.second.first == bundledTypeHash; });
-
-        if (foundType != typesForCommand.second) {
-            return foundType->second.second;
-        } else {
-            const auto bundledTypeName = createBundledTypeName(sedsCommandName, cachedTypesCount);
-            createAsn1Sequence(bundledTypeName, arguments);
-
-            m_asn1CommandArgumentsCache.insert({ sedsCommandName, { bundledTypeHash, bundledTypeName } });
-
-            return bundledTypeName;
-        }
     }
 }
 
 void AsyncInterfaceCommandTranslator::createAsn1Sequence(
-        const QString &name, const std::unordered_map<QString, QString> &arguments) const
+        const QString &name, const std::unordered_map<QString, QString> &arguments)
 {
     auto sequence = std::make_unique<Asn1Acn::Types::Sequence>(name);
 
@@ -167,9 +160,9 @@ std::unique_ptr<Asn1Acn::SequenceComponent> AsyncInterfaceCommandTranslator::cre
 QString AsyncInterfaceCommandTranslator::createBundledTypeName(const QString sedsCommandName, std::size_t counter) const
 {
     if (counter == 0) {
-        return m_bundledTypeNameTemplate.arg(sedsCommandName, "");
+        return m_bundledTypeNameTemplate.arg(sedsCommandName).arg("");
     } else {
-        return m_bundledTypeNameTemplate.arg(sedsCommandName, counter);
+        return m_bundledTypeNameTemplate.arg(sedsCommandName).arg(counter);
     }
 }
 
@@ -236,6 +229,28 @@ ivm::IVInterface::InterfaceType AsyncInterfaceCommandTranslator::switchInterface
         throw UnhandledValueException("InterfaceType");
         break;
     }
+}
+
+bool AsyncInterfaceCommandTranslator::ArgumentsCacheEntry::compareArguments(
+        const std::unordered_map<QString, QString> &arguments) const
+{
+    if (typeArguments.size() != arguments.size()) {
+        return false;
+    }
+
+    auto lhsIt = typeArguments.begin();
+    auto rhsIt = arguments.begin();
+
+    while (lhsIt != typeArguments.end() && rhsIt != arguments.end()) {
+        if (*lhsIt != *rhsIt) {
+            return false;
+        }
+
+        ++lhsIt;
+        ++rhsIt;
+    }
+
+    return true;
 }
 
 } // namespace conversion::iv::translator

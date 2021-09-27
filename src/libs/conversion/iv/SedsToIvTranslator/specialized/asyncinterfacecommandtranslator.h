@@ -45,8 +45,6 @@ namespace conversion::iv::translator {
  */
 class AsyncInterfaceCommandTranslator final : public InterfaceCommandTranslator
 {
-private:
-    using InterfaceCommandArgumentsCache = std::multimap<QString, std::pair<std::size_t, QString>>;
 
 public:
     /**
@@ -111,7 +109,7 @@ private:
      * @return  Name of the created type
      */
     auto buildAsn1SequenceType(const seds::model::InterfaceCommand &sedsCommand,
-            seds::model::CommandArgumentMode requestedArgumentMode) const -> QString;
+            seds::model::CommandArgumentMode requestedArgumentMode) -> QString;
 
     /**
      * @brief   Creates ASN.1 sequence type
@@ -121,7 +119,7 @@ private:
      *
      * @return  ASN.1 sequence
      */
-    auto createAsn1Sequence(const QString &name, const std::unordered_map<QString, QString> &arguments) const -> void;
+    auto createAsn1Sequence(const QString &name, const std::unordered_map<QString, QString> &arguments) -> void;
     /**
      * @brief   Creates ASN.1 sequence component type
      *
@@ -182,11 +180,19 @@ private:
     auto switchInterfaceType(ivm::IVInterface::InterfaceType interfaceType) const -> ivm::IVInterface::InterfaceType;
 
 private:
+    struct ArgumentsCacheEntry final {
+        QString asn1TypeName;
+        std::size_t typeHash;
+        std::unordered_map<QString, QString> typeArguments;
+
+        auto compareArguments(const std::unordered_map<QString, QString> &arguments) const -> bool;
+    };
+
     /// @brief  Output ASN.1 type definitions
     Asn1Acn::Definitions *m_asn1Definitions;
 
     /// @brief  Cache of the bundled ASN.1 types that was created for given command
-    static InterfaceCommandArgumentsCache m_asn1CommandArgumentsCache;
+    static std::multimap<QString, ArgumentsCacheEntry> m_commandArgumentsCache;
 
     /// @brief  Name for the argument in the IV interface
     static const QString m_ivInterfaceParameterName;

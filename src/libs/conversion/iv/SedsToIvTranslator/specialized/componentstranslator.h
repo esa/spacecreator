@@ -85,7 +85,7 @@ private:
      *
      * @return  Result InterfaceView function
      */
-    auto translateComponent(const seds::model::Component &sedsComponent) const -> ivm::IVFunction *;
+    auto translateComponent(const seds::model::Component &sedsComponent) -> ivm::IVFunction *;
 
     /**
      * @brief   Translates SEDS interface to InterfaceView interface
@@ -96,7 +96,7 @@ private:
      * @param   ivFunction          IV Function where the result should be added
      */
     auto translateInterface(const seds::model::Interface &sedsInterface, const seds::model::Component &sedsComponent,
-            const ivm::IVInterface::InterfaceType interfaceType, ivm::IVFunction *ivFunction) const -> void;
+            const ivm::IVInterface::InterfaceType interfaceType, ivm::IVFunction *ivFunction) -> void;
 
 private:
     /**

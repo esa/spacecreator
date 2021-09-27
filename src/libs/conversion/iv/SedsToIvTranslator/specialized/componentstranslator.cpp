@@ -52,7 +52,7 @@ QVector<ivm::IVFunction *> ComponentsTranslator::translateComponents()
     return ivComponents;
 }
 
-ivm::IVFunction *ComponentsTranslator::translateComponent(const seds::model::Component &sedsComponent) const
+ivm::IVFunction *ComponentsTranslator::translateComponent(const seds::model::Component &sedsComponent)
 {
     auto *ivFunction = new ivm::IVFunction();
     ivFunction->setEntityAttribute(ivm::meta::Props::token(ivm::meta::Props::Token::name), sedsComponent.nameStr());
@@ -70,7 +70,7 @@ ivm::IVFunction *ComponentsTranslator::translateComponent(const seds::model::Com
 
 void ComponentsTranslator::translateInterface(const seds::model::Interface &sedsInterface,
         const seds::model::Component &sedsComponent, const ivm::IVInterface::InterfaceType interfaceType,
-        ivm::IVFunction *ivFunction) const
+        ivm::IVFunction *ivFunction)
 {
     const auto &sedsInterfaceDeclaration = findInterfaceDeclaration(sedsInterface.type().nameStr(), sedsComponent);
 
