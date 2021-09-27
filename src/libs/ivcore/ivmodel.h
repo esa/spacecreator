@@ -104,3 +104,12 @@ private:
 };
 
 }
+
+namespace conversion {
+
+template <>
+struct ModelProperties<ivm::IVModel> {
+    static const ModelType type = ModelType::InterfaceView;
+};
+
+} // namespace conversion

@@ -28,7 +28,7 @@ SedsModel::SedsModel(Data data)
 
 conversion::ModelType SedsModel::modelType() const
 {
-    return conversion::ModelType::Seds;
+    return conversion::ModelProperties<SedsModel>::type;
 }
 
 const SedsModel::Data &SedsModel::data() const

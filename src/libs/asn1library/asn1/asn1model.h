@@ -88,3 +88,12 @@ private:
 };
 
 } // namespace Asn1Acn
+
+namespace conversion {
+
+template <>
+struct ModelProperties<Asn1Acn::Asn1Model> {
+    static const ModelType type = ModelType::Asn1;
+};
+
+} // namespace conversion

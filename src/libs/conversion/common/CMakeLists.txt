@@ -8,6 +8,7 @@ set(SOURCES exceptions.cpp
             translation/exceptions.cpp)
 set(INCLUDES exceptions.h
              model.h
+             modelproperties.h
              modeltype.h
              options.h
              registrar.h

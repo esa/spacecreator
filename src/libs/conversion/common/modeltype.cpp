@@ -29,8 +29,6 @@ QString modelTypeToString(ModelType modelType)
     switch (modelType) {
     case ModelType::Asn1:
         return QStringLiteral("ASN.1");
-    case ModelType::Aadl:
-        return QStringLiteral("AADL");
     case ModelType::Sdl:
         return QStringLiteral("SDL");
     case ModelType::Seds:

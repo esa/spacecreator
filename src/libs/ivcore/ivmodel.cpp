@@ -372,7 +372,7 @@ void IVModel::clear()
 
 conversion::ModelType IVModel::modelType() const
 {
-    return conversion::ModelType::InterfaceView;
+    return conversion::ModelProperties<IVModel>::type;
 }
 
 shared::PropertyTemplateConfig *IVModel::dynPropConfig() const

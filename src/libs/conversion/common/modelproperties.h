@@ -17,27 +17,23 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/lgpl-2.1.html>.
  */
 
-#include "asn1model.h"
+#pragma once
 
-namespace Asn1Acn {
+#include "modeltype.h"
 
-Asn1Model::Asn1Model(Asn1Model::Data data)
-    : m_data(std::move(data))
-{ }
+#include <QString>
 
-conversion::ModelType Asn1Model::modelType() const
-{
-    return conversion::ModelProperties<Asn1Model>::type;
-}
+namespace conversion {
 
-const Asn1Model::Data& Asn1Model::data() const
-{
-    return m_data;
-}
+/**
+ * @brief   Trait for properties of models
+ *
+ * @tparam  ModelType   Model
+ */
+template<typename Model>
+struct ModelProperties {
+    /// @brief  Model type
+    static const ModelType type = ModelType::Unspecified;
+};
 
-Asn1Model::Data& Asn1Model::data()
-{
-    return m_data;
-}
-
-} // namespace Asn1Acn
+} // namespace conversion

@@ -84,3 +84,12 @@ private:
 };
 
 } // namespace seds::model
+
+namespace conversion {
+
+template<>
+struct ModelProperties<::seds::model::SedsModel> {
+    static const ModelType type = ModelType::Seds;
+};
+
+} // namespace conversion

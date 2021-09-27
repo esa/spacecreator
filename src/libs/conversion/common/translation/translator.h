@@ -22,6 +22,7 @@
 #include "model.h"
 #include "modeltype.h"
 #include "options.h"
+#include "translation/exceptions.h"
 
 #include <memory>
 #include <set>
@@ -64,12 +65,12 @@ public:
     /**
      * @brief   Translate given source model into a target model
      *
-     * @param   sources     Vector of source models
-     * @param   options     Options for export configuration
+     * @param   sourceModels    Vector of source models
+     * @param   options         Options for export configuration
      *
      * @return  Target model translated from the source model
      */
-    virtual auto translateModels(std::vector<Model *> sources, const Options &options) const
+    virtual auto translateModels(std::vector<Model *> sourceModels, const Options &options) const
             -> std::vector<std::unique_ptr<Model>> = 0;
 
     /**
