@@ -29,7 +29,8 @@ namespace sdl {
 class Input : public Signal
 {
 public:
-    Input(const QString &name);
+    Input(const QString &name = "");
+    Input(const Input &input);
 
     // TODO: list of input parameters (variable declarations)
 };

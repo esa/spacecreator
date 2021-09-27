@@ -26,4 +26,9 @@ Input::Input(const QString &name)
 {
 }
 
+Input::Input(const Input &input)
+    : Signal(input.name())
+{
+}
+
 } // namespace sdl

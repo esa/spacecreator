@@ -33,12 +33,9 @@ public:
     auto visit(const Process &process) const -> void override;
     auto visit(const State &state) const -> void override;
     auto visit(const Input &input) const -> void override;
+    auto visit(const Signal &sig) const -> void override;
 
 private:
-    auto visit(const Process &process) const -> void;
-    auto visit(const State &state) const -> void;
-    auto visit(const Input &input) const -> void;
-
     template<typename T>
     auto exportCollection(const T &collection) const -> void;
 

@@ -29,9 +29,9 @@ namespace sdl {
 class Signal : public Node
 {
 public:
-    Signal(const QString &name);
+    Signal(const QString &name = "");
     auto name() const -> QString;
-    auto accept(Visitor &visitor) const -> void override;
+    virtual auto accept(Visitor &visitor) const -> void override;
 
 private:
     QString m_name = "";

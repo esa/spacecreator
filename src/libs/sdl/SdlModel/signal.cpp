@@ -22,7 +22,8 @@
 namespace sdl {
 
 Signal::Signal(const QString &name)
-    : m_name(name)
+    : Node(name)
+    , m_name(name)
 {
 }
 
@@ -31,7 +32,7 @@ auto Signal::name() const -> QString
     return m_name;
 }
 
-auto Process::accept(Visitor &visitor) const -> void
+auto Signal::accept(Visitor &visitor) const -> void
 {
     visitor.visit(*this);
 }

@@ -22,8 +22,19 @@
 namespace sdl {
 
 State::State(const QString &name, const std::vector<Input> &inputs)
-    : m_name(name)
+    : Node(m_name)
+    , m_name(name)
     , m_inputs(inputs)
+{
+}
+
+State::State()
+    : Node("")
+{
+}
+
+State::State(const State &state)
+    : Node(state.name())
 {
 }
 
@@ -35,6 +46,11 @@ auto State::name() const -> const QString &
 auto State::inputs() const -> const std::vector<Input> &
 {
     return m_inputs;
+}
+
+auto State::accept(Visitor &visitor) const -> void
+{
+    visitor.visit(*this);
 }
 
 } // namespace sdl

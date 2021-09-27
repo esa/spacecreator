@@ -20,6 +20,7 @@
 #include "sdlvisitor.h"
 
 #include <iostream>
+#include <qglobal.h>
 
 namespace sdl {
 
@@ -67,6 +68,21 @@ void SdlVisitor::visit(const Input &input) const
     // write some dummy CIF
     m_stream << "        /* CIF input (" << 250 << "," << 150 << "), (" << 150 << ", " << 75 << ") */\n";
     m_stream << "        input " << input.name() << "(" /* parametres of the input */ << ");\n";
+}
+
+void SdlVisitor::visit(const Signal &sig) const
+{
+    Q_UNUSED(sig);
+}
+
+template<typename T>
+auto SdlVisitor::exportCollection(const T &collection) const -> void
+{
+
+    for (const auto &item : collection) {
+        SdlVisitor visitor(m_stream);
+        item.accept(visitor);
+    }
 }
 
 } // namespace sdl

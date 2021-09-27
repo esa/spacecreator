@@ -24,7 +24,8 @@
 namespace sdl {
 
 Process::Process(const Process &process)
-    : m_name(process.name())
+    : Node(m_name)
+    , m_name(process.name())
     , m_stateMachine(process.stateMachine())
     , m_variables(process.variables())
     , m_procedures(process.procedures())
@@ -33,7 +34,8 @@ Process::Process(const Process &process)
 
 Process::Process(const QString &name, const StateMachine &stateMachine,
         const std::vector<VariableDeclaration> &variables, const std::vector<Procedure> &procedures)
-    : m_name(name)
+    : Node(m_name)
+    , m_name(name)
     , m_stateMachine(stateMachine)
     , m_variables(variables)
     , m_procedures(procedures)

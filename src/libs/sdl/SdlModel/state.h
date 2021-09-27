@@ -32,6 +32,8 @@ class State : public Node
 {
 public:
     State(const QString &name, const std::vector<Input> &inputs = std::vector<Input>());
+    State();
+    State(const State &state);
     auto name() const -> const QString &;
     auto inputs() const -> const std::vector<Input> &;
     auto accept(Visitor &visitor) const -> void override;
