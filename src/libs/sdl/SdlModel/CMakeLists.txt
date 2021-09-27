@@ -5,6 +5,7 @@ add_library(SdlModel STATIC)
 
 set(SOURCES sdlmodel.cpp
             statemachine.cpp
+            state.cpp
             process.cpp)
 set(INCLUDES sdlmodel.h)
 

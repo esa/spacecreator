@@ -34,7 +34,8 @@ class Transition
 class StateMachine
 {
 public:
-    StateMachine(const std::vector<State> &states, const std::vector<Transition> &transitions);
+    StateMachine(const std::vector<State> &states = std::vector<State>(),
+            const std::vector<Transition> &transitions = std::vector<Transition>());
     auto states() const -> const std::vector<State> &;
     auto transitions() const -> const std::vector<Transition> &;
 

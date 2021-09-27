@@ -41,8 +41,9 @@ class Process
 {
 public:
     Process(const Process &process);
-    Process(const QString &name, const StateMachine &stateMachine, const std::vector<VariableDeclaration> &variables,
-            const std::vector<Procedure> &procedures);
+    Process(const QString &name, const StateMachine &stateMachine = StateMachine(),
+            const std::vector<VariableDeclaration> &variables = std::vector<VariableDeclaration>(),
+            const std::vector<Procedure> &procedures = std::vector<Procedure>());
 
     auto name() const -> QString;
     auto stateMachine() const -> const StateMachine &;

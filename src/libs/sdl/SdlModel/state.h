@@ -46,6 +46,7 @@ public:
 class State
 {
 public:
+    State(const QString &name, const std::vector<Input> &inputs = std::vector<Input>());
     auto name() const -> const QString &;
     auto inputs() const -> const std::vector<Input> &;
 
