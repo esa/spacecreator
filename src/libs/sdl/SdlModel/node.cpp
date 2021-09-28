@@ -21,6 +21,21 @@
 
 namespace sdl {
 
+Node::Node(const QString &name)
+    : m_name(name)
+{
+}
+
 Node::~Node() {}
+
+void Node::setName(const QString &name)
+{
+    m_name = name;
+}
+
+const QString &Node::name() const
+{
+    return m_name;
+}
 
 } // sdl

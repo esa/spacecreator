@@ -28,36 +28,19 @@ class Visitor;
 class Node
 {
 protected:
-    Node(const QString &name)
-        : m_name(name)
-        , m_parent(nullptr)
-    {
-    }
-
+    Node(const QString &name);
     Node(const Node &other) = delete;
 
 public:
     virtual ~Node();
 
-    virtual void accept(Visitor &visitor) const = 0;
+    virtual auto accept(Visitor &visitor) const -> void = 0;
 
-    template<typename VisitorType, typename... Args>
-    typename VisitorType::ValueType valueFor(Args... args) const
-    {
-        VisitorType visitor(args...);
-        this->accept(visitor);
-        return visitor.value();
-    }
-
-    void setName(const QString &name) { m_name = name; }
-    virtual const QString &name() const { return m_name; }
-
-    Node *parent() const { return m_parent; }
-    void setParent(Node *parent) { m_parent = parent; }
+    auto setName(const QString &name) -> void;
+    auto name() const -> const QString &;
 
 private:
     QString m_name;
-    Node *m_parent;
 };
 
 } // namespace sdl
