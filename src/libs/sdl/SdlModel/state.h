@@ -41,15 +41,16 @@ class State : public Node
 public:
     State();
     State(const State &state);
-    State(const QString &name, std::vector<std::unique_ptr<Input>> &inputs);
+    State(const QString &name, std::vector<std::unique_ptr<Input>> &inputs,
+            std::vector<std::unique_ptr<ContinuousSignal>> &continuousSignals);
     ~State();
     auto inputs() const -> const std::vector<std::unique_ptr<Input>> &;
-    auto continuousSignals() -> const std::vector<ContinuousSignal> &;
+    auto continuousSignals() -> const std::vector<std::unique_ptr<ContinuousSignal>> &;
     auto accept(Visitor &visitor) const -> void override;
 
 private:
     std::vector<std::unique_ptr<Input>> m_inputs;
-    std::vector<ContinuousSignal> m_continuousSignals;
+    std::vector<std::unique_ptr<ContinuousSignal>> m_continuousSignals;
 };
 
 } // namespace sdl

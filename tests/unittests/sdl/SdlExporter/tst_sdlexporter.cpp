@@ -28,6 +28,7 @@
 
 using conversion::ModelType;
 using conversion::Options;
+using sdl::ContinuousSignal;
 using sdl::Input;
 using sdl::Procedure;
 using sdl::Process;
@@ -72,13 +73,17 @@ void tst_sdlmodel::testGenerateProcess()
     auto input1 = std::make_unique<Input>("some_input_name");
     inputs.push_back(std::move(input1));
 
-    auto state1 = std::make_unique<State>("some_state", inputs);
+    auto contSignals = std::vector<std::unique_ptr<ContinuousSignal>>();
+
+    auto state1 = std::make_unique<State>("some_state", inputs, contSignals);
 
     auto inputs2 = std::vector<std::unique_ptr<Input>>();
     auto input2 = std::make_unique<Input>("some_other_input_name");
     inputs2.push_back(std::move(input2));
 
-    auto state2 = std::make_unique<State>("some_other_state", inputs2);
+    auto contSignals2 = std::vector<std::unique_ptr<ContinuousSignal>>();
+
+    auto state2 = std::make_unique<State>("some_other_state", inputs2, contSignals2);
 
     auto states = std::vector<std::unique_ptr<State>>();
     states.push_back(std::move(state1));

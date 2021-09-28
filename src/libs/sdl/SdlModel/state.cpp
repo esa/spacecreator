@@ -21,11 +21,15 @@
 
 namespace sdl {
 
-State::State(const QString &name, std::vector<std::unique_ptr<Input>> &inputs)
+State::State(const QString &name, std::vector<std::unique_ptr<Input>> &inputs,
+        std::vector<std::unique_ptr<ContinuousSignal>> &continuousSignals)
     : Node(name)
 {
     for (unsigned long int i = 0; i < inputs.size(); i++) {
         m_inputs.push_back(std::move(inputs[i]));
+    }
+    for (unsigned long int i = 0; i < continuousSignals.size(); i++) {
+        m_continuousSignals.push_back(std::move(continuousSignals[i]));
     }
 }
 
@@ -46,7 +50,7 @@ auto State::inputs() const -> const std::vector<std::unique_ptr<Input>> &
     return m_inputs;
 }
 
-auto State::continuousSignals() -> const std::vector<ContinuousSignal> &
+auto State::continuousSignals() -> const std::vector<std::unique_ptr<ContinuousSignal>> &
 {
     return m_continuousSignals;
 }
