@@ -44,10 +44,7 @@ void SdlVisitor::visit(const Process &process) const
 
     // TODO: loop over procedures and export them
 
-    for (const auto &state : process.stateMachine().states()) {
-        visit(state);
-    }
-    //     exportCollection<State>(process.stateMachine().states());
+    exportCollection(process.stateMachine().states());
 
     m_stream << "endprocess " << process.name() << ";\n";
 }
@@ -57,9 +54,9 @@ void SdlVisitor::visit(const State &state) const
     // write some dummy CIF
     m_stream << "    /* CIF state (" << 250 << ", " << 150 << "), (" << 150 << ", " << 75 << ") */\n";
     m_stream << "    state " << state.name() << ";\n";
-    for (const auto &input : state.inputs()) {
-        visit(input);
-    }
+
+    exportCollection(state.inputs());
+
     m_stream << "    endstate;\n";
 }
 
