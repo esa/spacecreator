@@ -20,6 +20,7 @@
 #include <QObject>
 #include <QtTest>
 #include <conversion/common/options.h>
+#include <memory>
 #include <sdl/SdlExporter/SdlOptions/options.h>
 #include <sdl/SdlExporter/exporter.h>
 #include <sdl/SdlModel/process.h>
@@ -52,7 +53,8 @@ private Q_SLOTS:
 void tst_sdlmodel::testDefaultValuesInModel()
 {
     QString processName = "name_of_the_process";
-    auto sm = std::make_unique<StateMachine>();
+    auto states = std::vector<std::unique_ptr<State>>();
+    auto sm = std::make_unique<StateMachine>(states, std::vector<Transition>());
     Process process(processName, sm);
     SdlModel exampleModel(process);
 
@@ -65,9 +67,12 @@ void tst_sdlmodel::testGenerateProcess()
 {
     QString processName = "name_of_the_process";
     Input input1("some_input_name");
-    State state("some_state", { input1 });
-    State state2("some_other_state", { input1 });
-    auto sm = std::make_unique<StateMachine>(std::vector<State>({ state, state2 }), std::vector<Transition>());
+    auto state1 = std::make_unique<State>("some_state", std::vector<Input>({ input1 }));
+    auto state2 = std::make_unique<State>("some_other_state", std::vector<Input>({ input1 }));
+    auto states = std::vector<std::unique_ptr<State>>();
+    states.push_back(std::move(state1));
+    states.push_back(std::move(state2));
+    auto sm = std::make_unique<StateMachine>(states, std::vector<Transition>());
     Process process(processName, sm);
     SdlModel exampleModel(process, "Example");
 

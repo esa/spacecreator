@@ -22,6 +22,7 @@
 #include "state.h"
 
 #include <QString>
+#include <memory>
 #include <vector>
 
 namespace sdl {
@@ -34,13 +35,13 @@ class Transition
 class StateMachine
 {
 public:
-    StateMachine(const std::vector<State> &states = std::vector<State>(),
+    StateMachine(std::vector<std::unique_ptr<State>> &states,
             const std::vector<Transition> &transitions = std::vector<Transition>());
-    auto states() const -> const std::vector<State> &;
+    auto states() const -> const std::vector<std::unique_ptr<State>> &;
     auto transitions() const -> const std::vector<Transition> &;
 
 private:
-    std::vector<State> m_states;
+    std::vector<std::unique_ptr<State>> m_states;
     std::vector<Transition> m_transitions;
 };
 

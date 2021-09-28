@@ -19,15 +19,20 @@
 
 #include "statemachine.h"
 
+#include <iostream>
+#include <memory>
+
 namespace sdl {
 
-StateMachine::StateMachine(const std::vector<State> &states, const std::vector<Transition> &transitions)
-    : m_states(states)
-    , m_transitions(transitions)
+StateMachine::StateMachine(std::vector<std::unique_ptr<State>> &states, const std::vector<Transition> &transitions)
+    : m_transitions(transitions)
 {
+    for (unsigned long int i = 0; i < states.size(); i++) {
+        m_states.push_back(std::move(states[i]));
+    }
 }
 
-auto StateMachine::states() const -> const std::vector<State> &
+auto StateMachine::states() const -> const std::vector<std::unique_ptr<State>> &
 {
     return m_states;
 }
