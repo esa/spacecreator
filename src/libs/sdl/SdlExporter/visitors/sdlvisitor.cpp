@@ -29,9 +29,9 @@ SdlVisitor::SdlVisitor(QTextStream &stream)
 {
 }
 
-void SdlVisitor::visit(const SdlModel *model) const
+void SdlVisitor::visit(const SdlModel &model) const
 {
-    visit(model->data());
+    visit(model.data());
 }
 
 void SdlVisitor::visit(const Process &process) const

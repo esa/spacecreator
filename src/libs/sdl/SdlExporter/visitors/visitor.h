@@ -35,7 +35,7 @@ protected:
 public:
     virtual ~Visitor();
 
-    virtual auto visit(const SdlModel *model) const -> void = 0;
+    virtual auto visit(const SdlModel &model) const -> void = 0;
     virtual auto visit(const Process &process) const -> void = 0;
     virtual auto visit(const State &state) const -> void = 0;
     virtual auto visit(const Input &input) const -> void = 0;

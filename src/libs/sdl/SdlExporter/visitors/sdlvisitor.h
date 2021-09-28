@@ -33,7 +33,7 @@ class SdlVisitor : public Visitor
 public:
     SdlVisitor(QTextStream &stream);
     SdlVisitor(const QTextStream &&) = delete;
-    auto visit(const SdlModel *model) const -> void override;
+    auto visit(const SdlModel &model) const -> void override;
     auto visit(const Process &process) const -> void override;
     auto visit(const State &state) const -> void override;
     auto visit(const Input &input) const -> void override;
