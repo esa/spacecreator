@@ -48,12 +48,12 @@ public:
 
     auto stateMachine() const -> const std::unique_ptr<StateMachine> &;
     auto variables() const -> const std::vector<std::unique_ptr<VariableDeclaration>> &;
-    auto procedures() const -> const std::vector<Procedure> &;
+    auto procedures() const -> const std::vector<std::unique_ptr<Procedure>> &;
     auto accept(Visitor &visitor) const -> void override;
 
 private:
     std::unique_ptr<StateMachine> m_stateMachine;
     std::vector<std::unique_ptr<VariableDeclaration>> m_variables;
-    std::vector<Procedure> m_procedures;
+    std::vector<std::unique_ptr<Procedure>> m_procedures;
 };
 } // namespace sdl

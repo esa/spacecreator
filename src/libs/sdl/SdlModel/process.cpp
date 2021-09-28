@@ -41,7 +41,7 @@ auto Process::variables() const -> const std::vector<std::unique_ptr<VariableDec
     return m_variables;
 }
 
-auto Process::procedures() const -> const std::vector<Procedure> &
+auto Process::procedures() const -> const std::vector<std::unique_ptr<Procedure>> &
 {
     return m_procedures;
 }
