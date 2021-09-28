@@ -78,7 +78,6 @@ void SdlVisitor::visit(const Signal &sig) const
 template<typename T>
 auto SdlVisitor::exportCollection(const T &collection) const -> void
 {
-
     for (const auto &item : collection) {
         SdlVisitor visitor(m_stream);
         item.accept(visitor);
