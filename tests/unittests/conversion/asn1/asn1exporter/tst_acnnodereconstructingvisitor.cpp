@@ -17,16 +17,18 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/lgpl-2.1.html>.
  */
 
-#include "acnnodereconstructingvisitor_tests.h"
+#include "tst_acnnodereconstructingvisitor.h"
 
 #include <QtTest>
 #include <asn1library/asn1/acnsequencecomponent.h>
 #include <asn1library/asn1/asnsequencecomponent.h>
 #include <asn1library/asn1/choicevalue.h>
+#include <asn1library/asn1/definitions.h>
 #include <asn1library/asn1/multiplevalue.h>
 #include <asn1library/asn1/namedvalue.h>
 #include <asn1library/asn1/singlevalue.h>
 #include <asn1library/asn1/sourcelocation.h>
+#include <asn1library/asn1/typeassignment.h>
 #include <asn1library/asn1/types/bitstring.h>
 #include <asn1library/asn1/types/boolean.h>
 #include <asn1library/asn1/types/choice.h>
@@ -44,14 +46,10 @@
 #include <conversion/asn1/Asn1Exporter/visitors/acnnodereconstructingvisitor.h>
 
 using namespace Asn1Acn;
-using namespace Asn1Acn::Tests;
 
-AcnNodeReconstructingVisitorTests::AcnNodeReconstructingVisitorTests(QObject *parent)
-    : QObject(parent)
-{
-}
+namespace conversion::asn1::test {
 
-void AcnNodeReconstructingVisitorTests::test_emptyModule()
+void tst_AcnNodeReconstructingVisitor::testEmptyModule()
 {
     auto defs = std::make_unique<Definitions>(QStringLiteral("MyModule"), SourceLocation());
 
@@ -63,7 +61,7 @@ void AcnNodeReconstructingVisitorTests::test_emptyModule()
     QCOMPARE(actual, expected);
 }
 
-void AcnNodeReconstructingVisitorTests::test_boolean()
+void tst_AcnNodeReconstructingVisitor::testBoolean()
 {
     auto type = std::make_unique<Types::Boolean>();
 
@@ -76,7 +74,7 @@ void AcnNodeReconstructingVisitorTests::test_boolean()
     performTest(QStringLiteral("MyBool"), expectedResult, std::move(type));
 }
 
-void AcnNodeReconstructingVisitorTests::test_null()
+void tst_AcnNodeReconstructingVisitor::testNull()
 {
     auto type = std::make_unique<Types::Null>();
 
@@ -88,7 +86,7 @@ void AcnNodeReconstructingVisitorTests::test_null()
     performTest(QStringLiteral("MyNull"), expectedResult, std::move(type));
 }
 
-void AcnNodeReconstructingVisitorTests::test_integer()
+void tst_AcnNodeReconstructingVisitor::testInteger()
 {
     auto type = std::make_unique<Types::Integer>();
 
@@ -102,7 +100,7 @@ void AcnNodeReconstructingVisitorTests::test_integer()
     performTest(QStringLiteral("MyInteger"), expectedResult, std::move(type));
 }
 
-void AcnNodeReconstructingVisitorTests::test_real()
+void tst_AcnNodeReconstructingVisitor::testReal()
 {
     auto type = std::make_unique<Types::Real>();
 
@@ -115,7 +113,7 @@ void AcnNodeReconstructingVisitorTests::test_real()
     performTest(QStringLiteral("MyReal"), expectedResult, std::move(type));
 }
 
-void AcnNodeReconstructingVisitorTests::test_bitString()
+void tst_AcnNodeReconstructingVisitor::testBitString()
 {
     auto type = std::make_unique<Types::BitString>();
 
@@ -127,7 +125,7 @@ void AcnNodeReconstructingVisitorTests::test_bitString()
     performTest(QStringLiteral("MyBitString"), expectedResult, std::move(type));
 }
 
-void AcnNodeReconstructingVisitorTests::test_octetString()
+void tst_AcnNodeReconstructingVisitor::testOctetString()
 {
     auto type = std::make_unique<Types::OctetString>();
 
@@ -139,7 +137,7 @@ void AcnNodeReconstructingVisitorTests::test_octetString()
     performTest(QStringLiteral("MyOctetString"), expectedResult, std::move(type));
 }
 
-void AcnNodeReconstructingVisitorTests::test_IA5String()
+void tst_AcnNodeReconstructingVisitor::testIA5String()
 {
     auto type = std::make_unique<Types::IA5String>();
 
@@ -154,7 +152,7 @@ void AcnNodeReconstructingVisitorTests::test_IA5String()
     performTest(QStringLiteral("MyIA5String"), expectedResult, std::move(type));
 }
 
-void AcnNodeReconstructingVisitorTests::test_numericString()
+void tst_AcnNodeReconstructingVisitor::testNumericString()
 {
     auto type = std::make_unique<Types::NumericString>();
 
@@ -169,7 +167,7 @@ void AcnNodeReconstructingVisitorTests::test_numericString()
     performTest(QStringLiteral("MyNumericString"), expectedResult, std::move(type));
 }
 
-void AcnNodeReconstructingVisitorTests::test_enumerated()
+void tst_AcnNodeReconstructingVisitor::testEnumerated()
 {
     auto type = std::make_unique<Types::Enumerated>();
 
@@ -185,7 +183,7 @@ void AcnNodeReconstructingVisitorTests::test_enumerated()
     performTest(QStringLiteral("MyEnumerated"), expectedResult, std::move(type));
 }
 
-void AcnNodeReconstructingVisitorTests::test_sequenceOf()
+void tst_AcnNodeReconstructingVisitor::testSequenceOf()
 {
     auto type = std::make_unique<Types::SequenceOf>();
 
@@ -197,7 +195,7 @@ void AcnNodeReconstructingVisitorTests::test_sequenceOf()
     performTest(QStringLiteral("MySequenceOf"), expectedResult, std::move(type));
 }
 
-void AcnNodeReconstructingVisitorTests::test_choice()
+void tst_AcnNodeReconstructingVisitor::testChoice()
 {
     auto type = std::make_unique<Types::Choice>();
 
@@ -208,7 +206,7 @@ void AcnNodeReconstructingVisitorTests::test_choice()
     performTest(QStringLiteral("MyChoice"), expectedResult, std::move(type));
 }
 
-void AcnNodeReconstructingVisitorTests::test_choiceNested()
+void tst_AcnNodeReconstructingVisitor::testChoiceNested()
 {
     auto choiceType = std::make_unique<Types::Choice>();
     auto sequenceType = std::make_unique<Types::Sequence>();
@@ -241,7 +239,7 @@ void AcnNodeReconstructingVisitorTests::test_choiceNested()
     performTest(QStringLiteral("MyChoice"), expectedResult, std::move(choiceType));
 }
 
-void AcnNodeReconstructingVisitorTests::test_choiceParametrized()
+void tst_AcnNodeReconstructingVisitor::testChoiceParametrized()
 {
     auto choiceType = std::make_unique<Types::Choice>();
 
@@ -274,7 +272,7 @@ void AcnNodeReconstructingVisitorTests::test_choiceParametrized()
     performTest(QStringLiteral("MyChoice"), expectedResult, std::move(choiceType));
 }
 
-void AcnNodeReconstructingVisitorTests::test_sequence()
+void tst_AcnNodeReconstructingVisitor::testSequence()
 {
     auto type = std::make_unique<Types::Sequence>();
 
@@ -285,7 +283,7 @@ void AcnNodeReconstructingVisitorTests::test_sequence()
     performTest(QStringLiteral("MySequence"), expectedResult, std::move(type));
 }
 
-void AcnNodeReconstructingVisitorTests::test_sequenceNested()
+void tst_AcnNodeReconstructingVisitor::testSequenceNested()
 {
     auto sequenceType = std::make_unique<Types::Sequence>();
     auto choiceType = std::make_unique<Types::Choice>();
@@ -318,7 +316,7 @@ void AcnNodeReconstructingVisitorTests::test_sequenceNested()
     performTest(QStringLiteral("MySequence"), expectedResult, std::move(sequenceType));
 }
 
-void AcnNodeReconstructingVisitorTests::test_acnParameter()
+void tst_AcnNodeReconstructingVisitor::testAcnParameter()
 {
     auto type = std::make_unique<Types::Sequence>();
     type->addParameter(std::make_unique<AcnParameter>(
@@ -329,7 +327,7 @@ void AcnNodeReconstructingVisitorTests::test_acnParameter()
     performTest(QStringLiteral("MySequence"), expectedResult, std::move(type));
 }
 
-void AcnNodeReconstructingVisitorTests::test_acnArgument()
+void tst_AcnNodeReconstructingVisitor::testAcnArgument()
 {
     auto type = std::make_unique<Types::UserdefinedType>(QStringLiteral("MyType"), QStringLiteral("MyModule"), nullptr);
     type->addArgument(std::make_unique<AcnArgument>(QStringLiteral("ArgumentName")));
@@ -339,7 +337,7 @@ void AcnNodeReconstructingVisitorTests::test_acnArgument()
     performTest(QStringLiteral("MySequence"), expectedResult, std::move(type));
 }
 
-void AcnNodeReconstructingVisitorTests::test_integerEncodingToString()
+void tst_AcnNodeReconstructingVisitor::testIntegerEncodingToString()
 {
     using namespace Types;
     QCOMPARE(IntegerAcnParameters::encodingToString(IntegerEncoding::pos_int), QStringLiteral("pos-int"));
@@ -350,7 +348,7 @@ void AcnNodeReconstructingVisitorTests::test_integerEncodingToString()
     QCOMPARE(IntegerAcnParameters::encodingToString(IntegerEncoding::unspecified), QStringLiteral(""));
 }
 
-void AcnNodeReconstructingVisitorTests::test_realEncodingToString()
+void tst_AcnNodeReconstructingVisitor::testRealEncodingToString()
 {
     using namespace Types;
     QCOMPARE(Real::encodingToString(RealEncoding::IEEE754_1985_32), QStringLiteral("IEEE754-1985-32"));
@@ -358,14 +356,14 @@ void AcnNodeReconstructingVisitorTests::test_realEncodingToString()
     QCOMPARE(IntegerAcnParameters::encodingToString(IntegerEncoding::unspecified), QStringLiteral(""));
 }
 
-void AcnNodeReconstructingVisitorTests::test_asciiStringEncodingToString()
+void tst_AcnNodeReconstructingVisitor::testAsciiStringEncodingToString()
 {
     using namespace Types;
     QCOMPARE(AsciiStringAcnParameters::encodingToString(AsciiStringEncoding::ASCII), QStringLiteral("ASCII"));
     QCOMPARE(IntegerAcnParameters::encodingToString(IntegerEncoding::unspecified), QStringLiteral(""));
 }
 
-void AcnNodeReconstructingVisitorTests::performTest(
+void tst_AcnNodeReconstructingVisitor::performTest(
         const QString &name, const QString &expectedResult, std::unique_ptr<Types::Type> type) const
 {
     auto assignment = std::make_unique<TypeAssignment>(name, name + "T", SourceLocation(), std::move(type));
@@ -374,7 +372,7 @@ void AcnNodeReconstructingVisitorTests::performTest(
     QCOMPARE(actualResult, expectedResult);
 }
 
-QString AcnNodeReconstructingVisitorTests::restoreNode(const Node &node) const
+QString tst_AcnNodeReconstructingVisitor::restoreNode(const Node &node) const
 {
     QString ret;
     QTextStream outStream(&ret);
@@ -384,3 +382,5 @@ QString AcnNodeReconstructingVisitorTests::restoreNode(const Node &node) const
 
     return ret;
 }
+
+} // namespace conversion::asn1::test

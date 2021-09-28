@@ -17,24 +17,20 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/lgpl-2.1.html>.
  */
 
-#include "acnnodereconstructingvisitor_tests.h"
-#include "asn1nodereconstructingvisitor_tests.h"
+#include "tst_acnnodereconstructingvisitor.h"
+#include "tst_asn1nodereconstructingvisitor.h"
 
-#include <QObject>
 #include <QTest>
-#include <QtTest/qtestcase.h>
-#include <asn1library/asn1/definitions.h>
 
-int main(int argc, char *argv[])
+using namespace conversion::asn1::test;
+
+int main()
 {
-    int ret = 0;
-    const auto runTest = [&ret, argc, argv](QObject *obj) {
-        ret += QTest::qExec(obj, argc, argv);
-        delete obj;
-    };
+    tst_AcnNodeReconstructingVisitor acnNodeReconstructingVisitor;
+    tst_Asn1NodeReconstructingVisitor asn1NodeReconstructingVisitor;
 
-    runTest(new Asn1Acn::Tests::Asn1NodeReconstructingVisitorTests);
-    runTest(new Asn1Acn::Tests::AcnNodeReconstructingVisitorTests);
+    QTest::qExec(&acnNodeReconstructingVisitor);
+    QTest::qExec(&asn1NodeReconstructingVisitor);
 
-    return ret;
+    return EXIT_SUCCESS;
 }
