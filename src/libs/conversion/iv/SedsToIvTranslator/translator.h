@@ -78,9 +78,10 @@ private:
     /**
      * @brief   Translate SEDS package
      *
-     * @param   sedsPackage     Package to translate
-     * @param   asn1Model       ASN.1 Model with types defined in this package
-     * @param   ivModel         InterfaceView model to which should translated IV functions will be added
+     * @param   package             Package to translate
+     * @param   asn1Model           ASN.1 Model with types defined in this package
+     * @param   model               InterfaceView model to which should translated IV functions will be added
+     * @param   generateFunction    Generate parent function for the translated components
      */
     auto translatePackage(const seds::model::Package &package, Asn1Acn::Asn1Model *asn1Model, ivm::IVModel *model,
             bool generateFunction) const -> void;
