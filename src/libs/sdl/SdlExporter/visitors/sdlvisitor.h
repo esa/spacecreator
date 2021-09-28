@@ -28,9 +28,17 @@
 
 namespace sdl {
 
+/**
+ * @brief   Visitor serializing components of the SDL model
+ */
 class SdlVisitor : public Visitor
 {
 public:
+    /**
+     * @brief   Constructor
+     *
+     * @param   stream   output stream (where the serialized values are put)
+     */
     SdlVisitor(QTextStream &stream);
     SdlVisitor(const QTextStream &&) = delete;
     auto visit(const SdlModel &model) const -> void override;
