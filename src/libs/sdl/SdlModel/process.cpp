@@ -36,7 +36,7 @@ auto Process::stateMachine() const -> const std::unique_ptr<StateMachine> &
     return m_stateMachine;
 }
 
-auto Process::variables() const -> const std::vector<VariableDeclaration> &
+auto Process::variables() const -> const std::vector<std::unique_ptr<VariableDeclaration>> &
 {
     return m_variables;
 }

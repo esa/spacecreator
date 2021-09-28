@@ -47,13 +47,13 @@ public:
     virtual ~Process();
 
     auto stateMachine() const -> const std::unique_ptr<StateMachine> &;
-    auto variables() const -> const std::vector<VariableDeclaration> &;
+    auto variables() const -> const std::vector<std::unique_ptr<VariableDeclaration>> &;
     auto procedures() const -> const std::vector<Procedure> &;
     auto accept(Visitor &visitor) const -> void override;
 
 private:
     std::unique_ptr<StateMachine> m_stateMachine;
-    std::vector<VariableDeclaration> m_variables;
+    std::vector<std::unique_ptr<VariableDeclaration>> m_variables;
     std::vector<Procedure> m_procedures;
 };
 } // namespace sdl
