@@ -66,7 +66,8 @@ void tst_sdlmodel::testGenerateProcess()
     QString processName = "name_of_the_process";
     Input input1("some_input_name");
     State state("some_state", { input1 });
-    Process process(processName, StateMachine({ state }, std::vector<Transition>()));
+    State state2("some_other_state", { input1 });
+    Process process(processName, StateMachine({ state, state2 }, std::vector<Transition>()));
     SdlModel exampleModel(process, "Example");
 
     Options options;
