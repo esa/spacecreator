@@ -35,14 +35,13 @@ class Transition
 class StateMachine
 {
 public:
-    StateMachine(std::vector<std::unique_ptr<State>> &states,
-            const std::vector<Transition> &transitions = std::vector<Transition>());
+    StateMachine(std::vector<std::unique_ptr<State>> &states, std::vector<std::unique_ptr<Transition>> &transitions);
     auto states() const -> const std::vector<std::unique_ptr<State>> &;
-    auto transitions() const -> const std::vector<Transition> &;
+    auto transitions() const -> const std::vector<std::unique_ptr<Transition>> &;
 
 private:
     std::vector<std::unique_ptr<State>> m_states;
-    std::vector<Transition> m_transitions;
+    std::vector<std::unique_ptr<Transition>> m_transitions;
 };
 
 } // namespace sdl
