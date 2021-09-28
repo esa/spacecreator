@@ -21,10 +21,12 @@
 
 namespace sdl {
 
-State::State(const QString &name, const std::vector<Input> &inputs)
+State::State(const QString &name, std::vector<std::unique_ptr<Input>> &inputs)
     : Node(name)
-    , m_inputs(inputs)
 {
+    for (unsigned long int i = 0; i < inputs.size(); i++) {
+        m_inputs.push_back(std::move(inputs[i]));
+    }
 }
 
 State::State()
@@ -39,7 +41,7 @@ State::State(const State &state)
 
 State::~State() {}
 
-auto State::inputs() const -> const std::vector<Input> &
+auto State::inputs() const -> const std::vector<std::unique_ptr<Input>> &
 {
     return m_inputs;
 }

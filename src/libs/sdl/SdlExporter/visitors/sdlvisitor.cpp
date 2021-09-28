@@ -55,7 +55,7 @@ void SdlVisitor::visit(const State &state) const
     m_stream << "    /* CIF state (" << 250 << ", " << 150 << "), (" << 150 << ", " << 75 << ") */\n";
     m_stream << "    state " << state.name() << ";\n";
 
-    exportCollection(state.inputs());
+    exportPointersCollection(state.inputs());
 
     m_stream << "    endstate;\n";
 }

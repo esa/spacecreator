@@ -67,12 +67,23 @@ void tst_sdlmodel::testDefaultValuesInModel()
 void tst_sdlmodel::testGenerateProcess()
 {
     QString processName = "name_of_the_process";
-    Input input1("some_input_name");
-    auto state1 = std::make_unique<State>("some_state", std::vector<Input>({ input1 }));
-    auto state2 = std::make_unique<State>("some_other_state", std::vector<Input>({ input1 }));
+
+    auto inputs = std::vector<std::unique_ptr<Input>>();
+    auto input1 = std::make_unique<Input>("some_input_name");
+    inputs.push_back(std::move(input1));
+
+    auto state1 = std::make_unique<State>("some_state", inputs);
+
+    auto inputs2 = std::vector<std::unique_ptr<Input>>();
+    auto input2 = std::make_unique<Input>("some_other_input_name");
+    inputs2.push_back(std::move(input2));
+
+    auto state2 = std::make_unique<State>("some_other_state", inputs2);
+
     auto states = std::vector<std::unique_ptr<State>>();
     states.push_back(std::move(state1));
     states.push_back(std::move(state2));
+
     auto transitions = std::vector<std::unique_ptr<Transition>>();
     auto sm = std::make_unique<StateMachine>(states, transitions);
     Process process(processName, sm);

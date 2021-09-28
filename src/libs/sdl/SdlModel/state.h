@@ -19,11 +19,12 @@
 
 #pragma once
 
-#include "../SdlExporter/visitors/visitor.h"
 #include "input.h"
 #include "node.h"
 
 #include <QString>
+#include <memory>
+#include <sdl/SdlExporter/visitors/visitor.h>
 #include <vector>
 
 namespace sdl {
@@ -40,14 +41,14 @@ class State : public Node
 public:
     State();
     State(const State &state);
-    State(const QString &name, const std::vector<Input> &inputs);
+    State(const QString &name, std::vector<std::unique_ptr<Input>> &inputs);
     ~State();
-    auto inputs() const -> const std::vector<Input> &;
+    auto inputs() const -> const std::vector<std::unique_ptr<Input>> &;
     auto continuousSignals() -> const std::vector<ContinuousSignal> &;
     auto accept(Visitor &visitor) const -> void override;
 
 private:
-    std::vector<Input> m_inputs;
+    std::vector<std::unique_ptr<Input>> m_inputs;
     std::vector<ContinuousSignal> m_continuousSignals;
 };
 
