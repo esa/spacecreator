@@ -32,7 +32,6 @@
 
 using Asn1Acn::Asn1Model;
 using conversion::iv::IvOptions;
-using conversion::translator::IncorrectSourceModelException;
 using conversion::translator::TranslationException;
 using ivm::IVModel;
 using seds::model::SedsModel;
@@ -132,14 +131,14 @@ Asn1Acn::Definitions *SedsToIvTranslator::getAsn1Definitions(
     auto asn1File = std::find_if(
             std::begin(asn1Files), std::end(asn1Files), [&](const auto &file) { return file->name() == asn1FileName; });
     if (asn1File == asn1Files.end()) {
-        const auto message = QString("Unable to find file %1 in the ASN.1 model").arg(asn1FileName);
+        auto message = QString("Unable to find file %1 in the ASN.1 model").arg(asn1FileName);
         throw TranslationException(std::move(message));
     }
 
     const auto &asn1DefinitionsName = sedsPackage.asn1NameStr();
     auto *asn1Definitions = (*asn1File)->definitions(asn1DefinitionsName);
     if (!asn1Definitions) {
-        const auto message =
+        auto message =
                 QString("ASN.1 file %1 doesn't have definitions named %2").arg(asn1FileName).arg(asn1DefinitionsName);
         throw TranslationException(std::move(message));
     }

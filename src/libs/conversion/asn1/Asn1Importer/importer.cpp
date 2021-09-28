@@ -61,7 +61,7 @@ std::unique_ptr<conversion::Model> Asn1Importer::importModel(const Options &opti
     }
 
     if (!errorMessages.isEmpty()) {
-        const auto message = errorMessages.join("\n");
+        auto message = errorMessages.join("\n");
         throw ImportException(std::move(message));
     }
 

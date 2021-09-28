@@ -93,7 +93,7 @@ public:
     virtual auto getDependencies() const -> std::set<ModelType> = 0;
 
 protected:
-    auto checkSourceModelCount(const std::vector<Model *> models) const -> void;
+    auto checkSourceModelCount(const std::vector<Model *> &models) const -> void;
 
     template<typename ModelT>
     static auto getModel(const std::vector<Model *> models) -> ModelT *;
@@ -107,10 +107,11 @@ ModelT *Translator::getModel(const std::vector<Model *> models)
             [](Model *model) { return dynamic_cast<ModelT *>(model) != nullptr; });
 
     if (foundModels.empty()) {
-        auto message = QString("No %1 model found").arg(modelTypeToString(ModelProperties<ModelType>::type));
+        auto message = QString("Missing source %1 model").arg(modelTypeToString(ModelProperties<ModelType>::type));
         throw conversion::translator::TranslationException(std::move(message));
     } else if (foundModels.size() > 1) {
-        auto message = QString("More than 1 %1 model passed").arg(modelTypeToString(ModelProperties<ModelType>::type));
+        auto message =
+                QString("More than 1 source %1 model passed").arg(modelTypeToString(ModelProperties<ModelType>::type));
         throw conversion::translator::TranslationException(std::move(message));
     } else {
         return dynamic_cast<ModelT *>(foundModels[0]);

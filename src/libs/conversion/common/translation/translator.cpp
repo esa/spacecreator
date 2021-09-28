@@ -21,7 +21,7 @@
 
 namespace conversion::translator {
 
-void Translator::checkSourceModelCount(const std::vector<Model *> models) const
+void Translator::checkSourceModelCount(const std::vector<Model *> &models) const
 {
     const auto requiredModelsCount = getDependencies().size();
 

@@ -29,7 +29,6 @@
 #include <seds/SedsModel/sedsmodel.h>
 
 using Asn1Acn::Asn1Model;
-using conversion::translator::IncorrectSourceModelException;
 using conversion::translator::TranslationException;
 using seds::model::SedsModel;
 

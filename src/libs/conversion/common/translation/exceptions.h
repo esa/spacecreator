@@ -41,21 +41,6 @@ public:
 };
 
 /**
- * @brief   Exception thrown when translator gets unsupported model
- */
-class IncorrectSourceModelException : public TranslationException
-{
-public:
-    /**
-     * @brief   Constructor
-     *
-     * @param   expectedModelsTypes     Expected models types
-     * @param   receivedModelType       Received model type
-     */
-    explicit IncorrectSourceModelException(std::set<ModelType> expectedModelsTypes, ModelType receivedModelType);
-};
-
-/**
  * @brief   Exception thrown when translator encounters a data type that wasn't declared
  */
 class UndeclaredDataTypeException : public TranslationException

@@ -120,7 +120,7 @@ QString AsyncInterfaceCommandTranslator::buildAsn1SequenceType(
         return foundType->second.asn1TypeName;
     } else {
         const auto cachedTypesCount = m_commandArgumentsCache.count(sedsCommandName);
-        const auto bundledTypeName = createBundledTypeName(sedsCommandName, cachedTypesCount);
+        auto bundledTypeName = createBundledTypeName(sedsCommandName, cachedTypesCount);
         createAsn1Sequence(bundledTypeName, arguments);
 
         m_commandArgumentsCache.insert({ sedsCommandName, { bundledTypeName, bundledTypeHash, std::move(arguments) } });
@@ -135,7 +135,7 @@ void AsyncInterfaceCommandTranslator::createAsn1Sequence(
     auto sequence = std::make_unique<Asn1Acn::Types::Sequence>(name);
 
     for (const auto &[name, typeName] : arguments) {
-        sequence->addComponent(createAsn1SequenceComponent(name, typeName));
+        createAsn1SequenceComponent(name, typeName, sequence.get());
     }
 
     auto typeAssignment =
@@ -143,8 +143,8 @@ void AsyncInterfaceCommandTranslator::createAsn1Sequence(
     m_asn1Definitions->addType(std::move(typeAssignment));
 }
 
-std::unique_ptr<Asn1Acn::SequenceComponent> AsyncInterfaceCommandTranslator::createAsn1SequenceComponent(
-        const QString &name, const QString typeName) const
+void AsyncInterfaceCommandTranslator::createAsn1SequenceComponent(
+        const QString &name, const QString &typeName, Asn1Acn::Types::Sequence *sequence) const
 {
     const auto *referencedTypeAssignment = m_asn1Definitions->type(typeName);
     const auto *referencedType = referencedTypeAssignment->type();
@@ -153,11 +153,13 @@ std::unique_ptr<Asn1Acn::SequenceComponent> AsyncInterfaceCommandTranslator::cre
             typeName, m_asn1Definitions->name(), referencedTypeAssignment);
     sequenceComponentType->setType(referencedType->clone());
 
-    return std::make_unique<Asn1Acn::AsnSequenceComponent>(
+    auto sequenceComponent = std::make_unique<Asn1Acn::AsnSequenceComponent>(
             name, name, false, "", Asn1Acn::SourceLocation(), std::move(sequenceComponentType));
+    sequence->addComponent(std::move(sequenceComponent));
 }
 
-QString AsyncInterfaceCommandTranslator::createBundledTypeName(const QString sedsCommandName, std::size_t counter) const
+QString AsyncInterfaceCommandTranslator::createBundledTypeName(
+        const QString &sedsCommandName, const std::size_t counter) const
 {
     if (counter == 0) {
         return m_bundledTypeNameTemplate.arg(sedsCommandName).arg("");

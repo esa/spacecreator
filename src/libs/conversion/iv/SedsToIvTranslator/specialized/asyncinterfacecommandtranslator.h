@@ -28,6 +28,9 @@ namespace Asn1Acn {
 class AsnSequenceComponent;
 class Definitions;
 class SequenceComponent;
+namespace Types {
+class Sequence;
+} // namespace Types
 } // namespace Asn1Acn
 
 namespace seds::model {
@@ -114,22 +117,23 @@ private:
     /**
      * @brief   Creates ASN.1 sequence type
      *
+     * Adds the created sequence to the ASN.1 definitions member
+     *
      * @param   name        Name of the sequence
      * @param   arguments   SEDS command arguments
-     *
-     * @return  ASN.1 sequence
      */
     auto createAsn1Sequence(const QString &name, const std::unordered_map<QString, QString> &arguments) -> void;
     /**
      * @brief   Creates ASN.1 sequence component type
      *
+     * Added the created sequence component to the passed ASN.1 sequence
+     *
      * @param   name        Name of the component
      * @param   typeName    Name of the component type
-     *
-     * @return  ASN.1 sequence component
+     * @param   sequence    Sequence to which component should be added
      */
-    auto createAsn1SequenceComponent(const QString &name, const QString typeName) const
-            -> std::unique_ptr<Asn1Acn::SequenceComponent>;
+    auto createAsn1SequenceComponent(
+            const QString &name, const QString &typeName, Asn1Acn::Types::Sequence *sequence) const -> void;
     /**
      *  Create a name for the bundled argument type
      *
@@ -138,7 +142,7 @@ private:
      *
      *  @return Type name
      */
-    auto createBundledTypeName(const QString sedsCommandName, std::size_t counter = 0) const -> QString;
+    auto createBundledTypeName(const QString &sedsCommandName, const std::size_t counter = 0) const -> QString;
 
     /**
      * @brief   Process SEDS command arguments types
