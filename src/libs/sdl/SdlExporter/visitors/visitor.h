@@ -26,6 +26,7 @@ class Process;
 class SdlModel;
 class Signal;
 class State;
+class Transition;
 
 class Visitor
 {
@@ -40,6 +41,7 @@ public:
     virtual auto visit(const State &state) const -> void = 0;
     virtual auto visit(const Input &input) const -> void = 0;
     virtual auto visit(const Signal &sig) const -> void = 0;
+    virtual auto visit(const Transition &transition) const -> void = 0;
 };
 
 } // namespace sdl

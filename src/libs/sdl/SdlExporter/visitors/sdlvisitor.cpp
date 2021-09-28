@@ -72,6 +72,11 @@ void SdlVisitor::visit(const Signal &sig) const
     Q_UNUSED(sig);
 }
 
+void SdlVisitor::visit(const Transition &transition) const
+{
+    Q_UNUSED(transition);
+}
+
 template<typename T>
 auto SdlVisitor::exportCollection(const T &collection) const -> void
 {

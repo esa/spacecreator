@@ -25,6 +25,7 @@
 #include <sdl/SdlModel/sdlmodel.h>
 #include <sdl/SdlModel/signal.h>
 #include <sdl/SdlModel/state.h>
+#include <sdl/SdlModel/transition.h>
 
 namespace sdl {
 
@@ -46,6 +47,7 @@ public:
     auto visit(const State &state) const -> void override;
     auto visit(const Input &input) const -> void override;
     auto visit(const Signal &sig) const -> void override;
+    auto visit(const Transition &transition) const -> void override;
 
 private:
     template<typename T>

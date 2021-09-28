@@ -9,6 +9,7 @@ set(SOURCES sdlmodel.cpp
             signal.cpp
             input.cpp
             literal.cpp
+            transition.cpp
             variabledeclaration.cpp
             variablereference.cpp
             node.cpp

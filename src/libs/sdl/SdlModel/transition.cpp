@@ -17,27 +17,28 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/lgpl-2.1.html>.
  */
 
-#pragma once
-
-#include "state.h"
 #include "transition.h"
 
-#include <QString>
 #include <memory>
-#include <vector>
 
 namespace sdl {
 
-class StateMachine
+Transition::Transition(const QString &name, std::vector<std::unique_ptr<Action>> &actions)
+    : Node(name)
 {
-public:
-    StateMachine(std::vector<std::unique_ptr<State>> &states, std::vector<std::unique_ptr<Transition>> &transitions);
-    auto states() const -> const std::vector<std::unique_ptr<State>> &;
-    auto transitions() const -> const std::vector<std::unique_ptr<Transition>> &;
+    for (unsigned long int i = 0; i < actions.size(); i++) {
+        m_actions.push_back(std::move(actions[i]));
+    }
+}
 
-private:
-    std::vector<std::unique_ptr<State>> m_states;
-    std::vector<std::unique_ptr<Transition>> m_transitions;
-};
+auto Transition::actions() -> const std::vector<std::unique_ptr<Action>> &
+{
+    return m_actions;
+}
+
+auto Transition::accept(Visitor &visitor) const -> void
+{
+    visitor.visit(*this);
+}
 
 } // namespace sdl

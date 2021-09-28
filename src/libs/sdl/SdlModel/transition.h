@@ -19,25 +19,30 @@
 
 #pragma once
 
-#include "state.h"
-#include "transition.h"
+#include "node.h"
+#include "statemachine.h"
 
 #include <QString>
 #include <memory>
+#include <sdl/SdlExporter/visitors/visitor.h>
 #include <vector>
 
 namespace sdl {
 
-class StateMachine
+class Action : public Node
+{
+    // TODO: move to a separate file
+};
+
+class Transition : public Node
 {
 public:
-    StateMachine(std::vector<std::unique_ptr<State>> &states, std::vector<std::unique_ptr<Transition>> &transitions);
-    auto states() const -> const std::vector<std::unique_ptr<State>> &;
-    auto transitions() const -> const std::vector<std::unique_ptr<Transition>> &;
+    Transition(const QString &name, std::vector<std::unique_ptr<Action>> &actions);
+    auto actions() -> const std::vector<std::unique_ptr<Action>> &;
+    auto accept(Visitor &visitor) const -> void;
 
 private:
-    std::vector<std::unique_ptr<State>> m_states;
-    std::vector<std::unique_ptr<Transition>> m_transitions;
+    std::vector<std::unique_ptr<Action>> m_actions;
 };
 
 } // namespace sdl
