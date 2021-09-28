@@ -38,7 +38,7 @@ public:
     auto withIntegerDataType(QString name) -> Asn1ModelBuilder &;
 
 private:
-    Asn1Acn::File m_file;
+    std::unique_ptr<Asn1Acn::File> m_file;
     Asn1Acn::Definitions *m_definitions;
 };
 

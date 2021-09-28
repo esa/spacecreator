@@ -123,14 +123,14 @@ void SedsToIvTranslator::translatePackage(
 
     auto &asn1Files = asn1Model->data();
     auto asn1File = std::find_if(std::begin(asn1Files), std::end(asn1Files),
-            [&packageName](const auto &file) { return file.name() == packageName; });
+            [&packageName](const auto &file) { return file->name() == packageName; });
     if (asn1File == asn1Files.end()) {
         const auto message = QString("Unable to find file %1 in the ASN.1 model").arg(packageName);
         throw TranslationException(std::move(message));
     }
 
     const auto &asn1DefinitionsName = package.asn1NameStr();
-    auto *asn1Definitions = asn1File->definitions(asn1DefinitionsName);
+    auto *asn1Definitions = (*asn1File)->definitions(asn1DefinitionsName);
     if (!asn1Definitions) {
         const auto message =
                 QString("ASN.1 file %1 doesn't have definitions named %2").arg(packageName).arg(asn1DefinitionsName);

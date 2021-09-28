@@ -29,19 +29,19 @@ using namespace Asn1Acn::Types;
 namespace tests::conversion::common {
 
 Asn1ModelBuilder::Asn1ModelBuilder(QString name)
-    : m_file(std::move(name))
+    : m_file(std::make_unique<File>(std::move(name)))
 {
     const auto definitionsName = name.toUpper();
 
     auto definitions = std::make_unique<Asn1Acn::Definitions>(definitionsName, Asn1Acn::SourceLocation());
-    m_file.add(std::move(definitions));
+    m_file->add(std::move(definitions));
 
-    m_definitions = m_file.definitions(definitionsName);
+    m_definitions = m_file->definitions(definitionsName);
 }
 
 std::unique_ptr<Asn1Model> Asn1ModelBuilder::build()
 {
-    std::vector<File> files;
+    std::vector<std::unique_ptr<File>> files;
     files.push_back(std::move(m_file));
 
     return std::make_unique<Asn1Model>(std::move(files));
