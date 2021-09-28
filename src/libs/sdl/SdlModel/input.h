@@ -32,6 +32,7 @@ public:
     Input(const QString &name = "");
     Input(const Input &input);
 
-    // TODO: list of input parameters (variable declarations)
+    // TODO: list of input parameters (variants: variable references/literals)
+    // TODO: transition that shall be fired upon reception of this signal
 };
 } // namespace sdl

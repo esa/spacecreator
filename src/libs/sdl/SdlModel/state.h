@@ -28,6 +28,13 @@
 
 namespace sdl {
 
+class ContinuousSignal
+{
+    // TODO: move to a separate file
+    // TODO: this class shall inherit from Transition
+    // TODO: this class shall contain an Expression
+};
+
 class State : public Node
 {
 public:
@@ -36,10 +43,12 @@ public:
     State(const QString &name, const std::vector<Input> &inputs);
     ~State();
     auto inputs() const -> const std::vector<Input> &;
+    auto continuousSignals() -> const std::vector<ContinuousSignal> &;
     auto accept(Visitor &visitor) const -> void override;
 
 private:
     std::vector<Input> m_inputs;
+    std::vector<ContinuousSignal> m_continuousSignals;
 };
 
 } // namespace sdl

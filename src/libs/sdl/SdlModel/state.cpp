@@ -44,6 +44,11 @@ auto State::inputs() const -> const std::vector<Input> &
     return m_inputs;
 }
 
+auto State::continuousSignals() -> const std::vector<ContinuousSignal> &
+{
+    return m_continuousSignals;
+}
+
 auto State::accept(Visitor &visitor) const -> void
 {
     visitor.visit(*this);
