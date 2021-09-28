@@ -23,7 +23,6 @@ namespace sdl {
 
 State::State(const QString &name, const std::vector<Input> &inputs)
     : Node(name)
-    , m_name(name)
     , m_inputs(inputs)
 {
 }
@@ -39,11 +38,6 @@ State::State(const State &state)
 }
 
 State::~State() {}
-
-auto State::name() const -> const QString &
-{
-    return m_name;
-}
 
 auto State::inputs() const -> const std::vector<Input> &
 {

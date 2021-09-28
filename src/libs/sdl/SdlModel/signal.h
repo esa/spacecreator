@@ -31,11 +31,7 @@ class Signal : public Node
 public:
     Signal(const QString &name = "");
     virtual ~Signal();
-    auto name() const -> QString;
     virtual auto accept(Visitor &visitor) const -> void override;
-
-private:
-    QString m_name = "";
 };
 
 } // namespace sdl

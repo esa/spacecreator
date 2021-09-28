@@ -50,7 +50,7 @@ public:
     }
 
     void setName(const QString &name) { m_name = name; }
-    const QString &name() const { return m_name; }
+    virtual const QString &name() const { return m_name; }
 
     Node *parent() const { return m_parent; }
     void setParent(Node *parent) { m_parent = parent; }

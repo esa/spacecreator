@@ -25,7 +25,6 @@ namespace sdl {
 
 Process::Process(const Process &process)
     : Node(process.name())
-    , m_name(process.name())
     , m_stateMachine(process.stateMachine())
     , m_variables(process.variables())
     , m_procedures(process.procedures())
@@ -34,17 +33,11 @@ Process::Process(const Process &process)
 
 Process::Process(const QString &name, const StateMachine &stateMachine)
     : Node(name)
-    , m_name(name)
     , m_stateMachine(stateMachine)
 {
 }
 
 Process::~Process() {}
-
-auto Process::name() const -> QString
-{
-    return m_name;
-}
 
 auto Process::stateMachine() const -> const StateMachine &
 {

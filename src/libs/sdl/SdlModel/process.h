@@ -46,14 +46,12 @@ public:
     Process(const QString &name, const StateMachine &stateMachine);
     virtual ~Process();
 
-    auto name() const -> QString;
     auto stateMachine() const -> const StateMachine &;
     auto variables() const -> const std::vector<VariableDeclaration> &;
     auto procedures() const -> const std::vector<Procedure> &;
     auto accept(Visitor &visitor) const -> void override;
 
 private:
-    QString m_name = "";
     StateMachine m_stateMachine;
     std::vector<VariableDeclaration> m_variables;
     std::vector<Procedure> m_procedures;

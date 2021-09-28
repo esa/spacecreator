@@ -23,16 +23,10 @@ namespace sdl {
 
 Signal::Signal(const QString &name)
     : Node(name)
-    , m_name(name)
 {
 }
 
 Signal::~Signal() {}
-
-auto Signal::name() const -> QString
-{
-    return m_name;
-}
 
 auto Signal::accept(Visitor &visitor) const -> void
 {

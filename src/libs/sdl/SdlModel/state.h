@@ -31,16 +31,14 @@ namespace sdl {
 class State : public Node
 {
 public:
-    State(const QString &name, const std::vector<Input> &inputs = std::vector<Input>());
     State();
     State(const State &state);
+    State(const QString &name, const std::vector<Input> &inputs);
     ~State();
-    auto name() const -> const QString &;
     auto inputs() const -> const std::vector<Input> &;
     auto accept(Visitor &visitor) const -> void override;
 
 private:
-    QString m_name = "";
     std::vector<Input> m_inputs;
 };
 
