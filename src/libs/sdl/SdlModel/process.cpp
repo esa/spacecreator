@@ -23,23 +23,15 @@
 
 namespace sdl {
 
-Process::Process(const Process &process)
-    : Node(process.name())
-    , m_stateMachine(process.stateMachine())
-    , m_variables(process.variables())
-    , m_procedures(process.procedures())
-{
-}
-
-Process::Process(const QString &name, const StateMachine &stateMachine)
+Process::Process(const QString &name, std::unique_ptr<StateMachine> &stateMachine)
     : Node(name)
-    , m_stateMachine(stateMachine)
 {
+    m_stateMachine = std::move(stateMachine);
 }
 
 Process::~Process() {}
 
-auto Process::stateMachine() const -> const StateMachine &
+auto Process::stateMachine() const -> const std::unique_ptr<StateMachine> &
 {
     return m_stateMachine;
 }

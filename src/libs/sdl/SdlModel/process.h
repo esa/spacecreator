@@ -19,12 +19,12 @@
 
 #pragma once
 
-#include "../SdlExporter/visitors/visitor.h"
 #include "node.h"
 #include "statemachine.h"
 
 #include <QString>
 #include <memory>
+#include <sdl/SdlExporter/visitors/visitor.h>
 #include <vector>
 
 namespace sdl {
@@ -42,17 +42,17 @@ class Procedure
 class Process : public Node
 {
 public:
-    Process(const Process &process);
-    Process(const QString &name, const StateMachine &stateMachine);
+    Process(const Process &process) = delete; // TODO: there are probably some other cosntructors to delete
+    Process(const QString &name, std::unique_ptr<StateMachine> &stateMachine);
     virtual ~Process();
 
-    auto stateMachine() const -> const StateMachine &;
+    auto stateMachine() const -> const std::unique_ptr<StateMachine> &;
     auto variables() const -> const std::vector<VariableDeclaration> &;
     auto procedures() const -> const std::vector<Procedure> &;
     auto accept(Visitor &visitor) const -> void override;
 
 private:
-    StateMachine m_stateMachine;
+    std::unique_ptr<StateMachine> m_stateMachine;
     std::vector<VariableDeclaration> m_variables;
     std::vector<Procedure> m_procedures;
 };

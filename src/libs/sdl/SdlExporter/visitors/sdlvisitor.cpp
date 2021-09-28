@@ -44,7 +44,7 @@ void SdlVisitor::visit(const Process &process) const
 
     // TODO: loop over procedures and export them
 
-    exportCollection(process.stateMachine().states());
+    exportCollection(process.stateMachine()->states());
 
     m_stream << "endprocess " << process.name() << ";\n";
 }

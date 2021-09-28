@@ -52,7 +52,7 @@ private Q_SLOTS:
 void tst_sdlmodel::testDefaultValuesInModel()
 {
     QString processName = "name_of_the_process";
-    StateMachine sm;
+    auto sm = std::make_unique<StateMachine>();
     Process process(processName, sm);
     SdlModel exampleModel(process);
 
@@ -67,7 +67,8 @@ void tst_sdlmodel::testGenerateProcess()
     Input input1("some_input_name");
     State state("some_state", { input1 });
     State state2("some_other_state", { input1 });
-    Process process(processName, StateMachine({ state, state2 }, std::vector<Transition>()));
+    auto sm = std::make_unique<StateMachine>(std::vector<State>({ state, state2 }), std::vector<Transition>());
+    Process process(processName, sm);
     SdlModel exampleModel(process, "Example");
 
     Options options;
