@@ -26,11 +26,11 @@
 
 namespace sdl {
 
-class SdlModel;
-class Process;
-class State;
-class Signal;
 class Input;
+class Process;
+class SdlModel;
+class Signal;
+class State;
 
 class Visitor
 {

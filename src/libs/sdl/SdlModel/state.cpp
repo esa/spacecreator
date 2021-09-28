@@ -22,7 +22,7 @@
 namespace sdl {
 
 State::State(const QString &name, const std::vector<Input> &inputs)
-    : Node(m_name)
+    : Node(name)
     , m_name(name)
     , m_inputs(inputs)
 {

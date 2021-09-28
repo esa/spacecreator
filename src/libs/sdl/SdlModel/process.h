@@ -43,9 +43,7 @@ class Process : public Node
 {
 public:
     Process(const Process &process);
-    Process(const QString &name, const StateMachine &stateMachine = StateMachine(),
-            const std::vector<VariableDeclaration> &variables = std::vector<VariableDeclaration>(),
-            const std::vector<Procedure> &procedures = std::vector<Procedure>());
+    Process(const QString &name, const StateMachine &stateMachine);
     virtual ~Process();
 
     auto name() const -> QString;
