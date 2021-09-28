@@ -44,7 +44,7 @@ void SdlVisitor::visit(const Process &process) const
 
     // TODO: loop over procedures and export them
 
-    exportPointersCollection(process.stateMachine()->states());
+    exportCollection(process.stateMachine()->states());
 
     m_stream << "endprocess " << process.name() << ";\n";
 }
@@ -55,7 +55,7 @@ void SdlVisitor::visit(const State &state) const
     m_stream << "    /* CIF state (" << 250 << ", " << 150 << "), (" << 150 << ", " << 75 << ") */\n";
     m_stream << "    state " << state.name() << ";\n";
 
-    exportPointersCollection(state.inputs());
+    exportCollection(state.inputs());
 
     m_stream << "    endstate;\n";
 }
@@ -74,15 +74,6 @@ void SdlVisitor::visit(const Signal &sig) const
 
 template<typename T>
 auto SdlVisitor::exportCollection(const T &collection) const -> void
-{
-    for (const auto &item : collection) {
-        SdlVisitor visitor(m_stream);
-        item.accept(visitor);
-    }
-}
-
-template<typename T>
-auto SdlVisitor::exportPointersCollection(const T &collection) const -> void
 {
     for (const auto &item : collection) {
         SdlVisitor visitor(m_stream);

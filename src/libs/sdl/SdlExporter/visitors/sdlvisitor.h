@@ -43,9 +43,6 @@ private:
     template<typename T>
     auto exportCollection(const T &collection) const -> void;
 
-    template<typename T>
-    auto exportPointersCollection(const T &collection) const -> void;
-
     QTextStream &m_stream;
 };
 
