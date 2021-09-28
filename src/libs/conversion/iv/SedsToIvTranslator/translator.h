@@ -53,6 +53,19 @@ public:
      */
     virtual auto translateModels(std::vector<Model *> sourceModels, const Options &options) const
             -> std::vector<std::unique_ptr<Model>> override;
+
+    /**
+     * @brief   Returns a model type that is a source of this translator
+     *
+     * @return  Source model type
+     */
+    virtual auto getSourceModelType() const -> ModelType override;
+    /**
+     * @brief   Returns a model type that is a target of this translator
+     *
+     * @return  Target model type
+     */
+    virtual auto getTargetModelType() const -> ModelType override;
     /**
      * @brief   Provides a set of all source model types that are required for the translation
      *

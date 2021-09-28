@@ -5,7 +5,8 @@ set(SOURCES exceptions.cpp
             options.cpp
             export/exceptions.cpp
             import/exceptions.cpp
-            translation/exceptions.cpp)
+            translation/exceptions.cpp
+            translation/translator.cpp)
 set(INCLUDES exceptions.h
              model.h
              modelproperties.h

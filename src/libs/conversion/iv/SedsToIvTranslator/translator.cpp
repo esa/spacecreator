@@ -42,37 +42,10 @@ namespace conversion::iv::translator {
 std::vector<std::unique_ptr<Model>> SedsToIvTranslator::translateModels(
         std::vector<Model *> sourceModels, const Options &options) const
 {
-    if (sourceModels.empty()) {
-        throw TranslationException("No models passed for translation");
-    } else if (sourceModels.size() < 2) {
-        throw TranslationException("Not enough models passed for SEDS to InterfaceView translation");
-    } else if (sourceModels.size() > 2) {
-        throw TranslationException("Too many models passed for SEDS to InterfaceView translation");
-    }
+    checkSourceModelCount(sourceModels);
 
-    const SedsModel *sedsModel = nullptr;
-    Asn1Model *asn1Model = nullptr;
-
-    for (auto *sourceModel : sourceModels) {
-        switch (sourceModel->modelType()) {
-        case ModelType::Seds:
-            sedsModel = dynamic_cast<const SedsModel *>(sourceModel);
-            break;
-        case ModelType::Asn1:
-            asn1Model = dynamic_cast<Asn1Model *>(sourceModel);
-            break;
-        default:
-            throw IncorrectSourceModelException(getDependencies(), sourceModel->modelType());
-            break;
-        }
-    }
-
-    if (sedsModel == nullptr) {
-        throw TranslationException("Source SEDS model is null");
-    }
-    if (asn1Model == nullptr) {
-        throw TranslationException("Source ASN.1 model is null");
-    }
+    const auto *sedsModel = getModel<SedsModel>(sourceModels);
+    auto *asn1Model = getModel<Asn1Model>(sourceModels);
 
     const auto ivConfigFilename = options.value(IvOptions::configFilename);
     if (!ivConfigFilename) {
@@ -85,9 +58,20 @@ std::vector<std::unique_ptr<Model>> SedsToIvTranslator::translateModels(
     return translateSedsModel(sedsModel, asn1Model, ivConfig, options);
 }
 
+ModelType SedsToIvTranslator::getSourceModelType() const
+{
+    return ModelType::Seds;
+}
+
+ModelType SedsToIvTranslator::getTargetModelType() const
+{
+    return ModelType::InterfaceView;
+}
+
 std::set<ModelType> SedsToIvTranslator::getDependencies() const
 {
-    return std::set<ModelType> { ModelType::Seds, ModelType::Asn1 };
+    static std::set<ModelType> dependencies { ModelType::Seds, ModelType::Asn1 };
+    return dependencies;
 }
 
 std::vector<std::unique_ptr<Model>> SedsToIvTranslator::translateSedsModel(const SedsModel *sedsModel,
@@ -153,7 +137,7 @@ Asn1Acn::Definitions *SedsToIvTranslator::getAsn1Definitions(
     }
 
     const auto &asn1DefinitionsName = sedsPackage.asn1NameStr();
-    auto *asn1Definitions = asn1File->definitions(asn1DefinitionsName);
+    auto *asn1Definitions = (*asn1File)->definitions(asn1DefinitionsName);
     if (!asn1Definitions) {
         const auto message =
                 QString("ASN.1 file %1 doesn't have definitions named %2").arg(asn1FileName).arg(asn1DefinitionsName);

@@ -40,29 +40,27 @@ std::vector<std::unique_ptr<Model>> SedsToAsn1Translator::translateModels(
 {
     Q_UNUSED(options);
 
-    if (sourceModels.empty()) {
-        throw TranslationException("No models passed for translation");
-    } else if (sourceModels.size() != 1) {
-        throw TranslationException("Too many models passed for SEDS to InterfaceView translation");
-    }
+    checkSourceModelCount(sourceModels);
 
-    const auto *sourceModel = sourceModels[0];
-    if (sourceModel == nullptr) {
-        throw TranslationException("Source model is null");
-    }
-
-    if (sourceModel->modelType() != ModelType::Seds) {
-        throw IncorrectSourceModelException({ ModelType::Seds }, sourceModel->modelType());
-    }
-
-    const auto *sedsModel = dynamic_cast<const SedsModel *>(sourceModel);
+    const auto *sedsModel = getModel<SedsModel>(sourceModels);
 
     return translateSedsModel(sedsModel);
 }
 
+ModelType SedsToAsn1Translator::getSourceModelType() const
+{
+    return ModelType::Seds;
+}
+
+ModelType SedsToAsn1Translator::getTargetModelType() const
+{
+    return ModelType::Asn1;
+}
+
 std::set<ModelType> SedsToAsn1Translator::getDependencies() const
 {
-    return std::set<ModelType> { ModelType::Seds };
+    static std::set<ModelType> dependencies { ModelType::Seds };
+    return dependencies;
 }
 
 std::vector<std::unique_ptr<Model>> SedsToAsn1Translator::translateSedsModel(const SedsModel *sedsModel) const
