@@ -85,17 +85,15 @@ void Asn1Exporter::exportAcnModel(const Asn1Acn::File &file, const Options &opti
 
 void Asn1Exporter::writeAndCommit(QSaveFile &outputFile, const std::string &data) const
 {
-    bool opened = outputFile.open(QIODevice::WriteOnly);
-    bool written = outputFile.write(data.c_str());
-    bool commited = outputFile.commit();
-
-    if (!opened) {
+    if (!outputFile.open(QIODevice::WriteOnly)) {
         throw ExportException(QString("Failed to open a file %1").arg(outputFile.fileName()));
     }
-    if (!written) {
+
+    if (outputFile.write(data.c_str()) == -1) {
         throw ExportException(QString("Failed to write a file %1").arg(outputFile.fileName()));
     }
-    if (!commited) {
+
+    if (!outputFile.commit()) {
         throw ExportException(QString("Failed to commit a transaction in %1").arg(outputFile.fileName()));
     }
 }
