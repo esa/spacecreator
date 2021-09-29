@@ -44,7 +44,7 @@ using conversion::Options;
 using conversion::asn1::Asn1Options;
 using conversion::asn1::exporter::Asn1Exporter;
 
-namespace asn1::test {
+namespace conversion::asn1::test {
 
 class tsti_Asn1Exporter : public QObject
 {
@@ -144,8 +144,8 @@ void tsti_Asn1Exporter::testValid()
     }
 }
 
-} // namespace asn1::test
+} // namespace conversion::asn1::test
 
-QTEST_MAIN(asn1::test::tsti_Asn1Exporter)
+QTEST_MAIN(conversion::asn1::test::tsti_Asn1Exporter)
 
 #include "tsti_asn1exporter.moc"

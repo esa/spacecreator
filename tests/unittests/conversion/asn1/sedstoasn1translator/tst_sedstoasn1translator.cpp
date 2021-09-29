@@ -38,13 +38,11 @@
 using namespace Asn1Acn;
 using namespace seds::model;
 
-using conversion::Model;
-using conversion::ModelType;
 using conversion::Options;
 using conversion::asn1::translator::SedsToAsn1Translator;
 using conversion::translator::TranslationException;
 
-namespace tests::conversion::asn1 {
+namespace conversion::asn1::test {
 
 class MockModel final : public Model
 {
@@ -499,8 +497,8 @@ const Types::Type *tst_SedsToAsn1Translator::getType(const Asn1Model *asn1Model,
     return type;
 }
 
-} // namespace tests::conversion::asn1
+} // namespace conversion::asn1::test
 
-QTEST_MAIN(tests::conversion::asn1::tst_SedsToAsn1Translator)
+QTEST_MAIN(conversion::asn1::test::tst_SedsToAsn1Translator)
 
 #include "tst_sedstoasn1translator.moc"

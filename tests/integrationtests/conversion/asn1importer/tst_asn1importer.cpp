@@ -33,7 +33,7 @@ using conversion::asn1::Asn1Options;
 using conversion::asn1::importer::Asn1Importer;
 using conversion::importer::ImportException;
 
-namespace seds::test {
+namespace conversion::asn1::test {
 
 class tst_Asn1Importer : public QObject
 {
@@ -94,8 +94,8 @@ void tst_Asn1Importer::testInvalid()
     QVERIFY_EXCEPTION_THROWN(asn1Importer.importModel(options), ImportException);
 }
 
-} // namespace seds::test
+} // namespace conversion::asn1::test
 
-QTEST_MAIN(seds::test::tst_Asn1Importer)
+QTEST_MAIN(conversion::asn1::test::tst_Asn1Importer)
 
 #include "tst_asn1importer.moc"

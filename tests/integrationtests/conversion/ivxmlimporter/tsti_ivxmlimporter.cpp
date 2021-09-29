@@ -32,7 +32,7 @@ using conversion::iv::IvOptions;
 using conversion::iv::importer::IvXmlImporter;
 using ivm::IVModel;
 
-namespace iv::test {
+namespace conversion::iv::test {
 
 class tsti_IvXmlImporter : public QObject
 {
@@ -72,8 +72,8 @@ void tsti_IvXmlImporter::testValid()
     }
 }
 
-} // namespace iv::test
+} // namespace conversion::iv::test
 
-QTEST_MAIN(iv::test::tsti_IvXmlImporter)
+QTEST_MAIN(conversion::iv::test::tsti_IvXmlImporter)
 
 #include "tsti_ivxmlimporter.moc"

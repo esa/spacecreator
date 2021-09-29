@@ -35,24 +35,23 @@
 using namespace ivm;
 using namespace seds::model;
 
-using conversion::ModelType;
 using conversion::Options;
 using conversion::iv::IvOptions;
 using conversion::iv::translator::SedsToIvTranslator;
 using conversion::translator::TranslationException;
 
-namespace tests::conversion::iv {
+using tests::conversion::common::Asn1ModelBuilder;
+using tests::conversion::common::SedsComponentBuilder;
+using tests::conversion::common::SedsInterfaceBuilder;
+using tests::conversion::common::SedsInterfaceCommandBuilder;
+using tests::conversion::common::SedsInterfaceDeclarationBuilder;
+using tests::conversion::common::SedsModelBuilder;
 
-using common::Asn1ModelBuilder;
-using common::SedsComponentBuilder;
-using common::SedsInterfaceBuilder;
-using common::SedsInterfaceCommandBuilder;
-using common::SedsInterfaceDeclarationBuilder;
-using common::SedsModelBuilder;
+namespace conversion::iv::test {
 
-class MockModel final : public ::conversion::Model
+class MockModel final : public conversion::Model
 {
-    virtual auto modelType() const -> ::conversion::ModelType override { return ::conversion::ModelType::Unspecified; }
+    virtual auto modelType() const -> conversion::ModelType override { return conversion::ModelType::Unspecified; }
 };
 
 class tst_SedsToIvTranslator : public QObject
@@ -242,8 +241,8 @@ void tst_SedsToIvTranslator::testTranslateComponentWithRequiredInterface()
     QCOMPARE(param.direction(), shared::InterfaceParameter::Direction::IN);
 }
 
-} // namespace tests::conversion::iv
+} // namespace conversion::iv::test
 
-QTEST_MAIN(tests::conversion::iv::tst_SedsToIvTranslator)
+QTEST_MAIN(conversion::iv::test::tst_SedsToIvTranslator)
 
 #include "tst_sedstoivtranslator.moc"

@@ -38,7 +38,7 @@ using conversion::iv::exporter::IvXmlExporter;
 using ivm::IVModel;
 using ivm::IVPropertyTemplateConfig;
 
-namespace iv::test {
+namespace conversion::iv::test {
 
 class tsti_IvXmlExporter : public QObject
 {
@@ -90,8 +90,8 @@ void tsti_IvXmlExporter::testValid()
     QVERIFY(outputFileInfo.exists());
 }
 
-} // namespace iv::test
+} // namespace conversion::iv::test
 
-QTEST_MAIN(iv::test::tsti_IvXmlExporter)
+QTEST_MAIN(conversion::iv::test::tsti_IvXmlExporter)
 
 #include "tsti_ivxmlexporter.moc"
