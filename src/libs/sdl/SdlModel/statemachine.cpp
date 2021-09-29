@@ -25,22 +25,22 @@
 namespace sdl {
 
 StateMachine::StateMachine(
-        std::vector<std::unique_ptr<State>> &states, std::vector<std::unique_ptr<Transition>> &transitions)
+        std::vector<std::shared_ptr<State>> &states, std::vector<std::shared_ptr<Transition>> &transitions)
 {
     for (unsigned long int i = 0; i < states.size(); i++) {
-        m_states.push_back(std::move(states[i]));
+        m_states.push_back(states[i]);
     }
     for (unsigned long int i = 0; i < transitions.size(); i++) {
-        m_transitions.push_back(std::move(transitions[i]));
+        m_transitions.push_back(transitions[i]);
     }
 }
 
-auto StateMachine::states() const -> const std::vector<std::unique_ptr<State>> &
+auto StateMachine::states() const -> const std::vector<std::shared_ptr<State>> &
 {
     return m_states;
 }
 
-auto StateMachine::transitions() const -> const std::vector<std::unique_ptr<Transition>> &
+auto StateMachine::transitions() const -> const std::vector<std::shared_ptr<Transition>> &
 {
     return m_transitions;
 }

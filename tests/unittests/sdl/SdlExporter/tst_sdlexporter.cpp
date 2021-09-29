@@ -58,8 +58,8 @@ private Q_SLOTS:
 void tst_sdlmodel::testDefaultValuesInModel()
 {
     QString processName = "name_of_the_process";
-    auto states = std::vector<std::unique_ptr<State>>();
-    auto transitions = std::vector<std::unique_ptr<Transition>>();
+    auto states = std::vector<std::shared_ptr<State>>();
+    auto transitions = std::vector<std::shared_ptr<Transition>>();
     auto sm = std::make_unique<StateMachine>(states, transitions);
     Process process(processName, sm);
     SdlModel exampleModel(process);
@@ -72,6 +72,8 @@ void tst_sdlmodel::testDefaultValuesInModel()
 void tst_sdlmodel::testGenerateProcess()
 {
     QString processName = "name_of_the_process";
+
+    // transition from state to state
     auto nextstate = std::make_shared<NextState>("itself");
     auto actions = std::vector<std::shared_ptr<Action>>();
     actions.push_back(nextstate);
@@ -83,21 +85,27 @@ void tst_sdlmodel::testGenerateProcess()
 
     auto contSignals = std::vector<std::unique_ptr<ContinuousSignal>>();
 
-    auto state1 = std::make_unique<State>("some_state", inputs, contSignals);
+    auto state1 = std::make_shared<State>("some_state", inputs, contSignals);
+
+    // another transition, from state2 to state1
+    auto nextstate2 = std::make_shared<NextState>("toggle", state1);
+    auto actions2 = std::vector<std::shared_ptr<Action>>();
+    actions2.push_back(nextstate2);
+    auto transition2 = std::make_shared<Transition>("", actions2);
 
     auto inputs2 = std::vector<std::unique_ptr<Input>>();
-    auto input2 = std::make_unique<Input>("some_other_input_name");
+    auto input2 = std::make_unique<Input>("some_other_input_name", transition2);
     inputs2.push_back(std::move(input2));
 
     auto contSignals2 = std::vector<std::unique_ptr<ContinuousSignal>>();
 
-    auto state2 = std::make_unique<State>("some_other_state", inputs2, contSignals2);
+    auto state2 = std::make_shared<State>("some_other_state", inputs2, contSignals2);
 
-    auto states = std::vector<std::unique_ptr<State>>();
+    auto states = std::vector<std::shared_ptr<State>>();
     states.push_back(std::move(state1));
     states.push_back(std::move(state2));
 
-    auto transitions = std::vector<std::unique_ptr<Transition>>();
+    auto transitions = std::vector<std::shared_ptr<Transition>>();
     auto sm = std::make_unique<StateMachine>(states, transitions);
     Process process(processName, sm);
     SdlModel exampleModel(process, "Example");

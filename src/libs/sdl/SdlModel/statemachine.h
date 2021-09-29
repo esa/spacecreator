@@ -31,13 +31,13 @@ namespace sdl {
 class StateMachine
 {
 public:
-    StateMachine(std::vector<std::unique_ptr<State>> &states, std::vector<std::unique_ptr<Transition>> &transitions);
-    auto states() const -> const std::vector<std::unique_ptr<State>> &;
-    auto transitions() const -> const std::vector<std::unique_ptr<Transition>> &;
+    StateMachine(std::vector<std::shared_ptr<State>> &states, std::vector<std::shared_ptr<Transition>> &transitions);
+    auto states() const -> const std::vector<std::shared_ptr<State>> &;
+    auto transitions() const -> const std::vector<std::shared_ptr<Transition>> &;
 
 private:
-    std::vector<std::unique_ptr<State>> m_states;
-    std::vector<std::unique_ptr<Transition>> m_transitions;
+    std::vector<std::shared_ptr<State>> m_states;
+    std::vector<std::shared_ptr<Transition>> m_transitions;
 };
 
 } // namespace sdl
