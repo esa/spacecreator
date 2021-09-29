@@ -36,11 +36,7 @@ namespace Asn1Acn {
 
 QCache<QString, QString> Asn1Reader::m_cache {};
 
-#ifdef Q_OS_WIN
-static const QString defaultParameter("--field-prefix AUTO -customStg \"%1xml.stg\"::");
-#else
-static const QString defaultParameter("--field-prefix AUTO -customStg %1/xml.stg:");
-#endif
+static const QString defaultParameter("--field-prefix AUTO --xml-ast ");
 
 Asn1Reader::Asn1Reader(QObject *parent)
     : QObject(parent)
