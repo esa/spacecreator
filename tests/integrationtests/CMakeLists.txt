@@ -1,4 +1,3 @@
 add_subdirectory(conversion)
 add_subdirectory(libmsceditor)
-add_subdirectory(sedsxmlimporter)
 add_subdirectory(promelaexporter)
