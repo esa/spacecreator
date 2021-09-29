@@ -48,6 +48,7 @@ public:
     auto visit(const Input &input) const -> void override;
     auto visit(const Signal &sig) const -> void override;
     auto visit(const Transition &transition) const -> void override;
+    auto visit(const Action &action) const -> void override;
 
 private:
     template<typename T>

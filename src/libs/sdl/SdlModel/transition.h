@@ -19,6 +19,7 @@
 
 #pragma once
 
+#include "action.h"
 #include "node.h"
 #include "statemachine.h"
 
@@ -28,11 +29,6 @@
 #include <vector>
 
 namespace sdl {
-
-class Action : public Node
-{
-    // TODO: move to a separate file
-};
 
 class Transition : public Node
 {

@@ -19,31 +19,20 @@
 
 #pragma once
 
+#include "node.h"
+
+#include <QString>
+#include <memory>
+#include <sdl/SdlExporter/visitors/visitor.h>
+#include <vector>
+
 namespace sdl {
 
-class Action;
-class Input;
-class Process;
-class SdlModel;
-class Signal;
-class State;
-class Transition;
-
-class Visitor
+class Action : public Node
 {
-protected:
-    Visitor() {}
-
 public:
-    virtual ~Visitor();
-
-    virtual auto visit(const SdlModel &model) const -> void = 0;
-    virtual auto visit(const Process &process) const -> void = 0;
-    virtual auto visit(const State &state) const -> void = 0;
-    virtual auto visit(const Input &input) const -> void = 0;
-    virtual auto visit(const Signal &sig) const -> void = 0;
-    virtual auto visit(const Transition &transition) const -> void = 0;
-    virtual auto visit(const Action &action) const -> void = 0;
+    Action(const QString &name);
+    auto accept(Visitor &visitor) const -> void override;
 };
 
 } // namespace sdl

@@ -17,33 +17,20 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/lgpl-2.1.html>.
  */
 
-#pragma once
+#include "action.h"
+
+#include <memory>
 
 namespace sdl {
 
-class Action;
-class Input;
-class Process;
-class SdlModel;
-class Signal;
-class State;
-class Transition;
-
-class Visitor
+Action::Action(const QString &name)
+    : Node(name)
 {
-protected:
-    Visitor() {}
+}
 
-public:
-    virtual ~Visitor();
-
-    virtual auto visit(const SdlModel &model) const -> void = 0;
-    virtual auto visit(const Process &process) const -> void = 0;
-    virtual auto visit(const State &state) const -> void = 0;
-    virtual auto visit(const Input &input) const -> void = 0;
-    virtual auto visit(const Signal &sig) const -> void = 0;
-    virtual auto visit(const Transition &transition) const -> void = 0;
-    virtual auto visit(const Action &action) const -> void = 0;
-};
+auto Action::accept(Visitor &visitor) const -> void
+{
+    visitor.visit(*this);
+}
 
 } // namespace sdl

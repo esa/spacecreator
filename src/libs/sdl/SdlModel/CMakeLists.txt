@@ -10,6 +10,7 @@ set(SOURCES sdlmodel.cpp
             input.cpp
             literal.cpp
             transition.cpp
+            action.cpp
             variabledeclaration.cpp
             variablereference.cpp
             node.cpp
