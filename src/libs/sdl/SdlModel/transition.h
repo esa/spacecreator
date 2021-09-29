@@ -31,12 +31,12 @@ namespace sdl {
 class Transition : public Node
 {
 public:
-    Transition(const QString &name, std::vector<std::unique_ptr<Action>> &actions);
-    auto actions() -> const std::vector<std::unique_ptr<Action>> &;
+    Transition(const QString &name, std::vector<std::shared_ptr<Action>> &actions);
+    auto actions() -> const std::vector<std::shared_ptr<Action>> &;
     auto accept(Visitor &visitor) const -> void;
 
 private:
-    std::vector<std::unique_ptr<Action>> m_actions;
+    std::vector<std::shared_ptr<Action>> m_actions;
 };
 
 } // namespace sdl

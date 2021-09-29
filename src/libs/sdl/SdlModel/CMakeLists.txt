@@ -11,6 +11,7 @@ set(SOURCES sdlmodel.cpp
             literal.cpp
             transition.cpp
             action.cpp
+            nextstate.cpp
             variabledeclaration.cpp
             variablereference.cpp
             node.cpp

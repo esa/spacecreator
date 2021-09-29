@@ -24,7 +24,7 @@
 
 namespace sdl {
 
-Transition::Transition(const QString &name, std::vector<std::unique_ptr<Action>> &actions)
+Transition::Transition(const QString &name, std::vector<std::shared_ptr<Action>> &actions)
     : Node(name)
 {
     for (unsigned long int i = 0; i < actions.size(); i++) {
@@ -32,7 +32,7 @@ Transition::Transition(const QString &name, std::vector<std::unique_ptr<Action>>
     }
 }
 
-auto Transition::actions() -> const std::vector<std::unique_ptr<Action>> &
+auto Transition::actions() -> const std::vector<std::shared_ptr<Action>> &
 {
     return m_actions;
 }

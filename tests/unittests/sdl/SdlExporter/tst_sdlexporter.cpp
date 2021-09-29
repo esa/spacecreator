@@ -23,13 +23,17 @@
 #include <memory>
 #include <sdl/SdlExporter/SdlOptions/options.h>
 #include <sdl/SdlExporter/exporter.h>
+#include <sdl/SdlModel/action.h>
+#include <sdl/SdlModel/nextstate.h>
 #include <sdl/SdlModel/process.h>
 #include <sdl/SdlModel/sdlmodel.h>
 
 using conversion::ModelType;
 using conversion::Options;
+using sdl::Action;
 using sdl::ContinuousSignal;
 using sdl::Input;
+using sdl::NextState;
 using sdl::Procedure;
 using sdl::Process;
 using sdl::SdlModel;
@@ -68,8 +72,10 @@ void tst_sdlmodel::testDefaultValuesInModel()
 void tst_sdlmodel::testGenerateProcess()
 {
     QString processName = "name_of_the_process";
-
-    // auto transition =
+    auto nextstate = std::make_shared<NextState>("itself");
+    auto actions = std::vector<std::shared_ptr<Action>>();
+    actions.push_back(std::move(nextstate));
+    auto transition = std::make_unique<Transition>("", actions);
 
     auto inputs = std::vector<std::unique_ptr<Input>>();
     auto input1 = std::make_unique<Input>("some_input_name");
