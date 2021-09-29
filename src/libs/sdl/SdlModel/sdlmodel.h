@@ -28,7 +28,7 @@ namespace sdl {
 /**
  * @brief   Represents an SDL data model.
  *
- * Stores a Process.
+ * Stores a reference to the Process.
  */
 class SdlModel final : public conversion::Model
 {
@@ -39,7 +39,8 @@ public:
     /**
      * @brief   Constructor
      *
-     * data     model data (Process)
+     * @param data     model data (Process)
+     * @param name     name of this data model
      */
     explicit SdlModel(Data &data, const QString &name = "");
     /**
@@ -61,7 +62,7 @@ public:
     SdlModel &operator=(SdlModel &&) = delete;
 
     /**
-     * @brief   Get this model type
+     * @brief   Getter for this model type
      *
      * @return  Model type
      */

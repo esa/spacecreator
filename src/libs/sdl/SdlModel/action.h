@@ -25,9 +25,17 @@
 
 namespace sdl {
 
+/**
+ * @brief   Represents an SDL action
+ */
 class Action : public Node
 {
 public:
+    /**
+     * @brief   Constructor
+     *
+     * name     name of the element
+     */
     Action(const QString &name);
 };
 

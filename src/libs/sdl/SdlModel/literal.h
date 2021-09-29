@@ -23,10 +23,25 @@
 
 namespace sdl {
 
+/**
+ * @brief   Represents a literal used in SDL model.
+ *
+ * Stores a value as a string of characters
+ */
 class Literal
 {
 public:
-    Literal(const QString &m_value);
+    /**
+     * @brief   Constructor
+     *
+     * @param   value    value to store
+     */
+    Literal(const QString &value);
+    /**
+     * @brief   Getter for the stored value
+     *
+     * @return  stored value
+     */
     auto value() const -> const QString &;
 
 private:

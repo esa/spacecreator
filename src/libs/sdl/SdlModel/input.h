@@ -28,19 +28,45 @@
 
 namespace sdl {
 
+/**
+ * @brief   Represents an SDL input signal.
+ *
+ * Stores a pointer to the transition which should be fired upon reception of this signal.
+ */
 class Input : public Signal
 {
 public:
+    /**
+     * @brief   Constructor
+     *
+     * @param name    signal name
+     */
     Input(const QString &name);
+    /**
+     * @brief   Constructor
+     *
+     * @param name        signal name
+     * @param transition  a pointer to the transition which should be triggered upon reception of this signal
+     */
     Input(const QString &name, const std::shared_ptr<Transition> &transition);
+    /**
+     * @brief   Copy constructor
+     */
     Input(const Input &input);
+
+    /**
+     * @brief   Getter for the transition
+     *
+     * @return  Model type
+     */
     auto transition() const -> const std::shared_ptr<Transition> &;
+
     auto accept(Visitor &visitor) const -> void override;
 
 private:
-    // transition that shall be fired upon reception of this signal
     std::shared_ptr<Transition> m_transition;
 
     // TODO: list of input parameters (variants: variable references/literals)
 };
+
 } // namespace sdl

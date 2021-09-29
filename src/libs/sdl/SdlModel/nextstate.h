@@ -27,12 +27,35 @@
 
 namespace sdl {
 
+/**
+ * @brief   Represents a next state (go to state) action in SDL model.
+ *
+ * Stores a pointer to the next state
+ */
 class NextState : public Action
 {
 public:
+    /**
+     * @brief   Constructor
+     *
+     * @param   name    name of the action
+     */
     NextState(const QString &name);
+    /**
+     * @brief   Constructor
+     *
+     * @param   name    name of the action
+     * @param   state   a pointer to the next state
+     */
     NextState(const QString &name, const std::shared_ptr<State> &state);
+
+    /**
+     * @brief   Getter for the next state
+     *
+     * @return  next state
+     */
     auto state() const -> const std::shared_ptr<State> &;
+
     auto accept(Visitor &visitor) const -> void override;
 
 private:

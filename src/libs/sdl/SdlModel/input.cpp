@@ -37,6 +37,7 @@ Input::Input(const QString &name, const std::shared_ptr<Transition> &transition)
 
 Input::Input(const Input &input)
     : Signal(input.name())
+    , m_transition(input.transition())
 {
 }
 
