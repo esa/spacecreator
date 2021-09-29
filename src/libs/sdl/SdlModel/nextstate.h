@@ -31,11 +31,12 @@ class NextState : public Action
 {
 public:
     NextState(const QString &name);
-    auto state() const -> const std::unique_ptr<State> &;
+    NextState(const QString &name, const std::shared_ptr<State> &state);
+    auto state() const -> const std::shared_ptr<State> &;
     auto accept(Visitor &visitor) const -> void override;
 
 private:
-    std::unique_ptr<State> m_state;
+    std::shared_ptr<State> m_state;
 };
 
 } // namespace sdl

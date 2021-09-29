@@ -26,9 +26,16 @@ namespace sdl {
 NextState::NextState(const QString &name)
     : Action(name)
 {
+    m_state.reset();
 }
 
-auto NextState::state() const -> const std::unique_ptr<State> &
+NextState::NextState(const QString &name, const std::shared_ptr<State> &state)
+    : Action(name)
+    , m_state(state)
+{
+}
+
+auto NextState::state() const -> const std::shared_ptr<State> &
 {
     return m_state;
 }
