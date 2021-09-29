@@ -17,18 +17,20 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/lgpl-2.1.html>.
  */
 
-#include "nextstate.h"
+#pragma once
+
+#include "action.h"
+
+#include <QString>
+#include <sdl/SdlExporter/visitors/visitor.h>
 
 namespace sdl {
 
-Action::Action(const QString &name)
-    : Node(name)
+class NextState : public Action
 {
-}
-
-auto Action::accept(Visitor &visitor) const -> void
-{
-    visitor.visit(*this);
-}
+public:
+    NextState(const QString &name);
+    auto accept(Visitor &visitor) const -> void override;
+};
 
 } // namespace sdl

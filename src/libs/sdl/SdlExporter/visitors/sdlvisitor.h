@@ -20,7 +20,9 @@
 #include "visitor.h"
 
 #include <QTextStream>
+#include <sdl/SdlModel/action.h>
 #include <sdl/SdlModel/input.h>
+#include <sdl/SdlModel/nextstate.h>
 #include <sdl/SdlModel/process.h>
 #include <sdl/SdlModel/sdlmodel.h>
 #include <sdl/SdlModel/signal.h>
@@ -49,6 +51,7 @@ public:
     auto visit(const Signal &sig) const -> void override;
     auto visit(const Transition &transition) const -> void override;
     auto visit(const Action &action) const -> void override;
+    auto visit(const NextState &nextstate) const -> void override;
 
 private:
     template<typename T>

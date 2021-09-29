@@ -22,9 +22,7 @@
 #include "node.h"
 
 #include <QString>
-#include <memory>
 #include <sdl/SdlExporter/visitors/visitor.h>
-#include <vector>
 
 namespace sdl {
 

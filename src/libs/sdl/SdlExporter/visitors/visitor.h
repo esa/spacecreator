@@ -23,6 +23,7 @@ namespace sdl {
 
 class Action;
 class Input;
+class NextState;
 class Process;
 class SdlModel;
 class Signal;
@@ -44,6 +45,7 @@ public:
     virtual auto visit(const Signal &sig) const -> void = 0;
     virtual auto visit(const Transition &transition) const -> void = 0;
     virtual auto visit(const Action &action) const -> void = 0;
+    virtual auto visit(const NextState &nextstate) const -> void = 0;
 };
 
 } // namespace sdl

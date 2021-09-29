@@ -82,6 +82,11 @@ void SdlVisitor::visit(const Action &action) const
     Q_UNUSED(action);
 }
 
+void SdlVisitor::visit(const NextState &nextstate) const
+{
+    Q_UNUSED(nextstate);
+}
+
 template<typename T>
 auto SdlVisitor::exportCollection(const T &collection) const -> void
 {

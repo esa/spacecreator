@@ -21,12 +21,12 @@
 
 namespace sdl {
 
-Action::Action(const QString &name)
-    : Node(name)
+NextState::NextState(const QString &name)
+    : Action(name)
 {
 }
 
-auto Action::accept(Visitor &visitor) const -> void
+void NextState::accept(Visitor &visitor) const
 {
     visitor.visit(*this);
 }
