@@ -20,6 +20,7 @@
 #include "process.h"
 
 #include <memory>
+#include <sdl/SdlExporter/visitors/visitor.h>
 
 namespace sdl {
 

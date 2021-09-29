@@ -19,6 +19,8 @@
 
 #include "signal.h"
 
+#include <sdl/SdlExporter/visitors/visitor.h>
+
 namespace sdl {
 
 Signal::Signal(const QString &name)

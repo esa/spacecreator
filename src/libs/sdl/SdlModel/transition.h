@@ -21,11 +21,9 @@
 
 #include "action.h"
 #include "node.h"
-#include "statemachine.h"
 
 #include <QString>
 #include <memory>
-#include <sdl/SdlExporter/visitors/visitor.h>
 #include <vector>
 
 namespace sdl {

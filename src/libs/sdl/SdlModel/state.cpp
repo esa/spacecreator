@@ -19,6 +19,8 @@
 
 #include "state.h"
 
+#include <sdl/SdlExporter/visitors/visitor.h>
+
 namespace sdl {
 
 State::State(const QString &name, std::vector<std::unique_ptr<Input>> &inputs,

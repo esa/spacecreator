@@ -19,7 +19,6 @@
 
 #pragma once
 
-#include "../SdlExporter/visitors/visitor.h"
 #include "node.h"
 
 #include <QString>
@@ -31,7 +30,7 @@ class Signal : public Node
 public:
     Signal(const QString &name = "");
     virtual ~Signal();
-    virtual auto accept(Visitor &visitor) const -> void override;
+    auto accept(Visitor &visitor) const -> void override;
 };
 
 } // namespace sdl

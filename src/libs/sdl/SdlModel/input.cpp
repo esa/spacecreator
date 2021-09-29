@@ -19,6 +19,8 @@
 
 #include "input.h"
 
+#include <sdl/SdlExporter/visitors/visitor.h>
+
 namespace sdl {
 
 Input::Input(const QString &name)
@@ -29,6 +31,11 @@ Input::Input(const QString &name)
 Input::Input(const Input &input)
     : Signal(input.name())
 {
+}
+
+auto Input::accept(Visitor &visitor) const -> void
+{
+    visitor.visit(*this);
 }
 
 } // namespace sdl

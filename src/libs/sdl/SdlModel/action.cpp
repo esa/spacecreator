@@ -19,6 +19,8 @@
 
 #include "nextstate.h"
 
+#include <sdl/SdlExporter/visitors/visitor.h>
+
 namespace sdl {
 
 Action::Action(const QString &name)

@@ -31,6 +31,7 @@ class Input : public Signal
 public:
     Input(const QString &name = "");
     Input(const Input &input);
+    auto accept(Visitor &visitor) const -> void override;
 
     // TODO: list of input parameters (variants: variable references/literals)
     // TODO: transition that shall be fired upon reception of this signal

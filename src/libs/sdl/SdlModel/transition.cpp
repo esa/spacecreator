@@ -20,6 +20,7 @@
 #include "transition.h"
 
 #include <memory>
+#include <sdl/SdlExporter/visitors/visitor.h>
 
 namespace sdl {
 

@@ -19,16 +19,25 @@
 
 #pragma once
 
+#include <sdl/SdlModel/action.h>
+#include <sdl/SdlModel/input.h>
+#include <sdl/SdlModel/nextstate.h>
+#include <sdl/SdlModel/process.h>
+#include <sdl/SdlModel/sdlmodel.h>
+#include <sdl/SdlModel/signal.h>
+#include <sdl/SdlModel/state.h>
+#include <sdl/SdlModel/transition.h>
+
 namespace sdl {
 
-class Action;
-class Input;
-class NextState;
-class Process;
-class SdlModel;
-class Signal;
-class State;
-class Transition;
+// class Action;
+// class Input;
+// class NextState;
+// class Process;
+// class SdlModel;
+// class Signal;
+// class State;
+// class Transition;
 
 class Visitor
 {
