@@ -26,11 +26,23 @@ namespace sdl {
 Input::Input(const QString &name)
     : Signal(name)
 {
+    m_transition.reset();
+}
+
+Input::Input(const QString &name, const std::shared_ptr<Transition> &transition)
+    : Signal(name)
+    , m_transition(transition)
+{
 }
 
 Input::Input(const Input &input)
     : Signal(input.name())
 {
+}
+
+auto Input::transition() const -> const std::shared_ptr<Transition> &
+{
+    return m_transition;
 }
 
 auto Input::accept(Visitor &visitor) const -> void

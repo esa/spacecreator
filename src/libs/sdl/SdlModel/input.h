@@ -20,8 +20,10 @@
 #pragma once
 
 #include "signal.h"
+#include "transition.h"
 
 #include <QString>
+#include <memory>
 #include <vector>
 
 namespace sdl {
@@ -29,11 +31,16 @@ namespace sdl {
 class Input : public Signal
 {
 public:
-    Input(const QString &name = "");
+    Input(const QString &name);
+    Input(const QString &name, const std::shared_ptr<Transition> &transition);
     Input(const Input &input);
+    auto transition() const -> const std::shared_ptr<Transition> &;
     auto accept(Visitor &visitor) const -> void override;
 
+private:
+    // transition that shall be fired upon reception of this signal
+    std::shared_ptr<Transition> m_transition;
+
     // TODO: list of input parameters (variants: variable references/literals)
-    // TODO: transition that shall be fired upon reception of this signal
 };
 } // namespace sdl

@@ -69,6 +69,8 @@ void tst_sdlmodel::testGenerateProcess()
 {
     QString processName = "name_of_the_process";
 
+    // auto transition =
+
     auto inputs = std::vector<std::unique_ptr<Input>>();
     auto input1 = std::make_unique<Input>("some_input_name");
     inputs.push_back(std::move(input1));
