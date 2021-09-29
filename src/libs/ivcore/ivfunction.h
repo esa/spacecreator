@@ -29,6 +29,9 @@ struct IVFunctionPrivate;
 class IVFunction : public IVFunctionType
 {
     Q_OBJECT
+    Q_PROPERTY(QList<EntityAttribute> languages READ languages)
+    Q_PROPERTY(QString defaultLanguage READ defaultLanguage WRITE setDefaultLanguage)
+
 public:
     explicit IVFunction(QObject *parent = nullptr, const shared::Id &id = shared::InvalidId);
     ~IVFunction() override;
@@ -38,6 +41,12 @@ public:
     void setInstanceOf(IVFunctionType *fnType);
     const IVFunctionType *instanceOf() const;
     bool inheritsFunctionType() const;
+
+    const QList<EntityAttribute> &languages() const;
+    void addLanguage(const QString &name, const QString &language);
+
+    void setDefaultLanguage(const QString &name);
+    QString defaultLanguage() const;
 
     bool isPseudoFunction() const;
 
@@ -79,6 +88,7 @@ private:
 
     void reflectAttrs(const EntityAttributes &attrs);
     void reflectContextParams(const QVector<shared::ContextParameter> &params);
+    void checkDefaultFunctionLanguage();
 };
 
 }

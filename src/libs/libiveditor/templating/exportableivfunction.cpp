@@ -17,6 +17,7 @@
 
 #include "exportableivfunction.h"
 
+#include "exportableproperty.h"
 #include "ivcomment.h"
 #include "ivconnection.h"
 #include "ivconnectiongroup.h"
@@ -93,6 +94,19 @@ QVariantList ExportableIVFunction::contextParameters() const
         parameters << QVariant::fromValue(param);
     }
     return parameters;
+}
+
+QVariantList ExportableIVFunction::languages() const
+{
+    const auto ivFunction = exportedObject<ivm::IVFunction>();
+    if (!ivFunction) {
+        return {};
+    }
+    QVariantList result;
+    for (const auto &language : ivFunction->languages()) {
+        result << QVariant::fromValue(shared::ExportableProperty(language.name(), language.value()));
+    }
+    return result;
 }
 
 }

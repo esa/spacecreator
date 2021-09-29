@@ -38,6 +38,7 @@ private Q_SLOTS:
     void test_allItems();
     void test_readMetaData();
     void test_readFunction();
+    void test_readFunctionLanguages();
     void test_connectionGroup();
 };
 
@@ -130,6 +131,38 @@ void IVXMLReader::test_readFunction()
     shared::ContextParameter param2 = function->contextParam("trigger");
     QVERIFY(!param2.isNull());
     QCOMPARE(param2.paramType(), shared::BasicParameter::Type::Timer);
+}
+
+void IVXMLReader::test_readFunctionLanguages()
+{
+    QByteArray xml("<InterfaceView>"
+                   "<Function name=\"BigMamma\" is_type=\"NO\" default_language=\"default\">"
+                   "<ContextParameter name=\"duration\" type=\"MyInt\" value=\"60\"/>"
+                   "<Languages>"
+                   "<ComputeLanguage name=\"default\" language=\"cpp\"/>"
+                   "<ComputeLanguage name=\"secondary\" language=\"SDL\"/>"
+                   "</Languages></Function></InterfaceView>");
+
+    QBuffer buffer(&xml);
+    buffer.open(QIODevice::ReadOnly | QIODevice::Text);
+
+    ivm::IVXMLReader reader;
+
+    const bool ok = reader.read(&buffer);
+    QVERIFY(ok);
+    const QVector<ivm::IVObject *> objectsList = reader.parsedObjects();
+    QCOMPARE(objectsList.size(), 1);
+    ivm::IVFunction *function = qobject_cast<ivm::IVFunction *>(objectsList[0]);
+    QVERIFY(function != nullptr);
+    QCOMPARE(function->languages().size(), 2);
+
+    const EntityAttribute &lang1 = function->languages().at(0);
+    QCOMPARE(lang1.name(), "default");
+    QCOMPARE(lang1.value(), "cpp");
+
+    const EntityAttribute &lang2 = function->languages().at(1);
+    QCOMPARE(lang2.name(), "secondary");
+    QCOMPARE(lang2.value(), "SDL");
 }
 
 void IVXMLReader::test_connectionGroup()

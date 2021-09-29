@@ -56,7 +56,7 @@ bool IVModel::addObjectImpl(shared::VEObject *obj)
             d->m_visibleObjects.append(ivObj);
 
             for (const auto attr : d->m_dynPropConfig->propertyTemplatesForObject(ivObj)) {
-                if (attr->validate(ivObj)) {
+                if (attr->validate(ivObj) && !attr->isOptional()) {
                     const QVariant &currentValue = obj->entityAttributeValue(attr->name());
                     if (currentValue.isNull()) {
                         const QVariant &defaultValue = attr->defaultValue();
@@ -373,6 +373,11 @@ void IVModel::clear()
 conversion::ModelType IVModel::modelType() const
 {
     return conversion::ModelType::InterfaceView;
+}
+
+shared::PropertyTemplateConfig *IVModel::dynPropConfig() const
+{
+    return d->m_dynPropConfig;
 }
 
 /*!

@@ -19,6 +19,16 @@
             </Enumeration>
         </Type>
     </Attr>
+    <Attr label="DLanguage" name="default_language" visible="false">
+        <Scopes>
+            <Function>
+                <AttrValidator name="is_type" value="NO"/>
+            </Function>
+        </Scopes>
+        <Type>
+            <String validator="[a-zA-Z][\w_]*(?(?&lt;=_)[a-zA-Z0-9])"/>
+        </Type>
+    </Attr>
     <Attr name="is_type">
         <Type>
             <Enumeration defaultValue="NO">

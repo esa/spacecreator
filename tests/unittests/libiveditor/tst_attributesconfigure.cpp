@@ -76,6 +76,7 @@ void tst_AttributesConfigure::tst_loadImpl()
     const auto scope = int(ivm::IVPropertyTemplate::Scope::Provided_Interface);
     dp.setScopes(scope);
     dp.setVisible(false);
+    dp.setOptional(false);
     dp.setValue(QList<QVariant> { QVariant::fromValue(QString("value1")), QVariant::fromValue(QString("value2")) });
     dp.setValueValidatorPattern(QString("[\\d+]"));
     dp.setAttrValidatorPattern(
@@ -93,6 +94,7 @@ void tst_AttributesConfigure::tst_loadImpl()
     QVERIFY(propPtr->type() == dp.type());
     QVERIFY(propPtr->scopes() == dp.scopes());
     QVERIFY(propPtr->isVisible() == dp.isVisible());
+    QVERIFY(propPtr->isOptional() == dp.isOptional());
     QVERIFY(propPtr->value() == dp.value());
     QVERIFY(propPtr->valueValidatorPattern() == dp.valueValidatorPattern());
     QVERIFY(propPtr->attrValidatorPatterns() == dp.attrValidatorPatterns());

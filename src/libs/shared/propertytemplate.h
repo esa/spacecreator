@@ -82,6 +82,9 @@ public:
     bool isEditable() const;
     void setEditable(bool value);
 
+    bool isOptional() const;
+    void setOptional(bool value);
+
     QVariant value() const;
     void setValue(const QVariant &value);
 

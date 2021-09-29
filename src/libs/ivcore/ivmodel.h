@@ -88,6 +88,8 @@ public:
 
     virtual conversion::ModelType modelType() const override;
 
+    shared::PropertyTemplateConfig *dynPropConfig() const;
+
 Q_SIGNALS:
     void rootObjectChanged(shared::Id rootId);
 
