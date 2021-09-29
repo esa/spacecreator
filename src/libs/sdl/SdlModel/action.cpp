@@ -19,18 +19,11 @@
 
 #include "nextstate.h"
 
-#include <sdl/SdlExporter/visitors/visitor.h>
-
 namespace sdl {
 
 Action::Action(const QString &name)
     : Node(name)
 {
-}
-
-auto Action::accept(Visitor &visitor) const -> void
-{
-    visitor.visit(*this);
 }
 
 } // namespace sdl

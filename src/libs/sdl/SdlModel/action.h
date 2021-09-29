@@ -29,7 +29,6 @@ class Action : public Node
 {
 public:
     Action(const QString &name);
-    auto accept(Visitor &visitor) const -> void override;
 };
 
 } // namespace sdl

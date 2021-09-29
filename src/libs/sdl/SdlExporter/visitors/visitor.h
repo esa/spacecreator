@@ -19,7 +19,6 @@
 
 #pragma once
 
-#include <sdl/SdlModel/action.h>
 #include <sdl/SdlModel/input.h>
 #include <sdl/SdlModel/nextstate.h>
 #include <sdl/SdlModel/process.h>
@@ -29,15 +28,6 @@
 #include <sdl/SdlModel/transition.h>
 
 namespace sdl {
-
-// class Action;
-// class Input;
-// class NextState;
-// class Process;
-// class SdlModel;
-// class Signal;
-// class State;
-// class Transition;
 
 class Visitor
 {
@@ -53,7 +43,6 @@ public:
     virtual auto visit(const Input &input) const -> void = 0;
     virtual auto visit(const Signal &sig) const -> void = 0;
     virtual auto visit(const Transition &transition) const -> void = 0;
-    virtual auto visit(const Action &action) const -> void = 0;
     virtual auto visit(const NextState &nextstate) const -> void = 0;
 };
 

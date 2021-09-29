@@ -64,7 +64,11 @@ void SdlVisitor::visit(const Input &input) const
 {
     // write some dummy CIF
     m_stream << "        /* CIF input (" << 250 << "," << 150 << "), (" << 150 << ", " << 75 << ") */\n";
-    m_stream << "        input " << input.name() << "(" /* parametres of the input */ << ");\n";
+    m_stream << "        input " << input.name() << "(" /* TODO parametres of the input */ << ");\n";
+
+    if (input.transition() != nullptr) {
+        exportCollection(input.transition()->actions());
+    }
 }
 
 void SdlVisitor::visit(const Signal &sig) const
@@ -77,14 +81,17 @@ void SdlVisitor::visit(const Transition &transition) const
     Q_UNUSED(transition);
 }
 
-void SdlVisitor::visit(const Action &action) const
-{
-    Q_UNUSED(action);
-}
-
 void SdlVisitor::visit(const NextState &nextstate) const
 {
-    Q_UNUSED(nextstate);
+    // write some dummy CIF
+    m_stream << "            /* CIF NEXTSTATE (" << 250 << "," << 150 << "), (" << 150 << ", " << 75 << ") */\n";
+    m_stream << "            NEXTSTATE ";
+    if (nextstate.state() == nullptr) {
+        m_stream << "-";
+    } else {
+        m_stream << nextstate.state()->name();
+    }
+    m_stream << ";\n";
 }
 
 template<typename T>

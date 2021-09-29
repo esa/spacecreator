@@ -74,11 +74,11 @@ void tst_sdlmodel::testGenerateProcess()
     QString processName = "name_of_the_process";
     auto nextstate = std::make_shared<NextState>("itself");
     auto actions = std::vector<std::shared_ptr<Action>>();
-    actions.push_back(std::move(nextstate));
-    auto transition = std::make_unique<Transition>("", actions);
+    actions.push_back(nextstate);
+    auto transition = std::make_shared<Transition>("", actions);
 
     auto inputs = std::vector<std::unique_ptr<Input>>();
-    auto input1 = std::make_unique<Input>("some_input_name");
+    auto input1 = std::make_unique<Input>("some_input_name", transition);
     inputs.push_back(std::move(input1));
 
     auto contSignals = std::vector<std::unique_ptr<ContinuousSignal>>();
