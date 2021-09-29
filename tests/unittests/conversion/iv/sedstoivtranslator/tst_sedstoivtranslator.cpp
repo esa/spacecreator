@@ -30,6 +30,7 @@
 #include <sedsmodelbuilder/sedsinterfacecommandbuilder.h>
 #include <sedsmodelbuilder/sedsinterfacedeclarationbuilder.h>
 #include <sedsmodelbuilder/sedsmodelbuilder.h>
+#include <unittests/common/verifyexception.h>
 
 using namespace ivm;
 using namespace seds::model;
@@ -38,6 +39,7 @@ using conversion::ModelType;
 using conversion::Options;
 using conversion::iv::IvOptions;
 using conversion::iv::translator::SedsToIvTranslator;
+using conversion::translator::TranslationException;
 
 namespace tests::conversion::iv {
 
@@ -48,19 +50,75 @@ using common::SedsInterfaceCommandBuilder;
 using common::SedsInterfaceDeclarationBuilder;
 using common::SedsModelBuilder;
 
+class MockModel final : public ::conversion::Model
+{
+    virtual auto modelType() const -> ::conversion::ModelType override { return ::conversion::ModelType::Unspecified; }
+};
+
 class tst_SedsToIvTranslator : public QObject
 {
     Q_OBJECT
 
 private Q_SLOTS:
+    void testMissingModel();
+    void testNotEnoughModels();
+    void testTooManyModels();
+    void testWrongModel();
+
     void testTranslateComponentWithProvidedInterface();
     void testTranslateComponentWithRequiredInterface();
 };
 
+void tst_SedsToIvTranslator::testMissingModel()
+{
+    Options options;
+    SedsToIvTranslator translator;
+
+    VERIFY_EXCEPTION_THROWN_WITH_MESSAGE(translator.translateModels({}, options), TranslationException,
+            "No models passed for translation for SEDS to InterfaceView translation");
+}
+
+void tst_SedsToIvTranslator::testNotEnoughModels()
+{
+    Options options;
+    SedsToIvTranslator translator;
+
+    const auto sedsModel = SedsModelBuilder("Package").build();
+
+    VERIFY_EXCEPTION_THROWN_WITH_MESSAGE(translator.translateModels({ sedsModel.get() }, options), TranslationException,
+            "Not enough models passed for SEDS to InterfaceView translation");
+}
+
+void tst_SedsToIvTranslator::testTooManyModels()
+{
+    Options options;
+    SedsToIvTranslator translator;
+
+    const auto sedsModel1 = SedsModelBuilder("Package").build();
+    const auto sedsModel2 = SedsModelBuilder("Package").build();
+    const auto sedsModel3 = SedsModelBuilder("Package").build();
+
+    VERIFY_EXCEPTION_THROWN_WITH_MESSAGE(
+            translator.translateModels({ sedsModel1.get(), sedsModel2.get(), sedsModel3.get() }, options),
+            TranslationException, "Too many models passed for SEDS to InterfaceView translation");
+}
+
+void tst_SedsToIvTranslator::testWrongModel()
+{
+    Options options;
+    SedsToIvTranslator translator;
+
+    const auto sedsModel = SedsModelBuilder("Package").build();
+    const auto mockModel = std::make_unique<MockModel>();
+
+    VERIFY_EXCEPTION_THROWN_WITH_MESSAGE(translator.translateModels({ sedsModel.get(), mockModel.get() }, options),
+            TranslationException, "Missing source Unspecified model");
+}
+
 void tst_SedsToIvTranslator::testTranslateComponentWithProvidedInterface()
 {
     // clang-format off
-    const std::unique_ptr<seds::model::SedsModel> sedsModel =
+    const auto sedsModel =
         SedsModelBuilder("Package")
             .withIntegerDataType("MyInteger")
             .withComponent(
@@ -81,7 +139,7 @@ void tst_SedsToIvTranslator::testTranslateComponentWithProvidedInterface()
     // clang-format on
 
     // clang-format off
-    const std::unique_ptr<Asn1Acn::Asn1Model> asn1Model =
+    const auto asn1Model =
         Asn1ModelBuilder("Package")
             .withIntegerDataType("MyInteger")
         .build();
@@ -124,7 +182,7 @@ void tst_SedsToIvTranslator::testTranslateComponentWithProvidedInterface()
 void tst_SedsToIvTranslator::testTranslateComponentWithRequiredInterface()
 {
     // clang-format off
-    const std::unique_ptr<seds::model::SedsModel> sedsModel =
+    const auto sedsModel =
         SedsModelBuilder("Package")
             .withIntegerDataType("MyInteger")
             .withComponent(
@@ -144,7 +202,7 @@ void tst_SedsToIvTranslator::testTranslateComponentWithRequiredInterface()
     // clang-format on
 
     // clang-format off
-    const std::unique_ptr<Asn1Acn::Asn1Model> asn1Model =
+    const auto asn1Model =
         Asn1ModelBuilder("Package")
             .withIntegerDataType("MyInteger")
         .build();

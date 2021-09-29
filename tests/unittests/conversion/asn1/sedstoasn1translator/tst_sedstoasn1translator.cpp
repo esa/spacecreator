@@ -33,20 +33,33 @@
 #include <conversion/asn1/SedsToAsn1Translator/translator.h>
 #include <conversion/common/options.h>
 #include <seds/SedsModel/sedsmodel.h>
+#include <unittests/common/verifyexception.h>
 
 using namespace Asn1Acn;
 using namespace seds::model;
 
+using conversion::Model;
+using conversion::ModelType;
 using conversion::Options;
 using conversion::asn1::translator::SedsToAsn1Translator;
+using conversion::translator::TranslationException;
 
-namespace seds::test {
+namespace tests::conversion::asn1 {
+
+class MockModel final : public Model
+{
+    virtual auto modelType() const -> ModelType override { return ModelType::Unspecified; }
+};
 
 class tst_SedsToAsn1Translator : public QObject
 {
     Q_OBJECT
 
 private Q_SLOTS:
+    void testMissingModel();
+    void testTooManyModels();
+    void testWrongModel();
+
     void testTranslateBinaryDataType();
     void testTranslateBooleanDataType();
     void testTranslateEnumeratedDataType();
@@ -65,6 +78,38 @@ private:
     const Types::Type *getType(const Asn1Model *asn1Model, std::size_t index);
 };
 
+void tst_SedsToAsn1Translator::testMissingModel()
+{
+    Options options;
+    SedsToAsn1Translator translator;
+
+    VERIFY_EXCEPTION_THROWN_WITH_MESSAGE(translator.translateModels({}, options), TranslationException,
+            "No models passed for translation for SEDS to ASN.1 translation");
+}
+
+void tst_SedsToAsn1Translator::testTooManyModels()
+{
+    Options options;
+    SedsToAsn1Translator translator;
+
+    const auto sedsModel1 = createInteger16();
+    const auto sedsModel2 = createFloat64();
+
+    VERIFY_EXCEPTION_THROWN_WITH_MESSAGE(translator.translateModels({ sedsModel1.get(), sedsModel2.get() }, options),
+            TranslationException, "Too many models passed for SEDS to ASN.1 translation");
+}
+
+void tst_SedsToAsn1Translator::testWrongModel()
+{
+    Options options;
+    SedsToAsn1Translator translator;
+
+    const auto mockModel = std::make_unique<MockModel>();
+
+    VERIFY_EXCEPTION_THROWN_WITH_MESSAGE(translator.translateModels({ mockModel.get() }, options), TranslationException,
+            "Missing source Unspecified model");
+}
+
 void tst_SedsToAsn1Translator::testTranslateBinaryDataType()
 {
     const auto sedsModel = createBitString();
@@ -76,7 +121,7 @@ void tst_SedsToAsn1Translator::testTranslateBinaryDataType()
     QCOMPARE(resultModels.size(), 1);
 
     const auto &resultModel = resultModels[0];
-    QCOMPARE(resultModel->modelType(), conversion::ModelType::Asn1);
+    QCOMPARE(resultModel->modelType(), ModelType::Asn1);
 
     const auto *asn1Model = dynamic_cast<Asn1Model *>(resultModel.get());
     QVERIFY(asn1Model);
@@ -122,7 +167,7 @@ void tst_SedsToAsn1Translator::testTranslateBooleanDataType()
     QCOMPARE(resultModels.size(), 1);
 
     const auto &resultModel = resultModels[0];
-    QCOMPARE(resultModel->modelType(), conversion::ModelType::Asn1);
+    QCOMPARE(resultModel->modelType(), ModelType::Asn1);
 
     const auto *asn1Model = dynamic_cast<Asn1Model *>(resultModel.get());
     QVERIFY(asn1Model);
@@ -149,7 +194,7 @@ void tst_SedsToAsn1Translator::testTranslateEnumeratedDataType()
     QCOMPARE(resultModels.size(), 1);
 
     const auto &resultModel = resultModels[0];
-    QCOMPARE(resultModel->modelType(), conversion::ModelType::Asn1);
+    QCOMPARE(resultModel->modelType(), ModelType::Asn1);
 
     const auto *asn1Model = dynamic_cast<Asn1Model *>(resultModel.get());
     QVERIFY(asn1Model);
@@ -186,7 +231,7 @@ void tst_SedsToAsn1Translator::testTranslateIntegerDataType()
     QCOMPARE(resultModels.size(), 1);
 
     const auto &resultModel = resultModels[0];
-    QCOMPARE(resultModel->modelType(), conversion::ModelType::Asn1);
+    QCOMPARE(resultModel->modelType(), ModelType::Asn1);
 
     const auto *asn1Model = dynamic_cast<Asn1Model *>(resultModel.get());
     QVERIFY(asn1Model);
@@ -228,7 +273,7 @@ void tst_SedsToAsn1Translator::testTranslateFloatDataType()
     QCOMPARE(resultModels.size(), 1);
 
     const auto &resultModel = resultModels[0];
-    QCOMPARE(resultModel->modelType(), conversion::ModelType::Asn1);
+    QCOMPARE(resultModel->modelType(), ModelType::Asn1);
 
     const auto *asn1Model = dynamic_cast<Asn1Model *>(resultModel.get());
     QVERIFY(asn1Model);
@@ -269,7 +314,7 @@ void tst_SedsToAsn1Translator::testTranslateStringDataType()
     QCOMPARE(resultModels.size(), 1);
 
     const auto &resultModel = resultModels[0];
-    QCOMPARE(resultModel->modelType(), conversion::ModelType::Asn1);
+    QCOMPARE(resultModel->modelType(), ModelType::Asn1);
 
     const auto *asn1Model = dynamic_cast<Asn1Model *>(resultModels[0].get());
     QVERIFY(asn1Model);
@@ -454,8 +499,8 @@ const Types::Type *tst_SedsToAsn1Translator::getType(const Asn1Model *asn1Model,
     return type;
 }
 
-} // namespace seds::test
+} // namespace tests::conversion::asn1
 
-QTEST_MAIN(seds::test::tst_SedsToAsn1Translator)
+QTEST_MAIN(tests::conversion::asn1::tst_SedsToAsn1Translator)
 
 #include "tst_sedstoasn1translator.moc"
