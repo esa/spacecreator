@@ -37,7 +37,7 @@ const SdlModel::Data &SdlModel::data() const
     return m_data;
 }
 
-auto SdlModel::name() const -> const QString &
+const QString &SdlModel::name() const
 {
     return m_name;
 }

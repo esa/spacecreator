@@ -26,7 +26,7 @@ VariableReference::VariableReference(VariableDeclaration &declaration)
 {
 }
 
-auto VariableReference::declaration() const -> const VariableDeclaration &
+const VariableDeclaration &VariableReference::declaration() const
 {
     return m_declaration;
 }

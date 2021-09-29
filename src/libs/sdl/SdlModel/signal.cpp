@@ -30,7 +30,7 @@ Signal::Signal(const QString &name)
 
 Signal::~Signal() {}
 
-auto Signal::accept(Visitor &visitor) const -> void
+void Signal::accept(Visitor &visitor) const
 {
     visitor.visit(*this);
 }

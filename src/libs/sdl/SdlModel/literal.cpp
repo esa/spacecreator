@@ -25,7 +25,8 @@ Literal::Literal(const QString &value)
     : m_value(value)
 {
 }
-auto Literal::value() const -> const QString &
+
+const QString &Literal::value() const
 {
     return m_value;
 }

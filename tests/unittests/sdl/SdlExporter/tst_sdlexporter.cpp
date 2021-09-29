@@ -71,7 +71,7 @@ void tst_sdlmodel::testDefaultValuesInModel()
 
 void tst_sdlmodel::testGenerateProcess()
 {
-    QString processName = "name_of_the_process";
+    QString processName = "Modemanager";
 
     // transition from state to state
     auto nextstate = std::make_shared<NextState>("itself");
@@ -85,7 +85,7 @@ void tst_sdlmodel::testGenerateProcess()
 
     auto contSignals = std::vector<std::unique_ptr<ContinuousSignal>>();
 
-    auto state1 = std::make_shared<State>("some_state", inputs, contSignals);
+    auto state1 = std::make_shared<State>("Looping", inputs, contSignals);
 
     // another transition, from state2 to state1
     auto nextstate2 = std::make_shared<NextState>("toggle", state1);
@@ -99,7 +99,7 @@ void tst_sdlmodel::testGenerateProcess()
 
     auto contSignals2 = std::vector<std::unique_ptr<ContinuousSignal>>();
 
-    auto state2 = std::make_shared<State>("some_other_state", inputs2, contSignals2);
+    auto state2 = std::make_shared<State>("Idle", inputs2, contSignals2);
 
     auto states = std::vector<std::shared_ptr<State>>();
     states.push_back(std::move(state1));

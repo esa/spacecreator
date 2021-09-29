@@ -35,12 +35,12 @@ StateMachine::StateMachine(
     }
 }
 
-auto StateMachine::states() const -> const std::vector<std::shared_ptr<State>> &
+const std::vector<std::shared_ptr<State>> &StateMachine::states() const
 {
     return m_states;
 }
 
-auto StateMachine::transitions() const -> const std::vector<std::shared_ptr<Transition>> &
+const std::vector<std::shared_ptr<Transition>> &StateMachine::transitions() const
 {
     return m_transitions;
 }

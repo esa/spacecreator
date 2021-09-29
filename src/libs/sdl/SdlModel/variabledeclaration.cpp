@@ -27,12 +27,12 @@ VariableDeclaration::VariableDeclaration(const QString &name, const QString &typ
 {
 }
 
-auto VariableDeclaration::name() -> QString
+QString VariableDeclaration::name()
 {
     return m_name;
 }
 
-auto VariableDeclaration::type() -> QString
+QString VariableDeclaration::type()
 {
     return m_type;
 }

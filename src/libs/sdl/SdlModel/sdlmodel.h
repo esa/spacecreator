@@ -36,7 +36,6 @@ public:
     /** @brief Model data type **/
     using Data = Process;
 
-public:
     /**
      * @brief   Constructor
      *
@@ -59,9 +58,8 @@ public:
     /**
      * @brief   Default move assignment operator
      */
-    SdlModel &operator=(SdlModel &&) = default;
+    SdlModel &operator=(SdlModel &&) = delete;
 
-public:
     /**
      * @brief   Get this model type
      *
@@ -69,7 +67,6 @@ public:
      */
     virtual auto modelType() const -> conversion::ModelType override;
 
-public:
     /**
      * @brief   Getter for model data
      *
@@ -77,6 +74,11 @@ public:
      */
     auto data() const -> const Data &;
 
+    /**
+     * @brief   Getter for model name
+     *
+     * @returns Model name
+     */
     auto name() const -> const QString &;
 
 private:

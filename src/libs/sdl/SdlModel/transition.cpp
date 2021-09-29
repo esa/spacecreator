@@ -32,12 +32,12 @@ Transition::Transition(const QString &name, std::vector<std::shared_ptr<Action>>
     }
 }
 
-auto Transition::actions() -> const std::vector<std::shared_ptr<Action>> &
+const std::vector<std::shared_ptr<Action>> &Transition::actions()
 {
     return m_actions;
 }
 
-auto Transition::accept(Visitor &visitor) const -> void
+void Transition::accept(Visitor &visitor) const
 {
     visitor.visit(*this);
 }

@@ -38,11 +38,18 @@ void SdlVisitor::visit(const Process &process) const
 {
     // write some dummy CIF
     m_stream << "/* CIF PROCESS (" << 250 << ", " << 150 << "), (" << 150 << ", " << 75 << ") */\n";
-    m_stream << "process " << process.name() << "\n";
+    m_stream << "process " << process.name() << ";\n";
 
     // TODO: loop over process variables and export them
 
     // TODO: loop over procedures and export them
+
+    m_stream << "    /* CIF START (9, 285), (70, 35) */\n"
+                "    START;\n"
+                "        /* CIF NEXTSTATE (9, 335), (70, 35) */\n"
+                "        NEXTSTATE ";
+    m_stream << process.stateMachine()->states()[0]->name();
+    m_stream << ";\n";
 
     exportCollection(process.stateMachine()->states());
 
@@ -64,7 +71,7 @@ void SdlVisitor::visit(const Input &input) const
 {
     // write some dummy CIF
     m_stream << "        /* CIF input (" << 250 << "," << 150 << "), (" << 150 << ", " << 75 << ") */\n";
-    m_stream << "        input " << input.name() << "(" /* TODO parametres of the input */ << ");\n";
+    m_stream << "        input " << input.name() << ";\n";
 
     if (input.transition() != nullptr) {
         exportCollection(input.transition()->actions());
@@ -95,7 +102,7 @@ void SdlVisitor::visit(const NextState &nextstate) const
 }
 
 template<typename T>
-auto SdlVisitor::exportCollection(const T &collection) const -> void
+void SdlVisitor::exportCollection(const T &collection) const
 {
     for (const auto &item : collection) {
         SdlVisitor visitor(m_stream);

@@ -32,22 +32,22 @@ Process::Process(const QString &name, std::unique_ptr<StateMachine> &stateMachin
 
 Process::~Process() {}
 
-auto Process::stateMachine() const -> const std::unique_ptr<StateMachine> &
+const std::unique_ptr<StateMachine> &Process::stateMachine() const
 {
     return m_stateMachine;
 }
 
-auto Process::variables() const -> const std::vector<std::unique_ptr<VariableDeclaration>> &
+const std::vector<std::unique_ptr<VariableDeclaration>> &Process::variables() const
 {
     return m_variables;
 }
 
-auto Process::procedures() const -> const std::vector<std::unique_ptr<Procedure>> &
+const std::vector<std::unique_ptr<Procedure>> &Process::procedures() const
 {
     return m_procedures;
 }
 
-auto Process::accept(Visitor &visitor) const -> void
+void Process::accept(Visitor &visitor) const
 {
     visitor.visit(*this);
 }

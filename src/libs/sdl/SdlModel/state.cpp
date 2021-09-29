@@ -47,17 +47,17 @@ State::State(const State &state)
 
 State::~State() {}
 
-auto State::inputs() const -> const std::vector<std::unique_ptr<Input>> &
+const std::vector<std::unique_ptr<Input>> &State::inputs() const
 {
     return m_inputs;
 }
 
-auto State::continuousSignals() -> const std::vector<std::unique_ptr<ContinuousSignal>> &
+const std::vector<std::unique_ptr<ContinuousSignal>> &State::continuousSignals()
 {
     return m_continuousSignals;
 }
 
-auto State::accept(Visitor &visitor) const -> void
+void State::accept(Visitor &visitor) const
 {
     visitor.visit(*this);
 }

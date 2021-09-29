@@ -35,7 +35,7 @@ NextState::NextState(const QString &name, const std::shared_ptr<State> &state)
 {
 }
 
-auto NextState::state() const -> const std::shared_ptr<State> &
+const std::shared_ptr<State> &NextState::state() const
 {
     return m_state;
 }

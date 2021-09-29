@@ -40,12 +40,12 @@ Input::Input(const Input &input)
 {
 }
 
-auto Input::transition() const -> const std::shared_ptr<Transition> &
+const std::shared_ptr<Transition> &Input::transition() const
 {
     return m_transition;
 }
 
-auto Input::accept(Visitor &visitor) const -> void
+void Input::accept(Visitor &visitor) const
 {
     visitor.visit(*this);
 }
