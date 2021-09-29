@@ -20,8 +20,10 @@
 #pragma once
 
 #include "action.h"
+#include "state.h"
 
 #include <QString>
+#include <memory>
 
 namespace sdl {
 
@@ -29,7 +31,11 @@ class NextState : public Action
 {
 public:
     NextState(const QString &name);
+    auto state() const -> const std::unique_ptr<State> &;
     auto accept(Visitor &visitor) const -> void override;
+
+private:
+    std::unique_ptr<State> m_state;
 };
 
 } // namespace sdl

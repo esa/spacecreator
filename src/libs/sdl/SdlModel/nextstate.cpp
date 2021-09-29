@@ -28,6 +28,11 @@ NextState::NextState(const QString &name)
 {
 }
 
+auto NextState::state() const -> const std::unique_ptr<State> &
+{
+    return m_state;
+}
+
 void NextState::accept(Visitor &visitor) const
 {
     visitor.visit(*this);
