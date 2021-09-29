@@ -134,8 +134,8 @@ void AsyncInterfaceCommandTranslator::createAsn1Sequence(
 {
     auto sequence = std::make_unique<Asn1Acn::Types::Sequence>(name);
 
-    for (const auto &[name, typeName] : arguments) {
-        createAsn1SequenceComponent(name, typeName, sequence.get());
+    for (const auto &[argumentName, argumentTypeName] : arguments) {
+        createAsn1SequenceComponent(argumentName, argumentTypeName, sequence.get());
     }
 
     auto typeAssignment =

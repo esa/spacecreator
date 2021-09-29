@@ -21,6 +21,7 @@
 
 #include "specialized/interfacecommandtranslator.h"
 
+#include <conversion/common/qstringhash.h>
 #include <map>
 #include <seds/SedsModel/types/datatype.h>
 
