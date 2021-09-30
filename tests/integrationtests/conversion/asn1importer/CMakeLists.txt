@@ -1,4 +1,4 @@
-set(TEST_NAME tst_asn1importer)
+set(TEST_NAME tsti_asn1importer)
 project(${TEST_NAME})
 
 add_executable(${TEST_NAME})

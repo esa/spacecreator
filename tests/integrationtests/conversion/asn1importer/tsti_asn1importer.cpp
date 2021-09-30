@@ -35,7 +35,7 @@ using conversion::importer::ImportException;
 
 namespace conversion::asn1::test {
 
-class tst_Asn1Importer : public QObject
+class tsti_Asn1Importer : public QObject
 {
     Q_OBJECT
 
@@ -44,7 +44,7 @@ private Q_SLOTS:
     void testInvalid();
 };
 
-void tst_Asn1Importer::testValid()
+void tsti_Asn1Importer::testValid()
 {
     Options options;
     options.add(Asn1Options::inputFilename, "Valid.asn");
@@ -84,7 +84,7 @@ void tst_Asn1Importer::testValid()
     }
 }
 
-void tst_Asn1Importer::testInvalid()
+void tsti_Asn1Importer::testInvalid()
 {
     Options options;
     options.add(Asn1Options::inputFilename, "Invalid.asn");
@@ -96,6 +96,6 @@ void tst_Asn1Importer::testInvalid()
 
 } // namespace conversion::asn1::test
 
-QTEST_MAIN(conversion::asn1::test::tst_Asn1Importer)
+QTEST_MAIN(conversion::asn1::test::tsti_Asn1Importer)
 
-#include "tst_asn1importer.moc"
+#include "tsti_asn1importer.moc"
