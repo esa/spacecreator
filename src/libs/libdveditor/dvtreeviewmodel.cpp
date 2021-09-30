@@ -50,6 +50,7 @@ void DVTreeViewModel::updateItemData(QStandardItem *item, shared::VEObject *obje
         return;
     }
     item->setData(dvm::DVNameValidator::decodeName(obj->type(), obj->title()), Qt::DisplayRole);
+    item->setData(QVariant::fromValue(obj), DVObjectRole);
 
     QPixmap pix;
     switch (obj->type()) {

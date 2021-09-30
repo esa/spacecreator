@@ -35,6 +35,12 @@ class DVTreeViewModel : public shared::AbstractVisualizationModel
 {
     Q_OBJECT
 public:
+    enum Roles
+    {
+        DVObjectRole = Qt::UserRole + 321
+    };
+    Q_ENUM(Roles)
+
     explicit DVTreeViewModel(
             dvm::DVModel *dvModel, shared::cmd::CommandsStackBase *commandsStack, QObject *parent = nullptr);
 

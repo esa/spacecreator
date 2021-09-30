@@ -17,6 +17,7 @@
 
 #include "dvappwidget.h"
 
+#include "dvtreesortproxymodel.h"
 #include "itemeditor/graphicsview.h"
 #include "ui_dvappwidget.h"
 
@@ -30,6 +31,7 @@ DVAppWidget::DVAppWidget(QWidget *parent)
     : QWidget(parent)
     , ui(new Ui::DVAppWidget)
     , m_selectionModel(new QItemSelectionModel(nullptr, this))
+    , m_dvTreeSortModel(new DVTreeSortProxyModel(this))
 {
     ui->setupUi(this);
     ui->mainSplitter->setStretchFactor(1, 1);
@@ -55,9 +57,11 @@ void DVAppWidget::setGraphicsScene(QGraphicsScene *scene)
 
 void DVAppWidget::setAadlModel(QAbstractItemModel *model)
 {
-    m_selectionModel->setModel(model);
-    ui->treeView->setModel(model);
+    m_dvTreeSortModel->setSourceModel(model);
+    m_selectionModel->setModel(m_dvTreeSortModel);
+    ui->treeView->setModel(m_dvTreeSortModel);
     ui->treeView->setHeaderHidden(true);
+    ui->treeView->setSortingEnabled(true);
     ui->treeView->setSelectionModel(m_selectionModel);
 }
 

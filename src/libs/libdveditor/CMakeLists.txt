@@ -41,6 +41,8 @@ target_sources(${LIB_NAME} PRIVATE
     dveditorresources.qrc
     dvexporter.cpp
     dvexporter.h
+    dvtreesortproxymodel.cpp
+    dvtreesortproxymodel.h
     dvtreeviewmodel.cpp
     dvtreeviewmodel.h
     dvvisualizationmodel.cpp
