@@ -107,8 +107,12 @@ private:
 
 namespace conversion {
 
+/**
+ * @brief   Specialization for InterfaceView model properties
+ */
 template <>
 struct ModelProperties<ivm::IVModel> {
+    /// @brief  Model type
     static const ModelType type = ModelType::InterfaceView;
 };
 

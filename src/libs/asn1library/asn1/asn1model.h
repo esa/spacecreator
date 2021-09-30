@@ -91,8 +91,12 @@ private:
 
 namespace conversion {
 
+/**
+ * @brief   Specialization for ASN.1 model properties
+ */
 template <>
 struct ModelProperties<Asn1Acn::Asn1Model> {
+    /// @brief  Model type
     static const ModelType type = ModelType::Asn1;
 };
 

@@ -87,8 +87,12 @@ private:
 
 namespace conversion {
 
+/**
+ * @brief   Specialization for SEDS model properties
+ */
 template<>
 struct ModelProperties<::seds::model::SedsModel> {
+    /// @brief  Model type
     static const ModelType type = ModelType::Seds;
 };
 
