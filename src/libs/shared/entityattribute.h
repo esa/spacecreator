@@ -40,6 +40,8 @@ public:
     void setValue(const QVariant &value);
 
     QString name() const;
+    void setName(const QString &name);
+
     bool isProperty() const;
     bool isAttribute() const;
     Type type() const;

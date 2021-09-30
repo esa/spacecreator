@@ -380,6 +380,29 @@ shared::PropertyTemplateConfig *IVModel::dynPropConfig() const
     return d->m_dynPropConfig;
 }
 
+QString IVModel::defaultFunctionLanguage() const
+{
+    IVFunction f;
+    shared::PropertyTemplate *t =
+            d->m_dynPropConfig->propertyTemplateForObject(&f, meta::Props::token(meta::Props::Token::language));
+    if (!t) {
+        return {};
+    }
+    return t->defaultValue().toString();
+}
+
+QStringList IVModel::availableFunctionLanguages() const
+{
+    IVFunction f;
+    shared::PropertyTemplate *t =
+            d->m_dynPropConfig->propertyTemplateForObject(&f, meta::Props::token(meta::Props::Token::language));
+    if (t) {
+        return t->value().toStringList();
+    }
+
+    return {};
+}
+
 /*!
    Returns the connection with the given \p interfaceName connection from function \p source to function \p target
    If no such connection is found, a nullptr is returned.

@@ -55,6 +55,7 @@ private:
     void initContextParams();
     void initIfaceParams();
     void initCommentView();
+    void initLanguageView();
 };
 
 } // namespace ive

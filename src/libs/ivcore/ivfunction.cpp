@@ -123,9 +123,40 @@ const QList<EntityAttribute> &IVFunction::languages() const
     return d->m_languages;
 }
 
+void IVFunction::setLanguage(int idx, const EntityAttribute &value)
+{
+    if (idx < 0 || idx >= d->m_languages.size()) {
+        return;
+    }
+    d->m_languages[idx] = value;
+}
+
+bool IVFunction::hasLanguageName(const QString &name) const
+{
+    for (const EntityAttribute &language : d->m_languages) {
+        if (language.name() == name) {
+            return true;
+        }
+    }
+    return false;
+}
+
 void IVFunction::addLanguage(const QString &name, const QString &language)
 {
     d->m_languages.append(EntityAttribute(name, language, EntityAttribute::Type::Attribute));
+}
+
+/*!
+   Inserts the language \p value at position idx
+ */
+void IVFunction::insertLanguage(int idx, const EntityAttribute &value)
+{
+    d->m_languages.insert(idx, value);
+}
+
+void IVFunction::removeLanguage(int idx)
+{
+    d->m_languages.removeAt(idx);
 }
 
 void IVFunction::setDefaultLanguage(const QString &name)

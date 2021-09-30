@@ -41,6 +41,11 @@ QString EntityAttribute::name() const
     return m_name;
 }
 
+void EntityAttribute::setName(const QString &name)
+{
+    m_name = name;
+}
+
 bool EntityAttribute::isProperty() const
 {
     return m_type == Type::Property;

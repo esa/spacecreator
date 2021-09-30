@@ -43,7 +43,11 @@ public:
     bool inheritsFunctionType() const;
 
     const QList<EntityAttribute> &languages() const;
+    void setLanguage(int idx, const EntityAttribute &value);
+    bool hasLanguageName(const QString &name) const;
     void addLanguage(const QString &name, const QString &language);
+    void insertLanguage(int idx, const EntityAttribute &value);
+    void removeLanguage(int idx);
 
     void setDefaultLanguage(const QString &name);
     QString defaultLanguage() const;

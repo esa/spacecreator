@@ -34,6 +34,7 @@
 #include "ivpropertieslistmodel.h"
 #include "ivpropertiesview.h"
 #include "ivpropertytemplateconfig.h"
+#include "languageselect.h"
 #include "propertieslistmodel.h"
 #include "propertiesviewbase.h"
 
@@ -89,12 +90,12 @@ void IVPropertiesDialog::init()
     shared::PropertiesDialog::init();
 
     switch (dataObject()->type()) {
+    case ivm::IVObject::Type::Function:
+        initLanguageView();
     case ivm::IVObject::Type::FunctionType:
-    case ivm::IVObject::Type::Function: {
         initContextParams();
         initAttributesView();
         break;
-    }
     case ivm::IVObject::Type::RequiredInterface:
     case ivm::IVObject::Type::ProvidedInterface: {
         initIfaceParams();
@@ -224,6 +225,16 @@ void IVPropertiesDialog::initCommentView()
             commandStack()->push(commentTextCmd);
         });
     }
+}
+
+void IVPropertiesDialog::initLanguageView()
+{
+    auto fn = qobject_cast<ivm::IVFunction *>(dataObject());
+    if (!fn) {
+        return;
+    }
+    auto languagesWidget = new ive::LanguageSelect(fn, commandMacro(), this);
+    insertTab(languagesWidget, tr("Languages"));
 }
 
 } // namespace ive

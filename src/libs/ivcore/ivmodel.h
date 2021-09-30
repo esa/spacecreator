@@ -90,6 +90,9 @@ public:
 
     shared::PropertyTemplateConfig *dynPropConfig() const;
 
+    QString defaultFunctionLanguage() const;
+    QStringList availableFunctionLanguages() const;
+
 Q_SIGNALS:
     void rootObjectChanged(shared::Id rootId);
 
