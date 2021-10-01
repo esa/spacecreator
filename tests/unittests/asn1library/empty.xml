@@ -1,7 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
-<ASN1AST>
+<AstRoot>
    <Asn1File FileName="test.asn">
-      <Asn1Module ID="ModuleTest">
-      </Asn1Module>
+     <Modules>
+       <Module ID="ModuleTest">
+       </Module>
+    </Modules>
    </Asn1File>
-</ASN1AST>
+</AstRoot>

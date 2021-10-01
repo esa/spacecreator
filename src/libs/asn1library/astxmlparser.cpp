@@ -347,8 +347,9 @@ AstXmlParser::AstXmlParser(QXmlStreamReader &xmlReader)
 
 bool AstXmlParser::parse()
 {
-    if (nextRequiredElementIs({{QStringLiteral("AstRoot")}, {QStringLiteral("ASN1AST")}}))
+    if (nextRequiredElementIs(QStringLiteral("AstRoot"))) {
         readAstRoot();
+    }
 
     const bool ok = !m_xmlReader.hasError();
     if (!ok) {
@@ -359,44 +360,26 @@ bool AstXmlParser::parse()
 
 void AstXmlParser::readAstRoot()
 {
-    while (skipToChildElement(QStringLiteral("Asn1File")))
+    while (skipToChildElement(QStringLiteral("Asn1File"))) {
         readAsn1File();
+    }
 }
 
 void AstXmlParser::readAsn1File()
 {
     updateCurrentFile();
 
-    if (!m_xmlReader.readNextStartElement()) {
-        m_xmlReader.skipCurrentElement();
-        return;
-    }
-
-
-    if (m_xmlReader.name() == QStringLiteral("Modules")) {
+    if (nextRequiredElementIs(QStringLiteral("Modules"))) {
         readModules();
-        m_xmlReader.skipCurrentElement();
-        return;
     }
-
-    if (m_xmlReader.name() == QStringLiteral("Asn1Module")) {
-        readModule();
-        readModules();
-        if (m_xmlReader.name().toString() == QStringLiteral("Asn1Module")) {
-            m_xmlReader.skipCurrentElement();
-        }
-        return;
-    }
-
-    m_xmlReader.raiseError(QString("XML does not contain expected <%1> element")
-                                   .arg(QStringLiteral("Modules"), QStringLiteral("Asn1Module")));
     m_xmlReader.skipCurrentElement();
 }
 
 void AstXmlParser::readModules()
 {
-    while (nextElementIs({{QStringLiteral("Module")}, {QStringLiteral("Asn1Module")}}))
+    while (nextElementIs(QStringLiteral("Module"))) {
         readModule();
+    }
 }
 
 void AstXmlParser::updateCurrentFile()
@@ -408,18 +391,19 @@ void AstXmlParser::updateCurrentFile()
 void AstXmlParser::readModuleChildren()
 {
     while (m_xmlReader.readNextStartElement()) {
-        if (m_xmlReader.name() == QStringLiteral("ExportedTypes"))
+        if (m_xmlReader.name() == QStringLiteral("ExportedTypes")) {
             readExportedTypes();
-        else if (m_xmlReader.name() == QStringLiteral("ExportedValues"))
+        } else if (m_xmlReader.name() == QStringLiteral("ExportedValues")) {
             readExportedValues();
-        else if (m_xmlReader.name() == QStringLiteral("ImportedModules"))
+        } else if (m_xmlReader.name() == QStringLiteral("ImportedModules")) {
             readImportedModules();
-        else if (m_xmlReader.name() == QStringLiteral("TypeAssignments"))
+        } else if (m_xmlReader.name() == QStringLiteral("TypeAssignments")) {
             readTypeAssignments();
-        else if (m_xmlReader.name() == QStringLiteral("ValueAssignments"))
+        } else if (m_xmlReader.name() == QStringLiteral("ValueAssignments")) {
             readValueAssignments();
-        else
+        } else {
             m_xmlReader.skipCurrentElement();
+        }
     }
 }
 
@@ -454,8 +438,9 @@ void AstXmlParser::readValueAssignments()
 
 void AstXmlParser::readTypeAssignments()
 {
-    while (nextElementIs(QStringLiteral("TypeAssignment")))
+    while (nextElementIs(QStringLiteral("TypeAssignment"))) {
         readTypeAssignment();
+    }
 }
 
 void AstXmlParser::readTypeAssignment()
@@ -494,8 +479,9 @@ void AstXmlParser::readValueAssignment()
 
 ValuePtr AstXmlParser::findAndReadValueAssignmentValue()
 {
-    if (!m_xmlReader.readNextStartElement())
+    if (!m_xmlReader.readNextStartElement()) {
         return nullptr;
+    }
 
     auto val = readValueAssignmentValue();
     m_xmlReader.skipCurrentElement();
@@ -542,13 +528,13 @@ ValuePtr AstXmlParser::readValueAssignmentValue()
 
     const auto name = m_xmlReader.name();
 
-    if (isSingleValueName(name))
+    if (isSingleValueName(name)) {
         value = readSimpleValue(name);
-    else if (isMultipleValueName(name))
+    } else if (isMultipleValueName(name)) {
         value = readMultipleValue();
-    else if (isSequenceValue(name))
+    } else if (isSequenceValue(name)) {
         value = readSequenceValues();
-    else if (isChoiceValue(name)) {
+    } else if (isChoiceValue(name)) {
         value = readChoiceValue();
         m_xmlReader.skipCurrentElement();
     } else if (isNullValue(name)) {
@@ -655,20 +641,22 @@ int AstXmlParser::readCharPossitionInLineAttribute()
 
 void AstXmlParser::readImportedModules()
 {
-    while (nextRequiredElementIs(QStringLiteral("ImportedModule")))
+    while (nextRequiredElementIs(QStringLiteral("ImportedModule"))) {
         readImportedModule();
+    }
 }
 
 void AstXmlParser::readImportedModule()
 {
     const auto moduleName = readIdAttribute(QStringLiteral("ID"));
     while (m_xmlReader.readNextStartElement()) {
-        if (m_xmlReader.name() == QStringLiteral("ImportedTypes"))
+        if (m_xmlReader.name() == QStringLiteral("ImportedTypes")) {
             readImportedTypes(moduleName);
-        else if (m_xmlReader.name() == QStringLiteral("ImportedValues"))
+        } else if (m_xmlReader.name() == QStringLiteral("ImportedValues")) {
             readImportedValues(moduleName);
-        else
+        } else {
             m_xmlReader.skipCurrentElement();
+        }
     }
 }
 
@@ -686,8 +674,9 @@ void AstXmlParser::readImportedValue(const QString &moduleName)
 
 void AstXmlParser::readImportedTypes(const QString &moduleName)
 {
-    while (nextRequiredElementIs(QStringLiteral("ImportedType")))
+    while (nextRequiredElementIs(QStringLiteral("ImportedType"))) {
         readImportedType(moduleName);
+    }
 }
 
 void AstXmlParser::readImportedType(const QString &moduleName)
@@ -716,29 +705,12 @@ bool AstXmlParser::nextRequiredElementIs(const QString &name)
     return false;
 }
 
-bool AstXmlParser::nextRequiredElementIs(const QStringList &names)
-{
-    const bool ok = nextElementIs(names);
-    if (!ok) {
-        m_xmlReader.raiseError(QString("XML does not contain expected <%1> element").arg(names.join(",")));
-    }
-    return ok;
-}
-
 bool AstXmlParser::nextElementIs(const QString &name)
 {
     if (!m_xmlReader.readNextStartElement()) {
         return false;
     }
     return m_xmlReader.name() == name;
-}
-
-bool AstXmlParser::nextElementIs(const QStringList &names)
-{
-    if (!m_xmlReader.readNextStartElement()) {
-        return false;
-    }
-    return names.contains(m_xmlReader.name().toString());
 }
 
 SourceLocation AstXmlParser::readLocationFromAttributes()
@@ -753,8 +725,9 @@ QString AstXmlParser::readIsAlignedToNext()
 
 std::unique_ptr<Types::Type> AstXmlParser::findAndReadType()
 {
-    if (!skipToChildElement({{QStringLiteral("Asn1Type")}, {QStringLiteral("Type")}}))
+    if (!skipToChildElement(QStringLiteral("Asn1Type"))) {
         return {};
+    }
     return readType();
 }
 
@@ -762,29 +735,19 @@ static bool isTypeName(const QString &name)
 {
     // clang-format off
     return name == QStringLiteral("BIT_STRING")
-           || name == QStringLiteral("BIT STRING")
-           || name.startsWith(QStringLiteral("BitString"), Qt::CaseInsensitive)
-           || name.startsWith(QStringLiteral("Boolean"), Qt::CaseInsensitive)
-           || name.startsWith(QStringLiteral("Choice"), Qt::CaseInsensitive)
-           || name.startsWith(QStringLiteral("Enumerated"), Qt::CaseInsensitive)
-           || name.startsWith(QStringLiteral("IA5String"), Qt::CaseInsensitive)
-           || name.startsWith(QStringLiteral("Integer"), Qt::CaseInsensitive)
-           || name == QStringLiteral("NULL")
-           || name == QStringLiteral("NullType")
-           || name.startsWith(QStringLiteral("NumericString"), Qt::CaseInsensitive)
-           || name == QStringLiteral("OCTET_STRING")
-           || name == QStringLiteral("OCTET STRING")
-           || name == QStringLiteral("OctetStringType")
-           || name == QStringLiteral("REAL")
-           || name.startsWith(QStringLiteral("Real"), Qt::CaseInsensitive)
-           || name == QStringLiteral("SEQUENCE")
-           || name == QStringLiteral("SequenceType")
-           || name == QStringLiteral("SEQUENCE_OF")
-           || name == QStringLiteral("SEQUENCE OF")
-           || name == QStringLiteral("SequenceOfType")
-           || name == QStringLiteral("REFERENCE_TYPE")
-           || name == QStringLiteral("REFERENCE TYPE")
-           || name == QStringLiteral("ReferenceType");
+        || name == QStringLiteral("BOOLEAN")
+        || name == QStringLiteral("CHOICE")
+        || name == QStringLiteral("ENUMERATED")
+        || name == QStringLiteral("NumericString")
+        || name == QStringLiteral("IA5String")
+        || name == QStringLiteral("INTEGER")
+        || name == QStringLiteral("NULL")
+        || name == QStringLiteral("NumericString")
+        || name == QStringLiteral("OCTET_STRING")
+        || name == QStringLiteral("REAL")
+        || name == QStringLiteral("SEQUENCE")
+        || name == QStringLiteral("SEQUENCE_OF")
+        || name == QStringLiteral("REFERENCE_TYPE");
     // clang-format on
 }
 
@@ -799,12 +762,13 @@ std::unique_ptr<Types::Type> AstXmlParser::readType()
     while (m_xmlReader.readNextStartElement()) {
         const auto name = m_xmlReader.name().toString();
 
-        if (name == QStringLiteral("AcnParameters"))
+        if (name == QStringLiteral("AcnParameters")) {
             acnParameters = readAcnParameters();
-        else if (isTypeName(name))
+        } else if (isTypeName(name)) {
             type = readTypeDetails(name, location, isParametrized, alignToNext);
-        else
+        } else {
             m_xmlReader.skipCurrentElement();
+        }
     }
 
     AcnDefinedItemsAddingVisitor visitor(std::move(acnParameters));
@@ -817,8 +781,9 @@ AcnParameterPtrs AstXmlParser::readAcnParameters()
 {
     AcnParameterPtrs parameters;
 
-    while (skipToChildElement(QStringLiteral("AcnParameter")))
+    while (skipToChildElement(QStringLiteral("AcnParameter"))) {
         parameters.push_back(readAcnParameter());
+    }
 
     return parameters;
 }
@@ -854,12 +819,13 @@ std::unique_ptr<Types::Type> AstXmlParser::readTypeDetails(const QString &name,
 std::unique_ptr<Types::Type> AstXmlParser::buildTypeFromName(
     const QString &name, const SourceLocation &location, bool isParametrized)
 {
-    auto type = (name == QStringLiteral("REFERENCE_TYPE") || name == QStringLiteral("ReferenceType"))
+    auto type = (name == QStringLiteral("REFERENCE_TYPE"))
                     ? createReferenceType(location)
                     : Types::TypeFactory::createBuiltinType(name);
 
-    if (isParametrized)
+    if (isParametrized) {
         m_inParametrizedBranch = true;
+    }
 
     readTypeAttributes(*type);
     readTypeContents(name, *type);
@@ -902,8 +868,9 @@ void AstXmlParser::readReferredTypeDetails(Types::Type &type)
 void AstXmlParser::readAcnArguments(Types::Type &type)
 {
     AcnArgumentPtrs arguments;
-    while (skipToChildElement("argument"))
+    while (skipToChildElement("argument")) {
         arguments.push_back(std::make_unique<AcnArgument>(m_xmlReader.readElementText()));
+    }
 
     AcnDefinedItemsAddingVisitor visitor(std::move(arguments));
     type.accept(visitor);
@@ -911,31 +878,27 @@ void AstXmlParser::readAcnArguments(Types::Type &type)
 
 void AstXmlParser::readTypeContents(const QString &name, Types::Type &type)
 {
-    if (name == QStringLiteral("SequenceType")) {
-        readSequenceAsn(type);
-    } else if (name == QStringLiteral("SEQUENCE")) {
+    if (name == QStringLiteral("SEQUENCE")) {
         readSequence(type);
-    } else if (name == QStringLiteral("SEQUENCE_OF") || name == QStringLiteral("SEQUENCE OF") || name == QStringLiteral("SequenceOfType")) {
+    } else if (name == QStringLiteral("SEQUENCE_OF")) {
         readSequenceOf(type);
-    } else if (m_xmlReader.name() == "ChoiceType") {
-        readChoiceAsn(type);
     } else if (name == QStringLiteral("CHOICE")) {
         readChoice(type);
-    } else if (name == QStringLiteral("REFERENCE_TYPE") || name == QStringLiteral("REFERENCE TYPE") || name == QStringLiteral("ReferenceType")) {
+    } else if (name == QStringLiteral("REFERENCE_TYPE")) {
         readReferenceType(type);
-    } else if (name == QStringLiteral("INTEGER") || name.startsWith(QStringLiteral("Integer"), Qt::CaseInsensitive)) {
+    } else if (name == QStringLiteral("INTEGER")) {
         readInteger(type);
-    } else if (name == QStringLiteral("REAL") || name.startsWith(QStringLiteral("Real"), Qt::CaseInsensitive)) {
+    } else if (name == QStringLiteral("REAL")) {
         readReal(type);
-    } else if (name == QStringLiteral("ENUMERATED") || name.startsWith(QStringLiteral("Enumerated"), Qt::CaseInsensitive)) {
+    } else if (name == QStringLiteral("ENUMERATED")) {
         readEnumerated(type);
-    } else if (name == QStringLiteral("OCTET_STRING") || name == QStringLiteral("OCTET STRING") || name == QStringLiteral("OctetStringType")) {
+    } else if (name == QStringLiteral("OCTET_STRING")) {
         readOctetString(type);
-    } else if (name == QStringLiteral("IA5String") || name == QStringLiteral("IA5String")) {
+    } else if (name == QStringLiteral("IA5String")) {
         readIA5String(type);
     } else if (name == QStringLiteral("NumericString")) {
         readNumericString(type);
-    } else if (name == QStringLiteral("BIT_STRING") || name == QStringLiteral("BIT STRING") || name == QStringLiteral("BitStringType")) {
+    } else if (name == QStringLiteral("BIT_STRING")) {
         readBitString(type);
     } else {
         m_xmlReader.skipCurrentElement();
@@ -945,12 +908,13 @@ void AstXmlParser::readTypeContents(const QString &name, Types::Type &type)
 void AstXmlParser::readSequence(Types::Type &type)
 {
     while (m_xmlReader.readNextStartElement()) {
-        if (m_xmlReader.name() == QStringLiteral("SEQUENCE_COMPONENT"))
+        if (m_xmlReader.name() == QStringLiteral("SEQUENCE_COMPONENT")) {
             readSequenceComponent(type);
-        else if (m_xmlReader.name() == QStringLiteral("ACN_COMPONENT"))
+        } else if (m_xmlReader.name() == QStringLiteral("ACN_COMPONENT")) {
             readAcnComponent(type);
-        else
+        } else {
             m_xmlReader.skipCurrentElement();
+        }
     }
 }
 
@@ -976,61 +940,18 @@ void AstXmlParser::readAcnComponent(Types::Type &type)
     type.accept(visitor);
 }
 
-void AstXmlParser::readSequenceAsn(Types::Type &type)
-{
-    auto sequence = dynamic_cast<Types::Sequence *>(&type);
-    if (!sequence) {
-        return;
-    }
-
-    while (skipToChildElement(QStringLiteral("SequenceOrSetChild"))) {
-        const QString name = readVarNameAttribute();
-        auto sequenceType = findAndReadType();
-        sequenceType->setIdentifier(name);
-        sequence->addChild(std::move(sequenceType));
-        m_xmlReader.skipCurrentElement();
-    }
-}
-
 void AstXmlParser::readSequenceOf(Types::Type &type)
 {
-    parseRange<qlonglong>(type);
-
     while (m_xmlReader.readNextStartElement()) {
-        if (m_xmlReader.name() == QStringLiteral("Constraints"))
+        if (m_xmlReader.name() == QStringLiteral("Constraints")) {
             readConstraints(type);
-        else if (m_xmlReader.name() == QStringLiteral("Asn1Type")) {
+        } else if (m_xmlReader.name() == QStringLiteral("Asn1Type")) {
             auto attributes = m_xmlReader.attributes();
             auto childType = readType();
 
             ChildItemAddingVisitor visitor(attributes, m_currentFile, std::move(childType));
             type.accept(visitor);
-        } else if (m_xmlReader.name() == QStringLiteral("Type")) {
-            auto childType = readType();
-            if (childType) {
-                type.addChild(std::move(childType));
-            }
         } else {
-            m_xmlReader.skipCurrentElement();
-        }
-    }
-}
-
-void AstXmlParser::readChoiceAsn(Types::Type &type)
-{
-    auto choice = dynamic_cast<Types::Choice *>(&type);
-    if (!choice) {
-        return;
-    }
-
-    while (skipToChildElement(QStringLiteral("ChoiceChild"))) {
-        auto name = readVarNameAttribute();
-        auto choiceType = findAndReadType();
-        choiceType->setIdentifier(name);
-
-        choice->addChild(std::move(choiceType));
-
-        if (m_xmlReader.name() != QStringLiteral("ChoiceChild")) {
             m_xmlReader.skipCurrentElement();
         }
     }
@@ -1051,27 +972,24 @@ void AstXmlParser::readChoice(Types::Type &type)
 
 void AstXmlParser::readInteger(Types::Type &type)
 {
-    parseRange<qlonglong>(type);
     findAndReadConstraints(type);
 }
 
 void AstXmlParser::readReal(Types::Type &type)
 {
-    parseRange<double>(type);
     findAndReadConstraints(type);
 }
 
 void AstXmlParser::readEnumerated(Types::Type &type)
 {
     while (m_xmlReader.readNextStartElement()) {
-        if (m_xmlReader.name() == QStringLiteral("Items"))
+        if (m_xmlReader.name() == QStringLiteral("Items")) {
             readEnumeratedItem(type);
-        else if (m_xmlReader.name() == QStringLiteral("Constraints"))
+        } else if (m_xmlReader.name() == QStringLiteral("Constraints")) {
             readConstraints(type);
-        else if (m_xmlReader.name() == QStringLiteral("EnumValues"))
-            readEnumValues(type);
-        else
+        } else {
             m_xmlReader.skipCurrentElement();
+        }
     }
 }
 
@@ -1108,24 +1026,6 @@ void AstXmlParser::readEnumeratedItem(Types::Type &type)
     }
 }
 
-void AstXmlParser::readEnumValues(Types::Type &type)
-{
-    QStringList values;
-
-    while (m_xmlReader.readNextStartElement()) {
-        if (m_xmlReader.name() == QStringLiteral("EnumValue")) {
-            const QString value = m_xmlReader.attributes().value("StringValue").toString();
-            if (!value.isEmpty()) {
-                values.append(value);
-            }
-        }
-
-        m_xmlReader.skipCurrentElement();
-    }
-
-    type.m_parameters[ASN1_VALUES] = values;
-}
-
 void AstXmlParser::readReferenceType(Types::Type &type)
 {
     const TypeAssignment *assignment = m_currentDefinitions->type(type.typeName());
@@ -1133,15 +1033,16 @@ void AstXmlParser::readReferenceType(Types::Type &type)
         if (type.parameters().isEmpty()) {
             type.setParameters(assignment->type()->parameters());
         }
-    } 
+    }
 
     while (m_xmlReader.readNextStartElement()) {
-        if (m_xmlReader.name() == QStringLiteral("AcnArguments"))
+        if (m_xmlReader.name() == QStringLiteral("AcnArguments")) {
             readAcnArguments(type);
-        else if (m_xmlReader.name() == QStringLiteral("Asn1Type") || m_xmlReader.name() == QStringLiteral("Type"))
+        } else if (m_xmlReader.name() == QStringLiteral("Asn1Type")) {
             readReferredTypeDetails(type);
-        else
+        } else {
             m_xmlReader.skipCurrentElement();
+        }
     }
 }
 
@@ -1209,10 +1110,11 @@ private:
 void AstXmlParser::findAndReadConstraints(Types::Type &type)
 {
     while (m_xmlReader.readNextStartElement()) {
-        if (m_xmlReader.name() == QStringLiteral("Constraints"))
+        if (m_xmlReader.name() == QStringLiteral("Constraints")) {
             readConstraints(type);
-        else
+        } else {
             m_xmlReader.skipCurrentElement();
+        }
     }
 }
 
@@ -1225,48 +1127,12 @@ void AstXmlParser::readConstraints(Types::Type &type)
 bool AstXmlParser::skipToChildElement(const QString &name)
 {
     while (m_xmlReader.readNextStartElement()) {
-        if (m_xmlReader.name() == name)
+        if (m_xmlReader.name() == name) {
             return true;
-        else
+        } else {
             m_xmlReader.skipCurrentElement();
-    }
-
-    return false;
-}
-
-bool AstXmlParser::skipToChildElement(const QStringList &names)
-{
-    while (m_xmlReader.readNextStartElement()) {
-        if (names.contains(m_xmlReader.name().toString()))
-            return true;
-        else
-            m_xmlReader.skipCurrentElement();
-    }
-
-    return false;
-}
-
-template<typename T>
-void AstXmlParser::parseRange(Types::Type &type)
-{
-    QXmlStreamAttributes attributes = m_xmlReader.attributes();
-
-    auto parseAttribute = [&](const QString &attrName, const QString &mapName) {
-        if (attributes.hasAttribute(attrName)) {
-            bool ok;
-            const QString valueText = attributes.value(attrName).toString();
-            if (std::is_same<T, qlonglong>::value) {
-                qlonglong valueInt = valueText.toLongLong(&ok);
-                if (ok && !type.parameters().contains(mapName))
-                    type.m_parameters[mapName] = valueInt;
-            } else {
-                double valueDouble = valueText.toDouble(&ok);
-                if (ok && !type.parameters().contains(mapName))
-                    type.m_parameters[mapName] = static_cast<T>(valueDouble);
-            }
         }
-    };
+    }
 
-    parseAttribute("Min", ASN1_MIN);
-    parseAttribute("Max", ASN1_MAX);
+    return false;
 }

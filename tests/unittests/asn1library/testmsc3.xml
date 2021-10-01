@@ -1,297 +1,1238 @@
-<?xml version="1.0" encoding="utf-8"?>
-<ASN1AST>
-    <Asn1File FileName="testmsc3.asn">
-        <Asn1Module ID="TETRIS-DATAVIEW">
+﻿<?xml version="1.0" encoding="utf-8"?>
+<AstRoot xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="Asn1Schema.xsd" rename_policy="SelectiveEnumerants">
+  <Asn1File FileName="testmsc3.asn">
+    <Modules>
+      <Module Name="TETRIS-DATAVIEW" Line="1" CharPositionInLine="0">
         <ExportedTypes>
-            <ExportedType Name="Coordinates" />
-            <ExportedType Name="Color" />
-            <ExportedType Name="Pixels-Line" />
-            <ExportedType Name="Pixels" />
-            <ExportedType Name="Sprite" />
-            <ExportedType Name="Move-Status" />
-            <ExportedType Name="Move-Command" />
-            <ExportedType Name="Timer-Duration" />
-            <ExportedType Name="Line" />
-            <ExportedType Name="Grid" /> 
+          <ExportedType Name="Coordinates" />
+          <ExportedType Name="Color" />
+          <ExportedType Name="Pixels-Line" />
+          <ExportedType Name="Pixels" />
+          <ExportedType Name="Sprite" />
+          <ExportedType Name="Move-Status" />
+          <ExportedType Name="Move-Command" />
+          <ExportedType Name="Timer-Duration" />
+          <ExportedType Name="Line" />
+          <ExportedType Name="Grid" />
+          <ExportedType Name="T-Int32" />
+          <ExportedType Name="T-UInt32" />
+          <ExportedType Name="T-Int8" />
+          <ExportedType Name="T-UInt8" />
+          <ExportedType Name="T-Boolean" />
         </ExportedTypes>
-        <ExportedVariables>
-            <ExportedVariable Name="cols" />
-            <ExportedVariable Name="rows" />
-            <ExportedVariable Name="empty-line" />
-            <ExportedVariable Name="t-shape" />
-            <ExportedVariable Name="l-shape" />
-            <ExportedVariable Name="j-shape" />
-            <ExportedVariable Name="s-shape" />
-            <ExportedVariable Name="z-shape" />
-            <ExportedVariable Name="i-shape" />
-            <ExportedVariable Name="o-shape" /> 
-        </ExportedVariables>
+        <ExportedValues>
+          <ExportedValue Name="cols" />
+          <ExportedValue Name="rows" />
+          <ExportedValue Name="empty-line" />
+          <ExportedValue Name="t-shape" />
+          <ExportedValue Name="l-shape" />
+          <ExportedValue Name="j-shape" />
+          <ExportedValue Name="s-shape" />
+          <ExportedValue Name="z-shape" />
+          <ExportedValue Name="i-shape" />
+          <ExportedValue Name="o-shape" />
+        </ExportedValues>
         <ImportedModules>
-            <ImportedModule ID="TASTE-BasicTypes">
-                <ImportedTypes>
-                    <ImportedType Name="T-Int32" />
-                    <ImportedType Name="T-UInt32" />
-                    <ImportedType Name="T-Int8" />
-                    <ImportedType Name="T-UInt8" />
-                    <ImportedType Name="T-Boolean" />
-                </ImportedTypes>
-                <ImportedVariables>
-                </ImportedVariables>
-            </ImportedModule>
+          <ImportedModule ID="TASTE-BasicTypes">
+            <ImportedTypes>
+              <ImportedType Name="T-Int32" />
+              <ImportedType Name="T-UInt32" />
+              <ImportedType Name="T-Int8" />
+              <ImportedType Name="T-UInt8" />
+              <ImportedType Name="T-Boolean" />
+            </ImportedTypes>
+            <ImportedValues />
+          </ImportedModule>
         </ImportedModules>
         <TypeAssignments>
-            <TypeAssignment Name="Coordinates" Line="9" CharPositionInLine="18">
-                <Type Line="9" CharPositionInLine="18" Asn1File="testmsc3.asn">
-                    <SequenceType>
-                        <SequenceOrSetChild VarName="x" CName="x" AdaName="x" Optional="False" Line="10" CharPositionInLine="5" bAlwaysPresent = "True" bAlwaysAbsent="False">
-                            <Type Line="10" CharPositionInLine="7" Asn1File="testmsc3.asn">
-                                <IntegerType Min="-1" Max="11"/>
-                            </Type>
-                        </SequenceOrSetChild>
-                        <SequenceOrSetChild VarName="y" CName="y" AdaName="y" Optional="False" Line="11" CharPositionInLine="5" bAlwaysPresent = "True" bAlwaysAbsent="False">
-                            <Type Line="11" CharPositionInLine="7" Asn1File="testmsc3.asn">
-                                <IntegerType Min="-1" Max="21"/>
-                            </Type>
-                        </SequenceOrSetChild>
-                    </SequenceType>
-                </Type>
-            </TypeAssignment>
-            <TypeAssignment Name="Color" Line="15" CharPositionInLine="12">
-                <Type Line="15" CharPositionInLine="12" Asn1File="testmsc3.asn">
-                    <EnumeratedType Extensible="False" ValuesAutoCalculated="False">
-                        <EnumValues>
-                            <EnumValue StringValue="empty" IntValue="0" Line="16" CharPositionInLine="5" EnumID ="empty" />
-                            <EnumValue StringValue="blue" IntValue="1" Line="17" CharPositionInLine="5" EnumID ="blue" />
-                            <EnumValue StringValue="green" IntValue="2" Line="18" CharPositionInLine="5" EnumID ="green" />
-                            <EnumValue StringValue="red" IntValue="3" Line="19" CharPositionInLine="5" EnumID ="red" />
-                        </EnumValues>
-                    </EnumeratedType>
-                </Type>
-            </TypeAssignment>
-            <TypeAssignment Name="Pixels-Line" Line="23" CharPositionInLine="18">
-                <Type Line="23" CharPositionInLine="18" Asn1File="testmsc3.asn">
-                    <SequenceOfType Min="4" Max="4">
-                        <Type Line="23" CharPositionInLine="41" Asn1File="testmsc3.asn">
-                            <ReferenceType ReferencedTypeName="Color">
-                                <Type Line="15" CharPositionInLine="12" Asn1File="testmsc3.asn">
-                                    <EnumeratedType Extensible="False" ValuesAutoCalculated="False">
-                                        <EnumValues>
-                                            <EnumValue StringValue="empty" IntValue="0" Line="16" CharPositionInLine="5" EnumID ="empty" />
-                                            <EnumValue StringValue="blue" IntValue="1" Line="17" CharPositionInLine="5" EnumID ="blue" />
-                                            <EnumValue StringValue="green" IntValue="2" Line="18" CharPositionInLine="5" EnumID ="green" />
-                                            <EnumValue StringValue="red" IntValue="3" Line="19" CharPositionInLine="5" EnumID ="red" />
-                                        </EnumValues>
-                                    </EnumeratedType>
-                                </Type>
-                            </ReferenceType>
-
-                        </Type>
-                    </SequenceOfType>
-                </Type>
-            </TypeAssignment>
-            <TypeAssignment Name="Pixels" Line="24" CharPositionInLine="13">
-                <Type Line="24" CharPositionInLine="13" Asn1File="testmsc3.asn">
-                    <SequenceOfType Min="4" Max="4">
-                        <Type Line="24" CharPositionInLine="36" Asn1File="testmsc3.asn">
-                            <ReferenceType ReferencedTypeName="Pixels-Line" Min="4" Max="4"/>
-                        </Type>
-                    </SequenceOfType>
-                </Type>
-            </TypeAssignment>
-            <TypeAssignment Name="Sprite" Line="25" CharPositionInLine="13">
-                <Type Line="25" CharPositionInLine="13" Asn1File="testmsc3.asn">
-                    <SequenceType>
-                        <SequenceOrSetChild VarName="origin" CName="origin" AdaName="origin" Optional="False" Line="26" CharPositionInLine="5" bAlwaysPresent = "True" bAlwaysAbsent="False">
-                            <Type Line="26" CharPositionInLine="12" Asn1File="testmsc3.asn">
-                                <ReferenceType ReferencedTypeName="Coordinates">
-                                    <Type Line="9" CharPositionInLine="18" Asn1File="testmsc3.asn">
-                                        <SequenceType>
-                                            <SequenceOrSetChild VarName="x" CName="x" AdaName="x" Optional="False" Line="10" CharPositionInLine="5" bAlwaysPresent = "True" bAlwaysAbsent="False">
-                                                <Type Line="10" CharPositionInLine="7" Asn1File="testmsc3.asn">
-                                                    <IntegerType Min="-1" Max="11"/>
-                                                </Type>
-                                            </SequenceOrSetChild>
-                                            <SequenceOrSetChild VarName="y" CName="y" AdaName="y" Optional="False" Line="11" CharPositionInLine="5" bAlwaysPresent = "True" bAlwaysAbsent="False">
-                                                <Type Line="11" CharPositionInLine="7" Asn1File="testmsc3.asn">
-                                                    <IntegerType Min="-1" Max="21"/>
-                                                </Type>
-                                            </SequenceOrSetChild>
-                                        </SequenceType>
-                                    </Type>
-                                </ReferenceType>
-                            </Type>
-                        </SequenceOrSetChild>
-                        <SequenceOrSetChild VarName="shape" CName="shape" AdaName="shape" Optional="False" Line="27" CharPositionInLine="5" bAlwaysPresent = "True" bAlwaysAbsent="False">
-                            <Type Line="27" CharPositionInLine="12" Asn1File="testmsc3.asn">
-                                <ReferenceType ReferencedTypeName="Pixels" Min="4" Max="4"/>
-                            </Type>
-                        </SequenceOrSetChild>
-                    </SequenceType>
-                </Type>
-            </TypeAssignment>
-            <TypeAssignment Name="Move-Status" Line="30" CharPositionInLine="18">
-                <Type Line="30" CharPositionInLine="18" Asn1File="testmsc3.asn">
-                    <EnumeratedType Extensible="False" ValuesAutoCalculated="False">
-                        <EnumValues>
-                            <EnumValue StringValue="ok" IntValue="0" Line="30" CharPositionInLine="31" EnumID ="ok" />
-                            <EnumValue StringValue="rejected" IntValue="1" Line="30" CharPositionInLine="35" EnumID ="rejected" />
-                        </EnumValues>
-                    </EnumeratedType>
-                </Type>
-            </TypeAssignment>
-            <TypeAssignment Name="Move-Command" Line="32" CharPositionInLine="19">
-                <Type Line="32" CharPositionInLine="19" Asn1File="testmsc3.asn">
-                    <EnumeratedType Extensible="False" ValuesAutoCalculated="False">
-                        <EnumValues>
-                            <EnumValue StringValue="down" IntValue="0" Line="32" CharPositionInLine="32" EnumID ="down" />
-                            <EnumValue StringValue="right" IntValue="1" Line="32" CharPositionInLine="38" EnumID ="right" />
-                            <EnumValue StringValue="left" IntValue="2" Line="32" CharPositionInLine="45" EnumID ="left" />
-                            <EnumValue StringValue="rotate" IntValue="3" Line="32" CharPositionInLine="51" EnumID ="rotate" />
-                        </EnumValues>
-                    </EnumeratedType>
-                </Type>
-            </TypeAssignment>
-            <TypeAssignment Name="Timer-Duration" Line="34" CharPositionInLine="21">
-                <Type Line="34" CharPositionInLine="21" Asn1File="testmsc3.asn">
-                    <IntegerType Min="0" Max="2000"/>
-                </Type>
-            </TypeAssignment>
-            <TypeAssignment Name="Line" Line="37" CharPositionInLine="11">
-                <Type Line="37" CharPositionInLine="11" Asn1File="testmsc3.asn">
-                    <SequenceOfType Min="10" Max="10">
-                        <Type Line="37" CharPositionInLine="37" Asn1File="testmsc3.asn">
-                            <ReferenceType ReferencedTypeName="Color">
-                                <Type Line="15" CharPositionInLine="12" Asn1File="testmsc3.asn">
-                                    <EnumeratedType Extensible="False" ValuesAutoCalculated="False">
-                                        <EnumValues>
-                                            <EnumValue StringValue="empty" IntValue="0" Line="16" CharPositionInLine="5" EnumID ="empty" />
-                                            <EnumValue StringValue="blue" IntValue="1" Line="17" CharPositionInLine="5" EnumID ="blue" />
-                                            <EnumValue StringValue="green" IntValue="2" Line="18" CharPositionInLine="5" EnumID ="green" />
-                                            <EnumValue StringValue="red" IntValue="3" Line="19" CharPositionInLine="5" EnumID ="red" />
-                                        </EnumValues>
-                                    </EnumeratedType>
-                                </Type>
-                            </ReferenceType>
-
-                        </Type>
-                    </SequenceOfType>
-                </Type>
-            </TypeAssignment>
-            <TypeAssignment Name="Grid" Line="38" CharPositionInLine="11">
-                <Type Line="38" CharPositionInLine="11" Asn1File="testmsc3.asn">
-                    <SequenceOfType Min="20" Max="20">
-                        <Type Line="38" CharPositionInLine="37" Asn1File="testmsc3.asn">
-                            <ReferenceType ReferencedTypeName="Line" Min="10" Max="10"/>
-                        </Type>
-                    </SequenceOfType>
-                </Type>
-            </TypeAssignment>
+          <TypeAssignment Name="Coordinates" CName="Coordinates" AdaName="Coordinates" Line="9" CharPositionInLine="2">
+            <Asn1Type id="TETRIS-DATAVIEW.Coordinates" Line="9" CharPositionInLine="18" ParameterizedTypeInstance="false">
+              <SEQUENCE acnMaxSizeInBits="9" acnMinSizeInBits="9" uperMaxSizeInBits="9" uperMinSizeInBits="9">
+                <SEQUENCE_COMPONENT Name="x" Line="10" CharPositionInLine="5" AdaName="x" CName="x">
+                  <Asn1Type id="TETRIS-DATAVIEW.Coordinates.x" Line="10" CharPositionInLine="7" ParameterizedTypeInstance="false">
+                    <INTEGER acnMaxSizeInBits="4" acnMinSizeInBits="4" uperMaxSizeInBits="4" uperMinSizeInBits="4">
+                      <Constraints>
+                        <Range>
+                          <Min>
+                            <IntegerValue>-1</IntegerValue>
+                          </Min>
+                          <Max>
+                            <IntegerValue>11</IntegerValue>
+                          </Max>
+                        </Range>
+                      </Constraints>
+                      <WithComponentConstraints />
+                    </INTEGER>
+                  </Asn1Type>
+                </SEQUENCE_COMPONENT>
+                <SEQUENCE_COMPONENT Name="y" Line="11" CharPositionInLine="5" AdaName="y" CName="y">
+                  <Asn1Type id="TETRIS-DATAVIEW.Coordinates.y" Line="11" CharPositionInLine="7" ParameterizedTypeInstance="false">
+                    <INTEGER acnMaxSizeInBits="5" acnMinSizeInBits="5" uperMaxSizeInBits="5" uperMinSizeInBits="5">
+                      <Constraints>
+                        <Range>
+                          <Min>
+                            <IntegerValue>-1</IntegerValue>
+                          </Min>
+                          <Max>
+                            <IntegerValue>21</IntegerValue>
+                          </Max>
+                        </Range>
+                      </Constraints>
+                      <WithComponentConstraints />
+                    </INTEGER>
+                  </Asn1Type>
+                </SEQUENCE_COMPONENT>
+                <Constraints />
+                <WithComponentConstraints />
+              </SEQUENCE>
+            </Asn1Type>
+          </TypeAssignment>
+          <TypeAssignment Name="Color" CName="Color" AdaName="Color" Line="15" CharPositionInLine="2">
+            <AsnComment>  Each shape has its color</AsnComment>
+            <Asn1Type id="TETRIS-DATAVIEW.Color" Line="15" CharPositionInLine="12" ParameterizedTypeInstance="false">
+              <ENUMERATED acnMaxSizeInBits="2" acnMinSizeInBits="2" uperMaxSizeInBits="2" uperMinSizeInBits="2" encode-values="false">
+                <Items>
+                  <Item Name="empty" CName="empty" AdaName="empty" Value="0" Line="16" acnEncodeValue="0" CharPositionInLine="5" />
+                  <Item Name="blue" CName="blue" AdaName="blue" Value="1" Line="17" acnEncodeValue="1" CharPositionInLine="5" />
+                  <Item Name="green" CName="green" AdaName="green" Value="2" Line="18" acnEncodeValue="2" CharPositionInLine="5" />
+                  <Item Name="red" CName="red" AdaName="red" Value="3" Line="19" acnEncodeValue="3" CharPositionInLine="5" />
+                </Items>
+                <Constraints>
+                  <OR>
+                    <OR>
+                      <OR>
+                        <EnumValue>empty</EnumValue>
+                        <EnumValue>blue</EnumValue>
+                      </OR>
+                      <EnumValue>green</EnumValue>
+                    </OR>
+                    <EnumValue>red</EnumValue>
+                  </OR>
+                </Constraints>
+                <WithComponentConstraints />
+              </ENUMERATED>
+            </Asn1Type>
+          </TypeAssignment>
+          <TypeAssignment Name="Pixels-Line" CName="Pixels_Line" AdaName="Pixels_Line" Line="23" CharPositionInLine="2">
+            <AsnComment>  A shape is contained in a 4x4 grid located at (x, y) on the grid</AsnComment>
+            <Asn1Type id="TETRIS-DATAVIEW.Pixels-Line" Line="23" CharPositionInLine="18" ParameterizedTypeInstance="false">
+              <SEQUENCE_OF acnMaxSizeInBits="8" acnMinSizeInBits="8" uperMaxSizeInBits="8" uperMinSizeInBits="8">
+                <Constraints>
+                  <SIZE>
+                    <IntegerValue>4</IntegerValue>
+                  </SIZE>
+                </Constraints>
+                <WithComponentConstraints />
+                <Asn1Type id="TETRIS-DATAVIEW.Pixels-Line.#" Line="23" CharPositionInLine="41" ParameterizedTypeInstance="false">
+                  <REFERENCE_TYPE Module="TETRIS-DATAVIEW" TypeAssignment="Color">
+                    <Asn1Type id="TETRIS-DATAVIEW.Pixels-Line.#" Line="15" CharPositionInLine="12" ParameterizedTypeInstance="false" tasInfoModule="TETRIS-DATAVIEW" tasInfoName="Color">
+                      <ENUMERATED acnMaxSizeInBits="2" acnMinSizeInBits="2" uperMaxSizeInBits="2" uperMinSizeInBits="2" encode-values="false">
+                        <Items>
+                          <Item Name="empty" CName="empty" AdaName="empty" Value="0" Line="16" acnEncodeValue="0" CharPositionInLine="5" />
+                          <Item Name="blue" CName="blue" AdaName="blue" Value="1" Line="17" acnEncodeValue="1" CharPositionInLine="5" />
+                          <Item Name="green" CName="green" AdaName="green" Value="2" Line="18" acnEncodeValue="2" CharPositionInLine="5" />
+                          <Item Name="red" CName="red" AdaName="red" Value="3" Line="19" acnEncodeValue="3" CharPositionInLine="5" />
+                        </Items>
+                        <Constraints>
+                          <OR>
+                            <OR>
+                              <OR>
+                                <EnumValue>empty</EnumValue>
+                                <EnumValue>blue</EnumValue>
+                              </OR>
+                              <EnumValue>green</EnumValue>
+                            </OR>
+                            <EnumValue>red</EnumValue>
+                          </OR>
+                        </Constraints>
+                        <WithComponentConstraints />
+                      </ENUMERATED>
+                    </Asn1Type>
+                  </REFERENCE_TYPE>
+                </Asn1Type>
+              </SEQUENCE_OF>
+            </Asn1Type>
+          </TypeAssignment>
+          <TypeAssignment Name="Pixels" CName="Pixels" AdaName="Pixels" Line="24" CharPositionInLine="2">
+            <Asn1Type id="TETRIS-DATAVIEW.Pixels" Line="24" CharPositionInLine="13" ParameterizedTypeInstance="false">
+              <SEQUENCE_OF acnMaxSizeInBits="32" acnMinSizeInBits="32" uperMaxSizeInBits="32" uperMinSizeInBits="32">
+                <Constraints>
+                  <SIZE>
+                    <IntegerValue>4</IntegerValue>
+                  </SIZE>
+                </Constraints>
+                <WithComponentConstraints />
+                <Asn1Type id="TETRIS-DATAVIEW.Pixels.#" Line="24" CharPositionInLine="36" ParameterizedTypeInstance="false">
+                  <REFERENCE_TYPE Module="TETRIS-DATAVIEW" TypeAssignment="Pixels-Line">
+                    <Asn1Type id="TETRIS-DATAVIEW.Pixels.#" Line="23" CharPositionInLine="18" ParameterizedTypeInstance="false" tasInfoModule="TETRIS-DATAVIEW" tasInfoName="Pixels-Line">
+                      <SEQUENCE_OF acnMaxSizeInBits="8" acnMinSizeInBits="8" uperMaxSizeInBits="8" uperMinSizeInBits="8">
+                        <Constraints>
+                          <SIZE>
+                            <IntegerValue>4</IntegerValue>
+                          </SIZE>
+                        </Constraints>
+                        <WithComponentConstraints />
+                        <Asn1Type id="TETRIS-DATAVIEW.Pixels.#.#" Line="23" CharPositionInLine="41" ParameterizedTypeInstance="false">
+                          <REFERENCE_TYPE Module="TETRIS-DATAVIEW" TypeAssignment="Color">
+                            <Asn1Type id="TETRIS-DATAVIEW.Pixels.#.#" Line="15" CharPositionInLine="12" ParameterizedTypeInstance="false" tasInfoModule="TETRIS-DATAVIEW" tasInfoName="Color">
+                              <ENUMERATED acnMaxSizeInBits="2" acnMinSizeInBits="2" uperMaxSizeInBits="2" uperMinSizeInBits="2" encode-values="false">
+                                <Items>
+                                  <Item Name="empty" CName="empty" AdaName="empty" Value="0" Line="16" acnEncodeValue="0" CharPositionInLine="5" />
+                                  <Item Name="blue" CName="blue" AdaName="blue" Value="1" Line="17" acnEncodeValue="1" CharPositionInLine="5" />
+                                  <Item Name="green" CName="green" AdaName="green" Value="2" Line="18" acnEncodeValue="2" CharPositionInLine="5" />
+                                  <Item Name="red" CName="red" AdaName="red" Value="3" Line="19" acnEncodeValue="3" CharPositionInLine="5" />
+                                </Items>
+                                <Constraints>
+                                  <OR>
+                                    <OR>
+                                      <OR>
+                                        <EnumValue>empty</EnumValue>
+                                        <EnumValue>blue</EnumValue>
+                                      </OR>
+                                      <EnumValue>green</EnumValue>
+                                    </OR>
+                                    <EnumValue>red</EnumValue>
+                                  </OR>
+                                </Constraints>
+                                <WithComponentConstraints />
+                              </ENUMERATED>
+                            </Asn1Type>
+                          </REFERENCE_TYPE>
+                        </Asn1Type>
+                      </SEQUENCE_OF>
+                    </Asn1Type>
+                  </REFERENCE_TYPE>
+                </Asn1Type>
+              </SEQUENCE_OF>
+            </Asn1Type>
+          </TypeAssignment>
+          <TypeAssignment Name="Sprite" CName="Sprite" AdaName="Sprite" Line="25" CharPositionInLine="2">
+            <Asn1Type id="TETRIS-DATAVIEW.Sprite" Line="25" CharPositionInLine="13" ParameterizedTypeInstance="false">
+              <SEQUENCE acnMaxSizeInBits="41" acnMinSizeInBits="41" uperMaxSizeInBits="41" uperMinSizeInBits="41">
+                <SEQUENCE_COMPONENT Name="origin" Line="26" CharPositionInLine="5" AdaName="origin" CName="origin">
+                  <Asn1Type id="TETRIS-DATAVIEW.Sprite.origin" Line="26" CharPositionInLine="12" ParameterizedTypeInstance="false">
+                    <REFERENCE_TYPE Module="TETRIS-DATAVIEW" TypeAssignment="Coordinates">
+                      <Asn1Type id="TETRIS-DATAVIEW.Sprite.origin" Line="9" CharPositionInLine="18" ParameterizedTypeInstance="false" tasInfoModule="TETRIS-DATAVIEW" tasInfoName="Coordinates">
+                        <SEQUENCE acnMaxSizeInBits="9" acnMinSizeInBits="9" uperMaxSizeInBits="9" uperMinSizeInBits="9">
+                          <SEQUENCE_COMPONENT Name="x" Line="10" CharPositionInLine="5" AdaName="x" CName="x">
+                            <Asn1Type id="TETRIS-DATAVIEW.Sprite.origin.x" Line="10" CharPositionInLine="7" ParameterizedTypeInstance="false">
+                              <INTEGER acnMaxSizeInBits="4" acnMinSizeInBits="4" uperMaxSizeInBits="4" uperMinSizeInBits="4">
+                                <Constraints>
+                                  <Range>
+                                    <Min>
+                                      <IntegerValue>-1</IntegerValue>
+                                    </Min>
+                                    <Max>
+                                      <IntegerValue>11</IntegerValue>
+                                    </Max>
+                                  </Range>
+                                </Constraints>
+                                <WithComponentConstraints />
+                              </INTEGER>
+                            </Asn1Type>
+                          </SEQUENCE_COMPONENT>
+                          <SEQUENCE_COMPONENT Name="y" Line="11" CharPositionInLine="5" AdaName="y" CName="y">
+                            <Asn1Type id="TETRIS-DATAVIEW.Sprite.origin.y" Line="11" CharPositionInLine="7" ParameterizedTypeInstance="false">
+                              <INTEGER acnMaxSizeInBits="5" acnMinSizeInBits="5" uperMaxSizeInBits="5" uperMinSizeInBits="5">
+                                <Constraints>
+                                  <Range>
+                                    <Min>
+                                      <IntegerValue>-1</IntegerValue>
+                                    </Min>
+                                    <Max>
+                                      <IntegerValue>21</IntegerValue>
+                                    </Max>
+                                  </Range>
+                                </Constraints>
+                                <WithComponentConstraints />
+                              </INTEGER>
+                            </Asn1Type>
+                          </SEQUENCE_COMPONENT>
+                          <Constraints />
+                          <WithComponentConstraints />
+                        </SEQUENCE>
+                      </Asn1Type>
+                    </REFERENCE_TYPE>
+                  </Asn1Type>
+                </SEQUENCE_COMPONENT>
+                <SEQUENCE_COMPONENT Name="shape" Line="27" CharPositionInLine="5" AdaName="shape" CName="shape">
+                  <Asn1Type id="TETRIS-DATAVIEW.Sprite.shape" Line="27" CharPositionInLine="12" ParameterizedTypeInstance="false">
+                    <REFERENCE_TYPE Module="TETRIS-DATAVIEW" TypeAssignment="Pixels">
+                      <Asn1Type id="TETRIS-DATAVIEW.Sprite.shape" Line="24" CharPositionInLine="13" ParameterizedTypeInstance="false" tasInfoModule="TETRIS-DATAVIEW" tasInfoName="Pixels">
+                        <SEQUENCE_OF acnMaxSizeInBits="32" acnMinSizeInBits="32" uperMaxSizeInBits="32" uperMinSizeInBits="32">
+                          <Constraints>
+                            <SIZE>
+                              <IntegerValue>4</IntegerValue>
+                            </SIZE>
+                          </Constraints>
+                          <WithComponentConstraints />
+                          <Asn1Type id="TETRIS-DATAVIEW.Sprite.shape.#" Line="24" CharPositionInLine="36" ParameterizedTypeInstance="false">
+                            <REFERENCE_TYPE Module="TETRIS-DATAVIEW" TypeAssignment="Pixels-Line">
+                              <Asn1Type id="TETRIS-DATAVIEW.Sprite.shape.#" Line="23" CharPositionInLine="18" ParameterizedTypeInstance="false" tasInfoModule="TETRIS-DATAVIEW" tasInfoName="Pixels-Line">
+                                <SEQUENCE_OF acnMaxSizeInBits="8" acnMinSizeInBits="8" uperMaxSizeInBits="8" uperMinSizeInBits="8">
+                                  <Constraints>
+                                    <SIZE>
+                                      <IntegerValue>4</IntegerValue>
+                                    </SIZE>
+                                  </Constraints>
+                                  <WithComponentConstraints />
+                                  <Asn1Type id="TETRIS-DATAVIEW.Sprite.shape.#.#" Line="23" CharPositionInLine="41" ParameterizedTypeInstance="false">
+                                    <REFERENCE_TYPE Module="TETRIS-DATAVIEW" TypeAssignment="Color">
+                                      <Asn1Type id="TETRIS-DATAVIEW.Sprite.shape.#.#" Line="15" CharPositionInLine="12" ParameterizedTypeInstance="false" tasInfoModule="TETRIS-DATAVIEW" tasInfoName="Color">
+                                        <ENUMERATED acnMaxSizeInBits="2" acnMinSizeInBits="2" uperMaxSizeInBits="2" uperMinSizeInBits="2" encode-values="false">
+                                          <Items>
+                                            <Item Name="empty" CName="empty" AdaName="empty" Value="0" Line="16" acnEncodeValue="0" CharPositionInLine="5" />
+                                            <Item Name="blue" CName="blue" AdaName="blue" Value="1" Line="17" acnEncodeValue="1" CharPositionInLine="5" />
+                                            <Item Name="green" CName="green" AdaName="green" Value="2" Line="18" acnEncodeValue="2" CharPositionInLine="5" />
+                                            <Item Name="red" CName="red" AdaName="red" Value="3" Line="19" acnEncodeValue="3" CharPositionInLine="5" />
+                                          </Items>
+                                          <Constraints>
+                                            <OR>
+                                              <OR>
+                                                <OR>
+                                                  <EnumValue>empty</EnumValue>
+                                                  <EnumValue>blue</EnumValue>
+                                                </OR>
+                                                <EnumValue>green</EnumValue>
+                                              </OR>
+                                              <EnumValue>red</EnumValue>
+                                            </OR>
+                                          </Constraints>
+                                          <WithComponentConstraints />
+                                        </ENUMERATED>
+                                      </Asn1Type>
+                                    </REFERENCE_TYPE>
+                                  </Asn1Type>
+                                </SEQUENCE_OF>
+                              </Asn1Type>
+                            </REFERENCE_TYPE>
+                          </Asn1Type>
+                        </SEQUENCE_OF>
+                      </Asn1Type>
+                    </REFERENCE_TYPE>
+                  </Asn1Type>
+                </SEQUENCE_COMPONENT>
+                <Constraints />
+                <WithComponentConstraints />
+              </SEQUENCE>
+            </Asn1Type>
+          </TypeAssignment>
+          <TypeAssignment Name="Move-Status" CName="Move_Status" AdaName="Move_Status" Line="30" CharPositionInLine="2">
+            <Asn1Type id="TETRIS-DATAVIEW.Move-Status" Line="30" CharPositionInLine="18" ParameterizedTypeInstance="false">
+              <ENUMERATED acnMaxSizeInBits="1" acnMinSizeInBits="1" uperMaxSizeInBits="1" uperMinSizeInBits="1" encode-values="false">
+                <Items>
+                  <Item Name="ok" CName="ok" AdaName="ok" Value="0" Line="30" acnEncodeValue="0" CharPositionInLine="31" />
+                  <Item Name="rejected" CName="rejected" AdaName="rejected" Value="1" Line="30" acnEncodeValue="1" CharPositionInLine="35" />
+                </Items>
+                <Constraints>
+                  <OR>
+                    <EnumValue>ok</EnumValue>
+                    <EnumValue>rejected</EnumValue>
+                  </OR>
+                </Constraints>
+                <WithComponentConstraints />
+              </ENUMERATED>
+            </Asn1Type>
+          </TypeAssignment>
+          <TypeAssignment Name="Move-Command" CName="Move_Command" AdaName="Move_Command" Line="32" CharPositionInLine="2">
+            <Asn1Type id="TETRIS-DATAVIEW.Move-Command" Line="32" CharPositionInLine="19" ParameterizedTypeInstance="false">
+              <ENUMERATED acnMaxSizeInBits="2" acnMinSizeInBits="2" uperMaxSizeInBits="2" uperMinSizeInBits="2" encode-values="false">
+                <Items>
+                  <Item Name="down" CName="down" AdaName="down" Value="0" Line="32" acnEncodeValue="0" CharPositionInLine="32" />
+                  <Item Name="right" CName="right" AdaName="right" Value="1" Line="32" acnEncodeValue="1" CharPositionInLine="38" />
+                  <Item Name="left" CName="left" AdaName="left" Value="2" Line="32" acnEncodeValue="2" CharPositionInLine="45" />
+                  <Item Name="rotate" CName="rotate" AdaName="rotate" Value="3" Line="32" acnEncodeValue="3" CharPositionInLine="51" />
+                </Items>
+                <Constraints>
+                  <OR>
+                    <OR>
+                      <OR>
+                        <EnumValue>down</EnumValue>
+                        <EnumValue>right</EnumValue>
+                      </OR>
+                      <EnumValue>left</EnumValue>
+                    </OR>
+                    <EnumValue>rotate</EnumValue>
+                  </OR>
+                </Constraints>
+                <WithComponentConstraints />
+              </ENUMERATED>
+            </Asn1Type>
+          </TypeAssignment>
+          <TypeAssignment Name="Timer-Duration" CName="Timer_Duration" AdaName="Timer_Duration" Line="34" CharPositionInLine="2">
+            <Asn1Type id="TETRIS-DATAVIEW.Timer-Duration" Line="34" CharPositionInLine="21" ParameterizedTypeInstance="false">
+              <INTEGER acnMaxSizeInBits="11" acnMinSizeInBits="11" uperMaxSizeInBits="11" uperMinSizeInBits="11">
+                <Constraints>
+                  <Range>
+                    <Min>
+                      <IntegerValue>0</IntegerValue>
+                    </Min>
+                    <Max>
+                      <IntegerValue>2000</IntegerValue>
+                    </Max>
+                  </Range>
+                </Constraints>
+                <WithComponentConstraints />
+              </INTEGER>
+            </Asn1Type>
+          </TypeAssignment>
+          <TypeAssignment Name="Line" CName="Line" AdaName="Line" Line="37" CharPositionInLine="2">
+            <AsnComment>  Define the play area</AsnComment>
+            <Asn1Type id="TETRIS-DATAVIEW.Line" Line="37" CharPositionInLine="11" ParameterizedTypeInstance="false">
+              <SEQUENCE_OF acnMaxSizeInBits="20" acnMinSizeInBits="20" uperMaxSizeInBits="20" uperMinSizeInBits="20">
+                <Constraints>
+                  <SIZE>
+                    <IntegerValue>10</IntegerValue>
+                  </SIZE>
+                </Constraints>
+                <WithComponentConstraints />
+                <Asn1Type id="TETRIS-DATAVIEW.Line.#" Line="37" CharPositionInLine="37" ParameterizedTypeInstance="false">
+                  <REFERENCE_TYPE Module="TETRIS-DATAVIEW" TypeAssignment="Color">
+                    <Asn1Type id="TETRIS-DATAVIEW.Line.#" Line="15" CharPositionInLine="12" ParameterizedTypeInstance="false" tasInfoModule="TETRIS-DATAVIEW" tasInfoName="Color">
+                      <ENUMERATED acnMaxSizeInBits="2" acnMinSizeInBits="2" uperMaxSizeInBits="2" uperMinSizeInBits="2" encode-values="false">
+                        <Items>
+                          <Item Name="empty" CName="empty" AdaName="empty" Value="0" Line="16" acnEncodeValue="0" CharPositionInLine="5" />
+                          <Item Name="blue" CName="blue" AdaName="blue" Value="1" Line="17" acnEncodeValue="1" CharPositionInLine="5" />
+                          <Item Name="green" CName="green" AdaName="green" Value="2" Line="18" acnEncodeValue="2" CharPositionInLine="5" />
+                          <Item Name="red" CName="red" AdaName="red" Value="3" Line="19" acnEncodeValue="3" CharPositionInLine="5" />
+                        </Items>
+                        <Constraints>
+                          <OR>
+                            <OR>
+                              <OR>
+                                <EnumValue>empty</EnumValue>
+                                <EnumValue>blue</EnumValue>
+                              </OR>
+                              <EnumValue>green</EnumValue>
+                            </OR>
+                            <EnumValue>red</EnumValue>
+                          </OR>
+                        </Constraints>
+                        <WithComponentConstraints />
+                      </ENUMERATED>
+                    </Asn1Type>
+                  </REFERENCE_TYPE>
+                </Asn1Type>
+              </SEQUENCE_OF>
+            </Asn1Type>
+          </TypeAssignment>
+          <TypeAssignment Name="Grid" CName="Grid" AdaName="Grid" Line="38" CharPositionInLine="2">
+            <Asn1Type id="TETRIS-DATAVIEW.Grid" Line="38" CharPositionInLine="11" ParameterizedTypeInstance="false">
+              <SEQUENCE_OF acnMaxSizeInBits="400" acnMinSizeInBits="400" uperMaxSizeInBits="400" uperMinSizeInBits="400">
+                <Constraints>
+                  <SIZE>
+                    <IntegerValue>20</IntegerValue>
+                  </SIZE>
+                </Constraints>
+                <WithComponentConstraints />
+                <Asn1Type id="TETRIS-DATAVIEW.Grid.#" Line="38" CharPositionInLine="37" ParameterizedTypeInstance="false">
+                  <REFERENCE_TYPE Module="TETRIS-DATAVIEW" TypeAssignment="Line">
+                    <Asn1Type id="TETRIS-DATAVIEW.Grid.#" Line="37" CharPositionInLine="11" ParameterizedTypeInstance="false" tasInfoModule="TETRIS-DATAVIEW" tasInfoName="Line">
+                      <SEQUENCE_OF acnMaxSizeInBits="20" acnMinSizeInBits="20" uperMaxSizeInBits="20" uperMinSizeInBits="20">
+                        <Constraints>
+                          <SIZE>
+                            <IntegerValue>10</IntegerValue>
+                          </SIZE>
+                        </Constraints>
+                        <WithComponentConstraints />
+                        <Asn1Type id="TETRIS-DATAVIEW.Grid.#.#" Line="37" CharPositionInLine="37" ParameterizedTypeInstance="false">
+                          <REFERENCE_TYPE Module="TETRIS-DATAVIEW" TypeAssignment="Color">
+                            <Asn1Type id="TETRIS-DATAVIEW.Grid.#.#" Line="15" CharPositionInLine="12" ParameterizedTypeInstance="false" tasInfoModule="TETRIS-DATAVIEW" tasInfoName="Color">
+                              <ENUMERATED acnMaxSizeInBits="2" acnMinSizeInBits="2" uperMaxSizeInBits="2" uperMinSizeInBits="2" encode-values="false">
+                                <Items>
+                                  <Item Name="empty" CName="empty" AdaName="empty" Value="0" Line="16" acnEncodeValue="0" CharPositionInLine="5" />
+                                  <Item Name="blue" CName="blue" AdaName="blue" Value="1" Line="17" acnEncodeValue="1" CharPositionInLine="5" />
+                                  <Item Name="green" CName="green" AdaName="green" Value="2" Line="18" acnEncodeValue="2" CharPositionInLine="5" />
+                                  <Item Name="red" CName="red" AdaName="red" Value="3" Line="19" acnEncodeValue="3" CharPositionInLine="5" />
+                                </Items>
+                                <Constraints>
+                                  <OR>
+                                    <OR>
+                                      <OR>
+                                        <EnumValue>empty</EnumValue>
+                                        <EnumValue>blue</EnumValue>
+                                      </OR>
+                                      <EnumValue>green</EnumValue>
+                                    </OR>
+                                    <EnumValue>red</EnumValue>
+                                  </OR>
+                                </Constraints>
+                                <WithComponentConstraints />
+                              </ENUMERATED>
+                            </Asn1Type>
+                          </REFERENCE_TYPE>
+                        </Asn1Type>
+                      </SEQUENCE_OF>
+                    </Asn1Type>
+                  </REFERENCE_TYPE>
+                </Asn1Type>
+              </SEQUENCE_OF>
+            </Asn1Type>
+          </TypeAssignment>
         </TypeAssignments>
-        <VariablesAssignments>
-            <VariableAssignment Name="cols" Line="6" CharPositionInLine="2">
-                <Type Line="6" CharPositionInLine="7" Asn1File="testmsc3.asn">
-                    <IntegerType Min="MIN" Max="MAX"/>
-                </Type>
-                <Value>10</Value>
-            </VariableAssignment>
-            <VariableAssignment Name="rows" Line="7" CharPositionInLine="2">
-                <Type Line="7" CharPositionInLine="7" Asn1File="testmsc3.asn">
-                    <IntegerType Min="MIN" Max="MAX"/>
-                </Type>
-                <Value>20</Value>
-            </VariableAssignment>
-            <VariableAssignment Name="empty-line" Line="40" CharPositionInLine="2">
-                <Type Line="40" CharPositionInLine="13" Asn1File="testmsc3.asn">
-                    <ReferenceType ReferencedTypeName="Pixels-Line" Min="4" Max="4"/>
-                </Type>
-                <Value>{empty, empty, empty, empty}</Value>
-            </VariableAssignment>
-            <VariableAssignment Name="t-shape" Line="43" CharPositionInLine="2">
-                <Type Line="43" CharPositionInLine="10" Asn1File="testmsc3.asn">
-                    <ReferenceType ReferencedTypeName="Pixels" Min="4" Max="4"/>
-                </Type>
-                <Value>{empty-line, empty-line, {empty, red, empty, empty}, {red, red, red, empty}}</Value>
-            </VariableAssignment>
-            <VariableAssignment Name="l-shape" Line="50" CharPositionInLine="2">
-                <Type Line="50" CharPositionInLine="10" Asn1File="testmsc3.asn">
-                    <ReferenceType ReferencedTypeName="Pixels" Min="4" Max="4"/>
-                </Type>
-                <Value>{empty-line, {red, empty, empty, empty}, {red, empty, empty, empty}, {red, red, empty, empty}}</Value>
-            </VariableAssignment>
-            <VariableAssignment Name="j-shape" Line="57" CharPositionInLine="2">
-                <Type Line="57" CharPositionInLine="10" Asn1File="testmsc3.asn">
-                    <ReferenceType ReferencedTypeName="Pixels" Min="4" Max="4"/>
-                </Type>
-                <Value>{empty-line, {empty, blue, empty, empty}, {empty, blue, empty, empty}, {blue, blue, empty, empty}}</Value>
-            </VariableAssignment>
-            <VariableAssignment Name="s-shape" Line="64" CharPositionInLine="2">
-                <Type Line="64" CharPositionInLine="10" Asn1File="testmsc3.asn">
-                    <ReferenceType ReferencedTypeName="Pixels" Min="4" Max="4"/>
-                </Type>
-                <Value>{empty-line, empty-line, {empty, green, green, empty}, {green, green, empty, empty}}</Value>
-            </VariableAssignment>
-            <VariableAssignment Name="z-shape" Line="71" CharPositionInLine="2">
-                <Type Line="71" CharPositionInLine="10" Asn1File="testmsc3.asn">
-                    <ReferenceType ReferencedTypeName="Pixels" Min="4" Max="4"/>
-                </Type>
-                <Value>{empty-line, empty-line, {blue, blue, empty, empty}, {empty, blue, blue, empty}}</Value>
-            </VariableAssignment>
-            <VariableAssignment Name="i-shape" Line="78" CharPositionInLine="2">
-                <Type Line="78" CharPositionInLine="10" Asn1File="testmsc3.asn">
-                    <ReferenceType ReferencedTypeName="Pixels" Min="4" Max="4"/>
-                </Type>
-                <Value>{{red, empty, empty, empty}, {red, empty, empty, empty}, {red, empty, empty, empty}, {red, empty, empty, empty}}</Value>
-            </VariableAssignment>
-            <VariableAssignment Name="o-shape" Line="85" CharPositionInLine="2">
-                <Type Line="85" CharPositionInLine="10" Asn1File="testmsc3.asn">
-                    <ReferenceType ReferencedTypeName="Pixels" Min="4" Max="4"/>
-                </Type>
-                <Value>{empty-line, empty-line, {green, green, empty, empty}, {green, green, empty, empty}}</Value>
-            </VariableAssignment>
-        </VariablesAssignments>
-        </Asn1Module>
-        <Asn1Module ID="TASTE-BasicTypes">
+        <ValueAssignments>
+          <ValueAssignment Name="cols" CName="cols" AdaName="cols" Line="6" CharPositionInLine="2">
+            <Asn1Type id="TETRIS-DATAVIEW.cols" Line="6" CharPositionInLine="7" ParameterizedTypeInstance="false">
+              <INTEGER acnMaxSizeInBits="72" acnMinSizeInBits="8" uperMaxSizeInBits="72" uperMinSizeInBits="8">
+                <Constraints />
+                <WithComponentConstraints />
+              </INTEGER>
+            </Asn1Type>
+            <IntegerValue>10</IntegerValue>
+          </ValueAssignment>
+          <ValueAssignment Name="rows" CName="rows" AdaName="rows" Line="7" CharPositionInLine="2">
+            <Asn1Type id="TETRIS-DATAVIEW.rows" Line="7" CharPositionInLine="7" ParameterizedTypeInstance="false">
+              <INTEGER acnMaxSizeInBits="72" acnMinSizeInBits="8" uperMaxSizeInBits="72" uperMinSizeInBits="8">
+                <Constraints />
+                <WithComponentConstraints />
+              </INTEGER>
+            </Asn1Type>
+            <IntegerValue>20</IntegerValue>
+          </ValueAssignment>
+          <ValueAssignment Name="empty-line" CName="empty_line" AdaName="empty_line" Line="40" CharPositionInLine="2">
+            <Asn1Type id="TETRIS-DATAVIEW.empty-line" Line="40" CharPositionInLine="13" ParameterizedTypeInstance="false" tasInfoModule="TETRIS-DATAVIEW" tasInfoName="Pixels-Line">
+              <REFERENCE_TYPE Module="TETRIS-DATAVIEW" TypeAssignment="Pixels-Line">
+                <Asn1Type id="TETRIS-DATAVIEW.empty-line" Line="23" CharPositionInLine="18" ParameterizedTypeInstance="false" tasInfoModule="TETRIS-DATAVIEW" tasInfoName="Pixels-Line">
+                  <SEQUENCE_OF acnMaxSizeInBits="8" acnMinSizeInBits="8" uperMaxSizeInBits="8" uperMinSizeInBits="8">
+                    <Constraints>
+                      <SIZE>
+                        <IntegerValue>4</IntegerValue>
+                      </SIZE>
+                    </Constraints>
+                    <WithComponentConstraints />
+                    <Asn1Type id="TETRIS-DATAVIEW.empty-line.#" Line="23" CharPositionInLine="41" ParameterizedTypeInstance="false">
+                      <REFERENCE_TYPE Module="TETRIS-DATAVIEW" TypeAssignment="Color">
+                        <Asn1Type id="TETRIS-DATAVIEW.empty-line.#" Line="15" CharPositionInLine="12" ParameterizedTypeInstance="false" tasInfoModule="TETRIS-DATAVIEW" tasInfoName="Color">
+                          <ENUMERATED acnMaxSizeInBits="2" acnMinSizeInBits="2" uperMaxSizeInBits="2" uperMinSizeInBits="2" encode-values="false">
+                            <Items>
+                              <Item Name="empty" CName="empty" AdaName="empty" Value="0" Line="16" acnEncodeValue="0" CharPositionInLine="5" />
+                              <Item Name="blue" CName="blue" AdaName="blue" Value="1" Line="17" acnEncodeValue="1" CharPositionInLine="5" />
+                              <Item Name="green" CName="green" AdaName="green" Value="2" Line="18" acnEncodeValue="2" CharPositionInLine="5" />
+                              <Item Name="red" CName="red" AdaName="red" Value="3" Line="19" acnEncodeValue="3" CharPositionInLine="5" />
+                            </Items>
+                            <Constraints>
+                              <OR>
+                                <OR>
+                                  <OR>
+                                    <EnumValue>empty</EnumValue>
+                                    <EnumValue>blue</EnumValue>
+                                  </OR>
+                                  <EnumValue>green</EnumValue>
+                                </OR>
+                                <EnumValue>red</EnumValue>
+                              </OR>
+                            </Constraints>
+                            <WithComponentConstraints />
+                          </ENUMERATED>
+                        </Asn1Type>
+                      </REFERENCE_TYPE>
+                    </Asn1Type>
+                  </SEQUENCE_OF>
+                </Asn1Type>
+              </REFERENCE_TYPE>
+            </Asn1Type>
+            <SequenceOfValue>
+              <EnumValue>empty</EnumValue>
+              <EnumValue>empty</EnumValue>
+              <EnumValue>empty</EnumValue>
+              <EnumValue>empty</EnumValue>
+            </SequenceOfValue>
+          </ValueAssignment>
+          <ValueAssignment Name="t-shape" CName="t_shape" AdaName="t_shape" Line="43" CharPositionInLine="2">
+            <Asn1Type id="TETRIS-DATAVIEW.t-shape" Line="43" CharPositionInLine="10" ParameterizedTypeInstance="false" tasInfoModule="TETRIS-DATAVIEW" tasInfoName="Pixels">
+              <REFERENCE_TYPE Module="TETRIS-DATAVIEW" TypeAssignment="Pixels">
+                <Asn1Type id="TETRIS-DATAVIEW.t-shape" Line="24" CharPositionInLine="13" ParameterizedTypeInstance="false" tasInfoModule="TETRIS-DATAVIEW" tasInfoName="Pixels">
+                  <SEQUENCE_OF acnMaxSizeInBits="32" acnMinSizeInBits="32" uperMaxSizeInBits="32" uperMinSizeInBits="32">
+                    <Constraints>
+                      <SIZE>
+                        <IntegerValue>4</IntegerValue>
+                      </SIZE>
+                    </Constraints>
+                    <WithComponentConstraints />
+                    <Asn1Type id="TETRIS-DATAVIEW.t-shape.#" Line="24" CharPositionInLine="36" ParameterizedTypeInstance="false">
+                      <REFERENCE_TYPE Module="TETRIS-DATAVIEW" TypeAssignment="Pixels-Line">
+                        <Asn1Type id="TETRIS-DATAVIEW.t-shape.#" Line="23" CharPositionInLine="18" ParameterizedTypeInstance="false" tasInfoModule="TETRIS-DATAVIEW" tasInfoName="Pixels-Line">
+                          <SEQUENCE_OF acnMaxSizeInBits="8" acnMinSizeInBits="8" uperMaxSizeInBits="8" uperMinSizeInBits="8">
+                            <Constraints>
+                              <SIZE>
+                                <IntegerValue>4</IntegerValue>
+                              </SIZE>
+                            </Constraints>
+                            <WithComponentConstraints />
+                            <Asn1Type id="TETRIS-DATAVIEW.t-shape.#.#" Line="23" CharPositionInLine="41" ParameterizedTypeInstance="false">
+                              <REFERENCE_TYPE Module="TETRIS-DATAVIEW" TypeAssignment="Color">
+                                <Asn1Type id="TETRIS-DATAVIEW.t-shape.#.#" Line="15" CharPositionInLine="12" ParameterizedTypeInstance="false" tasInfoModule="TETRIS-DATAVIEW" tasInfoName="Color">
+                                  <ENUMERATED acnMaxSizeInBits="2" acnMinSizeInBits="2" uperMaxSizeInBits="2" uperMinSizeInBits="2" encode-values="false">
+                                    <Items>
+                                      <Item Name="empty" CName="empty" AdaName="empty" Value="0" Line="16" acnEncodeValue="0" CharPositionInLine="5" />
+                                      <Item Name="blue" CName="blue" AdaName="blue" Value="1" Line="17" acnEncodeValue="1" CharPositionInLine="5" />
+                                      <Item Name="green" CName="green" AdaName="green" Value="2" Line="18" acnEncodeValue="2" CharPositionInLine="5" />
+                                      <Item Name="red" CName="red" AdaName="red" Value="3" Line="19" acnEncodeValue="3" CharPositionInLine="5" />
+                                    </Items>
+                                    <Constraints>
+                                      <OR>
+                                        <OR>
+                                          <OR>
+                                            <EnumValue>empty</EnumValue>
+                                            <EnumValue>blue</EnumValue>
+                                          </OR>
+                                          <EnumValue>green</EnumValue>
+                                        </OR>
+                                        <EnumValue>red</EnumValue>
+                                      </OR>
+                                    </Constraints>
+                                    <WithComponentConstraints />
+                                  </ENUMERATED>
+                                </Asn1Type>
+                              </REFERENCE_TYPE>
+                            </Asn1Type>
+                          </SEQUENCE_OF>
+                        </Asn1Type>
+                      </REFERENCE_TYPE>
+                    </Asn1Type>
+                  </SEQUENCE_OF>
+                </Asn1Type>
+              </REFERENCE_TYPE>
+            </Asn1Type>
+            <SequenceOfValue>
+              <ReferenceValue Module="TETRIS-DATAVIEW" Name="empty-line" Line="44" CharPositionInLine="5">
+                <SequenceOfValue>
+                  <EnumValue>empty</EnumValue>
+                  <EnumValue>empty</EnumValue>
+                  <EnumValue>empty</EnumValue>
+                  <EnumValue>empty</EnumValue>
+                </SequenceOfValue>
+              </ReferenceValue>
+              <ReferenceValue Module="TETRIS-DATAVIEW" Name="empty-line" Line="45" CharPositionInLine="5">
+                <SequenceOfValue>
+                  <EnumValue>empty</EnumValue>
+                  <EnumValue>empty</EnumValue>
+                  <EnumValue>empty</EnumValue>
+                  <EnumValue>empty</EnumValue>
+                </SequenceOfValue>
+              </ReferenceValue>
+              <SequenceOfValue>
+                <EnumValue>empty</EnumValue>
+                <EnumValue>red</EnumValue>
+                <EnumValue>empty</EnumValue>
+                <EnumValue>empty</EnumValue>
+              </SequenceOfValue>
+              <SequenceOfValue>
+                <EnumValue>red</EnumValue>
+                <EnumValue>red</EnumValue>
+                <EnumValue>red</EnumValue>
+                <EnumValue>empty</EnumValue>
+              </SequenceOfValue>
+            </SequenceOfValue>
+          </ValueAssignment>
+          <ValueAssignment Name="l-shape" CName="l_shape" AdaName="l_shape" Line="50" CharPositionInLine="2">
+            <Asn1Type id="TETRIS-DATAVIEW.l-shape" Line="50" CharPositionInLine="10" ParameterizedTypeInstance="false" tasInfoModule="TETRIS-DATAVIEW" tasInfoName="Pixels">
+              <REFERENCE_TYPE Module="TETRIS-DATAVIEW" TypeAssignment="Pixels">
+                <Asn1Type id="TETRIS-DATAVIEW.l-shape" Line="24" CharPositionInLine="13" ParameterizedTypeInstance="false" tasInfoModule="TETRIS-DATAVIEW" tasInfoName="Pixels">
+                  <SEQUENCE_OF acnMaxSizeInBits="32" acnMinSizeInBits="32" uperMaxSizeInBits="32" uperMinSizeInBits="32">
+                    <Constraints>
+                      <SIZE>
+                        <IntegerValue>4</IntegerValue>
+                      </SIZE>
+                    </Constraints>
+                    <WithComponentConstraints />
+                    <Asn1Type id="TETRIS-DATAVIEW.l-shape.#" Line="24" CharPositionInLine="36" ParameterizedTypeInstance="false">
+                      <REFERENCE_TYPE Module="TETRIS-DATAVIEW" TypeAssignment="Pixels-Line">
+                        <Asn1Type id="TETRIS-DATAVIEW.l-shape.#" Line="23" CharPositionInLine="18" ParameterizedTypeInstance="false" tasInfoModule="TETRIS-DATAVIEW" tasInfoName="Pixels-Line">
+                          <SEQUENCE_OF acnMaxSizeInBits="8" acnMinSizeInBits="8" uperMaxSizeInBits="8" uperMinSizeInBits="8">
+                            <Constraints>
+                              <SIZE>
+                                <IntegerValue>4</IntegerValue>
+                              </SIZE>
+                            </Constraints>
+                            <WithComponentConstraints />
+                            <Asn1Type id="TETRIS-DATAVIEW.l-shape.#.#" Line="23" CharPositionInLine="41" ParameterizedTypeInstance="false">
+                              <REFERENCE_TYPE Module="TETRIS-DATAVIEW" TypeAssignment="Color">
+                                <Asn1Type id="TETRIS-DATAVIEW.l-shape.#.#" Line="15" CharPositionInLine="12" ParameterizedTypeInstance="false" tasInfoModule="TETRIS-DATAVIEW" tasInfoName="Color">
+                                  <ENUMERATED acnMaxSizeInBits="2" acnMinSizeInBits="2" uperMaxSizeInBits="2" uperMinSizeInBits="2" encode-values="false">
+                                    <Items>
+                                      <Item Name="empty" CName="empty" AdaName="empty" Value="0" Line="16" acnEncodeValue="0" CharPositionInLine="5" />
+                                      <Item Name="blue" CName="blue" AdaName="blue" Value="1" Line="17" acnEncodeValue="1" CharPositionInLine="5" />
+                                      <Item Name="green" CName="green" AdaName="green" Value="2" Line="18" acnEncodeValue="2" CharPositionInLine="5" />
+                                      <Item Name="red" CName="red" AdaName="red" Value="3" Line="19" acnEncodeValue="3" CharPositionInLine="5" />
+                                    </Items>
+                                    <Constraints>
+                                      <OR>
+                                        <OR>
+                                          <OR>
+                                            <EnumValue>empty</EnumValue>
+                                            <EnumValue>blue</EnumValue>
+                                          </OR>
+                                          <EnumValue>green</EnumValue>
+                                        </OR>
+                                        <EnumValue>red</EnumValue>
+                                      </OR>
+                                    </Constraints>
+                                    <WithComponentConstraints />
+                                  </ENUMERATED>
+                                </Asn1Type>
+                              </REFERENCE_TYPE>
+                            </Asn1Type>
+                          </SEQUENCE_OF>
+                        </Asn1Type>
+                      </REFERENCE_TYPE>
+                    </Asn1Type>
+                  </SEQUENCE_OF>
+                </Asn1Type>
+              </REFERENCE_TYPE>
+            </Asn1Type>
+            <SequenceOfValue>
+              <ReferenceValue Module="TETRIS-DATAVIEW" Name="empty-line" Line="51" CharPositionInLine="5">
+                <SequenceOfValue>
+                  <EnumValue>empty</EnumValue>
+                  <EnumValue>empty</EnumValue>
+                  <EnumValue>empty</EnumValue>
+                  <EnumValue>empty</EnumValue>
+                </SequenceOfValue>
+              </ReferenceValue>
+              <SequenceOfValue>
+                <EnumValue>red</EnumValue>
+                <EnumValue>empty</EnumValue>
+                <EnumValue>empty</EnumValue>
+                <EnumValue>empty</EnumValue>
+              </SequenceOfValue>
+              <SequenceOfValue>
+                <EnumValue>red</EnumValue>
+                <EnumValue>empty</EnumValue>
+                <EnumValue>empty</EnumValue>
+                <EnumValue>empty</EnumValue>
+              </SequenceOfValue>
+              <SequenceOfValue>
+                <EnumValue>red</EnumValue>
+                <EnumValue>red</EnumValue>
+                <EnumValue>empty</EnumValue>
+                <EnumValue>empty</EnumValue>
+              </SequenceOfValue>
+            </SequenceOfValue>
+          </ValueAssignment>
+          <ValueAssignment Name="j-shape" CName="j_shape" AdaName="j_shape" Line="57" CharPositionInLine="2">
+            <Asn1Type id="TETRIS-DATAVIEW.j-shape" Line="57" CharPositionInLine="10" ParameterizedTypeInstance="false" tasInfoModule="TETRIS-DATAVIEW" tasInfoName="Pixels">
+              <REFERENCE_TYPE Module="TETRIS-DATAVIEW" TypeAssignment="Pixels">
+                <Asn1Type id="TETRIS-DATAVIEW.j-shape" Line="24" CharPositionInLine="13" ParameterizedTypeInstance="false" tasInfoModule="TETRIS-DATAVIEW" tasInfoName="Pixels">
+                  <SEQUENCE_OF acnMaxSizeInBits="32" acnMinSizeInBits="32" uperMaxSizeInBits="32" uperMinSizeInBits="32">
+                    <Constraints>
+                      <SIZE>
+                        <IntegerValue>4</IntegerValue>
+                      </SIZE>
+                    </Constraints>
+                    <WithComponentConstraints />
+                    <Asn1Type id="TETRIS-DATAVIEW.j-shape.#" Line="24" CharPositionInLine="36" ParameterizedTypeInstance="false">
+                      <REFERENCE_TYPE Module="TETRIS-DATAVIEW" TypeAssignment="Pixels-Line">
+                        <Asn1Type id="TETRIS-DATAVIEW.j-shape.#" Line="23" CharPositionInLine="18" ParameterizedTypeInstance="false" tasInfoModule="TETRIS-DATAVIEW" tasInfoName="Pixels-Line">
+                          <SEQUENCE_OF acnMaxSizeInBits="8" acnMinSizeInBits="8" uperMaxSizeInBits="8" uperMinSizeInBits="8">
+                            <Constraints>
+                              <SIZE>
+                                <IntegerValue>4</IntegerValue>
+                              </SIZE>
+                            </Constraints>
+                            <WithComponentConstraints />
+                            <Asn1Type id="TETRIS-DATAVIEW.j-shape.#.#" Line="23" CharPositionInLine="41" ParameterizedTypeInstance="false">
+                              <REFERENCE_TYPE Module="TETRIS-DATAVIEW" TypeAssignment="Color">
+                                <Asn1Type id="TETRIS-DATAVIEW.j-shape.#.#" Line="15" CharPositionInLine="12" ParameterizedTypeInstance="false" tasInfoModule="TETRIS-DATAVIEW" tasInfoName="Color">
+                                  <ENUMERATED acnMaxSizeInBits="2" acnMinSizeInBits="2" uperMaxSizeInBits="2" uperMinSizeInBits="2" encode-values="false">
+                                    <Items>
+                                      <Item Name="empty" CName="empty" AdaName="empty" Value="0" Line="16" acnEncodeValue="0" CharPositionInLine="5" />
+                                      <Item Name="blue" CName="blue" AdaName="blue" Value="1" Line="17" acnEncodeValue="1" CharPositionInLine="5" />
+                                      <Item Name="green" CName="green" AdaName="green" Value="2" Line="18" acnEncodeValue="2" CharPositionInLine="5" />
+                                      <Item Name="red" CName="red" AdaName="red" Value="3" Line="19" acnEncodeValue="3" CharPositionInLine="5" />
+                                    </Items>
+                                    <Constraints>
+                                      <OR>
+                                        <OR>
+                                          <OR>
+                                            <EnumValue>empty</EnumValue>
+                                            <EnumValue>blue</EnumValue>
+                                          </OR>
+                                          <EnumValue>green</EnumValue>
+                                        </OR>
+                                        <EnumValue>red</EnumValue>
+                                      </OR>
+                                    </Constraints>
+                                    <WithComponentConstraints />
+                                  </ENUMERATED>
+                                </Asn1Type>
+                              </REFERENCE_TYPE>
+                            </Asn1Type>
+                          </SEQUENCE_OF>
+                        </Asn1Type>
+                      </REFERENCE_TYPE>
+                    </Asn1Type>
+                  </SEQUENCE_OF>
+                </Asn1Type>
+              </REFERENCE_TYPE>
+            </Asn1Type>
+            <SequenceOfValue>
+              <ReferenceValue Module="TETRIS-DATAVIEW" Name="empty-line" Line="58" CharPositionInLine="5">
+                <SequenceOfValue>
+                  <EnumValue>empty</EnumValue>
+                  <EnumValue>empty</EnumValue>
+                  <EnumValue>empty</EnumValue>
+                  <EnumValue>empty</EnumValue>
+                </SequenceOfValue>
+              </ReferenceValue>
+              <SequenceOfValue>
+                <EnumValue>empty</EnumValue>
+                <EnumValue>blue</EnumValue>
+                <EnumValue>empty</EnumValue>
+                <EnumValue>empty</EnumValue>
+              </SequenceOfValue>
+              <SequenceOfValue>
+                <EnumValue>empty</EnumValue>
+                <EnumValue>blue</EnumValue>
+                <EnumValue>empty</EnumValue>
+                <EnumValue>empty</EnumValue>
+              </SequenceOfValue>
+              <SequenceOfValue>
+                <EnumValue>blue</EnumValue>
+                <EnumValue>blue</EnumValue>
+                <EnumValue>empty</EnumValue>
+                <EnumValue>empty</EnumValue>
+              </SequenceOfValue>
+            </SequenceOfValue>
+          </ValueAssignment>
+          <ValueAssignment Name="s-shape" CName="s_shape" AdaName="s_shape" Line="64" CharPositionInLine="2">
+            <Asn1Type id="TETRIS-DATAVIEW.s-shape" Line="64" CharPositionInLine="10" ParameterizedTypeInstance="false" tasInfoModule="TETRIS-DATAVIEW" tasInfoName="Pixels">
+              <REFERENCE_TYPE Module="TETRIS-DATAVIEW" TypeAssignment="Pixels">
+                <Asn1Type id="TETRIS-DATAVIEW.s-shape" Line="24" CharPositionInLine="13" ParameterizedTypeInstance="false" tasInfoModule="TETRIS-DATAVIEW" tasInfoName="Pixels">
+                  <SEQUENCE_OF acnMaxSizeInBits="32" acnMinSizeInBits="32" uperMaxSizeInBits="32" uperMinSizeInBits="32">
+                    <Constraints>
+                      <SIZE>
+                        <IntegerValue>4</IntegerValue>
+                      </SIZE>
+                    </Constraints>
+                    <WithComponentConstraints />
+                    <Asn1Type id="TETRIS-DATAVIEW.s-shape.#" Line="24" CharPositionInLine="36" ParameterizedTypeInstance="false">
+                      <REFERENCE_TYPE Module="TETRIS-DATAVIEW" TypeAssignment="Pixels-Line">
+                        <Asn1Type id="TETRIS-DATAVIEW.s-shape.#" Line="23" CharPositionInLine="18" ParameterizedTypeInstance="false" tasInfoModule="TETRIS-DATAVIEW" tasInfoName="Pixels-Line">
+                          <SEQUENCE_OF acnMaxSizeInBits="8" acnMinSizeInBits="8" uperMaxSizeInBits="8" uperMinSizeInBits="8">
+                            <Constraints>
+                              <SIZE>
+                                <IntegerValue>4</IntegerValue>
+                              </SIZE>
+                            </Constraints>
+                            <WithComponentConstraints />
+                            <Asn1Type id="TETRIS-DATAVIEW.s-shape.#.#" Line="23" CharPositionInLine="41" ParameterizedTypeInstance="false">
+                              <REFERENCE_TYPE Module="TETRIS-DATAVIEW" TypeAssignment="Color">
+                                <Asn1Type id="TETRIS-DATAVIEW.s-shape.#.#" Line="15" CharPositionInLine="12" ParameterizedTypeInstance="false" tasInfoModule="TETRIS-DATAVIEW" tasInfoName="Color">
+                                  <ENUMERATED acnMaxSizeInBits="2" acnMinSizeInBits="2" uperMaxSizeInBits="2" uperMinSizeInBits="2" encode-values="false">
+                                    <Items>
+                                      <Item Name="empty" CName="empty" AdaName="empty" Value="0" Line="16" acnEncodeValue="0" CharPositionInLine="5" />
+                                      <Item Name="blue" CName="blue" AdaName="blue" Value="1" Line="17" acnEncodeValue="1" CharPositionInLine="5" />
+                                      <Item Name="green" CName="green" AdaName="green" Value="2" Line="18" acnEncodeValue="2" CharPositionInLine="5" />
+                                      <Item Name="red" CName="red" AdaName="red" Value="3" Line="19" acnEncodeValue="3" CharPositionInLine="5" />
+                                    </Items>
+                                    <Constraints>
+                                      <OR>
+                                        <OR>
+                                          <OR>
+                                            <EnumValue>empty</EnumValue>
+                                            <EnumValue>blue</EnumValue>
+                                          </OR>
+                                          <EnumValue>green</EnumValue>
+                                        </OR>
+                                        <EnumValue>red</EnumValue>
+                                      </OR>
+                                    </Constraints>
+                                    <WithComponentConstraints />
+                                  </ENUMERATED>
+                                </Asn1Type>
+                              </REFERENCE_TYPE>
+                            </Asn1Type>
+                          </SEQUENCE_OF>
+                        </Asn1Type>
+                      </REFERENCE_TYPE>
+                    </Asn1Type>
+                  </SEQUENCE_OF>
+                </Asn1Type>
+              </REFERENCE_TYPE>
+            </Asn1Type>
+            <SequenceOfValue>
+              <ReferenceValue Module="TETRIS-DATAVIEW" Name="empty-line" Line="65" CharPositionInLine="5">
+                <SequenceOfValue>
+                  <EnumValue>empty</EnumValue>
+                  <EnumValue>empty</EnumValue>
+                  <EnumValue>empty</EnumValue>
+                  <EnumValue>empty</EnumValue>
+                </SequenceOfValue>
+              </ReferenceValue>
+              <ReferenceValue Module="TETRIS-DATAVIEW" Name="empty-line" Line="66" CharPositionInLine="5">
+                <SequenceOfValue>
+                  <EnumValue>empty</EnumValue>
+                  <EnumValue>empty</EnumValue>
+                  <EnumValue>empty</EnumValue>
+                  <EnumValue>empty</EnumValue>
+                </SequenceOfValue>
+              </ReferenceValue>
+              <SequenceOfValue>
+                <EnumValue>empty</EnumValue>
+                <EnumValue>green</EnumValue>
+                <EnumValue>green</EnumValue>
+                <EnumValue>empty</EnumValue>
+              </SequenceOfValue>
+              <SequenceOfValue>
+                <EnumValue>green</EnumValue>
+                <EnumValue>green</EnumValue>
+                <EnumValue>empty</EnumValue>
+                <EnumValue>empty</EnumValue>
+              </SequenceOfValue>
+            </SequenceOfValue>
+          </ValueAssignment>
+          <ValueAssignment Name="z-shape" CName="z_shape" AdaName="z_shape" Line="71" CharPositionInLine="2">
+            <Asn1Type id="TETRIS-DATAVIEW.z-shape" Line="71" CharPositionInLine="10" ParameterizedTypeInstance="false" tasInfoModule="TETRIS-DATAVIEW" tasInfoName="Pixels">
+              <REFERENCE_TYPE Module="TETRIS-DATAVIEW" TypeAssignment="Pixels">
+                <Asn1Type id="TETRIS-DATAVIEW.z-shape" Line="24" CharPositionInLine="13" ParameterizedTypeInstance="false" tasInfoModule="TETRIS-DATAVIEW" tasInfoName="Pixels">
+                  <SEQUENCE_OF acnMaxSizeInBits="32" acnMinSizeInBits="32" uperMaxSizeInBits="32" uperMinSizeInBits="32">
+                    <Constraints>
+                      <SIZE>
+                        <IntegerValue>4</IntegerValue>
+                      </SIZE>
+                    </Constraints>
+                    <WithComponentConstraints />
+                    <Asn1Type id="TETRIS-DATAVIEW.z-shape.#" Line="24" CharPositionInLine="36" ParameterizedTypeInstance="false">
+                      <REFERENCE_TYPE Module="TETRIS-DATAVIEW" TypeAssignment="Pixels-Line">
+                        <Asn1Type id="TETRIS-DATAVIEW.z-shape.#" Line="23" CharPositionInLine="18" ParameterizedTypeInstance="false" tasInfoModule="TETRIS-DATAVIEW" tasInfoName="Pixels-Line">
+                          <SEQUENCE_OF acnMaxSizeInBits="8" acnMinSizeInBits="8" uperMaxSizeInBits="8" uperMinSizeInBits="8">
+                            <Constraints>
+                              <SIZE>
+                                <IntegerValue>4</IntegerValue>
+                              </SIZE>
+                            </Constraints>
+                            <WithComponentConstraints />
+                            <Asn1Type id="TETRIS-DATAVIEW.z-shape.#.#" Line="23" CharPositionInLine="41" ParameterizedTypeInstance="false">
+                              <REFERENCE_TYPE Module="TETRIS-DATAVIEW" TypeAssignment="Color">
+                                <Asn1Type id="TETRIS-DATAVIEW.z-shape.#.#" Line="15" CharPositionInLine="12" ParameterizedTypeInstance="false" tasInfoModule="TETRIS-DATAVIEW" tasInfoName="Color">
+                                  <ENUMERATED acnMaxSizeInBits="2" acnMinSizeInBits="2" uperMaxSizeInBits="2" uperMinSizeInBits="2" encode-values="false">
+                                    <Items>
+                                      <Item Name="empty" CName="empty" AdaName="empty" Value="0" Line="16" acnEncodeValue="0" CharPositionInLine="5" />
+                                      <Item Name="blue" CName="blue" AdaName="blue" Value="1" Line="17" acnEncodeValue="1" CharPositionInLine="5" />
+                                      <Item Name="green" CName="green" AdaName="green" Value="2" Line="18" acnEncodeValue="2" CharPositionInLine="5" />
+                                      <Item Name="red" CName="red" AdaName="red" Value="3" Line="19" acnEncodeValue="3" CharPositionInLine="5" />
+                                    </Items>
+                                    <Constraints>
+                                      <OR>
+                                        <OR>
+                                          <OR>
+                                            <EnumValue>empty</EnumValue>
+                                            <EnumValue>blue</EnumValue>
+                                          </OR>
+                                          <EnumValue>green</EnumValue>
+                                        </OR>
+                                        <EnumValue>red</EnumValue>
+                                      </OR>
+                                    </Constraints>
+                                    <WithComponentConstraints />
+                                  </ENUMERATED>
+                                </Asn1Type>
+                              </REFERENCE_TYPE>
+                            </Asn1Type>
+                          </SEQUENCE_OF>
+                        </Asn1Type>
+                      </REFERENCE_TYPE>
+                    </Asn1Type>
+                  </SEQUENCE_OF>
+                </Asn1Type>
+              </REFERENCE_TYPE>
+            </Asn1Type>
+            <SequenceOfValue>
+              <ReferenceValue Module="TETRIS-DATAVIEW" Name="empty-line" Line="72" CharPositionInLine="5">
+                <SequenceOfValue>
+                  <EnumValue>empty</EnumValue>
+                  <EnumValue>empty</EnumValue>
+                  <EnumValue>empty</EnumValue>
+                  <EnumValue>empty</EnumValue>
+                </SequenceOfValue>
+              </ReferenceValue>
+              <ReferenceValue Module="TETRIS-DATAVIEW" Name="empty-line" Line="73" CharPositionInLine="5">
+                <SequenceOfValue>
+                  <EnumValue>empty</EnumValue>
+                  <EnumValue>empty</EnumValue>
+                  <EnumValue>empty</EnumValue>
+                  <EnumValue>empty</EnumValue>
+                </SequenceOfValue>
+              </ReferenceValue>
+              <SequenceOfValue>
+                <EnumValue>blue</EnumValue>
+                <EnumValue>blue</EnumValue>
+                <EnumValue>empty</EnumValue>
+                <EnumValue>empty</EnumValue>
+              </SequenceOfValue>
+              <SequenceOfValue>
+                <EnumValue>empty</EnumValue>
+                <EnumValue>blue</EnumValue>
+                <EnumValue>blue</EnumValue>
+                <EnumValue>empty</EnumValue>
+              </SequenceOfValue>
+            </SequenceOfValue>
+          </ValueAssignment>
+          <ValueAssignment Name="i-shape" CName="i_shape" AdaName="i_shape" Line="78" CharPositionInLine="2">
+            <Asn1Type id="TETRIS-DATAVIEW.i-shape" Line="78" CharPositionInLine="10" ParameterizedTypeInstance="false" tasInfoModule="TETRIS-DATAVIEW" tasInfoName="Pixels">
+              <REFERENCE_TYPE Module="TETRIS-DATAVIEW" TypeAssignment="Pixels">
+                <Asn1Type id="TETRIS-DATAVIEW.i-shape" Line="24" CharPositionInLine="13" ParameterizedTypeInstance="false" tasInfoModule="TETRIS-DATAVIEW" tasInfoName="Pixels">
+                  <SEQUENCE_OF acnMaxSizeInBits="32" acnMinSizeInBits="32" uperMaxSizeInBits="32" uperMinSizeInBits="32">
+                    <Constraints>
+                      <SIZE>
+                        <IntegerValue>4</IntegerValue>
+                      </SIZE>
+                    </Constraints>
+                    <WithComponentConstraints />
+                    <Asn1Type id="TETRIS-DATAVIEW.i-shape.#" Line="24" CharPositionInLine="36" ParameterizedTypeInstance="false">
+                      <REFERENCE_TYPE Module="TETRIS-DATAVIEW" TypeAssignment="Pixels-Line">
+                        <Asn1Type id="TETRIS-DATAVIEW.i-shape.#" Line="23" CharPositionInLine="18" ParameterizedTypeInstance="false" tasInfoModule="TETRIS-DATAVIEW" tasInfoName="Pixels-Line">
+                          <SEQUENCE_OF acnMaxSizeInBits="8" acnMinSizeInBits="8" uperMaxSizeInBits="8" uperMinSizeInBits="8">
+                            <Constraints>
+                              <SIZE>
+                                <IntegerValue>4</IntegerValue>
+                              </SIZE>
+                            </Constraints>
+                            <WithComponentConstraints />
+                            <Asn1Type id="TETRIS-DATAVIEW.i-shape.#.#" Line="23" CharPositionInLine="41" ParameterizedTypeInstance="false">
+                              <REFERENCE_TYPE Module="TETRIS-DATAVIEW" TypeAssignment="Color">
+                                <Asn1Type id="TETRIS-DATAVIEW.i-shape.#.#" Line="15" CharPositionInLine="12" ParameterizedTypeInstance="false" tasInfoModule="TETRIS-DATAVIEW" tasInfoName="Color">
+                                  <ENUMERATED acnMaxSizeInBits="2" acnMinSizeInBits="2" uperMaxSizeInBits="2" uperMinSizeInBits="2" encode-values="false">
+                                    <Items>
+                                      <Item Name="empty" CName="empty" AdaName="empty" Value="0" Line="16" acnEncodeValue="0" CharPositionInLine="5" />
+                                      <Item Name="blue" CName="blue" AdaName="blue" Value="1" Line="17" acnEncodeValue="1" CharPositionInLine="5" />
+                                      <Item Name="green" CName="green" AdaName="green" Value="2" Line="18" acnEncodeValue="2" CharPositionInLine="5" />
+                                      <Item Name="red" CName="red" AdaName="red" Value="3" Line="19" acnEncodeValue="3" CharPositionInLine="5" />
+                                    </Items>
+                                    <Constraints>
+                                      <OR>
+                                        <OR>
+                                          <OR>
+                                            <EnumValue>empty</EnumValue>
+                                            <EnumValue>blue</EnumValue>
+                                          </OR>
+                                          <EnumValue>green</EnumValue>
+                                        </OR>
+                                        <EnumValue>red</EnumValue>
+                                      </OR>
+                                    </Constraints>
+                                    <WithComponentConstraints />
+                                  </ENUMERATED>
+                                </Asn1Type>
+                              </REFERENCE_TYPE>
+                            </Asn1Type>
+                          </SEQUENCE_OF>
+                        </Asn1Type>
+                      </REFERENCE_TYPE>
+                    </Asn1Type>
+                  </SEQUENCE_OF>
+                </Asn1Type>
+              </REFERENCE_TYPE>
+            </Asn1Type>
+            <SequenceOfValue>
+              <SequenceOfValue>
+                <EnumValue>red</EnumValue>
+                <EnumValue>empty</EnumValue>
+                <EnumValue>empty</EnumValue>
+                <EnumValue>empty</EnumValue>
+              </SequenceOfValue>
+              <SequenceOfValue>
+                <EnumValue>red</EnumValue>
+                <EnumValue>empty</EnumValue>
+                <EnumValue>empty</EnumValue>
+                <EnumValue>empty</EnumValue>
+              </SequenceOfValue>
+              <SequenceOfValue>
+                <EnumValue>red</EnumValue>
+                <EnumValue>empty</EnumValue>
+                <EnumValue>empty</EnumValue>
+                <EnumValue>empty</EnumValue>
+              </SequenceOfValue>
+              <SequenceOfValue>
+                <EnumValue>red</EnumValue>
+                <EnumValue>empty</EnumValue>
+                <EnumValue>empty</EnumValue>
+                <EnumValue>empty</EnumValue>
+              </SequenceOfValue>
+            </SequenceOfValue>
+          </ValueAssignment>
+          <ValueAssignment Name="o-shape" CName="o_shape" AdaName="o_shape" Line="85" CharPositionInLine="2">
+            <Asn1Type id="TETRIS-DATAVIEW.o-shape" Line="85" CharPositionInLine="10" ParameterizedTypeInstance="false" tasInfoModule="TETRIS-DATAVIEW" tasInfoName="Pixels">
+              <REFERENCE_TYPE Module="TETRIS-DATAVIEW" TypeAssignment="Pixels">
+                <Asn1Type id="TETRIS-DATAVIEW.o-shape" Line="24" CharPositionInLine="13" ParameterizedTypeInstance="false" tasInfoModule="TETRIS-DATAVIEW" tasInfoName="Pixels">
+                  <SEQUENCE_OF acnMaxSizeInBits="32" acnMinSizeInBits="32" uperMaxSizeInBits="32" uperMinSizeInBits="32">
+                    <Constraints>
+                      <SIZE>
+                        <IntegerValue>4</IntegerValue>
+                      </SIZE>
+                    </Constraints>
+                    <WithComponentConstraints />
+                    <Asn1Type id="TETRIS-DATAVIEW.o-shape.#" Line="24" CharPositionInLine="36" ParameterizedTypeInstance="false">
+                      <REFERENCE_TYPE Module="TETRIS-DATAVIEW" TypeAssignment="Pixels-Line">
+                        <Asn1Type id="TETRIS-DATAVIEW.o-shape.#" Line="23" CharPositionInLine="18" ParameterizedTypeInstance="false" tasInfoModule="TETRIS-DATAVIEW" tasInfoName="Pixels-Line">
+                          <SEQUENCE_OF acnMaxSizeInBits="8" acnMinSizeInBits="8" uperMaxSizeInBits="8" uperMinSizeInBits="8">
+                            <Constraints>
+                              <SIZE>
+                                <IntegerValue>4</IntegerValue>
+                              </SIZE>
+                            </Constraints>
+                            <WithComponentConstraints />
+                            <Asn1Type id="TETRIS-DATAVIEW.o-shape.#.#" Line="23" CharPositionInLine="41" ParameterizedTypeInstance="false">
+                              <REFERENCE_TYPE Module="TETRIS-DATAVIEW" TypeAssignment="Color">
+                                <Asn1Type id="TETRIS-DATAVIEW.o-shape.#.#" Line="15" CharPositionInLine="12" ParameterizedTypeInstance="false" tasInfoModule="TETRIS-DATAVIEW" tasInfoName="Color">
+                                  <ENUMERATED acnMaxSizeInBits="2" acnMinSizeInBits="2" uperMaxSizeInBits="2" uperMinSizeInBits="2" encode-values="false">
+                                    <Items>
+                                      <Item Name="empty" CName="empty" AdaName="empty" Value="0" Line="16" acnEncodeValue="0" CharPositionInLine="5" />
+                                      <Item Name="blue" CName="blue" AdaName="blue" Value="1" Line="17" acnEncodeValue="1" CharPositionInLine="5" />
+                                      <Item Name="green" CName="green" AdaName="green" Value="2" Line="18" acnEncodeValue="2" CharPositionInLine="5" />
+                                      <Item Name="red" CName="red" AdaName="red" Value="3" Line="19" acnEncodeValue="3" CharPositionInLine="5" />
+                                    </Items>
+                                    <Constraints>
+                                      <OR>
+                                        <OR>
+                                          <OR>
+                                            <EnumValue>empty</EnumValue>
+                                            <EnumValue>blue</EnumValue>
+                                          </OR>
+                                          <EnumValue>green</EnumValue>
+                                        </OR>
+                                        <EnumValue>red</EnumValue>
+                                      </OR>
+                                    </Constraints>
+                                    <WithComponentConstraints />
+                                  </ENUMERATED>
+                                </Asn1Type>
+                              </REFERENCE_TYPE>
+                            </Asn1Type>
+                          </SEQUENCE_OF>
+                        </Asn1Type>
+                      </REFERENCE_TYPE>
+                    </Asn1Type>
+                  </SEQUENCE_OF>
+                </Asn1Type>
+              </REFERENCE_TYPE>
+            </Asn1Type>
+            <SequenceOfValue>
+              <ReferenceValue Module="TETRIS-DATAVIEW" Name="empty-line" Line="86" CharPositionInLine="5">
+                <SequenceOfValue>
+                  <EnumValue>empty</EnumValue>
+                  <EnumValue>empty</EnumValue>
+                  <EnumValue>empty</EnumValue>
+                  <EnumValue>empty</EnumValue>
+                </SequenceOfValue>
+              </ReferenceValue>
+              <ReferenceValue Module="TETRIS-DATAVIEW" Name="empty-line" Line="87" CharPositionInLine="5">
+                <SequenceOfValue>
+                  <EnumValue>empty</EnumValue>
+                  <EnumValue>empty</EnumValue>
+                  <EnumValue>empty</EnumValue>
+                  <EnumValue>empty</EnumValue>
+                </SequenceOfValue>
+              </ReferenceValue>
+              <SequenceOfValue>
+                <EnumValue>green</EnumValue>
+                <EnumValue>green</EnumValue>
+                <EnumValue>empty</EnumValue>
+                <EnumValue>empty</EnumValue>
+              </SequenceOfValue>
+              <SequenceOfValue>
+                <EnumValue>green</EnumValue>
+                <EnumValue>green</EnumValue>
+                <EnumValue>empty</EnumValue>
+                <EnumValue>empty</EnumValue>
+              </SequenceOfValue>
+            </SequenceOfValue>
+          </ValueAssignment>
+        </ValueAssignments>
+      </Module>
+      <Module Name="TASTE-BasicTypes" Line="94" CharPositionInLine="0">
         <ExportedTypes>
-            <ExportedType Name="T-Int32" />
-            <ExportedType Name="T-UInt32" />
-            <ExportedType Name="T-Int8" />
-            <ExportedType Name="T-UInt8" />
-            <ExportedType Name="T-Boolean" /> 
+          <ExportedType Name="T-Int32" />
+          <ExportedType Name="T-UInt32" />
+          <ExportedType Name="T-Int8" />
+          <ExportedType Name="T-UInt8" />
+          <ExportedType Name="T-Boolean" />
         </ExportedTypes>
-        <ExportedVariables>
-         
-        </ExportedVariables>
-        <ImportedModules>
-        </ImportedModules>
+        <ExportedValues />
+        <ImportedModules />
         <TypeAssignments>
-            <TypeAssignment Name="T-Int32" Line="99" CharPositionInLine="13">
-                <Type Line="99" CharPositionInLine="13" Asn1File="testmsc3.asn">
-                    <IntegerType Min="-2147483648" Max="2147483647"/>
-                </Type>
-            </TypeAssignment>
-            <TypeAssignment Name="T-UInt32" Line="101" CharPositionInLine="13">
-                <Type Line="101" CharPositionInLine="13" Asn1File="testmsc3.asn">
-                    <IntegerType Min="0" Max="4294967295"/>
-                </Type>
-            </TypeAssignment>
-            <TypeAssignment Name="T-Int8" Line="103" CharPositionInLine="11">
-                <Type Line="103" CharPositionInLine="11" Asn1File="testmsc3.asn">
-                    <IntegerType Min="-128" Max="127"/>
-                </Type>
-            </TypeAssignment>
-            <TypeAssignment Name="T-UInt8" Line="105" CharPositionInLine="12">
-                <Type Line="105" CharPositionInLine="12" Asn1File="testmsc3.asn">
-                    <IntegerType Min="0" Max="255"/>
-                </Type>
-            </TypeAssignment>
-            <TypeAssignment Name="T-Boolean" Line="107" CharPositionInLine="14">
-                <Type Line="107" CharPositionInLine="14" Asn1File="testmsc3.asn">
-                    <BooleanType />
-                </Type>
-            </TypeAssignment>
+          <TypeAssignment Name="T-Int32" CName="T_Int32" AdaName="T_Int32" Line="99" CharPositionInLine="0">
+            <AsnComment> Set of TASTE predefined basic types</AsnComment>
+            <Asn1Type id="TASTE-BasicTypes.T-Int32" Line="99" CharPositionInLine="13" ParameterizedTypeInstance="false">
+              <INTEGER acnMaxSizeInBits="32" acnMinSizeInBits="32" uperMaxSizeInBits="32" uperMinSizeInBits="32">
+                <Constraints>
+                  <Range>
+                    <Min>
+                      <IntegerValue>-2147483648</IntegerValue>
+                    </Min>
+                    <Max>
+                      <IntegerValue>2147483647</IntegerValue>
+                    </Max>
+                  </Range>
+                </Constraints>
+                <WithComponentConstraints />
+              </INTEGER>
+            </Asn1Type>
+          </TypeAssignment>
+          <TypeAssignment Name="T-UInt32" CName="T_UInt32" AdaName="T_UInt32" Line="101" CharPositionInLine="0">
+            <Asn1Type id="TASTE-BasicTypes.T-UInt32" Line="101" CharPositionInLine="13" ParameterizedTypeInstance="false">
+              <INTEGER acnMaxSizeInBits="32" acnMinSizeInBits="32" uperMaxSizeInBits="32" uperMinSizeInBits="32">
+                <Constraints>
+                  <Range>
+                    <Min>
+                      <IntegerValue>0</IntegerValue>
+                    </Min>
+                    <Max>
+                      <IntegerValue>4294967295</IntegerValue>
+                    </Max>
+                  </Range>
+                </Constraints>
+                <WithComponentConstraints />
+              </INTEGER>
+            </Asn1Type>
+          </TypeAssignment>
+          <TypeAssignment Name="T-Int8" CName="T_Int8" AdaName="T_Int8" Line="103" CharPositionInLine="0">
+            <Asn1Type id="TASTE-BasicTypes.T-Int8" Line="103" CharPositionInLine="11" ParameterizedTypeInstance="false">
+              <INTEGER acnMaxSizeInBits="8" acnMinSizeInBits="8" uperMaxSizeInBits="8" uperMinSizeInBits="8">
+                <Constraints>
+                  <Range>
+                    <Min>
+                      <IntegerValue>-128</IntegerValue>
+                    </Min>
+                    <Max>
+                      <IntegerValue>127</IntegerValue>
+                    </Max>
+                  </Range>
+                </Constraints>
+                <WithComponentConstraints />
+              </INTEGER>
+            </Asn1Type>
+          </TypeAssignment>
+          <TypeAssignment Name="T-UInt8" CName="T_UInt8" AdaName="T_UInt8" Line="105" CharPositionInLine="0">
+            <Asn1Type id="TASTE-BasicTypes.T-UInt8" Line="105" CharPositionInLine="12" ParameterizedTypeInstance="false">
+              <INTEGER acnMaxSizeInBits="8" acnMinSizeInBits="8" uperMaxSizeInBits="8" uperMinSizeInBits="8">
+                <Constraints>
+                  <Range>
+                    <Min>
+                      <IntegerValue>0</IntegerValue>
+                    </Min>
+                    <Max>
+                      <IntegerValue>255</IntegerValue>
+                    </Max>
+                  </Range>
+                </Constraints>
+                <WithComponentConstraints />
+              </INTEGER>
+            </Asn1Type>
+          </TypeAssignment>
+          <TypeAssignment Name="T-Boolean" CName="T_Boolean" AdaName="T_Boolean" Line="107" CharPositionInLine="0">
+            <Asn1Type id="TASTE-BasicTypes.T-Boolean" Line="107" CharPositionInLine="14" ParameterizedTypeInstance="false">
+              <BOOLEAN acnMaxSizeInBits="1" acnMinSizeInBits="1" uperMaxSizeInBits="1" uperMinSizeInBits="1">
+                <Constraints />
+                <WithComponentConstraints />
+              </BOOLEAN>
+            </Asn1Type>
+          </TypeAssignment>
         </TypeAssignments>
-        <VariablesAssignments>
-        </VariablesAssignments>
-        </Asn1Module>
-    </Asn1File>
-</ASN1AST>
+        <ValueAssignments />
+      </Module>
+    </Modules>
+  </Asn1File>
+  <AcnDependencies />
+</AstRoot>

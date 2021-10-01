@@ -41,41 +41,31 @@ using namespace Asn1Acn::Types;
 
 std::unique_ptr<Type> TypeFactory::createBuiltinType(const QString &name)
 {
-    if (name == QStringLiteral("BOOLEAN") || name.startsWith(QStringLiteral("boolean"), Qt::CaseInsensitive))
+    if (name == QStringLiteral("BOOLEAN")) {
         return std::make_unique<Boolean>();
-
-    if (name == QStringLiteral("NULL") || name == QStringLiteral("NullType"))
+    } else if (name == QStringLiteral("NULL")) {
         return std::make_unique<Null>();
-
-    if (name == QStringLiteral("INTEGER") || name.startsWith(QStringLiteral("Integer"), Qt::CaseInsensitive))
+    } else if (name == QStringLiteral("INTEGER")) {
         return std::make_unique<Integer>();
-
-    if (name == QStringLiteral("REAL") || name.startsWith(QStringLiteral("Real"), Qt::CaseInsensitive))
+    } else if (name == QStringLiteral("REAL")) {
         return std::make_unique<Real>();
-
-    if (name == QStringLiteral("BIT_STRING") || name == QStringLiteral("BitStringType"))
+    } else if (name == QStringLiteral("BIT_STRING")) {
         return std::make_unique<BitString>();
-
-    if (name == QStringLiteral("OCTET_STRING") || name == QStringLiteral("OctetStringType"))
+    } else if (name == QStringLiteral("OCTET_STRING")) {
         return std::make_unique<OctetString>();
-
-    if (name.startsWith(QStringLiteral("IA5String"), Qt::CaseInsensitive))
+    } else if (name == QStringLiteral("IA5String")) {
         return std::make_unique<IA5String>();
-
-    if (name.startsWith(QStringLiteral("NumericString"), Qt::CaseInsensitive))
+    } else if (name == QStringLiteral("NumericString")) {
         return std::make_unique<NumericString>();
-
-    if (name == QStringLiteral("ENUMERATED") || name.startsWith(QStringLiteral("Enumerated"), Qt::CaseInsensitive))
+    } else if (name == QStringLiteral("ENUMERATED")) {
         return std::make_unique<Enumerated>();
-
-    if (name == QStringLiteral("CHOICE") || name.startsWith(QStringLiteral("Choice"), Qt::CaseInsensitive))
+    } else if (name == QStringLiteral("CHOICE")) {
         return std::make_unique<Choice>();
-
-    if (name == QStringLiteral("SEQUENCE") || name == QStringLiteral("SequenceType"))
+    } else if (name == QStringLiteral("SEQUENCE")) {
         return std::make_unique<Sequence>();
-
-    if (name == QStringLiteral("SEQUENCE_OF") || name == QStringLiteral("SequenceOfType"))
+    } else if (name == QStringLiteral("SEQUENCE_OF")) {
         return std::make_unique<SequenceOf>();
-
-    return nullptr;
+    } else {
+        return nullptr;
+    }
 }

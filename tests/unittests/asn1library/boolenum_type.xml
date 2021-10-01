@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<ASN1AST>
+<AstRoot>
    <Asn1File FileName="test.asn">
       <Asn1Module ID="ModuleTest">
          <TypeAssignments>

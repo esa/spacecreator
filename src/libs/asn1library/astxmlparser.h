@@ -117,12 +117,10 @@ private:
     void readSequence(Types::Type &type);
     void readSequenceComponent(Types::Type &type);
     void readAcnComponent(Types::Type &type);
-    void readSequenceAsn(Types::Type &type);
 
     void readSequenceOf(Types::Type &type);
 
     void readChoice(Types::Type &type);
-    void readChoiceAsn(Types::Type &type);
 
     void readReferenceType(Types::Type &type);
 
@@ -131,7 +129,6 @@ private:
 
     void readEnumerated(Types::Type &type);
     void readEnumeratedItem(Types::Type &type);
-    void readEnumValues(Types::Type &type);
 
     void readOctetString(Types::Type &type);
     void readIA5String(Types::Type &type);
@@ -145,14 +142,8 @@ private:
     QString readModuleAttribute();
 
     bool nextRequiredElementIs(const QString &name);
-    bool nextRequiredElementIs(const QStringList &names);
     bool nextElementIs(const QString &name);
-    bool nextElementIs(const QStringList &names);
     bool skipToChildElement(const QString &name);
-    bool skipToChildElement(const QStringList &names);
-
-    template<typename T>
-    void parseRange(Types::Type &type);
 
     QXmlStreamReader &m_xmlReader;
     std::map<QString, std::unique_ptr<File>> m_data;
