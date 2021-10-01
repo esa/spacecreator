@@ -29,7 +29,7 @@
                 QTest::qFail(message.constData(), __FILE__, __LINE__);\
                 return;\
             } catch (const exceptionType &ex) {\
-                if (QString(ex.what()) != exceptionMessage) {\
+                if (strcmp(ex.what(), exceptionMessage) != 0) {\
                     auto message = QByteArray() + "Expected exception message \"" + exceptionMessage +\
                                 "\" but got \"" + ex.what() + "\"";\
                     QTest::qFail(message.constData(), __FILE__, __LINE__);\
