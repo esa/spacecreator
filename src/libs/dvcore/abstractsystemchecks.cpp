@@ -17,7 +17,7 @@
 
 #include "abstractsystemchecks.h"
 
-namespace dve {
+namespace dvm {
 
 AbstractSystemChecks::AbstractSystemChecks(QObject *parent)
     : QObject(parent)

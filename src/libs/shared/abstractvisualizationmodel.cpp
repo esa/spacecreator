@@ -48,12 +48,12 @@ void AbstractVisualizationModel::updateItemData(QStandardItem *item, VEObject *o
     item->setData(obj->titleUI(), Qt::DisplayRole);
 }
 
-QStandardItem *AbstractVisualizationModel::createItem(VEObject *obj)
+QList<QStandardItem *> AbstractVisualizationModel::createItems(VEObject *obj)
 {
     auto item = new QStandardItem(obj->titleUI());
     item->setDragEnabled(true);
     item->setData(obj->id(), IdRole);
-    return item;
+    return { item };
 }
 
 QStandardItem *AbstractVisualizationModel::getParentItem(VEObject *obj)
@@ -105,11 +105,12 @@ void AbstractVisualizationModel::addItem(VEObject *obj)
         return;
     }
 
-    if (QStandardItem *item = createItem(obj)) {
+    QList<QStandardItem *> items = createItems(obj);
+    if (!items.isEmpty()) {
         if (auto parentItem = getParentItem(obj)) {
-            parentItem->appendRow(item);
+            parentItem->appendRow(items);
             parentItem->sortChildren(0);
-            m_itemCache.insert(obj->id(), item);
+            m_itemCache.insert(obj->id(), items[0]);
         }
     }
 }

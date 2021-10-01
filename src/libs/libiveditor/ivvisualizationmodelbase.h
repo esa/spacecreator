@@ -43,7 +43,7 @@ public:
 
 protected:
     void updateItemData(QStandardItem *item, shared::VEObject *obj) override;
-    QStandardItem *createItem(shared::VEObject *obj) override;
+    QList<QStandardItem *> createItems(shared::VEObject *obj) override;
 
 private Q_SLOTS:
     void updateConnectionItem(ivm::IVConnection *connection);
@@ -59,7 +59,7 @@ public:
     explicit IVVisualizationModel(ivm::IVModel *ivModel, cmd::CommandsStack *commandsStack, QObject *parent = nullptr);
 
     void updateItemData(QStandardItem *item, shared::VEObject *object) override;
-    QStandardItem *createItem(shared::VEObject *obj) override;
+    QList<QStandardItem *> createItems(shared::VEObject *obj) override;
 
 private Q_SLOTS:
     void onDataChanged(const QModelIndex &topLeft, const QModelIndex &bottomRight, const QVector<int> &roles);

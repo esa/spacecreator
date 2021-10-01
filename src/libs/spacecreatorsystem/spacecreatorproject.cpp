@@ -62,12 +62,15 @@ SpaceCreatorProject::~SpaceCreatorProject() { }
 DVEditorCorePtr SpaceCreatorProject::dvData(const QString &fileName) const
 {
     if (!m_dvStore.contains(fileName)) {
+        auto me = const_cast<SpaceCreatorProject *>(this);
         DVEditorCorePtr data(new dve::DVEditorCore());
         data->setAsn1Check(m_asnChecks.get());
+        auto checker = new scs::IvSystemQueries(me, data.data());
+        data->setSystemChecker(checker);
         data->loadHWLibrary(shared::hwLibraryPath());
         data->appModel()->load(fileName);
 
-        const_cast<SpaceCreatorProject *>(this)->setDvData(fileName, data);
+        me->setDvData(fileName, data);
         return data;
     }
 
@@ -337,8 +340,6 @@ void SpaceCreatorProject::setDvData(const QString &fileName, DVEditorCorePtr dvD
 
     m_dvStore[fileName] = dvData;
     connect(dvData.data(), &shared::EditorCore::editedExternally, this, &scs::SpaceCreatorProject::editedExternally);
-    auto checker = new scs::IvSystemQueries(this, dvData.data());
-    dvData->setSystemChecker(checker);
     Q_EMIT dvCoreAdded(dvData);
 }
 

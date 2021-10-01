@@ -31,8 +31,9 @@ QVariantList ExportableDVPartition::functions() const
 {
     QVariantList functions;
     const dvm::DVPartition *o = exportedObject<dvm::DVPartition>();
-    for (const dvm::DVFunction *function : o->functions())
-        functions << function->title();
+    for (dvm::DVFunction *function : o->functions()) {
+        functions << QVariant::fromValue(function);
+    }
     return functions;
 }
 

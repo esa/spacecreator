@@ -40,6 +40,7 @@ class GraphicsViewBase;
 }
 }
 namespace dvm {
+class AbstractSystemChecks;
 class DVBoardsModel;
 }
 
@@ -52,7 +53,6 @@ class Asn1SystemChecks;
 
 namespace dve {
 class DVAppModel;
-class AbstractSystemChecks;
 class DVExporter;
 
 class DVEditorCore : public shared::EditorCore
@@ -67,8 +67,8 @@ public:
     void setAsn1Check(Asn1Acn::Asn1SystemChecks *check);
     Asn1Acn::Asn1SystemChecks *asn1Checker() const;
 
-    void setSystemChecker(AbstractSystemChecks *checker);
-    AbstractSystemChecks *systemChecker() const;
+    void setSystemChecker(dvm::AbstractSystemChecks *checker);
+    dvm::AbstractSystemChecks *systemChecker() const;
 
     void addToolBars(QMainWindow *window) override;
 

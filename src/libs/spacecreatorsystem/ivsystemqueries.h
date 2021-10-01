@@ -34,7 +34,7 @@ class SpaceCreatorProject;
 /*!
    Queries for the IV system only
  */
-class IvSystemQueries : public dve::AbstractSystemChecks
+class IvSystemQueries : public dvm::AbstractSystemChecks
 {
     Q_OBJECT
 public:
@@ -56,6 +56,9 @@ public:
 
     bool connectionExists(const QString &sourceFunction, const QString &sourceInterface, const QString &targetFunction,
             const QString &targetInterface) const;
+
+    QString defaultImplementationForFunction(const QString &function) const override;
+    QStringList implementationsForFunction(const QString &function) const override;
 
     ivm::IVModel *ivModel() const;
 

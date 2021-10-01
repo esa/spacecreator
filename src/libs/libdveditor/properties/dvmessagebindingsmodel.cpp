@@ -39,7 +39,7 @@ DVMessageBindingsModel::DVMessageBindingsModel(shared::cmd::CommandsStackBase::M
 {
 }
 
-void DVMessageBindingsModel::initModel(dvm::DVConnection *connection, AbstractSystemChecks *systemChecker)
+void DVMessageBindingsModel::initModel(dvm::DVConnection *connection, dvm::AbstractSystemChecks *systemChecker)
 {
     Q_ASSERT(connection);
     Q_ASSERT(connection->model());

@@ -21,7 +21,7 @@
 #include <QObject>
 #include <QPair>
 
-namespace dve {
+namespace dvm {
 
 class AbstractSystemChecks : public QObject
 {
@@ -37,6 +37,9 @@ public:
 
     virtual QList<QPair<QString, QString>> messages(
             const QString &sourceFunction, const QString &targetFunction) const = 0;
+
+    virtual QString defaultImplementationForFunction(const QString &function) const = 0;
+    virtual QStringList implementationsForFunction(const QString &function) const = 0;
 
 Q_SIGNALS:
     void ivDataReset();

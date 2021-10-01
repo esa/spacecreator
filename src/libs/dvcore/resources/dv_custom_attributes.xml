@@ -1,1 +1,10 @@
-<Attrs/>
+<Attrs>
+    <Attr label="Implementation" name="selected_implementation" visible="false" optional="true">
+        <Scopes>
+            <Function/>
+        </Scopes>
+        <Type>
+            <String/>
+        </Type>
+    </Attr>
+</Attrs>

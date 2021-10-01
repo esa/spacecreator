@@ -3,8 +3,6 @@ set(LIB_NAME libdveditor)
 add_library(${LIB_NAME} STATIC)
 
 target_sources(${LIB_NAME} PRIVATE
-    abstractsystemchecks.cpp
-    abstractsystemchecks.h
     commands/cmdconnectionentitycreate.cpp
     commands/cmdconnectionentitycreate.h
     commands/cmddeviceentitycreate.cpp
@@ -47,6 +45,8 @@ target_sources(${LIB_NAME} PRIVATE
     dvtreeviewmodel.h
     dvvisualizationmodel.cpp
     dvvisualizationmodel.h
+    implementationdelegate.cpp
+    implementationdelegate.h
     itemeditor/dvconnectiongraphicsitem.cpp
     itemeditor/dvconnectiongraphicsitem.h
     itemeditor/dvdevicegraphicsitem.cpp

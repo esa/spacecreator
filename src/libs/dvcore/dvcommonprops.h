@@ -93,6 +93,8 @@ public:
         to_function,
         to_interface,
 
+        selected_implementation,
+
         // TASTE props:
         coordinates,
     };

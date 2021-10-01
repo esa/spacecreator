@@ -15,32 +15,22 @@
   along with this program. If not, see <https://www.gnu.org/licenses/lgpl-2.1.html>.
 */
 
-#include "abstractvisualizationmodel.h"
+#pragma once
 
-namespace shared {
-namespace cmd {
-class CommandsStackBase;
-} // namespace cmd
-} // namespace shared
-
-namespace dvm {
-class DVModel;
-} // namespace dvm
+#include <QStringList>
+#include <QStyledItemDelegate>
 
 namespace dve {
 
-class DVVisualizationModel : public shared::AbstractVisualizationModel
+class ImplementationDelegate : public QStyledItemDelegate
 {
     Q_OBJECT
 public:
-    explicit DVVisualizationModel(
-            dvm::DVModel *dvModel, shared::cmd::CommandsStackBase *commandsStack, QObject *parent = nullptr);
+    explicit ImplementationDelegate(QObject *parent = nullptr);
 
-    Qt::ItemFlags flags(const QModelIndex &index) const override;
-
-protected:
-    void updateItemData(QStandardItem *item, shared::VEObject *obj) override;
-    QList<QStandardItem *> createItems(shared::VEObject *obj) override;
+    QWidget *createEditor(QWidget *parent, const QStyleOptionViewItem &option, const QModelIndex &index) const override;
+    void setEditorData(QWidget *editor, const QModelIndex &index) const override;
+    void setModelData(QWidget *editor, QAbstractItemModel *model, const QModelIndex &index) const override;
 };
 
 } // namespace dve

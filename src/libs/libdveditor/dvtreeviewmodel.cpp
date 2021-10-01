@@ -19,8 +19,11 @@
 
 #include "commands/cmdentityattributechange.h"
 #include "commandsstackbase.h"
+#include "dvfunction.h"
 #include "dvmodel.h"
 #include "dvnamevalidator.h"
+
+#include <QDebug>
 
 namespace dve {
 
@@ -28,6 +31,7 @@ DVTreeViewModel::DVTreeViewModel(dvm::DVModel *dvModel, shared::cmd::CommandsSta
     : shared::AbstractVisualizationModel(dvModel, commandsStack, parent)
 {
     connect(this, &QStandardItemModel::dataChanged, this, &DVTreeViewModel::onDataChanged);
+    setColumnCount(2);
 }
 
 Qt::ItemFlags DVTreeViewModel::flags(const QModelIndex &index) const
@@ -41,6 +45,22 @@ Qt::ItemFlags DVTreeViewModel::flags(const QModelIndex &index) const
         }
     }
     return itemFlags;
+}
+
+QVariant DVTreeViewModel::headerData(int section, Qt::Orientation orientation, int role) const
+{
+    if (role == Qt::DisplayRole) {
+        if (section >= 0 && section <= columnCount()) {
+            switch (section) {
+            case 0:
+                return { tr("Name") };
+            case 1:
+                return { tr("Implementation") };
+            }
+        }
+    }
+
+    return QAbstractItemModel::headerData(section, orientation, role);
 }
 
 void DVTreeViewModel::updateItemData(QStandardItem *item, shared::VEObject *object)
@@ -88,16 +108,26 @@ void DVTreeViewModel::updateItemData(QStandardItem *item, shared::VEObject *obje
     item->setData(pix, Qt::DecorationRole);
 }
 
-QStandardItem *DVTreeViewModel::createItem(shared::VEObject *obj)
+QList<QStandardItem *> DVTreeViewModel::createItems(shared::VEObject *obj)
 {
-    QStandardItem *item = shared::AbstractVisualizationModel::createItem(obj);
+    QList<QStandardItem *> items = shared::AbstractVisualizationModel::createItems(obj);
     connect(obj, &shared::VEObject::attributeChanged, this, [this](const QString &attrName) {
         if (attrName == dvm::meta::Props::token(dvm::meta::Props::Token::name)) {
             updateItem();
         }
+        if (attrName == dvm::meta::Props::token(dvm::meta::Props::Token::selected_implementation)) {
+            updateImplementation(qobject_cast<dvm::DVFunction *>(sender()));
+        }
     });
-    updateItemData(item, obj);
-    return item;
+    updateItemData(items.first(), obj);
+
+    if (auto fn = qobject_cast<dvm::DVFunction *>(obj)) {
+        auto implItem = new QStandardItem(fn->usedImplementation());
+        implItem->setData(QVariant::fromValue(obj), DVObjectRole);
+        items.append(implItem);
+    }
+
+    return items;
 }
 
 void DVTreeViewModel::onDataChanged(
@@ -116,21 +146,80 @@ void DVTreeViewModel::onDataChanged(
             if (roles.contains(Qt::DisplayRole) || roles.isEmpty()) {
                 const shared::Id id = item->data(IdRole).toUuid();
                 if (auto obj = m_veModel->getObject(id)->as<dvm::DVObject *>()) {
-                    const QString name = dvm::DVNameValidator::encodeName(obj->type(), item->text());
-                    if (name != obj->title()) {
-                        if (dvm::DVNameValidator::isAcceptableName(obj, name)) {
-                            const QVariantHash attributes = { { dvm::meta::Props::token(dvm::meta::Props::Token::name),
-                                    name } };
-                            auto attributesCmd = new shared::cmd::CmdEntityAttributeChange(obj, attributes);
-                            m_commandsStack->push(attributesCmd);
-                        } else {
-                            updateItemData(item, obj);
-                        }
+                    switch (topLeft.column()) {
+                    case Columns::Name:
+                        setName(obj, item);
+                        break;
+                    case Columns::Implementation: {
+                        dvm::DVFunction *fn = qobject_cast<dvm::DVFunction *>(obj);
+                        setImplementation(fn, implementationItem(fn));
+                        break;
+                    }
                     }
                 }
             }
         }
     }
+}
+
+void DVTreeViewModel::setName(dvm::DVObject *obj, QStandardItem *item)
+{
+    const QString name = dvm::DVNameValidator::encodeName(obj->type(), item->text());
+    if (name != obj->title()) {
+        if (dvm::DVNameValidator::isAcceptableName(obj, name)) {
+            const QVariantHash attributes = { { dvm::meta::Props::token(dvm::meta::Props::Token::name), name } };
+            auto attributesCmd = new shared::cmd::CmdEntityAttributeChange(obj, attributes);
+            m_commandsStack->push(attributesCmd);
+        } else {
+            updateItemData(item, obj);
+        }
+    }
+}
+
+void DVTreeViewModel::setImplementation(dvm::DVFunction *fn, QStandardItem *item)
+{
+    if (!fn) {
+        return;
+    }
+
+    if (item->text() == fn->implementation()) {
+        return;
+    }
+
+    const QVariantHash attributes = { { dvm::meta::Props::token(dvm::meta::Props::Token::selected_implementation),
+            item->text() } };
+    auto attributesCmd = new shared::cmd::CmdEntityAttributeChange(fn, attributes);
+    m_commandsStack->push(attributesCmd);
+}
+
+void DVTreeViewModel::updateImplementation(dvm::DVFunction *fn)
+{
+    if (!fn) {
+        return;
+    }
+
+    QStandardItem *implItem = implementationItem(fn);
+    if (implItem) {
+        implItem->setData(fn->usedImplementation(), Qt::DisplayRole);
+        return;
+    }
+}
+
+QStandardItem *DVTreeViewModel::implementationItem(dvm::DVFunction *fn)
+{
+    if (!fn) {
+        return nullptr;
+    }
+    QStandardItem *parentItem = getItem(fn->parentObject());
+    QModelIndex parentIdx = indexFromItem(parentItem);
+    for (int row = 0; row < rowCount(parentIdx); ++row) {
+        QModelIndex idx = index(row, Columns::Implementation, parentIdx);
+        if (idx.data(DVObjectRole).value<dvm::DVFunction *>() == fn) {
+            return itemFromIndex(idx);
+        }
+    }
+
+    return nullptr;
 }
 
 } // namespace dve

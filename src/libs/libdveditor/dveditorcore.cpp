@@ -89,7 +89,7 @@ struct DVEditorCore::DVEditorCorePrivate {
     std::unique_ptr<dve::DVExporter> m_exporter;
     shared::PropertyTemplateConfig *m_dynPropConfig { nullptr };
 
-    dve::AbstractSystemChecks *m_systemChecks = nullptr;
+    dvm::AbstractSystemChecks *m_systemChecks = nullptr;
 
     QPointer<Asn1Acn::Asn1SystemChecks> m_asn1SystemChecks;
 
@@ -129,7 +129,7 @@ DVAppModel *DVEditorCore::appModel() const
     return d->m_appModel.get();
 }
 
-void DVEditorCore::setSystemChecker(AbstractSystemChecks *checker)
+void DVEditorCore::setSystemChecker(dvm::AbstractSystemChecks *checker)
 {
     if (d->m_systemChecks == checker) {
         return;
@@ -139,6 +139,7 @@ void DVEditorCore::setSystemChecker(AbstractSystemChecks *checker)
         delete d->m_systemChecks;
     }
     d->m_systemChecks = checker;
+    d->m_appModel->objectsModel()->setIVQueries(d->m_systemChecks);
 }
 
 void DVEditorCore::setAsn1Check(Asn1Acn::Asn1SystemChecks *check)
@@ -151,7 +152,7 @@ Asn1Acn::Asn1SystemChecks *DVEditorCore::asn1Checker() const
     return d->m_asn1SystemChecks;
 }
 
-AbstractSystemChecks *DVEditorCore::systemChecker() const
+dvm::AbstractSystemChecks *DVEditorCore::systemChecker() const
 {
     return d->m_systemChecks;
 }

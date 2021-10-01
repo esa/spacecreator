@@ -20,16 +20,17 @@
 
 #include <QList>
 #include <QObject>
+#include <QPointer>
 #include <QVector>
 #include <memory>
 
 #pragma once
 
 namespace dvm {
+class AbstractSystemChecks;
 class DVConnection;
 class DVDevice;
 class DVFunction;
-struct DVModelPrivate;
 class DVNode;
 
 class DVModel : public shared::VEModel
@@ -59,9 +60,15 @@ public:
 
     void resetBuses();
 
+    void setIVQueries(AbstractSystemChecks *ivQueries);
+    AbstractSystemChecks *ivQueries() const;
+
 protected Q_SLOTS:
     void onObjectsAdded(const QVector<shared::Id> &objectsIds);
     void onObjectRemoved();
+
+private:
+    QPointer<AbstractSystemChecks> m_ivQueries;
 };
 
 } // namespace dvm

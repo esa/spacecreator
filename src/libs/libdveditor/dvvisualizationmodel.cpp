@@ -66,11 +66,13 @@ void DVVisualizationModel::updateItemData(QStandardItem *item, shared::VEObject 
     }
 }
 
-QStandardItem *DVVisualizationModel::createItem(shared::VEObject *obj)
+QList<QStandardItem *> DVVisualizationModel::createItems(shared::VEObject *obj)
 {
-    QStandardItem *item = shared::AbstractVisualizationModel::createItem(obj);
-    updateItemData(item, obj);
-    return item;
+    QList<QStandardItem *> items = shared::AbstractVisualizationModel::createItems(obj);
+    if (!items.isEmpty()) {
+        updateItemData(items[0], obj);
+    }
+    return items;
 }
 
 } // namespace dve

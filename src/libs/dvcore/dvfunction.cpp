@@ -17,7 +17,11 @@
 
 #include "dvfunction.h"
 
+#include "abstractsystemchecks.h"
+#include "dvmodel.h"
 #include "dvpartition.h"
+
+#include <QDebug>
 
 namespace dvm {
 
@@ -29,6 +33,46 @@ DVFunction::DVFunction(DVObject *parent)
 DVPartition *DVFunction::partition() const
 {
     return qobject_cast<DVPartition *>(parent());
+}
+
+QString DVFunction::usedImplementation() const
+{
+    QString value = implementation();
+    if (value.isEmpty() && model() && model()->ivQueries()) {
+        return model()->ivQueries()->defaultImplementationForFunction(title());
+    }
+    return value;
+}
+
+void DVFunction::setImplementation(const QString &name)
+{
+    if (name == implementation()) {
+        return;
+    }
+
+    setEntityAttribute(meta::Props::token(meta::Props::Token::selected_implementation), name);
+
+    Q_EMIT implementationChanged();
+    Q_EMIT usedImplementationChanged();
+}
+
+QString DVFunction::implementation() const
+{
+    QString value = entityAttributeValue(meta::Props::token(meta::Props::Token::selected_implementation)).toString();
+    if (model() && model()->ivQueries()) {
+        if (!model()->ivQueries()->implementationsForFunction(title()).contains(value)) {
+            return "";
+        }
+    }
+    return value;
+}
+
+QStringList DVFunction::availableImplementations() const
+{
+    if (model() && model()->ivQueries()) {
+        return model()->ivQueries()->implementationsForFunction(title());
+    }
+    return {};
 }
 
 } // namespace dvm

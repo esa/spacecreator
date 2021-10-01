@@ -234,7 +234,7 @@ void IVPropertiesDialog::initLanguageView()
         return;
     }
     auto languagesWidget = new ive::LanguageSelect(fn, commandMacro(), this);
-    insertTab(languagesWidget, tr("Languages"));
+    insertTab(languagesWidget, tr("Implementations"));
 }
 
 } // namespace ive

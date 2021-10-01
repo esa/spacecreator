@@ -127,19 +127,19 @@ void IVVisualizationModelBase::updateItemData(QStandardItem *item, shared::VEObj
     item->setData(pix, Qt::DecorationRole);
 }
 
-QStandardItem *IVVisualizationModelBase::createItem(shared::VEObject *object)
+QList<QStandardItem *> IVVisualizationModelBase::createItems(shared::VEObject *object)
 {
     ivm::IVObject *obj = qobject_cast<ivm::IVObject *>(object);
     if (!obj) {
-        return nullptr;
+        return {};
     }
 
     if (obj->type() == ivm::IVObject::Type::InterfaceGroup) {
-        return nullptr;
+        return {};
     }
 
-    auto item = AbstractVisualizationModel::createItem(obj);
-    item->setData(static_cast<int>(obj->type()), TypeRole);
+    QList<QStandardItem *> items = AbstractVisualizationModel::createItems(obj);
+    items[0]->setData(static_cast<int>(obj->type()), TypeRole);
 
     connect(obj, &ivm::IVObject::titleChanged, this, &IVVisualizationModelBase::updateItem);
     connect(obj, &ivm::IVObject::visibilityChanged, this, &IVVisualizationModelBase::updateItem);
@@ -157,8 +157,8 @@ QStandardItem *IVVisualizationModelBase::createItem(shared::VEObject *object)
         }
     }
 
-    updateItemData(item, obj);
-    return item;
+    updateItemData(items[0], obj);
+    return items;
 }
 
 void IVVisualizationModelBase::updateConnectionItem(ivm::IVConnection *connection)
@@ -190,15 +190,15 @@ void IVVisualizationModel::updateItemData(QStandardItem *item, shared::VEObject 
     }
 }
 
-QStandardItem *IVVisualizationModel::createItem(shared::VEObject *obj)
+QList<QStandardItem *> IVVisualizationModel::createItems(shared::VEObject *obj)
 {
-    auto item = IVVisualizationModelBase::createItem(obj);
-    if (item) {
-        item->setEditable(true);
-        item->setCheckable(true);
-        item->setDragEnabled(false);
+    QList<QStandardItem *> items = IVVisualizationModelBase::createItems(obj);
+    if (!items.isEmpty()) {
+        items[0]->setEditable(true);
+        items[0]->setCheckable(true);
+        items[0]->setDragEnabled(false);
     }
-    return item;
+    return items;
 }
 
 void IVVisualizationModel::onDataChanged(

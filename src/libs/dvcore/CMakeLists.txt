@@ -3,6 +3,8 @@ set(LIB_NAME dvcore)
 add_library(${LIB_NAME} STATIC)
 
 target_sources(${LIB_NAME} PRIVATE
+    abstractsystemchecks.cpp
+    abstractsystemchecks.h
     connectionvalidator.cpp
     connectionvalidator.h
     dvboard.cpp

@@ -49,7 +49,7 @@ public:
 
 protected:
     virtual void updateItemData(QStandardItem *item, VEObject *obj);
-    virtual QStandardItem *createItem(VEObject *obj);
+    virtual QList<QStandardItem *> createItems(VEObject *obj);
     QStandardItem *getParentItem(VEObject *obj);
     QStandardItem *getItem(VEObject *obj);
 

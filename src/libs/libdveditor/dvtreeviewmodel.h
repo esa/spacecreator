@@ -26,7 +26,9 @@ class CommandsStackBase;
 } // namespace shared
 
 namespace dvm {
+class DVFunction;
 class DVModel;
+class DVObject;
 } // namespace dvm
 
 namespace dve {
@@ -35,6 +37,12 @@ class DVTreeViewModel : public shared::AbstractVisualizationModel
 {
     Q_OBJECT
 public:
+    enum Columns
+    {
+        Name = 0,
+        Implementation
+    };
+    Q_ENUM(Columns)
     enum Roles
     {
         DVObjectRole = Qt::UserRole + 321
@@ -45,13 +53,20 @@ public:
             dvm::DVModel *dvModel, shared::cmd::CommandsStackBase *commandsStack, QObject *parent = nullptr);
 
     Qt::ItemFlags flags(const QModelIndex &index) const override;
+    QVariant headerData(int section, Qt::Orientation orientation, int role = Qt::DisplayRole) const override;
 
 protected:
     void updateItemData(QStandardItem *item, shared::VEObject *object) override;
-    QStandardItem *createItem(shared::VEObject *obj) override;
+    QList<QStandardItem *> createItems(shared::VEObject *obj) override;
 
 private Q_SLOTS:
     void onDataChanged(const QModelIndex &topLeft, const QModelIndex &bottomRight, const QVector<int> &roles);
+
+private:
+    void setName(dvm::DVObject *obj, QStandardItem *item);
+    void setImplementation(dvm::DVFunction *fn, QStandardItem *item);
+    void updateImplementation(dvm::DVFunction *fn);
+    QStandardItem *implementationItem(dvm::DVFunction *fn);
 };
 
 } // namespace dve

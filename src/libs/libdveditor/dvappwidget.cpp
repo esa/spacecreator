@@ -18,9 +18,12 @@
 #include "dvappwidget.h"
 
 #include "dvtreesortproxymodel.h"
+#include "implementationdelegate.h"
 #include "itemeditor/graphicsview.h"
 #include "ui_dvappwidget.h"
 
+#include <QDebug>
+#include <QHeaderView>
 #include <QItemSelectionModel>
 #include <QSplitter>
 #include <QTreeView>
@@ -60,9 +63,12 @@ void DVAppWidget::setAadlModel(QAbstractItemModel *model)
     m_dvTreeSortModel->setSourceModel(model);
     m_selectionModel->setModel(m_dvTreeSortModel);
     ui->treeView->setModel(m_dvTreeSortModel);
-    ui->treeView->setHeaderHidden(true);
     ui->treeView->setSortingEnabled(true);
     ui->treeView->setSelectionModel(m_selectionModel);
+    ui->treeView->header()->setSectionResizeMode(0, QHeaderView::Stretch);
+
+    auto delegate = new ImplementationDelegate(ui->treeView);
+    ui->treeView->setItemDelegateForColumn(1, delegate);
 }
 
 void DVAppWidget::setHWModel(QAbstractItemModel *model)

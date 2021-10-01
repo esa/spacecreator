@@ -25,9 +25,21 @@ class DVPartition;
 class DVFunction : public DVObject
 {
     Q_OBJECT
+    Q_PROPERTY(QString usedImplementation READ usedImplementation NOTIFY usedImplementationChanged)
+    Q_PROPERTY(QString implementation READ implementation WRITE setImplementation NOTIFY implementationChanged)
+
 public:
     explicit DVFunction(DVObject *parent = nullptr);
     DVPartition *partition() const;
+
+    QString usedImplementation() const;
+    void setImplementation(const QString &name);
+    QString implementation() const;
+    QStringList availableImplementations() const;
+
+Q_SIGNALS:
+    void usedImplementationChanged();
+    void implementationChanged();
 };
 
 } // namespace dvm

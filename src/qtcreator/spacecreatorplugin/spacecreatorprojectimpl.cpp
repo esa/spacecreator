@@ -26,6 +26,7 @@
 #include "mscsystemchecks.h"
 
 #include <QDebug>
+#include <QDir>
 #include <algorithm>
 #include <editormanager/documentmodel.h>
 #include <projectexplorer/project.h>
@@ -86,6 +87,13 @@ QStringList SpaceCreatorProjectImpl::projectFiles(const QString &suffix) const
         }
     }
 #endif
+    // fallback (if project wasn't fully loaded yet
+    if (result.isEmpty()) {
+        QDir dir(m_project->rootProjectDirectory().toString());
+        for (const QString &entry : dir.entryList({ QString("*%1").arg(suffix) })) {
+            result.append(dir.filePath(entry));
+        }
+    }
     return result;
 }
 

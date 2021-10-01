@@ -27,11 +27,12 @@
 #include "spacecreatorproject.h"
 
 #include <QtDebug>
+#include <ivfunction.h>
 
 namespace scs {
 
 IvSystemQueries::IvSystemQueries(SpaceCreatorProject *project, QObject *parent)
-    : dve::AbstractSystemChecks(parent)
+    : dvm::AbstractSystemChecks(parent)
     , m_project(project)
 {
 }
@@ -214,6 +215,31 @@ bool IvSystemQueries::connectionExists(const QString &sourceFunction, const QStr
     QList<QPair<QString, QString>> connections = messages(sourceFunction, targetFunction);
     QPair<QString, QString> msgIf { sourceInterface, targetInterface };
     return connections.contains(msgIf);
+}
+
+QString IvSystemQueries::defaultImplementationForFunction(const QString &function) const
+{
+    qDebug() << Q_FUNC_INFO;
+    ivm::IVFunction *fn = functionByName(function);
+    if (!fn) {
+        return {};
+    }
+
+    return fn->defaultLanguage();
+}
+
+QStringList IvSystemQueries::implementationsForFunction(const QString &function) const
+{
+    ivm::IVFunction *fn = functionByName(function);
+    if (!fn) {
+        return {};
+    }
+
+    QStringList implementations;
+    for (const EntityAttribute &lang : fn->languages()) {
+        implementations.append(lang.name());
+    }
+    return implementations;
 }
 
 /*!
