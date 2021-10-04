@@ -50,6 +50,13 @@ public:
     auto actions() -> const std::vector<std::shared_ptr<Action>> &;
 
     /**
+     * @brief    Setter for the actions
+     *
+     * @param    const reference to the vector of pointers to actions
+     */
+    auto setActions(const std::vector<std::shared_ptr<Action>> &actions) -> void;
+
+    /**
      * @brief  visitor acceptor (calls visit method of the given visitor)
      */
     auto accept(Visitor &visitor) const -> void;
