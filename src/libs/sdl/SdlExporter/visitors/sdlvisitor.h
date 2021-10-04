@@ -45,7 +45,7 @@ public:
      */
     SdlVisitor(QTextStream &stream);
     /**
-     * @brief   Explicitly deleted move constructor
+     * @brief   Deleted move constructor
      */
     SdlVisitor(const QTextStream &&) = delete;
 

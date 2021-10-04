@@ -57,7 +57,7 @@ public:
      */
     SdlModel &operator=(const SdlModel &) = delete;
     /**
-     * @brief   Default move assignment operator
+     * @brief   Deleted move assignment operator
      */
     SdlModel &operator=(SdlModel &&) = delete;
 

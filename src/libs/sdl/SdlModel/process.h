@@ -30,24 +30,68 @@ namespace sdl {
 
 class VariableDeclaration
 {
-    // TODO
+    // TODO: extract to a separate file
 };
 
 class Procedure
 {
-    // TODO
+    // TODO: extract to a separate file
 };
 
+/**
+ * @brief   Represents a next state (go to state) action in SDL model.
+ *
+ * Stores a pointer to the next state
+ */
 class Process : public Node
 {
 public:
-    Process(const Process &process) = delete; // TODO: there are probably some other cosntructors to delete
+    /**
+     * @brief   Constructor
+     *
+     * @param   stream   output stream (where the serialized values are put)
+     */
     Process(const QString &name, std::unique_ptr<StateMachine> &stateMachine);
+
+    /**
+     * @brief deleted copy constructor
+     */
+    Process(const Process &) = delete;
+
+    /**
+     * @brief deleted move constructor
+     */
+    Process(const Process &&) = delete;
+
+    /**
+     * @brief virtual destructor
+     */
     virtual ~Process();
 
+    /**
+     * @brief   Getter for the state machine
+     *
+     * @return  a const reference to a pointer to the state machine
+     */
     auto stateMachine() const -> const std::unique_ptr<StateMachine> &;
+
+    /**
+     * @brief   Getter for the variables declared in this process
+     *
+     * @return  a const reference to a vector of pointers to variable declarations
+     */
     auto variables() const -> const std::vector<std::unique_ptr<VariableDeclaration>> &;
+
+    /**
+     * @brief   Getter for the procedures declared in this process
+     *
+     * @return  a const reference to a vector of pointers to procedure
+     */
     auto procedures() const -> const std::vector<std::unique_ptr<Procedure>> &;
+
+    /**
+     * @brief  visitor acceptor (calls visit method of the given visitor)
+     */
     auto accept(Visitor &visitor) const -> void override;
 
 private:
