@@ -87,6 +87,7 @@ public:
         asn1file,
         asn1type,
         asn1module,
+        node_label,
 
         from_function,
         from_interface,

@@ -32,6 +32,7 @@ class ExportableDVDevice : public ExportableDVObject
     Q_PROPERTY(QString portName READ portName)
     Q_PROPERTY(QString qualifier READ qualifier)
     Q_PROPERTY(QString nodeName READ nodeName)
+    Q_PROPERTY(QString nodeLabel READ nodeLabel)
 
 public:
     explicit ExportableDVDevice(const dvm::DVObject *dvObject = nullptr);
@@ -40,6 +41,7 @@ public:
     QString portName() const;
     QString qualifier() const;
     QString nodeName() const;
+    QString nodeLabel() const;
 };
 
 } // namespace dve

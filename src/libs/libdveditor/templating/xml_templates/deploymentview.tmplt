@@ -13,6 +13,7 @@ properties.value  :  |_ Value of that property
 The following tags are available in this template:
 Nodes                      : List of all available Nodes (Boards)
 node                       : |_ Instance of node (see "for node in Nodes")
+node.nodeLabel             :    |_ Unique label of this node
 node.partitions            :    |_ List of partitions (binary) in that node
 partition                  :    |  |_ Instance of node.partition (see "for partition in node.partitions")
 partitions.functions       :    |     |_ List of functions in that partition
@@ -26,6 +27,7 @@ device.name                :    |  |_ Name of the device
 device.portName            :    |  |_ Name of the port
 device.qualifier           :    |  |_ Qualifier of the bus (see bus.qualifier)
 device.nodeName            :    |  |_ Name of the node, this device belongs to
+device.nodeLabel           :    |  |_ Label of the node, this device belongs to
 node.requiredBusAccesses   :    |_ List of devices in the node that are actually used by at least one connection
 device                     :    |  |_ Instance of node.requiredBusAccesses (same properties as in node.devices)
 node.systemFunctions       :    |_ List of functions provided by the system/board

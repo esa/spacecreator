@@ -34,11 +34,14 @@ class DVNode : public DVObject
     Q_PROPERTY(QList<dvm::DVPartition *> partitions READ partitions)
     Q_PROPERTY(QList<dvm::DVDevice *> devices READ devices)
     Q_PROPERTY(QList<dvm::DVSystemFunction *> systemFunctions READ systemFunctions)
+    Q_PROPERTY(QString nodeLabel READ nodeLabel)
 
 public:
     explicit DVNode(const DVBoard &board, DVObject *parent = nullptr);
     explicit DVNode(DVObject *parent = nullptr);
     ~DVNode() override;
+
+    bool postInit() override;
 
     void addPartition(DVPartition *partition);
     void removePartition(DVPartition *partition);
@@ -55,7 +58,12 @@ public:
     DVSystemFunction *systemFunction(const QString &name) const;
     bool hasSystemFunction(const QString &name) const;
 
+    QString nodeLabel() const;
+
 private:
+    QString uniqueLabelName() const;
+    int nodeLabelCount(const QString &label) const;
+
     std::unique_ptr<DVNodePrivate> d;
 };
 

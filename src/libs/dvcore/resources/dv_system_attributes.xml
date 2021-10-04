@@ -5,6 +5,14 @@
         </Type>
         <Scopes/>
     </Attr>
+    <Attr label="Label" name="node_label" visible="false" editable="false">
+        <Type>
+        <String validator="[a-zA-Z][\w_]*(?(?&lt;=_)[a-zA-Z0-9])"/>
+        </Type>
+        <Scopes>
+            <Node/>
+        </Scopes>
+    </Attr>
     <Attr label="Config" name="config">
         <Type>
             <String/>

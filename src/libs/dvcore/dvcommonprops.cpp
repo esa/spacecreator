@@ -46,6 +46,7 @@ const QHash<QString, Props::Token> Props::TokensByName = {
     { "asn1file", Token::asn1file },
     { "asn1type", Token::asn1type },
     { "asn1module", Token::asn1module },
+    { "node_label", Token::node_label },
 
     { "from_node", Token::from_node },
     { "from_port", Token::from_port },

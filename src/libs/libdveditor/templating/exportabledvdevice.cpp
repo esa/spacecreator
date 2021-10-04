@@ -48,4 +48,13 @@ QString ExportableDVDevice::nodeName() const
     return node ? node->title() : "";
 }
 
+/*!
+   Label ob the node this device belongs to
+ */
+QString ExportableDVDevice::nodeLabel() const
+{
+    dvm::DVNode *node = exportedObject<dvm::DVDevice>()->node();
+    return node ? node->nodeLabel() : "";
+}
+
 } // namespace dve
