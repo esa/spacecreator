@@ -45,11 +45,25 @@ public:
     auto name() -> QString;
 
     /**
+     * @brief    Setter for the name of the declared variable
+     *
+     * @param    name   name of the declared variable
+     */
+    auto setName(const QString &name) -> void;
+
+    /**
      * @brief    Getter for the type
      *
      * @return   type of the declared variable
      */
     auto type() -> QString;
+
+    /**
+     * @brief    Setter for the type
+     *
+     * @param    type   type of the declared variable
+     */
+    auto setType(const QString &type) -> void;
 
 private:
     QString m_name = "";
