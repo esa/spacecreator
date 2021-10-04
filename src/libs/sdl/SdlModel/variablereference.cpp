@@ -31,4 +31,9 @@ const VariableDeclaration &VariableReference::declaration() const
     return m_declaration;
 }
 
+void VariableReference::setDeclaration(const VariableDeclaration &declaration)
+{
+    m_declaration = declaration;
+}
+
 } // namespace sdl

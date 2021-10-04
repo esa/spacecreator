@@ -37,14 +37,35 @@ const std::unique_ptr<StateMachine> &Process::stateMachine() const
     return m_stateMachine;
 }
 
+void Process::setStateMachine(std::unique_ptr<StateMachine> &stateMachine)
+{
+    m_stateMachine = std::move(stateMachine);
+}
+
 const std::vector<std::unique_ptr<VariableDeclaration>> &Process::variables() const
 {
     return m_variables;
 }
 
+void Process::setVariables(std::vector<std::unique_ptr<VariableDeclaration>> &variables)
+{
+    m_variables.clear();
+    for (auto &variable : variables) {
+        m_variables.push_back(std::move(variable));
+    }
+}
+
 const std::vector<std::unique_ptr<Procedure>> &Process::procedures() const
 {
     return m_procedures;
+}
+
+void Process::setProcedures(std::vector<std::unique_ptr<Procedure>> &procedures)
+{
+    m_procedures.clear();
+    for (auto &procedure : procedures) {
+        m_procedures.push_back(std::move(procedure));
+    }
 }
 
 void Process::accept(Visitor &visitor) const

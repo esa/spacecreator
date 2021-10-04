@@ -42,7 +42,7 @@ public:
      *
      * @return   name of the declared variable
      */
-    auto name() -> QString;
+    auto name() const -> QString;
 
     /**
      * @brief    Setter for the name of the declared variable
@@ -56,7 +56,7 @@ public:
      *
      * @return   type of the declared variable
      */
-    auto type() -> QString;
+    auto type() const -> QString;
 
     /**
      * @brief    Setter for the type

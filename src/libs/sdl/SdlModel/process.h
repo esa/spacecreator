@@ -80,7 +80,7 @@ public:
      *
      * @param   stateMachine a const reference to a pointer to the state machine
      */
-    auto setStateMachine(const std::unique_ptr<StateMachine> &stateMachine) -> void;
+    auto setStateMachine(std::unique_ptr<StateMachine> &stateMachine) -> void;
 
     /**
      * @brief   Getter for the variables declared in this process
@@ -94,7 +94,7 @@ public:
      *
      * @param   variables a const reference to a vector of pointers to variable declarations
      */
-    auto setVariables(const std::vector<std::unique_ptr<VariableDeclaration>> &variables) -> void;
+    auto setVariables(std::vector<std::unique_ptr<VariableDeclaration>> &variables) -> void;
 
     /**
      * @brief   Getter for the procedures declared in this process
@@ -108,7 +108,7 @@ public:
      *
      * @param   procedures a const reference to a vector of pointers to procedure
      */
-    auto setProcedures(const std::vector<std::unique_ptr<Procedure>> &procedures) -> void;
+    auto setProcedures(std::vector<std::unique_ptr<Procedure>> &procedures) -> void;
 
     /**
      * @brief  visitor acceptor (calls visit method of the given visitor)

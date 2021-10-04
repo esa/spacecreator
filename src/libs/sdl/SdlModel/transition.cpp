@@ -37,6 +37,14 @@ const std::vector<std::shared_ptr<Action>> &Transition::actions()
     return m_actions;
 }
 
+void Transition::setActions(std::vector<std::shared_ptr<Action>> &actions)
+{
+    m_actions.clear();
+    for (auto &action : actions) {
+        m_actions.push_back(std::move(action));
+    }
+}
+
 void Transition::accept(Visitor &visitor) const
 {
     visitor.visit(*this);

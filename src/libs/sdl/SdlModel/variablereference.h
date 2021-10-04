@@ -50,7 +50,7 @@ public:
      *
      * @param    declaration const reference to variable declaration
      */
-    auto setDeclaration(const VariableDeclaration &declaration) const -> void;
+    auto setDeclaration(const VariableDeclaration &declaration) -> void;
 
 private:
     VariableDeclaration &m_declaration;

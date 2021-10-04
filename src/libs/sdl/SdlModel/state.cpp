@@ -52,11 +52,26 @@ const std::vector<std::unique_ptr<Input>> &State::inputs() const
     return m_inputs;
 }
 
+void State::setInputs(std::vector<std::unique_ptr<Input>> &inputs)
+{
+    m_inputs.clear();
+    for (auto &input : inputs) {
+        m_inputs.push_back(std::move(input));
+    }
+}
+
 const std::vector<std::unique_ptr<ContinuousSignal>> &State::continuousSignals() const
 {
     return m_continuousSignals;
 }
 
+void State::setContinuousSignals(std::vector<std::unique_ptr<ContinuousSignal>> &continuousSignals)
+{
+    m_continuousSignals.clear();
+    for (auto &constinuousSignal : continuousSignals) {
+        m_continuousSignals.push_back(std::move(constinuousSignal));
+    }
+}
 void State::accept(Visitor &visitor) const
 {
     visitor.visit(*this);

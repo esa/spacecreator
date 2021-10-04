@@ -54,7 +54,7 @@ public:
      *
      * @param    const reference to the vector of pointers to actions
      */
-    auto setActions(const std::vector<std::shared_ptr<Action>> &actions) -> void;
+    auto setActions(std::vector<std::shared_ptr<Action>> &actions) -> void;
 
     /**
      * @brief  visitor acceptor (calls visit method of the given visitor)

@@ -90,7 +90,7 @@ public:
      *
      * @param   name model name
      */
-    auto setName(const QString &name) const -> void;
+    auto setName(const QString &name) -> void;
 
 private:
     /** @brief  Model data */

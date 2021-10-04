@@ -46,6 +46,11 @@ const std::shared_ptr<Transition> &Input::transition() const
     return m_transition;
 }
 
+void Input::setTransition(const std::shared_ptr<Transition> &transition)
+{
+    m_transition = transition;
+}
+
 void Input::accept(Visitor &visitor) const
 {
     visitor.visit(*this);

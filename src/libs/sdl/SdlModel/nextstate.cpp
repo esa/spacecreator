@@ -40,6 +40,11 @@ const std::shared_ptr<State> &NextState::state() const
     return m_state;
 }
 
+void NextState::setState(const std::shared_ptr<State> &state)
+{
+    m_state = state;
+}
+
 void NextState::accept(Visitor &visitor) const
 {
     visitor.visit(*this);

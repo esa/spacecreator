@@ -42,4 +42,9 @@ const QString &SdlModel::name() const
     return m_name;
 }
 
+void SdlModel::setName(const QString &name)
+{
+    m_name = name;
+}
+
 } // namespace sdl

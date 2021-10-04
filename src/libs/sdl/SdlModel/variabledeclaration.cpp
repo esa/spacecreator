@@ -27,14 +27,24 @@ VariableDeclaration::VariableDeclaration(const QString &name, const QString &typ
 {
 }
 
-QString VariableDeclaration::name()
+QString VariableDeclaration::name() const
 {
     return m_name;
 }
 
-QString VariableDeclaration::type()
+void VariableDeclaration::setName(const QString &name)
+{
+    m_name = name;
+}
+
+QString VariableDeclaration::type() const
 {
     return m_type;
+}
+
+void VariableDeclaration::setType(const QString &type)
+{
+    m_type = type;
 }
 
 } // namespace sdl
