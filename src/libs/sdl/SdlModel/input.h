@@ -42,6 +42,7 @@ public:
      * @param name    signal name
      */
     Input(const QString &name);
+
     /**
      * @brief   Constructor
      *
@@ -49,6 +50,7 @@ public:
      * @param transition  a pointer to the transition which should be triggered upon reception of this signal
      */
     Input(const QString &name, const std::shared_ptr<Transition> &transition);
+
     /**
      * @brief   Copy constructor
      */
@@ -57,10 +59,21 @@ public:
     /**
      * @brief   Getter for the transition
      *
-     * @return  Model type
+     * @return  a const reference to the pointer to transition which should be triggered upon reception of this signal
      */
     auto transition() const -> const std::shared_ptr<Transition> &;
 
+    /**
+     * @brief   Setter for the transition
+     *
+     * @param   transition a const reference to the pointer to transition which should be triggered upon reception of
+     *                     this signal
+     */
+    auto setTransition(const std::shared_ptr<Transition> &transition) -> void;
+
+    /**
+     * @brief  visitor acceptor (calls visit method of the given visitor)
+     */
     auto accept(Visitor &visitor) const -> void override;
 
 private:

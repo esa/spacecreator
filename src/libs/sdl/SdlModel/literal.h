@@ -37,12 +37,20 @@ public:
      * @param   value    value to store
      */
     Literal(const QString &value);
+
     /**
      * @brief   Getter for the stored value
      *
      * @return  stored value
      */
     auto value() const -> const QString &;
+
+    /**
+     * @brief   Setter for the stored value
+     *
+     * @param   value stored value
+     */
+    auto setValue(const QString &value) -> void;
 
 private:
     QString m_value = "";

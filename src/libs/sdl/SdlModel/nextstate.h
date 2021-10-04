@@ -41,6 +41,7 @@ public:
      * @param   name    name of the action
      */
     NextState(const QString &name);
+
     /**
      * @brief   Constructor
      *
@@ -55,6 +56,13 @@ public:
      * @return  next state
      */
     auto state() const -> const std::shared_ptr<State> &;
+
+    /**
+     * @brief   Setter for the next state
+     *
+     * @param   state next state
+     */
+    auto setState(const std::shared_ptr<State> &state) -> void;
 
     auto accept(Visitor &visitor) const -> void override;
 

@@ -45,6 +45,7 @@ public:
      * @param   name name to set
      */
     auto setName(const QString &name) -> void;
+
     /**
      * @brief   Getter for this node name
      *
