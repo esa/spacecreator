@@ -43,10 +43,12 @@ public:
      * @param name     name of this data model
      */
     explicit SdlModel(Data &data, const QString &name = "");
+
     /**
      * @brief   Deleted copy constructor/
      */
     SdlModel(const SdlModel &) = delete;
+
     /**
      * @brief   Default move constructor
      */
@@ -56,6 +58,7 @@ public:
      * @brief   Deleted copy assignment operator
      */
     SdlModel &operator=(const SdlModel &) = delete;
+
     /**
      * @brief   Deleted move assignment operator
      */

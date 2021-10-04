@@ -38,13 +38,50 @@ class ContinuousSignal
 class State : public Node
 {
 public:
+    /**
+     * @brief   Default constructor
+     */
     State();
+
+    /**
+     * @brief   Copy constructor
+     */
     State(const State &state);
+
+    /**
+     * @brief   Constructor
+     *
+     * @param   name              name of this state
+     * @param   inputs            a reference to a vector of pointers to inputs (inputs will be moved after call to this
+     *                            function)
+     * @param   continuousSignals a reference to a vector of pointers to continuous signals (continuous signals will be
+     *                            moved after call to this function)
+     */
     State(const QString &name, std::vector<std::unique_ptr<Input>> &inputs,
             std::vector<std::unique_ptr<ContinuousSignal>> &continuousSignals);
-    ~State();
+
+    /**
+     * @brief   Virtual destructor
+     */
+    virtual ~State();
+
+    /**
+     * @brief   Getter for the inputs (input signals)
+     *
+     * @return  a const reference to a vector of pointers to input signals
+     */
     auto inputs() const -> const std::vector<std::unique_ptr<Input>> &;
+
+    /**
+     * @brief   Getter for the continuous signals
+     *
+     * @return  a const reference to a vector of pointers to continuous signals
+     */
     auto continuousSignals() -> const std::vector<std::unique_ptr<ContinuousSignal>> &;
+
+    /**
+     * @brief  visitor acceptor (calls visit method of the given visitor)
+     */
     auto accept(Visitor &visitor) const -> void override;
 
 private:

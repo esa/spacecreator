@@ -28,11 +28,32 @@
 
 namespace sdl {
 
+/**
+ * @brief   Represents an SDL state machine
+ */
 class StateMachine
 {
 public:
+    /**
+     * @brief   Constructor
+     *
+     * @param   states      reference to the vector of pointers to states
+     * @param   transitions reference to the vector of pointers to transitions
+     */
     StateMachine(std::vector<std::shared_ptr<State>> &states, std::vector<std::shared_ptr<Transition>> &transitions);
+
+    /**
+     * @brief   Getter for the states of the state machine
+     *
+     * @return  const reference to a vector of pointers to states
+     */
     auto states() const -> const std::vector<std::shared_ptr<State>> &;
+
+    /**
+     * @brief   Getter for the transitions of the state machine
+     *
+     * @return  const reference to a vector of pointers to transitions
+     */
     auto transitions() const -> const std::vector<std::shared_ptr<Transition>> &;
 
 private:

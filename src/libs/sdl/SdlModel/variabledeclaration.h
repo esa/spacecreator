@@ -23,11 +23,32 @@
 
 namespace sdl {
 
+/**
+ * @brief   Represents an SDL variable declaration
+ */
 class VariableDeclaration
 {
 public:
+    /**
+     * @brief   Constructor
+     *
+     * @param   name   name of the declared variable
+     * @param   type   type of the declared variable
+     */
     VariableDeclaration(const QString &name, const QString &type);
+
+    /**
+     * @brief    Getter for the name of the declared variable
+     *
+     * @return   name of the declared variable
+     */
     auto name() -> QString;
+
+    /**
+     * @brief    Getter for the type
+     *
+     * @return   type of the declared variable
+     */
     auto type() -> QString;
 
 private:

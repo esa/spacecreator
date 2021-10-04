@@ -28,11 +28,30 @@
 
 namespace sdl {
 
+/**
+ * @brief   Represents an SDL transition
+ */
 class Transition : public Node
 {
 public:
+    /**
+     * @brief   Constructor
+     *
+     * @param   name    name of this transition
+     * @param   actions reference to the vector of pointers to actions
+     */
     Transition(const QString &name, std::vector<std::shared_ptr<Action>> &actions);
+
+    /**
+     * @brief    Getter for the actions
+     *
+     * @return   const reference to the vector of pointers to actions
+     */
     auto actions() -> const std::vector<std::shared_ptr<Action>> &;
+
+    /**
+     * @brief  visitor acceptor (calls visit method of the given visitor)
+     */
     auto accept(Visitor &visitor) const -> void;
 
 private:

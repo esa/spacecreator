@@ -25,11 +25,27 @@
 
 namespace sdl {
 
+/**
+ * @brief  Represents an SDL model signal
+ */
 class Signal : public Node
 {
 public:
+    /**
+     * @brief   Constructor
+     *
+     * @param name name of the signal
+     */
     Signal(const QString &name = "");
+
+    /**
+     * Virtual destructor
+     */
     virtual ~Signal();
+
+    /**
+     * @brief  visitor acceptor (calls visit method of the given visitor)
+     */
     auto accept(Visitor &visitor) const -> void override;
 };
 
