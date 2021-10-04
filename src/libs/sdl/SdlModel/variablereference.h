@@ -45,6 +45,13 @@ public:
      */
     auto declaration() const -> const VariableDeclaration &;
 
+    /**
+     * @brief    Setter for the referenced variable declaration
+     *
+     * @param    declaration const reference to variable declaration
+     */
+    auto setDeclaration(const VariableDeclaration &declaration) const -> void;
+
 private:
     VariableDeclaration &m_declaration;
 };
