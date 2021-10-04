@@ -13,7 +13,7 @@ space-creator:
     - export DOWNLOAD_DIR=/opt/qt-creator-dev
     - export BUILD_DIR=${PROJECT_ROOT}/build
     - export PACKAGE_DIR=${PROJECT_ROOT}/package
-    - export CMAKE_BUILD=-DCMAKE_BUILD_TYPE=Release
+    - export CMAKE_BUILD=-DCMAKE_BUILD_TYPE=RelWithDebInfo
     - export ENV_QT_BASE_DIR=${DOWNLOAD_DIR}/Qt/${ENV_QT_VERSION}/gcc_64
     - export QTC_SOURCE=${DOWNLOAD_DIR}/qt-creator
     - export QTC_INSTALL=${DOWNLOAD_DIR}/spacecreator.AppDir
@@ -51,9 +51,9 @@ space-creator:
     - cmake -GNinja -S ${PROJECT_ROOT} -B ${BUILD_DIR} ${CMAKE_BUILD} -DBUILD_PATCH_NUMBER=$CI_BUILD_ID -DENABLE_TESTS=OFF
     - cmake --build . --target all
     # Create .deb package
-    - cpack
+    #- cpack
     - mkdir -p ${PACKAGE_DIR}
-    - cp ${BUILD_DIR}/*.deb ${PACKAGE_DIR}
+    #- cp ${BUILD_DIR}/*.deb ${PACKAGE_DIR}
     # Create AppImage
     - ${PROJECT_ROOT}/scripts/create_appimage.sh
   cache:
