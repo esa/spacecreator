@@ -29,10 +29,13 @@
 
 namespace sdl {
 
+/**
+ * @brief   interface for SDL model visitors
+ */
 class Visitor
 {
 protected:
-    Visitor() {}
+    Visitor();
 
 public:
     virtual ~Visitor();

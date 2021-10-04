@@ -21,4 +21,6 @@
 
 using namespace sdl;
 
+Visitor::Visitor() {}
+
 Visitor::~Visitor() {}
