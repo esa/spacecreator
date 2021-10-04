@@ -25,6 +25,9 @@ namespace sdl {
 
 class Visitor;
 
+/**
+ * @brief   interface for SDL entities that could be visited
+ */
 class Node
 {
 protected:
@@ -36,7 +39,17 @@ public:
 
     virtual auto accept(Visitor &visitor) const -> void = 0;
 
+    /**
+     * @brief   Setter for this model type
+     *
+     * @param   name name to set
+     */
     auto setName(const QString &name) -> void;
+    /**
+     * @brief   Getter for this node name
+     *
+     * @return  node name
+     */
     auto name() const -> const QString &;
 
 private:
