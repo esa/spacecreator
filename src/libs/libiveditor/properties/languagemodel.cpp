@@ -118,20 +118,21 @@ bool LanguageModel::setData(const QModelIndex &index, const QVariant &value, int
         return false;
     }
 
+    auto setDefaultLanguage = [this](const QString &name, const QString &language) {
+        QVariantHash attrs = { { ivm::meta::Props::token(ivm::meta::Props::Token::default_language), name },
+            { ivm::meta::Props::token(ivm::meta::Props::Token::language), language } };
+        auto cmd = new cmd::CmdFunctionAttrChange(m_function, attrs);
+        m_cmdMacro->push(cmd);
+    };
+
     if (index.column() == Column::Default) {
         if (role == Qt::CheckStateRole) {
             QModelIndex oldDefault = defaultIndex();
             if (index == oldDefault) {
                 return false;
             }
-            QVariantHash attrs = { { ivm::meta::Props::token(ivm::meta::Props::Token::default_language),
-                    data(createIndex(index.row(), Column::Name)) } };
-            auto cmd = new cmd::CmdFunctionAttrChange(m_function, attrs);
-            m_cmdMacro->push(cmd);
-            attrs = { { ivm::meta::Props::token(ivm::meta::Props::Token::language),
-                    data(createIndex(index.row(), Column::Language)) } };
-            cmd = new cmd::CmdFunctionAttrChange(m_function, attrs);
-            m_cmdMacro->push(cmd);
+            setDefaultLanguage(data(createIndex(index.row(), Column::Name)).toString(),
+                    data(createIndex(index.row(), Column::Language)).toString());
             Q_EMIT dataChanged(oldDefault, oldDefault, QVector<int>() << role);
             Q_EMIT dataChanged(index, index, QVector<int>() << role);
             return true;
@@ -139,6 +140,8 @@ bool LanguageModel::setData(const QModelIndex &index, const QVariant &value, int
     }
     if ((role == Qt::DisplayRole || role == Qt::EditRole)
             && (index.column() == Column::Name || index.column() == Column::Language)) {
+        QModelIndex defaultIdx = createIndex(index.row(), Column::Default);
+        const bool isDefault = data(defaultIdx, Qt::CheckStateRole) == Qt::CheckState::Checked;
         EntityAttribute language = m_function->languages().at(index.row());
         if (index.column() == Column::Name) {
             QString name = uniqueName(value.toString());
@@ -150,6 +153,12 @@ bool LanguageModel::setData(const QModelIndex &index, const QVariant &value, int
         auto cmd = new cmd::CmdFunctionLanguageUpdate(m_function, index.row(), language);
         m_cmdMacro->push(cmd);
         Q_EMIT dataChanged(index, index, QVector<int>() << role);
+
+        if (isDefault) {
+            setDefaultLanguage(language.name(), language.value().toString());
+            Q_EMIT dataChanged(defaultIdx, defaultIdx, QVector<int>() << Qt::CheckStateRole);
+        }
+
         return true;
     }
 

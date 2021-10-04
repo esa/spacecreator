@@ -64,7 +64,6 @@ private Q_SLOTS:
 
 private:
     void setName(dvm::DVObject *obj, QStandardItem *item);
-    void setImplementation(dvm::DVFunction *fn, QStandardItem *item);
     void updateImplementation(dvm::DVFunction *fn);
     QStandardItem *implementationItem(dvm::DVFunction *fn);
 };

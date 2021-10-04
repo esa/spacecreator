@@ -219,7 +219,6 @@ bool IvSystemQueries::connectionExists(const QString &sourceFunction, const QStr
 
 QString IvSystemQueries::defaultImplementationForFunction(const QString &function) const
 {
-    qDebug() << Q_FUNC_INFO;
     ivm::IVFunction *fn = functionByName(function);
     if (!fn) {
         return {};

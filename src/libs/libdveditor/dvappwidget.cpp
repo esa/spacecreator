@@ -17,6 +17,7 @@
 
 #include "dvappwidget.h"
 
+#include "dveditorcore.h"
 #include "dvtreesortproxymodel.h"
 #include "implementationdelegate.h"
 #include "itemeditor/graphicsview.h"
@@ -58,22 +59,21 @@ void DVAppWidget::setGraphicsScene(QGraphicsScene *scene)
     ui->view->setScene(scene);
 }
 
-void DVAppWidget::setAadlModel(QAbstractItemModel *model)
+void DVAppWidget::setDVCore(DVEditorCore *core)
 {
-    m_dvTreeSortModel->setSourceModel(model);
+    m_dvCore = core;
+
+    m_dvTreeSortModel->setSourceModel(m_dvCore->itemTreeModel());
     m_selectionModel->setModel(m_dvTreeSortModel);
     ui->treeView->setModel(m_dvTreeSortModel);
     ui->treeView->setSortingEnabled(true);
     ui->treeView->setSelectionModel(m_selectionModel);
     ui->treeView->header()->setSectionResizeMode(0, QHeaderView::Stretch);
 
-    auto delegate = new ImplementationDelegate(ui->treeView);
+    auto delegate = new ImplementationDelegate(m_dvCore->commandsStack(), ui->treeView);
     ui->treeView->setItemDelegateForColumn(1, delegate);
-}
 
-void DVAppWidget::setHWModel(QAbstractItemModel *model)
-{
-    ui->hwLibraryView->setModel(model);
+    ui->hwLibraryView->setModel(m_dvCore->hwItemModel());
 }
 
 void DVAppWidget::setActions(const QVector<QAction *> &actions)

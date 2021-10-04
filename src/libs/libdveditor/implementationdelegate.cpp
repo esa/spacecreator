@@ -17,6 +17,8 @@
 
 #include "implementationdelegate.h"
 
+#include "commands/cmdentityattributechange.h"
+#include "commandsstackbase.h"
 #include "dvfunction.h"
 #include "dvtreeviewmodel.h"
 
@@ -24,8 +26,9 @@
 
 namespace dve {
 
-ImplementationDelegate::ImplementationDelegate(QObject *parent)
+ImplementationDelegate::ImplementationDelegate(shared::cmd::CommandsStackBase *commandsStack, QObject *parent)
     : QStyledItemDelegate(parent)
+    , m_commandsStack(commandsStack)
 {
 }
 
@@ -65,6 +68,14 @@ void ImplementationDelegate::setEditorData(QWidget *editor, const QModelIndex &i
 void ImplementationDelegate::setModelData(QWidget *editor, QAbstractItemModel *model, const QModelIndex &index) const
 {
     if (auto comboBox = qobject_cast<QComboBox *>(editor)) {
+        dvm::DVFunction *fn = index.data(dve::DVTreeViewModel::DVObjectRole).value<dvm::DVFunction *>();
+        if (fn) {
+            const QVariantHash attributes = {
+                { dvm::meta::Props::token(dvm::meta::Props::Token::selected_implementation), comboBox->currentText() }
+            };
+            auto attributesCmd = new shared::cmd::CmdEntityAttributeChange(fn, attributes);
+            m_commandsStack->push(attributesCmd);
+        }
         model->setData(index, comboBox->currentText());
         return;
     }

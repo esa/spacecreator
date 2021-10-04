@@ -19,7 +19,9 @@
 
 #include "commands/cmdentitiesremove.h"
 #include "commands/cmdfunctionattrchange.h"
+#include "commands/cmdfunctionlanguageupdate.h"
 #include "commands/cmdifaceattrchange.h"
+#include "ivfunction.h"
 #include "ivobject.h"
 #include "undocommand.h"
 
@@ -42,6 +44,8 @@ bool CommandsStack::push(QUndoCommand *command)
     if (auto nameCommand = dynamic_cast<CmdFunctionAttrChange *>(command)) {
         connect(nameCommand, &CmdFunctionAttrChange::nameChanged, this, &CommandsStack::nameChanged,
                 Qt::UniqueConnection);
+        connect(nameCommand, &CmdFunctionAttrChange::defaultImplementationChanged, this,
+                &CommandsStack::defaultImplementationChanged, Qt::UniqueConnection);
     }
     if (auto nameCommand = dynamic_cast<CmdIfaceAttrChange *>(command)) {
         connect(nameCommand, &CmdIfaceAttrChange::nameChanged, this, &CommandsStack::nameChanged, Qt::UniqueConnection);
@@ -49,6 +53,10 @@ bool CommandsStack::push(QUndoCommand *command)
     if (auto nameCommand = dynamic_cast<CmdEntitiesRemove *>(command)) {
         connect(nameCommand, &CmdEntitiesRemove::entitiesRemoved, this, &CommandsStack::entitiesRemoved,
                 Qt::UniqueConnection);
+    }
+    if (auto implCommand = dynamic_cast<CmdFunctionLanguageUpdate *>(command)) {
+        connect(implCommand, &CmdFunctionLanguageUpdate::implementationChanged, this,
+                &CommandsStack::implementationChanged, Qt::UniqueConnection);
     }
     m_undoStack->push(command);
     return true;

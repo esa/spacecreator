@@ -17,8 +17,15 @@
 
 #pragma once
 
+#include <QPointer>
 #include <QStringList>
 #include <QStyledItemDelegate>
+
+namespace shared {
+namespace cmd {
+class CommandsStackBase;
+}
+}
 
 namespace dve {
 
@@ -26,11 +33,14 @@ class ImplementationDelegate : public QStyledItemDelegate
 {
     Q_OBJECT
 public:
-    explicit ImplementationDelegate(QObject *parent = nullptr);
+    explicit ImplementationDelegate(shared::cmd::CommandsStackBase *commandsStack, QObject *parent = nullptr);
 
     QWidget *createEditor(QWidget *parent, const QStyleOptionViewItem &option, const QModelIndex &index) const override;
     void setEditorData(QWidget *editor, const QModelIndex &index) const override;
     void setModelData(QWidget *editor, QAbstractItemModel *model, const QModelIndex &index) const override;
+
+private:
+    QPointer<shared::cmd::CommandsStackBase> m_commandsStack;
 };
 
 } // namespace dve

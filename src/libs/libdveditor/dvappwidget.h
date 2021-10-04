@@ -30,6 +30,7 @@ class DVAppWidget;
 namespace dve {
 class DVTreeSortProxyModel;
 class GraphicsView;
+class DVEditorCore;
 
 class DVAppWidget : public QWidget
 {
@@ -42,14 +43,14 @@ public:
     QItemSelectionModel *selectionModel() const;
 
     void setGraphicsScene(QGraphicsScene *scene);
-    void setAadlModel(QAbstractItemModel *model);
-    void setHWModel(QAbstractItemModel *model);
+    void setDVCore(DVEditorCore *core);
     void setActions(const QVector<QAction *> &actions);
 
 private:
     Ui::DVAppWidget *ui = nullptr;
     QItemSelectionModel *m_selectionModel = nullptr;
     DVTreeSortProxyModel *m_dvTreeSortModel = nullptr;
+    DVEditorCore *m_dvCore = nullptr;
 };
 
 } // namespace dve

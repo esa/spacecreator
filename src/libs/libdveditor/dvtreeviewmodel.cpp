@@ -125,6 +125,9 @@ QList<QStandardItem *> DVTreeViewModel::createItems(shared::VEObject *obj)
         auto implItem = new QStandardItem(fn->usedImplementation());
         implItem->setData(QVariant::fromValue(obj), DVObjectRole);
         items.append(implItem);
+
+        connect(fn, &dvm::DVFunction::usedImplementationChanged, this,
+                [this]() { updateImplementation(qobject_cast<dvm::DVFunction *>(sender())); });
     }
 
     return items;
@@ -151,8 +154,7 @@ void DVTreeViewModel::onDataChanged(
                         setName(obj, item);
                         break;
                     case Columns::Implementation: {
-                        dvm::DVFunction *fn = qobject_cast<dvm::DVFunction *>(obj);
-                        setImplementation(fn, implementationItem(fn));
+                        // implementated in the delegate - to not set changes in the mode when triggered externally
                         break;
                     }
                     }
@@ -174,22 +176,6 @@ void DVTreeViewModel::setName(dvm::DVObject *obj, QStandardItem *item)
             updateItemData(item, obj);
         }
     }
-}
-
-void DVTreeViewModel::setImplementation(dvm::DVFunction *fn, QStandardItem *item)
-{
-    if (!fn) {
-        return;
-    }
-
-    if (item->text() == fn->implementation()) {
-        return;
-    }
-
-    const QVariantHash attributes = { { dvm::meta::Props::token(dvm::meta::Props::Token::selected_implementation),
-            item->text() } };
-    auto attributesCmd = new shared::cmd::CmdEntityAttributeChange(fn, attributes);
-    m_commandsStack->push(attributesCmd);
 }
 
 void DVTreeViewModel::updateImplementation(dvm::DVFunction *fn)

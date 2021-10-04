@@ -40,6 +40,10 @@ public:
     void undo() override;
     int id() const override;
 
+Q_SIGNALS:
+    void implementationChanged(
+            ivm::IVFunction *entity, const QString &newName, const QString &oldName, shared::UndoCommand *command);
+
 private:
     QPointer<ivm::IVFunction> m_function;
     int m_idx = -1;

@@ -88,8 +88,11 @@ public:
     bool saveAs();
     dve::DVExporter *exporter() const;
 
+    QAbstractItemModel *itemTreeModel() const;
+
     void loadHWLibrary(const QString &directory);
     void reloadHWLibrary();
+    QAbstractItemModel *hwItemModel() const;
 
     //
     void changeDvFunctionBindingName(const QString &oldName, const QString &name);
@@ -98,6 +101,8 @@ public:
             const QString &targetName, shared::MessageEnd msgSide);
     void removeDvMessageBinding(const QString &sourceFunction, const QString &sourceInterface,
             const QString &targetFunction, const QString &targetInterface);
+    void changeFunctionImplementationName(const QString &functionName, const QString &newName, const QString &oldName);
+    void changeDefaultImplementationNames();
 
 private Q_SLOTS:
     void showPropertyEditor(const shared::Id &id);

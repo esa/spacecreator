@@ -187,8 +187,7 @@ QWidget *DVEditorCore::mainwidget()
     if (!d->m_mainWidget) {
         d->m_mainWidget = new DVAppWidget;
         d->m_mainWidget->setGraphicsScene(d->m_model->scene());
-        d->m_mainWidget->setAadlModel(d->m_visualizationModel.get());
-        d->m_mainWidget->setHWModel(d->m_hwVisualizationModel.get());
+        d->m_mainWidget->setDVCore(this);
         d->m_mainWidget->setActions(initActions());
         connect(d->m_mainWidget->graphicsView(), &GraphicsView::importEntity, this, &DVEditorCore::importEntity);
         connect(d->m_mainWidget->selectionModel(), &QItemSelectionModel::selectionChanged, this,
@@ -312,6 +311,11 @@ DVExporter *DVEditorCore::exporter() const
     return d->m_exporter.get();
 }
 
+QAbstractItemModel *DVEditorCore::itemTreeModel() const
+{
+    return d->m_visualizationModel.get();
+}
+
 /*!
    Load the HW library from file in the given \p directory
  */
@@ -344,6 +348,11 @@ void DVEditorCore::loadHWLibrary(const QString &directory)
 void DVEditorCore::reloadHWLibrary()
 {
     loadHWLibrary(shared::hwLibraryPath());
+}
+
+QAbstractItemModel *DVEditorCore::hwItemModel() const
+{
+    return d->m_hwVisualizationModel.get();
 }
 
 /*!
@@ -461,6 +470,38 @@ void DVEditorCore::removeDvMessageBinding(const QString &sourceFunction, const Q
     }
 }
 
+void DVEditorCore::changeFunctionImplementationName(
+        const QString &functionName, const QString &newName, const QString &oldName)
+{
+    const QString implToken = dvm::meta::Props::token(dvm::meta::Props::Token::selected_implementation);
+    bool updated = false;
+    dvm::DVModel *model = d->m_appModel->objectsModel();
+    for (dvm::DVFunction *fn : model->allObjectsByType<dvm::DVFunction>()) {
+        if (fn->title() == functionName) {
+            QString value = fn->entityAttributeValue(implToken).toString();
+            if (value == oldName) {
+                const QVariantHash attributes = { { implToken, newName } };
+                auto cmd = new shared::cmd::CmdEntityAttributeChange(fn, attributes);
+                commandsStack()->push(cmd);
+                updated = true;
+            }
+            Q_EMIT fn->usedImplementationChanged(); // re-evaluate the used language
+        }
+    }
+
+    if (updated) {
+        Q_EMIT editedExternally(this);
+    }
+}
+
+void DVEditorCore::changeDefaultImplementationNames()
+{
+    dvm::DVModel *model = d->m_appModel->objectsModel();
+    for (dvm::DVFunction *fn : model->allObjectsByType<dvm::DVFunction>()) {
+        Q_EMIT fn->usedImplementationChanged(); // re-evaluate the used language
+    }
+}
+
 void DVEditorCore::showPropertyEditor(const shared::Id &id)
 {
     if (auto obj = d->m_appModel->objectsModel()->getObject(id)) {
@@ -539,5 +580,4 @@ void DVEditorCore::importEntity(const shared::Id &id, const QPointF &sceneDropPo
         }
     }
 }
-
 }

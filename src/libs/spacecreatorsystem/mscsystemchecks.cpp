@@ -69,6 +69,10 @@ void MscSystemChecks::setStorage(SpaceCreatorProject *storage)
                 &scs::MscSystemChecks::onEntityNameChanged);
         connect(ivCore->commandsStack(), &ive::cmd::CommandsStack::entitiesRemoved, this,
                 &scs::MscSystemChecks::onEntitiesRemoved);
+        connect(ivCore->commandsStack(), &ive::cmd::CommandsStack::implementationChanged, this,
+                &scs::MscSystemChecks::onImplementationChanged);
+        connect(ivCore->commandsStack(), &ive::cmd::CommandsStack::defaultImplementationChanged, this,
+                &scs::MscSystemChecks::onDefaultImplementationChanged);
     });
 }
 
@@ -591,4 +595,22 @@ void MscSystemChecks::onEntitiesRemoved(const QList<QPointer<ivm::IVObject>> &en
         }
     }
 }
+
+void MscSystemChecks::onImplementationChanged(
+        ivm::IVFunction *entity, const QString &newName, const QString &oldName, shared::UndoCommand *command)
+{
+    Q_UNUSED(command);
+    /// @todo ask user to update
+    for (const DVEditorCorePtr &dvCore : m_storage->allDVCores()) {
+        dvCore->changeFunctionImplementationName(entity->title(), newName, oldName);
+    }
+}
+
+void MscSystemChecks::onDefaultImplementationChanged()
+{
+    for (const DVEditorCorePtr &dvCore : m_storage->allDVCores()) {
+        dvCore->changeDefaultImplementationNames();
+    }
+}
+
 }
