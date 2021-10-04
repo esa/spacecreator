@@ -73,11 +73,25 @@ public:
     auto inputs() const -> const std::vector<std::unique_ptr<Input>> &;
 
     /**
+     * @brief   Setter for the inputs (input signals)
+     *
+     * @param   inputs a const reference to a vector of pointers to input signals
+     */
+    auto setInputs(const std::vector<std::unique_ptr<Input>> &inputs) -> void;
+
+    /**
      * @brief   Getter for the continuous signals
      *
      * @return  a const reference to a vector of pointers to continuous signals
      */
-    auto continuousSignals() -> const std::vector<std::unique_ptr<ContinuousSignal>> &;
+    auto continuousSignals() const -> const std::vector<std::unique_ptr<ContinuousSignal>> &;
+
+    /**
+     * @brief   Setter for the continuous signals
+     *
+     * @param   continuousSignals a const reference to a vector of pointers to continuous signals
+     */
+    auto setContinuousSignals(const std::vector<std::unique_ptr<ContinuousSignal>> &continuousSignals) -> void;
 
     /**
      * @brief  visitor acceptor (calls visit method of the given visitor)
