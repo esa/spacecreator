@@ -25,10 +25,24 @@
 
 namespace sdl {
 
+/**
+ * @brief   Represents an SDL variable reference
+ */
 class VariableReference
 {
 public:
+    /**
+     * @brief   Constructor
+     *
+     * @param   declaration   referenced variable declaration
+     */
     VariableReference(VariableDeclaration &declaration);
+
+    /**
+     * @brief    Getter for the referenced variable declaration
+     *
+     * @return   const reference to variable declaration
+     */
     auto declaration() const -> const VariableDeclaration &;
 
 private:
