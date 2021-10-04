@@ -44,13 +44,52 @@ public:
      * @param   stream   output stream (where the serialized values are put)
      */
     SdlVisitor(QTextStream &stream);
+    /**
+     * @brief   Explicitly deleted move constructor
+     */
     SdlVisitor(const QTextStream &&) = delete;
+
+    /**
+     * @brief   model visitor
+     *
+     * @param   model   model to be serialized
+     */
     auto visit(const SdlModel &model) const -> void override;
+    /**
+     * @brief   process visitor
+     *
+     * @param   process   process to be serialized
+     */
     auto visit(const Process &process) const -> void override;
+    /**
+     * @brief   state visitor
+     *
+     * @param   state   state to be serialized
+     */
     auto visit(const State &state) const -> void override;
+    /**
+     * @brief   input visitor
+     *
+     * @param   input   input to be serialized
+     */
     auto visit(const Input &input) const -> void override;
+    /**
+     * @brief   signal visitor
+     *
+     * @param   signal   signal to be serialized
+     */
     auto visit(const Signal &sig) const -> void override;
+    /**
+     * @brief   transition visitor
+     *
+     * @param   transition   transition to be serialized
+     */
     auto visit(const Transition &transition) const -> void override;
+    /**
+     * @brief   NEXTSTATE action visitor
+     *
+     * @param   nextstate   NEXTSTATE action to be serialized
+     */
     auto visit(const NextState &nextstate) const -> void override;
 
 private:
