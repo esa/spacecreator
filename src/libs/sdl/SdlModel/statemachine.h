@@ -50,11 +50,25 @@ public:
     auto states() const -> const std::vector<std::shared_ptr<State>> &;
 
     /**
+     * @brief   Setter for the states of the state machine
+     *
+     * @param   const reference to a vector of pointers to states
+     */
+    auto setStates(const std::vector<std::shared_ptr<State>> &states) const -> void;
+
+    /**
      * @brief   Getter for the transitions of the state machine
      *
      * @return  const reference to a vector of pointers to transitions
      */
     auto transitions() const -> const std::vector<std::shared_ptr<Transition>> &;
+
+    /**
+     * @brief   Setter for the transitions of the state machine
+     *
+     * @param   const reference to a vector of pointers to transitions
+     */
+    auto setTransitions(const std::vector<std::shared_ptr<Transition>> &transitions) const -> void;
 
 private:
     std::vector<std::shared_ptr<State>> m_states;
