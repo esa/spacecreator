@@ -27,11 +27,11 @@ State::State(const QString &name, std::vector<std::unique_ptr<Input>> &inputs,
         std::vector<std::unique_ptr<ContinuousSignal>> &continuousSignals)
     : Node(name)
 {
-    for (unsigned long int i = 0; i < inputs.size(); i++) {
-        m_inputs.push_back(std::move(inputs[i]));
+    for (auto &input : inputs) {
+        m_inputs.push_back(std::move(input));
     }
-    for (unsigned long int i = 0; i < continuousSignals.size(); i++) {
-        m_continuousSignals.push_back(std::move(continuousSignals[i]));
+    for (auto &constinuousSignal : continuousSignals) {
+        m_continuousSignals.push_back(std::move(constinuousSignal));
     }
 }
 
