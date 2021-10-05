@@ -85,13 +85,6 @@ public:
      */
     auto name() const -> const QString &;
 
-    /**
-     * @brief   Setter for model name
-     *
-     * @param   name model name
-     */
-    auto setName(const QString &name) -> void;
-
 private:
     /** @brief  Model data */
     Data &m_data;
