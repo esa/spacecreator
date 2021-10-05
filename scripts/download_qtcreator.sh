@@ -46,19 +46,18 @@ else
     exit 1
 fi
 
-LINUX_DIR="linux_64"
-# if version < 4.13
-if [ ${ENV_QTC_VERSION_SHORT} == "4.8" ]; then
-    LINUX_DIR="linux_gcc_64_rhel72"
+QTC_BASE_URL="https://download.qt.io/official_releases/qtcreator/${ENV_QTC_VERSION_SHORT}/${ENV_QTC_VERSION}/installer_source/linux_x64"
+if ! curl --head --silent --fail ${QTC_BASE_URL} > /dev/null; then
+    QTC_BASE_URL="https://download.qt.io/official_releases/qtcreator/${ENV_QTC_VERSION_SHORT}/${ENV_QTC_VERSION}/installer_source/linux_gcc_64_rhel72"
 fi
-
+echo "Loading QtCreator from ${QTC_BASE_URL}"
 
 # Grab the QtCreator binary
 cd "${DOWNLOAD_DIR}"
 export QTC_BINARY_FILE=qtcreator-${ENV_QTC_VERSION}.7z
 if [ ! -f "${QTC_BINARY_FILE}" ]; then
     echo "Downloading ${QTC_BINARY_FILE}"
-    curl -L "http://download.qt.io/official_releases/qtcreator/${ENV_QTC_VERSION_SHORT}/${ENV_QTC_VERSION}/installer_source/${LINUX_DIR}/qtcreator.7z" -o ${QTC_BINARY_FILE} -s
+    curl -L "${QTC_BASE_URL}/qtcreator.7z" -o ${QTC_BINARY_FILE} -s
 fi
 if [ ! -d "${QTC_INSTALL}" ]; then
     echo "Extracting QtCreator binary"
@@ -78,7 +77,7 @@ cd "${DOWNLOAD_DIR}"
 export QTC_DEV_FILE=qtcreator-${ENV_QTC_VERSION}_dev.7z
 if [ ! -f "${QTC_DEV_FILE}" ]; then
     echo "Downloading ${QTC_DEV_FILE}"
-    curl -L "http://download.qt.io/official_releases/qtcreator/${ENV_QTC_VERSION_SHORT}/${ENV_QTC_VERSION}/installer_source/${LINUX_DIR}/qtcreator_dev.7z" -o ${QTC_DEV_FILE} -s
+    curl -L "${QTC_BASE_URL}/qtcreator_dev.7z" -o ${QTC_DEV_FILE} -s
 fi
 HEADER_FILE=${QTC_INSTALL}/src/libs/extensionsystem/iplugin.h
 if [ ! -f "${LIB_FILE}" ]; then
