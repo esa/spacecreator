@@ -7,8 +7,7 @@ add_test(NAME ${TEST_NAME} COMMAND ${TEST_NAME})
 target_sources(${TEST_NAME}
     PRIVATE     ${TEST_NAME}.cpp)
 target_include_directories(${TEST_NAME}
-    PRIVATE     ${CMAKE_SOURCE_DIR}/src/libs
-    PRIVATE     ${CMAKE_SOURCE_DIR}/tests)
+    PRIVATE     ${CMAKE_SOURCE_DIR}/src/libs)
 target_link_libraries(${TEST_NAME}
     PRIVATE     SdlExporter
                 SdlModel

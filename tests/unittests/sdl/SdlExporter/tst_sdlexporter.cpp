@@ -27,7 +27,6 @@
 #include <sdl/SdlModel/nextstate.h>
 #include <sdl/SdlModel/process.h>
 #include <sdl/SdlModel/sdlmodel.h>
-#include <unittests/common/sdlmodelbuilder/sdlmodelbuilder.h>
 
 using conversion::ModelType;
 using conversion::Options;
