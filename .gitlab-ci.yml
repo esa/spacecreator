@@ -13,7 +13,7 @@ space-creator:
     - export DOWNLOAD_DIR=/opt/qt-creator-dev
     - export BUILD_DIR=${PROJECT_ROOT}/build
     - export PACKAGE_DIR=${PROJECT_ROOT}/package
-    - export CMAKE_BUILD=-DCMAKE_BUILD_TYPE=RelWithDebInfo
+    - export CMAKE_BUILD=-DCMAKE_BUILD_TYPE=Release
     - export ENV_QT_BASE_DIR=${DOWNLOAD_DIR}/Qt/${ENV_QT_VERSION}/gcc_64
     - export QTC_SOURCE=${DOWNLOAD_DIR}/qt-creator
     - export QTC_INSTALL=${DOWNLOAD_DIR}/spacecreator.AppDir
