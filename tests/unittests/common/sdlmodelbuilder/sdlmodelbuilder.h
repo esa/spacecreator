@@ -36,4 +36,4 @@ private:
     sdl::SdlModel::Data m_process;
 };
 
-} // namespace tests::conversion::common
+} // namespace tests::common

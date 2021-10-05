@@ -19,38 +19,23 @@
 
 #include "sdlmodelbuilder.h"
 
-using namespace seds::model;
+#include "sdl/SdlModel/statemachine.h"
 
-namespace tests::conversion::common {
+#include <memory>
+
+using namespace sdl;
+
+namespace tests::common {
 
 SdlModelBuilder::SdlModelBuilder(QString name)
 {
-    m_package.setName(std::move(name));
+    auto stateMachine = std::make_unique<sdl::StateMachine>();
+    m_process = sdl::Process(name, stateMachine);
 }
 
-std::unique_ptr<SedsModel> SdlModelBuilder::build()
+std::unique_ptr<SdlModel> SdlModelBuilder::build()
 {
-    PackageFile packageFile;
-    packageFile.setPackage(std::move(m_package));
-
-    return std::make_unique<SedsModel>(std::move(packageFile));
+    return std::make_unique<SdlModel>(std::move(m_process));
 }
 
-SdlModelBuilder &SdlModelBuilder::withIntegerDataType(QString name)
-{
-    IntegerDataType dataType;
-    dataType.setName(std::move(name));
-
-    m_package.addDataType(std::move(dataType));
-
-    return *this;
-}
-
-SdlModelBuilder &SdlModelBuilder::withComponent(Component component)
-{
-    m_package.addComponent(std::move(component));
-
-    return *this;
-}
-
-} // namespace tests::conversion::common
+} // namespace tests::common
