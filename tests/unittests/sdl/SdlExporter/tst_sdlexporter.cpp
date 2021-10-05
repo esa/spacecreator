@@ -44,7 +44,7 @@ using sdl::VariableDeclaration;
 using sdl::exporter::SdlExporter;
 using sdl::exporter::SdlOptions;
 
-namespace tests::conversion::Sdl {
+namespace tests::Sdl {
 
 class tst_sdlmodel : public QObject
 {
@@ -69,8 +69,27 @@ void tst_sdlmodel::testDefaultValuesInModel()
     QVERIFY(processName == data->name());
 }
 
+void verifyAndConsume(QTextStream &stream, const QString &string)
+{
+    QString line;
+    do {
+        line = stream.readLine();
+        if (line.contains(string)) {
+            return;
+        }
+    } while ((!line.isEmpty() || !line.contains(string)) && !stream.atEnd());
+
+    if (stream.atEnd()) {
+        QString message = QString("the generated file does not contain '%1' substring").arg(string);
+        QFAIL(message.toStdString().c_str());
+    }
+}
+
 void tst_sdlmodel::testGenerateProcess()
 {
+    QString modelName = "Example";
+    QString modelPrefix = "Sdl_";
+
     QString processName = "Modemanager";
 
     // transition from state to state
@@ -108,10 +127,10 @@ void tst_sdlmodel::testGenerateProcess()
     auto transitions = std::vector<std::shared_ptr<Transition>>();
     auto sm = std::make_unique<StateMachine>(states, transitions);
     Process process(processName, sm);
-    SdlModel exampleModel(process, "Example");
+    SdlModel exampleModel(process, modelName);
 
     Options options;
-    options.add(SdlOptions::sdlFilepathPrefix, "Sdl_");
+    options.add(SdlOptions::sdlFilepathPrefix, modelPrefix);
 
     SdlExporter exporter;
     try {
@@ -119,10 +138,28 @@ void tst_sdlmodel::testGenerateProcess()
     } catch (const std::exception &ex) {
         QFAIL(ex.what());
     }
+
+    QString filename = QString("%1%2.%3").arg(modelPrefix, modelName, "pr");
+    QFile outputFile(filename);
+    if (!outputFile.open(QIODevice::ReadOnly)) {
+        QFAIL("requested file cannot be found");
+    }
+    QTextStream consumableOutput(&outputFile);
+    verifyAndConsume(consumableOutput, "process Modemanager;");
+    verifyAndConsume(consumableOutput, "START;");
+    verifyAndConsume(consumableOutput, "NEXTSTATE");
+    verifyAndConsume(consumableOutput, "state Looping;");
+    verifyAndConsume(consumableOutput, "input some_input_name");
+    verifyAndConsume(consumableOutput, "NEXTSTATE -");
+    verifyAndConsume(consumableOutput, "endstate;");
+    verifyAndConsume(consumableOutput, "state Idle;");
+    verifyAndConsume(consumableOutput, "input some_other_input_name;");
+    verifyAndConsume(consumableOutput, "endstate;");
+    verifyAndConsume(consumableOutput, "endprocess Modemanager;");
 }
 
 } // namespace tests::sdl
 
-QTEST_MAIN(tests::conversion::Sdl::tst_sdlmodel)
+QTEST_MAIN(tests::Sdl::tst_sdlmodel)
 
 #include "tst_sdlexporter.moc"
