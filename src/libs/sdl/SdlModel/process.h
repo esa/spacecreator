@@ -54,19 +54,24 @@ public:
     Process(const QString &name, std::unique_ptr<StateMachine> &stateMachine);
 
     /**
-     * @brief deleted copy constructor
+     * @brief Deleted copy constructor
      */
     Process(const Process &) = delete;
 
     /**
-     * @brief deleted move constructor
+     * @brief Deleted move constructor
      */
-    Process(const Process &&) = delete;
+    Process(Process &&) = delete;
 
     /**
-     * @brief virtual destructor
+     * @brief Deleted copy assignment
      */
-    virtual ~Process();
+    Process &operator=(const Process &other) = delete;
+
+    /**
+     * @brief Deleted move assignment
+     */
+    Process &operator=(Process &&other) = delete;
 
     /**
      * @brief   Getter for the state machine

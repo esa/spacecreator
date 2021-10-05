@@ -30,8 +30,6 @@ Process::Process(const QString &name, std::unique_ptr<StateMachine> &stateMachin
     m_stateMachine = std::move(stateMachine);
 }
 
-Process::~Process() {}
-
 const std::unique_ptr<StateMachine> &Process::stateMachine() const
 {
     return m_stateMachine;
