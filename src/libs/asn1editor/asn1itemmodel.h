@@ -49,7 +49,7 @@ private:
 
     QStandardItem *createNumberItem(const Asn1Acn::Types::Type *asn1Item);
     QStandardItem *createBoolItem(const Asn1Acn::Types::Type *asn1Item);
-    QStandardItem *createChildItems(const Asn1Acn::Types::Type *asn1Item, QStandardItem *parent);
+    QStandardItem *createSequenceItem(const Asn1Acn::Types::Type *asn1Item, QStandardItem *parent);
     QStandardItem *createSequenceOfItem(const Asn1Acn::Types::Type *asn1Item, QStandardItem *parent);
     QStandardItem *createEnumeratedItem(const Asn1Acn::Types::Type *asn1Item);
     QStandardItem *createChoiceItem(const Asn1Acn::Types::Type *asn1Item, QStandardItem *parent);

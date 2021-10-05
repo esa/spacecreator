@@ -1,56 +1,100 @@
 <?xml version="1.0" encoding="utf-8"?>
-<ASN1AST>
+<AstRoot>
     <Asn1File FileName="/tmp/DataView.asn">
-        <Asn1Module ID="DataView">
+      <Modules>
+        <Module Name="DataView">
         <ExportedTypes>
             <ExportedType Name="My-Int" />
-            <ExportedType Name="My-Seq" /> 
+            <ExportedType Name="My-Seq" />
         </ExportedTypes>
         <ExportedVariables>
-         
         </ExportedVariables>
         <ImportedModules>
         </ImportedModules>
         <TypeAssignments>
             <TypeAssignment Name="My-Int" Line="3" CharPositionInLine="13">
-                <Type Line="3" CharPositionInLine="13" Asn1File="/tmp/DataView.asn">
-                    <IntegerType Min="0" Max="255"/>
-                </Type>
+                <Asn1Type id="DataView.My-Int" Line="3" CharPositionInLine="13" Asn1File="/tmp/DataView.asn">
+                    <INTEGER>
+                      <Constraints>
+                        <Range>
+                          <Min>
+                            <IntegerValue>0</IntegerValue>
+                          </Min>
+                          <Max>
+                            <IntegerValue>255</IntegerValue>
+                          </Max>
+                        </Range>
+                      </Constraints>
+                      <WithComponentConstraints />
+                    </INTEGER>
+                </Asn1Type>
             </TypeAssignment>
             <TypeAssignment Name="My-Seq" Line="5" CharPositionInLine="13">
-                <Type Line="5" CharPositionInLine="13" Asn1File="/tmp/DataView.asn">
-                    <SequenceType>
-                        <SequenceOrSetChild VarName="field-a" CName="field_a" AdaName="field_a" Optional="False" Line="6" CharPositionInLine="5" bAlwaysPresent = "True" bAlwaysAbsent="False">
-                            <Type Line="6" CharPositionInLine="13" Asn1File="/tmp/DataView.asn">
-                                <BooleanType />
-                            </Type>
-                        </SequenceOrSetChild>
-                        <SequenceOrSetChild VarName="field-b" CName="field_b" AdaName="field_b" Optional="False" Line="7" CharPositionInLine="5" bAlwaysPresent = "True" bAlwaysAbsent="False">
-                            <Type Line="7" CharPositionInLine="13" Asn1File="/tmp/DataView.asn">
-                                <ChoiceType>
-                                    <ChoiceChild VarName="choice1" Line="8" CharPositionInLine="7" EnumID ="choice1_PRESENT">
-                                        <Type Line="8" CharPositionInLine="15" Asn1File="/tmp/DataView.asn">
-                                            <BooleanType />
-                                        </Type>
-                                    </ChoiceChild>
-                                    <ChoiceChild VarName="choice2" Line="9" CharPositionInLine="7" EnumID ="choice2_PRESENT">
-                                        <Type Line="9" CharPositionInLine="15" Asn1File="/tmp/DataView.asn">
-                                            <SequenceOfType Min="1" Max="10">
-                                                <Type Line="9" CharPositionInLine="42" Asn1File="/tmp/DataView.asn">
-                                                    <ReferenceType ReferencedTypeName="My-Int" Min="0" Max="255"/>
-                                                </Type>
-                                            </SequenceOfType>
-                                        </Type>
-                                    </ChoiceChild>
-                                </ChoiceType>
-                            </Type>
-                        </SequenceOrSetChild>
-                    </SequenceType>
-                </Type>
+                <Asn1Type id="DataView.My-Seq" Line="5" CharPositionInLine="13" Asn1File="/tmp/DataView.asn">
+                    <SEQUENCE>
+                        <SEQUENCE_COMPONENT Name="field-a" CName="field_a" AdaName="field_a" Optional="False" Line="6" CharPositionInLine="5" bAlwaysPresent = "True" bAlwaysAbsent="False">
+                            <Asn1Type id="DataView.My-Seq.field-a" Line="6" CharPositionInLine="13" Asn1File="/tmp/DataView.asn">
+                                <BOOLEAN acnMaxSizeInBits="1" acnMinSizeInBits="1" uperMaxSizeInBits="1" uperMinSizeInBits="1">
+                                    <Constraints />
+                                    <WithComponentConstraints />
+                                </BOOLEAN>
+                            </Asn1Type>
+                        </SEQUENCE_COMPONENT>
+                        <SEQUENCE_COMPONENT Name="field-b" CName="field_b" AdaName="field_b" Optional="False" Line="7" CharPositionInLine="5" bAlwaysPresent = "True" bAlwaysAbsent="False">
+                            <Asn1Type id="DataView.My-Seq.field-b" Line="7" CharPositionInLine="13" Asn1File="/tmp/DataView.asn">
+                                <CHOICE>
+                                    <CHOICE_ALTERNATIVE Name="choice1" Line="8" CharPositionInLine="7" EnumID ="choice1_PRESENT">
+                                        <Asn1Type id="DataView.My-Seq.field-b.choice1" Line="8" CharPositionInLine="15" Asn1File="/tmp/DataView.asn">
+                                            <BOOLEAN acnMaxSizeInBits="1" acnMinSizeInBits="1" uperMaxSizeInBits="1" uperMinSizeInBits="1">
+                                                <Constraints />
+                                                <WithComponentConstraints />
+                                            </BOOLEAN>
+                                        </Asn1Type>
+                                    </CHOICE_ALTERNATIVE>
+                                    <CHOICE_ALTERNATIVE Name="choice2" Line="9" CharPositionInLine="7" EnumID ="choice2_PRESENT">
+                                        <Asn1Type id="DataView.My-Seq.field-b.choice2" Line="9" CharPositionInLine="15" Asn1File="/tmp/DataView.asn">
+                                            <SEQUENCE_OF>
+                                                <Constraints>
+                                                    <SIZE>
+                                                        <Range>
+                                                            <Min>
+                                                                <IntegerValue>1</IntegerValue>
+                                                            </Min>
+                                                            <Max>
+                                                                <IntegerValue>10</IntegerValue>
+                                                            </Max>
+                                                        </Range>
+                                                    </SIZE>
+                                                </Constraints>
+                                                <WithComponentConstraints />
+                                                <Asn1Type id="DataView.My-Seq.field-b.choice2-sequence" Line="9" CharPositionInLine="42" Asn1File="/tmp/DataView.asn">
+                                                    <REFERENCE_TYPE Module="DataView" ReferencedTypeName="My-Int">
+                                                        <Constraints>
+                                                            <Range>
+                                                            <Min>
+                                                                <IntegerValue>0</IntegerValue>
+                                                            </Min>
+                                                            <Max>
+                                                                <IntegerValue>255</IntegerValue>
+                                                            </Max>
+                                                            </Range>
+                                                        </Constraints>
+                                                        <WithComponentConstraints />
+                                                    </REFERENCE_TYPE>
+                                                </Asn1Type>
+                                            </SEQUENCE_OF>
+                                        </Asn1Type>
+                                    </CHOICE_ALTERNATIVE>
+                                </CHOICE>
+                            </Asn1Type>
+                        </SEQUENCE_COMPONENT>
+                    </SEQUENCE>
+                </Asn1Type>
             </TypeAssignment>
         </TypeAssignments>
         <VariablesAssignments>
         </VariablesAssignments>
-        </Asn1Module>
+        </Module>
+      </Modules>
     </Asn1File>
-</ASN1AST>
+</AstRoot>

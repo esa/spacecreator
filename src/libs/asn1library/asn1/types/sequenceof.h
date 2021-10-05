@@ -54,8 +54,8 @@ public:
     QString acnSize() const { return m_acnSize; }
     void setAcnSize(const QString &size) { m_acnSize = size; }
 
-    const Type &itemsType() const { return *m_itemsType; }
-    Type &itemsType() { return *m_itemsType; }
+    const Type *itemsType() const { return m_itemsType.get(); }
+    Type *itemsType() { return m_itemsType.get(); }
 
     void setItemsType(std::unique_ptr<Type> itemsType) { m_itemsType = std::move(itemsType); }
 

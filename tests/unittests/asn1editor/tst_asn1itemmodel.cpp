@@ -17,6 +17,7 @@
 
 #include "asn1editorconst.h"
 #include "asn1itemmodel.h"
+#include "asnsequencecomponent.h"
 #include "sourcelocation.h"
 #include "typeassignment.h"
 
@@ -164,10 +165,24 @@ void tst_Asn1ItemModel::testChoiceTypeModel()
 {
     Asn1Acn::SourceLocation location;
     auto type = std::make_unique<Asn1Acn::Types::Choice>();
-    auto choice1 = std::make_unique<Asn1Acn::Types::Integer>("choiceInt");
-    type->addChild(std::move(choice1));
-    auto choice2 = std::make_unique<Asn1Acn::Types::Real>("choiceReal");
-    type->addChild(std::move(choice2));
+    auto choice1 = std::make_unique<Asn1Acn::Types::ChoiceAlternative>(
+            "choiceInt",
+            "choiceInt",
+            "choiceInt",
+            "choiceInt",
+            "",
+            Asn1Acn::SourceLocation(),
+            std::make_unique<Asn1Acn::Types::Integer>("choiceInt"));
+    type->addComponent(std::move(choice1));
+    auto choice2 = std::make_unique<Asn1Acn::Types::ChoiceAlternative>(
+            "choiceReal",
+            "choiceReal",
+            "choiceReal",
+            "choiceReal",
+            "",
+            Asn1Acn::SourceLocation(),
+            std::make_unique<Asn1Acn::Types::Real>("choiceReal"));
+    type->addComponent(std::move(choice2));
     auto assignment = std::make_unique<Asn1Acn::TypeAssignment>("MyChoice", "MyChoice", location, std::move(type));
     itemModel->setAsn1Model(assignment);
 
@@ -192,12 +207,30 @@ void tst_Asn1ItemModel::testSequenceTypeModel()
 {
     Asn1Acn::SourceLocation location;
     auto type = std::make_unique<Asn1Acn::Types::Sequence>();
-    auto sequence1 = std::make_unique<Asn1Acn::Types::Integer>("intVal");
-    type->addChild(std::move(sequence1));
-    auto sequence2 = std::make_unique<Asn1Acn::Types::Real>("realVal");
-    type->addChild(std::move(sequence2));
-    auto sequence3 = std::make_unique<Asn1Acn::Types::Boolean>("boolVal");
-    type->addChild(std::move(sequence3));
+    auto sequence1 = std::make_unique<Asn1Acn::AsnSequenceComponent>(
+            "intVal",
+            "intVal",
+            false,
+            "",
+            Asn1Acn::SourceLocation(),
+            std::make_unique<Asn1Acn::Types::Integer>("intVal"));
+    type->addComponent(std::move(sequence1));
+    auto sequence2 = std::make_unique<Asn1Acn::AsnSequenceComponent>(
+            "realVal",
+            "realVal",
+            false,
+            "",
+            Asn1Acn::SourceLocation(),
+            std::make_unique<Asn1Acn::Types::Real>("realVal"));
+    type->addComponent(std::move(sequence2));
+    auto sequence3 = std::make_unique<Asn1Acn::AsnSequenceComponent>(
+            "boolVal",
+            "boolVal",
+            false,
+            "",
+            Asn1Acn::SourceLocation(),
+            std::make_unique<Asn1Acn::Types::Boolean>("boolVal"));
+    type->addComponent(std::move(sequence3));
     auto assignment = std::make_unique<Asn1Acn::TypeAssignment>("MySequence", "MySequence", location, std::move(type));
     itemModel->setAsn1Model(assignment);
 

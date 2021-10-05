@@ -19,8 +19,12 @@
 
 #include "asn1const.h"
 #include "typeassignment.h"
+#include "types/choice.h"
 #include "types/type.h"
 #include "types/userdefinedtype.h"
+#include "types/sequence.h"
+#include "types/sequenceof.h"
+#include "types/enumerated.h"
 
 #include <QVariant>
 
@@ -45,9 +49,9 @@ Asn1ValueParser::Asn1ValueParser(QObject *parent)
  * \return
  */
 QVariantMap Asn1ValueParser::parseAsn1Value(
-        const Asn1Acn::TypeAssignment *typeAssignemt, const QString &asn1Value, bool *valueOk) const
+        const Asn1Acn::TypeAssignment *typeAssignment, const QString &asn1Value, bool *valueOk) const
 {
-    return parseAsn1Value(typeAssignemt->type(), asn1Value, valueOk);
+    return parseAsn1Value(typeAssignment->type(), asn1Value, valueOk);
 }
 
 QVariantMap Asn1ValueParser::parseAsn1Value(
@@ -178,6 +182,12 @@ bool Asn1ValueParser::parseSequenceValue(
   seqVal { iVal 5 }
 }
 */
+    const auto *sequenceType = dynamic_cast<const Asn1Acn::Types::Sequence*>(asn1Type);
+    if (!sequenceType) {
+        Q_EMIT parseError(tr("Incorrect type while parsing sequence value"));
+        return false;
+    }
+
     QVariantList children;
     QVariantList parseList;
     QString value = asn1Value.trimmed();
@@ -212,10 +222,10 @@ bool Asn1ValueParser::parseSequenceValue(
     }
 
     for (const auto &field : parseList) {
-        const Asn1Acn::Types::Type *childType = getType(field.toMap()["name"].toString(), asn1Type);
+        const auto *sequenceComponent = sequenceType->component(field.toMap()["name"].toString());
 
-        if (childType) {
-            auto childValue = parseAsn1Value(childType, field.toMap()["value"].toString());
+        if (sequenceComponent && sequenceComponent->type()) {
+            auto childValue = parseAsn1Value(sequenceComponent->type(), field.toMap()["value"].toString());
 
             if (!childValue.isEmpty()) {
                 children.append(childValue);
@@ -240,6 +250,12 @@ bool Asn1ValueParser::parseSequenceOfValue(
 { { intVal 5, realVal 42.0 }, { intVal 6, realVal 13.9 } )
 
 */
+    const auto *sequenceOfType = dynamic_cast<const Asn1Acn::Types::SequenceOf*>(asn1Type);
+    if (!sequenceOfType) {
+        Q_EMIT parseError(tr("Incorrect type while parsing sequence of value"));
+        return false;
+    }
+
     QVariantList seqofValues;
     QString value = asn1Value.trimmed();
 
@@ -256,19 +272,20 @@ bool Asn1ValueParser::parseSequenceOfValue(
     while ((index = nextIndex(value))) {
         auto item = value.mid(0, index);
 
-        const Asn1Acn::Types::Type *itemType =
-                asn1Type->children().empty() ? asn1Type : asn1Type->children().at(0).get();
+        const auto *itemType = sequenceOfType->itemsType() ? sequenceOfType->itemsType() : asn1Type;
         auto itemValue = parseAsn1Value(itemType, item);
-        if (!itemValue.empty())
+        if (!itemValue.empty()) {
             seqofValues.append(itemValue);
-        else
+        } else {
             return false;
+        }
 
         if (index != -1) {
             value = value.remove(0, index).trimmed();
             value = value.remove(0, value.indexOf(",") + 1).trimmed();
-        } else
+        } else {
             break;
+        }
     }
 
     valueMap["seqofvalue"] = seqofValues;
@@ -286,47 +303,23 @@ bool Asn1ValueParser::parseSequenceOfValue(
 bool Asn1ValueParser::parseChoiceValue(
         const Asn1Acn::Types::Type *asn1Type, const QString &asn1Value, QVariantMap &valueMap) const
 {
+    const auto *choiceType = dynamic_cast<const Asn1Acn::Types::Choice*>(asn1Type);
+    if (!choiceType) {
+        Q_EMIT parseError(tr("Incorrect type while parsing choice value"));
+        return false;
+    }
+
     const QString name = asn1Value.left(asn1Value.indexOf(":")).trimmed();
 
-    const Asn1Acn::Types::Type *choiceType = getType(name, asn1Type);
-    if (choiceType) {
+    const auto *choiceComponent = choiceType->component(name);
+    if (choiceComponent && choiceComponent->type()) {
         const QString value = asn1Value.mid(asn1Value.indexOf(":") + 1).trimmed();
-        valueMap["choice"] = parseAsn1Value(choiceType, value);
+        valueMap["choice"] = parseAsn1Value(choiceComponent->type(), value);
 
         return true;
     }
 
     return false;
-}
-
-const Asn1Acn::Types::Type *Asn1ValueParser::getType(const QString &name, const Asn1Acn::Types::Type *asn1Type) const
-{
-    if (!asn1Type) {
-        return nullptr;
-    }
-
-    if (asn1Type->identifier() == name) {
-        return asn1Type;
-    }
-
-    // For user defined types check the referenced type
-    if (asn1Type->typeEnum() == Asn1Acn::Types::Type::USERDEFINED) {
-        auto userType = dynamic_cast<const Asn1Acn::Types::UserdefinedType *>(asn1Type);
-        if (userType && userType->referencedType() && userType->referencedType()->type()) {
-            if (userType->referencedType()->type()->identifier() == name) {
-                return userType->referencedType()->type();
-            }
-        }
-    }
-
-    for (const std::unique_ptr<Asn1Acn::Types::Type> &type : asn1Type->children()) {
-        const Asn1Acn::Types::Type *result = getType(name, type.get());
-        if (result) {
-            return result;
-        }
-    }
-
-    return nullptr;
 }
 
 bool Asn1ValueParser::checkRange(const QVariantMap &asn1Type, const QVariant &value) const

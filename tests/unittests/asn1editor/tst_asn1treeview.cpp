@@ -59,9 +59,18 @@ void tst_Asn1TreeView::cleanup()
 
 void tst_Asn1TreeView::testSetAsn1Value()
 {
+    QStringList errors;
+    QObject::connect(&m_parser, &Asn1Acn::Asn1Reader::parseError, [&errors](const QString &error) { errors << error; });
+
     m_types = m_parser.parseAsn1XmlFile(QFINDTESTDATA("DataView.xml"));
+
+    if(!errors.isEmpty()) {
+        QFAIL(errors.join("\n").toStdString().c_str());
+    }
+
     m_definitions = m_types->definitions("DataView");
     QVERIFY(m_definitions != nullptr);
+    QCOMPARE(m_definitions->types().size(), 2);
     const std::unique_ptr<Asn1Acn::TypeAssignment> &assignment = m_definitions->types().at(1);
     m_treeView->setAsn1Model(assignment);
 
@@ -92,6 +101,7 @@ void tst_Asn1TreeView::testSetIntValue()
     m_types = m_parser.parseAsn1XmlFile(QFINDTESTDATA("DataView.xml"));
     m_definitions = m_types->definitions("DataView");
     QVERIFY(m_definitions != nullptr);
+    QCOMPARE(m_definitions->types().size(), 2);
     const std::unique_ptr<Asn1Acn::TypeAssignment> &intType = m_definitions->types().at(0);
     m_treeView->setAsn1Model(intType);
     const QString value = "16";
@@ -105,6 +115,7 @@ void tst_Asn1TreeView::testSetSequenceValue()
     m_types = m_parser.parseAsn1XmlFile(QFINDTESTDATA("DataView.xml"));
     m_definitions = m_types->definitions("DataView");
     QVERIFY(m_definitions != nullptr);
+    QCOMPARE(m_definitions->types().size(), 2);
     const std::unique_ptr<Asn1Acn::TypeAssignment> &assignment = m_definitions->types().at(1);
     m_treeView->setAsn1Model(assignment);
     const QString value = "{ field-a  TRUE, field-b  choice1 : TRUE }";

@@ -90,9 +90,6 @@ public:
     const QVariantMap &parameters() const;
     void setParameters(const QVariantMap &parameters);
 
-    const std::vector<std::unique_ptr<Type>> &children() const;
-    void addChild(std::unique_ptr<Type> child);
-
     void setAlignToNext(const AlignToNext alignToNext) { m_alignment = alignToNext; }
     AlignToNext alignToNext() const { return m_alignment; }
 
@@ -105,12 +102,12 @@ public:
     static QString alignToNextToString(AlignToNext param);
     static QString endiannessToString(Endianness param);
 
-protected:
     void setIdentifier(const QString &name);
+
+protected:
 
     QString m_identifier;
     QVariantMap m_parameters;
-    std::vector<std::unique_ptr<Type>> m_children;
 
     AlignToNext m_alignment;
 

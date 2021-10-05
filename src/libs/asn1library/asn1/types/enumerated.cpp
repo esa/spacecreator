@@ -55,14 +55,6 @@ void Enumerated::accept(TypeReadingVisitor &visitor) const
     visitor.visit(*this);
 }
 
-QVariantList Enumerated::enumValues() const
-{
-    if (m_parameters.contains("values")) {
-        return m_parameters["values"].toList();
-    }
-    return {};
-}
-
 void Enumerated::addItem(const EnumeratedItem &item)
 {
     m_items.insert(item.name(), item);

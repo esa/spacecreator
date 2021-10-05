@@ -15,11 +15,16 @@
    along with this program. If not, see <https://www.gnu.org/licenses/lgpl-2.1.html>.
 */
 
+#include <iostream>
+
 #include "asn1itemmodel.h"
 
 #include "asn1const.h"
 #include "asn1editorconst.h"
 #include "typeassignment.h"
+#include "types/choice.h"
+#include "types/sequence.h"
+#include "types/sequenceof.h"
 #include "types/userdefinedtype.h"
 
 #include <QStandardItem>
@@ -91,7 +96,7 @@ Asn1ItemModel::ItemMap Asn1ItemModel::createModelItems(const Asn1Acn::Types::Typ
         valueItem = createBoolItem(asn1Item);
         break;
     case Asn1Acn::Types::Type::SEQUENCE:
-        valueItem = createChildItems(asn1Item, nameItem);
+        valueItem = createSequenceItem(asn1Item, nameItem);
         break;
     case Asn1Acn::Types::Type::SEQUENCEOF:
         valueItem = createSequenceOfItem(asn1Item, nameItem);
@@ -127,16 +132,12 @@ Asn1ItemModel::ItemMap Asn1ItemModel::createModelItems(const Asn1Acn::Types::Typ
         auto userType = static_cast<const Asn1Acn::Types::UserdefinedType *>(asn1Item);
         if (userType->referencedType()) {
             return createModelItems(userType->referencedType()->type(), asn1Item->identifier());
-        } else if (!asn1Item->children().empty()) {
-            valueItem = createItem(asn1Item->children().at(0).get());
         }
         break;
     }
     default:
-        if (!asn1Item->children().empty()) {
-            valueItem = createChildItems(asn1Item, nameItem);
-            valueItem->setEditable(false);
-        }
+        std::cerr << "Unhandled asn1 type\n";
+        break;
     }
 
     if (!valueItem) {
@@ -188,14 +189,16 @@ QStandardItem *Asn1ItemModel::createBoolItem(const Asn1Acn::Types::Type *asn1Ite
  * \param parent
  * \return
  */
-QStandardItem *Asn1ItemModel::createChildItems(const Asn1Acn::Types::Type *asn1Item, QStandardItem *parent)
+QStandardItem *Asn1ItemModel::createSequenceItem(const Asn1Acn::Types::Type *asn1Item, QStandardItem *parent)
 {
+    const auto *sequenceItem = dynamic_cast<const Asn1Acn::Types::Sequence*>(asn1Item);
+
     QList<QStandardItem *> typeItems;
     QList<QStandardItem *> valueItems;
     QList<QStandardItem *> presentItems;
 
-    for (const std::unique_ptr<Asn1Acn::Types::Type> &sequence : asn1Item->children()) {
-        ItemMap chilItem = createModelItems(sequence.get());
+    for (const auto &sequenceComponent : sequenceItem->components()) {
+        ItemMap chilItem = createModelItems(sequenceComponent->type(), sequenceComponent->name());
 
         parent->appendRow(chilItem["item"]);
 
@@ -219,12 +222,14 @@ QStandardItem *Asn1ItemModel::createChildItems(const Asn1Acn::Types::Type *asn1I
  */
 QStandardItem *Asn1ItemModel::createSequenceOfItem(const Asn1Acn::Types::Type *asn1Item, QStandardItem *parent)
 {
+    const auto *sequenceOfItem = dynamic_cast<const Asn1Acn::Types::SequenceOf*>(asn1Item);
+
     QList<QStandardItem *> typeItems;
     QList<QStandardItem *> valueItems;
     QList<QStandardItem *> presentItems;
 
-    if (!asn1Item->children().empty()) {
-        const Asn1Acn::Types::Type *type = asn1Item->children().at(0).get();
+    if (sequenceOfItem->itemsType()) {
+        const auto *type = sequenceOfItem->itemsType();
 
         if (type != nullptr) {
             for (int x = 0; x < asn1Item->parameters()[Asn1Acn::ASN1_MAX].toInt(); ++x) {
@@ -266,18 +271,20 @@ QStandardItem *Asn1ItemModel::createEnumeratedItem(const Asn1Acn::Types::Type *a
  */
 QStandardItem *Asn1ItemModel::createChoiceItem(const Asn1Acn::Types::Type *asn1Item, QStandardItem *parent)
 {
+    const auto *choiceItem = dynamic_cast<const Asn1Acn::Types::Choice*>(asn1Item);
+
     QList<QStandardItem *> typeItems;
     QList<QStandardItem *> valueItems;
     QList<QStandardItem *> presentItems;
     QVariantList chilsNames;
 
-    for (const std::unique_ptr<Asn1Acn::Types::Type> &choice : asn1Item->children()) {
-        ItemMap choiceItem = createModelItems(choice.get());
+    for (const auto &choiceAlternative : choiceItem->components()) {
+        ItemMap choiceItem = createModelItems(choiceAlternative->type(), choiceAlternative->name());
         parent->appendRow(choiceItem["item"]);
         typeItems.append(choiceItem["type"]);
         valueItems.append(choiceItem["value"]);
         presentItems.append(choiceItem["present"]);
-        chilsNames.append(choice->identifier());
+        chilsNames.append(choiceAlternative->name());
     }
 
     parent->appendColumn(typeItems);

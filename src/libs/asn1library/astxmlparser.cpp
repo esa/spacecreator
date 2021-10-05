@@ -206,6 +206,8 @@ public:
                                       readIntegerAttribute(QStringLiteral("Line")),
                                       readIntegerAttribute(QStringLiteral("CharPositionInLine")));
 
+        m_childType->setIdentifier(name);
+
         type.addComponent(std::make_unique<Types::ChoiceAlternative>(name,
                                                                            presentWhenName,
                                                                            adaNameAttribute,
@@ -224,6 +226,8 @@ public:
         SourceLocation location(m_currentFile,
                                       readIntegerAttribute(QStringLiteral("Line")),
                                       readIntegerAttribute(QStringLiteral("CharPositionInLine")));
+
+        m_childType->setIdentifier(name);
 
         type.addComponent(std::make_unique<AsnSequenceComponent>(name,
                                                                        cName,
@@ -1028,13 +1032,6 @@ void AstXmlParser::readEnumeratedItem(Types::Type &type)
 
 void AstXmlParser::readReferenceType(Types::Type &type)
 {
-    const TypeAssignment *assignment = m_currentDefinitions->type(type.typeName());
-    if (assignment) {
-        if (type.parameters().isEmpty()) {
-            type.setParameters(assignment->type()->parameters());
-        }
-    }
-
     while (m_xmlReader.readNextStartElement()) {
         if (m_xmlReader.name() == QStringLiteral("AcnArguments")) {
             readAcnArguments(type);

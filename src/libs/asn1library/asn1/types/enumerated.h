@@ -78,8 +78,6 @@ public:
 
     QString baseIconFile() const override { return QStringLiteral(":/asn1acn/images/outline/enumerated.png"); }
 
-    QVariantList enumValues() const;
-
     using Items = QMap<QString, EnumeratedItem>;
 
     const Items &items() const { return m_items; }

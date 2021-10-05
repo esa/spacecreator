@@ -507,8 +507,8 @@ void AstXmlParserTests::test_sequenceOfTypeAssingmentOfBuiltinType()
     const auto *seqOfType = dynamic_cast<const Types::SequenceOf *>(type->type());
     QVERIFY(seqOfType);
 
-    const auto &itemsType = seqOfType->itemsType();
-    QCOMPARE(itemsType.typeName(), QStringLiteral("INTEGER"));
+    const auto *itemsType = seqOfType->itemsType();
+    QCOMPARE(itemsType->typeName(), QStringLiteral("INTEGER"));
 }
 
 void AstXmlParserTests::test_valueAssignment()
@@ -929,10 +929,9 @@ void AstXmlParserTests::test_asn1AstReferenceParsing()
     QVERIFY(grid);
     const Asn1Acn::Types::SequenceOf *gridType = dynamic_cast<const Asn1Acn::Types::SequenceOf *>(grid->type());
     QVERIFY(gridType);
-    const auto &gridChild1 = gridType->itemsType();
-    QCOMPARE(gridChild1.typeEnum(), Asn1Acn::Types::Type::USERDEFINED);
-    QCOMPARE(gridChild1.typeName(), QString("Line"));
-    QCOMPARE(gridChild1.children().size(), 0);
+    const auto *gridChild1 = gridType->itemsType();
+    QCOMPARE(gridChild1->typeEnum(), Asn1Acn::Types::Type::USERDEFINED);
+    QCOMPARE(gridChild1->typeName(), QString("Line"));
 
     // Loading of second module
     const Asn1Acn::Definitions *definitions2 = m_parsedData["testmsc3.asn"]->definitions("TASTE-BasicTypes");

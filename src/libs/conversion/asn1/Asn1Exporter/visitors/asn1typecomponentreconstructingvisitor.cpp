@@ -112,7 +112,7 @@ void Asn1TypeComponentReconstructingVisitor::visit(const Types::SequenceOf &type
     m_outStream << QStringLiteral("SEQUENCE ") << toString(type.constraints()) << QStringLiteral(" OF ");
 
     Asn1TypeComponentReconstructingVisitor visitor(m_outStream, m_indent);
-    type.itemsType().accept(visitor);
+    type.itemsType()->accept(visitor);
 }
 
 void Asn1TypeComponentReconstructingVisitor::visit(const Types::Real &type)

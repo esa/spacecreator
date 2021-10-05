@@ -48,7 +48,6 @@ private:
             const Asn1Acn::Types::Type *asn1Type, const QString &asn1Value, QVariantMap &valueMap) const;
     bool parseChoiceValue(const Asn1Acn::Types::Type *asn1Type, const QString &asn1Value, QVariantMap &valueMap) const;
 
-    const Asn1Acn::Types::Type *getType(const QString &name, const Asn1Acn::Types::Type *asn1Type) const;
     bool checkRange(const QVariantMap &asn1Type, const QVariant &value) const;
 
     int nextIndex(const QString &value) const;
