@@ -35,6 +35,11 @@ class StateMachine
 {
 public:
     /**
+     * @brief    Default constructor
+     */
+    StateMachine();
+
+    /**
      * @brief   Constructor
      *
      * @param   states      reference to the vector of pointers to states

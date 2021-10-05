@@ -24,10 +24,30 @@
 
 namespace sdl {
 
+Process::Process()
+    : Node("")
+{
+}
+
 Process::Process(const QString &name, std::unique_ptr<StateMachine> &stateMachine)
     : Node(name)
 {
     m_stateMachine = std::move(stateMachine);
+}
+
+Process::Process(const Process &process)
+    : Node(process.name())
+{
+    m_procedures.clear();
+    m_variables.clear();
+
+    m_stateMachine = std::make_unique<StateMachine>(*process.stateMachine());
+    for (const auto &procedure : process.procedures()) {
+        m_procedures.push_back(std::make_unique<Procedure>(*procedure));
+    }
+    for (const auto &variable : process.variables()) {
+        m_variables.push_back(std::make_unique<VariableDeclaration>(*variable));
+    }
 }
 
 const std::unique_ptr<StateMachine> &Process::stateMachine() const

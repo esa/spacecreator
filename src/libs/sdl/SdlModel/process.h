@@ -47,6 +47,11 @@ class Process : public Node
 {
 public:
     /**
+     * @brief   Default constructor
+     */
+    Process();
+
+    /**
      * @brief   Constructor
      *
      * @param   stream   output stream (where the serialized values are put)
@@ -54,9 +59,9 @@ public:
     Process(const QString &name, std::unique_ptr<StateMachine> &stateMachine);
 
     /**
-     * @brief Deleted copy constructor
+     * @brief Copy constructor
      */
-    Process(const Process &) = delete;
+    Process(const Process &);
 
     /**
      * @brief Deleted move constructor

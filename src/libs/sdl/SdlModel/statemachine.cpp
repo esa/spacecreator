@@ -24,6 +24,8 @@
 
 namespace sdl {
 
+StateMachine::StateMachine() {}
+
 StateMachine::StateMachine(
         std::vector<std::shared_ptr<State>> &states, std::vector<std::shared_ptr<Transition>> &transitions)
 {

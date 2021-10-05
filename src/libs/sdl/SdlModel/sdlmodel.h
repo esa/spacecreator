@@ -42,7 +42,7 @@ public:
      * @param data     model data (Process)
      * @param name     name of this data model
      */
-    explicit SdlModel(Data &data, const QString &name = "");
+    explicit SdlModel(Data data, const QString &name = "");
 
     /**
      * @brief   Deleted copy constructor/
@@ -52,7 +52,7 @@ public:
     /**
      * @brief   Default move constructor
      */
-    SdlModel(SdlModel &&) = default;
+    SdlModel(SdlModel &&) = delete;
 
     /**
      * @brief   Deleted copy assignment operator
@@ -87,7 +87,7 @@ public:
 
 private:
     /** @brief  Model data */
-    Data &m_data;
+    Data m_data;
     /** @brief  Model name */
     QString m_name;
 };
