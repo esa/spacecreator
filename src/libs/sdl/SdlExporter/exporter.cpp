@@ -55,8 +55,8 @@ void SdlExporter::exportSdlModel(const SdlModel *const model, const Options &opt
     QString serializedModelData;
     QTextStream outputTextStream(&serializedModelData, QIODevice::WriteOnly);
 
-    sdl::SdlVisitor sdlvis(outputTextStream);
-    sdlvis.visit(*model);
+    sdl::SdlVisitor visitor(outputTextStream);
+    visitor.visit(*model);
 
     const auto pathPrefix = options.value(SdlOptions::sdlFilepathPrefix).value_or("");
     const auto filePath = makeFilePath(pathPrefix, model->name(), "pr");

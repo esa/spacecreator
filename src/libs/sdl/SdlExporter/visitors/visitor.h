@@ -30,22 +30,63 @@
 namespace sdl {
 
 /**
- * @brief   interface for SDL model visitors
+ * @brief   Interface for SDL model visitors
  */
 class Visitor
 {
-protected:
-    Visitor();
-
 public:
+    /**
+     * @brief   Virtual destructor
+     */
     virtual ~Visitor();
 
+    /**
+     * @brief   Model visitor
+     *
+     * @param   model   model to be visited
+     */
     virtual auto visit(const SdlModel &model) const -> void = 0;
+
+    /**
+     * @brief   Process visitor
+     *
+     * @param   process   process to be visited
+     */
     virtual auto visit(const Process &process) const -> void = 0;
+
+    /**
+     * @brief   State visitor
+     *
+     * @param   state   state to be visited
+     */
     virtual auto visit(const State &state) const -> void = 0;
+
+    /**
+     * @brief   Input visitor
+     *
+     * @param   input   input to be visited
+     */
     virtual auto visit(const Input &input) const -> void = 0;
+
+    /**
+     * @brief   Signal visitor
+     *
+     * @param   signal   signal to be visited
+     */
     virtual auto visit(const Signal &sig) const -> void = 0;
+
+    /**
+     * @brief   Transition visitor
+     *
+     * @param   transition   transition to be visited
+     */
     virtual auto visit(const Transition &transition) const -> void = 0;
+
+    /**
+     * @brief   NEXTSTATE action visitor
+     *
+     * @param   nextstate   NEXTSTATE action to be visited
+     */
     virtual auto visit(const NextState &nextstate) const -> void = 0;
 };
 

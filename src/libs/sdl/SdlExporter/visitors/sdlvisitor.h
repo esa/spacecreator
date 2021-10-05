@@ -46,6 +46,11 @@ public:
     SdlVisitor(QTextStream &stream);
 
     /**
+     * @brief   Virtual destructor
+     */
+    virtual ~SdlVisitor();
+
+    /**
      * @brief   Deleted move constructor
      */
     SdlVisitor(const QTextStream &&) = delete;

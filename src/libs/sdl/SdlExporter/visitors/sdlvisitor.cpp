@@ -29,6 +29,8 @@ SdlVisitor::SdlVisitor(QTextStream &stream)
 {
 }
 
+SdlVisitor::~SdlVisitor() {}
+
 void SdlVisitor::visit(const SdlModel &model) const
 {
     visit(model.data());
@@ -44,6 +46,7 @@ void SdlVisitor::visit(const Process &process) const
 
     // TODO: loop over procedures and export them
 
+    // TODO: initial transition (START) must be explicitly stated
     m_stream << "    /* CIF START (9, 285), (70, 35) */\n"
                 "    START;\n"
                 "        /* CIF NEXTSTATE (9, 335), (70, 35) */\n"
