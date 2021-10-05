@@ -3,19 +3,19 @@ project(SdlModel VERSION 1.0.0 LANGUAGES CXX)
 
 add_library(SdlModel STATIC)
 
-set(SOURCES sdlmodel.cpp
-            statemachine.cpp
-            state.cpp
-            signal.cpp
+set(SOURCES action.cpp
             input.cpp
             literal.cpp
-            transition.cpp
-            action.cpp
             nextstate.cpp
-            variabledeclaration.cpp
-            variablereference.cpp
             node.cpp
-            process.cpp)
+            process.cpp
+            sdlmodel.cpp
+            signal.cpp
+            state.cpp
+            statemachine.cpp
+            transition.cpp
+            variabledeclaration.cpp
+            variablereference.cpp)
 set(INCLUDES sdlmodel.h)
 
 target_sources(SdlModel
