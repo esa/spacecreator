@@ -26,17 +26,27 @@ namespace sdl {
 class Visitor;
 
 /**
- * @brief   interface for SDL entities that could be visited
+ * @brief   Interface for SDL entities that could be visited
  */
 class Node
 {
 protected:
-    Node(const QString &name);
+    /**
+     * @brief   Constructor
+     */
+    Node(QString name);
+
+    /**
+     * @brief   Deleted copy constructor
+     */
     Node(const Node &other) = delete;
 
 public:
     virtual ~Node();
 
+    /**
+     * @brief   Visitor acceptor (shall call visit method of the given visitor)
+     */
     virtual auto accept(Visitor &visitor) const -> void = 0;
 
     /**
@@ -44,7 +54,7 @@ public:
      *
      * @param   name name to set
      */
-    auto setName(const QString &name) -> void;
+    auto setName(QString name) -> void;
 
     /**
      * @brief   Getter for this node name

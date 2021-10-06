@@ -19,18 +19,20 @@
 
 #include "node.h"
 
+#include <memory>
+
 namespace sdl {
 
-Node::Node(const QString &name)
-    : m_name(name)
+Node::Node(QString name)
+    : m_name(std::move(name))
 {
 }
 
 Node::~Node() {}
 
-void Node::setName(const QString &name)
+void Node::setName(QString name)
 {
-    m_name = name;
+    m_name = std::move(name);
 }
 
 const QString &Node::name() const

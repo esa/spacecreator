@@ -36,7 +36,7 @@ public:
      *
      * @param name name of the signal
      */
-    Signal(const QString &name = "");
+    Signal(QString name = "");
 
     /**
      * Virtual destructor

@@ -19,13 +19,14 @@
 
 #include "state.h"
 
+#include <memory>
 #include <sdl/SdlExporter/visitors/visitor.h>
 
 namespace sdl {
 
-State::State(const QString &name, std::vector<std::unique_ptr<Input>> &inputs,
+State::State(QString name, std::vector<std::unique_ptr<Input>> &inputs,
         std::vector<std::unique_ptr<ContinuousSignal>> &continuousSignals)
-    : Node(name)
+    : Node(std::move(name))
 {
     for (auto &input : inputs) {
         m_inputs.push_back(std::move(input));

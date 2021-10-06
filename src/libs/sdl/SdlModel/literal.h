@@ -36,12 +36,12 @@ public:
      *
      * @param   value    value to store
      */
-    Literal(const QString &value);
+    Literal(QString value = "");
 
     /**
      * @brief   Getter for the stored value
      *
-     * @return  stored value
+     * @return  const reference to the stored value
      */
     auto value() const -> const QString &;
 
@@ -50,7 +50,7 @@ public:
      *
      * @param   value stored value
      */
-    auto setValue(const QString &value) -> void;
+    auto setValue(QString value) -> void;
 
 private:
     QString m_value = "";

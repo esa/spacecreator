@@ -19,10 +19,12 @@
 
 #include "action.h"
 
+#include <memory>
+
 namespace sdl {
 
-Action::Action(const QString &name)
-    : Node(name)
+Action::Action(QString name)
+    : Node(std::move(name))
 {
 }
 

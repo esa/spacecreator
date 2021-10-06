@@ -21,17 +21,13 @@
 
 #include "node.h"
 #include "statemachine.h"
+#include "variabledeclaration.h"
 
 #include <QString>
 #include <memory>
 #include <vector>
 
 namespace sdl {
-
-class VariableDeclaration
-{
-    // TODO: extract to a separate file
-};
 
 class Procedure
 {
@@ -56,7 +52,7 @@ public:
      *
      * @param   stream   output stream (where the serialized values are put)
      */
-    Process(const QString &name, std::unique_ptr<StateMachine> &stateMachine);
+    Process(QString name, std::unique_ptr<StateMachine> &stateMachine);
 
     /**
      * @brief Copy constructor
@@ -83,7 +79,7 @@ public:
      *
      * @return  a const reference to a pointer to the state machine
      */
-    auto stateMachine() const -> const std::unique_ptr<StateMachine> &;
+    auto stateMachine() const -> const StateMachine *;
 
     /**
      * @brief   Setter for the state machine

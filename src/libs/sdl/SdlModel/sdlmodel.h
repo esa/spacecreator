@@ -42,7 +42,7 @@ public:
      * @param data     model data (Process)
      * @param name     name of this data model
      */
-    explicit SdlModel(Data data, const QString &name = "");
+    explicit SdlModel(Data data, QString name = "");
 
     /**
      * @brief   Deleted copy constructor/

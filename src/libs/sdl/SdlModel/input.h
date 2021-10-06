@@ -41,7 +41,7 @@ public:
      *
      * @param name    signal name
      */
-    Input(const QString &name);
+    Input(QString name);
 
     /**
      * @brief   Constructor
@@ -49,7 +49,7 @@ public:
      * @param name        signal name
      * @param transition  a pointer to the transition which should be triggered upon reception of this signal
      */
-    Input(const QString &name, const std::shared_ptr<Transition> &transition);
+    Input(QString name, const std::shared_ptr<Transition> &transition);
 
     /**
      * @brief   Copy constructor

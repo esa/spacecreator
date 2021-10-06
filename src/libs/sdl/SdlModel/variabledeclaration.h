@@ -35,39 +35,39 @@ public:
      * @param   name   name of the declared variable
      * @param   type   type of the declared variable
      */
-    VariableDeclaration(const QString &name, const QString &type);
+    VariableDeclaration(QString name = "", QString type = "");
 
     /**
      * @brief    Getter for the name of the declared variable
      *
      * @return   name of the declared variable
      */
-    auto name() const -> QString;
+    auto name() const -> const QString &;
 
     /**
      * @brief    Setter for the name of the declared variable
      *
      * @param    name   name of the declared variable
      */
-    auto setName(const QString &name) -> void;
+    auto setName(QString name) -> void;
 
     /**
      * @brief    Getter for the type
      *
      * @return   type of the declared variable
      */
-    auto type() const -> QString;
+    auto type() const -> const QString &;
 
     /**
      * @brief    Setter for the type
      *
      * @param    type   type of the declared variable
      */
-    auto setType(const QString &type) -> void;
+    auto setType(QString type) -> void;
 
 private:
-    QString m_name = "";
-    QString m_type = "";
+    QString m_name;
+    QString m_type;
 };
 
 } // namespace sdl

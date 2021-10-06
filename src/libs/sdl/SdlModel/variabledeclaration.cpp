@@ -19,32 +19,34 @@
 
 #include "variabledeclaration.h"
 
+#include <memory>
+
 namespace sdl {
 
-VariableDeclaration::VariableDeclaration(const QString &name, const QString &type)
-    : m_name(name)
-    , m_type(type)
+VariableDeclaration::VariableDeclaration(QString name, QString type)
+    : m_name(std::move(name))
+    , m_type(std::move(type))
 {
 }
 
-QString VariableDeclaration::name() const
+const QString &VariableDeclaration::name() const
 {
     return m_name;
 }
 
-void VariableDeclaration::setName(const QString &name)
+void VariableDeclaration::setName(QString name)
 {
-    m_name = name;
+    m_name = std::move(name);
 }
 
-QString VariableDeclaration::type() const
+const QString &VariableDeclaration::type() const
 {
     return m_type;
 }
 
-void VariableDeclaration::setType(const QString &type)
+void VariableDeclaration::setType(QString type)
 {
-    m_type = type;
+    m_type = std::move(type);
 }
 
 } // namespace sdl

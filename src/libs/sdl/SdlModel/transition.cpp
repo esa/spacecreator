@@ -24,11 +24,11 @@
 
 namespace sdl {
 
-Transition::Transition(const QString &name, std::vector<std::shared_ptr<Action>> &actions)
-    : Node(name)
+Transition::Transition(QString name, std::vector<std::shared_ptr<Action>> &actions)
+    : Node(std::move(name))
 {
-    for (unsigned long int i = 0; i < actions.size(); i++) {
-        m_actions.push_back(std::move(actions[i]));
+    for (auto &action : actions) {
+        m_actions.push_back(std::move(action));
     }
 }
 

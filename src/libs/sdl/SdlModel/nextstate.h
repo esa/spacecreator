@@ -64,6 +64,9 @@ public:
      */
     auto setState(const std::shared_ptr<State> &state) -> void;
 
+    /**
+     * @brief  visitor acceptor (calls visit method of the given visitor)
+     */
     auto accept(Visitor &visitor) const -> void override;
 
 private:

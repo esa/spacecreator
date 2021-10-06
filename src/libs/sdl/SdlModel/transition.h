@@ -40,7 +40,7 @@ public:
      * @param   name    name of this transition
      * @param   actions reference to the vector of pointers to actions
      */
-    Transition(const QString &name, std::vector<std::shared_ptr<Action>> &actions);
+    Transition(QString name, std::vector<std::shared_ptr<Action>> &actions);
 
     /**
      * @brief    Getter for the actions

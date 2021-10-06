@@ -19,18 +19,19 @@
 
 #include "input.h"
 
+#include <memory>
 #include <sdl/SdlExporter/visitors/visitor.h>
 
 namespace sdl {
 
-Input::Input(const QString &name)
-    : Signal(name)
+Input::Input(QString name)
+    : Signal(std::move(name))
 {
     m_transition.reset();
 }
 
-Input::Input(const QString &name, const std::shared_ptr<Transition> &transition)
-    : Signal(name)
+Input::Input(QString name, const std::shared_ptr<Transition> &transition)
+    : Signal(std::move(name))
     , m_transition(transition)
 {
 }

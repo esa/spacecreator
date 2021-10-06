@@ -34,9 +34,9 @@ public:
     /**
      * @brief   Constructor
      *
-     * name     name of the element
+     * @param   name   name of the element
      */
-    Action(const QString &name);
+    Action(QString name = "");
 };
 
 } // namespace sdl

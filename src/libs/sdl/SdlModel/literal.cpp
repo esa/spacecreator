@@ -19,16 +19,23 @@
 
 #include "literal.h"
 
+#include <memory>
+
 namespace sdl {
 
-Literal::Literal(const QString &value)
-    : m_value(value)
+Literal::Literal(QString value)
+    : m_value(std::move(value))
 {
 }
 
 const QString &Literal::value() const
 {
     return m_value;
+}
+
+void Literal::setValue(QString value)
+{
+    m_value = std::move(value);
 }
 
 } // namespace sdl

@@ -29,10 +29,10 @@ Process::Process()
 {
 }
 
-Process::Process(const QString &name, std::unique_ptr<StateMachine> &stateMachine)
-    : Node(name)
+Process::Process(QString name, std::unique_ptr<StateMachine> &stateMachine)
+    : Node(std::move(name))
+    , m_stateMachine(std::move(stateMachine))
 {
-    m_stateMachine = std::move(stateMachine);
 }
 
 Process::Process(const Process &process)
@@ -50,9 +50,9 @@ Process::Process(const Process &process)
     }
 }
 
-const std::unique_ptr<StateMachine> &Process::stateMachine() const
+const StateMachine *Process::stateMachine() const
 {
-    return m_stateMachine;
+    return m_stateMachine.get();
 }
 
 void Process::setStateMachine(std::unique_ptr<StateMachine> &stateMachine)
