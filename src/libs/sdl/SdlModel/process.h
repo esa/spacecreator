@@ -62,7 +62,7 @@ public:
     /**
      * @brief Deleted move constructor
      */
-    Process(Process &&) = delete;
+    Process(Process &&) = default;
 
     /**
      * @brief Deleted copy assignment

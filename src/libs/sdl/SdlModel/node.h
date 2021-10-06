@@ -41,6 +41,11 @@ protected:
      */
     Node(const Node &other) = delete;
 
+    /**
+     * @brief   Move constructor
+     */
+    Node(Node &&) = default;
+
 public:
     virtual ~Node();
 

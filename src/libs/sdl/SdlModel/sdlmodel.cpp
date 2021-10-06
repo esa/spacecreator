@@ -22,7 +22,7 @@
 namespace sdl {
 
 SdlModel::SdlModel(Data data, QString name)
-    : m_data(data)
+    : m_data(std::move(data))
     , m_name(std::move(name))
 {
 }
