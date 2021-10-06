@@ -52,9 +52,9 @@ public:
     Input(QString name, const std::shared_ptr<Transition> &transition);
 
     /**
-     * @brief   Copy constructor
+     * @brief   Deleted copy constructor
      */
-    Input(const Input &input);
+    Input(const Input &input) = delete;
 
     /**
      * @brief   Getter for the transition
