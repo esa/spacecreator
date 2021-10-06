@@ -30,20 +30,20 @@ CmdFunctionLanguageUpdate::CmdFunctionLanguageUpdate(ivm::IVFunction *entity, in
     , m_newValues(values)
 {
     Q_ASSERT(m_function);
-    Q_ASSERT(idx >= 0 && idx < m_function->languages().size());
+    Q_ASSERT(idx >= 0 && idx < m_function->implementations().size());
 
-    m_oldValues = m_function->languages().at(m_idx);
+    m_oldValues = m_function->implementations().at(m_idx);
 }
 
 void CmdFunctionLanguageUpdate::redo()
 {
-    m_function->setLanguage(m_idx, m_newValues);
+    m_function->setImplementation(m_idx, m_newValues);
     Q_EMIT implementationChanged(m_function.data(), m_newValues.name(), m_oldValues.name(), this);
 }
 
 void CmdFunctionLanguageUpdate::undo()
 {
-    m_function->setLanguage(m_idx, m_oldValues);
+    m_function->setImplementation(m_idx, m_oldValues);
     Q_EMIT implementationChanged(m_function.data(), m_oldValues.name(), m_newValues.name(), this);
 }
 

@@ -19,7 +19,7 @@
             </Enumeration>
         </Type>
     </Attr>
-    <Attr label="DLanguage" name="default_language" visible="false">
+    <Attr label="Implementation" name="default_implementation" visible="false">
         <Scopes>
             <Function>
                 <AttrValidator name="is_type" value="NO"/>

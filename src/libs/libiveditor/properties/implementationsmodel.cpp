@@ -81,7 +81,7 @@ int ImplementationsModel::rowCount(const QModelIndex &parent) const
         return 0;
     }
 
-    return m_function->languages().count();
+    return m_function->implementations().count();
 }
 
 int ImplementationsModel::columnCount(const QModelIndex &parent) const
@@ -93,11 +93,11 @@ int ImplementationsModel::columnCount(const QModelIndex &parent) const
 
 QVariant ImplementationsModel::data(const QModelIndex &index, int role) const
 {
-    if (!index.isValid() || !m_function || m_function->languages().size() <= index.row()) {
+    if (!index.isValid() || !m_function || m_function->implementations().size() <= index.row()) {
         return QVariant();
     }
 
-    EntityAttribute attribute = m_function->languages().at(index.row());
+    EntityAttribute attribute = m_function->implementations().at(index.row());
 
     if (role == Qt::DisplayRole || role == Qt::EditRole) {
         switch (index.column()) {
@@ -110,7 +110,8 @@ QVariant ImplementationsModel::data(const QModelIndex &index, int role) const
     }
 
     if (role == Qt::CheckStateRole && index.column() == Column::Default) {
-        return m_function->defaultLanguage() == attribute.name() ? Qt::CheckState::Checked : Qt::CheckState::Unchecked;
+        return m_function->defaultImplementation() == attribute.name() ? Qt::CheckState::Checked
+                                                                       : Qt::CheckState::Unchecked;
     }
 
     if (role == Qt::FontRole && isImplementationUsed(index.row())) {
@@ -124,12 +125,12 @@ QVariant ImplementationsModel::data(const QModelIndex &index, int role) const
 
 bool ImplementationsModel::setData(const QModelIndex &index, const QVariant &value, int role)
 {
-    if (!index.isValid() || !m_function || m_function->languages().size() <= index.row()) {
+    if (!index.isValid() || !m_function || m_function->implementations().size() <= index.row()) {
         return false;
     }
 
     auto setDefaultLanguage = [this](const QString &name, const QString &language) {
-        QVariantHash attrs = { { ivm::meta::Props::token(ivm::meta::Props::Token::default_language), name },
+        QVariantHash attrs = { { ivm::meta::Props::token(ivm::meta::Props::Token::default_implementation), name },
             { ivm::meta::Props::token(ivm::meta::Props::Token::language), language } };
         auto cmd = new cmd::CmdFunctionAttrChange(m_function, attrs);
         m_cmdMacro->push(cmd);
@@ -152,7 +153,7 @@ bool ImplementationsModel::setData(const QModelIndex &index, const QVariant &val
             && (index.column() == Column::Name || index.column() == Column::Language)) {
         QModelIndex defaultIdx = createIndex(index.row(), Column::Default);
         const bool isDefault = data(defaultIdx, Qt::CheckStateRole) == Qt::CheckState::Checked;
-        EntityAttribute language = m_function->languages().at(index.row());
+        EntityAttribute language = m_function->implementations().at(index.row());
         if (index.column() == Column::Name) {
             QString name = uniqueName(value.toString());
             language.setName(name);
@@ -226,8 +227,8 @@ QModelIndex ImplementationsModel::defaultIndex() const
     }
 
     int row = 0;
-    for (const EntityAttribute &attribute : m_function->languages()) {
-        if (attribute.name() == m_function->defaultLanguage()) {
+    for (const EntityAttribute &attribute : m_function->implementations()) {
+        if (attribute.name() == m_function->defaultImplementation()) {
             return index(row, Column::Default);
         }
         ++row;
@@ -238,11 +239,11 @@ QModelIndex ImplementationsModel::defaultIndex() const
 
 bool ImplementationsModel::isImplementationUsed(int row) const
 {
-    if (!m_checks || row < 0 || row >= m_function->languages().size()) {
+    if (!m_checks || row < 0 || row >= m_function->implementations().size()) {
         return false;
     }
 
-    const QString name = m_function->languages().at(row).name();
+    const QString name = m_function->implementations().at(row).name();
     return m_checks->isImplementationUsed(m_function, name);
 }
 
@@ -254,7 +255,7 @@ QString ImplementationsModel::uniqueName(const QString &name)
 
     QString checkedName = name;
     int count = 0;
-    while (m_function->hasLanguageName(checkedName)) {
+    while (m_function->hasImplementationName(checkedName)) {
         checkedName = name + QString("_%1").arg(++count);
     }
 

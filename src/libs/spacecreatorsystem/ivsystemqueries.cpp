@@ -224,7 +224,7 @@ QString IvSystemQueries::defaultImplementationForFunction(const QString &functio
         return {};
     }
 
-    return fn->defaultLanguage();
+    return fn->defaultImplementation();
 }
 
 QStringList IvSystemQueries::implementationsForFunction(const QString &function) const
@@ -235,7 +235,7 @@ QStringList IvSystemQueries::implementationsForFunction(const QString &function)
     }
 
     QStringList implementations;
-    for (const EntityAttribute &lang : fn->languages()) {
+    for (const EntityAttribute &lang : fn->implementations()) {
         implementations.append(lang.name());
     }
     return implementations;

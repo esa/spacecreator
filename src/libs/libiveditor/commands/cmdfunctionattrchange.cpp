@@ -71,7 +71,7 @@ void CmdFunctionAttrChange::redo()
         Q_EMIT nameChanged(m_entity, oldName, this);
     }
 
-    if (m_newAttrs.contains(ivm::meta::Props::token((ivm::meta::Props::Token::default_language)))) {
+    if (m_newAttrs.contains(ivm::meta::Props::token((ivm::meta::Props::Token::default_implementation)))) {
         Q_EMIT defaultImplementationChanged(m_entity);
     }
 
@@ -88,7 +88,7 @@ void CmdFunctionAttrChange::undo()
         Q_EMIT nameChanged(m_entity, oldName, this);
     }
 
-    if (m_newAttrs.contains(ivm::meta::Props::token((ivm::meta::Props::Token::default_language)))) {
+    if (m_newAttrs.contains(ivm::meta::Props::token((ivm::meta::Props::Token::default_implementation)))) {
         Q_EMIT defaultImplementationChanged(m_entity);
     }
 }

@@ -30,20 +30,20 @@ CmdFunctionLanguageInsert::CmdFunctionLanguageInsert(ivm::IVFunction *entity, in
     , m_newValues(values)
 {
     Q_ASSERT(m_function);
-    Q_ASSERT(idx >= 0 && idx < m_function->languages().size() + 1);
+    Q_ASSERT(idx >= 0 && idx < m_function->implementations().size() + 1);
 }
 
 void CmdFunctionLanguageInsert::redo()
 {
     if (m_function) {
-        m_function->insertLanguage(m_idx, m_newValues);
+        m_function->insertImplementation(m_idx, m_newValues);
     }
 }
 
 void CmdFunctionLanguageInsert::undo()
 {
     if (m_function) {
-        m_function->removeLanguage(m_idx);
+        m_function->removeImplementation(m_idx);
     }
 }
 

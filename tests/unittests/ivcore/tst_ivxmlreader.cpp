@@ -136,12 +136,12 @@ void IVXMLReader::test_readFunction()
 void IVXMLReader::test_readFunctionLanguages()
 {
     QByteArray xml("<InterfaceView>"
-                   "<Function name=\"BigMamma\" is_type=\"NO\" default_language=\"default\">"
+                   "<Function name=\"BigMamma\" is_type=\"NO\" default_implementation=\"default\">"
                    "<ContextParameter name=\"duration\" type=\"MyInt\" value=\"60\"/>"
-                   "<Languages>"
-                   "<ComputeLanguage name=\"default\" language=\"cpp\"/>"
-                   "<ComputeLanguage name=\"secondary\" language=\"SDL\"/>"
-                   "</Languages></Function></InterfaceView>");
+                   "<Implementations>"
+                   "<Implementation name=\"default\" language=\"cpp\"/>"
+                   "<Implementation name=\"secondary\" language=\"SDL\"/>"
+                   "</Implementations></Function></InterfaceView>");
 
     QBuffer buffer(&xml);
     buffer.open(QIODevice::ReadOnly | QIODevice::Text);
@@ -154,13 +154,13 @@ void IVXMLReader::test_readFunctionLanguages()
     QCOMPARE(objectsList.size(), 1);
     ivm::IVFunction *function = qobject_cast<ivm::IVFunction *>(objectsList[0]);
     QVERIFY(function != nullptr);
-    QCOMPARE(function->languages().size(), 2);
+    QCOMPARE(function->implementations().size(), 2);
 
-    const EntityAttribute &lang1 = function->languages().at(0);
+    const EntityAttribute &lang1 = function->implementations().at(0);
     QCOMPARE(lang1.name(), "default");
     QCOMPARE(lang1.value(), "cpp");
 
-    const EntityAttribute &lang2 = function->languages().at(1);
+    const EntityAttribute &lang2 = function->implementations().at(1);
     QCOMPARE(lang2.name(), "secondary");
     QCOMPARE(lang2.value(), "SDL");
 }

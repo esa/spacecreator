@@ -29,21 +29,21 @@ CmdFunctionLanguageRemove::CmdFunctionLanguageRemove(ivm::IVFunction *entity, in
     , m_idx(idx)
 {
     Q_ASSERT(m_function);
-    Q_ASSERT(idx >= 0 && idx < m_function->languages().size() + 1);
-    m_value = m_function->languages().at(idx);
+    Q_ASSERT(idx >= 0 && idx < m_function->implementations().size() + 1);
+    m_value = m_function->implementations().at(idx);
 }
 
 void CmdFunctionLanguageRemove::redo()
 {
     if (m_function) {
-        m_function->removeLanguage(m_idx);
+        m_function->removeImplementation(m_idx);
     }
 }
 
 void CmdFunctionLanguageRemove::undo()
 {
     if (m_function) {
-        m_function->insertLanguage(m_idx, m_value);
+        m_function->insertImplementation(m_idx, m_value);
     }
 }
 

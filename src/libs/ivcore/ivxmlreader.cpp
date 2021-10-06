@@ -246,14 +246,14 @@ void IVXMLReader::processTagOpen(QXmlStreamReader &xml)
         }
         break;
     }
-    case Props::Token::Languages: {
-        // Container for list of languages only
+    case Props::Token::Implementations: {
+        // Container for list of implementations only
         break;
     }
-    case Props::Token::ComputeLanguage: {
+    case Props::Token::Implementation: {
         auto fn = qobject_cast<ivm::IVFunction *>(d->m_currentObject.get().data());
         if (fn) {
-            fn->addLanguage(attrValue(attrs, Props::Token::name), attrValue(attrs, Props::Token::language));
+            fn->addImplementation(attrValue(attrs, Props::Token::name), attrValue(attrs, Props::Token::language));
         }
         break;
     }

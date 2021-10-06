@@ -108,14 +108,15 @@ void tst_XmlDocExporter::testExportFunctions()
     const QByteArray text = testFileContent();
     const QByteArray expected = "<?xml version=\"1.0\"?>\n<InterfaceView>\n"
                                 "    <Function name=\"TestFunc1\" is_type=\"NO\" instance_of=\"\" language=\"SDL\" "
-                                "default_language=\"default\" foo=\"11\">\n"
+                                "default_implementation=\"default\" foo=\"11\">\n"
                                 "        <Property name=\"bar\" value=\"22\"/>\n"
                                 "        <ContextParameter name=\"Mo\" type=\"MyInt\" value=\"33\"/>\n"
-                                "        <Languages>\n"
-                                "           <ComputeLanguage name=\"default\" language=\"SDL\"/>\n"
-                                "        </Languages>\n"
+                                "        <Implementations>\n"
+                                "           <Implementation name=\"default\" language=\"SDL\"/>\n"
+                                "        </Implementations>\n"
                                 "    </Function>\n"
                                 "</InterfaceView>";
+    qWarning() << text;
     QVERIFY(XmlData(expected) == XmlData(text));
 }
 
@@ -151,11 +152,11 @@ void tst_XmlDocExporter::testExportNestedComment()
     const QByteArray text = testFileContent();
     const QByteArray expected = "<?xml version=\"1.0\"?>\n<InterfaceView>\n"
                                 "    <Function name=\"TestFunc1\" is_type=\"NO\" instance_of=\"\" language=\"SDL\" "
-                                "default_language=\"default\">\n"
+                                "default_implementation=\"default\">\n"
                                 "        <Comment name=\"TestComment1\"/>\n"
-                                "        <Languages>\n"
-                                "           <ComputeLanguage name=\"default\" language=\"SDL\"/>\n"
-                                "        </Languages>\n"
+                                "        <Implementations>\n"
+                                "           <Implementation name=\"default\" language=\"SDL\"/>\n"
+                                "        </Implementations>\n"
                                 "    </Function>\n"
                                 "</InterfaceView>";
     QVERIFY(XmlData(expected) == XmlData(text));
