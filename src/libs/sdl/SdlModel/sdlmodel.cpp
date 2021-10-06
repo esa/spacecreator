@@ -29,7 +29,7 @@ SdlModel::SdlModel(Data data, QString name)
 
 conversion::ModelType SdlModel::modelType() const
 {
-    return conversion::ModelType::Sdl;
+    return conversion::ModelProperties<SdlModel>::type;
 }
 
 const SdlModel::Data &SdlModel::data() const
