@@ -40,9 +40,9 @@ public:
     StateMachine() = default;
 
     /**
-     * @brief    Default copy constructor
+     * @brief    Deleted copy constructor
      */
-    StateMachine(const StateMachine &) = default;
+    StateMachine(const StateMachine &) = delete;
 
     /**
      * @brief   Default move constructor

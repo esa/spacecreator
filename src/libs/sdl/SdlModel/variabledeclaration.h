@@ -38,9 +38,9 @@ public:
     VariableDeclaration(QString name = "", QString type = "");
 
     /**
-     * @brief   Default copy constructor
+     * @brief   Deleted copy constructor
      */
-    VariableDeclaration(const VariableDeclaration &) = default;
+    VariableDeclaration(const VariableDeclaration &) = delete;
 
     /**
      * @brief   Default move constructor

@@ -32,6 +32,31 @@ namespace sdl {
 class Procedure
 {
     // TODO: extract to a separate file
+
+    /**
+     * @brief   Default constructor
+     */
+    Procedure() = default;
+
+    /**
+     * @brief   Deleted move constructor
+     */
+    Procedure(const Procedure &) = delete;
+
+    /**
+     * @brief   Default move constructor
+     */
+    Procedure(Procedure &&) = default;
+
+    /**
+     * @brief   Deleted copy assignment operator
+     */
+    Procedure &operator=(const Procedure &) = delete;
+
+    /**
+     * @brief   Default move assignment operator
+     */
+    Procedure &operator=(Procedure &&) = default;
 };
 
 /**
@@ -48,12 +73,12 @@ public:
     Process() = default;
 
     /**
-     * @brief Copy constructor
+     * @brief Deleted copy constructor
      */
-    Process(const Process &);
+    Process(const Process &) = delete;
 
     /**
-     * @brief Deleted move constructor
+     * @brief Default move constructor
      */
     Process(Process &&) = default;
 

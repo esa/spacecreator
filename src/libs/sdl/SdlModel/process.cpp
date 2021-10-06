@@ -30,21 +30,6 @@ Process::Process(QString name, std::unique_ptr<StateMachine> &stateMachine)
 {
 }
 
-Process::Process(const Process &process)
-    : Node(process.name())
-{
-    m_procedures.clear();
-    m_variables.clear();
-
-    m_stateMachine = std::make_unique<StateMachine>(*process.stateMachine());
-    for (const auto &procedure : process.procedures()) {
-        m_procedures.push_back(std::make_unique<Procedure>(*procedure));
-    }
-    for (const auto &variable : process.variables()) {
-        m_variables.push_back(std::make_unique<VariableDeclaration>(*variable));
-    }
-}
-
 const StateMachine *Process::stateMachine() const
 {
     return m_stateMachine.get();

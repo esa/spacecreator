@@ -61,8 +61,7 @@ void tst_sdlmodel::testDefaultValuesInModel()
     auto states = std::vector<std::shared_ptr<State>>();
     auto transitions = std::vector<std::shared_ptr<Transition>>();
     auto sm = std::make_unique<StateMachine>(states, transitions);
-    Process process(processName, sm);
-    SdlModel exampleModel(process);
+    SdlModel exampleModel(Process(processName, sm));
 
     QVERIFY(exampleModel.modelType() == ModelType::Sdl);
     const auto *const data = &exampleModel.data();
@@ -126,8 +125,7 @@ void tst_sdlmodel::testGenerateProcess()
 
     auto transitions = std::vector<std::shared_ptr<Transition>>();
     auto sm = std::make_unique<StateMachine>(states, transitions);
-    Process process(processName, sm);
-    SdlModel exampleModel(process, modelName);
+    SdlModel exampleModel(Process(processName, sm), modelName);
 
     Options options;
     options.add(SdlOptions::sdlFilepathPrefix, modelPrefix);

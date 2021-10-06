@@ -36,7 +36,7 @@ class NextState final : public Action
 {
 public:
     /**
-     * @brief   Default constructor
+     * @brief   Constructor
      *
      * @param   name    name of the action
      */
