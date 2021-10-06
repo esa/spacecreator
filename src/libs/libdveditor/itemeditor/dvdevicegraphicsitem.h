@@ -60,7 +60,6 @@ protected Q_SLOTS:
     void applyColorScheme() override;
 
 protected:
-    void rebuildLayout() override;
     void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget) override;
     shared::ColorManager::HandledColors handledColorType() const override;
     void updateInternalItems(Qt::Alignment alignment) override;

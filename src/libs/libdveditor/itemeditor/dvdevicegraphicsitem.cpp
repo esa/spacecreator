@@ -116,36 +116,6 @@ void DVDeviceGraphicsItem::applyColorScheme()
     update();
 }
 
-void DVDeviceGraphicsItem::rebuildLayout()
-{
-    shared::ui::VEInteractiveObject::rebuildLayout();
-
-    if (!targetItem()) {
-        prepareGeometryChange();
-        setBoundingRect(QRectF());
-        return;
-    }
-
-    if (entity()) {
-        const QPointF entityPos = shared::graphicsviewutils::pos(entity()->coordinates());
-        if (entityPos.isNull()) {
-            if (doLayout()) {
-                mergeGeometry();
-            }
-            return;
-        }
-    }
-    const QRectF parentRect = targetItem()->boundingRect();
-    const QPointF ifacePos = pos();
-    const Qt::Alignment side = shared::graphicsviewutils::getNearestSide(parentRect, ifacePos);
-    const QPointF stickyPos = shared::graphicsviewutils::getSidePosition(parentRect, ifacePos, side);
-    if (ifacePos != stickyPos) {
-        setPos(stickyPos);
-        mergeGeometry();
-    }
-    updateInternalItems(side);
-}
-
 void DVDeviceGraphicsItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget)
 {
     Q_UNUSED(option)

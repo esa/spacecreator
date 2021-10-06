@@ -159,6 +159,7 @@ qreal VEConnectionEndPointGraphicsItem::minSiblingDistance()
 bool VEConnectionEndPointGraphicsItem::doLayout()
 {
     const QPointF entityPos = scenePos();
+    instantLayoutUpdate();
     adjustItem();
     return entityPos != scenePos();
 }
