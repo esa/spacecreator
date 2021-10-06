@@ -38,7 +38,7 @@ public:
     /**
      * @brief   Virtual destructor
      */
-    virtual ~Visitor();
+    virtual ~Visitor() = default;
 
     /**
      * @brief   Model visitor

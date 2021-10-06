@@ -1,7 +1,6 @@
 project(SdlExporter VERSION 1.0.0 LANGUAGES CXX)
 
 set(SOURCES exporter.cpp
-            visitors/visitor.cpp
             visitors/sdlvisitor.cpp)
 set(INCLUDES exporter.h
              visitors/visitor.h

@@ -50,11 +50,6 @@ public:
     virtual ~Node();
 
     /**
-     * @brief   Visitor acceptor (shall call visit method of the given visitor)
-     */
-    virtual auto accept(Visitor &visitor) const -> void = 0;
-
-    /**
      * @brief   Setter for this model type
      *
      * @param   name name to set
@@ -67,6 +62,11 @@ public:
      * @return  node name
      */
     auto name() const -> const QString &;
+
+    /**
+     * @brief   Visitor acceptor (shall call visit method of the given visitor)
+     */
+    virtual auto accept(Visitor &visitor) const -> void = 0;
 
 private:
     QString m_name;

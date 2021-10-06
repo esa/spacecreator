@@ -35,7 +35,7 @@ namespace sdl {
 /**
  * @brief   Visitor serializing components of the SDL model
  */
-class SdlVisitor : public Visitor
+class SdlVisitor final : public Visitor
 {
 public:
     /**
@@ -44,11 +44,6 @@ public:
      * @param   stream   output stream (where the serialized values are put)
      */
     SdlVisitor(QTextStream &stream);
-
-    /**
-     * @brief   Virtual destructor
-     */
-    virtual ~SdlVisitor();
 
     /**
      * @brief   Deleted move constructor
