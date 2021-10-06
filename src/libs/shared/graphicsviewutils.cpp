@@ -481,7 +481,8 @@ QRectF adjustFromPoint(const QPointF &pos, const qreal &adjustment)
  * Returns a \a itemRect aligned inside of \a boundingRect but keeping the offset of \a originPointOffset
  */
 
-QRectF alignRectToSide(const QRectF &boundingRect, const QRectF &itemRect, Qt::Alignment side, const QPointF &originPointOffset, const QMarginsF &margins)
+QRectF alignRectToSide(const QRectF &boundingRect, const QRectF &itemRect, Qt::Alignment side,
+        const QPointF &originPointOffset, const QMarginsF &margins)
 {
     if (!boundingRect.isValid() || !itemRect.isValid())
         return {};
@@ -1009,7 +1010,7 @@ void findGeometryForRect(
         newBoundingRect |= rect;
     }
     newBoundingRect |= itemRect;
-    boundedRect = newBoundingRect.marginsAdded(margins);
+    boundedRect |= newBoundingRect.marginsAdded(margins);
 }
 
 /*!

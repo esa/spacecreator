@@ -47,7 +47,7 @@ void CmdEntityGeometryChange::redo()
 
 void CmdEntityGeometryChange::undo()
 {
-    for (auto it = m_data.crbegin(); it != m_data.crend(); ++it) {
+    for (auto it = m_data.cbegin(); it != m_data.cend(); ++it) {
         if (!it->entity)
             continue;
 

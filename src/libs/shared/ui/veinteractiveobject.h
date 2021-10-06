@@ -55,6 +55,8 @@ public:
     virtual void init();
     virtual void updateEntity();
     virtual void updateFromEntity() = 0;
+    virtual bool doLayout() = 0;
+    virtual void rebuildLayout() override;
     virtual QList<QPair<VEObject *, QVector<QPointF>>> prepareChangeCoordinatesCommandParams() const;
 
     virtual QString prepareTooltip() const;

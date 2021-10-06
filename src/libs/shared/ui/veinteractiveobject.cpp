@@ -72,11 +72,6 @@ void VEInteractiveObject::mergeGeometry()
         return;
     }
 
-    for (auto child : childItems()) {
-        if (auto io = qobject_cast<VEInteractiveObject *>(child->toGraphicsObject())) {
-            io->mergeGeometry();
-        }
-    }
     const QList<QPair<shared::VEObject *, QVector<QPointF>>> geometryData = prepareChangeCoordinatesCommandParams();
     const QUndoCommand *cmd = m_commandsStack->command(m_commandsStack->index() - 1);
     if (auto prevGeometryBasedCmd = dynamic_cast<const cmd::CmdEntityGeometryChange *>(cmd)) {
@@ -113,6 +108,12 @@ void VEInteractiveObject::updateEntity()
 
     const auto changeGeometryCmd = new cmd::CmdEntityGeometryChange(prepareChangeCoordinatesCommandParams());
     m_commandsStack->push(changeGeometryCmd);
+}
+
+void VEInteractiveObject::rebuildLayout()
+{
+    updateGripPoints();
+    applyColorScheme();
 }
 
 QList<QPair<shared::VEObject *, QVector<QPointF>>> VEInteractiveObject::prepareChangeCoordinatesCommandParams() const

@@ -88,7 +88,7 @@ void tst_IVConnectionGraphicsItem::tst_Overlapping()
     connection->init();
     ifaceItem1->addConnection(connection);
     ifaceItem2->addConnection(connection);
-    connection->layout();
+    connection->doLayout();
     QVERIFY(!checkIntersections(connection));
 
     auto funcItem = new ive::IVFunctionGraphicsItem(nullptr);

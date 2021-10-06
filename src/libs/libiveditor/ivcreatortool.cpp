@@ -659,6 +659,22 @@ void IVCreatorTool::handleDirectConnection(const QPointF &pos)
     handleConnection(m_connectionPoints);
 }
 
+static inline QVector<QPointF> generateConnectionPoints(IVItemModel *model, shared::Id startId, shared::Id endId)
+{
+    const IVInterfaceGraphicsItem *startItem = model->getItem<IVInterfaceGraphicsItem *>(startId);
+    const IVInterfaceGraphicsItem *endItem = model->getItem<IVInterfaceGraphicsItem *>(endId);
+    if (!startItem || !endItem)
+        return {};
+
+    const bool isStartEndpointNested = startItem->targetItem()->isAncestorOf(endItem);
+    const bool isEndEndpointNested = endItem->targetItem()->isAncestorOf(startItem);
+
+    QGraphicsItem *siblingItem = isStartEndpointNested ? startItem->targetItem() : endItem->targetItem();
+    return shared::graphicsviewutils::createConnectionPath(shared::graphicsviewutils::siblingItemsRects(siblingItem),
+            startItem->connectionEndPoint(isStartEndpointNested), startItem->targetItem()->sceneBoundingRect(),
+            endItem->connectionEndPoint(isEndEndpointNested), endItem->targetItem()->sceneBoundingRect());
+}
+
 void IVCreatorTool::handleConnection(const QVector<QPointF> &graphicPoints) const
 {
     const auto info = ive::gi::validateConnectionCreate(m_view ? m_view->scene() : nullptr, graphicPoints);
@@ -765,8 +781,8 @@ void IVCreatorTool::handleConnection(const QVector<QPointF> &graphicPoints) cons
                 return;
         }
 
-        auto cmd = new cmd::CmdConnectionItemCreate(
-                model()->objectsModel(), item->entity(), prevStartIfaceId, ifaceCommons.id, points);
+        auto cmd = new cmd::CmdConnectionItemCreate(model()->objectsModel(), item->entity(), prevStartIfaceId,
+                ifaceCommons.id, generateConnectionPoints(model(), prevStartIfaceId, ifaceCommons.id));
         if (!cmdMacro.push(cmd))
             return;
 
@@ -816,8 +832,8 @@ void IVCreatorTool::handleConnection(const QVector<QPointF> &graphicPoints) cons
                 return;
         }
 
-        auto cmd = new cmd::CmdConnectionItemCreate(
-                model()->objectsModel(), item->entity(), prevEndIfaceId, ifaceCommons.id, points);
+        auto cmd = new cmd::CmdConnectionItemCreate(model()->objectsModel(), item->entity(), prevEndIfaceId,
+                ifaceCommons.id, generateConnectionPoints(model(), prevEndIfaceId, ifaceCommons.id));
         if (!cmdMacro.push(cmd))
             return;
 
@@ -837,6 +853,9 @@ void IVCreatorTool::handleConnection(const QVector<QPointF> &graphicPoints) cons
     resultPoints.append(endInterfacePoint);
     Q_ASSERT(resultPoints.size() >= 2);
     if (resultPoints.first() != resultPoints.last()) {
+        if (resultPoints.size() == 2) {
+            resultPoints = generateConnectionPoints(model(), prevStartIfaceId, prevEndIfaceId);
+        }
         auto cmd = new cmd::CmdConnectionItemCreate(model()->objectsModel(),
                 parentForConnection ? parentForConnection->entity() : nullptr, prevStartIfaceId, prevEndIfaceId,
                 resultPoints);

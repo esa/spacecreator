@@ -74,11 +74,15 @@ private:
     void initItem(shared::ui::VEInteractiveObject *item) override;
 
     IVFunctionGraphicsItem *rootItem() const;
-    void setupInnerGeometry(ivm::IVObject *obj) const;
 
     void updateInterfaceOnConnectionAdd(ivm::IVConnection *connection, ivm::IVInterfaceGroup *connectionGroupEndPoint);
     void updateInterfaceOnConnectionRemove(
             ivm::IVConnection *connection, ivm::IVInterfaceGroup *connectionGroupEndPoint);
+
+    void setupGeometry(ivm::IVObject *obj);
+    void setupRectangularGeometry(ivm::IVObject *obj);
+    void setupInterfaceGeometry(ivm::IVObject *obj);
+    void setupConnectionGeometry(ivm::IVObject *obj);
 
 private:
     shared::DelayedSignal *m_textUpdate = nullptr;

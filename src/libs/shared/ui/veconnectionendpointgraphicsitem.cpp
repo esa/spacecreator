@@ -61,16 +61,6 @@ VERectGraphicsItem *VEConnectionEndPointGraphicsItem::targetItem() const
     return parentItem() ? qobject_cast<VERectGraphicsItem *>(parentItem()->toGraphicsObject()) : nullptr;
 }
 
-void VEConnectionEndPointGraphicsItem::setTargetItem(VERectGraphicsItem *item, const QPointF &globalPos)
-{
-    if (!item)
-        return;
-
-    setParentItem(item);
-    setPos(parentItem()->mapFromScene(globalPos));
-    instantLayoutUpdate();
-}
-
 QPointF VEConnectionEndPointGraphicsItem::connectionEndPoint(const bool innerConnection) const
 {
     Q_UNUSED(innerConnection)
@@ -92,14 +82,13 @@ void VEConnectionEndPointGraphicsItem::updateFromEntity()
         return;
 
     const QPointF coordinates = graphicsviewutils::pos(entity()->coordinates());
-    if (coordinates.isNull())
-        instantLayoutUpdate();
-    else
-        setTargetItem(qobject_cast<VERectGraphicsItem *>(parentObject()), coordinates);
-
-    adjustItem();
-    if (coordinates != scenePos()) {
-        mergeGeometry();
+    if (coordinates.isNull()) {
+        doLayout();
+    } else {
+        setPos(parentItem()->mapFromScene(coordinates));
+        if (doLayout()) {
+            mergeGeometry();
+        }
     }
 }
 
@@ -155,7 +144,7 @@ void VEConnectionEndPointGraphicsItem::adjustItem()
             setPos(helper.mappedOriginPoint());
             for (VEConnectionGraphicsItem *connection : qAsConst(m_connections)) {
                 if (connection) {
-                    connection->layout();
+                    connection->doLayout();
                 }
             }
         }
@@ -167,25 +156,27 @@ qreal VEConnectionEndPointGraphicsItem::minSiblingDistance()
     return kSiblingMinDistance;
 }
 
-bool VEConnectionEndPointGraphicsItem::layout()
+bool VEConnectionEndPointGraphicsItem::doLayout()
 {
-    const QPointF pos = shared::graphicsviewutils::pos(entity()->coordinates());
-    if (pos.isNull()) {
-        adjustItem();
-        return true;
-    }
-
-    const QRectF parentRect = targetItem()->sceneBoundingRect();
-    const Qt::Alignment side = shared::graphicsviewutils::getNearestSide(parentRect, pos);
-    const QPointF stickyPos = shared::graphicsviewutils::getSidePosition(parentRect, pos, side);
-    updateInternalItems(side);
-    setPos(targetItem()->mapFromScene(stickyPos));
-    return pos != stickyPos;
+    const QPointF entityPos = scenePos();
+    instantLayoutUpdate();
+    adjustItem();
+    return entityPos != scenePos();
 }
 
 QPainterPath VEConnectionEndPointGraphicsItem::ifaceShape() const
 {
     return mapToScene(shape());
+}
+
+void VEConnectionEndPointGraphicsItem::rebuildLayout()
+{
+    const QPointF entityPos = scenePos();
+    const QRectF parentRect = targetItem()->sceneBoundingRect();
+    const Qt::Alignment side = shared::graphicsviewutils::getNearestSide(parentRect, entityPos);
+    const QPointF stickyPos = shared::graphicsviewutils::getSidePosition(parentRect, entityPos, side);
+    updateInternalItems(side);
+    setPos(targetItem()->mapFromScene(stickyPos));
 }
 
 QVariant VEConnectionEndPointGraphicsItem::itemChange(GraphicsItemChange change, const QVariant &value)
@@ -233,7 +224,7 @@ void VEConnectionEndPointGraphicsItem::onManualMoveFinish(GripPoint *grip, const
     if (shift.isNull())
         return;
 
-    rebuildLayout();
+    doLayout();
     VEConnectionGraphicsItem::layoutInterfaceConnections(this, VEConnectionGraphicsItem::LayoutPolicy::Default,
             VEConnectionGraphicsItem::CollisionsPolicy::Rebuild, true);
     updateEntity();

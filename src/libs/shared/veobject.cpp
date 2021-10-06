@@ -160,6 +160,9 @@ void VEObject::clearAttributes()
 
 QVector<qint32> VEObject::coordinatesFromString(const QString &strCoordinates)
 {
+    if (strCoordinates.isEmpty())
+        return {};
+
     const QStringList &strCoords = strCoordinates.split(QLatin1Char(' '), QString::SkipEmptyParts);
     const int coordsCount = strCoords.size();
     QVector<qint32> coords(coordsCount);
