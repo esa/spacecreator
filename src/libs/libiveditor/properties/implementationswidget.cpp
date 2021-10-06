@@ -15,58 +15,58 @@
   along with this program. If not, see <https://www.gnu.org/licenses/lgpl-2.1.html>.
 */
 
-#include "languageselect.h"
+#include "implementationswidget.h"
 
+#include "implementationsmodel.h"
 #include "interface/comboboxdelegate.h"
 #include "ivfunction.h"
 #include "ivmodel.h"
-#include "languagemodel.h"
-#include "ui_languageselect.h"
+#include "ui_implementationswidget.h"
 
 #include <QDebug>
 #include <QHeaderView>
 
 namespace ive {
 
-LanguageSelect::LanguageSelect(ivm::IVFunction *fn, ivm::AbstractSystemChecks *checks,
+ImplementationsWidget::ImplementationsWidget(ivm::IVFunction *fn, ivm::AbstractSystemChecks *checks,
         shared::cmd::CommandsStackBase::Macro *macro, QWidget *parent)
     : QWidget(parent)
-    , ui(new Ui::LanguageSelect)
+    , ui(new Ui::ImplementationsWidget)
 {
     Q_ASSERT(fn && fn->model());
     ui->setupUi(this);
 
-    ui->tableView->setItemDelegateForColumn(LanguageModel::Column::Language,
+    ui->tableView->setItemDelegateForColumn(ImplementationsModel::Column::Language,
             new shared::ComboBoxDelegate(fn->model()->availableFunctionLanguages(), ui->tableView));
 
-    m_model = new LanguageModel(checks, macro, this);
+    m_model = new ImplementationsModel(checks, macro, this);
     m_model->setFunction(fn);
     ui->tableView->setModel(m_model);
     ui->tableView->horizontalHeader()->resizeSection(0, 220);
     ui->tableView->horizontalHeader()->resizeSection(1, 180);
 
-    connect(ui->addButton, &QPushButton::clicked, this, &LanguageSelect::addLanguage);
-    connect(ui->deleteButton, &QPushButton::clicked, this, &LanguageSelect::deleteSelectedLanguage);
+    connect(ui->addButton, &QPushButton::clicked, this, &ImplementationsWidget::addLanguage);
+    connect(ui->deleteButton, &QPushButton::clicked, this, &ImplementationsWidget::deleteSelectedLanguage);
     connect(ui->tableView->selectionModel(), &QItemSelectionModel::selectionChanged, this,
-            &LanguageSelect::updateDeleteButton);
+            &ImplementationsWidget::updateDeleteButton);
     updateDeleteButton();
 }
 
-LanguageSelect::~LanguageSelect()
+ImplementationsWidget::~ImplementationsWidget()
 {
     delete ui;
 }
 
-void LanguageSelect::addLanguage()
+void ImplementationsWidget::addLanguage()
 {
     int newRow = m_model->rowCount();
     m_model->insertRow(newRow);
-    QModelIndex idx = m_model->index(newRow, LanguageModel::Column::Name);
+    QModelIndex idx = m_model->index(newRow, ImplementationsModel::Column::Name);
     ui->tableView->edit(idx);
     ui->tableView->scrollToBottom();
 }
 
-void LanguageSelect::deleteSelectedLanguage()
+void ImplementationsWidget::deleteSelectedLanguage()
 {
     QModelIndexList selections = ui->tableView->selectionModel()->selectedRows();
     if (selections.size() != 1) {
@@ -79,7 +79,7 @@ void LanguageSelect::deleteSelectedLanguage()
     m_model->removeRow(selections.at(0).row());
 }
 
-void LanguageSelect::updateDeleteButton()
+void ImplementationsWidget::updateDeleteButton()
 {
     QModelIndexList selections = ui->tableView->selectionModel()->selectedRows();
     bool editable = true;

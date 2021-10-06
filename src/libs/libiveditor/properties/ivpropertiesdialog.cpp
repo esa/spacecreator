@@ -23,6 +23,7 @@
 #include "contextparametersmodel.h"
 #include "delegates/asn1valuedelegate.h"
 #include "ifaceparametersmodel.h"
+#include "implementationswidget.h"
 #include "interface/attributedelegate.h"
 #include "itemeditor/common/ivutils.h"
 #include "ivcomment.h"
@@ -35,7 +36,6 @@
 #include "ivpropertieslistmodel.h"
 #include "ivpropertiesview.h"
 #include "ivpropertytemplateconfig.h"
-#include "languageselect.h"
 #include "propertieslistmodel.h"
 #include "propertiesviewbase.h"
 
@@ -236,7 +236,7 @@ void IVPropertiesDialog::initLanguageView()
     if (!fn) {
         return;
     }
-    auto languagesWidget = new ive::LanguageSelect(fn, m_checks, commandMacro(), this);
+    auto languagesWidget = new ive::ImplementationsWidget(fn, m_checks, commandMacro(), this);
     insertTab(languagesWidget, tr("Implementations"));
 }
 

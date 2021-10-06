@@ -29,7 +29,7 @@ class IVFunction;
 
 namespace ive {
 
-class LanguageModel : public QAbstractItemModel
+class ImplementationsModel : public QAbstractItemModel
 {
     Q_OBJECT
 
@@ -42,7 +42,7 @@ public:
     };
     Q_ENUM(Column)
 
-    explicit LanguageModel(
+    explicit ImplementationsModel(
             ivm::AbstractSystemChecks *checks, cmd::CommandsStack::Macro *macro, QObject *parent = nullptr);
 
     void setFunction(ivm::IVFunction *fn);

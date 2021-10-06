@@ -27,23 +27,23 @@ class IVFunction;
 }
 
 namespace Ui {
-class LanguageSelect;
+class ImplementationsWidget;
 }
 
 namespace ive {
-class LanguageModel;
+class ImplementationsModel;
 
 /*!
    UI to select the implementation language(s) for functions
  */
-class LanguageSelect : public QWidget
+class ImplementationsWidget : public QWidget
 {
     Q_OBJECT
 
 public:
-    explicit LanguageSelect(ivm::IVFunction *fn, ivm::AbstractSystemChecks *checks, cmd::CommandsStack::Macro *macro,
-            QWidget *parent = nullptr);
-    ~LanguageSelect();
+    explicit ImplementationsWidget(ivm::IVFunction *fn, ivm::AbstractSystemChecks *checks,
+            cmd::CommandsStack::Macro *macro, QWidget *parent = nullptr);
+    ~ImplementationsWidget();
 
 private Q_SLOTS:
     void addLanguage();
@@ -51,8 +51,8 @@ private Q_SLOTS:
     void updateDeleteButton();
 
 private:
-    Ui::LanguageSelect *ui;
-    LanguageModel *m_model = nullptr;
+    Ui::ImplementationsWidget *ui;
+    ImplementationsModel *m_model = nullptr;
 };
 
 } // namespace ive
