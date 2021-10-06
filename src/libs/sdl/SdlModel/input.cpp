@@ -27,7 +27,6 @@ namespace sdl {
 Input::Input(QString name)
     : Signal(std::move(name))
 {
-    m_transition.reset();
 }
 
 Input::Input(QString name, const std::shared_ptr<Transition> &transition)

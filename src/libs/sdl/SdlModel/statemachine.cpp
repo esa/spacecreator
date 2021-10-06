@@ -29,11 +29,11 @@ StateMachine::StateMachine() {}
 StateMachine::StateMachine(
         std::vector<std::shared_ptr<State>> &states, std::vector<std::shared_ptr<Transition>> &transitions)
 {
-    for (unsigned long int i = 0; i < states.size(); i++) {
-        m_states.push_back(states[i]);
+    for (auto &state : states) {
+        m_states.push_back(state);
     }
-    for (unsigned long int i = 0; i < transitions.size(); i++) {
-        m_transitions.push_back(transitions[i]);
+    for (auto &transition : transitions) {
+        m_transitions.push_back(transition);
     }
 }
 
