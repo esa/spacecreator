@@ -1,11 +1,13 @@
+image: taste-buster:latest
+
 stages:
+  - build-test
   - build-test-and-bundle
+  - code-coverage
+  - documentation
 
-
-space-creator:
-  stage: build-test-and-bundle
-  image: taste-buster:latest
-  script:
+default:
+  before_script:
     - export PROJECT_ROOT=$(pwd)
     - export ENV_QTC_VERSION_SHORT=4.8
     - export ENV_QTC_VERSION=4.8.2
@@ -25,6 +27,11 @@ space-creator:
     # install qtcreator sources
     - ./scripts/download_qtcreator.sh
     - ./scripts/build_grantlee.sh
+
+
+space-creator-dev:
+  stage: build-test
+  script:
     # build space creator
     - cd ${BUILD_DIR}
     - cmake -GNinja -S ${PROJECT_ROOT} -B ${BUILD_DIR} ${CMAKE_BUILD} -DBUILD_PATCH_NUMBER=$CI_BUILD_ID -DCMAKE_PREFIX_PATH:STRING=${ENV_QT_BASE_DIR} -DQT_QMAKE_EXECUTABLE:STRING=${ENV_QT_BASE_DIR}/bin/qmake
@@ -35,20 +42,27 @@ space-creator:
     - export PATH=$PATH:${DOWNLOAD_DIR}/asn1scc
     - cd ${PROJECT_ROOT}
     - ./scripts/run_tests.sh ${BUILD_DIR}
-    ## coverage
-    #- export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/usr/lib/x86_64-linux-gnu/qtcreator:/usr/lib/x86_64-linux-gnu/qtcreator/plugins
-    #- export QT_QPA_PLATFORM=offscreen
-    #- mkdir -p coverage ; cd coverage ; rm * -rf
-    #- cmake -G Ninja -DCOVERAGE_ENABLED=ON ..
-    #- ninja ; ../scripts/run_tests.sh . ; ninja coverage ; ninja coverage_html
-    #- cd ..
-    # documentation
-    #- ./scripts/generate_documentation.sh
-    # debian package
-    # build the plugin
-    # Create .deb package
-    #- cpack
-    #- cp ${BUILD_DIR}/*.deb ${PACKAGE_DIR}
+  cache:
+    key: asn1scc
+    paths:
+      - build/asn1scc_bin
+  rules:
+    - if: "$CI_COMMIT_BRANCH != 'master'"
+
+
+space-creator:
+  stage: build-test-and-bundle
+  script:
+    # build space creator
+    - cd ${BUILD_DIR}
+    - cmake -GNinja -S ${PROJECT_ROOT} -B ${BUILD_DIR} ${CMAKE_BUILD} -DBUILD_PATCH_NUMBER=$CI_BUILD_ID -DCMAKE_PREFIX_PATH:STRING=${ENV_QT_BASE_DIR} -DQT_QMAKE_EXECUTABLE:STRING=${ENV_QT_BASE_DIR}/bin/qmake
+    - cmake --build . --target all
+    # unit tests
+    - cd ${DOWNLOAD_DIR}
+    - wget -q -O - https://github.com/ttsiodras/asn1scc/releases/download/4.2.4.7f/asn1scc-bin-4.2.4.7f.tar.bz2 | tar jxvf -
+    - export PATH=$PATH:${DOWNLOAD_DIR}/asn1scc
+    - cd ${PROJECT_ROOT}
+    - ./scripts/run_tests.sh ${BUILD_DIR}
     # Create AppImage
     - ${PROJECT_ROOT}/scripts/create_appimage.sh
   cache:
@@ -59,6 +73,38 @@ space-creator:
     reports:
       junit: build/tst_*-result.xml
     paths:
-      - doc/doxygen/html
       - package
     expire_in: 2 days
+  rules:
+    - if: "$CI_COMMIT_BRANCH == 'master'"
+
+
+space-creator-coverage:
+  stage: code-coverage
+  coverage: '/Code coverage: ^ *lines\.*:\s+(\d+.\d+\%)/'
+  script:
+    - export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/usr/lib/x86_64-linux-gnu/qtcreator:/usr/lib/x86_64-linux-gnu/qtcreator/plugins
+    - export QT_QPA_PLATFORM=offscreen
+    - mkdir -p coverage ; cd coverage ; rm * -rf
+    - cmake -G Ninja -DCOVERAGE_ENABLED=ON ..
+    - ninja ; ../scripts/run_tests.sh . ; ninja coverage ; ninja coverage_html
+  cache:
+    key: asn1scc
+    paths:
+      - build/asn1scc_bin
+  rules:
+    - if: "$CI_COMMIT_BRANCH == 'master'"
+      when: never
+
+
+space-creator-doc:
+  stage: documentation
+  script:
+    - ./scripts/generate_documentation.sh
+  artifacts:
+    paths:
+      - doc/doxygen/html
+    expire_in: 2 days
+  rules:
+    - if: "$CI_COMMIT_BRANCH == 'master'"
+      when: never
