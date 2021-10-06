@@ -38,7 +38,7 @@
 namespace scs {
 
 DvSystemChecks::DvSystemChecks(QObject *parent)
-    : QObject(parent)
+    : ivm::AbstractSystemChecks(parent)
 {
 }
 
@@ -123,6 +123,24 @@ dvm::DVFunction *DvSystemChecks::correspondingFunction(ivm::IVFunction *ivFunc, 
     dvm::DVModel *model = dvCore->appModel()->objectsModel();
     dvm::DVObject *dvf = model->getObjectByName(ivFunc->title(), dvm::DVObject::Type::Function);
     return qobject_cast<dvm::DVFunction *>(dvf);
+}
+
+bool DvSystemChecks::isImplementationUsed(ivm::IVFunction *ivFunc, const QString &name) const
+{
+    if (!m_storage) {
+        return false;
+    }
+
+    for (DVEditorCorePtr dvCore : m_storage->allDVCores()) {
+        dvm::DVFunction *dvFunc = correspondingFunction(ivFunc, dvCore);
+        if (dvFunc) {
+            if (dvFunc->implementation() == name) {
+                return true;
+            }
+        }
+    }
+
+    return false;
 }
 
 bool DvSystemChecks::checkFunctionIvValidity(const DVEditorCorePtr &dvCore) const

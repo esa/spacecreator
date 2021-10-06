@@ -18,6 +18,7 @@
 #pragma once
 
 #include "dveditorcore.h"
+#include "ivcore/abstractsystemchecks.h"
 
 #include <QObject>
 #include <QPointer>
@@ -35,7 +36,7 @@ class IVInterface;
 namespace scs {
 class SpaceCreatorProject;
 
-class DvSystemChecks : public QObject
+class DvSystemChecks : public ivm::AbstractSystemChecks
 {
     Q_OBJECT
 public:
@@ -55,6 +56,8 @@ public Q_SLOTS:
 
     ivm::IVFunction *correspondingFunction(dvm::DVFunction *dvFunc) const;
     dvm::DVFunction *correspondingFunction(ivm::IVFunction *ivFunc, const DVEditorCorePtr &dvCore) const;
+
+    bool isImplementationUsed(ivm::IVFunction *ivFunc, const QString &name) const override;
 
 private:
     bool checkFunctionIvValidity(const DVEditorCorePtr &dvCore) const;

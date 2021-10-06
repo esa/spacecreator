@@ -28,7 +28,8 @@
 
 namespace ive {
 
-LanguageSelect::LanguageSelect(ivm::IVFunction *fn, shared::cmd::CommandsStackBase::Macro *macro, QWidget *parent)
+LanguageSelect::LanguageSelect(ivm::IVFunction *fn, ivm::AbstractSystemChecks *checks,
+        shared::cmd::CommandsStackBase::Macro *macro, QWidget *parent)
     : QWidget(parent)
     , ui(new Ui::LanguageSelect)
 {
@@ -38,7 +39,7 @@ LanguageSelect::LanguageSelect(ivm::IVFunction *fn, shared::cmd::CommandsStackBa
     ui->tableView->setItemDelegateForColumn(LanguageModel::Column::Language,
             new shared::ComboBoxDelegate(fn->model()->availableFunctionLanguages(), ui->tableView));
 
-    m_model = new LanguageModel(macro, this);
+    m_model = new LanguageModel(checks, macro, this);
     m_model->setFunction(fn);
     ui->tableView->setModel(m_model);
     ui->tableView->horizontalHeader()->resizeSection(0, 220);
@@ -81,17 +82,17 @@ void LanguageSelect::deleteSelectedLanguage()
 void LanguageSelect::updateDeleteButton()
 {
     QModelIndexList selections = ui->tableView->selectionModel()->selectedRows();
+    bool editable = true;
     if (selections.size() != 1) {
-        ui->deleteButton->setEnabled(false);
-        return;
+        editable = false;
+    } else {
+        int selectedRow = selections.at(0).row();
+        if (selectedRow == m_model->defaultIndex().row() || m_model->isImplementationUsed(selectedRow)) {
+            editable = false;
+        }
     }
 
-    if (selections.at(0).row() == m_model->defaultIndex().row()) {
-        ui->deleteButton->setEnabled(false);
-        return;
-    }
-
-    return ui->deleteButton->setEnabled(true);
+    ui->deleteButton->setEnabled(editable);
 }
 
 } // namespace ive

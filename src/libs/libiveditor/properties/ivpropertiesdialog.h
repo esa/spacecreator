@@ -27,6 +27,7 @@ class Asn1SystemChecks;
 }
 
 namespace ivm {
+class AbstractSystemChecks;
 class IVPropertyTemplateConfig;
 }
 
@@ -41,7 +42,8 @@ class IVPropertiesDialog : public shared::PropertiesDialog
 
 public:
     explicit IVPropertiesDialog(ivm::IVPropertyTemplateConfig *dynPropConfig, ivm::IVObject *obj,
-            Asn1Acn::Asn1SystemChecks *asn1Checks, cmd::CommandsStack *commandsStack, QWidget *parent = nullptr);
+            ivm::AbstractSystemChecks *checks, Asn1Acn::Asn1SystemChecks *asn1Checks, cmd::CommandsStack *commandsStack,
+            QWidget *parent = nullptr);
     ~IVPropertiesDialog() override;
     void init() override;
 
@@ -56,6 +58,8 @@ private:
     void initIfaceParams();
     void initCommentView();
     void initLanguageView();
+
+    QPointer<ivm::AbstractSystemChecks> m_checks;
 };
 
 } // namespace ive

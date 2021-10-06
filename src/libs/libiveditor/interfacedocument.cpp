@@ -37,6 +37,7 @@
 #include "ivcomment.h"
 #include "ivconnection.h"
 #include "ivconnectiongroup.h"
+#include "ivcore/abstractsystemchecks.h"
 #include "ivcreatortool.h"
 #include "ivexporter.h"
 #include "ivfunction.h"
@@ -101,6 +102,7 @@ struct InterfaceDocument::InterfaceDocumentPrivate {
     IVCreatorTool *tool { nullptr };
 
     Asn1Acn::Asn1SystemChecks *asnCheck { nullptr };
+    ivm::AbstractSystemChecks *ivCheck { nullptr };
     QString mscFileName;
     QString asnFileName;
 };
@@ -567,6 +569,11 @@ void InterfaceDocument::setAsn1Check(Asn1Acn::Asn1SystemChecks *check)
             &ive::InterfaceDocument::checkAllInterfacesForAsn1Compliance, Qt::QueuedConnection);
 }
 
+void InterfaceDocument::setIvCheck(ivm::AbstractSystemChecks *checks)
+{
+    d->ivCheck = checks;
+}
+
 QString InterfaceDocument::supportedFileExtensions() const
 {
     return QStringLiteral("*.xml");
@@ -729,7 +736,7 @@ void InterfaceDocument::showPropertyEditor(const shared::Id &id)
         return;
     }
 
-    ive::IVPropertiesDialog dialog(d->dynPropConfig, obj, d->asnCheck, d->commandsStack, d->graphicsView);
+    ive::IVPropertiesDialog dialog(d->dynPropConfig, obj, d->ivCheck, d->asnCheck, d->commandsStack, d->graphicsView);
     dialog.init();
     dialog.exec();
 }

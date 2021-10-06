@@ -21,16 +21,19 @@
 #include "commands/cmdfunctionlanguageinsert.h"
 #include "commands/cmdfunctionlanguageremove.h"
 #include "commands/cmdfunctionlanguageupdate.h"
+#include "ivcore/abstractsystemchecks.h"
 #include "ivfunction.h"
 #include "ivmodel.h"
 
 #include <QDebug>
+#include <QFont>
 #include <QMetaEnum>
 
 namespace ive {
 
-LanguageModel::LanguageModel(cmd::CommandsStack::Macro *macro, QObject *parent)
+LanguageModel::LanguageModel(ivm::AbstractSystemChecks *checks, cmd::CommandsStack::Macro *macro, QObject *parent)
     : QAbstractItemModel(parent)
+    , m_checks(checks)
     , m_cmdMacro(macro)
 {
 }
@@ -107,6 +110,12 @@ QVariant LanguageModel::data(const QModelIndex &index, int role) const
 
     if (role == Qt::CheckStateRole && index.column() == Column::Default) {
         return m_function->defaultLanguage() == attribute.name() ? Qt::CheckState::Checked : Qt::CheckState::Unchecked;
+    }
+
+    if (role == Qt::FontRole && isImplementationUsed(index.row())) {
+        QFont font;
+        font.setItalic(true);
+        return QVariant::fromValue(font);
     }
 
     return QVariant();
@@ -224,6 +233,16 @@ QModelIndex LanguageModel::defaultIndex() const
     }
 
     return QModelIndex();
+}
+
+bool LanguageModel::isImplementationUsed(int row) const
+{
+    if (!m_checks || row < 0 || row >= m_function->languages().size()) {
+        return false;
+    }
+
+    const QString name = m_function->languages().at(row).name();
+    return m_checks->isImplementationUsed(m_function, name);
 }
 
 QString LanguageModel::uniqueName(const QString &name)

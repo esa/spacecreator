@@ -41,6 +41,7 @@ class VEObject;
 }
 
 namespace ivm {
+class AbstractSystemChecks;
 class IVObject;
 class IVInterface;
 class IVModel;
@@ -113,6 +114,7 @@ public:
     IVItemModel *itemsModel() const;
 
     void setAsn1Check(Asn1Acn::Asn1SystemChecks *check);
+    void setIvCheck(ivm::AbstractSystemChecks *checks);
 
     QString supportedFileExtensions() const;
 

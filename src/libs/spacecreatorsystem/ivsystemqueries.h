@@ -17,7 +17,7 @@
 
 #pragma once
 
-#include "abstractsystemchecks.h"
+#include "dvcore/abstractsystemchecks.h"
 #include "iveditorcore.h"
 
 #include <QPointer>

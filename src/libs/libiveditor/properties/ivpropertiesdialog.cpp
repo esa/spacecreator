@@ -28,6 +28,7 @@
 #include "ivcomment.h"
 #include "ivconnectiongroup.h"
 #include "ivconnectiongroupmodel.h"
+#include "ivcore/abstractsystemchecks.h"
 #include "ivinterface.h"
 #include "ivnamevalidator.h"
 #include "ivobject.h"
@@ -49,8 +50,10 @@
 namespace ive {
 
 IVPropertiesDialog::IVPropertiesDialog(ivm::IVPropertyTemplateConfig *dynPropConfig, ivm::IVObject *obj,
-        Asn1Acn::Asn1SystemChecks *asn1Checks, cmd::CommandsStack *commandsStack, QWidget *parent)
+        ivm::AbstractSystemChecks *checks, Asn1Acn::Asn1SystemChecks *asn1Checks, cmd::CommandsStack *commandsStack,
+        QWidget *parent)
     : shared::PropertiesDialog(dynPropConfig, obj, asn1Checks, commandsStack, parent)
+    , m_checks(checks)
 {
 }
 
@@ -233,7 +236,7 @@ void IVPropertiesDialog::initLanguageView()
     if (!fn) {
         return;
     }
-    auto languagesWidget = new ive::LanguageSelect(fn, commandMacro(), this);
+    auto languagesWidget = new ive::LanguageSelect(fn, m_checks, commandMacro(), this);
     insertTab(languagesWidget, tr("Implementations"));
 }
 

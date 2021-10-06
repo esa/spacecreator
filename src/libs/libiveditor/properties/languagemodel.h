@@ -23,6 +23,7 @@
 #include <QPointer>
 
 namespace ivm {
+class AbstractSystemChecks;
 class IVFunction;
 }
 
@@ -41,7 +42,8 @@ public:
     };
     Q_ENUM(Column)
 
-    explicit LanguageModel(cmd::CommandsStack::Macro *macro, QObject *parent = nullptr);
+    explicit LanguageModel(
+            ivm::AbstractSystemChecks *checks, cmd::CommandsStack::Macro *macro, QObject *parent = nullptr);
 
     void setFunction(ivm::IVFunction *fn);
 
@@ -63,10 +65,13 @@ public:
 
     QModelIndex defaultIndex() const;
 
+    bool isImplementationUsed(int row) const;
+
 private:
     QString uniqueName(const QString &name);
 
     QPointer<ivm::IVFunction> m_function;
+    QPointer<ivm::AbstractSystemChecks> m_checks;
     cmd::CommandsStack::Macro *m_cmdMacro { nullptr };
 };
 

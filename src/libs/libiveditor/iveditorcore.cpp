@@ -31,6 +31,7 @@
 #include "interfacedocument.h"
 #include "itemeditor/common/ivutils.h"
 #include "ivconnection.h"
+#include "ivcore/abstractsystemchecks.h"
 #include "ivcreatortool.h"
 #include "ivexporter.h"
 #include "ivfunction.h"
@@ -437,6 +438,16 @@ QStringList IVEditorCore::ivConnectionNames() const
     }
     connectionNames.removeDuplicates();
     return connectionNames;
+}
+
+void IVEditorCore::setDvChecks(ivm::AbstractSystemChecks *checks)
+{
+    m_checks = checks;
+}
+
+ivm::AbstractSystemChecks *IVEditorCore::dvChecks() const
+{
+    return m_checks;
 }
 
 /*!

@@ -88,6 +88,7 @@ IVEditorCorePtr SpaceCreatorProject::ivData(const QString &fileName) const
         data->registerBasicActions();
         data->document()->customActions(); // There some further actions are registered
         data->document()->setAsn1Check(m_asnChecks.get());
+        data->document()->setIvCheck(m_dvChecks.get());
 
         data->document()->load(fileName);
         if (data->document()->asn1FileName().isEmpty()) {
@@ -360,6 +361,7 @@ void SpaceCreatorProject::setIvData(const QString &fileName, IVEditorCorePtr ivD
 
     m_ivStore[fileName] = ivData;
     connect(ivData.data(), &shared::EditorCore::editedExternally, this, &scs::SpaceCreatorProject::editedExternally);
+    ivData->setDvChecks(m_dvChecks.get());
     Q_EMIT ivCoreAdded(ivData);
 }
 

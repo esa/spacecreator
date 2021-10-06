@@ -22,6 +22,7 @@
 #include <QWidget>
 
 namespace ivm {
+class AbstractSystemChecks;
 class IVFunction;
 }
 
@@ -40,7 +41,8 @@ class LanguageSelect : public QWidget
     Q_OBJECT
 
 public:
-    explicit LanguageSelect(ivm::IVFunction *fn, cmd::CommandsStack::Macro *macro, QWidget *parent = nullptr);
+    explicit LanguageSelect(ivm::IVFunction *fn, ivm::AbstractSystemChecks *checks, cmd::CommandsStack::Macro *macro,
+            QWidget *parent = nullptr);
     ~LanguageSelect();
 
 private Q_SLOTS:
