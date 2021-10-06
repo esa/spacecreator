@@ -39,7 +39,7 @@ class Procedure
  *
  * Stores a pointer to the next state
  */
-class Process : public Node
+class Process final : public Node
 {
 public:
     /**
