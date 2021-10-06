@@ -86,7 +86,7 @@ static inline QByteArray singlePartitionWithFunctions()
             "             coverage=\"FALSE\" cpu=\"x86_linux\" cpu_classifier=\"ocarina_processors_x86::x86.linux\""
             "             cpu_platform=\"PLATFORM_NATIVE\" name=\"demo\" package=\"ocarina_processors_x86\""
             "             vp_classifier=\"\" vp_name=\"\" vp_platform=\"PLATFORM_NONE\">"
-            "                 <function>asw_gnc_con</function>"
+            "                 <function name=\"asw_gnc_con\"/>"
             "                 <function>asw_gnc_gui</function>"
             "                 <function>asw_gnc_nav</function>"
             "                 <function>gnc_con</function>"

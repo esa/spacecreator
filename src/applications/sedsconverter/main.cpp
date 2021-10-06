@@ -20,6 +20,7 @@
 #include "sedsconverter.h"
 
 #include <QCoreApplication>
+#include <conversion/asn1/Asn1Options/options.h>
 #include <conversion/common/exceptions.h>
 #include <conversion/common/export/exceptions.h>
 #include <conversion/common/import/exceptions.h>
@@ -28,7 +29,9 @@
 #include <conversion/seds/SedsOptions/options.h>
 
 using conversion::ConversionException;
+using conversion::ModelType;
 using conversion::Options;
+using conversion::asn1::Asn1Options;
 using conversion::exporter::ExportException;
 using conversion::importer::ImportException;
 using conversion::iv::IvOptions;
@@ -46,16 +49,20 @@ int main(int argc, char **argv)
     sedsconverter::SedsConverter sedsConverter;
 
     Options options;
+    options.add(Asn1Options::inputFilename, "optional.asn");
+    options.add(Asn1Options::importAsn1File);
+    options.add(IvOptions::configFilename, "config.xml");
+    options.add(IvOptions::outputFilename, "output.xml");
     options.add(SedsOptions::inputFilename, argv[1]);
     options.add(SedsOptions::schemaFilename, "seds.xsd");
     options.add(SedsOptions::externalRefFilename, "config.toml");
     options.add(SedsOptions::skipValidation);
     options.add(SedsOptions::keepIntermediateFiles);
     options.add(IvOptions::configFilename, "config.xml");
-    options.add(IvOptions::outputFilename, "output.xml");
+    options.add(IvOptions::outputFilename, QString("%1.iv").arg(argv[1]));
 
     try {
-        sedsConverter.convert(conversion::ModelType::Asn1, {}, std::move(options));
+        sedsConverter.convert({ ModelType::Seds }, ModelType::InterfaceView, { ModelType::Asn1 }, std::move(options));
     } catch (const ImportException &ex) {
         const auto errorMessage = QString("Import failure: %1").arg(ex.errorMessage());
         qFatal("%s", errorMessage.toLatin1().constData());

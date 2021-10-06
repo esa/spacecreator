@@ -47,7 +47,7 @@ void CmdEntityGeometryChange::redo()
 
 void CmdEntityGeometryChange::undo()
 {
-    for (auto it = m_data.crbegin(); it != m_data.crend(); ++it) {
+    for (auto it = m_data.cbegin(); it != m_data.cend(); ++it) {
         if (!it->entity)
             continue;
 
@@ -75,6 +75,7 @@ bool CmdEntityGeometryChange::mergeGeometryData(const QList<QPair<shared::VEObje
         if (m_data.last() == data.last()) {
             data.takeLast();
         } else if (m_data.last().entity == data.last().entity) {
+            data.last().entity->setCoordinates(data.last().newCoordinates);
             m_data.last() = data.takeLast();
         } else {
             break;

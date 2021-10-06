@@ -17,11 +17,11 @@
 
 #include "abstractsystemchecks.h"
 
-namespace dve {
+namespace ivm {
 
 AbstractSystemChecks::AbstractSystemChecks(QObject *parent)
     : QObject(parent)
 {
 }
 
-} // namespace dve
+} // namespace ivm

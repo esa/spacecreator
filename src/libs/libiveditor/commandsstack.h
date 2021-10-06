@@ -25,6 +25,7 @@ class QUndoCommand;
 class QUndoStack;
 
 namespace ivm {
+class IVFunction;
 class IVObject;
 }
 
@@ -46,6 +47,9 @@ public:
 Q_SIGNALS:
     void nameChanged(ivm::IVObject *entity, const QString &oldName, shared::UndoCommand *command);
     void entitiesRemoved(const QList<QPointer<ivm::IVObject>> &entities, shared::UndoCommand *command);
+    void implementationChanged(
+            ivm::IVFunction *entity, const QString &newName, const QString &oldName, shared::UndoCommand *command);
+    void defaultImplementationChanged(ivm::IVFunction *entity);
 };
 
 }

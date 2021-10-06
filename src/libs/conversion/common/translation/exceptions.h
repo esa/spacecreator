@@ -22,6 +22,8 @@
 #include "../exceptions.h"
 #include "modeltype.h"
 
+#include <set>
+
 namespace conversion::translator {
 
 /**
@@ -36,21 +38,6 @@ public:
      * @param   message     Error message
      */
     explicit TranslationException(QString message);
-};
-
-/**
- * @brief   Exception thrown when translator gets unsupported model
- */
-class IncorrectSourceModelException : public TranslationException
-{
-public:
-    /**
-     * @brief   Constructor
-     *
-     * @param   expectedModelType   Expected model type
-     * @param   receivedModelType   Received model type
-     */
-    explicit IncorrectSourceModelException(ModelType expectedModelType, ModelType receivedModelType);
 };
 
 /**

@@ -26,13 +26,6 @@ TranslationException::TranslationException(QString message)
 {
 }
 
-IncorrectSourceModelException::IncorrectSourceModelException(ModelType expectedModelType, ModelType receivedModelType)
-    : TranslationException(QString("Source model not supported, expected %1 model, got %2 model")
-                                   .arg(modelTypeToString(expectedModelType))
-                                   .arg(modelTypeToString(receivedModelType)))
-{
-}
-
 UndeclaredDataTypeException::UndeclaredDataTypeException(const QString &dataTypeName)
     : TranslationException(QString("Undeclared data type '%1'").arg(dataTypeName))
 {

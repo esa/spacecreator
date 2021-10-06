@@ -61,9 +61,15 @@
         </item>
         <item row="1" column="0">
          <widget class="QTreeView" name="treeView">
-          <property name="headerHidden">
-           <bool>true</bool>
-          </property>
+          <attribute name="headerDefaultSectionSize">
+           <number>120</number>
+          </attribute>
+          <attribute name="headerShowSortIndicator" stdset="0">
+           <bool>false</bool>
+          </attribute>
+          <attribute name="headerStretchLastSection">
+           <bool>false</bool>
+          </attribute>
          </widget>
         </item>
        </layout>

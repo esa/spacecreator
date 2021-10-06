@@ -71,6 +71,10 @@ void CmdFunctionAttrChange::redo()
         Q_EMIT nameChanged(m_entity, oldName, this);
     }
 
+    if (m_newAttrs.contains(ivm::meta::Props::token((ivm::meta::Props::Token::default_language)))) {
+        Q_EMIT defaultImplementationChanged(m_entity);
+    }
+
     m_firstRedo = false;
 }
 
@@ -82,6 +86,10 @@ void CmdFunctionAttrChange::undo()
     if (m_oldAttrs.contains(nameKey) && m_entity->title() != m_newAttrs[nameKey].toString()) {
         const QString oldName = m_newAttrs[nameKey].toString();
         Q_EMIT nameChanged(m_entity, oldName, this);
+    }
+
+    if (m_newAttrs.contains(ivm::meta::Props::token((ivm::meta::Props::Token::default_language)))) {
+        Q_EMIT defaultImplementationChanged(m_entity);
     }
 }
 

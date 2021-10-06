@@ -169,74 +169,9 @@ void IVInterfaceGraphicsItem::updateInternalItems(Qt::Alignment alignment)
     setBoundingRect(shape().boundingRect());
 }
 
-static inline QPointF mapPositionFromOrigin(ivm::IVInterface *iface, ivm::meta::Props::Token coordinateToken,
-        const QRectF &functionRect, Qt::Alignment *side)
-{
-    const auto parentFn = iface->parentObject()->as<ivm::IVFunctionType *>();
-    const QRectF fnRect = shared::graphicsviewutils::rect(
-            ivm::IVObject::coordinatesFromString(
-                    parentFn->entityAttributeValue<QString>(ivm::meta::Props::token(coordinateToken))))
-                                  .normalized();
-    const QString strCoordinates = iface->entityAttributeValue<QString>(ivm::meta::Props::token(coordinateToken));
-    QPointF pos = shared::graphicsviewutils::pos(ivm::IVObject::coordinatesFromString(strCoordinates));
-
-    *side = shared::graphicsviewutils::getNearestSide(fnRect, pos);
-
-    pos = shared::graphicsviewutils::getSidePosition(fnRect, pos, *side);
-    if (qFuzzyCompare(fnRect.top(), pos.y())) {
-        const qreal sf = (pos.x() - fnRect.left()) / (fnRect.right() - fnRect.left());
-        pos = QLineF(functionRect.topLeft(), functionRect.topRight()).pointAt(sf);
-    } else if (qFuzzyCompare(fnRect.bottom(), pos.y())) {
-        const qreal sf = (pos.x() - fnRect.left()) / (fnRect.right() - fnRect.left());
-        pos = QLineF(functionRect.bottomLeft(), functionRect.bottomRight()).pointAt(sf);
-    } else if (qFuzzyCompare(fnRect.left(), pos.x())) {
-        const qreal sf = (pos.y() - fnRect.top()) / (fnRect.bottom() - fnRect.top());
-        pos = QLineF(functionRect.topLeft(), functionRect.bottomLeft()).pointAt(sf);
-    } else if (qFuzzyCompare(fnRect.right(), pos.x())) {
-        const qreal sf = (pos.y() - fnRect.top()) / (fnRect.bottom() - fnRect.top());
-        pos = QLineF(functionRect.topRight(), functionRect.bottomRight()).pointAt(sf);
-    }
-    return pos;
-}
-
 int IVInterfaceGraphicsItem::itemLevel(bool isSelected) const
 {
     return gi::itemLevel(entity(), isSelected);
-}
-
-void IVInterfaceGraphicsItem::rebuildLayout()
-{
-    shared::ui::VEInteractiveObject::rebuildLayout();
-    setVisible(entity() && (gi::nestingLevel(entity()) >= gi::kNestingVisibilityLevel || entity()->isRootObject())
-            && entity()->isVisible());
-
-    if (!targetItem()) {
-        prepareGeometryChange();
-        setBoundingRect(QRectF());
-        return;
-    }
-
-    const QRectF parentRect = targetItem()->boundingRect();
-    QPointF ifacePos = pos();
-    Qt::Alignment side = Qt::AlignCenter;
-    bool updateGeometry = false;
-    if (entity() && shared::graphicsviewutils::pos(entity()->coordinates()).isNull()) {
-        if (auto origin = entity()->cloneOf()) {
-            ifacePos = mapPositionFromOrigin(origin, ivm::meta::Props::Token::coordinates, parentRect, &side);
-            updateGeometry = true;
-        } else {
-            layout();
-            mergeGeometry();
-            return;
-        }
-    } else {
-        side = shared::graphicsviewutils::getNearestSide(parentRect, ifacePos);
-    }
-    const QPointF stickyPos = shared::graphicsviewutils::getSidePosition(parentRect, ifacePos, side);
-    setPos(stickyPos);
-    updateInternalItems(side);
-    if (updateGeometry)
-        mergeGeometry();
 }
 
 QPainterPath IVInterfaceGraphicsItem::shape() const
@@ -257,36 +192,6 @@ void IVInterfaceGraphicsItem::onSelectionChanged(bool isSelected)
 {
     const shared::ColorHandler &h = colorHandler();
     m_iface->setBrush(isSelected ? kSelectedBackgroundColor : h.brush());
-}
-
-void IVInterfaceGraphicsItem::layout()
-{
-    static const QList<ivm::meta::Props::Token> types { ivm::meta::Props::Token::coordinates,
-        ivm::meta::Props::Token::InnerCoordinates, ivm::meta::Props::Token::RootCoordinates };
-
-    QPointF pos = shared::graphicsviewutils::pos(entity()->coordinates());
-    int idx = 0;
-    ivm::meta::Props::Token token = entity()->coordinatesType();
-    while (pos.isNull() && idx < types.size()) {
-        token = types.at(idx);
-        const QString strCoordinates = entity()->entityAttributeValue<QString>(ivm::meta::Props::token(token));
-        pos = shared::graphicsviewutils::pos(ivm::IVObject::coordinatesFromString(strCoordinates));
-        ++idx;
-    }
-    if (pos.isNull()) {
-        const Qt::Alignment side = shared::graphicsviewutils::getNearestSide(targetItem()->boundingRect(), pos);
-        updateInternalItems(side);
-        adjustItem();
-        /// NOTE: iface items without connections are put close to top left corner
-        /// because of null pos
-        return;
-    }
-
-    Qt::Alignment side = Qt::AlignCenter;
-    const QRectF sceneParentFnRect = targetItem()->sceneBoundingRect();
-    pos = mapPositionFromOrigin(entity(), token, sceneParentFnRect, &side);
-    updateInternalItems(side);
-    setPos(targetItem()->mapFromScene(pos));
 }
 
 /*!

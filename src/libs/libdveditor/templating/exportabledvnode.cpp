@@ -77,4 +77,13 @@ QVariantList ExportableDVNode::systemFunctions() const
     return functions;
 }
 
+QString ExportableDVNode::nodeLabel() const
+{
+    auto node = exportedObject<dvm::DVNode>();
+    if (!node) {
+        return {};
+    }
+    return node->nodeLabel();
+}
+
 } // namespace dve

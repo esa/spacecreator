@@ -33,7 +33,7 @@ class Asn1Model final : public conversion::Model
 {
 public:
     /** @brief  Model data type */
-    using Data = std::vector<File>;
+    using Data = std::vector<std::unique_ptr<File>>;
 
 public:
     /**
@@ -75,6 +75,12 @@ public:
      * @returns Model data
      */
     auto data() const -> const Data&;
+    /**
+     * @brief   Getter for model data
+     *
+     * @returns Model data
+     */
+    auto data() -> Data&;
 
 private:
     /** @brief  Model data */
@@ -82,3 +88,16 @@ private:
 };
 
 } // namespace Asn1Acn
+
+namespace conversion {
+
+/**
+ * @brief   Specialization for ASN.1 model properties
+ */
+template <>
+struct ModelProperties<Asn1Acn::Asn1Model> {
+    /// @brief  Model type
+    static const ModelType type = ModelType::Asn1;
+};
+
+} // namespace conversion

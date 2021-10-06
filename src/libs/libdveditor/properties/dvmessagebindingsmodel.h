@@ -23,11 +23,11 @@
 #include <QPointer>
 
 namespace dvm {
+class AbstractSystemChecks;
 class DVConnection;
 }
 
 namespace dve {
-class AbstractSystemChecks;
 class DVMessageBindingsModel;
 
 class DVMessageBindingsModel : public QAbstractListModel
@@ -35,7 +35,7 @@ class DVMessageBindingsModel : public QAbstractListModel
 public:
     explicit DVMessageBindingsModel(shared::cmd::CommandsStackBase::Macro *macro, QObject *parent = nullptr);
 
-    void initModel(dvm::DVConnection *connection, AbstractSystemChecks *systemChecker);
+    void initModel(dvm::DVConnection *connection, dvm::AbstractSystemChecks *systemChecker);
 
     // QAbstractItemModel interface
     int rowCount(const QModelIndex &parent) const override;

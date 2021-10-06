@@ -17,24 +17,35 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/lgpl-2.1.html>.
  */
 
-#include "acnnodereconstructingvisitor_tests.h"
-#include "asn1nodereconstructingvisitor_tests.h"
+#pragma once
 
-#include <QObject>
-#include <QTest>
-#include <QtTest/qtestcase.h>
-#include <asn1library/asn1/definitions.h>
+#include <QString>
+#include <conversion/common/import/modelimporter.h>
+#include <memory>
 
-int main(int argc, char *argv[])
+namespace conversion {
+class Model;
+class Options;
+} // namespace conversion
+
+namespace conversion::asn1::importer {
+
+/**
+ * @brief   Importer that reads ASN.1 files
+ */
+class Asn1Importer final : public conversion::importer::ModelImporter
 {
-    int ret = 0;
-    const auto runTest = [&ret, argc, argv](QObject *obj) {
-        ret += QTest::qExec(obj, argc, argv);
-        delete obj;
-    };
+public:
+    /**
+     * @brief   Reads given ASN.1 file and produces ASN.1 model
+     *
+     * @param   options     List of options
+     *
+     * @throws  conversion::importer::ImportException
+     *
+     * @return  Imported ASN.1 model
+     */
+    virtual auto importModel(const conversion::Options &options) const -> std::unique_ptr<conversion::Model> override;
+};
 
-    runTest(new Asn1Acn::Tests::Asn1NodeReconstructingVisitorTests);
-    runTest(new Asn1Acn::Tests::AcnNodeReconstructingVisitorTests);
-
-    return ret;
-}
+} // namespace conversion::asn1::importer

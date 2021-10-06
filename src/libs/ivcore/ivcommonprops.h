@@ -45,6 +45,8 @@ public:
         Comment,
         Source,
         Target,
+        Languages,
+        ComputeLanguage,
 
         // attrs:
         name,
@@ -60,6 +62,8 @@ public:
         group_name,
         func_name,
         is_visible,
+        language,
+        default_language,
 
         // KNOWN TASTE props:
         coordinates,

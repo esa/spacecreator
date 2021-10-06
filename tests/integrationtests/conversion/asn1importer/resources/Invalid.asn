@@ -1,0 +1,7 @@
+InvalidModel DEFINITIONS AUTOMATIC TAGS ::= BEGIN
+
+MySeq ::= SEQUENCE {
+    fieldA    ItDoesntExist
+}
+
+END

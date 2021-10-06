@@ -50,8 +50,21 @@ public:
      *
      * @return  ASN.1 model translated from the SEDS models
      */
-    virtual auto translateModels(std::vector<const Model *> sourceModels, const Options &options) const
+    virtual auto translateModels(std::vector<Model *> sourceModels, const Options &options) const
             -> std::vector<std::unique_ptr<Model>> override;
+
+    /**
+     * @brief   Return a model type that is a source of this translator
+     *
+     * @return  Source model type
+     */
+    virtual auto getSourceModelType() const -> ModelType override;
+    /**
+     * @brief   Returns a model type that is a target of this translator
+     *
+     * @return  Target model type
+     */
+    virtual auto getTargetModelType() const -> ModelType override;
     /**
      * @brief   Provides a set of all source model types that are required for the translation
      *
@@ -77,7 +90,7 @@ private:
      *
      * @return  Result ASN.1 file
      */
-    auto translatePackage(const seds::model::Package &package) const -> Asn1Acn::File;
+    auto translatePackage(const seds::model::Package &package) const -> std::unique_ptr<Asn1Acn::File>;
 
     /**
      * @brief   Translate SEDS data types

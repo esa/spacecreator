@@ -19,6 +19,7 @@
 
 #pragma once
 
+#include "modelproperties.h"
 #include "modeltype.h"
 
 namespace conversion {

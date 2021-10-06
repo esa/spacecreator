@@ -22,6 +22,8 @@
 #include "ivinterface.h"
 #include "ivmodel.h"
 #include "ivobject.h"
+#include "propertytemplate.h"
+#include "propertytemplateconfig.h"
 
 #include <QDebug>
 #include <QScopedPointer>
@@ -31,6 +33,7 @@ namespace ivm {
 
 struct IVFunctionPrivate {
     QPointer<IVFunctionType> m_fnType;
+    QList<EntityAttribute> m_languages;
 };
 
 IVFunction::IVFunction(QObject *parent, const shared::Id &id)
@@ -55,6 +58,7 @@ bool IVFunction::postInit()
                         shared::ErrorItem::Warning, tr("Function type '%1' error").arg(typeName), "");
             }
         }
+        checkDefaultFunctionLanguage();
     }
 
     return IVObject::postInit();
@@ -114,8 +118,60 @@ bool IVFunction::inheritsFunctionType() const
     return instanceOf();
 }
 
+const QList<EntityAttribute> &IVFunction::languages() const
+{
+    return d->m_languages;
+}
+
+void IVFunction::setLanguage(int idx, const EntityAttribute &value)
+{
+    if (idx < 0 || idx >= d->m_languages.size()) {
+        return;
+    }
+    d->m_languages[idx] = value;
+}
+
+bool IVFunction::hasLanguageName(const QString &name) const
+{
+    for (const EntityAttribute &language : d->m_languages) {
+        if (language.name() == name) {
+            return true;
+        }
+    }
+    return false;
+}
+
+void IVFunction::addLanguage(const QString &name, const QString &language)
+{
+    d->m_languages.append(EntityAttribute(name, language, EntityAttribute::Type::Attribute));
+}
+
+/*!
+   Inserts the language \p value at position idx
+ */
+void IVFunction::insertLanguage(int idx, const EntityAttribute &value)
+{
+    d->m_languages.insert(idx, value);
+}
+
+void IVFunction::removeLanguage(int idx)
+{
+    d->m_languages.removeAt(idx);
+}
+
+void IVFunction::setDefaultLanguage(const QString &name)
+{
+    setEntityAttribute(meta::Props::token(meta::Props::Token::default_language), name);
+}
+
+QString IVFunction::defaultLanguage() const
+{
+    return entityAttributeValue(meta::Props::token(meta::Props::Token::default_language)).toString();
+}
+
 bool IVFunction::isPseudoFunction() const
 {
+    /// @todo update to multi language support
     return entityAttributeValue("language").toString() == "Pseudo function";
 }
 
@@ -182,6 +238,37 @@ void IVFunction::reflectContextParam()
 void IVFunction::reflectContextParams(const QVector<shared::ContextParameter> &params)
 {
     setContextParams(params);
+}
+
+void IVFunction::checkDefaultFunctionLanguage()
+{
+    if (languages().isEmpty()) {
+        // Add a default language
+        if (!model()) {
+            return;
+        }
+        QString value = entityAttributeValue("language").toString();
+        if (value.isEmpty()) {
+            shared::PropertyTemplate *temp = model()->dynPropConfig()->propertyTemplateForObject(
+                    this, meta::Props::token(meta::Props::Token::default_language));
+            if (!temp) {
+                return;
+            }
+            value = temp->defaultValue().toString();
+        }
+        addLanguage("default", value);
+        setDefaultLanguage("default");
+        return;
+    }
+
+    QString defaultLang = defaultLanguage();
+    for (const EntityAttribute &lang : languages()) {
+        if (lang.name() == defaultLang) {
+            return;
+        }
+    }
+    // default not found - setting the first one
+    setDefaultLanguage(languages().at(0).name());
 }
 
 }

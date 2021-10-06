@@ -30,8 +30,8 @@ namespace conversion {
  */
 enum class ModelType
 {
+    Unspecified,
     Asn1,
-    Aadl,
     InterfaceView,
     Sdl,
     Seds

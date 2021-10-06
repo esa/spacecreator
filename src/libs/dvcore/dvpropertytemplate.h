@@ -32,6 +32,7 @@ public:
         Partition = 0x2,
         Device = 0x4,
         Connection = 0x8,
+        Function = 0x16
     };
 
     Q_ENUM(Scope)

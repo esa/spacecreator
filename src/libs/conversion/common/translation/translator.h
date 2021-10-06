@@ -22,6 +22,7 @@
 #include "model.h"
 #include "modeltype.h"
 #include "options.h"
+#include "translation/exceptions.h"
 
 #include <memory>
 #include <set>
@@ -64,20 +65,57 @@ public:
     /**
      * @brief   Translate given source model into a target model
      *
-     * @param   sources     Vector of source models
-     * @param   options     Options for export configuration
+     * @param   sourceModels    Vector of source models
+     * @param   options         Options for export configuration
      *
      * @return  Target model translated from the source model
      */
-    virtual auto translateModels(std::vector<const Model *> sources, const Options &options) const
+    virtual auto translateModels(std::vector<Model *> sourceModels, const Options &options) const
             -> std::vector<std::unique_ptr<Model>> = 0;
 
+    /**
+     * @brief   Return a model type that is a source of this translator
+     *
+     * @return  Source model type
+     */
+    virtual auto getSourceModelType() const -> ModelType = 0;
+    /**
+     * @brief   Returns a model type that is a target of this translator
+     *
+     * @return  Target model type
+     */
+    virtual auto getTargetModelType() const -> ModelType = 0;
     /**
      * @brief   Provides a set of all source model types that are required for the translation
      *
      * @return  Set of required models
      */
     virtual auto getDependencies() const -> std::set<ModelType> = 0;
+
+protected:
+    auto checkSourceModelCount(const std::vector<Model *> &models) const -> void;
+
+    template<typename ModelT>
+    static auto getModel(const std::vector<Model *> models) -> ModelT *;
 };
+
+template<typename ModelT>
+ModelT *Translator::getModel(const std::vector<Model *> models)
+{
+    std::vector<Model *> foundModels;
+    std::copy_if(models.begin(), models.end(), std::back_inserter(foundModels),
+            [](Model *model) { return dynamic_cast<ModelT *>(model) != nullptr; });
+
+    if (foundModels.empty()) {
+        auto message = QString("Missing source %1 model").arg(modelTypeToString(ModelProperties<ModelType>::type));
+        throw conversion::translator::TranslationException(std::move(message));
+    } else if (foundModels.size() > 1) {
+        auto message =
+                QString("More than 1 source %1 model passed").arg(modelTypeToString(ModelProperties<ModelType>::type));
+        throw conversion::translator::TranslationException(std::move(message));
+    } else {
+        return dynamic_cast<ModelT *>(foundModels[0]);
+    }
+}
 
 } // namespace conversion::translator

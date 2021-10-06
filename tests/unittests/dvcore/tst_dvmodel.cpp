@@ -37,6 +37,7 @@ private Q_SLOTS:
     void testInitFromObjects();
     void testConnectionName();
     void testGetObjectByName();
+    void testUniqueNodeLabel();
 
 private:
     QScopedPointer<dvm::DVModel> m_model;
@@ -155,6 +156,18 @@ void tst_DVModel::testGetObjectByName()
     QCOMPARE(m_model->getObjectByName("partition_a", dvm::DVObject::Type::Partition), partition1);
     QCOMPARE(m_model->getObjectByName("partition_a", dvm::DVObject::Type::Partition, Qt::CaseSensitive), nullptr);
     QCOMPARE(m_model->getObjectByName("partition_a", dvm::DVObject::Type::Node), nullptr);
+}
+
+void tst_DVModel::testUniqueNodeLabel()
+{
+    auto node1 = new dvm::DVNode();
+    m_model->addObject(node1);
+    QCOMPARE(node1->nodeLabel(), "Node_1");
+
+    auto node2 = new dvm::DVNode();
+    node2->setEntityAttribute(dvm::meta::Props::token(dvm::meta::Props::Token::node_label), "Node_1");
+    m_model->addObject(node2);
+    QCOMPARE(node2->nodeLabel(), "Node_2");
 }
 
 QTEST_APPLESS_MAIN(tst_DVModel)

@@ -40,13 +40,11 @@ public:
     void updateFromEntity() override;
     QList<QPair<VEObject *, QVector<QPointF>>> prepareChangeCoordinatesCommandParams() const override;
 
-    /// PUBLIC FOR TESTING PURPOSE, MOVE TO PRIVATE
     QRectF nestedItemsSceneBoundingRect() const;
-    bool itemNeedsToBeRelayout() const;
-    void layout();
+    bool layoutShouldBeChanged() const;
+    bool doLayout() override;
 
 protected:
-    void rebuildLayout() override;
     void initGripPoints() override;
     void onManualMoveProgress(GripPoint *grip, const QPointF &from, const QPointF &to) override;
     void onManualResizeProgress(GripPoint *grip, const QPointF &from, const QPointF &to) override;

@@ -29,45 +29,42 @@
 #include <seds/SedsModel/sedsmodel.h>
 
 using Asn1Acn::Asn1Model;
-using conversion::translator::IncorrectSourceModelException;
 using conversion::translator::TranslationException;
 using seds::model::SedsModel;
 
 namespace conversion::asn1::translator {
 
 std::vector<std::unique_ptr<Model>> SedsToAsn1Translator::translateModels(
-        std::vector<const Model *> sourceModels, const Options &options) const
+        std::vector<Model *> sourceModels, const Options &options) const
 {
     Q_UNUSED(options);
 
-    if (sourceModels.empty()) {
-        throw TranslationException("No models passed for translation");
-    } else if (sourceModels.size() > 1) {
-        throw TranslationException("Only one model is allowed for translation");
-    }
+    checkSourceModelCount(sourceModels);
 
-    const auto *sourceModel = sourceModels[0];
-    if (sourceModel == nullptr) {
-        throw TranslationException("Source model is null");
-    }
-
-    if (sourceModel->modelType() != ModelType::Seds) {
-        throw IncorrectSourceModelException(ModelType::Seds, sourceModel->modelType());
-    }
-
-    const auto *sedsModel = dynamic_cast<const SedsModel *>(sourceModel);
+    const auto *sedsModel = getModel<SedsModel>(sourceModels);
 
     return translateSedsModel(sedsModel);
 }
 
+ModelType SedsToAsn1Translator::getSourceModelType() const
+{
+    return ModelType::Seds;
+}
+
+ModelType SedsToAsn1Translator::getTargetModelType() const
+{
+    return ModelType::Asn1;
+}
+
 std::set<ModelType> SedsToAsn1Translator::getDependencies() const
 {
-    return std::set<ModelType> { ModelType::Seds };
+    static std::set<ModelType> dependencies { ModelType::Seds };
+    return dependencies;
 }
 
 std::vector<std::unique_ptr<Model>> SedsToAsn1Translator::translateSedsModel(const SedsModel *sedsModel) const
 {
-    std::vector<Asn1Acn::File> asn1Files;
+    std::vector<std::unique_ptr<Asn1Acn::File>> asn1Files;
 
     const auto &sedsModelData = sedsModel->data();
     if (std::holds_alternative<seds::model::PackageFile>(sedsModelData)) {
@@ -90,14 +87,14 @@ std::vector<std::unique_ptr<Model>> SedsToAsn1Translator::translateSedsModel(con
     return result;
 }
 
-Asn1Acn::File SedsToAsn1Translator::translatePackage(const seds::model::Package &package) const
+std::unique_ptr<Asn1Acn::File> SedsToAsn1Translator::translatePackage(const seds::model::Package &package) const
 {
-    Asn1Acn::File asn1File("");
+    auto asn1File = std::make_unique<Asn1Acn::File>(package.nameStr());
 
-    auto definitions = std::make_unique<Asn1Acn::Definitions>(package.nameStr(), Asn1Acn::SourceLocation());
+    auto definitions = std::make_unique<Asn1Acn::Definitions>(package.asn1NameStr(), Asn1Acn::SourceLocation());
     translateDataTypes(package.dataTypes(), definitions.get());
 
-    asn1File.add(std::move(definitions));
+    asn1File->add(std::move(definitions));
 
     return asn1File;
 }

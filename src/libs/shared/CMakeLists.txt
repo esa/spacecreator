@@ -64,6 +64,8 @@ target_sources(${LIB_NAME} PRIVATE
     graphicsviewutils.h
     interface/attributedelegate.cpp
     interface/attributedelegate.h
+    interface/comboboxdelegate.cpp
+    interface/comboboxdelegate.h
     interface/creatortool.cpp
     interface/creatortool.h
     interface/objectstreeview.cpp

@@ -50,7 +50,7 @@ DVMessageBindingsWidget::DVMessageBindingsWidget(shared::cmd::CommandsStackBase:
     layout->addLayout(btnsLayout);
 }
 
-void DVMessageBindingsWidget::initModel(dvm::DVConnection *connection, AbstractSystemChecks *systemChecker)
+void DVMessageBindingsWidget::initModel(dvm::DVConnection *connection, dvm::AbstractSystemChecks *systemChecker)
 {
     // set up model
     if (!m_model) {

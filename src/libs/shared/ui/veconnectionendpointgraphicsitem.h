@@ -40,7 +40,6 @@ public:
     QList<QPointer<VEConnectionGraphicsItem>> connectionItems() const;
 
     VERectGraphicsItem *targetItem() const;
-    void setTargetItem(VERectGraphicsItem *item, const QPointF &globalPos);
 
     virtual QPointF connectionEndPoint(const bool innerConnection) const;
     virtual QPointF connectionEndPoint(VEConnectionGraphicsItem *connection = nullptr) const;
@@ -51,10 +50,11 @@ public:
     void adjustItem();
 
     static qreal minSiblingDistance();
-    virtual void layout();
+    bool doLayout() override;
     virtual QPainterPath ifaceShape() const;
 
 protected:
+    void rebuildLayout() override;
     QVariant itemChange(GraphicsItemChange change, const QVariant &value) override;
     void onManualMoveProgress(GripPoint *grip, const QPointF &from, const QPointF &to) override;
     void onManualMoveFinish(GripPoint *grip, const QPointF &from, const QPointF &to) override;

@@ -260,7 +260,7 @@ void CreatorTool::populateContextMenu_propertiesDialog(QMenu *menu)
         action->setEnabled(connectionItem);
 
         connect(action, &QAction::triggered, this, [connectionItem]() {
-            connectionItem->layout();
+            connectionItem->doLayout();
             connectionItem->updateEntity();
         });
     } else if (veIObj) {

@@ -32,29 +32,29 @@ const QString InterfaceCommandTranslator::m_interfaceParameterEncoding = "ACN";
 const QString InterfaceCommandTranslator::m_ivInterfaceNameTemplate = "%1_%2_%3";
 
 InterfaceCommandTranslator::InterfaceCommandTranslator(
-        const seds::model::Interface &interface, ivm::IVFunction *ivFunction)
-    : m_interface(interface)
+        const seds::model::Interface &sedsInterface, ivm::IVFunction *ivFunction)
+    : m_sedsInterface(sedsInterface)
     , m_ivFunction(ivFunction)
 {
 }
 
-ivm::IVInterface *InterfaceCommandTranslator::createIvInterface(const seds::model::InterfaceCommand &command,
+ivm::IVInterface *InterfaceCommandTranslator::createIvInterface(const seds::model::InterfaceCommand &sedsCommand,
         ivm::IVInterface::InterfaceType type, ivm::IVInterface::OperationKind kind) const
 {
     ivm::IVInterface::CreationInfo creationInfo;
     creationInfo.function = m_ivFunction;
     creationInfo.type = type;
-    creationInfo.name = m_ivInterfaceNameTemplate.arg(m_interface.nameStr())
-                                .arg(command.nameStr())
+    creationInfo.name = m_ivInterfaceNameTemplate.arg(m_sedsInterface.nameStr())
+                                .arg(sedsCommand.nameStr())
                                 .arg(interfaceTypeToString(type));
     creationInfo.kind = kind;
 
     return ivm::IVInterface::createIface(creationInfo);
 }
 
-const QString &InterfaceCommandTranslator::interfaceTypeToString(ivm::IVInterface::InterfaceType interfaceType) const
+const QString &InterfaceCommandTranslator::interfaceTypeToString(ivm::IVInterface::InterfaceType type) const
 {
-    switch (interfaceType) {
+    switch (type) {
     case ivm::IVInterface::InterfaceType::Required: {
         static QString name = "Ri";
         return name;

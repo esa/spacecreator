@@ -54,7 +54,6 @@ public:
     QPainterPath shape() const override;
 
     void updateFromEntity() override;
-    void layout() override;
     int itemLevel(bool isSelected) const override;
     QString prepareTooltip() const override;
 
@@ -66,7 +65,6 @@ public Q_SLOTS:
 
 protected:
     QVariant itemChange(GraphicsItemChange change, const QVariant &value) override;
-    void rebuildLayout() override;
     void onSelectionChanged(bool isSelected) override;
     void updateInternalItems(Qt::Alignment alignment) override;
     virtual shared::ColorManager::HandledColors handledColorType() const override;

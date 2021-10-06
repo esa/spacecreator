@@ -127,9 +127,11 @@ void DVDeviceGraphicsItem::rebuildLayout()
     }
 
     if (entity()) {
-        if (shared::graphicsviewutils::pos(entity()->coordinates()).isNull()) {
-            layout();
-            mergeGeometry();
+        const QPointF entityPos = shared::graphicsviewutils::pos(entity()->coordinates());
+        if (entityPos.isNull()) {
+            if (doLayout()) {
+                mergeGeometry();
+            }
             return;
         }
     }
@@ -137,7 +139,10 @@ void DVDeviceGraphicsItem::rebuildLayout()
     const QPointF ifacePos = pos();
     const Qt::Alignment side = shared::graphicsviewutils::getNearestSide(parentRect, ifacePos);
     const QPointF stickyPos = shared::graphicsviewutils::getSidePosition(parentRect, ifacePos, side);
-    setPos(stickyPos);
+    if (ifacePos != stickyPos) {
+        setPos(stickyPos);
+        mergeGeometry();
+    }
     updateInternalItems(side);
 }
 

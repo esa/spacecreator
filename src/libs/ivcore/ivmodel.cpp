@@ -56,7 +56,7 @@ bool IVModel::addObjectImpl(shared::VEObject *obj)
             d->m_visibleObjects.append(ivObj);
 
             for (const auto attr : d->m_dynPropConfig->propertyTemplatesForObject(ivObj)) {
-                if (attr->validate(ivObj)) {
+                if (attr->validate(ivObj) && !attr->isOptional()) {
                     const QVariant &currentValue = obj->entityAttributeValue(attr->name());
                     if (currentValue.isNull()) {
                         const QVariant &defaultValue = attr->defaultValue();
@@ -372,7 +372,35 @@ void IVModel::clear()
 
 conversion::ModelType IVModel::modelType() const
 {
-    return conversion::ModelType::InterfaceView;
+    return conversion::ModelProperties<IVModel>::type;
+}
+
+shared::PropertyTemplateConfig *IVModel::dynPropConfig() const
+{
+    return d->m_dynPropConfig;
+}
+
+QString IVModel::defaultFunctionLanguage() const
+{
+    IVFunction f;
+    shared::PropertyTemplate *t =
+            d->m_dynPropConfig->propertyTemplateForObject(&f, meta::Props::token(meta::Props::Token::language));
+    if (!t) {
+        return {};
+    }
+    return t->defaultValue().toString();
+}
+
+QStringList IVModel::availableFunctionLanguages() const
+{
+    IVFunction f;
+    shared::PropertyTemplate *t =
+            d->m_dynPropConfig->propertyTemplateForObject(&f, meta::Props::token(meta::Props::Token::language));
+    if (t) {
+        return t->value().toStringList();
+    }
+
+    return {};
 }
 
 /*!

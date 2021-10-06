@@ -415,7 +415,7 @@ void tst_ConnectionUtils::tst_endPoints()
             if (ci.function->addChild(iface)) {
                 auto ifaceItem = new ive::IVInterfaceGraphicsItem(iface, data.at(idx).function());
                 ifaceItem->init();
-                ifaceItem->setTargetItem(data.at(idx).function(), ci.position);
+                ifaceItem->setPos(ifaceItem->mapToParent(ifaceItem->mapFromScene(ci.position)));
             }
         }
     };
@@ -542,6 +542,10 @@ void tst_ConnectionUtils::checkEndPoints(ive::IVFunctionGraphicsItem *startFn, D
     QCOMPARE(result.failed(), shouldFail);
     if (!result.failed()) {
         if (isReversed) {
+            if (result.connectionPoints.first() != connectionPoints.last()) {
+                qDebug() << "###:"
+                         << shared::graphicsviewutils::comparePolygones(result.connectionPoints, connectionPoints);
+            }
             QCOMPARE(result.connectionPoints.first(), connectionPoints.last());
             QCOMPARE(result.connectionPoints.last(), connectionPoints.first());
         } else {

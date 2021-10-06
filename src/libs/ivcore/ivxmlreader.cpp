@@ -161,7 +161,6 @@ IVConnection::EndPointInfo *addConnectionPart(const EntityAttributes &otherAttrs
 void IVXMLReader::processTagOpen(QXmlStreamReader &xml)
 {
     const QString &tagName = xml.name().toString();
-    const QString &attrName = Props::token(Props::Token::name);
     const EntityAttributes attrs = attributes(xml.attributes());
     //    const XmlAttribute &nameAttr = attrs.take(attrName);
 
@@ -244,6 +243,17 @@ void IVXMLReader::processTagOpen(QXmlStreamReader &xml)
             shared::ContextParameter param(
                     attrValue(attrs, Props::Token::name), paramType, typeString, attrValue(attrs, Props::Token::value));
             function->addContextParam(param);
+        }
+        break;
+    }
+    case Props::Token::Languages: {
+        // Container for list of languages only
+        break;
+    }
+    case Props::Token::ComputeLanguage: {
+        auto fn = qobject_cast<ivm::IVFunction *>(d->m_currentObject.get().data());
+        if (fn) {
+            fn->addLanguage(attrValue(attrs, Props::Token::name), attrValue(attrs, Props::Token::language));
         }
         break;
     }

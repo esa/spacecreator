@@ -32,14 +32,17 @@ namespace Asn1Acn {
 class Asn1SystemChecks;
 }
 
-namespace dve {
+namespace dvm {
 class AbstractSystemChecks;
+}
+
+namespace dve {
 
 class DVPropertiesDialog : public shared::PropertiesDialog
 {
 public:
     DVPropertiesDialog(shared::PropertyTemplateConfig *dynPropConfig, dvm::DVObject *obj,
-            AbstractSystemChecks *systemChecker, Asn1Acn::Asn1SystemChecks *asn1Checks,
+            dvm::AbstractSystemChecks *systemChecker, Asn1Acn::Asn1SystemChecks *asn1Checks,
             shared::cmd::CommandsStackBase *commandsStack, QWidget *parent = nullptr);
 
     void init() override;
@@ -51,7 +54,7 @@ protected:
 private:
     void initAttributesView();
 
-    AbstractSystemChecks *m_systemChecker = nullptr;
+    dvm::AbstractSystemChecks *m_systemChecker = nullptr;
 };
 
 } // namespace dve

@@ -53,6 +53,16 @@ public:
     void updateSceneRect();
     void clearScene();
 
+    template<typename T>
+    T getItem(const shared::Id id) const
+    {
+        if (id.isNull()) {
+            return nullptr;
+        }
+
+        return qgraphicsitem_cast<T>(m_items.value(id));
+    }
+
 Q_SIGNALS:
     void itemClicked(shared::Id id);
     void itemDoubleClicked(shared::Id id);
@@ -67,16 +77,6 @@ private:
     void onSceneSelectionChanged();
 
 protected:
-    template<typename T>
-    T getItem(const shared::Id id) const
-    {
-        if (id.isNull()) {
-            return nullptr;
-        }
-
-        return qgraphicsitem_cast<T>(m_items.value(id));
-    }
-
     virtual VEInteractiveObject *createItem(shared::Id objectId) = 0;
     virtual void initItem(VEInteractiveObject *item);
 

@@ -39,6 +39,7 @@ struct PropertyTemplate::PropertyTemplatePrivate {
     bool m_isVisible = true;
     bool m_isEditable = true;
     bool m_isSystem = false;
+    bool m_isOptional = false;
 };
 
 PropertyTemplate::PropertyTemplate()
@@ -128,6 +129,16 @@ void PropertyTemplate::setEditable(bool value)
     d->m_isEditable = value;
 }
 
+bool PropertyTemplate::isOptional() const
+{
+    return d->m_isOptional;
+}
+
+void PropertyTemplate::setOptional(bool value)
+{
+    d->m_isOptional = value;
+}
+
 QVariant PropertyTemplate::value() const
 {
     return d->m_value;
@@ -178,6 +189,9 @@ QDomElement PropertyTemplate::toXml(QDomDocument *doc) const
     if (!d->m_isVisible) {
         attrElement.setAttribute(QLatin1String("visible"), QLatin1String("false"));
     }
+    if (d->m_isOptional) {
+        attrElement.setAttribute(QLatin1String("optional"), QLatin1String("true"));
+    }
 
     static const QMetaEnum &infoMeta = QMetaEnum::fromType<PropertyTemplate::Info>();
     if (d->m_info == PropertyTemplate::Info::Property) {
@@ -193,7 +207,7 @@ QDomElement PropertyTemplate::toXml(QDomDocument *doc) const
         typeSubElement.setAttribute(QLatin1String("validator"), d->m_rxValueValidatorPattern);
     }
     if (d->m_type == PropertyTemplate::Type::Enumeration) {
-        for (const auto& entry : d->m_value.toList()) {
+        for (const auto &entry : d->m_value.toList()) {
             QDomElement entryElement = doc->createElement(QLatin1String("Entry"));
             entryElement.setAttribute(QLatin1String("value"), entry.toString());
             typeSubElement.appendChild(entryElement);
@@ -241,6 +255,9 @@ void PropertyTemplate::initFromXml(const QDomElement &element)
     const bool isVisible =
             QString::compare(element.attribute(QLatin1String("visible")), QLatin1String("false"), Qt::CaseInsensitive)
             != 0;
+    const bool isOptional =
+            QString::compare(element.attribute(QLatin1String("optional")), QLatin1String("true"), Qt::CaseInsensitive)
+            == 0;
     static const QMetaEnum &infoMeta = QMetaEnum::fromType<PropertyTemplate::Info>();
     const int infoInt = infoMeta.keyToValue(attrType.toUtf8().data(), &ok);
     const PropertyTemplate::Info i =
@@ -315,6 +332,7 @@ void PropertyTemplate::initFromXml(const QDomElement &element)
     setValueValidatorPattern(typeValidator);
     setVisible(isVisible);
     setEditable(isEditable);
+    setOptional(isOptional);
 }
 
 QVariant PropertyTemplate::convertData(const QVariant &value, PropertyTemplate::Type type)

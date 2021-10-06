@@ -27,10 +27,15 @@ Asn1Model::Asn1Model(Asn1Model::Data data)
 
 conversion::ModelType Asn1Model::modelType() const
 {
-    return conversion::ModelType::Asn1;
+    return conversion::ModelProperties<Asn1Model>::type;
 }
 
 const Asn1Model::Data& Asn1Model::data() const
+{
+    return m_data;
+}
+
+Asn1Model::Data& Asn1Model::data()
 {
     return m_data;
 }

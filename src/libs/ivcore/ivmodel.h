@@ -88,6 +88,11 @@ public:
 
     virtual conversion::ModelType modelType() const override;
 
+    shared::PropertyTemplateConfig *dynPropConfig() const;
+
+    QString defaultFunctionLanguage() const;
+    QStringList availableFunctionLanguages() const;
+
 Q_SIGNALS:
     void rootObjectChanged(shared::Id rootId);
 
@@ -99,3 +104,16 @@ private:
 };
 
 }
+
+namespace conversion {
+
+/**
+ * @brief   Specialization for InterfaceView model properties
+ */
+template <>
+struct ModelProperties<ivm::IVModel> {
+    /// @brief  Model type
+    static const ModelType type = ModelType::InterfaceView;
+};
+
+} // namespace conversion

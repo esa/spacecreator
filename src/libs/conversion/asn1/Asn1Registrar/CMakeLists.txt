@@ -13,6 +13,7 @@ target_include_directories(Asn1Registrar
 target_link_libraries(Asn1Registrar
     PUBLIC      Conversion::Common
                 Conversion::Asn1Exporter
+                Conversion::Asn1Importer
                 Conversion::SedsToAsn1Translator
     PRIVATE     CommonProjectWarnings)
 

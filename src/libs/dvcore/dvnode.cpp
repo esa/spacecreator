@@ -19,6 +19,7 @@
 
 #include "dvboard.h"
 #include "dvdevice.h"
+#include "dvmodel.h"
 #include "dvpartition.h"
 #include "dvsystemfunction.h"
 
@@ -44,6 +45,17 @@ DVNode::DVNode(DVObject *parent)
 }
 
 DVNode::~DVNode() { }
+
+bool DVNode::postInit()
+{
+    QString label = nodeLabel();
+
+    if (label.isEmpty() || nodeLabelCount(label) > 1) {
+        setEntityAttribute(dvm::meta::Props::token(dvm::meta::Props::Token::node_label), uniqueLabelName());
+    }
+
+    return true;
+}
 
 void DVNode::addPartition(DVPartition *partition)
 {
@@ -121,6 +133,43 @@ DVSystemFunction *DVNode::systemFunction(const QString &name) const
 bool DVNode::hasSystemFunction(const QString &name) const
 {
     return systemFunction(name) != nullptr;
+}
+
+/*!
+   A Unique label for for this node within it's model
+ */
+QString DVNode::nodeLabel() const
+{
+    return entityAttributeValue(dvm::meta::Props::token(dvm::meta::Props::Token::node_label)).toString();
+}
+
+/*!
+   Creates a new unique label name
+ */
+QString DVNode::uniqueLabelName() const
+{
+    QString baseLabel = QString("Node_%1");
+    int idx = 1;
+    QString label = baseLabel.arg(idx);
+    while (nodeLabelCount(label) > 0) {
+        ++idx;
+        label = baseLabel.arg(idx);
+    }
+    return label;
+}
+
+int DVNode::nodeLabelCount(const QString &label) const
+{
+    DVModel *dvmodel = model();
+    Q_ASSERT(dvmodel);
+
+    int count = 0;
+    for (DVNode *node : dvmodel->allObjectsByType<DVNode>()) {
+        if (node->entityAttributeValue(meta::Props::token(meta::Props::Token::node_label)).toString() == label) {
+            ++count;
+        }
+    }
+    return count;
 }
 
 } // namespace dvm

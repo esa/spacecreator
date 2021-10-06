@@ -21,10 +21,12 @@
 #include "ivinterface.h"
 #include "ui/graphicsviewbase.h"
 
+#include <QPointer>
 #include <QSharedPointer>
 #include <QVector>
 
 namespace ivm {
+class AbstractSystemChecks;
 class IVConnection;
 class IVFunction;
 }
@@ -81,6 +83,9 @@ public:
     QStringList ivFunctionsNames() const;
     QStringList ivConnectionNames() const;
 
+    void setDvChecks(ivm::AbstractSystemChecks *checks);
+    ivm::AbstractSystemChecks *dvChecks() const;
+
 public Q_SLOTS:
     void onSaveRenderRequested();
 
@@ -105,6 +110,8 @@ private:
     QVector<ivm::IVConnection *> m_ivConnections;
 
     Qt::CaseSensitivity m_caseCheck = Qt::CaseInsensitive;
+
+    QPointer<ivm::AbstractSystemChecks> m_checks;
 };
 
 }

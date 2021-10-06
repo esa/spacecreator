@@ -15,19 +15,20 @@ space-creator:
     - export PACKAGE_DIR=${PROJECT_ROOT}/package
     - export CMAKE_BUILD=-DCMAKE_BUILD_TYPE=Release
     - export ENV_QT_BASE_DIR=${DOWNLOAD_DIR}/Qt/${ENV_QT_VERSION}/gcc_64
-    - export QTC_SOURCE=${DOWNLOAD_DIR}/qt-creator
     - export QTC_INSTALL=${DOWNLOAD_DIR}/spacecreator.AppDir
+    - export QTC_SOURCE=${QTC_INSTALL}
     - mkdir -p ${DOWNLOAD_DIR}
     - mkdir -p ${BUILD_DIR}
     - mkdir -p ${PACKAGE_DIR}
     # dependencies
-    - apt install -y  build-essential git g++ cmake cmake-data ninja-build make qtbase5-dev-tools qtbase5-dev qtdeclarative5-dev qtlocation5-dev qtpositioning5-dev libqt5svg5-dev libqt5websockets5-dev qt5-default qbs qtwebengine5-dev gcovr lcov ccache cccc doxygen graphviz zip p7zip curl wget default-jre uuid-dev pkg-config qtcreator fuse python3-pip
+    - apt install -y  build-essential git g++ cmake cmake-data ninja-build make gcovr lcov ccache cccc doxygen graphviz zip p7zip curl wget default-jre uuid-dev pkg-config fuse python3-pip
+    # install qtcreator sources
+    - ./scripts/download_qtcreator.sh
     - ./scripts/build_grantlee.sh
     # build space creator
     - cd ${BUILD_DIR}
-    - cmake -GNinja -S ${PROJECT_ROOT} -B ${BUILD_DIR} ${CMAKE_BUILD} -DBUILD_PATCH_NUMBER=$CI_BUILD_ID
+    - cmake -GNinja -S ${PROJECT_ROOT} -B ${BUILD_DIR} ${CMAKE_BUILD} -DBUILD_PATCH_NUMBER=$CI_BUILD_ID -DCMAKE_PREFIX_PATH:STRING=${ENV_QT_BASE_DIR} -DQT_QMAKE_EXECUTABLE:STRING=${ENV_QT_BASE_DIR}/bin/qmake
     - cmake --build . --target all
-    - cd ${PROJECT_ROOT}
     # unit tests
     - cd ${DOWNLOAD_DIR}
     - wget -q -O - https://github.com/ttsiodras/asn1scc/releases/download/4.2.4.7f/asn1scc-bin-4.2.4.7f.tar.bz2 | tar jxvf -
@@ -42,18 +43,12 @@ space-creator:
     #- ninja ; ../scripts/run_tests.sh . ; ninja coverage ; ninja coverage_html
     #- cd ..
     # documentation
-    - ./scripts/generate_documentation.sh
+    #- ./scripts/generate_documentation.sh
     # debian package
-    # install qtcreator sources
-    - ./scripts/download_qtcreator.sh
     # build the plugin
-    - cd ${BUILD_DIR}
-    - cmake -GNinja -S ${PROJECT_ROOT} -B ${BUILD_DIR} ${CMAKE_BUILD} -DBUILD_PATCH_NUMBER=$CI_BUILD_ID -DENABLE_TESTS=OFF
-    - cmake --build . --target all
     # Create .deb package
-    - cpack
-    - mkdir -p ${PACKAGE_DIR}
-    - cp ${BUILD_DIR}/*.deb ${PACKAGE_DIR}
+    #- cpack
+    #- cp ${BUILD_DIR}/*.deb ${PACKAGE_DIR}
     # Create AppImage
     - ${PROJECT_ROOT}/scripts/create_appimage.sh
   cache:

@@ -72,6 +72,12 @@ public:
      * @return Name string
      */
     auto nameStr() const -> const QString &;
+    /**
+     * @brief   Get name string that is valid for ASN.1
+     *
+     * @return  ASN.1 name string
+     */
+    auto asn1NameStr() const -> QString;
 
 private:
     QualifiedName m_qualifiedName;

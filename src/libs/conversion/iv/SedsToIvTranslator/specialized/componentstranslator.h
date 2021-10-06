@@ -48,10 +48,10 @@ public:
     /**
      * @brief   Constructor
      *
-     * @param   package             Package with components to translate
+     * @param   sedsPackage         Package with components to translate
      * @param   asn1Definitions     ASN.1 file where types of the packed argument will be saved
      */
-    ComponentsTranslator(const seds::model::Package &package, Asn1Acn::Definitions *asn1Definitions);
+    ComponentsTranslator(const seds::model::Package &sedsPackage, Asn1Acn::Definitions *asn1Definitions);
     /**
      * @brief   Deleted copy constructor
      */
@@ -81,22 +81,22 @@ private:
     /**
      * @brief   Translates SEDS component to InterfaceView function
      *
-     * @param   component   Component to translate
+     * @param   sedsComponent   Component to translate
      *
      * @return  Result InterfaceView function
      */
-    auto translateComponent(const seds::model::Component &component) const -> ivm::IVFunction *;
+    auto translateComponent(const seds::model::Component &sedsComponent) -> ivm::IVFunction *;
 
     /**
      * @brief   Translates SEDS interface to InterfaceView interface
      *
-     * @param   interface       Interface to translate
-     * @param   component       Parent component
-     * @param   interfaceType   Type of the IV interface
-     * @param   ivFunction      Target iv function
+     * @param   sedsInterface       Interface to translate
+     * @param   sedsComponent       Parent component
+     * @param   interfaceType       Type of the IV interface
+     * @param   ivFunction          IV Function where the result should be added
      */
-    auto translateInterface(const seds::model::Interface &interface, const seds::model::Component &component,
-            const ivm::IVInterface::InterfaceType interfaceType, ivm::IVFunction *ivFunction) const -> void;
+    auto translateInterface(const seds::model::Interface &sedsInterface, const seds::model::Component &sedsComponent,
+            const ivm::IVInterface::InterfaceType interfaceType, ivm::IVFunction *ivFunction) -> void;
 
 private:
     /**
@@ -105,16 +105,19 @@ private:
      * It first searches in the component interface declarations. If no declaration was found
      * then it searches in the package interface declarations.
      *
+     * @param   name            Interface declaration name
+     * @param   sedsComponent   Component to search in
+     *
      * @throw UndeclaredInterfaceException  If interface declaration was not found
      *
      * @return  Found interface declarartion
      */
-    auto findInterfaceDeclaration(const QString &interfaceTypeName, const seds::model::Component &component) const
+    auto findInterfaceDeclaration(const QString &name, const seds::model::Component &sedsComponent) const
             -> const seds::model::InterfaceDeclaration &;
 
 private:
     /// @brief  Parent package
-    const seds::model::Package &m_package;
+    const seds::model::Package &m_sedsPackage;
     /// @brief  Target ASN.1 type definitions
     Asn1Acn::Definitions *m_asn1Definitions;
 };

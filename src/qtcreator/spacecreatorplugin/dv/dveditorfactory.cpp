@@ -40,7 +40,7 @@ DVEditorFactory::DVEditorFactory(
     Core::FileIconProvider::registerIconOverlayForSuffix(":/projectexplorer/images/fileoverlay_scxml.png", "xml");
 }
 
-Core::IEditor *spctr::DVEditorFactory::createDVEditor()
+Core::IEditor *DVEditorFactory::createDVEditor()
 {
     return m_editorData->createEditor();
 }

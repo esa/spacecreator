@@ -40,7 +40,7 @@ public:
 
 protected:
     void updateItemData(QStandardItem *item, shared::VEObject *obj) override;
-    QStandardItem *createItem(shared::VEObject *obj) override;
+    QList<QStandardItem *> createItems(shared::VEObject *obj) override;
 };
 
 } // namespace dve

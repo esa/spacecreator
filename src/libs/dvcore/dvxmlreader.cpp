@@ -92,7 +92,10 @@ void DVXMLReader::processTagOpen(QXmlStreamReader &xml)
     case meta::Props::Token::Function: {
         if (auto partition = qobject_cast<dvm::DVPartition *>(d->m_currentObject)) {
             auto fn = new dvm::DVFunction(d->m_currentObject);
-            fn->setTitle(xml.readElementText());
+            if (tagName == "function") {
+                // old version
+                fn->setTitle(xml.readElementText());
+            }
             partition->addFunction(fn);
             obj = fn;
         }

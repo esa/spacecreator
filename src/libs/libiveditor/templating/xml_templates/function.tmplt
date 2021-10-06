@@ -26,6 +26,10 @@ func.connections        :   |_ List of all nested connections of function
 conn                    :       |_ Instance of nested connections
 func.connectedFunctions :   |_ List of connected functions
 connectedFunc           :       |_ List of parent Functions names
+func.languages          :   |_ List of all inmplementations languages for this function
+language                :       |_ Instance of language
+language.name           :           |_ Name for this implementation
+language.value          :           |_ Value of name of the programming language
 
 {% endcomment %}
 <Function{% for attr in func.attributes %} {{ attr.name }}="{{ attr.value }}"{% endfor %}>
@@ -50,4 +54,11 @@ connectedFunc           :       |_ List of parent Functions names
 {% for conn in func.connectiongroups %}
     {% include "connectiongroup.tmplt" %}
 {% endfor %}
+{% if func.languages %}
+    <Languages>
+{% for language in func.languages %}
+        <ComputeLanguage name="{{ language.name }}" language="{{ language.value }}"/>
+{% endfor %}
+    </Languages>
+{% endif %}
 </Function>

@@ -19,7 +19,6 @@
 
 #include "exporter.h"
 
-#include "Asn1Options/options.h"
 #include "export/exceptions.h"
 #include "visitors/acnnodereconstructingvisitor.h"
 #include "visitors/asn1nodereconstructingvisitor.h"
@@ -27,6 +26,7 @@
 #include <QSaveFile>
 #include <QString>
 #include <asn1library/asn1/asn1model.h>
+#include <conversion/asn1/Asn1Options/options.h>
 
 using Asn1Acn::Asn1Model;
 using conversion::asn1::Asn1Options;
@@ -48,36 +48,36 @@ void Asn1Exporter::exportModel(const Model *const model, const Options &options)
     }
 
     for (const auto &file : asn1Model->data()) {
-        exportAsn1Model(file, options);
-        exportAcnModel(file, options);
+        exportAsn1Model(file.get(), options);
+        exportAcnModel(file.get(), options);
     }
 }
 
-void Asn1Exporter::exportAsn1Model(const Asn1Acn::File &file, const Options &options) const
+void Asn1Exporter::exportAsn1Model(const Asn1Acn::File *file, const Options &options) const
 {
     QString serializedModelData;
     QTextStream outputTextStream(&serializedModelData, QIODevice::WriteOnly);
 
     Asn1Acn::Asn1NodeReconstructingVisitor asn1NodeReconVis(outputTextStream);
-    asn1NodeReconVis.visit(file);
+    asn1NodeReconVis.visit(*file);
 
     const auto pathPrefix = options.value(Asn1Options::asn1FilepathPrefix).value_or("");
-    const auto filePath = makeFilePath(pathPrefix, file.name(), "asn");
+    const auto filePath = makeFilePath(pathPrefix, file->name(), "asn");
 
     QSaveFile outputFile(filePath);
     writeAndCommit(outputFile, serializedModelData.toStdString());
 }
 
-void Asn1Exporter::exportAcnModel(const Asn1Acn::File &file, const Options &options) const
+void Asn1Exporter::exportAcnModel(const Asn1Acn::File *file, const Options &options) const
 {
     QString serializedModelData;
     QTextStream outputTextStream(&serializedModelData, QIODevice::WriteOnly);
 
     Asn1Acn::AcnNodeReconstructingVisitor acnNodeReconVis(outputTextStream);
-    acnNodeReconVis.visit(file);
+    acnNodeReconVis.visit(*file);
 
     const auto pathPrefix = options.value(Asn1Options::acnFilepathPrefix).value_or("");
-    const auto filePath = makeFilePath(pathPrefix, file.name(), "acn");
+    const auto filePath = makeFilePath(pathPrefix, file->name(), "acn");
 
     QSaveFile outputFile(filePath);
     writeAndCommit(outputFile, serializedModelData.toStdString());

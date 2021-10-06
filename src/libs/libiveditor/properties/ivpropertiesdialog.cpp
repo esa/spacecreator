@@ -28,12 +28,14 @@
 #include "ivcomment.h"
 #include "ivconnectiongroup.h"
 #include "ivconnectiongroupmodel.h"
+#include "ivcore/abstractsystemchecks.h"
 #include "ivinterface.h"
 #include "ivnamevalidator.h"
 #include "ivobject.h"
 #include "ivpropertieslistmodel.h"
 #include "ivpropertiesview.h"
 #include "ivpropertytemplateconfig.h"
+#include "languageselect.h"
 #include "propertieslistmodel.h"
 #include "propertiesviewbase.h"
 
@@ -48,8 +50,10 @@
 namespace ive {
 
 IVPropertiesDialog::IVPropertiesDialog(ivm::IVPropertyTemplateConfig *dynPropConfig, ivm::IVObject *obj,
-        Asn1Acn::Asn1SystemChecks *asn1Checks, cmd::CommandsStack *commandsStack, QWidget *parent)
+        ivm::AbstractSystemChecks *checks, Asn1Acn::Asn1SystemChecks *asn1Checks, cmd::CommandsStack *commandsStack,
+        QWidget *parent)
     : shared::PropertiesDialog(dynPropConfig, obj, asn1Checks, commandsStack, parent)
+    , m_checks(checks)
 {
 }
 
@@ -89,12 +93,12 @@ void IVPropertiesDialog::init()
     shared::PropertiesDialog::init();
 
     switch (dataObject()->type()) {
+    case ivm::IVObject::Type::Function:
+        initLanguageView();
     case ivm::IVObject::Type::FunctionType:
-    case ivm::IVObject::Type::Function: {
         initContextParams();
         initAttributesView();
         break;
-    }
     case ivm::IVObject::Type::RequiredInterface:
     case ivm::IVObject::Type::ProvidedInterface: {
         initIfaceParams();
@@ -224,6 +228,16 @@ void IVPropertiesDialog::initCommentView()
             commandStack()->push(commentTextCmd);
         });
     }
+}
+
+void IVPropertiesDialog::initLanguageView()
+{
+    auto fn = qobject_cast<ivm::IVFunction *>(dataObject());
+    if (!fn) {
+        return;
+    }
+    auto languagesWidget = new ive::LanguageSelect(fn, m_checks, commandMacro(), this);
+    insertTab(languagesWidget, tr("Implementations"));
 }
 
 } // namespace ive

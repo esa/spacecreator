@@ -19,10 +19,7 @@ endif()
 
 if(LINUX)
     find_path(QTC_LIB_DIR libExtensionSystem.so
-        "$ENV{QTC_INSTALL}/lib/qtcreator"
-        /opt/qt-creator-dev/build-debug/lib/qtcreator
-        /usr/lib/x86_64-linux-gnu/qtcreator
-        /usr/lib/aarch64-linux-gnu/qtcreator)
+        "$ENV{QTC_INSTALL}/lib/qtcreator")
 elseif(APPLE)
     find_path(QTC_LIB_DIR libExtensionSystem.dylib
         "$ENV{QTC_INSTALL}/Qt\ Creator.app/Contents/Frameworks")
@@ -34,10 +31,7 @@ endif()
 if(LINUX)
     find_path(QTC_PLUGINS_DIR libCore.so
         "$ENV{QTC_LIB_DIR}/plugins"
-        "$ENV{QTC_INSTALL}/lib/qtcreator/plugins"
-        /opt/qt-creator-dev/build-debug/lib/qtcreator/plugins
-        /usr/lib/x86_64-linux-gnu/qtcreator/plugins
-        /usr/lib/aarch64-linux-gnu/qtcreator/plugins)
+        "$ENV{QTC_INSTALL}/lib/qtcreator/plugins")
 elseif(APPLE)
     find_path(QTC_PLUGINS_DIR libCore.dylib
         "$ENV{QTC_INSTALL}/Qt\ Creator.app/Contents/PlugIns")
@@ -46,10 +40,9 @@ elseif(WIN32)
         "$ENV{QTC_INSTALL}/plugins")
 endif()
 
-
 find_path(QTC_SOURCE_DIR src/libs/extensionsystem/iplugin.h
+    "$ENV{QTC_INSTALL}/include/qtcreator"
     "$ENV{QTC_SOURCE}"
-    "$ENV{QTC_SOURCE}/src/libs/extensionsystem/iplugin.h"
     "$ENV{QTC_SOURCE}/include/qtcreator"
     "${QTC_SOURCE_DIR}/dev"
     /opt/qt-creator-dev/qt-creator
@@ -101,8 +94,8 @@ if (EXISTS ${QTC_SOURCE_DIR} AND EXISTS ${QTC_LIB_DIR})
 endif()
 
 if (NOT EXISTS ${QTC_SOURCE_DIR})
-    message("No QtCreator sources found - set the environemnt variable QTC_SOURCE to point to the sources directory")
+    message("No QtCreator sources found - set the environment variable QTC_SOURCE to point to the sources directory")
 endif()
 if (NOT EXISTS ${QTC_LIB_DIR})
-    message("No QtCreator binaries found - set the environemnt variable QTC_INSTALL  to point to the binary directory")
+    message("No QtCreator binaries found - set the environment variable QTC_INSTALL  to point to the binary directory")
 endif()

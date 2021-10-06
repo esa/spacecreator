@@ -19,20 +19,21 @@
 
 #pragma once
 
+#include "modeltype.h"
+
 #include <QString>
 
-namespace conversion::asn1 {
+namespace conversion {
 
 /**
- * @brief   Possible options for ASN.1/ACN conversion
+ * @brief   Trait for properties of models
+ *
+ * @tparam  ModelType   Model
  */
-class Asn1Options
-{
-public:
-    /** @brief Prefix to add at the beginning of the filepath */
-    inline static const QString asn1FilepathPrefix = "Asn1_Export_FilepathPrefix";
-    /** @brief Prefix to add at the beginning of the filepath */
-    inline static const QString acnFilepathPrefix = "Acn_Export_FilepathPrefix";
+template<typename Model>
+struct ModelProperties {
+    /// @brief  Model type
+    static const ModelType type = ModelType::Unspecified;
 };
 
-} // namespace conversion::asn1
+} // namespace conversion

@@ -17,7 +17,7 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/lgpl-2.1.html>.
  */
 
-#include "asn1nodereconstructingvisitor_tests.h"
+#include "tst_asn1nodereconstructingvisitor.h"
 
 #include <QtTest>
 #include <asn1library/asn1/acnsequencecomponent.h>
@@ -40,14 +40,10 @@
 #include <conversion/asn1/Asn1Exporter/visitors/asn1nodereconstructingvisitor.h>
 
 using namespace Asn1Acn;
-using namespace Asn1Acn::Tests;
 
-Asn1NodeReconstructingVisitorTests::Asn1NodeReconstructingVisitorTests(QObject *parent)
-    : QObject(parent)
-{
-}
+namespace conversion::asn1::test {
 
-void Asn1NodeReconstructingVisitorTests::test_singleImportedType()
+void tst_Asn1NodeReconstructingVisitor::testSingleImportedType()
 {
     auto defs = createDefinitions(QStringLiteral("MyModule_1"));
     defs->addImportedType(ImportedType(QStringLiteral("MyModule_1"), QStringLiteral("ImportedType_1")));
@@ -67,7 +63,7 @@ void Asn1NodeReconstructingVisitorTests::test_singleImportedType()
     QCOMPARE(actual, expected);
 }
 
-void Asn1NodeReconstructingVisitorTests::test_multipleImportedTypes()
+void tst_Asn1NodeReconstructingVisitor::testMultipleImportedTypes()
 {
     auto defs = createDefinitions(QStringLiteral("MyModule_1"));
 
@@ -90,7 +86,7 @@ void Asn1NodeReconstructingVisitorTests::test_multipleImportedTypes()
     QCOMPARE(actual, expected);
 }
 
-void Asn1NodeReconstructingVisitorTests::test_singleImportedValue()
+void tst_Asn1NodeReconstructingVisitor::testSingleImportedValue()
 {
     auto defs = createDefinitions(QStringLiteral("MyModule_1"));
     defs->addImportedValue(ImportedValue(QStringLiteral("MyModule_1"), QStringLiteral("ImportedValue_1")));
@@ -110,7 +106,7 @@ void Asn1NodeReconstructingVisitorTests::test_singleImportedValue()
     QCOMPARE(actual, expected);
 }
 
-void Asn1NodeReconstructingVisitorTests::test_multipleImportedValues()
+void tst_Asn1NodeReconstructingVisitor::testMultipleImportedValues()
 {
     auto defs = createDefinitions(QStringLiteral("MyModule_1"));
 
@@ -133,7 +129,7 @@ void Asn1NodeReconstructingVisitorTests::test_multipleImportedValues()
     QCOMPARE(actual, expected);
 }
 
-void Asn1NodeReconstructingVisitorTests::test_valueAssignmentSimpleValue()
+void tst_Asn1NodeReconstructingVisitor::testValueAssignmentSimpleValue()
 {
     auto actual = createSingleValueValueAssignmentValue(QStringLiteral("INTEGER"), QStringLiteral("10"));
     QString expected = "myValue INTEGER ::= 10\n";
@@ -141,7 +137,7 @@ void Asn1NodeReconstructingVisitorTests::test_valueAssignmentSimpleValue()
     QCOMPARE(actual, expected);
 }
 
-void Asn1NodeReconstructingVisitorTests::test_valueAssignmentBitString()
+void tst_Asn1NodeReconstructingVisitor::testValueAssignmentBitString()
 {
     auto actual = createSingleValueValueAssignmentValue(
             QStringLiteral("BIT_STRING"), QStringLiteral("1010"), BitStringValue::asString);
@@ -150,7 +146,7 @@ void Asn1NodeReconstructingVisitorTests::test_valueAssignmentBitString()
     QCOMPARE(actual, expected);
 }
 
-void Asn1NodeReconstructingVisitorTests::test_valueAssignmentBoolean()
+void tst_Asn1NodeReconstructingVisitor::testValueAssignmentBoolean()
 {
     auto actual = createSingleValueValueAssignmentValue(
             QStringLiteral("BOOLEAN"), QStringLiteral("true"), BooleanValue::reformatString);
@@ -159,7 +155,7 @@ void Asn1NodeReconstructingVisitorTests::test_valueAssignmentBoolean()
     QCOMPARE(actual, expected);
 }
 
-void Asn1NodeReconstructingVisitorTests::test_valueAssignmentOctetString()
+void tst_Asn1NodeReconstructingVisitor::testValueAssignmentOctetString()
 {
     auto actual = createSingleValueValueAssignmentValue(
             QStringLiteral("OCTET_STRING"), QStringLiteral("1010"), OctetStringValue::asString);
@@ -168,7 +164,7 @@ void Asn1NodeReconstructingVisitorTests::test_valueAssignmentOctetString()
     QCOMPARE(actual, expected);
 }
 
-void Asn1NodeReconstructingVisitorTests::test_valueAssignmentIA5String()
+void tst_Asn1NodeReconstructingVisitor::testValueAssignmentIA5String()
 {
     auto actual = createSingleValueValueAssignmentValue(
             QStringLiteral("IA5String"), QStringLiteral("MyValue"), StringValue::asString);
@@ -177,7 +173,7 @@ void Asn1NodeReconstructingVisitorTests::test_valueAssignmentIA5String()
     QCOMPARE(actual, expected);
 }
 
-void Asn1NodeReconstructingVisitorTests::test_valueAssignmentChoice()
+void tst_Asn1NodeReconstructingVisitor::testValueAssignmentChoice()
 {
     auto actual = createChoiceValueAssignmentValue();
 
@@ -186,7 +182,7 @@ void Asn1NodeReconstructingVisitorTests::test_valueAssignmentChoice()
     QCOMPARE(actual, expected);
 }
 
-void Asn1NodeReconstructingVisitorTests::test_valueAssignmentMultipleValues()
+void tst_Asn1NodeReconstructingVisitor::testValueAssignmentMultipleValues()
 {
     auto actual = createMultipleValueValueAssignmentValue();
 
@@ -195,7 +191,7 @@ void Asn1NodeReconstructingVisitorTests::test_valueAssignmentMultipleValues()
     QCOMPARE(actual, expected);
 }
 
-void Asn1NodeReconstructingVisitorTests::test_valueAssignmentNamedValue()
+void tst_Asn1NodeReconstructingVisitor::testValueAssignmentNamedValue()
 {
     auto actual = createNamedValueAssignmentValue();
 
@@ -204,27 +200,27 @@ void Asn1NodeReconstructingVisitorTests::test_valueAssignmentNamedValue()
     QCOMPARE(actual, expected);
 }
 
-void Asn1NodeReconstructingVisitorTests::test_typeAssignmentBooleanAcnParams()
+void tst_Asn1NodeReconstructingVisitor::testTypeAssignmentBooleanAcnParams()
 {
     //
 }
 
-void Asn1NodeReconstructingVisitorTests::test_typeAssignmentBoolean()
+void tst_Asn1NodeReconstructingVisitor::testTypeAssignmentBoolean()
 {
     testSimpleTypeAssignment(QStringLiteral("BOOLEAN"), QStringLiteral("BOOLEAN"));
 }
 
-void Asn1NodeReconstructingVisitorTests::test_typeAssignmentNull()
+void tst_Asn1NodeReconstructingVisitor::testTypeAssignmentNull()
 {
     testSimpleTypeAssignment(QStringLiteral("NULL"), QStringLiteral("NULL"));
 }
 
-void Asn1NodeReconstructingVisitorTests::test_typeAssignmentBitString()
+void tst_Asn1NodeReconstructingVisitor::testTypeAssignmentBitString()
 {
     testSimpleTypeAssignment(QStringLiteral("BIT_STRING"), QStringLiteral("BIT STRING"));
 }
 
-void Asn1NodeReconstructingVisitorTests::test_typeAssignmentBitStringWithValue()
+void tst_Asn1NodeReconstructingVisitor::testTypeAssignmentBitStringWithValue()
 {
     auto assignment = createTypeAssignmentWithConstraint(
             QStringLiteral("BIT_STRING"), new Constraints::RangeConstraint<BitStringValue>({ "1111", "1111" }));
@@ -235,12 +231,12 @@ void Asn1NodeReconstructingVisitorTests::test_typeAssignmentBitStringWithValue()
     QCOMPARE(actual, expected);
 }
 
-void Asn1NodeReconstructingVisitorTests::test_typeAssignmentOctetString()
+void tst_Asn1NodeReconstructingVisitor::testTypeAssignmentOctetString()
 {
     testSimpleTypeAssignment(QStringLiteral("OCTET_STRING"), QStringLiteral("OCTET STRING"));
 }
 
-void Asn1NodeReconstructingVisitorTests::test_typeAssignmentOctetStringWithValue()
+void tst_Asn1NodeReconstructingVisitor::testTypeAssignmentOctetStringWithValue()
 {
     auto assignment = createTypeAssignmentWithConstraint(
             QStringLiteral("OCTET_STRING"), new Constraints::RangeConstraint<OctetStringValue>({ "1010", "1010" }));
@@ -251,12 +247,12 @@ void Asn1NodeReconstructingVisitorTests::test_typeAssignmentOctetStringWithValue
     QCOMPARE(actual, expected);
 }
 
-void Asn1NodeReconstructingVisitorTests::test_typeAssignmentIA5String()
+void tst_Asn1NodeReconstructingVisitor::testTypeAssignmentIA5String()
 {
     testSimpleTypeAssignment(QStringLiteral("IA5String"), QStringLiteral("IA5String"));
 }
 
-void Asn1NodeReconstructingVisitorTests::test_typeAssignmentIA5StringWithValue()
+void tst_Asn1NodeReconstructingVisitor::testTypeAssignmentIA5StringWithValue()
 {
     auto assignment = createTypeAssignmentWithConstraint(
             QStringLiteral("IA5String"), new Constraints::RangeConstraint<StringValue>({ "TextString", "TextString" }));
@@ -267,12 +263,12 @@ void Asn1NodeReconstructingVisitorTests::test_typeAssignmentIA5StringWithValue()
     QCOMPARE(actual, expected);
 }
 
-void Asn1NodeReconstructingVisitorTests::test_typeAssignmentNumericString()
+void tst_Asn1NodeReconstructingVisitor::testTypeAssignmentNumericString()
 {
     testSimpleTypeAssignment(QStringLiteral("NumericString"), QStringLiteral("NumericString"));
 }
 
-void Asn1NodeReconstructingVisitorTests::test_typeAssignmentNumericStringWithValue()
+void tst_Asn1NodeReconstructingVisitor::testTypeAssignmentNumericStringWithValue()
 {
     auto assignment = createTypeAssignmentWithConstraint(
             QStringLiteral("NumericString"), new Constraints::RangeConstraint<StringValue>({ "12345678", "12345678" }));
@@ -283,7 +279,7 @@ void Asn1NodeReconstructingVisitorTests::test_typeAssignmentNumericStringWithVal
     QCOMPARE(actual, expected);
 }
 
-void Asn1NodeReconstructingVisitorTests::test_typeAssignmentEnumerated()
+void tst_Asn1NodeReconstructingVisitor::testTypeAssignmentEnumerated()
 {
     auto type = std::make_unique<Types::Enumerated>();
     type->addItem(Types::EnumeratedItem(1, QStringLiteral("e1"), 10, SourceLocation()));
@@ -302,7 +298,7 @@ void Asn1NodeReconstructingVisitorTests::test_typeAssignmentEnumerated()
     QCOMPARE(actual, expected);
 }
 
-void Asn1NodeReconstructingVisitorTests::test_typeAssignmentChoice()
+void tst_Asn1NodeReconstructingVisitor::testTypeAssignmentChoice()
 {
     auto type = std::make_unique<Types::Choice>();
     type->addComponent(std::make_unique<Types::ChoiceAlternative>(QStringLiteral("ch1"), QStringLiteral(""),
@@ -327,7 +323,7 @@ void Asn1NodeReconstructingVisitorTests::test_typeAssignmentChoice()
     QCOMPARE(actual, expected);
 }
 
-void Asn1NodeReconstructingVisitorTests::test_typeAssignmentNestedChoice()
+void tst_Asn1NodeReconstructingVisitor::testTypeAssignmentNestedChoice()
 {
     auto sequenceType = std::make_unique<Types::Sequence>();
     auto type = std::make_unique<Types::Choice>();
@@ -358,7 +354,7 @@ void Asn1NodeReconstructingVisitorTests::test_typeAssignmentNestedChoice()
     QCOMPARE(actual, expected);
 }
 
-void Asn1NodeReconstructingVisitorTests::test_typeAssignmentSequence()
+void tst_Asn1NodeReconstructingVisitor::testTypeAssignmentSequence()
 {
     auto type = std::make_unique<Types::Sequence>();
     type->addComponent(std::make_unique<AsnSequenceComponent>(QStringLiteral("seq1"), QStringLiteral("seq1"), true,
@@ -381,7 +377,7 @@ void Asn1NodeReconstructingVisitorTests::test_typeAssignmentSequence()
     QCOMPARE(actual, expected);
 }
 
-void Asn1NodeReconstructingVisitorTests::test_typeAssignmentNestedSequence()
+void tst_Asn1NodeReconstructingVisitor::testTypeAssignmentNestedSequence()
 {
     auto type = std::make_unique<Types::Sequence>();
     auto internalType = std::make_unique<Types::Sequence>();
@@ -411,7 +407,7 @@ void Asn1NodeReconstructingVisitorTests::test_typeAssignmentNestedSequence()
     QCOMPARE(actual, expected);
 }
 
-void Asn1NodeReconstructingVisitorTests::test_typeAssignmentSequenceOf()
+void tst_Asn1NodeReconstructingVisitor::testTypeAssignmentSequenceOf()
 {
     auto type = std::make_unique<Types::SequenceOf>();
     type->setItemsType(std::make_unique<Types::Integer>());
@@ -423,7 +419,7 @@ void Asn1NodeReconstructingVisitorTests::test_typeAssignmentSequenceOf()
     QCOMPARE(actual, expected);
 }
 
-void Asn1NodeReconstructingVisitorTests::test_typeAssignmentSequenceOfWithValue()
+void tst_Asn1NodeReconstructingVisitor::testTypeAssignmentSequenceOfWithValue()
 {
     auto internalType = std::make_unique<Types::Integer>();
 
@@ -441,12 +437,12 @@ void Asn1NodeReconstructingVisitorTests::test_typeAssignmentSequenceOfWithValue(
     QCOMPARE(actual, expected);
 }
 
-void Asn1NodeReconstructingVisitorTests::test_typeAssignmentReal()
+void tst_Asn1NodeReconstructingVisitor::testTypeAssignmentReal()
 {
     testSimpleTypeAssignment(QStringLiteral("REAL"), QStringLiteral("REAL"));
 }
 
-void Asn1NodeReconstructingVisitorTests::test_typeAssignmentRealWithValue()
+void tst_Asn1NodeReconstructingVisitor::testTypeAssignmentRealWithValue()
 {
     auto assignment = createTypeAssignmentWithConstraint(
             QStringLiteral("REAL"), new Constraints::RangeConstraint<RealValue>(1.1));
@@ -456,12 +452,12 @@ void Asn1NodeReconstructingVisitorTests::test_typeAssignmentRealWithValue()
     QCOMPARE(actual, expected);
 }
 
-void Asn1NodeReconstructingVisitorTests::test_typeAssignmentInteger()
+void tst_Asn1NodeReconstructingVisitor::testTypeAssignmentInteger()
 {
     testSimpleTypeAssignment(QStringLiteral("INTEGER"), QStringLiteral("INTEGER"));
 }
 
-void Asn1NodeReconstructingVisitorTests::test_typeAssignmentIntegerWithValue()
+void tst_Asn1NodeReconstructingVisitor::testTypeAssignmentIntegerWithValue()
 {
     auto assignment = createTypeAssignmentWithConstraint(
             QStringLiteral("INTEGER"), new Constraints::RangeConstraint<IntegerValue>({ 1, 2 }));
@@ -471,7 +467,7 @@ void Asn1NodeReconstructingVisitorTests::test_typeAssignmentIntegerWithValue()
     QCOMPARE(actual, expected);
 }
 
-void Asn1NodeReconstructingVisitorTests::test_typeAssignmentUserDefined()
+void tst_Asn1NodeReconstructingVisitor::testTypeAssignmentUserDefined()
 {
     auto type = std::make_unique<Types::UserdefinedType>(
             QStringLiteral("ReferencedType"), QStringLiteral("MyModule"), nullptr);
@@ -485,7 +481,7 @@ void Asn1NodeReconstructingVisitorTests::test_typeAssignmentUserDefined()
     QCOMPARE(actual, expected);
 }
 
-void Asn1NodeReconstructingVisitorTests::test_typeAssignmentUserDefinedWithValue()
+void tst_Asn1NodeReconstructingVisitor::testTypeAssignmentUserDefinedWithValue()
 {
     auto referedType = Types::TypeFactory::createBuiltinType(QStringLiteral("INTEGER"));
     auto &constrainedType = dynamic_cast<Constraints::WithConstraints<IntegerValue> &>(*referedType);
@@ -504,7 +500,7 @@ void Asn1NodeReconstructingVisitorTests::test_typeAssignmentUserDefinedWithValue
     QCOMPARE(actual, expected);
 }
 
-void Asn1NodeReconstructingVisitorTests::testSimpleTypeAssignment(
+void tst_Asn1NodeReconstructingVisitor::testSimpleTypeAssignment(
         const QString &astValue, const QString &asn1Value) const
 {
     auto assignment = createSimpleTypeAssignment(astValue);
@@ -515,7 +511,7 @@ void Asn1NodeReconstructingVisitorTests::testSimpleTypeAssignment(
     QCOMPARE(actual, expected);
 }
 
-std::unique_ptr<TypeAssignment> Asn1NodeReconstructingVisitorTests::createSimpleTypeAssignment(
+std::unique_ptr<TypeAssignment> tst_Asn1NodeReconstructingVisitor::createSimpleTypeAssignment(
         const QString &astTypeName) const
 {
     auto type = Types::TypeFactory::createBuiltinType(astTypeName);
@@ -525,23 +521,12 @@ std::unique_ptr<TypeAssignment> Asn1NodeReconstructingVisitorTests::createSimple
     return assignment;
 }
 
-template<typename T>
-std::unique_ptr<TypeAssignment> Asn1NodeReconstructingVisitorTests::createTypeAssignmentWithConstraint(
-        const QString &astTypeName, Constraints::Constraint<T> *constraint) const
-{
-    auto assignment = createSimpleTypeAssignment(astTypeName);
-    auto &constrainedType = dynamic_cast<Constraints::WithConstraints<T> &>(*assignment->type());
-    constrainedType.constraints().append(std::unique_ptr<Constraints::Constraint<T>>(constraint));
-
-    return assignment;
-}
-
-std::unique_ptr<Definitions> Asn1NodeReconstructingVisitorTests::createDefinitions(const QString &name) const
+std::unique_ptr<Definitions> tst_Asn1NodeReconstructingVisitor::createDefinitions(const QString &name) const
 {
     return std::make_unique<Definitions>(name, SourceLocation());
 }
 
-QString Asn1NodeReconstructingVisitorTests::createSingleValueValueAssignmentValue(
+QString tst_Asn1NodeReconstructingVisitor::createSingleValueValueAssignmentValue(
         const QString &typeName, const QString &typeValue, std::function<QString(const QString &)> printer) const
 {
     auto type = Types::TypeFactory::createBuiltinType(typeName);
@@ -552,7 +537,7 @@ QString Asn1NodeReconstructingVisitorTests::createSingleValueValueAssignmentValu
     return restoreNode(*assignment);
 }
 
-QString Asn1NodeReconstructingVisitorTests::createMultipleValueValueAssignmentValue() const
+QString tst_Asn1NodeReconstructingVisitor::createMultipleValueValueAssignmentValue() const
 {
     auto multipleValue = std::make_unique<MultipleValue>();
 
@@ -566,7 +551,7 @@ QString Asn1NodeReconstructingVisitorTests::createMultipleValueValueAssignmentVa
     return restoreNode(*assignment);
 }
 
-QString Asn1NodeReconstructingVisitorTests::createNamedValueAssignmentValue() const
+QString tst_Asn1NodeReconstructingVisitor::createNamedValueAssignmentValue() const
 {
     auto multipleValue = std::make_unique<NamedValue>();
 
@@ -580,7 +565,7 @@ QString Asn1NodeReconstructingVisitorTests::createNamedValueAssignmentValue() co
     return restoreNode(*assignment);
 }
 
-QString Asn1NodeReconstructingVisitorTests::createComponentialTypeAssignmentValue(
+QString tst_Asn1NodeReconstructingVisitor::createComponentialTypeAssignmentValue(
         std::unique_ptr<Types::Type> type) const
 {
     auto assignment = std::make_unique<TypeAssignment>(
@@ -588,7 +573,7 @@ QString Asn1NodeReconstructingVisitorTests::createComponentialTypeAssignmentValu
     return restoreNode(*assignment);
 }
 
-QString Asn1NodeReconstructingVisitorTests::createChoiceValueAssignmentValue() const
+QString tst_Asn1NodeReconstructingVisitor::createChoiceValueAssignmentValue() const
 {
     auto internalValue = std::make_unique<SingleValue>(QStringLiteral("10"));
     auto choiceValue = std::make_unique<ChoiceValue>(QStringLiteral("MyChoice"), std::move(internalValue));
@@ -599,7 +584,7 @@ QString Asn1NodeReconstructingVisitorTests::createChoiceValueAssignmentValue() c
     return restoreNode(*assignment);
 }
 
-QString Asn1NodeReconstructingVisitorTests::restoreNode(const Node &node) const
+QString tst_Asn1NodeReconstructingVisitor::restoreNode(const Node &node) const
 {
     QString ret;
     QTextStream outStream(&ret);
@@ -609,3 +594,5 @@ QString Asn1NodeReconstructingVisitorTests::restoreNode(const Node &node) const
 
     return ret;
 }
+
+} // namespace conversion::asn1::test

@@ -32,6 +32,12 @@ target_sources(${LIB_NAME} PRIVATE
     commands/cmdfunctionattrchange.h
     commands/cmdfunctionitemcreate.cpp
     commands/cmdfunctionitemcreate.h
+    commands/cmdfunctionlanguageinsert.cpp
+    commands/cmdfunctionlanguageinsert.h
+    commands/cmdfunctionlanguageremove.cpp
+    commands/cmdfunctionlanguageremove.h
+    commands/cmdfunctionlanguageupdate.cpp
+    commands/cmdfunctionlanguageupdate.h
     commands/cmdfunctiontypeitemcreate.cpp
     commands/cmdfunctiontypeitemcreate.h
     commands/cmdifaceattrchange.cpp
@@ -146,6 +152,11 @@ target_sources(${LIB_NAME} PRIVATE
     properties/ivpropertieslistmodel.h
     properties/ivpropertiesview.cpp
     properties/ivpropertiesview.h
+    properties/languagemodel.cpp
+    properties/languagemodel.h
+    properties/languageselect.cpp
+    properties/languageselect.h
+    properties/languageselect.ui
     templating/exportableivconnection.cpp
     templating/exportableivconnection.h
     templating/exportableivconnectiongroup.cpp

@@ -24,6 +24,7 @@
 #include "ivfunctiontype.h"
 #include "ivinterface.h"
 #include "ivmodel.h"
+#include "shared/graphicsviewutils.h"
 
 #include <QtMath>
 

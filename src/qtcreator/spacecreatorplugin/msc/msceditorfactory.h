@@ -39,7 +39,7 @@ public:
     MscEditorFactory(SpaceCreatorProjectManager *projectManager, const QList<QAction *> &mscActions, QObject *parent);
 
 #if QTC_VERSION == 48
-    Core::IEditor *createEditor() override { return createMSCEditor(); };
+    Core::IEditor *createEditor() override { return createMSCEditor(); }
 #endif
     Core::IEditor *createMSCEditor();
 

@@ -2,67 +2,71 @@
 Template for generation of XML scheme of the whole deployment view.
 ====================================
 Every instance/object (node, partition, connection, ...) has at least the following properties:
-name            : Name of the object
-attributes      : List of attributes
-attribute.name  :  |_ Name of that attribute
-attribute.value :  |_ Value of that attribute
-properties      : List of properties
-properties.name :  |_ Name of that property
-properties.value:  |_ Value of that property
+name              : Name of the object
+attributes        : List of attributes
+attribute.name    :  |_ Name of that attribute
+attribute.value   :  |_ Value of that attribute
+properties        : List of properties
+properties.name   :  |_ Name of that property
+properties.value  :  |_ Value of that property
 ====================================
 The following tags are available in this template:
-Nodes                    : List of all available Nodes (Boards)
-node                     : |_ Instance of node (see "for node in Nodes")
-node.partitions          :    |_ List of partitions (binary) in that node
-partition                :    |  |_ Instance of node.partition (see "for partition in node.partitions")
-partitions.functions     :    |     |_ List of functions in that partition
-function                 :    |        |_ Instance of partitions.function (see "for function in function in partition.functions")
-node.devices             :    |_ List of devices (ports) in that node
-device                   :    |  |_ Instance of node.device
-device.fullName          :    |  |_ Full name of the device, consisting of name and port
-device.name              :    |  |_ Name of the device
-device.portName          :    |  |_ Name of the port
-device.qualifier         :    |  |_ Qualifier of the bus (see bus.qualifier)
-device.nodeName          :    |  |_ Name of the node, this device belongs to
-node.requiredBusAccesses :    |_ List of devices in the node that are actually used by at least one connection
-device                   :    |  |_ Instance of node.requiredBusAccesses (same properties as in node.devices)
-node.systemFunctions     :    |_ List of functions provided by the system/board
-function                 :       |_ Instance of node.systemFunctions
-function.interfaces      :          |_ List of functions provided by the system/board
-interface                :             |_ Instance of function.interfaces
-interface.isProvided     :                |_ Is true if the interface type is "provided"
-interface.isRequired     :                |_ Is true if the interface type is "required"
-interface.params         :                |_ List of interface parameters
-param                    :                   |_ Instance of param (has no attributes and properties)
-param.isIn               :                      |_ Whether param is IN
-param.isOut              :                      |_ Whether param is OUT
-param.name               :                      |_ Name of param
-param.underscoredName    :                      |_ Name of param with " " replaced by "_" (spaces repladed with underscore)
-param.type               :                      |_ Type of param
-param.underscoredType    :                      |_ Type of param with "-" replaced by "_" (dashes repladed with underscore)
-param.encoding           :                      |_ Encoding of param
+Nodes                      : List of all available Nodes (Boards)
+node                       : |_ Instance of node (see "for node in Nodes")
+node.nodeLabel             :    |_ Unique label of this node
+node.partitions            :    |_ List of partitions (binary) in that node
+partition                  :    |  |_ Instance of node.partition (see "for partition in node.partitions")
+partitions.functions       :    |     |_ List of functions in that partition
+function                   :    |        |_ Instance of partitions.function (see "for function in function in partition.functions")
+function.usedImplementation:    |            |_ The implementation used for this functions
+function.implementation    :    |            |_ Implementation chosen excpilictly by the user (empty if default is used)
+node.devices               :    |_ List of devices (ports) in that node
+device                     :    |  |_ Instance of node.device
+device.fullName            :    |  |_ Full name of the device, consisting of name and port
+device.name                :    |  |_ Name of the device
+device.portName            :    |  |_ Name of the port
+device.qualifier           :    |  |_ Qualifier of the bus (see bus.qualifier)
+device.nodeName            :    |  |_ Name of the node, this device belongs to
+device.nodeLabel           :    |  |_ Label of the node, this device belongs to
+node.requiredBusAccesses   :    |_ List of devices in the node that are actually used by at least one connection
+device                     :    |  |_ Instance of node.requiredBusAccesses (same properties as in node.devices)
+node.systemFunctions       :    |_ List of functions provided by the system/board
+function                   :       |_ Instance of node.systemFunctions
+function.interfaces        :          |_ List of functions provided by the system/board
+interface                  :             |_ Instance of function.interfaces
+interface.isProvided       :                |_ Is true if the interface type is "provided"
+interface.isRequired       :                |_ Is true if the interface type is "required"
+interface.params           :                |_ List of interface parameters
+param                      :                   |_ Instance of param (has no attributes and properties)
+param.isIn                 :                      |_ Whether param is IN
+param.isOut                :                      |_ Whether param is OUT
+param.name                 :                      |_ Name of param
+param.underscoredName      :                      |_ Name of param with " " replaced by "_" (spaces repladed with underscore)
+param.type                 :                      |_ Type of param
+param.underscoredType      :                      |_ Type of param with "-" replaced by "_" (dashes repladed with underscore)
+param.encoding             :                      |_ Encoding of param
 
-Connections              : List of all available Connections between devices
-connection               : |_ Instance of connection (see "for connection in Connections")
-connection.fromNode      :    |_ The source node of this connection
-connection.fromDevice    :    |_ The source device of this connection
-connection.fromPort      :    |_ The source port of this connection
-connection.toNode        :    |_ The target node of this connection
-connection.toDevice      :    |_ The target device of this connection
-connection.toPort        :    |_ The target port of this connection
-connection.busName       :    |_ Name of the bus used by this connection (same as Buses.bus.name)
-connection.messages      :    |_ List of message binding of that connection
-message                  :       |_ Instance of message/binding (see "for message in connection.messages")
-message.fromFunction     :          |_ Name of the connected source function
-message.fromInterface    :          |_ Name of the connected source interface
-message.toFunction       :          |_ Name of the connected target function
-message.toInterface      :          |_ Name of the connected target interface
+Connections                : List of all available Connections between devices
+connection                 : |_ Instance of connection (see "for connection in Connections")
+connection.fromNode        :    |_ The source node of this connection
+connection.fromDevice      :    |_ The source device of this connection
+connection.fromPort        :    |_ The source port of this connection
+connection.toNode          :    |_ The target node of this connection
+connection.toDevice        :    |_ The target device of this connection
+connection.toPort          :    |_ The target port of this connection
+connection.busName         :    |_ Name of the bus used by this connection (same as Buses.bus.name)
+connection.messages        :    |_ List of message binding of that connection
+message                    :       |_ Instance of message/binding (see "for message in connection.messages")
+message.fromFunction       :          |_ Name of the connected source function
+message.fromInterface      :          |_ Name of the connected source interface
+message.toFunction         :          |_ Name of the connected target function
+message.toInterface        :          |_ Name of the connected target interface
 
-Buses                    : List of all used Buses
-bus                      : |_ Instance of one bus
-bus.qualifier            :    |_ Qualifier of the bus (same as device.qualifier of connected devices)
-bus.devices              :    |_ List of devices connected to this bus
-device                   :       |_ Instance of bus.devices (same properties as in node.devices)
+Buses                      : List of all used Buses
+bus                        : |_ Instance of one bus
+bus.qualifier              :    |_ Qualifier of the bus (same as device.qualifier of connected devices)
+bus.devices                :    |_ List of devices connected to this bus
+device                     :       |_ Instance of bus.devices (same properties as in node.devices)
 ====================================
 {% endcomment %}
 <DeploymentView>
@@ -77,7 +81,7 @@ device                   :       |_ Instance of bus.devices (same properties as 
             <Property name="{{ prop.name }}" value="{{ prop.value }}"/>
         {% endfor %}
         {% for function in partition.functions %}
-            <function>{{ function }}</function>
+            <Function{% for attr in function.attributes %} {{ attr.name }}="{{ attr.value }}"{% endfor %}/>
         {% endfor %}
         </Partition>
     {% endfor %}

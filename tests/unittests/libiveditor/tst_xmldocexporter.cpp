@@ -106,13 +106,16 @@ void tst_XmlDocExporter::testExportFunctions()
 
     QVERIFY(m_doc->exporter()->exportDocSilently(m_doc.get(), testFilePath));
     const QByteArray text = testFileContent();
-    const QByteArray expected =
-            "<?xml version=\"1.0\"?>\n<InterfaceView>\n"
-            "    <Function name=\"TestFunc1\" is_type=\"NO\" instance_of=\"\" language=\"SDL\" foo=\"11\">\n"
-            "        <Property name=\"bar\" value=\"22\"/>\n"
-            "        <ContextParameter name=\"Mo\" type=\"MyInt\" value=\"33\"/>\n"
-            "    </Function>\n"
-            "</InterfaceView>";
+    const QByteArray expected = "<?xml version=\"1.0\"?>\n<InterfaceView>\n"
+                                "    <Function name=\"TestFunc1\" is_type=\"NO\" instance_of=\"\" language=\"SDL\" "
+                                "default_language=\"default\" foo=\"11\">\n"
+                                "        <Property name=\"bar\" value=\"22\"/>\n"
+                                "        <ContextParameter name=\"Mo\" type=\"MyInt\" value=\"33\"/>\n"
+                                "        <Languages>\n"
+                                "           <ComputeLanguage name=\"default\" language=\"SDL\"/>\n"
+                                "        </Languages>\n"
+                                "    </Function>\n"
+                                "</InterfaceView>";
     QVERIFY(XmlData(expected) == XmlData(text));
 }
 
@@ -147,8 +150,12 @@ void tst_XmlDocExporter::testExportNestedComment()
     QVERIFY(m_doc->exporter()->exportDocSilently(m_doc.get(), testFilePath));
     const QByteArray text = testFileContent();
     const QByteArray expected = "<?xml version=\"1.0\"?>\n<InterfaceView>\n"
-                                "    <Function name=\"TestFunc1\" is_type=\"NO\" instance_of=\"\" language=\"SDL\">\n"
+                                "    <Function name=\"TestFunc1\" is_type=\"NO\" instance_of=\"\" language=\"SDL\" "
+                                "default_language=\"default\">\n"
                                 "        <Comment name=\"TestComment1\"/>\n"
+                                "        <Languages>\n"
+                                "           <ComputeLanguage name=\"default\" language=\"SDL\"/>\n"
+                                "        </Languages>\n"
                                 "    </Function>\n"
                                 "</InterfaceView>";
     QVERIFY(XmlData(expected) == XmlData(text));

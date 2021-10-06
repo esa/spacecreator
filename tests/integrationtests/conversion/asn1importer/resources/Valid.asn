@@ -1,0 +1,17 @@
+ValidModel DEFINITIONS AUTOMATIC TAGS ::= BEGIN
+
+MySeq ::= SEQUENCE {
+    fieldA  INTEGER (1..99999),
+    fieldB  MyEnum,
+    fieldC  REAL (1.00 .. 9999.00),
+    fieldD  BOOLEAN,
+    fieldE  IA5String (SIZE (5 .. 50)) OPTIONAL
+}
+
+MyEnum ::= ENUMERATED {
+    enum1,
+    enum2,
+    enum3
+}
+
+END

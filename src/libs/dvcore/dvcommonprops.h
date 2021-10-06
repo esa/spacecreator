@@ -87,11 +87,14 @@ public:
         asn1file,
         asn1type,
         asn1module,
+        node_label,
 
         from_function,
         from_interface,
         to_function,
         to_interface,
+
+        selected_implementation,
 
         // TASTE props:
         coordinates,

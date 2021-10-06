@@ -3,6 +3,8 @@ set(LIB_NAME ivcore)
 add_library(${LIB_NAME} STATIC)
 
 target_sources(${LIB_NAME} PRIVATE
+    abstractsystemchecks.cpp
+    abstractsystemchecks.h
     ivcommonprops.cpp
     ivcommonprops.h
     ivconnectionchain.cpp
@@ -47,8 +49,7 @@ target_sources(${LIB_NAME} PRIVATE
 )
 
 target_include_directories(${LIB_NAME}
-    PUBLIC .
-           ${CMAKE_SOURCE_DIR}/src/libs)
+    PUBLIC . ${CMAKE_SOURCE_DIR}/src/libs)
 
 target_link_libraries(${LIB_NAME}
     asn1editor

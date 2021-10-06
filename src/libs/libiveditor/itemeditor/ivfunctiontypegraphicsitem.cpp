@@ -72,10 +72,6 @@ void IVFunctionTypeGraphicsItem::rebuildLayout()
             && entity()->isVisible());
 
     updateTextPosition();
-    for (auto child : childItems()) {
-        if (auto iface = qgraphicsitem_cast<IVInterfaceGraphicsItem *>(child))
-            iface->instantLayoutUpdate();
-    }
 }
 
 int IVFunctionTypeGraphicsItem::itemLevel(bool isSelected) const

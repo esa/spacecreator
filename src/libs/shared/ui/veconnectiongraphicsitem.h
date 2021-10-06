@@ -67,7 +67,7 @@ public:
 
     QList<QPair<shared::VEObject *, QVector<QPointF>>> prepareChangeCoordinatesCommandParams() const override;
 
-    bool layout();
+    bool doLayout() override;
 
     bool replaceInterface(
             VEConnectionEndPointGraphicsItem *ifaceToBeReplaced, VEConnectionEndPointGraphicsItem *newIface);

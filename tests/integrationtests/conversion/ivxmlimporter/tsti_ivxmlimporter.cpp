@@ -32,7 +32,7 @@ using conversion::iv::IvOptions;
 using conversion::iv::importer::IvXmlImporter;
 using ivm::IVModel;
 
-namespace iv::test {
+namespace conversion::iv::test {
 
 class tsti_IvXmlImporter : public QObject
 {
@@ -52,7 +52,9 @@ void tsti_IvXmlImporter::testValid()
 
     try {
         const auto model = ivImporter.importModel(options);
+        QVERIFY(model);
         const auto *ivModel = dynamic_cast<IVModel *>(model.get());
+        QVERIFY(ivModel);
 
         QCOMPARE(ivModel->objects().size(), 8);
 
@@ -70,8 +72,8 @@ void tsti_IvXmlImporter::testValid()
     }
 }
 
-} // namespace iv::test
+} // namespace conversion::iv::test
 
-QTEST_MAIN(iv::test::tsti_IvXmlImporter)
+QTEST_MAIN(conversion::iv::test::tsti_IvXmlImporter)
 
 #include "tsti_ivxmlimporter.moc"

@@ -17,6 +17,7 @@
 
 #include "dvmodel.h"
 
+#include "abstractsystemchecks.h"
 #include "common.h"
 #include "dvbus.h"
 #include "dvconnection.h"
@@ -241,6 +242,22 @@ void DVModel::resetBuses()
         ++idx;
     }
     connect(this, &DVModel::objectRemoved, this, &DVModel::onObjectRemoved);
+}
+
+/*!
+    Sets the class to query system/IV information
+ */
+void DVModel::setIVQueries(AbstractSystemChecks *ivQueries)
+{
+    m_ivQueries = ivQueries;
+}
+
+/*!
+    Returns the class to query system/IV information
+ */
+AbstractSystemChecks *DVModel::ivQueries() const
+{
+    return m_ivQueries;
 }
 
 void DVModel::onObjectsAdded(const QVector<shared::Id> &objectsIds)

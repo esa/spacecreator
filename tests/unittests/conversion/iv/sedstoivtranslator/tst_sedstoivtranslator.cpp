@@ -19,46 +19,105 @@
 
 #include <QObject>
 #include <QtTest>
+#include <asn1modelbuilder/asn1modelbuilder.h>
 #include <conversion/common/options.h>
 #include <conversion/iv/IvOptions/options.h>
 #include <conversion/iv/SedsToIvTranslator/translator.h>
 #include <ivcore/ivfunction.h>
 #include <ivcore/ivmodel.h>
-#include <sedscomponentbuilder.h>
-#include <sedsinterfacebuilder.h>
-#include <sedsinterfacecommandbuilder.h>
-#include <sedsinterfacedeclarationbuilder.h>
-#include <sedsmodelbuilder.h>
+#include <sedsmodelbuilder/sedscomponentbuilder.h>
+#include <sedsmodelbuilder/sedsinterfacebuilder.h>
+#include <sedsmodelbuilder/sedsinterfacecommandbuilder.h>
+#include <sedsmodelbuilder/sedsinterfacedeclarationbuilder.h>
+#include <sedsmodelbuilder/sedsmodelbuilder.h>
+#include <unittests/common/verifyexception.h>
 
 using namespace ivm;
 using namespace seds::model;
 
-using conversion::ModelType;
 using conversion::Options;
 using conversion::iv::IvOptions;
 using conversion::iv::translator::SedsToIvTranslator;
+using conversion::translator::TranslationException;
 
-namespace tests::conversion::iv {
+using tests::conversion::common::Asn1ModelBuilder;
+using tests::conversion::common::SedsComponentBuilder;
+using tests::conversion::common::SedsInterfaceBuilder;
+using tests::conversion::common::SedsInterfaceCommandBuilder;
+using tests::conversion::common::SedsInterfaceDeclarationBuilder;
+using tests::conversion::common::SedsModelBuilder;
 
-using common::SedsComponentBuilder;
-using common::SedsInterfaceBuilder;
-using common::SedsInterfaceCommandBuilder;
-using common::SedsInterfaceDeclarationBuilder;
-using common::SedsModelBuilder;
+namespace conversion::iv::test {
+
+class MockModel final : public conversion::Model
+{
+    virtual auto modelType() const -> conversion::ModelType override { return conversion::ModelType::Unspecified; }
+};
 
 class tst_SedsToIvTranslator : public QObject
 {
     Q_OBJECT
 
 private Q_SLOTS:
+    void testMissingModel();
+    void testNotEnoughModels();
+    void testTooManyModels();
+    void testWrongModel();
+
     void testTranslateComponentWithProvidedInterface();
     void testTranslateComponentWithRequiredInterface();
 };
 
+void tst_SedsToIvTranslator::testMissingModel()
+{
+    Options options;
+    SedsToIvTranslator translator;
+
+    VERIFY_EXCEPTION_THROWN_WITH_MESSAGE(translator.translateModels({}, options), TranslationException,
+            "No models passed for translation for SEDS to InterfaceView translation");
+}
+
+void tst_SedsToIvTranslator::testNotEnoughModels()
+{
+    Options options;
+    SedsToIvTranslator translator;
+
+    const auto sedsModel = SedsModelBuilder("Package").build();
+
+    VERIFY_EXCEPTION_THROWN_WITH_MESSAGE(translator.translateModels({ sedsModel.get() }, options), TranslationException,
+            "Not enough models passed for SEDS to InterfaceView translation");
+}
+
+void tst_SedsToIvTranslator::testTooManyModels()
+{
+    Options options;
+    SedsToIvTranslator translator;
+
+    const auto sedsModel1 = SedsModelBuilder("Package").build();
+    const auto sedsModel2 = SedsModelBuilder("Package").build();
+    const auto sedsModel3 = SedsModelBuilder("Package").build();
+
+    VERIFY_EXCEPTION_THROWN_WITH_MESSAGE(
+            translator.translateModels({ sedsModel1.get(), sedsModel2.get(), sedsModel3.get() }, options),
+            TranslationException, "Too many models passed for SEDS to InterfaceView translation");
+}
+
+void tst_SedsToIvTranslator::testWrongModel()
+{
+    Options options;
+    SedsToIvTranslator translator;
+
+    const auto sedsModel = SedsModelBuilder("Package").build();
+    const auto mockModel = std::make_unique<MockModel>();
+
+    VERIFY_EXCEPTION_THROWN_WITH_MESSAGE(translator.translateModels({ sedsModel.get(), mockModel.get() }, options),
+            TranslationException, "Missing source Unspecified model");
+}
+
 void tst_SedsToIvTranslator::testTranslateComponentWithProvidedInterface()
 {
     // clang-format off
-    const std::unique_ptr<seds::model::SedsModel> sedsModel =
+    const auto sedsModel =
         SedsModelBuilder("Package")
             .withIntegerDataType("MyInteger")
             .withComponent(
@@ -78,13 +137,20 @@ void tst_SedsToIvTranslator::testTranslateComponentWithProvidedInterface()
             .build();
     // clang-format on
 
+    // clang-format off
+    const auto asn1Model =
+        Asn1ModelBuilder("Package")
+            .withIntegerDataType("MyInteger")
+        .build();
+    // clang-format on
+
     Options options;
     options.add(IvOptions::configFilename, "config.xml");
 
     SedsToIvTranslator translator;
 
-    const auto resultModels = translator.translateModels({ sedsModel.get() }, options);
-    QCOMPARE(resultModels.size(), 2);
+    const auto resultModels = translator.translateModels({ sedsModel.get(), asn1Model.get() }, options);
+    QCOMPARE(resultModels.size(), 1);
 
     const auto &resultModel = resultModels[0];
     QCOMPARE(resultModel->modelType(), ModelType::InterfaceView);
@@ -108,14 +174,14 @@ void tst_SedsToIvTranslator::testTranslateComponentWithProvidedInterface()
 
     const auto param = params[0];
     QCOMPARE(param.name(), "InputParam");
-    QCOMPARE(param.paramTypeName(), "Interface_ICommand_Type");
+    QCOMPARE(param.paramTypeName(), "ICommand_Type");
     QCOMPARE(param.direction(), shared::InterfaceParameter::Direction::IN);
 }
 
 void tst_SedsToIvTranslator::testTranslateComponentWithRequiredInterface()
 {
     // clang-format off
-    const std::unique_ptr<seds::model::SedsModel> sedsModel =
+    const auto sedsModel =
         SedsModelBuilder("Package")
             .withIntegerDataType("MyInteger")
             .withComponent(
@@ -134,13 +200,20 @@ void tst_SedsToIvTranslator::testTranslateComponentWithRequiredInterface()
             .build();
     // clang-format on
 
+    // clang-format off
+    const auto asn1Model =
+        Asn1ModelBuilder("Package")
+            .withIntegerDataType("MyInteger")
+        .build();
+    // clang-format on
+
     Options options;
     options.add(IvOptions::configFilename, "config.xml");
 
     SedsToIvTranslator translator;
 
-    const auto resultModels = translator.translateModels({ sedsModel.get() }, options);
-    QCOMPARE(resultModels.size(), 2);
+    const auto resultModels = translator.translateModels({ sedsModel.get(), asn1Model.get() }, options);
+    QCOMPARE(resultModels.size(), 1);
 
     const auto &resultModel = resultModels[0];
     QCOMPARE(resultModel->modelType(), ModelType::InterfaceView);
@@ -164,12 +237,12 @@ void tst_SedsToIvTranslator::testTranslateComponentWithRequiredInterface()
 
     const auto param = params[0];
     QCOMPARE(param.name(), "InputParam");
-    QCOMPARE(param.paramTypeName(), "Interface_ICommand_Type");
+    QCOMPARE(param.paramTypeName(), "ICommand_Type");
     QCOMPARE(param.direction(), shared::InterfaceParameter::Direction::IN);
 }
 
-} // namespace tests::conversion::iv
+} // namespace conversion::iv::test
 
-QTEST_MAIN(tests::conversion::iv::tst_SedsToIvTranslator)
+QTEST_MAIN(conversion::iv::test::tst_SedsToIvTranslator)
 
 #include "tst_sedstoivtranslator.moc"

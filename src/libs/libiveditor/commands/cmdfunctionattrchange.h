@@ -45,6 +45,7 @@ public:
 
 Q_SIGNALS:
     void nameChanged(ivm::IVObject *entity, const QString &oldName, shared::UndoCommand *command);
+    void defaultImplementationChanged(ivm::IVFunction *entity);
 
 private:
     QPointer<ivm::IVFunction> m_entity;

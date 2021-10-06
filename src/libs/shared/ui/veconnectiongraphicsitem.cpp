@@ -174,14 +174,14 @@ void VEConnectionGraphicsItem::setPoints(const QVector<QPointF> &points)
 {
     if (points.isEmpty()) {
         if (m_startItem && m_endItem)
-            instantLayoutUpdate();
+            doLayout();
         else
             m_points.clear();
         return;
     }
 
     if (!graphicsviewutils::comparePolygones(m_points, points)) {
-        m_points = shared::graphicsviewutils::round(points);
+        m_points = points;
         instantLayoutUpdate();
     }
 }
@@ -304,7 +304,7 @@ QList<QPair<VEObject *, QVector<QPointF>>> VEConnectionGraphicsItem::prepareChan
    Re-generates the connection path
    Returns true, if the points did change
  */
-bool VEConnectionGraphicsItem::layout()
+bool VEConnectionGraphicsItem::doLayout()
 {
     if (!m_startItem || !m_startItem->isVisible() || !m_endItem || !m_endItem->isVisible()) {
         setVisible(false);
@@ -314,7 +314,7 @@ bool VEConnectionGraphicsItem::layout()
     const QVector<QPointF> oldPoints = m_points;
     m_points = generateConnectionPath(this);
     updateBoundingRect();
-    return oldPoints != m_points;
+    return !shared::graphicsviewutils::comparePolygones(oldPoints, m_points);
 }
 
 bool VEConnectionGraphicsItem::replaceInterface(
@@ -364,7 +364,7 @@ void VEConnectionGraphicsItem::layoutConnection(
         VEConnectionEndPointGraphicsItem *ifaceItem, LayoutPolicy layoutPolicy, CollisionsPolicy collisionsPolicy)
 {
     if (layoutPolicy == LayoutPolicy::Default) {
-        layout();
+        doLayout();
         return;
     } else if (layoutPolicy == LayoutPolicy::LastSegment) {
         updateEndPoint(ifaceItem);
@@ -379,7 +379,7 @@ void VEConnectionGraphicsItem::layoutConnection(
     } else if (CollisionsPolicy::Rebuild == collisionsPolicy) {
         const QList<QGraphicsItem *> overlappedItems = intersectedItems(this);
         if (!overlappedItems.isEmpty()) {
-            layout();
+            doLayout();
             return;
         }
     }
@@ -519,9 +519,9 @@ void VEConnectionGraphicsItem::rebuildLayout()
     }
 
     if (m_startItem->entity()->coordinates().isEmpty())
-        m_startItem->layout();
+        m_startItem->doLayout();
     if (m_endItem->entity()->coordinates().isEmpty())
-        m_endItem->layout();
+        m_endItem->doLayout();
 
     bool pathObsolete(true);
     if (m_points.size() > 2) {
@@ -530,8 +530,7 @@ void VEConnectionGraphicsItem::rebuildLayout()
     }
 
     if (pathObsolete) {
-        const bool changed = layout();
-        if (changed) {
+        if (doLayout()) {
             mergeGeometry();
         }
         return;

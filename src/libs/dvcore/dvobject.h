@@ -40,11 +40,6 @@ public:
     {
         Unknown = 0,
 
-        Board,
-        Port,
-        SystemFunction,
-        SystemInterface,
-
         Node,
         Partition,
         Function,
@@ -52,6 +47,11 @@ public:
         Connection,
         Message,
         Bus,
+
+        Board,
+        Port,
+        SystemFunction,
+        SystemInterface,
     };
     Q_ENUM(Type)
 

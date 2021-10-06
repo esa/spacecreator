@@ -25,11 +25,11 @@
 class QTreeView;
 
 namespace dvm {
+class AbstractSystemChecks;
 class DVConnection;
 }
 
 namespace dve {
-class AbstractSystemChecks;
 class DVMessageBindingsModel;
 
 class DVMessageBindingsWidget : public QWidget
@@ -38,7 +38,7 @@ class DVMessageBindingsWidget : public QWidget
 public:
     DVMessageBindingsWidget(shared::cmd::CommandsStackBase::Macro *macro, QWidget *parent = nullptr);
 
-    void initModel(dvm::DVConnection *connection, AbstractSystemChecks *systemChecker);
+    void initModel(dvm::DVConnection *connection, dvm::AbstractSystemChecks *systemChecker);
 
 private Q_SLOTS:
     void bindAll();

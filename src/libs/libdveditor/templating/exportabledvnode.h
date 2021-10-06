@@ -32,6 +32,9 @@ class ExportableDVNode : public ExportableDVObject
     Q_PROPERTY(QVariantList devices READ devices)
     Q_PROPERTY(QVariantList requiredBusAccesses READ requiredBusAccesses)
     Q_PROPERTY(QVariantList systemFunctions READ systemFunctions)
+    Q_PROPERTY(QString nodeLabel READ nodeLabel)
+
+    QString m_nodeLabel;
 
 public:
     explicit ExportableDVNode(const dvm::DVObject *dvObject = nullptr);
@@ -40,6 +43,7 @@ public:
     QVariantList devices() const;
     QVariantList requiredBusAccesses() const;
     QVariantList systemFunctions() const;
+    QString nodeLabel() const;
 };
 
 } // namespace dve

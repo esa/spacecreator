@@ -104,13 +104,14 @@ void VERectGraphicsItem::updateFromEntity()
         return;
 
     const QRectF itemSceneRect { graphicsviewutils::rect(obj->coordinates()) };
-    if (!itemSceneRect.isValid())
-        layout();
-    else
+    if (!itemSceneRect.isValid()) {
+        doLayout();
+    } else {
         setRect(itemSceneRect);
-
-    if (itemNeedsToBeRelayout())
-        layout();
+        if (layoutShouldBeChanged() && doLayout()) {
+            mergeGeometry();
+        }
+    }
 }
 
 QList<QPair<shared::VEObject *, QVector<QPointF>>> VERectGraphicsItem::prepareChangeCoordinatesCommandParams() const
@@ -120,14 +121,6 @@ QList<QPair<shared::VEObject *, QVector<QPointF>>> VERectGraphicsItem::prepareCh
     params.append({ entity(), sceneGeometry });
     params.append(VEInteractiveObject::prepareChangeCoordinatesCommandParams());
     return params;
-}
-
-void VERectGraphicsItem::rebuildLayout()
-{
-    VEInteractiveObject::rebuildLayout();
-
-    updateGripPoints();
-    applyColorScheme();
 }
 
 void VERectGraphicsItem::onManualMoveProgress(GripPoint *grip, const QPointF &pressedAt, const QPointF &releasedAt)
@@ -143,7 +136,7 @@ void VERectGraphicsItem::onManualMoveProgress(GripPoint *grip, const QPointF &pr
             return;
         }
     }
-    setRect(rect);
+    setGeometry(rect);
     layoutConnectionsOnMove(shared::ui::VEConnectionGraphicsItem::CollisionsPolicy::Ignore);
 }
 
@@ -153,7 +146,7 @@ void VERectGraphicsItem::onManualResizeProgress(GripPoint *grip, const QPointF &
         return;
 
     const QRectF rect = transformedRect(grip, pressedAt, releasedAt);
-    setRect(rect);
+    setGeometry(rect);
     const QRectF entityRect = graphicsviewutils::rect(entity()->coordinates());
     const QPointF delta = releasedAt - pressedAt;
     for (auto child : childItems()) {
@@ -193,8 +186,9 @@ void VERectGraphicsItem::onManualResizeFinish(GripPoint *grip, const QPointF &pr
     if (pressedAt == releasedAt)
         return;
 
-    if (shared::graphicsviewutils::isBounded(this, sceneBoundingRect())
-            && !shared::graphicsviewutils::isCollided(this, sceneBoundingRect())) {
+    const QRectF rect = sceneBoundingRect();
+    if (rect.width() >= minimalSize().width() && rect.height() >= minimalSize().height()
+            && shared::graphicsviewutils::isBounded(this, rect) && !shared::graphicsviewutils::isCollided(this, rect)) {
         layoutInterfaces();
         layoutConnectionsOnResize(shared::ui::VEConnectionGraphicsItem::CollisionsPolicy::PartialRebuild);
         updateEntity();
@@ -320,9 +314,9 @@ void VERectGraphicsItem::onGeometryChanged()
         clearHighlight();
 }
 
-void VERectGraphicsItem::layout()
+bool VERectGraphicsItem::doLayout()
 {
-    if (itemNeedsToBeRelayout()) {
+    if (layoutShouldBeChanged()) {
         const auto parentFunction = qobject_cast<VERectGraphicsItem *>(parentObject());
         QRectF boundedRect =
                 QRectF(parentFunction ? parentFunction->sceneBoundingRect() : scene()->itemsBoundingRect());
@@ -332,12 +326,13 @@ void VERectGraphicsItem::layout()
                 parentFunction == nullptr ? graphicsviewutils::kRootMargins : graphicsviewutils::kContentMargins);
         if (itemRect != sceneBoundingRect()) {
             setRect(itemRect);
-            mergeGeometry();
+            return true;
         }
     }
+    return false;
 }
 
-bool VERectGraphicsItem::itemNeedsToBeRelayout() const
+bool VERectGraphicsItem::layoutShouldBeChanged() const
 {
     const QRectF currentRect = sceneBoundingRect();
     if (!currentRect.isValid())
@@ -355,7 +350,7 @@ void VERectGraphicsItem::layoutConnectionsOnResize(VEConnectionGraphicsItem::Col
                     iface, VEConnectionGraphicsItem::LayoutPolicy::Scaling, collisionsPolicy, true);
         } else if (auto connection = qobject_cast<VEConnectionGraphicsItem *>(item->toGraphicsObject())) {
             if (connection->sourceItem() != this && connection->targetItem() != this)
-                connection->layout();
+                connection->doLayout();
         }
     }
 }
