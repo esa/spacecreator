@@ -44,9 +44,9 @@ public:
     State() = default;
 
     /**
-     * @brief   Copy constructor
+     * @brief   Deleted copy constructor
      */
-    State(const State &state);
+    State(const State &state) = delete;
 
     /**
      * @brief   Constructor

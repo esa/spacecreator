@@ -36,11 +36,6 @@ State::State(QString name, std::vector<std::unique_ptr<Input>> &inputs,
     }
 }
 
-State::State(const State &state)
-    : Node(state.name())
-{
-}
-
 const std::vector<std::unique_ptr<Input>> &State::inputs() const
 {
     return m_inputs;

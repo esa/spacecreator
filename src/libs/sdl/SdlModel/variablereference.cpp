@@ -21,17 +21,17 @@
 
 namespace sdl {
 
-VariableReference::VariableReference(VariableDeclaration &declaration)
+VariableReference::VariableReference(const std::shared_ptr<VariableDeclaration> &declaration)
     : m_declaration(declaration)
 {
 }
 
-const VariableDeclaration &VariableReference::declaration() const
+const std::shared_ptr<VariableDeclaration> &VariableReference::declaration() const
 {
     return m_declaration;
 }
 
-void VariableReference::setDeclaration(const VariableDeclaration &declaration)
+void VariableReference::setDeclaration(const std::shared_ptr<VariableDeclaration> &declaration)
 {
     m_declaration = declaration;
 }

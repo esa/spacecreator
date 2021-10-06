@@ -22,6 +22,7 @@
 #include "variabledeclaration.h"
 
 #include <QString>
+#include <memory>
 
 namespace sdl {
 
@@ -36,24 +37,24 @@ public:
      *
      * @param   declaration   referenced variable declaration
      */
-    VariableReference(VariableDeclaration &declaration);
+    VariableReference(const std::shared_ptr<VariableDeclaration> &declaration);
 
     /**
      * @brief    Getter for the referenced variable declaration
      *
-     * @return   const reference to variable declaration
+     * @return   const reference to pointer to variable declaration
      */
-    auto declaration() const -> const VariableDeclaration &;
+    auto declaration() const -> const std::shared_ptr<VariableDeclaration> &;
 
     /**
      * @brief    Setter for the referenced variable declaration
      *
-     * @param    declaration const reference to variable declaration
+     * @param    declaration const reference to pointer to variable declaration
      */
-    auto setDeclaration(const VariableDeclaration &declaration) -> void;
+    auto setDeclaration(const std::shared_ptr<VariableDeclaration> &declaration) -> void;
 
 private:
-    VariableDeclaration &m_declaration;
+    std::shared_ptr<VariableDeclaration> m_declaration;
 };
 
 } // namespace sdl
