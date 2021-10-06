@@ -40,21 +40,21 @@ public:
      * @param   name    name of this transition
      * @param   actions reference to the vector of pointers to actions
      */
-    Transition(QString name, std::vector<std::shared_ptr<Action>> &actions);
+    Transition(QString name, std::vector<std::unique_ptr<Action>> &actions);
 
     /**
      * @brief    Getter for the actions
      *
      * @return   const reference to the vector of pointers to actions
      */
-    auto actions() -> const std::vector<std::shared_ptr<Action>> &;
+    auto actions() -> const std::vector<std::unique_ptr<Action>> &;
 
     /**
      * @brief    Setter for the actions
      *
      * @param    const reference to the vector of pointers to actions
      */
-    auto setActions(std::vector<std::shared_ptr<Action>> &actions) -> void;
+    auto setActions(std::vector<std::unique_ptr<Action>> &actions) -> void;
 
     /**
      * @brief  visitor acceptor (calls visit method of the given visitor)
@@ -62,7 +62,7 @@ public:
     auto accept(Visitor &visitor) const -> void;
 
 private:
-    std::vector<std::shared_ptr<Action>> m_actions;
+    std::vector<std::unique_ptr<Action>> m_actions;
 };
 
 } // namespace sdl
