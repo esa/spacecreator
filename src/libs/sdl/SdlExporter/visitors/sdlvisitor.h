@@ -46,9 +46,24 @@ public:
     SdlVisitor(QTextStream &stream);
 
     /**
-     * @brief   Deleted move constructor
+     * @brief   Deleted copy constructor
      */
-    SdlVisitor(const QTextStream &&) = delete;
+    SdlVisitor(const SdlVisitor &) = delete;
+
+    /**
+     * @brief   Default move constructor
+     */
+    SdlVisitor(SdlVisitor &&) = default;
+
+    /**
+     * @brief   Deleted copy assignment operator
+     */
+    SdlVisitor &operator=(const SdlVisitor &) = delete;
+
+    /**
+     * @brief   Deleted move assignment operator
+     */
+    SdlVisitor &operator=(SdlVisitor &&) = delete; // instances of this class cannot be moved
 
     /**
      * @brief   Model visitor

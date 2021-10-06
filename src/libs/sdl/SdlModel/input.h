@@ -37,11 +37,31 @@ class Input final : public Signal
 {
 public:
     /**
-     * @brief   Constructor
+     * @brief   Default constructor
      *
      * @param name    signal name
      */
-    Input(QString name);
+    Input(QString name = "");
+
+    /**
+     * @brief   Deleted copy constructor
+     */
+    Input(const Input &) = delete;
+
+    /**
+     * @brief   Default move constructor
+     */
+    Input(Input &&) = default;
+
+    /**
+     * @brief   Deleted copy assignment operator
+     */
+    Input &operator=(const Input &) = delete;
+
+    /**
+     * @brief   Default move assignment operator
+     */
+    Input &operator=(Input &&) = default;
 
     /**
      * @brief   Constructor
@@ -50,11 +70,6 @@ public:
      * @param transition  a pointer to the transition which should be triggered upon reception of this signal
      */
     Input(QString name, const std::shared_ptr<Transition> &transition);
-
-    /**
-     * @brief   Deleted copy constructor
-     */
-    Input(const Input &input) = delete;
 
     /**
      * @brief   Getter for the transition

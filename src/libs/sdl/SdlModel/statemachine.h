@@ -37,7 +37,27 @@ public:
     /**
      * @brief    Default constructor
      */
-    StateMachine();
+    StateMachine() = default;
+
+    /**
+     * @brief    Default copy constructor
+     */
+    StateMachine(const StateMachine &) = default;
+
+    /**
+     * @brief   Default move constructor
+     */
+    StateMachine(StateMachine &&) = default;
+
+    /**
+     * @brief   Default copy assignment operator
+     */
+    StateMachine &operator=(const StateMachine &) = default;
+
+    /**
+     * @brief   Default move assignment operator
+     */
+    StateMachine &operator=(StateMachine &&) = default;
 
     /**
      * @brief   Constructor

@@ -49,6 +49,21 @@ public:
     State(const State &state) = delete;
 
     /**
+     * @brief   Default move constructor
+     */
+    State(State &&) = default;
+
+    /**
+     * @brief   Deleted copy assignment operator
+     */
+    State &operator=(const State &) = delete;
+
+    /**
+     * @brief   Default move assignment operator
+     */
+    State &operator=(State &&) = default;
+
+    /**
      * @brief   Constructor
      *
      * @param   name              name of this state

@@ -33,11 +33,32 @@ class VariableReference final
 {
 public:
     /**
-     * @brief   Constructor
+     * @brief   Default constructor
      *
      * @param   declaration   referenced variable declaration
      */
-    VariableReference(const std::shared_ptr<VariableDeclaration> &declaration);
+    VariableReference(
+            const std::shared_ptr<VariableDeclaration> &declaration = std::make_shared<VariableDeclaration>());
+
+    /**
+     * @brief   Deleted copy constructor
+     */
+    VariableReference(const VariableReference &) = delete;
+
+    /**
+     * @brief   Default move constructor
+     */
+    VariableReference(VariableReference &&) = default;
+
+    /**
+     * @brief   Deleted copy assignment operator
+     */
+    VariableReference &operator=(const VariableReference &) = delete;
+
+    /**
+     * @brief   Default move assignment operator
+     */
+    VariableReference &operator=(VariableReference &&) = default;
 
     /**
      * @brief    Getter for the referenced variable declaration

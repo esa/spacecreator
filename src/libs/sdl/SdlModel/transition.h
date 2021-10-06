@@ -35,6 +35,31 @@ class Transition final : public Node
 {
 public:
     /**
+     * @brief   Default constructor
+     */
+    Transition() = default;
+
+    /**
+     * @brief   Deleted copy constructor
+     */
+    Transition(const Transition &) = delete;
+
+    /**
+     * @brief   Default move constructor
+     */
+    Transition(Transition &&) = default;
+
+    /**
+     * @brief   Deleted copy assignment operator
+     */
+    Transition &operator=(const Transition &) = delete;
+
+    /**
+     * @brief   Default move assignment operator
+     */
+    Transition &operator=(Transition &&) = default;
+
+    /**
      * @brief   Constructor
      *
      * @param   name    name of this transition

@@ -30,9 +30,9 @@ class Visitor;
  */
 class Node
 {
-protected:
+public:
     /**
-     * @brief   Constructor
+     * @brief   Default constructor
      */
     Node(QString name = "");
 
@@ -42,11 +42,20 @@ protected:
     Node(const Node &other) = delete;
 
     /**
-     * @brief   Move constructor
+     * @brief   Default move constructor
      */
     Node(Node &&) = default;
 
-public:
+    /**
+     * @brief   Deleted copy assignment operator
+     */
+    Node &operator=(const Node &) = delete;
+
+    /**
+     * @brief   Default move assignment operator
+     */
+    Node &operator=(Node &&) = default;
+
     /**
      * @brief   Default virtual destructor
      */

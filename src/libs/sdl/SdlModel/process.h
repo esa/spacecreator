@@ -45,14 +45,7 @@ public:
     /**
      * @brief   Default constructor
      */
-    Process();
-
-    /**
-     * @brief   Constructor
-     *
-     * @param   stream   output stream (where the serialized values are put)
-     */
-    Process(QString name, std::unique_ptr<StateMachine> &stateMachine);
+    Process() = default;
 
     /**
      * @brief Copy constructor
@@ -73,6 +66,13 @@ public:
      * @brief Deleted move assignment
      */
     Process &operator=(Process &&other) = delete;
+
+    /**
+     * @brief   Constructor
+     *
+     * @param   stream   output stream (where the serialized values are put)
+     */
+    Process(QString name, std::unique_ptr<StateMachine> &stateMachine);
 
     /**
      * @brief   Getter for the state machine

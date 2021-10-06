@@ -36,11 +36,31 @@ class NextState final : public Action
 {
 public:
     /**
-     * @brief   Constructor
+     * @brief   Default constructor
      *
      * @param   name    name of the action
      */
-    NextState(const QString &name);
+    NextState(QString name);
+
+    /**
+     * @brief   Deleted copy constructor
+     */
+    NextState(const NextState &) = delete;
+
+    /**
+     * @brief   Default move constructor
+     */
+    NextState(NextState &&) = default;
+
+    /**
+     * @brief   Deleted copy assignment operator
+     */
+    NextState &operator=(const NextState &) = delete;
+
+    /**
+     * @brief   Default move assignment operator
+     */
+    NextState &operator=(NextState &&) = default;
 
     /**
      * @brief   Constructor
@@ -48,7 +68,7 @@ public:
      * @param   name    name of the action
      * @param   state   a pointer to the next state
      */
-    NextState(const QString &name, const std::shared_ptr<State> &state);
+    NextState(QString name, const std::shared_ptr<State> &state);
 
     /**
      * @brief   Getter for the next state

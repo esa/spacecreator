@@ -38,6 +38,26 @@ public:
     VariableDeclaration(QString name = "", QString type = "");
 
     /**
+     * @brief   Default copy constructor
+     */
+    VariableDeclaration(const VariableDeclaration &) = default;
+
+    /**
+     * @brief   Default move constructor
+     */
+    VariableDeclaration(VariableDeclaration &&) = default;
+
+    /**
+     * @brief   Deleted copy assignment operator
+     */
+    VariableDeclaration &operator=(const VariableDeclaration &) = delete;
+
+    /**
+     * @brief   Default move assignment operator
+     */
+    VariableDeclaration &operator=(VariableDeclaration &&) = default;
+
+    /**
      * @brief    Getter for the name of the declared variable
      *
      * @return   name of the declared variable

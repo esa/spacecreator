@@ -32,11 +32,31 @@ class Literal final
 {
 public:
     /**
-     * @brief   Constructor
+     * @brief   Default constructor
      *
      * @param   value    value to store
      */
     Literal(QString value = "");
+
+    /**
+     * @brief   Deleted copy constructor
+     */
+    Literal(const Literal &) = delete;
+
+    /**
+     * @brief   Default move constructor
+     */
+    Literal(Literal &&) = default;
+
+    /**
+     * @brief   Deleted copy assignment operator
+     */
+    Literal &operator=(const Literal &) = delete;
+
+    /**
+     * @brief   Default move assignment operator
+     */
+    Literal &operator=(Literal &&) = default;
 
     /**
      * @brief   Getter for the stored value

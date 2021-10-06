@@ -36,6 +36,31 @@ class Visitor
 {
 public:
     /**
+     * @brief   Default constructor
+     */
+    Visitor() = default;
+
+    /**
+     * @brief   Deleted copy constructor
+     */
+    Visitor(const Visitor &) = delete;
+
+    /**
+     * @brief   Default move constructor
+     */
+    Visitor(Visitor &&) = default;
+
+    /**
+     * @brief   Deleted copy assignment operator
+     */
+    Visitor &operator=(const Visitor &) = delete;
+
+    /**
+     * @brief   Default move assignment operator
+     */
+    Visitor &operator=(Visitor &&) = default;
+
+    /**
      * @brief   Virtual destructor
      */
     virtual ~Visitor() = default;

@@ -37,6 +37,31 @@ class SdlExporter final : public conversion::exporter::ModelExporter
 {
 public:
     /**
+     * @brief   Default constructor
+     */
+    SdlExporter() = default;
+
+    /**
+     * @brief   Deleted copy constructor
+     */
+    SdlExporter(const SdlExporter &) = delete;
+
+    /**
+     * @brief   Default move constructor
+     */
+    SdlExporter(SdlExporter &&) = default;
+
+    /**
+     * @brief   Deleted copy assignment operator
+     */
+    SdlExporter &operator=(const SdlExporter &) = delete;
+
+    /**
+     * @brief   Default move assignment operator
+     */
+    SdlExporter &operator=(SdlExporter &&) = default;
+
+    /**
      * @brief   Exports SDL model to a file
      *
      * @param   model       Model to export

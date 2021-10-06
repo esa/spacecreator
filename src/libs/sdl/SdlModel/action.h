@@ -37,6 +37,26 @@ public:
      * @param   name   name of the element
      */
     Action(QString name = "");
+
+    /**
+     * @brief   Deleted copy constructor
+     */
+    Action(const Action &) = delete;
+
+    /**
+     * @brief   Default move constructor
+     */
+    Action(Action &&) = default;
+
+    /**
+     * @brief   Deleted copy assignment operator
+     */
+    Action &operator=(const Action &) = delete;
+
+    /**
+     * @brief   Default move assignment operator
+     */
+    Action &operator=(Action &&) = default;
 };
 
 } // namespace sdl

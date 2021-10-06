@@ -23,13 +23,13 @@
 
 namespace sdl {
 
-NextState::NextState(const QString &name)
-    : Action(name)
+NextState::NextState(QString name)
+    : Action(std::move(name))
 {
 }
 
-NextState::NextState(const QString &name, const std::shared_ptr<State> &state)
-    : Action(name)
+NextState::NextState(QString name, const std::shared_ptr<State> &state)
+    : Action(std::move(name))
     , m_state(state)
 {
 }
