@@ -47,7 +47,10 @@ protected:
     Node(Node &&) = default;
 
 public:
-    virtual ~Node();
+    /**
+     * @brief   Default virtual destructor
+     */
+    virtual ~Node() = default;
 
     /**
      * @brief   Setter for this model type

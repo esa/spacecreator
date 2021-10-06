@@ -53,7 +53,7 @@ public:
     auto setValue(QString value) -> void;
 
 private:
-    QString m_value = "";
+    QString m_value;
 };
 
 } // namespace sdl

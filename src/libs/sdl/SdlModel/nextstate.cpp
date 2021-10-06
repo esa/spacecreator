@@ -26,7 +26,6 @@ namespace sdl {
 NextState::NextState(const QString &name)
     : Action(name)
 {
-    m_state.reset();
 }
 
 NextState::NextState(const QString &name, const std::shared_ptr<State> &state)

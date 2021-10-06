@@ -28,8 +28,6 @@ Node::Node(QString name)
 {
 }
 
-Node::~Node() {}
-
 void Node::setName(QString name)
 {
     m_name = std::move(name);
