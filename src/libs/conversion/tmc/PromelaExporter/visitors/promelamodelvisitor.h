@@ -30,11 +30,26 @@ using ::tmc::promelamodel::NamedMtype;
 using ::tmc::promelamodel::PromelaModel;
 using ::tmc::promelamodel::Utype;
 
+/**
+ * @brief  Visitor for exporting @link{PromelaModel}
+ *
+ * This visitor exports PromelaModel to textual representation.
+ */
 class PromelaModelVisitor
 {
 public:
+    /**
+     * @brief Constructor.
+     *
+     * @param stream A stream to append exported model.
+     */
     PromelaModelVisitor(QTextStream &stream);
 
+    /**
+     * @brief Visit PromelaModel
+     *
+     * @param promelaModel PromelaModel to visit.
+     */
     void visit(const PromelaModel &promelaModel);
 
 private:

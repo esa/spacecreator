@@ -20,9 +20,6 @@
 #include "promelamodel.h"
 
 namespace tmc::promelamodel {
-PromelaModel::PromelaModel() {}
-
-PromelaModel::~PromelaModel() {}
 
 conversion::ModelType PromelaModel::modelType() const
 {

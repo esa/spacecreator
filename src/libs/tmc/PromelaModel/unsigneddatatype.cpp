@@ -20,13 +20,4 @@
 #include "unsigneddatatype.h"
 
 namespace tmc::promelamodel {
-UnsignedDataType::UnsignedDataType(unsigned int size)
-    : m_size(size)
-{
-}
-
-unsigned int UnsignedDataType::size() const
-{
-    return m_size;
-}
 }

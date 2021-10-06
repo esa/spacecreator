@@ -25,7 +25,7 @@ NamedMtype::NamedMtype(QString name)
 {
 }
 
-const QString &NamedMtype::getName() const
+const QString &NamedMtype::getName() const noexcept
 {
     return m_name;
 }
@@ -40,12 +40,12 @@ void NamedMtype::removeValue(const QString &value)
     m_values.remove(value);
 }
 
-bool NamedMtype::hasValue(const QString &value)
+bool NamedMtype::hasValue(const QString &value) const
 {
     return m_values.contains(value);
 }
 
-const QSet<QString> &NamedMtype::values() const
+const QSet<QString> &NamedMtype::values() const noexcept
 {
     return m_values;
 }

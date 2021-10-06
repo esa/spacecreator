@@ -20,12 +20,32 @@
 #pragma once
 
 namespace tmc::promelamodel {
-class UnsignedDataType
+/**
+ * @brief Representation of unsigned type from promela.
+ *
+ * The unsigned type from promela is a bit-field, whith available sizes from 1 to 32.
+ */
+class UnsignedDataType final
 {
 public:
-    UnsignedDataType(unsigned int size);
+    /**
+     * @brief Constructor.
+     *
+     * Construct unsgined data type with given width
+     *
+     * @param size the size of unsigned data type
+     */
+    constexpr UnsignedDataType(unsigned int size) noexcept
+        : m_size(size)
+    {
+    }
 
-    unsigned int size() const;
+    /**
+     * @brief Getter for size
+     *
+     * @return size of unsigned data type
+     */
+    constexpr unsigned int size() const noexcept { return m_size; }
 
 private:
     unsigned int m_size;

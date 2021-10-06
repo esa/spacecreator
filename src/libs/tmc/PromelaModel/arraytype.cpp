@@ -38,12 +38,12 @@ ArrayType::ArrayType(size_t size, UtypeRef type)
 {
 }
 
-size_t ArrayType::getSize() const
+size_t ArrayType::getSize() const noexcept
 {
     return m_size;
 }
 
-const ArrayType::Value &ArrayType::getType() const
+const ArrayType::Value &ArrayType::getType() const noexcept
 {
     return m_type;
 }

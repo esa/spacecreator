@@ -27,11 +27,25 @@ namespace conversion::tmc::exporter {
 using ::tmc::promelamodel::BasicType;
 using ::tmc::promelamodel::DataType;
 using ::tmc::promelamodel::Declaration;
+
+/**
+ * @brief  Visitor for exporting @link{::tmc::promelamodel::Declaration}
+ */
 class DeclarationVisitor
 {
 public:
+    /**
+     * @brief Constructor.
+     *
+     * @param stream  stream to append data type prefix
+     * @param prefix  prefix, which shall be added at the beginning, e.g. indent
+     */
     DeclarationVisitor(QTextStream &stream, QString prefix);
 
+    /** @brief  Visit Declaration
+     *
+     * @param declaration Declaration to visit
+     */
     void visit(const Declaration &declaration);
 
 private:

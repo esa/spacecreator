@@ -24,7 +24,8 @@ Utype::Utype(QString name)
     : m_name(std::move(name))
 {
 }
-const QString &Utype::getName() const
+
+const QString &Utype::getName() const noexcept
 {
     return m_name;
 }
@@ -33,9 +34,9 @@ void Utype::addField(const Declaration &field)
 {
     m_fields.append(field);
 }
-const QList<Declaration> &Utype::getFields() const
+
+const QList<Declaration> &Utype::getFields() const noexcept
 {
     return m_fields;
 }
-
 }

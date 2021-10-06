@@ -26,14 +26,28 @@
 namespace conversion::tmc::exporter {
 using ::tmc::promelamodel::Utype;
 
+/**
+ * @brief Vistor for exporting Utype
+ *
+ * This visitor exports user defined type to textual representation.
+ */
 class UtypeVisitor
 {
 public:
+    /**
+     * @brief Constructor.
+     *
+     * @param stream  A stream to append textual representation.
+     */
     UtypeVisitor(QTextStream &stream);
 
+    /**
+     * @brief  Constructor
+     *
+     * @param utype Utype to visit
+     */
     void visit(const Utype &utype);
 
-private:
 private:
     QTextStream &m_stream;
 };

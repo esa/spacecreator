@@ -30,19 +30,73 @@ using ::tmc::promelamodel::DataType;
 using ::tmc::promelamodel::UnsignedDataType;
 using ::tmc::promelamodel::UtypeRef;
 
+/**
+ * @brief  Visitor for exporting @link{::tmc::promelamodel::DataType}
+ *
+ * This translator creates suffix for data type.
+ * This should be used together with DataTypePrefixVisitor.
+ */
 class DataTypeSuffixVisitor
 {
 public:
+    /**
+     * @brief  Constructor.
+     *
+     * @param stream  steam to append data type suffix
+     */
     DataTypeSuffixVisitor(QTextStream &stream);
 
+    /**
+     * @brief  Visit DataType
+     *
+     * @param dataType DataType to visit
+     */
     void visit(const DataType &dataType);
 
+    /**
+     * @brief Visit value of DataType, whih is std::variant
+     *
+     * @param value std::variant to visit
+     */
     void visit(const DataType::Value &value);
+    /**
+     * @brief Visit value of ArrayType, whih is std::variant
+     *
+     * @param value std::variant to visit
+     */
     void visit(const ArrayType::Value &value);
 
+    /**
+     * @brief Handle UnsignedDatatype
+     *
+     * This function appends prefix for UnsignedDataType to stream.
+     *
+     * @param type type to translate.
+     */
     void operator()(const UnsignedDataType &type);
+    /**
+     * @brief Handle BasicType
+     *
+     * This function appends prefix for BasicType to stream.
+     *
+     * @param type type to translate.
+     */
     void operator()(const BasicType &type);
+    /**
+     * @brief Handle UtypeRef
+     *
+     * This function appends prefix for UtypeRef to stream.
+     *
+     * @param type type to translate.
+     */
     void operator()(const UtypeRef &type);
+    /**
+     * @brief Handle ArrayType
+     *
+     * This function appends prefix for ArrayType to stream.
+     *
+     * @param type type to translate.
+     */
     void operator()(const ArrayType &type);
 
 private:

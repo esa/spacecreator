@@ -28,27 +28,109 @@
 #include <variant>
 
 namespace tmc::promelamodel {
+/**
+ * @brief  Representation of data type in promela.
+ */
 class DataType final
 {
 public:
+    /**
+     * @brief variant value to represent data type.
+     *
+     * The data type can be 'unsigned', basic type, reference to user defined type or array
+     */
     using Value = std::variant<UnsignedDataType, UtypeRef, BasicType, ArrayType>;
 
+    /**
+     * @brief Constructor directly from variant value.
+     *
+     * @param value data type
+     */
     DataType(Value value);
+    /**
+     * @brief Constructor directly from unsigned.
+     *
+     * @param value unsigned data type
+     */
     DataType(UnsignedDataType value);
+    /**
+     * @brief Constructor directly from reference to user defined type.
+     *
+     * @param value refernece to user defined data type
+     */
     DataType(UtypeRef value);
+    /**
+     * @brief Constructor directly from basic type.
+     *
+     * @param value basic data type
+     */
     DataType(BasicType value);
+    /**
+     * @brief Constructor directly from array data type.
+     *
+     * @param value array data type
+     */
     DataType(ArrayType value);
 
-    const Value &getValue() const;
+    /**
+     * @brief Getter for variant DataType.
+     *
+     * @return datatype variant
+     */
+    const Value &getValue() const noexcept;
 
-    bool isUnsigned() const;
-    bool isReference() const;
-    bool isBasicType() const;
-    bool isArrayType() const;
+    /**
+     * @brief Checks if data type is UnsignedDataType
+     *
+     * @returns true if data type is UnsignedDataType, otherwise false
+     */
+    bool isUnsigned() const noexcept;
+    /**
+     * @brief Checks if data type is UtypeRef
+     *
+     * @returns true if data type is UtypeRef, otherwise false
+     */
+    bool isReference() const noexcept;
+    /**
+     * @brief Checks if data type is BasicType
+     *
+     * @returns true if data type is BasicType, otherwise false
+     */
+    bool isBasicType() const noexcept;
+    /**
+     * @brief Checks if data type is ArrayType
+     *
+     * @returns true if data type is ArrayType, otherwise false
+     */
+    bool isArrayType() const noexcept;
 
+    /**
+     * @brief Getter for UnsignedDataType
+     *
+     * @returns reference to UnsginedDataType
+     * @throws std::bad_variant_access data type does not contain UnsignedDataType
+     */
     const UnsignedDataType &getUnsigned() const;
+    /**
+     * @brief Getter for UtypeRef
+     *
+     * @returns reference to UtypeRef
+     * @throws std::bad_variant_access data type does not contain UtypeRef
+     */
     const UtypeRef &getReference() const;
+    /**
+     * @brief Getter for BasicType
+     *
+     * @returns reference to BasicType
+     * @throws std::bad_variant_access data type does not contain BasicType
+     */
     const BasicType &getBasicType() const;
+    /**
+     * @brief Getter for ArrayType
+     *
+     * @returns reference to ArrayType
+     * @throws std::bad_variant_access data type does not contain ArrayType
+     */
     const ArrayType &getArrayType() const;
 
 private:

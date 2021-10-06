@@ -25,15 +25,41 @@
 #include <QString>
 
 namespace tmc::promelamodel {
+/**
+ * @brief Representation of user defined type in promela - utype.
+ *
+ * User defined type is a structure with contains ordered list of fields.
+ **/
 class Utype final
 {
 public:
+    /**
+     * @brief Constructor.
+     *
+     * @param name the name of the user defined type.
+     */
     Utype(QString name);
 
-    const QString &getName() const;
+    /**
+     * @brief Getter for name of user defined type
+     *
+     * @return name of the user defined type
+     */
+    const QString &getName() const noexcept;
 
+    /**
+     * @brief Add a field to the user defined type
+     *
+     * @param field a field to add
+     */
     void addField(const Declaration &field);
-    const QList<Declaration> &getFields() const;
+
+    /**
+     * @brief Getter for all fields from user defined type
+     *
+     * @return the reference to the list with all fields from user defined type
+     */
+    const QList<Declaration> &getFields() const noexcept;
 
 private:
     QString m_name;

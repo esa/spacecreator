@@ -22,6 +22,9 @@
 #include "export/modelexporter.h"
 
 namespace conversion::tmc::exporter {
+/**
+ * @brief PromelaExporter exports PromelaModel to textual representation.
+ */
 class PromelaExporter final : public ::conversion::exporter::ModelExporter
 {
 public:

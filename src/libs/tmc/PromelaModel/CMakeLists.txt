@@ -1,25 +1,25 @@
 project(PromelaModel VERSION 1.0.0 LANGUAGES CXX)
 
 set(SOURCES
-  promelamodel.cpp
-  namedmtype.cpp
-  unsigneddatatype.cpp
-  utyperef.cpp
-  utype.cpp
+  arraytype.cpp
   datatype.cpp
   declaration.cpp
-  arraytype.cpp
+  namedmtype.cpp
+  promelamodel.cpp
+  unsigneddatatype.cpp
+  utype.cpp
+  utyperef.cpp
   )
 set(INCLUDES
-  promelamodel.h
-  namedmtype.h
-  unsigneddatatype.h
-  utyperef.h
-  utype.h
-  datatype.h
-  declaration.h
   arraytype.cpp
   basictypes.h
+  datatype.h
+  declaration.h
+  namedmtype.h
+  promelamodel.h
+  unsigneddatatype.h
+  utype.h
+  utyperef.h
   )
 
 add_library(PromelaModel STATIC)

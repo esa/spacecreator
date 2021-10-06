@@ -45,27 +45,27 @@ DataType::DataType(ArrayType value)
 {
 }
 
-const DataType::Value &DataType::getValue() const
+const DataType::Value &DataType::getValue() const noexcept
 {
     return m_value;
 }
 
-bool DataType::isUnsigned() const
+bool DataType::isUnsigned() const noexcept
 {
     return std::holds_alternative<UnsignedDataType>(m_value);
 }
 
-bool DataType::isReference() const
+bool DataType::isReference() const noexcept
 {
     return std::holds_alternative<UtypeRef>(m_value);
 }
 
-bool DataType::isBasicType() const
+bool DataType::isBasicType() const noexcept
 {
     return std::holds_alternative<BasicType>(m_value);
 }
 
-bool DataType::isArrayType() const
+bool DataType::isArrayType() const noexcept
 {
     return std::holds_alternative<ArrayType>(m_value);
 }

@@ -28,16 +28,51 @@
 
 namespace tmc::promelamodel
 {
+	/**
+	 * @brief representation of array type from promela.
+	 */
 	class ArrayType final
 	{
 	public:
+		/**
+		 * @brief The base type of array, which can be only BasicType or reference to Utype
+		 */
 		using Value = std::variant<BasicType, UtypeRef>;
-		ArrayType(size_t size, Value type);
+
+                /**
+                 * @brief Constructor directly from @link{Value}
+				 *
+				 * @param size  Size of the array
+				 * @param type  Base type of the array
+                 */
+                ArrayType(size_t size, Value type);
+                /**
+                 * @brief Constructor directly from @link{BasicType}
+				 *
+				 * @param size  Size of the array
+				 * @param type  Base type of the array
+                 */
 		ArrayType(size_t size, BasicType type);
+                /**
+                 * @brief Constructor directly from @link{UtypeRef}
+				 *
+				 * @param size  Size of the array
+				 * @param type  Base type of the array
+                 */
 		ArrayType(size_t size, UtypeRef type);
 
-		size_t getSize() const;
-		const Value& getType() const;
+		/**
+		 * @brief Getter for array size
+		 *
+		 * @returns Array size
+		 */
+		size_t getSize() const noexcept;
+		/**
+		 * @brief Getter for base type of array.
+		 *
+		 * @return Base type of array
+		 */
+		const Value& getType() const noexcept;
 
 	private:
 		size_t m_size;

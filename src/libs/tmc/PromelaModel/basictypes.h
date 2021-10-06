@@ -20,6 +20,9 @@
 #pragma once
 
 namespace tmc::promelamodel {
+/**
+ * @brief   Represents all available basic types in promela
+ */
 enum class BasicType
 {
     BIT,

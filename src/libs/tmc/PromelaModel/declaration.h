@@ -25,9 +25,17 @@
 #include <optional>
 
 namespace tmc::promelamodel {
+/**
+ * @brief Representation of declaration in promela.
+ *
+ * The declaration can be used to declare a variable or a field inside user defined data type.
+ */
 class Declaration final
 {
 public:
+    /**
+     * @brief Declaration visibility.
+     */
     enum Visibility
     {
         NORMAL,
@@ -36,10 +44,33 @@ public:
     };
 
 public:
+    /**
+     * @brief Constructor.
+     *
+     * @param type type of declared variable or field
+     * @param name name of declared variable or field
+     * @param visibility visibility of declared variable or field
+     */
     Declaration(DataType type, QString name, Visibility visibility = Visibility::NORMAL);
-    const DataType &getType() const;
-    const QString &getName() const;
-    Visibility getVisibility() const;
+
+    /**
+     * @brief Getter for declaration data type.
+     *
+     * @return declaration data type
+     */
+    const DataType &getType() const noexcept;
+    /**
+     * @brief Getter for declaration name.
+     *
+     * @return name of the declared variable or field
+     */
+    const QString &getName() const noexcept;
+    /**
+     * @brief Getter for declaration visibility.
+     *
+     * @return declaration visibility.
+     */
+    Visibility getVisibility() const noexcept;
 
 private:
     DataType m_type;

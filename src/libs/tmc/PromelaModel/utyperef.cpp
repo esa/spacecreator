@@ -25,7 +25,7 @@ UtypeRef::UtypeRef(QString ref)
 {
 }
 
-const QString &UtypeRef::getName() const
+const QString &UtypeRef::getName() const noexcept
 {
     return m_ref;
 }

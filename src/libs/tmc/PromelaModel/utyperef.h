@@ -22,12 +22,25 @@
 #include <QString>
 
 namespace tmc::promelamodel {
+/**
+ * @brief Representation of a reference to user defined type in promela.
+ */
 class UtypeRef
 {
 public:
+    /**
+     * @brief Constructor.
+     *
+     * @param name name of user defined type
+     */
     UtypeRef(QString ref);
 
-    const QString &getName() const;
+    /**
+     * @brief Getter for the name of user defined type.
+     *
+     * @return name of user defined type
+     */
+    const QString &getName() const noexcept;
 
 private:
     QString m_ref;

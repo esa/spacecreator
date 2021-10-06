@@ -27,17 +27,17 @@ Declaration::Declaration(DataType type, QString name, Visibility visibility)
 {
 }
 
-const DataType &Declaration::getType() const
+const DataType &Declaration::getType() const noexcept
 {
     return m_type;
 }
 
-const QString &Declaration::getName() const
+const QString &Declaration::getName() const noexcept
 {
     return m_name;
 }
 
-Declaration::Visibility Declaration::getVisibility() const
+Declaration::Visibility Declaration::getVisibility() const noexcept
 {
     return m_visibility;
 }
