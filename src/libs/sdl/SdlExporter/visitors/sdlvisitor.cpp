@@ -79,11 +79,6 @@ void SdlVisitor::visit(const Input &input) const
     }
 }
 
-void SdlVisitor::visit(const Signal &sig) const
-{
-    Q_UNUSED(sig);
-}
-
 void SdlVisitor::visit(const Transition &transition) const
 {
     Q_UNUSED(transition);

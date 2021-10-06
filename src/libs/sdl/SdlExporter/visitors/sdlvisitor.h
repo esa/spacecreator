@@ -79,13 +79,6 @@ public:
     auto visit(const Input &input) const -> void override;
 
     /**
-     * @brief   Signal visitor
-     *
-     * @param   signal   signal to be serialized
-     */
-    auto visit(const Signal &sig) const -> void override;
-
-    /**
      * @brief   Transition visitor
      *
      * @param   transition   transition to be serialized

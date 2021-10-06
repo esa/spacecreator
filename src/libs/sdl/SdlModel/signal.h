@@ -39,14 +39,9 @@ public:
     Signal(QString name = "");
 
     /**
-     * Virtual destructor
+     * @brief   Default virtual destructor
      */
-    virtual ~Signal();
-
-    /**
-     * @brief  visitor acceptor (calls visit method of the given visitor)
-     */
-    auto accept(Visitor &visitor) const -> void override;
+    virtual ~Signal() = default;
 };
 
 } // namespace sdl

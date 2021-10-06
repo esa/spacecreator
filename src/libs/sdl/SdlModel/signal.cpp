@@ -29,11 +29,4 @@ Signal::Signal(QString name)
 {
 }
 
-Signal::~Signal() {}
-
-void Signal::accept(Visitor &visitor) const
-{
-    visitor.visit(*this);
-}
-
 } // namespace sdl
