@@ -33,7 +33,7 @@ namespace sdl::exporter {
 /**
  * @brief   Exporter that outputs a .pr text file with serialized SDL model
  */
-class SdlExporter final : public ::conversion::exporter::ModelExporter
+class SdlExporter final : public conversion::exporter::ModelExporter
 {
 public:
     /**
