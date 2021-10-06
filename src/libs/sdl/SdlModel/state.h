@@ -35,13 +35,13 @@ class ContinuousSignal
     // TODO: this class shall contain an Expression
 };
 
-class State : public Node
+class State final : public Node
 {
 public:
     /**
      * @brief   Default constructor
      */
-    State();
+    State() = default;
 
     /**
      * @brief   Copy constructor
@@ -59,11 +59,6 @@ public:
      */
     State(QString name, std::vector<std::unique_ptr<Input>> &inputs,
             std::vector<std::unique_ptr<ContinuousSignal>> &continuousSignals);
-
-    /**
-     * @brief   Virtual destructor
-     */
-    virtual ~State();
 
     /**
      * @brief   Getter for the inputs (input signals)

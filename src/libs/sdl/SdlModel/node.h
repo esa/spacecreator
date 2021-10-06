@@ -34,7 +34,7 @@ protected:
     /**
      * @brief   Constructor
      */
-    Node(QString name);
+    Node(QString name = "");
 
     /**
      * @brief   Deleted copy constructor
