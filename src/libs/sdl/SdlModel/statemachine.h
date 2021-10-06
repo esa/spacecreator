@@ -31,7 +31,7 @@ namespace sdl {
 /**
  * @brief   Represents an SDL state machine
  */
-class StateMachine
+class StateMachine final
 {
 public:
     /**

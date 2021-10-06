@@ -33,7 +33,7 @@ namespace sdl {
  *
  * Stores a pointer to the transition which should be fired upon reception of this signal.
  */
-class Input : public Signal
+class Input final : public Signal
 {
 public:
     /**

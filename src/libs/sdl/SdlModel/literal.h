@@ -28,7 +28,7 @@ namespace sdl {
  *
  * Stores a value as a string of characters
  */
-class Literal
+class Literal final
 {
 public:
     /**

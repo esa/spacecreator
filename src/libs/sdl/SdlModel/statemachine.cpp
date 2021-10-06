@@ -19,9 +19,6 @@
 
 #include "statemachine.h"
 
-#include <iostream>
-#include <memory>
-
 namespace sdl {
 
 StateMachine::StateMachine() {}

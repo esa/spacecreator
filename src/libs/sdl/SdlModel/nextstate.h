@@ -32,7 +32,7 @@ namespace sdl {
  *
  * Stores a pointer to the next state
  */
-class NextState : public Action
+class NextState final : public Action
 {
 public:
     /**

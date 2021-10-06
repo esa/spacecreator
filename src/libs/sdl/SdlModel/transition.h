@@ -31,7 +31,7 @@ namespace sdl {
 /**
  * @brief   Represents an SDL transition
  */
-class Transition : public Node
+class Transition final : public Node
 {
 public:
     /**
