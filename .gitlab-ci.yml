@@ -46,6 +46,9 @@ space-creator-dev:
     key: asn1scc
     paths:
       - build/asn1scc_bin
+  artifacts:
+    reports:
+      junit: build/tst_*-result.xml
   rules:
     - if: "$CI_COMMIT_BRANCH != 'master'"
 
