@@ -49,6 +49,7 @@ private Q_SLOTS:
     void addLanguage();
     void deleteSelectedLanguage();
     void updateDeleteButton();
+    void rowsInserted(const QModelIndex &parent, int first, int last);
 
 private:
     Ui::ImplementationsWidget *ui;

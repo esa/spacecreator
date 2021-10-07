@@ -50,6 +50,9 @@ ImplementationsWidget::ImplementationsWidget(ivm::IVFunction *fn, ivm::AbstractS
     connect(ui->tableView->selectionModel(), &QItemSelectionModel::selectionChanged, this,
             &ImplementationsWidget::updateDeleteButton);
     updateDeleteButton();
+
+    connect(m_model, &ImplementationsModel::rowsInserted, this, &ImplementationsWidget::rowsInserted);
+    rowsInserted(QModelIndex(), 0, m_model->rowCount() - 1);
 }
 
 ImplementationsWidget::~ImplementationsWidget()
@@ -64,6 +67,7 @@ void ImplementationsWidget::addLanguage()
     QModelIndex idx = m_model->index(newRow, ImplementationsModel::Column::Name);
     ui->tableView->edit(idx);
     ui->tableView->scrollToBottom();
+    ui->tableView->selectRow(newRow);
 }
 
 void ImplementationsWidget::deleteSelectedLanguage()
@@ -93,6 +97,16 @@ void ImplementationsWidget::updateDeleteButton()
     }
 
     ui->deleteButton->setEnabled(editable);
+}
+
+void ImplementationsWidget::rowsInserted(const QModelIndex &parent, int first, int last)
+{
+    for (int idx = first; idx <= last; ++idx) {
+        const QModelIndex index = m_model->index(idx, ImplementationsModel::Column::Language, parent);
+        if (index.isValid()) {
+            ui->tableView->openPersistentEditor(index);
+        }
+    }
 }
 
 } // namespace ive

@@ -46,6 +46,10 @@ public:
     void setDVCore(DVEditorCore *core);
     void setActions(const QVector<QAction *> &actions);
 
+private Q_SLOTS:
+    void dvObjectInserted(const QModelIndex &parent, int first, int last);
+    void enableAllImplementationEdits();
+
 private:
     Ui::DVAppWidget *ui = nullptr;
     QItemSelectionModel *m_selectionModel = nullptr;
