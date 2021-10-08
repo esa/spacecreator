@@ -22,7 +22,6 @@
 #include "datatype.h"
 
 #include <QString>
-#include <optional>
 
 namespace tmc::promelamodel {
 /**
@@ -36,7 +35,7 @@ public:
     /**
      * @brief Declaration visibility.
      */
-    enum Visibility
+    enum class Visibility
     {
         NORMAL,
         SHOW,
@@ -76,6 +75,5 @@ private:
     DataType m_type;
     QString m_name;
     Visibility m_visibility;
-    // std::optional<Expr> init
 };
 }

@@ -30,7 +30,7 @@ class PromelaOptions
 {
 public:
     /** @brief  Filepath of output file  */
-    inline static const QString promelaOutputFile = "Promela_Export_Filepath";
+    inline static const QString promelaOutputFilepath = "Promela_Export_Filepath";
 };
 
 }

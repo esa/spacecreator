@@ -35,15 +35,18 @@ void DataTypePrefixVisitor::visit(const DataType::Value &value)
 {
     std::visit(*this, value);
 }
-void DataTypePrefixVisitor::visit(const ArrayType::Value &value)
+
+void DataTypePrefixVisitor::visit(const ArrayType::Type &value)
 {
     std::visit(*this, value);
 }
 
 void DataTypePrefixVisitor::operator()(const UnsignedDataType &type)
 {
+    Q_UNUSED(type);
     m_stream << "unsigned";
 }
+
 void DataTypePrefixVisitor::operator()(const BasicType &type)
 {
     switch (type) {

@@ -26,6 +26,7 @@
 #include <QSet>
 #include <QString>
 #include <conversion/common/model.h>
+#include <conversion/common/modelproperties.h>
 #include <map>
 
 namespace tmc::promelamodel {
@@ -100,5 +101,15 @@ private:
     std::map<QString, NamedMtype> m_named_m_type_values;
     QList<Utype> m_user_types;
     std::map<QString, Declaration> m_declarations;
+};
+}
+namespace conversion {
+/**
+ * @brief   Specialization for SEDS model properties
+ */
+template<>
+struct ModelProperties<::tmc::promelamodel::PromelaModel> {
+    /// @brief  Model type
+    static const ModelType type = ModelType::Seds;
 };
 }

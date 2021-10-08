@@ -19,63 +19,47 @@
 
 #pragma once
 
-#include <cstddef>
-
-#include <variant>
-
 #include "basictypes.h"
 #include "utyperef.h"
 
-namespace tmc::promelamodel
+#include <cstddef>
+#include <variant>
+
+namespace tmc::promelamodel {
+/**
+ * @brief representation of array type from promela.
+ */
+class ArrayType final
 {
-	/**
-	 * @brief representation of array type from promela.
-	 */
-	class ArrayType final
-	{
-	public:
-		/**
-		 * @brief The base type of array, which can be only BasicType or reference to Utype
-		 */
-		using Value = std::variant<BasicType, UtypeRef>;
+public:
+    /**
+     * @brief The base type of array, which can be only BasicType or reference to Utype
+     */
+    using Type = std::variant<BasicType, UtypeRef>;
 
-                /**
-                 * @brief Constructor directly from @link{Value}
-				 *
-				 * @param size  Size of the array
-				 * @param type  Base type of the array
-                 */
-                ArrayType(size_t size, Value type);
-                /**
-                 * @brief Constructor directly from @link{BasicType}
-				 *
-				 * @param size  Size of the array
-				 * @param type  Base type of the array
-                 */
-		ArrayType(size_t size, BasicType type);
-                /**
-                 * @brief Constructor directly from @link{UtypeRef}
-				 *
-				 * @param size  Size of the array
-				 * @param type  Base type of the array
-                 */
-		ArrayType(size_t size, UtypeRef type);
+    /**
+     * @brief Constructor directly from @link{Value}
+     *
+     * @param size  Size of the array
+     * @param type  Base type of the array
+     */
+    ArrayType(size_t size, Type type);
 
-		/**
-		 * @brief Getter for array size
-		 *
-		 * @returns Array size
-		 */
-		size_t getSize() const noexcept;
-		/**
-		 * @brief Getter for base type of array.
-		 *
-		 * @return Base type of array
-		 */
-		const Value& getType() const noexcept;
+    /**
+     * @brief Getter for array size
+     *
+     * @returns Array size
+     */
+    size_t getSize() const noexcept;
+    /**
+     * @brief Getter for base type of array.
+     *
+     * @return Base type of array
+     */
+    const Type &getType() const noexcept;
 
-	private:
-		size_t m_size;
-		Value m_type;
-	};
+private:
+    size_t m_size;
+    Type m_type;
+};
 }

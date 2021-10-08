@@ -11,7 +11,7 @@ set(SOURCES
   utyperef.cpp
   )
 set(INCLUDES
-  arraytype.cpp
+  arraytype.h
   basictypes.h
   datatype.h
   declaration.h
@@ -30,8 +30,10 @@ target_include_directories(PromelaModel
   PUBLIC    .
   PRIVATE   ${CMAKE_SOURCE_DIR}/src/libs)
 target_link_libraries(PromelaModel
-  PUBLIC Conversion::Common)
+  PUBLIC     Conversion::Common
+  PRIVATE    CommonProjectWarnings)
 
 add_format_target(PromelaModel)
+add_tidy_target(PromelaModel)
 
 add_library(TMC::PromelaModel ALIAS PromelaModel)

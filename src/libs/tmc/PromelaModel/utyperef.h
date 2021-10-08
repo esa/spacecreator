@@ -25,13 +25,13 @@ namespace tmc::promelamodel {
 /**
  * @brief Representation of a reference to user defined type in promela.
  */
-class UtypeRef
+class UtypeRef final
 {
 public:
     /**
      * @brief Constructor.
      *
-     * @param name name of user defined type
+     * @param ref name of user defined type
      */
     UtypeRef(QString ref);
 

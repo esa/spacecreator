@@ -23,7 +23,7 @@ namespace tmc::promelamodel {
 /**
  * @brief Representation of unsigned type from promela.
  *
- * The unsigned type from promela is a bit-field, whith available sizes from 1 to 32.
+ * The unsigned type from promela is a bit-field, with available sizes from 1 to 32.
  */
 class UnsignedDataType final
 {
@@ -31,7 +31,7 @@ public:
     /**
      * @brief Constructor.
      *
-     * Construct unsgined data type with given width
+     * Construct unsigned data type with given width
      *
      * @param size the size of unsigned data type
      */

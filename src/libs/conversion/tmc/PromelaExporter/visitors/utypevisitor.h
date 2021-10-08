@@ -49,6 +49,6 @@ public:
     void visit(const Utype &utype);
 
 private:
-   QTextStream &m_stream;
+    QTextStream &m_stream;
 };
 }

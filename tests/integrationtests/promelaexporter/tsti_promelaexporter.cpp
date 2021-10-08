@@ -19,8 +19,8 @@
 
 #include <QObject>
 #include <QtTest>
-#include <conversion/tmc/PromelaExporter/PromelaOptions/options.h>
 #include <conversion/tmc/PromelaExporter/promelaexporter.h>
+#include <conversion/tmc/PromelaOptions/options.h>
 #include <iostream>
 #include <tmc/PromelaModel/promelamodel.h>
 
@@ -190,7 +190,7 @@ QString tst_PromelaExporter::generatePromelaFromModel(const PromelaModel &model)
 {
     PromelaExporter exporter;
     Options options;
-    options.add(PromelaOptions::promelaOutputFile, "generated_promela.pml");
+    options.add(PromelaOptions::promelaOutputFilepath, "generated_promela.pml");
 
     exporter.exportModel(&model, options);
 

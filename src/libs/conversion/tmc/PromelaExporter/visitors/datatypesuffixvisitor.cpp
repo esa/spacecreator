@@ -35,7 +35,7 @@ void DataTypeSuffixVisitor::visit(const DataType::Value &value)
     std::visit(*this, value);
 }
 
-void DataTypeSuffixVisitor::visit(const ArrayType::Value &value)
+void DataTypeSuffixVisitor::visit(const ArrayType::Type &value)
 {
     std::visit(*this, value);
 }
@@ -44,8 +44,14 @@ void DataTypeSuffixVisitor::operator()(const UnsignedDataType &type)
 {
     m_stream << ":" << type.size();
 }
-void DataTypeSuffixVisitor::operator()(const BasicType &type) {}
-void DataTypeSuffixVisitor::operator()(const UtypeRef &type) {}
+void DataTypeSuffixVisitor::operator()(const BasicType &type)
+{
+    Q_UNUSED(type);
+}
+void DataTypeSuffixVisitor::operator()(const UtypeRef &type)
+{
+    Q_UNUSED(type);
+}
 void DataTypeSuffixVisitor::operator()(const ArrayType &type)
 {
     m_stream << "[" << type.getSize() << "]";

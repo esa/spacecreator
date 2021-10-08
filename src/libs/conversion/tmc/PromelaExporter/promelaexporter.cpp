@@ -19,7 +19,6 @@
 
 #include "promelaexporter.h"
 
-#include "PromelaOptions/options.h"
 #include "export/exceptions.h"
 #include "tmc/PromelaModel/promelamodel.h"
 #include "visitors/promelamodelvisitor.h"
@@ -27,6 +26,7 @@
 #include <QDirIterator>
 #include <QSaveFile>
 #include <QTextStream>
+#include <conversion/tmc/PromelaOptions/options.h>
 #include <iostream>
 
 using conversion::exporter::ExportException;
@@ -54,7 +54,7 @@ void PromelaExporter::exportModel(const Model *model, const Options &options) co
 
     outputTextStream.flush();
 
-    std::optional<QString> outputFilepath = options.value(PromelaOptions::promelaOutputFile);
+    std::optional<QString> outputFilepath = options.value(PromelaOptions::promelaOutputFilepath);
 
     if (outputFilepath) {
         QSaveFile outputFile(outputFilepath.value());
@@ -63,7 +63,7 @@ void PromelaExporter::exportModel(const Model *model, const Options &options) co
             throw ExportException(QString("Failed to open a file %1").arg(outputFile.fileName()));
         }
         std::string data = output.toStdString();
-        uint64_t written = outputFile.write(data.c_str());
+        int64_t written = outputFile.write(data.c_str());
         bool commited = outputFile.commit();
         if (written != output.length()) {
             throw ExportException(QString("Failed to write a file %1").arg(outputFile.fileName()));

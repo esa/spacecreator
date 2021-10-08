@@ -9,7 +9,6 @@ set(SOURCES
   visitors/datatypesuffixvisitor.cpp
   )
 set(INCLUDES
-  PromelaOptions/options.h
   promelaexporter.h
   visitors/promelamodelvisitor.h
   visitors/utypevisitor.h
@@ -28,8 +27,10 @@ target_include_directories(PromelaExporter
 target_link_libraries(PromelaExporter
   PUBLIC              Conversion::Common
                       TMC::PromelaModel
-                      ${QT_CORE})
+                      ${QT_CORE}
+  PRIVATE             CommonProjectWarnings)
 
 add_format_target(PromelaExporter)
+add_tidy_target(PromelaExporter)
 
 add_library(Conversion::PromelaExporter ALIAS PromelaExporter)

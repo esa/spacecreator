@@ -22,7 +22,7 @@
 namespace tmc::promelamodel {
 conversion::ModelType PromelaModel::modelType() const
 {
-    return conversion::ModelType::Promela;
+    return conversion::ModelProperties<PromelaModel>::type;
 }
 
 void PromelaModel::addMtype(const QString &value)

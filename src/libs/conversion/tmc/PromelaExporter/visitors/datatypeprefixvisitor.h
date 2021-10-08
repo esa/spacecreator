@@ -64,7 +64,7 @@ public:
      *
      * @param value std::variant to visit
      */
-    void visit(const ArrayType::Value &value);
+    void visit(const ArrayType::Type &value);
 
     /**
      * @brief Handle UnsignedDatatype

@@ -35,7 +35,5 @@ public:
      * @param   options     Options for export configuration
      */
     virtual auto exportModel(const Model *model, const Options &options) const -> void override;
-
-private:
 };
 }

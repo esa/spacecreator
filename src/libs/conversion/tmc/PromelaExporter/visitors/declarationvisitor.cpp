@@ -48,11 +48,11 @@ void DeclarationVisitor::visit(const Declaration &declaration)
 QString DeclarationVisitor::getVisitilityString(const Declaration &declaration)
 {
     switch (declaration.getVisibility()) {
-    case Declaration::NORMAL:
+    case Declaration::Visibility::NORMAL:
         return "";
-    case Declaration::HIDDEN:
+    case Declaration::Visibility::HIDDEN:
         return "hidden ";
-    case Declaration::SHOW:
+    case Declaration::Visibility::SHOW:
         return "show ";
     }
 

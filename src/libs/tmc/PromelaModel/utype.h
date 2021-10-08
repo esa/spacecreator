@@ -38,7 +38,7 @@ public:
      *
      * @param name the name of the user defined type.
      */
-    Utype(QString name);
+    explicit Utype(QString name);
 
     /**
      * @brief Getter for name of user defined type

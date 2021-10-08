@@ -20,21 +20,9 @@
 #include "arraytype.h"
 
 namespace tmc::promelamodel {
-ArrayType::ArrayType(size_t size, Value type)
+ArrayType::ArrayType(size_t size, Type type)
     : m_size(size)
     , m_type(std::move(type))
-{
-}
-
-ArrayType::ArrayType(size_t size, BasicType type)
-    : m_size(size)
-    , m_type(type)
-{
-}
-
-ArrayType::ArrayType(size_t size, UtypeRef type)
-    : m_size(size)
-    , m_type(type)
 {
 }
 
@@ -43,7 +31,7 @@ size_t ArrayType::getSize() const noexcept
     return m_size;
 }
 
-const ArrayType::Value &ArrayType::getType() const noexcept
+const ArrayType::Type &ArrayType::getType() const noexcept
 {
     return m_type;
 }
