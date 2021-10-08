@@ -69,6 +69,7 @@ protected:
     void updateInternalItems(Qt::Alignment alignment) override;
     virtual shared::ColorManager::HandledColors handledColorType() const override;
     shared::ui::TextItem *initTextItem() override;
+    void updateTextPosition() override;
 
     qreal typeIconHeight() const;
     void updateEntityTitle(const QString &text);

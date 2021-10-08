@@ -20,9 +20,9 @@
 #include "itemeditor/ivfunctiontypegraphicsitem.h"
 #include "itemeditor/ivinterfacegraphicsitem.h"
 #include "iveditor.h"
-#include "sharedlibrary.h"
-#include "ivpropertytemplateconfig.h"
 #include "ivmodel.h"
+#include "ivpropertytemplateconfig.h"
+#include "sharedlibrary.h"
 
 #include <QDebug>
 #include <QGraphicsScene>
@@ -58,47 +58,48 @@ void tst_IVInterfaceGraphicsItem::testMaxWidth()
 
     ivm::IVInterface::CreationInfo ifc;
     ifc.model = &model;
+    ifc.name = QLatin1String("I1");
 
     ifc.function = parentFunc->entity();
     ifc.type = ivm::IVInterface::InterfaceType::Provided;
 
     auto item = new ive::IVInterfaceGraphicsItem(ivm::IVInterface::createIface(ifc), parentFunc);
-    item->setBoundingRect(QRectF(200., 10., 50., 30.));
     item->init();
+    item->setPos(200., 10.);
 
-    QCOMPARE(item->maxWidth(), -1.);
+    QCOMPARE(item->maxWidth(), qAbs(scene.sceneRect().right() - item->pos().x()));
 
     auto funcItem = new ive::IVFunctionGraphicsItem(new ivm::IVFunction);
     scene.addItem(funcItem);
     funcItem->setBoundingRect(QRectF(400., 400., 300., 300.));
     funcItem->init();
-    QCOMPARE(item->maxWidth(), -1.);
+    QCOMPARE(item->maxWidth(), qAbs(scene.sceneRect().right() - item->pos().x()));
 
     // Function moved right of the interface
     funcItem->setBoundingRect(QRectF(400., 0., 300., 300.));
-    QCOMPARE(item->maxWidth(), 200.);
+    QCOMPARE(item->maxWidth(), funcItem->sceneBoundingRect().left() - item->scenePos().x());
     // Invisible items don't limit the width
     funcItem->setVisible(false);
-    QCOMPARE(item->maxWidth(), -1.);
+    QCOMPARE(item->maxWidth(), qAbs(scene.sceneRect().right() - item->pos().x()));
 
     ifc.function = funcItem->entity();
     ifc.type = ivm::IVInterface::InterfaceType::Required;
 
     // Another interface on the right
-    item->setBoundingRect(QRectF(20., 0., 50., 30.));
+    item->setPos(QPointF(20., 0.));
     auto item2 = new ive::IVInterfaceGraphicsItem(ivm::IVInterface::createIface(ifc), parentFunc);
-    item2->setBoundingRect(QRectF(130., 0., 50., 30.));
+    item2->setPos(QPointF(130., 0.));
     item2->init();
     QCOMPARE(item->maxWidth(), 110.);
     // Invisible items don't limit the width
     item2->setVisible(false);
-    QCOMPARE(item->maxWidth(), -1.);
+    QCOMPARE(item->maxWidth(), scene.sceneRect().right() - item->pos().x());
     // Item above/below don't limit the size
     item2->setVisible(true);
-    item2->setBoundingRect(QRectF(130., -40., 50., 30.));
-    QCOMPARE(item->maxWidth(), -1.);
-    item2->setBoundingRect(QRectF(130., 50., 50., 30.));
-    QCOMPARE(item->maxWidth(), -1.);
+    item2->setPos(QPointF(130., -40.));
+    QCOMPARE(item->maxWidth(), scene.sceneRect().right() - item->pos().x());
+    item2->setPos(QPointF(130., 50.));
+    QCOMPARE(item->maxWidth(), scene.sceneRect().right() - item->pos().x());
 
     // Function type
     auto typeItem = new ive::IVFunctionTypeGraphicsItem(new ivm::IVFunctionType());
