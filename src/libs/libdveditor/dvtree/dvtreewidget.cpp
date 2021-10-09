@@ -25,6 +25,7 @@
 
 #include <QHeaderView>
 #include <QItemSelectionModel>
+#include <QModelIndex>
 #include <QTreeView>
 #include <QVBoxLayout>
 
@@ -43,6 +44,7 @@ DVTreeWidget::DVTreeWidget(QWidget *parent)
 
     connect(m_dvTreeSortModel, &DVTreeSortProxyModel::rowsInserted, this, &DVTreeWidget::dvObjectInserted);
     connect(m_dvTreeSortModel, &DVTreeSortProxyModel::modelReset, this, &DVTreeWidget::enableAllImplementationEdits);
+    connect(m_dvTreeSortModel, &DVTreeSortProxyModel::dataChanged, this, &DVTreeWidget::updateImplementation);
 }
 
 void DVTreeWidget::setDVCore(DVEditorCore *core)
@@ -91,6 +93,23 @@ void DVTreeWidget::enableAllImplementationEdits()
         return;
     }
     dvObjectInserted(QModelIndex(), 0, m_dvTreeSortModel->rowCount() - 1);
+}
+
+void DVTreeWidget::updateImplementation(
+        const QModelIndex &topLeft, const QModelIndex &bottomRight, const QVector<int> &roles)
+{
+    Q_UNUSED(roles);
+    if (!m_dvTreeSortModel) {
+        return;
+    }
+    for (int row = topLeft.row(); row <= bottomRight.row(); ++row) {
+        QModelIndex index = m_dvTreeSortModel->index(row, topLeft.column(), topLeft.parent());
+        dvm::DVFunction *fn = index.data(dve::DVTreeViewModel::DVObjectRole).value<dvm::DVFunction *>();
+        if (fn) {
+            m_treeView->closePersistentEditor(index);
+            m_treeView->openPersistentEditor(index);
+        }
+    }
 }
 
 } // namespace dve

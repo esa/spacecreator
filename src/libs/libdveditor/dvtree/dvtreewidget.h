@@ -20,12 +20,16 @@
 #include <QWidget>
 
 class QItemSelectionModel;
+class QModelIndex;
 class QTreeView;
 
 namespace dve {
 class DVTreeSortProxyModel;
 class DVEditorCore;
 
+/*!
+   Class to represent theDV data in a tree view
+ */
 class DVTreeWidget : public QWidget
 {
     Q_OBJECT
@@ -38,6 +42,8 @@ public:
 private Q_SLOTS:
     void dvObjectInserted(const QModelIndex &parent, int first, int last);
     void enableAllImplementationEdits();
+    void updateImplementation(
+            const QModelIndex &topLeft, const QModelIndex &bottomRight, const QVector<int> &roles = QVector<int>());
 
 private:
     QTreeView *m_treeView = nullptr;
