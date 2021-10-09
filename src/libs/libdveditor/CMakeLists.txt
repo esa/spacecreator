@@ -39,14 +39,16 @@ target_sources(${LIB_NAME} PRIVATE
     dveditorresources.qrc
     dvexporter.cpp
     dvexporter.h
-    dvtreesortproxymodel.cpp
-    dvtreesortproxymodel.h
-    dvtreeviewmodel.cpp
-    dvtreeviewmodel.h
+    dvtree/dvtreesortproxymodel.cpp
+    dvtree/dvtreesortproxymodel.h
+    dvtree/dvtreeviewmodel.cpp
+    dvtree/dvtreeviewmodel.h
+    dvtree/dvtreewidget.cpp
+    dvtree/dvtreewidget.h
+    dvtree/implementationdelegate.cpp
+    dvtree/implementationdelegate.h
     dvvisualizationmodel.cpp
     dvvisualizationmodel.h
-    implementationdelegate.cpp
-    implementationdelegate.h
     itemeditor/dvconnectiongraphicsitem.cpp
     itemeditor/dvconnectiongraphicsitem.h
     itemeditor/dvdevicegraphicsitem.cpp

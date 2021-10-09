@@ -28,9 +28,8 @@ class DVAppWidget;
 }
 
 namespace dve {
-class DVTreeSortProxyModel;
-class GraphicsView;
 class DVEditorCore;
+class GraphicsView;
 
 class DVAppWidget : public QWidget
 {
@@ -46,14 +45,8 @@ public:
     void setDVCore(DVEditorCore *core);
     void setActions(const QVector<QAction *> &actions);
 
-private Q_SLOTS:
-    void dvObjectInserted(const QModelIndex &parent, int first, int last);
-    void enableAllImplementationEdits();
-
 private:
     Ui::DVAppWidget *ui = nullptr;
-    QItemSelectionModel *m_selectionModel = nullptr;
-    DVTreeSortProxyModel *m_dvTreeSortModel = nullptr;
     DVEditorCore *m_dvCore = nullptr;
 };
 

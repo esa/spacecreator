@@ -34,7 +34,7 @@
 #include "dvmessage.h"
 #include "dvmodel.h"
 #include "dvpropertytemplateconfig.h"
-#include "dvtreeviewmodel.h"
+#include "dvtree/dvtreeviewmodel.h"
 #include "dvvisualizationmodel.h"
 #include "errorhub.h"
 #include "itemeditor/dvitemmodel.h"
