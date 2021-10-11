@@ -84,7 +84,7 @@ public:
     /**
      * @brief  visitor acceptor (calls visit method of the given visitor)
      */
-    auto accept(Visitor &visitor) const -> void;
+    virtual auto accept(Visitor &visitor) const -> void;
 
 private:
     std::vector<std::unique_ptr<Action>> m_actions;

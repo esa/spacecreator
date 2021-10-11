@@ -106,7 +106,7 @@ public:
     /**
      * @brief  visitor acceptor (calls visit method of the given visitor)
      */
-    auto accept(Visitor &visitor) const -> void override;
+    virtual auto accept(Visitor &visitor) const -> void override;
 
 private:
     std::vector<std::unique_ptr<Input>> m_inputs;
