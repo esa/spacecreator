@@ -21,6 +21,7 @@
 
 #include "arraytype.h"
 #include "basictypes.h"
+#include "mtyperef.h"
 #include "unsigneddatatype.h"
 #include "utyperef.h"
 
@@ -39,7 +40,7 @@ public:
      *
      * The data type can be 'unsigned', basic type, reference to user defined type or array
      */
-    using Type = std::variant<UnsignedDataType, UtypeRef, BasicType, ArrayType>;
+    using Type = std::variant<UnsignedDataType, UtypeRef, MtypeRef, BasicType, ArrayType>;
 
     /**
      * @brief Constructor directly from variant value.
@@ -66,7 +67,13 @@ public:
      *
      * @return true if data type is UtypeRef, otherwise false
      */
-    bool isReference() const noexcept;
+    bool isUtypeReference() const noexcept;
+    /**
+     * @brief Checks if data type is MtypeRef
+     *
+     * @return true if data type is MtypeRef, otherwise false
+     */
+    bool isMtypeReference() const noexcept;
     /**
      * @brief Checks if data type is BasicType
      *
@@ -93,7 +100,14 @@ public:
      * @return reference to UtypeRef
      * @throws std::bad_variant_access data type does not contain UtypeRef
      */
-    const UtypeRef &getReference() const;
+    const UtypeRef &getUtypeReference() const;
+    /**
+     * @brief Getter for MtypeRef
+     *
+     * @return reference to MtypeRef
+     * @throws std::bad_variant_access data type does not contain MtypeRef
+     */
+    const MtypeRef &getMtypeReference() const;
     /**
      * @brief Getter for BasicType
      *

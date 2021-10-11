@@ -23,6 +23,7 @@ namespace conversion::tmc::exporter {
 using ::tmc::promela::model::ArrayType;
 using ::tmc::promela::model::BasicType;
 using ::tmc::promela::model::DataType;
+using ::tmc::promela::model::MtypeRef;
 using ::tmc::promela::model::UnsignedDataType;
 using ::tmc::promela::model::UtypeRef;
 
@@ -50,17 +51,24 @@ void DataTypeSuffixVisitor::operator()(const UnsignedDataType &type)
 {
     m_stream << ":" << type.size();
 }
+
 void DataTypeSuffixVisitor::operator()(const BasicType &type)
 {
     Q_UNUSED(type);
 }
+
 void DataTypeSuffixVisitor::operator()(const UtypeRef &type)
 {
     Q_UNUSED(type);
 }
+
+void DataTypeSuffixVisitor::operator()(const MtypeRef &type)
+{
+    Q_UNUSED(type);
+}
+
 void DataTypeSuffixVisitor::operator()(const ArrayType &type)
 {
     m_stream << "[" << type.getSize() << "]";
 }
-
 }

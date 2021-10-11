@@ -35,9 +35,14 @@ bool DataType::isUnsigned() const noexcept
     return std::holds_alternative<UnsignedDataType>(m_type);
 }
 
-bool DataType::isReference() const noexcept
+bool DataType::isUtypeReference() const noexcept
 {
     return std::holds_alternative<UtypeRef>(m_type);
+}
+
+bool DataType::isMtypeReference() const noexcept
+{
+    return std::holds_alternative<MtypeRef>(m_type);
 }
 
 bool DataType::isBasicType() const noexcept
@@ -55,9 +60,14 @@ const UnsignedDataType &DataType::getUnsigned() const
     return std::get<UnsignedDataType>(m_type);
 }
 
-const UtypeRef &DataType::getReference() const
+const UtypeRef &DataType::getUtypeReference() const
 {
     return std::get<UtypeRef>(m_type);
+}
+
+const MtypeRef &DataType::getMtypeReference() const
+{
+    return std::get<MtypeRef>(m_type);
 }
 
 const BasicType &DataType::getBasicType() const

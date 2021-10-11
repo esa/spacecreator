@@ -23,6 +23,7 @@ namespace conversion::tmc::exporter {
 using ::tmc::promela::model::ArrayType;
 using ::tmc::promela::model::BasicType;
 using ::tmc::promela::model::DataType;
+using ::tmc::promela::model::MtypeRef;
 using ::tmc::promela::model::UnsignedDataType;
 using ::tmc::promela::model::UtypeRef;
 
@@ -78,10 +79,21 @@ void DataTypePrefixVisitor::operator()(const BasicType &type)
         break;
     }
 }
+
 void DataTypePrefixVisitor::operator()(const UtypeRef &type)
 {
     m_stream << type.getName();
 }
+
+void DataTypePrefixVisitor::operator()(const MtypeRef &type)
+{
+    if (type.isNamed()) {
+        m_stream << "mtype : " << type.getName();
+    } else {
+        m_stream << "mtype";
+    }
+}
+
 void DataTypePrefixVisitor::operator()(const ArrayType &type)
 {
     std::visit(*this, type.getType());

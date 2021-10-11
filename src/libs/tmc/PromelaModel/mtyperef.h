@@ -19,48 +19,45 @@
 
 #pragma once
 
-#include "basictypes.h"
-#include "mtyperef.h"
-#include "utyperef.h"
-
-#include <cstddef>
-#include <variant>
+#include <QString>
 
 namespace tmc::promela::model {
 /**
- * @brief representation of array type from promela.
+ * @brief Representation of a reference to mtype in promela.
  */
-class ArrayType final
+class MtypeRef final
 {
 public:
     /**
-     * @brief The base type of array, which can be only BasicType or reference to Utype or Mtype
+     * @brief Constructor.
+     *
+     * Construct reference to unnamed mtype.
      */
-    using Type = std::variant<BasicType, UtypeRef, MtypeRef>;
+    MtypeRef();
+    /**
+     * @brief Constructor.
+     *
+     * Constructs reference to named mtype.
+     *
+     * @param ref name of mtype.
+     */
+    MtypeRef(QString ref);
 
     /**
-     * @brief Constructor directly from @link{Value}
+     * @brief Getter for the name of mtype
      *
-     * @param size  Size of the array
-     * @param type  Base type of the array
+     * @return name of mtype
      */
-    ArrayType(size_t size, Type type);
-
+    const QString &getName() const noexcept;
     /**
-     * @brief Getter for array size
+     * @brief Checks if referenced mtype is named
      *
-     * @returns Array size
+     * @return true if referenced mtype is named mtype, otherwise false
      */
-    size_t getSize() const noexcept;
-    /**
-     * @brief Getter for base type of array.
-     *
-     * @return Base type of array
-     */
-    const Type &getType() const noexcept;
+    bool isNamed() const noexcept;
 
 private:
-    size_t m_size;
-    Type m_type;
+    bool m_named;
+    QString m_ref;
 };
 }

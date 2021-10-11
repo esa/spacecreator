@@ -85,6 +85,14 @@ public:
      */
     void operator()(const ::tmc::promela::model::UtypeRef &type);
     /**
+     * @brief Handle MtypeRef
+     *
+     * This function appends prefix for MtypeRef to stream.
+     *
+     * @param type type to translate.
+     */
+    void operator()(const ::tmc::promela::model::MtypeRef &type);
+    /**
      * @brief Handle ArrayType
      *
      * This function appends prefix for ArrayType to stream.

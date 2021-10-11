@@ -32,6 +32,7 @@ using tmc::promela::model::ArrayType;
 using tmc::promela::model::BasicType;
 using tmc::promela::model::DataType;
 using tmc::promela::model::Declaration;
+using tmc::promela::model::MtypeRef;
 using tmc::promela::model::NamedMtype;
 using tmc::promela::model::PromelaModel;
 using tmc::promela::model::UnsignedDataType;
@@ -111,6 +112,16 @@ void tst_PromelaExporter::testUtype()
 {
     PromelaModel model;
 
+    model.addMtype("UNNAMED_A");
+    model.addMtype("UNNAMED_B");
+
+    NamedMtype named_mtype("states");
+    named_mtype.addValue("STATE_A");
+    named_mtype.addValue("STATE_B");
+    named_mtype.addValue("STATE_C");
+
+    model.addNamedMtype(named_mtype);
+
     Utype basic_types("basic_types");
 
     basic_types.addField(Declaration(DataType(BasicType::BIT), "field_one"));
@@ -145,6 +156,14 @@ void tst_PromelaExporter::testUtype()
     utype_refs.addField(Declaration(DataType(ArrayType(2, UtypeRef("basic_types"))), "field_two"));
 
     model.addUtype(utype_refs);
+
+    Utype mtype_refs("mtype_refs");
+    mtype_refs.addField(Declaration(DataType(MtypeRef()), "field_one"));
+    mtype_refs.addField(Declaration(DataType(MtypeRef("states")), "field_two"));
+    mtype_refs.addField(Declaration(DataType(ArrayType(2, MtypeRef())), "field_three"));
+    mtype_refs.addField(Declaration(DataType(ArrayType(2, MtypeRef("states"))), "field_four"));
+
+    model.addUtype(mtype_refs);
 
     QString out;
     try {

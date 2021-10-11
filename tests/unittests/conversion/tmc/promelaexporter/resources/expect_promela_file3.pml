@@ -1,3 +1,12 @@
+mtype {
+    UNNAMED_A,
+    UNNAMED_B,
+}
+mtype :states {
+    STATE_A,
+    STATE_B,
+    STATE_C,
+}
 typedef basic_types {
     bit field_one;
     bool field_two;
@@ -26,5 +35,12 @@ typedef array_types {
 typedef utype_refs {
     array_types field_one;
     basic_types field_two[2];
+}
+
+typedef mtype_refs {
+    mtype field_one;
+    mtype : states field_two;
+    mtype field_three[2];
+    mtype : states field_four[2];
 }
 
