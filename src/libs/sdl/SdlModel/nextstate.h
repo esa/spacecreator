@@ -41,7 +41,7 @@ public:
      * @param   name    name of the action
      * @param   state   a pointer to the next state
      */
-    NextState(QString name, const std::shared_ptr<State> &state);
+    NextState(QString name, State *state);
 
     /**
      * @brief   Constructor
@@ -82,7 +82,7 @@ public:
      *
      * @param   state next state
      */
-    auto setState(const std::shared_ptr<State> &state) -> void;
+    auto setState(State *state) -> void;
 
     /**
      * @brief  visitor acceptor (calls visit method of the given visitor)
@@ -90,7 +90,7 @@ public:
     virtual auto accept(Visitor &visitor) const -> void override;
 
 private:
-    std::shared_ptr<State> m_state;
+    State *m_state;
 };
 
 } // namespace sdl

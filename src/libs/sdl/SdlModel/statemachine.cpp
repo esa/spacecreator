@@ -22,22 +22,18 @@
 namespace sdl {
 
 StateMachine::StateMachine(
-        std::vector<std::shared_ptr<State>> &states, std::vector<std::shared_ptr<Transition>> &transitions)
+        std::vector<std::unique_ptr<State>> states, std::vector<std::unique_ptr<Transition>> transitions)
+    : m_states(std::move(states))
+    , m_transitions(std::move(transitions))
 {
-    for (auto &state : states) {
-        m_states.push_back(state);
-    }
-    for (auto &transition : transitions) {
-        m_transitions.push_back(transition);
-    }
 }
 
-const std::vector<std::shared_ptr<State>> &StateMachine::states() const
+const std::vector<std::unique_ptr<State>> &StateMachine::states() const
 {
     return m_states;
 }
 
-void StateMachine::setStates(std::vector<std::shared_ptr<State>> &states)
+void StateMachine::setStates(std::vector<std::unique_ptr<State>> &states)
 {
     m_states.clear();
     for (auto &state : states) {
@@ -45,12 +41,12 @@ void StateMachine::setStates(std::vector<std::shared_ptr<State>> &states)
     }
 }
 
-const std::vector<std::shared_ptr<Transition>> &StateMachine::transitions() const
+const std::vector<std::unique_ptr<Transition>> &StateMachine::transitions() const
 {
     return m_transitions;
 }
 
-void StateMachine::setTransitions(std::vector<std::shared_ptr<Transition>> &transitions)
+void StateMachine::setTransitions(std::vector<std::unique_ptr<Transition>> &transitions)
 {
     m_transitions.clear();
     for (auto &transition : transitions) {

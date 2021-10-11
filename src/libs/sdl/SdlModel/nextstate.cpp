@@ -28,7 +28,7 @@ NextState::NextState(QString name)
 {
 }
 
-NextState::NextState(QString name, const std::shared_ptr<State> &state)
+NextState::NextState(QString name, State *state)
     : Action(std::move(name))
     , m_state(state)
 {
@@ -36,10 +36,10 @@ NextState::NextState(QString name, const std::shared_ptr<State> &state)
 
 const State *NextState::state() const
 {
-    return m_state.get();
+    return m_state;
 }
 
-void NextState::setState(const std::shared_ptr<State> &state)
+void NextState::setState(State *state)
 {
     m_state = state;
 }

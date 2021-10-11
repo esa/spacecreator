@@ -58,9 +58,9 @@ private Q_SLOTS:
 void tst_sdlmodel::testDefaultValuesInModel()
 {
     QString processName = "name_of_the_process";
-    auto states = std::vector<std::shared_ptr<State>>();
-    auto transitions = std::vector<std::shared_ptr<Transition>>();
-    auto sm = std::make_unique<StateMachine>(states, transitions);
+    auto states = std::vector<std::unique_ptr<State>>();
+    auto transitions = std::vector<std::unique_ptr<Transition>>();
+    auto sm = std::make_unique<StateMachine>(std::move(states), std::move(transitions));
     SdlModel exampleModel(Process(processName, sm));
 
     QVERIFY(exampleModel.modelType() == ModelType::Sdl);
@@ -95,37 +95,38 @@ void tst_sdlmodel::testGenerateProcess()
     auto nextstate = std::make_unique<NextState>("itself");
     auto actions = std::vector<std::unique_ptr<Action>>();
     actions.push_back(std::move(nextstate));
-    auto transition = std::make_shared<Transition>("", actions);
+    auto transition = std::make_unique<Transition>("", std::move(actions));
 
     auto inputs = std::vector<std::unique_ptr<Input>>();
-    auto input1 = std::make_unique<Input>("some_input_name", transition);
+    auto input1 = std::make_unique<Input>("some_input_name", transition.get());
     inputs.push_back(std::move(input1));
 
     auto contSignals = std::vector<std::unique_ptr<ContinuousSignal>>();
 
-    auto state1 = std::make_shared<State>("Looping", inputs, contSignals);
+    auto state1 = std::make_unique<State>("Looping", std::move(inputs), std::move(contSignals));
 
     // another transition, from state2 to state1
-    auto nextstate2 = std::make_unique<NextState>("toggle", state1);
+    auto nextstate2 = std::make_unique<NextState>("toggle", state1.get());
     auto actions2 = std::vector<std::unique_ptr<Action>>();
     actions2.push_back(std::move(nextstate2));
-    auto transition2 = std::make_shared<Transition>("", actions2);
+    auto transition2 = std::make_unique<Transition>("", std::move(actions2));
 
     auto inputs2 = std::vector<std::unique_ptr<Input>>();
-    auto input2 = std::make_unique<Input>("some_other_input_name", transition2);
+    auto input2 = std::make_unique<Input>("some_other_input_name", transition2.get());
     inputs2.push_back(std::move(input2));
 
     auto contSignals2 = std::vector<std::unique_ptr<ContinuousSignal>>();
 
-    auto state2 = std::make_shared<State>("Idle", inputs2, contSignals2);
+    auto state2 = std::make_unique<State>("Idle", std::move(inputs2), std::move(contSignals2));
 
-    auto states = std::vector<std::shared_ptr<State>>();
+    auto states = std::vector<std::unique_ptr<State>>();
     states.push_back(std::move(state1));
     states.push_back(std::move(state2));
 
-    auto transitions = std::vector<std::shared_ptr<Transition>>();
-    auto sm = std::make_unique<StateMachine>(states, transitions);
-    SdlModel exampleModel(Process(processName, sm), modelName);
+    auto transitions = std::vector<std::unique_ptr<Transition>>();
+    auto sm = std::make_unique<StateMachine>(std::move(states), std::move(transitions));
+    auto process = Process(processName, sm);
+    SdlModel exampleModel(std::move(process), modelName);
 
     Options options;
     options.add(SdlOptions::sdlFilepathPrefix, modelPrefix);

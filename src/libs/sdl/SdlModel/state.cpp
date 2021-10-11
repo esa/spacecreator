@@ -24,16 +24,12 @@
 
 namespace sdl {
 
-State::State(QString name, std::vector<std::unique_ptr<Input>> &inputs,
-        std::vector<std::unique_ptr<ContinuousSignal>> &continuousSignals)
+State::State(QString name, std::vector<std::unique_ptr<Input>> inputs,
+        std::vector<std::unique_ptr<ContinuousSignal>> continuousSignals)
     : Node(std::move(name))
+    , m_inputs(std::move(inputs))
+    , m_continuousSignals(std::move(continuousSignals))
 {
-    for (auto &input : inputs) {
-        m_inputs.push_back(std::move(input));
-    }
-    for (auto &constinuousSignal : continuousSignals) {
-        m_continuousSignals.push_back(std::move(constinuousSignal));
-    }
 }
 
 const std::vector<std::unique_ptr<Input>> &State::inputs() const

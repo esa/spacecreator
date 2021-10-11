@@ -47,8 +47,8 @@ public:
      * @param   continuousSignals a reference to a vector of pointers to continuous signals (continuous signals will be
      *                            moved after call to this function)
      */
-    State(QString name, std::vector<std::unique_ptr<Input>> &inputs,
-            std::vector<std::unique_ptr<ContinuousSignal>> &continuousSignals);
+    State(QString name, std::vector<std::unique_ptr<Input>> inputs,
+            std::vector<std::unique_ptr<ContinuousSignal>> continuousSignals);
 
     /**
      * @brief   Default constructor

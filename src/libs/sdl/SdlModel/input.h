@@ -42,7 +42,7 @@ public:
      * @param name        signal name
      * @param transition  a pointer to the transition which should be triggered upon reception of this signal
      */
-    Input(QString name, const std::shared_ptr<Transition> &transition);
+    Input(QString name, Transition *transition);
 
     /**
      * @brief   Default constructor
@@ -84,7 +84,7 @@ public:
      * @param   transition a const reference to the pointer to transition which should be triggered upon reception of
      *                     this signal
      */
-    auto setTransition(const std::shared_ptr<Transition> &transition) -> void;
+    auto setTransition(Transition *transition) -> void;
 
     /**
      * @brief  visitor acceptor (calls visit method of the given visitor)
@@ -92,7 +92,7 @@ public:
     virtual auto accept(Visitor &visitor) const -> void override;
 
 private:
-    std::shared_ptr<Transition> m_transition;
+    Transition *m_transition;
 
     // TODO: list of input parameters (variants: variable references/literals)
 };

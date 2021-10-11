@@ -92,7 +92,9 @@ void SdlVisitor::visit(const NextState &nextstate) const
     if (nextstate.state() == nullptr) {
         m_stream << "-";
     } else {
-        m_stream << nextstate.state()->name();
+        if (nextstate.state()->name() != nullptr) {
+            m_stream << nextstate.state()->name();
+        }
     }
     m_stream << ";\n";
 }

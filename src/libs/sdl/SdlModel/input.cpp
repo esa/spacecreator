@@ -29,7 +29,7 @@ Input::Input(QString name)
 {
 }
 
-Input::Input(QString name, const std::shared_ptr<Transition> &transition)
+Input::Input(QString name, Transition *transition)
     : Signal(std::move(name))
     , m_transition(transition)
 {
@@ -37,10 +37,10 @@ Input::Input(QString name, const std::shared_ptr<Transition> &transition)
 
 Transition *Input::transition() const
 {
-    return m_transition.get();
+    return m_transition;
 }
 
-void Input::setTransition(const std::shared_ptr<Transition> &transition)
+void Input::setTransition(Transition *transition)
 {
     m_transition = transition;
 }

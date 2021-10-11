@@ -37,10 +37,10 @@ public:
     /**
      * @brief   Constructor
      *
-     * @param   states      reference to the vector of pointers to states
-     * @param   transitions reference to the vector of pointers to transitions
+     * @param   states      a vector of pointers to states
+     * @param   transitions a vector of pointers to transitions
      */
-    StateMachine(std::vector<std::shared_ptr<State>> &states, std::vector<std::shared_ptr<Transition>> &transitions);
+    StateMachine(std::vector<std::unique_ptr<State>> states, std::vector<std::unique_ptr<Transition>> transitions);
 
     /**
      * @brief    Default constructor
@@ -72,32 +72,32 @@ public:
      *
      * @return  const reference to a vector of pointers to states
      */
-    auto states() const -> const std::vector<std::shared_ptr<State>> &;
+    auto states() const -> const std::vector<std::unique_ptr<State>> &;
 
     /**
      * @brief   Setter for the states of the state machine
      *
      * @param   const reference to a vector of pointers to states
      */
-    auto setStates(std::vector<std::shared_ptr<State>> &states) -> void;
+    auto setStates(std::vector<std::unique_ptr<State>> &states) -> void;
 
     /**
      * @brief   Getter for the transitions of the state machine
      *
      * @return  const reference to a vector of pointers to transitions
      */
-    auto transitions() const -> const std::vector<std::shared_ptr<Transition>> &;
+    auto transitions() const -> const std::vector<std::unique_ptr<Transition>> &;
 
     /**
      * @brief   Setter for the transitions of the state machine
      *
      * @param   const reference to a vector of pointers to transitions
      */
-    auto setTransitions(std::vector<std::shared_ptr<Transition>> &transitions) -> void;
+    auto setTransitions(std::vector<std::unique_ptr<Transition>> &transitions) -> void;
 
 private:
-    std::vector<std::shared_ptr<State>> m_states;
-    std::vector<std::shared_ptr<Transition>> m_transitions;
+    std::vector<std::unique_ptr<State>> m_states;
+    std::vector<std::unique_ptr<Transition>> m_transitions;
 };
 
 } // namespace sdl
