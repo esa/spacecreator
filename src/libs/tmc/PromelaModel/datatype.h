@@ -58,53 +58,53 @@ public:
     /**
      * @brief Checks if data type is UnsignedDataType
      *
-     * @returns true if data type is UnsignedDataType, otherwise false
+     * @return true if data type is UnsignedDataType, otherwise false
      */
     bool isUnsigned() const noexcept;
     /**
      * @brief Checks if data type is UtypeRef
      *
-     * @returns true if data type is UtypeRef, otherwise false
+     * @return true if data type is UtypeRef, otherwise false
      */
     bool isReference() const noexcept;
     /**
      * @brief Checks if data type is BasicType
      *
-     * @returns true if data type is BasicType, otherwise false
+     * @return true if data type is BasicType, otherwise false
      */
     bool isBasicType() const noexcept;
     /**
      * @brief Checks if data type is ArrayType
      *
-     * @returns true if data type is ArrayType, otherwise false
+     * @return true if data type is ArrayType, otherwise false
      */
     bool isArrayType() const noexcept;
 
     /**
      * @brief Getter for UnsignedDataType
      *
-     * @returns reference to UnsginedDataType
+     * @return reference to UnsignedDataType
      * @throws std::bad_variant_access data type does not contain UnsignedDataType
      */
     const UnsignedDataType &getUnsigned() const;
     /**
      * @brief Getter for UtypeRef
      *
-     * @returns reference to UtypeRef
+     * @return reference to UtypeRef
      * @throws std::bad_variant_access data type does not contain UtypeRef
      */
     const UtypeRef &getReference() const;
     /**
      * @brief Getter for BasicType
      *
-     * @returns reference to BasicType
+     * @return reference to BasicType
      * @throws std::bad_variant_access data type does not contain BasicType
      */
     const BasicType &getBasicType() const;
     /**
      * @brief Getter for ArrayType
      *
-     * @returns reference to ArrayType
+     * @return reference to ArrayType
      * @throws std::bad_variant_access data type does not contain ArrayType
      */
     const ArrayType &getArrayType() const;
