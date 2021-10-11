@@ -19,7 +19,7 @@
 
 #include "utyperef.h"
 
-namespace tmc::promelamodel {
+namespace tmc::promela::model {
 UtypeRef::UtypeRef(QString ref)
     : m_ref(std::move(ref))
 {

@@ -31,7 +31,7 @@
 
 using conversion::exporter::ExportException;
 using conversion::exporter::IncorrectModelException;
-using tmc::promelamodel::PromelaModel;
+using tmc::promela::model::PromelaModel;
 
 namespace conversion::tmc::exporter {
 void PromelaExporter::exportModel(const Model *model, const Options &options) const

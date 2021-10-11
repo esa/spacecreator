@@ -25,7 +25,7 @@
 #include <cstddef>
 #include <variant>
 
-namespace tmc::promelamodel {
+namespace tmc::promela::model {
 /**
  * @brief representation of array type from promela.
  */

@@ -19,7 +19,7 @@
 
 #include "promelamodel.h"
 
-namespace tmc::promelamodel {
+namespace tmc::promela::model {
 conversion::ModelType PromelaModel::modelType() const
 {
     return conversion::ModelProperties<PromelaModel>::type;

@@ -19,7 +19,7 @@
 
 #include "namedmtype.h"
 
-namespace tmc::promelamodel {
+namespace tmc::promela::model {
 NamedMtype::NamedMtype(QString name)
     : m_name(std::move(name))
 {
@@ -48,15 +48,5 @@ bool NamedMtype::hasValue(const QString &value) const
 const QSet<QString> &NamedMtype::values() const noexcept
 {
     return m_values;
-}
-
-QSet<QString>::const_iterator NamedMtype::values_begin() const
-{
-    return m_values.begin();
-}
-
-QSet<QString>::const_iterator NamedMtype::values_end() const
-{
-    return m_values.end();
 }
 }

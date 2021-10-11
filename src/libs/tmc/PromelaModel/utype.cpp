@@ -19,7 +19,7 @@
 
 #include "utype.h"
 
-namespace tmc::promelamodel {
+namespace tmc::promela::model {
 Utype::Utype(QString name)
     : m_name(std::move(name))
 {

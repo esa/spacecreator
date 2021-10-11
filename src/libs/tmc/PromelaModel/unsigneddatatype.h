@@ -19,7 +19,7 @@
 
 #pragma once
 
-namespace tmc::promelamodel {
+namespace tmc::promela::model {
 /**
  * @brief Representation of unsigned type from promela.
  *

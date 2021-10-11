@@ -19,7 +19,7 @@
 
 #include "declaration.h"
 
-namespace tmc::promelamodel {
+namespace tmc::promela::model {
 Declaration::Declaration(DataType type, QString name, Visibility visibility)
     : m_type(std::move(type))
     , m_name(std::move(name))

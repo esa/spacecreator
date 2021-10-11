@@ -23,7 +23,7 @@
 
 #include <QString>
 
-namespace tmc::promelamodel {
+namespace tmc::promela::model {
 /**
  * @brief Representation of declaration in promela.
  *

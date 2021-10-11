@@ -29,7 +29,7 @@
 #include <conversion/common/modelproperties.h>
 #include <map>
 
-namespace tmc::promelamodel {
+namespace tmc::promela::model {
 /**
  * @brief Representation of Promela model.
  */
@@ -108,7 +108,7 @@ namespace conversion {
  * @brief   Specialization for SEDS model properties
  */
 template<>
-struct ModelProperties<::tmc::promelamodel::PromelaModel> {
+struct ModelProperties<::tmc::promela::model::PromelaModel> {
     /// @brief  Model type
     static const ModelType type = ModelType::Seds;
 };

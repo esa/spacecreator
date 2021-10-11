@@ -25,6 +25,10 @@
 #include <algorithm>
 
 namespace conversion::tmc::exporter {
+using ::tmc::promela::model::NamedMtype;
+using ::tmc::promela::model::PromelaModel;
+using ::tmc::promela::model::Utype;
+
 PromelaModelVisitor::PromelaModelVisitor(QTextStream &stream)
     : m_stream(stream)
 {
@@ -40,9 +44,9 @@ void PromelaModelVisitor::visit(const PromelaModel &promelaModel)
 void PromelaModelVisitor::generateMtypes(const QSet<QString> &values)
 {
     if (!values.isEmpty()) {
+        m_stream << "mtype {\n";
         QVector<QString> mtype_values = QVector<QString>::fromList(values.values());
         std::sort(mtype_values.begin(), mtype_values.end());
-        m_stream << "mtype {\n";
         generateMtypeNames(mtype_values);
         m_stream << "}\n";
     }
@@ -53,15 +57,14 @@ void PromelaModelVisitor::generateNamedMtypes(const std::map<QString, NamedMtype
     for (auto iter = values.begin(); iter != values.end(); ++iter) {
         m_stream << "mtype :" << iter->first << " {\n";
         QVector<QString> mtype_values = QVector<QString>::fromList(iter->second.values().toList());
+        std::sort(mtype_values.begin(), mtype_values.end());
         generateMtypeNames(mtype_values);
         m_stream << "}\n";
     }
 }
 
-void PromelaModelVisitor::generateMtypeNames(QVector<QString> &names)
+void PromelaModelVisitor::generateMtypeNames(const QVector<QString> &names)
 {
-    std::sort(names.begin(), names.end());
-
     for (const QString &value : names) {
         m_stream << "    " << value << ",\n";
     }

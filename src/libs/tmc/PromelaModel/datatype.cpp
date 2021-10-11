@@ -19,74 +19,54 @@
 
 #include "datatype.h"
 
-namespace tmc::promelamodel {
-DataType::DataType(Value value)
-    : m_value(std::move(value))
+namespace tmc::promela::model {
+DataType::DataType(Type type)
+    : m_type(std::move(type))
 {
 }
 
-DataType::DataType(UnsignedDataType value)
-    : m_value(value)
+const DataType::Type &DataType::getType() const noexcept
 {
-}
-
-DataType::DataType(UtypeRef value)
-    : m_value(value)
-{
-}
-
-DataType::DataType(BasicType value)
-    : m_value(value)
-{
-}
-
-DataType::DataType(ArrayType value)
-    : m_value(value)
-{
-}
-
-const DataType::Value &DataType::getValue() const noexcept
-{
-    return m_value;
+    return m_type;
 }
 
 bool DataType::isUnsigned() const noexcept
 {
-    return std::holds_alternative<UnsignedDataType>(m_value);
+    return std::holds_alternative<UnsignedDataType>(m_type);
 }
 
 bool DataType::isReference() const noexcept
 {
-    return std::holds_alternative<UtypeRef>(m_value);
+    return std::holds_alternative<UtypeRef>(m_type);
 }
 
 bool DataType::isBasicType() const noexcept
 {
-    return std::holds_alternative<BasicType>(m_value);
+    return std::holds_alternative<BasicType>(m_type);
 }
 
 bool DataType::isArrayType() const noexcept
 {
-    return std::holds_alternative<ArrayType>(m_value);
+    return std::holds_alternative<ArrayType>(m_type);
 }
 
 const UnsignedDataType &DataType::getUnsigned() const
 {
-    return std::get<UnsignedDataType>(m_value);
+    return std::get<UnsignedDataType>(m_type);
 }
 
 const UtypeRef &DataType::getReference() const
 {
-    return std::get<UtypeRef>(m_value);
+    return std::get<UtypeRef>(m_type);
 }
 
 const BasicType &DataType::getBasicType() const
 {
-    return std::get<BasicType>(m_value);
+    return std::get<BasicType>(m_type);
 }
 
 const ArrayType &DataType::getArrayType() const
 {
-    return std::get<ArrayType>(m_value);
+    return std::get<ArrayType>(m_type);
 }
 }

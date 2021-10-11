@@ -6,7 +6,6 @@ set(SOURCES
   declaration.cpp
   namedmtype.cpp
   promelamodel.cpp
-  unsigneddatatype.cpp
   utype.cpp
   utyperef.cpp
   )

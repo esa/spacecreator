@@ -24,12 +24,6 @@
 #include <QTextStream>
 
 namespace conversion::tmc::exporter {
-using ::tmc::promelamodel::ArrayType;
-using ::tmc::promelamodel::BasicType;
-using ::tmc::promelamodel::DataType;
-using ::tmc::promelamodel::UnsignedDataType;
-using ::tmc::promelamodel::UtypeRef;
-
 /**
  * @brief  Visitor for exporting @link{::tmc::promelamodel::DataType}
  *
@@ -51,20 +45,20 @@ public:
      *
      * @param dataType DataType to visit
      */
-    void visit(const DataType &dataType);
+    void visit(const ::tmc::promela::model::DataType &dataType);
 
     /**
-     * @brief Visit value of DataType, whih is std::variant
+     * @brief Visit value of DataType, which is std::variant
      *
-     * @param value std::variant to visit
+     * @param type std::variant to visit
      */
-    void visit(const DataType::Value &value);
+    void visit(const ::tmc::promela::model::DataType::Type &type);
     /**
-     * @brief Visit value of ArrayType, whih is std::variant
+     * @brief Visit value of ArrayType, which is std::variant
      *
-     * @param value std::variant to visit
+     * @param type std::variant to visit
      */
-    void visit(const ArrayType::Type &value);
+    void visit(const ::tmc::promela::model::ArrayType::Type &type);
 
     /**
      * @brief Handle UnsignedDatatype
@@ -73,7 +67,7 @@ public:
      *
      * @param type type to translate.
      */
-    void operator()(const UnsignedDataType &type);
+    void operator()(const ::tmc::promela::model::UnsignedDataType &type);
     /**
      * @brief Handle BasicType
      *
@@ -81,7 +75,7 @@ public:
      *
      * @param type type to translate.
      */
-    void operator()(const BasicType &type);
+    void operator()(const ::tmc::promela::model::BasicType &type);
     /**
      * @brief Handle UtypeRef
      *
@@ -89,7 +83,7 @@ public:
      *
      * @param type type to translate.
      */
-    void operator()(const UtypeRef &type);
+    void operator()(const ::tmc::promela::model::UtypeRef &type);
     /**
      * @brief Handle ArrayType
      *
@@ -97,7 +91,7 @@ public:
      *
      * @param type type to translate.
      */
-    void operator()(const ArrayType &type);
+    void operator()(const ::tmc::promela::model::ArrayType &type);
 
 private:
     QTextStream &m_stream;

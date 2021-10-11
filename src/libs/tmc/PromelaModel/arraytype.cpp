@@ -19,7 +19,7 @@
 
 #include "arraytype.h"
 
-namespace tmc::promelamodel {
+namespace tmc::promela::model {
 ArrayType::ArrayType(size_t size, Type type)
     : m_size(size)
     , m_type(std::move(type))

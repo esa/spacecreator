@@ -21,7 +21,7 @@
 
 #include <QString>
 
-namespace tmc::promelamodel {
+namespace tmc::promela::model {
 /**
  * @brief Representation of a reference to user defined type in promela.
  */

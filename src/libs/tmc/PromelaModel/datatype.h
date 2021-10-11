@@ -27,7 +27,7 @@
 #include <QString>
 #include <variant>
 
-namespace tmc::promelamodel {
+namespace tmc::promela::model {
 /**
  * @brief  Representation of data type in promela.
  */
@@ -35,49 +35,25 @@ class DataType final
 {
 public:
     /**
-     * @brief variant value to represent data type.
+     * @brief variant to represent data type.
      *
      * The data type can be 'unsigned', basic type, reference to user defined type or array
      */
-    using Value = std::variant<UnsignedDataType, UtypeRef, BasicType, ArrayType>;
+    using Type = std::variant<UnsignedDataType, UtypeRef, BasicType, ArrayType>;
 
     /**
      * @brief Constructor directly from variant value.
      *
      * @param value data type
      */
-    DataType(Value value);
-    /**
-     * @brief Constructor directly from unsigned.
-     *
-     * @param value unsigned data type
-     */
-    DataType(UnsignedDataType value);
-    /**
-     * @brief Constructor directly from reference to user defined type.
-     *
-     * @param value refernece to user defined data type
-     */
-    DataType(UtypeRef value);
-    /**
-     * @brief Constructor directly from basic type.
-     *
-     * @param value basic data type
-     */
-    DataType(BasicType value);
-    /**
-     * @brief Constructor directly from array data type.
-     *
-     * @param value array data type
-     */
-    DataType(ArrayType value);
+    DataType(Type type);
 
     /**
      * @brief Getter for variant DataType.
      *
      * @return datatype variant
      */
-    const Value &getValue() const noexcept;
+    const Type &getType() const noexcept;
 
     /**
      * @brief Checks if data type is UnsignedDataType
@@ -134,6 +110,6 @@ public:
     const ArrayType &getArrayType() const;
 
 private:
-    Value m_value;
+    Type m_type;
 };
 }

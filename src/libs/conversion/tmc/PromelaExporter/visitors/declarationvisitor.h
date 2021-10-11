@@ -24,10 +24,6 @@
 #include <QTextStream>
 
 namespace conversion::tmc::exporter {
-using ::tmc::promelamodel::BasicType;
-using ::tmc::promelamodel::DataType;
-using ::tmc::promelamodel::Declaration;
-
 /**
  * @brief  Visitor for exporting @link{::tmc::promelamodel::Declaration}
  */
@@ -46,10 +42,10 @@ public:
      *
      * @param declaration Declaration to visit
      */
-    void visit(const Declaration &declaration);
+    void visit(const ::tmc::promela::model::Declaration &declaration);
 
 private:
-    QString getVisitilityString(const Declaration &declaration);
+    QString getVisitilityString(const ::tmc::promela::model::Declaration &declaration);
 
 private:
     QTextStream &m_stream;

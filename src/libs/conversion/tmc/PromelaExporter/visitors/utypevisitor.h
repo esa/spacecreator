@@ -24,8 +24,6 @@
 #include <QTextStream>
 
 namespace conversion::tmc::exporter {
-using ::tmc::promelamodel::Utype;
-
 /**
  * @brief Vistor for exporting Utype
  *
@@ -46,7 +44,7 @@ public:
      *
      * @param utype Utype to visit
      */
-    void visit(const Utype &utype);
+    void visit(const ::tmc::promela::model::Utype &utype);
 
 private:
     QTextStream &m_stream;

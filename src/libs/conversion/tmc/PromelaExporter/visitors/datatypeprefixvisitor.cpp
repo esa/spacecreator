@@ -20,6 +20,11 @@
 #include "visitors/datatypeprefixvisitor.h"
 
 namespace conversion::tmc::exporter {
+using ::tmc::promela::model::ArrayType;
+using ::tmc::promela::model::BasicType;
+using ::tmc::promela::model::DataType;
+using ::tmc::promela::model::UnsignedDataType;
+using ::tmc::promela::model::UtypeRef;
 
 DataTypePrefixVisitor::DataTypePrefixVisitor(QTextStream &stream)
     : m_stream(stream)
@@ -28,17 +33,17 @@ DataTypePrefixVisitor::DataTypePrefixVisitor(QTextStream &stream)
 
 void DataTypePrefixVisitor::visit(const DataType &dataType)
 {
-    visit(dataType.getValue());
+    visit(dataType.getType());
 }
 
-void DataTypePrefixVisitor::visit(const DataType::Value &value)
+void DataTypePrefixVisitor::visit(const DataType::Type &type)
 {
-    std::visit(*this, value);
+    std::visit(*this, type);
 }
 
-void DataTypePrefixVisitor::visit(const ArrayType::Type &value)
+void DataTypePrefixVisitor::visit(const ArrayType::Type &type)
 {
-    std::visit(*this, value);
+    std::visit(*this, type);
 }
 
 void DataTypePrefixVisitor::operator()(const UnsignedDataType &type)

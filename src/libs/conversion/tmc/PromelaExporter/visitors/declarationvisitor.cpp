@@ -23,9 +23,10 @@
 #include "visitors/datatypesuffixvisitor.h"
 
 namespace conversion::tmc::exporter {
-using ::tmc::promelamodel::ArrayType;
-using ::tmc::promelamodel::UnsignedDataType;
-using ::tmc::promelamodel::UtypeRef;
+using ::tmc::promela::model::ArrayType;
+using ::tmc::promela::model::Declaration;
+using ::tmc::promela::model::UnsignedDataType;
+using ::tmc::promela::model::UtypeRef;
 
 DeclarationVisitor::DeclarationVisitor(QTextStream &stream, QString prefix)
     : m_stream(stream)

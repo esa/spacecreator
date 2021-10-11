@@ -26,10 +26,6 @@
 #include <QTextStream>
 
 namespace conversion::tmc::exporter {
-using ::tmc::promelamodel::NamedMtype;
-using ::tmc::promelamodel::PromelaModel;
-using ::tmc::promelamodel::Utype;
-
 /**
  * @brief  Visitor for exporting @link{PromelaModel}
  *
@@ -50,13 +46,13 @@ public:
      *
      * @param promelaModel PromelaModel to visit.
      */
-    void visit(const PromelaModel &promelaModel);
+    void visit(const ::tmc::promela::model::PromelaModel &promelaModel);
 
 private:
     void generateMtypes(const QSet<QString> &values);
-    void generateNamedMtypes(const std::map<QString, NamedMtype> &values);
-    void generateMtypeNames(QVector<QString> &names);
-    void generateUtypes(const QList<Utype> &utypes);
+    void generateNamedMtypes(const std::map<QString, ::tmc::promela::model::NamedMtype> &values);
+    void generateMtypeNames(const QVector<QString> &names);
+    void generateUtypes(const QList<::tmc::promela::model::Utype> &utypes);
 
 private:
     QTextStream &m_stream;

@@ -22,7 +22,9 @@
 #include "visitors/declarationvisitor.h"
 
 namespace conversion::tmc::exporter {
-using ::tmc::promelamodel::Declaration;
+using ::tmc::promela::model::Declaration;
+using ::tmc::promela::model::Utype;
+
 UtypeVisitor::UtypeVisitor(QTextStream &stream)
     : m_stream(stream)
 {

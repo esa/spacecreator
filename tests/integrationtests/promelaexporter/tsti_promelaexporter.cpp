@@ -28,15 +28,15 @@ namespace tmc::test {
 using conversion::Options;
 using conversion::tmc::PromelaOptions;
 using conversion::tmc::exporter::PromelaExporter;
-using tmc::promelamodel::ArrayType;
-using tmc::promelamodel::BasicType;
-using tmc::promelamodel::DataType;
-using tmc::promelamodel::Declaration;
-using tmc::promelamodel::NamedMtype;
-using tmc::promelamodel::PromelaModel;
-using tmc::promelamodel::UnsignedDataType;
-using tmc::promelamodel::Utype;
-using tmc::promelamodel::UtypeRef;
+using tmc::promela::model::ArrayType;
+using tmc::promela::model::BasicType;
+using tmc::promela::model::DataType;
+using tmc::promela::model::Declaration;
+using tmc::promela::model::NamedMtype;
+using tmc::promela::model::PromelaModel;
+using tmc::promela::model::UnsignedDataType;
+using tmc::promela::model::Utype;
+using tmc::promela::model::UtypeRef;
 
 class tst_PromelaExporter : public QObject
 {

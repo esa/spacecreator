@@ -20,6 +20,12 @@
 #include "visitors/datatypesuffixvisitor.h"
 
 namespace conversion::tmc::exporter {
+using ::tmc::promela::model::ArrayType;
+using ::tmc::promela::model::BasicType;
+using ::tmc::promela::model::DataType;
+using ::tmc::promela::model::UnsignedDataType;
+using ::tmc::promela::model::UtypeRef;
+
 DataTypeSuffixVisitor::DataTypeSuffixVisitor(QTextStream &stream)
     : m_stream(stream)
 {
@@ -27,17 +33,17 @@ DataTypeSuffixVisitor::DataTypeSuffixVisitor(QTextStream &stream)
 
 void DataTypeSuffixVisitor::visit(const DataType &dataType)
 {
-    visit(dataType.getValue());
+    visit(dataType.getType());
 }
 
-void DataTypeSuffixVisitor::visit(const DataType::Value &value)
+void DataTypeSuffixVisitor::visit(const DataType::Type &type)
 {
-    std::visit(*this, value);
+    std::visit(*this, type);
 }
 
-void DataTypeSuffixVisitor::visit(const ArrayType::Type &value)
+void DataTypeSuffixVisitor::visit(const ArrayType::Type &type)
 {
-    std::visit(*this, value);
+    std::visit(*this, type);
 }
 
 void DataTypeSuffixVisitor::operator()(const UnsignedDataType &type)

@@ -22,7 +22,7 @@
 #include <QSet>
 #include <QString>
 
-namespace tmc::promelamodel {
+namespace tmc::promela::model {
 
 /**
  * @brief Representation of named mtype form promela.
@@ -72,22 +72,8 @@ public:
      */
     const QSet<QString> &values() const noexcept;
 
-    /**
-     * @brief begin iterator
-     *
-     * @return begin iterator for all values of named mtype
-     */
-    QSet<QString>::const_iterator values_begin() const;
-    /**
-     * @brief end iterator
-     *
-     * @return end iterator for all values of named mtype
-     */
-    QSet<QString>::const_iterator values_end() const;
-
 private:
     QString m_name;
     QSet<QString> m_values;
 };
-
 }
