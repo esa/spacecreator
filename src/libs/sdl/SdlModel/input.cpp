@@ -35,9 +35,9 @@ Input::Input(QString name, const std::shared_ptr<Transition> &transition)
 {
 }
 
-const std::shared_ptr<Transition> &Input::transition() const
+Transition *Input::transition() const
 {
-    return m_transition;
+    return m_transition.get();
 }
 
 void Input::setTransition(const std::shared_ptr<Transition> &transition)

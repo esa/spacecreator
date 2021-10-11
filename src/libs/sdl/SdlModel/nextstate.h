@@ -75,7 +75,7 @@ public:
      *
      * @return  next state
      */
-    auto state() const -> const std::shared_ptr<State> &;
+    auto state() const -> const State *;
 
     /**
      * @brief   Setter for the next state

@@ -40,7 +40,7 @@ public:
      * @param   name    name of this transition
      * @param   actions reference to the vector of pointers to actions
      */
-    Transition(QString name, std::vector<std::unique_ptr<Action>> &actions);
+    Transition(QString name, std::vector<std::unique_ptr<Action>> actions);
 
     /**
      * @brief   Default constructor
@@ -77,7 +77,7 @@ public:
     /**
      * @brief    Setter for the actions
      *
-     * @param    const reference to the vector of pointers to actions
+     * @param    const a vector of pointers to actions
      */
     auto setActions(std::vector<std::unique_ptr<Action>> &actions) -> void;
 

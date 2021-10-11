@@ -26,9 +26,9 @@ VariableReference::VariableReference(const std::shared_ptr<VariableDeclaration> 
 {
 }
 
-const std::shared_ptr<VariableDeclaration> &VariableReference::declaration() const
+const VariableDeclaration *VariableReference::declaration() const
 {
-    return m_declaration;
+    return m_declaration.get();
 }
 
 void VariableReference::setDeclaration(const std::shared_ptr<VariableDeclaration> &declaration)

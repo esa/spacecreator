@@ -65,7 +65,7 @@ public:
      *
      * @return   const reference to pointer to variable declaration
      */
-    auto declaration() const -> const std::shared_ptr<VariableDeclaration> &;
+    auto declaration() const -> const VariableDeclaration *;
 
     /**
      * @brief    Setter for the referenced variable declaration

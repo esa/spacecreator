@@ -24,12 +24,10 @@
 
 namespace sdl {
 
-Transition::Transition(QString name, std::vector<std::unique_ptr<Action>> &actions)
+Transition::Transition(QString name, std::vector<std::unique_ptr<Action>> actions)
     : Node(std::move(name))
+    , m_actions(std::move(actions))
 {
-    for (auto &action : actions) {
-        m_actions.push_back(std::move(action));
-    }
 }
 
 const std::vector<std::unique_ptr<Action>> &Transition::actions()

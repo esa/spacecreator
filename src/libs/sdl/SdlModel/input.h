@@ -74,9 +74,9 @@ public:
     /**
      * @brief   Getter for the transition
      *
-     * @return  a const reference to the pointer to transition which should be triggered upon reception of this signal
+     * @return  a pointer to transition which should be triggered upon reception of this signal
      */
-    auto transition() const -> const std::shared_ptr<Transition> &;
+    auto transition() const -> Transition *;
 
     /**
      * @brief   Setter for the transition
