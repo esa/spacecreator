@@ -35,7 +35,7 @@ const StateMachine *Process::stateMachine() const
     return m_stateMachine.get();
 }
 
-void Process::setStateMachine(std::unique_ptr<StateMachine> &stateMachine)
+void Process::setStateMachine(std::unique_ptr<StateMachine> stateMachine)
 {
     m_stateMachine = std::move(stateMachine);
 }
@@ -45,12 +45,9 @@ const std::vector<std::unique_ptr<VariableDeclaration>> &Process::variables() co
     return m_variables;
 }
 
-void Process::setVariables(std::vector<std::unique_ptr<VariableDeclaration>> &variables)
+void Process::setVariables(std::vector<std::unique_ptr<VariableDeclaration>> variables)
 {
-    m_variables.clear();
-    for (auto &variable : variables) {
-        m_variables.push_back(std::move(variable));
-    }
+    m_variables = std::move(variables);
 }
 
 const std::vector<std::unique_ptr<Procedure>> &Process::procedures() const
@@ -58,12 +55,9 @@ const std::vector<std::unique_ptr<Procedure>> &Process::procedures() const
     return m_procedures;
 }
 
-void Process::setProcedures(std::vector<std::unique_ptr<Procedure>> &procedures)
+void Process::setProcedures(std::vector<std::unique_ptr<Procedure>> procedures)
 {
-    m_procedures.clear();
-    for (auto &procedure : procedures) {
-        m_procedures.push_back(std::move(procedure));
-    }
+    m_procedures = std::move(procedures);
 }
 
 void Process::accept(Visitor &visitor) const

@@ -85,9 +85,9 @@ public:
     /**
      * @brief   Setter for the inputs (input signals)
      *
-     * @param   inputs a const reference to a vector of pointers to input signals
+     * @param   inputs a vector of pointers to input signals
      */
-    auto setInputs(std::vector<std::unique_ptr<Input>> &inputs) -> void;
+    auto setInputs(std::vector<std::unique_ptr<Input>> inputs) -> void;
 
     /**
      * @brief   Getter for the continuous signals
@@ -99,9 +99,9 @@ public:
     /**
      * @brief   Setter for the continuous signals
      *
-     * @param   continuousSignals a const reference to a vector of pointers to continuous signals
+     * @param   continuousSignals a vector of pointers to continuous signals
      */
-    auto setContinuousSignals(std::vector<std::unique_ptr<ContinuousSignal>> &continuousSignals) -> void;
+    auto setContinuousSignals(std::vector<std::unique_ptr<ContinuousSignal>> continuousSignals) -> void;
 
     /**
      * @brief  visitor acceptor (calls visit method of the given visitor)

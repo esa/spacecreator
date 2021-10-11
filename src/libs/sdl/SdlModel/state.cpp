@@ -41,12 +41,9 @@ const std::vector<std::unique_ptr<Input>> &State::inputs() const
     return m_inputs;
 }
 
-void State::setInputs(std::vector<std::unique_ptr<Input>> &inputs)
+void State::setInputs(std::vector<std::unique_ptr<Input>> inputs)
 {
-    m_inputs.clear();
-    for (auto &input : inputs) {
-        m_inputs.push_back(std::move(input));
-    }
+    m_inputs = std::move(inputs);
 }
 
 const std::vector<std::unique_ptr<ContinuousSignal>> &State::continuousSignals() const
@@ -54,13 +51,11 @@ const std::vector<std::unique_ptr<ContinuousSignal>> &State::continuousSignals()
     return m_continuousSignals;
 }
 
-void State::setContinuousSignals(std::vector<std::unique_ptr<ContinuousSignal>> &continuousSignals)
+void State::setContinuousSignals(std::vector<std::unique_ptr<ContinuousSignal>> continuousSignals)
 {
-    m_continuousSignals.clear();
-    for (auto &constinuousSignal : continuousSignals) {
-        m_continuousSignals.push_back(std::move(constinuousSignal));
-    }
+    m_continuousSignals = std::move(continuousSignals);
 }
+
 void State::accept(Visitor &visitor) const
 {
     visitor.visit(*this);
