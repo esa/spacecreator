@@ -16,14 +16,25 @@ set(SOURCES action.cpp
             transition.cpp
             variabledeclaration.cpp
             variablereference.cpp)
-set(INCLUDES sdlmodel.h)
+set(INCLUDES action.h
+             input.h
+             literal.h
+             nextstate.h
+             node.h
+             process.h
+             sdlmodel.h
+             signal.h
+             state.h
+             statemachine.h
+             transition.h
+             variabledeclaration.h
+             variablereference.h)
 
 target_sources(SdlModel
     PRIVATE     "${SOURCES}"
                 "${INCLUDES}")
 target_include_directories(SdlModel
     PUBLIC      .
-    PRIVATE     ${CMAKE_SOURCE_DIR}/sdlmodel
     PRIVATE     ${CMAKE_SOURCE_DIR}/src/libs)
 target_link_libraries(SdlModel
     PUBLIC      Conversion::Common
