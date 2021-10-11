@@ -52,7 +52,7 @@ public:
     /**
      * @brief   Default move constructor
      */
-    SdlModel(SdlModel &&) = delete;
+    SdlModel(SdlModel &&) = default;
 
     /**
      * @brief   Deleted copy assignment operator
