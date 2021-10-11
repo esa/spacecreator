@@ -18,24 +18,17 @@
 #include "dvappwidget.h"
 
 #include "dveditorcore.h"
-#include "dvtreesortproxymodel.h"
-#include "implementationdelegate.h"
 #include "itemeditor/graphicsview.h"
 #include "ui_dvappwidget.h"
 
 #include <QDebug>
-#include <QHeaderView>
-#include <QItemSelectionModel>
 #include <QSplitter>
-#include <QTreeView>
 
 namespace dve {
 
 DVAppWidget::DVAppWidget(QWidget *parent)
     : QWidget(parent)
     , ui(new Ui::DVAppWidget)
-    , m_selectionModel(new QItemSelectionModel(nullptr, this))
-    , m_dvTreeSortModel(new DVTreeSortProxyModel(this))
 {
     ui->setupUi(this);
     ui->mainSplitter->setStretchFactor(1, 1);
@@ -51,7 +44,7 @@ GraphicsView *DVAppWidget::graphicsView() const
 
 QItemSelectionModel *DVAppWidget::selectionModel() const
 {
-    return m_selectionModel;
+    return ui->dvTreeWidget->selectionModel();
 }
 
 void DVAppWidget::setGraphicsScene(QGraphicsScene *scene)
@@ -63,15 +56,7 @@ void DVAppWidget::setDVCore(DVEditorCore *core)
 {
     m_dvCore = core;
 
-    m_dvTreeSortModel->setSourceModel(m_dvCore->itemTreeModel());
-    m_selectionModel->setModel(m_dvTreeSortModel);
-    ui->treeView->setModel(m_dvTreeSortModel);
-    ui->treeView->setSortingEnabled(true);
-    ui->treeView->setSelectionModel(m_selectionModel);
-    ui->treeView->header()->setSectionResizeMode(0, QHeaderView::Stretch);
-
-    auto delegate = new ImplementationDelegate(m_dvCore->commandsStack(), ui->treeView);
-    ui->treeView->setItemDelegateForColumn(1, delegate);
+    ui->dvTreeWidget->setDVCore(core);
 
     ui->hwLibraryView->setModel(m_dvCore->hwItemModel());
 }

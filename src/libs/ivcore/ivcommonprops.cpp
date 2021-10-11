@@ -36,8 +36,8 @@ const QHash<QString, Props::Token> Props::TokensByName = {
     { "Comment", Token::Comment },
     { "Source", Token::Source },
     { "Target", Token::Target },
-    { "Languages", Token::Languages },
-    { "ComputeLanguage", Token::ComputeLanguage },
+    { "Implementations", Token::Implementations },
+    { "Implementation", Token::Implementation },
 
     // attrs:
     { "name", Token::name },
@@ -54,7 +54,7 @@ const QHash<QString, Props::Token> Props::TokensByName = {
     { "func_name", Token::func_name },
     { "is_visible", Token::is_visible },
     { "language", Token::language },
-    { "default_language", Token::default_language },
+    { "default_implementation", Token::default_implementation },
 
     // TASTE props:
     { "Taste::coordinates", Token::coordinates },

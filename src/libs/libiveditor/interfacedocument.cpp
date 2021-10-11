@@ -1174,6 +1174,14 @@ QVector<QAction *> InterfaceDocument::initActions()
 
         if (const QGraphicsItem *item = d->itemsModel->getItem(rootId)) {
             d->graphicsView->centerOn(item->sceneBoundingRect().center());
+        } else {
+            QRectF rect;
+            for (auto item : d->graphicsView->scene()->items()) {
+                if (item->type() > QGraphicsItem::UserType) {
+                    rect |= item->sceneBoundingRect();
+                }
+            }
+            d->graphicsView->centerOn(rect.center());
         }
     });
     connect(d->objectsSelectionModel, &QItemSelectionModel::selectionChanged, this,

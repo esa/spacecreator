@@ -146,17 +146,17 @@ target_sources(${LIB_NAME} PRIVATE
     properties/delegates/asn1valuedelegate.h
     properties/ifaceparametersmodel.cpp
     properties/ifaceparametersmodel.h
+    properties/implementationsmodel.cpp
+    properties/implementationsmodel.h
+    properties/implementationswidget.cpp
+    properties/implementationswidget.h
+    properties/implementationswidget.ui
     properties/ivpropertiesdialog.cpp
     properties/ivpropertiesdialog.h
     properties/ivpropertieslistmodel.cpp
     properties/ivpropertieslistmodel.h
     properties/ivpropertiesview.cpp
     properties/ivpropertiesview.h
-    properties/languagemodel.cpp
-    properties/languagemodel.h
-    properties/languageselect.cpp
-    properties/languageselect.h
-    properties/languageselect.ui
     templating/exportableivconnection.cpp
     templating/exportableivconnection.h
     templating/exportableivconnectiongroup.cpp

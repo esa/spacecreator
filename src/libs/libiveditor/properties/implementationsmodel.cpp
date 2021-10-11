@@ -15,7 +15,7 @@
   along with this program. If not, see <https://www.gnu.org/licenses/lgpl-2.1.html>.
 */
 
-#include "languagemodel.h"
+#include "implementationsmodel.h"
 
 #include "commands/cmdfunctionattrchange.h"
 #include "commands/cmdfunctionlanguageinsert.h"
@@ -31,21 +31,22 @@
 
 namespace ive {
 
-LanguageModel::LanguageModel(ivm::AbstractSystemChecks *checks, cmd::CommandsStack::Macro *macro, QObject *parent)
+ImplementationsModel::ImplementationsModel(
+        ivm::AbstractSystemChecks *checks, cmd::CommandsStack::Macro *macro, QObject *parent)
     : QAbstractItemModel(parent)
     , m_checks(checks)
     , m_cmdMacro(macro)
 {
 }
 
-void LanguageModel::setFunction(ivm::IVFunction *fn)
+void ImplementationsModel::setFunction(ivm::IVFunction *fn)
 {
     beginResetModel();
     m_function = fn;
     endResetModel();
 }
 
-QVariant LanguageModel::headerData(int section, Qt::Orientation orientation, int role) const
+QVariant ImplementationsModel::headerData(int section, Qt::Orientation orientation, int role) const
 {
     if (role == Qt::DisplayRole && orientation == Qt::Horizontal) {
         switch (section) {
@@ -60,43 +61,43 @@ QVariant LanguageModel::headerData(int section, Qt::Orientation orientation, int
     return QVariant();
 }
 
-QModelIndex LanguageModel::index(int row, int column, const QModelIndex &parent) const
+QModelIndex ImplementationsModel::index(int row, int column, const QModelIndex &parent) const
 {
     Q_UNUSED(parent)
     return createIndex(row, column);
 }
 
-QModelIndex LanguageModel::parent(const QModelIndex &index) const
+QModelIndex ImplementationsModel::parent(const QModelIndex &index) const
 {
     Q_UNUSED(index)
     // no nesting levels -> no parents
     return QModelIndex();
 }
 
-int LanguageModel::rowCount(const QModelIndex &parent) const
+int ImplementationsModel::rowCount(const QModelIndex &parent) const
 {
     Q_UNUSED(parent)
     if (!m_function) {
         return 0;
     }
 
-    return m_function->languages().count();
+    return m_function->implementations().count();
 }
 
-int LanguageModel::columnCount(const QModelIndex &parent) const
+int ImplementationsModel::columnCount(const QModelIndex &parent) const
 {
     Q_UNUSED(parent)
     static const QMetaEnum &me = QMetaEnum::fromType<Column>();
     return me.keyCount();
 }
 
-QVariant LanguageModel::data(const QModelIndex &index, int role) const
+QVariant ImplementationsModel::data(const QModelIndex &index, int role) const
 {
-    if (!index.isValid() || !m_function || m_function->languages().size() <= index.row()) {
+    if (!index.isValid() || !m_function || m_function->implementations().size() <= index.row()) {
         return QVariant();
     }
 
-    EntityAttribute attribute = m_function->languages().at(index.row());
+    EntityAttribute attribute = m_function->implementations().at(index.row());
 
     if (role == Qt::DisplayRole || role == Qt::EditRole) {
         switch (index.column()) {
@@ -109,7 +110,8 @@ QVariant LanguageModel::data(const QModelIndex &index, int role) const
     }
 
     if (role == Qt::CheckStateRole && index.column() == Column::Default) {
-        return m_function->defaultLanguage() == attribute.name() ? Qt::CheckState::Checked : Qt::CheckState::Unchecked;
+        return m_function->defaultImplementation() == attribute.name() ? Qt::CheckState::Checked
+                                                                       : Qt::CheckState::Unchecked;
     }
 
     if (role == Qt::FontRole && isImplementationUsed(index.row())) {
@@ -121,14 +123,14 @@ QVariant LanguageModel::data(const QModelIndex &index, int role) const
     return QVariant();
 }
 
-bool LanguageModel::setData(const QModelIndex &index, const QVariant &value, int role)
+bool ImplementationsModel::setData(const QModelIndex &index, const QVariant &value, int role)
 {
-    if (!index.isValid() || !m_function || m_function->languages().size() <= index.row()) {
+    if (!index.isValid() || !m_function || m_function->implementations().size() <= index.row()) {
         return false;
     }
 
     auto setDefaultLanguage = [this](const QString &name, const QString &language) {
-        QVariantHash attrs = { { ivm::meta::Props::token(ivm::meta::Props::Token::default_language), name },
+        QVariantHash attrs = { { ivm::meta::Props::token(ivm::meta::Props::Token::default_implementation), name },
             { ivm::meta::Props::token(ivm::meta::Props::Token::language), language } };
         auto cmd = new cmd::CmdFunctionAttrChange(m_function, attrs);
         m_cmdMacro->push(cmd);
@@ -151,7 +153,7 @@ bool LanguageModel::setData(const QModelIndex &index, const QVariant &value, int
             && (index.column() == Column::Name || index.column() == Column::Language)) {
         QModelIndex defaultIdx = createIndex(index.row(), Column::Default);
         const bool isDefault = data(defaultIdx, Qt::CheckStateRole) == Qt::CheckState::Checked;
-        EntityAttribute language = m_function->languages().at(index.row());
+        EntityAttribute language = m_function->implementations().at(index.row());
         if (index.column() == Column::Name) {
             QString name = uniqueName(value.toString());
             language.setName(name);
@@ -174,7 +176,7 @@ bool LanguageModel::setData(const QModelIndex &index, const QVariant &value, int
     return false;
 }
 
-Qt::ItemFlags LanguageModel::flags(const QModelIndex &index) const
+Qt::ItemFlags ImplementationsModel::flags(const QModelIndex &index) const
 {
     if (!index.isValid()) {
         return Qt::NoItemFlags;
@@ -186,7 +188,7 @@ Qt::ItemFlags LanguageModel::flags(const QModelIndex &index) const
     return Qt::ItemIsEnabled | Qt::ItemIsSelectable | Qt::ItemIsEditable;
 }
 
-bool LanguageModel::insertRows(int row, int count, const QModelIndex &parent)
+bool ImplementationsModel::insertRows(int row, int count, const QModelIndex &parent)
 {
     if (!m_function) {
         return false;
@@ -204,7 +206,7 @@ bool LanguageModel::insertRows(int row, int count, const QModelIndex &parent)
     return true;
 }
 
-bool LanguageModel::removeRows(int row, int count, const QModelIndex &parent)
+bool ImplementationsModel::removeRows(int row, int count, const QModelIndex &parent)
 {
     if (!m_function) {
         return false;
@@ -218,15 +220,15 @@ bool LanguageModel::removeRows(int row, int count, const QModelIndex &parent)
     return true;
 }
 
-QModelIndex LanguageModel::defaultIndex() const
+QModelIndex ImplementationsModel::defaultIndex() const
 {
     if (!m_function) {
         return QModelIndex();
     }
 
     int row = 0;
-    for (const EntityAttribute &attribute : m_function->languages()) {
-        if (attribute.name() == m_function->defaultLanguage()) {
+    for (const EntityAttribute &attribute : m_function->implementations()) {
+        if (attribute.name() == m_function->defaultImplementation()) {
             return index(row, Column::Default);
         }
         ++row;
@@ -235,17 +237,17 @@ QModelIndex LanguageModel::defaultIndex() const
     return QModelIndex();
 }
 
-bool LanguageModel::isImplementationUsed(int row) const
+bool ImplementationsModel::isImplementationUsed(int row) const
 {
-    if (!m_checks || row < 0 || row >= m_function->languages().size()) {
+    if (!m_checks || row < 0 || row >= m_function->implementations().size()) {
         return false;
     }
 
-    const QString name = m_function->languages().at(row).name();
+    const QString name = m_function->implementations().at(row).name();
     return m_checks->isImplementationUsed(m_function, name);
 }
 
-QString LanguageModel::uniqueName(const QString &name)
+QString ImplementationsModel::uniqueName(const QString &name)
 {
     if (!m_function) {
         return name;
@@ -253,7 +255,7 @@ QString LanguageModel::uniqueName(const QString &name)
 
     QString checkedName = name;
     int count = 0;
-    while (m_function->hasLanguageName(checkedName)) {
+    while (m_function->hasImplementationName(checkedName)) {
         checkedName = name + QString("_%1").arg(++count);
     }
 

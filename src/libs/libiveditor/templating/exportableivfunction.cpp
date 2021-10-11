@@ -96,15 +96,15 @@ QVariantList ExportableIVFunction::contextParameters() const
     return parameters;
 }
 
-QVariantList ExportableIVFunction::languages() const
+QVariantList ExportableIVFunction::implementations() const
 {
     const auto ivFunction = exportedObject<ivm::IVFunction>();
     if (!ivFunction) {
         return {};
     }
     QVariantList result;
-    for (const auto &language : ivFunction->languages()) {
-        result << QVariant::fromValue(shared::ExportableProperty(language.name(), language.value()));
+    for (const auto &implementation : ivFunction->implementations()) {
+        result << QVariant::fromValue(shared::ExportableProperty(implementation.name(), implementation.value()));
     }
     return result;
 }

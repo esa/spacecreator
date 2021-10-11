@@ -163,7 +163,7 @@ void IVInterfaceGraphicsItem::updateInternalItems(Qt::Alignment alignment)
 {
     m_iface->setTransform(ifaceTransform(alignment));
     m_type->setTransform(typeTransform(alignment));
-    m_textItem->setTransform(textTransform(alignment));
+    updateText();
 
     m_shape = composeShape();
     setBoundingRect(shape().boundingRect());
@@ -200,37 +200,53 @@ void IVInterfaceGraphicsItem::onSelectionChanged(bool isSelected)
  */
 qreal IVInterfaceGraphicsItem::maxWidth() const
 {
-    qreal width = -1.;
     if (!scene()) {
-        return width;
+        return -1.;
     }
 
     const QRectF itemRect = sceneBoundingRect();
-    const qreal itemLeft = itemRect.left();
-    QRectF rect = sceneBoundingRect();
-    rect.setWidth(9e12); // extend to the right very far (infinite)
+    const QRectF sceneRect = scene()->sceneRect();
+    const QRectF parentRect = targetItem()->boundingRect();
+    const QPointF ifacePos = pos();
+    const Qt::Alignment side = shared::graphicsviewutils::getNearestSide(parentRect, ifacePos);
+    QRectF rect;
+    rect.setTop(itemRect.top());
+    rect.setBottom(itemRect.bottom());
+    if (side == Qt::AlignLeft) {
+        rect.setLeft(sceneRect.left());
+        rect.setRight(scenePos().x());
+    } else {
+        rect.setLeft(scenePos().x());
+        rect.setRight(sceneRect.right());
+    }
+
     for (QGraphicsItem *rootItem : scene()->items(rect)) {
-        if (dynamic_cast<ive::IVFunctionTypeGraphicsItem *>(rootItem)
-                || dynamic_cast<ive::IVCommentGraphicsItem *>(rootItem)) {
+        if (auto rectItem = qobject_cast<shared::ui::VERectGraphicsItem *>(rootItem->toGraphicsObject())) {
             QList<QGraphicsItem *> items;
             for (QGraphicsItem *item : rootItem->childItems()) {
-                if (dynamic_cast<ive::IVFunctionTypeGraphicsItem *>(item)
-                        || dynamic_cast<ive::IVInterfaceGraphicsItem *>(item)) {
+                if (item->type() == ive::IVFunctionTypeGraphicsItem::Type
+                        || item->type() == ive::IVInterfaceGraphicsItem::Type) {
                     items.append(item);
                 }
             }
             items.append(rootItem);
 
             for (QGraphicsItem *item : items) {
-                if (item->isVisible() && item != this && item != parentItem()) {
+                if (item->isVisible() && item != this) {
                     const QRectF otherRect = item->sceneBoundingRect();
                     if (otherRect.bottom() > itemRect.top() && otherRect.top() < itemRect.bottom()) {
                         // the items do vertically intersect
-                        if (otherRect.left() > itemLeft) {
-                            if (width < 0.) {
-                                width = otherRect.left() - itemLeft;
-                            } else {
-                                width = std::min(otherRect.left() - itemLeft, width);
+
+                        if (otherRect.contains(scenePos()))
+                            continue;
+
+                        if (side == Qt::AlignLeft) {
+                            if (otherRect.right() < rect.right() && otherRect.right() > rect.left()) {
+                                rect.setLeft(otherRect.right());
+                            }
+                        } else {
+                            if (otherRect.left() > rect.left() && otherRect.left() < rect.right()) {
+                                rect.setRight(otherRect.left());
                             }
                         }
                     }
@@ -239,7 +255,7 @@ qreal IVInterfaceGraphicsItem::maxWidth() const
         }
     }
 
-    return width;
+    return rect.width();
 }
 
 shared::ColorManager::HandledColors IVInterfaceGraphicsItem::handledColorType() const
@@ -258,9 +274,18 @@ shared::ui::TextItem *IVInterfaceGraphicsItem::initTextItem()
     textItem->setTextWrapMode(QTextOption::NoWrap);
     textItem->setTextInteractionFlags(Qt::NoTextInteraction);
     textItem->setTextAlignment(Qt::AlignTop | Qt::AlignLeft);
-    textItem->setPos(QPointF(5, -5));
     textItem->setHtml(entity()->titleUI());
     return textItem;
+}
+
+void IVInterfaceGraphicsItem::updateTextPosition()
+{
+    if (m_textItem) {
+        const QRectF parentRect = targetItem()->boundingRect();
+        const QPointF ifacePos = pos();
+        const Qt::Alignment side = shared::graphicsviewutils::getNearestSide(parentRect, ifacePos);
+        m_textItem->setPos(m_textItem->mapToParent(textTransform(side).map(QPointF(0, 0))));
+    }
 }
 
 qreal IVInterfaceGraphicsItem::typeIconHeight() const
@@ -537,5 +562,4 @@ void IVInterfaceGraphicsItem::updateEntityTitle(const QString &text)
     const QVariantHash attributes = { { ivm::meta::Props::token(ivm::meta::Props::Token::name), newName } };
     m_commandsStack->push(new shared::cmd::CmdEntityAttributeChange(entity(), attributes));
 }
-
 }

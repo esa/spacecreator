@@ -38,19 +38,28 @@ CmdEntityAttributeChange::CmdEntityAttributeChange(VEObject *entity, const QVari
     , m_newAttrs(attrs)
     , m_oldAttrs(getCurrentAttributes(entity, attrs))
 {
+    Q_ASSERT(entity != nullptr);
     setText(QObject::tr("Change Attribute"));
 }
 
 void CmdEntityAttributeChange::redo()
 {
-    for (auto it = m_newAttrs.constBegin(); it != m_newAttrs.constEnd(); ++it)
+    if (!m_entity) {
+        return;
+    }
+    for (auto it = m_newAttrs.constBegin(); it != m_newAttrs.constEnd(); ++it) {
         m_entity->setEntityAttribute(it.key(), it.value());
+    }
 }
 
 void CmdEntityAttributeChange::undo()
 {
-    for (auto it = m_oldAttrs.constBegin(); it != m_oldAttrs.constEnd(); ++it)
+    if (!m_entity) {
+        return;
+    }
+    for (auto it = m_oldAttrs.constBegin(); it != m_oldAttrs.constEnd(); ++it) {
         m_entity->setEntityAttribute(it.key(), it.value());
+    }
 }
 
 int CmdEntityAttributeChange::id() const

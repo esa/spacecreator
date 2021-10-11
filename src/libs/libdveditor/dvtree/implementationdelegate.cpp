@@ -68,15 +68,17 @@ void ImplementationDelegate::setEditorData(QWidget *editor, const QModelIndex &i
 void ImplementationDelegate::setModelData(QWidget *editor, QAbstractItemModel *model, const QModelIndex &index) const
 {
     if (auto comboBox = qobject_cast<QComboBox *>(editor)) {
+        QString implementation = comboBox->currentText();
         dvm::DVFunction *fn = index.data(dve::DVTreeViewModel::DVObjectRole).value<dvm::DVFunction *>();
         if (fn) {
-            const QVariantHash attributes = {
-                { dvm::meta::Props::token(dvm::meta::Props::Token::selected_implementation), comboBox->currentText() }
-            };
-            auto attributesCmd = new shared::cmd::CmdEntityAttributeChange(fn, attributes);
-            m_commandsStack->push(attributesCmd);
+            QString impltToken = dvm::meta::Props::token(dvm::meta::Props::Token::selected_implementation);
+            if (!fn->hasEntityAttribute(impltToken, implementation)) {
+                const QVariantHash attributes = { { impltToken, implementation } };
+                auto attributesCmd = new shared::cmd::CmdEntityAttributeChange(fn, attributes);
+                m_commandsStack->push(attributesCmd);
+            }
         }
-        model->setData(index, comboBox->currentText());
+        model->setData(index, implementation);
         return;
     }
 

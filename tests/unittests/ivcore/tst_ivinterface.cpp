@@ -24,6 +24,7 @@
 #include "ivpropertytemplateconfig.h"
 #include "ivtestutils.h"
 
+#include <QStandardPaths>
 #include <QTest>
 
 class tst_IVInterface : public QObject
@@ -41,6 +42,7 @@ private Q_SLOTS:
 
 void tst_IVInterface::initTestCase()
 {
+    QStandardPaths::setTestModeEnabled(true);
     ivm::initIVLibrary();
     cfg = ivm::IVPropertyTemplateConfig::instance();
     cfg->init(QLatin1String("default_attributes.xml"));

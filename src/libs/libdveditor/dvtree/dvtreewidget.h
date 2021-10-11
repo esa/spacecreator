@@ -17,42 +17,39 @@
 
 #pragma once
 
-#include "commandsstack.h"
-
 #include <QWidget>
 
-namespace ivm {
-class AbstractSystemChecks;
-class IVFunction;
-}
+class QItemSelectionModel;
+class QModelIndex;
+class QTreeView;
 
-namespace Ui {
-class LanguageSelect;
-}
-
-namespace ive {
-class LanguageModel;
+namespace dve {
+class DVTreeSortProxyModel;
+class DVEditorCore;
 
 /*!
-   UI to select the implementation language(s) for functions
+   Class to represent theDV data in a tree view
  */
-class LanguageSelect : public QWidget
+class DVTreeWidget : public QWidget
 {
     Q_OBJECT
-
 public:
-    explicit LanguageSelect(ivm::IVFunction *fn, ivm::AbstractSystemChecks *checks, cmd::CommandsStack::Macro *macro,
-            QWidget *parent = nullptr);
-    ~LanguageSelect();
+    explicit DVTreeWidget(QWidget *parent = nullptr);
+
+    void setDVCore(DVEditorCore *core);
+    QItemSelectionModel *selectionModel() const;
 
 private Q_SLOTS:
-    void addLanguage();
-    void deleteSelectedLanguage();
-    void updateDeleteButton();
+    void dvObjectInserted(const QModelIndex &parent, int first, int last);
+    void enableAllImplementationEdits();
+    void updateImplementation(
+            const QModelIndex &topLeft, const QModelIndex &bottomRight, const QVector<int> &roles = QVector<int>());
 
 private:
-    Ui::LanguageSelect *ui;
-    LanguageModel *m_model = nullptr;
+    QTreeView *m_treeView = nullptr;
+    QItemSelectionModel *m_selectionModel = nullptr;
+    DVTreeSortProxyModel *m_dvTreeSortModel = nullptr;
+    DVEditorCore *m_dvCore = nullptr;
 };
 
-} // namespace ive
+} // namespace dve

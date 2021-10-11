@@ -28,9 +28,8 @@ class DVAppWidget;
 }
 
 namespace dve {
-class DVTreeSortProxyModel;
-class GraphicsView;
 class DVEditorCore;
+class GraphicsView;
 
 class DVAppWidget : public QWidget
 {
@@ -48,8 +47,6 @@ public:
 
 private:
     Ui::DVAppWidget *ui = nullptr;
-    QItemSelectionModel *m_selectionModel = nullptr;
-    DVTreeSortProxyModel *m_dvTreeSortModel = nullptr;
     DVEditorCore *m_dvCore = nullptr;
 };
 

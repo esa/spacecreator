@@ -33,7 +33,7 @@ namespace ivm {
 
 struct IVFunctionPrivate {
     QPointer<IVFunctionType> m_fnType;
-    QList<EntityAttribute> m_languages;
+    QList<EntityAttribute> m_implementations;
 };
 
 IVFunction::IVFunction(QObject *parent, const shared::Id &id)
@@ -58,7 +58,7 @@ bool IVFunction::postInit()
                         shared::ErrorItem::Warning, tr("Function type '%1' error").arg(typeName), "");
             }
         }
-        checkDefaultFunctionLanguage();
+        checkDefaultFunctionImplementation();
     }
 
     return IVObject::postInit();
@@ -118,55 +118,55 @@ bool IVFunction::inheritsFunctionType() const
     return instanceOf();
 }
 
-const QList<EntityAttribute> &IVFunction::languages() const
+const QList<EntityAttribute> &IVFunction::implementations() const
 {
-    return d->m_languages;
+    return d->m_implementations;
 }
 
-void IVFunction::setLanguage(int idx, const EntityAttribute &value)
+void IVFunction::setImplementation(int idx, const EntityAttribute &value)
 {
-    if (idx < 0 || idx >= d->m_languages.size()) {
+    if (idx < 0 || idx >= d->m_implementations.size()) {
         return;
     }
-    d->m_languages[idx] = value;
+    d->m_implementations[idx] = value;
 }
 
-bool IVFunction::hasLanguageName(const QString &name) const
+bool IVFunction::hasImplementationName(const QString &name) const
 {
-    for (const EntityAttribute &language : d->m_languages) {
-        if (language.name() == name) {
+    for (const EntityAttribute &implementation : d->m_implementations) {
+        if (implementation.name() == name) {
             return true;
         }
     }
     return false;
 }
 
-void IVFunction::addLanguage(const QString &name, const QString &language)
+void IVFunction::addImplementation(const QString &name, const QString &language)
 {
-    d->m_languages.append(EntityAttribute(name, language, EntityAttribute::Type::Attribute));
+    d->m_implementations.append(EntityAttribute(name, language, EntityAttribute::Type::Attribute));
 }
 
 /*!
-   Inserts the language \p value at position idx
+   Inserts the implementation \p value at position idx
  */
-void IVFunction::insertLanguage(int idx, const EntityAttribute &value)
+void IVFunction::insertImplementation(int idx, const EntityAttribute &value)
 {
-    d->m_languages.insert(idx, value);
+    d->m_implementations.insert(idx, value);
 }
 
-void IVFunction::removeLanguage(int idx)
+void IVFunction::removeImplementation(int idx)
 {
-    d->m_languages.removeAt(idx);
+    d->m_implementations.removeAt(idx);
 }
 
-void IVFunction::setDefaultLanguage(const QString &name)
+void IVFunction::setDefaultImplementation(const QString &name)
 {
-    setEntityAttribute(meta::Props::token(meta::Props::Token::default_language), name);
+    setEntityAttribute(meta::Props::token(meta::Props::Token::default_implementation), name);
 }
 
-QString IVFunction::defaultLanguage() const
+QString IVFunction::defaultImplementation() const
 {
-    return entityAttributeValue(meta::Props::token(meta::Props::Token::default_language)).toString();
+    return entityAttributeValue(meta::Props::token(meta::Props::Token::default_implementation)).toString();
 }
 
 bool IVFunction::isPseudoFunction() const
@@ -240,9 +240,9 @@ void IVFunction::reflectContextParams(const QVector<shared::ContextParameter> &p
     setContextParams(params);
 }
 
-void IVFunction::checkDefaultFunctionLanguage()
+void IVFunction::checkDefaultFunctionImplementation()
 {
-    if (languages().isEmpty()) {
+    if (implementations().isEmpty()) {
         // Add a default language
         if (!model()) {
             return;
@@ -250,25 +250,25 @@ void IVFunction::checkDefaultFunctionLanguage()
         QString value = entityAttributeValue("language").toString();
         if (value.isEmpty()) {
             shared::PropertyTemplate *temp = model()->dynPropConfig()->propertyTemplateForObject(
-                    this, meta::Props::token(meta::Props::Token::default_language));
+                    this, meta::Props::token(meta::Props::Token::default_implementation));
             if (!temp) {
                 return;
             }
             value = temp->defaultValue().toString();
         }
-        addLanguage("default", value);
-        setDefaultLanguage("default");
+        addImplementation("default", value);
+        setDefaultImplementation("default");
         return;
     }
 
-    QString defaultLang = defaultLanguage();
-    for (const EntityAttribute &lang : languages()) {
-        if (lang.name() == defaultLang) {
+    QString defaultImpl = defaultImplementation();
+    for (const EntityAttribute &impl : implementations()) {
+        if (impl.name() == defaultImpl) {
             return;
         }
     }
     // default not found - setting the first one
-    setDefaultLanguage(languages().at(0).name());
+    setDefaultImplementation(implementations().at(0).name());
 }
 
 }

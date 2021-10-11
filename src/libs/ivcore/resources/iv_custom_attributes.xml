@@ -1,5 +1,5 @@
 <Attrs>
-    <Attr label="Language" name="language">
+    <Attr label="Language" name="language" visible="false">
         <Scopes>
             <Function>
                 <AttrValidator name="is_type" value="NO"/>
@@ -19,17 +19,17 @@
             </Enumeration>
         </Type>
     </Attr>
-    <Attr label="DLanguage" name="default_language" visible="false">
+    <Attr label="Implementation" name="default_implementation" visible="false">
         <Scopes>
             <Function>
                 <AttrValidator name="is_type" value="NO"/>
             </Function>
         </Scopes>
         <Type>
-            <String validator="[a-zA-Z][\w_]*(?(?&lt;=_)[a-zA-Z0-9])"/>
+            <String validator="[a-zA-Z0-9_]+"/>
         </Type>
     </Attr>
-    <Attr name="is_type">
+    <Attr label="Function Type" name="is_type">
         <Type>
             <Enumeration defaultValue="NO">
                 <Entry value="YES"/>
@@ -54,7 +54,7 @@
             </Enumeration>
         </Type>
     </Attr>
-    <Attr name="instance_of">
+    <Attr label="Instance of" name="instance_of">
         <Type>
             <String validator="[a-zA-Z0-9_]+"/>
         </Type>
@@ -64,42 +64,78 @@
             </Function>
         </Scopes>
     </Attr>
-    <Attr name="period">
+    <Attr label="Period (in ms)" name="period">
         <Type>
-            <String validator="\d+"/>
+            <String defaultValue="1000" validator="\d+"/>
         </Type>
         <Scopes>
-            <Required_Interface>
-                <AttrValidator name="kind" value="Cyclic"/>
-            </Required_Interface>
             <Provided_Interface>
                 <AttrValidator name="kind" value="Cyclic"/>
             </Provided_Interface>
         </Scopes>
     </Attr>
-    <Attr name="wcet">
+    <Attr label="Minimal inter-arrival time (in ms)" name="miat">
         <Type>
-            <String validator="\d+"/>
+            <String defaultValue="0" validator="\d+"/>
         </Type>
         <Scopes>
-            <Required_Interface>
-                <AttrValidator name="kind" value="Cyclic"/>
-            </Required_Interface>
             <Provided_Interface>
+                <AttrValidator name="kind" value="Sporadic"/>
+            </Provided_Interface>
+        </Scopes>
+    </Attr>
+    <Attr label="Worst case execution time (in ms)" name="wcet">
+        <Type>
+            <String defaultValue="0" validator="\d+"/>
+        </Type>
+        <Scopes>
+             <Provided_Interface>
+                <AttrValidator name="kind" value="Cyclic"/>
+                <AttrValidator name="kind" value="Sporadic"/>
+                <AttrValidator name="kind" value="Protected"/>
+                <AttrValidator name="kind" value="Unprotected"/>
+            </Provided_Interface>
+        </Scopes>
+    </Attr>
+    <Attr label="Message queue size" name="queue_size">
+        <Type>
+            <String defaultValue="1" validator="\d+"/>
+        </Type>
+        <Scopes>
+            <Provided_Interface>
+                <AttrValidator name="kind" value="Sporadic"/>
+            </Provided_Interface>
+        </Scopes>
+    </Attr>
+    <Attr label="Priority" name="priority">
+        <Type>
+            <String defaultValue="1" validator="\d+"/>
+        </Type>
+        <Scopes>
+             <Provided_Interface>
+                <AttrValidator name="kind" value="Cyclic"/>
+                <AttrValidator name="kind" value="Sporadic"/>
+            </Provided_Interface>
+        </Scopes>
+    </Attr>
+    <Attr label="Offset (ms)" name="dispatch_offset">
+        <Type>
+            <String defaultValue="0" validator="\d+"/>
+        </Type>
+        <Scopes>
+             <Provided_Interface>
                 <AttrValidator name="kind" value="Cyclic"/>
             </Provided_Interface>
         </Scopes>
     </Attr>
-    <Attr name="queue_size">
+    <Attr label="Stack size (kb)" name="stack_size">
         <Type>
-            <String validator="\d+"/>
+            <String defaultValue="50" validator="\d+"/>
         </Type>
         <Scopes>
-            <Required_Interface>
+             <Provided_Interface>
                 <AttrValidator name="kind" value="Cyclic"/>
-            </Required_Interface>
-            <Provided_Interface>
-                <AttrValidator name="kind" value="Cyclic"/>
+                <AttrValidator name="kind" value="Sporadic"/>
             </Provided_Interface>
         </Scopes>
     </Attr>

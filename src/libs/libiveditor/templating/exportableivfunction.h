@@ -38,7 +38,7 @@ class ExportableIVFunction : public ExportableIVObject
     Q_PROPERTY(QVariantList connectionGroups READ connectionGroups)
     Q_PROPERTY(QVariantList connectedFunctions READ connectedFunctions)
     Q_PROPERTY(QVariantList contextParameters READ contextParameters)
-    Q_PROPERTY(QVariantList languages READ languages)
+    Q_PROPERTY(QVariantList implementations READ implementations)
 
 public:
     explicit ExportableIVFunction(const ivm::IVFunctionType *function = nullptr);
@@ -50,7 +50,7 @@ public:
     QVariantList connectionGroups() const;
     QVariantList connectedFunctions() const;
     QVariantList contextParameters() const;
-    QVariantList languages() const;
+    QVariantList implementations() const;
 };
 
 }
