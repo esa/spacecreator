@@ -70,9 +70,10 @@ public:
     /**
      * @brief   Constructor
      *
-     * @param   stream   output stream (where the serialized values are put)
+     * @param   name           name of the process
+     * @param   stateMachine   state machine of the process
      */
-    Process(QString name, std::unique_ptr<StateMachine> &stateMachine);
+    Process(QString name, std::unique_ptr<StateMachine> stateMachine);
 
     /**
      * @brief   Default constructor

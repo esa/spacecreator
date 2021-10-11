@@ -79,7 +79,7 @@ public:
      *
      * @param    const a vector of pointers to actions
      */
-    auto setActions(std::vector<std::unique_ptr<Action>> &actions) -> void;
+    auto setActions(std::vector<std::unique_ptr<Action>> actions) -> void;
 
     /**
      * @brief  visitor acceptor (calls visit method of the given visitor)

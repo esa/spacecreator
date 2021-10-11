@@ -33,12 +33,9 @@ const std::vector<std::unique_ptr<State>> &StateMachine::states() const
     return m_states;
 }
 
-void StateMachine::setStates(std::vector<std::unique_ptr<State>> &states)
+void StateMachine::setStates(std::vector<std::unique_ptr<State>> states)
 {
-    m_states.clear();
-    for (auto &state : states) {
-        m_states.push_back(std::move(state));
-    }
+    m_states = std::move(states);
 }
 
 const std::vector<std::unique_ptr<Transition>> &StateMachine::transitions() const
@@ -46,12 +43,9 @@ const std::vector<std::unique_ptr<Transition>> &StateMachine::transitions() cons
     return m_transitions;
 }
 
-void StateMachine::setTransitions(std::vector<std::unique_ptr<Transition>> &transitions)
+void StateMachine::setTransitions(std::vector<std::unique_ptr<Transition>> transitions)
 {
-    m_transitions.clear();
-    for (auto &transition : transitions) {
-        m_transitions.push_back(std::move(transition));
-    }
+    m_transitions = std::move(transitions);
 }
 
 } // namespace sdl

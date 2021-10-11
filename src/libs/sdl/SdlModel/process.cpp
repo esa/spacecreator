@@ -24,7 +24,7 @@
 
 namespace sdl {
 
-Process::Process(QString name, std::unique_ptr<StateMachine> &stateMachine)
+Process::Process(QString name, std::unique_ptr<StateMachine> stateMachine)
     : Node(std::move(name))
     , m_stateMachine(std::move(stateMachine))
 {

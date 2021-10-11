@@ -77,9 +77,9 @@ public:
     /**
      * @brief   Setter for the states of the state machine
      *
-     * @param   const reference to a vector of pointers to states
+     * @param   states a vector of pointers to states
      */
-    auto setStates(std::vector<std::unique_ptr<State>> &states) -> void;
+    auto setStates(std::vector<std::unique_ptr<State>> states) -> void;
 
     /**
      * @brief   Getter for the transitions of the state machine
@@ -91,9 +91,9 @@ public:
     /**
      * @brief   Setter for the transitions of the state machine
      *
-     * @param   const reference to a vector of pointers to transitions
+     * @param   transitions a vector of pointers to transitions
      */
-    auto setTransitions(std::vector<std::unique_ptr<Transition>> &transitions) -> void;
+    auto setTransitions(std::vector<std::unique_ptr<Transition>> transitions) -> void;
 
 private:
     std::vector<std::unique_ptr<State>> m_states;

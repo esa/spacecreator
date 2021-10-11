@@ -35,12 +35,9 @@ const std::vector<std::unique_ptr<Action>> &Transition::actions()
     return m_actions;
 }
 
-void Transition::setActions(std::vector<std::unique_ptr<Action>> &actions)
+void Transition::setActions(std::vector<std::unique_ptr<Action>> actions)
 {
-    m_actions.clear();
-    for (auto &action : actions) {
-        m_actions.push_back(std::move(action));
-    }
+    m_actions = std::move(actions);
 }
 
 void Transition::accept(Visitor &visitor) const
