@@ -39,6 +39,14 @@ public:
      * @brief   Constructor
      *
      * @param   name    name of the action
+     * @param   state   a pointer to the next state
+     */
+    NextState(QString name, const std::shared_ptr<State> &state);
+
+    /**
+     * @brief   Constructor
+     *
+     * @param   name    name of the action
      */
     NextState(QString name);
 
@@ -61,14 +69,6 @@ public:
      * @brief   Default move assignment operator
      */
     NextState &operator=(NextState &&) = default;
-
-    /**
-     * @brief   Constructor
-     *
-     * @param   name    name of the action
-     * @param   state   a pointer to the next state
-     */
-    NextState(QString name, const std::shared_ptr<State> &state);
 
     /**
      * @brief   Getter for the next state

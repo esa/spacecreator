@@ -37,6 +37,14 @@ class Input final : public Signal
 {
 public:
     /**
+     * @brief   Constructor
+     *
+     * @param name        signal name
+     * @param transition  a pointer to the transition which should be triggered upon reception of this signal
+     */
+    Input(QString name, const std::shared_ptr<Transition> &transition);
+
+    /**
      * @brief   Default constructor
      *
      * @param name    signal name
@@ -62,14 +70,6 @@ public:
      * @brief   Default move assignment operator
      */
     Input &operator=(Input &&) = default;
-
-    /**
-     * @brief   Constructor
-     *
-     * @param name        signal name
-     * @param transition  a pointer to the transition which should be triggered upon reception of this signal
-     */
-    Input(QString name, const std::shared_ptr<Transition> &transition);
 
     /**
      * @brief   Getter for the transition

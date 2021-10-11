@@ -68,6 +68,13 @@ class Process final : public Node
 {
 public:
     /**
+     * @brief   Constructor
+     *
+     * @param   stream   output stream (where the serialized values are put)
+     */
+    Process(QString name, std::unique_ptr<StateMachine> &stateMachine);
+
+    /**
      * @brief   Default constructor
      */
     Process() = default;
@@ -85,19 +92,12 @@ public:
     /**
      * @brief Deleted copy assignment
      */
-    Process &operator=(const Process &other) = delete;
+    Process &operator=(const Process &) = delete;
 
     /**
      * @brief Deleted move assignment
      */
-    Process &operator=(Process &&other) = delete;
-
-    /**
-     * @brief   Constructor
-     *
-     * @param   stream   output stream (where the serialized values are put)
-     */
-    Process(QString name, std::unique_ptr<StateMachine> &stateMachine);
+    Process &operator=(Process &&) = delete;
 
     /**
      * @brief   Getter for the state machine

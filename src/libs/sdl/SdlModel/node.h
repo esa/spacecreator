@@ -39,7 +39,7 @@ public:
     /**
      * @brief   Deleted copy constructor
      */
-    Node(const Node &other) = delete;
+    Node(const Node &) = delete;
 
     /**
      * @brief   Default move constructor

@@ -35,6 +35,14 @@ class StateMachine final
 {
 public:
     /**
+     * @brief   Constructor
+     *
+     * @param   states      reference to the vector of pointers to states
+     * @param   transitions reference to the vector of pointers to transitions
+     */
+    StateMachine(std::vector<std::shared_ptr<State>> &states, std::vector<std::shared_ptr<Transition>> &transitions);
+
+    /**
      * @brief    Default constructor
      */
     StateMachine() = default;
@@ -58,14 +66,6 @@ public:
      * @brief   Default move assignment operator
      */
     StateMachine &operator=(StateMachine &&) = default;
-
-    /**
-     * @brief   Constructor
-     *
-     * @param   states      reference to the vector of pointers to states
-     * @param   transitions reference to the vector of pointers to transitions
-     */
-    StateMachine(std::vector<std::shared_ptr<State>> &states, std::vector<std::shared_ptr<Transition>> &transitions);
 
     /**
      * @brief   Getter for the states of the state machine

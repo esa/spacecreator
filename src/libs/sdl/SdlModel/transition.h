@@ -35,6 +35,14 @@ class Transition final : public Node
 {
 public:
     /**
+     * @brief   Constructor
+     *
+     * @param   name    name of this transition
+     * @param   actions reference to the vector of pointers to actions
+     */
+    Transition(QString name, std::vector<std::unique_ptr<Action>> &actions);
+
+    /**
      * @brief   Default constructor
      */
     Transition() = default;
@@ -58,14 +66,6 @@ public:
      * @brief   Default move assignment operator
      */
     Transition &operator=(Transition &&) = default;
-
-    /**
-     * @brief   Constructor
-     *
-     * @param   name    name of this transition
-     * @param   actions reference to the vector of pointers to actions
-     */
-    Transition(QString name, std::vector<std::unique_ptr<Action>> &actions);
 
     /**
      * @brief    Getter for the actions
