@@ -49,7 +49,11 @@ void SdlVisitor::visit(const Process &process) const
                 "    START;\n"
                 "        /* CIF NEXTSTATE (9, 335), (70, 35) */\n"
                 "        NEXTSTATE ";
-    m_stream << process.stateMachine()->states()[0]->name();
+    if (process.stateMachine() && //
+            !process.stateMachine()->states().empty() && //
+            process.stateMachine()->states()[0]->name() != nullptr) {
+        m_stream << process.stateMachine()->states()[0]->name();
+    }
     m_stream << ";\n";
 
     exportCollection(process.stateMachine()->states());

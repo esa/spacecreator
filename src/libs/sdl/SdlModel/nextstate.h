@@ -41,14 +41,7 @@ public:
      * @param   name    name of the action
      * @param   state   a pointer to the next state
      */
-    NextState(QString name, State *state);
-
-    /**
-     * @brief   Constructor
-     *
-     * @param   name    name of the action
-     */
-    NextState(QString name);
+    NextState(QString name, State *state = nullptr);
 
     /**
      * @brief   Deleted copy constructor
@@ -75,7 +68,7 @@ public:
      *
      * @return  next state
      */
-    auto state() const -> const State *;
+    auto state() const -> State *;
 
     /**
      * @brief   Setter for the next state
