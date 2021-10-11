@@ -1,3 +1,2 @@
 add_subdirectory(conversion)
 add_subdirectory(libmsceditor)
-add_subdirectory(promelaexporter)

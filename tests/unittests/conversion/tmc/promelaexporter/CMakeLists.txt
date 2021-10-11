@@ -1,4 +1,4 @@
-set(TEST_NAME tsti_promelaexporter)
+set(TEST_NAME tst_promelaexporter)
 project(${TEST_NAME})
 
 add_executable(${TEST_NAME})

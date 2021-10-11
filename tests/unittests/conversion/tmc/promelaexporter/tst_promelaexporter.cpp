@@ -215,4 +215,4 @@ void tst_PromelaExporter::showInfo(const QString &returned, const QString &expec
 }
 QTEST_MAIN(tmc::test::tst_PromelaExporter)
 
-#include "tsti_promelaexporter.moc"
+#include "tst_promelaexporter.moc"
