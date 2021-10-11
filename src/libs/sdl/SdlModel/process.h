@@ -96,9 +96,9 @@ public:
     Process &operator=(const Process &) = delete;
 
     /**
-     * @brief Deleted move assignment
+     * @brief Default move assignment
      */
-    Process &operator=(Process &&) = delete;
+    Process &operator=(Process &&) = default;
 
     /**
      * @brief   Getter for the state machine

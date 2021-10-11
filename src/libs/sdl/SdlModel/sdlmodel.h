@@ -55,14 +55,14 @@ public:
     SdlModel(SdlModel &&) = default;
 
     /**
-     * @brief   Deleted copy assignment operator
+     * @brief   Default copy assignment operator
      */
     SdlModel &operator=(const SdlModel &) = delete;
 
     /**
      * @brief   Deleted move assignment operator
      */
-    SdlModel &operator=(SdlModel &&) = delete;
+    SdlModel &operator=(SdlModel &&) = default;
 
     /**
      * @brief   Getter for this model type
