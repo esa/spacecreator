@@ -19,6 +19,7 @@
 
 #include <QObject>
 #include <QtTest>
+#include <common/sdlmodelbuilder/sdlmodelbuilder.h>
 #include <conversion/common/options.h>
 #include <memory>
 #include <sdl/SdlExporter/SdlOptions/options.h>
