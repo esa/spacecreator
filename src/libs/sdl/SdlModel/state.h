@@ -90,6 +90,13 @@ public:
     auto setInputs(std::vector<std::unique_ptr<Input>> inputs) -> void;
 
     /**
+     * @brief   Add the input signal
+     *
+     * @param   inputs a pointer to input signal
+     */
+    auto addInput(std::unique_ptr<Input> input) -> void;
+
+    /**
      * @brief   Getter for the continuous signals
      *
      * @return  a const reference to a vector of pointers to continuous signals
