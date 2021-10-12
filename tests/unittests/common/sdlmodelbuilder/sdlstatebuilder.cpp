@@ -53,4 +53,11 @@ SdlStateBuilder &SdlStateBuilder::withContinuousSignals(
     return *this;
 }
 
+SdlStateBuilder &SdlStateBuilder::withContinuousSignal(std::unique_ptr<ContinuousSignal> continuousSignal)
+{
+    m_continuousSignals.push_back(std::move(continuousSignal));
+
+    return *this;
+}
+
 } // namespace tests::common

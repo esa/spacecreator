@@ -115,25 +115,19 @@ void tst_sdlmodel::testGenerateProcess()
 
     auto input1 = std::make_unique<Input>("some_input_name", transition.get());
 
-    auto contSignals = std::vector<std::unique_ptr<ContinuousSignal>>();
-
     auto state1 = SdlStateBuilder("Looping")
                           .withInput(std::move(input1))
-                          .withContinuousSignals(std::move(contSignals))
+                          .withContinuousSignal(std::make_unique<ContinuousSignal>())
                           .build();
 
     // another transition, to state1
     auto transition2 = SdlTransitionBuilder().withNextStateAction(state1.get()).build();
 
-    auto inputs2 = std::vector<std::unique_ptr<Input>>();
     auto input2 = std::make_unique<Input>("some_other_input_name", transition2.get());
-    inputs2.push_back(std::move(input2));
-
-    auto contSignals2 = std::vector<std::unique_ptr<ContinuousSignal>>();
 
     auto state2 = SdlStateBuilder("Idle")
-                          .withInputs(std::move(inputs2))
-                          .withContinuousSignals(std::move(contSignals2))
+                          .withInput(std::move(input2))
+                          .withContinuousSignal(std::make_unique<ContinuousSignal>())
                           .build();
 
     // clang-format off
