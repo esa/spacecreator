@@ -139,16 +139,26 @@ void tst_sdlmodel::testGenerateProcess()
     states.push_back(std::move(state2));
 
     auto transitions = std::vector<std::unique_ptr<Transition>>();
-    auto sm = std::make_unique<StateMachine>(std::move(states), std::move(transitions));
-    auto process = Process(processName, std::move(sm));
-    SdlModel exampleModel(std::move(process), modelName);
+
+    // clang-format off
+    const auto exampleModel = SdlModelBuilder(modelName)
+        .withProcess(
+            SdlProcessBuilder(processName)
+                .withStateMachine(
+                    SdlStateMachineBuilder()
+                        .withStates(std::move(states))
+                        .withTransitions(std::move(transitions)
+                    ).build()
+                ).build()
+        ).build();
+    // clang-format on
 
     Options options;
     options.add(SdlOptions::sdlFilepathPrefix, modelPrefix);
 
     SdlExporter exporter;
     try {
-        exporter.exportModel(&exampleModel, options);
+        exporter.exportModel(exampleModel.get(), options);
     } catch (const std::exception &ex) {
         QFAIL(ex.what());
     }
