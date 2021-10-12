@@ -25,6 +25,7 @@
 #include <common/sdlmodelbuilder/sdlprocessbuilder.h>
 #include <common/sdlmodelbuilder/sdlstatebuilder.h>
 #include <common/sdlmodelbuilder/sdlstatemachinebuilder.h>
+#include <common/sdlmodelbuilder/sdltransitionbuilder.h>
 #include <conversion/common/options.h>
 #include <memory>
 #include <sdl/SdlExporter/SdlOptions/options.h>
@@ -53,6 +54,7 @@ using tests::common::SdlModelBuilder;
 using tests::common::SdlProcessBuilder;
 using tests::common::SdlStateBuilder;
 using tests::common::SdlStateMachineBuilder;
+using tests::common::SdlTransitionBuilder;
 
 namespace tests::Sdl {
 
@@ -108,11 +110,8 @@ void tst_sdlmodel::testGenerateProcess()
 
     QString processName = "Modemanager";
 
-    // transition from state to state
-    auto nextstate = std::make_unique<NextState>("itself");
-    auto actions = std::vector<std::unique_ptr<Action>>();
-    actions.push_back(std::move(nextstate));
-    auto transition = std::make_unique<Transition>("", std::move(actions));
+    // transition to the same state
+    auto transition = SdlTransitionBuilder().withNextStateAction().build();
 
     auto inputs = std::vector<std::unique_ptr<Input>>();
     auto input1 = std::make_unique<Input>("some_input_name", transition.get());
@@ -125,11 +124,8 @@ void tst_sdlmodel::testGenerateProcess()
                           .withContinuousSignals(std::move(contSignals))
                           .build();
 
-    // another transition, from state2 to state1
-    auto nextstate2 = std::make_unique<NextState>("toggle", state1.get());
-    auto actions2 = std::vector<std::unique_ptr<Action>>();
-    actions2.push_back(std::move(nextstate2));
-    auto transition2 = std::make_unique<Transition>("", std::move(actions2));
+    // another transition, to state1
+    auto transition2 = SdlTransitionBuilder().withNextStateAction(state1.get()).build();
 
     auto inputs2 = std::vector<std::unique_ptr<Input>>();
     auto input2 = std::make_unique<Input>("some_other_input_name", transition2.get());

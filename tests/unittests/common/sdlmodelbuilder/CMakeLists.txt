@@ -3,11 +3,15 @@ project(SdlModelBuilder VERSION 1.0.0 LANGUAGES CXX)
 set(SOURCES sdlmodelbuilder.cpp
             sdlprocessbuilder.cpp
             sdlstatebuilder.cpp
-            sdlstatemachinebuilder.cpp)
+            sdlstatemachinebuilder.cpp
+            sdltransitionbuilder.cpp
+            )
 set(INCLUDES sdlmodelbuilder.h
              sdlprocessbuilder.h
              sdlstatebuilder.h
-             sdlstatemachinebuilder.h)
+             sdlstatemachinebuilder.h
+             sdltransitionbuilder.h
+             )
 
 add_library(SdlModelBuilder STATIC)
 target_sources(SdlModelBuilder
