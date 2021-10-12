@@ -1,5 +1,5 @@
 /*
- Copyright (C) 2018-2021 European Space Agency - <maxime.perrotin@esa.int>
+ Copyright (C) 2021 European Space Agency - <maxime.perrotin@esa.int>
 
  This library is free software; you can redistribute it and/or
  modify it under the terms of the GNU Library General Public
@@ -18,26 +18,32 @@
 
 #pragma once
 
-#include <QPointer>
-#include <QUndoCommand>
+#include "undocommand.h"
 
+#include <QPointer>
+
+class EntityAttribute;
 namespace shared {
 class VEObject;
+class PropertyTemplateConfig;
 namespace cmd {
 
-class CmdEntityAttributeChange : public QUndoCommand
+class CmdEntityAttributesChange : public UndoCommand
 {
+    Q_OBJECT
 public:
-    explicit CmdEntityAttributeChange(VEObject *entity, const QVariantHash &attrs);
+    explicit CmdEntityAttributesChange(
+            shared::PropertyTemplateConfig *config, VEObject *entity, const QList<EntityAttribute> &attrs);
 
     void redo() override;
     void undo() override;
     int id() const override;
 
 private:
+    shared::PropertyTemplateConfig *m_config;
     QPointer<VEObject> m_entity;
-    const QVariantHash m_newAttrs;
-    const QVariantHash m_oldAttrs;
+    const QList<EntityAttribute> m_newAttrs;
+    const QList<EntityAttribute> m_oldAttrs;
 };
 
 } // namespace cmd

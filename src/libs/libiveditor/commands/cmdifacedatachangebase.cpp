@@ -17,17 +17,18 @@
 
 #include "cmdifacedatachangebase.h"
 
+#include "cmdentitiesremove.h"
 #include "ivconnection.h"
 #include "ivinterface.h"
 #include "ivmodel.h"
-#include "cmdentitiesremove.h"
 
 namespace ive {
 namespace cmd {
 
-CmdIfaceDataChangeBase::CmdIfaceDataChangeBase(ivm::IVInterface *iface, const QString &targetName,
-        const QVariant &targetValue, const QVariant &prevValue, QUndoCommand *parent)
-    : shared::UndoCommand(parent)
+CmdIfaceDataChangeBase::CmdIfaceDataChangeBase(shared::PropertyTemplateConfig *config, ivm::IVInterface *iface,
+        const QString &targetName, const QVariant &targetValue, const QVariant &prevValue, QUndoCommand *parent)
+    : shared::cmd::CmdEntityAttributesChange(
+            config, iface, { EntityAttribute { targetName, targetValue, EntityAttribute::Type::Attribute } })
     , m_iface(iface)
     , m_model(m_iface ? m_iface->model() : nullptr)
     , m_relatedConnections()

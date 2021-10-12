@@ -18,8 +18,8 @@
 
 #pragma once
 
+#include "commands/cmdentityattributeschange.h"
 #include "common.h"
-#include "undocommand.h"
 
 #include <QPointer>
 
@@ -32,11 +32,12 @@ class IVFunctionType;
 namespace ive {
 namespace cmd {
 
-class CmdFunctionAttrChange : public shared::UndoCommand
+class CmdFunctionAttrChange : public shared::cmd::CmdEntityAttributesChange
 {
     Q_OBJECT
 public:
-    explicit CmdFunctionAttrChange(ivm::IVFunction *entity, const QVariantHash &attrs);
+    explicit CmdFunctionAttrChange(
+            shared::PropertyTemplateConfig *config, ivm::IVFunction *entity, const QList<EntityAttribute> &attrs);
     ~CmdFunctionAttrChange() override;
 
     void redo() override;

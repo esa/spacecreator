@@ -18,7 +18,6 @@
 #include "mscsystemchecks.h"
 
 #include "chartlayoutmanager.h"
-#include "commands/cmdentityattributechange.h"
 #include "commands/cmdfunctionattrchange.h"
 #include "commands/cmdifaceattrchange.h"
 #include "commandsstack.h"

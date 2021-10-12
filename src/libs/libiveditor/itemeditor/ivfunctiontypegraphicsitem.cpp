@@ -18,7 +18,7 @@
 #include "ivfunctiontypegraphicsitem.h"
 
 #include "colors/colormanager.h"
-#include "commands/cmdentityattributechange.h"
+#include "commands/cmdentityattributeschange.h"
 #include "commands/cmdfunctionattrchange.h"
 #include "commandsstack.h"
 #include "graphicsitemhelpers.h"
@@ -34,6 +34,7 @@
 #include "ivmodel.h"
 #include "ivnamevalidator.h"
 #include "ivobject.h"
+#include "ivpropertytemplateconfig.h"
 #include "ui/textitem.h"
 
 #include <QApplication>
@@ -172,12 +173,15 @@ void IVFunctionTypeGraphicsItem::updateNameFromUi(const QString &name)
         return;
     }
 
-    const QVariantHash attributess = { { ivm::meta::Props::token(ivm::meta::Props::Token::name), newName } };
     QUndoCommand *attributesCmd = nullptr;
+    const QList<EntityAttribute> attributess = { EntityAttribute {
+            ivm::meta::Props::token(ivm::meta::Props::Token::name), newName, EntityAttribute::Type::Attribute } };
     if (entity()->type() == ivm::IVObject::Type::Function) {
-        attributesCmd = new ive::cmd::CmdFunctionAttrChange(static_cast<ivm::IVFunction *>(entity()), attributess);
+        attributesCmd = new ive::cmd::CmdFunctionAttrChange(
+                ivm::IVPropertyTemplateConfig::instance(), entity()->as<ivm::IVFunction *>(), attributess);
     } else {
-        attributesCmd = new shared::cmd::CmdEntityAttributeChange(entity(), attributess);
+        attributesCmd = new shared::cmd::CmdEntityAttributesChange(
+                ivm::IVPropertyTemplateConfig::instance(), entity(), attributess);
     }
     m_commandsStack->push(attributesCmd);
 }

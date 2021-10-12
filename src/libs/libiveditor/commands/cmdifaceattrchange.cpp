@@ -28,8 +28,9 @@ static inline QVariant getCurrentAttribute(const ivm::IVInterface *entity, const
     return (entity && !name.isEmpty()) ? entity->entityAttributeValue(name) : QVariant();
 }
 
-CmdIfaceAttrChange::CmdIfaceAttrChange(ivm::IVInterface *entity, const QString &attrName, const QVariant &value)
-    : CmdIfaceDataChangeBase(entity, attrName, value, getCurrentAttribute(entity, attrName))
+CmdIfaceAttrChange::CmdIfaceAttrChange(shared::PropertyTemplateConfig *config, ivm::IVInterface *entity,
+        const QString &attrName, const QVariant &value)
+    : CmdIfaceDataChangeBase(config, entity, attrName, value, getCurrentAttribute(entity, attrName))
 {
     if (m_targetToken == ivm::meta::Props::Token::kind) {
         m_relatedConnections = getRelatedConnections();
@@ -45,9 +46,10 @@ void CmdIfaceAttrChange::redo()
         break;
     }
     default:
-        m_iface->setEntityAttribute(m_targetName, m_newValue);
         break;
     }
+
+    CmdIfaceDataChangeBase::redo();
 
     if (m_targetToken == ivm::meta::Props::Token::name) {
         Q_EMIT nameChanged(m_iface, m_oldValue.toString(), this);
@@ -63,9 +65,10 @@ void CmdIfaceAttrChange::undo()
         break;
     }
     default:
-        m_iface->setEntityAttribute(m_targetName, m_oldValue);
         break;
     }
+
+    CmdIfaceDataChangeBase::undo();
 
     if (m_targetToken == ivm::meta::Props::Token::name) {
         Q_EMIT nameChanged(m_iface, m_newValue.toString(), this);
@@ -86,19 +89,17 @@ void CmdIfaceAttrChange::setKind(const QVariant &kind)
         removeConnections();
     else
         restoreConnections();
-
-    m_iface->setEntityAttribute(m_targetName, kind);
 }
 
 void CmdIfaceAttrChange::removeConnections()
 {
-    for (auto cmd : m_cmdRmConnection)
+    for (auto cmd : qAsConst(m_cmdRmConnection))
         cmd->redo();
 }
 
 void CmdIfaceAttrChange::restoreConnections()
 {
-    for (auto cmd : m_cmdRmConnection)
+    for (auto cmd : qAsConst(m_cmdRmConnection))
         cmd->undo();
 }
 
@@ -114,5 +115,5 @@ bool CmdIfaceAttrChange::connectionMustDie(const ivm::IVConnection *connection) 
     return ivm::IVInterface::OperationKind::Cyclic == newKind;
 }
 
-}
-}
+} // namespace cmd
+} // namespace ive

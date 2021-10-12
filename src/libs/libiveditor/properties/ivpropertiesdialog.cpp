@@ -18,7 +18,7 @@
 #include "ivpropertiesdialog.h"
 
 #include "asn1systemchecks.h"
-#include "commands/cmdentityattributechange.h"
+#include "commands/cmdentityattributeschange.h"
 #include "commandsstack.h"
 #include "contextparametersmodel.h"
 #include "delegates/asn1valuedelegate.h"
@@ -222,8 +222,11 @@ void IVPropertiesDialog::initCommentView()
             if (comment->title() == encodedText)
                 return;
 
-            const QVariantHash textArg { { ivm::meta::Props::token(ivm::meta::Props::Token::name), encodedText } };
-            auto commentTextCmd = new shared::cmd::CmdEntityAttributeChange(comment, textArg);
+            const QList<EntityAttribute> textArg { EntityAttribute {
+                    ivm::meta::Props::token(ivm::meta::Props::Token::name), encodedText,
+                    EntityAttribute::Type::Attribute } };
+            auto commentTextCmd = new shared::cmd::CmdEntityAttributesChange(
+                    ivm::IVPropertyTemplateConfig::instance(), comment, textArg);
             commentTextCmd->setText(tr("Edit Comment"));
             commandStack()->push(commentTextCmd);
         });

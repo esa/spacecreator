@@ -17,9 +17,9 @@
 
 #pragma once
 
+#include "cmdifacedatachangebase.h"
 #include "ivcommonprops.h"
 #include "ivmodel.h"
-#include "cmdifacedatachangebase.h"
 
 #include <QPointer>
 #include <QVariant>
@@ -34,7 +34,8 @@ namespace cmd {
 class CmdIfaceAttrChange : public CmdIfaceDataChangeBase
 {
 public:
-    explicit CmdIfaceAttrChange(ivm::IVInterface *entity, const QString &attrName, const QVariant &value);
+    explicit CmdIfaceAttrChange(shared::PropertyTemplateConfig *config, ivm::IVInterface *entity,
+            const QString &attrName, const QVariant &value);
 
     void redo() override;
     void undo() override;

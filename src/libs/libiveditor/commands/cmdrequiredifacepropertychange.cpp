@@ -28,9 +28,9 @@ QVariant getCurrentProperty(const ivm::IVInterfaceRequired *entity, const QStrin
     return (entity && !name.isEmpty()) ? entity->entityAttributeValue(name) : QVariant();
 }
 
-CmdRequiredIfacePropertyChange::CmdRequiredIfacePropertyChange(
+CmdRequiredIfacePropertyChange::CmdRequiredIfacePropertyChange(shared::PropertyTemplateConfig *config,
         ivm::IVInterfaceRequired *entity, const QString &propName, const QVariant &value)
-    : CmdIfaceDataChangeBase(entity, propName, value, getCurrentProperty(entity, propName))
+    : CmdIfaceDataChangeBase(config, entity, propName, value, getCurrentProperty(entity, propName))
 {
     if (m_targetToken == ivm::meta::Props::Token::InheritPI) {
         const bool lostInheritance = !m_newValue.toBool();
@@ -49,9 +49,9 @@ void CmdRequiredIfacePropertyChange::redo()
         break;
     }
     default:
-        m_iface->setEntityProperty(m_targetName, m_newValue);
         break;
     }
+    CmdIfaceDataChangeBase::redo();
 }
 
 void CmdRequiredIfacePropertyChange::undo()
@@ -62,9 +62,9 @@ void CmdRequiredIfacePropertyChange::undo()
         break;
     }
     default:
-        m_iface->setEntityProperty(m_targetName, m_oldValue);
         break;
     }
+    CmdIfaceDataChangeBase::undo();
 }
 
 bool CmdRequiredIfacePropertyChange::mergeWith(const QUndoCommand *command)
@@ -86,17 +86,19 @@ void CmdRequiredIfacePropertyChange::setInheritPI(bool nowInherited)
     if (nowInherited) {
         m_iface->setEntityProperty(m_targetName, nowInherited);
 
-        for (auto cmd : m_cmdRmConnection)
+        for (auto cmd : qAsConst(m_cmdRmConnection)) {
             cmd->undo();
-        for (auto connection : m_relatedConnections)
+        }
+        for (auto connection : qAsConst(m_relatedConnections)) {
             connection->setInheritPI();
+        }
     } else {
-        for (auto connection : m_relatedConnections)
+        for (auto connection : qAsConst(m_relatedConnections)) {
             connection->unsetInheritPI();
-        for (auto cmd : m_cmdRmConnection)
+        }
+        for (auto cmd : qAsConst(m_cmdRmConnection)) {
             cmd->redo();
-
-        m_iface->setEntityProperty(m_targetName, nowInherited);
+        }
     }
 }
 

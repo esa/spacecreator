@@ -17,7 +17,7 @@
 
 #include "ivpropertieslistmodel.h"
 
-#include "commands/cmdentitypropertychange.h"
+#include "commands/cmdentityattributeschange.h"
 #include "commands/cmdfunctionattrchange.h"
 #include "commands/cmdifaceattrchange.h"
 #include "ivcommonprops.h"
@@ -152,9 +152,12 @@ bool FunctionPropertiesListModel::setData(const QModelIndex &index, const QVaria
 {
     const QPair<QString, QVariant> data = prepareDataForUpdate(index, value, role);
     if (!data.first.isEmpty()) {
-        if (isAttr(index))
-            return m_cmdMacro->push(new cmd::CmdFunctionAttrChange(entity(), { { data.first, data.second } }));
-        return m_cmdMacro->push(new shared::cmd::CmdEntityPropertyChange(entity(), { { data.first, data.second } }));
+        if (isAttr(index)) {
+            return m_cmdMacro->push(new cmd::CmdFunctionAttrChange(m_propTemplatesConfig, entity(),
+                    { EntityAttribute { data.first, data.second, EntityAttribute::Type::Attribute } }));
+        }
+        return m_cmdMacro->push(new shared::cmd::CmdEntityAttributesChange(m_propTemplatesConfig, entity(),
+                { EntityAttribute { data.first, data.second, EntityAttribute::Type::Property } }));
     }
     return false;
 }
@@ -220,7 +223,7 @@ bool InterfacePropertiesListModel::setData(const QModelIndex &index, const QVari
 {
     const QPair<QString, QVariant> data = prepareDataForUpdate(index, value, role);
     if (!data.first.isEmpty()) {
-        return m_cmdMacro->push(new cmd::CmdIfaceAttrChange(entity(), data.first, data.second));
+        return m_cmdMacro->push(new cmd::CmdIfaceAttrChange(m_propTemplatesConfig, entity(), data.first, data.second));
     }
     return false;
 }

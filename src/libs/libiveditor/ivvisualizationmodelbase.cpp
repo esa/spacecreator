@@ -17,12 +17,13 @@
 
 #include "ivvisualizationmodelbase.h"
 
-#include "commands/cmdentityattributechange.h"
+#include "commands/cmdentityattributeschange.h"
 #include "commandsstack.h"
 #include "ivconnection.h"
 #include "ivconnectiongroup.h"
 #include "ivmodel.h"
 #include "ivnamevalidator.h"
+#include "ivpropertytemplateconfig.h"
 
 #include <QDebug>
 #include <QDirIterator>
@@ -225,10 +226,11 @@ void IVVisualizationModel::onDataChanged(
                         const QString name = ivm::IVNameValidator::encodeName(obj->type(), item->text());
                         if (name != obj->title()) {
                             if (ivm::IVNameValidator::isAcceptableName(obj, name)) {
-                                const QVariantHash attributes = {
-                                    { ivm::meta::Props::token(ivm::meta::Props::Token::name), name }
-                                };
-                                auto attributesCmd = new shared::cmd::CmdEntityAttributeChange(obj, attributes);
+                                const QList<EntityAttribute> attributes = { EntityAttribute {
+                                        ivm::meta::Props::token(ivm::meta::Props::Token::name), name,
+                                        EntityAttribute::Type::Attribute } };
+                                auto attributesCmd = new shared::cmd::CmdEntityAttributesChange(
+                                        ivm::IVPropertyTemplateConfig::instance(), obj, attributes);
                                 m_commandsStack->push(attributesCmd);
                             } else {
                                 updateItemData(item, obj);

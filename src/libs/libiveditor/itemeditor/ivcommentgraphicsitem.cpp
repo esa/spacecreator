@@ -18,7 +18,7 @@
 #include "ivcommentgraphicsitem.h"
 
 #include "colors/colormanager.h"
-#include "commands/cmdentityattributechange.h"
+#include "commands/cmdentityattributeschange.h"
 #include "commandsstackbase.h"
 #include "graphicsitemhelpers.h"
 #include "graphicsviewutils.h"
@@ -26,6 +26,7 @@
 #include "ivcomment.h"
 #include "ivfunctiongraphicsitem.h"
 #include "ivnamevalidator.h"
+#include "ivpropertytemplateconfig.h"
 #include "ui/textitem.h"
 
 #include <QApplication>
@@ -151,8 +152,10 @@ void IVCommentGraphicsItem::updateEntityTitle(const QString &text)
         return;
     }
 
-    const QVariantHash attributes = { { ivm::meta::Props::token(ivm::meta::Props::Token::name), newName } };
-    m_commandsStack->push(new shared::cmd::CmdEntityAttributeChange(entity(), attributes));
+    const QList<EntityAttribute> attributes = { EntityAttribute {
+            ivm::meta::Props::token(ivm::meta::Props::Token::name), newName, EntityAttribute::Type::Attribute } };
+    m_commandsStack->push(new shared::cmd::CmdEntityAttributesChange(
+            ivm::IVPropertyTemplateConfig::instance(), entity(), attributes));
 }
 
 }

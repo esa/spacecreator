@@ -17,8 +17,7 @@
 
 #include "propertieslistmodel.h"
 
-#include "commands/cmdentityattributechange.h"
-#include "commands/cmdentitypropertychange.h"
+#include "commands/cmdentityattributeschange.h"
 #include "commands/cmdentitypropertycreate.h"
 #include "commands/cmdentitypropertyremove.h"
 #include "commands/cmdentitypropertyrename.h"
@@ -47,8 +46,8 @@ QString PropertiesListModel::tokenNameFromIndex(const QModelIndex &index)
     return name;
 }
 
-bool PropertiesListModel::moveRows(const QModelIndex &sourceParent, int sourceRow,
-        int count, const QModelIndex &destinationParent, int destinationChild)
+bool PropertiesListModel::moveRows(const QModelIndex &sourceParent, int sourceRow, int count,
+        const QModelIndex &destinationParent, int destinationChild)
 {
     if (PropertiesModelBase::moveRows(sourceParent, sourceRow, count, destinationParent, destinationChild)) {
         for (int idx = 0; idx < count; ++idx)
@@ -263,8 +262,10 @@ bool PropertiesListModel::setData(const QModelIndex &index, const QVariant &valu
                 return false;
             }
 
-            const QVariantHash attributes = { { name, value } };
-            auto attributesCmd = new shared::cmd::CmdEntityAttributeChange(m_dataObject, attributes);
+            const QList<EntityAttribute> attributes = { EntityAttribute(
+                    name, QVariant::fromValue(value), EntityAttribute::Type::Attribute) };
+            auto attributesCmd =
+                    new shared::cmd::CmdEntityAttributesChange(m_propTemplatesConfig, m_dataObject, attributes);
             m_cmdMacro->push(attributesCmd);
             return true;
         } else if (isProp(index)) {
@@ -278,8 +279,8 @@ bool PropertiesListModel::setData(const QModelIndex &index, const QVariant &valu
                     return false;
                 }
 
-                const QVariantHash props = { { name, value } };
-                auto propsCmd = new shared::cmd::CmdEntityPropertyChange(m_dataObject, props);
+                const QList<EntityAttribute> props = { EntityAttribute(name, value, EntityAttribute::Type::Property) };
+                auto propsCmd = new shared::cmd::CmdEntityAttributesChange(m_propTemplatesConfig, m_dataObject, props);
                 m_cmdMacro->push(propsCmd);
                 return true;
             }

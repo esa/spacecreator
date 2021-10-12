@@ -33,18 +33,27 @@ namespace cmd {
 typedef QVector<QUndoCommand *> Commands;
 typedef QHash<shared::Id, Commands> CommandsStorage;
 
-static inline QVariantHash getCurrentAttributes(ivm::IVObject *entity, const QVariantHash &attrs)
+static inline QVariantHash getCurrentAttributes(ivm::IVObject *entity, const QList<EntityAttribute> &attrs)
 {
     QVariantHash result;
     for (auto it = attrs.constBegin(); it != attrs.constEnd(); ++it)
-        result.insert(it.key(), entity->entityAttributeValue(it.key()));
+        result.insert(it->name(), entity->entityAttributeValue(it->name()));
     return result;
 }
 
-CmdFunctionAttrChange::CmdFunctionAttrChange(ivm::IVFunction *entity, const QVariantHash &attrs)
-    : shared::UndoCommand()
+static inline QVariantHash convertAttributes(const QList<EntityAttribute> &attrs)
+{
+    QVariantHash result;
+    for (auto it = attrs.constBegin(); it != attrs.constEnd(); ++it)
+        result.insert(it->name(), it->value());
+    return result;
+}
+
+CmdFunctionAttrChange::CmdFunctionAttrChange(
+        shared::PropertyTemplateConfig *config, ivm::IVFunction *entity, const QList<EntityAttribute> &attrs)
+    : shared::cmd::CmdEntityAttributesChange(config, entity, attrs)
     , m_entity(entity)
-    , m_newAttrs(attrs)
+    , m_newAttrs(convertAttributes(attrs))
     , m_oldAttrs(getCurrentAttributes(entity, attrs))
 {
     setText(QObject::tr("Change Attribute"));
@@ -104,18 +113,20 @@ void CmdFunctionAttrChange::setAttrs(const QVariantHash &attrs, bool isRedo)
         return;
 
     for (auto it = attrs.constBegin(); it != attrs.constEnd(); ++it) {
-        const QString name = it.key();
-        const QVariant val = it.value();
-        switch (ivm::meta::Props::token(name)) {
+        switch (ivm::meta::Props::token(it.key())) {
         case ivm::meta::Props::Token::instance_of: {
-            handleFunctionInstanceOf(val, isRedo);
+            handleFunctionInstanceOf(it.value(), isRedo);
             break;
         }
         default: {
-            m_entity->setEntityAttribute(name, val);
             break;
         }
         }
+    }
+    if (isRedo) {
+        shared::cmd::CmdEntityAttributesChange::redo();
+    } else {
+        shared::cmd::CmdEntityAttributesChange::undo();
     }
 }
 
@@ -150,7 +161,6 @@ void CmdFunctionAttrChange::handleFunctionInstanceOf(const QVariant &attr, bool 
         performCommands(commandsSetNewFunctionType(newInstanceOf));
 
     m_entity->setInstanceOf(newInstanceOf);
-    m_entity->setEntityAttribute(ivm::meta::Props::token(ivm::meta::Props::Token::instance_of), attr);
 }
 
 Commands getCommands(const ivm::IVFunctionType *fnType, const CommandsStorage &cmdStorage,

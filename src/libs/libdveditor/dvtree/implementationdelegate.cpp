@@ -17,9 +17,10 @@
 
 #include "implementationdelegate.h"
 
-#include "commands/cmdentityattributechange.h"
+#include "commands/cmdentityattributeschange.h"
 #include "commandsstackbase.h"
 #include "dvfunction.h"
+#include "dvpropertytemplateconfig.h"
 #include "dvtreeviewmodel.h"
 
 #include <QComboBox>
@@ -73,8 +74,10 @@ void ImplementationDelegate::setModelData(QWidget *editor, QAbstractItemModel *m
         if (fn) {
             QString impltToken = dvm::meta::Props::token(dvm::meta::Props::Token::selected_implementation);
             if (!fn->hasEntityAttribute(impltToken, implementation)) {
-                const QVariantHash attributes = { { impltToken, implementation } };
-                auto attributesCmd = new shared::cmd::CmdEntityAttributeChange(fn, attributes);
+                const QList<EntityAttribute> attributes = { EntityAttribute {
+                        impltToken, implementation, EntityAttribute::Type::Attribute } };
+                auto attributesCmd = new shared::cmd::CmdEntityAttributesChange(
+                        dvm::DVPropertyTemplateConfig::instance(), fn, attributes);
                 m_commandsStack->push(attributesCmd);
             }
         }

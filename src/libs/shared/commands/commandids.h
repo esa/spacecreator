@@ -25,10 +25,10 @@ enum Id
     AutoLayoutEntity,
     ChangeEntityGeometry,
     CreateEntityProperty,
-    ChangeEntityAttribute,
     ChangeEntityProperty,
     RemoveEntityProperty,
     RenameEntityProperty,
+    ChangeEntityAttributes,
 
     LastId
 };

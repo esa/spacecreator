@@ -21,7 +21,7 @@
 #include "abstractvisualizationmodel.h"
 #include "asn1systemchecks.h"
 #include "commands/cmdentitiesremove.h"
-#include "commands/cmdentityattributechange.h"
+#include "commands/cmdentityattributeschange.h"
 #include "commands/cmdnodeentitycreate.h"
 #include "commandsstackbase.h"
 #include "dvappmodel.h"
@@ -365,8 +365,9 @@ void DVEditorCore::changeDvFunctionBindingName(const QString &oldName, const QSt
     // Update function bindings
     for (dvm::DVFunction *fn : model->allObjectsByType<dvm::DVFunction>()) {
         if (fn->title() == oldName) {
-            const QVariantHash attributes = { { dvm::meta::Props::token(dvm::meta::Props::Token::name), name } };
-            auto cmd = new shared::cmd::CmdEntityAttributeChange(fn, attributes);
+            const QList<EntityAttribute> attributes = { EntityAttribute {
+                    dvm::meta::Props::token(dvm::meta::Props::Token::name), name, EntityAttribute::Type::Attribute } };
+            auto cmd = new shared::cmd::CmdEntityAttributesChange(d->m_dynPropConfig, fn, attributes);
             commandsStack()->push(cmd);
             updated = true;
         }
@@ -375,15 +376,17 @@ void DVEditorCore::changeDvFunctionBindingName(const QString &oldName, const QSt
     for (dvm::DVMessage *msg : model->allObjectsByType<dvm::DVMessage>()) {
         if (msg->fromFunction() == oldName) {
             dvm::meta::Props::Token token = dvm::meta::Props::Token::from_function;
-            const QVariantHash attributes = { { dvm::meta::Props::token(token), name } };
-            auto cmd = new shared::cmd::CmdEntityAttributeChange(msg, attributes);
+            const QList<EntityAttribute> attributes = { EntityAttribute {
+                    dvm::meta::Props::token(token), name, EntityAttribute::Type::Attribute } };
+            auto cmd = new shared::cmd::CmdEntityAttributesChange(d->m_dynPropConfig, msg, attributes);
             commandsStack()->push(cmd);
             updated = true;
         }
         if (msg->toFunction() == oldName) {
             dvm::meta::Props::Token token = dvm::meta::Props::Token::to_function;
-            const QVariantHash attributes = { { dvm::meta::Props::token(token), name } };
-            auto cmd = new shared::cmd::CmdEntityAttributeChange(msg, attributes);
+            const QList<EntityAttribute> attributes = { EntityAttribute {
+                    dvm::meta::Props::token(token), name, EntityAttribute::Type::Attribute } };
+            auto cmd = new shared::cmd::CmdEntityAttributesChange(d->m_dynPropConfig, msg, attributes);
             commandsStack()->push(cmd);
             updated = true;
         }
@@ -429,14 +432,16 @@ void DVEditorCore::changeDvMessageBindingIfName(const QString &oldName, const QS
             dvm::meta::Props::Token token;
             if (msgSide == shared::SOURCE && msg->fromInterface() == oldName) {
                 token = dvm::meta::Props::Token::from_interface;
-                const QVariantHash attributes = { { dvm::meta::Props::token(token), name } };
-                auto cmd = new shared::cmd::CmdEntityAttributeChange(msg, attributes);
+                const QList<EntityAttribute> attributes = { EntityAttribute {
+                        dvm::meta::Props::token(token), name, EntityAttribute::Type::Attribute } };
+                auto cmd = new shared::cmd::CmdEntityAttributesChange(d->m_dynPropConfig, msg, attributes);
                 commandsStack()->push(cmd);
             }
             if (msgSide == shared::TARGET && msg->toInterface() == oldName) {
                 token = dvm::meta::Props::Token::to_interface;
-                const QVariantHash attributes = { { dvm::meta::Props::token(token), name } };
-                auto cmd = new shared::cmd::CmdEntityAttributeChange(msg, attributes);
+                const QList<EntityAttribute> attributes = { EntityAttribute {
+                        dvm::meta::Props::token(token), name, EntityAttribute::Type::Attribute } };
+                auto cmd = new shared::cmd::CmdEntityAttributesChange(d->m_dynPropConfig, msg, attributes);
                 commandsStack()->push(cmd);
             }
             updated = true;
@@ -480,8 +485,9 @@ void DVEditorCore::changeFunctionImplementationName(
         if (fn->title() == functionName) {
             QString value = fn->entityAttributeValue(implToken).toString();
             if (value == oldName) {
-                const QVariantHash attributes = { { implToken, newName } };
-                auto cmd = new shared::cmd::CmdEntityAttributeChange(fn, attributes);
+                const QList<EntityAttribute> attributes = { EntityAttribute {
+                        implToken, newName, EntityAttribute::Type::Attribute } };
+                auto cmd = new shared::cmd::CmdEntityAttributesChange(d->m_dynPropConfig, fn, attributes);
                 commandsStack()->push(cmd);
                 updated = true;
             }

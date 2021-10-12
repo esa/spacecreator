@@ -24,6 +24,7 @@
 #include "ivcore/abstractsystemchecks.h"
 #include "ivfunction.h"
 #include "ivmodel.h"
+#include "ivpropertytemplateconfig.h"
 
 #include <QDebug>
 #include <QFont>
@@ -130,9 +131,13 @@ bool ImplementationsModel::setData(const QModelIndex &index, const QVariant &val
     }
 
     auto setDefaultLanguage = [this](const QString &name, const QString &language) {
-        QVariantHash attrs = { { ivm::meta::Props::token(ivm::meta::Props::Token::default_implementation), name },
-            { ivm::meta::Props::token(ivm::meta::Props::Token::language), language } };
-        auto cmd = new cmd::CmdFunctionAttrChange(m_function, attrs);
+        const QList<EntityAttribute> attrs = {
+            EntityAttribute { ivm::meta::Props::token(ivm::meta::Props::Token::default_implementation), name,
+                    EntityAttribute::Type::Attribute },
+            EntityAttribute { ivm::meta::Props::token(ivm::meta::Props::Token::language), language,
+                    EntityAttribute::Type::Attribute }
+        };
+        auto cmd = new cmd::CmdFunctionAttrChange(ivm::IVPropertyTemplateConfig::instance(), m_function, attrs);
         m_cmdMacro->push(cmd);
     };
 

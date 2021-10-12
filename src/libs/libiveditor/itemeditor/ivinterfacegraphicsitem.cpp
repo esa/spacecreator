@@ -19,7 +19,7 @@
 #include "ivinterfacegraphicsitem.h"
 
 #include "colors/colormanager.h"
-#include "commands/cmdentityattributechange.h"
+#include "commands/cmdentityattributeschange.h"
 #include "commandsstackbase.h"
 #include "graphicsitemhelpers.h"
 #include "graphicsviewutils.h"
@@ -32,6 +32,7 @@
 #include "ivfunctiontypegraphicsitem.h"
 #include "ivinterface.h"
 #include "ivnamevalidator.h"
+#include "ivpropertytemplateconfig.h"
 #include "positionlookuphelper.h"
 #include "ui/textitem.h"
 #include "ui/veconnectiongraphicsitem.h"
@@ -559,7 +560,9 @@ void IVInterfaceGraphicsItem::updateEntityTitle(const QString &text)
     if (!ivm::IVNameValidator::isAcceptableName(entity(), newName)) {
         return;
     }
-    const QVariantHash attributes = { { ivm::meta::Props::token(ivm::meta::Props::Token::name), newName } };
-    m_commandsStack->push(new shared::cmd::CmdEntityAttributeChange(entity(), attributes));
+    const QList<EntityAttribute> attributes = { EntityAttribute {
+            ivm::meta::Props::token(ivm::meta::Props::Token::name), newName, EntityAttribute::Type::Attribute } };
+    m_commandsStack->push(new shared::cmd::CmdEntityAttributesChange(
+            ivm::IVPropertyTemplateConfig::instance(), entity(), attributes));
 }
 }

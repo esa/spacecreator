@@ -31,14 +31,12 @@ target_sources(${LIB_NAME} PRIVATE
     colors/colorsettingswidget.ui
     commandlineparser.cpp
     commandlineparser.h
-    commands/cmdentityattributechange.cpp
-    commands/cmdentityattributechange.h
+    commands/cmdentityattributeschange.cpp
+    commands/cmdentityattributeschange.h
     commands/cmdentityautolayout.cpp
     commands/cmdentityautolayout.h
     commands/cmdentitygeometrychange.cpp
     commands/cmdentitygeometrychange.h
-    commands/cmdentitypropertychange.cpp
-    commands/cmdentitypropertychange.h
     commands/cmdentitypropertycreate.cpp
     commands/cmdentitypropertycreate.h
     commands/cmdentitypropertyremove.cpp

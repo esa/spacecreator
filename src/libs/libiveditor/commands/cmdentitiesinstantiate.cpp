@@ -19,13 +19,14 @@
 
 #include "cmdinterfaceitemcreate.h"
 #include "commandids.h"
-#include "commands/cmdentityattributechange.h"
+#include "commands/cmdentityattributeschange.h"
 #include "graphicsviewutils.h"
 #include "itemeditor/common/ivutils.h"
 #include "ivfunction.h"
 #include "ivfunctiontype.h"
 #include "ivmodel.h"
 #include "ivnamevalidator.h"
+#include "ivpropertytemplateconfig.h"
 
 static inline void shiftObjects(const QVector<ivm::IVObject *> &objects, const QPointF &offset)
 {
@@ -63,8 +64,10 @@ CmdEntitiesInstantiate::CmdEntitiesInstantiate(
     typeGeometry.moveTo(pos);
     m_instantiatedEntity->setCoordinates(shared::graphicsviewutils::coordinates(typeGeometry));
 
-    m_subCmds.append(new shared::cmd::CmdEntityAttributeChange(m_instantiatedEntity,
-            { { ivm::meta::Props::token(ivm::meta::Props::Token::is_type), QLatin1String("NO") } }));
+    m_subCmds.append(
+            new shared::cmd::CmdEntityAttributesChange(ivm::IVPropertyTemplateConfig::instance(), m_instantiatedEntity,
+                    { EntityAttribute { ivm::meta::Props::token(ivm::meta::Props::Token::is_type), QLatin1String("NO"),
+                            EntityAttribute::Type::Attribute } }));
 
     for (auto iface : entity->interfaces()) {
         const ivm::IVInterface::CreationInfo clone =
@@ -74,7 +77,8 @@ CmdEntitiesInstantiate::CmdEntitiesInstantiate(
     }
 
     const QString nameKey = ivm::meta::Props::token(ivm::meta::Props::Token::instance_of);
-    m_subCmds.append(new shared::cmd::CmdEntityAttributeChange(m_instantiatedEntity, { { nameKey, entity->title() } }));
+    m_subCmds.append(new shared::cmd::CmdEntityAttributesChange(ivm::IVPropertyTemplateConfig::instance(),
+            m_instantiatedEntity, { EntityAttribute { nameKey, entity->title(), EntityAttribute::Type::Attribute } }));
 }
 
 CmdEntitiesInstantiate::~CmdEntitiesInstantiate()

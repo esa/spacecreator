@@ -17,11 +17,12 @@
 
 #include "dvtreeviewmodel.h"
 
-#include "commands/cmdentityattributechange.h"
+#include "commands/cmdentityattributeschange.h"
 #include "commandsstackbase.h"
 #include "dvfunction.h"
 #include "dvmodel.h"
 #include "dvnamevalidator.h"
+#include "dvpropertytemplateconfig.h"
 
 #include <QDebug>
 
@@ -169,8 +170,10 @@ void DVTreeViewModel::setName(dvm::DVObject *obj, QStandardItem *item)
     const QString name = dvm::DVNameValidator::encodeName(obj->type(), item->text());
     if (name != obj->title()) {
         if (dvm::DVNameValidator::isAcceptableName(obj, name)) {
-            const QVariantHash attributes = { { dvm::meta::Props::token(dvm::meta::Props::Token::name), name } };
-            auto attributesCmd = new shared::cmd::CmdEntityAttributeChange(obj, attributes);
+            const QList<EntityAttribute> attributes = { EntityAttribute {
+                    dvm::meta::Props::token(dvm::meta::Props::Token::name), name, EntityAttribute::Type::Attribute } };
+            auto attributesCmd = new shared::cmd::CmdEntityAttributesChange(
+                    dvm::DVPropertyTemplateConfig::instance(), obj, attributes);
             m_commandsStack->push(attributesCmd);
         } else {
             updateItemData(item, obj);

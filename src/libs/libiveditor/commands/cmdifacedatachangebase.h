@@ -17,6 +17,7 @@
 
 #pragma once
 
+#include "commands/cmdentityattributeschange.h"
 #include "ivcommonprops.h" // for Props, Props::Token
 #include "undocommand.h"
 
@@ -34,7 +35,7 @@ class IVModel;
 namespace ive {
 namespace cmd {
 
-class CmdIfaceDataChangeBase : public shared::UndoCommand
+class CmdIfaceDataChangeBase : public shared::cmd::CmdEntityAttributesChange
 {
     Q_OBJECT
 
@@ -50,8 +51,9 @@ Q_SIGNALS:
 protected:
     CmdIfaceDataChangeBase() = delete;
     CmdIfaceDataChangeBase(const CmdIfaceDataChangeBase &other) = delete;
-    explicit CmdIfaceDataChangeBase(ivm::IVInterface *iface, const QString &targetName,
-            const QVariant &targetValue, const QVariant &prevValue, QUndoCommand *parent = nullptr);
+    explicit CmdIfaceDataChangeBase(shared::PropertyTemplateConfig *config, ivm::IVInterface *iface,
+            const QString &targetName, const QVariant &targetValue, const QVariant &prevValue,
+            QUndoCommand *parent = nullptr);
 
     QPointer<ivm::IVInterface> m_iface;
     QPointer<ivm::IVModel> m_model;

@@ -20,7 +20,7 @@
 #include "commandlineparser.h"
 #include "commands/cmdchangeasn1file.h"
 #include "commands/cmdconnectionitemcreate.h"
-#include "commands/cmdentityattributechange.h"
+#include "commands/cmdentityattributeschange.h"
 #include "commands/cmdfunctionitemcreate.h"
 #include "commands/cmdifaceattrchange.h"
 #include "commands/cmdinterfaceitemcreate.h"
@@ -37,6 +37,7 @@
 #include "ivfunction.h"
 #include "ivinterface.h"
 #include "ivmodel.h"
+#include "ivpropertytemplateconfig.h"
 
 #include <QDateTime>
 #include <QDebug>
@@ -293,8 +294,10 @@ bool IVEditorCore::renameIVFunction(const QString &oldName, const QString &newNa
         return false;
     }
 
-    const QVariantHash attributess = { { ivm::meta::Props::token(ivm::meta::Props::Token::name), newName } };
-    auto cmd = new shared::cmd::CmdEntityAttributeChange(ivFunc, attributess);
+    const QList<EntityAttribute> attributess = { EntityAttribute {
+            ivm::meta::Props::token(ivm::meta::Props::Token::name), newName, EntityAttribute::Type::Attribute } };
+    auto cmd =
+            new shared::cmd::CmdEntityAttributesChange(ivm::IVPropertyTemplateConfig::instance(), ivFunc, attributess);
     commandsStack()->push(cmd);
 
     Q_EMIT editedExternally(this);
@@ -325,7 +328,7 @@ bool IVEditorCore::renameIVConnection(
         return false;
     }
 
-    auto cmd = new cmd::CmdIfaceAttrChange(ivConnect->targetInterface(),
+    auto cmd = new cmd::CmdIfaceAttrChange(ivm::IVPropertyTemplateConfig::instance(), ivConnect->targetInterface(),
             ivm::meta::Props::token(ivm::meta::Props::Token::name), QVariant::fromValue(newName));
     commandsStack()->push(cmd);
 
@@ -353,8 +356,8 @@ bool IVEditorCore::renameCyclicInterface(const QString &oldName, const QString &
         return false;
     }
 
-    auto cmd = new cmd::CmdIfaceAttrChange(
-            interface, ivm::meta::Props::token(ivm::meta::Props::Token::name), QVariant::fromValue(newName));
+    auto cmd = new cmd::CmdIfaceAttrChange(ivm::IVPropertyTemplateConfig::instance(), interface,
+            ivm::meta::Props::token(ivm::meta::Props::Token::name), QVariant::fromValue(newName));
     commandsStack()->push(cmd);
 
     Q_EMIT editedExternally(this);

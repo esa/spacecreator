@@ -542,10 +542,6 @@ void tst_ConnectionUtils::checkEndPoints(ive::IVFunctionGraphicsItem *startFn, D
     QCOMPARE(result.failed(), shouldFail);
     if (!result.failed()) {
         if (isReversed) {
-            if (result.connectionPoints.first() != connectionPoints.last()) {
-                qDebug() << "###:"
-                         << shared::graphicsviewutils::comparePolygones(result.connectionPoints, connectionPoints);
-            }
             QCOMPARE(result.connectionPoints.first(), connectionPoints.last());
             QCOMPARE(result.connectionPoints.last(), connectionPoints.first());
         } else {

@@ -24,6 +24,7 @@
 #include <QVector>
 #include <memory>
 
+class EntityAttribute;
 class QValidator;
 class QDomDocument;
 

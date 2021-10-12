@@ -18,6 +18,9 @@
 #include "commandsstack.h"
 #include "itemeditor/common/ivutils.h"
 #include "ivfunction.h"
+#include "ivinterface.h"
+#include "ivlibrary.h"
+#include "ivmodel.h"
 #include "ivpropertytemplateconfig.h"
 #include "properties/ivpropertieslistmodel.h"
 
@@ -30,6 +33,7 @@ class tst_PropertiesListModel : public QObject
 private Q_SLOTS:
     void initTestCase();
     void tst_object();
+    void tst_attributes();
 
 private:
     ive::cmd::CommandsStack::Macro *m_macro { nullptr };
@@ -38,6 +42,7 @@ private:
 
 void tst_PropertiesListModel::initTestCase()
 {
+    ivm::initIVLibrary();
     m_macro = new ive::cmd::CommandsStack::Macro(new ive::cmd::CommandsStack);
     m_config = ivm::IVPropertyTemplateConfig::instance();
     m_config->init(shared::interfaceCustomAttributesFilePath());
@@ -78,6 +83,51 @@ void tst_PropertiesListModel::tst_object()
     QVERIFY(!indexes.isEmpty());
     for (int idx = 0; idx < indexes.size(); ++idx) {
         QVERIFY(plmodel.removeProperty(indexes.at(idx)));
+    }
+}
+
+void tst_PropertiesListModel::tst_attributes()
+{
+    ivm::IVModel model(m_config);
+
+    ivm::IVFunction fn;
+    fn.setTitle("Function_1");
+    model.addObject(&fn);
+
+    ivm::IVInterface::CreationInfo ci;
+    ci.function = &fn;
+    ci.name = "Interface_1";
+    ci.type = ivm::IVInterface::InterfaceType::Provided;
+    ivm::IVInterfaceProvided iface(ci);
+    fn.addChild(&iface);
+    model.addObject(&iface);
+
+    ive::IVPropertiesListModel plmodel(m_macro, m_config);
+    plmodel.setDataObject(&iface);
+
+    const QString attrName = QLatin1String("kind");
+    QVERIFY(iface.hasEntityAttribute(attrName));
+
+    const QList<shared::PropertyTemplate *> propTemplates = m_config->propertyTemplatesForObject(&iface);
+    auto it = std::find_if(
+            propTemplates.cbegin(), propTemplates.cend(), [attrName](shared::PropertyTemplate *propTemplate) {
+                for (const QPair<QString, QString> &attrData : propTemplate->attrValidatorPatterns()) {
+                    if (attrData.first == attrName && propTemplate->attrValidatorPatterns().size() == 1) {
+                        return true;
+                    }
+                }
+                return false;
+            });
+    if (it != propTemplates.cend()) {
+        shared::PropertyTemplate *propTemplate = *it;
+        QVERIFY(propTemplate != nullptr);
+        auto kindMetaEnum = QMetaEnum::fromType<ivm::IVInterface::OperationKind>();
+        const QString validatorValue = propTemplate->attrValidatorPatterns().first().second;
+        for (int idx = 1; idx < kindMetaEnum.keyCount(); ++idx) {
+            const int enumValue = kindMetaEnum.keyToValue(kindMetaEnum.key(idx));
+            iface.setKind(static_cast<ivm::IVInterface::OperationKind>(enumValue));
+            QVERIFY(propTemplate->validate(&iface) == (kindMetaEnum.valueToKey(enumValue) == validatorValue));
+        }
     }
 }
 

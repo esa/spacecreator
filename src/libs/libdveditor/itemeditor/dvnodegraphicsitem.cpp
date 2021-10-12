@@ -17,11 +17,12 @@
 
 #include "dvnodegraphicsitem.h"
 
-#include "commands/cmdentityattributechange.h"
+#include "commands/cmdentityattributeschange.h"
 #include "commandsstackbase.h"
 #include "dvconnectiongraphicsitem.h"
 #include "dvdevicegraphicsitem.h"
 #include "dvnamevalidator.h"
+#include "dvpropertytemplateconfig.h"
 #include "graphicsviewutils.h"
 #include "ui/textitem.h"
 
@@ -124,8 +125,10 @@ void DVNodeGraphicsItem::updateEntityTitle(const QString &text)
     if (!dvm::DVNameValidator::isAcceptableName(entity(), newName)) {
         return;
     }
-    const QVariantHash attributes = { { dvm::meta::Props::token(dvm::meta::Props::Token::name), newName } };
-    m_commandsStack->push(new shared::cmd::CmdEntityAttributeChange(entity(), attributes));
+    const QList<EntityAttribute> attributes = { EntityAttribute {
+            dvm::meta::Props::token(dvm::meta::Props::Token::name), newName, EntityAttribute::Type::Attribute } };
+    m_commandsStack->push(new shared::cmd::CmdEntityAttributesChange(
+            dvm::DVPropertyTemplateConfig::instance(), entity(), attributes));
 }
 
 } // namespace dve
