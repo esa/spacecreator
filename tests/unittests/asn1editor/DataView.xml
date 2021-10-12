@@ -91,6 +91,25 @@
                     </SEQUENCE>
                 </Asn1Type>
             </TypeAssignment>
+            <TypeAssignment Name="MyString" Line="6" CharPositionInLine="13">
+                <Asn1Type id="DataView.MyString" Line="6" CharPositionInLine="13" Asn1File="/tmp/DataView.asn">
+                    <IA5String>
+                      <Constraints>
+                        <SIZE>
+                            <Range>
+                            <Min>
+                                <IntegerValue>1</IntegerValue>
+                            </Min>
+                            <Max>
+                                <IntegerValue>10</IntegerValue>
+                            </Max>
+                            </Range>
+                        </SIZE>
+                      </Constraints>
+                      <WithComponentConstraints />
+                    </IA5String>
+                </Asn1Type>
+            </TypeAssignment>
         </TypeAssignments>
         <VariablesAssignments>
         </VariablesAssignments>

@@ -54,6 +54,11 @@ QString AcnSequenceComponent::presentWhen() const
     return QString();
 }
 
+bool AcnSequenceComponent::isOptional() const
+{
+    return false;
+}
+
 const QString &AcnSequenceComponent::id() const
 {
     return m_id;

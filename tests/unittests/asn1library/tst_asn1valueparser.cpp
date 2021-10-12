@@ -55,6 +55,7 @@ private Q_SLOTS:
     void testIntValuesWithRangeError();
     void testRealValuesWithRangeError();
     void testBoolValues();
+    void testIA5StringValues();
     void testEnumValues();
     void testBoolValuesError();
     void testEnumValuesError();
@@ -153,7 +154,8 @@ void tst_Asn1ValueParser::testIntValuesWithRange()
 {
     Asn1Acn::SourceLocation location;
     auto type = std::make_unique<Asn1Acn::Types::Integer>();
-    type->setParameters({ { "min", 5 }, { "max", 15 } });
+    auto range = Range<typename IntegerValue::Type>(5, 15);
+    type->constraints().append(range);
     auto assignment = std::make_unique<Asn1Acn::TypeAssignment>("MyInt", "MyInt", location, std::move(type));
     auto valueMap = valueParser->parseAsn1Value(assignment.get(), "13");
     QCOMPARE(valueMap.size(), 2);
@@ -166,7 +168,8 @@ void tst_Asn1ValueParser::testRealValuesWithRange()
 {
     Asn1Acn::SourceLocation location;
     auto type = std::make_unique<Asn1Acn::Types::Real>();
-    type->setParameters({ { "min", 10.0 }, { "max", 50.0 } });
+    auto range = Range<typename RealValue::Type>(10.0, 50.0);
+    type->constraints().append(range);
     auto assignment = std::make_unique<Asn1Acn::TypeAssignment>("MyDouble", "MyDouble", location, std::move(type));
     auto valueMap = valueParser->parseAsn1Value(assignment.get(), "31.07");
     QCOMPARE(valueMap.size(), 2);
@@ -181,7 +184,8 @@ void tst_Asn1ValueParser::testIntValuesWithRangeError()
 
     Asn1Acn::SourceLocation location;
     auto type = std::make_unique<Asn1Acn::Types::Integer>();
-    type->setParameters({ { "min", 1 }, { "max", 10 } });
+    auto range = Range<typename IntegerValue::Type>(1, 10);
+    type->constraints().append(range);
     auto assignment = std::make_unique<Asn1Acn::TypeAssignment>("MyInt", "MyInt", location, std::move(type));
     auto valueMap = valueParser->parseAsn1Value(assignment.get(), "13");
     QCOMPARE(valueMap.size(), 0);
@@ -197,7 +201,8 @@ void tst_Asn1ValueParser::testRealValuesWithRangeError()
 
     Asn1Acn::SourceLocation location;
     auto type = std::make_unique<Asn1Acn::Types::Real>();
-    type->setParameters({ { "min", 10.0 }, { "max", 30.0 } });
+    auto range = Range<typename RealValue::Type>(10.0, 30.0);
+    type->constraints().append(range);
     auto assignment = std::make_unique<Asn1Acn::TypeAssignment>("MyDouble", "MyDouble", location, std::move(type));
     auto valueMap = valueParser->parseAsn1Value(assignment.get(), "31.07");
     QCOMPARE(valueMap.size(), 0);
@@ -219,14 +224,25 @@ void tst_Asn1ValueParser::testBoolValues()
     QVERIFY(valueMap["value"].toBool() == true);
 }
 
+void tst_Asn1ValueParser::testIA5StringValues()
+{
+    Asn1Acn::SourceLocation location;
+    auto type = std::make_unique<Asn1Acn::Types::IA5String>();
+    auto assignment = std::make_unique<Asn1Acn::TypeAssignment>("MyString", "MyString", location, std::move(type));
+    auto valueMap = valueParser->parseAsn1Value(assignment.get(), "Potato");
+    QCOMPARE(valueMap.size(), 2);
+
+    QCOMPARE(valueMap["name"].toString(), QString("MyString"));
+    QVERIFY(valueMap["value"].toString() == "Potato");
+}
+
 void tst_Asn1ValueParser::testEnumValues()
 {
     Asn1Acn::SourceLocation location;
     auto type = std::make_unique<Asn1Acn::Types::Enumerated>();
-    QVariantList enumValues = { "enum1", "enum2", "enum3" };
-    QVariantMap params;
-    params["values"] = enumValues;
-    type->setParameters(params);
+    type->addItem(Asn1Acn::Types::EnumeratedItem(0, "enum1", 0));
+    type->addItem(Asn1Acn::Types::EnumeratedItem(1, "enum2", 1));
+    type->addItem(Asn1Acn::Types::EnumeratedItem(2, "enum3", 2));
     auto assignment = std::make_unique<Asn1Acn::TypeAssignment>("MyEnum", "MyEnum", location, std::move(type));
     auto valueMap = valueParser->parseAsn1Value(assignment.get(), "enum2");
 
@@ -257,10 +273,9 @@ void tst_Asn1ValueParser::testEnumValuesError()
 
     Asn1Acn::SourceLocation location;
     auto type = std::make_unique<Asn1Acn::Types::Enumerated>();
-    QVariantList enumValues = { "enum1", "enum2", "enum3" };
-    QVariantMap params;
-    params["values"] = enumValues;
-    type->setParameters(params);
+    type->addItem(Asn1Acn::Types::EnumeratedItem(0, "enum1", 0));
+    type->addItem(Asn1Acn::Types::EnumeratedItem(1, "enum2", 1));
+    type->addItem(Asn1Acn::Types::EnumeratedItem(2, "enum3", 2));
     auto assignment = std::make_unique<Asn1Acn::TypeAssignment>("MyEnum", "MyEnum", location, std::move(type));
     auto valueMap = valueParser->parseAsn1Value(assignment.get(), "enum");
 
@@ -475,14 +490,13 @@ void tst_Asn1ValueParser::testSequenceOfValue()
 {
     Asn1Acn::SourceLocation location;
     auto ofType = std::make_unique<Asn1Acn::Types::Enumerated>();
-    QVariantList enumValues = { "red", "green", "blue" };
-    QVariantMap params;
-    params["values"] = enumValues;
-    params["Min"] = 2;
-    params["Max"] = 2;
-    ofType->setParameters(params);
+    ofType->addItem(Asn1Acn::Types::EnumeratedItem(0, "red", 0));
+    ofType->addItem(Asn1Acn::Types::EnumeratedItem(1, "green", 1));
+    ofType->addItem(Asn1Acn::Types::EnumeratedItem(2, "blue", 2));
 
     auto type = std::make_unique<Asn1Acn::Types::SequenceOf>();
+    auto range = Range<typename IntegerValue::Type>(2, 2);
+    type->constraints().append(range);
     type->setItemsType(std::move(ofType));
 
     auto assignment =
@@ -510,19 +524,16 @@ void tst_Asn1ValueParser::testUserType()
     Asn1Acn::SourceLocation location;
 
     auto colorType = std::make_unique<Asn1Acn::Types::Enumerated>();
-    QVariantList enumValues = { "red", "green", "blue" };
-    QVariantMap emunPparams;
-    emunPparams["values"] = enumValues;
-    colorType->setParameters(emunPparams);
+    colorType->addItem(Asn1Acn::Types::EnumeratedItem(0, "red", 0));
+    colorType->addItem(Asn1Acn::Types::EnumeratedItem(1, "green", 1));
+    colorType->addItem(Asn1Acn::Types::EnumeratedItem(2, "blue", 2));
     auto colorAssignment = std::make_unique<Asn1Acn::TypeAssignment>("Color", "Color", location, std::move(colorType));
 
     auto userType = std::make_unique<Asn1Acn::Types::UserdefinedType>("Color", "", colorAssignment.get());
-    QVariantMap userParams;
-    userParams["Min"] = 2;
-    userParams["Max"] = 2;
-    userType->setParameters(userParams);
 
     auto type = std::make_unique<Asn1Acn::Types::SequenceOf>();
+    auto range = Range<typename IntegerValue::Type>(2, 2);
+    type->constraints().append(range);
     type->setItemsType(std::move(userType));
     auto assignment =
             std::make_unique<Asn1Acn::TypeAssignment>("MySequenceOf", "MySequenceOf", location, std::move(type));

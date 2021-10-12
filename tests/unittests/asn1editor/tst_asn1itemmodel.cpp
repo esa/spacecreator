@@ -21,6 +21,8 @@
 #include "sourcelocation.h"
 #include "typeassignment.h"
 
+#include "constraints/rangeconstraint.h"
+#include "constraints/sizeconstraint.h"
 #include "types/bitstring.h"
 #include "types/boolean.h"
 #include "types/choice.h"
@@ -33,6 +35,8 @@
 #include "types/real.h"
 #include "types/sequence.h"
 #include "types/sequenceof.h"
+#include "values.h"
+#include "range.h"
 
 #include <QStandardItem>
 #include <QtTest>
@@ -55,6 +59,14 @@ private Q_SLOTS:
     void testIntTypeModelWithRange();
     void testRealTypeModelWithRange();
     void testBoolTypeModel();
+    void testBitStringTypeModel();
+    void testBitStringTypeModelWithRange();
+    void testIA5StringTypeModel();
+    void testIA5StringTypeModelWithRange();
+    void testNumericStringTypeModel();
+    void testNumericStringTypeModelWithRange();
+    void testOctetStringTypeModel();
+    void testOctetStringTypeModelWithRange();
     void testEnumTypeModel();
     void testChoiceTypeModel();
     void testSequenceTypeModel();
@@ -112,7 +124,8 @@ void tst_Asn1ItemModel::testIntTypeModelWithRange()
 {
     Asn1Acn::SourceLocation location;
     auto type = std::make_unique<Asn1Acn::Types::Integer>();
-    type->setParameters({ { "min", 5 }, { "max", 15 } });
+    auto range = Asn1Acn::Range<typename Asn1Acn::IntegerValue::Type>(5, 15);
+    type->constraints().append(range);
     auto assignment = std::make_unique<Asn1Acn::TypeAssignment>("MyInt", "MyInt", location, std::move(type));
     itemModel->setAsn1Model(assignment);
 
@@ -125,7 +138,8 @@ void tst_Asn1ItemModel::testRealTypeModelWithRange()
 {
     Asn1Acn::SourceLocation location;
     auto type = std::make_unique<Asn1Acn::Types::Real>();
-    type->setParameters({ { "min", 10.0 }, { "max", 50.0 } });
+    auto range = Asn1Acn::Range<typename Asn1Acn::RealValue::Type>(10.0, 50.0);
+    type->constraints().append(range);
     auto assignment = std::make_unique<Asn1Acn::TypeAssignment>("MyDouble", "MyDouble", location, std::move(type));
     itemModel->setAsn1Model(assignment);
 
@@ -146,12 +160,126 @@ void tst_Asn1ItemModel::testBoolTypeModel()
     QCOMPARE(toAsn1Type(itemModel->item(0, MODEL_VALUE_INDEX)->data(ASN1TYPE_ROLE)), Asn1Acn::Types::Type::BOOLEAN);
 }
 
+void tst_Asn1ItemModel::testBitStringTypeModel()
+{
+    Asn1Acn::SourceLocation location;
+    auto type = std::make_unique<Asn1Acn::Types::BitString>();
+    auto assignment = std::make_unique<Asn1Acn::TypeAssignment>("MyBitString", "MyBitString", location, std::move(type));
+    itemModel->setAsn1Model(assignment);
+
+    QCOMPARE(itemModel->item(0, MODEL_NAME_INDEX)->text(), QString("MyBitString"));
+    QCOMPARE(itemModel->item(0, MODEL_TYPE_INDEX)->text(), QString("BIT STRING"));
+    QCOMPARE(toAsn1Type(itemModel->item(0, MODEL_VALUE_INDEX)->data(ASN1TYPE_ROLE)), Asn1Acn::Types::Type::BITSTRING);
+}
+
+void tst_Asn1ItemModel::testBitStringTypeModelWithRange()
+{
+    Asn1Acn::SourceLocation location;
+    auto type = std::make_unique<Asn1Acn::Types::BitString>();
+    auto range = Asn1Acn::Range<int64_t>(1, 10);
+    auto rangeConstraint = std::make_unique<Asn1Acn::Constraints::RangeConstraint<Asn1Acn::IntegerValue>>(range);
+    auto sizeConstraint = std::make_unique<Asn1Acn::Constraints::SizeConstraint<Asn1Acn::BitStringValue>>(std::move(rangeConstraint));
+    type->constraints().append(std::move(sizeConstraint));
+    auto assignment = std::make_unique<Asn1Acn::TypeAssignment>("MyBitString", "MyBitString", location, std::move(type));
+    itemModel->setAsn1Model(assignment);
+
+    QCOMPARE(itemModel->item(0, MODEL_NAME_INDEX)->text(), QString("MyBitString"));
+    QCOMPARE(itemModel->item(0, MODEL_TYPE_INDEX)->text(), QString("BIT STRING Length(1..10)"));
+    QCOMPARE(toAsn1Type(itemModel->item(0, MODEL_VALUE_INDEX)->data(ASN1TYPE_ROLE)), Asn1Acn::Types::Type::BITSTRING);
+}
+
+void tst_Asn1ItemModel::testIA5StringTypeModel()
+{
+    Asn1Acn::SourceLocation location;
+    auto type = std::make_unique<Asn1Acn::Types::IA5String>();
+    auto assignment = std::make_unique<Asn1Acn::TypeAssignment>("MyIA5String", "MyIA5String", location, std::move(type));
+    itemModel->setAsn1Model(assignment);
+
+    QCOMPARE(itemModel->item(0, MODEL_NAME_INDEX)->text(), QString("MyIA5String"));
+    QCOMPARE(itemModel->item(0, MODEL_TYPE_INDEX)->text(), QString("IA5String"));
+    QCOMPARE(toAsn1Type(itemModel->item(0, MODEL_VALUE_INDEX)->data(ASN1TYPE_ROLE)), Asn1Acn::Types::Type::IA5STRING);
+}
+
+void tst_Asn1ItemModel::testIA5StringTypeModelWithRange()
+{
+    Asn1Acn::SourceLocation location;
+    auto type = std::make_unique<Asn1Acn::Types::IA5String>();
+    auto range = Asn1Acn::Range<int64_t>(1, 10);
+    auto rangeConstraint = std::make_unique<Asn1Acn::Constraints::RangeConstraint<Asn1Acn::IntegerValue>>(range);
+    auto sizeConstraint = std::make_unique<Asn1Acn::Constraints::SizeConstraint<Asn1Acn::StringValue>>(std::move(rangeConstraint));
+    type->constraints().append(std::move(sizeConstraint));
+    auto assignment = std::make_unique<Asn1Acn::TypeAssignment>("MyIA5String", "MyIA5String", location, std::move(type));
+    itemModel->setAsn1Model(assignment);
+
+    QCOMPARE(itemModel->item(0, MODEL_NAME_INDEX)->text(), QString("MyIA5String"));
+    QCOMPARE(itemModel->item(0, MODEL_TYPE_INDEX)->text(), QString("IA5String Length(1..10)"));
+    QCOMPARE(toAsn1Type(itemModel->item(0, MODEL_VALUE_INDEX)->data(ASN1TYPE_ROLE)), Asn1Acn::Types::Type::IA5STRING);
+}
+
+void tst_Asn1ItemModel::testNumericStringTypeModel()
+{
+    Asn1Acn::SourceLocation location;
+    auto type = std::make_unique<Asn1Acn::Types::NumericString>();
+    auto assignment = std::make_unique<Asn1Acn::TypeAssignment>("MyNumericString", "MyNumericString", location, std::move(type));
+    itemModel->setAsn1Model(assignment);
+
+    QCOMPARE(itemModel->item(0, MODEL_NAME_INDEX)->text(), QString("MyNumericString"));
+    QCOMPARE(itemModel->item(0, MODEL_TYPE_INDEX)->text(), QString("NumericString"));
+    QCOMPARE(toAsn1Type(itemModel->item(0, MODEL_VALUE_INDEX)->data(ASN1TYPE_ROLE)), Asn1Acn::Types::Type::NUMERICSTRING);
+}
+
+void tst_Asn1ItemModel::testNumericStringTypeModelWithRange()
+{
+    Asn1Acn::SourceLocation location;
+    auto type = std::make_unique<Asn1Acn::Types::NumericString>();
+    auto range = Asn1Acn::Range<int64_t>(1, 10);
+    auto rangeConstraint = std::make_unique<Asn1Acn::Constraints::RangeConstraint<Asn1Acn::IntegerValue>>(range);
+    auto sizeConstraint = std::make_unique<Asn1Acn::Constraints::SizeConstraint<Asn1Acn::StringValue>>(std::move(rangeConstraint));
+    type->constraints().append(std::move(sizeConstraint));
+    auto assignment = std::make_unique<Asn1Acn::TypeAssignment>("MyNumericString", "MyNumericString", location, std::move(type));
+    itemModel->setAsn1Model(assignment);
+
+    QCOMPARE(itemModel->item(0, MODEL_NAME_INDEX)->text(), QString("MyNumericString"));
+    QCOMPARE(itemModel->item(0, MODEL_TYPE_INDEX)->text(), QString("NumericString Length(1..10)"));
+    QCOMPARE(toAsn1Type(itemModel->item(0, MODEL_VALUE_INDEX)->data(ASN1TYPE_ROLE)), Asn1Acn::Types::Type::NUMERICSTRING);
+}
+
+void tst_Asn1ItemModel::testOctetStringTypeModel()
+{
+    Asn1Acn::SourceLocation location;
+    auto type = std::make_unique<Asn1Acn::Types::OctetString>();
+    auto assignment = std::make_unique<Asn1Acn::TypeAssignment>("MyOctetString", "MyOctetString", location, std::move(type));
+    itemModel->setAsn1Model(assignment);
+
+    QCOMPARE(itemModel->item(0, MODEL_NAME_INDEX)->text(), QString("MyOctetString"));
+    QCOMPARE(itemModel->item(0, MODEL_TYPE_INDEX)->text(), QString("OCTET STRING"));
+    QCOMPARE(toAsn1Type(itemModel->item(0, MODEL_VALUE_INDEX)->data(ASN1TYPE_ROLE)), Asn1Acn::Types::Type::OCTETSTRING);
+}
+
+void tst_Asn1ItemModel::testOctetStringTypeModelWithRange()
+{
+    Asn1Acn::SourceLocation location;
+    auto type = std::make_unique<Asn1Acn::Types::OctetString>();
+    auto range = Asn1Acn::Range<int64_t>(1, 10);
+    auto rangeConstraint = std::make_unique<Asn1Acn::Constraints::RangeConstraint<Asn1Acn::IntegerValue>>(range);
+    auto sizeConstraint = std::make_unique<Asn1Acn::Constraints::SizeConstraint<Asn1Acn::OctetStringValue>>(std::move(rangeConstraint));
+    type->constraints().append(std::move(sizeConstraint));
+    auto assignment = std::make_unique<Asn1Acn::TypeAssignment>("MyOctetString", "MyOctetString", location, std::move(type));
+    itemModel->setAsn1Model(assignment);
+
+    QCOMPARE(itemModel->item(0, MODEL_NAME_INDEX)->text(), QString("MyOctetString"));
+    QCOMPARE(itemModel->item(0, MODEL_TYPE_INDEX)->text(), QString("OCTET STRING Length(1..10)"));
+    QCOMPARE(toAsn1Type(itemModel->item(0, MODEL_VALUE_INDEX)->data(ASN1TYPE_ROLE)), Asn1Acn::Types::Type::OCTETSTRING);
+}
+
 void tst_Asn1ItemModel::testEnumTypeModel()
 {
     QVariantList enumValues = { "enum1", "enum2", "enum3" };
     Asn1Acn::SourceLocation location;
     auto type = std::make_unique<Asn1Acn::Types::Enumerated>();
-    type->setParameters({ { "values", enumValues } });
+    type->addItem(Asn1Acn::Types::EnumeratedItem(0, "enum1", 0));
+    type->addItem(Asn1Acn::Types::EnumeratedItem(1, "enum2", 1));
+    type->addItem(Asn1Acn::Types::EnumeratedItem(2, "enum3", 2));
     auto assignment = std::make_unique<Asn1Acn::TypeAssignment>("MyEnum", "MyEnum", location, std::move(type));
     itemModel->setAsn1Model(assignment);
 

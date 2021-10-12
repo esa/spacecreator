@@ -20,13 +20,30 @@
 #include <QMap>
 #include <QStandardItemModel>
 #include <memory>
+#include <optional>
 
 class QStandardItem;
 
 namespace Asn1Acn {
+namespace Constraints {
+template<typename ValueType>
+class Constraint;
+template<typename ValueType>
+class ConstraintList;
+template<typename ValueType>
+class WithConstraints;
+}
 namespace Types {
+class Boolean;
+class Choice;
+class Enumerated;
+class Sequence;
+class SequenceOf;
 class Type;
 }
+class IntegerValue;
+template<typename T>
+class Range;
 class TypeAssignment;
 }
 
@@ -47,15 +64,27 @@ private:
 
     ItemMap createModelItems(const Asn1Acn::Types::Type *asn1Item, const QString &name = {});
 
-    QStandardItem *createNumberItem(const Asn1Acn::Types::Type *asn1Item);
-    QStandardItem *createBoolItem(const Asn1Acn::Types::Type *asn1Item);
-    QStandardItem *createSequenceItem(const Asn1Acn::Types::Type *asn1Item, QStandardItem *parent);
-    QStandardItem *createSequenceOfItem(const Asn1Acn::Types::Type *asn1Item, QStandardItem *parent);
-    QStandardItem *createEnumeratedItem(const Asn1Acn::Types::Type *asn1Item);
-    QStandardItem *createChoiceItem(const Asn1Acn::Types::Type *asn1Item, QStandardItem *parent);
-    QStandardItem *createItem(const Asn1Acn::Types::Type *asn1Item, const QString &text = QString());
+    template<typename ValueType>
+    QStandardItem *createNumberItem(const Asn1Acn::Constraints::WithConstraints<ValueType> *asn1Item, QString &typeLimit);
+    QStandardItem *createBoolItem(const Asn1Acn::Types::Boolean *asn1Item);
+    template<typename ValueType>
+    QStandardItem *createStringItem(const Asn1Acn::Constraints::WithConstraints<ValueType> *asn1Item, QString &typeLimit);
+    QStandardItem *createSequenceItem(const Asn1Acn::Types::Sequence *asn1Item, QStandardItem *parent);
+    QStandardItem *createSequenceOfItem(const Asn1Acn::Types::SequenceOf *asn1Item, QStandardItem *parent, QString &typeLimit);
+    QStandardItem *createEnumeratedItem(const Asn1Acn::Types::Enumerated *asn1Item);
+    QStandardItem *createChoiceItem(const Asn1Acn::Types::Choice *asn1Item, QStandardItem *parent);
 
-    QStandardItem *createPresentItem(const Asn1Acn::Types::Type *asn1Item);
+    QStandardItem *createPresentItem();
+
+    template<typename ValueType>
+    std::optional<Asn1Acn::Range<typename ValueType::Type>> combineRanges(const Asn1Acn::Constraints::ConstraintList<ValueType> &constraintList);
+    template<typename ValueType>
+    std::optional<Asn1Acn::Range<typename ValueType::Type>> combineRange(const Asn1Acn::Constraints::Constraint<ValueType> *constraint);
+
+    template<typename ValueType>
+    std::optional<Asn1Acn::Range<int64_t>> combineSizes(const Asn1Acn::Constraints::ConstraintList<ValueType> &constraintList);
+    template<typename ValueType>
+    std::optional<Asn1Acn::Range<int64_t>> combineSize(const Asn1Acn::Constraints::Constraint<ValueType> *constraint);
 };
 
 } // namespace asn1

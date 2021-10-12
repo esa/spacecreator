@@ -35,7 +35,6 @@ Type::Type(const QString &identifier)
 
 Type::Type(const Type& other)
     : m_identifier(other.m_identifier)
-    , m_parameters(other.m_parameters)
     , m_alignment(other.m_alignment)
 {
 }
@@ -54,26 +53,9 @@ const QString &Type::identifier() const
     return m_identifier;
 }
 
-void Type::setIdentifier(const QString &name)
+void Type::setIdentifier(QString name)
 {
-    m_identifier = name;
-}
-
-/*!
-   Data values of this ASN1 type (like min/max for numbers)
- */
-const QVariantMap &Type::parameters() const
-{
-    return m_parameters;
-}
-
-/*!
-   Set parameters
-   Example for numbers: { { "min", 5 }, { "max", 15 } }
- */
-void Type::setParameters(const QVariantMap &parameters)
-{
-    m_parameters = parameters;
+    m_identifier = std::move(name);
 }
 
 AlignToNext Type::mapAlignToNext(QStringRef in)

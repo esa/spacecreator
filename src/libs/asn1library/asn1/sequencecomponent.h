@@ -54,6 +54,7 @@ public:
     virtual std::unique_ptr<SequenceComponent> clone() const = 0;
     virtual QString definitionAsString() const = 0;
     virtual QString presentWhen() const = 0;
+    virtual bool isOptional() const = 0;
 
     const QString &name() const { return m_name; }
     const QString &cName() const { return m_cName; }

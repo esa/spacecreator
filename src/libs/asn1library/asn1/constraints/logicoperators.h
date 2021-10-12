@@ -41,8 +41,8 @@ public:
     {}
     ~AndConstraint() override = default;
 
-    const Constraint<ValueType> &leftChild() const { return *m_leftChild; }
-    const Constraint<ValueType> &rightChild() const { return *m_rightChild; }
+    const Constraint<ValueType> *leftChild() const { return m_leftChild.get(); }
+    const Constraint<ValueType> *rightChild() const { return m_rightChild.get(); }
 
     void accept(ConstraintVisitor<ValueType> &visitor) const override { visitor.visit(*this); }
 
@@ -67,8 +67,8 @@ public:
     {}
     ~OrConstraint() override = default;
 
-    const Constraint<ValueType> &leftChild() const { return *m_leftChild; }
-    const Constraint<ValueType> &rightChild() const { return *m_rightChild; }
+    const Constraint<ValueType> *leftChild() const { return m_leftChild.get(); }
+    const Constraint<ValueType> *rightChild() const { return m_rightChild.get(); }
 
     void accept(ConstraintVisitor<ValueType> &visitor) const override { visitor.visit(*this); }
 

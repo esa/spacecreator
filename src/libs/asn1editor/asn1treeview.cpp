@@ -89,7 +89,8 @@ void Asn1TreeView::setAsn1Value(const QVariantMap &asn1Value)
 
         setChildValue(nameItem, asn1Value["choice"], -1, itemChoiceIndex(nameItem, choiceValue));
     } else if (asnType.startsWith("integer", Qt::CaseInsensitive) || asnType.startsWith("double", Qt::CaseInsensitive)
-            || asnType.startsWith("real", Qt::CaseInsensitive) || asnType.startsWith("string", Qt::CaseInsensitive)
+            || asnType.startsWith("real", Qt::CaseInsensitive) || asnType.startsWith("string", Qt::CaseInsensitive) || asnType.startsWith("ia5string", Qt::CaseInsensitive)
+            || asnType.startsWith("numericstring", Qt::CaseInsensitive) || asnType.startsWith("bitstring", Qt::CaseInsensitive) || asnType.startsWith("octetstring", Qt::CaseInsensitive)
             || asnType.startsWith("enumerated", Qt::CaseInsensitive)) {
         m_ItemModel->item(row, MODEL_VALUE_INDEX)->setText(asn1Value["value"].toString());
     } else if (asnType.startsWith("bool", Qt::CaseInsensitive)) {

@@ -46,9 +46,9 @@ public:
     std::unique_ptr<SequenceComponent> clone() const override;
     QString definitionAsString() const override;
     QString presentWhen() const override;
+    bool isOptional() const override;
 
     const SourceLocation &location() const;
-    bool isOptional() const;
 
 private:
     bool m_optional;

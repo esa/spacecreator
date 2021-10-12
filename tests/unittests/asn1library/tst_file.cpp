@@ -39,7 +39,8 @@ void tst_File::addAsn1Types()
 {
     Asn1Acn::SourceLocation location;
     auto type = std::make_unique<Asn1Acn::Types::Integer>();
-    type->setParameters({ { "min", 0 }, { "max", 255 } });
+    auto range = Asn1Acn::Range<typename Asn1Acn::IntegerValue::Type>(0, 255);
+    type->constraints().append(range);
     auto assignment = std::make_unique<Asn1Acn::TypeAssignment>("MyInt", "MyInt", location, std::move(type));
 
     auto asn1Definitions = std::make_unique<Asn1Acn::Definitions>("TestDef", location);

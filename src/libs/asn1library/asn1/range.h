@@ -54,6 +54,8 @@ public:
 
     QList<Range> difference(const Range &other) const;
 
+    bool check(const T value) const;
+
 private:
     T m_begin;
     T m_end;
@@ -82,8 +84,6 @@ bool Range<T>::intersects(const Range &other) const
 template<typename T>
 Range<T> Range<T>::merge(const Range &other) const
 {
-    Q_ASSERT(canMerge(other));
-
     return {qMin(begin(), other.begin()), qMax(end(), other.end())};
 }
 
@@ -99,8 +99,6 @@ bool Range<T>::canMerge(const Range &other) const
 template<typename T>
 Range<T> Range<T>::intersection(const Range &other) const
 {
-    Q_ASSERT(intersects(other));
-
     return {qMax(begin(), other.begin()), qMin(end(), other.end())};
 }
 
@@ -118,6 +116,19 @@ QList<Range<T>> Range<T>::difference(const Range &other) const
     if (other.end() >= end())
         return {first};
     return {first, second};
+}
+
+template<typename T>
+bool Range<T>::check(const T value) const
+{
+    if(value < m_begin) {
+        return false;
+    }
+    if(value > m_end) {
+        return false;
+    }
+
+    return true;
 }
 
 }

@@ -18,13 +18,23 @@
 #include "asn1valueparser.h"
 
 #include "asn1const.h"
+#include "constraints/logicoperators.h"
+#include "constraints/rangeconstraint.h"
+#include "constraints/sizeconstraint.h"
 #include "typeassignment.h"
+#include "types/bitstring.h"
 #include "types/choice.h"
-#include "types/type.h"
-#include "types/userdefinedtype.h"
+#include "types/enumerated.h"
+#include "types/ia5string.h"
+#include "types/integer.h"
+#include "types/numericstring.h"
+#include "types/octetstring.h"
+#include "types/real.h"
 #include "types/sequence.h"
 #include "types/sequenceof.h"
-#include "types/enumerated.h"
+#include "types/type.h"
+#include "types/userdefinedtype.h"
+#include "values.h"
 
 #include <QVariant>
 
@@ -77,19 +87,20 @@ QVariantMap Asn1ValueParser::parseAsn1Value(
     QString value = asn1Value.trimmed();
 
     valueMap["name"] = type->identifier();
-    const QVariantMap &asn1Values = type->parameters();
 
     switch (type->typeEnum()) {
     case Asn1Acn::Types::Type::INTEGER: {
-        int intVal = value.toInt(&ok);
-        if (ok && (ok = checkRange(asn1Values, intVal))) {
+        const auto *integerType = dynamic_cast<const Asn1Acn::Types::Integer*>(type);
+        const auto integerValue = value.toInt(&ok);
+        if (ok && (ok = checkRange<Asn1Acn::IntegerValue>(integerType, integerValue))) {
             valueMap["value"] = value;
         }
         break;
     }
     case Asn1Acn::Types::Type::REAL: {
-        double doubleVal = value.toDouble(&ok);
-        if (ok && (ok = checkRange(asn1Values, doubleVal))) {
+        const auto *realType = dynamic_cast<const Asn1Acn::Types::Real*>(type);
+        const auto realValue = value.toDouble(&ok);
+        if (ok && (ok = checkRange<Asn1Acn::RealValue>(realType, realValue))) {
             valueMap["value"] = value;
         }
         break;
@@ -106,14 +117,15 @@ QVariantMap Asn1ValueParser::parseAsn1Value(
         break;
     }
     case Asn1Acn::Types::Type::SEQUENCEOF: {
+        const auto *sequenceOfType = dynamic_cast<const Asn1Acn::Types::SequenceOf*>(type);
         ok = parseSequenceOfValue(type, value, valueMap)
-                && checkRange(asn1Values, valueMap["seqofvalue"].toList().count());
+                && checkSize<IntegerValue>(sequenceOfType, valueMap["seqofvalue"].toList().count());
         break;
     }
     case Asn1Acn::Types::Type::ENUMERATED: {
-        QVariantList values = asn1Values["values"].toList();
-        // check enumerated value
-        ok = values.contains(value);
+        const auto *enumeratedType = dynamic_cast<const Asn1Acn::Types::Enumerated*>(type);
+        const auto &enumeratedItems = enumeratedType->items();
+        ok = enumeratedItems.contains(value);
         if (ok) {
             valueMap["value"] = value;
         }
@@ -123,25 +135,40 @@ QVariantMap Asn1ValueParser::parseAsn1Value(
         ok = parseChoiceValue(type, value, valueMap);
         break;
     }
-    case Asn1Acn::Types::Type::BITSTRING:
-    case Asn1Acn::Types::Type::IA5STRING:
-    case Asn1Acn::Types::Type::NUMERICSTRING:
-    case Asn1Acn::Types::Type::OCTETSTRING:
-    case Asn1Acn::Types::Type::STRING:
-    default: {
-        // take string between " "
-        if (value.startsWith("\"")) {
-            value = value.remove(0, 1);
-        }
-        if (value.endsWith("\"")) {
-            value.chop(1);
-        }
-
-        ok = checkRange(asn1Values, value.length());
+    case Asn1Acn::Types::Type::BITSTRING: {
+        const auto *bitStringType = dynamic_cast<const Asn1Acn::Types::BitString*>(type);
+        ok = checkStringLength(bitStringType, value);
         if (ok) {
             valueMap["value"] = value;
         }
+        break;
     }
+    case Asn1Acn::Types::Type::IA5STRING: {
+        const auto *ia5String = dynamic_cast<const Asn1Acn::Types::IA5String*>(type);
+        ok = checkStringLength(ia5String, value);
+        if (ok) {
+            valueMap["value"] = value;
+        }
+        break;
+    }
+    case Asn1Acn::Types::Type::NUMERICSTRING: {
+        const auto *numericString = dynamic_cast<const Asn1Acn::Types::NumericString*>(type);
+        ok = checkStringLength(numericString, value);
+        if (ok) {
+            valueMap["value"] = value;
+        }
+        break;
+    }
+    case Asn1Acn::Types::Type::OCTETSTRING: {
+        const auto *octetString = dynamic_cast<const Asn1Acn::Types::OctetString*>(type);
+        ok = checkStringLength(octetString, value);
+        if (ok) {
+            valueMap["value"] = value;
+        }
+        break;
+    }
+    default:
+        break;
     }
 
     if (!ok) {
@@ -322,14 +349,87 @@ bool Asn1ValueParser::parseChoiceValue(
     return false;
 }
 
-bool Asn1ValueParser::checkRange(const QVariantMap &asn1Type, const QVariant &value) const
+template<typename ValueType>
+bool Asn1ValueParser::checkRange(const Constraints::WithConstraints<ValueType> *asn1Type, const typename ValueType::Type &value) const
 {
-    if (asn1Type.contains(ASN1_MIN) && value < asn1Type[ASN1_MIN])
-        return false;
-    else if (asn1Type.contains(ASN1_MAX) && value > asn1Type[ASN1_MAX])
-        return false;
+    for(const auto &constraint : asn1Type->constraints().constraints()) {
+        if(!checkRangeConstraint<ValueType>(constraint.get(), value)) {
+            return false;
+        }
+    }
 
     return true;
+}
+
+template<typename ValueType>
+bool Asn1ValueParser::checkSize(const Constraints::WithConstraints<ValueType> *asn1Type, const int32_t value) const
+{
+    for(const auto &constraint : asn1Type->constraints().constraints()) {
+        if(!checkSizeConstraint<ValueType>(constraint.get(), value)) {
+            return false;
+        }
+    }
+
+    return true;
+}
+
+template<typename ValueType>
+bool Asn1ValueParser::checkStringLength(const Constraints::WithConstraints<ValueType> *asn1Type, QString value) const
+{
+    // take string between " "
+    if (value.startsWith("\"")) {
+        value = value.remove(0, 1);
+    }
+    if (value.endsWith("\"")) {
+        value.chop(1);
+    }
+
+    return checkSize(asn1Type, value.length());
+}
+
+template<typename ValueType>
+bool Asn1ValueParser::checkRangeConstraint(const Constraints::Constraint<ValueType> *constraint, const typename ValueType::Type &value) const
+{
+    if(!constraint) {
+        return false;
+    }
+
+    if(const auto *andConstraint = dynamic_cast<const Constraints::AndConstraint<ValueType>*>(constraint); andConstraint) {
+        const auto leftConstraint = checkRangeConstraint(andConstraint->leftChild(), value);
+        const auto rightConstraint = checkRangeConstraint(andConstraint->rightChild(), value);
+        return leftConstraint && rightConstraint;
+    } else if (const auto *orConstraint = dynamic_cast<const Constraints::OrConstraint<ValueType>*>(constraint); orConstraint) {
+        const auto leftConstraint = checkRangeConstraint(andConstraint->leftChild(), value);
+        const auto rightConstraint = checkRangeConstraint(andConstraint->rightChild(), value);
+        return leftConstraint || rightConstraint;
+    } else if (const auto *rangeConstraint = dynamic_cast<const Constraints::RangeConstraint<ValueType>*>(constraint); rangeConstraint) {
+        const auto &range = rangeConstraint->range();
+        return range.check(value);
+    } else {
+        return true;
+    }
+}
+
+template<typename ValueType>
+bool Asn1ValueParser::checkSizeConstraint(const Constraints::Constraint<ValueType> *constraint, const int32_t value) const
+{
+    if(!constraint) {
+        return false;
+    }
+
+    if(const auto *andConstraint = dynamic_cast<const Constraints::AndConstraint<ValueType>*>(constraint); andConstraint) {
+        const auto leftConstraint = checkSizeConstraint<ValueType>(andConstraint->leftChild(), value);
+        const auto rightConstraint = checkSizeConstraint<ValueType>(andConstraint->rightChild(), value);
+        return leftConstraint && rightConstraint;
+    } else if (const auto *orConstraint = dynamic_cast<const Constraints::OrConstraint<ValueType>*>(constraint); orConstraint) {
+        const auto leftConstraint = checkSizeConstraint<ValueType>(andConstraint->leftChild(), value);
+        const auto rightConstraint = checkSizeConstraint<ValueType>(andConstraint->rightChild(), value);
+        return leftConstraint || rightConstraint;
+    } else if (const auto *sizeConstraint = dynamic_cast<const Constraints::SizeConstraint<ValueType>*>(constraint); sizeConstraint) {
+        return checkRangeConstraint<IntegerValue>(sizeConstraint->innerConstraints(), value);
+    } else {
+        return true;
+    }
 }
 
 int Asn1ValueParser::nextIndex(const QString &value) const

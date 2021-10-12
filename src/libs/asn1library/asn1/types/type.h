@@ -84,11 +84,9 @@ public:
     virtual std::unique_ptr<Type> clone() const = 0;
 
     const QString &identifier() const;
+    void setIdentifier(QString name);
 
     virtual QString baseIconFile() const = 0;
-
-    const QVariantMap &parameters() const;
-    void setParameters(const QVariantMap &parameters);
 
     void setAlignToNext(const AlignToNext alignToNext) { m_alignment = alignToNext; }
     AlignToNext alignToNext() const { return m_alignment; }
@@ -102,12 +100,9 @@ public:
     static QString alignToNextToString(AlignToNext param);
     static QString endiannessToString(Endianness param);
 
-    void setIdentifier(const QString &name);
-
 protected:
 
     QString m_identifier;
-    QVariantMap m_parameters;
 
     AlignToNext m_alignment;
 

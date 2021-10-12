@@ -81,9 +81,9 @@ template<typename ValueType>
 void PrintingVisitor<ValueType>::visit(const AndConstraint<ValueType> &constraint)
 {
     m_stream << "(";
-    constraint.leftChild().accept(*this);
+    constraint.leftChild()->accept(*this);
     m_stream << " ^ ";
-    constraint.rightChild().accept(*this);
+    constraint.rightChild()->accept(*this);
     m_stream << ")";
 }
 
@@ -91,9 +91,9 @@ template<typename ValueType>
 void PrintingVisitor<ValueType>::visit(const OrConstraint<ValueType> &constraint)
 {
     m_stream << "(";
-    constraint.leftChild().accept(*this);
+    constraint.leftChild()->accept(*this);
     m_stream << " | ";
-    constraint.rightChild().accept(*this);
+    constraint.rightChild()->accept(*this);
     m_stream << ")";
 }
 
