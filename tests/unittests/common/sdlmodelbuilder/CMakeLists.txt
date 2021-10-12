@@ -1,7 +1,9 @@
 project(SdlModelBuilder VERSION 1.0.0 LANGUAGES CXX)
 
-set(SOURCES sdlmodelbuilder.cpp)
-set(INCLUDES sdlmodelbuilder.h)
+set(SOURCES sdlmodelbuilder.cpp
+            sdlprocessbuilder.cpp)
+set(INCLUDES sdlmodelbuilder.h
+             sdlprocessbuilder.h)
 
 add_library(SdlModelBuilder STATIC)
 target_sources(SdlModelBuilder

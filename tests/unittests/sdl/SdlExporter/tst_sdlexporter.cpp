@@ -22,6 +22,7 @@
 #include <QObject>
 #include <QtTest>
 #include <common/sdlmodelbuilder/sdlmodelbuilder.h>
+#include <common/sdlmodelbuilder/sdlprocessbuilder.h>
 #include <conversion/common/options.h>
 #include <memory>
 #include <sdl/SdlExporter/SdlOptions/options.h>
@@ -47,6 +48,7 @@ using sdl::VariableDeclaration;
 using sdl::exporter::SdlExporter;
 using sdl::exporter::SdlOptions;
 using tests::common::SdlModelBuilder;
+using tests::common::SdlProcessBuilder;
 
 namespace tests::Sdl {
 
@@ -67,8 +69,11 @@ void tst_sdlmodel::testDefaultValuesInModel()
     const auto exampleModel =
         SdlModelBuilder("")
             .withProcess(
-                Process(processName, std::make_unique<StateMachine>()))
-            .build();
+                SdlProcessBuilder(processName)
+                    .withStateMachine(
+                        StateMachine()
+                    ).build()
+            ).build();
     // clang-format on
 
     QVERIFY(exampleModel->modelType() == ModelType::Sdl);

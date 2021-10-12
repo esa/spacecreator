@@ -17,23 +17,23 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/lgpl-2.1.html>.
  */
 
-#include "sdlmodelbuilder.h"
+#include "sdlprocessbuilder.h"
 
 namespace tests::common {
 
-SdlModelBuilder::SdlModelBuilder(QString name)
+SdlProcessBuilder::SdlProcessBuilder(QString processName)
 {
-    m_modelName = std::move(name);
+    m_processName = std::move(processName);
 }
 
-std::unique_ptr<SdlModel> SdlModelBuilder::build()
+Process SdlProcessBuilder::build()
 {
-    return std::make_unique<SdlModel>(std::move(m_process), m_modelName);
+    return Process(m_processName, std::make_unique<StateMachine>(std::move(m_stateMachine)));
 }
 
-SdlModelBuilder &SdlModelBuilder::withProcess(Process process)
+SdlProcessBuilder &SdlProcessBuilder::withStateMachine(StateMachine stateMachine)
 {
-    m_process = std::move(process);
+    m_stateMachine = std::move(stateMachine);
 
     return *this;
 }
