@@ -17,6 +17,8 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/lgpl-2.1.html>.
  */
 
+#include "statemachine.h"
+
 #include <QObject>
 #include <QtTest>
 #include <common/sdlmodelbuilder/sdlmodelbuilder.h>
@@ -44,6 +46,7 @@ using sdl::Transition;
 using sdl::VariableDeclaration;
 using sdl::exporter::SdlExporter;
 using sdl::exporter::SdlOptions;
+using tests::common::SdlModelBuilder;
 
 namespace tests::Sdl {
 
@@ -59,13 +62,17 @@ private Q_SLOTS:
 void tst_sdlmodel::testDefaultValuesInModel()
 {
     QString processName = "name_of_the_process";
-    auto states = std::vector<std::unique_ptr<State>>();
-    auto transitions = std::vector<std::unique_ptr<Transition>>();
-    auto sm = std::make_unique<StateMachine>(std::move(states), std::move(transitions));
-    SdlModel exampleModel(Process(processName, std::move(sm)));
 
-    QVERIFY(exampleModel.modelType() == ModelType::Sdl);
-    const auto *const data = &exampleModel.data();
+    // clang-format off
+    const auto exampleModel =
+        SdlModelBuilder("")
+            .withProcess(
+                Process(processName, std::make_unique<StateMachine>()))
+            .build();
+    // clang-format on
+
+    QVERIFY(exampleModel->modelType() == ModelType::Sdl);
+    const auto *const data = &exampleModel->data();
     QVERIFY(processName == data->name());
 }
 
