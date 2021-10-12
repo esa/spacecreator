@@ -31,24 +31,9 @@ std::unique_ptr<State> SdlStateBuilder::build()
     return std::make_unique<State>(std::move(m_stateName), std::move(m_inputs), std::move(m_continuousSignals));
 }
 
-SdlStateBuilder &SdlStateBuilder::withInputs(std::vector<std::unique_ptr<Input>> inputs)
-{
-    m_inputs = std::move(inputs);
-
-    return *this;
-}
-
 SdlStateBuilder &SdlStateBuilder::withInput(std::unique_ptr<Input> input)
 {
     m_inputs.push_back(std::move(input));
-
-    return *this;
-}
-
-SdlStateBuilder &SdlStateBuilder::withContinuousSignals(
-        std::vector<std::unique_ptr<ContinuousSignal>> continuousSignals)
-{
-    m_continuousSignals = std::move(continuousSignals);
 
     return *this;
 }

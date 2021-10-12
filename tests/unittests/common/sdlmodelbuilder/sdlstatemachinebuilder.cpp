@@ -26,23 +26,9 @@ std::unique_ptr<StateMachine> SdlStateMachineBuilder::build()
     return std::make_unique<StateMachine>(std::move(m_states), std::move(m_transitions));
 }
 
-SdlStateMachineBuilder &SdlStateMachineBuilder::withStates(std::vector<std::unique_ptr<State>> states)
-{
-    m_states = std::move(states);
-
-    return *this;
-}
-
 SdlStateMachineBuilder &SdlStateMachineBuilder::withState(std::unique_ptr<State> state)
 {
     m_states.push_back(std::move(state));
-
-    return *this;
-}
-
-SdlStateMachineBuilder &SdlStateMachineBuilder::withTransitions(std::vector<std::unique_ptr<Transition>> transitions)
-{
-    m_transitions = std::move(transitions);
 
     return *this;
 }

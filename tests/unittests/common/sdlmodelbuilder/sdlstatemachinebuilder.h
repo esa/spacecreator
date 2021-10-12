@@ -38,9 +38,7 @@ public:
 
     std::unique_ptr<StateMachine> build();
 
-    auto withStates(std::vector<std::unique_ptr<State>> states) -> SdlStateMachineBuilder &;
     auto withState(std::unique_ptr<State> state) -> SdlStateMachineBuilder &;
-    auto withTransitions(std::vector<std::unique_ptr<Transition>> transitions) -> SdlStateMachineBuilder &;
     auto withTransition(std::unique_ptr<Transition> transition) -> SdlStateMachineBuilder &;
 
 private:

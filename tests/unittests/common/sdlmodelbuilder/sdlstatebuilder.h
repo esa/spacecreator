@@ -36,9 +36,7 @@ public:
     SdlStateBuilder(QString stateName);
     std::unique_ptr<State> build();
 
-    auto withInputs(std::vector<std::unique_ptr<Input>> inputs) -> SdlStateBuilder &;
     auto withInput(std::unique_ptr<Input> input) -> SdlStateBuilder &;
-    auto withContinuousSignals(std::vector<std::unique_ptr<ContinuousSignal>> continuousSignals) -> SdlStateBuilder &;
     auto withContinuousSignal(std::unique_ptr<ContinuousSignal> continuousSignal) -> SdlStateBuilder &;
 
 private:
