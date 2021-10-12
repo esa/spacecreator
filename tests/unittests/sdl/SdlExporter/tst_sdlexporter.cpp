@@ -21,6 +21,7 @@
 
 #include <QObject>
 #include <QtTest>
+#include <common/sdlmodelbuilder/sdlinputbuilder.h>
 #include <common/sdlmodelbuilder/sdlmodelbuilder.h>
 #include <common/sdlmodelbuilder/sdlprocessbuilder.h>
 #include <common/sdlmodelbuilder/sdlstatebuilder.h>
@@ -50,6 +51,7 @@ using sdl::Transition;
 using sdl::VariableDeclaration;
 using sdl::exporter::SdlExporter;
 using sdl::exporter::SdlOptions;
+using tests::common::SdlInputBuilder;
 using tests::common::SdlModelBuilder;
 using tests::common::SdlProcessBuilder;
 using tests::common::SdlStateBuilder;
@@ -107,26 +109,17 @@ void tst_sdlmodel::testGenerateProcess()
 {
     QString modelName = "Example";
     QString modelPrefix = "Sdl_";
-
     QString processName = "Modemanager";
 
-    // transition to the same state
-    auto transition = SdlTransitionBuilder().withNextStateAction().build();
-
-    auto input1 = std::make_unique<Input>("some_input_name", transition.get());
-
+    auto transition1 = SdlTransitionBuilder().withNextStateAction().build();
     auto state1 = SdlStateBuilder("Looping")
-                          .withInput(std::move(input1))
+                          .withInput(SdlInputBuilder("some_input_name", transition1.get()).build())
                           .withContinuousSignal(std::make_unique<ContinuousSignal>())
                           .build();
 
-    // another transition, to state1
     auto transition2 = SdlTransitionBuilder().withNextStateAction(state1.get()).build();
-
-    auto input2 = std::make_unique<Input>("some_other_input_name", transition2.get());
-
     auto state2 = SdlStateBuilder("Idle")
-                          .withInput(std::move(input2))
+                          .withInput(SdlInputBuilder("some_other_input_name", transition2.get()).build())
                           .withContinuousSignal(std::make_unique<ContinuousSignal>())
                           .build();
 
@@ -138,8 +131,9 @@ void tst_sdlmodel::testGenerateProcess()
                     SdlStateMachineBuilder()
                         .withState(std::move(state1))
                         .withState(std::move(state2))
-                        .withTransition(std::make_unique<Transition>("empty_transition", std::vector<std::unique_ptr<Action>>())
-                    ).build()
+                        .withTransition(std::move(transition1))
+                        .withTransition(std::move(transition2))
+                    .build()
                 ).build()
         ).build();
     // clang-format on
