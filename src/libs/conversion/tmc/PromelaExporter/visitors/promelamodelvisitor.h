@@ -39,7 +39,7 @@ public:
      *
      * @param stream A stream to append exported model.
      */
-    PromelaModelVisitor(QTextStream &stream);
+    PromelaModelVisitor(QTextStream &stream, QString indent);
 
     /**
      * @brief Visit PromelaModel
@@ -56,5 +56,6 @@ private:
 
 private:
     QTextStream &m_stream;
+    const QString m_indent;
 };
 }

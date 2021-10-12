@@ -25,8 +25,9 @@ namespace conversion::tmc::exporter {
 using ::tmc::promela::model::Declaration;
 using ::tmc::promela::model::Utype;
 
-UtypeVisitor::UtypeVisitor(QTextStream &stream)
+UtypeVisitor::UtypeVisitor(QTextStream &stream, QString indent)
     : m_stream(stream)
+    , m_indent(std::move(indent))
 {
 }
 
@@ -34,7 +35,7 @@ void UtypeVisitor::visit(const Utype &utype)
 {
     m_stream << "typedef " << utype.getName() << " {\n";
     for (const Declaration &declaration : utype.getFields()) {
-        DeclarationVisitor visitor(m_stream, "    ");
+        DeclarationVisitor visitor(m_stream, m_indent);
         visitor.visit(declaration);
     }
     m_stream << "}\n\n";

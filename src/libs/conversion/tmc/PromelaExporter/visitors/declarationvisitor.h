@@ -45,7 +45,7 @@ public:
     void visit(const ::tmc::promela::model::Declaration &declaration);
 
 private:
-    QString getVisitilityString(const ::tmc::promela::model::Declaration &declaration);
+    QString getVisibilityString(const ::tmc::promela::model::Declaration &declaration);
 
 private:
     QTextStream &m_stream;

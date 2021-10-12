@@ -29,8 +29,9 @@ using ::tmc::promela::model::NamedMtype;
 using ::tmc::promela::model::PromelaModel;
 using ::tmc::promela::model::Utype;
 
-PromelaModelVisitor::PromelaModelVisitor(QTextStream &stream)
+PromelaModelVisitor::PromelaModelVisitor(QTextStream &stream, QString indent)
     : m_stream(stream)
+    , m_indent(std::move(indent))
 {
 }
 
@@ -66,14 +67,14 @@ void PromelaModelVisitor::generateNamedMtypes(const std::map<QString, NamedMtype
 void PromelaModelVisitor::generateMtypeNames(const QVector<QString> &names)
 {
     for (const QString &value : names) {
-        m_stream << "    " << value << ",\n";
+        m_stream << m_indent << value << ",\n";
     }
 }
 
 void PromelaModelVisitor::generateUtypes(const QList<Utype> &utypes)
 {
     for (const Utype &utype : utypes) {
-        UtypeVisitor visitor(m_stream);
+        UtypeVisitor visitor(m_stream, m_indent);
         visitor.visit(utype);
     }
 }

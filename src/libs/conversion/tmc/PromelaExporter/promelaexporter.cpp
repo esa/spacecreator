@@ -48,7 +48,7 @@ void PromelaExporter::exportModel(const Model *model, const Options &options) co
     QString output;
     QTextStream outputTextStream(&output, QIODevice::WriteOnly);
 
-    PromelaModelVisitor visitor(outputTextStream);
+    PromelaModelVisitor visitor(outputTextStream, m_commonIndent);
 
     visitor.visit(*promelaModel);
 
@@ -58,13 +58,13 @@ void PromelaExporter::exportModel(const Model *model, const Options &options) co
 
     if (outputFilepath) {
         QSaveFile outputFile(outputFilepath.value());
-        bool opened = outputFile.open(QIODevice::WriteOnly);
+        const bool opened = outputFile.open(QIODevice::WriteOnly);
         if (!opened) {
             throw ExportException(QString("Failed to open a file %1").arg(outputFile.fileName()));
         }
-        std::string data = output.toStdString();
-        int64_t written = outputFile.write(data.c_str());
-        bool commited = outputFile.commit();
+        const std::string data = output.toStdString();
+        const int64_t written = outputFile.write(data.c_str());
+        const bool commited = outputFile.commit();
         if (written != output.length()) {
             throw ExportException(QString("Failed to write a file %1").arg(outputFile.fileName()));
         }
@@ -73,4 +73,6 @@ void PromelaExporter::exportModel(const Model *model, const Options &options) co
         }
     }
 }
+
+const QString PromelaExporter::m_commonIndent = QString("    ");
 }

@@ -37,7 +37,7 @@ public:
      *
      * @param stream  A stream to append textual representation.
      */
-    UtypeVisitor(QTextStream &stream);
+    UtypeVisitor(QTextStream &stream, QString indent);
 
     /**
      * @brief  Constructor
@@ -48,5 +48,6 @@ public:
 
 private:
     QTextStream &m_stream;
+    const QString m_indent;
 };
 }
