@@ -33,6 +33,13 @@ SdlStateMachineBuilder &SdlStateMachineBuilder::withStates(std::vector<std::uniq
     return *this;
 }
 
+SdlStateMachineBuilder &SdlStateMachineBuilder::withState(std::unique_ptr<State> state)
+{
+    m_states.push_back(std::move(state));
+
+    return *this;
+}
+
 SdlStateMachineBuilder &SdlStateMachineBuilder::withTransitions(std::vector<std::unique_ptr<Transition>> transitions)
 {
     m_transitions = std::move(transitions);
