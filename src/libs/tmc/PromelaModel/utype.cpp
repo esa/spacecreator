@@ -20,14 +20,20 @@
 #include "utype.h"
 
 namespace tmc::promela::model {
-Utype::Utype(QString name)
+Utype::Utype(QString name, bool unionType)
     : m_name(std::move(name))
+    , m_unionType(unionType)
 {
 }
 
 const QString &Utype::getName() const noexcept
 {
     return m_name;
+}
+
+bool Utype::isUnionType() const noexcept
+{
+    return m_unionType;
 }
 
 void Utype::addField(const Declaration &field)

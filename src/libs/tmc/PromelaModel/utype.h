@@ -37,8 +37,9 @@ public:
      * @brief Constructor.
      *
      * @param name the name of the user defined type.
+     * @param unionType true if type is union
      */
-    explicit Utype(QString name);
+    explicit Utype(QString name, bool unionType = false);
 
     /**
      * @brief Getter for name of user defined type
@@ -46,6 +47,13 @@ public:
      * @return name of the user defined type
      */
     const QString &getName() const noexcept;
+
+    /**
+     * @brief Getter for unionType
+     *
+     * @return true if utype is union type, otherwise false
+     */
+    bool isUnionType() const noexcept;
 
     /**
      * @brief Add a field to the user defined type
@@ -63,6 +71,7 @@ public:
 
 private:
     QString m_name;
+    bool m_unionType;
     QList<Declaration> m_fields;
 };
 }

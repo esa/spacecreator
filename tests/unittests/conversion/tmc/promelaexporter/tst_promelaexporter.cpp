@@ -50,6 +50,7 @@ private Q_SLOTS:
     void testNamedMtype();
     void testUtype();
     void testUtypeVisibility();
+    void testUtypeUnion();
 
 private:
     QString getFileContents(const QString &filename);
@@ -194,6 +195,28 @@ void tst_PromelaExporter::testUtypeVisibility()
         QFAIL(ex.what());
     }
     QString out2 = getFileContents("expect_promela_file4.pml");
+    showInfo(out, out2);
+    QCOMPARE(out, out2);
+}
+
+void tst_PromelaExporter::testUtypeUnion()
+{
+    PromelaModel model;
+
+    Utype test_union("test_union", true);
+
+    test_union.addField(Declaration(DataType(BasicType::INT), "field_one"));
+    test_union.addField(Declaration(DataType(MtypeRef()), "field_two"));
+
+    model.addUtype(test_union);
+
+    QString out;
+    try {
+        out = generatePromelaFromModel(model);
+    } catch (const std::exception &ex) {
+        QFAIL(ex.what());
+    }
+    QString out2 = getFileContents("expect_promela_file5.pml");
     showInfo(out, out2);
     QCOMPARE(out, out2);
 }

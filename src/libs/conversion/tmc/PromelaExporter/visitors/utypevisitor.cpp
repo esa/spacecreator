@@ -33,7 +33,12 @@ UtypeVisitor::UtypeVisitor(QTextStream &stream, QString indent)
 
 void UtypeVisitor::visit(const Utype &utype)
 {
-    m_stream << "typedef " << utype.getName() << " {\n";
+    if (utype.isUnionType()) {
+        m_stream << "typedef union ";
+    } else {
+        m_stream << "typedef ";
+    }
+    m_stream << utype.getName() << " {\n";
     for (const Declaration &declaration : utype.getFields()) {
         DeclarationVisitor visitor(m_stream, m_indent);
         visitor.visit(declaration);
