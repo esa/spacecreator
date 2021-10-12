@@ -40,9 +40,7 @@ public:
     auto withContinuousSignal(std::unique_ptr<ContinuousSignal> continuousSignal) -> SdlStateBuilder &;
 
 private:
-    QString m_stateName;
-    std::vector<std::unique_ptr<Input>> m_inputs;
-    std::vector<std::unique_ptr<ContinuousSignal>> m_continuousSignals;
+    State m_state;
 };
 
 } // namespace tests::common

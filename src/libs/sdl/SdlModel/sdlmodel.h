@@ -42,7 +42,7 @@ public:
      * @param data     model data (Process)
      * @param name     name of this data model
      */
-    explicit SdlModel(Data data, QString name = "");
+    explicit SdlModel(Data data = Data(), QString name = "");
 
     /**
      * @brief   Deleted copy constructor/
@@ -79,11 +79,25 @@ public:
     auto data() const -> const Data &;
 
     /**
+     * @brief   Setter for model data
+     *
+     * @param   data model data
+     */
+    auto setData(Data data) -> void;
+
+    /**
      * @brief   Getter for model name
      *
      * @returns Model name
      */
     auto name() const -> const QString &;
+
+    /**
+     * @brief   Setter for model name
+     *
+     * @param   name model name
+     */
+    auto setName(QString name) -> void;
 
 private:
     /** @brief  Model data */

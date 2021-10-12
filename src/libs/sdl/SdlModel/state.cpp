@@ -57,6 +57,11 @@ void State::setContinuousSignals(std::vector<std::unique_ptr<ContinuousSignal>> 
     m_continuousSignals = std::move(continuousSignals);
 }
 
+void State::addContinuousSignal(std::unique_ptr<ContinuousSignal> continuousSignal)
+{
+    m_continuousSignals.push_back(std::move(continuousSignal));
+}
+
 void State::accept(Visitor &visitor) const
 {
     visitor.visit(*this);

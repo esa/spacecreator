@@ -37,9 +37,19 @@ const SdlModel::Data &SdlModel::data() const
     return m_data;
 }
 
+void SdlModel::setData(Data data)
+{
+    m_data = std::move(data);
+}
+
 const QString &SdlModel::name() const
 {
     return m_name;
+}
+
+void SdlModel::setName(QString name)
+{
+    m_name = std::move(name);
 }
 
 } // namespace sdl

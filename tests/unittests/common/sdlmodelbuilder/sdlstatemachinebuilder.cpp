@@ -23,19 +23,19 @@ namespace tests::common {
 
 std::unique_ptr<StateMachine> SdlStateMachineBuilder::build()
 {
-    return std::make_unique<StateMachine>(std::move(m_states), std::move(m_transitions));
+    return std::make_unique<StateMachine>(std::move(m_stateMachine));
 }
 
 SdlStateMachineBuilder &SdlStateMachineBuilder::withState(std::unique_ptr<State> state)
 {
-    m_states.push_back(std::move(state));
+    m_stateMachine.addState(std::move(state));
 
     return *this;
 }
 
 SdlStateMachineBuilder &SdlStateMachineBuilder::withTransition(std::unique_ptr<Transition> transition)
 {
-    m_transitions.push_back(std::move(transition));
+    m_stateMachine.addTransition(std::move(transition));
 
     return *this;
 }

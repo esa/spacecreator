@@ -35,8 +35,7 @@ public:
     std::unique_ptr<Input> build();
 
 private:
-    QString m_inputName;
-    Transition *m_transition;
+    Input m_input;
 };
 
 } // namespace tests::common

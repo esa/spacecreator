@@ -111,6 +111,13 @@ public:
     auto setContinuousSignals(std::vector<std::unique_ptr<ContinuousSignal>> continuousSignals) -> void;
 
     /**
+     * @brief   Add a continuous signal
+     *
+     * @param   continuousSignal a pointer to continuous signal
+     */
+    auto addContinuousSignal(std::unique_ptr<ContinuousSignal> continuousSignal) -> void;
+
+    /**
      * @brief  visitor acceptor (calls visit method of the given visitor)
      */
     virtual auto accept(Visitor &visitor) const -> void override;

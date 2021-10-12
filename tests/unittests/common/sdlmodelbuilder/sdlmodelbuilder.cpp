@@ -23,17 +23,17 @@ namespace tests::common {
 
 SdlModelBuilder::SdlModelBuilder(QString name)
 {
-    m_modelName = std::move(name);
+    m_model.setName(std::move(name));
 }
 
 std::unique_ptr<SdlModel> SdlModelBuilder::build()
 {
-    return std::make_unique<SdlModel>(std::move(m_process), m_modelName);
+    return std::make_unique<SdlModel>(std::move(m_model));
 }
 
 SdlModelBuilder &SdlModelBuilder::withProcess(Process process)
 {
-    m_process = std::move(process);
+    m_model.setData(std::move(process));
 
     return *this;
 }

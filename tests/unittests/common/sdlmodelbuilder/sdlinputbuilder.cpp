@@ -22,14 +22,14 @@
 namespace tests::common {
 
 SdlInputBuilder::SdlInputBuilder(QString inputName, Transition *transition)
-    : m_inputName(std::move(inputName))
-    , m_transition(transition)
 {
+    m_input.setName(std::move(inputName));
+    m_input.setTransition(transition);
 }
 
 std::unique_ptr<Input> SdlInputBuilder::build()
 {
-    return std::make_unique<Input>(std::move(m_inputName), m_transition);
+    return std::make_unique<Input>(std::move(m_input));
 }
 
 } // namespace tests::common

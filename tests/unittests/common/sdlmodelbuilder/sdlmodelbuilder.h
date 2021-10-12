@@ -36,8 +36,7 @@ public:
     auto withProcess(Process process) -> SdlModelBuilder &;
 
 private:
-    QString m_modelName;
-    Process m_process;
+    SdlModel m_model;
 };
 
 } // namespace tests::common

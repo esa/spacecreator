@@ -27,17 +27,19 @@ namespace tests::common {
 
 SdlTransitionBuilder::SdlTransitionBuilder(QString name)
 {
-    m_transitionName = std::move(name);
+    m_transition.setName(std::move(name));
 }
 
 std::unique_ptr<Transition> SdlTransitionBuilder::build()
 {
-    return std::make_unique<Transition>(std::move(m_transitionName), std::move(m_actions));
+    return std::make_unique<Transition>(std::move(m_transition));
 }
 
 SdlTransitionBuilder &SdlTransitionBuilder::withNextStateAction(State *nextState)
 {
-    m_actions.push_back(std::make_unique<NextState>("", nextState));
+    auto action = std::make_unique<NextState>("", nextState);
+
+    m_transition.addAction(std::move(action));
 
     return *this;
 }

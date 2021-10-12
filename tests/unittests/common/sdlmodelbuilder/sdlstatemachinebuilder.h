@@ -42,8 +42,7 @@ public:
     auto withTransition(std::unique_ptr<Transition> transition) -> SdlStateMachineBuilder &;
 
 private:
-    std::vector<std::unique_ptr<State>> m_states;
-    std::vector<std::unique_ptr<Transition>> m_transitions;
+    StateMachine m_stateMachine;
 };
 
 } // namespace tests::common

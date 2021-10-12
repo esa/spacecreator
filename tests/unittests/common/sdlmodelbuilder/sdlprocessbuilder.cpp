@@ -25,17 +25,17 @@ namespace tests::common {
 
 SdlProcessBuilder::SdlProcessBuilder(QString processName)
 {
-    m_processName = std::move(processName);
+    m_process.setName(std::move(processName));
 }
 
 Process SdlProcessBuilder::build()
 {
-    return Process(m_processName, std::move(m_stateMachine));
+    return std::move(m_process);
 }
 
 SdlProcessBuilder &SdlProcessBuilder::withStateMachine(std::unique_ptr<StateMachine> stateMachine)
 {
-    m_stateMachine = std::move(stateMachine);
+    m_process.setStateMachine(std::move(stateMachine));
 
     return *this;
 }

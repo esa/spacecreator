@@ -38,8 +38,7 @@ public:
     auto withNextStateAction(State *nextState = nullptr) -> SdlTransitionBuilder &;
 
 private:
-    QString m_transitionName;
-    std::vector<std::unique_ptr<Action>> m_actions;
+    Transition m_transition;
 };
 
 } // namespace tests::common

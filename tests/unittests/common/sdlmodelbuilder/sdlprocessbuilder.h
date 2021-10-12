@@ -39,8 +39,7 @@ public:
     // TODO withVariables()
 
 private:
-    QString m_processName;
-    std::unique_ptr<StateMachine> m_stateMachine;
+    Process m_process;
 };
 
 } // namespace tests::common
