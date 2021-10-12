@@ -134,8 +134,6 @@ void tst_sdlmodel::testGenerateProcess()
 
     auto state2 = std::make_unique<State>("Idle", std::move(inputs2), std::move(contSignals2));
 
-    auto transitions = std::vector<std::unique_ptr<Transition>>();
-
     // clang-format off
     const auto exampleModel = SdlModelBuilder(modelName)
         .withProcess(
@@ -144,7 +142,7 @@ void tst_sdlmodel::testGenerateProcess()
                     SdlStateMachineBuilder()
                         .withState(std::move(state1))
                         .withState(std::move(state2))
-                        .withTransitions(std::move(transitions)
+                        .withTransition(std::make_unique<Transition>("empty_transition", std::vector<std::unique_ptr<Action>>())
                     ).build()
                 ).build()
         ).build();
