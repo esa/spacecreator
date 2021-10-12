@@ -47,4 +47,11 @@ SdlStateMachineBuilder &SdlStateMachineBuilder::withTransitions(std::vector<std:
     return *this;
 }
 
+SdlStateMachineBuilder &SdlStateMachineBuilder::withTransition(std::unique_ptr<Transition> transition)
+{
+    m_transitions.push_back(std::move(transition));
+
+    return *this;
+}
+
 } // namespace tests::common

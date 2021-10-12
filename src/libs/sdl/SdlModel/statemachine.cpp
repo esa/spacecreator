@@ -53,4 +53,9 @@ void StateMachine::setTransitions(std::vector<std::unique_ptr<Transition>> trans
     m_transitions = std::move(transitions);
 }
 
+void StateMachine::addTransition(std::unique_ptr<Transition> transition)
+{
+    m_transitions.push_back(std::move(transition));
+}
+
 } // namespace sdl

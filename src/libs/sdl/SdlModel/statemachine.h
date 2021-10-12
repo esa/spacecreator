@@ -102,6 +102,13 @@ public:
      */
     auto setTransitions(std::vector<std::unique_ptr<Transition>> transitions) -> void;
 
+    /**
+     * @brief   Add a transition to this state machine
+     *
+     * @param   transition a pointer to transition
+     */
+    auto addTransition(std::unique_ptr<Transition> transition) -> void;
+
 private:
     std::vector<std::unique_ptr<State>> m_states;
     std::vector<std::unique_ptr<Transition>> m_transitions;
