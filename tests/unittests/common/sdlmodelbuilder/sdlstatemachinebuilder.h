@@ -20,27 +20,30 @@
 #pragma once
 
 #include <memory>
-#include <sdl/SdlModel/process.h>
+#include <sdl/SdlModel/state.h>
 #include <sdl/SdlModel/statemachine.h>
+#include <sdl/SdlModel/transition.h>
+#include <vector>
 
-using sdl::Process;
+using sdl::State;
 using sdl::StateMachine;
+using sdl::Transition;
 
 namespace tests::common {
 
-class SdlProcessBuilder final
+class SdlStateMachineBuilder final
 {
 public:
-    SdlProcessBuilder(QString processName);
-    Process build();
+    SdlStateMachineBuilder() = default;
 
-    auto withStateMachine(std::unique_ptr<StateMachine> stateMachine) -> SdlProcessBuilder &;
-    // TODO withProcedures()
-    // TODO withVariables()
+    std::unique_ptr<StateMachine> build();
+
+    auto withStates(std::vector<std::unique_ptr<State>> states) -> SdlStateMachineBuilder &;
+    auto withTransitions(std::vector<std::unique_ptr<Transition>> transitions) -> SdlStateMachineBuilder &;
 
 private:
-    QString m_processName;
-    std::unique_ptr<StateMachine> m_stateMachine;
+    std::vector<std::unique_ptr<State>> m_states;
+    std::vector<std::unique_ptr<Transition>> m_transitions;
 };
 
 } // namespace tests::common

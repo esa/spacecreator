@@ -17,30 +17,27 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/lgpl-2.1.html>.
  */
 
-#pragma once
-
-#include <memory>
-#include <sdl/SdlModel/process.h>
-#include <sdl/SdlModel/statemachine.h>
-
-using sdl::Process;
-using sdl::StateMachine;
+#include "sdlstatemachinebuilder.h"
 
 namespace tests::common {
 
-class SdlProcessBuilder final
+std::unique_ptr<StateMachine> SdlStateMachineBuilder::build()
 {
-public:
-    SdlProcessBuilder(QString processName);
-    Process build();
+    return std::make_unique<StateMachine>(std::move(m_states), std::move(m_transitions));
+}
 
-    auto withStateMachine(std::unique_ptr<StateMachine> stateMachine) -> SdlProcessBuilder &;
-    // TODO withProcedures()
-    // TODO withVariables()
+SdlStateMachineBuilder &SdlStateMachineBuilder::withStates(std::vector<std::unique_ptr<State>> states)
+{
+    m_states = std::move(states);
 
-private:
-    QString m_processName;
-    std::unique_ptr<StateMachine> m_stateMachine;
-};
+    return *this;
+}
+
+SdlStateMachineBuilder &SdlStateMachineBuilder::withTransitions(std::vector<std::unique_ptr<Transition>> transitions)
+{
+    m_transitions = std::move(transitions);
+
+    return *this;
+}
 
 } // namespace tests::common

@@ -19,6 +19,8 @@
 
 #include "sdlprocessbuilder.h"
 
+#include <memory>
+
 namespace tests::common {
 
 SdlProcessBuilder::SdlProcessBuilder(QString processName)
@@ -28,10 +30,10 @@ SdlProcessBuilder::SdlProcessBuilder(QString processName)
 
 Process SdlProcessBuilder::build()
 {
-    return Process(m_processName, std::make_unique<StateMachine>(std::move(m_stateMachine)));
+    return Process(m_processName, std::move(m_stateMachine));
 }
 
-SdlProcessBuilder &SdlProcessBuilder::withStateMachine(StateMachine stateMachine)
+SdlProcessBuilder &SdlProcessBuilder::withStateMachine(std::unique_ptr<StateMachine> stateMachine)
 {
     m_stateMachine = std::move(stateMachine);
 

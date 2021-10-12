@@ -23,6 +23,7 @@
 #include <QtTest>
 #include <common/sdlmodelbuilder/sdlmodelbuilder.h>
 #include <common/sdlmodelbuilder/sdlprocessbuilder.h>
+#include <common/sdlmodelbuilder/sdlstatemachinebuilder.h>
 #include <conversion/common/options.h>
 #include <memory>
 #include <sdl/SdlExporter/SdlOptions/options.h>
@@ -49,6 +50,7 @@ using sdl::exporter::SdlExporter;
 using sdl::exporter::SdlOptions;
 using tests::common::SdlModelBuilder;
 using tests::common::SdlProcessBuilder;
+using tests::common::SdlStateMachineBuilder;
 
 namespace tests::Sdl {
 
@@ -71,7 +73,7 @@ void tst_sdlmodel::testDefaultValuesInModel()
             .withProcess(
                 SdlProcessBuilder(processName)
                     .withStateMachine(
-                        StateMachine()
+                        SdlStateMachineBuilder().build()
                     ).build()
             ).build();
     // clang-format on
