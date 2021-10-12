@@ -23,6 +23,7 @@
 #include <QtTest>
 #include <common/sdlmodelbuilder/sdlmodelbuilder.h>
 #include <common/sdlmodelbuilder/sdlprocessbuilder.h>
+#include <common/sdlmodelbuilder/sdlstatebuilder.h>
 #include <common/sdlmodelbuilder/sdlstatemachinebuilder.h>
 #include <conversion/common/options.h>
 #include <memory>
@@ -50,6 +51,7 @@ using sdl::exporter::SdlExporter;
 using sdl::exporter::SdlOptions;
 using tests::common::SdlModelBuilder;
 using tests::common::SdlProcessBuilder;
+using tests::common::SdlStateBuilder;
 using tests::common::SdlStateMachineBuilder;
 
 namespace tests::Sdl {
@@ -118,7 +120,10 @@ void tst_sdlmodel::testGenerateProcess()
 
     auto contSignals = std::vector<std::unique_ptr<ContinuousSignal>>();
 
-    auto state1 = std::make_unique<State>("Looping", std::move(inputs), std::move(contSignals));
+    auto state1 = SdlStateBuilder("Looping")
+                          .withInputs(std::move(inputs))
+                          .withContinuousSignals(std::move(contSignals))
+                          .build();
 
     // another transition, from state2 to state1
     auto nextstate2 = std::make_unique<NextState>("toggle", state1.get());
@@ -132,7 +137,10 @@ void tst_sdlmodel::testGenerateProcess()
 
     auto contSignals2 = std::vector<std::unique_ptr<ContinuousSignal>>();
 
-    auto state2 = std::make_unique<State>("Idle", std::move(inputs2), std::move(contSignals2));
+    auto state2 = SdlStateBuilder("Idle")
+                          .withInputs(std::move(inputs2))
+                          .withContinuousSignals(std::move(contSignals2))
+                          .build();
 
     // clang-format off
     const auto exampleModel = SdlModelBuilder(modelName)

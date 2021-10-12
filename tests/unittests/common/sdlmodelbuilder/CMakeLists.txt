@@ -2,9 +2,11 @@ project(SdlModelBuilder VERSION 1.0.0 LANGUAGES CXX)
 
 set(SOURCES sdlmodelbuilder.cpp
             sdlprocessbuilder.cpp
+            sdlstatebuilder.cpp
             sdlstatemachinebuilder.cpp)
 set(INCLUDES sdlmodelbuilder.h
              sdlprocessbuilder.h
+             sdlstatebuilder.h
              sdlstatemachinebuilder.h)
 
 add_library(SdlModelBuilder STATIC)
