@@ -113,14 +113,12 @@ void tst_sdlmodel::testGenerateProcess()
     // transition to the same state
     auto transition = SdlTransitionBuilder().withNextStateAction().build();
 
-    auto inputs = std::vector<std::unique_ptr<Input>>();
     auto input1 = std::make_unique<Input>("some_input_name", transition.get());
-    inputs.push_back(std::move(input1));
 
     auto contSignals = std::vector<std::unique_ptr<ContinuousSignal>>();
 
     auto state1 = SdlStateBuilder("Looping")
-                          .withInputs(std::move(inputs))
+                          .withInput(std::move(input1))
                           .withContinuousSignals(std::move(contSignals))
                           .build();
 

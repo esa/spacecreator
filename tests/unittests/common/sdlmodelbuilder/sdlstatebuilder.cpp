@@ -38,6 +38,13 @@ SdlStateBuilder &SdlStateBuilder::withInputs(std::vector<std::unique_ptr<Input>>
     return *this;
 }
 
+SdlStateBuilder &SdlStateBuilder::withInput(std::unique_ptr<Input> input)
+{
+    m_inputs.push_back(std::move(input));
+
+    return *this;
+}
+
 SdlStateBuilder &SdlStateBuilder::withContinuousSignals(
         std::vector<std::unique_ptr<ContinuousSignal>> continuousSignals)
 {

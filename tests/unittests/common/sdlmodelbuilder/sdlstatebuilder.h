@@ -37,7 +37,9 @@ public:
     std::unique_ptr<State> build();
 
     auto withInputs(std::vector<std::unique_ptr<Input>> inputs) -> SdlStateBuilder &;
+    auto withInput(std::unique_ptr<Input> input) -> SdlStateBuilder &;
     auto withContinuousSignals(std::vector<std::unique_ptr<ContinuousSignal>> continuousSignals) -> SdlStateBuilder &;
+    // TODO withContinuousSignal()
 
 private:
     QString m_stateName;
