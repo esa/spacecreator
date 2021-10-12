@@ -433,7 +433,51 @@ void IVItemModel::setupInterfaceGeometry(ivm::IVObject *obj)
     obj->setEntityProperty(ivm::meta::Props::token(token), strCoord);
 }
 
-void IVItemModel::setupConnectionGeometry(ivm::IVObject *obj) { }
+void IVItemModel::setupConnectionGeometry(ivm::IVObject *obj)
+{
+    const ivm::meta::Props::Token token = obj->parentObject() && obj->parentObject()->isRootObject()
+            ? ivm::meta::Props::Token::InnerCoordinates
+            : ivm::meta::Props::Token::coordinates;
+
+    if (obj->hasEntityAttribute(ivm::meta::Props::token(token))) {
+        return;
+    }
+
+    ivm::IVConnection *connection = qobject_cast<ivm::IVConnection *>(obj);
+    if (!connection) {
+        return;
+    }
+    ivm::IVInterface *startEndPoint = connection->sourceInterface();
+    if (!startEndPoint || !startEndPoint->function()) {
+        return;
+    }
+    ivm::IVInterface *endEndPoint = connection->targetInterface();
+    if (!endEndPoint || !endEndPoint->function()) {
+        return;
+    }
+
+    const QPointF startPos = shared::graphicsviewutils::pos(startEndPoint->coordinates());
+    const QPointF endPos = shared::graphicsviewutils::pos(endEndPoint->coordinates());
+    const QRectF startRect = shared::graphicsviewutils::rect(startEndPoint->function()->coordinates());
+    const QRectF endRect = shared::graphicsviewutils::rect(endEndPoint->function()->coordinates());
+
+    QList<QRectF> siblingRects;
+    for (auto entity : objectsModel()->objects()) {
+        if (entity->parentObject() == connection->parentObject()) {
+            ivm::IVObject *iObj = qobject_cast<ivm::IVObject *>(entity);
+            if (!iObj)
+                continue;
+
+            if (kRectangularTypes.contains(iObj->type())) {
+                siblingRects.append(shared::graphicsviewutils::rect(iObj->coordinates()));
+            }
+        }
+    }
+
+    const QVector<QPointF> points =
+            shared::graphicsviewutils::createConnectionPath(siblingRects, startPos, startRect, endPos, endRect);
+    connection->setCoordinates(shared::graphicsviewutils::coordinates(points));
+}
 
 void IVItemModel::setupGeometry(ivm::IVObject *obj)
 {
