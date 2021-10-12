@@ -82,6 +82,13 @@ public:
     auto setStates(std::vector<std::unique_ptr<State>> states) -> void;
 
     /**
+     * @brief   Add a state to this state machine
+     *
+     * @param   state a pointer to state
+     */
+    auto addState(std::unique_ptr<State> state) -> void;
+
+    /**
      * @brief   Getter for the transitions of the state machine
      *
      * @return  const reference to a vector of pointers to transitions

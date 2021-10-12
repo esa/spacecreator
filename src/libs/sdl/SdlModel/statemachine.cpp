@@ -38,6 +38,11 @@ void StateMachine::setStates(std::vector<std::unique_ptr<State>> states)
     m_states = std::move(states);
 }
 
+void StateMachine::addState(std::unique_ptr<State> state)
+{
+    m_states.push_back(std::move(state));
+}
+
 const std::vector<std::unique_ptr<Transition>> &StateMachine::transitions() const
 {
     return m_transitions;
