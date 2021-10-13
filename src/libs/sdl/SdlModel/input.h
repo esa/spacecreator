@@ -21,6 +21,7 @@
 
 #include "signal.h"
 #include "transition.h"
+#include "variableliteral.h"
 #include "variablereference.h"
 
 #include <QString>
@@ -29,12 +30,6 @@
 #include <vector>
 
 namespace sdl {
-
-class VariableLiteral final
-{
-    // TODO: extract to a separate file
-    // TODO: this cshall inherit from Node
-};
 
 /**
  * @brief   Represents an SDL input signal.

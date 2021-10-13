@@ -52,6 +52,7 @@ using sdl::StateMachine;
 using sdl::Task;
 using sdl::Transition;
 using sdl::VariableDeclaration;
+using sdl::VariableLiteral;
 using sdl::exporter::SdlExporter;
 using sdl::exporter::SdlOptions;
 using tests::common::SdlInputBuilder;

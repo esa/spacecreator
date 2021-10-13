@@ -16,6 +16,7 @@ set(SOURCES action.cpp
             task.cpp
             transition.cpp
             variabledeclaration.cpp
+            variableliteral.cpp
             variablereference.cpp)
 set(INCLUDES action.h
              input.h
@@ -30,6 +31,7 @@ set(INCLUDES action.h
              task.h
              transition.h
              variabledeclaration.h
+             variableliteral.h
              variablereference.h)
 
 target_sources(SdlModel

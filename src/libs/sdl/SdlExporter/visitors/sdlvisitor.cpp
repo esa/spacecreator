@@ -83,12 +83,22 @@ void SdlVisitor::visit(const Input &input) const
     // write some dummy CIF
     m_stream << "        /* CIF input (" << 250 << "," << 150 << "), (" << 150 << ", " << 75 << ") */\n";
     m_stream << "        input " << input.name();
+    bool isInputParametersEmpty = input.parameters().empty();
+    if (!isInputParametersEmpty) {
+        m_stream << "(";
+    }
     for (auto &parameter : input.parameters()) {
         const auto variantParam = parameter.get();
         if (variantParam->index() == 0) { // parameter is a reference
             const auto paramReference = std::move(std::get<VariableReference>(*variantParam));
             m_stream << paramReference.declaration()->name();
+        } else if (variantParam->index() == 1) { // parameter is a literal
+            const auto paramLiteral = std::move(std::get<VariableLiteral>(*variantParam));
+            m_stream << paramLiteral.value();
         }
+    }
+    if (!isInputParametersEmpty) {
+        m_stream << ")";
     }
     m_stream << ";\n";
 
