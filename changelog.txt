@@ -1,3 +1,186 @@
+Release: DVE_12
+========================================================
+* [ea2a60d6] [2021-09-22] 639 Add protected connected functions when binding
+* [a46b33e9] [2021-09-22] 639 Remove protected connected functions when unbinding
+* [7c3cf697] [2021-09-23] SdlModel: add CMakeLists.txt
+* [a4d53167] [2021-09-23] SdlModel: add model's interface
+* [5c963215] [2021-09-23] SdlModel, SdlExporter, tests: stub files added
+* [08a9eb0b] [2021-09-24] clang-formatted stray files
+* [2b878d14] [2021-09-24] SdlModel, SdlExporter: build fixed
+* [8f216984] [2021-09-24] Conversion: Formatting fix
+* [dc8abf8d] [2021-09-22] IVE: Rectangular graphic items restores geometry if it's size less than minimal size
+* [da484434] [2021-09-24] SdlModel: added Process class
+* [b8b3650c] [2021-09-24] SdlExporter: SDL model default Process name check added
+* [a0d39c73] [2021-09-24] SdlModel: fixed model structure'n'constructors
+* [ca94b240] [2021-09-24] SdlModel: Model moved to src/libs/sdl/
+* [8a94f41e] [2021-09-24] SdlModel, SdlExporter: fixed namespaces
+* [cf3d31c2] [2021-09-24] SdlExporter: tests moved one directory upwards
+* [34e73362] [2021-09-24] SdlModel: fixed constructors
+* [c25e0e4c] [2021-09-24] SdlModel: StateMachine added
+* [460e5d5b] [2021-09-24] SdlModel: State added
+* [efa38a08] [2021-09-27] IVE: Interface layout
+* [1a963c11] [2021-09-27] SdlExporter: added empty SDL file generation
+* [d1568767] [2021-09-24] Asn1Importer: Implemented importer
+* [c1a029da] [2021-09-27] Asn1Importer: Review fixes
+* [e151ee4f] [2021-09-27] Asn1Importer: Expanded tests
+* [46136e8b] [2021-09-27] Conversion: Formatting fix
+* [d4b95afd] [2021-09-27] SdlExporter: dummy content generation added
+* [17cdd486] [2021-09-27] SdlExporter: added export of the Process from the Model
+* [9f21973d] [2021-09-27] SdlModel, SdlExporter: added default parameters to Process'n'State constructors
+* [b931c58e] [2021-09-27] SdlExporter: export states
+* [6128d40f] [2021-09-27] SdlModel: Signal and Input classes extracted to separate files
+* [cc6ed920] [2021-09-27] SdlExporter: tests: add some example input to state
+* [22d1b09f] [2021-09-27] SdlExporter: splitted export into separate functions
+* [e2ee9d1f] [2021-09-27] SdlExporter: tests: small dead code removed
+* [6a66f310] [2021-09-27] SdlModel: added VariableDeclaration class
+* [31f152ef] [2021-09-27] SdlModel: VariableReference added
+* [78455e95] [2021-09-27] SdlModel: added Literal class
+* [4a9e2586] [2021-09-27] SdlExporter: fix the exported file extension
+* [c663cd51] [2021-09-27] SdlModel, SdlExporter: Visitor and Node base classes added [wip]
+* [baa337a0] [2021-09-27] SdlModel, SdlExporter: visitors added but segmentation fault
+* [cfff1ca9] [2021-09-27] SdlModel, SdlExporter: added destructors to Node childs
+* [3ad73b8d] [2021-09-28] SdlModel, SdlExporter: fixed segmentation fault (please dont read uninitialized variables...)
+* [2e9f61ac] [2021-09-28] SdlModel, SdlExporter: updated licenses
+* [513e6d21] [2021-09-28] SdlModel: remove redundant name() implementations in Node children
+* [817790bf] [2021-09-28] SdlExporter: tests: added another state to export
+* [9378b4ce] [2021-09-28] SdlExporter: use exportCollection<>() in SdlVisitor
+* [2e894777] [2021-09-28] SdlModel: moved function definitions in Node class to cpp file
+* [da88c250] [2021-09-28] SdlExporter: removed raw pointer from SDL model visitor
+* [a9466840] [2021-09-28] SdlExporter, Asn1Exporter: fixed exception checks in exporter.cpp-s
+* [f1190fac] [2021-09-28] SdlModel: added ContinuousSignal class stub
+* [f2d6af95] [2021-09-28] SdlModel: store StateMachine in a Process as a unique_ptr
+* [422030cb] [2021-09-28] SdlModel: store VariableDeclarations as vector of unique pointers in Process
+* [8a50a64f] [2021-09-28] SdlModel: store Procedure-s as vector of unique pointers in Process
+* [33c77dbc] [2021-09-28] SdlModel: store States as unique pointers in StateMachine
+* [6f4442a1] [2021-09-28] SdlModel: store Transitions as unique pointers in StateMachine
+* [f53dd31e] [2021-09-28] SdlModel: store Inputs as unique pointers in State
+* [522597f4] [2021-09-28] SdlModel: store ContinuousSignal-s as unique pointers in State
+* [d912dd8e] [2021-09-28] SdlExporter: removed redundant exportPointersCollection function
+* [176883e4] [2021-09-28] SdlExporter: short description added to SdlVisitor
+* [8aee1637] [2021-09-28] SdlModel: added Transition class
+* [d05e3e19] [2021-09-29] 676 Add multi language to IV model
+* [ee5e4a35] [2021-09-21] SedsToIvTranslator: Created bundled interface command argument type is now using type references
+* [8f95e32b] [2021-09-22] SedsToIvTranslator: Fixed tests
+* [a157fea7] [2021-09-27] SedsToIvTranslator: Docs update
+* [00b3cd84] [2021-09-27] SedsToIvTranslator: Fixed getting ASN.1 package name
+* [4c14397a] [2021-09-28] SedsToIvTranslator: Docs fix
+* [0036bac8] [2021-09-28] SedsToIvTranslator: Merge conflict solved
+* [5826e87d] [2021-09-29] SdlModel: added Action stub source
+* [cf909d06] [2021-09-29] SdlModel: NextState class stub added
+* [4712039e] [2021-09-29] SdlModel, SdlExporter: removed circular dependency
+* [4804df9a] [2021-09-29] SdlModel: added state member and getter to NextState
+* [81d69a24] [2021-09-29] SdlModel: store the next state as a shared pointer
+* [5d4d996f] [2021-09-29] SdlModel: added transition to Input
+* [50d79fc7] [2021-09-29] SdlModel, SdlExporter: added nextstate action to transitions in tests
+* [a0a5f54c] [2021-09-29] SdlExporter: tests: add NextState's serialization
+* [74cbbd1f] [2021-09-29] SdlExporter: generating non-default NEXTSTATE added
+* [5bf2f660] [2021-09-29] SdlModel, SdlExporter: general cleanup applied
+* [c413a862] [2021-09-29] SdlModel: added comments
+* [13ec6ac4] [2021-09-30] 676 Show and edit function languages
+* [9ba641a0] [2021-09-23] SedsToIvTranslator: Variables cleanup
+* [7e741c18] [2021-09-23] SedsToIvTranslator: Some refactoring
+* [2cb5efa4] [2021-09-27] SedsToIvTranslator: Refactored translatePackage function
+* [89eae1aa] [2021-09-27] SedsToIvTranslator: Added additional check to the command argument caching
+* [900eda84] [2021-09-27] Conversion: Added ModelProperties trait
+* [cf5b1176] [2021-09-28] Conversion: Refactored checking source models in translators
+* [9f64bd08] [2021-09-28] Conversion: clang-tidy cleanup
+* [b6889b31] [2021-09-29] SedsToIvTranslator: Build fix
+* [d82b7efe] [2021-09-30] Conversion: Added some docs
+* [bbb498d5] [2021-09-30] Sort the DV tree
+* [e3079488] [2021-09-28] Asn1Exporter: Clean up in tests
+* [8589d66b] [2021-09-29] Conversion: Refactored directory structure
+* [3cf54349] [2021-09-29] Conversion: Created test helper check for exception message
+* [a673bc45] [2021-09-29] Conversion: Cleaned up namespaces in tests
+* [ea67a752] [2021-09-30] Asn1Importer: Fixed name of the test
+* [e9d61f9f] [2021-10-01] Conversion: Test fix
+* [bee0e8aa] [2021-10-01] 676 Show function implementation in DV
+* [bf263351] [2021-10-04] SdlExporter: added comments to sdlvisitor.h
+* [377823a2] [2021-10-04] SdlExporter: added short description to SDL visitor interface, moved constructor definition to .cpp file
+* [66eafac8] [2021-10-04] SdlModel: added node interface class short description
+* [eb56bfbb] [2021-10-04] SdlModel: added descriptions to Process class
+* [d861ae28] [2021-10-04] SdlModel: added documentation to model classes
+* [c16a0a67] [2021-10-04] SdlModel: added short description to VariableReference class
+* [27f8092a] [2021-10-04] SdlModel: add setters for variable declaration
+* [2f8f005f] [2021-10-04] SdlModel: add setter for variable reference
+* [c5b74cb4] [2021-10-04] SdlModel: add setter for transition
+* [44772d9b] [2021-10-04] SdlModel: add setters for StateMachine
+* [2a2784f6] [2021-10-04] SdlModel: add setters for State
+* [e806c8cb] [2021-10-04] SdlModel: added name setter declaration to SdlModel class
+* [80fc38ae] [2021-10-04] SdlModel: added setters to Process class
+* [fb391f1a] [2021-10-04] SdlModel: add setters declarations to Input, Literal, NextState and Node classes
+* [4f972250] [2021-10-04] SdlModel: missing setters implementation
+* [5243f69b] [2021-10-04] Add debug symbols in CI build
+* [9f412ffd] [2021-10-04] SdlExporter: tests: model builder wip
+* [1e6eb04f] [2021-10-04] 687 Add a unique nodeLabel for all nodes
+* [642efe2b] [2021-10-04] 676 Sync IV language changes to DV
+* [e9aa64ba] [2021-10-05] SdlExporter: tests: builder: fixes wip
+* [0df96b7d] [2021-10-05] Revert "SdlExporter: tests: builder: fixes wip"
+* [9c043332] [2021-10-05] Revert "SdlExporter: tests: model builder wip"
+* [3c3b7999] [2021-10-05] SdlExporter: removed unnecessary files
+* [44ea18a3] [2021-10-05] SdlModel, SdlExporter: review fixes
+* [43c1513f] [2021-10-05] SdlModel: include fixed
+* [d7fb86e5] [2021-10-05] SdlModel: for loops in State fixed
+* [647eb122] [2021-10-05] Release build only on CI
+* [7dbd7ecb] [2021-10-05] SdlExporter: tests: added verification checks
+* [a384bae9] [2021-10-05] SdlModel: alphabetical sorting applied to CMakeLists.txt
+* [d9df32ae] [2021-10-05] SdlModel: redundant setter removed
+* [b5306f27] [2021-10-05] SdlModel: rule of 5 applied to Process class
+* [e2765965] [2021-10-05] SdlModel: ownership of the model data added
+* [bb1f0433] [2021-10-06] 676 Check for used implementations in IV
+* [58388a37] [2021-08-18] 636 Use system Qt if it is newer than the app image one
+* [d876d2ee] [2021-08-18] 636 Use better file for system Qt check
+* [72e0198f] [2021-08-19] 636 Restore non AppImage environment
+* [3d931101] [2021-08-23] 636 More AppRun cleanup
+* [d9956987] [2021-08-24] AppImage only with Qt from QtCompany
+* [fd71b3e2] [2021-10-05] Clean up AppRun script
+* [e95ab724] [2021-10-05] Detect the correct QtC download url
+* [6bfd77aa] [2021-10-06] IVE: Undo issue
+* [51bdd656] [2021-10-06] SdlModel: passing by value added
+* [f7409e8a] [2021-10-06] SdlModel: move constructors added to Node and Process
+* [29288c21] [2021-10-06] SdlModel: Process made final
+* [69150188] [2021-10-06] SdlExporter: SdlVisitor and Visitor constructors/destructors cleanup
+* [d11bb9e0] [2021-10-06] SdlModel, SdlExporter: review fixes
+* [90ed433b] [2021-10-06] SdlModel: signal acceptor removed, SdlExporter: signal visitor removed
+* [f2324ac8] [2021-10-06] SdlModel: review fixes
+* [d98c514a] [2021-10-06] SdlModel: actions made unique instead of shared
+* [8be3aaab] [2021-10-06] SdlModel: default constructors/destructors fixed in State and Node
+* [6166ab8e] [2021-10-06] SdlModel: review fixes
+* [d3b69b8a] [2021-10-06] Artifacts for master builds only
+* [db1d9e4c] [2021-10-06] Merge branch 'master' into n7s-etb#79-sdl-model-exporter
+* [d4e55a6f] [2021-10-06] SdlModel: added ModelProperties specialization for SDL model
+* [bfd8b5cd] [2021-10-06] SdlExporter: review fixes
+* [cee58422] [2021-10-06] 676 Rename language widget to implementations
+* [a6b2a908] [2021-10-06] 676 Rename IV function languages to implementations
+* [b69b7d55] [2021-10-06] SdlModel: VariableReference changed from reference to pointer
+* [b9474523] [2021-10-06] SdlModel: applied rule of 5 to Input class
+* [93eedc8c] [2021-10-06] DVE: Crash when board is imported to the scene fix
+* [aa2c7f11] [2021-10-06] SdlModel, SdlExporter: applied rule of 5 to all SDL Model and Exporter classes
+* [fd4a6eb4] [2021-10-06] SdlModel: deleted copy constructors
+* [7012f7c3] [2021-10-06] DVE: Crash fix
+* [806098fe] [2021-10-07] Sync attributes from Taste project
+* [f6aa46f2] [2021-10-07] Fix AppImage start script
+* [84aa5811] [2021-10-07] Use test reports in CI
+* [29d1280c] [2021-10-07] 691 Reduce clicks to select a language/implementation
+* [389e8a45] [2021-10-08] IVE: Center Graphics View on diagram after file loading
+* [7368706f] [2021-10-08] IVE: Fix for text trimming during interaction with items on scene
+* [dc40b102] [2021-10-09] Move DV tree classes to a separate directory
+* [f15a6207] [2021-10-09] Update DV implementation comboboxes
+* [d1b86afb] [2021-10-11] SdlModel: added virtual in Node-s derived classes
+* [bbc9e23b] [2021-10-11] SdlModel: fixed SdlModel/CMakeLists.txt
+* [3adbe83b] [2021-10-11] SdlModel: changed delete to default in move constructor of SdlModel
+* [539dedac] [2021-10-11] SdlModel: review fixes
+* [203a7bf7] [2021-10-11] SdlModel: passing references to setters changed to pass-by-value
+* [c92d9a41] [2021-10-11] IVE: Crash when moving a large function
+* [650b4e80] [2021-10-11] SdlModel: reference changed to value+move
+* [325a2e76] [2021-10-11] SdlModel: shared pointers removed
+* [3bd01612] [2021-10-11] SdlExporter: UB fixed
+* [b7780ed7] [2021-10-11] SdlModel: passing StateMachine by value and moving
+* [41b1e3d1] [2021-10-11] SdlModel: added default move assignment operator to SdlModel and Process
+* [bd64d5aa] [2021-10-11] Merge branch 'master' into n7s-etb#79-sdl-model-exporter
+* [b36d2aba] [2021-10-12] Merge branch 'master' into n7s-etb#79-sdl-model-exporter
+* [c6129d87] [2021-10-12] IVE: attribute miat available in periodic interface
+* [a3abf4c7] [2021-10-13] IVE: Ensure diagram is visible when opening it
+
 Release: DVE_11
 ========================================================
 Known issues in layouting and undo/redo in interface view
