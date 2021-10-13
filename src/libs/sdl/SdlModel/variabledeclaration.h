@@ -19,6 +19,8 @@
 
 #pragma once
 
+#include "node.h"
+
 #include <QString>
 
 namespace sdl {
@@ -26,7 +28,7 @@ namespace sdl {
 /**
  * @brief   Represents an SDL variable declaration
  */
-class VariableDeclaration final
+class VariableDeclaration final : public Node
 {
 public:
     /**
@@ -58,20 +60,6 @@ public:
     VariableDeclaration &operator=(VariableDeclaration &&) = default;
 
     /**
-     * @brief    Getter for the name of the declared variable
-     *
-     * @return   name of the declared variable
-     */
-    auto name() const -> const QString &;
-
-    /**
-     * @brief    Setter for the name of the declared variable
-     *
-     * @param    name   name of the declared variable
-     */
-    auto setName(QString name) -> void;
-
-    /**
      * @brief    Getter for the type
      *
      * @return   type of the declared variable
@@ -85,8 +73,12 @@ public:
      */
     auto setType(QString type) -> void;
 
+    /**
+     * @brief  visitor acceptor (calls visit method of the given visitor)
+     */
+    virtual auto accept(Visitor &visitor) const -> void override;
+
 private:
-    QString m_name;
     QString m_type;
 };
 

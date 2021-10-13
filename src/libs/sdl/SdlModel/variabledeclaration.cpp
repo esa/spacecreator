@@ -20,23 +20,14 @@
 #include "variabledeclaration.h"
 
 #include <memory>
+#include <sdl/SdlExporter/visitors/visitor.h>
 
 namespace sdl {
 
 VariableDeclaration::VariableDeclaration(QString name, QString type)
-    : m_name(std::move(name))
+    : Node(std::move(name))
     , m_type(std::move(type))
 {
-}
-
-const QString &VariableDeclaration::name() const
-{
-    return m_name;
-}
-
-void VariableDeclaration::setName(QString name)
-{
-    m_name = std::move(name);
 }
 
 const QString &VariableDeclaration::type() const
@@ -47,6 +38,11 @@ const QString &VariableDeclaration::type() const
 void VariableDeclaration::setType(QString type)
 {
     m_type = std::move(type);
+}
+
+void VariableDeclaration::accept(Visitor &visitor) const
+{
+    visitor.visit(*this);
 }
 
 } // namespace sdl

@@ -27,6 +27,7 @@
 #include <sdl/SdlModel/state.h>
 #include <sdl/SdlModel/task.h>
 #include <sdl/SdlModel/transition.h>
+#include <sdl/SdlModel/variabledeclaration.h>
 
 namespace sdl {
 
@@ -114,6 +115,13 @@ public:
      * @param   task   task to be visited
      */
     virtual auto visit(const Task &task) const -> void = 0;
+
+    /**
+     * @brief   Variable declaration visitor
+     *
+     * @param   declaration   declaration to be visited
+     */
+    virtual auto visit(const VariableDeclaration &declaration) const -> void = 0;
 };
 
 } // namespace sdl

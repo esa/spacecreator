@@ -115,6 +115,13 @@ public:
      */
     auto visit(const Task &task) const -> void override;
 
+    /**
+     * @brief   Variable declaration visitor
+     *
+     * @param   declaration   declaration to be visited
+     */
+    auto visit(const VariableDeclaration &declaration) const -> void override;
+
 private:
     template<typename T>
     auto exportCollection(const T &collection) const -> void;
