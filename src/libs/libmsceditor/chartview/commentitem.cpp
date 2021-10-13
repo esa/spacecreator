@@ -76,6 +76,8 @@ CommentItem::CommentItem(MscChart *chart, ChartLayoutManager *chartLayoutManager
     m_linkItem->setPen(pen);
 
     setHighlightable(false);
+
+    connect(this, &InteractiveObject::relocated, this, [&]() { updateCif(); });
 }
 
 CommentItem::~CommentItem()
@@ -124,8 +126,7 @@ void CommentItem::attachTo(InteractiveObject *iObj)
     m_entity = m_iObj->modelEntity()->comment();
 
     if (!isGlobal()) {
-        connect(m_iObj, &InteractiveObject::moved, this, &CommentItem::scheduleLayoutUpdate, Qt::UniqueConnection);
-        connect(m_iObj, &InteractiveObject::relocated, this, &CommentItem::scheduleLayoutUpdate, Qt::UniqueConnection);
+        connect(m_iObj, &InteractiveObject::relocated, this, &CommentItem::onLinkedItemMoved, Qt::UniqueConnection);
     }
 
     if (auto entity = commentEntity()) {
@@ -232,6 +233,21 @@ void CommentItem::rebuildLayout()
         m_textItem->setExplicitSize(br.size());
     }
 
+    prepareGeometryChange();
+    setBoundingRect(m_textItem->boundingRect());
+
+    updateLinkPath();
+}
+
+void CommentItem::updateLinkPath()
+{
+    const QPair<QPointF, bool> commentData = m_iObj ? m_iObj->commentPoint() : qMakePair(QPointF(0, 0), false);
+    const QPointF commentPosition = commentData.first;
+    m_inverseLayout = commentData.second; // inverse layouting for comment
+
+    QRectF br = m_textItem->boundingRect();
+    br.moveTopLeft(pos());
+
     QPolygonF link;
     static const qreal tolerance = 5.;
     const bool directLink = qAbs(br.center().y() - commentPosition.y()) < tolerance;
@@ -265,9 +281,6 @@ void CommentItem::rebuildLayout()
             }
         }
     }
-
-    prepareGeometryChange();
-    setBoundingRect(m_textItem->boundingRect());
 
     m_linkItem->setVisible(isVisible() && !isGlobal());
     QPainterPath pp;
@@ -350,8 +363,6 @@ void CommentItem::onManualMoveProgress(shared::ui::GripPoint *gp, const QPointF 
 
         rebuildLayout();
         updateGripPoints();
-
-        Q_EMIT needUpdateLayout();
     } else {
         qWarning() << "ChartItem: Coordinates conversion (scene->mm) failed" << rect;
     }
@@ -413,6 +424,12 @@ void CommentItem::onManualResizeProgress(shared::ui::GripPoint *gp, const QPoint
     } else {
         qWarning() << "ChartItem: Coordinates conversion (scene->mm) failed" << rect;
     }
+}
+
+void CommentItem::onLinkedItemMoved(const QPointF &from, const QPointF &to)
+{
+    moveBy(to.x() - from.x(), to.y() - from.y());
+    updateLinkPath();
 }
 
 /*!

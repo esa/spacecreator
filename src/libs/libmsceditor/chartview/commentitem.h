@@ -56,15 +56,18 @@ protected:
     cif::CifLine::CifType mainCifType() const override;
     void initGripPoints() override;
     void rebuildLayout() override;
+    void updateLinkPath();
     void mouseDoubleClickEvent(QGraphicsSceneMouseEvent *event) override;
     void onManualMoveProgress(shared::ui::GripPoint *gp, const QPointF &from, const QPointF &to) override;
     void onManualResizeProgress(shared::ui::GripPoint *gp, const QPointF &from, const QPointF &to) override;
+
+private Q_SLOTS:
+    void onLinkedItemMoved(const QPointF &from, const QPointF &to);
 
 private:
     void textEdited(const QString &text);
     MscComment *commentEntity() const;
 
-private:
     TextItem *m_textItem = nullptr;
     QGraphicsPathItem *m_linkItem = nullptr;
     QPointer<MscChart> m_chart;
