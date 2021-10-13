@@ -508,6 +508,11 @@ void DVEditorCore::changeDefaultImplementationNames()
     }
 }
 
+void DVEditorCore::centerOnView()
+{
+    d->m_mainWidget->centerView();
+}
+
 void DVEditorCore::showPropertyEditor(const shared::Id &id)
 {
     if (auto obj = d->m_appModel->objectsModel()->getObject(id)) {

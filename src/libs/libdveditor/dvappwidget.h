@@ -44,6 +44,7 @@ public:
     void setGraphicsScene(QGraphicsScene *scene);
     void setDVCore(DVEditorCore *core);
     void setActions(const QVector<QAction *> &actions);
+    void centerView();
 
 private:
     Ui::DVAppWidget *ui = nullptr;

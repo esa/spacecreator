@@ -103,6 +103,7 @@ public:
             const QString &targetFunction, const QString &targetInterface);
     void changeFunctionImplementationName(const QString &functionName, const QString &newName, const QString &oldName);
     void changeDefaultImplementationNames();
+    void centerOnView();
 
 private Q_SLOTS:
     void showPropertyEditor(const shared::Id &id);

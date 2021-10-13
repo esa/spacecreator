@@ -166,6 +166,8 @@ private:
     QTreeView *createImportView();
     QTreeView *createSharedView();
 
+    void centerView();
+
     void onSceneSelectionChanged(const QList<shared::Id> &selectedObjects);
     void onViewSelectionChanged(const QItemSelection &selected, const QItemSelection &deselected);
 

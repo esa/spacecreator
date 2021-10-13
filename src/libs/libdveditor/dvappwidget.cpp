@@ -68,4 +68,15 @@ void DVAppWidget::setActions(const QVector<QAction *> &actions)
     }
 }
 
+void DVAppWidget::centerView()
+{
+    QRectF rect;
+    for (auto item : ui->view->scene()->items()) {
+        if (item->type() > QGraphicsItem::UserType) {
+            rect |= item->sceneBoundingRect();
+        }
+    }
+    ui->view->centerOn(rect.center());
+}
+
 } // namespace dve

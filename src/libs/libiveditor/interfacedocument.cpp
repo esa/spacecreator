@@ -646,6 +646,7 @@ void InterfaceDocument::setObjects(const QVector<ivm::IVObject *> &objects)
 {
     d->objectsModel->initFromObjects(objects);
     d->objectsModel->setRootObject({});
+    centerView();
 }
 
 void InterfaceDocument::onItemClicked(const shared::Id &id)
@@ -1171,18 +1172,7 @@ QVector<QAction *> InterfaceDocument::initActions()
         if (d->actExitToParent) {
             d->actExitToParent->setEnabled(nullptr != d->objectsModel->rootObject());
         }
-
-        if (const QGraphicsItem *item = d->itemsModel->getItem(rootId)) {
-            d->graphicsView->centerOn(item->sceneBoundingRect().center());
-        } else {
-            QRectF rect;
-            for (auto item : d->graphicsView->scene()->items()) {
-                if (item->type() > QGraphicsItem::UserType) {
-                    rect |= item->sceneBoundingRect();
-                }
-            }
-            d->graphicsView->centerOn(rect.center());
-        }
+        centerView();
     });
     connect(d->objectsSelectionModel, &QItemSelectionModel::selectionChanged, this,
             [this](const QItemSelection &selected, const QItemSelection & /*deselected*/) {
@@ -1285,6 +1275,25 @@ QTreeView *InterfaceDocument::createSharedView()
     d->sharedView->setModel(sourceModel);
 
     return d->sharedView;
+}
+
+void InterfaceDocument::centerView()
+{
+    if (!d->graphicsView) {
+        return;
+    }
+
+    if (const QGraphicsItem *item = d->itemsModel->getItem(d->objectsModel->rootObjectId())) {
+        d->graphicsView->centerOn(item->sceneBoundingRect().center());
+    } else {
+        QRectF rect;
+        for (auto item : d->graphicsView->scene()->items()) {
+            if (item->type() > QGraphicsItem::UserType) {
+                rect |= item->sceneBoundingRect();
+            }
+        }
+        d->graphicsView->centerOn(rect.center());
+    }
 }
 
 void InterfaceDocument::showNIYGUI(const QString &title)

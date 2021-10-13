@@ -77,6 +77,7 @@ void MainWindow::onOpenFileRequested()
     if (!fileName.isEmpty() && closeFile()) {
         shared::ErrorHub::clearErrors();
         m_core->appModel()->load(fileName);
+        m_core->centerOnView();
         if (shared::ErrorHub::hasErrors()) {
             QMessageBox::warning(this, tr("File load warnings"), shared::ErrorHub::errorDescriptions().join("\n"));
         }
