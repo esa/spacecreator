@@ -51,10 +51,8 @@ public:
 
     /**
      * @brief   Default constructor
-     *
-     * @param name    signal name
      */
-    Input(QString name = "");
+    Input() = default;
 
     /**
      * @brief   Deleted copy constructor
