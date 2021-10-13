@@ -21,6 +21,7 @@
 
 #include <iostream>
 #include <qglobal.h>
+#include <sdl/SdlModel/variablereference.h>
 
 namespace sdl {
 
@@ -81,7 +82,15 @@ void SdlVisitor::visit(const Input &input) const
 {
     // write some dummy CIF
     m_stream << "        /* CIF input (" << 250 << "," << 150 << "), (" << 150 << ", " << 75 << ") */\n";
-    m_stream << "        input " << input.name() << ";\n";
+    m_stream << "        input " << input.name();
+    for (auto &parameter : input.parameters()) {
+        const auto variantParam = parameter.get();
+        if (variantParam->index() == 0) { // parameter is a reference
+            const auto paramReference = std::move(std::get<VariableReference>(*variantParam));
+            m_stream << paramReference.declaration()->name();
+        }
+    }
+    m_stream << ";\n";
 
     if (input.transition() != nullptr) {
         exportCollection(input.transition()->actions());
