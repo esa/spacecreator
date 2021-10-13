@@ -178,6 +178,7 @@ void PropertiesListModel::updateRows(const QList<shared::PropertyTemplate *> &te
             const EntityAttribute attr = m_dataObject->entityAttribute(key);
             if (!attr.isValid() && propTemplate) {
                 rd.info = propTemplate->info();
+                rd.value = propTemplate->defaultValue().value<QString>();
             } else {
                 rd.value = attr.value();
                 rd.info = attr.isProperty() ? shared::PropertyTemplate::Info::Property
