@@ -34,9 +34,13 @@
 #include <sdl/SdlExporter/exporter.h>
 #include <sdl/SdlModel/action.h>
 #include <sdl/SdlModel/nextstate.h>
+#include <sdl/SdlModel/output.h>
 #include <sdl/SdlModel/process.h>
 #include <sdl/SdlModel/sdlmodel.h>
 #include <sdl/SdlModel/task.h>
+#include <sdl/SdlModel/variabledeclaration.h>
+#include <sdl/SdlModel/variableliteral.h>
+#include <sdl/SdlModel/variablereference.h>
 
 using conversion::ModelType;
 using conversion::Options;
@@ -44,6 +48,7 @@ using sdl::Action;
 using sdl::ContinuousSignal;
 using sdl::Input;
 using sdl::NextState;
+using sdl::Output;
 using sdl::Procedure;
 using sdl::Process;
 using sdl::SdlModel;

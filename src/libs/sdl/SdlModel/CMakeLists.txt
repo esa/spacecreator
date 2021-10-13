@@ -8,6 +8,7 @@ set(SOURCES action.cpp
             literal.cpp
             nextstate.cpp
             node.cpp
+            output.cpp
             process.cpp
             sdlmodel.cpp
             signal.cpp
@@ -23,6 +24,7 @@ set(INCLUDES action.h
              literal.h
              nextstate.h
              node.h
+             output.h
              process.h
              sdlmodel.h
              signal.h

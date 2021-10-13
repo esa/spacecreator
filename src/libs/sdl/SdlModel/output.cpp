@@ -17,39 +17,23 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/lgpl-2.1.html>.
  */
 
-#include "input.h"
+#include "output.h"
 
 #include <sdl/SdlExporter/visitors/visitor.h>
 
 namespace sdl {
 
-Input::Input(QString name, Transition *transition)
-    : Signal(std::move(name))
-    , m_transition(transition)
+Output::Parameter *Output::parameter() const
 {
+    return m_parameter;
 }
 
-Transition *Input::transition() const
+void Output::setParameter(Output::Parameter *const parameter)
 {
-    return m_transition;
+    m_parameter = parameter;
 }
 
-void Input::setTransition(Transition *transition)
-{
-    m_transition = transition;
-}
-
-const std::vector<std::unique_ptr<Input::Parameter>> &Input::parameters() const
-{
-    return m_parameters;
-}
-
-void Input::addParameter(std::unique_ptr<Parameter> parameter)
-{
-    m_parameters.push_back(std::move(parameter));
-}
-
-void Input::accept(Visitor &visitor) const
+void Output::accept(Visitor &visitor) const
 {
     visitor.visit(*this);
 }

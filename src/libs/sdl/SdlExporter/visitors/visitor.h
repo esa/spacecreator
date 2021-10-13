@@ -21,6 +21,7 @@
 
 #include <sdl/SdlModel/input.h>
 #include <sdl/SdlModel/nextstate.h>
+#include <sdl/SdlModel/output.h>
 #include <sdl/SdlModel/process.h>
 #include <sdl/SdlModel/sdlmodel.h>
 #include <sdl/SdlModel/signal.h>
@@ -94,6 +95,13 @@ public:
      * @param   input   input to be visited
      */
     virtual auto visit(const Input &input) const -> void = 0;
+
+    /**
+     * @brief   Output visitor
+     *
+     * @param   output  output to be visited
+     */
+    virtual auto visit(const Output &output) const -> void = 0;
 
     /**
      * @brief   NEXTSTATE action visitor
