@@ -88,11 +88,6 @@ void SdlVisitor::visit(const Input &input) const
     }
 }
 
-void SdlVisitor::visit(const Transition &transition) const
-{
-    Q_UNUSED(transition);
-}
-
 void SdlVisitor::visit(const NextState &nextstate) const
 {
     // write some dummy CIF

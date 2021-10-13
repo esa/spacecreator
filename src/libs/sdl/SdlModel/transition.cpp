@@ -24,9 +24,8 @@
 
 namespace sdl {
 
-Transition::Transition(QString name, std::vector<std::unique_ptr<Action>> actions)
-    : Node(std::move(name))
-    , m_actions(std::move(actions))
+Transition::Transition(std::vector<std::unique_ptr<Action>> actions)
+    : m_actions(std::move(actions))
 {
 }
 
@@ -38,11 +37,6 @@ const std::vector<std::unique_ptr<Action>> &Transition::actions()
 void Transition::addAction(std::unique_ptr<Action> action)
 {
     m_actions.push_back(std::move(action));
-}
-
-void Transition::accept(Visitor &visitor) const
-{
-    visitor.visit(*this);
 }
 
 } // namespace sdl

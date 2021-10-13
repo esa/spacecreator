@@ -95,13 +95,6 @@ public:
     auto visit(const Input &input) const -> void override;
 
     /**
-     * @brief   Transition visitor
-     *
-     * @param   transition   transition to be serialized
-     */
-    auto visit(const Transition &transition) const -> void override;
-
-    /**
      * @brief   NEXTSTATE action visitor
      *
      * @param   nextstate   NEXTSTATE action to be serialized

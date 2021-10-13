@@ -31,16 +31,15 @@ namespace sdl {
 /**
  * @brief   Represents an SDL transition
  */
-class Transition final : public Node
+class Transition final
 {
 public:
     /**
      * @brief   Constructor
      *
-     * @param   name    name of this transition
      * @param   actions reference to the vector of pointers to actions
      */
-    Transition(QString name, std::vector<std::unique_ptr<Action>> actions);
+    Transition(std::vector<std::unique_ptr<Action>> actions);
 
     /**
      * @brief   Default constructor
@@ -80,11 +79,6 @@ public:
      * @param    action  a pointer to action
      */
     auto addAction(std::unique_ptr<Action> action) -> void;
-
-    /**
-     * @brief  visitor acceptor (calls visit method of the given visitor)
-     */
-    virtual auto accept(Visitor &visitor) const -> void;
 
 private:
     std::vector<std::unique_ptr<Action>> m_actions;

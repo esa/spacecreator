@@ -96,13 +96,6 @@ public:
     virtual auto visit(const Input &input) const -> void = 0;
 
     /**
-     * @brief   Transition visitor
-     *
-     * @param   transition   transition to be visited
-     */
-    virtual auto visit(const Transition &transition) const -> void = 0;
-
-    /**
      * @brief   NEXTSTATE action visitor
      *
      * @param   nextstate   NEXTSTATE action to be visited
