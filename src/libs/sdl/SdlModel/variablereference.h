@@ -35,10 +35,9 @@ public:
     /**
      * @brief   Default constructor
      *
-     * @param   declaration   referenced variable declaration
+     * @param   declaration   referenced variable declaration pointer
      */
-    VariableReference(
-            const std::shared_ptr<VariableDeclaration> &declaration = std::make_shared<VariableDeclaration>());
+    VariableReference(VariableDeclaration *declaration = nullptr);
 
     /**
      * @brief   Deleted copy constructor
@@ -70,12 +69,12 @@ public:
     /**
      * @brief    Setter for the referenced variable declaration
      *
-     * @param    declaration const reference to pointer to variable declaration
+     * @param    declaration   pointer to variable declaration
      */
-    auto setDeclaration(const std::shared_ptr<VariableDeclaration> &declaration) -> void;
+    auto setDeclaration(VariableDeclaration *declaration) -> void;
 
 private:
-    std::shared_ptr<VariableDeclaration> m_declaration;
+    VariableDeclaration *m_declaration;
 };
 
 } // namespace sdl
