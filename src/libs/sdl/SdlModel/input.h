@@ -21,12 +21,20 @@
 
 #include "signal.h"
 #include "transition.h"
+#include "variablereference.h"
 
 #include <QString>
 #include <memory>
+#include <variant>
 #include <vector>
 
 namespace sdl {
+
+class VariableLiteral final
+{
+    // TODO: extract to a separate file
+    // TODO: this cshall inherit from Node
+};
 
 /**
  * @brief   Represents an SDL input signal.
@@ -36,6 +44,8 @@ namespace sdl {
 class Input final : public Signal
 {
 public:
+    using Parameter = std::variant<VariableReference, VariableLiteral>;
+
     /**
      * @brief   Constructor
      *
@@ -81,10 +91,23 @@ public:
     /**
      * @brief   Setter for the transition
      *
-     * @param   transition a const reference to the pointer to transition which should be triggered upon reception of
-     *                     this signal
+     * @param   transition a pointer to transition which should be triggered upon reception of this signal
      */
     auto setTransition(Transition *transition) -> void;
+
+    /**
+     * @brief   Getter for the parameters
+     *
+     * @return  a reference to vector of pointers to input parameters
+     */
+    auto parameters() const -> const std::vector<std::unique_ptr<Parameter>> &;
+
+    /**
+     * @brief   Setter for the transition
+     *
+     * @param   parameter  a pointer to input parameter
+     */
+    auto addParameter(std::unique_ptr<Parameter> parameter) -> void;
 
     /**
      * @brief  visitor acceptor (calls visit method of the given visitor)
@@ -94,7 +117,7 @@ public:
 private:
     Transition *m_transition;
 
-    // TODO: list of input parameters (variants: variable references/literals)
+    std::vector<std::unique_ptr<Parameter>> m_parameters;
 };
 
 } // namespace sdl

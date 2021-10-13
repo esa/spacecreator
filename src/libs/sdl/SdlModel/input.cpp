@@ -45,6 +45,16 @@ void Input::setTransition(Transition *transition)
     m_transition = transition;
 }
 
+const std::vector<std::unique_ptr<Input::Parameter>> &Input::parameters() const
+{
+    return m_parameters;
+}
+
+void Input::addParameter(std::unique_ptr<Parameter> parameter)
+{
+    m_parameters.push_back(std::move(parameter));
+}
+
 void Input::accept(Visitor &visitor) const
 {
     visitor.visit(*this);
