@@ -155,12 +155,4 @@
             <Required_Interface/>
         </Scopes>
     </Attr>
-    <Attr label="UIText" name="LabelTest" type="property">
-        <Type>
-            <Boolean/>
-        </Type>
-        <Scopes>
-            <Function/>
-        </Scopes>
-    </Attr>
 </Attrs>
