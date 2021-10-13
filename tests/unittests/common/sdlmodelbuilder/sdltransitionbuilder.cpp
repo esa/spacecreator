@@ -28,7 +28,8 @@ namespace tests::common {
 SdlTransitionBuilder::SdlTransitionBuilder(QString name)
     : m_transition(std::make_unique<Transition>())
 {
-    m_transition->setName(std::move(name));
+    // m_transition->setName(std::move(name));
+    (void)name;
 }
 
 std::unique_ptr<Transition> SdlTransitionBuilder::build()
