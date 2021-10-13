@@ -50,6 +50,11 @@ void Process::setVariables(std::vector<std::unique_ptr<VariableDeclaration>> var
     m_variables = std::move(variables);
 }
 
+void Process::addVariable(std::unique_ptr<VariableDeclaration> variable)
+{
+    m_variables.push_back(std::move(variable));
+}
+
 const std::vector<std::unique_ptr<Procedure>> &Process::procedures() const
 {
     return m_procedures;

@@ -40,9 +40,12 @@ void SdlVisitor::visit(const Process &process) const
     m_stream << "/* CIF PROCESS (" << 250 << ", " << 150 << "), (" << 150 << ", " << 75 << ") */\n";
     m_stream << "process " << process.name() << ";\n";
 
-    // TODO: loop over process variables and export them
+    exportCollection(process.variables());
+    m_stream << "\n";
 
     // TODO: loop over procedures and export them
+    m_stream << "    -- procedures\n";
+    m_stream << "\n";
 
     // TODO: initial transition (START) must be explicitly stated
     m_stream << "    /* CIF START (9, 285), (70, 35) */\n"
@@ -55,6 +58,7 @@ void SdlVisitor::visit(const Process &process) const
         m_stream << process.stateMachine()->states()[0]->name();
     }
     m_stream << ";\n";
+    m_stream << "\n";
 
     exportCollection(process.stateMachine()->states());
 
@@ -70,6 +74,7 @@ void SdlVisitor::visit(const State &state) const
     exportCollection(state.inputs());
 
     m_stream << "    endstate;\n";
+    m_stream << "\n";
 }
 
 void SdlVisitor::visit(const Input &input) const
@@ -107,7 +112,12 @@ void SdlVisitor::visit(const Task &task) const
 {
     // write some dummy CIF
     m_stream << "            /* CIF task (" << 250 << "," << 150 << "), (" << 150 << ", " << 75 << ") */\n";
-    m_stream << "            task " << task.content() << "\n";
+    m_stream << "            task " << task.content() << ";\n";
+}
+
+void SdlVisitor::visit(const VariableDeclaration &declaration) const
+{
+    m_stream << "    dcl " << declaration.name() << " " << declaration.type() << ";\n";
 }
 
 template<typename T>

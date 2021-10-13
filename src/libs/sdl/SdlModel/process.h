@@ -129,6 +129,13 @@ public:
     auto setVariables(std::vector<std::unique_ptr<VariableDeclaration>> variables) -> void;
 
     /**
+     * @brief   Add a variable declaration
+     *
+     * @param   variables a pointer to variable declaration
+     */
+    auto addVariable(std::unique_ptr<VariableDeclaration> variable) -> void;
+
+    /**
      * @brief   Getter for the procedures declared in this process
      *
      * @return  a const reference to a vector of pointers to procedure
