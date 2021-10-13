@@ -24,6 +24,7 @@
 #include <QTextStream>
 #include <sdl/SdlModel/input.h>
 #include <sdl/SdlModel/nextstate.h>
+#include <sdl/SdlModel/output.h>
 #include <sdl/SdlModel/process.h>
 #include <sdl/SdlModel/sdlmodel.h>
 #include <sdl/SdlModel/signal.h>
@@ -93,6 +94,13 @@ public:
      * @param   input   input to be serialized
      */
     auto visit(const Input &input) const -> void override;
+
+    /**
+     * @brief   Output visitor
+     *
+     * @param   output  output to be visited
+     */
+    auto visit(const Output &output) const -> void override;
 
     /**
      * @brief   NEXTSTATE action visitor
