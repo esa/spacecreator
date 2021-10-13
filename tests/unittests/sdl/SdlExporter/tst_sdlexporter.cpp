@@ -53,6 +53,7 @@ using sdl::Task;
 using sdl::Transition;
 using sdl::VariableDeclaration;
 using sdl::VariableLiteral;
+using sdl::VariableReference;
 using sdl::exporter::SdlExporter;
 using sdl::exporter::SdlOptions;
 using tests::common::SdlInputBuilder;
@@ -115,9 +116,12 @@ void tst_sdlmodel::testGenerateProcess()
     QString modelPrefix = "Sdl_";
     QString processName = "Modemanager";
 
+    auto variable = std::make_unique<VariableDeclaration>("howManyLoops", "INTEGER");
+
     auto transition1 = SdlTransitionBuilder().withNextStateAction().build();
+    auto someInput = SdlInputBuilder("some_input_name", transition1.get()).build();
     auto state1 = SdlStateBuilder("Looping")
-                          .withInput(SdlInputBuilder("some_input_name", transition1.get()).build())
+                          .withInput(std::move(someInput))
                           .withContinuousSignal(std::make_unique<ContinuousSignal>())
                           .build();
 
@@ -136,7 +140,6 @@ void tst_sdlmodel::testGenerateProcess()
                                                      .build())
                            .build();
 
-    auto variable = std::make_unique<VariableDeclaration>("howManyLoops", "INTEGER");
     process->addVariable(std::move(variable));
 
     // clang-format off
@@ -167,7 +170,6 @@ void tst_sdlmodel::testGenerateProcess()
     verifyAndConsume(consumableOutput, "START;");
     verifyAndConsume(consumableOutput, "NEXTSTATE");
     verifyAndConsume(consumableOutput, "state Looping;");
-    verifyAndConsume(consumableOutput, "input some_input_name");
     verifyAndConsume(consumableOutput, "NEXTSTATE -");
     verifyAndConsume(consumableOutput, "endstate;");
     verifyAndConsume(consumableOutput, "state Idle;");
