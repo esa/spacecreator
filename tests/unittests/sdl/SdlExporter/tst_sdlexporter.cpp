@@ -18,6 +18,7 @@
  */
 
 #include "statemachine.h"
+#include "variabledeclaration.h"
 
 #include <QObject>
 #include <QtTest>
@@ -125,18 +126,22 @@ void tst_sdlmodel::testGenerateProcess()
                           .withContinuousSignal(std::make_unique<ContinuousSignal>())
                           .build();
 
+    auto process = SdlProcessBuilder(processName)
+                           .withStateMachine(SdlStateMachineBuilder()
+                                                     .withState(std::move(state1))
+                                                     .withState(std::move(state2))
+                                                     .withTransition(std::move(transition1))
+                                                     .withTransition(std::move(transition2))
+                                                     .build())
+                           .build();
+
+    auto variable = std::make_unique<VariableDeclaration>("howManyLoops", "INTEGER");
+    process->addVariable(std::move(variable));
+
     // clang-format off
     const auto exampleModel = SdlModelBuilder(modelName)
         .withProcess(
-            SdlProcessBuilder(processName)
-                .withStateMachine(
-                    SdlStateMachineBuilder()
-                        .withState(std::move(state1))
-                        .withState(std::move(state2))
-                        .withTransition(std::move(transition1))
-                        .withTransition(std::move(transition2))
-                    .build()
-                ).build()
+            std::move(process)
         ).build();
     // clang-format on
 
@@ -157,6 +162,7 @@ void tst_sdlmodel::testGenerateProcess()
     }
     QTextStream consumableOutput(&outputFile);
     verifyAndConsume(consumableOutput, "process Modemanager;");
+    verifyAndConsume(consumableOutput, "dcl howManyLoops INTEGER");
     verifyAndConsume(consumableOutput, "START;");
     verifyAndConsume(consumableOutput, "NEXTSTATE");
     verifyAndConsume(consumableOutput, "state Looping;");
