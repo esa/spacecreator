@@ -28,6 +28,7 @@
 #include <sdl/SdlModel/sdlmodel.h>
 #include <sdl/SdlModel/signal.h>
 #include <sdl/SdlModel/state.h>
+#include <sdl/SdlModel/task.h>
 #include <sdl/SdlModel/transition.h>
 
 namespace sdl {
@@ -106,6 +107,13 @@ public:
      * @param   nextstate   NEXTSTATE action to be serialized
      */
     auto visit(const NextState &nextstate) const -> void override;
+
+    /**
+     * @brief   Task visitor
+     *
+     * @param   task   task to be serialized
+     */
+    auto visit(const Task &task) const -> void override;
 
 private:
     template<typename T>

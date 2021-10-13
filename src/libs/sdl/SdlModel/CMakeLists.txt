@@ -13,6 +13,7 @@ set(SOURCES action.cpp
             signal.cpp
             state.cpp
             statemachine.cpp
+            task.cpp
             transition.cpp
             variabledeclaration.cpp
             variablereference.cpp)
@@ -26,6 +27,7 @@ set(INCLUDES action.h
              signal.h
              state.h
              statemachine.h
+             task.h
              transition.h
              variabledeclaration.h
              variablereference.h)
