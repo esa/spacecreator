@@ -19,6 +19,8 @@
 
 #include "basecreatortool.h"
 
+#include <QPointer>
+
 namespace msc {
 
 class CommentCreatorTool : public BaseCreatorTool
@@ -36,7 +38,7 @@ private:
     bool onMouseMove(QMouseEvent *e) override;
 
     const bool m_isGlobalComment;
-    MscEntity *m_targetEntity = nullptr;
+    QPointer<MscEntity> m_targetEntity;
 };
 
 } // namespace msc
