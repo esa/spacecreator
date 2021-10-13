@@ -103,6 +103,13 @@ void SdlVisitor::visit(const NextState &nextstate) const
     m_stream << ";\n";
 }
 
+void SdlVisitor::visit(const Task &task) const
+{
+    // write some dummy CIF
+    m_stream << "            /* CIF task (" << 250 << "," << 150 << "), (" << 150 << ", " << 75 << ") */\n";
+    m_stream << "            task " << task.content() << "\n";
+}
+
 template<typename T>
 void SdlVisitor::exportCollection(const T &collection) const
 {

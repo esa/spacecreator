@@ -35,6 +35,7 @@
 #include <sdl/SdlModel/nextstate.h>
 #include <sdl/SdlModel/process.h>
 #include <sdl/SdlModel/sdlmodel.h>
+#include <sdl/SdlModel/task.h>
 
 using conversion::ModelType;
 using conversion::Options;
@@ -47,6 +48,7 @@ using sdl::Process;
 using sdl::SdlModel;
 using sdl::State;
 using sdl::StateMachine;
+using sdl::Task;
 using sdl::Transition;
 using sdl::VariableDeclaration;
 using sdl::exporter::SdlExporter;
