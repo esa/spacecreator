@@ -173,9 +173,9 @@ void tst_sdlmodel::testGenerateProcess()
     verifyAndConsume(consumableOutput, "process Modemanager;");
     verifyAndConsume(consumableOutput, "dcl howManyLoops INTEGER");
     verifyAndConsume(consumableOutput, "START;");
-    verifyAndConsume(consumableOutput, "NEXTSTATE");
+    verifyAndConsume(consumableOutput, "NEXTSTATE Looping;");
     verifyAndConsume(consumableOutput, "state Looping;");
-    verifyAndConsume(consumableOutput, "NEXTSTATE -");
+    verifyAndConsume(consumableOutput, "NEXTSTATE -;");
     verifyAndConsume(consumableOutput, "endstate;");
     verifyAndConsume(consumableOutput, "state Idle;");
     verifyAndConsume(consumableOutput, "input some_other_input_name;");
