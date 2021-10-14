@@ -35,7 +35,7 @@ namespace sdl {
  *
  * TODO
  */
-class Output final : public Signal, public Action
+class Output final : public Action
 {
 public:
     using Parameter = std::variant<VariableReference, VariableLiteral>;
