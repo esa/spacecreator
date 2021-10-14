@@ -41,12 +41,12 @@ void SdlVisitor::visit(const Process &process) const
     m_stream << "/* CIF PROCESS (" << 250 << ", " << 150 << "), (" << 150 << ", " << 75 << ") */\n";
     m_stream << "process " << process.name() << ";\n";
 
+    m_stream << "    /* CIF TEXT (16, 317), (267, 140) */\n";
     exportCollection(process.variables());
+    m_stream << "    /* CIF ENDTEXT */\n";
     m_stream << "\n";
 
     // TODO: loop over procedures and export them
-    m_stream << "    -- procedures\n";
-    m_stream << "\n";
 
     // TODO: initial transition (START) must be explicitly stated
     m_stream << "    /* CIF START (9, 285), (70, 35) */\n"
