@@ -1,0 +1,28 @@
+/* CIF PROCESS (250, 150), (150, 75) */
+process Modemanager;
+    /* CIF TEXT (764, 80), (267, 140) */
+    dcl howManyLoops MyInteger;
+    /* CIF ENDTEXT */
+    /* CIF START (549, 66), (70, 35) */
+    START;
+        /* CIF NEXTSTATE (548, 132), (70, 35) */
+        NEXTSTATE Looping;
+    /* CIF state (1102, 158), (70, 35) */
+    state Idle;
+        /* CIF input (1041, 213), (193, 35) */
+        input some_other_input_name;
+            /* CIF task (1041, 268), (191, 40) */
+            task 'EXAMPLE TASK CONTENTS';
+            /* CIF output (1048, 328), (178, 35) */
+            output Outname(howManyLoops);
+            /* CIF NEXTSTATE (1102, 383), (70, 35) */
+            NEXTSTATE Looping;
+    endstate;
+    /* CIF state (548, 132), (70, 35) */
+    state Looping;
+        /* CIF input (467, 223), (231, 40) */
+        input some_input_name(howManyLoops);
+            /* CIF NEXTSTATE (548, 283), (70, 35) */
+            NEXTSTATE -;
+    endstate;
+endprocess Modemanager;
