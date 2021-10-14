@@ -111,7 +111,7 @@ void SdlVisitor::visit(const Output &output) const
 {
     // write some dummy CIF
     m_stream << "            /* CIF NEXTSTATE (" << 250 << "," << 150 << "), (" << 150 << ", " << 75 << ") */\n";
-    m_stream << "            output " << output.Signal::name();
+    m_stream << "            output " << output.name();
     const auto outputParam = output.parameter();
     if (outputParam != nullptr) {
         m_stream << "(";

@@ -112,6 +112,14 @@ void verifyAndConsume(QTextStream &stream, const QString &string)
     if (stream.atEnd()) {
         QString message = QString("the generated file does not contain '%1' substring").arg(string);
         QFAIL(message.toStdString().c_str());
+        // TODO: abort the test
+    }
+}
+
+void checkSequenceAndConsume(std::vector<QString> &expectedOutput, QTextStream &consumableOutput)
+{
+    for (const auto &expectedLine : expectedOutput) {
+        verifyAndConsume(consumableOutput, expectedLine);
     }
 }
 
@@ -170,17 +178,19 @@ void tst_sdlmodel::testGenerateProcess()
         QFAIL("requested file cannot be found");
     }
     QTextStream consumableOutput(&outputFile);
-    verifyAndConsume(consumableOutput, "process Modemanager;");
-    verifyAndConsume(consumableOutput, "dcl howManyLoops INTEGER");
-    verifyAndConsume(consumableOutput, "START;");
-    verifyAndConsume(consumableOutput, "NEXTSTATE Looping;");
-    verifyAndConsume(consumableOutput, "state Looping;");
-    verifyAndConsume(consumableOutput, "NEXTSTATE -;");
-    verifyAndConsume(consumableOutput, "endstate;");
-    verifyAndConsume(consumableOutput, "state Idle;");
-    verifyAndConsume(consumableOutput, "input some_other_input_name;");
-    verifyAndConsume(consumableOutput, "endstate;");
-    verifyAndConsume(consumableOutput, "endprocess Modemanager;");
+    std::vector<QString> expectedOutput = {
+        "process Modemanager;",
+        "dcl howManyLoops INTEGER",
+        "START;",
+        "NEXTSTATE Looping;",
+        "state Looping;",
+        "NEXTSTATE -;",
+        "endstate;",
+        "state Idle;",
+        "endstate;",
+        "endprocess Modemanager;",
+    };
+    checkSequenceAndConsume(expectedOutput, consumableOutput);
 }
 
 } // namespace tests::sdl
