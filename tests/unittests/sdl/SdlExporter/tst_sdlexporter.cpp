@@ -129,7 +129,7 @@ void tst_sdlmodel::testGenerateProcess()
     QString modelPrefix = "Sdl_";
     QString processName = "Modemanager";
 
-    auto variable = std::make_unique<VariableDeclaration>("howManyLoops", "INTEGER");
+    auto variable = std::make_unique<VariableDeclaration>("howManyLoops", "MyInteger");
 
     auto transition1 = SdlTransitionBuilder().withNextStateAction().build();
     auto someInput = SdlInputBuilder("some_input_name", transition1.get()).build();
@@ -180,7 +180,7 @@ void tst_sdlmodel::testGenerateProcess()
     QTextStream consumableOutput(&outputFile);
     std::vector<QString> expectedOutput = {
         "process Modemanager;",
-        "dcl howManyLoops INTEGER",
+        "dcl howManyLoops MyInteger",
         "START;",
         "NEXTSTATE Looping;",
         "state Looping;",
