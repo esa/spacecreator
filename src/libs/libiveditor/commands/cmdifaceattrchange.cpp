@@ -59,6 +59,8 @@ void CmdIfaceAttrChange::redo()
 
 void CmdIfaceAttrChange::undo()
 {
+    CmdIfaceDataChangeBase::undo();
+
     switch (m_targetToken) {
     case ivm::meta::Props::Token::kind: {
         setKind(m_oldValue);
@@ -67,8 +69,6 @@ void CmdIfaceAttrChange::undo()
     default:
         break;
     }
-
-    CmdIfaceDataChangeBase::undo();
 
     if (m_targetToken == ivm::meta::Props::Token::name) {
         Q_EMIT nameChanged(m_iface, m_newValue.toString(), this);
