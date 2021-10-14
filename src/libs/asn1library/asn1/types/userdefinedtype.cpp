@@ -29,10 +29,9 @@
 
 using namespace Asn1Acn::Types;
 
-UserdefinedType::UserdefinedType(const QString &name, const QString &module, const Asn1Acn::TypeAssignment *referencedType)
+UserdefinedType::UserdefinedType(const QString &name, const QString &module)
     : m_name(name)
     , m_module(module)
-    , m_referencedType(referencedType)
     , m_type(nullptr)
 {
 }
@@ -41,7 +40,6 @@ UserdefinedType::UserdefinedType(const UserdefinedType &other)
     : Type(other)
     , m_name(other.m_name)
     , m_module(other.m_module)
-    , m_referencedType(other.m_referencedType)
 {
     m_type = (other.m_type != nullptr) ? other.m_type->clone() : nullptr;
 
@@ -87,14 +85,6 @@ std::unique_ptr<Type> UserdefinedType::clone() const
 QString UserdefinedType::baseIconFile() const
 {
     return QStringLiteral(":/asn1acn/images/outline/userdefined.png");
-}
-
-/*!
-   Returns the type that this one is based on (references to)
- */
-const Asn1Acn::TypeAssignment *UserdefinedType::referencedType() const
-{
-    return m_referencedType;
 }
 
 void UserdefinedType::setType(std::unique_ptr<Type> type)

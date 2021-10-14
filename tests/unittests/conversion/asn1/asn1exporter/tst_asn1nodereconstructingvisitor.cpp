@@ -469,8 +469,7 @@ void tst_Asn1NodeReconstructingVisitor::testTypeAssignmentIntegerWithValue()
 
 void tst_Asn1NodeReconstructingVisitor::testTypeAssignmentUserDefined()
 {
-    auto type = std::make_unique<Types::UserdefinedType>(
-            QStringLiteral("ReferencedType"), QStringLiteral("MyModule"), nullptr);
+    auto type = std::make_unique<Types::UserdefinedType>(QStringLiteral("ReferencedType"), QStringLiteral("MyModule"));
     type->setType(Types::TypeFactory::createBuiltinType(QStringLiteral("INTEGER")));
 
     auto assignment = std::make_unique<TypeAssignment>(
@@ -487,8 +486,7 @@ void tst_Asn1NodeReconstructingVisitor::testTypeAssignmentUserDefinedWithValue()
     auto &constrainedType = dynamic_cast<Constraints::WithConstraints<IntegerValue> &>(*referedType);
     constrainedType.constraints().append({ 1, 2 });
 
-    auto type = std::make_unique<Types::UserdefinedType>(
-            QStringLiteral("ReferencedType"), QStringLiteral("MyModule"), nullptr);
+    auto type = std::make_unique<Types::UserdefinedType>(QStringLiteral("ReferencedType"), QStringLiteral("MyModule"));
     type->setType(std::move(referedType));
     auto assignment = std::make_unique<TypeAssignment>(
             QStringLiteral("MyType"), QStringLiteral("MyTypeT"), SourceLocation(), std::move(type));

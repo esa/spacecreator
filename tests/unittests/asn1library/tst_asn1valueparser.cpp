@@ -527,9 +527,9 @@ void tst_Asn1ValueParser::testUserType()
     colorType->addItem(Asn1Acn::Types::EnumeratedItem(0, "red", 0));
     colorType->addItem(Asn1Acn::Types::EnumeratedItem(1, "green", 1));
     colorType->addItem(Asn1Acn::Types::EnumeratedItem(2, "blue", 2));
-    auto colorAssignment = std::make_unique<Asn1Acn::TypeAssignment>("Color", "Color", location, std::move(colorType));
 
-    auto userType = std::make_unique<Asn1Acn::Types::UserdefinedType>("Color", "", colorAssignment.get());
+    auto userType = std::make_unique<Asn1Acn::Types::UserdefinedType>("Color", "");
+    userType->setType(std::move(colorType));
 
     auto type = std::make_unique<Asn1Acn::Types::SequenceOf>();
     auto range = Range<typename IntegerValue::Type>(2, 2);

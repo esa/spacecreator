@@ -157,8 +157,8 @@ Asn1ItemModel::ItemMap Asn1ItemModel::createModelItems(const Asn1Acn::Types::Typ
     }
     case Asn1Acn::Types::Type::USERDEFINED: {
         auto userType = static_cast<const Asn1Acn::Types::UserdefinedType *>(asn1Item);
-        if (userType->referencedType()) {
-            return createModelItems(userType->referencedType()->type(), asn1Item->identifier());
+        if (userType->type()) {
+            return createModelItems(userType->type(), asn1Item->identifier());
         }
         break;
     }

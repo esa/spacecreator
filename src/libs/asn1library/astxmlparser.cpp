@@ -859,7 +859,13 @@ std::unique_ptr<Types::Type> AstXmlParser::createReferenceType(
         m_data[m_currentFile]->addTypeReference(std::move(ref));
     }
 
-    return std::make_unique<Types::UserdefinedType>(refName, module, referencedType);
+    auto type = std::make_unique<Types::UserdefinedType>(refName, module);
+
+    if(referencedType && referencedType->type()) {
+        type->setType(std::move(referencedType->type()->clone()));
+    }
+
+    return type;
 }
 
 void AstXmlParser::readReferredTypeDetails(Types::Type &type)

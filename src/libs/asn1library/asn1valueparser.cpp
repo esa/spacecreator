@@ -77,8 +77,8 @@ QVariantMap Asn1ValueParser::parseAsn1Value(
     // In case of user types, use the referenced type
     if (type->typeEnum() == Asn1Acn::Types::Type::USERDEFINED) {
         auto userType = dynamic_cast<const Asn1Acn::Types::UserdefinedType *>(type);
-        if (userType && userType->referencedType()) {
-            valueMap = parseAsn1Value(userType->referencedType(), asn1Value, valueOk);
+        if (userType && userType->type()) {
+            valueMap = parseAsn1Value(userType->type(), asn1Value, valueOk);
             valueMap["name"] = type->identifier();
             return valueMap;
         }

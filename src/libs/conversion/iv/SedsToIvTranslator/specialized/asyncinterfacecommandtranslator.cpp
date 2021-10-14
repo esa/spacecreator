@@ -149,8 +149,7 @@ void AsyncInterfaceCommandTranslator::createAsn1SequenceComponent(
     const auto *referencedTypeAssignment = m_asn1Definitions->type(typeName);
     const auto *referencedType = referencedTypeAssignment->type();
 
-    auto sequenceComponentType = std::make_unique<Asn1Acn::Types::UserdefinedType>(
-            typeName, m_asn1Definitions->name(), referencedTypeAssignment);
+    auto sequenceComponentType = std::make_unique<Asn1Acn::Types::UserdefinedType>(typeName, m_asn1Definitions->name());
     sequenceComponentType->setType(referencedType->clone());
 
     auto sequenceComponent = std::make_unique<Asn1Acn::AsnSequenceComponent>(

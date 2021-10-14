@@ -38,7 +38,7 @@ namespace Types {
 class UserdefinedType : public Type
 {
 public:
-    UserdefinedType(const QString &typeName, const QString &module, const TypeAssignment *referencedType);
+    UserdefinedType(const QString &typeName, const QString &module);
     UserdefinedType(const UserdefinedType &other);
 
     QString typeName() const override;
@@ -53,8 +53,6 @@ public:
 
     QString baseIconFile() const override;
 
-    const TypeAssignment *referencedType() const;
-
     const Type *type() const { return m_type.get(); }
     Type *type() { return m_type.get(); }
     void setType(std::unique_ptr<Type> type);
@@ -65,7 +63,6 @@ public:
 private:
     QString m_name;
     QString m_module;
-    const TypeAssignment *m_referencedType = nullptr;
 
     std::unique_ptr<Type> m_type;
     AcnArgumentPtrs m_arguments;
