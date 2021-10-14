@@ -20,3 +20,11 @@ doc/doxygen
 
 # VS Code directory
 .vscode
+
+# locally generated files for SDL exporter references
+tests/unittests/sdl/SdlExporter/references/*/*.aadl
+tests/unittests/sdl/SdlExporter/references/*/*.acn
+tests/unittests/sdl/SdlExporter/references/*/*.user
+tests/unittests/sdl/SdlExporter/references/*/*.msc
+tests/unittests/sdl/SdlExporter/references/*/work/binaries/*
+

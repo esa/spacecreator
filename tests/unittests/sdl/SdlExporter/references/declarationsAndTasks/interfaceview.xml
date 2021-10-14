@@ -1,0 +1,72 @@
+<InterfaceView asn1file="declarationsAndTasks.asn">
+<Function name="gui" is_type="NO" language="GUI">
+    <Property name="Taste::coordinates" value="9100 29000 29100 37000"/>
+<Provided_Interface name="Outname" kind="Sporadic">
+    <Input_Parameter name="p1" type="MyInteger" encoding="NATIVE"/>
+    <Property name="Taste::coordinates" value="14200 37000"/>
+    <Property name="Taste::InnerCoordinates" value="0 0"/>
+</Provided_Interface>
+
+<Required_Interface name="some_input_name" kind="Sporadic">
+    <Input_Parameter name="p1" type="MyInteger" encoding="NATIVE"/>
+    <Property name="Taste::coordinates" value="29100 33900"/>
+    <Property name="Taste::InnerCoordinates" value="0 0"/>
+    <Property name="Taste::InheritPI" value="true"/>
+    <Property name="Taste::Autonamed" value="false"/>
+</Required_Interface>
+
+<Required_Interface name="some_other_input_name" kind="Sporadic">
+    <Property name="Taste::coordinates" value="23900 37000"/>
+    <Property name="Taste::InnerCoordinates" value="0 0"/>
+    <Property name="Taste::InheritPI" value="true"/>
+    <Property name="Taste::Autonamed" value="false"/>
+</Required_Interface>
+
+</Function>
+
+<Function name="Modemanager" is_type="NO" language="SDL">
+    <Property name="Taste::coordinates" value="32700 57000 52700 65000"/>
+<Provided_Interface name="some_input_name" kind="Sporadic">
+    <Input_Parameter name="p1" type="MyInteger" encoding="NATIVE"/>
+    <Property name="Taste::coordinates" value="52700 58700"/>
+    <Property name="Taste::InnerCoordinates" value="0 0"/>
+</Provided_Interface>
+
+<Provided_Interface name="some_other_input_name" kind="Sporadic">
+    <Property name="Taste::coordinates" value="33700 57500"/>
+    <Property name="Taste::InnerCoordinates" value="0 0"/>
+</Provided_Interface>
+
+<Required_Interface name="Outname" kind="Sporadic">
+    <Input_Parameter name="p1" type="MyInteger" encoding="NATIVE"/>
+    <Property name="Taste::coordinates" value="32700 62100"/>
+    <Property name="Taste::InnerCoordinates" value="0 0"/>
+    <Property name="Taste::InheritPI" value="true"/>
+    <Property name="Taste::Autonamed" value="false"/>
+</Required_Interface>
+
+</Function>
+
+<Connection >
+    <Source func_name="gui" ri_name="some_other_input_name"/>
+    <Target func_name="Modemanager" pi_name="some_other_input_name"/>
+    <Property name="Taste::coordinates" value="23900 37600 23900 47400 33700 47400 33700 57200"/>
+</Connection>
+
+<Connection >
+    <Source func_name="gui" ri_name="some_input_name"/>
+    <Target func_name="Modemanager" pi_name="some_input_name"/>
+    <Property name="Taste::coordinates" value="29700 33900 54300 33900 54300 58700 53000 58700"/>
+</Connection>
+
+<Connection >
+    <Source func_name="Modemanager" ri_name="Outname"/>
+    <Target func_name="gui" pi_name="Outname"/>
+    <Property name="Taste::coordinates" value="32100 62100 14200 62100 14200 37300"/>
+</Connection>
+
+<Comment name="Welcome to TASTE!\n============\n\nRight click to add a function, and use Ctrl-Click to connect functions together.\n\nYou can split the screen in multiple windows using Ctrl-E-3">
+    <Property name="Taste::coordinates" value="4800 5100 46100 20700"/>
+</Comment>
+
+</InterfaceView>
