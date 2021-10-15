@@ -36,6 +36,7 @@ private Q_SLOTS:
     void testSetAsn1Value();
     void testSetIntValue();
     void testSetSequenceValue();
+    void testSetSequenceWithStringValue();
     void testSetSequenceInSequenceValue();
     void testSetStringValue();
 
@@ -126,9 +127,25 @@ void tst_Asn1TreeView::testSetSequenceValue()
     QCOMPARE(m_treeView->getAsn1Value(), value);
 }
 
+
+void tst_Asn1TreeView::testSetSequenceWithStringValue()
+{
+    m_types = m_parser.parseAsn1XmlFile(QFINDTESTDATA("string.xml"));
+    m_definitions = m_types->definitions("TEST-CASE");
+    QVERIFY(m_definitions != nullptr);
+    QCOMPARE(m_definitions->types().size(), 1);
+    const auto &assignment = m_definitions->types().at(0);
+    m_treeView->setAsn1Model(assignment);
+    const QString value = "{ strVal potatoes, numVal 3141592, bitVal ABCD, octVal AF45 }";
+    QVariantMap valueMap = m_valueParser.parseAsn1Value(assignment.get(), value);
+    QCOMPARE(valueMap.size(), 2);
+    m_treeView->setAsn1Value(valueMap);
+    QCOMPARE(m_treeView->getAsn1Value(), QString("{ strVal  \"potatoes\", numVal  \"3141592\", bitVal  \"ABCD\", octVal  \"AF45\" }"));
+}
+
 void tst_Asn1TreeView::testSetSequenceInSequenceValue()
 {
-    m_types = m_parser.parseAsn1XmlFile(QFINDTESTDATA("tetris_dataview.xml"));
+    m_types = m_parser.parseAsn1XmlFile(QFINDTESTDATA("tetris_dataview.xml")); 
     m_definitions = m_types->definitions("TETRIS-DATAVIEW");
     QVERIFY(m_definitions != nullptr);
     QCOMPARE(m_definitions->types().size(), 10);
@@ -153,7 +170,7 @@ void tst_Asn1TreeView::testSetStringValue()
     const QString value = "Potatoes";
     QVariantMap valueMap = m_valueParser.parseAsn1Value(stringType.get(), value);
     m_treeView->setAsn1Value(valueMap);
-    QCOMPARE(m_treeView->getAsn1Value(), value);
+    QCOMPARE(m_treeView->getAsn1Value(), QString("\"Potatoes\""));
 }
 
 QTEST_MAIN(tst_Asn1TreeView)

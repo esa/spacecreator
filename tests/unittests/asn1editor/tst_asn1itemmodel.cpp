@@ -354,7 +354,7 @@ void tst_Asn1ItemModel::testSequenceTypeModel()
     auto sequence3 = std::make_unique<Asn1Acn::AsnSequenceComponent>(
             "boolVal",
             "boolVal",
-            false,
+            true,
             "",
             Asn1Acn::SourceLocation(),
             std::make_unique<Asn1Acn::Types::Boolean>("boolVal"));
@@ -370,16 +370,19 @@ void tst_Asn1ItemModel::testSequenceTypeModel()
 
     QCOMPARE(itemModel->item(0, MODEL_NAME_INDEX)->child(0)->text(), QString("intVal"));
     QCOMPARE(itemModel->item(0, MODEL_NAME_INDEX)->child(0, MODEL_TYPE_INDEX)->text(), QString("INTEGER"));
+    QCOMPARE(itemModel->item(0, MODEL_NAME_INDEX)->child(0, MODEL_IS_OPTIONAL_INDEX)->data(OPTIONAL_ROLE).toBool(), false);
     QCOMPARE(toAsn1Type(itemModel->item(0, MODEL_NAME_INDEX)->child(0, MODEL_VALUE_INDEX)->data(ASN1TYPE_ROLE)),
             Asn1Acn::Types::Type::INTEGER);
 
     QCOMPARE(itemModel->item(0, MODEL_NAME_INDEX)->child(1)->text(), QString("realVal"));
     QCOMPARE(itemModel->item(0, MODEL_NAME_INDEX)->child(1, MODEL_TYPE_INDEX)->text(), QString("REAL"));
+    QCOMPARE(itemModel->item(0, MODEL_NAME_INDEX)->child(1, MODEL_IS_OPTIONAL_INDEX)->data(OPTIONAL_ROLE).toBool(), false);
     QCOMPARE(toAsn1Type(itemModel->item(0, MODEL_NAME_INDEX)->child(1, MODEL_VALUE_INDEX)->data(ASN1TYPE_ROLE)),
             Asn1Acn::Types::Type::REAL);
 
     QCOMPARE(itemModel->item(0, MODEL_NAME_INDEX)->child(2)->text(), QString("boolVal"));
     QCOMPARE(itemModel->item(0, MODEL_NAME_INDEX)->child(2, MODEL_TYPE_INDEX)->text(), QString("BOOLEAN"));
+    QCOMPARE(itemModel->item(0, MODEL_NAME_INDEX)->child(2, MODEL_IS_OPTIONAL_INDEX)->data(OPTIONAL_ROLE).toBool(), true);
     QCOMPARE(toAsn1Type(itemModel->item(0, MODEL_NAME_INDEX)->child(2, MODEL_VALUE_INDEX)->data(ASN1TYPE_ROLE)),
             Asn1Acn::Types::Type::BOOLEAN);
 }

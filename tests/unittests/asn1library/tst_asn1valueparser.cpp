@@ -61,6 +61,7 @@ private Q_SLOTS:
     void testEnumValuesError();
     void testChoiceValue();
     void testChoiceValueError();
+    void testSequenceValueWithString();
     void testSequenceValue();
     void testSequenceValueError();
     void testSequenceOfValue();
@@ -351,6 +352,35 @@ void tst_Asn1ValueParser::testChoiceValueError()
 
     auto arguments = spy.takeFirst();
     QCOMPARE(arguments.at(0).toString(), tr("Incorrect value for MyChoice"));
+}
+
+void tst_Asn1ValueParser::testSequenceValueWithString()
+{
+    Asn1Acn::SourceLocation location;
+    auto type = std::make_unique<Asn1Acn::Types::Sequence>();
+    auto sequence1 = std::make_unique<Asn1Acn::AsnSequenceComponent>(
+            "strVal",
+            "strVal",
+            false,
+            "",
+            Asn1Acn::SourceLocation(),
+            std::make_unique<Asn1Acn::Types::IA5String>("strVal"));
+    type->addComponent(std::move(sequence1));
+
+    auto assignment = std::make_unique<Asn1Acn::TypeAssignment>("MySequence", "MySequence", location, std::move(type));
+    auto valueMap = valueParser->parseAsn1Value(
+            assignment.get(), "{ strVal potatoes }");
+
+    QCOMPARE(valueMap.size(), 2);
+    QCOMPARE(valueMap["name"].toString(), QString("MySequence"));
+
+    auto childrenValue = valueMap["children"].toList();
+    QCOMPARE(childrenValue.size(), 1);
+
+    auto childValue = childrenValue.at(0).toMap();
+    QCOMPARE(childValue.size(), 2);
+    QCOMPARE(childValue["name"].toString(), QString("strVal"));
+    QCOMPARE(childValue["value"].toString(), QString("potatoes"));
 }
 
 void tst_Asn1ValueParser::testSequenceValue()

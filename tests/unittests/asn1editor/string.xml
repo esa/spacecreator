@@ -1,0 +1,102 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<AstRoot xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="Asn1Schema.xsd" rename_policy="SelectiveEnumerants">
+  <Asn1File FileName="string.asn">
+    <Modules>
+      <Module Name="TEST-CASE" Line="1" CharPositionInLine="0">
+        <ExportedTypes>
+          <ExportedType Name="MySeq" />
+        </ExportedTypes>
+        <ExportedValues />
+        <ImportedModules />
+        <TypeAssignments>
+          <TypeAssignment Name="MySeq" CName="MySeq" AdaName="MySeq" Line="2" CharPositionInLine="4">
+            <Asn1Type id="TEST-CASE.MySeq" Line="2" CharPositionInLine="14" ParameterizedTypeInstance="false">
+              <SEQUENCE acnMaxSizeInBits="420" acnMinSizeInBits="20" uperMaxSizeInBits="420" uperMinSizeInBits="20">
+                <SEQUENCE_COMPONENT Name="strVal" Line="3" CharPositionInLine="8" AdaName="strVal" CName="strVal">
+                  <Asn1Type id="TEST-CASE.MySeq.strVal" Line="3" CharPositionInLine="15" ParameterizedTypeInstance="false">
+                    <IA5String acnMaxSizeInBits="145" acnMinSizeInBits="5" uperMaxSizeInBits="145" uperMinSizeInBits="5">
+                      <Constraints>
+                        <SIZE>
+                          <Range>
+                            <Min>
+                              <IntegerValue>0</IntegerValue>
+                            </Min>
+                            <Max>
+                              <IntegerValue>20</IntegerValue>
+                            </Max>
+                          </Range>
+                        </SIZE>
+                      </Constraints>
+                      <WithComponentConstraints />
+                    </IA5String>
+                  </Asn1Type>
+                </SEQUENCE_COMPONENT>
+                <SEQUENCE_COMPONENT Name="numVal" Line="4" CharPositionInLine="8" AdaName="numVal" CName="numVal">
+                  <Asn1Type id="TEST-CASE.MySeq.numVal" Line="4" CharPositionInLine="15" ParameterizedTypeInstance="false">
+                    <NumericString acnMaxSizeInBits="85" acnMinSizeInBits="5" uperMaxSizeInBits="85" uperMinSizeInBits="5">
+                      <Constraints>
+                        <SIZE>
+                          <Range>
+                            <Min>
+                              <IntegerValue>0</IntegerValue>
+                            </Min>
+                            <Max>
+                              <IntegerValue>20</IntegerValue>
+                            </Max>
+                          </Range>
+                        </SIZE>
+                      </Constraints>
+                      <WithComponentConstraints />
+                    </NumericString>
+                  </Asn1Type>
+                </SEQUENCE_COMPONENT>
+                <SEQUENCE_COMPONENT Name="bitVal" Line="5" CharPositionInLine="8" AdaName="bitVal" CName="bitVal">
+                  <Asn1Type id="TEST-CASE.MySeq.bitVal" Line="5" CharPositionInLine="15" ParameterizedTypeInstance="false">
+                    <BIT_STRING acnMaxSizeInBits="25" acnMinSizeInBits="5" uperMaxSizeInBits="25" uperMinSizeInBits="5">
+                      <Constraints>
+                        <SIZE>
+                          <Range>
+                            <Min>
+                              <IntegerValue>0</IntegerValue>
+                            </Min>
+                            <Max>
+                              <IntegerValue>20</IntegerValue>
+                            </Max>
+                          </Range>
+                        </SIZE>
+                      </Constraints>
+                      <WithComponentConstraints />
+                    </BIT_STRING>
+                  </Asn1Type>
+                </SEQUENCE_COMPONENT>
+                <SEQUENCE_COMPONENT Name="octVal" Line="6" CharPositionInLine="8" AdaName="octVal" CName="octVal">
+                  <Asn1Type id="TEST-CASE.MySeq.octVal" Line="6" CharPositionInLine="15" ParameterizedTypeInstance="false">
+                    <OCTET_STRING acnMaxSizeInBits="165" acnMinSizeInBits="5" uperMaxSizeInBits="165" uperMinSizeInBits="5">
+                      <Constraints>
+                        <SIZE>
+                          <Range>
+                            <Min>
+                              <IntegerValue>0</IntegerValue>
+                            </Min>
+                            <Max>
+                              <IntegerValue>20</IntegerValue>
+                            </Max>
+                          </Range>
+                        </SIZE>
+                      </Constraints>
+                      <WithComponentConstraints />
+                    </OCTET_STRING>
+                  </Asn1Type>
+                </SEQUENCE_COMPONENT>
+                <Constraints />
+                <WithComponentConstraints />
+              </SEQUENCE>
+            </Asn1Type>
+          </TypeAssignment>
+        </TypeAssignments>
+        <ValueAssignments />
+      </Module>
+    </Modules>
+  </Asn1File>
+  <AcnDependencies />
+</AstRoot>
