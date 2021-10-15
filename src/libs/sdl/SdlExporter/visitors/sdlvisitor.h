@@ -23,6 +23,7 @@
 
 #include <QTextStream>
 #include <sdl/SdlModel/input.h>
+#include <sdl/SdlModel/label.h>
 #include <sdl/SdlModel/nextstate.h>
 #include <sdl/SdlModel/output.h>
 #include <sdl/SdlModel/process.h>
@@ -122,6 +123,13 @@ public:
      * @param   declaration   declaration to be serialized
      */
     auto visit(const VariableDeclaration &declaration) const -> void override;
+
+    /**
+     * @brief   Label visitor
+     *
+     * @param   label   label to be visited
+     */
+    auto visit(const Label &label) const -> void override;
 
 private:
     template<typename T>

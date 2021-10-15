@@ -17,18 +17,20 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/lgpl-2.1.html>.
  */
 
-#include "action.h"
+#include "label.h"
+
+#include <sdl/SdlExporter/visitors/visitor.h>
 
 namespace sdl {
 
-Action::Action(QString name)
+Label::Label(QString name)
     : Node(std::move(name))
 {
 }
 
-void Action::setLabel(std::unique_ptr<Label> label)
+void Label::accept(Visitor &visitor) const
 {
-    m_label = std::move(label);
+    visitor.visit(*this);
 }
 
 } // namespace sdl

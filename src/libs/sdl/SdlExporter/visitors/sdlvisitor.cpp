@@ -139,6 +139,13 @@ void SdlVisitor::visit(const VariableDeclaration &declaration) const
     m_stream << "    dcl " << declaration.name() << " " << declaration.type() << ";\n";
 }
 
+void SdlVisitor::visit(const Label &label) const
+{
+    // write some dummy CIF
+    m_stream << "        /* CIF task (" << 250 << "," << 150 << "), (" << 150 << ", " << 75 << ") */\n";
+    m_stream << "        " << label.name() << ";\n";
+}
+
 template<typename T>
 void SdlVisitor::exportCollection(const T &collection) const
 {

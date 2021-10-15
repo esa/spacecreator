@@ -19,57 +19,51 @@
 
 #pragma once
 
-#include "label.h"
 #include "node.h"
 
 #include <QString>
-#include <memory>
-#include <optional>
 
 namespace sdl {
 
 /**
- * @brief   Represents an SDL action
+ * @brief   Represents a label in SDL model.
+ *
+ * Action can contain a Label
  */
-class Action : public Node
+class Label final : public Node
 {
 public:
     /**
      * @brief   Constructor
      *
-     * @param   name   name of the element
+     * @param   name      name of the label
      */
-    Action(QString name = "");
+    Label(QString name = "");
 
     /**
      * @brief   Deleted copy constructor
      */
-    Action(const Action &) = delete;
+    Label(const Label &) = delete;
 
     /**
      * @brief   Default move constructor
      */
-    Action(Action &&) = default;
+    Label(Label &&) = default;
 
     /**
      * @brief   Deleted copy assignment operator
      */
-    Action &operator=(const Action &) = delete;
+    Label &operator=(const Label &) = delete;
 
     /**
      * @brief   Default move assignment operator
      */
-    Action &operator=(Action &&) = default;
+    Label &operator=(Label &&) = default;
 
     /**
-     * @brief   Default move assignment operator
-     *
-     * @param   label  pointer to the label that shall be put before this action
+     * @brief  visitor acceptor (calls visit method of the given visitor)
      */
-    auto setLabel(std::unique_ptr<Label> label) -> void;
-
-private:
-    std::optional<std::unique_ptr<Label>> m_label;
+    virtual auto accept(Visitor &visitor) const -> void override;
 };
 
 } // namespace sdl
