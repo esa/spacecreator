@@ -51,6 +51,9 @@ public:
     // Internal
     MSCEditorCorePtr mscEditorCore() const;
 
+public Q_SLOTS:
+    void checkForErrors();
+
 Q_SIGNALS:
     void reloadRequested(QString *errorString, const QString &);
     void mscDataLoaded(const QString &fileName, MSCEditorCorePtr data);

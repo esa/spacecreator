@@ -74,8 +74,7 @@ Core::IDocument::OpenResult DVEditorDocument::open(
     connect(m_plugin->undoStack(), &QUndoStack::cleanChanged, this, [this](bool) { Q_EMIT changed(); });
     Q_EMIT dvDataLoaded(absfileName, m_plugin);
 
-    QMetaObject::invokeMethod(
-            storage->dvChecks(), "checkDVFile", Qt::QueuedConnection, Q_ARG(DVEditorCorePtr, m_plugin));
+    QMetaObject::invokeMethod(this, "checkForErrors", Qt::QueuedConnection);
 
     return OpenResult::Success;
 }
@@ -100,7 +99,7 @@ bool DVEditorDocument::save(QString *errorString, const QString &name, bool auto
     }
     bool dirty = isModified();
 
-    shared::ErrorHub::clearFileErrors(actualName.toString());
+    checkForErrors();
 
     dve::DVAppModel *model = m_plugin->appModel();
     model->setPath(actualName.toString());
@@ -171,6 +170,19 @@ bool DVEditorDocument::reload(QString *errorString, ReloadFlag flag, ChangeType 
 DVEditorCorePtr DVEditorDocument::dvEditorCore() const
 {
     return m_plugin;
+}
+
+void DVEditorDocument::checkForErrors()
+{
+    if (!m_projectManager | !m_plugin) {
+        return;
+    }
+
+    const QString fileName = m_plugin->filePath();
+    shared::ErrorHub::clearFileErrors(fileName);
+    SpaceCreatorProjectImpl *project = m_projectManager->project(fileName);
+    scs::SpaceCreatorProject *storage = project ? project : m_projectManager->orphanStorage();
+    storage->dvChecks()->checkDVFile(m_plugin);
 }
 
 }

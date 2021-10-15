@@ -23,6 +23,7 @@
 #include "spacecreatorproject.h"
 #include "spacecreatorprojectimpl.h"
 #include "spacecreatorprojectmanager.h"
+#include "systemchecks.h"
 
 #include <QFileInfo>
 #include <QUndoStack>
@@ -175,6 +176,17 @@ bool MscEditorDocument::reload(QString *errorString, ReloadFlag flag, ChangeType
 MSCEditorCorePtr MscEditorDocument::mscEditorCore() const
 {
     return m_plugin;
+}
+
+void MscEditorDocument::checkForErrors()
+{
+    if (!m_plugin || !m_plugin->systemChecker()) {
+        return;
+    }
+
+    m_plugin->systemChecker()->checkInstanceNames();
+    m_plugin->systemChecker()->checkInstanceRelations();
+    m_plugin->systemChecker()->checkMessages();
 }
 
 }

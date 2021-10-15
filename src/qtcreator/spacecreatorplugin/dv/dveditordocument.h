@@ -56,6 +56,9 @@ public:
     // Internal
     DVEditorCorePtr dvEditorCore() const;
 
+public Q_SLOTS:
+    void checkForErrors();
+
 Q_SIGNALS:
     void reloadRequested(QString *errorString, const QString &);
     void dvDataLoaded(const QString &fileName, DVEditorCorePtr data);
