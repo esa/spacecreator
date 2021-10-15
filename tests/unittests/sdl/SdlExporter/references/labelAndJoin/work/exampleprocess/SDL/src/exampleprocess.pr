@@ -1,0 +1,16 @@
+/* CIF PROCESS (250, 150), (150, 75) */
+process Exampleprocess;
+    /* CIF START (320, 10), (70, 35) */
+    START;
+        /* CIF label (314, 65), (81, 35) */
+        fromStart:
+        /* CIF NEXTSTATE (320, 120), (70, 35) */
+        NEXTSTATE Idle;
+    /* CIF state (320, 120), (70, 35) */
+    state Idle;
+        /* CIF input (318, 175), (73, 35) */
+        input sigReset;
+            /* CIF join (337, 230), (35, 35) */
+            join fromStart;
+    endstate;
+endprocess Exampleprocess;
