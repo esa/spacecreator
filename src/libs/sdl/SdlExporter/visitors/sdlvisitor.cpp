@@ -83,21 +83,21 @@ void SdlVisitor::visit(const Input &input) const
     // write some dummy CIF
     m_stream << "        /* CIF input (" << 250 << "," << 150 << "), (" << 150 << ", " << 75 << ") */\n";
     m_stream << "        input " << input.name();
-    bool isInputParametersEmpty = input.parameters().empty();
-    if (!isInputParametersEmpty) {
+
+    const auto &inputParameters = input.parameters();
+    const size_t numOfInputParameters = inputParameters.size();
+
+    if (numOfInputParameters > 0) {
         m_stream << "(";
     }
-    for (auto &parameter : input.parameters()) {
-        const auto variantParam = parameter.get();
-        if (variantParam->index() == 0) { // parameter is a reference
-            const auto paramReference = std::move(std::get<VariableReference>(*variantParam));
-            m_stream << paramReference.declaration()->name();
-        } else if (variantParam->index() == 1) { // parameter is a literal
-            const auto paramLiteral = std::move(std::get<VariableLiteral>(*variantParam));
-            m_stream << paramLiteral.value();
+    for (size_t i = 0; i < numOfInputParameters; i++) {
+        const auto parameter = inputParameters[i].get();
+        m_stream << parameter->declaration()->name();
+        if (i != numOfInputParameters - 1) {
+            m_stream << ", ";
         }
     }
-    if (!isInputParametersEmpty) {
+    if (numOfInputParameters > 0) {
         m_stream << ")";
     }
     m_stream << ";\n";
@@ -112,11 +112,9 @@ void SdlVisitor::visit(const Output &output) const
     // write some dummy CIF
     m_stream << "            /* CIF NEXTSTATE (" << 250 << "," << 150 << "), (" << 150 << ", " << 75 << ") */\n";
     m_stream << "            output " << output.name();
-    const auto outputParam = output.parameter();
-    if (outputParam != nullptr) {
-        m_stream << "(";
-        m_stream << outputParam->declaration()->name();
-        m_stream << ")";
+    const auto outputParamRef = output.parameter();
+    if (outputParamRef != nullptr) {
+        m_stream << "(" << outputParamRef->declaration()->name() << ")";
     }
     m_stream << ";\n";
 }
