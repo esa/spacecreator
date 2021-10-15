@@ -115,13 +115,7 @@ void SdlVisitor::visit(const Output &output) const
     const auto outputParam = output.parameter();
     if (outputParam != nullptr) {
         m_stream << "(";
-        if (outputParam->index() == 0) { // parameter is a variable reference
-            const auto param0 = std::move(std::get<VariableReference>(*outputParam));
-            m_stream << param0.declaration()->name();
-        } else if (outputParam->index() == 1) { // parameter is a literal
-            const auto param1 = std::move(std::get<VariableLiteral>(*outputParam));
-            m_stream << param1.value();
-        }
+        m_stream << outputParam->declaration()->name();
         m_stream << ")";
     }
     m_stream << ";\n";
