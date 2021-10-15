@@ -137,6 +137,14 @@ QVariantMap Asn1ValueParser::parseAsn1Value(
     }
     case Asn1Acn::Types::Type::BITSTRING: {
         const auto *bitStringType = dynamic_cast<const Asn1Acn::Types::BitString*>(type);
+
+        if (value.startsWith("\"")) {
+            value = value.remove(0, 1);
+        }
+        if (value.endsWith("\"")) {
+            value.chop(1);
+        }
+
         ok = checkStringLength(bitStringType, value);
         if (ok) {
             valueMap["value"] = value;
@@ -145,6 +153,14 @@ QVariantMap Asn1ValueParser::parseAsn1Value(
     }
     case Asn1Acn::Types::Type::IA5STRING: {
         const auto *ia5String = dynamic_cast<const Asn1Acn::Types::IA5String*>(type);
+
+        if (value.startsWith("\"")) {
+            value = value.remove(0, 1);
+        }
+        if (value.endsWith("\"")) {
+            value.chop(1);
+        }
+
         ok = checkStringLength(ia5String, value);
         if (ok) {
             valueMap["value"] = value;
@@ -153,6 +169,14 @@ QVariantMap Asn1ValueParser::parseAsn1Value(
     }
     case Asn1Acn::Types::Type::NUMERICSTRING: {
         const auto *numericString = dynamic_cast<const Asn1Acn::Types::NumericString*>(type);
+
+        if (value.startsWith("\"")) {
+            value = value.remove(0, 1);
+        }
+        if (value.endsWith("\"")) {
+            value.chop(1);
+        }
+
         ok = checkStringLength(numericString, value);
         if (ok) {
             valueMap["value"] = value;
@@ -161,6 +185,14 @@ QVariantMap Asn1ValueParser::parseAsn1Value(
     }
     case Asn1Acn::Types::Type::OCTETSTRING: {
         const auto *octetString = dynamic_cast<const Asn1Acn::Types::OctetString*>(type);
+
+        if (value.startsWith("\"")) {
+            value = value.remove(0, 1);
+        }
+        if (value.endsWith("\"")) {
+            value.chop(1);
+        }
+
         ok = checkStringLength(octetString, value);
         if (ok) {
             valueMap["value"] = value;
