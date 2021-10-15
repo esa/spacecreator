@@ -20,8 +20,7 @@
     <Property name="Taste::Autonamed" value="true"/>
 </Required_Interface>
 
-<Required_Interface name="literalOutput" kind="Sporadic">
-    <Input_Parameter name="f" type="MyInteger" encoding="NATIVE"/>
+<Required_Interface name="parameterlessOutput" kind="Sporadic">
     <Property name="Taste::coordinates" value="52300 60900"/>
     <Property name="Taste::InnerCoordinates" value="0 0"/>
     <Property name="Taste::InheritPI" value="true"/>
@@ -38,8 +37,7 @@
     <Property name="Taste::InnerCoordinates" value="0 0"/>
 </Provided_Interface>
 
-<Provided_Interface name="literalOutput" kind="Sporadic">
-    <Input_Parameter name="f" type="MyInteger" encoding="NATIVE"/>
+<Provided_Interface name="parameterlessOutput" kind="Sporadic">
     <Property name="Taste::coordinates" value="21500 35400"/>
     <Property name="Taste::InnerCoordinates" value="0 0"/>
 </Provided_Interface>
@@ -62,15 +60,15 @@
 </Function>
 
 <Connection >
-    <Source func_name="Modemanager" ri_name="literalOutput"/>
-    <Target func_name="gui" pi_name="literalOutput"/>
-    <Property name="Taste::coordinates" value="52300 61500 52300 62500 19900 62500 19900 35400 21200 35400"/>
-</Connection>
-
-<Connection >
     <Source func_name="gui" ri_name="some_input_name"/>
     <Target func_name="Modemanager" pi_name="some_input_name"/>
     <Property name="Taste::coordinates" value="42100 34000 70100 34000 70100 54600 68800 54600"/>
+</Connection>
+
+<Connection >
+    <Source func_name="Modemanager" ri_name="referenceOutput"/>
+    <Target func_name="gui" pi_name="referenceOutput"/>
+    <Property name="Taste::coordinates" value="47900 58000 2400 58000 2400 29700 21200 29700"/>
 </Connection>
 
 <Connection >
@@ -80,9 +78,9 @@
 </Connection>
 
 <Connection >
-    <Source func_name="Modemanager" ri_name="referenceOutput"/>
-    <Target func_name="gui" pi_name="referenceOutput"/>
-    <Property name="Taste::coordinates" value="47900 58000 2400 58000 2400 29700 21200 29700"/>
+    <Source func_name="Modemanager" ri_name="parameterlessOutput"/>
+    <Target func_name="gui" pi_name="parameterlessOutput"/>
+    <Property name="Taste::coordinates" value="52300 61500 52300 62500 19900 62500 19900 35400 21200 35400"/>
 </Connection>
 
 <Comment name="Welcome to TASTE!\n============\n\nRight click to add a function, and use Ctrl-Click to connect functions together.\n\nYou can split the screen in multiple windows using Ctrl-E-3">

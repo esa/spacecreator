@@ -7,6 +7,15 @@ process Modemanager;
     START;
         /* CIF NEXTSTATE (548, 132), (70, 35) */
         NEXTSTATE Looping;
+    /* CIF state (548, 132), (70, 35) */
+    state Looping;
+        /* CIF input (468, 187), (231, 35) */
+        input some_input_name(howManyLoops);
+            /* CIF output (508, 242), (150, 35) */
+            output parameterlessOutput;
+            /* CIF NEXTSTATE (549, 297), (70, 35) */
+            NEXTSTATE -;
+    endstate;
     /* CIF state (1102, 158), (70, 35) */
     state Idle;
         /* CIF input (1041, 213), (193, 35) */
@@ -17,12 +26,5 @@ process Modemanager;
             output referenceOutput(howManyLoops);
             /* CIF NEXTSTATE (1102, 383), (70, 35) */
             NEXTSTATE Looping;
-    endstate;
-    /* CIF state (548, 132), (70, 35) */
-    state Looping;
-        /* CIF input (466, 223), (231, 40) */
-        input some_input_name(howManyLoops);
-            /* CIF NEXTSTATE (547, 283), (70, 35) */
-            NEXTSTATE -;
     endstate;
 endprocess Modemanager;
