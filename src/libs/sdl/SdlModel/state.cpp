@@ -37,11 +37,6 @@ const std::vector<std::unique_ptr<Input>> &State::inputs() const
     return m_inputs;
 }
 
-void State::setInputs(std::vector<std::unique_ptr<Input>> inputs)
-{
-    m_inputs = std::move(inputs);
-}
-
 void State::addInput(std::unique_ptr<Input> input)
 {
     m_inputs.push_back(std::move(input));
@@ -50,11 +45,6 @@ void State::addInput(std::unique_ptr<Input> input)
 const std::vector<std::unique_ptr<ContinuousSignal>> &State::continuousSignals() const
 {
     return m_continuousSignals;
-}
-
-void State::setContinuousSignals(std::vector<std::unique_ptr<ContinuousSignal>> continuousSignals)
-{
-    m_continuousSignals = std::move(continuousSignals);
 }
 
 void State::addContinuousSignal(std::unique_ptr<ContinuousSignal> continuousSignal)

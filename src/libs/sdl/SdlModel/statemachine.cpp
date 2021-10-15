@@ -33,11 +33,6 @@ const std::vector<std::unique_ptr<State>> &StateMachine::states() const
     return m_states;
 }
 
-void StateMachine::setStates(std::vector<std::unique_ptr<State>> states)
-{
-    m_states = std::move(states);
-}
-
 void StateMachine::addState(std::unique_ptr<State> state)
 {
     m_states.push_back(std::move(state));
@@ -46,11 +41,6 @@ void StateMachine::addState(std::unique_ptr<State> state)
 const std::vector<std::unique_ptr<Transition>> &StateMachine::transitions() const
 {
     return m_transitions;
-}
-
-void StateMachine::setTransitions(std::vector<std::unique_ptr<Transition>> transitions)
-{
-    m_transitions = std::move(transitions);
 }
 
 void StateMachine::addTransition(std::unique_ptr<Transition> transition)

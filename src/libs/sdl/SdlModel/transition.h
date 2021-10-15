@@ -77,13 +77,6 @@ public:
     /**
      * @brief    Setter for the actions
      *
-     * @param    actions a vector of pointers to actions
-     */
-    auto setActions(std::vector<std::unique_ptr<Action>> actions) -> void;
-
-    /**
-     * @brief    Setter for the actions
-     *
      * @param    action  a pointer to action
      */
     auto addAction(std::unique_ptr<Action> action) -> void;

@@ -75,13 +75,6 @@ public:
     auto states() const -> const std::vector<std::unique_ptr<State>> &;
 
     /**
-     * @brief   Setter for the states of the state machine
-     *
-     * @param   states a vector of pointers to states
-     */
-    auto setStates(std::vector<std::unique_ptr<State>> states) -> void;
-
-    /**
      * @brief   Add a state to this state machine
      *
      * @param   state a pointer to state
@@ -94,13 +87,6 @@ public:
      * @return  const reference to a vector of pointers to transitions
      */
     auto transitions() const -> const std::vector<std::unique_ptr<Transition>> &;
-
-    /**
-     * @brief   Setter for the transitions of the state machine
-     *
-     * @param   transitions a vector of pointers to transitions
-     */
-    auto setTransitions(std::vector<std::unique_ptr<Transition>> transitions) -> void;
 
     /**
      * @brief   Add a transition to this state machine

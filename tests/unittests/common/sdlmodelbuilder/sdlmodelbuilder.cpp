@@ -22,6 +22,7 @@
 namespace tests::common {
 
 SdlModelBuilder::SdlModelBuilder(QString name)
+    : m_model(SdlModel(Process()))
 {
     m_model.setName(std::move(name));
 }

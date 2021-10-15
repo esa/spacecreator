@@ -35,11 +35,6 @@ const std::vector<std::unique_ptr<Action>> &Transition::actions()
     return m_actions;
 }
 
-void Transition::setActions(std::vector<std::unique_ptr<Action>> actions)
-{
-    m_actions = std::move(actions);
-}
-
 void Transition::addAction(std::unique_ptr<Action> action)
 {
     m_actions.push_back(std::move(action));

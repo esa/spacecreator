@@ -83,13 +83,6 @@ public:
     auto inputs() const -> const std::vector<std::unique_ptr<Input>> &;
 
     /**
-     * @brief   Setter for the inputs (input signals)
-     *
-     * @param   inputs a vector of pointers to input signals
-     */
-    auto setInputs(std::vector<std::unique_ptr<Input>> inputs) -> void;
-
-    /**
      * @brief   Add the input signal
      *
      * @param   inputs a pointer to input signal
@@ -102,13 +95,6 @@ public:
      * @return  a const reference to a vector of pointers to continuous signals
      */
     auto continuousSignals() const -> const std::vector<std::unique_ptr<ContinuousSignal>> &;
-
-    /**
-     * @brief   Setter for the continuous signals
-     *
-     * @param   continuousSignals a vector of pointers to continuous signals
-     */
-    auto setContinuousSignals(std::vector<std::unique_ptr<ContinuousSignal>> continuousSignals) -> void;
 
     /**
      * @brief   Add a continuous signal

@@ -27,5 +27,6 @@ target_link_libraries(SdlModelBuilder
     PRIVATE     CommonProjectWarnings)
 
 add_format_target(SdlModelBuilder)
+add_tidy_target(SdlModelBuilder)
 
 add_library(ConversionTests::SdlModelBuilder ALIAS SdlModelBuilder)
