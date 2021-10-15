@@ -26,6 +26,7 @@
 #include "dvfunction.h"
 #include "dvmessage.h"
 #include "dvmodel.h"
+#include "dvsystemchecks.h"
 #include "interfacedocument.h"
 #include "ivconnection.h"
 #include "ivconnectionchain.h"
@@ -72,6 +73,8 @@ void MscSystemChecks::setStorage(SpaceCreatorProject *storage)
                 &scs::MscSystemChecks::onImplementationChanged);
         connect(ivCore->commandsStack(), &ive::cmd::CommandsStack::defaultImplementationChanged, this,
                 &scs::MscSystemChecks::onDefaultImplementationChanged);
+        connect(ivCore->commandsStack(), &ive::cmd::CommandsStack::attributeChanged, this,
+                &scs::MscSystemChecks::onAttributeChanged);
     });
 }
 
@@ -609,6 +612,23 @@ void MscSystemChecks::onDefaultImplementationChanged()
 {
     for (const DVEditorCorePtr &dvCore : m_storage->allDVCores()) {
         dvCore->changeDefaultImplementationNames();
+    }
+}
+
+void MscSystemChecks::onAttributeChanged(shared::VEObject *entity, const QString &attrName, const QVariant &oldValue)
+{
+    Q_UNUSED(oldValue)
+    if (!entity) {
+        return;
+    }
+
+    static QString kindTocken = ivm::meta::Props::token(ivm::meta::Props::Token::kind);
+    if (attrName == kindTocken) {
+        DvSystemChecks dvChecks;
+        dvChecks.setStorage(m_storage);
+        for (const DVEditorCorePtr &dvCore : m_storage->allDVCores()) {
+            dvChecks.checkDVFile(dvCore);
+        }
     }
 }
 

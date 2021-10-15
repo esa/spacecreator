@@ -39,6 +39,9 @@ public:
     void undo() override;
     int id() const override;
 
+Q_SIGNALS:
+    void attributeChanged(VEObject *entity, const QString &attrName, const QVariant &oldValue);
+
 private:
     shared::PropertyTemplateConfig *m_config;
     QPointer<VEObject> m_entity;

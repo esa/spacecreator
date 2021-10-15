@@ -39,6 +39,7 @@ class MSCEditorCore;
 
 namespace shared {
 class UndoCommand;
+class VEObject;
 }
 
 namespace scs {
@@ -88,6 +89,7 @@ public Q_SLOTS:
     void onImplementationChanged(
             ivm::IVFunction *entity, const QString &newName, const QString &oldName, shared::UndoCommand *command);
     void onDefaultImplementationChanged();
+    void onAttributeChanged(shared::VEObject *entity, const QString &attrName, const QVariant &oldValue);
 
 private:
     QPointer<SpaceCreatorProject> m_storage;

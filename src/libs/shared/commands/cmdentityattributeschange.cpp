@@ -31,8 +31,8 @@ CmdEntityAttributesChange::CmdEntityAttributesChange(
     : UndoCommand()
     , m_config(config)
     , m_entity(entity)
-    , m_oldAttrs(entity ? entity->entityAttributes().values() : QList<EntityAttribute>())
     , m_newAttrs(attrs)
+    , m_oldAttrs(entity ? entity->entityAttributes().values() : QList<EntityAttribute>())
 {
     Q_ASSERT(entity != nullptr);
     setText(QObject::tr("Change Attribute(s)"));
@@ -45,7 +45,9 @@ void CmdEntityAttributesChange::redo()
     }
 
     for (const EntityAttribute &attr : qAsConst(m_newAttrs)) {
+        QVariant oldValue = m_entity->entityAttributeValue(attr.name());
         m_entity->setEntityAttribute(attr);
+        Q_EMIT attributeChanged(m_entity, attr.name(), oldValue);
     }
     QList<EntityAttribute> aboutToRemoveAttrs;
     for (PropertyTemplate *attrTemplate : m_config->propertyTemplatesForObject(m_entity)) {
@@ -64,11 +66,20 @@ void CmdEntityAttributesChange::undo()
         return;
     }
 
+    QHash<QString, EntityAttribute> oldAttrs;
     QHash<QString, EntityAttribute> attrs;
     for (const EntityAttribute &attr : qAsConst(m_oldAttrs)) {
-        attrs[attr.name()] = attr;
+        const QString name = attr.name();
+        oldAttrs[name] = m_entity->entityAttribute(name);
+        attrs[name] = attr;
     }
+
     m_entity->setEntityAttributes(attrs);
+
+    for (const EntityAttribute &attr : oldAttrs) {
+        const QString name = attr.name();
+        Q_EMIT attributeChanged(m_entity, name, oldAttrs[name].value());
+    }
 }
 
 int CmdEntityAttributesChange::id() const

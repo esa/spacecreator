@@ -58,6 +58,11 @@ bool CommandsStack::push(QUndoCommand *command)
         connect(implCommand, &CmdFunctionLanguageUpdate::implementationChanged, this,
                 &CommandsStack::implementationChanged, Qt::UniqueConnection);
     }
+    if (auto attrCommand = dynamic_cast<shared::cmd::CmdEntityAttributesChange *>(command)) {
+        connect(attrCommand, &shared::cmd::CmdEntityAttributesChange::attributeChanged, this,
+                &CommandsStack::attributeChanged, Qt::UniqueConnection);
+    }
+
     m_undoStack->push(command);
     return true;
 }
