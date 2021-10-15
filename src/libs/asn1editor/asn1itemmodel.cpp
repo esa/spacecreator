@@ -179,6 +179,11 @@ Asn1ItemModel::ItemMap Asn1ItemModel::createModelItems(const Asn1Acn::Types::Typ
     return itemMap;
 }
 
+/*!
+ * \brief Asn1ItemModel::createNumberItem Create an item with the type number
+ * \param asn1Item
+ * \return
+ */
 template<typename ValueType>
 QStandardItem *Asn1ItemModel::createNumberItem(const Asn1Acn::Constraints::WithConstraints<ValueType> *asn1Item, QString &typeLimit)
 {

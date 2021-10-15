@@ -167,10 +167,10 @@ void tst_Asn1TreeView::testSetStringValue()
     QCOMPARE(m_definitions->types().size(), 3);
     const std::unique_ptr<Asn1Acn::TypeAssignment> &stringType = m_definitions->types().at(2);
     m_treeView->setAsn1Model(stringType);
-    const QString value = "Potatoes";
+    const QString value = "TestString";
     QVariantMap valueMap = m_valueParser.parseAsn1Value(stringType.get(), value);
     m_treeView->setAsn1Value(valueMap);
-    QCOMPARE(m_treeView->getAsn1Value(), QString("\"Potatoes\""));
+    QCOMPARE(m_treeView->getAsn1Value(), QString("\"TestString\""));
 }
 
 QTEST_MAIN(tst_Asn1TreeView)

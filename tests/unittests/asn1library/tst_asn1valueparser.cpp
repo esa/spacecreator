@@ -230,11 +230,11 @@ void tst_Asn1ValueParser::testIA5StringValues()
     Asn1Acn::SourceLocation location;
     auto type = std::make_unique<Asn1Acn::Types::IA5String>();
     auto assignment = std::make_unique<Asn1Acn::TypeAssignment>("MyString", "MyString", location, std::move(type));
-    auto valueMap = valueParser->parseAsn1Value(assignment.get(), "Potato");
+    auto valueMap = valueParser->parseAsn1Value(assignment.get(), "TestString");
     QCOMPARE(valueMap.size(), 2);
 
     QCOMPARE(valueMap["name"].toString(), QString("MyString"));
-    QVERIFY(valueMap["value"].toString() == "Potato");
+    QVERIFY(valueMap["value"].toString() == "TestString");
 }
 
 void tst_Asn1ValueParser::testEnumValues()
