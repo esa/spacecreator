@@ -38,7 +38,7 @@ namespace sdl {
 class Output final : public Action
 {
 public:
-    using Parameter = std::variant<VariableReference, VariableLiteral>;
+    using Parameter = VariableReference;
 
     /**
      * @brief   Default constructor
