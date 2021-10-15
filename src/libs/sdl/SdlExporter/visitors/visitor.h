@@ -20,6 +20,7 @@
 #pragma once
 
 #include <sdl/SdlModel/input.h>
+#include <sdl/SdlModel/label.h>
 #include <sdl/SdlModel/nextstate.h>
 #include <sdl/SdlModel/output.h>
 #include <sdl/SdlModel/process.h>
@@ -123,6 +124,13 @@ public:
      * @param   declaration   declaration to be visited
      */
     virtual auto visit(const VariableDeclaration &declaration) const -> void = 0;
+
+    /**
+     * @brief   Label visitor
+     *
+     * @param   label   label to be visited
+     */
+    virtual auto visit(const Label &label) const -> void = 0;
 };
 
 } // namespace sdl

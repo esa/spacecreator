@@ -5,6 +5,7 @@ add_library(SdlModel STATIC)
 
 set(SOURCES action.cpp
             input.cpp
+            label.cpp
             literal.cpp
             nextstate.cpp
             node.cpp
@@ -18,9 +19,11 @@ set(SOURCES action.cpp
             transition.cpp
             variabledeclaration.cpp
             variableliteral.cpp
-            variablereference.cpp)
+            variablereference.cpp
+            )
 set(INCLUDES action.h
              input.h
+             label.h
              literal.h
              nextstate.h
              node.h
@@ -34,7 +37,8 @@ set(INCLUDES action.h
              transition.h
              variabledeclaration.h
              variableliteral.h
-             variablereference.h)
+             variablereference.h
+             )
 
 target_sources(SdlModel
     PRIVATE     "${SOURCES}"
