@@ -39,7 +39,7 @@ namespace sdl {
 class Input final : public Signal
 {
 public:
-    using Parameter = std::variant<VariableReference, VariableLiteral>;
+    using Parameter = VariableReference;
 
     /**
      * @brief   Constructor
