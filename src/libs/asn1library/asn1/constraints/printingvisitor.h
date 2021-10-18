@@ -24,15 +24,14 @@
 ****************************************************************************/
 #pragma once
 
-#include <QTextStream>
-
-#include "constraintvisitor.h"
-
 #include "constraintlist.h"
+#include "constraintvisitor.h"
 #include "fromconstraint.h"
 #include "logicoperators.h"
 #include "rangeconstraint.h"
 #include "sizeconstraint.h"
+
+#include <QTextStream>
 
 namespace Asn1Acn {
 namespace Constraints {
@@ -43,7 +42,8 @@ class PrintingVisitor : public ConstraintVisitor<ValueType>
 public:
     PrintingVisitor(QTextStream &stream)
         : m_stream(stream)
-    {}
+    {
+    }
 
     void visit(const RangeConstraint<ValueType> &constraint) override;
     void visit(const AndConstraint<ValueType> &constraint) override;
@@ -73,8 +73,7 @@ void PrintingVisitor<ValueType>::visit(const RangeConstraint<ValueType> &constra
     if (range.isSingleItem())
         m_stream << ValueType::asString(range.begin());
     else
-        m_stream << ValueType::asString(range.begin()) << " .. "
-                 << ValueType::asString(range.end());
+        m_stream << ValueType::asString(range.begin()) << " .. " << ValueType::asString(range.end());
 }
 
 template<typename ValueType>

@@ -24,9 +24,8 @@
 ****************************************************************************/
 #pragma once
 
-#include <memory>
-
 #include <QString>
+#include <memory>
 
 namespace Asn1Acn {
 

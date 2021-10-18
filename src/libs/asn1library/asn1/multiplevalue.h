@@ -24,12 +24,11 @@
 ****************************************************************************/
 #pragma once
 
-#include <memory>
-#include <vector>
-
 #include "value.h"
 
 #include <QString>
+#include <memory>
+#include <vector>
 
 namespace Asn1Acn {
 

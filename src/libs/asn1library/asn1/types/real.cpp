@@ -34,7 +34,8 @@ Real::Real(const QString &identifier)
     : Type(identifier)
     , m_encoding(RealEncoding::unspecified)
     , m_endianness(Endianness::unspecified)
-{}
+{
+}
 
 void Real::accept(TypeMutatingVisitor &visitor)
 {

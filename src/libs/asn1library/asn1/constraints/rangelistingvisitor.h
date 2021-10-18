@@ -24,19 +24,17 @@
 ****************************************************************************/
 #pragma once
 
-#include <algorithm>
-#include <functional>
-#include <stdexcept>
-
-#include <data/rangelist.h>
-
-#include "constraintvisitor.h"
-
 #include "constraintlist.h"
+#include "constraintvisitor.h"
 #include "fromconstraint.h"
 #include "logicoperators.h"
 #include "rangeconstraint.h"
 #include "sizeconstraint.h"
+
+#include <algorithm>
+#include <data/rangelist.h>
+#include <functional>
+#include <stdexcept>
 
 namespace Asn1Acn {
 namespace Constraints {
@@ -84,12 +82,11 @@ inline RangeList<typename ValueType::Type> toRangeList(const Constraint<ValueTyp
 template<typename ValueType>
 void RangeListingVisitor<ValueType>::visit(const RangeConstraint<ValueType> &constraint)
 {
-    this->m_result = {constraint.range()};
+    this->m_result = { constraint.range() };
 }
 
 template<typename ValueType>
-RangeList<typename ValueType::Type> RangeListingVisitor<ValueType>::toRangeList(
-    const Constraint<ValueType> &c) const
+RangeList<typename ValueType::Type> RangeListingVisitor<ValueType>::toRangeList(const Constraint<ValueType> &c) const
 {
     return Fuzzer::Data::Constraints ::toRangeList(c);
 }
@@ -121,18 +118,14 @@ void RangeListingVisitorBase<ValueType, ResultType>::visit(const SizeConstraint<
 }
 
 template<typename ValueType, typename ResultType>
-void RangeListingVisitorBase<ValueType, ResultType>::visit(
-    const ConstraintList<ValueType> &constraint)
+void RangeListingVisitorBase<ValueType, ResultType>::visit(const ConstraintList<ValueType> &constraint)
 {
     const auto &constraints = constraint.constraints();
     if (constraints.empty())
         return;
     m_result = toRangeList(*constraints.front());
-    std::for_each(std::begin(constraints) + 1,
-                  std::end(constraints),
-                  [this](const std::unique_ptr<Constraint<ValueType>> &c) {
-                      m_result.intersect(toRangeList(*c));
-                  });
+    std::for_each(std::begin(constraints) + 1, std::end(constraints),
+            [this](const std::unique_ptr<Constraint<ValueType>> &c) { m_result.intersect(toRangeList(*c)); });
     m_result.compact();
 }
 

@@ -24,24 +24,23 @@
 ****************************************************************************/
 #pragma once
 
-#include <QString>
-
 #include "../constraints/withconstraints.h"
 #include "types/asciistringacnparameters.h"
 #include "types/string.h"
 #include "types/type.h"
 
+#include <QString>
+
 namespace Asn1Acn {
 namespace Types {
 
-class IA5String : public String,
-                  public AsciiStringAcnParameters,
-                  public Constraints::WithConstraints<StringValue>
+class IA5String : public String, public AsciiStringAcnParameters, public Constraints::WithConstraints<StringValue>
 {
 public:
     IA5String(const QString &identifier = QString())
         : String(identifier)
-    { }
+    {
+    }
     IA5String(const IA5String &other) = default;
 
     QString typeName() const override { return QLatin1String("IA5String"); }

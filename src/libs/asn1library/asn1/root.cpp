@@ -24,17 +24,18 @@
 ****************************************************************************/
 #include "root.h"
 
-#include <QFileInfo>
-
 #include "mutatingvisitor.h"
 #include "project.h"
 #include "visitor.h"
+
+#include <QFileInfo>
 
 using namespace Asn1Acn;
 
 Root::Root()
     : Node("ROOT", {})
-{}
+{
+}
 
 Root::Root(const Root &other)
     : Root()
@@ -43,7 +44,7 @@ Root::Root(const Root &other)
         add(std::make_unique<Project>(*p));
 }
 
-Root::~Root() { }
+Root::~Root() {}
 
 void Root::accept(Visitor &visitor) const
 {

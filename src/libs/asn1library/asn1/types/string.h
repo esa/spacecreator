@@ -34,7 +34,8 @@ class String : public Type
 protected:
     String(const QString &identifier = QString())
         : Type(identifier)
-    { }
+    {
+    }
     String(const String &other) = default;
 
 public:

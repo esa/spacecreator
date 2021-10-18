@@ -24,10 +24,9 @@
 ****************************************************************************/
 #pragma once
 
+#include <QString>
 #include <memory>
 #include <vector>
-
-#include <QString>
 
 namespace Asn1Acn {
 
@@ -37,7 +36,8 @@ public:
     AcnArgument();
     AcnArgument(const QString &argument)
         : m_argument(argument)
-    {}
+    {
+    }
 
     AcnArgument(const AcnArgument &other) = default;
 

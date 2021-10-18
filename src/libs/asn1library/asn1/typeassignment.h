@@ -36,10 +36,8 @@ namespace Asn1Acn {
 class TypeAssignment : public Node
 {
 public:
-    TypeAssignment(const QString &name,
-                   const QString &cName,
-                   const SourceLocation &location,
-                   std::unique_ptr<Types::Type> type);
+    TypeAssignment(const QString &name, const QString &cName, const SourceLocation &location,
+            std::unique_ptr<Types::Type> type);
     TypeAssignment(const TypeAssignment &other);
     ~TypeAssignment() override;
 

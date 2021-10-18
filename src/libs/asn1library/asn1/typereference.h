@@ -25,6 +25,7 @@
 #pragma once
 
 #include "sourcelocation.h"
+
 #include <QString>
 
 namespace Asn1Acn {
@@ -37,7 +38,8 @@ public:
         : m_location(location)
         , m_name(name)
         , m_module(module)
-    {}
+    {
+    }
     TypeReference(const TypeReference &other) = default;
 
     const SourceLocation &location() const { return m_location; }

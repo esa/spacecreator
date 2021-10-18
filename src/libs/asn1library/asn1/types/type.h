@@ -24,12 +24,12 @@
 ****************************************************************************/
 #pragma once
 
+#include "typereadingvisitor.h"
+
 #include <QString>
 #include <QVariantMap>
 #include <memory>
 #include <vector>
-
-#include "typereadingvisitor.h"
 
 namespace Asn1Acn {
 
@@ -40,8 +40,19 @@ namespace Types {
 
 class TypeMutatingVisitor;
 
-enum class AlignToNext { byte, word, dword, unspecified };
-enum class Endianness { big, little, unspecified };
+enum class AlignToNext
+{
+    byte,
+    word,
+    dword,
+    unspecified
+};
+enum class Endianness
+{
+    big,
+    little,
+    unspecified
+};
 
 class Type
 {
@@ -101,7 +112,6 @@ public:
     static QString endiannessToString(Endianness param);
 
 protected:
-
     QString m_identifier;
 
     AlignToNext m_alignment;

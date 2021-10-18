@@ -24,12 +24,12 @@
 ****************************************************************************/
 #pragma once
 
-#include <memory>
-#include <vector>
-
 #include "constraint.h"
 #include "constraintvisitor.h"
 #include "rangeconstraint.h"
+
+#include <memory>
+#include <vector>
 
 namespace Asn1Acn {
 namespace Constraints {
@@ -41,20 +41,11 @@ public:
     ConstraintList() {}
     ConstraintList(const ConstraintList &other);
 
-    const std::vector<std::unique_ptr<Constraint<ValueType>>> &constraints() const
-    {
-        return m_constraints;
-    }
+    const std::vector<std::unique_ptr<Constraint<ValueType>>> &constraints() const { return m_constraints; }
 
-    void append(std::unique_ptr<Constraint<ValueType>> c)
-    {
-        m_constraints.emplace_back(std::move(c));
-    }
+    void append(std::unique_ptr<Constraint<ValueType>> c) { m_constraints.emplace_back(std::move(c)); }
 
-    void append(const Range<typename ValueType::Type> &r)
-    {
-        append(std::make_unique<RangeConstraint<ValueType>>(r));
-    }
+    void append(const Range<typename ValueType::Type> &r) { append(std::make_unique<RangeConstraint<ValueType>>(r)); }
 
     void clear() { m_constraints.clear(); }
 

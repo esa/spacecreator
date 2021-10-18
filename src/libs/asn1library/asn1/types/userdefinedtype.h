@@ -25,12 +25,11 @@
 
 #pragma once
 
-#include "type.h"
 #include "../acnargument.h"
-
-#include <vector>
+#include "type.h"
 
 #include <QString>
+#include <vector>
 
 namespace Asn1Acn {
 namespace Types {

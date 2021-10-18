@@ -33,7 +33,7 @@ Type::Type(const QString &identifier)
 {
 }
 
-Type::Type(const Type& other)
+Type::Type(const Type &other)
     : m_identifier(other.m_identifier)
     , m_alignment(other.m_alignment)
 {

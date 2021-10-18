@@ -24,14 +24,15 @@
 ****************************************************************************/
 #pragma once
 
-#include <QString>
-
 #include "type.h"
+
+#include <QString>
 
 namespace Asn1Acn {
 namespace Types {
 
-enum class IntegerEncoding {
+enum class IntegerEncoding
+{
     pos_int,
     twos_complement,
     ASCII,

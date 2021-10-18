@@ -24,11 +24,10 @@
 ****************************************************************************/
 #pragma once
 
-#include <QString>
-
+#include "../constraints/withconstraints.h"
 #include "type.h"
 
-#include "../constraints/withconstraints.h"
+#include <QString>
 
 namespace Asn1Acn {
 namespace Types {
@@ -38,7 +37,8 @@ class SequenceOf : public Type, public Constraints::WithConstraints<IntegerValue
 public:
     SequenceOf(const QString &identifier = QString())
         : Type(identifier)
-    { }
+    {
+    }
     SequenceOf(const SequenceOf &other);
 
     QString typeName() const override { return QLatin1String("SEQUENCE OF"); }

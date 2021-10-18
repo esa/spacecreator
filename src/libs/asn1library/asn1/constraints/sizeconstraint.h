@@ -24,14 +24,13 @@
 ****************************************************************************/
 #pragma once
 
-#include <memory>
-#include <stdexcept>
-
-#include <QString>
-
 #include "../values.h"
 #include "constraint.h"
 #include "constraintvisitor.h"
+
+#include <QString>
+#include <memory>
+#include <stdexcept>
 
 namespace Asn1Acn {
 namespace Constraints {
@@ -43,7 +42,8 @@ public:
     SizeConstraint() = default;
     SizeConstraint(std::unique_ptr<Constraint<IntegerValue>> innerConstraints)
         : m_innerContraints(std::move(innerConstraints))
-    {}
+    {
+    }
 
     void setInnerConstraints(std::unique_ptr<Constraint<IntegerValue>> innerConstraints)
     {

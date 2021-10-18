@@ -25,18 +25,16 @@
 ****************************************************************************/
 #pragma once
 
-#include <memory>
-
-#include <QString>
-
-#include <QXmlStreamReader>
-
-#include "asn1/values.h"
 #include "asn1/constraints/constraintlist.h"
 #include "asn1/constraints/fromconstraint.h"
 #include "asn1/constraints/logicoperators.h"
 #include "asn1/constraints/rangeconstraint.h"
 #include "asn1/constraints/sizeconstraint.h"
+#include "asn1/values.h"
+
+#include <QString>
+#include <QXmlStreamReader>
+#include <memory>
 
 namespace Asn1Acn {
 
@@ -51,7 +49,8 @@ public:
     explicit AstXmlConstraintParser(QXmlStreamReader &xmlReader, ConstraintListT &targetList)
         : m_xmlReader(xmlReader)
         , m_list(targetList)
-    {}
+    {
+    }
 
     bool parse();
 
@@ -68,7 +67,8 @@ public:
 
     explicit AstXmlConstraintNodeParser(QXmlStreamReader &xmlReader)
         : m_xmlReader(xmlReader)
-    {}
+    {
+    }
 
     bool parseSingleSubNode();
     bool parseNextSubNode();
@@ -237,18 +237,16 @@ QString AstXmlConstraintNodeParser<T>::findValue()
 }
 
 template<typename T>
-typename AstXmlConstraintNodeParser<T>::Constraints AstXmlConstraintNodeParser<T>::buildRange(
-    const QString &val) const
+typename AstXmlConstraintNodeParser<T>::Constraints AstXmlConstraintNodeParser<T>::buildRange(const QString &val) const
 {
-    return RangeConstraint<T>::create({T::fromAstValue(val)});
+    return RangeConstraint<T>::create({ T::fromAstValue(val) });
 }
 
 template<typename T>
 typename AstXmlConstraintNodeParser<T>::Constraints AstXmlConstraintNodeParser<T>::buildRange(
-    const QString &min, const QString &max) const
+        const QString &min, const QString &max) const
 {
-    return RangeConstraint<T>::create(
-        {T::fromAstValue(min), T::fromAstValue(max)});
+    return RangeConstraint<T>::create({ T::fromAstValue(min), T::fromAstValue(max) });
 }
 
 }

@@ -24,12 +24,11 @@
 ****************************************************************************/
 #pragma once
 
-#include <memory>
-#include <vector>
+#include "../acnparameter.h"
 
 #include <QString>
-
-#include "../acnparameter.h"
+#include <memory>
+#include <vector>
 
 namespace Asn1Acn {
 namespace Types {
@@ -58,16 +57,14 @@ protected:
 template<typename T>
 inline const T *AcnParameterizableCollection<T>::component(const QString &name) const
 {
-    auto found = find_if(m_components.begin(), m_components.end(), [name](const auto &item) {
-        return item->name() == name;
-    });
+    auto found = find_if(
+            m_components.begin(), m_components.end(), [name](const auto &item) { return item->name() == name; });
 
     return found == m_components.end() ? nullptr : (*found).get();
 }
 
 template<typename T>
-inline AcnParameterizableCollection<T>::AcnParameterizableCollection(
-    const AcnParameterizableCollection<T> &other)
+inline AcnParameterizableCollection<T>::AcnParameterizableCollection(const AcnParameterizableCollection<T> &other)
 {
     for (const auto &parameter : other.m_parameters)
         addParameter(std::make_unique<AcnParameter>(*parameter));

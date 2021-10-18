@@ -24,15 +24,20 @@
 ****************************************************************************/
 #pragma once
 
-#include <QString>
-
 #include "../constraints/withconstraints.h"
 #include "type.h"
+
+#include <QString>
 
 namespace Asn1Acn {
 namespace Types {
 
-enum class RealEncoding { IEEE754_1985_32, IEEE754_1985_64, unspecified };
+enum class RealEncoding
+{
+    IEEE754_1985_32,
+    IEEE754_1985_64,
+    unspecified
+};
 
 class Real : public Type, public Constraints::WithConstraints<RealValue>
 {

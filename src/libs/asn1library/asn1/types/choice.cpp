@@ -30,13 +30,8 @@
 using namespace Asn1Acn;
 using namespace Asn1Acn::Types;
 
-ChoiceAlternative::ChoiceAlternative(const QString &name,
-                                     const QString &presentWhenName,
-                                     const QString &adaName,
-                                     const QString &cName,
-                                     const QString &presentWhen,
-                                     const SourceLocation &location,
-                                     std::unique_ptr<Type> type)
+ChoiceAlternative::ChoiceAlternative(const QString &name, const QString &presentWhenName, const QString &adaName,
+        const QString &cName, const QString &presentWhen, const SourceLocation &location, std::unique_ptr<Type> type)
     : m_name(name)
     , m_presentWhenName(presentWhenName)
     , m_adaName(adaName)
@@ -44,7 +39,8 @@ ChoiceAlternative::ChoiceAlternative(const QString &name,
     , m_presentWhen(presentWhen)
     , m_location(location)
     , m_type(std::move(type))
-{}
+{
+}
 
 ChoiceAlternative::ChoiceAlternative(const ChoiceAlternative &other)
     : m_name(other.m_name)
@@ -54,12 +50,14 @@ ChoiceAlternative::ChoiceAlternative(const ChoiceAlternative &other)
     , m_presentWhen(other.m_presentWhen)
     , m_location(other.m_location)
     , m_type(other.m_type->clone())
-{}
+{
+}
 
 Choice::Choice(const Choice &other)
     : Type(other)
     , AcnParameterizableCollection<ChoiceAlternative>(other)
-{}
+{
+}
 
 void Choice::accept(TypeMutatingVisitor &visitor)
 {

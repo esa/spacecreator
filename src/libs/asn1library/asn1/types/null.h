@@ -24,9 +24,9 @@
 ****************************************************************************/
 #pragma once
 
-#include <QString>
-
 #include "type.h"
+
+#include <QString>
 
 namespace Asn1Acn {
 namespace Types {
@@ -36,7 +36,8 @@ class Null : public Type
 public:
     Null(const QString &identifier = QString())
         : Type(identifier)
-    { }
+    {
+    }
     Null(const Null &other) = default;
 
     QString typeName() const override { return QLatin1String("NULL"); }

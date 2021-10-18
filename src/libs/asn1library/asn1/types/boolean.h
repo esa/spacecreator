@@ -24,10 +24,10 @@
 ****************************************************************************/
 #pragma once
 
-#include <QString>
-
 #include "../constraints/withconstraints.h"
 #include "type.h"
+
+#include <QString>
 
 namespace Asn1Acn {
 namespace Types {
@@ -37,7 +37,8 @@ class Boolean : public Type, public Constraints::WithConstraints<BooleanValue>
 public:
     Boolean(const QString &identifier = QString())
         : Type(identifier)
-    { }
+    {
+    }
     Boolean(const Boolean &other) = default;
 
     QString typeName() const override { return QLatin1String("BOOLEAN"); }

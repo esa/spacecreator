@@ -23,19 +23,20 @@ namespace Asn1Acn {
 
 Asn1Model::Asn1Model(Asn1Model::Data data)
     : m_data(std::move(data))
-{ }
+{
+}
 
 conversion::ModelType Asn1Model::modelType() const
 {
     return conversion::ModelProperties<Asn1Model>::type;
 }
 
-const Asn1Model::Data& Asn1Model::data() const
+const Asn1Model::Data &Asn1Model::data() const
 {
     return m_data;
 }
 
-Asn1Model::Data& Asn1Model::data()
+Asn1Model::Data &Asn1Model::data()
 {
     return m_data;
 }

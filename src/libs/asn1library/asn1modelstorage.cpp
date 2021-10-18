@@ -46,7 +46,7 @@ Asn1ModelStorage::Asn1ModelStorage(QObject *parent)
 /*!
    \brief Asn1ModelStorage::~Asn1ModelStorage
  */
-Asn1ModelStorage::~Asn1ModelStorage() { }
+Asn1ModelStorage::~Asn1ModelStorage() {}
 
 /*!
    Returns the asn types for the given file (full path).
@@ -136,7 +136,7 @@ QSharedPointer<File> Asn1ModelStorage::loadData(const QString &fileName)
 
 void Asn1ModelStorage::loadChangedFiles()
 {
-    for (const QString& fileName : m_filesToReload) {
+    for (const QString &fileName : m_filesToReload) {
         loadFile(fileName);
     }
     m_filesToReload.clear();

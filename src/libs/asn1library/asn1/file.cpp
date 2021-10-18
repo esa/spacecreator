@@ -33,7 +33,8 @@ using namespace Asn1Acn;
 File::File(const QString &path)
     : Node(path, { path, 0, 0 })
     , m_polluted(false)
-{}
+{
+}
 
 File::File(const File &other)
     : File(other.location().path())

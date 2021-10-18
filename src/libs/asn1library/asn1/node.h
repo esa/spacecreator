@@ -40,7 +40,8 @@ protected:
         : m_name(name)
         , m_location(location)
         , m_parent(nullptr)
-    {}
+    {
+    }
 
     Node(const Node &other) = delete;
 

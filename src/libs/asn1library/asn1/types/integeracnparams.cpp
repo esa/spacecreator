@@ -33,7 +33,8 @@ IntegerAcnParameters::IntegerAcnParameters()
     , m_size(0)
     , m_acnMinSizeInBits(0)
     , m_acnMaxSizeInBits(0)
-{}
+{
+}
 
 IntegerEncoding IntegerAcnParameters::mapEncoding(QStringRef in)
 {

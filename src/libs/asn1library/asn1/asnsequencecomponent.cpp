@@ -27,23 +27,21 @@
 
 using namespace Asn1Acn;
 
-AsnSequenceComponent::AsnSequenceComponent(const QString &name,
-                                           const QString &cName,
-                                           bool optional,
-                                           const QString &presentWhen,
-                                           const SourceLocation &location,
-                                           std::unique_ptr<Types::Type> type)
+AsnSequenceComponent::AsnSequenceComponent(const QString &name, const QString &cName, bool optional,
+        const QString &presentWhen, const SourceLocation &location, std::unique_ptr<Types::Type> type)
     : SequenceComponent(name, cName, std::move(type))
     , m_optional(optional)
     , m_presentWhen(presentWhen)
     , m_location(location)
-{}
+{
+}
 
 AsnSequenceComponent::AsnSequenceComponent(const AsnSequenceComponent &other)
     : SequenceComponent(other)
     , m_presentWhen(other.m_presentWhen)
     , m_location(other.m_location)
-{}
+{
+}
 
 QString AsnSequenceComponent::definitionAsString() const
 {

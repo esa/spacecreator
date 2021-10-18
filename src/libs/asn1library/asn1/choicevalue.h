@@ -24,9 +24,9 @@
 ****************************************************************************/
 #pragma once
 
-#include <memory>
-
 #include "value.h"
+
+#include <memory>
 
 namespace Asn1Acn {
 

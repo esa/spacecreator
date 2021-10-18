@@ -24,14 +24,14 @@
 ****************************************************************************/
 #pragma once
 
-#include <QMap>
-#include <QString>
-
+#include "../constraints/withconstraints.h"
 #include "../range.h"
 #include "../sourcelocation.h"
-#include "../constraints/withconstraints.h"
 #include "integeracnparams.h"
 #include "type.h"
+
+#include <QMap>
+#include <QString>
 
 namespace Asn1Acn {
 namespace Types {
@@ -46,7 +46,8 @@ public:
         , m_name(name)
         , m_value(value)
         , m_location(location)
-    {}
+    {
+    }
 
     const QString &name() const { return m_name; }
     long value() const { return m_value; }
@@ -60,9 +61,7 @@ private:
     SourceLocation m_location;
 };
 
-class Enumerated : public Type,
-                   public IntegerAcnParameters,
-                   public Constraints::WithConstraints<EnumValue>
+class Enumerated : public Type, public IntegerAcnParameters, public Constraints::WithConstraints<EnumValue>
 {
 public:
     Enumerated(const QString &identifier = QString());

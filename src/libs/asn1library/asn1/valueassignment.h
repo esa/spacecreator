@@ -37,10 +37,8 @@ namespace Asn1Acn {
 class ValueAssignment : public Node
 {
 public:
-    ValueAssignment(const QString &name,
-                    const SourceLocation &location,
-                    std::unique_ptr<Types::Type> type,
-                    ValuePtr value);
+    ValueAssignment(
+            const QString &name, const SourceLocation &location, std::unique_ptr<Types::Type> type, ValuePtr value);
     ValueAssignment(const ValueAssignment &other);
     ~ValueAssignment() override;
 

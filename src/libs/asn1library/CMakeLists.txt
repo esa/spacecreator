@@ -132,4 +132,6 @@ if(OPTIONS_NO_DEPRECATED)
     target_compile_options(${LIB_NAME} PRIVATE -Wno-deprecated -Wno-deprecated-declarations)
 endif()
 
+add_format_target(${LIB_NAME})
+
 source_group("Resource Files" REGULAR_EXPRESSION ".*.qrc$")

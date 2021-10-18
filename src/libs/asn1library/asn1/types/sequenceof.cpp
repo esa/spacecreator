@@ -35,7 +35,8 @@ SequenceOf::SequenceOf(const SequenceOf &other)
     , WithConstraints<IntegerValue>(other)
     , m_acnSize(other.m_acnSize)
     , m_itemsType(other.m_itemsType->clone())
-{}
+{
+}
 
 void SequenceOf::accept(TypeMutatingVisitor &visitor)
 {

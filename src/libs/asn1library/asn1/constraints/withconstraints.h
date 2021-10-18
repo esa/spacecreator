@@ -24,10 +24,10 @@
 ****************************************************************************/
 #pragma once
 
-#include <memory>
-
 #include "../values.h"
 #include "constraintlist.h"
+
+#include <memory>
 
 namespace Asn1Acn {
 namespace Constraints {

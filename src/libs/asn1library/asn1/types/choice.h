@@ -24,11 +24,11 @@
 ****************************************************************************/
 #pragma once
 
-#include <QString>
-
 #include "../sourcelocation.h"
 #include "acnparameterizablecomposite.h"
 #include "type.h"
+
+#include <QString>
 
 namespace Asn1Acn {
 namespace Types {
@@ -36,19 +36,11 @@ namespace Types {
 class ChoiceAlternative
 {
 public:
-    ChoiceAlternative(const QString &name,
-                      const QString &presentWhenName,
-                      const QString &adaName,
-                      const QString &cName,
-                      const QString &presentWhen,
-                      const SourceLocation &location,
-                      std::unique_ptr<Type> type);
+    ChoiceAlternative(const QString &name, const QString &presentWhenName, const QString &adaName, const QString &cName,
+            const QString &presentWhen, const SourceLocation &location, std::unique_ptr<Type> type);
 
     ChoiceAlternative(const ChoiceAlternative &other);
-    std::unique_ptr<ChoiceAlternative> clone() const
-    {
-        return std::make_unique<ChoiceAlternative>(*this);
-    }
+    std::unique_ptr<ChoiceAlternative> clone() const { return std::make_unique<ChoiceAlternative>(*this); }
 
     QString definitionAsString() const { return name(); }
     const QString &name() const { return m_name; }
@@ -77,7 +69,8 @@ class Choice : public Type, public AcnParameterizableCollection<ChoiceAlternativ
 public:
     Choice(const QString &identifier = QString())
         : Type(identifier)
-    { }
+    {
+    }
     Choice(const Choice &other);
 
     QString typeName() const override { return QLatin1String("CHOICE"); }

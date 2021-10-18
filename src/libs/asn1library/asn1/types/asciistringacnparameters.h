@@ -29,7 +29,8 @@
 namespace Asn1Acn {
 namespace Types {
 
-enum class AsciiStringEncoding {
+enum class AsciiStringEncoding
+{
     ASCII,
     unspecified,
 };

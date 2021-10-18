@@ -24,11 +24,11 @@
 ****************************************************************************/
 #pragma once
 
-#include <QString>
-
 #include "../sequencecomponent.h"
 #include "acnparameterizablecomposite.h"
 #include "type.h"
+
+#include <QString>
 
 namespace Asn1Acn {
 namespace Types {
@@ -38,7 +38,8 @@ class Sequence : public Type, public AcnParameterizableCollection<SequenceCompon
 public:
     Sequence(const QString &identifier = QString())
         : Type(identifier)
-    { }
+    {
+    }
     Sequence(const Sequence &other) = default;
 
     QString typeName() const override { return QLatin1String("SEQUENCE"); }

@@ -25,20 +25,18 @@
 ****************************************************************************/
 #pragma once
 
-#include <memory>
-
-#include <QString>
-
-#include <QXmlStreamReader>
-
 #include "asn1/acnargument.h"
 #include "asn1/acnparameter.h"
 #include "asn1/acnsequencecomponent.h"
 #include "asn1/definitions.h"
 #include "asn1/file.h"
 #include "asn1/namedvalue.h"
-#include "asn1/value.h"
 #include "asn1/types/type.h"
+#include "asn1/value.h"
+
+#include <QString>
+#include <QXmlStreamReader>
+#include <memory>
 
 namespace Asn1Acn {
 
@@ -96,13 +94,10 @@ private:
 
     std::unique_ptr<Types::Type> findAndReadType();
     std::unique_ptr<Types::Type> readType();
-    std::unique_ptr<Types::Type> readTypeDetails(const QString &name,
-                                                       const SourceLocation &location,
-                                                       const bool isParametrized,
-                                                       const QString &typeAlignment);
-    std::unique_ptr<Types::Type> buildTypeFromName(const QString &name,
-                                                         const SourceLocation &location,
-                                                         bool isParametrized);
+    std::unique_ptr<Types::Type> readTypeDetails(const QString &name, const SourceLocation &location,
+            const bool isParametrized, const QString &typeAlignment);
+    std::unique_ptr<Types::Type> buildTypeFromName(
+            const QString &name, const SourceLocation &location, bool isParametrized);
 
     std::unique_ptr<Types::Type> createReferenceType(const SourceLocation &location);
     void readReferredTypeDetails(Types::Type &type);

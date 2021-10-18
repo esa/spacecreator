@@ -31,7 +31,8 @@ using namespace Asn1Acn;
 
 Definitions::Definitions(const QString &name, const SourceLocation &location)
     : Node(name, location)
-{}
+{
+}
 
 Definitions::Definitions(const Definitions &other)
     : Definitions(other.name(), other.location())
@@ -46,7 +47,7 @@ Definitions::Definitions(const Definitions &other)
         addImportedValue(importedValue);
 }
 
-Definitions::~Definitions() { }
+Definitions::~Definitions() {}
 
 void Definitions::accept(Visitor &visitor) const
 {

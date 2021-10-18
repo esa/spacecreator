@@ -24,13 +24,12 @@
 ****************************************************************************/
 #pragma once
 
-#include <algorithm>
-#include <initializer_list>
+#include "range.h"
 
 #include <QList>
 #include <QString>
-
-#include "range.h"
+#include <algorithm>
+#include <initializer_list>
 
 namespace Asn1Acn {
 
@@ -41,13 +40,16 @@ public:
     RangeList() = default;
     RangeList(std::initializer_list<Range<T>> ranges)
         : m_ranges(ranges)
-    {}
+    {
+    }
     RangeList(const QList<Range<T>> &ranges)
         : m_ranges(ranges)
-    {}
+    {
+    }
     RangeList(QList<Range<T>> &&ranges)
         : m_ranges(std::move(ranges))
-    {}
+    {
+    }
 
     using const_iterator = typename QList<Range<T>>::const_iterator;
 
@@ -72,7 +74,7 @@ private:
 template<typename T>
 inline RangeList<T> difference(const Range<T> &range, const RangeList<T> &list)
 {
-    RangeList<T> result{range};
+    RangeList<T> result { range };
 
     for (const auto &r : list)
         result.intersect(range.difference(r));
@@ -87,15 +89,10 @@ QString RangeList<T>::asString() const
     if (isEmpty())
         return {};
     const auto rangeStr = [](const Range<T> &r) {
-        return r.isSingleItem() ? QString("%1").arg(r.begin())
-                                : QString("%1 .. %2").arg(r.begin()).arg(r.end());
+        return r.isSingleItem() ? QString("%1").arg(r.begin()) : QString("%1 .. %2").arg(r.begin()).arg(r.end());
     };
-    return std::accumulate(begin() + 1,
-                           end(),
-                           rangeStr(m_ranges.first()),
-                           [rangeStr](const QString &a, const Range<T> &b) {
-                               return a + " | " + rangeStr(b);
-                           });
+    return std::accumulate(begin() + 1, end(), rangeStr(m_ranges.first()),
+            [rangeStr](const QString &a, const Range<T> &b) { return a + " | " + rangeStr(b); });
 }
 
 template<typename T>
@@ -122,9 +119,8 @@ void RangeList<T>::compact()
 template<typename T>
 void RangeList<T>::sort()
 {
-    std::sort(m_ranges.begin(), m_ranges.end(), [](const Range<T> &a, const Range<T> &b) {
-        return a.begin() < b.begin();
-    });
+    std::sort(m_ranges.begin(), m_ranges.end(),
+            [](const Range<T> &a, const Range<T> &b) { return a.begin() < b.begin(); });
 }
 
 template<typename T>

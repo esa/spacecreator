@@ -24,11 +24,11 @@
 ****************************************************************************/
 #pragma once
 
-#include <QString>
-
 #include "../constraints/withconstraints.h"
 #include "string.h"
 #include "type.h"
+
+#include <QString>
 
 namespace Asn1Acn {
 namespace Types {
@@ -38,7 +38,8 @@ class OctetString : public String, public Constraints::WithConstraints<OctetStri
 public:
     OctetString(const QString &identifier = QString())
         : String(identifier)
-    { }
+    {
+    }
     OctetString(const OctetString &other) = default;
 
     QString typeName() const override { return QLatin1String("OCTET STRING"); }

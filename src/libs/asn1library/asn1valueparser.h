@@ -56,14 +56,16 @@ private:
     bool parseChoiceValue(const Asn1Acn::Types::Type *asn1Type, const QString &asn1Value, QVariantMap &valueMap) const;
 
     template<typename ValueType>
-    bool checkRange(const Constraints::WithConstraints<ValueType> *asn1Type, const typename ValueType::Type &value) const;
+    bool checkRange(
+            const Constraints::WithConstraints<ValueType> *asn1Type, const typename ValueType::Type &value) const;
     template<typename ValueType>
     bool checkSize(const Constraints::WithConstraints<ValueType> *asn1Type, const int32_t value) const;
     template<typename ValueType>
     bool checkStringLength(const Constraints::WithConstraints<ValueType> *asn1Type, QString value) const;
 
     template<typename ValueType>
-    bool checkRangeConstraint(const Constraints::Constraint<ValueType> *constraint, const typename ValueType::Type &value) const;
+    bool checkRangeConstraint(
+            const Constraints::Constraint<ValueType> *constraint, const typename ValueType::Type &value) const;
     template<typename ValueType>
     bool checkSizeConstraint(const Constraints::Constraint<ValueType> *constraint, const int32_t value) const;
 

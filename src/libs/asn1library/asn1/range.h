@@ -34,11 +34,13 @@ class Range
 public:
     Range(const T &singleItem)
         : Range(singleItem, singleItem)
-    {}
+    {
+    }
     Range(const T &begin, const T &end)
         : m_begin(qMin(begin, end))
         , m_end(qMax(begin, end))
-    {}
+    {
+    }
     Range(const Range &other) = default;
     Range &operator=(const Range &other) = default;
 
@@ -84,7 +86,7 @@ bool Range<T>::intersects(const Range &other) const
 template<typename T>
 Range<T> Range<T>::merge(const Range &other) const
 {
-    return {qMin(begin(), other.begin()), qMax(end(), other.end())};
+    return { qMin(begin(), other.begin()), qMax(end(), other.end()) };
 }
 
 template<typename T>
@@ -92,39 +94,39 @@ bool Range<T>::canMerge(const Range &other) const
 {
     if (intersects(other))
         return true;
-    return qAbs(begin() - other.begin()) == 1 || qAbs(end() - other.end()) == 1
-           || qAbs(begin() - other.end()) == 1 || qAbs(end() - other.begin()) == 1;
+    return qAbs(begin() - other.begin()) == 1 || qAbs(end() - other.end()) == 1 || qAbs(begin() - other.end()) == 1
+            || qAbs(end() - other.begin()) == 1;
 }
 
 template<typename T>
 Range<T> Range<T>::intersection(const Range &other) const
 {
-    return {qMax(begin(), other.begin()), qMin(end(), other.end())};
+    return { qMax(begin(), other.begin()), qMin(end(), other.end()) };
 }
 
 template<typename T>
 QList<Range<T>> Range<T>::difference(const Range &other) const
 {
     if (!intersects(other))
-        return {*this};
+        return { *this };
     if (intersection(other) == *this)
         return {};
-    const Range first{begin(), other.begin() - 1};
-    const Range second{other.end() + 1, end()};
+    const Range first { begin(), other.begin() - 1 };
+    const Range second { other.end() + 1, end() };
     if (other.begin() <= begin())
-        return {second};
+        return { second };
     if (other.end() >= end())
-        return {first};
-    return {first, second};
+        return { first };
+    return { first, second };
 }
 
 template<typename T>
 bool Range<T>::check(const T value) const
 {
-    if(value < m_begin) {
+    if (value < m_begin) {
         return false;
     }
-    if(value > m_end) {
+    if (value > m_end) {
         return false;
     }
 

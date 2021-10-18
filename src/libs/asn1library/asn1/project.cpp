@@ -32,7 +32,8 @@ using namespace Asn1Acn;
 Project::Project(const QString &projectName)
     : Node(projectName, {})
     , m_buildersCount(0)
-{}
+{
+}
 
 Project::Project(const Project &other)
     : Project(other.name())
@@ -41,7 +42,7 @@ Project::Project(const Project &other)
         add(std::make_unique<File>(*file));
 }
 
-Project::~Project() { }
+Project::~Project() {}
 
 void Project::accept(Visitor &visitor) const
 {

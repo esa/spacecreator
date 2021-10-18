@@ -24,11 +24,11 @@
 ****************************************************************************/
 #pragma once
 
-#include <memory>
-
 #include "../values.h"
 #include "constraint.h"
 #include "constraintvisitor.h"
+
+#include <memory>
 
 namespace Asn1Acn {
 namespace Constraints {
@@ -39,7 +39,8 @@ class FromConstraint : public Constraint<ValueType>
 public:
     FromConstraint(std::unique_ptr<Constraint<StringValue>> innerConstraints)
         : m_innerContraints(std::move(innerConstraints))
-    {}
+    {
+    }
 
     const Constraint<StringValue> &innerConstraints() const { return *m_innerContraints; }
 

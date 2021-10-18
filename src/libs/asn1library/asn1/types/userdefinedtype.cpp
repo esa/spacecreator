@@ -23,9 +23,10 @@
 **
 ****************************************************************************/
 
+#include "userdefinedtype.h"
+
 #include "typemutatingvisitor.h"
 #include "typereadingvisitor.h"
-#include "userdefinedtype.h"
 
 using namespace Asn1Acn::Types;
 

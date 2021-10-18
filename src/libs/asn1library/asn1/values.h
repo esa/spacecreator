@@ -24,38 +24,33 @@
 ****************************************************************************/
 #pragma once
 
-#include <cstdint>
-
 #include <QString>
+#include <cstdint>
 
 namespace Asn1Acn {
 
-struct IntegerValue
-{
+struct IntegerValue {
     using Type = std::int64_t;
     static QString astNodeName() { return QStringLiteral("IntegerValue"); }
     static Type fromAstValue(const QString &value) { return value.toLongLong(); }
     static QString asString(Type t) { return QString::number(t); }
 };
 
-struct RealValue
-{
+struct RealValue {
     using Type = double;
     static QString astNodeName() { return QStringLiteral("RealValue"); }
     static Type fromAstValue(const QString &value) { return value.toDouble(); }
     static QString asString(Type t) { return QString::number(t); }
 };
 
-struct EnumValue
-{
+struct EnumValue {
     using Type = QString;
     static QString astNodeName() { return QStringLiteral("EnumValue"); }
     static Type fromAstValue(const QString &value) { return value; }
     static QString asString(Type t) { return t; }
 };
 
-struct BooleanValue
-{
+struct BooleanValue {
     using Type = bool;
     static QString astNodeName() { return QStringLiteral("BooleanValue"); }
     static Type fromAstValue(const QString &value) { return value.toUpper() == "TRUE"; }
@@ -63,24 +58,21 @@ struct BooleanValue
     static QString reformatString(const QString &value) { return asString(fromAstValue(value)); }
 };
 
-struct StringValue
-{
+struct StringValue {
     using Type = QString;
     static QString astNodeName() { return QStringLiteral("StringValue"); }
     static Type fromAstValue(const QString &value) { return value; }
     static QString asString(Type t) { return '"' + t + '"'; }
 };
 
-struct BitStringValue
-{
+struct BitStringValue {
     using Type = QString;
     static QString astNodeName() { return QStringLiteral("BitStringValue"); }
     static Type fromAstValue(const QString &value) { return value; }
     static QString asString(Type t) { return "'" + t + "'B"; }
 };
 
-struct OctetStringValue
-{
+struct OctetStringValue {
     using Type = QString;
     static QString astNodeName() { return QStringLiteral("OctetStringValue"); }
     static Type fromAstValue(const QString &value) { return value; }

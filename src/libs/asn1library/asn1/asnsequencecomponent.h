@@ -34,12 +34,8 @@ public:
     AsnSequenceComponent() = default;
     ~AsnSequenceComponent() override = default;
 
-    AsnSequenceComponent(const QString &name,
-                         const QString &cName,
-                         bool optional,
-                         const QString &presentWhen,
-                         const SourceLocation &location,
-                         std::unique_ptr<Types::Type> type);
+    AsnSequenceComponent(const QString &name, const QString &cName, bool optional, const QString &presentWhen,
+            const SourceLocation &location, std::unique_ptr<Types::Type> type);
 
     AsnSequenceComponent(const AsnSequenceComponent &other);
 

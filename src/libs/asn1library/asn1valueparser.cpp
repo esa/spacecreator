@@ -90,7 +90,7 @@ QVariantMap Asn1ValueParser::parseAsn1Value(
 
     switch (type->typeEnum()) {
     case Asn1Acn::Types::Type::INTEGER: {
-        const auto *integerType = dynamic_cast<const Asn1Acn::Types::Integer*>(type);
+        const auto *integerType = dynamic_cast<const Asn1Acn::Types::Integer *>(type);
         const auto integerValue = value.toInt(&ok);
         if (ok && (ok = checkRange<Asn1Acn::IntegerValue>(integerType, integerValue))) {
             valueMap["value"] = value;
@@ -98,7 +98,7 @@ QVariantMap Asn1ValueParser::parseAsn1Value(
         break;
     }
     case Asn1Acn::Types::Type::REAL: {
-        const auto *realType = dynamic_cast<const Asn1Acn::Types::Real*>(type);
+        const auto *realType = dynamic_cast<const Asn1Acn::Types::Real *>(type);
         const auto realValue = value.toDouble(&ok);
         if (ok && (ok = checkRange<Asn1Acn::RealValue>(realType, realValue))) {
             valueMap["value"] = value;
@@ -117,13 +117,13 @@ QVariantMap Asn1ValueParser::parseAsn1Value(
         break;
     }
     case Asn1Acn::Types::Type::SEQUENCEOF: {
-        const auto *sequenceOfType = dynamic_cast<const Asn1Acn::Types::SequenceOf*>(type);
+        const auto *sequenceOfType = dynamic_cast<const Asn1Acn::Types::SequenceOf *>(type);
         ok = parseSequenceOfValue(type, value, valueMap)
                 && checkSize<IntegerValue>(sequenceOfType, valueMap["seqofvalue"].toList().count());
         break;
     }
     case Asn1Acn::Types::Type::ENUMERATED: {
-        const auto *enumeratedType = dynamic_cast<const Asn1Acn::Types::Enumerated*>(type);
+        const auto *enumeratedType = dynamic_cast<const Asn1Acn::Types::Enumerated *>(type);
         const auto &enumeratedItems = enumeratedType->items();
         ok = enumeratedItems.contains(value);
         if (ok) {
@@ -136,7 +136,7 @@ QVariantMap Asn1ValueParser::parseAsn1Value(
         break;
     }
     case Asn1Acn::Types::Type::BITSTRING: {
-        const auto *bitStringType = dynamic_cast<const Asn1Acn::Types::BitString*>(type);
+        const auto *bitStringType = dynamic_cast<const Asn1Acn::Types::BitString *>(type);
 
         if (value.startsWith("\"")) {
             value = value.remove(0, 1);
@@ -152,7 +152,7 @@ QVariantMap Asn1ValueParser::parseAsn1Value(
         break;
     }
     case Asn1Acn::Types::Type::IA5STRING: {
-        const auto *ia5String = dynamic_cast<const Asn1Acn::Types::IA5String*>(type);
+        const auto *ia5String = dynamic_cast<const Asn1Acn::Types::IA5String *>(type);
 
         if (value.startsWith("\"")) {
             value = value.remove(0, 1);
@@ -168,7 +168,7 @@ QVariantMap Asn1ValueParser::parseAsn1Value(
         break;
     }
     case Asn1Acn::Types::Type::NUMERICSTRING: {
-        const auto *numericString = dynamic_cast<const Asn1Acn::Types::NumericString*>(type);
+        const auto *numericString = dynamic_cast<const Asn1Acn::Types::NumericString *>(type);
 
         if (value.startsWith("\"")) {
             value = value.remove(0, 1);
@@ -184,7 +184,7 @@ QVariantMap Asn1ValueParser::parseAsn1Value(
         break;
     }
     case Asn1Acn::Types::Type::OCTETSTRING: {
-        const auto *octetString = dynamic_cast<const Asn1Acn::Types::OctetString*>(type);
+        const auto *octetString = dynamic_cast<const Asn1Acn::Types::OctetString *>(type);
 
         if (value.startsWith("\"")) {
             value = value.remove(0, 1);
@@ -241,7 +241,7 @@ bool Asn1ValueParser::parseSequenceValue(
   seqVal { iVal 5 }
 }
 */
-    const auto *sequenceType = dynamic_cast<const Asn1Acn::Types::Sequence*>(asn1Type);
+    const auto *sequenceType = dynamic_cast<const Asn1Acn::Types::Sequence *>(asn1Type);
     if (!sequenceType) {
         Q_EMIT parseError(tr("Incorrect type while parsing sequence value"));
         return false;
@@ -309,7 +309,7 @@ bool Asn1ValueParser::parseSequenceOfValue(
 { { intVal 5, realVal 42.0 }, { intVal 6, realVal 13.9 } )
 
 */
-    const auto *sequenceOfType = dynamic_cast<const Asn1Acn::Types::SequenceOf*>(asn1Type);
+    const auto *sequenceOfType = dynamic_cast<const Asn1Acn::Types::SequenceOf *>(asn1Type);
     if (!sequenceOfType) {
         Q_EMIT parseError(tr("Incorrect type while parsing sequence of value"));
         return false;
@@ -362,7 +362,7 @@ bool Asn1ValueParser::parseSequenceOfValue(
 bool Asn1ValueParser::parseChoiceValue(
         const Asn1Acn::Types::Type *asn1Type, const QString &asn1Value, QVariantMap &valueMap) const
 {
-    const auto *choiceType = dynamic_cast<const Asn1Acn::Types::Choice*>(asn1Type);
+    const auto *choiceType = dynamic_cast<const Asn1Acn::Types::Choice *>(asn1Type);
     if (!choiceType) {
         Q_EMIT parseError(tr("Incorrect type while parsing choice value"));
         return false;
@@ -382,10 +382,11 @@ bool Asn1ValueParser::parseChoiceValue(
 }
 
 template<typename ValueType>
-bool Asn1ValueParser::checkRange(const Constraints::WithConstraints<ValueType> *asn1Type, const typename ValueType::Type &value) const
+bool Asn1ValueParser::checkRange(
+        const Constraints::WithConstraints<ValueType> *asn1Type, const typename ValueType::Type &value) const
 {
-    for(const auto &constraint : asn1Type->constraints().constraints()) {
-        if(!checkRangeConstraint<ValueType>(constraint.get(), value)) {
+    for (const auto &constraint : asn1Type->constraints().constraints()) {
+        if (!checkRangeConstraint<ValueType>(constraint.get(), value)) {
             return false;
         }
     }
@@ -396,8 +397,8 @@ bool Asn1ValueParser::checkRange(const Constraints::WithConstraints<ValueType> *
 template<typename ValueType>
 bool Asn1ValueParser::checkSize(const Constraints::WithConstraints<ValueType> *asn1Type, const int32_t value) const
 {
-    for(const auto &constraint : asn1Type->constraints().constraints()) {
-        if(!checkSizeConstraint<ValueType>(constraint.get(), value)) {
+    for (const auto &constraint : asn1Type->constraints().constraints()) {
+        if (!checkSizeConstraint<ValueType>(constraint.get(), value)) {
             return false;
         }
     }
@@ -420,21 +421,25 @@ bool Asn1ValueParser::checkStringLength(const Constraints::WithConstraints<Value
 }
 
 template<typename ValueType>
-bool Asn1ValueParser::checkRangeConstraint(const Constraints::Constraint<ValueType> *constraint, const typename ValueType::Type &value) const
+bool Asn1ValueParser::checkRangeConstraint(
+        const Constraints::Constraint<ValueType> *constraint, const typename ValueType::Type &value) const
 {
-    if(!constraint) {
+    if (!constraint) {
         return false;
     }
 
-    if(const auto *andConstraint = dynamic_cast<const Constraints::AndConstraint<ValueType>*>(constraint); andConstraint) {
+    if (const auto *andConstraint = dynamic_cast<const Constraints::AndConstraint<ValueType> *>(constraint);
+            andConstraint) {
         const auto leftConstraint = checkRangeConstraint(andConstraint->leftChild(), value);
         const auto rightConstraint = checkRangeConstraint(andConstraint->rightChild(), value);
         return leftConstraint && rightConstraint;
-    } else if (const auto *orConstraint = dynamic_cast<const Constraints::OrConstraint<ValueType>*>(constraint); orConstraint) {
+    } else if (const auto *orConstraint = dynamic_cast<const Constraints::OrConstraint<ValueType> *>(constraint);
+               orConstraint) {
         const auto leftConstraint = checkRangeConstraint(andConstraint->leftChild(), value);
         const auto rightConstraint = checkRangeConstraint(andConstraint->rightChild(), value);
         return leftConstraint || rightConstraint;
-    } else if (const auto *rangeConstraint = dynamic_cast<const Constraints::RangeConstraint<ValueType>*>(constraint); rangeConstraint) {
+    } else if (const auto *rangeConstraint = dynamic_cast<const Constraints::RangeConstraint<ValueType> *>(constraint);
+               rangeConstraint) {
         const auto &range = rangeConstraint->range();
         return range.check(value);
     } else {
@@ -443,21 +448,25 @@ bool Asn1ValueParser::checkRangeConstraint(const Constraints::Constraint<ValueTy
 }
 
 template<typename ValueType>
-bool Asn1ValueParser::checkSizeConstraint(const Constraints::Constraint<ValueType> *constraint, const int32_t value) const
+bool Asn1ValueParser::checkSizeConstraint(
+        const Constraints::Constraint<ValueType> *constraint, const int32_t value) const
 {
-    if(!constraint) {
+    if (!constraint) {
         return false;
     }
 
-    if(const auto *andConstraint = dynamic_cast<const Constraints::AndConstraint<ValueType>*>(constraint); andConstraint) {
+    if (const auto *andConstraint = dynamic_cast<const Constraints::AndConstraint<ValueType> *>(constraint);
+            andConstraint) {
         const auto leftConstraint = checkSizeConstraint<ValueType>(andConstraint->leftChild(), value);
         const auto rightConstraint = checkSizeConstraint<ValueType>(andConstraint->rightChild(), value);
         return leftConstraint && rightConstraint;
-    } else if (const auto *orConstraint = dynamic_cast<const Constraints::OrConstraint<ValueType>*>(constraint); orConstraint) {
+    } else if (const auto *orConstraint = dynamic_cast<const Constraints::OrConstraint<ValueType> *>(constraint);
+               orConstraint) {
         const auto leftConstraint = checkSizeConstraint<ValueType>(andConstraint->leftChild(), value);
         const auto rightConstraint = checkSizeConstraint<ValueType>(andConstraint->rightChild(), value);
         return leftConstraint || rightConstraint;
-    } else if (const auto *sizeConstraint = dynamic_cast<const Constraints::SizeConstraint<ValueType>*>(constraint); sizeConstraint) {
+    } else if (const auto *sizeConstraint = dynamic_cast<const Constraints::SizeConstraint<ValueType> *>(constraint);
+               sizeConstraint) {
         return checkRangeConstraint<IntegerValue>(sizeConstraint->innerConstraints(), value);
     } else {
         return true;

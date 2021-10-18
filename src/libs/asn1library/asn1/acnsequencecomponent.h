@@ -24,13 +24,12 @@
 ****************************************************************************/
 #pragma once
 
-#include <memory>
-#include <vector>
-
-#include <QString>
-
 #include "sequencecomponent.h"
 #include "types/type.h"
+
+#include <QString>
+#include <memory>
+#include <vector>
 
 namespace Asn1Acn {
 

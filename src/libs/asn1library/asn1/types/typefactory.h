@@ -24,9 +24,9 @@
 ****************************************************************************/
 #pragma once
 
-#include <QString>
-
 #include "type.h"
+
+#include <QString>
 
 namespace Asn1Acn {
 namespace Types {

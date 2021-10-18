@@ -27,17 +27,17 @@
 
 using namespace Asn1Acn;
 
-AcnSequenceComponent::AcnSequenceComponent(const QString &id,
-                                           const QString &name,
-                                           std::unique_ptr<Types::Type> type)
+AcnSequenceComponent::AcnSequenceComponent(const QString &id, const QString &name, std::unique_ptr<Types::Type> type)
     : SequenceComponent(name, name, std::move(type)) // TODO CName in ACN_COMPONENT
     , m_id(id)
-{}
+{
+}
 
 AcnSequenceComponent::AcnSequenceComponent(const AcnSequenceComponent &other)
     : SequenceComponent(other)
     , m_id(other.id())
-{}
+{
+}
 
 std::unique_ptr<SequenceComponent> AcnSequenceComponent::clone() const
 {

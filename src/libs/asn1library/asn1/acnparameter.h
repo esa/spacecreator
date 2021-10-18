@@ -24,10 +24,9 @@
 ****************************************************************************/
 #pragma once
 
+#include <QString>
 #include <memory>
 #include <vector>
-
-#include <QString>
 
 namespace Asn1Acn {
 
@@ -39,7 +38,8 @@ public:
         : m_id(id)
         , m_name(name)
         , m_type(type)
-    {}
+    {
+    }
 
     AcnParameter(const AcnParameter &other) = default;
 

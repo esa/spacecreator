@@ -34,11 +34,11 @@ template<typename ValueType>
 class AndConstraint : public Constraint<ValueType>
 {
 public:
-    AndConstraint(std::unique_ptr<Constraint<ValueType>> leftChild,
-                  std::unique_ptr<Constraint<ValueType>> rightChild)
+    AndConstraint(std::unique_ptr<Constraint<ValueType>> leftChild, std::unique_ptr<Constraint<ValueType>> rightChild)
         : m_leftChild(std::move(leftChild))
         , m_rightChild(std::move(rightChild))
-    {}
+    {
+    }
     ~AndConstraint() override = default;
 
     const Constraint<ValueType> *leftChild() const { return m_leftChild.get(); }
@@ -60,11 +60,11 @@ template<typename ValueType>
 class OrConstraint : public Constraint<ValueType>
 {
 public:
-    OrConstraint(std::unique_ptr<Constraint<ValueType>> leftChild,
-                 std::unique_ptr<Constraint<ValueType>> rightChild)
+    OrConstraint(std::unique_ptr<Constraint<ValueType>> leftChild, std::unique_ptr<Constraint<ValueType>> rightChild)
         : m_leftChild(std::move(leftChild))
         , m_rightChild(std::move(rightChild))
-    {}
+    {
+    }
     ~OrConstraint() override = default;
 
     const Constraint<ValueType> *leftChild() const { return m_leftChild.get(); }

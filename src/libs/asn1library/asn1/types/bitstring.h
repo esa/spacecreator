@@ -24,11 +24,11 @@
 ****************************************************************************/
 #pragma once
 
-#include <QString>
-
 #include "../constraints/withconstraints.h"
 #include "string.h"
 #include "type.h"
+
+#include <QString>
 
 namespace Asn1Acn {
 namespace Types {
@@ -38,7 +38,8 @@ class BitString : public String, public Constraints::WithConstraints<BitStringVa
 public:
     BitString(const QString &identifier = QString())
         : String(identifier)
-    { }
+    {
+    }
     BitString(const BitString &other) = default;
 
     QString typeName() const override { return QLatin1String("BIT STRING"); }

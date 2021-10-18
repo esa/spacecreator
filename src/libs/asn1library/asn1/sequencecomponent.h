@@ -24,12 +24,11 @@
 ****************************************************************************/
 #pragma once
 
-#include <memory>
-
-#include <QString>
-
 #include "sourcelocation.h"
 #include "types/type.h"
+
+#include <QString>
+#include <memory>
 
 namespace Asn1Acn {
 
@@ -43,13 +42,15 @@ public:
         : m_name(name)
         , m_cName(cName)
         , m_type(std::move(type))
-    {}
+    {
+    }
 
     SequenceComponent(const SequenceComponent &other)
         : m_name(other.m_name)
         , m_cName(other.m_cName)
         , m_type(other.m_type->clone())
-    {}
+    {
+    }
 
     virtual std::unique_ptr<SequenceComponent> clone() const = 0;
     virtual QString definitionAsString() const = 0;

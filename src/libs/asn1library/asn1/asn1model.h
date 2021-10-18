@@ -19,10 +19,10 @@
 
 #pragma once
 
+#include "file.h"
+
 #include <conversion/common/model.h>
 #include <memory>
-
-#include "file.h"
 
 namespace Asn1Acn {
 
@@ -74,13 +74,13 @@ public:
      *
      * @returns Model data
      */
-    auto data() const -> const Data&;
+    auto data() const -> const Data &;
     /**
      * @brief   Getter for model data
      *
      * @returns Model data
      */
-    auto data() -> Data&;
+    auto data() -> Data &;
 
 private:
     /** @brief  Model data */
@@ -94,7 +94,7 @@ namespace conversion {
 /**
  * @brief   Specialization for ASN.1 model properties
  */
-template <>
+template<>
 struct ModelProperties<Asn1Acn::Asn1Model> {
     /// @brief  Model type
     static const ModelType type = ModelType::Asn1;

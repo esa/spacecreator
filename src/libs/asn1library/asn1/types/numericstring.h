@@ -24,24 +24,23 @@
 ****************************************************************************/
 #pragma once
 
-#include <QString>
-
 #include "../constraints/withconstraints.h"
 #include "asciistringacnparameters.h"
 #include "string.h"
 #include "type.h"
 
+#include <QString>
+
 namespace Asn1Acn {
 namespace Types {
 
-class NumericString : public String,
-                      public AsciiStringAcnParameters,
-                      public Constraints::WithConstraints<StringValue>
+class NumericString : public String, public AsciiStringAcnParameters, public Constraints::WithConstraints<StringValue>
 {
 public:
     NumericString(const QString &identifier = QString())
         : String(identifier)
-    { }
+    {
+    }
     NumericString(const NumericString &other) = default;
 
     QString typeName() const override { return QLatin1String("NumericString"); }

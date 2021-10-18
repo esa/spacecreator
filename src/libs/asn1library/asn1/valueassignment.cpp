@@ -29,14 +29,13 @@
 
 using namespace Asn1Acn;
 
-ValueAssignment::ValueAssignment(const QString &name,
-                                 const SourceLocation &location,
-                                 std::unique_ptr<Types::Type> type,
-                                 ValuePtr value)
+ValueAssignment::ValueAssignment(
+        const QString &name, const SourceLocation &location, std::unique_ptr<Types::Type> type, ValuePtr value)
     : Node(name, location)
     , m_type(std::move(type))
     , m_value(std::move(value))
-{}
+{
+}
 
 ValueAssignment::ValueAssignment(const ValueAssignment &other)
     : Node(other.name(), other.location())

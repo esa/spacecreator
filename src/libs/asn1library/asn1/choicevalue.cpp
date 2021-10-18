@@ -30,12 +30,14 @@ using namespace Asn1Acn;
 ChoiceValue::ChoiceValue(const QString &name, ValuePtr value)
     : m_name(name)
     , m_value(std::move(value))
-{}
+{
+}
 
 ChoiceValue::ChoiceValue(const ChoiceValue &other)
     : m_name(other.m_name)
     , m_value(other.m_value->clone())
-{}
+{
+}
 
 QString ChoiceValue::asString() const
 {

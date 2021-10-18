@@ -33,7 +33,8 @@ using namespace Asn1Acn::Types;
 Enumerated::Enumerated(const QString &identifier)
     : Type(identifier)
     , m_encodeValues(false)
-{}
+{
+}
 
 std::unique_ptr<Type> Enumerated::clone() const
 {

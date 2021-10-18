@@ -28,7 +28,8 @@ using namespace Asn1Acn::Types;
 
 AsciiStringAcnParameters::AsciiStringAcnParameters()
     : m_encoding(AsciiStringEncoding::unspecified)
-{}
+{
+}
 
 AsciiStringEncoding AsciiStringAcnParameters::mapEncoding(QStringRef in)
 {

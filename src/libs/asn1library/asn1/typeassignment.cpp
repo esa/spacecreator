@@ -29,10 +29,8 @@
 
 using namespace Asn1Acn;
 
-TypeAssignment::TypeAssignment(const QString &name,
-                               const QString &cName,
-                               const SourceLocation &location,
-                               std::unique_ptr<Types::Type> type)
+TypeAssignment::TypeAssignment(
+        const QString &name, const QString &cName, const SourceLocation &location, std::unique_ptr<Types::Type> type)
     : Node(name, location)
     , m_cName(cName)
     , m_type(std::move(type))
@@ -43,7 +41,8 @@ TypeAssignment::TypeAssignment(const QString &name,
 
 TypeAssignment::TypeAssignment(const TypeAssignment &other)
     : TypeAssignment(other.name(), other.cName(), other.location(), other.type()->clone())
-{}
+{
+}
 
 TypeAssignment::~TypeAssignment() {}
 

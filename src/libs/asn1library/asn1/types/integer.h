@@ -31,14 +31,13 @@
 namespace Asn1Acn {
 namespace Types {
 
-class Integer : public Type,
-                public IntegerAcnParameters,
-                public Constraints::WithConstraints<IntegerValue>
+class Integer : public Type, public IntegerAcnParameters, public Constraints::WithConstraints<IntegerValue>
 {
 public:
     Integer(const QString &identifier = QString())
         : Type(identifier)
-    { }
+    {
+    }
     Integer(const Integer &other) = default;
 
     QString typeName() const override;
