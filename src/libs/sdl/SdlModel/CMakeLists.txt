@@ -5,6 +5,7 @@ add_library(SdlModel STATIC)
 
 set(SOURCES action.cpp
             input.cpp
+            join.cpp
             label.cpp
             literal.cpp
             nextstate.cpp
@@ -23,6 +24,7 @@ set(SOURCES action.cpp
             )
 set(INCLUDES action.h
              input.h
+             join.h
              label.h
              literal.h
              nextstate.h

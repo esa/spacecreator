@@ -20,6 +20,7 @@
 #pragma once
 
 #include <sdl/SdlModel/input.h>
+#include <sdl/SdlModel/join.h>
 #include <sdl/SdlModel/label.h>
 #include <sdl/SdlModel/nextstate.h>
 #include <sdl/SdlModel/output.h>
@@ -131,6 +132,13 @@ public:
      * @param   label   label to be visited
      */
     virtual auto visit(const Label &label) const -> void = 0;
+
+    /**
+     * @brief   Join visitor
+     *
+     * @param   join   join to be visited
+     */
+    virtual auto visit(const Join &join) const -> void = 0;
 };
 
 } // namespace sdl
