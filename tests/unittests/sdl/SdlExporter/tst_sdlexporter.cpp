@@ -150,21 +150,17 @@ void tst_sdlmodel::testGenerateProcess()
                           .withContinuousSignal(std::make_unique<ContinuousSignal>())
                           .build();
 
-    auto process = SdlProcessBuilder(processName)
+    // clang-format off
+    const auto exampleModel = SdlModelBuilder(modelName)
+        .withProcess(SdlProcessBuilder(processName)
                            .withStateMachine(SdlStateMachineBuilder()
                                                      .withState(std::move(state1))
                                                      .withState(std::move(state2))
                                                      .withTransition(std::move(transition1))
                                                      .withTransition(std::move(transition2))
                                                      .build())
-                           .build();
-
-    process->addVariable(std::move(variable));
-
-    // clang-format off
-    const auto exampleModel = SdlModelBuilder(modelName)
-        .withProcess(
-            std::move(process)
+                           .withVariable(std::move(variable)
+                           ).build()
         ).build();
     // clang-format on
 
