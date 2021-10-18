@@ -20,11 +20,13 @@
 #pragma once
 
 #include <memory>
+#include <sdl/SdlModel/output.h>
 #include <sdl/SdlModel/state.h>
 #include <sdl/SdlModel/task.h>
 #include <sdl/SdlModel/transition.h>
 
 using sdl::Action;
+using sdl::Output;
 using sdl::State;
 using sdl::Task;
 using sdl::Transition;
@@ -41,6 +43,8 @@ public:
     auto withNextStateAction(State *nextState = nullptr) -> SdlTransitionBuilder &;
 
     auto withTask(std::unique_ptr<Task> task) -> SdlTransitionBuilder &;
+
+    auto withOutput(std::unique_ptr<Output> output) -> SdlTransitionBuilder &;
 
 private:
     std::unique_ptr<Transition> m_transition;
