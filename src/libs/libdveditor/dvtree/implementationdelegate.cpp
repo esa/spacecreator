@@ -58,7 +58,16 @@ void ImplementationDelegate::setEditorData(QWidget *editor, const QModelIndex &i
 {
     if (index.isValid()) {
         if (auto comboBox = qobject_cast<QComboBox *>(editor)) {
-            comboBox->setCurrentText(index.data(Qt::DisplayRole).toString());
+            dvm::DVFunction *fn = index.data(dve::DVTreeViewModel::DVObjectRole).value<dvm::DVFunction *>();
+            m_updating = true;
+            if (fn) {
+                comboBox->clear();
+                comboBox->addItems(fn->availableImplementations());
+                comboBox->setCurrentText(fn->usedImplementation());
+            } else {
+                comboBox->setCurrentText(index.data(Qt::DisplayRole).toString());
+            }
+            m_updating = false;
         }
         return;
     }
@@ -68,10 +77,14 @@ void ImplementationDelegate::setEditorData(QWidget *editor, const QModelIndex &i
 
 void ImplementationDelegate::setModelData(QWidget *editor, QAbstractItemModel *model, const QModelIndex &index) const
 {
+    if (m_updating) {
+        return;
+    }
+
     if (auto comboBox = qobject_cast<QComboBox *>(editor)) {
         QString implementation = comboBox->currentText();
         dvm::DVFunction *fn = index.data(dve::DVTreeViewModel::DVObjectRole).value<dvm::DVFunction *>();
-        if (fn) {
+        if (fn && fn->implementation() != implementation) {
             QString impltToken = dvm::meta::Props::token(dvm::meta::Props::Token::selected_implementation);
             if (!fn->hasEntityAttribute(impltToken, implementation)) {
                 const QList<EntityAttribute> attributes = { EntityAttribute {

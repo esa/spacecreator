@@ -40,6 +40,9 @@ public:
     void undo() override;
     int id() const override;
 
+Q_SIGNALS:
+    void implementationListChanged(ivm::IVFunction *entity);
+
 private:
     QPointer<ivm::IVFunction> m_function;
     int m_idx = -1;

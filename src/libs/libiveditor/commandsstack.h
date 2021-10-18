@@ -51,6 +51,7 @@ Q_SIGNALS:
     void implementationChanged(
             ivm::IVFunction *entity, const QString &newName, const QString &oldName, shared::UndoCommand *command);
     void defaultImplementationChanged(ivm::IVFunction *entity);
+    void implementationListChanged(ivm::IVFunction *entity);
     void attributeChanged(shared::VEObject *entity, const QString &attrName, const QVariant &oldValue);
 };
 

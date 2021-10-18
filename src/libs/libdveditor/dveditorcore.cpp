@@ -82,7 +82,7 @@ struct DVEditorCore::DVEditorCorePrivate {
 
     std::unique_ptr<dve::DVAppModel> m_appModel;
     std::unique_ptr<dve::DVItemModel> m_model;
-    std::unique_ptr<shared::AbstractVisualizationModel> m_visualizationModel;
+    std::unique_ptr<dve::DVTreeViewModel> m_visualizationModel;
     std::unique_ptr<dvm::DVModel> m_hwModel;
     std::unique_ptr<shared::AbstractVisualizationModel> m_hwVisualizationModel;
     std::unique_ptr<dve::DVCreatorTool> m_creatorTool;
@@ -506,6 +506,13 @@ void DVEditorCore::changeDefaultImplementationNames()
     for (dvm::DVFunction *fn : model->allObjectsByType<dvm::DVFunction>()) {
         Q_EMIT fn->usedImplementationChanged(); // re-evaluate the used language
     }
+}
+
+void DVEditorCore::updateFunctionImplementationList(const QString &functionName)
+{
+    dvm::DVObject *obj = d->m_appModel->objectsModel()->getObjectByName(functionName, dvm::DVObject::Type::Function);
+    dvm::DVFunction *fn = qobject_cast<dvm::DVFunction *>(obj);
+    d->m_visualizationModel->updateImplementation(fn);
 }
 
 void DVEditorCore::centerOnView()

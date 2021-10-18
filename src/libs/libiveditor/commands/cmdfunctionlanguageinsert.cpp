@@ -37,6 +37,7 @@ void CmdFunctionLanguageInsert::redo()
 {
     if (m_function) {
         m_function->insertImplementation(m_idx, m_newValues);
+        Q_EMIT implementationListChanged(m_function.data());
     }
 }
 
@@ -44,6 +45,7 @@ void CmdFunctionLanguageInsert::undo()
 {
     if (m_function) {
         m_function->removeImplementation(m_idx);
+        Q_EMIT implementationListChanged(m_function.data());
     }
 }
 

@@ -190,6 +190,7 @@ void DVTreeViewModel::updateImplementation(dvm::DVFunction *fn)
     QStandardItem *implItem = implementationItem(fn);
     if (implItem) {
         implItem->setData(fn->usedImplementation(), Qt::DisplayRole);
+        Q_EMIT dataChanged(implItem->index(), implItem->index(), { Qt::DisplayRole, Qt::EditRole });
         return;
     }
 }

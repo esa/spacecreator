@@ -73,6 +73,8 @@ void MscSystemChecks::setStorage(SpaceCreatorProject *storage)
                 &scs::MscSystemChecks::onImplementationChanged);
         connect(ivCore->commandsStack(), &ive::cmd::CommandsStack::defaultImplementationChanged, this,
                 &scs::MscSystemChecks::onDefaultImplementationChanged);
+        connect(ivCore->commandsStack(), &ive::cmd::CommandsStack::implementationListChanged, this,
+                &scs::MscSystemChecks::onImplementationListChanged);
         connect(ivCore->commandsStack(), &ive::cmd::CommandsStack::attributeChanged, this,
                 &scs::MscSystemChecks::onAttributeChanged);
     });
@@ -612,6 +614,13 @@ void MscSystemChecks::onDefaultImplementationChanged()
 {
     for (const DVEditorCorePtr &dvCore : m_storage->allDVCores()) {
         dvCore->changeDefaultImplementationNames();
+    }
+}
+
+void MscSystemChecks::onImplementationListChanged(ivm::IVFunction *ivFunction)
+{
+    for (const DVEditorCorePtr &dvCore : m_storage->allDVCores()) {
+        dvCore->updateFunctionImplementationList(ivFunction->title());
     }
 }
 

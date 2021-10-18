@@ -55,6 +55,8 @@ public:
     Qt::ItemFlags flags(const QModelIndex &index) const override;
     QVariant headerData(int section, Qt::Orientation orientation, int role = Qt::DisplayRole) const override;
 
+    void updateImplementation(dvm::DVFunction *fn);
+
 protected:
     void updateItemData(QStandardItem *item, shared::VEObject *object) override;
     QList<QStandardItem *> createItems(shared::VEObject *obj) override;
@@ -64,7 +66,6 @@ private Q_SLOTS:
 
 private:
     void setName(dvm::DVObject *obj, QStandardItem *item);
-    void updateImplementation(dvm::DVFunction *fn);
     QStandardItem *implementationItem(dvm::DVFunction *fn);
 };
 

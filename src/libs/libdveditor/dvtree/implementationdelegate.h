@@ -41,6 +41,7 @@ public:
 
 private:
     QPointer<shared::cmd::CommandsStackBase> m_commandsStack;
+    mutable bool m_updating = false;
 };
 
 } // namespace dve
