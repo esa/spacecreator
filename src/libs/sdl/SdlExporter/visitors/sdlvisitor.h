@@ -127,9 +127,16 @@ public:
     /**
      * @brief   Label visitor
      *
-     * @param   label   label to be visited
+     * @param   label   label to be serialized
      */
     auto visit(const Label &label) const -> void override;
+
+    /**
+     * @brief   Join visitor
+     *
+     * @param   join   join to be serialized
+     */
+    virtual auto visit(const Join &join) const -> void override;
 
 private:
     template<typename T>

@@ -146,6 +146,11 @@ void SdlVisitor::visit(const Label &label) const
     m_stream << "        " << label.name() << ";\n";
 }
 
+void SdlVisitor::visit(const Join &join) const
+{
+    (void)join;
+}
+
 template<typename T>
 void SdlVisitor::exportCollection(const T &collection) const
 {
