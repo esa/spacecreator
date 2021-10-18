@@ -31,9 +31,15 @@ namespace tests::common {
 class SdlInputBuilder final
 {
 public:
-    SdlInputBuilder(QString inputName, Transition *transition = nullptr);
+    explicit SdlInputBuilder();
 
     auto build() -> std::unique_ptr<Input>;
+
+    auto withName(QString name) -> SdlInputBuilder &;
+
+    auto withTransition(Transition *transition) -> SdlInputBuilder &;
+
+    auto withParameter(std::unique_ptr<Input::Parameter> parameter) -> SdlInputBuilder &;
 
 private:
     std::unique_ptr<Input> m_input;

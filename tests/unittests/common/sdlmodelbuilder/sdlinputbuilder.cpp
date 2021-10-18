@@ -23,16 +23,35 @@
 
 namespace tests::common {
 
-SdlInputBuilder::SdlInputBuilder(QString inputName, Transition *transition)
+SdlInputBuilder::SdlInputBuilder()
     : m_input(std::make_unique<Input>())
 {
-    m_input->setName(std::move(inputName));
-    m_input->setTransition(transition);
 }
 
 std::unique_ptr<Input> SdlInputBuilder::build()
 {
     return std::move(m_input);
+}
+
+SdlInputBuilder &SdlInputBuilder::withName(QString name)
+{
+    m_input->setName(std::move(name));
+
+    return *this;
+}
+
+SdlInputBuilder &SdlInputBuilder::withTransition(Transition *transition)
+{
+    m_input->setTransition(transition);
+
+    return *this;
+}
+
+SdlInputBuilder &SdlInputBuilder::withParameter(std::unique_ptr<Input::Parameter> parameter)
+{
+    m_input->addParameter(std::move(parameter));
+
+    return *this;
 }
 
 } // namespace tests::common
