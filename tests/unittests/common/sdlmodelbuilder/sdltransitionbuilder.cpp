@@ -46,4 +46,11 @@ SdlTransitionBuilder &SdlTransitionBuilder::withNextStateAction(State *nextState
     return *this;
 }
 
+SdlTransitionBuilder &SdlTransitionBuilder::withTask(std::unique_ptr<Task> task)
+{
+    m_transition->addAction(std::move(task));
+
+    return *this;
+}
+
 } // namespace tests::common

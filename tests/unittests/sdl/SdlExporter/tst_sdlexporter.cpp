@@ -27,6 +27,7 @@
 #include <common/sdlmodelbuilder/sdlprocessbuilder.h>
 #include <common/sdlmodelbuilder/sdlstatebuilder.h>
 #include <common/sdlmodelbuilder/sdlstatemachinebuilder.h>
+#include <common/sdlmodelbuilder/sdltaskbuilder.h>
 #include <common/sdlmodelbuilder/sdltransitionbuilder.h>
 #include <conversion/common/options.h>
 #include <memory>
@@ -66,6 +67,7 @@ using tests::common::SdlModelBuilder;
 using tests::common::SdlProcessBuilder;
 using tests::common::SdlStateBuilder;
 using tests::common::SdlStateMachineBuilder;
+using tests::common::SdlTaskBuilder;
 using tests::common::SdlTransitionBuilder;
 
 namespace tests::Sdl {
@@ -138,7 +140,11 @@ void tst_sdlmodel::testGenerateProcess()
                           .withContinuousSignal(std::make_unique<ContinuousSignal>())
                           .build();
 
-    auto transition2 = SdlTransitionBuilder().withNextStateAction(state1.get()).build();
+    auto transition2 = SdlTransitionBuilder()
+                               .withTask(SdlTaskBuilder().withContents("'EXAMPLE TASK CONTENTS'").build())
+                               .withNextStateAction(state1.get())
+                               .build();
+
     auto state2 = SdlStateBuilder("Idle")
                           .withInput(SdlInputBuilder("some_other_input_name", transition2.get()).build())
                           .withContinuousSignal(std::make_unique<ContinuousSignal>())
@@ -187,6 +193,7 @@ void tst_sdlmodel::testGenerateProcess()
         "NEXTSTATE -;",
         "endstate;",
         "state Idle;",
+        "task 'EXAMPLE TASK CONTENTS';",
         "endstate;",
         "endprocess Modemanager;",
     };

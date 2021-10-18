@@ -20,30 +20,25 @@
 #pragma once
 
 #include <memory>
-#include <sdl/SdlModel/state.h>
 #include <sdl/SdlModel/task.h>
-#include <sdl/SdlModel/transition.h>
 
-using sdl::Action;
-using sdl::State;
 using sdl::Task;
-using sdl::Transition;
 
 namespace tests::common {
 
-class SdlTransitionBuilder final
+class SdlTaskBuilder final
 {
 public:
-    SdlTransitionBuilder(QString transitionName = "");
+    explicit SdlTaskBuilder();
 
-    auto build() -> std::unique_ptr<Transition>;
+    auto build() -> std::unique_ptr<Task>;
 
-    auto withNextStateAction(State *nextState = nullptr) -> SdlTransitionBuilder &;
+    auto withName(QString name) -> SdlTaskBuilder &;
 
-    auto withTask(std::unique_ptr<Task> task) -> SdlTransitionBuilder &;
+    auto withContents(QString contents) -> SdlTaskBuilder &;
 
 private:
-    std::unique_ptr<Transition> m_transition;
+    std::unique_ptr<Task> m_task;
 };
 
 } // namespace tests::common
