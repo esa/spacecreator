@@ -329,11 +329,12 @@ void tst_Asn1NodeReconstructingVisitor::testTypeAssignmentNestedChoice()
     auto type = std::make_unique<Types::Choice>();
 
     sequenceType->addComponent(std::make_unique<AsnSequenceComponent>(QStringLiteral("seq1"), QStringLiteral("seq1"),
-            true, QStringLiteral(""), SourceLocation(),
+            true, std::nullopt, QStringLiteral(""), SourceLocation(),
             Types::TypeFactory::createBuiltinType(QStringLiteral("INTEGER"))));
 
     sequenceType->addComponent(std::make_unique<AsnSequenceComponent>(QStringLiteral("seq2"), QStringLiteral("seq2"),
-            true, QStringLiteral(""), SourceLocation(), Types::TypeFactory::createBuiltinType(QStringLiteral("REAL"))));
+            true, std::nullopt, QStringLiteral(""), SourceLocation(),
+            Types::TypeFactory::createBuiltinType(QStringLiteral("REAL"))));
 
     type->addComponent(std::make_unique<Types::ChoiceAlternative>(QStringLiteral("ch1"), QStringLiteral(""),
             QStringLiteral(""), QStringLiteral(""), QStringLiteral(""), SourceLocation(), std::move(sequenceType)));
@@ -358,10 +359,12 @@ void tst_Asn1NodeReconstructingVisitor::testTypeAssignmentSequence()
 {
     auto type = std::make_unique<Types::Sequence>();
     type->addComponent(std::make_unique<AsnSequenceComponent>(QStringLiteral("seq1"), QStringLiteral("seq1"), true,
-            QStringLiteral(""), SourceLocation(), Types::TypeFactory::createBuiltinType(QStringLiteral("INTEGER"))));
+            std::nullopt, QStringLiteral(""), SourceLocation(),
+            Types::TypeFactory::createBuiltinType(QStringLiteral("INTEGER"))));
 
     type->addComponent(std::make_unique<AsnSequenceComponent>(QStringLiteral("seq2"), QStringLiteral("seq2"), true,
-            QStringLiteral(""), SourceLocation(), Types::TypeFactory::createBuiltinType(QStringLiteral("REAL"))));
+            std::nullopt, QStringLiteral(""), SourceLocation(),
+            Types::TypeFactory::createBuiltinType(QStringLiteral("REAL"))));
 
     auto actual = createComponentialTypeAssignmentValue(std::move(type));
 
@@ -383,12 +386,14 @@ void tst_Asn1NodeReconstructingVisitor::testTypeAssignmentNestedSequence()
     auto internalType = std::make_unique<Types::Sequence>();
 
     internalType->addComponent(std::make_unique<AsnSequenceComponent>(QStringLiteral("n1"), QStringLiteral("n1"), true,
-            QStringLiteral(""), SourceLocation(), Types::TypeFactory::createBuiltinType(QStringLiteral("INTEGER"))));
+            std::nullopt, QStringLiteral(""), SourceLocation(),
+            Types::TypeFactory::createBuiltinType(QStringLiteral("INTEGER"))));
     internalType->addComponent(std::make_unique<AsnSequenceComponent>(QStringLiteral("n2"), QStringLiteral("n2"), true,
-            QStringLiteral(""), SourceLocation(), Types::TypeFactory::createBuiltinType(QStringLiteral("REAL"))));
+            std::nullopt, QStringLiteral(""), SourceLocation(),
+            Types::TypeFactory::createBuiltinType(QStringLiteral("REAL"))));
 
     type->addComponent(std::make_unique<AsnSequenceComponent>(QStringLiteral("seq1"), QStringLiteral("seq1"), true,
-            QStringLiteral(""), SourceLocation(), std::move(internalType)));
+            std::nullopt, QStringLiteral(""), SourceLocation(), std::move(internalType)));
 
     auto actual = createComponentialTypeAssignmentValue(std::move(type));
 

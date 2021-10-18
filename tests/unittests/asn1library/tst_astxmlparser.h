@@ -102,6 +102,7 @@ private Q_SLOTS:
     void test_sequenceComponentsWithAcnParams();
     void test_sequenceAcnComponents();
     void test_sequenceValueAssignment();
+    void test_sequenceDefaultValue();
 
     void test_octetStringWithSizeConstraint();
     void test_octetStringWithRangedSizeConstraint();

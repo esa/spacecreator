@@ -26,6 +26,8 @@
 
 #include "sequencecomponent.h"
 
+#include <optional>
+
 namespace Asn1Acn {
 
 class AsnSequenceComponent : public SequenceComponent
@@ -34,15 +36,16 @@ public:
     AsnSequenceComponent() = default;
     ~AsnSequenceComponent() override = default;
 
-    AsnSequenceComponent(const QString &name, const QString &cName, bool optional, const QString &presentWhen,
-            const SourceLocation &location, std::unique_ptr<Types::Type> type);
+    AsnSequenceComponent(const QString &name, const QString &cName, bool optional, std::optional<QString> defaultValue,
+            const QString &presentWhen, const SourceLocation &location, std::unique_ptr<Types::Type> type);
 
     AsnSequenceComponent(const AsnSequenceComponent &other);
 
     std::unique_ptr<SequenceComponent> clone() const override;
     QString definitionAsString() const override;
     QString presentWhen() const override;
-    bool isOptional() const override;
+    bool isOptional() const;
+    const std::optional<QString> &defaultValue() const;
 
     void accept(SequenceComponentVisitor &visitor) override;
 
@@ -50,6 +53,7 @@ public:
 
 private:
     bool m_optional;
+    std::optional<QString> m_defaultValue;
     QString m_presentWhen;
     SourceLocation m_location;
 };

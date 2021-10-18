@@ -56,11 +56,6 @@ QString AcnSequenceComponent::presentWhen() const
     return QString();
 }
 
-bool AcnSequenceComponent::isOptional() const
-{
-    return false;
-}
-
 void AcnSequenceComponent::accept(SequenceComponentVisitor &visitor)
 {
     visitor.visit(*this);

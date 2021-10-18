@@ -30,9 +30,11 @@
 using namespace Asn1Acn;
 
 AsnSequenceComponent::AsnSequenceComponent(const QString &name, const QString &cName, bool optional,
-        const QString &presentWhen, const SourceLocation &location, std::unique_ptr<Types::Type> type)
+        std::optional<QString> defaultValue, const QString &presentWhen, const SourceLocation &location,
+        std::unique_ptr<Types::Type> type)
     : SequenceComponent(name, cName, std::move(type))
     , m_optional(optional)
+    , m_defaultValue(std::move(defaultValue))
     , m_presentWhen(presentWhen)
     , m_location(location)
 {
@@ -40,6 +42,8 @@ AsnSequenceComponent::AsnSequenceComponent(const QString &name, const QString &c
 
 AsnSequenceComponent::AsnSequenceComponent(const AsnSequenceComponent &other)
     : SequenceComponent(other)
+    , m_optional(other.m_optional)
+    , m_defaultValue(other.m_defaultValue)
     , m_presentWhen(other.m_presentWhen)
     , m_location(other.m_location)
 {
@@ -68,6 +72,11 @@ std::unique_ptr<SequenceComponent> AsnSequenceComponent::clone() const
 const SourceLocation &AsnSequenceComponent::location() const
 {
     return m_location;
+}
+
+const std::optional<QString> &AsnSequenceComponent::defaultValue() const
+{
+    return m_defaultValue;
 }
 
 bool AsnSequenceComponent::isOptional() const

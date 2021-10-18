@@ -21,6 +21,7 @@
 
 #include "asn1const.h"
 #include "asn1editorconst.h"
+#include "asnsequencecomponent.h"
 #include "constraints/logicoperators.h"
 #include "constraints/rangeconstraint.h"
 #include "constraints/sizeconstraint.h"
@@ -252,9 +253,15 @@ QStandardItem *Asn1ItemModel::createSequenceItem(const Asn1Acn::Types::Sequence 
     QList<QStandardItem *> presentItems;
 
     for (const auto &sequenceComponent : asn1Item->components()) {
-        ItemMap childItem = createModelItems(sequenceComponent->type(), sequenceComponent->name());
+        const auto *asnSequenceComponent = dynamic_cast<const Asn1Acn::AsnSequenceComponent*>(sequenceComponent.get());
 
-        if (sequenceComponent->isOptional()) {
+        if(!asnSequenceComponent) {
+            continue;
+        }
+
+        ItemMap childItem = createModelItems(asnSequenceComponent->type(), asnSequenceComponent->name());
+
+        if (asnSequenceComponent->isOptional()) {
             childItem["present"]->setEnabled(true);
             childItem["present"]->setCheckState(Qt::Unchecked);
             childItem["present"]->setCheckable(true);

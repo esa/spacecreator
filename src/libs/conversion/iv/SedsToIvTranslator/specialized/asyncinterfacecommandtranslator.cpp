@@ -153,7 +153,7 @@ void AsyncInterfaceCommandTranslator::createAsn1SequenceComponent(
     sequenceComponentType->setType(referencedType->clone());
 
     auto sequenceComponent = std::make_unique<Asn1Acn::AsnSequenceComponent>(
-            name, name, false, "", Asn1Acn::SourceLocation(), std::move(sequenceComponentType));
+            name, name, false, std::nullopt, "", Asn1Acn::SourceLocation(), std::move(sequenceComponentType));
     sequence->addComponent(std::move(sequenceComponent));
 }
 

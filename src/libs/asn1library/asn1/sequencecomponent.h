@@ -56,7 +56,6 @@ public:
     virtual std::unique_ptr<SequenceComponent> clone() const = 0;
     virtual QString definitionAsString() const = 0;
     virtual QString presentWhen() const = 0;
-    virtual bool isOptional() const = 0;
 
     virtual void accept(SequenceComponentVisitor &visitor) = 0;
 

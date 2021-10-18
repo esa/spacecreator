@@ -362,6 +362,7 @@ void tst_Asn1ValueParser::testSequenceValueWithString()
             "strVal",
             "strVal",
             false,
+            std::nullopt,
             "",
             Asn1Acn::SourceLocation(),
             std::make_unique<Asn1Acn::Types::IA5String>("strVal"));
@@ -391,6 +392,7 @@ void tst_Asn1ValueParser::testSequenceValue()
             "intVal",
             "intVal",
             false,
+            std::nullopt,
             "",
             Asn1Acn::SourceLocation(),
             std::make_unique<Asn1Acn::Types::Integer>("intVal"));
@@ -399,6 +401,7 @@ void tst_Asn1ValueParser::testSequenceValue()
             "realVal",
             "realVal",
             false,
+            std::nullopt,
             "",
             Asn1Acn::SourceLocation(),
             std::make_unique<Asn1Acn::Types::Real>("realVal"));
@@ -407,6 +410,7 @@ void tst_Asn1ValueParser::testSequenceValue()
             "boolVal",
             "boolVal",
             false,
+            std::nullopt,
             "",
             Asn1Acn::SourceLocation(),
             std::make_unique<Asn1Acn::Types::Boolean>("boolVal"));
@@ -434,6 +438,7 @@ void tst_Asn1ValueParser::testSequenceValue()
             "choiceVal",
             "choiceVal",
             false,
+            std::nullopt,
             "",
             Asn1Acn::SourceLocation(),
             std::move(choice));
@@ -483,6 +488,7 @@ void tst_Asn1ValueParser::testSequenceValueError()
             "intVal",
             "intVal",
             false,
+            std::nullopt,
             "",
             Asn1Acn::SourceLocation(),
             std::make_unique<Asn1Acn::Types::Integer>("intVal"));
@@ -491,6 +497,7 @@ void tst_Asn1ValueParser::testSequenceValueError()
             "realVal",
             "realVal",
             false,
+            std::nullopt,
             "",
             Asn1Acn::SourceLocation(),
             std::make_unique<Asn1Acn::Types::Real>("realVal"));
@@ -499,6 +506,7 @@ void tst_Asn1ValueParser::testSequenceValueError()
             "boolVal",
             "boolVal",
             false,
+            std::nullopt,
             "",
             Asn1Acn::SourceLocation(),
             std::make_unique<Asn1Acn::Types::Boolean>("boolVal"));

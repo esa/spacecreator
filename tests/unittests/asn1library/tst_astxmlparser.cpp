@@ -2522,6 +2522,97 @@ void AstXmlParserTests::test_sequenceValueAssignment()
     QCOMPARE(mySeq->value()->asString(), QStringLiteral("{is1 1, rs1 2.2}"));
 }
 
+void AstXmlParserTests::test_sequenceDefaultValue()
+{
+    parse(
+        R"(<?xml version="1.0" encoding="utf-8"?>)"
+        R"(<AstRoot xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="Asn1Schema.xsd" rename_policy="SelectiveEnumerants">)"
+        R"(<Asn1File FileName="TestDefinitions.asn">)"
+        R"(    <Modules>)"
+        R"(    <Module Name="TestDefinitions" Line="1" CharPositionInLine="0">)"
+        R"(        <ExportedTypes>)"
+        R"(        <ExportedType Name="MySeq" />)"
+        R"(        </ExportedTypes>)"
+        R"(        <ExportedValues />)"
+        R"(        <ImportedModules />)"
+        R"(        <TypeAssignments>)"
+        R"(        <TypeAssignment Name="MySeq" CName="MySeq" AdaName="MySeq" Line="2" CharPositionInLine="4">)"
+        R"(            <Asn1Type id="TestDefinitions.MySeq" Line="2" CharPositionInLine="14" ParameterizedTypeInstance="false">)"
+        R"(            <SEQUENCE acnMaxSizeInBits="221" acnMinSizeInBits="3" uperMaxSizeInBits="221" uperMinSizeInBits="3">)"
+        R"(                <SEQUENCE_COMPONENT Name="intVal" Line="3" CharPositionInLine="8" AdaName="intVal" CName="intVal">)"
+        R"(                <Default>)"
+        R"(                    <IntegerValue>42</IntegerValue>)"
+        R"(                </Default>)"
+        R"(                <Asn1Type id="TestDefinitions.MySeq.intVal" Line="3" CharPositionInLine="15" ParameterizedTypeInstance="false">)"
+        R"(                    <INTEGER acnMaxSizeInBits="72" acnMinSizeInBits="8" uperMaxSizeInBits="72" uperMinSizeInBits="8">)"
+        R"(                    <Constraints />)"
+        R"(                    <WithComponentConstraints />)"
+        R"(                    </INTEGER>)"
+        R"(                </Asn1Type>)"
+        R"(                </SEQUENCE_COMPONENT>)"
+        R"(                <SEQUENCE_COMPONENT Name="boolVal" Line="4" CharPositionInLine="8" AdaName="boolVal" CName="boolVal">)"
+        R"(                <Default>)"
+        R"(                    <BooleanValue>false</BooleanValue>)"
+        R"(                </Default>)"
+        R"(                <Asn1Type id="TestDefinitions.MySeq.boolVal" Line="4" CharPositionInLine="16" ParameterizedTypeInstance="false">)"
+        R"(                    <BOOLEAN acnMaxSizeInBits="1" acnMinSizeInBits="1" uperMaxSizeInBits="1" uperMinSizeInBits="1">)"
+        R"(                    <Constraints />)"
+        R"(                    <WithComponentConstraints />)"
+        R"(                    </BOOLEAN>)"
+        R"(                </Asn1Type>)"
+        R"(                </SEQUENCE_COMPONENT>)"
+        R"(                <SEQUENCE_COMPONENT Name="strVal" Line="5" CharPositionInLine="8" AdaName="strVal" CName="strVal">)"
+        R"(                <Default>)"
+        R"(                    <StringValue>DefaultString</StringValue>)"
+        R"(                </Default>)"
+        R"(                <Asn1Type id="TestDefinitions.MySeq.strVal" Line="5" CharPositionInLine="15" ParameterizedTypeInstance="false">)"
+        R"(                    <IA5String acnMaxSizeInBits="145" acnMinSizeInBits="5" uperMaxSizeInBits="145" uperMinSizeInBits="5">)"
+        R"(                    <Constraints>)"
+        R"(                        <SIZE>)"
+        R"(                        <Range>)"
+        R"(                            <Min>)"
+        R"(                            <IntegerValue>0</IntegerValue>)"
+        R"(                            </Min>)"
+        R"(                            <Max>)"
+        R"(                            <IntegerValue>20</IntegerValue>)"
+        R"(                            </Max>)"
+        R"(                        </Range>)"
+        R"(                        </SIZE>)"
+        R"(                    </Constraints>)"
+        R"(                    <WithComponentConstraints />)"
+        R"(                    </IA5String>)"
+        R"(                </Asn1Type>)"
+        R"(                </SEQUENCE_COMPONENT>)"
+        R"(                <Constraints />)"
+        R"(                <WithComponentConstraints />)"
+        R"(            </SEQUENCE>)"
+        R"(            </Asn1Type>)"
+        R"(        </TypeAssignment>)"
+        R"(        </TypeAssignments>)"
+        R"(        <ValueAssignments />)"
+        R"(    </Module>)"
+        R"(    </Modules>)"
+        R"(</Asn1File>)"
+        R"(<AcnDependencies />)"
+        R"(</AstRoot>)");
+
+    auto type = m_parsedData["TestDefinitions.asn"]->definitions("TestDefinitions")->type("MySeq");
+    auto *seqType = dynamic_cast<const Types::Sequence *>(type->type());
+    QVERIFY(seqType);
+
+    const auto *intComponent = dynamic_cast<const AsnSequenceComponent*>(seqType->component(QStringLiteral("intVal")));
+    QVERIFY(intComponent);
+    QCOMPARE(*intComponent->defaultValue(), "42");
+
+    const auto *boolComponent = dynamic_cast<const AsnSequenceComponent*>(seqType->component(QStringLiteral("boolVal")));
+    QVERIFY(boolComponent);
+    QCOMPARE(*boolComponent->defaultValue(), "false");
+
+    const auto *strComponent = dynamic_cast<const AsnSequenceComponent*>(seqType->component(QStringLiteral("strVal")));
+    QVERIFY(strComponent);
+    QCOMPARE(*strComponent->defaultValue(), "DefaultString");
+}
+
 void AstXmlParserTests::test_octetStringWithSizeConstraint()
 {
     parse(

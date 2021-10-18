@@ -339,6 +339,7 @@ void tst_Asn1ItemModel::testSequenceTypeModel()
             "intVal",
             "intVal",
             false,
+            std::nullopt,
             "",
             Asn1Acn::SourceLocation(),
             std::make_unique<Asn1Acn::Types::Integer>("intVal"));
@@ -347,6 +348,7 @@ void tst_Asn1ItemModel::testSequenceTypeModel()
             "realVal",
             "realVal",
             false,
+            std::nullopt,
             "",
             Asn1Acn::SourceLocation(),
             std::make_unique<Asn1Acn::Types::Real>("realVal"));
@@ -355,6 +357,7 @@ void tst_Asn1ItemModel::testSequenceTypeModel()
             "boolVal",
             "boolVal",
             true,
+            std::nullopt,
             "",
             Asn1Acn::SourceLocation(),
             std::make_unique<Asn1Acn::Types::Boolean>("boolVal"));

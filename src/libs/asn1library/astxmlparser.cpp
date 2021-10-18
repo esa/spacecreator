@@ -211,13 +211,16 @@ public:
         const auto cName = readStringAttribute(QStringLiteral("CName"));
         const auto presentWhen = readStringAttribute(QStringLiteral("present-when"));
         const auto optional = readStringAttribute(QStringLiteral("Optional")).toLower();
+        const auto defaultValue = hasAttribute(QStringLiteral("Default"))
+                ? std::make_optional<QString>(readStringAttribute(QStringLiteral("Default")))
+                : std::nullopt;
         SourceLocation location(m_currentFile, readIntegerAttribute(QStringLiteral("Line")),
                 readIntegerAttribute(QStringLiteral("CharPositionInLine")));
 
         m_childType->setIdentifier(name);
 
         type.addComponent(std::make_unique<AsnSequenceComponent>(
-                name, cName, optional == "true", presentWhen, location, std::move(m_childType)));
+                name, cName, optional == "true", defaultValue, presentWhen, location, std::move(m_childType)));
     }
 
     void visit(Types::SequenceOf &type) override { type.setItemsType(std::move(m_childType)); }
@@ -228,6 +231,7 @@ public:
     void visit(Types::UserdefinedType &type) override { type.setType(std::move(m_childType)); }
 
 protected:
+    bool hasAttribute(const QString &key) const { return m_attributes.hasAttribute(key); }
     int readIntegerAttribute(const QString &key) const { return m_attributes.value(key).toInt(); }
     QString readStringAttribute(const QString &key) const { return m_attributes.value(key).toString(); }
     const QString &currentFile() const { return m_currentFile; }
@@ -901,11 +905,28 @@ void AstXmlParser::readSequence(Types::Type &type)
 void AstXmlParser::readSequenceComponent(Types::Type &type)
 {
     auto attributes = m_xmlReader.attributes();
-    auto childType = findAndReadType();
+
+    std::unique_ptr<Types::Type> childType = nullptr;
+    std::optional<QString> defaultValue = std::nullopt;
+
+    while (m_xmlReader.readNextStartElement()) {
+        if (m_xmlReader.name() == QStringLiteral("Asn1Type")) {
+            childType = readType();
+        } else if (m_xmlReader.name() == QStringLiteral("Default")) {
+            m_xmlReader.readNextStartElement();
+            defaultValue = m_xmlReader.readElementText();
+            m_xmlReader.skipCurrentElement();
+        } else {
+            m_xmlReader.skipCurrentElement();
+        }
+    }
+
+    if (defaultValue) {
+        attributes.append(QStringLiteral("Default"), *defaultValue);
+    }
 
     ChildItemAddingVisitor visitor(attributes, m_currentFile, std::move(childType));
     type.accept(visitor);
-    m_xmlReader.skipCurrentElement();
 }
 
 void AstXmlParser::readAcnComponent(Types::Type &type)
