@@ -19,17 +19,20 @@
 
 #include "sdlinputbuilder.h"
 
+#include <memory>
+
 namespace tests::common {
 
 SdlInputBuilder::SdlInputBuilder(QString inputName, Transition *transition)
+    : m_input(std::make_unique<Input>())
 {
-    m_input.setName(std::move(inputName));
-    m_input.setTransition(transition);
+    m_input->setName(std::move(inputName));
+    m_input->setTransition(transition);
 }
 
 std::unique_ptr<Input> SdlInputBuilder::build()
 {
-    return std::make_unique<Input>(std::move(m_input));
+    return std::move(m_input);
 }
 
 } // namespace tests::common

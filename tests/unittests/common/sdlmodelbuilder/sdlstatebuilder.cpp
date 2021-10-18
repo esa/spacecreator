@@ -22,25 +22,26 @@
 namespace tests::common {
 
 SdlStateBuilder::SdlStateBuilder(QString name)
+    : m_state(std::make_unique<State>())
 {
-    m_state.setName(std::move(name));
+    m_state->setName(std::move(name));
 }
 
 std::unique_ptr<State> SdlStateBuilder::build()
 {
-    return std::make_unique<State>(std::move(m_state));
+    return std::move(m_state);
 }
 
 SdlStateBuilder &SdlStateBuilder::withInput(std::unique_ptr<Input> input)
 {
-    m_state.addInput(std::move(input));
+    m_state->addInput(std::move(input));
 
     return *this;
 }
 
 SdlStateBuilder &SdlStateBuilder::withContinuousSignal(std::unique_ptr<ContinuousSignal> continuousSignal)
 {
-    m_state.addContinuousSignal(std::move(continuousSignal));
+    m_state->addContinuousSignal(std::move(continuousSignal));
 
     return *this;
 }

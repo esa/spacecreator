@@ -32,14 +32,15 @@ class SdlProcessBuilder final
 {
 public:
     SdlProcessBuilder(QString processName);
-    Process build();
+
+    auto build() -> std::unique_ptr<Process>;
 
     auto withStateMachine(std::unique_ptr<StateMachine> stateMachine) -> SdlProcessBuilder &;
     // TODO withProcedures()
     // TODO withVariables()
 
 private:
-    Process m_process;
+    std::unique_ptr<Process> m_process;
 };
 
 } // namespace tests::common

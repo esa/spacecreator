@@ -33,12 +33,13 @@ class SdlTransitionBuilder final
 {
 public:
     SdlTransitionBuilder(QString transitionName = "");
-    std::unique_ptr<Transition> build();
+
+    auto build() -> std::unique_ptr<Transition>;
 
     auto withNextStateAction(State *nextState = nullptr) -> SdlTransitionBuilder &;
 
 private:
-    Transition m_transition;
+    std::unique_ptr<Transition> m_transition;
 };
 
 } // namespace tests::common

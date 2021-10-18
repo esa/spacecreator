@@ -24,18 +24,19 @@
 namespace tests::common {
 
 SdlProcessBuilder::SdlProcessBuilder(QString processName)
+    : m_process(std::make_unique<Process>())
 {
-    m_process.setName(std::move(processName));
+    m_process->setName(std::move(processName));
 }
 
-Process SdlProcessBuilder::build()
+std::unique_ptr<Process> SdlProcessBuilder::build()
 {
     return std::move(m_process);
 }
 
 SdlProcessBuilder &SdlProcessBuilder::withStateMachine(std::unique_ptr<StateMachine> stateMachine)
 {
-    m_process.setStateMachine(std::move(stateMachine));
+    m_process->setStateMachine(std::move(stateMachine));
 
     return *this;
 }

@@ -31,12 +31,13 @@ class SdlModelBuilder final
 {
 public:
     SdlModelBuilder(QString modelName);
-    std::unique_ptr<SdlModel> build();
 
-    auto withProcess(Process process) -> SdlModelBuilder &;
+    auto build() -> std::unique_ptr<SdlModel>;
+
+    auto withProcess(std::unique_ptr<Process> process) -> SdlModelBuilder &;
 
 private:
-    SdlModel m_model;
+    std::unique_ptr<SdlModel> m_model;
 };
 
 } // namespace tests::common

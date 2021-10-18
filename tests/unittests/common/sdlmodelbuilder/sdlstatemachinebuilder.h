@@ -34,15 +34,15 @@ namespace tests::common {
 class SdlStateMachineBuilder final
 {
 public:
-    SdlStateMachineBuilder() = default;
+    explicit SdlStateMachineBuilder();
 
-    std::unique_ptr<StateMachine> build();
+    auto build() -> std::unique_ptr<StateMachine>;
 
     auto withState(std::unique_ptr<State> state) -> SdlStateMachineBuilder &;
     auto withTransition(std::unique_ptr<Transition> transition) -> SdlStateMachineBuilder &;
 
 private:
-    StateMachine m_stateMachine;
+    std::unique_ptr<StateMachine> m_stateMachine;
 };
 
 } // namespace tests::common

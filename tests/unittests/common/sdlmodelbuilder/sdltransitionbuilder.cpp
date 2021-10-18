@@ -26,20 +26,21 @@ using sdl::NextState;
 namespace tests::common {
 
 SdlTransitionBuilder::SdlTransitionBuilder(QString name)
+    : m_transition(std::make_unique<Transition>())
 {
-    m_transition.setName(std::move(name));
+    m_transition->setName(std::move(name));
 }
 
 std::unique_ptr<Transition> SdlTransitionBuilder::build()
 {
-    return std::make_unique<Transition>(std::move(m_transition));
+    return std::move(m_transition);
 }
 
 SdlTransitionBuilder &SdlTransitionBuilder::withNextStateAction(State *nextState)
 {
     auto action = std::make_unique<NextState>("", nextState);
 
-    m_transition.addAction(std::move(action));
+    m_transition->addAction(std::move(action));
 
     return *this;
 }

@@ -34,13 +34,14 @@ class SdlStateBuilder final
 {
 public:
     SdlStateBuilder(QString stateName);
-    std::unique_ptr<State> build();
+
+    auto build() -> std::unique_ptr<State>;
 
     auto withInput(std::unique_ptr<Input> input) -> SdlStateBuilder &;
     auto withContinuousSignal(std::unique_ptr<ContinuousSignal> continuousSignal) -> SdlStateBuilder &;
 
 private:
-    State m_state;
+    std::unique_ptr<State> m_state;
 };
 
 } // namespace tests::common

@@ -21,21 +21,26 @@
 
 namespace tests::common {
 
+SdlStateMachineBuilder::SdlStateMachineBuilder()
+    : m_stateMachine(std::make_unique<StateMachine>())
+{
+}
+
 std::unique_ptr<StateMachine> SdlStateMachineBuilder::build()
 {
-    return std::make_unique<StateMachine>(std::move(m_stateMachine));
+    return std::move(m_stateMachine);
 }
 
 SdlStateMachineBuilder &SdlStateMachineBuilder::withState(std::unique_ptr<State> state)
 {
-    m_stateMachine.addState(std::move(state));
+    m_stateMachine->addState(std::move(state));
 
     return *this;
 }
 
 SdlStateMachineBuilder &SdlStateMachineBuilder::withTransition(std::unique_ptr<Transition> transition)
 {
-    m_stateMachine.addTransition(std::move(transition));
+    m_stateMachine->addTransition(std::move(transition));
 
     return *this;
 }

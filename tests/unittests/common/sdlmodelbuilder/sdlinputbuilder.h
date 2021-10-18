@@ -32,10 +32,11 @@ class SdlInputBuilder final
 {
 public:
     SdlInputBuilder(QString inputName, Transition *transition = nullptr);
-    std::unique_ptr<Input> build();
+
+    auto build() -> std::unique_ptr<Input>;
 
 private:
-    Input m_input;
+    std::unique_ptr<Input> m_input;
 };
 
 } // namespace tests::common
