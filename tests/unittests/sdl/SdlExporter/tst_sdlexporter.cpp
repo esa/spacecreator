@@ -133,7 +133,10 @@ void tst_sdlmodel::testGenerateProcess()
 
     auto variable = std::make_unique<VariableDeclaration>("howManyLoops", "MyInteger");
 
-    auto transition1 = SdlTransitionBuilder().withNextStateAction().build();
+    auto parameterlessOutput = std::make_unique<Output>();
+    parameterlessOutput->setName("parameterlessOutput");
+
+    auto transition1 = SdlTransitionBuilder().withOutput(std::move(parameterlessOutput)).withNextStateAction().build();
     auto howManyLoopsRef = std::make_unique<VariableReference>(variable.get());
     auto someInput = SdlInputBuilder()
                              .withName("some_input_name")
@@ -145,8 +148,14 @@ void tst_sdlmodel::testGenerateProcess()
                           .withContinuousSignal(std::make_unique<ContinuousSignal>())
                           .build();
 
+    auto referenceOutput = std::make_unique<Output>();
+    referenceOutput->setName("referenceOutput");
+    auto howManyLoopsRef2 = VariableReference(variable.get());
+    referenceOutput->setParameter(&howManyLoopsRef2);
+
     auto transition2 = SdlTransitionBuilder()
                                .withTask(SdlTaskBuilder().withContents("'EXAMPLE TASK CONTENTS'").build())
+                               .withOutput(std::move(referenceOutput))
                                .withNextStateAction(state1.get())
                                .build();
 
@@ -201,7 +210,7 @@ void tst_sdlmodel::testGenerateProcess()
         "state Idle;",
         "input some_other_input_name;",
         "task 'EXAMPLE TASK CONTENTS';",
-        // output referenceOutput(howManyLoops);
+        "output referenceOutput(howManyLoops);",
         "NEXTSTATE Looping;",
         "endstate;",
         "endprocess Modemanager;",

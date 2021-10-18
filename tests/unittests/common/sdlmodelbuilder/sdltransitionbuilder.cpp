@@ -53,4 +53,11 @@ SdlTransitionBuilder &SdlTransitionBuilder::withTask(std::unique_ptr<Task> task)
     return *this;
 }
 
+SdlTransitionBuilder &SdlTransitionBuilder::withOutput(std::unique_ptr<Output> output)
+{
+    m_transition->addAction(std::move(output));
+
+    return *this;
+}
+
 } // namespace tests::common
