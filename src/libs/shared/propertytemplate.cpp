@@ -34,7 +34,7 @@ struct PropertyTemplate::PropertyTemplatePrivate {
     QVariant m_value;
     QVariant m_defaultValue;
     QString m_rxValueValidatorPattern;
-    QMap<int, QPair<QString, QString>> m_rxAttrValidatorPattern;
+    QMultiMap<int, QPair<QString, QString>> m_rxAttrValidatorPattern;
     int m_scopes = 0;
     bool m_isVisible = true;
     bool m_isEditable = true;
@@ -174,7 +174,7 @@ QMap<int, QPair<QString, QString>> PropertyTemplate::attrValidatorPatterns() con
     return d->m_rxAttrValidatorPattern;
 }
 
-void PropertyTemplate::setAttrValidatorPattern(const QMap<int, QPair<QString, QString>> &pattern)
+void PropertyTemplate::setAttrValidatorPattern(const QMultiMap<int, QPair<QString, QString>> &pattern)
 {
     d->m_rxAttrValidatorPattern = pattern;
 }
@@ -297,7 +297,7 @@ void PropertyTemplate::initFromXml(const QDomElement &element)
     const QDomElement scopeElement = element.firstChildElement(kScopesTagName);
     const QMetaEnum scopeMeta = scopeMetaEnum();
     int s = 0;
-    QMap<int, QPair<QString, QString>> attrValidators;
+    QMultiMap<int, QPair<QString, QString>> attrValidators;
     if (!scopeElement.isNull() && scopeElement.hasChildNodes()) {
         QDomElement scopeSubElement = scopeElement.firstChildElement();
         while (!scopeSubElement.isNull()) {
@@ -401,8 +401,9 @@ bool PropertyTemplate::validate(const VEObject *object) const
         return true;
     }
 
-    const auto it = d->m_rxAttrValidatorPattern.constFind(objScope);
-    if (it != d->m_rxAttrValidatorPattern.constEnd()) {
+    auto it = d->m_rxAttrValidatorPattern.lowerBound(objScope);
+    const auto upperBound = d->m_rxAttrValidatorPattern.upperBound(objScope);
+    while (it != upperBound) {
         auto checkPattern = [](const EntityAttributes &data, const QString &name, const QString &pattern) {
             auto objAttrIter = data.constFind(name);
             if (objAttrIter != data.constEnd()) {
@@ -413,7 +414,9 @@ bool PropertyTemplate::validate(const VEObject *object) const
             }
             return true;
         };
-        return checkPattern(object->entityAttributes(), it->first, it->second);
+        if (checkPattern(object->entityAttributes(), it->first, it->second))
+            return true;
+        ++it;
     }
     return false;
 }
