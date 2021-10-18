@@ -134,7 +134,12 @@ void tst_sdlmodel::testGenerateProcess()
     auto variable = std::make_unique<VariableDeclaration>("howManyLoops", "MyInteger");
 
     auto transition1 = SdlTransitionBuilder().withNextStateAction().build();
-    auto someInput = SdlInputBuilder("some_input_name", transition1.get()).build();
+    auto howManyLoopsRef = std::make_unique<VariableReference>(variable.get());
+    auto someInput = SdlInputBuilder()
+                             .withName("some_input_name")
+                             .withTransition(transition1.get())
+                             .withParameter(std::move(howManyLoopsRef))
+                             .build();
     auto state1 = SdlStateBuilder("Looping")
                           .withInput(std::move(someInput))
                           .withContinuousSignal(std::make_unique<ContinuousSignal>())
@@ -146,7 +151,10 @@ void tst_sdlmodel::testGenerateProcess()
                                .build();
 
     auto state2 = SdlStateBuilder("Idle")
-                          .withInput(SdlInputBuilder("some_other_input_name", transition2.get()).build())
+                          .withInput(SdlInputBuilder()
+                                             .withName("some_other_input_name")
+                                             .withTransition(transition2.get())
+                                             .build())
                           .withContinuousSignal(std::make_unique<ContinuousSignal>())
                           .build();
 
@@ -186,10 +194,15 @@ void tst_sdlmodel::testGenerateProcess()
         "START;",
         "NEXTSTATE Looping;",
         "state Looping;",
+        "input some_input_name(howManyLoops);",
+        // output parameterlessOutput;
         "NEXTSTATE -;",
         "endstate;",
         "state Idle;",
+        "input some_other_input_name;",
         "task 'EXAMPLE TASK CONTENTS';",
+        // output referenceOutput(howManyLoops);
+        "NEXTSTATE Looping;",
         "endstate;",
         "endprocess Modemanager;",
     };
