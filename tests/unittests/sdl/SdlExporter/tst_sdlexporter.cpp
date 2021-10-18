@@ -24,6 +24,7 @@
 #include <QtTest>
 #include <common/sdlmodelbuilder/sdlinputbuilder.h>
 #include <common/sdlmodelbuilder/sdlmodelbuilder.h>
+#include <common/sdlmodelbuilder/sdloutputbuilder.h>
 #include <common/sdlmodelbuilder/sdlprocessbuilder.h>
 #include <common/sdlmodelbuilder/sdlstatebuilder.h>
 #include <common/sdlmodelbuilder/sdlstatemachinebuilder.h>
@@ -64,6 +65,7 @@ using sdl::exporter::SdlExporter;
 using sdl::exporter::SdlOptions;
 using tests::common::SdlInputBuilder;
 using tests::common::SdlModelBuilder;
+using tests::common::SdlOutputBuilder;
 using tests::common::SdlProcessBuilder;
 using tests::common::SdlStateBuilder;
 using tests::common::SdlStateMachineBuilder;
@@ -133,25 +135,24 @@ void tst_sdlmodel::testGenerateProcess()
 
     auto variable = std::make_unique<VariableDeclaration>("howManyLoops", "MyInteger");
 
-    auto parameterlessOutput = std::make_unique<Output>();
-    parameterlessOutput->setName("parameterlessOutput");
-
-    auto transition1 = SdlTransitionBuilder().withOutput(std::move(parameterlessOutput)).withNextStateAction().build();
-    auto howManyLoopsRef = std::make_unique<VariableReference>(variable.get());
+    auto transition1 = SdlTransitionBuilder()
+                               .withOutput(SdlOutputBuilder().withName("parameterlessOutput").build())
+                               .withNextStateAction()
+                               .build();
     auto someInput = SdlInputBuilder()
                              .withName("some_input_name")
                              .withTransition(transition1.get())
-                             .withParameter(std::move(howManyLoopsRef))
+                             .withParameter(std::make_unique<VariableReference>(variable.get()))
                              .build();
     auto state1 = SdlStateBuilder("Looping")
                           .withInput(std::move(someInput))
                           .withContinuousSignal(std::make_unique<ContinuousSignal>())
                           .build();
 
-    auto referenceOutput = std::make_unique<Output>();
-    referenceOutput->setName("referenceOutput");
-    auto howManyLoopsRef2 = VariableReference(variable.get());
-    referenceOutput->setParameter(&howManyLoopsRef2);
+    auto referenceOutput = SdlOutputBuilder()
+                                   .withName("referenceOutput")
+                                   .withParameter(std::make_unique<VariableReference>(variable.get()))
+                                   .build();
 
     auto transition2 = SdlTransitionBuilder()
                                .withTask(SdlTaskBuilder().withContents("'EXAMPLE TASK CONTENTS'").build())
@@ -204,7 +205,7 @@ void tst_sdlmodel::testGenerateProcess()
         "NEXTSTATE Looping;",
         "state Looping;",
         "input some_input_name(howManyLoops);",
-        // output parameterlessOutput;
+        "output parameterlessOutput;",
         "NEXTSTATE -;",
         "endstate;",
         "state Idle;",
