@@ -31,6 +31,7 @@
 #include <memory>
 
 namespace Asn1Acn {
+class SequenceComponentVisitor;
 
 class SequenceComponent
 {
@@ -56,6 +57,8 @@ public:
     virtual QString definitionAsString() const = 0;
     virtual QString presentWhen() const = 0;
     virtual bool isOptional() const = 0;
+
+    virtual void accept(SequenceComponentVisitor &visitor) = 0;
 
     const QString &name() const { return m_name; }
     const QString &cName() const { return m_cName; }

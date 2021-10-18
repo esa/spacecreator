@@ -25,6 +25,8 @@
 
 #include "asnsequencecomponent.h"
 
+#include "sequencecomponentvisitor.h"
+
 using namespace Asn1Acn;
 
 AsnSequenceComponent::AsnSequenceComponent(const QString &name, const QString &cName, bool optional,
@@ -51,6 +53,11 @@ QString AsnSequenceComponent::definitionAsString() const
 QString AsnSequenceComponent::presentWhen() const
 {
     return m_presentWhen;
+}
+
+void AsnSequenceComponent::accept(SequenceComponentVisitor &visitor)
+{
+    visitor.visit(*this);
 }
 
 std::unique_ptr<SequenceComponent> AsnSequenceComponent::clone() const

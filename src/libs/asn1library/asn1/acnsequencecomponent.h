@@ -48,6 +48,8 @@ public:
     QString presentWhen() const override;
     bool isOptional() const override;
 
+    void accept(SequenceComponentVisitor &visitor) override;
+
     const QString &id() const;
 
 private:

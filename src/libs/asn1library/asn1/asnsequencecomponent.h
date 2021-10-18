@@ -44,6 +44,8 @@ public:
     QString presentWhen() const override;
     bool isOptional() const override;
 
+    void accept(SequenceComponentVisitor &visitor) override;
+
     const SourceLocation &location() const;
 
 private:

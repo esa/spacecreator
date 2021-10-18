@@ -47,6 +47,7 @@ target_sources(${LIB_NAME} PRIVATE
     asn1/root.cpp
     asn1/root.h
     asn1/sequencecomponent.h
+	asn1/sequencecomponentvisitor.h
     asn1/singlevalue.cpp
     asn1/singlevalue.h
     asn1/sourcelocation.cpp
