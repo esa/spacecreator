@@ -22,9 +22,11 @@
 #include <memory>
 #include <sdl/SdlModel/process.h>
 #include <sdl/SdlModel/statemachine.h>
+#include <sdl/SdlModel/variabledeclaration.h>
 
 using sdl::Process;
 using sdl::StateMachine;
+using sdl::VariableDeclaration;
 
 namespace tests::common {
 
@@ -37,7 +39,7 @@ public:
 
     auto withStateMachine(std::unique_ptr<StateMachine> stateMachine) -> SdlProcessBuilder &;
     // TODO withProcedures()
-    // TODO withVariables()
+    auto withVariable(std::unique_ptr<VariableDeclaration> variable) -> SdlProcessBuilder &;
 
 private:
     std::unique_ptr<Process> m_process;

@@ -41,4 +41,11 @@ SdlProcessBuilder &SdlProcessBuilder::withStateMachine(std::unique_ptr<StateMach
     return *this;
 }
 
+SdlProcessBuilder &SdlProcessBuilder::withVariable(std::unique_ptr<VariableDeclaration> variable)
+{
+    m_process->addVariable(std::move(variable));
+
+    return *this;
+}
+
 } // namespace tests::common
