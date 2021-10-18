@@ -24,9 +24,9 @@
 
 #include <QGraphicsView>
 #include <QPainter>
+#include <QtDebug>
 #include <QtGlobal>
 
-static const ivm::meta::Props::Token innerCoordToken = ivm::meta::Props::Token::InnerCoordinates;
 static const QList<ivm::IVObject::Type> rectangleEntityTypes { ivm::IVObject::Type::Function,
     ivm::IVObject::Type::FunctionType, ivm::IVObject::Type::Comment };
 
@@ -116,7 +116,8 @@ void MiniViewRenderer::updateData()
     const QVector<ivm::IVObject *> childEntities = d->item->entity()->children();
 
     for (const ivm::IVObject *child : qAsConst(childEntities)) {
-        const QString strCoordinates = child->entityAttributeValue<QString>(ivm::meta::Props::token(innerCoordToken));
+        auto token = ivm::meta::Props::token(ivm::meta::Props::Token::coordinates);
+        const QString strCoordinates = child->entityAttributeValue<QString>(token);
         if (rectangleEntityTypes.contains(child->type())) {
             const QRectF itemSceneRect =
                     shared::graphicsviewutils::rect(ivm::IVObject::coordinatesFromString(strCoordinates));
@@ -127,14 +128,15 @@ void MiniViewRenderer::updateData()
                 d->itemsWithoutGeometry.append(child->id());
             }
         } else if (auto connection = qobject_cast<const ivm::IVConnection *>(child)) {
+            const QPolygonF itemScenePoints =
+                    shared::graphicsviewutils::polygon(ivm::IVObject::coordinatesFromString(strCoordinates));
+
             if (connection->source()->id() != d->item->entity()->id()
                     && connection->target()->id() != d->item->entity()->id()) { // Child <> Child Connection
-                const QPolygonF itemScenePoints =
-                        shared::graphicsviewutils::polygon(ivm::IVObject::coordinatesFromString(strCoordinates));
                 if (!itemScenePoints.isEmpty()) {
                     d->childrenConnections.insert(child->id(), itemScenePoints);
                 } else {
-                    /// TODO:
+                    /// TODO: generate paths for connections between children
                 }
             } else { // Parent <> Child connection
                 const ivm::IVInterface *outerIface = connection->source()->id() == d->item->entity()->id()
@@ -157,15 +159,18 @@ void MiniViewRenderer::updateData()
                     continue;
                 }
                 QPointF innerIfacePos;
-                if (innerIface->hasEntityAttribute(ivm::meta::Props::token(innerCoordToken))) {
-                    const QString ifaceStrCoordinates =
-                            innerIface->entityAttributeValue<QString>(ivm::meta::Props::token(innerCoordToken));
+                const QString innerIfacePosStr = token;
+                if (innerIface->hasEntityAttribute(innerIfacePosStr)) {
+                    const QString ifaceStrCoordinates = innerIface->entityAttributeValue<QString>(innerIfacePosStr);
                     innerIfacePos = ifaceStrCoordinates.isEmpty()
                             ? QPointF(-1, -1)
                             : shared::graphicsviewutils::pos(ivm::IVObject::coordinatesFromString(ifaceStrCoordinates));
                     const ConnectionData cd { outerIfaceItem->scenePos(), innerIfacePos,
                         innerIface->parentObject()->id() };
                     d->parentChildConnections << cd;
+                } else {
+                    /// TODO: generate position for inner interface and path for connection between it
+                    /// and outer interface
                 }
             }
         }
@@ -241,7 +246,7 @@ void MiniViewRenderer::drawData(QPainter *painter)
         painter->drawRect(mappedRect);
 
         const QString text = d->item->entity()->model()->getObject(it.key())->titleUI();
-        const qreal margin = 8;
+        static const qreal margin = 8;
         painter->setFont(painterFont);
         shared::graphicsviewutils::drawText(
                 painter, mappedRect.adjusted(margin, margin, -margin, -margin), text, margin);

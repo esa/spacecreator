@@ -138,7 +138,6 @@ void IVItemModel::onObjectAdded(shared::Id objectId)
         return;
     }
 
-    setupGeometry(object);
     if (object->type() == ivm::IVObject::Type::InterfaceGroup) {
         return;
     }
@@ -151,6 +150,7 @@ void IVItemModel::onObjectAdded(shared::Id objectId)
             && !isRootOrRootChild) {
         return;
     }
+    setupGeometry(object);
 
     shared::ui::VEItemModel::onObjectAdded(objectId);
 }
@@ -274,7 +274,8 @@ void IVItemModel::setupRectangularGeometry(ivm::IVObject *obj)
     ivm::IVObject *parentObj = obj->parentObject();
 
     if (obj->isRootObject()) { // Root Level Function in Inner View
-        if (obj->hasEntityAttribute(ivm::meta::Props::token(ivm::meta::Props::Token::RootCoordinates))) {
+        static const QString tokenStr = ivm::meta::Props::token(ivm::meta::Props::Token::RootCoordinates);
+        if (obj->hasEntityAttribute(tokenStr)) {
             return;
         }
 
@@ -288,23 +289,17 @@ void IVItemModel::setupRectangularGeometry(ivm::IVObject *obj)
 
         const QString strRootCoord =
                 ivm::IVObject::coordinatesToString(shared::graphicsviewutils::coordinates(mappedViewportGeometry));
-        obj->setEntityProperty(ivm::meta::Props::token(ivm::meta::Props::Token::RootCoordinates), strRootCoord);
+        obj->setEntityProperty(tokenStr, strRootCoord);
     } else {
-        ivm::meta::Props::Token token { ivm::meta::Props::Token::Unknown };
-        if (!parentObj) { // Top Level Function
-            token = ivm::meta::Props::Token::coordinates;
-        } else { // Nested Function in Inner View
-            token = ivm::meta::Props::Token::InnerCoordinates;
-        }
-
-        if (obj->hasEntityAttribute(ivm::meta::Props::token(token))) {
+        const QString tokenStr = ivm::meta::Props::token(ivm::meta::Props::Token::coordinates);
+        if (obj->hasEntityAttribute(tokenStr)) {
             return;
         }
 
         QRectF parentGeometry;
-        if (parentObj && token == ivm::meta::Props::Token::InnerCoordinates) {
-            const QVariant rootCoord =
-                    parentObj->entityAttributeValue(ivm::meta::Props::token(ivm::meta::Props::Token::RootCoordinates));
+        if (parentObj) {
+            static const QString parentTokenStr = ivm::meta::Props::token(ivm::meta::Props::Token::RootCoordinates);
+            const QVariant rootCoord = parentObj->entityAttributeValue(parentTokenStr);
             if (rootCoord.isValid()) {
                 parentGeometry =
                         shared::graphicsviewutils::rect(ivm::IVObject::coordinatesFromString(rootCoord.toString()));
@@ -328,7 +323,7 @@ void IVItemModel::setupRectangularGeometry(ivm::IVObject *obj)
             }
             auto child = qobject_cast<const ivm::IVObject *>(veObj);
             if (kRectangularTypes.contains(child->type())) {
-                const QVariant coordinates = child->entityAttributeValue(ivm::meta::Props::token(token));
+                const QVariant coordinates = child->entityAttributeValue(tokenStr);
                 if (!coordinates.isValid()) {
                     continue;
                 }
@@ -341,7 +336,7 @@ void IVItemModel::setupRectangularGeometry(ivm::IVObject *obj)
 
         QRectF itemGeometry;
         shared::graphicsviewutils::findGeometryForRect(itemGeometry, parentGeometry, existingRects);
-        if (token == ivm::meta::Props::Token::InnerCoordinates) {
+        if (parentObj) {
             const QString strRootCoord = ivm::IVObject::coordinatesToString(
                     shared::graphicsviewutils::coordinates(parentGeometry | itemsGeometry | itemGeometry));
             parentObj->setEntityProperty(
@@ -350,7 +345,7 @@ void IVItemModel::setupRectangularGeometry(ivm::IVObject *obj)
 
         const QString strCoord =
                 ivm::IVObject::coordinatesToString(shared::graphicsviewutils::coordinates(itemGeometry));
-        obj->setEntityProperty(ivm::meta::Props::token(token), strCoord);
+        obj->setEntityProperty(tokenStr, strCoord);
     }
 }
 
@@ -364,8 +359,6 @@ void IVItemModel::setupInterfaceGeometry(ivm::IVObject *obj)
     ivm::meta::Props::Token token { ivm::meta::Props::Token::Unknown };
     if (parentObj->isRootObject()) {
         token = ivm::meta::Props::Token::RootCoordinates;
-    } else if (parentObj->parentObject()) {
-        token = ivm::meta::Props::Token::InnerCoordinates;
     } else {
         token = ivm::meta::Props::Token::coordinates;
     }
@@ -383,9 +376,6 @@ void IVItemModel::setupInterfaceGeometry(ivm::IVObject *obj)
     } else if (obj->hasEntityAttribute(ivm::meta::Props::token(ivm::meta::Props::Token::RootCoordinates))) {
         ifacePos = mapPositionFromOrigin(
                 obj->as<ivm::IVInterface *>(), ivm::meta::Props::Token::RootCoordinates, parentRect, &side);
-    } else if (obj->hasEntityAttribute(ivm::meta::Props::token(ivm::meta::Props::Token::InnerCoordinates))) {
-        ifacePos = mapPositionFromOrigin(
-                obj->as<ivm::IVInterface *>(), ivm::meta::Props::Token::InnerCoordinates, parentRect, &side);
     }
 
     const qreal sideSize = IVInterfaceGraphicsItem::baseLength();
@@ -435,11 +425,7 @@ void IVItemModel::setupInterfaceGeometry(ivm::IVObject *obj)
 
 void IVItemModel::setupConnectionGeometry(ivm::IVObject *obj)
 {
-    const ivm::meta::Props::Token token = obj->parentObject() && obj->parentObject()->isRootObject()
-            ? ivm::meta::Props::Token::InnerCoordinates
-            : ivm::meta::Props::Token::coordinates;
-
-    if (obj->hasEntityAttribute(ivm::meta::Props::token(token))) {
+    if (obj->hasEntityAttribute(ivm::meta::Props::token(ivm::meta::Props::Token::coordinates))) {
         return;
     }
 

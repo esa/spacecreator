@@ -155,13 +155,11 @@ void tst_IVObject::test_coordinatesType()
 
     model.setRootObject(fn1->id());
     QCOMPARE(fn1->coordinatesType(), ivm::meta::Props::Token::RootCoordinates);
-    QCOMPARE(fn2->coordinatesType(), ivm::meta::Props::Token::InnerCoordinates);
     QCOMPARE(fn3->coordinatesType(), ivm::meta::Props::Token::coordinates);
 
     model.setRootObject(fn2->id());
     QCOMPARE(fn1->coordinatesType(), ivm::meta::Props::Token::coordinates);
     QCOMPARE(fn2->coordinatesType(), ivm::meta::Props::Token::RootCoordinates);
-    QCOMPARE(fn3->coordinatesType(), ivm::meta::Props::Token::InnerCoordinates);
 }
 
 void tst_IVObject::test_hasAttributes()

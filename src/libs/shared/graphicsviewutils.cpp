@@ -455,12 +455,18 @@ QVector<QPointF> polygon(const QVector<qint32> &coordinates)
 
 QVector<qint32> coordinates(const QPointF &point)
 {
+    if (point.isNull())
+        return {};
+
     return coordinates(QVector<QPointF> { point });
 }
 
 QVector<qint32> coordinates(const QRectF &rect)
 {
-    return coordinates(QVector<QPointF> { rect.topLeft(), rect.bottomRight() });
+    if (rect.isValid())
+        return coordinates(QVector<QPointF> { rect.topLeft(), rect.bottomRight() });
+
+    return {};
 }
 
 QVector<qint32> coordinates(const QVector<QPointF> &points)

@@ -563,11 +563,7 @@ void IVCreatorTool::handleFunctionType(QGraphicsScene *scene, const QPointF &pos
             return;
 
         if (auto parentItem = m_previewItem->parentItem()) {
-            if (!parentItem->sceneBoundingRect()
-                            .marginsRemoved(shared::graphicsviewutils::kRootMargins)
-                            .contains(itemSceneRect)) {
-                itemSceneRect = QRectF();
-            }
+            itemSceneRect = {};
         }
 
         ivm::IVFunction *parentObject = gi::functionObject(m_previewItem->parentItem());
@@ -592,11 +588,7 @@ void IVCreatorTool::handleFunction(QGraphicsScene *scene, const QPointF &pos)
             return;
 
         if (auto parentItem = m_previewItem->parentItem()) {
-            if (!parentItem->sceneBoundingRect()
-                            .marginsRemoved(shared::graphicsviewutils::kRootMargins)
-                            .contains(itemSceneRect)) {
-                itemSceneRect = QRectF();
-            }
+            itemSceneRect = {};
         }
 
         ivm::IVFunction *parentObject = gi::functionObject(m_previewItem->parentItem());

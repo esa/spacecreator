@@ -417,7 +417,7 @@ void IVInterface::restoreInternals(const IVInterface *disconnectMe)
         return;
 
     // keep current coordinates:
-    for (meta::Props::Token t : { meta::Props::Token::InnerCoordinates, meta::Props::Token::coordinates }) {
+    for (meta::Props::Token t : { meta::Props::Token::RootCoordinates, meta::Props::Token::coordinates }) {
         const QString &name = meta::Props::token(t);
         m_originalFields.attrs[name] = entityAttribute(name);
     }
@@ -498,8 +498,8 @@ void IVInterface::reflectAttrs(const IVInterface *from)
         }
     }
 
-    for (auto t : { meta::Props::Token::InheritPI, meta::Props::Token::coordinates,
-                 meta::Props::Token::InnerCoordinates, meta::Props::Token::Autonamed }) {
+    for (auto t : { meta::Props::Token::InheritPI, meta::Props::Token::coordinates, meta::Props::Token::RootCoordinates,
+                 meta::Props::Token::Autonamed }) {
         const bool isInheritPIFlag = t == meta::Props::Token::InheritPI;
         const bool isInheritedPI = !isFunctionTypeInherited && isRequired() && from->isProvided();
         if (!isInheritPIFlag || isInheritedPI)

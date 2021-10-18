@@ -67,7 +67,6 @@ public:
 
         // KNOWN TASTE props:
         coordinates,
-        InnerCoordinates,
         RootCoordinates,
         InheritPI,
         Autonamed,

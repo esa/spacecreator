@@ -36,7 +36,8 @@ CmdFunctionItemCreate::CmdFunctionItemCreate(ivm::IVModel *model, ivm::IVFunctio
     , m_entity(new ivm::IVFunction(m_parent ? qobject_cast<QObject *>(m_parent) : qobject_cast<QObject *>(m_model), id))
 {
     m_entity->setTitle(title);
-    prepareData({ qMakePair(m_entity, QVector<QPointF> { geometry.topLeft(), geometry.bottomRight() }) });
+    if (geometry.isValid())
+        prepareData({ qMakePair(m_entity, QVector<QPointF> { geometry.topLeft(), geometry.bottomRight() }) });
 }
 
 CmdFunctionItemCreate::~CmdFunctionItemCreate()

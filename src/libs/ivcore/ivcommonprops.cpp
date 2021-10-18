@@ -58,7 +58,6 @@ const QHash<QString, Props::Token> Props::TokensByName = {
 
     // TASTE props:
     { "Taste::coordinates", Token::coordinates },
-    { "Taste::InnerCoordinates", Token::InnerCoordinates },
     { "Taste::RootCoordinates", Token::RootCoordinates },
     { "Taste::InheritPI", Token::InheritPI },
     { "Taste::Autonamed", Token::Autonamed },

@@ -183,24 +183,8 @@ void IVObject::setCoordinates(const QVector<qint32> &coordinates)
 
 meta::Props::Token IVObject::coordinatesType() const
 {
-    meta::Props::Token token = meta::Props::Token::coordinates;
-    if (auto parentItem = parentObject()) {
-        if (parentObject()->isRootObject()) {
-            if (isInterface()) {
-                token = meta::Props::Token::RootCoordinates;
-            } else {
-                token = meta::Props::Token::InnerCoordinates;
-            }
-        } else if (auto grandParent = parentItem->parentObject()) {
-            if (isInterface() && grandParent->isRootObject()) {
-                token = meta::Props::Token::InnerCoordinates;
-            }
-        }
-    }
-    if (isRootObject()) {
-        token = meta::Props::Token::RootCoordinates;
-    }
-    return token;
+    bool isRootObj = isRootObject() || (isInterface() && parentObject() && parentObject()->isRootObject());
+    return isRootObj ? meta::Props::Token::RootCoordinates : meta::Props::Token::coordinates;
 }
 
 QStringList IVObject::path() const
@@ -333,7 +317,6 @@ void IVObject::setAttributeImpl(const QString &attributeName, const QVariant &va
             break;
         }
         case meta::Props::Token::RootCoordinates:
-        case meta::Props::Token::InnerCoordinates:
         case meta::Props::Token::coordinates: {
             VEObject::setAttributeImpl(attr.name(), attr.value(), attr.type());
             Q_EMIT coordinatesChanged(value.value<QVector<qint32>>());
