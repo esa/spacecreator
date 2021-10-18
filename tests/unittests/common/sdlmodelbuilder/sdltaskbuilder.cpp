@@ -17,33 +17,32 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/lgpl-2.1.html>.
  */
 
-#pragma once
-
-#include <memory>
-#include <sdl/SdlModel/state.h>
-#include <sdl/SdlModel/task.h>
-#include <sdl/SdlModel/transition.h>
-
-using sdl::Action;
-using sdl::State;
-using sdl::Task;
-using sdl::Transition;
+#include "sdltaskbuilder.h"
 
 namespace tests::common {
 
-class SdlTransitionBuilder final
+SdlTaskBuilder::SdlTaskBuilder()
+    : m_task(std::make_unique<Task>())
 {
-public:
-    SdlTransitionBuilder(QString transitionName = "");
+}
 
-    auto build() -> std::unique_ptr<Transition>;
+std::unique_ptr<Task> SdlTaskBuilder::build()
+{
+    return std::move(m_task);
+}
 
-    auto withNextStateAction(State *nextState = nullptr) -> SdlTransitionBuilder &;
+SdlTaskBuilder &SdlTaskBuilder::withName(QString name)
+{
+    m_task->setName(std::move(name));
 
-    auto withTask(std::unique_ptr<Task> task) -> SdlTransitionBuilder &;
+    return *this;
+}
 
-private:
-    std::unique_ptr<Transition> m_transition;
-};
+SdlTaskBuilder &SdlTaskBuilder::withContents(QString contents)
+{
+    m_task->setContent(std::move(contents));
+
+    return *this;
+}
 
 } // namespace tests::common

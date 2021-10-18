@@ -5,6 +5,7 @@ set(SOURCES sdlmodelbuilder.cpp
             sdlprocessbuilder.cpp
             sdlstatebuilder.cpp
             sdlstatemachinebuilder.cpp
+            sdltaskbuilder.cpp
             sdltransitionbuilder.cpp
             )
 set(INCLUDES sdlmodelbuilder.h
@@ -12,6 +13,7 @@ set(INCLUDES sdlmodelbuilder.h
              sdlprocessbuilder.h
              sdlstatebuilder.h
              sdlstatemachinebuilder.h
+             sdltaskbuilder.h
              sdltransitionbuilder.h
              )
 
