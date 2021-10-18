@@ -17,25 +17,32 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/lgpl-2.1.html>.
  */
 
-#include "output.h"
+#pragma once
 
-#include <sdl/SdlExporter/visitors/visitor.h>
+#include <memory>
+#include <sdl/SdlModel/output.h>
+#include <sdl/SdlModel/transition.h>
+#include <sdl/SdlModel/variablereference.h>
 
-namespace sdl {
+using sdl::Output;
+using sdl::Transition;
+using sdl::VariableReference;
 
-VariableReference *Output::parameter() const
+namespace tests::common {
+
+class SdlOutputBuilder final
 {
-    return m_parameter.get();
-}
+public:
+    explicit SdlOutputBuilder();
 
-void Output::setParameter(std::unique_ptr<VariableReference> parameter)
-{
-    m_parameter = std::move(parameter);
-}
+    auto build() -> std::unique_ptr<Output>;
 
-void Output::accept(Visitor &visitor) const
-{
-    visitor.visit(*this);
-}
+    auto withName(QString name) -> SdlOutputBuilder &;
 
-} // namespace sdl
+    auto withParameter(std::unique_ptr<VariableReference> parameter) -> SdlOutputBuilder &;
+
+private:
+    std::unique_ptr<Output> m_output;
+};
+
+} // namespace tests::common

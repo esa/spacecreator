@@ -31,15 +31,12 @@
 namespace sdl {
 
 /**
- * @brief   Represents an SDL output signal.
+ * @brief   Represents an SDL output signal action.
  *
- * TODO
  */
 class Output final : public Action
 {
 public:
-    using Parameter = VariableReference;
-
     /**
      * @brief   Default constructor
      */
@@ -68,16 +65,16 @@ public:
     /**
      * @brief   Getter for the optional output parameter
      *
-     * @return  an optional pointer to parameter
+     * @return  a pointer to variable reference
      */
-    auto parameter() const -> Parameter *;
+    auto parameter() const -> VariableReference *;
 
     /**
      * @brief   Setter for the optional output parameter
      *
      * @param   parameter a pointer to parameter
      */
-    auto setParameter(Parameter *parameter) -> void;
+    auto setParameter(std::unique_ptr<VariableReference> parameter) -> void;
 
     /**
      * @brief  visitor acceptor (calls visit method of the given visitor)
@@ -85,7 +82,7 @@ public:
     virtual auto accept(Visitor &visitor) const -> void override;
 
 private:
-    Parameter *m_parameter;
+    std::unique_ptr<VariableReference> m_parameter;
 };
 
 } // namespace sdl

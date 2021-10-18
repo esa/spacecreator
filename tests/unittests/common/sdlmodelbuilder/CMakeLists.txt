@@ -2,6 +2,7 @@ project(SdlModelBuilder VERSION 1.0.0 LANGUAGES CXX)
 
 set(SOURCES sdlmodelbuilder.cpp
             sdlinputbuilder.cpp
+            sdloutputbuilder.cpp
             sdlprocessbuilder.cpp
             sdlstatebuilder.cpp
             sdlstatemachinebuilder.cpp
@@ -10,6 +11,7 @@ set(SOURCES sdlmodelbuilder.cpp
             )
 set(INCLUDES sdlmodelbuilder.h
              sdlinputbuilder.h
+             sdloutputbuilder.cpp
              sdlprocessbuilder.h
              sdlstatebuilder.h
              sdlstatemachinebuilder.h
