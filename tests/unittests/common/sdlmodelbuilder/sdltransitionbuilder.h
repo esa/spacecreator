@@ -46,6 +46,8 @@ public:
 
     auto withOutput(std::unique_ptr<Output> output) -> SdlTransitionBuilder &;
 
+    auto withAction(std::unique_ptr<Action> action) -> SdlTransitionBuilder &;
+
 private:
     std::unique_ptr<Transition> m_transition;
 };
