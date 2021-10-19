@@ -22,10 +22,12 @@
 #include <memory>
 #include <sdl/SdlModel/process.h>
 #include <sdl/SdlModel/statemachine.h>
+#include <sdl/SdlModel/transition.h>
 #include <sdl/SdlModel/variabledeclaration.h>
 
 using sdl::Process;
 using sdl::StateMachine;
+using sdl::Transition;
 using sdl::VariableDeclaration;
 
 namespace tests::common {
@@ -37,6 +39,7 @@ public:
 
     auto build() -> std::unique_ptr<Process>;
 
+    auto withStartTransition(std::unique_ptr<Transition> transition) -> SdlProcessBuilder &;
     auto withStateMachine(std::unique_ptr<StateMachine> stateMachine) -> SdlProcessBuilder &;
     // TODO withProcedures()
     auto withVariable(std::unique_ptr<VariableDeclaration> variable) -> SdlProcessBuilder &;

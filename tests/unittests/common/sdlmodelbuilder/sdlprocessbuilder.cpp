@@ -34,6 +34,13 @@ std::unique_ptr<Process> SdlProcessBuilder::build()
     return std::move(m_process);
 }
 
+SdlProcessBuilder &SdlProcessBuilder::withStartTransition(std::unique_ptr<Transition> transition)
+{
+    m_process->setStartTransition(std::move(transition));
+
+    return *this;
+}
+
 SdlProcessBuilder &SdlProcessBuilder::withStateMachine(std::unique_ptr<StateMachine> stateMachine)
 {
     m_process->setStateMachine(std::move(stateMachine));
