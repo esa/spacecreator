@@ -299,7 +299,10 @@ void tst_sdlmodel::testGenerateProcessWithLabelAndJoin()
     auto transition1 = SdlTransitionBuilder().withNextStateAction().build();
     auto state1 = SdlStateBuilder("Idle").withInput(SdlInputBuilder("sigReset", transition1.get()).build()).build();
 
+    auto startTransition = SdlTransitionBuilder().withNextStateAction(state1.get()).build();
+
     auto process = SdlProcessBuilder(processName)
+                           .withStartTransition(std::move(startTransition))
                            .withStateMachine(SdlStateMachineBuilder()
                                                      .withState(std::move(state1))
                                                      .withTransition(std::move(transition1))
