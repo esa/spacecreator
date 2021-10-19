@@ -81,6 +81,7 @@ class tst_sdlmodel : public QObject
 private Q_SLOTS:
     void testDefaultValuesInModel();
     void testGenerateProcess();
+    void testGenerateProcessWithTasksVariablesAndParameters();
 };
 
 void tst_sdlmodel::testDefaultValuesInModel()
@@ -129,9 +130,76 @@ void checkSequenceAndConsume(std::vector<QString> &expectedOutput, QTextStream &
 
 void tst_sdlmodel::testGenerateProcess()
 {
-    QString modelName = "Example";
+    QString modelName = "BasicProcess";
     QString modelPrefix = "Sdl_";
-    QString processName = "Modemanager";
+    QString processName = "ExampleProcess";
+
+    auto transition1 = SdlTransitionBuilder().withNextStateAction().build();
+    auto someInput = SdlInputBuilder().withName("some_input_name").withTransition(transition1.get()).build();
+    auto state1 = SdlStateBuilder("Looping").withInput(std::move(someInput)).build();
+
+    auto referenceOutput = SdlOutputBuilder().withName("referenceOutput").build();
+
+    auto transition2 = SdlTransitionBuilder().withNextStateAction(state1.get()).build();
+
+    auto state2 = SdlStateBuilder("Idle")
+                          .withInput(SdlInputBuilder()
+                                             .withName("some_other_input_name")
+                                             .withTransition(transition2.get())
+                                             .build())
+                          .build();
+
+    // clang-format off
+    const auto exampleModel = SdlModelBuilder(modelName)
+        .withProcess(SdlProcessBuilder(processName)
+                           .withStateMachine(SdlStateMachineBuilder()
+                                                     .withState(std::move(state1))
+                                                     .withState(std::move(state2))
+                                                     .withTransition(std::move(transition1))
+                                                     .withTransition(std::move(transition2))
+                                                     .build()
+                           ).build()
+        ).build();
+    // clang-format on
+
+    Options options;
+    options.add(SdlOptions::sdlFilepathPrefix, modelPrefix);
+
+    SdlExporter exporter;
+    try {
+        exporter.exportModel(exampleModel.get(), options);
+    } catch (const std::exception &ex) {
+        QFAIL(ex.what());
+    }
+
+    QString filename = QString("%1%2.%3").arg(modelPrefix, modelName, "pr");
+    QFile outputFile(filename);
+    if (!outputFile.open(QIODevice::ReadOnly)) {
+        QFAIL("requested file cannot be found");
+    }
+    QTextStream consumableOutput(&outputFile);
+    std::vector<QString> expectedOutput = {
+        "process ExampleProcess;",
+        "START;",
+        "NEXTSTATE Looping;",
+        "state Looping;",
+        "input some_input_name;",
+        "NEXTSTATE -;",
+        "endstate;",
+        "state Idle;",
+        "input some_other_input_name;",
+        "NEXTSTATE Looping;",
+        "endstate;",
+        "endprocess ExampleProcess;",
+    };
+    checkSequenceAndConsume(expectedOutput, consumableOutput);
+}
+
+void tst_sdlmodel::testGenerateProcessWithTasksVariablesAndParameters()
+{
+    QString modelName = "TasksVariablesAndParameters";
+    QString modelPrefix = "Sdl_";
+    QString processName = "ExampleProcess";
 
     auto variable = std::make_unique<VariableDeclaration>("howManyLoops", "MyInteger");
     auto variableReference = VariableReference(variable.get());
@@ -197,7 +265,7 @@ void tst_sdlmodel::testGenerateProcess()
     }
     QTextStream consumableOutput(&outputFile);
     std::vector<QString> expectedOutput = {
-        "process Modemanager;",
+        "process ExampleProcess;",
         "dcl howManyLoops MyInteger",
         "START;",
         "NEXTSTATE Looping;",
@@ -212,7 +280,7 @@ void tst_sdlmodel::testGenerateProcess()
         "output referenceOutput(howManyLoops);",
         "NEXTSTATE Looping;",
         "endstate;",
-        "endprocess Modemanager;",
+        "endprocess ExampleProcess;",
     };
     checkSequenceAndConsume(expectedOutput, consumableOutput);
 }

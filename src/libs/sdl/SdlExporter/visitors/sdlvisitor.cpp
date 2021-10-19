@@ -41,10 +41,12 @@ void SdlVisitor::visit(const Process &process) const
     m_stream << "/* CIF PROCESS (" << 250 << ", " << 150 << "), (" << 150 << ", " << 75 << ") */\n";
     m_stream << "process " << process.name() << ";\n";
 
-    m_stream << "    /* CIF TEXT (16, 317), (267, 140) */\n";
-    exportCollection(process.variables());
-    m_stream << "    /* CIF ENDTEXT */\n";
-    m_stream << "\n";
+    if (!process.variables().empty()) {
+        m_stream << "    /* CIF TEXT (16, 317), (267, 140) */\n";
+        exportCollection(process.variables());
+        m_stream << "    /* CIF ENDTEXT */\n";
+        m_stream << "\n";
+    }
 
     // TODO: loop over procedures and export them
 
