@@ -298,10 +298,11 @@ void tst_sdlmodel::testGenerateProcessWithLabelAndJoin()
     QString modelPrefix = "Sdl_";
     QString processName = "ExampleProcess";
 
-    auto transition1 = SdlTransitionBuilder().withNextStateAction().build();
+    auto transition1 = SdlTransitionBuilder().withAction(std::make_unique<NextState>("")).build();
     auto state1 = SdlStateBuilder("Idle").withInput(SdlInputBuilder("sigReset", transition1.get()).build()).build();
 
-    auto startTransition = SdlTransitionBuilder().withNextStateAction(state1.get()).build();
+    auto nextStateSame = std::make_unique<NextState>("", state1.get());
+    auto startTransition = SdlTransitionBuilder().withAction(std::move(nextStateSame)).build();
 
     auto process = SdlProcessBuilder(processName)
                            .withStartTransition(std::move(startTransition))
