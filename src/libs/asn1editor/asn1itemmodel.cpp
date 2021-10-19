@@ -15,8 +15,6 @@
    along with this program. If not, see <https://www.gnu.org/licenses/lgpl-2.1.html>.
 */
 
-#include <iostream>
-
 #include "asn1itemmodel.h"
 
 #include "asn1const.h"
@@ -25,6 +23,7 @@
 #include "constraints/logicoperators.h"
 #include "constraints/rangeconstraint.h"
 #include "constraints/sizeconstraint.h"
+#include "range.h"
 #include "typeassignment.h"
 #include "types/bitstring.h"
 #include "types/boolean.h"
@@ -34,14 +33,15 @@
 #include "types/integer.h"
 #include "types/numericstring.h"
 #include "types/octetstring.h"
+#include "types/real.h"
 #include "types/sequence.h"
 #include "types/sequenceof.h"
 #include "types/userdefinedtype.h"
-#include "types/real.h"
-#include "range.h"
 #include "values.h"
 
 #include <QStandardItem>
+#include <QtDebug>
+#include <iostream>
 
 namespace asn1 {
 
@@ -96,62 +96,62 @@ Asn1ItemModel::ItemMap Asn1ItemModel::createModelItems(const Asn1Acn::Types::Typ
 
     switch (asn1Item->typeEnum()) {
     case Asn1Acn::Types::Type::INTEGER: {
-        const auto *integerItem = dynamic_cast<const Asn1Acn::Types::Integer*>(asn1Item);
+        const auto *integerItem = dynamic_cast<const Asn1Acn::Types::Integer *>(asn1Item);
         valueItem = createNumberItem<Asn1Acn::IntegerValue>(integerItem, typeLimit);
         valueItem->setData(integerItem->typeEnum(), ASN1TYPE_ROLE);
         break;
     }
     case Asn1Acn::Types::Type::REAL: {
-        const auto *realItem = dynamic_cast<const Asn1Acn::Types::Real*>(asn1Item);
+        const auto *realItem = dynamic_cast<const Asn1Acn::Types::Real *>(asn1Item);
         valueItem = createNumberItem<Asn1Acn::RealValue>(realItem, typeLimit);
         valueItem->setData(realItem->typeEnum(), ASN1TYPE_ROLE);
         break;
     }
     case Asn1Acn::Types::Type::BOOLEAN: {
-        const auto *boolItem = dynamic_cast<const Asn1Acn::Types::Boolean*>(asn1Item);
+        const auto *boolItem = dynamic_cast<const Asn1Acn::Types::Boolean *>(asn1Item);
         valueItem = createBoolItem(boolItem);
         break;
     }
     case Asn1Acn::Types::Type::SEQUENCE: {
-        const auto *sequenceItem = dynamic_cast<const Asn1Acn::Types::Sequence*>(asn1Item);
+        const auto *sequenceItem = dynamic_cast<const Asn1Acn::Types::Sequence *>(asn1Item);
         valueItem = createSequenceItem(sequenceItem, nameItem);
         break;
     }
     case Asn1Acn::Types::Type::SEQUENCEOF: {
-        const auto *sequenceOfItem = dynamic_cast<const Asn1Acn::Types::SequenceOf*>(asn1Item);
+        const auto *sequenceOfItem = dynamic_cast<const Asn1Acn::Types::SequenceOf *>(asn1Item);
         valueItem = createSequenceOfItem(sequenceOfItem, nameItem, typeLimit);
         break;
     }
     case Asn1Acn::Types::Type::ENUMERATED: {
-        const auto *enumeratedItem = dynamic_cast<const Asn1Acn::Types::Enumerated*>(asn1Item);
+        const auto *enumeratedItem = dynamic_cast<const Asn1Acn::Types::Enumerated *>(asn1Item);
         valueItem = createEnumeratedItem(enumeratedItem);
         break;
     }
     case Asn1Acn::Types::Type::CHOICE: {
-        const auto *choiceItem = dynamic_cast<const Asn1Acn::Types::Choice*>(asn1Item);
+        const auto *choiceItem = dynamic_cast<const Asn1Acn::Types::Choice *>(asn1Item);
         valueItem = createChoiceItem(choiceItem, nameItem);
         break;
     }
     case Asn1Acn::Types::Type::BITSTRING: {
-        const auto *bitStringItem = dynamic_cast<const Asn1Acn::Types::BitString*>(asn1Item);
+        const auto *bitStringItem = dynamic_cast<const Asn1Acn::Types::BitString *>(asn1Item);
         valueItem = createStringItem<Asn1Acn::BitStringValue>(bitStringItem, typeLimit);
         valueItem->setData(asn1Item->typeEnum(), ASN1TYPE_ROLE);
         break;
     }
     case Asn1Acn::Types::Type::IA5STRING: {
-        const auto *ia5StringItem = dynamic_cast<const Asn1Acn::Types::IA5String*>(asn1Item);
+        const auto *ia5StringItem = dynamic_cast<const Asn1Acn::Types::IA5String *>(asn1Item);
         valueItem = createStringItem<Asn1Acn::StringValue>(ia5StringItem, typeLimit);
         valueItem->setData(asn1Item->typeEnum(), ASN1TYPE_ROLE);
         break;
     }
     case Asn1Acn::Types::Type::NUMERICSTRING: {
-        const auto *numericStringItem = dynamic_cast<const Asn1Acn::Types::NumericString*>(asn1Item);
+        const auto *numericStringItem = dynamic_cast<const Asn1Acn::Types::NumericString *>(asn1Item);
         valueItem = createStringItem<Asn1Acn::StringValue>(numericStringItem, typeLimit);
         valueItem->setData(asn1Item->typeEnum(), ASN1TYPE_ROLE);
         break;
     }
     case Asn1Acn::Types::Type::OCTETSTRING: {
-        const auto *octetStringItem = dynamic_cast<const Asn1Acn::Types::OctetString*>(asn1Item);
+        const auto *octetStringItem = dynamic_cast<const Asn1Acn::Types::OctetString *>(asn1Item);
         valueItem = createStringItem<Asn1Acn::OctetStringValue>(octetStringItem, typeLimit);
         valueItem->setData(asn1Item->typeEnum(), ASN1TYPE_ROLE);
         break;
@@ -186,13 +186,14 @@ Asn1ItemModel::ItemMap Asn1ItemModel::createModelItems(const Asn1Acn::Types::Typ
  * \return
  */
 template<typename ValueType>
-QStandardItem *Asn1ItemModel::createNumberItem(const Asn1Acn::Constraints::WithConstraints<ValueType> *asn1Item, QString &typeLimit)
+QStandardItem *Asn1ItemModel::createNumberItem(
+        const Asn1Acn::Constraints::WithConstraints<ValueType> *asn1Item, QString &typeLimit)
 {
     QStandardItem *item = new QStandardItem("");
 
     const auto &constraints = asn1Item->constraints();
     const auto range = combineRanges<ValueType>(constraints);
-    if(range) {
+    if (range) {
         item->setText(QString::number(range->begin()));
         item->setData(QVariant::fromValue(range->begin()), MIN_RANGE_ROLE);
         item->setData(QVariant::fromValue(range->end()), MAX_RANGE_ROLE);
@@ -220,13 +221,14 @@ QStandardItem *Asn1ItemModel::createBoolItem(const Asn1Acn::Types::Boolean *asn1
 }
 
 template<typename ValueType>
-QStandardItem *Asn1ItemModel::createStringItem(const Asn1Acn::Constraints::WithConstraints<ValueType> *asn1Item, QString &typeLimit)
+QStandardItem *Asn1ItemModel::createStringItem(
+        const Asn1Acn::Constraints::WithConstraints<ValueType> *asn1Item, QString &typeLimit)
 {
     QStandardItem *item = new QStandardItem("");
 
     const auto &constraints = asn1Item->constraints();
     const auto range = combineSizes<ValueType>(constraints);
-    if(range) {
+    if (range) {
         item->setData(QVariant::fromValue(range->begin()), MIN_RANGE_ROLE);
         item->setData(QVariant::fromValue(range->end()), MAX_RANGE_ROLE);
 
@@ -253,20 +255,16 @@ QStandardItem *Asn1ItemModel::createSequenceItem(const Asn1Acn::Types::Sequence 
     QList<QStandardItem *> presentItems;
 
     for (const auto &sequenceComponent : asn1Item->components()) {
-        const auto *asnSequenceComponent = dynamic_cast<const Asn1Acn::AsnSequenceComponent*>(sequenceComponent.get());
+        const auto *asnSequenceComponent = dynamic_cast<const Asn1Acn::AsnSequenceComponent *>(sequenceComponent.get());
 
-        if(!asnSequenceComponent) {
+        if (!asnSequenceComponent) {
             continue;
         }
 
         ItemMap childItem = createModelItems(asnSequenceComponent->type(), asnSequenceComponent->name());
-
-        if (asnSequenceComponent->isOptional()) {
-            childItem["present"]->setEnabled(true);
-            childItem["present"]->setCheckState(Qt::Unchecked);
-            childItem["present"]->setCheckable(true);
-            childItem["present"]->setData(true, OPTIONAL_ROLE);
-        }
+        childItem["present"]->setEnabled(true);
+        childItem["present"]->setCheckable(true);
+        childItem["present"]->setCheckState(asnSequenceComponent->isOptional() ? Qt::Checked : Qt::Unchecked);
 
         parent->appendRow(childItem["item"]);
 
@@ -288,7 +286,8 @@ QStandardItem *Asn1ItemModel::createSequenceItem(const Asn1Acn::Types::Sequence 
  * \param parent
  * \return
  */
-QStandardItem *Asn1ItemModel::createSequenceOfItem(const Asn1Acn::Types::SequenceOf *asn1Item, QStandardItem *parent, QString &typeLimit)
+QStandardItem *Asn1ItemModel::createSequenceOfItem(
+        const Asn1Acn::Types::SequenceOf *asn1Item, QStandardItem *parent, QString &typeLimit)
 {
     const auto &constraints = asn1Item->constraints();
     const auto range = combineSizes<Asn1Acn::IntegerValue>(constraints);
@@ -327,7 +326,8 @@ QStandardItem *Asn1ItemModel::createSequenceOfItem(const Asn1Acn::Types::Sequenc
     if (range->isSingleItem()) {
         typeLimit = QString(tr(" Size(%1)")).arg(QString::number(range->begin()));
     } else {
-        typeLimit = QString(tr(" Size(%1..%2)")).arg(QString::number(range->begin())).arg(QString::number(range->end()));
+        typeLimit =
+                QString(tr(" Size(%1..%2)")).arg(QString::number(range->begin())).arg(QString::number(range->end()));
     }
 
     return item;
@@ -343,7 +343,7 @@ QStandardItem *Asn1ItemModel::createEnumeratedItem(const Asn1Acn::Types::Enumera
     const auto &enumItems = asn1Item->items();
 
     QVariantList childNames;
-    for(const auto &enumItem : enumItems) {
+    for (const auto &enumItem : enumItems) {
         childNames.append(enumItem.name());
     }
 
@@ -391,17 +391,17 @@ QStandardItem *Asn1ItemModel::createPresentItem()
 {
     QStandardItem *item = new QStandardItem();
     item->setEnabled(false);
-    item->setData(false, OPTIONAL_ROLE);
 
     return item;
 }
 
 template<typename ValueType>
-std::optional<Asn1Acn::Range<typename ValueType::Type>> Asn1ItemModel::combineRanges(const Asn1Acn::Constraints::ConstraintList<ValueType> &constraintList)
+std::optional<Asn1Acn::Range<typename ValueType::Type>> Asn1ItemModel::combineRanges(
+        const Asn1Acn::Constraints::ConstraintList<ValueType> &constraintList)
 {
     const auto &constraints = constraintList.constraints();
 
-    if(constraints.empty()) {
+    if (constraints.empty()) {
         return std::nullopt;
     }
 
@@ -409,33 +409,39 @@ std::optional<Asn1Acn::Range<typename ValueType::Type>> Asn1ItemModel::combineRa
 }
 
 template<typename ValueType>
-std::optional<Asn1Acn::Range<typename ValueType::Type>> Asn1ItemModel::combineRange(const Asn1Acn::Constraints::Constraint<ValueType> *constraint)
+std::optional<Asn1Acn::Range<typename ValueType::Type>> Asn1ItemModel::combineRange(
+        const Asn1Acn::Constraints::Constraint<ValueType> *constraint)
 {
-    if(const auto *andConstraint = dynamic_cast<const Asn1Acn::Constraints::AndConstraint<ValueType>*>(constraint); andConstraint) {
+    if (const auto *andConstraint = dynamic_cast<const Asn1Acn::Constraints::AndConstraint<ValueType> *>(constraint);
+            andConstraint) {
         const auto leftRange = combineRange<ValueType>(andConstraint->leftChild());
         const auto rightRange = combineRange<ValueType>(andConstraint->rightChild());
 
-        if(!leftRange) {
+        if (!leftRange) {
             return rightRange;
         }
-        if(!rightRange) {
+        if (!rightRange) {
             return leftRange;
         }
 
         return leftRange->intersection(*rightRange);
-    } else if (const auto *orConstraint = dynamic_cast<const Asn1Acn::Constraints::OrConstraint<ValueType>*>(constraint); orConstraint) {
+    } else if (const auto *orConstraint =
+                       dynamic_cast<const Asn1Acn::Constraints::OrConstraint<ValueType> *>(constraint);
+               orConstraint) {
         const auto leftRange = combineRange<ValueType>(andConstraint->leftChild());
         const auto rightRange = combineRange<ValueType>(andConstraint->rightChild());
 
-        if(!leftRange) {
+        if (!leftRange) {
             return rightRange;
         }
-        if(!rightRange) {
+        if (!rightRange) {
             return leftRange;
         }
 
         return leftRange->merge(*rightRange);
-    } else if (const auto *rangeConstraint = dynamic_cast<const Asn1Acn::Constraints::RangeConstraint<ValueType>*>(constraint); rangeConstraint) {
+    } else if (const auto *rangeConstraint =
+                       dynamic_cast<const Asn1Acn::Constraints::RangeConstraint<ValueType> *>(constraint);
+               rangeConstraint) {
         return rangeConstraint->range();
     } else {
         return std::nullopt;
@@ -443,11 +449,12 @@ std::optional<Asn1Acn::Range<typename ValueType::Type>> Asn1ItemModel::combineRa
 }
 
 template<typename ValueType>
-std::optional<Asn1Acn::Range<int64_t>> Asn1ItemModel::combineSizes(const Asn1Acn::Constraints::ConstraintList<ValueType> &constraintList)
+std::optional<Asn1Acn::Range<int64_t>> Asn1ItemModel::combineSizes(
+        const Asn1Acn::Constraints::ConstraintList<ValueType> &constraintList)
 {
     const auto &constraints = constraintList.constraints();
 
-    if(constraints.empty()) {
+    if (constraints.empty()) {
         return std::nullopt;
     }
 
@@ -455,33 +462,39 @@ std::optional<Asn1Acn::Range<int64_t>> Asn1ItemModel::combineSizes(const Asn1Acn
 }
 
 template<typename ValueType>
-std::optional<Asn1Acn::Range<int64_t>> Asn1ItemModel::combineSize(const Asn1Acn::Constraints::Constraint<ValueType> *constraint)
+std::optional<Asn1Acn::Range<int64_t>> Asn1ItemModel::combineSize(
+        const Asn1Acn::Constraints::Constraint<ValueType> *constraint)
 {
-    if(const auto *andConstraint = dynamic_cast<const Asn1Acn::Constraints::AndConstraint<ValueType>*>(constraint); andConstraint) {
+    if (const auto *andConstraint = dynamic_cast<const Asn1Acn::Constraints::AndConstraint<ValueType> *>(constraint);
+            andConstraint) {
         const auto leftSize = combineSize<ValueType>(andConstraint->leftChild());
         const auto rightSize = combineSize<ValueType>(andConstraint->rightChild());
 
-        if(!leftSize) {
+        if (!leftSize) {
             return rightSize;
         }
-        if(!rightSize) {
+        if (!rightSize) {
             return leftSize;
         }
 
         return leftSize->intersection(*rightSize);
-    } else if (const auto *orConstraint = dynamic_cast<const Asn1Acn::Constraints::OrConstraint<ValueType>*>(constraint); orConstraint) {
+    } else if (const auto *orConstraint =
+                       dynamic_cast<const Asn1Acn::Constraints::OrConstraint<ValueType> *>(constraint);
+               orConstraint) {
         const auto leftSize = combineSize<ValueType>(andConstraint->leftChild());
         const auto rightSize = combineSize<ValueType>(andConstraint->rightChild());
 
-        if(!leftSize) {
+        if (!leftSize) {
             return rightSize;
         }
-        if(!rightSize) {
+        if (!rightSize) {
             return leftSize;
         }
 
         return leftSize->merge(*rightSize);
-    } else if (const auto *sizeConstraint = dynamic_cast<const Asn1Acn::Constraints::SizeConstraint<ValueType>*>(constraint); sizeConstraint) {
+    } else if (const auto *sizeConstraint =
+                       dynamic_cast<const Asn1Acn::Constraints::SizeConstraint<ValueType> *>(constraint);
+               sizeConstraint) {
         return combineRange<Asn1Acn::IntegerValue>(sizeConstraint->innerConstraints());
     } else {
         return std::nullopt;

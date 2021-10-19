@@ -26,7 +26,6 @@ const int ASN1TYPE_ROLE = Qt::UserRole;
 const int MIN_RANGE_ROLE = Qt::UserRole + 1;
 const int MAX_RANGE_ROLE = Qt::UserRole + 2;
 const int CHOICE_LIST_ROLE = Qt::UserRole + 3;
-const int OPTIONAL_ROLE = Qt::UserRole + 4;
 
 const int MODEL_NAME_INDEX = 0;
 const int MODEL_TYPE_INDEX = 1;
