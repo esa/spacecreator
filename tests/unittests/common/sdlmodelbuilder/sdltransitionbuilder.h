@@ -36,7 +36,7 @@ namespace tests::common {
 class SdlTransitionBuilder final
 {
 public:
-    SdlTransitionBuilder(QString transitionName = "");
+    explicit SdlTransitionBuilder();
 
     auto build() -> std::unique_ptr<Transition>;
 

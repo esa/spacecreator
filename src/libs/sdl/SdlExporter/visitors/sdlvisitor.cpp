@@ -91,7 +91,7 @@ void SdlVisitor::visit(const Input &input) const
         m_stream << "(";
     }
     for (size_t i = 0; i < numOfInputParameters; i++) {
-        const auto parameter = inputParameters[i].get();
+        const auto parameter = inputParameters[i];
         m_stream << parameter->declaration()->name();
         if (i != numOfInputParameters - 1) {
             m_stream << ", ";
@@ -110,7 +110,7 @@ void SdlVisitor::visit(const Input &input) const
 void SdlVisitor::visit(const Output &output) const
 {
     // write some dummy CIF
-    m_stream << "            /* CIF NEXTSTATE (" << 250 << "," << 150 << "), (" << 150 << ", " << 75 << ") */\n";
+    m_stream << "            /* CIF output (" << 250 << "," << 150 << "), (" << 150 << ", " << 75 << ") */\n";
     m_stream << "            output " << output.name();
     const auto outputParamRef = output.parameter();
     if (outputParamRef != nullptr) {

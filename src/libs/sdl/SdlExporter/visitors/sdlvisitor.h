@@ -98,7 +98,7 @@ public:
     /**
      * @brief   Output visitor
      *
-     * @param   output  output to be visited
+     * @param   output  output to be serialized
      */
     auto visit(const Output &output) const -> void override;
 
@@ -119,7 +119,7 @@ public:
     /**
      * @brief   Variable declaration visitor
      *
-     * @param   declaration   declaration to be visited
+     * @param   declaration   declaration to be serialized
      */
     auto visit(const VariableDeclaration &declaration) const -> void override;
 

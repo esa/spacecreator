@@ -22,9 +22,11 @@
 #include <memory>
 #include <sdl/SdlModel/input.h>
 #include <sdl/SdlModel/transition.h>
+#include <sdl/SdlModel/variablereference.h>
 
 using sdl::Input;
 using sdl::Transition;
+using sdl::VariableReference;
 
 namespace tests::common {
 
@@ -39,7 +41,7 @@ public:
 
     auto withTransition(Transition *transition) -> SdlInputBuilder &;
 
-    auto withParameter(std::unique_ptr<Input::Parameter> parameter) -> SdlInputBuilder &;
+    auto withParameter(VariableReference *parameter) -> SdlInputBuilder &;
 
 private:
     std::unique_ptr<Input> m_input;

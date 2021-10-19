@@ -131,7 +131,7 @@ public:
     /**
      * @brief   Add a variable declaration
      *
-     * @param   variables a pointer to variable declaration
+     * @param   variable a pointer to variable declaration
      */
     auto addVariable(std::unique_ptr<VariableDeclaration> variable) -> void;
 

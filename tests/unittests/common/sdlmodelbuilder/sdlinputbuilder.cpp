@@ -47,9 +47,9 @@ SdlInputBuilder &SdlInputBuilder::withTransition(Transition *transition)
     return *this;
 }
 
-SdlInputBuilder &SdlInputBuilder::withParameter(std::unique_ptr<Input::Parameter> parameter)
+SdlInputBuilder &SdlInputBuilder::withParameter(VariableReference *parameter)
 {
-    m_input->addParameter(std::move(parameter));
+    m_input->addParameter(parameter);
 
     return *this;
 }
