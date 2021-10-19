@@ -148,7 +148,15 @@ void SdlVisitor::visit(const Label &label) const
 
 void SdlVisitor::visit(const Join &join) const
 {
-    (void)join;
+    m_stream << "            /* CIF join (" << 250 << "," << 150 << "), (" << 150 << ", " << 75 << ") */\n";
+    m_stream << "            join ";
+    if (join.label() != nullptr) {
+        m_stream << join.label()->name();
+    } else {
+        m_stream << "MISSING_LABEL";
+        // TODO: throw an exception here?
+    }
+    m_stream << ";\n";
 }
 
 template<typename T>
