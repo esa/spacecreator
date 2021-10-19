@@ -33,30 +33,15 @@ namespace seds::model {
 
 const QString &dataTypeNameStr(const DataType &dataType)
 {
+    const QString *dataTypeName = nullptr;
 
-    switch (dataType.index()) {
-    case 0:
-        return std::get<ArrayDataType>(dataType).nameStr();
-    case 1:
-        return std::get<BinaryDataType>(dataType).nameStr();
-    case 2:
-        return std::get<BooleanDataType>(dataType).nameStr();
-    case 3:
-        return std::get<ContainerDataType>(dataType).nameStr();
-    case 4:
-        return std::get<EnumeratedDataType>(dataType).nameStr();
-    case 5: // NOLINT(readability-magic-numbers)
-        return std::get<FloatDataType>(dataType).nameStr();
-    case 6: // NOLINT(readability-magic-numbers)
-        return std::get<IntegerDataType>(dataType).nameStr();
-    case 7: // NOLINT(readability-magic-numbers)
-        return std::get<StringDataType>(dataType).nameStr();
-    case 8: // NOLINT(readability-magic-numbers)
-        return std::get<SubRangeDataType>(dataType).nameStr();
-    default: {
-        static QString emptyStr("");
+    std::visit([&dataTypeName](auto &&dataType) { dataTypeName = &dataType.nameStr(); }, dataType);
+
+    if (dataTypeName) {
+        return *dataTypeName;
+    } else {
+        static const QString emptyStr = "";
         return emptyStr;
-    }
     }
 }
 
