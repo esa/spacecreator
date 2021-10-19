@@ -50,17 +50,11 @@ void SdlVisitor::visit(const Process &process) const
 
     // TODO: loop over procedures and export them
 
-    // TODO: initial transition (START) must be explicitly stated
-    m_stream << "    /* CIF START (9, 285), (70, 35) */\n"
-                "    START;\n"
-                "        /* CIF NEXTSTATE (9, 335), (70, 35) */\n"
-                "        NEXTSTATE ";
-    if (process.stateMachine() && //
-            !process.stateMachine()->states().empty() && //
-            process.stateMachine()->states()[0]->name() != nullptr) {
-        m_stream << process.stateMachine()->states()[0]->name();
+    if (process.startTransition() != nullptr) {
+        m_stream << "    /* CIF START (9, 285), (70, 35) */\n"
+                    "    START;\n";
+        exportCollection(process.startTransition()->actions());
     }
-    m_stream << ";\n";
     m_stream << "\n";
 
     exportCollection(process.stateMachine()->states());
