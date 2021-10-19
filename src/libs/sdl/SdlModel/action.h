@@ -19,7 +19,6 @@
 
 #pragma once
 
-#include "label.h"
 #include "node.h"
 
 #include <QString>
@@ -60,16 +59,6 @@ public:
      * @brief   Default move assignment operator
      */
     Action &operator=(Action &&) = default;
-
-    /**
-     * @brief   Default move assignment operator
-     *
-     * @param   label  pointer to the label that shall be put before this action
-     */
-    auto setLabel(std::unique_ptr<Label> label) -> void;
-
-private:
-    std::optional<std::unique_ptr<Label>> m_label;
 };
 
 } // namespace sdl

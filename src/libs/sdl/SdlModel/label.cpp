@@ -24,7 +24,7 @@
 namespace sdl {
 
 Label::Label(QString name)
-    : Node(std::move(name))
+    : Action(std::move(name))
 {
 }
 

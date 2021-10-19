@@ -35,6 +35,7 @@
 #include <sdl/SdlExporter/SdlOptions/options.h>
 #include <sdl/SdlExporter/exporter.h>
 #include <sdl/SdlModel/action.h>
+#include <sdl/SdlModel/label.h>
 #include <sdl/SdlModel/nextstate.h>
 #include <sdl/SdlModel/output.h>
 #include <sdl/SdlModel/process.h>
@@ -49,6 +50,7 @@ using conversion::Options;
 using sdl::Action;
 using sdl::ContinuousSignal;
 using sdl::Input;
+using sdl::Label;
 using sdl::NextState;
 using sdl::Output;
 using sdl::Procedure;
@@ -298,11 +300,17 @@ void tst_sdlmodel::testGenerateProcessWithLabelAndJoin()
     QString modelPrefix = "Sdl_";
     QString processName = "ExampleProcess";
 
-    auto transition1 = SdlTransitionBuilder().withAction(std::make_unique<NextState>("")).build();
+    auto transition1 = SdlTransitionBuilder() //
+                               .withAction(std::make_unique<NextState>(""))
+                               .build();
     auto state1 = SdlStateBuilder("Idle").withInput(SdlInputBuilder("sigReset", transition1.get()).build()).build();
 
+    auto fromStartLabel = std::make_unique<Label>("fromStart");
     auto nextStateSame = std::make_unique<NextState>("", state1.get());
-    auto startTransition = SdlTransitionBuilder().withAction(std::move(nextStateSame)).build();
+    auto startTransition = SdlTransitionBuilder() //
+                                   .withAction(std::move(fromStartLabel)) //
+                                   .withAction(std::move(nextStateSame))
+                                   .build();
 
     auto process = SdlProcessBuilder(processName)
                            .withStartTransition(std::move(startTransition))
@@ -342,7 +350,7 @@ void tst_sdlmodel::testGenerateProcessWithLabelAndJoin()
         "NEXTSTATE Idle;",
         "state Idle;",
         "input sigReset;",
-        "join fromStart;"
+        "join fromStart;",
         "endstate;",
         "endprocess ExampleProcess;",
     };
