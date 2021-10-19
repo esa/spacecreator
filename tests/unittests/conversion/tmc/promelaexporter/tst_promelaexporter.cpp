@@ -131,7 +131,8 @@ void tst_PromelaExporter::testUtype()
     basic_types.addField(Declaration(DataType(BasicType::PID), "field_four"));
     basic_types.addField(Declaration(DataType(BasicType::SHORT), "field_five"));
     basic_types.addField(Declaration(DataType(BasicType::INT), "field_six"));
-    basic_types.addField(Declaration(DataType(BasicType::CHAN), "field_seven"));
+    basic_types.addField(Declaration(DataType(BasicType::FLOAT), "field_seven"));
+    basic_types.addField(Declaration(DataType(BasicType::CHAN), "field_eight"));
 
     model.addUtype(basic_types);
 

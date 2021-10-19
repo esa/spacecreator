@@ -31,6 +31,7 @@ enum class BasicType
     PID,
     SHORT,
     INT,
+    FLOAT,
     CHAN
 };
 }

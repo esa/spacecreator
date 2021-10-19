@@ -14,7 +14,8 @@ typedef basic_types {
     pid field_four;
     short field_five;
     int field_six;
-    chan field_seven;
+    float field_seven;
+    chan field_eight;
 }
 
 typedef unsigned_types {

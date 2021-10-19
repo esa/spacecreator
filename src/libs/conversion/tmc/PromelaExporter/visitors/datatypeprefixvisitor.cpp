@@ -74,6 +74,9 @@ void DataTypePrefixVisitor::operator()(const BasicType &type)
     case BasicType::INT:
         m_stream << "int";
         break;
+    case BasicType::FLOAT:
+        m_stream << "float";
+        break;
     case BasicType::CHAN:
         m_stream << "chan";
         break;
