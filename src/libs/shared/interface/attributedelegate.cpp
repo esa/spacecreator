@@ -26,6 +26,7 @@
 #include <QRegularExpression>
 #include <QRegularExpressionValidator>
 #include <QSpinBox>
+#include <QTimer>
 
 namespace shared {
 
@@ -71,29 +72,27 @@ static void setConfiguredEditorData(QWidget *editor, const QVariant &displayValu
     }
 }
 
-template <typename T>
-inline void connectCommitData(T *editor, QAbstractItemDelegate *context) {
-    QObject::connect(editor, &T::editingFinished, context, [context, editor](){
-        context->commitData(editor);
-    });
+template<typename T>
+inline void connectCommitData(T *editor, QAbstractItemDelegate *context)
+{
+    QObject::connect(editor, &T::editingFinished, context, [context, editor]() { context->commitData(editor); });
 }
 
-template <>
-inline void connectCommitData(QCheckBox *editor, QAbstractItemDelegate *context) {
-    QObject::connect(editor, &QCheckBox::stateChanged, context, [context, editor](){
-        context->commitData(editor);
-    });
+template<>
+inline void connectCommitData(QCheckBox *editor, QAbstractItemDelegate *context)
+{
+    QObject::connect(editor, &QCheckBox::stateChanged, context, [context, editor]() { context->commitData(editor); });
 }
 
-template <>
-inline void connectCommitData(QComboBox *editor, QAbstractItemDelegate *context) {
-    QObject::connect(editor, &QComboBox::currentTextChanged, context, [context, editor](){
-        context->commitData(editor);
-    });
+template<>
+inline void connectCommitData(QComboBox *editor, QAbstractItemDelegate *context)
+{
+    QObject::connect(
+            editor, &QComboBox::currentTextChanged, context, [context, editor]() { context->commitData(editor); });
 }
 
-static QWidget *createConfiguredEditor(QAbstractItemDelegate *context,
-        const QString &attribute, const QVariant &editValue, const QVariant &validator, QWidget *parent)
+static QWidget *createConfiguredEditor(QAbstractItemDelegate *context, const QString &attribute,
+        const QVariant &editValue, const QVariant &validator, QWidget *parent)
 {
     if (!editValue.isValid())
         return nullptr;
@@ -160,10 +159,20 @@ QWidget *AttributeDelegate::createEditor(
         QWidget *parent, const QStyleOptionViewItem &option, const QModelIndex &index) const
 {
     if (index.isValid()) {
-        QWidget *editor = createConfiguredEditor(const_cast<AttributeDelegate *>(this), PropertiesListModel::tokenNameFromIndex(index),
-                index.data(PropertiesListModel::EditRole), index.data(PropertiesListModel::ValidatorRole), parent);
+        QWidget *editor = createConfiguredEditor(const_cast<AttributeDelegate *>(this),
+                PropertiesListModel::tokenNameFromIndex(index), index.data(PropertiesListModel::EditRole),
+                index.data(PropertiesListModel::ValidatorRole), parent);
         if (editor) {
             editor->setEnabled(index.flags().testFlag(Qt::ItemIsEnabled));
+        }
+
+        /// Workaroung for #699 because of autoselecting data for QLineEdit after editor creation
+        /// https://code.qt.io/cgit/qt/qtbase.git/tree/src/widgets/itemviews/qabstractitemview.cpp#n4351
+        if (auto lineEdit = qobject_cast<QLineEdit *>(editor)) {
+            QTimer::singleShot(0, lineEdit, [lineEdit, name = PropertiesListModel::tokenNameFromIndex(index)]() {
+                if (QString::compare(name, QLatin1String("name"), Qt::CaseInsensitive))
+                    lineEdit->deselect();
+            });
         }
         return editor;
     }
