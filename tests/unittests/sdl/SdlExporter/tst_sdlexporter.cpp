@@ -226,6 +226,8 @@ void tst_sdlmodel::testGenerateProcessWithTasksVariablesAndParameters()
                                .withNextStateAction(state1.get())
                                .build();
 
+    auto startTransition = SdlTransitionBuilder().withNextStateAction(state1.get()).build();
+
     auto state2 = SdlStateBuilder("Idle")
                           .withInput(SdlInputBuilder()
                                              .withName("some_other_input_name")
@@ -234,17 +236,20 @@ void tst_sdlmodel::testGenerateProcessWithTasksVariablesAndParameters()
                           .withContinuousSignal(std::make_unique<ContinuousSignal>())
                           .build();
 
-    // clang-format off
-    const auto exampleModel = SdlModelBuilder(modelName)
-        .withProcess(SdlProcessBuilder(processName)
+    auto process = SdlProcessBuilder(processName)
+                           .withStartTransition(std::move(startTransition))
                            .withStateMachine(SdlStateMachineBuilder()
                                                      .withState(std::move(state1))
                                                      .withState(std::move(state2))
                                                      .withTransition(std::move(transition1))
                                                      .withTransition(std::move(transition2))
                                                      .build())
-                           .withVariable(std::move(variable)
-                           ).build()
+                           .build();
+
+    // clang-format off
+    const auto exampleModel = SdlModelBuilder(modelName)
+        .withProcess(
+            std::move(process)
         ).build();
     // clang-format on
 
