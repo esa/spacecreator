@@ -82,6 +82,7 @@ private Q_SLOTS:
     void testDefaultValuesInModel();
     void testGenerateProcess();
     void testGenerateProcessWithTasksVariablesAndParameters();
+    void testGenerateProcessWithLabelAndJoin();
 };
 
 void tst_sdlmodel::testDefaultValuesInModel()
@@ -287,6 +288,11 @@ void tst_sdlmodel::testGenerateProcessWithTasksVariablesAndParameters()
         "endprocess ExampleProcess;",
     };
     checkSequenceAndConsume(expectedOutput, consumableOutput);
+}
+
+void tst_sdlmodel::testGenerateProcessWithLabelAndJoin()
+{
+    // TODO
 }
 
 } // namespace tests::sdl
