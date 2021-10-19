@@ -143,6 +143,8 @@ void tst_sdlmodel::testGenerateProcess()
 
     auto referenceOutput = SdlOutputBuilder().withName("referenceOutput").build();
 
+    auto startTransition = SdlTransitionBuilder().withNextStateAction(state1.get()).build();
+
     auto transition2 = SdlTransitionBuilder().withNextStateAction(state1.get()).build();
 
     auto state2 = SdlStateBuilder("Idle")
