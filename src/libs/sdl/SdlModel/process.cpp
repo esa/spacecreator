@@ -30,6 +30,16 @@ Process::Process(QString name, std::unique_ptr<StateMachine> stateMachine)
 {
 }
 
+Transition *Process::startTransition() const
+{
+    return m_startTransition.get();
+}
+
+void Process::setStartTransition(std::unique_ptr<Transition> transition)
+{
+    m_startTransition = std::move(transition);
+}
+
 const StateMachine *Process::stateMachine() const
 {
     return m_stateMachine.get();

@@ -101,6 +101,20 @@ public:
     Process &operator=(Process &&) = default;
 
     /**
+     * @brief Getter for START transition
+     *
+     * @return START transition pointer
+     */
+    auto startTransition() const -> Transition *;
+
+    /**
+     * @brief Setter for START transition
+     *
+     * @param transition  START transition
+     */
+    auto setStartTransition(std::unique_ptr<Transition> transition) -> void;
+
+    /**
      * @brief   Getter for the state machine
      *
      * @return  a const reference to a pointer to the state machine
@@ -155,6 +169,7 @@ public:
     virtual auto accept(Visitor &visitor) const -> void override;
 
 private:
+    std::unique_ptr<Transition> m_startTransition;
     std::unique_ptr<StateMachine> m_stateMachine;
     std::vector<std::unique_ptr<VariableDeclaration>> m_variables;
     std::vector<std::unique_ptr<Procedure>> m_procedures;
