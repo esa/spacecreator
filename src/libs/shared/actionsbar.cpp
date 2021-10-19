@@ -19,6 +19,7 @@
 
 #include <QAction>
 #include <QActionEvent>
+#include <QFrame>
 #include <QToolButton>
 #include <QVBoxLayout>
 
@@ -42,12 +43,18 @@ void ActionsBar::actionEvent(QActionEvent *event)
 
     switch (event->type()) {
     case QEvent::ActionAdded: {
-        auto button = new QToolButton(this);
-        button->setAutoRaise(true);
-        button->setFocusPolicy(Qt::NoFocus);
-        button->setIconSize(m_iconSize);
-        button->setDefaultAction(action);
-        m_layout->insertWidget(m_layout->count() - 1, button);
+        if (action->isSeparator()) {
+            QFrame *line = new QFrame(this);
+            line->setFrameShape(QFrame::HLine);
+            m_layout->insertWidget(m_layout->count() - 1, line);
+        } else {
+            auto button = new QToolButton(this);
+            button->setAutoRaise(true);
+            button->setFocusPolicy(Qt::NoFocus);
+            button->setIconSize(m_iconSize);
+            button->setDefaultAction(action);
+            m_layout->insertWidget(m_layout->count() - 1, button);
+        }
         break;
     }
 
@@ -61,6 +68,13 @@ void ActionsBar::actionEvent(QActionEvent *event)
     default:
         Q_ASSERT_X(false, "ActionsBar::actionEvent", "internal error");
     }
+}
+
+void ActionsBar::addSeparator()
+{
+    QAction *action = new QAction(this);
+    action->setSeparator(true);
+    addAction(action);
 }
 
 }

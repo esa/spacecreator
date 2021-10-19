@@ -149,12 +149,6 @@ bool SpaceCreatorPlugin::initialize(const QStringList &arguments, QString *error
     Core::ActionManager::actionContainer(Core::Constants::M_TOOLS)->addMenu(menu);
 
     // IV
-    m_asn1DialogAction = new QAction(QIcon(QLatin1String(":/toolbar/icns/asn1.png")), tr("Show ASN1 dialog ..."), this);
-    Core::Command *showAsn1Cmd = Core::ActionManager::registerAction(m_asn1DialogAction, Constants::IV_SHOW_ASN1_ID);
-    ive::ActionsManager::registerAction(Q_FUNC_INFO, m_asn1DialogAction, "Asn1", "Edit the ASN1 file");
-    connect(m_asn1DialogAction, &QAction::triggered, this, &SpaceCreatorPlugin::showAsn1Dialog);
-    m_asn1DialogAction->setEnabled(false);
-
     m_actionSaveSceneRender =
             new QAction(QIcon(QLatin1String(":/toolbar/icns/render.svg")), tr("Render Scene..."), this);
     Core::Command *renderCmd = Core::ActionManager::registerAction(m_actionSaveSceneRender, Constants::IV_RENDER_ID);
@@ -183,7 +177,6 @@ bool SpaceCreatorPlugin::initialize(const QStringList &arguments, QString *error
     updateActions();
 
     menu->addSeparator();
-    menu->addAction(showAsn1Cmd);
     menu->addAction(renderCmd);
     menu->addAction(exportElectedCmd);
     menu->addAction(exporttypeCmd);
@@ -205,7 +198,7 @@ bool SpaceCreatorPlugin::initialize(const QStringList &arguments, QString *error
     mscActions << m_showMinimapAction << m_checkInstancesAction << m_checkMessagesAction;
     m_mscFactory = new MscEditorFactory(m_projectsManager, mscActions, this);
     QList<QAction *> ivActions;
-    ivActions << m_asn1DialogAction << m_showMinimapAction << m_showE2EDataflow << m_exportSelectedIV << m_exportIVType
+    ivActions << m_showMinimapAction << m_showE2EDataflow << m_exportSelectedIV << m_exportIVType
               << m_actionSaveSceneRender;
     m_ivFactory = new IVEditorFactory(m_projectsManager, ivActions, this);
     QList<QAction *> dvActions;
@@ -258,13 +251,6 @@ void SpaceCreatorPlugin::showE2EDataflow()
     }
 }
 
-void SpaceCreatorPlugin::showAsn1Dialog()
-{
-    if (auto ivEditor = qobject_cast<spctr::IVQtCEditor *>(Core::EditorManager::currentEditor())) {
-        ivEditor->showAsn1Dialog();
-    }
-}
-
 void SpaceCreatorPlugin::exportSelectedIV()
 {
     if (auto ivEditor = qobject_cast<spctr::IVQtCEditor *>(Core::EditorManager::currentEditor())) {
@@ -298,7 +284,6 @@ void SpaceCreatorPlugin::updateActions()
         isIV = editor->document()->filePath().toString().endsWith("interfaceview.xml", Qt::CaseInsensitive);
     }
     m_messageDeclarationAction->setEnabled(isMsc);
-    m_asn1DialogAction->setEnabled(isIV);
     m_actionSaveSceneRender->setEnabled(isIV);
     m_showMinimapAction->setEnabled(isIV || isMsc);
     m_showE2EDataflow->setEnabled(isIV);

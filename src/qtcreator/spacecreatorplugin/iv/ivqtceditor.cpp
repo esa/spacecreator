@@ -17,7 +17,6 @@
 
 #include "ivqtceditor.h"
 
-#include "asn1dialog.h"
 #include "commands/cmdchangeasn1file.h"
 #include "commandsstack.h"
 #include "endtoend/endtoendview.h"
@@ -84,29 +83,6 @@ QWidget *IVQtCEditor::toolBar()
     }
 
     return m_toolbar;
-}
-
-/*!
-   Show the dialog to display and edit the used ASN1 file
- */
-void IVQtCEditor::showAsn1Dialog()
-{
-    if (ivPlugin().isNull()) {
-        return;
-    }
-
-    IVEditorCorePtr plugin = ivPlugin();
-    ive::Asn1Dialog dialog;
-    QFileInfo fi(plugin->document()->asn1FilePath());
-    dialog.setFile(fi);
-    dialog.show();
-    int result = dialog.exec();
-    if (result == QDialog::Accepted) {
-        if (plugin->document()->asn1FileName() != dialog.fileName()) {
-            auto command = new ive::cmd::CmdChangeAsn1File(plugin->document(), dialog.fileName());
-            plugin->commandsStack()->push(command);
-        }
-    }
 }
 
 void IVQtCEditor::showE2EDataflow(const QStringList &mscFiles)

@@ -17,7 +17,6 @@
 
 #include "dvqtceditor.h"
 
-#include "asn1dialog.h"
 #include "commandsstack.h"
 #include "dveditordocument.h"
 #include "dvmainwidget.h"
@@ -81,18 +80,6 @@ QWidget *DVQtCEditor::toolBar()
     }
 
     return m_toolbar;
-}
-
-/*!
-   Show the dialog to display and edit the used ASN1 file
- */
-void DVQtCEditor::showAsn1Dialog()
-{
-    if (dvPlugin().isNull()) {
-        return;
-    }
-
-    //@todo show asn1 dialog
 }
 
 }

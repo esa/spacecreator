@@ -71,7 +71,6 @@ private Q_SLOTS:
     void showMessageDeclarations();
     void setMinimapVisible(bool visible);
     void showE2EDataflow();
-    void showAsn1Dialog();
     void exportSelectedIV();
     void exportComponentType();
     void updateActions();
@@ -91,7 +90,6 @@ private:
     QAction *m_checkMessagesAction = nullptr;
     QAction *m_checkDvFunctionsAction = nullptr;
     QAction *m_checkDvMessagesAction = nullptr;
-    QAction *m_asn1DialogAction = nullptr;
     QAction *m_actionSaveSceneRender = nullptr;
     QAction *m_showMinimapAction = nullptr;
     QAction *m_showE2EDataflow = nullptr;

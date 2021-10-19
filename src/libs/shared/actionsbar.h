@@ -26,7 +26,7 @@ namespace shared {
 
 /*!
    A simple vertical toolbar
-   New buttons are added using the addAction() function
+   New buttons are added using the QWidget::addAction() function
  */
 class ActionsBar : public QWidget
 {
@@ -34,12 +34,14 @@ class ActionsBar : public QWidget
 public:
     explicit ActionsBar(QWidget *parent = nullptr);
 
+    void addSeparator();
+
 protected:
     void actionEvent(QActionEvent *event) override;
 
 private:
     QVBoxLayout *m_layout = nullptr;
-    QSize m_iconSize = { 32, 32 };
+    QSize m_iconSize = { 22, 22 };
 };
 
 }

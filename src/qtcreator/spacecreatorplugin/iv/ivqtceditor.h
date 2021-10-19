@@ -50,7 +50,6 @@ public:
     QWidget *toolBar() override;
 
 public Q_SLOTS:
-    void showAsn1Dialog();
     void showE2EDataflow(const QStringList &mscFiles);
 
 private:

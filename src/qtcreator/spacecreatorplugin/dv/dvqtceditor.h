@@ -49,9 +49,6 @@ public:
 
     QWidget *toolBar() override;
 
-public Q_SLOTS:
-    void showAsn1Dialog();
-
 private:
     DVEditorDocument *m_document = nullptr;
     QPointer<QToolBar> m_toolbar = nullptr;

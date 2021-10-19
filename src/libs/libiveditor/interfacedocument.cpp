@@ -175,6 +175,9 @@ void InterfaceDocument::init()
     for (QAction *action : qAsConst(d->m_toolbarActions)) {
         ivToolBar->addAction(action);
     }
+    ivToolBar->addSeparator();
+    // add checkers etc.
+
     editorLayout->addWidget(ivToolBar);
     editorLayout->addWidget(editorView);
 
