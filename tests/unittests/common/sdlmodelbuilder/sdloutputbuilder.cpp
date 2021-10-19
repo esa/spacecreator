@@ -40,9 +40,9 @@ SdlOutputBuilder &SdlOutputBuilder::withName(QString name)
     return *this;
 }
 
-SdlOutputBuilder &SdlOutputBuilder::withParameter(std::unique_ptr<VariableReference> parameter)
+SdlOutputBuilder &SdlOutputBuilder::withParameter(VariableReference *parameter)
 {
-    m_output->setParameter(std::move(parameter));
+    m_output->setParameter(parameter);
 
     return *this;
 }

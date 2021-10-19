@@ -74,7 +74,7 @@ public:
      *
      * @param   parameter a pointer to parameter
      */
-    auto setParameter(std::unique_ptr<VariableReference> parameter) -> void;
+    auto setParameter(VariableReference *parameter) -> void;
 
     /**
      * @brief  visitor acceptor (calls visit method of the given visitor)
@@ -82,7 +82,7 @@ public:
     virtual auto accept(Visitor &visitor) const -> void override;
 
 private:
-    std::unique_ptr<VariableReference> m_parameter;
+    VariableReference *m_parameter;
 };
 
 } // namespace sdl

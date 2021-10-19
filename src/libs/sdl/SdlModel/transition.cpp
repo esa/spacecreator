@@ -24,11 +24,6 @@
 
 namespace sdl {
 
-Transition::Transition(std::vector<std::unique_ptr<Action>> actions)
-    : m_actions(std::move(actions))
-{
-}
-
 const std::vector<std::unique_ptr<Action>> &Transition::actions()
 {
     return m_actions;

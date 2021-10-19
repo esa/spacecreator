@@ -134,6 +134,7 @@ void tst_sdlmodel::testGenerateProcess()
     QString processName = "Modemanager";
 
     auto variable = std::make_unique<VariableDeclaration>("howManyLoops", "MyInteger");
+    auto variableReference = VariableReference(variable.get());
 
     auto transition1 = SdlTransitionBuilder()
                                .withOutput(SdlOutputBuilder().withName("parameterlessOutput").build())
@@ -142,17 +143,14 @@ void tst_sdlmodel::testGenerateProcess()
     auto someInput = SdlInputBuilder()
                              .withName("some_input_name")
                              .withTransition(transition1.get())
-                             .withParameter(std::make_unique<VariableReference>(variable.get()))
+                             .withParameter(&variableReference)
                              .build();
     auto state1 = SdlStateBuilder("Looping")
                           .withInput(std::move(someInput))
                           .withContinuousSignal(std::make_unique<ContinuousSignal>())
                           .build();
 
-    auto referenceOutput = SdlOutputBuilder()
-                                   .withName("referenceOutput")
-                                   .withParameter(std::make_unique<VariableReference>(variable.get()))
-                                   .build();
+    auto referenceOutput = SdlOutputBuilder().withName("referenceOutput").withParameter(&variableReference).build();
 
     auto transition2 = SdlTransitionBuilder()
                                .withTask(SdlTaskBuilder().withContents("'EXAMPLE TASK CONTENTS'").build())

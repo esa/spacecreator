@@ -39,8 +39,6 @@ namespace sdl {
 class Input final : public Signal
 {
 public:
-    using Parameter = VariableReference;
-
     /**
      * @brief   Constructor
      *
@@ -93,14 +91,14 @@ public:
      *
      * @return  a reference to vector of pointers to input parameters
      */
-    auto parameters() const -> const std::vector<std::unique_ptr<Parameter>> &;
+    auto parameters() const -> const std::vector<VariableReference *> &;
 
     /**
      * @brief   Setter for the transition
      *
      * @param   parameter  a pointer to input parameter
      */
-    auto addParameter(std::unique_ptr<Parameter> parameter) -> void;
+    auto addParameter(VariableReference *parameter) -> void;
 
     /**
      * @brief  visitor acceptor (calls visit method of the given visitor)
@@ -110,7 +108,7 @@ public:
 private:
     Transition *m_transition;
 
-    std::vector<std::unique_ptr<Parameter>> m_parameters;
+    std::vector<VariableReference *> m_parameters;
 };
 
 } // namespace sdl

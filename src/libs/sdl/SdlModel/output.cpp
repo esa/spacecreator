@@ -25,12 +25,12 @@ namespace sdl {
 
 VariableReference *Output::parameter() const
 {
-    return m_parameter.get();
+    return m_parameter;
 }
 
-void Output::setParameter(std::unique_ptr<VariableReference> parameter)
+void Output::setParameter(VariableReference *parameter)
 {
-    m_parameter = std::move(parameter);
+    m_parameter = parameter;
 }
 
 void Output::accept(Visitor &visitor) const

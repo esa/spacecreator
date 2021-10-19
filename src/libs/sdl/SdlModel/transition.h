@@ -35,13 +35,6 @@ class Transition final
 {
 public:
     /**
-     * @brief   Constructor
-     *
-     * @param   actions reference to the vector of pointers to actions
-     */
-    Transition(std::vector<std::unique_ptr<Action>> actions);
-
-    /**
      * @brief   Default constructor
      */
     Transition() = default;
