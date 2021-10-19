@@ -22,14 +22,11 @@
 
 #include <QPointer>
 #include <QQueue>
-#include <QVariantMap>
 
 class QMenu;
-class QToolBar;
 class QUndoStack;
-class QAbstractItemView;
-class QTreeView;
 class QItemSelection;
+class QItemSelectionModel;
 
 namespace Asn1Acn {
 class Asn1ModelStorage;
@@ -52,14 +49,16 @@ namespace cmd {
 class CommandsStack;
 }
 
+class InterfaceTabGraphicsScene;
+class IVAppWidget;
 class IVExporter;
-class IVItemModel;
-class IVCommentGraphicsItem;
-class IVConnectionGraphicsItem;
 class IVFunctionGraphicsItem;
 class IVFunctionTypeGraphicsItem;
+class IVCommentGraphicsItem;
+class IVConnectionGraphicsItem;
 class IVInterfaceGraphicsItem;
-class InterfaceTabGraphicsScene;
+class IVItemModel;
+class IVVisualizationModelBase;
 
 class InterfaceDocument : public QObject
 {
@@ -71,15 +70,12 @@ public:
     ~InterfaceDocument() override;
 
     void init();
-    QVector<QAction *> initActions();
-
-    void fillToolBar(QToolBar *toolBar);
 
     IVExporter *exporter() const;
 
     QGraphicsScene *scene() const;
     shared::ui::GraphicsViewBase *graphicsView() const;
-    QWidget *view() const;
+    ive::IVAppWidget *view() const;
 
     QUndoStack *undoStack() const;
     cmd::CommandsStack *commandsStack() const;
@@ -104,14 +100,18 @@ public:
 
     bool isDirty() const;
 
-    QString title() const;
-
     QList<QAction *> customActions() const;
 
     QHash<shared::Id, shared::VEObject *> objects() const;
     ivm::IVModel *objectsModel() const;
     ivm::IVModel *importModel() const;
+    ivm::IVModel *sharedModel() const;
     IVItemModel *itemsModel() const;
+
+    IVVisualizationModelBase *visualisationModel() const;
+    QItemSelectionModel *objectsSelectionModel() const;
+    IVVisualizationModelBase *importVisualisationModel() const;
+    IVVisualizationModelBase *sharedVisualisationModel() const;
 
     void setAsn1Check(Asn1Acn::Asn1SystemChecks *check);
     void setIvCheck(ivm::AbstractSystemChecks *checks);
@@ -120,6 +120,8 @@ public:
 
     bool checkInterfaceAsn1Compliance(const ivm::IVInterface *interface) const;
     bool checkAllInterfacesForAsn1Compliance();
+
+    QList<shared::VEObject *> prepareSelectedObjectsForExport(QString &name, bool silent = false);
 
 Q_SIGNALS:
     void dirtyChanged(bool dirty);
@@ -135,8 +137,6 @@ public Q_SLOTS:
     void onColorSchemeMenuInvoked();
     void onDynContextEditorMenuInvoked();
 
-private Q_SLOTS:
-    void onItemClicked(const shared::Id &id);
     void onItemDoubleClicked(const shared::Id &id);
     void onItemCreated(const shared::Id &id);
 
@@ -147,26 +147,11 @@ private Q_SLOTS:
     void importEntity(const shared::Id &id, const QPointF &sceneDropPoint);
     void instantiateEntity(const shared::Id &id, const QPointF &sceneDropPoint);
 
-    void copyItems();
-    void cutItems();
-    void pasteItems();
-    void pasteItems(const QPointF &sceneDropPoint);
-
-    void showContextMenuForIVModel(const QPoint &pos);
-
 private:
     bool exportImpl(QString &targetPath, const QList<shared::VEObject *> &objects);
     bool loadImpl(const QString &path);
     QString getComponentName(const QStringList &exportNames);
-    QList<shared::VEObject *> prepareSelectedObjectsForExport(QString &name, bool silent = false);
     bool loadComponentModel(ivm::IVModel *model, const QString &path);
-
-    QWidget *createGraphicsView();
-    QTreeView *createModelView();
-    QTreeView *createImportView();
-    QTreeView *createSharedView();
-
-    void centerView();
 
     void onSceneSelectionChanged(const QList<shared::Id> &selectedObjects);
     void onViewSelectionChanged(const QItemSelection &selected, const QItemSelection &deselected);

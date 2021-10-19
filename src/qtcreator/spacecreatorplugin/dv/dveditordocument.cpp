@@ -73,6 +73,7 @@ Core::IDocument::OpenResult DVEditorDocument::open(
 #endif
     connect(m_plugin->undoStack(), &QUndoStack::cleanChanged, this, [this](bool) { Q_EMIT changed(); });
     Q_EMIT dvDataLoaded(absfileName, m_plugin);
+    m_plugin->centerOnView();
 
     QMetaObject::invokeMethod(this, "checkForErrors", Qt::QueuedConnection);
 
@@ -162,6 +163,7 @@ bool DVEditorDocument::reload(QString *errorString, ReloadFlag flag, ChangeType 
     bool success = false;
     if (m_plugin) {
         success = m_plugin->appModel()->load(filePath().toString());
+        m_plugin->centerOnView();
     }
     Q_EMIT reloadFinished(success);
     return success;

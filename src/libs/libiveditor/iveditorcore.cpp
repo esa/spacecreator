@@ -30,6 +30,7 @@
 #include "graphicsviewutils.h"
 #include "interfacedocument.h"
 #include "itemeditor/common/ivutils.h"
+#include "ivappwidget.h"
 #include "ivconnection.h"
 #include "ivcore/abstractsystemchecks.h"
 #include "ivcreatortool.h"
@@ -62,13 +63,8 @@ namespace ive {
 IVEditorCore::IVEditorCore(QObject *parent)
     : shared::EditorCore(parent)
     , m_document(new ive::InterfaceDocument(this))
-    , m_docToolBar(new QToolBar)
 {
     m_document->init();
-
-    m_docToolBar->setObjectName("Document ToolBar");
-    m_docToolBar->setAllowedAreas(Qt::AllToolBarAreas);
-    m_docToolBar->setMovable(true);
 
     if (ivm::IVModel *model = document()->objectsModel()) {
         connect(model, &ivm::IVModel::objectsAdded, this, &ive::IVEditorCore::updateIVItems);
@@ -95,7 +91,6 @@ shared::ui::GraphicsViewBase *IVEditorCore::chartView()
 void IVEditorCore::addToolBars(QMainWindow *window)
 {
     window->addToolBar(mainToolBar());
-    window->addToolBar(m_docToolBar);
 }
 
 void IVEditorCore::registerBasicActions()
@@ -453,6 +448,11 @@ ivm::AbstractSystemChecks *IVEditorCore::dvChecks() const
     return m_checks;
 }
 
+void IVEditorCore::centerOnView()
+{
+    m_document->view()->centerView();
+}
+
 /*!
  * \brief Return the list of image formats which the Qt is available to write.
  */
@@ -478,7 +478,7 @@ void IVEditorCore::onSaveRenderRequested()
     dialog.setDefaultSuffix(".png");
     if (dialog.exec() == QDialog::Accepted) {
         const QString fileName = dialog.selectedUrls().value(0).toLocalFile();
-        saveSceneRender(fileName);
+        //        saveSceneRender(fileName);
     }
 }
 

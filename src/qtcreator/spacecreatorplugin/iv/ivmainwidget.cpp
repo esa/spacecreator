@@ -21,6 +21,7 @@
 #include "commandsstack.h"
 #include "errorhub.h"
 #include "interfacedocument.h"
+#include "ivappwidget.h"
 
 #include <QHBoxLayout>
 #include <QMessageBox>

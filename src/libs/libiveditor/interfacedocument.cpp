@@ -27,18 +27,17 @@
 #include "context/action/actionsmanager.h"
 #include "context/action/editor/dynactioneditor.h"
 #include "errorhub.h"
-#include "graphicsviewutils.h"
 #include "interface/objectstreeview.h"
 #include "itemeditor/common/ivutils.h"
 #include "itemeditor/graphicsitemhelpers.h"
 #include "itemeditor/graphicsview.h"
 #include "itemeditor/ivfunctiongraphicsitem.h"
 #include "itemeditor/ivitemmodel.h"
+#include "ivappwidget.h"
 #include "ivcomment.h"
 #include "ivconnection.h"
 #include "ivconnectiongroup.h"
 #include "ivcore/abstractsystemchecks.h"
-#include "ivcreatortool.h"
 #include "ivexporter.h"
 #include "ivfunction.h"
 #include "ivmodel.h"
@@ -50,9 +49,7 @@
 #include "propertytemplatewidget.h"
 
 #include <QAction>
-#include <QApplication>
 #include <QBuffer>
-#include <QClipboard>
 #include <QDebug>
 #include <QDialogButtonBox>
 #include <QDir>
@@ -62,10 +59,8 @@
 #include <QLineEdit>
 #include <QMenu>
 #include <QMessageBox>
-#include <QMimeData>
 #include <QSplitter>
 #include <QStandardPaths>
-#include <QToolBar>
 #include <QUndoStack>
 #include <QVBoxLayout>
 #include <algorithm>
@@ -77,29 +72,17 @@ struct InterfaceDocument::InterfaceDocumentPrivate {
 
     QString filePath;
 
-    QPointer<QWidget> view;
-    ive::GraphicsView *graphicsView { nullptr };
+    IVAppWidget *view = nullptr;
     ivm::IVPropertyTemplateConfig *dynPropConfig { nullptr };
-    QTreeView *objectsView { nullptr };
     IVItemModel *itemsModel { nullptr };
     IVVisualizationModelBase *objectsVisualizationModel { nullptr };
     QItemSelectionModel *objectsSelectionModel { nullptr };
     ivm::IVModel *objectsModel { nullptr };
-    shared::ui::ObjectsTreeView *importView { nullptr };
     ivm::IVModel *importModel { nullptr };
-    shared::ui::ObjectsTreeView *sharedView { nullptr };
+    IVVisualizationModelBase *importVisualisationModel { nullptr };
     ivm::IVModel *sharedModel { nullptr };
+    IVVisualizationModelBase *sharedVisualisationModel { nullptr };
     IVExporter *exporter { nullptr };
-
-    QAction *actCreateConnectionGroup { nullptr };
-    QAction *actRemove { nullptr };
-    QAction *actZoomIn { nullptr };
-    QAction *actZoomOut { nullptr };
-    QAction *actExitToRoot { nullptr };
-    QAction *actExitToParent { nullptr };
-    QVector<QAction *> m_toolbarActions;
-
-    IVCreatorTool *tool { nullptr };
 
     Asn1Acn::Asn1SystemChecks *asnCheck { nullptr };
     ivm::AbstractSystemChecks *ivCheck { nullptr };
@@ -116,8 +99,6 @@ InterfaceDocument::InterfaceDocument(QObject *parent)
     : QObject(parent)
     , d(new InterfaceDocumentPrivate)
 {
-    d->exporter = new IVExporter(this);
-
     d->commandsStack = new cmd::CommandsStack(this);
     connect(d->commandsStack, &cmd::CommandsStack::cleanChanged, this,
             [this](bool clean) { Q_EMIT dirtyChanged(!clean); });
@@ -132,100 +113,44 @@ InterfaceDocument::InterfaceDocument(QObject *parent)
 
 InterfaceDocument::~InterfaceDocument()
 {
-    delete d->view;
     delete d;
 }
 
 void InterfaceDocument::init()
 {
-    if (!d->view.isNull()) {
-        return;
-    }
-
-    d->itemsModel = new IVItemModel(d->objectsModel, d->commandsStack, this);
-    connect(d->itemsModel, &IVItemModel::itemClicked, this, &InterfaceDocument::onItemClicked);
-    connect(d->itemsModel, &IVItemModel::itemDoubleClicked, this, &InterfaceDocument::onItemDoubleClicked);
-    connect(d->itemsModel, &IVItemModel::itemsSelected, this, &InterfaceDocument::onSceneSelectionChanged);
-
-    d->view = new QWidget;
-    auto rootLayout = new QVBoxLayout;
-    rootLayout->setMargin(0);
-    d->view->setLayout(rootLayout);
-
-    QWidget *panelWidget = new QWidget;
-    QVBoxLayout *panelLayout = new QVBoxLayout;
-    panelLayout->setMargin(0);
-    panelWidget->setLayout(panelLayout);
-
-    QSplitter *panelSplitter = new QSplitter(Qt::Vertical, panelWidget);
-    panelSplitter->setHandleWidth(1);
-    panelSplitter->addWidget(createModelView());
-    panelSplitter->addWidget(createImportView());
-    panelSplitter->addWidget(createSharedView());
-    panelLayout->addWidget(panelSplitter);
-
-    QWidget *editorView = createGraphicsView();
-    auto editorWidget = new QWidget;
-    auto editorLayout = new QHBoxLayout;
-    editorLayout->setMargin(0);
-    editorLayout->setSpacing(0);
-    editorWidget->setLayout(editorLayout);
-    auto ivToolBar = new shared::ActionsBar(editorWidget);
-    initActions();
-    for (QAction *action : qAsConst(d->m_toolbarActions)) {
-        ivToolBar->addAction(action);
-    }
-    ivToolBar->addSeparator();
-    // add checkers etc.
-
-    editorLayout->addWidget(ivToolBar);
-    editorLayout->addWidget(editorView);
-
-    auto splitter = new QSplitter(Qt::Horizontal, d->view);
-    splitter->setHandleWidth(1);
-    splitter->addWidget(panelWidget);
-    splitter->addWidget(editorWidget);
-    splitter->setStretchFactor(0, 0);
-    splitter->setStretchFactor(1, 1);
-    rootLayout->addWidget(splitter);
+    // Create view models, as the can't handle filled models at creations
+    itemsModel();
+    visualisationModel();
+    importVisualisationModel();
+    sharedVisualisationModel();
 
     QTimer::singleShot(0, this, &InterfaceDocument::loadAvailableComponents);
 }
 
-void InterfaceDocument::fillToolBar(QToolBar *toolBar)
-{
-    if (toolBar == nullptr) {
-        return;
-    }
-
-    toolBar->setUpdatesEnabled(false);
-    toolBar->clear();
-
-    const QVector<QAction *> &docActions = initActions();
-    for (QAction *action : docActions) {
-        toolBar->addAction(action);
-    }
-
-    toolBar->setUpdatesEnabled(true);
-}
-
 IVExporter *InterfaceDocument::exporter() const
 {
+    if (!d->exporter) {
+        d->exporter = new IVExporter(const_cast<InterfaceDocument *>(this));
+    }
     return d->exporter;
 }
 
 QGraphicsScene *InterfaceDocument::scene() const
 {
-    return d->itemsModel->scene();
+    return itemsModel()->scene();
 }
 
 shared::ui::GraphicsViewBase *InterfaceDocument::graphicsView() const
 {
-    return d->graphicsView;
+    view();
+    return d->view->graphicsView();
 }
 
-QWidget *InterfaceDocument::view() const
+IVAppWidget *InterfaceDocument::view() const
 {
+    if (!d->view) {
+        d->view = new IVAppWidget(const_cast<InterfaceDocument *>(this));
+    }
     return d->view;
 }
 
@@ -509,15 +434,6 @@ bool InterfaceDocument::isDirty() const
     return d->commandsStack && !d->commandsStack->isClean();
 }
 
-QString InterfaceDocument::title() const
-{
-    const QString fileName = QFileInfo(path()).fileName();
-    if (fileName.isEmpty()) {
-        return tr("Untitled");
-    }
-    return fileName;
-}
-
 QList<QAction *> InterfaceDocument::customActions() const
 {
     QList<QAction *> actions;
@@ -555,9 +471,69 @@ ivm::IVModel *InterfaceDocument::importModel() const
     return d->importModel;
 }
 
+ivm::IVModel *InterfaceDocument::sharedModel() const
+{
+    return d->sharedModel;
+}
+
 IVItemModel *InterfaceDocument::itemsModel() const
 {
+    if (!d->itemsModel) {
+        d->itemsModel = new IVItemModel(d->objectsModel, d->commandsStack, const_cast<InterfaceDocument *>(this));
+        connect(d->itemsModel, &IVItemModel::itemDoubleClicked, this, &InterfaceDocument::onItemDoubleClicked);
+        connect(d->itemsModel, &IVItemModel::itemsSelected, this, &InterfaceDocument::onSceneSelectionChanged);
+    }
+
     return d->itemsModel;
+}
+
+IVVisualizationModelBase *InterfaceDocument::visualisationModel() const
+{
+    if (!d->objectsVisualizationModel) {
+        d->objectsVisualizationModel =
+                new IVVisualizationModel(d->objectsModel, d->commandsStack, const_cast<InterfaceDocument *>(this));
+        auto headerItem = new QStandardItem(tr("IV Structure"));
+        headerItem->setTextAlignment(Qt::AlignCenter);
+        d->objectsVisualizationModel->setHorizontalHeaderItem(0, headerItem);
+    }
+
+    return d->objectsVisualizationModel;
+}
+
+QItemSelectionModel *InterfaceDocument::objectsSelectionModel() const
+{
+    if (!d->objectsSelectionModel) {
+        d->objectsSelectionModel = new QItemSelectionModel(visualisationModel(), const_cast<InterfaceDocument *>(this));
+        connect(d->objectsSelectionModel, &QItemSelectionModel::selectionChanged, this,
+                &InterfaceDocument::onViewSelectionChanged);
+    }
+    return d->objectsSelectionModel;
+}
+
+IVVisualizationModelBase *InterfaceDocument::importVisualisationModel() const
+{
+    if (!d->importVisualisationModel) {
+        d->importVisualisationModel = new IVVisualizationModelBase(importModel(), d->commandsStack,
+                shared::DropData::Type::ImportableType, const_cast<InterfaceDocument *>(this));
+        auto headerItem = new QStandardItem(tr("Import Component"));
+        headerItem->setTextAlignment(Qt::AlignCenter);
+        d->importVisualisationModel->setHorizontalHeaderItem(0, headerItem);
+    }
+
+    return d->importVisualisationModel;
+}
+
+IVVisualizationModelBase *InterfaceDocument::sharedVisualisationModel() const
+{
+    if (!d->sharedVisualisationModel) {
+        d->sharedVisualisationModel = new IVVisualizationModelBase(sharedModel(), d->commandsStack,
+                shared::DropData::Type::InstantiatableType, const_cast<InterfaceDocument *>(this));
+        auto headerItem = new QStandardItem(tr("Shared Types"));
+        headerItem->setTextAlignment(Qt::AlignCenter);
+        d->sharedVisualisationModel->setHorizontalHeaderItem(0, headerItem);
+    }
+
+    return d->sharedVisualisationModel;
 }
 
 void InterfaceDocument::setAsn1Check(Asn1Acn::Asn1SystemChecks *check)
@@ -649,12 +625,9 @@ void InterfaceDocument::setObjects(const QVector<ivm::IVObject *> &objects)
 {
     d->objectsModel->initFromObjects(objects);
     d->objectsModel->setRootObject({});
-    centerView();
-}
-
-void InterfaceDocument::onItemClicked(const shared::Id &id)
-{
-    Q_UNUSED(id)
+    if (d->view) {
+        d->view->centerView();
+    }
 }
 
 void InterfaceDocument::onItemDoubleClicked(const shared::Id &id)
@@ -667,7 +640,7 @@ void InterfaceDocument::onItemDoubleClicked(const shared::Id &id)
         if (entity->isFunction()) {
             if (auto fn = entity->as<ivm::IVFunction *>()) {
                 if (fn->hasNestedChildren()) {
-                    d->itemsModel->changeRootItem(id);
+                    itemsModel()->changeRootItem(id);
                     return;
                 }
             }
@@ -700,7 +673,7 @@ void InterfaceDocument::onDataTypesMenuInvoked()
 
 void InterfaceDocument::prepareEntityNameForEditing(const shared::Id &id)
 {
-    if (auto entity = d->itemsModel->getItem(id)) {
+    if (auto entity = itemsModel()->getItem(id)) {
         if (auto iObj = qobject_cast<shared::ui::VEInteractiveObject *>(entity->toGraphicsObject())) {
             iObj->enableEditMode();
         }
@@ -730,7 +703,6 @@ void InterfaceDocument::showPropertyEditor(const shared::Id &id)
 {
     Q_ASSERT(d->asnCheck);
     Q_ASSERT(d->commandsStack);
-    Q_ASSERT(d->graphicsView);
     if (id.isNull()) {
         return;
     }
@@ -740,7 +712,7 @@ void InterfaceDocument::showPropertyEditor(const shared::Id &id)
         return;
     }
 
-    ive::IVPropertiesDialog dialog(d->dynPropConfig, obj, d->ivCheck, d->asnCheck, d->commandsStack, d->graphicsView);
+    ive::IVPropertiesDialog dialog(d->dynPropConfig, obj, d->ivCheck, d->asnCheck, d->commandsStack, graphicsView());
     dialog.init();
     dialog.exec();
 }
@@ -777,7 +749,7 @@ void InterfaceDocument::importEntity(const shared::Id &id, const QPointF &sceneD
         return;
     }
 
-    if (!d->exporter->exportObjects({ obj }, &buffer)) {
+    if (!exporter()->exportObjects({ obj }, &buffer)) {
         shared::ErrorHub::addError(shared::ErrorItem::Error, tr("Error during component export"));
         return;
     }
@@ -803,97 +775,6 @@ void InterfaceDocument::instantiateEntity(const shared::Id &id, const QPointF &s
     auto cmdInstantiate = new cmd::CmdEntitiesInstantiate(
             obj->as<ivm::IVFunctionType *>(), parentObject, d->objectsModel, sceneDropPoint);
     d->commandsStack->push(cmdInstantiate);
-}
-
-void InterfaceDocument::copyItems()
-{
-    QBuffer buffer;
-    if (!buffer.open(QIODevice::WriteOnly)) {
-        shared::ErrorHub::addError(
-                shared::ErrorItem::Error, tr("Can't open buffer for exporting: %1").arg(buffer.errorString()), "");
-        return;
-    }
-
-    QString name;
-    const QList<shared::VEObject *> objects = prepareSelectedObjectsForExport(name, true);
-    if (!d->exporter->exportObjects(objects, &buffer)) {
-        shared::ErrorHub::addError(shared::ErrorItem::Error, tr("Error during component export"));
-        return;
-    }
-    buffer.close();
-    QApplication::clipboard()->setText(QString::fromUtf8(buffer.data()));
-}
-
-void InterfaceDocument::cutItems()
-{
-    copyItems();
-    d->tool->removeSelectedItems();
-}
-
-void InterfaceDocument::pasteItems(const QPointF &sceneDropPoint)
-{
-    const QByteArray data = QApplication::clipboard()->text().toUtf8();
-    if (data.isEmpty()) {
-        return;
-    }
-
-    QGraphicsItem *itemAtScenePos = scene()->itemAt(sceneDropPoint, graphicsView()->transform());
-    while (itemAtScenePos && itemAtScenePos->type() != IVFunctionGraphicsItem::Type) {
-        itemAtScenePos = itemAtScenePos->parentItem();
-    }
-    ivm::IVFunctionType *parentObject = gi::functionObject(itemAtScenePos);
-    auto cmdImport = new cmd::CmdEntitiesImport(
-            data, parentObject, d->objectsModel, sceneDropPoint, QFileInfo(path()).absolutePath());
-    d->commandsStack->push(cmdImport);
-}
-
-void InterfaceDocument::pasteItems()
-{
-    const QPoint viewportCursorPos = graphicsView()->viewport()->mapFromGlobal(QCursor::pos());
-    QPointF sceneDropPoint;
-    if (graphicsView()
-                    ->viewport()
-                    ->rect()
-                    .marginsRemoved(shared::graphicsviewutils::kContentMargins.toMargins())
-                    .contains(viewportCursorPos)) {
-        sceneDropPoint = graphicsView()->mapToScene(viewportCursorPos);
-    }
-    pasteItems(sceneDropPoint);
-}
-
-void InterfaceDocument::showContextMenuForIVModel(const QPoint &pos)
-{
-    const QModelIndex idx = d->objectsView->indexAt(pos);
-    if (!idx.isValid()) {
-        return;
-    }
-
-    const auto obj =
-            d->objectsModel->getObject(idx.data(static_cast<int>(ive::IVVisualizationModelBase::IdRole)).toUuid());
-    if (!obj) {
-        return;
-    }
-    QList<QAction *> actions;
-
-    if (obj->type() == ivm::IVObject::Type::Function || obj->type() == ivm::IVObject::Type::FunctionType) {
-        QAction *actExportSelectedEntities = new QAction(tr("Export selected entities"));
-        connect(actExportSelectedEntities, &QAction::triggered, this, &InterfaceDocument::exportSelectedFunctions);
-        actions.append(actExportSelectedEntities);
-        ActionsManager::registerAction(
-                Q_FUNC_INFO, actExportSelectedEntities, "Export selected entities", "Export selected entities");
-    }
-
-    if (obj->type() == ivm::IVObject::Type::FunctionType) {
-        QAction *actExportSelectedSharedType = new QAction(tr("Export component type"));
-        connect(actExportSelectedSharedType, &QAction::triggered, this, &InterfaceDocument::exportSelectedType);
-        actions.append(actExportSelectedSharedType);
-        ActionsManager::registerAction(
-                Q_FUNC_INFO, actExportSelectedSharedType, "Export component type", "Export component type");
-    }
-
-    QMenu *menu = new QMenu;
-    menu->addActions(actions);
-    menu->exec(d->objectsView->mapToGlobal(pos));
 }
 
 static inline bool exportObjects(
@@ -998,7 +879,7 @@ bool InterfaceDocument::exportImpl(QString &targetPath, const QList<shared::VEOb
         (*it)->setEntityAttribute(ivm::meta::Props::token(ivm::meta::Props::Token::name), targetDir.dirName());
     }
 
-    if (!exportObjects(d->exporter, objects, targetDir.filePath(shared::kDefaultInterfaceViewFileName))) {
+    if (!exportObjects(exporter(), objects, targetDir.filePath(shared::kDefaultInterfaceViewFileName))) {
         return false;
     }
 
@@ -1043,262 +924,6 @@ bool InterfaceDocument::loadImpl(const QString &path)
     return true;
 }
 
-QVector<QAction *> InterfaceDocument::initActions()
-{
-    if (d->tool != nullptr) {
-        return d->m_toolbarActions;
-    }
-
-    auto actionGroup = new QActionGroup(this);
-    actionGroup->setExclusive(true);
-
-    d->tool = new IVCreatorTool(this);
-    connect(d->tool, &IVCreatorTool::created, this, [this, actionGroup]() {
-        if (QAction *currentAction = actionGroup->checkedAction())
-            currentAction->setChecked(false);
-        d->tool->setCurrentToolType(IVCreatorTool::ToolType::Pointer);
-    });
-    connect(d->tool, &IVCreatorTool::functionCreated, this, &InterfaceDocument::prepareEntityNameForEditing,
-            Qt::QueuedConnection);
-    connect(d->tool, &IVCreatorTool::propertyEditorRequest, this, &InterfaceDocument::showPropertyEditor,
-            Qt::QueuedConnection);
-    connect(d->tool, &IVCreatorTool::informUser, this, &InterfaceDocument::showInfoMessage);
-    connect(d->tool, &IVCreatorTool::copyActionTriggered, this, &InterfaceDocument::copyItems);
-    connect(d->tool, &IVCreatorTool::cutActionTriggered, this, &InterfaceDocument::cutItems);
-    connect(d->tool, &IVCreatorTool::pasteActionTriggered, this,
-            qOverload<const QPointF &>(&InterfaceDocument::pasteItems));
-
-    auto actCreateFunctionType = new QAction(tr("Function Type"));
-    ActionsManager::registerAction(Q_FUNC_INFO, actCreateFunctionType, "Function Type", "Create FunctionType object");
-    actCreateFunctionType->setCheckable(true);
-    actCreateFunctionType->setActionGroup(actionGroup);
-    connect(actCreateFunctionType, &QAction::triggered, this, [this]() {
-        d->tool->setCurrentToolType(IVCreatorTool::ToolType::FunctionType);
-        qWarning() << Q_FUNC_INFO << "Not implemented yet.";
-    });
-    actCreateFunctionType->setIcon(QIcon(":/toolbar/icns/function_type.svg"));
-
-    auto actCreateFunction = new QAction(tr("Function"));
-    ActionsManager::registerAction(Q_FUNC_INFO, actCreateFunction, "Function", "Create Function object");
-    actCreateFunction->setCheckable(true);
-    actCreateFunction->setActionGroup(actionGroup);
-    connect(actCreateFunction, &QAction::triggered, this,
-            [this]() { d->tool->setCurrentToolType(IVCreatorTool::ToolType::Function); });
-    actCreateFunction->setIcon(QIcon(":/toolbar/icns/function.svg"));
-
-    auto actCreateProvidedInterface = new QAction(tr("Provided Interface"));
-    ActionsManager::registerAction(
-            Q_FUNC_INFO, actCreateProvidedInterface, "Provided Interface", "Create Provided Interface object");
-    actCreateProvidedInterface->setCheckable(true);
-    actCreateProvidedInterface->setActionGroup(actionGroup);
-    connect(actCreateProvidedInterface, &QAction::triggered, this,
-            [this]() { d->tool->setCurrentToolType(IVCreatorTool::ToolType::ProvidedInterface); });
-    actCreateProvidedInterface->setIcon(QIcon(":/toolbar/icns/pi.svg"));
-
-    auto actCreateRequiredInterface = new QAction(tr("Required Interface"));
-    ActionsManager::registerAction(
-            Q_FUNC_INFO, actCreateRequiredInterface, "Required Interface", "Create Required Interface object");
-    actCreateRequiredInterface->setCheckable(true);
-    actCreateRequiredInterface->setActionGroup(actionGroup);
-    connect(actCreateRequiredInterface, &QAction::triggered, this,
-            [this]() { d->tool->setCurrentToolType(IVCreatorTool::ToolType::RequiredInterface); });
-    actCreateRequiredInterface->setIcon(QIcon(":/toolbar/icns/ri.svg"));
-
-    auto actCreateComment = new QAction(tr("Comment"));
-    ActionsManager::registerAction(Q_FUNC_INFO, actCreateComment, "Comment", "Create Comment object");
-    actCreateComment->setCheckable(true);
-    actCreateComment->setActionGroup(actionGroup);
-    connect(actCreateComment, &QAction::triggered, this,
-            [this]() { d->tool->setCurrentToolType(IVCreatorTool::ToolType::Comment); });
-    actCreateComment->setIcon(QIcon(":/toolbar/icns/comment.svg"));
-
-    auto actCreateConnection = new QAction(tr("Connection"));
-    ActionsManager::registerAction(Q_FUNC_INFO, actCreateConnection, "Connection", "Create Connection object");
-    actCreateConnection->setCheckable(true);
-    actCreateConnection->setActionGroup(actionGroup);
-    connect(actCreateConnection, &QAction::triggered, this,
-            [this]() { d->tool->setCurrentToolType(IVCreatorTool::ToolType::MultiPointConnection); });
-    actCreateConnection->setIcon(QIcon(":/toolbar/icns/connection.svg"));
-
-    d->actCreateConnectionGroup = new QAction(tr("Create Connection Group"));
-    ActionsManager::registerAction(
-            Q_FUNC_INFO, d->actCreateConnectionGroup, "Connection Group", "Create Connection group");
-    d->actCreateConnectionGroup->setActionGroup(actionGroup);
-    connect(d->actCreateConnectionGroup, &QAction::triggered, this, [this]() { d->tool->groupSelectedItems(); });
-    d->actCreateConnectionGroup->setIcon(QIcon(":/toolbar/icns/connection_group.svg"));
-
-    d->actRemove = new QAction(tr("Remove"));
-    ActionsManager::registerAction(Q_FUNC_INFO, d->actRemove, "Remove", "Remove selected object");
-    d->actRemove->setIcon(QIcon(QLatin1String(":/toolbar/icns/delete.svg")));
-    d->actRemove->setEnabled(false);
-    d->actRemove->setShortcut(QKeySequence::Delete);
-    connect(d->actRemove, &QAction::triggered, this, [this]() { d->tool->removeSelectedItems(); });
-
-    d->actZoomIn = new QAction(tr("Zoom In"));
-    ActionsManager::registerAction(Q_FUNC_INFO, d->actZoomIn, "Zoom In", "Scale up the current scene");
-    d->actZoomIn->setIcon(QIcon(QLatin1String(":/toolbar/icns/zoom_in.svg")));
-    d->actZoomIn->setShortcut(QKeySequence::ZoomIn);
-    connect(d->actZoomIn, &QAction::triggered, this,
-            [this]() { d->graphicsView->setZoom(d->graphicsView->zoom() + d->graphicsView->zoomStepPercent()); });
-
-    d->actZoomOut = new QAction(tr("Zoom Out"));
-    ActionsManager::registerAction(Q_FUNC_INFO, d->actZoomOut, "Zoom Out", "Scale down the current scene");
-    d->actZoomOut->setIcon(QIcon(QLatin1String(":/toolbar/icns/zoom_out.svg")));
-    d->actZoomOut->setShortcut(QKeySequence::ZoomOut);
-    connect(d->actZoomOut, &QAction::triggered, this,
-            [this]() { d->graphicsView->setZoom(d->graphicsView->zoom() - d->graphicsView->zoomStepPercent()); });
-
-    d->actExitToRoot = new QAction(tr("Exit to root function"));
-    d->actExitToRoot->setActionGroup(actionGroup);
-    d->actExitToRoot->setEnabled(false);
-    connect(d->actExitToRoot, &QAction::triggered, this, [this]() { d->itemsModel->changeRootItem({}); });
-    d->actExitToRoot->setIcon(QIcon(":/toolbar/icns/exit.svg"));
-
-    d->actExitToParent = new QAction(tr("Exit to parent function"));
-    d->actExitToParent->setActionGroup(actionGroup);
-    d->actExitToParent->setEnabled(false);
-    connect(d->actExitToParent, &QAction::triggered, this, [this]() {
-        ivm::IVObject *parentObject =
-                d->objectsModel->rootObject() ? d->objectsModel->rootObject()->parentObject() : nullptr;
-        d->itemsModel->changeRootItem(parentObject ? parentObject->id() : shared::InvalidId);
-    });
-    d->actExitToParent->setIcon(QIcon(":/toolbar/icns/exit_parent.svg"));
-
-    d->m_toolbarActions = { actCreateFunctionType, actCreateFunction, actCreateProvidedInterface,
-        actCreateRequiredInterface, actCreateComment, actCreateConnection, d->actCreateConnectionGroup, d->actRemove,
-        d->actZoomIn, d->actZoomOut, d->actExitToRoot, d->actExitToParent };
-
-    connect(d->objectsModel, &ivm::IVModel::rootObjectChanged, this, [this](const shared::Id &rootId) {
-        if (d->actExitToRoot) {
-            d->actExitToRoot->setEnabled(nullptr != d->objectsModel->rootObject());
-        }
-        if (d->actExitToParent) {
-            d->actExitToParent->setEnabled(nullptr != d->objectsModel->rootObject());
-        }
-        centerView();
-    });
-    connect(d->objectsSelectionModel, &QItemSelectionModel::selectionChanged, this,
-            [this](const QItemSelection &selected, const QItemSelection & /*deselected*/) {
-                d->actRemove->setEnabled(!selected.isEmpty());
-                const QModelIndexList idxs = selected.indexes();
-                auto it = std::find_if(idxs.cbegin(), idxs.cend(), [](const QModelIndex &index) {
-                    return index.data(static_cast<int>(ive::IVVisualizationModelBase::TypeRole)).toInt()
-                            == static_cast<int>(ivm::IVObject::Type::Connection);
-                });
-                d->actCreateConnectionGroup->setEnabled(it != std::cend(idxs));
-            });
-    return d->m_toolbarActions;
-}
-
-QWidget *InterfaceDocument::createGraphicsView()
-{
-    if (!d->graphicsView) {
-        d->graphicsView = new ive::GraphicsView;
-        connect(d->graphicsView, &ive::GraphicsView::zoomChanged, this, [this](qreal percent) {
-            d->itemsModel->zoomChanged();
-            d->actZoomIn->setEnabled(!qFuzzyCompare(percent, d->graphicsView->maxZoomPercent()));
-            d->actZoomOut->setEnabled(!qFuzzyCompare(percent, d->graphicsView->minZoomPercent()));
-        });
-
-        connect(d->graphicsView, &GraphicsView::importEntity, this, &InterfaceDocument::importEntity);
-        connect(d->graphicsView, &GraphicsView::instantiateEntity, this, &InterfaceDocument::instantiateEntity);
-        connect(d->graphicsView, &GraphicsView::copyItems, this, &InterfaceDocument::copyItems);
-        connect(d->graphicsView, &GraphicsView::cutItems, this, &InterfaceDocument::cutItems);
-        connect(d->graphicsView, &GraphicsView::pasteItems, this, qOverload<>(&InterfaceDocument::pasteItems));
-    }
-    d->graphicsView->setScene(d->itemsModel->scene());
-    d->graphicsView->setUpdatesEnabled(false);
-    d->itemsModel->updateSceneRect();
-    d->graphicsView->setUpdatesEnabled(true);
-    return d->graphicsView;
-}
-
-QTreeView *InterfaceDocument::createModelView()
-{
-    if (d->objectsView)
-        return d->objectsView;
-
-    d->objectsView = new QTreeView;
-    d->objectsView->setObjectName(QLatin1String("IVModelView"));
-    d->objectsView->setSelectionBehavior(QAbstractItemView::SelectionBehavior::SelectItems);
-    d->objectsView->setSelectionMode(QAbstractItemView::SelectionMode::ExtendedSelection);
-    d->objectsView->setContextMenuPolicy(Qt::ContextMenuPolicy::CustomContextMenu);
-    connect(d->objectsView, &QTreeView::customContextMenuRequested, this,
-            &InterfaceDocument::showContextMenuForIVModel);
-
-    d->objectsVisualizationModel = new IVVisualizationModel(d->objectsModel, d->commandsStack, d->objectsView);
-    auto headerItem = new QStandardItem(tr("IV Structure"));
-    headerItem->setTextAlignment(Qt::AlignCenter);
-    d->objectsVisualizationModel->setHorizontalHeaderItem(0, headerItem);
-    d->objectsView->setModel(d->objectsVisualizationModel);
-
-    d->objectsSelectionModel = new QItemSelectionModel(d->objectsVisualizationModel, d->objectsView);
-    connect(d->objectsSelectionModel, &QItemSelectionModel::selectionChanged, this,
-            &InterfaceDocument::onViewSelectionChanged);
-    d->objectsView->setSelectionModel(d->objectsSelectionModel);
-
-    return d->objectsView;
-}
-
-QTreeView *InterfaceDocument::createImportView()
-{
-    if (d->importView)
-        return d->importView;
-
-    d->importView = new shared::ui::ObjectsTreeView;
-    d->importView->setObjectName(QLatin1String("ImportView"));
-    d->importView->setSelectionBehavior(QAbstractItemView::SelectionBehavior::SelectItems);
-    d->importView->setSelectionMode(QAbstractItemView::SelectionMode::SingleSelection);
-    d->importView->setEditTriggers(QAbstractItemView::EditTrigger::NoEditTriggers);
-    auto sourceModel = new IVVisualizationModelBase(
-            d->importModel, d->commandsStack, shared::DropData::Type::ImportableType, d->importView);
-    auto headerItem = new QStandardItem(tr("Import Component"));
-    headerItem->setTextAlignment(Qt::AlignCenter);
-    sourceModel->setHorizontalHeaderItem(0, headerItem);
-    d->importView->setModel(sourceModel);
-
-    return d->importView;
-}
-
-QTreeView *InterfaceDocument::createSharedView()
-{
-    if (d->sharedView)
-        return d->sharedView;
-
-    d->sharedView = new shared::ui::ObjectsTreeView;
-    d->sharedView->setObjectName(QLatin1String("SharedView"));
-    d->sharedView->setSelectionBehavior(QAbstractItemView::SelectionBehavior::SelectItems);
-    d->sharedView->setSelectionMode(QAbstractItemView::SelectionMode::SingleSelection);
-    d->sharedView->setEditTriggers(QAbstractItemView::EditTrigger::NoEditTriggers);
-    auto sourceModel = new IVVisualizationModelBase(
-            d->sharedModel, d->commandsStack, shared::DropData::Type::InstantiatableType, d->sharedView);
-    auto headerItem = new QStandardItem(tr("Shared Types"));
-    headerItem->setTextAlignment(Qt::AlignCenter);
-    sourceModel->setHorizontalHeaderItem(0, headerItem);
-    d->sharedView->setModel(sourceModel);
-
-    return d->sharedView;
-}
-
-void InterfaceDocument::centerView()
-{
-    if (!d->graphicsView) {
-        return;
-    }
-
-    if (const QGraphicsItem *item = d->itemsModel->getItem(d->objectsModel->rootObjectId())) {
-        d->graphicsView->centerOn(item->sceneBoundingRect().center());
-    } else {
-        QRectF rect;
-        for (auto item : d->graphicsView->scene()->items()) {
-            if (item->type() > QGraphicsItem::UserType) {
-                rect |= item->sceneBoundingRect();
-            }
-        }
-        d->graphicsView->centerOn(rect.center());
-    }
-}
-
 void InterfaceDocument::showNIYGUI(const QString &title)
 {
     QString header = title.isEmpty() ? "NIY" : title;
@@ -1332,7 +957,7 @@ void InterfaceDocument::onViewSelectionChanged(const QItemSelection &selected, c
 {
     auto updateSelection = [this](const QItemSelection &selection, bool value) {
         for (const QModelIndex &idx : selection.indexes()) {
-            if (auto graphicsItem = d->itemsModel->getItem(idx.data(IVVisualizationModelBase::IdRole).toUuid())) {
+            if (auto graphicsItem = itemsModel()->getItem(idx.data(IVVisualizationModelBase::IdRole).toUuid())) {
                 graphicsItem->setSelected(value);
             }
         }

@@ -27,6 +27,7 @@
 #include "errorhub.h"
 #include "interfacedocument.h"
 #include "itemeditor/common/ivutils.h"
+#include "ivappwidget.h"
 #include "iveditorcore.h"
 #include "ivexporter.h"
 #include "ivfunctiontype.h"
@@ -92,7 +93,6 @@ MainWindow::MainWindow(ive::IVEditorCore *core, QWidget *parent)
 
     initMenus();
 
-    m_core->document()->fillToolBar(m_core->docToolBar());
     if (auto view = m_core->chartView()) {
         m_zoomCtrl->setView(view);
         connect(view, &ive::GraphicsView::mouseMoved, this, &MainWindow::onGraphicsViewInfo, Qt::UniqueConnection);
@@ -323,7 +323,11 @@ void MainWindow::onGraphicsViewInfo(const QString &info)
 
 void MainWindow::updateWindowTitle()
 {
-    setWindowTitle(QString("Interface View Editor [%1][*]").arg(m_core->document()->title()));
+    QString fileName = QFileInfo(m_core->document()->path()).fileName();
+    if (fileName.isEmpty()) {
+        fileName = tr("Untitled");
+    }
+    setWindowTitle(QString("Interface View Editor [%1][*]").arg(fileName));
 }
 
 /*!

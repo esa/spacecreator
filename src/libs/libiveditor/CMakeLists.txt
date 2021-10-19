@@ -125,6 +125,9 @@ target_sources(${LIB_NAME} PRIVATE
     itemeditor/ivinterfacegroupgraphicsitem.h
     itemeditor/ivitemmodel.cpp
     itemeditor/ivitemmodel.h
+    ivappwidget.cpp
+    ivappwidget.h
+    ivappwidget.ui
     ivconnectiongroupmodel.cpp
     ivconnectiongroupmodel.h
     ivcreatortool.cpp

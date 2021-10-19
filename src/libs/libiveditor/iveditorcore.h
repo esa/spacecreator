@@ -52,8 +52,6 @@ public:
 
     void registerBasicActions();
 
-    QToolBar *docToolBar() { return m_docToolBar; }
-
     void populateCommandLineArguments(shared::CommandLineParser *parser) const override;
 
     QAction *actionExportFunctions();
@@ -86,6 +84,8 @@ public:
     void setDvChecks(ivm::AbstractSystemChecks *checks);
     ivm::AbstractSystemChecks *dvChecks() const;
 
+    void centerOnView();
+
 public Q_SLOTS:
     void onSaveRenderRequested();
 
@@ -99,8 +99,6 @@ private:
     QUrl helpPage() const override;
 
     ive::InterfaceDocument *m_document { nullptr };
-
-    QToolBar *m_docToolBar { nullptr };
 
     QAction *m_actionExportFunctions { nullptr };
     QAction *m_actionExportType { nullptr };
