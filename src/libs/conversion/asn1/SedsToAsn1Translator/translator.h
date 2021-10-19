@@ -91,15 +91,25 @@ private:
      * @return  Result ASN.1 file
      */
     auto translatePackage(const seds::model::Package &package) const -> std::unique_ptr<Asn1Acn::File>;
-
     /**
      * @brief   Translate SEDS data types
      *
      * @param   dataTypes       Vector of data types to translate
      * @param   definitions     Where translated data types should be added
      */
-    auto translateDataTypes(
-            const std::vector<seds::model::DataType> &dataTypes, Asn1Acn::Definitions *definitions) const -> void;
+    auto translateDataTypes(const std::vector<const seds::model::DataType *> &dataTypes,
+            Asn1Acn::Definitions *definitions) const -> void;
+
+    /**
+     * @brief   Collects all data types declared in given package
+     *
+     * Gets data types from the package and those declared in the components
+     *
+     * @param   package     SEDS package
+     *
+     * @return  Vector with all data types declared in the given package
+     */
+    std::vector<const seds::model::DataType *> collectDataTypes(const seds::model::Package &package) const;
 };
 
 } // namespace conversion::asn1::translator

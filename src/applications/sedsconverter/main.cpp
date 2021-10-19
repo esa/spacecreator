@@ -62,7 +62,7 @@ int main(int argc, char **argv)
     options.add(IvOptions::outputFilename, QString("%1.iv").arg(argv[1]));
 
     try {
-        sedsConverter.convert({ ModelType::Seds }, ModelType::InterfaceView, { ModelType::Asn1 }, std::move(options));
+        sedsConverter.convert({ ModelType::Seds }, ModelType::Asn1, {}, std::move(options));
     } catch (const ImportException &ex) {
         const auto errorMessage = QString("Import failure: %1").arg(ex.errorMessage());
         qFatal("%s", errorMessage.toLatin1().constData());

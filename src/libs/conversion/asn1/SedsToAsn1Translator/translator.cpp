@@ -19,6 +19,7 @@
 
 #include "translator.h"
 
+#include "datatypesdependencyresolver.h"
 #include "visitors/datatypetranslatorvisitor.h"
 
 #include <asn1library/asn1/asn1model.h>
@@ -89,28 +90,47 @@ std::vector<std::unique_ptr<Model>> SedsToAsn1Translator::translateSedsModel(con
 
 std::unique_ptr<Asn1Acn::File> SedsToAsn1Translator::translatePackage(const seds::model::Package &package) const
 {
-    auto asn1File = std::make_unique<Asn1Acn::File>(package.nameStr());
+    std::vector<const seds::model::DataType *> dataTypes = collectDataTypes(package);
 
     auto definitions = std::make_unique<Asn1Acn::Definitions>(package.asn1NameStr(), Asn1Acn::SourceLocation());
-    translateDataTypes(package.dataTypes(), definitions.get());
+    translateDataTypes(dataTypes, definitions.get());
 
+    auto asn1File = std::make_unique<Asn1Acn::File>(package.nameStr());
     asn1File->add(std::move(definitions));
 
     return asn1File;
 }
 
 void SedsToAsn1Translator::translateDataTypes(
-        const std::vector<seds::model::DataType> &dataTypes, Asn1Acn::Definitions *definitions) const
+        const std::vector<const seds::model::DataType *> &dataTypes, Asn1Acn::Definitions *definitions) const
 {
     std::unique_ptr<Asn1Acn::Types::Type> type;
 
-    for (const auto &dataType : dataTypes) {
-        std::visit(DataTypeTranslatorVisitor { type }, dataType);
+    DataTypesDependencyResolver dependencyResolver;
+    const auto resolvedDataTypes = dependencyResolver.resolve(&dataTypes);
+
+    for (const auto *dataType : resolvedDataTypes) {
+        std::visit(DataTypeTranslatorVisitor { type }, *dataType);
 
         auto typeAssignment = std::make_unique<Asn1Acn::TypeAssignment>(
                 type->identifier(), type->identifier(), Asn1Acn::SourceLocation(), std::move(type));
         definitions->addType(std::move(typeAssignment));
     }
+}
+
+std::vector<const seds::model::DataType *> SedsToAsn1Translator::collectDataTypes(
+        const seds::model::Package &package) const
+{
+    const auto func = [](const auto &dataType) { return &dataType; };
+
+    std::vector<const seds::model::DataType *> dataTypes;
+
+    std::transform(package.dataTypes().begin(), package.dataTypes().end(), std::back_inserter(dataTypes), func);
+    for (const auto &component : package.components()) {
+        std::transform(component.dataTypes().begin(), component.dataTypes().end(), std::back_inserter(dataTypes), func);
+    }
+
+    return dataTypes;
 }
 
 } // namespace conversion::asn1::translator

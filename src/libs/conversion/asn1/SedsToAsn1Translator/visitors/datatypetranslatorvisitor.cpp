@@ -68,7 +68,7 @@ overloaded(Ts...)->overloaded<Ts...>;
 void DataTypeTranslatorVisitor::operator()(const ArrayDataType &sedsType)
 {
     Q_UNUSED(sedsType);
-    qDebug() << "array";
+    throw TranslationException("ArrayDataType translation not implemented");
 }
 
 void DataTypeTranslatorVisitor::operator()(const BinaryDataType &sedsType)
@@ -94,7 +94,7 @@ void DataTypeTranslatorVisitor::operator()(const BooleanDataType &sedsType)
 void DataTypeTranslatorVisitor::operator()(const ContainerDataType &sedsType)
 {
     Q_UNUSED(sedsType);
-    qDebug() << "container";
+    throw TranslationException("ContainerDataType translation not implemented");
 }
 
 void DataTypeTranslatorVisitor::operator()(const EnumeratedDataType &sedsType)
@@ -144,7 +144,7 @@ void DataTypeTranslatorVisitor::operator()(const StringDataType &sedsType)
 void DataTypeTranslatorVisitor::operator()(const seds::model::SubRangeDataType &sedsType)
 {
     Q_UNUSED(sedsType);
-    qDebug() << "subrange";
+    throw TranslationException("SubRangeDataType translation not implemented");
 }
 
 void DataTypeTranslatorVisitor::translateIntegerEncoding(

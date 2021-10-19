@@ -1,10 +1,12 @@
 project(SedsToAsn1Translator VERSION 1.0.0 LANGUAGES CXX)
 
-set(SOURCES translator.cpp
+set(SOURCES datatypesdependencyresolver.cpp
+            translator.cpp
             visitors/datatypetranslatorvisitor.cpp
             visitors/floatrangetranslatorvisitor.cpp
             visitors/integerrangetranslatorvisitor.cpp)
-set(INCLUDES translator.h
+set(INCLUDES datatypesdependencyresolver.h
+             translator.h
              visitors/datatypetranslatorvisitor.h
              visitors/floatrangetranslatorvisitor.h
              visitors/integerrangetranslatorvisitor.h)
